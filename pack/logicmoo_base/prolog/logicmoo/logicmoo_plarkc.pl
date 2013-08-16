@@ -17,10 +17,14 @@
    set_prolog_flag(qcompile,large).
 */
 
+
+
 :- baseKB:disable_mpred_expansion.
 :- set_prolog_flag(lm_expanders,false).
 :- wdmsg("loading current_renames").
 :- load_files(pldata(current_renames),[qcompile(auto)]).
+:- wdmsg("done with rns").
+:- load_files(rs,[qcompile(auto)]).
 :- wdmsg("done with current_renames").
 :- retractall(renames(_)).
 :- baseKB:enable_mpred_expansion.
@@ -31,7 +35,7 @@
 :- set_prolog_stack(local, limit(32*10**9)).
 :- set_prolog_stack(global, limit(32*10**9)).
 
-
+:- if(false).
 :- baseKB:disable_mpred_expansion.
 :- set_prolog_flag(lm_expanders,false).
 :- if(exists_source(pldata('kb_7166.qlf'))).
@@ -45,6 +49,7 @@
 :- set_module(kb_7166:class(library)).
 :- baseKB:enable_mpred_expansion.
 :- set_prolog_flag(lm_expanders,true).
+:- endif.
 
 :- if(current_predicate(on_fin/1)).
 :- forall(call(retract,on_fin(CALL)),call(CALL)).

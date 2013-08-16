@@ -2,6 +2,7 @@
 /* * module  MUD server startup script in SWI-Prolog
 
 */
+:- set_prolog_flag(double_quotes,string).
 :- set_prolog_flag(autoload_logicmoo,false).
 :- if( \+ current_module(prolog_stack)).
 :- system:use_module(library(prolog_stack)).
@@ -25,7 +26,10 @@
 :-endif.
 
 :- user:ensure_loaded(setup_paths).
+:- set_prolog_flag(double_quotes,string).
 :- user:ensure_loaded(library(logicmoo_utils)).
+:- set_prolog_flag(double_quotes,string).
+
 % :- module(init_mud_server,[]).
 % restore entry state
 
@@ -74,7 +78,11 @@
 :- endif.
 
 :- ensure_loaded(library(prolog_server)).
-:- prolog_server(4023, [allow(_)]).
+:- getenv_safe('LOGICMOO_PORT',Was,3000),
+   WebPort is Was + 1023,
+   prolog_server(WebPort, [allow(_)]).
+
+:- http_handler('/hmud/', http_reply_from_files(pack(hMUD), []), [prefix]).
 
 :- shell('./hmud/policyd').
 
@@ -106,7 +114,7 @@ kill_unsafe_preds:-(dmsg("kill_unsafe_preds!"),w_tl(set_prolog_flag(access_level
 
 :- if(exists_source(library(eggdrop))).
 :- ensure_loaded(library(eggdrop)).
-%:- egg_go.
+:- egg_go.
 :- endif.
 %:- use_listing_vars.
 % :- [run].
@@ -153,7 +161,10 @@ kill_unsafe_preds:-(dmsg("kill_unsafe_preds!"),w_tl(set_prolog_flag(access_level
 
 % :- must((statistics(cputime,X),X<65)).  % was 52
 
-ensure_webserver_3020:- find_and_call(ensure_webserver(3020)).
+ensure_webserver_3020:- 
+   getenv_safe('LOGICMOO_PORT',Was,3000),
+   WebPort is Was + 20,
+   find_and_call(ensure_webserver(WebPort)).
 :- initialization(ensure_webserver_3020).
 :- initialization(ensure_webserver_3020,now).
 :- initialization(ensure_webserver_3020,restore).
@@ -217,12 +228,12 @@ ensure_webserver_3020:- find_and_call(ensure_webserver(3020)).
 %:- push_modules.
 % [Required] load the mud system
 % :- with_mpred_trace_exec(show_entry(gripe_time(40,ensure_loaded(prologmud(mud_loader))))).
-% :- must(show_entry(gripe_time(40,ensure_loaded(prologmud(mud_loader))))).
+:- must(show_entry(gripe_time(40,ensure_loaded(prologmud(mud_loader))))).
 %:- lmce:reset_modules.
 
 :- set_prolog_flag(logicmoo_debug,true).
 
-% :- mpred_trace_exec.
+:- mpred_trace_exec.
 :- ain(isLoaded(iSourceCode7)).
 :- mpred_notrace_exec.
 
@@ -359,7 +370,7 @@ lst :- force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
 :- assert_setting01(lmconf:eachRule_Preconditional(true)).
 :- assert_setting01(lmconf:eachFact_Preconditional(true)).
 
-:- ensure_loaded(library(parser_e2c)). 
+% UNCOMMNET :- ensure_loaded(library(parser_e2c)). 
 
 :- mpred_notrace_exec.
 

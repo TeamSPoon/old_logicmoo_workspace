@@ -65,6 +65,7 @@ quiet_all_module_predicates_are_transparent/1,
             unnumbervars/2,
             unnumbervars_and_save/2,
             qdmsg/1,
+            getenv_safe/3,
             var_to_name/3
           ]).
 
@@ -72,6 +73,10 @@ quiet_all_module_predicates_are_transparent/1,
 :- if(\+ current_predicate(system:nop/1)).
 system:nop(_).
 :- endif.
+
+getenv_safe(Name,ValueO,Default):-
+   (getenv(Name,RV)->Value=RV;Value=Default),
+    (number(Default)->( \+ number(Value) -> atom_number(Value,ValueO); Value=ValueO);(Value=ValueO)).
 
 qdmsg(M):-compound(M),functor(M,F,_),!,debug(logicmoo(F),'~q',[M]).
 qdmsg(M):-debug(logicmoo(M),'QMSG: ~q',[M]).

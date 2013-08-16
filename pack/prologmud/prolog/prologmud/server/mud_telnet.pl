@@ -90,7 +90,11 @@ sanify_thread(ID):-
 % ===========================================================
 % TELNET REPL + READER
 % ===========================================================
-start_mud_telnet_4000:- start_mud_telnet(4000),start_prolog_telnet(4002).
+start_mud_telnet_4000:- 
+   getenv_safe('LOGICMOO_PORT',Was,3000),
+   WebPort is Was + 1000,
+  start_mud_telnet(WebPort),WebPort2 is WebPort + 2,
+  start_prolog_telnet(WebPort2).
 
 start_mud_telnet(Port):- 
   must(telnet_server(Port, [allow(_ALL),get_call_pred(login_and_run_nodebug)])),!.

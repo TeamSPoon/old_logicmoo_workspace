@@ -120,58 +120,61 @@ sexpr_sterm_to_pterm_list(VAR,[VAR]).
 
 Always a S-Expression: 'WFFOut' placing variables in 'VARSOut'
 
-|?-input_to_forms("(isa a b)",Clause,Vars).
+|?-input_to_forms(`(isa a b)`,Clause,Vars).
 Clause = [isa,a,b]
 Vars = _h70
 
-| ?- input_to_forms("(isa a (b))",Clause,Vars).
+| ?- input_to_forms(`(isa a (b))`,Clause,Vars).
 Clause = [isa,a,[b]]
 Vars = _h70
 
-|?-input_to_forms("(list a b )",Clause,Vars)
+|?-input_to_forms(`(list a b )`,Clause,Vars)
 Clause = [list,a,b]
 Vars = _h70
 
-| ?- input_to_forms("(genlMt A ?B)",Clause,Vars).
+| ?- input_to_forms(`(genlMt A ?B)`,Clause,Vars).
 Clause = [genlMt,'A',_h998]
 Vars = [=('B',_h998)|_h1101]
 
-| ?- input_to_forms("(goals Iran  (not   (exists   (?CITIZEN)   (and    (citizens Iran ?CITIZEN)    (relationExistsInstance maleficiary ViolentAction ?CITIZEN)))))",Clause,Vars).
+| ?- input_to_forms(`
+ (goals Iran  (not   (exists   (?CITIZEN)   
+  (and    (citizens Iran ?CITIZEN)    (relationExistsInstance maleficiary ViolentAction ?CITIZEN)))))`,
+ Clause,Vars).
 
 Clause = [goals,Iran,[not,[exists,[_h2866],[and,[citizens,Iran,_h2866],[relationExistsInstance,maleficiary,ViolentAction,_h2866]]]]]
 Vars = [=(CITIZEN,_h2866)|_h3347]
 
-| ?- input_to_forms("
+| ?- input_to_forms(`
 (queryTemplate-Reln QuestionTemplate definitionalDisplaySentence 
        (NLPatternList 
-           (NLPattern-Exact \"can you\") 
+           (NLPattern-Exact "can you") 
            (RequireOne 
                (NLPattern-Word Acquaint-TheWord Verb) 
                (NLPattern-Word Tell-TheWord Verb)) 
            (RequireOne 
-               (NLPattern-Exact \"me with\") 
-               (NLPattern-Exact \"me what\")) 
+               (NLPattern-Exact "me with") 
+               (NLPattern-Exact "me what")) 
            (OptionalOne 
-               (WordSequence \"the term\") \"a\" \"an\") 
+               (WordSequence "the term") "a" "an") 
            (NLPattern-Template NPTemplate :THING) 
-           (OptionalOne \"is\") 
+           (OptionalOne "is" ) 
            (OptionalOne TemplateQuestionMarkMarker)) 
        (definitionalDisplaySentence :THING ?SENTENCE)) ",
  Clause,Vars).
 
-| ?- input_to_forms("
+| ?- input_to_forms(`
  (#$STemplate #$bioForProposal-short 
   (#$NLPatternList (#$NLPattern-Template #$NPTemplate :ARG1) 
-   (#$NLPattern-Exact \"short bio for use in proposals\") (#$NLPattern-Word #$Be-TheWord #$Verb) 
-      (#$NLPattern-Exact \"\\\"\") (#$NLPattern-Template #$NPTemplate :ARG2)) (#$bioForProposal-short :ARG1 :ARG2)) ",
+   (#$NLPattern-Exact "short bio for use in proposals" ) (#$NLPattern-Word #$Be-TheWord #$Verb) 
+      (#$NLPattern-Exact "") (#$NLPattern-Template #$NPTemplate :ARG2)) (#$bioForProposal-short :ARG1 :ARG2)) ",
       Clause,Vars).
 
 
-input_to_forms("
+input_to_forms(`
  (#$STemplate #$bioForProposal-short 
   (#$NLPatternList (#$NLPattern-Template #$NPTemplate :ARG1) 
-   (#$NLPattern-Exact \"short bio for use in proposals\") (#$NLPattern-Word #$Be-TheWord #$Verb) 
-      (#$NLPattern-Exact \"\") (#$NLPattern-Template #$NPTemplate :ARG2)) (#$bioForProposal-short :ARG1 :ARG2)) ",
+   (#$NLPattern-Exact "short bio for use in proposals" ) (#$NLPattern-Word #$Be-TheWord #$Verb) 
+      (#$NLPattern-Exact "") (#$NLPattern-Template #$NPTemplate :ARG2)) (#$bioForProposal-short :ARG1 :ARG2)) ",
       Clause,Vars).
 
 // ==================================================================== */
@@ -227,7 +230,6 @@ get_input_to_forms(Forms,FormsOut,Vars):-
 :- style_check(-singleton).
 :- style_check(-discontiguous).
 % :- style_check(-atom).
-:- set_prolog_flag(double_quotes, codes). 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    Parsing
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -264,22 +266,22 @@ parse_sexpr_codes(Codes, Expr) :- phrase(sexpr(Expr), Codes).
 %%  sexpr(L)// is semidet.
 %
 sexpr(L)                      --> sblank,sexpr(L).
-sexpr(L)                      --> "(", !, swhite, sexpr_list(L), swhite.
-sexpr('$VECT'(V))                 --> "#(", !, sexpr_vector(V), swhite.
-sexpr('$SYM'(t))                 --> "#t", !, swhite.
-sexpr('$SYM'(f))                 --> "#f", !, swhite.
-sexpr('$SYM'(E))              --> "#$", !, swhite, sexpr(E).
-sexpr('$CHAR'(C))                 --> "#\\", rsymbol(C), !, swhite.
-sexpr('$STR'(S))                 --> """", !, sexpr_string(S), swhite.
-sexpr(['$SYM'(quote),E])              --> "'", !, swhite, sexpr(E).
-sexpr(['$SYM'(backquote),E])         --> "`", !, swhite, sexpr(E).
-sexpr(['$SYM'(function),E])                 --> "#\'", sexpr(E), !, swhite.
-sexpr(['$BQ-COMMA-ELIPSE',E]) --> ",@", !, swhite, sexpr(E).
-sexpr('$COMMA'(E))            --> ",", !, swhite, sexpr(E).
+sexpr(L)                      --> `(`, !, swhite, sexpr_list(L), swhite.
+sexpr('$VECT'(V))                 --> `#(`, !, sexpr_vector(V), swhite.
+sexpr('$SYM'(t))                 --> `#t`, !, swhite.
+sexpr('$SYM'(f))                 --> `#f`, !, swhite.
+sexpr('$SYM'(E))              --> `#$`, !, swhite, sexpr(E).
+sexpr('$CHAR'(C))                 --> `#\\`, rsymbol(C), !, swhite.
+sexpr('$STR'(S))                 --> `"`, !, sexpr_string(S), swhite.
+sexpr(['$SYM'(quote),E])              --> `'`, !, swhite, sexpr(E).
+sexpr(['$SYM'(backquote),E])         --> [96] , !, swhite, sexpr(E).
+sexpr(['$SYM'(function),E])                 --> `#\'`, sexpr(E), !, swhite.
+sexpr(['$BQ-COMMA-ELIPSE',E]) --> `,@`, !, swhite, sexpr(E).
+sexpr('$COMMA'(E))            --> `,`, !, swhite, sexpr(E).
 sexpr('$SYM'(E))                      --> sym_or_num(E),!, swhite.
 
 sblank --> [C], {C =< 32}, swhite.
-sblank --> ";", line_comment, swhite.
+sblank --> `;`, line_comment, swhite.
 
 swhite --> sblank.
 swhite --> [].
@@ -303,23 +305,23 @@ sexprs([]) --> [].
 
 :- was_export(sexpr_list//1).
 
-sexpr_list([]) --> ")", !.
-sexpr_list(_) --> ".", [C], {\+ sym_char(C)}, !, {fail}.
+sexpr_list([]) --> `)`, !.
+sexpr_list(_) --> `.`, [C], {\+ sym_char(C)}, !, {fail}.
 sexpr_list([Car|Cdr]) --> sexpr(Car), !, sexpr_rest(Cdr).
 
-sexpr_rest([]) --> ")", !.
-sexpr_rest(E) --> ".", [C], {\+ sym_char(C)}, !, sexpr(E,C), !, ")".
+sexpr_rest([]) --> `)`, !.
+sexpr_rest(E) --> `.`, [C], {\+ sym_char(C)}, !, sexpr(E,C), !, `)`.
 sexpr_rest([Car|Cdr]) --> sexpr(Car), !, sexpr_rest(Cdr).
 
-sexpr_vector([]) --> ")", !.
+sexpr_vector([]) --> `)`, !.
 sexpr_vector([First|Rest]) --> sexpr(First), !, sexpr_vector(Rest).
 
-sexpr_string([C|S]) --> "\\", lchar(C),!, sexpr_string(S).
-sexpr_string([]) --> """", !.
+sexpr_string([C|S]) --> `\\`, lchar(C),!, sexpr_string(S).
+sexpr_string([]) --> `""`, !.
 sexpr_string([C|S]) --> lchar(C), sexpr_string(S).
 
-lchar(92) --> "\\", !.
-lchar(34) --> "\"", !.
+lchar(92) --> `\\`, !.
+lchar(34) --> `"`, !.
 lchar(N)  --> [C], {C >= 32, N is C}.
 
 rsymbol(E) --> [C], {sym_char(C)}, sym_string(S), {string_to_atom([C|S],E)}.
@@ -331,8 +333,8 @@ sym_string([H|T]) --> [H], {sym_char(H)}, sym_string(T).
 sym_string([]) --> [].
 
 snumber(N) --> unsigned_number(N).
-snumber(N) --> "-", unsigned_number(M), {N is -M}.
-snumber(N) --> "+", unsigned_number(N).
+snumber(N) --> `-`, unsigned_number(M), {N is -M}.
+snumber(N) --> `+`, unsigned_number(N).
 
 unsigned_number(N) --> cdigit(X), unsigned_number(X,N).
 unsigned_number(N,M) --> cdigit(X), {Y is N*10+X}, unsigned_number(Y,M).
@@ -789,27 +791,27 @@ if_script_file_time(X):-if_startup_script_local(time(X)).
 if_startup_script_local(_).
 
 % Append:
-    :- if_script_file_time(run("
+    :- if_script_file_time(run(`
         (defun append (x y)
           (if x
               (cons (car x) (append (cdr x) y))
             y))
 
-        (append '(a b) '(3 4 5))"
+        (append '(a b) '(3 4 5))`
 )).
 
     %@ V = [append, [a, b, 3, 4, 5]].
     
 
 % Fibonacci, naive version:
-    :- if_script_file_time(run("
+    :- if_script_file_time(run(`
         (defun fib (n)
           (if (= 0 n)
               0
             (if (= 1 n)
                 1
               (+ (fib (- n 1)) (fib (- n 2))))))
-        (fib 24)"
+        (fib 24)`
 )).
 
     %@ % 14,255,802 inferences, 3.71 CPU in 3.87 seconds (96% CPU, 3842534 Lips)
@@ -817,7 +819,7 @@ if_startup_script_local(_).
     
 
 % Fibonacci, accumulating version:
-    :- if_script_file_time(run("
+    :- if_script_file_time(run(`
         (defun fib (n)
           (if (= 0 n) 0 (fib1 0 1 1 n)))
 
@@ -826,7 +828,7 @@ if_startup_script_local(_).
               f2
             (fib1 f2 (+ f1 f2) (+ i 1) to)))
 
-        (fib 250)"
+        (fib 250)`
 )).
 
     %@ % 39,882 inferences, 0.010 CPU in 0.013 seconds (80% CPU, 3988200 Lips)
@@ -834,7 +836,7 @@ if_startup_script_local(_).
     
 
 % Fibonacci, iterative version:
-    :- if_script_file_time(run("
+    :- if_script_file_time(run(`
         (defun fib (n)
           (setq f (cons 0 1))
           (setq i 0)
@@ -843,7 +845,7 @@ if_startup_script_local(_).
             (setq i (+ i 1)))
           (car f))
 
-        (fib 350)"
+        (fib 350)`
 )).
 
     %@ % 34,233 inferences, 0.010 CPU in 0.010 seconds (98% CPU, 3423300 Lips)
@@ -851,7 +853,7 @@ if_startup_script_local(_).
     
 
 % Higher-order programming and eval:
-    :- if_startup_script_local(run("
+    :- if_startup_script_local(run(`
         (defun map (f xs)
           (if xs
               (cons (eval (list f (car xs))) (map f (cdr xs)))
@@ -860,7 +862,7 @@ if_startup_script_local(_).
         (defun plus1 (x) (+ 1 x))
 
         (map 'plus1 '(1 2 3))
-        "
+        `
         )).
 
     %@ V = [map, plus1, [2, 3, 4]].

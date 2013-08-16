@@ -157,7 +157,7 @@ cyckb_t_e2c(P,A,B,C):-  maplist(do_renames_e2c,[P,A,B,C],[P1,A1,B1,C1]),!,call_u
 
 % idGen(X):-flag(idGen,X,X+1).
 
-:- ensure_loaded(logicmoo(mpred/mpred_loader)).
+%:- ensure_loaded(logicmoo(mpred/mpred_loader)).
 
 % :- file_begin(pl).
 

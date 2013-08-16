@@ -397,7 +397,7 @@ ttModule(tSourceData,mudToCyc('PropositionalInformationThing'),comment("Source d
 prologHybrid(isLoadedType(ttModule),pfcControlled).
 prologHybrid(isLoaded(tMicrotheory),pfcControlled).
 
-isLoaded(Thing),isa(Thing,ModType)==> isLoadedType(ModType).
+isLoaded(Thing),isa(Thing,ModType), \+ ttExpressionType(ModType) ==> isLoadedType(ModType).
 
 pfcControlled(prologArity(tRelation,ftInt)).
 pfcControlled(isa(ftTerm,tCol)).
@@ -707,8 +707,8 @@ genls(tSpatialThing,tTemporalThing).
 tSet(ttTypeFacet).
 tCol(tAvoidForwardChain, comment("tAvoidForwardChain means that backchain is required for subclasses to gain membership TODO: Give example ")).
 % genls(ttExpressionType,tAvoidForwardChain).
-isa('Thing',tAvoidForwardChain).
-isa('CycLTerm',tAvoidForwardChain).
+isa('tThing',tAvoidForwardChain).
+%isa('CycLTerm',tAvoidForwardChain).
 ==>prologHybrid(quotedIsa(ftTerm,ttExpressionType)).
 :- kb_dynamic(quotedIsa/2).
 
@@ -724,9 +724,8 @@ isa('CycLTerm',tAvoidForwardChain).
 % isa(I,C):- cwc, when(?=(I,C),\+ clause_b(isa(I,C))), (loop_check(visit_pred(I,C))*->true;loop_check(no_repeats(isa_backchaing(I,C)))).
 %isa(I,C):- cwc, loop_check(visit_pred(I,C)).
 %isa(I,C):- cwc, loop_check(visit_isa(I,C)).
-isa(I,C):- cwc, no_repeats(loop_check(isa_0(I,C))).
-isa_0(I,C):- cwc, isa_backchaing(I,C).
-isa_0(I,C):- cwc, call_u(isa(I,C)).
+isa(I,C):- cwc, no_repeats(loop_check((make_never_ft(C),(isa_backchaing(I,C);call_u(isa(I,C)))))).
+make_never_ft(C):- ignore((var(C),\+ attvar(C),freeze(C, \+ (atom(C),atom_concat('ft',_,C))))).
 
 quotedIsa(I,C):- cwc, term_is_ft(I,C).
 
