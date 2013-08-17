@@ -20,16 +20,25 @@
 % attack joe ->translates-> attack nw
 vtActionTemplate(actAttack(vtDirection)).
 
+% check to make sure the canonicalizer left the compound..
+:- sanity(clause(baseKB:vtActionTemplate(actAttack(vtDirection)),true)).
+% instead of replacing with..
+:- sanity( \+ clause(baseKB:vtActionTemplate(actAttack),true)).
+
+
+
+agent_call_command(Agent,actAttack(Dir)):- once(actAttack(Agent,Dir)).
+
 % Attack
 % Successful Attack
-agent_call_command(Agent,actAttack(Dir)) :-	
+actAttack(Agent,Dir) :-	
 	from_dir_target(Agent,Dir,XXYY),
 	mudAtLoc(What,XXYY),
 	damage_foe(Agent,What,hit),
 	call_update_charge(Agent,actAttack).
 
 % Destroy small objects (food, etc.)
-agent_call_command(Agent,actAttack(Dir)) :-	
+actAttack(Agent,Dir) :-	
 	from_dir_target(Agent,Dir,XXYY),
 	mudAtLoc(What,XXYY),	
 	props(What,mudWeight(Was)),
@@ -38,7 +47,7 @@ agent_call_command(Agent,actAttack(Dir)) :-
 	call_update_charge(Agent,actAttack).
 
 % Hit a big object... causes damage to agent attacking
-agent_call_command(Agent,actAttack(Dir)) :-	
+actAttack(Agent,Dir) :-	
 	from_dir_target(Agent,Dir,XXYY),
 	mudAtLoc(What,XXYY),
 	props(What,mudWeight(_)),
@@ -46,7 +55,7 @@ agent_call_command(Agent,actAttack(Dir)) :-
 	call_update_charge(Agent,actAttack).
 
 % Hit nothing (empty space)... causes a little damage
-agent_call_command(Agent,actAttack(Dir)) :-
+actAttack(Agent,Dir) :-
 	from_dir_target(Agent,Dir,XXYY),
 	not(mudAtLoc(_,XXYY)),
 	call_update_stats(Agent,wiff),

@@ -17,8 +17,8 @@
 % ====================================================
 action_info(actStats(isOptional(tObj,isSelfAgent)), "Examine MUD stats of something").
 
-tCol(tStatPred).
-tStatPred(isEach(
+tCol(rtStatPred).
+rtStatPred(isEach(
          mudEnergy,
          mudStr,
          mudStm, % stamina
@@ -28,7 +28,7 @@ tStatPred(isEach(
 
 
 agent_call_command(_Agent,actStats(What)):-
-  findall(Pred, (tStatPred(Stat),Pred=..[Stat,What,value]),Stats),
+  findall(Pred, (rtStatPred(Stat),Pred=..[Stat,What,value]),Stats),
    sort(Stats,StatsS),
    show_kb_preds(What,StatsS),!.
    %xlisting(What),!.

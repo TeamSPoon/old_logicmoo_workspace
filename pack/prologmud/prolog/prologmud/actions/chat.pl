@@ -33,9 +33,9 @@ chat_to_callcmd(Agent,Say,What,CMD):-append(Text,[to,Whom],What),!,chat_command_
 % say some text
 chat_to_callcmd(Agent,Say,What,CMD):-mudAtLoc(Agent,Where),chat_command_parse_2(Agent,Say,Where,What,CMD).
 
-chat_command_parse_2(Agent,Say,Where,What,actProlog(do_social(Agent,Say,Where,What))).
+chat_command_parse_2(Agent,Say,Where,What,actProlog(actSocial(Agent,Say,Where,What))).
 
-do_social(Agent,Say,Whom,Text):-
+actSocial(Agent,Say,Whom,Text):-
    mudAtLoc(Agent,Where),
    asInvoked(Cmd,[Say,Agent,Whom,Text]),
    raise_location_event(Where,actNotice(reciever,Cmd)).

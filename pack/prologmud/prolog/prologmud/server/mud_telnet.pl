@@ -235,9 +235,9 @@ deregister_player_stream_local(P,In,Out):-
 
 check_console(Id,In,Out,Err):-
     (thread_self(main)->get_main_thread_error_stream(Err); Err=Out),
-     (thread_util:has_console(Id,In, Out,Err)->true;
-       ((retractall(thread_util:has_console(Id,_,_,_)),
-          asserta(thread_util:has_console(Id,In,Out,Err))))).
+     (call(call,thread_util:has_console(Id,In, Out,Err))->true;
+       ((call(retractall,thread_util:has_console(Id,_,_,_)),
+          call(asserta,thread_util:has_console(Id,In,Out,Err))))).
 
 
 :-export(enqueue_session_action/3).
@@ -249,25 +249,25 @@ enqueue_session_action(A,L,S):- show_call(must(find_and_call(enqueue_agent_actio
 setup_streams:-
   get_session_io(In,Out),
   setup_streams(In, Out),
-  listing(thread_util:has_console/4).
+  call(listing,thread_util:has_console/4).
 
 setup_streams(In, Out):- thread_self(main),!,
    set_prolog_flag(color_term,true),
    set_prolog_flag(tty_control, true),
    stream_property(Err,alias(user_error)),set_stream(Err,alias(current_error)),
-   retractall(thread_util:has_console(Id, _, _, _)),
-   asserta(thread_util:has_console(Id, In, Out, Err)).
+   call(retractall,thread_util:has_console(Id, _, _, _)),
+   call(asserta,thread_util:has_console(Id, In, Out, Err)).
 
 setup_streams(In,Out):-
   call_u((must_det_l((
    thread_self(Id),
-   thread_at_exit(retractall(thread_util:has_console(Id, _, _, _))),
+   thread_at_exit(call(retractall,thread_util:has_console(Id, _, _, _))),
    set_prolog_flag(color_term,true),
    set_stream(In, tty(true)),
    set_prolog_IO(In, Out, Out),
    stream_property(user_error,file_no(N)),quintus:current_stream(N,write,Err),
-   retractall(thread_util:has_console(Id, _, _, _)),
-   asserta(thread_util:has_console(Id, In, Out, Err)),
+   call(retractall,thread_util:has_console(Id, _, _, _)),
+   call(asserta,thread_util:has_console(Id, In, Out, Err)),
    set_stream(Err,alias(user_error)), % set_stream(Err,alias(current_error)),
    set_stream(In, close_on_exec(false)),
    set_stream(Out, close_on_exec(false)),
@@ -611,7 +611,7 @@ call_close_and_detatch(In, Out, Id, Call):-
 
 
 close_connection(In, Out) :-
-        retractall(thread_util:has_console(_,In,Out,_)),
+        call(retractall,thread_util:has_console(_,In,Out,_)),
         ignore(catch(close(In, [force(true)]),_,true)),
         ignore(catch(close(Out, [force(true)]),_,true)).
 

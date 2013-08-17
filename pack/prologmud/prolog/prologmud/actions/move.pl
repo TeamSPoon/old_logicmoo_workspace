@@ -26,7 +26,9 @@ agent_text_command(Agent,[DirSS],Agent,OUT):-nonvar(DirSS), show_call(coerce(Dir
 
 agent_call_command(Agnt,Cmd):- compound(Cmd),functor(Cmd,actMove,_),!,must(move_command(Agnt,Cmd)).
 
-action_info(actMove(isOptional(ftNumber,1),vtDirection),"Move [n=1] distance in direction").
+action_info(actMove(isOptional(ftNumber,1),vtDirection),"Move [1] south % distance in direction").
+
+verb_alias("go",actMove).
 
 /*
 % dir###

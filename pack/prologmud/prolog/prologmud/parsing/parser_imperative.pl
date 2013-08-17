@@ -11,6 +11,7 @@
 */
 :- include(prologmud(mud_header)).
 
+:- set_prolog_flag(logicmoo_virtualize,true).
 
 :-export((
                    parse_agent_text_command/5,            
@@ -239,9 +240,10 @@ match_object_1(A,Obj):-same_ci(A,Obj),!.
 match_object_1(A,Obj):-isa(Obj,Type),same_ci(A,Type),!.
 
 :-nodebug(logicmoo(parser)).
+:-debug(logicmoo(parser)).
 
 % dmsg_parserm(D):-dmsg(D),!.
-dmsg_parserm(D):- dmsg(parser,D).
+dmsg_parserm(D):- dmsg_parserm('~N~q~n',[D]).
 dmsg_parserm(F,A):-ignore((debugging_logicmoo(logicmoo(parser)),dmsg(F,A))).
 
 
@@ -656,7 +658,7 @@ parseIsaMost(List,Term) --> parseIsa(isAnd(List),Term),{!}.
 
 coerce_hook(A,B,C):- var(A),!,freeze(A,coerce_hook(A,B,C)).
 coerce_hook(A,B,C):- to_arg_value(A,AStr)->isa(AStr,B)->A=C.
-coerce_hook(AStr,B,C):- any_to_string(AStr,A), no_repeats(C,(coerce0(A,B,C0),to_arg_value(C0,C))),(show_failure(isa(C,B))->!;true).
+coerce_hook(AStr,B,C):- any_to_string(AStr,A), no_repeats(C,(coerce0(A,B,C0),to_arg_value(C0,C))),(show_failure(ereq(isa(C,B)))->!;true).
 
 coerce0(String,Type,Inst):- var(Type),!,trace_or_throw(var_specifiedItemType(String,Type,Inst)).
 coerce0(String,Type,Inst):- var(String),!,instances_of_type(Inst,Type),name_text(Inst,String).

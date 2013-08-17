@@ -265,7 +265,7 @@ ttTypeType(ttItemType).
 tSet(tItem).
 typeGenls(ttItemType,tItem).
 typeGenls(ttObjectType,tObj).
-typeGenls(ttPredType,tPred).
+typeGenls(ttRelationType,tPred).
 typeGenls(ttRegionType,tRegion).
 typeGenls(ttSpatialType,tSpatialThing).
 % :- break.
@@ -293,16 +293,16 @@ disjointWith(tObj,tRegion).
 disjointWith(ttSpatialType,ttAbstractType).
 
 
-ptBinaryPredicate(arity).
+rtBinaryPredicate(arity).
 
-%ptBinaryPredicate(Pred) ==> arity(Pred,2),tPred(Pred).
-%arity(Pred,2),tPred(Pred) ==> ptBinaryPredicate(Pred).
+%rtBinaryPredicate(Pred) ==> arity(Pred,2),tPred(Pred).
+%arity(Pred,2),tPred(Pred) ==> rtBinaryPredicate(Pred).
 
-% () <==> ptBinaryPredicate(Pred).
-prologHybrid(relationMostInstance(ptBinaryPredicate,tCol,vtValue)).
-%relationMostInstance(BP,_,_)==>(ptBinaryPredicate(BP),ptRolePredicate(BP)).
-prologHybrid(relationAllInstance(ptBinaryPredicate,tCol,vtValue)).
-relationAllInstance(BP,_,_)==>ptBinaryPredicate(BP).
+% () <==> rtBinaryPredicate(Pred).
+prologHybrid(relationMostInstance(rtBinaryPredicate,tCol,vtValue)).
+%relationMostInstance(BP,_,_)==>(rtBinaryPredicate(BP),rtRolePredicate(BP)).
+prologHybrid(relationAllInstance(rtBinaryPredicate,tCol,vtValue)).
+relationAllInstance(BP,_,_)==>rtBinaryPredicate(BP).
 
 
 % (isa(Inst,Type), tCol(Inst)) ==> isa(Type,ttTypeType).
@@ -343,7 +343,7 @@ formatted_resultIsa(ftDiceFn(ftInt,ftInt,ftInt),ftInt).
 
 %  tCol(prologMacroHead).
 % tCol(ArgsIsa):-mpred_is_trigger(ArgsIsa).
-% tCol(ArgsIsa):-ttPredType(ArgsIsa).
+% tCol(ArgsIsa):-ttRelationType(ArgsIsa).
 % TODO decide if OK
 %(mpred_prop(_,meta_argtypes(ArgTypes)),{is_declarations(ArgTypes)}) ==> meta_argtypes(ArgTypes).
 %tCol(F):-t(functorDeclares,F).
@@ -524,7 +524,7 @@ tCol(vtVerb).
 %:- compile_predicates([isa/2]).
 %prologHybrid(repl_to_string(tAgent,term),[prologSingleValued,argSingleValueDefault(2,default_repl_obj_to_string)]).
 % prologHybrid(repl_writer(tAgent,term),[prologSingleValued,argSingleValueDefault(2,default_repl_writer)]).
-%:- forall(ttPredType(F),dynamic(F/1)).
+%:- forall(ttRelationType(F),dynamic(F/1)).
 %:- foreach(retract(isa(I,C)),assert_hasInstance(C,I)).
 %isa(AT,ttAgentType):- genls(AT,ttAgentGeneric).
 %genls(AT,ttAgentGeneric):- isa(AT,ttAgentType).
@@ -626,14 +626,14 @@ vtValue(Val)/(atom(Val),i_name_lc(Val,KW))==>mudKeyword(Val,KW).
 ttPredAndValueType(Str)/
   (i_name('mud',Str,Pred),
   i_name('vt',Str,VT)) ==> 
-    (ptRolePredicate(Pred),
+    (rtRolePredicate(Pred),
      ttValueType(VT),
       mudKeyword(VT,Str),mudKeyword(Pred,Str),
       argIsa(Pred,2,VT),
       argIsa(Pred,1,tTemporalThing)).
 
-%relationMostInstance(arg1Isa,ptRolePredicate,tTemporalThing).
-%relationMostInstance(arg2QuotedIsa,ptRolePredicate,ftTerm).
+%relationMostInstance(arg1Isa,rtRolePredicate,tTemporalThing).
+%relationMostInstance(arg2QuotedIsa,rtRolePredicate,ftTerm).
 
 % mudKeyword(W,R) <= {atom(W),i_name_lc(W,R)}.
 
@@ -974,7 +974,7 @@ tCol(genlsInheritable).
 :-dynamic(genlsInheritable/1).
 
 genlsInheritable(tCol).
-genlsInheritable(ttPredType).
+genlsInheritable(ttRelationType).
 :-must(ain((genls(ttTypeType,genlsInheritable)))).
 
 :- dynamic(nearestIsa/2).
@@ -1095,7 +1095,7 @@ completelyAssertedCollection(cachedPredicate).
 
 argsQuoted(cachedPredicate).
 
-ttPredType(cachedPredicate).
+ttRelationType(cachedPredicate).
 cachedPredicate(P)/predicate_to_goal(P,Goal)==>{forall(call_u(Goal),ain(Goal))}.
 
 cachedPredicate(vtActionTemplate(_)).
@@ -1242,15 +1242,15 @@ prologBuiltin(onEachLoad/0).
 argsQuoted(onEachLoad).
 argsQuoted(must).
 
-tCol(tStatPred).
+tCol(rtStatPred).
 
-prologHybrid(normalAgentGoal(tStatPred,ftTerm)).
+prologHybrid(normalAgentGoal(rtStatPred,ftTerm)).
 
-(tStatPred(Pred)==>(ptRolePredicate(Pred),arity(Pred,2),singleValuedInArg(Pred,2))).
+(rtStatPred(Pred)==>(rtRolePredicate(Pred),arity(Pred,2),singleValuedInArg(Pred,2))).
 
 :- ain(((normalAgentGoal(Pred,N)/atom(Pred) ==>
  ({AT=..[Pred,tAgent,ftPercent]},{kb_dynamic(Pred,2)},
-     meta_argtypes(AT),argSingleValueDefault(Pred,2,N),prologHybrid(Pred),tStatPred(Pred))))).
+     meta_argtypes(AT),argSingleValueDefault(Pred,2,N),prologHybrid(Pred),rtStatPred(Pred))))).
 
 
 normalAgentGoal(mudEnergy,90).
@@ -1281,6 +1281,16 @@ normalAgentGoal(Pred,Val) ==>  ( t(Pred,A,V)/(V<Val) ==> agentGOAL(A,t(Pred,A,Va
 normalAgentGoal(Pred,Val)==>  (tAgent(A)==>mdefault(t(Pred,A,Val))).
 
 genls(tRoom,tRegion).
+
+
+
+vtActionTemplate(actImprove(rtStatPred)).
+
+% check to make sure the canonicalizer left the compound..
+:- sanity(clause(baseKB:vtActionTemplate(actImprove(rtStatPred)),true)).
+% instead of replacing with..
+:- sanity( \+ clause(baseKB:vtActionTemplate(actImprove),true)).
+
 
 :- set_prolog_flag(dialect_pfc,false).
 
