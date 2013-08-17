@@ -181,6 +181,7 @@ base_clause_expansion(_,I,O):- string(I),!,expand_kif_string_or_fail(pl_te,I,O),
 
 base_clause_expansion(P1,end_of_file,O):- !, prolog_load_context(module,Module),mpred_te(term,Module,end_of_file,P1,O,_P2),!,fail.
 base_clause_expansion(_,':-'(ain_expanded(I)),':-'(ain_expanded(I))):-!.
+base_clause_expansion(_,':-'(ain(I)),':-'(ain(I))):-!.
 base_clause_expansion(_,:-(I), O):-  !, expand_isEach_or_fail(:-(I),O),!.
 base_clause_expansion(_,I, O):- get_consequent_functor(I,F,A),base_clause_expansion_fa(I,O,F,A).
 base_clause_expansion(_,I, O):- expand_isEach_or_fail(I,O),!.
@@ -294,3 +295,20 @@ system:term_expansion(I,PosI,O,PosI):- current_prolog_flag(lm_expanders,true),no
 :- ensure_loaded(library(logicmoo/pfc/'system_base.pfc')).
 
 :- set_prolog_flag(read_attvars,false).
+
+:- sanity((clause(baseKB:ignore_file_mpreds(_),B),compound(B))).
+
+/*
+
+:- set_prolog_flag(retry_undefined,true).
+
+:- noguitracer.
+:- call(call,(trace,call(call,(dmiles:mpred_ain(fooaosdasd,(cuz,ax)))))).
+
+:- break.
+:- rtrace(uses_predicate(dmiles:mpred_ain/2,O)).
+:- break.
+
+:- set_prolog_flag(retry_undefined,false).
+
+*/

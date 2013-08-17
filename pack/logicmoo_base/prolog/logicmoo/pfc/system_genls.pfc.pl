@@ -50,6 +50,8 @@ col_as_unary(functorDeclares).
 genls(completelyAssertedCollection,tSet).
 
 isa(I,ttPredType):-I==col_as_unary,!,fail.
+isa(I,ttRelationType):-I==col_as_unary,!,fail.
+isa(I,ttRelationType):-I==col_as_isa,!,fail.
 isa(I,C):- functorDeclares==C, I== (==>) ,!,fail.
 isa(I,C):- cwc, atom(C),loop_check((col_as_unary(C);\+col_as_isa(C))),loop_check(isa_w_type_atom(I,C)).
 

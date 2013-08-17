@@ -286,9 +286,10 @@ type_prefix(fn,tFunction).
 type_prefix(mud,tMudPred).
 type_prefix(mud,tPred).
 type_prefix(prop,tPred).
-type_prefix(prolog,ttPredType).
-type_prefix(pfc,ttPredType).
-type_prefix(pt,ttPredType).
+type_prefix(prolog,ttRelationType).
+type_prefix(pfc,ttRelationType).
+type_prefix(rt,ttRelationType).
+type_prefix(pt,ttRelationType).
 type_prefix(ft,ttExpressionType).
 type_prefix(pred,tPred).
 type_prefix(macro,ttMacroType).
@@ -466,7 +467,7 @@ transitive_P_r_l(DB,P,L,R):-ground(L:R),call_u_t(DB,P,A3,R),call_u_t(DB,P,A2,A3)
 % If Is A Known True.
 %
 is_known_true(C):-has_free_args(C),!,trace_or_throw(has_free_args(is_known_true,C)).
-is_known_true(isa(tPred, ttPredType)).
+is_known_true(isa(tPred, ttRelationType)).
 is_known_true(F):-is_known_false0(F),!,fail.
 is_known_true(F):-is_known_trew(F),!.
 %is_known_true(isa(G,tTemporalThing)):- a(_,G),not_mud_isa(G,tCol),not_mud_isa(G,tPred).
@@ -494,7 +495,7 @@ is_known_trew(genls(ttExpressionType,tCol)).
 is_known_trew(genls(ttExpressionType,ttNotTemporalType)).
 is_known_trew(genls(meta_argtypes,tRelation)).
 is_known_trew(genls(tFunction,tRelation)).
-is_known_trew(genls(F,tPred)):-a(ttPredType,F).
+is_known_trew(genls(F,tPred)):-a(ttRelationType,F).
 is_known_trew(isa(_,_)):-fail.
 is_known_trew(disjointWith(A,B)):-disjointWithT(A,B).
 
@@ -622,9 +623,9 @@ baseKB:prologBuiltin(not_mud_isa/3).
 not_mud_isa0(I,T):-(is_ftVar(I);is_ftVar(T)),trace_or_throw(var_not_mud_isa(I,T)).
 not_mud_isa0(I,_):- is_sk_unit(I),!,fail.
 not_mud_isa0(ttTypeByAction,ttTypeByAction).
-not_mud_isa0(meta_argtypes,ttPredType).
-not_mud_isa0(isa,ttPredType).
-not_mud_isa0(props,ttPredType).
+not_mud_isa0(meta_argtypes,ttRelationType).
+not_mud_isa0(isa,ttRelationType).
+not_mud_isa0(props,ttRelationType).
 not_mud_isa0(F, functorDeclares):- \+ (clause_asserted(functorDeclares(F))).
 not_mud_isa0(actGossup,tChannel).
 not_mud_isa0(_, blah):-!.
@@ -702,7 +703,7 @@ baseKB:prologBuiltin(isa_asserted/2).
 % type  (isa/2).
 %
 type_isa(Type,ttTemporalType):-arg(_,vv(tAgent,tItem,tObj,tRegion),Type),!.
-type_isa(ArgIsa,ttPredType):-a(ttPredType,ArgIsa),!.
+type_isa(ArgIsa,ttRelationType):-a(ttRelationType,ArgIsa),!.
 type_isa(ftString,ttExpressionType):-!.
 type_isa(Type,ttExpressionType):-chk_ft(Type),!. % text
 %  from name
@@ -825,7 +826,7 @@ isa_asserted_0(I,C):- (atom(I);atom(C)),type_isa(I,C).
 
 isa_asserted_0(I,C):- var(C),!,tCol_gen(C),nonvar(C),isa_asserted_0(I,C).
 isa_asserted_0(I,C):- sanity(tCol(C)), call_u(mpred_univ(C,I,CI)),call_u(CI).
-isa_asserted_0(ttPredType, completelyAssertedCollection):-!.
+isa_asserted_0(ttRelationType, completelyAssertedCollection):-!.
 isa_asserted_0(I,_):- nonvar(I),sanity(\+ is_ftVar(I)), clause_b(completeIsaAsserted(I)),!,fail.
 isa_asserted_0(_,C):- sanity(\+ is_ftVar(C)), clause_b(completelyAssertedCollection(C)),!,fail.
 % isa_asserted_0(I,C):-  not_mud_isa(I,C),!,fail.
@@ -844,7 +845,7 @@ isa_asserted_0(I,C):- isa_asserted_compound(I,C).
 %  (isa/2) asserted  Secondary Helper.
 %
 
-%isa_asserted_compound(I,T):- a(ttPredType,T),!,cheaply_u(isa(I,T)).
+%isa_asserted_compound(I,T):- a(ttRelationType,T),!,cheaply_u(isa(I,T)).
 isa_asserted_compound(I,T):- \+ compound(T),!, isa_w_type_atom(I,T).
 %isa_asserted_compound(_,T):- a(completelyAssertedCollection,T),!,fail.
 %isa_asserted_compound(I,T):- append_term(T,I,HEAD),ruleBackward(HEAD,BODY),call_mpred_body(HEAD,BODY).
@@ -1136,7 +1137,7 @@ assert_isa_rev(T,I):- hotrace(chk_ft(T)),(is_ftCompound(I)->dmsg(once(dont_asser
 % assert_isa_hooked(I,T):- motel:defconcept(I,isAnd([lexicon,T])).
 % assert_isa_hooked(I,T):- motel:defprimconcept(I,T).
 % assert_isa_hooked(I,T):-dmsg((told(assert_isa(I,T)))).
-% TODO assert_isa(F,T):-a(ttPredType,T),!,decl_mpred(F,T).
+% TODO assert_isa(F,T):-a(ttRelationType,T),!,decl_mpred(F,T).
 % TODO assert_isa_rev(T,I):- ttTemporalType(T),!,assert_isa(I,T).
 % TODO assert_isa_rev(T,I):- assert_isa(I,T).
 % one of 4 special cols
@@ -1237,7 +1238,7 @@ end_of_file.
 :- meta_predicate assert_isa_hooked(?,1).
 
 assert_isa_hooked(A,_):-retractall(a(cache_I_L,isa,A,_)),fail.
-assert_isa_hooked(F,T):- a(ttPredType,T),decl_mpred(F,T),fail.
+assert_isa_hooked(F,T):- a(ttRelationType,T),decl_mpred(F,T),fail.
 assert_isa_hooked(I,T):- assert_isa(I,T).
 assert_isa_hooked(I,T):-  \+ (ground(assert_isa(T))),!, trace_or_throw( \+ (ground(assert_isa(I,T)))).
 assert_isa_hooked(I,T):- assert_hasInstance(T,I),fail.
@@ -1266,7 +1267,7 @@ assert_isa_hooked(food5,tWeapon):-trace_or_throw(assert_isa(food5,tWeapon)).
 %
 % assert  (isa/2) hooked after.
 %
-assert_isa_hooked_after(F,T):-a(ttPredType,T),!,decl_mpred(F,T).
+assert_isa_hooked_after(F,T):-a(ttRelationType,T),!,decl_mpred(F,T).
 assert_isa_hooked_after(_,tCol):-!.
 assert_isa_hooked_after(_,ttExpressionType):-!.
 %assert_isa_hooked_after(I,T):- ttTemporalType(T),!,assert_isa_hooked_creation(I,T).
@@ -1308,7 +1309,7 @@ baseKB:module_local_init(_UserModule,_SystemModule):-
 %mpred_term_expansion(G,GO):-  \+ t_l:disable_px,was_isa(G,I,C),GO=isa(I,C).
 
 baseKB:module_local_init(_UserModule,SystemModule):-ain(SystemModule:tCol(tCol)).
-baseKB:module_local_init(_UserModule,SystemModule):-ain(SystemModule:tCol(ttPredType)).
+baseKB:module_local_init(_UserModule,SystemModule):-ain(SystemModule:tCol(ttRelationType)).
 
 call_u_t(DB,P,L,A1,A2):-call_u(call(DB,P,L,A1,A2)).
 call_u_t(DB,P,L,A1):-call_u(call(DB,P,L,A1)).

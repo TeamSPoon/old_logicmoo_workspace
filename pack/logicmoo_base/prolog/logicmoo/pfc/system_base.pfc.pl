@@ -300,6 +300,8 @@ arity(quasiQuote,1).
 
 quasiQuote('QuoteFn').
 
+argsQuoted(argsQuoted).
+
 argsQuoted('loop_check_term').
 argsQuoted('loop_check_term_key').
 argsQuoted('QuoteFn').
@@ -319,6 +321,8 @@ argsQuoted(member).
 argsQuoted(=..).
 argsQuoted({}).
 argsQuoted(second_order).
+argsQuoted(ftSpec).
+argsQuoted(vtActionTemplate).
 % argsQuoted((':-')).
 
 :- dynamic((==>)/2).

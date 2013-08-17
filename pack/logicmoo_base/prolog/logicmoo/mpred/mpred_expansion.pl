@@ -183,7 +183,7 @@
 
 :- use_module(library(apply)).
 %= :- shared_multifile(was_chain_rule/1).
-%= :- shared_multifile(baseKB:ptReformulatorDirectivePredicate/1).
+%= :- shared_multifile(baseKB:rtReformulatorDirectivePredicate/1).
 %= :- shared_multifile(props/2).
 
 :- dynamic(baseKB:col_as_isa/1).
@@ -290,7 +290,7 @@ disabled a(T,I):- rdf_x(I,rdf:type,T).
 %
 :- meta_predicate a(+,?).
 % WANT (but will loop) a(C,I):- !, quietly((atom(C),G=..[C,I], no_repeats_old(call_u(G)))).
-a(C,I):- quietly((atom(C),G=..[C,I], no_repeats_old(lookup_u(G)))).
+a(C,I):- quietly((atom(C),current_predicate(C/1), G=..[C,I], no_repeats_old(lookup_u(G)))).
 
 
 %=  :- was_export(alt_calls/1).
@@ -402,7 +402,7 @@ functor_declares_instance_0(tFunction,tFunction).
 functor_declares_instance_0(P,tPred):- arg(_,s(tPred,prologMultiValued,mpred_isa,mpred_isa,
        prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,prologSideEffects,
        predCanHaveSingletons,prologBuiltin,prologKIF,prologDynamic,prologMacroHead,prologListValued,prologSingleValued),P).
-functor_declares_instance_0(P,tPred):-isa_from_morphology(P,ttPredType).
+functor_declares_instance_0(P,tPred):-isa_from_morphology(P,ttRelationType).
 functor_declares_instance_0(P,tFunction):-isa_from_morphology(P,ftFunctional).
 functor_declares_instance_0(P,tFunction):-isa_from_morphology(P,O)->O=tFunction.
 
@@ -410,7 +410,7 @@ functor_declares_instance_0(P,tCol):- arg(_,s(tCol,ftSpec),P).
 functor_declares_instance_0(P,P):- arg(_,s(ttExpressionType,ttModule,tSet,tFunction),P).
 functor_declares_instance_0(P,P):- cheaply_u(functorDeclares(P)). % arity(P,1),\+((arity(P,N),N>1)).
 %functor_declares_instance_0(COL,COL):- call_u(isa(COL,tCol)).
-%functor_declares_instance_0(P,tPred):-isa_asserted(P,ttPredType),!.
+%functor_declares_instance_0(P,tPred):-isa_asserted(P,ttRelationType),!.
 %functor_declares_instance_0(P,tCol):-isa_asserted(P,functorDeclares),\+functor_declares_instance_0(P,tPred).
 
 

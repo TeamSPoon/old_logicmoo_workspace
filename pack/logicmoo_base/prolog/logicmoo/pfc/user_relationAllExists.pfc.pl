@@ -70,7 +70,7 @@ genls(_,_,MT):-isa(_,_,MT),genls(_,_,MT).
 :- kb_dynamic(tHominid/1).
 
 :- kb_dynamic(relationAllOnly/3).
-:- kb_dynamic(ptTransitiveBinaryPredicate/1).
+:- kb_dynamic(rtTransitiveBinaryPredicate/1).
 
 predInterArgIsa(mudSubPart(tBodyPart,tBodyPart)).
 
@@ -104,14 +104,14 @@ cycl('
 */
 
 
-ptTransitiveBinaryPredicate(mudSubPart).
+rtTransitiveBinaryPredicate(mudSubPart).
 
 % all_different_vals
-(pass4,ptTransitiveBinaryPredicate(P)/ground(P) ==>
+(pass4,rtTransitiveBinaryPredicate(P)/ground(P) ==>
      ((t(P,A,B),t(P,B,C))/(ground(v(A,B,C)),A\==C,B\==C,A\==B) ==> t(P,A,C))).
 
 /*
-ptTransitiveBinaryPredicate(genls).
+rtTransitiveBinaryPredicate(genls).
 :- sanity(is_entailed_u(
   (((t(genls,A,B),t(genls,B,C))/( ground(v(A,B,C)),A\==C,B\==C,A\==B) ) ==> t(genls,A,C)))).
 */
@@ -132,7 +132,7 @@ ptTransitiveBinaryPredicate(genls).
 :- dynamic(relationAllExists/3).
 
 
-(relationAllExists(Pred,Col1,Col2) ==> (ptBinaryPredicate(Pred),tCol(Col1),tCol(Col2))).
+(relationAllExists(Pred,Col1,Col2) ==> (rtBinaryPredicate(Pred),tCol(Col1),tCol(Col2))).
 
 % version that works but not safe
 /*
@@ -183,28 +183,28 @@ relationExistsInstance(Pred,D_COL,VAL) ==>
 
 
 
-prologHybrid(relationMostInstance(ptBinaryPredicate,tCol,vtValue)).
-relationMostInstance(BP,_,_)==>(ptBinaryPredicate(BP),ptRolePredicate(BP)).
-prologHybrid(relationAllInstance(ptBinaryPredicate,tCol,vtValue)).
-relationAllInstance(BP,_,_)==>ptBinaryPredicate(BP).
+prologHybrid(relationMostInstance(rtBinaryPredicate,tCol,vtValue)).
+relationMostInstance(BP,_,_)==>(rtBinaryPredicate(BP),rtRolePredicate(BP)).
+prologHybrid(relationAllInstance(rtBinaryPredicate,tCol,vtValue)).
+relationAllInstance(BP,_,_)==>rtBinaryPredicate(BP).
 
-relationMostInstance(BP,TCol,_)==>ptBinaryPredicate(BP),tCol(TCol).
+relationMostInstance(BP,TCol,_)==>rtBinaryPredicate(BP),tCol(TCol).
 (relationMostInstance(Pred,_,Value),{\+number(Value)},argIsa(Pred,2,Type))==> isa(Value,Type).
 %((relationMostInstance(Pred,Type,Value),{G=..[Pred,Inst,Value],GI=..[Pred,Inst,_]})) ==> (({GI=..[Pred,Inst,_]},isa(Inst,Type), ~GI) ==> G ).
 relationMostInstance(Pred,Type,Value) ==> mdefault(isa(Inst,Type) ==> t(Pred,Inst,Value)).
 % relationMostInstance(Pred,Type,Value) ==> mdefault( isa(Inst,Type) ==> ?Pred(Inst,Value) ).
 
-% ptBinaryPredicate(P)<==>(tPred(P),arity(P,2)).
+% rtBinaryPredicate(P)<==>(tPred(P),arity(P,2)).
 
-prologHybrid(relationAllInstance(ptBinaryPredicate,tCol,vtValue)).
-relationAllInstance(BP,_,_)==>ptBinaryPredicate(BP).
-relationAllInstance(Pred,_,Value),{\+number(Value)},argIsa(Pred,2,Type)==>(isa(Value,Type),isa(Pred,ptRolePredicate)).
+prologHybrid(relationAllInstance(rtBinaryPredicate,tCol,vtValue)).
+relationAllInstance(BP,_,_)==>rtBinaryPredicate(BP).
+relationAllInstance(Pred,_,Value),{\+number(Value)},argIsa(Pred,2,Type)==>(isa(Value,Type),isa(Pred,rtRolePredicate)).
 
 relationAllInstance(Pred,I_COL,VAL) ==>
  ({G1=..[Pred,INST,_Missing],G2=..[Pred,INST,VAL]},
   (isa(INST,I_COL) ==> ( ~ G1 ==> G2))).
 
-prologHybrid(relationInstanceAll(ptBinaryPredicate,vtValue,tCol)).
+prologHybrid(relationInstanceAll(rtBinaryPredicate,vtValue,tCol)).
 
 relationInstanceAll(Pred,VAL,I_COL) ==>
  ({G2=..[Pred,VAL,INST]},

@@ -1150,6 +1150,7 @@ checked_clause_count((_ ==> _)).
 checked_clause_count((_ <==> _)).
 checked_clause_count(spft(_,_,ax)).
 checked_clause_count(agent_command(_,_)).
+checked_clause_count(ignore_file_mpreds(_)).
 
 
 :- dynamic(lmcache:last_clause_count/2).
@@ -1260,12 +1261,12 @@ set_file_lang(W):-
    %assert_until_eof(t_l:current_lang(W)),
    forall((prolog_load_context(file,Source);which_file(Source);prolog_load_context(source,Source)),
    ignore((  % \+ lmcache:mpred_directive_value(Source,language,W),
-   decache_file_type(Source),
+  % decache_file_type(Source),
 
    debug(logicmoo(loader),'~N~p~n',[lmcache:mpred_directive_value(Source,language,W)]),
    (Source = '/root/lib/swipl/pack/logicmoo_base/prolog/logicmoo/pfc/system_common.pfc.pl'-> must(W=pfc);true),
    assert_until_eof(Source,lmcache:mpred_directive_value(Source,language,W))))),
-   must(get_lang(W)).
+   sanity(get_lang(W)).
 
 
 set_lang(W):-

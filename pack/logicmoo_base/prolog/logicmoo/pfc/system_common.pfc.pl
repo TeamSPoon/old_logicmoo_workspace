@@ -75,7 +75,7 @@ prologHybrid(genls/2).
  with_pfa(With,(((bt/2),(nt/3),(pk/3),(pt/2),(spft/3),(tms/1),(hs/1),(que/1),(pm/1),
           (('==>')/1),(('::::')/2),(('<-')/2),(('<==>')/2),(('==>')/2),(('~')/1),(('nesc')/1),((mpred_action)/1),
           (mpred_do_and_undo_method/2),
-	  prologMultiValued/1,prologOrdered/1,prologNegByFailure/1,prologPTTP/1,prologKIF/1,pfcControlled/1,ttPredType/1,
+	  prologMultiValued/1,prologOrdered/1,prologNegByFailure/1,prologPTTP/1,prologKIF/1,pfcControlled/1,ttRelationType/1,
            prologHybrid/1,predCanHaveSingletons/1,prologDynamic/1,prologBuiltin/1,prologMacroHead/1,prologListValued/1,prologSingleValued/1,
           (hs/1),(pfcControlled/1),(prologDynamic/2),(prologSideEffects/1),(prologSingleValued/1),(singleValuedInArg/2),(prologSideEffects/1,prologMacroHead/1,pfcControlled/1,
            resolveConflict/1,resolverConflict_robot/1)))),
@@ -135,7 +135,7 @@ conflict(C) ==> {must(with_mpred_trace_exec((resolveConflict(C),\+conflict(C))))
 % resolve conflicts asap
 % mpred_select(conflict(X),W) :- que(conflict(X),W).
 
-:- dynamic(ptUnaryPredicate/1).
+:- dynamic(rtUnaryPredicate/1).
 :- dynamic(ttExpressionType/1).
 
 {type_prefix(_Prefix,Type)}==>tCol(Type).
@@ -216,7 +216,10 @@ ttExpressionType(ftSpec).
 functorForFtSpec(prologEquality).
 
 resultIsa(_F,C)/ground(C)==>ftSpec(C).
+argsQuoted(argsQuoted).
+argsQuoted(ftSpec).
 ftSpec(vtActionTemplate).
+argsQuoted(vtActionTemplate).
 
 % ftSpec(ftSpec).
 meta_argtypes(ftSpec(meta_argtypes(ftSpec))).  % An argtype specification is considered to be a legal specification
@@ -230,8 +233,8 @@ meta_argtypes(ftSpec(tCol)).  % A typeclass is considered to be a legal specific
 
 pfcControlled(P),arity(P,A)==>hybrid_support(P,A).
 
-ttPredType(X)==>tCol(X).
-ttPredType(X)/atom(X)==>(arity(X,1),pfcControlled(X)).
+ttRelationType(X)==>tCol(X).
+ttRelationType(X)/atom(X)==>(arity(X,1),pfcControlled(X)).
 
 tSet(ttExpressionType).
 
@@ -248,7 +251,7 @@ completelyAssertedCollection(tPred).
 completelyAssertedCollection(tFunction).
 
 completelyAssertedCollection(prologMacroHead).  % Items read from a file might be a special Macro Head
-completelyAssertedCollection(ttPredType).  % Or they might be a predciate declarer
+completelyAssertedCollection(ttRelationType).  % Or they might be a predciate declarer
 completelyAssertedCollection(functorDeclares).  % or they might declare other things
 % completelyAssertedCollection(prologMacroHead).  % or they might declare other things
 
@@ -274,25 +277,25 @@ completelyAssertedCollection(ttTemporalType).
 completelyAssertedCollection(ttTypeType).
 completelyAssertedCollection(ttUnverifiableType).
 
-ttPredType(pfcDatabaseTerm).
-ttPredType(pfcControlled).
-ttPredType(prologSingleValued).
+ttRelationType(pfcDatabaseTerm).
+ttRelationType(pfcControlled).
+ttRelationType(prologSingleValued).
 
 
-ttPredType(pfcWatched).
-ttPredType(pfcCreates).
+ttRelationType(pfcWatched).
+ttRelationType(pfcCreates).
 :- dynamic(pfcNegTrigger/1).
-ttPredType(pfcNegTrigger).
-ttPredType(pfcPosTrigger).
-ttPredType(pfcBcTrigger).
-ttPredType(pfcRHS).
+ttRelationType(pfcNegTrigger).
+ttRelationType(pfcPosTrigger).
+ttRelationType(pfcBcTrigger).
+ttRelationType(pfcRHS).
 
-ttPredType(pfcMustFC).
+ttRelationType(pfcMustFC).
 
-((ttPredType(X)/atom(X)) ==>support_hilog(X,1)).
+((ttRelationType(X)/atom(X)) ==>support_hilog(X,1)).
 
 
-ttPredType(P)==>(tCol(P),completelyAssertedCollection(P)).
+ttRelationType(P)==>(tCol(P),completelyAssertedCollection(P)).
 
 :- dynamic(baseKB:ttTypeType/1).
 
@@ -325,13 +328,13 @@ tCol(tSet).
 
 % :- prolog.
 % tPred
-ttPredType(isEach(pfcDatabaseTerm,pfcControlled,pfcWatched,pfcMustFC,predIsFlag,prologMultiValued,
+ttRelationType(isEach(pfcDatabaseTerm,pfcControlled,pfcWatched,pfcMustFC,predIsFlag,prologMultiValued,
  pfcBcTrigger,
  prologSingleValued,prologMacroHead,notAssertable,prologBuiltin,prologDynamic,prologOrdered,prologNegByFailure,prologPTTP,prologKIF,prologEquality,prologPTTP,
  prologSideEffects,prologHybrid,prologListValued)).
 
 completelyAssertedCollection(isEach(tCol,tPred,pfcControlled)).
-ttPredType(C)==>completelyAssertedCollection(C).
+ttRelationType(C)==>completelyAssertedCollection(C).
 
 % genls(meta_argtypes,ftSpec).
 
@@ -341,7 +344,7 @@ prologMultiValued(P)==> \+ prologSingleValued(P).
 prologSingleValued(P)==> \+ prologMultiValued(P).
 
 ~(ttExpressionType(prologEquality)).
-ttPredType(prologEquality).
+ttRelationType(prologEquality).
 prologEquality(mudEquals).
 prologEquality(('=')).
 prologEquality(('==')).
@@ -352,13 +355,13 @@ tSet(isEach(tCol,tPred,pfcControlled)).
 tSet(meta_argtypes).
 tSet(prologMacroHead).
 tSet(functorDeclares).
-ttPredType(predIsFlag).
-ttPredType(prologDynamic).
-ttPredType(prologHybrid).
-ttPredType(pfcControlled).
-ttPredType(prologKIF).
-ttPredType(prologBuiltin).
-ttPredType(prologPTTP).
+ttRelationType(predIsFlag).
+ttRelationType(prologDynamic).
+ttRelationType(prologHybrid).
+ttRelationType(pfcControlled).
+ttRelationType(prologKIF).
+ttRelationType(prologBuiltin).
+ttRelationType(prologPTTP).
 
 pfcControlled(genlPreds).
 pfcControlled(isa).
@@ -404,7 +407,7 @@ tSet(tCol).
 tSet(ttModule).
 tFixedArityRelation(tSet).
 tFixedArityRelation(tCol).
-ttPredType(prologHybrid).
+ttRelationType(prologHybrid).
 
 :- check_clause_counts.
 
@@ -505,8 +508,8 @@ tSet(tKnownID).
 
 % (tInferInstanceFromArgType(Prop),tPred(Prop),arity(Prop,N)/(N>1) ==> ({i_name('vt',Prop,FinalType)},tCol(FinalType),tInferInstanceFromArgType(FinalType),argIsa(Prop,N,FinalType))).
 
-ttPredType(predCanHaveSingletons).
-ttPredType(prologSideEffects).
+ttRelationType(predCanHaveSingletons).
+ttRelationType(prologSideEffects).
 prologSideEffects(write/1).
 prologSideEffects(resolveConflict/1).
 
@@ -529,10 +532,10 @@ prologSideEffects(resolveConflict/1).
 
 
 arity(prologMacroHead,1).
-ttPredType(isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,prologHybrid,
+ttRelationType(isEach(prologMultiValued,prologOrdered,prologNegByFailure,prologPTTP,prologHybrid,
   predCanHaveSingletons,prologDynamic,tPred,prologMacroHead,prologListValued,prologSingleValued)).
 prologMacroHead(prologMacroHead).
-ttPredType(X)==>functorDeclares(X).
+ttRelationType(X)==>functorDeclares(X).
 % tCol(X)==>functorDeclares(X).
 % functorDeclares(X)==>tCol(X).
 % prologMacroHead(X)==>functorDeclares(X).
@@ -542,7 +545,7 @@ tPred(pddlSomethingIsa(ftTerm,ftListFn(tCol))).
 /*
 prologBuiltin(A) :- cwc,head_to_functor_name(A, B),prologBuiltin(B).
 prologBuiltin(P) :- cwc,is_ftCompound(P),!,get_functor(P,F,A),functor(C,F,A),(predicate_property(C,built_in)). % predicate_property(P,static)).
-ttPredType(PT)==> {atom(PT),H=..[PT,I]}, (H:-cwc,head_to_functor_name(I,F),call_u(call(PT,F))).
+ttRelationType(PT)==> {atom(PT),H=..[PT,I]}, (H:-cwc,head_to_functor_name(I,F),call_u(call(PT,F))).
 */
 
 
@@ -629,7 +632,7 @@ tSet(vtDirection).
 disjointWith(ttTemporalType,ttAbstractType).
 disjointWith(Sub, Super) ==> disjointWith( Super, Sub).
 
-(ptSymmetric(Pred) ==> ({atom(Pred),G1=..[Pred,X,Y],G2=..[Pred,Y,X]}, (G1==>G2), (~(G1)==> ~(G2)))).
+(rtSymmetric(Pred) ==> ({atom(Pred),G1=..[Pred,X,Y],G2=..[Pred,Y,X]}, (G1==>G2), (~(G1)==> ~(G2)))).
 
 
 tSet(tNotForUnboundPredicates).
@@ -674,7 +677,7 @@ completelyAssertedCollection(ttExpressionType).
 completelyAssertedCollection(tCol).
 completelyAssertedCollection(prologMacroHead).
 % completelyAssertedCollection(functorDeclares).
-completelyAssertedCollection(ttPredType).
+completelyAssertedCollection(ttRelationType).
 completelyAssertedCollection(completelyAssertedCollection).
 
 % dividesBetween(S,C1,C2) ==> (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
@@ -684,7 +687,7 @@ completelyAssertedCollection(completelyAssertedCollection).
 % isa(Col1, ttObjectType) ==> ~(isa(Col1, ttExpressionType)).
 
 
-% tCol(ArgsIsa):-ttPredType(ArgsIsa).
+% tCol(ArgsIsa):-ttRelationType(ArgsIsa).
 % TODO decide if OK
 %tCol(F):-t(functorDeclares,F).
 tSet(ttExpressionType).
@@ -736,7 +739,7 @@ completelyAssertedCollection(tCol).
 
 :- kb_dynamic(isa/2).
 
-ttPredType(Prop)==>tCol(Prop).
+ttRelationType(Prop)==>tCol(Prop).
 
 
 
@@ -762,7 +765,7 @@ prologHybrid(typeGenls/2).
 :- ain(meta_argtypes(typeGenls(ttTypeType,tCol))).
 %(isa(COLTYPEINST,COLTYPE) , typeGenls(COLTYPE,COL)) ==> genls(COLTYPEINST,COL).
 
-typeGenls(ttPredType,tPred).
+typeGenls(ttRelationType,tPred).
 
 
 prologHybrid(argIsa/3).
@@ -970,7 +973,7 @@ argIsa(Prop,N,Type),{number(N)},ttExpressionType(Type) ==> argQuotedIsa(Prop,N,T
 
 :- kb_dynamic(mudLabelTypeProps/3).
 :- shared_multifile(mudLabelTypeProps/3).
-:- forall(ttPredType(F),must((decl_type(F),ain(functorDeclares(F)),ain(genls(F,tPred))))).
+:- forall(ttRelationType(F),must((decl_type(F),ain(functorDeclares(F)),ain(genls(F,tPred))))).
 % :-  /**/ export(mtForPred/2).
 
 /*
@@ -1162,7 +1165,7 @@ ttTypeFacet(ttTypeFacet).
 ttTypeFacet(ttUnverifiableType).
 
 
-%typeGenls(tPred,ttPredType).
+%typeGenls(tPred,ttRelationType).
 typeGenls(ttExpressionTypeType,ttExpressionType).
 typeGenls(ttTypeFacet,tCol).
 typeGenls(ttTypeType,tCol).
@@ -1172,7 +1175,7 @@ typeGenls(ttTypeType,tCol).
  (isa(Inst,TT) ==> genls(Inst,ST))).
 
 
-:-kb_dynamic(ptUnaryPredicate/1).
+:-kb_dynamic(rtUnaryPredicate/1).
 :-kb_dynamic(ttSpatialType/1).
 
 
@@ -1193,7 +1196,7 @@ ttUnverifiableType(ttExpressionType).
 ttUnverifiableType(vtDirection).
 
 
-%ttPredType(ArgsIsa)==>tPred(ArgsIsa).
+%ttRelationType(ArgsIsa)==>tPred(ArgsIsa).
 %TODO isa(_,ArgsIsa)==>tCol(ArgsIsa).
 
 :- set_prolog_flag(report_error,true),set_prolog_flag(debug_on_error,true),set_prolog_flag(debug, true).
@@ -1236,22 +1239,22 @@ quotedDefnIff(ftCodeIs(SomeCode),SomeCode):- cwc, is_ftNonvar(SomeCode).
 
 (ttExpressionType(FT)/append_term(FT,Arg,Head)==> ((Head:- !, term_is_ft(Arg,FT)))).
 
-% tCol(Type),(ptBinaryPredicate(Pred)/(functor(G,Pred,2),G=..[Pred,isInstFn(Type),Value])), G ==> relationMostInstance(Pred,Type,Value).
+% tCol(Type),(rtBinaryPredicate(Pred)/(functor(G,Pred,2),G=..[Pred,isInstFn(Type),Value])), G ==> relationMostInstance(Pred,Type,Value).
 
 
 %((genlPreds(Col1,Col2),(arity(Col1,1);arity(Col2,1)))==>genls(Col1,Col2)).
 %((genls(Col1,Col2),(tPred(Col1);tPred(Col2)))==>genlPreds(Col1,Col2)).
 
-tSet(ptBinaryPredicate).
-ttPredType(ptBinaryPredicate).
+tSet(rtBinaryPredicate).
+ttRelationType(rtBinaryPredicate).
 
-isa(arity,ptBinaryPredicate).
+isa(arity,rtBinaryPredicate).
 
-% (arity(Pred,2),tPred(Pred)) <==> isa(Pred,ptBinaryPredicate).
+% (arity(Pred,2),tPred(Pred)) <==> isa(Pred,rtBinaryPredicate).
 
-ttPredType('ptUnaryPredicate').
+ttRelationType('rtUnaryPredicate').
 
-isa(arity,ptBinaryPredicate).
+isa(arity,rtBinaryPredicate).
 
 
 
@@ -1267,12 +1270,12 @@ specialFunctor('/').
 */
 :- endif.
 
-arity(Pred,2),tPred(Pred) <==> ptBinaryPredicate(Pred).
+arity(Pred,2),tPred(Pred) <==> rtBinaryPredicate(Pred).
 
 % if arity is ever greater than 1 it can never become 1
 % arity(F,A)/(number(A),A>1) ==> ~(arity(F,1)).
 
-completelyAssertedCollection(ptBinaryPredicate).
+completelyAssertedCollection(rtBinaryPredicate).
 
 
 % TODO ADD THIS 
