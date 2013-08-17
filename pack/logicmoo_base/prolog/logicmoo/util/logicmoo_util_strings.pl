@@ -45,6 +45,8 @@
             concat_atom_safe/3,
             convert_members/3,
             convert_to_string/2,
+            convert_cycString/2,
+            cycString_to_atomcycString/2,
             ctype_continue/2,
             ctype_switch/2,
             ctype_switcher/1,
@@ -456,6 +458,8 @@ atomic_list_concat_safe([D1|Bonus],AtomSep,V):-var(D1),atomic(AtomSep),
   sub_string(V,_,NumAfter,0,NewV),atomic_list_concat_safe(Bonus,AtomSep,NewV),!,
   any_to_string_or_var(D1,D1O).
 atomic_list_concat_safe([V],_Sep,V):-!.
+
+
 
 
 
@@ -1085,6 +1089,29 @@ list_to_atomics_list0([E|EnglishF],[A|EnglishA]):-
 list_to_atomics_list0([],[]):-!.
 */
 
+text_to_uq_atom(A,Sub):- atom_prefix(A,'"'),atom_suffix(A,1,'"'),sub_atom(A,1,_,1,Sub),!.
+text_to_uq_atom(A,A).
+
+
+cycString_to_atomcycString(A,SA):-atom_string(A,S),term_to_atom(S,SA).
+
+convert_cycString(A,B):- atom(A),text_to_uq_atom(A,Sub),atom_string(Sub,M),!,convert_cycString(M,B).
+convert_cycString(A,B):- atom_length(A,L),tokenize_atom(A,T),!,convert_cycString(A,L,T,B),!.
+convert_cycString(A,B):- string(A),term_to_atom(A,B).
+
+
+convert_cycString(_,0,_,'""'):-!.
+convert_cycString(A,L,_,B):- L<3,!,term_to_atom(A,B).
+convert_cycString(A,L,_,B):- L>3, \+ atom_contains(A," "), \+ atom_contains(A,"'"),!,term_to_atom(A,B).
+convert_cycString(A,_,[],B):-!,term_to_atom(A,B).
+convert_cycString(A,_,[_],B):-!,term_to_atom(A,B).
+convert_cycString(_,_,List,B):-convert_cycString_list(List,B).
+
+convert_cycString_list([],[]).
+convert_cycString_list([T,-,P|List],B):-atomic_list_concat([T,P],-,TP),!,convert_cycString_list([TP|List],B).
+convert_cycString_list([T,P|List],B):-member(T,['#','~','#$','\'']),atom_concat(T,P,TP),!,convert_cycString_list([TP|List],B).
+convert_cycString_list([T|List],[P|BList]):-cycString_to_atomcycString(T,P),convert_cycString_list(List,BList).
+
 :- export(atomic_list_concat_catch/3).
 
 %= 	 	 
@@ -1664,7 +1691,7 @@ to_word_list(A,SL):-once(hotrace((to_word_list_0(A,S0),(is_list(S0)->delete(S0,'
 %
 as_atom(A,A):-atom(A),!.
 as_atom(T,A):- compound(T), \+ is_list(T),arg(_,T,M),atomic(M),as_atom(M,A),!.
-as_atom(S,A):- string_to_atom(S,A),!.
+as_atom(S,A):- catch(string_to_atom(S,A),_,fail),!.
 as_atom(T,A):- term_to_atom(T,A).
 
 :- export(to_word_list_0/2).

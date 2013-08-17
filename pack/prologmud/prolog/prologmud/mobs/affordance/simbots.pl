@@ -21,7 +21,7 @@ tCol(mobSimian).
 defined_affordance([subjType= "Passable",actionVerb= "TravelThru"]).
 
 prologHybrid(mudDescription(ftTerm,ftString)).
-prologHybrid(nameStrings(ftTerm,ftString)).
+prologHybrid(nameString(ftTerm,ftString)).
 
 defined_affordance([subjType= "Television",
 stringMatch= "TV",
@@ -478,7 +478,7 @@ do_define_affordance(LIST):-(member(subjType= SType,LIST);member(alsoType= SType
   decl_type(Type),do_define_type_affordance(Type,LIST).
 
 do_define_type_affordance1(Type,_= Type):-!.
-do_define_type_affordance1(Type,subjType= String):- ain_expanded(nameStrings(Type,String)).
+do_define_type_affordance1(Type,subjType= String):- ain_expanded(nameString(Type,String)).
 
 
 do_define_type_affordance1(Type,alsoType= TWhat):-i_name(t,TWhat,ParentType),ain(genls(Type,ParentType)).
@@ -626,6 +626,8 @@ simbots_templates0(Templ):-verb_affordance(V,O,_,_,_),Templ=..[V,O].
 
 :-forall(defined_affordance(Attrs),
     must(do_define_affordance(Attrs))).
+
+:-ain((verb_affordance(Verb, Obj, _,_,_)==>verb_for_type(Verb, Obj))).
 
 :-listing(verb_desc/3).
 :-listing(verb_for_type/2).
@@ -856,6 +858,7 @@ verb_for_type(actThinkAbout, tLookAble).
 
 
 */
+
 
 :-ain({simbots_templates(Templ)} ==> vtActionTemplate(Templ)).
 

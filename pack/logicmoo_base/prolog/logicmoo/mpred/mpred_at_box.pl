@@ -26,6 +26,7 @@
          (shared_multifile)/1,
          add_import_predicate/3,
          autoload_library_index/4,
+         ensure_abox/1,
          baseKB_hybrid_support/2,
          uses_predicate/2,
          uses_predicate/5,
@@ -106,7 +107,7 @@ user_m_check(_Out).
 :- meta_predicate make_shared_multifile(+,+,+).
 :- meta_predicate make_shared_multifile(*,*,*,*).
 
-
+:- meta_predicate with_no_retry_undefined(:).
 :- meta_predicate shared_multifile(:).
 
 :- meta_predicate transitive_path(2,*,*).
@@ -244,7 +245,7 @@ mtCanAssert(_).
 makeConstant(_Mt).
 
 
-%:- module_transparent((ensure_abox)/1).
+:- module_transparent((ensure_abox)/1).
 :- multifile(lmcache:has_pfc_database_preds/1).
 :- volatile(lmcache:has_pfc_database_preds/1).
 :- dynamic(lmcache:has_pfc_database_preds/1).
@@ -280,7 +281,7 @@ system:get_current_default_tbox(baseKB).
 %
 set_defaultAssertMt(ABox):- 
   sanity(mtCanAssert(ABox)),
-  with_no_retry_undefined(must_det_l((
+  must(((
     get_current_default_tbox(TBox),
     asserta_new(TBox:mtCycL(ABox)),
     asserta_new(ABox:defaultTBoxMt(TBox)),
@@ -301,7 +302,7 @@ set_fileAssertMt(ABox):-
  '$current_typein_module'(CM),
  '$current_source_module'(SM),
  sanity(mtCanAssert(ABox)),
- with_no_retry_undefined(must_det_l((
+ (((
    fileAssertMt(Was),
    % get_current_default_tbox(TBox),
 
@@ -310,10 +311,9 @@ set_fileAssertMt(ABox):-
    assert_setting(baseKB:file_to_module(File,ABox)),
    assert_setting(lmcache:mpred_directive_value(File,module,ABox)),
    % MAYBE? '$set_typein_module'(TBox),
-
-   onEndOfFile(set_defaultAssertMt(Was)),
-   onEndOfFile('$set_source_module'(SM)),
-   onEndOfFile('$set_typein_module'(CM))))).
+   call_on_eof(set_defaultAssertMt(Was)),
+   call_on_eof('$set_source_module'(SM)),
+   call_on_eof('$set_typein_module'(CM))))).
 
 
 
@@ -398,7 +398,7 @@ ensure_imports_tbox(M,TBox):-
 ensure_imports_tbox(M,TBox):-
   asserta(lmcache:is_ensured_imports_tbox(M,TBox)),
   
-  must_det_l((
+  must((
    skip_user(TBox),
    ignore(maybe_delete_import_module(M,TBox)),
    ignore(maybe_delete_import_module(TBox,M)),
@@ -485,7 +485,7 @@ add_import_predicate(Mt,Goal,OtherMt):-
    assert_if_new(( Mt:Goal :- OtherMt:Goal)).
   
 make_as_dynamic(Reason,Mt,F,A):- 
- must_det_l((
+ must((
    multifile(Mt:F/A),
    discontiguous(Mt:F/A),
    dynamic(Mt:F/A),
@@ -552,6 +552,7 @@ has_parent_goal(F,G):-prolog_frame_attribute(F,goal, G);(prolog_frame_attribute(
 
 
 uses_predicate(_,CallerMt,'$pldoc',4,retry):- multifile(CallerMt:'$pldoc'/4),discontiguous(CallerMt:'$pldoc'/4),dynamic(CallerMt:'$pldoc'/4),!.
+
 uses_predicate(_,M,F,A,R):- 
   prolog_current_frame(FR), functor(P,F,A),(prolog_frame_attribute(FR,parent_goal,predicate_property(M:P,_))),!,R=error.
 uses_predicate(_,Module,Name,Arity,Action) :- 

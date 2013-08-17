@@ -54,8 +54,8 @@ typeGenls(ttValueType,vtValue).
 :- user:ensure_loaded(library('logicmoo/util/logicmoo_util_dcg')).
 
 
-asserta_parserVars(N,V,Type):-foc_current_agent(A),asserta(parserVars(A,N,V,Type)).
-parserVars(N,V,Type):- foc_current_agent(A),
+asserta_parserVars(N,V,Type):- show_failure(current_agent(A)),asserta(parserVars(A,N,V,Type)).
+parserVars(N,V,Type):- show_failure(current_agent(A);A=iCurrentAgentFn),
    (parserVars_local(A,N,V,Type)*->true;parserVars_falback(global,N,V,Type)).
 
 parserVars_local(A,(N1;N2),V,Type):-!,parserVars_local(A,N1,V,Type);parserVars_local(A,N2,V,Type).

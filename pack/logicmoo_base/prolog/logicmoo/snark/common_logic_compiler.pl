@@ -407,7 +407,7 @@ nnf(KB,Lit,FreeV,Pos,1):- is_ftVar(Lit),!,wdmsg(warn(nnf(KB,Lit,FreeV,Pos,1))),P
 nnf(KB,Fin,FreeV,NNF,Paths):- corrected_modal(KB,Fin,F), Fin \=@= F,!,nnf(KB,F,FreeV,NNF,Paths).
 
 /*
-nnf(KB,'CollectionSubsetFn'(Col,'TheSetOf'(Var,Formulas)),FreeV,Var,2):- is_ftVar(Var), \+ is_ftVar(Col),
+nnf(KB,'tColOfCollectionSubsetFn'(Col,'tSetOfTheSetOfFn'(Var,Formulas)),FreeV,Var,2):- is_ftVar(Var), \+ is_ftVar(Col),
    nnf(KB,all(Var,isa(Var,Col)&Formulas),FreeV,SubForms,_),   
    asserta(added_constraints(KB,Var,SubForms)).
 */

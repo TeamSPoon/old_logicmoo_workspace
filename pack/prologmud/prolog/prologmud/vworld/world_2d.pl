@@ -444,8 +444,9 @@ compute_dir(Region1,X,Y,Z,Dir):-
    atomic_list_concat_catch([NS,EW,UD],'',Dir),!.
 
 prologBuiltin(get_dir_offset/5).
-get_dir_offset(Dir,F,OX,OY,OZ):-
+get_dir_offset(Dir,F,OX,OY,OZ):- sanity(nonvar(Dir)),
   dir_offset(Dir,F,OX,OY,OZ),!.
+get_dir_offset(reverseOf(Dir),F,OX,OY,OZ):- !,get_dir_offset((Dir),F,X,Y,Z),!, OX is -X, OY is -Y, OZ is -Z.
 get_dir_offset(Dir,F,OX,OY,OZ):- any_to_atom(Dir,DirA),
   dir_offset(DirA,F,OX,OY,OZ),!.
 get_dir_offset(Dir,F,OX,OY,OZ):- any_to_string(Dir,DirS),

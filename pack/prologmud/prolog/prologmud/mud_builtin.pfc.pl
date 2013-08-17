@@ -33,7 +33,7 @@
 :- import(agent_call_command/2).
 
 :- assert_until_eof(infSupertypeName).
-:- onEndOfFile(dmsg(infSupertypeName)).
+:- call_on_eof(dmsg(infSupertypeName)).
 
 :- include(prologmud(mud_header)).
 
@@ -251,7 +251,7 @@ tWorld(iWorld7).
 */
 ttExpressionType(ftProlog).
 
-% ==> neg(arity(bordersOn,1)).
+% ==> neg(arity(mudAreaConnected,1)).
 
 %ruleRewrite(isa(isInstFn(Sub),Super),genls(Sub,Super)):-ground(Sub:Super),!.
 
@@ -559,7 +559,7 @@ prologMultiValued(mudKeyword(ftTerm,ftString),prologHybrid).
 prologMultiValued(mudMemory(tAgent,ftTerm),prologHybrid).
 prologMultiValued(mudNamed(ftTerm,ftTerm),prologHybrid).
 prologMultiValued(mudPossess(tObj,tObj),prologHybrid).
-prologMultiValued(nameStrings(ftTerm,ftString),prologHybrid).
+prologMultiValued(nameString(ftTerm,ftString),prologHybrid).
 prologMultiValued(pathDirLeadsTo(tRegion,vtDirection,tRegion),prologHybrid).
 prologMultiValued(pathName(tRegion,vtDirection,ftString),prologHybrid).
 prologMultiValued(genls(tCol,tCol),prologHybrid).
@@ -615,7 +615,7 @@ prologSingleValued(typeGrid(tCol,ftInt,ftListFn(ftString))).
 resultIsa(apathFn,tPathway).
 % '<==>'(isa(Whom,tNpcAgent),whenAnd(isa(Whom,tAgent),naf(isa(Whom,tHumanControlled)))).
 '<==>'(mudDescription(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
-'<==>'(nameStrings(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
+'<==>'(nameString(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
 
 ttPredAndValueType("size").
 ttPredAndValueType("texture").
@@ -717,7 +717,7 @@ prologMultiValued(mudActAffect(ftTerm,ftTerm,ftTerm)).
 prologMultiValued(mudActAffect(tItem,vtVerb,ftTerm(ftVoprop))).
 prologMultiValued(mudCmdFailure(tAgent,ftAction)).
 
-tPred(isEach(tAgent/1, mudEnergy/2,mudHealth/2, mudAtLoc/2, failure/2, typeGrid/3, gridValue/4, isa/2, tItem/1, mudMemory/2, pathName/3, mudPossess/2, tRegion/1, mudScore/2, mudStm/2, mudFacing/2, localityOfObject/2, tThinking/1, mudWearing/2, mudFacing/2, mudHeight/2, act_term/2, nameStrings/2, mudDescription/2, pathDirLeadsTo/3, mudAgentTurnnum/2)).
+tPred(isEach(tAgent/1, mudEnergy/2,mudHealth/2, mudAtLoc/2, failure/2, typeGrid/3, gridValue/4, isa/2, tItem/1, mudMemory/2, pathName/3, mudPossess/2, tRegion/1, mudScore/2, mudStm/2, mudFacing/2, localityOfObject/2, tThinking/1, mudWearing/2, mudFacing/2, mudHeight/2, act_term/2, nameString/2, mudDescription/2, pathDirLeadsTo/3, mudAgentTurnnum/2)).
 prologHybrid(mudToHitArmorClass0 / 2).
 prologHybrid(mudAtLoc/2).
 prologBuiltin((agent_command/2)).
@@ -861,7 +861,7 @@ vtBasicDirPlusUpDown(vUp).
 %localityOfObject(Clothes,Agent):- mudSubPart(Agent,Clothes).
 %localityOfObject(Inner,Container):- mudInsideOf(Inner,Container).
 %localityOfObject(Inner,Outer):- only_if_pttp, localityOfObject(Inner,Container),localityOfObject(Container,Outer).
-nameStrings(apathFn(Region,Dir),Text):- pathName(Region,Dir,Text).
+nameString(apathFn(Region,Dir),Text):- pathName(Region,Dir,Text).
 meta_argtypes(mudMaterial(tSpatialThing,vtMaterial)).
 meta_argtypes(mudTexture(tSpatialThing,vtTexture)).
 meta_argtypes(mudWearing(tAgent,tWearAble)).
@@ -875,7 +875,7 @@ meta_argtypes(type_action_info(tCol,vtActionTemplate,ftText)).
 tCol(ttAgentType).
 
 prologHybrid(pathDirLeadsTo(tRegion,vtDirection,tRegion)).
-prologHybrid(bordersOn(tRegion,tRegion),tSymmetricRelation).
+prologHybrid(mudAreaConnected(tRegion,tRegion),tSymmetricRelation).
 
 ttAgentType(mobMonster).
 % instTypeProps(apathFn(Region,_Dir),tPathway,[localityOfObject(Region)]).
@@ -909,6 +909,8 @@ typeGenls(ttRegionType,tRegion).
 % cycAssert(A,B):- trace_or_throw(cycAssert(A,B)).
 */
 
+genls('SetOrCollection',tCol).
+genls('Collection',tCol).
 
 
 prologHybrid(dividesBetween(tCol,tCol,tCol)).
@@ -936,21 +938,27 @@ completelyAssertedCollection(tCarryAble).
 completelyAssertedCollection(vtVerb).
 genls(ttTypeByAction,completelyAssertedCollection).
 
-arity(bordersOn,2).
+arity(mudAreaConnected,2).
 
 
 % ensure_some_pathBetween(R1,R2):- cwc,must((ain(pathDirLeadsTo(R1,aRelatedFn(vtDirection,R1,R2),R2)),ain(pathDirLeadsTo(R2,aRelatedFn(vtDirection,R2,R1),R1)))),!.
 
-bordersOn(R1,R2)/ground(bordersOn(R1,R2)) ==> isa(R1,tRegion),isa(R2,tRegion),bordersOn(R2,R1).
+mudAreaConnected(R1,R2)/ground(mudAreaConnected(R1,R2)) ==> isa(R1,tRegion),isa(R2,tRegion),mudAreaConnected(R2,R1).
 
-(bordersOn(R1,R2)/ground(bordersOn(R1,R2)), \+ pathDirLeadsTo(R1,_,R2), 
+prologBuiltin(random_path_dir/1).
+random_path_dir(Dir):-nonvar(Dir),!,random_path_dir(Dir0),Dir=Dir0,!.
+random_path_dir(Dir):- call(call,random_instance(vtBasicDir,Dir,true)).
+random_path_dir(Dir):- call(call,random_instance(vtBasicDirPlusUpDown,Dir,true)).
+random_path_dir(Dir):- call(call,random_instance(vtDirection,Dir,true)).
+
+(mudAreaConnected(R1,R2)/ground(mudAreaConnected(R1,R2)), \+ pathDirLeadsTo(R1,_,R2), 
   {random_path_dir(Dir),reverse_dir(Dir,Rev)}, 
    {\+ pathDirLeadsTo(R1,Dir,_NotR2), 
    \+ pathDirLeadsTo(R2,Rev,_NotR1)}) ==>
   {ain(pathDirLeadsTo(R1,Dir,R2))}.
 
 pathDirLeadsTo(R1,Dir,R2)/reverse_dir(Dir,Rev) ==> pathDirLeadsTo(R2,Rev,R1).
-% pathDirLeadsTo(R1,_,R2) ==> bordersOn(R1,R2).
+% pathDirLeadsTo(R1,_,R2) ==> mudAreaConnected(R1,R2).
 
 singleValuedInArg(pathDirLeadsTo,2).
 
@@ -1234,11 +1242,6 @@ Unsuccessful attempt by is a rulebook. [19
 
 
 
-prologBuiltin(random_path_dir/1).
-random_path_dir(Dir):-nonvar(Dir),!,random_path_dir(Dir0),Dir=Dir0,!.
-random_path_dir(Dir):- call(call,random_instance(vtBasicDir,Dir,true)).
-random_path_dir(Dir):- call(call,random_instance(vtBasicDirPlusUpDown,Dir,true)).
-random_path_dir(Dir):- call(call,random_instance(vtDirection,Dir,true)).
 
 prologBuiltin(onEachLoad/0).
 argsQuoted(onEachLoad).

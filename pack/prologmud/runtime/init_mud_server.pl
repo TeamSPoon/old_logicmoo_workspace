@@ -144,10 +144,11 @@ kill_unsafe_preds:-(dmsg("kill_unsafe_preds!"),w_tl(set_prolog_flag(access_level
         type_action_info/3)).
 
 :- statistics.
+% :- gripe_time(40,baseKB:ensure_loaded(library(parser_e2c))).
 
 :- set_prolog_flag(logicmoo_include,'$set_source_module'(baseKB)).
 :- set_prolog_flag(pfc_booted,true).
-:- set_prolog_flag(retry_undefined,true).
+%:- set_prolog_flag(retry_undefined,true).
 :- set_prolog_flag(read_attvars,false).
 
 % :- must((statistics(cputime,X),X<65)).  % was 52
@@ -219,8 +220,6 @@ ensure_webserver_3020:- find_and_call(ensure_webserver(3020)).
 :- must(show_entry(gripe_time(40,ensure_loaded(prologmud(mud_loader))))).
 %:- lmce:reset_modules.
 
-% :- gripe_time(40,user:ensure_loaded(library(parser_e2c))).
-
 :- set_prolog_flag(logicmoo_debug,true).
 
 % :- mpred_trace_exec.
@@ -233,7 +232,7 @@ ensure_webserver_3020:- find_and_call(ensure_webserver(3020)).
 
 
 :- set_prolog_flag(dialect_pfc,false).
-:- set_prolog_flag(retry_undefined,true).
+%:- set_prolog_flag(retry_undefined,true).
 :- set_prolog_flag(logicmoo_debug,true).
 :- set_prolog_flag(unsafe_speedups,false).
 
@@ -309,10 +308,10 @@ pddlSomethingIsa('iGoldUniform675',['tGoldUniform','ProtectiveAttire','PortableO
 pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']))).
 :-onSpawn(localityOfObject(iCommanderdata66,tOfficeRoom)).
   
-:- ain((mpred_argtypes(bordersOn(tRegion,tRegion)))).
+:- ain((mpred_argtypes(mudAreaConnected(tRegion,tRegion)))).
 
 
-:- call_u(onSpawn(bordersOn(tLivingRoom,tOfficeRoom))).
+:- call_u(onSpawn(mudAreaConnected(tLivingRoom,tOfficeRoom))).
 :- nortrace,notrace.
 
 :- set_prolog_flag(dialect_pfc,false).
@@ -372,12 +371,12 @@ tSourceData(iWorldData8).
 
 :- set_prolog_flag(unsafe_speedups,true).
 :- statistics.
-:- gripe_time(1.0,coerce(s,vtDirection,_)).
-:- gripe_time(2.0, \+ coerce(l,vtDirection,_)).
+:- gripe_time(1.0,must(coerce(s,vtDirection,_))).
+:- gripe_time(2.0,must( \+ coerce(l,vtDirection,_))).
 
 :- check_clause_counts.
 
-:- make.
+% :- make.
 :- initialization(lar,restore).
 % :- initialization(lar).
 

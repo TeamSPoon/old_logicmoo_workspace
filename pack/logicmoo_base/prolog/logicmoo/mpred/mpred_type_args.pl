@@ -192,7 +192,7 @@ term_is_ft(Term,Type):- no_repeats_old(Type,(term_is_ft_how(Term,Was),trans_subf
 % Term If Is A Format Type How.
 %
 term_is_ft_how(Term,Type):- clause_b(quotedDefnIff(Type,Info)),nonvar(Info),
-   (show_success(why,(Info='SubLQuoteFn'(LISPSYMBOL),nop(dmsg(Term+Type+LISPSYMBOL))))-> 
+   (show_success(why,(Info='uSubLQuoteFn'(LISPSYMBOL),nop(dmsg(Term+Type+LISPSYMBOL))))-> 
                  fail;
                  (append_term(Info,Term,CALL),call_u(CALL))),!.
 
@@ -490,7 +490,7 @@ argIsa_call_0(predicateConventionMt,2,ftAtom).
 argIsa_call_0('<=>',_,ftTerm).
 argIsa_call_0(class_template,N,Type):- (N=1 -> Type=tCol;Type=ftListFn(ftVoprop)).
 argIsa_call_0(Arity,N,T):-mpred_arity_pred(Arity),arity_no_bc(Arity,A),number(A),number(N),N=<A,arg(N,vv(tPred,ftInt,tCol),T).
-argIsa_call_0(F,2,ftString):-member(F,[descriptionHere,mudDescription,nameStrings,mudKeyword]),!.
+argIsa_call_0(F,2,ftString):-member(F,[descriptionHere,mudDescription,nameString,mudKeyword]),!.
 
 argIsa_call_0(F,N,Type):-a(functorDeclares,F),!,(N=1 -> Type=F ; Type=ftTerm(ftVoprop)).
 argIsa_call_0(F,N,Type):-a(tCol,F),!,(N=1 -> Type=F ; Type=ftTerm(ftVoprop)).

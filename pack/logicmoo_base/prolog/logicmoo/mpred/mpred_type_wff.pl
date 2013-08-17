@@ -956,7 +956,7 @@ leave_as_is_db('comment'(_,_)).
 leave_as_is_db(infer_by(_)).
 leave_as_is_db(b_d(_,_,_)).
 leave_as_is_db(ct(_,_)).
-% leave_as_is_db('CollectionSubsetFn'(_,_)).
+% leave_as_is_db('tColOfCollectionSubsetFn'(_,_)).
 leave_as_is_db(ignore(_)).
 leave_as_is_db(isa(_,_)).
 leave_as_is_db(P):-prequent(P).
@@ -1132,11 +1132,10 @@ is_function(Function):- is_function(Function,Function,0).
 %
 % If Is A Function.
 %
-is_function(_,'SubLQuoteFn',_):- !,fail.
-is_function(_,'aQuoteFn',_):- !,fail.
-is_function(_,'aNARTFn',_):- !,fail.
-is_function(_,'CollectionSubsetFn',_).
-is_function(_,'aCollectionSubsetFn',_).
+is_function(_,'uSubLQuoteFn',_):- !,fail.
+is_function(_,'xQuoteFn',_):- !,fail.
+is_function(_,'uNARTFn',_):- !,fail.
+is_function(_,'tCol_CollectionSubsetFn',_).
 is_function(_,F,_):- atom_concat('sk',_Was,F),!,fail.
 % is_function(P,_,_):- loop_check(leave_as_is(P)),!,fail.
 is_function(_,F,_):- loop_check(is_log_op(F)),!,fail.
@@ -1200,7 +1199,7 @@ get_pred(Pred,F):- get_functor(Pred,F).
 % Function Converted To Predicate.
 %
 function_to_predicate(Function,NewVar,PredifiedFunction):- 
- Function = 'CollectionSubsetFn'(Col,'TheSetOf'(NewVar,Formulas)), 
+ Function = 'tColOfCollectionSubsetFn'(Col,'tSetOfTheSetOfFn'(NewVar,Formulas)), 
  must(is_ftVar(NewVar)), % \+ is_ftVar(Col),!,
  PredifiedFunction = (isa(NewVar,Col) & Formulas).
 

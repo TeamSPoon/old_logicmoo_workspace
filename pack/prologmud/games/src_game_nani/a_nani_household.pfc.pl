@@ -22,7 +22,7 @@ use this file with...
 % Rooms
 % ==================================================
 
-/* technically the following are not needed due the bordersOn/2s below */
+/* technically the following are not needed due the mudAreaConnected/2s below */
 :-onSpawn tRegion(tKitchen).
 :-onSpawn tRegion(tHall).
 :-onSpawn tRegion(tCellar).
@@ -39,14 +39,14 @@ use this file with...
 % Doors
 % ==================================================
 
-:-decl_mpred_hybrid(bordersOn(tRegion,tRegion),symmetric).
+:-decl_mpred_hybrid(mudAreaConnected(tRegion,tRegion),symmetric).
 
-:-onSpawn bordersOn(tLivingRoom,tOfficeRoom).
-:-onSpawn bordersOn(tHall,tDiningRoom).
-:-onSpawn bordersOn(tHall,tBedRoom).
-:-onSpawn bordersOn(tHall,tLivingRoom).
-:-onSpawn bordersOn(tHall,tBathRoom).
-:-onSpawn bordersOn(tKitchen, tCellar).
-:-onSpawn bordersOn(tDiningRoom, tKitchen).
-:-onSpawn bordersOn(tBedRoom, tClosetRoom).
-:-onSpawn bordersOn(tKitchen, tBackYard).
+:-onSpawn mudAreaConnected(tLivingRoom,tOfficeRoom).
+:-onSpawn mudAreaConnected(tHall,tDiningRoom).
+:-onSpawn mudAreaConnected(tHall,tBedRoom).
+:-onSpawn mudAreaConnected(tHall,tLivingRoom).
+:-onSpawn mudAreaConnected(tHall,tBathRoom).
+:-onSpawn mudAreaConnected(tKitchen, tCellar).
+:-onSpawn mudAreaConnected(tDiningRoom, tKitchen).
+:-onSpawn mudAreaConnected(tBedRoom, tClosetRoom).
+:-onSpawn mudAreaConnected(tKitchen, tBackYard).

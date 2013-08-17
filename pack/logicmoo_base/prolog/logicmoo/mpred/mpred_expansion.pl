@@ -633,7 +633,7 @@ expand_kif_string_or_fail(_Why,I,O):- string(I), % atom_contains(I,'('),
    O=PTerm.
 
 
-expand_kif_string(I,O):- any_to_string(I,S),
+expand_kif_string(I,O):- any_to_string(I,S),string(S),
   input_to_forms(string(S),O,Vs)->
   put_variable_names(Vs).
   
@@ -1049,10 +1049,10 @@ db_expand_0(Op,EL,O):- is_list(EL),!,must_maplist(db_expand_0(Op),EL,O).
 db_expand_0(_Op,P,PO):- 
   compound(P),
   P=..[ARE,FF,AA],
-  atom_concat('arg',REST,ARE),
-  member(E,['Genl','Isa','SometimesIsa','Format','QuotedIsa']),atom_concat(N,E,REST),
-  atom_number(N,NN),
-  atom_concat('arg',E,AE),
+   atom_concat('arg',REST,ARE),
+   member(E,['Genl','Isa','SometimesIsa','Format','QuotedIsa']),atom_concat(N,E,REST),
+   atom_number(N,NN),
+   atom_concat('arg',E,AE),
   PO=..[AE,FF,NN,AA],!.
 
 
@@ -1096,10 +1096,9 @@ db_expand_0(Op,pddlSorts(I,EL),O):- listToE(EL,E),fully_expand_clause_now(Op,gen
 db_expand_0(Op,pddlTypes(EL),O):- listToE(EL,E),fully_expand_clause_now(Op,isa(E,tCol),O).
 db_expand_0(Op,pddlPredicates(EL),O):- listToE(EL,E),fully_expand_clause_now(Op,prologHybrid(E),O).
 
-/*
+
 db_expand_0(Op,DECL,O):- arg(_,DECL,S),string(S),DECL=..[F|Args],maplist(destringify,Args,ArgsO),
   ArgsO\=@=Args,!,DECLM=..[F|ArgsO],db_expand_0(Op,DECLM,O).
-*/
 
 % db_expand_0(Op,EACH,O):- EACH=..[each|List],db_expand_maplist(fully_expand_now(Op),List,T,T,O).
 db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..[D,F/A|Args],is_ftNameArity(F,A),functor_declares_instance(D,TPRED),

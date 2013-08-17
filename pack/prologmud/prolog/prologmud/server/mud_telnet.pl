@@ -451,7 +451,7 @@ atom_label(SLabel,SLab2):- sub_atom(SLabel,0,2,_,SLab2),!.
 inst_label(Obj,Label):-  typeHasGlyph(Obj,Label),!.
 inst_label(Obj,SLab2):-  atom(Obj),atom_label(Obj,SLab2).
 inst_label(Obj,SLab2):-  term_to_atom(Obj,SLabel),atom_label(SLabel,SLab2).
-inst_label(Obj,Label):-  iprops(Obj,nameStrings(Val)),Val\=Obj,inst_label(Val,Label),!.
+inst_label(Obj,Label):-  iprops(Obj,nameString(Val)),Val\=Obj,inst_label(Val,Label),!.
 inst_label(Obj,Label):-  iprops(Obj,mudNamed(Val)),Val\=Obj,!,inst_label(Val,Label),!.
 inst_label(Obj,Label):-  iprops(Obj,isa(Val)),Val\=Obj,inst_label(Val,Label),!.
 inst_label(_Obj,'&&').

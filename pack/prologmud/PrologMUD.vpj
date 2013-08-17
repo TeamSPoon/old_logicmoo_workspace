@@ -140,6 +140,19 @@
 				<F N="games/src_game_wumpus/objs_misc_monster.pfc.pl"/>
 			</Folder>
 		</Folder>
+		<Folder Name="../../">
+			<F N="../../.gitattributes"/>
+			<F N="../../.gitignore"/>
+			<F N="../../.gitmodules"/>
+			<F N="../../.hgignore"/>
+			<F N="../../LICENSE"/>
+			<F N="../../LogicMOO.vpw"/>
+			<F N="../../pack.pl"/>
+			<F N="../../prologmud.pep"/>
+			<F N="../../README.md"/>
+			<F N="../../StartMUDServer.bat"/>
+			<F N="../../startMUDServer.sh"/>
+		</Folder>
 		<Folder Name="../../games">
 			<F
 				N="../../games/*.*"
@@ -171,6 +184,19 @@
 		<Folder Name="../logicmoo_nlu">
 			<Folder Name="prolog">
 				<F N="../logicmoo_nlu/prolog/parser_all.pl"/>
+				<F N="../logicmoo_nlu/prolog/parser_e2c.pl"/>
+				<F N="../logicmoo_nlu/prolog/parser_stanford.pl"/>
+				<F N="../logicmoo_nlu/prolog/POSTaggerParser.java"/>
+			</Folder>
+		</Folder>
+		<Folder Name="/opt">
+			<Folder Name="cyc">
+				<F N="/opt/cyc/cb-prolog.lisp"/>
+				<F N="/opt/cyc/cyc_export_utils.pl"/>
+				<F N="/opt/cyc/export.lisp"/>
+				<F N="/opt/cyc/kb_7166.pl"/>
+				<F N="/opt/cyc/kb_7166.pl-a1"/>
+				<F N="/opt/cyc/kb_7166.pl-a3"/>
 			</Folder>
 		</Folder>
 		<Folder Name="prolog">
@@ -179,19 +205,6 @@
 				Recurse="1"
 				Refilter="0"
 				Excludes=".git/;*.*~;*~/"/>
-		</Folder>
-		<Folder Name="../../">
-			<F N="../../.gitattributes"/>
-			<F N="../../.gitignore"/>
-			<F N="../../.gitmodules"/>
-			<F N="../../.hgignore"/>
-			<F N="../../LICENSE"/>
-			<F N="../../LogicMOO.vpw"/>
-			<F N="../../pack.pl"/>
-			<F N="../../prologmud.pep"/>
-			<F N="../../README.md"/>
-			<F N="../../StartMUDServer.bat"/>
-			<F N="../../startMUDServer.sh"/>
 		</Folder>
 		<Folder Name="runtime">
 			<F

@@ -21,7 +21,7 @@
             ansicall1/3,
             ansifmt/2,
             ansifmt/3,
-          is_hiding_dmsgs/0,
+            is_hiding_dmsgs/0,
             colormsg/2,
             contains_atom/2,
             contrasting_color/2,
@@ -328,7 +328,6 @@ with_no_dmsg(TypeUnShown,Call):-w_tl(set_prolog_flag(opt_debug,filter),
 dmsg_hides_message(_):- current_prolog_flag(opt_debug,false),!.
 dmsg_hides_message(_):- current_prolog_flag(opt_debug,true),!,fail.
 dmsg_hides_message(C):-  tlbugger:dmsg_match(HideShow,Matcher),matches_term(Matcher,C),!,HideShow=hidden.
-
 
 :- export(matches_term/2).
 

@@ -64,6 +64,7 @@ quiet_all_module_predicates_are_transparent/1,
             term_to_string/2,
             unnumbervars/2,
             unnumbervars_and_save/2,
+            qdmsg/1,
             var_to_name/3
           ]).
 
@@ -72,6 +73,8 @@ quiet_all_module_predicates_are_transparent/1,
 system:nop(_).
 :- endif.
 
+qdmsg(M):-compound(M),functor(M,F,_),!,debug(logicmoo(F),'~q',[M]).
+qdmsg(M):-debug(logicmoo(M),'QMSG: ~q',[M]).
 
 :- meta_predicate
 

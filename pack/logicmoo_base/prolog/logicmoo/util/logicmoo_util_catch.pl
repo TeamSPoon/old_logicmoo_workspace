@@ -57,8 +57,7 @@
             functor_safe/3,
             get_must/2,
             ib_multi_transparent33/1,
-            if_defined/1,
-            if_defined/2,
+            if_defined/1,if_defined/2,
             input_key/1,
             is_ftCompound/1,
             not_ftCompound/1,
@@ -86,9 +85,8 @@
 
             must/1,
             must_det/1,
-            must_det/2,
+            %must_det_dead/2,
             must_det_l/1,
-            must_det_lm/2,
             must_l/1,
             nd_dbgsubst/4,
             nd_dbgsubst1/5,
@@ -125,7 +123,8 @@
             with_preds/6,
             without_must/1,
             non_user_console/0,
-            y_must/2
+            y_must/2,
+            must_find_and_call/1
 
 
           ]).
@@ -159,8 +158,8 @@ non_user_console:-current_input(In),stream_property(In, close_on_exec(true)).
 		catchvvnt(0, ?, 0),
 		catchv(0, ?, 0),
 		
-		if_defined(+),
-		if_defined(+, 0),
+		if_defined(:),
+		if_defined(:, 0),
 		ddmsg_call(0),
 		on_x_fail(0),
 		on_x_log_throw(0),
@@ -168,12 +167,13 @@ non_user_console:-current_input(In),stream_property(In, close_on_exec(true)).
 		
 		on_x_log_cont(0),
 		on_x_log_fail(0),
-		if_defined(+, 0),        
+		
 
         must(0),
+        must_find_and_call(0),
         must_det(0),
-        must_det(0, 0),
-        must_det_l(:),
+        %must_det_dead(0, 0),
+        must_det_l(0),
         must_l(0),
         one_must(0, 0),
         one_must_det(0, 0),
@@ -236,7 +236,6 @@ non_user_console:-current_input(In),stream_property(In, close_on_exec(true)).
         maplist_safe/3,
         module_functor/4,
 
-        must_det_lm/2,
         nd_dbgsubst/4,
         nd_dbgsubst1/5,
         nd_dbgsubst2/4,
@@ -502,8 +501,7 @@ doall_and_fail(Call):- time_call(once(doall(Call))),fail.
 quietly_must(G):- /*no_trace*/(must(G)).
 
 
-:- meta_predicate if_defined(+).
-:- export(if_defined/1).
+:- module_transparent((if_defined/1,if_defined/2)).
 
 %% if_defined( ?G) is semidet.
 %
@@ -511,16 +509,13 @@ quietly_must(G):- /*no_trace*/(must(G)).
 %
 if_defined(Goal):- if_defined(Goal,((dmsg(warn_undefined(Goal))),!,fail)).
 
-:- meta_predicate if_defined(+,0).
-:- export(if_defined/2).
-
 %% if_defined( ?Goal, :GoalElse) is semidet.
 %
 % If Defined Else.
 %
-if_defined(Goal,_Else):- current_predicate(_,Goal),!,Goal.
-if_defined(_:Goal,Else):- !, current_predicate(_,OM:Goal)->OM:Goal;Else.
-if_defined(Goal,  Else):- current_predicate(_,OM:Goal)->OM:Goal;Else.
+if_defined(Goal,Else):- current_predicate(_,Goal)*->Goal;Else.
+% if_defined(M:Goal,Else):- !, current_predicate(_,OM:Goal),!,OM:Goal;Else.
+%if_defined(Goal,  Else):- current_predicate(_,OM:Goal)->OM:Goal;Else.
 
 
 
@@ -1378,12 +1373,12 @@ one_must_det(_Call,OnFail):-OnFail,!.
 
 %= 	 	 
 
-%% must_det( :GoalGoal, :GoalOnFail) is semidet.
+%% must_det_dead( :GoalGoal, :GoalOnFail) is semidet.
 %
 % Must Be Successfull Deterministic.
 %
-must_det(Goal,OnFail):- trace_or_throw(deprecated(must_det(Goal,OnFail))),Goal,!.
-must_det(_Call,OnFail):-OnFail.
+%must_det_dead(Goal,OnFail):- trace_or_throw(deprecated(must_det(Goal,OnFail))),Goal,!.
+%must_det_dead(_Call,OnFail):-OnFail.
 
 :- module_transparent(must_det_l/1).
 
@@ -1393,24 +1388,14 @@ must_det(_Call,OnFail):-OnFail.
 %
 % Must Be Successfull Deterministic (list Version).
 %
-must_det_l(MGoal):- strip_module(MGoal,M,Goal),!, must_det_lm(M,Goal).
+must_det_l(Goal):-strip_module(Goal,_,P),var(P),trace_or_throw(var_must_det_l(Goal)),!.
+must_det_l([Goal]):-!,must_det(Goal).
+must_det_l([Goal|List]):-!,must_det(Goal),!,must_det_l(List).
+must_det_l(Goal):-tlbugger:skip_bugger,!,must_det(Goal).
+must_det_l((Goal,List)):-!,must_det_l(Goal),!,must_det_l(List).
+must_det_l(Goal):- must_det(Goal),!.
 
-:- module_transparent(must_det_lm/2).
-
-%= 	 	 
-
-%% must_det_lm( ?M, :TermGoal) is semidet.
-%
-% Must Be Successfull Deterministic Lm.
-%
-must_det_lm(M,Goal):-var(Goal),trace_or_throw(var_must_det_l(M:Goal)),!.
-must_det_lm(M,[Goal]):-!,must_det_lm(M,Goal).
-must_det_lm(M,[Goal|List]):-!,must_find_and_call(M:Goal),!,must_det_lm(M,List).
-must_det_lm(M,Goal):-tlbugger:skip_bugger,!,find_and_call(M:Goal).
-must_det_lm(M,(Goal,List)):-!,must_find_and_call(M:Goal),!,must_det_lm(M,List).
-must_det_lm(M,Goal):- must_find_and_call(M:Goal),!.
-
-must_find_and_call(G):-must(find_and_call(G)).
+must_find_and_call(G):-must(G).
 
 :- module_transparent(det_lm/2).
 

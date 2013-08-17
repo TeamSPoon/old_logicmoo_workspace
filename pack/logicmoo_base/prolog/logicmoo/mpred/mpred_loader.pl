@@ -12,8 +12,6 @@
 :- module(mpred_loader,
           [ add_from_file/1,
           % unused_assertion/1,
-          assert_until_eof/2,
-          assert_until_eof/1,
           mpred_ops/0,setup_module_ops/1,
           set_file_lang/1,
           mpred_te/6,
@@ -67,8 +65,7 @@
             declare_load_dbase/1,
             disable_mpred_expansion/0,
             disable_mpreds_in_current_file/0,
-            do_end_of_file_actions/4,
-            do_end_of_file_actions_real/0,
+            
             dyn_begin/0,
             dyn_end/0,
             enable_mpred_expansion/0,
@@ -118,7 +115,7 @@
             loader_side_effect_capture_only/2,
             loader_side_effect_verify_only/2,
             must_expand_term_to_command/2,
-            loading_source_file/1,
+            
             make_db_listing/0,
             make_dynamic/1,
            (make_dynamic_ilc)/1,
@@ -149,7 +146,7 @@
             must_locate_file/2,
             maybe_locate_file/2,
             myDebugOnError/1,
-            onEndOfFile/1,
+            
             op_alias/2,
             op_lang/1,
             pl_to_mpred_syntax/2,
@@ -239,12 +236,14 @@
         baseKB:loaded_file_world_time(+, +, +).
 :- multifile((t_l:into_form_code/0, t_l:mpred_module_expansion/1, user:term_expansion/2)).
 :- (dynamic   user:term_expansion/2).
-% :- (module_transparent add_from_file/1, add_term/2, assert_kif/1, assert_kif_dolce/1, assert_until_eof/2,assert_until_eof/1, begin_pfc/0, call_file_command/4, 
+% :- (module_transparent add_from_file/1, add_term/2, assert_kif/1, assert_kif_dolce/1,
+ 
+%  begin_pfc/0, call_file_command/4, 
 % call_from_module/2, with_source_module/2, can_be_dynamic/1, cl_assert/2, clear_predicates/1, collect_expansions/3, compile_clause/1,
 %  mpred_term_expansion_by_storage_type/3, convert_side_effect/2, convert_side_effect/3, convert_side_effect_0a/2, convert_side_effect_0b/2, convert_side_effect_0c/2, 
 % convert_side_effect_buggy/2, current_context_module/1, current_op_alias/2, cwc/0, decache_file_type/1, ensure_abox/1, declare_load_dbase/1, 
-% disable_mpred_expansion/0, disable_mpreds_in_current_file/0, do_end_of_file_actions/4, do_end_of_file_actions_real/0, dyn_begin/0, dyn_end/0, enable_mpred_expansion/0, end_module_type/1, end_module_type/2, ensure_loaded_no_mpreds/1, ensure_mpred_file_consulted/2, ensure_mpred_file_loaded/1, ensure_mpred_file_loaded/2, ensure_prolog_file_consulted/2, etrace/0, expand_in_mpred_kb_module/2, expanded_already_functor/1, file_begin/1, file_end/1, finish_processing_world/0, force_reload_mpred_file/1, 
-%  force_reload_mpred_file2/2, force_reload_mpred_file/2, from_kif_string/2, get_file_type/2, get_lang/1, get_last_time_file/3, get_op_alias/2, gload/0, guess_file_type_loader/2, hdr_debug/2, in_include_file/0, in_mpred_kb_module/0, include_mpred_files/1, get_lang/1, is_code_body/1, is_compiling/0, is_compiling_sourcecode/0, is_kif_string/1, is_mpred_file/1, guess_if_mpred_file0/1, lang_op_alias/3, load_file_dir/2, load_file_some_type/2, expand_term_to_load_calls/2, load_file_term_to_command_1/3, load_file_term_to_command_1b/3, mpred_term_expansion_by_pred_class/3, expand_term_to_load_calls/2, expand_term_to_load_calls/4, load_init_world/2, load_language_file/1, load_mpred_files/0, load_mpred_on_file_end/2, loader_side_effect_capture_only/2, loader_side_effect_verify_only/2, expand_term_to_command/2, loading_source_file/1, make_db_listing/0, make_dynamic/1, module_typed_term_expand/2, module_typed_term_expand/5, mpred_begin/0,  mpred_expand_inside_file_anyways/0, mpred_expand_inside_file_anyways/1, mpred_te/4, mpred_expander_now/2, mpred_expand_file_module_clause/4, mpred_implode_varnames/1, mpred_loader_file/0, mpred_may_expand/0, mpred_may_expand_module/1, mpred_maybe_skip/1, mpred_process_input/2, mpred_process_input_1/1, baseKB:mpred_skipped_module/1, mpred_term_expansion/2, mpred_use_module/1, must_compile_special_clause/1, expand_term_to_load_calls/2, must_locate_file/2, must_expand_term_to_command/2, myDebugOnError/1, onEndOfFile/1, op_alias/2, op_lang/1, pl_to_mpred_syntax/2, pl_to_mpred_syntax0/2, pl_to_mpred_syntax_h/2, pop_predicates/2, process_this_script/0, process_this_script/1, process_this_script0/1, prolog_load_file_loop_checked/2, prolog_load_file_loop_checked_0/2, prolog_load_file_nlc/2, prolog_load_file_nlc_0/2, push_predicates/2, read_one_term/2, read_one_term/3, register_module_type/1, register_module_type/2, rsavedb/0, savedb/0, scan_updates/0, show_bool/1, show_interesting_cl/2, show_load_context/0, simplify_why/2, simplify_why_r/4, stream_pos/1, term_expand_local_each/5, transform_opers/3, transform_opers_0/2, transform_opers_1/2, use_file_type_loader/2, use_was_isa/3, was_exported_content/3, with_mpred_expansions/1, with_no_mpred_expansions/1, with_source_module/2, xfile_module_term_expansion_pass_3/7,  (~)/1, baseKB:cl_assert/2, baseKB:cwc/0, baseKB:mpred_provide_clauses/3, always_expand_on_thread/1, t_l:current_lang/1, current_op_alias/2, defaultAssertMt/1, disable_mpred_term_expansions_globally/0, baseKB:loaded_file_world_time/3, mpred_directive_value/3, baseKB:mpred_skipped_module/1, 
+% disable_mpred_expansion/0, disable_mpreds_in_current_file/0, dyn_begin/0, dyn_end/0, enable_mpred_expansion/0, end_module_type/1, end_module_type/2, ensure_loaded_no_mpreds/1, ensure_mpred_file_consulted/2, ensure_mpred_file_loaded/1, ensure_mpred_file_loaded/2, ensure_prolog_file_consulted/2, etrace/0, expand_in_mpred_kb_module/2, expanded_already_functor/1, file_begin/1, file_end/1, finish_processing_world/0, force_reload_mpred_file/1, 
+%  force_reload_mpred_file2/2, force_reload_mpred_file/2, from_kif_string/2, get_file_type/2, get_lang/1, get_last_time_file/3, get_op_alias/2, gload/0, guess_file_type_loader/2, hdr_debug/2, in_include_file/0, in_mpred_kb_module/0, include_mpred_files/1, get_lang/1, is_code_body/1, is_compiling/0, is_compiling_sourcecode/0, is_kif_string/1, is_mpred_file/1, guess_if_mpred_file0/1, lang_op_alias/3, load_file_dir/2, load_file_some_type/2, expand_term_to_load_calls/2, load_file_term_to_command_1/3, load_file_term_to_command_1b/3, mpred_term_expansion_by_pred_class/3, expand_term_to_load_calls/2, expand_term_to_load_calls/4, load_init_world/2, load_language_file/1, load_mpred_files/0, load_mpred_on_file_end/2, loader_side_effect_capture_only/2, loader_side_effect_verify_only/2, expand_term_to_command/2, loading_source_file/1, make_db_listing/0, make_dynamic/1, module_typed_term_expand/2, module_typed_term_expand/5, mpred_begin/0,  mpred_expand_inside_file_anyways/0, mpred_expand_inside_file_anyways/1, mpred_te/4, mpred_expander_now/2, mpred_expand_file_module_clause/4, mpred_implode_varnames/1, mpred_loader_file/0, mpred_may_expand/0, mpred_may_expand_module/1, mpred_maybe_skip/1, mpred_process_input/2, mpred_process_input_1/1, baseKB:mpred_skipped_module/1, mpred_term_expansion/2, mpred_use_module/1, must_compile_special_clause/1, expand_term_to_load_calls/2, must_locate_file/2, must_expand_term_to_command/2, myDebugOnError/1, op_alias/2, op_lang/1, pl_to_mpred_syntax/2, pl_to_mpred_syntax0/2, pl_to_mpred_syntax_h/2, pop_predicates/2, process_this_script/0, process_this_script/1, process_this_script0/1, prolog_load_file_loop_checked/2, prolog_load_file_loop_checked_0/2, prolog_load_file_nlc/2, prolog_load_file_nlc_0/2, push_predicates/2, read_one_term/2, read_one_term/3, register_module_type/1, register_module_type/2, rsavedb/0, savedb/0, scan_updates/0, show_bool/1, show_interesting_cl/2, show_load_context/0, simplify_why/2, simplify_why_r/4, stream_pos/1, term_expand_local_each/5, transform_opers/3, transform_opers_0/2, transform_opers_1/2, use_file_type_loader/2, use_was_isa/3, was_exported_content/3, with_mpred_expansions/1, with_no_mpred_expansions/1, with_source_module/2, xfile_module_term_expansion_pass_3/7,  (~)/1, baseKB:cl_assert/2, baseKB:cwc/0, baseKB:mpred_provide_clauses/3, always_expand_on_thread/1, t_l:current_lang/1, current_op_alias/2, defaultAssertMt/1, disable_mpred_term_expansions_globally/0, baseKB:loaded_file_world_time/3, mpred_directive_value/3, baseKB:mpred_skipped_module/1, 
 %   never_reload_file/1, prolog_load_file_loop_checked/2, registered_module_type/2).
 :- module_transparent 
             mpred_ops/0,setup_module_ops/1.
@@ -340,8 +339,6 @@ dont_term_expansion(Type,I):-
 % mpred_file_term_expansion(_,_,_,_):- \+ current_predicate(_,_:mpred_loader_file),!,fail.
 mpred_file_term_expansion(_,_,I,_):- is_directive_form(I),!,fail.
 mpred_file_term_expansion(_,_,I,_):- is_ftVar(I),!,fail.
-mpred_file_term_expansion(Type,DefMod,end_of_file,O):- !, Type = term, DefMod = user,             
-      do_end_of_file_actions(Type,DefMod,end_of_file,O),!,fail.
 % mpred_file_term_expansion(_,_,_,_):- get_lang(pl),!,fail.
 % mpred_file_term_expansion(Type,LoaderMod,(I:-B),OO):-B==true,!,mpred_file_term_expansion(Type,LoaderMod,I,OO).
 % mpred_file_term_expansion(_Type,_LoaderMod,I,( :- must(ain(I)))):-!.
@@ -495,30 +492,6 @@ read_one_term(Stream,Term,Vs):- catch(once(( read_term(Stream,Term,[double_quote
 etrace:-leash(+all),leash(+exception),dtrace.
 
 
-:- thread_local(t_l:on_eof/2).
-:- export(t_l:on_eof/2).
-
-
-
-
-%% onEndOfFile( ?Call) is det.
-%
-% Whenever End Of File.
-%
-onEndOfFile(Call):- which_file(F), asserta(t_l:on_eof(F,Call)).
-
-
-
-
-%% assert_until_eof( ?F) is det.
-%
-% Assert Until Eof.
-%
-assert_until_eof(F):- must_det_l((loading_source_file(File),assert_until_eof(File,F))).
-
-assert_until_eof(File,F):-
-  debug(logicmoo(loader),'~N~p~n',[assert_until_eof(File,F)]),
-  must_det_l((asserta(F,Ref),asserta((t_l:on_eof(File,ignore(erase(Ref))))))).
 
 :- style_check(+singleton).
 :- style_check(-discontiguous).
@@ -831,8 +804,8 @@ mpred_may_expand:-quietly_must(loading_module(M)),mpred_may_expand_module(M),!,m
 %
 mpred_may_expand_module(M):-baseKB:mpred_skipped_module(M),!,fail.
 mpred_may_expand_module(M):-module_property(M,file(F)),is_mpred_file(F).
-mpred_may_expand_module(M):-t_l:mpred_module_expansion(M),!.
-mpred_may_expand_module(_):-t_l:mpred_module_expansion(*),!.
+mpred_may_expand_module(M):- t_l:mpred_module_expansion(M),!.
+mpred_may_expand_module(_):- t_l:mpred_module_expansion(*),!.
 
 
 
@@ -950,35 +923,6 @@ call_file_command0(I,CALL,[(:- quietly_must(CALL2)),(:- quietly_must(CALL)),OO],
   was_exported_content(I,CALL,OO),!.
 call_file_command0(I,CALL,[(:- quietly_must(CALL)),OO],(:-CALL)):- was_exported_content(I,CALL,OO),!.
 % call_file_command(I,CALL,OO,O):- (current_predicate(_,CALL) -> ((quietly_must(call(CALL)),was_exported_content(I,CALL,OO))); OO=[O,:-CALL]).
-
-
-
-
-
-
-% ensure we only process onEndOfFile directive at the end of the actual source files
-
-
-
-%% do_end_of_file_actions( ?VALUE1, ?VALUE2, ?VALUE3, ?VALUE4) is det.
-%
-% Do End Of File Actions.
-%
-do_end_of_file_actions(_,_,_,_):- in_include_file,!.
-do_end_of_file_actions(term,_,_,_):- quietly_must(loading_source_file(_F)),do_end_of_file_actions_real.
-
-
-
-
-%% do_end_of_file_actions_real is det.
-%
-% Do End Of File Actions Real.
-%
-do_end_of_file_actions_real:- which_file(F),
-   GETTER=t_l:on_eof(F,TODO),
-       forall(GETTER,((doall(show_failure(why,TODO))),ignore(retract(GETTER)))).
-
-
 
 
 
@@ -1207,7 +1151,7 @@ dyn_end:-file_end(dyn).
 enable_mpred_expansion:- set_prolog_flag(lm_expanders,true), set_prolog_flag(mpred_te,true),
      (( \+ t_l:disable_px) -> true ;
                  (retractall(t_l:disable_px),
-                 onEndOfFile(asserta_if_new(t_l:disable_px)))).
+                 call_on_eof(asserta_if_new(t_l:disable_px)))).
 
 
 
@@ -1219,8 +1163,7 @@ enable_mpred_expansion:- set_prolog_flag(lm_expanders,true), set_prolog_flag(mpr
 disable_mpred_expansion:- 
             set_prolog_flag(mpred_te,false),
              (( t_l:disable_px) -> true ;
-                 (asserta_if_new(t_l:disable_px),
-                 onEndOfFile(retractall(t_l:disable_px)))).
+                 assert_until_eof(t_l:disable_px)).
 
 
 
@@ -1751,14 +1694,6 @@ make_dynamic_ilc(C):- % trace_or_throw(make_dynamic_ilc(C)),
 :- thread_local(t_l:pretend_loading_file/1).
 
 
-
-%% loading_source_file( ?F) is det.
-%
-% Loading Source File.
-%
-loading_source_file(F):-once(t_l:pretend_loading_file(F);prolog_load_context(source,F);loading_file(F);call('$module'(F,F))).
-
-
 :- dynamic(baseKB:never_reload_file/1).
 
 
@@ -2094,13 +2029,7 @@ force_reload_mpred_file2(WorldIn,MFileIn):-
 load_mpred_on_file_end(World,File):- atom(File),
    quietly_must(atom(File)),
    asserta_new(baseKB:loaded_mpred_file(World,File)),
-   debug(logicmoo(loader),'~N~p~n',[(info(load_mpred_file_complete(File)))]),
-   forall(t_l:on_eof(File,Call),quietly_must((on_f_log_ignore(Call),retractall(t_l:on_eof(File,Call))))).
-
-
-
-
-
+   signal_eof(File).
 
 
 

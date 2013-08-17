@@ -23,6 +23,7 @@
           dbreq/1,
           swc/0,
           vwc/0,
+          check_mfa/3,
           skipped_dirs/1,
           ignore_mpreds_in_file/1,
           ignore_mpreds_in_file/0,
@@ -56,14 +57,19 @@
               system:call_expansion/4,
               system:sub_call_expansion/4)).
 
-:- module_transparent((decl_as/1,
-          decl_as_rev/2,
-          decl_as/4,
-          virtualize_code/2,
+:- module_transparent(('$kb_shared'/1,decl_shared/1,decl_as/2,
+          virtualize_source/3,
+          virtualize_code/3,
+          virtualize_code_fa/5,
           ereq/1,
-          map_compound_args/3,
-          map_compound_args/4,
           dbreq/1,
+          swc/0,
+          vwc/0,
+          check_mfa/3,
+          skipped_dirs/1,
+          ignore_mpreds_in_file/1,
+          ignore_mpreds_in_file/0,
+          clause_b/1,
           warn_if_static/2)).
 
 
@@ -235,13 +241,15 @@ virtualize_ereq(mtProlog,1).
 virtualize_ereq(mtCycL,1).
 virtualize_ereq(mtExact,1).
 virtualize_ereq(mtGlobal,1).
-virtualize_ereq(nameStrings,1).
+virtualize_ereq(nameString,2).
 
 
 virtualize_ereq(arity,2).
 virtualize_ereq(argIsa,3).
 virtualize_ereq(argQuotedIsa,3).
-
+virtualize_ereq(cyckb_t_e2c,3).
+virtualize_ereq(cyckb_t_e2c,4).
+virtualize_ereq(cyckb_t_e2c,_).
 
 
 virtualize_ereq(call_OnEachLoad,1).

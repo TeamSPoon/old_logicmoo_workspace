@@ -31,6 +31,7 @@
 % Douglas Miles
 */
 
+:- add_to_search_path(pfc,'.').
 
 :-       op(990,xfx,(':=')),
          op(250,yfx,('?')),
@@ -116,6 +117,8 @@ el(X):- logicmoo_util_filesystem:filematch(X,Y),ensure_loaded(Y).
 :- el(('logicmoo/snark/common_logic_clif.pfc')).
 
 :- el(('user_relationAllExists.pfc')).
+
+:- el(('user_transitiveViaArg.pfc')).
 
 
 :- multifile(baseKB:locked_baseKB/0).

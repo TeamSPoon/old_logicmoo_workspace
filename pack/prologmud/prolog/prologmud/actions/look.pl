@@ -75,7 +75,7 @@ cmdLook(Agent,LOC):- garbage_collect_atoms, call_u(call(cmdLook_proc,Agent,LOC))
 
 :-export(cmdLook_proc/3).
 cmdLook_proc(Agent,LOC):- 
-   with_no_modifications(w_tl(mpred_prop(nameStrings,prologListValued),cmdLook_proc_0(Agent,LOC))),
+   with_no_modifications(w_tl(mpred_prop(nameString,prologListValued),cmdLook_proc_0(Agent,LOC))),
    ain(props(Agent,mudNeedsLook(vFalse))).
 cmdLook_proc_0(Agent,LOC):-
  findall(Show,on_command_show(Agent,actLook,Show),MORELOOK),
@@ -119,7 +119,7 @@ cmdLookTest(Agent,LOC):-current_agent(Agent),mudAtLoc(Agent,LOC),
 
 :-export(nameStringsList/2).
 
-nameStringsList(Region,ValueList):-findall(Value,nameStrings(Region,Value),ValueList).
+nameStringsList(Region,ValueList):-findall(Value,nameString(Region,Value),ValueList).
 
 tLooking(Agent):- current_agent(Agent),!.
 tLooking(Agent):- tAgent(Agent),not(tDeleted(Agent)).

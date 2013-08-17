@@ -34,6 +34,8 @@
 % :- must(initEnvironment).
 :- endif.
 
+:- set_module(baseKB:class(development)).
+
 :- dynamic(baseKB:col_as_isa/1).
 :- dynamic(baseKB:col_as_unary/1).
 :- dynamic(baseKB:col_as_static/1).
@@ -100,9 +102,11 @@ col_as_unary(Col)==>tCol(Col).
 col_as_isa(Col)==>tCol(Col).
 
 
+
 % ((prologHybrid(C),{must(callable(C)),get_functor(C,F,A),C\=F}) ==> arity(F,A)).
 
 t(C,I)==>isa(I,C).
+
 
 %% t(?Collection, ?VALUE1) is semidet.
 %
@@ -120,14 +124,6 @@ completelyAssertedCollection(pm).
 completelyAssertedCollection(prologMacroHead).
 completelyAssertedCollection(tMicrotheory).
 completelyAssertedCollection(mtCycL).
-
-
-%% prologNegByFailure( ?VALUE1) is semidet.
-%
-% Prolog Negated By Failure.
-%
-prologNegByFailure(prologNegByFailure).
-   	 
 
 
 
@@ -296,15 +292,15 @@ arity(quasiQuote,1).
 
 :-call(asserta_if_new, baseKB:mtCycL(baseKB)).
 
-% this mean to leave terms at EL:  foo('QuoteFn'([cant,touch,me])).
+% this mean to leave terms at EL:  foo('xQuoteFn'([cant,touch,me])).
 
-quasiQuote('QuoteFn').
+quasiQuote('xQuoteFn').
 
 argsQuoted(argsQuoted).
 
 argsQuoted('loop_check_term').
 argsQuoted('loop_check_term_key').
-argsQuoted('QuoteFn').
+argsQuoted('xQuoteFn').
 argsQuoted('$VAR').
 
 argsQuoted(ain).
@@ -602,6 +598,9 @@ mtCycL(O)==>({find_and_call(ensure_abox(O))},~mtProlog(O),\+ mtProlog(O)).
 {module_property(Mt,class(user)),
    (atom_concat('common_logic_',_,Mt);atom_concat('logicmoo_',_,Mt);atom_concat('mpred_',_,Mt))} 
     ==>  mtProlog(Mt).
+
+
+{module_property(Mt,class(microtheory))} ==> mtCycL(Mt).
 {module_property(Mt,class(library))} ==> mtProlog(Mt).
 {module_property(Mt,class(system))} ==> mtProlog(Mt).
 
@@ -687,4 +686,5 @@ nondet.
 
 % :- set_prolog_flag(dialect_pfc,false).
 :- mpred_notrace_exec.
+
 

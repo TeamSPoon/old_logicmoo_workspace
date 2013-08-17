@@ -170,20 +170,17 @@ baseKB:mpred_skipped_module(eggdrop).
 
 
 
-base_clause_expansion(_,I,_):- \+ compound(I), \+ string(I), !, fail.
 base_clause_expansion(_,I,_):-
   % prolog_load_context(term,TermWas),
    (b_getval('$source_term',TermWas),\+ same_terms(TermWas, I)),
    (b_getval('$term',STermWas),\+ same_terms(STermWas, I)),!,
    fail.
-
 base_clause_expansion(_,I,O):- string(I),!,expand_kif_string_or_fail(pl_te,I,O),!.
-
-base_clause_expansion(P1,end_of_file,O):- !, prolog_load_context(module,Module),mpred_te(term,Module,end_of_file,P1,O,_P2),!,fail.
+base_clause_expansion(_,I,_):- \+ compound(I), !, fail.
 base_clause_expansion(_,':-'(ain_expanded(I)),':-'(ain_expanded(I))):-!.
 base_clause_expansion(_,':-'(ain(I)),':-'(ain(I))):-!.
 base_clause_expansion(_,:-(I), O):-  !, expand_isEach_or_fail(:-(I),O),!.
-base_clause_expansion(_,I, O):- get_consequent_functor(I,F,A),base_clause_expansion_fa(I,O,F,A).
+base_clause_expansion(_,I, O):- get_consequent_functor(I,F,A)->base_clause_expansion_fa(I,O,F,A),!.
 base_clause_expansion(_,I, O):- expand_isEach_or_fail(I,O),!.
 
 base_clause_expansion_fa(_,_,F,A):- clause_b(mpred_prop(F,A,prologBuiltin)),!,fail.
@@ -194,7 +191,7 @@ base_clause_expansion_fa(_,_,F,A):- ain(mpred_prop(F,A,prologBuiltin)),!,fail.
 
 needs_pfc(F,A):- 
   (clause_b(prologMacroHead(F));clause_b(functorDeclares(F));clause_b(prologHybrid(F));
-  clause_b(mpred_prop(F,A,prologHybrid));clause_b(wrap_shared(F,_,ereq))),!.
+  clause_b(mpred_prop(F,A,prologHybrid));clause_b(wrap_shared(F,A,ereq))),!.
 
 /*
 maybe_builtin(I) :- nonvar(I),get_consequent_functor(I,F,A),
@@ -203,12 +200,11 @@ maybe_builtin(I) :- nonvar(I),get_consequent_functor(I,F,A),
 
 */
 
+:- ( defaultAssertMt(_)->true;set_defaultAssertMt(baseKB)).
+
 :- enable_mpred_expansion.
 
-:- ensure_loaded(library('logicmoo/mpred/mpred_userkb.pl')).
-
-:- set_defaultAssertMt(baseKB).
-:- set_fileAssertMt(baseKB).
+:- consult(library('logicmoo/mpred/mpred_userkb.pl')).
 
 /*
 
@@ -302,7 +298,7 @@ system:term_expansion(I,PosI,O,PosI):- current_prolog_flag(lm_expanders,true),no
 
 /*
 
-:- set_prolog_flag(retry_undefined,true).
+%:- set_prolog_flag(retry_undefined,true).
 
 :- noguitracer.
 :- call(call,(trace,call(call,(dmiles:mpred_ain(fooaosdasd,(cuz,ax)))))).
@@ -316,3 +312,4 @@ system:term_expansion(I,PosI,O,PosI):- current_prolog_flag(lm_expanders,true),no
 */
 
 :- statistics.
+

@@ -35,7 +35,7 @@ typeGrid('tFreeSpaceContent',5, [--,--,--,--,--]).
 
 pddlPredicates([
 % dynamic startrek
-  nameStrings(ftTerm,ftString),
+  nameString(ftTerm,ftString),
   pathName(tRegion,vtDirection,ftString),
 %  localityOfObject(tObj,tRegion),
   mudStowing(tAgent,tClothing),
@@ -545,253 +545,253 @@ STARSHIP ENTERPRISE
 
  /* found 141 for pddlSomethingIsa(_G1422,_G1423). */ 
 
-/* Prediate:  nameStrings/2 
+/* Prediate:  nameString/2 
 interpreted.
 file('c:/development/opensim4opencog/bin/cynd/startrek/mudreader.pl').
 line_count(52).
 number_of_clauses(2).
-Pattern: nameStrings(_G1446,_G1447). 
+Pattern: nameString(_G1446,_G1447). 
  */
-nameStrings('iArea1000',"Main Engineering").
-nameStrings('iArea1001',"Geordi's Quarters").
-nameStrings('iArea1002',"A Corridor").
-nameStrings('iArea1003',"Data's Quarters").
-nameStrings('iArea1004',"The Brig").
-nameStrings('iArea1005',"A Corridor").
-nameStrings('iArea1006',"Transporter Room").
-nameStrings('iArea1007',"School").
-nameStrings('iArea1008',"A Corridor").
-nameStrings('iArea1009',"Holodeck 2").
-nameStrings('iArea1010',"Turbolift").
-nameStrings('iArea1011',"Turbolift").
-nameStrings('iArea1012',"Cargo Bay 1").
-nameStrings('iArea1013',"A Corridor").
-nameStrings('iArea1014',"Riker's Quarters").
-nameStrings('iArea1015',"Sick Bay").
-nameStrings('iArea1016',"A Corridor").
-nameStrings('iArea1017',"Holodeck 4 Entrance  A Narrow Alley").
-nameStrings('iArea1018',"Crusher's Quarters").
-nameStrings('iArea1019',"A Corridor").
-nameStrings('iArea1020',"Enterprise Security").
-nameStrings('iArea1021',"Ten Forward").
-nameStrings('iArea1022',"Shuttle Bay").
-nameStrings('iArea1023',"Troi's Quarters").
-nameStrings('iArea1024',"A Corridor").
-nameStrings('iArea1025',"Worf's Quarters").
-nameStrings('iArea1026',"Enterprise Gym").
-nameStrings('iArea1027',"A Corridor").
-nameStrings('iArea1028',"Picard's Quarters").
-nameStrings('iArea1029',"Science Lab").
-nameStrings('iArea1030',"A Corridor").
-nameStrings('iArea1031',"Cargo Bay 2").
-nameStrings('iArea1032',"Turbolift").
-nameStrings('iArea1033',"Turbolift").
-nameStrings('iArea1034',"Turbolift").
-nameStrings('iArea1035',"Picard's Ready Room").
-nameStrings('iArea1036',"Main Bridge  Upper Half").
-nameStrings('iArea1037',"Conference Room").
-nameStrings('iArea1038',"Main Bridge  Lower Half").
-nameStrings('iArea1039',"Outer Space by the Enterprise").
-nameStrings('iArea1040',"Outer Space").
-nameStrings('iArea1041',"Outer Space").
-nameStrings('iArea1042',"Transporter Beam").
-nameStrings('iAlexander671',"Alexander").
-nameStrings(iCommanderdata66,"Data").
-nameStrings(iCommanderdata66,"CycLBot").
-nameStrings(iCommanderdata66,"CycBot").
-nameStrings(iCommanderdata66,"CycBot1").
-nameStrings('iBoots673',"Boots").
-nameStrings('iCommBadge674',"Comm Badge").
-nameStrings('iGoldUniform675',"Gold Uniform").
-nameStrings('iPhaser676',"Phaser").
-nameStrings(iExplorer1,"Player").
-nameStrings('iBoots773',"Boots").
-nameStrings('iCommBadge774',"Comm Badge").
-nameStrings('iGoldUniform775',"Gold Uniform").
-nameStrings('iPhaser776',"Phaser").
-nameStrings('iDrCrusher677',"Dr. Crusher").
-nameStrings('iBoots678',"Boots").
-nameStrings('iCommBadge679',"Comm Badge").
-nameStrings('iBlueUniform680',"Blue Uniform").
-nameStrings('iMedicalTricorder681',"Medical Tricorder").
-nameStrings('iMedicalTricorder682',"Medical Tricorder").
-nameStrings('iMedicalTricorder683',"Medical Tricorder").
-nameStrings('iGeordi684',"Geordi").
-nameStrings('iBoots685',"Boots").
-nameStrings('iCommBadge686',"Comm Badge").
-nameStrings('iGoldUniform687',"Gold Uniform").
-nameStrings('iVISOR688',"VISOR").
-nameStrings('iGuinan689',"Guinan").
-nameStrings('iTea690',"Tea").
-nameStrings('iSynthehol691',"Synthehol").
-nameStrings('iFerengiAle692',"Ferengi Ale").
-nameStrings('iRomulanWhisky693',"Romulan Whisky").
-nameStrings('iLemonadePruneJuice694',"Lemonade 'tPrune Juice'").
-nameStrings('iVulcanBeer695',"Vulcan Beer").
-nameStrings('iOBrien696',"O'tBrien").
-nameStrings('iBoots697',"Boots").
-nameStrings('iCommBadge698',"Comm Badge").
-nameStrings('iGoldUniform699',"Gold Uniform").
-nameStrings('iPhaser700',"Phaser").
-nameStrings('iPicard701',"Picard").
-nameStrings('iBoots702',"Boots").
-nameStrings('iCommBadge703',"Comm Badge").
-nameStrings('iRedUniform704',"Red Uniform").
-nameStrings('iPhaserRifle705',"5 Phaser Rifle").
-nameStrings('iPicardsFlute',"5 Picard's Flute").
-nameStrings('iRiker707',"Riker").
-nameStrings('iBoots708',"Boots").
-nameStrings('iCommBadge709',"Comm Badge").
-nameStrings('iRedUniform710',"Red Uniform").
-nameStrings('iTrombone711',"Trombone").
-nameStrings('iTroi712',"Troi").
-nameStrings('iBoots713',"Boots").
-nameStrings('iCommBadge714',"Comm Badge").
-nameStrings('iBlueUniform715',"Blue Uniform").
-nameStrings('iWesley716',"Wesley").
-nameStrings('iBoots717',"Boots").
-nameStrings('iCommBadge718',"Comm Badge").
-nameStrings('iRedUniform719',"Red Uniform").
-nameStrings('iWorf720',"Worf").
-nameStrings('iBoots721',"Boots").
-nameStrings('iCommBadge722',"Comm Badge").
-nameStrings('iGoldUniform723',"Gold Uniform").
-nameStrings('iPhaser724',"Phaser").
-nameStrings('iSash725',"Sash").
-nameStrings('iLivingston726',"Livingston").
-nameStrings('iSpot727',"Spot").
-nameStrings('iExplorer2',"Ensign").
-nameStrings('iBoots729',"Boots").
-nameStrings('iCommBadge730',"Comm Badge").
-nameStrings('iGoldUniform731',"Gold Uniform").
-nameStrings('iExplorer3',"Ensign").
-nameStrings('iBoots733',"Boots").
-nameStrings('iCommBadge734',"Comm Badge").
-nameStrings('iGoldUniform735',"Gold Uniform").
-nameStrings('iExplorer4',"Ensign").
-nameStrings('iBoots737',"Boots").
-nameStrings('iCommBadge738',"Comm Badge").
-nameStrings('iRedUniform739',"Red Uniform").
-nameStrings('iExplorer5',"Ensign").
-nameStrings('iBoots741',"Boots").
-nameStrings('iCommBadge742',"Comm Badge").
-nameStrings('iRedUniform743',"Red Uniform").
-nameStrings('iExplorer6',"Ensign").
-nameStrings('iBoots745',"Boots").
-nameStrings('iCommBadge746',"Comm Badge").
-nameStrings('iBlueUniform747',"Blue Uniform").
-nameStrings('iExplorer7',"Ensign").
-nameStrings('iBoots749',"Boots").
-nameStrings('iCommBadge750',"Comm Badge").
-nameStrings('iBlueUniform751',"Blue Uniform").
-nameStrings('iExplorer8',"Ensign").
-nameStrings('iBoots753',"Boots").
-nameStrings('iCommBadge754',"Comm Badge").
-nameStrings('iBlueUniform755',"Blue Uniform").
-nameStrings('iDilithiumCrystal756',"Dilithium Crystal").
-nameStrings('iDilithiumCrystal757',"Dilithium Crystal").
-nameStrings('iDilithiumCrystal758',"Dilithium Crystal").
-nameStrings('iTricorder759',"Tricorder").
-nameStrings('iTricorder760',"Tricorder").
-nameStrings('iTricorder761',"Tricorder").
-nameStrings('iAlexander671',"alexander rozhenko").
-nameStrings(iCommanderdata66,"Data").
-nameStrings(iExplorer1,"Player").
-nameStrings('iDrCrusher677',"Doctor Crusher").
-nameStrings('iGeordi684',"Geordi LaForge").
-nameStrings('iGuinan689',"Guinan").
-nameStrings('iOBrien696',"Chief O'tBrien").
-nameStrings('iPicard701',"Captain Picard").
-nameStrings('iRiker707',"Commander Riker").
-nameStrings('iTroi712',"Counselor Troi").
-nameStrings('iWesley716',"Wesley").
-nameStrings('iWorf720',"Lieutenant Worf").
-nameStrings('iLivingston726',"Livingston").
-nameStrings('iSpot727',"Spot").
-nameStrings('iExplorer2',"the ensign").
-nameStrings('iExplorer3',"the ensign").
-nameStrings('iExplorer4',"the ensign").
-nameStrings('iExplorer5',"the ensign").
-nameStrings('iExplorer6',"the ensign").
-nameStrings('iExplorer7',"the ensign").
-nameStrings('iExplorer8',"the ensign").
-nameStrings('iBoots673',"a pair of Starfleet black boots").
-nameStrings('iCommBadge674',"a Starfleet communication badge").
-nameStrings('iGoldUniform675',"a gold Starfleet engineering uniform").
-nameStrings('iPhaser676',"a standard issue phaser").
-nameStrings('iBoots773',"a pair of Starfleet black boots").
-nameStrings('iCommBadge774',"a Starfleet communication badge").
-nameStrings('iGoldUniform775',"a gold Starfleet engineering uniform").
-nameStrings('iPhaser776',"a standard issue phaser").
-nameStrings('iBoots678',"a pair of Starfleet black boots").
-nameStrings('iCommBadge679',"a Starfleet communication badge").
-nameStrings('iBlueUniform680',"a blue Starfleet medical uniform").
-nameStrings('iMedicalTricorder681',"a medical Tricorder").
-nameStrings('iMedicalTricorder682',"a medical Tricorder").
-nameStrings('iMedicalTricorder683',"a medical Tricorder").
-nameStrings('iBoots685',"a pair of Starfleet black boots").
-nameStrings('iCommBadge686',"a Starfleet communication badge").
-nameStrings('iGoldUniform687',"a gold Starfleet engineering uniform").
-nameStrings('iVISOR688',"Geordi's VISOR").
-nameStrings('iTea690',"a small cup").
-nameStrings('iSynthehol691',"a synthehol").
-nameStrings('iFerengiAle692',"a Ferengi bottle").
-nameStrings('iRomulanWhisky693',"a Romulan bottle").
-nameStrings('iLemonadePruneJuice694',"a small glass").
-nameStrings('iVulcanBeer695',"a Vulcan bottle").
-nameStrings('iBoots697',"a pair of Starfleet black boots").
-nameStrings('iCommBadge698',"a Starfleet communication badge").
-nameStrings('iGoldUniform699',"a gold Starfleet engineering uniform").
-nameStrings('iPhaser700',"a standard issue phaser").
-nameStrings('iBoots702',"a pair of Starfleet black boots").
-nameStrings('iCommBadge703',"a Starfleet communication badge").
-nameStrings('iRedUniform704',"a burgandy Starfleet command uniform").
-nameStrings('iPhaserRifle705',"a phaser rifle").
-nameStrings('iPicardsFlute',"Picard's flute").
-nameStrings('iBoots708',"a pair of Starfleet black boots").
-nameStrings('iCommBadge709',"a Starfleet communication badge").
-nameStrings('iRedUniform710',"a burgandy Starfleet command uniform").
-nameStrings('iTrombone711',"Riker's trombone").
-nameStrings('iBoots713',"a pair of Starfleet black boots").
-nameStrings('iCommBadge714',"a Starfleet communication badge").
-nameStrings('iBlueUniform715',"a blue Starfleet medical uniform").
-nameStrings('iBoots717',"a pair of Starfleet black boots").
-nameStrings('iCommBadge718',"a Starfleet communication badge").
-nameStrings('iRedUniform719',"a burgandy Starfleet command uniform").
-nameStrings('iBoots721',"a pair of Starfleet black boots").
-nameStrings('iCommBadge722',"a Starfleet communication badge").
-nameStrings('iGoldUniform723',"a gold Starfleet engineering uniform").
-nameStrings('iPhaser724',"a standard issue phaser").
-nameStrings('iSash725',"Worf's sash").
-nameStrings('iBoots729',"a pair of Starfleet black boots").
-nameStrings('iCommBadge730',"a Starfleet communication badge").
-nameStrings('iGoldUniform731',"a gold Starfleet engineering uniform").
-nameStrings('iBoots733',"a pair of Starfleet black boots").
-nameStrings('iCommBadge734',"a Starfleet communication badge").
-nameStrings('iGoldUniform735',"a gold Starfleet engineering uniform").
-nameStrings('iBoots737',"a pair of Starfleet black boots").
-nameStrings('iCommBadge738',"a Starfleet communication badge").
-nameStrings('iRedUniform739',"a burgandy Starfleet command uniform").
-nameStrings('iBoots741',"a pair of Starfleet black boots").
-nameStrings('iCommBadge742',"a Starfleet communication badge").
-nameStrings('iRedUniform743',"a burgandy Starfleet command uniform").
-nameStrings('iBoots745',"a pair of Starfleet black boots").
-nameStrings('iCommBadge746',"a Starfleet communication badge").
-nameStrings('iBlueUniform747',"a blue Starfleet medical uniform").
-nameStrings('iBoots749',"a pair of Starfleet black boots").
-nameStrings('iCommBadge750',"a Starfleet communication badge").
-nameStrings('iBlueUniform751',"a blue Starfleet medical uniform").
-nameStrings('iBoots753',"a pair of Starfleet black boots").
-nameStrings('iCommBadge754',"a Starfleet communication badge").
-nameStrings('iBlueUniform755',"a blue Starfleet medical uniform").
-nameStrings('iDilithiumCrystal756',"a dilithium crystal").
-nameStrings('iDilithiumCrystal757',"a dilithium crystal").
-nameStrings('iDilithiumCrystal758',"a dilithium crystal").
-nameStrings('iTricorder759',"a medical Tricorder").
-nameStrings('iTricorder760',"a medical Tricorder").
-nameStrings('iTricorder761',"a medical Tricorder").
+nameString('iArea1000',"Main Engineering").
+nameString('iArea1001',"Geordi's Quarters").
+nameString('iArea1002',"A Corridor").
+nameString('iArea1003',"Data's Quarters").
+nameString('iArea1004',"The Brig").
+nameString('iArea1005',"A Corridor").
+nameString('iArea1006',"Transporter Room").
+nameString('iArea1007',"School").
+nameString('iArea1008',"A Corridor").
+nameString('iArea1009',"Holodeck 2").
+nameString('iArea1010',"Turbolift").
+nameString('iArea1011',"Turbolift").
+nameString('iArea1012',"Cargo Bay 1").
+nameString('iArea1013',"A Corridor").
+nameString('iArea1014',"Riker's Quarters").
+nameString('iArea1015',"Sick Bay").
+nameString('iArea1016',"A Corridor").
+nameString('iArea1017',"Holodeck 4 Entrance  A Narrow Alley").
+nameString('iArea1018',"Crusher's Quarters").
+nameString('iArea1019',"A Corridor").
+nameString('iArea1020',"Enterprise Security").
+nameString('iArea1021',"Ten Forward").
+nameString('iArea1022',"Shuttle Bay").
+nameString('iArea1023',"Troi's Quarters").
+nameString('iArea1024',"A Corridor").
+nameString('iArea1025',"Worf's Quarters").
+nameString('iArea1026',"Enterprise Gym").
+nameString('iArea1027',"A Corridor").
+nameString('iArea1028',"Picard's Quarters").
+nameString('iArea1029',"Science Lab").
+nameString('iArea1030',"A Corridor").
+nameString('iArea1031',"Cargo Bay 2").
+nameString('iArea1032',"Turbolift").
+nameString('iArea1033',"Turbolift").
+nameString('iArea1034',"Turbolift").
+nameString('iArea1035',"Picard's Ready Room").
+nameString('iArea1036',"Main Bridge  Upper Half").
+nameString('iArea1037',"Conference Room").
+nameString('iArea1038',"Main Bridge  Lower Half").
+nameString('iArea1039',"Outer Space by the Enterprise").
+nameString('iArea1040',"Outer Space").
+nameString('iArea1041',"Outer Space").
+nameString('iArea1042',"Transporter Beam").
+nameString('iAlexander671',"Alexander").
+nameString(iCommanderdata66,"Data").
+nameString(iCommanderdata66,"CycLBot").
+nameString(iCommanderdata66,"CycBot").
+nameString(iCommanderdata66,"CycBot1").
+nameString('iBoots673',"Boots").
+nameString('iCommBadge674',"Comm Badge").
+nameString('iGoldUniform675',"Gold Uniform").
+nameString('iPhaser676',"Phaser").
+nameString(iExplorer1,"Player").
+nameString('iBoots773',"Boots").
+nameString('iCommBadge774',"Comm Badge").
+nameString('iGoldUniform775',"Gold Uniform").
+nameString('iPhaser776',"Phaser").
+nameString('iDrCrusher677',"Dr. Crusher").
+nameString('iBoots678',"Boots").
+nameString('iCommBadge679',"Comm Badge").
+nameString('iBlueUniform680',"Blue Uniform").
+nameString('iMedicalTricorder681',"Medical Tricorder").
+nameString('iMedicalTricorder682',"Medical Tricorder").
+nameString('iMedicalTricorder683',"Medical Tricorder").
+nameString('iGeordi684',"Geordi").
+nameString('iBoots685',"Boots").
+nameString('iCommBadge686',"Comm Badge").
+nameString('iGoldUniform687',"Gold Uniform").
+nameString('iVISOR688',"VISOR").
+nameString('iGuinan689',"Guinan").
+nameString('iTea690',"Tea").
+nameString('iSynthehol691',"Synthehol").
+nameString('iFerengiAle692',"Ferengi Ale").
+nameString('iRomulanWhisky693',"Romulan Whisky").
+nameString('iLemonadePruneJuice694',"Lemonade 'tPrune Juice'").
+nameString('iVulcanBeer695',"Vulcan Beer").
+nameString('iOBrien696',"O'tBrien").
+nameString('iBoots697',"Boots").
+nameString('iCommBadge698',"Comm Badge").
+nameString('iGoldUniform699',"Gold Uniform").
+nameString('iPhaser700',"Phaser").
+nameString('iPicard701',"Picard").
+nameString('iBoots702',"Boots").
+nameString('iCommBadge703',"Comm Badge").
+nameString('iRedUniform704',"Red Uniform").
+nameString('iPhaserRifle705',"5 Phaser Rifle").
+nameString('iPicardsFlute',"5 Picard's Flute").
+nameString('iRiker707',"Riker").
+nameString('iBoots708',"Boots").
+nameString('iCommBadge709',"Comm Badge").
+nameString('iRedUniform710',"Red Uniform").
+nameString('iTrombone711',"Trombone").
+nameString('iTroi712',"Troi").
+nameString('iBoots713',"Boots").
+nameString('iCommBadge714',"Comm Badge").
+nameString('iBlueUniform715',"Blue Uniform").
+nameString('iWesley716',"Wesley").
+nameString('iBoots717',"Boots").
+nameString('iCommBadge718',"Comm Badge").
+nameString('iRedUniform719',"Red Uniform").
+nameString('iWorf720',"Worf").
+nameString('iBoots721',"Boots").
+nameString('iCommBadge722',"Comm Badge").
+nameString('iGoldUniform723',"Gold Uniform").
+nameString('iPhaser724',"Phaser").
+nameString('iSash725',"Sash").
+nameString('iLivingston726',"Livingston").
+nameString('iSpot727',"Spot").
+nameString('iExplorer2',"Ensign").
+nameString('iBoots729',"Boots").
+nameString('iCommBadge730',"Comm Badge").
+nameString('iGoldUniform731',"Gold Uniform").
+nameString('iExplorer3',"Ensign").
+nameString('iBoots733',"Boots").
+nameString('iCommBadge734',"Comm Badge").
+nameString('iGoldUniform735',"Gold Uniform").
+nameString('iExplorer4',"Ensign").
+nameString('iBoots737',"Boots").
+nameString('iCommBadge738',"Comm Badge").
+nameString('iRedUniform739',"Red Uniform").
+nameString('iExplorer5',"Ensign").
+nameString('iBoots741',"Boots").
+nameString('iCommBadge742',"Comm Badge").
+nameString('iRedUniform743',"Red Uniform").
+nameString('iExplorer6',"Ensign").
+nameString('iBoots745',"Boots").
+nameString('iCommBadge746',"Comm Badge").
+nameString('iBlueUniform747',"Blue Uniform").
+nameString('iExplorer7',"Ensign").
+nameString('iBoots749',"Boots").
+nameString('iCommBadge750',"Comm Badge").
+nameString('iBlueUniform751',"Blue Uniform").
+nameString('iExplorer8',"Ensign").
+nameString('iBoots753',"Boots").
+nameString('iCommBadge754',"Comm Badge").
+nameString('iBlueUniform755',"Blue Uniform").
+nameString('iDilithiumCrystal756',"Dilithium Crystal").
+nameString('iDilithiumCrystal757',"Dilithium Crystal").
+nameString('iDilithiumCrystal758',"Dilithium Crystal").
+nameString('iTricorder759',"Tricorder").
+nameString('iTricorder760',"Tricorder").
+nameString('iTricorder761',"Tricorder").
+nameString('iAlexander671',"alexander rozhenko").
+nameString(iCommanderdata66,"Data").
+nameString(iExplorer1,"Player").
+nameString('iDrCrusher677',"Doctor Crusher").
+nameString('iGeordi684',"Geordi LaForge").
+nameString('iGuinan689',"Guinan").
+nameString('iOBrien696',"Chief O'tBrien").
+nameString('iPicard701',"Captain Picard").
+nameString('iRiker707',"Commander Riker").
+nameString('iTroi712',"Counselor Troi").
+nameString('iWesley716',"Wesley").
+nameString('iWorf720',"Lieutenant Worf").
+nameString('iLivingston726',"Livingston").
+nameString('iSpot727',"Spot").
+nameString('iExplorer2',"the ensign").
+nameString('iExplorer3',"the ensign").
+nameString('iExplorer4',"the ensign").
+nameString('iExplorer5',"the ensign").
+nameString('iExplorer6',"the ensign").
+nameString('iExplorer7',"the ensign").
+nameString('iExplorer8',"the ensign").
+nameString('iBoots673',"a pair of Starfleet black boots").
+nameString('iCommBadge674',"a Starfleet communication badge").
+nameString('iGoldUniform675',"a gold Starfleet engineering uniform").
+nameString('iPhaser676',"a standard issue phaser").
+nameString('iBoots773',"a pair of Starfleet black boots").
+nameString('iCommBadge774',"a Starfleet communication badge").
+nameString('iGoldUniform775',"a gold Starfleet engineering uniform").
+nameString('iPhaser776',"a standard issue phaser").
+nameString('iBoots678',"a pair of Starfleet black boots").
+nameString('iCommBadge679',"a Starfleet communication badge").
+nameString('iBlueUniform680',"a blue Starfleet medical uniform").
+nameString('iMedicalTricorder681',"a medical Tricorder").
+nameString('iMedicalTricorder682',"a medical Tricorder").
+nameString('iMedicalTricorder683',"a medical Tricorder").
+nameString('iBoots685',"a pair of Starfleet black boots").
+nameString('iCommBadge686',"a Starfleet communication badge").
+nameString('iGoldUniform687',"a gold Starfleet engineering uniform").
+nameString('iVISOR688',"Geordi's VISOR").
+nameString('iTea690',"a small cup").
+nameString('iSynthehol691',"a synthehol").
+nameString('iFerengiAle692',"a Ferengi bottle").
+nameString('iRomulanWhisky693',"a Romulan bottle").
+nameString('iLemonadePruneJuice694',"a small glass").
+nameString('iVulcanBeer695',"a Vulcan bottle").
+nameString('iBoots697',"a pair of Starfleet black boots").
+nameString('iCommBadge698',"a Starfleet communication badge").
+nameString('iGoldUniform699',"a gold Starfleet engineering uniform").
+nameString('iPhaser700',"a standard issue phaser").
+nameString('iBoots702',"a pair of Starfleet black boots").
+nameString('iCommBadge703',"a Starfleet communication badge").
+nameString('iRedUniform704',"a burgandy Starfleet command uniform").
+nameString('iPhaserRifle705',"a phaser rifle").
+nameString('iPicardsFlute',"Picard's flute").
+nameString('iBoots708',"a pair of Starfleet black boots").
+nameString('iCommBadge709',"a Starfleet communication badge").
+nameString('iRedUniform710',"a burgandy Starfleet command uniform").
+nameString('iTrombone711',"Riker's trombone").
+nameString('iBoots713',"a pair of Starfleet black boots").
+nameString('iCommBadge714',"a Starfleet communication badge").
+nameString('iBlueUniform715',"a blue Starfleet medical uniform").
+nameString('iBoots717',"a pair of Starfleet black boots").
+nameString('iCommBadge718',"a Starfleet communication badge").
+nameString('iRedUniform719',"a burgandy Starfleet command uniform").
+nameString('iBoots721',"a pair of Starfleet black boots").
+nameString('iCommBadge722',"a Starfleet communication badge").
+nameString('iGoldUniform723',"a gold Starfleet engineering uniform").
+nameString('iPhaser724',"a standard issue phaser").
+nameString('iSash725',"Worf's sash").
+nameString('iBoots729',"a pair of Starfleet black boots").
+nameString('iCommBadge730',"a Starfleet communication badge").
+nameString('iGoldUniform731',"a gold Starfleet engineering uniform").
+nameString('iBoots733',"a pair of Starfleet black boots").
+nameString('iCommBadge734',"a Starfleet communication badge").
+nameString('iGoldUniform735',"a gold Starfleet engineering uniform").
+nameString('iBoots737',"a pair of Starfleet black boots").
+nameString('iCommBadge738',"a Starfleet communication badge").
+nameString('iRedUniform739',"a burgandy Starfleet command uniform").
+nameString('iBoots741',"a pair of Starfleet black boots").
+nameString('iCommBadge742',"a Starfleet communication badge").
+nameString('iRedUniform743',"a burgandy Starfleet command uniform").
+nameString('iBoots745',"a pair of Starfleet black boots").
+nameString('iCommBadge746',"a Starfleet communication badge").
+nameString('iBlueUniform747',"a blue Starfleet medical uniform").
+nameString('iBoots749',"a pair of Starfleet black boots").
+nameString('iCommBadge750',"a Starfleet communication badge").
+nameString('iBlueUniform751',"a blue Starfleet medical uniform").
+nameString('iBoots753',"a pair of Starfleet black boots").
+nameString('iCommBadge754',"a Starfleet communication badge").
+nameString('iBlueUniform755',"a blue Starfleet medical uniform").
+nameString('iDilithiumCrystal756',"a dilithium crystal").
+nameString('iDilithiumCrystal757',"a dilithium crystal").
+nameString('iDilithiumCrystal758',"a dilithium crystal").
+nameString('iTricorder759',"a medical Tricorder").
+nameString('iTricorder760',"a medical Tricorder").
+nameString('iTricorder761',"a medical Tricorder").
 
- /* found 322 for nameStrings(_G1446,_G1447). */ 
+ /* found 322 for nameString(_G1446,_G1447). */ 
 
 pddlDescription(Obj,List)==>{member(E,List)},mudDescription(Obj,E).
 

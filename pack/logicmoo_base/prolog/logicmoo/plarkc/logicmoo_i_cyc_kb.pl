@@ -278,7 +278,7 @@ baseKB:cyc_to_plarkc('thereExistsAtMost', 'atmost').
 baseKB:cyc_to_plarkc('CycLClosedAtomicTerm', 'ftAtomicTerm').
 baseKB:cyc_to_plarkc('UnitOfMeasure', 'tUnitOfMeasure').
 baseKB:cyc_to_plarkc('CharacterString', 'ftString').
-baseKB:cyc_to_plarkc('SetOrCollection', 'tCol').
+baseKB:cyc_to_plarkc('SetOrCollection', 'tSpec').
 baseKB:cyc_to_plarkc('ScalarInterval', 'tScalarInterval').
 
 
@@ -335,7 +335,7 @@ baseKB:mpred_to_cyc(vtProvabilityStatus, 'CycProvabilityStatus').
 baseKB:mpred_to_cyc(vtTruthValue, 'TruthValue').
 baseKB:mpred_to_cyc(vtCanonicalizerDirective, 'CanonicalizerDirective').
 
-baseKB:mpred_to_cyc(aCollectionSubsetFn,'CollectionSubsetFn').
+baseKB:mpred_to_cyc(tColOfCollectionSubsetFn,'CollectionSubsetFn').
 baseKB:mpred_to_cyc(vTrue, 'True').
 baseKB:mpred_to_cyc(vFalse, 'False').
 baseKB:mpred_to_cyc(vGuest, 'Guest').
@@ -599,7 +599,7 @@ cyc_to_clif_notify(B,A):- cyc_to_clif(B,A) -> B\=@=A, nop(dmsg(B==A)).
 cyc_to_clif(V,V):-is_ftVar(V),!.
 cyc_to_clif(I,O):-atom(I),must(cyc_to_mpred_idiom(I,O)),!.
 cyc_to_clif(V,V):-not(compound(V)),!.
-cyc_to_clif('SubLQuoteFn'(V),V):-atom(V),!.
+cyc_to_clif('uSubLQuoteFn'(V),V):-atom(V),!.
 cyc_to_clif(isa(I,C),O):-atom(C),M=..[C,I],!,cyc_to_clif(M,O).
 cyc_to_clif(I,O):-ruleRewrite(I,M),I\=@=M,!,cyc_to_clif(M,O).
 cyc_to_clif([H|T],[HH|TT]):-!,cyc_to_clif(H,HH),cyc_to_clif(T,TT),!.
@@ -846,7 +846,6 @@ checkCycAvailablity:- catchv((current_predicate(invokeSubL/2),ignore((invokeSubL
 */
 % :- dmsg("Loading tinyKB should take under a minute 666").
 
-% :-must((asserta((user:term_expansion(A,B):-cyc_to_clif_notify(A,B),!),CLREF),asserta(at_eof_action(erase(CLREF))))).
 % :- gripe_time(60,qcompile(logicmoo(plarkc/'logicmoo_i_cyc_kb_tinykb.pfc'))).
 :- disable_mpred_expansion.
 :- set_prolog_flag(lm_expanders,false).
@@ -854,7 +853,6 @@ checkCycAvailablity:- catchv((current_predicate(invokeSubL/2),ignore((invokeSubL
 :- ensure_loaded(logicmoo(plarkc/'logicmoo_i_cyc_kb_tinykb.pfc')).
 :- enable_mpred_expansion.
 :- gripe_time(60,ensure_loaded(logicmoo(plarkc/'logicmoo_i_cyc_xform.pfc'))).
-%:-must(forall(retract(at_eof_action(CALL)),must(CALL))).
 :- set_prolog_flag(lm_expanders,true).
 
 

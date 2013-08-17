@@ -1795,7 +1795,7 @@ mpred_slow_search.
 %
 % Rule Backward.
 %
-ruleBackward(R,Condition):- call_u(( ruleBackward0(R,Condition),functor(Condition,F,_),\+ consequent_arg(_,v(mpred_call_no_bc,call,call_u),F))).
+ruleBackward(R,Condition):- call_u(( ruleBackward0(R,Condition),functor(Condition,F,_),\+ consequent_arg(_,v(call_u_no_bc,call,call_u),F))).
 %ruleBackward0(F,Condition):-clause_u(F,Condition),\+ (is_true(Condition);mpred_is_info(Condition)).
 
 %% ruleBackward0( +F, ?Condition) is semidet.

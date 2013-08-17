@@ -415,28 +415,34 @@ name_text(I,O):- nonvar(I),no_repeats(O,(name_text_now(I,M),any_to_string(M,S), 
 :-dynamic(name_text_now/2).
 :-multifile(name_text_now/2).
 :-export(name_text_now/2).
-name_text_now(Name,Text):-clause_b(nameStrings(Name,Text)).
-name_text_now(Name,Text):-clause_b(mudKeyword(Name,Text)).
-name_text_now(Name,Text):-must(guess_nameStrings(Name,Text)).
+name_text_now(Name,Text):- name_text_cached(Name,Text).
+name_text_now(Name,Text):- atomic(Name),guess_nameStrings(Name,Text),!.
 
-guess_mudDescription([],_):-!,fail.
-guess_mudDescription('',_):-!,fail.
-guess_mudDescription("",_):-!,fail.
-guess_mudDescription(Name,Text):-string(Name),!,Name=Text.
-guess_mudDescription(Name,Text):-is_list(Name),!,
-    maplist(as_atom,Name,RealName),atomic_list_concat(RealName,Obj),!,guess_mudDescription(Obj,Text).
-guess_mudDescription(Name,Desc):- isa(Name,tPred), \+ isa(Name,tCol),atomic(Name),make_summary([],Name,Desc).
-guess_mudDescription(Name,Desc):- atomic(Name),to_case_breaks(Name,TextT),
+name_text_cached(Name,Text):-clause_b(nameString(Name,Text)).
+name_text_cached(Name,Text):-clause_b(mudKeyword(Name,Text)).
+
+:- baseKB:import(logicmoo_util_strings:convert_cycString/2).
+
+guess_mudDescription(O,S):-guess_mudDescription_0(O,OS),!,convert_cycString(OS,S).
+guess_mudDescription_0([],_):-!,fail.
+guess_mudDescription_0('',_):-!,fail.
+guess_mudDescription_0("",_):-!,fail.
+guess_mudDescription_0(Name,Text):-string(Name),!,Name=Text.
+guess_mudDescription_0(Name,Text):-is_list(Name),!,
+    maplist(as_atom,Name,RealName),atomic_list_concat(RealName,Obj),!,guess_mudDescription_0(Obj,Text).
+guess_mudDescription_0(Name,Desc):- isa(Name,tPred), \+ isa(Name,tCol),atomic(Name),make_summary([],Name,Desc).
+guess_mudDescription_0(Name,Desc):- atomic(Name),!,atom(Name),to_case_breaks(Name,TextT),
    maplist(to_descriptive_name(Name),TextT,TextL),!,atomics_to_string(TextL,' ',Desc).
 
-guess_nameStrings([],_):-!,fail.
-guess_nameStrings('',_):-!,fail.
-guess_nameStrings("",_):-!,fail.
-guess_nameStrings(Name,Text):-string(Name),!,Name=Text.
-guess_nameStrings(Name,Text):-is_list(Name),!,
-    maplist(as_atom,Name,RealName),atomic_list_concat(RealName,Obj),!,guess_nameStrings(Obj,Text).
-guess_nameStrings(Name,Text):-compound(Name),!,Name=..[F,A|List],!,guess_nameStrings([F,A|List],Text).
-guess_nameStrings(Name,Text):-atom(Name),to_case_breaks(Name,ListN),to_case_breaks_trimed(Name,ListN,Text).
+guess_nameStrings(O,S):-guess_nameStrings_0(O,OS),!,convert_cycString(OS,S).
+guess_nameStrings_0([],_):-!,fail.
+guess_nameStrings_0('',_):-!,fail.
+guess_nameStrings_0("",_):-!,fail.
+guess_nameStrings_0(Name,Text):-string(Name),!,Name=Text.
+guess_nameStrings_0(Name,Text):-is_list(Name),!,
+    maplist(as_atom,Name,RealName),atomic_list_concat(RealName,Obj),!,guess_nameStrings_0(Obj,Text).
+guess_nameStrings_0(Name,Text):-compound(Name),!, \+ is_ftVar(Name),Name=..[F,A|List],!,guess_nameStrings_0([F,A|List],Text).
+guess_nameStrings_0(Name,Text):-atom(Name),to_case_breaks(Name,ListN),to_case_breaks_trimed(Name,ListN,Text).
 
 to_case_breaks_trimed(Name,[t(TextL,Class),t(TextR,Class)|ListN],Text):-  
     maplist(to_descriptive_name(Name),[t(TextL,Class),t(TextR,Class)|ListN],Desc),
@@ -474,10 +480,10 @@ to_descriptive_name(_For,Desc,Atom):-any_to_atom(Desc,Atom),!.
 :-ain((tCol(ttKeyworded))).
 :-ain((completelyAssertedCollection(ttKeyworded))).
 :-ain((vtActionTemplate(AT)/(get_functor(AT,F))) ==> vtVerb(F)).
-:-onSpawn((ttKeyworded(T),isa(F,T),{\+ nameString(F,_),once(guess_nameStrings(F,Txt))}==>(nameString(F,Txt)))).
-:-onSpawn((ttKeyworded(T),isa(F,T),{\+ mudDescription(F,_),once(guess_mudDescription(F,Txt))}==>(mudDescription(F,Txt)))).
+:-onSpawn((ttKeyworded(T),{freeze(F,atomic(F))},isa(F,T),{ \+ call_u_no_bc(nameString(F,_)),once(guess_nameStrings(F,Txt))}==>(nameString(F,Txt)))).
+:-onSpawn((ttKeyworded(T),{freeze(F,atomic(F))},isa(F,T),{ \+ call_u_no_bc(mudDescription(F,_)),once(guess_mudDescription(F,Txt))}==>(mudDescription(F,Txt)))).
 :-ain((ttKeyworded(vtVerb))).
-:-ain((ttKeyworded(tCol))).
+%:-ain((ttKeyworded(tCol))).
 % :-ain((ttKeyworded(tRelation))).
 :- mpred_notrace_exec.
 

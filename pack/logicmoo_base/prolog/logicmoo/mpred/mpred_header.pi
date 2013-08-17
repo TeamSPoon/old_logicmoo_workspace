@@ -252,6 +252,7 @@ lm_util:register_mpred_impl_file(F):- (current_prolog_flag(xref,true)->true;
 :- decl_shared(genlMt/2).
 :- decl_shared(arity/2).
 :- decl_shared(genls/2).
+:- decl_shared(ttStringType/1).
 :- decl_shared(mpred_f/2).
 :- decl_shared(mpred_f/3).
 :- decl_shared(ttExpressionType/1).

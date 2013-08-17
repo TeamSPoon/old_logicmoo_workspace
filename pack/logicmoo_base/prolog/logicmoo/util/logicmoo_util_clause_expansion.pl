@@ -15,6 +15,7 @@
 :- module(lmce,
           [
 
+          is_file_enabling/1,
           swi_module/2,
           show_module_imports/0,
           show_module_imports/1,
@@ -104,6 +105,9 @@ appear in the source-code.
 
 
 :- module_transparent((is_user_module/0,without_lm_expanders/1,lmce_system_term_expansion/5,lmce_system_goal_expansion/5,functor_non_colon/3)).
+
+:- ensure_loaded(logicmoo_util_body_file_scope).
+:- ensure_loaded(logicmoo_util_shared_dynamic).
 :- ensure_loaded(logicmoo_util_dmsg).
 :- ensure_loaded(logicmoo_util_rtrace).
 
@@ -310,6 +314,7 @@ get_pos_at(C,Num):-compound(C),arg(1,C,Num),number(Num).
 :- dynamic(baseKB:known_complete_prolog_impl_file/3).
 glean_prolog_impl_file(_,_,_,_):- current_prolog_flag(xref,true),!.
 glean_prolog_impl_file(_,File,SM,TypeIn):- baseKB:known_complete_prolog_impl_file(SM,File,TypeIn),!.
+
 glean_prolog_impl_file(end_of_file,File,SM,TypeIn):- 
    prolog_load_context(source,F),prolog_load_context(file,F),
    baseKB:mpred_is_impl_file(File),!,

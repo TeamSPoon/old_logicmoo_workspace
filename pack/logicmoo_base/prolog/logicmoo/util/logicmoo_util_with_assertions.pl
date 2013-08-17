@@ -24,21 +24,34 @@
             with_each_item/3]).
 
 :- meta_predicate
-        w_tl(:, :),
+        w_tl(0, 0),
+        w_tl_e(0, 0),
+         w_mtl(0, 0),
+         w_mtl_e(0, 0),
         wno_tl(0, 0),        
-        w_tl_e(:, :),
         wno_tl_e(0, 0),        
         with_no_x(0),
-        wtg(:, 0).
+        wtg(0, 0).
 :- module_transparent
         check_thread_local_1m/1,
-        to_thread_head_1m/4.
+        to_thread_head_1m/4,
+            w_tl/2,
+            w_tl_e/2,
+            w_mtl/2,
+            w_mtl_e/2,
+            wno_tl/2,
+            wno_tl_e/2,
+            key_asserta/1,
+            key_erase/0,
+            wtg/2,
+            with_no_x/1,
+            with_each_item/3.
 
 :- include('logicmoo_util_header.pi').
 
 :- use_module(library(gui_tracer)).
 :- meta_predicate with_each_item(:,+,+).
-%% with_each_item(+P2,+EleList,+ArgList) is nondet.
+%% with_each_item(:P2,+EleList,+ArgList) is nondet.
 %
 % Call apply(P,[Ele|ArgList]) on each Ele(ment) in the EleList.
 %
@@ -60,79 +73,85 @@ with_each_item(P,H,S) :- apply(P,[H|S]).
 with_no_x(G):- getenv('DISPLAY',DISP),!,call_cleanup((unsetenv('DISPLAY'),with_no_x(G)),setenv('DISPLAY',DISP)).
 with_no_x(G):- current_prolog_flag(gui,true),!,call_cleanup((set_prolog_flag(gui,false),with_no_x(G)),set_prolog_flag(gui,true)).
 with_no_x(G):- current_prolog_flag(gui_tracer,true),!,call_cleanup((noguitracer,with_no_x(G)),guitracer).
-with_no_x(G):- w_tl(tlbugger:show_must_go_on,call(G)).
+with_no_x(G):- w_mtl(tlbugger:show_must_go_on,call(G)).
 
 
 %% wtg( ?M, :GoalCall) is nondet.
 %
 % maybe this one wont use thread local checking
 %
-:- meta_predicate(wtg(:,0)).
-wtg(M:With,Call):- w_tl(M:With,Call).
-
-% = :- meta_predicate(w_tl(:,0)).
+wtg(With,Call):- w_tl(With,Call).
 
 :- use_module(system:logicmoo_util_scce).
 
 %= 	 	 
 
-%% w_tl( ?CALL1, ?Call) is nondet.
+%% w_mtl( ?CALL1, ?Call) is nondet.
 %
 % W Thread Local.
 %
-w_tl(_:[],Call):- !,Call.
-w_tl(M:[With|MORE],Call):- !,w_tl(M:With,w_tl(M:MORE,Call)).
-w_tl(M:(With,MORE),Call):- !,w_tl(M:With,w_tl(M:MORE,Call)).
-w_tl(M:(With;MORE),Call):- !,w_tl(M:With,Call);w_tl(M:MORE,Call).
-w_tl(-TL:With,Call):- !,wno_tl(TL:With,Call).
-w_tl(+TL:With,Call):- !,w_tl(TL:With,Call).
-w_tl(M:not(With),Call):- !,wno_tl(M:With,Call).
-w_tl(M:(-With),Call):- !,wno_tl(M:With,Call).
-w_tl(M:(+With),Call):- !,w_tl(M:With,Call).
 
-w_tl(OPM:op(N,XFY,OP),MCall):-!,
+w_tl(W,G):-
+ strip_module(W,MW,WP),
+ strip_module(G,MG,GP),
+ w_mtl(MW:WP,MG:GP).
+
+w_mtl(_:[],Call):- !,Call.
+w_mtl(M:[With|MORE],Call):- !,w_mtl(M:With,w_mtl(M:MORE,Call)).
+w_mtl(M:(With,MORE),Call):- !,w_mtl(M:With,w_mtl(M:MORE,Call)).
+w_mtl(M:(With;MORE),Call):- !,w_mtl(M:With,Call);w_mtl(M:MORE,Call).
+w_mtl(-TL:With,Call):- !,wno_tl(TL:With,Call).
+w_mtl(+TL:With,Call):- !,w_mtl(TL:With,Call).
+w_mtl(M:not(With),Call):- !,wno_tl(M:With,Call).
+w_mtl(M:(-With),Call):- !,wno_tl(M:With,Call).
+w_mtl(M:(+With),Call):- !,w_mtl(M:With,Call).
+
+w_mtl(OPM:op(N,XFY,OP),Call):-!,
      (current_op(PN,XFY,OPM:OP);PN=0),!,
-     strip_module(MCall,M,Call),
-     (PN==N -> Call ; setup_call_cleanup(op(N,XFY,OPM:OP),'@'(Call,M),op(PN,XFY,OPM:OP))).
+     (PN==N -> Call ; setup_call_cleanup(op(N,XFY,OPM:OP),Call,op(PN,XFY,OPM:OP))).
 
-w_tl(FPM:current_prolog_flag(N,XFY),MCall):- !,w_tl(FPM:set_prolog_flag(N,XFY),MCall).
+w_mtl(FPM:current_prolog_flag(N,XFY),Call):- !,w_mtl(FPM:set_prolog_flag(N,XFY),Call).
 
-w_tl(_FPM:set_prolog_flag(N,XFY),MCall):- !,
+w_mtl(_FPM:set_prolog_flag(N,XFY),Call):- !,
      (current_prolog_flag(N,WAS);WAS=unUSED),
-     strip_module(MCall,M,Call),!,
-     (XFY==WAS -> Call ; 
-     (setup_call_cleanup(set_prolog_flag(N,XFY),'@'(Call,M),(WAS=unUSED->true;set_prolog_flag(N,WAS))))).
+    (XFY==WAS -> Call ; 
+     (setup_call_cleanup(set_prolog_flag(N,XFY),Call,(WAS=unUSED->true;set_prolog_flag(N,WAS))))).
 
-w_tl(M:before_after(Before,After),Call):-
+w_mtl(M:before_after(Before,After),Call):-
      (M:Before -> setup_call_cleanup(true,Call,M:After);Call).
 
-w_tl(_:ensure(WM:THeadWM),CM:Call):- !,
+w_mtl(_:ensure(WM:THeadWM),MCall):- !,
  hotrace(( 
      to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> copy_term(HAssert,CHAssert) ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),
-     ((CM:notrace((HAssert\=(_:-_),M:CHAssert,!,HAssert=@=CHAssert))) -> ( CM:Call );
-            setup_call_cleanup(asserta(M:HAssert,REF),CM:Call,erase(REF))).
+     ((notrace((HAssert\=(_:-_),M:CHAssert,!,HAssert=@=CHAssert))) -> ( MCall );
+            setup_call_cleanup(asserta(M:HAssert,REF),MCall,erase(REF))).
 
-w_tl(_:scc(WM:THeadWM),CM:Call):- !,
+w_mtl(_:scc(WM:THeadWM),MCall):- !,
    hotrace(( 
        to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> true ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),
-       setup_call_cleanup(asserta(M:HAssert,REF),CM:Call,erase(REF)).
+       setup_call_cleanup(asserta(M:HAssert,REF),MCall,erase(REF)).
 
-w_tl(_:scce(WM:THeadWM),CM:Call):- !,w_tl_e(WM:THeadWM,CM:Call).
+w_mtl(_:scce(WM:THeadWM),MCall):- !,w_mtl_e(WM:THeadWM,MCall).
 
-w_tl(WM:THeadWM,CM:Call):-w_tl_e(WM:THeadWM,CM:Call).
+w_mtl(WM:THeadWM,MCall):-w_mtl_e(WM:THeadWM,MCall).
 
-w_tl_e(WM:THeadWM,CM:Call):-
- clause_asserted(WM:THeadWM)-> CM:Call;
+w_tl_e(W,G):-
+ strip_module(W,MW,WP),
+ strip_module(G,MG,GP),
+ w_mtl_e(MW:WP,MG:GP).
+
+w_mtl_e(WM:THeadWM,MCall):-
+ clause_asserted(WM:THeadWM)-> MCall;
  
  (notrace(( 
      to_thread_head_1m(WM:THeadWM,M,_Head,HAssert) -> true ; throw(failed(to_thread_head_1m(WM:THeadWM,M,_,HAssert))))),
-     scce_orig2(key_asserta(M:HAssert),CM:Call,key_erase)).
+     scce_orig2(key_asserta(M:HAssert),MCall,key_erase)).
 
 
 key_asserta(M:HAssert):- asserta(M:HAssert,REF),(nb_current('$w_tl_e',Was)->nb_setval('$w_tl_e',[REF|Was]);nb_setval('$w_tl_e',[REF])).
-key_erase:- once((nb_current('$w_tl_e',[REF|Was]),nb_setval('$w_tl_e',Was),erase(REF))).
+key_erase:- nb_current('$w_tl_e',[REF|Was])->nb_setval('$w_tl_e',Was)->erase(REF).
 
-   	 
+:- nb_setval('$w_tl_e',[]).
 
 %% wno_tl( :GoalUHead, :GoalCall) is nondet.
 %

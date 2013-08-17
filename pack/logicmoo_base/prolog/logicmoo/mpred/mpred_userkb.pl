@@ -20,6 +20,7 @@
 % SOWA> It's stronger than that.  The absurd type is defined by axioms that are contradictory. 
 %  Therefore, by definition, nothing of that type can exist. 
 
+% this commented out so the autoloader doent pick it up
 %:- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
 %:- module(baseKB_user, [mpred_userkb_file/0]).
 %:- include('mpred_header.pi').
@@ -27,8 +28,6 @@
 
 mpred_userkb_file.
 
-:- '$set_source_module'(baseKB).
-:- '$set_typein_module'(baseKB).
 
 :- ain(arity(functorDeclares, 1)).
 :- dynamic(isa/2).

@@ -71,7 +71,7 @@ mudTermAnglify(verbFn(F),[is,F]):-atom_concat(_,'ing',F).
 mudTermAnglify(verbFn(F),[F,is]).
 % term_anglify(ftCallable(Term),String):-term_to_atom(Term,Atom),any_to_string(Atom,String).
 mudTermAnglify(determinerString(Obj,Text),[posNP(Obj),is,uses,ftString(Text),as,a,determiner]).
-mudTermAnglify(nameStrings(Obj,Text),[posNP(Obj),is,refered,to,as,ftString(Text)]).
+mudTermAnglify(nameString(Obj,Text),[posNP(Obj),is,refered,to,as,ftString(Text)]).
 mudTermAnglify(mudTermAnglify(Term,Text),[ftCallable(Term),is,converted,to,english,using,ftCallable(Text)]).
 
 
@@ -222,8 +222,8 @@ local_term_anglify(posNP(P),English):- local_term_anglify_np(P,English).
 local_term_anglify(noun_phrase(P),English):- local_term_anglify_np(P,English).
 
 local_term_anglify(actNotice(Who,What),[posNP(Who),notices,What]).
-local_term_anglify(fN(Region,tRegion),[(String)]):- call_u(nameStrings(Region,String)),!.
-local_term_anglify(fN(Region,tRegion),[nameString1(String)]):- holds_t(nameStrings,Region,String),!.
+local_term_anglify(fN(Region,tRegion),[(String)]):- call_u(nameString(Region,String)),!.
+local_term_anglify(fN(Region,tRegion),[nameString1(String)]):- holds_t(nameString,Region,String),!.
 
 
 local_term_anglify([P|L],English):-!, local_term_anglify(P,PE),local_term_anglify(L,LE),!,flatten_append(PE,LE,English),!.
@@ -285,9 +285,9 @@ anglify_noun_known(Obj,FT,String):- ttExpressionType(FT),correctFormatType(chang
 anglify_noun_known(StringO,_Hint, [StringO]).
 anglify_noun_known(Obj,_Hint,["right","here"]):- current_agent(Self),mudAtLoc(Self,Obj),!.
 anglify_noun_known(Obj,_Hint,["here"]):- current_agent(Self),req1(localityOfObject(Self,Obj)),!.
-anglify_noun_known(Obj,_Hint,StringO):- findall(String,holds_t(nameStrings,Obj,String),List),List\=[],sort_by_strlen(List,[StringO|_]),!.
+anglify_noun_known(Obj,_Hint,StringO):- findall(String,holds_t(nameString,Obj,String),List),List\=[],sort_by_strlen(List,[StringO|_]),!.
 %anglify_noun_known(Obj,_Hint,String):-
-%nameStrings(X,Y,_,_)
+%nameString(X,Y,_,_)
 
 %:- file_begin(prolog).
 

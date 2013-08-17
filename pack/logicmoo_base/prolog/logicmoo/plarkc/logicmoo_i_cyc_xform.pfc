@@ -42,6 +42,18 @@ genls(Sub, _Super) ==> tCol(Sub).
 
 */
 
+:-ain((isa(X,'SecondOrderCollection')<==>isa(X,'ttTypeType'))).
+isa(X,'FirstOrderCollection')==>isa(X,'tCol').
+isa(X,'LinguisticObjectType')==>isa(X,tCol).
+
+remappedCollection(tSet,'Collection').
+remappedCollection(ttExpressionType,'SubLExpression').
+remappedCollection(tCol,'SetOrCollection').
+remappedConstant(tPred,'Predicate').
+remappedCollection(Prolog,CycL)==>coExtensional(CycL,Prolog).
+
+coExtensional(CycL,Prolog)==>(genls(CycL,Prolog),coExtensional(Prolog,CycL)).
+
 
 % Hook a predicate up!
 /*
@@ -50,6 +62,8 @@ genls(Sub, _Super) ==> tCol(Sub).
 ((tinyPredTypeActive(PREDTYPE),isa(F,PREDTYPE)) ==> tinyPredActive(F)).
 
 ((tinyPredActive(F),arity(F,A))==>tinyInstallToAssertedEL(F,A)).
+
+
 
 ==>tinyPredActive(isa).
 ==>tinyPredActive(genls).
@@ -94,9 +108,9 @@ tRelation(ArgTypes)/is_declarations(ArgTypes) ==> meta_argtypes(ArgTypes).
 end_of_file.
 
 %(exactlyAssertedSentence(CycL), is_simple_gaf(CycL)) ==> ({cycAssert(CycL)},CycL).
-%(exactlyAssertedSentence(CycL), needs_indexing(CycL)) ==> assertedSentence(CycL).
+%(exactlyAssertedSentence(CycL), needs_indexing(CycL)) ==> call_u_no_bc(CycL).
 %(exactlyAssertedSentence(CycL), needs_canoncalization(CycL)) ==> trueSentence(CycL).
 %:- prolog.
-assertedSentence(CycL) ==> ({ sent_to_conseq(CycL,Consequent) }, Consequent).
+call_u_no_bc(CycL) ==> ({ sent_to_conseq(CycL,Consequent) }, Consequent).
 trueSentence(CycL) ==> ({ sent_to_conseq(CycL,Consequent) }, Consequent).
 

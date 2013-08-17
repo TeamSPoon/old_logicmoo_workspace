@@ -2411,13 +2411,14 @@ time_call(Call):-
 %
 gripe_time(TooLong,Goal):- statistics(cputime,StartCPU),
   statistics(walltime,[StartWALL,_]),
+  NeedGripe=v(yes),
   (Goal*->Success=true;Success=fail),
   once((statistics(walltime,[EndWALL,_]),statistics(cputime,EndCPU),
      ElapseCPU is EndCPU-StartCPU,
-     (ElapseCPU>TooLong 
+     ((ground(NeedGripe),ElapseCPU>TooLong,nb_setarg(1,NeedGripe,_))
         -> (wdmsg(gripe_CPUTIME(warn(ElapseCPU>TooLong),Goal)))
         ; (ElapseWALL is (EndWALL-StartWALL)/1000,
-             (ElapseWALL>TooLong 
+             ((ground(NeedGripe),ElapseWALL>TooLong,nb_setarg(1,NeedGripe,_))
                   -> wdmsg(gripe_WALLTIME(warn(ElapseWALL>TooLong),cputime=ElapseCPU,Goal))
                   ; true))))), 
   Success.

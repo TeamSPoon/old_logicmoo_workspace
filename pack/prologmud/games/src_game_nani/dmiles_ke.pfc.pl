@@ -18,7 +18,7 @@ use this file with...
 :- file_begin(pfc).
 
 tRegion(dmiles_room).
-bordersOn(dmiles_room,iHall7).
+mudAreaConnected(dmiles_room,iHall7).
 
 tSet(tOakDesk).
 genls(tOakDesk,tFurniture).

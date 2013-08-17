@@ -1208,7 +1208,7 @@ que_read_source_file_vars(F):-ain00(varname_cache:queued_read_source_file_vars(F
 dcall_if_verbose(G):-!, notrace(G).
 dcall_if_verbose(G):-show_call(why,G).
 
-%  list_undefined([module_class([user,system,library,test,development])]).
+%  list_undefined([module_class([user,system,library,test,temporary,development])]).
 :- dynamic(varname_cache:varname_info_file/1).
 :- dynamic(varname_cache:queued_read_source_file_vars/1).
 
@@ -1385,7 +1385,7 @@ term_expansion_save_vars(HB):- \+ ground(HB),  \+ t_l:dont_varname_te,\+ t_l:don
 
 without_varname_scan(Goal):-
   w_tl(current_prolog_flag(mpred_vars,false),  
-   w_tl([-t_l:dont_varname_te,- t_l:dont_varname],Goal)).
+   w_tl([ - t_l:dont_varname_te,- t_l:dont_varname],Goal)).
 
 %= 	 	 
 

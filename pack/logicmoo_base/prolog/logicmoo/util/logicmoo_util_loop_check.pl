@@ -295,6 +295,7 @@ loop_check_term_key(Call,KeyIn,TODO):- notrace(make_key(KeyIn,Key)) -> loop_chec
 %
 % No Loop Check.
 %
+no_loop_check(Call):- !, wno_tl(lmcache:ilc(_),Call).
 no_loop_check(Call):- no_loop_check(Call, fail).
 :- export(no_loop_check/2).
 

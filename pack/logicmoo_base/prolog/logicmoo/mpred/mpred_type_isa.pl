@@ -1117,7 +1117,7 @@ assert_isa_rev(T,I):- sanity(nonvar(I)),sanity(nonvar(T)),fail.
 assert_isa_rev(T,I):- sanity( \+ (singletons_throw_else_fail(assert_isa(I,T)))),fail.
 
 % this more about "never"
-assert_isa_rev(T,I):- not_mud_isa(I,T,Why),trace_or_throw(not_mud_isa(I,T,Why)).
+assert_isa_rev(T,I):- not_mud_isa(I,T,Why)->dmsg(trace_or_throw(not_mud_isa(I,T,Why))),fail.
 % skip formatter cols
 assert_isa_rev(ftTerm,_):-!.
 assert_isa_rev(ftString,_):-!.

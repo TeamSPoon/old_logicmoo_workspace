@@ -26,7 +26,7 @@
        ensure_loaded(library('logicmoo/util/logicmoo_util_clause_expansion.pl')))))).
 :- endif.
 :- if(( ( \+ ((current_prolog_flag(logicmoo_include,Call),Call))) )). 
-:- module(logicmoo_utils_file,[]).
+:- module(logicmoo_utils_file,[logicmoo_utils_test_msg/0]).
 :- endif.
 % restore entry state
 :- current_predicate(lmce:reset_modules/0)->lmce:reset_modules;true.
@@ -174,8 +174,9 @@ baseKB:logicmoo_scan_autoloads:-false.
 
 
 :- thread_local logicmoo_utils_test_tl/0.
-logicmoo_utils_test_msg:- w_tl((logicmoo_utils_test_tl:-dmsg("Adding logicmoo/utils to autoload path",[])),logicmoo_utils_test_tl).
-
+logicmoo_utils_test_msg:- w_tl((
+ logicmoo_utils_test_tl:-dmsg("Adding logicmoo/utils to autoload path",[])),logicmoo_utils_test_tl).
+:- export(logicmoo_utils_test_msg/0).
 /*
 % the next are loaded idomaticaly later (if needed)
 % :- ensure_loaded(library('logicmoo/util/logicmoo_util_clause_expansion.pl')).

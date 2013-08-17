@@ -574,8 +574,8 @@ requires_storage(C,Why):- requires_storage(C,true,Why).
 % Requires Storage.
 %
 requires_storage(G,_,Why):-get_functor(G,F),!,special_head(G,F,Why),!.
-requires_storage(_,_,t_l:consulting_sources):-t_l:consulting_sources,mpred_may_expand,!.
-% requires_storage(_,_,t_l:consulting_sources):-t_l:consulting_sources,in_file_expansion.
+requires_storage(_,_,t_l:consulting_sources):- t_l:consulting_sources,mpred_may_expand,!.
+% requires_storage(_,_,t_l:consulting_sources):- t_l:consulting_sources,in_file_expansion.
 
 
 %= 	 	 
@@ -753,7 +753,7 @@ req_old2(C0):- nop(dmsg(call_u(C0))), !,preq(call_u,/*to_exp*/(C0)).
 % Mreq Old Extended Helper.
 %
 mreq_old2(C0):- nop(dmsg(call_u(C0))), agenda_rescan_for_module_ready,
-   no_loop_check(w_tl([-t_l:infInstanceOnly(_),-t_l:infAssertedOnly(_),-t_l:noRandomValues(_)],
+   no_loop_check(w_tl([ - t_l:infInstanceOnly(_), - t_l:infAssertedOnly(_), - t_l:noRandomValues(_)],
      preq(must,/*to_exp*/(C0)))).
 
 % -  ireq(Query) = Normal query (May not use second order logic) (must be asserted on isntance) (used mainly by 2nd order logic to avoid looping)

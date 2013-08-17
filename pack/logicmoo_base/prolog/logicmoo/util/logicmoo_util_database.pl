@@ -12,7 +12,7 @@
             attr_bind/2,attr_bind/1,
             split_attrs/3,
             dont_make_cyclic/1,
-
+            
             variant_i/2,av_comp/2,
             is_visible_module/1,
             hb_to_clause/3,
@@ -45,7 +45,7 @@
             assert_i/1,asserta_i/1,assertz_i/1,
             retract_i/1,retractall_i/1,
 
-
+            apply_term/3,
             clause_safe/2,
             debugCallWhy/2,
             erase_safe/2,
@@ -894,6 +894,9 @@ append_term(T,I,HEAD):-atom(T),!,HEAD=..[T,I],!.
 append_term(Call,E,CallE):-var(Call),!, must(compound(CallE)),CallE=..ListE,append(List,[E],ListE),Call=..List.
 append_term(Call,E,CallE):-must(compound(Call)), Call=..List, append(List,[E],ListE), CallE=..ListE.
 
+
+apply_term(T,LST,HEAD):- atom(T),!,HEAD=..[T|LST],!.
+apply_term(T,LST,HEAD):- HEAD=..[t,T|LST],!.
 
 
 :-export(erase_safe/2).

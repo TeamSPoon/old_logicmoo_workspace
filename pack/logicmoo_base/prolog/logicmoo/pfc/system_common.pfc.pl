@@ -724,7 +724,9 @@ isa('CycLTerm',tAvoidForwardChain).
 % isa(I,C):- cwc, when(?=(I,C),\+ clause_b(isa(I,C))), (loop_check(visit_pred(I,C))*->true;loop_check(no_repeats(isa_backchaing(I,C)))).
 %isa(I,C):- cwc, loop_check(visit_pred(I,C)).
 %isa(I,C):- cwc, loop_check(visit_isa(I,C)).
-isa(I,C):- cwc, no_repeats(isa_backchaing(I,C)).
+isa(I,C):- cwc, no_repeats(loop_check(isa_0(I,C))).
+isa_0(I,C):- cwc, isa_backchaing(I,C).
+isa_0(I,C):- cwc, call_u(isa(I,C)).
 
 quotedIsa(I,C):- cwc, term_is_ft(I,C).
 
@@ -962,9 +964,10 @@ typeGenls(ttValueType,vtValue).
 % :- must((vtColor(vRed))).
 
 
-argIsa(Prop,N,Type) <- {cwc,number(N),argIsa_known(Prop,N,Type),must(ground(argIsa(Prop,N,Type)))}.
+argIsa(Prop,N,Type) :- cwc,number(N),loop_check(argIsa_known(Prop,N,Type)),must(ground(argIsa(Prop,N,Type))).
+%argIsa(Prop,N,Type) <- {cwc,number(N),argIsa_known(Prop,N,Type),must(ground(argIsa(Prop,N,Type)))}.
 
-argIsa(Prop,N,Type),{number(N)},ttExpressionType(Type) ==> argQuotedIsa(Prop,N,Type).
+ttExpressionType(Type) ==> (argIsa(Prop,N,Type),{number(N)} ==> argQuotedIsa(Prop,N,Type)).
 
 :- discontiguous(prologSingleValued/1).
 
@@ -1070,6 +1073,11 @@ ttExpressionType(ftVar).
 ttExpressionType(ftVoprop).
 
 
+ttStringType('CharacterString').
+ttStringType('SubLString').
+ttStringType('SubLListOfStrings').
+ttStringType(['ListOfTypeFn', X]):-atom(X),ttStringType(X).
+
 
 % resultIsa(F,C)==>(ftSpec(C),'tFunction'(F)).
 % ( meta_argtypes(FT)/dif(FT,COL), genls(FT, COL),tCol(COL),{\+ (isa(COL,ttExpressionType))}) ==> formatted_resultIsa(FT,COL).
@@ -1082,7 +1090,7 @@ ttExpressionType(ftVoprop).
 
 % :- kb_dynamic((disjointWith/2,genls/2)).
 
-argsQuoted(bordersOn).
+argsQuoted(mudAreaConnected).
 
 prologHybrid(argQuotedIsa(tRelation,ftInt,ttExpressionType)).
 prologHybrid(argIsa(tRelation,ftInt,tCol)).
