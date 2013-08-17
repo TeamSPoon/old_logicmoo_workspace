@@ -23,6 +23,9 @@
           ereq/1,
           dbreq/1,
           swc/0,
+          skipped_dirs/1,
+          ignore_mpreds_in_file/1,
+          ignore_mpreds_in_file/0,
           clause_b/1,
           warn_if_static/2]).
 
@@ -56,12 +59,15 @@
 :- module_transparent((decl_shared/1,
           virtualize_code/2,
           ereq/1,
+          map_compound_args/3,
+          map_compound_args/4,
           dbreq/1,
           warn_if_static/2)).
 
 :- meta_predicate decl_shared(1,+).
 :- meta_predicate decl_shared(+).
-
+:- meta_predicate map_compound_args(3,*,*,*).
+:- meta_predicate map_compound_args(2,*,*).
 :- dynamic(baseKB:safe_wrap/3).
 
 
@@ -86,6 +92,24 @@ ereq(C):- find_and_call(C).
 :- module_transparent(dbreq/1).
 dbreq(C):- ereq(C).
 
+:- multifile(baseKB:ignore_file_mpreds/1).
+:- dynamic(baseKB:ignore_file_mpreds/1).
+
+:- asserta((baseKB:ignore_file_mpreds(M):- skipped_dirs(M))).
+
+skipped_dirs(M):-expand_file_search_path(swi(''),M),nonvar(M).
+skipped_dirs(M):-expand_file_search_path(pack(logicmoo_base/prolog/logicmoo/util),M),nonvar(M).
+skipped_dirs(M):-expand_file_search_path(pack(logicmoo_base/prolog/logicmoo/mpred),M),nonvar(M).
+
+
+ignore_mpreds_in_file:-if_defined(t_l:disable_px,fail),!.
+ignore_mpreds_in_file:-prolog_load_context(file,F),ignore_mpreds_in_file(F),!.
+ignore_mpreds_in_file:-prolog_load_context(source,F),ignore_mpreds_in_file(F),!.
+
+ignore_mpreds_in_file(F):-if_defined(baseKB:registered_mpred_file(F),fail),!,fail.
+ignore_mpreds_in_file(F):-if_defined(baseKB:ignore_file_mpreds(F),fail),!.
+ignore_mpreds_in_file(F):-skipped_dirs(Base),atom(Base),atom_concat(Base,_,F),!.
+ignore_mpreds_in_file(F):-atom(F),baseKB:ignore_file_mpreds(Base),atom(Base),atom_concat(Base,_,F),!.
 
 %% baseKB:safe_wrap( ?VALUE1, :Wrapper, ?VALUE3) is semidet.
 %
@@ -96,15 +120,17 @@ get_virtualizer_mode(ge,F,A,HowIn):- baseKB:safe_wrap(F,A,HowOut),!,must(HowIn=H
 
 % baseKB:safe_wrap(_,_,_):-!,fail.
 baseKB:safe_wrap(O,_,_):- bad_functor_check(O),!,fail.
-baseKB:safe_wrap(F,A,T):- virtualize_safety(F,A0),A==A0,arg(_,v(on_x_rtrace,on_x_debug),T),current_predicate(T/1).
-baseKB:safe_wrap(F,_,ereq):- never_virtualize(F),!,fail.
-baseKB:safe_wrap(F,A,dbreq):- is_user_module, virtualize_dbreq(F,A).
+baseKB:safe_wrap(F,A,on_x_rtrace):- integer(A),virtualize_safety(F,A).
+baseKB:safe_wrap(F,A,ereq):- prolog_load_context(module,M),(never_virtualize(M:F/A);never_virtualize(F)),!,fail.
+baseKB:safe_wrap(F,A,dbreq):- virtualize_dbreq(F,A),is_user_module.
+baseKB:safe_wrap(F,A,_):- clause_b(prologBuiltin(F/A)),!,fail.
 baseKB:safe_wrap(F,A,ereq):- virtualize_ereq(F,A).
 baseKB:safe_wrap(COL,_,ereq):- clause_b(col_as_isa(COL)).
-%baseKB:safe_wrap(F,A,on_x_log_throw):- virtualize_safety(F,A0),A==A0.
-baseKB:safe_wrap(F,_,_):- clause_b(prologBuiltin(F)),!,fail.
 baseKB:safe_wrap(F,A,call_u):- find_and_call(hybrid_support(F,A)).
 baseKB:safe_wrap(COL,_,ereq):- clause_b(col_as_unary(COL)).
+
+% imported_from(system)
+
 
 baseKB:safe_wrap(F,A,ereq):- atom(F),integer(A),
    functor(Goal,F,A),
@@ -114,7 +140,6 @@ baseKB:safe_wrap(F,A,ereq):- atom(F),integer(A),
    \+ predicate_property(M:Goal,static),
    \+ predicate_property(M:Goal,imported_from(_)),!.
 
-% Preds that we''d like to know a little more than "instanciation exception"s
 
 
 bad_functor_check(O):-var(O).
@@ -123,6 +148,7 @@ bad_functor_check(:):- !,dumpST,dtrace.
 %bad_functor_check(//):- !,dumpST,dtrace.
 
 
+% Preds that we''d like to know a little more than "instanciation exception"s
 virtualize_safety(O):- bad_functor_check(O),!,fail.
 virtualize_safety((=..),2).
 virtualize_safety(functor,3).
@@ -140,15 +166,18 @@ never_virtualize(lookup_u).
 never_virtualize(dbreq).
 never_virtualize(clause_b).
 never_virtualize(('.')).
+never_virtualize((':-')).
 never_virtualize(('[]')).
 never_virtualize(('[|]')).
 never_virtualize((/)).
 never_virtualize((//)).
 never_virtualize(add).
+never_virtualize(padd).
 never_virtualize(del).
 never_virtualize(clr).
 never_virtualize(ain).
 never_virtualize(props).
+never_virtualize(iprop).
 never_virtualize(on_x_rtrace).
 never_virtualize(on_x_debug).
 never_virtualize(aina).
@@ -157,7 +186,9 @@ never_virtualize(decl_shared).
 never_virtualize(ainz).
 never_virtualize(apply).
 never_virtualize(call).
-never_virtualize(F):- ereq(mpred_mark(pfcBuiltin,F,_)).
+never_virtualize(call).
+never_virtualize(thread_util:_/A):-integer(A). % prevents query
+%never_virtualize(F):- ereq(mpred_mark(pfcBuiltin,F,_)).
 
 % operations to transactionalize
 virtualize_dbreq(O,_):- bad_functor_check(O),!,fail.
@@ -248,7 +279,7 @@ virtualize_ereq(tAgent,1).
 virtualize_ereq(tCol,1).
 
 virtualize_ereq(ttExpressionType,1).
-virtualize_ereq(ttPredType,1).
+virtualize_ereq(ttRelationType,1).
 virtualize_ereq(ttTemporalType,1).
 virtualize_ereq(use_ideep_swi,0).
 virtualize_ereq(==>,_).
@@ -297,6 +328,7 @@ virtualize_args_as(Goal,_):-predicate_property(Goal,built_in),!,fail.
 virtualize_args_as(Goal,Goal):-predicate_property(Goal,transparent),!.
 virtualize_args_as(Which,Args):- descend_ge(Which),Args=Which.
 
+descend_ge(':-'((:),0)).
 descend_ge(':-'((-),0)).
 descend_ge(( :- 0)).
 descend_ge('{}'(0)).
@@ -306,6 +338,35 @@ descend_ge('<--'(-,-)).
 descend_ge(z(if)).
 descend_ge(z(_)):-!,fail.
 descend_ge(Which):-functor(Which,F,_),!,descend_ge(z(F)),!.
+
+:- nb_linkval('$xform_arity',xform_arity(_C,_F,_A)).
+
+xform_arity(C,F,A):-var(C),!,sanity(var(F)),must(var(A)), nb_getval('$xform_arity',xform_arity(C,F,A)),!.
+xform_arity(C,F,A):-atom(C),!,C=F,ignore(clause_b(arity(F,A))).
+xform_arity(F/A,F,A):-atom(F),!.
+xform_arity(F//Am2,F,A):- integer(Am2),!, A is Am2+2.
+xform_arity(C,F,A):- compound(C), functor(C,F,A).
+
+xform(_,_):-!,fail.
+xform(Var,Out):- \+compound(Var),!,Out=Var.
+xform(Nonvar,Out):- \+ current_prolog_flag(lm_expanders,true),!,Nonvar=Out.
+xform(isa(C,P),mpred_prop(F,A,P)):-nonvar(P),!,is_reltype(P),xform_arity(C,F,A).
+xform(isa(C,P),(ttRelationType(P),mpred_prop(F,A,P))):-nonvar(C),xform_arity(C,F,A),is_reltype(P),!.
+xform(mpred_prop(C,P),mpred_prop(F,A,P)):- xform_arity(C,F,A),!.
+xform(hybrid_support(F,A),mpred_prop(F,A,prologHybrid)):-!.
+xform(arity(F,A),mpred_prop(F,A,arity)):-!.
+xform(mpred_mark(P,F,A),mpred_prop(F,A,P)):-!.
+xform(PC,mpred_prop(F,A,P)):- PC=..[P,C],is_reltype(P),!,xform_arity(C,F,A).
+xform(PFA,mpred_prop(F,A,P)):- PFA=..[P,F,A],is_reltype(P),!.
+xform(In,PART):- map_compound_args(xform,In,PART),!.
+
+:-multifile(baseKB:ttRelationType/1).
+:-dynamic(baseKB:ttRelationType/1).
+is_reltype(Var):-var(Var),!,fail.
+is_reltype(pfcControlled).
+is_reltype(prologHybrid).
+is_reltype(prologBuiltin).
+is_reltype(P):-clause_b(ttRelationType(P)).
 
 
 cannot_decend_expansion(_,In):- \+ compound(In),!.
@@ -338,6 +399,8 @@ virtualize_code_each(X,Arg,In,Out):- var(Arg),!,virtualize_code_each(X,(+),In,Ou
 virtualize_code_each(X,Arg,In,Out):- (integer(Arg); Arg == + ) -> virtualize_code(X,In,Out),!.
 virtualize_code_each(X,-,In,Out):- if_defined(fully_expand_head(X,In,Out)),!.
 virtualize_code_each(_,_,In,Out):- must(Out=In).
+
+map_compound_args(Pred,In,Out):- must(( compound(In), In=..[F|InL],maplist(Pred,InL,OutL),Out=..[F|OutL])).
 
 map_compound_args(Pred,Args,In,Out):- must(( compound(Args), compound(In), Args=..[_|ArgsL],In=..[F|InL],maplist(Pred,ArgsL,InL,OutL),Out=..[F|OutL])).
 
@@ -461,6 +524,15 @@ swc.
 %system:sub_body_expansion(In,Out):-virtualize_source(be,In,Out).
 %system:sub_body_expansion(In,Out):- Out\== true, Out\=(cwc,_),could_safe_virtualize,virtualize_source(be,In,Out).
 %system:sub_call_expansion(In,Out):-virtualize_source(ce,In,Out).
-system:goal_expansion(In,Goal,Out,Goal):- callable(Goal), \+ current_prolog_flag(xref,true), In\== true, In\=(cwc,_),current_prolog_flag(lm_expanders,true), virtualize_source(ge,In,Out)-> In\=Out.
+
+system:goal_expansion(In,Goal,Out,Goal):- compound(Goal),Goal=(SWC,_),swc==SWC,!,virtualize_source(ge,In,Out)-> In\=Out.
+system:goal_expansion(In,Goal,Out,Goal):- 
+    current_prolog_flag(logicmoo_virtualize,true),
+    \+ t_l:disable_px,
+    callable(Goal), \+ current_prolog_flag(xref,true), In\== true, In\=(cwc,_),
+    current_prolog_flag(lm_expanders,true),
+    \+ignore_mpreds_in_file,
+    virtualize_source(ge,In,Out)-> In\=Out.
 %system:term_expansion(In,Goal,Out,Goal):- In\== true, In\=(cwc,_),current_prolog_flag(lm_expanders,true), virtualize_source(te,In,Out)-> In\=Out.
 
+system:term_expansion(X,Y):- compound(X),xform(X,Y).

@@ -19,8 +19,13 @@
 :- set_prolog_flag(generate_debug_info,true).
 :- profile(true).
 
-:- ensure_loaded(setup_paths).
-:- ensure_loaded(library(logicmoo_utils)).
+:-if((multifile(baseKB:ignore_file_mpreds/1),dynamic(baseKB:ignore_file_mpreds/1), 
+   (prolog_load_context(source,F1) -> asserta(baseKB:ignore_file_mpreds(F1)) ; true),
+   (prolog_load_context(file,F) -> asserta(baseKB:ignore_file_mpreds(F)) ; true))).
+:-endif.
+
+:- user:ensure_loaded(setup_paths).
+:- user:ensure_loaded(library(logicmoo_utils)).
 % :- module(init_mud_server,[]).
 % restore entry state
 

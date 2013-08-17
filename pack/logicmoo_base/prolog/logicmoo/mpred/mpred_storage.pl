@@ -619,7 +619,7 @@ special_head(_,F,Why):-special_head0(F,Why),!,show_failure(why,\+(a(prologDynami
 %
 % Special Head Primary Helper.
 %
-special_head0(F,ttPredType):-a(ttPredType,F),!.
+special_head0(F,ttRelationType):-a(ttRelationType,F),!.
 special_head0(F,functorDeclares):-a(functorDeclares,F),!.
 special_head0(F,prologMacroHead):-a(prologMacroHead,F),!.
 special_head0(F,pfcControlled):-a(pfcControlled,F).

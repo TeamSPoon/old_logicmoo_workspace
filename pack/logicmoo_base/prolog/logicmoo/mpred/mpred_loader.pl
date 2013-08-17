@@ -356,7 +356,8 @@ mpred_file_term_expansion0(Type,LoaderMod,I,O):-
   % \+ mpred_prolog_only_file(F),
   call_u(baseKB:mtCycL(MT1)),
   must((proper_source_mod([LoaderMod,MF,MT1],AM))),
-  b_getval('$source_term',TermWas), TermWas == I,
+  (((nb_current('$source_term',TermWas), TermWas == I);
+    (b_getval('$term',TermWas), TermWas == I))),
   call_cleanup(
         w_tl(t_l:current_why_source(mfl(AM,F,L)),
         (( get_original_term_source(Orig), 
@@ -531,7 +532,7 @@ assert_until_eof(File,F):-
 %
 % Gload.
 %
-gload:- ensure_mpred_file_loaded(logicmoo('rooms/startrek.all.mpred')).
+gload:- ensure_mpred_file_loaded(logicmoo('rooms/startrek.all.pfc.pl')).
 
 %:-meta_predicate(savedb/0).
 
@@ -1126,8 +1127,6 @@ clause_count(Mask,N):-
          flag(clause_count,X,X), must(X=0),
          flag(clause_count,X,X+Count),fail)),flag(clause_count,N,0),!.
 
-check_clause_counts:- notrace((forall(checked_clause_count(Mask),sanity(check_clause_count(Mask))))),fail.
-check_clause_counts.
 
 :- dynamic(checked_clause_count/2).
 
@@ -1164,6 +1163,9 @@ check_clause_count(Mask):- swc,
      (Diff ==0 -> true;
      (Diff == -1 -> true;
      (Diff<0 -> trace_or_throw(bad_count(Mask,(Was --> N))) ; dmsg(good_count(Mask,(Was --> N)))))).
+
+check_clause_counts:- ((forall(checked_clause_count(Mask),sanity(check_clause_count(Mask))))),fail.
+check_clause_counts.
 
 %% begin_pfc is det.
 %
@@ -1246,14 +1248,14 @@ simplify_language_name(W,W).
 file_begin(WIn):- 
  must_det_l((   
    simplify_language_name(WIn,W),
-   set_lang(W),
+   %set_lang(W),
    set_file_lang(W),   
    find_and_call(fileAssertMt(Mt)),
    set_fileAssertMt(Mt),
    wdmsg(set_fileAssertMt(Mt->W)),
-   op_lang(W),
+   %op_lang(W),
    enable_mpred_expansion)),!,
-   must(get_lang(W)).
+   sanity(get_lang(W)).
 
 
 
@@ -1620,7 +1622,7 @@ mpred_term_expansion((M:Fact:- BODY),(:- ((cl_assert(Dir,M:Fact:- BODY))))):- no
 % Specific to the "*PREDICATE CLASS*" based default
 %
       mpred_term_expansion_by_pred_class(_,Fact,Output):- get_functor(Fact,F,_A),lookup_u(prologOnly(F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!,fail.
-      mpred_term_expansion_by_pred_class(pfc(pred_type),Fact,Output):- get_functor(Fact,F,_A),lookup_u(ttPredType(F)),Output='$si$':'$was_imported_kb_content$'(Fact,ttPredType(F)),!.
+      mpred_term_expansion_by_pred_class(pfc(pred_type),Fact,Output):- get_functor(Fact,F,_A),lookup_u(ttRelationType(F)),Output='$si$':'$was_imported_kb_content$'(Fact,ttRelationType(F)),!.
       mpred_term_expansion_by_pred_class(pfc(func_decl),Fact,Output):- get_functor(Fact,F,_A),lookup_u(functorDeclares(F)),Output='$si$':'$was_imported_kb_content$'(Fact,functorDeclares(F)),!.
       mpred_term_expansion_by_pred_class(pfc(macro_head),Fact,Output):- get_functor(Fact,F,_A),lookup_u(prologMacroHead(F)),Output='$si$':'$was_imported_kb_content$'(Fact,prologMacroHead(F)),!.
       mpred_term_expansion_by_pred_class(pfc(mpred_ctrl),Fact,Output):- get_functor(Fact,F,_A),lookup_u(pfcControlled(F)),Output='$si$':'$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
@@ -2052,6 +2054,7 @@ force_reload_mpred_file(World,MFileIn):-
 % Helper for Force Reloading of a Managed Predicate File.
 %
 force_reload_mpred_file2(WorldIn,MFileIn):- 
+ sanity(call_u(baseKB:mtCycL(WorldIn))),
  must(call_u(baseKB:mtCycL(WorldIn)->World=WorldIn;defaultAssertMt(World))),
  strip_module(MFileIn,_MaybeNewModule,_),
  NewModule = World,
@@ -2059,6 +2062,8 @@ force_reload_mpred_file2(WorldIn,MFileIn):-
  % NewModule:ensure_loaded(logicmoo(mpred/mpred_userkb)),
  forall(must_locate_file(MFileIn,File),
    must_det_l((
+   % must((atom(File),ignore(retract(baseKB:ignore_file_mpreds(File):-true)))),
+   sanity(\+ baseKB:ignore_file_mpreds(File) ),
    once(show_success(prolog_load_file,defaultAssertMt(DBASE));DBASE=NewModule),
    sanity(exists_file(File)),
    sanity((true,defaultAssertMt(World))),
@@ -2373,4 +2378,5 @@ pop_predicates(M:F/A,STATE):- functor(H,F,A),forall(member((H:-B),STATE),M:asser
 
 
 mpred_loader_file.
-system:term_expansion(end_of_file,_):-must(check_clause_counts),fail.
+%system:term_expansion(end_of_file,_):-must(check_clause_counts),fail.
+system:term_expansion(EOF,_):-end_of_file==EOF,must(check_clause_counts),fail.

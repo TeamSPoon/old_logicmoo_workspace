@@ -31,6 +31,7 @@ mpred_userkb_file.
 :- '$set_typein_module'(baseKB).
 
 :- ain(arity(functorDeclares, 1)).
+:- dynamic(isa/2).
 
 %% base_kb_pred_list( ?VALUE1) is semidet.
 %
@@ -141,10 +142,10 @@ prologDynamic/1,prologHybrid/1,prologKIF/1,prologListValued/1,prologMacroHead/1,
 prologPTTP/1,
 prologSideEffects/1,
 prologSingleValued/1,
-props/2,ptReformulatorDirectivePredicate/1,pttp1a_wid/3,pttp_builtin/2,
+props/2,rtReformulatorDirectivePredicate/1,pttp1a_wid/3,pttp_builtin/2,
 % pttp_nnf_pre_clean_functor/3,
 quasiQuote/1,relationMostInstance/3,resolveConflict/1,
-ptSymmetric/1,
+rtSymmetric/1,
 resolverConflict_robot/1,
 retractall_wid/1,
 search/7,
@@ -171,7 +172,7 @@ tRelation/1,
 tried_guess_types_from_name/1,
 tCol/1,
 ttExpressionType/1,
-ttPredType/1,
+ttRelationType/1,
 ttTemporalType/1,
 ttUnverifiableType/1,
 type_action_info/3,

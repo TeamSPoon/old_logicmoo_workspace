@@ -117,7 +117,6 @@
 
 :- include('logicmoo_util_header.pi').
 
-:- ensure_loaded(logicmoo_util_shared_dynamic).
 
 %% with_source_module( +NewModule, :GoalGoal) is semidet.
 %
@@ -977,4 +976,6 @@ rebuild_pred_into(OMC,NMC,AssertZ,OtherTraits):-
       listing(NMC),
       retractall(tlbugger:rbuild_pred_impl_cache_pp(NC,_))
       )).
+
+:- ensure_loaded(logicmoo_util_shared_dynamic).
 

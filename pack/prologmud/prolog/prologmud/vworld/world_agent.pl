@@ -158,18 +158,21 @@ agent_call_command_now(Agent,CMD  ):- \+ where_atloc(Agent,_),!, agent_call_comm
 agent_call_command_now(Agent,CMD  ):- where_atloc(Agent,Where),
    % start event
    must(raise_location_event(Where,actNotice(reciever,begin(Agent,CMD)))),
-   must(on_x_debug(agent_call_command_now_2(Agent,CMD)) ->
+   (call(on_x_debug(agent_call_command_now_2(Agent,CMD)) ->
    % event done
      send_command_completed_message(Agent,Where,done,CMD);
    % event fail
-     send_command_completed_message(Agent,Where,failed,CMD)),!.
+     send_command_completed_message(Agent,Where,failed,CMD))),!.
 
 agent_call_command_now_2(Agent,CMD):- loop_check((agent_call_command_now_3(Agent,CMD)),dmsg(looped(agent_call_command_now_2(Agent,CMD)))).
 agent_call_command_now_3(Agent,CMD):-
    with_agent(Agent,
      w_tl(t_l:side_effect_ok,
      w_tl(t_l:agent_current_action(Agent,CMD),
-  (find_and_call(agent_call_command(Agent,CMD))*->true;agent_call_command_all_fallback(Agent,CMD))))),
+  ((
+  % call_no_cuts(agent_call_command(Agent,CMD))
+    find_and_call(agent_call_command(Agent,CMD))
+     *->true;agent_call_command_all_fallback(Agent,CMD)))))),
   padd(Agent,mudLastCommand(CMD)).
 
 agent_call_command_all_fallback(Agent,CMD):- if_defined(agent_call_command_fallback(Agent,CMD)),!.
@@ -268,7 +271,7 @@ guess_session_ids(ID):-thread_self(TID),thread_property(TID,alias(ID)).
 % anonymous sessions
 guess_session_ids(ID):-thread_self(ID), \+ thread_property(ID,alias(ID)).
 % anonymous sessions
-guess_session_ids(In):-thread_self(ID),thread_util:has_console(ID,In,_Out,_Err).
+guess_session_ids(In):-thread_self(ID),call(call,thread_util:has_console(ID,In,_Out,_Err)).
 
 
 :-export(my_random_member/2).

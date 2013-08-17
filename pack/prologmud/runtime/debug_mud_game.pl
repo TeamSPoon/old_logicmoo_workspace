@@ -7,7 +7,7 @@
 % Setup Runtime paths
 % ==============================
 
-:- system:ensure_loaded(setup_paths).
+:- user:ensure_loaded(setup_paths).
 
 
 % ==============================
@@ -15,7 +15,7 @@
 % (and Default Daemons/inference engine)
 % ==============================
 
-:- ensure_loaded(logicmoo_repl).
+:- user:ensure_loaded(logicmoo_repl).
 
 % ==============================
 % Now start the profiler

@@ -979,7 +979,7 @@ leave_as_is_functor('z_unused').
 leave_as_is_functor('genlMt').
 leave_as_is_functor('{}').
 leave_as_is_functor(F):-cheaply_u(argsQuoted(F)).
-leave_as_is_functor(F):-loop_check(cheaply_u(ptReformulatorDirectivePredicate(F))).
+leave_as_is_functor(F):-loop_check(cheaply_u(rtReformulatorDirectivePredicate(F))).
 
 
 
@@ -1144,7 +1144,7 @@ is_function(_,F,_):- atom_concat(_Was,'Fn',F).
 is_function(_,F,_):- cheaply_u(tFunction(F)).
 % is_function(_,F,A):- A2 is A+1, current_predicate(F/A2), \+ current_predicate(F/A).
 
-%:- ain(isa(I,C)<=(ttPredType(C),baseKB:isa(I,C))).
+%:- ain(isa(I,C)<=(ttRelationType(C),baseKB:isa(I,C))).
 
 
 

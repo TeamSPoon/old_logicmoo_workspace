@@ -17,16 +17,16 @@
 % Setup Runtime paths
 % ==============================
 
-:- ensure_loaded(setup_paths).
+:- user:ensure_loaded(setup_paths).
 
-:- test_for_release(setup_paths).
+:- user:test_for_release(setup_paths).
 
 % ==============================
 % Load logicmoo REPL Base
 % (and Default Daemons/inference engine)
 % ==============================
 
-:- test_for_release(logicmoo_repl).
+:- user:test_for_release(logicmoo_repl).
 
 
 % ==============================
@@ -48,7 +48,7 @@
 
 
 % [Required] Load the Logicmoo Backchaining Inference System
-:- gripe_time(40,with_no_mpred_expansions(if_file_exists(test_for_release(logicmoo(logicmoo_engine))))).
+:- gripe_time(40,with_no_mpred_expansions(if_file_exists(user:test_for_release(logicmoo(logicmoo_engine))))).
 
 
 :- asserta(baseKB:skip_el_assertions).
@@ -63,10 +63,10 @@
 :- rl_add_history('list_undefined.').
 
 
-:- test_for_release(library(logicmoo/logicmoo_plarkc)).
-:- test_for_release(library(logicmoo/logicmoo_planner)).
-:- test_for_release(library(parser_all)).
-:- test_for_release(init_mud_server).
+:- user:test_for_release(library(logicmoo/logicmoo_plarkc)).
+:- user:test_for_release(library(logicmoo/logicmoo_planner)).
+:- user:test_for_release(library(parser_all)).
+:- user:test_for_release(init_mud_server).
 
 
 % [Never] saves about a 3 minute compilation time (for when not runing mud)
@@ -149,7 +149,7 @@ sanity_test2:- enqueue_agent_action("rez pants"),
 push_env_ctx:-!,fail.
 push_env_ctx:-!.
 
-:- test_for_release(debug_mud_game).
+:- user:test_for_release(debug_mud_game).
 
 :- asserta(t_l:disable_px).
 
