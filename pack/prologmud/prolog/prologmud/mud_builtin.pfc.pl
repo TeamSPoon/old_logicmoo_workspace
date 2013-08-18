@@ -1253,6 +1253,11 @@ prologHybrid(normalAgentGoal(rtStatPred,ftTerm)).
      meta_argtypes(AT),argSingleValueDefault(Pred,2,N),prologHybrid(Pred),rtStatPred(Pred))))).
 
 
+:- ain(((normalAgentGoal(Pred,N)/atom(Pred) ==>
+ ({AT=..[Pred,tAgent,ftPercent]},{kb_dynamic(Pred,2)},
+     meta_argtypes(AT),argSingleValueDefault(Pred,2,N),prologHybrid(Pred),rtStatPred(Pred))))).
+
+
 normalAgentGoal(mudEnergy,90).
 normalAgentGoal(mudNonHunger,90).
 normalAgentGoal(mudHygiene,90).

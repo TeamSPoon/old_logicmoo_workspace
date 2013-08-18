@@ -220,7 +220,10 @@ push_current_choice/1,
       with_no_mpred_trace_exec(0),
       with_mpred_trace_exec(0),
       with_fc_mode(+,0),
-      bagof_or_nil(?,^,-).
+      bagof_or_nil(?,^,-),
+      mpred_ain(+,+),
+      mpred_ainz(+,+),
+      mpred_aina(+,+).
 
 :- meta_predicate mpred_retract_i_or_warn(+).
 :- meta_predicate mpred_retract_i_or_warn_0(+).
@@ -747,24 +750,46 @@ mpred_ain(MTP,S):- is_ftVar(MTP),!,trace_or_throw(var_mpred_ain(MTP,S)).
 mpred_ain(user:MTP,S):- !, must(mpred_ain(MTP,S)).
 mpred_ain(user:MTP :-B,S):- !, must(mpred_ain(MTP:-B,S)).
 
+mpred_ain(ToMt:P,(mfl(FromMt,File,Lineno),UserWhy)):- ToMt == FromMt, defaultAssertMt(ABox), ABox==ToMt,!,
+  mpred_ain(P,(mfl(FromMt,File,Lineno),UserWhy)).
+
 mpred_ain(ToMt:P :- B,(mfl(FromMt,File,Lineno),UserWhy)):- ToMt \== FromMt,
  defaultAssertMt(ABox), ToMt \== ABox,!,
   with_umt(ToMt,(mpred_ain(ToMt:P :- B,(mfl(ToMt,File,Lineno),UserWhy)))).
 
+/*
+
+mpred_ain(ToMt:P,(mfl(FromMt,File,Lineno),UserWhy)):- ToMt \== FromMt,
+ defaultAssertMt(ABox), ToMt \== ABox,!,
+  with_umt(FromMt,(mpred_ain(ToMt:P,(mfl(ToMt,File,Lineno),UserWhy)))).
+
+mpred_ain(MTP,S):- sanity(stack_check), strip_module(MTP,MT,P), P\==MTP,
+ \+ clause_b(mtExact(MT)), !,
+  with_umt(MT,mpred_ain(P,S)),!.
+
+mpred_ain(MTP :- B,S):- strip_module(MTP,MT,P),P\==MTP, 
+  \+ clause_b(mtExact(MT)), !,
+  with_umt(MT,mpred_ain(P :- B,S)),!.
+*/
 mpred_ain(ToMt:P,(mfl(FromMt,File,Lineno),UserWhy)):- ToMt \== FromMt,
  defaultAssertMt(ABox), ToMt \== ABox,!,
   with_umt(ToMt,(mpred_ain(ToMt:P,(mfl(ToMt,File,Lineno),UserWhy)))).
 
-mpred_ain(MTP,S):- sanity(stack_check), strip_module(MTP,MT,P),P\==MTP,!,
+mpred_ain(MTP,S):- sanity(stack_check), strip_module(MTP,MT,P),P\==MTP,
+  !,
   with_umt(MT,mpred_ain(P,S)),!.
 
-mpred_ain(MTP :- B,S):- strip_module(MTP,MT,P),P\==MTP,!,
+mpred_ain(MTP :- B,S):- strip_module(MTP,MT,P),P\==MTP,
+  !,
   with_umt(MT,mpred_ain(P :- B,S)),!.
 
 mpred_ain(PIn,S):- 
    if_defined(is_motel(PIn),fail),
    with_current_why(S, motel_ain(PIn,S)),!.
-
+/*
+mpred_ain(P,(mfl(FromMt,File,Lineno),UserWhy)):- P\=(_:_), defaultAssertMt(ABox), FromMt \== ABox,!,
+  mpred_ain(FromMt:P,(mfl(FromMt,File,Lineno),UserWhy)).
+*/
 mpred_ain(PIn,S):- 
   must(add_eachRulePreconditional(PIn,P)),
   must(full_transform(ain,P,P0)),!,
@@ -1618,9 +1643,9 @@ mpred_fwc1(Fact):-
 % does some special, built in forward chaining if P is
 %  a rule.
 
-% mpred_do_rule((H:-attr_bind(B,_))):- get_functor(H,F,A),lookup_u(mpred_mark(pfcLHS,F,A)), sanity(nonvar(B)), repropagate(H),!. 
+% mpred_do_rule((H:-attr_bind(B,_))):- get_functor(H,F,A),lookup_u(mpred_prop(pfcLHS,F,A)), sanity(nonvar(B)), repropagate(H),!. 
 mpred_do_rule((H:-B)):- var(H),sanity(nonvar(B)),forall(call_u(B),mpred_ain(H)),!.
-mpred_do_rule((H:-B)):- get_functor(H,F,A),lookup_u(mpred_mark(pfcLHS,F,A)), sanity(nonvar(B)),forall(call_u(B),mpred_fwc(H)),!.
+mpred_do_rule((H:-B)):- get_functor(H,F,A),lookup_u(mpred_prop(pfcLHS,F,A)), sanity(nonvar(B)),forall(call_u(B),mpred_fwc(H)),!.
 %   !,dtrace,ignore((lookup_u(H),mpred_fwc1(H),fail)).
 
 % mpred_do_rule((H:-B)):- !,ignore((call_u(B),mpred_fwc1(H),fail)).
@@ -2382,15 +2407,15 @@ mpred_mark_fa_as(_Sup,_P,_,_,pfcCallCodeTst):- !.
 mpred_mark_fa_as(_Sup,_P,t,_,_):- !.
 mpred_mark_fa_as(_Sup,_P,argIsa,N,_):- !,must(N=3).
 mpred_mark_fa_as(_Sup,_P,arity,N,_):- !,must(N=2).
-mpred_mark_fa_as(_Sup,_P,mpred_mark,N,_):- !,must(N=3).
+mpred_mark_fa_as(_Sup,_P,mpred_prop,N,_):- !,must(N=3).
 mpred_mark_fa_as(_Sup,_P,mpred_isa,N,_):- must(N=2).
 mpred_mark_fa_as(_Sup,_P,'[|]',N,_):- dtrace,must(N=2).
 mpred_mark_fa_as(_Sup,_P,_:mpred_isa,N,_):- must(N=2).
 mpred_mark_fa_as(Sup, _P,F,A,Type):- really_mpred_mark(Sup,Type,F,A),!.
 
-really_mpred_mark(_  ,Type,F,A):- mpred_call_no_bc(mpred_mark(Type,F,A)),!.
+really_mpred_mark(_  ,Type,F,A):- mpred_call_no_bc(mpred_prop(F,A,Type)),!.
 really_mpred_mark(Sup,Type,F,A):- 
-  MARK = mpred_mark(Type,F,A),
+  MARK = mpred_prop(F,A,Type),
   check_never_assert(MARK),
   with_no_mpred_trace_exec(with_fc_mode(direct,mpred_post1(MARK,(s(Sup),ax)))).
   % with_no_mpred_trace_exec(with_fc_mode(direct,mpred_fwc1(MARK,(s(Sup),ax)))),!.

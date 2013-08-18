@@ -19,9 +19,9 @@
    fully_expand(Before,After),
   mpred_must(After = defaultAssertMt(ABox),create_predicate_istAbove(ABox,F,A)).
 
-:- Before = ((mpred_mark(pfcCreates,F, A)/(is_ftNameArity(F,A))==>{create_predicate_istAbove(abox,F,A)})),
+:- Before = ((mpred_prop(F, A, pfcCreates)/(is_ftNameArity(F,A))==>{create_predicate_istAbove(abox,F,A)})),
    fully_expand(Before,After),
-  mpred_must(After =(mpred_mark(pfcCreates,F, A)/(is_ftNameArity(F,A))==>{defaultAssertMt(ABox),create_predicate_istAbove(ABox,F,A)})).
+  mpred_must(After =(mpred_prop(F, A, pfcCreates)/(is_ftNameArity(F,A))==>{defaultAssertMt(ABox),create_predicate_istAbove(ABox,F,A)})).
 
 
 :- Before = bar(fooFn),

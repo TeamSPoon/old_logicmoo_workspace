@@ -122,7 +122,7 @@ mdefault/1, % pfc
 mpred_do_and_undo_method/2,
 %mpred_isa/2,
 %mpred_manages_unknowns/0,
-mpred_mark/3,
+mpred_prop/3,
 predicateConventionMt/2,
 mudKeyword/2,
 mudDescription/2,
@@ -456,7 +456,7 @@ on_modules_changed :-
 %
 % Never Assert For User Code Primary Helper.
 %
-never_assert_u0(mpred_mark(pfcPosTrigger,F,A),Why):- fail,
+never_assert_u0(mpred_prop(F,A,pfcPosTrigger),Why):- fail,
   functor(P,F,A),
   ignore(predicate_property(M:P,exported)),
   defined_predicate(M:P),  
@@ -486,3 +486,4 @@ system:term_expansion(M1:(M2:G),(M1:G)):-atom(M1),M1==M2,!.
 system:goal_expansion(M1:(M2:G),(M1:G)):-atom(M1),M1==M2,!.
 system:sub_call_expansion(_:dynamic(_:((M:F)/A)),dynamic(M:F/A)):-atom(M),atom(F),integer(A).
 */
+

@@ -267,7 +267,8 @@ ensure_abox(M):-
         M:dynamic(M:F/A),
         M:discontiguous(M:F/A),
         create_predicate_istAbove(M,F,A),        
-        M:module_transparent(M:F/A))))),!.
+        M:module_transparent(M:F/A))))),!,
+   set_prolog_flag(M:unknown,error).
 
 
 
@@ -387,7 +388,7 @@ ensure_imports(M):- ain(genlMt(M,baseKB)).
 % Skip over 'user' module and still see 'system'.
 %
 skip_user(Mt):- import_module(Mt,system), \+ default_module(Mt,user), !.
-skip_user(Mt):- !, add_import_module(Mt,system,start),ignore(delete_import_module(Mt,user)),
+skip_user(Mt):- current_prolog_flag(logicmoo_import_module,true), add_import_module(Mt,system,start),ignore(delete_import_module(Mt,user)),!,
   forall((import_module(Mt,X),default_module(X,user)),skip_user(X)).
   
 inherit_into_module(Child,Parent):- ==(Child,Parent),!.
@@ -473,7 +474,7 @@ correct_module(MT,_,_,_,MT):-!.
 :- dynamic(lmcache:how_registered_pred/4).
 :- module_transparent(lmcache:how_registered_pred/4).
 
-add_import_predicate(Mt,Goal,OtherMt):- fail,
+add_import_predicate(Mt,Goal,OtherMt):- current_prolog_flag(logicmoo_import_module,true),
    clause_b(mtGlobal(Mt)),
    clause_b(mtGlobal(OtherMt)),
    \+ import_module(OtherMt,Mt),
@@ -531,8 +532,8 @@ baseKB:hybrid_support(genlMt,2).
 
 %predicateConventionMt(genlMt,baseKB).
 
-% baseKBOnly mark_mark/3 must be findable from every module (dispite the fact that baseKB is not imported)
-:- dynamic baseKB:mpred_mark/3.
+% baseKBOnly mpred_prop/3 must be findable from every module (dispite the fact that baseKB is not imported)
+:- dynamic baseKB:mpred_prop/3.
 
 % hybrid_support (like spft/3) must be defined directly in every module and then aggregated thru genlMts (thus to baseKB)
 
@@ -575,12 +576,15 @@ uses_predicate(user,user, F, A, retry) :- clause_b(arity(F,A)),functor(P,F,A),
    call(call,assert((user:P :- call_u(P)))),
    user:compile_predicates([F/A]),!.
 
+uses_predicate(_, M, uses_predicate, 2, retry) :- break, !,M:import(uses_predicate/2).
+
 uses_predicate(_,_, (:-), _, error) :- !,dumpST,dbreak.
 uses_predicate(_,_, (/), _, error) :- !,dumpST,dbreak.
 uses_predicate(_,_, (//), _, error) :- !,dumpST,dbreak.
+uses_predicate(_,_, (:), 3, error) :- !.
 uses_predicate(_,_, (:), _, error) :- !,dumpST,dbreak.
-uses_predicate(_,myMt,mtExact,1, retry):- myMt:import(baseKB:mtExact/1),!.
 % uses_predicate(SM,_, '>>',  4, error) :- !,dumpST,dbreak.
+uses_predicate(_, M, mtExact,1, retry):- !, M:import(baseKB:mtExact/1).
 uses_predicate(_,_, '[|]', _, error) :- !,dumpST,dbreak.
 uses_predicate(User, User, module, 2, error):-!.
 
@@ -602,13 +606,14 @@ uses_predicate(BaseKB,System, F,A,R):-  System\==BaseKB, call_u(mtCycL(BaseKB)),
    loop_check_term(must(uses_predicate(System,BaseKB,F,A,R)),
                    term(uses_predicate(System,BaseKB,F,A,R)),fail),!.
 
-uses_predicate(_CallerMt, baseKB, F, A,retry):-
+uses_predicate(_CallerMt, baseKB, F, A,retry):- fail,
   create_predicate_istAbove(baseKB,F,A),
    nop(system:import(baseKB:F/A)),!.
 
 uses_predicate(System, BaseKB, F,A, retry):-  System\==BaseKB, call_u(mtCycL(BaseKB)),\+ call_u(mtCycL(System)),!,
    create_predicate_istAbove(BaseKB,F,A),
-    nop(system:import(BaseKB:F/A)),!.
+    BaseKB:export(BaseKB:F/A),
+    system:import(BaseKB:F/A),!.
 
 % keeps from calling this more than once
 uses_predicate(SM,M,F,A,error):- 
@@ -627,9 +632,9 @@ uses_predicate(_,Module, Name, Arity, Action) :- fail,
 uses_predicate(_,System, _,_, error):- module_property(System,class(system)),!.
 uses_predicate(_,System, _,_, error):- module_property(System,class(library)),!.
 
-uses_predicate(SM,CallerMt,F,A,R):- 
+uses_predicate(SM,CallerMt,F,A,retry):- 
     loop_check_term(retry_undefined(CallerMt,F,A),dump_break_loop_check_uses_predicate(SM,CallerMt,F,A,retry),dump_break),
-    R=retry.
+    sanity(current_predicate(CallerMt:F/A)).
 
 %% create_predicate_istAbove(+ChildDefMt,+F,+A) is semidet.
 %
@@ -657,7 +662,7 @@ with_no_retry_undefined(Goal):- w_tl(set_prolog_flag(retry_undefined,false),Goal
 % Every module has it''s own
 retry_undefined(CallerMt,'$pldoc',4):- multifile(CallerMt:'$pldoc'/4),discontiguous(CallerMt:'$pldoc'/4),dynamic(CallerMt:'$pldoc'/4),!.
 
-% 3 very special Mts
+% 2 very special Mts
 % Module defines the type
 % retry_undefined(baseKB,F,A):- make_as_dynamic(retry_undefined(baseKB),baseKB,F,A),!.
 retry_undefined(lmcache,F,A):- volatile(lmcache:F/A),make_as_dynamic(retry_undefined(lmcache),lmcache,F,A),!.
@@ -709,6 +714,13 @@ retry_undefined(CallerMt,F,A):-
        asserta(lmcache:how_registered_pred(PredMt:use_module(CallerMt:File),CallerMt,F,A)),
        use_module(CallerMt:File),!.
 
+retry_undefined(CallerMt,F,A):-functor(P,F,A),find_module(CallerMt:P,From),must(show_call(retry_undefined,CallerMt:import(From:F/A))),!.
+
+% 3 very special Mts
+retry_undefined(lmconf,F,A):- make_as_dynamic(retry_undefined(lmconf),lmconf,F,A),!.
+retry_undefined(lmcache,F,A):- volatile(lmcache:F/A),make_as_dynamic(retry_undefined(lmcache),lmcache,F,A),!.
+retry_undefined(t_l,F,A):- thread_local(t_l:F/A),!,make_as_dynamic(retry_undefined(t_l),t_l,F,A),!.
+
 /*
 retry_undefined(CallerMt,F,A):-
       autoload_library_index(F,A,PredMt,File),
@@ -720,6 +732,7 @@ retry_undefined(CallerMt,F,A):-
 retry_undefined(CallerMt,F,A):-functor(P,F,A),find_module(P,M),show_call(CallerMt:import(F/A)),!.
 
 
+%TODO current_prolog_flag(logicmoo_import_module,true).
 %retry_undefined(PredMt:must/1) % UNDO % :- add_import_module(PredMt,logicmoo_util_catch,start),!.
 %retry_undefined(PredMt:debugm/2) % UNDO % :- add_import_module(PredMt,logicmoo_util_dmsg,start),!.
 

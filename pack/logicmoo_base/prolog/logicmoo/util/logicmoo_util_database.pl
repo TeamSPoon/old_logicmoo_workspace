@@ -299,6 +299,7 @@ find_and_call(C,M,  G):-dtrace,C:on_x_rtrace(M:G).
 
 current_module_ordered(user).
 current_module_ordered(baseKB).
+current_module_ordered(system).
 current_module_ordered(X):-current_module(X).
 %= 	 	 
 
@@ -309,14 +310,17 @@ current_module_ordered(X):-current_module(X).
 find_and_call(C:G):-current_predicate(_,C:G),!,find_and_call(C,G).
 find_and_call(_:G):-current_predicate(_,R:G),!,find_and_call(R:G).
 find_and_call(G):-current_predicate(_,G),!,loop_check(on_x_rtrace(G)).
-find_and_call(G):-current_predicate(_,R:G),!,find_and_call(R:G).
+find_and_call(G):- strip_module(G,M,P),sanity(nonvar(P)),
+  (((current_module_from(M,C), module_of(C,P,R))) *-> R:call(P);(dmsg(warn(unknown_find_and_call(G))))).
+/*
+find_and_call(G):-current_predicate(_,G),!,loop_check(on_x_rtrace(G)).
+*/
 
 module_of(O,G,M):-predicate_property(O:G,imported_from(M)),!.
 module_of(M,G,M):-predicate_property(M:G,defined), \+ predicate_property(M:G,imported_from(_)).
 
-find_module(G,R):- strip_module(G,M,P),module_of(M,P,R),!.
-find_module(G,M):- current_module_ordered(C),module_of(C,G,M),!.
-
+find_module(G,R):- nonvar(R),!,find_module(G,RR),R=RR,!.
+find_module(G,R):- strip_module(G,M,P),sanity(nonvar(P)),current_module_from(M,C), module_of(C,P,R),!.
 callable_module(G,R):- strip_module(G,R,P),predicate_property(R:P,defined),!.
 callable_module(G,R):- strip_module(G,_,P),current_module_ordered(R),predicate_property(R:P,defined),!.
 callable_module(G,R):- strip_module(G,M,P),module_of(M,P,R).
