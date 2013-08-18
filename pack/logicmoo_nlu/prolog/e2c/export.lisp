@@ -317,7 +317,8 @@
 
 (define assertion-id-with-vars-string (assrt)
   (csetq elvars (ASSERTION-EL-VARIABLES assrt))
-  (clet ((idstr (cconcatenate "a" *kbnum* "_" (string (assertion-id assrt)))))
+  (punless elvars (ret  (assertion-id assrt)))
+  (clet ((idstr (cconcatenate "a" (string (assertion-id assrt)))))
   (pwhen elvars
      (csetq idstr (cconcatenate idstr  "("))
      (csetq idstr (cconcatenate idstr (pl-varname (car elvars))))
@@ -376,6 +377,18 @@
 (cdo  ;; ((anum 1190000 (1+ anum))) ((= anum 1190005))
  ((anum 990000 (1+ anum))) ((= anum (+ 990000 500)))
  (clet ((assrt (find-assertion-by-id anum))) (showa assrt))))
+
+
+(define ri2 ()
+(cdo  ;; ((anum 1190000 (1+ anum))) ((= anum 1190005))
+ ((anum 990000 (1+ anum))) ((= anum (+ 990000 500)))
+ (clet ((assrt (find-assertion-by-id anum)))
+   (punless (equal (assertion-hl-formula assrt) (assertion-el-formula assrt))
+     (print (assertion-hl-formula assrt))
+     (print (assertion-el-formula assrt))))))
+
+
+
 
 
 (define ruleinfo (assrt type &optional (str nil))
