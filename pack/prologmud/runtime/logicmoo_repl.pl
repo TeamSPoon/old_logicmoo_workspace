@@ -40,7 +40,7 @@ setup_rl_read_history_0:-
 % [Optionaly] Load an Eggdrop (Expects you have  Eggdrop runinng with PROLOG.TCL scripts @ https://github.com/TeamSPoon/MUD_ircbot/)
 :- if((fail , exists_source(library(eggdrop)))).
 :- ensure_loaded(library(eggdrop)).
-:- eggdrop:egg_go.
+% :- eggdrop:egg_go.
 :- initialization((current_predicate(egg_go/0)->egg_go;true),now).
 :- endif.
 

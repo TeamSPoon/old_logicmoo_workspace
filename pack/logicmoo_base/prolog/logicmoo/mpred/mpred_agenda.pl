@@ -216,7 +216,10 @@ mpred_one_second_timer:- repeat,time_tick(1.0,baseKB:hook_one_second_timer_tick)
 %
 % Start One Second Timer.
 %
-start_one_second_timer:-thread_property(_,alias(mpred_one_second_timer))-> true ; thread_create(mpred_one_second_timer,_,[alias(mpred_one_second_timer)]).
+start_one_second_timer:-
+ thread_property(_,alias(mpred_one_second_timer))
+     -> true ; 
+    thread_create(mpred_one_second_timer,_,[alias(mpred_one_second_timer)]).
 
 % :-initialization(start_one_second_timer).
 

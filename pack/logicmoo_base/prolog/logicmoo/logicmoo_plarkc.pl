@@ -6,74 +6,61 @@
 % Dec 13, 2035
 %
 */
-end_of_file.
-:- module(logicmoo_run_old_pttp,[]).
+% :- module(logicmoo_run_old_pttp,[]).
 
-:- user:ensure_loaded(logicmoo(logicmoo_engine)).
+:- ensure_loaded(logicmoo(logicmoo_engine)).
+:- asserta_new(user:file_search_path(pldata,'/opt/cyc/')).
+
+/*
+:- (current_prolog_flag(qcompile,PrevValue)->true;PrevValue=false),
+   call(assert,on_fin(set_prolog_flag(qcompile,PrevValue))),
+   set_prolog_flag(qcompile,large).
+*/
+
+:- baseKB:disable_mpred_expansion.
+:- set_prolog_flag(lm_expanders,false).
+:- wdmsg("loading current_renames").
+:- load_files(pldata(current_renames),[qcompile(auto)]).
+:- wdmsg("done with current_renames").
+:- retractall(renames(_)).
+:- baseKB:enable_mpred_expansion.
+:- set_prolog_flag(lm_expanders,true).
+
 :- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)).
 
-
-:- meta_predicate cwtdl(0,+,+).
-:- meta_predicate transfer_predicate(?,0,0).
-:- meta_predicate transTiny(?,0).
-
-:- was_dynamic(cwtdl_failed/1).
-
-cwtdl(Goal,DL,TL):- cwc,
-  cnotrace((ignore((nortrace,
-   (show_failure(why,catch(call_with_time_limit(TL,(((call_with_depth_limit(Goal,DL,DLE),DLE\==depth_limit_exceeded)))),E,(dmsg(E:cwtdl(Goal,DL,TL)),fail)))
-     ->true;
-    assert(cwtdl_failed(Goal))))))).
-
-%:-in_cmt(listing(cwtdl/3)).
-:- ltkb1.
-% :- dmsg("Loading tinyKB should take under a minute").
-
-%:- in_cmt(doall((filematch(logicmoo('plarkc/mpred_cyc_kb_tinykb.pl'),F),source_file(X,F),predicate_property(X,static),X\='$pldoc'(_G8428,_G8429,_G8430,_G8431),listing(X)))).
-
-:- file_begin(pfc).
-
-:- must_det(argIsa(genlPreds,2,_)).
-
-transfer_predicate(C,If,Q):-doall((clause(C,true,Ref),If,Q,on_x_log_throw(erase(Ref)))).
-transTiny(Template,If):-transfer_predicate(tinyK8(Template),If,once(ain(Template))).
-
-:- mpred_notrace.
+:- set_prolog_stack(local, limit(32*10**9)).
+:- set_prolog_stack(global, limit(32*10**9)).
 
 
-reallyLoadTiny:- transTiny(tCol(X),ground(X)).
-reallyLoadTiny:- transTiny(arity(X,Y),ground((X,Y))).
-reallyLoadTiny:- transTiny(genls(X,Y),((X\=ftAtomicTerm,ground((X,Y))))).
-reallyLoadTiny:- mpred_trace.
-reallyLoadTiny:- transTiny(genls(X,Y),((ground((X,Y))))).
-%TODO_VERIFY_STILL_UNNEEDED :- retract_all((ftClosedAtomicTerm(A) :- ftAtomicTerm(A))).
-%TODO_VERIFY_STILL_UNNEEDED :- mpred_withdraw(genls(ftAtomicTerm,ftClosedAtomicTerm)).
-reallyLoadTiny:- transTiny(genlMt(X,Y),writeq((X,Y))).
-reallyLoadTiny:- transTiny(ttExpressionType(X),ground(X)).
+:- baseKB:disable_mpred_expansion.
+:- set_prolog_flag(lm_expanders,false).
+:- if(exists_source(pldata('kb_7166.qlf'))).
+:- wdmsg("loading kb_7166").
+:- ensure_loaded(pldata('kb_7166.qlf')).
+:- else.
+:- wdmsg("qcompile kb_7166").
+:- load_files(pldata(kb_7166),[qcompile(auto)]).
+:- endif.
+:- wdmsg("done loading kb_7166").
+:- set_module(kb_7166:class(library)).
+:- baseKB:enable_mpred_expansion.
+:- set_prolog_flag(lm_expanders,true).
 
-%TODO_VERIFY_STILL_UNNEEDED :-mpred_withdraw(genls(ftAtomicTerm,ftClosedAtomicTerm)).
+:- if(current_predicate(on_fin/1)).
+:- forall(call(retract,on_fin(CALL)),call(CALL)).
+:- endif.
 
-%TODO_VERIFY_STILL_UNNEEDED :-retract_all((ftClosedAtomicTerm(A) :- ftAtomicTerm(A))).
-reallyLoadTiny:- mpred_notrace.
-
-
-:- if(false).
-:- doall(reallyLoadTiny).
+:- if(current_predicate(setup7166/0)).
+:- initialization(setup7166,after_load).
+:- initialization(setup7166,restore).
 :- endif.
 
 
-%TODO FIX :-ain((((cycl(X),{must(cyc_to_clif(X,Y))}) ==> clif(Y)))).
-
-:- mpred_notrace.
-:- ain((((cycl('$VAR'('X')),{must(cyc_to_clif('$VAR'('X'),'$VAR'('Y')))}) ==> clif('$VAR'('Y'))))).
-
-% ?-listing(cycl).
-
-%TODO FIX :- must(isa(iExplorer2,tHominid)).
-%TODO FIX :- must(tHominid(iExplorer2)).
-
-tHominid(iExplorer2).
-
+end_of_file.
+%
+:-in_cmt(listing(cwtdl/3)).
+:- dmsg("Loading tinyKB should take under a minute").
+:- ltkb1.
 :- must((mudSubPart(iExplorer2,Inst),isa(Inst,tHumanNeck))).
 :- must((mudSubPart(iExplorer2,Inst),isa(Inst,tHumanHair))).
 

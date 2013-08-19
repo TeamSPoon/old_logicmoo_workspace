@@ -421,9 +421,9 @@ name_text_now(Name,Text):- atomic(Name),guess_nameStrings(Name,Text),!.
 name_text_cached(Name,Text):-clause_b(nameString(Name,Text)).
 name_text_cached(Name,Text):-clause_b(mudKeyword(Name,Text)).
 
-:- baseKB:import(logicmoo_util_strings:convert_cycString/2).
+:- baseKB:import(logicmoo_util_strings:convert_to_cycString/2).
 
-guess_mudDescription(O,S):-guess_mudDescription_0(O,OS),!,convert_cycString(OS,S).
+guess_mudDescription(O,S):-guess_mudDescription_0(O,OS),!,convert_to_cycString(OS,S).
 guess_mudDescription_0([],_):-!,fail.
 guess_mudDescription_0('',_):-!,fail.
 guess_mudDescription_0("",_):-!,fail.
@@ -434,7 +434,7 @@ guess_mudDescription_0(Name,Desc):- isa(Name,tPred), \+ isa(Name,tCol),atomic(Na
 guess_mudDescription_0(Name,Desc):- atomic(Name),!,atom(Name),to_case_breaks(Name,TextT),
    maplist(to_descriptive_name(Name),TextT,TextL),!,atomics_to_string(TextL,' ',Desc).
 
-guess_nameStrings(O,S):-guess_nameStrings_0(O,OS),!,convert_cycString(OS,S).
+guess_nameStrings(O,S):-guess_nameStrings_0(O,OS),!,convert_to_cycString(OS,S).
 guess_nameStrings_0([],_):-!,fail.
 guess_nameStrings_0('',_):-!,fail.
 guess_nameStrings_0("",_):-!,fail.

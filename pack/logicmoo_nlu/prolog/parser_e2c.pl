@@ -100,38 +100,10 @@ disable_current_module_expansion(M):-
 :- endif.
 
 
-:- asserta_new(user:file_search_path(pldata,'/opt/cyc/')).
-
 :- (current_prolog_flag(qcompile,PrevValue)->true;PrevValue=false),
    call(assert,on_fin(set_prolog_flag(qcompile,PrevValue))),
    set_prolog_flag(qcompile,large).
 
-:- set_prolog_flag(logicmoo_virtualize,true).
-
-:- ensure_loaded(pldata(cyc_export_utils)).
-
-:- if(exists_source(pldata('kb_7166.qlf'))).
-:- wdmsg("loading kb_7166").
-:- ensure_loaded(pldata('kb_7166.qlf')).
-:- else.
-:- wdmsg("qcompile kb_7166").
-:- load_files(pldata(kb_7166),[qcompile(auto)]).
-:- endif.
-:- wdmsg("done loading kb_7166").
-:- set_module(kb_7166:class(library)).
-
-:- if(current_predicate(on_fin/1)).
-:- forall(call(retract,on_fin(CALL)),call(CALL)).
-:- endif.
-
-:- if(current_predicate(on_end/1)).
-:- forall(call(retract,on_end(CALL)),call(CALL)).
-:- endif.
-
-:- if(current_predicate(setup7166/0)).
-:- initialization(setup7166,after_load).
-:- initialization(setup7166,restore).
-:- endif.
 
 :- set_prolog_flag(logicmoo_virtualize,true).
 
@@ -152,7 +124,7 @@ disable_current_module_expansion(M):-
 %:- dynamic_multifile_exported kbp_t_list_prehook/2.
 
 do_renames_e2c(I,O):- is_ftVar(I),!,I=O.
-do_renames_e2c(I,O):- atomic(I),kb7166:do_renames(I,O),!.
+do_renames_e2c(I,O):- atomic(I),do_renames(I,O),!.
 do_renames_e2c(A,B):- compound_name_arguments(A,P,ARGS),maplist(do_renames_e2c,[P|ARGS],[T|L]),compound_name_arguments(B,T,L).
  
 
@@ -211,8 +183,8 @@ lmfs:e2c_in_file(Head,Vars,In,Out):-
 enable_e2c :- enable_in_file(e2c_in_file).
 disable_e2 :- disable_in_file(e2c_in_file).
 %:- enable_body_reorder.
-%:- enable_body_textstr.
-:- enable_e2c.
+:- enable_body_textstr.
+% :- enable_e2c.
 
 
 notground(V):-notrace(not(ground(V))).
@@ -264,7 +236,7 @@ get_pl_type(C,compound(F,A)):-functor(C,F,A).
 :-export((dm1/0,dm2/0,dm3/0)).
 
 dm1:-
-  mmake,
+  % mmake,
    e2c("I am happy when I am seeing two books sitting on a shelf",F),portray_clause(F),
    forall(clause(e2c_result(Text),O),retractall((e2c_result(Text):-O))),
    forall(descriptionTest(_,Texts),forall(member(Text,Texts),doE2CTest(Text))),
@@ -306,6 +278,7 @@ nodeTrans(pp,'PrepositionalPhrase').
 
 nodeTrans(s,'NLSentence').
 nodeTrans(whnp,'WHPronoun').
+%:- rtrace.
 nodeTrans(P,S):-dstringify(P,S),!.
 nodeTrans(P,string([P])).
 
@@ -455,7 +428,7 @@ posm_c_gen( StrVar,'ProperNoun',normal,Proper) :-
       'countryName-LongForm'(Proper, CycStr);
       'countryName-ShortForm'(Proper, CycStr)))).
 
-posm_c_gen(String,POS,Form,CycL):- String=[_|_],!,posm_c_gen_multi(String,POS,Form,CycL).
+posm_c_gen(String,POS,Form,CycL):- nonvar(String), String=[_|_],!,posm_c_gen_multi(String,POS,Form,CycL).
 
 posm_c_gen(Eng,POS,Form,CycL):-posm_c_gen_unify(_CycWord,Eng,POS,Form,CycL).
 
@@ -680,9 +653,9 @@ cycWordPosForm_Likely(POS,CycWord,Form):-
 	 'denotation'(CycWord,POS, _Arg, _CycL))),      
 	 speechPartPreds_transitive(POS, Form).
 
-sanify_string(String,_PredName,Sane):- if_defined(isT(nameString(isa,Y)),fail),atom(Y), \+ atom(String),!,trace_or_throw(sanify_string(String,Sane)).
-sanify_string(String,_PredName,String):- \+ compound(String).
-sanify_string(String,_PredName,String):- sanify_string_list(String).
+sanify_string(String,Sane):- if_defined(isT(nameString(isa,Y)),fail),atom(Y), \+ atom(String),!,trace_or_throw(sanify_string(String,Sane)).
+sanify_string(String,String):- \+ compound(String).
+sanify_string(String,String):- sanify_string_list(String).
 
 % sanify_string([_|Tring]):-length(Tring,RLen),!,between(0,1,RLen).
 sanify_string_list([_]).
@@ -755,7 +728,9 @@ meetsForm80(String,RootString,form80(MainPlusTrans,main+tv)):-fail,nop((String,R
 % ==========================================================
 % meetsForm(String,CycWord,Form)
 % ==========================================================
- 
+
+cycstring(_).
+
 meetsForm(String,CycWord,Form):-  no_repeats(meetsForm_0(String,CycWord,Form)).
 
 meetsForm_0(String,CycWord,Form):- one_must( meetsForm_1(String,CycWord,Form),meetsForm_2(String,CycWord,Form)).
@@ -766,7 +741,7 @@ meetsForm_0(String,CycWord,Form):- genlPreds_different(Child,Form),meetsForm_1(S
 meetsForm_1(String,CycWord,Form):- has_wordage(String),is_wordage_prop(String, form(_, CycWord, _)),!,is_wordage_prop(String, form(_, CycWord, Form)).
 % meetsForm_1(String,CycWord,Form):-nonvar(String),stringListToWordForm(String,CycWord,Form).
 %'abbreviationForLexicalWord'('Kilogram-TheWord', 'singular', [kg])
-meetsForm_1(String,CycWord,Form):- (cycstring(String),'abbreviationForLexicalWord'(CycWord,Form,String)).
+meetsForm_1(String,CycWord,Form):-  stringArgUC(String, CycString,'abbreviationForLexicalWord'(CycWord,Form,CycString)).
 meetsForm_1(String,CycWord,Form):- 
                       stringArgUC(String, CycString, (((once(nonvar(CycWord);atom(CycString))),                        
                                  cyckb_t_e2c(Form,CycWord,CycString),is_speechPartPred(Form),notPrefixOrSuffix(CycWord)))).
@@ -4006,10 +3981,10 @@ lex_trans2_verb2(VerbPhrase,CycL,Subj,Event,Obj):-
 
 % uses genFormat
 lex_trans2_verb2(String,MeaningTerm,Subj,Event,Obj):-
-   nonvar(String),
-   append(String,['~a'],Rest),!,
-   not(memberchk('~a',Rest)),
-   'genFormat'(Pred,['~a'|Rest],Format),
+   convert_to_1cycString(String,CycString),
+   append(CycString,["~a"],Rest),!,
+   not(memberchk("~a",Rest)),
+   'genFormat'(Pred,["~a"|Rest],Format),
    do_genformat(Format,Pred,Subj,Obj,MeaningTerm).
 
 do_genformat(['NIL'],Pred,Subj,Obj,MeaningTerm):-MeaningTerm =..[Pred,Subj,Obj].

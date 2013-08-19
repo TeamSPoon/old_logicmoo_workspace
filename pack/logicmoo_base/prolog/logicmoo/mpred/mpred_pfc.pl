@@ -521,8 +521,8 @@ throw_depricated:- trace_or_throw(throw_depricated).
 assert_u(MH):- assert_u_no_dep(MH).
 assert_u_no_dep(MH):- fix_mp(clause(assert,assert_u),MH,MHA),
     attvar_op_fully(assert_i, MHA),expire_tabled_list(MHA).
-asserta_u(MH):- throw_depricated, fix_mp(clause(assert,asserta_u),MH,MHA),attvar_op_fully(asserta_i,MHA).
-assertz_u(MH):- throw_depricated, fix_mp(clause(assert,assertz_u),MH,MHA),attvar_op_fully(assertz_i,MHA).
+asserta_u(MH):- fix_mp(clause(assert,asserta_u),MH,MHA),attvar_op_fully(asserta_i,MHA).
+assertz_u(MH):- fix_mp(clause(assert,assertz_u),MH,MHA),attvar_op_fully(assertz_i,MHA).
 retract_u(H):- retract_u0(H) *-> true; attvar_op_fully(retract_u0,H).
 
 retract_u0(H0):- strip_module(H0,_,H),(H = ( \+ _ )),!,trace_or_throw(mpred_warn(retract_u(H0))),expire_tabled_list(H).
@@ -1165,7 +1165,8 @@ mpred_enqueue(P,S):-
  ( (must(get_fc_mode(P,S,Mode))
     -> (Mode=direct  -> loop_check_term(mpred_fwc(P),mpred_enqueueing(P),true) ;
 	Mode=depth   -> mpred_asserta_w_support(que(P,S),S) ;
-	Mode=breadth -> mpred_assert_w_support(que(P,S),S) ;
+        Mode=paused   -> mpred_asserta_w_support(que(P,S),S) ;
+	Mode=breadth -> mpred_assertz_w_support(que(P,S),S) ;
 	true         -> mpred_error("Unrecognized pm mode: ~p", Mode))
      ; mpred_error("No pm mode"))),!.
 
@@ -1197,10 +1198,9 @@ mpred_remove_old_version(_).
 %    direct -  mpred_fwc has already done the job.
 %    depth or breadth - use the queue mechanism.
 
-mpred_run :- lookup_u(pm(Mode)),Mode=direct,!.
+mpred_run :- (get_fc_mode(_,_,Mode)->(Mode=direct;Mode=paused)),!.
 % mpred_run :- repeat, \+ mpred_step, !.
 mpred_run:-
-%  (\+ lookup_u(pm(direct))),
   mpred_step,
   mpred_run.
 mpred_run.
@@ -1883,7 +1883,7 @@ make_visible(M,M:F/A):- must_det(M:export(M:F/A)).
 make_visible(R,M:F/A):- must_det_l((M:export(M:F/A),R:import(M:F/A),R:export(M:F/A))).
 
 call_u_mp_fa(_,P,F,_):- (F==t; ( \+ clause_b(prologBuiltin(F)),
-  F\=isT,F\=isTT, \+predicate_property(P,file(_)))),if_defined(t_ify0(P,TGaf),fail), if_defined(isT(TGaf),false).
+  F \= isT,F \= isTT, \+ predicate_property(P,file(_)))),if_defined(t_ify0(P,TGaf),fail), if_defined(isT(TGaf),false).
 call_u_mp_fa(M,P,F,A):- loop_check(call_u_mp_lc(M,P,F,A)).
 
 call_u_mp_lc(M,P,F,A):- current_predicate(M:F/A),!,catch(M:P,E,(wdmsg(call_u_mp(M,P)),wdmsg(E),dtrace)).

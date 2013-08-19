@@ -106,7 +106,7 @@ kill_unsafe_preds:-(dmsg("kill_unsafe_preds!"),w_tl(set_prolog_flag(access_level
 
 :- if(exists_source(library(eggdrop))).
 :- ensure_loaded(library(eggdrop)).
-:- egg_go.
+%:- egg_go.
 :- endif.
 %:- use_listing_vars.
 % :- [run].
@@ -217,7 +217,7 @@ ensure_webserver_3020:- find_and_call(ensure_webserver(3020)).
 %:- push_modules.
 % [Required] load the mud system
 % :- with_mpred_trace_exec(show_entry(gripe_time(40,ensure_loaded(prologmud(mud_loader))))).
-:- must(show_entry(gripe_time(40,ensure_loaded(prologmud(mud_loader))))).
+% :- must(show_entry(gripe_time(40,ensure_loaded(prologmud(mud_loader))))).
 %:- lmce:reset_modules.
 
 :- set_prolog_flag(logicmoo_debug,true).
@@ -238,6 +238,7 @@ ensure_webserver_3020:- find_and_call(ensure_webserver(3020)).
 
 % :- mpred_trace_exec.
 
+:- if(functorDeclares(mobExplorer)).
 
 :- sanity(functorDeclares(tSourceData)).
 :- sanity(functorDeclares(mobExplorer)).
@@ -316,6 +317,8 @@ pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','Por
 
 :- set_prolog_flag(dialect_pfc,false).
 
+:- endif.
+
 :- file_begin(pl).
 
 
@@ -333,7 +336,6 @@ start_telnet:- on_x_log_cont(start_mud_telnet_4000).
 :- write('\n?- user:ensure_loaded(run_mud_game). % to begin loading mud worlds').
 % :- user:ensure_loaded(start_mud_server).
 
-lar:- login_and_run.
 
 :- initialization(ensure_webserver_3020,now).
 
@@ -348,17 +350,16 @@ lst :- force_reload_mpred_file('../games/src_game_startrek/*.pfc.pl').
 
 :- must_det(argIsa(genlPreds,2,_)).
 
-load_ckb:- ensure_loaded(logicmoo(plarkc/logicmoo_i_cyc_kb)),logicmoo_i_cyc_kb:call(call,ltkb1).
+:- expand_file_search_path(pack(logicmoo_nlu/prolog/pldata),X),exists_directory(X),!,assert(user:file_search_path(pldata,X)).
+
+:- ensure_loaded(logicmoo(logicmoo_plarkc)). % ,logicmoo_i_cyc_kb:call(call,ltkb1).
 
 %:- initialization(ltkb1,load_ckb).
 
 :- assert_setting01(lmconf:eachRule_Preconditional(true)).
 :- assert_setting01(lmconf:eachFact_Preconditional(true)).
 
-tSourceData(iWorldData8).
-:- ain(isLoaded(iWorldData8)).
-:- ain(isRuntime).
-
+:- ensure_loaded(library(parser_e2c)). 
 
 :- mpred_notrace_exec.
 
@@ -371,12 +372,13 @@ tSourceData(iWorldData8).
 
 :- set_prolog_flag(unsafe_speedups,true).
 :- statistics.
-:- gripe_time(1.0,must(coerce(s,vtDirection,_))).
-:- gripe_time(2.0,must( \+ coerce(l,vtDirection,_))).
+%:- gripe_time(1.0,must(coerce(s,vtDirection,_))).
+%:- gripe_time(2.0,must( \+ coerce(l,vtDirection,_))).
 
 :- check_clause_counts.
 
 % :- make.
+lar:- ain(tSourceData(iWorldData8)),ain(isLoaded(iWorldData8)),ain(isRuntime), login_and_run.
 :- initialization(lar,restore).
 % :- initialization(lar).
 

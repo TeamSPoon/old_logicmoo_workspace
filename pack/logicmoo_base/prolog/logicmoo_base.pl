@@ -52,7 +52,7 @@ prolog_stack:stack_guard(none).
 
 
 
-:- set_prolog_flag(logicmoo_autoload,true).
+:- set_prolog_flag(logicmoo_autoload,false).
 
 
 % must be xref-ing or logicmoo_autoload or used as include file

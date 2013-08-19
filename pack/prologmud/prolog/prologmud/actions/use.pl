@@ -60,7 +60,7 @@ action_verb_useable(actWield,tWieldAble,mudWielding,mudPossess,mudStowing).
 action_verb_useable(actStow,tStowAble,mudStowing,mudPossess,mudWielding).
 % action_verb_useable(actUse,mudUsing,tUseAble,mudPossess,mudPossess).
 
-:- baseKB:import(logicmoo_util_strings:convert_cycString/2).
+:- baseKB:import(logicmoo_util_strings:convert_to_cycString/2).
 
 action_info(Syntax,String):-
  no_repeats([Syntax],(

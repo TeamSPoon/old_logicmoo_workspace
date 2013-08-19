@@ -64,6 +64,7 @@ can_reorderBody(_ ,Body):-member(M,[reorder]),contains_f(M,Body),!.
 
 :-meta_predicate(do_body_reorder(+,-)).
 
+do_body_reorder(_,_,_,_):-!,fail.
 do_body_reorder(_,_,H,H):- \+ compound(H),!.
 do_body_reorder(Head,Vars,(A;B),(AA;BB)):- !,do_body_reorder(Head,Vars,A,AA),do_body_reorder(Head,Vars,B,BB).
 do_body_reorder(Head,_,Body,Body):- \+ can_reorderBody(Head,Body),!.
@@ -108,19 +109,19 @@ make_reordering_vkey(VH,[],VB,a0(Key)):-pairify_key(VH,VB,Key).
 make_reordering_vkey(VH,VA,[],b0(Key)):-pairify_key(VH,VA,Key).
 make_reordering_vkey(VH,VA,VB,open(Key1,Key2,Key3)):-pairify_key(VH,VA,Key3),pairify_key(VH,VB,Key1),pairify_key(VA,VB,Key2).
 
-reorderBody(C1,C2):- trace,call_body_reorder(anon,2,[C1,C2]).
-reorderBody(C1,C2,C3):- trace,call_body_reorder(anon,3,[C1,C2,C3]).
-reorderBody(C1,C2,C3,C4):- trace,call_body_reorder_compare(anon,4,[C1,C2,C3,C4]).
+reorderBody(C1,C2):- call_body_reorder(anon,2,[C1,C2]).
+reorderBody(C1,C2,C3):- call_body_reorder(anon,3,[C1,C2,C3]).
+reorderBody(C1,C2,C3,C4):- call_body_reorder(anon,4,[C1,C2,C3,C4]).
 
 lookup_reorder(Key,In,Out):- lmcache:reordering(Key,In,Out),!.
 save_reorder(Key,In,Out):- call(asserta,lmcache:reordering(Key,In,Out)),!.
 
-call_body_reorder_key(_Code,_Head,Key,C1,C2):- lookup_reorder(Key,(C1,C2),Found),!,ereq(Found).
-call_body_reorder_key(_Code,_Head,Key,C1,C2):- guess_reorder(C1,C2,Reordered),!,
+call_body_reorder_key(_Code,_Head,Key,C1,C2):- notrace(lookup_reorder(Key,(C1,C2),Found)),!,ereq(Found).
+call_body_reorder_key(_Code,_Head,Key,C1,C2):- notrace(guess_reorder(C1,C2,Reordered)),!,
    save_reorder(Key,(C1,C2),Reordered),!,ereq(Reordered).
 
 
-call_body_reorder_compare(Code,Head,C1,C2):- make_reordering_key(Head,C1,C2,Key),!,
+call_body_reorder_compare(Code,Head,C1,C2):- notrace(make_reordering_key(Head,C1,C2,Key)),!,
    call_body_reorder_key(Code,Head,Code-Key,C1,C2).
 
 
@@ -129,10 +130,9 @@ make_body_reorderer(Code,Head,[C3|C12],OUT):- make_body_reorderer(Code,Head,C12,
 
 :-meta_predicate(call_body_reorder(+,+,+)).
 call_body_reorder(_Code,_Head,[A]):- !,callClause(A).
+call_body_reorder(_Code,_Head,[A|B]):- !,callClause(A),call_body_reorder(_Code,_Head,B).
 call_body_reorder(Code,Head,[C1,C2]):- !, call_body_reorder_compare(Code,Head,C1,C2).
-
-call_body_reorder(Code,Head,[C1,C2,C3]):- 
-   call_body_reorder_compare(Code,Head,call_body_reorder_compare(Code,Head,C1,C2),C3).
+call_body_reorder(Code,Head,[C1,C2,C3]):- call_body_reorder_compare(Code,Head,call_body_reorder_compare(Code,Head,C1,C2),C3).
 
 call_body_reorder(Code,Head,[C1,C2,C3,C4]):- 
    call_body_reorder_compare(Code,Head,call_body_reorder_compare(Code,Head,call_body_reorder_compare(Code,Head,C1,C2),C3),C4).
@@ -184,10 +184,14 @@ fasterClause(C1,C2,T1,T2):-
 :-meta_predicate(callClause(+)) .
 callClause(_^C):-!,callClause(C).
 callClause((C0->C1;C2)):-!,(callClause(C0)->callClause(C1);callClause(C2)).
+callClause((C0*->C1;C2)):-!,(callClause(C0)*->callClause(C1);callClause(C2)).
+callClause((C0->C1)):-!,(callClause(C0)->callClause(C1)).
+callClause((C0*->C1)):-!,(callClause(C0)*->callClause(C1)).
 callClause((C1;C2)):-!,callClause(C1);callClause(C2).
 callClause((C1,C2)):-!,callClause(C1),callClause(C2).
-callClause(C):-debugOnError(ereq(C)).
+%callClause(C):-debugOnError(ereq(C)).
 callClause([L|Ist]):- !, dmsg(callClause([L|Ist])),!,call_body_reorder(_ ,[L|Ist]).
+callClause(C):- on_x_debug(ereq(C)).
 
 enable_body_reorder:- enable_in_file(do_body_reorder).
 disable_body_reorder:- disable_in_file(do_body_reorder).

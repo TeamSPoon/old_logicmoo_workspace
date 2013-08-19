@@ -2988,20 +2988,23 @@ hook_message_hook:-
 %  current_predicate(logicmoo_bugger_loaded/0)
 
 user:message_hook(Term, Kind, Lines):- 
- ignore((
+ notrace(( 
+ loop_check((ignore((
+ tlbugger:rtracing,
  \+ \+ 
  catch(((
  (Kind= warning;Kind= error), 
  Term\=syntax_error(_), 
  backtrace(40), \+ baseKB:no_buggery, \+ tlbugger:no_buggery_tl,
+ stop_rtrace,trace,
   dmsg(message_hook(Term, Kind, Lines)),hotrace(dumpST(10)),dmsg(message_hook(Term, Kind, Lines)),
    !,fail,
    (sleep(1.0),read_pending_codes(user_input, Chars, []), format(error_error, '~s', [Chars]),flush_output(error_error),!,Chars=[C],
                 dtrace(true,C),!),
 
-   fail)),_,true))),fail)).
+   fail)),_,true))),fail)))))).
 
-% :-hook_message_hook.
+:-hook_message_hook.
 
 % have to load this module here so we dont take ownership of prolog_exception_hook/4.
 :- load_files(library(prolog_stack), [silent(true)]).

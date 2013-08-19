@@ -12,6 +12,7 @@
 :- iriprefix{swrlb = "http://www.w3.org/2003/11/swrlb"}.
 */
 
+
 impPred(istAsserted) .
 
 impPred(queryMt) .
@@ -37,8 +38,8 @@ forwardSentence(isa(NART, COL)) :- mtVisible(BaseKB) & removalSentence(natFuncti
 
 
 impPred(destructureFormula) .
-//destructureFormula(TERM, R, ARGS) :- TERM =.. [hilog(R) | ARGS].
-destructureFormula(TERM, R, ARGS) :- TERM = t(R|Rest), ARGS = [].
+destructureFormula(TERM, R, ARGS) :- TERM =.. [R | ARGS].
+destructureFormula(TERM, R, ARGS) :- TERM =.. [t,(R|Rest)], ARGS = [].
 destructureFormula(TERM, R, ARGS) :- TERM = t(R,A1), ARGS = [A1].
 destructureFormula(TERM, R, ARGS) :- TERM = t(R,A1,A2), ARGS = [A1,A2].
 destructureFormula(TERM, R, ARGS) :- TERM = t(R,A1,A2,A3), ARGS = [A1,A2,A3].

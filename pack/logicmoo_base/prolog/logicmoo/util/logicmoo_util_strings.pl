@@ -45,8 +45,8 @@
             concat_atom_safe/3,
             convert_members/3,
             convert_to_string/2,
-            convert_cycString/2,
-            cycString_to_atomcycString/2,
+            convert_to_cycString/2,
+            convert_to_1cycString/2,
             ctype_continue/2,
             ctype_switch/2,
             ctype_switcher/1,
@@ -394,7 +394,8 @@ all_upper_atom(X):-toUppercase(X,N),!,N=X.
 %
 % Atom Contains.
 %
-atom_contains(F,X):-sub_string(F,_,_,_,X).
+%
+atom_contains(F,X):- on_x_debug(sub_string(F,_,_,_,X)).
 % atom_contains(F0,C0):- must((any_to_atom(F0,F),!,any_to_atom(C0,C))),!,sub_string(F,_,_,_,C).
 
 
@@ -618,7 +619,7 @@ toCase(_Pred,MiXed,MiXed):-noCaseChange(MiXed),!.
 toCase(_Pred,95,45):-!.
 toCase( Pred,MiXed,CASED):-atom(MiXed),!,call(Pred,MiXed,CASED),!.
 toCase( Pred,D3,DD3):- text_to_string_safe(D3,S),!,string_to_atom(S,A3),toCase(Pred,A3,DD3).
-toCase( Pred,D3,DD3):- is_list(D3),atomic_list_concat(D3," ",Str),maplist(toCase( Pred),Str,DD3).
+toCase( Pred,D3,DD3):- is_list(D3),atomic_list_concat(D3,' ',Str),maplist(toCase( Pred),Str,DD3).
 toCase( Pred,D3,DD3):- is_list(D3),!,maplist(toCase( Pred),D3,DD3).
 toCase( Pred,MiXed,CASED):-compound(MiXed),MiXed=..MList,maplist(toCase(Pred),MList,UList),!,CASED=..UList.
 
@@ -1076,7 +1077,7 @@ any_to_string1(A,""):-nonvar(A),member(A,[[],'',"",``]),!.
 any_to_string1(List,String):- text_to_string_safe(List,String),!.
 any_to_string1(List,String):- is_list(List),!,must_maplist(any_to_string1,List,StringList), 
     must(atomics_to_string(StringList, ' ', String)),!.
-any_to_string1(List,String):- on_x_debug(format(string(String),'~s',[List])).
+any_to_string1(List,String):- on_x_debug(format(string(String),'~w',[List])).
 any_to_string1(Term,String):- show_call(on_x_debug(term_string(Term,String))).
 any_to_string1(List,String):- on_x_debug(format(string(String),'~p',[List])).
 any_to_string1(List,String):- format(string(String),'~q',[List]).
@@ -1089,28 +1090,31 @@ list_to_atomics_list0([E|EnglishF],[A|EnglishA]):-
 list_to_atomics_list0([],[]):-!.
 */
 
-text_to_uq_atom(A,Sub):- atom_prefix(A,'"'),atom_suffix(A,1,'"'),sub_atom(A,1,_,1,Sub),!.
+text_to_uq_atom(A,Sub):- atom_prefix(A,'"'),ifprolog:atom_suffix(A,1,'"'),sub_atom(A,1,_,1,Sub),!.
 text_to_uq_atom(A,A).
 
 
-cycString_to_atomcycString(A,SA):-atom_string(A,S),term_to_atom(S,SA).
-
-convert_cycString(A,B):- atom(A),text_to_uq_atom(A,Sub),atom_string(Sub,M),!,convert_cycString(M,B).
-convert_cycString(A,B):- atom_length(A,L),tokenize_atom(A,T),!,convert_cycString(A,L,T,B),!.
-convert_cycString(A,B):- string(A),term_to_atom(A,B).
+convert_to_cycString(A,B):- atom_length(A,L),tokenize_atom(A,T),!,convert_to_cycString_by_len(A,L,T,B),!.
+convert_to_cycString(A,B):- convert_to_1cycString(A,B),!.
 
 
-convert_cycString(_,0,_,'""'):-!.
-convert_cycString(A,L,_,B):- L<3,!,term_to_atom(A,B).
-convert_cycString(A,L,_,B):- L>3, \+ atom_contains(A," "), \+ atom_contains(A,"'"),!,term_to_atom(A,B).
-convert_cycString(A,_,[],B):-!,term_to_atom(A,B).
-convert_cycString(A,_,[_],B):-!,term_to_atom(A,B).
-convert_cycString(_,_,List,B):-convert_cycString_list(List,B).
+convert_to_1cycString(A,B):- atom_string(A,B).
 
-convert_cycString_list([],[]).
-convert_cycString_list([T,-,P|List],B):-atomic_list_concat([T,P],-,TP),!,convert_cycString_list([TP|List],B).
-convert_cycString_list([T,P|List],B):-member(T,['#','~','#$','\'']),atom_concat(T,P,TP),!,convert_cycString_list([TP|List],B).
-convert_cycString_list([T|List],[P|BList]):-cycString_to_atomcycString(T,P),convert_cycString_list(List,BList).
+convert_to_cycString_by_len(_,0,_,""):-!.
+convert_to_cycString_by_len(A,L,_,B):- L<3,!,convert_to_1cycString(A,B).
+convert_to_cycString_by_len(A,L,_,B):- L>3, \+ atom_contains(A,' '), \+ atom_contains(A,"'"),!,convert_to_1cycString(A,B).
+convert_to_cycString_by_len(A,_,[],B):-!,convert_to_1cycString(A,B).
+convert_to_cycString_by_len(A,_,[_],B):-!,convert_to_1cycString(A,B).
+convert_to_cycString_by_len(_,_,List,B):-convert_to_cycString_list(List,B).
+
+% convert_to_cycString_list(T,P)
+convert_to_cycString_list([],[]):-!.
+convert_to_cycString_list([T,-,P|List],B):-atomic_list_concat([T,P],-,TP),!,convert_to_cycString_list([TP|List],B).
+convert_to_cycString_list([T,P|List],B):-member(T,['#','~','#$','\'']),atom_concat(T,P,TP),!,convert_to_cycString_list([TP|List],B).
+convert_to_cycString_list([T|List],[P|BList]):-convert_to_1cycString(T,P),convert_to_cycString_list(List,BList).
+
+
+
 
 :- export(atomic_list_concat_catch/3).
 
@@ -1247,7 +1251,7 @@ atomSplitEasy(Atom,WordsO):-
 %
 % Atom Split.
 %
-atomSplit(S,WordsO,List):- hotrace(( atomic(S),atomic_list_concat_safe(Words1," ",S),!, atomSplit2(Words1,Words,List),!, Words=WordsO )).
+atomSplit(S,WordsO,List):- hotrace(( atomic(S),atomic_list_concat_safe(Words1,' ',S),!, atomSplit2(Words1,Words,List),!, Words=WordsO )).
 atomSplit(Atom,WordsO,List):- hotrace(( atom(Atom), atomic_list_concat_safe(Words1,' ',Atom),!, atomSplit2(Words1,Words,List),!, Words=WordsO )).
 atomSplit(Atom,Words,[Space|AtomO]):-hotrace((var(Atom),ground(Words),!,atomic_list_concat_safe(Words,Space,AtomO),!,Atom=AtomO)).
 
@@ -1454,8 +1458,8 @@ member_ci(W,WL):-to_word_list(WL,ListI),member(LL2,ListI),string_equal_ci(LL2,W)
 string_ci(A,LIC):-ground(string_ci(A,LIC)),!,string_ci(A,LIC1),string_ci(LIC,LIC2),LIC1=LIC2.
 string_ci(A,LIC):-hotrace((must(nonvar(A)),non_empty(A),any_to_string(A,S),!,text_to_string(S,SS),
    string_lower(SS,SL),
-  atomics_to_string(SLIC,"_",SL),
-   atomics_to_string(SLIC," ",LIC))),!.
+  atomics_to_string(SLIC,'_',SL),
+   atomics_to_string(SLIC,' ',LIC))),!.
 
 :- export(append_ci/3).
 
@@ -1749,7 +1753,7 @@ is_simple_split(S):-text_to_string(S,SS),split_string(SS,"().!\"\'","()",O),!,O=
 %
 % Converted To word list  Extended Helper.
 %
-to_word_list_2(Input,WList):-is_simple_split(Input),split_string(Input," "," ",WList),!.
+to_word_list_2(Input,WList):-is_simple_split(Input),split_string(Input,' ',' ',WList),!.
 to_word_list_2(A,S):-atomSplit(A,S),!.
 to_word_list_2(Atom,WList):- atom_to_memory_file(Atom,File),open_memory_file(File,read,Stream),read_stream_to_arglist(Stream,WList).
 to_word_list_2(Input,WList):- open_string(Input,Stream),read_stream_to_arglist(Stream,WList).

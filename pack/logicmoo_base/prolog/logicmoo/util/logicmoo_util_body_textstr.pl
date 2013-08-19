@@ -52,13 +52,21 @@ do_body_textstr(Head,Vars,BodI,BodO):- compound(BodI),
    do_body_textstr(Head,Vars,stringArg(StrVar,BodI),BodO). 
 do_body_textstr(Head,Vars,H,HO):- H=..HL, must_maplist(do_body_textstr(Head,Vars),HL,HOL),HO=..HOL.
 
-stringArg(User,CallWithUser):- dtrace,vsubst(no_repeats(CallWithUser),User,Cyc,CallWithCyc),!, (ground(User) -> (ssz(User,Cyc),CallWithCyc)  ; (CallWithCyc, ssz(User,Cyc))).
+stringArg(User,CallWithUser):- vsubst(no_repeats(CallWithUser),User,Cyc,CallWithCyc),!, 
+ (ground(User) -> (ssz(User,Cyc),CallWithCyc)  ; (CallWithCyc, ssz(User,Cyc))).
 
+ssz(User,Cyc):-cycStringToString(Cyc,User).
+
+stringArgUCTest:-stringArgUCTest('"I"',_).
+stringArgUCTest:-stringArgUCTest(['"I"','"am"'],_).
+stringArgUCTest(User,Cyc):- stringArgUC(User,Cyc,dmsg(User->Cyc)),!.
 
 stringArgUC(User,Cyc,CallWithCyc):- must_det(var(Cyc)),!,stringArgUC2(User,Cyc,CallWithCyc).
+
 stringArgUC2(User,Cyc,CallWithCyc):- var(User),!,CallWithCyc,cycStringToString(Cyc,User).
 stringArgUC2([User,U2|MORE],Cyc,CallWithCyc):- Cyc=[User,U2|MORE],!,CallWithCyc.
 stringArgUC2([User],Cyc,CallWithCyc):- Cyc=User,!,CallWithCyc,atom(Cyc).
+stringArgUC2(User,Cyc,CallWithCyc):- Cyc=User,!,CallWithCyc,atom(Cyc).
 
 cycStringToString(Cyc,User):- (atom(Cyc)->User=[Cyc];User=Cyc),!.
       
