@@ -1028,7 +1028,7 @@ moo_hide(PIn):-
 
 moo_hide1(M,Pred):-
   predicate_property(Pred,imported_from(M)),
- '$set_predicate_attribute'(M:Pred, trace, 1),
+ '$set_predicate_attribute'(M:Pred, trace, 0),
  '$set_predicate_attribute'(M:Pred, noprofile, 1),
  '$set_predicate_attribute'(M:Pred, hide_childs, 1),!.
 
@@ -1067,7 +1067,10 @@ moo_hide_showChilds(M,F,A,_MPred):-
 :-moo_hide_showChilds(bugger,atLeastOne1,2).
 :-moo_hide_showChilds(bugger,atLeastOne3,3).
 
-bdmsg(_):-bugger_flag(opt_debug=off),!.
+
+% bugger_debug=off turns off just debugging about the debugger
+% opt_debug=off turns off all the rest of debugging
+bdmsg(_):-bugger_flag(bugger_debug=off),!.
 bdmsg(D):-once(dmsg(D)).
 
 bugger_term_expansion(T,T2):- compound(T), once(bugger_t_expansion(T,T2)).

@@ -29,6 +29,7 @@ local_directory_search('..').
 local_directory_search('.'). 
 local_directory_search('../../src_game').  % for non uploadables
 local_directory_search('../../src_incoming').  % for user uploads
+local_directory_search('../../src').  % for user uploads
 local_directory_search('../../src_modules').  % for big modules
 local_directory_search('../../src_data'). 
 local_directory_search('../../src_natlang_data').  

@@ -43,6 +43,7 @@
 :-ensure_loaded(logicmoo('vworld/telnet_server.pl')).
 :-ensure_loaded(logicmoo('vworld/npc_toploop.pl')).
 :-ensure_loaded(logicmoo('vworld/game_loader.pl')).
+:-ensure_loaded(logicmoo('vworld/mud_tests.pl')).
 
 % NPC planners
 :-ensure_loaded(logicmoo('mobs/monster.pl')).

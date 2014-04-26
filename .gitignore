@@ -1,16 +1,25 @@
 syntax: glob
 temp/*
-.svn
+.git*
+.svn*
 logicmoo.wiki/
 LogicMOO.vpwhist
 *.vtg
 *.pl~
 *lock
 *.orig
+*.bak
+*~
+core
 src/moo_settings.db
 saved_cached_queries
 t
+wiki/
 logwumpus
 *.out
 src_incoming/data/*.pl
+src_modules/logicserver
+src_data
+src/savedb
+src_incoming/savedb
 

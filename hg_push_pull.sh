@@ -8,7 +8,7 @@ do
         cd $NEWPWD
         git pull
 #        git update
-        cd $NEWPWD/logicmoo.wiki
+        cd $NEWPWD/wiki
            git pull
 #           git update
    echo "Hit CTRL+C $NEWPWD ${BASH_SOURCE[0]}";
