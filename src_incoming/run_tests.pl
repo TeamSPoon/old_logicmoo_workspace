@@ -37,8 +37,10 @@ if_version_greater(V,Goal):- current_prolog_flag(version,F), ((F > V) -> call(Go
 %
 start_servers :- if_version_greater(70109,ensure_loaded(logicmoo(launchcliopatria))).
 
-% start_servers  
-:- if_version_greater(70109,http_mud_server).
+% start_servers
+% this is evil. Starts the old mudconsole, the experiment with Jan's
+% webconsole. We're not using that
+% :- if_version_greater(70109,http_mud_server).
 
 :- if_flag_true(fullStart, start_servers).
 
@@ -49,7 +51,7 @@ start_servers :- if_version_greater(70109,ensure_loaded(logicmoo(launchcliopatri
 % Load datalog
 :- if_flag_true(fullStart, ((ensure_loaded(logicmoo('des/des.pl')),
   flush_output,
-  init_des, 
+  init_des,
   display_status,
  %  des,
    !))).
@@ -113,14 +115,14 @@ lundef :- A = [],
 
 % [Optionaly] Put a telnet client handler on the main console
 % :- at_start(login_and_run).
-run_setup:- 
+run_setup:-
    nodebug,
    debug,
    scan_db_prop,
    at_start(gload),
    register_timer_thread(npc_ticker,1,npc_tick_tock).
 
-run:- 
+run:-
    login_and_run.
 
 gload:- load_game(logicmoo('rooms/startrek.all.pl')).
@@ -135,21 +137,31 @@ gload:- load_game(logicmoo('rooms/startrek.all.pl')).
 :- noguitracer.
 
 % :- at_start(run).
-:- run_setup.
+:- at_start(run_setup).
 
 % do some sanity testing
-:- do_player_action('s'),
-   do_player_action(look),
+
+moo:decl_mud_test(movedist,
+ (
+   dmsg("teleport to main enginering"),
+   do_player_action('tp Area1000'),
+   dmsg("set the move dist to 5 meters"),
+   do_player_action('@set movedist 5'),
+   dmsg("going 5 meters"),
+   do_player_action('n'),
+   dmsg("must be now be in corridor"),
+   req(atloc(self,'Area1001')),
+   do_player_action('@set movedist 1'),
+   call_n_times(5, do_player_action('s')),
    do_player_action('s'),
-   do_player_action('s'),
-   do_player_action('e'),
-   do_player_action('e'),
-   do_player_action(look),
-   do_player_action('s'),
-   do_player_action('s').
+   dmsg("must be now be back in engineering"),
+   req(atloc(self,'Area1000')))).
 
 
-:- run.
+:- run_mud_tests.
+
+:- at_start(run).
 
 % so scripted versions don't just exit
-:- prolog.
+% :- prolog.
+
