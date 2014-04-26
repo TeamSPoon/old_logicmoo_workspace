@@ -27,6 +27,11 @@
 http:location(css, root(css), []).
 
 http_mud_server :-
+	debug(mudconsole, "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&", []),
+	debug(mudconsole, "&				       &", []),
+	debug(mudconsole, "&   MUD CONSOLE (after web console) &", []),
+	debug(mudconsole, "&				       &", []),
+	debug(mudconsole, "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&", []),
 	http_mud_server([port(3020)]).
 
 http_mud_server(Options) :-

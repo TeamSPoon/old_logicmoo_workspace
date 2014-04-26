@@ -49,7 +49,7 @@
 
      debugOnError/1, % Throws unless [Fail or Debug]
      logOnError/1, % Succeeds unless no error and failure occured
-     
+
 
      debugOnFailure/1, % Succeeds but can be set to [Fail or Debug]
      logOnFailure/1,  % Fails unless [+Ignore]
@@ -58,7 +58,7 @@
 
      % cant ignore - Throws but can be set to [Throw, Fail or Ignore or Debug]
      must/1, % must succeed at least once
-     cmust/1, % doesnt run on release 
+     cmust/1, % doesnt run on release
      gmust/2, % like must/1 but arg2 must be ground at exit
      prolog_must/1,
      prolog_must_l/1,
@@ -81,7 +81,7 @@
 	% debugOnFailure/2,
      debugOnFailureEach/1,
 
-     moo_hide/1, 
+     moo_hide/1,
 
      fmt/1,fmt0/1,
      fmt/2,fmt0/2,
@@ -102,7 +102,7 @@
      buggeroo/0,
      join_path/3,
      export_all_preds/0,
-     export_all_preds/1    
+     export_all_preds/1
 	 ]).
 
 was_module(Mod,Exports) :- nop(was_module(Mod,Exports)).
@@ -155,7 +155,7 @@ set_bugger_flag(F,V):-create_prolog_flag(F,V,[term]).
 :- meta_predicate bugger:prolog_must(:).
 :- meta_predicate bugger:showProfilerStatistics(:).
 :- meta_predicate bugger:notrace_call(:).
- 
+
 :-use_module(logicmoo('logicmoo_util/logicmoo_util_ctx_frame.pl')).
 
  % cli_notrace(+Call) is nondet.
@@ -173,7 +173,7 @@ set_bugger_flag(F,V):-create_prolog_flag(F,V,[term]).
 :- set_prolog_flag(backtrace_goal_depth, 10).
 :- set_prolog_flag(backtrace_show_lines, true).
 % =========================================================================
- 
+
 
 :-use_module(logicmoo('logicmoo_util/logicmoo_util_strings.pl')).
 :-use_module(logicmoo('logicmoo_util/logicmoo_util_library.pl')).
@@ -448,7 +448,7 @@ on_prolog_ecall_override(_F,_A,_Var, Value, Value).
 bin_ecall(F,A,unwrap,true):-member(F/A,[(';')/2,(',')/2,('->')/2,('call')/1]).
 bin_ecall(F,A,fail,throw(never_fail(F/A))):-member(F/A,[(retractall)/1]).
 bin_ecall(F,A,asis,true):-member(F/A,[('must')/1]).
-  
+
 
 :-dhideTrace(prolog_ecall/2).
 :-dhideTrace(prolog_ecall/5).
@@ -462,7 +462,7 @@ prolog_ecall(BDepth,OnCall, (X->Y;Z)):-!,(prolog_ecall(BDepth,OnCall,X) -> prolo
 prolog_ecall(BDepth,OnCall,Call):-functor(Call,F,A),prolog_ecall_fa(BDepth,OnCall,F,A,Call).
 
 % fake = true
-prolog_ecall_fa(_,_,F,A,Call):- 
+prolog_ecall_fa(_,_,F,A,Call):-
   on_prolog_ecall(F,A,fake,true),!,
   atom_concat(F,'_FaKe_Binding',FAKE),
   numbervars(Call,FAKE,0,_),
@@ -472,7 +472,7 @@ prolog_ecall_fa(_,_,F,A,Call):-
 prolog_ecall_fa(_,_,F,0,Call):-
   (on_prolog_ecall(F,0,unwrap,true);on_prolog_ecall(F,0,asis,true)),!,
   call(Call).
-  
+
 % A=1 , (unwrap = true )
 prolog_ecall_fa(BDepth,OnCall,F,1,Call):-
   on_prolog_ecall(F,1,unwrap,true),
@@ -494,7 +494,7 @@ prolog_ecall_fa(_,_,F,A,Call):-
   call(Call).
 
 % each = true
-prolog_ecall_fa(BDepth,OnCall,F,A,Call):- 
+prolog_ecall_fa(BDepth,OnCall,F,A,Call):-
   (on_prolog_ecall(F,A,each,true);BDepth>0),!,
   BDepth1 is BDepth-1,
   predicate_property(Call,number_of_clauses(_Count)),
@@ -1038,7 +1038,7 @@ moo_hide1(N,MPred):-
 
 
 %%:-user:(forall(current_predicate(bugger:FA),bugger:moo_hide(bugger:FA))).
-% hide this module from tracing 
+% hide this module from tracing
 %%:-user:(forall(current_predicate(logicmoo_util_strings:FA),bugger:moo_hide(logicmoo_util_strings:FA))).
 
 module_notrace(M):- forall(predicate_property(P,imported_from(M)),bugger:moo_hide(M:P)).
@@ -1067,7 +1067,7 @@ moo_hide_showChilds(M,F,A,_MPred):-
 :-moo_hide_showChilds(bugger,atLeastOne1,2).
 :-moo_hide_showChilds(bugger,atLeastOne3,3).
 
-
+bdmsg(_):-bugger_flag(opt_debug=off),!.
 bdmsg(D):-once(dmsg(D)).
 
 bugger_term_expansion(T,T2):- compound(T), once(bugger_t_expansion(T,T2)).
