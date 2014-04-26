@@ -28,6 +28,9 @@
     This file was altered by Anne Ogborn to make the logicmoo mud
     console.
 
+     Note -this was an experiment. Decided it wouldn't work well for our
+     uses, but wanted to leave the code around.
+
 */
 
 :- module(mudconsole,

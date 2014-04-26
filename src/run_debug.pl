@@ -23,11 +23,14 @@ user:file_search_path(weblog, '/usr/local/lib/swipl-7.1.11/pack/weblog/prolog').
 user:file_search_path(cliopatria, '/devel/ClioPatria').
 user:file_search_path(cliopatria, 't:/devel/ClioPatria').
 
+:- ensure_loaded(logicmoo('http/user_page')).
+
 :- meta_predicate(if_version_greater(?,0)).
 
 if_version_greater(V,Goal):- current_prolog_flag(version,F), ((F > V) -> call(Goal) ; true).
 
-:- if_flag_true(true, if_version_greater(70109,ensure_loaded(logicmoo('mudconsole/mudconsolestart')))).
+% set to false because we don't want to use the mudconsole
+:- if_flag_true(false, if_version_greater(70109,ensure_loaded(logicmoo('mudconsole/mudconsolestart')))).
 
 % [Optionaly 1st run] tell where ClioPatria is located and restart for the 2nd run
 %:- set_setting(cliopatria_binding:path, 't:/devel/ClioPatria'), save_settings('moo_settings.db').
@@ -151,7 +154,7 @@ gload:- load_game(logicmoo('rooms/startrek.all.pl')).
    do_player_action('s').
 
 
-:- run.
+:- at_start(run).
 
-% so scripted versions don't just exit
-:- prolog.
+% So scripted versions don't just exit
+:- at_start(prolog).
