@@ -14,10 +14,12 @@ core
 src/moo_settings.db
 saved_cached_queries
 t
+wiki/
 logwumpus
 *.out
 src_incoming/data/*.pl
 src_modules/logicserver
 src_data
 src/savedb
+src_incoming/savedb
 
