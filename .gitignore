@@ -1,0 +1,16 @@
+syntax: glob
+temp/*
+.svn
+logicmoo.wiki/
+LogicMOO.vpwhist
+*.vtg
+*.pl~
+*lock
+*.orig
+src/moo_settings.db
+saved_cached_queries
+t
+logwumpus
+*.out
+src_incoming/data/*.pl
+

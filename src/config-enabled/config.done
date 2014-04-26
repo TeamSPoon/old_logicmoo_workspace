@@ -1,0 +1,11 @@
+/* Generated file
+   Keep track of installed config files
+*/
+
+file('debug.pl','c:/docs/prolog/cliopatria/cliopatria/config-available',1396935159).
+file('config.pl','c:/docs/prolog/cliopatria/cliopatria/config-available',1396935159).
+file('store.pl','c:/docs/prolog/cliopatria/cliopatria/config-available',1396935159).
+file('network.pl','c:/docs/prolog/cliopatria/cliopatria/config-available',1396935159).
+file('winpath.pl','c:/docs/prolog/cliopatria/cliopatria/config-available',1396935159).
+file('zlib.pl','c:/docs/prolog/cliopatria/cliopatria/config-available',1396935159).
+file('pengines.pl','c:/docs/prolog/cliopatria/cliopatria/config-available',1396935159).
