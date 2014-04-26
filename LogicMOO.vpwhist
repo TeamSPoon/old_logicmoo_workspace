@@ -4,14 +4,13 @@ CurrentProject=LogicMOO_MUD.vpj
 nl_system.vpj=Release
 logicserver.vpj=Release
 [ProjectDates]
-ECLiPSe 6.1.vpj=20140419220508190
-IndigologFlux.vpj=20140421182201160
-LogicMOO.vpj=20140423034357064
-LogicMOO_MUD.vpj=20140424205501615
-LogicmooDatabaseServer.vpj=20140420212637699
-SWI-Prolog.vpj=20140423025555797
-nl_system.vpj=20140421182109153
-logicserver.vpj=20140421182122948
+IndigologFlux.vpj=20140425214233289
+LogicMOO.vpj=20140425214233289
+LogicMOO_MUD.vpj=20140425214233289
+LogicmooDatabaseServer.vpj=20140425214233289
+logicserver.vpj=20140425214233289
+nl_system.vpj=20140425214233293
+SWI-Prolog.vpj=20140425214233289
 [TreeExpansion2]
 - IndigologFlux.vpj
   + src_modules\indigolog
