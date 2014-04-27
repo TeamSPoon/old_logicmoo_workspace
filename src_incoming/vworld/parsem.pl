@@ -2,7 +2,7 @@
 % Dec 13, 2035
 % Douglas Miles
 %
-/** <module> 
+/** <module>
 % Initial Telnet/Text console parser (using DCG)
 % Comments below document the basic idea.
 %
@@ -14,7 +14,8 @@
                    login_and_run/0,
                    parseIsa//2,
                    parseForTypes//2,
-                   run_player/1]).
+                   run_player/1,
+		   generate_new_player/1]).
 
 :- dynamic(agent_message_stream/3).
 
@@ -28,10 +29,14 @@
 
 foc_current_player(P):- thlocal:current_agent(P),!.
 foc_current_player(P):-
-  gensym(player,N),
-   P=explorer(N),   
-   must(create_agent(P)),!,
+   generate_new_player(P),
+   !,
    asserta(thlocal:current_agent(P)).
+
+generate_new_player(P) :-
+  gensym(player,N),
+   P=explorer(N),
+   must(create_agent(P)).
 
 login_and_run:-
   foc_current_player(P),
@@ -76,7 +81,7 @@ call_player_action(Agent,CMD):-fmt('unknown_call_command(~q,~q).',[Agent,CMD]).
 
 
 % execute a prolog command including prolog/0
-do_player_action(Agent,[VERB|ARGS]):- 
+do_player_action(Agent,[VERB|ARGS]):-
       debugOnError((moo:agent_text_command(Agent,[VERB|ARGS],NewAgent,CMD))),
       debugOnError(moo:agent_call_command(NewAgent,CMD)),!,
       atloc(Agent,Where),
@@ -85,7 +90,7 @@ do_player_action(Agent,[VERB|ARGS]):-
 % lists
 do_player_action(A,Atom):-atom(Atom),atomSplit(Atom,List),do_player_action(A,List).
 % prolog command
-do_player_action(_Gent,Atom):- atom(Atom), catch(((once((read_term_from_atom(Atom,OneCmd,[variables(VARS)]), 
+do_player_action(_Gent,Atom):- atom(Atom), catch(((once((read_term_from_atom(Atom,OneCmd,[variables(VARS)]),
       predicate_property(OneCmd,_),!,
       fmt('doing command ~q~n',[OneCmd]))), ignore((OneCmd,fmt('Yes: ~w',[VARS]),fail)))),_,fail).
 
@@ -108,11 +113,11 @@ type_parse(Type,StringM,Term,LeftOver):-
    to_word_list(StringM,String),
    HOW = phrase(parseIsa(Type,Term),String,LeftOver),
    fmt('parsing with ~q ~n.',[HOW]),
-   (debugOnError(HOW)-> 
+   (debugOnError(HOW)->
       fmt('Success! parse \'~q\' "~q" = ~q   (leftover=~q) . ~n',[Type,String,Term,LeftOver]);
       fmt('No Success.~n',[])).
 
-      
+
 % ===========================================================
 % PARSER
 % ===========================================================
@@ -122,7 +127,7 @@ moo:agent_text_command(Agent,[SVERB|ARGS],Agent,GOAL):-
 
 
 % parses a verb phrase and retuns one interpretation (action)
-parse_agent_text_command(Agent,SVERB,ARGS,GOAL):- 
+parse_agent_text_command(Agent,SVERB,ARGS,GOAL):-
    parse_verb_pharse(Agent,SVERB,ARGS,GOALANDLEFTOVERS),
    dmsg(parserm("GOALANDLEFTOVERS"=GOALANDLEFTOVERS)),
    GOALANDLEFTOVERS \= [],
@@ -132,7 +137,7 @@ parse_agent_text_command(Agent,SVERB,ARGS,GOAL):-
 verb_matches(SVERB,VERB):-same(VERB,SVERB).
 
 % parses a verb phrase and retuns multiple interps
-parse_verb_pharse(Agent,SVERB,ARGS,GOALANDLEFTOVERS):- 
+parse_verb_pharse(Agent,SVERB,ARGS,GOALANDLEFTOVERS):-
    findall([VERB|TYPEARGS],
     ((
      isa(Agent,What),
@@ -165,18 +170,18 @@ bestParse(Order,LeftOver1-GOAL1,LeftOver2-GOAL2):-
 
 :-style_check(-singleton).
 
-bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):- 
+bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
    compare(Order,L1,L2), Order \== '='.
-bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):- 
+bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
    compare(Order,-A1,-A2), Order \== '='.
-bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):- 
+bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
    compare(Order,GOAL1,GOAL2).
 
 :-style_check(+singleton).
-   
+
 specifier_text(Dir,dir):-member(Dir,[n,s,e,w,ne,nw,se,sw,u,d]).
 
-phrase_parseForTypes(TYPEARGS,GOODARGS,ARGS,LeftOver):- 
+phrase_parseForTypes(TYPEARGS,GOODARGS,ARGS,LeftOver):-
    to_word_list(ARGS,ARGSL),!,
     phrase_parseForTypes_l(TYPEARGS,GOODARGS,ARGSL,LeftOver).
 
