@@ -69,7 +69,7 @@ call_player_action(Agent,CMD):-var(CMD),!,fmt('unknown_var_command(~q,~q).',[Age
 call_player_action(_,end_of_file):-tick_tock.
 call_player_action(_,''):-tick_tock.
 call_player_action(Agent,CMD):-do_player_action(Agent, CMD),!.
-% call_player_action(Agent,CMD):-do_player_action(Agent, CMD),!.
+% call_player_action(Agent,CMD):- trace, do_player_action(Agent, CMD),!.
 call_player_action(Agent,CMD):-fmt('unknown_call_command(~q,~q).',[Agent,CMD]).
 
 
@@ -89,12 +89,6 @@ do_player_action(_Gent,Atom):- atom(Atom), catch(((once((read_term_from_atom(Ato
 
 % remove period at end
 do_player_action(A,PeriodAtEnd):-append(New,[(.)],PeriodAtEnd),!,do_player_action(A,New).
-
-
-
-
-
-
 
 
 
@@ -312,5 +306,4 @@ display_grid_labels :-
 
 
 :- include(logicmoo('vworld/vworld_footer.pl')).
-
 

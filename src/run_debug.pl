@@ -153,6 +153,7 @@ gload:- load_game(logicmoo('rooms/startrek.all.pl')).
    do_player_action('s'),
    do_player_action('s').
 
+:- at_start(start_servers).
 
 :- at_start(run).
 
