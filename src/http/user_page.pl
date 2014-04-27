@@ -77,11 +77,8 @@ mud_page(_Request) :-
 	     \description_section,
 	     \stats_section,
 	     \player_prompt,
-	     \input_section,
-%	     \html_post(head, meta([type(keyword),
-%	     content('hello,goodbye')], [])),
-	     p('Howdy howdy')]
-	).
+	     \input_section
+	    ]).
 
 actual_style(Style) :- style(name(Style)),!.
 actual_style(logicmoo).
@@ -124,7 +121,7 @@ map_row(P, OX, OY, X, Y) -->
            NOY is OY + 1,
            NY is Y - 1
         },
-	html(tr(\map_cell(P, OX, NOY, 0, X))),
+	html(tr(\map_cell(P, OY, OX, 0, X))),
 	map_row(P, OX, NOY, X , NY).
 
 map_cell(_, _, _, X, X) --> [].
@@ -161,7 +158,7 @@ http_player_from_session(P) :-
 	http_session_data(player(P)), !.
 http_player_from_session(P) :-
 	http_current_request(Request),
-	member(search(Opts), Request),
+	(   member(search(Opts), Request) ; Opts = []),
 	substance(need_new_player(Opts, P)).
 
 description_section -->
