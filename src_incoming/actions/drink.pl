@@ -12,7 +12,7 @@
 
 :- register_module_type(command).
 
-moo:decl_action(drink(item)).
+moo:decl_action(drink(drinkable),"Drink a Drinkabel Item").
 
 
 % Eat something held
