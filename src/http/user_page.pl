@@ -33,13 +33,19 @@ user:file_search_path(css, './http/web/css').
 user:file_search_path(icons, './http/web/icons').
 
 % Someday these will be set up per-MUD
-%
+% these are static assets that belong to a specific MUD
 user:file_search_path(js, '../src_assets/web/js').
 user:file_search_path(css, '../src_assets/web/css').
 user:file_search_path(icons, '../src_assets/web/icons').
+user:file_search_path(mud_code, '../src_assets/web/prolog').
 
-% The game page where players spend most of gtheir time
-:- http_handler(mud(.),    mud_page,    [priority(10)]).
+%
+%  SECURITY - potential security hole.
+%
+:- use_module(mud_code(mud_specific), [style/1]).
+
+% The game page where players spend most of their time
+:- http_handler(mud(.), mud_page, [id(mud), priority(10)]).
 
 :- html_resource(jquery,
 		 [ virtual(true),
@@ -58,16 +64,41 @@ user:file_search_path(icons, '../src_assets/web/icons').
 		 ]).
 
 mud_page(_Request) :-
+	actual_style(Style),
 	reply_html_page(
-	    title('Logic Moo'),
+	    Style,
+	    [link([
+		 rel('shortcut icon'),
+		 type('image/x-icon'),
+		 href('/icons/favicon.ico')])],
 	    [h1('Yup this is it'),
 	     \map_section,
 	     \description_section,
 	     \stats_section,
 	     \player_prompt,
 	     \input_section,
+%	     \html_post(head, meta([type(keyword),
+%	     content('hello,goodbye')], [])),
 	     p('Howdy howdy')]
 	).
+
+actual_style(Style) :- style(name(Style)),!.
+actual_style(logicmoo).
+
+:- multifile user:head/2, user:body/2.
+
+% fallback style
+user:head(logicmoo, Head) -->
+	html(head([
+		 title('LogicMOO'),
+		 Head
+	     ])).
+user:body(logicmoo, Body) -->
+	html(body([
+		 h1('LogicMOO MUD'),
+		 div(id(content), Body)
+	     ])).
+
 
 map_section -->
 	html(p('someday this will be a snazzy map')).
