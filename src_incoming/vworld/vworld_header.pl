@@ -69,4 +69,5 @@
 :-ensure_loaded(logicmoo('actions/teleport.pl')).
 :-ensure_loaded(logicmoo('actions/chat.pl')).
 :-ensure_loaded(logicmoo('actions/help.pl')).
+:-ensure_loaded(logicmoo('actions/get_set.pl')).
 
