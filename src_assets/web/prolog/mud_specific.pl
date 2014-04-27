@@ -37,7 +37,7 @@ style(map_grid_size(32, 32)).
 style(map_display(wall, 'W' )).
 style(map_display(floor, '.' )).
 
-:- multifile user:head/2, user:body/2.
+:- multifile user:head/4, user:body/4.
 
 %%	user:head(+Style:atom, +Head:html, ?A:List, ?B:List) is det
 %

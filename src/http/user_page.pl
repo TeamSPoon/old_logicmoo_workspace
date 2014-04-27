@@ -83,7 +83,7 @@ mud_page(_Request) :-
 actual_style(Style) :- style(name(Style)),!.
 actual_style(logicmoo).
 
-:- multifile user:head/2, user:body/2.
+:- multifile user:head/4, user:body/4.
 
 % fallback style
 user:head(logicmoo, Head) -->
