@@ -67,6 +67,12 @@ moo:coerce(What,_Type,NewThing):-NewThing = What.
 :- dynamic moo:decl_database_hook/2.
 :- multifile moo:decl_database_hook/2.
 
+
+:- dynamic moo:decl_mud_test/2.
+:- multifile moo:decl_mud_test/2.
+
+
+
 % hooks are declared as
 % moo:decl_database_hook(assert(A_or_Z),Fact).
 % moo:decl_database_hook(retract(One_or_All),Fact).

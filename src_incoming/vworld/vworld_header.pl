@@ -36,7 +36,7 @@
 
 % logicmoo vworld mud server
 :-ensure_loaded(logicmoo('vworld/world.pl')).
-% :-ensure_loaded(logicmoo('vworld/room_grids.pl')).
+:-ensure_loaded(logicmoo('vworld/telnetplayer.pl')).
 :-ensure_loaded(logicmoo('vworld/lib.pl')).
 :-ensure_loaded(logicmoo('vworld/actr.pl')).
 :-ensure_loaded(logicmoo('vworld/parsem.pl')).

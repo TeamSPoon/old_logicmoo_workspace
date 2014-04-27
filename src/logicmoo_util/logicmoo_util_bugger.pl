@@ -729,7 +729,7 @@ dmsg2(T):-!,
 		Depth2 = (Depth-25))),
         with_output_to_stream(user_error,
         ((
-	fmt0(';;',[T]),!,
+	fmt(';;',[T]),!,
 	indent_e(Depth2),!,
 	fmt0('~q\n',[T])))))).
 
