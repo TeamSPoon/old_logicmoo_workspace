@@ -28,7 +28,7 @@ moo:world_agent_plan(_World,Self,Act):-
    
 % Possible agent actions.
 prey_idea(Self,move(Dir)) :-
-	look_percepts(Self,List),
+	get_percepts(Self,List),
 	list_agents(Agents),
 	obj_memb(NearAgnt,Agents),
 	list_object_dir_visible(List,NearAgnt,OppDir),
@@ -37,21 +37,21 @@ prey_idea(Self,move(Dir)) :-
 	nth_member(Num,What,List),
 	What == [].
 prey_idea(Self,take(nut)) :-
-	look_feet(Self,What),
+	get_feet(Self,What),
 	member(nut,What).
 prey_idea(Self,eat(nut)) :-
 	charge(Self,Charge),
 	Charge < 120,
 	possess(Self,nut).
 prey_idea(Self,move(Dir)) :-
-	look_percepts(Self,List),
+	get_percepts(Self,List),
 	list_object_dir_visible(List,nut,Dir).
 prey_idea(_Agent,_) :-
 	spawn.
 prey_idea(Self,move(Dir)) :-
 	memory(Self,directions([Dir|_])),
 	num_near(Num,Dir,here),
-	look_near(Self,List),
+	get_near(Self,List),
 	nth_member(Num,What,List),
 	What == [].
 prey_idea(Prey,sit) :-

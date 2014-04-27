@@ -8,15 +8,15 @@
 /** <module>
 % This file defines the basic look action
 % Agents will use the predicate:
-% look_all(Agent,Chg,Dam,Fail,Scr,Percepts,Inv)
-% instead of look_all(Agent,), these can be called separately
+% get_all(Agent,Chg,Dam,Fail,Scr,Percepts,Inv)
+% instead of get_all(Agent,), these can be called separately
 % charge(Agent,Chg) = charge (amount of charge agent has)
 % damage(Agent,Dam) = damage
 % success(Agent,Suc) = checks success of last action (actually checks the failure predicate)
 % score(Agent,Scr) = score
-% look_percepts(Agent,Percepts) = list of lists of objects in agents location plus 2 locations in each direction
-% look_near(Agent,Percepts) = list of lists of objects in agents atloc plus 1 atloc in each dir
-% look_feet(Agent,Percept) = list of objects in agents location
+% get_percepts(Agent,Percepts) = list of lists of objects in agents location plus 2 locations in each direction
+% get_near(Agent,Percepts) = list of lists of objects in agents atloc plus 1 atloc in each dir
+% get_feet(Agent,Percept) = list of objects in agents location
 % inventory(Agt,Inv) = inventory (anything the agent has taken
 % to do this.
 %
@@ -26,7 +26,7 @@
 % padd(Obj,height(ObjHt))  == add(p(height,Obj,ObjHt)) == add(p(height,Obj,ObjHt)) == add(height(Obj,ObjHt))
 */
 
-:- module(look, [look_all/7, look_percepts/2,look_brief/1, look_to_fmt/1, look_near/2, look_feet/2,height_on_obj/2, inventory/2]).
+:- module(look, [get_all/7, get_percepts/2,  get_near/2, get_feet/2, height_on_obj/2, inventory/2]).
 
 :- include(logicmoo('vworld/vworld_header.pl')).
 
@@ -35,8 +35,6 @@
 :- dynamic blocks/1.
 
 
-look_brief(Agent):- prop(Agent,last_command,X),functor(X,look,_),!.
-look_brief(Agent):- look_to_fmt(Agent).
 
 looking(Agent):- thlocal:current_agent(Agent),!.
 looking(Agent):- thinking(Agent).
@@ -45,8 +43,8 @@ looking(Agent):- thinking(Agent).
 % Look, reports everything not blocked up to two locations away
 % plus the agents score, damage, charge, and if they succeeded at their last action.
 % To make this action take a turn, change the first line to:
-% Impliment(look_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv)) :-
-look_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
+% Impliment(get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv)) :-
+get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
 	looking(Agent),
 	ignore(charge(Agent,Vit)),
         ignore(damage(Agent,Dam)),
@@ -60,7 +58,7 @@ look_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
 	!.
 
 % Get only the Percepts
-look_percepts(Agent,Percepts) :-
+get_percepts(Agent,Percepts) :-
 	looking(Agent),
 	view_list(Dirs),
 	check_for_blocks(Agent),
@@ -69,19 +67,19 @@ look_percepts(Agent,Percepts) :-
 	!.
 
 % Look at locations immediately around argent
-look_near(Agent,Percepts) :-
+get_near(Agent,Percepts) :-
 	looking(Agent),
 	view_near_list(Dirs),
 	view_dirs(Agent,Dirs,Percepts),
 	!.
 
 % Look only at location agent is currently in.
-look_feet(Agent,Percept) :-
+get_feet(Agent,Percept) :-
 	looking(Agent),
 	atloc(Agent,LOC),
         facing(Agent,Facing),
         reverse_dir(Facing,Rev),
-	look_mdir(Agent,[Facing,Rev],LOC,Percept),
+	get_mdir(Agent,[Facing,Rev],LOC,Percept),
 	!.
 
 % Get only the Inv (inventory)
@@ -95,7 +93,7 @@ inventory(Agent, Inv) :-
 %	   [nw,nw],[n,nw]]).
 
 %grid of view, upper left (nw) to lower right (se)
-%This is the order the agents will receive their Percepts returned from look_all(Agent,) in
+%This is the order the agents will receive their Percepts returned from get_all(Agent,) in
 view_list([[nw,nw],[n,nw],[n,n],[n,ne],[ne,ne],
 	    [w,nw],[nw,here],[n,here],[ne,here],[e,ne],
 	    [w,w],[w,here],[d,u],[e,here],[e,e],
@@ -176,17 +174,17 @@ view_dirs(_,[],[]).
 view_dirs(Agent,[[D1,D2]|Rest],Percepts) :-
 	view_dirs(Agent,Rest,Psofar),
 	atloc(Agent,LOC),
-	look_mdir(Agent,[D1,D2],LOC,What),
+	get_mdir(Agent,[D1,D2],LOC,What),
 	append([What],Psofar,Percepts).
 
 % The look loop (look at one location)
-look_mdir(_Gent,[],LOC,What) :-
+get_mdir(_Gent,[],LOC,What) :-
 	report(LOC,What).
-look_mdir(_Gent,[here],LOC,What) :-
+get_mdir(_Gent,[here],LOC,What) :-
 	report(LOC,What).
-look_mdir(Agent,[Dir|D],LOC,What) :-
+get_mdir(Agent,[Dir|D],LOC,What) :-
 	move_dir_target(LOC,Dir,XXYY),
-	look_mdir(Agent,D,XXYY,What).
+	get_mdir(Agent,D,XXYY,What).
 
 % Reports everything at a location.
 report(LOC,What) :-
@@ -212,118 +210,11 @@ moo:decl_action(look).
 moo:decl_action(look(dir)).
 moo:decl_action(look(item)).
 
-moo:agent_call_command(Agent,look):- with_assertions(thlocal:current_agent(Agent),look_to_fmt(Agent)).
 
-scan_updates:-ignore(catch(make,_,true)).
+moo:agent_call_command(Agent,look):- 
+   with_assertions(thlocal:current_agent(Agent),
+           telnet_look(Agent)).
 
-look_to_fmt(Agent):-
-        scan_updates,!,
-        must(atloc(Agent,LOC)),!,
-        locationToRegion(LOC,Region),
-        must(look_location_fmt(Agent,Region)),!,
-        ignore(look_exits_fmt(Agent,LOC)),!,
-        must(look_loc_objects_fmt(Agent,LOC)),!,
-        must(deliver_location_events(Agent,LOC)),!,
-        ignore(look_all(Agent,Chg,Dam,Suc,Scr,Percepts,Inv)),
-        ignore(height(Agent,Ht)),
-        ignore(facing(Agent,Facing)),
-        fmt('Agent=~w Ht=~w Facing=~w LOC=~w Charge=~w Dam=~w Success=~w Score=~w Inventory=~q ~n', [Agent,Ht,Facing,LOC,Chg,Dam,Suc,Scr,Inv]),
-	ignore((nonvar(Percepts),write_pretty(Percepts))),
-        must(ignore(((look_near(Agent,Stuff),
-        fmt('STUFF=~q',[Stuff]))))),!.
-
-look_exits_fmt(_Agent,LOC):-
-  locationToRegion(LOC,Region),
-   setof(D-E,pathBetween_call(Region,D,E),Set),
-   forall_member(D-E,Set,once(describe_path(Region,D,E))).
-
-describe_path(Region,D,E):-
-   req(pathName(Region,D,S)) -> fmt('~w.',[S]) ;
-   nameStrings(E,NS) -> fmt('~w is ~w',[D,NS]) ;
-   fmt('~w ~w',[D,E]).   
-
-look_location_fmt(Agent,Region):-
-      must(show_room_grid(Region)),
-      must(look_o_fmt(Agent,Region,4,6,'the name of this place',99)),!.
-
-look_o_fmt(_Agent,O,LOW,_GOOD,WhatString,_Max):-
-   order_descriptions(O,LOW-199,[Region|IST]) -> forall_member(M,[Region|IST],fmt0('~w.  ',[M])) ;
-   setof(S,nameStrings(O,S),[Region|IST]) ->   forall_member(M,[Region|IST],fmt0('~w is ~w. ',[M,WhatString])) ;
-   setof(S,mud_isa(O,S),List), fmt('~q is ~w',[mud_isa(O,List),WhatString]).
-
-look_loc_objects_fmt(Agent,Region):- !,ignore((
-     setof(O,inRegion(O,Region),Set),
-       forall_member(O,Set,look_object_fmt(Agent,O)))).
-
-look_loc_objects_fmt(Agent,Region):-
-       props(Agent,[id(X)]),
-       look_object_expect_for_fmt(Agent,Region,[same(X),classof(invisible)]).
-
-look_object_expect_for_fmt(Agent,Region,ExceptFor):-
- setof(O,inRegion(O,Region),Set),
- forall(member(O,Set),(divide_match(O,ExceptFor,_,[]),look_object_fmt(Agent,O))).
-
-
-look_object_fmt(Agent,O):-
- look_o_fmt(Agent,O,4,6,'is here.',1).
-
-%% divide_match(-O,-InList,+Matches,+NotMatches)
-divide_match(O,InList,Matches,NotMatches):-
-   divide_match0(O,InList,MatchesI,NotMatchesI),!,
-   NotMatches=NotMatchesI,Matches=MatchesI.
-
-divide_match0(_,More,[],[]):-More==[],!.
-divide_match0(O,[Test|For],True,False):-
-   props(O,Test ) ->
-   divide_match(O,For,[Test|True],False);
-   divide_match(O,For,True,[Test|False]).
-
-deliver_location_events(_Agent,_LOC):-true.
-
-order_descriptions(O,DescSpecs,ListO):-findall(S,(description(O,S),meets_desc_spec(S,DescSpecs)),Rev),reverse(Rev,List),delete_repeats(List,ListO).
-
-delete_repeats([],[]):-!.
-delete_repeats([Region|List],[Region|ListO]):-delete(List,Region,ListM), delete_repeats(ListM,ListO),!.
-
-meets_desc_spec(S0,_L):- string_to_atom(S0,A),atomic_list_concat([_,_|_],'mudBareHandDa',A),!,fail.
-meets_desc_spec(S,From-To):- desc_len(S,Region),!, Region =< To, Region >= From.
-meets_desc_spec(_,_).
-
-desc_len(S0,Region):-string_to_atom(S0,S),
-   atomic_list_concat(Words,' ',S),length(Words,Ws),atomic_list_concat(Sents,'.',S),length(Sents,Ss),Region is Ss+Ws,!.
-
-% Display what the agent sees in a form which
-% makes sense to me
-write_pretty([]).
-write_pretty(Percepts) :-
-	write_pretty_aux(Percepts, Rest, 0),
-	nl,
-	write_pretty(Rest).
-
-write_pretty_aux(Rest,Rest,5).
-write_pretty_aux([[]|Tail],Return,Column) :-
-	Ctemp is Column + 1,
-	label_type(Obj,0),
-	write(Obj), write(' '),
-	write_pretty_aux(Tail,Return,Ctemp).
-write_pretty_aux([[dark]|Tail],Return,Column) :-
-	Ctemp is Column + 1,
-	write('dk '),
-	write_pretty_aux(Tail,Return,Ctemp).
-write_pretty_aux([[Head]|Tail], Return, Column) :-
-	Ctemp is Column + 1,
-	label_type(Map,Head),
-	write(Map), write(' '),
-	write_pretty_aux(Tail, Return, Ctemp).
-write_pretty_aux([[Agent]|Tail],Return,Column) :-
-	Ctemp is Column + 1,
-	mud_isa(Agent,agent),
-	write('Ag'), write(' '),
-	write_pretty_aux(Tail,Return,Ctemp).
-write_pretty_aux([[_|_]|Tail],Return,Column) :-
-	Ntemp is Column + 1,
-	write('A+'), write(' '),
-	write_pretty_aux(Tail,Return,Ntemp).
 
 :- include(logicmoo('vworld/vworld_footer.pl')).
 

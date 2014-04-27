@@ -6,17 +6,6 @@
 %
 */
 
-/*:-module(room_grids, [
-         init_location_grid/1,
-         display_grid_labels/0,
-         show_room_grid/1,
-         grid_dist/3,
-         to_3d/2,
-         is_3d/1,
-         in_grid/2,
-         locationToRegion/2,
-         init_location_grid/2]).
-*/
 % :- include(logicmoo('vworld/vworld_header.pl')).
 
 :- register_module_type(utility).
@@ -324,23 +313,6 @@ rez_object(XY,Type):-
            add(atloc(Name,XY)),!.
 
 
-show_room_grid(Room) :-show_room_grid_new(Room),!.
-% show_room_grid(Room) :-show_room_grid_old(Room),!.
-
-% ===================================================================
-% show_room_grid_new(Room)
-% ===================================================================
-show_room_grid_new(Room):-
-   grid_size(Room,Xs,Ys,_Zs),
-   Ys1 is Ys+1,Xs1 is Xs+1,
-   between(0,Ys1,Y),
-   nl, between(0,Xs1,X),
-   loc_to_xy(Room,X,Y,LOC),
-   write(' '),
-   OutsideTest = (not(between(1,Xs,X));not(between(1,Ys,Y))),
-   once(show_room_grid_single(Room,LOC,OutsideTest)),fail.
-show_room_grid_new(_):-nl.
-
 doorLocation(_Room,3,0,_Z,n).
 doorLocation(_Room,2,0,_Z,n).
 doorLocation(_Room,4,0,_Z,n).
@@ -358,79 +330,6 @@ doorLocation(_Room,6,6,_Z,se).
 doorLocation(_Room,0,0,_Z,nw).
 doorLocation(_Room,6,0,_Z,sw).
 doorLocation(_Room,_X,_Y,_Z,_Dir):-!,fail.
-door_label(R,Dir,'  '):-pathBetween_call(R,Dir,SP),atomic(SP).
-show_room_grid_single(Room, xyz(Room,X,Y,Z),OutsideTest):- OutsideTest, doorLocation(Room,X,Y,Z,Dir), door_label(Room,Dir,Label),write(Label),!.
-show_room_grid_single(_Room,_LOC,OutsideTest):-OutsideTest,!,write('[]'),!.
-show_room_grid_single(_Room,LOC,_OutsideTest):- atloc(Obj,LOC),inst_label(Obj,Label), write(Label), !.
-show_room_grid_single(_Room,LOC,_OutsideTest):- atloc(_Obj,LOC),write('..'), !.
-show_room_grid_single(_Room,_LOC,_OutsideTest):- write('--'), !.
-
-inst_label(Obj,Label):-label_type(Label,Obj),!.
-inst_label(Obj,Label):-  props(Obj,nameStrings(Val)),Val\=Obj,inst_label(Val,Label),!.
-inst_label(Obj,Label):-  props(Obj,named(Val)),Val\=Obj,inst_label(Val,Label),!.
-inst_label(Obj,Label):-  props(Obj,isa(Val)),Val\=Obj,inst_label(Val,Label),!.
-inst_label(Obj,SLabe2):-term_to_atom(Obj,SLabel),sub_atom(SLabel,1,2,_,SLabe2),!.
-inst_label(Obj,SLabe2):-term_to_atom(Obj,SLabel),sub_atom(SLabel,0,2,_,SLabe2),!.
-inst_label(_Obj,'&&').
-
-% ===================================================================
-% show_room_grid_old(Room)
-% ===================================================================
-% Display world
-show_room_grid_old(Room) :-  
-	grid(Room,1,G,_),
-	length(G,N),
-	M is N + 1,
-	show_room_grid(Room,1,1,M).
-
-show_room_grid(Room,Old,N,N) :-
-	New is Old + 1,
-	\+ grid(Room,New,N,_),
-	nl,
-	!.
-
-show_room_grid(Room,Old,N,N) :-
-	New is Old + 1,
-	nl,
-	!,
-	show_room_grid(Room,New,1,N).
-show_room_grid(Room,Y,X,N) :-
-      loc_to_xy(Room,X,Y,LOC),
-	atloc(Obj,LOC),
-        props(Obj,classof(agent)),
-	list_agents(Agents),
-	obj_memb(Agent,Agents),
-	atloc(Agent,LOC),
-	write('Region1+'), write(' '),
-	XX is X + 1,
-	!,
-	show_room_grid(Room,Y,XX,N).
-show_room_grid(Room,Y,X,N) :-
-        loc_to_xy(Room,X,Y,LOC),
-	atloc(Obj,LOC),
-        prop(Obj,classof,Class),
-	label_type(Label,Class),
-	write(Label), write(' '),
-	XX is X + 1,
-	!,
-	show_room_grid(Room,Y,XX,N).
-show_room_grid(Room,Y,X,N) :-
-      loc_to_xy(Room,X,Y,LOC),
-	atloc(Agent,LOC),
-	mud_isa(Agent,agent),
-	write('Ag'), write(' '),
-	XX is X + 1,
-	!,
-	show_room_grid(Room,Y,XX,N).
-
-
-% Used to display the labels of the grid locations. (the key to the map).
-% Used at end of run.
-display_grid_labels :-
-	findall([Label,Name],label_type(Label,Name),List),
-	forall(prop_memb([Label,Name],List),
-	           (write(Label), write('='), write(Name), write(' '))),
-		   nl.
 
 % :- include(logicmoo('vworld/vworld_footer.pl')).
 

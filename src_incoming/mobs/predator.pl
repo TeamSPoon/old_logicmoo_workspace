@@ -32,24 +32,24 @@ predator_idea(Agent,eat(Corpse)) :-
 	obj_memb(Corpse,List),
         mud_isa(Corpse,corpse).
 predator_idea(Agent,take(What)) :-
-	look_feet(Agent,What),
+	get_feet(Agent,What),
 	mud_isa(What,corpse).
 predator_idea(Agent,move(Dir)) :-
-	look_percepts(Agent,List),
+	get_percepts(Agent,List),
 	list_object_dir_visible(List,corpse(_),Dir).
 predator_idea(Agent,attack(Dir)) :-
-	look_near(Agent,List),
+	get_near(Agent,List),
 	list_object_dir_near(List,prey(_),Dir).
 
 % find something near and itnersting and go to it.. or find a dirrection and go that way.. or sit 
 
 predator_idea(Agent,move(Dir)) :-
-	look_percepts(Agent,List),
+	get_percepts(Agent,List),
 	list_object_dir_visible(List,prey(_),Dir).
 predator_idea(Agent,move(Dir)) :-
 	memory(Agent,directions([Dir|_])),
 	num_near(Num,Dir,here),
-	look_near(Agent,List),
+	get_near(Agent,List),
 	nth_member(Num,What,List),
 	(What == [];
 	    What == [nut]).
