@@ -8,12 +8,34 @@
 :- use_module(library(http/html_head)).
 
 
-%%	style_name(-Style:atom) is nondet
+%%	style_name(-Style:term) is nondet
 %
-%	true if Style is the style name (whats passed to user:body)
-%	for this mud
+%       binds Style to a styling option.
+%	usually called with a partially bound argument whose unbound
+%	parts are bound by style/1.
+%
+%	Style may be
+%
+%	name(X) - X is the name of the style used by user:head and
+%		  user:body
+%
+%       map  - if present, display a gridded map area
+%
+%       map_grid_size(X,Y)  - map "squares" are this size in pixels
+%
+%	map_display(+Semantics, -TermerizedHTML)
+%	                    - turn semantics into html. If this fails
+%	                    will use blank to fill in cell
+%	blank(-TermerizedHTML) contents of the td field if there is no
+%			       semantic content or map_display fails
+%
+%
 %
 style(name(startrek)).
+style(map).
+style(map_grid_size(32, 32)).
+style(map_display(wall, 'W' )).
+style(map_display(floor, '.' )).
 
 :- multifile user:head/2, user:body/2.
 
