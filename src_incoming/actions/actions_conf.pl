@@ -1,6 +1,6 @@
 
 
-:- use_module('look.pl').   % look_percepts(Agent,[list of internal traits],[list of percepts]).
+:- use_module('look.pl').   % get_percepts(Agent,[list of internal traits],[list of percepts]).
 :- use_module('move.pl').   % move(Dir). Dir is one of 8 cardinal directions
 :- use_module('sit.pl').    % sit. Don't do anything.
 :- use_module('take.pl').   % take(Object). take an object in the same atloc as agent

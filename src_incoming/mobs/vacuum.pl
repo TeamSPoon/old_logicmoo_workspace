@@ -27,15 +27,15 @@ moo:world_agent_plan(_World,Agent,Act):-
 vacuum_idea(Agent,take(outlet)) :-
 	charge(Agent,Charge),
 	Charge < 490,
-	look_feet(Agent,What),
+	get_feet(Agent,What),
 	member(outlet,What).
 vacuum_idea(Agent,take(dirt)) :-
-	look_feet(Agent,What),
+	get_feet(Agent,What),
 	member(dirt,What).
 vacuum_idea(Agent,move(Dir)) :-
 	charge(Agent,Charge),
 	Charge < 200,
-	look_percepts(Agent,List),
+	get_percepts(Agent,List),
 	list_object_dir_visible(List,outlet,Dir),
 	number_to_dir(N,Dir,here),
 	nth_member(N,What,List),
@@ -45,14 +45,14 @@ vacuum_idea(Agent,move(Dir)) :-
 vacuum_idea(Agent,climb(Dir)) :-
 	charge(Agent,Charge),
 	Charge < 200,
-	look_percepts(Agent,List),
+	get_percepts(Agent,List),
 	list_object_dir_visible(List,outlet,Dir),
 	number_to_dir(N,Dir,here),
 	nth_member(N,What,List),
 	(What == [low_box];
 	    What == [low_wall]).
 vacuum_idea(Agent,move(Dir)) :-
-	look_percepts(Agent,List),
+	get_percepts(Agent,List),
 	list_object_dir_visible(List,dirt,Dir),
 	number_to_dir(N,Dir,here),
 	nth_member(N,What,List),
@@ -60,7 +60,7 @@ vacuum_idea(Agent,move(Dir)) :-
 	What == [dirt];
 	What == [outlet]).
 vacuum_idea(Agent,climb(Dir)) :-
-	look_percepts(Agent,List),
+	get_percepts(Agent,List),
 	list_object_dir_visible(List,dirt,Dir),
 	number_to_dir(N,Dir,here),
 	nth_member(N,What,List),
@@ -69,7 +69,7 @@ vacuum_idea(Agent,climb(Dir)) :-
 vacuum_idea(Agent,move(Dir)) :-
 	memory(Agent,directions([Dir|_])),
 	num_near(Num,Dir,here),
-	look_near(Agent,List),
+	get_near(Agent,List),
 	nth_member(Num,What,List),
 	(What == [];
 	What == [outlet]).

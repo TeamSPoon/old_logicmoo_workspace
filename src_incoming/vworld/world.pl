@@ -45,16 +45,16 @@
             num_near/3,
             asInvoked/2,
             define_type/1,
-            findall_type_default_props/3
-
-            ,
-                     init_location_grid/1,
-         display_grid_labels/0,
-         show_room_grid/1,
+            findall_type_default_props/3,
+         init_location_grid/1,
          grid_dist/3,
          to_3d/2,
          is_3d/1,
          in_grid/2,
+         loc_to_xy/4,
+         grid_size/4,
+         doorLocation/5,
+         foc_current_player/1,
          locationToRegion/2,
          init_location_grid/2
  ]).
@@ -68,6 +68,19 @@
 :- include(logicmoo('vworld/room_grids.pl')).
 
 :- register_module_type(utility).
+
+
+foc_current_player(P):- thlocal:current_agent(P),!.
+foc_current_player(P):-
+   generate_new_player(P),
+   !,
+   asserta(thlocal:current_agent(P)).
+
+generate_new_player(P) :-
+  gensym(player,N),
+   P=explorer(N),
+   must(create_agent(P)).
+
 
 % Lists all the agents in the run. Except for other monsters.
 list_agents(Agents) :- agent_list(Agents), !.

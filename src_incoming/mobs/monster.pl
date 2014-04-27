@@ -31,27 +31,27 @@ monster_idea(Agent,eat(Food)) :-
 	isa_any(Food,[food,corpse]),
 	obj_memb(Food,List).
 monster_idea(Agent,take(Food)) :-
-	look_feet(Agent,What),
+	get_feet(Agent,What),
 	isa_any(Food,[food,corpse]),
 	obj_memb(Food,What).
 monster_idea(Agent,move(Dir)) :-
-	look_percepts(Agent,List),
+	get_percepts(Agent,List),
 	isa_any(Food,[food,corpse]),
 	list_object_dir_visible(List,Food,Dir).
 monster_idea(Agent,attack(Dir)) :-
-	look_near(Agent,List),
+	get_near(Agent,List),
 	list_agents(Agents),
 	isa_any(NearAgt,Agents),
 	list_object_dir_near(List,NearAgt,Dir).
 monster_idea(Agent,move(Dir)) :-
-	look_percepts(Agent,List),
+	get_percepts(Agent,List),
 	list_agents(Agents),
 	isa_any(NearAgt,Agents),
 	list_object_dir_visible(List,NearAgt,Dir).
 monster_idea(Agent,move(Dir)) :-
 	memory(Agent,directions([Dir|_])),
 	num_near(Num,Dir,here),
-	look_near(Agent,List),
+	get_near(Agent,List),
 	nth_member(Num,What,List),
 	What == [].
 monster_idea(Agent,sit) :-
