@@ -316,7 +316,8 @@ failOnError(Call):-catch(Call,_,fail).
 
 fresh_line:-current_output(Strm),fresh_line(Strm),!.
 fresh_line(Strm):-failOnError((stream_property(Strm,position('$stream_position'(_,_,POS,_))),ifThen(POS>0,nl(Strm)))),!.
-fresh_line(Strm):-trace,nl(Strm),!.
+fresh_line(Strm):-failOnError(nl(Strm)),!.
+fresh_line(_).
 
 ifThen(When,Do):-When->Do;true.
 
@@ -1071,6 +1072,7 @@ moo_hide_showChilds(M,F,A,_MPred):-
 % bugger_debug=off turns off just debugging about the debugger
 % opt_debug=off turns off all the rest of debugging
 bdmsg(_):-bugger_flag(bugger_debug=off),!.
+bdmsg(_):-!.
 bdmsg(D):-once(dmsg(D)).
 
 bugger_term_expansion(T,T2):- compound(T), once(bugger_t_expansion(T,T2)).

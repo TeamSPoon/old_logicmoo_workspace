@@ -26,7 +26,7 @@
 % padd(Obj,height(ObjHt))  == add(p(height,Obj,ObjHt)) == add(p(height,Obj,ObjHt)) == add(height(Obj,ObjHt))
 */
 
-:- module(look, [get_all/7, get_percepts/2,  get_near/2, get_feet/2, height_on_obj/2, inventory/2]).
+:- module(look, [get_all/7, get_percepts/2,  get_near/2, get_feet/2, height_on_obj/2, inventory/2, can_sense/5 ]).
 
 :- include(logicmoo('vworld/vworld_header.pl')).
 
@@ -34,9 +34,11 @@
 
 :- dynamic blocks/1.
 
+% can_sense(Agent,Sense,InList,CanDetect,CantDetect).
+can_sense(_Agent,visual,InList,InList,[]).
 
 
-looking(Agent):- thlocal:current_agent(Agent),!.
+looking(Agent):- get_session_id(O), thlocal:current_agent(O,Agent),!.
 looking(Agent):- thinking(Agent).
 
 % ********** TOP LEVEL PREDICATE: this is the predicate agents use to look
@@ -187,9 +189,8 @@ get_mdir(Agent,[Dir|D],LOC,What) :-
 	get_mdir(Agent,D,XXYY,What).
 
 % Reports everything at a location.
-report(LOC,What) :-
-	findall(Z,atloc(Z,LOC),List),
-	mask(List,[],What).
+report(LOC,List) :-
+	findall(Z,atloc(Z,LOC),List).
 
 % Converts the objects seen... basically to weed out the 0's the empty locations report
 mask([],What,What).
@@ -212,7 +213,8 @@ moo:decl_action(look(item)).
 
 
 moo:agent_call_command(Agent,look):- 
-   with_assertions(thlocal:current_agent(Agent),
+   get_session_id(O),
+   with_assertions(thlocal:current_agent(O,Agent),
            telnet_look(Agent)).
 
 

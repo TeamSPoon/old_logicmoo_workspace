@@ -36,7 +36,7 @@ predator_idea(Agent,take(What)) :-
 	mud_isa(What,corpse).
 predator_idea(Agent,move(Dir)) :-
 	get_percepts(Agent,List),
-	list_object_dir_visible(List,corpse(_),Dir).
+	list_object_dir_sensed(_,List,corpse(_),Dir).
 predator_idea(Agent,attack(Dir)) :-
 	get_near(Agent,List),
 	list_object_dir_near(List,prey(_),Dir).
@@ -45,7 +45,7 @@ predator_idea(Agent,attack(Dir)) :-
 
 predator_idea(Agent,move(Dir)) :-
 	get_percepts(Agent,List),
-	list_object_dir_visible(List,prey(_),Dir).
+	list_object_dir_sensed(_,List,prey(_),Dir).
 predator_idea(Agent,move(Dir)) :-
 	memory(Agent,directions([Dir|_])),
 	num_near(Num,Dir,here),

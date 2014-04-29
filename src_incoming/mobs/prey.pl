@@ -31,7 +31,7 @@ prey_idea(Self,move(Dir)) :-
 	get_percepts(Self,List),
 	list_agents(Agents),
 	obj_memb(NearAgnt,Agents),
-	list_object_dir_visible(List,NearAgnt,OppDir),
+	list_object_dir_sensed(_,List,NearAgnt,OppDir),
 	reverse_dir(OppDir,Dir),
 	number_to_dir(Num,Dir,here),
 	nth_member(Num,What,List),
@@ -45,7 +45,7 @@ prey_idea(Self,eat(nut)) :-
 	possess(Self,nut).
 prey_idea(Self,move(Dir)) :-
 	get_percepts(Self,List),
-	list_object_dir_visible(List,nut,Dir).
+	list_object_dir_sensed(_,List,nut,Dir).
 prey_idea(_Agent,_) :-
 	spawn.
 prey_idea(Self,move(Dir)) :-

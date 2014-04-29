@@ -11,7 +11,7 @@
 :- module(npc_toploop, [
           npc_tick/0,
           join_npcs_long_running/0,npc_tick_tock/0,npc_tick_tock_time/1,
-          npc_controller/2,
+          npc_controller/2,          
           tick_controller/2]).
 
 :- include(logicmoo('vworld/vworld_header.pl')).
@@ -29,20 +29,31 @@ npc_tick:-
 
 join_npcs_long_running.
 
-npc_controller(simple_world_agent_plan,Who):-dbase:agent(Who).
+% skip manually controled agents
+npc_controller(simple_world_agent_plan,Who):-dbase:agent(Who),not(agent_message_stream(Who,_,_)).
 
 tick_controller(simple_world_agent_plan,Who):- tick(Who).
 
-tick(Who):- findall(Idea,moo:world_agent_plan(current,Who,Idea),IdeaS),!,
-   % dmsg(world_agent_plan(current,Who,IdeaS)),
-   random_member(Idea,IdeaS),!,do_agent_call_command(Who,Idea).
+tick(Who):- 
+   findall(Idea,get_world_agent_plan(current,Who,Idea),IdeaS),!,IdeaS=[_|_],
+   random_member(Idea,IdeaS),!,
+   do_agent_call_plan_command(Who,Idea).
 
-do_agent_call_command(A,C):-moo:agent_call_command(A,C).
 
-moo:decl_action(tick).
-moo:decl_action(tock,"run npc_tick/0").
-moo:decl_action(tick(agent)).
+get_world_agent_plan(W,Who,Idea):- agent(Who),moo:world_agent_plan(W,Who,Idea).
+
+do_agent_call_plan_command(A,C):-agent_doing(A,C),!.
+do_agent_call_plan_command(A,C):-   
+   with_assertions(agent_doing(A,C),((
+   call_agent_command(A,C),agent_done(A,C)))).
+
+
+
+
 moo:decl_action(npc_timer(int),"sets how often to let NPCs run").
+moo:decl_action(tock,"Makes All NPCs do something brilliant").
+moo:decl_action(tick(agent),"Makes some agent do something brilliant").
+moo:decl_action(tick,"Makes *your* agent do something brilliant").
 
 moo:agent_call_command(_Agent,npc_timer(Time)):-retractall(npc_tick_tock_time(_)),asserta(npc_tick_tock_time(Time)).
 moo:agent_call_command(Agent,tick) :- tick(Agent).

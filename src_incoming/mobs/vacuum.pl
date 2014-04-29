@@ -36,7 +36,7 @@ vacuum_idea(Agent,move(Dir)) :-
 	charge(Agent,Charge),
 	Charge < 200,
 	get_percepts(Agent,List),
-	list_object_dir_visible(List,outlet,Dir),
+	list_object_dir_sensed(_,List,outlet,Dir),
 	number_to_dir(N,Dir,here),
 	nth_member(N,What,List),
 	(What == [];
@@ -46,14 +46,14 @@ vacuum_idea(Agent,climb(Dir)) :-
 	charge(Agent,Charge),
 	Charge < 200,
 	get_percepts(Agent,List),
-	list_object_dir_visible(List,outlet,Dir),
+	list_object_dir_sensed(_,List,outlet,Dir),
 	number_to_dir(N,Dir,here),
 	nth_member(N,What,List),
 	(What == [low_box];
 	    What == [low_wall]).
 vacuum_idea(Agent,move(Dir)) :-
 	get_percepts(Agent,List),
-	list_object_dir_visible(List,dirt,Dir),
+	list_object_dir_sensed(_,List,dirt,Dir),
 	number_to_dir(N,Dir,here),
 	nth_member(N,What,List),
 	(What == [];
@@ -61,7 +61,7 @@ vacuum_idea(Agent,move(Dir)) :-
 	What == [outlet]).
 vacuum_idea(Agent,climb(Dir)) :-
 	get_percepts(Agent,List),
-	list_object_dir_visible(List,dirt,Dir),
+	list_object_dir_sensed(_,List,dirt,Dir),
 	number_to_dir(N,Dir,here),
 	nth_member(N,What,List),
 	(What == [low_box];

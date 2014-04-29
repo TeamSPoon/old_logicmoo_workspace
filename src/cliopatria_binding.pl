@@ -2,7 +2,7 @@
 /** <module> Separate module so setting ends up in right place
 
 % [Optionaly 1st run] tell where ClioPatria is located and restart
-:-set_setting(cliopatria_binding:path, 't:/devel/ClioPatria'), save_settings('moo_settings.db').
+:-set_setting(cliopatria_binding:path, '/devel/ClioPatria'), save_settings('moo_settings.db').
 
 */
 :- use_module(library(settings)).

@@ -288,22 +288,25 @@ number_to_dir(25,se,se).
 
 % Scans through list of perceptions (as returned by look_percepts(Agent,L) or look_all(NearAgt,_,_,_,L,_))
 % for an object, returns the direction in which the object lies.
-list_object_dir_visible(List,Object,Dir) :-
+list_object_dir_sensed(_,List,Type,Dir) :-
 	!,
-	scan_lists_aux(List,Object,1,N),
+	scan_lists_aux(List,Type,1,N),
 	number_to_dir(N,Dir,_).
-list_object_dir_near(List,Object,Dir) :-
+
+
+list_object_dir_near(List,Type,Dir) :-
 	!,
-	scan_lists_aux(List,Object,1,N),
+	scan_lists_aux(List,Type,1,N),
 	num_near(N,Dir,_).
 
-scan_lists_aux([Loc|_],Obj,N,N) :-
+scan_lists_aux([Loc|_],Type,N,N) :-
 	member(Obj,Loc),
+        isa(Obj,Type),
 	!.
-scan_lists_aux([_|Rest],Obj,M,N) :-
+scan_lists_aux([_|Rest],Type,M,N) :-
 	Mtemp is M + 1,
 	!,
-	scan_lists_aux(Rest,Obj,Mtemp,N).
+	scan_lists_aux(Rest,Type,Mtemp,N).
 
 rez_object(_,0):-!.
 rez_object(XY,Type):-

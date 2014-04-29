@@ -16,6 +16,14 @@
 :- module(dbase, [
           scan_db_prop/0,
     world_clear/1,
+
+    type/1,
+
+    %dynamic existence
+    agent/1,region/1,item/2,
+
+      agent_done/2, agent_doing/2,
+
     del/1,
     clr/1,
     classof/2,
@@ -24,8 +32,7 @@
     props/2,
     prop/3,
     prop_or/4,
-    padd/3,
-    type/1,
+    padd/3,    
     padd/2,
     db_op/2,
     pathName/3,
@@ -38,6 +45,9 @@
     db_prop_g/1
     ]).
 
+:-dynamic agent/1,region/1,item/2.
+
+:-dynamic agent_done/2, agent_doing/2.
 
 :- dynamic p/3,p/4,p/5,p/6,p/7,db_prop_g/1,is_db_prop/2,is_db_prop/3,pathName/3,type/1,classof/2,isa/2.
 
@@ -242,9 +252,9 @@ must_asserta(C):-
       must(hooked_asserta(C)),!.
 
 argIsa_call(isa,1,argIsaFn(isa,1)):-!.
-argIsa_call(isa,2,type).
-argIsa_call(classof,2,type).
-argIsa_call(memory,2,term).
+argIsa_call(isa,2,type):-!.
+argIsa_call(classof,2,type):-!.
+argIsa_call(memory,2,term):-!.
 argIsa_call(Prop,N1,Type):-is_db_prop(Prop,A),functor(P,Prop,A),db_prop(P,_),arg(N1,P,Type).
 argIsa_call(Prop,N1,Type):- dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),Type=argIsaFn(Prop,N1).
 

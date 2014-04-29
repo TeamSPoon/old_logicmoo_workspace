@@ -82,5 +82,10 @@
 				Refilter="0"
 				Excludes=""/>
 		</Folder>
+		<F
+			N="*.*"
+			Recurse="0"
+			Refilter="0"
+			Excludes=""/>
 	</Files>
 </Project>

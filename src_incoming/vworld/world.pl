@@ -18,9 +18,12 @@
 */
 :- module(world,
 	[
+        call_agent_command/2,
+        call_agent_action/2,
             mud_isa/2,
             isa_any/2,
             put_in_world/1,
+            get_session_id/1,
             pathBetween_call/3,
             obj_memb/2,
             prop_memb/2,            
@@ -40,7 +43,7 @@
             list_agents/1,
             agent_list/1,
             check_for_fall/3,
-            list_object_dir_visible/3,
+            list_object_dir_sensed/4,
             list_object_dir_near/3,
             num_near/3,
             asInvoked/2,
@@ -69,12 +72,12 @@
 
 :- register_module_type(utility).
 
+get_session_id(main):-thread_self(main),!.
+get_session_id(ID):-thread_self(ID),thlocal:current_agent(ID,_),!.
+get_session_id(O):-current_input(O),!.
 
-foc_current_player(P):- thlocal:current_agent(P),!.
-foc_current_player(P):-
-   generate_new_player(P),
-   !,
-   asserta(thlocal:current_agent(P)).
+foc_current_player(P):- get_session_id(O),thlocal:current_agent(O,P),!.
+foc_current_player(P):- get_session_id(O),generate_new_player(P), !, asserta(thlocal:current_agent(O,P)).
 
 generate_new_player(P) :-
   gensym(player,N),
@@ -173,6 +176,7 @@ create_meta(T,P,C,MT):-
    must(split_name_type(T,P,C)),
    define_subtype(C,MT),
    OP =.. [MT,P],
+   assert_if_new(OP),
    must(forall_member(E,[OP,classof(P,MT),classof(P,C)],must(add(E)))),
    must(findall_type_default_props(P,C,Props)),!,
    must(padd(P,Props)),!.
@@ -209,7 +213,8 @@ formattype(FormatType):-mud_isa(FormatType,formattype).
 
 define_type(Spec):-create_instance(Spec,type,[]).
 create_instance(What,FormatType,List):- FormatType\==type,
-   formattype(FormatType),!,throw(formattype(FormatType,create_instance(What,FormatType,List))).
+   formattype(FormatType),!,
+   throw(formattype(FormatType,create_instance(What,FormatType,List))).
 
 create_instance(SubType,type,List):-!,
    add(isa(SubType,type)),

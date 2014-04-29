@@ -45,7 +45,7 @@
 */
 
 % [Optionaly] Start the telent server
-:-at_start(telnet_server(4040, [allow(_ALL),call_pred(login_and_run)])).
+:-at_start(telnet_server(4000, [allow(_ALL),call_pred(login_and_run)])).
 
 
 

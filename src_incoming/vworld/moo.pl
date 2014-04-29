@@ -9,11 +9,11 @@ create_queryPred(H,B):-functor(H,HF,HA),functor(B,BF,BA),
       dynamic(BF/BA),moo:export(BF/BA), multifile(BF/BA), 
       asserta((H:-B)).
 
-:- dynamic thlocal:current_agent/1.
-:- thread_local(thload:current_agent/1).
+:- dynamic thlocal:current_agent/2.
+:- thread_local(thload:current_agent/2).
 
-:-asserta(thload:current_agent(dead)).
-:-ignore(retract(thload:current_agent(dead))).
+:-asserta(thload:current_agent(_,dead)).
+:-ignore(retract(thload:current_agent(_,dead))).
 
 :- dynamic moo:action_rules/4.
 :- multifile moo:action_rules/4.

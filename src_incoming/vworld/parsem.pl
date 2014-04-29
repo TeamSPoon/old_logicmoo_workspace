@@ -8,7 +8,9 @@
 %
 */
 
-:- module(parsem, [specifier_text/2,
+:- module(parsem, [
+                   parse_agent_text_command/5,
+                   specifier_text/2,
                    parseIsa//2,
                    parseForTypes//2]).
 
@@ -43,12 +45,11 @@ type_parse(Type,StringM,Term,LeftOver):-
 % PARSER
 % ===========================================================
 
-moo:agent_text_command(Agent,[SVERB|ARGS],Agent,GOAL):-
-   parse_agent_text_command(Agent,SVERB,ARGS,GOAL),!.
 
+parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL):- moo:agent_text_command(Agent,[SVERB|ARGS],NewAgent,GOAL).
 
 % parses a verb phrase and retuns one interpretation (action)
-parse_agent_text_command(Agent,SVERB,ARGS,GOAL):-
+parse_agent_text_command(Agent,SVERB,ARGS,Agent,GOAL):-
    parse_verb_pharse(Agent,SVERB,ARGS,GOALANDLEFTOVERS),
    dmsg(parserm("GOALANDLEFTOVERS"=GOALANDLEFTOVERS)),
    GOALANDLEFTOVERS \= [],
@@ -134,7 +135,7 @@ trans_decl_subft(FT,Sub):-moo:decl_subft(FT,A),moo:decl_subft(A,B),moo:decl_subf
 
 
 parseFmt(number,Term)--> dcgReorder(theText([String]),{any_to_number(String,Term)}).
-parseFmt(string,Term)--> dcgReorder(theText([String]),{trace,atom_string(Term,String)}).
+parseFmt(string,Term)--> dcgReorder(theText([String]),{atom_string(Term,String)}).
 parseFmt(or([L|_]),Term) --> parseIsa(L,Term).
 parseFmt(or([_|List]),Term) --> parseIsa(or(List),Term).
 parseFmt(and([L|List]),Term1) --> dcgAnd(parseIsa(L,Term1),parseIsa(and(List),Term2)),{ignore(Term1==Term2),!}.

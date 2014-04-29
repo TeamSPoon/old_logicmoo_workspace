@@ -37,7 +37,7 @@ monster_idea(Agent,take(Food)) :-
 monster_idea(Agent,move(Dir)) :-
 	get_percepts(Agent,List),
 	isa_any(Food,[food,corpse]),
-	list_object_dir_visible(List,Food,Dir).
+	list_object_dir_sensed(_,List,Food,Dir).
 monster_idea(Agent,attack(Dir)) :-
 	get_near(Agent,List),
 	list_agents(Agents),
@@ -47,7 +47,7 @@ monster_idea(Agent,move(Dir)) :-
 	get_percepts(Agent,List),
 	list_agents(Agents),
 	isa_any(NearAgt,Agents),
-	list_object_dir_visible(List,NearAgt,Dir).
+	list_object_dir_sensed(_,List,NearAgt,Dir).
 monster_idea(Agent,move(Dir)) :-
 	memory(Agent,directions([Dir|_])),
 	num_near(Num,Dir,here),
