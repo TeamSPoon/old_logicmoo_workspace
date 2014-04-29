@@ -17,9 +17,10 @@
 
 % Take something
 % Successfully picking something up
-moo:agent_call_command(Agent,take(Obj)) :-
+moo:agent_call_command(Agent,take(SObj)) :-
 	atloc(Agent,LOC),
 	atloc(Obj,LOC),
+        object_match(SObj,Obj),
 	props(Obj,weight(1)),
 	worth(Agent,take,Obj),
 	permanence_take(take,Agent,Obj),

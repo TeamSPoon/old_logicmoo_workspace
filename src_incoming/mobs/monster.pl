@@ -27,9 +27,8 @@ moo:world_agent_plan(_World,Agent,Act):-
 monster_idea(Agent,eat(Food)) :-
 	charge(Agent,Charge),
 	Charge < 100,
-	inventory(Agent, List),
-	isa_any(Food,[food,corpse]),
-	obj_memb(Food,List).
+        possess(Agent, Food),
+        isa_any(Food,[food,corpse]).
 monster_idea(Agent,take(Food)) :-
 	get_feet(Agent,What),
 	isa_any(Food,[food,corpse]),

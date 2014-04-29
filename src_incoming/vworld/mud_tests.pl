@@ -22,3 +22,6 @@ run_mud_test(Name,Test):-
 
 % TODO (not use call/1)
 run_mud_test_code(Test):-call(Test).
+
+
+

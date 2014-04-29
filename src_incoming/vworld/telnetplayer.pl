@@ -72,8 +72,8 @@ do_player_action(VA):- foc_current_player(Agent), call_player_action(Agent,VA),!
 call_player_action(Agent,CMD):-var(CMD),!,fmt('unknown_var_command(~q,~q).',[Agent,CMD]).
 call_player_action(_,end_of_file):-tick_tock.
 call_player_action(_,''):-tick_tock.
-call_player_action(Agent,CMD):-call_agent_action(Agent, CMD),!.
-% call_player_action(Agent,CMD):- trace, call_agent_action(Agent, CMD),!.
+call_player_action(Agent,CMD):- call_agent_command(Agent, CMD),!.
+% call_player_action(Agent,CMD):- trace, call_agent_command(Agent, CMD),!.
 call_player_action(Agent,CMD):-fmt('unknown_call_command(~q,~q).',[Agent,CMD]).
 
 

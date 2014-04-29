@@ -12,6 +12,8 @@
                    parse_agent_text_command/5,
                    specifier_text/2,
                    parseIsa//2,
+                   objects_match/3,
+                   object_match/2,
                    parseForTypes//2]).
 
 
@@ -40,6 +42,11 @@ type_parse(Type,StringM,Term,LeftOver):-
       fmt('Success! parse \'~q\' "~q" = ~q   (leftover=~q) . ~n',[Type,String,Term,LeftOver]);
       fmt('No Success.~n',[])).
 
+
+objects_match(SObj,Inv,List):-
+   findall(Obj, (member(Obj,Inv),object_match(SObj,Obj)), List).
+
+object_match(SObj,Obj):- isaOrSame(Obj,SObj).
 
 % ===========================================================
 % PARSER

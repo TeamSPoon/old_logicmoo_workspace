@@ -17,11 +17,14 @@
 moo:decl_action(drop(item)).
 
 % Drop something
-moo:agent_call_command(Agent,drop(Obj)) :-
+moo:agent_call_command(Agent,drop(SObj)) :-
+	possess(Agent,Obj),
+        object_match(SObj,Obj),
 	del(possess(Agent,Obj)),
 	atloc(Agent,LOC),
 	add(atloc(Obj,LOC)),
 	moo:update_charge(Agent,drop).
+
 %Nothing to drop
 moo:agent_call_command(Agent,drop(_)) :-
 	moo:update_charge(Agent,drop),

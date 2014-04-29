@@ -17,8 +17,9 @@
 
 :- include(logicmoo('vworld/vworld_header.pl')).
 
-
+ 
 load_game(File):-absolute_file_name(File,Path),see(Path),
+   world_clear(current),
    repeat,
    read_term(Term,[double_quotes(string)]),
    game_assert(Term),

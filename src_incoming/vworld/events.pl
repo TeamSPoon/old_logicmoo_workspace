@@ -21,7 +21,7 @@ call_agent_command(Agent,[VERB|ARGS]):-
       call_agent_action(NewAgent,CMD),!.
 
 % lists
-call_agent_command(A,Atom):-atom(Atom),atomSplit(Atom,List),call_agent_action(A,List).
+call_agent_command(A,Atom):-atom(Atom),atomSplit(Atom,List),call_agent_command(A,List).
 
 % prolog command
 call_agent_command(_Gent,Atom):- atom(Atom), catch(((once((read_term_from_atom(Atom,OneCmd,[variables(VARS)]),

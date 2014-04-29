@@ -117,6 +117,15 @@ getCompare(Op, Obj, Compare,PreCall,Condition,db_op(Op,PreCall),false):-
 */
 
 dbase:type(T):-moo:subclass(A,B),(T=B;T=A).
+dbase:type(item).
+
+
+moo:subclass(drinkable,item).
+moo:subclass(possessable,item).
+moo:subclass(useable,item).
+moo:subclass(eatable,item).
+moo:subclass(chargeable,item).
+moo:subclass(wearable,item).
 
 comparitiveOp((\=)).
 comparitiveOp((\==)).
@@ -193,6 +202,7 @@ db_forall(u,C):- trace,db_forall_quf(C,U,Template),U,Template,must(ground(Templa
 db_forall(ra,C):-db_forall_quf(C,U,Template), doall((U,retractall(Template))).
 db_forall(ra,C):-ignore(retractall(C)).
 db_forall(a,C):- functor(C,F,A),!, (is_db_prop(F,A,singleValued) -> must(db_forall_assert_sv(C,F,A)) ; must(db_forall_assert_mv(C,F,A))).
+db_forall(r,C):- ground(C),retractall(C).
 db_forall(Op,C):-!,trace,throw(unhandled(db_forall(Op,C))).
 
 % only place ever should actual gaem desbase be changed from
@@ -253,6 +263,7 @@ must_asserta(C):-
 
 argIsa_call(isa,1,argIsaFn(isa,1)):-!.
 argIsa_call(isa,2,type):-!.
+argIsa_call(act,2,verb):-!,trace.
 argIsa_call(classof,2,type):-!.
 argIsa_call(memory,2,term):-!.
 argIsa_call(Prop,N1,Type):-is_db_prop(Prop,A),functor(P,Prop,A),db_prop(P,_),arg(N1,P,Type).
@@ -429,7 +440,7 @@ db_prop_multi(determinerString(term,string)).
 db_prop_multi(descriptionHere(term,string)).
 db_prop_multi(description(term,string)).
 db_prop_multi(keyword(term,string)).
-db_prop_multi(act(object,verb,list(props))).
+db_prop_multi(act(type,verb,term)).
 db_prop_multi(memory(agent,term)).
 db_prop_multi(wearing(agent,wearable)).
 db_prop_multi(grid(region,int,int,object)).

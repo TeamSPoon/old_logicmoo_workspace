@@ -12,16 +12,15 @@
 
 :- register_module_type(command).
 
-moo:decl_action(drink(drinkable),"Drink a Drinkabel Item").
-
+moo:decl_action(drink(drinkable),"Drink a Drinkable Item").
 
 % Eat something held
 % Check to make sure it's in the agents possession... 
 % if it is, process it's worth, then destroy it
-moo:agent_call_command(Agent,drink(Obj)) :-
-	findall(Poss,possess(Agent,Poss),Inv),
-	member(Obj,Inv),
-	worth(Agent,eat,Obj),
+moo:agent_call_command(Agent,drink(SObj)) :-
+	possess(Agent,Obj),
+        object_match(SObj,Obj),
+	worth(Agent,drink,Obj),
 	del(possess(Agent,Obj)),
 	moo:update_charge(Agent,eat).
 

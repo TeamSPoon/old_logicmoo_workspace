@@ -59,7 +59,13 @@
          doorLocation/5,
          foc_current_player/1,
          locationToRegion/2,
-         init_location_grid/2
+         init_location_grid/2,
+         set_stats/2,
+         worth/3,
+         spread/0,
+         growth/0,
+         isaOrSame/2
+
  ]).
 
 
@@ -69,8 +75,11 @@
 
 :- include(logicmoo('vworld/events.pl')).
 :- include(logicmoo('vworld/room_grids.pl')).
+:- include(logicmoo('vworld/effects.pl')).
+:- include(logicmoo('vworld/spawning.pl')).
 
 :- register_module_type(utility).
+
 
 get_session_id(main):-thread_self(main),!.
 get_session_id(ID):-thread_self(ID),thlocal:current_agent(ID,_),!.
@@ -128,10 +137,10 @@ is_type0(monster).
 is_type0(dir).
 is_type0(agent).
 
-isaOrSame(A,B):-A=B,!.
+isaOrSame(A,B):-A==B,!.
 isaOrSame(A,B):-mud_isa(A,B).
 
-intersect(A,EF,B,LF,Tests,Results):-findall( A-B, ((member(A,EF),member(B,LF),once(Tests))), Results),ignore([A-B|_]==Results).
+intersect(A,EF,B,LF,Tests,Results):-findall( A-B, ((member(A,EF),member(B,LF),once(Tests))), Results),[A-B|_]=Results.
 % is_property(P,_A),PROP=..[P|ARGS],CALL=..[P,Obj|ARGS],req(CALL).
 obj_memb(E,L):-member(E,L).
 isa_any(E,L):-flatten([E],EE),flatten([L],LL),!,intersect(A,EE,B,LL,isaOrSame(A,B),_Results).

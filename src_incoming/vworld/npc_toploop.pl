@@ -11,7 +11,8 @@
 :- module(npc_toploop, [
           npc_tick/0,
           join_npcs_long_running/0,npc_tick_tock/0,npc_tick_tock_time/1,
-          npc_controller/2,          
+          npc_controller/2,   
+          get_world_agent_plan/3,
           tick_controller/2]).
 
 :- include(logicmoo('vworld/vworld_header.pl')).
@@ -40,6 +41,8 @@ tick(Who):-
    do_agent_call_plan_command(Who,Idea).
 
 
+
+
 get_world_agent_plan(W,Who,Idea):- agent(Who),moo:world_agent_plan(W,Who,Idea).
 
 do_agent_call_plan_command(A,C):-agent_doing(A,C),!.
@@ -48,12 +51,15 @@ do_agent_call_plan_command(A,C):-
    call_agent_command(A,C),agent_done(A,C)))).
 
 
-
+tick_test:-foc_current_player(Who),get_world_agent_plan(current,Who,_Idea).
 
 moo:decl_action(npc_timer(int),"sets how often to let NPCs run").
 moo:decl_action(tock,"Makes All NPCs do something brilliant").
 moo:decl_action(tick(agent),"Makes some agent do something brilliant").
 moo:decl_action(tick,"Makes *your* agent do something brilliant").
+moo:decl_action(prolog,"Call prolog toploop").
+
+moo:agent_call_command(_,prolog) :- prolog.
 
 moo:agent_call_command(_Agent,npc_timer(Time)):-retractall(npc_tick_tock_time(_)),asserta(npc_tick_tock_time(Time)).
 moo:agent_call_command(Agent,tick) :- tick(Agent).
