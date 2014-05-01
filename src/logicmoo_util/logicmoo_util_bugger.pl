@@ -251,6 +251,7 @@ hideRest:- functor_source_file(system,_P,F,A,_File),hideTraceMFA(system,F,A,-all
 hideRest.
 
 :- meta_predicate(hideTrace(:,+)).
+:- meta_predicate bugger:with_output_to_stream(*,0).
 
 functor_source_file(M,P,F,A,File):-functor_source_file0(M,P,F,A,File). % must(ground((M,F,A,File))),must(user:nonvar(P)).
 functor_source_file0(M,P,F,A,File):-current_predicate(F/A),functor(P,F,A),source_file(P,File),predicate_module(P,M).

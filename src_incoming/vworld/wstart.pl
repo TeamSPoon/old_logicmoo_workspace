@@ -11,6 +11,9 @@
 % This file is used as a configuation file and a startup script.
 */
 
+:- ensure_loaded(logicmoo('vworld/dbase.pl')).
+
+
 % standard header used in all files that all modules are loaded (therefore useful for when(?) the day comes that modules *can*only*see their explicitly imported modules)
 :- include(logicmoo('vworld/vworld_header.pl')).
 
@@ -21,7 +24,7 @@
 :- ensure_loaded(logicmoo('rooms/vacuum.map.pl')).
 
 % puts world into running state
-:- must(old_setup).
+% :- must(old_setup).
 
 % standard footer to clean up any header defined states
 :- include(logicmoo('vworld/vworld_footer.pl')).

@@ -27,7 +27,7 @@
          dcgReorder/4
 	 ]).
 
-
+ 
  :- meta_predicate logicmoo_util_dcg:dcgOnce(//,?,?).
  :- meta_predicate logicmoo_util_dcg:dcgOr(//,//,?,?).
  :- meta_predicate logicmoo_util_dcg:dcgOr(//,//,//,?,?).
@@ -48,13 +48,14 @@
  :- meta_predicate logicmoo_util_dcg:dcgNot(//,?,?).
  :- meta_predicate logicmoo_util_dcg:dcgStartsWith(//,?,?).
  :- meta_predicate logicmoo_util_dcg:dcgOneOrMore(//,?,*).
- :- meta_predicate logicmoo_util_dcg:do_dcgTest_startsWith(*,//,0).
- :- meta_predicate logicmoo_util_dcg:dcgAnd(//,//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgAnd(//,//,//,?,?).
- :- meta_predicate logicmoo_util_dcg:theCode(0,*,*).
  :- meta_predicate logicmoo_util_dcg:dcgOnceOr(//,//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgStartsWith1(//,*,*).
  :- meta_predicate logicmoo_util_dcg:dcgReorder(//,//,?,?).
+ :- meta_predicate logicmoo_util_dcg:dcgAnd(//,//,//,?,?).
+ :- meta_predicate logicmoo_util_dcg:dcgAnd(//,//,?,?).
+%   :- meta_predicate logicmoo_util_dcg:theCode(0,*,*).
+ :- meta_predicate logicmoo_util_dcg:dcgStartsWith1(//,*,*).
+
+
 
 :-dynamic 
    decl_dcgTest/2,

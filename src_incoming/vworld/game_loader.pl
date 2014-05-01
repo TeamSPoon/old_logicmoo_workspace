@@ -1,23 +1,26 @@
+/** <module> Game loading Utils
 %
 % Dec 13, 2035
 % Douglas Miles
-%
-/** <module> 
-% Game loading Utils
-% Comments below document the basic idea.
 %
 */
 
 :- module(game_loader, [
           finish_processing_game/0, 
           game_assert/1,
+          isa_assert/3,
+          gload/0,
           correctArgsIsa/2,
           pgs/1,
-          load_game/1]).
+          load_game/1
+          ]).
+
+:- meta_predicate game_loader:show_call(0).
 
 :- include(logicmoo('vworld/vworld_header.pl')).
 
- 
+dbadd0(C0):-db_op(a,C0).
+
 load_game(File):-absolute_file_name(File,Path),see(Path),
    world_clear(current),
    repeat,
@@ -39,11 +42,17 @@ finish_processing_game:- retract(in_finish_processing_game).
 finish_processing_game.
 
 
-savedb:-tell(savedb),listing(dbase:_),told.
+gload:- load_game(savedb),!.
+gload:- load_game(logicmoo('rooms/startrek.all.pl')).
+
+savedb:-
+   dbase_mod(DBM),
+   tell(savedb),listing(DBM:_),told.
 
 discoverAndCorrectArgsIsa(_Prop,_N1,[],[]):-!.
 discoverAndCorrectArgsIsa(Prop,N1,[A|Args],[AA|AArgs]):-
-   dbase:argIsa_call(Prop,N1,Type),
+   %dbase:
+   argIsa_call(Prop,N1,Type),
    must(isa_assert_g(A,Type,AA)),
    N2 is N1+1,
    discoverAndCorrectArgsIsa(Prop,N2,Args,AArgs).
@@ -90,9 +99,24 @@ isa_assert(Arg,Props,NewArg):- compound(Props),
 isa_assert(A,C,A):-must(ground(A)),dmsg(todo(define(isa_assert(A,C,'ConvertedArg')))),throw(retry(_)).
 
 isa_assert(A,Type,_NewArg):-throw(failure(isa_assert(A,Type))).
-  
-correctArgsIsa(A,AA):-functor(A,_,1),!,must(any_to_value(A,AA)),cmust(ground(AA)).
+
+
+
+holdsFunctor(k).
+holdsFunctor(p).
+holdsFunctor(holds).
+
+correctArgsIsa(A,AA):-
+   functor(A,_,1),!,
+   must(any_to_value(A,AA)),
+   cmust(ground(AA)).
+
 correctArgsIsa(M:A,M:AA):-!,correctArgsIsa(A,AA).
+
+correctArgsIsa(A,AA):-A =..[KP,Prop|Args],atom(Prop),holdsFunctor(KP),!,
+   discoverAndCorrectArgsIsa(Prop,1,Args,AArgs),
+   AA =..[Prop|AArgs].
+
 correctArgsIsa(A,AA):-A =..[Prop|Args],
    discoverAndCorrectArgsIsa(Prop,1,Args,AArgs),
    AA =..[Prop|AArgs].
@@ -101,7 +125,7 @@ game_assert((':-'(A))):-hotrace(A),!.
 game_assert(A):-must(once(correctArgsIsa(A,AA))),must(once(pgs(AA))),!.
 
 % pgs(A):- fail, A=..[SubType,Arg], moo:createableType(SubType,Type),!,AA =.. [Type,Arg],
-%      add(AA), assert_if_new(moo:call_after_load(create_instance(Arg,SubType,[debugInfo(moo:createableType(AA,SubType,Type))]))).   
+%      dbadd0(AA), assert_if_new(moo:call_after_load(create_instance(Arg,SubType,[debugInfo(moo:createableType(AA,SubType,Type))]))).   
 
 pgs(somethingIsa(A,List)):-forall_member(E,List,game_assert(classof(A,E))).
 pgs(somethingDescription(A,List)):-forall_member(E,List,game_assert(description(A,E))).
@@ -117,7 +141,7 @@ pgs(A):- A=..[SubType,_],member(SubType,[string,action,dir]),!.
 pgs(C):- C=..[SubType,Arg],isa_mc(FT,formattype),functor(FT,SubType,A),(A==0->true;functor(Arg,_,A)),!.
 
 pgs(A):- A=..[SubType,Arg], member(SubType,[agent,item, type, region]),!,
-      add(A),
+      dbadd0(A),
       assert_if_new(moo:call_after_load(create_instance(Arg,SubType,[]))).   
 
 pgs(A):- A=..[SubType,_],
@@ -128,10 +152,10 @@ pgs(A):- A=..[SubType,Arg],
       member(SubType,[wearable]),
       assert_if_new(moo:call_after_load(create_instance(Arg,item,[isa(A,SubType)]))).   
 
-pgs(A):- A=..[SubType,_],dmsg(todo(ensure_creatabe(SubType))),add(A),!.
+pgs(A):- A=..[SubType,_],dmsg(todo(ensure_creatabe(SubType))),dbadd0(A),!.
 
 pgs(W):-functor(W,F,A),functor(WW,F,A),db_prop_game_assert(WW),throw_safe(todo(pgs(W))).
-pgs(W):-add(W).
+pgs(W):-dbadd0(W).
 pgs(A):-fmt('skipping ~q.',[A]).
 
 /*
@@ -196,8 +220,8 @@ add_description(A,_S,_S0,1,_,[Word]):-add_description_word(A,Word).
 
 add_description(A,S,S0,Ws,Sents,['#$PunchingSomething',B|C]):-add_description(A,S,S0,Ws,Sents,[B|C]).
 add_description(A,S,S0,Ws,Sents,[Det,B|C]):-ddeterminer(Det,L),add_description(A,S,S0,Ws,Sents,[B|C]),game_assert(determinerString(A,L)).
-add_description(A,S,S0,Ws,_Sents,_Words):-Ws>3,is_here_String(S),!,show_call(add(descriptionHere(A,S0))).
-add_description(A,_S,S0,_Ws,_Sents,_Words):-show_call(add(description(A,S0))).
+add_description(A,S,S0,Ws,_Sents,_Words):-Ws>3,is_here_String(S),!,show_call(dbadd0(descriptionHere(A,S0))).
+add_description(A,_S,S0,_Ws,_Sents,_Words):-show_call(dbadd0(description(A,S0))).
 
 is_here_String(S):- atomic_list_concat_safe([_,is,_,here,_],S).
 is_here_String(S):- atomic_list_concat_safe([_,here],S).
@@ -225,9 +249,9 @@ add_description_kv(A,K,V):-atom_to_value(V,Term),C=..[K,A,Term],show_call(game_a
 
 % =======================================================
 
-show_call(add(A)):-
+show_call(dbadd0(A)):-
    correctArgsIsa(A,AA),
-   show_call0(add(AA)).
+   show_call0(dbadd0(AA)).
 show_call(game_assert(A)):-
    correctArgsIsa(A,AA),
    show_call0(game_assert(AA)).
@@ -237,4 +261,5 @@ show_call0(C):-debugOnError(C). %% dmsg(show_call(C)),C.
 % :- finish_processing_game.
 
 :- include(logicmoo('vworld/vworld_footer.pl')).
+
 

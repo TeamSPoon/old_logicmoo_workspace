@@ -48,16 +48,9 @@ prey_idea(Self,move(Dir)) :-
 	list_object_dir_sensed(_,List,nut,Dir).
 prey_idea(_Agent,_) :-
 	spawn.
-prey_idea(Self,move(Dir)) :-
-	memory(Self,directions([Dir|_])),
-	num_near(Num,Dir,here),
-	get_near(Self,List),
-	nth_member(Num,What,List),
-	What == [].
-prey_idea(Prey,sit) :-
-	del(memory(Prey,directions(Old))),
-	random_permutation(Old,New),
-	add(memory(Prey,directions(New))).
+
+prey_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[nut]).
+
 
 
 % spawn new prey

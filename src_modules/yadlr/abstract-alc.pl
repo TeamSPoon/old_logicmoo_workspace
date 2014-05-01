@@ -7,7 +7,7 @@
 
 :- assert_if_new( use_inference_engine(resolution) ).
 :- assert_if_new( use_algebra(alg_lukasiewicz) ).
-:- use_module('../pl/yadlr').
+%:- use_module('pl/yadlr').
 
 :- consult(domain).
 
@@ -65,5 +65,5 @@ test4 :-
 	set_proof_tree_log( yes ),
 	yadlr_retract( kb ),
 	preparation,
-	check_members( kb, good_competition, [0.3,0.3], [superleague91,serieA87], R1 ),
-	check_members( kb, good_competition, D,         I,                        R2 ).
+	check_members( kb, good_competition, [0.3,0.3], [superleague91,serieA87], _R1 ),
+	check_members( kb, good_competition, _D,         _I,                        _R2 ).

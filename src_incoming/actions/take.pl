@@ -34,15 +34,19 @@ moo:agent_call_command(Agent,take(_)) :-
 % or in the agent's possession.
 permanence_take(take,Agent,Obj) :-
 	atloc(Agent,LOC),
-	check_permanence(take,Agent,LOC,Obj).
+	check_permanence(take,Agent,LOC,Obj),!,
+        term_listing(Obj).
 
-check_permanence(take,_,LOC,Obj) :-
-           props(Obj,permanence(take,0)),
-	del(atloc(Obj,LOC)).
-check_permanence(take,Agent,LOC,Obj) :-
+check_permanence(take,_,_,Obj):-
+        props(Obj,permanence(take,0)),        
+        atloc(Obj,LOC),
+	clr(atloc(Obj,LOC)).
+check_permanence(take,Agent,_,Obj) :-
 	props(Obj,permanence(take,1)),
-	del(atloc(Obj,LOC)),
-	add(possess(Agent,Obj)).
+        atloc(Obj,LOC),
+	ignore(clr(atloc(Obj,LOC))),
+	add(possess(Agent,Obj)),
+        (req(possess(Agent,Obj)) -> true; throw(req(possess(Agent,Obj)))).
 check_permanence(take,_,_,_).
 
 % Record keeping

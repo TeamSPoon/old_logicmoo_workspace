@@ -132,7 +132,9 @@ calc_xyz(Region1,Dir,force(X1,Y1,Z1),X2,Y2,Z2):-
    X2 is X+ (OX*X1), Y2 is Y+OY*Y1, Z2 is Z+OZ*Z1.
 
 move_dir_target(RegionXYZ,Dir,XXYY):-
-   notrace(calc_xyz(RegionXYZ,Dir,force(1,1,1),X,Y,Z)),
+   move_dir_target(RegionXYZ,Dir,1,XXYY).
+move_dir_target(RegionXYZ,Dir,Force,XXYY):-
+   notrace(calc_xyz(RegionXYZ,Dir,force(Force,Force,Force),X,Y,Z)),
    notrace(locationToRegion(RegionXYZ,Region1)),
    notrace(round_loc_target(Region1,X,Y,Z,Region2,X2,Y2,Z2)),
    XXYY = xyz(Region2,X2,Y2,Z2),!,
@@ -179,6 +181,7 @@ dir_offset(sw,F,-F,-F,0).
 dir_offset(se,F,F,F,0).
 dir_offset(nw,F,-F,-F,0).
 dir_offset(here,_,0,0,0).
+
 
 
 % dir_mult(X,Y,Z,X1,Y1,Z1,X2,Y2,Z2):- X2 is X * X1,Y2 is Y * Y1,Z2 is Z * Z1.

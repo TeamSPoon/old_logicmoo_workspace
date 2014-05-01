@@ -40,8 +40,7 @@ run_tests :-
 
 :- register_module_type(utility).
 
-old_setup:-
-       
+old_setup:-      
 	must(growth),
 	must(list_agents(Agents)),
         fmt('Old Setup creating agents.. ~w',[Agents]),
@@ -70,7 +69,8 @@ run_vworld(_) :-
 % end condition 2
 run_vworld(_) :-
 	end_score(Scr),
-	dbase:score(_,AgentScr),
+	% db ase:score(_,AgentScr),
+        score(_,AgentScr),
 	AgentScr >= Scr,
 	del(end_score(_)),
 	!.

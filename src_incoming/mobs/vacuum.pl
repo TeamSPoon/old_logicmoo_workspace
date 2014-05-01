@@ -66,17 +66,8 @@ vacuum_idea(Agent,climb(Dir)) :-
 	nth_member(N,What,List),
 	(What == [low_box];
 	    What == [low_wall]).
-vacuum_idea(Agent,move(Dir)) :-
-	memory(Agent,directions([Dir|_])),
-	num_near(Num,Dir,here),
-	get_near(Agent,List),
-	nth_member(Num,What,List),
-	(What == [];
-	What == [outlet]).
-vacuum_idea(Agent,sit) :-
-	del(memory(Agent,directions(Old))),
-	random_permutation(Old,New),
-	add(memory(Agent,directions(New))).
+
+vacuum_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[outlet]).
 
 
 

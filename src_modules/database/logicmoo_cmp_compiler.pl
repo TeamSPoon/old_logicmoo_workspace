@@ -1598,6 +1598,7 @@ selectBestRuleMatrix(Sign,HeadSlots,Flags,KRVars,entails((Body),(EntailedHeadLit
 
 /*
 
+
 entails(and(disjoint(C, E), and(domain(A, B, C), domain(D, B, E))), disjointRelation(A, D)), 
 
 Prolog: disjointRelation(A, D):- domain(A, B, C), domain(D, B, E), disjoint(C, E).

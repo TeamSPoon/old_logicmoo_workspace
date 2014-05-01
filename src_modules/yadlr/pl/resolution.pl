@@ -25,6 +25,7 @@
 			yadlr_concept_name/2, yadlr_relation_name/2,
 			yadlr_instance_name/2,
 			yadlr_assert/3, yadlr_init/1,
+                        retractKB/1,
 			yadlr_retrieve_concept/2, yadlr_retrieve_instance/2,
 			set_debug_msgs/1, set_depth_limit/1,
 			set_proof_tree_log/1, unset_proof_tree_log/0] ).
@@ -43,14 +44,14 @@ use_debug_msgs( no ).
 
 set_debug_msgs( yes ) :-
 	retractall( use_debug_msgs(_) ),
-	assert( use_debug_msgs(yes) ).
+	assert_if_new( use_debug_msgs(yes) ).
 set_debug_msgs( no ) :-
 	retractall( use_debug_msgs(_) ),
-	assert( use_debug_msgs(no) ).
+	assert_if_new( use_debug_msgs(no) ).
 
 msg_debug( Msg ) :-
 	use_debug_msgs( yes ),
-	format( '~q~n', Msg ),
+	fmt( '~q~n', Msg ),
 	!.
 msg_debug( _ ) :-
 	use_debug_msgs( no ),
@@ -62,15 +63,15 @@ use_proof_tree_log( no ).
 set_proof_tree_log( no ) :-
 	!,
 	retractall( use_proof_tree_log(_) ),
-	assert( use_proof_tree_log(no) ).
+	assert_if_new( use_proof_tree_log(no) ).
 set_proof_tree_log( yes ) :-
 	!,
 	retractall( use_proof_tree_log(_) ),
-	assert( use_proof_tree_log(yes) ),
+	assert_if_new( use_proof_tree_log(yes) ),
 	open( 'resolution.log', write, _, [type(text),alias(yadlr_logfile)] ).
 set_proof_tree_log( File ) :-
 	retractall( use_proof_tree_log(_) ),
-	assert( use_proof_tree_log(yes) ),
+	assert_if_new( use_proof_tree_log(yes) ),
 	open( File, write, _, [type(text),alias(yadlr_logfile)] ).
 
 unset_proof_tree_log :-
@@ -81,7 +82,7 @@ msg_proof_tree( Depth, StepType, OpenList, RestrVars ) :-
 	use_proof_tree_log( yes ),
 	yadlr_format_clauses( OpenList, Clauses ),
 	fmt_range( RestrVars, Restr ),
-	format( yadlr_logfile,
+	fmt( yadlr_logfile,
 		'derivation(~d, ~q, ~q, ~q).~n',
 		[Depth, StepType, Restr, Clauses] ),
 	!.
@@ -95,10 +96,10 @@ use_depth_limit( no ).
 set_depth_limit( N ) :-
 	integer( N ),
 	retractall( use_depth_limit(_) ),
-	assert( use_depth_limit(N) ).
+	assert_if_new( use_depth_limit(N) ).
 set_depth_limit( no ) :-
 	retractall( use_depth_limit(_) ),
-	assert( use_depth_limit(no) ).
+	assert_if_new( use_depth_limit(no) ).
 	
 
 
@@ -166,9 +167,9 @@ yadlr_init( KB ) :-
 yadlr_assert_one( KB, Clause ) :-
 	yadlr_clause_neg( Clause, [] ),
 	!,
-	recorda( KB, Clause, _ ).
+	db_recorda( KB, Clause, _ ).
 yadlr_assert_one( KB, Clause ) :-
-	recordz( KB, Clause, _ ).
+	db_recordz( KB, Clause, _ ).
 
 yadlr_assert_many( _, [] ).
 yadlr_assert_many( KB, [Head|Rest] ) :-
@@ -177,50 +178,52 @@ yadlr_assert_many( KB, [Head|Rest] ) :-
 
 % TODO: check if it already exists, and fail
 yadlr_concept( KB, ConceptName ) :-
-	recordz( KB, yconcept(ConceptName), _ ).
+	db_recordz( KB, yconcept(ConceptName), _ ).
 
 yadlr_relation( KB, RelationName ) :-
-	recordz( KB, yrelation(RelationName), _ ).
+	db_recordz( KB, yrelation(RelationName), _ ).
 
 yadlr_instance( KB, InstanceName ) :-
-	recordz( KB, yinstance(InstanceName), _ ).
+	db_recordz( KB, yinstance(InstanceName), _ ).
 
 yadlr_concept_name( KB, ConceptName ) :-
-	recorded( KB, yconcept(ConceptName), _ ).
+	db_recorded( KB, yconcept(ConceptName), _ ).
 
 yadlr_relation_name( KB, RelationName ) :-
-	recorded( KB, yrelation(RelationName), _ ).
+	db_recorded( KB, yrelation(RelationName), _ ).
 
 yadlr_instance_name( KB, InstanceName ) :-
-	recorded( KB, yinstance(InstanceName), _ ).
+	db_recorded( KB, yinstance(InstanceName), _ ).
 
 yadlr_assert( KB, Formula, FuzzyDegree ) :-
 	clausify_abstract( Formula, FuzzyDegree, Clauses ),
 	yadlr_assert_many( KB, Clauses ).
 
+
+
 % SWI Prolog does not have eraseall/1
 retractKB( KB ) :-
-	current_prolog_flag(argv,[pl|_]),
-	recorded( KB, _, Ref ),
+	prolog_engine(swi),
+	db_recorded( KB, _, Ref ),
 	erase( Ref ),
 	fail.
 retractKB( _ ) :-
-	current_prolog_flag(argv,[pl|_]),
+	prolog_engine(swi),
 	!.
-retractKB( KB ) :-
-	eraseall( KB ).
+% SWI Prolog does not have eraseall/1
+% retractKB( KB ) :- eraseall( KB ).
 
 yadlr_retrieve_concept( KB, ConceptName ) :-
-	recorded( KB, yconcept(ConceptName), _ ).
+	db_recorded( KB, yconcept(ConceptName), _ ).
 
 yadlr_retrieve_relation( KB, RelationName ) :-
-	recorded( KB, yrelation(RelationName), _ ).
+	db_recorded( KB, yrelation(RelationName), _ ).
 
 yadlr_retrieve_instance( KB, InstanceName ) :-
-	recorded( KB, yinstance(InstanceName), _ ).
+	db_recorded( KB, yinstance(InstanceName), _ ).
 
 yadlr_retrieve_clause( KB, yclause(Pos,Neg,Deg) ) :-
-	recorded( KB, yclause(Pos,Neg,Deg), _ ).
+	db_recorded( KB, yclause(Pos,Neg,Deg), _ ).
 	
 
 %%
@@ -233,14 +236,15 @@ yadlr_retrieve_clause( KB, yclause(Pos,Neg,Deg) ) :-
 % SWI Prolog does not have remove_duplicates/2
 % also consider file_search_path(swi, _) as a test,
 % as the Prolog interpreter might have been renamed
-
-:- ( current_prolog_flag(argv,[pl|_]) ->
-     assert( remove_duplicates([], []) ),
-     assert( (remove_duplicates([Elem|L], [Elem|NL]) :-
+/*
+:- ( prolog_engine(swi) ->
+     assert_if_new( remove_duplicates([], []) ),
+     assert_if_new( (remove_duplicates([Elem|L], [Elem|NL]) :-
 	     delete(L, Elem, Temp), remove_duplicates(Temp, NL)) )
    ;
      true
    ).
+*/
 
 complement_member( L1, [L2|_]) :-
 	yadlr_lit_complement( L1, L2 ).
@@ -358,7 +362,7 @@ resolve( Clause1, Clause2, Res, RestrVarsIn, RestrVarsOut ) :-
 	!,
 	% look for the complement-intersection of Clause1
 	% and Clause2.
-	compatible( Clause1, Clause2, Inters, Residue ),
+	compatible( Clause1, Clause2, _Inters, Residue ),
 	% check degrees
 	yadlr_clause_degree( Clause1, Deg1 ),
 	yadlr_clause_degree( Clause2, Deg2 ),
@@ -446,7 +450,7 @@ has_vars( [H|R] ) :- var( H ) ; has_vars( R ).
 lr_pass( _, Depth, _, Open, Open, RestrVars, RestrVars ) :-
 	check_clause_degree( RestrVars, 0.0 ),
 	NewDepth is Depth + 1,
-	msg_proof_tree( NewDepth, f, Open, RestrVarsIn ).
+	msg_proof_tree( NewDepth, f, Open, _RestrVarsIn ).
 % nothing left to prove, success
 lr_pass( _, Depth, [], Open, Open, RestrVars, RestrVars ) :-
 	NewDepth is Depth + 1,

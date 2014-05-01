@@ -9,8 +9,7 @@
 */
 
 :- module(parsem, [
-                   parse_agent_text_command/5,
-                   specifier_text/2,
+                   parse_agent_text_command/5,                   
                    parseIsa//2,
                    objects_match/3,
                    object_match/2,
@@ -35,7 +34,7 @@ type_parse(Type,StringM):- type_parse(Type,StringM, _Term).
 type_parse(Type,StringM, Term):-type_parse(Type,StringM, Term, []).
 
 type_parse(Type,StringM,Term,LeftOver):-
-   to_word_list(StringM,String),
+   to_word_list(StringM,String),  
    HOW = phrase(parseIsa(Type,Term),String,LeftOver),
    fmt('parsing with ~q ~n.',[HOW]),
    (debugOnError(HOW)->
@@ -78,7 +77,7 @@ parse_verb_pharse(Agent,SVERB,ARGS,GOALANDLEFTOVERS):-
    dmsg(parserm("TEMPLATES"=TEMPLATES)),
    TEMPLATES \= [],
    findall(LeftOver-GOAL,
-     ((
+     (( 
       member([VERB|TYPEARGS],TEMPLATES),
       phrase_parseForTypes(TYPEARGS,GOODARGS,ARGS,LeftOver),
       GOAL=..[VERB|GOODARGS])),
@@ -108,14 +107,17 @@ bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
 
 :-style_check(+singleton).
 
-specifier_text(Dir,dir):-member(Dir,[n,s,e,w,ne,nw,se,sw,u,d]).
+moo:specifier_text(Dir,dir):-member(Dir,[n,s,e,w,ne,nw,se,sw,u,d]).
+
+
+moo:specifier_text(Text,Subclass):-moo:subclass(Subclass,spatialthing),isa(X,Subclass),req(keyword(X,Text)).
 
 phrase_parseForTypes(TYPEARGS,GOODARGS,ARGS,LeftOver):-
    to_word_list(ARGS,ARGSL),!,
     phrase_parseForTypes_l(TYPEARGS,GOODARGS,ARGSL,LeftOver).
 
 phrase_parseForTypes_l(TYPEARGS,GOODARGS,ARGSL,LeftOver):-
-    debugOnError(phrase(parseForTypes(TYPEARGS,GOODARGS),ARGSL,LeftOver)).
+    debugOnError(phrase(parseForTypes(TYPEARGS,GOODARGS),ARGSL,LeftOver)).    
 
 
 parseForTypes([], [], A, A).
@@ -129,6 +131,10 @@ parseIsa(A, B, C) :-
 
 % parseIsa(not(T),Term) --> dcgAnd(dcgNot(parseIsa(T)),theText(Term)).
 
+parseIsa(optional(_Type,Who), Who, D, D).
+parseIsa(optional(Type,_Who), Term, C, D) :- parseIsa(Type, Term, C, D).
+
+
 parseIsa(not(Type), Term, C, D) :-  dcgAnd(dcgNot(parseIsa(Type)), theText(Term), C, D).
 
 parseIsa(FT, B, C, D) :- trans_decl_subft(FT,Sub), parseFmt(Sub, B, C, D),!.
@@ -140,6 +146,9 @@ trans_decl_subft(FT,Sub):-moo:decl_subft(FT,A),moo:decl_subft(A,Sub).
 trans_decl_subft(FT,Sub):-moo:decl_subft(FT,A),moo:decl_subft(A,B),moo:decl_subft(B,Sub).
 
 
+equals_icase(A,B):-string_upper(A,U),string_upper(B,U).
+
+parseFmt(Type,Dir)--> {moo:specifier_text(Dir,Type)}, dcgReorder(theString(String),{equals_icase(Dir,String)}).
 
 parseFmt(number,Term)--> dcgReorder(theText([String]),{any_to_number(String,Term)}).
 parseFmt(string,Term)--> dcgReorder(theText([String]),{atom_string(Term,String)}).

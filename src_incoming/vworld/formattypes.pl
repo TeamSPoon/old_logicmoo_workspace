@@ -15,6 +15,8 @@
           atom_to_value/2,
           any_to_dir/2]).
 
+:- include(logicmoo('vworld/vworld_header.pl')).
+
 term_is_ft(Term,Type):-
    moo:decl_ft(Type,How),
    format_complies(Term,How,NewTerm),
@@ -118,4 +120,4 @@ p2c_dir2('n','North-Directly').
 
 
 
-
+:- include(logicmoo('vworld/vworld_footer.pl')).

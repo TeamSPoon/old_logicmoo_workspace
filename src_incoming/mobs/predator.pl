@@ -46,16 +46,9 @@ predator_idea(Agent,attack(Dir)) :-
 predator_idea(Agent,move(Dir)) :-
 	get_percepts(Agent,List),
 	list_object_dir_sensed(_,List,prey(_),Dir).
-predator_idea(Agent,move(Dir)) :-
-	memory(Agent,directions([Dir|_])),
-	num_near(Num,Dir,here),
-	get_near(Agent,List),
-	nth_member(Num,What,List),
-	(What == [];
-	    What == [nut]).
-predator_idea(Agent,sit) :-
-	del(memory(Agent,directions(Old))),
-	random_permutation(Old,New),
-	add(memory(Agent,directions(New))).
+
+predator_idea(Agent,Act) :- 
+      move_or_sit_memory_idea(Agent,Act,[nut]).
+
 
 :- include(logicmoo('vworld/vworld_footer.pl')).

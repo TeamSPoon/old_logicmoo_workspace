@@ -35,7 +35,7 @@
 % SWI Prolog modules do not export operators by default
 % so they must be explicitly placed in the user namespace
 
-:- ( current_prolog_flag(argv,[pl|_]) ->
+:- ( prolog_engine(swi) ->
      op( 400, fy, user:(box) ),	% Necessity, Always
      op( 400, fy, user:(dia) ),	% Possibly, Eventually
      op( 400, fy, user:(cir) )	% Next time
@@ -294,14 +294,14 @@ skolem_not( F, X, FreeV, FmlSk) :-
 %%% generate new atomic symbols
 
 genatom( A ) :-
-	recorded( nfsdl, Inc, Ref ),
+	db_recorded( nfsdl, Inc, Ref ),
 	!,
 	erase( Ref ),
 	NewInc is Inc + 1,
-	recordz( nfsdl, NewInc, _ ),
+	db_recordz( nfsdl, NewInc, _ ),
 	atom_concat( f, NewInc, A ).
 genatom( f1 ) :-
-	recordz( nfsdl, 1, _ ).
+	db_recordz( nfsdl, 1, _ ).
 
 
 %%% Substitution

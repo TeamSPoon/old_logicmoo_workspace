@@ -1,12 +1,6 @@
-% say.pl
-% May 18, 1996
-% John Eikenberry
-%
+/** <module>  This file defines the predicates for the agent to socialize
 % Dec 13, 2035
 % Douglas Miles
-%
-/** <module> 
-% This file defines the predicates for the agent to say
 %
 */
 
@@ -16,16 +10,9 @@
 
 :- register_module_type(command).
 
-moo:agent_text_command(Agent,[Dir],Agent,move(Dir)):-
-        specifier_text(Dir,dir),!.
-
 moo:decl_action(Say,text("invokes",Does)):-socialCommand(Say,_SocialVerb,Does).
 
-agentOrRegionOrGossup(A):-region(A).
-agentOrRegionOrGossup(A):-agent(A).
-agentOrRegionOrGossup(gossup).
-
-socialCommand(Say,SocialVerb,chat(SocialVerb,agentOrRegionOrGossup,string)):-socialVerb(SocialVerb), Say =.. [SocialVerb,agentOrRegion,string].
+socialCommand(Say,SocialVerb,chat(optional(verb,SocialVerb),optional(channel,here),string)):-socialVerb(SocialVerb), Say =.. [SocialVerb,optional(channel,here),string].
 socialVerb(SocialVerb):-member(SocialVerb,[say,whisper,emote,tell,ask,shout,gossup]).
 
 moo:agent_text_command(Agent,[Say|What],Agent,CMD):-

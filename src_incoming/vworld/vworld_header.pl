@@ -7,6 +7,9 @@
 :- set_prolog_flag(double_quotes, atom).
 :- set_prolog_flag(double_quotes, string). 
 
+% these do not get defined!?
+% :-dynamic user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
+
 %  very very first import
 :- ensure_loaded(logicmoo('vworld/moo.pl')).
 
@@ -30,8 +33,9 @@
 :- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_dcg.pl')).
 
 % make sure these get in early
+% :- ensure_loaded(logicmoo('vworld/dbase.pl')).
 :- ensure_loaded(logicmoo('vworld/formattypes.pl')).
-:- ensure_loaded(logicmoo('vworld/dbase.pl')).
+:- ensure_loaded(logicmoo('vworld/game_loader.pl')).
 :- ensure_loaded(logicmoo('vworld/kernel.pl')).
 
 % logicmoo vworld mud server
@@ -42,7 +46,6 @@
 :-ensure_loaded(logicmoo('vworld/parsem.pl')).
 :-ensure_loaded(logicmoo('vworld/telnet_server.pl')).
 :-ensure_loaded(logicmoo('vworld/npc_toploop.pl')).
-:-ensure_loaded(logicmoo('vworld/game_loader.pl')).
 :-ensure_loaded(logicmoo('vworld/mud_tests.pl')).
 
 % NPC planners

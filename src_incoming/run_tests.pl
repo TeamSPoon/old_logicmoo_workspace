@@ -141,6 +141,7 @@ gload:- load_game(logicmoo('rooms/startrek.all.pl')).
 
 % do some sanity testing
 
+
 moo:decl_mud_test(movedist,
  (
    dmsg("teleport to main enginering"),
@@ -157,11 +158,19 @@ moo:decl_mud_test(movedist,
    dmsg("must be now be back in engineering"),
    req(atloc(self,'Area1000')))).
 
+moo:decl_mud_test(drop_take,
+ (
+  do_player_action('drop food'),
+  do_player_action('take food')
+)).
 
-:- run_mud_tests.
+%:- run_mud_tests.
 
-:- at_start(run).
+:- at_start((debug,run_mud_tests)).
+
+:- at_start((debug,run)).
 
 % so scripted versions don't just exit
+
 % :- prolog.
 

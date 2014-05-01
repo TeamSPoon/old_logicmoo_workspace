@@ -47,16 +47,8 @@ monster_idea(Agent,move(Dir)) :-
 	list_agents(Agents),
 	isa_any(NearAgt,Agents),
 	list_object_dir_sensed(_,List,NearAgt,Dir).
-monster_idea(Agent,move(Dir)) :-
-	memory(Agent,directions([Dir|_])),
-	num_near(Num,Dir,here),
-	get_near(Agent,List),
-	nth_member(Num,What,List),
-	What == [].
-monster_idea(Agent,sit) :-
-	del(memory(Agent,directions(Old))),
-	random_permutation(Old,New),
-	add(memory(Agent,directions(New))).
+
+monster_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[corpse]).
 
 moo:type_default_props(Instance,monster, [description(Instance,SFmt),wearing(tough_hide),possess(tough_hide)]):-sformat(SFmt,"Very screy looking monster named ~w",[Instance]).
 

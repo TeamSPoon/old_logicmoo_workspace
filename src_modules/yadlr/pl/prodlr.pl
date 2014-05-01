@@ -27,7 +27,7 @@
                    relation_path/3, relation_path/1, concept_name/1, concept_name_or_not/1, num/1,
                    legitimate_literal/1, thread_itemfunctor/1]).
 
-:- assert(user:use_algebra(alg_lukasiewicz)).
+:- assert_if_new(user:use_algebra(alg_lukasiewicz)).
 
 :- use_module( fuzzyutils ).
 
@@ -39,9 +39,9 @@
 %prolog_engine(swi) :- current_prolog_flag(argv, [pl|_]).
 %prolog_engine(yap) :- predicate_property(yap_flag(_,_), built_in).
 
-init_engine(swi) :-
-	assert((remove_duplicates([], []))),
-	assert((remove_duplicates([H|X], [H|Y]) :- delete(X, H, Z), remove_duplicates(Z,Y))).
+init_engine(swi) :-!.
+%	assert_if_new((remove_duplicates([], []))),
+%	assert_if_new((remove_duplicates([H|X], [H|Y]) :- delete(X, H, Z), remove_duplicates(Z,Y))).
 
 init_engine(yap) :-
 	use_module( library(dialect/swi) ).
@@ -56,18 +56,18 @@ concept_name(thing).
 
 %declare_instance(Instance) :-
 %	atom(Instance),
-%	assert(instance(Instance)).
+%	assert_if_new(instance(Instance)).
 
 declare_concept(Concept, Super) :-
 	atom(Concept),
 	atom(Super),
-	assert(concept_name(Concept)),
-	assert(concept_sub(Concept,Super)),
-	assert((concept_sub(Super, I, Deg) :- concept(Concept, I, Deg))).
+	assert_if_new(concept_name(Concept)),
+	assert_if_new(concept_sub(Concept,Super)),
+	assert_if_new((concept_sub(Super, I, Deg) :- concept(Concept, I, Deg))).
 
 declare_concept(Concept) :- declare_concept(Concept, thing).
 
-% record an assertion Concept(Instance) >= Deg
+% db_record an assertion Concept(Instance) >= Deg
 % if there is already an assertion about Instance, we keep the one with the greater degree.
 % i don't think that's necessary.
 assert_instance(Concept, Instance, Deg) :-
@@ -171,8 +171,8 @@ declare_relation(Relation, Domain, Range) :- declare_relation(Relation, uni, Dom
 declare_relation(Relation, Super, Domain, Range) :-
 	atom(Relation), atom(Super),
 	atom(Domain), atom(Range),
-	assert(relation_name(Relation, Domain, Range)),
-	assert((relation_sub(Super, X, Y, Deg) :- relation(Relation, X, Y, Deg))).
+	assert_if_new(relation_name(Relation, Domain, Range)),
+	assert_if_new((relation_sub(Super, X, Y, Deg) :- relation(Relation, X, Y, Deg))).
 
 
 assert_role(Relation, Inst1, Inst2, Deg) :-
@@ -569,23 +569,23 @@ yadlr_init( KB ) :-
 % TODO: check if it already exists, and fail
 yadlr_concept( KB, ConceptName ) :-
 	declare_concept(ConceptName),
-	recordz( KB, yconcept(ConceptName), _ ).
+	db_recordz( KB, yconcept(ConceptName), _ ).
 
 yadlr_relation( KB, RelationName ) :-
 	declare_relation(RelationName, thing, thing),
-	recordz( KB, yrelation(RelationName), _ ).
+	db_recordz( KB, yrelation(RelationName), _ ).
 
 yadlr_instance( KB, InstanceName ) :-
-	recordz( KB, yinstance(InstanceName), _ ).
+	db_recordz( KB, yinstance(InstanceName), _ ).
 
 yadlr_concept_name( KB, ConceptName ) :-
-	recorded( KB, yconcept(ConceptName), _ ).
+	db_recorded( KB, yconcept(ConceptName), _ ).
 
 yadlr_relation_name( KB, RelationName ) :-
-	recorded( KB, yrelation(RelationName), _ ).
+	db_recorded( KB, yrelation(RelationName), _ ).
 
 yadlr_instance_name( KB, InstanceName ) :-
-	recorded( KB, yinstance(InstanceName), _ ).
+	db_recorded( KB, yinstance(InstanceName), _ ).
 
 yadlr_assert( KB, Formula, FuzzyDegree ) :-
 	clausify_abstract( Formula, FuzzyDegree, Clauses ),
@@ -596,9 +596,9 @@ yadlr_assert( KB, Formula, FuzzyDegree ) :-
 yadlr_assert_one( KB, Clause ) :-
 	yadlr_clause_body( Clause, [] ),
 	!,
-	recorda( KB, Clause, _ ).
+	db_recorda( KB, Clause, _ ).
 yadlr_assert_one( KB, Clause ) :-
-	recordz( KB, Clause, _ ).
+	db_recordz( KB, Clause, _ ).
 */
 
 yadlr_assert_one(KB, dla(concept, Assertion, Degree)) :-
@@ -618,7 +618,7 @@ yadlr_assert_one(KB, dla(relation, Assertion, Degree)) :-
 
 yadlr_assert_one(_, DLClause) :-
 	mkplclause(DLClause, Clause),
-	assert(Clause),
+	assert_if_new(Clause),
 	!.
 
 yadlr_assert_many( _, []).
@@ -627,24 +627,24 @@ yadlr_assert_many( KB, [Head|Rest] ) :-
 	yadlr_assert_many(KB, Rest).
 
 retractKB( KB ) :-
-	current_prolog_flag(argv,[pl|_]),
-	recorded( KB, _, Ref ),
+	prolog_engine(swi),
+	db_recorded( KB, _, Ref ),
 	erase( Ref ),
 	fail.
 retractKB( _ ) :-
-	current_prolog_flag(argv,[pl|_]),
+	prolog_engine(swi),
 	!.
-retractKB( KB ) :-
-	eraseall( KB ).
+%retractKB( KB ) :-
+%	eraseall( KB ).
 
 yadlr_retrieve_concept( KB, ConceptName ) :-
-	recorded( KB, yconcept(ConceptName), _ ).
+	db_recorded( KB, yconcept(ConceptName), _ ).
 
 yadlr_retrieve_relation( KB, RelationName ) :-
-	recorded( KB, yrelation(RelationName), _ ).
+	db_recorded( KB, yrelation(RelationName), _ ).
 
 yadlr_retrieve_instance( KB, InstanceName ) :-
-	recorded( KB, yinstance(InstanceName), _ ).
+	db_recorded( KB, yinstance(InstanceName), _ ).
 
 % try to transform some not so arbitrary formula into acceptable horn clauses.
 

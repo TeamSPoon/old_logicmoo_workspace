@@ -7,7 +7,7 @@
 
 :- assert_if_new( use_inference_engine(resolution) ).
 :- assert_if_new( use_algebra(alg_lukasiewicz) ).
-:- use_module('../pl/yadlr').
+%:- use_module('pl/yadlr').
 
 
 :- consult(domain).
@@ -40,9 +40,9 @@ test2 :-
 	set_proof_tree_log( 'test2.log' ),
 	preparation,
 	yadlr_assert( kb, ( good(superleague91) ), _X ),
-	check_membership( kb, panathinaikos, good_team, _Degree, Restr1 ),
+	check_membership( kb, panathinaikos, good_team, Degree, Restr1 ),
 	fmt( 'Restrictions: = ~q~n', [Restr1] ),
-	check_membership( kb, napoli, good_team, _Degree, Restr2 ),
+	check_membership( kb, napoli, good_team, Degree, Restr2 ),
 	fmt( 'Restrictions: = ~q~n', [Restr2] ),
 	unset_proof_tree_log.
 

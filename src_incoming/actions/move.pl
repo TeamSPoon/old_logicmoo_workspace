@@ -15,24 +15,41 @@
 :- include(logicmoo('vworld/vworld_header.pl')).
 
 :- register_module_type(command).
-   
+
+moo:agent_text_command(Agent,[Dir],Agent,move(Dir)):- moo:specifier_text(Dir,dir).
+moo:agent_text_command(Agent,[DirS],Agent,move(DirS)):- atom(DirS),moo:specifier_text(Dir,dir),atom(Dir),atom_concat(Dir,N,DirS),atom_number(N,_).
 
 moo:agent_call_command(Agnt,Cmd):- functor(Cmd,move,_),!,
    must(move_command(Agnt,Cmd)).
 
 moo:decl_action(move(dir)).
 
+% dir###
+move_command(Agent,move(DirS)) :-atom(DirS),
+	    atom_concat(Dir,N,DirS),atom_number(N,Dist),
+            move_command(Agent,Dir,Dist).
+% dir
+move_command(Agent,move(Dir)) :-
+	    movedist(Agent,Dist),
+            move_command(Agent,Dir,Dist).
+ 
+
 % Move thy agent
+move_command(Agent,Dir,Dist) :- 
+   catch(doall((between(1,Dist,_),move_command_1(Agent,Dir))),giveup(_),true).
+
+
 
 % cant get anywhere since the map fails it
-move_command(Agent,move(Dir)) :-
-	    atloc(Agent,LOC),
+move_command_1(Agent,Dir) :-
+	atloc(Agent,LOC),
         not(move_dir_target(LOC,Dir,_)),!,
-		add(failure(Agent,move)).
+		add(failure(Agent,move)),
+      throw(giveup(nopath(Agent,move))).
 
 % Run into something big, Ouch...
 % damage and charge... plus it doesn't get anywhere
-move_command(Agent,move(Dir)) :-
+move_command_1(Agent,Dir) :-
 	atloc(Agent,LOC),
         move_dir_target(LOC,Dir,XXYY),
         is_3d(XXYY),
@@ -44,20 +61,26 @@ move_command(Agent,move(Dir)) :-
          ObjHt2 > 1,
 	!,
 	moo:update_stats(Agent,collide),
-	moo:update_charge(Agent,move).
+	moo:update_charge(Agent,move),
+        raise_location_event(XXYY,collide(Agent,Obj2)),
+   throw(giveup(collide(Agent,Obj2))).
+
 
 % Another Agent is in the way
-move_command(Agent,move(Dir)) :- 
+move_command_1(Agent,Dir):- 
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	is_3d(XXYY),
         atloc(Agent2,XXYY),
 	mud_isa(Agent2,agent),
 	moo:update_stats(Agent,collide),
-	moo:update_charge(Agent,move).
+	moo:update_charge(Agent,move),
+        raise_location_event(XXYY,collide(Agent,Agent2)),
+   throw(giveup(collide(Agent,Agent2))).
+
 
 %Move successfully
-move_command(Agent,move(Dir)) :-
+move_command_1(Agent,Dir) :-
 	in_world_move(_,Agent,Dir),
 	moo:update_charge(Agent,move).
 

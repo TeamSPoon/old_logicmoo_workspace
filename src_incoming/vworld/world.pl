@@ -227,7 +227,9 @@ create_instance(What,FormatType,List):- FormatType\==type,
 
 create_instance(SubType,type,List):-!,
    add(isa(SubType,type)),
-   assert_if_new(dbase:type(SubType)),
+   dbase_mod(M),
+   A = M:type(SubType),
+   assert_if_new(A),
    padd(SubType,List).
 
 moo:decl_createableType(agent).

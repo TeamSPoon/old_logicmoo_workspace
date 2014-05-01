@@ -34,6 +34,9 @@ create_queryPred(H,B):-functor(H,HF,HA),functor(B,BF,BA),
 :- multifile moo:decl_update_charge/2.
 :- multifile moo:decl_update_stats/2.
 
+:- dynamic moo:specifier_text/2.
+:- multifile moo:specifier_text/2.
+
 :-dynamic(moo:call_after_load/1).
 :-multifile(moo:call_after_load/1).
 

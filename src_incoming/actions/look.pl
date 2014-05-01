@@ -207,15 +207,27 @@ success(Agent,no) :-
 success(_,yes).
 
 
-moo:decl_action(look).
-moo:decl_action(look(dir)).
-moo:decl_action(look(item)).
+moo:decl_action(look, "generalized look in region").
+moo:decl_action(look(dir), "Look in a direction").
+moo:decl_action(look(item), "Look at a speficific item").
 
+moo:agent_call_command(Agent,look(Dir)):-
+   view_dirs(Agent,[[Dir,here],[Dir,Dir],[Dir,Dir,adjacent]],Percepts),
+   forall_member(P,Percepts,call_agent_action(Agent,examine(P))).
+
+moo:agent_call_command(Agent,look(SObj)):-
+   objects_match(Agent,SObj,Percepts),
+   forall_member(P,Percepts,call_agent_action(Agent,examine(P))).
 
 moo:agent_call_command(Agent,look):- 
    get_session_id(O),
    with_assertions(thlocal:current_agent(O,Agent),
            telnet_look(Agent)).
+
+
+
+moo:decl_action(examine(item), "view details of item (see also @list)").
+moo:agent_call_command(_Gent,examine(SObj)):- term_listing(SObj).
 
 
 :- include(logicmoo('vworld/vworld_footer.pl')).

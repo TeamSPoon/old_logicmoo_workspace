@@ -67,9 +67,16 @@
 		</Folder>
 	</CustomFolders>
 	<Files AutoFolders="PackageView">
-		<Folder Name="src_modules/logicserver">
+		<Folder Name="src_modules/pdl-tableau">
 			<F
-				N="src_modules/logicserver/*.*"
+				N="src_modules/pdl-tableau/*.*"
+				Recurse="1"
+				Refilter="0"
+				Excludes=""/>
+		</Folder>
+		<Folder Name="src_modules/yadlr">
+			<F
+				N="src_modules/yadlr/*.*"
 				Recurse="1"
 				Refilter="0"
 				Excludes=""/>

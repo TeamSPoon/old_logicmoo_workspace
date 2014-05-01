@@ -80,6 +80,7 @@ explorer_idea(Agent,attack(Dir)) :-
 	list_object_dir_near(List,monster(_),Dir).
 
 explorer_idea(Agent,sit) :-
+        req(memory(Agent,directions(Old))),
 	del(memory(Agent,directions(Old))),
 	random_permutation(Old,New),
 	add(memory(Agent,directions(New))).
