@@ -1,15 +1,19 @@
-% ===================================================================
-% File 'effects.pl'
-% Purpose: An Implementation a MUD server in SWI-Prolog
+/** <module> 
+% This file gives a common place where world effects 
+% (such as carrying  shield or being drunk) are implemented
+%
+% Project Logicmoo: A MUD server written in Prolog
 % Maintainer: Douglas Miles
-% Contact: $Author: dmiles $@users.sourceforge.net ;
-% Version: 'run.pl' 1.0.0
-% Revision:  $Revision: 1.7 $
-% Revised At:   $Date: 2002/07/11 21:57:28 $
-% ===================================================================
+% Dec 13, 2035
 %
-% This file gives a common place where world effectsd take place
-%
+*/
+
+/*
+% This file is "included" from world.pl 
+*/
+
+
+
 
 % Used by eat.pl and take.pl
 % Is the object worth anything (either scored points or charge)

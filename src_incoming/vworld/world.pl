@@ -1,21 +1,18 @@
-% vworld.01
+/** <module> 
+% Common place to reduce redundancy World utility prediates
+%
+% Project Logicmoo: A MUD server written in Prolog
+% Maintainer: Douglas Miles
+% Dec 13, 2035
+%
+% Special thanks to code written on
 % May 18, 1996
 % written by John Eikenberry
 % interface by Martin Ronsdorf
 % general assistance Dr. Donald Nute
 %
-% Any questions about this mail to jae@ai.uga.edu
-% Dec 13, 2035
-% Douglas Miles
-%
-/** <module>
-% Common place to reduce redundancy World utility prediates
-% **************IMPORTANT**************
-% To customize your world, you need to modify wstart.pl
-%
-% *.objects.pl / *.map.pl is defined in wstart.pl for ease of setting up and testing.
-% ****************************************
 */
+
 :- module(world,
 	[
         call_agent_command/2,
@@ -71,57 +68,16 @@
 
 :- dynamic  agent_list/1.
 
-:- include(logicmoo('vworld/vworld_header.pl')).
-
-:- include(logicmoo('vworld/events.pl')).
-:- include(logicmoo('vworld/room_grids.pl')).
-:- include(logicmoo('vworld/effects.pl')).
-:- include(logicmoo('vworld/spawning.pl')).
-
+:- include(logicmoo('vworld/moo_header.pl')).
 :- register_module_type(utility).
 
-
-get_session_id(main):-thread_self(main),!.
-get_session_id(ID):-thread_self(ID),thlocal:current_agent(ID,_),!.
-get_session_id(O):-current_input(O),!.
-
-foc_current_player(P):- get_session_id(O),thlocal:current_agent(O,P),!.
-foc_current_player(P):- get_session_id(O),generate_new_player(P), !, asserta(thlocal:current_agent(O,P)).
-
-generate_new_player(P) :-
-  gensym(player,N),
-   P=explorer(N),
-   must(create_agent(P)).
+:- include(logicmoo('vworld/world_2d.pl')).
+:- include(logicmoo('vworld/world_agent.pl')).
+:- include(logicmoo('vworld/world_effects.pl')).
+:- include(logicmoo('vworld/world_events.pl')).
+:- include(logicmoo('vworld/world_spawning.pl')).
 
 
-% Lists all the agents in the run. Except for other monsters.
-list_agents(Agents) :- agent_list(Agents), !.
-list_agents(Agents) :- % build cache
-	findall(NearAgent,req(agent(NearAgent)),Agents),
-	assert(agent_list(Agents)),!.
-
-% When an agent dies, it turns into a corpse.
-% corpse is defined as an object in the *.objects.pl files
-agent_into_corpse(Agent) :-
-	del(atloc(Agent,LOC)),
-	clr(str(Agent,_)),
-	clr(height(Agent,_)),
-	clr(stm(Agent,_)),
-	clr(spd(Agent,_)),
-	add(atloc(corpse(Agent),LOC)).
-
-% Displays all the agents stats. Used at end of a run.
-display_stats(Agents) :-
-	forall(member(Agent,Agents),
-	          (charge(Agent,Chg),
-		  damage(Agent,Dam),
-		  score(Agent,Scr),
-		  findall(Obj,possess(Agent,Obj),Inv),
-		  write('Agent = '), write(Agent), nl,
-		  write('Charge = '), write(Chg), write('  '),
-		  write('Dam= ' ), write(Dam), write('  '),
-		  write('Score = '), write(Scr), nl,
-		  write('Inventory = '), write(Inv), nl)).
 
 is_property(P,A):- db_prop(_,C),functor(C,P,A2),A is A2-1.
 
@@ -277,4 +233,4 @@ same(X,Y):- compound(Y),arg(1,Y,X),!.
 moo:type_default_props(_,agent,last_command(stand)).
 
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).

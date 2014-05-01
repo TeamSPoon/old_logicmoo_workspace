@@ -1,13 +1,12 @@
-% ===================================================================
-% File 'spawning.pl'
-% Purpose: An Implementation a MUD server in SWI-Prolog
-% Maintainer: Douglas Miles
-% Contact: $Author: dmiles $@users.sourceforge.net ;
-% Version: 'run.pl' 1.0.0
-% Revision:  $Revision: 1.7 $
-% Revised At:   $Date: 2002/07/11 21:57:28 $
-% ===================================================================
+/** <module>  File is responsible for 
+%  laying out new objects in the mud based on some frame rules (using RETE method)
 %
+%
+% Project Logicmoo: A MUD server written in Prolog
+% Maintainer: Douglas Miles
+% Dec 13, 2035
+%
+*/
 
 
 moo:on_world_load :- retractall(spawn_objects(_)).

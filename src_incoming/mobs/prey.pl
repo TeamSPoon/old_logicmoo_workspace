@@ -1,20 +1,21 @@
+/** <module> 
+% This is a *very* simple example of an agent meant to be 
+% used as prey (dead prey turns into food) in simple simulations.
+%
 % prey.pl
+%
 % July 8, 1996
 % John Eikenberry
 %
 % Dec 13, 2035
 % Douglas Miles
 %
-/** <module> 
-% This is a *very* simple example of an agent meant to be 
-% used as prey (dead prey turns into food) in simple simulations.
-%
 */
 
 % Declare the module name and the exported (public) predicates.
 :- module(prey,[]).
 
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 :- register_module_type(planning).
 :- register_module_type(command).
 
@@ -34,7 +35,7 @@ prey_idea(Self,move(Dir)) :-
 	list_object_dir_sensed(_,List,NearAgnt,OppDir),
 	reverse_dir(OppDir,Dir),
 	number_to_dir(Num,Dir,here),
-	nth_member(Num,What,List),
+	nth1(Num,List,What),
 	What == [].
 prey_idea(Self,take(nut)) :-
 	get_feet(Self,What),
@@ -97,6 +98,6 @@ spawn_prey(N) :-
 moo:agent_call_command(Agent,rez(NewType)):- atloc(Agent,LOC), create_instance(NewType,item,[atloc(LOC)]).
 
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).
 
 

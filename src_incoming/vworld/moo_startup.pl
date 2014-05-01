@@ -1,24 +1,24 @@
-% wstart.pl
-% July 10,1996
-% John Eikenberry
-%
-% Dec 13, 2035
-% Douglas Miles
-%
 /** <module> 
 % This file loads the world (world.pl), the map of the world, 
 % the agents and their definitions.
 % This file is used as a configuation file and a startup script.
+%
+% July 10,1996
+% John Eikenberry
+%
+% Project Logicmoo: A MUD server written in Prolog
+% Maintainer: Douglas Miles
+% Dec 13, 2035
+%
 */
 
 :- ensure_loaded(logicmoo('vworld/dbase.pl')).
 
-
 % standard header used in all files that all modules are loaded (therefore useful for when(?) the day comes that modules *can*only*see their explicitly imported modules)
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 
 % These contain the definition of the object types.
-:- ensure_loaded(logicmoo('objs/vacuum.objects.pl')). 
+:- ensure_loaded(logicmoo('objs/objs_misc_monster.pl')). 
 
 % Load the map file (*.map.pl) appropriate for the world being used.
 :- ensure_loaded(logicmoo('rooms/vacuum.map.pl')).
@@ -27,7 +27,7 @@
 % :- must(old_setup).
 
 % standard footer to clean up any header defined states
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).
 
 
 % Define the agents traits, both for your agent and the world inhabitants. 
@@ -48,8 +48,7 @@
 */
 
 % [Optionaly] Start the telent server
-:-at_start(telnet_server(4000, [allow(_ALL),call_pred(login_and_run)])).
-
+:-at_start(start_mud_telent(4000)).
 
 
 

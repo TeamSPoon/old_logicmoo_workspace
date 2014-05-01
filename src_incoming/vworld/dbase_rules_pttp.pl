@@ -1,3 +1,12 @@
+/** <module> 
+% Still working on (and testing) but will provide the memoization (not really, just iterative deepening search) inference for Logicmoo Later
+%
+% Project Logicmoo: A MUD server written in Prolog
+% Maintainer: Douglas Miles
+% Dec 13, 2035
+%
+*/
+
 :- visible(+all), leash(-exit),leash(-fail),leash(-call),leash(-redo).
 
 prolog_engine(swi).

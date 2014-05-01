@@ -3,7 +3,7 @@
 % help.pl
 % Douglas Miles 2014
 */
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 
 :- register_module_type(command).
 
@@ -17,5 +17,5 @@ moo:specifier_text(Text,verb):- moo:decl_action(A,_,_),functor(A,Text,_).
 
 
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).
 

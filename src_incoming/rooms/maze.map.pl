@@ -1,10 +1,3 @@
-% maze.map.pl
-% July 10, 1996
-% John Eikenberry
-%
-% Dec 13, 2035
-% Douglas Miles
-%
 /** <module> 
 % Test world for maze world can be defined by a grid like the
 % one below. The grid must be rectangular (ie. same number of
@@ -13,6 +6,13 @@
 % To look at the world, once this file is consulted,  use the show_world/0 command. 
 %
 % The two letter codes used below are defined in maze.objects.pl
+%
+% maze.map.pl
+% July 10, 1996
+% John Eikenberry
+%
+% Dec 13, 2035
+% Douglas Miles
 %
 */
 

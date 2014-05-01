@@ -1,14 +1,12 @@
-%
-% Dec 13, 2035
-% Douglas Miles
-%
 /** <module> 
-% Loops to make sure all Agents get a chance to do their things
-% Comments below document the basic idea.
+% Uses timers to make sure all Agents get a chance to do their things
+%
+% Project Logicmoo: A MUD server written in Prolog
+% Maintainer: Douglas Miles
+% Dec 13, 2035
 %
 */
-
-:- module(npc_toploop, [
+:- module(toploop_npc, [
           move_or_sit_memory_idea/3,
           npc_tick/0,
           join_npcs_long_running/0,npc_tick_tock/0,npc_tick_tock_time/1,
@@ -16,7 +14,7 @@
           get_world_agent_plan/3,
           tick_controller/2]).
 
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 
 :- dynamic(npc_tick_tock_time/1).
 npc_tick_tock_time(30).
@@ -43,7 +41,7 @@ move_or_sit_memory_idea(Agent,move(Dir),[Outlet]) :-
 	memory(Agent,directions([Dir|_])),
 	num_near(Num,Dir,here),
 	get_near(Agent,List),
-	nth_member(Num,What,List),
+	nth1(Num,List,What),
 	(What == [];
 	What == [Outlet]).
 move_or_sit_memory_idea(Agent,sit,_) :-
@@ -86,5 +84,5 @@ moo:agent_call_command(_Agent,idea(Who)) :-  catch(idea(Who,_),E,(dmsg(idea(E, W
 moo:agent_call_command(_Agent,tock) :- npc_tick.
 moo:agent_call_command(_Agent,tick(Other)) :- in_thread_and_join(tick(Other)).
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).
 

@@ -1,14 +1,14 @@
+/* <module>
+% Imperitive Sentence Parser (using DCG)
 %
+% Project Logicmoo: A MUD server written in Prolog
+% Maintainer: Douglas Miles
 % Dec 13, 2035
-% Douglas Miles
-%
-/** <module>
-% Initial Telnet/Text console parser (using DCG)
-% Comments below document the basic idea.
 %
 */
 
-:- module(parsem, [
+
+:- module(parser_imperative, [
                    parse_agent_text_command/5,                   
                    parseIsa//2,
                    objects_match/3,
@@ -16,7 +16,7 @@
                    parseForTypes//2]).
 
 
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 
 :- register_module_type(utility).
 
@@ -163,6 +163,6 @@ specifiedItemType([String],Type,StringO):-nonvar(String),specifiedItemType(Strin
 specifiedItemType(A,T,AA):- format_complies(A,T,AA),!.
 specifiedItemType(String,Type,String):- atom(Type), Term =..[Type,String], logOnError(req(Term)),!.
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).
 
 

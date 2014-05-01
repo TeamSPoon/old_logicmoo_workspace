@@ -12,7 +12,7 @@
 
 :- module(move, []).
 
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 
 :- register_module_type(command).
 
@@ -104,6 +104,6 @@ moo:agent_call_command(Agent,go(Dir)) :-
 	moo:update_charge(Agent,move).
 
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).
 
 

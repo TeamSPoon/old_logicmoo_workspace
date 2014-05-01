@@ -12,7 +12,7 @@
 */
 :- module(push, []).
 
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 
 :- register_module_type(command).
 
@@ -100,6 +100,6 @@ moo:decl_update_charge(Agent,push) :- padd(Agent,[charge(-6)]).
 moo:decl_update_stats(Agent,strain) :- padd(Agent,[damage(-2)]).
 moo:decl_update_stats(Agent,hernia) :- padd(Agent,[damage(-4),failure(hernia)]).
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).
 
 

@@ -1,16 +1,16 @@
-% events.pl
+/** <module> File used to implement in_world_events
+% like Talking, Appearing, falling rocks..
+%
+% Project Logicmoo: A MUD server written in Prolog
+% Maintainer: Douglas Miles
 % Dec 13, 2035
-% Douglas Miles
-%
-/** <module> % File used to implement in_world_events...
-% the world is run.
-%
-% props(Obj,height(ObjHt))  == k(height,Obj,ObjHt) == rdf(Obj,height,ObjHt) == height(Obj,ObjHt)
-% padd(Obj,height(ObjHt))  == padd(height,Obj,ObjHt,...) == add(QueryForm)
-% kretract[all](Obj,height(ObjHt))  == kretract[all](Obj,height,ObjHt) == pretract[all](height,Obj,ObjHt) == del[all](QueryForm)
-% keraseall(AnyTerm).
 %
 */
+
+/*
+% This file is "included" from world.pl 
+*/
+
 
 asInvoked([L|Ist],Cmd):-atom(L),!, Cmd=..[L|Ist].
 asInvoked(List,Cmd):-Cmd=..[asInvoked|List].

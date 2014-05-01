@@ -45,7 +45,7 @@ start_servers :- if_version_greater(70109,ensure_loaded(logicmoo(launchcliopatri
 :- if_flag_true(fullStart, start_servers).
 
 % [Required] load and start mud
-:- ensure_loaded(logicmoo('vworld/wstart')).
+:- ensure_loaded(logicmoo('vworld/moo_startup')).
 
 /*
 % Load datalog

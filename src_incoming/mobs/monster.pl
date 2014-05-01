@@ -1,12 +1,12 @@
+/** <module> 
+% This is optional (simple) monster to prowl the maze world.
+%
 % monster.pl
 % July 11, 1996
 % John Eikenberry
 %
 % Dec 13, 2035
 % Douglas Miles
-%
-/** <module> 
-% This is optional (simple) monster to prowl the maze world.
 %
 % Declare the module name and the exported (public) predicates.
 */
@@ -17,7 +17,7 @@
 % :- dynamic  agent_list/1.
 
 % Possible agent actions.
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 :- register_module_type(planning).
 
 moo:world_agent_plan(_World,Agent,Act):-
@@ -54,7 +54,7 @@ moo:type_default_props(Instance,monster, [description(Instance,SFmt),wearing(tou
 
 
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).
 
 
 

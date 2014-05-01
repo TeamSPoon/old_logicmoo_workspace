@@ -1,9 +1,12 @@
-% Dec 13, 2035
-% Douglas Miles
+/** <module> 
+% A MUD testing API is defined here
 %
-/** <module>  MUD testing API is defined here
+% Project Logicmoo: A MUD server written in Prolog
+% Maintainer: Douglas Miles
+% Dec 13, 2035
+%
 */
-:- module(mud_tests,
+:- module(moo_testing,
 	[run_mud_tests/0,
         run_mud_test/2,
         run_mud_test_code/1]).

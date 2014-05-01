@@ -1,35 +1,3 @@
-% manual.pl
-% July 1, 1995
-% John Eikenberry
-% Dec 13, 2035
-% Douglas Miles
-%
-/** <module> 
-% now unused.. it could exist when we want a 
-% manual agent... (meant for debugging purposes)
-%
-*/
-
-:- module(man,[]).
-
-end_of_file.
-
-
-
-
-
-
-OOOOOOOOLLLLLLLLLLDDDDDDDDDDDD SYSTEM
-
-
-
-
-
-
-
-
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Commands to run simulation.
 %
@@ -58,7 +26,7 @@ run_tests :-
   stat_total/2,
   total_turns/1, current_turn/1, end_score/1.
 
-:- include(logicmoo('vworld/vworld_header.pl')).
+
 
 :- register_module_type(utility).
 
@@ -216,7 +184,7 @@ even(Num) :-
 	Mod is (Num mod 2),
 	Mod == 0.
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+
 
 
 
@@ -242,10 +210,8 @@ even(Num) :-
 :- meta_predicate with_assertions(:,0).
 :- meta_predicate forall_member(?,?,0).
 
-:- include(logicmoo('vworld/vworld_header.pl')).
-:- register_module_type(utility).
 
-with_assertions(With,Call):-setup_call_cleanup(asserta(With,Ref),Call,erase(Ref)).
+:- register_module_type(utility).
 
 
 
@@ -304,14 +270,27 @@ nth_member(N,X,[_|T]) :-
 	nth_member(M,X,T).
 
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+
+
+% manual.pl
+% July 1, 1995
+% John Eikenberry
+% Dec 13, 2035
+% Douglas Miles
+%
+/** <module> 
+% now unused.. it could exist when we want a 
+% manual agent... (meant for debugging purposes)
+%
+*/
+
 
 
 :- dynamic take/2.
 
 % write out stats and percepts and ask for an action
 % Possible agent actions.
-:- include(logicmoo('vworld/vworld_header.pl')).
+
 :- register_module_type(utility).
 
 moo:agent_call_command(_,_):-fail.
@@ -432,6 +411,6 @@ move_dir(0'u,u).
 
 take_object(0,_).
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+
 
 

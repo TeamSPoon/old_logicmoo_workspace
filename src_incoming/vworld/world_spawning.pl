@@ -1,11 +1,17 @@
-% ===================================================================
-% File 'spawning.pl'  File is responsible for 
-%  laying out new objhects in the mud based on some frame rules
-% Purpose: An Implementation a MUD server in SWI-Prolog
+/** <module>  
+% File is responsible for 
+%  laying out new objects in the mud based on some frame rules
+%
+%
+% Project Logicmoo: A MUD server written in Prolog
 % Maintainer: Douglas Miles
-% ===================================================================
+% Dec 13, 2035
+%
+*/
 
-
+/*
+% This file is "included" from world.pl 
+*/
 
 
 amzi_timer(T1):-get_time(T1).
@@ -40,7 +46,7 @@ spread(_,_).
 :-style_check(-discontiguous).
 
 
-dmsg(M):-'format'('% ~q. ~n', [M]).
+csdmsg(M):-'format'('% ~q. ~n', [M]).
 
 
 
@@ -49,7 +55,7 @@ dmsg(M):-'format'('% ~q. ~n', [M]).
 :-style_check(-discontiguous).
 
 
-callStub(P,F,A):- predicate_property(P,number_of_clauses(N)),(N==1 -> (dmsg(failed(callStub(P,F,A),!,fail))); ((functor(PP,F,A),dmsg(callStub(P,F,A)),retractall((PP:-callStub(PP,F,A))),callStub(P,F,A)))).
+callStub(P,F,A):- predicate_property(P,number_of_clauses(N)),(N==1 -> (csdmsg(failed(callStub(P,F,A),!,fail))); ((functor(PP,F,A),csdmsg(callStub(P,F,A)),retractall((PP:-callStub(PP,F,A))),callStub(P,F,A)))).
 
 createStub(F,A):- dynamic(F/A),!. % functor(P,F,A),asserta((P:-callStub(P,F,A))).
 
@@ -1042,7 +1048,7 @@ rule f9#
 	[end_table - ET with [position-none],
 	 not(tv) - TV with [position-none,place_on-table],
 	 couch - C with [position-wall/W],
-	 not end_table - ET2 with [position-wall/W]]
+	 not(end_table)- ET2 with [position-wall/W]]
 	==>
 	[update(end_table - ET with [position-wall/W])].
 
@@ -1050,7 +1056,7 @@ rule f10#
 	[end_table - ET with [position-none],
 	 not(tv) - TV with [position-none,place_on-table],
 	 chair - C with [position-wall/W],
-	 not end_table - ET2 with [position-wall/W]]
+	 not(end_table) - ET2 with [position-wall/W]]
 	==>
 	[update(end_table - ET with [position-wall/W])].
 

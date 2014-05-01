@@ -1,19 +1,23 @@
-% eg.explorer.pl
+/** <module> 
+% This is simple example explorer for the maze world.
+%
+%
+% monster.pl
 % July 11, 1996
 % John Eikenberry
 %
 % Dec 13, 2035
 % Douglas Miles
 %
-/** <module> 
-% This is simple example explorer for the maze world.
-%
+% Declare the module name and the exported (public) predicates.
 */
+
+
 
 % Declare the module name and the exported (public) predicates.
 :- module(explorer,[]).
 
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 :- register_module_type(planning).
 
 
@@ -65,14 +69,14 @@ explorer_idea(Agent,move(Dir)) :-
 	list_object_dir_sensed(_,List,monster,OppDir),
 	reverse_dir(OppDir,Dir),
 	number_to_dir(N,Dir,here),
-	nth_member(N,What,List),
+        nth1(N,List,What),
 	What == [].
 
 explorer_idea(Agent,move(Dir)) :-
 	memory(Agent,directions([Dir|_])),
 	num_near(Num,Dir,here),
 	get_near(Agent,List),
-	nth_member(Num,What,List),
+	nth1(Num,List,What),
 	What == [].
 
 explorer_idea(Agent,attack(Dir)) :-
@@ -86,6 +90,6 @@ explorer_idea(Agent,sit) :-
 	add(memory(Agent,directions(New))).
 
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).
 
 

@@ -1,10 +1,12 @@
-/** <module> File used as storage place for all predicates which change as
+/** <module> 
+% File used as storage place for all predicates which change as
 % the world is run.
 %
 % props(Obj,height(ObjHt))  == k(height,Obj,ObjHt) == rdf(Obj,height,ObjHt) == height(Obj,ObjHt)
 % padd(Obj,height(ObjHt))  == padd(height,Obj,ObjHt,...) == add(QueryForm)
 % kretract[all](Obj,height(ObjHt))  == kretract[all](Obj,height,ObjHt) == pretract[all](height,Obj,ObjHt) == del[all](QueryForm)
 % keraseall(AnyTerm).
+%
 %
 % Dec 13, 2035
 % Douglas Miles
@@ -46,9 +48,9 @@ user_export(Prop/Arity):-
 % Found new meta-predicates in iteration 1 (0.281 sec)
 %:- meta_predicate db_forall(?,?,?,0).
 
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 
-:- include('motel').
+:- include('dbase_types_motel').
 
 :- register_module_type(utility).
 
@@ -496,7 +498,7 @@ load_motel:- defrole([],time_state,restr(time,period)).
 :- scan_db_prop.
 :-load_motel.
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).
 
 
 

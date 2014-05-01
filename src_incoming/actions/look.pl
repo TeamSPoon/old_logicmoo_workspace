@@ -28,7 +28,7 @@
 
 :- module(look, [get_all/7, get_percepts/2,  get_near/2, get_feet/2, height_on_obj/2, inventory/2, can_sense/5 ]).
 
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 
 :- register_module_type(command).
 
@@ -53,11 +53,8 @@ get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
 	ignore(success(Agent,Suc)),
 	ignore(score(Agent,Scr)),
 	ignore(inventory(Agent,Inv)),
-	ignore((view_list(Dirs),
-	check_for_blocks(Agent),
-	view_dirs(Agent,Dirs,Tmp_percepts),
-	alter_view(Dirs,Tmp_percepts,Percepts))),
-	!.
+	ignore(get_percepts(Agent,Percepts) ),!.
+
 
 % Get only the Percepts
 get_percepts(Agent,Percepts) :-
@@ -230,6 +227,6 @@ moo:decl_action(examine(item), "view details of item (see also @list)").
 moo:agent_call_command(_Gent,examine(SObj)):- term_listing(SObj).
 
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).
 
 

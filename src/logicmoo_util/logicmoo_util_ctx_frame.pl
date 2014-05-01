@@ -33,12 +33,16 @@
          getCtxValue/3,
          makeLocalContext/2,
          appendAttributes/4,
+         with_assertions/2,
          currentContext/2]).
 
 :-use_module(logicmoo('logicmoo_util/logicmoo_util_library.pl')).
 :-use_module(logicmoo('logicmoo_util/logicmoo_util_bugger.pl')).
 
 currentContext(Name,X):-hotrace(makeLocalContext(Name,X)),!.
+
+
+with_assertions(With,Call):-setup_call_cleanup(asserta(With,Ref),Call,erase(Ref)).
 
 % ===================================================================
 :-dynamic(no_cyclic_terms).

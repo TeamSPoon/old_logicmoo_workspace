@@ -3,7 +3,7 @@
 % Douglas Miles 2014
 
 */
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 
 :- register_module_type(command).
 
@@ -13,4 +13,4 @@ moo:decl_action('@set'(optional(term,self),atom,term),text("@sets term to a prop
 moo:agent_call_command(_Agent,'@set'(Obj,Prop,Value)) :- game_assert(k(Prop,Obj,Value)).
 moo:agent_call_command(_Agent,'@get'(Obj,Prop)) :- catch((findall(Value,(req(k(Prop,Obj,Value)),fmt(k(Prop,Obj,Value))),L),(L==[_|_]->true;fmt(k(Prop,Obj,missing)))),E,fmt('@get Error ~q',[E])).
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).

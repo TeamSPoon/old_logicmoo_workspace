@@ -1,3 +1,11 @@
+/** <module> 
+% Still working on (and testing) but will provide the type inference for Logicmoo Later
+%
+% Project Logicmoo: A MUD server written in Prolog
+% Maintainer: Douglas Miles
+% Dec 13, 2035
+%
+*/
 
 /*
 

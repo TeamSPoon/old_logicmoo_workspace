@@ -1,3 +1,11 @@
+/** <module> 
+% Non-module Impl of CircleMUD StarTrek TNG files
+%
+% Dec 13, 2035
+% Douglas Miles
+%
+*/
+
 
 /*
 moo:type_grid('SpaceInAHOC',0, [ed,ed,ed,ex,ed,ed,ed]).

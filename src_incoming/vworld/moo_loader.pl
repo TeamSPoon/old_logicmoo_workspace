@@ -1,7 +1,9 @@
-/** <module> Game loading Utils
+/** <module> 
+% Game loading Utils
 %
+% Project Logicmoo: A MUD server written in Prolog
+% Maintainer: Douglas Miles
 % Dec 13, 2035
-% Douglas Miles
 %
 */
 
@@ -17,7 +19,7 @@
 
 :- meta_predicate game_loader:show_call(0).
 
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 
 dbadd0(C0):-db_op(a,C0).
 
@@ -260,6 +262,6 @@ show_call0(C):-debugOnError(C). %% dmsg(show_call(C)),C.
 
 % :- finish_processing_game.
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).
 
 

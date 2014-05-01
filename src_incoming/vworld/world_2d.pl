@@ -1,12 +1,18 @@
-% Dec 13, 2035
-% Douglas Miles
-%
-/** <module>
+/** <module> 
 % This module defines the way we lay out 2-D grids into room
+%
+% Project Logicmoo: A MUD server written in Prolog
+% Maintainer: Douglas Miles
+% Dec 13, 2035
 %
 */
 
-% :- include(logicmoo('vworld/vworld_header.pl')).
+/*
+% This file is "included" from world.pl 
+*/
+
+
+% :- include(logicmoo('vworld/moo_header.pl')).
 
 :- register_module_type(utility).
 
@@ -337,5 +343,5 @@ doorLocation(_Room,0,0,_Z,nw).
 doorLocation(_Room,6,0,_Z,sw).
 doorLocation(_Room,_X,_Y,_Z,_Dir):-!,fail.
 
-% :- include(logicmoo('vworld/vworld_footer.pl')).
+% :- include(logicmoo('vworld/moo_footer.pl')).
 

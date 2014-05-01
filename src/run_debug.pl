@@ -16,8 +16,6 @@
 % ======================================================
 :- use_module('logicmoo_util/logicmoo_util_all.pl').
 
-:- ensure_loaded(logicmoo('vworld/dbase.pl')).
-
 % one more case of not clear what's the good way to do this.
 % Add your own path to weblog for now
 user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog').
@@ -51,7 +49,7 @@ start_servers :- if_version_greater(70111,ensure_loaded(logicmoo(launchcliopatri
 :- if_flag_true(fullStart, start_servers).
 
 % [Required] load and start mud
-:- ensure_loaded(logicmoo('vworld/wstart')).
+:- ensure_loaded(logicmoo('vworld/moo_startup')).
 
 /*
 % Load datalog

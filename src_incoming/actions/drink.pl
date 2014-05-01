@@ -8,7 +8,7 @@
 
 :- module(drink, []).
 
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 
 :- register_module_type(command).
 
@@ -29,4 +29,4 @@ moo:decl_update_charge(Agent,drink) :-
 	New is Old - 1,
 	add(charge(Agent,New)).
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).

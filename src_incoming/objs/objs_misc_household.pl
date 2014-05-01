@@ -1,6 +1,17 @@
+/** <module> 
+% This file contains the definitions for the objects in a household
+% To create a new world, simply change the object definitions as
+% described below (or in manual)
+%
+% *******Object definitions*******
+%.
+% Use the fmt moo:label_type_props(label,typecode,[property1,property2,etc.]]).
+% label is whats used to refer to the object in the running world
+% typecode is whats used to refer to the object for initialization (see world.pl)
 % ===============================================================================================
 %    by Mea_culpa
 % ===============================================================================================
+*/
 
 :- style_check(-singleton).
 :- style_check(-discontiguous).

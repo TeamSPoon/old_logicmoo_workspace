@@ -12,7 +12,7 @@
 
 :- module(attack, []).
 
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 
 :- register_module_type(command).
 
@@ -103,6 +103,6 @@ moo:decl_update_stats(Agent,wiff) :-
 
 
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).
 
 

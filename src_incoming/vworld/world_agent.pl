@@ -10,8 +10,8 @@
 */
 
 /*
-% Another file includes this!
-% This file is loaded from world.pl 
+% This file is "included" from world.pl 
+:-module(actr, [ call_agent_command/2,  call_agent_action/2 ]).
 */
 
 

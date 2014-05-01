@@ -1,13 +1,14 @@
-
 /** <module> 
-% It is the basic module system of the MUD
+% This module defines the module types that we use:
+% utility,planner,parser,action,database,effects,spawning_loading,connection
+% It is the basic module system of the Logicmoo MUD
 %
-% Douglas Miles
+% Project Logicmoo: A MUD server written in Prolog
+% Maintainer: Douglas Miles
 % Dec 13, 2035
 %
-% This module defines the module types that we use:
-% utility,planner,parser,actions
 */
+
 :- module(moo,[coerce/3, current_context_module/1,
 
     term_expansion_local/2,
@@ -155,11 +156,11 @@ term_expansion_local0(A,A).
 
 % user:term_expansion(X,Y):- term_expansion_local0(X,Y).
 
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 
 :- register_module_type(utility).
 
 moo:agent_text_command(_Agent,_Text,_AgentTarget,_Cmd):-fail.
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).
 

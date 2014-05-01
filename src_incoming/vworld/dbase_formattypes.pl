@@ -1,12 +1,13 @@
-% Dec 13, 2035
-% Douglas Miles
+/** <module> 
+% This is mainly used by the moo_loader but also needed everywhere
 %
-/** <module>
-% This is mainly used by the game loader but also needed everywhere
+% Project Logicmoo: A MUD server written in Prolog
+% Maintainer: Douglas Miles
+% Dec 13, 2035
 %
 */
 % =======================================================
-:- module(formattypes, [
+:- module(dbase_formattypes, [
           term_is_ft/2,
           is_decl_ft/1,
           format_complies/3,
@@ -15,7 +16,7 @@
           atom_to_value/2,
           any_to_dir/2]).
 
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 
 term_is_ft(Term,Type):-
    moo:decl_ft(Type,How),
@@ -120,4 +121,4 @@ p2c_dir2('n','North-Directly').
 
 
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).

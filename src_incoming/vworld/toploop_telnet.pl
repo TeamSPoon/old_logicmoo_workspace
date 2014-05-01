@@ -1,12 +1,14 @@
+/** <module>  
+% Initial Telnet/Text console 
+% ALL telnet client business logic is here (removed from everywhere else!)
 %
+% Project Logicmoo: A MUD server written in Prolog
+% Maintainer: Douglas Miles
 % Dec 13, 2035
-% Douglas Miles
-%
-/** <module>  Initial Telnet/Text console ALL text client business logic is here and removed from everywhere else!
 %
 */
 
-:- module(telnetplayer, [
+:- module(toploop_telnet, [
                   agent_message_stream/3,
                   do_player_action/1,
                   look_brief/1,
@@ -14,17 +16,20 @@
                   show_room_grid/1,
                   inst_label/2,
                   display_grid_labels/0,
+                  start_mud_telent/1,
+                  read_and_do_telnet/1,
                    login_and_run/0]).
 
 :- dynamic(agent_message_stream/3).
 
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 
 :- register_module_type(utility).
 
 % ===========================================================
 % TELNET REPL + READER
 % ===========================================================
+start_mud_telent(Port):- telnet_server(Port, [allow(_ALL),call_pred(login_and_run)]),!.
 
 login_and_run:-
   foc_current_player(P),
@@ -398,5 +403,6 @@ call_pred(Call, Options) :-
 	).
 
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+
+:- include(logicmoo('vworld/moo_footer.pl')).
 
