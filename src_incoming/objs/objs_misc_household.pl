@@ -5,7 +5,6 @@
 :- style_check(-singleton).
 :- style_check(-discontiguous).
 :- style_check(-atom).
-:- style_check(-string).
 
 % ==================================================
 % Mud Dictionary
