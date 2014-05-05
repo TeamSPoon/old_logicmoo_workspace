@@ -16,12 +16,14 @@
      assert_if_new/1,
      programmer_error/1,
      forall_member/3,
+     debugOnError0/1,
      global_pathname/2,
      printAll/2,
      debugOnFailure/1,
      module_notrace/1,
      os_to_prolog_filename/2,
      dumpList/1,
+     debugOnFailure0/1,
      ifThen/2,
      nop/1,
      to_m_f_arity_pi/5,
@@ -136,7 +138,7 @@ set_bugger_flag(F,V):-create_prolog_flag(F,V,[term]).
 :- meta_predicate bugger:test_call(:).
 :- meta_predicate bugger:cmust(:).
 :- meta_predicate bugger:debugCall(:).
-:- meta_predicate bugger:prolog_ecall(*,1,:).
+:- meta_predicate bugger:prolog_ecall(*,1,?).
 :- meta_predicate bugger:traceafter_call(:).
 :- meta_predicate bugger:if_prolog(*,:).
 :- meta_predicate bugger:must(:).
@@ -367,7 +369,8 @@ must(Call):-atLeastOne0(throw_or_debug(must(Call),Call),Call).
 throwOnFailure(Call):-atLeastOne0(throw(throwOnFailure(Call)),Call).
 ignoreOnError(CX):-ignore(catch(CX,_,true)).
 
-debugCall(C):-trace,dmsg(debugCall(C)), trace(C,[-all,+fail]),notrace,trace,!,C.
+debugCall(C):-notrace,dmsg(debugCall(C)), trace(C,[-all,+fail,+exception]),debug,visible(+all), leash(-exit),leash(-fail),leash(-call),leash(-redo),leash(+exception),trace,!,C.
+debugCallF(C):-notrace,dmsg(debugCall(C)), trace(C,[-all,+fail,+exception]),debug,visible(+all), leash(-exit),leash(+fail),leash(-call),leash(-redo),leash(+exception),trace,!,C.
 
 debugOnError(C):-prolog_ecall(0,debugOnError0,C).
 debugOnError0(C):- catch(C,E,(dmsg(E,C),debugCall(C))).
@@ -375,7 +378,7 @@ debugOnErrorEach(C):-prolog_ecall(1,debugOnError,C).
 debugOnErrorIgnore(C):-ignore(debugOnError(C)).
 
 debugOnFailure(C):-prolog_ecall(0,debugOnFailure0,C).
-debugOnFailure0(C):- atLeastOne0(debugCall(C),C).
+debugOnFailure0(C):- atLeastOne0(debugCallF(C),C).
 debugOnFailureEach(C):-prolog_ecall(1,debugOnFailure,C).
 debugOnFailureIgnore(C):-ignore(debugOnFailure(C)).
 
@@ -716,12 +719,13 @@ logger_property(todo,once,true).
 
 :-debug(todo).
 
-dmsg(_):- bugger_flag(opt_debug=off),!.
-dmsg(V):-var(V),!,trace,throw(dmsg(V)).
+dmsg(V):-notrace(dmsg0(V)).
+dmsg0(_):- bugger_flag(opt_debug=off),!.
+dmsg0(V):-var(V),!,trace,throw(dmsg(V)).
 
-dmsg(C):-functor(C,Topic,_),debugging(Topic,_True_or_False),!,logger_property(Topic,once,true),!,
+dmsg0(C):-functor(C,Topic,_),debugging(Topic,_True_or_False),!,logger_property(Topic,once,true),!,
       (dmsg_log(Topic,_Time,C) -> true ; ((get_time(Time),asserta(dmsg_log(todo,Time,C)),!,dmsg2(C)))).
-dmsg(C):-notrace((copy_term(C,Stuff), randomVars(Stuff),!,dmsg2(Stuff))).
+dmsg0(C):-notrace((copy_term(C,Stuff), randomVars(Stuff),!,dmsg2(Stuff))).
 
 dmsg2(T):-!,
 	((
@@ -1085,7 +1089,7 @@ bugger_t_expansion(T,AA):- T=..[F,A],unwrappabe(F),bdmsg(bugger_term_expansion(T
 bugger_t_expansion([F0|ARGS0],[F1|ARGS1]):-bugger_t_expansion(F0,F1),bugger_t_expansion(ARGS0,ARGS1).
 bugger_t_expansion(T,TT):- T=..[F|ARGS0],bugger_t_expansion(ARGS0,ARGS1), TT=..[F|ARGS1].
 
-
+unwrappabe(F):-member(F,['debugOnError',debugOnError0]),!,fail.
 unwrappabe(F):-member(FF,['OnError','OnFailure','LeastOne','Ignore','must']),atom_concat(_,FF,F),!.
 
 

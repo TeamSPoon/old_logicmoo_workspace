@@ -61,13 +61,15 @@
          worth/3,
          spread/0,
          growth/0,
-         isaOrSame/2
+         isaOrSame/2,
+         current_agent_or_var/1
 
  ]).
 
 
 :- dynamic  agent_list/1.
 
+:-use_module(logicmoo('vworld/dbase.pl')).
 :- include(logicmoo('vworld/moo_header.pl')).
 :- register_module_type(utility).
 
@@ -141,7 +143,8 @@ create_meta(T,P,C,MT):-
    must(split_name_type(T,P,C)),
    define_subtype(C,MT),
    OP =.. [MT,P],
-   assert_if_new(OP),
+   dbase_mod(M),
+   assert_if_new(M:OP),
    must(forall_member(E,[OP,classof(P,MT),classof(P,C)],must(add(E)))),
    must(findall_type_default_props(P,C,Props)),!,
    must(padd(P,Props)),!.
@@ -162,8 +165,6 @@ moo:decl_createableType(item).
 moo:decl_createableType(S,T):- moo:createableType(T),req(subclass(S,T)).
 moo:decl_createableType(T,T):-nonvar(T),moo:createableType(T).
 
-:- style_check(-discontiguous).
-
 moo:decl_subclass(int,formattype).
 moo:decl_subclass(dir,formattype).
 moo:decl_subclass(number,formattype).
@@ -177,20 +178,26 @@ formattype(FormatType):-moo:decl_subclass(FormatType,formattype).
 formattype(FormatType):-mud_isa(FormatType,formattype).
 
 define_type(Spec):-create_instance(Spec,type,[]).
-create_instance(What,FormatType,List):- FormatType\==type,
+
+create_instance(What,Type,Props):- create_instance_0(What,Type,Props),!.
+
+:-discontiguous create_instance_0/3.
+
+create_instance_0(What,FormatType,List):- FormatType\==type,
    formattype(FormatType),!,
    throw(formattype(FormatType,create_instance(What,FormatType,List))).
 
-create_instance(SubType,type,List):-!,
-   add(isa(SubType,type)),
-   dbase_mod(M),
-   A = M:type(SubType),
+create_instance_0(SubType,type,List):-!,
+   dbase:add(isa(SubType,type)),
+      dbase_mod(M),
+      A = M:type(SubType),
    assert_if_new(A),
    padd(SubType,List).
 
 moo:decl_createableType(agent).
 moo:decl_subclass(actor,agent).
-create_instance(T,agent,List):-!,
+
+create_instance_0(T,agent,List):-!,
    retractall(agent_list(_)),
    must(create_meta(T,P,_,agent)),
    must(padd(P,List)),
@@ -207,11 +214,11 @@ create_instance(T,agent,List):-!,
    add(memory(P,directions([n,s,e,w,ne,nw,se,sw,u,d]))),!.
 
 moo:decl_createableType(region).
-create_instance(T,Type,List):- moo:createableType(Type),
+create_instance_0(T,Type,List):- moo:createableType(Type),
    create_meta(T,P,_,Type),!,
    padd(P,List).
 
-create_instance(T,Type,List):-moo:subclass(Type,MetaType),moo:createableType(MetaType),
+create_instance_0(T,Type,List):-moo:subclass(Type,MetaType),moo:createableType(MetaType),
    create_meta(T,P,_,MetaType),
    padd(P,isa(Type)),
    padd(P,List),

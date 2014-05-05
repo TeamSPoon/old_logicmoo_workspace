@@ -7,7 +7,7 @@
 %
 */
 
-:- visible(+all), leash(-exit),leash(-fail),leash(-call),leash(-redo).
+% :- visible(+all), leash(-exit),leash(-fail),leash(-call),leash(-redo).
 
 prolog_engine(swi).
 

@@ -14,10 +14,9 @@
 http:location(cliopatria, root(cliopatria), [priority(100)]).
 
 
-:- setting(path, atom, invalid,
-	   'Path to root of cliopatria install').
+:- setting(path, atom, '/devel/ClioPatria', 'Path to root of cliopatria install').
 
-:- load_settings('moo_settings.db').
+% :- load_settings('moo_settings.db').
 
 add_cliopatria_to_search_path :-
 	setting(path, invalid),

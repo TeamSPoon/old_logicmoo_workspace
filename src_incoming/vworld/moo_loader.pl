@@ -7,7 +7,7 @@
 %
 */
 
-:- module(game_loader, [
+:- module(moo_loader, [
           finish_processing_game/0, 
           game_assert/1,
           isa_assert/3,
@@ -17,7 +17,7 @@
           load_game/1
           ]).
 
-:- meta_predicate game_loader:show_call(0).
+:- meta_predicate show_call(0).
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
@@ -44,7 +44,7 @@ finish_processing_game:- retract(in_finish_processing_game).
 finish_processing_game.
 
 
-gload:- load_game(savedb),!.
+% gload:- load_game(savedb),!.
 gload:- load_game(logicmoo('rooms/startrek.all.pl')).
 
 savedb:-

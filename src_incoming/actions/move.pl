@@ -30,7 +30,7 @@ move_command(Agent,move(DirS)) :-atom(DirS),
             move_command(Agent,Dir,Dist).
 % dir
 move_command(Agent,move(Dir)) :-
-	    movedist(Agent,Dist),
+	    req(movedist(Agent,Dist)),
             move_command(Agent,Dir,Dist).
  
 
@@ -97,10 +97,7 @@ moo:decl_update_stats(Agent,fall) :- padd(Agent,damage,-10).
 moo:decl_action(go(dir)).
 moo:agent_call_command(Agent,go(Dir)) :-
 	atloc(Agent,LOC),
-	move_dir_target(LOC,Dir,XXYY),
-        del(atloc(Agent,LOC)),
-        add(atloc(Agent,XXYY)),
-	moo:update_stats(Agent,collide),
+        in_world_move(LOC,Agent,Dir),
 	moo:update_charge(Agent,move).
 
 

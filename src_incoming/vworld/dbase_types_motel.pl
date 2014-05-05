@@ -110,7 +110,7 @@ c2p(CNF,CLF,HP) :- translate(CNF,CLF), clausesToNHProlog(CLF,HP).
  * @(#) dynamicDef.pl 1.16@(#)
  *
  */
-:- visible(+all), leash(-exit),leash(-fail),leash(-call),leash(-redo).
+% :- visible(+all), leash(-exit),leash(-fail),leash(-call),leash(-redo).
 
 prolog_engine(swi).
 

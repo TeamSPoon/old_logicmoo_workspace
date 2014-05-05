@@ -103,6 +103,9 @@ moo:run_database_hooks(Type,Hook):- must(doall((copy_term(Hook,HCopy),moo:decl_d
 
 :-dynamic registered_module_type/2.
 
+:- meta_predicate moo:tick_every(*,*,0).
+:- meta_predicate moo:register_timer_thread(*,*,0).
+
 
 register_timer_thread(Name,_Seconds,_OnTick):-current_thread(Name,_Status).
 register_timer_thread(Name,Seconds,OnTick):-

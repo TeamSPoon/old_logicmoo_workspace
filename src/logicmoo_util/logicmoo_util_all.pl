@@ -22,6 +22,14 @@ join_path33(A,B,C):-exists_directory(B)->B=C;directory_file_path(A,B,C).
     retractall(logicmoo_runtime_dir(RunDir)),
     asserta(logicmoo_runtime_dir(RunDir)).
 
+:- 
+    source_location(File,_Line),
+    file_directory_name(File, RunDir),
+    atom_concat(RunDir,'/../library',RelDir),
+    absolute_file_name(RelDir,A),
+   'format'(' ~q. ~n',[user:file_search_path(library, A)]),
+   asserta(user:file_search_path(library, A)).
+
 
 % Add the locations that the MUD source files will be picked up by the system
 local_directory_search('../..').

@@ -56,7 +56,7 @@ tick(Who):-
    do_agent_call_plan_command(Who,Idea).
 
 
-
+ 
 get_world_agent_plan(W,Who,Idea):- agent(Who), moo:world_agent_plan(W,Who,Idea).
 
 do_agent_call_plan_command(A,C):-agent_doing(A,C),!.

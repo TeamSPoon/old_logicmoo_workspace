@@ -12,29 +12,34 @@
 % Douglas Miles
 */
 
-/*
 :- module(dbase, [
 
  add/1, add0/1, agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, classof/2, clr/1, damage/2, db_op/2, db_prop/2, db_prop/1, atloc/2, is_db_prop/2, is_db_prop/3,
  db_prop_g/1, db_prop_game_assert/1, del/1, failure/2, grid/4, inRegion/2, is_db_prop/2, is_db_prop/3, isa/2, item/1, 
- memory/2, padd/2, padd/3, pathName/3, possess/2, prop/3, prop_or/4, props/2, region/1, req/1, scan_db_prop/0, score/2, stm/2, term_listing/1, 
- thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, nameStrings/2, description/2, pathBetween/3, act_turn/2
-
+ memory/2, padd/2, padd/3, pathName/3, possess/2, prop/3, prop_or/4, props/2, region/1, req/1, scan_db_prop/0, score/2, stm/2, term_listing/1,  facing/2,
+ thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, nameStrings/2, description/2, pathBetween/3, act_turn/2,
+ dbase_mod/1
     ]).
-*/
+
 :- dynamic 
-  dbase_mod/1,
+ dbase_mod/1,
  add/1, add0/1, agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, classof/2, clr/1, damage/2, db_op/2, db_prop/2, db_prop/1, atloc/2, is_db_prop/2, is_db_prop/3,
  db_prop_g/1, db_prop_game_assert/1, del/1, failure/2, grid/4, inRegion/2, is_db_prop/2, is_db_prop/3, isa/2, item/1, 
- memory/2, padd/2, padd/3, pathName/3, possess/2, prop/3, prop_or/4, props/2, region/1, req/1, scan_db_prop/0, score/2, stm/2, term_listing/1, 
- thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, nameStrings/2, description/2, pathBetween/3, act_turn/2
-.
+ memory/2, padd/2, padd/3, pathName/3, possess/2, prop/3, prop_or/4, props/2, region/1, req/1, scan_db_prop/0, score/2, stm/2, term_listing/1, facing/2,
+ thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, nameStrings/2, description/2, pathBetween/3, act_turn/2.
 
-:- context_module(M),asserta(dbase_mod(M)).
+dbase_mod(dbase).
+/*
+
+:- context_module(M),
+   asserta(dbase_mod(M)),
+   dmsg(assert_if_new(dbase_mod(M))).
+
+*/
 
 user_export(_):- dbase_mod(user),!.
 user_export(Prop/Arity):- 
-   dbase_mod(M), '@'( export(Prop/Arity) , M).
+   dbase_mod(M), '@'( M:export(Prop/Arity) , M).
 
 :- multifile db_prop/1,db_prop/2.
 
@@ -289,7 +294,7 @@ argIsa_call(act,_,term):-!.
 argIsa_call(classof,2,type):-!.
 argIsa_call(memory,2,term):-!.
 argIsa_call(Prop,N1,Type):-is_db_prop(Prop,A),functor(P,Prop,A),db_prop(P,_),!,arg(N1,P,Type),!.
-argIsa_call(Prop,N1,Type):- dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),Type=argIsaFn(Prop,N1).
+argIsa_call(Prop,N1,Type):- trace, dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),Type=argIsaFn(Prop,N1).
 
 db_forall_quf(C,Pretest,Template):- C=..[Prop,OBJ|ARGS],
       translate_args(Prop,OBJ,2,ARGS,NEWARGS,true,Pretest),
@@ -353,17 +358,21 @@ compare_n(Last,NewLast):-atomic(NewLast),not(atomic(Last)),throw(incomparable_te
 
 inRegion(O,Region):-atloc(O,LOC),locationToRegion(LOC,Region).
 
+member_or_e(E,[L|List]):-!,member(E,[L|List]).
+member_or_e(E,E).
+
 is_single_valuedOrFail(F,A,Obj,ARGS):-is_db_prop(F,A,singleValued),!,valuedOrThrow(F,A,Obj,ARGS),!.
 is_single_valuedOrFail(_,_,_,_):-fail.
 
-valuedOrThrow(F,_,Obj,ARGS):-mud_isa(Obj,T),findall_type_default_props(Obj,T,Props),Props=[_|_],Prop=..[F|ARGS], member(Prop,Props),!.
+valuedOrThrow(F,_,Obj,ARGS):-mud_isa(Obj,T),findall_type_default_props(Obj,T,Props),Props=[_|_],Prop=..[F|ARGS], member_or_e(Prop,Props),!.
 valuedOrThrow(F,A,Obj,ARGS):-valuedOrThrow1(F,A,Obj,ARGS).
 valuedOrThrow1(_F,_A,_Obj,ARGS):-last(ARGS,unknown),!.
 valuedOrThrow1(F,A,Obj,ARGS):-throw(is_single_valuedOrFail(F,A,Obj,ARGS)).
 
 moo:type_default_props(_,food,[height(0)]).
 
-update_value(OLD,X,NEW):-number(OLD),catch(NEW is OLD + X,_,fail),!.
+update_value(OLD,+X,NEW):-number(OLD),catch(NEW is OLD + X,_,fail),!.
+update_value(OLD,-X,NEW):-number(OLD),catch(NEW is OLD - X,_,fail),!.
 update_value(_OLD,NEW,NEW).
 
 moo:specifier_text(Text,pred):- is_db_prop(Text,_).
@@ -478,8 +487,8 @@ db_prop_multi(isa(term,type)).
 define_db_prop(ArgTypes,_):-doall((arg(_,ArgTypes,ArgType),functor(ArgType,F,_),define_type(F))),fail.
 define_db_prop(ArgTypes,_):- once((functor(ArgTypes,F,A),dynamic(F/A),user_export(F/A))),fail.
 
-define_db_prop(ArgTypes,PropTypes):-functor(ArgTypes,Prop,Arity),asserta(is_db_prop(Prop,Arity)),member(PT,PropTypes),asserta(is_db_prop(Prop,Arity,PT)),is_db_prop_decl2(Prop,Arity,PT),fail.
-define_db_prop(ArgTypes,PropTypes):-functor(ArgTypes,P,A),member(external(Module),PropTypes),not(dbase_mod(Module)),!,length(ARGS,A),HEAD=..[P|ARGS],must(predicate_property(Module:HEAD,_)),!.
+define_db_prop(ArgTypes,PropTypes):-functor(ArgTypes,Prop,Arity),assert_if_new(is_db_prop(Prop,Arity)),member_or_e(PT,PropTypes),assert_if_new(is_db_prop(Prop,Arity,PT)),is_db_prop_decl2(Prop,Arity,PT),fail.
+define_db_prop(ArgTypes,PropTypes):-functor(ArgTypes,P,A),member_or_e(external(Module),PropTypes),not(dbase_mod(Module)),!,length(ARGS,A),HEAD=..[P|ARGS],must(predicate_property(Module:HEAD,_)),!.
 define_db_prop(ArgTypes,PT):-functor(ArgTypes,F,A),length(ARGS,A),HEAD=..[F|ARGS],BODY=req(HEAD),is_db_prop_decl2(F,A,PT), ensure_clause(HEAD,BODY),!.
 
 is_db_prop_decl2(Prop,Arity,_/*flag*/):- dynamic(Prop/Arity),user_export(Prop/Arity).
@@ -491,7 +500,7 @@ ensure_clause(HEAD,BODY):-nop(asserta((HEAD:-BODY))),nop(compile_predicates([HEA
 
 scan_db_prop:-
    dbase_mod(DBM),
-   '@'((forall(db_prop(ArgTypes,PropTypes),define_db_prop(ArgTypes,PropTypes))),DBM).
+   '@'(forall(db_prop(ArgTypes,PropTypes),debugOnError0(define_db_prop(ArgTypes,PropTypes))),DBM).
 
 load_motel:- defrole([],time_state,restr(time,period)).
 

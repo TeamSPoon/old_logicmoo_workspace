@@ -18,9 +18,13 @@
                   display_grid_labels/0,
                   start_mud_telent/1,
                   read_and_do_telnet/1,
+                  remove_dupes/2,
+                  telnet_fmt_shown/3,
                    login_and_run/0]).
 
-:- dynamic(agent_message_stream/3).
+:- dynamic agent_message_stream/3, telnet_fmt_shown/3.
+
+:- meta_predicate toploop_telnet:show_room_grid_single(*,*,0).
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
@@ -71,15 +75,14 @@ scan_updates:-ignore(catch(make,_,true)).
 % USES PACKRAT PARSER 
 % ===========================================================
 
-do_player_action(VA):- foc_current_player(Agent), call_player_action(Agent,VA),!.
+do_player_action(VA):- debug, foc_current_player(Agent), do_player_action(Agent,VA),!.
 
-
-call_player_action(Agent,CMD):-var(CMD),!,fmt('unknown_var_command(~q,~q).',[Agent,CMD]).
-call_player_action(_,end_of_file):-tick_tock.
-call_player_action(_,''):-tick_tock.
-call_player_action(Agent,CMD):- call_agent_command(Agent, CMD),!.
-% call_player_action(Agent,CMD):- trace, call_agent_command(Agent, CMD),!.
-call_player_action(Agent,CMD):-fmt('unknown_call_command(~q,~q).',[Agent,CMD]).
+do_player_action(Agent,CMD):-var(CMD),!,fmt('unknown_var_command(~q,~q).',[Agent,CMD]).
+do_player_action(_,end_of_file):-tick_tock.
+do_player_action(_,''):-tick_tock.
+do_player_action(Agent,CMD):- call_agent_command(Agent, CMD),!.
+% do_player_action(Agent,CMD):- trace, call_agent_command(Agent, CMD),!.
+do_player_action(Agent,CMD):-fmt('unknown_call_command(~q,~q).',[Agent,CMD]).
 
 
 % ===========================================================
@@ -89,6 +92,63 @@ call_player_action(Agent,CMD):-fmt('unknown_call_command(~q,~q).',[Agent,CMD]).
 look_brief(Agent):- prop(Agent,last_command,X),functor(X,look,_),!.
 look_brief(Agent):- telnet_look(Agent).
 
+look_via_pred(_,[]).
+look_via_pred(Pred,[L|List]):-!,
+   ignore(look_via_pred_0(Pred,L)),
+   look_via_pred(Pred,List).
+
+look_via_pred_0(Pred,F=Call):-
+   look_via_pred_1(Pred,F,Call).
+look_via_pred_0(Pred,all(Call)):- 
+   functor(Call,F,_),
+   look_via_pred_1(Pred,F,all(Call)).
+look_via_pred_0(Pred,Call):- 
+   functor(Call,F,_),
+   look_via_pred_1(Pred,F,Call).
+
+look_via_pred_1(Pred,F,all(Call0)):-!,look_via_pred_2(Pred,F,Call0).
+look_via_pred_1(Pred,F,Call0):-look_via_pred_2(Pred,F,Call0).
+
+look_via_pred_2(Pred,F,Call0):-
+   wsubst(Call0,value(Transform),NewValue,Call),
+   ignore(Transform = (object_string_fmt) ),
+    wsubst(Call,value,NewValue,GCall),
+     doall((catch(call(GCall),NewValue,true),
+     fmt_call(Pred,Transform,F,NewValue))).
+
+
+object_string_fmt(Obj,String):- String = o(Obj,Str),object_string(Obj,Str).
+
+fmt_call(Pred,Transform,F,NewValue):-flatten([NewValue],ValueList), NewValue\=ValueList,fmt_call(Pred,Transform,F,ValueList).
+fmt_call(Pred,Transform,N,[V]):-fmt_call_pred(Pred,Transform,N,V),!.
+fmt_call(Pred,Transform,N,[V|VV]):-remove_dupes([V|VV],RVs),reverse(RVs,Vs),fmt_call_pred(Pred,Transform,N,Vs),!.
+fmt_call(Pred,Transform,N,V):-fmt_call_pred(Pred,Transform,N,V),!.
+
+fmt_call_pred(Pred,Transform,N,[L|List]):-!, doall((member(V,[L|List]),fmt_call_pred_trans(Pred,Transform,N,V))).
+fmt_call_pred(Pred,Transform,N,V0):-fmt_call_pred_trans(Pred,Transform,N,V0).
+
+fmt_call_pred_trans(Pred,Transform,N,V0):-call(Transform,V0,V),!,call(Pred,N,V).
+
+
+telnet_fmt(TL,N,V):-telnet_fmt_shown(TL,N,V),!.
+telnet_fmt(TL,N,V):-assert_if_new(telnet_fmt_shown(TL,N,V)),fmt('~q.~n',[N=V]).
+
+
+remove_dupes(In,Out):-remove_dupes(In,Out,[]).
+
+remove_dupes([],[],_):-!.
+remove_dupes([I|In],Out,Shown):-member(I,Shown),!,remove_dupes(In,Out,Shown).
+remove_dupes([I|In],[I|Out],Shown):-remove_dupes(In,Out,[I|Shown]).
+
+values_shown(TL,Vs):-findall(V,(telnet_fmt_shown(TL,_,VV),flatten([VV],VVV),member(V,VVV)),Vs).
+values_shown_strings(TL):-values_shown(TL,Vs),remove_dupes(Vs,Objs),reverse(Objs,RObjs),telnet_look_objs(RObjs).
+
+telnet_look_objs([]).
+telnet_look_objs([O|Objs]):-!,telnet_look_obj(O),!,telnet_look_objs(Objs).
+
+telnet_look_obj(O):-number(O).
+telnet_look_obj(error(_,_)).
+telnet_look_obj(O):-fresh_line,telnet_print_object_desc(_,O),!.
 
 telnet_look(Agent):-
         scan_updates,!,
@@ -96,15 +156,26 @@ telnet_look(Agent):-
         locationToRegion(LOC,Region),
         must(telnet_print_grid_and_region_name(Agent,Region)),!,
         ignore(telnet_print_exits(Agent,LOC)),!,
-        must(telnet_print_region_objects(Agent,LOC)),!,
         must(deliver_location_events(Agent,LOC)),!,
-        ignore(get_all(Agent,Chg,Dam,Suc,Scr,Percepts,Inv)),
-        ignore(height(Agent,Ht)),
-        ignore(facing(Agent,Facing)),
-        fmt('Agent=~w Ht=~w Facing=~w LOC=~w Charge=~w Dam=~w Success=~w Score=~w Inventory=~q ~n', [Agent,Ht,Facing,LOC,Chg,Dam,Suc,Scr,Inv]),
-	ignore((nonvar(Percepts),write_pretty(Percepts))),
-        must(ignore(((get_near(Agent,Stuff),
-        fmt('STUFF=~q',[Stuff]))))),!.
+         gensym(telnet_fmt,TL),        
+         look_via_pred(telnet_fmt(TL),
+         [
+         charge(Agent,value),
+         damage(Agent,value),
+         success=look:success(Agent,value),
+         score(Agent,value),
+         inventory(Agent,value),
+         all(get_feet(Agent,value)),
+         get_near(Agent,value),
+         height(Agent,value),
+         facing(Agent,value),
+         height_on_obj(Agent,value),
+         all(inRegion(value,Region)),
+         %inRegions=inRegion(all,Region),
+         get_percepts(Agent,value)
+         ]),
+      % values_shown_strings(TL),
+      retractall(telnet_fmt_shown(TL,_,_)).
 
 telnet_print_exits(_Agent,LOC):-
   locationToRegion(LOC,Region),
@@ -123,25 +194,18 @@ telnet_print_grid_and_region_name(Agent,Region):-
 telnet_print_object_desc(_Agent,O,LOW,_GOOD,WhatString,_Max):-
    order_descriptions(O,LOW-199,[Region|IST]) -> forall_member(M,[Region|IST],fmt0('~w.  ',[M])) ;
    setof(S,nameStrings(O,S),[Region|IST]) ->   forall_member(M,[Region|IST],fmt0('~w is ~w. ',[M,WhatString])) ;
-   setof(S,mud_isa(O,S),List), fmt('~q is ~w',[mud_isa(O,List),WhatString]).
+   ((setof(S,((mud_isa_a(O,S),nonvar(S))),List),fmt('~q is ~w',[mud_isa(O,List),WhatString]))).
 
-telnet_print_region_objects(Agent,Region):- !,ignore((
-     setof(O,inRegion(O,Region),Set),
-       forall_member(O,Set,telnet_print_object_desc(Agent,O)))).
+mud_isa_a(O,S):-mud_isa(O,S).
+mud_isa_a(O,classof(O)).
 
-telnet_print_region_objects(Agent,Region):-
-       props(Agent,[id(X)]),
-       telnet_print_region_objects_except(Agent,Region,[same(X),classof(invisible)]).
-
-telnet_print_region_objects_except(Agent,Region,ExceptFor):-
- setof(O,inRegion(O,Region),Set),
- forall(member(O,Set),(divide_match(O,ExceptFor,_,[]),telnet_print_object_desc(Agent,O))).
-
+telnet_print_region_objects(Agent,Region):- 
+     setof(O,inRegion(O,Region),Set), forall_member(O,Set,telnet_print_object_desc(Agent,O)).
 
 telnet_print_object_desc(Agent,O):-
  telnet_print_object_desc(Agent,O,4,6,'is here.',1).
 
-%% divide_match(-O,-InList,+Matches,+NotMatches)
+%% divide_match(+O,+InList,-Matches,-NotMatches)
 divide_match(O,InList,Matches,NotMatches):-
    divide_match0(O,InList,MatchesI,NotMatchesI),!,
    NotMatches=NotMatchesI,Matches=MatchesI.
@@ -153,18 +217,6 @@ divide_match0(O,[Test|For],True,False):-
    divide_match(O,For,True,[Test|False]).
 
 deliver_location_events(_Agent,_LOC):-true.
-
-order_descriptions(O,DescSpecs,ListO):-findall(S,(description(O,S),meets_desc_spec(S,DescSpecs)),Rev),reverse(Rev,List),delete_repeats(List,ListO).
-
-delete_repeats([],[]):-!.
-delete_repeats([Region|List],[Region|ListO]):-delete(List,Region,ListM), delete_repeats(ListM,ListO),!.
-
-meets_desc_spec(S0,_L):- string_to_atom(S0,A),atomic_list_concat([_,_|_],'mudBareHandDa',A),!,fail.
-meets_desc_spec(S,From-To):- desc_len(S,Region),!, Region =< To, Region >= From.
-meets_desc_spec(_,_).
-
-desc_len(S0,Region):-string_to_atom(S0,S),
-   atomic_list_concat(Words,' ',S),length(Words,Ws),atomic_list_concat(Sents,'.',S),length(Sents,Ss),Region is Ss+Ws,!.
 
 % Display what the agent sees in a form which
 % makes sense to me

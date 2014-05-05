@@ -11,8 +11,9 @@
         run_mud_test/2,
         run_mud_test_code/1]).
 
-:- meta_predicate mud_tests:run_mud_test_code(0).
-:- meta_predicate mud_tests:run_mud_test(*,0).
+:- meta_predicate moo_testing:run_mud_test_code(0).
+:- meta_predicate moo_testing:run_mud_test(*,0).
+
 
 % do some sanity testing (expects the startrek world is loaded)
 run_mud_tests:-

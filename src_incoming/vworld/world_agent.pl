@@ -42,10 +42,11 @@ call_agent_command(A,CMD):- call_agent_action(A,CMD),!.
 
 % All Actions must be called from here!
 call_agent_action(Agent,CMDI):-
-      subst(CMDI,self,Agent,CMD),
+      subst(CMDI,self,Agent,CMDI2),
       thread_self(TS),
       asserta(thlocal:current_agent(TS,Agent)),
       atloc(Agent,Where),
+      subst(CMDI2,here,Where,CMD),
       % start event
       raise_location_event(Where,notice(reciever,do(Agent,CMD))),
      catch(( ignore(( once((debugOnError(moo:agent_call_command(Agent,CMD)),
@@ -60,6 +61,10 @@ call_agent_action(Agent,CMDI):-
 get_session_id(main):-thread_self(main),!.
 get_session_id(ID):-thread_self(ID),thlocal:current_agent(ID,_),!.
 get_session_id(O):-current_input(O),!.
+
+current_agent_or_var(P):- get_session_id(O),thlocal:current_agent(O,P),!.
+current_agent_or_var(P):- get_session_id(P),P \=main,!.
+current_agent_or_var(_).
 
 foc_current_player(P):- get_session_id(O),thlocal:current_agent(O,P),!.
 foc_current_player(P):- get_session_id(O),generate_new_player(P), !, asserta(thlocal:current_agent(O,P)).

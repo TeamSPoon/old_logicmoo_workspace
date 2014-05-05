@@ -13,6 +13,8 @@
                    parseIsa//2,
                    objects_match/3,
                    object_match/2,
+                   object_string/2,
+                   order_descriptions/3,
                    parseForTypes//2]).
 
 
@@ -42,10 +44,71 @@ type_parse(Type,StringM,Term,LeftOver):-
       fmt('No Success.~n',[])).
 
 
+meets_desc_spec(T,_L):- term_to_atom(T,S0),string_to_atom(S0,A),atomic_list_concat([_,_|_],'mudBareHandDa',A),!,fail.
+meets_desc_spec(_,[]):-!.
+meets_desc_spec(S,[DS|SL]):-!,meets_desc_spec(S,DS),meets_desc_spec(S,SL),!.
+meets_desc_spec(S,From-To):-!, desc_len(S,Len),!, between(From,To,Len).
+meets_desc_spec(_,_).
+
+desc_len(S0,Region):- term_to_atom(S0,S),
+   atomic_list_concat(Words,' ',S),length(Words,Ws),atomic_list_concat(Sents,'.',S),length(Sents,Ss),Region is Ss+Ws,!.
+
+order_descriptions(O,DescSpecs,ListO):-findall(S,(description(O,S),meets_desc_spec(S,DescSpecs)),Rev),reverse(Rev,List),delete_repeats(List,ListO).
+
+delete_repeats([],[]):-!.
+delete_repeats([Region|List],[Region|ListO]):-delete(List,Region,ListM), delete_repeats(ListM,ListO),!.
+
 objects_match(SObj,Inv,List):-
    findall(Obj, (member(Obj,Inv),object_match(SObj,Obj)), List).
 
+:-dynamic (object_string_used/2).
+
+object_string(O,String):-object_string(_,O,1-4,String),!.
+
+object_string(Agent,O,DescSpecs,String):- 
+   gensym(object_string,OS),
+   object_print_details(OS,Agent,O,DescSpecs,[]),
+   with_output_to(string(StringI),doall((retract(object_string_used(OS,Str)),write(Str)))),
+   retractall(object_string_used(OS,_)),
+   string_dedupe(StringI,String).
+
+remove_predupes([L|ListI],[L|ListO]):-not(member_ci(L,ListI)),remove_predupes(ListI,ListO).
+remove_predupes([_|ListI],ListO):- remove_predupes(ListI,ListO).
+
+member_ci(L,ListI):-member(L,ListI),!.
+member_ci(L,ListI):-string_lower(L,LL),member(LLL,ListI),string_lower(LLL,LL),!.
+
+string_dedupe(StringI,StringO):- atomics_to_string(StringL," ",StringI),remove_predupes(StringL,StringL0),atomics_to_string(StringL0," ",StringO).
+
+object_print_details(OS,Agent,O,DescSpecs,Skipped):-
+   once(member(O,Skipped);
+   (forall((req(keyword(O,KW)),meets_desc_spec(KW,DescSpecs)),object_print_details_fmt(OS,' ~w',[KW])),
+   forall((req(nameStrings(O,KW)),meets_desc_spec(KW,DescSpecs)),object_print_details_fmt(OS,' ~w',[KW])),
+   ignore((mud_isa(O,S), meets_desc_spec(mud_isa(O,S),DescSpecs),object_print_details_fmt(OS,' ~w',[mud_isa(O,S)]))),
+   order_descriptions(O,DescSpecs,List),
+   forall_member(M,List,object_print_details_fmt(OS,' ~w.',[M])),
+   forall(mud_isa(O,S),object_print_details(OS,Agent,S,DescSpecs,[O|Skipped])))).
+
+object_print_details_fmt(OS,Fmt,[A|KW]):- sformat(Str,Fmt,[A|KW]), assert_if_new(object_string_used(OS,Str)).
+
 object_match(SObj,Obj):- isaOrSame(Obj,SObj).
+object_match(S,Obj):- 
+   atoms_of(S,Atoms),
+   current_agent_or_var(P),
+   object_string(P,Obj,1-3,String),
+   string_lower(String,LString),
+   str_contains_all(Atoms,LString).
+
+str_contains_all([],_String):-!.
+str_contains_all([A|Atoms],String):-
+      string_lower(A,L),
+      sub_string(String,_,_,Aft,L),sub_string(String,Aft,_,0,SubString),!,
+      str_contains_all(Atoms,SubString).
+
+atoms_of(Var,[]):- (var(Var);Var==[]),!.
+atoms_of(Atom,[Atom]):-atomic(Atom),!.
+atoms_of([H|T],L):-atoms_of(H,HL),atoms_of(T,TL),append(HL,TL,L),!.
+atoms_of(C,L):-C=..CL,atoms_of(CL,L),!.
 
 % ===========================================================
 % PARSER
@@ -150,18 +213,24 @@ equals_icase(A,B):-string_upper(A,U),string_upper(B,U).
 
 parseFmt(Type,Dir)--> {moo:specifier_text(Dir,Type)}, dcgReorder(theString(String),{equals_icase(Dir,String)}).
 
-parseFmt(number,Term)--> dcgReorder(theText([String]),{any_to_number(String,Term)}).
-parseFmt(string,Term)--> dcgReorder(theText([String]),{atom_string(Term,String)}).
+parseFmt(string,String)--> theString(String).
 parseFmt(or([L|_]),Term) --> parseIsa(L,Term).
 parseFmt(or([_|List]),Term) --> parseIsa(or(List),Term).
+
+parseFmt(optional(Type,_),Term) --> parseIsa(Type,Term).
+parseFmt(optional(_,Term),Term) --> [].
+
 parseFmt(and([L|List]),Term1) --> dcgAnd(parseIsa(L,Term1),parseIsa(and(List),Term2)),{ignore(Term1==Term2),!}.
-parseFmt(item,Term)--> dcgAnd(dcgLenBetween(2,1),theText(String)),{specifiedItemType(String,item,Term)}.
-parseFmt(actor,Term)--> dcgAnd(dcgLenBetween(2,1),theText(String)),{specifiedItemType(String,actor,Term)}.
 parseFmt(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{specifiedItemType(String,Type,Term)}.
 
 specifiedItemType([String],Type,StringO):-nonvar(String),specifiedItemType(String,Type,StringO).
-specifiedItemType(A,T,AA):- format_complies(A,T,AA),!.
-specifiedItemType(String,Type,String):- atom(Type), Term =..[Type,String], logOnError(req(Term)),!.
+specifiedItemType(String,Type,Inst):- instances_of_type(Inst,Type),object_match(String,Inst),!.
+specifiedItemType(A,T,AA):- is_decl_ft(T),!, format_complies(A,T,AA),!.
+
+instances_of_type(Inst,Type):- isa(Inst,Type).
+%% instances_of_type(Inst,Type):- atom(Type), Term =..[Type,Inst], logOnError(req(Term)).
+
+
 
 :- include(logicmoo('vworld/moo_footer.pl')).
 

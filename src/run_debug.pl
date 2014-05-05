@@ -24,6 +24,16 @@ user:file_search_path(weblog, '/usr/local/lib/swipl-7.1.11/pack/weblog/prolog').
 user:file_search_path(cliopatria, '/devel/ClioPatria').
 user:file_search_path(cliopatria, 't:/devel/ClioPatria').
 
+
+:- use_module(library(settings)).
+
+:- user:file_search_path(cliopatria,SP),
+   exists_directory(SP),
+   writeq(user:file_search_path(cliopatria,SP)),nl.
+   %set_setting_default(cliopatria_binding:path, SP).
+   %save_settings('moo_settings.db').
+   %%setting(cliopatria_binding:path, atom, SP, 'Path to root of cliopatria install'),!.
+
 :- ensure_loaded(logicmoo('http/user_page')).
 
 :- meta_predicate(if_version_greater(?,0)).

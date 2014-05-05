@@ -24,15 +24,16 @@ term_is_ft(Term,Type):-
    ignore(NewTerm=Term).
 
 
-is_decl_ft(S):- is_decl_ft_except(S,[]).
-
+is_decl_ft(S):-   moo:decl_ft(S,_).
+is_decl_ft(S):-   moo:decl_subft(S,_).
+/*
 is_decl_ft_except(S,List):-
    moo:decl_ft(S,_);
    not((member(S,List), 
       ((moo:decl_subft(S,S2) ,
         is_decl_ft_except(S2,[S|List]) ;
              ((moo:decl_subft(S3,S) , is_decl_ft_except(S3,[S,S2|List]))))))).
-
+*/
 
 moo:decl_ft(atom,atom(self)).
 moo:decl_ft(apath(region,dir),formatted).
@@ -54,7 +55,7 @@ moo:decl_subft(var,prolog).
 moo:decl_subft(term,prolog).
 moo:decl_subft(atom,term).
 moo:decl_subft(string,term).
-moo:decl_subft(number,term).
+% moo:decl_subft(number,term).
 moo:decl_subft(id,term).
 
 moo:decl_subft(int,integer).
@@ -64,6 +65,8 @@ moo:decl_subft(dice,int).
 format_complies(A,Type,A):- var(Type),!,trace,throw(failure(format_complies(A,Type))).
 format_complies(A,string,AA):- ignoreOnError(text_to_string(A,AA)).
 format_complies(A,int,AA):- any_to_number(A,AA).
+format_complies(A,number,AA):- any_to_number(A,AA).
+format_complies(A,integer,AA):- any_to_number(A,AA).
 format_complies(A,Fmt,AA):- moo:decl_ft(Fmt,formatted),!,format_complies(A,formatted(Fmt),AA).
 format_complies(A,Fmt,A):- moo:decl_ft(Fmt,Code),!,subst(Code,self,A,Call),Call.   
 format_complies(A,number,AA):- must(any_to_number(A,AA)).

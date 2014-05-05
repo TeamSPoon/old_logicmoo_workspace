@@ -16,7 +16,7 @@
 % score(Agent,Scr) = score
 % get_percepts(Agent,Percepts) = list of lists of objects in agents location plus 2 locations in each direction
 % get_near(Agent,Percepts) = list of lists of objects in agents atloc plus 1 atloc in each dir
-% get_feet(Agent,Percept) = list of objects in agents location
+% get_feet(Agent,Percepts) = list of objects in agents location
 % inventory(Agt,Inv) = inventory (anything the agent has taken
 % to do this.
 %
@@ -26,7 +26,7 @@
 % padd(Obj,height(ObjHt))  == add(p(height,Obj,ObjHt)) == add(p(height,Obj,ObjHt)) == add(height(Obj,ObjHt))
 */
 
-:- module(look, [get_all/7, get_percepts/2,  get_near/2, get_feet/2, height_on_obj/2, inventory/2, can_sense/5 ]).
+:- module(look, [get_all/7, get_percepts/2,  get_near/2, get_feet/2, height_on_obj/2, inventory/2, can_sense/5 , success/2, flatten_dedupe/2]).
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
@@ -39,7 +39,8 @@ can_sense(_Agent,visual,InList,InList,[]).
 
 
 looking(Agent):- get_session_id(O), thlocal:current_agent(O,Agent),!.
-looking(Agent):- thinking(Agent).
+looking(Agent):- isa(Agent,agent).
+% looking(Agent):- thinking(Agent).
 
 % ********** TOP LEVEL PREDICATE: this is the predicate agents use to look
 % Look, reports everything not blocked up to two locations away
@@ -47,42 +48,54 @@ looking(Agent):- thinking(Agent).
 % To make this action take a turn, change the first line to:
 % Impliment(get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv)) :-
 get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
+  call((
 	looking(Agent),
-	ignore(charge(Agent,Vit)),
-        ignore(damage(Agent,Dam)),
-	ignore(success(Agent,Suc)),
-	ignore(score(Agent,Scr)),
-	ignore(inventory(Agent,Inv)),
-	ignore(get_percepts(Agent,Percepts) ),!.
+	charge(Agent,Vit),
+        damage(Agent,Dam),
+	success(Agent,Suc),
+	score(Agent,Scr),
+	inventory(Agent,Inv),
+	get_percepts(Agent,Percepts))),!.
 
+
+flatten_dedupe(Percepts0,Percepts):-
+   flatten([Percepts0],Percepts1),remove_dupes(Percepts1,Percepts).
 
 % Get only the Percepts
-get_percepts(Agent,Percepts) :-
+get_percepts(Agent,Percepts) :- get_percepts0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts).
+get_percepts0(Agent,Percepts) :-
+  call((
 	looking(Agent),
-	view_list(Dirs),
+	view_vectors(Dirs),
 	check_for_blocks(Agent),
 	view_dirs(Agent,Dirs,Tmp_percepts),
-	alter_view(Dirs,Tmp_percepts,Percepts),
+	alter_view(Dirs,Tmp_percepts,Percepts))),
 	!.
 
 % Look at locations immediately around argent
-get_near(Agent,Percepts) :-
+get_near(Agent,Percepts):- get_near0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts).
+   
+get_near0(Agent,Percepts) :-
+  call((
 	looking(Agent),
-	view_near_list(Dirs),
-	view_dirs(Agent,Dirs,Percepts),
-	!.
+	near_vectors(Dirs),
+	view_dirs(Agent,Dirs,Percepts))),!.
 
 % Look only at location agent is currently in.
-get_feet(Agent,Percept) :-
+get_feet(Agent,Percepts) :-  get_feet0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts).
+
+get_feet0(Agent,Percepts):-
+  call((
 	looking(Agent),
 	atloc(Agent,LOC),
         facing(Agent,Facing),
         reverse_dir(Facing,Rev),
-	get_mdir(Agent,[Facing,Rev],LOC,Percept),
+	get_mdir_u(Agent,[Facing,Rev],LOC,Percepts))),
 	!.
 
 % Get only the Inv (inventory)
-inventory(Agent, Inv) :-
+inventory(Agent,Percepts) :-  inventory0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts).
+inventory0(Agent, Inv) :-
 	findall(Poss,possess(Agent,Poss),Inv).
 
 %View list starting at vac's position and moving out in a clockwise spiral
@@ -93,14 +106,14 @@ inventory(Agent, Inv) :-
 
 %grid of view, upper left (nw) to lower right (se)
 %This is the order the agents will receive their Percepts returned from get_all(Agent,) in
-view_list([[nw,nw],[n,nw],[n,n],[n,ne],[ne,ne],
+view_vectors([[nw,nw],[n,nw],[n,n],[n,ne],[ne,ne],
 	    [w,nw],[nw,here],[n,here],[ne,here],[e,ne],
 	    [w,w],[w,here],[d,u],[e,here],[e,e],
 	    [w,sw],[sw,here],[s,here],[se,here],[e,se],
 	    [sw,sw],[s,sw],[s,s],[s,se],[se,se]]).
 
 % A view list of only the locations immediately surrounding the agent.
-view_near_list([[nw,here],[n,here],[ne,here],
+near_vectors([[nw,here],[n,here],[ne,here],
 	[w,here],[d,u],[e,here],
 	[sw,here],[s,here],[se,here]]).
 
@@ -125,11 +138,10 @@ height_on_obj(Agent,Ht) :-
 	member(Obj,Objs),
 	props(Obj,height(ObjHt)),
 	height(Agent,AgHt),
-	Ht = (AgHt + ObjHt) - 1.
+	Ht = (AgHt + ObjHt) - 1,!.
 height_on_obj(Agent,Ht) :-
-	height(Agent,Ht).
-height_on_obj(Agent,Ht) :-
-	height(Agent,Ht).
+	height(Agent,Ht),!.
+
 
 % Figure out if any obstacles are blocking vision...
 blocked_percepts(_,[],[],Blocked_Percepts,Blocked_Percepts).
@@ -170,10 +182,11 @@ dark_if_yes(no,[P],P).
 
 % Builds the Percepts list. (everything located up to 2 locations away from agent).
 view_dirs(_,[],[]).
-view_dirs(Agent,[[D1,D2]|Rest],Percepts) :-
+view_dirs(Agent,[[D1|D2]|Rest],Percepts) :-
+      looking(Agent),
 	view_dirs(Agent,Rest,Psofar),
 	atloc(Agent,LOC),
-	get_mdir(Agent,[D1,D2],LOC,What),
+	get_mdir_u(Agent,[D1|D2],LOC,What),
 	append([What],Psofar,Percepts).
 
 % The look loop (look at one location)
@@ -184,6 +197,17 @@ get_mdir(_Gent,[here],LOC,What) :-
 get_mdir(Agent,[Dir|D],LOC,What) :-
 	move_dir_target(LOC,Dir,XXYY),
 	get_mdir(Agent,D,XXYY,What).
+
+% The look loop (look at one location)
+get_mdir_u(_Gent,[],LOC,What) :-
+	report(LOC,What).
+get_mdir_u(_Gent,[here],LOC,What) :-
+	report(LOC,What).
+get_mdir_u(Agent,[Dir|D],LOC,What) :-
+	move_dir_target(LOC,Dir,XXYY),
+	get_mdir_u(Agent,D,XXYY,What).
+get_mdir_u(Agent,[_|D],LOC,What) :- 
+   get_mdir_u(Agent,D,LOC,What).
 
 % Reports everything at a location.
 report(LOC,List) :-
@@ -200,7 +224,7 @@ mask([Head|Tail],SoFar,What) :-
 
 % Check to see if last action was successful or not
 success(Agent,no) :-
-	failure(Agent,_).
+	failure(Agent,_),!.
 success(_,yes).
 
 
