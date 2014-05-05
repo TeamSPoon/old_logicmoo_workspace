@@ -1090,7 +1090,7 @@ bugger_t_expansion([F0|ARGS0],[F1|ARGS1]):-bugger_t_expansion(F0,F1),bugger_t_ex
 bugger_t_expansion(T,TT):- T=..[F|ARGS0],bugger_t_expansion(ARGS0,ARGS1), TT=..[F|ARGS1].
 
 unwrappabe(F):-member(F,['debugOnError',debugOnError0]),!,fail.
-unwrappabe(F):-member(FF,['OnError','OnFailure','LeastOne','Ignore','must']),atom_concat(_,FF,F),!.
+unwrappabe(F):-member(FF,['OnError','OnFailure','LeastOne','Ignore','must_is_used']),atom_concat(_,FF,F),!.
 
 
 

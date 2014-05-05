@@ -94,27 +94,24 @@ look_brief(Agent):- telnet_look(Agent).
 
 look_via_pred(_,[]).
 look_via_pred(Pred,[L|List]):-!,
-   ignore(look_via_pred_0(Pred,L)),!,
+   catch((ignore(look_via_pred_0(Pred,L);dmsg(failed(look_via_pred_0(Pred,L))))),E,dmsg(error_failed(E,look_via_pred_0(Pred,L)))),
    look_via_pred(Pred,List).
 
-look_via_pred_0(Pred,F=Call):-
-   look_via_pred_1(Pred,F,Call).
-look_via_pred_0(Pred,all(Call)):- !,
-   functor(Call,F,_),
-   look_via_pred_1(Pred,F,all(Call)).
-look_via_pred_0(Pred,Call):- 
-   functor(Call,F,_),
-   look_via_pred_1(Pred,F,Call).
+look_via_pred_0(Pred,F=Call):- !,look_via_pred_1(Pred,F,Call).
+look_via_pred_0(Pred,once(Call)):- !,functor(Call,F,_), look_via_pred_1(Pred,F,once(Call)).
+look_via_pred_0(Pred,all(Call)):- !,functor(Call,F,_), look_via_pred_1(Pred,F,all(Call)).
+look_via_pred_0(Pred,Call):- functor(Call,F,_), look_via_pred_1(Pred,F,Call).
 
 look_via_pred_1(Pred,F,all(Call)):-!,look_via_pred_2(Pred,F,Call).
+look_via_pred_1(Pred,F,once(Call)):-!,look_via_pred_2(Pred,F,once(Call)).
 look_via_pred_1(Pred,F,Call):-look_via_pred_2(Pred,F,Call).
 
 look_via_pred_2(Pred,F,Call0):-
-   wsubst(Call0,value(Transform),NewValue,Call),
-   ignore(Transform = (object_string_fmt) ),
-    wsubst(Call,value,NewValue,GCall),
-     doall((catch(call(GCall),NewValue,true),
-     fmt_call(Pred,Transform,F,NewValue))).
+      wsubst(Call0,value(Transform),NewValue,Call),
+      ignore(Transform = (object_string_fmt) ),
+      wsubst(Call,value,NewValue,GCall),
+      doall((catch(call(GCall),Error, NewValue=Error), 
+             fmt_call(Pred,Transform,F,NewValue))).
 
 
 object_string_fmt(Obj,String):- object_string(Obj,Str), String = Str.
@@ -127,11 +124,8 @@ fmt_call(Pred,Transform,N,V):-fmt_call_pred(Pred,Transform,N,V),!.
 fmt_call_pred(Pred,Transform,N,[L|List]):-!, doall((member(V,[L|List]),fmt_call_pred_trans(Pred,Transform,N,V))).
 fmt_call_pred(Pred,Transform,N,V0):-fmt_call_pred_trans(Pred,Transform,N,V0).
 
-fmt_call_pred_trans(Pred,Transform,N,V0):-call(Transform,V0,V),!,call(Pred,N,V).
+fmt_call_pred_trans(Pred,Transform,N,V0):-must((debugOnError(call(Transform,V0,V)),!,debugOnError(call(Pred,N,V)))).
 
-
-telnet_fmt(TL,N,V):-telnet_fmt_shown(TL,N,V),!.
-telnet_fmt(TL,N,V):-assert_if_new(telnet_fmt_shown(TL,N,V)),fmt('~q.~n',[N=V]).
 
 
 remove_dupes(In,Out):-remove_dupes(In,Out,[]).
@@ -140,8 +134,6 @@ remove_dupes([],[],_):-!.
 remove_dupes([I|In],Out,Shown):-member(I,Shown),!,remove_dupes(In,Out,Shown).
 remove_dupes([I|In],[I|Out],Shown):-remove_dupes(In,Out,[I|Shown]).
 
-values_shown(TL,Vs):-findall(V,(telnet_fmt_shown(TL,_,VV),flatten([VV],VVV),member(V,VVV)),Vs).
-values_shown_strings(TL):-values_shown(TL,Vs),remove_dupes(Vs,Objs),reverse(Objs,RObjs),telnet_look_objs(RObjs).
 
 telnet_look_objs([]).
 telnet_look_objs([O|Objs]):-!,telnet_look_obj(O),!,telnet_look_objs(Objs).
@@ -154,14 +146,17 @@ telnet_look(Agent):-
         scan_updates,!,
         must(atloc(Agent,LOC)),!,
         locationToRegion(LOC,Region),
-        must(telnet_print_grid_and_region_name(Agent,Region)),!,
-        ignore(telnet_print_exits(Agent,LOC)),!,
+        must(show_room_grid(Region)),
+        must(telnet_print_object_desc(Agent,Region,4,6,'the name of this place',99)),!,
+        setof(D-E,pathBetween_call(Region,D,E),Set),
+        forall_member(D-E,Set,once(telnet_print_path(Region,D,E))),
         must(deliver_location_events(Agent,LOC)),!,
          gensym(telnet_fmt,TL),
          look_via_pred(telnet_fmt(TL),
          [
-         charge(Agent,value),
-         damage(Agent,value),
+         charge(Agent,value(=)),
+         movedist(Agent,value),
+         damage(Agent,value(=)),
          success=look:success(Agent,value),
          score(Agent,value),
          inventory(Agent,value),
@@ -170,26 +165,21 @@ telnet_look(Agent):-
          height(Agent,value),
          facing(Agent,value),
          height_on_obj(Agent,value),
-         all(inRegion(value,Region)),
-         %inRegions=inRegion(all,Region),
-         get_percepts(Agent,value)
+         get_percepts(Agent,value),
+         inRegion(value,Region)
          ]),
-      % values_shown_strings(TL),
       retractall(telnet_fmt_shown(TL,_,_)).
-
-telnet_print_exits(_Agent,LOC):-
-  locationToRegion(LOC,Region),
-   setof(D-E,pathBetween_call(Region,D,E),Set),
-   forall_member(D-E,Set,once(telnet_print_path(Region,D,E))).
 
 telnet_print_path(Region,D,E):-
    req(pathName(Region,D,S)) -> fmt('~w.',[S]) ;
    nameStrings(E,NS) -> fmt('~w is ~w',[D,NS]) ;
    fmt('~w ~w',[D,E]).   
 
-telnet_print_grid_and_region_name(Agent,Region):-
-      must(show_room_grid(Region)),
-      must(telnet_print_object_desc(Agent,Region,4,6,'the name of this place',99)),!.
+telnet_fmt(TL,N,V):-telnet_fmt_shown(TL,N,V),!.
+telnet_fmt(TL,N,V):-assert_if_new(telnet_fmt_shown(TL,N,V)),fmt('~q.~n',[N=V]).
+values_shown(TL,Vs):-findall(V,(telnet_fmt_shown(TL,_,VV),flatten([VV],VVV),member(V,VVV)),Vs).
+values_shown_strings(TL):-values_shown(TL,Vs),remove_dupes(Vs,Objs),reverse(Objs,RObjs),telnet_look_objs(RObjs).
+
 
 telnet_print_object_desc(_Agent,O,LOW,_GOOD,WhatString,_Max):-
    order_descriptions(O,LOW-199,[Region|IST]) -> forall_member(M,[Region|IST],fmt0('~w.  ',[M])) ;
@@ -199,8 +189,6 @@ telnet_print_object_desc(_Agent,O,LOW,_GOOD,WhatString,_Max):-
 mud_isa_a(O,S):-mud_isa(O,S).
 mud_isa_a(O,classof(O)).
 
-telnet_print_region_objects(Agent,Region):- 
-     setof(O,inRegion(O,Region),Set), forall_member(O,Set,telnet_print_object_desc(Agent,O)).
 
 telnet_print_object_desc(Agent,O):-
  telnet_print_object_desc(Agent,O,4,6,'is here.',1).

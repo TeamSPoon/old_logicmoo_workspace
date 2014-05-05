@@ -9,12 +9,14 @@
 
 
 :- module(parser_imperative, [
-                   parse_agent_text_command/5,                   
+                   parse_agent_text_command/5,            
+                   parse_agent_text_command_0/5,            
                    parseIsa//2,
                    objects_match/3,
                    object_match/2,
                    object_string/2,
                    order_descriptions/3,
+                   string_equal_ci/2,
                    parseForTypes//2]).
 
 
@@ -85,6 +87,8 @@ remove_predupes([_|ListI],ListO):- remove_predupes(ListI,ListO).
 member_ci(L,ListI):-member(L,ListI),!.
 member_ci(L,ListI):-string_lower(L,LL),member(LLL,ListI),string_lower(LLL,LL),!.
 
+string_equal_ci(L0,L1):-string_lower(L0,L2),string_lower(L1,L2).
+
 object_print_details(OS,Agent,O,DescSpecs,Skipped):-
    once(member(O,Skipped);
   (
@@ -117,25 +121,45 @@ atoms_of(Atom,[Atom]):-atomic(Atom),!.
 atoms_of([H|T],L):-atoms_of(H,HL),atoms_of(T,TL),append(HL,TL,L),!.
 atoms_of(C,L):-C=..CL,atoms_of(CL,L),!.
 
+call_no_cuts(CALL):-clause(CALL,TEST),call_no_cuts_0(TEST).
+
+call_no_cuts_0(true):-!.
+call_no_cuts_0((!)):-!.
+call_no_cuts_0((A,B)):-!.call_no_cuts_0(A),call_no_cuts_0(B).
+call_no_cuts_0(C):-call(C).
+
 % ===========================================================
 % PARSER
 % ===========================================================
+parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL):-
+  parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL),
+   dmsg(succeed_parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL)),!.
 
+parse_agent_text_command(Agent,VERB,[PT2|ARGS],NewAgent,GOAL):-
+   atomic_list_concat([VERB,PT2],'_',SVERB),
+   parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL),!,
+   dmsg(special_succeed_parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL)),!.
 
-parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL):- moo:agent_text_command(Agent,[SVERB|ARGS],NewAgent,GOAL).
+parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL):-
+ dmsg(failed_parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL)),fail,
+ debug,visible(+all),leash(+all),trace,
+ parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL),!.
+
+parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL):- 
+   call_no_cuts(moo:agent_text_command(Agent,[VERB|ARGS],NewAgent,GOAL)),
+   verb_matches(SVERB,VERB).
 
 % parses a verb phrase and retuns one interpretation (action)
-parse_agent_text_command(Agent,SVERB,ARGS,Agent,GOAL):-
+parse_agent_text_command_0(Agent,SVERB,ARGS,Agent,GOAL):-
    parse_verb_pharse(Agent,SVERB,ARGS,GOALANDLEFTOVERS),
    dmsg(parserm("GOALANDLEFTOVERS"=GOALANDLEFTOVERS)),
    GOALANDLEFTOVERS \= [],
    must(chooseBestGoal(GOALANDLEFTOVERS,GOAL)),
    dmsg(parserm("chooseBestGoal"=GOAL)).
 
-verb_matches(SVERB,VERB):-same(VERB,SVERB).
+verb_matches(SVERB,VERB):-samef(VERB,SVERB).
 
-% parses a verb phrase and retuns multiple interps
-parse_verb_pharse(Agent,SVERB,ARGS,GOALANDLEFTOVERS):-
+parse_verb_phrase_templates(Agent,SVERB,_ARGS,TEMPLATES):-
    findall([VERB|TYPEARGS],
     ((
      isa(Agent,What),
@@ -143,7 +167,12 @@ parse_verb_pharse(Agent,SVERB,ARGS,GOALANDLEFTOVERS):-
      TEMPL=..[VERB|TYPEARGS],
      verb_matches(SVERB,VERB))),
      TEMPLATES_FA),
-   sort(TEMPLATES_FA,TEMPLATES),
+   % (TEMPLATES=[]->throw(noTemplates(Agent,SVERB,ARGS));true),
+   sort(TEMPLATES_FA,TEMPLATES),!.
+   
+% parses a verb phrase and retuns multiple interps
+parse_verb_pharse(Agent,SVERB,ARGS,GOALANDLEFTOVERS):-
+   parse_verb_phrase_templates(Agent,SVERB,ARGS,TEMPLATES),
    dmsg(parserm("TEMPLATES"=TEMPLATES)),
    TEMPLATES \= [],
    findall(LeftOver-GOAL,

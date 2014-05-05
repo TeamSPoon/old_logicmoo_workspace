@@ -47,6 +47,7 @@
             define_type/1,
             findall_type_default_props/3,
          init_location_grid/1,
+         samef/2,
          grid_dist/3,
          to_3d/2,
          is_3d/1,
@@ -240,6 +241,13 @@ split_name_type(C,P,C):-string(C),trace,gensym(C,P),!.
 same(X,Y):- X=Y,!.
 same(X,Y):- compound(X),arg(1,X,Y),!.
 same(X,Y):- compound(Y),arg(1,Y,X),!.
+same(X,Y):- samef(X,Y).
+
+functor_safe(P,F,0):- notrace(string(P);is_list(P);atomic(P)), text_to_string(P,F),!.
+functor_safe(P,F,A):- notrace(var(P);compound(P)),functor(P,F,A).
+
+samef(X,Y):- X=Y,!.
+samef(X,Y):- notrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci(XF,YF)))).
 
 moo:type_default_props(_,agent,last_command(stand)).
 

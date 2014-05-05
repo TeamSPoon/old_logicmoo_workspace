@@ -66,6 +66,7 @@
 
 :-include('logicmoo_util_header.pl').
 :-use_module(logicmoo('logicmoo_util/logicmoo_util_bugger.pl')).
+:-use_module(logicmoo('logicmoo_util/logicmoo_util_strings.pl')).
 
 
 decl_dcgTest(X,Y):- nonvar(Y),!,do_dcgTest(X,Y,true).
@@ -97,12 +98,15 @@ theString(String) --> theString(String, " ").
 
 atomic_to_string(S,Str):-sformat(Str,'~w',[S]).
 
-atomics_to_string_str([],_Sep,""):-!.
-atomics_to_string_str([S],_Sep,String):-!,atomic_to_string(S,String).
-atomics_to_string_str([S|Text],Sep,String):-
+atomics_to_string_str(L,S,A):-catch(atomics_to_string(L,S,A),_,fail).
+atomics_to_string_str(L,S,A):-atomics_to_string_str0(L,S,A).
+
+atomics_to_string_str0([],_Sep,""):-!.
+atomics_to_string_str0([S],_Sep,String):-!,atomic_to_string(S,String).
+atomics_to_string_str0([S|Text],Sep,String):-
    atomic_to_string(S,StrL),
-   atomics_to_string_str(Text,Sep,StrR),
-   atomic_list_concat([StrL,StrR],Sep,String).
+   atomics_to_string_str0(Text,Sep,StrR),!,
+   atomics_to_string([StrL,StrR],Sep,String).
 
 % theString(String,Sep) --> [S|Text], {atomic_list_concat([S|Text],Sep,String),!}.
 theString(String,Sep) --> [S|Text], {atomics_to_string_str([S|Text],Sep,String),!}.

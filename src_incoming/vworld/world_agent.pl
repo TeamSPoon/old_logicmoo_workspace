@@ -21,7 +21,7 @@
 % execute a prolog command including prolog/0
 call_agent_command(Agent,[VERB|ARGS]):-
       debugOnError(parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD)),
-      call_agent_action(NewAgent,CMD),!.
+      must(call_agent_action(NewAgent,CMD)),!.
 
 % lists
 call_agent_command(A,Atom):-atom(Atom),atomSplit(Atom,List),!,call_agent_command(A,List).
@@ -34,6 +34,7 @@ call_agent_command(_Gent,Atom):- atom(Atom), catch((
 
 % remove period at end
 call_agent_command(A,PeriodAtEnd):-append(New,[(.)],PeriodAtEnd),!,call_agent_command(A,New).
+
 call_agent_command(Ag,[A,B|REST]):- atom(A),atom(B),A=='@',atom_concat(A,B,C),!,call_agent_command(Ag,[C|REST]).
 
 call_agent_command(A,[L,I|IST]):- atom(L), CMD =.. [L,I|IST],!, call_agent_action(A,CMD).

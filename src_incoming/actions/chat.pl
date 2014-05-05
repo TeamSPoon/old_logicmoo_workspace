@@ -17,7 +17,7 @@ socialVerb(SocialVerb):-member(SocialVerb,[say,whisper,emote,tell,ask,shout,goss
 
 moo:agent_text_command(Agent,[Say|What],Agent,CMD):-
       socialVerb(Say),
-      chat_to_callcmd(Agent,Say,What,CMD),!.
+      once(chat_to_callcmd(Agent,Say,What,CMD)).
 
 % ask joe about some text
 chat_to_callcmd(Agent,ask,What,CMD):-append([Whom,about],About,What),!,chat_command_parse_2(Agent,ask,Whom,About,CMD).
