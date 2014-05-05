@@ -95,9 +95,17 @@ theText([S|Text]) --> [S|Text].
 decl_dcgTest("this is a string",theString("this is a string")).
 theString(String) --> theString(String, " ").
 
+atomic_to_string(S,Str):-sformat(Str,'~w',[S]).
+
+atomics_to_string_str([],_Sep,""):-!.
+atomics_to_string_str([S],_Sep,String):-!,atomic_to_string(S,String).
+atomics_to_string_str([S|Text],Sep,String):-
+   atomic_to_string(S,StrL),
+   atomics_to_string_str(Text,Sep,StrR),
+   atomic_list_concat([StrL,StrR],Sep,String).
 
 % theString(String,Sep) --> [S|Text], {atomic_list_concat([S|Text],Sep,String),!}.
-theString(String,Sep) --> [S|Text], {atomics_to_string([S|Text],Sep,String),!}.
+theString(String,Sep) --> [S|Text], {atomics_to_string_str([S|Text],Sep,String),!}.
 
 decl_dcgTest_startsWith([a,b|_],theCode(X=1),X==1).
 decl_dcgTest_startsWith("anything",theCode(X=1),X==1).
@@ -263,7 +271,7 @@ decl_dcgTest_startsWith(List,Phrase,true):-decl_dcgTest_startsWith(List,Phrase).
 
 
 
-
+to_word_list(A,S):-atomSplit(A,S),!.
 to_word_list(V,V):-var(V),!.
 to_word_list([],[]):-!.
 to_word_list("",[]):-!.

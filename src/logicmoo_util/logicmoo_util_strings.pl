@@ -289,11 +289,12 @@ any_to_string0(List,String):-sformat(String,'~q',[List]).
 
 splt_words('',[],[]):-!.
 splt_words(Atom,[Term|List],Vars):- atom_length(Atom,To),between(0,To,X), 
-      sub_atom(Atom,0,Len,X,Sub),catch(read_term_from_atom(Sub,Term,[variable_names(NewOnes)]),_,fail),
+      sub_atom(Atom,0,Len,X,Sub),Len>0,catch(read_term_from_atom(Sub,Term,[variable_names(NewOnes)]),_,fail),
       sub_atom(Atom,Len,_,0,Next),!,
       splt_words(Next,List,NewVars),
-      merge_vars(NewVars,NewOnes,Vars).
-splt_words(Atom,List,[]):-atomic_list_concat(List,' ',Atom).
+      merge_vars(NewVars,NewOnes,Vars),!.
+splt_words(Atom,[L0|ListO],Vars):-atomic_list_concat([L0,L1|List],' ',Atom),atomic_list_concat([L1|List],' ',Atom2),!,
+      splt_words(Atom2,ListO,Vars).
 
 
 merge_vars(NewVars,[],NewVars).
@@ -312,7 +313,7 @@ vars_to_ucase_0([N=V|Vars],List):-
    ignore(N=V),
    vars_to_ucase_0(Vars,List).
 
-atomSplit(In,List):- any_to_string(In,String),atom_string(Atom,String),splt_words(Atom,List,Vars),vars_to_ucase(Vars,List),!.
+atomSplit(In,List):- ground(In), any_to_string(In,String),atom_string(Atom,String),splt_words(Atom,List,Vars),vars_to_ucase(Vars,List),!.
 atomSplit(Atom,WordsO):- 
    atomSplit(Atom,WordsO,[' ','\t','\n','\v','\f','\r',' ','!','"','#','$','%','&','\'',
     '(',')','*','+',',','-','.','/',':',';','<',
