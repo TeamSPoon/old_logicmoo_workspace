@@ -61,33 +61,39 @@ delete_repeats([Region|List],[Region|ListO]):-delete(List,Region,ListM), delete_
 objects_match(SObj,Inv,List):-
    findall(Obj, (member(Obj,Inv),object_match(SObj,Obj)), List).
 
-:-dynamic (object_string_used/2).
+:-dynamic object_string_used/2.
+
+call_listing(_):-!.
+call_listing(Call):-forall(Call,fmt('~q.~n',[Call])).
 
 object_string(O,String):-object_string(_,O,1-4,String),!.
 
 object_string(Agent,O,DescSpecs,String):- 
    gensym(object_string,OS),
-   object_print_details(OS,Agent,O,DescSpecs,[]),
-   with_output_to(string(StringI),doall((retract(object_string_used(OS,Str)),write(Str)))),
-   retractall(object_string_used(OS,_)),
+   object_print_details(OS,Agent,O,DescSpecs,[type,item,agent]),
+   call_listing(object_string_used(OS,_)),
+   with_output_to(string(StringI),forall(retract(object_string_used(OS,Str)),write(Str))),
    string_dedupe(StringI,String).
 
+string_dedupe(StringI,StringO):- atomics_to_string(StringL," ",StringI),remove_predupes(StringL,StringL0),atomics_to_string(StringL0," ",StringO).
+
+remove_predupes([],[]).
+remove_predupes([L|ListI],ListO):- member(L,["",''," ",' ']),!,remove_predupes(ListI,ListO).
 remove_predupes([L|ListI],[L|ListO]):-not(member_ci(L,ListI)),remove_predupes(ListI,ListO).
 remove_predupes([_|ListI],ListO):- remove_predupes(ListI,ListO).
 
 member_ci(L,ListI):-member(L,ListI),!.
 member_ci(L,ListI):-string_lower(L,LL),member(LLL,ListI),string_lower(LLL,LL),!.
 
-string_dedupe(StringI,StringO):- atomics_to_string(StringL," ",StringI),remove_predupes(StringL,StringL0),atomics_to_string(StringL0," ",StringO).
-
 object_print_details(OS,Agent,O,DescSpecs,Skipped):-
    once(member(O,Skipped);
-   (forall((req(keyword(O,KW)),meets_desc_spec(KW,DescSpecs)),object_print_details_fmt(OS,' ~w',[KW])),
-   forall((req(nameStrings(O,KW)),meets_desc_spec(KW,DescSpecs)),object_print_details_fmt(OS,' ~w',[KW])),
-   ignore((mud_isa(O,S), meets_desc_spec(mud_isa(O,S),DescSpecs),object_print_details_fmt(OS,' ~w',[mud_isa(O,S)]))),
-   order_descriptions(O,DescSpecs,List),
-   forall_member(M,List,object_print_details_fmt(OS,' ~w.',[M])),
-   forall(mud_isa(O,S),object_print_details(OS,Agent,S,DescSpecs,[O|Skipped])))).
+  (
+   object_print_details_fmt(OS,' ~w ',[O]),
+   forall((keyword(O,KW),meets_desc_spec(KW,DescSpecs)),object_print_details_fmt(OS,' ~w ',[KW])),
+   forall((nameStrings(O,KW),meets_desc_spec(KW,DescSpecs)),object_print_details_fmt(OS,' ~w ',[KW])),
+   (mud_isa(O,type);forall((mud_isa(O,S), meets_desc_spec(mud_isa(O,S),DescSpecs)),object_print_details_fmt(OS,' ~w ',[isa(S)]))),
+   ignore((order_descriptions(O,DescSpecs,List),forall_member(M,List,object_print_details_fmt(OS,' ~w ',[M])))),
+   forall(mud_isa(O,S),object_print_details(OS,Agent,S,DescSpecs,[O|Skipped])) )).
 
 object_print_details_fmt(OS,Fmt,[A|KW]):- sformat(Str,Fmt,[A|KW]), assert_if_new(object_string_used(OS,Str)).
 
@@ -95,14 +101,15 @@ object_match(SObj,Obj):- isaOrSame(Obj,SObj).
 object_match(S,Obj):- 
    atoms_of(S,Atoms),
    current_agent_or_var(P),
-   object_string(P,Obj,1-3,String),
+   object_string(P,Obj,0-5,String),
    string_lower(String,LString),
    str_contains_all(Atoms,LString).
 
 str_contains_all([],_String):-!.
 str_contains_all([A|Atoms],String):-
       string_lower(A,L),
-      sub_string(String,_,_,Aft,L),sub_string(String,Aft,_,0,SubString),!,
+      sub_string(String,_,_,Aft,L),
+      sub_string(String,Aft,_,0,SubString),!,
       str_contains_all(Atoms,SubString).
 
 atoms_of(Var,[]):- (var(Var);Var==[]),!.
@@ -199,7 +206,7 @@ parseIsa(optional(Type,_Who), Term, C, D) :- parseIsa(Type, Term, C, D).
 
 
 parseIsa(not(Type), Term, C, D) :-  dcgAnd(dcgNot(parseIsa(Type)), theText(Term), C, D).
-
+parseIsa(FT, B, [AT|C], D) :- member_ci(AT,['at','the','a','an']),!,parseIsa(FT, B, C, D).
 parseIsa(FT, B, C, D) :- trans_decl_subft(FT,Sub), parseFmt(Sub, B, C, D),!.
 parseIsa(FT, B, C, D) :- trans_decl_subft(Sub,FT), parseFmt(Sub, B, C, D),!.
 parseIsa(FT, B, C, D) :- parseFmt(FT, B, C, D),!.

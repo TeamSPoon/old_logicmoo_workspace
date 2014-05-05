@@ -94,20 +94,20 @@ look_brief(Agent):- telnet_look(Agent).
 
 look_via_pred(_,[]).
 look_via_pred(Pred,[L|List]):-!,
-   ignore(look_via_pred_0(Pred,L)),
+   ignore(look_via_pred_0(Pred,L)),!,
    look_via_pred(Pred,List).
 
 look_via_pred_0(Pred,F=Call):-
    look_via_pred_1(Pred,F,Call).
-look_via_pred_0(Pred,all(Call)):- 
+look_via_pred_0(Pred,all(Call)):- !,
    functor(Call,F,_),
    look_via_pred_1(Pred,F,all(Call)).
 look_via_pred_0(Pred,Call):- 
    functor(Call,F,_),
    look_via_pred_1(Pred,F,Call).
 
-look_via_pred_1(Pred,F,all(Call0)):-!,look_via_pred_2(Pred,F,Call0).
-look_via_pred_1(Pred,F,Call0):-look_via_pred_2(Pred,F,Call0).
+look_via_pred_1(Pred,F,all(Call)):-!,look_via_pred_2(Pred,F,Call).
+look_via_pred_1(Pred,F,Call):-look_via_pred_2(Pred,F,Call).
 
 look_via_pred_2(Pred,F,Call0):-
    wsubst(Call0,value(Transform),NewValue,Call),
@@ -117,7 +117,7 @@ look_via_pred_2(Pred,F,Call0):-
      fmt_call(Pred,Transform,F,NewValue))).
 
 
-object_string_fmt(Obj,String):- String = o(Obj,Str),object_string(Obj,Str).
+object_string_fmt(Obj,String):- object_string(Obj,Str), String = Str.
 
 fmt_call(Pred,Transform,F,NewValue):-flatten([NewValue],ValueList), NewValue\=ValueList,fmt_call(Pred,Transform,F,ValueList).
 fmt_call(Pred,Transform,N,[V]):-fmt_call_pred(Pred,Transform,N,V),!.
@@ -157,7 +157,7 @@ telnet_look(Agent):-
         must(telnet_print_grid_and_region_name(Agent,Region)),!,
         ignore(telnet_print_exits(Agent,LOC)),!,
         must(deliver_location_events(Agent,LOC)),!,
-         gensym(telnet_fmt,TL),        
+         gensym(telnet_fmt,TL),
          look_via_pred(telnet_fmt(TL),
          [
          charge(Agent,value),
@@ -311,7 +311,7 @@ show_room_grid(Room,Old,N,N) :-
 show_room_grid(Room,Y,X,N) :-
       loc_to_xy(Room,X,Y,LOC),
 	atloc(Obj,LOC),
-        props(Obj,classof(agent)),
+        props(Obj,ofclass(agent)),
 	list_agents(Agents),
 	obj_memb(Agent,Agents),
 	atloc(Agent,LOC),
@@ -322,7 +322,7 @@ show_room_grid(Room,Y,X,N) :-
 show_room_grid(Room,Y,X,N) :-
         loc_to_xy(Room,X,Y,LOC),
 	atloc(Obj,LOC),
-        prop(Obj,classof,Class),
+        prop(Obj,ofclass,Class),
 	label_type(Label,Class),
 	write(Label), write(' '),
 	XX is X + 1,

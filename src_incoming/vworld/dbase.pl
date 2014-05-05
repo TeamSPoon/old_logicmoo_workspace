@@ -14,7 +14,7 @@
 
 :- module(dbase, [
 
- add/1, add0/1, agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, classof/2, clr/1, damage/2, db_op/2, db_prop/2, db_prop/1, atloc/2, is_db_prop/2, is_db_prop/3,
+ add/1, add0/1, agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, ofclass/2, clr/1, damage/2, db_op/2, db_prop/2, db_prop/1, atloc/2, is_db_prop/2, is_db_prop/3,
  db_prop_g/1, db_prop_game_assert/1, del/1, failure/2, grid/4, inRegion/2, is_db_prop/2, is_db_prop/3, isa/2, item/1, 
  memory/2, padd/2, padd/3, pathName/3, possess/2, prop/3, prop_or/4, props/2, region/1, req/1, scan_db_prop/0, score/2, stm/2, term_listing/1,  facing/2,
  thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, nameStrings/2, description/2, pathBetween/3, act_turn/2,
@@ -23,7 +23,7 @@
 
 :- dynamic 
  dbase_mod/1,
- add/1, add0/1, agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, classof/2, clr/1, damage/2, db_op/2, db_prop/2, db_prop/1, atloc/2, is_db_prop/2, is_db_prop/3,
+ add/1, add0/1, agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, ofclass/2, clr/1, damage/2, db_op/2, db_prop/2, db_prop/1, atloc/2, is_db_prop/2, is_db_prop/3,
  db_prop_g/1, db_prop_game_assert/1, del/1, failure/2, grid/4, inRegion/2, is_db_prop/2, is_db_prop/3, isa/2, item/1, 
  memory/2, padd/2, padd/3, pathName/3, possess/2, prop/3, prop_or/4, props/2, region/1, req/1, scan_db_prop/0, score/2, stm/2, term_listing/1, facing/2,
  thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, nameStrings/2, description/2, pathBetween/3, act_turn/2.
@@ -291,7 +291,7 @@ must_asserta(C):-
 argIsa_call(isa,1,argIsaFn(isa,1)):-!.
 argIsa_call(isa,2,type):-!.
 argIsa_call(act,_,term):-!.
-argIsa_call(classof,2,type):-!.
+argIsa_call(ofclass,2,type):-!.
 argIsa_call(memory,2,term):-!.
 argIsa_call(Prop,N1,Type):-is_db_prop(Prop,A),functor(P,Prop,A),db_prop(P,_),!,arg(N1,P,Type),!.
 argIsa_call(Prop,N1,Type):- trace, dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),Type=argIsaFn(Prop,N1).
@@ -466,7 +466,7 @@ db_prop(CallSig,[external(M)]):-db_prop_prolog(M:CallSig).
 db_prop_multi(G,AT,[ordered|LIST]):-db_prop_multi(G,LIST),functor(G,_,AT).
 
 db_prop_multi(named(term,term),[genlpreds(id)]).
-db_prop_multi(classof(term,type),[alias(isa)]).
+db_prop_multi(ofclass(term,type),[alias(isa)]).
 db_prop_multi(G,[]):-db_prop_multi(G).
 
 db_prop_multi(failure(agent,action)).

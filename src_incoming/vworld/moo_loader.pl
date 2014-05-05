@@ -129,7 +129,7 @@ game_assert(A):-must(once(correctArgsIsa(A,AA))),must(once(pgs(AA))),!.
 % pgs(A):- fail, A=..[SubType,Arg], moo:createableType(SubType,Type),!,AA =.. [Type,Arg],
 %      dbadd0(AA), assert_if_new(moo:call_after_load(create_instance(Arg,SubType,[debugInfo(moo:createableType(AA,SubType,Type))]))).   
 
-pgs(somethingIsa(A,List)):-forall_member(E,List,game_assert(classof(A,E))).
+pgs(somethingIsa(A,List)):-forall_member(E,List,game_assert(ofclass(A,E))).
 pgs(somethingDescription(A,List)):-forall_member(E,List,game_assert(description(A,E))).
 pgs(objects(Type,List)):-forall_member(I,List,game_assert(isa(I,Type))).
 pgs(sorts(Type,List)):-forall_member(I,List,game_assert(subclass(I,Type))).

@@ -129,11 +129,15 @@ cached(G):-catch(G,_,fail).
 
 mud_isa(O,T):- O==T,!.
 mud_isa(O,T):- var(O),var(T),!,isa_mc(T,_),anyInst(O),mud_isa(O,T).
-mud_isa(O,T):-cached(not_mud_isa(O,T)),!,fail.
-mud_isa(O,T):- props(O,classof(T)).
+mud_isa(O,T):- cached(not_mud_isa(O,T)),!,fail.
+mud_isa(O,T):- props(O,ofclass(T)).
 mud_isa(O,T):- props(O,isa(T)).
-mud_isa(O,T):- compound(O),once(var(T);atom(T)),functor(O,T,_).
-mud_isa(O,T):- atom(O),atom(T),not(is_type(O)),is_type(T),atom_concat(T,_Int,O),!. %catch(number_codes(Int,_),_,fail),!.
+mud_isa(_,T):- (atom(T);var(T)),!,fail.
+mud_isa(O,T):- compound(O),!,functor(O,T,_).
+mud_isa(O,T):- atom(O),!,mud_isa_atom(O,T).
+
+mud_isa_atom(O,T):- atomic_list_concat([T,_|_],'-',O),!.
+mud_isa_atom(O,T):- atom_concat(T,Int,O),catch(atom_number(Int,_),_,fail),!.
 
 define_subtype(O,T):-assert_if_new(moo:decl_subclass(O,T)).
 
@@ -145,7 +149,7 @@ create_meta(T,P,C,MT):-
    OP =.. [MT,P],
    dbase_mod(M),
    assert_if_new(M:OP),
-   must(forall_member(E,[OP,classof(P,MT),classof(P,C)],must(add(E)))),
+   must(forall_member(E,[OP,ofclass(P,MT),ofclass(P,C)],must(add(E)))),
    must(findall_type_default_props(P,C,Props)),!,
    must(padd(P,Props)),!.
 
