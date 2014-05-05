@@ -92,56 +92,6 @@ do_player_action(Agent,CMD):-fmt('unknown_call_command(~q,~q).',[Agent,CMD]).
 look_brief(Agent):- prop(Agent,last_command,X),functor(X,look,_),!.
 look_brief(Agent):- telnet_look(Agent).
 
-look_via_pred(_,[]).
-look_via_pred(Pred,[L|List]):-!,
-   catch((ignore(look_via_pred_0(Pred,L);dmsg(failed(look_via_pred_0(Pred,L))))),E,dmsg(error_failed(E,look_via_pred_0(Pred,L)))),
-   look_via_pred(Pred,List).
-
-look_via_pred_0(Pred,F=Call):- !,look_via_pred_1(Pred,F,Call).
-look_via_pred_0(Pred,once(Call)):- !,functor(Call,F,_), look_via_pred_1(Pred,F,once(Call)).
-look_via_pred_0(Pred,all(Call)):- !,functor(Call,F,_), look_via_pred_1(Pred,F,all(Call)).
-look_via_pred_0(Pred,Call):- functor(Call,F,_), look_via_pred_1(Pred,F,Call).
-
-look_via_pred_1(Pred,F,all(Call)):-!,look_via_pred_2(Pred,F,Call).
-look_via_pred_1(Pred,F,once(Call)):-!,look_via_pred_2(Pred,F,once(Call)).
-look_via_pred_1(Pred,F,Call):-look_via_pred_2(Pred,F,Call).
-
-look_via_pred_2(Pred,F,Call0):-
-      wsubst(Call0,value(Transform),NewValue,Call),
-      ignore(Transform = (object_string_fmt) ),
-      wsubst(Call,value,NewValue,GCall),
-      doall((catch(call(GCall),Error, NewValue=Error), 
-             fmt_call(Pred,Transform,F,NewValue))).
-
-
-object_string_fmt(Obj,String):- object_string(Obj,Str), String = Str.
-
-fmt_call(Pred,Transform,F,NewValue):-flatten([NewValue],ValueList), NewValue\=ValueList,fmt_call(Pred,Transform,F,ValueList).
-fmt_call(Pred,Transform,N,[V]):-fmt_call_pred(Pred,Transform,N,V),!.
-fmt_call(Pred,Transform,N,[V|VV]):-remove_dupes([V|VV],RVs),reverse(RVs,Vs),fmt_call_pred(Pred,Transform,N,Vs),!.
-fmt_call(Pred,Transform,N,V):-fmt_call_pred(Pred,Transform,N,V),!.
-
-fmt_call_pred(Pred,Transform,N,[L|List]):-!, doall((member(V,[L|List]),fmt_call_pred_trans(Pred,Transform,N,V))).
-fmt_call_pred(Pred,Transform,N,V0):-fmt_call_pred_trans(Pred,Transform,N,V0).
-
-fmt_call_pred_trans(Pred,Transform,N,V0):-must((debugOnError(call(Transform,V0,V)),!,debugOnError(call(Pred,N,V)))).
-
-
-
-remove_dupes(In,Out):-remove_dupes(In,Out,[]).
-
-remove_dupes([],[],_):-!.
-remove_dupes([I|In],Out,Shown):-member(I,Shown),!,remove_dupes(In,Out,Shown).
-remove_dupes([I|In],[I|Out],Shown):-remove_dupes(In,Out,[I|Shown]).
-
-
-telnet_look_objs([]).
-telnet_look_objs([O|Objs]):-!,telnet_look_obj(O),!,telnet_look_objs(Objs).
-
-telnet_look_obj(O):-number(O).
-telnet_look_obj(error(_,_)).
-telnet_look_obj(O):-fresh_line,telnet_print_object_desc(_,O),!.
-
 telnet_look(Agent):-
         scan_updates,!,
         must(atloc(Agent,LOC)),!,
@@ -152,7 +102,7 @@ telnet_look(Agent):-
         forall_member(D-E,Set,once(telnet_print_path(Region,D,E))),
         must(deliver_location_events(Agent,LOC)),!,
          gensym(telnet_fmt,TL),
-         look_via_pred(telnet_fmt(TL),
+         look_via_pred(telnet_fmt(TL),object_string,
          [
          charge(Agent,value(=)),
          movedist(Agent,value),
@@ -179,6 +129,13 @@ telnet_fmt(TL,N,V):-telnet_fmt_shown(TL,N,V),!.
 telnet_fmt(TL,N,V):-assert_if_new(telnet_fmt_shown(TL,N,V)),fmt('~q.~n',[N=V]).
 values_shown(TL,Vs):-findall(V,(telnet_fmt_shown(TL,_,VV),flatten([VV],VVV),member(V,VVV)),Vs).
 values_shown_strings(TL):-values_shown(TL,Vs),remove_dupes(Vs,Objs),reverse(Objs,RObjs),telnet_look_objs(RObjs).
+
+telnet_look_objs([]).
+telnet_look_objs([O|Objs]):-!,telnet_look_obj(O),!,telnet_look_objs(Objs).
+
+telnet_look_obj(O):-number(O).
+telnet_look_obj(error(_,_)).
+telnet_look_obj(O):-fresh_line,telnet_print_object_desc(_,O),!.
 
 
 telnet_print_object_desc(_Agent,O,LOW,_GOOD,WhatString,_Max):-
