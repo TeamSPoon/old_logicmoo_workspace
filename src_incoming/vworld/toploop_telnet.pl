@@ -15,9 +15,10 @@
                   show_room_grid/1,
                   inst_label/2,
                   display_grid_labels/0,
+                  telnet_repl_writer/4,
+                  telnet_repl_obj_to_string/3,
                   start_mud_telent/1,
                   read_and_do_telnet/1,
-                  telnet_fmt/4,  
                   run_player_telnet/1,
                    login_and_run/0]).
 
@@ -134,8 +135,9 @@ divide_match0(O,[Test|For],True,False):-
 
 */
 telnet_repl_writer(_TL,call,term,Goal):-!,ignore(debugOnError(Goal)).
-telnet_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=todo),fmt('~q=(~w)~q.~n',[N,TypeO,V]).
-telnet_repl_obj_to_string(O,Type,toString(TypeO,O)):-copy_term(Type,TypeO),ignore(TypeO=todo).
+telnet_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=t),fmt('~q=(~w)~q.~n',[N,TypeO,V]).
+telnet_repl_obj_to_string(O,_Type,S):- object_string(O,S),!.
+telnet_repl_obj_to_string(O,Type,toString(TypeO,O)):-copy_term(Type,TypeO),ignore(TypeO=s).
 
 
 % Display what the agent sees in a form which
