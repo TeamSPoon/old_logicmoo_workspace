@@ -36,7 +36,10 @@ start_mud_telent(Port):- telnet_server(Port, [allow(_ALL),call_pred(login_and_ru
 login_and_run:-
   foc_current_player(P),
    fmt('~n~n~nHello ~w! Welcome to the MUD!~n',[P]),
-   run_player_telnet(P),!,
+   % sets some IO functions
+   with_kb_assertions([repl_writer(P,telnet_repl_writer),repl_to_string(P,telnet_repl_obj_to_string)],
+     % runs the Telent REPL
+     run_player_telnet(P)),
    fmt('~n~n~Goodbye ~w! ~n',[P]).
 
 run_player_telnet(P) :-    
@@ -127,6 +130,10 @@ divide_match0(O,[Test|For],True,False):-
    props(O,Test ) ->
    divide_match(O,For,[Test|True],False);
    divide_match(O,For,True,[Test|False]).
+
+
+telnet_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=todo),fmt('~q=(~w)~q.~n',[N,TypeO,V]).
+telnet_repl_obj_to_string(O,Type,toString(TypeO,O)):-copy_term(Type,TypeO),ignore(TypeO=todo).
 
 
 % Display what the agent sees in a form which

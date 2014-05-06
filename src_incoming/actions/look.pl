@@ -256,8 +256,8 @@ moo:agent_call_command(Agent,look):-
 moo:decl_db_prop(repl_writer(agent,term),[singleValued,default(default_repl_writer)]).
 moo:decl_db_prop(repl_to_string(agent,term),[singleValued,default(default_repl_obj_to_string)]).
 
-default_repl_writer(_TL,N,VT,V):-fmt('~q=(~w)~q.~n',[N,VT,V]).
-default_repl_obj_to_string(O,Type,toString(Type,O)).
+default_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=o),fmt('~q=(~w)~q.~n',[N,TypeO,V]).
+default_repl_obj_to_string(O,Type,toString(TypeO,O)):-copy_term(Type,TypeO),ignore(TypeO=o).
 
 call_wp(WP,TL,N,VT,V):-call(WP,TL,N,VT,V).
 
@@ -320,7 +320,7 @@ look_via_pred_3(WPred ,ToSTR,F,Type,GCall,NewValue):-
              fmt_call(WPred ,ToSTR,F,Type,NewValue))).
 
 
-fmt_call(WPred ,ToSTR,F,Type,NewValue):-flatten([NewValue],ValueList), NewValue\=ValueList,fmt_call(WPred ,ToSTR,F,Type,ValueList).
+fmt_call(WPred ,ToSTR,F,Type,NewValue):-flatten([NewValue],ValueList), NewValue\=ValueList,fmt_call(WPred ,ToSTR,F,Type,ValueList),!.
 fmt_call(WPred ,ToSTR,N,Type,[V]):-fmt_call_pred(WPred ,ToSTR,N,Type,V),!.
 fmt_call(WPred ,ToSTR,N,Type,[V|VV]):-remove_dupes([V|VV],RVs),reverse(RVs,Vs),fmt_call_pred(WPred ,ToSTR,N,Type,Vs),!.
 fmt_call(WPred ,ToSTR,N,Type,V):-fmt_call_pred(WPred ,ToSTR,N,Type,V),!.

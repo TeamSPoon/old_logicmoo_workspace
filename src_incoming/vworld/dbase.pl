@@ -19,7 +19,8 @@
  memory/2, padd/2, padd/3, pathName/3, possess/2, prop/3, prop_or/4, props/2, region/1, req/1, scan_db_prop/0, score/2, stm/2, term_listing/1,  facing/2,
  thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, nameStrings/2, description/2, pathBetween/3, act_turn/2,
  dbase_mod/1, define_db_prop/2,
- clause_present_1/3
+ clause_present_1/3,
+ with_kb_assertions/2
     ]).
 
 :- dynamic 
@@ -118,6 +119,13 @@ padd(Obj,Prop,Value):- must(atom(Prop)), PropValue=..[Prop,Value],!,padd(Obj,Pro
 prop(Obj,Prop,Value):- must(atom(Prop)), C=..[Prop,Obj,Value],!,req(C).
 %% prop_or(Obj,Prop,Value)
 prop_or(Obj,Prop,Value,OrElse):- once(prop(Obj,Prop,Value);Value=OrElse).
+
+% TODO: canonicalize clauses first!
+with_kb_assertions([],Call):- !,Call.
+with_kb_assertions([With|MORE],Call):-!,with_kb_assertions(With,with_kb_assertions(MORE,Call)).
+with_kb_assertions(With,Call):-
+   setup_call_cleanup(asserta(With,Ref),Call,erase(Ref)).
+
 
 
 world_clear(Named):-fmt('Clearing world database: ~q.',[Named]).

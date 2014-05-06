@@ -41,7 +41,8 @@
 
 currentContext(Name,X):-hotrace(makeLocalContext(Name,X)),!.
 
-
+with_assertions([],Call):- !,Call.
+with_assertions([With|MORE],Call):-!,with_assertions(With,with_assertions(MORE,Call)).
 with_assertions(With,Call):-setup_call_cleanup(asserta(With,Ref),Call,erase(Ref)).
 
 % ===================================================================
