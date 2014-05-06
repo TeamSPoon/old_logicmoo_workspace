@@ -17,7 +17,8 @@
                   display_grid_labels/0,
                   start_mud_telent/1,
                   read_and_do_telnet/1,
-                  telnet_fmt/4,          
+                  telnet_fmt/4,  
+                  run_player_telnet/1,
                    login_and_run/0]).
 
 :- dynamic agent_message_stream/3, telnet_fmt_shown/3.
@@ -94,7 +95,7 @@ do_player_action(Agent,CMD):-fmt('unknown_call_command(~q,~q).',[Agent,CMD]).
 look_brief(Agent):- prop(Agent,last_command,X),functor(X,look,_),!.
 look_brief(Agent):- do_player_action(Agent,look).
   
-
+/*
 telnet_fmt(TL,N,_Type,V):-telnet_fmt_shown(TL,N,V),!.
 telnet_fmt(TL,N,Type,V):-assert_if_new(telnet_fmt_shown(TL,N,V)),fmt('~q.~n',[N=o(Type,V)]).
 values_shown(TL,Vs):-findall(V,(telnet_fmt_shown(TL,_,VV),flatten([VV],VVV),member(V,VVV)),Vs).
@@ -131,7 +132,8 @@ divide_match0(O,[Test|For],True,False):-
    divide_match(O,For,[Test|True],False);
    divide_match(O,For,True,[Test|False]).
 
-
+*/
+telnet_repl_writer(_TL,call,term,Goal):-!,ignore(debugOnError(Goal)).
 telnet_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=todo),fmt('~q=(~w)~q.~n',[N,TypeO,V]).
 telnet_repl_obj_to_string(O,Type,toString(TypeO,O)):-copy_term(Type,TypeO),ignore(TypeO=todo).
 

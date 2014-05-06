@@ -363,7 +363,7 @@ cmust(Call):-atLeastOne0(throw_or_debug(cmust(Call),Call),Call).
 gmust(True,Call):-catch((Call,True->true;throw(retry(gmust(True,Call)))),retry(gmust(True,_)),(trace,Call,True)).
 
 % must is used declaring the predicate must suceeed
-must(Call):-skipWrapper,!,Call.
+must(Call):-notrace(skipWrapper),!,Call.
 must(Call):-atLeastOne0(throw_or_debug(must(Call),Call),Call).
 
 throwOnFailure(Call):-atLeastOne0(throw(throwOnFailure(Call)),Call).
@@ -1090,7 +1090,7 @@ bugger_t_expansion([F0|ARGS0],[F1|ARGS1]):-bugger_t_expansion(F0,F1),bugger_t_ex
 bugger_t_expansion(T,TT):- T=..[F|ARGS0],bugger_t_expansion(ARGS0,ARGS1), TT=..[F|ARGS1].
 
 unwrappabe(F):-member(F,['debugOnError',debugOnError0]),!,fail.
-unwrappabe(F):-member(FF,['OnError','OnFailure','LeastOne','Ignore','must_is_used']),atom_concat(_,FF,F),!.
+unwrappabe(F):-member(FF,['OnError','OnFailure','LeastOne','Ignore','must']),atom_concat(_,FF,F),!.
 
 
 
