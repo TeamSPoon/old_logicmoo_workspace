@@ -30,3 +30,5 @@ add_cliopatria_to_search_path :-
 
 :- add_cliopatria_to_search_path.
 
+:- ensure_loaded(logicmoo('vworld/dbase_rdf_entailment.pl')).
+

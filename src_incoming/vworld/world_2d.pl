@@ -20,9 +20,8 @@ grid_dist(L1,L2,Dist):- to_3d(L1,L13D),to_3d(L2,L23D),dist(L13D,L23D,Dist),!.
 
 dist(_,_,5).
 
-pathBetween_call(Form,Dir,To):-any_to_dir(Dir,Dir2),pathBetween(Form,Dir2,To),must(Dir=Dir2).
+pathBetween_call(From,Dir,To):-any_to_dir(Dir,Dir2),pathBetween(From,Dir2,To),same(Dir,Dir2).
    
-
 % 5x5 rooms are average
 %% to_3d(L1,L13D):-compound(L1)->L13D=L1; room_center(L1,X,Y,Z), L13D = xyz(L1,X,Y,Z).
 to_3d(xyz(L1,X,Y,Z),xyz(L1,X,Y,Z)):- nonvar(L1),!.

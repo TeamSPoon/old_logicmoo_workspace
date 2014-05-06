@@ -14,17 +14,18 @@
 
 :- module(dbase, [
 
- add/1, add0/1, agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, ofclass/2, clr/1, damage/2, db_op/2, db_prop/2, db_prop/1, atloc/2, is_db_prop/2, is_db_prop/3,
+ add/1, add0/1, agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, ofclass/2, clr/1, damage/2, db_op/2, db_prop/2, db_prop/1, atloc/2, is_db_prop/3,
  db_prop_g/1, db_prop_game_assert/1, del/1, failure/2, grid/4, inRegion/2, is_db_prop/2, is_db_prop/3, isa/2, item/1, 
  memory/2, padd/2, padd/3, pathName/3, possess/2, prop/3, prop_or/4, props/2, region/1, req/1, scan_db_prop/0, score/2, stm/2, term_listing/1,  facing/2,
  thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, nameStrings/2, description/2, pathBetween/3, act_turn/2,
- dbase_mod/1
+ dbase_mod/1, define_db_prop/2,
+ clause_present_1/3
     ]).
 
 :- dynamic 
  dbase_mod/1,
  add/1, add0/1, agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, ofclass/2, clr/1, damage/2, db_op/2, db_prop/2, db_prop/1, atloc/2, is_db_prop/2, is_db_prop/3,
- db_prop_g/1, db_prop_game_assert/1, del/1, failure/2, grid/4, inRegion/2, is_db_prop/2, is_db_prop/3, isa/2, item/1, 
+ db_prop_g/1, db_prop_game_assert/1, del/1, failure/2, grid/4, inRegion/2, is_db_prop/3, isa/2, item/1, 
  memory/2, padd/2, padd/3, pathName/3, possess/2, prop/3, prop_or/4, props/2, region/1, req/1, scan_db_prop/0, score/2, stm/2, term_listing/1, facing/2,
  thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, nameStrings/2, description/2, pathBetween/3, act_turn/2.
 
@@ -41,7 +42,7 @@ user_export(_):- dbase_mod(user),!.
 user_export(Prop/Arity):- 
    dbase_mod(M), '@'( M:export(Prop/Arity) , M).
 
-:- multifile db_prop/1,db_prop/2.
+:- multifile db_prop/2.
 
 :- meta_predicate man:with_assertions(:,0).
 :- meta_predicate world:intersect(?,0,?,0,0,-).
@@ -105,7 +106,7 @@ clr(C0):-db_op(ra,C0).
 %% req(Query)
 req(C0):- db_op(q,C0).
 %% props(Obj,QueryPropSpecs)
-props(Obj,PropSpecs):-req(props(Obj,PropSpecs)).
+props(Obj,PropSpecs):-db_op0('q',props(Obj,PropSpecs)).
 %% add(Assertion)
 add0(C0):- db_op(a,C0).
 add(C0):- add0(C0).
@@ -173,7 +174,11 @@ db_op0(Op,props(Obj,[P|ROPS])):-!,db_op(Op,props(Obj,P)),db_op(Op,props(Obj,ROPS
 db_op(Op,props(Obj, Compare)):- 
    getCompare(Op,Obj,Compare,PreCall,Condition,OnTrue,OnFalse),!,PreCall, (Condition -> OnTrue ; OnFalse).
 */
-db_op0(Op,props(Obj,PropVal)):-!,PropVal=..[Prop|Vals],
+db_op0('q',props(Obj,PropVal)):- var(Obj),!,
+   throw(db_op0('q',props(Obj,PropVal))).
+
+db_op0(Op,props(Obj,PropVal)):-   
+   !,PropVal=..[Prop|Vals],
 	Call=..[Prop,Obj|Vals],
 	db_op(Op,Call).
 db_op0(Op,C0):-functor(C0,F,A),db_op_4(Op,F,A,C0),!.
@@ -272,16 +277,22 @@ pl_arg_type(Arg,Type):-
          Arg = Type.
 
 
-clause_present(C):-functor(C,F,A),clause_present(C,F,A).
-clause_present(C,F,1):-C=..[F,A],format_complies(A,F,_).
-clause_present(C,_F,_A):-not(predicate_property(C,_)),!,fail.
-clause_present(C,_F,_A):-not(ground(C)),!,fail.
-clause_present(C,_F,_A):- debugOnError(C).
-% clause_present(C,_F,_A):-predicate_property(C,foreign),!,throw(predicate_property(C,foreign)),!,fail.
-% clause_present(C,_F,_A):-clause(C,true),!.
-clause_present(C0,_F,A):- A>1, arg(A,C0,NEW),string(NEW),!,copy_term(C0,C),
+:-thread_local clause_present_lookup_local/3.
+
+clause_present(C):-notrace((functor(C,F,A),clause_present(C,F,A))).
+clause_present(C,F,1):-C=..[F,A], is_decl_ft(F), format_complies(A,F,_).
+clause_present(C,_F,_A):- not(predicate_property(C,_)),!,fail.
+clause_present(C,_F,_A):- not(ground(C)),!,fail.
+clause_present(C,F,A):- clause_present_lookup_local(C,F,A),!,fail.
+clause_present(C,_,1):- !, clause(C,true).
+clause_present(C,F,A):- with_assertions(clause_present_lookup_local(C,F,A),clause_present_1(C,F,A)).
+
+clause_present_1(C,_,_):- debugOnError(C).
+% clause_present_1(C,_F,_A):-predicate_property(C,foreign),!,throw(predicate_property(C,foreign)),!,fail.
+% clause_present_1(C,_F,_A):-clause(C,true),!.
+clause_present_1(C0,_F,A):- A>1, arg(A,C0,NEW),string(NEW),!,copy_term(C0,C),
    setarg(A,C,OLD),C,string_chars(NEW,[S|C1]),string_chars(OLD,[S|C2]),C1=C2,trace,dmsg(present(C)).
-%clause_present(C,F,A):- A>1, arg(A,C,NEW),snonvar(NEW),!,setarg(A,C,OLD),clause_present(C,F,A),pl_arg_type(NEW,string),string_chars(NEW,[S|C1]),string_chars(OLD,[S|C2]),C1=C2,dmsg(present(C)).
+%clause_present_1(C,F,A):- A>1, arg(A,C,NEW),snonvar(NEW),!,setarg(A,C,OLD),clause_present(C,F,A),pl_arg_type(NEW,string),string_chars(NEW,[S|C1]),string_chars(OLD,[S|C2]),C1=C2,dmsg(present(C)).
 
 
 must_asserta(C):-
@@ -293,8 +304,9 @@ argIsa_call(isa,2,type):-!.
 argIsa_call(act,_,term):-!.
 argIsa_call(ofclass,2,type):-!.
 argIsa_call(memory,2,term):-!.
-argIsa_call(Prop,N1,Type):-is_db_prop(Prop,A),functor(P,Prop,A),db_prop(P,_),!,arg(N1,P,Type),!.
-argIsa_call(Prop,N1,Type):- trace, dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),Type=argIsaFn(Prop,N1).
+argIsa_call(Prop,N1,Type):-is_db_prop(Prop,N1,argIsa(Type)),!.
+argIsa_call(Prop,N1,Type):-dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),
+   Type=argIsaFn(Prop,N1).
 
 db_forall_quf(C,Pretest,Template):- C=..[Prop,OBJ|ARGS],
       translate_args(Prop,OBJ,2,ARGS,NEWARGS,true,Pretest),
@@ -357,6 +369,8 @@ compare_n(NewLast,Last):-atomic(NewLast),not(atomic(Last)),throw(incomparable_te
 compare_n(Last,NewLast):-atomic(NewLast),not(atomic(Last)),throw(incomparable_terms(Last,NewLast)).
 
 inRegion(O,Region):-atloc(O,LOC),locationToRegion(LOC,Region).
+inRegion(apath(Region,Dir),Region):-pathBetween(Region,Dir,_To).
+
 
 member_or_e(E,[L|List]):-!,member(E,[L|List]).
 member_or_e(E,E).
@@ -375,52 +389,46 @@ update_value(OLD,+X,NEW):-number(OLD),catch(NEW is OLD + X,_,fail),!.
 update_value(OLD,-X,NEW):-number(OLD),catch(NEW is OLD - X,_,fail),!.
 update_value(_OLD,NEW,NEW).
 
-moo:specifier_text(Text,pred):- is_db_prop(Text,_).
+moo:specifier_text(Text,pred):- is_db_prop(Text,_,arity(_,_)).
 
 % single valued
 moo:decl_subclass(agent,object).
 moo:decl_subclass(item,object).
 
-db_prop(spawn_rate(subclass(object),int)).
-db_prop(charge(agent,int)).
-db_prop(score(object,int)).
-db_prop(damage(agent,int)).
-db_prop(defence(agent,int)).
-db_prop(id(object,id)).
-db_prop(str(agent,int)).
-db_prop(spd(agent,int)).
-db_prop(stm(agent,int)).
-db_prop(attack(agent,int)).
-db_prop(height(agent,int)).
-db_prop(act_turn(agent,int)).
-db_prop(weight(object,int)).
-db_prop(permanence(item,verb,int)).
-db_prop(weight(object,int)).
-db_prop(last_command(agent,command)).
-db_prop(mudMaxHitPoints(agent,int)).
-db_prop(mudToHitArmorClass0(agent,int)).
-db_prop(mudBareHandDamage(agent,dice)).
-db_prop(armorLevel(possessable,int)).
-db_prop(chargeRemaining(chargable,int)).
-db_prop(chargeCapacity(chargable,int)).
-db_prop(mudLevelOf(possessable,int)).
-db_prop(inRegion(term,region)).
 
-db_prop(type_grid(regiontype,int,list(term))).
-
+db_prop(pathName(region,dir,string)).
 db_prop(verbOverride(term,action,action)).
 
-db_prop(facing(agent,dir),singleValued).
-
-db_prop(movedist(agent,number),singleValued).
-
-% db_prop(inRegion(object,region)).
-db_prop(atloc(object,xyz(region,int,int,int)),singleValued).
-
-db_prop(pathBetween(region,dir,region)).
-db_prop(pathName(region,dir,string)).
-db_prop(location_center(region,xyz(region,int,int,int)),singleValued).
-
+db_prop_sv(atloc(object,xyz(region,int,int,int))).
+db_prop_sv(act_turn(agent,int)).
+db_prop_sv(armorLevel(possessable,int)).
+db_prop_sv(attack(agent,int)).
+db_prop_sv(charge(agent,int)).
+db_prop_sv(chargeCapacity(chargable,int)).
+db_prop_sv(chargeRemaining(chargable,int)).
+db_prop_sv(damage(agent,int)).
+db_prop_sv(defence(agent,int)).
+db_prop_sv(facing(agent,dir)).
+db_prop_sv(height(agent,int)).
+db_prop_sv(id(object,id)).
+db_prop_sv(inRegion(term,region)).
+db_prop_sv(last_command(agent,command)).
+db_prop_sv(location_center(region,xyz(region,int,int,int))).
+db_prop_sv(movedist(agent,number)).
+db_prop_sv(mudBareHandDamage(agent,dice)).
+db_prop_sv(mudLevelOf(possessable,int)).
+db_prop_sv(mudMaxHitPoints(agent,int)).
+db_prop_sv(mudToHitArmorClass0(agent,int)).
+db_prop_sv(pathBetween(region,dir,region)).
+db_prop_sv(permanence(item,verb,int)).
+db_prop_sv(score(object,int)).
+db_prop_sv(spawn_rate(subclass(object),int)).
+db_prop_sv(spd(agent,int)).
+db_prop_sv(stm(agent,int)).
+db_prop_sv(str(agent,int)).
+db_prop_sv(type_grid(regiontype,int,list(term))).
+db_prop_sv(weight(object,int)).
+db_prop_sv(ArgTypes):-db_prop_g(ArgTypes).
 
 db_prop_format(apath(region,dir),areaPath).
 db_prop_format(dice(int,int,int),int).
@@ -452,8 +460,7 @@ db_prop_game_assert(somethingDescription(term,list(string))).
 db_prop_game_assert(objects(type,list(id))).
 db_prop_game_assert(sorts(type,list(type))).
 
-db_prop(ArgTypes):-db_prop_g(ArgTypes).
-db_prop(ArgTypes,[singleValued]):-db_prop(ArgTypes).
+db_prop(ArgTypes,[singleValued]):-db_prop_sv(ArgTypes).
 
 db_prop(CallSig,[external(M)]):-db_prop_prolog(M:CallSig).
 :-dynamic(db_prop_prolog/1).
@@ -482,33 +489,74 @@ db_prop_multi(grid(region,int,int,object)).
 db_prop_multi(possess(agent,item)).
 db_prop_multi(subclass(type,type)).
 db_prop_multi(isa(term,type)).
+
+db_prop(repl_writer(agent,term),[singleValued,default(look:default_repl_writer)]).
+db_prop(repl_to_string(agent,term),[singleValued,default(look:default_repl_obj_to_string)]).
+
+db_prop(ArgTypes,PropTypes):-moo:decl_db_prop(ArgTypes,PropTypes).
 % somethingIsa('NpcCol1012-Ensign732',['NpcCol1012',actor,'MaleAnimal']).
 
-define_db_prop(ArgTypes,_):-doall((arg(_,ArgTypes,ArgType),functor(ArgType,F,_),define_type(F))),fail.
-define_db_prop(ArgTypes,_):- once((functor(ArgTypes,F,A),dynamic(F/A),user_export(F/A))),fail.
 
-define_db_prop(ArgTypes,PropTypes):-functor(ArgTypes,Prop,Arity),assert_if_new(is_db_prop(Prop,Arity)),member_or_e(PT,PropTypes),assert_if_new(is_db_prop(Prop,Arity,PT)),is_db_prop_decl2(Prop,Arity,PT),fail.
-define_db_prop(ArgTypes,PropTypes):-functor(ArgTypes,P,A),member_or_e(external(Module),PropTypes),not(dbase_mod(Module)),!,length(ARGS,A),HEAD=..[P|ARGS],must(predicate_property(Module:HEAD,_)),!.
-define_db_prop(ArgTypes,PT):-functor(ArgTypes,F,A),length(ARGS,A),HEAD=..[F|ARGS],BODY=req(HEAD),is_db_prop_decl2(F,A,PT), ensure_clause(HEAD,BODY),!.
+define_db_prop(ArgTypes,PropTypes):-
+   functor(ArgTypes,F,A),
+      doall(define_db_prop_0(ArgTypes,F,A)),
+      doall((member_or_e(PT,PropTypes),define_db_prop_1(ArgTypes,F,A,PT))),
+      doall(define_db_prop_1(ArgTypes,F,A,interArgIsa)),
+      doall((member_or_e(PT,PropTypes),define_db_prop_2(ArgTypes,F,A,PT))),
+      doall(define_db_prop_2(ArgTypes,F,A,interArgIsa)),
+      doall((member_or_e(PT,PropTypes),define_db_prop_3(ArgTypes,F,A,PT))),
+      doall(define_db_prop_3(ArgTypes,F,A,interArgIsa)),!.
 
-is_db_prop_decl2(Prop,Arity,_/*flag*/):- dynamic(Prop/Arity),user_export(Prop/Arity).
 
-% this is just to catch asserts at these predicates that are supposed to be contained.. We dont really want them compiled
-%ensure_clause(HEAD,_BODY):-clause(HEAD,_),!.
-% ensure_clause(HEAD,_):-functor(HEAD,F,A),pred_as_is(F,A), !.
-ensure_clause(HEAD,BODY):-nop(asserta((HEAD:-BODY))),nop(compile_predicates([HEAD])),functor(HEAD,F,A),dynamic(F/A),user_export(F/A).
+define_argType(F,N,ArgType):-assert_if_new(is_db_prop(F,N,argIsa(ArgType))).
+
+% pass 0
+define_db_prop_0(ArgTypes,F,A):-assert_if_new(is_db_prop(F,A,arity(F,A))),fail.
+define_db_prop_0(ArgTypes,F,_):-doall((arg(N,ArgTypes,ArgType),define_argType(F,N,ArgType))),fail.
+
+% pass 1
+define_db_prop_1(_,F,A,PT):-assert_if_new(is_db_prop(F,A,PT)).
+
+% pass 2
+define_db_prop_2(_,F,A,external(Module)):-not(dbase_mod(Module)),!,length(ARGS,A),HEAD=..[P|ARGS],must(predicate_property(Module:HEAD,_)),!.
+define_db_prop_2(_,F,A,interArgIsa):- not((is_db_prop(F,A,external(Module)),not(dbase_mod(Module)))), declare_dbase_local(F,A).
+define_db_prop_2(_,_,_,_).
+
+% pass 3
+define_db_prop_3(ArgTypes,F,A,PT):- nop(dmsg(define_db_prop_3(ArgTypes,F,A,PT))).
+
+
+declare_dbase_local(F,A):- is_db_prop(F,A,hasStub),!.
+declare_dbase_local(F,A):- dynamic(F/A),user_export(F/A),
+      functor(HEAD,F,A),HEAD=..[F|ARGS],ensure_clause(HEAD,F,A,body_req(F,A,HEAD)),
+      assert_if_new(is_db_prop(F,A,hasStub)).
+
+
+body_req(F,A,HEAD):-is_db_prop(F,A,external(Module)),!,call(Module:HEAD).
+%body_req(isa,2,_):-!,fail.
+%body_req(_,_,HEAD):-req(Head).
+body_req(F,A,HEAD):-is_db_prop(F,A,default(V)),arg(A,HEAD,V).
+
+ensure_clause(HEAD,_,_,_BODY):-not(not((numbervars(clause(HEAD,BODY),'$VAR',0,_),clause(HEAD,BODY)))),!.
+% ensure_clause(HEAD,F,A,_):-pred_as_is(F,A), !.
+ensure_clause(HEAD,F,A,BODY):-assertz((HEAD:-BODY)),
+   % this is just to catch asserts at these predicates that are supposed to be contained.. We dont really want them compiled
+   nop(compile_predicates([HEAD])).
+
+
+nameStrings(apath(Region,Dir),Text):- pathName(Region,Dir,Text).
+description(apath(Region,Dir),Text):- pathName(Region,Dir,Text).
 
 scan_db_prop:-
    dbase_mod(DBM),
-   '@'(forall(db_prop(ArgTypes,PropTypes),debugOnError0(define_db_prop(ArgTypes,PropTypes))),DBM).
+   '@'(forall(db_prop(ArgTypes,PropTypes),debugOnError0( define_db_prop(ArgTypes,PropTypes))),DBM).
 
 load_motel:- defrole([],time_state,restr(time,period)).
 
 :- scan_db_prop.
+
 :-load_motel.
 
 :- include(logicmoo('vworld/moo_footer.pl')).
-
-
 
 

@@ -16,13 +16,13 @@ moo:type_grid('SpaceInAHOC',4, [ed,--,--,--,--,--,ed]).
 moo:type_grid('SpaceInAHOC',5, [ed,--,--,--,--,--,ed]).
 moo:type_grid('SpaceInAHOC',6, [ed,ed,ed,ex,ed,ed,ed]).
 */
-
+/*
 moo:type_grid('SpaceInAHOC',1, [--,--,--,--,--]).
 moo:type_grid('SpaceInAHOC',2, [--,--,--,--,--]).
 moo:type_grid('SpaceInAHOC',3, [--,--,--,--,--]).
 moo:type_grid('SpaceInAHOC',4, [--,--,--,--,--]).
 moo:type_grid('SpaceInAHOC',5, [--,--,--,--,--]).
-
+*/
 % center of room is 3,3,1 (rooms ranges are (1-5,1-5,1-5)
 
 % :- style_check(-singleton).

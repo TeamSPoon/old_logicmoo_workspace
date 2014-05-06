@@ -41,7 +41,6 @@
 :- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_dcg.pl')).
 
 % make sure these get in early
-:- ensure_loaded(logicmoo('vworld/dbase_rdf_entailment.pl')).
 :- ensure_loaded(logicmoo('vworld/dbase_formattypes.pl')).
 
 % logicmoo vworld mud server

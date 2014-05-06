@@ -26,7 +26,13 @@
 % padd(Obj,height(ObjHt))  == add(p(height,Obj,ObjHt)) == add(p(height,Obj,ObjHt)) == add(height(Obj,ObjHt))
 */
 
-:- module(look, [get_all/7, get_percepts/2,  get_near/2, get_feet/2, height_on_obj/2, inventory/2, can_sense/5 , success/2, flatten_dedupe/2]).
+:- module(look, [get_all/7, get_percepts/2,  get_near/2, get_feet/2, height_on_obj/2, inventory/2, can_sense/5 , success/2, 
+          remove_dupes/2,
+          look_via_pred/3,
+          call_look/2,
+          default_repl_obj_to_string/3,
+          default_repl_writer/4,
+          flatten_dedupe/2]).
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
@@ -37,6 +43,8 @@
 % can_sense(Agent,Sense,InList,CanDetect,CantDetect).
 can_sense(_Agent,visual,InList,InList,[]).
 
+moo:decl_action(examine(item), "view details of item (see also @list)").
+moo:agent_call_command(_Gent,examine(SObj)):- term_listing(SObj).
 
 looking(Agent):- get_session_id(O), thlocal:current_agent(O,Agent),!.
 looking(Agent):- isa(Agent,agent).
@@ -243,12 +251,93 @@ moo:agent_call_command(Agent,look(SObj)):-
 moo:agent_call_command(Agent,look):- 
    get_session_id(O),
    with_assertions(thlocal:current_agent(O,Agent),
-           telnet_look(Agent)).
+        ((atloc(Agent,LOC),call_look(Agent,LOC)))).
+
+moo:decl_db_prop(repl_writer(agent,term),[singleValued,default(default_repl_writer)]).
+moo:decl_db_prop(repl_to_string(agent,term),[singleValued,default(default_repl_obj_to_string)]).
+
+default_repl_writer(_TL,N,VT,V):-fmt('~q=(~w)~q.~n',[N,VT,V]).
+default_repl_obj_to_string(O,Type,toString(Type,O)).
+
+call_wp(WP,TL,N,VT,V):-call(WP,TL,N,VT,V).
+
+forall_call_wp(Call,WP,TL,N,VT,V):-forall(Call,call_wp(WP,TL,N,VT,V)).
+
+call_look(Agent,LOC):-
+       must( dbase:repl_writer(Agent,WPred  )),
+        must((dbase:repl_to_string(Agent,ToSTR))),
+        locationToRegion(LOC,Region),
+        gensym(call_look,TL),
+         call_wp(WPred  ,TL,call,term,show_room_grid(Region)),
+         forall_call_wp(nameStrings(Region,E),WPred  ,TL,nameStrings,string,E),
+         forall_call_wp(description(Region,E),WPred  ,TL,description,string,E),
+         forall_call_wp(pathBetween_call(Region,D,E),WPred  ,TL,path(D),region,E),
+         forall_call_wp(dbase:pathName(Region,D,E),WPred  ,TL,path(D),string,E),
+         forall_call_wp(deliverable_location_events(Agent,LOC,Event),WPred  ,TL,event,term,Event),
+         look_via_pred(WPred  ,ToSTR,
+         [
+         charge(Agent,value),
+         movedist(Agent,value),
+         damage(Agent,value),
+         success=look:success(Agent,value),
+         score(Agent,value),
+         inventory(Agent,value),
+         all(get_feet(Agent,value)),
+         get_near(Agent,value),
+         height(Agent,value),
+         facing(Agent,value),
+         height_on_obj(Agent,value),
+         get_percepts(Agent,value),
+         inRegion(value(ToSTR),Region)
+         ]),
+      retractall(telnet_fmt_shown(TL,_,_)).
+
+
+look_via_pred(_,_,[]).
+look_via_pred(WPred ,ToSTR,[L|List]):-!,
+   catch((ignore(look_via_pred_0(WPred ,ToSTR,L);dmsg(failed(look_via_pred_0(WPred ,L))))),E,dmsg(error_failed(E,look_via_pred_0(WPred ,L)))),
+   look_via_pred(WPred ,ToSTR,List).
+
+look_via_pred_0(WPred ,ToSTR,F=Call):- !,look_via_pred_1(WPred ,ToSTR,F,Call).
+look_via_pred_0(WPred ,ToSTR,once(Call)):- !,functor(Call,F,_), look_via_pred_1(WPred ,ToSTR,F,once(Call)).
+look_via_pred_0(WPred ,ToSTR,all(Call)):- !,functor(Call,F,_), look_via_pred_1(WPred ,ToSTR,F,all(Call)).
+look_via_pred_0(WPred ,ToSTR,Call):- functor(Call,F,_), look_via_pred_1(WPred ,ToSTR,F,Call).
+
+look_via_pred_1(WPred ,ToSTR,F,all(Call)):-!,look_via_pred_2(WPred ,ToSTR,F,Call).
+look_via_pred_1(WPred ,ToSTR,F,once(Call)):-!,look_via_pred_2(WPred ,ToSTR,F,once(Call)).
+look_via_pred_1(WPred ,ToSTR,F,Call):-look_via_pred_2(WPred ,ToSTR,F,Call).
+
+look_via_pred_2(WPred ,ToSTRIn,F,Call0):-
+      wsubst(Call0,value(ToSTR),value,Call),
+      ignore( ToSTR = (ToSTRIn) ),
+      wsubst(Call,value,NewValue,GCall),
+      % call_argIsa(F,.,.),
+      look_via_pred_3(WPred ,ToSTR,F,_UnkType,GCall,NewValue).
+
+look_via_pred_3(WPred ,ToSTR,F,Type,GCall,NewValue):-
+  % dmsg(look_via_pred_3(WPred ,ToSTR,F,GCall,NewValue)),
+      doall((catch(call(GCall),Error, NewValue=Error), 
+             fmt_call(WPred ,ToSTR,F,Type,NewValue))).
+
+
+fmt_call(WPred ,ToSTR,F,Type,NewValue):-flatten([NewValue],ValueList), NewValue\=ValueList,fmt_call(WPred ,ToSTR,F,Type,ValueList).
+fmt_call(WPred ,ToSTR,N,Type,[V]):-fmt_call_pred(WPred ,ToSTR,N,Type,V),!.
+fmt_call(WPred ,ToSTR,N,Type,[V|VV]):-remove_dupes([V|VV],RVs),reverse(RVs,Vs),fmt_call_pred(WPred ,ToSTR,N,Type,Vs),!.
+fmt_call(WPred ,ToSTR,N,Type,V):-fmt_call_pred(WPred ,ToSTR,N,Type,V),!.
+
+fmt_call_pred(WPred ,ToSTR,N,Type,[L|List]):-!, doall((member(V,[L|List]),fmt_call_pred_trans(WPred ,ToSTR,N,Type,V))).
+fmt_call_pred(WPred ,ToSTR,N,Type,V0):-fmt_call_pred_trans(WPred ,ToSTR,N,Type,V0).
+
+fmt_call_pred_trans(WPred ,ToSTR,N,Type,V0):-must((debugOnError(call(ToSTR,V0,Type,V)),!,debugOnError(call(WPred,_Tn,N,Type,V)))).
 
 
 
-moo:decl_action(examine(item), "view details of item (see also @list)").
-moo:agent_call_command(_Gent,examine(SObj)):- term_listing(SObj).
+remove_dupes(In,Out):-remove_dupes(In,Out,[]).
+
+remove_dupes([],[],_):-!.
+remove_dupes([I|In],Out,Shown):-member(I,Shown),!,remove_dupes(In,Out,Shown).
+remove_dupes([I|In],[I|Out],Shown):-remove_dupes(In,Out,[I|Shown]).
+
 
 
 :- include(logicmoo('vworld/moo_footer.pl')).

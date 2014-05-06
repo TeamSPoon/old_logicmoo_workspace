@@ -12,14 +12,12 @@
                   agent_message_stream/3,
                   do_player_action/1,
                   look_brief/1,
-                  telnet_look/1,
                   show_room_grid/1,
                   inst_label/2,
                   display_grid_labels/0,
                   start_mud_telent/1,
                   read_and_do_telnet/1,
-                  remove_dupes/2,
-                  telnet_fmt_shown/3,
+                  telnet_fmt/4,          
                    login_and_run/0]).
 
 :- dynamic agent_message_stream/3, telnet_fmt_shown/3.
@@ -64,7 +62,8 @@ prompt_read(Prompt,Atom):-
          (is_list(Codes)-> atom_codes(Atom,Codes);
            assert(wants_logout(P))),!.
 
-tick_tock:-fmt('tick tock',[]),sleep(1),!.
+tick_tock:-
+           scan_updates,!,fmt('tick tock',[]),sleep(1),!.
 
 
 scan_updates:-ignore(catch(make,_,true)).
@@ -90,43 +89,11 @@ do_player_action(Agent,CMD):-fmt('unknown_call_command(~q,~q).',[Agent,CMD]).
 % ===========================================================
 
 look_brief(Agent):- prop(Agent,last_command,X),functor(X,look,_),!.
-look_brief(Agent):- telnet_look(Agent).
+look_brief(Agent):- do_player_action(Agent,look).
+  
 
-telnet_look(Agent):-
-        scan_updates,!,
-        must(atloc(Agent,LOC)),!,
-        locationToRegion(LOC,Region),
-        must(show_room_grid(Region)),
-        must(telnet_print_object_desc(Agent,Region,4,6,'the name of this place',99)),!,
-        setof(D-E,pathBetween_call(Region,D,E),Set),
-        forall_member(D-E,Set,once(telnet_print_path(Region,D,E))),
-        must(deliver_location_events(Agent,LOC)),!,
-         gensym(telnet_fmt,TL),
-         look_via_pred(telnet_fmt(TL),object_string,
-         [
-         charge(Agent,value(=)),
-         movedist(Agent,value),
-         damage(Agent,value(=)),
-         success=look:success(Agent,value),
-         score(Agent,value),
-         inventory(Agent,value),
-         all(get_feet(Agent,value)),
-         get_near(Agent,value),
-         height(Agent,value),
-         facing(Agent,value),
-         height_on_obj(Agent,value),
-         get_percepts(Agent,value),
-         inRegion(value,Region)
-         ]),
-      retractall(telnet_fmt_shown(TL,_,_)).
-
-telnet_print_path(Region,D,E):-
-   req(pathName(Region,D,S)) -> fmt('~w.',[S]) ;
-   nameStrings(E,NS) -> fmt('~w is ~w',[D,NS]) ;
-   fmt('~w ~w',[D,E]).   
-
-telnet_fmt(TL,N,V):-telnet_fmt_shown(TL,N,V),!.
-telnet_fmt(TL,N,V):-assert_if_new(telnet_fmt_shown(TL,N,V)),fmt('~q.~n',[N=V]).
+telnet_fmt(TL,N,_Type,V):-telnet_fmt_shown(TL,N,V),!.
+telnet_fmt(TL,N,Type,V):-assert_if_new(telnet_fmt_shown(TL,N,V)),fmt('~q.~n',[N=o(Type,V)]).
 values_shown(TL,Vs):-findall(V,(telnet_fmt_shown(TL,_,VV),flatten([VV],VVV),member(V,VVV)),Vs).
 values_shown_strings(TL):-values_shown(TL,Vs),remove_dupes(Vs,Objs),reverse(Objs,RObjs),telnet_look_objs(RObjs).
 
@@ -161,7 +128,6 @@ divide_match0(O,[Test|For],True,False):-
    divide_match(O,For,[Test|True],False);
    divide_match(O,For,True,[Test|False]).
 
-deliver_location_events(_Agent,_LOC):-true.
 
 % Display what the agent sees in a form which
 % makes sense to me

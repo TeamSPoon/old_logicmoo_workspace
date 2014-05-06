@@ -27,3 +27,6 @@ send_to_agent(Whom,NewEvent):- agent_message_stream(Whom,_Input,Output),!,fmt(Ou
 send_to_agent(Whom,NewEvent):- nop(could_not(send_to_agent(Whom,NewEvent))).
 :-export(send_to_agent/2).
 
+:-export(deliverable_location_events/3).
+
+deliverable_location_events(Agent,Loc,tick(Agent,Loc)):-fail.

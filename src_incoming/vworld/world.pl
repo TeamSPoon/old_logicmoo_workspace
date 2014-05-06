@@ -32,8 +32,6 @@
             agent_into_corpse/1, display_stats/1,
             reverse_dir/2,
             same/2,
-            remove_dupes/2,
-            look_via_pred/3,
             round_loc/8,
             round_loc_target/8,
             dir_offset/5,

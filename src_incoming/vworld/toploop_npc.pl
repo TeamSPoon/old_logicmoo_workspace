@@ -79,7 +79,7 @@ moo:decl_action(prolog,"Call prolog toploop").
 
 moo:agent_call_command(_,prolog) :- prolog.
 moo:agent_call_command(_Agent,npc_timer(Time)):-retractall(npc_tick_tock_time(_)),asserta(npc_tick_tock_time(Time)).
-moo:agent_call_command(Who,tick) :-  catch(tick(Who),E,(dmsg(tick(E, Who)),debug,ggtrace,trace,tick(Who))).
+moo:agent_call_command(Who,tick) :-  debugOnError(tick(Who)).
 moo:agent_call_command(_Agent,idea(Who)) :-  catch(idea(Who,_),E,(dmsg(idea(E, Who)),debug,ggtrace,trace,idea(Who,_))).
 moo:agent_call_command(_Agent,tock) :- npc_tick.
 moo:agent_call_command(_Agent,tick(Other)) :- in_thread_and_join(tick(Other)).

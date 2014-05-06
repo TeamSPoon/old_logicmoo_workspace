@@ -369,8 +369,8 @@ must(Call):-atLeastOne0(throw_or_debug(must(Call),Call),Call).
 throwOnFailure(Call):-atLeastOne0(throw(throwOnFailure(Call)),Call).
 ignoreOnError(CX):-ignore(catch(CX,_,true)).
 
-debugCall(C):-notrace,dmsg(debugCall(C)), trace(C,[-all,+fail,+exception]),debug,visible(+all), leash(-exit),leash(-fail),leash(-call),leash(-redo),leash(+exception),trace,!,C.
-debugCallF(C):-notrace,dmsg(debugCall(C)), trace(C,[-all,+fail,+exception]),debug,visible(+all), leash(-exit),leash(+fail),leash(-call),leash(-redo),leash(+exception),trace,!,C.
+debugCall(C):-notrace,dmsg(debugCall(C)), trace(C,[-all,+fail,+exception]),debug,visible(+all), leash(-exit),leash(-call),leash(-redo),leash(+exception),trace,!,C.
+debugCallF(C):-notrace,dmsg(debugCall(C)), trace(C,[-all,+fail,+exception]),debug,visible(+all), leash(-exit),leash(+fail),leash(-call),leash(-redo),leash(+exception),leash(+fail),trace,!,C.
 
 debugOnError(C):-prolog_ecall(0,debugOnError0,C).
 debugOnError0(C):- catch(C,E,(dmsg(E,C),debugCall(C))).

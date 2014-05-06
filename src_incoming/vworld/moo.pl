@@ -15,6 +15,7 @@
          register_module_type/1, 
          registered_module_type/2, 
          end_module_type/1,
+         decl_dbase_pred/2,
          register_timer_thread/3,
          end_module_type/2         ]).
 
@@ -31,6 +32,9 @@ create_queryPred(H,B):-functor(H,HF,HA),functor(B,BF,BA),
 
 :-asserta(thload:current_agent(_,dead)).
 :-ignore(retract(thload:current_agent(_,dead))).
+
+:- dynamic moo:decl_db_prop/2.
+:- multifile moo:decl_db_prop/2.
 
 :- dynamic moo:action_rules/4.
 :- multifile moo:action_rules/4.
@@ -156,6 +160,7 @@ term_expand_local_each(CM,X,F,A,X):-registered_module_type(CM,dynamic),dynamic(F
 term_expansion_local0(A,B):-term_expansion_local(A,B),!.
 term_expansion_local0(A,A).
 
+moo:decl_dbase_pred(Pred,Flags):-dbase:define_db_prop(Pred,Flags).
 
 % user:term_expansion(X,Y):- term_expansion_local0(X,Y).
 
