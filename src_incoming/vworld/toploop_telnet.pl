@@ -94,46 +94,8 @@ do_player_action(Agent,CMD):-fmt('unknown_call_command(~q,~q).',[Agent,CMD]).
 % ===========================================================
 
 look_brief(Agent):- prop(Agent,last_command,X),functor(X,look,_),!.
-look_brief(Agent):- do_player_action(Agent,look).
+look_brief(Agent):- call_agent_action(Agent,look).
   
-/*
-telnet_fmt(TL,N,_Type,V):-telnet_fmt_shown(TL,N,V),!.
-telnet_fmt(TL,N,Type,V):-assert_if_new(telnet_fmt_shown(TL,N,V)),fmt('~q.~n',[N=o(Type,V)]).
-values_shown(TL,Vs):-findall(V,(telnet_fmt_shown(TL,_,VV),flatten([VV],VVV),member(V,VVV)),Vs).
-values_shown_strings(TL):-values_shown(TL,Vs),remove_dupes(Vs,Objs),reverse(Objs,RObjs),telnet_look_objs(RObjs).
-
-telnet_look_objs([]).
-telnet_look_objs([O|Objs]):-!,telnet_look_obj(O),!,telnet_look_objs(Objs).
-
-telnet_look_obj(O):-number(O).
-telnet_look_obj(error(_,_)).
-telnet_look_obj(O):-fresh_line,telnet_print_object_desc(_,O),!.
-
-
-telnet_print_object_desc(_Agent,O,LOW,_GOOD,WhatString,_Max):-
-   order_descriptions(O,LOW-199,[Region|IST]) -> forall_member(M,[Region|IST],fmt0('~w.  ',[M])) ;
-   setof(S,nameStrings(O,S),[Region|IST]) ->   forall_member(M,[Region|IST],fmt0('~w is ~w. ',[M,WhatString])) ;
-   ((setof(S,((mud_isa_a(O,S),nonvar(S))),List),fmt('~q is ~w',[mud_isa(O,List),WhatString]))).
-
-mud_isa_a(O,S):-mud_isa(O,S).
-mud_isa_a(O,classof(O)).
-
-
-telnet_print_object_desc(Agent,O):-
- telnet_print_object_desc(Agent,O,4,6,'is here.',1).
-
-%% divide_match(+O,+InList,-Matches,-NotMatches)
-divide_match(O,InList,Matches,NotMatches):-
-   divide_match0(O,InList,MatchesI,NotMatchesI),!,
-   NotMatches=NotMatchesI,Matches=MatchesI.
-
-divide_match0(_,More,[],[]):-More==[],!.
-divide_match0(O,[Test|For],True,False):-
-   props(O,Test ) ->
-   divide_match(O,For,[Test|True],False);
-   divide_match(O,For,True,[Test|False]).
-
-*/
 telnet_repl_writer(_TL,call,term,Goal):-!,ignore(debugOnError(Goal)).
 telnet_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=t),fmt('~q=(~w)~q.~n',[N,TypeO,V]).
 telnet_repl_obj_to_string(O,_Type,S):- object_string(O,S),!.
