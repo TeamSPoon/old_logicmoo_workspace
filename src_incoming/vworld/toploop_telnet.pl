@@ -37,6 +37,7 @@ start_mud_telent(Port):- telnet_server(Port, [allow(_ALL),call_pred(login_and_ru
 
 login_and_run:-
   foc_current_player(P),
+  threads,
    fmt('~n~n~nHello ~w! Welcome to the MUD!~n',[P]),
    % sets some IO functions
    with_kb_assertions([repl_writer(P,telnet_repl_writer),repl_to_string(P,telnet_repl_obj_to_string)],
@@ -92,7 +93,7 @@ do_player_action(Agent,CMD):-fmt('unknown_call_command(~q,~q).',[Agent,CMD]).
 % ===========================================================
 % DEFAULT TELNET "LOOK"
 % ===========================================================
-
+look_brief(_Agent):-!.
 look_brief(Agent):- prop(Agent,last_command,X),functor(X,look,_),!.
 look_brief(Agent):- call_agent_action(Agent,look).
   

@@ -1,5 +1,10 @@
 
 
+
+
+% threads
+moo:agent_text_command(Agent,[prolog,X],Agent,prologCall(X)).
+
 end_of_file.
 
 

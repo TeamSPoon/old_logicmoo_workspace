@@ -28,7 +28,7 @@
 
 :- module(look, [get_all/7, get_percepts/2,  get_near/2, get_feet/2, height_on_obj/2, inventory/2, can_sense/5 , success/2, 
           remove_dupes/2,
-          look_via_pred/3,
+          show_kb_via_pred/3,
           call_look/2,
           default_repl_obj_to_string/3,
           default_repl_writer/4,
@@ -39,6 +39,30 @@
 :- register_module_type(command).
 
 :- dynamic blocks/1.
+
+% ====================================================
+% the entire inventory system
+% ====================================================
+moo:decl_action(inventory(optional(agent,self)), "Examine an inventory").
+moo:agent_call_command(Agent,inventory(Who)):- show_kb_preds(Agent,inventory(Who,value)).
+
+% Get only the Inv (inventory)
+inventory(Agent,Percepts) :-  inventory0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts).
+inventory0(Agent, Inv) :-
+	findall(Poss,possess(Agent,Poss),Inv).
+
+
+% ====================================================
+% the entire stats system
+% ====================================================
+moo:decl_action(stats(stats(term,self)), "Examine MUD stats of something").
+moo:agent_call_command(Agent,stats(What)):- 
+   show_kb_preds(Agent,[
+         charge(What,value),
+         score(What,value),
+         damage(What,value),
+         height(What,value)]).
+
 
 % can_sense(Agent,Sense,InList,CanDetect,CantDetect).
 can_sense(_Agent,visual,InList,InList,[]).
@@ -101,10 +125,7 @@ get_feet0(Agent,Percepts):-
 	get_mdir_u(Agent,[Facing,Rev],LOC,Percepts))),
 	!.
 
-% Get only the Inv (inventory)
-inventory(Agent,Percepts) :-  inventory0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts).
-inventory0(Agent, Inv) :-
-	findall(Poss,possess(Agent,Poss),Inv).
+
 
 %View list starting at vac's position and moving out in a clockwise spiral
 %old_view_list([[e,w],[n,here],[ne,here],[e,here],[se,here],[s,here],[sw,here],
@@ -260,65 +281,70 @@ default_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=o),fmt('~q
 default_repl_obj_to_string(O,Type,toString(TypeO,O)):-copy_term(Type,TypeO),ignore(TypeO=o).
 
 call_look(Agent,LOC):-
-       must(dbase:repl_writer(Agent,WPred)),
-        must(dbase:repl_to_string(Agent,ToSTR)),
-        locationToRegion(LOC,Region),
-        gensym(call_look,TL),
-         look_via_pred(WPred,ToSTR,
+    show_kb_preds(Agent,LOC,
          [
-         atloc(Agent,value),
-         nameStrings(Region,value),
-         description(Region,value),
-         % TODO make this work
+      % TODO make this work
          %  why does this this work on Prolog REPL?
          %   with_output_to(string(Str),show_room_grid('Area1000'))
          %  but yet this doent?
-         show_room_grid(Region) = with_output_to(string(value),show_room_grid(Region)),
+         show_room_grid(region) = with_output_to(string(value),show_room_grid(region)),
          % for now workarround is 
-         call(show_room_grid(Region)),
+         call(show_room_grid(region)),
+         atloc(Agent,value),
+         nameStrings(region,value),
+         description(region,value),
          events=deliverable_location_events(Agent,LOC,value),
-         path(D) = pathBetween_call(Region,D,value),
-         path(D) = pathName(Region,D,value),
-         inRegion(value(ToSTR),Region),
+         path(D) = pathBetween_call(region,D,value),
+         path(D) = pathName(region,D,value),
+         inRegion(value,region),
          facing(Agent,value),
          all(get_feet(Agent,value)),
          get_near(Agent,value),
-         get_percepts(Agent,value),
-         charge(Agent,value),
-         score(Agent,value),
-         damage(Agent,value),
-         height(Agent,value),
-         height_on_obj(Agent,value),
-         inventory(Agent,value),
+         get_percepts(Agent,value),         
          movedist(Agent,value),
+         height_on_obj(Agent,value),
          success=look:success(Agent,value)
-       ]),
-      retractall(telnet_fmt_shown(TL,_,_)).
+       ]).
+
+show_kb_preds(Agent,List):-
+      ignore(atloc(Agent,LOC)),
+      show_kb_preds(Agent,LOC,List).
+
+show_kb_preds(Agent,LOC,List):-
+      ignore(atloc(Agent,LOC)),
+       locationToRegion(LOC,Region),
+       must(dbase:repl_writer(Agent,WPred)),
+        must(dbase:repl_to_string(Agent,ToSTR)),
+        subst(List,region,Region,ListR),
+        show_kb_via_pred(WPred,ToSTR,ListR),!.
 
 
-look_via_pred(_,_,[]).
-look_via_pred(WPred,ToSTR,[L|List]):-!,
-   catch((ignore(look_via_pred_0(WPred,ToSTR,L);dmsg(failed(look_via_pred_0(WPred,L))))),E,dmsg(error_failed(E,look_via_pred_0(WPred,L)))),
-   look_via_pred(WPred,ToSTR,List).
 
-look_via_pred_0(WPred,ToSTR,F=Call):- !,look_via_pred_1(WPred,ToSTR,F,Call).
-look_via_pred_0(WPred,ToSTR,once(Call)):- !,functor(Call,F,_), look_via_pred_1(WPred,ToSTR,F,once(Call)).
-look_via_pred_0(WPred,ToSTR,all(Call)):- !,functor(Call,F,_), look_via_pred_1(WPred,ToSTR,F,all(Call)).
-look_via_pred_0(WPred,ToSTR,Call):- functor(Call,F,_), look_via_pred_1(WPred,ToSTR,F,Call).
 
-look_via_pred_1(WPred,ToSTR,F,all(Call)):-!,look_via_pred_2(WPred,ToSTR,F,Call).
-look_via_pred_1(WPred,ToSTR,F,once(Call)):-!,look_via_pred_2(WPred,ToSTR,F,once(Call)).
-look_via_pred_1(_WPred,_ToSTR,_F,call(Call)):-!,call(Call).
-look_via_pred_1(WPred,ToSTR,F,Call):-look_via_pred_2(WPred,ToSTR,F,Call).
+show_kb_via_pred(_,_,[]).
+show_kb_via_pred(WPred,ToSTR,[L|List]):-!,
+   show_kb_via_pred(WPred,ToSTR,L),
+   show_kb_via_pred(WPred,ToSTR,List).
+show_kb_via_pred(WPred,ToSTR,L):-!,catch((ignore(show_kb_via_pred_0(WPred,ToSTR,L);dmsg(failed(show_kb_via_pred_0(WPred,L))))),E,dmsg(error_failed(E,show_kb_via_pred_0(WPred,L)))).
 
-look_via_pred_2(WPred,ToSTRIn,F,Call0):-
+show_kb_via_pred_0(WPred,ToSTR,F=Call):- !,show_kb_via_pred_1(WPred,ToSTR,F,Call).
+show_kb_via_pred_0(WPred,ToSTR,once(Call)):- !,functor(Call,F,_), show_kb_via_pred_1(WPred,ToSTR,F,once(Call)).
+show_kb_via_pred_0(WPred,ToSTR,all(Call)):- !,functor(Call,F,_), show_kb_via_pred_1(WPred,ToSTR,F,all(Call)).
+show_kb_via_pred_0(WPred,ToSTR,Call):- functor(Call,F,_), show_kb_via_pred_1(WPred,ToSTR,F,Call).
+
+show_kb_via_pred_1(WPred,ToSTR,F,all(Call)):-!,show_kb_via_pred_2(WPred,ToSTR,F,Call).
+show_kb_via_pred_1(WPred,ToSTR,F,once(Call)):-!,show_kb_via_pred_2(WPred,ToSTR,F,once(Call)).
+show_kb_via_pred_1(_WPred,_ToSTR,_F,call(Call)):-!,call(Call).
+show_kb_via_pred_1(WPred,ToSTR,F,Call):-show_kb_via_pred_2(WPred,ToSTR,F,Call).
+
+show_kb_via_pred_2(WPred,ToSTRIn,F,Call0):-
       wsubst(Call0,value(ToSTR),value,Call),
       ignore( ToSTR = (ToSTRIn) ),
       wsubst(Call,value,NewValue,GCall),
-      look_via_pred_3(WPred,ToSTR,F,_UnkType,GCall,NewValue).
+      show_kb_via_pred_3(WPred,ToSTR,F,_UnkType,GCall,NewValue).
 
-look_via_pred_3(WPred,ToSTR,F,Type,GCall,NewValue):-
-  % dmsg(look_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
+show_kb_via_pred_3(WPred,ToSTR,F,Type,GCall,NewValue):-
+  % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
       findall(NewValue,(catch(call(GCall),Error, NewValue=Error), 
              fmt_call(WPred,ToSTR,F,Type,NewValue)),Count),
       (Count==[] ->
