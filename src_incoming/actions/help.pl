@@ -16,6 +16,5 @@ moo:agent_call_command(_Agent,help) :- doall((moo:decl_action(A,B,C),fmt(moo:dec
 moo:specifier_text(Text,verb):- moo:decl_action(_,A,_),functor(A,Text,_).
 
 
-
 :- include(logicmoo('vworld/moo_footer.pl')).
 

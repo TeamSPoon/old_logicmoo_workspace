@@ -495,7 +495,7 @@ somethingIsa('Area1040',['BPVLocation','FreeSpaceContent']).
 somethingIsa('Area1041',['BPVLocation','FreeSpaceContent']).
 somethingIsa('ShipMap123',[item]).
 verbOverride('ShipMap123',examine(this),
-  prologCode(fmt("
+  prologCall(fmt("
 STARSHIP ENTERPRISE
 
              Turbolift               |                Ten Forward

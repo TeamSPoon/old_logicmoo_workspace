@@ -80,9 +80,6 @@ fmt_call_pred_trans(WPred,ToSTR,N,Type,V0):-must((debugOnError(call(ToSTR,V0,Typ
 
 
 
-% threads
-moo:agent_text_command(Agent,[prolog,X],Agent,prologCall(X)).
-
 end_of_file.
 
 
