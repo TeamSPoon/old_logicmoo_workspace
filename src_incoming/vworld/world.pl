@@ -46,6 +46,11 @@
             asInvoked/2,
             define_type/1,
             findall_type_default_props/3,
+                       
+          show_kb_via_pred/3,
+          default_repl_obj_to_string/3,
+          default_repl_writer/4,
+          show_kb_preds/2,show_kb_preds/3,success/2,          
          init_location_grid/1,
          samef/2,
          grid_dist/3,

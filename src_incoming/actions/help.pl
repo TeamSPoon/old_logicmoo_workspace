@@ -13,7 +13,7 @@ moo:decl_action(agent, help, "shows this help").
 moo:agent_call_command(_Agent,help) :- doall((moo:decl_action(A,B,C),fmt(moo:decl_action(A,B,C)))).
 
 
-moo:specifier_text(Text,verb):- moo:decl_action(A,_,_),functor(A,Text,_).
+moo:specifier_text(Text,verb):- moo:decl_action(_,A,_),functor(A,Text,_).
 
 
 

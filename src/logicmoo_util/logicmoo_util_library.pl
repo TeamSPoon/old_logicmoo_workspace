@@ -18,13 +18,25 @@
          throw_safe/1,
          maplist_safe/2,
          maplist_safe/3,
+         remove_dupes/2,
          list_to_set_safe/2,
+         flatten_dedupe/2,
          at_start/1,
    multi_transparent/1]).
+
 
 :-use_module(logicmoo('logicmoo_util/logicmoo_util_bugger.pl')).
 :-use_module(logicmoo('logicmoo_util/logicmoo_util_ctx_frame.pl')).
 
+
+flatten_dedupe(Percepts0,Percepts):-
+   flatten([Percepts0],Percepts1),remove_dupes(Percepts1,Percepts).
+
+remove_dupes(In,Out):-remove_dupes(In,Out,[]).
+
+remove_dupes([],[],_):-!.
+remove_dupes([I|In],Out,Shown):-member(I,Shown),!,remove_dupes(In,Out,Shown).
+remove_dupes([I|In],[I|Out],Shown):-remove_dupes(In,Out,[I|Shown]).
 
 
 :- meta_predicate at_start(0).

@@ -17,6 +17,7 @@
                    object_string/2,
                    order_descriptions/3,
                    string_equal_ci/2,
+                   sort_by_strlen/2,
                    parseForTypes//2]).
 
 
@@ -157,6 +158,13 @@ parse_agent_text_command_0(Agent,SVERB,ARGS,Agent,GOAL):-
    must(chooseBestGoal(GOALANDLEFTOVERS,GOAL)),
    dmsg(parserm("chooseBestGoal"=GOAL)).
 
+parse_agent_text_command_0(Agent,IVERB,ARGS,NewAgent,GOAL):- 
+   verb_alias_to_verb(IVERB,SVERB),
+   parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL).
+
+verb_alias_to_verb(IVERB,SVERB):-verb_matches("l",IVERB),SVERB=look,!.
+verb_alias_to_verb(IVERB,SVERB):-specifiedItemType(IVERB,verb,SVERB), IVERB \= SVERB.
+
 verb_matches(SVERB,VERB):-samef(VERB,SVERB).
 
 parse_verb_phrase_templates(Agent,SVERB,_ARGS,TEMPLATES):-
@@ -246,8 +254,7 @@ trans_decl_subft(FT,Sub):-moo:decl_subft(FT,A),moo:decl_subft(A,B),moo:decl_subf
 
 
 equals_icase(A,B):-string_upper(A,U),string_upper(B,U).
-
-parseFmt(Type,Dir)--> {moo:specifier_text(Dir,Type)}, dcgReorder(theString(String),{equals_icase(Dir,String)}).
+starts_with_icase(A,B):-string_upper(A,UA),string_upper(B,UB),(atom_concat(UA,_,UB);atom_concat(UB,_,UA)).
 
 parseFmt(string,String)--> theString(String).
 parseFmt(or([L|_]),Term) --> parseIsa(L,Term).
@@ -259,13 +266,22 @@ parseFmt(optional(_,Term),Term) --> [].
 parseFmt(and([L|List]),Term1) --> dcgAnd(parseIsa(L,Term1),parseIsa(and(List),Term2)),{ignore(Term1==Term2),!}.
 parseFmt(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{specifiedItemType(String,Type,Term)}.
 
-specifiedItemType([String],Type,StringO):-nonvar(String),specifiedItemType(String,Type,StringO).
+specifiedItemType([String],Type,StringO):-nonvar(String),!,specifiedItemType(String,Type,StringO).
+specifiedItemType(String,Type,Inst) :- moo:specifier_text(Inst,Type), equals_icase(Inst,String),!.
 specifiedItemType(String,Type,Inst):- instances_of_type(Inst,Type),object_match(String,Inst),!.
+specifiedItemType(String,Type,Longest) :- findall(Inst, (moo:specifier_text(Inst,Type), starts_with_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
 specifiedItemType(A,T,AA):- is_decl_ft(T),!, format_complies(A,T,AA),!.
 
 instances_of_type(Inst,Type):- isa(Inst,Type).
 %% instances_of_type(Inst,Type):- atom(Type), Term =..[Type,Inst], logOnError(req(Term)).
 
+sort_by_strlen(List,Sorted):-predsort(longest_string,List,Sorted).
+
+% longest_string(?Order, @Term1, @Term2)
+longest_string(Order,TStr1,TStr2):-
+   text_to_string(TStr1,Str1),string_length(Str1,L1),
+   text_to_string(TStr2,Str2),string_length(Str2,L2),
+   compare(Order,L2-Str2,L1-Str1).
 
 
 :- include(logicmoo('vworld/moo_footer.pl')).

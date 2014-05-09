@@ -60,6 +60,10 @@
 :- ensure_loaded(logicmoo('mobs/vacuum.pl')).
 
 % Action/Commands implementation
+
+:- expand_file_name('../src_incoming/actions/*pl',X),
+     forall(member(E,X),ensure_loaded(E)).
+/*
 :- ensure_loaded(logicmoo('actions/any.pl')).
 :- ensure_loaded(logicmoo('actions/drink.pl')).
 :- ensure_loaded(logicmoo('actions/use.pl')).
@@ -77,4 +81,4 @@
 :- ensure_loaded(logicmoo('actions/chat.pl')).
 :- ensure_loaded(logicmoo('actions/help.pl')).
 :- ensure_loaded(logicmoo('actions/get_set.pl')).
-
+*/

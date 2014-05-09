@@ -38,6 +38,8 @@ start_mud_telent(Port):- telnet_server(Port, [allow(_ALL),call_pred(login_and_ru
 login_and_run:-
   foc_current_player(P),
   threads,
+   listing(atloc/2),
+   call_agent_command(P,'look'),
    fmt('~n~n~nHello ~w! Welcome to the MUD!~n',[P]),
    % sets some IO functions
    with_kb_assertions([repl_writer(P,telnet_repl_writer),repl_to_string(P,telnet_repl_obj_to_string)],
@@ -46,16 +48,19 @@ login_and_run:-
    fmt('~n~n~Goodbye ~w! ~n',[P]).
 
 run_player_telnet(P) :-    
-   repeat,foc_current_player(P),
+   repeat,
+      foc_current_player(P),
       get_session_id(O),
-      with_assertions(thlocal:current_agent(O,P),once(read_and_do_telnet(P))), retract(wants_logout(P)).
+      with_assertions(thlocal:current_agent(O,P),once(read_and_do_telnet(P))), 
+      retract(wants_logout(P)),
+      retractall(agent_message_stream(P,_,_)).
 
 read_and_do_telnet(P):-
-            must(ignore(look_brief(P))),!,
    current_input(Input),
    current_output(Output),
    retractall(agent_message_stream(P,_,_)),
    assert(agent_message_stream(P,Input,Output)),
+         must(ignore(look_brief(P))),!,
             notrace((sformat(S,'~w>',[P]),prompt_read(S,List))),!,
             must(once(do_player_action(List))),!.
 
@@ -96,7 +101,7 @@ do_player_action(Agent,CMD):-fmt('unknown_call_command(~q,~q).',[Agent,CMD]).
 look_brief(_Agent):-!.
 look_brief(Agent):- prop(Agent,last_command,X),functor(X,look,_),!.
 look_brief(Agent):- call_agent_action(Agent,look).
-  
+
 telnet_repl_writer(_TL,call,term,Goal):-!,ignore(debugOnError(Goal)).
 telnet_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=t),fmt('~q=(~w)~q.~n',[N,TypeO,V]).
 telnet_repl_obj_to_string(O,_Type,S):- object_string(O,S),!.

@@ -8,17 +8,9 @@
 /** <module>
 % This file defines the basic look action
 % Agents will use the predicate:
-% get_all(Agent,Chg,Dam,Fail,Scr,Percepts,Inv)
-% instead of get_all(Agent,), these can be called separately
-% charge(Agent,Chg) = charge (amount of charge agent has)
-% damage(Agent,Dam) = damage
-% success(Agent,Suc) = checks success of last action (actually checks the failure predicate)
-% score(Agent,Scr) = score
 % get_percepts(Agent,Percepts) = list of lists of objects in agents location plus 2 locations in each direction
 % get_near(Agent,Percepts) = list of lists of objects in agents atloc plus 1 atloc in each dir
 % get_feet(Agent,Percepts) = list of objects in agents location
-% inventory(Agt,Inv) = inventory (anything the agent has taken
-% to do this.
 %
 
 %
@@ -26,13 +18,7 @@
 % padd(Obj,height(ObjHt))  == add(p(height,Obj,ObjHt)) == add(p(height,Obj,ObjHt)) == add(height(Obj,ObjHt))
 */
 
-:- module(look, [get_all/7, get_percepts/2,  get_near/2, get_feet/2, height_on_obj/2, inventory/2, can_sense/5 , success/2, 
-          remove_dupes/2,
-          show_kb_via_pred/3,
-          call_look/2,
-          default_repl_obj_to_string/3,
-          default_repl_writer/4,
-          flatten_dedupe/2]).
+:- module(look, [ get_percepts/2,  get_near/2, get_feet/2, height_on_obj/2, can_sense/5 , call_look/2]).
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
@@ -40,28 +26,6 @@
 
 :- dynamic blocks/1.
 
-% ====================================================
-% the entire inventory system
-% ====================================================
-moo:decl_action(inventory(optional(agent,self)), "Examine an inventory").
-moo:agent_call_command(Agent,inventory(Who)):- show_kb_preds(Agent,inventory(Who,value)).
-
-% Get only the Inv (inventory)
-inventory(Agent,Percepts) :-  inventory0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts).
-inventory0(Agent, Inv) :-
-	findall(Poss,possess(Agent,Poss),Inv).
-
-
-% ====================================================
-% the entire stats system
-% ====================================================
-moo:decl_action(stats(stats(term,self)), "Examine MUD stats of something").
-moo:agent_call_command(Agent,stats(What)):- 
-   show_kb_preds(Agent,[
-         charge(What,value),
-         score(What,value),
-         damage(What,value),
-         height(What,value)]).
 
 
 % can_sense(Agent,Sense,InList,CanDetect,CantDetect).
@@ -69,6 +33,54 @@ can_sense(_Agent,visual,InList,InList,[]).
 
 moo:decl_action(examine(item), "view details of item (see also @list)").
 moo:agent_call_command(_Gent,examine(SObj)):- term_listing(SObj).
+
+
+
+moo:decl_action(look, "generalized look in region").
+moo:decl_action(look(dir), "Look in a direction").
+moo:decl_action(look(item), "Look at a speficific item").
+
+moo:agent_call_command(Agent,look(Dir)):-
+   view_dirs(Agent,[[Dir,here],[Dir,Dir],[Dir,Dir,adjacent]],Percepts),
+   forall_member(P,Percepts,call_agent_action(Agent,examine(P))).
+
+moo:agent_call_command(Agent,look(SObj)):-
+   objects_match(Agent,SObj,Percepts),
+   forall_member(P,Percepts,call_agent_action(Agent,examine(P))).
+
+moo:agent_call_command(Agent,look):- 
+   get_session_id(O),
+   with_assertions(thlocal:current_agent(O,Agent),
+        ((atloc(Agent,LOC),call_look(Agent,LOC)))).
+
+
+call_look(Agent,LOC):-
+    show_kb_preds(Agent,LOC,
+         [
+      % TODO make this work
+         %  why does this this work on Prolog REPL?
+         %   with_output_to(string(Str),show_room_grid('Area1000'))
+         %  but yet this doent?
+         show_room_grid(region) = with_output_to(string(value),show_room_grid(region)),
+         % for now workarround is 
+         call(show_room_grid(region)),
+         atloc(Agent,value),
+         nameStrings(region,value),
+         description(region,value),
+         events=deliverable_location_events(Agent,LOC,value),
+         path(D) = pathBetween_call(region,D,value),
+         path(D) = pathName(region,D,value),
+         inRegion(value,region),
+         facing(Agent,value),
+         all(get_feet(Agent,value)),
+         get_near(Agent,value),
+         get_percepts(Agent,value),         
+         movedist(Agent,value),
+         height_on_obj(Agent,value),
+         success=look:success(Agent,value)
+       ]).
+
+
 
 looking(Agent):- get_session_id(O), thlocal:current_agent(O,Agent),!.
 looking(Agent):- isa(Agent,agent).
@@ -89,9 +101,6 @@ get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
 	inventory(Agent,Inv),
 	get_percepts(Agent,Percepts))),!.
 
-
-flatten_dedupe(Percepts0,Percepts):-
-   flatten([Percepts0],Percepts1),remove_dupes(Percepts1,Percepts).
 
 % Get only the Percepts
 get_percepts(Agent,Percepts) :- get_percepts0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts).
@@ -250,126 +259,6 @@ mask([K|Tail],SoFar,What) :-
 	mask(Tail, SoFar,What).
 mask([Head|Tail],SoFar,What) :-
 	mask(Tail,[Head|SoFar],What).
-
-% Check to see if last action was successful or not
-success(Agent,no) :-
-	failure(Agent,_),!.
-success(_,yes).
-
-
-moo:decl_action(look, "generalized look in region").
-moo:decl_action(look(dir), "Look in a direction").
-moo:decl_action(look(item), "Look at a speficific item").
-
-moo:agent_call_command(Agent,look(Dir)):-
-   view_dirs(Agent,[[Dir,here],[Dir,Dir],[Dir,Dir,adjacent]],Percepts),
-   forall_member(P,Percepts,call_agent_action(Agent,examine(P))).
-
-moo:agent_call_command(Agent,look(SObj)):-
-   objects_match(Agent,SObj,Percepts),
-   forall_member(P,Percepts,call_agent_action(Agent,examine(P))).
-
-moo:agent_call_command(Agent,look):- 
-   get_session_id(O),
-   with_assertions(thlocal:current_agent(O,Agent),
-        ((atloc(Agent,LOC),call_look(Agent,LOC)))).
-
-moo:decl_db_prop(repl_writer(agent,term),[singleValued,default(default_repl_writer)]).
-moo:decl_db_prop(repl_to_string(agent,term),[singleValued,default(default_repl_obj_to_string)]).
-
-default_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=o),fmt('~q=(~w)~q.~n',[N,TypeO,V]).
-default_repl_obj_to_string(O,Type,toString(TypeO,O)):-copy_term(Type,TypeO),ignore(TypeO=o).
-
-call_look(Agent,LOC):-
-    show_kb_preds(Agent,LOC,
-         [
-      % TODO make this work
-         %  why does this this work on Prolog REPL?
-         %   with_output_to(string(Str),show_room_grid('Area1000'))
-         %  but yet this doent?
-         show_room_grid(region) = with_output_to(string(value),show_room_grid(region)),
-         % for now workarround is 
-         call(show_room_grid(region)),
-         atloc(Agent,value),
-         nameStrings(region,value),
-         description(region,value),
-         events=deliverable_location_events(Agent,LOC,value),
-         path(D) = pathBetween_call(region,D,value),
-         path(D) = pathName(region,D,value),
-         inRegion(value,region),
-         facing(Agent,value),
-         all(get_feet(Agent,value)),
-         get_near(Agent,value),
-         get_percepts(Agent,value),         
-         movedist(Agent,value),
-         height_on_obj(Agent,value),
-         success=look:success(Agent,value)
-       ]).
-
-show_kb_preds(Agent,List):-
-      ignore(atloc(Agent,LOC)),
-      show_kb_preds(Agent,LOC,List).
-
-show_kb_preds(Agent,LOC,List):-
-      ignore(atloc(Agent,LOC)),
-       locationToRegion(LOC,Region),
-       must(dbase:repl_writer(Agent,WPred)),
-        must(dbase:repl_to_string(Agent,ToSTR)),
-        subst(List,region,Region,ListR),
-        show_kb_via_pred(WPred,ToSTR,ListR),!.
-
-
-
-
-show_kb_via_pred(_,_,[]).
-show_kb_via_pred(WPred,ToSTR,[L|List]):-!,
-   show_kb_via_pred(WPred,ToSTR,L),
-   show_kb_via_pred(WPred,ToSTR,List).
-show_kb_via_pred(WPred,ToSTR,L):-!,catch((ignore(show_kb_via_pred_0(WPred,ToSTR,L);dmsg(failed(show_kb_via_pred_0(WPred,L))))),E,dmsg(error_failed(E,show_kb_via_pred_0(WPred,L)))).
-
-show_kb_via_pred_0(WPred,ToSTR,F=Call):- !,show_kb_via_pred_1(WPred,ToSTR,F,Call).
-show_kb_via_pred_0(WPred,ToSTR,once(Call)):- !,functor(Call,F,_), show_kb_via_pred_1(WPred,ToSTR,F,once(Call)).
-show_kb_via_pred_0(WPred,ToSTR,all(Call)):- !,functor(Call,F,_), show_kb_via_pred_1(WPred,ToSTR,F,all(Call)).
-show_kb_via_pred_0(WPred,ToSTR,Call):- functor(Call,F,_), show_kb_via_pred_1(WPred,ToSTR,F,Call).
-
-show_kb_via_pred_1(WPred,ToSTR,F,all(Call)):-!,show_kb_via_pred_2(WPred,ToSTR,F,Call).
-show_kb_via_pred_1(WPred,ToSTR,F,once(Call)):-!,show_kb_via_pred_2(WPred,ToSTR,F,once(Call)).
-show_kb_via_pred_1(_WPred,_ToSTR,_F,call(Call)):-!,call(Call).
-show_kb_via_pred_1(WPred,ToSTR,F,Call):-show_kb_via_pred_2(WPred,ToSTR,F,Call).
-
-show_kb_via_pred_2(WPred,ToSTRIn,F,Call0):-
-      wsubst(Call0,value(ToSTR),value,Call),
-      ignore( ToSTR = (ToSTRIn) ),
-      wsubst(Call,value,NewValue,GCall),
-      show_kb_via_pred_3(WPred,ToSTR,F,_UnkType,GCall,NewValue).
-
-show_kb_via_pred_3(WPred,ToSTR,F,Type,GCall,NewValue):-
-  % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
-      findall(NewValue,(catch(call(GCall),Error, NewValue=Error), 
-             fmt_call(WPred,ToSTR,F,Type,NewValue)),Count),
-      (Count==[] ->
-        fmt_call(WPred,ToSTR,F,Type,notFound(F,Type)); true),!.
-
-
-fmt_call(WPred,ToSTR,F,Type,NewValue):-flatten([NewValue],ValueList), NewValue\=ValueList,fmt_call(WPred,ToSTR,F,Type,ValueList),!.
-fmt_call(WPred,ToSTR,N,Type,[V]):-fmt_call_pred(WPred,ToSTR,N,Type,V),!.
-fmt_call(WPred,ToSTR,N,Type,[V|VV]):-remove_dupes([V|VV],RVs),reverse(RVs,Vs),fmt_call_pred(WPred,ToSTR,N,Type,Vs),!.
-fmt_call(WPred,ToSTR,N,Type,V):-fmt_call_pred(WPred,ToSTR,N,Type,V),!.
-
-fmt_call_pred(WPred,ToSTR,N,Type,[L|List]):-!, doall((member(V,[L|List]),fmt_call_pred_trans(WPred,ToSTR,N,Type,V))).
-fmt_call_pred(WPred,ToSTR,N,Type,V0):-fmt_call_pred_trans(WPred,ToSTR,N,Type,V0).
-
-fmt_call_pred_trans(WPred,ToSTR,N,Type,V0):-must((debugOnError(call(ToSTR,V0,Type,V)),!,debugOnError(call(WPred,_Tn,N,Type,V)))).
-
-
-
-remove_dupes(In,Out):-remove_dupes(In,Out,[]).
-
-remove_dupes([],[],_):-!.
-remove_dupes([I|In],Out,Shown):-member(I,Shown),!,remove_dupes(In,Out,Shown).
-remove_dupes([I|In],[I|Out],Shown):-remove_dupes(In,Out,[I|Shown]).
-
-
 
 :- include(logicmoo('vworld/moo_footer.pl')).
 

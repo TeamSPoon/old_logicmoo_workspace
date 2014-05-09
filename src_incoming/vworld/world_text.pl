@@ -1,4 +1,82 @@
+/** <module> 
+% Writer NPC_Interface  for supporting inforation based actions
+%
+%
+% Douglas Miles
+% Dec 13, 2035
+%
+%
+*/
 
+
+moo:decl_db_prop(repl_writer(agent,term),[singleValued,default(default_repl_writer)]).
+moo:decl_db_prop(repl_to_string(agent,term),[singleValued,default(default_repl_obj_to_string)]).
+
+default_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=o),fmt('~q=(~w)~q.~n',[N,TypeO,V]).
+default_repl_obj_to_string(O,Type,toString(TypeO,O)):-copy_term(Type,TypeO),ignore(TypeO=o).
+
+
+% Check to see if last action was successful or not
+success(Agent,no) :-
+	failure(Agent,_),!.
+success(_,yes).
+
+
+
+show_kb_preds(Agent,List):-
+      ignore(atloc(Agent,LOC)),
+      show_kb_preds(Agent,LOC,List).
+
+show_kb_preds(Agent,LOC,List):-
+      ignore(atloc(Agent,LOC)),
+       locationToRegion(LOC,Region),
+       must(dbase:repl_writer(Agent,WPred)),
+        must(dbase:repl_to_string(Agent,ToSTR)),
+        subst(List,region,Region,ListR),
+        show_kb_via_pred(WPred,ToSTR,ListR),!.
+
+
+
+
+show_kb_via_pred(_,_,[]).
+show_kb_via_pred(WPred,ToSTR,[L|List]):-!,
+   show_kb_via_pred(WPred,ToSTR,L),
+   show_kb_via_pred(WPred,ToSTR,List).
+show_kb_via_pred(WPred,ToSTR,L):-!,catch((ignore(show_kb_via_pred_0(WPred,ToSTR,L);dmsg(failed(show_kb_via_pred_0(WPred,L))))),E,dmsg(error_failed(E,show_kb_via_pred_0(WPred,L)))).
+
+show_kb_via_pred_0(WPred,ToSTR,F=Call):- !,show_kb_via_pred_1(WPred,ToSTR,F,Call).
+show_kb_via_pred_0(WPred,ToSTR,once(Call)):- !,functor(Call,F,_), show_kb_via_pred_1(WPred,ToSTR,F,once(Call)).
+show_kb_via_pred_0(WPred,ToSTR,all(Call)):- !,functor(Call,F,_), show_kb_via_pred_1(WPred,ToSTR,F,all(Call)).
+show_kb_via_pred_0(WPred,ToSTR,Call):- functor(Call,F,_), show_kb_via_pred_1(WPred,ToSTR,F,Call).
+
+show_kb_via_pred_1(WPred,ToSTR,F,all(Call)):-!,show_kb_via_pred_2(WPred,ToSTR,F,Call).
+show_kb_via_pred_1(WPred,ToSTR,F,once(Call)):-!,show_kb_via_pred_2(WPred,ToSTR,F,once(Call)).
+show_kb_via_pred_1(_WPred,_ToSTR,_F,call(Call)):-!,call(Call).
+show_kb_via_pred_1(WPred,ToSTR,F,Call):-show_kb_via_pred_2(WPred,ToSTR,F,Call).
+
+show_kb_via_pred_2(WPred,ToSTRIn,F,Call0):-
+      wsubst(Call0,value(ToSTR),value,Call),
+      ignore( ToSTR = (ToSTRIn) ),
+      wsubst(Call,value,NewValue,GCall),
+      show_kb_via_pred_3(WPred,ToSTR,F,_UnkType,GCall,NewValue).
+
+show_kb_via_pred_3(WPred,ToSTR,F,Type,GCall,NewValue):-
+  % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
+      findall(NewValue,(catch(call(GCall),Error, NewValue=Error), 
+             fmt_call(WPred,ToSTR,F,Type,NewValue)),Count),
+      (Count==[] ->
+        fmt_call(WPred,ToSTR,F,Type,notFound(F,Type)); true),!.
+
+
+fmt_call(WPred,ToSTR,F,Type,NewValue):-flatten([NewValue],ValueList), NewValue\=ValueList,fmt_call(WPred,ToSTR,F,Type,ValueList),!.
+fmt_call(WPred,ToSTR,N,Type,[V]):-fmt_call_pred(WPred,ToSTR,N,Type,V),!.
+fmt_call(WPred,ToSTR,N,Type,[V|VV]):-remove_dupes([V|VV],RVs),reverse(RVs,Vs),fmt_call_pred(WPred,ToSTR,N,Type,Vs),!.
+fmt_call(WPred,ToSTR,N,Type,V):-fmt_call_pred(WPred,ToSTR,N,Type,V),!.
+
+fmt_call_pred(WPred,ToSTR,N,Type,[L|List]):-!, doall((member(V,[L|List]),fmt_call_pred_trans(WPred,ToSTR,N,Type,V))).
+fmt_call_pred(WPred,ToSTR,N,Type,V0):-fmt_call_pred_trans(WPred,ToSTR,N,Type,V0).
+
+fmt_call_pred_trans(WPred,ToSTR,N,Type,V0):-must((debugOnError(call(ToSTR,V0,Type,V)),!,debugOnError(call(WPred,_Tn,N,Type,V)))).
 
 
 
