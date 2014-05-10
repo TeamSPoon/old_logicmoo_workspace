@@ -17,7 +17,7 @@
 
 % one more case of not clear what's the good way to do this.
 % Add your own path to weblog for now
-user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog').
+user:file_search_path(weblog, 'C:/docs/Prolog/weblog/weblog/prolog').
 user:file_search_path(weblog, 'C:/Users/Administrator/AppData/Roaming/SWI-Prolog/pack/weblog').
 user:file_search_path(weblog, '/usr/local/lib/swipl-7.1.11/pack/weblog/prolog').
 user:file_search_path(cliopatria, '/devel/ClioPatria').

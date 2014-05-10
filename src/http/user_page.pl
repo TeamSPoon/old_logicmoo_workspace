@@ -13,6 +13,14 @@
 :- use_module(library(option)).
 :- use_module(library(http/http_session)).
 :- use_module(library(http/http_wrapper)).
+:- use_module(weblog(html_form/ajaxify)).
+
+wire_in_weblog :-
+  assertz(user:file_search_path(css, weblog('static/css'))),
+  assertz(user:file_search_path(js, weblog('static/js'))),
+  assertz(user:file_search_path(icons, weblog('static/icons'))).
+
+:- wire_in_weblog.
 
 :- multifile http:location/3.
 :- dynamic   http:location/3.
