@@ -1,3 +1,4 @@
+
 % Dec 13, 2035
 % Douglas Miles
 %
@@ -18,19 +19,24 @@
 :- register_module_type(command).
 
 %   moo:decl_action(_,tick(agent),"Makes some agent do something brilliant")  
-moo:decl_action(_,where(actor),"Tells where actor is").
-moo:decl_action(_,where(item),"Tells where item is").
+% moo:decl_action(_,where(actor),"Tells where actor is").
+% moo:decl_action(_,where(item),"Tells where item is").
 
-/*
-moo:decl_subclass(actor,object).
-moo:decl_subclass(item,object).
-moo:decl_action(_,where(object),"Tells where item is").
-*/
+moo:decl_action(_,where(object),"Tells where something is").
+moo:subclass(agent,object).
+moo:subclass(item,object).
+
+moo:agent_text_command(Agent,[where,X],Agent,where(X)).
+moo:agent_text_command(Agent,[where,BE,X],Agent,where(X)):-member(BE,[is,are,be,were]).
+
 
 % where 
-moo:agent_call_command(Agent,where(SObj)) :-
-	atloc(SObj,LOC),
-        dmsg(command(where(atloc(SObj,LOC)))).
+moo:agent_call_command(_Agent,where(SObj)) :-
+	atloc(Obj,LOC),
+        object_match(SObj,Obj),
+        fmt(cmdresult(where,atloc(Obj,LOC))).
+
 
 :- include(logicmoo('vworld/moo_footer.pl')).
+
 
