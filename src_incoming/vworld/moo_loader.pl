@@ -47,9 +47,12 @@ finish_processing_game.
 % gload:- load_game(savedb),!.
 gload:- load_game(logicmoo('rooms/startrek.all.pl')).
 
+savedb:-!.
 savedb:-
+ ignoreOnError((
    dbase_mod(DBM),
-   tell(savedb),listing(DBM:_),told.
+   make_directory('/tmp/lm/'),
+   tell('/tmp/lm/savedb'),listing(DBM:_),told)).
 
 discoverAndCorrectArgsIsa(_Prop,_N1,[],[]):-!.
 discoverAndCorrectArgsIsa(Prop,N1,[A|Args],[AA|AArgs]):-
@@ -77,7 +80,7 @@ isa_assert(A,Type,AA):-fisa_assert(A,Type,AA),!.
 isa_assert(A,Type,AA):-format_complies(A,Type,AA),!.
 isa_assert(O,argIsaFn(_,_),O):-!. %any_to_value(O,V).  %missing
 isa_assert(A,type,A):-atom(A),define_type(A).
-isa_assert(A,term,A):-!. %% must(ground(A)).
+isa_assert(A,term,A):-!. % must(ground(A)).
 isa_assert([A|AA],list(T),LIST):-!,findall(OT,((member(O,[A|AA]),isa_assert_g(O,T,OT))),LIST).
 isa_assert(A,list(T),[OT]):-!,isa_assert_g(A,T,OT).
 isa_assert([],[],[]):-!.
@@ -258,7 +261,7 @@ show_call(game_assert(A)):-
    correctArgsIsa(A,AA),
    show_call0(game_assert(AA)).
 show_call(C):-show_call0(C).
-show_call0(C):-debugOnError(C). %% dmsg(show_call(C)),C.      
+show_call0(C):-debugOnError(C). % dmsg(show_call(C)),C.      
 
 % :- finish_processing_game.
 

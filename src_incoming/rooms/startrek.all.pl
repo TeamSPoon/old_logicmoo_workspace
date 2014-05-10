@@ -29,7 +29,7 @@ moo:type_grid('SpaceInAHOC',5, [--,--,--,--,--]).
 :-set_prolog_flag(double_quotes,string).
 :-style_check(-atom).
 
-%%:-['../hyhtn/translog4.pl'].
+% % :-['../hyhtn/translog4.pl'].
 %end_of_file.
 
 predicates([
@@ -1238,7 +1238,7 @@ objects('BPVLocation',['Area1000','Area1001','Area1002','Area1003','Area1004','A
 ]).
 objects(agent,['NpcCol1000-Geordi684','NpcCol1002-Worf720','NpcCol1003-Dr-Crusher677','NpcCol1004-Troi712','NpcCol1005-Riker707','NpcCol1006-Picard701','NpcCol1007-Guinan689','NpcCol1008-OBrien696','NpcCol1009-Wesley716','NpcCol1010-Livingston726','NpcCol1011-Spot727','NpcCol1012-Ensign728','NpcCol1012-Ensign732','NpcCol1012-Ensign736','NpcCol1012-Ensign740','NpcCol1012-Ensign744','NpcCol1012-Ensign748','NpcCol1012-Ensign752','NpcCol1013-Alexander671',vacuum(1),explorer(player1)]).
 
-%%objects(areaPath,List):-findall(apath(A,B),pathBetween(A,B,C),List).
+% % objects(areaPath,List):-findall(apath(A,B),pathBetween(A,B,C),List).
 objects(areaPath,[apath('Area1000',"n"),apath('Area1001',"e"),apath('Area1002',"n"),apath('Area1002',"e"),apath('Area1002',"s"),apath('Area1002',"w"),apath('Area1003',"w"),apath('Area1004',"e"),apath('Area1005',"n"),apath('Area1005',"e"),apath('Area1005',"s"),apath('Area1005',"w"),apath('Area1006',"n"),apath('Area1006',"w"),apath('Area1007',"e"),apath('Area1008',"n"),apath('Area1008',"e"),apath('Area1008',"s"),apath('Area1008',"w"),apath('Area1009',"w"),apath('Area1010',"s"),apath('Area1010',"u"),apath('Area1011',"n"),apath('Area1011',"u"),apath('Area1011',"d"),apath('Area1012',"e"),apath('Area1013',"n"),apath('Area1013',"e"),apath('Area1013',"s"),apath('Area1013',"w"),apath('Area1014',"w"),apath('Area1015',"e"),apath('Area1016',"n"),apath('Area1016',"e"),apath('Area1016',"s"),apath('Area1016',"w"),apath('Area1017',"w"),apath('Area1018',"e"),apath('Area1019',"n"),apath('Area1019',"e"),apath('Area1019',"s"),apath('Area1019',"w"),apath('Area1020',"w"),apath('Area1021',"s"),apath('Area1022',"n"),apath('Area1022',"s"),apath('Area1023',"e"),apath('Area1024',"n"),apath('Area1024',"e"),apath('Area1024',"s"),apath('Area1024',"w"),apath('Area1025',"w"),apath('Area1026',"e"),apath('Area1027',"n"),apath('Area1027',"e"),apath('Area1027',"s"),apath('Area1027',"w"),apath('Area1028',"w"),apath('Area1029',"e"),apath('Area1030',"n"),apath('Area1030',"e"),apath('Area1030',"s"),apath('Area1030',"w"),apath('Area1031',"w"),apath('Area1032',"s"),apath('Area1032',"u"),apath('Area1032',"d"),apath('Area1033',"u"),apath('Area1033',"d"),apath('Area1034',"u"),apath('Area1034',"d"),apath('Area1035',"e"),apath('Area1036',"n"),apath('Area1036',"e"),apath('Area1036',"d"),apath('Area1037',"w"),apath('Area1038',"s"),apath('Area1038',"w"),apath('Area1039',"n"),apath('Area1039',"u"),apath('Area1040',"u"),apath('Area1040',"d"),apath('Area1041',"u"),apath('Area1041',"d"),apath('Area1042',"n"),apath('Area1042',"s")]).
 
 objects(dir,["n","s","e","w","u","d"]).
@@ -1259,7 +1259,7 @@ implied_invariant([loaded(P,V)], [at(V,L),at(P,L)]).
 
 inconsistent_constraint([certified(P), not_insured(P)]).
 
-%%atomic_invariants([]):-!.%%,fail.
+% % atomic_invariants([]):-!.% % ,fail.
 atomic_invariants([
       pathBetween('Area1000',"n",'Area1002'),
       pathBetween('Area1001',"e",'Area1002'),
@@ -1348,7 +1348,7 @@ atomic_invariants([
       % pathBetween('Area1042',"n",'Area4075'),
       pathBetween('Area1042',"s",'Area1006'),
 
-     %% printAll(pathBetween(X,Y,Z),agentRoute(apath(X,Y),X,Z)).
+     % %  printAll(pathBetween(X,Y,Z),agentRoute(apath(X,Y),X,Z)).
       agentRoute(apath('Area1000',"n"),'Area1000','Area1002'),
       agentRoute(apath('Area1001',"e"),'Area1001','Area1002'),
       agentRoute(apath('Area1002',"n"),'Area1002','Area1005'),
@@ -1758,7 +1758,7 @@ inRegion('ArtifactCol1009-Tricorder759','Area1015').
 inRegion('ArtifactCol1009-Tricorder760','Area1015').
 inRegion('ArtifactCol1009-Tricorder761','Area1015').
 */
-%% printAll(actorStartState(agent,X,List),ss(agent,X,List)).
+% %  printAll(actorStartState(agent,X,List),ss(agent,X,List)).
    ss(agent,'NpcCol1000-Geordi684',[inRegion('NpcCol1000-Geordi684','Area1000'),wearing('NpcCol1000-Geordi684','ArtifactCol1005-Boots685'),wearing('NpcCol1000-Geordi684','ArtifactCol1006-Comm-Badge686'),wearing('NpcCol1000-Geordi684','ArtifactCol1003-Gold-Uniform687'),wearing('NpcCol1000-Geordi684','ArtifactCol1008-VISOR688')]),
    ss(agent,vacuum(1),[inRegion(vacuum(1),'Area1010'),possess(vacuum(1),'ArtifactCol1000-Phaser676'),wearing(vacuum(1),'ArtifactCol1005-Boots673'),wearing(vacuum(1),'ArtifactCol1006-Comm-Badge674'),wearing(vacuum(1),'ArtifactCol1003-Gold-Uniform675')]),
    ss(agent,explorer(player1),[inRegion(explorer(player1),'Area1000'),possess(explorer(player1),'ArtifactCol1000-Phaser776'),wearing(explorer(player1),'ArtifactCol1005-Boots773'),wearing(explorer(player1),'ArtifactCol1006-Comm-Badge774'),wearing(explorer(player1),'ArtifactCol1003-Gold-Uniform775')]),

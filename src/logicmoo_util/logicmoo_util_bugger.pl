@@ -31,7 +31,7 @@
      makeArgIndexes/1,
      printAll/1,
      dynamic_load_pl/1,
-
+     term_to_message_string/2,
      atLeastOne/1,
      atLeastOne0/2,
 
@@ -106,6 +106,9 @@
      export_all_preds/0,
      export_all_preds/1
 	 ]).
+
+:-multifile term_to_message_string/2.
+:-dynamic term_to_message_string/2.
 
 was_module(Mod,Exports) :- nop(was_module(Mod,Exports)).
 
@@ -698,7 +701,8 @@ indent_e(X):-XX is X -1,!,write(' '), indent_e(XX).
 % ===================================================================
 fmt0(X,Y,Z):-catch((format(X,Y,Z),flush_output_safe(X)),E,dmsg(E)).
 fmt0(X,Y):-catch((format(X,Y),flush_output_safe),E,dmsg(E)).
-fmt0(X):- (atom(X) -> catch((format(X,[]),flush_output_safe),E,dmsg(E)) ; 'format'('~q~n',[X])).
+fmt0(X):-catch(text_to_string(X,S),_,fail),'format'('~w',[S]),!.
+fmt0(X):- (atom(X) -> catch((format(X,[]),flush_output_safe),E,dmsg(E)) ; (term_to_message_string(X,M) -> 'format'('~q~n',[M]);'format'('~q~n',[X]))).
 fmt(X):-fresh_line,fmt0(X).
 fmt(X,Y):-fresh_line,fmt0(X,Y),!.
 fmt(X,Y,Z):- fmt0(X,Y,Z),!.
@@ -735,9 +739,9 @@ dmsg2(T):-!,
 		Depth2 = (Depth-25))),
         with_output_to_stream(user_error,
         ((
-	fmt(';;',[T]),!,
+	fmt(';;',[]),!,
 	indent_e(Depth2),!,
-	fmt0('~q\n',[T])))))).
+	fmt0(T)))))).
 
 dmsg2([]):-!.
 dmsg2(LF):-functor(LF,F,_),loggerReFmt(F,LR), ((LR==F,is_stream(F))->loggerFmtReal(F,LF,[]);dmsg(LR,LF,[])),!.

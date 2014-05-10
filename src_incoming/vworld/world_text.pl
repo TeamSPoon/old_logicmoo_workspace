@@ -78,6 +78,45 @@ fmt_call_pred(WPred,ToSTR,N,Type,V0):-fmt_call_pred_trans(WPred,ToSTR,N,Type,V0)
 
 fmt_call_pred_trans(WPred,ToSTR,N,Type,V0):-must((debugOnError(call(ToSTR,V0,Type,V)),!,debugOnError(call(WPred,_Tn,N,Type,V)))).
 
+% ===========================================
+%% generatePhrase(+Term,-English).
+% Generate english version of a message
+% ===========================================
+bugger:term_to_message_string(T,M):-generatePhrase(T,M),!.
+
+generatePhrase(Term,String):- debugOnError(( fully_expand(Term,EnglishM),!,fully_expand(EnglishM,English) , join_for_string(English,String))),!.
+
+join_for_string(English,EnglishS):-failOnError(( flatten(English,EnglishF),list_to_atomics_list(EnglishF,EnglishA),atomics_to_string(EnglishA," ",EnglishS))),!.
+join_for_string(English,English).
+
+list_to_atomics_list(L,AL):-list_to_atomics_list0(L,AL),!.
+list_to_atomics_list0(Var,Var):-var(Var),!.
+list_to_atomics_list0([E|EnglishF],[A|EnglishA]):-
+   any_to_string(E,A),
+   list_to_atomics_list0(EnglishF,EnglishA),!.
+list_to_atomics_list0([],[]):-!.
+
+
+
+fully_expand(Var,Var):-var(Var),!.
+fully_expand([],[]):-!.
+fully_expand(T,E):-moo:term_anglify(T,TA),flatten(TA,FTA),fully_expand(FTA,E),!.
+fully_expand(Var,Var):-not(compound(Var)),!.
+fully_expand([T|Term],Out):-!,
+   fully_expand(T,E),
+   fully_expand(Term,English),
+   flatten_append(E,English,Out),!.
+fully_expand(T,T).
+
+flatten_append(First,Last,Out):-flatten([First],FirstF),flatten([Last],LastF),append(FirstF,LastF,Out),!.
+
+moo:term_anglify(string(Obj),String):-failOnError(text_to_string(Obj,String)).
+moo:term_anglify(atloc(Obj,LOC),[as(Obj,noun_phrase),is,at,as(LOC,noun_phrase)]).
+moo:term_anglify(as(Obj,noun_phrase),String):- nameStrings(Obj,String).
+moo:term_anglify(as(Obj,noun_phrase),String):- locationToRegion(Obj,Region),Obj\=Region,!,moo:term_anglify(as(Region,noun_phrase),String).
+moo:term_anglify(as(Obj,noun_phrase),[the,noun,with,token,Obj]):-!.
+moo:term_anglify(as(Obj,Type),[the,object,with,type,Type,with,token,Obj]):-!.
+moo:term_anglify(cmdresult(Cmd,Whatnot),[the,command,result,of,Cmd,is,Whatnot]):-!.
 
 
 end_of_file.

@@ -289,7 +289,7 @@ server_loop(ServerSocket, Options) :-
 	tcp_open_socket(Slave, InStream, OutStream),
 	set_stream(InStream, close_on_abort(false)),
 	set_stream(OutStream, close_on_abort(false)),
-	tcp_host_to_address(Host, Peer),
+	catch(tcp_host_to_address(Host, Peer),_,Host = Peer),
 	(   Postfix = []
 	;   between(2, 1000, Num),
 	    Postfix = [-, Num]

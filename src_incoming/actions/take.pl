@@ -25,6 +25,7 @@ moo:agent_call_command(Agent,take(SObj)) :-
 	worth(Agent,take,Obj),
 	permanence_take(take,Agent,Obj),
 	moo:update_charge(Agent,take).
+
 %Nothing to pick up
 moo:agent_call_command(Agent,take(_)) :-
 	moo:update_charge(Agent,take),
