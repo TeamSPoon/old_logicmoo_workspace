@@ -19,6 +19,10 @@
          register_timer_thread/3,
          end_module_type/2         ]).
 
+
+:- multifile moo:term_anglify/2.
+:- dynamic moo:term_anglify/2.
+
 current_context_module(Ctx):-loading_module_h(Ctx),!.
 current_context_module(Ctx):-context_module(Ctx).
 
@@ -94,6 +98,9 @@ moo:coerce(What,_Type,NewThing):-NewThing = What.
 
 :- dynamic moo:decl_mud_test/2.
 :- multifile moo:decl_mud_test/2.
+
+:- multifile moo:verb_alias/2.
+:- dynamic moo:verb_alias/2.
 
 
 

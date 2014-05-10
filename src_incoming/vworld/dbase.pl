@@ -98,6 +98,7 @@ moo:subclass(object,spatialthing).
 moo:subclass(item,spatialthing).
 
 
+
 % replaced the 1st with the 2nd and better version of retract
 % del(C0):-db_op(r,C0)
 %% del(RetractOne)    <--  del(C0):- ignore((db_op('q',C0),!,db_op('r',C0))).
@@ -195,17 +196,17 @@ db_op_4(Op,:,2,_MODULE:C0):-!,/*throw(module_form(MODULE:C0)),*/
   functor(C0,F,A),
   dmsg(todo(unmodulize(F/A))),
   db_op(Op,C0).
-db_op_4(Op,k,_,C0):- C0=..[k,Prop|ARGS],C1=..[Prop|ARGS],!,db_op(Op,C1),!.
-db_op_4(Op,p,_,C0):- C0=..[p,Prop|ARGS],C1=..[Prop|ARGS],!,db_op(Op,C1),!.
-db_op_4(Op,k,_,C0):- C0=..[k,Prop|ARGS],C1=..[Prop|ARGS],!,db_op(Op,C1),!.
-db_op_4(Op,p,_,C0):- C0=..[p,Prop|ARGS],C1=..[Prop|ARGS],!,db_op(Op,C1),!.
-db_op_4(Op,svo,_,C0):- C0=..[svo,Obj,Prop|ARGS],C1=..[Prop,Obj|ARGS],!,db_op(Op,C1),!.
+db_op_4(Op,k,_,C0):- C0=..[k,Prop|ARGS],atom(Prop), C1=..[Prop|ARGS],!,db_op(Op,C1),!.
+db_op_4(Op,p,_,C0):- C0=..[p,Prop|ARGS],atom(Prop), C1=..[Prop|ARGS],!,db_op(Op,C1),!.
+db_op_4(Op,k,_,C0):- C0=..[k,Prop|ARGS],atom(Prop),C1=..[Prop|ARGS],!,db_op(Op,C1),!.
+db_op_4(Op,p,_,C0):- C0=..[p,Prop|ARGS],atom(Prop), C1=..[Prop|ARGS],!,db_op(Op,C1),!.
+db_op_4(Op,svo,_,C0):- C0=..[svo,Obj,Prop|ARGS],atom(Prop),C1=..[Prop,Obj|ARGS],!,db_op(Op,C1),!.
 db_op_4(q,Fmt,1,C0):-is_decl_ft(Fmt),!,C0=..[_,A],format_complies(A,Fmt,_).
 db_op_4(a,Fmt,1,_C0):-is_decl_ft(Fmt),!,dmsg(todo(dont_assert_is_decl_ft(Fmt))),!.
 db_op_4(Op,Prop,_,C0):- 
    C0=..[Prop|ARGS],db_op_disj(Op,Prop,ARGS).
 
-db_op_unit(_Op,Prop,ARGS,C0):-C0=..[Prop|ARGS].
+db_op_unit(_Op,Prop,ARGS,C0):- must(atom(Prop)), C0=..[Prop|ARGS].
 
 % impl/1
 db_op_disj(Op,Prop,ARGS):-is_db_prop(Prop,_,impl(Other)),!,
@@ -303,16 +304,21 @@ clause_present_1(C0,_F,A):- A>1, arg(A,C0,NEW),string(NEW),!,copy_term(C0,C),
 %clause_present_1(C,F,A):- A>1, arg(A,C,NEW),snonvar(NEW),!,setarg(A,C,OLD),clause_present(C,F,A),pl_arg_type(NEW,string),string_chars(NEW,[S|C1]),string_chars(OLD,[S|C2]),C1=C2,dmsg(present(C)).
 
 
+is_2nd_order_holds(Prop):-member(Prop,[call,req,k,p,holds,not_k,not_p,not_holds]).
+
 must_asserta(C):-
       must(ground(C)),
       must(hooked_asserta(C)),!.
-
+      
+argIsa_call(Prop,N1,_Type):-once((must(nonvar(Prop)),must(number(N1)))),fail.
 argIsa_call(isa,1,argIsaFn(isa,1)):-!.
 argIsa_call(isa,2,type):-!.
 argIsa_call(act,_,term):-!.
 argIsa_call(ofclass,2,type):-!.
 argIsa_call(memory,2,term):-!.
 argIsa_call(Prop,N1,Type):-is_db_prop(Prop,N1,argIsa(Type)),!.
+argIsa_call(Prop,N1,Type):-is_2nd_order_holds(Prop),dmsg(todo(define(argIsa_call(Prop,N1,'Second_Order_TYPE')))),
+   Type=argIsaFn(Prop,N1).
 argIsa_call(Prop,N1,Type):-dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),
    Type=argIsaFn(Prop,N1).
 

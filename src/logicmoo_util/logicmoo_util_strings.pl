@@ -32,10 +32,11 @@
          isWhitespace/1,
          atomSplit/2,
          atomic_list_concat_safe/2,
-         string_chars/2,
-         text_to_string/2,
-         string_upper/2,
-         string_lower/2
+         any_to_string/2
+         %string_chars/2
+         % text_to_string/2,
+         %string_upper/2,
+         %string_lower/2
 
    ]).
 
@@ -280,11 +281,12 @@ ltrim(X,X).
 
 any_to_string(Atom,String):-notrace(once(any_to_string0(Atom,String))).
 
+any_to_string0(Atom,String):-var(Atom),!,term_to_atom(Atom,AAtom),!,any_to_string0(AAtom,String).
 any_to_string0(Atom,String):-string(Atom),Atom=String.
 any_to_string0(Atom,String):-atom(Atom),atom_string(Atom,String).
 any_to_string0(A,""):-nonvar(A),member(A,[[],'',""]).
-any_to_string0(List,String):-atomics_to_string(List, ' ', String).
 any_to_string0(List,String):-catch(text_to_string(List,String),_,fail).
+any_to_string0(List,String):-is_list(List),atomics_to_string(List, ' ', String).
 any_to_string0(List,String):-sformat(String,'~q',[List]).
 
 splt_words('',[],[]):-!.
