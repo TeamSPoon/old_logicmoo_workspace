@@ -24,6 +24,9 @@
     59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *************************************************************************/
+:- module(actionDatabase, []).
+
+end_of_file.
 
 :- module(actionDatabase,[take/3,
 			  eat/2,

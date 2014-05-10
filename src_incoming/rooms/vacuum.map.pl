@@ -1,11 +1,3 @@
-% vacuum.map.pl
-% July 10, 1996
-% John Eikenberry
-%
-%
-% Dec 13, 2035
-% Douglas Miles
-%
 /** <module> 
 % Test worlds for vacuum world can be defined by a grid like the
 % one below. The grid must be rectangular (ie. same number of
@@ -13,9 +5,19 @@
 %
 % To look at the world, use the show_world/0 command. 
 %
-% The two letter codes used below are defined in vacuum.objects.pl
+% The two letter codes used below are defined in map.objects.pl
+%
+% predator.map.pl
+% July 10, 1996
+% John Eikenberry
+%
+%
+% Dec 13, 2035
+% Douglas Miles
 %
 */
+
+
 moo:grid_key( ed='edge of world').
 moo:grid_key( hw='high wall').
 moo:grid_key( lw='low wall').

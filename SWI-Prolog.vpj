@@ -69,6 +69,23 @@
 		</Folder>
 	</CustomFolders>
 	<Files AutoFolders="PackageView">
+		<Folder Name="../ClioPatria">
+			<F
+				N="../ClioPatria/*.pl"
+				Recurse="1"/>
+		</Folder>
+		<Folder Name="../pl-devel">
+			<F
+				N="../pl-devel/*.c"
+				Recurse="1"
+				Refilter="0"
+				Excludes=""/>
+			<F
+				N="../pl-devel/*.h"
+				Recurse="0"
+				Refilter="0"
+				Excludes=""/>
+		</Folder>
 		<Folder Name="c:/pf/swipl">
 			<F
 				N="c:/pf/swipl/*.chr"

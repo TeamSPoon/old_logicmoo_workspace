@@ -1,26 +1,26 @@
-% vworld.01
+/** <module> 
+% Common place to reduce redundancy World utility prediates
+%
+% Project Logicmoo: A MUD server written in Prolog
+% Maintainer: Douglas Miles
+% Dec 13, 2035
+%
+% Special thanks to code written on
 % May 18, 1996
 % written by John Eikenberry
 % interface by Martin Ronsdorf
 % general assistance Dr. Donald Nute
 %
-% Any questions about this mail to jae@ai.uga.edu
-% Dec 13, 2035
-% Douglas Miles
-%
-/** <module>
-% Common place to reduce redundancy World utility prediates
-% **************IMPORTANT**************
-% To customize your world, you need to modify wstart.pl
-%
-% *.objects.pl / *.map.pl is defined in wstart.pl for ease of setting up and testing.
-% ****************************************
 */
+
 :- module(world,
 	[
+        call_agent_command/2,
+        call_agent_action/2,
             mud_isa/2,
             isa_any/2,
             put_in_world/1,
+            get_session_id/1,
             pathBetween_call/3,
             obj_memb/2,
             prop_memb/2,            
@@ -40,13 +40,19 @@
             list_agents/1,
             agent_list/1,
             check_for_fall/3,
-            list_object_dir_visible/3,
+            list_object_dir_sensed/4,
             list_object_dir_near/3,
             num_near/3,
             asInvoked/2,
             define_type/1,
             findall_type_default_props/3,
+                       
+          show_kb_via_pred/3,
+          default_repl_obj_to_string/3,
+          default_repl_writer/4,
+          show_kb_preds/2,show_kb_preds/3,success/2,          
          init_location_grid/1,
+         samef/2,
          grid_dist/3,
          to_3d/2,
          is_3d/1,
@@ -56,60 +62,32 @@
          doorLocation/5,
          foc_current_player/1,
          locationToRegion/2,
-         init_location_grid/2
+         init_location_grid/2,
+         set_stats/2,
+         worth/3,
+         spread/0,
+         growth/0,
+         isaOrSame/2,
+         current_agent_or_var/1
+
  ]).
 
 
 :- dynamic  agent_list/1.
 
-:- include(logicmoo('vworld/vworld_header.pl')).
-
-:- include(logicmoo('vworld/events.pl')).
-:- include(logicmoo('vworld/room_grids.pl')).
-
+:-use_module(logicmoo('vworld/dbase.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 :- register_module_type(utility).
 
 
-foc_current_player(P):- thlocal:current_agent(P),!.
-foc_current_player(P):-
-   generate_new_player(P),
-   !,
-   asserta(thlocal:current_agent(P)).
-
-generate_new_player(P) :-
-  gensym(player,N),
-   P=explorer(N),
-   must(create_agent(P)).
+:- include(logicmoo('vworld/world_2d.pl')).
+:- include(logicmoo('vworld/world_agent.pl')).
+:- include(logicmoo('vworld/world_text.pl')).
+:- include(logicmoo('vworld/world_effects.pl')).
+:- include(logicmoo('vworld/world_events.pl')).
+:- include(logicmoo('vworld/world_spawning.pl')).
 
 
-% Lists all the agents in the run. Except for other monsters.
-list_agents(Agents) :- agent_list(Agents), !.
-list_agents(Agents) :- % build cache
-	findall(NearAgent,req(agent(NearAgent)),Agents),
-	assert(agent_list(Agents)),!.
-
-% When an agent dies, it turns into a corpse.
-% corpse is defined as an object in the *.objects.pl files
-agent_into_corpse(Agent) :-
-	del(atloc(Agent,LOC)),
-	clr(str(Agent,_)),
-	clr(height(Agent,_)),
-	clr(stm(Agent,_)),
-	clr(spd(Agent,_)),
-	add(atloc(corpse(Agent),LOC)).
-
-% Displays all the agents stats. Used at end of a run.
-display_stats(Agents) :-
-	forall(member(Agent,Agents),
-	          (charge(Agent,Chg),
-		  damage(Agent,Dam),
-		  score(Agent,Scr),
-		  findall(Obj,possess(Agent,Obj),Inv),
-		  write('Agent = '), write(Agent), nl,
-		  write('Charge = '), write(Chg), write('  '),
-		  write('Dam= ' ), write(Dam), write('  '),
-		  write('Score = '), write(Scr), nl,
-		  write('Inventory = '), write(Inv), nl)).
 
 is_property(P,A):- db_prop(_,C),functor(C,P,A2),A is A2-1.
 
@@ -125,10 +103,10 @@ is_type0(monster).
 is_type0(dir).
 is_type0(agent).
 
-isaOrSame(A,B):-A=B,!.
+isaOrSame(A,B):-A==B,!.
 isaOrSame(A,B):-mud_isa(A,B).
 
-intersect(A,EF,B,LF,Tests,Results):-findall( A-B, ((member(A,EF),member(B,LF),once(Tests))), Results),ignore([A-B|_]==Results).
+intersect(A,EF,B,LF,Tests,Results):-findall( A-B, ((member(A,EF),member(B,LF),once(Tests))), Results),[A-B|_]=Results.
 % is_property(P,_A),PROP=..[P|ARGS],CALL=..[P,Obj|ARGS],req(CALL).
 obj_memb(E,L):-member(E,L).
 isa_any(E,L):-flatten([E],EE),flatten([L],LL),!,intersect(A,EE,B,LL,isaOrSame(A,B),_Results).
@@ -159,11 +137,15 @@ cached(G):-catch(G,_,fail).
 
 mud_isa(O,T):- O==T,!.
 mud_isa(O,T):- var(O),var(T),!,isa_mc(T,_),anyInst(O),mud_isa(O,T).
-mud_isa(O,T):-cached(not_mud_isa(O,T)),!,fail.
-mud_isa(O,T):- props(O,classof(T)).
+mud_isa(O,T):- cached(not_mud_isa(O,T)),!,fail.
+mud_isa(O,T):- props(O,ofclass(T)).
 mud_isa(O,T):- props(O,isa(T)).
-mud_isa(O,T):- compound(O),once(var(T);atom(T)),functor(O,T,_).
-mud_isa(O,T):- atom(O),atom(T),not(is_type(O)),is_type(T),atom_concat(T,_Int,O),!. %catch(number_codes(Int,_),_,fail),!.
+mud_isa(_,T):- (atom(T);var(T)),!,fail.
+mud_isa(O,T):- compound(O),!,functor(O,T,_).
+mud_isa(O,T):- atom(O),!,mud_isa_atom(O,T).
+
+mud_isa_atom(O,T):- atomic_list_concat([T,_|_],'-',O),!.
+mud_isa_atom(O,T):- atom_concat(T,Int,O),catch(atom_number(Int,_),_,fail),!.
 
 define_subtype(O,T):-assert_if_new(moo:decl_subclass(O,T)).
 
@@ -173,7 +155,9 @@ create_meta(T,P,C,MT):-
    must(split_name_type(T,P,C)),
    define_subtype(C,MT),
    OP =.. [MT,P],
-   must(forall_member(E,[OP,classof(P,MT),classof(P,C)],must(add(E)))),
+   dbase_mod(M),
+   assert_if_new(M:OP),
+   must(forall_member(E,[OP,ofclass(P,MT),ofclass(P,C)],must(add(E)))),
    must(findall_type_default_props(P,C,Props)),!,
    must(padd(P,Props)),!.
 
@@ -193,8 +177,6 @@ moo:decl_createableType(item).
 moo:decl_createableType(S,T):- moo:createableType(T),req(subclass(S,T)).
 moo:decl_createableType(T,T):-nonvar(T),moo:createableType(T).
 
-:- style_check(-discontiguous).
-
 moo:decl_subclass(int,formattype).
 moo:decl_subclass(dir,formattype).
 moo:decl_subclass(number,formattype).
@@ -208,17 +190,26 @@ formattype(FormatType):-moo:decl_subclass(FormatType,formattype).
 formattype(FormatType):-mud_isa(FormatType,formattype).
 
 define_type(Spec):-create_instance(Spec,type,[]).
-create_instance(What,FormatType,List):- FormatType\==type,
-   formattype(FormatType),!,throw(formattype(FormatType,create_instance(What,FormatType,List))).
 
-create_instance(SubType,type,List):-!,
-   add(isa(SubType,type)),
-   assert_if_new(dbase:type(SubType)),
+create_instance(What,Type,Props):- create_instance_0(What,Type,Props),!.
+
+:-discontiguous create_instance_0/3.
+
+create_instance_0(What,FormatType,List):- FormatType\==type,
+   formattype(FormatType),!,
+   throw(formattype(FormatType,create_instance(What,FormatType,List))).
+
+create_instance_0(SubType,type,List):-!,
+   dbase:add(isa(SubType,type)),
+      dbase_mod(M),
+      A = M:type(SubType),
+   assert_if_new(A),
    padd(SubType,List).
 
 moo:decl_createableType(agent).
 moo:decl_subclass(actor,agent).
-create_instance(T,agent,List):-!,
+
+create_instance_0(T,agent,List):-!,
    retractall(agent_list(_)),
    must(create_meta(T,P,_,agent)),
    must(padd(P,List)),
@@ -235,11 +226,11 @@ create_instance(T,agent,List):-!,
    add(memory(P,directions([n,s,e,w,ne,nw,se,sw,u,d]))),!.
 
 moo:decl_createableType(region).
-create_instance(T,Type,List):- moo:createableType(Type),
+create_instance_0(T,Type,List):- moo:createableType(Type),
    create_meta(T,P,_,Type),!,
    padd(P,List).
 
-create_instance(T,Type,List):-moo:subclass(Type,MetaType),moo:createableType(MetaType),
+create_instance_0(T,Type,List):-moo:subclass(Type,MetaType),moo:createableType(MetaType),
    create_meta(T,P,_,MetaType),
    padd(P,isa(Type)),
    padd(P,List),
@@ -257,8 +248,15 @@ split_name_type(C,P,C):-string(C),trace,gensym(C,P),!.
 same(X,Y):- X=Y,!.
 same(X,Y):- compound(X),arg(1,X,Y),!.
 same(X,Y):- compound(Y),arg(1,Y,X),!.
+same(X,Y):- samef(X,Y).
+
+functor_safe(P,F,0):- notrace(string(P);is_list(P);atomic(P)), text_to_string(P,F),!.
+functor_safe(P,F,A):- notrace(var(P);compound(P)),functor(P,F,A).
+
+samef(X,Y):- X=Y,!.
+samef(X,Y):- notrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci(XF,YF)))).
 
 moo:type_default_props(_,agent,last_command(stand)).
 
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).

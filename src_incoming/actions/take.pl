@@ -11,15 +11,16 @@
 */
 :- module(take, []).
 
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 
 :- register_module_type(command).
 
 % Take something
 % Successfully picking something up
-moo:agent_call_command(Agent,take(Obj)) :-
+moo:agent_call_command(Agent,take(SObj)) :-
 	atloc(Agent,LOC),
 	atloc(Obj,LOC),
+        object_match(SObj,Obj),
 	props(Obj,weight(1)),
 	worth(Agent,take,Obj),
 	permanence_take(take,Agent,Obj),
@@ -33,15 +34,19 @@ moo:agent_call_command(Agent,take(_)) :-
 % or in the agent's possession.
 permanence_take(take,Agent,Obj) :-
 	atloc(Agent,LOC),
-	check_permanence(take,Agent,LOC,Obj).
+	check_permanence(take,Agent,LOC,Obj),!,
+        term_listing(Obj).
 
-check_permanence(take,_,LOC,Obj) :-
-           props(Obj,permanence(take,0)),
-	del(atloc(Obj,LOC)).
-check_permanence(take,Agent,LOC,Obj) :-
+check_permanence(take,_,_,Obj):-
+        props(Obj,permanence(take,0)),        
+        atloc(Obj,LOC),
+	clr(atloc(Obj,LOC)).
+check_permanence(take,Agent,_,Obj) :-
 	props(Obj,permanence(take,1)),
-	del(atloc(Obj,LOC)),
-	add(possess(Agent,Obj)).
+        atloc(Obj,LOC),
+	ignore(clr(atloc(Obj,LOC))),
+	add(possess(Agent,Obj)),
+        (req(possess(Agent,Obj)) -> true; throw(req(possess(Agent,Obj)))).
 check_permanence(take,_,_,_).
 
 % Record keeping
@@ -53,5 +58,5 @@ moo:decl_update_charge(Agent,take) :-
 
 
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).
 

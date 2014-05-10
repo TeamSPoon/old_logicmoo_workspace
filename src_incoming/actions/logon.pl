@@ -9,7 +9,7 @@
 */
 :- module(login, []).
 
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 
 :- register_module_type(command).
 
@@ -24,6 +24,6 @@ moo:agent_call_command(Agent,rename(NewName)):- padd(Agent,named(NewName)).
 moo:agent_text_command(Agent,[logout],Agent,prologCall(assert(wants_logout(Agent)))).
 
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).
 
 

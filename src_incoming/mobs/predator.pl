@@ -1,13 +1,13 @@
+/** <module> 
+% This is a *very* simple example of an agent for
+% the predator example world.
+%
 % eg.predator.pl
 % July 8, 1996
 % John Eikenberry
 %
 % Dec 13, 2035
 % Douglas Miles
-%
-/** <module> 
-% This is a *very* simple example of an agent for
-% the predator example world.
 %
 */
 
@@ -18,7 +18,7 @@
 % :- dynamic memory/2.
 
 % Possible agent actions.
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 :- register_module_type(planning).
 
 moo:world_agent_plan(_World,Agent,Act):-
@@ -36,7 +36,7 @@ predator_idea(Agent,take(What)) :-
 	mud_isa(What,corpse).
 predator_idea(Agent,move(Dir)) :-
 	get_percepts(Agent,List),
-	list_object_dir_visible(List,corpse(_),Dir).
+	list_object_dir_sensed(_,List,corpse(_),Dir).
 predator_idea(Agent,attack(Dir)) :-
 	get_near(Agent,List),
 	list_object_dir_near(List,prey(_),Dir).
@@ -45,17 +45,10 @@ predator_idea(Agent,attack(Dir)) :-
 
 predator_idea(Agent,move(Dir)) :-
 	get_percepts(Agent,List),
-	list_object_dir_visible(List,prey(_),Dir).
-predator_idea(Agent,move(Dir)) :-
-	memory(Agent,directions([Dir|_])),
-	num_near(Num,Dir,here),
-	get_near(Agent,List),
-	nth_member(Num,What,List),
-	(What == [];
-	    What == [nut]).
-predator_idea(Agent,sit) :-
-	del(memory(Agent,directions(Old))),
-	random_permutation(Old,New),
-	add(memory(Agent,directions(New))).
+	list_object_dir_sensed(_,List,prey(_),Dir).
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+predator_idea(Agent,Act) :- 
+      move_or_sit_memory_idea(Agent,Act,[nut]).
+
+
+:- include(logicmoo('vworld/moo_footer.pl')).

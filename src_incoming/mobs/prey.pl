@@ -1,20 +1,21 @@
+/** <module> 
+% This is a *very* simple example of an agent meant to be 
+% used as prey (dead prey turns into food) in simple simulations.
+%
 % prey.pl
+%
 % July 8, 1996
 % John Eikenberry
 %
 % Dec 13, 2035
 % Douglas Miles
 %
-/** <module> 
-% This is a *very* simple example of an agent meant to be 
-% used as prey (dead prey turns into food) in simple simulations.
-%
 */
 
 % Declare the module name and the exported (public) predicates.
 :- module(prey,[]).
 
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 :- register_module_type(planning).
 :- register_module_type(command).
 
@@ -31,10 +32,10 @@ prey_idea(Self,move(Dir)) :-
 	get_percepts(Self,List),
 	list_agents(Agents),
 	obj_memb(NearAgnt,Agents),
-	list_object_dir_visible(List,NearAgnt,OppDir),
+	list_object_dir_sensed(_,List,NearAgnt,OppDir),
 	reverse_dir(OppDir,Dir),
 	number_to_dir(Num,Dir,here),
-	nth_member(Num,What,List),
+	nth1(Num,List,What),
 	What == [].
 prey_idea(Self,take(nut)) :-
 	get_feet(Self,What),
@@ -45,19 +46,12 @@ prey_idea(Self,eat(nut)) :-
 	possess(Self,nut).
 prey_idea(Self,move(Dir)) :-
 	get_percepts(Self,List),
-	list_object_dir_visible(List,nut,Dir).
+	list_object_dir_sensed(_,List,nut,Dir).
 prey_idea(_Agent,_) :-
 	spawn.
-prey_idea(Self,move(Dir)) :-
-	memory(Self,directions([Dir|_])),
-	num_near(Num,Dir,here),
-	get_near(Self,List),
-	nth_member(Num,What,List),
-	What == [].
-prey_idea(Prey,sit) :-
-	del(memory(Prey,directions(Old))),
-	random_permutation(Old,New),
-	add(memory(Prey,directions(New))).
+
+prey_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[nut]).
+
 
 
 % spawn new prey
@@ -104,6 +98,6 @@ spawn_prey(N) :-
 moo:agent_call_command(Agent,rez(NewType)):- atloc(Agent,LOC), create_instance(NewType,item,[atloc(LOC)]).
 
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).
 
 

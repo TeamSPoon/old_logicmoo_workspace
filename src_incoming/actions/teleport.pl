@@ -14,13 +14,14 @@
 */
 :- module(teleport, []).
 
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 
 :- register_module_type(command).
 
 % teleport
 moo:agent_text_command(Agent,[tp],Agent,teleport).
 moo:agent_text_command(Agent,[tp,Other,Where],Agent,teleport_to(Other,Where)).
+moo:agent_text_command(Agent,[tp,Where],Agent,teleport_to(self,Where)).
 
 moo:decl_action(teleport,"randomly teleport somewhere").
 moo:decl_action(teleport(item,region)).
@@ -41,6 +42,6 @@ moo:agent_call_command(_Agent,teleport_to(Other,Where)):-
    add(atloc(Target,Location)).
 
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).
 
 

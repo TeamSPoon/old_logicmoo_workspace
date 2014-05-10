@@ -17,7 +17,7 @@
 
 :- module(eat, []).
 
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 
 :- register_module_type(command).
 
@@ -26,9 +26,9 @@ moo:decl_action(eat(item)).
 % Eat something held
 % Check to make sure it's in the agents possession... 
 % if it is, process it's worth, then destroy it
-moo:agent_call_command(Agent,eat(Obj)) :-
-	findall(Poss,possess(Agent,Poss),Inv),
-	member(Obj,Inv),
+moo:agent_call_command(Agent,eat(SObj)) :-
+	possess(Agent,Obj),
+        object_match(SObj,Obj),
 	worth(Agent,eat,Obj),
 	del(possess(Agent,Obj)),
 	moo:update_charge(Agent,eat).
@@ -38,6 +38,6 @@ moo:decl_update_charge(Agent,eat) :-
 	New is Old - 1,
 	add(charge(Agent,New)).
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).
 
 

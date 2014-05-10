@@ -27,7 +27,7 @@
          dcgReorder/4
 	 ]).
 
-
+ 
  :- meta_predicate logicmoo_util_dcg:dcgOnce(//,?,?).
  :- meta_predicate logicmoo_util_dcg:dcgOr(//,//,?,?).
  :- meta_predicate logicmoo_util_dcg:dcgOr(//,//,//,?,?).
@@ -48,13 +48,14 @@
  :- meta_predicate logicmoo_util_dcg:dcgNot(//,?,?).
  :- meta_predicate logicmoo_util_dcg:dcgStartsWith(//,?,?).
  :- meta_predicate logicmoo_util_dcg:dcgOneOrMore(//,?,*).
- :- meta_predicate logicmoo_util_dcg:do_dcgTest_startsWith(*,//,0).
- :- meta_predicate logicmoo_util_dcg:dcgAnd(//,//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgAnd(//,//,//,?,?).
- :- meta_predicate logicmoo_util_dcg:theCode(0,*,*).
  :- meta_predicate logicmoo_util_dcg:dcgOnceOr(//,//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgStartsWith1(//,*,*).
  :- meta_predicate logicmoo_util_dcg:dcgReorder(//,//,?,?).
+ :- meta_predicate logicmoo_util_dcg:dcgAnd(//,//,//,?,?).
+ :- meta_predicate logicmoo_util_dcg:dcgAnd(//,//,?,?).
+%   :- meta_predicate logicmoo_util_dcg:theCode(0,*,*).
+ :- meta_predicate logicmoo_util_dcg:dcgStartsWith1(//,*,*).
+
+
 
 :-dynamic 
    decl_dcgTest/2,
@@ -65,6 +66,7 @@
 
 :-include('logicmoo_util_header.pl').
 :-use_module(logicmoo('logicmoo_util/logicmoo_util_bugger.pl')).
+:-use_module(logicmoo('logicmoo_util/logicmoo_util_strings.pl')).
 
 
 decl_dcgTest(X,Y):- nonvar(Y),!,do_dcgTest(X,Y,true).
@@ -94,9 +96,20 @@ theText([S|Text]) --> [S|Text].
 decl_dcgTest("this is a string",theString("this is a string")).
 theString(String) --> theString(String, " ").
 
+atomic_to_string(S,Str):-sformat(Str,'~w',[S]).
+
+atomics_to_string_str(L,S,A):-catch(atomics_to_string(L,S,A),_,fail).
+atomics_to_string_str(L,S,A):-atomics_to_string_str0(L,S,A).
+
+atomics_to_string_str0([],_Sep,""):-!.
+atomics_to_string_str0([S],_Sep,String):-!,atomic_to_string(S,String).
+atomics_to_string_str0([S|Text],Sep,String):-
+   atomic_to_string(S,StrL),
+   atomics_to_string_str0(Text,Sep,StrR),!,
+   atomics_to_string([StrL,StrR],Sep,String).
 
 % theString(String,Sep) --> [S|Text], {atomic_list_concat([S|Text],Sep,String),!}.
-theString(String,Sep) --> [S|Text], {atomics_to_string([S|Text],Sep,String),!}.
+theString(String,Sep) --> [S|Text], {atomics_to_string_str([S|Text],Sep,String),!}.
 
 decl_dcgTest_startsWith([a,b|_],theCode(X=1),X==1).
 decl_dcgTest_startsWith("anything",theCode(X=1),X==1).
@@ -262,7 +275,7 @@ decl_dcgTest_startsWith(List,Phrase,true):-decl_dcgTest_startsWith(List,Phrase).
 
 
 
-
+to_word_list(A,S):-atomSplit(A,S),!.
 to_word_list(V,V):-var(V),!.
 to_word_list([],[]):-!.
 to_word_list("",[]):-!.

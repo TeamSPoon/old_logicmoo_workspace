@@ -1,11 +1,3 @@
-% predator.map.pl
-% July 10, 1996
-% John Eikenberry
-%
-%
-% Dec 13, 2035
-% Douglas Miles
-%
 /** <module> 
 % Test worlds for predator world can be defined by a grid like the
 % one below. The grid must be rectangular (ie. same number of
@@ -14,6 +6,14 @@
 % To look at the world, use the show_world/0 command. 
 %
 % The two letter codes used below are defined in map.objects.pl
+%
+% predator.map.pl
+% July 10, 1996
+% John Eikenberry
+%
+%
+% Dec 13, 2035
+% Douglas Miles
 %
 */
 
@@ -47,6 +47,6 @@ moo:type_grid(forest,19,[ed,--,--,--,--,--,--,--,--,--,--,--,--,--,tr,--,--,--,-
 moo:type_grid(forest,20,[ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed]).
 
 
-:- include(logicmoo('vworld/vworld_footer')).
+:- include(logicmoo('vworld/moo_footer')).
 
 

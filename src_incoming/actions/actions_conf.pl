@@ -1,4 +1,12 @@
+:- module(actions_conf, []).
 
+end_of_file.
+
+:- source_location(File,_Line),
+    file_directory_name(File, RunDir),
+    atom_concat(RunDir,'/*.pl',Exp),
+     expand_file_name(Exp,X),
+     forall(member(E,X),ensure_loaded(E)).
 
 :- use_module('look.pl').   % get_percepts(Agent,[list of internal traits],[list of percepts]).
 :- use_module('move.pl').   % move(Dir). Dir is one of 8 cardinal directions
@@ -9,6 +17,5 @@
 :- use_module('push.pl').   % push(Dir). push an object in direction Dir
 :- use_module('eat.pl').    % eat(Object). eat/destroy object in possesion
 :- use_module('attack.pl'). % attack(Dir). attack another agent in direction Dir
-
 
 

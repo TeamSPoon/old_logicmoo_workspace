@@ -8,7 +8,7 @@
 % Revised At:   $Date: 2002/07/11 21:57:28 $
 % =================================================================== */
 :- module(logicmoo_util_terms,[
-         weak_nd_subst/4,
+         wsubst/4,
          subst/4,
          in_thread_and_join/1,
          in_thread_and_join/2,
@@ -31,6 +31,7 @@ doall(C):-ignore((C,fail)).
 */
 :- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_bugger.pl')).
 
+:- meta_predicate in_thread_and_join(0,*).
 in_thread_and_join(Goal):-in_thread_and_join(Goal,_Status).
 in_thread_and_join(Goal,Status):-thread_create(Goal,ID,[]),thread_join(ID,Status).
 
@@ -62,8 +63,11 @@ nd_subst2( _X, _Sk, L, L ).
 
 
 
+wsubst(A,B,C,D):- 
+      catch(notrace(weak_nd_subst(A,B,C,D)),_,fail),!.
+wsubst(A,_B,_C,A).
 
-weak_nd_subst(  Var, VarS,SUB,SUB ) :- Var=VarS,!.
+weak_nd_subst(  Var, VarS,SUB,SUB ) :- nonvar(Var),Var=VarS,!.
 weak_nd_subst(        P, X,Sk,        P1 ) :- functor(P,_,N),weak_nd_subst1( X, Sk, P, N, P1 ).
 
 weak_nd_subst1( _,  _, P, 0, P  ).
@@ -73,7 +77,7 @@ weak_nd_subst1( X, Sk, P, N, P1 ) :- N > 0, P =.. [F|Args], weak_nd_subst2( X, S
             P1 =.. [FS|ArgS].
 
 weak_nd_subst2( _,  _, [], [] ).
-weak_nd_subst2( X, Sk, [A|As], [Sk|AS] ) :- X = A, !, weak_nd_subst2( X, Sk, As, AS).
+weak_nd_subst2( X, Sk, [A|As], [Sk|AS] ) :- nonvar(A), X = A, !, weak_nd_subst2( X, Sk, As, AS).
 weak_nd_subst2( X, Sk, [A|As], [A|AS]  ) :- var(A), !, weak_nd_subst2( X, Sk, As, AS).
 weak_nd_subst2( X, Sk, [A|As], [Ap|AS] ) :- weak_nd_subst( A,X,Sk,Ap ),weak_nd_subst2( X, Sk, As, AS).
 weak_nd_subst2( _X, _Sk, L, L ).

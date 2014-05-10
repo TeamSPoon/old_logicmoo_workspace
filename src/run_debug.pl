@@ -7,6 +7,7 @@
 :- dynamic(fullStart/0).
 :- guitracer.
 
+
 % ======================================================
 % Configure the logicmoo utilities into the file path
 % :- include('logicmoo_util/logicmoo_util_header').
@@ -23,6 +24,16 @@ user:file_search_path(weblog, '/usr/local/lib/swipl-7.1.11/pack/weblog/prolog').
 user:file_search_path(cliopatria, '/devel/ClioPatria').
 user:file_search_path(cliopatria, 't:/devel/ClioPatria').
 
+
+:- use_module(library(settings)).
+
+:- user:file_search_path(cliopatria,SP),
+   exists_directory(SP),
+   writeq(user:file_search_path(cliopatria,SP)),nl.
+   %set_setting_default(cliopatria_binding:path, SP).
+   %save_settings('moo_settings.db').
+   %%setting(cliopatria_binding:path, atom, SP, 'Path to root of cliopatria install'),!.
+
 :- ensure_loaded(logicmoo('http/user_page')).
 
 :- meta_predicate(if_version_greater(?,0)).
@@ -33,12 +44,12 @@ if_version_greater(V,Goal):- current_prolog_flag(version,F), ((F > V) -> call(Go
 :- if_flag_true(false, if_version_greater(70109,ensure_loaded(logicmoo('mudconsole/mudconsolestart')))).
 
 % [Optionaly 1st run] tell where ClioPatria is located and restart for the 2nd run
-%:- set_setting(cliopatria_binding:path, 't:/devel/ClioPatria'), save_settings('moo_settings.db').
+%:- set_setting(cliopatria_binding:path, '/devel/ClioPatria'), save_settings('moo_settings.db').
 
 % [Optionaly] load and start sparql server
 % if we don't start cliopatria we have to manually start
 %
-start_servers :- if_version_greater(70109,ensure_loaded(logicmoo(launchcliopatria))).
+start_servers :- if_version_greater(70111,ensure_loaded(logicmoo(launchcliopatria))).
 
 % start_servers
 % this is evil. Starts the old mudconsole, the experiment with Jan's
@@ -48,7 +59,7 @@ start_servers :- if_version_greater(70109,ensure_loaded(logicmoo(launchcliopatri
 :- if_flag_true(fullStart, start_servers).
 
 % [Required] load and start mud
-:- ensure_loaded(logicmoo('vworld/wstart')).
+:- ensure_loaded(logicmoo('vworld/moo_startup')).
 
 /*
 % Load datalog
@@ -74,10 +85,10 @@ moo:agent_text_command(Agent,[run,Term], Agent,prologCall(Term)).
 %:- if_flag_true(fullStart,ensure_loaded(logicmoo('indigolog/flux_main_swi.pl'))).
 
 % FLUX AGENT SYSTEM WITH GOLOG
-:- if_flag_true(fullStart,ensure_loaded(logicmoo('indigolog/indigolog_main_swi_flux.pl'))).
+% :- if_flag_true(true,ensure_loaded(logicmoo('indigolog/indigolog_main_swi_flux.pl'))).
 
 % LOGICMOO DATABASE LOGIC ENGINE SERVER
-:- if_flag_true(fullStart,ensure_loaded(logicmoo('database/logicmoo.swi'))).
+%:- if_flag_true(true,ensure_loaded(logicmoo('database/logicmoo.swi'))).
 
 % when we import new and awefull code base (the previous )this can be helpfull
 % we redfine list_undefined/1 .. this is the old version
@@ -122,13 +133,11 @@ run_setup:-
    nodebug,
    debug,
    scan_db_prop,
-   at_start(gload),
+   at_start(load_game(logicmoo('rooms/startrek.all.pl'))),
    register_timer_thread(npc_ticker,1,npc_tick_tock).
 
 run:-
    login_and_run.
-
-gload:- load_game(logicmoo('rooms/startrek.all.pl')).
 
 % LOGICMOO LOGICSERVER DATA (Defaut uncommented)
 :- if_flag_true(fullStart, ensure_loaded(logicmoo('data/mworld0.pldata'))).
@@ -143,7 +152,7 @@ gload:- load_game(logicmoo('rooms/startrek.all.pl')).
 :- run_setup.
 
 % do some sanity testing
-:- do_player_action('s'),
+ht:- do_player_action('s'),
    do_player_action(look),
    do_player_action('s'),
    do_player_action('s'),
@@ -153,6 +162,7 @@ gload:- load_game(logicmoo('rooms/startrek.all.pl')).
    do_player_action('s'),
    do_player_action('s').
 
+:- at_start(start_servers).
 
 :- at_start(run).
 

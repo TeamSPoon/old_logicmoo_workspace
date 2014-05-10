@@ -75,5 +75,17 @@
 				Refilter="0"
 				Excludes=""/>
 		</Folder>
+		<Folder Name="src_assets">
+			<F
+				N="src_assets/*.*"
+				Recurse="1"
+				Refilter="0"
+				Excludes=""/>
+		</Folder>
+		<F
+			N="*.*"
+			Recurse="0"
+			Refilter="0"
+			Excludes=""/>
 	</Files>
 </Project>

@@ -8,17 +8,9 @@
 /** <module>
 % This file defines the basic look action
 % Agents will use the predicate:
-% get_all(Agent,Chg,Dam,Fail,Scr,Percepts,Inv)
-% instead of get_all(Agent,), these can be called separately
-% charge(Agent,Chg) = charge (amount of charge agent has)
-% damage(Agent,Dam) = damage
-% success(Agent,Suc) = checks success of last action (actually checks the failure predicate)
-% score(Agent,Scr) = score
 % get_percepts(Agent,Percepts) = list of lists of objects in agents location plus 2 locations in each direction
 % get_near(Agent,Percepts) = list of lists of objects in agents atloc plus 1 atloc in each dir
-% get_feet(Agent,Percept) = list of objects in agents location
-% inventory(Agt,Inv) = inventory (anything the agent has taken
-% to do this.
+% get_feet(Agent,Percepts) = list of objects in agents location
 %
 
 %
@@ -26,9 +18,9 @@
 % padd(Obj,height(ObjHt))  == add(p(height,Obj,ObjHt)) == add(p(height,Obj,ObjHt)) == add(height(Obj,ObjHt))
 */
 
-:- module(look, [get_all/7, get_percepts/2,  get_near/2, get_feet/2, height_on_obj/2, inventory/2]).
+:- module(look, [ get_percepts/2,  get_near/2, get_feet/2, height_on_obj/2, can_sense/5 , call_look/2]).
 
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 
 :- register_module_type(command).
 
@@ -36,8 +28,63 @@
 
 
 
-looking(Agent):- thlocal:current_agent(Agent),!.
-looking(Agent):- thinking(Agent).
+% can_sense(Agent,Sense,InList,CanDetect,CantDetect).
+can_sense(_Agent,visual,InList,InList,[]).
+
+moo:decl_action(examine(item), "view details of item (see also @list)").
+moo:agent_call_command(_Gent,examine(SObj)):- term_listing(SObj).
+
+
+
+moo:decl_action(look, "generalized look in region").
+moo:decl_action(look(dir), "Look in a direction").
+moo:decl_action(look(item), "Look at a speficific item").
+
+moo:agent_call_command(Agent,look(Dir)):-
+   view_dirs(Agent,[[Dir,here],[Dir,Dir],[Dir,Dir,adjacent]],Percepts),
+   forall_member(P,Percepts,call_agent_action(Agent,examine(P))).
+
+moo:agent_call_command(Agent,look(SObj)):-
+   objects_match(Agent,SObj,Percepts),
+   forall_member(P,Percepts,call_agent_action(Agent,examine(P))).
+
+moo:agent_call_command(Agent,look):- 
+   get_session_id(O),
+   with_assertions(thlocal:current_agent(O,Agent),
+        ((atloc(Agent,LOC),call_look(Agent,LOC)))).
+
+
+call_look(Agent,LOC):-
+    show_kb_preds(Agent,LOC,
+         [
+      % TODO make this work
+         %  why does this this work on Prolog REPL?
+         %   with_output_to(string(Str),show_room_grid('Area1000'))
+         %  but yet this doent?
+         show_room_grid(region) = with_output_to(string(value),show_room_grid(region)),
+         % for now workarround is 
+         call(show_room_grid(region)),
+         atloc(Agent,value),
+         nameStrings(region,value),
+         description(region,value),
+         events=deliverable_location_events(Agent,LOC,value),
+         path(D) = pathBetween_call(region,D,value),
+         path(D) = pathName(region,D,value),
+         inRegion(value,region),
+         facing(Agent,value),
+         all(get_feet(Agent,value)),
+         get_near(Agent,value),
+         get_percepts(Agent,value),         
+         movedist(Agent,value),
+         height_on_obj(Agent,value),
+         success=look:success(Agent,value)
+       ]).
+
+
+
+looking(Agent):- get_session_id(O), thlocal:current_agent(O,Agent),!.
+looking(Agent):- isa(Agent,agent).
+% looking(Agent):- thinking(Agent).
 
 % ********** TOP LEVEL PREDICATE: this is the predicate agents use to look
 % Look, reports everything not blocked up to two locations away
@@ -45,46 +92,49 @@ looking(Agent):- thinking(Agent).
 % To make this action take a turn, change the first line to:
 % Impliment(get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv)) :-
 get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
+  call((
 	looking(Agent),
-	ignore(charge(Agent,Vit)),
-        ignore(damage(Agent,Dam)),
-	ignore(success(Agent,Suc)),
-	ignore(score(Agent,Scr)),
-	ignore(inventory(Agent,Inv)),
-	ignore((view_list(Dirs),
+	charge(Agent,Vit),
+        damage(Agent,Dam),
+	success(Agent,Suc),
+	score(Agent,Scr),
+	inventory(Agent,Inv),
+	get_percepts(Agent,Percepts))),!.
+
+
+% Get only the Percepts
+get_percepts(Agent,Percepts) :- get_percepts0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts).
+get_percepts0(Agent,Percepts) :-
+  call((
+	looking(Agent),
+	view_vectors(Dirs),
 	check_for_blocks(Agent),
 	view_dirs(Agent,Dirs,Tmp_percepts),
 	alter_view(Dirs,Tmp_percepts,Percepts))),
 	!.
 
-% Get only the Percepts
-get_percepts(Agent,Percepts) :-
-	looking(Agent),
-	view_list(Dirs),
-	check_for_blocks(Agent),
-	view_dirs(Agent,Dirs,Tmp_percepts),
-	alter_view(Dirs,Tmp_percepts,Percepts),
-	!.
-
 % Look at locations immediately around argent
-get_near(Agent,Percepts) :-
+get_near(Agent,Percepts):- get_near0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts).
+   
+get_near0(Agent,Percepts) :-
+  call((
 	looking(Agent),
-	view_near_list(Dirs),
-	view_dirs(Agent,Dirs,Percepts),
-	!.
+	near_vectors(Dirs),
+	view_dirs(Agent,Dirs,Percepts))),!.
 
 % Look only at location agent is currently in.
-get_feet(Agent,Percept) :-
+get_feet(Agent,Percepts) :-  get_feet0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts).
+
+get_feet0(Agent,Percepts):-
+  call((
 	looking(Agent),
 	atloc(Agent,LOC),
         facing(Agent,Facing),
         reverse_dir(Facing,Rev),
-	get_mdir(Agent,[Facing,Rev],LOC,Percept),
+	get_mdir_u(Agent,[Facing,Rev],LOC,Percepts))),
 	!.
 
-% Get only the Inv (inventory)
-inventory(Agent, Inv) :-
-	findall(Poss,possess(Agent,Poss),Inv).
+
 
 %View list starting at vac's position and moving out in a clockwise spiral
 %old_view_list([[e,w],[n,here],[ne,here],[e,here],[se,here],[s,here],[sw,here],
@@ -94,14 +144,14 @@ inventory(Agent, Inv) :-
 
 %grid of view, upper left (nw) to lower right (se)
 %This is the order the agents will receive their Percepts returned from get_all(Agent,) in
-view_list([[nw,nw],[n,nw],[n,n],[n,ne],[ne,ne],
+view_vectors([[nw,nw],[n,nw],[n,n],[n,ne],[ne,ne],
 	    [w,nw],[nw,here],[n,here],[ne,here],[e,ne],
 	    [w,w],[w,here],[d,u],[e,here],[e,e],
 	    [w,sw],[sw,here],[s,here],[se,here],[e,se],
 	    [sw,sw],[s,sw],[s,s],[s,se],[se,se]]).
 
 % A view list of only the locations immediately surrounding the agent.
-view_near_list([[nw,here],[n,here],[ne,here],
+near_vectors([[nw,here],[n,here],[ne,here],
 	[w,here],[d,u],[e,here],
 	[sw,here],[s,here],[se,here]]).
 
@@ -126,11 +176,10 @@ height_on_obj(Agent,Ht) :-
 	member(Obj,Objs),
 	props(Obj,height(ObjHt)),
 	height(Agent,AgHt),
-	Ht = (AgHt + ObjHt) - 1.
+	Ht = (AgHt + ObjHt) - 1,!.
 height_on_obj(Agent,Ht) :-
-	height(Agent,Ht).
-height_on_obj(Agent,Ht) :-
-	height(Agent,Ht).
+	height(Agent,Ht),!.
+
 
 % Figure out if any obstacles are blocking vision...
 blocked_percepts(_,[],[],Blocked_Percepts,Blocked_Percepts).
@@ -171,10 +220,11 @@ dark_if_yes(no,[P],P).
 
 % Builds the Percepts list. (everything located up to 2 locations away from agent).
 view_dirs(_,[],[]).
-view_dirs(Agent,[[D1,D2]|Rest],Percepts) :-
+view_dirs(Agent,[[D1|D2]|Rest],Percepts) :-
+      looking(Agent),
 	view_dirs(Agent,Rest,Psofar),
 	atloc(Agent,LOC),
-	get_mdir(Agent,[D1,D2],LOC,What),
+	get_mdir_u(Agent,[D1|D2],LOC,What),
 	append([What],Psofar,Percepts).
 
 % The look loop (look at one location)
@@ -186,10 +236,20 @@ get_mdir(Agent,[Dir|D],LOC,What) :-
 	move_dir_target(LOC,Dir,XXYY),
 	get_mdir(Agent,D,XXYY,What).
 
+% The look loop (look at one location)
+get_mdir_u(_Gent,[],LOC,What) :-
+	report(LOC,What).
+get_mdir_u(_Gent,[here],LOC,What) :-
+	report(LOC,What).
+get_mdir_u(Agent,[Dir|D],LOC,What) :-
+	move_dir_target(LOC,Dir,XXYY),
+	get_mdir_u(Agent,D,XXYY,What).
+get_mdir_u(Agent,[_|D],LOC,What) :- 
+   get_mdir_u(Agent,D,LOC,What).
+
 % Reports everything at a location.
-report(LOC,What) :-
-	findall(Z,atloc(Z,LOC),List),
-	mask(List,[],What).
+report(LOC,List) :-
+	findall(Z,atloc(Z,LOC),List).
 
 % Converts the objects seen... basically to weed out the 0's the empty locations report
 mask([],What,What).
@@ -200,22 +260,6 @@ mask([K|Tail],SoFar,What) :-
 mask([Head|Tail],SoFar,What) :-
 	mask(Tail,[Head|SoFar],What).
 
-% Check to see if last action was successful or not
-success(Agent,no) :-
-	failure(Agent,_).
-success(_,yes).
-
-
-moo:decl_action(look).
-moo:decl_action(look(dir)).
-moo:decl_action(look(item)).
-
-
-moo:agent_call_command(Agent,look):- 
-   with_assertions(thlocal:current_agent(Agent),
-           telnet_look(Agent)).
-
-
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).
 
 

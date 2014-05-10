@@ -57,7 +57,7 @@ start_servers :-
 %:-set_setting(cliopatria_binding:path, 't:/devel/ClioPatria'), save_settings('moo_settings.db').
 
 % [Required] load and start mud
-:-ensure_loaded(logicmoo('vworld/wstart')).
+:- ensure_loaded(logicmoo('vworld/moo_startup')).
 
 
 

@@ -11,7 +11,7 @@
 */
 :- module(climb, []).
 
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 
 :- register_module_type(command).
 
@@ -71,6 +71,6 @@ moo:decl_update_stats(Agent,pulled) :-
 	add(failure(Agent,pulled)).
 
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).
 
 

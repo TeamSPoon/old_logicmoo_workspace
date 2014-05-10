@@ -6,7 +6,7 @@
 % Douglas Miles 2014
 
 */
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 
 :- register_module_type(command).
 
@@ -25,5 +25,5 @@ moo:agent_call_command(Agent,Sit) :-is_posture(Sit),
 
 moo:decl_update_charge(Agent,Sit) :- is_posture(Sit), padd(Agent,[charge(-1)]).
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).
 

@@ -27,7 +27,7 @@ user:file_search_path(cliopatria, 't:/devel/ClioPatria').
 
 if_version_greater(V,Goal):- current_prolog_flag(version,F), ((F > V) -> call(Goal) ; true).
 
-:- if_flag_true(true, if_version_greater(70109,ensure_loaded(logicmoo('mudconsole/mudconsolestart')))).
+:- if_flag_true(fullStart, if_version_greater(70109,ensure_loaded(logicmoo('mudconsole/mudconsolestart')))).
 
 % [Optionaly 1st run] tell where ClioPatria is located and restart for the 2nd run
 %:- set_setting(cliopatria_binding:path, 't:/devel/ClioPatria'), save_settings('moo_settings.db').
@@ -45,7 +45,7 @@ start_servers :- if_version_greater(70109,ensure_loaded(logicmoo(launchcliopatri
 :- if_flag_true(fullStart, start_servers).
 
 % [Required] load and start mud
-:- ensure_loaded(logicmoo('vworld/wstart')).
+:- ensure_loaded(logicmoo('vworld/moo_startup')).
 
 /*
 % Load datalog
@@ -125,7 +125,6 @@ run_setup:-
 run:-
    login_and_run.
 
-gload:- load_game(logicmoo('rooms/startrek.all.pl')).
 
 % LOGICMOO LOGICSERVER DATA (Defaut uncommented)
 :- if_flag_true(fullStart, ensure_loaded(logicmoo('data/mworld0.pldata'))).
@@ -141,8 +140,10 @@ gload:- load_game(logicmoo('rooms/startrek.all.pl')).
 
 % do some sanity testing
 
-moo:decl_mud_test(movedist,
+
+moo:decl_mud_test(test_movedist,
  (
+  foc_current_player(P),
    dmsg("teleport to main enginering"),
    do_player_action('tp Area1000'),
    dmsg("set the move dist to 5 meters"),
@@ -150,18 +151,26 @@ moo:decl_mud_test(movedist,
    dmsg("going 5 meters"),
    do_player_action('n'),
    dmsg("must be now be in corridor"),
-   req(atloc(self,'Area1001')),
+   req(atloc(P,'Area1001')),
    do_player_action('@set movedist 1'),
    call_n_times(5, do_player_action('s')),
    do_player_action('s'),
    dmsg("must be now be back in engineering"),
-   req(atloc(self,'Area1000')))).
+   req(atloc(P,'Area1000')))).
 
+moo:decl_mud_test(drop_take,
+ (
+  do_player_action('drop food'),
+  do_player_action('take food')
+)).
 
-:- run_mud_tests.
+%:- run_mud_tests.
 
-:- at_start(run).
+:- at_start((debug,run_mud_tests)).
+
+:- at_start((debug,run)).
 
 % so scripted versions don't just exit
+
 % :- prolog.
 

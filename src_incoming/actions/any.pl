@@ -17,7 +17,7 @@ action_removes_states(_Agent,List,Dels):-findall(A,member(A -> _,List),Dels).
 action_requires_states(_Agent,List,Preconds):-findall(A,(member(A,List),\+ functor(A,(->),_)),Preconds).
 
 
-:- include(logicmoo('vworld/vworld_header.pl')).
+:- include(logicmoo('vworld/moo_header.pl')).
 
 :- register_module_type(command).
 moo:action_rules(_,_,_,_):-fail.
@@ -41,6 +41,6 @@ moo:agent_call_command(Agent,ACT) :-
 %Nothing to use
       add(failure(Agent,SENT))).
 
-:- include(logicmoo('vworld/vworld_footer.pl')).
+:- include(logicmoo('vworld/moo_footer.pl')).
 
 
