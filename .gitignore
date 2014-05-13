@@ -1,7 +1,8 @@
 syntax: glob
 temp/*
-.git*
-.svn*
+.hg/
+.git/
+.svn/
 logicmoo.wiki/
 LogicMOO.vpwhist
 *.vtg
@@ -10,6 +11,8 @@ LogicMOO.vpwhist
 *.orig
 *.bak
 *~
+hMUD/
+src_data/star_trek/
 core
 src/moo_settings.db
 saved_cached_queries
@@ -18,9 +21,8 @@ wiki/
 logwumpus
 *.out
 *.log
-src_incoming/data/*.pl
-src_modules/logicserver
-src_data
+src_modules/
+src_data/*.*
 src/savedb
 src_incoming/savedb
 

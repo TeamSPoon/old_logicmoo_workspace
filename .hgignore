@@ -1,4 +1,5 @@
 syntax: glob
+src_data/star_trek
 temp/*
 .git*
 .svn*
@@ -14,10 +15,11 @@ core
 src/moo_settings.db
 saved_cached_queries
 t
+wiki/
+hMUD/
 logwumpus
 *.out
-src_incoming/data/*.pl
-src_modules/logicserver
-src_data
+src_modules/
+src_data/*.*
 src/savedb
 
