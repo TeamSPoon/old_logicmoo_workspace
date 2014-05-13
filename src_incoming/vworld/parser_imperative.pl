@@ -181,7 +181,7 @@ parse_agent_text_command_1(Agent,IVERB,ARGS,NewAgent,GOAL):-
 moo:verb_alias('l','look').
 moo:verb_alias('where is','where').
 
-pos_word_formula('infinitive',Verb,Formula):-'infinitive'(TheWord, Verb, _, _G183),'verbSemTrans'(TheWord, 0, 'TransitiveNPCompFrame', Formula, _, _).
+pos_word_formula('infinitive',Verb,Formula):- e2c_data:'infinitive'(TheWord, Verb, _, _G183), e2c_data:'verbSemTrans'(TheWord, 0, 'TransitiveNPCompFrame', Formula, _, _).
 
 verb_alias_to_verb(IVERB,SVERB):-moo:verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.
 verb_alias_to_verb(IVERB,SVERB):-specifiedItemType(IVERB,verb,SVERB), IVERB \= SVERB.
