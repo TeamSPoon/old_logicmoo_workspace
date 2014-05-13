@@ -723,13 +723,13 @@ logger_property(todo,once,true).
 
 :-debug(todo).
 
-dmsg(V):-notrace(dmsg0(V)).
+dmsg(V):- (dmsg0(V)).
 dmsg0(_):- bugger_flag(opt_debug=off),!.
 dmsg0(V):-var(V),!,trace,throw(dmsg(V)).
 
 dmsg0(C):-functor(C,Topic,_),debugging(Topic,_True_or_False),!,logger_property(Topic,once,true),!,
       (dmsg_log(Topic,_Time,C) -> true ; ((get_time(Time),asserta(dmsg_log(todo,Time,C)),!,dmsg2(C)))).
-dmsg0(C):-notrace((copy_term(C,Stuff), randomVars(Stuff),!,dmsg2(Stuff))).
+dmsg0(C):-((copy_term(C,Stuff), randomVars(Stuff),!,dmsg2(Stuff))).
 
 dmsg2(T):-!,
 	((

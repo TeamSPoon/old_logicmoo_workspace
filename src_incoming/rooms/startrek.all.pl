@@ -34,7 +34,7 @@ moo:type_grid('SpaceInAHOC',5, [--,--,--,--,--]).
 
 predicates([
 % dynamic startrek
-  nameStrings(term,string),
+  nameString(term,string),
   pathName(region,dir,string),
   inRegion(agent,'BPVLocation'),
   possess(agent,'ProtectiveAttire'),
@@ -539,253 +539,253 @@ STARSHIP ENTERPRISE
 
  /* found 141 for somethingIsa(_G1422,_G1423). */ 
 
-/* Prediate:  nameStrings/2 
+/* Prediate:  nameString/2 
 interpreted.
 file('c:/development/opensim4opencog/bin/cynd/startrek/mudreader.pl').
 line_count(52).
 number_of_clauses(2).
-Pattern: nameStrings(_G1446,_G1447). 
+Pattern: nameString(_G1446,_G1447). 
  */
-nameStrings('Area1000',"Main Engineering").
-nameStrings('Area1001',"Geordi's Quarters").
-nameStrings('Area1002',"A Corridor").
-nameStrings('Area1003',"Data's Quarters").
-nameStrings('Area1004',"The Brig").
-nameStrings('Area1005',"A Corridor").
-nameStrings('Area1006',"Transporter Room").
-nameStrings('Area1007',"School").
-nameStrings('Area1008',"A Corridor").
-nameStrings('Area1009',"Holodeck 2").
-nameStrings('Area1010',"Turbolift").
-nameStrings('Area1011',"Turbolift").
-nameStrings('Area1012',"Cargo Bay 1").
-nameStrings('Area1013',"A Corridor").
-nameStrings('Area1014',"Riker's Quarters").
-nameStrings('Area1015',"Sick Bay").
-nameStrings('Area1016',"A Corridor").
-nameStrings('Area1017',"Holodeck 4 Entrance - A Narrow Alley").
-nameStrings('Area1018',"Crusher's Quarters").
-nameStrings('Area1019',"A Corridor").
-nameStrings('Area1020',"Enterprise Security").
-nameStrings('Area1021',"Ten Forward").
-nameStrings('Area1022',"Shuttle Bay").
-nameStrings('Area1023',"Troi's Quarters").
-nameStrings('Area1024',"A Corridor").
-nameStrings('Area1025',"Worf's Quarters").
-nameStrings('Area1026',"Enterprise Gym").
-nameStrings('Area1027',"A Corridor").
-nameStrings('Area1028',"Picard's Quarters").
-nameStrings('Area1029',"Science Lab").
-nameStrings('Area1030',"A Corridor").
-nameStrings('Area1031',"Cargo Bay 2").
-nameStrings('Area1032',"Turbolift").
-nameStrings('Area1033',"Turbolift").
-nameStrings('Area1034',"Turbolift").
-nameStrings('Area1035',"Picard's Ready Room").
-nameStrings('Area1036',"Main Bridge - Upper Half").
-nameStrings('Area1037',"Conference Room").
-nameStrings('Area1038',"Main Bridge - Lower Half").
-nameStrings('Area1039',"Outer Space by the Enterprise").
-nameStrings('Area1040',"Outer Space").
-nameStrings('Area1041',"Outer Space").
-nameStrings('Area1042',"Transporter Beam").
-nameStrings('NpcCol1013-Alexander671',"Alexander").
-nameStrings(vacuum(1),"Data").
-nameStrings(vacuum(1),"CycLBot").
-nameStrings(vacuum(1),"CycBot").
-nameStrings(vacuum(1),"CycBot1").
-nameStrings('ArtifactCol1005-Boots673',"Boots").
-nameStrings('ArtifactCol1006-Comm-Badge674',"Comm Badge").
-nameStrings('ArtifactCol1003-Gold-Uniform675',"Gold Uniform").
-nameStrings('ArtifactCol1000-Phaser676',"Phaser").
-nameStrings(explorer(player1),"Player").
-nameStrings('ArtifactCol1005-Boots773',"Boots").
-nameStrings('ArtifactCol1006-Comm-Badge774',"Comm Badge").
-nameStrings('ArtifactCol1003-Gold-Uniform775',"Gold Uniform").
-nameStrings('ArtifactCol1000-Phaser776',"Phaser").
-nameStrings('NpcCol1003-Dr-Crusher677',"Dr. Crusher").
-nameStrings('ArtifactCol1005-Boots678',"Boots").
-nameStrings('ArtifactCol1006-Comm-Badge679',"Comm Badge").
-nameStrings('ArtifactCol1004-Blue-Uniform680',"Blue Uniform").
-nameStrings('ArtifactCol1009-Medical-Tricorder681',"Medical Tricorder").
-nameStrings('ArtifactCol1009-Medical-Tricorder682',"Medical Tricorder").
-nameStrings('ArtifactCol1009-Medical-Tricorder683',"Medical Tricorder").
-nameStrings('NpcCol1000-Geordi684',"Geordi").
-nameStrings('ArtifactCol1005-Boots685',"Boots").
-nameStrings('ArtifactCol1006-Comm-Badge686',"Comm Badge").
-nameStrings('ArtifactCol1003-Gold-Uniform687',"Gold Uniform").
-nameStrings('ArtifactCol1008-VISOR688',"VISOR").
-nameStrings('NpcCol1007-Guinan689',"Guinan").
-nameStrings('ArtifactCol1020-Tea690',"Tea").
-nameStrings('ArtifactCol1021-Synthehol691',"Synthehol").
-nameStrings('ArtifactCol1022-Ferengi-Ale692',"Ferengi Ale").
-nameStrings('ArtifactCol1023-Romulan-Whisky693',"Romulan Whisky").
-nameStrings('ArtifactCol1024-Lemonade-Prune-Juice694',"Lemonade 'Prune Juice'").
-nameStrings('ArtifactCol1025-Vulcan-Beer695',"Vulcan Beer").
-nameStrings('NpcCol1008-OBrien696',"O'Brien").
-nameStrings('ArtifactCol1005-Boots697',"Boots").
-nameStrings('ArtifactCol1006-Comm-Badge698',"Comm Badge").
-nameStrings('ArtifactCol1003-Gold-Uniform699',"Gold Uniform").
-nameStrings('ArtifactCol1000-Phaser700',"Phaser").
-nameStrings('NpcCol1006-Picard701',"Picard").
-nameStrings('ArtifactCol1005-Boots702',"Boots").
-nameStrings('ArtifactCol1006-Comm-Badge703',"Comm Badge").
-nameStrings('ArtifactCol1002-Red-Uniform704',"Red Uniform").
-nameStrings('ArtifactCol1001-5-Phaser-Rifle705',"5 Phaser Rifle").
-nameStrings('ArtifactCol1011-5-Picards-Flute706',"5 Picard's Flute").
-nameStrings('NpcCol1005-Riker707',"Riker").
-nameStrings('ArtifactCol1005-Boots708',"Boots").
-nameStrings('ArtifactCol1006-Comm-Badge709',"Comm Badge").
-nameStrings('ArtifactCol1002-Red-Uniform710',"Red Uniform").
-nameStrings('ArtifactCol1012-Trombone711',"Trombone").
-nameStrings('NpcCol1004-Troi712',"Troi").
-nameStrings('ArtifactCol1005-Boots713',"Boots").
-nameStrings('ArtifactCol1006-Comm-Badge714',"Comm Badge").
-nameStrings('ArtifactCol1004-Blue-Uniform715',"Blue Uniform").
-nameStrings('NpcCol1009-Wesley716',"Wesley").
-nameStrings('ArtifactCol1005-Boots717',"Boots").
-nameStrings('ArtifactCol1006-Comm-Badge718',"Comm Badge").
-nameStrings('ArtifactCol1002-Red-Uniform719',"Red Uniform").
-nameStrings('NpcCol1002-Worf720',"Worf").
-nameStrings('ArtifactCol1005-Boots721',"Boots").
-nameStrings('ArtifactCol1006-Comm-Badge722',"Comm Badge").
-nameStrings('ArtifactCol1003-Gold-Uniform723',"Gold Uniform").
-nameStrings('ArtifactCol1000-Phaser724',"Phaser").
-nameStrings('ArtifactCol1007-Sash725',"Sash").
-nameStrings('NpcCol1010-Livingston726',"Livingston").
-nameStrings('NpcCol1011-Spot727',"Spot").
-nameStrings('NpcCol1012-Ensign728',"Ensign").
-nameStrings('ArtifactCol1005-Boots729',"Boots").
-nameStrings('ArtifactCol1006-Comm-Badge730',"Comm Badge").
-nameStrings('ArtifactCol1003-Gold-Uniform731',"Gold Uniform").
-nameStrings('NpcCol1012-Ensign732',"Ensign").
-nameStrings('ArtifactCol1005-Boots733',"Boots").
-nameStrings('ArtifactCol1006-Comm-Badge734',"Comm Badge").
-nameStrings('ArtifactCol1003-Gold-Uniform735',"Gold Uniform").
-nameStrings('NpcCol1012-Ensign736',"Ensign").
-nameStrings('ArtifactCol1005-Boots737',"Boots").
-nameStrings('ArtifactCol1006-Comm-Badge738',"Comm Badge").
-nameStrings('ArtifactCol1002-Red-Uniform739',"Red Uniform").
-nameStrings('NpcCol1012-Ensign740',"Ensign").
-nameStrings('ArtifactCol1005-Boots741',"Boots").
-nameStrings('ArtifactCol1006-Comm-Badge742',"Comm Badge").
-nameStrings('ArtifactCol1002-Red-Uniform743',"Red Uniform").
-nameStrings('NpcCol1012-Ensign744',"Ensign").
-nameStrings('ArtifactCol1005-Boots745',"Boots").
-nameStrings('ArtifactCol1006-Comm-Badge746',"Comm Badge").
-nameStrings('ArtifactCol1004-Blue-Uniform747',"Blue Uniform").
-nameStrings('NpcCol1012-Ensign748',"Ensign").
-nameStrings('ArtifactCol1005-Boots749',"Boots").
-nameStrings('ArtifactCol1006-Comm-Badge750',"Comm Badge").
-nameStrings('ArtifactCol1004-Blue-Uniform751',"Blue Uniform").
-nameStrings('NpcCol1012-Ensign752',"Ensign").
-nameStrings('ArtifactCol1005-Boots753',"Boots").
-nameStrings('ArtifactCol1006-Comm-Badge754',"Comm Badge").
-nameStrings('ArtifactCol1004-Blue-Uniform755',"Blue Uniform").
-nameStrings('ArtifactCol1010-Dilithium-Crystal756',"Dilithium Crystal").
-nameStrings('ArtifactCol1010-Dilithium-Crystal757',"Dilithium Crystal").
-nameStrings('ArtifactCol1010-Dilithium-Crystal758',"Dilithium Crystal").
-nameStrings('ArtifactCol1009-Tricorder759',"Tricorder").
-nameStrings('ArtifactCol1009-Tricorder760',"Tricorder").
-nameStrings('ArtifactCol1009-Tricorder761',"Tricorder").
-nameStrings('NpcCol1013-Alexander671',"alexander rozhenko").
-nameStrings(vacuum(1),"Data").
-nameStrings(explorer(player1),"Player").
-nameStrings('NpcCol1003-Dr-Crusher677',"Doctor Crusher").
-nameStrings('NpcCol1000-Geordi684',"Geordi LaForge").
-nameStrings('NpcCol1007-Guinan689',"Guinan").
-nameStrings('NpcCol1008-OBrien696',"Chief O'Brien").
-nameStrings('NpcCol1006-Picard701',"Captain Picard").
-nameStrings('NpcCol1005-Riker707',"Commander Riker").
-nameStrings('NpcCol1004-Troi712',"Counselor Troi").
-nameStrings('NpcCol1009-Wesley716',"Wesley").
-nameStrings('NpcCol1002-Worf720',"Lieutenant Worf").
-nameStrings('NpcCol1010-Livingston726',"Livingston").
-nameStrings('NpcCol1011-Spot727',"Spot").
-nameStrings('NpcCol1012-Ensign728',"the ensign").
-nameStrings('NpcCol1012-Ensign732',"the ensign").
-nameStrings('NpcCol1012-Ensign736',"the ensign").
-nameStrings('NpcCol1012-Ensign740',"the ensign").
-nameStrings('NpcCol1012-Ensign744',"the ensign").
-nameStrings('NpcCol1012-Ensign748',"the ensign").
-nameStrings('NpcCol1012-Ensign752',"the ensign").
-nameStrings('ArtifactCol1005-Boots673',"a pair of Starfleet black boots").
-nameStrings('ArtifactCol1006-Comm-Badge674',"a Starfleet communication badge").
-nameStrings('ArtifactCol1003-Gold-Uniform675',"a gold Starfleet engineering uniform").
-nameStrings('ArtifactCol1000-Phaser676',"a standard issue phaser").
-nameStrings('ArtifactCol1005-Boots773',"a pair of Starfleet black boots").
-nameStrings('ArtifactCol1006-Comm-Badge774',"a Starfleet communication badge").
-nameStrings('ArtifactCol1003-Gold-Uniform775',"a gold Starfleet engineering uniform").
-nameStrings('ArtifactCol1000-Phaser776',"a standard issue phaser").
-nameStrings('ArtifactCol1005-Boots678',"a pair of Starfleet black boots").
-nameStrings('ArtifactCol1006-Comm-Badge679',"a Starfleet communication badge").
-nameStrings('ArtifactCol1004-Blue-Uniform680',"a blue Starfleet medical uniform").
-nameStrings('ArtifactCol1009-Medical-Tricorder681',"a medical Tricorder").
-nameStrings('ArtifactCol1009-Medical-Tricorder682',"a medical Tricorder").
-nameStrings('ArtifactCol1009-Medical-Tricorder683',"a medical Tricorder").
-nameStrings('ArtifactCol1005-Boots685',"a pair of Starfleet black boots").
-nameStrings('ArtifactCol1006-Comm-Badge686',"a Starfleet communication badge").
-nameStrings('ArtifactCol1003-Gold-Uniform687',"a gold Starfleet engineering uniform").
-nameStrings('ArtifactCol1008-VISOR688',"Geordi's VISOR").
-nameStrings('ArtifactCol1020-Tea690',"a small cup").
-nameStrings('ArtifactCol1021-Synthehol691',"a synthehol").
-nameStrings('ArtifactCol1022-Ferengi-Ale692',"a Ferengi bottle").
-nameStrings('ArtifactCol1023-Romulan-Whisky693',"a Romulan bottle").
-nameStrings('ArtifactCol1024-Lemonade-Prune-Juice694',"a small glass").
-nameStrings('ArtifactCol1025-Vulcan-Beer695',"a Vulcan bottle").
-nameStrings('ArtifactCol1005-Boots697',"a pair of Starfleet black boots").
-nameStrings('ArtifactCol1006-Comm-Badge698',"a Starfleet communication badge").
-nameStrings('ArtifactCol1003-Gold-Uniform699',"a gold Starfleet engineering uniform").
-nameStrings('ArtifactCol1000-Phaser700',"a standard issue phaser").
-nameStrings('ArtifactCol1005-Boots702',"a pair of Starfleet black boots").
-nameStrings('ArtifactCol1006-Comm-Badge703',"a Starfleet communication badge").
-nameStrings('ArtifactCol1002-Red-Uniform704',"a burgandy Starfleet command uniform").
-nameStrings('ArtifactCol1001-5-Phaser-Rifle705',"a phaser rifle").
-nameStrings('ArtifactCol1011-5-Picards-Flute706',"Picard's flute").
-nameStrings('ArtifactCol1005-Boots708',"a pair of Starfleet black boots").
-nameStrings('ArtifactCol1006-Comm-Badge709',"a Starfleet communication badge").
-nameStrings('ArtifactCol1002-Red-Uniform710',"a burgandy Starfleet command uniform").
-nameStrings('ArtifactCol1012-Trombone711',"Riker's trombone").
-nameStrings('ArtifactCol1005-Boots713',"a pair of Starfleet black boots").
-nameStrings('ArtifactCol1006-Comm-Badge714',"a Starfleet communication badge").
-nameStrings('ArtifactCol1004-Blue-Uniform715',"a blue Starfleet medical uniform").
-nameStrings('ArtifactCol1005-Boots717',"a pair of Starfleet black boots").
-nameStrings('ArtifactCol1006-Comm-Badge718',"a Starfleet communication badge").
-nameStrings('ArtifactCol1002-Red-Uniform719',"a burgandy Starfleet command uniform").
-nameStrings('ArtifactCol1005-Boots721',"a pair of Starfleet black boots").
-nameStrings('ArtifactCol1006-Comm-Badge722',"a Starfleet communication badge").
-nameStrings('ArtifactCol1003-Gold-Uniform723',"a gold Starfleet engineering uniform").
-nameStrings('ArtifactCol1000-Phaser724',"a standard issue phaser").
-nameStrings('ArtifactCol1007-Sash725',"Worf's sash").
-nameStrings('ArtifactCol1005-Boots729',"a pair of Starfleet black boots").
-nameStrings('ArtifactCol1006-Comm-Badge730',"a Starfleet communication badge").
-nameStrings('ArtifactCol1003-Gold-Uniform731',"a gold Starfleet engineering uniform").
-nameStrings('ArtifactCol1005-Boots733',"a pair of Starfleet black boots").
-nameStrings('ArtifactCol1006-Comm-Badge734',"a Starfleet communication badge").
-nameStrings('ArtifactCol1003-Gold-Uniform735',"a gold Starfleet engineering uniform").
-nameStrings('ArtifactCol1005-Boots737',"a pair of Starfleet black boots").
-nameStrings('ArtifactCol1006-Comm-Badge738',"a Starfleet communication badge").
-nameStrings('ArtifactCol1002-Red-Uniform739',"a burgandy Starfleet command uniform").
-nameStrings('ArtifactCol1005-Boots741',"a pair of Starfleet black boots").
-nameStrings('ArtifactCol1006-Comm-Badge742',"a Starfleet communication badge").
-nameStrings('ArtifactCol1002-Red-Uniform743',"a burgandy Starfleet command uniform").
-nameStrings('ArtifactCol1005-Boots745',"a pair of Starfleet black boots").
-nameStrings('ArtifactCol1006-Comm-Badge746',"a Starfleet communication badge").
-nameStrings('ArtifactCol1004-Blue-Uniform747',"a blue Starfleet medical uniform").
-nameStrings('ArtifactCol1005-Boots749',"a pair of Starfleet black boots").
-nameStrings('ArtifactCol1006-Comm-Badge750',"a Starfleet communication badge").
-nameStrings('ArtifactCol1004-Blue-Uniform751',"a blue Starfleet medical uniform").
-nameStrings('ArtifactCol1005-Boots753',"a pair of Starfleet black boots").
-nameStrings('ArtifactCol1006-Comm-Badge754',"a Starfleet communication badge").
-nameStrings('ArtifactCol1004-Blue-Uniform755',"a blue Starfleet medical uniform").
-nameStrings('ArtifactCol1010-Dilithium-Crystal756',"a dilithium crystal").
-nameStrings('ArtifactCol1010-Dilithium-Crystal757',"a dilithium crystal").
-nameStrings('ArtifactCol1010-Dilithium-Crystal758',"a dilithium crystal").
-nameStrings('ArtifactCol1009-Tricorder759',"a medical Tricorder").
-nameStrings('ArtifactCol1009-Tricorder760',"a medical Tricorder").
-nameStrings('ArtifactCol1009-Tricorder761',"a medical Tricorder").
+nameString('Area1000',"Main Engineering").
+nameString('Area1001',"Geordi's Quarters").
+nameString('Area1002',"A Corridor").
+nameString('Area1003',"Data's Quarters").
+nameString('Area1004',"The Brig").
+nameString('Area1005',"A Corridor").
+nameString('Area1006',"Transporter Room").
+nameString('Area1007',"School").
+nameString('Area1008',"A Corridor").
+nameString('Area1009',"Holodeck 2").
+nameString('Area1010',"Turbolift").
+nameString('Area1011',"Turbolift").
+nameString('Area1012',"Cargo Bay 1").
+nameString('Area1013',"A Corridor").
+nameString('Area1014',"Riker's Quarters").
+nameString('Area1015',"Sick Bay").
+nameString('Area1016',"A Corridor").
+nameString('Area1017',"Holodeck 4 Entrance - A Narrow Alley").
+nameString('Area1018',"Crusher's Quarters").
+nameString('Area1019',"A Corridor").
+nameString('Area1020',"Enterprise Security").
+nameString('Area1021',"Ten Forward").
+nameString('Area1022',"Shuttle Bay").
+nameString('Area1023',"Troi's Quarters").
+nameString('Area1024',"A Corridor").
+nameString('Area1025',"Worf's Quarters").
+nameString('Area1026',"Enterprise Gym").
+nameString('Area1027',"A Corridor").
+nameString('Area1028',"Picard's Quarters").
+nameString('Area1029',"Science Lab").
+nameString('Area1030',"A Corridor").
+nameString('Area1031',"Cargo Bay 2").
+nameString('Area1032',"Turbolift").
+nameString('Area1033',"Turbolift").
+nameString('Area1034',"Turbolift").
+nameString('Area1035',"Picard's Ready Room").
+nameString('Area1036',"Main Bridge - Upper Half").
+nameString('Area1037',"Conference Room").
+nameString('Area1038',"Main Bridge - Lower Half").
+nameString('Area1039',"Outer Space by the Enterprise").
+nameString('Area1040',"Outer Space").
+nameString('Area1041',"Outer Space").
+nameString('Area1042',"Transporter Beam").
+nameString('NpcCol1013-Alexander671',"Alexander").
+nameString(vacuum(1),"Data").
+nameString(vacuum(1),"CycLBot").
+nameString(vacuum(1),"CycBot").
+nameString(vacuum(1),"CycBot1").
+nameString('ArtifactCol1005-Boots673',"Boots").
+nameString('ArtifactCol1006-Comm-Badge674',"Comm Badge").
+nameString('ArtifactCol1003-Gold-Uniform675',"Gold Uniform").
+nameString('ArtifactCol1000-Phaser676',"Phaser").
+nameString(explorer(player1),"Player").
+nameString('ArtifactCol1005-Boots773',"Boots").
+nameString('ArtifactCol1006-Comm-Badge774',"Comm Badge").
+nameString('ArtifactCol1003-Gold-Uniform775',"Gold Uniform").
+nameString('ArtifactCol1000-Phaser776',"Phaser").
+nameString('NpcCol1003-Dr-Crusher677',"Dr. Crusher").
+nameString('ArtifactCol1005-Boots678',"Boots").
+nameString('ArtifactCol1006-Comm-Badge679',"Comm Badge").
+nameString('ArtifactCol1004-Blue-Uniform680',"Blue Uniform").
+nameString('ArtifactCol1009-Medical-Tricorder681',"Medical Tricorder").
+nameString('ArtifactCol1009-Medical-Tricorder682',"Medical Tricorder").
+nameString('ArtifactCol1009-Medical-Tricorder683',"Medical Tricorder").
+nameString('NpcCol1000-Geordi684',"Geordi").
+nameString('ArtifactCol1005-Boots685',"Boots").
+nameString('ArtifactCol1006-Comm-Badge686',"Comm Badge").
+nameString('ArtifactCol1003-Gold-Uniform687',"Gold Uniform").
+nameString('ArtifactCol1008-VISOR688',"VISOR").
+nameString('NpcCol1007-Guinan689',"Guinan").
+nameString('ArtifactCol1020-Tea690',"Tea").
+nameString('ArtifactCol1021-Synthehol691',"Synthehol").
+nameString('ArtifactCol1022-Ferengi-Ale692',"Ferengi Ale").
+nameString('ArtifactCol1023-Romulan-Whisky693',"Romulan Whisky").
+nameString('ArtifactCol1024-Lemonade-Prune-Juice694',"Lemonade 'Prune Juice'").
+nameString('ArtifactCol1025-Vulcan-Beer695',"Vulcan Beer").
+nameString('NpcCol1008-OBrien696',"O'Brien").
+nameString('ArtifactCol1005-Boots697',"Boots").
+nameString('ArtifactCol1006-Comm-Badge698',"Comm Badge").
+nameString('ArtifactCol1003-Gold-Uniform699',"Gold Uniform").
+nameString('ArtifactCol1000-Phaser700',"Phaser").
+nameString('NpcCol1006-Picard701',"Picard").
+nameString('ArtifactCol1005-Boots702',"Boots").
+nameString('ArtifactCol1006-Comm-Badge703',"Comm Badge").
+nameString('ArtifactCol1002-Red-Uniform704',"Red Uniform").
+nameString('ArtifactCol1001-5-Phaser-Rifle705',"5 Phaser Rifle").
+nameString('ArtifactCol1011-5-Picards-Flute706',"5 Picard's Flute").
+nameString('NpcCol1005-Riker707',"Riker").
+nameString('ArtifactCol1005-Boots708',"Boots").
+nameString('ArtifactCol1006-Comm-Badge709',"Comm Badge").
+nameString('ArtifactCol1002-Red-Uniform710',"Red Uniform").
+nameString('ArtifactCol1012-Trombone711',"Trombone").
+nameString('NpcCol1004-Troi712',"Troi").
+nameString('ArtifactCol1005-Boots713',"Boots").
+nameString('ArtifactCol1006-Comm-Badge714',"Comm Badge").
+nameString('ArtifactCol1004-Blue-Uniform715',"Blue Uniform").
+nameString('NpcCol1009-Wesley716',"Wesley").
+nameString('ArtifactCol1005-Boots717',"Boots").
+nameString('ArtifactCol1006-Comm-Badge718',"Comm Badge").
+nameString('ArtifactCol1002-Red-Uniform719',"Red Uniform").
+nameString('NpcCol1002-Worf720',"Worf").
+nameString('ArtifactCol1005-Boots721',"Boots").
+nameString('ArtifactCol1006-Comm-Badge722',"Comm Badge").
+nameString('ArtifactCol1003-Gold-Uniform723',"Gold Uniform").
+nameString('ArtifactCol1000-Phaser724',"Phaser").
+nameString('ArtifactCol1007-Sash725',"Sash").
+nameString('NpcCol1010-Livingston726',"Livingston").
+nameString('NpcCol1011-Spot727',"Spot").
+nameString('NpcCol1012-Ensign728',"Ensign").
+nameString('ArtifactCol1005-Boots729',"Boots").
+nameString('ArtifactCol1006-Comm-Badge730',"Comm Badge").
+nameString('ArtifactCol1003-Gold-Uniform731',"Gold Uniform").
+nameString('NpcCol1012-Ensign732',"Ensign").
+nameString('ArtifactCol1005-Boots733',"Boots").
+nameString('ArtifactCol1006-Comm-Badge734',"Comm Badge").
+nameString('ArtifactCol1003-Gold-Uniform735',"Gold Uniform").
+nameString('NpcCol1012-Ensign736',"Ensign").
+nameString('ArtifactCol1005-Boots737',"Boots").
+nameString('ArtifactCol1006-Comm-Badge738',"Comm Badge").
+nameString('ArtifactCol1002-Red-Uniform739',"Red Uniform").
+nameString('NpcCol1012-Ensign740',"Ensign").
+nameString('ArtifactCol1005-Boots741',"Boots").
+nameString('ArtifactCol1006-Comm-Badge742',"Comm Badge").
+nameString('ArtifactCol1002-Red-Uniform743',"Red Uniform").
+nameString('NpcCol1012-Ensign744',"Ensign").
+nameString('ArtifactCol1005-Boots745',"Boots").
+nameString('ArtifactCol1006-Comm-Badge746',"Comm Badge").
+nameString('ArtifactCol1004-Blue-Uniform747',"Blue Uniform").
+nameString('NpcCol1012-Ensign748',"Ensign").
+nameString('ArtifactCol1005-Boots749',"Boots").
+nameString('ArtifactCol1006-Comm-Badge750',"Comm Badge").
+nameString('ArtifactCol1004-Blue-Uniform751',"Blue Uniform").
+nameString('NpcCol1012-Ensign752',"Ensign").
+nameString('ArtifactCol1005-Boots753',"Boots").
+nameString('ArtifactCol1006-Comm-Badge754',"Comm Badge").
+nameString('ArtifactCol1004-Blue-Uniform755',"Blue Uniform").
+nameString('ArtifactCol1010-Dilithium-Crystal756',"Dilithium Crystal").
+nameString('ArtifactCol1010-Dilithium-Crystal757',"Dilithium Crystal").
+nameString('ArtifactCol1010-Dilithium-Crystal758',"Dilithium Crystal").
+nameString('ArtifactCol1009-Tricorder759',"Tricorder").
+nameString('ArtifactCol1009-Tricorder760',"Tricorder").
+nameString('ArtifactCol1009-Tricorder761',"Tricorder").
+nameString('NpcCol1013-Alexander671',"alexander rozhenko").
+nameString(vacuum(1),"Data").
+nameString(explorer(player1),"Player").
+nameString('NpcCol1003-Dr-Crusher677',"Doctor Crusher").
+nameString('NpcCol1000-Geordi684',"Geordi LaForge").
+nameString('NpcCol1007-Guinan689',"Guinan").
+nameString('NpcCol1008-OBrien696',"Chief O'Brien").
+nameString('NpcCol1006-Picard701',"Captain Picard").
+nameString('NpcCol1005-Riker707',"Commander Riker").
+nameString('NpcCol1004-Troi712',"Counselor Troi").
+nameString('NpcCol1009-Wesley716',"Wesley").
+nameString('NpcCol1002-Worf720',"Lieutenant Worf").
+nameString('NpcCol1010-Livingston726',"Livingston").
+nameString('NpcCol1011-Spot727',"Spot").
+nameString('NpcCol1012-Ensign728',"the ensign").
+nameString('NpcCol1012-Ensign732',"the ensign").
+nameString('NpcCol1012-Ensign736',"the ensign").
+nameString('NpcCol1012-Ensign740',"the ensign").
+nameString('NpcCol1012-Ensign744',"the ensign").
+nameString('NpcCol1012-Ensign748',"the ensign").
+nameString('NpcCol1012-Ensign752',"the ensign").
+nameString('ArtifactCol1005-Boots673',"a pair of Starfleet black boots").
+nameString('ArtifactCol1006-Comm-Badge674',"a Starfleet communication badge").
+nameString('ArtifactCol1003-Gold-Uniform675',"a gold Starfleet engineering uniform").
+nameString('ArtifactCol1000-Phaser676',"a standard issue phaser").
+nameString('ArtifactCol1005-Boots773',"a pair of Starfleet black boots").
+nameString('ArtifactCol1006-Comm-Badge774',"a Starfleet communication badge").
+nameString('ArtifactCol1003-Gold-Uniform775',"a gold Starfleet engineering uniform").
+nameString('ArtifactCol1000-Phaser776',"a standard issue phaser").
+nameString('ArtifactCol1005-Boots678',"a pair of Starfleet black boots").
+nameString('ArtifactCol1006-Comm-Badge679',"a Starfleet communication badge").
+nameString('ArtifactCol1004-Blue-Uniform680',"a blue Starfleet medical uniform").
+nameString('ArtifactCol1009-Medical-Tricorder681',"a medical Tricorder").
+nameString('ArtifactCol1009-Medical-Tricorder682',"a medical Tricorder").
+nameString('ArtifactCol1009-Medical-Tricorder683',"a medical Tricorder").
+nameString('ArtifactCol1005-Boots685',"a pair of Starfleet black boots").
+nameString('ArtifactCol1006-Comm-Badge686',"a Starfleet communication badge").
+nameString('ArtifactCol1003-Gold-Uniform687',"a gold Starfleet engineering uniform").
+nameString('ArtifactCol1008-VISOR688',"Geordi's VISOR").
+nameString('ArtifactCol1020-Tea690',"a small cup").
+nameString('ArtifactCol1021-Synthehol691',"a synthehol").
+nameString('ArtifactCol1022-Ferengi-Ale692',"a Ferengi bottle").
+nameString('ArtifactCol1023-Romulan-Whisky693',"a Romulan bottle").
+nameString('ArtifactCol1024-Lemonade-Prune-Juice694',"a small glass").
+nameString('ArtifactCol1025-Vulcan-Beer695',"a Vulcan bottle").
+nameString('ArtifactCol1005-Boots697',"a pair of Starfleet black boots").
+nameString('ArtifactCol1006-Comm-Badge698',"a Starfleet communication badge").
+nameString('ArtifactCol1003-Gold-Uniform699',"a gold Starfleet engineering uniform").
+nameString('ArtifactCol1000-Phaser700',"a standard issue phaser").
+nameString('ArtifactCol1005-Boots702',"a pair of Starfleet black boots").
+nameString('ArtifactCol1006-Comm-Badge703',"a Starfleet communication badge").
+nameString('ArtifactCol1002-Red-Uniform704',"a burgandy Starfleet command uniform").
+nameString('ArtifactCol1001-5-Phaser-Rifle705',"a phaser rifle").
+nameString('ArtifactCol1011-5-Picards-Flute706',"Picard's flute").
+nameString('ArtifactCol1005-Boots708',"a pair of Starfleet black boots").
+nameString('ArtifactCol1006-Comm-Badge709',"a Starfleet communication badge").
+nameString('ArtifactCol1002-Red-Uniform710',"a burgandy Starfleet command uniform").
+nameString('ArtifactCol1012-Trombone711',"Riker's trombone").
+nameString('ArtifactCol1005-Boots713',"a pair of Starfleet black boots").
+nameString('ArtifactCol1006-Comm-Badge714',"a Starfleet communication badge").
+nameString('ArtifactCol1004-Blue-Uniform715',"a blue Starfleet medical uniform").
+nameString('ArtifactCol1005-Boots717',"a pair of Starfleet black boots").
+nameString('ArtifactCol1006-Comm-Badge718',"a Starfleet communication badge").
+nameString('ArtifactCol1002-Red-Uniform719',"a burgandy Starfleet command uniform").
+nameString('ArtifactCol1005-Boots721',"a pair of Starfleet black boots").
+nameString('ArtifactCol1006-Comm-Badge722',"a Starfleet communication badge").
+nameString('ArtifactCol1003-Gold-Uniform723',"a gold Starfleet engineering uniform").
+nameString('ArtifactCol1000-Phaser724',"a standard issue phaser").
+nameString('ArtifactCol1007-Sash725',"Worf's sash").
+nameString('ArtifactCol1005-Boots729',"a pair of Starfleet black boots").
+nameString('ArtifactCol1006-Comm-Badge730',"a Starfleet communication badge").
+nameString('ArtifactCol1003-Gold-Uniform731',"a gold Starfleet engineering uniform").
+nameString('ArtifactCol1005-Boots733',"a pair of Starfleet black boots").
+nameString('ArtifactCol1006-Comm-Badge734',"a Starfleet communication badge").
+nameString('ArtifactCol1003-Gold-Uniform735',"a gold Starfleet engineering uniform").
+nameString('ArtifactCol1005-Boots737',"a pair of Starfleet black boots").
+nameString('ArtifactCol1006-Comm-Badge738',"a Starfleet communication badge").
+nameString('ArtifactCol1002-Red-Uniform739',"a burgandy Starfleet command uniform").
+nameString('ArtifactCol1005-Boots741',"a pair of Starfleet black boots").
+nameString('ArtifactCol1006-Comm-Badge742',"a Starfleet communication badge").
+nameString('ArtifactCol1002-Red-Uniform743',"a burgandy Starfleet command uniform").
+nameString('ArtifactCol1005-Boots745',"a pair of Starfleet black boots").
+nameString('ArtifactCol1006-Comm-Badge746',"a Starfleet communication badge").
+nameString('ArtifactCol1004-Blue-Uniform747',"a blue Starfleet medical uniform").
+nameString('ArtifactCol1005-Boots749',"a pair of Starfleet black boots").
+nameString('ArtifactCol1006-Comm-Badge750',"a Starfleet communication badge").
+nameString('ArtifactCol1004-Blue-Uniform751',"a blue Starfleet medical uniform").
+nameString('ArtifactCol1005-Boots753',"a pair of Starfleet black boots").
+nameString('ArtifactCol1006-Comm-Badge754',"a Starfleet communication badge").
+nameString('ArtifactCol1004-Blue-Uniform755',"a blue Starfleet medical uniform").
+nameString('ArtifactCol1010-Dilithium-Crystal756',"a dilithium crystal").
+nameString('ArtifactCol1010-Dilithium-Crystal757',"a dilithium crystal").
+nameString('ArtifactCol1010-Dilithium-Crystal758',"a dilithium crystal").
+nameString('ArtifactCol1009-Tricorder759',"a medical Tricorder").
+nameString('ArtifactCol1009-Tricorder760',"a medical Tricorder").
+nameString('ArtifactCol1009-Tricorder761',"a medical Tricorder").
 
- /* found 322 for nameStrings(_G1446,_G1447). */ 
+ /* found 322 for nameString(_G1446,_G1447). */ 
 
 /* Prediate:  somethingDescription/2 
 interpreted.

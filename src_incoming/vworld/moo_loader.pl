@@ -134,12 +134,12 @@ game_assert(A):-must(once(correctArgsIsa(A,AA))),must(once(pgs(AA))),!.
 
 pgs(somethingIsa(A,List)):-forall_member(E,List,game_assert(ofclass(A,E))).
 pgs(somethingDescription(A,List)):-forall_member(E,List,game_assert(description(A,E))).
-pgs(objects(Type,List)):-forall_member(I,List,game_assert(isa(I,Type))).
+pgs(objects(Type,List)):-forall_member(I,List,game_assert(mud_isa(I,Type))).
 pgs(sorts(Type,List)):-forall_member(I,List,game_assert(subclass(I,Type))).
 pgs(predicates(List)):-forall_member(T,List,assert(db_prop_g(T))).
 
 pgs(description(A,E)):- must(once(add_description(A,E))).
-pgs(nameStrings(A,S0)):- determinerRemoved(S0,String,S),!,game_assert(nameStrings(A,S)),game_assert(determinerString(A,String)).
+pgs(nameString(A,S0)):- determinerRemoved(S0,String,S),!,game_assert(nameString(A,S)),game_assert(determinerString(A,String)).
 
 % skip formatter types
 pgs(A):- A=..[SubType,_],member(SubType,[string,action,dir]),!.
@@ -155,7 +155,7 @@ pgs(A):- A=..[SubType,_],
 
 pgs(A):- A=..[SubType,Arg], 
       member(SubType,[wearable]),
-      assert_if_new(moo:call_after_load(create_instance(Arg,item,[isa(A,SubType)]))).   
+      assert_if_new(moo:call_after_load(create_instance(Arg,item,[mud_isa(A,SubType)]))).   
 
 pgs(A):- A=..[SubType,_],dmsg(todo(ensure_creatabe(SubType))),dbadd0(A),!.
 
@@ -242,7 +242,7 @@ ddeterminer0(the).
 ddeterminer(L,L):-ddeterminer0(L).
 ddeterminer(U,L):-string_lower(U,L),U\=L,!,ddeterminer0(L).
 
-add_description_word(A,Word):- string_upper(Word,Word),string_lower(Word,Flag),string_to_atom(Flag,Atom),show_call(game_assert(isa(A,Atom))).
+add_description_word(A,Word):- string_upper(Word,Word),string_lower(Word,Flag),string_to_atom(Flag,Atom),show_call(game_assert(mud_isa(A,Atom))).
 add_description_word(A,Word):- string_lower(Word,Word),show_call(game_assert(keyword(A,Word))).
 add_description_word(A,Word):- string_lower(Word,Lower),show_call(game_assert(keyword(A,Lower))).
 

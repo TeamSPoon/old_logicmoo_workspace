@@ -72,9 +72,9 @@ get_map_size(X,Y):-
 get_map_size(4,4).
 
 
-create_webglyph(Detected,_,Label):- member(O,Detected),isa(O,'agent'),inst_label(O,Label).
-create_webglyph(Detected,_,wall):- member(O,Detected),isa(O,'wall').
-create_webglyph(Detected,_,floor):- member(O,Detected),isa(O,'floor').
+create_webglyph(Detected,_,Label):- member(O,Detected),mud_isa(O,'agent'),inst_label(O,Label).
+create_webglyph(Detected,_,wall):- member(O,Detected),mud_isa(O,'wall').
+create_webglyph(Detected,_,floor):- member(O,Detected),mud_isa(O,'floor').
 create_webglyph([],[],floor).
 create_webglyph(_,_,darkness).
    

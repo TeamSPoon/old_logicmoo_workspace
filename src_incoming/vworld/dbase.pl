@@ -14,21 +14,24 @@
 
 :- module(dbase, [
 
- add/1, add0/1, agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, ofclass/2, clr/1, damage/2, db_op/2, db_prop/2, db_prop/1, atloc/2, is_db_prop/3,
- db_prop_g/1, db_prop_game_assert/1, del/1, failure/2, grid/4, inRegion/2, is_db_prop/2, is_db_prop/3, isa/2, item/1, 
+ add/1, add0/1, agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, ofclass/2, clr/1, damage/2, db_op/2, atloc/2, 
+ db_prop_g/1, db_prop_game_assert/1, del/1, failure/2, grid/4, inRegion/2, mud_isa/2, item/1, 
  memory/2, padd/2, padd/3, pathName/3, possess/2, prop/3, prop_or/4, props/2, region/1, req/1, scan_db_prop/0, score/2, stm/2, term_listing/1,  facing/2,
- thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, nameStrings/2, description/2, pathBetween/3, act_turn/2,
- dbase_mod/1, define_db_prop/2,
+ thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, nameString/2, description/2, pathBetween/3, act_turn/2,
+ dbase_mod/1, dbase_define_db_prop/2,
  clause_present_1/3,
  with_kb_assertions/2
     ]).
 
+
+
+
 :- dynamic 
  dbase_mod/1,
- add/1, add0/1, agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, ofclass/2, clr/1, damage/2, db_op/2, db_prop/2, db_prop/1, atloc/2, is_db_prop/2, is_db_prop/3,
- db_prop_g/1, db_prop_game_assert/1, del/1, failure/2, grid/4, inRegion/2, is_db_prop/3, isa/2, item/1, 
+ add/1, add0/1, agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, ofclass/2, clr/1, damage/2, db_op/2,atloc/2, 
+ db_prop_g/1, db_prop_game_assert/1, del/1, failure/2, grid/4, inRegion/2, mud_isa/2, item/1, 
  memory/2, padd/2, padd/3, pathName/3, possess/2, prop/3, prop_or/4, props/2, region/1, req/1, scan_db_prop/0, score/2, stm/2, term_listing/1, facing/2,
- thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, nameStrings/2, description/2, pathBetween/3, act_turn/2.
+ thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, nameString/2, description/2, pathBetween/3, act_turn/2.
 
 dbase_mod(dbase).
 /*
@@ -40,17 +43,17 @@ dbase_mod(dbase).
 */
 
 user_export(_):- dbase_mod(user),!.
+user_export(_M:Prop/Arity):-!,user_export(Prop/Arity).
 user_export(Prop/Arity):- 
    dbase_mod(M), '@'( M:export(Prop/Arity) , M).
 
-:- multifile db_prop/2.
 
 :- meta_predicate man:with_assertions(:,0).
 :- meta_predicate world:intersect(?,0,?,0,0,-).
 :- meta_predicate clause_present(:), db_forall_assert_mv(+,+,+), db_forall_assert_sv(+,+,+), db_forall(+,+), db_forall_quf(+,+,+).
 
 :- meta_predicate hooked_asserta(^), hooked_assert(^), hooked_retract(^), hooked_retractall(^).
-%% :- meta_predicate del(0),clr(0),add(0),add0(0),req(0), db_op(0,0,0),db_prop(0,0),db_prop(0).
+% % :- meta_predicate del(0),clr(0),add(0),add0(0),req(0), db_op(0,0,0),moo:db_prop(0,0),moo:db_prop(0).
 
 % Found new meta-predicates in iteration 1 (0.281 sec)
 %:- meta_predicate db_forall(?,?,?,0).
@@ -131,8 +134,8 @@ with_kb_assertions(With,Call):-
 
 world_clear(Named):-fmt('Clearing world database: ~q.',[Named]).
 
-pred_as_is(F,A):-is_db_prop(F,A,flag),!.
-pred_as_is(F,A):-is_db_prop(F,A,external(_)),!.
+pred_as_is(F,A):-moo:is_db_prop(F,A,flag),!.
+pred_as_is(F,A):-moo:is_db_prop(F,A,external(_)),!.
 pred_as_is(p,_):-!,fail.
 pred_as_is(k,_):-!,fail.
 
@@ -209,22 +212,22 @@ db_op_4(Op,Prop,_,C0):-
 db_op_unit(_Op,Prop,ARGS,C0):- must(atom(Prop)), C0=..[Prop|ARGS].
 
 % impl/1
-db_op_disj(Op,Prop,ARGS):-is_db_prop(Prop,_,impl(Other)),!,
+db_op_disj(Op,Prop,ARGS):-moo:is_db_prop(Prop,_,impl(Other)),!,
 	db_op_unit(Op,Other,ARGS,Unit),!,db_forall(Op,Unit).
 % alias/1
-db_op_disj(Op,Prop,ARGS):-is_db_prop(Prop,_,alias(Other)),!,
+db_op_disj(Op,Prop,ARGS):-moo:is_db_prop(Prop,_,alias(Other)),!,
 	db_op_unit(Op,Other,ARGS,Unit),!,db_forall(Op,Unit).
 % inverse/1
 db_op_disj(Op,Prop,ARGS):-
-      is_db_prop(Prop,_,inverse(Other)),!,
+      moo:is_db_prop(Prop,_,inverse(Other)),!,
       inverse_args(ARGS,Inverse),
       db_op_unit(Op,Other,Inverse,Unit1),
       db_op_unit(Op,Prop,ARGS,Unit2),
       db_forall(Op,(Unit1;Unit2)).
 
 % assert/1
-db_op_disj(a,Prop,ARGS):- is_db_prop(Prop,_,assert(How)),!,call_pa(How,Prop,ARGS).
-db_op_disj(Op,Prop,ARGS):- is_db_prop(Prop,W,assert(How)),!,throw(cant(db_op_disj(Op,Prop,ARGS),is_db_prop(Prop,W,assert(How)))).
+db_op_disj(a,Prop,ARGS):- moo:is_db_prop(Prop,_,assert(How)),!,call_pa(How,Prop,ARGS).
+db_op_disj(Op,Prop,ARGS):- moo:is_db_prop(Prop,W,assert(How)),!,throw(cant(db_op_disj(Op,Prop,ARGS),moo:is_db_prop(Prop,W,assert(How)))).
 
 % plain prop
 db_op_disj(Op,Prop,ARGS):-db_op_unit(Op,Prop,ARGS,Unit),db_forall(Op,Unit).
@@ -240,9 +243,9 @@ db_forall('q',C):-!,db_forall_quf(C,U,Template),!,U, debugOnError(Template).
 db_forall(u,C):- trace,db_forall_quf(C,U,Template),U,Template,must(ground(Template)),!,ignore(retractall(Template)).
 db_forall(ra,C):-db_forall_quf(C,U,Template), doall((U,retractall(Template))).
 db_forall(ra,C):-ignore(retractall(C)).
-db_forall(a,C0):- db_forall_quf(C0,U,C),must(U),functor(C,F,A),!, (is_db_prop(F,A,singleValued) -> must(db_forall_assert_sv(C,F,A)) ; must(db_forall_assert_mv(C,F,A))).
+db_forall(a,C0):- db_forall_quf(C0,U,C),must(U),functor(C,F,A),!, (moo:is_db_prop(F,A,singleValued) -> must(db_forall_assert_sv(C,F,A)) ; must(db_forall_assert_mv(C,F,A))).
 
-db_forall(a,C):- functor(C,F,A),!, (is_db_prop(F,A,singleValued) -> must(db_forall_assert_sv(C,F,A)) ; must(db_forall_assert_mv(C,F,A))).
+db_forall(a,C):- functor(C,F,A),!, (moo:is_db_prop(F,A,singleValued) -> must(db_forall_assert_sv(C,F,A)) ; must(db_forall_assert_mv(C,F,A))).
 db_forall(r,C):- ground(C),retractall(C).
 db_forall(Op,C):-!,trace,throw(unhandled(db_forall(Op,C))).
 
@@ -255,7 +258,7 @@ hooked_retractall(C):- moo:run_database_hooks(retract(all),C), retractall(C).
 
 % assert to a mutlivalue pred
 db_forall_assert_mv(C,F,A):-
-   (clause_present(C,F,A) -> true; (is_db_prop(F,A,ordered)-> hooked_assert(C) ; hooked_asserta(C))).
+   (clause_present(C,F,A) -> true; (moo:is_db_prop(F,A,ordered)-> hooked_assert(C) ; hooked_asserta(C))).
 
 % assert to a singlevalue pred
 db_forall_assert_sv(C,F,A):- clause_present(C,F,A),!.
@@ -310,16 +313,20 @@ must_asserta(C):-
       must(ground(C)),
       must(hooked_asserta(C)),!.
       
-argIsa_call(Prop,N1,_Type):-once((must(nonvar(Prop)),must(number(N1)))),fail.
-argIsa_call(isa,1,argIsaFn(isa,1)):-!.
-argIsa_call(isa,2,type):-!.
-argIsa_call(act,_,term):-!.
-argIsa_call(ofclass,2,type):-!.
-argIsa_call(memory,2,term):-!.
-argIsa_call(Prop,N1,Type):-is_db_prop(Prop,N1,argIsa(Type)),!.
-argIsa_call(Prop,N1,Type):-is_2nd_order_holds(Prop),dmsg(todo(define(argIsa_call(Prop,N1,'Second_Order_TYPE')))),
+argIsa_call(Prop,N1,Type):-once((must(nonvar(Prop)),must(number(N1)))),fail.
+argIsa_call(Prop,N1,Type):-argIsa_call_0(Prop,N1,Type),!.
+argIsa_call(Prop,N1,Type):-argIsa_call_1(Prop,N1,Type),!.
+
+argIsa_call_0(mud_isa,1,argIsaFn(mud_isa,1)):-!.
+argIsa_call_0(mud_isa,2,type):-!.
+argIsa_call_0(act,_,term):-!.
+argIsa_call_0(ofclass,2,type):-!.
+argIsa_call_0(memory,2,term):-!.
+argIsa_call_0(Prop,N1,Type):-moo:is_db_prop(Prop,N1,argIsa(Type)),!.
+
+argIsa_call_1(Prop,N1,Type):-is_2nd_order_holds(Prop),dmsg(todo(define(argIsa_call(Prop,N1,'Second_Order_TYPE')))),
    Type=argIsaFn(Prop,N1).
-argIsa_call(Prop,N1,Type):-dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),
+argIsa_call_1(Prop,N1,Type):-dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),
    Type=argIsaFn(Prop,N1).
 
 db_forall_quf(C,Pretest,Template):- C=..[Prop,OBJ|ARGS],
@@ -389,7 +396,7 @@ inRegion(apath(Region,Dir),Region):-pathBetween(Region,Dir,_To).
 member_or_e(E,[L|List]):-!,member(E,[L|List]).
 member_or_e(E,E).
 
-is_single_valuedOrFail(F,A,Obj,ARGS):-is_db_prop(F,A,singleValued),!,valuedOrThrow(F,A,Obj,ARGS),!.
+is_single_valuedOrFail(F,A,Obj,ARGS):-moo:is_db_prop(F,A,singleValued),!,valuedOrThrow(F,A,Obj,ARGS),!.
 is_single_valuedOrFail(_,_,_,_):-fail.
 
 valuedOrThrow(F,_,Obj,ARGS):-mud_isa(Obj,T),findall_type_default_props(Obj,T,Props),Props=[_|_],Prop=..[F|ARGS], member_or_e(Prop,Props),!.
@@ -403,15 +410,15 @@ update_value(OLD,+X,NEW):-number(OLD),catch(NEW is OLD + X,_,fail),!.
 update_value(OLD,-X,NEW):-number(OLD),catch(NEW is OLD - X,_,fail),!.
 update_value(_OLD,NEW,NEW).
 
-moo:specifier_text(Text,pred):- is_db_prop(Text,_,arity(_,_)).
+moo:specifier_text(Text,pred):- moo:is_db_prop(Text,_,arity(_,_)).
 
 % single valued
 moo:decl_subclass(agent,object).
 moo:decl_subclass(item,object).
 
 
-db_prop(pathName(region,dir,string)).
-db_prop(verbOverride(term,action,action)).
+moo:db_prop(pathName(region,dir,string)).
+moo:db_prop(verbOverride(term,action,action)).
 
 db_prop_sv(atloc(object,xyz(region,int,int,int))).
 db_prop_sv(act_turn(agent,int)).
@@ -436,11 +443,11 @@ db_prop_sv(mudToHitArmorClass0(agent,int)).
 db_prop_sv(pathBetween(region,dir,region)).
 db_prop_sv(permanence(item,verb,int)).
 db_prop_sv(score(object,int)).
-db_prop_sv(spawn_rate(subclass(object),int)).
+db_prop_sv(spawn_rate(moo:subclass(object),int)).
 db_prop_sv(spd(agent,int)).
 db_prop_sv(stm(agent,int)).
 db_prop_sv(str(agent,int)).
-db_prop_sv(type_grid(regiontype,int,list(term))).
+% db_prop_sv(type_grid(regiontype,int,list(term))).
 db_prop_sv(weight(object,int)).
 db_prop_sv(ArgTypes):-db_prop_g(ArgTypes).
 
@@ -455,43 +462,100 @@ moo:decl_subclass(door,item).
 moo:decl_subclass(dir,string).
 
 % flags
-db_prop(agent(id),[flag]).
-db_prop(item(id),[flag]).
-db_prop(region(id),[flag]).
-db_prop(type(id),[flag]).
+moo:db_prop(agent(id),[flag]).
+moo:db_prop(item(id),[flag]).
+moo:db_prop(region(id),[flag]).
+moo:db_prop(type(id),[flag]).
 
 
-db_prop(thinking(agent),[flag]).
-db_prop(deleted(id),[flag]).
+moo:db_prop(thinking(agent),[flag]).
+moo:db_prop(deleted(id),[flag]).
 
 % multivalued
-db_prop(G,[multi(AT)|LIST]):-db_prop_multi(G,AT,LIST).
+moo:db_prop(G,[multi(AT)|LIST]):-db_prop_multi(G,AT,LIST).
 
-db_prop(G,[assert(game_assert)]):-db_prop_game_assert(G).
+moo:db_prop(G,[assert(game_assert)]):-db_prop_game_assert(G).
 
 db_prop_game_assert(somethingIsa(term,list(type))).
 db_prop_game_assert(somethingDescription(term,list(string))).
 db_prop_game_assert(objects(type,list(id))).
 db_prop_game_assert(sorts(type,list(type))).
 
-db_prop(ArgTypes,[singleValued]):-db_prop_sv(ArgTypes).
+moo:db_prop(ArgTypes,[singleValued]):-db_prop_sv(ArgTypes).
 
-db_prop(CallSig,[external(M)]):-db_prop_prolog(M:CallSig).
+moo:db_prop(CallSig,[external(M)]):-db_prop_prolog(M:CallSig).
 :-dynamic(db_prop_prolog/1).
 %db_prop_prolog(world:nearby(object,object)).
 %db_prop_prolog(world:mud_isa(object,type)).
 %db_prop_prolog(world:same(id,id)).
 
+replace_nth([],_N,OldVar,_NewVar,[]):-!,throw(missed_the_boat).
+replace_nth([OldVar|ARGS],1,OldVar,NewVar,[NewVar|ARGS]):-!.
+replace_nth([Carry|ARGS],Which,OldVar,NewVar,[Carry|NEWARGS]):-
+ Which1 is Which-1,
+ replace_nth(ARGS,Which1,OldVar,NewVar,NEWARGS),!.
+
+
+insert_into(ARGS,0,Insert,[Insert|ARGS]):- !.
+insert_into([Carry|ARGS],After,Insert,[Carry|NEWARGS]):-
+   After1 is After - 1,
+   insert_into(ARGS,After1,Insert,NEWARGS).
+
+moo:term_anglify_last(Head,English):-compound(Head),
+   functor(Head,F,A),A>1,
+   not(ends_with_icase(F,"Fn")),not(starts_with_icase(F,"SKF-")),
+   atom_codes(F,[C|_]),code_type(C,lower),
+   Head=..[F|ARGS],
+   term_anglify_args(Head,F,A,ARGS,singleValued,English).
+
+moo:term_anglify(Head,English):-
+      functor(Head,F,A),
+      moo:is_db_prop(F,A,Info),member(Info,[singleValued,multi(_)]),
+      Head=..[F|ARGS],
+      term_anglify_args(Head,F,A,ARGS,Info,English),fully_expand(English,EnglishO),!.
+
+
+
+term_anglify_args(Head,F,A,ARGS,multi(Which),English):- !,replace_nth(ARGS,Which,OldVar,NewVar,NEWARGS),!,
+      NewHead=..[F|NEWARGS], findall(NewVar,NewHead,ListNewVar),list_to_set_safe(ListNewVar,SetNewVar),NewVar=list(ListNewVar),
+      term_anglify_args(Head,F,A,NewHead,singleValued,English).
+term_anglify_args(Head,F,A,ARGS0,singleValued,English):- add_arg_parts_of_speech(F,1,ARGS0,ARGS),verb_after_arg(F,A,After),
+   insert_into(ARGS,After,verbFn(F),NEWARGS),
+   fully_expand(NEWARGS,English),!.
+
+unCamelCase(S,String):-any_to_string(S,Str),S\=Str,!,unCamelCase(Str,String),!.
+unCamelCase("",""):-!.
+unCamelCase(S,String):-sub_string(S,0,1,_,Char),sub_string(S,1,_,0,Rest),unCamelCase(Rest,RestString),string_lower(Char,NewChar),
+  (Char\=NewChar->atomics_to_string(['_',NewChar,RestString],String);atomics_to_string([Char,RestString],String)),!.
+
+moo:term_anglify(verbFn(mud_isa),[is,a]):-!.
+moo:term_anglify(verbFn(isa),[is,a]):-!.
+moo:term_anglify(verbFn(F),[is|UL]):-not(string_lower(F,F)),unCamelCase(F,U),atomics_to_string(UL,"_",U).
+moo:term_anglify(verbFn(F),[is,F]):-atom_concat(_,'ing',F).
+moo:term_anglify(verbFn(F),[F,is]).
+% moo:term_anglify(prolog(Term),String):-term_to_atom(Term,Atom),any_to_string(Atom,String).
+moo:term_anglify(determinerString(Obj,Text),[np(Obj),is,uses,string(Text),as,a,determiner]).
+moo:term_anglify(nameString(Obj,Text),[np(Obj),is,refered,to,as,string(Text)]).
+moo:term_anglify(moo:term_anglify(Term,List),[prolog(Term),is,converted,to,english,using,prolog(Text)]).
+
+
+add_arg_parts_of_speech(_F,_N,[],[]).
+add_arg_parts_of_speech(F,N,[A|ARGS0],[ARG|ARGS]):-argIsa_call_or_undressed(F,N,A,ARG),N1 is N+1, add_arg_parts_of_speech(F,N1,ARGS0,ARGS).
+
+argIsa_call_or_undressed(F,N,Obj,fN(Obj,Type)):-argIsa_call_0(F,N,Type),!.
+argIsa_call_or_undressed(F,N,Obj,Obj).
+
+verb_after_arg(_,_,1).
 
 % multivalued
 db_prop_multi(G,AT,[ordered|LIST]):-db_prop_multi(G,LIST),functor(G,_,AT).
 
 db_prop_multi(named(term,term),[genlpreds(id)]).
-db_prop_multi(ofclass(term,type),[alias(isa)]).
+db_prop_multi(ofclass(term,type),[alias(mud_isa)]).
 db_prop_multi(G,[]):-db_prop_multi(G).
 
 db_prop_multi(failure(agent,action)).
-db_prop_multi(nameStrings(term,string)).
+db_prop_multi(nameString(term,string)).
 db_prop_multi(determinerString(term,string)).
 db_prop_multi(descriptionHere(term,string)).
 db_prop_multi(description(term,string)).
@@ -501,17 +565,18 @@ db_prop_multi(memory(agent,term)).
 db_prop_multi(wearing(agent,wearable)).
 db_prop_multi(grid(region,int,int,object)).
 db_prop_multi(possess(agent,item)).
-db_prop_multi(subclass(type,type)).
-db_prop_multi(isa(term,type)).
+db_prop_multi(moo:subclass(type,type)).
+db_prop_multi(mud_isa(term,type)).
 
-db_prop(repl_writer(agent,term),[singleValued,default(look:default_repl_writer)]).
-db_prop(repl_to_string(agent,term),[singleValued,default(look:default_repl_obj_to_string)]).
+moo:db_prop(repl_writer(agent,term),[singleValued,default(look:default_repl_writer)]).
+moo:db_prop(repl_to_string(agent,term),[singleValued,default(look:default_repl_obj_to_string)]).
 
-db_prop(ArgTypes,PropTypes):-moo:decl_db_prop(ArgTypes,PropTypes).
 % somethingIsa('NpcCol1012-Ensign732',['NpcCol1012',actor,'MaleAnimal']).
 
-
-define_db_prop(ArgTypes,PropTypes):-
+dbase_define_db_prop(_M:ArgTypes,PropTypes):-!,
+   dbase_define_db_prop(ArgTypes,PropTypes),!.
+   
+dbase_define_db_prop(ArgTypes,PropTypes):-
    functor(ArgTypes,F,A),
       doall(define_db_prop_0(ArgTypes,F,A)),
       doall((member_or_e(PT,PropTypes),define_db_prop_1(ArgTypes,F,A,PT))),
@@ -522,35 +587,37 @@ define_db_prop(ArgTypes,PropTypes):-
       doall(define_db_prop_3(ArgTypes,F,A,interArgIsa)),!.
 
 
-define_argType(F,N,ArgType):-assert_if_new(is_db_prop(F,N,argIsa(ArgType))).
+define_argType(F,N,ArgType):-assert_if_new(moo:is_db_prop(F,N,argIsa(ArgType))).
 
 % pass 0
-define_db_prop_0(ArgTypes,F,A):-assert_if_new(is_db_prop(F,A,arity(F,A))),fail.
+define_db_prop_0(ArgTypes,F,A):-assert_if_new(moo:is_db_prop(F,A,arity(F,A))),fail.
 define_db_prop_0(ArgTypes,F,_):-doall((arg(N,ArgTypes,ArgType),define_argType(F,N,ArgType))),fail.
 
 % pass 1
-define_db_prop_1(_,F,A,PT):-assert_if_new(is_db_prop(F,A,PT)).
+define_db_prop_1(_,F,A,PT):-assert_if_new(moo:is_db_prop(F,A,PT)).
 
 % pass 2
 define_db_prop_2(_,F,A,external(Module)):-not(dbase_mod(Module)),!,length(ARGS,A),HEAD=..[P|ARGS],must(predicate_property(Module:HEAD,_)),!.
-define_db_prop_2(_,F,A,interArgIsa):- not((is_db_prop(F,A,external(Module)),not(dbase_mod(Module)))), declare_dbase_local(F,A).
+define_db_prop_2(_,F,A,interArgIsa):- not((moo:is_db_prop(F,A,external(Module)),not(dbase_mod(Module)))), declare_dbase_local(F,A).
 define_db_prop_2(_,_,_,_).
 
 % pass 3
 define_db_prop_3(ArgTypes,F,A,PT):- nop(dmsg(define_db_prop_3(ArgTypes,F,A,PT))).
 
-
-declare_dbase_local(F,A):- is_db_prop(F,A,hasStub),!.
+declare_dbase_local(_M:F,A):-!, declare_dbase_local(F,A).
+declare_dbase_local(F,A):- moo:is_db_prop(F,A,hasStub),!.
+declare_dbase_local(F,A):- functor(Pred,F,A),predicate_property(Pred,imported_from(Module)),not(dbase_mod(Module)),!.
 declare_dbase_local(F,A):- dynamic(F/A),user_export(F/A),
       functor(HEAD,F,A),HEAD=..[F|ARGS],ensure_clause(HEAD,F,A,body_req(F,A,HEAD)),
-      assert_if_new(is_db_prop(F,A,hasStub)).
+      assert_if_new(moo:is_db_prop(F,A,hasStub)).
 
 
-body_req(F,A,HEAD):-is_db_prop(F,A,external(Module)),!,call(Module:HEAD).
-%body_req(isa,2,_):-!,fail.
+body_req(F,A,HEAD):-moo:is_db_prop(F,A,external(Module)),!,call(Module:HEAD).
+%body_req(mud_isa,2,_):-!,fail.
 %body_req(_,_,HEAD):-req(Head).
-body_req(F,A,HEAD):-is_db_prop(F,A,default(V)),arg(A,HEAD,V).
+body_req(F,A,HEAD):-moo:is_db_prop(F,A,default(V)),arg(A,HEAD,V).
 
+ensure_clause(_M:HEAD,_,_,_BODY):-!,ensure_clause(HEAD,_,_,_BODY).
 ensure_clause(HEAD,_,_,_BODY):-not(not((numbervars(clause(HEAD,BODY),'$VAR',0,_),clause(HEAD,BODY)))),!.
 % ensure_clause(HEAD,F,A,_):-pred_as_is(F,A), !.
 ensure_clause(HEAD,F,A,BODY):-assertz((HEAD:-BODY)),
@@ -558,19 +625,45 @@ ensure_clause(HEAD,F,A,BODY):-assertz((HEAD:-BODY)),
    nop(compile_predicates([HEAD])).
 
 
-nameStrings(apath(Region,Dir),Text):- pathName(Region,Dir,Text).
+nameString(apath(Region,Dir),Text):- pathName(Region,Dir,Text).
 description(apath(Region,Dir),Text):- pathName(Region,Dir,Text).
 
 scan_db_prop:-
-   dbase_mod(DBM),
-   '@'(forall(db_prop(ArgTypes,PropTypes),debugOnError0( define_db_prop(ArgTypes,PropTypes))),DBM).
+   dbase_mod(DBM),debug,
+   '@'(forall(moo:db_prop(ArgTypes,PropTypes),debugOnError0( dbase_define_db_prop(ArgTypes,PropTypes))),DBM).
 
 load_motel:- defrole([],time_state,restr(time,period)).
 
 :- scan_db_prop.
 
+
 :-load_motel.
 
+
 :- include(logicmoo('vworld/moo_footer.pl')).
+
+end_of_file.
+
+
+
+:-dmsg(loading(kb3)).
+call_assertion_holds(P,A):- 'ASSERTION'(_TRUTH,_NNF,_MT,_,/*HL*/[P,A]).
+call_assertion_holds(P,A,B):- 'ASSERTION'(_TRUTH,_NNF,_MT,_,/*HL*/[P,A,B]).
+call_assertion_holds(P,A,B,C):- 'ASSERTION'(_TRUTH,_NNF,_MT,_,/*HL*/[P,A,B,C]).
+call_assertion_holds(P,A,B,C,D):- 'ASSERTION'(_TRUTH,_NNF,_MT,_,/*HL*/[P,A,B,C,D]).
+call_assertion_holds(P,A,B,C,D,E):- 'ASSERTION'(_TRUTH,_NNF,_MT,_,/*HL*/[P,A,B,C,D,E]).
+call_assertion_holds(P,A,B,C,D,E,F):- 'ASSERTION'(_TRUTH,_NNF,_MT,_,/*HL*/[P,A,B,C,D,E,F]).
+
+call_assertion_holds(P,A):-assertion_holds(P,A).
+call_assertion_holds(P,A,B):-assertion_holds(P,A,B).
+call_assertion_holds(P,A,B,C):-assertion_holds(P,A,B,C).
+call_assertion_holds(P,A,B,C,D):-assertion_holds(P,A,B,C,D).
+call_assertion_holds(P,A,B,C,D,E):-assertion_holds(P,A,B,C,D,E).
+call_assertion_holds(P,A,B,C,D,E,F):-assertion_holds(P,A,B,C,D,E,F).
+
+
+end_of_file.
+
+
 
 

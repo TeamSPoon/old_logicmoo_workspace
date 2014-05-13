@@ -39,7 +39,7 @@ room_center(Room,X,Y,Z):-
 
 
 locationToRegion(xyz(Room,_,_,_),Region2):-!,locationToRegion(Room,Region2).
-locationToRegion(Room,Room).
+locationToRegion(Obj,Obj):-mud_isa(Obj,region),!. % inRegion(Obj,Room).
 
 loc_to_xy(xyz(Room,_,_,Z),X,Y,xyz(Room,X,Y,Z)):-!.
 loc_to_xy(Room,X,Y,xyz(Room,X,Y,1)).
@@ -49,7 +49,7 @@ is_3d(LOC):- compound(LOC).
 % Quintus random(1,MaxX,X) and random(1,MaxY,Y)
 grid_size(Room,MaxX,MaxY,MaxZ):- fail,
    moo:type_grid(What,1,L),
-   props(Room,isa(What)),!,
+   props(Room,mud_isa(What)),!,
    maxZ(MaxZ),
 	length(L,MaxX),
 	findall(1,moo:type_grid(What,_,_),LL),
@@ -309,7 +309,7 @@ list_object_dir_near(List,Type,Dir) :-
 
 scan_lists_aux([Loc|_],Type,N,N) :-
 	member(Obj,Loc),
-        isa(Obj,Type),
+        mud_isa(Obj,Type),
 	!.
 scan_lists_aux([_|Rest],Type,M,N) :-
 	Mtemp is M + 1,

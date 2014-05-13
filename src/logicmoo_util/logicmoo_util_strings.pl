@@ -286,8 +286,15 @@ any_to_string0(Atom,String):-string(Atom),Atom=String.
 any_to_string0(Atom,String):-atom(Atom),atom_string(Atom,String).
 any_to_string0(A,""):-nonvar(A),member(A,[[],'',""]).
 any_to_string0(List,String):-catch(text_to_string(List,String),_,fail).
-any_to_string0(List,String):-is_list(List),atomics_to_string(List, ' ', String).
+any_to_string0(List,String):-is_list(List), (catch(atomics_to_string(List, ' ', String),_,fail);((list_to_atomics_list0(List,AList),catch(atomics_to_string(AList, ' ', String),_,fail)))),!.
 any_to_string0(List,String):-sformat(String,'~q',[List]).
+
+list_to_atomics_list0(Var,A):-var(Var),!,any_to_string(Var,A),!.
+list_to_atomics_list0([E|EnglishF],[A|EnglishA]):-
+   any_to_string(E,A),
+   list_to_atomics_list0(EnglishF,EnglishA),!.
+list_to_atomics_list0([],[]):-!.
+
 
 splt_words('',[],[]):-!.
 splt_words(Atom,[Term|List],Vars):- atom_length(Atom,To),between(0,To,X), 

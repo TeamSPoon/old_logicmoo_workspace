@@ -1,7 +1,7 @@
-/** <module> 
+/** <module>
 % All modules are declared here so that this next lines dont have to be pasted into every file.
-% Since this list will need at least 160 entries to cover the obj classes rooms and commands, 
-% we add the modules here to not waste 160^2 lines of text and having to not 
+% Since this list will need at least 160 entries to cover the obj classes rooms and commands,
+% we add the modules here to not waste 160^2 lines of text and having to not
 % update 160+ files whenever a new module is used
 %
 % Project Logicmoo: A MUD server written in Prolog
@@ -12,13 +12,14 @@
 
 % :-set_prolog_flag(unknown,fail).
 :- set_prolog_flag(double_quotes, atom).
-:- set_prolog_flag(double_quotes, string). 
+:- set_prolog_flag(double_quotes, string).
 
 % these do not get defined!?
 % :-dynamic user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
 
 %  very very first import
-% :- ensure_loaded(logicmoo('vworld/dbase.pl')).
+:- debug.
+:- ensure_loaded(logicmoo('vworld/dbase.pl')).
 :- ensure_loaded(logicmoo('vworld/moo.pl')).
 
 % :-context_module(Ctx),writeq(context_module(Ctx)),nl.
@@ -82,3 +83,5 @@
 :- ensure_loaded(logicmoo('actions/help.pl')).
 :- ensure_loaded(logicmoo('actions/get_set.pl')).
 */
+
+:- ensure_loaded(logicmoo('vworld/parser_e2c.pl')).

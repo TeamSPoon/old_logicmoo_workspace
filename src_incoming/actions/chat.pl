@@ -37,6 +37,7 @@ do_social(Agent,Say,Whom,Text):-
    asInvoked([Say,Agent,Whom,Text],Cmd),
    raise_location_event(Where,notice(reciever,Cmd)).
 
+
 :- include(logicmoo('vworld/moo_footer.pl')).
 
 
