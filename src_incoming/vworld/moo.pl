@@ -18,10 +18,11 @@
          enter_term_anglify/2,
          % decl_dbase_pred/2,
          register_timer_thread/3,
+         dynamic_multifile_exported/1,
+         op(1150,fx,dynamic_multifile_exported),
          end_module_type/2         ]).
 
 
-:-op(1150,fx,dynamic_multifile_exported).
 dynamic_multifile_exported(M:F):-!, '@'(dynamic_multifile_exported(F), M).
 dynamic_multifile_exported(F/A):-!,dynamic(F/A),multifile(F/A), export(F/A).
 dynamic_multifile_exported([A]):-!,dynamic_multifile_exported(A).

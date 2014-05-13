@@ -20,9 +20,9 @@ lexicicalRefWord(W,lex(W,L)):-
    sformat(String,'~w',[W]),
    findall([POS,Pred,CycWord],my_lexicalRef(POS,Pred,CycWord,String),L).
 
-my_lexicalRef(POS,Pred,CycWord,String):-isa_speechpart(POS),'#$lexicalRef'(POS,Pred,CycWord,String).
+my_lexicalRef(POS,Pred,CycWord,String):-isa_speechpart(POS),'lexicalRef'(POS,Pred,CycWord,String).
 
-isa_speechpart(POS):-'#$isa'(POS,'#$SpeechPart').
+isa_speechpart(POS):-'isa'(POS,'SpeechPart').
    
 
 lexicicalRefWord(W,(W)):-!.
@@ -104,8 +104,8 @@ dictionary_access(D,B,A):-dictionary(D,B,A).
 dictionary_access(input,B,A):-dict(input,B,A).
 /*
 dictionary_accessCyc(D,B,A):-
-   '#$isa'(Dict,'#$DictionaryPredicate'),
-   atom_concat('#$dictionary_',D,Dict),
+   'isa'(Dict,'DictionaryPredicate'),
+   atom_concat('dictionary_',D,Dict),
    Call =.. [Dict,DB,DA],Call,
    balanceBinding(DB=DA,B=A).
 */ 
@@ -389,9 +389,9 @@ rememberDictionary2(PredHum,Y,Z):-
 
 rememberDictionary2(PredHum,Y,Z):-
    makeConstant(PredHum),
-   cycAssert(isa(PredHum,'#$DictionaryPredicate'),'#$ElizaMt'),
-   cycAssert(isa(PredHum,'#$BinaryPredicate'),'#$ElizaMt'),
+   cycAssert(isa(PredHum,'DictionaryPredicate'),'ElizaMt'),
+   cycAssert(isa(PredHum,'BinaryPredicate'),'ElizaMt'),
    Cyc =.. [PredHum,string(Y),string(Z)],
-   cycAssert(Cyc,'#$ElizaMt'),!.
+   cycAssert(Cyc,'ElizaMt'),!.
 
 

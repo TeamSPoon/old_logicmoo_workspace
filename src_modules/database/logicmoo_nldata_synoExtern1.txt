@@ -1,4 +1,4 @@
-?A	?B	?C	
+% ?A	?B	?C	
 ContextSensitiveGrammar	CC2OntologyNotes	"Signals/Discrete/Linguistic/Formal/Context sensitive"	
 ContextFreeGrammar	CC2OntologyNotes	"Signals/Discrete/Linguistic/Formal/Context free"	
 Homomorphism	CC2OntologyNotes	"Signals/Continuous/Functional/Algebra of functions/homomorphisms"	
