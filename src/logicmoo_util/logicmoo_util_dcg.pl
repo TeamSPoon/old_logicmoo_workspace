@@ -275,11 +275,12 @@ decl_dcgTest_startsWith(List,Phrase,true):-decl_dcgTest_startsWith(List,Phrase).
 
 
 
-to_word_list(A,S):-atomSplit(A,S),!.
 to_word_list(V,V):-var(V),!.
 to_word_list([],[]):-!.
 to_word_list("",[]):-!.
 to_word_list('',[]):-!.
+to_word_list([A,B|C],[A,B|C]):-atom(A),atom(B),!.
+to_word_list(A,S):-atomSplit(A,S),!.
 to_word_list(Input,WList):- (string(Input);atom(Input)),(atomic_list_concat(WList," ",Input);WList=[Input]),!.
 to_word_list(Input,Input).
 

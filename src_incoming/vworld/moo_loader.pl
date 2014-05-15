@@ -139,7 +139,7 @@ pgs(sorts(Type,List)):-forall_member(I,List,game_assert(subclass(I,Type))).
 pgs(predicates(List)):-forall_member(T,List,assert(db_prop_g(T))).
 
 pgs(description(A,E)):- must(once(add_description(A,E))).
-pgs(nameString_call(A,S0)):- determinerRemoved(S0,String,S),!,game_assert(nameString_call(A,S)),game_assert(determinerString(A,String)).
+pgs(nameString(A,S0)):- determinerRemoved(S0,String,S),!,game_assert(nameString(A,S)),game_assert(determinerString(A,String)).
 
 % skip formatter types
 pgs(A):- A=..[SubType,_],member(SubType,[string,action,dir]),!.

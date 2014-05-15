@@ -13,7 +13,7 @@
          dynamic_multifile_exported/1,
          dynamic_multifile_exported/2,
          op(1150,fx,dynamic_multifile_exported),
-    term_expansion_local/2,
+         term_expansion_local/2,
          register_module_type/1, 
          registered_module_type/2, 
          end_module_type/1,
@@ -61,6 +61,13 @@ create_queryPred(H,B):-functor(H,HF,HA),functor(B,BF,BA),
 :-asserta(thload:current_agent(_,dead)).
 :-ignore(retract(thload:current_agent(_,dead))).
 
+:- dynamic_multifile_exported moo:dbase_true/1.
+:- dynamic_multifile_exported moo:dbase_true/2.
+:- dynamic_multifile_exported moo:dbase_true/3.
+:- dynamic_multifile_exported moo:dbase_true/4.
+:- dynamic_multifile_exported moo:dbase_true/5.
+:- dynamic_multifile_exported moo:dbase_true/6.
+:- dynamic_multifile_exported moo:dbase_true/7.
 :- dynamic_multifile_exported moo:action_rules/4.
 :- dynamic_multifile_exported moo:agent_call_command/2.
 :- dynamic_multifile_exported moo:agent_text_command/4.
@@ -117,7 +124,7 @@ moo:run_database_hooks(Type,Hook):- must(doall((copy_term(Hook,HCopy),moo:decl_d
 
 
 
-:-dynamic_multifile_exported registered_module_type/2.
+:- dynamic_multifile_exported registered_module_type/2.
 
 :- meta_predicate moo:tick_every(*,*,0).
 :- meta_predicate moo:register_timer_thread(*,*,0).

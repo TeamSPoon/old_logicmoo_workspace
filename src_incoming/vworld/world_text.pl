@@ -52,7 +52,7 @@ show_kb_via_pred_0(WPred,ToSTR,Call):- functor(Call,F,_), show_kb_via_pred_1(WPr
 
 show_kb_via_pred_1(WPred,ToSTR,F,all(Call)):-!,show_kb_via_pred_2(WPred,ToSTR,F,Call).
 show_kb_via_pred_1(WPred,ToSTR,F,once(Call)):-!,show_kb_via_pred_2(WPred,ToSTR,F,once(Call)).
-show_kb_via_pred_1(_WPred,_ToSTR,_F,call(Call)):-!,debugOnError(call(Call)).
+show_kb_via_pred_1(_WPred,_ToSTR,_F,call(Call)):-!,debugOnError(holds_tcall(Call)).
 show_kb_via_pred_1(WPred,ToSTR,F,Call):-show_kb_via_pred_2(WPred,ToSTR,F,Call).
 
 show_kb_via_pred_2(WPred0,ToSTRIn,F0,Call0):-
@@ -63,51 +63,51 @@ show_kb_via_pred_2(WPred0,ToSTRIn,F0,Call0):-
 
 show_kb_via_pred_3(WPred,ToSTR,fmt(SayIt),Type,GCall,NewValue):-!,
   % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
-      findall(NewValue,(catch(call(GCall),Error, NewValue=Error), 
+      findall(NewValue,(catch(holds_tcall(GCall),Error, NewValue=Error), 
              fmt(text(SayIt))),Count),
       (Count==[] ->
-        fmt_call(WPred,ToSTR,F,Type,notFound(F,Type)); true),!.
+        fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(F,Type)); true),!.
 
 show_kb_via_pred_3(WPred,ToSTR,fmt,Type,GCall,NewValue):-!,
   % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
-      findall(NewValue,(catch(call(GCall),Error, NewValue=Error), 
+      findall(NewValue,(catch(holds_tcall(GCall),Error, NewValue=Error), 
              fmt(GCall)),Count),
       (Count==[] ->
-        fmt_call(WPred,ToSTR,F,Type,notFound(F,Type)); true),!.
+        fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(F,Type)); true),!.
 
 
 show_kb_via_pred_3(WPred,ToSTR,output,Type,GCall,NewValue):-!,
   % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
-      findall(NewValue,(catch(call(GCall),Error, NewValue=Error), 
-             fmt_call(WPred,ToSTR,F,Type,NewValue)),Count),
+      findall(NewValue,(catch(holds_tcall(GCall),Error, NewValue=Error), 
+             fmt_holds_tcall(WPred,ToSTR,F,Type,NewValue)),Count),
       (Count==[] ->
-        fmt_call(WPred,ToSTR,F,Type,notFound(F,Type)); true),!.
+        fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(F,Type)); true),!.
 
 
 show_kb_via_pred_3(WPred,ToSTR,F,Type,GCall,NewValue):- canUseEnglish,!,
   % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
-      findall(NewValue,(catch(call(GCall),Error, NewValue=Error), 
+      findall(NewValue,(catch(holds_tcall(GCall),Error, NewValue=Error), 
              fmt(text(GCall))),Count),!,
       (Count==[] ->
-        (fmt_call(WPred,ToSTR,F,Type,notFound(F,Type))); true),!.
+        (fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(F,Type))); true),!.
 
 show_kb_via_pred_3(WPred,ToSTR,F,Type,GCall,NewValue):-
   % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
-      findall(NewValue,(catch(call(GCall),Error, NewValue=Error), 
-             fmt_call(WPred,ToSTR,F,Type,NewValue)),Count),
+      findall(NewValue,(catch(holds_tcall(GCall),Error, NewValue=Error), 
+             fmt_holds_tcall(WPred,ToSTR,F,Type,NewValue)),Count),
       (Count==[] ->
-        fmt_call(WPred,ToSTR,F,Type,notFound(F,Type)); true),!.
+        fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(F,Type)); true),!.
 
 
-fmt_call(WPred,ToSTR,F,Type,NewValue):-flatten([NewValue],ValueList), NewValue\=ValueList,fmt_call(WPred,ToSTR,F,Type,ValueList),!.
-fmt_call(WPred,ToSTR,N,Type,[V]):-fmt_call_pred(WPred,ToSTR,N,Type,V),!.
-fmt_call(WPred,ToSTR,N,Type,[V|VV]):-remove_dupes([V|VV],RVs),reverse(RVs,Vs),fmt_call_pred(WPred,ToSTR,N,Type,Vs),!.
-fmt_call(WPred,ToSTR,N,Type,V):-fmt_call_pred(WPred,ToSTR,N,Type,V),!.
+fmt_holds_tcall(WPred,ToSTR,F,Type,NewValue):-flatten([NewValue],ValueList), NewValue\=ValueList,fmt_holds_tcall(WPred,ToSTR,F,Type,ValueList),!.
+fmt_holds_tcall(WPred,ToSTR,N,Type,[V]):-fmt_holds_tcall_pred(WPred,ToSTR,N,Type,V),!.
+fmt_holds_tcall(WPred,ToSTR,N,Type,[V|VV]):-remove_dupes([V|VV],RVs),reverse(RVs,Vs),fmt_holds_tcall_pred(WPred,ToSTR,N,Type,Vs),!.
+fmt_holds_tcall(WPred,ToSTR,N,Type,V):-fmt_holds_tcall_pred(WPred,ToSTR,N,Type,V),!.
 
-fmt_call_pred(WPred,ToSTR,N,Type,[L|List]):-!, doall((member(V,[L|List]),fmt_call_pred_trans(WPred,ToSTR,N,Type,V))).
-fmt_call_pred(WPred,ToSTR,N,Type,V0):-fmt_call_pred_trans(WPred,ToSTR,N,Type,V0).
+fmt_holds_tcall_pred(WPred,ToSTR,N,Type,[L|List]):-!, doall((member(V,[L|List]),fmt_holds_tcall_pred_trans(WPred,ToSTR,N,Type,V))).
+fmt_holds_tcall_pred(WPred,ToSTR,N,Type,V0):-fmt_holds_tcall_pred_trans(WPred,ToSTR,N,Type,V0).
 
-fmt_call_pred_trans(WPred,ToSTR,N,Type,V0):-must((debugOnError(call(ToSTR,V0,Type,V)),!,debugOnError(call(WPred,_Tn,N,Type,V)))).
+fmt_holds_tcall_pred_trans(WPred,ToSTR,N,Type,V0):-must((debugOnError(holds_tcall(ToSTR,V0,Type,V)),!,debugOnError(holds_tcall(WPred,_Tn,N,Type,V)))).
 
 % ===========================================
 % generatePhrase(+Term,-English).
@@ -271,10 +271,10 @@ local_term_anglify_np_last(Obj,_,[the,noun,with,token,Obj]):-!.
 anglify_noun_known(Obj,FT,String):- is_decl_ft(FT),isa_assert(Obj,FT,String),!.
 anglify_noun_known(Self,_Hint,[you]):- get_session_id(O),thlocal:current_agent(O,Self),!.
 anglify_noun_known(Obj,_Hint,[right,here]):- get_session_id(O),thlocal:current_agent(O,Self),atloc(Self,Obj),!.
-anglify_noun_known(Obj,_Hint,[here]):- get_session_id(O),thlocal:current_agent(O,Self),inRegion(Self,Obj),!.
-anglify_noun_known(Obj,_Hint,StringO):- findall(String,nameString_call(Obj,String),List),List\=[],sort_by_strlen(List,[StringO|_]),!.
+anglify_noun_known(Obj,_Hint,[here]):- get_session_id(O),thlocal:current_agent(O,Self),req(inRegion(Self,Obj)),!.
+anglify_noun_known(Obj,_Hint,StringO):- findall(String,holds_t(nameString,Obj,String),List),List\=[],sort_by_strlen(List,[StringO|_]),!.
 %anglify_noun_known(Obj,_Hint,String):-
-%nameString_call(X,Y,_,_)
+%nameString(X,Y,_,_)
 end_of_file.
 
 

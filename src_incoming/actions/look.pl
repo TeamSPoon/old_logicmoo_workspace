@@ -65,7 +65,7 @@ call_look(Agent,LOC):-
          % for now workarround is 
          output=call(show_room_grid(region)),
          atloc(Agent,value),
-         nameString_call(region,value),
+         nameString(region,value),
          description(region,value),
          events=deliverable_location_events(Agent,LOC,value),
          fmt(path(D)=value) = pathBetween_call(region,D,value),

@@ -11,6 +11,7 @@
 % ========================================================================================
 % ========================================================================================
 
+
 lexicicalRefWords([],[]).
 lexicicalRefWords([W|L],[O|LL]):-
    lexicicalRefWord(W,O),!,
@@ -20,13 +21,21 @@ lexicicalRefWord(W,lex(W,L)):-
    sformat(String,'~w',[W]),
    findall([POS,Pred,CycWord],my_lexicalRef(POS,Pred,CycWord,String),L).
 
-my_lexicalRef(POS,Pred,CycWord,String):-isa_speechpart(POS),'lexicalRef'(POS,Pred,CycWord,String).
+:- registerCycPred(((e2c_data:lexicalRef/4, e2c_data:isa/2))).
 
-isa_speechpart(POS):-'isa'(POS,'SpeechPart').
+my_lexicalRef(POS,Pred,CycWord,String):-isa_speechpart(POS),assertion_holds('lexicalRef',POS,Pred,CycWord,String).
+
+isa_speechpart(POS):-assertion_holds('isa',POS,'SpeechPart').
    
 
 lexicicalRefWord(W,(W)):-!.
 
+% ===================================================================
+% ===================================================================
+
+to_codes(A,O):-atom(A),!,atom_codes(A,O).
+to_codes(S,O):-string(S),!,string_to_atom(S,A),to_codes(A,O).
+to_codes(C,C).
 
 translatePersonalUTokens(UWords,Output):-
 	toLowercase(UWords,Words),idioms(doctor,Words,Output),!.
@@ -54,6 +63,7 @@ translatePersonalCodes2(Codes,Output):-
 
 % ========================================================================================
 % ========================================================================================
+:-export(idioms/3).
 
 idioms(doctor,F,R):-!,
       idioms_each(slang,F,S),
@@ -101,10 +111,10 @@ decontract(H,[H]):-!.
 
 
 dictionary_access(D,B,A):-dictionary(D,B,A).
-dictionary_access(input,B,A):-dict(input,B,A).
 /*
+dictionary_access(input,B,A):-dict(input,B,A).
 dictionary_accessCyc(D,B,A):-
-   'isa'(Dict,'DictionaryPredicate'),
+   assertion_holds('isa',Dict,'DictionaryPredicate'),
    atom_concat('dictionary_',D,Dict),
    Call =.. [Dict,DB,DA],Call,
    balanceBinding(DB=DA,B=A).

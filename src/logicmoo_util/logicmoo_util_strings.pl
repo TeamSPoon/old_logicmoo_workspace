@@ -281,11 +281,11 @@ ltrim(X,X).
 
 any_to_string(Atom,String):-notrace(once(any_to_string0(Atom,String))).
 
-any_to_string0(Atom,String):-var(Atom),!,term_to_atom(Atom,AAtom),!,any_to_string0(AAtom,String).
-any_to_string0(Atom,String):-string(Atom),Atom=String.
-any_to_string0(Atom,String):-atom(Atom),atom_string(Atom,String).
-any_to_string0(A,""):-nonvar(A),member(A,[[],'',""]).
-any_to_string0(List,String):-catch(text_to_string(List,String),_,fail).
+any_to_string0(Atom,String):-var(Atom),!,term_to_atom(Atom,AAtom),!,any_to_string0(AAtom,String),!.
+any_to_string0(Atom,String):-string(Atom),Atom=String,!.
+any_to_string0(Atom,String):-atom(Atom),atom_string(Atom,String),!.
+any_to_string0(A,""):-nonvar(A),member(A,[[],'',""]),!.
+any_to_string0(List,String):-catch(text_to_string(List,String),_,fail),!.
 any_to_string0(List,String):-is_list(List), (catch(atomics_to_string(List, ' ', String),_,fail);((list_to_atomics_list0(List,AList),catch(atomics_to_string(AList, ' ', String),_,fail)))),!.
 any_to_string0(List,String):-sformat(String,'~q',[List]).
 
@@ -304,7 +304,7 @@ splt_words(Atom,[Term|List],Vars):- atom_length(Atom,To),between(0,To,X),
       splt_words(Next,List,NewVars),
       merge_vars(NewVars,NewOnes,Vars),!.
 splt_words(Atom,[L0|ListO],Vars):-atomic_list_concat([L0,L1|List],' ',Atom),atomic_list_concat([L1|List],' ',Atom2),!,
-      splt_words(Atom2,ListO,Vars).
+      splt_words(Atom2,ListO,Vars),!.
 
 
 merge_vars(NewVars,[],NewVars).
@@ -315,7 +315,7 @@ merge_vars([X=Y|More],OldVars,[X=Y|NewVars]):-
    merge_vars(More,OldVars,NewVars).
 
 vars_to_ucase(_,List):-ground(List),!.
-vars_to_ucase(Vars,[L|List]):- var(L),!,vars_to_ucase_0(Vars,[L|List]).
+vars_to_ucase(Vars,[L|List]):- var(L),!,vars_to_ucase_0(Vars,[L|List]),!.
 vars_to_ucase(Vars,[_|List]):- vars_to_ucase(Vars,List).
 
 vars_to_ucase_0([],_).

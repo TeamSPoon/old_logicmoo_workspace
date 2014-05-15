@@ -170,7 +170,7 @@ show_room_grid_single(_Room,LOC,_OutsideTest):- atloc(_Obj,LOC),write('..'), !.
 show_room_grid_single(_Room,_LOC,_OutsideTest):- write('--'), !.
 
 inst_label(Obj,Label):-label_type(Label,Obj),!.
-inst_label(Obj,Label):-  props(Obj,nameString_call(Val)),Val\=Obj,inst_label(Val,Label),!.
+inst_label(Obj,Label):-  props(Obj,nameString(Val)),Val\=Obj,inst_label(Val,Label),!.
 inst_label(Obj,Label):-  props(Obj,named(Val)),Val\=Obj,inst_label(Val,Label),!.
 inst_label(Obj,Label):-  props(Obj,mud_isa(Val)),Val\=Obj,inst_label(Val,Label),!.
 inst_label(Obj,SLabe2):-term_to_atom(Obj,SLabel),sub_atom(SLabel,1,2,_,SLabe2),!.

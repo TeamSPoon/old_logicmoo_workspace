@@ -110,7 +110,7 @@ ensure_some(Property,OfAgent):- prop(OfAgent, Property,_),!.
 ensure_some(Property,OfAgent):- create_someval(Property,OfAgent,Value),padd(OfAgent,Property,Value).
 
 create_someval(facing,_Agent,Dir) :- random_member(Dir,[n,s,e,w,ne,nw,se,sw]).
-create_someval(atloc,Agent,Where) :- inRegion(Agent,Region),
+create_someval(atloc,Agent,Where) :- req(inRegion(Agent,Region)),
    in_grid(Region,Where),
    unoccupied(Where),!.
 

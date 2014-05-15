@@ -15,23 +15,24 @@
 :- module(dbase, [
 
  add/1, add0/1, agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, ofclass/2, clr/1, damage/2, db_op/2, atloc/2, 
- db_prop_g/1, db_prop_game_assert/1, del/1, failure/2, grid/4, mud_isa/2, item/1, 
- memory/2, padd/2, padd/3, pathName/3, possess/2, prop/3, prop_or/4, props/2, region/1, req/1, scan_db_prop/0, score/2, stm/2, term_listing/1,  facing/2,
- thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, nameString_call/2, description/2, act_turn/2,
+ db_prop_g/1, db_prop_game_assert/1, del/1, failure/2, grid/4, mud_isa/2, item/1, holds_tcall/1,
+ memory/2, padd/2, padd/3, possess/2, prop/3, prop_or/4, props/2, region/1, req/1, scan_db_prop/0, score/2, stm/2, term_listing/1,  facing/2,
+ thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, description/2, act_turn/2,
  dbase_mod/1, dbase_define_db_prop/2,
  clause_present_1/3,
  with_kb_assertions/2
     ]).
 
 
-
-
 :- dynamic 
  dbase_mod/1,
- add/1, add0/1, agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, ofclass/2,  damage/2, db_op/2,atloc/2, 
- db_prop_g/1, db_prop_game_assert/1, del/1, failure/2, grid/4, mud_isa/2, item/1, 
+  agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, ofclass/2,  damage/2, db_op/2,atloc/2, 
+ db_prop_g/1, db_prop_game_assert/1, failure/2, grid/4, mud_isa/2, item/1, 
  memory/2, pathName/3, possess/2, region/1, req/1, scan_db_prop/0, score/2, stm/2, term_listing/1, facing/2,
- thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, nameString_call/2, description/2, act_turn/2.
+ thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2,  description/2, act_turn/2.
+
+:- ensure_loaded(logicmoo('vworld/parser_e2c.pl')).
+:-begin_transform_cyc_preds.
 
 dbase_mod(dbase).
 /*
@@ -57,6 +58,9 @@ user_export(Prop/Arity):-
 
 % Found new meta-predicates in iteration 1 (0.281 sec)
 %:- meta_predicate db_forall(?,?,?,0).
+
+% :- ensure_loaded(logicmoo('vworld/e2c_data.pl')).
+:- ensure_loaded(logicmoo('vworld/moo.pl')).
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
@@ -178,6 +182,8 @@ additiveOp(+).
 additiveOp(-).
 additiveOp((/)).
 
+holds_tcall(Call):-req(Call).
+
 db_op(q,Term):-!, db_op0(q,Term).
 db_op(Op,Term):-must(db_op0(Op,Term)).
 db_op0(_Op,props(_Obj,Open)):-Open==[],!.
@@ -204,6 +210,7 @@ db_op_4(Op,p,_,C0):- C0=..[p,Prop|ARGS],atom(Prop), C1=..[Prop|ARGS],!,db_op(Op,
 db_op_4(Op,k,_,C0):- C0=..[k,Prop|ARGS],atom(Prop),C1=..[Prop|ARGS],!,db_op(Op,C1),!.
 db_op_4(Op,p,_,C0):- C0=..[p,Prop|ARGS],atom(Prop), C1=..[Prop|ARGS],!,db_op(Op,C1),!.
 db_op_4(Op,svo,_,C0):- C0=..[svo,Obj,Prop|ARGS],atom(Prop),C1=..[Prop,Obj|ARGS],!,db_op(Op,C1),!.
+
 db_op_4(q,Fmt,1,C0):-is_decl_ft(Fmt),!,C0=..[_,A],format_complies(A,Fmt,_).
 db_op_4(a,Fmt,1,_C0):-is_decl_ft(Fmt),!,dmsg(todo(dont_assert_is_decl_ft(Fmt))),!.
 db_op_4(Op,Prop,_,C0):- 
@@ -239,7 +246,7 @@ db_forall(r,(C1;C2)):-!,trace,once((db_forall(r,C1),db_forall(r,C2))).
 db_forall(ra,(C1;C2)):-!,must(db_forall(ra,C1)),must(db_forall(ra,C2)).
 db_forall('q',(C1;C2)):-!, db_forall('q',C1) ; db_forall('q',C2).
 db_forall(a,(C1;C2)):-!,db_forall(a,C1),!,db_forall(a,C2),!.
-db_forall('q',C):-!,db_forall_quf(C,U,Template),!,U, debugOnError(Template).
+db_forall('q', Term):- db_forall_query(Term).
 db_forall(u,C):- trace,db_forall_quf(C,U,Template),U,Template,must(ground(Template)),!,ignore(retractall(Template)).
 db_forall(ra,C):-db_forall_quf(C,U,Template), doall((U,retractall(Template))).
 db_forall(ra,C):-ignore(retractall(C)).
@@ -248,6 +255,13 @@ db_forall(a,C0):- db_forall_quf(C0,U,C),must(U),functor(C,F,A),!, (moo:is_db_pro
 db_forall(a,C):- functor(C,F,A),!, (moo:is_db_prop(F,A,singleValued) -> must(db_forall_assert_sv(C,F,A)) ; must(db_forall_assert_mv(C,F,A))).
 db_forall(r,C):- ground(C),retractall(C).
 db_forall(Op,C):-!,trace,throw(unhandled(db_forall(Op,C))).
+
+
+db_forall_query(Term):- user:goal_expansion(Term,Term2),Term\==Term2,!,db_forall_query(Term2).
+db_forall_query(C):- !, predicate_property(C,built_in),!,trace,call(C).
+db_forall_query(C):- !, db_forall_quf(C,Pretest,Template),!,Pretest, debugOnError(Template).
+
+
 
 % only place ever should actual gaem desbase be changed from
 hooked_asserta(C):-moo:run_database_hooks(assert(a),C),asserta(C).
@@ -322,7 +336,7 @@ argIsa_call_0(mud_isa,2,type):-!.
 argIsa_call_0(act,_,term):-!.
 argIsa_call_0(ofclass,2,type):-!.
 argIsa_call_0(memory,2,term):-!.
-argIsa_call_0(Prop,N1,Type):-moo:is_db_prop(Prop,N1,argIsa(Type)),!.
+argIsa_call_0(Prop,N1,Type):- trace,moo:is_db_prop(Prop,N1,argIsa(Type)),!.
 
 argIsa_call_1(Prop,N1,Type):-is_2nd_order_holds(Prop),dmsg(todo(define(argIsa_call(Prop,N1,'Second_Order_TYPE')))),
    Type=argIsaFn(Prop,N1).
@@ -389,8 +403,8 @@ compare_n(Last,NewLast):-number(NewLast),not(number(Last)),throw(incomparable_te
 compare_n(NewLast,Last):-atomic(NewLast),not(atomic(Last)),throw(incomparable_terms(Last,NewLast)).
 compare_n(Last,NewLast):-atomic(NewLast),not(atomic(Last)),throw(incomparable_terms(Last,NewLast)).
 
-e2c_data:inRegion(O,Region):-atloc(O,LOC),locationToRegion(LOC,Region).
-e2c_data:inRegion(apath(Region,Dir),Region):-e2c_data:pathBetween(Region,Dir,_To).
+moo:dbase_true(inRegion,O,Region):-atloc(O,LOC),locationToRegion(LOC,Region).
+moo:dbase_true(inRegion,apath(Region,Dir),Region):- holds_t(pathBetween,Region,Dir,_To).
 
 
 member_or_e(E,[L|List]):-!,member(E,[L|List]).
@@ -419,6 +433,7 @@ moo:decl_subclass(item,object).
 
 moo:db_prop(pathName(region,dir,string)).
 moo:db_prop(verbOverride(term,action,action)).
+moo:db_prop(ArgTypes):-db_prop_g(ArgTypes).
 
 db_prop_sv(atloc(object,xyz(region,int,int,int))).
 db_prop_sv(act_turn(agent,int)).
@@ -432,7 +447,7 @@ db_prop_sv(defence(agent,int)).
 db_prop_sv(facing(agent,dir)).
 db_prop_sv(height(agent,int)).
 db_prop_sv(id(object,id)).
-db_prop_sv(e2c_data:inRegion(term,region)).
+db_prop_sv(inRegion(term,region)).
 db_prop_sv(last_command(agent,command)).
 db_prop_sv(location_center(region,xyz(region,int,int,int))).
 db_prop_sv(movedist(agent,number)).
@@ -449,7 +464,6 @@ db_prop_sv(stm(agent,int)).
 db_prop_sv(str(agent,int)).
 % db_prop_sv(type_grid(regiontype,int,list(term))).
 db_prop_sv(weight(object,int)).
-db_prop_sv(ArgTypes):-db_prop_g(ArgTypes).
 
 db_prop_format(apath(region,dir),areaPath).
 db_prop_format(dice(int,int,int),int).
@@ -535,7 +549,7 @@ moo:term_anglify(verbFn(F),[is,F]):-atom_concat(_,'ing',F).
 moo:term_anglify(verbFn(F),[F,is]).
 % moo:term_anglify(prolog(Term),String):-term_to_atom(Term,Atom),any_to_string(Atom,String).
 moo:term_anglify(determinerString(Obj,Text),[np(Obj),is,uses,string(Text),as,a,determiner]).
-moo:term_anglify(nameString_call(Obj,Text),[np(Obj),is,refered,to,as,string(Text)]).
+moo:term_anglify(nameString(Obj,Text),[np(Obj),is,refered,to,as,string(Text)]).
 moo:term_anglify(moo:term_anglify(Term,List),[prolog(Term),is,converted,to,english,using,prolog(Text)]).
 
 
@@ -555,7 +569,7 @@ db_prop_multi(ofclass(term,type),[alias(mud_isa)]).
 db_prop_multi(G,[]):-db_prop_multi(G).
 
 db_prop_multi(failure(agent,action)).
-db_prop_multi(nameString_call(term,string)).
+db_prop_multi(nameString(term,string)).
 db_prop_multi(determinerString(term,string)).
 db_prop_multi(descriptionHere(term,string)).
 db_prop_multi(description(term,string)).
@@ -625,8 +639,8 @@ ensure_clause(HEAD,F,A,BODY):-assertz((HEAD:-BODY)),
    nop(compile_predicates([HEAD])).
 
 
-nameString_call(apath(Region,Dir),Text):- pathName(Region,Dir,Text).
-description(apath(Region,Dir),Text):- pathName(Region,Dir,Text).
+moo:dbase_true(nameString,apath(Region,Dir),Text):- holds_t(pathName(Region,Dir,Text)).
+description(apath(Region,Dir),Text):- holds_t(pathName(Region,Dir,Text)).
 
 scan_db_prop:-
    dbase_mod(DBM),debug,
@@ -643,27 +657,6 @@ load_motel:- defrole([],time_state,restr(time,period)).
 :- include(logicmoo('vworld/moo_footer.pl')).
 
 end_of_file.
-
-
-
-:-dmsg(loading(kb3)).
-call_assertion_holds(P,A):- 'ASSERTION'(_TRUTH,_NNF,_MT,_,/*HL*/[P,A]).
-call_assertion_holds(P,A,B):- 'ASSERTION'(_TRUTH,_NNF,_MT,_,/*HL*/[P,A,B]).
-call_assertion_holds(P,A,B,C):- 'ASSERTION'(_TRUTH,_NNF,_MT,_,/*HL*/[P,A,B,C]).
-call_assertion_holds(P,A,B,C,D):- 'ASSERTION'(_TRUTH,_NNF,_MT,_,/*HL*/[P,A,B,C,D]).
-call_assertion_holds(P,A,B,C,D,E):- 'ASSERTION'(_TRUTH,_NNF,_MT,_,/*HL*/[P,A,B,C,D,E]).
-call_assertion_holds(P,A,B,C,D,E,F):- 'ASSERTION'(_TRUTH,_NNF,_MT,_,/*HL*/[P,A,B,C,D,E,F]).
-
-call_assertion_holds(P,A):-assertion_holds(P,A).
-call_assertion_holds(P,A,B):-assertion_holds(P,A,B).
-call_assertion_holds(P,A,B,C):-assertion_holds(P,A,B,C).
-call_assertion_holds(P,A,B,C,D):-assertion_holds(P,A,B,C,D).
-call_assertion_holds(P,A,B,C,D,E):-assertion_holds(P,A,B,C,D,E).
-call_assertion_holds(P,A,B,C,D,E,F):-assertion_holds(P,A,B,C,D,E,F).
-
-
-end_of_file.
-
 
 
 

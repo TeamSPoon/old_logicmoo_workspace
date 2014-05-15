@@ -19,6 +19,7 @@
 
 %  very very first import
 :- debug.
+
 :- ensure_loaded(logicmoo('vworld/dbase.pl')).
 :- ensure_loaded(logicmoo('vworld/moo.pl')).
 
@@ -34,6 +35,7 @@
 :- ensure_loaded(library(quintus)).
 
 % logicmoo utils shared with other systems
+
 :- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_bugger.pl')).
 :- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_library.pl')).
 :- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_ctx_frame.pl')).
@@ -50,7 +52,9 @@
 :- ensure_loaded(logicmoo('vworld/moo_loader.pl')).
 :- ensure_loaded(logicmoo('vworld/toploop_telnet.pl')).
 :- ensure_loaded(logicmoo('vworld/toploop_npc.pl')).
+:- ensure_loaded(logicmoo('vworld/parser_e2c.pl')).
 :- ensure_loaded(logicmoo('vworld/parser_imperative.pl')).
+
 :- ensure_loaded(logicmoo('vworld/moo_testing.pl')).
 
 % NPC planners
@@ -84,4 +88,5 @@
 :- ensure_loaded(logicmoo('actions/get_set.pl')).
 */
 
-:- ensure_loaded(logicmoo('vworld/parser_e2c.pl')).
+
+

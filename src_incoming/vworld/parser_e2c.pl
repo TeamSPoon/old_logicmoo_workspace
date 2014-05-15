@@ -8,7 +8,7 @@
 % Revised At:   $Date: 2002/06/27 14:13:20 $
 % ===================================================================
 
-:-module(e2c,[
+:-module(parser_e2c,[
          e2c/1,
 	e2c/2,
 	testE2C/0,
@@ -47,24 +47,43 @@
 	 assertThrough/2,
 	 retractAllThrough/1,
 	 retractAllThrough/2,
+         begin_transform_cyc_preds/0,
+         is_holds_like/1,
+         end_transform_cyc_preds/0,
+         cyc_goal_expansion/2,
          getVarAtom/2, 
                    idGen/1, 
                     list_to_term/2, 
-                    lowerCasePred/1,     
+                    lowerCasePred/1,   
+            stringToWords/2, 
+            balanceBinding/2,
+                     holds_t/8,
+         holds_t/7,
+         holds_t/6,
+         holds_t/5,
+         holds_t/4,
+         holds_t/3,
+         holds_t/2,
+         holds_t/1,
+         isCycPredArity/2,
+
 	 testOpenCyc/0]).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+
+:- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_all.pl')).
+:- ensure_loaded(logicmoo('vworld/moo.pl')).
+
 
 :- register_module_type(utility).
 
-% posm_cached(Phrase,POS,Form,CycL)
+% posm_cached(CycL, Phrase,POS,Form,CycL)
 :-dynamic lex/3,  lexMap/3.
 
 %%lowerCasePred(CycLPred)
 lowerCasePred(Pred):-atom(Pred),atom_codes(Pred,[_,_,C|_]),char_type(C,lower).
 
 idGen(X):-flag(idGen,X,X+1).
-
+     
 %list_to_term(X,Y):- balanceBinding(X,Y).
 list_to_term(X,Y):-nonvar(X),var(Y),!,list_to_terms_lr(X,Y).
 list_to_term(X,Y):-list_to_terms_rl(X,Y).
@@ -73,7 +92,30 @@ list_to_terms_rl(List,(A;B)):-list_to_terms_rl(A,AL),list_to_terms_rl(B,BL),appe
 list_to_terms_lr([],true):-!.
 list_to_terms_lr([T],T):-!.
 list_to_terms_lr([H|T],(H,TT)):-!,list_to_terms_lr(T,TT).
-   
+
+
+
+ah(P,A1,A2,A3,A4,A5,A6,A7):- dmsg(ah(P,7,A1,A2,A3,A4,A5,A6,A7)).
+ah(P,A1,A2,A3,A4,A5,A6):- dmsg(ah(P,6,A1,A2,A3,A4,A5,A6)).
+ah(P,A1,A2,A3,A4,A5):- dmsg(ah(P,5,A1,A2,A3,A4,A5)).
+ah(P,A1,A2,A3,A4):- dmsg(ah(P,4,A1,A2,A3,A4)).
+ah(P,A1,A2,A3):- dmsg(ah(P,3,A1,A2,A3)).
+ah(P,A1,A2):- dmsg(ah(P,2,A1,A2)).
+ah(P,A1):- dmsg(ah(P,1,A1)).
+
+
+
+stringToWords([],[]).
+stringToWords(TheList,Words):-functor(TheList,'TheList',_),TheList=..[_|List],!,stringToWords(List,Words).
+stringToWords(string(S),Words):-!,stringToWords(S,Words).
+stringToWords(['TheList'|List],Words):-!,stringToWords(List,Words).
+stringToWords([S|Tring],[W|Words]):-stringToWord(S,W),stringToWords(Tring,Words).
+
+:-dynamic(textCached/2).
+
+stringToWord([S|L],W):-!,textCached([S|L],[lex,W|_]).
+stringToWord(S,W):-textCached([S],[lex,W|_]).
+
 % ===================================================================
 % Connecter to Cyc TCP Server
 % ===================================================================
@@ -210,7 +252,7 @@ readUntil(Char,Char,_InStream,[]):-!.
 readUntil(Char,C,InStream,[C|Out]):-get_code(InStream,Next),
    readUntil(Char,Next,InStream,Out).
 
-
+      
       
 % ===================================================================
 %  conversion toCycApiExpression
@@ -281,7 +323,6 @@ cachable_query(isa(_,_)).
 % ===================================================================
 %  Cyc Assert
 % ===================================================================
-
 cycAssert(Mt:CycL):-!,
    cycAssert(CycL,Mt).
 cycAssert(CycL):-
@@ -493,7 +534,7 @@ mtForPred(_CycL,Mt):-defaultMt(Mt).
 :-dynamic(isRegisteredCycPred/3).
 
 % ?- registerCycPred('BaseKB':isa/2). 
-registerCycPred(Mt:Pred/Arity):-!,
+registerCycPred(Mt:Pred/Arity):- !,
    registerCycPred(Mt,Pred,Arity).
 
 % ?- registerCycPred('BaseKB':isa(_,_)). 
@@ -528,22 +569,18 @@ registerCycPred(Mt,Pred,Arity):-
       assertz(e2c:isRegisteredCycPred(Mt,Pred,Arity)),
       M = e2c_data,
       '@'(((
-      functor(Term,Pred,Arity),
+      % functor(Term,Pred,Arity),
       F = Pred,
-      A = Arity,
+      A is Arity,
+    %  A1 is Arity + 1,
       A2 is Arity + 2,
-      A3 is Arity + 3,
       dynamic(F/A), multifile(F/A), export(F/A),
       dynamic(F/A2), multifile(F/A2), export(F/A2),
-      dynamic(assertion_holds/A3), multifile(assertion_holds/A3), export(assertion_holds/A3),
-      Term =..[F|LST],
-      append(LST,[_Mt,_Vars],LLIST),
-      Term2 =..[F|LLIST],
-      Term3 =..[assertion_holds,F|LLIST],
-      % asserta(( Term :- cycQuery(Term,Mt)))
-      asserta((Term3 :- Term2 )),
-      asserta((Term3 :- Term ))
+    %  dynamic(assertion_holds/A1), multifile(assertion_holds/A1), export(assertion_holds/A1),
+      !
       )),  M).
+
+
 
 % ============================================
 % Assert Side Effect Prolog to Cyc Predicate Mapping
@@ -600,11 +637,13 @@ retractAllThrough(ToMt,CycL):-
 retractAllThrough(ToMt,CycL):-
       ignore(ToMt=user),
       system:retractall(ToMt:CycL),!.
-            
+
 */
 % ============================================
 % Register isa/genls (more for testing :)
 % ============================================
+
+
 
 % examples
 :-registerCycPred('BaseKB',e2c_data:isa,2).
@@ -618,7 +657,74 @@ retractAllThrough(ToMt,CycL):-
       
 testOpenCyc:-halt.
 
+
 :-ensure_loaded(logicmoo('src_data/e2c_data')).
+
+holds_t(P,A1,A2,A3,A4,A5,A6,A7):- isCycPredArity(P,7),(call_fa(P,A1,A2,A3,A4,A5,A6,A7);call_fa_mt(P,A1,A2,A3,A4,A5,A6,A7,_,_);assertion_true([P,A1,A2,A3,A4,A5,A6,A7])).
+holds_t(P,A1,A2,A3,A4,A5,A6):- isCycPredArity(P,6),(call_fa(P,A1,A2,A3,A4,A5,A6);call_fa_mt(P,A1,A2,A3,A4,A5,A6,_,_)).
+holds_t(P,A1,A2,A3,A4,A5):-isCycPredArity(P,5),(call_fa(P,A1,A2,A3,A4,A5);call_fa_mt(P,A1,A2,A3,A4,A5,_,_)).
+holds_t(P,A1,A2,A3,A4):- isCycPredArity(P,4),(call_fa(P,A1,A2,A3,A4);call_fa_mt(P,A1,A2,A3,A4,_,_)).
+holds_t(P,A1,A2,A3):-isCycPredArity(P,3),(call_fa(P,A1,A2,A3);call_fa_mt(P,A1,A2,A3,_,_)).
+holds_t(P,A1,A2):-isCycPredArity(P,2),(call_fa(P,A1,A2);call_fa_mt(P,A1,A2,_,_)).
+holds_t(P,A1):-isCycPredArity(P,1),(call_fa(P,A1);call_fa_mt(P,A1,_,_)).
+
+
+holds_t([AH,P|LIST]):-is_holds_like(AH),!,holds_t_p2(P,LIST).
+holds_t([P|LIST]):-!,holds_t_p2(P,LIST).
+holds_t(CALL):-CALL=..[P|LIST],holds_t([P|LIST]).
+holds_t_p2(P,LIST):- CALL=..[holds_t,P|LIST],call(CALL).
+
+dfa(P,N):-dynamic(P/N).
+
+
+call_fa(P,A1,A2,A3,A4,A5,A6,A7):- dfa(P,7),CALL=..[P,A1,A2,A3,A4,A5,A6,A7],(moo:dbase_true(CALL);call(CALL)).
+call_fa(P,A1,A2,A3,A4,A5,A6):- moo:dbase_true(P,A1,A2,A3,A4,A5,A6).
+call_fa(P,A1,A2,A3,A4,A5,A6):- assertion_holds(P,A1,A2,A3,A4,A5,A6).
+call_fa(P,A1,A2,A3,A4,A5,A6):- dfa(P,6),call(P,A1,A2,A3,A4,A5,A6).
+call_fa(P,A1,A2,A3,A4,A5):- moo:dbase_true(P,A1,A2,A3,A4,A5).
+call_fa(P,A1,A2,A3,A4,A5):- assertion_holds(P,A1,A2,A3,A4,A5).
+call_fa(P,A1,A2,A3,A4,A5):- dfa(P,5),call(P,A1,A2,A3,A4,A5).
+call_fa(P,A1,A2,A3,A4):- moo:dbase_true(P,A1,A2,A3,A4).
+call_fa(P,A1,A2,A3,A4):- assertion_holds(P,A1,A2,A3,A4).
+call_fa(P,A1,A2,A3,A4):- dfa(P,4),call(P,A1,A2,A3,A4).
+call_fa(P,A1,A2,A3):- moo:dbase_true(P,A1,A2,A3).
+call_fa(P,A1,A2,A3):- assertion_holds(P,A1,A2,A3).
+call_fa(P,A1,A2,A3):- dfa(P,3),call(P,A1,A2,A3).
+call_fa(P,A1,A2):- moo:dbase_true(P,A1,A2).
+call_fa(P,A1,A2):- assertion_holds(P,A1,A2).
+call_fa(P,A1,A2):- dfa(P,2),call(P,A1,A2).
+call_fa(P,A1):- moo:dbase_true(P,A1).
+call_fa(P,A1):- assertion_holds(P,A1).
+call_fa(P,A1):- dfa(P,1),call(P,A1).
+
+call_fa_mt(P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- dfa(P,9),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],call(CALL).
+call_fa_mt(P,A1,A2,A3,A4,A5,A6,A7,A8):- dfa(P,8),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],call(CALL).
+call_fa_mt(P,A1,A2,A3,A4,A5,A6,A7):- dfa(P,7),CALL=..[P,A1,A2,A3,A4,A5,A6,A7],call(CALL).
+call_fa_mt(P,A1,A2,A3,A4,A5,A6):- dfa(P,6),call(P,A1,A2,A3,A4,A5,A6).
+call_fa_mt(P,A1,A2,A3,A4,A5):- dfa(P,5),call(P,A1,A2,A3,A4,A5).
+call_fa_mt(P,A1,A2,A3,A4):- dfa(P,4),call(P,A1,A2,A3,A4).
+call_fa_mt(P,A1,A2,A3):- dfa(P,3),call(P,A1,A2,A3).
+
+arityMatches(A,S-E):- !, between(S,E,OTHER), A=OTHER.
+arityMatches(A,OTHER):-number(OTHER),!, A=OTHER.
+
+isCycPredArity(P,A):- P==arity,!,A=2.
+isCycPredArity(P,A):-nonvar(P),!,isCycPredArity0(P,OTHER),arityMatches(A,OTHER).
+isCycPredArity(P,A):- isCycPredArity0(P,OTHER),arityMatches(A,OTHER).
+
+
+isCycPredArity0(P,A):- isRegisteredCycPred(_,P,A).
+isCycPredArity0(P,A):- holds_t(arity,P,A).
+isCycPredArity0(P,A):- 'arityMax'(P, A, _, _).
+isCycPredArity0(P,A):- 'arityMin'(P, A, _, _),not('arityMax'(P, _, _, _)).
+
+
+assertion_true([P|LIST]):-'ASSERTION'(':TRUE-DEF',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
+assertion_true([P|LIST]):-'ASSERTION'(':TRUE-MON',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
+assertion_true([AH,P|LIST]):-is_holds_like(AH),!,assertion_true([P|LIST]).
+assertion_true([P|LIST]):-!, moo:dbase_true([P|LIST]).
+
+
 % ===================================================================
 % File 'e2c.pl'
 % Purpose: Attempto Controlled English to CycL conversions from SWI-Prolog  
@@ -628,10 +734,49 @@ testOpenCyc:-halt.
 % Version: 'interface.pl' 1.0.0
 % Revision:  $Revision: 1.3 $
 % Revised At:   $Date: 2002/06/06 15:43:15 $
-
 % ===================================================================
 
+:-dynamic(ended_transform_cyc_preds/0).
+:-multifile(user:goal_expansion/2).
 
+begin_transform_cyc_preds:- retractall((ended_transform_cyc_preds)),
+   asserta((user:goal_expansion(G1,G2):- not(ended_transform_cyc_preds), compound(G1), cyc_goal_expansion(G1,G2))).
+
+end_transform_cyc_preds:-!.   
+end_transform_cyc_preds:-
+   asserta(ended_transform_cyc_preds),
+   retractall((user:goal_expansion(G1,G2):- not(ended_transform_cyc_preds), compound(G1), cyc_goal_expansion(G1,G2))).
+
+set_list_len(List,A,NewList):-length(List,LL),A=LL,!,NewList=List.
+set_list_len(List,A,NewList):-length(List,LL),A>LL,length(NewList,A),append(List,_,NewList),!.
+set_list_len(List,A,NewList):-length(NewList,A),append(NewList,_,List),!.
+
+is_holds_like(isa):-!,fail.
+is_holds_like(assertion).
+is_holds_like(holds).
+is_holds_like(assertion_holds).
+is_holds_like(holds_t).
+
+
+cyc_goal_expansion(G1,_):-var(G1),!,fail.
+cyc_goal_expansion(not(G1),not(G2)):-!,cyc_goal_expansion(G1,G2).
+cyc_goal_expansion( \+(G1) , \+(G2)):-!,cyc_goal_expansion(G1,G2).
+cyc_goal_expansion(G1,G2):- 
+            functor(G1,HF,_),is_holds_like(HF),
+            G1=..[HF,F|List],isCycPredArity(F,A),!,
+            set_list_len(List,A,NewList),
+            G2=..[holds_t,F|NewList],!,
+            dmsg(cyc_goal_expansion(G1,G2)).
+cyc_goal_expansion(G1,G2):- 
+            functor(G1,F,_),isCycPredArity(F,A),!,
+            G1=..[F|List], set_list_len(List,A,NewList), 
+            G2=..[holds_t,F|NewList],!,
+            dmsg(cyc_goal_expansion(G1,G2)).
+cyc_goal_expansion(G1,G2):- fail, G1=G2, dmsg((gexp(G1))),!,fail.
+
+% :- include(logicmoo('vworld/moo_header.pl')).
+
+:-begin_transform_cyc_preds.
 
 
 % Semantic Interpretation
@@ -654,22 +799,34 @@ e2c(English):-
       e2c(English,CycLOut),
       'fmt'('~w~n',[CycLOut]).
 
-
 e2c(English,CycLOut):-
-   atom_junct(English,[Eng|Lish]),
-   e2c([Eng|Lish],CycLOut).
+   to_word_list(English,[Eng|Lish]),!,
+   string_list_to_atom_list([Eng|Lish],Atoms),!,
+   e2c_list(Atoms,CycLOut).
 
-e2c([Eng|Lish],CycLOut):-
-   once(notrace((
-   length(Lish,M1),
+string_list_to_atom_list([],[]):-!.
+string_list_to_atom_list([Eng|Lish],[E|Atoms]):-
+ to_aword(Eng,E),!,
+ string_list_to_atom_list(Lish,Atoms).
+
+to_aword(Eng,Eng):-var(Eng),!.
+to_aword(Eng,E):-string(Eng),!,atom_string(E0,Eng),to_aword(E0,E).
+to_aword(Eng,N):-atom(Eng),atom_number(Eng,N),!.
+to_aword(Eng,Eng):-atom(Eng),!.
+to_aword(Eng,Eng).
+
+
+e2c_list([Eng|Lish],CycLOut):- 
+   length(Lish,M1),!,
+   once(((
    between(0,M1,Slack),
    length(Rest,Slack),
-   try_e2c([Eng|Lish],_CycL,Rest)
+   try_e2c(_CycL,[Eng|Lish],Rest)
    ))),
    % now may iterate out with rest pinned down
    try_e2c(CycLMid,[Eng|Lish],Rest),
    toCycApiExpression(CycLMid,CycLOut).
-   
+
    
 try_e2c(CycL,English,Rest):-sentence(CycL,English,Rest),!.
 try_e2c(CycL,English,Rest):-noun_phrase('?Var','?SomeRelation',CycL,English,Rest),!.
@@ -697,7 +854,7 @@ declaritive_sentence(CycL) -->
 possible_prep-->[of];[].
 
 inquiry('thereExists'(Actor,CycL)) --> wh_pronoun(Actor), verb_phrase(Actor,'?QuestionEvent',CycL),[?].
-inquiry(CycL) --> inv_sentence(CycL),[?].
+inquiry(CycL) --> inv_sentence(CycL),[(?)].
 
 inv_sentence(CycL) --> aux, declaritive_sentence(CycL).
 
@@ -749,7 +906,6 @@ phrase_meaning_adj(Phrase,Subj,CycL):-
 phrase_meaning_adj(Phrase,Subj,'hasAttributeOrCollection'(Subj,CycL)):-
       posMeans(Phrase,'Adjective',Form,CycL),not(lowerCasePred(CycL)).
 
-
 % =======================================================
 % Nouns Phrases
 % =======================================================
@@ -757,7 +913,7 @@ phrase_meaning_adj(Phrase,Subj,'hasAttributeOrCollection'(Subj,CycL)):-
 noun_phrase(Subj,CycLIn,CycLOut) --> noun_expression(Subj,Isa,CycLOut),rel_clause(Subj,CycLIn,Isa).
 %noun_phrase(Subj,CycL1,CycL) --> noun_expression(Subj,CycL1,CycL),[and],noun_phrase(Subj,CycL1,CycL)
    
-noun_expression(PN,CycL,CycL) --> pronoun(PN).
+noun_expression(PN,CycL,CycL) --> {trace},pronoun(PN).
 noun_expression(PN,CycL,CycL) --> proper_noun_phrase(PN).
 noun_expression(Subj,CycLVerb,CycLOut) -->  
    quant_phrase(Subj,AttribIsa,CycLVerb,CycLOut),
@@ -776,16 +932,25 @@ noun_expression(Subj,CycLVerb,('thereExists'(Subj,'and'(AttribIsa,CycLVerb)))) -
 % =======================================================
 
 conj_word --> [X],{conj_word(X)}.
+conj_word --> [X],{connective_word(X)}.
 disj_word --> [X],{disj_word(X)}.
 
-conj_word(that). conj_word(who). conj_word(and). conj_word(also). disj_word(or).
+conj_word(and). conj_word(also). disj_word(or).  
+% and	but	or	yet	for	nor	so
+
+
+common_Subordinating_Conjunctions([
+after,although,as,[as,if],[as,long,as],[as,though],because,before,[even,if],[even,though],if,
+[if,only],[in,order,that],[now,that],once,[rather,than],since,[so,that],than,that,though,till,unless,until,when,whenever,where,whereas,wherever,while]).
 
 % =======================================================
 % Rel Clauses
 % =======================================================
 
+connective_word(that). connective_word(who). connective_word(which). 
+
+rel_clause(Subj,Isa,'and'(Isa, HowDoes)) --> [X],{connective_word(X)},adverbs_phrase(Event,Does,HowDoes),verb_phrase(Subj,Event,Does).
 rel_clause(_,Isa,Isa) --> [].
-rel_clause(Subj,Isa,'and'(Isa, HowDoes)) --> [that],adverbs_phrase(Event,Does,HowDoes),verb_phrase(Subj,Event,Does).
 
 
 % =======================================================
@@ -798,6 +963,8 @@ collection_noun(Subj,CycLCollection) --> [A,B,C],{phraseNoun([A,B,C],Form,Subj,C
 collection_noun(Subj,CycLCollection) --> [A,B],{phraseNoun([A,B],Form,Subj,CycLCollection)}.
 collection_noun(Subj,CycLCollection) --> [A],{phraseNoun([A],Form,Subj,CycLCollection)}.
 collection_noun(Subj,'AdultMalePerson') --> [man].
+
+collection(M)--> collection_noun('?Subj',CycLCollection).
 
 phraseNoun(Eng,Form,Subj,CycLCollection):-
       phraseNoun_each(Eng,Form,CycLCollction),
@@ -1059,27 +1226,29 @@ fp(N,N).
 fp([N|_],N).
 
 
+/*
+'nonCompositionalVerbSemTrans'('End-TheWord', 'Agreement', ['and', ['isa', ':ACTION', 'EndingAnAgreement'], ['performedBy', ':ACTION', ':SUBJECT'], ['objectActedOn', ':ACTION', ':OBJECT']]).
 
-%'nonCompositionalVerbSemTrans'('End-TheWord', 'Agreement', ['and', ['isa', ':ACTION', 'EndingAnAgreement'], ['performedBy', ':ACTION', ':SUBJECT'], ['objectActedOn', ':ACTION', ':OBJECT']]).
-
-%'lightVerb-TransitiveSemTrans'('Do-TheWord', 'CommercialActivity', ['and', ['isa', ':ACTION', 'CommercialActivity'], ['performedBy', ':ACTION', ':SUBJECT']]).
-%'multiWordStringDenotesArgInReln'([service], 'Provide-TheWord', 'AgentiveNoun', 'providerOfService', 2).
-%'nounSemTrans'('Hire-TheWord', 0, 'RegularNounFrame', ['and', ['isa', '?HIRE', 'EmployeeHiring'], ['objectActedOn', '?HIRE', ':NOUN']]).
-%'multiWordStringDenotesArgInReln'([service], 'Provide-TheWord', 'AgentiveNoun', 'providerOfService', 2).
-%'headMedialString'([intended], 'Recipient-TheWord', [of, communication], 'SimpleNoun', 'communicationTarget').
-%'agentiveNounSemTrans'('Emit-TheWord', 0, 'RegularNounFrame', ['emitter', '?X', ':NOUN']).
-%'adjSemTrans'('Cloud-TheWord', 0, 'RegularAdjFrame', ['weather', ':NOUN', 'Cloudy']).
-%'relationIndicators'('abbreviationForMultiWordString', 'Form-TheWord', 'Verb').
+'lightVerb-TransitiveSemTrans'('Do-TheWord', 'CommercialActivity', ['and', ['isa', ':ACTION', 'CommercialActivity'], ['performedBy', ':ACTION', ':SUBJECT']]).
+'multiWordStringDenotesArgInReln'([service], 'Provide-TheWord', 'AgentiveNoun', 'providerOfService', 2).
+'nounSemTrans'('Hire-TheWord', 0, 'RegularNounFrame', ['and', ['isa', '?HIRE', 'EmployeeHiring'], ['objectActedOn', '?HIRE', ':NOUN']]).
+'multiWordStringDenotesArgInReln'([service], 'Provide-TheWord', 'AgentiveNoun', 'providerOfService', 2).
+'headMedialString'([intended], 'Recipient-TheWord', [of, communication], 'SimpleNoun', 'communicationTarget').
+'agentiveNounSemTrans'('Emit-TheWord', 0, 'RegularNounFrame', ['emitter', '?X', ':NOUN']).
+'adjSemTrans'('Cloud-TheWord', 0, 'RegularAdjFrame', ['weather', ':NOUN', 'Cloudy']).
+'relationIndicators'('abbreviationForMultiWordString', 'Form-TheWord', 'Verb').
 %'genNatTerm-compoundString'('TransportViaFn', 'Transport-TheWord', [via], 'MassNoun', 'singular').
 %'genTemplate'('transferredThing', ['ConcatenatePhrasesFn', ['TermParaphraseFn-NP', ':ARG2'], ['BestHeadVerbForInitialSubjectFn', 'Be-TheWord'], ['BestNLPhraseOfStringFn', 'transferred in'], ['TermParaphraseFn-NP', ':ARG1']]).
 %'lightVerb-TransitiveSemTrans'('Do-TheWord', 'CommercialActivity', ['and', ['isa', ':ACTION', 'CommercialActivity'], ['performedBy', ':ACTION', ':SUBJECT']]).
 %'genTemplate-Constrained'('isa', ['quotedCollection', ':ARG2'], ['NPIsNP-NLSentenceFn', ['BestCycLPhraseFn', ':ARG1'], ['BestDetNbarFn-Indefinite', ['TermParaphraseFn', ':ARG2']]]).
 
+*/
 
 
 % ============================================================================
 % posMeans
 % ============================================================================
+posMeans(Phrase,POS,Form,CycL):- !, posm_c( Phrase,POS,Form,CycL).
 
 posMeans(Phrase,POS,Form,CycL):-
       posm_cached,!,
@@ -1094,7 +1263,7 @@ posMeans(Phrase,POS,Form,CycL):-
 
 
 cache_the_posm:-
-      posm_c(Phrase,POS,Form,CycL),
+      posm_c( Phrase,POS,Form,CycL),
       CycWord = _,
       assert_if_new(posm_cached(CycWord,Phrase,POS,Form,CycL)),%write(.),flush,
       %fmt('~q~n',[posm_cached(Phrase,POS,Form,CycL)]),
@@ -1109,22 +1278,22 @@ cache_the_posm.
 % ============================================================================
 
 %'multiWordString'([health, care], 'Organize-TheWord', 'SimpleNoun', 'MedicalCareOrganization').
-posm_c(Phrase,POS,Form,CycL):-'multiWordString'(Words, CycWord, POS, CycL),
+posm_c( Phrase,POS,Form,CycL):-'multiWordString'(Words, CycWord, POS, CycL),
 	 pos(CycWord,Eng,_POS,Form),append(Words,Eng,Phrase).
 
 %'genPhrase'('MedicalCareProvider', 'AgentiveNoun', 'agentive-Sg', [health, care, provider]).
-posm_c(Phrase,POS,Form,CycL):-'genPhrase'(CycL, POS,Form, Phrase).
+posm_c( Phrase,POS,Form,CycL):-'genPhrase'(CycL, POS,Form, Phrase).
 
 %'headMedialString'([dimensionless], 'Unit-TheWord', [of, measure], 'SimpleNoun', 'DimensionlessUnitOfMeasure').
-posm_c(Phrase,POS,Form,CycL):-'headMedialString'(WordsBef,CycWord,WordsAft,POS, CycL),
+posm_c( Phrase,POS,Form,CycL):-'headMedialString'(WordsBef,CycWord,WordsAft,POS, CycL),
 	 pos(CycWord,Eng,_POS,Form),append(WordsBef,Eng,PhrasingLeft),append(PhrasingLeft,WordsAft,Phrase).
 
 %'compoundString'('Movement-TheWord', [of, fluid], 'MassNoun', 'FluidFlowEvent').
-posm_c(Phrase,POS,Form,CycL):-'compoundString'(CycWord,Words,POS, CycL),
+posm_c( Phrase,POS,Form,CycL):-'compoundString'(CycWord,Words,POS, CycL),
 	 pos(CycWord,Eng,_POS,Form),append(Eng,Words,Phrase).
 
 %'prepCollocation'('Beset-TheWord', 'Adjective', 'By-TheWord').      
-posm_c(Phrase,POS,Form2,'PrepCollocationFn'(CycWord1,POS,CycWord2)):-'prepCollocation'(CycWord1,POS, CycWord2),
+posm_c( Phrase,POS,Form2,'PrepCollocationFn'(CycWord1,POS,CycWord2)):-'prepCollocation'(CycWord1,POS, CycWord2),
 	 pos(CycWord1,Eng1,_POS,Form1),pos(CycWord2,Eng2,_POS,Form2),append(Eng1,Eng2,Phrase).
 
 
@@ -1133,22 +1302,22 @@ posm_c(Phrase,POS,Form2,'PrepCollocationFn'(CycWord1,POS,CycWord2)):-'prepColloc
 
 
 %'initialismString'('CodeOfConduct', [coc]).
-posm_c(Term,'SimpleNoun',normal,Proper) :- 
+posm_c( Term,'SimpleNoun',normal,Proper) :- 
       'initialismString'(Proper,Term);
       'formerName'(Proper, Term);
       'scientificName'(Proper, Term);
       'termStrings-GuessedFromName'(Proper, Term);
-      e2c_data:'nameString'(Proper, Term).
+      'nameString'(Proper, Term).
 
 %'abbreviationString-PN'('India', ['IND']).
-posm_c(Term,'ProperNoun',normal,Proper) :- 
+posm_c( Term,'ProperNoun',normal,Proper) :- 
       'initialismString'('CodeOfConduct',Term);
       'abbreviationString-PN'(Proper, Term);
       'preferredNameString'(Proper, Term);
       'countryName-LongForm'(Proper, Term);
       'countryName-ShortForm'(Proper, Term).
 
-posm_c(Eng,POS,Form,CycL):-
+posm_c( Eng,POS,Form,CycL):-
 	 pos(CycWord,Eng,POS,Form),
 	 posm_build(CycWord,Eng,POS,Form,CycL).
 
@@ -1197,7 +1366,7 @@ posTT(CycWord,Phrase,POS,Form:PosForms):- fail.
 
 
   
-:-catch([foo],_,true).
+:-catch(['posm_cached_data.pl'],_,true).
 
 %:-posMeans(CycWord,Phrase,POS,Form,CycL).
 
@@ -1217,7 +1386,7 @@ clean_posm_cache:-tell(foo2),
    told.
 
 save_posm_cache
-   :-tell(foo),
+   :-tell('posm_cached_data.pl'),
    listing(posm_cached),
    told.
 
@@ -1236,7 +1405,7 @@ partition_cache(CycWord,Phrase,POS,Form,CycL):-
 % Partitinion CycNL
 % ======================================================
 
-%posm_cached('Skill-TheWord', [skilled], 'MassNoun', 'regularDegree':'posForms', meaningOfWord('Skill-TheWord')).
+posm_cached('Skill-TheWord', [skilled], 'MassNoun', 'regularDegree':'posForms', meaningOfWord('Skill-TheWord')).
 
 partition_cache(CycWord,Phrase,POS,Form,meaningOfWord(CycWord)):-!,
    posm_cached(CycWord,Phrase,_,_,CycL),not(CycL=meaningOfWord(_)),
@@ -2739,24 +2908,53 @@ valid(C)  :-   (65 =< C, C =< 90);    % A - Z
 
 
 
-
-% =================================================================
-% english2Kif
-% Contact: $Author: dmiles $@users.sourceforge.net ;
-% Version: 'interface.pl' 1.0.0
-% Revision:  $Revision: 1.9 $
-% Revised At:   $Date: 2002/06/27 14:13:20 $
 % ===================================================================
-% =================================================================
-clientEvent(Channel,Agent,english(phrase([learn|Input],Codes),_)):-!,
-	    AS = exec_lf(and(equals('?TargetAgent','Self'),equals('?Speaker',Agent),['or'|Ors])),
-	    findall(Kif,english2Kif(Input,Kif),Ors),fmt(AS).
 
-clientEvent(Channel,Agent,english(phrase(Input,Codes),_)):-
-	    AS = exec_lf(and(equals('?TargetAgent','Self'),equals('?Speaker',Agent),['or'|Ors])),
-	    findall(Kif,english2Kif(Input,Kif),Ors),
-	    sendEvent(Channel,Agent,(AS)).
-% ===================================================================
+
+
+%list_to_conj(X,Y):- balanceBinding(X,Y).
+list_to_conj(X,Y):-nonvar(X),var(Y),!,list_to_conjs_lr(X,Y).
+list_to_conj(X,Y):-list_to_conjs_rl(X,Y).
+list_to_conjs_rl(List,(A,B)):-list_to_conjs_rl(A,AL),list_to_conjs_rl(B,BL),append(AL,BL,List).
+list_to_conjs_rl(List,(A;B)):-list_to_conjs_rl(A,AL),list_to_conjs_rl(B,BL),append(AL,[or|BL],List).
+list_to_conjs_lr([],true):-!.
+list_to_conjs_lr([T],T):-!.
+list_to_conjs_lr([H|T],(H,TT)):-!,list_to_conjs_lr(T,TT).
+   
+balanceBinding(Binding,Binding):- (var(Binding);number(Binding)),!.
+balanceBinding(string(B),string(B)):-!.
+balanceBinding(Binding,BindingP):-atom(Binding),atom_concat('#$',BindingP,Binding),!.
+balanceBinding(nart(B),nart(BA)):-balanceBinding(B,BA),!.
+balanceBinding(nart(B),(BA)):-!,balanceBinding(B,BA),!.
+balanceBinding(string(B),List):-atomSplit(List,B),!.
+balanceBinding(string(B),B):-!.
+balanceBinding(string([]),""):-!.
+balanceBinding(quote(B),BO):-!,balanceBinding(B,BO).
+balanceBinding(['noparens','#','G',[GU|ID]],guid([GU|ID])):-!.
+balanceBinding([A|L],Binding):-balanceBindingCons(A,L,Binding).
+balanceBinding(Binding,Binding):-!.
+ 
+balanceBindingCons(A,L,[A|L]):- (var(A);var(L);A=string(_);number(A)),!.
+balanceBindingCons('and-also',L,Binding):-balanceBindingS(L,LO), list_to_conj(LO,Binding),!.
+balanceBindingCons('eval',L,Binding):-balanceBindingS(L,LO), list_to_conj(LO,Binding),!.
+balanceBindingCons('#$and-also',L,Binding):-balanceBindingS(L,LO), list_to_conj(LO,Binding),!.
+
+balanceBindingCons(A,L,Binding):-
+	 balanceBinding(A,AO),
+         balanceBindingCons(A,AO,L,Binding).
+balanceBindingCons(A,AO,L,Binding):-
+         atom(AO),!,
+	 balanceBindingS(L,LO),
+	 Binding=..[AO|LO],!.
+balanceBindingCons(A,AO,L,Binding):-
+	 balanceBindingS(L,LO),
+	 Binding=[AO|LO],!.
+
+balanceBindingS(Binding,Binding):- (var(Binding);atom(Binding);number(Binding)),!.
+balanceBindingS([],[]).
+balanceBindingS([V,[L]|M],[LL|ML]):-V=='\'',balanceBindingS(L,LL),balanceBindingS(M,ML).
+balanceBindingS([A|L],[AA|LL]):-balanceBinding(A,AA),balanceBindingS(L,LL).
+   
 % ===================================================================
 codesToForms(Codes,[],Codes):-!.
 codesToForms(Codes,[List|More],Out):-!,
@@ -2769,7 +2967,7 @@ codesToForms(Codes,cyclist,Out):-!,getSurfaceFromChars(Codes,M,_).
 codesToForms(Codes,cyclistvars,Out:V):-!,getSurfaceFromChars(Codes,Out,V).
 codesToForms(Codes,cycl,Out):-!,getSurfaceFromChars(Codes,O,V),balanceBinding(O,Out).
 codesToForms(Codes,cyclvars,Out:V):-!,getSurfaceFromChars(Codes,O,V),balanceBinding(O,Out).
-codesToForms(Codes,words,Out):-!,getWordTokens(Codes,Out).
+codesToForms(Codes,words,Out):-!,to_word_list(Codes,Out).
 codesToForms(Codes,idioms(D),Out):-!,idioms(D,Codes,Out).
 codesToForms(Codes,Pred,Out):-atom(Pred),!,Call=..[Pred,Codes,Out],!,Call.
 
@@ -2782,8 +2980,52 @@ dirrect_order([start,tomcat]).
 :- op(100,fx,('`')).
 
 	 
+:-export((collection/3, fdelete/3)).
+
+% ===============================================================================================
+	             	 	
+fdelete([],T,[]):-!.
+
+fdelete([Replace|Rest],[H|T],Out):-
+	functor(Replace,F,_),memberchk(F,[H|T]),!,
+       fdelete(Rest,[H|T],Out),!.
+
+fdelete([Replace|Rest],[H|T],[Replace|Out]):-!,
+       fdelete(Rest,[H|T],Out),!.
+
+fdelete([Replace|Rest],F,Out):-
+	functor(Replace,F,_),!,%F=FF,
+       fdelete(Rest,F,Out),!.
+
+fdelete([Replace|Rest],F,[Replace|Out]):-
+       fdelete(Rest,F,Out),!.
+
+%:-ensure_loaded(opencyc_chatterbot_data).
 
 
+% end_of_file.
+
+% ===============================================================================================
+
+% =================================================================
+% english2Kif
+% Contact: $Author: dmiles $@users.sourceforge.net ;
+% Version: 'interface.pl' 1.0.0
+% Revision:  $Revision: 1.9 $
+% Revised At:   $Date: 2002/06/27 14:13:20 $
+% ===================================================================
+% =================================================================
+/*
+
+clientEvent(Channel,Agent,english(phrase([learn|Input],Codes),_)):-!,
+	    AS = exec_lf(and(equals('?TargetAgent','Self'),equals('?Speaker',Agent),['or'|Ors])),
+	    findall(Kif,english2Kif(Input,Kif),Ors),fmt(AS).
+
+clientEvent(Channel,Agent,english(phrase(Input,Codes),_)):-
+	    AS = exec_lf(and(equals('?TargetAgent','Self'),equals('?Speaker',Agent),['or'|Ors])),
+	    findall(Kif,english2Kif(Input,Kif),Ors),
+	    sendEvent(Channel,Agent,(AS)).
+*/
 
 english2Kif(Sentence):-english2Kif(Sentence,Kif),fmt(Kif).
 english2Obj(Sentence):-english2Obj(Sentence,Kif),fmt(Kif).
@@ -2799,9 +3041,7 @@ english2Obj(Sentence,noun_phrase(A,C)):-
 english2Kif:-english2Kif('i am happy').
 
 convertToWordage([],['True']):-!.
-convertToWordage(String,C):-is_string(String),string_to_atom(String,Atom),!,convertToWordage(Atom,C).
-convertToWordage(Atom,C):-atom(Atom),!,
-      atom_codes(Atom,Codes),!,getWordTokens(Codes,List),!,
+convertToWordage(Atom,C):-to_word_list(Atom,List),!,
       idioms(chat,List,ListExpanded),!,
       convertToWordage(ListExpanded,C),!.
       %isDebug(fmt('~q<br>',[C])),!.
@@ -2815,6 +3055,10 @@ convertToWordage(noRepeats(NoRepeats),Next):-!,
       subst(WordsNoIT,i,'I',Next),!.
 %e2c(English,CycLOut)   
 
+removeRepeats(WordsNoIT,WordsNoITO):-
+      removeRepeats1(WordsNoIT,M),
+      removeRepeats2(M,WordsNoITO),!.
+     
 
 % =================================================================
 % wordageToKif
@@ -2828,6 +3072,7 @@ wordageToKif(('?'),Words,Quest,query(Kif)) :- phrase(questionmark_sent(Kif),Ques
 wordageToKif(('.'),Words,Quest,assert(Kif)) :- phrase(period_sent(Kif),Quest).
 wordageToKif(Symbol,Words,Quest,Kif) :- not(memberchk(Symbol,[('.'),('?')])),phrase(sentence(Kif),Words).
 wordageToKif(Symbol,Words,Quest,words(Words)).
+
 
 % =======================================================
 % sentence(CycL, [every,man,that,paints,likes,monet],[]) 
@@ -2979,6 +3224,7 @@ noun_phrase(S,A,B)-->subject(S,A,B).
 
 % a man that walks
 subject(List, In, Out, [M,N,O|More], F) :-
+      nonvar(More),
       (nth1(Loc,[M,N,O],'who');nth1(Loc,[M,N,O],'that')),
       noun_phrase_rel_clause(Loc,List, In, Out, [M,N,O|More], F).
 
@@ -3118,7 +3364,7 @@ poStr(CycL,String):-
       'termStrings'(CycL,String, _,_);
       'termStrings-GuessedFromName'(CycL,String, _,_);
       'prettyName'(CycL,String, _,_);
-      e2c_data:'nameString'(CycL,String, _,_);
+      'nameString'(CycL,String, _,_);
       'nicknames'(CycL,String, _,_);
       'preferredTermStrings'(CycL,String, _,_).
 
@@ -3170,8 +3416,8 @@ wh_pronoun('?What') --> [what].
 % ==========================================================
 % POS DCG
 % ==========================================================
-isForm(POS,CycWord,Form) --> [String],{notrace(meetsForm(Form,String,POS,CycWord)),!}.
-isForm(POS,CycWord,Form) --> [S,W|String],{notrace(meetsForm(Form,[S,W|String],POS,CycWord))},String.
+isForm(POS,CycWord,Form) --> [String],{hotrace(meetsForm(Form,String,POS,CycWord)),!}.
+isForm(POS,CycWord,Form) --> [S,W|String],{hotrace(meetsForm(Form,[S,W|String],POS,CycWord))},String.
 
 meetsForm(Form,String,POS,CycWord):- (var(String);var(Form)),throw(meetsForm(String,POS,CycWord)).
 meetsForm(Form,String,POS,CycWord):-stringToWordForm(String,CycWord,Form),cycWordPosForm(POS,CycWord,Form).
@@ -3181,8 +3427,8 @@ meetsForm(Form,String,POS,CycWord):-'genlPreds'(Child,Form,_,_),meetsForm(Child,
 
 isPOS(POS,CycWord) --> isPOS(POS,CycWord,String).
 
-isPOS(POS,CycWord,String) --> [String],{notrace(meetsPos(String,POS,CycWord)),!}.
-isPOS(POS,CycWord,String) --> [S,W],{notrace(meetsPos([S,W|String],POS,CycWord))},String.
+isPOS(POS,CycWord,String) --> [String],{hotrace(meetsPos(String,POS,CycWord)),!}.
+isPOS(POS,CycWord,String) --> [S,W],{hotrace(meetsPos([S,W|String],POS,CycWord))},String.
 
 cycWordPosForm(POS,CycWord,Form):-
 	 'preferredGenUnit'(CycL,POS, CycWord,_,_);
@@ -3191,8 +3437,9 @@ cycWordPosForm(POS,CycWord,Form):-
 	 'denotation'(CycWord,POS, Arg, CycL, _,_);
 	 'speechPartPreds'(POS, Form, _,_).
 
+nonground(V):-notrace(not(ground(V))).
 
-meetsPos(String,POS,CycWord):- (var(String);var(POS)),throw(meetsPos(String,POS,CycWord)).
+meetsPos(String,POS,CycWord):- (nonground(String);nonground(POS)),throw(meetsPos(String,POS,CycWord)).
 meetsPos([String],POS,CycWord):-!,meetsPos(String,POS,CycWord).
 meetsPos(String,POS,CycWord):-'partOfSpeech'(CycWord,POS, String,_,_).
 meetsPos(String,POS,CycWord):-stringToWordForm(String,CycWord,Form),cycWordPosForm(POS,CycWord,Form).
@@ -3210,6 +3457,7 @@ meetsPos(String,'Adjective',CycWord):-'wnS'(CycWord,_, String, 'AdjectiveSatelli
 
 meetsPos(String,POS,CycWord):- atom(String),
 	    'prefixString'(CycWord, Prefix, _,_),
+            atom(Prefix),
 	    atom_concat(Prefix,_,String),
 	    'derivationalAffixBasePOS'(CycWord,POS,_,_).
 
@@ -3230,7 +3478,7 @@ cycWordForISA(CycWord,EventIsa):-fail.
 
 % peace atal beh - 695-1297
 %isCycWord(CycWord) --> {var(CycWord),!,trace}.
-isCycWord(CycWord) --> {notrace(cycWordFromString(CycWord,String))},literal(String).
+isCycWord(CycWord) --> {hotrace(cycWordFromString(CycWord,String))},literal(String).
 
 cycWordFromString(CycWord,String):-'baseForm'(CycWord,String,_,_).
 cycWordFromString(CycWord,String):-'partOfSpeech'(CycWord,POS, String,_,_).
@@ -3298,7 +3546,7 @@ stringAtomToWordForm(String,CycWord,Form):-
 % ==========================================================
 stringToWordsForm(String,[CycWord|Words],Form):- 
          'abbreviationForCompoundString'(CycWord,WordList,Form,String,_,_),
-	 stringToWords(WordList,Words,_).
+	 stringToWords(WordList,Words).
 
 stringToWordsPOS(String,CycWords,POS):-
       'abbreviationForMultiWordString'(List,Word,POS,String,_,_),
@@ -3472,7 +3720,7 @@ best_subject_constituant(Target,Event,CycL,and(CycL,CycLO,'eventOccursAt'(Event,
 	 best_subject(Target,Event,CycLO).
    
 %rest_of(txt([A|C])) --> [A|C].
-rest_of(thingFor(Rest), [A|Rest], []):-notrace(meetsPos(A,'Determiner',CycWord)),!.
+rest_of(thingFor(Rest), [A|Rest], []):-hotrace(meetsPos(A,'Determiner',CycWord)),!.
 rest_of(thingFor(Rest), Rest, []):-Rest=[_|_].
 
 %%lowerCasePred(CycLPred)
@@ -3683,10 +3931,6 @@ frame_template('RegularAdjFrame',Subj,Result,Extras) -->noun_phrase(Subj,true,Ex
 
 
 
-removeRepeats(WordsNoIT,WordsNoITO):-
-      removeRepeats1(WordsNoIT,M),
-      removeRepeats2(M,WordsNoITO),!.
-     
 removeRepeats1([],[]):-!.
 removeRepeats1([H|T],[HH|TT]):- stringToString(H,HH),!,removeRepeats1(T,TT).
 removeRepeats1([H,H1|Rest],Out):-toLowercase(H,H1),!,removeRepeats1([H|Rest],Out).
@@ -3849,7 +4093,7 @@ sterm_to_pterm_list([S|STERM],[P|PTERM]):-!,
 sterm_to_pterm_list(VAR,[VAR]).
 
 
-atom_junct(Atom,Words):-to_word_list(Atom,Words),!.
+atom_junct(Atom,Words):-!,to_word_list(Atom,Words),!.
 
 atom_junct(Atom,Words):-
    concat_atom(Words1,' ',Atom),
@@ -3860,7 +4104,8 @@ atom_junct2([W|S],[A,Mark|Words]):- member(Mark,['.',',','?']),atom_concat(A,Mar
 atom_junct2([W|S],[Mark,A|Words]):- member(Mark,['.',',','?']),atom_concat(Mark,A,W),not(A=''),!,atom_junct2(S,Words).
 atom_junct2([W|S],[W|Words]):-atom_junct2(S,Words).
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+% :- include(logicmoo('vworld/moo_footer.pl')).
 
 
+% :-end_transform_cyc_preds.
 
