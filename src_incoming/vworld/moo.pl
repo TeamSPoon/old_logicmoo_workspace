@@ -10,7 +10,9 @@
 */
 
 :- module(moo,[coerce/3, current_context_module/1,
-
+         dynamic_multifile_exported/1,
+         dynamic_multifile_exported/2,
+         op(1150,fx,dynamic_multifile_exported),
     term_expansion_local/2,
          register_module_type/1, 
          registered_module_type/2, 
@@ -18,16 +20,20 @@
          enter_term_anglify/2,
          % decl_dbase_pred/2,
          register_timer_thread/3,
-         dynamic_multifile_exported/1,
-         op(1150,fx,dynamic_multifile_exported),
-         end_module_type/2         ]).
+         end_module_type/2        
+          ]).
 
+dynamic_multifile_exported(M:FA):- !, dynamic_multifile_exported(M,FA).
+dynamic_multifile_exported( FA ):- !, current_module(M),dynamic_multifile_exported(M,FA).
 
-dynamic_multifile_exported(M:F):-!, '@'(dynamic_multifile_exported(F), M).
-dynamic_multifile_exported(F/A):-!,dynamic(F/A),multifile(F/A), export(F/A).
-dynamic_multifile_exported([A]):-!,dynamic_multifile_exported(A).
-dynamic_multifile_exported([A|L]):-!,dynamic_multifile_exported(A),dynamic_multifile_exported(L).
-dynamic_multifile_exported((A,L)):-!,dynamic_multifile_exported(A),dynamic_multifile_exported(L).
+dynamic_multifile_exported(_,M:F/A):-!,dynamic_multifile_exported(M,F,A).
+dynamic_multifile_exported(_, M:F ):-!,dynamic_multifile_exported(M,F).
+dynamic_multifile_exported(M, [A] ):-!,dynamic_multifile_exported(M,A).
+dynamic_multifile_exported(M,[A|L]):-!,dynamic_multifile_exported(M,A),dynamic_multifile_exported(M,L).
+dynamic_multifile_exported(M,(A,L)):-!,dynamic_multifile_exported(M,A),dynamic_multifile_exported(M,L).
+dynamic_multifile_exported(M, F/A ):-!,dynamic_multifile_exported(M,F,A).
+
+dynamic_multifile_exported(M,F,A):-!, '@'(( dynamic(F/A), multifile(F/A), M:export(F/A)), M).
 
 enter_term_anglify(X,Y):-findall(X-Y-Body,clause(moo:term_anglify(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
 enter_term_anglify(X,Y):-findall(X-Y-Body,clause(moo:term_anglify_np(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
@@ -174,8 +180,6 @@ term_expansion_local0(A,A).
 :- register_module_type(utility).
 
 moo:agent_text_command(_Agent,_Text,_AgentTarget,_Cmd):-fail.
-
-
 
 %:- include(logicmoo('vworld/moo_footer.pl')).
 

@@ -144,19 +144,20 @@ run:-
 moo:decl_mud_test(test_movedist,
  (
   foc_current_player(P),
-   dmsg("teleport to main enginering"),
+   test_name("teleport to main enginering"),
    do_player_action('tp Area1000'),
-   dmsg("set the move dist to 5 meters"),
+   test_true(req(atloc(P,'Area1000'))),
+   test_name("set the move dist to 5 meters"),
    do_player_action('@set movedist 5'),
-   dmsg("going 5 meters"),
+   test_name("going 5 meters"),
    do_player_action('n'),
-   dmsg("must be now be in corridor"),
-   req(atloc(P,'Area1001')),
+   test_name("must be now be in corridor"),
+   test_true(req(atloc(P,'Area1001'))),
    do_player_action('@set movedist 1'),
    call_n_times(5, do_player_action('s')),
    do_player_action('s'),
-   dmsg("must be now be back in engineering"),
-   req(atloc(P,'Area1000')))).
+   test_name("must be now be back in engineering"),
+   test_true(req(atloc(P,'Area1000'))))).
 
 moo:decl_mud_test(drop_take,
  (

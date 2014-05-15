@@ -272,10 +272,9 @@ anglify_noun_known(Obj,FT,String):- is_decl_ft(FT),isa_assert(Obj,FT,String),!.
 anglify_noun_known(Self,_Hint,[you]):- get_session_id(O),thlocal:current_agent(O,Self),!.
 anglify_noun_known(Obj,_Hint,[right,here]):- get_session_id(O),thlocal:current_agent(O,Self),atloc(Self,Obj),!.
 anglify_noun_known(Obj,_Hint,[here]):- get_session_id(O),thlocal:current_agent(O,Self),inRegion(Self,Obj),!.
-anglify_noun_known(Obj,_Hint,StringO):- findall(String,nameString(Obj,String),List),List\=[],sort_by_strlen(List,[StringO|_]),!.
+anglify_noun_known(Obj,_Hint,StringO):- findall(String,nameString_call(Obj,String),List),List\=[],sort_by_strlen(List,[StringO|_]),!.
 %anglify_noun_known(Obj,_Hint,String):-
-%nameString(X,Y,_,_)
-
+%nameString_call(X,Y,_,_)
 end_of_file.
 
 

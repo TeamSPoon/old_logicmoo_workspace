@@ -101,7 +101,7 @@ isa_assert(Arg,Props,NewArg):- compound(Props),
    C=..[F,Arg|TypesL],
    correctArgsIsa(C,CC),
    CC=..[F,NewArg|_].
-isa_assert(A,C,A):-must(ground(A)),dmsg(todo(define(isa_assert(A,C,'ConvertedArg')))),throw(retry(_)).
+isa_assert(A,C,A):-must(ground(A)),trace, dmsg(todo(define(isa_assert(A,C,'ConvertedArg')))),throw(retry(_)).
 
 isa_assert(A,Type,_NewArg):-throw(failure(isa_assert(A,Type))).
 
@@ -139,7 +139,7 @@ pgs(sorts(Type,List)):-forall_member(I,List,game_assert(subclass(I,Type))).
 pgs(predicates(List)):-forall_member(T,List,assert(db_prop_g(T))).
 
 pgs(description(A,E)):- must(once(add_description(A,E))).
-pgs(nameString(A,S0)):- determinerRemoved(S0,String,S),!,game_assert(nameString(A,S)),game_assert(determinerString(A,String)).
+pgs(nameString_call(A,S0)):- determinerRemoved(S0,String,S),!,game_assert(nameString_call(A,S)),game_assert(determinerString(A,String)).
 
 % skip formatter types
 pgs(A):- A=..[SubType,_],member(SubType,[string,action,dir]),!.

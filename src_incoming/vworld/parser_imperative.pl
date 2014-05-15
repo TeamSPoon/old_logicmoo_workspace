@@ -102,7 +102,7 @@ object_print_details(OS,Agent,O,DescSpecs,Skipped):-
   (
    object_print_details_fmt(OS,' ~w ',[O]),
    forall((keyword(O,KW),meets_desc_spec(KW,DescSpecs)),object_print_details_fmt(OS,' ~w ',[KW])),
-   forall((nameString(O,KW),meets_desc_spec(KW,DescSpecs)),object_print_details_fmt(OS,' ~w ',[KW])),
+   forall((nameString_call(O,KW),meets_desc_spec(KW,DescSpecs)),object_print_details_fmt(OS,' ~w ',[KW])),
    (mud_isa(O,type);forall((mud_isa(O,S), meets_desc_spec(mud_isa(O,S),DescSpecs)),object_print_details_fmt(OS,' ~w ',[mud_isa(S)]))),
    ignore((order_descriptions(O,DescSpecs,List),forall_member(M,List,object_print_details_fmt(OS,' ~w ',[M])))),
    forall(mud_isa(O,S),object_print_details(OS,Agent,S,DescSpecs,[O|Skipped])) )).

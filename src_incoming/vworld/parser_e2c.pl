@@ -38,8 +38,9 @@
 	 cyclifyNew/2,
 	 defaultMt/1,
 	 mtForPred/2,
-	 isRegisterCycPred/3,
+	 isRegisteredCycPred/3,
 	 registerCycPred/1,
+         registerCycPredPlus2/1,
 	 registerCycPred/2,
 	 registerCycPred/3,
 	 assertThrough/1,
@@ -47,6 +48,9 @@
 	 retractAllThrough/1,
 	 retractAllThrough/2,
          getVarAtom/2, 
+                   idGen/1, 
+                    list_to_term/2, 
+                    lowerCasePred/1,     
 	 testOpenCyc/0]).
 
 :- include(logicmoo('vworld/moo_header.pl')).
@@ -54,19 +58,12 @@
 :- register_module_type(utility).
 
 % posm_cached(Phrase,POS,Form,CycL)
-
-:-dynamic_multifile_exported 
-         posm_cached/4, posm_cached/5,
-                   idGen/1, 
-                    lex/3, 
-                    lexMap/3, 
-                    list_to_term/2, 
-                    lowerCasePred/1, 
-                     assertz_if_new/1.
+:-dynamic lex/3,  lexMap/3.
 
 %%lowerCasePred(CycLPred)
 lowerCasePred(Pred):-atom(Pred),atom_codes(Pred,[_,_,C|_]),char_type(C,lower).
 
+idGen(X):-flag(idGen,X,X+1).
 
 %list_to_term(X,Y):- balanceBinding(X,Y).
 list_to_term(X,Y):-nonvar(X),var(Y),!,list_to_terms_lr(X,Y).
@@ -474,7 +471,7 @@ addPrologKB:- defaultMt(Mt),!,ensureMt(Mt),cycAssert('BaseKB':'genlMt'(Mt,'Infer
 
 mtForPred(CycL,Mt):-
    functor(CycL,Pred,_),
-   isRegisterCycPred(Mt,Pred,_),!.
+   isRegisteredCycPred(Mt,Pred,_),!.
 
 mtForPred(_CycL,Mt):-defaultMt(Mt).
 
@@ -493,21 +490,30 @@ mtForPred(_CycL,Mt):-defaultMt(Mt).
 %  Query into #$BaseKB for (#$isa ?X ?Y) 
 %
 % ============================================
-:-dynamic(isRegisterCycPred/3).
+:-dynamic(isRegisteredCycPred/3).
 
 % ?- registerCycPred('BaseKB':isa/2). 
 registerCycPred(Mt:Pred/Arity):-!,
    registerCycPred(Mt,Pred,Arity).
+
 % ?- registerCycPred('BaseKB':isa(_,_)). 
 registerCycPred(Mt:Term):-
    functor(Term,Pred,Arity),
    registerCycPred(Mt,Pred,Arity).
 
 registerCycPred(M:F):-!, '@'(registerCycPred(F), M).
-registerCycPred(F/A):-!,dynamic(F/A),multifile(F/A), export(F/A).
+registerCycPred(F/A):- reallyRegisterCycPred(F,A).
 registerCycPred([A]):-!,registerCycPred(A).
 registerCycPred([A|L]):-!,registerCycPred(A),registerCycPred(L).
 registerCycPred((A,L)):-!,registerCycPred(A),registerCycPred(L).
+
+registerCycPredPlus2(M:F):-!, '@'(registerCycPredPlus2(F), M).
+registerCycPredPlus2(F/A):- A2 is A -2, registerCycPred(F/A2).
+registerCycPredPlus2([A]):-!,registerCycPredPlus2(A).
+registerCycPredPlus2([A|L]):-!,registerCycPredPlus2(A),registerCycPredPlus2(L).
+registerCycPredPlus2((A,L)):-!,registerCycPredPlus2(A),registerCycPredPlus2(L).
+
+reallyRegisterCycPred(F,A) :- registerCycPred(_,F,A).
 
 % ?- registerCycPred(isa(_,_),'BaseKB'). 
 registerCycPred(Term,Mt):-
@@ -515,12 +521,29 @@ registerCycPred(Term,Mt):-
    registerCycPred(Mt,Pred,Arity).
    
 % ?- registerCycPred('BaseKB',isa,2). 
+registerCycPred(Mt,_:Pred,Arity):-!,registerCycPred(Mt,Pred,Arity).
 registerCycPred(Mt,Pred,0):-!,registerCycPred(Mt,Pred,2).
-registerCycPred(Mt,Pred,Arity):-isRegisterCycPred(Mt,Pred,Arity),!.
+registerCycPred(Mt,Pred,Arity):-isRegisteredCycPred(Mt,Pred,Arity),!.
 registerCycPred(Mt,Pred,Arity):-
+      assertz(e2c:isRegisteredCycPred(Mt,Pred,Arity)),
+      M = e2c_data,
+      '@'(((
       functor(Term,Pred,Arity),
-      asserta(( Term :- cycQuery(Term,Mt))),
-      assertz(isRegisterCycPred(Mt,Pred,Arity)),!.
+      F = Pred,
+      A = Arity,
+      A2 is Arity + 2,
+      A3 is Arity + 3,
+      dynamic(F/A), multifile(F/A), export(F/A),
+      dynamic(F/A2), multifile(F/A2), export(F/A2),
+      dynamic(assertion_holds/A3), multifile(assertion_holds/A3), export(assertion_holds/A3),
+      Term =..[F|LST],
+      append(LST,[_Mt,_Vars],LLIST),
+      Term2 =..[F|LLIST],
+      Term3 =..[assertion_holds,F|LLIST],
+      % asserta(( Term :- cycQuery(Term,Mt)))
+      asserta((Term3 :- Term2 )),
+      asserta((Term3 :- Term ))
+      )),  M).
 
 % ============================================
 % Assert Side Effect Prolog to Cyc Predicate Mapping
@@ -542,7 +565,7 @@ assertThrough(CycL):-
 
 assertThrough(ToMt,CycL):-
       functor(CycL,Pred,Arity),
-      isRegisterCycPred(Mt,Pred,Arity),!,
+      isRegisteredCycPred(Mt,Pred,Arity),!,
       ignore(ToMt=Mt),
       cycAssert(CycL,ToMt),!.
 
@@ -570,7 +593,7 @@ retractAllThrough(CycL):-
 
 retractAllThrough(ToMt,CycL):-
       functor(CycL,Pred,Arity),
-      isRegisterCycPred(Mt,Pred,Arity),!,
+      isRegisteredCycPred(Mt,Pred,Arity),!,
       ignore(ToMt=Mt),
       cycRetract(CycL,ToMt),!.
 
@@ -584,8 +607,8 @@ retractAllThrough(ToMt,CycL):-
 % ============================================
 
 % examples
-:-registerCycPred('BaseKB',isa,2).
-:-registerCycPred('BaseKB',genls,2).
+:-registerCycPred('BaseKB',e2c_data:isa,2).
+:-registerCycPred('BaseKB',e2c_data:genls,2).
 :-registerCycPred('BaseKB',genlMt,2).
 
 
@@ -622,6 +645,11 @@ testOpenCyc:-halt.
    the third is the empty list.
 */
 
+:- style_check(-singleton).
+:- style_check(-discontiguous).
+:- style_check(-atom).
+% :- style_check(-string).
+
 e2c(English):-
       e2c(English,CycLOut),
       'fmt'('~w~n',[CycLOut]).
@@ -639,8 +667,8 @@ e2c([Eng|Lish],CycLOut):-
    try_e2c([Eng|Lish],_CycL,Rest)
    ))),
    % now may iterate out with rest pinned down
-   try_e2c(CycL,[Eng|Lish],Rest),
-   toCycApiExpression(CycLIn,CycLOut).
+   try_e2c(CycLMid,[Eng|Lish],Rest),
+   toCycApiExpression(CycLMid,CycLOut).
    
    
 try_e2c(CycL,English,Rest):-sentence(CycL,English,Rest),!.
@@ -1054,7 +1082,8 @@ fp([N|_],N).
 % ============================================================================
 
 posMeans(Phrase,POS,Form,CycL):-
-      posm_cached,!,posm_cached(Phrase,POS,Form,CycL).
+      posm_cached,!,
+      posm_cached(_CycWord,Phrase,POS,Form,CycL).
 
 
 posMeans(Phrase,POS,Form,CycL):-
@@ -1066,8 +1095,9 @@ posMeans(Phrase,POS,Form,CycL):-
 
 cache_the_posm:-
       posm_c(Phrase,POS,Form,CycL),
-      assertz_if_new(posm_cached(Phrase,POS,Form,CycL)),%write(.),flush,
-      %fmt('~q~n',[posm_cached(CycWord,Phrase,POS,Form,CycL)]),
+      CycWord = _,
+      assert_if_new(posm_cached(CycWord,Phrase,POS,Form,CycL)),%write(.),flush,
+      %fmt('~q~n',[posm_cached(Phrase,POS,Form,CycL)]),
       fail.
    
 cache_the_posm.
@@ -1108,7 +1138,7 @@ posm_c(Term,'SimpleNoun',normal,Proper) :-
       'formerName'(Proper, Term);
       'scientificName'(Proper, Term);
       'termStrings-GuessedFromName'(Proper, Term);
-      'nameString'(Proper, Term).
+      e2c_data:'nameString'(Proper, Term).
 
 %'abbreviationString-PN'('India', ['IND']).
 posm_c(Term,'ProperNoun',normal,Proper) :- 
@@ -1122,7 +1152,7 @@ posm_c(Eng,POS,Form,CycL):-
 	 pos(CycWord,Eng,POS,Form),
 	 posm_build(CycWord,Eng,POS,Form,CycL).
 
-% posm_c(Eng,POS,Form,CycL):-posTT(CycWord,Eng,POS,Form),'TTPred-denotation'(CycWord, POS, _, CycL).
+% posm_c( Eng,POS,Form,CycL):-posTT(CycWord,Eng,POS,Form),'$$TTPred-denotation'(CycWord, POS, _, CycL).
 
 
 %'denotation'('Capacity-TheWord', 'SimpleNoun', 0, 'Volume').
@@ -1161,9 +1191,9 @@ posTT(CycWord,Phrase,POS,Form:PosForms):- fail.
 
 %:-at_initialization(convertCycKb).
 :-dynamic(posm_cached).
-:-dynamic(posm_cached/4).
-:-dynamic(real_posm_cached/4).
-:-dynamic(real_posm_cachedTT/4).
+:-dynamic(posm_cached/5).
+:-dynamic(real_posm_cached/5).
+:-dynamic(real_posm_cachedTT/5).
 
 
   
@@ -1210,7 +1240,7 @@ partition_cache(CycWord,Phrase,POS,Form,CycL):-
 
 partition_cache(CycWord,Phrase,POS,Form,meaningOfWord(CycWord)):-!,
    posm_cached(CycWord,Phrase,_,_,CycL),not(CycL=meaningOfWord(_)),
-   assertz_if_new(real_posm_cached(CycWord,Phrase,POS,Form,CycL)).
+   assert_if_new(real_posm_cached(CycWord,Phrase,POS,Form,CycL)).
       
    %real_posm_cached('Type-TheWord', [of, geographical, entity, classified, by, hierarchy], 'SimpleNoun', form, 'GeographicalEntityByHierarchy').
 partition_cache(CycWord,Phrase,POS,form,CycL):-!,
@@ -1220,7 +1250,7 @@ partition_cache(CycWord,Phrase,POS,form,CycL):-!,
       
 
 partition_cache(CycWord,Phrase,POS,Form,CycL):-!,
-   assertz_if_new(real_posm_cached(CycWord,Phrase,POS,Form,CycL)).
+   assert_if_new(real_posm_cached(CycWord,Phrase,POS,Form,CycL)).
 
 % ======================================================
 % Partitinion TT CycNL
@@ -1228,17 +1258,17 @@ partition_cache(CycWord,Phrase,POS,Form,CycL):-!,
 % ======================================================
 
 % Delete copies of cycNL from TT
-partition_cacheTT(CycWord,Phrase,POS,Form,CycL):-
+partition_cacheTT(_CycWord,Phrase,POS,Form,CycL):-
    posm_cached(OCycWord,Phrase,_,_,_),
    atom(OCycWord),
    not(atom_concat('TT',_,OCycWord)),!.
 
 partition_cacheTT(CycWord,Phrase,POS,Form,meaningOfWord(CycWord)):-
    posm_cached(CycWord,Phrase,_,_,CycL),not(CycL=meaningOfWord(_)),!,
-   assertz_if_new(real_posm_cachedTT(CycWord,Phrase,POS,Form,CycL)).
+   assert_if_new(real_posm_cachedTT(CycWord,Phrase,POS,Form,CycL)).
 
 partition_cacheTT(CycWord,Phrase,POS,Form,CycL):-!,
-   assertz_if_new(real_posm_cachedTT(CycWord,Phrase,POS,Form,CycL)).
+   assert_if_new(real_posm_cachedTT(CycWord,Phrase,POS,Form,CycL)).
 
 
 
@@ -1462,7 +1492,7 @@ cycPred('affixRuleTypeMorphemePosition').
 cycPred('etymologicalVariantOfSuffix').
 cycPred('variantOfSuffix').
 cycPred('relationInstanceAll').
-cycPred('genls').
+cycPred(e2c_data:'genls').
 cycPred('disjointWith').
 cycPred('coExtensional').
 cycPred('partitionedInto').
@@ -3064,7 +3094,7 @@ colection(Subj,isaMember(Subj,CycL)) --> isPOS('Noun',CycWord,String),
 
 wordPosCycL(CycWord,POS,CycL):-
       'denotation'(CycWord, POS, _, CycL,_,_);'denotationRelatedTo'(CycWord, POS, _, CycL,_,_).
-wordPosCycL(CycWord,POS,CycL):-'genls'(Child,POS,_,_),wordPosCycL(CycWord,Child,CycL).
+wordPosCycL(CycWord,POS,CycL):- e2c_data:'genls'(Child,POS,_,_),wordPosCycL(CycWord,Child,CycL).
 wordPosCycL(CycWord,_,CycL):-
       'denotation'(CycWord, POS, _, CycL,_,_);'denotationRelatedTo'(CycWord, POS, _, CycL,_,_).
       
@@ -3088,7 +3118,7 @@ poStr(CycL,String):-
       'termStrings'(CycL,String, _,_);
       'termStrings-GuessedFromName'(CycL,String, _,_);
       'prettyName'(CycL,String, _,_);
-      'nameString'(CycL,String, _,_);
+      e2c_data:'nameString'(CycL,String, _,_);
       'nicknames'(CycL,String, _,_);
       'preferredTermStrings'(CycL,String, _,_).
 
@@ -3166,7 +3196,7 @@ meetsPos(String,POS,CycWord):- (var(String);var(POS)),throw(meetsPos(String,POS,
 meetsPos([String],POS,CycWord):-!,meetsPos(String,POS,CycWord).
 meetsPos(String,POS,CycWord):-'partOfSpeech'(CycWord,POS, String,_,_).
 meetsPos(String,POS,CycWord):-stringToWordForm(String,CycWord,Form),cycWordPosForm(POS,CycWord,Form).
-meetsPos(String,POS,CycWord):-'genls'(Child,POS,_,_),meetsPos(String,Child,CycWord).
+meetsPos(String,POS,CycWord):-e2c_data:'genls'(Child,POS,_,_),meetsPos(String,Child,CycWord).
 meetsPos(String,'Verb',CycWord):-atom(String),meetsPosVerb(String,CycWord),!.
 
 %meetsPos(String,'Noun',CycWord):-atom(String),meetsPosNoun(String,CycWord).
@@ -3390,7 +3420,7 @@ verb_phrase(Subj,Event,and_concat(CycL)) --> [Verb],
 	 {atom(Verb),((atom_concat('',Verb,Predicate),'arity'(Predicate,N,_,_));('arity'(Verb,N,_,_),Predicate=Verb)),!},
 	 verb_phrase_arity(N,Predicate,Subj,Event,CycL).
 
-:-index(verb_phrase_arity(0,0,0,0,0,0,0)).
+% :-index(verb_phrase_arity(0,0,0,0,0,0,0)).
 %TODO rename subject/3 to noun_phrase/3
 verb_phrase_arity(2,Predicate,Subj,Event,CycL) --> 
 	       best_subject(Obj,ACT,Mid),

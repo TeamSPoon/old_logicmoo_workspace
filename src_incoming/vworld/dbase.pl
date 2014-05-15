@@ -15,9 +15,9 @@
 :- module(dbase, [
 
  add/1, add0/1, agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, ofclass/2, clr/1, damage/2, db_op/2, atloc/2, 
- db_prop_g/1, db_prop_game_assert/1, del/1, failure/2, grid/4, inRegion/2, mud_isa/2, item/1, 
+ db_prop_g/1, db_prop_game_assert/1, del/1, failure/2, grid/4, mud_isa/2, item/1, 
  memory/2, padd/2, padd/3, pathName/3, possess/2, prop/3, prop_or/4, props/2, region/1, req/1, scan_db_prop/0, score/2, stm/2, term_listing/1,  facing/2,
- thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, nameString/2, description/2, pathBetween/3, act_turn/2,
+ thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, nameString_call/2, description/2, act_turn/2,
  dbase_mod/1, dbase_define_db_prop/2,
  clause_present_1/3,
  with_kb_assertions/2
@@ -28,10 +28,10 @@
 
 :- dynamic 
  dbase_mod/1,
- add/1, add0/1, agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, ofclass/2, clr/1, damage/2, db_op/2,atloc/2, 
- db_prop_g/1, db_prop_game_assert/1, del/1, failure/2, grid/4, inRegion/2, mud_isa/2, item/1, 
- memory/2, padd/2, padd/3, pathName/3, possess/2, prop/3, prop_or/4, props/2, region/1, req/1, scan_db_prop/0, score/2, stm/2, term_listing/1, facing/2,
- thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, nameString/2, description/2, pathBetween/3, act_turn/2.
+ add/1, add0/1, agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, ofclass/2,  damage/2, db_op/2,atloc/2, 
+ db_prop_g/1, db_prop_game_assert/1, del/1, failure/2, grid/4, mud_isa/2, item/1, 
+ memory/2, pathName/3, possess/2, region/1, req/1, scan_db_prop/0, score/2, stm/2, term_listing/1, facing/2,
+ thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, nameString_call/2, description/2, act_turn/2.
 
 dbase_mod(dbase).
 /*
@@ -389,8 +389,8 @@ compare_n(Last,NewLast):-number(NewLast),not(number(Last)),throw(incomparable_te
 compare_n(NewLast,Last):-atomic(NewLast),not(atomic(Last)),throw(incomparable_terms(Last,NewLast)).
 compare_n(Last,NewLast):-atomic(NewLast),not(atomic(Last)),throw(incomparable_terms(Last,NewLast)).
 
-inRegion(O,Region):-atloc(O,LOC),locationToRegion(LOC,Region).
-inRegion(apath(Region,Dir),Region):-pathBetween(Region,Dir,_To).
+e2c_data:inRegion(O,Region):-atloc(O,LOC),locationToRegion(LOC,Region).
+e2c_data:inRegion(apath(Region,Dir),Region):-e2c_data:pathBetween(Region,Dir,_To).
 
 
 member_or_e(E,[L|List]):-!,member(E,[L|List]).
@@ -432,7 +432,7 @@ db_prop_sv(defence(agent,int)).
 db_prop_sv(facing(agent,dir)).
 db_prop_sv(height(agent,int)).
 db_prop_sv(id(object,id)).
-db_prop_sv(inRegion(term,region)).
+db_prop_sv(e2c_data:inRegion(term,region)).
 db_prop_sv(last_command(agent,command)).
 db_prop_sv(location_center(region,xyz(region,int,int,int))).
 db_prop_sv(movedist(agent,number)).
@@ -440,7 +440,7 @@ db_prop_sv(mudBareHandDamage(agent,dice)).
 db_prop_sv(mudLevelOf(possessable,int)).
 db_prop_sv(mudMaxHitPoints(agent,int)).
 db_prop_sv(mudToHitArmorClass0(agent,int)).
-db_prop_sv(pathBetween(region,dir,region)).
+db_prop_sv(e2c_data:pathBetween(region,dir,region)).
 db_prop_sv(permanence(item,verb,int)).
 db_prop_sv(score(object,int)).
 db_prop_sv(spawn_rate(moo:subclass(object),int)).
@@ -535,7 +535,7 @@ moo:term_anglify(verbFn(F),[is,F]):-atom_concat(_,'ing',F).
 moo:term_anglify(verbFn(F),[F,is]).
 % moo:term_anglify(prolog(Term),String):-term_to_atom(Term,Atom),any_to_string(Atom,String).
 moo:term_anglify(determinerString(Obj,Text),[np(Obj),is,uses,string(Text),as,a,determiner]).
-moo:term_anglify(nameString(Obj,Text),[np(Obj),is,refered,to,as,string(Text)]).
+moo:term_anglify(nameString_call(Obj,Text),[np(Obj),is,refered,to,as,string(Text)]).
 moo:term_anglify(moo:term_anglify(Term,List),[prolog(Term),is,converted,to,english,using,prolog(Text)]).
 
 
@@ -555,7 +555,7 @@ db_prop_multi(ofclass(term,type),[alias(mud_isa)]).
 db_prop_multi(G,[]):-db_prop_multi(G).
 
 db_prop_multi(failure(agent,action)).
-db_prop_multi(nameString(term,string)).
+db_prop_multi(nameString_call(term,string)).
 db_prop_multi(determinerString(term,string)).
 db_prop_multi(descriptionHere(term,string)).
 db_prop_multi(description(term,string)).
@@ -625,7 +625,7 @@ ensure_clause(HEAD,F,A,BODY):-assertz((HEAD:-BODY)),
    nop(compile_predicates([HEAD])).
 
 
-nameString(apath(Region,Dir),Text):- pathName(Region,Dir,Text).
+nameString_call(apath(Region,Dir),Text):- pathName(Region,Dir,Text).
 description(apath(Region,Dir),Text):- pathName(Region,Dir,Text).
 
 scan_db_prop:-
