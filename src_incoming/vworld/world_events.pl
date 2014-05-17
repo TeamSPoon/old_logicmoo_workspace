@@ -15,17 +15,25 @@
 asInvoked([L|Ist],Cmd):-atom(L),!, Cmd=..[L|Ist].
 asInvoked(List,Cmd):-Cmd=..[asInvoked|List].
 
-atlocNear(Whom,Where):-atloc(Whom,LOC),locs_near(LOC,Where).
-raise_location_event(Where,Event):-
-   forall(atlocNear(Whom,Where),raise_event(Whom,Event)).
+atlocNear(Whom,Where):-nonvar(Where),!,findall(Whom,atlocNear0(Whom,Where),List),list_to_set(List,Set),!,member(Whom,Set).
+atlocNear(Whom,Where):-nonvar(Whom),!,findall(Where,atlocNear0(Whom,Where),List),list_to_set(List,Set),!,member(Where,Set).
+atlocNear(Whom,Where):-findall(Whom+Where,atlocNear0(Whom,Where),List),list_to_set(List,Set),!,member(Whom+Where,Set).
+
+atlocNear0(Whom,Where):-locs_near(Where,LOC),atloc(Whom,LOC).
+
+raise_location_event(Where,Event):- forall(atlocNear(Whom,Where),ignore(show_event_to(Whom,Event))).
 :-export(raise_location_event/2).
 
-raise_event(Whom,Event):-subst(Event,reciever,Whom,NewEvent),send_to_agent(Whom,NewEvent),!.
-:-export(raise_event/2).
 
-send_to_agent(Whom,NewEvent):- agent_message_stream(Whom,_Input,Output),!,fmt(Output,' ~n Event: ~q. ~n ',[NewEvent]).
-send_to_agent(Whom,NewEvent):- nop(could_not(send_to_agent(Whom,NewEvent))).
-:-export(send_to_agent/2).
+show_event_to(Whom,Event):-subst(Event,reciever,you,NewEventM),subst(NewEventM,Whom,you,NewEvent),direct_to_agent(Whom,NewEvent),!.
+direct_to_agent(Whom,NewEvent):- 
+      ensure_agent_stream(Whom,Session,Output),
+      with_assertions(thlocal:current_agent(Session,Whom),ignoreOnError((with_output_to_stream(Output,fmt(NewEvent))))),!.
+
+direct_to_agent(Whom,NewEvent):- nop(dmsg(could_not(direct_to_agent(Whom,NewEvent)))).
+%%:-export(direct_to_agent/2).
+ensure_agent_stream(Whom,Input,Output):-agent_message_stream(Whom,Input,Output),is_stream(Input),is_stream(Output),!.
+ensure_agent_stream(Whom,_Input,_Output):-ignore(retract(agent_message_stream(Whom,_,_))),!,fail.
 
 :-export(deliverable_location_events/3).
 

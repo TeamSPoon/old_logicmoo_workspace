@@ -119,17 +119,22 @@ region_near(R1,R1).
 
 moo:type_default_props(OfAgent,agent,[facing(F),atloc(L)]):-create_someval(facing,OfAgent,F),create_someval(atloc,OfAgent,L).
 
-put_in_world(Agent):-ensure_some(atloc,Agent),ensure_some(facing,Agent),!.
+put_in_world(Agent):-ensure_some(facing,Agent),!,ensure_some(atloc,Agent),!.
 
 ensure_some(Property,OfAgent):- prop(OfAgent, Property,_),!.
 ensure_some(Property,OfAgent):- create_someval(Property,OfAgent,Value),padd(OfAgent,Property,Value).
 
 create_someval(facing,_Agent,Dir) :- random_member(Dir,[n,s,e,w,ne,nw,se,sw]).
-create_someval(atloc,Agent,Where) :- req(inRegion(Agent,Region)),
+create_someval(atloc,Agent,Where) :- 
+   defaultRegion(Agent,Region),
    in_grid(Region,Where),
    unoccupied(Where),!.
-
 create_someval(atloc,_Agent,Loc) :- find_unoccupied(Loc).
+
+defaultRegion(Agent,Region):- inRegion(Agent,Region),!.
+defaultRegion(_Agent,Region):- inRegion(_,Region),!.
+defaultRegion(_Agent,Region):- Region = 'Area1000'.
+
 
 decide_region(LOC):- findall(O,region(O),LOCS),random_member(LOC,LOCS).
 

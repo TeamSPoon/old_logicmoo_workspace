@@ -232,10 +232,10 @@ flatten_append(First,Last,Out):-flatten([First],FirstF),flatten([Last],LastF),ap
 local_term_anglify(Var,[prolog(Var)]):- var(Var),!.
 local_term_anglify([Var],[prolog([Var])]):- var(Var),!.
 
-local_term_anglify(np(P),English):-!, local_term_anglify((P),English).
-local_term_anglify(noun_phrase(P),English):-!, local_term_anglify((P),English).
+local_term_anglify(np(P),English):- local_term_anglify_np(P,English).
+local_term_anglify(noun_phrase(P),English):- local_term_anglify_np(P,English).
 
-
+local_term_anglify(notice(Who,What),[np(Who),notices,What]).
 local_term_anglify(fN(Region,region),[(String)]):- nameString(Region,String),!.
 
 local_term_anglify(fN(Region,region),[nameString1(String)]):- holds_t(nameString,Region,String),!.
@@ -261,6 +261,10 @@ local_term_anglify(fN(Obj,X),String):- locationToRegion(Obj,Region), Obj \= Regi
 % should not have searched nouns yet
 local_term_anglify(fN(Obj,T),String):- local_term_anglify_np(Obj,T,String),!.
 
+local_term_anglify(done(Obj,Term),[fN(Obj,np),did,:,Term]).
+local_term_anglify(failed(Obj,Term),[fN(Obj,np),didnt,:,Term]).
+local_term_anglify(do(Obj,Term),[fN(Obj,np),begun,:,Term]).
+
 
 % almost all else failed
 local_term_anglify(fN(Obj,T),String):- anglify_noun_known(Obj,T,String),!.
@@ -272,12 +276,14 @@ local_term_anglify(fN(Obj,T),String):- anglify_noun_known(Obj,T,String),!.
 
 moo:term_anglify_np(Obj,Hint,String):-local_term_anglify_np(Obj,Hint,String).
 
+local_term_anglify_np(Obj,String):-mud_isa(Obj,Isa),local_term_anglify_np(Obj,Isa,String),!.
+local_term_anglify_np(Obj,String):-local_term_anglify_np(Obj,term,String).
+
 % specific noun searching
 local_term_anglify_np(Obj,Hint,String):- anglify_noun_known(Obj,Hint,String),!.
 local_term_anglify_np(Obj,dir,Obj):- !.
 local_term_anglify_np(string(Obj),string,Obj):- !.
 local_term_anglify_np(Obj,string,Obj):- !.
-
 
 local_term_anglify_np_last(Obj,Hint,String):- anglify_noun_known(Obj,Hint,String),!.
 local_term_anglify_np_last(Obj,FT,String):- is_decl_ft(FT),isa_assert(Obj,FT,String),!.
@@ -288,10 +294,11 @@ local_term_anglify_np_last(Obj,Type,[prolog(Obj),fN,Type]):-!.
 local_term_anglify_np_last(Obj,_,[the,noun,with,token,Obj]):-!.
 
 
+% anglify_noun_known(Self,_Hint,[you]):- current_agent(Self),!.
 anglify_noun_known(Obj,FT,String):- is_decl_ft(FT),isa_assert(Obj,FT,String),!.
-anglify_noun_known(Self,_Hint,[you]):- get_session_id(O),thlocal:current_agent(O,Self),!.
-anglify_noun_known(Obj,_Hint,[right,here]):- get_session_id(O),thlocal:current_agent(O,Self),atloc(Self,Obj),!.
-anglify_noun_known(Obj,_Hint,[here]):- get_session_id(O),thlocal:current_agent(O,Self),req(inRegion(Self,Obj)),!.
+anglify_noun_known(explorer(StringO),_Hint, [StringO]).
+anglify_noun_known(Obj,_Hint,[right,here]):- current_agent(Self),atloc(Self,Obj),!.
+anglify_noun_known(Obj,_Hint,[here]):- current_agent(Self),req(inRegion(Self,Obj)),!.
 anglify_noun_known(Obj,_Hint,StringO):- findall(String,holds_t(nameString,Obj,String),List),List\=[],sort_by_strlen(List,[StringO|_]),!.
 %anglify_noun_known(Obj,_Hint,String):-
 %nameString(X,Y,_,_)

@@ -39,6 +39,7 @@ start_mud_telent(Port):- telnet_server(Port, [allow(_ALL),call_pred(login_and_ru
 
 login_and_run:-
   foc_current_player(P),
+   ensure_player_stream_local(P,_,_),
    threads,
    call_agent_command(P,'who'),
    call_agent_command(P,'look'),
@@ -52,6 +53,7 @@ login_and_run:-
 run_player_telnet(P) :-    
       foc_current_player(P),
       get_session_id(O),
+      retractall(wants_logout(P)),
       with_assertions(thlocal:current_agent(O,P),
        ((repeat,
         once(read_and_do_telnet(P)), 
@@ -59,19 +61,24 @@ run_player_telnet(P) :-
         retract(wants_logout(P)),
         retractall(agent_message_stream(P,_,_))))).
 
-read_and_do_telnet(P):-
+
+ensure_player_stream_local(P,Input,Output):-
    current_input(Input),
    current_output(Output),
-   retractall(agent_message_stream(P,_,_)),
-   assert(agent_message_stream(P,Input,Output)),
+   (agent_message_stream(P,Input,Output)->true;
+      ((retractall(agent_message_stream(P,_,_)),
+     assert(agent_message_stream(P,Input,Output))))),!.
+
+read_and_do_telnet(P):-
+   ensure_player_stream_local(P,_,_),
          must(ignore(look_brief(P))),!,
-            ((sformat(S,'~w>',[P]),prompt_read(S,List))),!,
+           sformat(S,'~w>',[P]),prompt_read(S,List),
             must(once(do_player_action(List))),!.
 
 prompt_read(Prompt,Atom):-
-        current_input(In),
         fresh_line,
         fmt0('~n~w ',[Prompt]),
+        current_input(In),
 	read_line_to_codes(In,Codes),
         foc_current_player(P),
          (is_list(Codes)-> atom_codes(Atom,Codes);
