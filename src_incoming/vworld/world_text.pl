@@ -124,7 +124,7 @@ is_leave_alone(exact_message).
 is_leave_alone(todo).
 is_leave_alone((error)).
 is_leave_alone(parserm).
-is_leave_alone(F):-not((is_db_prop(F,_,_))).
+is_leave_alone(F):-is_db_prop(F,_,_),!,fail.
 is_leave_alone(A):-failOnError((sub_atom(A,_,1,0,S),atom_number(S,_))),!.
 
 moo:term_anglify(A,B):-local_term_anglify(A,B).
