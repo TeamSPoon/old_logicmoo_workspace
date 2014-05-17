@@ -61,7 +61,7 @@ read_and_do_telnet(P):-
    retractall(agent_message_stream(P,_,_)),
    assert(agent_message_stream(P,Input,Output)),
          must(ignore(look_brief(P))),!,
-            notrace((sformat(S,'~w>',[P]),prompt_read(S,List))),!,
+            ((sformat(S,'~w>',[P]),prompt_read(S,List))),!,
             must(once(do_player_action(List))),!.
 
 prompt_read(Prompt,Atom):-
@@ -91,16 +91,16 @@ do_player_action(Agent,CMD):-var(CMD),!,fmt('unknown_var_command(~q,~q).',[Agent
 do_player_action(_,end_of_file):-tick_tock.
 do_player_action(_,''):-tick_tock.
 do_player_action(Agent,CMD):- call_agent_command(Agent, CMD),!.
-% do_player_action(Agent,CMD):- trace, call_agent_command(Agent, CMD),!.
-do_player_action(Agent,CMD):-fmt('unknown_call_command(~q,~q).',[Agent,CMD]).
+% do_player_action(Agent,CMD):- fmt('unknown_call_command(~q,~q).', trace, call_agent_command(Agent, CMD),!.
+do_player_action(Agent,CMD):-fmt('skipping_unknown_call_command(~q,~q).',[Agent,CMD]).
 
 
 % ===========================================================
 % DEFAULT TELNET "LOOK"
 % ===========================================================
-look_brief(_Agent):-!.
+look_brief(Agent):- not(props(Agent,needs_look(true))).
 look_brief(Agent):- prop(Agent,last_command,X),functor(X,look,_),!.
-look_brief(Agent):- call_agent_action(Agent,look).
+look_brief(Agent):- clr(props(Agent,needs_look(true))),call_agent_action(Agent,look).
 
 telnet_repl_writer(_TL,call,term,Goal):-!,ignore(debugOnError(Goal)).
 telnet_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=t),fmt('~q=(~w)~q.~n',[N,TypeO,V]).

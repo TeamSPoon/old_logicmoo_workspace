@@ -20,7 +20,7 @@ grid_dist(L1,L2,Dist):- to_3d(L1,L13D),to_3d(L2,L23D),dist(L13D,L23D,Dist),!.
 
 dist(_,_,5).
 
-pathBetween_call(From,Dir,To):-any_to_dir(Dir,Dir2),pathBetween(From,Dir2,To),same(Dir,Dir2).
+pathBetween_call(From,Dir,To):-any_to_dir(Dir,Dir2),holds_t(pathBetween,From,Dir2,To),same(Dir,Dir2).
    
 % 5x5 rooms are average
 %% to_3d(L1,L13D):-compound(L1)->L13D=L1; room_center(L1,X,Y,Z), L13D = xyz(L1,X,Y,Z).
@@ -139,9 +139,9 @@ calc_xyz(Region1,Dir,force(X1,Y1,Z1),X2,Y2,Z2):-
 move_dir_target(RegionXYZ,Dir,XXYY):-
    move_dir_target(RegionXYZ,Dir,1,XXYY).
 move_dir_target(RegionXYZ,Dir,Force,XXYY):-
-   notrace(calc_xyz(RegionXYZ,Dir,force(Force,Force,Force),X,Y,Z)),
-   notrace(locationToRegion(RegionXYZ,Region1)),
-   notrace(round_loc_target(Region1,X,Y,Z,Region2,X2,Y2,Z2)),
+   hotrace(calc_xyz(RegionXYZ,Dir,force(Force,Force,Force),X,Y,Z)),
+   hotrace(locationToRegion(RegionXYZ,Region1)),
+   hotrace(round_loc_target(Region1,X,Y,Z,Region2,X2,Y2,Z2)),
    XXYY = xyz(Region2,X2,Y2,Z2),!,
    must(ground(XXYY)),
    check_ahead_for_ground(XXYY).
@@ -198,7 +198,8 @@ in_world_move(LOC,Agent,Dir) :-
         ignore(atloc(Agent,LOC)),
         in_world_move0(LOC,Agent,Dir),
         atloc(Agent,LOC2),
-        must(LOC2 \== LOC).
+        must(LOC2 \== LOC),
+        padd(Agent,[needs_look(true)]).
   
 in_world_move0(LOC,Agent,Dir) :-
         padd(Agent,facing(Dir)),

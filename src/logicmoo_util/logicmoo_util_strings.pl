@@ -74,7 +74,7 @@ clean_out_atom(X,Y):-atom_codes(X,C),clean_codes(C,D),!,atom_codes(X,D),!,Y=X.
 
 all_upper_atom(X):-toUppercase(X,N),!,N=X.
 
-atom_contains(F,C):- hotrace((atom(F),atom(C),sub_atom(F,_,_,_,C))).
+atom_contains(F,C):- notrace((atom(F),atom(C),sub_atom(F,_,_,_,C))).
 
           
 atomic_list_concat_safe(O,''):- O=[],!.
@@ -279,7 +279,7 @@ ltrim([32,32|String],Out) :- trim(String,Out),!.
 ltrim([P|X],Y):- (isWhitespace(P);not(number(P));P<33;P>128),trim(X,Y),!.
 ltrim(X,X).
 
-any_to_string(Atom,String):-notrace(once(any_to_string0(Atom,String))).
+any_to_string(Atom,String):- notrace(once(any_to_string0(Atom,String))).
 
 any_to_string0(Atom,String):-var(Atom),!,term_to_atom(Atom,AAtom),!,any_to_string0(AAtom,String),!.
 any_to_string0(Atom,String):-string(Atom),Atom=String,!.
@@ -334,8 +334,8 @@ atomSplit(Atom,WordsO):-
 %%atomSplit(Atom,WordsO):- atomSplit(Atom,WordsO,[' ','\'',';',',','"','`',':','?','!','.','\n','\t','\r','\\','*','%','(',')','#']),!.
 
 atomSplit(S,WordsO,List):- notrace(( string(S),string_to_atom(S,Atom), atomic_list_concat(Words1,' ',Atom),!, atomSplit2(Words1,Words,List),!, Words=WordsO )).
-atomSplit(Atom,WordsO,List):- notrace(( atom(Atom), atomic_list_concat(Words1,' ',Atom),!, atomSplit2(Words1,Words,List),!, Words=WordsO )).
-atomSplit(Atom,Words,[Space|AtomO]):-notrace((var(Atom),ground(Words),!,atomic_list_concat(Words,Space,AtomO),!,Atom=AtomO)).
+atomSplit(Atom,WordsO,List):- hotrace(( atom(Atom), atomic_list_concat(Words1,' ',Atom),!, atomSplit2(Words1,Words,List),!, Words=WordsO )).
+atomSplit(Atom,Words,[Space|AtomO]):-hotrace((var(Atom),ground(Words),!,atomic_list_concat(Words,Space,AtomO),!,Atom=AtomO)).
 
 
 atomSplit2([],[],_List):-!.

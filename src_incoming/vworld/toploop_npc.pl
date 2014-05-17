@@ -17,7 +17,7 @@
 :- include(logicmoo('vworld/moo_header.pl')).
 
 :- dynamic(npc_tick_tock_time/1).
-npc_tick_tock_time(30).
+npc_tick_tock_time(300).
 
 npc_tick_tock:-
    npc_tick_tock_time(Time),sleep(Time),
@@ -30,7 +30,7 @@ npc_tick:-
 join_npcs_long_running.
 
 % skip manually controled agents
-npc_controller(simple_world_agent_plan,Who):- req(agent(Who)),not(agent_message_stream(Who,_,_)).
+npc_controller(simple_world_agent_plan,Who):- call(dbase:agent(Who)),not(agent_message_stream(Who,_,_)).
 
 tick_controller(simple_world_agent_plan,Who):- tick(Who).
 

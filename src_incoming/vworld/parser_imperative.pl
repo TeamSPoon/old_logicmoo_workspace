@@ -24,10 +24,11 @@
                    parseForTypes//2]).
 
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo('vworld/moo_header')).
 
 :- register_module_type(utility).
 
+:- ensure_loaded(logicmoo('vworld/parser_e2c')).
 
 % ===========================================================
 % PARSE command
@@ -101,7 +102,7 @@ object_print_details(OS,Agent,O,DescSpecs,Skipped):-
    once(member(O,Skipped);
   (
    object_print_details_fmt(OS,' ~w ',[O]),
-   forall((keyword(O,KW),meets_desc_spec(KW,DescSpecs)),object_print_details_fmt(OS,' ~w ',[KW])),
+   forall((holds_t(keyword(O,KW)),meets_desc_spec(KW,DescSpecs)),object_print_details_fmt(OS,' ~w ',[KW])),
    forall((holds_t(nameString,O,KW),meets_desc_spec(KW,DescSpecs)),object_print_details_fmt(OS,' ~w ',[KW])),
    (mud_isa(O,type);forall((mud_isa(O,S), meets_desc_spec(mud_isa(O,S),DescSpecs)),object_print_details_fmt(OS,' ~w ',[mud_isa(S)]))),
    ignore((order_descriptions(O,DescSpecs,List),forall_member(M,List,object_print_details_fmt(OS,' ~w ',[M])))),
@@ -181,7 +182,7 @@ parse_agent_text_command_1(Agent,IVERB,ARGS,NewAgent,GOAL):-
 moo:verb_alias('l','look').
 moo:verb_alias('where is','where').
 
-pos_word_formula('infinitive',Verb,Formula):- e2c_data:'infinitive'(TheWord, Verb, _, _G183), e2c_data:'verbSemTrans'(TheWord, 0, 'TransitiveNPCompFrame', Formula, _, _).
+pos_word_formula('infinitive',Verb,Formula):- dbase:'infinitive'(TheWord, Verb, _, _G183), dbase:'verbSemTrans'(TheWord, 0, 'TransitiveNPCompFrame', Formula, _, _).
 
 verb_alias_to_verb(IVERB,SVERB):-moo:verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.
 verb_alias_to_verb(IVERB,SVERB):-specifiedItemType(IVERB,verb,SVERB), IVERB \= SVERB.
@@ -320,6 +321,6 @@ longest_string(Order,TStr1,TStr2):-
 
 
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo('vworld/moo_footer')).
 
 

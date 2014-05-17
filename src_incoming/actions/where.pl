@@ -36,7 +36,7 @@ moo:agent_call_command(_Agent,where(SObj)) :-
 
 moo:decl_action(agent,who(optional(agent,_)),"Lists who is online (where they are at least)").
 
-moo:agent_call_command(_Gent,who(Agnt2)) :- C = moo:dbase_true(inRegion,Agnt2,_Where), forall(req(C),dmsg(fmt(cmdresult(who(Agnt2),C)))).
+moo:agent_call_command(_Gent,who(Agnt2)) :- C = debase:dbase_true(inRegion,Agnt2,_Where), forall(req(C),dmsg(fmt(cmdresult(who(Agnt2),C)))).
 
 
 :- include(logicmoo('vworld/moo_footer.pl')).

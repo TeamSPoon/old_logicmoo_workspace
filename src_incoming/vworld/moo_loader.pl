@@ -132,14 +132,20 @@ game_assert(A):-must(once(correctArgsIsa(A,AA))),must(once(pgs(AA))),!.
 % pgs(A):- fail, A=..[SubType,Arg], moo:createableType(SubType,Type),!,AA =.. [Type,Arg],
 %      dbadd0(AA), assert_if_new(moo:call_after_load(create_instance(Arg,SubType,[debugInfo(moo:createableType(AA,SubType,Type))]))).   
 
+
+
+% ================================================
+% pgs
+% ================================================
 pgs(somethingIsa(A,List)):-forall_member(E,List,game_assert(ofclass(A,E))).
 pgs(somethingDescription(A,List)):-forall_member(E,List,game_assert(description(A,E))).
 pgs(objects(Type,List)):-forall_member(I,List,game_assert(mud_isa(I,Type))).
 pgs(sorts(Type,List)):-forall_member(I,List,game_assert(subclass(I,Type))).
-pgs(predicates(List)):-forall_member(T,List,assert(db_prop_g(T))).
+pgs(predicates(List)):-forall_member(T,List,assert(db_prop_from_game_load(T))).
 
 pgs(description(A,E)):- must(once(add_description(A,E))).
 pgs(nameString(A,S0)):- determinerRemoved(S0,String,S),!,game_assert(nameString(A,S)),game_assert(determinerString(A,String)).
+
 
 % skip formatter types
 pgs(A):- A=..[SubType,_],member(SubType,[string,action,dir]),!.
@@ -160,7 +166,9 @@ pgs(A):- A=..[SubType,Arg],
 pgs(A):- A=..[SubType,_],dmsg(todo(ensure_creatabe(SubType))),dbadd0(A),!.
 
 pgs(W):-functor(W,F,A),functor(WW,F,A),db_prop_game_assert(WW),throw_safe(todo(pgs(W))).
-pgs(W):-dbadd0(W).
+% pgs(inRegion(A,B)):- trace, dbadd0(inRegion(A,B)),!.
+pgs(W):-dbadd0(W),!.
+pgs(W):-trace,dbadd0(W),!.
 pgs(A):-fmt('skipping ~q.',[A]).
 
 /*
@@ -261,7 +269,7 @@ show_call(game_assert(A)):-
    correctArgsIsa(A,AA),
    show_call0(game_assert(AA)).
 show_call(C):-show_call0(C).
-show_call0(C):-debugOnError(C). % dmsg(show_call(C)),C.      
+show_call0(C):-call(C). % dmsg(show_call(C)),C.      
 
 % :- finish_processing_game.
 

@@ -15,13 +15,15 @@
          op(1150,fx,dynamic_multifile_exported),
          term_expansion_local/2,
          register_module_type/1, 
-         registered_module_type/2, 
+         registered_module_type/2,
          end_module_type/1,
          enter_term_anglify/2,
          % decl_dbase_pred/2,
          register_timer_thread/3,
          end_module_type/2        
           ]).
+
+:- dynamic registered_module_type/2.
 
 dynamic_multifile_exported(M:FA):- !, dynamic_multifile_exported(M,FA).
 dynamic_multifile_exported( FA ):- !, current_module(M),dynamic_multifile_exported(M,FA).
@@ -40,7 +42,7 @@ enter_term_anglify(X,Y):-findall(X-Y-Body,clause(moo:term_anglify_np(X,Y),Body),
 enter_term_anglify(X,Y):-findall(X-Y-Body,clause(moo:term_anglify_last(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
 enter_term_anglify(X,Y):-findall(X-Y-Body,clause(moo:term_anglify_np_last(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
 
-:- dynamic_multifile_exported moo:db_prop/2, moo:db_prop/1, moo:is_db_prop/2, moo:is_db_prop/3.
+:- dynamic_multifile_exported moo:db_prop/2, moo:db_prop/1, moo:is_db_prop/3.
 
 :- dynamic_multifile_exported moo:term_anglify/2.
 :- dynamic_multifile_exported moo:term_anglify_last/2.
@@ -61,13 +63,6 @@ create_queryPred(H,B):-functor(H,HF,HA),functor(B,BF,BA),
 :-asserta(thload:current_agent(_,dead)).
 :-ignore(retract(thload:current_agent(_,dead))).
 
-:- dynamic_multifile_exported moo:dbase_true/1.
-:- dynamic_multifile_exported moo:dbase_true/2.
-:- dynamic_multifile_exported moo:dbase_true/3.
-:- dynamic_multifile_exported moo:dbase_true/4.
-:- dynamic_multifile_exported moo:dbase_true/5.
-:- dynamic_multifile_exported moo:dbase_true/6.
-:- dynamic_multifile_exported moo:dbase_true/7.
 :- dynamic_multifile_exported moo:action_rules/4.
 :- dynamic_multifile_exported moo:agent_call_command/2.
 :- dynamic_multifile_exported moo:agent_text_command/4.
@@ -139,12 +134,12 @@ tick_every(Name,Seconds,OnTick):-repeat,sleep(Seconds),catch(OnTick,E,dmsg(cause
 end_module_type(Type):-current_context_module(CM),end_module_type(CM,Type).
 end_module_type(CM,Type):-retractall(registered_module_type(CM,Type)).
 
-register_module_type(Type):-current_context_module(CM),register_module_type(CM,Type).
+register_module_type(Type):- current_context_module(CM),register_module_type(CM,Type).
 
 register_module_type(CM,Types):-is_list(Types),!,forall(member(T,Types),register_module_type(CM,T)).
-register_module_type(CM,Type):-asserta_new(registered_module_type(CM,Type)).
+register_module_type(CM,Type):-asserta(registered_module_type(CM,Type)).
 
-registered_module_type(Type):-current_context_module(CM),registered_module_type(CM,Type).
+registered_module_type(Type):- current_context_module(CM),registered_module_type(CM,Type).
 
 :-meta_predicate term_expansion_local(?,?),term_expansion_local0(?,?).
 % :-meta_predicate user:term_expansion(?,?).
@@ -183,8 +178,8 @@ term_expansion_local0(A,A).
 
 % user:term_expansion(X,Y):- term_expansion_local0(X,Y).
 
-:- include(logicmoo('vworld/moo_header.pl')).
-:- register_module_type(utility).
+%:- include(logicmoo('vworld/moo_header.pl')).
+%:- register_module_type(utility).
 
 moo:agent_text_command(_Agent,_Text,_AgentTarget,_Cmd):-fail.
 

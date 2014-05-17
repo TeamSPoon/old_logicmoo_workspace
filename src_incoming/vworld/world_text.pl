@@ -31,8 +31,8 @@ show_kb_preds(Agent,List):-
 show_kb_preds(Agent,LOC,List):-
       ignore(atloc(Agent,LOC)),
        locationToRegion(LOC,Region),
-       must(dbase:repl_writer(Agent,WPred)),
-        must(dbase:repl_to_string(Agent,ToSTR)),
+       must(holds_t(repl_writer,Agent,WPred)),
+        must(holds_t(repl_to_string,Agent,ToSTR)),
         subst(List,region,Region,ListR),
         show_kb_via_pred(WPred,ToSTR,ListR),!.
 
@@ -107,7 +107,7 @@ fmt_holds_tcall(WPred,ToSTR,N,Type,V):-fmt_holds_tcall_pred(WPred,ToSTR,N,Type,V
 fmt_holds_tcall_pred(WPred,ToSTR,N,Type,[L|List]):-!, doall((member(V,[L|List]),fmt_holds_tcall_pred_trans(WPred,ToSTR,N,Type,V))).
 fmt_holds_tcall_pred(WPred,ToSTR,N,Type,V0):-fmt_holds_tcall_pred_trans(WPred,ToSTR,N,Type,V0).
 
-fmt_holds_tcall_pred_trans(WPred,ToSTR,N,Type,V0):-must((debugOnError(holds_tcall(ToSTR,V0,Type,V)),!,debugOnError(holds_tcall(WPred,_Tn,N,Type,V)))).
+fmt_holds_tcall_pred_trans(WPred,ToSTR,N,Type,V0):-must((debugOnError(call(ToSTR,V0,Type,V)),!,debugOnError(call(WPred,_Tn,N,Type,V)))).
 
 % ===========================================
 % generatePhrase(+Term,-English).
@@ -124,7 +124,7 @@ is_leave_alone(exact_message).
 is_leave_alone(todo).
 is_leave_alone((error)).
 is_leave_alone(parserm).
-is_leave_alone(F):-not((is_db_prop(F,_))).
+is_leave_alone(F):-not((is_db_prop(F,_,_))).
 is_leave_alone(A):-failOnError((sub_atom(A,_,1,0,S),atom_number(S,_))),!.
 
 moo:term_anglify(A,B):-local_term_anglify(A,B).

@@ -75,17 +75,17 @@
 
 :- dynamic  agent_list/1.
 
-% :-use_module(logicmoo('vworld/dbase.pl')).
-:- include(logicmoo('vworld/moo_header.pl')).
+% :-use_module(logicmoo('vworld/dbase')).
+:- include(logicmoo('vworld/moo_header')).
 :- register_module_type(utility).
 
 
-:- include(logicmoo('vworld/world_2d.pl')).
-:- include(logicmoo('vworld/world_agent.pl')).
-:- include(logicmoo('vworld/world_text.pl')).
-:- include(logicmoo('vworld/world_effects.pl')).
-:- include(logicmoo('vworld/world_events.pl')).
-:- include(logicmoo('vworld/world_spawning.pl')).
+:- include(logicmoo('vworld/world_2d')).
+:- include(logicmoo('vworld/world_agent')).
+:- include(logicmoo('vworld/world_text')).
+:- include(logicmoo('vworld/world_effects')).
+:- include(logicmoo('vworld/world_events')).
+:- include(logicmoo('vworld/world_spawning')).
 
 
 
@@ -251,13 +251,13 @@ same(X,Y):- compound(X),arg(1,X,Y),!.
 same(X,Y):- compound(Y),arg(1,Y,X),!.
 same(X,Y):- samef(X,Y).
 
-functor_safe(P,F,0):- notrace(string(P);is_list(P);atomic(P)), text_to_string(P,F),!.
-functor_safe(P,F,A):- notrace(var(P);compound(P)),functor(P,F,A).
+functor_safe(P,F,0):- hotrace(string(P);is_list(P);atomic(P)), text_to_string(P,F),!.
+functor_safe(P,F,A):- hotrace(var(P);compound(P)),functor(P,F,A).
 
 samef(X,Y):- X=Y,!.
-samef(X,Y):- notrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci(XF,YF)))).
+samef(X,Y):- hotrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci(XF,YF)))).
 
 moo:type_default_props(_,agent,last_command(stand)).
 
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo('vworld/moo_footer')).
