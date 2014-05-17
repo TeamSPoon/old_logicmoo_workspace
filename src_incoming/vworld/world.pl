@@ -57,6 +57,7 @@
          to_3d/2,
          is_3d/1,
          in_grid/2,
+         in_grid_rnd/2,
          loc_to_xy/4,
          grid_size/4,
          doorLocation/5,

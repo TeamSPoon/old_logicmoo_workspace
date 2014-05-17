@@ -13,6 +13,8 @@
                    parse_agent_text_command_1/5,            
                    parseIsa//2,
                    objects_match/3,
+                   call_tabled/1,
+                   findall_tabled/3,
                    parse_for/2,
                    parse_for/3,
                    parse_for/4,

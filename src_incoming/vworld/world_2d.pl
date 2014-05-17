@@ -34,14 +34,14 @@ room_center(Room,X,Y,Z):-
       grid_size(Room,MaxX,MaxY,MaxZ),
       center_xyz(MaxX,X),
       center_xyz(MaxY,Y),
-      center_xyz(MaxZ,Z),
-      dmsg(todo("get room size and calc center ",Room)).
+      center_xyz(MaxZ,Z),!.
+      % doing it ! dmsg(todo("get room size and calc center ",Room)).
 
 
 locationToRegion(xyz(Room,_,_,_),Region2):-!,locationToRegion(Room,Region2).
 locationToRegion(Obj,Obj):-mud_isa(Obj,region),!. % inRegion(Obj,Room).
 
-loc_to_xy(xyz(Room,_,_,Z),X,Y,xyz(Room,X,Y,Z)):-!.
+loc_to_xy(LOC,X,Y,xyz(Room,X,Y,1)):- locationToRegion(LOC,Room),!.
 loc_to_xy(Room,X,Y,xyz(Room,X,Y,1)).
 
 is_3d(LOC):- compound(LOC).
@@ -59,13 +59,19 @@ grid_size(_Room,MaxX,MaxY,MaxZ):- MaxX = 5 , MaxY = 5 , maxZ(MaxZ) ,!.
 
 maxZ(2).
 
-% for now not useing grids
 in_grid(LocName,xyz(LocName,X,Y,1)) :-
+   grid_size(LocName,MaxX,MaxY, _MaxZ),!,
+   between(1,MaxX,X),
+   between(1,MaxY,Y).
+
+in_grid_rnd(LocName,xyz(LocName,X,Y,1)) :-
    grid_size(LocName,MaxX,MaxY, _MaxZ),!,
    repeat,
 	X is (1 + random(MaxX-2)),
 	Y is (1 + random(MaxY-2)).	
-in_grid(LocName,xyz(LocName,1,1,1)).
+
+% for now not useing grids
+in_grid_rnd(LocName,xyz(LocName,1,1,1)).
 
 
 init_location_grid(LocName):-
@@ -97,10 +103,19 @@ init3(LocName,LocType,xyz(LocName,X,Y,1),[O|T]) :-
 
 
 nearby(X,Y):-atloc(X,L1),atloc(Y,L2),locs_near(L1,L2).
-locs_near(L1,L2):- L1 = L2,!.
-locs_near(L1,L2):- grid_dist(L1,L2,Dist), Dist<4,!.
-locs_near(L1,L2):- locationToRegion(L1,R1),locationToRegion(L2,R2),!,R2==R1.
 
+:-export(locs_near/2).
+locs_near(L1,L2):- var(L1),nonvar(L2),!,locs_near(L2,L1).
+locs_near(L1,L2):- nonvar(L1),nonvar(L2),L2=xyz(_,_,_,_),locationToRegion(L1,R),!,call_tabled(locs_near_i(R,L2)).
+locs_near(L1,L2):- nonvar(L1),nonvar(L2),locationToRegion(L1,R1),locationToRegion(L2,R2),!,region_near(R1,R2).
+locs_near(L1,L2):-region_near(R1,R2),in_grid(R1,L1),in_grid(R2,L2).
+
+:-export(locs_near_i/2).
+locs_near_i(L1,L2):- locationToRegion(L1,R),in_grid(R,L2).
+locs_near_i(L1,L2):- locationToRegion(L1,R),pathBetween_call(R,_,R2),in_grid(R2,L2).
+
+region_near(R1,R2):-pathBetween_call(R1,_,R2).
+region_near(R1,R1).
 
 moo:type_default_props(OfAgent,agent,[facing(F),atloc(L)]):-create_someval(facing,OfAgent,F),create_someval(atloc,OfAgent,L).
 
@@ -121,7 +136,7 @@ decide_region(LOC):- findall(O,region(O),LOCS),random_member(LOC,LOCS).
 random_member(LOC,LOCS):- length(LOCS,Len),Len>0, X is random(Len),nth0(X,LOCS,LOC).
 find_unoccupied(Where):-
    must(decide_region(LOC)),
-   in_grid(LOC,Where),
+   in_grid_rnd(LOC,Where),
    unoccupied(Where),!.
 find_unoccupied('Area1000'):- trace, throw(game_not_loaded).
 

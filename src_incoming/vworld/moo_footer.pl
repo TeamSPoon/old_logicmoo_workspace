@@ -13,6 +13,7 @@
 
 :- retract(loading_module_h(_)).
 
+:- end_transform_cyc_preds.
 % :-end_transform_cyc_preds.
 
 

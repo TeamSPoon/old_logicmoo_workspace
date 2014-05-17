@@ -23,6 +23,8 @@
 :- ensure_loaded(logicmoo('vworld/dbase.pl')).
 :- ensure_loaded(logicmoo('vworld/moo.pl')).
 
+:- end_transform_cyc_preds.
+
 % :-context_module(Ctx),writeq(context_module(Ctx)),nl.
 
 :-context_module(Ctx),asserta(loading_module_h(Ctx)).

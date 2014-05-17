@@ -134,7 +134,7 @@ tick_every(Name,Seconds,OnTick):-repeat,sleep(Seconds),catch(OnTick,E,dmsg(cause
 end_module_type(Type):-current_context_module(CM),end_module_type(CM,Type).
 end_module_type(CM,Type):-retractall(registered_module_type(CM,Type)).
 
-register_module_type(Type):- current_context_module(CM),register_module_type(CM,Type).
+register_module_type(Type):- current_context_module(CM),register_module_type(CM,Type),begin_transform_cyc_preds.
 
 register_module_type(CM,Types):-is_list(Types),!,forall(member(T,Types),register_module_type(CM,T)).
 register_module_type(CM,Type):-asserta(registered_module_type(CM,Type)).
