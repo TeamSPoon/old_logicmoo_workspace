@@ -28,8 +28,15 @@
  memory/2, padd/2, padd/3, possess/2, prop/3, prop_or/4, props/2, region/1, req/1, scan_db_prop/0, score/2, stm/2, term_listing/1,  facing/2,
  thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, description/2, act_turn/2,
  dbase_mod/1, dbase_define_db_prop/2,
- clause_present_1/3,
- with_kb_assertions/2,
+
+          is_holds_false/1,
+          is_holds_true/1,
+
+          db_forall_query/1,
+
+         clause_present_1/3,
+         with_kb_assertions/2,
+
           getSurfaceFromChars/3,
           isSlot/1,
           assertion_holds/7,
@@ -86,7 +93,6 @@
            retractAllThrough/1,
            retractAllThrough/2,
            begin_transform_cyc_preds/0,
-           is_holds_like/1,
          end_transform_cyc_preds/0,
          cyc_goal_expansion/2,
          list_to_term/2, 
@@ -243,7 +249,7 @@ holds_t(P,A1,A2):-isCycPredArity_NE(P,2),(call_fa(P,A1,A2);call_fa_mt(P,A1,A2,_,
 holds_t(P,A1):-isCycPredArity_NE(P,1),(call_fa(P,A1);call_fa_mt(P,A1,_,_)).
 
 
-holds_t([AH,P|LIST]):-is_holds_like(AH),!,holds_t_p2(P,LIST).
+holds_t([AH,P|LIST]):-is_holds_true(AH),!,holds_t_p2(P,LIST).
 holds_t([P|LIST]):-!,holds_t_p2(P,LIST).
 holds_t(CALL):-CALL=..[P|LIST],holds_t([P|LIST]).
 holds_t_p2(P,LIST):- CALL=..[holds_t,P|LIST],call(CALL).
@@ -307,7 +313,7 @@ isCycPredArity0(P,A):- holds_t(arityMin,P, A),not(holds_t(arityMax,P, _)).
 
 assertion_true([P|LIST]):-'ASSERTION'(':TRUE-DEF',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
 assertion_true([P|LIST]):-'ASSERTION'(':TRUE-MON',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
-assertion_true([AH,P|LIST]):-is_holds_like(AH),!,assertion_true([P|LIST]).
+assertion_true([AH,P|LIST]):-is_holds_true(AH),!,assertion_true([P|LIST]).
 assertion_true([P|LIST]):-!, dbase:dbase_true([P|LIST]).
 
 
@@ -342,11 +348,7 @@ set_list_len(List,A,NewList):-length(List,LL),A=LL,!,NewList=List.
 set_list_len(List,A,NewList):-length(List,LL),A>LL,length(NewList,A),append(List,_,NewList),!.
 set_list_len(List,A,NewList):-length(NewList,A),append(NewList,_,List),!.
 
-is_holds_like(isa):-!,fail.
-is_holds_like(assertion).
-is_holds_like(holds).
-is_holds_like(assertion_holds).
-is_holds_like(holds_t).
+
 
 use_holds_db(F,A):-isCycPredArity(F,A).
 
@@ -358,7 +360,7 @@ cyc_pred_expansion(_Pred,_HOLDS,G1,_):-not(compound(G1)),!,fail.
 cyc_pred_expansion(Pred,HOLDS,not(G1),not(G2)):-!,cyc_pred_expansion(Pred,HOLDS,G1,G2).
 cyc_pred_expansion(Pred,HOLDS, \+(G1) , \+(G2)):-!,cyc_pred_expansion(Pred,HOLDS,G1,G2).
 cyc_pred_expansion(Pred,M:HOLDS,G1,G3):- 
-            functor(G1,HF,_),is_holds_like(HF),
+            functor(G1,HF,_),is_holds_true(HF),
             G1=..[HF,F|List],call(Pred,F,A),!,
             set_list_len(List,A,NewList),
             G2=..[HOLDS,F|NewList],!,
@@ -557,16 +559,16 @@ show_term_listing(H):- writeq(H),write('.'),nl,!.
 % replaced the 1st with the 2nd and better version of retract
 % del(C0):-db_op(r,C0)
 %% del(RetractOne)    <--  del(C0):- ignore((db_op('q',C0),!,db_op('r',C0))).
-del(C0):- db_op('q',C0) -> db_op('ra',C0) ; dmsg(failure(del(C0))).
+del(C0):- (db_op('r',C0) -> db_op('ra',C0) ; dmsg(failed(del(C0)))).
 %% clr(Retractall)
 clr(C0):-db_op(ra,C0).
 %% req(Query)
 req(C0):- db_op(q,C0).
 %% props(Obj,QueryPropSpecs)
-props(Obj,PropSpecs):-db_op0('q',props(Obj,PropSpecs)).
+props(Obj,PropSpecs):-db_op('q',props(Obj,PropSpecs)).
 %% add(Assertion)
-add0(C0):- db_op(a,C0).
 add(C0):- add0(C0).
+add0(C0):- db_op(a,C0).
 %% padd(Obj,PropSpecs)
 padd(Obj,PropSpecs):-add0(props(Obj,PropSpecs)).
 %% padd(Obj,Prop,Value)
@@ -594,18 +596,15 @@ pred_as_is(k,_):-!,fail.
 
 holds_tcall(Call):-req(Call).
 
-db_op(q,Term):-!, db_op0(q,Term).
+db_op( q,Term):-!,db_op0(q,Term).
+db_op( r,Term):-!,db_op0(q,Term),!,db_op0(ra,Term).
 db_op(Op,Term):-must(db_op0(Op,Term)).
+
 db_op0(_Op,props(_Obj,Open)):-Open==[],!.
 db_op0(Op,props(Obj,[P|ROPS])):-!,db_op(Op,props(Obj,P)),db_op(Op,props(Obj,ROPS)).
+db_op0(Op,props(Obj,PropVal)):- !,PropVal=..[Prop|Vals],
+	Call=..[Prop,Obj|Vals], db_op(Op,Call).
 
-db_op0('q',props(Obj,PropVal)):- var(Obj),!,
-   throw(db_op0('q',props(Obj,PropVal))).
-
-db_op0(Op,props(Obj,PropVal)):-   
-   !,PropVal=..[Prop|Vals],
-	Call=..[Prop,Obj|Vals],
-	db_op(Op,Call).
 db_op0(Op,C0):-functor(C0,F,A),db_op_4(Op,F,A,C0),!.
 
 db_op_4(Op,:,2,_MODULE:C0):-!,/*throw(module_form(MODULE:C0)),*/
@@ -663,12 +662,15 @@ db_forall(a,C):- functor(C,F,A),!, (moo:is_db_prop(F,A,singleValued) -> must(db_
 db_forall(r,C):- ground(C),retractall(C),!.
 db_forall(Op,C):-!,trace,throw(unhandled(db_forall(Op,C))).
 
+
 db_forall_query((C0->C1;C2)):- !, (db_forall_query(C0) -> db_forall_query(C1) ; db_forall_query(C2)).
 db_forall_query((C1;C2)):-!, db_forall_query(C1) ; db_forall_query(C2).
-db_forall_query((C1,C2)):-!, db_forall_query(C1) , db_forall_query(C2).
-db_forall_query(Term):- once(cyc_goal_expansion(Term,Term2)),Term\==Term2,!,db_forall_query(Term2).
-db_forall_query(C):- predicate_property(C,_PP),!,call(C).
-db_forall_query(C):- trace, db_forall_quf(C,Pretest,Template),!,Pretest, call(Template).
+db_forall_query(Term):-findall(a(Term),db_forall_query0(Term),List),list_to_set_safe(List,Set),!,member(a(Term),Set).
+db_forall_query0((C1,C2)):-!, db_forall_query0(C1) , db_forall_query0(C2).
+db_forall_query0(Term):- once(expand_goal(Term,Term2)),Term\==Term2,!,db_forall_query0(Term2).
+db_forall_query0(Term):-db_forall_query1(Term).
+db_forall_query1(C):- predicate_property(C,_PP),!,call(C).
+db_forall_query1(C):- trace, db_forall_quf(C,Pretest,Template),!,Pretest, call(Template).
 
 
 
@@ -757,8 +759,16 @@ clause_present_1(C0,_F,A):- A>1, arg(A,C0,NEW),string(NEW),!,copy_term(C0,C),
    setarg(A,C,OLD),C,string_chars(NEW,[S|C1]),string_chars(OLD,[S|C2]),C1=C2,trace,dmsg(present(C)).
 %clause_present_1(C,F,A):- A>1, arg(A,C,NEW),snonvar(NEW),!,setarg(A,C,OLD),clause_present(C,F,A),pl_arg_type(NEW,string),string_chars(NEW,[S|C1]),string_chars(OLD,[S|C2]),C1=C2,dmsg(present(C)).
 
+is_holds_true(Prop):-atom(Prop),is_holds_true0(Prop).
+is_holds_true0(Prop):-member(Prop,[k,p,holds,holds_t,dbase_true,res,assertion_holds,assertion,call]).
 
-is_2nd_order_holds(Prop):-member(Prop,[call,req,k,p,holds,not_k,not_p,not_holds]).
+is_2nd_order_holds(Prop):- is_holds_true(Prop) ; is_holds_false(Prop).
+
+is_holds_false(Prop):-atom(Prop),is_holds_true0(Stem),is_holds_false0(Prop,Stem).
+is_holds_false0(Prop,Stem):-atom_concat('not_',Stem,Prop).
+is_holds_false0(Prop,Stem):-atom_concat(Stem,'_not',Prop).
+is_holds_false0(Prop,Stem):-atom_concat(Stem,'_false',Prop).
+
 
 must_asserta(C):-
       must(ground(C)),
@@ -766,6 +776,7 @@ must_asserta(C):-
       
 argIsa_call(Prop,N1,Type):-once((must(nonvar(Prop)),must(number(N1)))),fail.
 argIsa_call(Prop,N1,Type):-argIsa_call_0(Prop,N1,Type),!.
+argIsa_call(_:Prop,N1,Type):-!,argIsa_call(Prop,N1,Type).
 argIsa_call(Prop,N1,Type):-argIsa_call_1(Prop,N1,Type),!.
 
 argIsa_call_0(mud_isa,1,argIsaFn(mud_isa,1)):-!.
@@ -775,7 +786,7 @@ argIsa_call_0(ofclass,2,type):-!.
 argIsa_call_0(memory,2,term):-!.
 argIsa_call_0(Prop,N1,Type):- moo:is_db_prop(Prop,_,argIsa(N1,Type)),!.
 
-argIsa_call_1(Prop,N1,Type):- is_2nd_order_holds(Prop),dmsg(todo(define(argIsa_call(Prop,N1,'Second_Order_TYPE')))),
+argIsa_call_1(Prop,N1,Type):- is_2nd_order_holds(Prop),trace,dmsg(todo(define(argIsa_call(Prop,N1,'Second_Order_TYPE')))),
    Type=argIsaFn(Prop,N1).
 argIsa_call_1(Prop,N1,Type):-dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),
    Type=argIsaFn(Prop,N1).
@@ -956,6 +967,8 @@ moo:db_prop(ArgTypes):-db_prop_from_game_load(ArgTypes).
 % =================================================================================================
 % BEGIN world database
 % =================================================================================================
+
+:- begin_transform_cyc_preds.
 
 db_prop_format(apath(region,dir),areaPath).
 db_prop_format(dice(int,int,int),int).

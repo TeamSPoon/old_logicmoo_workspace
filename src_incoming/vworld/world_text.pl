@@ -219,7 +219,7 @@ best_nl_phrase(Order,TStr1,TStr2):-
 
 is_phrase_type(np).
 
-% local_term_anglify_first(T,TA):-compound(T),local_term_anglify(T,TA).
+local_term_anglify_first(T,TA):-compound(T),local_term_anglify(T,TA).
 % local_term_anglify_first(FmtObj,String):-compound(FmtObj),functor(FmtObj,Fmt,_),isa_assert(FmtObj,Fmt,String),!.
 local_term_anglify_first(T,TA):-enter_term_anglify(T,TA).
 
@@ -227,6 +227,12 @@ local_term_anglify_first(T,TA):-enter_term_anglify(T,TA).
 flatten_append(First,Last,Out):-flatten([First],FirstF),flatten([Last],LastF),append(FirstF,LastF,Out),!.
 
 local_term_anglify(Var,[prolog(Var)]):- var(Var),!.
+
+local_term_anglify(HOLDS,English):-HOLDS=..[H,Pred,A|MORE],atom(Pred),is_holds_true(H),HOLDS2=..[Pred,A|MORE],!,local_term_anglify(HOLDS2,English).
+local_term_anglify(HOLDS,[A,verbFn(Pred)|MORE]):-HOLDS=..[H,Pred,A|MORE],is_holds_true(H),!.
+local_term_anglify(HOLDS,English):-HOLDS=..[H,Pred,A|MORE],is_holds_false(H),atom(Pred),HOLDS2=..[Pred,A|MORE],!,local_term_anglify(not(HOLDS2),English).
+local_term_anglify(HOLDS,[false,that,A,verbFn(Pred)|MORE]):-HOLDS=..[H,Pred,A|MORE],is_holds_false(H),!.
+local_term_anglify(not(HOLDS),[false,that,English]):-!,local_term_anglify(HOLDS,English).
 local_term_anglify(notFound(F,Type),[no,TypeC,'-s',for,FC]):-copy_term(notFound(F,Type),notFound(FC,TypeC)),ignore(TypeC='type'),ignore(FC='whatever').
 local_term_anglify(NPO,String):-NPO=..[NP,Obj],is_phrase_type(NP),!,enter_term_anglify(fN(Obj,NP),String).
 
@@ -236,7 +242,7 @@ local_term_anglify(string(Obj),[String]):-failOnError(any_to_string(Obj,StringUQ
 % enter_term_anglify(prolog(Obj),string(String)):-failOnError(any_to_string(Obj,StringUQ)),atomics_to_string(['(',StringUQ,')'],"",String).
 local_term_anglify(atloc(Obj,LOC),String):-fully_expand([fN(Obj,np),is,at,fN(LOC,np)],String).
 local_term_anglify(description(Obj,Term),[fN(Obj,np),description,contains,:,string(Term)]).
-local_term_anglify(fN(Obj,X),String):- locationToRegion(Obj,Region),Obj\=Region,enter_term_anglify(fN(Region,X),String),!.
+local_term_anglify(fN(Obj,X),String):- locationToRegion(Obj,Region), Obj \= Region, enter_term_anglify(fN(Region,X),String),!.
 % should not have searched nouns yet
 local_term_anglify(fN(Obj,T),String):- local_term_anglify_np(Obj,T,String),!.
 
