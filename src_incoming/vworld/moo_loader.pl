@@ -66,7 +66,7 @@ isa_assert_g(A,Type,AA):-
   cmust(ground(A:Type)),
   gmust(ground(AA),isa_assert(A,Type,AA)).
   
-
+%  @set movedist 4
 
 fisa_assert(A,integer,AA):-!,isa_assert(A,int,AA).
 fisa_assert(A,int,AA):- must(any_to_number(A,AA)).
@@ -76,7 +76,7 @@ fisa_assert(A,dir,AA):- must(string_to_atom(A,AA)).
 
 
 isa_assert(A,Type,A):- once(var(A);var(Type)),!,trace,throw(failure(isa_assert(A,Type))).
-isa_assert(A,Type,AA):-fisa_assert(A,Type,AA),!.
+isa_assert(A,Type,AA):-fisa_assert(A,Type,AAA),AA=AAA,!.
 isa_assert(A,Type,AA):-format_complies(A,Type,AA),!.
 isa_assert(O,argIsaFn(_,_),O):-!. %any_to_value(O,V).  %missing
 isa_assert(A,type,A):-atom(A),define_type(A).
@@ -105,12 +105,6 @@ isa_assert(A,C,A):-must(ground(A)),trace, dmsg(todo(define(isa_assert(A,C,'Conve
 
 isa_assert(A,Type,_NewArg):-throw(failure(isa_assert(A,Type))).
 
-
-
-holdsFunctor(k).
-holdsFunctor(p).
-holdsFunctor(holds).
-
 correctArgsIsa(A,AA):-
    functor(A,_,1),!,
    must(any_to_value(A,AA)),
@@ -118,7 +112,10 @@ correctArgsIsa(A,AA):-
 
 correctArgsIsa(M:A,M:AA):-!,correctArgsIsa(A,AA).
 
-correctArgsIsa(A,AA):-A =..[KP,Prop|Args],atom(Prop),holdsFunctor(KP),!,
+correctArgsIsa(A,AA):-A =..[KP,Prop|Args],atom(Prop),is_holds_true(KP),!,
+   discoverAndCorrectArgsIsa(Prop,1,Args,AArgs),AA =..[Prop|AArgs].
+
+correctArgsIsa(A,not(AA)):-A =..[KP,Prop|Args],atom(Prop),is_holds_false(KP),!,
    discoverAndCorrectArgsIsa(Prop,1,Args,AArgs),
    AA =..[Prop|AArgs].
 

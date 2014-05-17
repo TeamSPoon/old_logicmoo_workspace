@@ -284,6 +284,7 @@ any_to_string(Atom,String):- hotrace(once(any_to_string0(Atom,String))).
 any_to_string0(Atom,String):-var(Atom),!,term_to_atom(Atom,AAtom),!,any_to_string0(AAtom,String),!.
 any_to_string0(Atom,String):-string(Atom),Atom=String,!.
 any_to_string0(Atom,String):-atom(Atom),atom_string(Atom,String),!.
+any_to_string0([Atom],String):-atom(Atom),atom_string(Atom,String),!.
 any_to_string0(A,""):-nonvar(A),member(A,[[],'',""]),!.
 any_to_string0(List,String):-catch(text_to_string(List,String),_,fail),!.
 any_to_string0(List,String):-is_list(List), (catch(atomics_to_string(List, ' ', String),_,fail);((list_to_atomics_list0(List,AList),catch(atomics_to_string(AList, ' ', String),_,fail)))),!.
@@ -328,7 +329,8 @@ vars_to_ucase_0([N=V|Vars],List):-
    ignore(N=V),
    vars_to_ucase_0(Vars,List).
 
-atomSplit(In,List):- hotrace(( ground(In), any_to_string(In,String),atom_string(Atom,String),splt_words(Atom,List,Vars),vars_to_ucase(Vars,List))),!.
+atomSplit(In,List):- hotrace(( ground(In),
+ any_to_string(In,String),atom_string(Atom,String),splt_words(Atom,List,Vars),vars_to_ucase(Vars,List))),!.
 atomSplit(Atom,WordsO):- 
    hotrace((atomSplit(Atom,WordsO,[' ','\t','\n','\v','\f','\r',' ','!','"','#','$','%','&','\'',
     '(',')','*','+',',','-','.','/',':',';','<',

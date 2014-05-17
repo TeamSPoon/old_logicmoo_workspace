@@ -16,9 +16,11 @@
 
 :- register_module_type(command).
 
+moo:agent_text_command(Agent,[DirSS],Agent,move(dir)):- catch(((string_to_atom(DirSS,Dir),moo:specifier_text(Dir,dir))),_,fail),!.
+
 moo:agent_text_command(Agent,[DirSS],Agent,move(DirS)):- 
  catch(((string_to_atom(DirSS,DirS),moo:specifier_text(Dir,dir),
-       catch((atom_concat(Dir,N,DirS),(N='';atom_number(N,_))),_,fail))),_,fail).
+       catch((atom_concat(Dir,N,DirS),(atom_number(N,_))),_,fail))),_,fail).
 
 moo:agent_call_command(Agnt,Cmd):- functor(Cmd,move,_),!,
    must(move_command(Agnt,Cmd)).
@@ -38,8 +40,9 @@ get_move_dist(Agent,Dist):-req(movedist(Agent,Dist)),!.
 get_move_dist(_Gent,1).
 
 % Move thy agent
-move_command(Agent,DirS,Dist) :- 
+move_command(Agent,DirS,DistS) :- 
    string_to_atom(DirS,Dir),
+   any_to_number(DistS,Dist),
    catch(doall((between(1,Dist,_),move_command_1(Agent,Dir))),giveup(_),true).
 
 

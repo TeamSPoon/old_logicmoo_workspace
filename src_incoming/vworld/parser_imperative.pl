@@ -42,7 +42,7 @@ moo:decl_action(_Human_Player,parse(prolog,list(term)),"Development test to pars
 
 moo:agent_text_command(Agent,[parse,Type|List],Agent,parse(Type,List)).
 
-moo:agent_call_command(_Gent,parse(Type,StringM)):-
+moo:agent_call_command(_Gent,parse(Type,StringM)):- trace,
    parse_for(Type,StringM,_Term,_LeftOver).
 
 parse_for(Type,StringM):- parse_for(Type,StringM, _Term).
@@ -52,15 +52,16 @@ parse_for(Type,StringM, Term):-parse_for(Type,StringM, Term, []).
 list_tail(_,[]).
 list_tail(String,LeftOver):-ground(String),to_word_list(String,List),length(List,L),!,between(1,L,X),length(LeftOver,X).
 
-parse_for(Type,StringM,Term,LeftOver):-parse_for(Type,StringM,Term,LeftOver,fmt).
-parse_for(Type,StringM,Term,LeftOver,Print2):-
+parse_for(Type,StringM,Term,LeftOver):- 
+   Print2 = fmt,
    to_word_list(StringM,String),
+   trace,
    list_tail(String,LeftOver),
    HOW = phrase(parseIsa(Type,Term),String,LeftOver),
    call(Print2,'parsing with ~q ~n.',[HOW]),
    (debugOnError(HOW)->
-      call(Print2,'Success! parse \'~q\' "~q" = ~q   (leftover=~q) . ~n',[Type,String,Term,LeftOver]);
-      call(Print2,'No Success.~n',[])).
+      xcall(Print2,'Success! parse \'~q\' "~q" = ~q   (leftover=~q) . ~n',[Type,String,Term,LeftOver]);
+      xcall(Print2,'No Success.~n',[])).
 
 
 meets_desc_spec(T,_L):- term_to_atom(T,S0),string_to_atom(S0,A),atomic_list_concat([_,_|_],'mudBareHandDa',A),!,fail.
@@ -87,7 +88,7 @@ call_listing(Call):-forall(Call,fmt('~q.~n',[Call])).
 
 
 
-object_string(O,String):-call_tabled((object_string(_,O,1-4,String))),!.
+object_string(O,String):-object_string(_,O,1-4,String),!.
 
 % fast maybe works slower in long run
 object_string(Agent,O,DescSpecs,String):- fail,
@@ -269,7 +270,7 @@ parse_vp_real(Agent,SVERB,ARGS,GOALANDLEFTOVERS):-
      (( 
       member([VERB|TYPEARGS],TEMPLATES),      
       dmsg(parserm("parseForTypes"=phrase_parseForTypes(TYPEARGS,GOODARGS,ARGS,LeftOver))),
-      call_tabled((phrase_parseForTypes(TYPEARGS,GOODARGS,ARGS,LeftOver))),
+      phrase_parseForTypes(TYPEARGS,GOODARGS,ARGS,LeftOver),
       GOAL=..[VERB|GOODARGS])),
       GOALANDLEFTOVERS_FA),
    sort(GOALANDLEFTOVERS_FA,GOALANDLEFTOVERS).
@@ -342,11 +343,15 @@ call_tabled(findall(A,B,C)):-!,findall_tabled(A,B,C).
 call_tabled(C):-copy_term(C,CC),numbervars(CC,'$VAR',0,_),call_tabled(C,C).
 call_tabled(CC,C):-make_key(CC,Key),call_tabled0(Key,C,C,List),!,member(C,List).
 call_tabled0(Key,_,_,List):-call_tabled_list(Key,List),!.
-call_tabled0(Key,E,C,List):-findall(E,C,List1),list_to_set(List1,List),asserta(call_tabled_list(Key,List)),!.
+call_tabled0(Key,E,C,List):-findall(E,C,List1),list_to_set(List1,List),asserta_if_ground(call_tabled_list(Key,List)),!.
 
 findall_tabled(Result,C,List):-make_key(Result^C,RKey),findall_tabled4(Result,C,RKey,List).
 findall_tabled4(_,_,RKey,List):-call_tabled_list(RKey,List),!.
-findall_tabled4(Result,C,RKey,List):-findall(Result,call_tabled(C),RList),list_to_set(RList,List),asserta(call_tabled_list(RKey,List)).
+findall_tabled4(Result,C,RKey,List):-findall(Result,call_tabled(C),RList),list_to_set(RList,List),asserta_if_ground(call_tabled_list(RKey,List)).
+
+asserta_if_ground(_):-!.
+asserta_if_ground(G):-ground(G),asserta(G),!.
+asserta_if_ground(_).
 
 parseIsa0(FT, B, C, D):- list_tail(C,D),parseForIsa(FT, B, C, D).
 

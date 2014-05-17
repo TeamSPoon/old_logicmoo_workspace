@@ -924,7 +924,7 @@ clause_present_1(C0,_F,A):- A>1, arg(A,C0,NEW),string(NEW),!,copy_term(C0,C),
 %clause_present_1(C,F,A):- A>1, arg(A,C,NEW),snonvar(NEW),!,setarg(A,C,OLD),clause_present(C,F,A),pl_arg_type(NEW,string),string_chars(NEW,[S|C1]),string_chars(OLD,[S|C2]),C1=C2,dmsg(present(C)).
 
 is_holds_true(Prop):-hotrace((atom(Prop),is_holds_true0(Prop))).
-is_holds_true0(Prop):-member(Prop,[k,p,holds,holds_t,dbase_true,res,assertion_holds,assertion,call]).
+is_holds_true0(Prop):-member(Prop,[k,p,holds,holds_t,dbase_true,res,assertion_holds,assertion]).
 
 is_2nd_order_holds(Prop):- is_holds_true(Prop) ; is_holds_false(Prop).
 

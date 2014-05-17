@@ -276,6 +276,7 @@ decl_dcgTest_startsWith(List,Phrase,true):-decl_dcgTest_startsWith(List,Phrase).
 
 to_word_list(A,S):-once(hotrace(to_word_list_0(A,S))).
 to_word_list_0(V,V):-var(V),!.
+to_word_list_0([A],[A]):-number(A),!.
 to_word_list_0([],[]):-!.
 to_word_list_0("",[]):-!.
 to_word_list_0('',[]):-!.
