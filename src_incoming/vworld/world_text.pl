@@ -10,10 +10,12 @@
 
 :-export(fully_expand/2).
 
+:- begin_transform_cyc_preds.
+
 local_decl_db_prop(repl_writer(agent,term),[singleValued,default(default_repl_writer)]).
 local_decl_db_prop(repl_to_string(agent,term),[singleValued,default(default_repl_obj_to_string)]).
 
-default_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=o),fmt('~q=(~w)~q.~n',[N,TypeO,V]).
+default_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=o),fmt('~q=(~w )~q.~n',[N,TypeO,V]).
 default_repl_obj_to_string(O,Type,toString(TypeO,O)):-copy_term(Type,TypeO),ignore(TypeO=o).
 
 
@@ -66,14 +68,14 @@ show_kb_via_pred_3(WPred,ToSTR,fmt(SayIt),Type,GCall,NewValue):-!,
       findall(NewValue,(catch(holds_tcall(GCall),Error, NewValue=Error), 
              fmt(text(SayIt))),Count),
       (Count==[] ->
-        fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(F,Type)); true),!.
+        fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(f1,F,Type)); true),!.
 
 show_kb_via_pred_3(WPred,ToSTR,fmt,Type,GCall,NewValue):-!,
   % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
       findall(NewValue,(catch(holds_tcall(GCall),Error, NewValue=Error), 
              fmt(GCall)),Count),
       (Count==[] ->
-        fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(F,Type)); true),!.
+        fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(f2,F,Type)); true),!.
 
 
 show_kb_via_pred_3(WPred,ToSTR,output,Type,GCall,NewValue):-!,
@@ -81,7 +83,7 @@ show_kb_via_pred_3(WPred,ToSTR,output,Type,GCall,NewValue):-!,
       findall(NewValue,(catch(holds_tcall(GCall),Error, NewValue=Error), 
              fmt_holds_tcall(WPred,ToSTR,F,Type,NewValue)),Count),
       (Count==[] ->
-        fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(F,Type)); true),!.
+        fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(f3,F,Type)); true),!.
 
 
 show_kb_via_pred_3(WPred,ToSTR,F,Type,GCall,NewValue):- canUseEnglish,!,
@@ -89,14 +91,14 @@ show_kb_via_pred_3(WPred,ToSTR,F,Type,GCall,NewValue):- canUseEnglish,!,
       findall(NewValue,(catch(holds_tcall(GCall),Error, NewValue=Error), 
              fmt(text(GCall))),Count),!,
       (Count==[] ->
-        (fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(F,Type))); true),!.
+        (fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(f4,F,Type))); true),!.
 
 show_kb_via_pred_3(WPred,ToSTR,F,Type,GCall,NewValue):-
   % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
       findall(NewValue,(catch(holds_tcall(GCall),Error, NewValue=Error), 
              fmt_holds_tcall(WPred,ToSTR,F,Type,NewValue)),Count),
       (Count==[] ->
-        fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(F,Type)); true),!.
+        fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(f5,F,Type)); true),!.
 
 
 fmt_holds_tcall(WPred,ToSTR,F,Type,NewValue):-flatten([NewValue],ValueList), NewValue\=ValueList,fmt_holds_tcall(WPred,ToSTR,F,Type,ValueList),!.
@@ -181,6 +183,7 @@ fully_expand_0(FC,O):-catch((trace,fully_expand_1(FC,O)),_,fail).
 fully_expand_1(Var,Var):-var(Var),!.
 fully_expand_1([],[]):-!.
 % fully_expand_1(StringIsError,_Out):-string(StringIsError),!,trace,fail.
+fully_expand_1([T|TT],FTAO):-local_term_anglify_first([T|TT],TA),flatten([TA],FTA),fully_expand_1(FTA,FTAO),!.
 fully_expand_1([T|Term],Out):-!,
    fully_expand_2(T,E),
    fully_expand_1(Term,English),
@@ -227,13 +230,25 @@ local_term_anglify_first(T,TA):-enter_term_anglify(T,TA).
 flatten_append(First,Last,Out):-flatten([First],FirstF),flatten([Last],LastF),append(FirstF,LastF,Out),!.
 
 local_term_anglify(Var,[prolog(Var)]):- var(Var),!.
+local_term_anglify([Var],[prolog([Var])]):- var(Var),!.
+
+local_term_anglify(np(P),English):-!, local_term_anglify((P),English).
+local_term_anglify(noun_phrase(P),English):-!, local_term_anglify((P),English).
+
+
+local_term_anglify(fN(Region,region),[(String)]):- nameString(Region,String),!.
+
+local_term_anglify(fN(Region,region),[nameString1(String)]):- holds_t(nameString,Region,String),!.
+
+
+local_term_anglify([P|L],English):-!, local_term_anglify(P,PE),local_term_anglify(L,LE),!,flatten_append(PE,LE,English),!.
 
 local_term_anglify(HOLDS,English):-HOLDS=..[H,Pred,A|MORE],atom(Pred),is_holds_true(H),HOLDS2=..[Pred,A|MORE],!,local_term_anglify(HOLDS2,English).
 local_term_anglify(HOLDS,[A,verbFn(Pred)|MORE]):-HOLDS=..[H,Pred,A|MORE],is_holds_true(H),!.
 local_term_anglify(HOLDS,English):-HOLDS=..[H,Pred,A|MORE],is_holds_false(H),atom(Pred),HOLDS2=..[Pred,A|MORE],!,local_term_anglify(not(HOLDS2),English).
 local_term_anglify(HOLDS,[false,that,A,verbFn(Pred)|MORE]):-HOLDS=..[H,Pred,A|MORE],is_holds_false(H),!.
 local_term_anglify(not(HOLDS),[false,that,English]):-!,local_term_anglify(HOLDS,English).
-local_term_anglify(notFound(F,Type),[no,TypeC,'-s',for,FC]):-copy_term(notFound(F,Type),notFound(FC,TypeC)),ignore(TypeC='type'),ignore(FC='whatever').
+local_term_anglify(notFound(FNum,F,Type),[no,FNum,TypeC,'-s',for,FC]):-copy_term(notFound(F,Type),notFound(FC,TypeC)),ignore(TypeC='type'),ignore(FC='whatever').
 local_term_anglify(NPO,String):-NPO=..[NP,Obj],is_phrase_type(NP),!,enter_term_anglify(fN(Obj,NP),String).
 
 local_term_anglify(fN(Obj,argIsaFn(_PathName,_NumTwo)),String):- enter_term_anglify(Obj,String),!.
@@ -245,7 +260,6 @@ local_term_anglify(description(Obj,Term),[fN(Obj,np),description,contains,:,stri
 local_term_anglify(fN(Obj,X),String):- locationToRegion(Obj,Region), Obj \= Region, enter_term_anglify(fN(Region,X),String),!.
 % should not have searched nouns yet
 local_term_anglify(fN(Obj,T),String):- local_term_anglify_np(Obj,T,String),!.
-
 
 
 % almost all else failed
@@ -281,6 +295,11 @@ anglify_noun_known(Obj,_Hint,[here]):- get_session_id(O),thlocal:current_agent(O
 anglify_noun_known(Obj,_Hint,StringO):- findall(String,holds_t(nameString,Obj,String),List),List\=[],sort_by_strlen(List,[StringO|_]),!.
 %anglify_noun_known(Obj,_Hint,String):-
 %nameString(X,Y,_,_)
+
+
+:- end_transform_cyc_preds.
+
+
 end_of_file.
 
 
@@ -519,4 +538,5 @@ description('Area1040', "You feel very cold").
 description('Area1041', "Outer Space").
 description('Area1041', "You're floating in outer space right above the USS Enterprise").
 description('Area1041', "You feel very cold").
+
 

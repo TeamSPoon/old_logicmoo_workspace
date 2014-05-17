@@ -194,7 +194,8 @@ dir_offset(here,_,0,0,0).
 
 % Used in move.pl, push.pl and climb.pl
 % Move agent (usually). Used to relocate agent's location.
-in_world_move(LOC,Agent,Dir) :-
+in_world_move(LOC,Agent,DirS) :-
+        string_to_atom(DirS,Dir),
         ignore(atloc(Agent,LOC)),
         in_world_move0(LOC,Agent,Dir),
         atloc(Agent,LOC2),

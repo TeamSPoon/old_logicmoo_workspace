@@ -296,9 +296,12 @@ list_to_atomics_list0([E|EnglishF],[A|EnglishA]):-
 list_to_atomics_list0([],[]):-!.
 
 
+catch_read_term_from_atom(Sub,Term,NewOnes):-catch(read_term_from_atom(Sub,Term,[variable_names(NewOnes)]),_,fail),Term\==end_of_file.
+
 splt_words('',[],[]):-!.
 splt_words(Atom,[Term|List],Vars):- atom_length(Atom,To),between(0,To,X), 
-      sub_atom(Atom,0,Len,X,Sub),Len>0,catch(read_term_from_atom(Sub,Term,[variable_names(NewOnes)]),_,fail),
+      sub_atom(Atom,0,Len,X,Sub),Len>0,
+      catch_read_term_from_atom(Sub,Term,NewOnes),
       (compound(Term)->sub_atom(Sub,_,1,0,')');true),
       sub_atom(Atom,Len,_,0,Next),!,
       splt_words(Next,List,NewVars),

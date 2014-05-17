@@ -685,7 +685,7 @@ tconsult(File):-
                 read(X),
                 catch((!,getTermExpansionLogged(X,Y)),E,(writeq(E),nl,fail)),
                 once(assertAll(Y)),
-           X==end_of_file,
+           X == end_of_file,
         seen,
         told.
 

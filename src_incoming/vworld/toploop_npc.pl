@@ -81,9 +81,17 @@ moo:agent_text_command(Agent,[prolog,X],Agent,prologCall(X)).
 
 warnOnError(X):-catch(X,E,dmsg(error(E:X))).
 
-moo:agent_call_command(_Agent,prologCall(C)) :- atom_to_term(C,X,[]),  warnOnError(X).
-moo:agent_call_command(_Agent,prolog(C)) :- atom_to_term(C,X,[]),  warnOnError(X).
+moo:agent_call_command(Agent,prologCall(C)) :- agent_call_safely(Agent,C).
+moo:agent_call_command(Agent,prolog(C)) :- agent_call_safely(Agent,C).
 
+agent_call_safely(_Agnt,C):- any_to_callable(C,X,Vars), !, gensym(result_count_,RC),flag(RC,_,0),agent_call_safely(RC,X,Vars),flag(RC,CC,CC),fmt(result_count(CC)).
+agent_call_safely(RC,X,[]) :- '@'(notrace((warnOnError(doall(((X,flag(RC,CC,CC+1),fmt(cmdresult(X,true)))))))),user).
+agent_call_safely(RC,X,Vars) :-  '@'(notrace((warnOnError(doall(((X,flag(RC,CC,CC+1),fmt(cmdresult(X,Vars)))))))),user).
+
+atom_to_term_safe(A,T,O):-catch(atom_to_term(A,T,O),_,fail),T\==end_of_file.
+any_to_callable(S,X,Vs):-string(C),!,string_to_atom(S,C),atom_to_term_safe(C,X,Vs).
+any_to_callable(C,X,Vs):-atom(C),!,atom_to_term_safe(C,X,Vs).
+any_to_callable(C,X,Vs):-expand_goal(C,X),term_variables((C,X),Vs),!.
 
 moo:agent_call_command(_Agent,npc_timer(Time)):-retractall(npc_tick_tock_time(_)),asserta(npc_tick_tock_time(Time)).
 moo:agent_call_command(Who,tick) :-  debugOnError(tick(Who)).

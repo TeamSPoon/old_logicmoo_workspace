@@ -28,7 +28,8 @@
 idGen(X):-flag(idGen,X,X+1).
 
 %:- ensure_loaded(logicmoo('vworld/dbase.pl')).
-%:- dbase:begin_transform_cyc_preds.
+:- begin_transform_cyc_preds.
+
 
 
 % Semantic Interpretation
@@ -2954,5 +2955,5 @@ atom_junct2([W|S],[W|Words]):-atom_junct2(S,Words).
 % :- include(logicmoo('vworld/moo_footer.pl')).
 
 
-% :-end_transform_cyc_preds.
+:-end_transform_cyc_preds.
 

@@ -37,6 +37,8 @@
          clause_present_1/3,
          with_kb_assertions/2,
 
+         make_list/3,
+
           getSurfaceFromChars/3,
           isSlot/1,
           assertion_holds/7,
@@ -83,6 +85,22 @@
           dbase_true/6,
           dbase_true/7,
 
+          xcall/1,
+          xcall/2,
+          xcall/3,
+          xcall/4,
+          xcall/5,
+          xcall/6,
+          xcall/7,
+
+          xcall_not/1,
+          xcall_not/2,
+          xcall_not/3,
+          xcall_not/4,
+          xcall_not/5,
+          xcall_not/6,
+          xcall_not/7,
+
            isRegisteredCycPred/3,
            registerCycPred/1,
            registerCycPredPlus2/1,
@@ -99,6 +117,7 @@
          lowerCasePred/1,   
          stringToWords/2, 
           balanceBinding/2,
+
          holds_t/8,
          holds_t/7,
          holds_t/6,
@@ -107,6 +126,16 @@
          holds_t/3,
          holds_t/2,
          holds_t/1,
+
+         holds_f/8,
+         holds_f/7,
+         holds_f/6,
+         holds_f/5,
+         holds_f/4,
+         holds_f/3,
+         holds_f/2,
+         holds_f/1,
+
          isCycPredArity/2,         
          testOpenCyc/0]).
 
@@ -116,25 +145,39 @@
 :- meta_predicate get_module_of(0,-).
 
 :- dynamic
-          dbase_true/1,
-          dbase_true/2,
-          dbase_true/3,
-          dbase_true/4,
-          dbase_true/5,
-          dbase_true/6,
-          dbase_true/7.
-
-:- meta_predicate man:with_assertions(:,0).
-:- meta_predicate world:intersect(?,0,?,0,0,-).
-:- meta_predicate clause_present(:), db_forall_assert_mv(+,+,+), db_forall_assert_sv(+,+,+), db_forall(+,+), db_forall_quf(+,+,+).
-
-:- dynamic 
           assertion_holds/7,
           assertion_holds/6,
           assertion_holds/5,
           assertion_holds/4,
           assertion_holds/3,
           assertion_holds/2,
+          dbase_true/1,
+          dbase_true/2,
+          dbase_true/3,
+          dbase_true/4,
+          dbase_true/5,
+          dbase_true/6,
+          dbase_true/7,
+
+          assertion_holds_not/7,
+          assertion_holds_not/6,
+          assertion_holds_not/5,
+          assertion_holds_not/4,
+          assertion_holds_not/3,
+          assertion_holds_not/2,
+          dbase_false/1,
+          dbase_false/2,
+          dbase_false/3,
+          dbase_false/4,
+          dbase_false/5,
+          dbase_false/6,
+          dbase_false/7.
+
+:- meta_predicate man:with_assertions(:,0).
+:- meta_predicate world:intersect(?,0,?,0,0,-).
+:- meta_predicate clause_present(:), db_forall_assert_mv(+,+,+), db_forall_assert_sv(+,+,+), db_forall(+,+), db_forall_quf(+,+,+).
+
+:- dynamic 
  dbase_mod/1,
   agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, ofclass/2,  damage/2, db_op/2,atloc/2, 
  db_prop_from_game_load/1, db_prop_game_assert/1, failure/2, grid/4, mud_isa/2, item/1, 
@@ -160,6 +203,21 @@ dbase_mod(dbase).
 :- dynamic_multifile_exported dbase_true/5.
 :- dynamic_multifile_exported dbase_true/6.
 :- dynamic_multifile_exported dbase_true/7.
+
+make_list(E,1,[E]):-!.
+make_list(E,N,[E|List]):- M1 is N - 1, make_list(E,M1,List),!.
+
+def_meta_predicate(F,S,E):-doall(((between(S,E,N),make_list('?',N,List),CALL=..[F|List],meta_predicate(CALL)))).
+:- def_meta_predicate(call_f,2,8).
+:- def_meta_predicate(call_t,2,8).
+:- def_meta_predicate(xcall,1,7).
+:- def_meta_predicate(xcall_not,1,7).
+:- def_meta_predicate(dbase_true,1,7).
+:- def_meta_predicate(dbase_false,1,7).
+:- def_meta_predicate(call_f_mt,4,10).
+:- def_meta_predicate(call_t_mt,4,10).
+:- def_meta_predicate(assertion_holds,2,7).
+:- def_meta_predicate(assertion_holds_not,2,7).
 
 %:- register_module_type(utility).
 
@@ -239,21 +297,6 @@ registerCycPred(Mt,Pred,Arity):-
       )),  M).
 
 
-
-holds_t(P,A1,A2,A3,A4,A5,A6,A7):- isCycPredArity_NE(P,7),(call_fa(P,A1,A2,A3,A4,A5,A6,A7);call_fa_mt(P,A1,A2,A3,A4,A5,A6,A7,_,_);assertion_true([P,A1,A2,A3,A4,A5,A6,A7])).
-holds_t(P,A1,A2,A3,A4,A5,A6):- isCycPredArity_NE(P,6),(call_fa(P,A1,A2,A3,A4,A5,A6);call_fa_mt(P,A1,A2,A3,A4,A5,A6,_,_)).
-holds_t(P,A1,A2,A3,A4,A5):-isCycPredArity_NE(P,5),(call_fa(P,A1,A2,A3,A4,A5);call_fa_mt(P,A1,A2,A3,A4,A5,_,_)).
-holds_t(P,A1,A2,A3,A4):- isCycPredArity_NE(P,4),(call_fa(P,A1,A2,A3,A4);call_fa_mt(P,A1,A2,A3,A4,_,_)).
-holds_t(P,A1,A2,A3):-isCycPredArity_NE(P,3),(call_fa(P,A1,A2,A3);call_fa_mt(P,A1,A2,A3,_,_)).
-holds_t(P,A1,A2):-isCycPredArity_NE(P,2),(call_fa(P,A1,A2);call_fa_mt(P,A1,A2,_,_)).
-holds_t(P,A1):-isCycPredArity_NE(P,1),(call_fa(P,A1);call_fa_mt(P,A1,_,_)).
-
-
-holds_t([AH,P|LIST]):-is_holds_true(AH),!,holds_t_p2(P,LIST).
-holds_t([P|LIST]):-!,holds_t_p2(P,LIST).
-holds_t(CALL):-CALL=..[P|LIST],holds_t([P|LIST]).
-holds_t_p2(P,LIST):- CALL=..[holds_t,P|LIST],call(CALL).
-
 get_module_of(P,M):-predicate_property(P,imported_from(M)),!.
 get_module_of(MM:_,M):-!,MM=M.
 get_module_of(P,M):-functor(P,F,A),get_module_of_4(P,F,A,M).
@@ -263,36 +306,146 @@ get_module_of_4(_P,F,A,_M):-trace, isCycPredArity(F,A),!,fail.
 get_module_of_4(P,F,A,M):- trace, show_cgoal(get_module_of_4(P,F,A,M)).
 
 
-callable(F,A):- functor(P,F,A),predicate_property(P,_),!.
+callable(F,A):- functor_safe(P,F,A),predicate_property(P,_),!.
+
+% ================================================================================
+% begin holds_t
+% ================================================================================
+holds_t(P,A1,A2,A3,A4,A5,A6,A7):- isCycPredArity_NE(P,7),(call_t(P,A1,A2,A3,A4,A5,A6,A7);call_t_mt(P,A1,A2,A3,A4,A5,A6,A7,_,_);assertion_true([P,A1,A2,A3,A4,A5,A6,A7])).
+holds_t(P,A1,A2,A3,A4,A5,A6):- isCycPredArity_NE(P,6),(call_t(P,A1,A2,A3,A4,A5,A6);call_t_mt(P,A1,A2,A3,A4,A5,A6,_,_)).
+holds_t(P,A1,A2,A3,A4,A5):-isCycPredArity_NE(P,5),(call_t(P,A1,A2,A3,A4,A5);call_t_mt(P,A1,A2,A3,A4,A5,_,_)).
+holds_t(P,A1,A2,A3,A4):- isCycPredArity_NE(P,4),(call_t(P,A1,A2,A3,A4);call_t_mt(P,A1,A2,A3,A4,_,_)).
+holds_t(P,A1,A2,A3):-isCycPredArity_NE(P,3),(call_t(P,A1,A2,A3);call_t_mt(P,A1,A2,A3,_,_)).
+holds_t(P,A1,A2):-isCycPredArity_NE(P,2),(call_t(P,A1,A2);call_t_mt(P,A1,A2,_,_)).
+holds_t(P,A1):-isCycPredArity_NE(P,1),(call_t(P,A1);call_t_mt(P,A1,_,_)).
 
 
-call_fa(P,A1,A2,A3,A4,A5,A6,A7):- callable(P,7),CALL=..[P,A1,A2,A3,A4,A5,A6,A7],(dbase:dbase_true(CALL);call(CALL)).
-call_fa(P,A1,A2,A3,A4,A5,A6):- dbase:dbase_true(P,A1,A2,A3,A4,A5,A6).
-call_fa(P,A1,A2,A3,A4,A5,A6):- assertion_holds(P,A1,A2,A3,A4,A5,A6).
-call_fa(P,A1,A2,A3,A4,A5,A6):- callable(P,6),call(P,A1,A2,A3,A4,A5,A6).
-call_fa(P,A1,A2,A3,A4,A5):- dbase:dbase_true(P,A1,A2,A3,A4,A5).
-call_fa(P,A1,A2,A3,A4,A5):- assertion_holds(P,A1,A2,A3,A4,A5).
-call_fa(P,A1,A2,A3,A4,A5):- callable(P,5),call(P,A1,A2,A3,A4,A5).
-call_fa(P,A1,A2,A3,A4):- dbase:dbase_true(P,A1,A2,A3,A4).
-call_fa(P,A1,A2,A3,A4):- assertion_holds(P,A1,A2,A3,A4).
-call_fa(P,A1,A2,A3,A4):- callable(P,4),call(P,A1,A2,A3,A4).
-call_fa(P,A1,A2,A3):- dbase:dbase_true(P,A1,A2,A3).
-call_fa(P,A1,A2,A3):- assertion_holds(P,A1,A2,A3).
-call_fa(P,A1,A2,A3):- callable(P,3),call(P,A1,A2,A3).
-call_fa(P,A1,A2):- dbase:dbase_true(P,A1,A2).
-call_fa(P,A1,A2):- assertion_holds(P,A1,A2).
-call_fa(P,A1,A2):- callable(P,2),call(P,A1,A2).
-call_fa(P,A1):- dbase:dbase_true(P,A1).
-call_fa(P,A1):- assertion_holds(P,A1).
-call_fa(P,A1):- callable(P,1),call(P,A1).
+holds_t([AH,P|LIST]):-is_holds_true(AH),!,holds_t_p2(P,LIST).
+holds_t([AH,P|LIST]):-is_holds_false(AH),!,holds_f_p2(P,LIST).
+holds_t([P|LIST]):-!,holds_t_p2(P,LIST).
+holds_t(CALL):-CALL=..[P|LIST],holds_t([P|LIST]).
+holds_t_p2(P,LIST):- CALL=..[holds_t,P|LIST],call(CALL).
 
-call_fa_mt(P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- callable(P,9),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],call(CALL).
-call_fa_mt(P,A1,A2,A3,A4,A5,A6,A7,A8):- callable(P,8),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],call(CALL).
-call_fa_mt(P,A1,A2,A3,A4,A5,A6,A7):- callable(P,7),CALL=..[P,A1,A2,A3,A4,A5,A6,A7],call(CALL).
-call_fa_mt(P,A1,A2,A3,A4,A5,A6):- callable(P,6),call(P,A1,A2,A3,A4,A5,A6).
-call_fa_mt(P,A1,A2,A3,A4,A5):- callable(P,5),call(P,A1,A2,A3,A4,A5).
-call_fa_mt(P,A1,A2,A3,A4):- callable(P,4),call(P,A1,A2,A3,A4).
-call_fa_mt(P,A1,A2,A3):- callable(P,3),call(P,A1,A2,A3).
+
+call_t(P,A1,A2,A3,A4,A5,A6,A7):- callable(P,7),CALL=..[P,A1,A2,A3,A4,A5,A6,A7],(dbase:dbase_true(CALL);call(CALL)).
+call_t(P,A1,A2,A3,A4,A5,A6):- dbase:dbase_true(P,A1,A2,A3,A4,A5,A6).
+call_t(P,A1,A2,A3,A4,A5,A6):- assertion_holds(P,A1,A2,A3,A4,A5,A6).
+call_t(P,A1,A2,A3,A4,A5,A6):- callable(P,6),call(P,A1,A2,A3,A4,A5,A6).
+call_t(P,A1,A2,A3,A4,A5):- dbase:dbase_true(P,A1,A2,A3,A4,A5).
+call_t(P,A1,A2,A3,A4,A5):- assertion_holds(P,A1,A2,A3,A4,A5).
+call_t(P,A1,A2,A3,A4,A5):- callable(P,5),call(P,A1,A2,A3,A4,A5).
+call_t(P,A1,A2,A3,A4):- dbase:dbase_true(P,A1,A2,A3,A4).
+call_t(P,A1,A2,A3,A4):- assertion_holds(P,A1,A2,A3,A4).
+call_t(P,A1,A2,A3,A4):- callable(P,4),call(P,A1,A2,A3,A4).
+call_t(P,A1,A2,A3):- dbase:dbase_true(P,A1,A2,A3).
+call_t(P,A1,A2,A3):- assertion_holds(P,A1,A2,A3).
+call_t(P,A1,A2,A3):- callable(P,3),call(P,A1,A2,A3).
+call_t(P,A1,A2):- dbase:dbase_true(P,A1,A2).
+call_t(P,A1,A2):- assertion_holds(P,A1,A2).
+call_t(P,A1,A2):- callable(P,2),call(P,A1,A2).
+call_t(P,A1):- dbase:dbase_true(P,A1).
+call_t(P,A1):- assertion_holds(P,A1).
+call_t(P,A1):- callable(P,1),call(P,A1).
+
+call_t_mt(P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- callable(P,9),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],call(CALL).
+call_t_mt(P,A1,A2,A3,A4,A5,A6,A7,A8):- callable(P,8),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],call(CALL).
+call_t_mt(P,A1,A2,A3,A4,A5,A6,A7):- callable(P,7),CALL=..[P,A1,A2,A3,A4,A5,A6,A7],call(CALL).
+call_t_mt(P,A1,A2,A3,A4,A5,A6):- callable(P,6),call(P,A1,A2,A3,A4,A5,A6).
+call_t_mt(P,A1,A2,A3,A4,A5):- callable(P,5),call(P,A1,A2,A3,A4,A5).
+call_t_mt(P,A1,A2,A3,A4):- callable(P,4),call(P,A1,A2,A3,A4).
+call_t_mt(P,A1,A2,A3):- callable(P,3),call(P,A1,A2,A3).
+
+xcall(P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],call(CALL).
+xcall(P,A1,A2,A3,A4,A5,A6,A7,A8):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],call(CALL).
+xcall(P,A1,A2,A3,A4,A5,A6,A7):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7],call(CALL).
+xcall(P,A1,A2,A3,A4,A5,A6):- call(P,A1,A2,A3,A4,A5,A6).
+xcall(P,A1,A2,A3,A4,A5):- call(P,A1,A2,A3,A4,A5).
+xcall(P,A1,A2,A3,A4):- call(P,A1,A2,A3,A4).
+xcall(P,A1,A2,A3):- call(P,A1,A2,A3).
+xcall(P,A1,A2):- call(P,A1,A2).
+xcall(P,A1):- call(P,A1).
+xcall(P):- call(P).
+
+assertion_true([AH,P|LIST]):-is_holds_true(AH),!,assertion_true([P|LIST]).
+assertion_true([AH,P|LIST]):-is_holds_false(AH),!,assertion_false([P|LIST]).
+assertion_true([P|LIST]):-'ASSERTION'(':TRUE-DEF',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
+assertion_true([P|LIST]):-'ASSERTION'(':TRUE-MON',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
+assertion_true([P|LIST]):-!, dbase:dbase_true([P|LIST]).
+
+% ================================================================================
+% end holds_t
+% ================================================================================
+
+
+% ================================================================================
+% begin holds_f
+% ================================================================================
+holds_f(P,A1,A2,A3,A4,A5,A6,A7):- isCycPredArity_NE(P,7),(call_f(P,A1,A2,A3,A4,A5,A6,A7);call_f_mt(P,A1,A2,A3,A4,A5,A6,A7,_,_);assertion_false([P,A1,A2,A3,A4,A5,A6,A7])).
+holds_f(P,A1,A2,A3,A4,A5,A6):- isCycPredArity_NE(P,6),(call_f(P,A1,A2,A3,A4,A5,A6);call_f_mt(P,A1,A2,A3,A4,A5,A6,_,_)).
+holds_f(P,A1,A2,A3,A4,A5):-isCycPredArity_NE(P,5),(call_f(P,A1,A2,A3,A4,A5);call_f_mt(P,A1,A2,A3,A4,A5,_,_)).
+holds_f(P,A1,A2,A3,A4):- isCycPredArity_NE(P,4),(call_f(P,A1,A2,A3,A4);call_f_mt(P,A1,A2,A3,A4,_,_)).
+holds_f(P,A1,A2,A3):-isCycPredArity_NE(P,3),(call_f(P,A1,A2,A3);call_f_mt(P,A1,A2,A3,_,_)).
+holds_f(P,A1,A2):-isCycPredArity_NE(P,2),(call_f(P,A1,A2);call_f_mt(P,A1,A2,_,_)).
+holds_f(P,A1):-isCycPredArity_NE(P,1),(call_f(P,A1);call_f_mt(P,A1,_,_)).
+
+
+holds_f([AH,P|LIST]):-is_holds_true(AH),!,holds_f_p2(P,LIST).
+holds_f([AH,P|LIST]):-is_holds_false(AH),!,holds_t_p2(P,LIST).
+holds_f([P|LIST]):-!,holds_f_p2(P,LIST).
+holds_f(CALL):-CALL=..[P|LIST],holds_f([P|LIST]).
+holds_f_p2(P,LIST):- xcall(((CALL=..[holds_f,P|LIST],xcall(CALL)))).
+
+
+call_f(P,A1,A2,A3,A4,A5,A6,A7):- xcall(((callable(P,7),CALL=..[P,A1,A2,A3,A4,A5,A6,A7],(dbase:dbase_false(CALL);xcall_not(CALL))))).
+call_f(P,A1,A2,A3,A4,A5,A6):- xcall(((dbase:dbase_false(P,A1,A2,A3,A4,A5,A6)))).
+call_f(P,A1,A2,A3,A4,A5,A6):- xcall(((assertion_holds_not(P,A1,A2,A3,A4,A5,A6)))).
+call_f(P,A1,A2,A3,A4,A5,A6):- xcall(((callable(P,6),xcall_not(P,A1,A2,A3,A4,A5,A6)))).
+call_f(P,A1,A2,A3,A4,A5):- xcall(((dbase:dbase_false(P,A1,A2,A3,A4,A5)))).
+call_f(P,A1,A2,A3,A4,A5):- xcall(((assertion_holds_not(P,A1,A2,A3,A4,A5)))).
+call_f(P,A1,A2,A3,A4,A5):- xcall(((callable(P,5),xcall_not(P,A1,A2,A3,A4,A5)))).
+call_f(P,A1,A2,A3,A4):- xcall((( dbase:dbase_false(P,A1,A2,A3,A4)))).
+call_f(P,A1,A2,A3,A4):- xcall(((assertion_holds_not(P,A1,A2,A3,A4)))).
+call_f(P,A1,A2,A3,A4):- xcall(((callable(P,4),xcall_not(P,A1,A2,A3,A4)))).
+call_f(P,A1,A2,A3):- xcall(((dbase:dbase_false(P,A1,A2,A3)))).
+call_f(P,A1,A2,A3):- xcall(((assertion_holds_not(P,A1,A2,A3)))).
+call_f(P,A1,A2,A3):- xcall(((callable(P,3),xcall_not(P,A1,A2,A3)))).
+call_f(P,A1,A2):- xcall(((dbase:dbase_false(P,A1,A2)))).
+call_f(P,A1,A2):- xcall((( assertion_holds_not(P,A1,A2)))).
+call_f(P,A1,A2):- xcall(((callable(P,2),xcall_not(P,A1,A2)))).
+call_f(P,A1):- xcall(((dbase:dbase_false(P,A1)))).
+call_f(P,A1):- xcall(((assertion_holds_not(P,A1)))).
+call_f(P,A1):- xcall(((callable(P,1),xcall_not(P,A1)))).
+
+call_f_mt(P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- callable(P,9),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],xcall_not(CALL).
+call_f_mt(P,A1,A2,A3,A4,A5,A6,A7,A8):- callable(P,8),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],xcall_not(CALL).
+call_f_mt(P,A1,A2,A3,A4,A5,A6,A7):- callable(P,7),CALL=..[P,A1,A2,A3,A4,A5,A6,A7],xcall_not(CALL).
+call_f_mt(P,A1,A2,A3,A4,A5,A6):- callable(P,6),xcall_not(P,A1,A2,A3,A4,A5,A6).
+call_f_mt(P,A1,A2,A3,A4,A5):- callable(P,5),xcall_not(P,A1,A2,A3,A4,A5).
+call_f_mt(P,A1,A2,A3,A4):- callable(P,4),xcall_not(P,A1,A2,A3,A4).
+call_f_mt(P,A1,A2,A3):- callable(P,3),xcall_not(P,A1,A2,A3).
+
+xcall_not(P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],\+ xcall(CALL).
+xcall_not(P,A1,A2,A3,A4,A5,A6,A7,A8):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],\+ xcall(CALL).
+xcall_not(P,A1,A2,A3,A4,A5,A6,A7):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7],\+ xcall(CALL).
+xcall_not(P,A1,A2,A3,A4,A5,A6):- \+ xcall(P,A1,A2,A3,A4,A5,A6).
+xcall_not(P,A1,A2,A3,A4,A5):- \+ xcall(P,A1,A2,A3,A4,A5).
+xcall_not(P,A1,A2,A3,A4):- \+ xcall(P,A1,A2,A3,A4).
+xcall_not(P,A1,A2,A3):- \+ xcall(P,A1,A2,A3).
+xcall_not(P,A1,A2):- \+ xcall(P,A1,A2).
+xcall_not(P,A1):- \+ xcall(P,A1).
+xcall_not(P):- \+ xcall(P).
+
+assertion_false([AH,P|LIST]):-is_holds_true(AH),!,assertion_false([P|LIST]).
+assertion_false([AH,P|LIST]):-is_holds_false(AH),!,assertion_true([P|LIST]).
+assertion_false([P|LIST]):-'ASSERTION'(':FALSE-DEF',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
+assertion_false([P|LIST]):-'ASSERTION'(':FALSE-MON',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
+assertion_false([P|LIST]):-!, dbase:dbase_false([P|LIST]).
+
+% ================================================================================
+% end holds_f 
+% ================================================================================
+
+
 
 arityMatches(A,S-E):- !, system:between(S,E,OTHER), A=OTHER.
 arityMatches(A,OTHER):-number(OTHER),!, A=OTHER.
@@ -304,17 +457,13 @@ isCycPredArity(P,A):-nonvar(P),!,isCycPredArity0(P,OTHER),!,arityMatches(A,OTHER
 isCycPredArity(P,A):- isCycPredArity0(P,OTHER),arityMatches(A,OTHER).
 
 
-isCycPredArity0(P,A):-nonvar(P),member(P,[arity,arityMax,arityMin]),!,A=2.
+isCycPredArity0(P,A):- nonvar(P),member(P,[arity,arityMax,arityMin]),!,A=2.
 isCycPredArity0(P,A):- isRegisteredCycPred(_,P,A).
-isCycPredArity0(P,A):- holds_t(arity,P, A).
-isCycPredArity0(P,A):- holds_t(arityMax,P, A).
-isCycPredArity0(P,A):- holds_t(arityMin,P, A),not(holds_t(arityMax,P, _)).
+isCycPredArity0(P,A):- xcall(holds_t(arity,P, A)).
+isCycPredArity0(P,A):- xcall(holds_t(arityMax,P, A)).
+isCycPredArity0(P,A):- xcall(((holds_t(arityMin,P, A),not(holds_t(arityMax,P, _))))).
 
 
-assertion_true([P|LIST]):-'ASSERTION'(':TRUE-DEF',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
-assertion_true([P|LIST]):-'ASSERTION'(':TRUE-MON',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
-assertion_true([AH,P|LIST]):-is_holds_true(AH),!,assertion_true([P|LIST]).
-assertion_true([P|LIST]):-!, dbase:dbase_true([P|LIST]).
 
 
 %:- register_module_type(utility).
@@ -339,7 +488,6 @@ ended_transform_cyc_preds.
 
 begin_transform_cyc_preds:- retractall((ended_transform_cyc_preds)).
 
-end_transform_cyc_preds:-!.   
 end_transform_cyc_preds:-
    asserta(ended_transform_cyc_preds),
    retractall((user:goal_expansion(G1,G2):- not(ended_transform_cyc_preds), compound(G1), cyc_goal_expansion(G1,G2))).
@@ -349,32 +497,41 @@ set_list_len(List,A,NewList):-length(List,LL),A>LL,length(NewList,A),append(List
 set_list_len(List,A,NewList):-length(NewList,A),append(NewList,_,List),!.
 
 
+functor_safe(P,F,A):- strip_module(P,P0),var(F),!,functor(P0,F0,A),strip_module(F0,F),!.
+functor_safe(P,F,A):- strip_module(P,P0),strip_module(F,F0),!,functor(P0,F0,A).
+
+strip_module(_:P,P):-nonvar(P),!.
+strip_module(P,P).
 
 use_holds_db(F,A):-isCycPredArity(F,A).
 
-cyc_goal_expansion(G1,G2):-cyc_pred_expansion(use_holds_db, dbase:holds_t,G1,G2).
-cyc_head_expansion(G1,G2):-cyc_pred_expansion(use_holds_db, dbase:dbase_true,G1,G2).
+cyc_goal_expansion(G1,G2):-cyc_pred_expansion(use_holds_db, holds_t:holds_f,G1,G2).
+cyc_head_expansion(G1,G2):-cyc_pred_expansion(use_holds_db, dbase_true:dbase_false,G1,G2).
 
 
-cyc_pred_expansion(_Pred,_HOLDS,G1,_):-not(compound(G1)),!,fail.
-cyc_pred_expansion(Pred,HOLDS,not(G1),not(G2)):-!,cyc_pred_expansion(Pred,HOLDS,G1,G2).
-cyc_pred_expansion(Pred,HOLDS, \+(G1) , \+(G2)):-!,cyc_pred_expansion(Pred,HOLDS,G1,G2).
-cyc_pred_expansion(Pred,M:HOLDS,G1,G3):- 
-            functor(G1,HF,_),is_holds_true(HF),
+cyc_pred_expansion(_Prd,_HOLDS,G1,_):-not(compound(G1)),!,fail.
+cyc_pred_expansion(_Prd,_HOLDS,G1,G1):- functor(G1,xcall,_).
+cyc_pred_expansion(Pred,NHOLDS:HOLDS,not(G1),G2):-!,cyc_pred_expansion(Pred,HOLDS:NHOLDS,G1,G2).
+cyc_pred_expansion(Pred,NHOLDS:HOLDS, \+(G1) ,G2):-!,cyc_pred_expansion(Pred,HOLDS:NHOLDS,G1,G2).
+cyc_pred_expansion(Pred,HOLDS:_NHOLDS,G1,G2):- 
+            functor_safe(G1,HF,_),is_holds_true(HF),
             G1=..[HF,F|List],call(Pred,F,A),!,
             set_list_len(List,A,NewList),
             G2=..[HOLDS,F|NewList],!,
-   prepend_module22(G2,M,G3),
-            dmsg_p(cyc_pred_expansion(Pred,HOLDS,G1,G3)).
-cyc_pred_expansion(Pred,M:HOLDS,G1,G3):- 
-            functor(G1,F,_),call(Pred,F,A),!,
+            dmsg_p(cyc_pred_expansion(Pred,HOLDS,G1,G2)).
+cyc_pred_expansion(Pred,_HOLDS:NHOLDS,G1,G2):- 
+            functor_safe(G1,HF,_),is_holds_false(HF),
+            G1=..[HF,F|List],call(Pred,F,A),!,
+            set_list_len(List,A,NewList),
+            G2=..[NHOLDS,F|NewList],!,
+            dmsg_p(cyc_pred_expansion(Pred,NHOLDS,G1,G2)).
+cyc_pred_expansion(Pred,HOLDS:_NHOLDS,G1,G2):- 
+            functor_safe(G1,F,_),call(Pred,F,A),!,
             G1=..[F|List], set_list_len(List,A,NewList), 
             G2=..[HOLDS,F|NewList],!,
-   prepend_module22(G2,M,G3),
-            dmsg_p(cyc_pred_expansion(Pred,HOLDS,G1,G3)).
+            dmsg_p(cyc_pred_expansion(Pred,HOLDS,G1,G2)).
 cyc_pred_expansion(Pred,HOLDS,G1,G2):- fail, G1=G2, dmsg(once(cyc_pred_expansion(Pred,HOLDS,G1,G2))),!,fail.
 
-prepend_module22(G2,_,G2).
 
 dmsg_p(_):-!.
 dmsg_p(P):-once(dmsg(P)),!.
@@ -382,6 +539,7 @@ dmsg_p(_):-!.
 
 cyc_term_expansion(G1,_):-not(compound(G1)),!,fail.
 cyc_term_expansion(((H:-B)),R):-!,cyc_rule_expansion(H,B,R),!.
+% cyc_term_expansion(H,HR):-trace,cyc_head_expansion(H,HR),!.
 
 cyc_rule_expansion(H,B,((HR:-BR))):-cyc_head_expansion(H,HR),!,must(expand_goal(B,BR)).
 
@@ -744,7 +902,7 @@ pl_arg_type(Arg,Type):-
 
 :-thread_local clause_present_lookup_local/3.
 
-clause_present(C):-notrace((functor(C,F,A),clause_present(C,F,A))).
+clause_present(C):-hotrace((functor_safe(C,F,A),clause_present(C,F,A))).
 clause_present(C,F,1):-C=..[F,A], is_decl_ft(F), format_complies(A,F,_).
 clause_present(C,_F,_A):- not(predicate_property(C,_)),!,fail.
 clause_present(C,_F,_A):- not(ground(C)),!,fail.
@@ -759,15 +917,16 @@ clause_present_1(C0,_F,A):- A>1, arg(A,C0,NEW),string(NEW),!,copy_term(C0,C),
    setarg(A,C,OLD),C,string_chars(NEW,[S|C1]),string_chars(OLD,[S|C2]),C1=C2,trace,dmsg(present(C)).
 %clause_present_1(C,F,A):- A>1, arg(A,C,NEW),snonvar(NEW),!,setarg(A,C,OLD),clause_present(C,F,A),pl_arg_type(NEW,string),string_chars(NEW,[S|C1]),string_chars(OLD,[S|C2]),C1=C2,dmsg(present(C)).
 
-is_holds_true(Prop):-atom(Prop),is_holds_true0(Prop).
+is_holds_true(Prop):-hotrace((atom(Prop),is_holds_true0(Prop))).
 is_holds_true0(Prop):-member(Prop,[k,p,holds,holds_t,dbase_true,res,assertion_holds,assertion,call]).
 
 is_2nd_order_holds(Prop):- is_holds_true(Prop) ; is_holds_false(Prop).
 
-is_holds_false(Prop):-atom(Prop),is_holds_true0(Stem),is_holds_false0(Prop,Stem).
+is_holds_false(Prop):-hotrace((atom(Prop),is_holds_true0(Stem),is_holds_false0(Prop,Stem))).
 is_holds_false0(Prop,Stem):-atom_concat('not_',Stem,Prop).
 is_holds_false0(Prop,Stem):-atom_concat(Stem,'_not',Prop).
 is_holds_false0(Prop,Stem):-atom_concat(Stem,'_false',Prop).
+is_holds_false0(Prop,Stem):-atom_concat(Stem,'_f',Prop).
 
 
 must_asserta(C):-
@@ -866,9 +1025,6 @@ compare_n(NewLast,Last):-number(NewLast),not(number(Last)),throw(incomparable_te
 compare_n(Last,NewLast):-number(NewLast),not(number(Last)),throw(incomparable_terms(Last,NewLast)).
 compare_n(NewLast,Last):-atomic(NewLast),not(atomic(Last)),throw(incomparable_terms(Last,NewLast)).
 compare_n(Last,NewLast):-atomic(NewLast),not(atomic(Last)),throw(incomparable_terms(Last,NewLast)).
-
-dbase:dbase_true(inRegion,O,Region):-atloc(O,LOC),locationToRegion(LOC,Region).
-dbase:dbase_true(inRegion,apath(Region,Dir),Region):- holds_t(pathBetween,Region,Dir,_To).
 
 
 member_or_e(E,[L|List]):-!,member(E,[L|List]).
@@ -969,6 +1125,9 @@ moo:db_prop(ArgTypes):-db_prop_from_game_load(ArgTypes).
 % =================================================================================================
 
 :- begin_transform_cyc_preds.
+
+inRegion(O,Region):-atloc(O,LOC),locationToRegion(LOC,Region).
+inRegion(apath(Region,Dir),Region):- pathBetween(Region,Dir,_To).
 
 db_prop_format(apath(region,dir),areaPath).
 db_prop_format(dice(int,int,int),int).
@@ -1100,7 +1259,7 @@ db_prop_flag(deleted(id)).
 
 
 % multivalued
-db_prop_multi(G,AT,[ordered|LIST]):-db_prop_multi(G,LIST),functor(G,_,AT).
+db_prop_multi(G,AT,[ordered|LIST]):-db_prop_multi(G,LIST),functor_safe(G,_,AT).
 
 db_prop_multi(named(term,term),[genlpreds(id)]).
 db_prop_multi(ofclass(term,type),[alias(mud_isa)]).
@@ -1120,6 +1279,7 @@ db_prop_multi(possess(agent,item)).
 db_prop_multi(moo:subclass(type,type)).
 db_prop_multi(mud_isa(term,type)).
 
+:-end_transform_cyc_preds.
 % =================================================================================================
 % END world database
 % =================================================================================================

@@ -28,7 +28,7 @@ load_game(File):-absolute_file_name(File,Path),see(Path),
    repeat,
    read_term(Term,[double_quotes(string)]),
    game_assert(Term),
-   Term=end_of_file,seen,!,
+   Term == end_of_file,seen,!,
    finish_processing_game.
 
 :-dynamic(in_finish_processing_game/0).

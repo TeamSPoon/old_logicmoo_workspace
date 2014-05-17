@@ -605,7 +605,7 @@ dynamic_load_pl(PLNAME):- % unload_file(PLNAME),
    Term==end_of_file,
    close(In).
 
-load_term(end_of_file,_Options):-!.
+load_term(E,_Options):- E == end_of_file, !.
 load_term(Term,Options):-catch(load_term2(Term,Options),E,(dmsg(error(load_term(Term,Options,E))),throw_safe(E))).
 
 load_term2(':-'(Term),Options):-!,load_dirrective(Term,Options),!.

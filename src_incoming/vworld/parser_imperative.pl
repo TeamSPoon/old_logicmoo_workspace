@@ -75,7 +75,10 @@ objects_match(SObj,Inv,List):-
 call_listing(_):-!.
 call_listing(Call):-forall(Call,fmt('~q.~n',[Call])).
 
-object_string(O,String):-object_string(_,O,1-4,String),!.
+% world:show_kb_via_pred_3(telnet_repl_writer, telnet_repl_obj_to_string, nameString, A, nameString('Area1007', B), C)
+% world:fmt_holds_tcall_pred_trans(telnet_repl_writer, telnet_repl_obj_to_string, nameString, _G2089767, notFound(f4, nameString, _G2089767)) 
+object_string(O,String):-object_string0(O,String),!.
+object_string0(O,String):-object_string(_,O,1-4,String),!.
 
 object_string(Agent,O,DescSpecs,String):- 
    gensym(object_string,OS),
@@ -90,8 +93,7 @@ remove_predupes([],[]).
 remove_predupes([L|ListI],ListO):- member(L,["",''," ",' ']),!,remove_predupes(ListI,ListO),!.
 remove_predupes([L|ListI], ListO):- (member_ci(L,ListI) -> remove_predupes(ListI,ListO) ; (remove_predupes(ListI,ListM),[L|ListM]=ListO)),!.
 
-member_ci(L,ListI):-memberchk(L,ListI),!.
-member_ci(L,ListI):-any_to_string(L,LL1),member(LL2,ListI),string_equal_ci(LL2,LL1),!.
+member_ci(L,ListI):-member(LL2,ListI),string_equal_ci(LL2,L).
 
 string_ci(A,LIC):-any_to_string(A,S),text_to_string(S,SS),string_lower(SS,SL),atomics_to_string(SLIC,"_",SL),atomics_to_string(SLIC," ",LIC),!.
 
@@ -162,6 +164,9 @@ parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL):- !,
  parse_agent_text_command_1(Agent,SVERB,ARGS,NewAgent,GOAL),!.
 
 
+parse_agent_text_command_1(Agent,VERB,ARGS,NewAgent,GOAL):- 
+   call_no_cuts(moo:agent_text_command(Agent,[VERB|ARGS],NewAgent,GOAL)).
+
 parse_agent_text_command_1(Agent,SVERB,ARGS,NewAgent,GOAL):- 
    call_no_cuts(moo:agent_text_command(Agent,[VERB|ARGS],NewAgent,GOAL)),
    verb_matches(SVERB,VERB).
@@ -176,10 +181,14 @@ parse_agent_text_command_1(Agent,SVERB,ARGS,Agent,GOAL):-
 
 parse_agent_text_command_1(Agent,IVERB,ARGS,NewAgent,GOAL):- 
    verb_alias_to_verb(IVERB,SVERB),
-   parse_agent_text_command_1(Agent,SVERB,ARGS,NewAgent,GOAL),!.
+   parse_agent_text_command_11(Agent,SVERB,ARGS,NewAgent,GOAL),!.
 
+parse_agent_text_command_11(Agent,SVERB,ARGS,NewAgent,GOAL):-parse_agent_text_command_1(Agent,SVERB,ARGS,NewAgent,GOAL).
+parse_agent_text_command_11(Agent,SVERB,ARGS,NewAgent,GOAL):-to_word_list(SVERB,L),!,L=[A,B|C],append([B|C],ARGS,BCARGS),
+   debugOnError(parse_agent_text_command_1(Agent,A,BCARGS,NewAgent,GOAL)).
 
 moo:verb_alias('l','look').
+moo:verb_alias('s','move s').
 moo:verb_alias('where is','where').
 
 pos_word_formula('infinitive',Verb,Formula):- dbase:'infinitive'(TheWord, Verb, _, _G183), dbase:'verbSemTrans'(TheWord, 0, 'TransitiveNPCompFrame', Formula, _, _).
@@ -237,7 +246,7 @@ bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
 
 :-style_check(+singleton).
 
-moo:specifier_text(Dir,dir):-member(Dir,[n,s,e,w,ne,nw,se,sw,u,d]).
+moo:specifier_text(Dir,dir):-member_ci(Dir,[n,s,e,w,ne,nw,se,sw,u,d]).
 
 
 moo:specifier_text(Text,Subclass):-moo:subclass(Subclass,spatialthing),mud_isa(X,Subclass),req(keyword(X,Text)).

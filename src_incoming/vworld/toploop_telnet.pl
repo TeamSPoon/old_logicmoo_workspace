@@ -15,6 +15,7 @@
                   show_room_grid/1,
                   inst_label/2,
                   display_grid_labels/0,
+                  wants_logout/1,
                   telnet_repl_writer/4,
                   telnet_repl_obj_to_string/3,
                   start_mud_telent/1,
@@ -24,12 +25,13 @@
 
 :- dynamic agent_message_stream/3, telnet_fmt_shown/3.
 
-:- meta_predicate toploop_telnet:show_room_grid_single(*,*,0).
+:- meta_predicate show_room_grid_single(*,*,0).
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
 :- register_module_type(utility).
 
+:- dynamic wants_logout/1.
 % ===========================================================
 % TELNET REPL + READER
 % ===========================================================
@@ -37,7 +39,7 @@ start_mud_telent(Port):- telnet_server(Port, [allow(_ALL),call_pred(login_and_ru
 
 login_and_run:-
   foc_current_player(P),
-  threads,
+   threads,
    call_agent_command(P,'who'),
    call_agent_command(P,'look'),
    fmt('~n~n~nHello ~w! Welcome to the MUD!~n',[P]),
@@ -45,15 +47,17 @@ login_and_run:-
    with_kb_assertions([repl_writer(P,telnet_repl_writer),repl_to_string(P,telnet_repl_obj_to_string)],
      % runs the Telent REPL
      run_player_telnet(P)),
-   fmt('~n~n~Goodbye ~w! ~n',[P]).
+   fmt('~n~nGoodbye ~w! ~n',[P]).
 
 run_player_telnet(P) :-    
-   repeat,
       foc_current_player(P),
       get_session_id(O),
-      with_assertions(thlocal:current_agent(O,P),once(read_and_do_telnet(P))), 
-      retract(wants_logout(P)),
-      retractall(agent_message_stream(P,_,_)).
+      with_assertions(thlocal:current_agent(O,P),
+       ((repeat,
+        once(read_and_do_telnet(P)), 
+        wants_logout(P),
+        retract(wants_logout(P)),
+        retractall(agent_message_stream(P,_,_))))).
 
 read_and_do_telnet(P):-
    current_input(Input),
@@ -71,7 +75,7 @@ prompt_read(Prompt,Atom):-
 	read_line_to_codes(In,Codes),
         foc_current_player(P),
          (is_list(Codes)-> atom_codes(Atom,Codes);
-           assert(wants_logout(P))),!.
+           (assert(wants_logout(P)),Atom='quit')),!.
 
 tick_tock:-
            scan_updates,!,fmt('tick tock',[]),sleep(1),!.
@@ -88,7 +92,7 @@ scan_updates:-ignore(catch(make,_,true)).
 do_player_action(VA):- debug, foc_current_player(Agent), do_player_action(Agent,VA),!.
 
 do_player_action(Agent,CMD):-var(CMD),!,fmt('unknown_var_command(~q,~q).',[Agent,CMD]).
-do_player_action(_,end_of_file):-tick_tock.
+do_player_action(_,EOF):- end_of_file == EOF, tick_tock.
 do_player_action(_,''):-tick_tock.
 do_player_action(Agent,CMD):- call_agent_command(Agent, CMD),!.
 % do_player_action(Agent,CMD):- fmt('unknown_call_command(~q,~q).', trace, call_agent_command(Agent, CMD),!.

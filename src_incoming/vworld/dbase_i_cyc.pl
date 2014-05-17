@@ -653,8 +653,8 @@ Vars = [=(CITIZEN,_h2866)|_h3347]
 
 ====================================================================*/
 
-getSurfaceFromChars([],[end_of_file],_):-!.
-getSurfaceFromChars([41],[end_of_file],_):-!.
+getSurfaceFromChars([],[EOF],_):- end_of_file == EOF, !.
+getSurfaceFromChars([41],[EOF],_):- end_of_file == EOF, !.
 
 getSurfaceFromChars([CH|ARSIn],TERM,VARS):-
          trim4e2c([CH|ARSIn],CHARS),CHARS=[FC|REST],!,

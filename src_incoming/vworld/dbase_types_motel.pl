@@ -3192,7 +3192,7 @@ compileEnvironment(FileName,EnvName) :-
 	!,
 	fail.
 
-treatClause('end_of_file') :-
+treatClause(EOF) :- end_of_file == EOF,
 	!.
 treatClause((:-dynamic Pred/Arity)) :-
 %	write((:-dynamic Pred/Arity)), write('.'), nl,
@@ -5531,7 +5531,7 @@ loadEnvironment(_FileName,_EnvName) :-
 	!, 
 	fail.
 
-assertClause('end_of_file') :-
+assertClause(EOF) :- end_of_file == EOF,
 	!.
 assertClause(Clause) :-
 	assertz(Clause),
@@ -13621,7 +13621,7 @@ loadKB(FileName,EnvName) :-
 	!.
 
 
-doFileGoal('end_of_file') :-
+doFileGoal(EOF) :- end_of_file == EOF,
 	seen,
 	!.
 doFileGoal(Goal) :-
