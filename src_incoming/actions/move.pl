@@ -16,7 +16,7 @@
 
 :- register_module_type(command).
 
-moo:agent_text_command(Agent,[DirSS],Agent,move(dir)):- catch(((string_to_atom(DirSS,Dir),moo:specifier_text(Dir,dir))),_,fail),!.
+moo:agent_text_command(Agent,[DirSS],Agent,move(Dir)):- catch(((string_to_atom(DirSS,Dir),moo:specifier_text(Dir,dir))),_,fail),!.
 
 moo:agent_text_command(Agent,[DirSS],Agent,move(DirS)):- 
  catch(((string_to_atom(DirSS,DirS),moo:specifier_text(Dir,dir),
