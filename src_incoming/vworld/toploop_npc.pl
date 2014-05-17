@@ -78,6 +78,7 @@ moo:decl_action(tick,"Makes *your* agent do something brilliant").
 moo:decl_action(prolog(prolog),"Call prolog toploop").
 
 moo:agent_text_command(Agent,[prolog,X],Agent,prologCall(X)).
+moo:agent_text_command(Agent,[prolog],Agent,prologCall(prolog)).
 
 warnOnError(X):-catch(X,E,dmsg(error(E:X))).
 
@@ -85,7 +86,7 @@ moo:agent_call_command(Agent,prologCall(C)) :- agent_call_safely(Agent,C).
 moo:agent_call_command(Agent,prolog(C)) :- agent_call_safely(Agent,C).
 
 agent_call_safely(_Agnt,C):- any_to_callable(C,X,Vars), !, gensym(result_count_,RC),flag(RC,_,0),agent_call_safely(RC,X,Vars),flag(RC,CC,CC),fmt(result_count(CC)).
-agent_call_safely(RC,X,[]) :- '@'(notrace((warnOnError(doall(((X,flag(RC,CC,CC+1),fmt(cmdresult(X,true)))))))),user).
+agent_call_safely(RC,X,[]) :- !, '@'(notrace((warnOnError(doall(((X,flag(RC,CC,CC+1),fmt(cmdresult(X,true)))))))),user).
 agent_call_safely(RC,X,Vars) :-  '@'(notrace((warnOnError(doall(((X,flag(RC,CC,CC+1),fmt(cmdresult(X,Vars)))))))),user).
 
 atom_to_term_safe(A,T,O):-catch(atom_to_term(A,T,O),_,fail),T\==end_of_file.

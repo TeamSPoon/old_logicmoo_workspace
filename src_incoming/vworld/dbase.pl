@@ -692,19 +692,25 @@ scan_db_prop:-
    !.
 scan_db_prop:-!.
 
+functor_safe(Obj,Obj):-not(compound(Obj)),!.
+functor_safe(_:Obj,F):-!,functor_safe(Obj,F).
+functor_safe(Obj,F):-functor(Obj,F,_).
 
-term_listing(Obj):- catch(listing(Obj),_,fail),fail.
-term_listing(Obj):-
+term_listing(Obj):- nonvar(var(Obj)),catch(listing(Obj),_,fail),fail.
+term_listing(Obj):- 
+    term_to_atom(Obj,HO),
+   functor_safe(Obj,F),
    doall((
    predicate_property(H,number_of_clauses(_)),
+   functor(H,HF,_),
+   HF\==F,
    clause(H,B),
-   use_term_listing(Obj,((H:-B))),
+   use_term_listing(Obj,HO,H,B),
    show_term_listing(H,B),
    fail)).
 
-
-use_term_listing(Obj,HB):- once((subst(HB,Obj,fov,H1B1), H1B1 \= HB)),!.
-use_term_listing(Obj,HB):- term_to_atom(Obj,HO), term_to_atom(HB,HBO), sub_atom_icasechk(HBO,_,HO),!.
+use_term_listing(Obj,HO,H,B):- term_to_atom((H:-B),HBO), sub_atom_icasechk(HBO,_,HO),!.
+use_term_listing(Obj,HO,H,B):- not(not(((subst((H:-B),Obj,fov,H1B1), H1B1 \= (H:-B))))),!.
 
 
 show_term_listing(H,true):- !, show_term_listing(H).

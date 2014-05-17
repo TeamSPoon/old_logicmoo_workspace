@@ -14,14 +14,16 @@
 % ====================================================
 % show the stats system
 % ====================================================
-moo:decl_action(stats(optional(object,self)), "Examine MUD stats of something").
-moo:agent_call_command(Agent,stats(What)):- 
+moo:decl_action(stats(optional(term,self)), "Examine MUD stats of something").
+moo:agent_call_command(Agent,stats(SWhat)):- 
+   term_listing(SWhat),
+   doall((parse_for(optional(agent,self),SWhat,What,_LeftOver),
    show_kb_preds(Agent,[
          charge(What,value),
          str(What,value),
          score(What,value),
          damage(What,value),
-         height(What,value)]).
+         height(What,value)]))).
 
 
 :- include(logicmoo('vworld/moo_footer.pl')).
