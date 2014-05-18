@@ -173,8 +173,6 @@
           dbase_false/6,
           dbase_false/7.
 
-:- meta_predicate man:with_assertions(:,0).
-:- meta_predicate world:intersect(?,0,?,0,0,-).
 :- meta_predicate clause_present(:), db_forall_assert_mv(+,+,+), db_forall_assert_sv(+,+,+), db_forall(+,+), db_forall_quf(+,+,+).
 
 :- dynamic 
