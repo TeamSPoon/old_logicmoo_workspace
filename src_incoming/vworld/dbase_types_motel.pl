@@ -10,18 +10,18 @@
 /*
 
 nt: notice(explorer(player1),do(explorer(player1),prolog)). 
- 1 ?- translate(implies(and(isa(X,C),genls(C,SC)),isa(X,SC)),X).
-X = [cl([isa(X, SC)], [and(isa(X, C), genls(C, SC))])].
+ 1 ?- translate(implies(and(mud_isa(X,C),genls(C,SC)),mud_isa(X,SC)),X).
+X = [cl([mud_isa(X, SC)], [and(mud_isa(X, C), genls(C, SC))])].
 
 
-- translate(exists(Z,implies(and([isa(X,C),genls(C,SC)]),isa(X,SC),knows(X,Z))),F).
-F = [cl([implies(and([isa(X, C), genls(C, SC)]), isa(X, SC), knows(X, f1))], [])].
+- translate(exists(Z,implies(and([mud_isa(X,C),genls(C,SC)]),mud_isa(X,SC),knows(X,Z))),F).
+F = [cl([implies(and([mud_isa(X, C), genls(C, SC)]), mud_isa(X, SC), knows(X, f1))], [])].
 
-4 ?- translate(exists(Z,implies(and([isa(X,C),genls(C,SC)]),and([isa(X,SC),knows(X,Z)]))),F).
-F = [cl([isa(X, SC)], [isa(X, C), genls(C, SC)]), cl([knows(X, f2)], [isa(X, C), genls(C, SC)])].
+4 ?- translate(exists(Z,implies(and([mud_isa(X,C),genls(C,SC)]),and([mud_isa(X,SC),knows(X,Z)]))),F).
+F = [cl([mud_isa(X, SC)], [mud_isa(X, C), genls(C, SC)]), cl([knows(X, f2)], [mud_isa(X, C), genls(C, SC)])].
 
-5 ?- translate(exists(Z,implies(and([isa(X,C),allHasPred(C,Pred)]),holds(Pred,X,Z))),F).
-F = [cl([holds(Pred, X, f3)], [isa(X, C), allHasPred(C, Pred)])].
+5 ?- translate(exists(Z,implies(and([mud_isa(X,C),allHasPred(C,Pred)]),holds(Pred,X,Z))),F).
+F = [cl([holds(Pred, X, f3)], [mud_isa(X, C), allHasPred(C, Pred)])].
 
 6 ?- 
 
@@ -3192,7 +3192,7 @@ compileEnvironment(FileName,EnvName) :-
 	!,
 	fail.
 
-treatClause('end_of_file') :-
+treatClause(EOF) :- end_of_file == EOF,
 	!.
 treatClause((:-dynamic Pred/Arity)) :-
 %	write((:-dynamic Pred/Arity)), write('.'), nl,
@@ -5531,7 +5531,7 @@ loadEnvironment(_FileName,_EnvName) :-
 	!, 
 	fail.
 
-assertClause('end_of_file') :-
+assertClause(EOF) :- end_of_file == EOF,
 	!.
 assertClause(Clause) :-
 	assertz(Clause),
@@ -6463,8 +6463,8 @@ example(59) :-
 	sb_defconcept(mother,[supers([parent,woman])]),
 	sb_defconcept(father,[supers([parent,man])]),
 	sb_defconcept(granni,[supers([grandparent,mother])]),
-	sb_defelem(harry,[isa(parent)]),
-	sb_defelem(mary,[isa(mother), 
+	sb_defelem(harry,[mud_isa(parent)]),
+	sb_defelem(mary,[mud_isa(mother), 
                          irole(child, 
                                iname('marys-child'),
                                [nr(1,30,2), vr(harry)])]).
@@ -11075,7 +11075,7 @@ constructRestriction(RName,[vr(ICName2)|L1],[ICName2|L2]) :-
 	!.
      
  /*-------------------------------------------------------------------------------
-  * make_defelem(ICName,isa(CName))
+  * make_defelem(ICName,mud_isa(CName))
   * individualisiert ein Konzept CName mit dem Instanz-Namen ICName vom Typ string,
   * d.h. es wird das Abox-Element ICName zu Konzept hinzugefuegt und zwar in modal
   * context [] bzw MS.
@@ -11086,10 +11086,10 @@ consistCheck(Env,MS,IC,Concept) :-
 % vor dem Test die Normalform von not(Concept) mittels
 % normalizeNot(not(Concept),NotConcept)
 % bilden und dann
-% sb_ask(Env,MS,(isa(IC,NotConcept)))
+% sb_ask(Env,MS,(mud_isa(IC,NotConcept)))
 % aufrufen
 			 normalizeNot(not(Concept),NotConcept),
-			 sb_ask(Env,MS,(isa(IC,NotConcept))),
+			 sb_ask(Env,MS,(mud_isa(IC,NotConcept))),
 			 nl,
 			 write('--- impossible --- '),
 			 !,
@@ -11104,7 +11104,7 @@ consistCheck(Env,MS,IC,Concept) :-
 
 
 
-make_defelem(EnvName,MS,ICName,isa(CName)):-
+make_defelem(EnvName,MS,ICName,mud_isa(CName)):-
 	  consistCheck(EnvName,MS,ICName,CName),
 	  assert_ind(EnvName,MS,ICName,CName),
 	  !.
@@ -11138,7 +11138,7 @@ make_defelem_list(EnvName,MS,ICName1,irole(RName,iname(IRName),[X|T])) :-
 
 /*--------------------------------------------------------------------------------
  * sb_defelem(ICName1,ISpecListe)
- * ISpecListe=[isa(...),irole(iname(...)nr(...)vr(...))]
+ * ISpecListe=[mud_isa(...),irole(iname(...)nr(...)vr(...))]
  * erzeugt eine Instanz ICName1 fuer ein Konzept, an dem auch die Rolle RName
  * individualisiert werden kann mit dem Instanznamen IRName,
  * der Kardinalitaet der indiv. Rolle nr(MinNr,MaxNr,DefNr),
@@ -11296,14 +11296,14 @@ sb_ask(M,Q) :-
 /*----------------------------------------------------------------------------
  ************************* sb_ask-Selektoren fuer die ABox ***********************
  *
- * sb_ask(EnvName,MS,(isa(ICName,CName)))
+ * sb_ask(EnvName,MS,(mud_isa(ICName,CName)))
  *
  * ermoeglicht den Zugriff Initial.-Beziehung einer Instanz ICName zum entsprech-
  * ende generellen Konzept CName.
  *------------------------------------------*/
 
 
- sb_ask(EnvName,MS,(isa(ICName,CName))) :- 
+ sb_ask(EnvName,MS,(mud_isa(ICName,CName))) :- 
 	ask(EnvName,MS,elementOf(ICName,CName),_).
 
 
@@ -11881,7 +11881,7 @@ unmake_irole(EnvName,MS,ICName1,irole(RName,iname(IRName),vr(ICName2))) :-
 	undefprimrole(EnvName,MS,IRName, restr(RName,CName2)),
         delete_ind(EnvName,MS,ICName1,ICName2,IRName).
 
-unmake_defelem(EnvName,MS,ICName,isa(CName)):-
+unmake_defelem(EnvName,MS,ICName,mud_isa(CName)):-
 	delete_ind(EnvName,MS,ICName,CName),
 	!.
 
@@ -11949,7 +11949,7 @@ sb_fact(P1,P2,P3) :-
 	completeParameter([P1,P2,P3],EnvName,MS,Query,Proof),
 	sb_fact(EnvName,MS,Query,Proof).
 
-sb_fact(EnvName,MS,isa(X,C),Exp) :-
+sb_fact(EnvName,MS,mud_isa(X,C),Exp) :-
 	retractall(hypothesis(_)),
  	environment(EnvName,Env,_),
  	convertMS(negative,Env,[[],true],MS,[],[W1,G1],_),
@@ -13240,8 +13240,8 @@ testMotelExample(57) :-
 testMotelExample(58) :-
 	print('No goal for this example'), nl.
 testMotelExample(59) :-
-	tryGoal(sb_ask(isa(harry,parent))),
-	tryGoal(sb_ask(isa(harry,person))),
+	tryGoal(sb_ask(mud_isa(harry,parent))),
+	tryGoal(sb_ask(mud_isa(harry,person))),
 	printTime(setof((X,Y),sb_ask(role(child,X,Y)),L1)), print(L1), nl,
 	printTime(setof(X,sb_ask(roleDef(child,X)),L2)), print(L2), nl,
 	printTime(setof((X,Y),sb_ask(roleNr('marys-child',X,Y)),L3)), print(L3), nl,
@@ -13621,7 +13621,7 @@ loadKB(FileName,EnvName) :-
 	!.
 
 
-doFileGoal('end_of_file') :-
+doFileGoal(EOF) :- end_of_file == EOF,
 	seen,
 	!.
 doFileGoal(Goal) :-

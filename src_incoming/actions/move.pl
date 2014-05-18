@@ -16,8 +16,11 @@
 
 :- register_module_type(command).
 
-moo:agent_text_command(Agent,[Dir],Agent,move(Dir)):- moo:specifier_text(Dir,dir).
-moo:agent_text_command(Agent,[DirS],Agent,move(DirS)):- atom(DirS),moo:specifier_text(Dir,dir),atom(Dir),atom_concat(Dir,N,DirS),atom_number(N,_).
+moo:agent_text_command(Agent,[DirSS],Agent,move(Dir)):- catch(((string_to_atom(DirSS,Dir),moo:specifier_text(Dir,dir))),_,fail),!.
+
+moo:agent_text_command(Agent,[DirSS],Agent,move(DirS)):- 
+ catch(((string_to_atom(DirSS,DirS),moo:specifier_text(Dir,dir),
+       catch((atom_concat(Dir,N,DirS),(atom_number(N,_))),_,fail))),_,fail).
 
 moo:agent_call_command(Agnt,Cmd):- functor(Cmd,move,_),!,
    must(move_command(Agnt,Cmd)).
@@ -25,17 +28,21 @@ moo:agent_call_command(Agnt,Cmd):- functor(Cmd,move,_),!,
 moo:decl_action(move(dir)).
 
 % dir###
-move_command(Agent,move(DirS)) :-atom(DirS),
-	    atom_concat(Dir,N,DirS),atom_number(N,Dist),
+move_command(Agent,move(DirSS)) :- catch((string_to_atom(DirSS,DirS),
+	    atom_concat(Dir,N,DirS),atom_number(N,Dist)),_,fail),!,
             move_command(Agent,Dir,Dist).
 % dir
 move_command(Agent,move(Dir)) :-
-	    req(movedist(Agent,Dist)),
+	    get_move_dist(Agent,Dist),
             move_command(Agent,Dir,Dist).
- 
+
+get_move_dist(Agent,Dist):-req(movedist(Agent,Dist)),!.
+get_move_dist(_Gent,1).
 
 % Move thy agent
-move_command(Agent,Dir,Dist) :- 
+move_command(Agent,DirS,DistS) :- 
+   string_to_atom(DirS,Dir),
+   any_to_number(DistS,Dist),
    catch(doall((between(1,Dist,_),move_command_1(Agent,Dir))),giveup(_),true).
 
 

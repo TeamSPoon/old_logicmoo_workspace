@@ -15,6 +15,7 @@
                   show_room_grid/1,
                   inst_label/2,
                   display_grid_labels/0,
+                  wants_logout/1,
                   telnet_repl_writer/4,
                   telnet_repl_obj_to_string/3,
                   start_mud_telent/1,
@@ -24,12 +25,13 @@
 
 :- dynamic agent_message_stream/3, telnet_fmt_shown/3.
 
-:- meta_predicate toploop_telnet:show_room_grid_single(*,*,0).
+:- meta_predicate show_room_grid_single(*,*,0).
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
 :- register_module_type(utility).
 
+:- dynamic wants_logout/1.
 % ===========================================================
 % TELNET REPL + READER
 % ===========================================================
@@ -37,41 +39,50 @@ start_mud_telent(Port):- telnet_server(Port, [allow(_ALL),call_pred(login_and_ru
 
 login_and_run:-
   foc_current_player(P),
-  threads,
-   listing(atloc/2),
+   ensure_player_stream_local(P,_,_),
+   threads,
+   call_agent_command(P,'who'),
    call_agent_command(P,'look'),
    fmt('~n~n~nHello ~w! Welcome to the MUD!~n',[P]),
    % sets some IO functions
    with_kb_assertions([repl_writer(P,telnet_repl_writer),repl_to_string(P,telnet_repl_obj_to_string)],
      % runs the Telent REPL
      run_player_telnet(P)),
-   fmt('~n~n~Goodbye ~w! ~n',[P]).
+   fmt('~n~nGoodbye ~w! ~n',[P]).
 
 run_player_telnet(P) :-    
-   repeat,
       foc_current_player(P),
       get_session_id(O),
-      with_assertions(thlocal:current_agent(O,P),once(read_and_do_telnet(P))), 
-      retract(wants_logout(P)),
-      retractall(agent_message_stream(P,_,_)).
+      retractall(wants_logout(P)),
+      with_assertions(thlocal:current_agent(O,P),
+       ((repeat,
+        once(read_and_do_telnet(P)), 
+        wants_logout(P),
+        retract(wants_logout(P)),
+        retractall(agent_message_stream(P,_,_))))).
 
-read_and_do_telnet(P):-
+
+ensure_player_stream_local(P,Input,Output):-
    current_input(Input),
    current_output(Output),
-   retractall(agent_message_stream(P,_,_)),
-   assert(agent_message_stream(P,Input,Output)),
+   (agent_message_stream(P,Input,Output)->true;
+      ((retractall(agent_message_stream(P,_,_)),
+     assert(agent_message_stream(P,Input,Output))))),!.
+
+read_and_do_telnet(P):-
+   ensure_player_stream_local(P,_,_),
          must(ignore(look_brief(P))),!,
-            notrace((sformat(S,'~w>',[P]),prompt_read(S,List))),!,
+           sformat(S,'~w>',[P]),prompt_read(S,List),
             must(once(do_player_action(List))),!.
 
 prompt_read(Prompt,Atom):-
-        current_input(In),
         fresh_line,
         fmt0('~n~w ',[Prompt]),
+        current_input(In),
 	read_line_to_codes(In,Codes),
         foc_current_player(P),
          (is_list(Codes)-> atom_codes(Atom,Codes);
-           assert(wants_logout(P))),!.
+           (assert(wants_logout(P)),Atom='quit')),!.
 
 tick_tock:-
            scan_updates,!,fmt('tick tock',[]),sleep(1),!.
@@ -88,23 +99,23 @@ scan_updates:-ignore(catch(make,_,true)).
 do_player_action(VA):- debug, foc_current_player(Agent), do_player_action(Agent,VA),!.
 
 do_player_action(Agent,CMD):-var(CMD),!,fmt('unknown_var_command(~q,~q).',[Agent,CMD]).
-do_player_action(_,end_of_file):-tick_tock.
+do_player_action(_,EOF):- end_of_file == EOF, tick_tock.
 do_player_action(_,''):-tick_tock.
 do_player_action(Agent,CMD):- call_agent_command(Agent, CMD),!.
-% do_player_action(Agent,CMD):- trace, call_agent_command(Agent, CMD),!.
-do_player_action(Agent,CMD):-fmt('unknown_call_command(~q,~q).',[Agent,CMD]).
+% do_player_action(Agent,CMD):- fmt('unknown_call_command(~q,~q).', trace, call_agent_command(Agent, CMD),!.
+do_player_action(Agent,CMD):-fmt('skipping_unknown_call_command(~q,~q).',[Agent,CMD]).
 
 
 % ===========================================================
 % DEFAULT TELNET "LOOK"
 % ===========================================================
-look_brief(_Agent):-!.
+look_brief(Agent):- not(props(Agent,needs_look(true))).
 look_brief(Agent):- prop(Agent,last_command,X),functor(X,look,_),!.
-look_brief(Agent):- call_agent_action(Agent,look).
+look_brief(Agent):- clr(props(Agent,needs_look(true))),call_agent_action(Agent,look).
 
 telnet_repl_writer(_TL,call,term,Goal):-!,ignore(debugOnError(Goal)).
 telnet_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=t),fmt('~q=(~w)~q.~n',[N,TypeO,V]).
-telnet_repl_obj_to_string(O,_Type,S):- object_string(O,S),!.
+telnet_repl_obj_to_string(O,_TypeHint,S):- object_string(O,S),!.
 telnet_repl_obj_to_string(O,Type,toString(TypeO,O)):-copy_term(Type,TypeO),ignore(TypeO=s).
 
 
@@ -170,9 +181,9 @@ show_room_grid_single(_Room,LOC,_OutsideTest):- atloc(_Obj,LOC),write('..'), !.
 show_room_grid_single(_Room,_LOC,_OutsideTest):- write('--'), !.
 
 inst_label(Obj,Label):-label_type(Label,Obj),!.
-inst_label(Obj,Label):-  props(Obj,nameStrings(Val)),Val\=Obj,inst_label(Val,Label),!.
+inst_label(Obj,Label):-  props(Obj,nameString(Val)),Val\=Obj,inst_label(Val,Label),!.
 inst_label(Obj,Label):-  props(Obj,named(Val)),Val\=Obj,inst_label(Val,Label),!.
-inst_label(Obj,Label):-  props(Obj,isa(Val)),Val\=Obj,inst_label(Val,Label),!.
+inst_label(Obj,Label):-  props(Obj,mud_isa(Val)),Val\=Obj,inst_label(Val,Label),!.
 inst_label(Obj,SLabe2):-term_to_atom(Obj,SLabel),sub_atom(SLabel,1,2,_,SLabe2),!.
 inst_label(Obj,SLabe2):-term_to_atom(Obj,SLabel),sub_atom(SLabel,0,2,_,SLabe2),!.
 inst_label(_Obj,'&&').

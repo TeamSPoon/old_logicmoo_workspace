@@ -563,8 +563,8 @@ cycQueryA(CycL):-cycQuery(CycL).
 assertion(Result):-assertion(_,_PRED,_,MT,[Pred|ARGS],TRUE,FORWARD,DEFAULT,NIL1,NIL2,ASSERTEDTRUEDEF,DATE,NIL3),
          once(assertRefactor(Pred,ARGS,Result)).
 
-assertRefactor(implies,[ARG1,ARG2],Result):-litRefactor([implies,ARG1,ARG2],[implies,LARG1,[Pred|LARG2]]),Result=..[holds,pl_implied,Pred,LARG2,LARG1],!.
-assertRefactor(Pred,R1,Out):-litRefactor(R1,R2),Out=..[holds,Pred|R2].
+assertRefactor(implies,[ARG1,ARG2],Result):-litRefactor([implies,ARG1,ARG2],[implies,LARG1,[Pred|LARG2]]), Result =.. [holds,pl_implied,Pred,LARG2,LARG1],!.
+assertRefactor(Pred,R1,Out):-litRefactor(R1,R2) ,Out=..[holds,Pred|R2].
 
 litRefactor(Subj,Subj):- (var(Subj);atom(Subj);number(Subj)),!.
 litRefactor([H|T],[HH|TT]):-litRefactor(H,HH),litRefactor(T,TT),!.
@@ -1170,6 +1170,15 @@ stringToWords([S|Tring],[W|Words]):-stringToWord(S,W),stringToWords(Tring,Words)
 stringToWord([S],W):-!,textCached([S],[lex,W|_]).
 stringToWord(S,W):-textCached([S],[lex,W|_]).
 
+/*
+ah(P,A1,A2,A3,A4,A5,A6,A7):- dmsg(ah(P,7,A1,A2,A3,A4,A5,A6,A7)).
+ah(P,A1,A2,A3,A4,A5,A6):- dmsg(ah(P,6,A1,A2,A3,A4,A5,A6)).
+ah(P,A1,A2,A3,A4,A5):- dmsg(ah(P,5,A1,A2,A3,A4,A5)).
+ah(P,A1,A2,A3,A4):- dmsg(ah(P,4,A1,A2,A3,A4)).
+ah(P,A1,A2,A3):- dmsg(ah(P,3,A1,A2,A3)).
+ah(P,A1,A2):- dmsg(ah(P,2,A1,A2)).
+ah(P,A1):- dmsg(ah(P,1,A1)).
+*/
 
 
 %suggestVar(_,Subj,Subj2):-makeName(Subj,Subj2),!.

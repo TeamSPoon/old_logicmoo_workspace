@@ -28,7 +28,7 @@ load_game(File):-absolute_file_name(File,Path),see(Path),
    repeat,
    read_term(Term,[double_quotes(string)]),
    game_assert(Term),
-   Term=end_of_file,seen,!,
+   Term == end_of_file,seen,!,
    finish_processing_game.
 
 :-dynamic(in_finish_processing_game/0).
@@ -66,7 +66,7 @@ isa_assert_g(A,Type,AA):-
   cmust(ground(A:Type)),
   gmust(ground(AA),isa_assert(A,Type,AA)).
   
-
+%  @set movedist 4
 
 fisa_assert(A,integer,AA):-!,isa_assert(A,int,AA).
 fisa_assert(A,int,AA):- must(any_to_number(A,AA)).
@@ -76,7 +76,7 @@ fisa_assert(A,dir,AA):- must(string_to_atom(A,AA)).
 
 
 isa_assert(A,Type,A):- once(var(A);var(Type)),!,trace,throw(failure(isa_assert(A,Type))).
-isa_assert(A,Type,AA):-fisa_assert(A,Type,AA),!.
+isa_assert(A,Type,AA):-fisa_assert(A,Type,AAA),AA=AAA,!.
 isa_assert(A,Type,AA):-format_complies(A,Type,AA),!.
 isa_assert(O,argIsaFn(_,_),O):-!. %any_to_value(O,V).  %missing
 isa_assert(A,type,A):-atom(A),define_type(A).
@@ -101,15 +101,9 @@ isa_assert(Arg,Props,NewArg):- compound(Props),
    C=..[F,Arg|TypesL],
    correctArgsIsa(C,CC),
    CC=..[F,NewArg|_].
-isa_assert(A,C,A):-must(ground(A)),dmsg(todo(define(isa_assert(A,C,'ConvertedArg')))),throw(retry(_)).
+isa_assert(A,C,A):-must(ground(A)),trace, dmsg(todo(define(isa_assert(A,C,'ConvertedArg')))),throw(retry(_)).
 
 isa_assert(A,Type,_NewArg):-throw(failure(isa_assert(A,Type))).
-
-
-
-holdsFunctor(k).
-holdsFunctor(p).
-holdsFunctor(holds).
 
 correctArgsIsa(A,AA):-
    functor(A,_,1),!,
@@ -118,7 +112,10 @@ correctArgsIsa(A,AA):-
 
 correctArgsIsa(M:A,M:AA):-!,correctArgsIsa(A,AA).
 
-correctArgsIsa(A,AA):-A =..[KP,Prop|Args],atom(Prop),holdsFunctor(KP),!,
+correctArgsIsa(A,AA):-A =..[KP,Prop|Args],atom(Prop),is_holds_true(KP),!,
+   discoverAndCorrectArgsIsa(Prop,1,Args,AArgs),AA =..[Prop|AArgs].
+
+correctArgsIsa(A,not(AA)):-A =..[KP,Prop|Args],atom(Prop),is_holds_false(KP),!,
    discoverAndCorrectArgsIsa(Prop,1,Args,AArgs),
    AA =..[Prop|AArgs].
 
@@ -132,14 +129,20 @@ game_assert(A):-must(once(correctArgsIsa(A,AA))),must(once(pgs(AA))),!.
 % pgs(A):- fail, A=..[SubType,Arg], moo:createableType(SubType,Type),!,AA =.. [Type,Arg],
 %      dbadd0(AA), assert_if_new(moo:call_after_load(create_instance(Arg,SubType,[debugInfo(moo:createableType(AA,SubType,Type))]))).   
 
+
+
+% ================================================
+% pgs
+% ================================================
 pgs(somethingIsa(A,List)):-forall_member(E,List,game_assert(ofclass(A,E))).
 pgs(somethingDescription(A,List)):-forall_member(E,List,game_assert(description(A,E))).
-pgs(objects(Type,List)):-forall_member(I,List,game_assert(isa(I,Type))).
+pgs(objects(Type,List)):-forall_member(I,List,game_assert(mud_isa(I,Type))).
 pgs(sorts(Type,List)):-forall_member(I,List,game_assert(subclass(I,Type))).
-pgs(predicates(List)):-forall_member(T,List,assert(db_prop_g(T))).
+pgs(predicates(List)):-forall_member(T,List,assert(db_prop_from_game_load(T))).
 
 pgs(description(A,E)):- must(once(add_description(A,E))).
-pgs(nameStrings(A,S0)):- determinerRemoved(S0,String,S),!,game_assert(nameStrings(A,S)),game_assert(determinerString(A,String)).
+pgs(nameString(A,S0)):- determinerRemoved(S0,String,S),!,game_assert(nameString(A,S)),game_assert(determinerString(A,String)).
+
 
 % skip formatter types
 pgs(A):- A=..[SubType,_],member(SubType,[string,action,dir]),!.
@@ -155,12 +158,14 @@ pgs(A):- A=..[SubType,_],
 
 pgs(A):- A=..[SubType,Arg], 
       member(SubType,[wearable]),
-      assert_if_new(moo:call_after_load(create_instance(Arg,item,[isa(A,SubType)]))).   
+      assert_if_new(moo:call_after_load(create_instance(Arg,item,[mud_isa(A,SubType)]))).   
 
 pgs(A):- A=..[SubType,_],dmsg(todo(ensure_creatabe(SubType))),dbadd0(A),!.
 
 pgs(W):-functor(W,F,A),functor(WW,F,A),db_prop_game_assert(WW),throw_safe(todo(pgs(W))).
-pgs(W):-dbadd0(W).
+% pgs(inRegion(A,B)):- trace, dbadd0(inRegion(A,B)),!.
+pgs(W):-dbadd0(W),!.
+pgs(W):-trace,dbadd0(W),!.
 pgs(A):-fmt('skipping ~q.',[A]).
 
 /*
@@ -242,7 +247,7 @@ ddeterminer0(the).
 ddeterminer(L,L):-ddeterminer0(L).
 ddeterminer(U,L):-string_lower(U,L),U\=L,!,ddeterminer0(L).
 
-add_description_word(A,Word):- string_upper(Word,Word),string_lower(Word,Flag),string_to_atom(Flag,Atom),show_call(game_assert(isa(A,Atom))).
+add_description_word(A,Word):- string_upper(Word,Word),string_lower(Word,Flag),string_to_atom(Flag,Atom),show_call(game_assert(mud_isa(A,Atom))).
 add_description_word(A,Word):- string_lower(Word,Word),show_call(game_assert(keyword(A,Word))).
 add_description_word(A,Word):- string_lower(Word,Lower),show_call(game_assert(keyword(A,Lower))).
 
@@ -261,7 +266,7 @@ show_call(game_assert(A)):-
    correctArgsIsa(A,AA),
    show_call0(game_assert(AA)).
 show_call(C):-show_call0(C).
-show_call0(C):-debugOnError(C). % dmsg(show_call(C)),C.      
+show_call0(C):-call(C). % dmsg(show_call(C)),C.      
 
 % :- finish_processing_game.
 

@@ -66,7 +66,7 @@
      prolog_must_l/1,
 
 
-
+        with_output_to_stream/2,
      dmsg/1,
      dmsg/2,
      dfmt/1,
@@ -121,45 +121,45 @@ set_bugger_flag(F,V):-create_prolog_flag(F,V,[term]).
 :- meta_predicate atLeastOne3(+,:,:).
 :- meta_predicate atLeastOne0(:,:).
 :- meta_predicate atLeastOne(:).
-:- meta_predicate bugger:prolog_must_not(:).
-:- meta_predicate bugger:gmust(:,:).
-:- meta_predicate bugger:logOnFailure0(:).
-:- meta_predicate bugger:debugOnError0(:).
-:- meta_predicate bugger:throw_or_debug(*,:).
-:- meta_predicate bugger:printAll(:,*).
-:- meta_predicate bugger:load_dirrective(:,*).
-:- meta_predicate bugger:debugOnFailure0(:).
-:- meta_predicate bugger:cli_notrace(:).
-:- meta_predicate bugger:printPredCount(*,:,*).
-:- meta_predicate bugger:ignoreOnError(:).
-:- meta_predicate bugger:traceIf(:).
-:- meta_predicate bugger:ifThen(:,:).
-:- meta_predicate bugger:prolog_ecall_fa(*,1,*,*,:).
-:- meta_predicate bugger:tryCatchIgnore(:).
-:- meta_predicate bugger:logOnError0(:).
-:- meta_predicate bugger:failOnError(:).
-:- meta_predicate bugger:test_call(:).
-:- meta_predicate bugger:cmust(:).
-:- meta_predicate bugger:debugCall(:).
-:- meta_predicate bugger:prolog_ecall(*,1,?).
-:- meta_predicate bugger:traceafter_call(:).
-:- meta_predicate bugger:if_prolog(*,:).
-:- meta_predicate bugger:must(:).
-:- meta_predicate bugger:map_tree_to_list(2,?,*).
-:- meta_predicate bugger:debugOnError(:).
-:- meta_predicate bugger:debugOnError0(:).
-:- meta_predicate bugger:debugOnErrorIgnore(:).
-:- meta_predicate bugger:debugOnFailure0(:).
-:- meta_predicate bugger:forall_member(*,*,:).
-:- meta_predicate bugger:throwOnFailure(:).
-:- meta_predicate bugger:hotrace(:).
+:- meta_predicate prolog_must_not(:).
+:- meta_predicate gmust(:,:).
+:- meta_predicate logOnFailure0(:).
+:- meta_predicate debugOnError0(:).
+:- meta_predicate throw_or_debug(*,:).
+:- meta_predicate printAll(:,*).
+:- meta_predicate load_dirrective(:,*).
+:- meta_predicate debugOnFailure0(:).
+:- meta_predicate cli_notrace(:).
+:- meta_predicate printPredCount(*,:,*).
+:- meta_predicate ignoreOnError(:).
+:- meta_predicate traceIf(:).
+:- meta_predicate ifThen(:,:).
+:- meta_predicate prolog_ecall_fa(*,1,*,*,:).
+:- meta_predicate tryCatchIgnore(:).
+:- meta_predicate logOnError0(:).
+:- meta_predicate failOnError(:).
+:- meta_predicate test_call(:).
+:- meta_predicate cmust(:).
+:- meta_predicate debugCall(:).
+:- meta_predicate prolog_ecall(*,1,?).
+:- meta_predicate traceafter_call(:).
+:- meta_predicate if_prolog(*,:).
+:- meta_predicate must(:).
+:- meta_predicate map_tree_to_list(2,?,*).
+:- meta_predicate debugOnError(:).
+:- meta_predicate debugOnError0(:).
+:- meta_predicate debugOnErrorIgnore(:).
+:- meta_predicate debugOnFailure0(:).
+:- meta_predicate forall_member(*,*,:).
+:- meta_predicate throwOnFailure(:).
+:- meta_predicate hotrace(:).
 % Restarting analysis ...
 % Found new meta-predicates in iteration 2 (:.:16 sec)
-:- meta_predicate bugger:prolog_must_l(:).
-:- meta_predicate bugger:printAll(:).
-:- meta_predicate bugger:prolog_must(:).
-:- meta_predicate bugger:showProfilerStatistics(:).
-:- meta_predicate bugger:notrace_call(:).
+:- meta_predicate prolog_must_l(:).
+:- meta_predicate printAll(:).
+:- meta_predicate prolog_must(:).
+:- meta_predicate showProfilerStatistics(:).
+:- meta_predicate notrace_call(:).
 
 :-use_module(logicmoo('logicmoo_util/logicmoo_util_ctx_frame.pl')).
 
@@ -256,7 +256,7 @@ hideRest:- functor_source_file(system,_P,F,A,_File),hideTraceMFA(system,F,A,-all
 hideRest.
 
 :- meta_predicate(hideTrace(:,+)).
-:- meta_predicate bugger:with_output_to_stream(*,0).
+:- meta_predicate with_output_to_stream(*,0).
 
 functor_source_file(M,P,F,A,File):-functor_source_file0(M,P,F,A,File). % must(ground((M,F,A,File))),must(user:nonvar(P)).
 functor_source_file0(M,P,F,A,File):-current_predicate(F/A),functor(P,F,A),source_file(P,File),predicate_module(P,M).
@@ -605,7 +605,7 @@ dynamic_load_pl(PLNAME):- % unload_file(PLNAME),
    Term==end_of_file,
    close(In).
 
-load_term(end_of_file,_Options):-!.
+load_term(E,_Options):- E == end_of_file, !.
 load_term(Term,Options):-catch(load_term2(Term,Options),E,(dmsg(error(load_term(Term,Options,E))),throw_safe(E))).
 
 load_term2(':-'(Term),Options):-!,load_dirrective(Term,Options),!.
@@ -723,13 +723,13 @@ logger_property(todo,once,true).
 
 :-debug(todo).
 
-dmsg(V):-notrace(dmsg0(V)).
+dmsg(V):- (dmsg0(V)).
 dmsg0(_):- bugger_flag(opt_debug=off),!.
 dmsg0(V):-var(V),!,trace,throw(dmsg(V)).
 
 dmsg0(C):-functor(C,Topic,_),debugging(Topic,_True_or_False),!,logger_property(Topic,once,true),!,
       (dmsg_log(Topic,_Time,C) -> true ; ((get_time(Time),asserta(dmsg_log(todo,Time,C)),!,dmsg2(C)))).
-dmsg0(C):-notrace((copy_term(C,Stuff), randomVars(Stuff),!,dmsg2(Stuff))).
+dmsg0(C):-((copy_term(C,Stuff), randomVars(Stuff),!,dmsg2(Stuff))).
 
 dmsg2(T):-!,
 	((

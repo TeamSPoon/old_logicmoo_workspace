@@ -21,8 +21,10 @@ moo:agent_text_command(Agent,[login,NewName],Agent,rename(NewName)).
 moo:agent_call_command(Agent,rename(NewName)):- padd(Agent,named(NewName)).
 
 % logout
-moo:agent_text_command(Agent,[logout],Agent,prologCall(assert(wants_logout(Agent)))).
+moo:agent_text_command(Agent,[Quit],Agent,prologCall(assert(wants_logout(Agent)))):-lorq(Quit).
 
+lorq(Quit):-member(Quit,[logout,quit]).
+moo:decl_action(Quit,"logs out of game (quits)"):-lorq(Quit).
 
 :- include(logicmoo('vworld/moo_footer.pl')).
 

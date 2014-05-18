@@ -12,7 +12,7 @@
 %
 */
 
-:- ensure_loaded(logicmoo('vworld/dbase.pl')).
+%%:- ensure_loaded(logicmoo('vworld/dbase.pl')).
 
 % standard header used in all files that all modules are loaded (therefore useful for when(?) the day comes that modules *can*only*see their explicitly imported modules)
 :- include(logicmoo('vworld/moo_header.pl')).

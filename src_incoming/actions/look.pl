@@ -61,14 +61,14 @@ call_look(Agent,LOC):-
          %  why does this this work on Prolog REPL?
          %   with_output_to(string(Str),show_room_grid('Area1000'))
          %  but yet this doent?
-         show_room_grid(region) = with_output_to(string(value),show_room_grid(region)),
+         % show_room_grid(region) = with_output_to(string(value),show_room_grid(region)),
          % for now workarround is 
-         call(show_room_grid(region)),
+         output=call(show_room_grid(region)),
          atloc(Agent,value),
-         nameStrings(region,value),
+         nameString(region,value),
          description(region,value),
          events=deliverable_location_events(Agent,LOC,value),
-         path(D) = pathBetween_call(region,D,value),
+         fmt(path(D)=value) = pathBetween_call(region,D,value),
          path(D) = pathName(region,D,value),
          inRegion(value,region),
          facing(Agent,value),
@@ -83,7 +83,7 @@ call_look(Agent,LOC):-
 
 
 looking(Agent):- get_session_id(O), thlocal:current_agent(O,Agent),!.
-looking(Agent):- isa(Agent,agent).
+looking(Agent):- mud_isa(Agent,agent).
 % looking(Agent):- thinking(Agent).
 
 % ********** TOP LEVEL PREDICATE: this is the predicate agents use to look
@@ -103,6 +103,7 @@ get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
 
 
 % Get only the Percepts
+moo:db_prop(look:get_percepts(agent,list(spatial))).
 get_percepts(Agent,Percepts) :- get_percepts0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts).
 get_percepts0(Agent,Percepts) :-
   call((
@@ -114,7 +115,8 @@ get_percepts0(Agent,Percepts) :-
 	!.
 
 % Look at locations immediately around argent
-get_near(Agent,Percepts):- get_near0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts).
+moo:db_prop(look:get_near(agent,list(spatial))).
+get_near(Agent,PerceptsO):- get_near0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
    
 get_near0(Agent,Percepts) :-
   call((
@@ -123,7 +125,8 @@ get_near0(Agent,Percepts) :-
 	view_dirs(Agent,Dirs,Percepts))),!.
 
 % Look only at location agent is currently in.
-get_feet(Agent,Percepts) :-  get_feet0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts).
+moo:db_prop(look:get_feet(agent,list(spatial))).
+get_feet(Agent,PerceptsO) :-  get_feet0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
 
 get_feet0(Agent,Percepts):-
   call((

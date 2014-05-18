@@ -44,32 +44,34 @@ call_agent_command(A,CMD):- call_agent_action(A,CMD),!.
 
 % All Actions must be called from here!
 call_agent_action(Agent,CMDI):-
-      subst(CMDI,self,Agent,CMDI2),
-      thread_self(TS),
-      asserta(thlocal:current_agent(TS,Agent)),
+   ensure_session_id(Agent,SESSION,Pushed),
+      subst(CMDI,self,Agent,CMDI2),      
       atloc(Agent,Where),
       subst(CMDI2,here,Where,CMD),
       % start event
-      raise_location_event(Where,notice(reciever,do(Agent,CMD))),
+     raise_location_event(Where,notice(reciever,do(Agent,CMD))),
      catch(( ignore(( once((debugOnError(moo:agent_call_command(Agent,CMD)),
            % complete event
            raise_location_event(Where,notice(reciever,done(Agent,CMD))));
            % fail event
               raise_location_event(Where,notice(reciever,failed(Agent,CMD))))))),E,fmt('call_agent_action/2 Error ~q ',[E])),
-  retract(thlocal:current_agent(TS,Agent)).
+    (Pushed -> ignore(retract(thlocal:current_agent(SESSION,Agent)));true).
 
 
+ensure_session_id(Agent,SESSION,fail):- get_session_id(SESSION),once(thlocal:current_agent(SESSION,Agent2)),Agent2==Agent,!.
+ensure_session_id(Agent,SESSION,true):- get_session_id(SESSION),asserta(thlocal:current_agent(SESSION,Agent)),!.
 
-get_session_id(main):-thread_self(main),!.
-get_session_id(ID):-thread_self(ID),thlocal:current_agent(ID,_),!.
-get_session_id(O):-current_input(O),!.
 
-current_agent_or_var(P):- get_session_id(O),thlocal:current_agent(O,P),!.
-current_agent_or_var(P):- get_session_id(P),P \=main,!.
+get_session_id(IDIn):-current_input(ID),is_stream(ID),!,ID=IDIn.
+get_session_id(ID):-thread_self(ID).
+
+current_agent(PIn):-get_session_id(O),thlocal:current_agent(O,P),!,P=PIn.
+
+current_agent_or_var(P):- once(current_agent(PIn)),P=PIn,!.
 current_agent_or_var(_).
 
-foc_current_player(P):- get_session_id(O),thlocal:current_agent(O,P),!.
-foc_current_player(P):- get_session_id(O),generate_new_player(P), !, asserta(thlocal:current_agent(O,P)).
+foc_current_player(P):- current_agent(P),!.
+foc_current_player(P):- get_session_id(O),generate_new_player(P),!,asserta(thlocal:current_agent(O,P)).
 
 generate_new_player(P) :-
   gensym(player,N),

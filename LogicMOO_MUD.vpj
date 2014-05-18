@@ -67,6 +67,18 @@
 			Filters=""/>
 	</CustomFolders>
 	<Files AutoFolders="PackageView">
+		<Folder Name="src">
+			<F
+				N="src/*.*"
+				Recurse="0"
+				Refilter="0"
+				Excludes=""/>
+		</Folder>
+		<Folder Name="src/logicmoo_util">
+			<F
+				N="src/logicmoo_util/*.*"
+				Recurse="1"/>
+		</Folder>
 		<Folder Name="src_incoming">
 			<F
 				N="src_incoming/*.*"

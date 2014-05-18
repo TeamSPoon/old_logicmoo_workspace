@@ -18,10 +18,6 @@
 
 :- register_module_type(command).
 
-%   moo:decl_action(_,tick(agent),"Makes some agent do something brilliant")  
-% moo:decl_action(_,where(actor),"Tells where actor is").
-% moo:decl_action(_,where(item),"Tells where item is").
-
 moo:decl_action(_,where(object),"Tells where something is").
 moo:subclass(agent,object).
 moo:subclass(item,object).
@@ -35,6 +31,12 @@ moo:agent_call_command(_Agent,where(SObj)) :-
 	atloc(Obj,LOC),
         object_match(SObj,Obj),
         fmt(cmdresult(where,atloc(Obj,LOC))).
+
+
+
+moo:decl_action(agent,who(optional(agent,_)),"Lists who is online (where they are at least)").
+
+moo:agent_call_command(_Gent,who(Agnt2)) :- C = (agent(Agnt2),dbase_true(inRegion,Agnt2,Where)), forall(db_forall_query(C),fmt(cmdresult(who(Agnt2),inRegion(Agnt2,Where)))).
 
 
 :- include(logicmoo('vworld/moo_footer.pl')).

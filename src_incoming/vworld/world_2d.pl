@@ -20,7 +20,7 @@ grid_dist(L1,L2,Dist):- to_3d(L1,L13D),to_3d(L2,L23D),dist(L13D,L23D,Dist),!.
 
 dist(_,_,5).
 
-pathBetween_call(From,Dir,To):-any_to_dir(Dir,Dir2),pathBetween(From,Dir2,To),same(Dir,Dir2).
+pathBetween_call(From,Dir,To):-any_to_dir(Dir,Dir2),holds_t(pathBetween,From,Dir2,To),same(Dir,Dir2).
    
 % 5x5 rooms are average
 %% to_3d(L1,L13D):-compound(L1)->L13D=L1; room_center(L1,X,Y,Z), L13D = xyz(L1,X,Y,Z).
@@ -34,14 +34,14 @@ room_center(Room,X,Y,Z):-
       grid_size(Room,MaxX,MaxY,MaxZ),
       center_xyz(MaxX,X),
       center_xyz(MaxY,Y),
-      center_xyz(MaxZ,Z),
-      dmsg(todo("get room size and calc center ",Room)).
+      center_xyz(MaxZ,Z),!.
+      % doing it ! dmsg(todo("get room size and calc center ",Room)).
 
 
 locationToRegion(xyz(Room,_,_,_),Region2):-!,locationToRegion(Room,Region2).
-locationToRegion(Room,Room).
+locationToRegion(Obj,Obj):-mud_isa(Obj,region),!. % inRegion(Obj,Room).
 
-loc_to_xy(xyz(Room,_,_,Z),X,Y,xyz(Room,X,Y,Z)):-!.
+loc_to_xy(LOC,X,Y,xyz(Room,X,Y,1)):- locationToRegion(LOC,Room),!.
 loc_to_xy(Room,X,Y,xyz(Room,X,Y,1)).
 
 is_3d(LOC):- compound(LOC).
@@ -49,7 +49,7 @@ is_3d(LOC):- compound(LOC).
 % Quintus random(1,MaxX,X) and random(1,MaxY,Y)
 grid_size(Room,MaxX,MaxY,MaxZ):- fail,
    moo:type_grid(What,1,L),
-   props(Room,isa(What)),!,
+   props(Room,mud_isa(What)),!,
    maxZ(MaxZ),
 	length(L,MaxX),
 	findall(1,moo:type_grid(What,_,_),LL),
@@ -59,13 +59,19 @@ grid_size(_Room,MaxX,MaxY,MaxZ):- MaxX = 5 , MaxY = 5 , maxZ(MaxZ) ,!.
 
 maxZ(2).
 
-% for now not useing grids
 in_grid(LocName,xyz(LocName,X,Y,1)) :-
+   grid_size(LocName,MaxX,MaxY, _MaxZ),!,
+   between(1,MaxX,X),
+   between(1,MaxY,Y).
+
+in_grid_rnd(LocName,xyz(LocName,X,Y,1)) :-
    grid_size(LocName,MaxX,MaxY, _MaxZ),!,
    repeat,
 	X is (1 + random(MaxX-2)),
 	Y is (1 + random(MaxY-2)).	
-in_grid(LocName,xyz(LocName,1,1,1)).
+
+% for now not useing grids
+in_grid_rnd(LocName,xyz(LocName,1,1,1)).
 
 
 init_location_grid(LocName):-
@@ -97,31 +103,45 @@ init3(LocName,LocType,xyz(LocName,X,Y,1),[O|T]) :-
 
 
 nearby(X,Y):-atloc(X,L1),atloc(Y,L2),locs_near(L1,L2).
-locs_near(L1,L2):- L1 = L2,!.
-locs_near(L1,L2):- grid_dist(L1,L2,Dist), Dist<4,!.
-locs_near(L1,L2):- locationToRegion(L1,R1),locationToRegion(L2,R2),!,R2==R1.
 
+:-export(locs_near/2).
+locs_near(L1,L2):- var(L1),nonvar(L2),!,locs_near(L2,L1).
+locs_near(L1,L2):- nonvar(L1),nonvar(L2),L2=xyz(_,_,_,_),locationToRegion(L1,R),!,call_tabled(locs_near_i(R,L2)).
+locs_near(L1,L2):- nonvar(L1),nonvar(L2),locationToRegion(L1,R1),locationToRegion(L2,R2),!,region_near(R1,R2).
+locs_near(L1,L2):-region_near(R1,R2),in_grid(R1,L1),in_grid(R2,L2).
+
+:-export(locs_near_i/2).
+locs_near_i(L1,L2):- locationToRegion(L1,R),in_grid(R,L2).
+locs_near_i(L1,L2):- locationToRegion(L1,R),pathBetween_call(R,_,R2),in_grid(R2,L2).
+
+region_near(R1,R2):-pathBetween_call(R1,_,R2).
+region_near(R1,R1).
 
 moo:type_default_props(OfAgent,agent,[facing(F),atloc(L)]):-create_someval(facing,OfAgent,F),create_someval(atloc,OfAgent,L).
 
-put_in_world(Agent):-ensure_some(atloc,Agent),ensure_some(facing,Agent),!.
+put_in_world(Agent):-ensure_some(facing,Agent),!,ensure_some(atloc,Agent),!.
 
 ensure_some(Property,OfAgent):- prop(OfAgent, Property,_),!.
 ensure_some(Property,OfAgent):- create_someval(Property,OfAgent,Value),padd(OfAgent,Property,Value).
 
 create_someval(facing,_Agent,Dir) :- random_member(Dir,[n,s,e,w,ne,nw,se,sw]).
-create_someval(atloc,Agent,Where) :- inRegion(Agent,Region),
+create_someval(atloc,Agent,Where) :- 
+   defaultRegion(Agent,Region),
    in_grid(Region,Where),
    unoccupied(Where),!.
-
 create_someval(atloc,_Agent,Loc) :- find_unoccupied(Loc).
+
+defaultRegion(Agent,Region):- inRegion(Agent,Region),!.
+defaultRegion(_Agent,Region):- inRegion(_,Region),!.
+defaultRegion(_Agent,Region):- Region = 'Area1000'.
+
 
 decide_region(LOC):- findall(O,region(O),LOCS),random_member(LOC,LOCS).
 
 random_member(LOC,LOCS):- length(LOCS,Len),Len>0, X is random(Len),nth0(X,LOCS,LOC).
 find_unoccupied(Where):-
    must(decide_region(LOC)),
-   in_grid(LOC,Where),
+   in_grid_rnd(LOC,Where),
    unoccupied(Where),!.
 find_unoccupied('Area1000'):- trace, throw(game_not_loaded).
 
@@ -139,9 +159,9 @@ calc_xyz(Region1,Dir,force(X1,Y1,Z1),X2,Y2,Z2):-
 move_dir_target(RegionXYZ,Dir,XXYY):-
    move_dir_target(RegionXYZ,Dir,1,XXYY).
 move_dir_target(RegionXYZ,Dir,Force,XXYY):-
-   notrace(calc_xyz(RegionXYZ,Dir,force(Force,Force,Force),X,Y,Z)),
-   notrace(locationToRegion(RegionXYZ,Region1)),
-   notrace(round_loc_target(Region1,X,Y,Z,Region2,X2,Y2,Z2)),
+   hotrace(calc_xyz(RegionXYZ,Dir,force(Force,Force,Force),X,Y,Z)),
+   hotrace(locationToRegion(RegionXYZ,Region1)),
+   hotrace(round_loc_target(Region1,X,Y,Z,Region2,X2,Y2,Z2)),
    XXYY = xyz(Region2,X2,Y2,Z2),!,
    must(ground(XXYY)),
    check_ahead_for_ground(XXYY).
@@ -194,11 +214,13 @@ dir_offset(here,_,0,0,0).
 
 % Used in move.pl, push.pl and climb.pl
 % Move agent (usually). Used to relocate agent's location.
-in_world_move(LOC,Agent,Dir) :-
+in_world_move(LOC,Agent,DirS) :-
+        string_to_atom(DirS,Dir),
         ignore(atloc(Agent,LOC)),
         in_world_move0(LOC,Agent,Dir),
         atloc(Agent,LOC2),
-        must(LOC2 \== LOC).
+        must(LOC2 \== LOC),
+        padd(Agent,[needs_look(true)]).
   
 in_world_move0(LOC,Agent,Dir) :-
         padd(Agent,facing(Dir)),
@@ -309,7 +331,7 @@ list_object_dir_near(List,Type,Dir) :-
 
 scan_lists_aux([Loc|_],Type,N,N) :-
 	member(Obj,Loc),
-        isa(Obj,Type),
+        mud_isa(Obj,Type),
 	!.
 scan_lists_aux([_|Rest],Type,M,N) :-
 	Mtemp is M + 1,
