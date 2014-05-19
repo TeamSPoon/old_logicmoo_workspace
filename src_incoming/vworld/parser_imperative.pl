@@ -199,6 +199,7 @@ call_no_cuts_0((!)):-!.
 call_no_cuts_0((A,B)):-!.call_no_cuts_0(A),call_no_cuts_0(B).
 call_no_cuts_0(C):-call(C).
 
+dmsg_parserm(_).
 % ===========================================================
 % PARSER
 % ===========================================================
@@ -210,15 +211,15 @@ parse_vp(Agent,do(NewAgent,GOAL),[SVERB|ARGS],[]):-
 
 parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL):-
   parse_agent_text_command_1(Agent,SVERB,ARGS,NewAgent,GOAL),
-   dmsg(parserm(succeed_parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL))),!.
+   dmsg_parserm((succeed_parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL))),!.
 
 parse_agent_text_command_0(Agent,VERB,[PT2|ARGS],NewAgent,GOAL):-atomic(VERB),atomic(PT2),
    atomic_list_concat([VERB,PT2],'_',SVERB),
    parse_agent_text_command_1(Agent,SVERB,ARGS,NewAgent,GOAL),
-   dmsg(parserm(special_succeed_parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL))),!.
+   dmsg_parserm((special_succeed_parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL))),!.
 
 parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL):- !,
- dmsg(parserm(failed_parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL))),fail,
+ dmsg_parserm((failed_parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL))),fail,
  debug,visible(+all),leash(+all),trace,
  parse_agent_text_command_1(Agent,SVERB,ARGS,NewAgent,GOAL),!.
 
@@ -233,10 +234,10 @@ parse_agent_text_command_1(Agent,SVERB,ARGS,NewAgent,GOAL):-
 % parses a verb phrase and retuns one interpretation (action)
 parse_agent_text_command_1(Agent,SVERB,ARGS,Agent,GOAL):-
    parse_vp_real(Agent,SVERB,ARGS,GOALANDLEFTOVERS),
-   dmsg(parserm("GOALANDLEFTOVERS"=GOALANDLEFTOVERS)),
+   dmsg_parserm(("GOALANDLEFTOVERS"=GOALANDLEFTOVERS)),
    GOALANDLEFTOVERS \= [],
    must(chooseBestGoal(GOALANDLEFTOVERS,GOAL)),
-   dmsg(parserm("chooseBestGoal"=GOAL)).
+   dmsg_parserm(("chooseBestGoal"=GOAL)).
 
 parse_agent_text_command_1(Agent,IVERB,ARGS,NewAgent,GOAL):- 
    verb_alias_to_verb(IVERB,SVERB),
@@ -271,12 +272,12 @@ parse_vp_templates(Agent,SVERB,_ARGS,TEMPLATES):-
 % parses a verb phrase and retuns multiple interps
 parse_vp_real(Agent,SVERB,ARGS,GOALANDLEFTOVERS):-
    parse_vp_templates(Agent,SVERB,ARGS,TEMPLATES),
-   dmsg(parserm("TEMPLATES"= ([SVERB,ARGS] = TEMPLATES))),
+   dmsg_parserm(("TEMPLATES"= ([SVERB,ARGS] = TEMPLATES))),
    TEMPLATES \= [],
    findall(LeftOver-GOAL,
      (( 
       member([VERB|TYPEARGS],TEMPLATES),      
-      dmsg(parserm("parseForTypes"=phrase_parseForTypes(TYPEARGS,GOODARGS,ARGS,LeftOver))),
+      dmsg_parserm(("parseForTypes"=phrase_parseForTypes(TYPEARGS,GOODARGS,ARGS,LeftOver))),
       phrase_parseForTypes(TYPEARGS,GOODARGS,ARGS,LeftOver),
       GOAL=..[VERB|GOODARGS])),
       GOALANDLEFTOVERS_FA),
@@ -285,7 +286,7 @@ parse_vp_real(Agent,SVERB,ARGS,GOALANDLEFTOVERS):-
 chooseBestGoal([_LeftOver - GOAL],GOAL):-!.
 chooseBestGoal(GOALANDLEFTOVERS,GOAL):-
    predsort(bestParse,GOALANDLEFTOVERS,Sorted),
-   dmsg(parserm("Sorted"=Sorted)),
+   dmsg_parserm(("Sorted"=Sorted)),
    member(_LeftOver - GOAL,Sorted),!.
 
 % bestParse(?Order, @Term1, @Term2)
