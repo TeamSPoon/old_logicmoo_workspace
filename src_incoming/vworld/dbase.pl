@@ -593,11 +593,11 @@ scan_arities:- forall(holds_t(arity,F,A),registerCycPred(F,A)).
 % ensure_NL_loaded(File):- current_prolog_flag(version,V),V>70111,!,dmsg(delay_loading(File)),!.
 ensure_NL_loaded(File):-dmsg(loading(File)),load_files(File,[if(not_loaded),qcompile(auto)]).
 
-:- ensure_loaded(logicmoo('database/logicmoo_nldata_freq.pdat.txt')).
-:- ensure_loaded(logicmoo('database/logicmoo_nldata_BRN_WSJ_LEXICON.txt')).
-:- ensure_loaded(logicmoo('database/logicmoo_nldata_colloc.pdat.txt')).
-:- ensure_loaded(logicmoo('database/logicmoo_cyc_pos_data')).
-:- ensure_loaded(logicmoo('database/logicmoo_nl_dictionary')).
+:- ensure_NL_loaded(logicmoo('database/logicmoo_nldata_freq.pdat.txt')).
+:- ensure_NL_loaded(logicmoo('database/logicmoo_nldata_BRN_WSJ_LEXICON.txt')).
+:- ensure_NL_loaded(logicmoo('database/logicmoo_nldata_colloc.pdat.txt')).
+:- ensure_NL_loaded(logicmoo('database/logicmoo_cyc_pos_data')).
+:- ensure_NL_loaded(logicmoo('database/logicmoo_nl_dictionary')).
 
 :- ensure_NL_loaded(logicmoo('pldata/tt0_00022_cycl')).
 :- ensure_NL_loaded(logicmoo('pldata/mworld0')).
