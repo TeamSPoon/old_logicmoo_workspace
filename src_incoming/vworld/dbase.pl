@@ -22,8 +22,8 @@
 */
 
 :- module(dbase, [
-
- add/1, add0/1, agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, ofclass/2, clr/1, damage/2, db_op/2, atloc/2, 
+  skip_qlfs/0,
+  add/1, add0/1, agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, ofclass/2, clr/1, damage/2, db_op/2, atloc/2, 
  db_prop_from_game_load/1, db_prop_game_assert/1, del/1, failure/2, grid/4, mud_isa/2, item/1, holds_tcall/1,
  memory/2, padd/2, padd/3, possess/2, prop/3, prop_or/4, props/2, region/1, req/1, scan_db_prop/0, score/2, stm/2, term_listing/1,  facing/2,
  thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, description/2, act_turn/2,
@@ -148,12 +148,18 @@
           dbase_t/6,
           dbase_t/7,
 
-          assertion_holds_not/7,
-          assertion_holds_not/6,
-          assertion_holds_not/5,
-          assertion_holds_not/4,
-          assertion_holds_not/3,
-          assertion_holds_not/2,
+          assertion_holds_f/7,
+          assertion_holds_f/6,
+          assertion_holds_f/5,
+          assertion_holds_f/4,
+          assertion_holds_f/3,
+          assertion_holds_f/2,
+          assertion_holds_t/7,
+          assertion_holds_t/6,
+          assertion_holds_t/5,
+          assertion_holds_t/4,
+          assertion_holds_t/3,
+          assertion_holds_t/2,
           dbase_f/1,
           dbase_f/2,
           dbase_f/3,
@@ -165,6 +171,19 @@
 :- meta_predicate clause_present(:), db_forall_assert_mv(+,+,+), db_forall_assert_sv(+,+,+), db_forall(+,+), db_forall_quf(+,+,+).
 
 :- dynamic 
+          assertion_holds_f/7,
+          assertion_holds_f/6,
+          assertion_holds_f/5,
+          assertion_holds_f/4,
+          assertion_holds_f/3,
+          assertion_holds_f/2,
+          assertion_holds_t/7,
+          assertion_holds_t/6,
+          assertion_holds_t/5,
+          assertion_holds_t/4,
+          assertion_holds_t/3,
+          assertion_holds_t/2,
+ skip_qlfs/0,
  dbase_mod/1,
   agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, ofclass/2,  damage/2, db_op/2,atloc/2, 
  db_prop_from_game_load/1, db_prop_game_assert/1, failure/2, grid/4, mud_isa/2, item/1, 
@@ -221,8 +240,8 @@ def_meta_predicate(F,S,E):-doall(((between(S,E,N),make_list('?',N,List),CALL=..[
 :- def_meta_predicate(dbase_f,1,7).
 :- def_meta_predicate(call_f_mt,4,10).
 :- def_meta_predicate(call_t_mt,4,10).
-:- def_meta_predicate(assertion_holds,2,7).
-:- def_meta_predicate(assertion_holds_not,2,7).
+:- def_meta_predicate(assertion_holds_t,2,7).
+:- def_meta_predicate(assertion_holds_f,2,7).
 
 %:- moo:register_module_type(utility).
 
@@ -290,19 +309,6 @@ registerCycPred(Mt,Pred,Arity):-
       assertz(M:isRegisteredCycPred(Mt,Pred,Arity)),
       add_db_prop(Pred,Arity,isRegisteredCycPred(Mt,Pred,Arity)),!.
 
-/*
-      '@'(((
-      % functor(Term,Pred,Arity),
-      F = Pred,
-      A is Arity,
-    %  A1 is Arity + 1,
-      A2 is Arity + 2,
-      dynamic(F/A), multifile(F/A), export(F/A),
-      dynamic(F/A2), multifile(F/A2), export(F/A2),
-    %  dynamic(assertion_holds/A1), multifile(assertion_holds/A1), export(assertion_holds/A1),
-      !
-      )),  M).
-*/
 
 get_module_of(P,M):-predicate_property(P,imported_from(M)),!.
 get_module_of(MM:_,M):-!,MM=M.
@@ -336,22 +342,22 @@ holds_t_p2(P,LIST):- CALL=..[holds_t,P|LIST],call(CALL).
 
 call_t(P,A1,A2,A3,A4,A5,A6,A7):- callable(P,7),CALL=..[P,A1,A2,A3,A4,A5,A6,A7],(dbase:dbase_t(CALL);call(CALL)).
 call_t(P,A1,A2,A3,A4,A5,A6):- dbase:dbase_t(P,A1,A2,A3,A4,A5,A6).
-call_t(P,A1,A2,A3,A4,A5,A6):- assertion_holds(P,A1,A2,A3,A4,A5,A6).
+call_t(P,A1,A2,A3,A4,A5,A6):- assertion_holds_t_t(P,A1,A2,A3,A4,A5,A6).
 call_t(P,A1,A2,A3,A4,A5,A6):- callable(P,6),call(P,A1,A2,A3,A4,A5,A6).
 call_t(P,A1,A2,A3,A4,A5):- dbase:dbase_t(P,A1,A2,A3,A4,A5).
-call_t(P,A1,A2,A3,A4,A5):- assertion_holds(P,A1,A2,A3,A4,A5).
+call_t(P,A1,A2,A3,A4,A5):- assertion_holds_t_t(P,A1,A2,A3,A4,A5).
 call_t(P,A1,A2,A3,A4,A5):- callable(P,5),call(P,A1,A2,A3,A4,A5).
 call_t(P,A1,A2,A3,A4):- dbase:dbase_t(P,A1,A2,A3,A4).
-call_t(P,A1,A2,A3,A4):- assertion_holds(P,A1,A2,A3,A4).
+call_t(P,A1,A2,A3,A4):- assertion_holds_t(P,A1,A2,A3,A4).
 call_t(P,A1,A2,A3,A4):- callable(P,4),call(P,A1,A2,A3,A4).
 call_t(P,A1,A2,A3):- dbase:dbase_t(P,A1,A2,A3).
-call_t(P,A1,A2,A3):- assertion_holds(P,A1,A2,A3).
+call_t(P,A1,A2,A3):- assertion_holds_t(P,A1,A2,A3).
 call_t(P,A1,A2,A3):- callable(P,3),call(P,A1,A2,A3).
 call_t(P,A1,A2):- dbase:dbase_t(P,A1,A2).
-call_t(P,A1,A2):- assertion_holds(P,A1,A2).
+call_t(P,A1,A2):- assertion_holds_t(P,A1,A2).
 call_t(P,A1,A2):- callable(P,2),call(P,A1,A2).
 call_t(P,A1):- dbase:dbase_t(P,A1).
-call_t(P,A1):- assertion_holds(P,A1).
+call_t(P,A1):- assertion_holds_t(P,A1).
 call_t(P,A1):- callable(P,1),call(P,A1).
 
 call_t_mt(P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- callable(P,9),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],call(CALL).
@@ -405,22 +411,22 @@ holds_f_p2(P,LIST):- xcall(((CALL=..[holds_f,P|LIST],xcall(CALL)))).
 
 call_f(P,A1,A2,A3,A4,A5,A6,A7):- xcall(((callable(P,7),CALL=..[P,A1,A2,A3,A4,A5,A6,A7],(dbase:dbase_f(CALL);xcall_not(CALL))))).
 call_f(P,A1,A2,A3,A4,A5,A6):- xcall(((dbase:dbase_f(P,A1,A2,A3,A4,A5,A6)))).
-call_f(P,A1,A2,A3,A4,A5,A6):- xcall(((assertion_holds_not(P,A1,A2,A3,A4,A5,A6)))).
+call_f(P,A1,A2,A3,A4,A5,A6):- xcall(((assertion_holds_f(P,A1,A2,A3,A4,A5,A6)))).
 call_f(P,A1,A2,A3,A4,A5,A6):- xcall(((callable(P,6),xcall_not(P,A1,A2,A3,A4,A5,A6)))).
 call_f(P,A1,A2,A3,A4,A5):- xcall(((dbase:dbase_f(P,A1,A2,A3,A4,A5)))).
-call_f(P,A1,A2,A3,A4,A5):- xcall(((assertion_holds_not(P,A1,A2,A3,A4,A5)))).
+call_f(P,A1,A2,A3,A4,A5):- xcall(((assertion_holds_f(P,A1,A2,A3,A4,A5)))).
 call_f(P,A1,A2,A3,A4,A5):- xcall(((callable(P,5),xcall_not(P,A1,A2,A3,A4,A5)))).
 call_f(P,A1,A2,A3,A4):- xcall((( dbase:dbase_f(P,A1,A2,A3,A4)))).
-call_f(P,A1,A2,A3,A4):- xcall(((assertion_holds_not(P,A1,A2,A3,A4)))).
+call_f(P,A1,A2,A3,A4):- xcall(((assertion_holds_f(P,A1,A2,A3,A4)))).
 call_f(P,A1,A2,A3,A4):- xcall(((callable(P,4),xcall_not(P,A1,A2,A3,A4)))).
 call_f(P,A1,A2,A3):- xcall(((dbase:dbase_f(P,A1,A2,A3)))).
-call_f(P,A1,A2,A3):- xcall(((assertion_holds_not(P,A1,A2,A3)))).
+call_f(P,A1,A2,A3):- xcall(((assertion_holds_f(P,A1,A2,A3)))).
 call_f(P,A1,A2,A3):- xcall(((callable(P,3),xcall_not(P,A1,A2,A3)))).
 call_f(P,A1,A2):- xcall(((dbase:dbase_f(P,A1,A2)))).
-call_f(P,A1,A2):- xcall((( assertion_holds_not(P,A1,A2)))).
+call_f(P,A1,A2):- xcall((( assertion_holds_f(P,A1,A2)))).
 call_f(P,A1,A2):- xcall(((callable(P,2),xcall_not(P,A1,A2)))).
 call_f(P,A1):- xcall(((dbase:dbase_f(P,A1)))).
-call_f(P,A1):- xcall(((assertion_holds_not(P,A1)))).
+call_f(P,A1):- xcall(((assertion_holds_f(P,A1)))).
 call_f(P,A1):- xcall(((callable(P,1),xcall_not(P,A1)))).
 
 call_f_mt(P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- callable(P,9),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],xcall_not(CALL).
@@ -580,29 +586,16 @@ scan_arities:- forall(holds_t(arity,F,A),registerCycPred(F,A)).
 % logicmoo('vworld/dbase') compiled into dbase 11.97 sec, 2,140,309 clauses
 %:- include(logicmoo('pldata/trans_header')).
 
-process_mworld:-forall(dynamicCyc2(C),registerCycPredPlus2(C)).
+process_mworld:-!. %forall(dynamicCyc2(C),registerCycPredPlus2(C)).
 
 % logicmoo('pldata/mworld0.pldata') compiled into world 61.18 sec, 483,738 clauses
 
-ensure_NL_loaded(File):-at_start_once('@'(load_files(File,[if(not_loaded),qcompile(auto)]),dbase)).
 
-:- ensure_NL_loaded(logicmoo('pldata/tiny_kb')).
-:- ensure_NL_loaded(logicmoo('pldata/nldata_freq_pdat')).
-:- ensure_NL_loaded(logicmoo('pldata/nldata_BRN_WSJ_LEXICON')).
-:- ensure_NL_loaded(logicmoo('pldata/nldata_colloc_pdat')).
-:- ensure_NL_loaded(logicmoo('pldata/nldata_cycl_pos0')).
-:- ensure_NL_loaded(logicmoo('pldata/nldata_dictionary_some01')).
-:- ensure_NL_loaded(logicmoo('pldata/tt0_00022_cycl')).
-:- ensure_NL_loaded(logicmoo('pldata/hl_holds')).
-
-:- ensure_NL_loaded(logicmoo('pldata/mworld0_declpreds')).
-:- at_start_once(dbase:process_mworld).
-:- ensure_NL_loaded(logicmoo('pldata/mworld0')).
 
 % withvars_988 loaded 9.46 sec, 4,888,433 clauses
-:- catch(ensure_NL_loaded(logicmoo('pldata/withvars_988')),_,true).
 
 :- meta_predicate get_module_of(0,+,+,-).
+:- at_start_once(dbase:process_mworld).
 
 :- use_module(library(check)).
 :- (
@@ -965,7 +958,7 @@ clause_present_1(C0,_F,A):- A>1, arg(A,C0,NEW),string(NEW),!,copy_term(C0,C),
 %clause_present_1(C,F,A):- A>1, arg(A,C,NEW),snonvar(NEW),!,setarg(A,C,OLD),clause_present(C,F,A),pl_arg_type(NEW,string),string_chars(NEW,[S|C1]),string_chars(OLD,[S|C2]),C1=C2,dmsg(present(C)).
 
 is_holds_true(Prop):-hotrace((atom(Prop),is_holds_true0(Prop))).
-is_holds_true0(Prop):-member(Prop,[k,p,holds,holds_t,dbase_t,res,assertion_holds,assertion]).
+is_holds_true0(Prop):-member(Prop,[k,p,holds,holds_t,dbase_t,res,assertion_holds_t,assertion]).
 
 is_2nd_order_holds(Prop):- is_holds_true(Prop) ; is_holds_false(Prop).
 

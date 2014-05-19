@@ -23,6 +23,24 @@
 at_start_once(G):- moo:at_started_once(G)->true;(asserta(moo:at_started_once(G)),G).
 ensure_m_loaded(File):-at_start_once((load_files(File,[if(not_loaded),qcompile(auto)]))).
 
+ensure_NL_loaded(File):-at_start_once('@'(load_files(File,[if(not_loaded),qcompile(auto)]),dbase)).
+
+
+% done in 'user' to avoid reloading when we reload dbase
+:- 
+ '@'((
+   ensure_NL_loaded(logicmoo('pldata/tiny_kb')),
+   ensure_NL_loaded(logicmoo('pldata/nldata_freq_pdat')),
+   ensure_NL_loaded(logicmoo('pldata/nldata_BRN_WSJ_LEXICON')),
+   ensure_NL_loaded(logicmoo('pldata/nldata_colloc_pdat')),
+   ensure_NL_loaded(logicmoo('pldata/nldata_cycl_pos0')),
+   ensure_NL_loaded(logicmoo('pldata/nldata_dictionary_some01')),
+   ensure_NL_loaded(logicmoo('pldata/tt0_00022_cycl')),
+   ensure_NL_loaded(logicmoo('pldata/hl_holds')),
+   ensure_NL_loaded(logicmoo('pldata/mworld0_declpreds')),
+   ensure_NL_loaded(logicmoo('pldata/mworld0')),
+   catch(ensure_NL_loaded(logicmoo('pldata/withvars_988')),_,true)), 'user').
+
 :- ensure_loaded(logicmoo('vworld/dbase')).
 :- ensure_loaded(logicmoo('vworld/moo')).
 
@@ -93,6 +111,4 @@ ensure_m_loaded(File):-at_start_once((load_files(File,[if(not_loaded),qcompile(a
 :- ensure_loaded(logicmoo('actions/help')).
 :- ensure_loaded(logicmoo('actions/get_set')).
 */
-
-
 
