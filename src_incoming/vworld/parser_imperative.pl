@@ -37,7 +37,7 @@
 :- meta_predicate findall_tabled4(?,?,?,?).
 
 
-:- include(logicmoo('vworld/moo_header')).
+% :- include(logicmoo('vworld/moo_header')).
 
 :- register_module_type(utility).
 
@@ -403,6 +403,14 @@ parseFmt(or([_|List]),Term) --> parseForIsa(or(List),Term).
 parseFmt(optional(Type,_),Term) --> parseForIsa(Type,Term).
 parseFmt(optional(_,Term),Term) --> [].
 
+parseFmt(list(Type),[Term|List]) --> parseForIsa(Type,Term),parseForIsa(list(Type),List).
+parseFmt(list(_Type),[]) --> [].
+
+parseFmt(countBetween(_Type,_,High),[]) --> {High==0,!}, [].
+parseFmt(countBetween(Type,Low,High),[Term|List]) --> parseForIsa(Type,Term),{!,Low2 is Low -1,High2 is High -1 },
+   parseForIsa(countBetween(Type,Low2,High2),List).
+parseFmt(countBetween(_Type,Low,_),[]) --> {!, Low < 1}, [].
+
 parseFmt(and([L|List]),Term1) --> dcgAnd(parseForIsa(L,Term1),parseForIsa(and(List),Term2)),{ignore(Term1==Term2),!}.
 parseFmt(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{specifiedItemType(String,Type,Term)}.
 
@@ -425,6 +433,6 @@ longest_string(Order,TStr1,TStr2):-
 
 
 
-:- include(logicmoo('vworld/moo_footer')).
+% :- include(logicmoo('vworld/moo_footer')).
 
 

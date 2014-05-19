@@ -595,15 +595,19 @@ scan_arities:- forall(holds_t(arity,F,A),registerCycPred(F,A)).
 
 :- include(logicmoo(vworld/dbase_i_cyc)).
 
+% logicmoo('vworld/dbase.pl') compiled into dbase 11.97 sec, 2,140,309 clauses
 % :- include(logicmoo('pldata/trans_header.pl')).
 
 % logicmoo('pldata/mworld0.pldata') compiled into world 61.18 sec, 483,738 clauses
 :- dmsg(loading(kb0)).
 :- ensure_loaded(logicmoo('pldata/tiny_kb')).
 
+:-dynamic at_started_once/1.
+at_start_once(G):- at_started_once(G)->true;(asserta(at_started_once(G)),G).
+
 % this next line delays loading of NL content
 % ensure_NL_loaded(File):- current_prolog_flag(version,V),V>70111,!,dmsg(delay_loading(File)),!.
-ensure_NL_loaded(File):-dmsg(loading(File)),load_files(File,[if(not_loaded),qcompile(auto)]).
+ensure_NL_loaded(File):-dmsg(loading(File)),at_start_once((load_files(File,[if(not_loaded),qcompile(auto)]))).
 
 :- ensure_NL_loaded(logicmoo('database/logicmoo_nldata_freq.pdat')).
 :- ensure_NL_loaded(logicmoo('database/logicmoo_nldata_BRN_WSJ_LEXICON')).
