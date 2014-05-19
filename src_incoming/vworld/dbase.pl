@@ -42,12 +42,6 @@
 
           getSurfaceFromChars/3,
           isSlot/1,
-          assertion_holds/7,
-          assertion_holds/6,
-          assertion_holds/5,
-          assertion_holds/4,
-          assertion_holds/3,
-          assertion_holds/2,
            scan_arities/0,
           'ASSERTION'/5,
           'ASSERTION'/6,
@@ -78,13 +72,13 @@
            defaultMt/1,
            mtForPred/2,
 
-          dbase_true/1,
-          dbase_true/2,
-          dbase_true/3,
-          dbase_true/4,
-          dbase_true/5,
-          dbase_true/6,
-          dbase_true/7,
+          dbase_t/1,
+          dbase_t/2,
+          dbase_t/3,
+          dbase_t/4,
+          dbase_t/5,
+          dbase_t/6,
+          dbase_t/7,
 
           xcall/1,
           xcall/2,
@@ -146,19 +140,13 @@
 :- meta_predicate get_module_of(0,-).
 
 :- dynamic
-          assertion_holds/7,
-          assertion_holds/6,
-          assertion_holds/5,
-          assertion_holds/4,
-          assertion_holds/3,
-          assertion_holds/2,
-          dbase_true/1,
-          dbase_true/2,
-          dbase_true/3,
-          dbase_true/4,
-          dbase_true/5,
-          dbase_true/6,
-          dbase_true/7,
+          dbase_t/1,
+          dbase_t/2,
+          dbase_t/3,
+          dbase_t/4,
+          dbase_t/5,
+          dbase_t/6,
+          dbase_t/7,
 
           assertion_holds_not/7,
           assertion_holds_not/6,
@@ -166,13 +154,13 @@
           assertion_holds_not/4,
           assertion_holds_not/3,
           assertion_holds_not/2,
-          dbase_false/1,
-          dbase_false/2,
-          dbase_false/3,
-          dbase_false/4,
-          dbase_false/5,
-          dbase_false/6,
-          dbase_false/7.
+          dbase_f/1,
+          dbase_f/2,
+          dbase_f/3,
+          dbase_f/4,
+          dbase_f/5,
+          dbase_f/6,
+          dbase_f/7.
 
 :- meta_predicate clause_present(:), db_forall_assert_mv(+,+,+), db_forall_assert_sv(+,+,+), db_forall(+,+), db_forall_quf(+,+,+).
 
@@ -195,13 +183,21 @@ dbase_mod(dbase).
 :- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_terms')).
 :- ensure_loaded(logicmoo('vworld/moo')).
 
-:- dynamic_multifile_exported dbase_true/1.
-:- dynamic_multifile_exported dbase_true/2.
-:- dynamic_multifile_exported dbase_true/3.
-:- dynamic_multifile_exported dbase_true/4.
-:- dynamic_multifile_exported dbase_true/5.
-:- dynamic_multifile_exported dbase_true/6.
-:- dynamic_multifile_exported dbase_true/7.
+:- dynamic_multifile_exported dbase_t/1.
+:- dynamic_multifile_exported dbase_t/2.
+:- dynamic_multifile_exported dbase_t/3.
+:- dynamic_multifile_exported dbase_t/4.
+:- dynamic_multifile_exported dbase_t/5.
+:- dynamic_multifile_exported dbase_t/6.
+:- dynamic_multifile_exported dbase_t/7.
+
+:- discontiguous dbase_t/1.
+:- discontiguous dbase_t/2.
+:- discontiguous dbase_t/3.
+:- discontiguous dbase_t/4.
+:- discontiguous dbase_t/5.
+:- discontiguous dbase_t/6.
+:- discontiguous dbase_t/7.
 
 :- meta_predicate isDebug(?).
 :- meta_predicate ensure_db_predicate_2(?,?,?,?,?,?).
@@ -221,8 +217,8 @@ def_meta_predicate(F,S,E):-doall(((between(S,E,N),make_list('?',N,List),CALL=..[
 :- def_meta_predicate(call_t,2,8).
 :- def_meta_predicate(xcall,1,7).
 :- def_meta_predicate(xcall_not,1,7).
-:- def_meta_predicate(dbase_true,1,7).
-:- def_meta_predicate(dbase_false,1,7).
+:- def_meta_predicate(dbase_t,1,7).
+:- def_meta_predicate(dbase_f,1,7).
 :- def_meta_predicate(call_f_mt,4,10).
 :- def_meta_predicate(call_t_mt,4,10).
 :- def_meta_predicate(assertion_holds,2,7).
@@ -338,23 +334,23 @@ holds_t(CALL):-CALL=..[P|LIST],holds_t([P|LIST]).
 holds_t_p2(P,LIST):- CALL=..[holds_t,P|LIST],call(CALL).
 
 
-call_t(P,A1,A2,A3,A4,A5,A6,A7):- callable(P,7),CALL=..[P,A1,A2,A3,A4,A5,A6,A7],(dbase:dbase_true(CALL);call(CALL)).
-call_t(P,A1,A2,A3,A4,A5,A6):- dbase:dbase_true(P,A1,A2,A3,A4,A5,A6).
+call_t(P,A1,A2,A3,A4,A5,A6,A7):- callable(P,7),CALL=..[P,A1,A2,A3,A4,A5,A6,A7],(dbase:dbase_t(CALL);call(CALL)).
+call_t(P,A1,A2,A3,A4,A5,A6):- dbase:dbase_t(P,A1,A2,A3,A4,A5,A6).
 call_t(P,A1,A2,A3,A4,A5,A6):- assertion_holds(P,A1,A2,A3,A4,A5,A6).
 call_t(P,A1,A2,A3,A4,A5,A6):- callable(P,6),call(P,A1,A2,A3,A4,A5,A6).
-call_t(P,A1,A2,A3,A4,A5):- dbase:dbase_true(P,A1,A2,A3,A4,A5).
+call_t(P,A1,A2,A3,A4,A5):- dbase:dbase_t(P,A1,A2,A3,A4,A5).
 call_t(P,A1,A2,A3,A4,A5):- assertion_holds(P,A1,A2,A3,A4,A5).
 call_t(P,A1,A2,A3,A4,A5):- callable(P,5),call(P,A1,A2,A3,A4,A5).
-call_t(P,A1,A2,A3,A4):- dbase:dbase_true(P,A1,A2,A3,A4).
+call_t(P,A1,A2,A3,A4):- dbase:dbase_t(P,A1,A2,A3,A4).
 call_t(P,A1,A2,A3,A4):- assertion_holds(P,A1,A2,A3,A4).
 call_t(P,A1,A2,A3,A4):- callable(P,4),call(P,A1,A2,A3,A4).
-call_t(P,A1,A2,A3):- dbase:dbase_true(P,A1,A2,A3).
+call_t(P,A1,A2,A3):- dbase:dbase_t(P,A1,A2,A3).
 call_t(P,A1,A2,A3):- assertion_holds(P,A1,A2,A3).
 call_t(P,A1,A2,A3):- callable(P,3),call(P,A1,A2,A3).
-call_t(P,A1,A2):- dbase:dbase_true(P,A1,A2).
+call_t(P,A1,A2):- dbase:dbase_t(P,A1,A2).
 call_t(P,A1,A2):- assertion_holds(P,A1,A2).
 call_t(P,A1,A2):- callable(P,2),call(P,A1,A2).
-call_t(P,A1):- dbase:dbase_true(P,A1).
+call_t(P,A1):- dbase:dbase_t(P,A1).
 call_t(P,A1):- assertion_holds(P,A1).
 call_t(P,A1):- callable(P,1),call(P,A1).
 
@@ -381,7 +377,7 @@ assertion_true([AH,P|LIST]):-is_holds_true(AH),!,assertion_true([P|LIST]).
 assertion_true([AH,P|LIST]):-is_holds_false(AH),!,assertion_false([P|LIST]).
 assertion_true([P|LIST]):-'ASSERTION'(':TRUE-DEF',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
 assertion_true([P|LIST]):-'ASSERTION'(':TRUE-MON',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
-assertion_true([P|LIST]):-!, dbase:dbase_true([P|LIST]).
+assertion_true([P|LIST]):-!, dbase:dbase_t([P|LIST]).
 
 % ================================================================================
 % end holds_t
@@ -407,23 +403,23 @@ holds_f(CALL):-CALL=..[P|LIST],holds_f([P|LIST]).
 holds_f_p2(P,LIST):- xcall(((CALL=..[holds_f,P|LIST],xcall(CALL)))).
 
 
-call_f(P,A1,A2,A3,A4,A5,A6,A7):- xcall(((callable(P,7),CALL=..[P,A1,A2,A3,A4,A5,A6,A7],(dbase:dbase_false(CALL);xcall_not(CALL))))).
-call_f(P,A1,A2,A3,A4,A5,A6):- xcall(((dbase:dbase_false(P,A1,A2,A3,A4,A5,A6)))).
+call_f(P,A1,A2,A3,A4,A5,A6,A7):- xcall(((callable(P,7),CALL=..[P,A1,A2,A3,A4,A5,A6,A7],(dbase:dbase_f(CALL);xcall_not(CALL))))).
+call_f(P,A1,A2,A3,A4,A5,A6):- xcall(((dbase:dbase_f(P,A1,A2,A3,A4,A5,A6)))).
 call_f(P,A1,A2,A3,A4,A5,A6):- xcall(((assertion_holds_not(P,A1,A2,A3,A4,A5,A6)))).
 call_f(P,A1,A2,A3,A4,A5,A6):- xcall(((callable(P,6),xcall_not(P,A1,A2,A3,A4,A5,A6)))).
-call_f(P,A1,A2,A3,A4,A5):- xcall(((dbase:dbase_false(P,A1,A2,A3,A4,A5)))).
+call_f(P,A1,A2,A3,A4,A5):- xcall(((dbase:dbase_f(P,A1,A2,A3,A4,A5)))).
 call_f(P,A1,A2,A3,A4,A5):- xcall(((assertion_holds_not(P,A1,A2,A3,A4,A5)))).
 call_f(P,A1,A2,A3,A4,A5):- xcall(((callable(P,5),xcall_not(P,A1,A2,A3,A4,A5)))).
-call_f(P,A1,A2,A3,A4):- xcall((( dbase:dbase_false(P,A1,A2,A3,A4)))).
+call_f(P,A1,A2,A3,A4):- xcall((( dbase:dbase_f(P,A1,A2,A3,A4)))).
 call_f(P,A1,A2,A3,A4):- xcall(((assertion_holds_not(P,A1,A2,A3,A4)))).
 call_f(P,A1,A2,A3,A4):- xcall(((callable(P,4),xcall_not(P,A1,A2,A3,A4)))).
-call_f(P,A1,A2,A3):- xcall(((dbase:dbase_false(P,A1,A2,A3)))).
+call_f(P,A1,A2,A3):- xcall(((dbase:dbase_f(P,A1,A2,A3)))).
 call_f(P,A1,A2,A3):- xcall(((assertion_holds_not(P,A1,A2,A3)))).
 call_f(P,A1,A2,A3):- xcall(((callable(P,3),xcall_not(P,A1,A2,A3)))).
-call_f(P,A1,A2):- xcall(((dbase:dbase_false(P,A1,A2)))).
+call_f(P,A1,A2):- xcall(((dbase:dbase_f(P,A1,A2)))).
 call_f(P,A1,A2):- xcall((( assertion_holds_not(P,A1,A2)))).
 call_f(P,A1,A2):- xcall(((callable(P,2),xcall_not(P,A1,A2)))).
-call_f(P,A1):- xcall(((dbase:dbase_false(P,A1)))).
+call_f(P,A1):- xcall(((dbase:dbase_f(P,A1)))).
 call_f(P,A1):- xcall(((assertion_holds_not(P,A1)))).
 call_f(P,A1):- xcall(((callable(P,1),xcall_not(P,A1)))).
 
@@ -450,7 +446,7 @@ assertion_false([AH,P|LIST]):-is_holds_true(AH),!,assertion_false([P|LIST]).
 assertion_false([AH,P|LIST]):-is_holds_false(AH),!,assertion_true([P|LIST]).
 assertion_false([P|LIST]):-'ASSERTION'(':FALSE-DEF',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
 assertion_false([P|LIST]):-'ASSERTION'(':FALSE-MON',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
-assertion_false([P|LIST]):-!, dbase:dbase_false([P|LIST]).
+assertion_false([P|LIST]):-!, dbase:dbase_f([P|LIST]).
 
 % ================================================================================
 % end holds_f 
@@ -517,7 +513,7 @@ strip_module(P,P).
 use_holds_db(F,A):-isCycPredArity(F,A).
 
 cyc_goal_expansion(G1,G2):-cyc_pred_expansion(use_holds_db, holds_t:holds_f,G1,G2).
-cyc_head_expansion(G1,G2):-cyc_pred_expansion(use_holds_db, dbase_true:dbase_false,G1,G2).
+cyc_head_expansion(G1,G2):-cyc_pred_expansion(use_holds_db, dbase_t:dbase_f,G1,G2).
 
 
 cyc_pred_expansion(_Prd,_HOLDS,G1,_):-not(compound(G1)),!,fail.
@@ -577,23 +573,6 @@ ah(P,A1):- dmsg(ah(P,1,A1)).
 % :- style_check(-string).
 
  
-:- dynamic_multifile_exported(dbase,
- ((
-  %dbase:inRegion/2,
-  %dbase:pathBetween/3,
-  dbase:'ASSERTION'/5,
-  dbase:'ASSERTION'/6,
-  dbase:'ASSERTION'/7,
-  dbase:'ASSERTION'/8,
-  dbase:transprob/4,
-  dbase:transprob2/3,
-  dbase:indexCyc/1,
-  dbase:bcr/1,
-  %dbase:((dynamicCyc))/1,
-  dbase:brillPos/1,
-  dbase:mws/2 
-  )) ).
-
 scan_arities:- forall(holds_t(arity,F,A),registerCycPred(F,A)).
 
 :- include(logicmoo(vworld/dbase_i_cyc)).
@@ -608,16 +587,15 @@ process_mworld:-forall(dynamicCyc2(C),registerCycPredPlus2(C)).
 ensure_NL_loaded(File):-at_start_once('@'(load_files(File,[if(not_loaded),qcompile(auto)]),dbase)).
 
 :- ensure_NL_loaded(logicmoo('pldata/tiny_kb')).
-:- ensure_NL_loaded(logicmoo('database/logicmoo_nldata_freq.pdat')).
-:- ensure_NL_loaded(logicmoo('database/logicmoo_nldata_BRN_WSJ_LEXICON')).
-:- ensure_NL_loaded(logicmoo('database/logicmoo_nldata_colloc.pdat')).
-:- ensure_NL_loaded(logicmoo('database/logicmoo_cyc_pos_data')).
-:- ensure_NL_loaded(logicmoo('database/logicmoo_nl_dictionary')).
-
+:- ensure_NL_loaded(logicmoo('pldata/nldata_freq_pdat')).
+:- ensure_NL_loaded(logicmoo('pldata/nldata_BRN_WSJ_LEXICON')).
+:- ensure_NL_loaded(logicmoo('pldata/nldata_colloc_pdat')).
+:- ensure_NL_loaded(logicmoo('pldata/nldata_cycl_pos0')).
+:- ensure_NL_loaded(logicmoo('pldata/nldata_dictionary_some01')).
 :- ensure_NL_loaded(logicmoo('pldata/tt0_00022_cycl')).
 :- ensure_NL_loaded(logicmoo('pldata/hl_holds')).
 
-:- ensure_NL_loaded(logicmoo('pldata/mworld')).
+:- ensure_NL_loaded(logicmoo('pldata/mworld0_declpreds')).
 :- at_start_once(dbase:process_mworld).
 :- ensure_NL_loaded(logicmoo('pldata/mworld0')).
 
@@ -636,47 +614,42 @@ ensure_NL_loaded(File):-at_start_once('@'(load_files(File,[if(not_loaded),qcompi
 
 
 /*
+ First time you run this 2 million clauses are qcompiled 
+ (I've excluded 7 million more clauses that are only available with spec ial C Y C  Liciens ing)
 
-;;    loading(kb0)
-%     logicmoo('pldata/tiny_kb') compiled into dbase 6.54 sec, 9,019 clauses
-%     logicmoo('database/logicmoo_nl_dictionary') compiled into dbase 0.09 sec, 267 clauses
-;;     loading(logicmoo('database/logicmoo_nldata_freq.pdat.txt'))
-%     logicmoo('database/logicmoo_nldata_freq.pdat.txt') compiled into dbase 15.24 sec, 107,710 clauses
-;;     loading(logicmoo('database/logicmoo_nldata_BRN_WSJ_LEXICON.txt'))
-%     logicmoo('database/logicmoo_nldata_BRN_WSJ_LEXICON.txt') compiled into dbase 12.26 sec, 113,869 clauses
-;;     loading(logicmoo('database/logicmoo_nldata_colloc.pdat.txt'))
-%     logicmoo('database/logicmoo_nldata_colloc.pdat.txt') compiled into dbase 9.50 sec, 64,087 clauses
-;;     loading(logicmoo('database/logicmoo_cyc_pos_data'))
-%     logicmoo('database/logicmoo_cyc_pos_data') compiled into dbase 0.39 sec, 2,480 clauses
-;;     loading(logicmoo('pldata/tt0_00022_cycl'))
-%     logicmoo('pldata/tt0_00022_cycl') compiled into dbase 54.46 sec, 313,290 clauses
-;;     loading(logicmoo('pldata/mworld0'))
-%     logicmoo('pldata/mworld0') compiled into dbase 109.01 sec, 483,066 clauses
-;;     loading(logicmoo('pldata/hl_holds'))
-%     logicmoo('pldata/hl_holds') compiled into dbase 324.81 sec, 1,041,327 clauses
+      /devel/logicmoo/src_data/pldata/tiny_kb.pl *qcompiled* into tiny_kb 2.40 sec, 8,481 clauses
+%     /devel/logicmoo/src_data/pldata/nldata_freq_pdat.pl *qcompiled* into nldata_freq_pdat 7.88 sec, 107,704 clauses
+%     /devel/logicmoo/src_data/pldata/nldata_BRN_WSJ_LEXICON.pl *qcompiled* into nldata_BRN_WSJ_LEXICON 7.65 sec, 113,863 clauses
+%     /devel/logicmoo/src_data/pldata/nldata_colloc_pdat.pl *qcompiled* into nldata_colloc_pdat 6.31 sec, 64,081 clauses
+%     /devel/logicmoo/src_data/pldata/nldata_cycl_pos0.pl *qcompiled* into nldata_cycl_pos0 0.20 sec, 2,488 clauses
+%     /devel/logicmoo/src_data/pldata/nldata_dictionary_some01.pl *qcompiled* into nldata_dictionary_some01 0.03 sec, 293 clauses
+%     /devel/logicmoo/src_data/pldata/tt0_00022_cycl.pl *qcompiled* into tt0_00022_cycl 26.86 sec, 313,234 clauses
+%     /devel/logicmoo/src_data/pldata/hl_holds.pl *qcompiled* into hl_holds 175.31 sec, 1,041,317 clauses
+%     /devel/logicmoo/src_data/pldata/mworld0_declpreds.pl *qcompiled* into dbase 0.05 sec, 680 clauses
+%     /devel/logicmoo/src_data/pldata/mworld0.pl *qcompiled* into mworld0 60.49 sec, 483,046 clauses
 
+  It took several minutes on my 48 core machine with 128gb ram on all SSDs as you can see.. 
 
-   loading(kb0)
-%     logicmoo('pldata/tiny_kb') compiled into dbase 2.73 sec, 9,017 clauses
-%     loading(logicmoo('database/logicmoo_nldata_freq.pdat.txt'))
-%     logicmoo('database/logicmoo_nldata_freq.pdat.txt') compiled into dbase 0.03 sec, 107,710 clauses
-%     loading(logicmoo('database/logicmoo_nldata_BRN_WSJ_LEXICON.txt'))
-%     logicmoo('database/logicmoo_nldata_BRN_WSJ_LEXICON.txt') compiled into dbase 0.72 sec, 113,869 clauses
-   loading(logicmoo('database/logicmoo_nldata_colloc.pdat'))
-%     /devel/logicmoo/src_modules/database/logicmoo_nldata_colloc.pdat.pl *qcompiled* into dbase 0.30 sec, 64,081 clauses
-%     loading(logicmoo('database/logicmoo_cyc_pos_data'))
-%     logicmoo('database/logicmoo_cyc_pos_data') loaded into dbase 0.00 sec, 2,479 clauses
-%     loading(logicmoo('database/logicmoo_nl_dictionary'))
-%     logicmoo('database/logicmoo_nl_dictionary') loaded into dbase 0.00 sec, 266 clauses
-%     loading(logicmoo('pldata/tt0_00022_cycl'))
-%     logicmoo('pldata/tt0_00022_cycl') loaded into dbase 0.28 sec, 313,287 clauses
-%     loading(logicmoo('pldata/mworld0'))
-%     logicmoo('pldata/mworld0') loaded into dbase 0.53 sec, 483,065 clauses
-%     loading(logicmoo('pldata/hl_holds'))
-%     logicmoo('pldata/hl_holds') loaded into dbase 1.35 sec, 1,041,321 clauses
+  But afterwards .. it is able to load the system from .qlf in a mater of under 3 seconds!
 
+  No other SQL clone has been able to beat this .. Prolog uses 80% less ram and 10x times faster than
+    any SQL indexing strategy I've for a large database (wtf? secret is all atoms are keys)  
+   (The atom table (pointers to strings) is of no interest/use during join ops obviouslly.. 
+     in which i have to do millions of join ops per semantic parse)
+
+%     logicmoo('pldata/tiny_kb') loaded into tiny_kb 0.02 sec, 9,016 clauses
+%     logicmoo('pldata/nldata_freq_pdat') loaded into nldata_freq_pdat 0.10 sec, 107,709 clauses
+%     logicmoo('pldata/nldata_BRN_WSJ_LEXICON') loaded into nldata_BRN_WSJ_LEXICON 0.09 sec, 113,868 clauses
+%     logicmoo('pldata/nldata_colloc_pdat') loaded into nldata_colloc_pdat 0.06 sec, 64,086 clauses
+%     logicmoo('pldata/nldata_cycl_pos0') loaded into nldata_cycl_pos0 0.00 sec, 2,479 clauses
+%     logicmoo('pldata/nldata_dictionary_some01') loaded into nldata_dictionary_some01 0.00 sec, 264 clauses
+%     logicmoo('pldata/tt0_00022_cycl') loaded into tt0_00022_cycl 0.28 sec, 313,287 clauses
+%     logicmoo('pldata/hl_holds') loaded into hl_holds 1.31 sec, 1,041,321 clauses
+%     logicmoo('pldata/mworld0_declpreds') loaded into dbase 0.00 sec, 679 clauses
+%     logicmoo('pldata/mworld0') loaded into mworld0 0.60 sec, 483,058 clauses
 
 */
+
 user_export(_):- dbase_mod(user),!.
 user_export(_M:Prop/Arity):-!,user_export(Prop/Arity).
 user_export(Prop/Arity):- 
@@ -992,7 +965,7 @@ clause_present_1(C0,_F,A):- A>1, arg(A,C0,NEW),string(NEW),!,copy_term(C0,C),
 %clause_present_1(C,F,A):- A>1, arg(A,C,NEW),snonvar(NEW),!,setarg(A,C,OLD),clause_present(C,F,A),pl_arg_type(NEW,string),string_chars(NEW,[S|C1]),string_chars(OLD,[S|C2]),C1=C2,dmsg(present(C)).
 
 is_holds_true(Prop):-hotrace((atom(Prop),is_holds_true0(Prop))).
-is_holds_true0(Prop):-member(Prop,[k,p,holds,holds_t,dbase_true,res,assertion_holds,assertion]).
+is_holds_true0(Prop):-member(Prop,[k,p,holds,holds_t,dbase_t,res,assertion_holds,assertion]).
 
 is_2nd_order_holds(Prop):- is_holds_true(Prop) ; is_holds_false(Prop).
 
@@ -1200,8 +1173,8 @@ moo:db_prop(ArgTypes):-db_prop_from_game_load(ArgTypes).
 
 :- dbase:begin_transform_cyc_preds.
 
-inRegion(O,Region):-atloc(O,LOC),locationToRegion(LOC,Region).
-inRegion(apath(Region,Dir),Region):- pathBetween(Region,Dir,_To).
+dbase_t(inRegion,O,Region):-atloc(O,LOC),locationToRegion(LOC,Region).
+dbase_t(inRegion,apath(Region,Dir),Region):- holds_t(pathBetween,Region,Dir,_To).
 
 db_prop_format(apath(region,dir),areaPath).
 db_prop_format(dice(int,int,int),int).
@@ -1248,8 +1221,8 @@ type(T):-moo:subclass(A,B),(T=B;T=A).
 type(item).
 
 
-nameString(apath(Region,Dir),Text):- pathName(Region,Dir,Text).
-description(apath(Region,Dir),Text):- holds_t(pathName(Region,Dir,Text)).
+dbase_t(nameString,apath(Region,Dir),Text):- holds_t(pathName,Region,Dir,Text).
+description(apath(Region,Dir),Text):- holds_t(pathName, Region,Dir,Text).
 
 moo:decl_action(list(term)).
 moo:agent_call_command(_Gent,list(Obj)):- term_listing(Obj).
