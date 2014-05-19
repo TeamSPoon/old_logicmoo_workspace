@@ -14,7 +14,7 @@
 
 % :- include(logicmoo('vworld/moo_header.pl')).
 
-:- register_module_type(utility).
+:- moo:register_module_type(utility).
 
 grid_dist(L1,L2,Dist):- to_3d(L1,L13D),to_3d(L2,L23D),dist(L13D,L23D,Dist),!.
 

@@ -5,7 +5,7 @@
 */
 :- include(logicmoo('vworld/moo_header.pl')).
 
-:- register_module_type(command).
+:- moo:register_module_type(command).
 
 moo:decl_action('@get'(optional(term,self),term),text("@get term to a property")).
 moo:decl_action('@set'(optional(term,self),atom,term),text("@sets term to a property")).

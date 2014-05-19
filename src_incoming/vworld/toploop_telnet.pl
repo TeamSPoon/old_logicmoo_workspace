@@ -29,7 +29,7 @@
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
-:- register_module_type(utility).
+:- moo:register_module_type(utility).
 
 :- dynamic wants_logout/1.
 % ===========================================================

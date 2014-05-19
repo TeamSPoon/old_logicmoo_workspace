@@ -8,7 +8,7 @@
 */
 :- include(logicmoo('vworld/moo_header.pl')).
 
-:- register_module_type(command).
+:- moo:register_module_type(command).
 
 is_posture(sit).
 is_posture(stand).

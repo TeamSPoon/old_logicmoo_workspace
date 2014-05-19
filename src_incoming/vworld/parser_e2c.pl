@@ -22,7 +22,7 @@
 :- meta_predicate do_dcg(?,?,?,?,?).
 :- meta_predicate isPOS(?,?,?,?,?).
 
-:- register_module_type(utility).
+:- moo:register_module_type(utility).
 
 % posm_cached(CycL, Phrase,POS,Form,CycL)
 :-dynamic lex/3,  lexMap/3.
@@ -30,7 +30,7 @@
 idGen(X):-flag(idGen,X,X+1).
 
 %:- ensure_loaded(logicmoo('vworld/dbase.pl')).
-:- begin_transform_cyc_preds.
+:- dbase:begin_transform_cyc_preds.
 
 
 
@@ -2957,5 +2957,5 @@ atom_junct2([W|S],[W|Words]):-atom_junct2(S,Words).
 % :- include(logicmoo('vworld/moo_footer.pl')).
 
 
-:-end_transform_cyc_preds.
+:-dbase:end_transform_cyc_preds.
 

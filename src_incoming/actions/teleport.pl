@@ -16,7 +16,7 @@
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
-:- register_module_type(command).
+:- moo:register_module_type(command).
 
 % teleport
 moo:agent_text_command(Agent,[tp],Agent,teleport).

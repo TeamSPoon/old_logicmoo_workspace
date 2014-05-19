@@ -14,7 +14,7 @@
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
-:- register_module_type(command).
+:- moo:register_module_type(command).
 
 moo:agent_text_command(Agent,[DirSS],Agent,move(Dir)):- catch(((string_to_atom(DirSS,Dir),moo:specifier_text(Dir,dir))),_,fail),!.
 

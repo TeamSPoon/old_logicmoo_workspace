@@ -18,7 +18,7 @@
 :- module(explorer,[]).
 
 :- include(logicmoo('vworld/moo_header.pl')).
-:- register_module_type(planning).
+:- moo:register_module_type(planning).
 
 
 vette_idea(Agent,Act,Act):-dmsg(vette_idea(Agent,Act)).

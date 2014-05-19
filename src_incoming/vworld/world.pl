@@ -78,7 +78,7 @@
 
 % :-use_module(logicmoo('vworld/dbase')).
 :- include(logicmoo('vworld/moo_header')).
-:- register_module_type(utility).
+:- moo:register_module_type(utility).
 
 
 :- include(logicmoo('vworld/world_2d')).

@@ -10,7 +10,7 @@
 
 :-export(fully_expand/2).
 
-:- begin_transform_cyc_preds.
+:- dbase:begin_transform_cyc_preds.
 
 local_decl_db_prop(repl_writer(agent,term),[singleValued,default(default_repl_writer)]).
 local_decl_db_prop(repl_to_string(agent,term),[singleValued,default(default_repl_obj_to_string)]).
@@ -304,7 +304,7 @@ anglify_noun_known(Obj,_Hint,StringO):- findall(String,holds_t(nameString,Obj,St
 %nameString(X,Y,_,_)
 
 
-:- end_transform_cyc_preds.
+:- dbase:end_transform_cyc_preds.
 
 
 end_of_file.

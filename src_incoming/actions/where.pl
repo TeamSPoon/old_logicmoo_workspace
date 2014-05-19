@@ -16,7 +16,7 @@
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
-:- register_module_type(command).
+:- moo:register_module_type(command).
 
 moo:decl_action(_,where(object),"Tells where something is").
 moo:subclass(agent,object).

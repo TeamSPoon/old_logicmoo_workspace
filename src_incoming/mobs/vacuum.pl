@@ -13,7 +13,7 @@
 % :- dynamic memory/2.
 
 :- include(logicmoo('vworld/moo_header.pl')).
-:- register_module_type(planning).
+:- moo:register_module_type(planning).
 
 % Possible agent actions.
 

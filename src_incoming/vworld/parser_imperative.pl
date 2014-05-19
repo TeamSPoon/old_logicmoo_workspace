@@ -39,7 +39,7 @@
 
 % :- include(logicmoo('vworld/moo_header')).
 
-:- register_module_type(utility).
+:- moo:register_module_type(utility).
 
 :- ensure_loaded(logicmoo('vworld/parser_e2c')).
 

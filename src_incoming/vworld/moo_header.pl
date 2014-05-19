@@ -19,15 +19,19 @@
 
 %  very very first import
 :- debug.
+:-dynamic moo:at_started_once/1.
+at_start_once(G):- moo:at_started_once(G)->true;(asserta(moo:at_started_once(G)),G).
+ensure_m_loaded(File):-at_start_once((load_files(File,[if(not_loaded),qcompile(auto)]))).
 
-:- ensure_loaded(logicmoo('vworld/dbase.pl')).
-:- ensure_loaded(logicmoo('vworld/moo.pl')).
+:- ensure_loaded(logicmoo('vworld/dbase')).
+:- ensure_loaded(logicmoo('vworld/moo')).
 
-:- end_transform_cyc_preds.
+:- dbase:end_transform_cyc_preds.
 
 % :-context_module(Ctx),writeq(context_module(Ctx)),nl.
 
 :-context_module(Ctx),asserta(loading_module_h(Ctx)).
+
 
 % These three are for use with Quintus
 %:- prolog_flag(unknown,error,fail). % Not sure if this is needed for Quintus
@@ -38,56 +42,56 @@
 
 % logicmoo utils shared with other systems
 
-:- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_bugger.pl')).
-:- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_library.pl')).
-:- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_ctx_frame.pl')).
-:- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_strings.pl')).
-:- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_terms.pl')).
-:- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_dcg.pl')).
+:- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_bugger')).
+:- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_library')).
+:- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_ctx_frame')).
+:- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_strings')).
+:- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_terms')).
+:- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_dcg')).
 
 % make sure these get in early
-:- ensure_loaded(logicmoo('vworld/dbase_formattypes.pl')).
+:- ensure_loaded(logicmoo('vworld/dbase_formattypes')).
 
 % logicmoo vworld mud server
-:- ensure_loaded(logicmoo('vworld/world.pl')).
-% :- ensure_loaded(logicmoo('vworld/world_action.pl')).
-:- ensure_loaded(logicmoo('vworld/moo_loader.pl')).
-:- ensure_loaded(logicmoo('vworld/toploop_telnet.pl')).
-:- ensure_loaded(logicmoo('vworld/toploop_npc.pl')).
-:- ensure_loaded(logicmoo('vworld/parser_e2c.pl')).
-:- ensure_loaded(logicmoo('vworld/parser_imperative.pl')).
+:- ensure_loaded(logicmoo('vworld/world')).
+% :- ensure_loaded(logicmoo('vworld/world_action')).
+:- ensure_loaded(logicmoo('vworld/moo_loader')).
+:- ensure_loaded(logicmoo('vworld/toploop_telnet')).
+:- ensure_loaded(logicmoo('vworld/toploop_npc')).
+:- ensure_loaded(logicmoo('vworld/parser_e2c')).
+:- ensure_loaded(logicmoo('vworld/parser_imperative')).
 
-:- ensure_loaded(logicmoo('vworld/moo_testing.pl')).
+:- ensure_loaded(logicmoo('vworld/moo_testing')).
 
 % NPC planners
-:- ensure_loaded(logicmoo('mobs/monster.pl')).
-:- ensure_loaded(logicmoo('mobs/predator.pl')).
-:- ensure_loaded(logicmoo('mobs/explorer.pl')).
-:- ensure_loaded(logicmoo('mobs/prey.pl')).
-:- ensure_loaded(logicmoo('mobs/vacuum.pl')).
+:- ensure_loaded(logicmoo('mobs/monster')).
+:- ensure_loaded(logicmoo('mobs/predator')).
+:- ensure_loaded(logicmoo('mobs/explorer')).
+:- ensure_loaded(logicmoo('mobs/prey')).
+:- ensure_loaded(logicmoo('mobs/vacuum')).
 
 % Action/Commands implementation
 
 :- expand_file_name('../src_incoming/actions/*pl',X),
      forall(member(E,X),ensure_loaded(E)).
 /*
-:- ensure_loaded(logicmoo('actions/any.pl')).
-:- ensure_loaded(logicmoo('actions/drink.pl')).
-:- ensure_loaded(logicmoo('actions/use.pl')).
-:- ensure_loaded(logicmoo('actions/attack.pl')).
-:- ensure_loaded(logicmoo('actions/push.pl')).
-:- ensure_loaded(logicmoo('actions/climb.pl')).
-:- ensure_loaded(logicmoo('actions/eat.pl')).
-:- ensure_loaded(logicmoo('actions/move.pl')).
-:- ensure_loaded(logicmoo('actions/drop.pl')).
-:- ensure_loaded(logicmoo('actions/sit.pl')).
-:- ensure_loaded(logicmoo('actions/look.pl')).
-:- ensure_loaded(logicmoo('actions/take.pl')).
-:- ensure_loaded(logicmoo('actions/logon.pl')).
-:- ensure_loaded(logicmoo('actions/teleport.pl')).
-:- ensure_loaded(logicmoo('actions/chat.pl')).
-:- ensure_loaded(logicmoo('actions/help.pl')).
-:- ensure_loaded(logicmoo('actions/get_set.pl')).
+:- ensure_loaded(logicmoo('actions/any')).
+:- ensure_loaded(logicmoo('actions/drink')).
+:- ensure_loaded(logicmoo('actions/use')).
+:- ensure_loaded(logicmoo('actions/attack')).
+:- ensure_loaded(logicmoo('actions/push')).
+:- ensure_loaded(logicmoo('actions/climb')).
+:- ensure_loaded(logicmoo('actions/eat')).
+:- ensure_loaded(logicmoo('actions/move')).
+:- ensure_loaded(logicmoo('actions/drop')).
+:- ensure_loaded(logicmoo('actions/sit')).
+:- ensure_loaded(logicmoo('actions/look')).
+:- ensure_loaded(logicmoo('actions/take')).
+:- ensure_loaded(logicmoo('actions/logon')).
+:- ensure_loaded(logicmoo('actions/teleport')).
+:- ensure_loaded(logicmoo('actions/chat')).
+:- ensure_loaded(logicmoo('actions/help')).
+:- ensure_loaded(logicmoo('actions/get_set')).
 */
 
 

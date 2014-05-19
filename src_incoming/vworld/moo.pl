@@ -14,7 +14,7 @@
          dynamic_multifile_exported/2,
          op(1150,fx,dynamic_multifile_exported),
          term_expansion_local/2,
-         register_module_type/1, 
+         moo:register_module_type/1, 
          registered_module_type/2,
          end_module_type/1,
          enter_term_anglify/2,
@@ -134,10 +134,10 @@ tick_every(Name,Seconds,OnTick):-repeat,sleep(Seconds),catch(OnTick,E,dmsg(cause
 end_module_type(Type):-current_context_module(CM),end_module_type(CM,Type).
 end_module_type(CM,Type):-retractall(registered_module_type(CM,Type)).
 
-register_module_type(Type):- current_context_module(CM),register_module_type(CM,Type),begin_transform_cyc_preds.
+moo:register_module_type(Type):- current_context_module(CM),moo:register_module_type(CM,Type),dbase:begin_transform_cyc_preds.
 
-register_module_type(CM,Types):-is_list(Types),!,forall(member(T,Types),register_module_type(CM,T)).
-register_module_type(CM,Type):-asserta(registered_module_type(CM,Type)).
+moo:register_module_type(CM,Types):-is_list(Types),!,forall(member(T,Types),moo:register_module_type(CM,T)).
+moo:register_module_type(CM,Type):-asserta(registered_module_type(CM,Type)).
 
 registered_module_type(Type):- current_context_module(CM),registered_module_type(CM,Type).
 
@@ -179,7 +179,7 @@ term_expansion_local0(A,A).
 % user:term_expansion(X,Y):- term_expansion_local0(X,Y).
 
 %:- include(logicmoo('vworld/moo_header.pl')).
-%:- register_module_type(utility).
+%:- moo:register_module_type(utility).
 
 moo:agent_text_command(_Agent,_Text,_AgentTarget,_Cmd):-fail.
 

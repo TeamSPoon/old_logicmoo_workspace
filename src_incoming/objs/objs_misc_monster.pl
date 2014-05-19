@@ -224,11 +224,11 @@ Object applies:
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
-:-ignore(register_module_type([world_types,parser])).
+:-ignore(moo:register_module_type([world_types,parser])).
 
 label_type(Label,Type):-moo:label_type_props(Label,Type,_).
 
-% :-register_module_type(dynamic).
+% :-moo:register_module_type(dynamic).
 
 max_charge(500).
 max_damage(120).

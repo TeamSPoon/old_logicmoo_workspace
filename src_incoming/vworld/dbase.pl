@@ -1,10 +1,10 @@
 /** <module> 
 % ===================================================================
-% File 'dbase.pl'
+% File 'dbase'
 % Purpose: Emulation of OpenCyc for SWI-Prolog
 % Maintainer: Douglas Miles
 % Contact: $Author: dmiles $@users.sourceforge.net ;
-% Version: 'interface.pl' 1.0.0
+% Version: 'interface' 1.0.0
 % Revision:  $Revision: 1.9 $
 % Revised At:   $Date: 2002/06/27 14:13:20 $
 % ===================================================================
@@ -33,6 +33,7 @@
           is_holds_true/1,
 
           db_forall_query/1,
+          process_mworld/0,
 
          clause_present_1/3,
          with_kb_assertions/2,
@@ -110,8 +111,8 @@
            assertThrough/2,
            retractAllThrough/1,
            retractAllThrough/2,
-           begin_transform_cyc_preds/0,
-         end_transform_cyc_preds/0,
+           dbase:begin_transform_cyc_preds/0,
+         dbase:end_transform_cyc_preds/0,
          cyc_goal_expansion/2,
          list_to_term/2, 
          lowerCasePred/1,   
@@ -189,10 +190,10 @@
 % :- context_module(M),asserta(dbase_mod(M)),dmsg(assert_if_new(dbase_mod(M))).
 dbase_mod(dbase).
 
-:- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_bugger.pl')).
-:- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_all.pl')).
-:- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_terms.pl')).
-:- ensure_loaded(logicmoo('vworld/moo.pl')).
+:- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_bugger')).
+:- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_all')).
+:- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_terms')).
+:- ensure_loaded(logicmoo('vworld/moo')).
 
 :- dynamic_multifile_exported dbase_true/1.
 :- dynamic_multifile_exported dbase_true/2.
@@ -227,7 +228,7 @@ def_meta_predicate(F,S,E):-doall(((between(S,E,N),make_list('?',N,List),CALL=..[
 :- def_meta_predicate(assertion_holds,2,7).
 :- def_meta_predicate(assertion_holds_not,2,7).
 
-%:- register_module_type(utility).
+%:- moo:register_module_type(utility).
 
 add_db_prop(_,_,Var):- var(Var),!.
 add_db_prop(_,_,[]):- !.
@@ -291,7 +292,9 @@ registerCycPred(Mt,Pred,Arity):-isRegisteredCycPred(Mt,Pred,Arity),!.
 registerCycPred(Mt,Pred,Arity):-
       M = dbase,
       assertz(M:isRegisteredCycPred(Mt,Pred,Arity)),
-      add_db_prop(Pred,Arity,isRegisteredCycPred(Mt,Pred,Arity)),
+      add_db_prop(Pred,Arity,isRegisteredCycPred(Mt,Pred,Arity)),!.
+
+/*
       '@'(((
       % functor(Term,Pred,Arity),
       F = Pred,
@@ -303,7 +306,7 @@ registerCycPred(Mt,Pred,Arity):-
     %  dynamic(assertion_holds/A1), multifile(assertion_holds/A1), export(assertion_holds/A1),
       !
       )),  M).
-
+*/
 
 get_module_of(P,M):-predicate_property(P,imported_from(M)),!.
 get_module_of(MM:_,M):-!,MM=M.
@@ -474,7 +477,7 @@ isCycPredArity0(P,A):- xcall(((holds_t(arityMin,P, A),not(holds_t(arityMax,P, _)
 
 
 
-%:- register_module_type(utility).
+%:- moo:register_module_type(utility).
 
      
 %list_to_term(X,Y):- balanceBinding(X,Y).
@@ -494,9 +497,9 @@ list_to_terms_lr([H|T],(H,TT)):-!,list_to_terms_lr(T,TT).
 
 ended_transform_cyc_preds.
 
-begin_transform_cyc_preds:- retractall((ended_transform_cyc_preds)).
+dbase:begin_transform_cyc_preds:- retractall((ended_transform_cyc_preds)).
 
-end_transform_cyc_preds:-
+dbase:end_transform_cyc_preds:-
    asserta(ended_transform_cyc_preds),
    retractall((user:goal_expansion(G1,G2):- not(ended_transform_cyc_preds), compound(G1), cyc_goal_expansion(G1,G2))).
 
@@ -595,20 +598,16 @@ scan_arities:- forall(holds_t(arity,F,A),registerCycPred(F,A)).
 
 :- include(logicmoo(vworld/dbase_i_cyc)).
 
-% logicmoo('vworld/dbase.pl') compiled into dbase 11.97 sec, 2,140,309 clauses
-% :- include(logicmoo('pldata/trans_header.pl')).
+% logicmoo('vworld/dbase') compiled into dbase 11.97 sec, 2,140,309 clauses
+%:- include(logicmoo('pldata/trans_header')).
+
+process_mworld:-forall(dynamicCyc2(C),registerCycPredPlus2(C)).
 
 % logicmoo('pldata/mworld0.pldata') compiled into world 61.18 sec, 483,738 clauses
-:- dmsg(loading(kb0)).
-:- ensure_loaded(logicmoo('pldata/tiny_kb')).
 
-:-dynamic at_started_once/1.
-at_start_once(G):- at_started_once(G)->true;(asserta(at_started_once(G)),G).
+ensure_NL_loaded(File):-at_start_once('@'(load_files(File,[if(not_loaded),qcompile(auto)]),dbase)).
 
-% this next line delays loading of NL content
-% ensure_NL_loaded(File):- current_prolog_flag(version,V),V>70111,!,dmsg(delay_loading(File)),!.
-ensure_NL_loaded(File):-dmsg(loading(File)),at_start_once((load_files(File,[if(not_loaded),qcompile(auto)]))).
-
+:- ensure_NL_loaded(logicmoo('pldata/tiny_kb')).
 :- ensure_NL_loaded(logicmoo('database/logicmoo_nldata_freq.pdat')).
 :- ensure_NL_loaded(logicmoo('database/logicmoo_nldata_BRN_WSJ_LEXICON')).
 :- ensure_NL_loaded(logicmoo('database/logicmoo_nldata_colloc.pdat')).
@@ -616,8 +615,11 @@ ensure_NL_loaded(File):-dmsg(loading(File)),at_start_once((load_files(File,[if(n
 :- ensure_NL_loaded(logicmoo('database/logicmoo_nl_dictionary')).
 
 :- ensure_NL_loaded(logicmoo('pldata/tt0_00022_cycl')).
-:- ensure_NL_loaded(logicmoo('pldata/mworld0')).
 :- ensure_NL_loaded(logicmoo('pldata/hl_holds')).
+
+:- ensure_NL_loaded(logicmoo('pldata/mworld')).
+:- at_start_once(dbase:process_mworld).
+:- ensure_NL_loaded(logicmoo('pldata/mworld0')).
 
 % withvars_988 loaded 9.46 sec, 4,888,433 clauses
 :- catch(ensure_NL_loaded(logicmoo('pldata/withvars_988')),_,true).
@@ -689,11 +691,11 @@ user_export(Prop/Arity):-
 
 :- ensure_loaded(logicmoo('vworld/moo')).
 
-% :- include(logicmoo('vworld/moo_header')).
+%:- include(logicmoo('vworld/moo_header')).
 
 :- include('dbase_types_motel').
 
-%r:- register_module_type(utility).
+%r:- moo:register_module_type(utility).
 
 dbase_define_db_prop(P):-dbase_define_db_prop(P,[]).
 dbase_define_db_prop(M:ArgTypes,PropTypes):-!,
@@ -1196,7 +1198,7 @@ moo:db_prop(ArgTypes):-db_prop_from_game_load(ArgTypes).
 % BEGIN world database
 % =================================================================================================
 
-:- begin_transform_cyc_preds.
+:- dbase:begin_transform_cyc_preds.
 
 inRegion(O,Region):-atloc(O,LOC),locationToRegion(LOC,Region).
 inRegion(apath(Region,Dir),Region):- pathBetween(Region,Dir,_To).
@@ -1351,7 +1353,7 @@ db_prop_multi(possess(agent,item)).
 db_prop_multi(moo:subclass(type,type)).
 db_prop_multi(mud_isa(term,type)).
 
-:-end_transform_cyc_preds.
+:-dbase:end_transform_cyc_preds.
 % =================================================================================================
 % END world database
 % =================================================================================================
@@ -1364,7 +1366,7 @@ load_motel:- defrole([],time_state,restr(time,period)).
 
 :- load_motel.
 
-% :- include(logicmoo('vworld/moo_footer')).
+%:- include(logicmoo('vworld/moo_footer')).
 
 
 

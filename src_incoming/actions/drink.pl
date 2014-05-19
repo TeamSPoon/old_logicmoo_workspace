@@ -10,7 +10,7 @@
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
-:- register_module_type(command).
+:- moo:register_module_type(command).
 
 moo:decl_action(drink(drinkable),"Drink a Drinkable Item").
 
