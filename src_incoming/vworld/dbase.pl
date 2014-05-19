@@ -812,7 +812,7 @@ with_kb_assertions(With,Call):-
 
 
 
-world_clear(Named):-fmt('Clearing world database: ~q.',[Named]).
+world_clear(Named):-dmsg('Clearing world database: ~q.',[Named]).
 
 pred_as_is(F,A):-moo:is_db_prop(F,A,flag),!.
 pred_as_is(F,A):-moo:is_db_prop(F,A,module(_)),!.

@@ -51,7 +51,7 @@ moo:decl_action(_Human_Player,parse(prolog,list(term)),"Development test to pars
 moo:agent_text_command(Agent,[parse,Type|List],Agent,parse(Type,List)).
 
 moo:agent_call_command(_Gent,parse(Type,StringM)):-
-   parse_for(Type,StringM,_Term,_LeftOver).
+   parse_for(Type,StringM,_Term,_LeftOver,fmt).
 
 parse_for(Type,StringM):- parse_for(Type,StringM, _Term).
 
@@ -61,7 +61,9 @@ list_tail(_,[]).
 list_tail(String,LeftOver):-ground(String),to_word_list(String,List),length(List,L),!,between(1,L,X),length(LeftOver,X).
 
 parse_for(Type,StringM,Term,LeftOver):- 
-   Print2 = fmt,
+     parse_for(dmsg_parserm,Type,StringM,Term,LeftOver).
+
+parse_for(Print2, Type,StringM,Term,LeftOver):- 
    to_word_list(StringM,String),
    list_tail(String,LeftOver),
    HOW = phrase(parseIsa(Type,Term),String,LeftOver),
@@ -91,7 +93,7 @@ objects_match(SObj,Inv,List):-
 :-dynamic object_string_used/2.
 
 call_listing(_):-!.
-call_listing(Call):-forall(Call,fmt('~q.~n',[Call])).
+call_listing(Call):-forall(Call,dmsg_parserm('~q.~n',[Call])).
 
 
 

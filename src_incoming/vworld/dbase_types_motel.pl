@@ -14504,7 +14504,7 @@ completeParameter([P1,P2,P3,P4],P1,P2,P3,P4) :-
  * @(#) initCall.pl 1.4@(#)
  *
 */
-:- write('MOTEL v0.8 Copyright (c) 1993, Patrick Brandmeier, Ullrich Hustadt (LOGICMOO HACKED)  Renate Schmidt, Jan Timm. All rights preserved.').
+:- dmsg('MOTEL v0.8 Copyright (c) 1993, Patrick Brandmeier, Ullrich Hustadt (LOGICMOO HACKED)  Renate Schmidt, Jan Timm. All rights preserved.').
 /*
 :- nl, nl.
 :- write('Welcome to MOTEL (Version 0.8 July 1993)').

@@ -22,4 +22,6 @@ logwumpus
 src_modules/
 src_data/*.*
 src/savedb
-
+hidden_todo/
+*.qlf
+withvars_988.*
