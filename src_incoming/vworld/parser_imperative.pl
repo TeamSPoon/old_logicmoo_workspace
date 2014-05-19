@@ -42,7 +42,7 @@ moo:decl_action(_Human_Player,parse(prolog,list(term)),"Development test to pars
 
 moo:agent_text_command(Agent,[parse,Type|List],Agent,parse(Type,List)).
 
-moo:agent_call_command(_Gent,parse(Type,StringM)):- trace,
+moo:agent_call_command(_Gent,parse(Type,StringM)):-
    parse_for(Type,StringM,_Term,_LeftOver).
 
 parse_for(Type,StringM):- parse_for(Type,StringM, _Term).
@@ -55,13 +55,12 @@ list_tail(String,LeftOver):-ground(String),to_word_list(String,List),length(List
 parse_for(Type,StringM,Term,LeftOver):- 
    Print2 = fmt,
    to_word_list(StringM,String),
-   trace,
    list_tail(String,LeftOver),
    HOW = phrase(parseIsa(Type,Term),String,LeftOver),
    call(Print2,'parsing with ~q ~n.',[HOW]),
    (debugOnError(HOW)->
-      xcall(Print2,'Success! parse \'~q\' "~q" = ~q   (leftover=~q) . ~n',[Type,String,Term,LeftOver]);
-      xcall(Print2,'No Success.~n',[])).
+      call(Print2,'Success! parse \'~q\' "~q" = ~q   (leftover=~q) . ~n',[Type,String,Term,LeftOver]);
+      call(Print2,'No Success.~n',[])).
 
 
 meets_desc_spec(T,_L):- term_to_atom(T,S0),string_to_atom(S0,A),atomic_list_concat([_,_|_],'mudBareHandDa',A),!,fail.
@@ -104,7 +103,7 @@ object_string_list1(Agent,O,DescSpecs,String):-
    object_print_details(save_ol(OpenList),Agent,O,DescSpecs,[type,item,agent]),   
    OpenList = StringI,
    append(OpenList,[],StringI),
-   trace,list_to_set(StringI,String).
+   list_to_set(StringI,String).
 
 save_ol_e(OS,E):-string(E),!,to_word_list(E,WL),save_ol_list(OS,WL),!.
 save_ol_e(OS,mud_isa(A)):-!,save_ol_e(OS,A).

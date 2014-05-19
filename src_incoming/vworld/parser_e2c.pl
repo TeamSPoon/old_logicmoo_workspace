@@ -166,7 +166,7 @@ phrase_meaning_adj(Phrase,Subj,'hasAttributeOrCollection'(Subj,CycL)):-
 noun_phrase(Subj,CycLIn,CycLOut) --> noun_expression(Subj,Isa,CycLOut),rel_clause(Subj,CycLIn,Isa).
 %noun_phrase(Subj,CycL1,CycL) --> noun_expression(Subj,CycL1,CycL),[and],noun_phrase(Subj,CycL1,CycL)
    
-noun_expression(PN,CycL,CycL) --> {trace},pronoun(PN).
+noun_expression(PN,CycL,CycL) --> pronoun(PN).
 noun_expression(PN,CycL,CycL) --> proper_noun_phrase(PN).
 noun_expression(Subj,CycLVerb,CycLOut) -->  
    quant_phrase(Subj,AttribIsa,CycLVerb,CycLOut),

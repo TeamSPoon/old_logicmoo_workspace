@@ -163,7 +163,6 @@ pgs(A):- A=..[SubType,Arg],
 pgs(A):- A=..[SubType,_],dmsg(todo(ensure_creatabe(SubType))),dbadd0(A),!.
 
 pgs(W):-functor(W,F,A),functor(WW,F,A),db_prop_game_assert(WW),throw_safe(todo(pgs(W))).
-% pgs(inRegion(A,B)):- trace, dbadd0(inRegion(A,B)),!.
 pgs(W):-dbadd0(W),!.
 pgs(W):-trace,dbadd0(W),!.
 pgs(A):-fmt('skipping ~q.',[A]).

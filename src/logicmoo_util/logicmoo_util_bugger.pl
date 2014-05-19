@@ -739,7 +739,7 @@ dmsg2(T):-!,
 		Depth2 = (Depth-25))),
         with_output_to_stream(user_error,
         ((
-	fmt(';;',[]),!,
+	fmt('%',[]),!,
 	indent_e(Depth2),!,
 	fmt0(T)))))).
 
@@ -843,7 +843,7 @@ flush_output_safe(X):-ignore(catch(flush_output(X),_,true)).
 writeFailureLog(E,X):-
 		fmt(user_error,'\n% error: ~q ~q\n',[E,X]),flush_output_safe(user_error),!,
 		%,true.
-		fmt('\n;; error: ~q ~q\n',[E,X]),!,flush_output. %,fmt([E,X]).
+		fmt('\n% error: ~q ~q\n',[E,X]),!,flush_output. %,fmt([E,X]).
 
 %unknown(Old, autoload).
 

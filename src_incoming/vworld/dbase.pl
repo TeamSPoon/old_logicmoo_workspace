@@ -583,30 +583,47 @@ scan_arities:- forall(holds_t(arity,F,A),registerCycPred(F,A)).
 
 :- include(logicmoo(vworld/dbase_i_cyc)).
 
-:- include(logicmoo('pldata/trans_header.pl')).
+% :- include(logicmoo('pldata/trans_header.pl')).
 
 % logicmoo('pldata/mworld0.pldata') compiled into world 61.18 sec, 483,738 clauses
 :- dmsg(loading(kb0)).
 :- ensure_loaded(logicmoo('pldata/tiny_kb')).
 
-
 % this next line delays loading of NL content
-ensure_NL_loaded(File):-dmsg(delay_loading(File)),!.
-ensure_NL_loaded(File):-ensure_loaded(File).
+% ensure_NL_loaded(File):- current_prolog_flag(version,V),V>70111,!,dmsg(delay_loading(File)),!.
+ensure_NL_loaded(File):-dmsg(loading(File)),load_files(File,[if(not_loaded),qcompile(auto)]).
 
+:- ensure_loaded(logicmoo('database/logicmoo_nldata_freq.pdat.txt')).
+:- ensure_loaded(logicmoo('database/logicmoo_nldata_BRN_WSJ_LEXICON.txt')).
+:- ensure_loaded(logicmoo('database/logicmoo_nldata_colloc.pdat.txt')).
+:- ensure_loaded(logicmoo('database/logicmoo_cyc_pos_data')).
 :- ensure_loaded(logicmoo('database/logicmoo_nl_dictionary')).
-
-:- ensure_NL_loaded(logicmoo('database/logicmoo_nldata_freq.pdat.txt')).
-:- ensure_NL_loaded(logicmoo('database/logicmoo_nldata_BRN_WSJ_LEXICON.txt')).
-:- ensure_NL_loaded(logicmoo('database/logicmoo_nldata_colloc.pdat.txt')).
-:- ensure_NL_loaded(logicmoo('database/logicmoo_nldata_freq.pdat.txt')).
-:- ensure_NL_loaded(logicmoo('database/logicmoo_cyc_pos_data')).
 
 :- ensure_NL_loaded(logicmoo('pldata/tt0_00022_cycl')).
 :- ensure_NL_loaded(logicmoo('pldata/mworld0')).
 :- ensure_NL_loaded(logicmoo('pldata/hl_holds')).
 
+/*
 
+;;    loading(kb0)
+%     logicmoo('pldata/tiny_kb') compiled into dbase 6.54 sec, 9,019 clauses
+%     logicmoo('database/logicmoo_nl_dictionary') compiled into dbase 0.09 sec, 267 clauses
+;;     loading(logicmoo('database/logicmoo_nldata_freq.pdat.txt'))
+%     logicmoo('database/logicmoo_nldata_freq.pdat.txt') compiled into dbase 15.24 sec, 107,710 clauses
+;;     loading(logicmoo('database/logicmoo_nldata_BRN_WSJ_LEXICON.txt'))
+%     logicmoo('database/logicmoo_nldata_BRN_WSJ_LEXICON.txt') compiled into dbase 12.26 sec, 113,869 clauses
+;;     loading(logicmoo('database/logicmoo_nldata_colloc.pdat.txt'))
+%     logicmoo('database/logicmoo_nldata_colloc.pdat.txt') compiled into dbase 9.50 sec, 64,087 clauses
+;;     loading(logicmoo('database/logicmoo_cyc_pos_data'))
+%     logicmoo('database/logicmoo_cyc_pos_data') compiled into dbase 0.39 sec, 2,480 clauses
+;;     loading(logicmoo('pldata/tt0_00022_cycl'))
+%     logicmoo('pldata/tt0_00022_cycl') compiled into dbase 54.46 sec, 313,290 clauses
+;;     loading(logicmoo('pldata/mworld0'))
+%     logicmoo('pldata/mworld0') compiled into dbase 109.01 sec, 483,066 clauses
+;;     loading(logicmoo('pldata/hl_holds'))
+%     logicmoo('pldata/hl_holds') compiled into dbase 324.81 sec, 1,041,327 clauses
+
+*/
 user_export(_):- dbase_mod(user),!.
 user_export(_M:Prop/Arity):-!,user_export(Prop/Arity).
 user_export(Prop/Arity):- 

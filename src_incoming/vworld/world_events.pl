@@ -11,9 +11,10 @@
 % This file is "included" from world.pl 
 */
 
-
-asInvoked([L|Ist],Cmd):-atom(L),!, Cmd=..[L|Ist].
-asInvoked(List,Cmd):-Cmd=..[asInvoked|List].
+asInvoked(Cmd,[L|Ist]):-append([L|Ist],[],Foo),Foo\==[L|Ist],!,asInvoked(Cmd,Foo).
+asInvoked(Cmd,[L|Ist]):-atom(L),!, Cmd=..[L|Ist].
+asInvoked(Cmd,[L|Ist]):-!,Cmd=..[asInvoked,L|Ist].
+asInvoked(Cmd,Cmd):-!.
 
 atlocNear(Whom,Where):-nonvar(Where),!,findall(Whom,atlocNear0(Whom,Where),List),list_to_set(List,Set),!,member(Whom,Set).
 atlocNear(Whom,Where):-nonvar(Whom),!,findall(Where,atlocNear0(Whom,Where),List),list_to_set(List,Set),!,member(Where,Set).

@@ -12,7 +12,7 @@
 
 do_social(Agent,Say,Whom,Text):- 
    atloc(Agent,Where),
-   asInvoked([Say,Agent,Whom,Text],Cmd),
+   asInvoked(Cmd,[Say,Agent,Whom,Text]),
    raise_location_event(Where,notice(reciever,Cmd)).
 
 moo:decl_action(Say,text("invokes",Does)):-socialCommand(Say,_SocialVerb,Does).
