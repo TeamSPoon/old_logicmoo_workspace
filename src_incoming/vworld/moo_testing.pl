@@ -16,8 +16,10 @@
         run_mud_test_code/1]).
 
 :- dynamic(was_test_name/1).
-:- meta_predicate moo_testing:run_mud_test_code(0).
-:- meta_predicate moo_testing:run_mud_test(*,0).
+:- meta_predicate run_mud_test_code(0).
+:- meta_predicate run_mud_test(*,0).
+:- meta_predicate test_true(0).
+:- meta_predicate test_false(0).
 
 
 % do some sanity testing (expects the startrek world is loaded)

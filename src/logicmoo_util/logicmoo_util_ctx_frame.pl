@@ -36,6 +36,8 @@
          with_assertions/2,
          currentContext/2]).
 
+:- meta_predicate with_assertions(:,0).
+
 :-use_module(logicmoo('logicmoo_util/logicmoo_util_library.pl')).
 :-use_module(logicmoo('logicmoo_util/logicmoo_util_bugger.pl')).
 

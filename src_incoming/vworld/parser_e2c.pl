@@ -19,6 +19,8 @@
 :- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_all.pl')).
 :- ensure_loaded(logicmoo('vworld/moo.pl')).
 
+:- meta_predicate do_dcg(?,?,?,?,?).
+:- meta_predicate isPOS(?,?,?,?,?).
 
 :- register_module_type(utility).
 

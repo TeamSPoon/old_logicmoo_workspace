@@ -202,6 +202,16 @@ dbase_mod(dbase).
 :- dynamic_multifile_exported dbase_true/6.
 :- dynamic_multifile_exported dbase_true/7.
 
+:- meta_predicate isDebug(?).
+:- meta_predicate ensure_db_predicate_2(?,?,?,?,?,?).
+:- meta_predicate cyc_pred_expansion(?,?,?,?).
+:- meta_predicate with_kb_assertions(?,?).
+:- meta_predicate show_cgoal(?).
+:- meta_predicate retractall_cloc(?).
+:- meta_predicate retract_cloc(?).
+:- meta_predicate assertz_cloc(?).
+:- meta_predicate asserta_cloc(?).
+
 make_list(E,1,[E]):-!.
 make_list(E,N,[E|List]):- M1 is N - 1, make_list(E,M1,List),!.
 
@@ -234,23 +244,23 @@ rem_db_prop(F,A,CL):- retractall(moo:is_db_prop(F,A,CL)).
 %
 %  the following will all do the same things:
 %
-% ?- registerCycPred('BaseKB':isa/2). 
-% ?- registerCycPred('BaseKB':isa(_,_)). 
-% ?- registerCycPred(isa(_,_),'BaseKB'). 
-% ?- registerCycPred('BaseKB',isa,2). 
+% :- registerCycPred('BaseKB':isa/2). 
+% :- registerCycPred('BaseKB':isa(_,_)). 
+% :- registerCycPred(isa(_,_),'BaseKB'). 
+% :- registerCycPred('BaseKB',isa,2). 
 %
 %  Will make calls 
-% ?- isa(X,Y)
+% :- isa(X,Y)
 %  Query into #$BaseKB for (#$isa ?X ?Y) 
 %
 % ============================================
 :-dynamic(isRegisteredCycPred/3).
 
-% ?- registerCycPred('BaseKB':isa/2). 
+% :- registerCycPred('BaseKB':isa/2). 
 registerCycPred(Mt:Pred/Arity):- !,
    registerCycPred(Mt,Pred,Arity).
 
-% ?- registerCycPred('BaseKB':isa(_,_)). 
+% :- registerCycPred('BaseKB':isa(_,_)). 
 registerCycPred(Mt:Term):-
    functor(Term,Pred,Arity),
    registerCycPred(Mt,Pred,Arity).
@@ -269,12 +279,12 @@ registerCycPredPlus2((A,L)):-!,registerCycPredPlus2(A),registerCycPredPlus2(L).
 
 reallyRegisterCycPred(F,A) :- registerCycPred(_,F,A).
 
-% ?- registerCycPred(isa(_,_),'BaseKB'). 
+% :- registerCycPred(isa(_,_),'BaseKB'). 
 registerCycPred(Term,Mt):-
    functor(Term,Pred,Arity),
    registerCycPred(Mt,Pred,Arity).
    
-% ?- registerCycPred('BaseKB',isa,2). 
+% :- registerCycPred('BaseKB',isa,2). 
 registerCycPred(Mt,_:Pred,Arity):-!,registerCycPred(Mt,Pred,Arity).
 registerCycPred(Mt,Pred,0):-!,registerCycPred(Mt,Pred,2).
 registerCycPred(Mt,Pred,Arity):-isRegisteredCycPred(Mt,Pred,Arity),!.
@@ -570,6 +580,8 @@ ah(P,A1):- dmsg(ah(P,1,A1)).
   %dbase:pathBetween/3,
   dbase:'ASSERTION'/5,
   dbase:'ASSERTION'/6,
+  dbase:'ASSERTION'/7,
+  dbase:'ASSERTION'/8,
   dbase:transprob/4,
   dbase:transprob2/3,
   dbase:indexCyc/1,
@@ -593,15 +605,29 @@ scan_arities:- forall(holds_t(arity,F,A),registerCycPred(F,A)).
 % ensure_NL_loaded(File):- current_prolog_flag(version,V),V>70111,!,dmsg(delay_loading(File)),!.
 ensure_NL_loaded(File):-dmsg(loading(File)),load_files(File,[if(not_loaded),qcompile(auto)]).
 
-:- ensure_NL_loaded(logicmoo('database/logicmoo_nldata_freq.pdat.txt')).
-:- ensure_NL_loaded(logicmoo('database/logicmoo_nldata_BRN_WSJ_LEXICON.txt')).
-:- ensure_NL_loaded(logicmoo('database/logicmoo_nldata_colloc.pdat.txt')).
+:- ensure_NL_loaded(logicmoo('database/logicmoo_nldata_freq.pdat')).
+:- ensure_NL_loaded(logicmoo('database/logicmoo_nldata_BRN_WSJ_LEXICON')).
+:- ensure_NL_loaded(logicmoo('database/logicmoo_nldata_colloc.pdat')).
 :- ensure_NL_loaded(logicmoo('database/logicmoo_cyc_pos_data')).
 :- ensure_NL_loaded(logicmoo('database/logicmoo_nl_dictionary')).
 
 :- ensure_NL_loaded(logicmoo('pldata/tt0_00022_cycl')).
 :- ensure_NL_loaded(logicmoo('pldata/mworld0')).
 :- ensure_NL_loaded(logicmoo('pldata/hl_holds')).
+
+% withvars_988 loaded 9.46 sec, 4,888,433 clauses
+:- catch(ensure_NL_loaded(logicmoo('pldata/withvars_988')),_,true).
+
+:- meta_predicate get_module_of(0,+,+,-).
+
+:- use_module(library(check)).
+:- (
+(
+ redefine_system_predicate(check:list_undefined(_)),
+ abolish(check:list_undefined/1),
+ assert((check:list_undefined(A):- not(thread_self(main)),!, ignore(A=[]))),
+ assert((check:list_undefined(A):- ignore(A=[]))))).
+
 
 /*
 
@@ -622,6 +648,27 @@ ensure_NL_loaded(File):-dmsg(loading(File)),load_files(File,[if(not_loaded),qcom
 %     logicmoo('pldata/mworld0') compiled into dbase 109.01 sec, 483,066 clauses
 ;;     loading(logicmoo('pldata/hl_holds'))
 %     logicmoo('pldata/hl_holds') compiled into dbase 324.81 sec, 1,041,327 clauses
+
+
+   loading(kb0)
+%     logicmoo('pldata/tiny_kb') compiled into dbase 2.73 sec, 9,017 clauses
+%     loading(logicmoo('database/logicmoo_nldata_freq.pdat.txt'))
+%     logicmoo('database/logicmoo_nldata_freq.pdat.txt') compiled into dbase 0.03 sec, 107,710 clauses
+%     loading(logicmoo('database/logicmoo_nldata_BRN_WSJ_LEXICON.txt'))
+%     logicmoo('database/logicmoo_nldata_BRN_WSJ_LEXICON.txt') compiled into dbase 0.72 sec, 113,869 clauses
+   loading(logicmoo('database/logicmoo_nldata_colloc.pdat'))
+%     /devel/logicmoo/src_modules/database/logicmoo_nldata_colloc.pdat.pl *qcompiled* into dbase 0.30 sec, 64,081 clauses
+%     loading(logicmoo('database/logicmoo_cyc_pos_data'))
+%     logicmoo('database/logicmoo_cyc_pos_data') loaded into dbase 0.00 sec, 2,479 clauses
+%     loading(logicmoo('database/logicmoo_nl_dictionary'))
+%     logicmoo('database/logicmoo_nl_dictionary') loaded into dbase 0.00 sec, 266 clauses
+%     loading(logicmoo('pldata/tt0_00022_cycl'))
+%     logicmoo('pldata/tt0_00022_cycl') loaded into dbase 0.28 sec, 313,287 clauses
+%     loading(logicmoo('pldata/mworld0'))
+%     logicmoo('pldata/mworld0') loaded into dbase 0.53 sec, 483,065 clauses
+%     loading(logicmoo('pldata/hl_holds'))
+%     logicmoo('pldata/hl_holds') loaded into dbase 1.35 sec, 1,041,321 clauses
+
 
 */
 user_export(_):- dbase_mod(user),!.

@@ -14,6 +14,9 @@
           get_world_agent_plan/3,
           tick_controller/2]).
 
+:- meta_predicate warnOnError(?).
+:- meta_predicate agent_call_safely(?,?,?).
+
 :- include(logicmoo('vworld/moo_header.pl')).
 
 :- dynamic(npc_tick_tock_time/1).

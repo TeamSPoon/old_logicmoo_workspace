@@ -18,6 +18,7 @@
           ]).
 
 :- meta_predicate show_call(0).
+:- meta_predicate show_call0(0).
 
 :- include(logicmoo('vworld/moo_header.pl')).
 

@@ -32,6 +32,7 @@ doall(C):-ignore((C,fail)).
 :- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_bugger.pl')).
 
 :- meta_predicate in_thread_and_join(0,*).
+:- meta_predicate in_thread_and_join(0).
 in_thread_and_join(Goal):-in_thread_and_join(Goal,_Status).
 in_thread_and_join(Goal,Status):-thread_create(Goal,ID,[]),thread_join(ID,Status).
 

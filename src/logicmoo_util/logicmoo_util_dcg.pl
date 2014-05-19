@@ -28,34 +28,37 @@
 	 ]).
 
  
- :- meta_predicate logicmoo_util_dcg:dcgOnce(//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgOr(//,//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgOr(//,//,//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgTraceOnFailure(0).
- :- meta_predicate logicmoo_util_dcg:dcgAnd(//,//,//,//,?,?).
- :- meta_predicate logicmoo_util_dcg:theAll(//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgLeftOf(//,*,*,*).
- :- meta_predicate logicmoo_util_dcg:dcgIgnore(//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgAndRest(//,*,*,*).
- :- meta_predicate logicmoo_util_dcg:do_dcgTest(*,//,0).
- :- meta_predicate logicmoo_util_dcg:dcgOr(//,//,//,//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgStartsWith0(//,?,*).
- :- meta_predicate logicmoo_util_dcg:suggestVar(2,*,?).
- :- meta_predicate logicmoo_util_dcg:dcgBoth(//,//,*,*).
- :- meta_predicate logicmoo_util_dcg:dcgZeroOrMore(//,?,*).
- :- meta_predicate logicmoo_util_dcg:dcgMid(//,*,//,*,?).
- :- meta_predicate logicmoo_util_dcg:dcgOr(//,//,//,//,//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgNot(//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgStartsWith(//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgOneOrMore(//,?,*).
- :- meta_predicate logicmoo_util_dcg:dcgOnceOr(//,//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgReorder(//,//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgAnd(//,//,//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgAnd(//,//,?,?).
-%   :- meta_predicate logicmoo_util_dcg:theCode(0,*,*).
- :- meta_predicate logicmoo_util_dcg:dcgStartsWith1(//,*,*).
-
-
+:- meta_predicate dcgOnce(//,?,?).
+:- meta_predicate dcgOr(//,//,?,?).
+:- meta_predicate dcgOr(//,//,//,?,?).
+:- meta_predicate dcgTraceOnFailure(0).
+:- meta_predicate dcgAnd(//,//,//,//,?,?).
+:- meta_predicate theAll(//,?,?).
+:- meta_predicate dcgLeftOf(//,*,*,*).
+:- meta_predicate dcgIgnore(//,?,?).
+:- meta_predicate dcgAndRest(//,*,*,*).
+:- meta_predicate do_dcgTest(*,//,0).
+:- meta_predicate dcgOr(//,//,//,//,?,?).
+:- meta_predicate dcgStartsWith0(//,?,*).
+:- meta_predicate suggestVar(2,*,?).
+:- meta_predicate dcgBoth(//,//,*,*).
+:- meta_predicate dcgZeroOrMore(//,?,*).
+:- meta_predicate dcgMid(//,*,//,*,?).
+:- meta_predicate dcgOr(//,//,//,//,//,?,?).
+:- meta_predicate dcgNot(//,?,?).
+:- meta_predicate dcgStartsWith(//,?,?).
+:- meta_predicate dcgOneOrMore(//,?,*).
+:- meta_predicate dcgOnceOr(//,//,?,?).
+:- meta_predicate dcgReorder(//,//,?,?).
+:- meta_predicate dcgAnd(//,//,//,?,?).
+:- meta_predicate dcgAnd(//,//,?,?).
+:- meta_predicate dcgStartsWith1(//,*,*).
+:- meta_predicate do_dcgTest_startsWith(?,//,?).
+:- meta_predicate theCode(?,?,?).
+:- meta_predicate decl_dcgTest_startsWith(?,?,?).
+:- meta_predicate dcgWhile(?,//,?,?).
+:- meta_predicate decl_dcgTest(?,?).
+:- meta_predicate decl_dcgTest(?,?,?).
 
 :-dynamic 
    decl_dcgTest/2,

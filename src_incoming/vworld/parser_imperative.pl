@@ -29,6 +29,14 @@
                    parseForTypes//2]).
 
 
+:- meta_predicate call_listing(?).
+:- meta_predicate call_tabled0(?,?,?,?).
+:- meta_predicate object_print_details(2,?,?,?,?).
+:- meta_predicate call_no_cuts_0(?).
+:- meta_predicate call_tabled(?).
+:- meta_predicate findall_tabled4(?,?,?,?).
+
+
 :- include(logicmoo('vworld/moo_header')).
 
 :- register_module_type(utility).

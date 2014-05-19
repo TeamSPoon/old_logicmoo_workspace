@@ -88,7 +88,8 @@
 :- include(logicmoo('vworld/world_events')).
 :- include(logicmoo('vworld/world_spawning')).
 
-
+:- meta_predicate intersect_pred(+,+,+,+,?,-).
+:- meta_predicate cached(0).
 
 is_property(P,A):- moo:db_prop(_,C),functor(C,P,A2),A is A2-1.
 
@@ -107,11 +108,11 @@ is_type0(agent).
 isaOrSame(A,B):-A==B,!.
 isaOrSame(A,B):-world_mud_isa(A,B).
 
-intersect(A,EF,B,LF,Tests,Results):-findall( A-B, ((member(A,EF),member(B,LF),once(Tests))), Results),[A-B|_]=Results.
+intersect_pred(A,EF,B,LF,Tests,Results):-findall( A-B, ((member(A,EF),member(B,LF),once(Tests))), Results),[A-B|_]=Results.
 % is_property(P,_A),PROP=..[P|ARGS],CALL=..[P,Obj|ARGS],req(CALL).
 obj_memb(E,L):-member(E,L).
-isa_any(E,L):-flatten([E],EE),flatten([L],LL),!,intersect(A,EE,B,LL,isaOrSame(A,B),_Results).
-prop_memb(E,L):-flatten([E],EE),flatten([L],LL),!,intersect(A,EE,B,LL,isaOrSame(A,B),_Results).
+isa_any(E,L):-flatten([E],EE),flatten([L],LL),!,intersect_pred(A,EE,B,LL,isaOrSame(A,B),_Results).
+prop_memb(E,L):-flatten([E],EE),flatten([L],LL),!,intersect_pred(A,EE,B,LL,isaOrSame(A,B),_Results).
 
 exists(O):-item(O).
 exists(O):-agent(O).
