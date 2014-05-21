@@ -69,8 +69,21 @@
 
 % Action/Commands implementation
 
+:- ensure_loaded(logicmoo('pldata/tiny_kb')).
+:- ensure_loaded(logicmoo('pldata/nldata_freq_pdat')).
+:- ensure_loaded(logicmoo('pldata/nldata_BRN_WSJ_LEXICON')).
+:- ensure_loaded(logicmoo('pldata/nldata_colloc_pdat')).
+:- ensure_loaded(logicmoo('pldata/nldata_cycl_pos0')).
+:- ensure_loaded(logicmoo('pldata/nldata_dictionary_some01')).
+:- ensure_loaded(logicmoo('pldata/tt0_00022_cycl')).
+:- ensure_loaded(logicmoo('pldata/hl_holds')).
+:- ensure_loaded(logicmoo('pldata/mworld0')).
+:- catch(ensure_loaded(logicmoo('pldata/withvars_988')),_,true).
+
 :- expand_file_name('../src_incoming/actions/*pl',X),
      forall(member(E,X),ensure_loaded(E)).
+
+
 /*
 :- ensure_loaded(logicmoo('actions/any')).
 :- ensure_loaded(logicmoo('actions/drink')).
@@ -89,21 +102,11 @@
 :- ensure_loaded(logicmoo('actions/chat')).
 :- ensure_loaded(logicmoo('actions/help')).
 :- ensure_loaded(logicmoo('actions/get_set')).
-*/
 
 % done in 'user' to avoid reloading when we reload dbase
-:- expand_file_name('../src_data/pldata/*pl',X),
+
+:- expand_file_name('../src_data/pldata/  *pl',X),
      forall(member(E,X),ensure_loaded(E)).
-/*
-:- ensure_loaded(logicmoo('pldata/tiny_kb')).
-:- ensure_loaded(logicmoo('pldata/nldata_freq_pdat')).
-:- ensure_loaded(logicmoo('pldata/nldata_BRN_WSJ_LEXICON')).
-:- ensure_loaded(logicmoo('pldata/nldata_colloc_pdat')).
-:- ensure_loaded(logicmoo('pldata/nldata_cycl_pos0')).
-:- ensure_loaded(logicmoo('pldata/nldata_dictionary_some01')).
-:- ensure_loaded(logicmoo('pldata/tt0_00022_cycl')).
-:- ensure_loaded(logicmoo('pldata/hl_holds')).
-:- ensure_loaded(logicmoo('pldata/mworld0')).
-:- catch(ensure_loaded(logicmoo('pldata/withvars_988')),_,true).
+
 */
 

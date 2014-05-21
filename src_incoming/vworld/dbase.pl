@@ -27,7 +27,7 @@
  db_prop_from_game_load/1, db_prop_game_assert/1, del/1, failure/2, grid/4, mud_isa/2, item/1, holds_tcall/1,
  memory/2, padd/2, padd/3, possess/2, prop/3, prop_or/4, props/2, region/1, req/1, scan_db_prop/0, score/2, stm/2, term_listing/1,  facing/2,
  thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, description/2, act_turn/2,
- dbase_mod/1, dbase_define_db_prop/2,
+ dbase_mod/1, dbase_define_db_prop/2, useExternalDBs/0,
 
           is_holds_false/1,
           is_holds_true/1,
@@ -298,6 +298,8 @@ get_module_of_4(P,F,A,M):- trace, show_cgoal(get_module_of_4(P,F,A,M)).
 
 
 callable(F,A):- functor_safe(P,F,A),predicate_property(P,_),!.
+:-dynamic(useExternalDBs/0).
+useExternalDBs:-fail.
 
 % ================================================================================
 % begin holds_t
@@ -360,7 +362,8 @@ xcall(P):- call(P).
 assertion_t([AH,P|LIST]):-is_holds_true(AH),!,assertion_t([P|LIST]).
 assertion_t([AH,P|LIST]):-is_holds_false(AH),!,assertion_f([P|LIST]).
 % todo hook into loaded files!
-assertion_t([P|LIST]):-tiny_kb:'ASSERTION'(':TRUE-DEF',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
+assertion_t(_):-not(useExternalDBs),!,fail.
+assertion_t([P|LIST]):- tiny_kb:'ASSERTION'(':TRUE-DEF',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
 assertion_t([P|LIST]):-tiny_kb:'ASSERTION'(':TRUE-MON',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
 assertion_t([P|LIST]):- append([assertion_holds_mworld0,P|LIST],[_,_],CallList),Call=..CallList, '@'(xcall(Call),mworld0).
 assertion_t([P|LIST]):- Call=..[assertion_holds,P|LIST], '@'(xcall(Call),hl_holds).
@@ -430,6 +433,7 @@ xcall_not(P):- \+ xcall(P).
 assertion_f([AH,P|LIST]):-is_holds_true(AH),!,assertion_f([P|LIST]).
 assertion_f([AH,P|LIST]):-is_holds_false(AH),!,assertion_f([P|LIST]).
 % todo hook into loaded files!
+assertion_f(_):-not(useExternalDBs),!,fail.
 assertion_f([P|LIST]):-tiny_kb:'ASSERTION'(':FALSE-DEF',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
 assertion_f([P|LIST]):-tiny_kb:'ASSERTION'(':FALSE-MON',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
 
