@@ -579,7 +579,6 @@ process_mworld:-!. %forall(dynamicCyc2(C),registerCycPredPlus2(C)).
 
 % withvars_988 loaded 9.46 sec, 4,888,433 clauses
 
-:- meta_predicate get_module_of(0,+,+,-).
 :- dbase:process_mworld.
 
 :- use_module(library(check)).
