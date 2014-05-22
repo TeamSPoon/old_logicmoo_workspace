@@ -134,7 +134,7 @@
 
 :-dynamic(isRegisteredCycPred/3).
 
-:- meta_predicate get_module_of(0,+,+,-).
+:- meta_predicate get_module_of_4(0,+,+,-).
 :- meta_predicate get_module_of(0,-).
 
 :- dynamic
@@ -583,7 +583,7 @@ process_mworld:-!. %forall(dynamicCyc2(C),registerCycPredPlus2(C)).
 :- dbase:process_mworld.
 
 :- use_module(library(check)).
-:- (
+remove_undef_search:- (
 (
  redefine_system_predicate(check:list_undefined(_)),
  abolish(check:list_undefined/1),

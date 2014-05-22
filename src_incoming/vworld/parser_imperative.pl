@@ -14,6 +14,8 @@
                    parseIsa//2,
                    objects_match/3,
                    call_tabled/1,
+                   dmsg_parserm/2,
+                   dmsg_parserm/1,
                    findall_tabled/3,
                    parse_for/2,
                    parse_for/3,
@@ -202,6 +204,7 @@ call_no_cuts_0((A,B)):-!.call_no_cuts_0(A),call_no_cuts_0(B).
 call_no_cuts_0(C):-call(C).
 
 dmsg_parserm(_).
+dmsg_parserm(_,_).
 % ===========================================================
 % PARSER
 % ===========================================================
