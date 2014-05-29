@@ -10,11 +10,11 @@
 */
 :- module(drop, []).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(command).
+:- register_module_type(command).
 
-moo:decl_action(drop(item)).
+moo:action_info(drop(item)).
 
 % Drop something
 moo:agent_call_command(Agent,drop(SObj)) :-
@@ -31,13 +31,13 @@ moo:agent_call_command(Agent,drop(_)) :-
 	add(failure(Agent,drop)).
 
 % Record keeping
-moo:decl_update_charge(Agent,drop) :-
+moo:update_charge(Agent,drop) :-
 	del(charge(Agent,Old)),
 	New is Old - 1,
 	add(charge(Agent,New)).
 
 
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 
 

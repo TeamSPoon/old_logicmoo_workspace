@@ -12,12 +12,12 @@
 
 :- module(attack, []).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(command).
+:- register_module_type(command).
 
 % attack joe ->translates-> attack nw
-moo:decl_action(attack(dir)).
+moo:action_info(attack(dir)).
 
 % Attack
 % Successful Attack
@@ -86,16 +86,16 @@ damage_foe(Agent,What,hit) :-
 	add(damage(What,NewDam)).
 
 % Record keeping
-moo:decl_update_charge(Agent,attack) :-
+moo:update_charge(Agent,attack) :-
 	del(charge(Agent,Old)),
 	New is Old - 5,
 	add(charge(Agent,New)).
-moo:decl_update_stats(Agent,bash) :- 
+moo:update_stats(Agent,bash) :- 
 	del(damage(Agent,Old)),
 	New is Old - 2,
 	add(damage(Agent,New)),
 	add(failure(Agent,bash)).
-moo:decl_update_stats(Agent,wiff) :- 
+moo:update_stats(Agent,wiff) :- 
 	del(damage(Agent,Old)),
 	New is Old - 1,
 	add(damage(Agent,New)),
@@ -103,6 +103,6 @@ moo:decl_update_stats(Agent,wiff) :-
 
 
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 
 

@@ -11,15 +11,15 @@
 */
 :- module(climb, []).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(command).
+:- register_module_type(command).
 
 can_move_into(_LOC,XXYY):-var(XXYY),!,fail.
 can_move_into(_LOC,XXYY):-not(atloc(_,XXYY)),!.
 can_move_into(_LOC,XXYY):-ground(XXYY).
 
-moo:decl_action(climb(dir)).
+moo:action_info(climb(dir)).
 
 % Climb
 % If there is nothing there to climb, move to location
@@ -54,23 +54,23 @@ climbable(Agent,Dir) :-
 	ObjHt > 1.
 
 %Record keeping
-moo:decl_update_charge(Agent,climb) :-
+moo:update_charge(Agent,climb) :-
 	del(charge(Agent,Old)),
 	New is Old - 5,
 	add(charge(Agent,New)).
 
-moo:decl_update_stats(Agent,trip) :- 
+moo:update_stats(Agent,trip) :- 
         del(damage(Agent,Old)),
 	New is Old - 3,
 	add(damage(Agent,New)).
 
-moo:decl_update_stats(Agent,pulled) :- 
+moo:update_stats(Agent,pulled) :- 
         del(damage(Agent,Old)),
 	New is Old - 2,
 	add(damage(Agent,New)),
 	add(failure(Agent,pulled)).
 
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 
 

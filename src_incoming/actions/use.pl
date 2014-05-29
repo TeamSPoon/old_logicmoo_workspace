@@ -7,9 +7,9 @@
 
 :- module(use, []).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(command).
+:- register_module_type(command).
 
 
 
@@ -19,7 +19,7 @@ moo:use_usable(use,using,usable,stowed).
 moo:use_usable(drink,drinking,drinkable,holding).
 moo:use_usable(stow,stowed,stowable,holding).
 
-moo:decl_action(Syntax,String):-moo:use_usable(Stow,Stowed,Stowable,Holding),Syntax=..[Stow,Stowable],
+moo:action_help(Syntax,String):-moo:use_usable(Stow,Stowed,Stowable,Holding),Syntax=..[Stow,Stowable],
    sformat(String,'~w a ~w that you are/have ~w so it will be ~w.',[Stow,Stowable,Holding,Stowed]).
 
 use_verbs(USE,USING,USABLE,STOWED):-moo:use_usable(USE,USING,USABLE,STOWED).
@@ -62,7 +62,7 @@ check_permanence(USE,Agent,LOC,Obj) :-
 check_permanence(_,_,_,_).
 
 % Record keeping
-moo:decl_update_charge(Agent,USE) :-
+moo:update_charge(Agent,USE) :-
     use_verbs(USE,_USING,_USABLE,_STOWED),
       padd(Agent,[charge(-2)]).
 
@@ -71,5 +71,5 @@ moo:decl_update_charge(Agent,USE) :-
 
 
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 

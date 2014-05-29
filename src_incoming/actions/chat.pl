@@ -6,16 +6,16 @@
 
 :- module(chat, [do_social/4]).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(command).
+:- register_module_type(command).
 
 do_social(Agent,Say,Whom,Text):- 
    atloc(Agent,Where),
    asInvoked(Cmd,[Say,Agent,Whom,Text]),
    raise_location_event(Where,notice(reciever,Cmd)).
 
-moo:decl_action(Say,text("invokes",Does)):-socialCommand(Say,_SocialVerb,Does).
+moo:action_help(Say,text("invokes",Does)):-socialCommand(Say,_SocialVerb,Does).
 
 socialCommand(Say,SocialVerb,chat(optional(verb,SocialVerb),optional(channel,here),string)):-socialVerb(SocialVerb),
    Say =.. [SocialVerb,optional(channel,here),string].
@@ -38,8 +38,9 @@ chat_to_callcmd(Agent,Say,What,CMD):-atloc(Agent,Where),chat_command_parse_2(Age
 
 chat_command_parse_2(Agent,Say,Where,Text,do_social(Agent,Say,Where,Text)).
 
-moo:agent_call_command(Agent,do_social(Agent,Say,Whom,Text)):- must(do_social(Agent,Say,Whom,Text)).
+moo:agent_call_command(Agent,do_social(Agent,Say,Whom,Text)):- 
+   do_social(Agent,Say,Whom,Text).
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 
 

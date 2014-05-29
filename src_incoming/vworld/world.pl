@@ -1,7 +1,7 @@
 /** <module>
 % Common place to reduce redundancy World utility prediates
 %
-% Project Logicmoo: A MUD server written in Prolog
+% Project LogicMoo: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
@@ -45,13 +45,12 @@
             num_near/3,
             asInvoked/2,
             define_type/1,
-            findall_type_default_props/3,
-
           show_kb_via_pred/3,
           default_repl_obj_to_string/3,
           default_repl_writer/4,
           show_kb_preds/2,show_kb_preds/3,success/2,
          init_location_grid/1,
+         test_te/0,
          samef/2,
          grid_dist/3,
          to_3d/2,
@@ -78,7 +77,7 @@
 
 % :-use_module(logicmoo('vworld/dbase')).
 :- include(logicmoo('vworld/moo_header')).
-:- moo:register_module_type(utility).
+:- register_module_type(utility).
 
 
 :- include(logicmoo('vworld/world_2d')).
@@ -96,7 +95,7 @@ is_property(P,A):- moo:db_prop(_,C),functor(C,P,A2),A is A2-1.
 is_type(O):-is_type0(O).
 is_type0(T):-moo:label_type_props(_,T,_).
 is_type0(T):-moo:type_default_props(_,T,_).
-is_type0(OT):- moo:decl_subclass(OT,_); moo:decl_subclass(_,OT).
+is_type0(OT):- decl_subclass(OT,_); moo:subclass(_,OT).
 is_type0(food).
 is_type0(explorer).
 is_type0(predator).
@@ -130,9 +129,9 @@ isa_mc(region,regiontype).
 isa_mc(agent,agenttype).
 isa_mc(item,itemtype).
 
-isa_mc(FT,formattype):-moo:decl_ft(FT,_).
+isa_mc(FT,formattype):-moo:ft_info(FT,_).
 
-moo:decl_subclass(SubType,formattype):-isa_mc(SubType,formattype).
+moo:subclass(SubType,formattype):-isa_mc(SubType,formattype).
 
 not_mud_isa(agent,formattype).
 cached(G):-catch(G,_,fail).
@@ -150,9 +149,7 @@ world_mud_isa(O,T):- atom(O),!,mud_isa_atom(O,T).
 mud_isa_atom(O,T):- atomic_list_concat([T,_|_],'-',O),!.
 mud_isa_atom(O,T):- atom_concat(T,Int,O),catch(atom_number(Int,_),_,fail),!.
 
-define_subtype(O,T):-assert_if_new(moo:decl_subclass(O,T)).
-
-findall_type_default_props(Inst,Type,TraitsO):-findall(Props,moo:type_default_props(Inst,Type,Props),Traits),flatten(Traits,TraitsO),!.
+define_subtype(O,T):- add(moo:subclass(O,T)).
 
 create_meta(T,P,C,MT):-
    must(split_name_type(T,P,C)),
@@ -171,25 +168,25 @@ rez_to_inventory(Whom,T,P):-
 
 create_instance(P,What):-create_instance(P,What,[]).
 
-moo:decl_subclass(wearable,item).
-moo:decl_subclass(knife,item).
-moo:decl_subclass(food,item).
+moo:subclass(wearable,item).
+moo:subclass(knife,item).
+moo:subclass(food,item).
 
-moo:decl_createableType(FT):- formattype(FT),!,fail.
-moo:decl_createableType(item).
-moo:decl_createableType(S,T):- moo:createableType(T),req(subclass(S,T)).
-moo:decl_createableType(T,T):-nonvar(T),moo:createableType(T).
+moo:createableType(FT):- formattype(FT),!,fail.
+moo:createableType(item).
+moo:createableSubclassType(S,T):- moo:createableType(T),moo:subclass(S,T).
+moo:createableSubclassType(T,T):-nonvar(T),moo:createableType(T).
 
-moo:decl_subclass(int,formattype).
-moo:decl_subclass(dir,formattype).
-moo:decl_subclass(number,formattype).
-moo:decl_subclass(string,formattype).
+moo:subclass(int,formattype).
+moo:subclass(dir,formattype).
+moo:subclass(number,formattype).
+moo:subclass(string,formattype).
 
 
 create_agent(P):-create_agent(P,[]).
 create_agent(P,List):-must(create_instance(P,agent,List)).
 
-formattype(FormatType):-moo:decl_subclass(FormatType,formattype).
+formattype(FormatType):-moo:subclass(FormatType,formattype).
 formattype(FormatType):-dbase:mud_isa(FormatType,formattype).
 
 define_type(Spec):-create_instance(Spec,type,[]).
@@ -209,8 +206,8 @@ create_instance_0(SubType,type,List):-!,
    assert_if_new(A),
    padd(SubType,List).
 
-moo:decl_createableType(agent).
-moo:decl_subclass(actor,agent).
+moo:createableType(agent).
+moo:subclass(actor,agent).
 
 create_instance_0(T,agent,List):-!,
    retractall(agent_list(_)),
@@ -228,7 +225,7 @@ create_instance_0(T,agent,List):-!,
    set_stats(P,List),
    add(memory(P,directions([n,s,e,w,ne,nw,se,sw,u,d]))),!.
 
-moo:decl_createableType(region).
+moo:createableType(region).
 create_instance_0(T,Type,List):- moo:createableType(Type),
    create_meta(T,P,_,Type),!,
    padd(P,List).
@@ -240,7 +237,7 @@ create_instance_0(T,Type,List):-moo:subclass(Type,MetaType),moo:createableType(M
    clr(atloc(P,_)),
    put_in_world(P).
 
-moo:decl_createableType(type).
+moo:createableType(type).
 
 split_name_type(T,T,C):-compound(T),functor(T,C,_),!.
 split_name_type(T,T,C):-atom(T),atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),catch(number_codes(_,Digits),_,fail),atom_codes(C,Type),!.
@@ -253,13 +250,10 @@ same(X,Y):- compound(X),arg(1,X,Y),!.
 same(X,Y):- compound(Y),arg(1,Y,X),!.
 same(X,Y):- samef(X,Y).
 
-functor_safe(P,F,0):- hotrace(string(P);is_list(P);atomic(P)), text_to_string(P,F),!.
-functor_safe(P,F,A):- hotrace(var(P);compound(P)),functor(P,F,A).
-
 samef(X,Y):- X=Y,!.
 samef(X,Y):- hotrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci(XF,YF)))).
 
 moo:type_default_props(_,agent,last_command(stand)).
 
 
-:- include(logicmoo('vworld/moo_footer')).
+:- include(logicmoo(vworld/moo_footer)).

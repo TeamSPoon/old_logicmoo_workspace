@@ -86,5 +86,8 @@
 				Refilter="0"
 				Excludes=""/>
 		</Folder>
+		<Folder Name="src_incoming/vworld">
+			<F N="src_incoming/vworld/moo_loadall.pl"/>
+		</Folder>
 	</Files>
 </Project>

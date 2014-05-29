@@ -6,16 +6,16 @@
 % Douglas Miles 2014
 
 */
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(command).
+:- register_module_type(command).
 
 is_posture(sit).
 is_posture(stand).
 is_posture(lay).
 is_posture(kneel).
 
-moo:decl_action(Posture,text("sets and agent's posture to ",Posture)):-is_posture(Posture).
+moo:action_help(Posture,text("sets and agent's posture to ",Posture)):-is_posture(Posture).
 
 % Sit - do nothing.
 moo:agent_call_command(Agent,Sit) :-is_posture(Sit),
@@ -23,7 +23,7 @@ moo:agent_call_command(Agent,Sit) :-is_posture(Sit),
         padd(Agent,posture(Sit)),
 	moo:update_charge(Agent,Sit).
 
-moo:decl_update_charge(Agent,Sit) :- is_posture(Sit), padd(Agent,[charge(-1)]).
+moo:update_charge(Agent,Sit) :- is_posture(Sit), padd(Agent,[charge(-1)]).
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 

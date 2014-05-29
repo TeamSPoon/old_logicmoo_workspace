@@ -6,16 +6,16 @@
 % July 10,1996
 % John Eikenberry
 %
-% Project Logicmoo: A MUD server written in Prolog
+% Project LogicMoo: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
 */
 
-%%:- ensure_loaded(logicmoo('vworld/dbase.pl')).
+:- include(logicmoo(vworld/moo_header)).
+:- include(logicmoo(vworld/moo_loadall)).
 
 % standard header used in all files that all modules are loaded (therefore useful for when(?) the day comes that modules *can*only*see their explicitly imported modules)
-:- include(logicmoo('vworld/moo_header.pl')).
 
 % These contain the definition of the object types.
 :- ensure_loaded(logicmoo('objs/objs_misc_monster.pl')). 
@@ -27,7 +27,7 @@
 % :- must(old_setup).
 
 % standard footer to clean up any header defined states
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 
 
 % Define the agents traits, both for your agent and the world inhabitants. 

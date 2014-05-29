@@ -1,9 +1,16 @@
+/** <module> 
+% This module is the CircleMUD configurator
+*/
 
+:- module(mobs_conf,[]).
+
+/*
 :- use_module(logicmoo('mobs/monster.pl')).
 :- use_module(logicmoo('mobs/predator.pl')).
 :- use_module(logicmoo('mobs/explorer.pl')).
 :- use_module(logicmoo('mobs/prey.pl')).
 :- use_module(logicmoo('mobs/vacuum.pl')).
+*/
 
 
 end_of_file.

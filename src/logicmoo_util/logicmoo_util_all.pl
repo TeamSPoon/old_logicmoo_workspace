@@ -1,6 +1,6 @@
-/** <module> Logicmoo Path Setups
+/** <not module> Logicmoo Path Setups
 */
-:-module(logicmoo_util_all,[if_flag_true/2]).
+%:-module(logicmoo_util_all,[if_flag_true/2]).
 
 :- meta_predicate if_flag_true(0,0).
 :- multifile user:file_search_path/2.
@@ -27,13 +27,13 @@ join_path33(A,B,C):-exists_directory(B)->B=C;directory_file_path(A,B,C).
     source_location(File,_Line),
     file_directory_name(File, RunDir),
     atom_concat(RunDir,'/../library',RelDir),
-    absolute_file_name(RelDir,A),
+    my_absolute_file_name(RelDir,A),
    'format'(' ~q. ~n',[user:file_search_path(library, A)]),
    asserta(user:file_search_path(library, A)).
 */
 
 % Add the locations that the MUD source files will be picked up by the system
-local_directory_search('../..').
+%local_directory_search('../..').
 local_directory_search('..'). 
 local_directory_search('.'). 
 local_directory_search('../../src_game').  % for non uploadables
@@ -48,19 +48,26 @@ local_directory_search('~logicmoo-mud/cynd/startrek'). % home dir CynD world
    setenv('PATH_INDIGOLOG','t:/devel/logicmoo/src_modules/indigolog');
    setenv('PATH_INDIGOLOG','/devel/logicmoo/src_modules/indigolog').
 
+my_absolute_file_name(F,A):-catch(expand_file_name(F,[A]),_,fail),F\=A,!.
+my_absolute_file_name(F,A):-catch(absolute_file_name(F,A),_,fail),!.
+
 % register search path hook
 user:file_search_path(library,ATLIB):-getenv('PATH_INDIGOLOG',AT),atom_concat(AT,'/lib',ATLIB).
 user:file_search_path(indigolog,AT):-getenv('PATH_INDIGOLOG',AT).
-user:file_search_path(logicmoo,Dir):- logicmoo_runtime_dir(RunDir), local_directory_search(Locally), join_path33(RunDir,Locally,Directory),absolute_file_name(Directory,Dir).
+user:file_search_path(logicmoo,Dir):- 
+   local_directory_search(Locally),
+   locally_to_dir(Locally,Dir).
 
-:-forall(user:file_search_path(logicmoo,Dir),(writeq(Dir),nl)).
+locally_to_dir(Locally,Dir):-logicmoo_runtime_dir(RunDir), join_path33(RunDir,Locally,Directory),my_absolute_file_name(Directory,Dir),exists_directory(Dir),!.
+locally_to_dir(Directory,Dir):-my_absolute_file_name(Directory,Dir),exists_directory(Dir),!.
 
-:- use_module(logicmoo('logicmoo_util/logicmoo_util_bugger.pl')).
-:- use_module(logicmoo('logicmoo_util/logicmoo_util_library.pl')).
-:- use_module(logicmoo('logicmoo_util/logicmoo_util_ctx_frame.pl')).
-:- use_module(logicmoo('logicmoo_util/logicmoo_util_strings.pl')).
-:- use_module(logicmoo('logicmoo_util/logicmoo_util_terms.pl')).
-:- use_module(logicmoo('logicmoo_util/logicmoo_util_dcg.pl')).
+r:- use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)).
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_library)).
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)).
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_strings)).
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_terms)).
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_dcg)).
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_library)).
 
 
 
@@ -75,4 +82,8 @@ win_fork(G,SERVIO,PID):-atom_concat('swipl-win.exe ',G,AC),writeq(win_fork(AC,SE
 % fork(G):-writeq(fork(G)),nl.
 */
 
+
+show_file_search_path:-'format'('% ~q.~n',[forall(user:file_search_path(_,_))]), 
+  forall(user:file_search_path(A,B),'format'('% ~q.~n',[user:file_search_path(A,B)])).
+% :-show_file_search_path.
 

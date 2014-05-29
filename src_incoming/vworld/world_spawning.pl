@@ -3,7 +3,7 @@
 %  laying out new objects in the mud based on some frame rules
 %
 %
-% Project Logicmoo: A MUD server written in Prolog
+% Project LogicMoo: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
@@ -17,7 +17,7 @@
 amzi_timer(T1):-get_time(T1).
 
 
-moo:on_world_load :- retractall(spawn_objects(_)).
+moodb:on_world_load :- retractall(spawn_objects(_)).
 
 growth :-
 	findall(([Obj,Chance]),
@@ -146,7 +146,7 @@ do(_) :- write('invalid command'),nl.
 
 % loads the rules (Prolog terms) into the Prolog database
 
-load :- reconsult('room.kb'),!.
+load :- reconsult('room.moo'),!.
 load :-
 	write('Enter the file name in single quotes (ex. ''room.fkb''.): '),
 	read(F),

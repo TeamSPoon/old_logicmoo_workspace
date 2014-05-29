@@ -32,7 +32,8 @@
          isWhitespace/1,
          atomSplit/2,
          atomic_list_concat_safe/2,
-         any_to_string/2
+         any_to_string/2,
+         atom_contains/2
          %string_chars/2
          % text_to_string/2,
          %string_upper/2,
@@ -74,8 +75,10 @@ clean_out_atom(X,Y):-atom_codes(X,C),clean_codes(C,D),!,atom_codes(X,D),!,Y=X.
 
 all_upper_atom(X):-toUppercase(X,N),!,N=X.
 
-atom_contains(F,C):- notrace((atom(F),atom(C),sub_atom(F,_,_,_,C))).
+atom_contains(F0,C0):- notrace((any_to_atom(F0,F),any_to_atom(C0,C),sub_atom(F,_,_,_,C))).
 
+any_to_atom(A,A):-atom(A),!.
+any_to_atom(T,A):-sformat(S,'~w',[T]),atom_string(A,S).
           
 atomic_list_concat_safe(O,''):- O=[],!.
 atomic_list_concat_safe([Atom|Bonus],V):-atomic(Atom),atom_concat(Atom,NV,V),!,atomic_list_concat_safe(Bonus,NV).

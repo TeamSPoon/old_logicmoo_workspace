@@ -10,7 +10,7 @@
 
 :-export(fully_expand/2).
 
-:- dbase:begin_transform_cyc_preds.
+:- begin_transform_moo_preds.
 
 local_decl_db_prop(repl_writer(agent,term),[singleValued,default(default_repl_writer)]).
 local_decl_db_prop(repl_to_string(agent,term),[singleValued,default(default_repl_obj_to_string)]).
@@ -112,27 +112,30 @@ fmt_holds_tcall_pred(WPred,ToSTR,N,Type,V0):-fmt_holds_tcall_pred_trans(WPred,To
 fmt_holds_tcall_pred_trans(WPred,ToSTR,N,Type,V0):-must((debugOnError(call(ToSTR,V0,Type,V)),!,debugOnError(call(WPred,_Tn,N,Type,V)))).
 
 % ===========================================
-% generatePhrase(+Term,-English).
+% generatePhrase_local(+Term,-English).
 % Generate english version of a message
 % ===========================================
+:-export(generatePhrase_local/2).
+
 bugger:term_to_message_string(T,T):-var(T),!.
-bugger:term_to_message_string(text(T),M):-debugOnError(generatePhrase(T,M)),!.
-bugger:term_to_message_string(fmt(T),M):-debugOnError(generatePhrase(T,M)),!.
+bugger:term_to_message_string(T,T):-!.
+bugger:term_to_message_string(text(T),M):-debugOnError(generatePhrase_local(T,M)),!.
+bugger:term_to_message_string(fmt(T),M):-debugOnError(generatePhrase_local(T,M)),!.
 bugger:term_to_message_string(C,C):-compound(C),functor(C,F,_),is_leave_alone(F),!.
-bugger:term_to_message_string((T),M):-failOnError(generatePhrase(T,M)),!.
+bugger:term_to_message_string((T),M):-failOnError(generatePhrase_local(T,M)),!.
 bugger:term_to_message_string(T,T):-!.
 
 is_leave_alone(exact_message).
 is_leave_alone(todo).
 is_leave_alone((error)).
 is_leave_alone(parserm).
-is_leave_alone(F):-is_db_prop(F,_,_),!,fail.
+is_leave_alone(F):- moodb:is_db_prop(F,_,_),!,fail.
 is_leave_alone(A):-failOnError((sub_atom(A,_,1,0,S),atom_number(S,_))),!.
 
 moo:term_anglify(A,B):-local_term_anglify(A,B).
 moo:term_anglify_np_last(Obj,T,String):- local_term_anglify_np_last(Obj,T,String).
 
-generatePhrase(Term,String):- debugOnError(( fully_expand(Term,EnglishM),!,
+generatePhrase_local(Term,String):- debugOnError(( fully_expand(Term,EnglishM),!,
           % fmt('FR0=~q~n',[fully_expand(Term,EnglishM)]),
           fully_expand(EnglishM,EnglishG),fix_grammar(EnglishG,English) , join_for_string(English,String))),!.
 
@@ -145,9 +148,6 @@ local_grammar_correction([room,are],[room,is]).
 local_grammar_correction([in,region,here],[is,here]).
 local_grammar_correction([X,X],[X]):-member(X,[is,are]).
  
-append_ci([],L1,L2):-string_equal_ci(L1,L2),!.
-append_ci([H1|T],L2,[H2|L3]) :- string_equal_ci(H1,H2),append_ci(T,L2,L3).
-
 get_grammar_correction(C1,C2):-
    local_grammar_correction(W1,W2),to_word_list(W1,C1),to_word_list(W2,C2).
 
@@ -286,8 +286,8 @@ local_term_anglify_np(string(Obj),string,Obj):- !.
 local_term_anglify_np(Obj,string,Obj):- !.
 
 local_term_anglify_np_last(Obj,Hint,String):- anglify_noun_known(Obj,Hint,String),!.
-local_term_anglify_np_last(Obj,FT,String):- is_decl_ft(FT),isa_assert(Obj,FT,String),!.
-local_term_anglify_np_last(Obj,Type,[prolog(Obj)]):-is_decl_ft(Type),!.
+local_term_anglify_np_last(Obj,FT,String):- is_ft(FT),isa_assert(Obj,FT,String),!.
+local_term_anglify_np_last(Obj,Type,[prolog(Obj)]):-is_ft(Type),!.
 local_term_anglify_np_last(Obj,Type,[the,Type,prolog(Obj)]):-!.
 local_term_anglify_np_last(apath(Region,Dir),_,[a,fN(Dir,dir),'-ern',way,from,fN(Region,np)]):-!.
 local_term_anglify_np_last(Obj,Type,[prolog(Obj),fN,Type]):-!.
@@ -295,7 +295,7 @@ local_term_anglify_np_last(Obj,_,[the,noun,with,token,Obj]):-!.
 
 
 % anglify_noun_known(Self,_Hint,[you]):- current_agent(Self),!.
-anglify_noun_known(Obj,FT,String):- is_decl_ft(FT),isa_assert(Obj,FT,String),!.
+anglify_noun_known(Obj,FT,String):- is_ft(FT),isa_assert(Obj,FT,String),!.
 anglify_noun_known(explorer(StringO),_Hint, [StringO]).
 anglify_noun_known(Obj,_Hint,[right,here]):- current_agent(Self),atloc(Self,Obj),!.
 anglify_noun_known(Obj,_Hint,[here]):- current_agent(Self),req(inRegion(Self,Obj)),!.
@@ -304,7 +304,7 @@ anglify_noun_known(Obj,_Hint,StringO):- findall(String,holds_t(nameString,Obj,St
 %nameString(X,Y,_,_)
 
 
-:- dbase:end_transform_cyc_preds.
+:- end_transform_moo_preds.
 
 
 end_of_file.

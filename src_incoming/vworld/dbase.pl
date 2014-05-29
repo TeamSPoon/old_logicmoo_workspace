@@ -21,123 +21,163 @@
 % Douglas Miles
 */
 
-:- module(dbase, [
-  skip_qlfs/0,
-  add/1, add0/1, agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, ofclass/2, clr/1, damage/2, db_op/2, atloc/2, 
- db_prop_from_game_load/1, db_prop_game_assert/1, del/1, failure/2, grid/4, mud_isa/2, item/1, holds_tcall/1,
- memory/2, padd/2, padd/3, possess/2, prop/3, prop_or/4, props/2, region/1, req/1, scan_db_prop/0, score/2, stm/2, term_listing/1,  facing/2,
- thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, description/2, act_turn/2,
- dbase_mod/1, dbase_define_db_prop/2, useExternalDBs/0,
+:- module(dbase,
+ [
+add/1,
+always_transform_moo_preds/0,
+prevent_transform_moo_preds/0,
+add0/1,
+argIsa_call/3,
+assertThrough/1,
+assertThrough/2,
+balanceBinding/2,
+clause_present_1/3,
+clr/1,
+cycAssert/1,
+cycAssert/2,
+cycInit/0,
+cyclify/2,
+cyclifyNew/2,
+cycQuery/1,
+cycQuery/2,
+cycRetract/1,
+cycRetract/2,
+cycRetractAll/1,
+cycRetractAll/2,
+cycStats/0,
+db_forall_query/1,
+db_op/2,
+db_prop_from_game_load/1,
+db_prop_game_assert/1,
+dbase_define_db_prop/2,
+dbase_mod/1,
+dbase_t/1,
+dbase_t/2,
+dbase_t/3,
+dbase_t/4,
+dbase_t/5,
+dbase_t/6,
+dbase_t/7,
+defaultMt/1,
+del/1,
+ensureMt/1,
+findall_type_default_props/3,
+finishCycConnection/3,
+formatCyc/3,
+getCycConnection/3,
+getSurfaceFromChars/3,
+holds_f/1,
+holds_f/2,
+holds_f/3,
+holds_f/4,
+holds_f/5,
+holds_f/6,
+holds_f/7,
+holds_f/8,
+holds_t/1,
+holds_t/2,
+holds_t/3,
+holds_t/4,
+holds_t/5,
+holds_t/6,
+holds_t/7,
+holds_t/8,
+holds_tcall/1,
+inside_clause_expansion/1,
+invokeSubL/1,
+invokeSubL/2,
+invokeSubLRaw/2,
+is_holds_false/1,
+is_holds_true/1,
+isCycPredArity/2,
+isDebug/0,
+isSlot/1,
+list_to_term/2,
+lowerCasePred/1,
+makeConstant/1,
+try_mud_body_expansion/2,
+try_mud_head_expansion/2,
+padd/2,
+padd/3,
+printSubL/2,
+process_mworld/0,
+prop/3,
+prop_or/4,
+props/2,
+req/1,
+retractAllThrough/1,
+retractAllThrough/2,
+scan_arities/0,
+scan_db_prop/0,
+skip_qlfs/0,
+stringToWords/2,
+term_listing/1,
+toCycApiExpression/2,
+toCycApiExpression/3,
+use_term_listing/2,
+useExternalDBs/0,
+with_kb_assertions/2,
+world_clear/1,
+xcall/1,
+xcall/2,
+xcall/3,
+xcall/4,
+xcall/5,
+xcall/6,
+xcall/7,
+xcall_not/1,
+xcall_not/2,
+xcall_not/3,
+xcall_not/4,
+xcall_not/5,
+xcall_not/6,
+xcall_not/7,         
+testOpenCyc/0]).
 
-          is_holds_false/1,
-          is_holds_true/1,
+:-registerCycPred((
+     type/1, agent/1, item/1, region/1,
 
-          db_forall_query/1,
-          process_mworld/0,
+      thinking/1,
 
-         clause_present_1/3,
-         with_kb_assertions/2,
+      act_term/2,
+      act_turn/2,
+      agent_doing/2,
+      agent_done/2,
+      atloc/2,
+      charge/2,
+      damage/2,
+      description/2,
+      facing/2,
+      failure/2,
+      grid/4,
+      height/2,
+      memory/2,
+      mtForPred/2,
+      mud_isa/2,
+      ofclass/2,
+      pathName/3, 
+      possess/2,
+      score/2,
+      stm/2,      
+      str/2,
+      wearing/2)).
 
-         make_list/3,
+is_holds_true(Prop):-once(notrace((atom(Prop),is_holds_true0(Prop)))).
+is_holds_true0(Prop):-member(Prop,[k,p,holds,holds_t,dbase_t,res,assertion_t,assertion]).
 
-          getSurfaceFromChars/3,
-          isSlot/1,
-           scan_arities/0,
-           cycInit/0,
-           getCycConnection/3,
-           finishCycConnection/3,
-           invokeSubL/1,
-           invokeSubL/2,
-           invokeSubLRaw/2,
-           cycStats/0,
-           printSubL/2,
-           formatCyc/3,
-           toCycApiExpression/2,
-           toCycApiExpression/3,
-           cycQuery/1,
-           cycQuery/2,
-           cycAssert/1,
-           cycAssert/2,
-           cycRetract/1,
-           cycRetract/2,
-           cycRetractAll/1,
-           cycRetractAll/2,
-           isDebug/0,
-           makeConstant/1,
-           ensureMt/1,
-           cyclify/2,
-           cyclifyNew/2,
-           defaultMt/1,
-           mtForPred/2,
+is_2nd_order_holds(Prop):- is_holds_true(Prop) ; is_holds_false(Prop).
 
-          dbase_t/1,
-          dbase_t/2,
-          dbase_t/3,
-          dbase_t/4,
-          dbase_t/5,
-          dbase_t/6,
-          dbase_t/7,
-
-          xcall/1,
-          xcall/2,
-          xcall/3,
-          xcall/4,
-          xcall/5,
-          xcall/6,
-          xcall/7,
-
-          xcall_not/1,
-          xcall_not/2,
-          xcall_not/3,
-          xcall_not/4,
-          xcall_not/5,
-          xcall_not/6,
-          xcall_not/7,
-
-           isRegisteredCycPred/3,
-           registerCycPred/1,
-           registerCycPredPlus2/1,
-           registerCycPred/2,
-           registerCycPred/3,
-           assertThrough/1,
-           assertThrough/2,
-           retractAllThrough/1,
-           retractAllThrough/2,
-           dbase:begin_transform_cyc_preds/0,
-         dbase:end_transform_cyc_preds/0,
-         cyc_goal_expansion/2,
-         list_to_term/2, 
-         lowerCasePred/1,   
-         stringToWords/2, 
-          balanceBinding/2,
-
-         holds_t/8,
-         holds_t/7,
-         holds_t/6,
-         holds_t/5,
-         holds_t/4,
-         holds_t/3,
-         holds_t/2,
-         holds_t/1,
-
-         holds_f/8,
-         holds_f/7,
-         holds_f/6,
-         holds_f/5,
-         holds_f/4,
-         holds_f/3,
-         holds_f/2,
-         holds_f/1,
-
-         isCycPredArity/2,         
-         testOpenCyc/0]).
-
-:-dynamic(isRegisteredCycPred/3).
+is_holds_false(Prop):-notrace((atom(Prop),once((is_holds_false0(Prop,Stem),is_holds_true0(Stem))))).
+is_holds_false0(Prop,Stem):-atom_concat('not_',Stem,Prop).
+is_holds_false0(Prop,Stem):-atom_concat(Stem,'_not',Prop).
+is_holds_false0(Prop,Stem):-atom_concat(Stem,'_false',Prop).
+is_holds_false0(Prop,Stem):-atom_concat(Stem,'_f',Prop).
 
 :- meta_predicate get_module_of_4(0,+,+,-).
 :- meta_predicate get_module_of(0,-).
 
 :- dynamic
+    inside_clause_expansion/1,   
           dbase_t/1,
           dbase_t/2,
           dbase_t/3,
@@ -158,15 +198,9 @@
 
 :- meta_predicate clause_present(:), db_forall_assert_mv(+,+,+), db_forall_assert_sv(+,+,+), db_forall(+,+), db_forall_quf(+,+,+).
 
-:- dynamic 
-          assertion_f/1,
-          assertion_t/1,
- skip_qlfs/0,
- dbase_mod/1,
-  agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, ofclass/2,  damage/2, db_op/2,atloc/2, 
- db_prop_from_game_load/1, db_prop_game_assert/1, failure/2, grid/4, mud_isa/2, item/1, 
- memory/2, pathName/3, possess/2, region/1, req/1, scan_db_prop/0, score/2, stm/2, term_listing/1, facing/2,
- thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2,  description/2, act_turn/2.
+:- dynamic skip_qlfs/0, db_op/2, dbase_mod/1, db_prop_from_game_load/1, db_prop_game_assert/1, req/1, scan_db_prop/0, term_listing/1,
+  argIsa_call/3, use_term_listing/2,world_clear/1.
+
 
 :- dynamic(db_prop_prolog/1).
 
@@ -175,10 +209,10 @@
 % :- context_module(M),asserta(dbase_mod(M)),dmsg(assert_if_new(dbase_mod(M))).
 dbase_mod(dbase).
 
-:- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_bugger')).
-:- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_all')).
-:- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_terms')).
-:- ensure_loaded(logicmoo('vworld/moo')).
+% :- ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_all)).
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_library)).
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)).
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)).
 
 :- dynamic_multifile_exported dbase_t/1.
 :- dynamic_multifile_exported dbase_t/2.
@@ -198,7 +232,7 @@ dbase_mod(dbase).
 
 :- meta_predicate isDebug(?).
 :- meta_predicate ensure_db_predicate_2(?,?,?,?,?,?).
-:- meta_predicate cyc_pred_expansion(?,?,?,?).
+:- meta_predicate mud_pred_expansion(+,+,+,-).
 :- meta_predicate with_kb_assertions(?,?).
 :- meta_predicate show_cgoal(?).
 :- meta_predicate retractall_cloc(?).
@@ -206,10 +240,6 @@ dbase_mod(dbase).
 :- meta_predicate assertz_cloc(?).
 :- meta_predicate asserta_cloc(?).
 
-make_list(E,1,[E]):-!.
-make_list(E,N,[E|List]):- M1 is N - 1, make_list(E,M1,List),!.
-
-def_meta_predicate(F,S,E):-doall(((between(S,E,N),make_list('?',N,List),CALL=..[F|List],meta_predicate(CALL)))).
 :- def_meta_predicate(call_f,2,8).
 :- def_meta_predicate(call_t,2,8).
 :- def_meta_predicate(xcall,1,7).
@@ -221,71 +251,12 @@ def_meta_predicate(F,S,E):-doall(((between(S,E,N),make_list('?',N,List),CALL=..[
 :- def_meta_predicate(assertion_t,1,1).
 :- def_meta_predicate(assertion_f,1,1).
 
-%:- moo:register_module_type(utility).
 
-add_db_prop(_,_,Var):- var(Var),!.
-add_db_prop(_,_,[]):- !.
-add_db_prop(F,A,[C|L]):-!, add_db_prop(F,A,C),add_db_prop(F,A,L),!.
-add_db_prop(F,A,CL):- assert_if_new(moo:is_db_prop(F,A,CL)).
-
-rem_db_prop(_,_,Var):- var(Var),!.
-rem_db_prop(_,_,[]):- !.
-rem_db_prop(F,A,[C|L]):-!, rem_db_prop(F,A,C),rem_db_prop(F,A,L),!.
-rem_db_prop(F,A,CL):- retractall(moo:is_db_prop(F,A,CL)).
-
-% ============================================
-% Prolog to Cyc Predicate Mapping
-%
-%  the following will all do the same things:
-%
-% :- registerCycPred('BaseKB':isa/2). 
-% :- registerCycPred('BaseKB':isa(_,_)). 
-% :- registerCycPred(isa(_,_),'BaseKB'). 
-% :- registerCycPred('BaseKB',isa,2). 
-%
-%  Will make calls 
-% :- isa(X,Y)
-%  Query into #$BaseKB for (#$isa ?X ?Y) 
-%
-% ============================================
-:-dynamic(isRegisteredCycPred/3).
-
-% :- registerCycPred('BaseKB':isa/2). 
-registerCycPred(Mt:Pred/Arity):- !,
-   registerCycPred(Mt,Pred,Arity).
-
-% :- registerCycPred('BaseKB':isa(_,_)). 
-registerCycPred(Mt:Term):-
-   functor(Term,Pred,Arity),
-   registerCycPred(Mt,Pred,Arity).
-
-registerCycPred(M:F):-!, '@'(registerCycPred(F), M).
-registerCycPred(F/A):- reallyRegisterCycPred(F,A).
-registerCycPred([A]):-!,registerCycPred(A).
-registerCycPred([A|L]):-!,registerCycPred(A),registerCycPred(L).
-registerCycPred((A,L)):-!,registerCycPred(A),registerCycPred(L).
-
-registerCycPredPlus2(M:F):-!, '@'(registerCycPredPlus2(F), M).
-registerCycPredPlus2(F/A):- A2 is A -2, registerCycPred(F/A2).
-registerCycPredPlus2([A]):-!,registerCycPredPlus2(A).
-registerCycPredPlus2([A|L]):-!,registerCycPredPlus2(A),registerCycPredPlus2(L).
-registerCycPredPlus2((A,L)):-!,registerCycPredPlus2(A),registerCycPredPlus2(L).
-
-reallyRegisterCycPred(F,A) :- registerCycPred(_,F,A).
-
-% :- registerCycPred(isa(_,_),'BaseKB'). 
-registerCycPred(Term,Mt):-
-   functor(Term,Pred,Arity),
-   registerCycPred(Mt,Pred,Arity).
-   
-% :- registerCycPred('BaseKB',isa,2). 
-registerCycPred(Mt,_:Pred,Arity):-!,registerCycPred(Mt,Pred,Arity).
-registerCycPred(Mt,Pred,0):-!,registerCycPred(Mt,Pred,2).
-registerCycPred(Mt,Pred,Arity):-isRegisteredCycPred(Mt,Pred,Arity),!.
-registerCycPred(Mt,Pred,Arity):-
-      M = dbase,
-      assertz(M:isRegisteredCycPred(Mt,Pred,Arity)),
-      add_db_prop(Pred,Arity,isRegisteredCycPred(Mt,Pred,Arity)),!.
+callable_tf(P,2):-arity_pred(P),!,fail.
+callable_tf(F,A):- functor_safe(P,F,A),predicate_property(P,_),!.
+:-dynamic(useExternalDBs/0).
+useExternalDBs:-fail.
+useDBMts:- fail, useExternalDBs.
 
 
 get_module_of(P,M):-predicate_property(P,imported_from(M)),!.
@@ -296,10 +267,6 @@ get_module_of_4(_P,F,A,M):- current_predicate(F0/A0),F0=F,A0=A,!,dbase_mod(M).
 get_module_of_4(_P,F,A,_M):-trace, isCycPredArity(F,A),!,fail.
 get_module_of_4(P,F,A,M):- trace, show_cgoal(get_module_of_4(P,F,A,M)).
 
-
-callable(F,A):- functor_safe(P,F,A),predicate_property(P,_),!.
-:-dynamic(useExternalDBs/0).
-useExternalDBs:-fail.
 
 % ================================================================================
 % begin holds_t
@@ -320,33 +287,33 @@ holds_t(CALL):-CALL=..[P|LIST],holds_t([P|LIST]).
 holds_t_p2(P,LIST):- CALL=..[holds_t,P|LIST],call(CALL).
 
 
-call_t(P,A1,A2,A3,A4,A5,A6,A7):- callable(P,7),List= [P,A1,A2,A3,A4,A5,A6,A7], CALL=..List,(assertion_t(List);dbase:dbase_t(CALL);call(CALL)).
-call_t(P,A1,A2,A3,A4,A5,A6):- dbase:dbase_t(P,A1,A2,A3,A4,A5,A6).
+call_t(P,A1,A2,A3,A4,A5,A6,A7):- callable_tf(P,7),List= [P,A1,A2,A3,A4,A5,A6,A7], CALL=..List,(assertion_t(List);dbase_t(CALL);xcall(CALL)).
+call_t(P,A1,A2,A3,A4,A5,A6):- dbase_t(P,A1,A2,A3,A4,A5,A6).
 call_t(P,A1,A2,A3,A4,A5,A6):- assertion_t([P,A1,A2,A3,A4,A5,A6]).
-call_t(P,A1,A2,A3,A4,A5,A6):- callable(P,6),call(P,A1,A2,A3,A4,A5,A6).
-call_t(P,A1,A2,A3,A4,A5):- dbase:dbase_t(P,A1,A2,A3,A4,A5).
+call_t(P,A1,A2,A3,A4,A5,A6):- callable_tf(P,6),xcall(P,A1,A2,A3,A4,A5,A6).
+call_t(P,A1,A2,A3,A4,A5):- dbase_t(P,A1,A2,A3,A4,A5).
 call_t(P,A1,A2,A3,A4,A5):- assertion_t([P,A1,A2,A3,A4,A5]).
-call_t(P,A1,A2,A3,A4,A5):- callable(P,5),call(P,A1,A2,A3,A4,A5).
-call_t(P,A1,A2,A3,A4):- dbase:dbase_t(P,A1,A2,A3,A4).
+call_t(P,A1,A2,A3,A4,A5):- callable_tf(P,5),xcall(P,A1,A2,A3,A4,A5).
+call_t(P,A1,A2,A3,A4):- dbase_t(P,A1,A2,A3,A4).
 call_t(P,A1,A2,A3,A4):- assertion_t([P,A1,A2,A3,A4]).
-call_t(P,A1,A2,A3,A4):- callable(P,4),call(P,A1,A2,A3,A4).
-call_t(P,A1,A2,A3):- dbase:dbase_t(P,A1,A2,A3).
+call_t(P,A1,A2,A3,A4):- callable_tf(P,4),xcall(P,A1,A2,A3,A4).
+call_t(P,A1,A2,A3):- dbase_t(P,A1,A2,A3).
 call_t(P,A1,A2,A3):- assertion_t([P,A1,A2,A3]).
-call_t(P,A1,A2,A3):- callable(P,3),call(P,A1,A2,A3).
-call_t(P,A1,A2):- dbase:dbase_t(P,A1,A2).
+call_t(P,A1,A2,A3):- callable_tf(P,3),xcall(P,A1,A2,A3).
+call_t(P,A1,A2):- dbase_t(P,A1,A2).
 call_t(P,A1,A2):- assertion_t([P,A1,A2]).
-call_t(P,A1,A2):- callable(P,2),call(P,A1,A2).
-call_t(P,A1):- dbase:dbase_t(P,A1).
+call_t(P,A1,A2):- callable_tf(P,2),xcall(P,A1,A2).
+call_t(P,A1):- dbase_t(P,A1).
 call_t(P,A1):- assertion_t([P,A1]).
-call_t(P,A1):- callable(P,1),call(P,A1).
+call_t(P,A1):- callable_tf(P,1),xcall(P,A1).
 
-call_t_mt(P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- callable(P,9),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],call(CALL).
-call_t_mt(P,A1,A2,A3,A4,A5,A6,A7,A8):- callable(P,8),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],call(CALL).
-call_t_mt(P,A1,A2,A3,A4,A5,A6,A7):- callable(P,7),CALL=..[P,A1,A2,A3,A4,A5,A6,A7],call(CALL).
-call_t_mt(P,A1,A2,A3,A4,A5,A6):- callable(P,6),call(P,A1,A2,A3,A4,A5,A6).
-call_t_mt(P,A1,A2,A3,A4,A5):- callable(P,5),call(P,A1,A2,A3,A4,A5).
-call_t_mt(P,A1,A2,A3,A4):- callable(P,4),call(P,A1,A2,A3,A4).
-call_t_mt(P,A1,A2,A3):- callable(P,3),call(P,A1,A2,A3).
+call_t_mt(P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- useDBMts,callable_tf(P,9),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],xcall(CALL).
+call_t_mt(P,A1,A2,A3,A4,A5,A6,A7,A8):- useDBMts,callable_tf(P,8),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],xcall(CALL).
+call_t_mt(P,A1,A2,A3,A4,A5,A6,A7):- useDBMts,callable_tf(P,7),CALL=..[P,A1,A2,A3,A4,A5,A6,A7],xcall(CALL).
+call_t_mt(P,A1,A2,A3,A4,A5,A6):- useDBMts,callable_tf(P,6),xcall(P,A1,A2,A3,A4,A5,A6).
+call_t_mt(P,A1,A2,A3,A4,A5):- useDBMts,callable_tf(P,5),xcall(P,A1,A2,A3,A4,A5).
+call_t_mt(P,A1,A2,A3,A4):- useDBMts,callable_tf(P,4),xcall(P,A1,A2,A3,A4).
+call_t_mt(P,A1,A2,A3):- useDBMts,callable_tf(P,3),xcall(P,A1,A2,A3).
 
 xcall(P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],call(CALL).
 xcall(P,A1,A2,A3,A4,A5,A6,A7,A8):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],call(CALL).
@@ -391,33 +358,33 @@ holds_f([P|LIST]):-!,holds_f_p2(P,LIST).
 holds_f(CALL):-CALL=..[P|LIST],holds_f([P|LIST]).
 holds_f_p2(P,LIST):- xcall(((CALL=..[holds_f,P|LIST],xcall(CALL)))).
 
-call_f(P,A1,A2,A3,A4,A5,A6,A7):- xcall(((callable(P,7),List= [P,A1,A2,A3,A4,A5,A6,A7], CALL=..List,(assertion_f(List);dbase:dbase_f(CALL);xcall_not(CALL))))).
-call_f(P,A1,A2,A3,A4,A5,A6):- xcall(((dbase:dbase_f(P,A1,A2,A3,A4,A5,A6)))).
-call_f(P,A1,A2,A3,A4,A5,A6):- xcall(((assertion_f(P,A1,A2,A3,A4,A5,A6)))).
-call_f(P,A1,A2,A3,A4,A5,A6):- xcall(((callable(P,6),xcall_not(P,A1,A2,A3,A4,A5,A6)))).
-call_f(P,A1,A2,A3,A4,A5):- xcall(((dbase:dbase_f(P,A1,A2,A3,A4,A5)))).
-call_f(P,A1,A2,A3,A4,A5):- xcall(((assertion_f(P,A1,A2,A3,A4,A5)))).
-call_f(P,A1,A2,A3,A4,A5):- xcall(((callable(P,5),xcall_not(P,A1,A2,A3,A4,A5)))).
-call_f(P,A1,A2,A3,A4):- xcall((( dbase:dbase_f(P,A1,A2,A3,A4)))).
-call_f(P,A1,A2,A3,A4):- xcall(((assertion_f(P,A1,A2,A3,A4)))).
-call_f(P,A1,A2,A3,A4):- xcall(((callable(P,4),xcall_not(P,A1,A2,A3,A4)))).
-call_f(P,A1,A2,A3):- xcall(((dbase:dbase_f(P,A1,A2,A3)))).
-call_f(P,A1,A2,A3):- xcall(((assertion_f(P,A1,A2,A3)))).
-call_f(P,A1,A2,A3):- xcall(((callable(P,3),xcall_not(P,A1,A2,A3)))).
-call_f(P,A1,A2):- xcall(((dbase:dbase_f(P,A1,A2)))).
-call_f(P,A1,A2):- xcall((( assertion_f(P,A1,A2)))).
-call_f(P,A1,A2):- xcall(((callable(P,2),xcall_not(P,A1,A2)))).
-call_f(P,A1):- xcall(((dbase:dbase_f(P,A1)))).
-call_f(P,A1):- xcall(((assertion_f(P,A1)))).
-call_f(P,A1):- xcall(((callable(P,1),xcall_not(P,A1)))).
+call_f(P,A1,A2,A3,A4,A5,A6,A7):- xcall(((callable_tf(P,7),List= [P,A1,A2,A3,A4,A5,A6,A7], CALL=..List,(assertion_f(List);dbase_f(CALL);xcall_not(CALL))))).
+call_f(P,A1,A2,A3,A4,A5,A6):- xcall(((dbase_f(P,A1,A2,A3,A4,A5,A6)))).
+call_f(P,A1,A2,A3,A4,A5,A6):- xcall(((assertion_f([P,A1,A2,A3,A4,A5,A6])))).
+call_f(P,A1,A2,A3,A4,A5,A6):- xcall(((callable_tf(P,6),xcall_not(P,A1,A2,A3,A4,A5,A6)))).
+call_f(P,A1,A2,A3,A4,A5):- xcall(((dbase_f(P,A1,A2,A3,A4,A5)))).
+call_f(P,A1,A2,A3,A4,A5):- xcall(((assertion_f([P,A1,A2,A3,A4,A5])))).
+call_f(P,A1,A2,A3,A4,A5):- xcall(((callable_tf(P,5),xcall_not(P,A1,A2,A3,A4,A5)))).
+call_f(P,A1,A2,A3,A4):- xcall((( dbase_f(P,A1,A2,A3,A4)))).
+call_f(P,A1,A2,A3,A4):- xcall(((assertion_f([P,A1,A2,A3,A4])))).
+call_f(P,A1,A2,A3,A4):- xcall(((callable_tf(P,4),xcall_not(P,A1,A2,A3,A4)))).
+call_f(P,A1,A2,A3):- xcall(((dbase_f(P,A1,A2,A3)))).
+call_f(P,A1,A2,A3):- xcall(((assertion_f([P,A1,A2,A3])))).
+call_f(P,A1,A2,A3):- xcall(((callable_tf(P,3),xcall_not(P,A1,A2,A3)))).
+call_f(P,A1,A2):- xcall(((dbase_f(P,A1,A2)))).
+call_f(P,A1,A2):- xcall((( assertion_f([P,A1,A2])))).
+call_f(P,A1,A2):- xcall(((callable_tf(P,2),xcall_not(P,A1,A2)))).
+call_f(P,A1):- xcall(((dbase_f(P,A1)))).
+call_f(P,A1):- xcall(((assertion_f([P,A1])))).
+call_f(P,A1):- xcall(((callable_tf(P,1),xcall_not(P,A1)))).
 
-call_f_mt(P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- callable(P,9),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],xcall_not(CALL).
-call_f_mt(P,A1,A2,A3,A4,A5,A6,A7,A8):- callable(P,8),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],xcall_not(CALL).
-call_f_mt(P,A1,A2,A3,A4,A5,A6,A7):- callable(P,7),CALL=..[P,A1,A2,A3,A4,A5,A6,A7],xcall_not(CALL).
-call_f_mt(P,A1,A2,A3,A4,A5,A6):- callable(P,6),xcall_not(P,A1,A2,A3,A4,A5,A6).
-call_f_mt(P,A1,A2,A3,A4,A5):- callable(P,5),xcall_not(P,A1,A2,A3,A4,A5).
-call_f_mt(P,A1,A2,A3,A4):- callable(P,4),xcall_not(P,A1,A2,A3,A4).
-call_f_mt(P,A1,A2,A3):- callable(P,3),xcall_not(P,A1,A2,A3).
+call_f_mt(P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- useDBMts, callable_tf(P,9),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],xcall_not(CALL).
+call_f_mt(P,A1,A2,A3,A4,A5,A6,A7,A8):- useDBMts,  callable_tf(P,8),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],xcall_not(CALL).
+call_f_mt(P,A1,A2,A3,A4,A5,A6,A7):- useDBMts, callable_tf(P,7),CALL=..[P,A1,A2,A3,A4,A5,A6,A7],xcall_not(CALL).
+call_f_mt(P,A1,A2,A3,A4,A5,A6):- useDBMts, callable_tf(P,6),xcall_not(P,A1,A2,A3,A4,A5,A6).
+call_f_mt(P,A1,A2,A3,A4,A5):- useDBMts, callable_tf(P,5),xcall_not(P,A1,A2,A3,A4,A5).
+call_f_mt(P,A1,A2,A3,A4):- useDBMts,  callable_tf(P,4),xcall_not(P,A1,A2,A3,A4).
+call_f_mt(P,A1,A2,A3):- useDBMts, callable_tf(P,3),xcall_not(P,A1,A2,A3).
 
 xcall_not(P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],\+ xcall(CALL).
 xcall_not(P,A1,A2,A3,A4,A5,A6,A7,A8):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],\+ xcall(CALL).
@@ -453,17 +420,15 @@ isCycPredArity_NE(P,A):-ignore(isCycPredArity(P,A)).
 isCycPredArity(P,A):-nonvar(P),!,isCycPredArity0(P,OTHER),!,arityMatches(A,OTHER).
 isCycPredArity(P,A):- isCycPredArity0(P,OTHER),arityMatches(A,OTHER).
 
+arity_pred(P):-nonvar(P),member(P,[arity,arityMax,arityMin]).
 
-isCycPredArity0(P,A):- nonvar(P),member(P,[arity,arityMax,arityMin]),!,A=2.
-isCycPredArity0(P,A):- isRegisteredCycPred(_,P,A).
+isCycPredArity0(P,A):- arity_pred(P),!,A=2.
+isCycPredArity0(P,A):- moodb:isRegisteredCycPred(_,P,A).
 isCycPredArity0(P,A):- xcall(holds_t(arity,P, A)).
 isCycPredArity0(P,A):- xcall(holds_t(arityMax,P, A)).
+isCycPredArity0(holds,7):-!.
+isCycPredArity0(P,_):- is_2nd_order_holds(P),!,fail.
 isCycPredArity0(P,A):- xcall(((holds_t(arityMin,P, A),not(holds_t(arityMax,P, _))))).
-
-
-
-
-%:- moo:register_module_type(utility).
 
      
 %list_to_term(X,Y):- balanceBinding(X,Y).
@@ -478,72 +443,152 @@ list_to_terms_lr([H|T],(H,TT)):-!,list_to_terms_lr(T,TT).
 
      
 
-:-dynamic(ended_transform_cyc_preds/0).
 :-multifile(user:goal_expansion/2).
-
-ended_transform_cyc_preds.
-
-dbase:begin_transform_cyc_preds:- retractall((ended_transform_cyc_preds)).
-
-dbase:end_transform_cyc_preds:-
-   asserta(ended_transform_cyc_preds),
-   retractall((user:goal_expansion(G1,G2):- not(ended_transform_cyc_preds), compound(G1), cyc_goal_expansion(G1,G2))).
-
+   
 set_list_len(List,A,NewList):-length(List,LL),A=LL,!,NewList=List.
 set_list_len(List,A,NewList):-length(List,LL),A>LL,length(NewList,A),append(List,_,NewList),!.
 set_list_len(List,A,NewList):-length(NewList,A),append(NewList,_,List),!.
 
+use_holds_db(Builtin,_):-
+   member(Builtin,[compound,var]),!,fail.
 
-functor_safe(P,F,A):- strip_module(P,P0),var(F),!,functor(P0,F0,A),strip_module(F0,F),!.
-functor_safe(P,F,A):- strip_module(P,P0),strip_module(F,F0),!,functor(P0,F0,A).
+use_holds_db(F,_):-is_2nd_order_holds(F),!,fail.
+use_holds_db(F,A):- isCycPredArity(F,A).
 
-strip_module(_:P,P):-nonvar(P),!.
-strip_module(P,P).
+true2(F,A):- isCycPredArity(F,A),!.
+%true2(F,A):- integer(A),isCycPredArity(F,A2),!,trace,throw(isCycPredArity(F,A-A2)).
+true2(F,A):- integer(A),moodb:registerCycPred(F,A).
 
-use_holds_db(F,A):-isCycPredArity(F,A).
+is_kb_module(Moo):-atom(Moo),member(Moo,[moo,opencyc]).
 
-cyc_goal_expansion(G1,G2):-cyc_pred_expansion(use_holds_db, holds_t:holds_f,G1,G2).
-cyc_head_expansion(G1,G2):-cyc_pred_expansion(use_holds_db, dbase_t:dbase_f,G1,G2).
+try_mud_body_expansion(G0,G2):- not_ended_transform_moo_preds, mud_goal_expansion_0(G0,G1),!,goals_different(G0, G1),!,prepend_module(G1,dbase,G2).
+mud_goal_expansion_0(G1,G2):-notrace((mud_pred_expansion(use_holds_db, holds_t - holds_f,G1,G2))).
 
-
-cyc_pred_expansion(_Prd,_HOLDS,G1,_):-not(compound(G1)),!,fail.
-cyc_pred_expansion(_Prd,_HOLDS,G1,G1):- functor(G1,xcall,_).
-cyc_pred_expansion(Pred,NHOLDS:HOLDS,not(G1),G2):-!,cyc_pred_expansion(Pred,HOLDS:NHOLDS,G1,G2).
-cyc_pred_expansion(Pred,NHOLDS:HOLDS, \+(G1) ,G2):-!,cyc_pred_expansion(Pred,HOLDS:NHOLDS,G1,G2).
-cyc_pred_expansion(Pred,HOLDS:_NHOLDS,G1,G2):- 
-            functor_safe(G1,HF,_),is_holds_true(HF),
-            G1=..[HF,F|List],call(Pred,F,A),!,
-            set_list_len(List,A,NewList),
-            G2=..[HOLDS,F|NewList],!,
-            dmsg_p(cyc_pred_expansion(Pred,HOLDS,G1,G2)).
-cyc_pred_expansion(Pred,_HOLDS:NHOLDS,G1,G2):- 
-            functor_safe(G1,HF,_),is_holds_false(HF),
-            G1=..[HF,F|List],call(Pred,F,A),!,
-            set_list_len(List,A,NewList),
-            G2=..[NHOLDS,F|NewList],!,
-            dmsg_p(cyc_pred_expansion(Pred,NHOLDS,G1,G2)).
-cyc_pred_expansion(Pred,HOLDS:_NHOLDS,G1,G2):- 
-            functor_safe(G1,F,_),call(Pred,F,A),!,
-            G1=..[F|List], set_list_len(List,A,NewList), 
-            G2=..[HOLDS,F|NewList],!,
-            dmsg_p(cyc_pred_expansion(Pred,HOLDS,G1,G2)).
-cyc_pred_expansion(Pred,HOLDS,G1,G2):- fail, G1=G2, dmsg(once(cyc_pred_expansion(Pred,HOLDS,G1,G2))),!,fail.
+try_mud_head_expansion(G0,G2):- not_ended_transform_moo_preds, mud_clause_expansion_0(G0,G1),!,goals_different(G0, G1),!,prepend_module(G1,dbase,G2).
+mud_clause_expansion_0(G1,G2):-notrace((mud_pred_expansion(use_holds_db, dbase_t - dbase_f,G1,G2))),!.
 
 
 dmsg_p(_):-!.
 dmsg_p(P):-once(dmsg(P)),!.
 dmsg_p(_):-!.
 
-cyc_term_expansion(G1,_):-not(compound(G1)),!,fail.
-cyc_term_expansion(((H:-B)),R):-!,cyc_rule_expansion(H,B,R),!.
-% cyc_term_expansion(H,HR):-trace,cyc_head_expansion(H,HR),!.
+goals_different(G0,G1):-G0==G1,!,fail.
+goals_different(G0,G1):-goals_different_1(G0,G1),!.
+goals_different(G0,G1):- G0\==G1.
 
-cyc_rule_expansion(H,B,((HR:-BR))):-cyc_head_expansion(H,HR),!,must(expand_goal(B,BR)).
+% goals_different_0(G0,dbase:G1):-G0==G1,!.
+% goals_different_0(G0,G1):-trace.
+goals_different_1(NV:G0,G1):-nonvar(NV),!,goals_different_1(G0,G1).
+goals_different_1(G0,NV:G1):-nonvar(NV),!,goals_different_1(G0,G1).
+goals_different_1(G0,G1):- (var(G0);var(G1)),!,throw(goals_different(G0,G1)).
+goals_different_1(G0,G1):- G0 \= G1,!.
 
-cyc_body_expansion(B,BR):-user:goal_expansion(B,BR).
 
-user:goal_expansion(G1,G2):- compound(G1),  not(ended_transform_cyc_preds), cyc_goal_expansion(G1,G2),!.
-user:term_expansion(G1,G2):- compound(G1),  not(ended_transform_cyc_preds), cyc_term_expansion(G1,G2),!.
+attempt_clause_expansion(B,_):-not(compound(B)),!,fail.
+attempt_clause_expansion(B,BR):-  copy_term(B,BC),numbervars(BC,0,_),!, attempt_clause_expansion(B,BC,BR).
+attempt_clause_expansion(_,BC,_):-inside_clause_expansion(BC),!,fail.
+attempt_clause_expansion(B,BC,BR):- 
+    setup_call_cleanup(asserta(inside_clause_expansion(BC)),
+    force_clause_expansion(B,BR),
+    must(retract(inside_clause_expansion(BC)))).
+
+force_clause_expansion(M:((H:-B)),R):- !, mud_rule_expansion(M:H,M:B,R),!.
+force_clause_expansion(((M:H:-B)),R):- !, mud_rule_expansion(M:H,B,R),!.
+force_clause_expansion(((H:-B)),R):-mud_rule_expansion(H,B,R),!.
+force_clause_expansion(H,HR):- try_mud_head_expansion(H,HR),!.
+force_clause_expansion(H,HR):- user:expand_term(H,HR).
+
+mud_rule_expansion(H,B,((HR:-BR))):-force_clause_expansion(H,HR),user:expand_goal(B,BR),!.
+
+is_term_head(H):- (( \+ \+ inside_clause_expansion(H))),!.
+is_term_head(_):- inside_clause_expansion(_),!,fail.
+is_term_head(H):-H=_, is_our_sources(H).
+
+is_our_sources(_):- not(prolog_load_context(directory,_)).
+is_our_sources(_):- prolog_load_context(directory,Dir0),absolute_file_name(Dir0,Dir),user:file_search_path(logicmoo,LM0),absolute_file_name(LM0,LM),!,
+      atom_concat(LM,_,Dir),!.
+
+
+:-dynamic(always_transform_moo_preds).
+:-dynamic(prevent_transform_moo_preds).
+not_ended_transform_moo_preds:- prevent_transform_moo_preds,!,fail.
+not_ended_transform_moo_preds:- always_transform_moo_preds,!.
+not_ended_transform_moo_preds:- not(moodb:ended_transform_moo_preds).
+
+
+
+univ_left(Comp,[M:P|List]):- univ_left0(M, Comp, [P|List]),!.
+univ_left(Comp,[H,M:P|List]):- univ_left0(M,Comp,[H,P|List]),!.
+univ_left(Comp,[P|List]):- univ_left0(dbase,Comp,[P|List]),!.
+
+univ_left0(M,M:Comp,List):- Comp=..List,!.
+
+
+head_xform(G0,_HOLDSNHOLDS,G1):- 
+      functor_safe(G0,F,A),
+      true2(F,A),
+      G0=G1,!.
+head_xform(G0,_HOLDSNHOLDS,G1):- trace,G0=G1.
+  
+mud_pred_expansion(_Prd,_HOLDS,G1,_):-not(compound(G1)),!,fail.
+mud_pred_expansion(_Prd,_HOLDS,G1,G1):- functor_safe(G1,xcall,_),!.
+mud_pred_expansion(Pred,NHOLDS - HOLDS, not(G1) ,G2):-!,mud_pred_expansion(Pred,HOLDS - NHOLDS,G1,G2).
+mud_pred_expansion(Pred,NHOLDS - HOLDS, \+(G1) ,G2):-!,mud_pred_expansion(Pred,HOLDS - NHOLDS,G1,G2).
+
+mud_pred_expansion(Pred, HOLDSNHOLDS, G0 ,G2):-
+ functor(G0,F,1),G1=..[F,MP],
+ predicate_property(G0, meta_predicate(G1)),
+ member(MP,[:,0,1,2,3,4,5,6,7,8,9]),!,
+ G0=..[F,Term],
+ mud_pred_expansion(Pred, HOLDSNHOLDS, Term ,G2).
+
+mud_pred_expansion(_Pred,HOLDSNHOLDS, Moo:G0,G3):- nonvar(Moo),is_kb_module(Moo),
+   head_xform(G0,HOLDSNHOLDS,G1),
+   mud_pred_expansion_0(true2,HOLDSNHOLDS,G1,G2),!,G2=G3.
+mud_pred_expansion(Pred,HOLDSNHOLDS, Moo:G1,G3):-  nonvar(Moo),!, mud_pred_expansion_0(Pred,HOLDSNHOLDS,Moo:G1,G2),!,G2=G3.
+mud_pred_expansion(Pred,HOLDSNHOLDS,G1,G3):- mud_pred_expansion_0(Pred,HOLDSNHOLDS,G1,G2),!,G2=G3.
+
+
+
+
+mud_pred_expansion_0(Pred,HOLDSNHOLDS,_:G1,G2):-!,compound(G1),
+   mud_pred_expansion_1(Pred,HOLDSNHOLDS,G1,G2),!.
+mud_pred_expansion_0(Pred,HOLDSNHOLDS,G1,G2):-!,compound(G1),
+   mud_pred_expansion_1(Pred,HOLDSNHOLDS,G1,G2),!.
+
+mud_pred_expansion_1(_,HoldsT-HoldsF,P,_):-functor(P,Holds,_),member(Holds,[HoldsT,HoldsF]),!,fail.
+mud_pred_expansion_1(_,_,P,_):-functor(P,Holds,_),member(Holds,[',',';']),!,fail.
+% mud_pred_expansion_1(_,_,P,_):-functor(P,Holds,_),is_2nd_order_holds(Holds),trace,!,fail.
+
+mud_pred_expansion_1(Pred,HOLDS-NHOLDS,G1,G2):-
+   functor_safe(G1,F,A),is_2nd_order_holds(F),!,
+   (is_holds_true(F) -> HOLDSNHOLDS=HOLDS-NHOLDS ; HOLDSNHOLDS=NHOLDS-HOLDS),
+   mud_pred_expansion_holds(F,A,Pred,HOLDSNHOLDS,G1,G2).
+
+mud_pred_expansion_1(Pred,HOLDS-_NHOLDS,G1,G2):-             
+            functor_safe(G1,F,_),
+            notrace((call(Pred,F,_))),
+            must(call(Pred,F,A)),!,            
+            G1=..[F|List], set_list_len(List,A,NewList), 
+            univ_left(G2,[HOLDS,F|NewList]),!,
+            dmsg_p(mud_pred_expansion(Pred,HOLDS,G1,G2)).
+%mud_pred_expansion_1(Pred,HOLDS,G1,G2):- fail, G1=G2, dmsg(once(mud_pred_expansion(Pred,HOLDS,G1,G2))),!,fail.
+
+
+mud_pred_expansion_holds(HF,1,Pred,HOLDSNHOLDS,G0,G2):- !, 
+  G0=..[HF,G1],compound(G1),not(is_list(G1)),!,
+  mud_pred_expansion(Pred,HOLDSNHOLDS,G1,G2).
+
+mud_pred_expansion_holds(HF,A1,Pred,HOLDS-_NHOLDS,G1,G2):-
+            (A1>2 -> A is A1 - 1 ; true),
+            G1=..[HF,F,Arg1|List],
+            nonvar(F),
+            must(call(Pred,F,A)),!,
+            set_list_len([Arg1|List],A,NewList),
+            univ_left(G2 , [HOLDS,F|NewList]),!,
+            dmsg_p(mud_pred_expansion(Pred,HOLDS,G1,G2)).
+
+ 
 
 ah(P,A1,A2,A3,A4,A5,A6,A7):- dmsg(ah(P,7,A1,A2,A3,A4,A5,A6,A7)).
 ah(P,A1,A2,A3,A4,A5,A6):- dmsg(ah(P,6,A1,A2,A3,A4,A5,A6)).
@@ -563,14 +608,14 @@ ah(P,A1):- dmsg(ah(P,1,A1)).
 % :- style_check(-string).
 
  
-scan_arities:- forall(holds_t(arity,F,A),registerCycPred(F,A)).
+scan_arities:- forall(holds_t(arity,F,A),moodb:registerCycPred(F,A)).
 
 :- include(logicmoo(vworld/dbase_i_cyc)).
 
 % logicmoo('vworld/dbase') compiled into dbase 11.97 sec, 2,140,309 clauses
 %:- include(logicmoo('pldata/trans_header')).
 
-process_mworld:-!. %forall(dynamicCyc2(C),registerCycPredPlus2(C)).
+process_mworld:-!. %forall(dynamicCyc2(C),moodb:registerCycPredPlus2(C)).
 
 % logicmoo('pldata/mworld0.pldata') compiled into world 61.18 sec, 483,738 clauses
 
@@ -579,15 +624,26 @@ process_mworld:-!. %forall(dynamicCyc2(C),registerCycPredPlus2(C)).
 
 % withvars_988 loaded 9.46 sec, 4,888,433 clauses
 
-:- dbase:process_mworld.
+:- process_mworld.
+
+real_list_undefined(A):-
+ merge_options(A, [module_class([user])], B),
+        prolog_walk_code([undefined(trace), on_trace(found_undef)|B]),
+        findall(C-D, retract(undef(C, D)), E),
+        (   E==[]
+        ->  true
+        ;   print_message(warning, check(undefined_predicates)),
+            keysort(E, F),
+            group_pairs_by_key(F, G),
+            maplist(check:report_undefined, G)
+        ).
 
 :- use_module(library(check)).
-remove_undef_search:- (
-(
+remove_undef_search:- ((
  redefine_system_predicate(check:list_undefined(_)),
  abolish(check:list_undefined/1),
  assert((check:list_undefined(A):- not(thread_self(main)),!, ignore(A=[]))),
- assert((check:list_undefined(A):- ignore(A=[]))))).
+ assert((check:list_undefined(A):- ignore(A=[]),real_list_undefined(A))))).
 
 % done in 'user' to avoid reloading when we reload dbase
 ensure_q_loaded(File):-'@'(load_files(File,[if(not_loaded),qcompile(auto),expand(true),derived_from('../src_data/pldata/mworld0_declpreds.pl')]),user).
@@ -653,18 +709,14 @@ user_export(Prop/Arity):-
 
 
 :- meta_predicate hooked_asserta(^), hooked_assertz(^), hooked_retract(^), hooked_retractall(^).
-% % :- meta_predicate del(0),clr(0),add(0),add0(0),req(0), db_op(0,0,0),moo:db_prop(0,0),moo:db_prop(0).
+% % :- meta_predicate del(0),clr(0),add(0),add0(0),req(0), db_op(0,0,0),moo:db_prop(0,0).
 
 % Found new meta-predicates in iteration 1 (0.281 sec)
 %:- meta_predicate db_forall(?,?,?,0).
 
-:- ensure_loaded(logicmoo('vworld/moo')).
-
-%:- include(logicmoo('vworld/moo_header')).
-
 :- include('dbase_types_motel').
 
-%r:- moo:register_module_type(utility).
+% :- register_module_type(utility).
 
 dbase_define_db_prop(P):-dbase_define_db_prop(P,[]).
 dbase_define_db_prop(M:ArgTypes,PropTypes):-!,
@@ -677,26 +729,26 @@ dbase_define_db_prop(ArgTypes,PropTypes):-
    doall(define_db_prop_2(ArgTypes,F,A,PropTypes)),
    doall(define_db_prop_3(ArgTypes,F,A,PropTypes)).
 
-define_argType(F,A,N,ArgType):-add_db_prop(F,A,argIsa(N,ArgType)).
+define_argType(F,A,N,ArgType):-moodb:add_db_prop(F,A,argIsa(N,ArgType)).
 
 % pass 0 = assert arity and argTypes
-define_db_prop_0(ArgTypes,F,A):-add_db_prop(F,A,arity(F,A)),fail.
-define_db_prop_0(ArgTypes,F,A):-add_db_prop(F,A,argTypes(ArgTypes)),fail.
+define_db_prop_0(ArgTypes,F,A):-moodb:add_db_prop(F,A,arity(F,A)),fail.
+define_db_prop_0(ArgTypes,F,A):-moodb:add_db_prop(F,A,argTypes(ArgTypes)),fail.
 define_db_prop_0(ArgTypes,F,A):-doall(forall(arg(N,ArgTypes,ArgType),define_argType(F,A,N,ArgType))),fail.
 
 % pass 1 = assert misc properties
-define_db_prop_1(W,F,A,PT):-add_db_prop(F,A,PT),!,forall(member_or_e(E,PT),define_db_prop_3(W,F,A,PT)).
+define_db_prop_1(W,F,A,PT):-moodb:add_db_prop(F,A,PT),!,forall(member_or_e(E,PT),define_db_prop_3(W,F,A,PT)).
 
 % pass 2 = add extensional hooks
-define_db_prop_2(W,F,A,_):- doall(forall(moo:is_db_prop(F,A,CL),ignore(define_db_prop_3(W,F,A,CL)))).
+define_db_prop_2(W,F,A,_):- doall(forall(moodb:is_db_prop(F,A,CL),ignore(define_db_prop_3(W,F,A,CL)))).
 
 % pass 3 = re-add extensional hooks
-define_db_prop_3(_,Pred,Arity,isRegisteredCycPred(_,Pred,Arity)):-registerCycPred(Pred,Arity).
-define_db_prop_3(_,Pred,Arity,cyc):-registerCycPred(Pred,Arity).
+define_db_prop_3(_,Pred,Arity,isRegisteredCycPred(_,Pred,Arity)):- moodb:registerCycPred(Pred,Arity).
+define_db_prop_3(_,Pred,Arity,cyc):-moodb:registerCycPred(Pred,Arity).
 define_db_prop_3(_,F,A,module(Module)):-not(dbase_mod(Module)),functor(HEAD,F,A),must(predicate_property(Module:HEAD,_)),!.
 define_db_prop_3(_,F,A,module(Module)):-dbase_mod(Module),!,declare_dbase_local(F,A).
 define_db_prop_3(_,F,A,arity(F,A)):- 
-   not((moo:is_db_prop(F,A,module(Module)),not(dbase_mod(Module)))),!,
+   not((moodb:is_db_prop(F,A,module(Module)),not(dbase_mod(Module)))),!,
       declare_dbase_local(F,A).
 define_db_prop_3(_,_,_,_).
 
@@ -705,9 +757,9 @@ declare_dbase_local(_M:F,A):- !, trace, declare_dbase_local(F,A).
 declare_dbase_local(F,A):- declare_dbase_local_1(F,A).
 
 
-declare_dbase_local_1(F,A):- moo:is_db_prop(F,A,hasStub),!.
+declare_dbase_local_1(F,A):- moodb:is_db_prop(F,A,hasStub),!.
 
-declare_dbase_local_1(F,A):- once(add_db_prop(F,A,hasStub)),fail.
+declare_dbase_local_1(F,A):- once(moodb:add_db_prop(F,A,hasStub)),fail.
 
 declare_dbase_local_1(F,A):- functor(Pred,F,A), get_module_of(Pred,Module),declare_dbase_local_1(Module, Pred, F,A).
 
@@ -715,7 +767,7 @@ declare_dbase_local_1(Module, Pred, F,A):-
    not(dbase_mod(Module)),!,
    dbase_mod(DBModule),
    rem_db_prop(F,A,module(DBModule)),
-   add_db_prop(F,A,module(Module)).
+   moodb:add_db_prop(F,A,module(Module)).
 
 declare_dbase_local_1(Module, Pred, F,A):- 
    dbase_mod(Module),!,
@@ -729,9 +781,6 @@ scan_db_prop:-
    !.
 scan_db_prop:-!.
 
-functor_safe(Obj,Obj):-not(compound(Obj)),!.
-functor_safe(_:Obj,F):-!,functor_safe(Obj,F).
-functor_safe(Obj,F):-functor(Obj,F,_).
 
 term_listing(Obj):- nonvar(var(Obj)),catch(listing(Obj),_,fail),fail.
 term_listing(Obj):- 
@@ -789,8 +838,8 @@ with_kb_assertions(With,Call):-
 
 world_clear(Named):-dmsg('Clearing world database: ~q.',[Named]).
 
-pred_as_is(F,A):-moo:is_db_prop(F,A,flag),!.
-pred_as_is(F,A):-moo:is_db_prop(F,A,module(_)),!.
+pred_as_is(F,A):-moodb:is_db_prop(F,A,flag),!.
+pred_as_is(F,A):-moodb:is_db_prop(F,A,module(_)),!.
 pred_as_is(p,_):-!,fail.
 pred_as_is(k,_):-!,fail.
 
@@ -801,7 +850,8 @@ db_op( q,Term):-!,db_op0(q,Term).
 db_op( r,Term):-!,db_op0(q,Term),!,db_op0(ra,Term).
 db_op(Op,Term):-must(db_op0(Op,Term)).
 
-db_op0(_Op,props(_Obj,Open)):-Open==[],!.
+db_op0(_Op,props(_Obj,NotOpen)):-NotOpen==[],!.
+db_op0(Op,props(Obj,Open)):-var(Open),throw((db_op0(Op,props(Obj,Open)))).
 db_op0(Op,props(Obj,[P|ROPS])):-!,db_op(Op,props(Obj,P)),db_op(Op,props(Obj,ROPS)).
 db_op0(Op,props(Obj,PropVal)):- !,PropVal=..[Prop|Vals],
 	Call=..[Prop,Obj|Vals], db_op(Op,Call).
@@ -818,30 +868,30 @@ db_op_4(Op,k,_,C0):- C0=..[k,Prop|ARGS],atom(Prop),C1=..[Prop|ARGS],!,db_op(Op,C
 db_op_4(Op,p,_,C0):- C0=..[p,Prop|ARGS],atom(Prop), C1=..[Prop|ARGS],!,db_op(Op,C1).
 db_op_4(Op,svo,_,C0):- C0=..[svo,Obj,Prop|ARGS],atom(Prop),C1=..[Prop,Obj|ARGS],!,db_op(Op,C1).
 
-db_op_4(q,Fmt,1,C0):-is_decl_ft(Fmt),!,C0=..[_,A],format_complies(A,Fmt,_).
-db_op_4(a,Fmt,1,_C0):-is_decl_ft(Fmt),!,dmsg(todo(dont_assert_is_decl_ft(Fmt))),!.
+db_op_4(q,Fmt,1,C0):-is_ft(Fmt),!,C0=..[_,A],format_complies(A,Fmt,_).
+db_op_4(a,Fmt,1,_C0):-is_ft(Fmt),!,dmsg(todo(dont_assert_is_ft(Fmt))),!.
 db_op_4(Op,Prop,_,C0):- 
    C0=..[Prop|ARGS],db_op_disj(Op,Prop,ARGS).
 
 db_op_unit(_Op,Prop,ARGS,C0):- must(atom(Prop)), C0=..[Prop|ARGS].
 
 % impl/1
-db_op_disj(Op,Prop,ARGS):-moo:is_db_prop(Prop,_,impl(Other)),!,
+db_op_disj(Op,Prop,ARGS):-moodb:is_db_prop(Prop,_,impl(Other)),!,
 	db_op_unit(Op,Other,ARGS,Unit),!,db_forall(Op,Unit).
 % alias/1
-db_op_disj(Op,Prop,ARGS):-moo:is_db_prop(Prop,_,alias(Other)),!,
+db_op_disj(Op,Prop,ARGS):-moodb:is_db_prop(Prop,_,alias(Other)),!,
 	db_op_unit(Op,Other,ARGS,Unit),!,db_forall(Op,Unit).
 % inverse/1
 db_op_disj(Op,Prop,ARGS):-
-      moo:is_db_prop(Prop,_,inverse(Other)),!,
+      moodb:is_db_prop(Prop,_,inverse(Other)),!,
       inverse_args(ARGS,Inverse),
       db_op_unit(Op,Other,Inverse,Unit1),
       db_op_unit(Op,Prop,ARGS,Unit2),
       db_forall(Op,(Unit1;Unit2)).
 
 % assert/1
-db_op_disj(a,Prop,ARGS):- moo:is_db_prop(Prop,_,assert(How)),!,call_pa(How,Prop,ARGS).
-db_op_disj(Op,Prop,ARGS):- moo:is_db_prop(Prop,W,assert(How)),!,throw(cant(db_op_disj(Op,Prop,ARGS),moo:is_db_prop(Prop,W,assert(How)))).
+db_op_disj(a,Prop,ARGS):- moodb:is_db_prop(Prop,_,assert(How)),!,call_pa(How,Prop,ARGS).
+db_op_disj(Op,Prop,ARGS):- moodb:is_db_prop(Prop,W,assert(How)),!,throw(cant(db_op_disj(Op,Prop,ARGS),moodb:is_db_prop(Prop,W,assert(How)))).
 
 % plain prop
 db_op_disj(Op,Prop,ARGS):-db_op_unit(Op,Prop,ARGS,Unit),db_forall(Op,Unit).
@@ -857,9 +907,9 @@ db_forall(a,(C1;C2)):-!,db_forall(a,C1),!,db_forall(a,C2),!.
 db_forall(u,C):- trace,db_forall_quf(C,U,Template),U,Template,must(ground(Template)),!,ignore(retractall(Template)).
 db_forall(ra,C):-db_forall_quf(C,U,Template), doall((U,retractall(Template))).
 db_forall(ra,C):-ignore(retractall(C)).
-db_forall(a,C0):- db_forall_quf(C0,U,C),must(U),functor(C,F,A),!, (moo:is_db_prop(F,A,singleValued) -> must(db_forall_assert_sv(C,F,A)) ; must(db_forall_assert_mv(C,F,A))).
+db_forall(a,C0):- db_forall_quf(C0,U,C),must(U),functor(C,F,A),!, (moodb:is_db_prop(F,A,singleValued) -> must(db_forall_assert_sv(C,F,A)) ; must(db_forall_assert_mv(C,F,A))).
 
-db_forall(a,C):- functor(C,F,A),!, (moo:is_db_prop(F,A,singleValued) -> must(db_forall_assert_sv(C,F,A)) ; must(db_forall_assert_mv(C,F,A))).
+db_forall(a,C):- functor(C,F,A),!, (moodb:is_db_prop(F,A,singleValued) -> must(db_forall_assert_sv(C,F,A)) ; must(db_forall_assert_mv(C,F,A))).
 db_forall(r,C):- ground(C),retractall(C),!.
 db_forall(Op,C):-!,trace,throw(unhandled(db_forall(Op,C))).
 
@@ -868,25 +918,30 @@ db_forall_query((C0->C1;C2)):- !, (db_forall_query(C0) -> db_forall_query(C1) ; 
 db_forall_query((C1;C2)):-!, db_forall_query(C1) ; db_forall_query(C2).
 db_forall_query(Term):-findall(a(Term),db_forall_query0(Term),List),list_to_set_safe(List,Set),!,member(a(Term),Set).
 db_forall_query0((C1,C2)):-!, db_forall_query0(C1) , db_forall_query0(C2).
-db_forall_query0(Term):- once(expand_goal(Term,Term2)),Term\==Term2,!,db_forall_query0(Term2).
+db_forall_query0(Term):- once(expand_goal(Term,Term2)),goals_different(Term, Term2),!,db_forall_query0(Term2).
 db_forall_query0(Term):-db_forall_query1(Term).
 db_forall_query1(C):- predicate_property(C,_PP),!,call(C).
 db_forall_query1(C):- trace, db_forall_quf(C,Pretest,Template),!,Pretest, call(Template).
 
 
+must_no_singletons(C):- throw_if_true(contains_singletons(C),C).
+must_ground(C):- throw_if_true(not(ground(C)),C).
 
 % only place ever should actual game dbase be changed from
-hooked_asserta(C):-moo:run_database_hooks(assert(a),C),asserta_cloc(C).
-hooked_assertz(C):- moo:run_database_hooks(assert(z),C), assertz_cloc(C).
-hooked_retract(C):- moo:run_database_hooks(retract(one),C), must(retract_cloc(C)).
-hooked_retractall(C):- moo:run_database_hooks(retract(all),C), retractall_cloc(C).
+hooked_asserta(C):- must_no_singletons(hooked_asserta(C)).
+hooked_asserta(C):- moodb:run_database_hooks(assert(a),C),asserta_cloc(C).
+hooked_assertz(C):- must_no_singletons(hooked_assertz(C)).
+hooked_assertz(C):- run_database_hooks(assert(z),C), assertz_cloc(C).
+hooked_retract(C):- must_ground(hooked_retract(C)).
+hooked_retract(C):- run_database_hooks(retract(one),C), must(retract_cloc(C)).
+hooked_retractall(C):- run_database_hooks(retract(all),C), retractall_cloc(C).
 
 ensure_db_predicate(AR,M:C,_,F,A,G):- nonvar(M), !,ensure_db_predicate(AR,C,M,F,A,G).
-ensure_db_predicate(AR,CI,M,F,A,G):-cyc_goal_expansion(CI,C),CI\== C,!,ensure_db_predicate(AR,C,M,F,A,G).
-ensure_db_predicate(AR,CI,M,F,A,G):-cyc_head_expansion(CI,C), CI\== C,!,ensure_db_predicate_2(AR,C,M,F,A,G).
+ensure_db_predicate(AR,CI,M,F,A,G):-try_mud_head_expansion(CI,C),goals_different(CI, C),!,ensure_db_predicate_2(AR,C,M,F,A,G).
+ensure_db_predicate(AR,CI,M,F,A,G):-try_mud_body_expansion(CI,C),goals_different(CI, C),!,ensure_db_predicate(AR,C,M,F,A,G).
 ensure_db_predicate(AR,CI,M,F,A,G):-ensure_db_predicate_2(AR,CI,M,F,A,G).
 
-ensure_db_predicate_2(AR,CI,M,F,A,G):-cyc_head_expansion(CI,C),CI\==C,!,ensure_db_predicate_2(AR,C,M,F,A,G).
+ensure_db_predicate_2(AR,CI,M,F,A,G):-try_mud_head_expansion(CI,C),goals_different(CI, C),!,ensure_db_predicate_2(AR,C,M,F,A,G).
 ensure_db_predicate_2(AR,C,M,F,A,G):- get_module_of(C,M),!, functor(C,F,A), make_predicate(M,F,A),prepend_module(C,M,G).
 ensure_db_predicate_2(AR,C,M,F,A,G):- 
    must(functor(C,F,A)),
@@ -899,6 +954,7 @@ ensure_db_predicate_2(AR,C,M,F,A,G):-
 prepend_module(_:C,M,M:C):-!.
 prepend_module(C,M,M:C).
 
+make_predicate(dbase,F,A):-!,registerCycPred(F,A),!.
 make_predicate(M,F,A):- T =  '@'((dynamic(F/A)),M),ground(T),!,T.
 make_predicate(M,F,A):- dynamic(F/A).
 
@@ -912,9 +968,46 @@ show_cgoal(G):-dmsg(show_goal(G)),call(G).
 
 % assert to a mutlivalue pred
 db_forall_assert_mv(C,F,A):-
-   (clause_present(C,F,A) -> true; (moo:is_db_prop(F,A,ordered)-> hooked_assertz(C) ; hooked_asserta(C))).
+   (clause_present(C,F,A) -> true; (moodb:is_db_prop(F,A,ordered)-> hooked_assertz(C) ; hooked_asserta(C))).
+
+term_parts(A,[A]):- not(compound(A)),!.
+term_parts([A|L],TERMS):-!,term_parts_l([A|L],TERMS).
+term_parts(Comp,[P/A|TERMS]):- functor(Comp,P,A), Comp=..[P|List],term_parts_l(List,TERMS).
+
+term_parts_l(Var,[open(Var),Var]):-var(Var),!.
+term_parts_l([],[]):-!.
+term_parts_l([A|L],TERMS):-!,term_parts(A,AP),term_parts_l(L,LP),append(AP,LP,TERMS).
+term_parts_l(Term,[open(Term)|TERMS]):-term_parts(Term,TERMS),!.
+
+pred_term_parts(Pred,A,[A]):- call(Pred,A),!.
+pred_term_parts(Pred,[A|L],TERMS):-!,pred_term_parts_l(Pred,[A|L],TERMS).
+pred_term_parts(Pred,Comp,TERMS):-Comp=..[P,A|List],pred_term_parts_l(Pred,[P,A|List],TERMS).
+pred_term_parts(_,Term,[]).
+
+pred_term_parts_l(_,NV,[]):-NV==[],!.
+pred_term_parts_l(Pred,[A|L],TERMS):-!,pred_term_parts(Pred,A,AP),pred_term_parts_l(Pred,L,LP),append(AP,LP,TERMS).
+pred_term_parts_l(Pred,Term,TERMS):-pred_term_parts(Pred,Term,TERMS),!.
+pred_term_parts_l(_,Term,[]).
+
+throw_if_true(T,E):- once(T),throw(throw_if_true(E:T)).
+
+list_retain(PL,Pred,Result):- throw_if_true(not(is_list(PL)),list_retain(PL,Pred,Result)).
+list_retain([],_Pred,[]):-!.
+list_retain([R|List],Pred,[R|Retained]):- call(Pred,R),!, list_retain(List,Pred,Retained).
+list_retain([_|List],Pred,Retained):- list_retain(List,Pred,Retained).
+
+identical_member(X,[Y|_])  :-
+	X == Y,
+	!.
+identical_member(X,[_|L]) :-
+	identical_member(X,L).
+
+contains_singletons(Term):-pred_term_parts(var,Term,Vars1),
+   term_variables(Term,Vars2),
+   member(Var,Vars2),findall(Var,identical_member(Var,Vars1),List),length(List,1).
 
 % assert to a singlevalue pred
+db_forall_assert_sv(C,F,A):- throw_if_true(contains_singletons(C),db_forall_assert_sv(C,F,A)).
 db_forall_assert_sv(C,F,A):- clause_present(C,F,A),!.
 db_forall_assert_sv(C0,F,A):- 
    copy_term(c(_,C0),c(_,C)),
@@ -946,7 +1039,7 @@ pl_arg_type(Arg,Type):-
 :-thread_local clause_present_lookup_local/3.
 
 clause_present(C):-hotrace((functor_safe(C,F,A),clause_present(C,F,A))).
-clause_present(C,F,1):-C=..[F,A], is_decl_ft(F), format_complies(A,F,_).
+clause_present(C,F,1):-C=..[F,A], is_ft(F), format_complies(A,F,_).
 clause_present(C,_F,_A):- not(predicate_property(C,_)),!,fail.
 clause_present(C,_F,_A):- not(ground(C)),!,fail.
 clause_present(C,F,A):- clause_present_lookup_local(C,F,A),!,fail.
@@ -960,16 +1053,6 @@ clause_present_1(C0,_F,A):- A>1, arg(A,C0,NEW),string(NEW),!,copy_term(C0,C),
    setarg(A,C,OLD),C,string_chars(NEW,[S|C1]),string_chars(OLD,[S|C2]),C1=C2,trace,dmsg(present(C)).
 %clause_present_1(C,F,A):- A>1, arg(A,C,NEW),snonvar(NEW),!,setarg(A,C,OLD),clause_present(C,F,A),pl_arg_type(NEW,string),string_chars(NEW,[S|C1]),string_chars(OLD,[S|C2]),C1=C2,dmsg(present(C)).
 
-is_holds_true(Prop):-hotrace((atom(Prop),is_holds_true0(Prop))).
-is_holds_true0(Prop):-member(Prop,[k,p,holds,holds_t,dbase_t,res,assertion_t,assertion]).
-
-is_2nd_order_holds(Prop):- is_holds_true(Prop) ; is_holds_false(Prop).
-
-is_holds_false(Prop):-hotrace((atom(Prop),is_holds_true0(Stem),is_holds_false0(Prop,Stem))).
-is_holds_false0(Prop,Stem):-atom_concat('not_',Stem,Prop).
-is_holds_false0(Prop,Stem):-atom_concat(Stem,'_not',Prop).
-is_holds_false0(Prop,Stem):-atom_concat(Stem,'_false',Prop).
-is_holds_false0(Prop,Stem):-atom_concat(Stem,'_f',Prop).
 
 
 must_asserta(C):-
@@ -986,7 +1069,7 @@ argIsa_call_0(mud_isa,2,type):-!.
 argIsa_call_0(act,_,term):-!.
 argIsa_call_0(ofclass,2,type):-!.
 argIsa_call_0(memory,2,term):-!.
-argIsa_call_0(Prop,N1,Type):- moo:is_db_prop(Prop,_,argIsa(N1,Type)),!.
+argIsa_call_0(Prop,N1,Type):- moodb:is_db_prop(Prop,_,argIsa(N1,Type)),!.
 
 argIsa_call_1(Prop,N1,Type):- is_2nd_order_holds(Prop),trace,dmsg(todo(define(argIsa_call(Prop,N1,'Second_Order_TYPE')))),
    Type=argIsaFn(Prop,N1).
@@ -1073,15 +1156,20 @@ compare_n(Last,NewLast):-atomic(NewLast),not(atomic(Last)),throw(incomparable_te
 member_or_e(E,[L|List]):-!,member(E,[L|List]).
 member_or_e(E,E).
 
-is_single_valuedOrFail(F,A,Obj,ARGS):-moo:is_db_prop(F,A,singleValued),!,valuedOrThrow(F,A,Obj,ARGS),!.
+is_single_valuedOrFail(F,A,Obj,ARGS):-moodb:is_db_prop(F,A,singleValued),!,valuedOrThrow(F,A,Obj,ARGS),!.
 is_single_valuedOrFail(_,_,_,_):-fail.
 
-valuedOrThrow(F,_,Obj,ARGS):-mud_isa(Obj,T),findall_type_default_props(Obj,T,Props),Props=[_|_],Prop=..[F|ARGS], member_or_e(Prop,Props),!.
+valuedOrThrow(F,_,Obj,ARGS):-mud_isa(Obj,T), findall_type_default_props(Obj,T,Props),Props=[_|_],Prop=..[F|ARGS], member_or_e(Prop,Props),!.
 valuedOrThrow(F,A,Obj,ARGS):-valuedOrThrow1(F,A,Obj,ARGS).
 valuedOrThrow1(_F,_A,_Obj,ARGS):-last(ARGS,unknown),!.
 valuedOrThrow1(F,A,Obj,ARGS):-throw(is_single_valuedOrFail(F,A,Obj,ARGS)).
 
+:-asserta(always_transform_moo_preds).
 
+user:goal_expansion(G1,G3):- compound(G1),  once(try_mud_body_expansion(G1,G2)),goals_different(G1,G2),G2=G3.
+user:term_expansion(G1,G3):- compound(G1),  once(attempt_clause_expansion(G1,G2)),goals_different(G1,G2),G2=G3.
+
+findall_type_default_props(Inst,Type,TraitsO):-findall(Props,moo:type_default_props(Inst,Type,Props),Traits),flatten(Traits,TraitsO),!.
 
 % =================================================================================================
 % BEGIN world English
@@ -1095,6 +1183,7 @@ replace_nth([Carry|ARGS],Which,OldVar,NewVar,[Carry|NEWARGS]):-
 
 update_value(OLD,+X,NEW):-number(OLD),catch(NEW is OLD + X,_,fail),!.
 update_value(OLD,-X,NEW):-number(OLD),catch(NEW is OLD - X,_,fail),!.
+update_value(OLD,NEW,NEXT):-var(NEW),!,throw(logicmoo_bug(update_value(OLD,NEW,NEXT))).
 update_value(_OLD,NEW,NEW).
 
 insert_into(ARGS,0,Insert,[Insert|ARGS]):- !.
@@ -1112,7 +1201,7 @@ moo:term_anglify_last(Head,English):-compound(Head),
 
 moo:term_anglify(Head,English):-
       functor(Head,F,A),
-      moo:is_db_prop(F,A,Info),member(Info,[singleValued,multi(_)]),
+      moodb:is_db_prop(F,A,Info),member(Info,[singleValued,multi(_)]),
       Head=..[F|ARGS],
       term_anglify_args(Head,F,A,ARGS,Info,English),fully_expand(English,EnglishO),!.
 
@@ -1137,7 +1226,7 @@ moo:term_anglify(verbFn(F),[F,is]).
 % moo:term_anglify(prolog(Term),String):-term_to_atom(Term,Atom),any_to_string(Atom,String).
 moo:term_anglify(determinerString(Obj,Text),[np(Obj),is,uses,string(Text),as,a,determiner]).
 moo:term_anglify(nameString(Obj,Text),[np(Obj),is,refered,to,as,string(Text)]).
-moo:term_anglify(moo:term_anglify(Term,List),[prolog(Term),is,converted,to,english,using,prolog(Text)]).
+moo:term_anglify(moo:term_anglify(Term,Text),[prolog(Term),is,converted,to,english,using,prolog(Text)]).
 
 
 add_arg_parts_of_speech(_F,_N,[],[]).
@@ -1149,25 +1238,26 @@ argIsa_call_or_undressed(F,N,Obj,Obj).
 verb_after_arg(_,_,1).
 
 
+:- style_check(+discontiguous).
+
+
 db_prop_argsIsa(ArgTypes):-db_prop_findall(ArgTypes,_).
 
 
 db_prop_findall(ArgTypes,PROPS):-moo:db_prop(ArgTypes,PROPS).
 db_prop_findall(ArgTypes,PROPS):-db_prop_multi(ArgTypes,PROPS).
-db_prop_findall(ArgTypes,[]):-moo:db_prop(ArgTypes).
+% db_prop_findall(ArgTypes,[]):-moo:db_prop(ArgTypes).
 db_prop_findall(ArgTypes,[]):-db_prop_sv(ArgTypes).
 db_prop_findall(ArgTypes,[]):-db_prop_multi(ArgTypes).
 
 
-moo:db_prop(ArgTypes):-db_prop_from_game_load(ArgTypes).
-
-:- style_check(+discontiguous).
+moo:db_prop(ArgTypes,[from_game_load]):-db_prop_from_game_load(ArgTypes).
 
 % =================================================================================================
 % BEGIN world database
 % =================================================================================================
 
-:- dbase:begin_transform_cyc_preds.
+:- begin_transform_moo_preds.
 
 dbase_t(inRegion,O,Region):-atloc(O,LOC),locationToRegion(LOC,Region).
 dbase_t(inRegion,apath(Region,Dir),Region):- holds_t(pathBetween,Region,Dir,_To).
@@ -1180,12 +1270,15 @@ db_resultIsa(apath,areaPath).
 % prolog code
 moo:db_prop(CallSig,[module(M)]):-db_prop_prolog(M,CallSig).
 
+
 % db_prop_prolog(world,nearby(object,object)).
 db_prop_prolog(world,mud_isa(object,type)).
 % db_prop_prolog(world,same(id,id)).
 
 % game_assert
 moo:db_prop(G,[assert(game_assert)]):- db_prop_game_assert(G).
+
+
 db_prop_game_assert(somethingIsa(term,list(type))).
 db_prop_game_assert(somethingDescription(term,list(string))).
 db_prop_game_assert(objects(type,list(id))).
@@ -1207,7 +1300,7 @@ moo:db_prop(repl_to_string(agent,term),[singleValued,default(look:default_repl_o
 
 
 
-moo:db_prop(look:get_feet(agent,list(spatial))).
+moo:db_prop(look:get_feet(agent,list(spatial)),[]).
 moo:db_prop(look:get_near(agent,list(spatial)),[module(look)]).
 moo:db_prop(get_precepts(agent,list(spatial)),[module(look)]).
 
@@ -1220,7 +1313,10 @@ type(item).
 dbase_t(nameString,apath(Region,Dir),Text):- holds_t(pathName,Region,Dir,Text).
 description(apath(Region,Dir),Text):- holds_t(pathName, Region,Dir,Text).
 
-moo:decl_action(list(term)).
+dbase_t(type_action_help,agent,What,Help):- holds_t(action_help,What,Help).
+dbase_t(action_help,What,text("command is: ",What)):- holds_t(action_info,What).
+
+moo:action_info(list(term)).
 moo:agent_call_command(_Gent,list(Obj)):- term_listing(Obj).
 
 channel(A):-region(A).
@@ -1243,15 +1339,14 @@ moo:subclass(wearable,item).
 
 moo:type_default_props(_,food,[height(0)]).
 
-moo:specifier_text(Text,pred):- moo:is_db_prop(Text,_,arity(_,_)).
+moo:specifier_text(Text,pred):- moodb:is_db_prop(Text,_,arity(_,_)).
 
 % single valued
-moo:decl_subclass(agent,object).
-moo:decl_subclass(item,object).
+moo:subclass(agent,object).
+moo:subclass(item,object).
 
 
-moo:db_prop(pathName(region,dir,string)).
-moo:db_prop_multi(verbAsWell(term,action,action)).
+moo:db_prop(pathName(region,dir,string),[]).
 db_prop_sv(verbOverride(term,action,action)).
 
 db_prop_sv(atloc(object,xyz(region,int,int,int))).
@@ -1265,7 +1360,7 @@ db_prop_sv(damage(agent,int)).
 db_prop_sv(defence(agent,int)).
 db_prop_sv(facing(agent,dir)).
 db_prop_sv(height(agent,int)).
-db_prop_sv(id(object,id)).
+% db_prop_sv(id(object,term)).
 db_prop_sv(inRegion(term,region)).
 db_prop_sv(last_command(agent,command)).
 db_prop_sv(location_center(region,xyz(region,int,int,int))).
@@ -1286,10 +1381,10 @@ db_prop_sv(weight(object,int)).
 
 db_prop_sv(needs_look(agent,boolean)). 
 
-moo:decl_subclass(areaPath,door).
-moo:decl_subclass(door,item).
+moo:subclass(areaPath,door).
+moo:subclass(door,item).
 
-moo:decl_subclass(dir,string).
+moo:subclass(dir,string).
 
 % flags
 db_prop_flag(agent(id)).
@@ -1302,12 +1397,13 @@ db_prop_flag(deleted(id)).
 
 
 % multivalued
-db_prop_multi(G,AT,[ordered|LIST]):-db_prop_multi(G,LIST),functor_safe(G,_,AT).
+db_prop_multi(G,AT,[ordered|LIST]):- db_prop_multi(G,LIST),functor_safe(G,_,AT).
 
-db_prop_multi(named(term,term),[genlpreds(id)]).
+% db_prop_multi(named(term,term),[genlpreds(id)]).
 db_prop_multi(ofclass(term,type),[alias(mud_isa)]).
 db_prop_multi(G,[]):-db_prop_multi(G).
 
+db_prop_multi(verbAsWell(term,action,action)).
 db_prop_multi(failure(agent,action)).
 db_prop_multi(nameString(term,string)).
 db_prop_multi(determinerString(term,string)).
@@ -1322,21 +1418,20 @@ db_prop_multi(possess(agent,item)).
 db_prop_multi(moo:subclass(type,type)).
 db_prop_multi(mud_isa(term,type)).
 
-:-dbase:end_transform_cyc_preds.
+:-end_transform_moo_preds.
 % =================================================================================================
 % END world database
 % =================================================================================================
 
+:-noguitracer.
+
 load_motel:- defrole([],time_state,restr(time,period)).
 
-:- scan_db_prop.
+:- debug,scan_db_prop.
 
 :- dbase_define_db_prop(mudMaxHitPoints(agent,int)).
 
 :- load_motel.
 
-%:- include(logicmoo('vworld/moo_footer')).
-
-
-
+%:- include(logicmoo(vworld/moo_footer)).
 

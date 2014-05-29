@@ -17,11 +17,11 @@
 
 :- module(eat, []).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(command).
+:- register_module_type(command).
 
-moo:decl_action(eat(item)).
+moo:action_info(eat(item)).
 
 % Eat something held
 % Check to make sure it's in the agents possession... 
@@ -33,11 +33,11 @@ moo:agent_call_command(Agent,eat(SObj)) :-
 	del(possess(Agent,Obj)),
 	moo:update_charge(Agent,eat).
 
-moo:decl_update_charge(Agent,eat) :-
+moo:update_charge(Agent,eat) :-
 	del(charge(Agent,Old)),
 	New is Old - 1,
 	add(charge(Agent,New)).
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 
 

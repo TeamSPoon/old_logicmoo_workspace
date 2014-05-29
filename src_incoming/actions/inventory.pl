@@ -3,15 +3,15 @@
 % Douglas Miles 2014
 % inventory(Agt,Inv) = inventory (anything the agent has taken
 */
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(command).
+:- register_module_type(command).
 
 
 % ====================================================
 % the entire inventory system
 % ====================================================
-moo:decl_action(inventory(optional(agent,self)), "Examine an inventory").
+moo:action_help(inventory(optional(agent,self)), "Examine an inventory").
 moo:agent_call_command(Agent,inventory(Who)):- show_kb_preds(Agent,inventory(Who,value)).
 
 % Get only the Inv (inventory)
@@ -20,5 +20,5 @@ inventory0(Agent, Inv) :-
 	findall(Poss,possess(Agent,Poss),Inv).
 
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 

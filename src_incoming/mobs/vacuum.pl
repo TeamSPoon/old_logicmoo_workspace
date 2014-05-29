@@ -12,8 +12,8 @@
 % Predicates asserted during run.
 % :- dynamic memory/2.
 
-:- include(logicmoo('vworld/moo_header.pl')).
-:- moo:register_module_type(planning).
+:- include(logicmoo(vworld/moo_header)).
+:- register_module_type(planning).
 
 % Possible agent actions.
 
@@ -70,6 +70,6 @@ vacuum_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[outlet]).
 
 
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 
 

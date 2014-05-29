@@ -16,7 +16,6 @@
 % Douglas Miles
 */
 
-
 :- registerCycPred((
 'abbreviationString-PN'/2, 
 'countryName-LongForm'/2, 

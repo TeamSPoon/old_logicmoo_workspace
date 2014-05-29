@@ -18,8 +18,8 @@
 % :- dynamic memory/2.
 
 % Possible agent actions.
-:- include(logicmoo('vworld/moo_header.pl')).
-:- moo:register_module_type(planning).
+:- include(logicmoo(vworld/moo_header)).
+:- register_module_type(planning).
 
 moo:world_agent_plan(_World,Agent,Act):-
    mud_isa(Agent,predator),
@@ -51,4 +51,4 @@ predator_idea(Agent,Act) :-
       move_or_sit_memory_idea(Agent,Act,[nut]).
 
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).

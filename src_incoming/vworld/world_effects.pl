@@ -2,7 +2,7 @@
 % This file gives a common place where world effects 
 % (such as carrying  shield or being drunk) are implemented
 %
-% Project Logicmoo: A MUD server written in Prolog
+% Project LogicMoo: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %

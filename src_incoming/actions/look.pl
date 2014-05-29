@@ -20,25 +20,25 @@
 
 :- module(look, [ get_percepts/2,  get_near/2, get_feet/2, height_on_obj/2, can_sense/5 , call_look/2]).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(command).
+:- register_module_type(command).
 
 :- dynamic blocks/1.
 
-
+:- begin_transform_moo_preds.
 
 % can_sense(Agent,Sense,InList,CanDetect,CantDetect).
 can_sense(_Agent,visual,InList,InList,[]).
 
-moo:decl_action(examine(item), "view details of item (see also @list)").
+moo:action_help(examine(item), "view details of item (see also @list)").
 moo:agent_call_command(_Gent,examine(SObj)):- term_listing(SObj).
 
 
 
-moo:decl_action(look, "generalized look in region").
-moo:decl_action(look(dir), "Look in a direction").
-moo:decl_action(look(item), "Look at a speficific item").
+moo:action_help(look, "generalized look in region").
+moo:action_help(look(dir), "Look in a direction").
+moo:action_help(look(item), "Look at a speficific item").
 
 moo:agent_call_command(Agent,look(Dir)):-
    view_dirs(Agent,[[Dir,here],[Dir,Dir],[Dir,Dir,adjacent]],Percepts),
@@ -103,7 +103,7 @@ get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
 
 
 % Get only the Percepts
-moo:db_prop(look:get_percepts(agent,list(spatial))).
+moo:db_prop(look:get_percepts(agent,list(spatial)),[call_module(look)]).
 get_percepts(Agent,Percepts) :- get_percepts0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts).
 get_percepts0(Agent,Percepts) :-
   call((
@@ -115,7 +115,7 @@ get_percepts0(Agent,Percepts) :-
 	!.
 
 % Look at locations immediately around argent
-moo:db_prop(look:get_near(agent,list(spatial))).
+moo:db_prop(look:get_near(agent,list(spatial)),[call_module(look)]).
 get_near(Agent,PerceptsO):- get_near0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
    
 get_near0(Agent,Percepts) :-
@@ -125,7 +125,7 @@ get_near0(Agent,Percepts) :-
 	view_dirs(Agent,Dirs,Percepts))),!.
 
 % Look only at location agent is currently in.
-moo:db_prop(look:get_feet(agent,list(spatial))).
+moo:db_prop(look:get_feet(agent,list(spatial)),[call_module(look)]).
 get_feet(Agent,PerceptsO) :-  get_feet0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
 
 get_feet0(Agent,Percepts):-
@@ -263,6 +263,6 @@ mask([K|Tail],SoFar,What) :-
 mask([Head|Tail],SoFar,What) :-
 	mask(Tail,[Head|SoFar],What).
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 
 

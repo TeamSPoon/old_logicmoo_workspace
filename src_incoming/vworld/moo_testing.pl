@@ -1,7 +1,7 @@
 /** <module> 
 % A MUD testing API is defined here
 %
-% Project Logicmoo: A MUD server written in Prolog
+% Project LogicMoo: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
@@ -24,14 +24,14 @@
 
 % do some sanity testing (expects the startrek world is loaded)
 run_mud_tests:-
-  forall(moo:decl_mud_test(Name,Test),run_mud_test(Name,Test)).
+  forall(moo:mud_test(Name,Test),run_mud_test(Name,Test)).
 
-moo:decl_action(tests,"run run_mud_tests/0").
+moo:action_help(tests,"run run_mud_tests/0").
 
-moo:agent_call_command(_Agent,tests) :- make, run_mud_tests.
+moo:agent_call_command(_Agent,tests) :- scan_updates, run_mud_tests.
 
 
-moo:decl_action(test(term),"run tests containing term").
+moo:action_help(test(term),"run tests containing term").
 
 moo:agent_call_command(_Gent,test(Obj)):- term_test(Obj).
 
@@ -43,9 +43,9 @@ test_false(SomeGoal):- not(SomeGoal); (last_test_name(String),dmsg(moo_test(fail
 
 term_test(Obj):-
    doall((
-   moo:decl_mud_test(H,B),
-   use_term_listing(Obj,moo:decl_mud_test(H,B)),
-   moo:decl_mud_test(H,B),
+   moo:mud_test(H,B),
+   use_term_listing(Obj,moo:mud_test(H,B)),
+   moo:mud_test(H,B),
    fail)).
 
 run_mud_test(Name,Test):-

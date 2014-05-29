@@ -1,7 +1,7 @@
 /** <module> 
 % last file loaded per file (loses at any module side effects
 %
-% Project Logicmoo: A MUD server written in Prolog
+% Project LogicMoo: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
@@ -13,8 +13,8 @@
 
 :- retract(loading_module_h(_)).
 
-:- dbase:end_transform_cyc_preds.
-% :-dbase:end_transform_cyc_preds.
+:- end_transform_moo_preds.
+
 
 
 

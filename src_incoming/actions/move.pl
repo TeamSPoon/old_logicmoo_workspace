@@ -12,9 +12,11 @@
 
 :- module(move, []).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(command).
+:- register_module_type(command).
+
+:- begin_transform_moo_preds.
 
 moo:agent_text_command(Agent,[DirSS],Agent,move(Dir)):- catch(((string_to_atom(DirSS,Dir),moo:specifier_text(Dir,dir))),_,fail),!.
 
@@ -22,10 +24,10 @@ moo:agent_text_command(Agent,[DirSS],Agent,move(DirS)):-
  catch(((string_to_atom(DirSS,DirS),moo:specifier_text(Dir,dir),
        catch((atom_concat(Dir,N,DirS),(atom_number(N,_))),_,fail))),_,fail).
 
-moo:agent_call_command(Agnt,Cmd):- functor(Cmd,move,_),!,
+dbase:dbase_t(agent_call_command,Agnt,Cmd):- functor(Cmd,move,_),!,
    must(move_command(Agnt,Cmd)).
 
-moo:decl_action(move(dir)).
+moo:action_info(move(dir)).
 
 % dir###
 move_command(Agent,move(DirSS)) :- catch((string_to_atom(DirSS,DirS),
@@ -93,21 +95,21 @@ move_command_1(Agent,Dir) :-
 
 %Record keeping
 
-moo:decl_update_charge(Agent,move) :- padd(Agent,charge,-4).
+moo:update_charge(Agent,move) :- padd(Agent,charge,-4).
 
-moo:decl_update_stats(Agent,collide) :- padd(Agent,damage,-5),add(failure(Agent,collide)).
+moo:update_stats(Agent,collide) :- padd(Agent,damage,-5),add(failure(Agent,collide)).
 
-moo:decl_update_stats(Agent,fall) :- padd(Agent,damage,-10).
+moo:update_stats(Agent,fall) :- padd(Agent,damage,-10).
 
 % cheating but to test
 
-moo:decl_action(go(dir)).
+moo:action_info(go(dir)).
 moo:agent_call_command(Agent,go(Dir)) :-
 	atloc(Agent,LOC),
         in_world_move(LOC,Agent,Dir),
 	moo:update_charge(Agent,move).
 
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 
 

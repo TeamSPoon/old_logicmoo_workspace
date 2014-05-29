@@ -47,6 +47,6 @@ moo:type_grid(forest,19,[ed,--,--,--,--,--,--,--,--,--,--,--,--,--,tr,--,--,--,-
 moo:type_grid(forest,20,[ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed]).
 
 
-:- include(logicmoo('vworld/moo_footer')).
+:- include(logicmoo(vworld/moo_footer)).
 
 

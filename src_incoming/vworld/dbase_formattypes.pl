@@ -1,7 +1,7 @@
 /** <module> 
 % This is mainly used by the moo_loader but also needed everywhere
 %
-% Project Logicmoo: A MUD server written in Prolog
+% Project LogicMoo: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
@@ -9,66 +9,70 @@
 % =======================================================
 :- module(dbase_formattypes, [
           term_is_ft/2,
-          is_decl_ft/1,
+          is_ft/1,
           format_complies/3,
           any_to_value/2,
           any_to_number/2,
           atom_to_value/2,
           any_to_dir/2]).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo(vworld/moo_header)).
+
+:- registerCycPred((ft_info/2,subft/2)).
 
 term_is_ft(Term,Type):-
-   moo:decl_ft(Type,How),
+   moo:ft_info(Type,How),
    format_complies(Term,How,NewTerm),
    ignore(NewTerm=Term).
 
 
-is_decl_ft(S):-   moo:decl_ft(S,_).
-is_decl_ft(S):-   moo:decl_subft(S,_).
+
+is_ft(S):-   moo:ft_info(S,_).
+is_ft(S):-   moo:subft(S,_).
+
 /*
-is_decl_ft_except(S,List):-
-   moo:decl_ft(S,_);
+is_ft_except(S,List):-
+   moo:ft_info(S,_);
    not((member(S,List), 
-      ((moo:decl_subft(S,S2) ,
-        is_decl_ft_except(S2,[S|List]) ;
-             ((moo:decl_subft(S3,S) , is_decl_ft_except(S3,[S,S2|List]))))))).
+      ((moo:subft(S,S2) ,
+        is_ft_except(S2,[S|List]) ;
+             ((moo:subft(S3,S) , is_ft_except(S3,[S,S2|List]))))))).
 */
 
-moo:decl_ft(atom,atom(self)).
-moo:decl_ft(apath(region,dir),formatted).
-moo:decl_ft(string,string(self)).
-moo:decl_ft(number,number(self)).
-moo:decl_ft(type,type(self)).
-moo:decl_ft(dir,any_to_dir(self,_)).
-moo:decl_ft(dice(int,int,int),formatted).
-moo:decl_ft(xyz(region,int,int,int),formatted).
-moo:decl_ft(list(type),formatted).
-moo:decl_ft(term,nonvar(self)).
-moo:decl_ft(id,nonvar(self)).
-moo:decl_ft(prolog,true).
-moo:decl_ft(rest,true).
-moo:decl_ft(var,var(self)).
-moo:decl_ft(action(prolog),formatted).
+moo:ft_info(atom,atom(self)).
+moo:ft_info(apath(region,dir),formatted).
+moo:ft_info(string,string(self)).
+moo:ft_info(number,number(self)).
+moo:ft_info(type,type(self)).
+moo:ft_info(dir,any_to_dir(self,_)).
+moo:ft_info(dice(int,int,int),formatted).
+moo:ft_info(xyz(region,int,int,int),formatted).
+moo:ft_info(list(type),formatted).
+moo:ft_info(term,nonvar(self)).
+moo:ft_info(id,nonvar(self)).
+moo:ft_info(prolog,true).
+moo:ft_info(rest,true).
+moo:ft_info(var,var(self)).
+moo:ft_info(action(prolog),formatted).
 
-moo:decl_subft(var,prolog).
-moo:decl_subft(term,prolog).
-moo:decl_subft(atom,term).
-moo:decl_subft(string,term).
-% moo:decl_subft(number,term).
-moo:decl_subft(id,term).
+moo:subft(var,prolog).
+moo:subft(term,prolog).
+moo:subft(atom,term).
+moo:subft(string,term).
+% moo:subft(number,term).
+moo:subft(id,term).
 
-moo:decl_subft(int,integer).
-moo:decl_subft(integer,number).
-moo:decl_subft(dice,int).
+moo:subft(int,integer).
+moo:subft(integer,number).
+moo:subft(dice,int).
 
 format_complies(A,Type,A):- var(Type),!,trace,throw(failure(format_complies(A,Type))).
 format_complies(A,string,AA):- ignoreOnError(text_to_string(A,AA)).
 format_complies(A,int,AA):- any_to_number(A,AA).
 format_complies(A,number,AA):- any_to_number(A,AA).
 format_complies(A,integer,AA):- any_to_number(A,AA).
-format_complies(A,Fmt,AA):- moo:decl_ft(Fmt,formatted),!,format_complies(A,formatted(Fmt),AA).
-format_complies(A,Fmt,A):- moo:decl_ft(Fmt,Code),!,subst(Code,self,A,Call),Call.   
+format_complies(A,Fmt,AA):- ft_info(Fmt,formatted),!,format_complies(A,formatted(Fmt),AA).
+format_complies(A,Fmt,A):- ft_info(Fmt,Code),!,subst(Code,self,A,Call),Call.   
 format_complies(A,number,AA):- must(any_to_number(A,AA)).
 format_complies(A,dir,AA):- any_to_dir(A,AA).
 format_complies([A|AA],list(T),LIST):-!,findall(OT,((member(O,[A|AA]),format_complies(O,T,OT))),LIST).
@@ -84,7 +88,7 @@ format_complies(Args,formatted(Types),NewArgs):- compound(Args),compound(Types),
    Types=..[F|TypesL],
    NewArgs=..[F|NewArgsL],!,   
    format_complies(ArgsL,TypesL,NewArgsL).
-format_complies(A,Super,AA):- moo:decl_subft(Sub,Super),format_complies(A,Sub,AA).
+format_complies(A,Super,AA):- subft(Sub,Super),format_complies(A,Sub,AA).
   
 
 
@@ -123,5 +127,6 @@ p2c_dir2('e','East-Directly').
 p2c_dir2('n','North-Directly').
 
 
+:- include(logicmoo(vworld/moo_footer)).
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+

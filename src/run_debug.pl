@@ -2,19 +2,20 @@
 /** <module> An Implementation a MUD server in SWI-Prolog
 
 */
+:- debug.
 :- use_module(library(settings)).
 
 :- dynamic(fullStart/0).
-:- guitracer.
+% :- guitracer.
 
 
 % ======================================================
 % Configure the logicmoo utilities into the file path
 % :- include('logicmoo_util/logicmoo_util_header').
-% :- use_module('logicmoo_util/logicmoo_util_all.pl').
+% :- ensure_loaded('logicmoo_util/logicmoo_util_all.pl').
 % And adds the local directories to file search path of logicmoo(..)
 % ======================================================
-:- use_module('logicmoo_util/logicmoo_util_all.pl').
+:- consult('logicmoo_util/logicmoo_util_all').
 
 % one more case of not clear what's the good way to do this.
 % Add your own path to weblog for now
@@ -49,7 +50,8 @@ if_version_greater(V,Goal):- current_prolog_flag(version,F), ((F > V) -> call(Go
 % [Optionaly] load and start sparql server
 % if we don't start cliopatria we have to manually start
 %
-start_servers :- if_version_greater(70111,ensure_loaded(logicmoo(launchcliopatria))).
+start_servers :- !.
+start_servers :- if_version_greater(70111,thread_create(ensure_loaded(logicmoo(launchcliopatria)),_,[alias(loading_code)])).
 
 % start_servers
 % this is evil. Starts the old mudconsole, the experiment with Jan's
@@ -76,7 +78,7 @@ moo:agent_text_command(Agent,[run,Term], Agent,prologCall(Term)).
 
 
 :- use_module(library(check)).
-:- at_start(check:list_undefined).
+% :- at_start(check:list_undefined).
 
 % GOLOG SYSTEM WITHOUT FLUX (Default Commented Out)
 %:- if_flag_true(fullStart,ensure_loaded(logicmoo('indigolog/indigolog_main_swi.pl'))).
@@ -104,12 +106,7 @@ lundef :- A = [],
             maplist(report_undefined, G)
         )).
 
-:- if_flag_true(fullStart,
-(
- redefine_system_predicate(check:list_undefined(_)),
- abolish(check:list_undefined/1),
- assert((check:list_undefined(A):- not(thread_self(main)),!, ignore(A=[]))),
- assert((check:list_undefined(A):- ignore(A=[]))))).
+:- if_flag_true(fullStart,remove_undef_search).
 
 
 /*
@@ -129,11 +126,14 @@ lundef :- A = [],
 
 % [Optionaly] Put a telnet client handler on the main console
 % :- at_start(login_and_run).
+
+load_default_game :- load_game(logicmoo('rooms/startrek.all.pl')).
+
 run_setup:-
    nodebug,
-   debug,
+   debug,  
    scan_db_prop,
-   at_start(load_game(logicmoo('rooms/startrek.all.pl'))),
+   at_start(load_default_game),
    register_timer_thread(npc_ticker,1,npc_tick_tock).
 
 run:-
@@ -146,11 +146,6 @@ run:-
 
 %:- register_timer_thread(npc_ticker,30,npc_tick).
 
-:- noguitracer.
-
-% :- at_start(run).
-:- run_setup.
-
 % do some sanity testing
 ht:- do_player_action('s'),
    do_player_action(look),
@@ -162,8 +157,10 @@ ht:- do_player_action('s'),
    do_player_action('s'),
    do_player_action('s').
 
-:- at_start(start_servers).
+:- noguitracer.
 
+:- at_start(start_servers).
+:- at_start(run_setup).
 :- at_start(run).
 
 % So scripted versions don't just exit

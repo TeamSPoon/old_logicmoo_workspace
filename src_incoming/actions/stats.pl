@@ -7,14 +7,14 @@
 % to do this.
 % Douglas Miles 2014
 */
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(command).
+:- register_module_type(command).
 
 % ====================================================
 % show the stats system
 % ====================================================
-moo:decl_action(stats(optional(term,self)), "Examine MUD stats of something").
+moo:action_help(stats(optional(term,self)), "Examine MUD stats of something").
 moo:agent_call_command(Agent,stats(SWhat)):- 
    term_listing(SWhat),
    doall((parse_for(optional(agent,self),SWhat,What,_LeftOver),
@@ -26,5 +26,5 @@ moo:agent_call_command(Agent,stats(SWhat)):-
          height(What,value)]))).
 
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 

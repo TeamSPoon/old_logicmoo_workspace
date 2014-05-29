@@ -1,7 +1,7 @@
 /** <module> 
 % Game loading Utils
 %
-% Project Logicmoo: A MUD server written in Prolog
+% Project LogicMoo: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
@@ -20,7 +20,7 @@
 :- meta_predicate show_call(0).
 :- meta_predicate show_call0(0).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo(vworld/moo_header)).
 
 dbadd0(C0):-db_op(a,C0).
 
@@ -28,18 +28,20 @@ load_game(File):-absolute_file_name(File,Path),see(Path),
    world_clear(current),
    repeat,
    read_term(Term,[double_quotes(string)]),
-   game_assert(Term),
+   musterd(game_assert(Term)),
    Term == end_of_file,seen,!,
-   finish_processing_game.
+   musterd(finish_processing_game).
 
 :-dynamic(in_finish_processing_game/0).
 
-finish_processing_game:- in_finish_processing_game,!.
+musterd(C):-catch(debugOnFailure0(C),E,((dmsg(E:C),debugCall(C)))).
+
+finish_processing_game:- debug,in_finish_processing_game,!.
 finish_processing_game:- assert(in_finish_processing_game),fail.
 finish_processing_game:- ignore(scan_db_prop),fail.
-finish_processing_game:- retract(moo:call_after_load(A)),once(must(A)),fail.
+finish_processing_game:- retract(moodb:call_after_load(A)),once(musterd(A)),fail.
 finish_processing_game:- ignore(scan_db_prop),fail.
-finish_processing_game:- retract(moo:call_after_load(A)),once(must(A)),fail.
+finish_processing_game:- retract(moodb:call_after_load(A)),once(musterd(A)),fail.
 finish_processing_game:- savedb,fail.
 finish_processing_game:- retract(in_finish_processing_game).
 finish_processing_game.
@@ -59,7 +61,7 @@ discoverAndCorrectArgsIsa(_Prop,_N1,[],[]):-!.
 discoverAndCorrectArgsIsa(Prop,N1,[A|Args],[AA|AArgs]):-
    %dbase:
    argIsa_call(Prop,N1,Type),
-   must(isa_assert_g(A,Type,AA)),
+   musterd(isa_assert_g(A,Type,AA)),
    N2 is N1+1,
    discoverAndCorrectArgsIsa(Prop,N2,Args,AArgs).
 
@@ -70,10 +72,10 @@ isa_assert_g(A,Type,AA):-
 %  @set movedist 4
 
 fisa_assert(A,integer,AA):-!,isa_assert(A,int,AA).
-fisa_assert(A,int,AA):- must(any_to_number(A,AA)).
-fisa_assert(A,number,AA):- must(any_to_number(A,AA)).
-fisa_assert(A,string,AA):- must(text_to_string(A,AA)).
-fisa_assert(A,dir,AA):- must(string_to_atom(A,AA)).
+fisa_assert(A,int,AA):- musterd(any_to_number(A,AA)).
+fisa_assert(A,number,AA):- musterd(any_to_number(A,AA)).
+fisa_assert(A,string,AA):- musterd(text_to_string(A,AA)).
+fisa_assert(A,dir,AA):- musterd(string_to_atom(A,AA)).
 
 
 isa_assert(A,Type,A):- once(var(A);var(Type)),!,trace,throw(failure(isa_assert(A,Type))).
@@ -81,7 +83,7 @@ isa_assert(A,Type,AA):-fisa_assert(A,Type,AAA),AA=AAA,!.
 isa_assert(A,Type,AA):-format_complies(A,Type,AA),!.
 isa_assert(O,argIsaFn(_,_),O):-!. %any_to_value(O,V).  %missing
 isa_assert(A,type,A):-atom(A),define_type(A).
-isa_assert(A,term,A):-!. % must(ground(A)).
+isa_assert(A,term,A):-!. % musterd(ground(A)).
 isa_assert([A|AA],list(T),LIST):-!,findall(OT,((member(O,[A|AA]),isa_assert_g(O,T,OT))),LIST).
 isa_assert(A,list(T),[OT]):-!,isa_assert_g(A,T,OT).
 isa_assert([],[],[]):-!.
@@ -102,13 +104,13 @@ isa_assert(Arg,Props,NewArg):- compound(Props),
    C=..[F,Arg|TypesL],
    correctArgsIsa(C,CC),
    CC=..[F,NewArg|_].
-isa_assert(A,C,A):-must(ground(A)),trace, dmsg(todo(define(isa_assert(A,C,'ConvertedArg')))),throw(retry(_)).
+isa_assert(A,C,A):-musterd(ground(A)),trace, dmsg(todo(define(isa_assert(A,C,'ConvertedArg')))),throw(retry(_)).
 
 isa_assert(A,Type,_NewArg):-throw(failure(isa_assert(A,Type))).
 
 correctArgsIsa(A,AA):-
    functor(A,_,1),!,
-   must(any_to_value(A,AA)),
+   musterd(any_to_value(A,AA)),
    cmust(ground(AA)).
 
 correctArgsIsa(M:A,M:AA):-!,correctArgsIsa(A,AA).
@@ -125,10 +127,10 @@ correctArgsIsa(A,AA):-A =..[Prop|Args],
    AA =..[Prop|AArgs].
 
 game_assert((':-'(A))):-hotrace(A),!.
-game_assert(A):-must(once(correctArgsIsa(A,AA))),must(once(pgs(AA))),!.
+game_assert(A):-musterd(once(correctArgsIsa(A,AA))),musterd(once(pgs(AA))),!.
 
-% pgs(A):- fail, A=..[SubType,Arg], moo:createableType(SubType,Type),!,AA =.. [Type,Arg],
-%      dbadd0(AA), assert_if_new(moo:call_after_load(create_instance(Arg,SubType,[debugInfo(moo:createableType(AA,SubType,Type))]))).   
+% pgs(A):- fail, A=..[SubType,Arg], moo:createableSubclassType(SubType,Type),!,AA =.. [Type,Arg],
+%      dbadd0(AA), assert_if_new(moodb:call_after_load(world:create_instance(Arg,SubType,[debugInfo(moo:createableSubclassType(AA,SubType,Type))]))).   
 
 
 
@@ -141,7 +143,7 @@ pgs(objects(Type,List)):-forall_member(I,List,game_assert(mud_isa(I,Type))).
 pgs(sorts(Type,List)):-forall_member(I,List,game_assert(subclass(I,Type))).
 pgs(predicates(List)):-forall_member(T,List,assert(db_prop_from_game_load(T))).
 
-pgs(description(A,E)):- must(once(add_description(A,E))).
+pgs(description(A,E)):- musterd(once(add_description(A,E))).
 pgs(nameString(A,S0)):- determinerRemoved(S0,String,S),!,game_assert(nameString(A,S)),game_assert(determinerString(A,String)).
 
 
@@ -151,7 +153,7 @@ pgs(C):- C=..[SubType,Arg],isa_mc(FT,formattype),functor(FT,SubType,A),(A==0->tr
 
 pgs(A):- A=..[SubType,Arg], member(SubType,[agent,item, type, region]),!,
       dbadd0(A),
-      assert_if_new(moo:call_after_load(create_instance(Arg,SubType,[]))).   
+      assert_if_new(moodb:call_after_load(world:create_instance(Arg,SubType,[]))).   
 
 pgs(A):- A=..[SubType,_],
          define_type(SubType),
@@ -159,14 +161,14 @@ pgs(A):- A=..[SubType,_],
 
 pgs(A):- A=..[SubType,Arg], 
       member(SubType,[wearable]),
-      assert_if_new(moo:call_after_load(create_instance(Arg,item,[mud_isa(A,SubType)]))).   
+      assert_if_new(moodb:call_after_load(world:create_instance(Arg,item,[mud_isa(A,SubType)]))).   
 
 pgs(A):- A=..[SubType,_],dmsg(todo(ensure_creatabe(SubType))),dbadd0(A),!.
 
 pgs(W):-functor(W,F,A),functor(WW,F,A),db_prop_game_assert(WW),throw_safe(todo(pgs(W))).
 pgs(W):-dbadd0(W),!.
 pgs(W):-trace,dbadd0(W),!.
-pgs(A):-fmt('skipping ~q.',[A]).
+pgs(A):-fmt('% ERROR skipping ~q.',[A]).
 
 /*
 "Lieutenant",
@@ -218,7 +220,7 @@ add_description(A,S0):-
    atomic_list_concat(Words,' ',S),
    atomic_list_concat(Sents,'.',S),!,
    length(Words,Ws),
-   must(add_description(A,S,S0,Ws,Sents,Words)).
+   musterd(add_description(A,S,S0,Ws,Sents,Words)).
 % "NOBACKSTAB","ACT_STAY_ZONE","MEMORY"
 add_description(A,S,_S0,Ws,_Sents,_Words):- Ws<3,  
    atomic_list_concat([K,V],': ',S),!,add_description_kv(A,K,V).
@@ -270,6 +272,6 @@ show_call0(C):-call(C). % dmsg(show_call(C)),C.
 
 % :- finish_processing_game.
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 
 

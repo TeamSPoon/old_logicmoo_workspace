@@ -1,7 +1,7 @@
 /** <module> File used to implement in_world_events
 % like Talking, Appearing, falling rocks..
 %
-% Project Logicmoo: A MUD server written in Prolog
+% Project LogicMoo: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %

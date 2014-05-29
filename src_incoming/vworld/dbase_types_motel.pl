@@ -1,7 +1,7 @@
 /** <module> 
 % Still working on (and testing) but will provide the type inference for Logicmoo Later
 %
-% Project Logicmoo: A MUD server written in Prolog
+% Project LogicMoo: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
@@ -114,7 +114,7 @@ c2p(CNF,CLF,HP) :- translate(CNF,CLF), clausesToNHProlog(CLF,HP).
 
 prolog_engine(swi).
 
-%%:- use_module('../../src/logicmoo_util/logicmoo_util_all.pl').
+%%:- ensure_loaded('../../src/logicmoo_util/logicmoo_util_all.pl').
 /*
 assert_if_new(X):-catch(X,_,fail),!.
 assert_if_new(X):-assertz(X).

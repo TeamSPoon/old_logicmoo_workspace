@@ -7,27 +7,158 @@
 % Revision:  $Revision: 1.7 $
 % Revised At:   $Date: 2002/07/11 21:57:28 $
 % ===================================================================
-:-module(logicmoo_util_library,[dynamic_transparent/1,
+:-module(logicmoo_util_library,
+        [dynamic_transparent/1,
          upcase_atom_safe/2,
          concat_atom_safe/3,
          string_to_atom_safe/2,
+         makeArgIndexes/1,
+         doall/1,
          atom_concat_safe/3,
+         op(1150,fx,dynamic_multifile_exported),
+         dynamic_multifile_exported/3,
+         dynamic_multifile_exported/2,
+         dynamic_multifile_exported/1,
          exists_file_safe/1,
          exists_directory_safe/1,
+         def_meta_predicate/3,
          time_file_safe/2,
          throw_safe/1,
          maplist_safe/2,
          maplist_safe/3,
+         subst/4,
+         wsubst/4,
          remove_dupes/2,
          list_to_set_safe/2,
+         functor_safe/3,
+         functor_safe/2,
          flatten_dedupe/2,
          at_start/1,
-   multi_transparent/1]).
+         in_thread_and_join/1,
+         in_thread_and_join/2,
+         asserta_new/1,
+         asserta_if_new/1,
+         assert_if_new/1,
+         make_list/3,
+         multi_transparent/1]).
+
+:-use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)).
+:-use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)).
 
 
-:-use_module(logicmoo('logicmoo_util/logicmoo_util_bugger.pl')).
-:-use_module(logicmoo('logicmoo_util/logicmoo_util_ctx_frame.pl')).
+% =================================================================================
+% Utils
+% =================================================================================
 
+:-dynamic(argNumsTracked/3).
+:-dynamic(argNFound/3).
+% :-index(argNFound(1,1,1)).
+
+makeArgIndexes(CateSig):-functor(CateSig,F,_),makeArgIndexes(CateSig,F),!.
+makeArgIndexes(CateSig,F):- argNumsTracked(F,Atom,Number),arg(Number,CateSig,Arg),user:nonvar(Arg),
+     %%Number<10,user:nonvar(Arg),atom_number(Atom,Number),
+     assert_if_new(argNFound(F,Atom,Arg)),fail.
+makeArgIndexes(_NEW,_F).
+
+
+
+% peekAttributes/2,pushAttributes/2,pushCateElement/2.
+:- meta_predicate asserta_new(:),asserta_if_new(:),assertz_new(:),assertz_if_new(:),assert_if_new(:).
+asserta_new(_Ctx,NEW):-ignore(retractall(NEW)),asserta(NEW).
+writeqnl(_Ctx,NEW):- fmt('~q.~n',[NEW]),!.
+
+asserta_new(NEW):-ignore(retractall(NEW)),asserta(NEW).
+assertz_new(NEW):-ignore(retractall(NEW)),assertz(NEW).
+
+assert_if_new(N):-catch(N,_,fail),!.
+assert_if_new(N):-assert(N),!.
+
+assertz_if_new(N):-catch(N,_,fail),!.
+assertz_if_new(N):-assertz(N),!.
+
+asserta_if_new(N):-catch(N,_,fail),!.
+asserta_if_new(N):-asserta(N),!.
+
+:- meta_predicate doall(0).
+doall(C):-ignore((C,fail)).
+
+:- ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_bugger)).
+
+:- meta_predicate in_thread_and_join(0).
+in_thread_and_join(Goal):-in_thread_and_join(Goal,_Status).
+:- meta_predicate in_thread_and_join(0,+).
+in_thread_and_join(Goal,Status):-thread_create(Goal,ID,[]),thread_join(ID,Status).
+
+% ===================================================================
+% Substitution based on ==
+% ===================================================================
+
+% Usage: subst(+Fml,+X,+Sk,?FmlSk)
+
+subst(A,B,C,D):- 
+      catch(notrace(nd_subst(A,B,C,D)),_,fail),!.
+subst(A,_B,_C,A).
+
+nd_subst(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
+nd_subst(  P, X,Sk, P1 ) :- functor(P,_,N),nd_subst1( X, Sk, P, N, P1 ).
+
+nd_subst1( _,  _, P, 0, P  ).
+nd_subst1( X, Sk, P, N, P1 ) :- N > 0, P =.. [F|Args], 
+            nd_subst2( X, Sk, Args, ArgS ),
+            nd_subst2( X, Sk, [F], [FS] ),  
+            P1 =.. [FS|ArgS].
+
+nd_subst2( _,  _, [], [] ).
+nd_subst2( X, Sk, [A|As], [Sk|AS] ) :- X == A, !, nd_subst2( X, Sk, As, AS).
+nd_subst2( X, Sk, [A|As], [A|AS]  ) :- var(A), !, nd_subst2( X, Sk, As, AS).
+nd_subst2( X, Sk, [A|As], [Ap|AS] ) :- nd_subst( A,X,Sk,Ap ),nd_subst2( X, Sk, As, AS).
+nd_subst2( _X, _Sk, L, L ).
+
+
+
+wsubst(A,B,C,D):- 
+      catch(notrace(weak_nd_subst(A,B,C,D)),_,fail),!.
+wsubst(A,_B,_C,A).
+
+weak_nd_subst(  Var, VarS,SUB,SUB ) :- nonvar(Var),Var=VarS,!.
+weak_nd_subst(        P, X,Sk,        P1 ) :- functor(P,_,N),weak_nd_subst1( X, Sk, P, N, P1 ).
+
+weak_nd_subst1( _,  _, P, 0, P  ).
+
+weak_nd_subst1( X, Sk, P, N, P1 ) :- N > 0, P =.. [F|Args], weak_nd_subst2( X, Sk, Args, ArgS ),
+            weak_nd_subst2( X, Sk, [F], [FS] ),
+            P1 =.. [FS|ArgS].
+
+weak_nd_subst2( _,  _, [], [] ).
+weak_nd_subst2( X, Sk, [A|As], [Sk|AS] ) :- nonvar(A), X = A, !, weak_nd_subst2( X, Sk, As, AS).
+weak_nd_subst2( X, Sk, [A|As], [A|AS]  ) :- var(A), !, weak_nd_subst2( X, Sk, As, AS).
+weak_nd_subst2( X, Sk, [A|As], [Ap|AS] ) :- weak_nd_subst( A,X,Sk,Ap ),weak_nd_subst2( X, Sk, As, AS).
+weak_nd_subst2( _X, _Sk, L, L ).
+
+
+make_list(E,1,[E]):-!.
+make_list(E,N,[E|List]):- M1 is N - 1, make_list(E,M1,List),!.
+
+
+:- meta_predicate def_meta_predicate(0,+,+).
+
+def_meta_predicate(M:F,S,E):-doall(((between(S,E,N),make_list('?',N,List),CALL=..[F|List],'@'(meta_predicate(CALL),M)))).
+
+:- meta_predicate dynamic_multifile_exported(0), dynamic_multifile_exported(+,+), dynamic_multifile_exported(+,+,+).
+
+dynamic_multifile_exported(M:FA):- !,dynamic_multifile_exported(M,FA).
+dynamic_multifile_exported( FA ):- leash(+call),trace, !, current_module(M),trace,dynamic_multifile_exported(M,FA).
+
+dynamic_multifile_exported(_,M:F/A):-!,dynamic_multifile_exported(M,F,A).
+dynamic_multifile_exported(_, M:F ):-!,dynamic_multifile_exported(M,F).
+dynamic_multifile_exported(M, [A] ):-!,dynamic_multifile_exported(M,A).
+dynamic_multifile_exported(M,[A|L]):-!,dynamic_multifile_exported(M,A),dynamic_multifile_exported(M,L).
+dynamic_multifile_exported(M,(A,L)):-!,dynamic_multifile_exported(M,A),dynamic_multifile_exported(M,L).
+dynamic_multifile_exported(M, F/A ):-!,dynamic_multifile_exported(M,F,A).
+
+
+dynamic_multifile_exported(M,F,A):- integer(A),atom(M),atom(F),!, '@'(( dynamic(F/A), multifile(F/A), M:export(F/A)), M).
+dynamic_multifile_exported(M,F,A):-throw((dynamic_multifile_exported(M,F,A))).
 
 flatten_dedupe(Percepts0,Percepts):-
    flatten([Percepts0],Percepts1),remove_dupes(Percepts1,Percepts).
@@ -38,6 +169,22 @@ remove_dupes([],[],_):-!.
 remove_dupes([I|In],Out,Shown):-member(I,Shown),!,remove_dupes(In,Out,Shown).
 remove_dupes([I|In],[I|Out],Shown):-remove_dupes(In,Out,[I|Shown]).
 
+functor_safe(_:Obj,F):-!,functor_safe(Obj,F).
+functor_safe(Obj,F):-string(Obj),!,atom_string(F,Obj).
+functor_safe(Obj,Obj):-not(compound(Obj)),!.
+functor_safe(Obj,F):-functor(Obj,F,_).
+
+strip_f_module(_:P,F):-nonvar(P),!,strip_f_module(P,F).
+strip_f_module(P,P):-atom(P),!.
+strip_f_module(P,F):-hotrace(string(P);is_list(P);atomic(P)), text_to_string(P,S),!,atom_string(F,S).
+strip_f_module(P,P).
+
+functor_safe(M:P,M:F,A):-var(P),atom(M),!,functor(P,F,A).
+functor_safe(P,F,A):-var(P),!,strip_f_module(F,F0),functor(P,F0,A).
+functor_safe(P,F,0):- hotrace(string(P);is_list(P);atomic(P)), text_to_string(P,S),!,atom_string(F,S).
+functor_safe(P,F,A):- strip_f_module(P,P0),var(F),!,functor(P0,F0,A),strip_f_module(F0,F),!.
+functor_safe(P,F,A):- strip_f_module(P,P0),strip_f_module(F,F0),!,functor(P0,F0,A).
+functor_safe(P,F,A):- hotrace(var(P);compound(P)),functor(P,F,A).
 
 :- meta_predicate at_start(0).
 
@@ -51,7 +198,7 @@ at_start(Goal):-
 	     true
 	;
 	     catch(
-		 (assert(at_started(Named2)),Goal),
+		 (assert(at_started(Named2)),debugOnFailure0((Goal))),
 		 E,
 		 (retractall(at_started(Named2)),throw(E)))
 	).

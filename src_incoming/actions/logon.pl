@@ -9,12 +9,12 @@
 */
 :- module(login, []).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(command).
+:- register_module_type(command).
 
-moo:decl_action(login(string)).
-moo:decl_action(rename(string)).
+moo:action_info(login(string)).
+moo:action_info(rename(string)).
 
 % logon
 moo:agent_text_command(Agent,[login,NewName],Agent,rename(NewName)).
@@ -24,8 +24,8 @@ moo:agent_call_command(Agent,rename(NewName)):- padd(Agent,named(NewName)).
 moo:agent_text_command(Agent,[Quit],Agent,prologCall(assert(wants_logout(Agent)))):-lorq(Quit).
 
 lorq(Quit):-member(Quit,[logout,quit]).
-moo:decl_action(Quit,"logs out of game (quits)"):-lorq(Quit).
+moo:action_help(Quit,"logs out of game (quits)"):-lorq(Quit).
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 
 

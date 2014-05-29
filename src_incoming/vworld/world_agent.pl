@@ -57,6 +57,27 @@ call_agent_action(Agent,CMDI):-
               raise_location_event(Where,notice(reciever,failed(Agent,CMD))))))),E,fmt('call_agent_action/2 Error ~q ',[E])),
     (Pushed -> ignore(retract(thlocal:current_agent(SESSION,Agent)));true).
 
+test_te:- xcall((
+ 
+
+  user:term_expansion(((call_agent_action(Agent,CMDI):-
+  (( ensure_session_id(Agent,SESSION,Pushed),
+      subst(CMDI,self,Agent,CMDI2),      
+      atloc(Agent,Where),
+      subst(CMDI2,here,Where,CMD),
+      % start event
+     % raise_location_event(Where,notice(reciever,do(Agent,CMD))),
+     catch(( ignore(( once((debugOnError(moo:agent_call_command(Agent,CMD)),
+           % complete event
+           raise_location_event(Where,notice(reciever,done(Agent,CMD))));
+           % fail event
+              raise_location_event(Where,notice(reciever,failed(Agent,CMD))))))),E,fmt('call_agent_action/2 Error ~q ',[E])),
+    (Pushed -> ignore(retract(thlocal:current_agent(SESSION,Agent)));true))))),TE), 
+
+  writeq(TE)
+  )).
+
+:-test_te.
 
 ensure_session_id(Agent,SESSION,fail):- get_session_id(SESSION),once(thlocal:current_agent(SESSION,Agent2)),Agent2==Agent,!.
 ensure_session_id(Agent,SESSION,true):- get_session_id(SESSION),asserta(thlocal:current_agent(SESSION,Agent)),!.

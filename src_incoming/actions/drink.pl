@@ -8,11 +8,11 @@
 
 :- module(drink, []).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(command).
+:- register_module_type(command).
 
-moo:decl_action(drink(drinkable),"Drink a Drinkable Item").
+moo:action_help(drink(drinkable),"Drink a Drinkable Item").
 
 % Eat something held
 % Check to make sure it's in the agents possession... 
@@ -24,9 +24,9 @@ moo:agent_call_command(Agent,drink(SObj)) :-
 	del(possess(Agent,Obj)),
 	moo:update_charge(Agent,eat).
 
-moo:decl_update_charge(Agent,drink) :-
+moo:update_charge(Agent,drink) :-
 	del(charge(Agent,Old)),
 	New is Old - 1,
 	add(charge(Agent,New)).
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).

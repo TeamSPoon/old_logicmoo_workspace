@@ -222,7 +222,7 @@ Object applies:
 */
 :- module(objects, [ max_charge/1, max_damage/1,label_type/2]).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo(vworld/moo_header)).
 
 :-ignore(moo:register_module_type([world_types,parser])).
 
@@ -235,7 +235,7 @@ max_damage(120).
 
 % :-end_module_type(dynamic).
 
-moo:type_default_props(Instance,Type,[named(Instance),id(Instance)|SP]):- moo:label_type_props(_,Type,SomeProps),flatten(SomeProps,SP).
+moo:type_default_props(Inst,Type,[named(Inst),kwLabel(Lbl)|SP]):- moo:label_type_props(Lbl,Type,SomeProps),flatten(SomeProps,SP).
 
 % Vacuum World example objects........
 moo:label_type_props(wl,wall,[height(3),weight(4)]).
@@ -275,4 +275,4 @@ moo:label_type_props(th,tough_hide,[act(wear,defence(2))]).
 % Define the maximum charge and maximum damage an agent can have
 
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).

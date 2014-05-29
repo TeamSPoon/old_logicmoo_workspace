@@ -16,13 +16,13 @@
 	testE2C/0]).
 
 
-:- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_all.pl')).
-:- ensure_loaded(logicmoo('vworld/moo.pl')).
+% :- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_all.pl')).
+:- ensure_loaded(logicmoo(vworld/moo)).
 
 :- meta_predicate do_dcg(?,?,?,?,?).
 :- meta_predicate isPOS(?,?,?,?,?).
 
-:- moo:register_module_type(utility).
+:- register_module_type(utility).
 
 % posm_cached(CycL, Phrase,POS,Form,CycL)
 :-dynamic lex/3,  lexMap/3.
@@ -30,7 +30,7 @@
 idGen(X):-flag(idGen,X,X+1).
 
 %:- ensure_loaded(logicmoo('vworld/dbase.pl')).
-:- dbase:begin_transform_cyc_preds.
+:- begin_transform_moo_preds.
 
 
 
@@ -655,7 +655,7 @@ posTT(CycWord,Phrase,POS,Form:PosForms):- fail.
 
 
   
-:-catch(['posm_cached_data.pl'],_,true).
+:-catch(consult('posm_cached_data.pl'),_,true).
 
 %:-posMeans(CycWord,Phrase,POS,Form,CycL).
 
@@ -1931,14 +1931,14 @@ wordageToKif(Symbol,Words,Quest,words(Words)).
 % =======================================================
 %sentence(S) --> conjunct(_),!,syntact(S).
 %sentence(S) --> interjections(_),!,syntact(S).
-questionmark_sent(true(CycL)) --> assertion(CycL).
+questionmark_sent(true(CycL)) --> assertion_nl(CycL).
 questionmark_sent(can(CycL)) --> interogative(CycL).
 questionmark_sent(yn(CycL)) --> imparative(CycL).
 
 simplifyLF(true(X),X).
 simplifyLF(yn(X),X).
 
-period_sent(CycL) --> assertion(CycL).
+period_sent(CycL) --> assertion_nl(CycL).
 period_sent(interogative(CycL)) --> interogative(CycL).
 period_sent(command(Act)) --> imparative(Act).
 
@@ -1946,7 +1946,7 @@ simplifyLF(interogative(X),X).
 simplifyLF(command(X),X).
 
 sentence(command(Act)) --> imparative(Act).
-sentence(assert(CycL)) --> assertion(CycL).
+sentence(assert(CycL)) --> assertion_nl(CycL).
 %sentence(query(CycL)) --> interogative(CycL).
      
 simplifyLF(interogative(X),X).
@@ -1989,7 +1989,7 @@ interogative(CycL) --> verb_phrase(TargetAgent,ImparitiveEvent,CycL),
 	 {varnameIdea('?TargetAgent',TargetAgent),varnameIdea('QuestionEvent',ImparitiveEvent)}.
 
 % =================================================================
-% assertion
+% assertion_nl
 % =================================================================
 % Now lets say that the input values for the memory NN uses the pattern from the other nodes output
 % our naming specialist, Linda Bergstedt
@@ -1998,17 +1998,17 @@ interogative(CycL) --> verb_phrase(TargetAgent,ImparitiveEvent,CycL),
 % It should be a mix.
 
 % the dog licks the bowl
-assertion(CycL) --> noun_phrase(Subj,CycL1,CycL),verb_phrase_after_nouns(Subj,Event,CycL1).
+assertion_nl(CycL) --> noun_phrase(Subj,CycL1,CycL),verb_phrase_after_nouns(Subj,Event,CycL1).
 
 % gen assertion 1
-assertion(gen_assert(Call,Result)) --> [S],
+assertion_nl(gen_assert(Call,Result)) --> [S],
 	    { 'genFormat'(Predicate,[S|Template],ArgsI,_,_),atom(Predicate),
 	    (compound(ArgsI) -> trasfromArgs(ArgsI,Args) ; Args=[1,2]),
 	    length(Args,Size),functor(Call,Predicate,Size),
 	    placeVars(Blanks,Args,Call)},
 	    do_dcg(Template,Blanks,Result).
 
-assertion(gen_assert(Predicate)) --> [S],
+assertion_nl(gen_assert(Predicate)) --> [S],
 	    { 'genFormat'(Predicate,S,_,_,_) }.
 
 % =================================================================
@@ -2325,7 +2325,7 @@ wordToWNPOS(CycWord,WNWord,POS):-'denotationPlaceholder'(CycWord,POS, _, WNWord,
 
 
 % cycWordForISA
-cycWordForISA(CycWord,EventIsa):-fail.
+cycWordForISA(CycWord,EventIsa):-fail.  
 
 
 % peace atal beh - 695-1297
@@ -2954,8 +2954,8 @@ atom_junct2([W|S],[A,Mark|Words]):- member(Mark,['.',',','?']),atom_concat(A,Mar
 atom_junct2([W|S],[Mark,A|Words]):- member(Mark,['.',',','?']),atom_concat(Mark,A,W),not(A=''),!,atom_junct2(S,Words).
 atom_junct2([W|S],[W|Words]):-atom_junct2(S,Words).
 
-% :- include(logicmoo('vworld/moo_footer.pl')).
+% :- include(logicmoo(vworld/moo_footer)).
 
 
-:-dbase:end_transform_cyc_preds.
+:- end_transform_moo_preds.
 

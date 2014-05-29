@@ -17,13 +17,15 @@
 % Declare the module name and the exported (public) predicates.
 :- module(explorer,[]).
 
-:- include(logicmoo('vworld/moo_header.pl')).
-:- moo:register_module_type(planning).
+:- include(logicmoo(vworld/moo_header)).
+:- register_module_type(planning).
 
 
+vette_idea(Agent,Act,Act):-var(Act),!,dmsg(vette_idea(Agent,Act)).
+vette_idea(_,sit,sit):-!.
 vette_idea(Agent,Act,Act):-dmsg(vette_idea(Agent,Act)).
 
-moo:label_type_props(explorer(_),explorer,[]).
+% moo:label_type_props(explorer(ID),explorer,[]).
 
 moo:world_agent_plan(_World,Agent,ActV):-
    agent(Agent),
@@ -90,6 +92,6 @@ explorer_idea(Agent,sit) :-
 	add(memory(Agent,directions(New))).
 
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 
 

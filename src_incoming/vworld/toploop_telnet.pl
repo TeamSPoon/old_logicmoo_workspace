@@ -2,7 +2,7 @@
 % Initial Telnet/Text console 
 % ALL telnet client business logic is here (removed from everywhere else!)
 %
-% Project Logicmoo: A MUD server written in Prolog
+% Project LogicMoo: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
@@ -27,9 +27,9 @@
 
 :- meta_predicate show_room_grid_single(*,*,0).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(utility).
+:- register_module_type(utility).
 
 :- dynamic wants_logout/1.
 % ===========================================================
@@ -86,10 +86,6 @@ prompt_read(Prompt,Atom):-
 
 tick_tock:-
            scan_updates,!,fmt('tick tock',[]),sleep(1),!.
-
-
-scan_updates:-ignore(catch(make,_,true)).
-
 
 
 % ===========================================================
@@ -357,5 +353,5 @@ call_pred(Call, Options) :-
 
 
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 

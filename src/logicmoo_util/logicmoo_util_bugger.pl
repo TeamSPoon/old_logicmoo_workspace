@@ -11,9 +11,6 @@
 */
 :-module(bugger,[
      was_module/2,
-     asserta_if_new/1,
-     asserta_new/1,
-     assert_if_new/1,
      programmer_error/1,
      forall_member/3,
      debugOnError0/1,
@@ -24,17 +21,21 @@
      os_to_prolog_filename/2,
      dumpList/1,
      debugOnFailure0/1,
+      op(1150,fx,meta_predicate_transparent),
+      meta_predicate_transparent/1,
+      meta_predicate_transparent/2,
      ifThen/2,
      nop/1,
      to_m_f_arity_pi/5,
      test_call/1,
-     makeArgIndexes/1,
      printAll/1,
      dynamic_load_pl/1,
      term_to_message_string/2,
      atLeastOne/1,
+     ggtrace/0,
+     gftrace/0,
+     grtrace/0,
      atLeastOne0/2,
-
 %     read_line_with_nl/3,
 	 unnumbervars/2,
 
@@ -43,6 +44,8 @@
 
      logOnErrorIgnore/1,
      debugOnErrorIgnore/1,
+     debugCall/1,
+     debugCallF/1,
 
      % can ignore
      failOnError/1, % for wrapping code may throw to indicate failure
@@ -82,8 +85,7 @@
 	 writeFailureLog/2,
 	% debugOnFailure/2,
      debugOnFailureEach/1,
-
-     moo_hide/1,
+    moo_hide/1,
 
      fmt/1,fmt0/1,
      fmt/2,fmt0/2,
@@ -125,7 +127,7 @@ set_bugger_flag(F,V):-create_prolog_flag(F,V,[term]).
 :- meta_predicate gmust(:,:).
 :- meta_predicate logOnFailure0(:).
 :- meta_predicate debugOnError0(:).
-:- meta_predicate throw_or_debug(*,:).
+:- meta_predicate will_debug_else_throw(*,:).
 :- meta_predicate printAll(:,*).
 :- meta_predicate load_dirrective(:,*).
 :- meta_predicate debugOnFailure0(:).
@@ -170,9 +172,9 @@ set_bugger_flag(F,V):-create_prolog_flag(F,V,[term]).
 
 % =========================================================================
  % false = use this wrapper, true = code is good and avoid using this wrapper
- skipWrapper:-false.
+ skipWrapper:-true.
  % false = hide this wrapper
- showHiddens:-true.
+ showHiddens:-false.
 
 :- set_prolog_flag(backtrace_depth,   20).
 :- set_prolog_flag(backtrace_goal_depth, 10).
@@ -339,15 +341,22 @@ traceAll:-findall(_,(member(F,[member/2,dmsg/1,takeout/3,findall/3,clearCateStac
 traceAll:-!.
 
 
-
-% peekAttributes/2,pushAttributes/2,pushCateElement/2.
-:- meta_predicate asserta_new(:),asserta_if_new(:),assert_if_new(:).
-
+meta_predicate_transparent(X):-strip_module(X,M,F),!, meta_predicate_transparent(M,F).
+meta_predicate_transparent(M,(X,Y)):-!,meta_predicate_transparent(M,X),meta_predicate_transparent(M,Y),!.
+meta_predicate_transparent(_M,X):-atom(X),!.
+meta_predicate_transparent(_M,X):-
+  debugOnFailureEach((
+  arg(1,X,A),functor(X,F,_),
+  FA=F/A,
+  dynamic_if_missing(FA),
+  %module_transparent(FA),
+  %%meta_predicate(X),
+  %trace(FA, -all),
+  %%dhideTrace(FA),
+  !)).
 
 forall_member(C,[C],Call):-!,once(Call).
 forall_member(C,C1,Call):-forall(member(C,C1),once(Call)).
-
-:-op(1150,fx,meta_predicate_transparent).
 
 must_assign(From=To):-must_assign(From,To).
 must_assign(From,To):-To=From,!.
@@ -360,20 +369,22 @@ prolog_must(Call):-must(Call).
 
 % cmust is only used for type checking
 cmust(_):-bugger_flag(release,true),!.
-cmust(Call):-atLeastOne0(throw_or_debug(cmust(Call),Call),Call).
+cmust(Call):-atLeastOne0(will_debug_else_throw(cmust(Call),Call),Call).
 
 % gmust is must with cmust
 gmust(True,Call):-catch((Call,True->true;throw(retry(gmust(True,Call)))),retry(gmust(True,_)),(trace,Call,True)).
 
 % must is used declaring the predicate must suceeed
 must(Call):-notrace(skipWrapper),!,Call.
-must(Call):-atLeastOne0(throw_or_debug(must(Call),Call),Call).
+must(Call):-atLeastOne0(Call,Call).
 
 throwOnFailure(Call):-atLeastOne0(throw(throwOnFailure(Call)),Call).
 ignoreOnError(CX):-ignore(catch(CX,_,true)).
 
-debugCall(C):-notrace,dmsg(debugCall(C)), trace(C,[-all,+fail,+exception]),debug,visible(+all), leash(-exit),leash(-call),leash(-redo),leash(+exception),trace,!,C.
-debugCallF(C):-notrace,dmsg(debugCall(C)), trace(C,[-all,+fail,+exception]),debug,visible(+all), leash(-exit),leash(+fail),leash(-call),leash(-redo),leash(+exception),leash(+fail),trace,!,C.
+pause_trace(_):- notrace(((debug,visible(+all),leash(+exception),leash(+call)))),trace.
+
+debugCall(C):-notrace,dmsg(debugCall(C)),pause_trace(errored(C)),notrace(ggtrace),C.
+debugCallF(C):-notrace,dmsg(debugCallF(C)), pause_trace(failed(C)),notrace(gftrace),C.
 
 debugOnError(C):-prolog_ecall(0,debugOnError0,C).
 debugOnError0(C):- catch(C,E,(dmsg(E,C),debugCall(C))).
@@ -417,9 +428,7 @@ local_predicate(P,_):-predicate_property(P,file(F)),!,atom_contains(F,'aiml_'),!
 local_predicate(P,F/N):-functor(P,F,N),!,fail.
 
 
-throw_or_debug(E,Goal):-
-   dmsg(bugger(throw_or_debug(E,Goal))),
-   trace,Goal.
+will_debug_else_throw(E,Goal):- dmsg(bugger(will_debug_else_throw(E,Goal))),grtrace,Goal.
 
 show_goal_rethrow(E,Goal):-
    dmsg(bugger(show_goal_rethrow(E,Goal))),
@@ -526,13 +535,14 @@ programmer_error(E):-trace, randomVars(E),dmsg('~q~n',[error(E)]),trace,randomVa
 
 
 :-dhideTrace(atLeastOne/1).
-atLeastOne(Call):- atLeastOne0(throw_or_debug(atLeastOne(Call),Call),Call).
+atLeastOne(Call):- atLeastOne0(will_debug_else_throw(atLeastOne(Call),Call),Call).
 
 :-dhideTrace(atLeastOne0/2).
 % now using gensym counter instead of findall (since findall can make tracing difficult)
 atLeastOne0(OnFail,Call):- gensym(atLeastOneCounter,Sym),flag(Sym,_,0),!, atLeastOne3(Sym,OnFail,Call).
-atLeastOne3(Sym,_OnFail,Call):-call(Call),flag(Sym,C,C+1).
-atLeastOne3(Sym,OnFail,_Call):-flag(Sym,Old,0),!,(Old==0 -> call(OnFail) ; true).
+atLeastOne3(Sym,_NFail,Call):-call(Call),flag(Sym,C,C+1).
+atLeastOne3(Sym,OnFail,_All):-flag(Sym,Old,0),!, Old==0, % if old > 0 we want to fail 
+         call(OnFail).
 
 %old findall version
 %atLeastOne1(OneA,_Else):-copy_term(OneA,One), findall(One,call(One),OneL),[_|_]=OneL,!,member(OneA,OneL).
@@ -551,25 +561,6 @@ prolog_must_not(_Call):-!.
 
 dynamic_if_missing(F/A):-functor(X,F,A),predicate_property(X,_),!.
 dynamic_if_missing(F/A):- dynamic([F/A]).
-
-meta_predicate_transparent(X):-strip_module(X,M,F),!, meta_predicate_transparent(M,F).
-meta_predicate_transparent(M,(X,Y)):-!,meta_predicate_transparent(M,X),meta_predicate_transparent(M,Y),!.
-meta_predicate_transparent(_M,X):-atom(X),!.
-meta_predicate_transparent(_M,X):-
-  debugOnFailureEach((
-  arg(1,X,A),functor(X,F,_),
-  FA=F/A,
-  dynamic_if_missing(FA),
-  %module_transparent(FA),
-  %%meta_predicate(X),
-  %trace(FA, -all),
-  %%dhideTrace(FA),
-  !)).
-
-
-asserta_new(_Ctx,NEW):-ignore(retract(NEW)),asserta(NEW).
-writeqnl(_Ctx,NEW):- fmt('~q.~n',[NEW]),!.
-asserta_new(NEW):-ignore(retract(NEW)),asserta(NEW).
 
 
 %%%retractall(E):- retractall(E),functor(E,File,A),dynamic(File/A),!.
@@ -908,29 +899,6 @@ os_to_prolog_filename(OS,PL):-atom_concat_safe(BeforeSlash,'/',OS),os_to_prolog_
 os_to_prolog_filename(OS,PL):-absolute_file_name(OS,OSP),OS \= OSP,!,os_to_prolog_filename(OSP,PL).
 
 
-% =================================================================================
-% Utils
-% =================================================================================
-
-
-:-dynamic(argNumsTracked/3).
-:-dynamic(argNFound/3).
-% :-index(argNFound(1,1,1)).
-
-makeArgIndexes(CateSig):-functor(CateSig,F,_),makeArgIndexes(CateSig,F),!.
-makeArgIndexes(CateSig,F):- argNumsTracked(F,Atom,Number),arg(Number,CateSig,Arg),user:nonvar(Arg),
-     %%Number<10,user:nonvar(Arg),atom_number(Atom,Number),
-     assert_if_new(argNFound(F,Atom,Arg)),fail.
-makeArgIndexes(_NEW,_F).
-
-
-assert_if_new(N):-N,!.
-assert_if_new(N):-assert(N),!.
-
-asserta_if_new(N):-N,!.
-asserta_if_new(N):-asserta(N),!.
-
-
 
 % =================================================================================
 % Utils
@@ -967,10 +935,14 @@ listify(OUT,[OUT]).
 traceIf(_Call):-!.
 traceIf(Call):-ignore((Call,trace)).
 
+% hotrace(Goal).
+% Like notrace/1 it still skips over debugging Goal.
+% Unlike notrace/1, it allows traceing when excpetions are raised during Goal.
+hotrace(X):-!, tracing -> notrace(X) ; catch(notrace(X),E,(dmsg(E-X),grtrace,X)).
+% more accepable.. less usefull
+hotrace(X):- tracing -> notrace(X) ; X.
 
-% When you trust the code enough you dont to debug it
-% but if that code does something wrong while your not debugging, you want to see the error
-hotrace(X):- tracing -> notrace_call(X) ; call(X).
+
 
 notrace_call(X):-notrace,catch(traceafter_call(X),E,(dmsg(E-X),trace,throw(E))).
 traceafter_call(X):-X,trace.
@@ -1084,8 +1056,20 @@ bdmsg(_):-bugger_flag(bugger_debug=off),!.
 bdmsg(_):-!.
 bdmsg(D):-once(dmsg(D)).
 
-bugger_term_expansion(T,T2):- compound(T), once(bugger_t_expansion(T,T2)).
+bugger_term_expansion(_,_):-!,fail.
+bugger_term_expansion(T,T3):- compound(T), once(bugger_t_expansion(T,T2)),T\=T2,!,catch(expand_term(T2,T3),_,fail).
 
+ggtrace:- visible(-all),
+   visible(+call),visible(-unify),visible(+exception),
+   leash(-exit),leash(-fail),leash(-call),leash(-redo),leash(+exception),
+   trace.
+
+gftrace:- visible(-all),
+   visible(+call),visible(+fail),visible(-unify),visible(+exception),
+   leash(-exit),leash(-fail),leash(-call),leash(-redo),leash(+exception),
+   trace.
+
+grtrace:- visible(+all),leash(+all), trace.
 
 
 bugger_t_expansion(T,T):-not(compound(T)),!.
@@ -1113,7 +1097,7 @@ bugger_expand_term(T,_):- bdmsg(bugger_expand_term(T)),fail.
 
 % user:expand_term(G,G2):- compound(G),bugger_expand_term(G,G2),!.
 
-user:term_expansion((H:-G),(H:-G2)):- bugger_term_expansion(G,G2),!.
+user:term_expansion((H:-G),(H:-G2)):- bugger_term_expansion(G,G2).
 
 
 

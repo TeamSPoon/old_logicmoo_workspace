@@ -2,18 +2,20 @@
 /** <module> An Implementation a MUD server in SWI-Prolog
 
 */
+:- debug.
 :- use_module(library(settings)).
 
 :- dynamic(fullStart/0).
-:- guitracer.
+% :- guitracer.
+
 
 % ======================================================
 % Configure the logicmoo utilities into the file path
 % :- include('logicmoo_util/logicmoo_util_header').
-% :- use_module('logicmoo_util/logicmoo_util_all.pl').
+% :- ensure_loaded('logicmoo_util/logicmoo_util_all.pl').
 % And adds the local directories to file search path of logicmoo(..)
 % ======================================================
-:- use_module('../src/logicmoo_util/logicmoo_util_all.pl').
+:- consult('logicmoo_util/logicmoo_util_all').
 
 % one more case of not clear what's the good way to do this.
 % Add your own path to weblog for now
@@ -23,19 +25,33 @@ user:file_search_path(weblog, '/usr/local/lib/swipl-7.1.11/pack/weblog/prolog').
 user:file_search_path(cliopatria, '/devel/ClioPatria').
 user:file_search_path(cliopatria, 't:/devel/ClioPatria').
 
+
+:- use_module(library(settings)).
+
+:- user:file_search_path(cliopatria,SP),
+   exists_directory(SP),
+   writeq(user:file_search_path(cliopatria,SP)),nl.
+   %set_setting_default(cliopatria_binding:path, SP).
+   %save_settings('moo_settings.db').
+   %%setting(cliopatria_binding:path, atom, SP, 'Path to root of cliopatria install'),!.
+
+:- ensure_loaded(logicmoo('http/user_page')).
+
 :- meta_predicate(if_version_greater(?,0)).
 
 if_version_greater(V,Goal):- current_prolog_flag(version,F), ((F > V) -> call(Goal) ; true).
 
-:- if_flag_true(fullStart, if_version_greater(70109,ensure_loaded(logicmoo('mudconsole/mudconsolestart')))).
+% set to false because we don't want to use the mudconsole
+:- if_flag_true(false, if_version_greater(70109,ensure_loaded(logicmoo('mudconsole/mudconsolestart')))).
 
 % [Optionaly 1st run] tell where ClioPatria is located and restart for the 2nd run
-%:- set_setting(cliopatria_binding:path, 't:/devel/ClioPatria'), save_settings('moo_settings.db').
+%:- set_setting(cliopatria_binding:path, '/devel/ClioPatria'), save_settings('moo_settings.db').
 
 % [Optionaly] load and start sparql server
 % if we don't start cliopatria we have to manually start
 %
-start_servers :- if_version_greater(70109,ensure_loaded(logicmoo(launchcliopatria))).
+start_servers :- !.
+start_servers :- if_version_greater(70111,thread_create(ensure_loaded(logicmoo(launchcliopatria)),_,[alias(loading_code)])).
 
 % start_servers
 % this is evil. Starts the old mudconsole, the experiment with Jan's
@@ -62,7 +78,7 @@ moo:agent_text_command(Agent,[run,Term], Agent,prologCall(Term)).
 
 
 :- use_module(library(check)).
-:- at_start(check:list_undefined).
+% :- at_start(check:list_undefined).
 
 % GOLOG SYSTEM WITHOUT FLUX (Default Commented Out)
 %:- if_flag_true(fullStart,ensure_loaded(logicmoo('indigolog/indigolog_main_swi.pl'))).
@@ -71,10 +87,10 @@ moo:agent_text_command(Agent,[run,Term], Agent,prologCall(Term)).
 %:- if_flag_true(fullStart,ensure_loaded(logicmoo('indigolog/flux_main_swi.pl'))).
 
 % FLUX AGENT SYSTEM WITH GOLOG
-:- if_flag_true(fullStart,ensure_loaded(logicmoo('indigolog/indigolog_main_swi_flux.pl'))).
+% :- if_flag_true(true,ensure_loaded(logicmoo('indigolog/indigolog_main_swi_flux.pl'))).
 
 % LOGICMOO DATABASE LOGIC ENGINE SERVER
-:- if_flag_true(fullStart,ensure_loaded(logicmoo('database/logicmoo.swi'))).
+%:- if_flag_true(true,ensure_loaded(logicmoo('database/logicmoo.swi'))).
 
 % when we import new and awefull code base (the previous )this can be helpfull
 % we redfine list_undefined/1 .. this is the old version
@@ -90,12 +106,7 @@ lundef :- A = [],
             maplist(report_undefined, G)
         )).
 
-:- if_flag_true(fullStart,
-(
- redefine_system_predicate(check:list_undefined(_)),
- abolish(check:list_undefined/1),
- assert((check:list_undefined(A):- not(thread_self(main)),!, ignore(A=[]))),
- assert((check:list_undefined(A):- ignore(A=[]))))).
+:- if_flag_true(fullStart,remove_undef_search).
 
 
 /*
@@ -119,12 +130,11 @@ run_setup:-
    nodebug,
    debug,
    scan_db_prop,
-   at_start(gload),
+   at_start(load_game(logicmoo('rooms/startrek.all.pl'))),
    register_timer_thread(npc_ticker,1,npc_tick_tock).
 
 run:-
    login_and_run.
-
 
 % LOGICMOO LOGICSERVER DATA (Defaut uncommented)
 :- if_flag_true(fullStart, ensure_loaded(logicmoo('data/mworld0.pldata'))).
@@ -136,12 +146,22 @@ run:-
 :- noguitracer.
 
 % :- at_start(run).
-:- at_start(run_setup).
+%:- run_setup.
 
 % do some sanity testing
+ht:- do_player_action('s'),
+   do_player_action(look),
+   do_player_action('s'),
+   do_player_action('s'),
+   do_player_action('e'),
+   do_player_action('e'),
+   do_player_action(look),
+   do_player_action('s'),
+   do_player_action('s').
 
+:- at_start(start_servers).
 
-moo:decl_mud_test(test_movedist,
+moo:mud_test(test_movedist,
  (
   foc_current_player(P),
    test_name("teleport to main enginering"),
@@ -159,7 +179,7 @@ moo:decl_mud_test(test_movedist,
    test_name("must be now be back in engineering"),
    test_true(req(atloc(P,'Area1000'))))).
 
-moo:decl_mud_test(drop_take,
+moo:mud_test(drop_take,
  (
   do_player_action('drop food'),
   do_player_action('take food')
@@ -172,6 +192,5 @@ moo:decl_mud_test(drop_take,
 :- at_start((debug,run)).
 
 % so scripted versions don't just exit
-
-% :- prolog.
+% :- at_start(prolog).
 

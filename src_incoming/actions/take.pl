@@ -11,9 +11,9 @@
 */
 :- module(take, []).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(command).
+:- register_module_type(command).
 
 % Take something
 % Successfully picking something up
@@ -51,7 +51,7 @@ check_permanence(take,Agent,_,Obj) :-
 check_permanence(take,_,_,_).
 
 % Record keeping
-moo:decl_update_charge(Agent,take) :-
+moo:update_charge(Agent,take) :-
       padd(Agent,[charge(-2)]).
 
 
@@ -59,5 +59,5 @@ moo:decl_update_charge(Agent,take) :-
 
 
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 

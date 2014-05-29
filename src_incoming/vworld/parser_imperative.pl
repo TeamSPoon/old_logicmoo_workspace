@@ -1,7 +1,7 @@
 /* <module>
 % Imperitive Sentence Parser (using DCG)
 %
-% Project Logicmoo: A MUD server written in Prolog
+% Project LogicMoo: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
@@ -20,10 +20,12 @@
                    parse_for/2,
                    parse_for/3,
                    parse_for/4,
+                   print_parse_for/5,
                    object_match/2,
                    object_string/2,
                    order_descriptions/3,
                    string_equal_ci/2,
+                   append_ci/3,
                    starts_with_icase/2,
                    sort_by_strlen/2,
                    remove_predupes/2,
@@ -37,23 +39,23 @@
 :- meta_predicate call_no_cuts_0(?).
 :- meta_predicate call_tabled(?).
 :- meta_predicate findall_tabled4(?,?,?,?).
-
+:- meta_predicate print_parse_for(2,?,?,?,?).
 
 % :- include(logicmoo('vworld/moo_header')).
 
-:- moo:register_module_type(utility).
+:- register_module_type(utility).
 
 :- ensure_loaded(logicmoo('vworld/parser_e2c')).
 
 % ===========================================================
 % PARSE command
 % ===========================================================
-moo:decl_action(_Human_Player,parse(prolog,list(term)),"Development test to parse some Text for a human.  Usage: parse 'item' the blue backpack").
+moo:action_help(parse(prolog,list(term)),"Development test to parse some Text for a human.  Usage: parse 'item' the blue backpack").
 
 moo:agent_text_command(Agent,[parse,Type|List],Agent,parse(Type,List)).
 
 moo:agent_call_command(_Gent,parse(Type,StringM)):-
-   parse_for(Type,StringM,_Term,_LeftOver,fmt).
+   print_parse_for(Type,StringM,_Term,_LeftOver,fmt).
 
 parse_for(Type,StringM):- parse_for(Type,StringM, _Term).
 
@@ -63,9 +65,9 @@ list_tail(_,[]).
 list_tail(String,LeftOver):-ground(String),to_word_list(String,List),length(List,L),!,between(1,L,X),length(LeftOver,X).
 
 parse_for(Type,StringM,Term,LeftOver):- 
-     parse_for(dmsg_parserm,Type,StringM,Term,LeftOver).
+     print_parse_for(dmsg_parserm,Type,StringM,Term,LeftOver).
 
-parse_for(Print2, Type,StringM,Term,LeftOver):- 
+print_parse_for(Print2, Type,StringM,Term,LeftOver):- 
    to_word_list(StringM,String),
    list_tail(String,LeftOver),
    HOW = phrase(parseIsa(Type,Term),String,LeftOver),
@@ -158,6 +160,9 @@ member_ci(L,[List|I]):-!,member(LL2,[List|I]),string_equal_ci(LL2,L).
 member_ci(L,L):-to_word_list(L,ListI),member(LL2,ListI),string_equal_ci(LL2,L).
 
 string_ci(A,LIC):-hotrace((any_to_string(A,S),text_to_string(S,SS),string_lower(SS,SL),atomics_to_string(SLIC,"_",SL),atomics_to_string(SLIC," ",LIC))),!.
+
+append_ci([],L1,L2):-string_equal_ci(L1,L2),!.
+append_ci([H1|T],L2,[H2|L3]) :- string_equal_ci(H1,H2),append_ci(T,L2,L3).
 
 string_equal_ci(L0,L1):-once(string_ci(L0,SL0)),string_ci(L1,SL0),!.
 string_equal_ci(L0,L0):-!.
@@ -266,7 +271,7 @@ verb_matches(SVERB,VERB):-samef(VERB,SVERB).
 parse_vp_templates(Agent,SVERB,_ARGS,TEMPLATES):-
    findall([VERB|TYPEARGS],
     ((     
-     moo:decl_action(What,TEMPL,_),
+     moo:type_action_help(What,TEMPL,_),
      mud_isa(Agent,What),
      TEMPL=..[VERB|TYPEARGS],
      verb_matches(SVERB,VERB))),
@@ -349,8 +354,8 @@ expire_tabled_list(T):-CT= call_tabled_list(Key,List),doall(((CT,any_term_overla
 
 any_term_overlap(T1,T2):-atoms_of(T1,A1),atoms_of(T2,A2),!,member(A,A1),member(A,A2),!.
 
-moo:decl_database_hook(assert(_),C):-expire_tabled_list(C).
-moo:decl_database_hook(retract(_),C):-expire_tabled_list(C).
+moo:database_hook(assert(_),C):-expire_tabled_list(C).
+moo:database_hook(retract(_),C):-expire_tabled_list(C).
 
 call_tabled(findall(A,B,C)):-!,findall_tabled(A,B,C).
 call_tabled(C):-copy_term(C,CC),numbervars(CC,'$VAR',0,_),call_tabled(C,C).
@@ -376,19 +381,19 @@ parseForIsa(optional(_Type,Who), Who, D, D).
 parseForIsa(not(Type), Term, C, D) :-  dcgAnd(dcgNot(parseIsa(Type)), theText(Term), C, D).
 parseForIsa(FT, B, C, D):-to_word_list(C,O),O\=C,!,parseForIsa(FT, B, O, D).
 parseForIsa(FT, B, [AT|C], D) :- nonvar(AT),member_ci(AT,['at','the','a','an']),!,parseForIsa(FT, B, C, D).
-parseForIsa(FT, B, C, D) :- trans_decl_sub(FT,Sub), parseFmtOrIsa(Sub, B, C, D),!.
-parseForIsa(FT, B, C, D) :- trans_decl_sub(Sub,FT), parseFmtOrIsa(Sub, B, C, D),!.
+parseForIsa(FT, B, C, D) :- query_trans_sub(FT,Sub), parseFmtOrIsa(Sub, B, C, D),!.
+parseForIsa(FT, B, C, D) :- query_trans_sub(Sub,FT), parseFmtOrIsa(Sub, B, C, D),!.
 parseForIsa(FT, B, C, D) :- parseFmtOrIsa(FT, B, C, D),!.
 
-trans_decl_sub(Sub,Super):-trans_decl_subft(Sub,Super).
-trans_decl_sub(Sub,Super):-trans_decl_sc(Sub,Super).
+query_trans_sub(Sub,Super):-query_trans_subft(Sub,Super).
+query_trans_sub(Sub,Super):-query_trans_sc(Sub,Super).
 
-trans_decl_subft(FT,Sub):-moo:decl_subft(FT,Sub).
-trans_decl_subft(FT,Sub):-moo:decl_subft(FT,A),moo:decl_subft(A,Sub).
-trans_decl_subft(FT,Sub):-moo:decl_subft(FT,A),moo:decl_subft(A,B),moo:decl_subft(B,Sub).
-trans_decl_sc(FT,Sub):-moo:subclass(FT,Sub).
-trans_decl_sc(FT,Sub):-moo:subclass(FT,A),moo:subclass(A,Sub).
-trans_decl_sc(FT,Sub):-moo:subclass(FT,A),moo:subclass(A,B),moo:subclass(B,Sub).
+query_trans_subft(FT,Sub):-moo:subft(FT,Sub).
+query_trans_subft(FT,Sub):-moo:subft(FT,A),moo:subft(A,Sub).
+query_trans_subft(FT,Sub):-moo:subft(FT,A),moo:subft(A,B),moo:subft(B,Sub).
+query_trans_sc(FT,Sub):-moo:subclass(FT,Sub).
+query_trans_sc(FT,Sub):-moo:subclass(FT,A),moo:subclass(A,Sub).
+query_trans_sc(FT,Sub):-moo:subclass(FT,A),moo:subclass(A,B),moo:subclass(B,Sub).
 
 
 equals_icase(A,B):-string_ci(A,U),string_ci(B,U).
@@ -418,10 +423,10 @@ parseFmt(and([L|List]),Term1) --> dcgAnd(parseForIsa(L,Term1),parseForIsa(and(Li
 parseFmt(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{specifiedItemType(String,Type,Term)}.
 
 specifiedItemType([String],Type,StringO):-nonvar(String),!,specifiedItemType(String,Type,StringO).
-specifiedItemType(String,Type,Inst) :- moo:specifier_text(Inst,Type), equals_icase(Inst,String),!.
+specifiedItemType(String,Type,Inst) :- specifier_text(Inst,Type), equals_icase(Inst,String),!.
 specifiedItemType(String,Type,Inst):- instances_of_type(Inst,Type),object_match(String,Inst),!.
 specifiedItemType(String,Type,Longest) :- findall(Inst, (moo:specifier_text(Inst,Type),starts_or_ends_with_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
-specifiedItemType(A,T,AA):- is_decl_ft(T), format_complies(A,T,AA),!.
+specifiedItemType(A,T,AA):- is_ft(T), format_complies(A,T,AA),!.
 
 instances_of_type(Inst,Type):- setof(Inst-Type,mud_isa(Inst,Type),Set),member(Inst-Type,Set).
 % instances_of_type(Inst,Type):- atom(Type), Term =..[Type,Inst], logOnError(req(Term)).
@@ -436,6 +441,6 @@ longest_string(Order,TStr1,TStr2):-
 
 
 
-% :- include(logicmoo('vworld/moo_footer')).
+% :- include(logicmoo(vworld/moo_footer)).
 
 

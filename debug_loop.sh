@@ -9,10 +9,10 @@ while [ 1 ]
 do
         echo "Hit CTRL+C ${BASH_SOURCE[0]} ";
         cd $OLDPWD
-           reset
+           reset -w
         sleep 3;
         cd $NEWPWD
         swipl -f run_debug.pl
-        reset
+        reset -w
 done
 
