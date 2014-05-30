@@ -35,8 +35,7 @@
 
 :- ensure_loaded(logicmoo(vworld/moo)).
 :- ensure_loaded(logicmoo(vworld/dbase)).
-
-:-include(moo_loadall).
+:- ensure_moo_loaded(logicmoo(vworld/world)).
 
 
 % Define the agents traits, both for your agent and the world inhabitants. 
@@ -70,6 +69,7 @@
 % :- must(old_setup).
 
 % [Optionaly] Start the telnet server
+
 :-at_start(toploop_telnet:start_mud_telnet(4000)).
 
 

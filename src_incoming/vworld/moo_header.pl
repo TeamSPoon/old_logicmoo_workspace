@@ -37,5 +37,9 @@
 :- ensure_moo_loaded(logicmoo(vworld/parser_e2c)).
 :- ensure_moo_loaded(logicmoo(vworld/parser_imperative)).
 
-:- ensure_loaded(logicmoo(vworld/moo_loader)).
+:- ensure_moo_loaded(logicmoo(vworld/moo_loader)).
 :- ensure_moo_loaded(logicmoo(vworld/moo_testing)).
+
+:-include(moo_loadall).
+
+

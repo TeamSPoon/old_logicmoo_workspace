@@ -18,6 +18,7 @@
 */
 
 :- module(vacuum_map,[]).
+:- include(logicmoo(vworld/moo_header)).
 
 moo:grid_key( ed='edge of world').
 moo:grid_key( hw='high wall').
@@ -50,4 +51,4 @@ moo:type_grid(storage,18,[ed,--,--,--,--,--,--,--,--,--,dt,dt,--,--,--,--,--,--,
 moo:type_grid(storage,19,[ed,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,ed]).
 moo:type_grid(storage,20,[ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed]).
 
-
+:- include(logicmoo(vworld/moo_footer)).
