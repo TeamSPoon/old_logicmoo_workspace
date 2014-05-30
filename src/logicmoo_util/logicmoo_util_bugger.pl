@@ -12,6 +12,7 @@
 :-module(bugger,[
      was_module/2,
      programmer_error/1,
+     moo_hide_childs/1,
      forall_member/3,
      debugOnError0/1,
      global_pathname/2,
@@ -120,6 +121,8 @@ set_bugger_flag(F,V):-current_prolog_flag(F,_Old),set_prolog_flag(F,V),!.
 set_bugger_flag(F,V):-create_prolog_flag(F,V,[term]).
 
 
+:- meta_predicate moo_hide_childs(:).
+
 :- meta_predicate atLeastOne3(+,:,:).
 :- meta_predicate atLeastOne0(:,:).
 :- meta_predicate atLeastOne(:).
@@ -162,8 +165,9 @@ set_bugger_flag(F,V):-create_prolog_flag(F,V,[term]).
 :- meta_predicate prolog_must(:).
 :- meta_predicate showProfilerStatistics(:).
 :- meta_predicate notrace_call(:).
+:- meta_predicate debugCallF(:).
 
-:-use_module(logicmoo('logicmoo_util/logicmoo_util_ctx_frame.pl')).
+:-ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_ctx_frame.pl')).
 
  % cli_notrace(+Call) is nondet.
  % use call/1 with trace turned off
@@ -182,8 +186,8 @@ set_bugger_flag(F,V):-create_prolog_flag(F,V,[term]).
 % =========================================================================
 
 
-:-use_module(logicmoo('logicmoo_util/logicmoo_util_strings.pl')).
-:-use_module(logicmoo('logicmoo_util/logicmoo_util_library.pl')).
+:-ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_strings.pl')).
+:-ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_library.pl')).
 
 ib_multi_transparent(MT):-multifile(MT),module_transparent(MT),dynamic(MT).
 
@@ -1006,15 +1010,19 @@ to_m_f_arity_pi(PI,_M,F,A,PI):-!,functor(PI,F,A).
 moo_hide(_PIn):-showHiddens,!.
 moo_hide(PIn):-
  must(to_m_f_arity_pi(PIn,M,_F,_A,MPred)),
- moo_hide1(M,MPred).
+ moo_hide_childs(M,MPred).
 
-moo_hide1(M,Pred):-
+
+moo_hide_childs(M:Pred):-
+  moo_hide_childs(M,Pred).
+
+moo_hide_childs(M,Pred):-
   predicate_property(Pred,imported_from(M)),
  '$set_predicate_attribute'(M:Pred, trace, 0),
  '$set_predicate_attribute'(M:Pred, noprofile, 1),
  '$set_predicate_attribute'(M:Pred, hide_childs, 1),!.
 
-moo_hide1(N,MPred):-
+moo_hide_childs(N,MPred):-
  predicate_property(MPred,imported_from(M)),
   writeq(wont_hide(M,N,MPred)),nl.
 
@@ -1097,7 +1105,7 @@ bugger_expand_term(T,_):- bdmsg(bugger_expand_term(T)),fail.
 
 % user:expand_term(G,G2):- compound(G),bugger_expand_term(G,G2),!.
 
-user:term_expansion((H:-G),(H:-G2)):- bugger_term_expansion(G,G2).
+% user:term_expansion((H:-G),(H:-G2)):- bugger_term_expansion(G,G2).
 
 
 

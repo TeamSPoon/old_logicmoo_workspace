@@ -5,7 +5,7 @@
 */
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- moodb:register_module_type(command).
 
 moo:action_help('@get'(optional(term,self),term),text("@get term to a property")).
 moo:action_help('@set'(optional(term,self),atom,term),text("@sets term to a property")).

@@ -84,19 +84,19 @@ balanceBindingS([A|L],[AA|LL]):-balanceBinding(A,AA),balanceBindingS(L,LL).
 isCycUnavailable :- true.
 
 getCycConnection(SocketId,OutStream,InStream):-
-      retract(dbase:cycConnection(SocketId,OutStream,InStream)),
-      assertz(dbase:cycConnectionUsed(SocketId,OutStream,InStream)),!.
+      retract(cycConnection(SocketId,OutStream,InStream)),
+      assertz(cycConnectionUsed(SocketId,OutStream,InStream)),!.
 
 getCycConnection(SocketId,OutStream,InStream):-
       tcp_socket(SocketId),
       tcp_connect(SocketId,'CycServer':3601),
       tcp_open_socket(SocketId, InStream, OutStream),!,
       isDebug((fmt(user_error,'Connected to Cyc TCP Server {~w,~w}\n',[InStream,OutStream]),flush_output(user_error))),
-      assertz(dbase:cycConnectionUsed(SocketId,OutStream,InStream)),!.
+      assertz(cycConnectionUsed(SocketId,OutStream,InStream)),!.
 
 finishCycConnection(SocketId,OutStream,InStream):-
-      ignore(system:retractall(dbase:cycConnectionUsed(SocketId,OutStream,InStream))),
-      asserta(dbase:cycConnection(SocketId,OutStream,InStream)),!.
+      ignore(system:retractall(cycConnectionUsed(SocketId,OutStream,InStream))),
+      asserta(cycConnection(SocketId,OutStream,InStream)),!.
       
 cycStats:- % will add more 
    listing(cycConnection),
@@ -288,7 +288,7 @@ cycAssert(CycL):-
 
 cycAssert(_CycL,_Mt):- isCycUnavailable,!.
 cycAssert(CycL,Mt):-
-      system:retractall(dbase:cached_query(_,_)),
+      system:retractall(cached_query(_,_)),
       cyclifyNew(CycL,CycLGood),
       cyclify(Mt,MtGood),
       defaultAssertOptions(DefaultOptions), 
@@ -312,7 +312,7 @@ cycRetractAll(CycL):-
 
 cycRetractAll(CycL,Mt):-cycUnassert(CycL,Mt).
 cycUnassert(CycL,Mt):-
-      system:retractall(dbase:cached_query(_,_)),
+      system:retractall(cached_query(_,_)),
       cyclifyNew(CycL,CycLGood),
       cyclify(Mt,MtGood),
       invokeSubL('CYC-UNASSERT'(quote(CycLGood),MtGood)).
@@ -538,10 +538,10 @@ retractAllThrough(ToMt,CycL):-
 
 
 % examples
-:-registerCycPred('BaseKB',dbase:isa,2).
-:-registerCycPred('BaseKB',dbase:genls,2).
+:-registerCycPred('BaseKB',isa,2).
+:-registerCycPred('BaseKB',genls,2).
 :-registerCycPred('BaseKB',genlMt,2).
-:-registerCycPred('BaseKB',dbase:arity,2).
+:-registerCycPred('BaseKB',arity,2).
 
 
 % ============================================

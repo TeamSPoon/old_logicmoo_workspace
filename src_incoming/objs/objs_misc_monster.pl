@@ -44,9 +44,9 @@
 %        doing Action on object defined.
 %
 % # permanence(take,N) where N ranges from 0-2.
-% ---> 0 = object dissapears when taken.
+% ---> dissapears = 0 = object dissapears when taken.
 % ---> 1 = object is held when taken, can be eaten/destroyed (see eat.pl)
-% ---> 2 = object stays where it is but something else (charge,score)
+% --->  2 = object stays where it is but something else (charge,score)
 %          is usually accumulated.
 %
 % # attack(N) where N is some positive or negative interger.
@@ -224,11 +224,11 @@ Object applies:
 
 :- include(logicmoo(vworld/moo_header)).
 
-:-ignore(moo:register_module_type([world_types,parser])).
+:-ignore(moo:moodb:register_module_type([world_types,parser])).
 
 label_type(Label,Type):-moo:label_type_props(Label,Type,_).
 
-% :-moo:register_module_type(dynamic).
+% :-moo:moodb:register_module_type(dynamic).
 
 max_charge(500).
 max_damage(120).
@@ -242,18 +242,18 @@ moo:label_type_props(wl,wall,[height(3),weight(4)]).
 moo:label_type_props(tr,tree,[height(3),weight(4)]).
 moo:label_type_props(rk,rock,[height(2),weight(4)]).
 moo:label_type_props(pt,pit,[height(-1),weight(4)]).
-moo:label_type_props(ot,outlet,[height(1),weight(1),permanence(take,2),act(take,charge(50))]).
-moo:label_type_props(nt,nut,[height(1),weight(1),permanence(take,1),act(eat,charge(40)),spawn_rate(10)]).
+moo:label_type_props(ot,outlet,[height(1),weight(1),permanence(take,2),act(take,charge(+50))]).
+moo:label_type_props(nt,nut,[height(1),weight(1),permanence(take,1),act(eat,charge(+40)),spawn_rate(10)]).
 moo:label_type_props(lw,low_wall,[height(2),weight(4)]).
 moo:label_type_props(lg,ledge,[height(2),weight(4)]).
 moo:label_type_props(lb,low_box,[height(2),weight(2)]).
 moo:label_type_props(hw,high_wall,[height(3),weight(4)]).
 moo:label_type_props(hb,high_box,[height(3),weight(3)]).
-moo:label_type_props(gd,gold,[height(1),weight(1),permanence(take,0),act(take,score(10))]).
-moo:label_type_props(fd,food,[height(1),weight(1),permanence(take,1),act(eat,charge(80))]).
+moo:label_type_props(gd,gold,[height(1),weight(1),permanence(take,dissapears),act(take,score(+10))]).
+moo:label_type_props(fd,food,[height(1),weight(1),permanence(take,1),act(eat,charge(+80))]).
 moo:label_type_props(el,elixer,[height(1),weight(1),permanence(take,1),act(eat,damage(-10))]).
 moo:label_type_props(ed,edge,[height(10),weight(4)]).
-moo:label_type_props(dt,dirt,[height(1),weight(1),permanence(take,0),act(take,score(1)),spawn_rate(5)]).
+moo:label_type_props(dt,dirt,[height(1),weight(1),permanence(take,dissapears),act(take,score(+1)),spawn_rate(5)]).
 moo:label_type_props(dr,door,[height(3),weight(2)]).
 
 %Empty Location
@@ -262,8 +262,8 @@ moo:label_type_props(--,0,[]).
 
 % What an agent turns into upon death.
 % Must be named corpse (or edit abent_to_corpse/1 in lib.pl.
-moo:label_type_props(cp,corpsea,[height(1),weight(1),permanence(take,1),act(eat,charge(80)),act(take,score(10))]).
-moo:label_type_props(cp,corpseb,[height(1),weight(1),permanence(take,1),act(eat,charge(120))]).
+moo:label_type_props(cp,corpsea,[height(1),weight(1),permanence(take,1),act(eat,charge(+80)),act(take,score(+10))]).
+moo:label_type_props(cp,corpseb,[height(1),weight(1),permanence(take,1),act(eat,charge(+120))]).
 moo:label_type_props(da,corpsec,[height(2),weight(2)]).
 % This is used to make the monster roaming the maze a bit tougher
 % It doesn't require any of the usual traits since the monster will never 

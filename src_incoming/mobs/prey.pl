@@ -16,8 +16,8 @@
 :- module(prey,[]).
 
 :- include(logicmoo(vworld/moo_header)).
-:- register_module_type(planning).
-:- register_module_type(command).
+:- moodb:register_module_type(planning).
+:- moodb:register_module_type(command).
 
 % Predicates asserted during run.
 % :- dynamic memory/2. 

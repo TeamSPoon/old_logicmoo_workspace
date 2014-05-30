@@ -41,11 +41,9 @@
 :- meta_predicate findall_tabled4(?,?,?,?).
 :- meta_predicate print_parse_for(2,?,?,?,?).
 
-% :- include(logicmoo('vworld/moo_header')).
+:- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(utility).
-
-:- ensure_loaded(logicmoo('vworld/parser_e2c')).
+:- moodb:register_module_type(utility).
 
 % ===========================================================
 % PARSE command
@@ -205,7 +203,7 @@ call_no_cuts(CALL):-clause(CALL,TEST),call_no_cuts_0(TEST).
 
 call_no_cuts_0(true):-!.
 call_no_cuts_0((!)):-!.
-call_no_cuts_0((A,B)):-!.call_no_cuts_0(A),call_no_cuts_0(B).
+call_no_cuts_0((A,B)):-!,call_no_cuts_0(A),call_no_cuts_0(B).
 call_no_cuts_0(C):-call(C).
 
 dmsg_parserm(_).
@@ -261,7 +259,7 @@ moo:verb_alias('l','look').
 moo:verb_alias('s','move s').
 moo:verb_alias('where is','where').
 
-pos_word_formula('infinitive',Verb,Formula):- dbase:'infinitive'(TheWord, Verb, _, _G183), dbase:'verbSemTrans'(TheWord, 0, 'TransitiveNPCompFrame', Formula, _, _).
+pos_word_formula('infinitive',Verb,Formula):- 'infinitive'(TheWord, Verb, _, _G183), 'verbSemTrans'(TheWord, 0, 'TransitiveNPCompFrame', Formula, _, _).
 
 verb_alias_to_verb(IVERB,SVERB):-moo:verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.
 verb_alias_to_verb(IVERB,SVERB):-specifiedItemType(IVERB,verb,SVERB), IVERB \= SVERB.

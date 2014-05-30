@@ -19,7 +19,7 @@ action_requires_states(_Agent,List,Preconds):-findall(A,(member(A,List),\+ funct
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- moodb:register_module_type(command).
 moo:action_rules(_,_,_,_):-fail.
 
 moo:action_rules(Agent,use,[Obj],[possess(Agent,Obj),mud_isa(Obj,useable),stowed(Agent,Obj)->using(Agent,Obj)]).

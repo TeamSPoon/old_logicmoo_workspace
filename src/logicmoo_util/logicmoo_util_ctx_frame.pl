@@ -38,8 +38,8 @@
 
 :- meta_predicate with_assertions(:,0).
 
-:-use_module(logicmoo('logicmoo_util/logicmoo_util_library.pl')).
-:-use_module(logicmoo('logicmoo_util/logicmoo_util_bugger.pl')).
+:-ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_library.pl')).
+:-ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_bugger.pl')).
 
 currentContext(Name,X):-hotrace(makeLocalContext(Name,X)),!.
 

@@ -5,7 +5,7 @@
 */
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- moodb:register_module_type(command).
 
 
 % ====================================================
@@ -19,6 +19,14 @@ inventory(Agent,Percepts) :-  inventory0(Agent,Percepts0),!,flatten_dedupe(Perce
 inventory0(Agent, Inv) :-
 	findall(Poss,possess(Agent,Poss),Inv).
 
+
+test_exists(O):-moo:item(O).
+test_exists(O):-kb:agent(O).
+test_exists(O):-moo:region(O).
+test_anyInst(O):-moo:type(O).
+test_anyInst(O):-test_exists(O).
+
+:- listing(inventory:_).
 
 :- include(logicmoo(vworld/moo_footer)).
 

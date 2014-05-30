@@ -17,6 +17,7 @@
 %
 */
 
+:- module(vacuum_map,[]).
 
 moo:grid_key( ed='edge of world').
 moo:grid_key( hw='high wall').

@@ -11,6 +11,7 @@
           npc_tick/0,
           join_npcs_long_running/0,npc_tick_tock/0,npc_tick_tock_time/1,
           npc_controller/2,   
+          warnOnError/1,
           get_world_agent_plan/3,
           tick_controller/2]).
 
@@ -18,7 +19,7 @@
 :- meta_predicate agent_call_safely(?,?,?).
 
 :- include(logicmoo(vworld/moo_header)).
-:- begin_transform_moo_preds.
+:- moodb:begin_transform_moo_preds.
 :- dynamic(npc_tick_tock_time/1).
 npc_tick_tock_time(300).
 
@@ -54,7 +55,7 @@ move_or_sit_memory_idea(Agent,sit,_) :-
 
 tick(Who):-
    findall(Idea,get_world_agent_plan(current,Who,Idea),IdeaS),!,IdeaS=[_|_],
-   random_member(Idea,IdeaS),!,
+   my_random_member(Idea,IdeaS),!,
    do_agent_call_plan_command(Who,Idea).
 
 

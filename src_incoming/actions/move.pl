@@ -14,9 +14,9 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- moodb:register_module_type(command).
 
-:- begin_transform_moo_preds.
+:- moodb:begin_transform_moo_preds.
 
 moo:agent_text_command(Agent,[DirSS],Agent,move(Dir)):- catch(((string_to_atom(DirSS,Dir),moo:specifier_text(Dir,dir))),_,fail),!.
 
@@ -24,7 +24,7 @@ moo:agent_text_command(Agent,[DirSS],Agent,move(DirS)):-
  catch(((string_to_atom(DirSS,DirS),moo:specifier_text(Dir,dir),
        catch((atom_concat(Dir,N,DirS),(atom_number(N,_))),_,fail))),_,fail).
 
-dbase:dbase_t(agent_call_command,Agnt,Cmd):- functor(Cmd,move,_),!,
+agent_call_command(Agnt,Cmd):- functor(Cmd,move,_),!,
    must(move_command(Agnt,Cmd)).
 
 moo:action_info(move(dir)).

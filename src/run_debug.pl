@@ -7,6 +7,7 @@
 
 :- dynamic(fullStart/0).
 % :- guitracer.
+:- set_prolog_flag(verbose_load,true).
 
 
 % ======================================================
@@ -51,7 +52,13 @@ if_version_greater(V,Goal):- current_prolog_flag(version,F), ((F > V) -> call(Go
 % if we don't start cliopatria we have to manually start
 %
 start_servers :- !.
-start_servers :- if_version_greater(70111,thread_create(ensure_loaded(logicmoo(launchcliopatria)),_,[alias(loading_code)])).
+
+
+%%:- ensure_loaded('t:/devel/cliopatria/rdfql/sparql_runtime.pl').
+
+start_servers :- if_version_greater(70111,ensure_loaded(logicmoo(launchcliopatria))).
+
+% start_servers :- if_version_greater(70111,thread_create(ensure_loaded(logicmoo(launchcliopatria)),_,[alias(loading_code)])).
 
 % start_servers
 % this is evil. Starts the old mudconsole, the experiment with Jan's
@@ -63,6 +70,7 @@ start_servers :- if_version_greater(70111,thread_create(ensure_loaded(logicmoo(l
 % [Required] load and start mud
 :- ensure_loaded(logicmoo('vworld/moo_startup')).
 
+
 /*
 % Load datalog
 :- if_flag_true(fullStart, ((ensure_loaded(logicmoo('des/des.pl')),
@@ -73,8 +81,6 @@ start_servers :- if_version_greater(70111,thread_create(ensure_loaded(logicmoo(l
    !))).
 
 */
-
-moo:agent_text_command(Agent,[run,Term], Agent,prologCall(Term)).
 
 
 :- use_module(library(check)).
@@ -124,6 +130,11 @@ lundef :- A = [],
 
 */
 
+:- moodb:begin_transform_moo_preds.
+
+moo:agent_text_command(Agent,[run,Term], Agent,prologCall(Term)).
+
+
 % [Optionaly] Put a telnet client handler on the main console
 % :- at_start(login_and_run).
 
@@ -159,8 +170,12 @@ ht:- do_player_action('s'),
 
 :- noguitracer.
 
+:- make.
+
 :- at_start(start_servers).
 :- at_start(run_setup).
+
+
 :- at_start(run).
 
 % So scripted versions don't just exit

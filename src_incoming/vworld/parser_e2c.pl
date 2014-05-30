@@ -17,12 +17,11 @@
 
 
 % :- ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_all.pl')).
-:- ensure_loaded(logicmoo(vworld/moo)).
 
 :- meta_predicate do_dcg(?,?,?,?,?).
 :- meta_predicate isPOS(?,?,?,?,?).
 
-:- register_module_type(utility).
+:- moodb:register_module_type(utility).
 
 % posm_cached(CycL, Phrase,POS,Form,CycL)
 :-dynamic lex/3,  lexMap/3.
@@ -30,9 +29,9 @@
 idGen(X):-flag(idGen,X,X+1).
 
 %:- ensure_loaded(logicmoo('vworld/dbase.pl')).
-:- begin_transform_moo_preds.
+:- moodb:begin_transform_moo_preds.
 
-
+:- retractall(moodb:prevent_transform_moo_preds).
 
 % Semantic Interpretation
 /* from Bratko chapter 17 page 455.
@@ -950,7 +949,7 @@ cycPred('affixRuleTypeMorphemePosition').
 cycPred('etymologicalVariantOfSuffix').
 cycPred('variantOfSuffix').
 cycPred('relationInstanceAll').
-cycPred(dbase:'genls').
+cycPred('genls').
 cycPred('disjointWith').
 cycPred('coExtensional').
 cycPred('partitionedInto').
@@ -2192,7 +2191,7 @@ colection(Subj,isaMember(Subj,CycL)) --> isPOS('Noun',CycWord,String),
 
 wordPosCycL(CycWord,POS,CycL):-
       'denotation'(CycWord, POS, _, CycL,_,_);'denotationRelatedTo'(CycWord, POS, _, CycL,_,_).
-wordPosCycL(CycWord,POS,CycL):- dbase:'genls'(Child,POS,_,_),wordPosCycL(CycWord,Child,CycL).
+wordPosCycL(CycWord,POS,CycL):- 'genls'(Child,POS,_,_),wordPosCycL(CycWord,Child,CycL).
 wordPosCycL(CycWord,_,CycL):-
       'denotation'(CycWord, POS, _, CycL,_,_);'denotationRelatedTo'(CycWord, POS, _, CycL,_,_).
       
@@ -2295,7 +2294,7 @@ meetsPos(String,POS,CycWord):- (nonground(String);nonground(POS)),throw(meetsPos
 meetsPos([String],POS,CycWord):-!,meetsPos(String,POS,CycWord).
 meetsPos(String,POS,CycWord):-'partOfSpeech'(CycWord,POS, String,_,_).
 meetsPos(String,POS,CycWord):-stringToWordForm(String,CycWord,Form),cycWordPosForm(POS,CycWord,Form).
-meetsPos(String,POS,CycWord):-dbase:'genls'(Child,POS,_,_),meetsPos(String,Child,CycWord).
+meetsPos(String,POS,CycWord):-moomt:'genls'(Child,POS,_,_),meetsPos(String,Child,CycWord).
 meetsPos(String,'Verb',CycWord):-atom(String),meetsPosVerb(String,CycWord),!.
 
 %meetsPos(String,'Noun',CycWord):-atom(String),meetsPosNoun(String,CycWord).
@@ -2957,5 +2956,5 @@ atom_junct2([W|S],[W|Words]):-atom_junct2(S,Words).
 % :- include(logicmoo(vworld/moo_footer)).
 
 
-:- end_transform_moo_preds.
+:-  moodb:end_transform_moo_preds.
 

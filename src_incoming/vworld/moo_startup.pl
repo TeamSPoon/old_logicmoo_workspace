@@ -11,23 +11,32 @@
 % Dec 13, 2035
 %
 */
+:- set_prolog_flag(verbose_load,true).
 
-:- include(logicmoo(vworld/moo_header)).
-:- include(logicmoo(vworld/moo_loadall)).
+% logicmoo utils shared with other systems
 
-% standard header used in all files that all modules are loaded (therefore useful for when(?) the day comes that modules *can*only*see their explicitly imported modules)
+:- ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_bugger)).
+:- ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_library)).
+:- ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)).
+:- ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_strings)).
+:- ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_terms)).
+:- ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_dcg)).
+:- set_prolog_flag(verbose_load,true).
+% these do not get defined!?
+% :-dynamic user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
 
-% These contain the definition of the object types.
-:- ensure_loaded(logicmoo('objs/objs_misc_monster.pl')). 
+% These three are for use with Quintus
+%:- prolog_flag(unknown,error,fail). % Not sure if this is needed for Quintus
+%:- ensure_loaded(library(random)).
+%:- ensure_loaded(library(date)).
 
-% Load the map file (*.map.pl) appropriate for the world being used.
-:- ensure_loaded(logicmoo('rooms/vacuum.map.pl')).
+% This one is for use with SWI
+:- ensure_loaded(library(quintus)).
 
-% puts world into running state
-% :- must(old_setup).
+:- ensure_loaded(logicmoo(vworld/moo)).
+:- ensure_loaded(logicmoo(vworld/dbase)).
 
-% standard footer to clean up any header defined states
-:- include(logicmoo(vworld/moo_footer)).
+:-include(moo_loadall).
 
 
 % Define the agents traits, both for your agent and the world inhabitants. 
@@ -47,10 +56,20 @@
 :-create_agent(explorer(2),[]).
 */
 
-% [Optionaly] Start the telent server
-:-at_start(start_mud_telent(4000)).
 
+% standard header used in all files that all modules are loaded (therefore useful for when(?) the day comes that modules *can*only*see their explicitly imported modules)
+% :- ensure_loaded(logicmoo(vworld/moo_header)).
 
+% These contain the definition of the object types.
+:- ensure_moo_loaded(logicmoo('objs/objs_misc_monster.pl')). 
 
+% Load the map file (*.map.pl) appropriate for the world being used.
+:- ensure_moo_loaded(logicmoo('rooms/vacuum.map.pl')).
+
+% puts world into running state
+% :- must(old_setup).
+
+% [Optionaly] Start the telnet server
+:-at_start(toploop_telnet:start_mud_telnet(4000)).
 
 

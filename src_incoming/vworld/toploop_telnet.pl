@@ -18,7 +18,7 @@
                   wants_logout/1,
                   telnet_repl_writer/4,
                   telnet_repl_obj_to_string/3,
-                  start_mud_telent/1,
+                  start_mud_telnet/1,
                   read_and_do_telnet/1,
                   run_player_telnet/1,
                    login_and_run/0]).
@@ -29,13 +29,13 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(utility).
+:- moodb:register_module_type(utility).
 
 :- dynamic wants_logout/1.
 % ===========================================================
 % TELNET REPL + READER
 % ===========================================================
-start_mud_telent(Port):- telnet_server(Port, [allow(_ALL),call_pred(login_and_run)]),!.
+start_mud_telnet(Port):- telnet_server(Port, [allow(_ALL),call_pred(login_and_run)]),!.
 
 login_and_run:-
   foc_current_player(P),
@@ -46,7 +46,7 @@ login_and_run:-
    fmt('~n~n~nHello ~w! Welcome to the MUD!~n',[P]),
    % sets some IO functions
    with_kb_assertions([repl_writer(P,telnet_repl_writer),repl_to_string(P,telnet_repl_obj_to_string)],
-     % runs the Telent REPL
+     % runs the Telnet REPL
      run_player_telnet(P)),
    fmt('~n~nGoodbye ~w! ~n',[P]).
 

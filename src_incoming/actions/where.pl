@@ -16,7 +16,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- moodb:register_module_type(command).
 
 moo:action_help(where(object),"Tells where something is").
 moo:subclass(agent,object).

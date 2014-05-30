@@ -48,8 +48,8 @@ string_upper(M,U):-toUppercase(M,U).
 string_lower(M,U):-toLowercase(M,U).
 */
 
-:-use_module(logicmoo('logicmoo_util/logicmoo_util_library.pl')).
-:-use_module(logicmoo('logicmoo_util/logicmoo_util_bugger.pl')).
+:-ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_library.pl')).
+:-ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_bugger.pl')).
 
 ib_multi_transparent(MT):-multifile(MT),dynamic(MT),module_transparent(MT).
 

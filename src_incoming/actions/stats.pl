@@ -9,7 +9,7 @@
 */
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- moodb:register_module_type(command).
 
 % ====================================================
 % show the stats system

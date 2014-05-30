@@ -14,7 +14,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- moodb:register_module_type(command).
 
 % attack joe ->translates-> attack nw
 moo:action_info(attack(dir)).

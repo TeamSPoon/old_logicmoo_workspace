@@ -11,7 +11,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- moodb:register_module_type(command).
 
 moo:action_info(login(string)).
 moo:action_info(rename(string)).

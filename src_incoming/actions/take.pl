@@ -13,7 +13,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- moodb:register_module_type(command).
 
 % Take something
 % Successfully picking something up
@@ -39,7 +39,7 @@ permanence_take(take,Agent,Obj) :-
         term_listing(Obj).
 
 check_permanence(take,_,_,Obj):-
-        props(Obj,permanence(take,0)),        
+        props(Obj,permanence(take,dissapears)),        
         atloc(Obj,LOC),
 	clr(atloc(Obj,LOC)).
 check_permanence(take,Agent,_,Obj) :-

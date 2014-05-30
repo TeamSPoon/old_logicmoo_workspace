@@ -10,12 +10,13 @@
 :-module(logicmoo_util_library,
         [dynamic_transparent/1,
          upcase_atom_safe/2,
+         get_module_of/2,
          concat_atom_safe/3,
          string_to_atom_safe/2,
          makeArgIndexes/1,
          doall/1,
          atom_concat_safe/3,
-         op(1150,fx,dynamic_multifile_exported),
+         op(1150,fx,(dynamic_multifile_exported)),
          dynamic_multifile_exported/3,
          dynamic_multifile_exported/2,
          dynamic_multifile_exported/1,
@@ -30,8 +31,8 @@
          wsubst/4,
          remove_dupes/2,
          list_to_set_safe/2,
+         get_functor/2,
          functor_safe/3,
-         functor_safe/2,
          flatten_dedupe/2,
          at_start/1,
          in_thread_and_join/1,
@@ -42,8 +43,8 @@
          make_list/3,
          multi_transparent/1]).
 
-:-use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)).
-:-use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)).
+:-ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_bugger)).
+:-ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)).
 
 
 % =================================================================================
@@ -139,6 +140,19 @@ weak_nd_subst2( _X, _Sk, L, L ).
 make_list(E,1,[E]):-!.
 make_list(E,N,[E|List]):- M1 is N - 1, make_list(E,M1,List),!.
 
+:- meta_predicate get_module_of_4(0,+,+,-).
+:- meta_predicate get_module_of(0,-).
+
+get_module_of(V,M):-var(V),!,current_context_module(M).
+get_module_of(F/A,M):-!,functor(P,F,A),!,get_module_of(P,M).
+get_module_of(P,M):-predicate_property(P,imported_from(M)),!.
+get_module_of(MM:_,M):-!,MM=M.
+get_module_of(P,M):-functor(P,F,A),get_module_of_4(P,F,A,M).
+get_module_of_4(_P,F,A,M):- current_predicate(M0:F0/A0),F0=F,A0=A,!,M=M0.
+get_module_of_4(_P,F,A,M):- current_predicate(F0/A0),F0=F,A0=A,!,dbase_mod(M).
+get_module_of_4(_P,F,A,_M):-trace, isCycPredArity(F,A),!,fail.
+get_module_of_4(P,F,A,M):- trace, debugCall(get_module_of_4(P,F,A,M)).
+
 
 :- meta_predicate def_meta_predicate(0,+,+).
 
@@ -169,10 +183,11 @@ remove_dupes([],[],_):-!.
 remove_dupes([I|In],Out,Shown):-member(I,Shown),!,remove_dupes(In,Out,Shown).
 remove_dupes([I|In],[I|Out],Shown):-remove_dupes(In,Out,[I|Shown]).
 
-functor_safe(_:Obj,F):-!,functor_safe(Obj,F).
-functor_safe(Obj,F):-string(Obj),!,atom_string(F,Obj).
-functor_safe(Obj,Obj):-not(compound(Obj)),!.
-functor_safe(Obj,F):-functor(Obj,F,_).
+get_functor(Obj,F):-var(Obj),throw(get_functor(Obj,F)).
+get_functor(_:Obj,F):-!,get_functor(Obj,F).
+get_functor(Obj,F):- string(Obj),!,atom_string(F,Obj).
+get_functor(Obj,Obj):-not(compound(Obj)),!.
+get_functor(Obj,F):-functor(Obj,F,_).
 
 strip_f_module(_:P,F):-nonvar(P),!,strip_f_module(P,F).
 strip_f_module(P,P):-atom(P),!.
@@ -181,10 +196,13 @@ strip_f_module(P,P).
 
 functor_safe(M:P,M:F,A):-var(P),atom(M),!,functor(P,F,A).
 functor_safe(P,F,A):-var(P),!,strip_f_module(F,F0),functor(P,F0,A).
-functor_safe(P,F,0):- hotrace(string(P);is_list(P);atomic(P)), text_to_string(P,S),!,atom_string(F,S).
-functor_safe(P,F,A):- strip_f_module(P,P0),var(F),!,functor(P0,F0,A),strip_f_module(F0,F),!.
-functor_safe(P,F,A):- strip_f_module(P,P0),strip_f_module(F,F0),!,functor(P0,F0,A).
-functor_safe(P,F,A):- hotrace(var(P);compound(P)),functor(P,F,A).
+functor_safe(P,F,A):-compound(P),!,functor_safe_compound(P,F,A).
+functor_safe(P,F,0):- hotrace(string(P);atomic(P)), text_to_string(P,S),!,atom_string(F,S).
+functor_safe_compound((_,_),',',2).
+functor_safe_compound([_|_],'.',2).
+functor_safe_compound(P,F,A):- functor(P,F,A).
+functor_safe_compound(P,F,A):- strip_f_module(P,P0),var(F),!,functor(P0,F0,A),strip_f_module(F0,F),!.
+functor_safe_compound(P,F,A):- strip_f_module(P,P0),strip_f_module(F,F0),!,functor(P0,F0,A).
 
 :- meta_predicate at_start(0).
 

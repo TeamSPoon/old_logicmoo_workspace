@@ -50,7 +50,7 @@
           default_repl_writer/4,
           show_kb_preds/2,show_kb_preds/3,success/2,
          init_location_grid/1,
-         test_te/0,
+         % test_te/0,
          samef/2,
          grid_dist/3,
          to_3d/2,
@@ -75,10 +75,8 @@
 
 :- dynamic  agent_list/1.
 
-% :-use_module(logicmoo('vworld/dbase')).
-:- include(logicmoo('vworld/moo_header')).
-:- register_module_type(utility).
-
+:- include(logicmoo(vworld/moo_header)).
+:- moodb:register_module_type(utility).
 
 :- include(logicmoo('vworld/world_2d')).
 :- include(logicmoo('vworld/world_agent')).
@@ -93,9 +91,9 @@
 is_property(P,A):- moo:db_prop(_,C),functor(C,P,A2),A is A2-1.
 
 is_type(O):-is_type0(O).
-is_type0(T):-moo:label_type_props(_,T,_).
-is_type0(T):-moo:type_default_props(_,T,_).
-is_type0(OT):- decl_subclass(OT,_); moo:subclass(_,OT).
+is_type0(T):-holds_t(label_type_props,_,T,_).
+is_type0(T):- holds_t(type_default_props,_,T,_).
+is_type0(OT):- holds_t(subclass,OT,_); holds_t(subclass,_,OT).
 is_type0(food).
 is_type0(explorer).
 is_type0(predator).
@@ -113,11 +111,13 @@ obj_memb(E,L):-member(E,L).
 isa_any(E,L):-flatten([E],EE),flatten([L],LL),!,intersect_pred(A,EE,B,LL,isaOrSame(A,B),_Results).
 prop_memb(E,L):-flatten([E],EE),flatten([L],LL),!,intersect_pred(A,EE,B,LL,isaOrSame(A,B),_Results).
 
-exists(O):-item(O).
-exists(O):-agent(O).
-exists(O):-region(O).
-anyInst(O):-type(O).
+
+exists(O):-  dbase:holds_t(item,O).
+exists(O):-  dbase:holds_t(agent,O).
+exists(O):-  dbase:holds_t(region,O).
+anyInst(O):-  dbase:holds_t(type,O).
 anyInst(O):-exists(O).
+
 
 metaclass(regiontype).
 metaclass(agenttype).
@@ -136,9 +136,9 @@ moo:subclass(SubType,formattype):-isa_mc(SubType,formattype).
 not_mud_isa(agent,formattype).
 cached(G):-catch(G,_,fail).
 
-world_mud_isa(O,T):- mud_isa(O,T).
+world_mud_isa(O,T):- req(mud_isa(O,T)).
 world_mud_isa(O,T):- O==T,!.
-world_mud_isa(O,T):- var(O),var(T),!,isa_mc(T,_),anyInst(O),mud_isa(O,T).
+world_mud_isa(O,T):- var(O),var(T),!,isa_mc(T,_),anyInst(O),req(mud_isa(O,T)).
 world_mud_isa(O,T):- cached(not_mud_isa(O,T)),!,fail.
 world_mud_isa(O,T):- props(O,ofclass(T)).
 world_mud_isa(O,T):- props(O,mud_isa(T)).
@@ -187,7 +187,7 @@ create_agent(P):-create_agent(P,[]).
 create_agent(P,List):-must(create_instance(P,agent,List)).
 
 formattype(FormatType):-moo:subclass(FormatType,formattype).
-formattype(FormatType):-dbase:mud_isa(FormatType,formattype).
+formattype(FormatType):-dbase:holds_t(isa, FormatType, formattype).
 
 define_type(Spec):-create_instance(Spec,type,[]).
 
@@ -200,7 +200,7 @@ create_instance_0(What,FormatType,List):- FormatType\==type,
    throw(formattype(FormatType,create_instance(What,FormatType,List))).
 
 create_instance_0(SubType,type,List):-!,
-   dbase:add(mud_isa(SubType,type)),
+   add(mud_isa(SubType,type)),
       dbase_mod(M),
       A = M:type(SubType),
    assert_if_new(A),

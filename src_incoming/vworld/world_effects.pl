@@ -27,8 +27,8 @@ worth(Agent,Action,Obj) :-
 % Charge up those batteries
 worth(Agent,Action,Obj) :-
            props(Obj,act(Action,charge(NRG))),
-	charge(Agent,Chg),
-	stm(Agent,Stm),
+	req(charge(Agent,Chg)),
+	req(stm(Agent,Stm)),
 	max_charge(Max),
 	(Chg + NRG) < (((Stm * 10) -20) + Max),
 	del(charge(Agent,Y)),
@@ -38,9 +38,9 @@ worth(Agent,Action,Obj) :-
 % Heal
 worth(Agent,Action,Obj) :-
            props(Obj,act(Action,heal(Hl))),
-	damage(Agent,Dam),
-	stm(Agent,Stm),
-	str(Agent,Str),
+	req((damage(Agent,Dam),
+             stm(Agent,Stm),
+             str(Agent,Str))),
 	max_damage(Max),
 	(Dam + Hl) < ((((Stm * 10) -20) + ((Str * 5) - 10)) + Max),
 	del(charge(Agent,Y)),

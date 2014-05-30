@@ -9,7 +9,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- moodb:register_module_type(command).
 
 
 
@@ -52,13 +52,13 @@ do_permanence(USE,Agent,Obj) :-
 
 check_permanence(USE,_Agent,LOC,Obj) :-
      use_verbs(USE,_USING,_USABLE,_STOWED),
-	props(Obj,permanence(USE,0)),
+	props(Obj,permanence(USE,dissapears)),
 	del(atloc(Obj,LOC)).
 check_permanence(USE,Agent,LOC,Obj) :-
     use_verbs(USE,USING,_USABLE,_STOWED),
         props(Obj,permanence(USE,1)),
 	del(atloc(Obj,LOC)),
-	add(k(USING,Agent,Obj)).
+	padd(Agent,USING,Obj).
 check_permanence(_,_,_,_).
 
 % Record keeping

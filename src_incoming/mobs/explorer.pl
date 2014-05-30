@@ -18,7 +18,7 @@
 :- module(explorer,[]).
 
 :- include(logicmoo(vworld/moo_header)).
-:- register_module_type(planning).
+:- moodb:register_module_type(planning).
 
 
 vette_idea(Agent,Act,Act):-var(Act),!,dmsg(vette_idea(Agent,Act)).

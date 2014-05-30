@@ -9,11 +9,11 @@
 */
 
 
-:- (loading_module_h(CM),registered_module_type(utility,CM))->export_all_preds;true.
+%:- (moodb:loading_module_h(CM),moodb:registered_module_type(utility,CM))->export_all_preds;true.
 
-:- retract(loading_module_h(_)).
+%:- retract(moodb:loading_module_h(_)).
 
-:- end_transform_moo_preds.
+:-  moodb:end_transform_moo_preds.
 
 
 

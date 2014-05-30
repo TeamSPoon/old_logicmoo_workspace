@@ -13,7 +13,7 @@
 % :- dynamic memory/2.
 
 :- include(logicmoo(vworld/moo_header)).
-:- register_module_type(planning).
+:- moodb:register_module_type(planning).
 
 % Possible agent actions.
 

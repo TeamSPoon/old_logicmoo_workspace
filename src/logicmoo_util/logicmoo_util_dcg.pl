@@ -68,8 +68,8 @@
 
 
 :-include('logicmoo_util_header.pl').
-:-use_module(logicmoo('logicmoo_util/logicmoo_util_bugger.pl')).
-:-use_module(logicmoo('logicmoo_util/logicmoo_util_strings.pl')).
+:-ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_bugger.pl')).
+:-ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_strings.pl')).
 
 
 decl_dcgTest(X,Y):- nonvar(Y),!,do_dcgTest(X,Y,true).

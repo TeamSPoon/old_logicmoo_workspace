@@ -22,6 +22,9 @@
 :- meta_predicate test_false(0).
 
 
+:- include(logicmoo(vworld/moo_header)).
+:- moodb:register_module_type(utility).
+
 % do some sanity testing (expects the startrek world is loaded)
 run_mud_tests:-
   forall(moo:mud_test(Name,Test),run_mud_test(Name,Test)).

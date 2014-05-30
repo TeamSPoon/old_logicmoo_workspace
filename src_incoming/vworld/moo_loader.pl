@@ -59,7 +59,6 @@ savedb:-
 
 discoverAndCorrectArgsIsa(_Prop,_N1,[],[]):-!.
 discoverAndCorrectArgsIsa(Prop,N1,[A|Args],[AA|AArgs]):-
-   %dbase:
    argIsa_call(Prop,N1,Type),
    musterd(isa_assert_g(A,Type,AA)),
    N2 is N1+1,

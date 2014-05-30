@@ -61,13 +61,13 @@ user:file_search_path(logicmoo,Dir):-
 locally_to_dir(Locally,Dir):-logicmoo_runtime_dir(RunDir), join_path33(RunDir,Locally,Directory),my_absolute_file_name(Directory,Dir),exists_directory(Dir),!.
 locally_to_dir(Directory,Dir):-my_absolute_file_name(Directory,Dir),exists_directory(Dir),!.
 
-r:- use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)).
-:- use_module(logicmoo(logicmoo_util/logicmoo_util_library)).
-:- use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)).
-:- use_module(logicmoo(logicmoo_util/logicmoo_util_strings)).
-:- use_module(logicmoo(logicmoo_util/logicmoo_util_terms)).
-:- use_module(logicmoo(logicmoo_util/logicmoo_util_dcg)).
-:- use_module(logicmoo(logicmoo_util/logicmoo_util_library)).
+r:- ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_bugger)).
+:- ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_library)).
+:- ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)).
+:- ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_strings)).
+:- ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_terms)).
+:- ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_dcg)).
+:- ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_library)).
 
 
 

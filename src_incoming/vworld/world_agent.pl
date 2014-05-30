@@ -56,7 +56,7 @@ call_agent_action(Agent,CMDI):-
            % fail event
               raise_location_event(Where,notice(reciever,failed(Agent,CMD))))))),E,fmt('call_agent_action/2 Error ~q ',[E])),
     (Pushed -> ignore(retract(thlocal:current_agent(SESSION,Agent)));true).
-
+/*
 test_te:- xcall((
  
 
@@ -78,6 +78,7 @@ test_te:- xcall((
   )).
 
 :-test_te.
+*/
 
 ensure_session_id(Agent,SESSION,fail):- get_session_id(SESSION),once(thlocal:current_agent(SESSION,Agent2)),Agent2==Agent,!.
 ensure_session_id(Agent,SESSION,true):- get_session_id(SESSION),asserta(thlocal:current_agent(SESSION,Agent)),!.

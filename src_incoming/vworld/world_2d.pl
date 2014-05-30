@@ -14,7 +14,7 @@
 
 % :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(utility).
+:- moodb:register_module_type(utility).
 
 grid_dist(L1,L2,Dist):- to_3d(L1,L13D),to_3d(L2,L23D),dist(L13D,L23D,Dist),!.
 
@@ -124,7 +124,7 @@ put_in_world(Agent):-ensure_some(facing,Agent),!,ensure_some(atloc,Agent),!.
 ensure_some(Property,OfAgent):- prop(OfAgent, Property,_),!.
 ensure_some(Property,OfAgent):- create_someval(Property,OfAgent,Value),padd(OfAgent,Property,Value).
 
-create_someval(facing,_Agent,Dir) :- random_member(Dir,[n,s,e,w,ne,nw,se,sw]).
+create_someval(facing,_Agent,Dir) :- my_random_member(Dir,[n,s,e,w,ne,nw,se,sw]).
 create_someval(atloc,Agent,Where) :- 
    defaultRegion(Agent,Region),
    in_grid(Region,Where),
@@ -136,9 +136,11 @@ defaultRegion(_Agent,Region):- inRegion(_,Region),!.
 defaultRegion(_Agent,Region):- Region = 'Area1000'.
 
 
-decide_region(LOC):- findall(O,region(O),LOCS),random_member(LOC,LOCS).
+decide_region(LOC):- findall(O,region(O),LOCS),my_random_member(LOC,LOCS).
 
-random_member(LOC,LOCS):- length(LOCS,Len),Len>0, X is random(Len),nth0(X,LOCS,LOC).
+:-export(my_random_member/2).
+
+my_random_member(LOC,LOCS):- length(LOCS,Len),Len>0, X is random(Len),nth0(X,LOCS,LOC).
 find_unoccupied(Where):-
    must(decide_region(LOC)),
    in_grid_rnd(LOC,Where),

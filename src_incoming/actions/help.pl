@@ -5,7 +5,7 @@
 */
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- moodb:register_module_type(command).
 
 moo:type_action_help(agent, help, "shows this help").
 

@@ -18,7 +18,8 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- registerCycPred((ft_info/2,subft/2)).
+:- registerCycPred(ft_info,2).
+:- registerCycPred(subft,2).
 
 term_is_ft(Term,Type):-
    moo:ft_info(Type,How),
@@ -43,7 +44,7 @@ moo:ft_info(atom,atom(self)).
 moo:ft_info(apath(region,dir),formatted).
 moo:ft_info(string,string(self)).
 moo:ft_info(number,number(self)).
-moo:ft_info(type,type(self)).
+moo:ft_info(type,isa(self,type)).
 moo:ft_info(dir,any_to_dir(self,_)).
 moo:ft_info(dice(int,int,int),formatted).
 moo:ft_info(xyz(region,int,int,int),formatted).
@@ -71,8 +72,8 @@ format_complies(A,string,AA):- ignoreOnError(text_to_string(A,AA)).
 format_complies(A,int,AA):- any_to_number(A,AA).
 format_complies(A,number,AA):- any_to_number(A,AA).
 format_complies(A,integer,AA):- any_to_number(A,AA).
-format_complies(A,Fmt,AA):- ft_info(Fmt,formatted),!,format_complies(A,formatted(Fmt),AA).
-format_complies(A,Fmt,A):- ft_info(Fmt,Code),!,subst(Code,self,A,Call),Call.   
+format_complies(A,Fmt,AA):- moo:ft_info(Fmt,formatted),!,format_complies(A,formatted(Fmt),AA).
+format_complies(A,Fmt,A):- moo:ft_info(Fmt,Code),!,subst(Code,self,A,Call),debugOnError(req(Call)).   
 format_complies(A,number,AA):- must(any_to_number(A,AA)).
 format_complies(A,dir,AA):- any_to_dir(A,AA).
 format_complies([A|AA],list(T),LIST):-!,findall(OT,((member(O,[A|AA]),format_complies(O,T,OT))),LIST).
@@ -88,7 +89,7 @@ format_complies(Args,formatted(Types),NewArgs):- compound(Args),compound(Types),
    Types=..[F|TypesL],
    NewArgs=..[F|NewArgsL],!,   
    format_complies(ArgsL,TypesL,NewArgsL).
-format_complies(A,Super,AA):- subft(Sub,Super),format_complies(A,Sub,AA).
+format_complies(A,Super,AA):- moo:subft(Sub,Super),format_complies(A,Sub,AA).
   
 
 

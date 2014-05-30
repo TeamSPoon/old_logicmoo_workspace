@@ -22,11 +22,11 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- moodb:register_module_type(command).
 
 :- dynamic blocks/1.
 
-:- begin_transform_moo_preds.
+:- moodb:begin_transform_moo_preds.
 
 % can_sense(Agent,Sense,InList,CanDetect,CantDetect).
 can_sense(_Agent,visual,InList,InList,[]).

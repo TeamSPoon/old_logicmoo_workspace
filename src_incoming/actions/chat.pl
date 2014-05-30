@@ -8,7 +8,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- moodb:register_module_type(command).
 
 do_social(Agent,Say,Whom,Text):- 
    atloc(Agent,Where),
