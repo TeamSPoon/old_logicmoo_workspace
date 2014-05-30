@@ -480,152 +480,6 @@ list_to_terms_lr([T],T):-!.
 list_to_terms_lr([H|T],(H,TT)):-!,list_to_terms_lr(T,TT).
 
 
-     
-
-:-multifile(user:goal_expansion/2).
-   
-set_list_len(List,A,NewList):-length(List,LL),A=LL,!,NewList=List.
-set_list_len(List,A,NewList):-length(List,LL),A>LL,length(NewList,A),append(List,_,NewList),!.
-set_list_len(List,A,NewList):-length(NewList,A),append(NewList,_,List),!.
-
-
-
-if_use_holds_db(F,A):- never_use_holds_db(F,A),!,fail.
-if_use_holds_db(F,A2,A):- use_holds_db(F,A2,A),!.
-if_use_holds_db(F,A,_):- integer(A),asserta(never_use_holds_db(F,A)),!,fail.
-
-use_holds_db(F,A,_):- never_use_holds_db(F,A),!,fail.
-use_holds_db(F,A2,A):- integer(A2), A is A2-2, isCycPredArity(F,A),!.
-use_holds_db(F,A,A):- isCycPredArity(F,A).
-
-ensure_moo_pred(F,A):-never_use_holds_db(F,A),!,throw(never_use_holds_db(F,A)).
-ensure_moo_pred(F,A,NewA):-use_holds_db(F,A,NewA),!.
-ensure_moo_pred(F,A,A):- dmsg(once(registerCycPred(F,A))),moodb:registerCycPred(F,A).
-
-is_kb_module(Moo):-atom(Moo),member(Moo,[moo,kb,opencyc]).
-is_kb_mt_module(Moo):-atom(Moo),member(Moo,[moomt,kbmt]).
-
-try_mud_body_expansion(G0,G2):- hotrace((mud_goal_expansion_0(G0,G1),!,goals_different(G0, G1),!,dbase_mod(DBASE))),prepend_module(G1,DBASE,G2).
-mud_goal_expansion_0(G1,G2):- hotrace((mud_pred_expansion(if_use_holds_db, holds_t - holds_f,G1,G2))).
-
-try_mud_head_expansion(G0,G2):- hotrace((mud_clause_expansion_0(G0,G1),!,goals_different(G0, G1),!,dbase_mod(DBASE))),prepend_module(G1,DBASE,G2).
-mud_clause_expansion_0(G1,G2):- hotrace((mud_pred_expansion(if_use_holds_db, dbase_t - dbase_f,G1,G2))),!.
-
-
-dmsg_p(_):-!.
-dmsg_p(P):-once(dmsg(P)),!.
-dmsg_p(_):-!.
-
-:-'$hide'(goals_different/2).
-
-goals_different(G0,G1):-G0==G1,!,fail.
-goals_different(G0,G1):-goals_different_1(G0,G1),!.
-goals_different(G0,G1):- G0\==G1.
-
-goals_different_1(NV:G0,G1):-nonvar(NV),!,goals_different_1(G0,G1).
-goals_different_1(G0,NV:G1):-nonvar(NV),!,goals_different_1(G0,G1).
-goals_different_1(G0,G1):- (var(G0);var(G1)),!,throw(goals_different(G0,G1)).
-goals_different_1(G0,G1):- G0 \= G1,!.
-
-
-attempt_clause_expansion(B,BR):-  compound(B), copy_term(B,BC),numbervars(BC,0,_),!, attempt_clause_expansion(B,BC,BR).
-attempt_clause_expansion(_,BC,_):-inside_clause_expansion(BC),!,fail.
-attempt_clause_expansion(B,BC,BR):- 
-    setup_call_cleanup(asserta(inside_clause_expansion(BC)),
-    force_clause_expansion(B,BR),
-    ignore(retract(inside_clause_expansion(BC)))).
-
-force_clause_expansion(M:((H:-B)),R):- !, mud_rule_expansion(M:H,M:B,R),!.
-force_clause_expansion(((M:H:-B)),R):- !, mud_rule_expansion(M:H,B,R),!.
-force_clause_expansion(((H:-B)),R):-mud_rule_expansion(H,B,R),!.
-force_clause_expansion(H,HR):- try_mud_head_expansion(H,HR),!.
-force_clause_expansion(H,HR):- user:expand_term(H,HR).
-
-mud_rule_expansion(H,B,((HR:-BR))):-force_clause_expansion(H,HR),user:expand_goal(B,BR),!.
-
-is_term_head(H):- (( \+ \+ inside_clause_expansion(H))),!.
-%is_term_head(_):- inside_clause_expansion(_),!,fail.
-%is_term_head(H):-H=_, is_our_sources(H).
-
-
-is_our_dir(LM):- user:file_search_path(logicmoo,LM0),absolute_file_name(LM0,LM).
-current_loading_file_path(Path):- prolog_load_context(module,M),!,module_property(M,file(Path)).
-current_loading_file_path(Dir):- prolog_load_context(directory,Dir0),!,absolute_file_name(Dir0,Dir).
-
-is_our_sources(_):- current_loading_file_path(Dir),is_our_dir(LM),atom_concat(LM,_,Dir),!.
-is_our_sources(_):- prolog_load_context(module,user),!,not(prolog_load_context(directory,_)).
-
-do_term_expansions:- notrace(( moodb:may_moo_term_expand, not(moodb:ended_transform_moo_preds), not(moodb:prevent_transform_moo_preds) )).
-
-
-univ_left(Comp,[M:P|List]):- nonvar(M),univ_left0(M, Comp, [P|List]),!.
-univ_left(Comp,[H,M:P|List]):- nonvar(M),univ_left0(M,Comp,[H,P|List]),!.
-univ_left(Comp,[P|List]):-dbase_mod(DBASE), univ_left0(DBASE,Comp,[P|List]),!.
-
-% univ_left0(dfgdfuser,Comp,List):- trace,Comp=..List,!.
-univ_left0(M,M:Comp,List):- Comp=..List,!.
-
-holds_form(G1,HOLDS,G2):-
-      functor_safe(G1,F,A),
-      ensure_moo_pred(F,A,NewA),!,            
-      G1=..[F|List], set_list_len(List,NewA,NewList), 
-      univ_left(G2,[HOLDS,F|NewList]),!.
-
-xcall_form(G1,G2):- nonvar(G1),
-      functor_safe(G1,F,A),
-      ensure_moo_pred(F,A,NewA),
-      G1=..[F|List], set_list_len(List,NewA,NewList), 
-      univ_left(G2,[F|NewList]),!.
-xcall_form(G1,G1).
-
-mud_pred_expansion(_Prd,_HNH,G1,_):-not(compound(G1)),!,fail.
-mud_pred_expansion(_Prd,_HNH,G1,G2):- functor_safe(G1,xcall,_),G2 = (G1),!.
-mud_pred_expansion(Pred,NHOLDS - HOLDS, not(G1) ,G2):-!,mud_pred_expansion(Pred,HOLDS - NHOLDS,G1,G2).
-mud_pred_expansion(Pred,NHOLDS - HOLDS, \+(G1) ,G2):-!,mud_pred_expansion(Pred,HOLDS - NHOLDS,G1,G2).
-
-mud_pred_expansion(Pred, HNH, G0 ,G2):-
- functor(G0,F,1),G1=..[F,MP],
- predicate_property(G0, meta_predicate(G1)),
- member(MP,[:,0,1,2,3,4,5,6,7,8,9]),!,
- G0=..[F,Term],
- mud_pred_expansion(Pred, HNH, Term ,Term2),
-  G2=..[F,Term2],!.
-
-mud_pred_expansion(_Pred,HNH, Moo:G0,G3):- nonvar(Moo),is_kb_module(Moo),
-   xcall_form(G0,G1),
-   mud_pred_expansion_0(ensure_moo_pred,HNH,G1,G2),!,G2=G3.
-mud_pred_expansion(Pred,HNH, Moo:G1,G3):-  nonvar(Moo),!, mud_pred_expansion_0(Pred,HNH,Moo:G1,G2),!,G2=G3.
-mud_pred_expansion(Pred,HNH,G1,G3):- mud_pred_expansion_0(Pred,HNH,G1,G2),!,G2=G3.
-
-mud_pred_expansion_0(Pred,HNH,_:G1,G2):-!,compound(G1),
-   mud_pred_expansion_1(Pred,HNH,G1,G2),!.
-mud_pred_expansion_0(Pred,HNH,G1,G2):-!,compound(G1),
-   mud_pred_expansion_1(Pred,HNH,G1,G2),!.
-
-mud_pred_expansion_1(Pred,HNH,G1,G2):-G1=..[F|ArgList],functor(G1,F,A),mud_pred_expansion_2(Pred,F,A,HNH,ArgList,G2).
-
-mud_pred_expansion_2(_,Holds,_,HoldsT-HoldsF,_,_):-member(Holds,[HoldsT,HoldsF]),!,fail.
-mud_pred_expansion_2(_,Holds,_,_,_,_):-member(Holds,[',',';']),!,fail.
-
-mud_pred_expansion_2(Pred,F,A,HNH,ArgList,G2):-member(F,[':','.']),!,throw(mud_pred_expansion_2(Pred,F,A,HNH,ArgList,G2)).
-mud_pred_expansion_2(Pred,F,_,HNH,ArgList,G2):- is_holds_true(F),holds_form_l(Pred,ArgList,HNH,G2).
-mud_pred_expansion_2(Pred,F,_,HOLDS - NHOLDS,ArgList,G2):- is_holds_false(F),holds_form_l(Pred,ArgList,NHOLDS - HOLDS,G2).
-% mud_pred_expansion_2(Pred,F,A,HNH,ArgList,G2):-is_2nd_order_holds(F),!,throw(mud_pred_expansion_2(Pred,F,A,HNH,ArgList,G2)).
-mud_pred_expansion_2(Pred,F,A,HNH,ArgList,G2):- call(Pred,F,A,_),holds_form_l(Pred,[F|ArgList],HNH,G2).
-
-holds_form_l(Pred,[G1],HNH,G2):-
-   compound(G1),not(is_list(G1)),!,
-   mud_pred_expansion(Pred,HNH,G1,G2).
-
-holds_form_l(_,[F|List],HOLDS - _NHOLDS,G2):-
-   atom(F),
-   G1=..[F|List],
-   holds_form(G1,HOLDS,G2).
-
-holds_form_l(_,[F|List],HOLDS - _NHOLDS,G2):- G2=..[HOLDS,F|List].
- 
-
-
 ah(P,A1,A2,A3,A4,A5,A6,A7):- dmsg(ah(P,7,A1,A2,A3,A4,A5,A6,A7)).
 ah(P,A1,A2,A3,A4,A5,A6):- dmsg(ah(P,6,A1,A2,A3,A4,A5,A6)).
 ah(P,A1,A2,A3,A4,A5):- dmsg(ah(P,5,A1,A2,A3,A4,A5)).
@@ -752,7 +606,7 @@ user_export(Prop/Arity):-
 % Found new meta-predicates in iteration 1 (0.281 sec)
 %:- meta_predicate db_forall(?,?,?,0).
 
-:- include('dbase_types_motel').
+:- include(dbase_types_motel).
 
 % :- moodb:register_module_type(utility).
 
@@ -818,6 +672,8 @@ scan_db_prop:-
    ignore(('@'(forall(db_prop_findall(ArgTypes,PropTypes),call( dbase_define_db_prop(ArgTypes,PropTypes))),DBM))),
    !.
 scan_db_prop:-!.
+
+
 
 
 term_listing(Obj):- nonvar(var(Obj)),catch(listing(Obj),_,fail),fail.
@@ -1197,9 +1053,6 @@ valuedOrThrow(F,A,Obj,ARGS):-valuedOrThrow1(F,A,Obj,ARGS).
 valuedOrThrow1(_F,_A,_Obj,ARGS):-last(ARGS,unknown),!.
 valuedOrThrow1(F,A,Obj,ARGS):-throw(is_single_valuedOrFail(F,A,Obj,ARGS)).
 
-user:goal_expansion(G1,G3):- compound(G1), do_term_expansions, once(try_mud_body_expansion(G1,G2)),goals_different(G1,G2),G2=G3.
-user:term_expansion(G1,G3):- compound(G1), do_term_expansions,  once(attempt_clause_expansion(G1,G2)),goals_different(G1,G2),G2=G3.
-
 
 findall_type_default_props(Inst,Type,TraitsO):-findall(Props,moo:type_default_props(Inst,Type,Props),Traits),flatten(Traits,TraitsO),!.
 
@@ -1222,11 +1075,14 @@ insert_into([Carry|ARGS],After,Insert,[Carry|NEWARGS]):-
    insert_into(ARGS,After1,Insert,NEWARGS).
 
 
-:-include(dbase_i_builtin).
+
+:-include(dbase_c_term_expansion).
 
 :-noguitracer.
 
 load_motel:- defrole([],time_state,restr(time,period)).
+
+:-include(dbase_i_builtin).
 
 :- debug,scan_db_prop.
 
@@ -1234,5 +1090,4 @@ load_motel:- defrole([],time_state,restr(time,period)).
 
 :- load_motel.
 
-
-
+:-include(moo_loadall).

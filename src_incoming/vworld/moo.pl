@@ -346,3 +346,4 @@ term_expansion_local0(A,A).
 
 :- registerCycPred(agent_call_command,2).
 
+

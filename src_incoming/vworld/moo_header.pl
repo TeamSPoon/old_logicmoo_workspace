@@ -23,23 +23,6 @@
 :- set_prolog_flag(double_quotes,string).
 :- set_prolog_flag(verbose_load,true).
 
-%:- debug.
-%:- ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_library)).
-%:- ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_bugger)).
-
-:- ensure_loaded(logicmoo(vworld/moo)).
-:- ensure_loaded(logicmoo(vworld/dbase)).
-
-% logicmoo vworld mud server
-:- ensure_moo_loaded(logicmoo(vworld/world)).
-:- ensure_moo_loaded(logicmoo(vworld/toploop_telnet)).
-:- ensure_moo_loaded(logicmoo(vworld/toploop_npc)).
-:- ensure_moo_loaded(logicmoo(vworld/parser_e2c)).
-:- ensure_moo_loaded(logicmoo(vworld/parser_imperative)).
-
-:- ensure_moo_loaded(logicmoo(vworld/moo_loader)).
-:- ensure_moo_loaded(logicmoo(vworld/moo_testing)).
-
 :-include(moo_loadall).
 
 

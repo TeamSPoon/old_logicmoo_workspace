@@ -37,6 +37,8 @@
 :- ensure_loaded(logicmoo(vworld/dbase)).
 :- ensure_moo_loaded(logicmoo(vworld/world)).
 
+:- include(moo_loadall).
+
 
 % Define the agents traits, both for your agent and the world inhabitants. 
 % agent name and stats ([] = defaults).
