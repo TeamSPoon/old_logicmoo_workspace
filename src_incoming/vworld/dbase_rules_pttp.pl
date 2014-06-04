@@ -11,7 +11,7 @@
 
 prolog_engine(swi).
 
-%%:- use_module('../../src/logicmoo_util/logicmoo_util_all.pl').
+%%:- user_use_module('../../src/logicmoo_util/logicmoo_util_all.pl').
 assert_if_new(X):-catch(X,_,fail),!.
 assert_if_new(X):-assertz(X).
 

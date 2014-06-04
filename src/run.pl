@@ -37,7 +37,7 @@ user:file_search_path(cliopatria, 't:/devel/ClioPatria').
 
 
 
-:-ensure_loaded(logicmoo('mudconsole/mudconsolestart')).
+:-use_module(logicmoo('mudconsole/mudconsolestart')).
 
 % [Optionaly] load and start sparql server
 % if we don't start cliopatria we have to manually start
@@ -46,7 +46,7 @@ user:file_search_path(cliopatria, 't:/devel/ClioPatria').
 start_servers :-
 	current_prolog_flag(version,F),
 	F > 70109,
-	ensure_loaded(logicmoo(launchcliopatria)).
+	use_module(logicmoo(launchcliopatria)).
 start_servers :-
 	current_prolog_flag(version,F),
 	F =< 70109,
@@ -57,7 +57,7 @@ start_servers :-
 %:-set_setting(cliopatria_binding:path, 't:/devel/ClioPatria'), save_settings('moo_settings.db').
 
 % [Required] load and start mud
-:- ensure_loaded(logicmoo('vworld/moo_startup')).
+:- use_module(logicmoo('vworld/moo_startup')).
 
 
 

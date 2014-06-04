@@ -10,59 +10,74 @@
 */
 
 :- module(moodb,
-        [     
-        op(1150,fx,decl_mpred)
-        ]).
-
-:- op(1150,fx,(decl_mpred)).
-
-:-export((coerce/3, 
-           add_db_prop/3,
-           never_use_holds_db/2,
-           rem_db_prop/3,
+        [ coerce/3,     
+        op(1150,fx,((decl_mpred))),          
+          add_mpred_prop/2,
+           not_loading_game_file/0,
+           never_use_holds_db/3,
+           rem_mpred_prop/2,
           is_2nd_order_holds/1,
           is_holds_false/1,
           is_holds_true/1,
-
+          include_moo_files/1,
          current_context_module/1,         
-         (decl_mpred)/1,         
-         (decl_mpred)/2,
-         (decl_mpred)/3,
          ensure_moo_loaded/1,
+         do_all_of/1,
+         call_after/2,
          isRegisteredCycPred/3,
+         get_mpred_prop/2,
          registerCycPredPlus2/1,
          term_expansion_local/2,
          run_database_hooks/2,
-         moodb:register_module_type/1,
+         register_module_type/1,
          registered_module_type/2,
          end_module_type/1,
          enter_term_anglify/2,
-         % decl_dbase_pred/2,
          register_timer_thread/3,
+         defined_type/1,
+         is_defined_type/1,
+         define_type/1,
          scan_updates/0,
-          begin_transform_moo_preds/0,
-           moodb:end_transform_moo_preds/0,
-          loading_module_h/1,
-            may_moo_term_expand/0,
-            ended_transform_moo_preds/0,
-            prevent_transform_moo_preds/0,
-         end_module_type/2 )).
+            loading_module_h/1,
 
-:-dynamic loading_module_h/1.
+             ended_transform_moo_preds/0, prevent_transform_moo_preds/0, 
+             always_transform_heads/0, may_moo_term_expand/1,
+             begin_transform_moo_preds/0, end_transform_moo_preds/0,
+             do_term_expansions/0,check_term_expansions/0,
 
-is_holds_true(Prop):-once(notrace((atom(Prop),is_holds_true0(Prop)))).
-is_holds_true0(Prop):-member(Prop,[k,p,holds,holds_t,dbase_t,res,assertion_t,assertion]).
+          dbase_mod/1,
+         end_module_type/2 ]).
+
+:-dynamic(moodb:dbase_mod/1).
+moodb:dbase_mod(dbase).
+
+:-export((         (decl_mpred)/1,         
+         (decl_mpred)/2,
+         (decl_mpred)/3,
+                   loading_game_file/1 ,  loaded_game_file/1         )).
+
+not_loading_game_file:-not(loading_game_file(_)),loaded_game_file(_).
+
+:-dynamic loading_module_h/1, loading_game_file/1, loaded_game_file/1, is_defined_type/1.
+
+:- include(logicmoo(logicmoo_util/logicmoo_util_header)).
+
+is_holds_true(Prop):- notrace((atom(Prop),is_holds_true0(Prop))),!.
+is_holds_true0(Prop):-arg(_,p(k,p,holds,holds_t,dbase_t,asserted_dbase_t,req,assertion_t,assertion),Prop).
 
 is_2nd_order_holds(Prop):- is_holds_true(Prop) ; is_holds_false(Prop).
 
 % is_holds_false(Prop):-notrace((atom(Prop),once((is_holds_false0(Prop,Stem),is_holds_true0(Stem))))).
-is_holds_false(Prop):-member(Prop,[not,nholds,holds_f,dbase_f,resnt,assertion_f,retraction]).
+is_holds_false(Prop):-member(Prop,[not,nholds,holds_f,dbase_f,aint,assertion_f,asserted_dbase_f,retraction]).
 
 is_holds_false0(Prop,Stem):-atom_concat('not_',Stem,Prop).
 is_holds_false0(Prop,Stem):-atom_concat(Stem,'_not',Prop).
 is_holds_false0(Prop,Stem):-atom_concat(Stem,'_false',Prop).
 is_holds_false0(Prop,Stem):-atom_concat(Stem,'_f',Prop).
 
+defined_type(A):-A==isa,!,fail.
+defined_type(A):-is_defined_type(A).
+define_type(Spec):-asserta_if_new(is_defined_type(Spec)).
 
 include_moo_files(Mask):- expand_file_name(Mask,X),
      forall(member(E,X),ensure_moo_loaded(E)).
@@ -76,17 +91,21 @@ scan_updates:-ignore(catch(make,_,true)).
 
 :-dynamic(isRegisteredCycPred/3).
 
-:-dynamic ended_transform_moo_preds/0,prevent_transform_moo_preds/0, may_moo_term_expand/0.
+:-dynamic ended_transform_moo_preds/0, prevent_transform_moo_preds/0, may_moo_term_expand/1, always_transform_heads/0.
 
-ended_transform_moo_preds.
-
-begin_transform_moo_preds:- retractall(ended_transform_moo_preds),asserta(may_moo_term_expand).
-
- moodb:end_transform_moo_preds:- retractall(ended_transform_moo_preds),asserta(ended_transform_moo_preds).
+:-module_transparent begin_transform_moo_preds/0, end_transform_moo_preds/0.
+begin_transform_moo_preds:- retractall(moodb:ended_transform_moo_preds),context_module(CM),asserta(moodb:may_moo_term_expand(CM)).
 
 
 
-:- ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_library)).
+end_transform_moo_preds:- retractall(moodb:ended_transform_moo_preds),asserta(moodb:ended_transform_moo_preds).
+
+:-module_transparent(do_term_expansions/0).
+:-module_transparent(check_term_expansions/0).
+
+do_term_expansions:- always_transform_heads,not(prevent_transform_moo_preds),!.
+do_term_expansions:- context_module(CM),may_moo_term_expand(CM),!, not(ended_transform_moo_preds), not(prevent_transform_moo_preds).
+check_term_expansions:- not(do_term_expansions).
 
 :- dynamic registered_module_type/2.
 
@@ -108,15 +127,16 @@ locate_moo_file0(SpecPre, Path) :-
 
 :- meta_predicate ensure_moo_loaded(:).
 
+% the once/1s here arte just for dmiles institional memory
 ensure_moo_loaded(A) :-
-   setup_call_cleanup(asserta(may_moo_term_expand),
+   setup_call_cleanup(once(asserta(may_moo_term_expand(_))),
         load_moo_files(A),
-        retract(may_moo_term_expand)).
+        once(retract(may_moo_term_expand(asdasdasd)))).
 
 :- meta_predicate load_moo_files(:,+).
 
-load_moo_files(F0):-!,use_module(F0).
-load_moo_files(F0):-!,ensure_loaded(F0).
+load_moo_files(F0):-!,user_use_module(F0).
+% load_moo_files(F0):-use_module(F0).
 
 load_moo_files(M:F0,List):-!,
   locate_moo_file(M:F0,F),  % scope_settings  expand(true),register(false),
@@ -133,17 +153,31 @@ enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_np(X,Y),Body),Lis
 enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_last(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
 enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_np_last(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
 
-:- dynamic_multifile_exported db_prop/2, is_db_prop/3.
+:- dynamic_multifile_exported moodb:mpred_prop/2.
 
-add_db_prop(_,_,Var):- var(Var),!.
-add_db_prop(_,_,[]):- !.
-add_db_prop(F,A,[C|L]):-!, add_db_prop(F,A,C),add_db_prop(F,A,L),!.
-add_db_prop(F,A,CL):- assert_if_new(is_db_prop(F,A,CL)).
+member_or_e(E,[L|List]):-!,member(E,[L|List]).
+member_or_e(E,E).
 
-rem_db_prop(_,_,Var):- var(Var),!.
-rem_db_prop(_,_,[]):- !.
-rem_db_prop(F,A,[C|L]):-!, rem_db_prop(F,A,C),rem_db_prop(F,A,L),!.
-rem_db_prop(F,A,CL):- retractall(is_db_prop(F,A,CL)).
+get_mpred_prop(P,Prop):- var(P),!,isRegisteredCycPred(_,F,A),functor(P,F,A),get_mpred_prop0(P,Prop).
+get_mpred_prop(F/A,Prop):-!,isRegisteredCycPred(_,F,A),functor(P,F,A),get_mpred_prop0(P,Prop).
+get_mpred_prop(F,Prop):- isRegisteredCycPred(_,F,A),!,functor(P,F,A),get_mpred_prop0(P,Prop).
+get_mpred_prop(P,Prop):- get_mpred_prop0(P,Prop).
+
+
+get_mpred_prop0(P,Prop):- mpred_new_props(P,Props),member_or_e(Prop,Props).
+
+mpred_new_props(FA,CL):-moodb:mpred_prop(FA,CL).
+
+
+add_mpred_prop(_,Var):- var(Var),!.
+add_mpred_prop(_,[]):- !.
+add_mpred_prop(FA,[C|L]):-!, add_mpred_prop(FA,C),add_mpred_prop(FA,L),!.
+add_mpred_prop(FA,CL):- asserta(moodb:mpred_prop(FA,CL)). % , call_after(dbase_module_loaded, dbase:add(holds_t(CL,FA))).
+
+rem_mpred_prop(_,Var):- var(Var),!.
+rem_mpred_prop(_,[]):- !.
+rem_mpred_prop(FA,[C|L]):-!, rem_mpred_prop(FA,C),rem_mpred_prop(FA,L),!.
+rem_mpred_prop(FA,CL):- retractall(moodb:mpred_prop(FA,CL)). % ,call_after(dbase_module_loaded, dbase:db_op(ra,holds_t(CL,FA))).
 
 % ============================================
 % Prolog to Cyc Predicate Mapping
@@ -169,13 +203,30 @@ decl_mpred(Mt:Pred/Arity):- !,
 % :- decl_mpred('BaseKB':isa(_,_)). 
 decl_mpred(Mt:Term):-
    functor(Term,Pred,Arity),
-   decl_mpred(Mt,Pred,Arity).
+   decl_mpred(Mt,Pred,Arity),!.
 
-decl_mpred(M:F):-!, '@'(decl_mpred(F), M).
-decl_mpred(F/A):- decl_mpred(F,A).
-decl_mpred([A]):-!,decl_mpred(A).
-decl_mpred([A|L]):-!,decl_mpred(A),decl_mpred(L).
-decl_mpred((A,L)):-!,decl_mpred(A),decl_mpred(L).
+decl_mpred(M):-var(M),throw(instanciation_error(decl_mpred(M))).
+decl_mpred(AB):-decl_mpred0(AB),!.
+decl_mpred(M):-throw(failed(decl_mpred(M))).
+
+decl_mpred0(M:F):-!, '@'(decl_mpred(F), M).
+decl_mpred0(F/A):-!, decl_mpred(F,A).
+decl_mpred0([A]):-!,decl_mpred(A).
+decl_mpred0([A|L]):-!,decl_mpred(A),decl_mpred(L).
+decl_mpred0((A,L)):-!,decl_mpred(A),decl_mpred(L).
+decl_mpred0(M):-compound(M),functor(M,F,A),decl_mpred(F,A),call_after(dbase_module_loaded,dbase:add(argsIsa(M))).
+
+:- meta_predicate call_after(+,+).
+
+:-dynamic(dbase_module_loaded/0).
+dbase_module_loaded:- 
+   %module_property(dbase,exports(List)),member(add/1,List),
+   predicate_property(dbase:add(_),_),!,asserta((dbase_module_loaded:-!)).
+
+call_after(When,C):- When,!,do_all_of(When),once(must(C)).
+call_after(When,C):- assert_if_new(moodb:will_call_after(When,C)).
+
+do_all_of(When):- doall((retract(moodb:call_after_load(When,A)),once(must(A)))).
 
 registerCycPredPlus2(M:F):-!, '@'(registerCycPredPlus2(F), M).
 registerCycPredPlus2(F/A):- A2 is A -2, decl_mpred(F/A2).
@@ -188,49 +239,59 @@ get_term_fa(_:P,F,A):-nonvar(P),!,get_term_fa(P,F,A).
 get_term_fa(F/A,F,A):-nonvar(F),!.
 get_term_fa(P,F,A):-functor_safe(P,F,A).
 
+decl_mpred(A,B):-decl_mpred0(A,B),!.
+
 % :- decl_mpred(isa,2). 
-decl_mpred(Term,Arity):- integer(Arity),!,
+decl_mpred0(Term,Arity):- integer(Arity),!,
    get_term_fa(Term,Pred,_),
    decl_mpred(_Mt,Pred,Arity).
 % :- decl_mpred(isa(_,_),'BaseKB'). 
-decl_mpred(Term,Mt):- !,
+decl_mpred0(Term,Mt):- !,
    get_term_fa(Term,Pred,Arity),
    decl_mpred(Mt,Pred,Arity).
 
 
-   
+decl_mpred(A,B,C):-loop_check(decl_mpred0(A,B,C),dmsg(todo(loop_check(decl_mpred0(A,B,C))))),!.
+
+decl_mpred0(Mt,Pred,Arity):-decl_mpred_now(Mt,Pred,Arity).
+
+
 % :- decl_mpred('BaseKB',isa,2). 
-decl_mpred(Mt,_:Pred,Arity):-!,decl_mpred(Mt,Pred,Arity).
-decl_mpred(Mt,Pred,0):-!,decl_mpred(Mt,Pred,2).
-decl_mpred(Mt,Pred,Arity):-isRegisteredCycPred(Mt,Pred,Arity),!.
-decl_mpred(_,Pred,Arity):-isRegisteredCycPred(_,Pred,Arity),!.
-decl_mpred(Mt,Pred,Arity):-      
-      M = moodb,
+
+decl_mpred_now(Mt,M:Pred,Arity):-var(Pred),!,decl_mpred_now(Mt,M:Pred,Arity).
+decl_mpred_now(Mt,_:Pred,Arity):- nonvar(Pred),!,decl_mpred_now(Mt,Pred,Arity).
+decl_mpred_now(Mt,Pred,0):-!,decl_mpred_now(Mt,Pred,2).
+decl_mpred_now(_,Pred,Arity):-isRegisteredCycPred(_,Pred,Arity),!.
+decl_mpred_now(Mt,Pred,Arity):-    
+   M = moodb,
       checkCycPred(Pred,Arity),
       assertz(M:isRegisteredCycPred(Mt,Pred,Arity)),
-      add_db_prop(Pred,Arity,isRegisteredCycPred(Mt,Pred,Arity)),!.
+      functor(Templ,Pred,Arity),
+      add_mpred_prop(Templ,arity(Pred,Arity)).
 
 checkCycPreds:-isRegisteredCycPred(_,F,A),checkCycPred(F,A),fail.
 checkCycPreds.
 
-:-dynamic(never_use_holds_db/2).
+:-dynamic(never_use_holds_db/3).
 
-never_use_holds_db(op,_).
-never_use_holds_db(Builtin,Int):-integer(Int), functor(G,Builtin,Int),member(PP,[built_in, imported_from(system), foreign]),predicate_property(G,PP).
-never_use_holds_db(F,_):- is_2nd_order_holds(F).
+never_use_holds_db(':-',1,oper(':-')):-!.
+never_use_holds_db(op,_,oper(op)):-!.
+never_use_holds_db(decl_mpred,_,oper(decl_mpred)):-!.
 
-checkCycPred(:,2):-throw(checkCycPred(:,2)).
-checkCycPred(F,A):-never_use_holds_db(F,A),throw(never_use_holds_db(F,A)).
+never_use_holds_db(Builtin,Int,pp(Builtin/Int,G,PP)):-integer(Int), functor(G,Builtin,Int),member(PP,[imported_from(system),foreign,built_in]),predicate_property(G,PP),!.
+never_use_holds_db(F,_,is_2nd_order_holds):- is_2nd_order_holds(F),!.
+
+checkCycPred(:,2):-!,trace, dumpST, throw(checkCycPred(:,2)).
+checkCycPred(F,A):-never_use_holds_db(F,A,Why),throw(never_use_holds_db(F,A,Why)).
 checkCycPred(F,A):-copy_term(checkCycPred(F,A),CALL),catch(checkCycPred0(F,A),E,dmsg(E=CALL)).
 checkCycPred0(F,A):-functor(P,F,A),compile_predicates([F/A]),get_module_of(P,_M).
 
-:- decl_mpred(db_prop/2).
-:- decl_mpred(subclass/2).
 
 :- thread_local(thload:current_agent/2).
 :- asserta(thload:current_agent(_,dead)).
 :- ignore(retract(thload:current_agent(_,dead))).
 
+:-module_transparent(current_context_module/1).
 current_context_module(Ctx):-loading_module_h(Ctx),!.
 current_context_module(Ctx):-context_module(Ctx).
 
@@ -241,17 +302,20 @@ current_context_module(Ctx):-context_module(Ctx).
 :- dynamic_multifile_exported world_agent_plan/3.
 
 
+:- decl_mpred(db_prop/2).
+:- decl_mpred(subclass/2).
+
 :- decl_mpred(term_anglify_last/2).
 :- decl_mpred(term_anglify/2).
 
 :- decl_mpred action_info/1.
 :- decl_mpred action_help/2.
-:- decl_mpred type_action_help/3.
 :- decl_mpred action_rules/4.
 :- decl_mpred agent_text_command/4.
 :- decl_mpred createableSubclassType/2.
 :- decl_mpred createableType/1.
 :- decl_mpred label_type_props/3.
+:- decl_mpred label_type/2.
 :- decl_mpred specifier_text/2.
 :- decl_mpred subclass/2.
 :- decl_mpred term_anglify/2.
@@ -263,6 +327,8 @@ current_context_module(Ctx):-context_module(Ctx).
 :- decl_mpred update_charge/2.
 :- decl_mpred update_stats/2.
 :- decl_mpred use_usable/4.
+
+:- module_transparent register_module_type/1.
 
 :- dynamic_multifile_exported(decl_coerce/3).
 
@@ -346,4 +412,6 @@ term_expansion_local0(A,A).
 
 :- decl_mpred(agent_call_command,2).
 
+%:- module_predicates_are_exported(moodb).
+%:- module_meta_predicates_are_transparent(moodb).
 

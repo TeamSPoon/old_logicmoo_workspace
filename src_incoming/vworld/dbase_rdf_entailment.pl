@@ -1,7 +1,7 @@
 :- module(dbase_rdf_entailment,
 	  []).
 
-end_of_file.
+% end_of_file.
 
 /** <module> MUD Entailment
 

@@ -11,6 +11,7 @@
         run_mud_test/2,
         test_name/1,
         test_true/1,
+        term_test/1,
         test_false/1,
         last_test_name/1,
         run_mud_test_code/1]).

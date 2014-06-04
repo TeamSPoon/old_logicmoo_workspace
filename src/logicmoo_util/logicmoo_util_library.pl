@@ -12,8 +12,8 @@
          upcase_atom_safe/2,
          get_module_of/2,
          concat_atom_safe/3,
-         string_to_atom_safe/2,
          makeArgIndexes/1,
+         contains_singletons/1,
          doall/1,
          atom_concat_safe/3,
          op(1150,fx,(dynamic_multifile_exported)),
@@ -43,9 +43,13 @@
          make_list/3,
          multi_transparent/1]).
 
-:-ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_bugger)).
-:-ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)).
+:- '@'(use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)),'user').
 
+% :-user_use_module(logicmoo(logicmoo_util/logicmoo_util_strings)).
+% :-user_use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)).
+
+lastMember(_E,List):-var(List),!,fail.
+lastMember(E,[H|List]):-lastMember(E,List);E=H.
 
 % =================================================================================
 % Utils
@@ -83,7 +87,7 @@ asserta_if_new(N):-asserta(N),!.
 :- meta_predicate doall(0).
 doall(C):-ignore((C,fail)).
 
-:- ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_bugger)).
+:- user_use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)).
 
 :- meta_predicate in_thread_and_join(0).
 in_thread_and_join(Goal):-in_thread_and_join(Goal,_Status).
@@ -141,22 +145,27 @@ make_list(E,1,[E]):-!.
 make_list(E,N,[E|List]):- M1 is N - 1, make_list(E,M1,List),!.
 
 :- meta_predicate get_module_of_4(0,+,+,-).
-:- meta_predicate get_module_of(0,-).
+get_module_of_4(_P,F,A,M):- current_predicate(M0:F0/A0),F0=F,A0=A,!,M=M0.
+get_module_of_4(P,F,A,M):-throw((get_module_of_4(P,F,A,M))).
+/*
+get_module_of_4(_P,F,A,M):- current_predicate(F0/A0),F0=F,A0=A,!,moodb:dbase_mod(M).
+get_module_of_4(_P,F,A,_M):-trace, dbase:isCycPredArity(F,A),!,fail.
+get_module_of_4(P,F,A,M):- trace, debugCall(get_module_of_4(P,F,A,M)).
+*/
 
-get_module_of(V,M):-var(V),!,current_context_module(M).
+:- meta_predicate get_module_of(0,-).
+get_module_of(V,M):-var(V),!,current_module(M).
 get_module_of(F/A,M):-!,functor(P,F,A),!,get_module_of(P,M).
 get_module_of(P,M):-predicate_property(P,imported_from(M)),!.
+get_module_of(P,M):-predicate_property(_:P,imported_from(M)),!.
 get_module_of(MM:_,M):-!,MM=M.
 get_module_of(P,M):-functor(P,F,A),get_module_of_4(P,F,A,M).
-get_module_of_4(_P,F,A,M):- current_predicate(M0:F0/A0),F0=F,A0=A,!,M=M0.
-get_module_of_4(_P,F,A,M):- current_predicate(F0/A0),F0=F,A0=A,!,dbase_mod(M).
-get_module_of_4(_P,F,A,_M):-trace, isCycPredArity(F,A),!,fail.
-get_module_of_4(P,F,A,M):- trace, debugCall(get_module_of_4(P,F,A,M)).
 
 
 :- meta_predicate def_meta_predicate(0,+,+).
 
-def_meta_predicate(M:F,S,E):-doall(((between(S,E,N),make_list('?',N,List),CALL=..[F|List],'@'(meta_predicate(CALL),M)))).
+def_meta_predicate(M:F,S,E):-!,doall(((between(S,E,N),make_list('?',N,List),CALL=..[F|List],'@'(meta_predicate(CALL),M)))).
+def_meta_predicate(F,S,E):-throw((def_meta_predicate(F,S,E))).
 
 :- meta_predicate dynamic_multifile_exported(0), dynamic_multifile_exported(+,+), dynamic_multifile_exported(+,+,+).
 
@@ -191,17 +200,18 @@ get_functor(Obj,F):-functor(Obj,F,_).
 
 strip_f_module(_:P,F):-nonvar(P),!,strip_f_module(P,F).
 strip_f_module(P,P):-atom(P),!.
-strip_f_module(P,F):-hotrace(string(P);is_list(P);atomic(P)), text_to_string(P,S),!,atom_string(F,S).
+strip_f_module(P,F):- notrace(string(P);is_list(P);atomic(P)), text_to_string(P,S),!,atom_string(F,S).
 strip_f_module(P,P).
 
 functor_safe(M:P,M:F,A):-var(P),atom(M),!,functor(P,F,A).
 functor_safe(P,F,A):-var(P),!,strip_f_module(F,F0),functor(P,F0,A).
 functor_safe(P,F,A):-compound(P),!,functor_safe_compound(P,F,A).
-functor_safe(P,F,0):- hotrace(string(P);atomic(P)), text_to_string(P,S),!,atom_string(F,S).
+functor_safe(P,F,0):- notrace(string(P);atomic(P)), text_to_string(P,S),!,atom_string(F,S).
 functor_safe_compound((_,_),',',2).
 functor_safe_compound([_|_],'.',2).
+functor_safe_compound(_:P,F,A):- functor(P,F,A),!.
 functor_safe_compound(P,F,A):- functor(P,F,A).
-functor_safe_compound(P,F,A):- strip_f_module(P,P0),var(F),!,functor(P0,F0,A),strip_f_module(F0,F),!.
+functor_safe_compound(P,F,A):- var(F),strip_f_module(P,P0),!,functor(P0,F0,A),strip_f_module(F0,F),!.
 functor_safe_compound(P,F,A):- strip_f_module(P,P0),strip_f_module(F,F0),!,functor(P0,F0,A).
 
 :- meta_predicate at_start(0).
@@ -254,11 +264,9 @@ multi_transparent(X):-functor(X,F,A),multi_transparent(F/A),!.
 :- module_transparent(library_directory/1).
 
 throw_safe(Exc):-throw(Exc).
-string_to_atom_safe(ISO,LISTO):-LISTO==[],!,string_to_atom(ISO,'').
-string_to_atom_safe(ISO,LISTO):-string_to_atom(ISO,LISTO).
 atom_concat_safe(L,R,A):- ((atom(A),(atom(L);atom(R))) ; ((atom(L),atom(R)))), !, atom_concat(L,R,A),!.
-exists_file_safe(File):-must(atomic(File)),exists_file(File).
-exists_directory_safe(File):-must(atomic(File)),exists_directory(File).
+exists_file_safe(File):-bugger:must(atomic(File)),exists_file(File).
+exists_directory_safe(File):-bugger:must(atomic(File)),exists_directory(File).
 concat_atom_safe(List,Sep,[Atom]):-atom(Atom),!,concat_atom(List,Sep,Atom),!.
 concat_atom_safe(List,Sep,Atom):-atom(Atom),!,concat_atom(ListM,Sep,Atom),!,List = ListM.
 concat_atom_safe(List,Sep,Atom):- concat_atom(List,Sep,Atom),!.
@@ -276,7 +284,7 @@ list_to_set_safe([A|AA],BB):- (not(not(lastMember(A,AA))) -> list_to_set_safe(AA
 % so far only the findall version works .. the other runs out of local stack!?
 
 maplist_safe(_Pred,[]):-!.
-maplist_safe(Pred,LIST):-findall(E,(member(E,LIST),debugOnFailure(apply(Pred,[E]))),LISTO),!, ignore(LIST=LISTO),!.
+maplist_safe(Pred,LIST):-findall(E,(member(E,LIST), bugger:debugOnFailure(apply(Pred,[E]))),LISTO),!, ignore(LIST=LISTO),!.
 % though this should been fine %  maplist_safe(Pred,[A|B]):- copy_term(Pred+A, Pred0+A0), debugOnFailure(once(call(Pred0,A0))),     maplist_safe(Pred,B),!.
 
 maplist_safe(_Pred,[],[]):-!.
@@ -302,7 +310,42 @@ addLibraryDir :- buggerDir(Here),atom_concat(Here,'/..',UpOne), absolute_file_na
 :-hasLibrarySupport->true;throwNoLib.
 
 % TODO remove this next line
-% :-ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_bugger')).
+:-user_use_module(logicmoo('logicmoo_util/logicmoo_util_bugger')).
 % and replace with...
 
 
+
+term_parts(A,[A]):- not(compound(A)),!.
+term_parts([A|L],TERMS):-!,term_parts_l([A|L],TERMS).
+term_parts(Comp,[P/A|TERMS]):- functor(Comp,P,A), Comp=..[P|List],term_parts_l(List,TERMS).
+
+term_parts_l(Var,[open(Var),Var]):-var(Var),!.
+term_parts_l([],[]):-!.
+term_parts_l([A|L],TERMS):-!,term_parts(A,AP),term_parts_l(L,LP),append(AP,LP,TERMS).
+term_parts_l(Term,[open(Term)|TERMS]):-term_parts(Term,TERMS),!.
+
+pred_term_parts(Pred,A,[A]):- call(Pred,A),!.
+pred_term_parts(_Pred,A,[]):-not(compound(A)),!.
+pred_term_parts(Pred,[A|L],TERMS):-!,pred_term_parts_l(Pred,[A|L],TERMS),!.
+pred_term_parts(Pred,Comp,TERMS):-Comp=..[P,A|List],pred_term_parts_l(Pred,[P,A|List],TERMS),!.
+pred_term_parts(_,_Term,[]).
+
+pred_term_parts_l(_,NV,[]):-NV==[],!.
+pred_term_parts_l(Pred,[A|L],TERMS):-!,pred_term_parts(Pred,A,AP),pred_term_parts_l(Pred,L,LP),append(AP,LP,TERMS),!.
+pred_term_parts_l(Pred,Term,TERMS):-pred_term_parts(Pred,Term,TERMS),!.
+pred_term_parts_l(_,_Term,[]).
+
+throw_if_true_else_fail(T,E):- once(hotrace(T)),throw(throw_if_true_else_fail(E:T)).
+
+list_retain(PL,Pred,Result):- throw_if_true_else_fail(not(is_list(PL)),list_retain(PL,Pred,Result)).
+list_retain([],_Pred,[]):-!.
+list_retain([R|List],Pred,[R|Retained]):- call(Pred,R),!, list_retain(List,Pred,Retained).
+list_retain([_|List],Pred,Retained):- list_retain(List,Pred,Retained).
+
+identical_member(X,[Y|_])  :-
+	X == Y,
+	!.
+identical_member(X,[_|L]) :-
+	'identical_member'(X,L).
+
+contains_singletons(Term):- not(ground(Term)),not(not((numbervars(Term,0,E,[attvar(skip),singletons(true)]),sub_term(Term,'$VAR'('_'))))).

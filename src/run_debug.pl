@@ -4,16 +4,22 @@
 */
 :- debug.
 :- use_module(library(settings)).
+% :- use_module(library(check)).
+% :- make.
 
-:- dynamic(fullStart/0).
+:- dynamic(run_debug:fullStart/0).
+
+:-context_module(CM),assert(run_debug:loading_from_cm(CM)).
+:-module(run_debug).
+:-run_debug:loading_from_cm(CM),module(CM).
+
 % :- guitracer.
 :- set_prolog_flag(verbose_load,true).
-
 
 % ======================================================
 % Configure the logicmoo utilities into the file path
 % :- include('logicmoo_util/logicmoo_util_header').
-% :- ensure_loaded('logicmoo_util/logicmoo_util_all.pl').
+% :- user_use_module('logicmoo_util/logicmoo_util_all.pl').
 % And adds the local directories to file search path of logicmoo(..)
 % ======================================================
 :- consult('logicmoo_util/logicmoo_util_all').
@@ -27,7 +33,7 @@ user:file_search_path(cliopatria, '/devel/ClioPatria').
 user:file_search_path(cliopatria, 't:/devel/ClioPatria').
 
 
-:- use_module(library(settings)).
+:- user_use_module(library(settings)).
 
 :- user:file_search_path(cliopatria,SP),
    exists_directory(SP),
@@ -36,14 +42,14 @@ user:file_search_path(cliopatria, 't:/devel/ClioPatria').
    %save_settings('moo_settings.db').
    %%setting(cliopatria_binding:path, atom, SP, 'Path to root of cliopatria install'),!.
 
-:- ensure_loaded(logicmoo('http/user_page')).
+:- user_use_module(logicmoo('http/user_page')).
 
-:- meta_predicate(if_version_greater(?,0)).
+:- meta_predicate(startup_mod:if_version_greater(?,0)).
 
-if_version_greater(V,Goal):- current_prolog_flag(version,F), ((F > V) -> call(Goal) ; true).
+startup_mod:if_version_greater(V,Goal):- current_prolog_flag(version,F), ((F > V) -> call(Goal) ; true).
 
 % set to false because we don't want to use the mudconsole
-:- if_flag_true(false, if_version_greater(70109,ensure_loaded(logicmoo('mudconsole/mudconsolestart')))).
+:- if_flag_true(false, startup_mod:if_version_greater(70109,user_use_module(logicmoo('mudconsole/mudconsolestart')))).
 
 % [Optionaly 1st run] tell where ClioPatria is located and restart for the 2nd run
 %:- set_setting(cliopatria_binding:path, '/devel/ClioPatria'), save_settings('moo_settings.db').
@@ -53,86 +59,28 @@ if_version_greater(V,Goal):- current_prolog_flag(version,F), ((F > V) -> call(Go
 %
 start_servers :- !.
 
+%%:- user_use_module('t:/devel/cliopatria/rdfql/sparql_runtime.pl').
 
-%%:- ensure_loaded('t:/devel/cliopatria/rdfql/sparql_runtime.pl').
+start_servers :- startup_mod:if_version_greater(70111,user_use_module(logicmoo(launchcliopatria))).
 
-start_servers :- if_version_greater(70111,ensure_loaded(logicmoo(launchcliopatria))).
+%start_servers :- startup_mod:if_version_greater(70111,thread_create(user_use_module(logicmoo(launchcliopatria)),_,[alias(loading_code)])).
 
-% start_servers :- if_version_greater(70111,thread_create(ensure_loaded(logicmoo(launchcliopatria)),_,[alias(loading_code)])).
-
-% start_servers
+% run_debug:start_servers
 % this is evil. Starts the old mudconsole, the experiment with Jan's
 % webconsole. We're not using that
-% :- if_version_greater(70109,http_mud_server).
+% :- startup_mod:if_version_greater(70109,http_mud_server).
 
-:- if_flag_true(fullStart, start_servers).
+:- if_flag_true(fullStart, run_debug:start_servers).
 
 % [Required] load and start mud
-:- ensure_loaded(logicmoo('vworld/moo_startup')).
+:- include(logicmoo('vworld/moo_startup')).
 
 
-/*
-% Load datalog
-:- if_flag_true(fullStart, ((ensure_loaded(logicmoo('des/des.pl')),
-  flush_output,
-  init_des,
-  display_status,
- %  des,
-   !))).
 
-*/
-
-
-:- use_module(library(check)).
-% :- at_start(check:list_undefined).
-
-% GOLOG SYSTEM WITHOUT FLUX (Default Commented Out)
-%:- if_flag_true(fullStart,ensure_loaded(logicmoo('indigolog/indigolog_main_swi.pl'))).
-
-% FLUX AGENT SYSTEM WITHOUT GOLOG (Default Commented Out)
-%:- if_flag_true(fullStart,ensure_loaded(logicmoo('indigolog/flux_main_swi.pl'))).
-
-% FLUX AGENT SYSTEM WITH GOLOG
-% :- if_flag_true(true,ensure_loaded(logicmoo('indigolog/indigolog_main_swi_flux.pl'))).
-
-% LOGICMOO DATABASE LOGIC ENGINE SERVER
-%:- if_flag_true(true,ensure_loaded(logicmoo('database/logicmoo.swi'))).
-
-% when we import new and awefull code base (the previous )this can be helpfull
-% we redfine list_undefined/1 .. this is the old version
-lundef :- A = [],
-       check:( merge_options(A, [module_class([user])], B),
-        prolog_walk_code([undefined(trace), on_trace(found_undef)|B]),
-        findall(C-D, retract(undef(C, D)), E),
-        (   E==[]
-        ->  true
-        ;   print_message(warning, check(undefined_predicates)),
-            keysort(E, F),
-            group_pairs_by_key(F, G),
-            maplist(report_undefined, G)
-        )).
-
-:- if_flag_true(fullStart,remove_undef_search).
-
-
-/*
-  ==
-  ?- [library(mudconsole)].
-  ?- mc_start.				% opens browser
-
-   or else http_mud_server
-
-  ?- mc_format('Hello ~w', [world]).
-  ?- mc_html(p(['Hello ', b(world)])).
-  ?- mc_ask([age(Age)], [p('How old are you'), input([name(age)])]).
-  Age = 24.				% type 24 <enter>
-  ==
-
-*/
-
-:- moodb:begin_transform_moo_preds.
-
-moo:agent_text_command(Agent,[run,Term], Agent,prologCall(Term)).
+:-run_debug:loading_from_cm(CM),module(CM).
+% :-module(user).
+% :-prolog.
+% end_of_file.
 
 
 % [Optionaly] Put a telnet client handler on the main console
@@ -143,7 +91,6 @@ load_default_game :- load_game(logicmoo('rooms/startrek.all.pl')).
 run_setup:-
    nodebug,
    debug,  
-   scan_db_prop,
    at_start(load_default_game),
    register_timer_thread(npc_ticker,1,npc_tick_tock).
 
@@ -151,7 +98,7 @@ run:-
    login_and_run.
 
 % LOGICMOO LOGICSERVER DATA (Defaut uncommented)
-:- if_flag_true(fullStart, ensure_loaded(logicmoo('data/mworld0.pldata'))).
+:- if_flag_true(fullStart, user_use_module(logicmoo('data/mworld0.pldata'))).
 
 % :- if_flag_true(fullStart, load_game(logicmoo('rooms/startrek.all.pl'))).
 
@@ -168,13 +115,15 @@ ht:- do_player_action('s'),
    do_player_action('s'),
    do_player_action('s').
 
-:- noguitracer.
+:- catch(noguitracer,_,true).
 
-:- make.
+% :- make.
 
-:- at_start(start_servers).
+:- at_start(run_debug:start_servers).
+
+end_of_file.
+
 :- at_start(run_setup).
-
 
 :- at_start(run).
 

@@ -26,7 +26,7 @@
 % .. that was a "hint" to where you could fastforward the backwards search .. end named binding context also had a "index" to when you leave a named block.. 
 % you could quickly reset the top of an index.
 
-:-module(ctx_frame,[ctxHideIfNeeded/3,
+:-module(ctx_frame,[
          lastMember/2,
          lastMember/3,
          pushCtxFrame/3,
@@ -38,8 +38,9 @@
 
 :- meta_predicate with_assertions(:,0).
 
-:-ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_library.pl')).
-:-ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_bugger.pl')).
+:-use_module(logicmoo(logicmoo_util/logicmoo_util_library)).
+:-use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)).
+:-use_module(logicmoo(logicmoo_util/logicmoo_util_library)).
 
 currentContext(Name,X):-hotrace(makeLocalContext(Name,X)),!.
 
@@ -179,7 +180,7 @@ lastMember2(E,List):-to_open_list(_,Closed,_Open,List),reverse(Closed,Rev),membe
 
 %lastMember(End,List) :- append(_,[End|_],List).
 
-ctxHideIfNeeded(_Ctx,Before,After):-hideIfNeeded(Before,After),!.
+bugger:evil_term(_Ctx,Before,After):-hideIfNeeded(Before,After),!.
 
 hideIfNeeded(I,I):- (var(I);atomic(I)),!.
 hideIfNeeded([I|_],ctx):-nonvar(I),I=frame(_,_,_),!.
@@ -209,5 +210,4 @@ mergeAppend0(L,R,A):-append(L,R,A).
 
 eqmember(E,List):-copy_term_numvars(E:List,E0:List0),member(E0,List0).
 copy_term_numvars(OLD,NEW):-copy_term(OLD,NEW),numbervars(NEW,0,_).
-
 

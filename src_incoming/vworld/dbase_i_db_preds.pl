@@ -40,7 +40,6 @@ prepCollocation/3,
 scientificName/2, 
 verbSemTrans/4, 
 infinitive/4, 
-verbSemTrans/6, 
 'termStrings-GuessedFromName'/2)).
 
 :- registerCycPredPlus2([

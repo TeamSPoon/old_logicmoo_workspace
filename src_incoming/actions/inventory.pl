@@ -7,6 +7,7 @@
 
 :- moodb:register_module_type(command).
 
+:-debug.
 
 % ====================================================
 % the entire inventory system

@@ -14,7 +14,7 @@
 % Douglas Miles
 */
 
-
+:- meta_predicate isDebug(0).
 
 stringToWords([],[]).
 stringToWords(TheList,Words):-functor(TheList,'TheList',_),TheList=..[_|List],!,stringToWords(List,Words).
@@ -26,6 +26,16 @@ stringToWords([S|Tring],[W|Words]):-stringToWord(S,W),stringToWords(Tring,Words)
 
 stringToWord([S|L],W):-!,textCached([S|L],[lex,W|_]).
 stringToWord(S,W):-textCached([S],[lex,W|_]).
+
+     
+%list_to_term(X,Y):- balanceBinding(X,Y).
+list_to_term(X,Y):-nonvar(X),var(Y),!,list_to_terms_lr(X,Y).
+list_to_term(X,Y):-list_to_terms_rl(X,Y).
+list_to_terms_rl(List,(A,B)):-list_to_terms_rl(A,AL),list_to_terms_rl(B,BL),append(AL,BL,List).
+list_to_terms_rl(List,(A;B)):-list_to_terms_rl(A,AL),list_to_terms_rl(B,BL),append(AL,[or|BL],List).
+list_to_terms_lr([],true):-!.
+list_to_terms_lr([T],T):-!.
+list_to_terms_lr([H|T],(H,TT)):-!,list_to_terms_lr(T,TT).
 
 % ===================================================================
 
@@ -492,7 +502,7 @@ assertThrough(Mt:CycL):-
 assertThrough(CycL):-
       assertThrough(_Mt,CycL).
 
-assertThrough(ToMt,CycL):-
+assertThrough(ToMt,CycL):- throw(whyHEre),
       functor(CycL,Pred,Arity),
       isRegisteredCycPred(Mt,Pred,Arity),!,
       ignore(ToMt=Mt),
@@ -807,8 +817,10 @@ variable(VN)-->  ['?',A], { var_number(A,VN)   } .
 variable(VN)-->  ['??'], { var_gen(A),var_number(A,VN)   } .     %Anonymous
 variable(VN)-->  ['?'], { var_gen(A),var_number(A,VN)   } . 
 
+idGen66(X):-flag(idGen,X,X+1).
+
 % Makes up sequencial Variable names for anonymous cycl getPrologVars
-var_gen(Atom):-idGen(Number),number_codes(Number,Codes),atom_codes(Atom,[86,65,82|Codes]). % "VAR"
+var_gen(Atom):-idGen66(Number),number_codes(Number,Codes),atom_codes(Atom,[86,65,82|Codes]). % "VAR"
 
 constant(Number) --> number(Number) .
    

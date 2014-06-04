@@ -220,11 +220,11 @@ Object applies:
 
 %
 */
-:- module(objects, [ max_charge/1, max_damage/1,label_type/2]).
+:- module(objects, [ max_charge/1, max_damage/1 ]).
 
 :- include(logicmoo(vworld/moo_header)).
 
-:-ignore(moo:moodb:register_module_type([world_types,parser])).
+:-moodb:register_module_type([world_types,parser]).
 
 label_type(Label,Type):-moo:label_type_props(Label,Type,_).
 

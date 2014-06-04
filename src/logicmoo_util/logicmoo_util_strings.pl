@@ -9,6 +9,7 @@
 % ===================================================================
 :-module(logicmoo_util_strings,[
             atoms_of/2,
+            to_word_list/2,
             equals_icase/2,
             string_ci/2,
             string_dedupe/2,
@@ -34,7 +35,7 @@
          is_string/1,
          is_codelist/1,
          is_charlist/1,
-
+         string_to_atom_safe/2,
          stringToCodelist/2,
          trim/2,
          clean_codes/2,
@@ -54,6 +55,11 @@
 
    ]).
 
+:-import(bugger:must/1).
+
+string_to_atom_safe(ISO,LISTO):-LISTO==[],!,string_to_atom(ISO,'').
+string_to_atom_safe(ISO,LISTO):-string_to_atom(ISO,LISTO).
+
 /*
 string_chars(S,C):-atom_chars(S,C).
 text_to_string(T,S):-string_to_atom(S,T).
@@ -61,8 +67,8 @@ string_upper(M,U):-toUppercase(M,U).
 string_lower(M,U):-toLowercase(M,U).
 */
 
-:-ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_library.pl')).
-:-ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_bugger.pl')).
+:- use_module(logicmoo_util_bugger).
+:- meta_predicate map_tree_to_list(2,?,*).
 
 ib_multi_transparent(MT):-multifile(MT),dynamic(MT),module_transparent(MT).
 
@@ -377,6 +383,22 @@ interleave([Atom|More],Space,[Atom,Space|Result]):-interleave(More,Space,Result)
 
 
 
+%================================================================
+% decends tree
+%================================================================
+
+map_tree_to_list(_,PATTERN,Output):- (var(PATTERN);number(PATTERN)),!,must_assign([PATTERN],Output).
+map_tree_to_list(_,[],OUT):-!,must_assign([],OUT).
+map_tree_to_list(Pred,IN,Output):- once(call(Pred,IN,MID)),must((MID=IN -> flatten([MID],OUT) ; map_tree_to_list(Pred,MID,OUT))),!,must_assign(OUT=Output).
+map_tree_to_list(Pred,[I|IN],Output):-!,debugOnFailureEach((map_tree_to_list(Pred,I,O1),map_tree_to_list(Pred,IN,O2),!,append(O1,O2,OUT))),!,must_assign(OUT=Output).
+map_tree_to_list(Pred,IN,Output):-atom(IN),must((atomSplit(IN,MID),!,map_tree_to_list(Pred,MID,OUT))),!,must_assign(OUT=Output).
+map_tree_to_list(Pred,IN,Output):-
+ must((compound(IN), IN=..INP, append(Left,[Last],INP), map_tree_to_list(Pred,Last,UT),!,
+  append(Left,[UT],OUTP),!, OUT =.. OUTP)),must_assign([OUT],Output).
+map_tree_to_list(_,IN,IN):-trace,must_assign([IN],IN).
+
+
+
 equals_icase(A,B):-string_ci(A,U),string_ci(B,U).
 starts_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),atom_concat(UB,_,UA).
 starts_or_ends_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),(atom_concat(UB,_,UA);atom_concat(_,UA,UB)).
@@ -399,6 +421,17 @@ append_ci([H1|T],L2,[H2|L3]) :- string_equal_ci(H1,H2),append_ci(T,L2,L3).
 string_equal_ci(L0,L1):-once(string_ci(L0,SL0)),string_ci(L1,SL0),!.
 string_equal_ci(L0,L0):-!.
 
+
+to_word_list(A,S):-once(hotrace(to_word_list_0(A,S))).
+to_word_list_0(V,V):-var(V),!.
+to_word_list_0([A],[A]):-number(A),!.
+to_word_list_0([],[]):-!.
+to_word_list_0("",[]):-!.
+to_word_list_0('',[]):-!.
+to_word_list_0([A,B|C],[A,B|C]):-atom(A),atom(B),!.
+to_word_list_0(A,S):-atomSplit(A,S),!.
+to_word_list_0(Input,WList):- (string(Input);atom(Input)),(atomic_list_concat(WList," ",Input);WList=[Input]),!.
+to_word_list_0(Input,Input).
 
 str_contains_all([],_String):-!.
 str_contains_all(A,SL):-string_ci(SL,SLIC),SL\=SLIC,!,str_contains_all(A,SLIC).
@@ -423,5 +456,4 @@ longest_string(Order,TStr1,TStr2):-
    text_to_string(TStr1,Str1),string_length(Str1,L1),
    text_to_string(TStr2,Str2),string_length(Str2,L2),
    compare(Order,L2-Str2,L1-Str1).
-
 

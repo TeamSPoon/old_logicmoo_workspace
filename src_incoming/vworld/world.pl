@@ -19,19 +19,16 @@
         call_agent_action/2,
             world_mud_isa/2,
             isa_any/2,
+          create_meta/4,
             put_in_world/1,
             get_session_id/1,
             pathBetween_call/3,
             obj_memb/2,
             prop_memb/2,
             move_dir_target/3,
-            create_instance/2,create_instance/3,
-            create_agent/1,
-            create_agent/2,
             in_world_move/3, check_for_fall/3,
             agent_into_corpse/1, display_stats/1,
             reverse_dir/2,
-            same/2,
             round_loc/8,
             round_loc_target/8,
             dir_offset/5,
@@ -44,14 +41,13 @@
             list_object_dir_near/3,
             num_near/3,
             asInvoked/2,
-            define_type/1,
+
           show_kb_via_pred/3,
           default_repl_obj_to_string/3,
           default_repl_writer/4,
           show_kb_preds/2,show_kb_preds/3,success/2,
          init_location_grid/1,
          % test_te/0,
-         samef/2,
          grid_dist/3,
          to_3d/2,
          is_3d/1,
@@ -72,6 +68,13 @@
 
  ]).
 
+:-discontiguous create_instance_0/3.
+
+:-export((
+          create_instance/2,create_instance/3,
+          create_instance_0/3,
+          create_agent/1,
+          create_agent/2)).
 
 :- dynamic  agent_list/1.
 
@@ -238,20 +241,7 @@ create_instance_0(T,Type,List):-moo:subclass(Type,MetaType),moo:createableType(M
    put_in_world(P).
 
 moo:createableType(type).
-
-split_name_type(T,T,C):-compound(T),functor(T,C,_),!.
-split_name_type(T,T,C):-atom(T),atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),catch(number_codes(_,Digits),_,fail),atom_codes(C,Type),!.
-split_name_type(C,P,C):-atom(C),C==food,gensym(C,P),!.
-split_name_type(C,P,C):-atom(C),trace,gensym(C,P),!.
-split_name_type(C,P,C):-string(C),trace,gensym(C,P),!.
-
-same(X,Y):- X=Y,!.
-same(X,Y):- compound(X),arg(1,X,Y),!.
-same(X,Y):- compound(Y),arg(1,Y,X),!.
-same(X,Y):- samef(X,Y).
-
-samef(X,Y):- X=Y,!.
-samef(X,Y):- hotrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci(XF,YF)))).
+f(X,Y):- hotrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci(XF,YF)))).
 
 moo:type_default_props(_,agent,last_command(stand)).
 

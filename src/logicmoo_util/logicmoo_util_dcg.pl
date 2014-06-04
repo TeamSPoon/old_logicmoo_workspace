@@ -10,7 +10,9 @@
 % ===================================================================
 */
 :-module(logicmoo_util_dcg,[
+         do_dcg_util_tests/0,
          dcgAnd//2,
+         dumpList/1,
          dcgOr//2,
          dcgNot//1,
          theString//1,
@@ -67,10 +69,11 @@
    decl_dcgTest_startsWith/3.
 
 
-:-include('logicmoo_util_header.pl').
-:-ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_bugger.pl')).
-:-ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_strings.pl')).
-
+:-use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)).
+:-use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)).
+:-use_module(logicmoo(logicmoo_util/logicmoo_util_library)).
+:-use_module(logicmoo(logicmoo_util/logicmoo_util_strings)).
+:-use_module(logicmoo(logicmoo_util/logicmoo_util_terms)).
 
 decl_dcgTest(X,Y):- nonvar(Y),!,do_dcgTest(X,Y,true).
 decl_dcgTest(X,Y,Z):- nonvar(Y),!,do_dcgTest(X,Y,Z).
@@ -258,7 +261,7 @@ decl_dcgTest("this is text",dcgStartsWith0(theText([this,is]))).
 % DCG Tester
 % =======================================================
 
-doTests:-
+do_dcg_util_tests:-
    forall(decl_dcgTest(List,Phrase,Call),'@'((do_dcgTest(List,Phrase,Call)),logicmoo_util_dcg)),
    forall(decl_dcgTest_startsWith(List,Phrase,Call),'@'((do_dcgTest_startsWith(List,Phrase,Call)),logicmoo_util_dcg)).
 
@@ -277,24 +280,24 @@ decl_dcgTest(List,Phrase,true):-decl_dcgTest(List,Phrase).
 decl_dcgTest_startsWith(List,Phrase,true):-decl_dcgTest_startsWith(List,Phrase).
 
 
-to_word_list(A,S):-once(hotrace(to_word_list_0(A,S))).
-to_word_list_0(V,V):-var(V),!.
-to_word_list_0([A],[A]):-number(A),!.
-to_word_list_0([],[]):-!.
-to_word_list_0("",[]):-!.
-to_word_list_0('',[]):-!.
-to_word_list_0([A,B|C],[A,B|C]):-atom(A),atom(B),!.
-to_word_list_0(A,S):-atomSplit(A,S),!.
-to_word_list_0(Input,WList):- (string(Input);atom(Input)),(atomic_list_concat(WList," ",Input);WList=[Input]),!.
-to_word_list_0(Input,Input).
 
-:-source_location(File,_Line),module_property(M,file(File)),!,forall(current_predicate(M:F/A),M:export(F/A)).
+% :-source_location(File,_Line),module_property(M,file(File)),!,forall(current_predicate(M:F/A),M:export(F/A)).
 
-:-doTests.
+     
+
+
+dumpList(B):- currentContext(dumpList,Ctx),dumpList(Ctx,B).
+dumpList(_,AB):-dmsg(dumpList(AB)),!.
+
+dumpList(_,[]):-!.
+%dumpList(Ctx,[A|B]):-!,fmt(Ctx,A),dumpList(Ctx,B),!.
+%dumpList(Ctx,B):-fmt(Ctx,dumpList(B)).
 
 end_of_file.
 
 sentenceTagger(English,Tagged).
+
+
 
 
 
@@ -303,5 +306,6 @@ testPhrase(Dcg,English):-
          phrase(Dcg,Tagged,Left),
          nl,nl,writeq(left),         
          nl,dumpList(Left).
+
 
 
