@@ -18,8 +18,8 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- registerCycPred(ft_info,2).
-:- registerCycPred(subft,2).
+:- decl_mpred(ft_info,2).
+:- decl_mpred(subft,2).
 
 term_is_ft(Term,Type):-
    moo:ft_info(Type,How),

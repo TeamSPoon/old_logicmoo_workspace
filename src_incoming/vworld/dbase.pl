@@ -126,7 +126,7 @@ testOpenCyc/0)).
 :-dynamic(dbase_mod/1).
 dbase_mod(dbase).
 
-:-registerCycPred((
+:-decl_mpred((
      type/1, agent/1, item/1, region/1,
 
       thinking/1,
@@ -498,7 +498,7 @@ ah(P,A1):- dmsg(ah(P,1,A1)).
 % :- style_check(-string).
 
  
-scan_arities:- forall(holds_t(arity,F,A),moodb:registerCycPred(F,A)).
+scan_arities:- forall(holds_t(arity,F,A),moodb:decl_mpred(F,A)).
 
 :- include(logicmoo(vworld/dbase_i_cyc)).
 
@@ -635,8 +635,8 @@ define_db_prop_1(W,F,A,PT):-moodb:add_db_prop(F,A,PT),!,forall(member_or_e(E,PT)
 define_db_prop_2(W,F,A,_):- doall(forall(moodb:is_db_prop(F,A,CL),ignore(define_db_prop_3(W,F,A,CL)))).
 
 % pass 3 = re-add extensional hooks
-define_db_prop_3(_,Pred,Arity,isRegisteredCycPred(_,Pred,Arity)):- moodb:registerCycPred(Pred,Arity).
-define_db_prop_3(_,Pred,Arity,cyc):-moodb:registerCycPred(Pred,Arity).
+define_db_prop_3(_,Pred,Arity,isRegisteredCycPred(_,Pred,Arity)):- moodb:decl_mpred(Pred,Arity).
+define_db_prop_3(_,Pred,Arity,cyc):-moodb:decl_mpred(Pred,Arity).
 define_db_prop_3(_,F,A,module(Module)):-not(dbase_mod(Module)),functor(HEAD,F,A),must(predicate_property(Module:HEAD,_)),!.
 define_db_prop_3(_,F,A,module(Module)):-dbase_mod(Module),!,declare_dbase_local(F,A).
 define_db_prop_3(_,F,A,arity(F,A)):- 
@@ -662,7 +662,7 @@ declare_dbase_local_1(Module, Pred, F,A):-
    moodb:add_db_prop(F,A,module(Module)).
 
 declare_dbase_local_1(Module, Pred, F,A):- 
-   dbase_mod(Module),!,registerCycPred(F,A).
+   dbase_mod(Module),!,decl_mpred(F,A).
    %%'@'(((  dynamic( F/A ), Module:export( F/A )   )),Module ),!. 
 
 
@@ -845,7 +845,7 @@ ensure_db_predicate_2(_AR,CI,G):- expand_term(CI,G).
 prepend_module(_:C,M,M:C):-!.
 prepend_module(C,M,M:C).
 
-make_predicate(DBASE,F,A):-dbase_mod(DBASE),!,registerCycPred(F,A),!.
+make_predicate(DBASE,F,A):-dbase_mod(DBASE),!,decl_mpred(F,A),!.
 make_predicate(M,F,A):- T =  '@'((dynamic(F/A)),M),ground(T),!,T.
 make_predicate(M,F,A):- dynamic(F/A).
 

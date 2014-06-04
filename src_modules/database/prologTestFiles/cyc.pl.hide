@@ -3471,7 +3471,7 @@ dumpstack_argument(N,Frame):-
 	NN is N +1,
 	dumpstack_argument(NN,Frame).
 	
-dumpstack_argument(N,Frame):-!,write('\n').
+dumpstack_argument(_N,_Frame):-!,write('\n').
 	
 :-dynamic_transparent(mods/1).
 

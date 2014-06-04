@@ -538,10 +538,10 @@ retractAllThrough(ToMt,CycL):-
 
 
 % examples
-:-registerCycPred('BaseKB',isa,2).
-:-registerCycPred('BaseKB',genls,2).
-:-registerCycPred('BaseKB',genlMt,2).
-:-registerCycPred('BaseKB',arity,2).
+:-decl_mpred('BaseKB',isa,2).
+:-decl_mpred('BaseKB',genls,2).
+:-decl_mpred('BaseKB',genlMt,2).
+:-decl_mpred('BaseKB',arity,2).
 
 
 % ============================================

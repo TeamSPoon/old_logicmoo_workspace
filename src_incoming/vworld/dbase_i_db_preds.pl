@@ -16,7 +16,7 @@
 % Douglas Miles
 */
 
-:- registerCycPred((
+:- decl_mpred((
 'abbreviationString-PN'/2, 
 'countryName-LongForm'/2, 
 'countryName-ShortForm'/2, 

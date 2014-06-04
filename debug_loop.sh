@@ -10,6 +10,7 @@ do
         echo "Hit CTRL+C ${BASH_SOURCE[0]} ";
         cd $OLDPWD
            reset -w
+	   echo -en "\ec\e[3J"
         sleep 3;
         cd $NEWPWD
         swipl -f run_debug.pl

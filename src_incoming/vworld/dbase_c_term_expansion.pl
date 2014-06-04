@@ -40,7 +40,7 @@ use_holds_db(F,A,A):- isCycPredArity(F,A).
 
 ensure_moo_pred(F,A):-never_use_holds_db(F,A),!,throw(never_use_holds_db(F,A)).
 ensure_moo_pred(F,A,NewA):-use_holds_db(F,A,NewA),!.
-ensure_moo_pred(F,A,A):- dmsg(once(registerCycPred(F,A))),moodb:registerCycPred(F,A).
+ensure_moo_pred(F,A,A):- dmsg(once(decl_mpred(F,A))),moodb:decl_mpred(F,A).
 
 is_kb_module(Moo):-atom(Moo),member(Moo,[moo,kb,opencyc]).
 is_kb_mt_module(Moo):-atom(Moo),member(Moo,[moomt,kbmt]).

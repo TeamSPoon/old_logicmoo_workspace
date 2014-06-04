@@ -11,10 +11,10 @@
 
 :- module(moodb,
         [     
-        op(1150,fx,registerCycPred)
+        op(1150,fx,decl_mpred)
         ]).
 
-:- op(1150,fx,(registerCycPred)).
+:- op(1150,fx,(decl_mpred)).
 
 :-export((coerce/3, 
            add_db_prop/3,
@@ -25,9 +25,9 @@
           is_holds_true/1,
 
          current_context_module/1,         
-         (registerCycPred)/1,         
-         (registerCycPred)/2,
-         (registerCycPred)/3,
+         (decl_mpred)/1,         
+         (decl_mpred)/2,
+         (decl_mpred)/3,
          ensure_moo_loaded/1,
          isRegisteredCycPred/3,
          registerCycPredPlus2/1,
@@ -150,10 +150,10 @@ rem_db_prop(F,A,CL):- retractall(is_db_prop(F,A,CL)).
 %
 %  the following will all do the same things:
 %
-% :- registerCycPred('BaseKB':isa/2). 
-% :- registerCycPred('BaseKB':isa(_,_)). 
-% :- registerCycPred(isa(_,_),'BaseKB'). 
-% :- registerCycPred('BaseKB',isa,2). 
+% :- decl_mpred('BaseKB':isa/2). 
+% :- decl_mpred('BaseKB':isa(_,_)). 
+% :- decl_mpred(isa(_,_),'BaseKB'). 
+% :- decl_mpred('BaseKB',isa,2). 
 %
 %  Will make calls 
 % :- isa(X,Y)
@@ -162,23 +162,23 @@ rem_db_prop(F,A,CL):- retractall(is_db_prop(F,A,CL)).
 % ============================================
 :-dynamic(isRegisteredCycPred/3).
 
-% :- registerCycPred('BaseKB':isa/2). 
-registerCycPred(Mt:Pred/Arity):- !,
-   registerCycPred(Mt,Pred,Arity).
+% :- decl_mpred('BaseKB':isa/2). 
+decl_mpred(Mt:Pred/Arity):- !,
+   decl_mpred(Mt,Pred,Arity).
 
-% :- registerCycPred('BaseKB':isa(_,_)). 
-registerCycPred(Mt:Term):-
+% :- decl_mpred('BaseKB':isa(_,_)). 
+decl_mpred(Mt:Term):-
    functor(Term,Pred,Arity),
-   registerCycPred(Mt,Pred,Arity).
+   decl_mpred(Mt,Pred,Arity).
 
-registerCycPred(M:F):-!, '@'(registerCycPred(F), M).
-registerCycPred(F/A):- registerCycPred(F,A).
-registerCycPred([A]):-!,registerCycPred(A).
-registerCycPred([A|L]):-!,registerCycPred(A),registerCycPred(L).
-registerCycPred((A,L)):-!,registerCycPred(A),registerCycPred(L).
+decl_mpred(M:F):-!, '@'(decl_mpred(F), M).
+decl_mpred(F/A):- decl_mpred(F,A).
+decl_mpred([A]):-!,decl_mpred(A).
+decl_mpred([A|L]):-!,decl_mpred(A),decl_mpred(L).
+decl_mpred((A,L)):-!,decl_mpred(A),decl_mpred(L).
 
 registerCycPredPlus2(M:F):-!, '@'(registerCycPredPlus2(F), M).
-registerCycPredPlus2(F/A):- A2 is A -2, registerCycPred(F/A2).
+registerCycPredPlus2(F/A):- A2 is A -2, decl_mpred(F/A2).
 registerCycPredPlus2([A]):-!,registerCycPredPlus2(A).
 registerCycPredPlus2([A|L]):-!,registerCycPredPlus2(A),registerCycPredPlus2(L).
 registerCycPredPlus2((A,L)):-!,registerCycPredPlus2(A),registerCycPredPlus2(L).
@@ -188,23 +188,23 @@ get_term_fa(_:P,F,A):-nonvar(P),!,get_term_fa(P,F,A).
 get_term_fa(F/A,F,A):-nonvar(F),!.
 get_term_fa(P,F,A):-functor_safe(P,F,A).
 
-% :- registerCycPred(isa,2). 
-registerCycPred(Term,Arity):- integer(Arity),!,
+% :- decl_mpred(isa,2). 
+decl_mpred(Term,Arity):- integer(Arity),!,
    get_term_fa(Term,Pred,_),
-   registerCycPred(_Mt,Pred,Arity).
-% :- registerCycPred(isa(_,_),'BaseKB'). 
-registerCycPred(Term,Mt):- !,
+   decl_mpred(_Mt,Pred,Arity).
+% :- decl_mpred(isa(_,_),'BaseKB'). 
+decl_mpred(Term,Mt):- !,
    get_term_fa(Term,Pred,Arity),
-   registerCycPred(Mt,Pred,Arity).
+   decl_mpred(Mt,Pred,Arity).
 
 
    
-% :- registerCycPred('BaseKB',isa,2). 
-registerCycPred(Mt,_:Pred,Arity):-!,registerCycPred(Mt,Pred,Arity).
-registerCycPred(Mt,Pred,0):-!,registerCycPred(Mt,Pred,2).
-registerCycPred(Mt,Pred,Arity):-isRegisteredCycPred(Mt,Pred,Arity),!.
-registerCycPred(_,Pred,Arity):-isRegisteredCycPred(_,Pred,Arity),!.
-registerCycPred(Mt,Pred,Arity):-      
+% :- decl_mpred('BaseKB',isa,2). 
+decl_mpred(Mt,_:Pred,Arity):-!,decl_mpred(Mt,Pred,Arity).
+decl_mpred(Mt,Pred,0):-!,decl_mpred(Mt,Pred,2).
+decl_mpred(Mt,Pred,Arity):-isRegisteredCycPred(Mt,Pred,Arity),!.
+decl_mpred(_,Pred,Arity):-isRegisteredCycPred(_,Pred,Arity),!.
+decl_mpred(Mt,Pred,Arity):-      
       M = moodb,
       checkCycPred(Pred,Arity),
       assertz(M:isRegisteredCycPred(Mt,Pred,Arity)),
@@ -224,8 +224,8 @@ checkCycPred(F,A):-never_use_holds_db(F,A),throw(never_use_holds_db(F,A)).
 checkCycPred(F,A):-copy_term(checkCycPred(F,A),CALL),catch(checkCycPred0(F,A),E,dmsg(E=CALL)).
 checkCycPred0(F,A):-functor(P,F,A),compile_predicates([F/A]),get_module_of(P,_M).
 
-:- registerCycPred(db_prop/2).
-:- registerCycPred(subclass/2).
+:- decl_mpred(db_prop/2).
+:- decl_mpred(subclass/2).
 
 :- thread_local(thload:current_agent/2).
 :- asserta(thload:current_agent(_,dead)).
@@ -241,28 +241,28 @@ current_context_module(Ctx):-context_module(Ctx).
 :- dynamic_multifile_exported world_agent_plan/3.
 
 
-:- registerCycPred(term_anglify_last/2).
-:- registerCycPred(term_anglify/2).
+:- decl_mpred(term_anglify_last/2).
+:- decl_mpred(term_anglify/2).
 
-:- registerCycPred action_info/1.
-:- registerCycPred action_help/2.
-:- registerCycPred type_action_help/3.
-:- registerCycPred action_rules/4.
-:- registerCycPred agent_text_command/4.
-:- registerCycPred createableSubclassType/2.
-:- registerCycPred createableType/1.
-:- registerCycPred label_type_props/3.
-:- registerCycPred specifier_text/2.
-:- registerCycPred subclass/2.
-:- registerCycPred term_anglify/2.
-:- registerCycPred term_anglify_last/2.
-:- registerCycPred term_anglify_np/3.
-:- registerCycPred term_anglify_np_last/3.
-:- registerCycPred type_default_props/3.
-:- registerCycPred type_grid/3.
-:- registerCycPred update_charge/2.
-:- registerCycPred update_stats/2.
-:- registerCycPred use_usable/4.
+:- decl_mpred action_info/1.
+:- decl_mpred action_help/2.
+:- decl_mpred type_action_help/3.
+:- decl_mpred action_rules/4.
+:- decl_mpred agent_text_command/4.
+:- decl_mpred createableSubclassType/2.
+:- decl_mpred createableType/1.
+:- decl_mpred label_type_props/3.
+:- decl_mpred specifier_text/2.
+:- decl_mpred subclass/2.
+:- decl_mpred term_anglify/2.
+:- decl_mpred term_anglify_last/2.
+:- decl_mpred term_anglify_np/3.
+:- decl_mpred term_anglify_np_last/3.
+:- decl_mpred type_default_props/3.
+:- decl_mpred type_grid/3.
+:- decl_mpred update_charge/2.
+:- decl_mpred update_stats/2.
+:- decl_mpred use_usable/4.
 
 :- dynamic_multifile_exported(decl_coerce/3).
 
@@ -344,6 +344,6 @@ term_expansion_local0(A,A).
 
 % user:term_expansion(X,Y):- term_expansion_local0(X,Y).
 
-:- registerCycPred(agent_call_command,2).
+:- decl_mpred(agent_call_command,2).
 
 
