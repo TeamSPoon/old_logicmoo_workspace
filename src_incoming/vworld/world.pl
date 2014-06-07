@@ -64,6 +64,7 @@
          spread/0,
          growth/0,
          isaOrSame/2,
+         mud_isa/2,
          current_agent_or_var/1
 
  ]).
@@ -139,20 +140,18 @@ moo:subclass(SubType,formattype):-isa_mc(SubType,formattype).
 not_mud_isa(agent,formattype).
 cached(G):-catch(G,_,fail).
 
-world_mud_isa(O,T):- req(mud_isa(O,T)).
+mud_isa(O,T):-world_mud_isa(O,T).
+
 world_mud_isa(O,T):- O==T,!.
-world_mud_isa(O,T):- var(O),var(T),!,isa_mc(T,_),anyInst(O),req(mud_isa(O,T)).
+world_mud_isa(O,T):- var(O),var(T),!,isa_mc(T,_),anyInst(O),req(isa(O,T)).
 world_mud_isa(O,T):- cached(not_mud_isa(O,T)),!,fail.
-world_mud_isa(O,T):- props(O,ofclass(T)).
-world_mud_isa(O,T):- props(O,mud_isa(T)).
-world_mud_isa(_,T):- (atom(T);var(T)),!,fail.
-world_mud_isa(O,T):- compound(O),!,functor(O,T,_).
+world_mud_isa(O,T):- req(isa(O,T)).
+world_mud_isa(_,T):- not(atom(T)),!,fail.
 world_mud_isa(O,T):- atom(O),!,mud_isa_atom(O,T).
+world_mud_isa(O,T):- compound(O),!,functor(O,T,_).
 
 mud_isa_atom(O,T):- atomic_list_concat([T,_|_],'-',O),!.
 mud_isa_atom(O,T):- atom_concat(T,Int,O),catch(atom_number(Int,_),_,fail),!.
-
-define_subtype(O,T):- add(moo:subclass(O,T)).
 
 create_meta(T,P,C,MT):-
    must(split_name_type(T,P,C)),
@@ -160,7 +159,7 @@ create_meta(T,P,C,MT):-
    OP =.. [MT,P],
    dbase_mod(M),
    assert_if_new(M:OP),
-   must(forall_member(E,[OP,ofclass(P,MT),ofclass(P,C)],must(add(E)))),
+   must(forall_member(E,[OP,isa(P,MT),isa(P,C)],must(add(E)))),
    must(findall_type_default_props(P,C,Props)),!,
    must(padd(P,Props)),!.
 

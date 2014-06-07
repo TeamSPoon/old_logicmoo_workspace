@@ -28,8 +28,10 @@ balanceBinding/2,
 clause_present_1/3, 
 define_subtype/2,
 do_expand_args/3,
+call_no_cuts/1,
 expand_head/2,
 clr/1,
+call_tabled/1,
 cycAssert/1,
 call_after_game_load/1,
 cycAssert/2,
@@ -1639,6 +1641,7 @@ call_no_cuts(CALL):-clause(CALL,TEST),call_no_cuts_0(TEST).
 call_no_cuts_0(true):-!.
 call_no_cuts_0((!)):-!.
 call_no_cuts_0((A,B)):-!,call_no_cuts_0(A),call_no_cuts_0(B).
+call_no_cuts_0(CALL):-catch(clause(CALL,_),_,fail),!,clause(CALL,TEST),call_no_cuts_0(TEST).
 call_no_cuts_0(C):-call(C).
 
 

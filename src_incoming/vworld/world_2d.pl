@@ -49,7 +49,7 @@ is_3d(LOC):- compound(LOC).
 % Quintus random(1,MaxX,X) and random(1,MaxY,Y)
 grid_size(Room,MaxX,MaxY,MaxZ):- fail,
    moo:type_grid(What,1,L),
-   props(Room,mud_isa(What)),!,
+   mud_isa(Room,What),!,
    maxZ(MaxZ),
 	length(L,MaxX),
 	findall(1,moo:type_grid(What,_,_),LL),

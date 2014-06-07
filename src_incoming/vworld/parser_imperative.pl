@@ -11,12 +11,12 @@
 :- module(parser_imperative, [
                    parse_agent_text_command/5,            
                    parse_agent_text_command_1/5,            
+                   parse_vp_templates/4,
                    parseIsa//2,
+                   parseIsa0//2,
                    objects_match/3,
-                   call_tabled/1,
                    dmsg_parserm/2,
                    dmsg_parserm/1,
-                   findall_tabled/3,
                    parse_for/2,
                    parse_for/3,
                    parse_for/4,
@@ -27,12 +27,7 @@
                    parseForTypes//2]).
 
 
-:- meta_predicate call_listing(?).
-:- meta_predicate call_tabled0(?,?,?,?).
 :- meta_predicate object_print_details(2,?,?,?,?).
-:- meta_predicate call_no_cuts_0(?).
-:- meta_predicate call_tabled(?).
-:- meta_predicate findall_tabled4(?,?,?,?).
 :- meta_predicate print_parse_for(2,?,?,?,?).
 
 :- include(logicmoo(vworld/moo_header)).
@@ -88,9 +83,6 @@ objects_match(SObj,Inv,List):-
 
 :-dynamic object_string_used/2.
 
-call_listing(_):-!.
-call_listing(Call):-forall(Call,dmsg_parserm('~q.~n',[Call])).
-
 
 
 object_string(O,String):-object_string(_,O,1-4,String),!.
@@ -125,8 +117,7 @@ save_ol_list(OS,[E|L]):-!,save_ol_e(OS,E),!,save_ol_list(OS,L),!.
 % slow but works
 object_string_list2(Agent,O,DescSpecs,String):- 
    gensym(object_string,OS),
-   object_print_details(save_fmt(OS),Agent,O,DescSpecs,[type,item,agent]),
-   call_listing(object_string_used(OS,_)),
+   object_print_details(save_fmt(OS),Agent,O,DescSpecs,[type,item,agent]),   
    findall(Str,retract(object_string_used(OS,Str)),StringI),
    list_to_set(StringI,String).
 
@@ -162,12 +153,9 @@ object_match(S,Obj):-
    str_contains_all(Atoms,LString).
 
 
-call_no_cuts(CALL):-clause(CALL,TEST),call_no_cuts_0(TEST).
 
-call_no_cuts_0(true):-!.
-call_no_cuts_0((!)):-!.
-call_no_cuts_0((A,B)):-!,call_no_cuts_0(A),call_no_cuts_0(B).
-call_no_cuts_0(C):-call(C).
+
+:-debug.
 
 dmsg_parserm(_).
 dmsg_parserm(_,_).
@@ -232,7 +220,7 @@ verb_matches(SVERB,VERB):-samef(VERB,SVERB).
 parse_vp_templates(Agent,SVERB,_ARGS,TEMPLATES):-
    findall([VERB|TYPEARGS],
     ((     
-     moo:type_action_help(What,TEMPL,_),
+     moodb:type_action_help(What,TEMPL,_),
      mud_isa(Agent,What),
      TEMPL=..[VERB|TYPEARGS],
      verb_matches(SVERB,VERB))),
@@ -305,32 +293,7 @@ parseIsa(A, B, C) :-
 
 parseIsa(_T, _, [AT|_], _):- var(AT),!,fail.
 parseIsa(FT, B, C, D):- to_word_list(C,O),O\=C,!,parseIsa(FT, B, O, D).
-parseIsa(FT, B, C, D):-  call_tabled(parseIsa0(FT, B, C, D)).
-
-:-dynamic(call_tabled_list/2).
-
-make_key(CC,Key):-copy_term(CC,Key),numbervars(Key,'$VAR',0,_),!.
-
-expire_tabled_list(T):-CT= call_tabled_list(Key,List),doall(((CT,any_term_overlap(T,Key:List),retract(CT)))).
-
-any_term_overlap(T1,T2):-atoms_of(T1,A1),atoms_of(T2,A2),!,member(A,A1),member(A,A2),!.
-
-moo:database_hook(assert(_),C):-expire_tabled_list(C).
-moo:database_hook(retract(_),C):-expire_tabled_list(C).
-
-call_tabled(findall(A,B,C)):-!,findall_tabled(A,B,C).
-call_tabled(C):-copy_term(C,CC),numbervars(CC,'$VAR',0,_),call_tabled(C,C).
-call_tabled(CC,C):-make_key(CC,Key),call_tabled0(Key,C,C,List),!,member(C,List).
-call_tabled0(Key,_,_,List):-call_tabled_list(Key,List),!.
-call_tabled0(Key,E,C,List):-findall(E,C,List1),list_to_set(List1,List),asserta_if_ground(call_tabled_list(Key,List)),!.
-
-findall_tabled(Result,C,List):-make_key(Result^C,RKey),findall_tabled4(Result,C,RKey,List).
-findall_tabled4(_,_,RKey,List):-call_tabled_list(RKey,List),!.
-findall_tabled4(Result,C,RKey,List):-findall(Result,call_tabled(C),RList),list_to_set(RList,List),asserta_if_ground(call_tabled_list(RKey,List)).
-
-asserta_if_ground(_):-!.
-asserta_if_ground(G):-ground(G),asserta(G),!.
-asserta_if_ground(_).
+parseIsa(FT, B, C, D):-  dbase:call_tabled(parseIsa0(FT, B, C, D)).
 
 parseIsa0(FT, B, C, D):- list_tail(C,D),parseForIsa(FT, B, C, D).
 

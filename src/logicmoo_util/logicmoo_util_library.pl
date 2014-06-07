@@ -348,4 +348,5 @@ identical_member(X,[Y|_])  :-
 identical_member(X,[_|L]) :-
 	'identical_member'(X,L).
 
-contains_singletons(Term):- not(ground(Term)),not(not((numbervars(Term,0,E,[attvar(skip),singletons(true)]),sub_term(Term,'$VAR'('_'))))).
+
+contains_singletons(Term):- not(ground(Term)),not(not((term_variables(Term,Vs),numbervars(Term,0,_,[attvar(skip),singletons(true)]),member('$VAR'('_'),Vs)))).

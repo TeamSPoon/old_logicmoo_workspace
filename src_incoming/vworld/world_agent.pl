@@ -23,7 +23,7 @@
 call_agent_command(Ag,[A,B|REST]):- atom(A),atom(B),member(A,['@']),atom_concat(A,B,C),!,call_agent_command(Ag,[C|REST]).
 
 call_agent_command(Agent,[VERB|ARGS]):-
-      debugOnError(parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD)),
+      debugOnError(parser_imperative:parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD)),
       must(call_agent_action(NewAgent,CMD)),!.
 
 % lists
@@ -57,7 +57,7 @@ call_agent_action(Agent,CMDI):-
               raise_location_event(Where,notice(reciever,failed(Agent,CMD))))))),E,fmt('call_agent_action/2 Error ~q ',[E])),
     (Pushed -> ignore(retract(thlocal:current_agent(SESSION,Agent)));true).
 /*
-test_te:- xcall((
+test_te:- xcall_t((
  
 
   user:term_expansion(((call_agent_action(Agent,CMDI):-

@@ -32,6 +32,9 @@
 :- moodb:register_module_type(utility).
 
 :- dynamic wants_logout/1.
+
+:- decl_mpred(label_type,2).
+
 % ===========================================================
 % TELNET REPL + READER
 % ===========================================================
@@ -54,7 +57,9 @@ run_player_telnet(P) :-
       foc_current_player(P),
       get_session_id(O),
       retractall(wants_logout(P)),
-      with_assertions(thlocal:current_agent(O,P),
+      expand_head(thlocal:current_agent(O,P),HG),
+      must(repl_writer(P,_RWhat)),
+      with_assertions(HG,
        ((repeat,
         once(read_and_do_telnet(P)), 
         wants_logout(P),
@@ -179,7 +184,7 @@ show_room_grid_single(_Room,_LOC,_OutsideTest):- write('--'), !.
 inst_label(Obj,Label):-label_type(Label,Obj),!.
 inst_label(Obj,Label):-  props(Obj,nameString(Val)),Val\=Obj,inst_label(Val,Label),!.
 inst_label(Obj,Label):-  props(Obj,named(Val)),Val\=Obj,inst_label(Val,Label),!.
-inst_label(Obj,Label):-  props(Obj,mud_isa(Val)),Val\=Obj,inst_label(Val,Label),!.
+inst_label(Obj,Label):-  props(Obj,isa(Val)),Val\=Obj,inst_label(Val,Label),!.
 inst_label(Obj,SLabe2):-term_to_atom(Obj,SLabel),sub_atom(SLabel,1,2,_,SLabe2),!.
 inst_label(Obj,SLabe2):-term_to_atom(Obj,SLabel),sub_atom(SLabel,0,2,_,SLabe2),!.
 inst_label(_Obj,'&&').
@@ -208,7 +213,7 @@ show_room_grid(Room,Old,N,N) :-
 show_room_grid(Room,Y,X,N) :-
       loc_to_xy(Room,X,Y,LOC),
 	atloc(Obj,LOC),
-        props(Obj,ofclass(agent)),
+        props(Obj,isa(agent)),
 	list_agents(Agents),
 	obj_memb(Agent,Agents),
 	atloc(Agent,LOC),
@@ -219,7 +224,7 @@ show_room_grid(Room,Y,X,N) :-
 show_room_grid(Room,Y,X,N) :-
         loc_to_xy(Room,X,Y,LOC),
 	atloc(Obj,LOC),
-        prop(Obj,ofclass,Class),
+        prop(Obj,isa,Class),
 	label_type(Label,Class),
 	write(Label), write(' '),
 	XX is X + 1,

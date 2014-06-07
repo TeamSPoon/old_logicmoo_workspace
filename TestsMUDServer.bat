@@ -38,7 +38,7 @@ SET MUDSCRIPT=src_incoming/run_tests.pl
 
 :startMUD
 rem call 	pskill -t swipl-win
-call 	pskill -t swipl
+rem call 	pskill -t swipl
 
 if "%SWIPLWIN%"=="true" (
 

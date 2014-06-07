@@ -154,7 +154,7 @@ moo:type(item).
 moo:equivRule(nameString(apath(Region,Dir),Text),pathName(Region,Dir,Text)).
 moo:equivRule(description(apath(Region,Dir),Text),pathName(Region,Dir,Text)).
 
-dbase_t(action_help,What,text("command is: ",What)):- holds_t(action_info,What).
+% dbase_t(action_help,What,text("command is: ",What)):- holds_t(action_info,What).
 
 moo:expand_args(subclass(eachOf(region,agent,gossup),channel)).
 
