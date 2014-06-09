@@ -26,6 +26,7 @@
 :- dynamic agent_message_stream/3, telnet_fmt_shown/3.
 
 :- meta_predicate show_room_grid_single(*,*,0).
+:- meta_predicate telnet_repl_writer(*,*,*,^).
 
 :- include(logicmoo(vworld/moo_header)).
 
@@ -48,9 +49,10 @@ login_and_run:-
    call_agent_command(P,'look'),
    fmt('~n~n~nHello ~w! Welcome to the MUD!~n',[P]),
    % sets some IO functions
-   with_kb_assertions([repl_writer(P,telnet_repl_writer),repl_to_string(P,telnet_repl_obj_to_string)],
+   with_assertions(moodb:repl_writer(P,telnet_repl_writer),
+      with_assertions(moodb:repl_to_string(P,telnet_repl_obj_to_string),
      % runs the Telnet REPL
-     run_player_telnet(P)),
+     run_player_telnet(P))),
    fmt('~n~nGoodbye ~w! ~n',[P]).
 
 run_player_telnet(P) :-    
@@ -58,7 +60,7 @@ run_player_telnet(P) :-
       get_session_id(O),
       retractall(wants_logout(P)),
       expand_head(thlocal:current_agent(O,P),HG),
-      must(repl_writer(P,_RWhat)),
+      must(moodb:repl_writer(P,_)),!,
       with_assertions(HG,
        ((repeat,
         once(read_and_do_telnet(P)), 
@@ -155,7 +157,7 @@ write_pretty_aux([[_|_]|Tail],Return,Column) :-
 
 
 
-show_room_grid(Room) :-show_room_grid_new(Room),!.
+show_room_grid(Room) :- ignore(show_room_grid_new(Room)),!.
 % show_room_grid(Room) :-show_room_grid_old(Room),!.
 
 % ===================================================================

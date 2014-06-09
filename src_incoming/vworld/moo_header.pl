@@ -9,22 +9,21 @@
 % Dec 13, 2035
 %
 */
-
-
-:- context_module(Ctx),
-   asserta(moodb:loading_module_h(Ctx)),
-    'format'('% moo_header: ~q.~n',[loading_module_h(Ctx)]).
-
 :- style_check(+singleton).
 :- style_check(+discontiguous).
+
 
 % :- set_prolog_flag(unknown,fail).
 % :- set_prolog_flag(unknown,error).
 % :- set_prolog_flag(double_quotes,atom).
 :- set_prolog_flag(double_quotes,string).
 :- set_prolog_flag(verbose_load,true).
+% logicmoo vworld mud server
 
-% :- include(moo_loadall).
+
+:- context_module(Ctx),
+   asserta(moodb:loading_module_h(Ctx)),
+    'format'('% moo_header: ~q.~n',[loading_module_h(Ctx)]).
 
 :- call((context_module(Ctx),(( may_moo_term_expand(Ctx) -> true; asserta(may_moo_term_expand(Ctx)), 'format'('% moo_header: ~q.~n',[may_moo_term_expand(Ctx)]))))).
 
@@ -33,13 +32,4 @@
 
 end_of_file.
 
-% logicmoo vworld mud server
-:- ensure_moo_loaded(logicmoo(vworld/world)).
-:- ensure_moo_loaded(logicmoo(vworld/dbase_formattypes)).
-:- ensure_moo_loaded(logicmoo(vworld/toploop_telnet)).
-:- ensure_moo_loaded(logicmoo(vworld/toploop_npc)).
-:- ensure_moo_loaded(logicmoo(vworld/parser_e2c)).
-:- ensure_moo_loaded(logicmoo(vworld/parser_imperative)).
-:- ensure_moo_loaded(logicmoo(vworld/moo_loader)).
-:- ensure_moo_loaded(logicmoo(vworld/moo_testing)).
 

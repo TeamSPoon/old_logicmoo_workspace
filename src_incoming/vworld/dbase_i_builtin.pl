@@ -128,10 +128,9 @@ argsIsa(objects(type,list(id))).
 argsIsa(predicates(list(functor))).
 argsIsa(sorts(type,list(type))).
 
-
-moo:singleValued(repl_writer(agent,term),default_sv(look:default_repl_writer)).
-
-moo:mpred(repl_to_string(agent,term),[singleValued,default_sv(look:default_repl_obj_to_string)]).
+% live another day to fight (meaning repl_to_string/1 for now is in prolog)
+% moo:singleValued(repl_writer(agent,term),default_sv(look:default_repl_writer)).
+% moo:mpred(repl_to_string(agent,term),[singleValued,default_sv(look:default_repl_obj_to_string)]).
 
 moo:mpred(label_type(string,type),[singleValued]).
 
@@ -213,6 +212,8 @@ moo:singleValued(stm(agent,int)).
 moo:singleValued(str(agent,int)).
 % moo:singleValued(type_grid(regiontype,int,list(term))).
 moo:singleValued(weight(object,int)).
+
+:-decl_mpred(needs_look/2).
 
 moo:singleValued(needs_look(agent,boolean)). 
 

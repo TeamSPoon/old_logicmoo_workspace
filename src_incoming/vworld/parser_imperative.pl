@@ -345,7 +345,7 @@ specifiedItemType([String],Type,StringO):-nonvar(String),!,specifiedItemType(Str
 specifiedItemType(String,Type,Inst) :- specifier_text(Inst,Type), equals_icase(Inst,String),!.
 specifiedItemType(String,Type,Inst):- instances_of_type(Inst,Type),object_match(String,Inst),!.
 specifiedItemType(String,Type,Longest) :- findall(Inst, (moo:specifier_text(Inst,Type),starts_or_ends_with_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
-specifiedItemType(A,T,AA):- is_ft(T), format_complies(A,T,AA),!.
+specifiedItemType(A,T,AA):- is_ft(T), correctFormatType(tell(_),A,T,AA),!.
 
 instances_of_type(Inst,Type):- setof(Inst-Type,mud_isa(Inst,Type),Set),member(Inst-Type,Set).
 % instances_of_type(Inst,Type):- atom(Type), Term =..[Type,Inst], logOnError(req(Term)).

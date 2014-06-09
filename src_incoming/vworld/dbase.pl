@@ -35,7 +35,7 @@ call_tabled/1,
 cycAssert/1,
 call_after_game_load/1,
 cycAssert/2,
-db_query_lc/1,
+% db_query_lc/1,
 cycInit/0,
 cyclify/2,
 cyclifyNew/2,
@@ -108,6 +108,16 @@ xcall_f/5,
 xcall_f/6,
 xcall_f/7,         
 testOpenCyc/0]).
+
+:- set_prolog_flag(double_quotes, atom).
+:- set_prolog_flag(double_quotes, string).
+
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)).
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_library)).
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)).
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_strings)).
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_terms)).
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_dcg)).
 
 :- include(logicmoo(vworld/dbase_i_cyc)).
 
@@ -320,16 +330,15 @@ call_after_game_load(Code):-call_after(moodb:not_loading_game_file,Code).
           dbase_f/7))).
 
 
-:- meta_predicate pred_term_parts(1,?,*).
 :- meta_predicate mud_pred_expansion_2(3,?,?,*,*,*).
-:- meta_predicate list_retain(*,1,*).
-% Restarting analysis ...
-% Found new meta-predicates in iteration 2 (12.070 sec)
 :- meta_predicate mud_pred_expansion_1(3,*,*,*).
-:- meta_predicate pred_term_parts_l(1,*,*).
-% Restarting analysis ...
-% Found new meta-predicates in iteration 3 (11.946 sec)
-:- meta_predicate mud_pred_expansion_0(3,*,*,*).
+:- meta_predicate trigger_determined(*,*,0).
+:- meta_predicate trigger_first(*,0).
+:- meta_predicate trigger_pred(?,1,0).
+:- meta_predicate trigger_nonvar(*,0).
+:- meta_predicate trigger_ground(*,0).
+:- meta_predicate check_disj(*,*,0).
+:- meta_predicate mud_pred_expansion_0(3,?,*,?).
 
 :- meta_predicate clause_present(:), db_assert_mv(+,+,+,0), db_assert_sv(+,+,+,-), db_op_exact(+,+), db_quf(+,-,-).
 
@@ -338,8 +347,6 @@ call_after_game_load(Code):-call_after(moodb:not_loading_game_file,Code).
 :- dynamic db_prop_prolog/11.
 
 % :- context_module(M),asserta(moodb:dbase_mod(M)),dmsg(assert_if_new(moodb:dbase_mod(M))).
-
-:- include(logicmoo(logicmoo_util/logicmoo_util_header)).
 
 :- dynamic_multifile_exported dbase_t/1.
 :- dynamic_multifile_exported dbase_t/2.
@@ -638,10 +645,11 @@ holds_t(P,A1,A2,A3):-isCycPredArity_NE(P,3),which_t(DBS),(call_t(DBS,P,A1,A2,A3)
 holds_t(P,A1,A2):-holds_relaxed_t(P,A1,A2).
 holds_t(P,A1):-isCycPredArity_NE(P,1),which_t(DBS),(call_t(DBS,P,A1);call_mt_t(DBS,P,A1,_,_)).
 
-
+%holds_relaxed_t(Arity, P, A):- Arity == arity,!,isCycPredArity_NE(P,A).
 holds_relaxed_t(P,A1,A2):- isCycPredArity_NE(P,2),which_t(DBS),!,relax_term(P,PR,A1,R1,A2,R2),holds_relaxed_0_t(DBS,PR,R1,R2).
 holds_relaxed_0_t(DBS,P,A1,A2):-call_t(DBS,P,A1,A2).
 holds_relaxed_0_t(DBS,P,A1,A2):-call_mt_t(DBS,P,A1,A2,_,_).
+holds_relaxed_0_t(DBS,P,A1,A2):-ground((P,A1)), TEMPL=..[P,T1,_],dbase_t(default_sv,TEMPL,A2),req(isa(A1,T1)),!.
 
 
 holds_t([AH,P|LIST]):-is_holds_true(AH),!,holds_t_p2(P,LIST).
@@ -730,11 +738,11 @@ holds_relaxed_0_f(DBS,P,A1,A2):-call_f(DBS,P,A1,A2).
 holds_relaxed_0_f(DBS,P,A1,A2):-call_mt_f(DBS,P,A1,A2,_,_).
 
 
-holds_f([AH,P|LIST]):-is_holds_true(AH),!,holds_t_p2(P,LIST).
-holds_f([AH,P|LIST]):-is_holds_false(AH),!,holds_f_p2(P,LIST).
+holds_f([AH,P|LIST]):-is_holds_true(AH),!,holds_f_p2(P,LIST).
+holds_f([AH,P|LIST]):-is_holds_false(AH),!,holds_t_p2(P,LIST).
 holds_f([P|LIST]):-!,holds_t_p2(P,LIST).
 holds_f(CALL):-CALL=..[P|LIST],holds_f([P|LIST]).
-holds_t_p2(P,LIST):- CALL=..[holds_t,P|LIST],call(CALL).
+holds_f_p2(P,LIST):- CALL=..[holds_f,P|LIST],call(CALL).
 
 dbase_f(List):-is_list(List),!,Call=..[dbase_t|List],Call.
 dbase_f(List):-holds_f(List).
@@ -920,7 +928,7 @@ clr(C0):-db_op(ra,C0).
 req(C0):- db_op(ask(call),C0).
 mreq(C0):- db_op(ask(must),C0).
 %% props(Obj,QueryPropSpecs)
-props(Obj,PropSpecs):-db_op(query,props(Obj,PropSpecs)).
+props(Obj,PropSpecs):-db_op(ask(query),props(Obj,PropSpecs)).
 %% add(Assertion)
 add(C0):- db_op(tell(_OldV), C0).
 %% padd(Obj,PropSpecs)
@@ -940,8 +948,8 @@ with_kb_assertions(With,Call):-
    kb_update(With,OldV),
    setup_call_cleanup(add(With),Call,kb_update(OldV,With)).
 
-update(New,OldV):-req(New),!,OldV=New.
-update(New,OldV):-db_op(tell(OldV),New).
+kb_update(New,OldV):-req(New),!,OldV=New.
+kb_update(New,OldV):-db_op(tell(OldV),New).
 
 world_clear(Named):-dmsg('Clearing world database: ~q.',[Named]).
 
@@ -1067,7 +1075,7 @@ db_op00(tell(isa(T,type)),isa(T,type)):-!,db_tell_isa(T,type).
 
 db_op00(tell(OldV),B):- !,loop_check(db_op0(tell(OldV),B),true). % true = we are already processing this assert
 db_op00(ask(Must),createableType(SubType)):-!, call(Must,is_creatable_type(SubType)).
-db_op00(ask(Must),Term):-!,loop_check(db_op0(ask(Must),Term),db_query_lc(Term)).
+db_op00(ask(Must),Term):-!,loop_check(db_op0(ask(Must),Term),db_query_lc(Must,Term)).
 db_op00(Op,Term):-!,loop_check_throw(db_op0(Op,Term)).
 db_op0(Op,Term):-not(compound(Term)),!,throw_safe(nc(db_op0(Op,Term))).
 db_op0(Op,[holds_t,P|Args]):-atom(P),!,Goal=..[P|Args],db_op0(Op,Goal).
@@ -1079,13 +1087,13 @@ db_op0(Op,(C1,C2)):-!,db_op(Op,C1),db_op(Op,C2).
 db_op0(retract,(C1;C2)):-!,trace,once((db_op(retract,C1),db_op(retract,C2))).
 db_op0(ra,(C1;C2)):-!,must(db_op(ra,C1)),must(db_op(ra,C2)).
 db_op0(tell(OldV),(C1;C2)):-!,db_op(tell(OldV),C1),!,db_op(tell(OldV),C2),!.
-db_op0(ask(Must),props(Obj,Props)):-var(Props),!,findall(Prop,(dbase_t([P,Obj|REST]),Prop=..[P|REST]),Props).
+db_op0(ask(_Must),props(Obj,Props)):-var(Props),!,findall(Prop,(dbase_t([P,Obj|REST]),Prop=..[P|REST]),Props).
 db_op0(Op,props(Obj,Open)):-var(Open),!,throw_safe(db_op0(Op,props(Obj,Open))).
 db_op0(_Op,props(_Obj,[])):-!.
 db_op0(Op,props(Obj,[P])):- nonvar(P),!,db_op(Op,props(Obj,P)).
 db_op0(Op,props(Obj,[P|ROPS])):-!,db_op(Op,props(Obj,P)),db_op(Op,props(Obj,ROPS)).
 db_op0(Op,props(Obj,PropVal)):-PropVal=..[Prop,NonVar|Val],Obj==NonVar,!,db_op0(Op,[holds_t,Prop,Obj|Val]).
-db_op0(Op,props(Obj,PropVal)):-PropVal=..[Prop|Val],db_op0(Op,[holds_t,Prop,Obj|Val]).
+db_op0(Op,props(Obj,PropVal)):-!,PropVal=..[Prop|Val],db_op0(Op,[holds_t,Prop,Obj|Val]).
 db_op0(retract,Term):-!,db_op(ask(Must),Term),!,db_op(ra,Term).
 db_op0(Op,expand_args(Exp,Term)):-!,forall(do_expand_args(Exp,Term,O),db_op0(Op,O)).
 db_op0(Op,somethingIsa(A,List)):-!,forall_member(E,List,db_op(Op, isa(A,E))).
@@ -1157,6 +1165,7 @@ db_op_unit(Op,_C0,Prop,ARGS):-db_op_sentence(Op,Prop,ARGS,Unit),db_op_exact(Op,U
 
 db_op_exact(tell(OldV),W):-non_assertable(W,Why),dumpST,trace,throw_safe(todo(db_op(tell(OldV), non_assertable(Why,W)))).
 db_op_exact(ask(Must), Term):- !,db_query(Must,Term).
+db_op_exact(query, Term):- !,db_query(ask(findall),Term).
 db_op_exact(u,C):- grtrace,db_quf(C,U,Template),U,Template,must(ground(Template)),!,ignore(retractall(Template)).
 db_op_exact(ra,C):-db_quf(C,U,Template), doall((U,retractall(Template))).
 db_op_exact(ra,C):- ignore(retractall(C)).
@@ -1169,15 +1178,15 @@ db_op_exact(Op,C):-!,trace,throw(unhandled(db_op_exact(Op,C))).
 % db_query/1
 % ================================================
 
-db_query(_Must,LC):-loop_check_throw(db_query_lc(LC)).
+db_query(Must,LC):-loop_check_throw(db_query_lc(Must,LC)).
 
-db_query_lc((C0->C1;C2)):- !, (db_query(C0) -> db_query(C1) ; db_query(C2)).
-db_query_lc((C1;C2)):-!, db_query(C1) ; db_query(C2).
-db_query_lc(Term):-findall(a(Term),db_query0(Term),List),list_to_set_safe(List,Set),!,member(a(Term),Set).
+db_query_lc(Must,(C0->C1;C2)):- !, (db_query(sf(!,!),C0) -> db_query(Must,C1) ; db_query(Must,C2)).
+db_query_lc(Must,(C1;C2)):-!, db_query(Must,C1) ; db_query(Must,C2).
+db_query_lc(Must,Term):-findall(a(Term),db_query0(Must,Term),List),list_to_set_safe(List,Set),!,member(a(Term),Set).
 
-db_query0(Term):- expand_goal(Term,Term2),db_query1(Term2).
+db_query0(_Must,Term):- expand_goal(Term,Term2),!,db_query1(Term2).
 db_query1(C):- not(not(predicate_property(C,_PP))),!,call(C).
-db_query1(C):- grtrace, db_quf(C,Pretest,Template),!,Pretest, call(Template).
+db_query1(C):- db_quf(C,Pretest,Template),!,Pretest, grtrace, call(Template).
 
 singletons_throw_or_fail(C):- contains_singletons(C),grtrace,throw(contains_singletons(C)).
 nonground_throw_or_fail(C):- throw_if_true_else_fail(not(ground(C)),C).
@@ -1587,6 +1596,8 @@ add_description_kv(A,K,V):-atom_to_value(V,Term),C=..[K,A,Term],
    learnArgIsaInst(K,2,V),
    decl_mpred(K,2),show_call(add(C)).
 
+learnArgIsa(P,N,T):-add(argIsa(P,N,T)).
+
 learnArgIsaInst(K,Num,Arg):-integer(Arg),!,learnArgIsa(K,Num,int).
 learnArgIsaInst(K,Num,Arg):-number(Arg),!,learnArgIsa(K,Num,number).
 learnArgIsaInst(_,_,_).
@@ -1646,7 +1657,7 @@ call_no_cuts_0(C):-call(C).
 
 
 
-:- meta_predicate throw_if_true_else_fail(^,*).
+% :- meta_predicate throw_if_true_else_fail(^,*).
 :- meta_predicate compare_op(*,2,?,?).
 :- meta_predicate holds_tcall(^).
 

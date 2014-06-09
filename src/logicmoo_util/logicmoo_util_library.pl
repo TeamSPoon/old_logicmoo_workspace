@@ -39,6 +39,7 @@
          in_thread_and_join/2,
          asserta_new/1,
          asserta_if_new/1,
+         throw_if_true_else_fail/2,
          assert_if_new/1,
          make_list/3,
          multi_transparent/1]).

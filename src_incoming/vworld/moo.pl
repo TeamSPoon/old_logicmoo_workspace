@@ -48,10 +48,28 @@
           dbase_mod/1,
          end_module_type/2 ]).
 
+:- set_prolog_flag(double_quotes, atom).
+:- set_prolog_flag(double_quotes, string).
+
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)).
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_library)).
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)).
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_strings)).
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_terms)).
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_dcg)).
+
 :-dynamic(moodb:dbase_mod/1).
 moodb:dbase_mod(dbase).
 
-:-export((         (decl_mpred)/1,         
+:-dynamic(repl_writer/2).
+:-dynamic(repl_to_string/2).
+:-export(repl_writer/2).
+:-export(repl_to_string/2).
+:-module_transparent repl_writer/2,repl_to_string/2.
+
+
+:-export(( 
+         (decl_mpred)/1,         
          (decl_mpred)/2,
          (decl_mpred)/3,
                    loading_game_file/1 ,  loaded_game_file/1         )).
@@ -60,7 +78,6 @@ not_loading_game_file:-not(loading_game_file(_)),loaded_game_file(_).
 
 :-dynamic loading_module_h/1, loading_game_file/1, loaded_game_file/1, is_defined_type/1.
 
-:- include(logicmoo(logicmoo_util/logicmoo_util_header)).
 
 is_holds_true(Prop):- notrace((atom(Prop),is_holds_true0(Prop))),!.
 is_holds_true0(Prop):-arg(_,p(k,p,holds,holds_t,dbase_t,asserted_dbase_t,req,assertion_t,assertion),Prop).

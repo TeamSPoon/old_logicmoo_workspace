@@ -23,8 +23,17 @@
 
 
 % logicmoo utils shared with other systems
-:- include(logicmoo(logicmoo_util/logicmoo_util_header)).
+:- set_prolog_flag(double_quotes, atom).
+:- set_prolog_flag(double_quotes, string).
 
+% :- use_module(logicmoo_util_all).
+
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)).
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_library)).
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)).
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_strings)).
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_terms)).
+:- use_module(logicmoo(logicmoo_util/logicmoo_util_dcg)).
 
 :- use_module(logicmoo(vworld/moo)).
 :- use_module(logicmoo(vworld/dbase)).
@@ -109,7 +118,6 @@ make_qlfs:-
 
 
 :- ensure_moo_loaded(logicmoo(vworld/dbase_formattypes)).
-
 
 % logicmoo vworld mud server
 :- ensure_moo_loaded(logicmoo(vworld/world)).

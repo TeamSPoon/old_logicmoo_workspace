@@ -123,8 +123,6 @@ ht:- do_player_action('s'),
 
 :- at_start(run_setup).
 
-end_of_file.
-
 :- at_start(run).
 
 % So scripted versions don't just exit

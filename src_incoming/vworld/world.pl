@@ -91,8 +91,9 @@
 
 :- meta_predicate intersect_pred(+,+,+,+,?,-).
 :- meta_predicate cached(0).
+:- meta_predicate show_kb_via_pred_3(*,*,*,*,^,?).
 
-is_property(P,A):- moo:db_prop(_,C),functor(C,P,A2),A is A2-1.
+% is_property(P,A):- moo:db_prop(_,C),functor(C,P,A2),A is A2-1.
 
 is_type(O):-is_type0(O).
 is_type0(T):-holds_t(label_type_props,_,T,_).

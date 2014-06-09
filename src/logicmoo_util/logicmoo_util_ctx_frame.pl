@@ -36,7 +36,7 @@
          with_assertions/2,
          currentContext/2]).
 
-:- meta_predicate with_assertions(:,0).
+:- meta_predicate with_assertions(0,0).
 
 :-use_module(logicmoo(logicmoo_util/logicmoo_util_library)).
 :-use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)).
@@ -45,9 +45,9 @@
 currentContext(Name,X):-hotrace(makeLocalContext(Name,X)),!.
 
 with_assertions([],Call):- !,Call.
-with_assertions([With|MORE],Call):-!,with_assertions(With,with_assertions(MORE,Call)).
-with_assertions(With,Call):- !,setup_call_cleanup(asserta(With),Call,must(retract(With))).
-% with_assertions(With,Call):- setup_call_cleanup(asserta(With,Ref),Call,erase(Ref)).
+with_assertions([With|MORE],Call):- !,with_assertions(With,with_assertions(MORE,Call)).
+with_assertions(With,Call):- catch(With,_,fail),!,Call.
+with_assertions(With,Call):- setup_call_cleanup(asserta(With),Call,must(retract(With))).
 
 % ===================================================================
 :-dynamic(no_cyclic_terms).

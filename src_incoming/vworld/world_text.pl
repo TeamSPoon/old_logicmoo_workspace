@@ -12,8 +12,9 @@
 
 :- moodb:begin_transform_moo_preds.
 
-local_decl_db_prop(repl_writer(agent,term),[singleValued,default(default_repl_writer)]).
-local_decl_db_prop(repl_to_string(agent,term),[singleValued,default(default_repl_obj_to_string)]).
+% live another day to fight (meaning repl_to_string/1 for now is in prolog)
+% local_decl_db_prop(repl_writer(agent,term),[singleValued,default(default_repl_writer)]).
+% local_decl_db_prop(repl_to_string(agent,term),[singleValued,default(default_repl_obj_to_string)]).
 
 default_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=o),fmt('~q=(~w )~q.~n',[N,TypeO,V]).
 default_repl_obj_to_string(O,Type,toString(TypeO,O)):-copy_term(Type,TypeO),ignore(TypeO=o).
@@ -33,8 +34,8 @@ show_kb_preds(Agent,List):-
 show_kb_preds(Agent,LOC,List):-
       ignore(atloc(Agent,LOC)),
        locationToRegion(LOC,Region),
-       must(holds_t(repl_writer,Agent,WPred)),
-        must(holds_t(repl_to_string,Agent,ToSTR)),
+         once((moodb:repl_writer(Agent,WPred);WPred=default_repl_writer)),
+         once((moodb:repl_to_string(Agent,ToSTR);ToSTR=default_repl_obj_to_string)),
         subst(List,region,Region,ListR),
         show_kb_via_pred(WPred,ToSTR,ListR),!.
 
@@ -129,7 +130,7 @@ is_leave_alone(exact_message).
 is_leave_alone(todo).
 is_leave_alone((error)).
 is_leave_alone(parserm).
-is_leave_alone(F):- moodb:is_db_prop(F,_,_),!,fail.
+% is_leave_alone(F):- moodb:is_db_prop(F,_,_),!,fail.
 is_leave_alone(A):-failOnError((sub_atom(A,_,1,0,S),atom_number(S,_))),!.
 
 moo:term_anglify(A,B):-local_term_anglify(A,B).
@@ -286,7 +287,7 @@ local_term_anglify_np(string(Obj),string,Obj):- !.
 local_term_anglify_np(Obj,string,Obj):- !.
 
 local_term_anglify_np_last(Obj,Hint,String):- anglify_noun_known(Obj,Hint,String),!.
-local_term_anglify_np_last(Obj,FT,String):- is_ft(FT),isa_assert(Obj,FT,String),!.
+local_term_anglify_np_last(Obj,FT,String):- is_ft(FT),correctFormatType(tell(_),Obj,FT,String),!.
 local_term_anglify_np_last(Obj,Type,[prolog(Obj)]):-is_ft(Type),!.
 local_term_anglify_np_last(Obj,Type,[the,Type,prolog(Obj)]):-!.
 local_term_anglify_np_last(apath(Region,Dir),_,[a,fN(Dir,dir),'-ern',way,from,fN(Region,np)]):-!.
@@ -295,7 +296,7 @@ local_term_anglify_np_last(Obj,_,[the,noun,with,token,Obj]):-!.
 
 
 % anglify_noun_known(Self,_Hint,[you]):- current_agent(Self),!.
-anglify_noun_known(Obj,FT,String):- is_ft(FT),isa_assert(Obj,FT,String),!.
+anglify_noun_known(Obj,FT,String):- is_ft(FT),correctFormatType(tell(_),Obj,FT,String),!.
 anglify_noun_known(explorer(StringO),_Hint, [StringO]).
 anglify_noun_known(Obj,_Hint,[right,here]):- current_agent(Self),atloc(Self,Obj),!.
 anglify_noun_known(Obj,_Hint,[here]):- current_agent(Self),req(inRegion(Self,Obj)),!.
