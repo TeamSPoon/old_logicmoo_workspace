@@ -128,7 +128,7 @@ moo:mpred(CallSig,[ask_module(M),assert_with_pred(add),query_with_pred(call)]):-
 
 
 % db_prop_prolog(world,nearby(object,object)).
-db_prop_prolog(world,isa(object,type)).
+db_prop_prolog(world,mud_isa(object,type)).
 % db_prop_prolog(world,same(id,id)).
 
 
@@ -161,7 +161,7 @@ moo:subclass(text,formattype).
 
 mpred(action_help(verb,text)).
 
-mpred(agent_text_command(agent,text,agent,verb)).
+argsIsa(agent_text_command(agent,text,agent,verb)).
 
 mpred(description(term,text),[assert_with_pred(assert_description),ask_predicate(query_description)]).
 
@@ -316,11 +316,16 @@ multiValued(isa(term,type)).
 mpred(directions(term,list(term))).
 
 
+moo:action_info(list(term)).
+
+moodb:agent_call_command(_Gent,list(Obj)):- term_listing(Obj).
+
+moo:mpred(ask_module(mpred,atom)).
+moo:argsIsa(agent_call_command(agent,term(verb))).
+
 % =================================================================================================
 % END world database
 % =================================================================================================
-moo:action_info(list(term)).
-moo:agent_call_command(_Gent,list(Obj)):- term_listing(Obj).
 
 :- end_transform_moo_preds.
 

@@ -39,9 +39,9 @@
 % ===========================================================
 moo:action_help(parse(prolog,list(term)),"Development test to parse some Text for a human.  Usage: parse 'item' the blue backpack").
 
-moo:agent_text_command(Agent,[parse,Type|List],Agent,parse(Type,List)).
+moodb:agent_text_command(Agent,[parse,Type|List],Agent,parse(Type,List)).
 
-moo:agent_call_command(_Gent,parse(Type,StringM)):-
+moodb:agent_call_command(_Gent,parse(Type,StringM)):-
    print_parse_for(Type,StringM,_Term,_LeftOver,fmt).
 
 parse_for(Type,StringM):- parse_for(Type,StringM, _Term).
@@ -184,10 +184,10 @@ parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL):- !,
 
 
 parse_agent_text_command_1(Agent,VERB,ARGS,NewAgent,GOAL):- 
-   call_no_cuts(moo:agent_text_command(Agent,[VERB|ARGS],NewAgent,GOAL)).
+   call_no_cuts(moodb:agent_text_command(Agent,[VERB|ARGS],NewAgent,GOAL)).
 
 parse_agent_text_command_1(Agent,SVERB,ARGS,NewAgent,GOAL):- 
-   call_no_cuts(moo:agent_text_command(Agent,[VERB|ARGS],NewAgent,GOAL)),
+   call_no_cuts(moodb:agent_text_command(Agent,[VERB|ARGS],NewAgent,GOAL)),
    verb_matches(SVERB,VERB).
 
 % parses a verb phrase and retuns one interpretation (action)

@@ -21,7 +21,7 @@ moo:action_info(push(dir)).
 % Push a box
 % Nothing to push... agent moves and takes a little damage.
 %Plus it still costs the same charge as if the agent did push something
-moo:agent_call_command(Agent,push(Dir)) :-	
+moodb:agent_call_command(Agent,push(Dir)) :-	
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	atloc(What,XXYY),
@@ -32,7 +32,7 @@ moo:agent_call_command(Agent,push(Dir)) :-
 
 % Pushing what cannot be pushed
 % Some damage and loss of charge (same as normal push)
-moo:agent_call_command(Agent,push(Dir)) :-	
+moodb:agent_call_command(Agent,push(Dir)) :-	
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	atloc(What,XXYY),
@@ -41,7 +41,7 @@ moo:agent_call_command(Agent,push(Dir)) :-
 	moo:update_charge(Agent,push).
 
 % A successful PUSH
-moo:agent_call_command(Agent,push(Dir)) :-	
+moodb:agent_call_command(Agent,push(Dir)) :-	
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	atloc(What,XXYY),

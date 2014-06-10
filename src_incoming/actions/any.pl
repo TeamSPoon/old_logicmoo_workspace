@@ -26,7 +26,7 @@ moo:action_rules(Agent,use,[Obj],[possess(Agent,Obj),mud_isa(Obj,useable),stowed
 moo:action_rules(Agent,stow,[Obj],[possess(Agent,Obj),mud_isa(Obj,stowable),genlPreds(Using,controling),k(Using,Agent,Obj)->stowed(Agent,Obj)]).
 
 % Use something
-moo:agent_call_command(Agent,ACT) :-
+moodb:agent_call_command(Agent,ACT) :-
    ACT =.. [VERB|SENT],
    moo:action_rules(Agent,VERB,SENT,StateRules),
       action_requires_states(Agent,StateRules,REQS),

@@ -709,6 +709,7 @@ xcall_t(P):- call(P).
 assertion_t([AH,P|LIST]):-is_holds_true(AH),!,assertion_t([P|LIST]).
 assertion_t([AH,P|LIST]):-is_holds_false(AH),!,assertion_f([P|LIST]).
 % todo hook into loaded files!
+assertion_t([P|LIST]):- Call=..[asserted_dbase_t,P|LIST],Call.
 assertion_t(_):-not(useExternalDBs),!,fail.
 assertion_t([P|LIST]):- tiny_kb:'ASSERTION'(':TRUE-DEF',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
 assertion_t([P|LIST]):-tiny_kb:'ASSERTION'(':TRUE-MON',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
@@ -808,7 +809,7 @@ is_creatable_type(Type):-holds_t([isa,Type,creatable_type]).
 arityMatches(A,S-E):- !, catch((system:between(S,E,OTHER),A=OTHER),_,(trace,system:between(S,E,OTHER),A=OTHER)).
 arityMatches(A,OTHER):-number(OTHER),!,A=OTHER.
 
-isCycPredArity_ignoreable(P,A):-ignore(isCycPredArity(P,A)).
+isCycPredArity_ignoreable(P,A):-notrace(ignore(isCycPredArity(P,A))).
 
 isCycPredArity_Check(P,A):-isCycPredArity(P,A),!.
 isCycPredArity_Check(P,A):-get_mpred_prop(P/A,_).
@@ -1094,6 +1095,7 @@ db_op00(Op,isa(Term,Var)):-var(Var),!,db_op0(Op,get_isa(Term,Var)).
 db_op00(ask(Must),isa(T,type)):-!,call_must(Must,defined_type(T)).
 db_op00(tell(isa(T,type)),isa(T,type)):-!,db_tell_isa(T,type).
 
+db_op00(ask(_Must),true):-!.
 db_op00(tell(OldV),B):- !,loop_check(db_op0(tell(OldV),B),true). % true = we are already processing this assert
 db_op00(ask(Must),createableType(SubType)):-!, call_must(Must,is_creatable_type(SubType)).
 db_op00(ask(Must),Term):-!,loop_check(db_op0(ask(Must),Term),db_query_lc(Must,Term)).
@@ -1406,6 +1408,7 @@ asserta_if_ground(G):-ground(G),asserta(G),!.
 asserta_if_ground(_).
 
 call_no_cuts(CALL):-clause(CALL,TEST),call_no_cuts_0(TEST).
+call_no_cuts(CALL):-expand_goal(CALL,EG),EG\=CALL,!,clause(EG,TEST),call_no_cuts_0(TEST).
 
 call_no_cuts_0(true):-!.
 call_no_cuts_0((!)):-!.

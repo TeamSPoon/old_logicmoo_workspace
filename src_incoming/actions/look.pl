@@ -32,7 +32,7 @@
 can_sense(_Agent,visual,InList,InList,[]).
 
 moo:action_help(examine(item), "view details of item (see also @list)").
-moo:agent_call_command(_Gent,examine(SObj)):- term_listing(SObj).
+moodb:agent_call_command(_Gent,examine(SObj)):- term_listing(SObj).
 
 
 
@@ -40,15 +40,15 @@ moo:action_help(look, "generalized look in region").
 moo:action_help(look(dir), "Look in a direction").
 moo:action_help(look(item), "Look at a speficific item").
 
-moo:agent_call_command(Agent,look(Dir)):-
+moodb:agent_call_command(Agent,look(Dir)):-
    view_dirs(Agent,[[Dir,here],[Dir,Dir],[Dir,Dir,adjacent]],Percepts),
    forall_member(P,Percepts,call_agent_action(Agent,examine(P))).
 
-moo:agent_call_command(Agent,look(SObj)):-
+moodb:agent_call_command(Agent,look(SObj)):-
    objects_match(Agent,SObj,Percepts),
    forall_member(P,Percepts,call_agent_action(Agent,examine(P))).
 
-moo:agent_call_command(Agent,look):- 
+moodb:agent_call_command(Agent,look):- 
    get_session_id(O),
    with_assertions(thlocal:current_agent(O,Agent),
         ((atloc(Agent,LOC),call_look(Agent,LOC)))).

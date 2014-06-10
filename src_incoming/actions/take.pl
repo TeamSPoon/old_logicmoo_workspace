@@ -17,7 +17,7 @@
 
 % Take something
 % Successfully picking something up
-moo:agent_call_command(Agent,take(SObj)) :-
+moodb:agent_call_command(Agent,take(SObj)) :-
 	atloc(Agent,LOC),
 	atloc(Obj,LOC),
         object_match(SObj,Obj),
@@ -27,7 +27,7 @@ moo:agent_call_command(Agent,take(SObj)) :-
 	moo:update_charge(Agent,take).
 
 %Nothing to pick up
-moo:agent_call_command(Agent,take(_)) :-
+moodb:agent_call_command(Agent,take(_)) :-
 	moo:update_charge(Agent,take),
 	add(failure(Agent,take)).
 

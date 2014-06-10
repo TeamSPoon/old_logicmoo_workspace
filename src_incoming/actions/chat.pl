@@ -21,7 +21,7 @@ socialCommand(Say,SocialVerb,chat(optional(verb,SocialVerb),optional(channel,her
    Say =.. [SocialVerb,optional(channel,here),string].
 socialVerb(SocialVerb):-member(SocialVerb,[say,whisper,emote,tell,ask,shout]). % ,gossup
 
-moo:agent_text_command(Agent,[Say|What],Agent,CMD):-
+moodb:agent_text_command(Agent,[Say|What],Agent,CMD):-
       socialVerb(Say),
       once(chat_to_callcmd(Agent,Say,What,CMD)).
 
@@ -38,7 +38,7 @@ chat_to_callcmd(Agent,Say,What,CMD):-atloc(Agent,Where),chat_command_parse_2(Age
 
 chat_command_parse_2(Agent,Say,Where,Text,do_social(Agent,Say,Where,Text)).
 
-moo:agent_call_command(Agent,do_social(Agent,Say,Whom,Text)):- 
+moodb:agent_call_command(Agent,do_social(Agent,Say,Whom,Text)):- 
    do_social(Agent,Say,Whom,Text).
 
 :- include(logicmoo(vworld/moo_footer)).

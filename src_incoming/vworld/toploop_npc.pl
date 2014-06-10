@@ -80,13 +80,13 @@ moo:action_help(idea(optional(agent,self)),"Makes some agent (or self) think of 
 moo:action_help(tick,"Makes *your* agent do something brilliant").
 moo:action_help(prolog(prolog),"Call prolog toploop").
 
-moo:agent_text_command(Agent,[prolog,X],Agent,prologCall(X)).
-moo:agent_text_command(Agent,[prolog],Agent,prologCall(prolog)).
+moodb:agent_text_command(Agent,[prolog,X],Agent,prologCall(X)).
+moodb:agent_text_command(Agent,[prolog],Agent,prologCall(prolog)).
 
 warnOnError(X):-catch(X,E,dmsg( error(E:X) )).
 
-moo:agent_call_command(Agent,prologCall(C)) :- agent_call_safely(Agent,C).
-moo:agent_call_command(Agent,prolog(C)) :- agent_call_safely(Agent,C).
+moodb:agent_call_command(Agent,prologCall(C)) :- agent_call_safely(Agent,C).
+moodb:agent_call_command(Agent,prolog(C)) :- agent_call_safely(Agent,C).
 
 agent_call_safely(_Agnt,C):- any_to_callable(C,X,Vars), !, gensym(result_count_,RC),flag(RC,_,0),agent_call_safely(RC,X,Vars),flag(RC,CC,CC),fmt(result_count(CC)).
 agent_call_safely(RC,X,[]) :- !, '@'(notrace((warnOnError(doall(((X,flag(RC,CC,CC+1),fmt(cmdresult(X,true)))))))),user).
@@ -97,11 +97,11 @@ any_to_callable(S,X,Vs):-string(C),!,string_to_atom(S,C),atom_to_term_safe(C,X,V
 any_to_callable(C,X,Vs):-atom(C),!,atom_to_term_safe(C,X,Vs).
 any_to_callable(C,X,Vs):-expand_goal(C,X),term_variables((C,X),Vs),!.
 
-moo:agent_call_command(_Agent,npc_timer(Time)):-retractall(npc_tick_tock_time(_)),asserta(npc_tick_tock_time(Time)).
-moo:agent_call_command(Who,tick) :-  debugOnError(tick(Who)).
-moo:agent_call_command(_Agent,idea(Who)) :-  catch(idea(Who,_),E,(dmsg(idea(E, Who)),ggtrace,idea(Who,_))).
-moo:agent_call_command(_Agent,tock) :- npc_tick.
-moo:agent_call_command(_Agent,tick(Other)) :- in_thread_and_join(tick(Other)).
+moodb:agent_call_command(_Agent,npc_timer(Time)):-retractall(npc_tick_tock_time(_)),asserta(npc_tick_tock_time(Time)).
+moodb:agent_call_command(Who,tick) :-  debugOnError(tick(Who)).
+moodb:agent_call_command(_Agent,idea(Who)) :-  catch(idea(Who,_),E,(dmsg(idea(E, Who)),ggtrace,idea(Who,_))).
+moodb:agent_call_command(_Agent,tock) :- npc_tick.
+moodb:agent_call_command(_Agent,tick(Other)) :- in_thread_and_join(tick(Other)).
 
 :- include(logicmoo(vworld/moo_footer)).
 

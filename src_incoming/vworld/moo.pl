@@ -82,6 +82,7 @@ not_loading_game_file:-not(loading_game_file(_)),loaded_game_file(_).
 
 
 is_holds_true(Prop):- notrace((atom(Prop),is_holds_true0(Prop))),!.
+
 is_holds_true0(Prop):-arg(_,p(k,p,holds,holds_t,dbase_t,asserted_dbase_t,req,assertion_t,assertion),Prop).
 
 is_2nd_order_holds(Prop):- is_holds_true(Prop) ; is_holds_false(Prop).
@@ -295,6 +296,7 @@ checkCycPreds.
 
 :-dynamic(never_use_holds_db/3).
 
+never_use_holds_db(agent_call_command,2,coded(agent_call_command,2)).
 never_use_holds_db(':-',1,oper(':-')):-!.
 never_use_holds_db(op,_,oper(op)):-!.
 never_use_holds_db(decl_mpred,_,oper(decl_mpred)):-!.
@@ -317,11 +319,10 @@ current_context_module(Ctx):-loading_module_h(Ctx),!.
 current_context_module(Ctx):-context_module(Ctx).
 
 
-%:- dynamic_multifile_exported agent_call_command/2.
+:- dynamic_multifile_exported agent_call_command/2.
 :- dynamic_multifile_exported call_after_load/1.
 :- dynamic_multifile_exported thlocal:current_agent/2.
 :- dynamic_multifile_exported world_agent_plan/3.
-
 
 :- decl_mpred(db_prop/2).
 :- decl_mpred(subclass/2).
@@ -353,8 +354,8 @@ current_context_module(Ctx):-context_module(Ctx).
 
 :- dynamic_multifile_exported(decl_coerce/3).
 
-decl_coerce(_,_,_):-fail.
-coerce(What,Type,NewThing):- decl_coerce(What,Type,NewThing),!.
+moodb:decl_coerce(_,_,_):-fail.
+coerce(What,Type,NewThing):- moodb:decl_coerce(What,Type,NewThing),!.
 coerce(What,_Type,NewThing):-NewThing = What.
 
 
@@ -431,7 +432,6 @@ term_expansion_local0(A,A).
 
 % user:term_expansion(X,Y):- term_expansion_local0(X,Y).
 
-:- decl_mpred(agent_call_command,2).
 
 %:- module_predicates_are_exported(moodb).
 %:- module_meta_predicates_are_transparent(moodb).

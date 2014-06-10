@@ -28,7 +28,9 @@ argIsa_call_0(type_max_charge,1,object).
 argIsa_call_0(type_max_charge,2,int).
 
 
+argIsa_call_0(agent_text_command,_,term).
 argIsa_call_0(term_anglify,_,term).
+
 
 argIsa_call_0(memory,2,term):-!.
 argIsa_call_0(Pred,N,Type):- holds_t(argIsa,Pred,N,Type),!.
@@ -36,6 +38,7 @@ argIsa_call_0(Pred,N,Type):- holds_t(isa,Templ,mpred),functor(Templ,Pred,A),A>0,
 argIsa_call_0(Pred,N,Type):- get_mpred_prop(Pred,argsIsa(Templ)),!,arg(N,Templ,Type).
 argIsa_call_0(Func,N,Type):- get_functor(Func,F,_),F \= Func,argIsa_call_0(F,N,Type).
 argIsa_call_0(Pred,N,Type):- holds_t(ft_info,Templ,formatted),functor(Templ,Pred,A),A>0,!,arg(N,Templ,Type).
+argIsa_call_0(Pred,N,Type):- holds_t(argsIsa,Templ),!,arg(N,Templ,Type).
 
 argIsa_call_1(Prop,N1,Type):- is_2nd_order_holds(Prop),trace,dmsg(todo(define(argIsa_call(Prop,N1,'Second_Order_TYPE')))),
    Type=argIsaFn(Prop,N1).
@@ -128,6 +131,9 @@ term_is_ft(Term,Type):-
 % =======================================================
 % correctArgsIsa/3
 % =======================================================
+
+
+moodb:decl_coerce(A,Type,AA):- correctAnyType(tell(_),A,Type,AA).
 
 same_vars(T1,T2):-term_variables(T1,V1),term_variables(T2,V2),!,V1==V2.
 

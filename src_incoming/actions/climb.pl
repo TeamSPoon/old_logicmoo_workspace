@@ -24,7 +24,7 @@ moo:action_info(climb(dir)).
 % Climb
 % If there is nothing there to climb, move to location
 % plus take some damage and loose charge 
-moo:agent_call_command(Agent,climb(Dir)) :-	
+moodb:agent_call_command(Agent,climb(Dir)) :-	
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	can_move_into(LOC,XXYY),
@@ -32,13 +32,13 @@ moo:agent_call_command(Agent,climb(Dir)) :-
 	moo:update_stats(Agent,trip),
 	moo:update_charge(Agent,climb).
 % Object is too high to climb, or it is another agent. 
-moo:agent_call_command(Agent,climb(Dir)) :-
+moodb:agent_call_command(Agent,climb(Dir)) :-
 	
 	\+ climbable(Agent,Dir),
 	moo:update_stats(Agent,pulled),
 	moo:update_charge(Agent,climb).
 % Successful climb
-moo:agent_call_command(Agent,climb(Dir)) :-	
+moodb:agent_call_command(Agent,climb(Dir)) :-	
 	in_world_move(_,Agent,Dir),
 	moo:update_charge(Agent,climb).
 

@@ -32,12 +32,12 @@ run_mud_tests:-
 
 moo:action_help(tests,"run run_mud_tests/0").
 
-moo:agent_call_command(_Agent,tests) :- scan_updates, run_mud_tests.
+moodb:agent_call_command(_Agent,tests) :- scan_updates, run_mud_tests.
 
 
 moo:action_help(test(term),"run tests containing term").
 
-moo:agent_call_command(_Gent,test(Obj)):- term_test(Obj).
+moodb:agent_call_command(_Gent,test(Obj)):- term_test(Obj).
 
 test_name(String):-dmsg(moo_test(named(String))),retractall(was_test_name(_)),asserta(was_test_name(String)).
 last_test_name(String):-was_test_name(String),!.

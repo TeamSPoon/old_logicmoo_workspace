@@ -21,7 +21,7 @@ moo:action_info(attack(dir)).
 
 % Attack
 % Successful Attack
-moo:agent_call_command(Agent,attack(Dir)) :-	
+moodb:agent_call_command(Agent,attack(Dir)) :-	
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	atloc(What,XXYY),
@@ -29,7 +29,7 @@ moo:agent_call_command(Agent,attack(Dir)) :-
 	moo:update_charge(Agent,attack).
 
 % Destroy small objects (food, etc.)
-moo:agent_call_command(Agent,attack(Dir)) :-	
+moodb:agent_call_command(Agent,attack(Dir)) :-	
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	atloc(What,XXYY),	
@@ -38,7 +38,7 @@ moo:agent_call_command(Agent,attack(Dir)) :-
 	moo:update_charge(Agent,attack).
 
 % Hit a big object... causes damage to agent attacking
-moo:agent_call_command(Agent,attack(Dir)) :-	
+moodb:agent_call_command(Agent,attack(Dir)) :-	
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	atloc(What,XXYY),	
@@ -48,7 +48,7 @@ moo:agent_call_command(Agent,attack(Dir)) :-
 	moo:update_charge(Agent,attack).
 
 % Hit nothing (empty space)... causes a little damage
-moo:agent_call_command(Agent,attack(Dir)) :-	
+moodb:agent_call_command(Agent,attack(Dir)) :-	
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	not(atloc(_,XXYY)),

@@ -26,7 +26,7 @@ moo:action_info(eat(item)).
 % Eat something held
 % Check to make sure it's in the agents possession... 
 % if it is, process it's worth, then destroy it
-moo:agent_call_command(Agent,eat(SObj)) :-
+moodb:agent_call_command(Agent,eat(SObj)) :-
 	possess(Agent,Obj),
         object_match(SObj,Obj),
 	worth(Agent,eat,Obj),

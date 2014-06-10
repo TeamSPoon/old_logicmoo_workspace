@@ -74,7 +74,7 @@ start_servers :- if_version_greater(70111,thread_create(ensure_loaded(logicmoo(l
 
 */
 
-moo:agent_text_command(Agent,[run,Term], Agent,prologCall(Term)).
+moodb:agent_text_command(Agent,[run,Term], Agent,prologCall(Term)).
 
 
 :- use_module(library(check)).

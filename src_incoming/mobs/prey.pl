@@ -60,7 +60,7 @@ prey_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[nut]).
 moo:action_info(spawn(type)).
 moo:action_info(rez(type)).
 
-moo:agent_call_command(_Agent,spawn(prey)):-spawn.
+moodb:agent_call_command(_Agent,spawn(prey)):-spawn.
 
 spawn :-
 	maybe(10),
@@ -95,7 +95,7 @@ spawn_prey(N) :-
 	spawn_prey(Ntemp).
 
 
-moo:agent_call_command(Agent,rez(NewType)):- atloc(Agent,LOC), create_instance(NewType,item,[atloc(LOC)]).
+moodb:agent_call_command(Agent,rez(NewType)):- atloc(Agent,LOC), create_instance(NewType,item,[atloc(LOC)]).
 
 
 :- include(logicmoo(vworld/moo_footer)).

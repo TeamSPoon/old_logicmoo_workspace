@@ -17,7 +17,7 @@
 moo:action_info(drop(item)).
 
 % Drop something
-moo:agent_call_command(Agent,drop(SObj)) :-
+moodb:agent_call_command(Agent,drop(SObj)) :-
 	possess(Agent,Obj),
         object_match(SObj,Obj),
 	del(possess(Agent,Obj)),
@@ -26,7 +26,7 @@ moo:agent_call_command(Agent,drop(SObj)) :-
 	moo:update_charge(Agent,drop).
 
 %Nothing to drop
-moo:agent_call_command(Agent,drop(_)) :-
+moodb:agent_call_command(Agent,drop(_)) :-
 	moo:update_charge(Agent,drop),
 	add(failure(Agent,drop)).
 

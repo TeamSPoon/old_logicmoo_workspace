@@ -26,7 +26,7 @@ use_verbs(USE,USING,USABLE,STOWED):-moo:use_usable(USE,USING,USABLE,STOWED).
 
 % Use something
 % Successfully picking something up
-moo:agent_call_command(Agent,SENT) :-
+moodb:agent_call_command(Agent,SENT) :-
   use_verbs(USE,_USING,USABLE,STOWED),
     SENT=..[USE,Obj],
 	possess(Agent,Obj),
@@ -37,7 +37,7 @@ moo:agent_call_command(Agent,SENT) :-
 	do_permanence(USE,Agent,Obj),
 	moo:update_charge(Agent,USE).
 %Nothing to use
-moo:agent_call_command(Agent,SENT) :-
+moodb:agent_call_command(Agent,SENT) :-
   use_verbs(USE,_USING,_USABLE,_STOWED),
     SENT=..[USE,_Obj],
 	moo:update_charge(Agent,USE),

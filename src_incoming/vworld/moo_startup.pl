@@ -262,7 +262,7 @@ lundef :- A = [],
 
 :- begin_transform_moo_preds.
 
-moo:agent_text_command(Agent,[run,Term], Agent,prologCall(Term)).
+moodb:agent_text_command(Agent,[run,Term], Agent,prologCall(Term)).
 
 
 :-at_start(toploop_telnet:start_mud_telnet(4000)).

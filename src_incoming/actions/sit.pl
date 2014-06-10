@@ -18,7 +18,7 @@ is_posture(kneel).
 moo:action_help(Posture,text("sets and agent's posture to ",Posture)):-is_posture(Posture).
 
 % Sit - do nothing.
-moo:agent_call_command(Agent,Sit) :-is_posture(Sit),
+moodb:agent_call_command(Agent,Sit) :-is_posture(Sit),
         fmt('agent ~w is now ~wing ',[Agent,Sit]),
         padd(Agent,posture(Sit)),
 	moo:update_charge(Agent,Sit).

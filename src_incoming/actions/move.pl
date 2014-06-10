@@ -18,13 +18,13 @@
 
 :- moodb:begin_transform_moo_preds.
 
-moo:agent_text_command(Agent,[DirSS],Agent,move(Dir)):- catch(((string_to_atom(DirSS,Dir),moo:specifier_text(Dir,dir))),_,fail),!.
+moodb:agent_text_command(Agent,[DirSS],Agent,move(Dir)):- catch(((string_to_atom(DirSS,Dir),moo:specifier_text(Dir,dir))),_,fail),!.
 
-moo:agent_text_command(Agent,[DirSS],Agent,move(DirS)):- 
+moodb:agent_text_command(Agent,[DirSS],Agent,move(DirS)):- 
  catch(((string_to_atom(DirSS,DirS),moo:specifier_text(Dir,dir),
        catch((atom_concat(Dir,N,DirS),(atom_number(N,_))),_,fail))),_,fail).
 
-agent_call_command(Agnt,Cmd):- functor(Cmd,move,_),!,
+moodb:agent_call_command(Agnt,Cmd):- functor(Cmd,move,_),!,
    must(move_command(Agnt,Cmd)).
 
 moo:action_info(move(dir)).
@@ -104,7 +104,7 @@ moo:update_stats(Agent,fall) :- padd(Agent,damage,-10).
 % cheating but to test
 
 moo:action_info(go(dir)).
-moo:agent_call_command(Agent,go(Dir)) :-
+moodb:agent_call_command(Agent,go(Dir)) :-
 	atloc(Agent,LOC),
         in_world_move(LOC,Agent,Dir),
 	moo:update_charge(Agent,move).

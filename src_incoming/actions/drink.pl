@@ -17,7 +17,7 @@ moo:action_help(drink(drinkable),"Drink a Drinkable Item").
 % Eat something held
 % Check to make sure it's in the agents possession... 
 % if it is, process it's worth, then destroy it
-moo:agent_call_command(Agent,drink(SObj)) :-
+moodb:agent_call_command(Agent,drink(SObj)) :-
 	possess(Agent,Obj),
         object_match(SObj,Obj),
 	worth(Agent,drink,Obj),
