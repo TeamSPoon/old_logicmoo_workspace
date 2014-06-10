@@ -56,6 +56,7 @@ call_agent_action(Agent,CMDI):-
            % fail event
               raise_location_event(Where,notice(reciever,failed(Agent,CMD))))))),E,fmt('call_agent_action/2 Error ~q ',[E])),
     (Pushed -> ignore(retract(thlocal:current_agent(SESSION,Agent)));true).
+
 /*
 test_te:- xcall_t((
  

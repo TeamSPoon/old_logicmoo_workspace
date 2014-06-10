@@ -87,7 +87,7 @@ mpred(verb_alias(string,string)).
 
 mpred(label_type_props(string,type,list(props))).
 
-mpred(type_grid(type,term(list(grid)))).
+mpred(type_grid(type,int,term)).
 
 mpred(action_rules(term(agent),term(verb),term(object),term(list(props)))).
 
@@ -203,6 +203,7 @@ moo:subclass(item,object).
 
 moo:mpred(pathName(region,dir,string)).
 
+moo:mpred(erbOverride(term,action,action)).
 moo:singleValued(verbOverride(term,action,action)).
 moo:singleValued(atloc(object,xyz(region,int,int,int))).
 moo:singleValued(act_turn(agent,int)).

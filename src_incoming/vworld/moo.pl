@@ -182,7 +182,7 @@ fix_fa(F/A,FA):- !,isRegisteredCycPred(_,F,A),functor(FA,F,A).
 fix_fa(FC,FA):- atomic(FC),!,get_functor(FC,F),isRegisteredCycPred(_,F,A),functor(FA,F,A).
 fix_fa(FA,FA). % functor(FA,F,A),isRegisteredCycPred(_,F,A).
 
-get_mpred_prop(P,Prop):- fix_fa(P,FA),moodb:mpred_prop(FA,Prop).
+get_mpred_prop(P,Prop):- notrace((fix_fa(P,FA),moodb:mpred_prop(FA,Prop))).
 
 add_mpred_prop(_,Var):- var(Var),!.
 add_mpred_prop(_,[]):- !.

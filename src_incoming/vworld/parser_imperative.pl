@@ -208,6 +208,7 @@ parse_agent_text_command_11(Agent,SVERB,ARGS,NewAgent,GOAL):-to_word_list(SVERB,
 
 moo:verb_alias('l','look').
 moo:verb_alias('s','move s').
+moo:verb_alias('go','go').
 moo:verb_alias('where is','where').
 
 pos_word_formula('infinitive',Verb,Formula):- 'infinitive'(TheWord, Verb, _, _G183), 'verbSemTrans'(TheWord, 0, 'TransitiveNPCompFrame', Formula, _, _).
@@ -215,6 +216,7 @@ pos_word_formula('infinitive',Verb,Formula):- 'infinitive'(TheWord, Verb, _, _G1
 verb_alias_to_verb(IVERB,SVERB):-moo:verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.
 verb_alias_to_verb(IVERB,SVERB):-specifiedItemType(IVERB,verb,SVERB), IVERB \= SVERB.
 
+verb_matches("go",VERB):-!,VERB=go.
 verb_matches(SVERB,VERB):-samef(VERB,SVERB).
 
 parse_vp_templates(Agent,SVERB,_ARGS,TEMPLATES):-

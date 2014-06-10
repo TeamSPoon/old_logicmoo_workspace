@@ -1034,7 +1034,7 @@ isa_type(Type):-req(isa(Type,type)).
 
 db_op_simpler(_,KB:Term,Term):-is_kb_module(KB).
 db_op_simpler(_,KB:Term,Term):-dbase_mod(KB).
-db_op_simpler(Op,MODULE:C0,holds_tcall(MODULE:C0)):- atom(MODULE), nonvar(C0),not(not(predicate_property(C0,_PP))),!. % , functor(C0,F,A), dmsg(todo(unmodulize(F/A))), %throw(module_form(MODULE:C0)),
+db_op_simpler(ask(_),MODULE:C0,holds_tcall(MODULE:C0)):- atom(MODULE), nonvar(C0),not(not(predicate_property(C0,_PP))),!. % , functor(C0,F,A), dmsg(todo(unmodulize(F/A))), %throw(module_form(MODULE:C0)),
                                                                              %    db_op(Op,C0).
 db_op_simpler(_,C0,C1):- C0=..[svo,Obj,Prop|ARGS],!,C1=..[p,Prop,Obj|ARGS],!.
 db_op_simpler(_,DBASE_T,DBASE):- DBASE_T=..[HOLDS,P,A|ARGS],atom(P),is_holds_true(HOLDS),DBASE=..[P,A|ARGS].
@@ -1077,7 +1077,7 @@ forwardRule_call(A,B):-holds_t(forwardRule,B,A).
 add_from_file(B,_):- contains_singletons(B),dmsg(todo(add_from_file_contains_singletons(B))),!,fail.
 add_from_file(B,B):- db_op(tell(_OldV),B),!.
 
-db_op(Op,Term):-do_all_of(dbase_module_loaded),db_op00(Op,Term),do_all_of(dbase_module_loaded).
+db_op(Op,Term):-notrace(do_all_of(dbase_module_loaded)),db_op00(Op,Term),notrace((do_all_of(dbase_module_loaded))).
 
 db_op00(Op,isa(Term,Var)):-var(Var),!,db_op0(Op,get_isa(Term,Var)).
 db_op00(ask(Must),isa(T,type)):-!,call(Must,defined_type(T)).
@@ -1122,7 +1122,7 @@ db_op0(Op,Term):- notrace((equivRule_call(Term,NewTerm),not(contains_singletons(
 db_op0(Op,Term):-  notrace((forwardRule_call(Term,NewTerm),not(contains_singletons(NewTerm)))),db_op(Op,NewTerm).
 
 
-db_op0(tell(_OldV),singleValued(Term)):-!,add(mpred(Term,singleValued)).
+db_op0(tell(_OldV),singleValued(Term)):-!,add(mpred(Term)),add_mpred_prop(Term,singleValued).
 db_op0(tell(_OldV),multiValued(Term)):-!,functor_safe(Term,_F,A),add(mpred(Term,multi(A))).
 db_op0(tell(_OldV),isa(A,mpred)):- decl_mpred(A),!.
 
@@ -1181,13 +1181,13 @@ db_op_unit(Op,_C0,Prop,ARGS):-db_op_sentence(Op,Prop,ARGS,Unit),db_op_exact(Op,U
 
 db_op_exact(tell(OldV),W):-non_assertable(W,Why),dumpST,trace,throw_safe(todo(db_op(tell(OldV), non_assertable(Why,W)))).
 db_op_exact(ask(Must), Term):- !,db_query(Must,Term).
-db_op_exact(query, Term):- !,db_query(ask(findall),Term).
-db_op_exact(u,C):- grtrace,db_quf(C,U,Template),U,Template,must(ground(Template)),!,ignore(retractall(Template)).
-db_op_exact(ra,C):-db_quf(C,U,Template), doall((U,retractall(Template))).
-db_op_exact(ra,C):- ignore(retractall(C)).
+db_op_exact(query, Term):- !,db_query(findall,Term).
+db_op_exact(u,C):- grtrace,db_quf(C,U,Template),U,Template,must(ground(Template)),!,ignore(hooked_retractall(Template)).
+db_op_exact(ra,C):-db_quf(C,U,Template), doall((U,hooked_retractall(Template))).
+db_op_exact(ra,C):- ignore(hooked_retractall(C)).
 db_op_exact(tell(OldV),C0):- db_quf(C0,U,C),must(U),functor(C,F,A),( get_mpred_prop(F/A,singleValued) -> must(db_assert_sv(C,F,A,OldV)) ; must(db_assert_mv(C,F,A,OldV))).
 db_op_exact(tell(OldV),C):- functor(C,F,A),!, functor(FA,F,A), (get_mpred_prop(FA,singleValued) -> must(db_assert_sv(C,F,A,OldV)) ; must(db_assert_mv(C,F,A,OldV))).
-db_op_exact(retract,C):- ground(C),retractall(C),!.
+db_op_exact(retract,C):- ground(C),hooked_retractall(C),!.
 db_op_exact(Op,C):-!,trace,throw(unhandled(db_op_exact(Op,C))).
 
 % ================================================
@@ -1471,15 +1471,15 @@ is_mpred_prolog(F,A):-get_mpred_prop(F/A,ask_module(_)),
 
 correctArgsIsa(_,NC,NC):-not(compound(NC)),!.
 correctArgsIsa(Op,M:A,MAA):-nonvar(M),!,correctArgsIsa(Op,A,AA),M:AA=MAA.
-
-correctArgsIsa(Op,A,AA):-A =..[KP,Prop|Args],atom(Prop),is_holds_true(KP),!,
+correctArgsIsa(Op,A,AA):- hotrace(correctArgsIsa0(Op,A,AA)).
+correctArgsIsa0(Op,A,AA):-A =..[KP,Prop|Args],atom(Prop),is_holds_true(KP),!,
    discoverAndCorrectArgsIsa(Op,Prop,1,Args,AArgs),AA =..[Prop|AArgs].
 
-correctArgsIsa(Op,A,not(AA)):-A =..[KP,Prop|Args],atom(Prop),is_holds_false(KP),!,
+correctArgsIsa0(Op,A,not(AA)):-A =..[KP,Prop|Args],atom(Prop),is_holds_false(KP),!,
    discoverAndCorrectArgsIsa(Op,Prop,1,Args,AArgs),
    AA =..[Prop|AArgs].
 
-correctArgsIsa(Op,A,AA):-A =..[Prop|Args],
+correctArgsIsa0(Op,A,AA):-A =..[Prop|Args],
    discoverAndCorrectArgsIsa(Op,Prop,1,Args,AArgs),
    AA =..[Prop|AArgs].
 
@@ -1526,6 +1526,8 @@ correctType(Op,Arg,Props,NewArg):- compound(Props),
 correctType(Op,A,C,A):-must(ground(A)),trace, dmsg(todo(define(correctType(Op,A,C,'ConvertedArg')))),throw(retry(_)).
 correctType(Op,A,Type,_NewArg):-throw(failure(correctType(Op,A,Type))).
 
+:-decl_mpred(subft/2).
+
 :- style_check(-singleton).
 
 correctFormatType(Op,A,Type,A):- var(Type),!,trace,throw(failure(correctFormatType(Op,A,Type))).
@@ -1553,7 +1555,7 @@ correctFormatType(Op,Args,formatted(Types),NewArgs):- compound(Args),compound(Ty
    Types=..[F|TypesL],
    NewArgs=..[F|NewArgsL],!,   
    correctFormatType(Op,ArgsL,TypesL,NewArgsL).
-correctFormatType(Op,A,Super,AA):- moo:subft(Sub,Super),correctFormatType(Op,A,Sub,AA).
+correctFormatType(Op,A,Super,AA):- holds_t(subft,Sub,Super),correctFormatType(Op,A,Sub,AA).
   
 :- style_check(+singleton).
 
@@ -1787,7 +1789,7 @@ savedb:-
 is_ft_except(S,List):-
    moo:ft_info(S,_);
    not((member(S,List), 
-      ((moo:subft(S,S2) ,
+      ((get_subft(S,S2) ,
         is_ft_except(S2,[S|List]) ;
              ((moo:subft(S3,S) , is_ft_except(S3,[S,S2|List]))))))).
 */

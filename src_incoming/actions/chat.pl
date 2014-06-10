@@ -19,7 +19,7 @@ moo:action_help(Say,text("invokes",Does)):-socialCommand(Say,_SocialVerb,Does).
 
 socialCommand(Say,SocialVerb,chat(optional(verb,SocialVerb),optional(channel,here),string)):-socialVerb(SocialVerb),
    Say =.. [SocialVerb,optional(channel,here),string].
-socialVerb(SocialVerb):-member(SocialVerb,[say,whisper,emote,tell,ask,shout,gossup]).
+socialVerb(SocialVerb):-member(SocialVerb,[say,whisper,emote,tell,ask,shout]). % ,gossup
 
 moo:agent_text_command(Agent,[Say|What],Agent,CMD):-
       socialVerb(Say),
