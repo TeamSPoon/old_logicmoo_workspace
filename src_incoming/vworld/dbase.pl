@@ -1588,11 +1588,11 @@ any_to_dir(D,O):-atom(D),sub_atom(D, 0, 1, _, S),toLowercase(S,L),p2c_dir2(L,O),
 
 detWithSpace(WithSpace,String):-ddeterminer0(String),atom_concat(String,' ',WithSpace).
 detWithSpace(WithSpace,String):-ddeterminer1(String),atom_concat(String,' ',WithSpace).
-determinerRemoved(S0,Det,S):- detWithSpace(WithSpace,String),string_concat(WithSpace,S,S0),string_lower(String,Det).
+determinerRemoved(S0,Det,S):- nonvar(S0),detWithSpace(WithSpace,String),string_concat(WithSpace,S,S0),string_lower(String,Det).
 
 assert_description(moo:description(A,S0)):-assert_description(A,S0).
 
-assert_description(A,S0):-string_concat('#$PunchingSomething ',S,S0),!,assert_description(A,S).
+assert_description(A,S0):-nonvar(S0),string_concat('#$PunchingSomething ',S,S0),!,assert_description(A,S).
 
 assert_description(A,S0):-determinerRemoved(S0,String,S),!,assert_description(A,S),add(determinerString(A,String)).
 assert_description(A,S0):-
