@@ -66,7 +66,7 @@ if "%SWIPLWIN%"=="true" (
 	)
 
     if "%USECHOICE%"=="true" (
-    	CHOICE /T 4 /C YN /CS /D Y /M  "RESTART MUD"
+    	CHOICE /T 10 /C YN /CS /D Y /M  "RESTART MUD"
     	IF ERRORLEVEL 1 goto startMUD
     )
 

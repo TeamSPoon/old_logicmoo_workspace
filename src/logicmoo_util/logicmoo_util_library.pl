@@ -32,6 +32,7 @@
          remove_dupes/2,
          list_to_set_safe/2,
          get_functor/2,
+         get_functor/3,
          functor_safe/3,
          flatten_dedupe/2,
          at_start/1,
@@ -193,11 +194,13 @@ remove_dupes([],[],_):-!.
 remove_dupes([I|In],Out,Shown):-member(I,Shown),!,remove_dupes(In,Out,Shown).
 remove_dupes([I|In],[I|Out],Shown):-remove_dupes(In,Out,[I|Shown]).
 
-get_functor(Obj,F):-var(Obj),throw(get_functor(Obj,F)).
-get_functor(_:Obj,F):-!,get_functor(Obj,F).
-get_functor(Obj,F):- string(Obj),!,atom_string(F,Obj).
-get_functor(Obj,Obj):-not(compound(Obj)),!.
-get_functor(Obj,F):-functor(Obj,F,_).
+get_functor(Obj,F):-get_functor(Obj,F,_).
+
+get_functor(Obj,F,_):-var(Obj),throw(get_functor(Obj,F)).
+get_functor(_:Obj,F,A):-!,get_functor(Obj,F,A).
+get_functor(Obj,F,0):- string(Obj),!,atom_string(F,Obj).
+get_functor(Obj,Obj,0):-not(compound(Obj)),!.
+get_functor(Obj,F,A):-functor(Obj,F,A).
 
 strip_f_module(_:P,F):-nonvar(P),!,strip_f_module(P,F).
 strip_f_module(P,P):-atom(P),!.

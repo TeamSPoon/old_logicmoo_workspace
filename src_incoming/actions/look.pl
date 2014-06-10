@@ -103,7 +103,8 @@ get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
 
 
 % Get only the Percepts
-moo:db_prop(look:get_percepts(agent,list(spatial)),[call_module(look)]).
+
+% moo:mpred(get_percepts(agent,list(spatial)),[ask_module(look)]).
 get_percepts(Agent,Percepts) :- get_percepts0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts).
 get_percepts0(Agent,Percepts) :-
   call((
@@ -115,7 +116,7 @@ get_percepts0(Agent,Percepts) :-
 	!.
 
 % Look at locations immediately around argent
-moo:db_prop(look:get_near(agent,list(spatial)),[call_module(look)]).
+% moo:mpred(look:get_near(agent,list(spatial)),[ask_module(look)]).
 get_near(Agent,PerceptsO):- get_near0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
    
 get_near0(Agent,Percepts) :-
@@ -125,7 +126,7 @@ get_near0(Agent,Percepts) :-
 	view_dirs(Agent,Dirs,Percepts))),!.
 
 % Look only at location agent is currently in.
-moo:db_prop(look:get_feet(agent,list(spatial)),[call_module(look)]).
+% moo:mpred(look:get_feet(agent,list(spatial)),[ask_module(look)]).
 get_feet(Agent,PerceptsO) :-  get_feet0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
 
 get_feet0(Agent,Percepts):-

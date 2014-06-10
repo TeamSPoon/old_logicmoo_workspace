@@ -11,7 +11,7 @@
 
 :- moodb:register_module_type(command).
 
-
+mpred(use_usable(verb,term(mpred),type,term(mpred))).
 
 moo:use_usable(wear,wearing,wearable,stowed).
 moo:use_usable(hold,holding,wieldable,stowed).

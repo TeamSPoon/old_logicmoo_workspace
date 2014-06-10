@@ -30,19 +30,22 @@ set_list_len(List,A,NewList):-length(List,LL),A=LL,!,NewList=List.
 set_list_len(List,A,NewList):-length(List,LL),A>LL,length(NewList,A),append(List,_,NewList),!.
 set_list_len(List,A,NewList):-length(NewList,A),append(NewList,_,List),!.
 
+if_mud_asserted(F,A2,_):-is_mpred_prolog(F,A2),!,fail.
+if_mud_asserted(F,A2,A):-use_holds_db(F,A2,A).
 
-if_mud_asserted(F,A2,A):-if_use_holds_db(F,A2,A).
-
+if_use_holds_db(F,A2,_):- is_mpred_prolog(F,A2),!,fail.
 if_use_holds_db(F,A,_):-  never_use_holds_db(F,A,_Why),!,fail.
 if_use_holds_db(F,A2,A):- use_holds_db(F,A2,A),!.
 if_use_holds_db(F,A,_):- integer(A),findall(n(File,Line),source_location(File,Line),SL),ignore(inside_clause_expansion(CE)),asserta(never_use_holds_db(F,A,discoveredInCode(F,A,SL,CE))),!,fail.
 
 use_holds_db(F,A,_):- never_use_holds_db(F,A,_),!,fail.
 use_holds_db(F,A2,A):- integer(A2), A is A2-2, isCycPredArity_Check(F,A),!.
+use_holds_db(F,A,A):- integer(A),isa_type(F),!.
 use_holds_db(F,A,A):- isCycPredArity_Check(F,A).
 
-ensure_moo_pred(F,A):-never_use_holds_db(F,A,Why),!,throw(never_use_holds_db(F,A,Why)).
-ensure_moo_pred(F,A,NewA):-use_holds_db(F,A,NewA),!.
+ensure_moo_pred(F,A,A):- is_mpred_prolog(F,A),!.
+ensure_moo_pred(F,A,_):- never_use_holds_db(F,A,Why),!,throw(never_use_holds_db(F,A,Why)).
+ensure_moo_pred(F,A,NewA):- use_holds_db(F,A,NewA),!.
 ensure_moo_pred(F,A,A):- dmsg(once(decl_mpred(F,A))),moodb:decl_mpred(F,A).
 
 is_kb_module(Moo):-atom(Moo),member(Moo,[moo,kb,opencyc]).
@@ -55,7 +58,7 @@ try_mud_body_expansion(G0,G2):- ((mud_goal_expansion_0(G0,G1),!,goals_different(
 mud_goal_expansion_0(G1,G2):- ((mud_pred_expansion(if_use_holds_db, holds_t - holds_f,G1,G2))).
 
 try_mud_head_expansion(G0,G2):- ((mud_head_expansion_0(G0,G1),!,goals_different(G0, G1),!,moodb:dbase_mod(DBASE))),prepend_module(G1,DBASE,G2).
-mud_head_expansion_0(G1,G2):- ((mud_pred_expansion(if_use_holds_db, dbase_t - dbase_f,G1,G2))),!.
+mud_head_expansion_0(G1,G2):- ((mud_pred_expansion(if_mud_asserted, dbase_t - dbase_f,G1,G2))),!.
 
 try_mud_asserted_expansion(G0,G2):- mud_asserted_expansion_0(G0,G1),!,goals_different(G0, G1),add_from_file(G1,G2),!.
 mud_asserted_expansion_0(G1,G2):- ((mud_pred_expansion(if_mud_asserted, asserted_dbase_t - asserted_dbase_f,G1,G2))),!.

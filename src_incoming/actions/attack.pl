@@ -60,14 +60,14 @@ moo:agent_call_command(Agent,attack(Dir)) :-
 check_for_defence(Agent,Def) :-
 	findall(Poss,possess(Agent,Poss),Inv),
 	member(Obj,Inv),
-	props(Obj,act(_,defence(Def))).
+	props(Obj,act_affect(_,defence(Def))).
 check_for_defence(_,0).
 
 % Check to see if attacking agent has a weapon
 check_for_weapon(Agent,Wpn) :-
 	findall(Poss,possess(Agent,Poss),Inv),
         member(Obj,Inv),
-        props(Obj,act(_,attack(Wpn))).
+        props(Obj,act_affect(_,attack(Wpn))).
 
 check_for_weapon(_,0).
 

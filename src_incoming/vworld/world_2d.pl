@@ -129,7 +129,7 @@ create_someval(atloc,_Agent,Loc) :- find_unoccupied(Loc).
 
 defaultRegion(Agent,Region):- inRegion(Agent,Region),!.
 defaultRegion(_Agent,Region):- inRegion(_,Region),!.
-defaultRegion(_Agent,Region):- Region = 'Area1000'.
+defaultRegion(_Agent,Region):- trace, Region = 'Area1000'.
 
 
 decide_region(LOC):- findall(O,region(O),LOCS),my_random_member(LOC,LOCS).

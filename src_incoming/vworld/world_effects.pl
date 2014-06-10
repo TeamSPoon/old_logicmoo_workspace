@@ -19,14 +19,14 @@
 % Is the object worth anything (either scored points or charge)
 % Score any points?
 worth(Agent,Action,Obj) :-
-	props(Obj,act(Action,score(S))),
+	props(Obj,act_affect(Action,score(S))),
 	del(score(Agent,Y)),
 	X is Y + S,
 	add(score(Agent,X)),
 	fail. % fail to check for charge too
 % Charge up those batteries
 worth(Agent,Action,Obj) :-
-           props(Obj,act(Action,charge(NRG))),
+           props(Obj,act_affect(Action,charge(NRG))),
 	req(charge(Agent,Chg)),
 	req(stm(Agent,Stm)),
 	max_charge(Max),
@@ -37,7 +37,7 @@ worth(Agent,Action,Obj) :-
 	fail. % fail to check for healing
 % Heal
 worth(Agent,Action,Obj) :-
-           props(Obj,act(Action,heal(Hl))),
+           props(Obj,act_affect(Action,heal(Hl))),
 	req((damage(Agent,Dam),
              stm(Agent,Stm),
              str(Agent,Str))),

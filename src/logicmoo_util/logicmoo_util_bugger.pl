@@ -595,6 +595,7 @@ atLeastOne(Call):- atLeastOne0(will_debug_else_throw(atLeastOne(Call),Call),Call
 
 :-dhideTrace(atLeastOne0/2).
 % now using gensym counter instead of findall (since findall can make tracing difficult)
+atLeastOne0(_OnFail,Call):-!,Call.
 atLeastOne0(OnFail,Call):- gensym(atLeastOneCounter,Sym),flag(Sym,_,0),!, atLeastOne3(Sym,OnFail,Call).
 atLeastOne3(Sym,_NFail,Call):-call(Call),flag(Sym,C,C+1).
 atLeastOne3(Sym,OnFail,_All):-flag(Sym,Old,0),!, Old==0, % if old > 0 we want to fail 

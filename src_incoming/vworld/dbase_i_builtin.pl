@@ -81,6 +81,16 @@ moo:term_anglify(determinerString(Obj,Text),[np(Obj),is,uses,string(Text),as,a,d
 moo:term_anglify(nameString(Obj,Text),[np(Obj),is,refered,to,as,string(Text)]).
 moo:term_anglify(moo:term_anglify(Term,Text),[prolog(Term),is,converted,to,english,using,prolog(Text)]).
 
+mpred(type_max_damage(type,int)).
+
+mpred(verb_alias(string,string)).
+
+mpred(label_type_props(string,type,list(props))).
+
+mpred(type_grid(type,term(list(grid)))).
+
+mpred(action_rules(term(agent),term(verb),term(object),term(list(props)))).
+
 moo:type_max_damage(object,500).
 moo:type_max_charge(object,120).
 
@@ -135,11 +145,22 @@ argsIsa(sorts(type,list(type))).
 moo:mpred(label_type(string,type),[singleValued]).
 
 
-
+/*
 moo:mpred(look:get_feet(agent,list(spatial)),[]).
 moo:mpred(look:get_near(agent,list(spatial)),[ask_module(look)]).
 moo:mpred(get_precepts(agent,list(spatial)),[ask_module(look)]).
+*/
 
+mpred(assert_with_pred(mpred,term)).
+mpred(multi(mpred,int)).
+mpred(ask_predicate(mpred,term)).
+mpred(equivRule(term,term)).
+
+moo:subclass(text,formattype).
+
+mpred(action_help(verb,text)).
+
+mpred(agent_text_command(agent,text,agent,verb)).
 
 mpred(description(term,text),[assert_with_pred(assert_description),ask_predicate(query_description)]).
 
@@ -210,8 +231,10 @@ moo:singleValued(spawn_rate(propFn(subclass(object)),int)).
 moo:singleValued(spd(agent,int)).
 moo:singleValued(stm(agent,int)).
 moo:singleValued(str(agent,int)).
-% moo:singleValued(type_grid(regiontype,int,list(term))).
+moo:singleValued(type_grid(regiontype,int,list(term))).
 moo:singleValued(weight(object,int)).
+
+mpred(comment(term,string)).
 
 :-decl_mpred(needs_look/2).
 
@@ -221,6 +244,9 @@ moo:subclass(areaPath,door).
 moo:subclass(door,item).
 
 moo:subclass(dir,string).
+moo:subclass(string,text).
+moo:subclass(text,term).
+
 
 :-debug.
 
@@ -246,14 +272,16 @@ multiValued(descriptionHere(term,string)).
 
 multiValued(description(term,string)).
 multiValued(keyword(term,string)).
-multiValued(keyword(term,kwLabel)).
-multiValued(act_result(item,verb,effect)).
+multiValued(kwLabel(term,string)).
+multiValued(act_affect(item,verb,effect)).
 multiValued(memory(agent,term)).
 multiValued(wearing(agent,wearable)).
 multiValued(grid(region,int,int,object)).
 multiValued(possess(agent,item)).
 multiValued(subclass(type,type)).
 multiValued(isa(term,type)).
+
+mpred(directions(term,list(term))).
 
 
 % =================================================================================================

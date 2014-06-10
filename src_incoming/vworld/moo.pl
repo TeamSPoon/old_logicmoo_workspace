@@ -170,31 +170,29 @@ enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_np(X,Y),Body),Lis
 enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_last(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
 enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_np_last(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
 
-:- dynamic_multifile_exported moodb:mpred_prop/2.
+:- dynamic_multifile_exported moodb:mpred_prop/3.
 
 member_or_e(E,[L|List]):-!,member(E,[L|List]).
 member_or_e(E,E).
 
-get_mpred_prop(P,Prop):- var(P),!,isRegisteredCycPred(_,F,A),functor(P,F,A),get_mpred_prop0(P,Prop).
-get_mpred_prop(F/A,Prop):-!,isRegisteredCycPred(_,F,A),functor(P,F,A),get_mpred_prop0(P,Prop).
-get_mpred_prop(F,Prop):- isRegisteredCycPred(_,F,A),!,functor(P,F,A),get_mpred_prop0(P,Prop).
-get_mpred_prop(P,Prop):- get_mpred_prop0(P,Prop).
 
+fix_fa(FA0,FA):-var(FA0),throw(fix_fa(FA0,FA)).
+fix_fa(_:FA0,FA):-!,fix_fa(FA0,FA).
+fix_fa(F/A,FA):- !,isRegisteredCycPred(_,F,A),functor(FA,F,A).
+fix_fa(FC,FA):- atomic(FC),!,get_functor(FC,F),isRegisteredCycPred(_,F,A),functor(FA,F,A).
+fix_fa(FA,FA). % functor(FA,F,A),isRegisteredCycPred(_,F,A).
 
-get_mpred_prop0(P,Prop):- mpred_new_props(P,Props),member_or_e(Prop,Props).
-
-mpred_new_props(FA,CL):-moodb:mpred_prop(FA,CL).
-
+get_mpred_prop(P,Prop):- fix_fa(P,FA),moodb:mpred_prop(FA,Prop).
 
 add_mpred_prop(_,Var):- var(Var),!.
 add_mpred_prop(_,[]):- !.
 add_mpred_prop(FA,[C|L]):-!, add_mpred_prop(FA,C),add_mpred_prop(FA,L),!.
-add_mpred_prop(FA,CL):- asserta(moodb:mpred_prop(FA,CL)). % , call_after(dbase_module_loaded, dbase:add(holds_t(CL,FA))).
+add_mpred_prop(F0,CL):- fix_fa(F0,FA), asserta_if_new(moodb:mpred_prop(FA,CL)).
 
 rem_mpred_prop(_,Var):- var(Var),!.
 rem_mpred_prop(_,[]):- !.
 rem_mpred_prop(FA,[C|L]):-!, rem_mpred_prop(FA,C),rem_mpred_prop(FA,L),!.
-rem_mpred_prop(FA,CL):- retractall(moodb:mpred_prop(FA,CL)). % ,call_after(dbase_module_loaded, dbase:db_op(ra,holds_t(CL,FA))).
+rem_mpred_prop(F0,CL):- fix_fa(F0,FA), retractall(moodb:mpred_prop(FA,CL)).
 
 % ============================================
 % Prolog to Cyc Predicate Mapping
@@ -231,7 +229,7 @@ decl_mpred0(F/A):-!, decl_mpred(F,A).
 decl_mpred0([A]):-!,decl_mpred(A).
 decl_mpred0([A|L]):-!,decl_mpred(A),decl_mpred(L).
 decl_mpred0((A,L)):-!,decl_mpred(A),decl_mpred(L).
-decl_mpred0(M):-compound(M),functor(M,F,A),decl_mpred(F,A),call_after(dbase_module_loaded,dbase:add(argsIsa(M))).
+decl_mpred0(M):-compound(M),functor(M,F,A),decl_mpred(F,A),add_mpred_prop(M,argsIsa(M)).
 
 :- meta_predicate call_after(+,+).
 
@@ -243,7 +241,9 @@ dbase_module_loaded:-
 call_after(When,C):- When,!,do_all_of(When),once(must(C)).
 call_after(When,C):- assert_if_new(moodb:will_call_after(When,C)).
 
-do_all_of(When):- doall((retract(moodb:call_after_load(When,A)),once(must(A)))).
+:-dynamic(doing_all_of/1).
+do_all_of(When):- doing_all_of(When),!.
+do_all_of(When):- with_assertions(doing_all_of(When),doall((retract(moodb:call_after_load(When,A)),once(must(A))))).
 
 registerCycPredPlus2(M:F):-!, '@'(registerCycPredPlus2(F), M).
 registerCycPredPlus2(F/A):- A2 is A -2, decl_mpred(F/A2).
@@ -252,19 +252,19 @@ registerCycPredPlus2([A|L]):-!,registerCycPredPlus2(A),registerCycPredPlus2(L).
 registerCycPredPlus2((A,L)):-!,registerCycPredPlus2(A),registerCycPredPlus2(L).
 
 
-get_term_fa(_:P,F,A):-nonvar(P),!,get_term_fa(P,F,A).
-get_term_fa(F/A,F,A):-nonvar(F),!.
-get_term_fa(P,F,A):-functor_safe(P,F,A).
-
 decl_mpred(A,B):-decl_mpred0(A,B),!.
+
 
 % :- decl_mpred(isa,2). 
 decl_mpred0(Term,Arity):- integer(Arity),!,
-   get_term_fa(Term,Pred,_),
+   get_functor(Term,Pred,_),
    decl_mpred(_Mt,Pred,Arity).
+
+decl_mpred0(Term,Templ):-compound(Templ),add_mpred_prop(Term,Templ).
+
 % :- decl_mpred(isa(_,_),'BaseKB'). 
 decl_mpred0(Term,Mt):- !,
-   get_term_fa(Term,Pred,Arity),
+   get_functor(Term,Pred,Arity),
    decl_mpred(Mt,Pred,Arity).
 
 
