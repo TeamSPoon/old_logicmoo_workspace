@@ -906,7 +906,7 @@ use_term_listing(Obj,HO):-
    clause(HO,B),
    use_term_listing(Obj,HO,HO,B).
 
-use_term_listing(Obj,HO,H,B):- term_to_atom((H:-B),HO), sub_atom_icasechk(Obj,_,HO),!.
+use_term_listing(Obj,HO,H,B):- term_to_atom((H:-B),HO), sub_atom_icasechk(HO,_,Obj),!.
 use_term_listing(Obj,_HO,H,B):- not(not(((subst((H:-B),Obj,fov,H1B1), H1B1 \= (H:-B))))),!.
 
 
@@ -1034,8 +1034,8 @@ isa_type(Type):-req(isa(Type,type)).
 
 db_op_simpler(_,KB:Term,Term):-is_kb_module(KB).
 db_op_simpler(_,KB:Term,Term):-dbase_mod(KB).
-db_op_simpler(Op,MODULE:C0,C0):- nonvar(C0),!, functor(C0,F,A), dmsg(todo(unmodulize(F/A))), %throw(module_form(MODULE:C0)),
-                                                                                 db_op(Op,C0).
+db_op_simpler(Op,MODULE:C0,holds_tcall(MODULE:C0)):- atom(MODULE), nonvar(C0),not(not(predicate_property(C0,_PP))),!. % , functor(C0,F,A), dmsg(todo(unmodulize(F/A))), %throw(module_form(MODULE:C0)),
+                                                                             %    db_op(Op,C0).
 db_op_simpler(_,C0,C1):- C0=..[svo,Obj,Prop|ARGS],!,C1=..[p,Prop,Obj|ARGS],!.
 db_op_simpler(_,DBASE_T,DBASE):- DBASE_T=..[HOLDS,P,A|ARGS],atom(P),is_holds_true(HOLDS),DBASE=..[P,A|ARGS].
 
