@@ -16,27 +16,27 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- moodb:register_module_type(command).
+:- moo:register_module_type(command).
 
-moo:action_help(where(object),"Tells where something is").
-moo:subclass(agent,object).
-moo:subclass(item,object).
+dyn:action_help(where(object),"Tells where something is").
+dyn:subclass(agent,object).
+dyn:subclass(item,object).
 
-moodb:agent_text_command(Agent,[where,X],Agent,where(X)).
-moodb:agent_text_command(Agent,[where,BE,X],Agent,where(X)):-member(BE,[is,are,be,were]).
+moo:agent_text_command(Agent,[where,X],Agent,where(X)).
+moo:agent_text_command(Agent,[where,BE,X],Agent,where(X)):-member(BE,[is,are,be,were]).
 
 
 % where 
-moodb:agent_call_command(_Agent,where(SObj)) :-
+moo:agent_call_command(_Agent,where(SObj)) :-
 	atloc(Obj,LOC),
         object_match(SObj,Obj),
         fmt(cmdresult(where,atloc(Obj,LOC))).
 
 
 
-moo:action_help(who(optional(agent,_)),"Lists who is online (where they are at least)").
+dyn:action_help(who(optional(agent,_)),"Lists who is online (where they are at least)").
 
-moodb:agent_call_command(_Gent,who(Agnt2)) :- C = (agent(Agnt2),dbase_t(inRegion,Agnt2,Where)), forall(db_query(_,C),fmt(cmdresult(who(Agnt2),inRegion(Agnt2,Where)))).
+moo:agent_call_command(_Gent,who(Agnt2)) :- C = (agent(Agnt2),dbase_t(inRegion,Agnt2,Where)), forall(db_query(_,C),fmt(cmdresult(who(Agnt2),inRegion(Agnt2,Where)))).
 
 
 :- include(logicmoo(vworld/moo_footer)).

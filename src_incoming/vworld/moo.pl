@@ -9,7 +9,7 @@
 %
 */
 
-:- module(moodb,
+:- module(moo,
         [ coerce/3,     
         op(1150,fx,((decl_mpred))),          
           add_mpred_prop/2,
@@ -60,8 +60,8 @@
 
 % :- once(context_module(user);(trace,context_module(CM),writeq(context_module(CM)))).
 
-:-dynamic(moodb:dbase_mod/1).
-moodb:dbase_mod(dbase).
+:-dynamic(moo:dbase_mod/1).
+moo:dbase_mod(dbase).
 
 :-dynamic(repl_writer/2).
 :-dynamic(repl_to_string/2).
@@ -114,16 +114,16 @@ scan_updates:-ignore(catch(make,_,true)).
 :-dynamic ended_transform_moo_preds/0, prevent_transform_moo_preds/0, may_moo_term_expand/1, always_transform_heads/0.
 
 :-module_transparent begin_transform_moo_preds/0, end_transform_moo_preds/0.
-begin_transform_moo_preds:- retractall(moodb:ended_transform_moo_preds),context_module(CM),asserta(moodb:may_moo_term_expand(CM)).
+begin_transform_moo_preds:- retractall(moo:ended_transform_moo_preds),context_module(CM),asserta(moo:may_moo_term_expand(CM)).
 
 
 
-end_transform_moo_preds:- retractall(moodb:ended_transform_moo_preds),asserta(moodb:ended_transform_moo_preds).
+end_transform_moo_preds:- retractall(moo:ended_transform_moo_preds),asserta(moo:ended_transform_moo_preds).
 
 :-module_transparent(do_term_expansions/0).
 :-module_transparent(check_term_expansions/0).
 
-do_term_expansions:- context_module(CM), notrace(moodb:do_term_expansions(CM)).
+do_term_expansions:- context_module(CM), notrace(moo:do_term_expansions(CM)).
 do_term_expansions(_):- always_transform_heads,not(prevent_transform_moo_preds),!.
 do_term_expansions(CM):- may_moo_term_expand(CM),!, not(ended_transform_moo_preds), not(prevent_transform_moo_preds).
 
@@ -175,7 +175,7 @@ enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_np(X,Y),Body),Lis
 enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_last(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
 enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_np_last(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
 
-:- dynamic_multifile_exported moodb:mpred_prop/3.
+:- dynamic_multifile_exported moo:mpred_prop/3.
 
 member_or_e(E,[L|List]):-!,member(E,[L|List]).
 member_or_e(E,E).
@@ -187,17 +187,17 @@ fix_fa(F/A,FA):- !,isRegisteredCycPred(_,F,A),functor(FA,F,A).
 fix_fa(FC,FA):- atomic(FC),!,get_functor(FC,F),isRegisteredCycPred(_,F,A),functor(FA,F,A).
 fix_fa(FA,FA). % functor(FA,F,A),isRegisteredCycPred(_,F,A).
 
-get_mpred_prop(P,Prop):- notrace((fix_fa(P,FA),moodb:mpred_prop(FA,Prop))).
+get_mpred_prop(P,Prop):- notrace((fix_fa(P,FA),moo:mpred_prop(FA,Prop))).
 
 add_mpred_prop(_,Var):- var(Var),!.
 add_mpred_prop(_,[]):- !.
 add_mpred_prop(FA,[C|L]):-!, add_mpred_prop(FA,C),add_mpred_prop(FA,L),!.
-add_mpred_prop(F0,CL):- fix_fa(F0,FA), asserta_if_new(moodb:mpred_prop(FA,CL)).
+add_mpred_prop(F0,CL):- fix_fa(F0,FA), asserta_if_new(moo:mpred_prop(FA,CL)).
 
 rem_mpred_prop(_,Var):- var(Var),!.
 rem_mpred_prop(_,[]):- !.
 rem_mpred_prop(FA,[C|L]):-!, rem_mpred_prop(FA,C),rem_mpred_prop(FA,L),!.
-rem_mpred_prop(F0,CL):- fix_fa(F0,FA), retractall(moodb:mpred_prop(FA,CL)).
+rem_mpred_prop(F0,CL):- fix_fa(F0,FA), retractall(moo:mpred_prop(FA,CL)).
 
 % ============================================
 % Prolog to Cyc Predicate Mapping
@@ -244,11 +244,11 @@ dbase_module_loaded:-
    predicate_property(dbase:add(_),_),!,asserta((dbase_module_loaded:-!)).
 
 call_after(When,C):- When,!,do_all_of(When),once(must(C)).
-call_after(When,C):- assert_if_new(moodb:will_call_after(When,C)).
+call_after(When,C):- assert_if_new(moo:will_call_after(When,C)).
 
 :-dynamic(doing_all_of/1).
 do_all_of(When):- doing_all_of(When),!.
-do_all_of(When):- with_assertions(doing_all_of(When),doall((retract(moodb:call_after_load(When,A)),once(must(A))))).
+do_all_of(When):- with_assertions(doing_all_of(When),doall((retract(moo:call_after_load(When,A)),once(must(A))))).
 
 registerCycPredPlus2(M:F):-!, '@'(registerCycPredPlus2(F), M).
 registerCycPredPlus2(F/A):- A2 is A -2, decl_mpred(F/A2).
@@ -285,7 +285,7 @@ decl_mpred_now(Mt,_:Pred,Arity):- nonvar(Pred),!,decl_mpred_now(Mt,Pred,Arity).
 decl_mpred_now(Mt,Pred,0):-!,decl_mpred_now(Mt,Pred,2).
 decl_mpred_now(_,Pred,Arity):-isRegisteredCycPred(_,Pred,Arity),!.
 decl_mpred_now(Mt,Pred,Arity):-    
-   M = moodb,
+   M = moo,
       checkCycPred(Pred,Arity),
       assertz(M:isRegisteredCycPred(Mt,Pred,Arity)),
       functor(Templ,Pred,Arity),
@@ -354,8 +354,8 @@ current_context_module(Ctx):-context_module(Ctx).
 
 :- dynamic_multifile_exported(decl_coerce/3).
 
-moodb:decl_coerce(_,_,_):-fail.
-coerce(What,Type,NewThing):- moodb:decl_coerce(What,Type,NewThing),!.
+moo:decl_coerce(_,_,_):-fail.
+coerce(What,Type,NewThing):- moo:decl_coerce(What,Type,NewThing),!.
 coerce(What,_Type,NewThing):-NewThing = What.
 
 
@@ -388,13 +388,13 @@ tick_every(Name,Seconds,OnTick):- repeat,sleep(Seconds),catch(OnTick,E,dmsg(caus
 end_module_type(Type):-current_context_module(CM),end_module_type(CM,Type).
 end_module_type(CM,Type):- retractall(registered_module_type(CM,Type)).
 
-register_module_type(Type):- current_context_module(CM), moodb:register_module_type(CM,Type),begin_transform_moo_preds.
+register_module_type(Type):- current_context_module(CM), moo:register_module_type(CM,Type),begin_transform_moo_preds.
 
-register_module_type(CM,Types):-is_list(Types),!,forall(member(T,Types), moodb:register_module_type(CM,T)).
+register_module_type(CM,Types):-is_list(Types),!,forall(member(T,Types), moo:register_module_type(CM,T)).
 register_module_type(CM,Type):-asserta(registered_module_type(CM,Type)).
 
 registered_module_type(Type):- current_context_module(CM),registered_module_type(CM,Type).
-moodb:registered_module_type(Type):- current_context_module(CM),registered_module_type(CM,Type).
+moo:registered_module_type(Type):- current_context_module(CM),registered_module_type(CM,Type).
 
 :-meta_predicate term_expansion_local(?,?),term_expansion_local0(?,?).
 % :-meta_predicate user:term_expansion(?,?).
@@ -433,6 +433,6 @@ term_expansion_local0(A,A).
 % user:term_expansion(X,Y):- term_expansion_local0(X,Y).
 
 
-%:- module_predicates_are_exported(moodb).
-%:- module_meta_predicates_are_transparent(moodb).
+%:- module_predicates_are_exported(moo).
+%:- module_meta_predicates_are_transparent(moo).
 

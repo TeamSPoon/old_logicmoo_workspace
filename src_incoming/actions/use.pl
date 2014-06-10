@@ -9,24 +9,24 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- moodb:register_module_type(command).
+:- moo:register_module_type(command).
 
 mpred(use_usable(verb,term(mpred),type,term(mpred))).
 
-moo:use_usable(wear,wearing,wearable,stowed).
-moo:use_usable(hold,holding,wieldable,stowed).
-moo:use_usable(use,using,usable,stowed).
-moo:use_usable(drink,drinking,drinkable,holding).
-moo:use_usable(stow,stowed,stowable,holding).
+dyn:use_usable(wear,wearing,wearable,stowed).
+dyn:use_usable(hold,holding,wieldable,stowed).
+dyn:use_usable(use,using,usable,stowed).
+dyn:use_usable(drink,drinking,drinkable,holding).
+dyn:use_usable(stow,stowed,stowable,holding).
 
-moo:action_help(Syntax,String):-moo:use_usable(Stow,Stowed,Stowable,Holding),Syntax=..[Stow,Stowable],
+dyn:action_help(Syntax,String):-dyn:use_usable(Stow,Stowed,Stowable,Holding),Syntax=..[Stow,Stowable],
    sformat(String,'~w a ~w that you are/have ~w so it will be ~w.',[Stow,Stowable,Holding,Stowed]).
 
-use_verbs(USE,USING,USABLE,STOWED):-moo:use_usable(USE,USING,USABLE,STOWED).
+use_verbs(USE,USING,USABLE,STOWED):-dyn:use_usable(USE,USING,USABLE,STOWED).
 
 % Use something
 % Successfully picking something up
-moodb:agent_call_command(Agent,SENT) :-
+moo:agent_call_command(Agent,SENT) :-
   use_verbs(USE,_USING,USABLE,STOWED),
     SENT=..[USE,Obj],
 	possess(Agent,Obj),
@@ -35,12 +35,12 @@ moodb:agent_call_command(Agent,SENT) :-
 	props(Obj, weight =< 1),
 	worth(Agent,USE,Obj),
 	do_permanence(USE,Agent,Obj),
-	moo:update_charge(Agent,USE).
+	dyn:update_charge(Agent,USE).
 %Nothing to use
-moodb:agent_call_command(Agent,SENT) :-
+moo:agent_call_command(Agent,SENT) :-
   use_verbs(USE,_USING,_USABLE,_STOWED),
     SENT=..[USE,_Obj],
-	moo:update_charge(Agent,USE),
+	dyn:update_charge(Agent,USE),
 	add(failure(Agent,USE)).
 
 % Is the obect going to stick around after usen, either as is
@@ -62,7 +62,7 @@ check_permanence(USE,Agent,LOC,Obj) :-
 check_permanence(_,_,_,_).
 
 % Record keeping
-moo:update_charge(Agent,USE) :-
+dyn:update_charge(Agent,USE) :-
     use_verbs(USE,_USING,_USABLE,_STOWED),
       padd(Agent,[charge(-2)]).
 

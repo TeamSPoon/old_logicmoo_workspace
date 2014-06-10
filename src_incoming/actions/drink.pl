@@ -10,21 +10,21 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- moodb:register_module_type(command).
+:- moo:register_module_type(command).
 
-moo:action_help(drink(drinkable),"Drink a Drinkable Item").
+dyn:action_help(drink(drinkable),"Drink a Drinkable Item").
 
 % Eat something held
 % Check to make sure it's in the agents possession... 
 % if it is, process it's worth, then destroy it
-moodb:agent_call_command(Agent,drink(SObj)) :-
+moo:agent_call_command(Agent,drink(SObj)) :-
 	possess(Agent,Obj),
         object_match(SObj,Obj),
 	worth(Agent,drink,Obj),
 	del(possess(Agent,Obj)),
-	moo:update_charge(Agent,eat).
+	dyn:update_charge(Agent,eat).
 
-moo:update_charge(Agent,drink) :-
+dyn:update_charge(Agent,drink) :-
 	del(charge(Agent,Old)),
 	New is Old - 1,
 	add(charge(Agent,New)).

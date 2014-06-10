@@ -14,40 +14,40 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- moodb:register_module_type(command).
+:- moo:register_module_type(command).
 
-moo:action_info(push(dir)).
+dyn:action_info(push(dir)).
 
 % Push a box
 % Nothing to push... agent moves and takes a little damage.
 %Plus it still costs the same charge as if the agent did push something
-moodb:agent_call_command(Agent,push(Dir)) :-	
+moo:agent_call_command(Agent,push(Dir)) :-	
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	atloc(What,XXYY),
 	integer(What),
 	in_world_move(_,Agent,Dir),
-	moo:update_stats(Agent,strain),
-	moo:update_charge(Agent,push).
+	dyn:update_stats(Agent,strain),
+	dyn:update_charge(Agent,push).
 
 % Pushing what cannot be pushed
 % Some damage and loss of charge (same as normal push)
-moodb:agent_call_command(Agent,push(Dir)) :-	
+moo:agent_call_command(Agent,push(Dir)) :-	
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	atloc(What,XXYY),
 	\+ pushable(Agent,What,XXYY,Dir),
-	moo:update_stats(Agent,hernia),
-	moo:update_charge(Agent,push).
+	dyn:update_stats(Agent,hernia),
+	dyn:update_charge(Agent,push).
 
 % A successful PUSH
-moodb:agent_call_command(Agent,push(Dir)) :-	
+moo:agent_call_command(Agent,push(Dir)) :-	
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	atloc(What,XXYY),
 	move_object(XXYY,What,Dir),
 	in_world_move(_,Agent,Dir),
-	moo:update_charge(Agent,push).
+	dyn:update_charge(Agent,push).
 
 % Can the Object be pushed?
 pushable(Agent,Obj,LOC,Dir) :-
@@ -96,9 +96,9 @@ squish_behind(_,_).
 crashbang(Obj) :- padd(Obj,[damage(-5)]).
 
 % Record keeping
-moo:update_charge(Agent,push) :- padd(Agent,[charge(-6)]).
-moo:update_stats(Agent,strain) :- padd(Agent,[damage(-2)]).
-moo:update_stats(Agent,hernia) :- padd(Agent,[damage(-4),failure(hernia)]).
+dyn:update_charge(Agent,push) :- padd(Agent,[charge(-6)]).
+dyn:update_stats(Agent,strain) :- padd(Agent,[damage(-2)]).
+dyn:update_stats(Agent,hernia) :- padd(Agent,[damage(-4),failure(hernia)]).
 
 :- include(logicmoo(vworld/moo_footer)).
 

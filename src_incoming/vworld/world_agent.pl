@@ -58,22 +58,22 @@ call_agent_action(Agent,CMDI):-
     (Pushed -> ignore(retract(thlocal:current_agent(SESSION,Agent)));true).
 
 
-my_agent_call_command(Agent,CMD):- moodb:agent_call_command(Agent,CMD),!.
-my_agent_call_command(Agent,CMD):- trace,moodb:agent_call_command(Agent,CMD),!.
+my_agent_call_command(Agent,CMD):- moo:agent_call_command(Agent,CMD),!.
+my_agent_call_command(Agent,CMD):- trace,moo:agent_call_command(Agent,CMD),!.
 
 
 /*
 % agent_text_command
-moodb:agent_call_command(Agent,[VERB|SENT]) :- is_list([VERB|SENT]),
+moo:agent_call_command(Agent,[VERB|SENT]) :- is_list([VERB|SENT]),
   VERBSENT=[VERB|SENT],
   trace,
-   moodb:agent_text_command(Agent,[VERB|SENT],AgentR,CMD),grtrace,VERBSENT\=CMD,
-   moodb:agent_call_command(AgentR,CMD),!.
+   moo:agent_text_command(Agent,[VERB|SENT],AgentR,CMD),grtrace,VERBSENT\=CMD,
+   moo:agent_call_command(AgentR,CMD),!.
 
-moodb:agent_call_command(Agent,VERBSENT) :- compound(VERBSENT),not(is_list(VERBSENT)),
+moo:agent_call_command(Agent,VERBSENT) :- compound(VERBSENT),not(is_list(VERBSENT)),
    VERBSENT=..[VERB|SENT],
-   moodb:agent_text_command(Agent,[VERB|SENT],AgentR,CMD),grtrace,VERBSENT\=CMD,
-   moodb:agent_call_command(AgentR,CMD).
+   moo:agent_text_command(Agent,[VERB|SENT],AgentR,CMD),grtrace,VERBSENT\=CMD,
+   moo:agent_call_command(AgentR,CMD).
 */
 
 /*
@@ -87,7 +87,7 @@ test_te:- xcall_t((
       subst(CMDI2,here,Where,CMD),
       % start event
      % raise_location_event(Where,notice(reciever,do(Agent,CMD))),
-     catch(( ignore(( once((debugOnError(moodb:agent_call_command(Agent,CMD)),
+     catch(( ignore(( once((debugOnError(moo:agent_call_command(Agent,CMD)),
            % complete event
            raise_location_event(Where,notice(reciever,done(Agent,CMD))));
            % fail event

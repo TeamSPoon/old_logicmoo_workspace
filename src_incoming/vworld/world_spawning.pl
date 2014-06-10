@@ -17,7 +17,7 @@
 amzi_timer(T1):-get_time(T1).
 
 
-moodb:on_world_load :- retractall(spawn_objects(_)).
+moo:on_world_load :- retractall(spawn_objects(_)).
 
 growth :-
 	findall(([Obj,Chance]),
@@ -147,7 +147,7 @@ do(_) :- write('invalid command'),nl.
 
 % loads the rules (Prolog terms) into the Prolog database
 
-load :- reconsult('room.moo'),!.
+load :- reconsult('room.dyn'),!.
 load :-
 	write('Enter the file name in single quotes (ex. ''room.fkb''.): '),
 	read(F),

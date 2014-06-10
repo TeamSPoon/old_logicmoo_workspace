@@ -21,7 +21,7 @@
 :- meta_predicate do_dcg(?,?,?,?,?).
 :- meta_predicate isPOS(?,?,?,?,?).
 
-:- moodb:register_module_type(utility).
+:- moo:register_module_type(utility).
 
 % posm_cached(CycL, Phrase,POS,Form,CycL)
 :-dynamic lex/3,  lexMap/3.
@@ -29,9 +29,9 @@
 idGen(X):-flag(idGen,X,X+1).
 
 %:- ensure_loaded(logicmoo('vworld/dbase.pl')).
-:- moodb:begin_transform_moo_preds.
+:- moo:begin_transform_moo_preds.
 
-:- retractall(moodb:prevent_transform_moo_preds).
+:- retractall(moo:prevent_transform_moo_preds).
 
 % Semantic Interpretation
 /* from Bratko chapter 17 page 455.
@@ -2956,5 +2956,5 @@ atom_junct2([W|S],[W|Words]):-atom_junct2(S,Words).
 % :- include(logicmoo(vworld/moo_footer)).
 
 
-:-  moodb:end_transform_moo_preds.
+:-  moo:end_transform_moo_preds.
 

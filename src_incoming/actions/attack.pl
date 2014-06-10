@@ -14,46 +14,46 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- moodb:register_module_type(command).
+:- moo:register_module_type(command).
 
 % attack joe ->translates-> attack nw
-moo:action_info(attack(dir)).
+dyn:action_info(attack(dir)).
 
 % Attack
 % Successful Attack
-moodb:agent_call_command(Agent,attack(Dir)) :-	
+moo:agent_call_command(Agent,attack(Dir)) :-	
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	atloc(What,XXYY),
 	damage_foe(Agent,What,hit),
-	moo:update_charge(Agent,attack).
+	dyn:update_charge(Agent,attack).
 
 % Destroy small objects (food, etc.)
-moodb:agent_call_command(Agent,attack(Dir)) :-	
+moo:agent_call_command(Agent,attack(Dir)) :-	
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	atloc(What,XXYY),	
 	props(What,weight(1)),
 	destroy_object(XXYY,What),
-	moo:update_charge(Agent,attack).
+	dyn:update_charge(Agent,attack).
 
 % Hit a big object... causes damage to agent attacking
-moodb:agent_call_command(Agent,attack(Dir)) :-	
+moo:agent_call_command(Agent,attack(Dir)) :-	
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	atloc(What,XXYY),	
 	What \== 0,
 	props(What,weight(_)),
-	moo:update_stats(Agent,bash),
-	moo:update_charge(Agent,attack).
+	dyn:update_stats(Agent,bash),
+	dyn:update_charge(Agent,attack).
 
 % Hit nothing (empty space)... causes a little damage
-moodb:agent_call_command(Agent,attack(Dir)) :-	
+moo:agent_call_command(Agent,attack(Dir)) :-	
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	not(atloc(_,XXYY)),
-	moo:update_stats(Agent,wiff),
-	moo:update_charge(Agent,attack).
+	dyn:update_stats(Agent,wiff),
+	dyn:update_charge(Agent,attack).
 
 % Check to see if agent being attacked is carrying an 
 % object which provides defence
@@ -86,16 +86,16 @@ damage_foe(Agent,What,hit) :-
 	add(damage(What,NewDam)).
 
 % Record keeping
-moo:update_charge(Agent,attack) :-
+dyn:update_charge(Agent,attack) :-
 	del(charge(Agent,Old)),
 	New is Old - 5,
 	add(charge(Agent,New)).
-moo:update_stats(Agent,bash) :- 
+dyn:update_stats(Agent,bash) :- 
 	del(damage(Agent,Old)),
 	New is Old - 2,
 	add(damage(Agent,New)),
 	add(failure(Agent,bash)).
-moo:update_stats(Agent,wiff) :- 
+dyn:update_stats(Agent,wiff) :- 
 	del(damage(Agent,Old)),
 	New is Old - 1,
 	add(damage(Agent,New)),

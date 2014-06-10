@@ -9,7 +9,7 @@
 */
 
 
-moodb:on_world_load :- retractall(spawn_objects(_)).
+moo:on_world_load :- retractall(spawn_objects(_)).
 
 growth :-
 	findall(([Obj,Chance]),
@@ -945,7 +945,7 @@ go :-
 	!,go.
 go :-
 	conflict_set([]),
-	finished, !.			% supplied in moo for what to do at end
+	finished, !.			% supplied in dyn for what to do at end
 go :-
 	message(119).
 

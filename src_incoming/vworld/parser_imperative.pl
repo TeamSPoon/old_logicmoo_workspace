@@ -32,16 +32,16 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- moodb:register_module_type(utility).
+:- moo:register_module_type(utility).
 
 % ===========================================================
 % PARSE command
 % ===========================================================
-moo:action_help(parse(prolog,list(term)),"Development test to parse some Text for a human.  Usage: parse 'item' the blue backpack").
+dyn:action_help(parse(prolog,list(term)),"Development test to parse some Text for a human.  Usage: parse 'item' the blue backpack").
 
-moodb:agent_text_command(Agent,[parse,Type|List],Agent,parse(Type,List)).
+moo:agent_text_command(Agent,[parse,Type|List],Agent,parse(Type,List)).
 
-moodb:agent_call_command(_Gent,parse(Type,StringM)):-
+moo:agent_call_command(_Gent,parse(Type,StringM)):-
    print_parse_for(Type,StringM,_Term,_LeftOver,fmt).
 
 parse_for(Type,StringM):- parse_for(Type,StringM, _Term).
@@ -184,10 +184,10 @@ parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL):- !,
 
 
 parse_agent_text_command_1(Agent,VERB,ARGS,NewAgent,GOAL):- 
-   call_no_cuts(moodb:agent_text_command(Agent,[VERB|ARGS],NewAgent,GOAL)).
+   call_no_cuts(moo:agent_text_command(Agent,[VERB|ARGS],NewAgent,GOAL)).
 
 parse_agent_text_command_1(Agent,SVERB,ARGS,NewAgent,GOAL):- 
-   call_no_cuts(moodb:agent_text_command(Agent,[VERB|ARGS],NewAgent,GOAL)),
+   call_no_cuts(moo:agent_text_command(Agent,[VERB|ARGS],NewAgent,GOAL)),
    verb_matches(SVERB,VERB).
 
 % parses a verb phrase and retuns one interpretation (action)
@@ -206,14 +206,14 @@ parse_agent_text_command_11(Agent,SVERB,ARGS,NewAgent,GOAL):-parse_agent_text_co
 parse_agent_text_command_11(Agent,SVERB,ARGS,NewAgent,GOAL):-to_word_list(SVERB,L),!,L=[A,B|C],append([B|C],ARGS,BCARGS),
    debugOnError(parse_agent_text_command_1(Agent,A,BCARGS,NewAgent,GOAL)).
 
-moo:verb_alias('l','look').
-moo:verb_alias('s','move s').
-moo:verb_alias('go','go').
-moo:verb_alias('where is','where').
+dyn:verb_alias('l','look').
+dyn:verb_alias('s','move s').
+dyn:verb_alias('go','go').
+dyn:verb_alias('where is','where').
 
 pos_word_formula('infinitive',Verb,Formula):- 'infinitive'(TheWord, Verb, _, _G183), 'verbSemTrans'(TheWord, 0, 'TransitiveNPCompFrame', Formula, _, _).
 
-verb_alias_to_verb(IVERB,SVERB):-moo:verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.
+verb_alias_to_verb(IVERB,SVERB):-dyn:verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.
 verb_alias_to_verb(IVERB,SVERB):-specifiedItemType(IVERB,verb,SVERB), IVERB \= SVERB.
 
 verb_matches("go",VERB):-!,VERB=go.
@@ -222,7 +222,7 @@ verb_matches(SVERB,VERB):-samef(VERB,SVERB).
 parse_vp_templates(Agent,SVERB,_ARGS,TEMPLATES):-
    findall([VERB|TYPEARGS],
     ((     
-     moodb:type_action_help(What,TEMPL,_),
+     moo:type_action_help(What,TEMPL,_),
      mud_isa(Agent,What),
      TEMPL=..[VERB|TYPEARGS],
      verb_matches(SVERB,VERB))),
@@ -267,10 +267,10 @@ bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
 
 :-style_check(+singleton).
 
-moo:specifier_text(Dir,dir):-member_ci(Dir,[n,s,e,w,ne,nw,se,sw,u,d]).
+dyn:specifier_text(Dir,dir):-member_ci(Dir,[n,s,e,w,ne,nw,se,sw,u,d]).
 
 
-moo:specifier_text(Text,Subclass):-moo:subclass(Subclass,spatialthing),mud_isa(X,Subclass),req(keyword(X,Text)).
+dyn:specifier_text(Text,Subclass):-dyn:subclass(Subclass,spatialthing),mud_isa(X,Subclass),req(keyword(X,Text)).
 
 phrase_parseForTypes(TYPEARGS,GOODARGS,ARGS,LeftOver):-
    to_word_list(ARGS,ARGSL),!,
@@ -314,12 +314,12 @@ parseForIsa(FT, B, C, D) :- parseFmtOrIsa(FT, B, C, D),!.
 query_trans_sub(Sub,Super):-query_trans_subft(Sub,Super).
 query_trans_sub(Sub,Super):-query_trans_sc(Sub,Super).
 
-query_trans_subft(FT,Sub):-moo:subft(FT,Sub).
-query_trans_subft(FT,Sub):-moo:subft(FT,A),moo:subft(A,Sub).
-query_trans_subft(FT,Sub):-moo:subft(FT,A),moo:subft(A,B),moo:subft(B,Sub).
-query_trans_sc(FT,Sub):-moo:subclass(FT,Sub).
-query_trans_sc(FT,Sub):-moo:subclass(FT,A),moo:subclass(A,Sub).
-query_trans_sc(FT,Sub):-moo:subclass(FT,A),moo:subclass(A,B),moo:subclass(B,Sub).
+query_trans_subft(FT,Sub):-dyn:subft(FT,Sub).
+query_trans_subft(FT,Sub):-dyn:subft(FT,A),dyn:subft(A,Sub).
+query_trans_subft(FT,Sub):-dyn:subft(FT,A),dyn:subft(A,B),dyn:subft(B,Sub).
+query_trans_sc(FT,Sub):-dyn:subclass(FT,Sub).
+query_trans_sc(FT,Sub):-dyn:subclass(FT,A),dyn:subclass(A,Sub).
+query_trans_sc(FT,Sub):-dyn:subclass(FT,A),dyn:subclass(A,B),dyn:subclass(B,Sub).
 
 
 parseFmtOrIsa(Sub, B, C, D):-parseFmt(Sub, B, C, D).
@@ -346,7 +346,7 @@ parseFmt(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{specifiedItem
 specifiedItemType([String],Type,StringO):-nonvar(String),!,specifiedItemType(String,Type,StringO).
 specifiedItemType(String,Type,Inst) :- specifier_text(Inst,Type), equals_icase(Inst,String),!.
 specifiedItemType(String,Type,Inst):- instances_of_type(Inst,Type),object_match(String,Inst),!.
-specifiedItemType(String,Type,Longest) :- findall(Inst, (moo:specifier_text(Inst,Type),starts_or_ends_with_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
+specifiedItemType(String,Type,Longest) :- findall(Inst, (dyn:specifier_text(Inst,Type),starts_or_ends_with_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
 specifiedItemType(A,T,AA):- is_ft(T), correctFormatType(tell(_),A,T,AA),!.
 
 instances_of_type(Inst,Type):- setof(Inst-Type,mud_isa(Inst,Type),Set),member(Inst-Type,Set).

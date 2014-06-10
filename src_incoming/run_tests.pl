@@ -74,7 +74,7 @@ start_servers :- if_version_greater(70111,thread_create(ensure_loaded(logicmoo(l
 
 */
 
-moodb:agent_text_command(Agent,[run,Term], Agent,prologCall(Term)).
+moo:agent_text_command(Agent,[run,Term], Agent,prologCall(Term)).
 
 
 :- use_module(library(check)).
@@ -161,7 +161,7 @@ ht:- do_player_action('s'),
 
 :- at_start(start_servers).
 
-moo:mud_test(test_movedist,
+dyn:mud_test(test_movedist,
  (
   foc_current_player(P),
    test_name("teleport to main enginering"),
@@ -179,7 +179,7 @@ moo:mud_test(test_movedist,
    test_name("must be now be back in engineering"),
    test_true(req(atloc(P,'Area1000'))))).
 
-moo:mud_test(drop_take,
+dyn:mud_test(drop_take,
  (
   do_player_action('drop food'),
   do_player_action('take food')

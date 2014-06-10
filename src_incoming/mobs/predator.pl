@@ -19,9 +19,9 @@
 
 % Possible agent actions.
 :- include(logicmoo(vworld/moo_header)).
-:- moodb:register_module_type(planning).
+:- moo:register_module_type(planning).
 
-moo:world_agent_plan(_World,Agent,Act):-
+dyn:world_agent_plan(_World,Agent,Act):-
    mud_isa(Agent,predator),
    predator_idea(Agent,Act).
 

@@ -142,7 +142,7 @@ ht:- do_player_action('s'),
 
 % :- at_start(start_servers).
 
-moo:mud_test(test_movedist,
+dyn:mud_test(test_movedist,
  (
   foc_current_player(P),
    test_name("teleport to main enginering"),
@@ -161,7 +161,7 @@ moo:mud_test(test_movedist,
    test_name("must be now be back in engineering"),
    test_true(req(inRegion(P,'Area1000'))))).
 
-moo:mud_test(drop_take,
+dyn:mud_test(drop_take,
  (
   do_player_action('drop food'),
   do_player_action('take food')

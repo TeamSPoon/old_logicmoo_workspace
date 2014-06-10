@@ -123,7 +123,7 @@ inverse_args([A,R,G,S],[S,R,G,A]):-!.
 inverse_args([P,A,R,G,S],[S,A,R,G,P]):-!.
 
 term_is_ft(Term,Type):-
-   moo:ft_info(Type,How),
+   dyn:ft_info(Type,How),
    correctFormatType(tell(_OldV),Term,How,NewTerm),
    ignore(NewTerm=Term).
 
@@ -133,7 +133,7 @@ term_is_ft(Term,Type):-
 % =======================================================
 
 
-moodb:decl_coerce(A,Type,AA):- correctAnyType(tell(_),A,Type,AA).
+moo:decl_coerce(A,Type,AA):- correctAnyType(tell(_),A,Type,AA).
 
 same_vars(T1,T2):-term_variables(T1,V1),term_variables(T2,V2),!,V1==V2.
 
@@ -268,7 +268,7 @@ detWithSpace(WithSpace,String):-ddeterminer0(String),atom_concat(String,' ',With
 detWithSpace(WithSpace,String):-ddeterminer1(String),atom_concat(String,' ',WithSpace).
 determinerRemoved(S0,Det,S):- nonvar(S0),detWithSpace(WithSpace,String),string_concat(WithSpace,S,S0),string_lower(String,Det).
 
-assert_description(moo:description(A,S0)):-assert_description(A,S0).
+assert_description(dyn:description(A,S0)):-assert_description(A,S0).
 
 assert_description(A,S0):-nonvar(S0),string_concat('#$PunchingSomething ',S,S0),!,assert_description(A,S).
 

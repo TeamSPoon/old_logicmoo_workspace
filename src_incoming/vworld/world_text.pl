@@ -10,7 +10,7 @@
 
 :-export(fully_expand/2).
 
-:- moodb:begin_transform_moo_preds.
+:- moo:begin_transform_moo_preds.
 
 % live another day to fight (meaning repl_to_string/1 for now is in prolog)
 % local_decl_db_prop(repl_writer(agent,term),[singleValued,default(default_repl_writer)]).
@@ -34,8 +34,8 @@ show_kb_preds(Agent,List):-
 show_kb_preds(Agent,LOC,List):-
       ignore(atloc(Agent,LOC)),
        locationToRegion(LOC,Region),
-         once((moodb:repl_writer(Agent,WPred);WPred=default_repl_writer)),
-         once((moodb:repl_to_string(Agent,ToSTR);ToSTR=default_repl_obj_to_string)),
+         once((moo:repl_writer(Agent,WPred);WPred=default_repl_writer)),
+         once((moo:repl_to_string(Agent,ToSTR);ToSTR=default_repl_obj_to_string)),
         subst(List,region,Region,ListR),
         show_kb_via_pred(WPred,ToSTR,ListR),!.
 
@@ -130,11 +130,11 @@ is_leave_alone(exact_message).
 is_leave_alone(todo).
 is_leave_alone((error)).
 is_leave_alone(parserm).
-% is_leave_alone(F):- moodb:is_db_prop(F,_,_),!,fail.
+% is_leave_alone(F):- moo:is_db_prop(F,_,_),!,fail.
 is_leave_alone(A):-failOnError((sub_atom(A,_,1,0,S),atom_number(S,_))),!.
 
-moo:term_anglify(A,B):-local_term_anglify(A,B).
-moo:term_anglify_np_last(Obj,T,String):- local_term_anglify_np_last(Obj,T,String).
+dyn:term_anglify(A,B):-local_term_anglify(A,B).
+dyn:term_anglify_np_last(Obj,T,String):- local_term_anglify_np_last(Obj,T,String).
 
 generatePhrase_local(Term,String):- debugOnError(( fully_expand(Term,EnglishM),!,
           % fmt('FR0=~q~n',[fully_expand(Term,EnglishM)]),
@@ -275,7 +275,7 @@ local_term_anglify(fN(Obj,T),String):- anglify_noun_known(Obj,T,String),!.
 % %enter_term_anglify(Obj,Obj):-!.
 
 
-moo:term_anglify_np(Obj,Hint,String):-local_term_anglify_np(Obj,Hint,String).
+dyn:term_anglify_np(Obj,Hint,String):-local_term_anglify_np(Obj,Hint,String).
 
 local_term_anglify_np(Obj,String):-mud_isa(Obj,Isa),local_term_anglify_np(Obj,Isa,String),!.
 local_term_anglify_np(Obj,String):-local_term_anglify_np(Obj,term,String).
@@ -305,7 +305,7 @@ anglify_noun_known(Obj,_Hint,StringO):- findall(String,holds_t(nameString,Obj,St
 %nameString(X,Y,_,_)
 
 
-:-  moodb:end_transform_moo_preds.
+:-  moo:end_transform_moo_preds.
 
 
 end_of_file.

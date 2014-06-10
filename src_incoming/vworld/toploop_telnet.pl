@@ -30,7 +30,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- moodb:register_module_type(utility).
+:- moo:register_module_type(utility).
 
 :- dynamic wants_logout/1.
 
@@ -49,8 +49,8 @@ login_and_run:-
    call_agent_command(P,'look'),
    fmt('~n~n~nHello ~w! Welcome to the MUD!~n',[P]),
    % sets some IO functions
-   with_assertions(moodb:repl_writer(P,telnet_repl_writer),
-      with_assertions(moodb:repl_to_string(P,telnet_repl_obj_to_string),
+   with_assertions(moo:repl_writer(P,telnet_repl_writer),
+      with_assertions(moo:repl_to_string(P,telnet_repl_obj_to_string),
      % runs the Telnet REPL
      run_player_telnet(P))),
    fmt('~n~nGoodbye ~w! ~n',[P]).
@@ -60,7 +60,7 @@ run_player_telnet(P) :-
       get_session_id(O),
       retractall(wants_logout(P)),
       expand_head(thlocal:current_agent(O,P),HG),
-      must(moodb:repl_writer(P,_)),!,
+      must(moo:repl_writer(P,_)),!,
       with_assertions(HG,
        ((repeat,
         once(read_and_do_telnet(P)), 

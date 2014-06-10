@@ -9,13 +9,13 @@
 */
 :- include(logicmoo(vworld/moo_header)).
 
-:- moodb:register_module_type(command).
+:- moo:register_module_type(command).
 
 % ====================================================
 % show the stats system
 % ====================================================
-moo:action_help(stats(optional(term,self)), "Examine MUD stats of something").
-moodb:agent_call_command(Agent,stats(SWhat)):- 
+dyn:action_help(stats(optional(term,self)), "Examine MUD stats of something").
+moo:agent_call_command(Agent,stats(SWhat)):- 
    term_listing(SWhat),
    doall((parse_for(optional(agent,self),SWhat,What,_LeftOver),
    show_kb_preds(Agent,[

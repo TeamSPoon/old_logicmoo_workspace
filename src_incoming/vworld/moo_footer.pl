@@ -9,9 +9,9 @@
 */
 
 
-:- context_module(CM),(moodb:loading_module_h(CM),moodb:registered_module_type(utility,CM))->module_predicates_are_exported(CM);module_predicates_are_exported(CM).
+:- context_module(CM),(moo:loading_module_h(CM),moo:registered_module_type(utility,CM))->module_predicates_are_exported(CM);module_predicates_are_exported(CM).
 
-:- moodb:loading_module_h(CM), (context_module(CM) -> retract(moodb:loading_module_h(CM)) ; true).
+:- moo:loading_module_h(CM), (context_module(CM) -> retract(moo:loading_module_h(CM)) ; true).
 
 :- end_transform_moo_preds.
 

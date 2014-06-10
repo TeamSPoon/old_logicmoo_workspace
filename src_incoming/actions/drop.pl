@@ -12,26 +12,26 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- moodb:register_module_type(command).
+:- moo:register_module_type(command).
 
-moo:action_info(drop(item)).
+dyn:action_info(drop(item)).
 
 % Drop something
-moodb:agent_call_command(Agent,drop(SObj)) :-
+moo:agent_call_command(Agent,drop(SObj)) :-
 	possess(Agent,Obj),
         object_match(SObj,Obj),
 	del(possess(Agent,Obj)),
 	atloc(Agent,LOC),
 	add(atloc(Obj,LOC)),
-	moo:update_charge(Agent,drop).
+	dyn:update_charge(Agent,drop).
 
 %Nothing to drop
-moodb:agent_call_command(Agent,drop(_)) :-
-	moo:update_charge(Agent,drop),
+moo:agent_call_command(Agent,drop(_)) :-
+	dyn:update_charge(Agent,drop),
 	add(failure(Agent,drop)).
 
 % Record keeping
-moo:update_charge(Agent,drop) :-
+dyn:update_charge(Agent,drop) :-
 	del(charge(Agent,Old)),
 	New is Old - 1,
 	add(charge(Agent,New)).

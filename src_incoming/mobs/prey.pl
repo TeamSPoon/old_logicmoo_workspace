@@ -16,14 +16,14 @@
 :- module(prey,[]).
 
 :- include(logicmoo(vworld/moo_header)).
-:- moodb:register_module_type(planning).
-:- moodb:register_module_type(command).
+:- moo:register_module_type(planning).
+:- moo:register_module_type(command).
 
 % Predicates asserted during run.
 % :- dynamic memory/2. 
 %:- dynamic agent_list/1.
 
-moo:world_agent_plan(_World,Self,Act):-
+dyn:world_agent_plan(_World,Self,Act):-
    mud_isa(Self,prey),
    prey_idea(Self,Act).
    
@@ -57,10 +57,10 @@ prey_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[nut]).
 % spawn new prey
 % maybe(N) == N chance of each agent spawning a new agent each turn
 
-moo:action_info(spawn(type)).
-moo:action_info(rez(type)).
+dyn:action_info(spawn(type)).
+dyn:action_info(rez(type)).
 
-moodb:agent_call_command(_Agent,spawn(prey)):-spawn.
+moo:agent_call_command(_Agent,spawn(prey)):-spawn.
 
 spawn :-
 	maybe(10),
@@ -95,7 +95,7 @@ spawn_prey(N) :-
 	spawn_prey(Ntemp).
 
 
-moodb:agent_call_command(Agent,rez(NewType)):- atloc(Agent,LOC), create_instance(NewType,item,[atloc(LOC)]).
+moo:agent_call_command(Agent,rez(NewType)):- atloc(Agent,LOC), create_instance(NewType,item,[atloc(LOC)]).
 
 
 :- include(logicmoo(vworld/moo_footer)).

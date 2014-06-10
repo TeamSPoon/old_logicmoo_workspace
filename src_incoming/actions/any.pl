@@ -19,25 +19,25 @@ action_requires_states(_Agent,List,Preconds):-findall(A,(member(A,List),\+ funct
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- moodb:register_module_type(command).
-moo:action_rules(_,_,_,_):-fail.
+:- moo:register_module_type(command).
+dyn:action_rules(_,_,_,_):-fail.
 
-moo:action_rules(Agent,use,[Obj],[possess(Agent,Obj),mud_isa(Obj,useable),stowed(Agent,Obj)->using(Agent,Obj)]).
-moo:action_rules(Agent,stow,[Obj],[possess(Agent,Obj),mud_isa(Obj,stowable),genlPreds(Using,controling),k(Using,Agent,Obj)->stowed(Agent,Obj)]).
+dyn:action_rules(Agent,use,[Obj],[possess(Agent,Obj),mud_isa(Obj,useable),stowed(Agent,Obj)->using(Agent,Obj)]).
+dyn:action_rules(Agent,stow,[Obj],[possess(Agent,Obj),mud_isa(Obj,stowable),genlPreds(Using,controling),k(Using,Agent,Obj)->stowed(Agent,Obj)]).
 
 % Use something
-moodb:agent_call_command(Agent,ACT) :-
+moo:agent_call_command(Agent,ACT) :-
    ACT =.. [VERB|SENT],
-   moo:action_rules(Agent,VERB,SENT,StateRules),
+   dyn:action_rules(Agent,VERB,SENT,StateRules),
       action_requires_states(Agent,StateRules,REQS),
       action_removes_states(Agent,StateRules,REMS),
       action_adds_states(Agent,StateRules,ADDS),
-     moo:update_charge(Agent,VERB),
+     dyn:update_charge(Agent,VERB),
      ((
          req(REQS)) ->
          ((clr(REMS),
          add(ADDS),
-         moo:update_charge(Agent,VERB)));	
+         dyn:update_charge(Agent,VERB)));	
 %Nothing to use
       add(failure(Agent,SENT))).
 

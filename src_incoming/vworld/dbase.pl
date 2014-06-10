@@ -162,7 +162,7 @@ Z = number_of_rules(1) ;
 Z = noprofile ;
 */
 
-call_after_game_load(Code):-call_after(moodb:not_loading_game_file,Code).
+call_after_game_load(Code):-call_after(moo:not_loading_game_file,Code).
 
 :-decl_mpred((
      type/1, agent/1, item/1, region/1,
@@ -194,10 +194,10 @@ call_after_game_load(Code):-call_after(moodb:not_loading_game_file,Code).
       str/2,
       wearing/2)).
 
-:- moodb:dbase_mod(DBASE), dynamic(DBASE:inside_clause_expansion/1).
+:- moo:dbase_mod(DBASE), dynamic(DBASE:inside_clause_expansion/1).
 
 
-:- moodb:dbase_mod(DBASE), 
+:- moo:dbase_mod(DBASE), 
           DBASE:(dynamic((
           dbase_t/1,
           dbase_t/2,
@@ -230,7 +230,7 @@ call_after_game_load(Code):-call_after(moodb:not_loading_game_file,Code).
           dbase_f/6,
           dbase_f/7))).
 
-:- moodb:dbase_mod(DBASE), 
+:- moo:dbase_mod(DBASE), 
           DBASE:(export((
           dbase_t/1,
           dbase_t/2,
@@ -263,7 +263,7 @@ call_after_game_load(Code):-call_after(moodb:not_loading_game_file,Code).
           dbase_f/6,
           dbase_f/7))).
 
-:- moodb:dbase_mod(DBASE), 
+:- moo:dbase_mod(DBASE), 
           DBASE:(multifile((
           dbase_t/1,
           dbase_t/2,
@@ -296,7 +296,7 @@ call_after_game_load(Code):-call_after(moodb:not_loading_game_file,Code).
           dbase_f/6,
           dbase_f/7))).
 
-:- moodb:dbase_mod(DBASE), 
+:- moo:dbase_mod(DBASE), 
           DBASE:(discontiguous((
           dbase_t/1,
           dbase_t/2,
@@ -346,7 +346,7 @@ call_after_game_load(Code):-call_after(moodb:not_loading_game_file,Code).
 
 :- dynamic db_prop_prolog/11.
 
-% :- context_module(M),asserta(moodb:dbase_mod(M)),dmsg(assert_if_new(moodb:dbase_mod(M))).
+% :- context_module(M),asserta(moo:dbase_mod(M)),dmsg(assert_if_new(moo:dbase_mod(M))).
 
 :- dynamic_multifile_exported dbase_t/1.
 :- dynamic_multifile_exported dbase_t/2.
@@ -837,12 +837,12 @@ isCycPredArity0(P,A):- xcall_t(((holds_t(arityMin,P,A),not(holds_t(arityMax,P, _
 :- style_check(+singleton).
 
 
-scan_arities:- forall(holds_t(arity,F,A),moodb:decl_mpred(F,A)).
+scan_arities:- forall(holds_t(arity,F,A),moo:decl_mpred(F,A)).
 
 % logicmoo('vworld/dbase') compiled into dbase 11.97 sec, 2,140,309 clauses
 %:- include(logicmoo('pldata/trans_header')).
 
-process_mworld:-!. %forall(dynamicCyc2(C),moodb:registerCycPredPlus2(C)).
+process_mworld:-!. %forall(dynamicCyc2(C),moo:registerCycPredPlus2(C)).
 
 % logicmoo('pldata/mworld0.pldata') compiled into world 61.18 sec, 483,738 clauses
 
@@ -872,10 +872,10 @@ remove_undef_search:- ((
  assert((check:list_undefined(A):- not(thread_self(main)),!, ignore(A=[]))),
  assert((check:list_undefined(A):- ignore(A=[]),real_list_undefined(A))))).
 
-user_export(_):- moodb:dbase_mod(user),!.
+user_export(_):- moo:dbase_mod(user),!.
 user_export(_M:Prop/Arity):-!,user_export(Prop/Arity).
 user_export(Prop/Arity):- 
-   moodb:dbase_mod(M), '@'( ((export(Prop/Arity),dynamic(Prop/Arity))) , M).
+   moo:dbase_mod(M), '@'( ((export(Prop/Arity),dynamic(Prop/Arity))) , M).
 
 
 :- meta_predicate hooked_asserta(^), hooked_assertz(^), hooked_retract(^), hooked_retractall(^).
@@ -887,7 +887,7 @@ user_export(Prop/Arity):-
 
 % :- include(dbase_types_motel).
 
-% :- moodb:register_module_type(utility).
+% :- moo:register_module_type(utility).
 
 
 term_listing(Obj):- nonvar(var(Obj)),catch(listing(Obj),_,fail),fail.
@@ -1004,7 +1004,7 @@ samef(X,Y):- hotrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci
 
 :-decl_mpred( type_max_charge/2).
 
-define_subtype(O,T):- define_type(O),define_type(T),add(moo:subclass(O,T)).
+define_subtype(O,T):- define_type(O),define_type(T),add(dyn:subclass(O,T)).
 
 :-decl_mpred(ft_info(formattype,term)).
 :-decl_mpred(subft(formattype,formattype)).
@@ -1267,7 +1267,7 @@ replace_nth([T|FARGS],A,OLD,[T|FARGO]):-
 
 % only place ever should actual game dbase be changed from
 hooked_asserta(C):- singletons_throw_or_fail(hooked_asserta(C)).
-hooked_asserta(C):- moodb:run_database_hooks(assert(tell(_OldV)),C),asserta_cloc(C).
+hooked_asserta(C):- moo:run_database_hooks(assert(tell(_OldV)),C),asserta_cloc(C).
 hooked_assertz(C):- singletons_throw_or_fail(hooked_assertz(C)).
 hooked_assertz(C):- run_database_hooks(assert(z),C), assertz_cloc(C).
 hooked_retract(C):- nonground_throw_or_fail(hooked_retract(C)).
@@ -1457,12 +1457,12 @@ user:term_expansion(G1,G3):- notrace((compound(G1), do_term_expansions)),  once(
 load_game(File):-absolute_file_name(File,Path),see(Path),
    world_clear(current),
    repeat,
-   asserta(moodb:loading_game_file(File)),
+   asserta(moo:loading_game_file(File)),
    read_term(Term,[double_quotes(string)]),
    game_assert(Term),
    Term == end_of_file,seen,!,
-   retractall(moodb:loading_game_file(File)),
-   assert_if_new(moodb:loaded_game_file(File)),
+   retractall(moo:loading_game_file(File)),
+   assert_if_new(moo:loaded_game_file(File)),
    must(finish_processing_game).
 
 game_assert(end_of_file):-!.
@@ -1475,8 +1475,8 @@ game_assert(Term):-once(must(add(Term))).
 finish_processing_game:- debug,in_finish_processing_game,!.
 finish_processing_game:- assert(in_finish_processing_game),fail.
 finish_processing_game:- do_all_of(dbase_module_loaded).
-finish_processing_game:- retract(moodb:call_after_load(A)),once(must(A)),fail.
-finish_processing_game:- call_after(moodb:not_loading_game_file,dbase:savedb),fail.
+finish_processing_game:- retract(moo:call_after_load(A)),once(must(A)),fail.
+finish_processing_game:- call_after(moo:not_loading_game_file,dbase:savedb),fail.
 finish_processing_game:- retractall(in_finish_processing_game).
 finish_processing_game.
 
@@ -1489,17 +1489,17 @@ gload:- load_game(logicmoo('rooms/startrek.all.pl')).
 % savedb:-!.
 savedb:-
  ignoreOnError((
-   moodb:dbase_mod(DBM),
+   moo:dbase_mod(DBM),
    make_directory('/tmp/lm/'),
    tell('/tmp/lm/savedb'),listing(DBM:dbase_t),told)).
 
 /*
 is_ft_except(S,List):-
-   moo:ft_info(S,_);
+   dyn:ft_info(S,_);
    not((member(S,List), 
       ((get_subft(S,S2) ,
         is_ft_except(S2,[S|List]) ;
-             ((moo:subft(S3,S) , is_ft_except(S3,[S,S2|List]))))))).
+             ((dyn:subft(S3,S) , is_ft_except(S3,[S,S2|List]))))))).
 */
 
 
@@ -1514,8 +1514,8 @@ p2c_dir2('n','North-Directly').
 :-include(dbase_i_builtin).
 
 :- begin_transform_moo_preds.
-moo:database_hook(assert(_),C):-expire_tabled_list(C).
-moo:database_hook(retract(_),C):-expire_tabled_list(C).
+dyn:database_hook(assert(_),C):-expire_tabled_list(C).
+dyn:database_hook(retract(_),C):-expire_tabled_list(C).
 :- end_transform_moo_preds.
 
 

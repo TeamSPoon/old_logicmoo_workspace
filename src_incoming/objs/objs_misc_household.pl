@@ -5,7 +5,7 @@
 %
 % *******Object definitions*******
 %.
-% Use the fmt moo:label_type_props(label,typecode,[property1,property2,etc.]]).
+% Use the fmt dyn:label_type_props(label,typecode,[property1,property2,etc.]]).
 % label is whats used to refer to the object in the running world
 % typecode is whats used to refer to the object for initialization (see world.pl)
 % ===============================================================================================

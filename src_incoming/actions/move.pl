@@ -14,20 +14,20 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- moodb:register_module_type(command).
+:- moo:register_module_type(command).
 
-:- moodb:begin_transform_moo_preds.
+:- moo:begin_transform_moo_preds.
 
-moodb:agent_text_command(Agent,[DirSS],Agent,move(Dir)):- catch(((string_to_atom(DirSS,Dir),moo:specifier_text(Dir,dir))),_,fail),!.
+moo:agent_text_command(Agent,[DirSS],Agent,move(Dir)):- catch(((string_to_atom(DirSS,Dir),dyn:specifier_text(Dir,dir))),_,fail),!.
 
-moodb:agent_text_command(Agent,[DirSS],Agent,move(DirS)):- 
- catch(((string_to_atom(DirSS,DirS),moo:specifier_text(Dir,dir),
+moo:agent_text_command(Agent,[DirSS],Agent,move(DirS)):- 
+ catch(((string_to_atom(DirSS,DirS),dyn:specifier_text(Dir,dir),
        catch((atom_concat(Dir,N,DirS),(atom_number(N,_))),_,fail))),_,fail).
 
-moodb:agent_call_command(Agnt,Cmd):- functor(Cmd,move,_),!,
+moo:agent_call_command(Agnt,Cmd):- functor(Cmd,move,_),!,
    must(move_command(Agnt,Cmd)).
 
-moo:action_info(move(dir)).
+dyn:action_info(move(dir)).
 
 % dir###
 move_command(Agent,move(DirSS)) :- catch((string_to_atom(DirSS,DirS),
@@ -69,8 +69,8 @@ move_command_1(Agent,Dir) :-
          ObjHt2 > ObjHt,
          ObjHt2 > 1,
 	!,
-	moo:update_stats(Agent,collide),
-	moo:update_charge(Agent,move),
+	dyn:update_stats(Agent,collide),
+	dyn:update_charge(Agent,move),
         raise_location_event(XXYY,collide(Agent,Obj2)),
    throw(giveup(collide(Agent,Obj2))).
 
@@ -82,8 +82,8 @@ move_command_1(Agent,Dir):-
 	is_3d(XXYY),
         atloc(Agent2,XXYY),
 	mud_isa(Agent2,agent),
-	moo:update_stats(Agent,collide),
-	moo:update_charge(Agent,move),
+	dyn:update_stats(Agent,collide),
+	dyn:update_charge(Agent,move),
         raise_location_event(XXYY,collide(Agent,Agent2)),
    throw(giveup(collide(Agent,Agent2))).
 
@@ -91,23 +91,23 @@ move_command_1(Agent,Dir):-
 %Move successfully
 move_command_1(Agent,Dir) :-
 	in_world_move(_,Agent,Dir),
-	moo:update_charge(Agent,move).
+	dyn:update_charge(Agent,move).
 
 %Record keeping
 
-moo:update_charge(Agent,move) :- padd(Agent,charge,-4).
+dyn:update_charge(Agent,move) :- padd(Agent,charge,-4).
 
-moo:update_stats(Agent,collide) :- padd(Agent,damage,-5),add(failure(Agent,collide)).
+dyn:update_stats(Agent,collide) :- padd(Agent,damage,-5),add(failure(Agent,collide)).
 
-moo:update_stats(Agent,fall) :- padd(Agent,damage,-10).
+dyn:update_stats(Agent,fall) :- padd(Agent,damage,-10).
 
 % cheating but to test
 
-moo:action_info(go(dir)).
-moodb:agent_call_command(Agent,go(Dir)) :-
+dyn:action_info(go(dir)).
+moo:agent_call_command(Agent,go(Dir)) :-
 	atloc(Agent,LOC),
         in_world_move(LOC,Agent,Dir),
-	moo:update_charge(Agent,move).
+	dyn:update_charge(Agent,move).
 
 
 :- include(logicmoo(vworld/moo_footer)).

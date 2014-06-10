@@ -24,20 +24,20 @@
 
 
 :- include(logicmoo(vworld/moo_header)).
-:- moodb:register_module_type(utility).
+:- moo:register_module_type(utility).
 
 % do some sanity testing (expects the startrek world is loaded)
 run_mud_tests:-
-  forall(moo:mud_test(Name,Test),run_mud_test(Name,Test)).
+  forall(dyn:mud_test(Name,Test),run_mud_test(Name,Test)).
 
-moo:action_help(tests,"run run_mud_tests/0").
+dyn:action_help(tests,"run run_mud_tests/0").
 
-moodb:agent_call_command(_Agent,tests) :- scan_updates, run_mud_tests.
+moo:agent_call_command(_Agent,tests) :- scan_updates, run_mud_tests.
 
 
-moo:action_help(test(term),"run tests containing term").
+dyn:action_help(test(term),"run tests containing term").
 
-moodb:agent_call_command(_Gent,test(Obj)):- term_test(Obj).
+moo:agent_call_command(_Gent,test(Obj)):- term_test(Obj).
 
 test_name(String):-dmsg(moo_test(named(String))),retractall(was_test_name(_)),asserta(was_test_name(String)).
 last_test_name(String):-was_test_name(String),!.
@@ -47,9 +47,9 @@ test_false(SomeGoal):- not(SomeGoal); (last_test_name(String),dmsg(moo_test(fail
 
 term_test(Obj):-
    doall((
-   moo:mud_test(H,B),
-   use_term_listing(Obj,moo:mud_test(H,B)),
-   moo:mud_test(H,B),
+   dyn:mud_test(H,B),
+   use_term_listing(Obj,dyn:mud_test(H,B)),
+   dyn:mud_test(H,B),
    fail)).
 
 run_mud_test(Name,Test):-

@@ -44,11 +44,11 @@ is_3d(LOC):- compound(LOC).
 
 % Quintus random(1,MaxX,X) and random(1,MaxY,Y)
 grid_size(Room,MaxX,MaxY,MaxZ):- fail,
-   moo:type_grid(What,1,L),
+   dyn:type_grid(What,1,L),
    mud_isa(Room,What),!,
    maxZ(MaxZ),
 	length(L,MaxX),
-	findall(1,moo:type_grid(What,_,_),LL),
+	findall(1,dyn:type_grid(What,_,_),LL),
 	length(LL,MaxY),!.
 
 grid_size(_Room,MaxX,MaxY,MaxZ):- MaxX = 5 , MaxY = 5 , maxZ(MaxZ) ,!.
@@ -113,7 +113,7 @@ locs_near_i(L1,L2):- locationToRegion(L1,R),pathBetween_call(R,_,R2),in_grid(R2,
 region_near(R1,R2):-pathBetween_call(R1,_,R2).
 region_near(R1,R1).
 
-moo:type_default_props(OfAgent,agent,[facing(F),atloc(L)]):-create_someval(facing,OfAgent,F),create_someval(atloc,OfAgent,L).
+dyn:type_default_props(OfAgent,agent,[facing(F),atloc(L)]):-create_someval(facing,OfAgent,F),create_someval(atloc,OfAgent,L).
 
 put_in_world(Agent):-ensure_some(facing,Agent),!,ensure_some(atloc,Agent),!.
 
@@ -255,7 +255,7 @@ check_for_fall(LOC,XXYY,Agent) :-
 	props(LowObj,height(Hl)),
 	Hd is Hh - Hl,
 	Hd > 1,
-	moo:update_stats(Agent,fall).
+	dyn:update_stats(Agent,fall).
 check_for_fall(_,_,_).
 
 

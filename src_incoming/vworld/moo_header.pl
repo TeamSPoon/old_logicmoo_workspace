@@ -22,7 +22,7 @@
 
 
 :- context_module(Ctx),
-   asserta(moodb:loading_module_h(Ctx)),
+   asserta(moo:loading_module_h(Ctx)),
     'format'('% moo_header: ~q.~n',[loading_module_h(Ctx)]).
 
 :- call((context_module(Ctx),(( may_moo_term_expand(Ctx) -> true; asserta(may_moo_term_expand(Ctx)), 'format'('% moo_header: ~q.~n',[may_moo_term_expand(Ctx)]))))).

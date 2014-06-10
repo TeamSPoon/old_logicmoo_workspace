@@ -22,33 +22,33 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- moodb:register_module_type(command).
+:- moo:register_module_type(command).
 
 :- dynamic blocks/1.
 
-:- moodb:begin_transform_moo_preds.
+:- moo:begin_transform_moo_preds.
 
 % can_sense(Agent,Sense,InList,CanDetect,CantDetect).
 can_sense(_Agent,visual,InList,InList,[]).
 
-moo:action_help(examine(item), "view details of item (see also @list)").
-moodb:agent_call_command(_Gent,examine(SObj)):- term_listing(SObj).
+dyn:action_help(examine(item), "view details of item (see also @list)").
+moo:agent_call_command(_Gent,examine(SObj)):- term_listing(SObj).
 
 
 
-moo:action_help(look, "generalized look in region").
-moo:action_help(look(dir), "Look in a direction").
-moo:action_help(look(item), "Look at a speficific item").
+dyn:action_help(look, "generalized look in region").
+dyn:action_help(look(dir), "Look in a direction").
+dyn:action_help(look(item), "Look at a speficific item").
 
-moodb:agent_call_command(Agent,look(Dir)):-
+moo:agent_call_command(Agent,look(Dir)):-
    view_dirs(Agent,[[Dir,here],[Dir,Dir],[Dir,Dir,adjacent]],Percepts),
    forall_member(P,Percepts,call_agent_action(Agent,examine(P))).
 
-moodb:agent_call_command(Agent,look(SObj)):-
+moo:agent_call_command(Agent,look(SObj)):-
    objects_match(Agent,SObj,Percepts),
    forall_member(P,Percepts,call_agent_action(Agent,examine(P))).
 
-moodb:agent_call_command(Agent,look):- 
+moo:agent_call_command(Agent,look):- 
    get_session_id(O),
    with_assertions(thlocal:current_agent(O,Agent),
         ((atloc(Agent,LOC),call_look(Agent,LOC)))).
@@ -104,7 +104,7 @@ get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
 
 % Get only the Percepts
 
-% moo:mpred(get_percepts(agent,list(spatial)),[ask_module(look)]).
+% dyn:mpred(get_percepts(agent,list(spatial)),[ask_module(look)]).
 get_percepts(Agent,Percepts) :- get_percepts0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts).
 get_percepts0(Agent,Percepts) :-
   call((
@@ -116,7 +116,7 @@ get_percepts0(Agent,Percepts) :-
 	!.
 
 % Look at locations immediately around argent
-% moo:mpred(look:get_near(agent,list(spatial)),[ask_module(look)]).
+% dyn:mpred(look:get_near(agent,list(spatial)),[ask_module(look)]).
 get_near(Agent,PerceptsO):- get_near0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
    
 get_near0(Agent,Percepts) :-
@@ -126,7 +126,7 @@ get_near0(Agent,Percepts) :-
 	view_dirs(Agent,Dirs,Percepts))),!.
 
 % Look only at location agent is currently in.
-% moo:mpred(look:get_feet(agent,list(spatial)),[ask_module(look)]).
+% dyn:mpred(look:get_feet(agent,list(spatial)),[ask_module(look)]).
 get_feet(Agent,PerceptsO) :-  get_feet0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
 
 get_feet0(Agent,Percepts):-

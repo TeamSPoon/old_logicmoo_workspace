@@ -18,16 +18,16 @@
 :- module(explorer,[]).
 
 :- include(logicmoo(vworld/moo_header)).
-:- moodb:register_module_type(planning).
+:- moo:register_module_type(planning).
 
 
 vette_idea(Agent,Act,Act):-var(Act),!,dmsg(vette_idea(Agent,Act)).
 vette_idea(_,sit,sit):-!.
 vette_idea(Agent,Act,Act):-dmsg(vette_idea(Agent,Act)).
 
-% moo:label_type_props(explorer(ID),explorer,[]).
+% dyn:label_type_props(explorer(ID),explorer,[]).
 
-moo:world_agent_plan(_World,Agent,ActV):-
+dyn:world_agent_plan(_World,Agent,ActV):-
    agent(Agent),
   % mud_isa(Agent,explorer),
    explorer_idea(Agent,Act),

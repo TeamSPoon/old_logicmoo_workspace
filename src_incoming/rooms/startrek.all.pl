@@ -8,20 +8,20 @@
 
 
 /*
-moo:type_grid('SpaceInAHOC',0, [ed,ed,ed,ex,ed,ed,ed]).
-moo:type_grid('SpaceInAHOC',1, [ed,--,--,--,--,--,ed]).
-moo:type_grid('SpaceInAHOC',2, [ed,--,--,--,--,--,ed]).
-moo:type_grid('SpaceInAHOC',3, [ex,--,--,--,--,--,ex]).
-moo:type_grid('SpaceInAHOC',4, [ed,--,--,--,--,--,ed]).
-moo:type_grid('SpaceInAHOC',5, [ed,--,--,--,--,--,ed]).
-moo:type_grid('SpaceInAHOC',6, [ed,ed,ed,ex,ed,ed,ed]).
+dyn:type_grid('SpaceInAHOC',0, [ed,ed,ed,ex,ed,ed,ed]).
+dyn:type_grid('SpaceInAHOC',1, [ed,--,--,--,--,--,ed]).
+dyn:type_grid('SpaceInAHOC',2, [ed,--,--,--,--,--,ed]).
+dyn:type_grid('SpaceInAHOC',3, [ex,--,--,--,--,--,ex]).
+dyn:type_grid('SpaceInAHOC',4, [ed,--,--,--,--,--,ed]).
+dyn:type_grid('SpaceInAHOC',5, [ed,--,--,--,--,--,ed]).
+dyn:type_grid('SpaceInAHOC',6, [ed,ed,ed,ex,ed,ed,ed]).
 */
 /*
-moo:type_grid('SpaceInAHOC',1, [--,--,--,--,--]).
-moo:type_grid('SpaceInAHOC',2, [--,--,--,--,--]).
-moo:type_grid('SpaceInAHOC',3, [--,--,--,--,--]).
-moo:type_grid('SpaceInAHOC',4, [--,--,--,--,--]).
-moo:type_grid('SpaceInAHOC',5, [--,--,--,--,--]).
+dyn:type_grid('SpaceInAHOC',1, [--,--,--,--,--]).
+dyn:type_grid('SpaceInAHOC',2, [--,--,--,--,--]).
+dyn:type_grid('SpaceInAHOC',3, [--,--,--,--,--]).
+dyn:type_grid('SpaceInAHOC',4, [--,--,--,--,--]).
+dyn:type_grid('SpaceInAHOC',5, [--,--,--,--,--]).
 */
 % center of room is 3,3,1 (rooms ranges are (1-5,1-5,1-5)
 

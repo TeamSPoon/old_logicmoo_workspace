@@ -46,18 +46,18 @@ use_holds_db(F,A,A):- isCycPredArity_Check(F,A).
 ensure_moo_pred(F,A,A):- is_mpred_prolog(F,A),!.
 ensure_moo_pred(F,A,_):- never_use_holds_db(F,A,Why),!,throw(never_use_holds_db(F,A,Why)).
 ensure_moo_pred(F,A,NewA):- use_holds_db(F,A,NewA),!.
-ensure_moo_pred(F,A,A):- dmsg(once(decl_mpred(F,A))),moodb:decl_mpred(F,A).
+ensure_moo_pred(F,A,A):- dmsg(once(decl_mpred(F,A))),moo:decl_mpred(F,A).
 
-is_kb_module(Moo):-atom(Moo),member(Moo,[moo,kb,opencyc]).
-is_kb_mt_module(Moo):-atom(Moo),member(Moo,[moomt,kbmt]).
+is_kb_module(Moo):-atom(Moo),member(Moo,[dyn,kb,opencyc]).
+is_kb_mt_module(Moo):-atom(Moo),member(Moo,[moomt,kbmt,mt]).
 
 prepend_module(_:C,M,M:C):-!.
 prepend_module(C,M,M:C).
 
-try_mud_body_expansion(G0,G2):- ((mud_goal_expansion_0(G0,G1),!,goals_different(G0, G1),!,moodb:dbase_mod(DBASE))),prepend_module(G1,DBASE,G2).
+try_mud_body_expansion(G0,G2):- ((mud_goal_expansion_0(G0,G1),!,goals_different(G0, G1),!,moo:dbase_mod(DBASE))),prepend_module(G1,DBASE,G2).
 mud_goal_expansion_0(G1,G2):- ((mud_pred_expansion(if_use_holds_db, holds_t - holds_f,G1,G2))).
 
-try_mud_head_expansion(G0,G2):- ((mud_head_expansion_0(G0,G1),!,goals_different(G0, G1),!,moodb:dbase_mod(DBASE))),prepend_module(G1,DBASE,G2).
+try_mud_head_expansion(G0,G2):- ((mud_head_expansion_0(G0,G1),!,goals_different(G0, G1),!,moo:dbase_mod(DBASE))),prepend_module(G1,DBASE,G2).
 mud_head_expansion_0(G1,G2):- ((mud_pred_expansion(if_mud_asserted, dbase_t - dbase_f,G1,G2))),!.
 
 try_mud_asserted_expansion(G0,G2):- mud_asserted_expansion_0(G0,G1),!,goals_different(G0, G1),add_from_file(G1,G2),!.
@@ -117,7 +117,7 @@ is_our_sources(_):- prolog_load_context(module,user),!,not(prolog_load_context(d
 
 univ_left(Comp,[M:P|List]):- nonvar(M),univ_left0(M, Comp, [P|List]),!.
 univ_left(Comp,[H,M:P|List]):- nonvar(M),univ_left0(M,Comp,[H,P|List]),!.
-univ_left(Comp,[P|List]):-moodb:dbase_mod(DBASE), univ_left0(DBASE,Comp,[P|List]),!.
+univ_left(Comp,[P|List]):-moo:dbase_mod(DBASE), univ_left0(DBASE,Comp,[P|List]),!.
 
 % univ_left0(dfgdfuser,Comp,List):- trace,Comp=..List,!.
 univ_left0(M,M:Comp,List):- Comp=..List,!.

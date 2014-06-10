@@ -81,13 +81,13 @@
 :- dynamic  agent_list/1.
 
 :- include(logicmoo(vworld/moo_header)).
-:- moodb:register_module_type(utility).
+:- moo:register_module_type(utility).
 
 :- meta_predicate intersect_pred(+,+,+,+,?,-).
 :- meta_predicate cached(0).
 :- meta_predicate show_kb_via_pred_3(*,*,*,*,^,?).
 
-% is_property(P,A):- moo:db_prop(_,C),functor(C,P,A2),A is A2-1.
+% is_property(P,A):- dyn:db_prop(_,C),functor(C,P,A2),A is A2-1.
 
 is_type(O):-is_type0(O).
 is_type0(T):-holds_t(label_type_props,_,T,_).
@@ -128,9 +128,9 @@ isa_mc(region,regiontype).
 isa_mc(agent,agenttype).
 isa_mc(item,itemtype).
 
-isa_mc(FT,formattype):-moo:ft_info(FT,_).
+isa_mc(FT,formattype):-dyn:ft_info(FT,_).
 
-moo:subclass(SubType,formattype):-isa_mc(SubType,formattype).
+dyn:subclass(SubType,formattype):-isa_mc(SubType,formattype).
 
 not_mud_isa(agent,formattype).
 cached(G):-catch(G,_,fail).
@@ -165,25 +165,25 @@ rez_to_inventory(Whom,T,P):-
 
 create_instance(P,What):-create_instance(P,What,[]).
 
-moo:subclass(wearable,item).
-moo:subclass(knife,item).
-moo:subclass(food,item).
+dyn:subclass(wearable,item).
+dyn:subclass(knife,item).
+dyn:subclass(food,item).
 
-moo:createableType(FT):- formattype(FT),!,fail.
-moo:createableType(item).
-moo:createableSubclassType(S,T):- moo:createableType(T),moo:subclass(S,T).
-moo:createableSubclassType(T,T):-nonvar(T),moo:createableType(T).
+dyn:createableType(FT):- formattype(FT),!,fail.
+dyn:createableType(item).
+dyn:createableSubclassType(S,T):- dyn:createableType(T),dyn:subclass(S,T).
+dyn:createableSubclassType(T,T):-nonvar(T),dyn:createableType(T).
 
-moo:subclass(int,formattype).
-moo:subclass(dir,formattype).
-moo:subclass(number,formattype).
-moo:subclass(string,formattype).
+dyn:subclass(int,formattype).
+dyn:subclass(dir,formattype).
+dyn:subclass(number,formattype).
+dyn:subclass(string,formattype).
 
 
 create_agent(P):-create_agent(P,[]).
 create_agent(P,List):-must(create_instance(P,agent,List)).
 
-formattype(FormatType):-moo:subclass(FormatType,formattype).
+formattype(FormatType):-dyn:subclass(FormatType,formattype).
 formattype(FormatType):-dbase:holds_t(isa, FormatType, formattype).
 
 define_type(Spec):-create_instance(Spec,type,[]).
@@ -203,8 +203,8 @@ create_instance_0(SubType,type,List):-!,
    assert_if_new(A),
    padd(SubType,List).
 
-moo:createableType(agent).
-moo:subclass(actor,agent).
+dyn:createableType(agent).
+dyn:subclass(actor,agent).
 
 create_instance_0(T,agent,List):-!,
    retractall(agent_list(_)),
@@ -222,22 +222,22 @@ create_instance_0(T,agent,List):-!,
    set_stats(P,List),
    add(memory(P,directions([n,s,e,w,ne,nw,se,sw,u,d]))),!.
 
-moo:createableType(region).
-create_instance_0(T,Type,List):- moo:createableType(Type),
+dyn:createableType(region).
+create_instance_0(T,Type,List):- dyn:createableType(Type),
    create_meta(T,P,_,Type),!,
    padd(P,List).
 
-create_instance_0(T,Type,List):-moo:subclass(Type,MetaType),moo:createableType(MetaType),
+create_instance_0(T,Type,List):-dyn:subclass(Type,MetaType),dyn:createableType(MetaType),
    create_meta(T,P,_,MetaType),
    padd(P,mud_isa(Type)),
    padd(P,List),
    clr(atloc(P,_)),
    put_in_world(P).
 
-%moo:createableType(type).
+%dyn:createableType(type).
 %f(X,Y):- hotrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci(XF,YF)))).
 
-moo:type_default_props(_,agent,last_command(stand)).
+dyn:type_default_props(_,agent,last_command(stand)).
 
 :- include(logicmoo('vworld/world_2d')).
 :- include(logicmoo('vworld/world_agent')).
