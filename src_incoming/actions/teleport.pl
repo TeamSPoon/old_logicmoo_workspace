@@ -23,8 +23,8 @@ moo:agent_text_command(Agent,[tp],Agent,teleport).
 moo:agent_text_command(Agent,[tp,Other,Where],Agent,teleport_to(Other,Where)).
 moo:agent_text_command(Agent,[tp,Where],Agent,teleport_to(self,Where)).
 
-dyn:action_help(teleport,"randomly teleport somewhere").
-dyn:action_info(teleport(item,region)).
+moo:action_help(teleport,"randomly teleport somewhere").
+moo:action_info(teleport(item,region)).
 
 %random
 moo:agent_call_command(Agent,teleport):-
@@ -39,7 +39,7 @@ moo:agent_call_command(_Agent,teleport_to(Other,Where)):-
    moo:coerce(Where,region,Location),
    clr(inRegion(Target,_)),
    clr(atloc(Target,_)),
-   to_3d(Location,Where3D)
+   to_3d(Location,Where3D),
    add(atloc(Target,Where3D)).
 
 
@@ -49,7 +49,7 @@ moo:agent_call_command(Agent,tp(Where)):-
    moo:coerce(Where,region,Location),
    clr(inRegion(Target,_)),
    clr(atloc(Target,_)),
-   to_3d(Location,Where3D)
+   to_3d(Location,Where3D),
    add(atloc(Target,Where3D)).
 
 :- include(logicmoo(vworld/moo_footer)).

@@ -19,7 +19,7 @@ dyn:use_usable(use,using,usable,stowed).
 dyn:use_usable(drink,drinking,drinkable,holding).
 dyn:use_usable(stow,stowed,stowable,holding).
 
-dyn:action_help(Syntax,String):-dyn:use_usable(Stow,Stowed,Stowable,Holding),Syntax=..[Stow,Stowable],
+moo:action_help(Syntax,String):-dyn:use_usable(Stow,Stowed,Stowable,Holding),Syntax=..[Stow,Stowable],
    sformat(String,'~w a ~w that you are/have ~w so it will be ~w.',[Stow,Stowable,Holding,Stowed]).
 
 use_verbs(USE,USING,USABLE,STOWED):-dyn:use_usable(USE,USING,USABLE,STOWED).

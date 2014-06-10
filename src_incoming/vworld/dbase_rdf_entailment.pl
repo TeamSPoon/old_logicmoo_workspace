@@ -1,7 +1,7 @@
 :- module(dbase_rdf_entailment,
 	  []).
 
-% end_of_file.
+end_of_file.
 
 /** <module> MUD Entailment
 
@@ -25,8 +25,8 @@ This entailment module does MUD-DB entailment.
 % :- rdf_attach_library((.)).
 
 :- rdf_meta
-	mud_db:rdf(o,o,o),
-	mud_db:individual_of(r,r).
+	dbase_rdf_entailment:rdf(o,o,o),
+	dbase_rdf_entailment:individual_of(r,r).
 
 :- public rdf/3.
 

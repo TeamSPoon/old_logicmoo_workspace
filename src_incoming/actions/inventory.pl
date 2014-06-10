@@ -12,7 +12,7 @@
 % ====================================================
 % the entire inventory system
 % ====================================================
-dyn:action_help(inventory(optional(agent,self)), "Examine an inventory").
+moo:action_help(inventory(optional(agent,self)), "Examine an inventory").
 moo:agent_call_command(Agent,inventory(Who)):- show_kb_preds(Agent,inventory(Who,value)).
 
 % Get only the Inv (inventory)

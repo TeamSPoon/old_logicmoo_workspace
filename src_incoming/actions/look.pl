@@ -31,14 +31,14 @@
 % can_sense(Agent,Sense,InList,CanDetect,CantDetect).
 can_sense(_Agent,visual,InList,InList,[]).
 
-dyn:action_help(examine(item), "view details of item (see also @list)").
+moo:action_help(examine(item), "view details of item (see also @list)").
 moo:agent_call_command(_Gent,examine(SObj)):- term_listing(SObj).
 
 
 
-dyn:action_help(look, "generalized look in region").
-dyn:action_help(look(dir), "Look in a direction").
-dyn:action_help(look(item), "Look at a speficific item").
+moo:action_help(look, "generalized look in region").
+moo:action_help(look(dir), "Look in a direction").
+moo:action_help(look(item), "Look at a speficific item").
 
 moo:agent_call_command(Agent,look(Dir)):-
    view_dirs(Agent,[[Dir,here],[Dir,Dir],[Dir,Dir,adjacent]],Percepts),

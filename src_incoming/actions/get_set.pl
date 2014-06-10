@@ -7,8 +7,8 @@
 
 :- moo:register_module_type(command).
 
-dyn:action_help('@get'(optional(term,self),term),text("@get term to a property")).
-dyn:action_help('@set'(optional(term,self),atom,term),text("@sets term to a property")).
+moo:action_help('@get'(optional(term,self),term),text("@get term to a property")).
+moo:action_help('@set'(optional(term,self),atom,term),text("@sets term to a property")).
 
 moo:agent_call_command(Agent,'@set'(Obj0,Prop0,Value0)) :- subst(game_assert(k(Prop0,Obj0,Value0)),self,Agent,K),dmsg(K),debugOnError(K).
 

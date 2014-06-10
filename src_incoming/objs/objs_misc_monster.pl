@@ -228,7 +228,7 @@ Object applies:
 
 label_type(Label,Type):-dyn:label_type_props(Label,Type,_).
 
-% :-dyn:moo:register_module_type(dynamic).
+% :-moo:register_module_type(dynamic).
 
 max_charge(500).
 max_damage(120).

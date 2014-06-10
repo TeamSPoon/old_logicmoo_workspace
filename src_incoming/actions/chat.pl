@@ -15,7 +15,7 @@ do_social(Agent,Say,Whom,Text):-
    asInvoked(Cmd,[Say,Agent,Whom,Text]),
    raise_location_event(Where,notice(reciever,Cmd)).
 
-dyn:action_help(Say,text("invokes",Does)):-socialCommand(Say,_SocialVerb,Does).
+moo:action_help(Say,text("invokes",Does)):-socialCommand(Say,_SocialVerb,Does).
 
 socialCommand(Say,SocialVerb,chat(optional(verb,SocialVerb),optional(channel,here),string)):-socialVerb(SocialVerb),
    Say =.. [SocialVerb,optional(channel,here),string].

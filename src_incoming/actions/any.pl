@@ -20,15 +20,15 @@ action_requires_states(_Agent,List,Preconds):-findall(A,(member(A,List),\+ funct
 :- include(logicmoo(vworld/moo_header)).
 
 :- moo:register_module_type(command).
-dyn:action_rules(_,_,_,_):-fail.
+moo:action_rules(_,_,_,_):-fail.
 
-dyn:action_rules(Agent,use,[Obj],[possess(Agent,Obj),mud_isa(Obj,useable),stowed(Agent,Obj)->using(Agent,Obj)]).
-dyn:action_rules(Agent,stow,[Obj],[possess(Agent,Obj),mud_isa(Obj,stowable),genlPreds(Using,controling),k(Using,Agent,Obj)->stowed(Agent,Obj)]).
+moo:action_rules(Agent,use,[Obj],[possess(Agent,Obj),mud_isa(Obj,useable),stowed(Agent,Obj)->using(Agent,Obj)]).
+moo:action_rules(Agent,stow,[Obj],[possess(Agent,Obj),mud_isa(Obj,stowable),genlPreds(Using,controling),k(Using,Agent,Obj)->stowed(Agent,Obj)]).
 
 % Use something
 moo:agent_call_command(Agent,ACT) :-
    ACT =.. [VERB|SENT],
-   dyn:action_rules(Agent,VERB,SENT,StateRules),
+   moo:action_rules(Agent,VERB,SENT,StateRules),
       action_requires_states(Agent,StateRules,REQS),
       action_removes_states(Agent,StateRules,REMS),
       action_adds_states(Agent,StateRules,ADDS),

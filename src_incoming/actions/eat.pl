@@ -21,7 +21,7 @@
 
 :- moo:register_module_type(command).
 
-dyn:action_info(eat(item)).
+moo:action_info(eat(item)).
 
 % Eat something held
 % Check to make sure it's in the agents possession... 

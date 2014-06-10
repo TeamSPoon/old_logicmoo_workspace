@@ -27,7 +27,7 @@ moo:agent_text_command(Agent,[DirSS],Agent,move(DirS)):-
 moo:agent_call_command(Agnt,Cmd):- functor(Cmd,move,_),!,
    must(move_command(Agnt,Cmd)).
 
-dyn:action_info(move(dir)).
+moo:action_info(move(dir)).
 
 % dir###
 move_command(Agent,move(DirSS)) :- catch((string_to_atom(DirSS,DirS),
@@ -103,7 +103,7 @@ dyn:update_stats(Agent,fall) :- padd(Agent,damage,-10).
 
 % cheating but to test
 
-dyn:action_info(go(dir)).
+moo:action_info(go(dir)).
 moo:agent_call_command(Agent,go(Dir)) :-
 	atloc(Agent,LOC),
         in_world_move(LOC,Agent,Dir),

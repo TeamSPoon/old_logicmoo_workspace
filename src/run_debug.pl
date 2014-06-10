@@ -6,6 +6,7 @@
 :- use_module(library(settings)).
 % :- use_module(library(check)).
 % :- make.
+:- portray_text(true).
 
 :- dynamic(run_debug:fullStart/0).
 
@@ -28,9 +29,10 @@
 % Add your own path to weblog for now
 user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog').
 user:file_search_path(weblog, 'C:/Users/Administrator/AppData/Roaming/SWI-Prolog/pack/weblog').
-user:file_search_path(weblog, '/usr/local/lib/swipl-7.1.11/pack/weblog/prolog').
-user:file_search_path(cliopatria, '/devel/ClioPatria').
-user:file_search_path(cliopatria, 't:/devel/ClioPatria').
+
+user:file_search_path(weblog, '/usr/local/lib/swipl-7.1.11/pack/weblog/prolog'):-current_prolog_flag(unix,true).
+user:file_search_path(cliopatria, '/devel/ClioPatria'). %  current_prolog_flag(unix,true).
+%user:file_search_path(cliopatria, 't:/devel/ClioPatria'):- not( current_prolog_flag(unix,true)).
 
 
 :- user_use_module(library(settings)).
@@ -57,13 +59,10 @@ startup_mod:if_version_greater(V,Goal):- current_prolog_flag(version,F), ((F > V
 % [Optionaly] load and start sparql server
 % if we don't start cliopatria we have to manually start
 %
-start_servers :- !.
-
-%%:- user_use_module('t:/devel/cliopatria/rdfql/sparql_runtime.pl').
-
-start_servers :- startup_mod:if_version_greater(70111,user_use_module(logicmoo(launchcliopatria))).
-
-%start_servers :- startup_mod:if_version_greater(70111,thread_create(user_use_module(logicmoo(launchcliopatria)),_,[alias(loading_code)])).
+% :- use_module('t:/devel/cliopatria/rdfql/sparql_runtime.pl').
+hard_work:-ensure_loaded(logicmoo(launchcliopatria)).
+slow_work:-with_assertions(moo:prevent_transform_moo_preds,hard_work),retractall(prevent_transform_moo_preds).
+start_servers :- startup_mod:if_version_greater(70111,thread_create(slow_work,_,[alias(loading_code)])).
 
 % run_debug:start_servers
 % this is evil. Starts the old mudconsole, the experiment with Jan's
@@ -119,7 +118,7 @@ ht:- do_player_action('s'),
 
 % :- make.
 
-:- at_start(run_debug:start_servers).
+% :- at_start(run_debug:start_servers).
 
 :- at_start(run_setup).
 
@@ -171,8 +170,17 @@ dyn:mud_test(drop_take,
 
 :- at_start((debug,run_mud_tests)).
 
+
 :- at_start((debug,run)).
 
 
 % So scripted versions don't just exit
 :- at_start(prolog).
+
+end_of_file.
+
+:- doc_server(4088).
+
+:- use_module(library(pldoc/doc_library)).
+:- doc_load_library.
+

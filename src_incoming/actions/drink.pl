@@ -12,7 +12,7 @@
 
 :- moo:register_module_type(command).
 
-dyn:action_help(drink(drinkable),"Drink a Drinkable Item").
+moo:action_help(drink(drinkable),"Drink a Drinkable Item").
 
 % Eat something held
 % Check to make sure it's in the agents possession... 

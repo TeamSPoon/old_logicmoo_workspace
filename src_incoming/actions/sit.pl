@@ -15,7 +15,7 @@ is_posture(stand).
 is_posture(lay).
 is_posture(kneel).
 
-dyn:action_help(Posture,text("sets and agent's posture to ",Posture)):-is_posture(Posture).
+moo:action_help(Posture,text("sets and agent's posture to ",Posture)):-is_posture(Posture).
 
 % Sit - do nothing.
 moo:agent_call_command(Agent,Sit) :-is_posture(Sit),

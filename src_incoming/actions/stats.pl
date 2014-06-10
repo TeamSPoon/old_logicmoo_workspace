@@ -14,7 +14,7 @@
 % ====================================================
 % show the stats system
 % ====================================================
-dyn:action_help(stats(optional(term,self)), "Examine MUD stats of something").
+moo:action_help(stats(optional(term,self)), "Examine MUD stats of something").
 moo:agent_call_command(Agent,stats(SWhat)):- 
    term_listing(SWhat),
    doall((parse_for(optional(agent,self),SWhat,What,_LeftOver),

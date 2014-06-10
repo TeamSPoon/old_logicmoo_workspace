@@ -80,25 +80,34 @@ goals_different_1(G0,G1):- (var(G0);var(G1)),!,throw(goals_different(G0,G1)).
 goals_different_1(G0,G1):- G0 \= G1,!.
 
 
-attempt_clause_expansion(B,BR):-  compound(B), copy_term(B,BC),numbervars(BC,0,_),!, attempt_clause_expansion(B,BC,BR).
+attempt_clause_expansion(B,BR):- compound(B), copy_term(B,BC),numbervars(BC,0,_),!, attempt_clause_expansion(B,BC,BR).
 attempt_clause_expansion(_,BC,_):-inside_clause_expansion(BC),!,fail.
 attempt_clause_expansion(B,BC,BR):- 
     setup_call_cleanup(asserta(inside_clause_expansion(BC)),
     force_clause_expansion(B,BR),
     ignore(retract(inside_clause_expansion(BC)))).
 
-force_clause_expansion(M:((H:-B)),R):- !, mud_rule_expansion(M:H,M:B,R),!.
-force_clause_expansion(((M:H:-B)),R):- !, mud_rule_expansion(M:H,B,R),!.
-force_clause_expansion(((H:-B)),R):-mud_rule_expansion(H,B,R),!.
-force_clause_expansion(H,HR):- try_mud_asserted_expansion(H,HR),!.
-force_clause_expansion(H,HR):- try_mud_head_expansion(H,HR),!.
-force_clause_expansion(B,BR):-force_head_expansion(B,BR).
+force_clause_expansion(B,BR):- force_expand(force_clause_expansion0(B,BR)).
+
+force_clause_expansion0(M:((H:-B)),R):- !, mud_rule_expansion(M:H,M:B,R),!.
+force_clause_expansion0(((M:H:-B)),R):- !, mud_rule_expansion(M:H,B,R),!.
+force_clause_expansion0(((H:-B)),R):-mud_rule_expansion(H,B,R),!.
+force_clause_expansion0(H,HR):- try_mud_asserted_expansion(H,HR),!.
+force_clause_expansion0(H,HR):- try_mud_head_expansion(H,HR),!.
+force_clause_expansion0(B,BR):- force_head_expansion(B,BR).
+
+force_expand(Goal):-thread_self(ID),with_assertions_1ce(moo:always_expand_on_thread(ID),Goal).
+with_assertions_1ce(A,G):- A,!,G,!.
+with_assertions_1ce(A,G):-with_assertions(A,G).
+
+force_expand_goal(A, B) :- force_expand(expand_goal(A, B)).
+
 
 force_head_expansion(H,HR):- try_mud_head_expansion(H,HR),!.
-force_head_expansion(H,HR):- user:expand_term(H,HR).
+force_head_expansion(H,HR):- force_expand(expand_term(H,HR)).
 
-mud_rule_expansion(H,True,HR):-True==true,!,force_head_expansion(H,HR).
-mud_rule_expansion(H,B,((HR:-BR))):-force_head_expansion(H,HR),user:expand_goal(B,BR),!.
+mud_rule_expansion(H,True,HR):-True==true,!,force_head_expansion(H,HR).  
+mud_rule_expansion(H,B,((HR:-BR))):-force_head_expansion(H,HR),force_expand(expand_goal(B,BR)),!.
 
 is_term_head(H):- (( \+ \+ inside_clause_expansion(H))),!.
 %is_term_head(_):- inside_clause_expansion(_),!,fail.
@@ -189,4 +198,7 @@ do_holds_form([F|List],HOLDS - _NHOLDS,G2):-
    holds_form(G1,HOLDS,G2).
 
 do_holds_form([F|List],HOLDS - _NHOLDS,G2):- G2=..[HOLDS,F|List].
- 
+
+
+
+

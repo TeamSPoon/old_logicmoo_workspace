@@ -16,7 +16,7 @@
 
 :- moo:register_module_type(command).
 
-dyn:action_info(push(dir)).
+moo:action_info(push(dir)).
 
 % Push a box
 % Nothing to push... agent moves and takes a little damage.

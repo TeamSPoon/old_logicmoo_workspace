@@ -14,7 +14,7 @@
 
 :- moo:register_module_type(command).
 
-dyn:action_info(drop(item)).
+moo:action_info(drop(item)).
 
 % Drop something
 moo:agent_call_command(Agent,drop(SObj)) :-

@@ -11,6 +11,8 @@ prefix(skos, 'http://www.w3.org/2004/02/skos/core#').
 prefix(foaf, 'http://xmlns.com/foaf/0.1/').
 prefix(void, 'http://rdfs.org/ns/void#').
 prefix(serql, 'http://www.openrdf.org/schema/serql#').
+prefix(logicmoo, 'http://onto.ui.sav.sk/agents.owl#').
+prefix(skosxl, 'http://www.w3.org/2008/05/skos-xl#').
 prefix(user, 'http://www.swi-prolog.org/cliopatria/user/').
 prefix(lib, 'http://www.swi-prolog.org/rdf/library/').
 prefix(vann, 'http://purl.org/vocab/vann/').

@@ -21,6 +21,7 @@
 % Douglas Miles
 */
 :- module(dbase,[add/1,
+force_expand_goal/2,
 argIsa_call/3,
 assertThrough/1,
 assertThrough/2,
@@ -89,7 +90,7 @@ stringToWords/2,
 term_listing/1,
 toCycApiExpression/2,
 toCycApiExpression/3,
-use_term_listing/2,
+use_term_listing/3,
 useExternalDBs/0,
 with_kb_assertions/2,
 world_clear/1,
@@ -832,6 +833,7 @@ isCycPredArity0(P,A):- xcall_t(((holds_t(arityMin,P,A),not(holds_t(arityMax,P, _
 
 
 :- include(logicmoo(vworld/dbase_i_db_preds)).
+:- include(logicmoo(vworld/dbase_i_pldoc)).
 
 :- style_check(+discontiguous).
 :- style_check(+singleton).
@@ -888,33 +890,6 @@ user_export(Prop/Arity):-
 % :- include(dbase_types_motel).
 
 % :- moo:register_module_type(utility).
-
-
-term_listing(Obj):- nonvar(var(Obj)),catch(listing(Obj),_,fail),fail.
-term_listing(Obj):- 
-   any_to_atom(Obj,HO),
-   get_functor(Obj,F),
-   doall((
-   predicate_property(H,number_of_clauses(_)),
-   functor(H,HF,_),
-   HF\==F,
-   clause(H,B),
-   use_term_listing(Obj,HO,H,B),
-   show_term_listing(H,B),
-   fail)).
-
-use_term_listing(Obj,HO):-
-   clause(HO,B),
-   use_term_listing(Obj,HO,HO,B).
-
-use_term_listing(Obj,HO,H,B):- term_to_atom((H:-B),HO), (sub_atom_icasechk(HO,_,Obj);sub_atom_icasechk(Obj,_)),!.
-use_term_listing(Obj,_HO,H,B):- not(not(((subst((H:-B),Obj,fov,H1B1), H1B1 \= (H:-B))))),!.
-
-
-show_term_listing(H,true):- !, show_term_listing(H).
-show_term_listing(H,B):- show_term_listing((H:-B)).
-
-show_term_listing(H):- writeq(H),write('.'),nl,!.
 
 
 :- dynamic(non_assertable/1).
@@ -1028,7 +1003,7 @@ is_ft(S):-   holds_t(isa,S,formattype).
           atom_to_value/2,
           any_to_dir/2)).
 
-expand_goal_correct_argIsa(A,B):-expand_goal(A,B).
+expand_goal_correct_argIsa(A,B):-force_expand_goal(A,B).
 
 isa_type(Type):-req(isa(Type,type)).
 isa_type(Type):-req(isa(Type,formattype)).
@@ -1215,11 +1190,11 @@ db_query_lc(Must,(C0->C1;C2)):- !, (db_query(sf(!,!),C0) -> db_query(Must,C1) ; 
 db_query_lc(Must,(C1;C2)):-!, db_query(Must,C1) ; db_query(Must,C2).
 db_query_lc(Must,Term):-findall(a(Term),db_query0(Must,Term),List),list_to_set_safe(List,Set),!,member(a(Term),Set).
 
-db_query0(Must,Term):- expand_goal(Term,Term2),!,call_must(Must,db_query1(Term2)).
+db_query0(Must,Term):- force_expand_goal(Term,Term2),!,call_must(Must,db_query1(Term2)).
 % db_query1(C):- not(not(predicate_property(C,_PP))),!,call(C).
 db_query1(C):- db_quf(C,Pretest,Template),!,call_expanded(Pretest), call_expanded(Template).
 
-call_expanded(Goal):-expand_goal(Goal,Call),call(Call).
+call_expanded(Goal):-force_expand_goal(Goal,Call),call(Call).
 
 singletons_throw_or_fail(C):- contains_singletons(C),grtrace,throw(contains_singletons(C)).
 nonground_throw_or_fail(C):- throw_if_true_else_fail(not(ground(C)),C).
@@ -1281,7 +1256,7 @@ ensure_db_predicate_1(AR,M:C,G):- nonvar(M), !,ensure_db_predicate_1(AR,C,G).
 ensure_db_predicate_1(AR,CI,G):- force_head_expansion(CI,C),ensure_db_predicate_2(AR,C,G).
 
 ensure_db_predicate_2(AR,M:C,G):- nonvar(M),ensure_db_predicate_2(AR,C,G).
-ensure_db_predicate_2(_AR,CI,G):- force_head_expansion(CI,EG),expand_term(EG,G).
+ensure_db_predicate_2(_AR,CI,G):- force_head_expansion(CI,EG),force_expand(expand_term(EG,G)).
 
 % ensure_db_predicate(tell(OldV),agent('NpcCol1000-Geordi684'),Out).
 
@@ -1408,7 +1383,7 @@ asserta_if_ground(G):-ground(G),asserta(G),!.
 asserta_if_ground(_).
 
 call_no_cuts(CALL):-clause(CALL,TEST),call_no_cuts_0(TEST).
-call_no_cuts(CALL):-expand_goal(CALL,EG),EG\=CALL,!,clause(EG,TEST),call_no_cuts_0(TEST).
+call_no_cuts(CALL):-force_expand_goal(CALL,EG),EG\=CALL,!,clause(EG,TEST),call_no_cuts_0(TEST).
 
 call_no_cuts_0(true):-!.
 call_no_cuts_0((!)):-!.
@@ -1511,7 +1486,10 @@ p2c_dir2('d','Down-Directly').
 p2c_dir2('e','East-Directly').
 p2c_dir2('n','North-Directly').
 
+
+:- begin_transform_moo_preds.
 :-include(dbase_i_builtin).
+:- end_transform_moo_preds.
 
 :- begin_transform_moo_preds.
 dyn:database_hook(assert(_),C):-expire_tabled_list(C).

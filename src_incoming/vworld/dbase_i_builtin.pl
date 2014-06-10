@@ -22,7 +22,7 @@
 */
 
 :- decl_mpred(term_anglify/2).
-:- decl_mpred(assert_with_pred, 2).
+:- decl_mpred(assert_with_pred,2).
 :- begin_transform_moo_preds.
 
 
@@ -89,7 +89,7 @@ mpred(label_type_props(string,type,list(props))).
 
 mpred(type_grid(type,int,term)).
 
-mpred(action_rules(term(agent),term(verb),term(object),term(list(props)))).
+mpred(action_rules(agent,verb,term(object),term(list(props)))).
 
 dyn:type_max_damage(object,500).
 dyn:type_max_charge(object,120).
@@ -148,8 +148,8 @@ dyn:mpred(label_type(string,type),[singleValued]).
 /*
 dyn:mpred(look:get_feet(agent,list(spatial)),[]).
 dyn:mpred(look:get_near(agent,list(spatial)),[ask_module(look)]).
-dyn:mpred(get_precepts(agent,list(spatial)),[ask_module(look)]).
 */
+mpred(get_precepts(agent,list(spatial)),[ask_module(look)]).
 mpred(mud_test(term,prolog)).
 
 mpred(assert_with_pred(mpred,term)).
@@ -316,12 +316,13 @@ multiValued(isa(term,type)).
 mpred(directions(term,list(term))).
 
 
-dyn:action_info(list(term)).
-
-moo:agent_call_command(_Gent,list(Obj)):- term_listing(Obj).
+moo:action_info(list(term)).
 
 dyn:mpred(ask_module(mpred,atom)).
 dyn:argsIsa(agent_call_command(agent,term(verb))).
+
+moo:agent_call_command(_Gent,list(Obj)):- term_listing(Obj).
+
 
 % =================================================================================================
 % END world database

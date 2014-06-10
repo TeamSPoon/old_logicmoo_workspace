@@ -19,7 +19,7 @@ can_move_into(_LOC,XXYY):-var(XXYY),!,fail.
 can_move_into(_LOC,XXYY):-not(atloc(_,XXYY)),!.
 can_move_into(_LOC,XXYY):-ground(XXYY).
 
-dyn:action_info(climb(dir)).
+moo:action_info(climb(dir)).
 
 % Climb
 % If there is nothing there to climb, move to location

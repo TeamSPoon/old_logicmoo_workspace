@@ -46,7 +46,7 @@ user:file_search_path(cliopatria, 't:/devel/ClioPatria').
 start_servers :-
 	current_prolog_flag(version,F),
 	F > 70109,
-	use_module(logicmoo(launchcliopatria)).
+	ensure_loaded(logicmoo(launchcliopatria)).
 start_servers :-
 	current_prolog_flag(version,F),
 	F =< 70109,

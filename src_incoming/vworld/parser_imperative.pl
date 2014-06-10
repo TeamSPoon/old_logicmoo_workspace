@@ -37,7 +37,7 @@
 % ===========================================================
 % PARSE command
 % ===========================================================
-dyn:action_help(parse(prolog,list(term)),"Development test to parse some Text for a human.  Usage: parse 'item' the blue backpack").
+moo:action_help(parse(prolog,list(term)),"Development test to parse some Text for a human.  Usage: parse 'item' the blue backpack").
 
 moo:agent_text_command(Agent,[parse,Type|List],Agent,parse(Type,List)).
 

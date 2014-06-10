@@ -73,12 +73,12 @@ do_agent_call_plan_command(A,C):-
 
 idea(Who,IdeaS):- findall(Idea,(get_world_agent_plan(current,Who,Idea),dmsg(get_world_agent_plan(current,Who,Idea))),IdeaS),(IdeaS==[]->dmsg(noidea(idea(Who)));true).
 
-dyn:action_help(npc_timer(int),"sets how often to let NPCs run").
-dyn:action_help(tock,"Makes All NPCs do something brilliant").
-dyn:action_help(tick(agent),"Makes some agent do something brilliant").
-dyn:action_help(idea(optional(agent,self)),"Makes some agent (or self) think of something brilliant").
-dyn:action_help(tick,"Makes *your* agent do something brilliant").
-dyn:action_help(prolog(prolog),"Call prolog toploop").
+moo:action_help(npc_timer(int),"sets how often to let NPCs run").
+moo:action_help(tock,"Makes All NPCs do something brilliant").
+moo:action_help(tick(agent),"Makes some agent do something brilliant").
+moo:action_help(idea(optional(agent,self)),"Makes some agent (or self) think of something brilliant").
+moo:action_help(tick,"Makes *your* agent do something brilliant").
+moo:action_help(prolog(prolog),"Call prolog toploop").
 
 moo:agent_text_command(Agent,[prolog,X],Agent,prologCall(X)).
 moo:agent_text_command(Agent,[prolog],Agent,prologCall(prolog)).
@@ -95,7 +95,7 @@ agent_call_safely(RC,X,Vars) :-  '@'(notrace((warnOnError(doall(((X,flag(RC,CC,C
 atom_to_term_safe(A,T,O):-catch(atom_to_term(A,T,O),_,fail),T\==end_of_file.
 any_to_callable(S,X,Vs):-string(C),!,string_to_atom(S,C),atom_to_term_safe(C,X,Vs).
 any_to_callable(C,X,Vs):-atom(C),!,atom_to_term_safe(C,X,Vs).
-any_to_callable(C,X,Vs):-expand_goal(C,X),term_variables((C,X),Vs),!.
+any_to_callable(C,X,Vs):-force_expand(expand_goal(C,X)),term_variables((C,X),Vs),!.
 
 moo:agent_call_command(_Agent,npc_timer(Time)):-retractall(npc_tick_tock_time(_)),asserta(npc_tick_tock_time(Time)).
 moo:agent_call_command(Who,tick) :-  debugOnError(tick(Who)).

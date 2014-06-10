@@ -18,7 +18,8 @@
 
 :- moo:register_module_type(command).
 
-dyn:action_help(where(object),"Tells where something is").
+moo:action_help(where(object),"Tells where something is").
+
 dyn:subclass(agent,object).
 dyn:subclass(item,object).
 
@@ -34,7 +35,7 @@ moo:agent_call_command(_Agent,where(SObj)) :-
 
 
 
-dyn:action_help(who(optional(agent,_)),"Lists who is online (where they are at least)").
+moo:action_help(who(optional(agent,_)),"Lists who is online (where they are at least)").
 
 moo:agent_call_command(_Gent,who(Agnt2)) :- C = (agent(Agnt2),dbase_t(inRegion,Agnt2,Where)), forall(db_query(_,C),fmt(cmdresult(who(Agnt2),inRegion(Agnt2,Where)))).
 

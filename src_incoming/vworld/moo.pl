@@ -40,6 +40,7 @@
          scan_updates/0,
             loading_module_h/1,
 
+            always_expand_on_thread/1,
              ended_transform_moo_preds/0, prevent_transform_moo_preds/0, 
              always_transform_heads/0, may_moo_term_expand/1,
              begin_transform_moo_preds/0, end_transform_moo_preds/0,
@@ -111,11 +112,10 @@ scan_updates:-ignore(catch(make,_,true)).
 
 :-dynamic(isRegisteredCycPred/3).
 
-:-dynamic ended_transform_moo_preds/0, prevent_transform_moo_preds/0, may_moo_term_expand/1, always_transform_heads/0.
+:-dynamic ended_transform_moo_preds/0, always_expand_on_thread/1, prevent_transform_moo_preds/0, may_moo_term_expand/1, always_transform_heads/0.
 
 :-module_transparent begin_transform_moo_preds/0, end_transform_moo_preds/0.
 begin_transform_moo_preds:- retractall(moo:ended_transform_moo_preds),context_module(CM),asserta(moo:may_moo_term_expand(CM)).
-
 
 
 end_transform_moo_preds:- retractall(moo:ended_transform_moo_preds),asserta(moo:ended_transform_moo_preds).
@@ -124,6 +124,7 @@ end_transform_moo_preds:- retractall(moo:ended_transform_moo_preds),asserta(moo:
 :-module_transparent(check_term_expansions/0).
 
 do_term_expansions:- context_module(CM), notrace(moo:do_term_expansions(CM)).
+do_term_expansions(_):- thread_self(ID),moo:always_expand_on_thread(ID),!.
 do_term_expansions(_):- always_transform_heads,not(prevent_transform_moo_preds),!.
 do_term_expansions(CM):- may_moo_term_expand(CM),!, not(ended_transform_moo_preds), not(prevent_transform_moo_preds).
 
@@ -333,9 +334,9 @@ current_context_module(Ctx):-context_module(Ctx).
 :- decl_mpred action_info/1.
 :- decl_mpred action_help/2.
 :- decl_mpred action_rules/4.
-:- decl_mpred agent_text_command/4.
-:- decl_mpred createableSubclassType/2.
-:- decl_mpred createableType/1.
+:- dynamic_multifile_exported agent_text_command/4.
+:- decl_mpred createableSubclassType(type,type).
+:- decl_mpred createableType(type).
 :- decl_mpred label_type_props/3.
 :- decl_mpred label_type/2.
 :- decl_mpred specifier_text/2.

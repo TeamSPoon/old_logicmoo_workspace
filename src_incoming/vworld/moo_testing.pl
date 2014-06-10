@@ -30,12 +30,12 @@
 run_mud_tests:-
   forall(dyn:mud_test(Name,Test),run_mud_test(Name,Test)).
 
-dyn:action_help(tests,"run run_mud_tests/0").
+moo:action_help(tests,"run run_mud_tests/0").
 
 moo:agent_call_command(_Agent,tests) :- scan_updates, run_mud_tests.
 
 
-dyn:action_help(test(term),"run tests containing term").
+moo:action_help(test(term),"run tests containing term").
 
 moo:agent_call_command(_Gent,test(Obj)):- term_test(Obj).
 
@@ -48,7 +48,7 @@ test_false(SomeGoal):- not(SomeGoal); (last_test_name(String),dmsg(moo_test(fail
 term_test(Obj):-
    doall((
    dyn:mud_test(H,B),
-   use_term_listing(Obj,dyn:mud_test(H,B)),
+   use_term_listing(Obj,dyn:mud_test(H,B),true),
    dyn:mud_test(H,B),
    fail)).
 

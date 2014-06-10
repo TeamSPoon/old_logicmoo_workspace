@@ -1179,7 +1179,7 @@ bugger_expand_term(T,_):- bdmsg(bugger_expand_term(T)),fail.
 
 
 
-% user:expand_goal(G,G2):- compound(G),bugger_expand_goal(G,G2),!.
+% user:     expand_goal(G,G2):- compound(G),bugger_expand_goal(G,G2),!.
 
 
 % user:goal_expansion(G,G2):- compound(G),bugger_goal_expansion(G,G2).

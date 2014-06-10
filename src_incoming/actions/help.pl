@@ -8,8 +8,8 @@
 :- moo:register_module_type(command).
 
 moo:type_action_help(agent, help, "shows this help").
-moo:type_action_help(_What,TEMPL,Help):-dyn:action_help(TEMPL,Help).
-moo:type_action_help(_What,TEMPL,S):-dyn:action_info(TEMPL),sformat(S,'Prolog looks like: ~q',[TEMPL]).
+moo:type_action_help(_What,TEMPL,Help):-moo:action_help(TEMPL,Help).
+moo:type_action_help(_What,TEMPL,S):-moo:action_info(TEMPL),sformat(S,'Prolog looks like: ~q',[TEMPL]).
 
 % Help - A command to tell an agent all the possible commands
 moo:agent_call_command(_Agent,help) :- doall((moo:type_action_help(A,B,C),fmt(dyn:type_action_help(A,B,C)))).
