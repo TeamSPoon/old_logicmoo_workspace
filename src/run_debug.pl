@@ -124,7 +124,7 @@ ht:- do_player_action('s'),
 :- at_start(run_setup).
 
 
-:- noguitracer.
+:- catch(noguitracer,_,fail).
 
 % :- at_start(run).
 %:- run_setup.

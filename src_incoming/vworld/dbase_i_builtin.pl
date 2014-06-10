@@ -193,6 +193,36 @@ moo:subclass(chargeable,item).
 moo:subclass(wearable,item).
 
 
+moo:ft_info(atom,atom(self)).
+moo:ft_info(apath(region,dir),formatted).
+moo:ft_info(string,string(self)).
+moo:ft_info(number,number(self)).
+moo:ft_info(type,isa(self,type)).
+moo:ft_info(dir,any_to_dir(self,_)).
+moo:ft_info(dice(int,int,int),formatted).
+moo:ft_info(xyz(region,int,int,int),formatted).
+moo:ft_info(list(type),formatted).
+moo:ft_info(term,nonvar(self)).
+moo:ft_info(id,nonvar(self)).
+moo:ft_info(prolog,true).
+moo:ft_info(rest,true).
+moo:ft_info(var,var(self)).
+moo:ft_info(action(prolog),formatted).
+
+moo:subft(var,prolog).
+moo:subft(term,prolog).
+moo:subft(atom,term).
+moo:subft(string,term).
+% moo:subft(number,term).
+moo:subft(id,term).
+
+moo:subft(int,integer).
+moo:subft(integer,number).
+moo:subft(dice,int).
+
+moo:formattype(FormatType):-moo:subclass(FormatType,formattype).
+moo:formattype(FormatType):-dbase:holds_t(isa, FormatType, formattype).
+
 moo:type_default_props(_Inst,food,[height(0)]).
 
 moo:specifier_text(Text,pred):- get_mpred_prop(_,arity(Text,_)).

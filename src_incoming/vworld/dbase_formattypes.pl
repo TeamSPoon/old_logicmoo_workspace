@@ -35,7 +35,7 @@ argIsa_call_0(Pred,N,Type):- holds_t(argIsa,Pred,N,Type),!.
 argIsa_call_0(Pred,N,Type):- holds_t(isa,Templ,mpred),functor(Templ,Pred,A),A>0,!,arg(N,Templ,Type).
 argIsa_call_0(Pred,N,Type):- get_mpred_prop(Pred,argsIsa(Templ)),!,arg(N,Templ,Type).
 argIsa_call_0(Func,N,Type):- get_functor(Func,F,_),F \= Func,argIsa_call_0(F,N,Type).
-argIsa_call_0(Pred,N,Type):- moo:ft_info(Templ,formatted),functor(Templ,Pred,A),A>0,!,arg(N,Templ,Type).
+argIsa_call_0(Pred,N,Type):- holds_t(ft_info,Templ,formatted),functor(Templ,Pred,A),A>0,!,arg(N,Templ,Type).
 
 argIsa_call_1(Prop,N1,Type):- is_2nd_order_holds(Prop),trace,dmsg(todo(define(argIsa_call(Prop,N1,'Second_Order_TYPE')))),
    Type=argIsaFn(Prop,N1).
@@ -168,13 +168,14 @@ correctAnyType(Op,A,Type,A):- trace,dmsg(warn(not(correctAnyType(Op,A,Type)))).
 
 correctType(_Op,A,Type,A):- (var(A);var(Type)),!. % ,trace,throw(failure(correctType(Op,A,Type))).
 correctType(_Op,O,argIsaFn(_,_),O):-!. %any_to_value(O,V).  %missing
-correctType(_Op,A,type,A):-atom(A),define_type(A).
-correctType(_Op,A,term,A):-!. % must(ground(A)).
+correctType(_Op,A,term,A):-!.
+correctType(_Op,A,prolog,A):-!.
 correctType(Op,[A|AA],list(T),LIST):-!,findall(OT,((member(O,[A|AA]),correctAnyType(Op,O,T,OT))),LIST).
 correctType(Op,A,list(T),[OT]):-!,correctAnyType(Op,A,T,OT).
 correctType(_Op,[],[],[]):-!.
 correctType(ask(Must),A,xyz(Region, int, int, int),xyz(AA, _, _, _)):-atom(A),correctType(ask(Must),A,Region,AA).
 correctType(Op,A,Type,AA):-correctFormatType(Op,A,Type,AAA),AA=AAA,!.
+correctType(_Op,A,type,A):-atom(A),define_type(A).
 correctType(_Op,A,Type,A):-atom(Type),
       dmsg(todo(isa_assert_type(Type))),
       define_type(Type),add(isa(A,Type)),!.
@@ -206,6 +207,7 @@ correctFormatType(_O,A,int,AA):- any_to_number(A,AA).
 correctFormatType(Op,A,integer,AA):-!,correctFormatType(Op,A,int,AA).
 correctFormatType(_O,A,number,AA):- must(any_to_number(A,AA)).
 correctFormatType(_O,A,string,AA):- must(text_to_string(A,AA)).
+correctFormatType(_O,A,prolog,AA):- A=AA.
 correctFormatType(_O,A,text,AA):- A=AA.
 correctFormatType(_O,A,verb,AA):- A=AA.
 correctFormatType(_O,A,term(_),AA):- A=AA.

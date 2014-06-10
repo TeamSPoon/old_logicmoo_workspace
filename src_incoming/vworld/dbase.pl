@@ -1005,16 +1005,15 @@ samef(X,Y):- hotrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci
 
 define_subtype(O,T):- define_type(O),define_type(T),add(moo:subclass(O,T)).
 
-:-decl_mpred( ft_info/2).
-:-decl_mpred( subft/2).
-:-decl_mpred( subclass/2).
-:-decl_mpred( isa/2).
+:-decl_mpred(ft_info(formattype,term)).
+:-decl_mpred(subft(formattype,formattype)).
+:-decl_mpred(subclass(type,type)).
+:-decl_mpred(isa/2).
 
 is_ft(S):-   holds_t(ft_info,S,_).
 is_ft(S):-   holds_t(subft,S,_).
 is_ft(S):-   holds_t(subclass,S,formattype).
 is_ft(S):-   holds_t(isa,S,formattype).
-
 
 
 :-export((
@@ -1031,6 +1030,7 @@ is_ft(S):-   holds_t(isa,S,formattype).
 expand_goal_correct_argIsa(A,B):-expand_goal(A,B).
 
 isa_type(Type):-req(isa(Type,type)).
+isa_type(Type):-req(isa(Type,formattype)).
 
 db_op_simpler(_,KB:Term,Term):-is_kb_module(KB).
 db_op_simpler(_,KB:Term,Term):-dbase_mod(KB).
@@ -1099,7 +1099,7 @@ db_op00(ask(Must),createableType(SubType)):-!, call_must(Must,is_creatable_type(
 db_op00(ask(Must),Term):-!,loop_check(db_op0(ask(Must),Term),db_query_lc(Must,Term)).
 db_op00(Op,Term):-!,loop_check_throw(db_op0(Op,Term)).
 
-db_op0(Op,Term):-not(compound(Term)),!,throw_safe(nc(db_op0(Op,Term))).
+db_op0(Op,Term):-not(compound(Term)),!,grtrace,throw_safe(nc(db_op0(Op,Term))).
 db_op0(Op,[holds_t,P|Args]):-atom(P),!,Goal=..[P|Args],db_op0(Op,Goal).
 db_op0(Op,KB:Term):-is_kb_module(KB),!,db_op(Op,Term).
 db_op0(Op,KB:Term):-dbase_mod(KB),!,db_op(Op,Term).
@@ -1507,37 +1507,6 @@ p2c_dir2('u','Up-Directly').
 p2c_dir2('d','Down-Directly').
 p2c_dir2('e','East-Directly').
 p2c_dir2('n','North-Directly').
-
-
-moo:ft_info(atom,atom(self)).
-moo:ft_info(apath(region,dir),formatted).
-moo:ft_info(string,string(self)).
-moo:ft_info(number,number(self)).
-moo:ft_info(type,isa(self,type)).
-moo:ft_info(dir,any_to_dir(self,_)).
-moo:ft_info(dice(int,int,int),formatted).
-moo:ft_info(xyz(region,int,int,int),formatted).
-moo:ft_info(list(type),formatted).
-moo:ft_info(term,nonvar(self)).
-moo:ft_info(id,nonvar(self)).
-moo:ft_info(prolog,true).
-moo:ft_info(rest,true).
-moo:ft_info(var,var(self)).
-moo:ft_info(action(prolog),formatted).
-
-moo:subft(var,prolog).
-moo:subft(term,prolog).
-moo:subft(atom,term).
-moo:subft(string,term).
-% moo:subft(number,term).
-moo:subft(id,term).
-
-moo:subft(int,integer).
-moo:subft(integer,number).
-moo:subft(dice,int).
-
-moo:formattype(FormatType):-moo:subclass(FormatType,formattype).
-moo:formattype(FormatType):-dbase:holds_t(isa, FormatType, formattype).
 
 :-include(dbase_i_builtin).
 
