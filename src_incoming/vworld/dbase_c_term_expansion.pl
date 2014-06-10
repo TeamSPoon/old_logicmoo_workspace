@@ -135,6 +135,8 @@ xcall_form(G1,G2):- nonvar(G1),
       univ_left(G2,[F|NewList]),!.
 xcall_form(G1,G1).
 
+:- meta_predicate mud_pred_expansion(+,+,+,-).
+
 mud_pred_expansion(_Prd,_HNH,G1,_):-not(compound(G1)),!,fail.
 mud_pred_expansion(_Prd,_HNH,_:G1,_):-var(G1),!,fail.
 mud_pred_expansion(_Prd,_HNH,G1,G2):- functor_safe(G1,F,_),xcall_t==F,!,G2 = (G1),!.

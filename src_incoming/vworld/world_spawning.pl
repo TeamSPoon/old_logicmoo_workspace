@@ -59,12 +59,12 @@ callStub(P,F,A):- predicate_property(P,number_of_clauses(N)),(N==1 -> (csdmsg(fa
 
 createStub(F,A):- dynamic(F/A),!. % functor(P,F,A),asserta((P:-callStub(P,F,A))).
 
-
+/*
 
 :- forall(member(F/A,[
       conflict_set/1,  
       cls/0,  
-      create_instance/3,  
+      %create_instance/3,  
       frinst/4,  
       list/1,  
       mea/1,  
@@ -84,6 +84,7 @@ createStub(F,A):- dynamic(F/A),!. % functor(P,F,A),asserta((P:-callStub(P,F,A)))
       nid/1
       ]),createStub(F,A)).
 
+*/
 
 % FOOPS - an integration of frames, forward chaining with LEX and MEA,
 % and Prolog.

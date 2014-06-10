@@ -150,6 +150,7 @@ moo:mpred(look:get_feet(agent,list(spatial)),[]).
 moo:mpred(look:get_near(agent,list(spatial)),[ask_module(look)]).
 moo:mpred(get_precepts(agent,list(spatial)),[ask_module(look)]).
 */
+mpred(mud_test(term,prolog)).
 
 mpred(assert_with_pred(mpred,term)).
 mpred(multi(mpred,int)).
@@ -274,7 +275,7 @@ multiValued(descriptionHere(term,string)).
 multiValued(description(term,string)).
 multiValued(keyword(term,string)).
 multiValued(kwLabel(term,string)).
-multiValued(act_affect(item,verb,effect)).
+multiValued(act_affect(item,verb,term(effect))).
 multiValued(memory(agent,term)).
 multiValued(wearing(agent,wearable)).
 multiValued(grid(region,int,int,object)).

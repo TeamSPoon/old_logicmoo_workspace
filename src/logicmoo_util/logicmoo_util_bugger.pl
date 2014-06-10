@@ -18,11 +18,11 @@
          inside_loop_check/1,
          is_loop_checked/1,
      programmer_error/1,
-     moo_hide_childs/1,
      forall_member/3,
      debugOnError0/1,
      global_pathname/2,
      printAll/2,
+     moo_hide_childs/1,
      debugOnFailure/1,
      module_notrace/1,
      user_use_module/1,
@@ -144,7 +144,8 @@ set_bugger_flag(F,V):-current_prolog_flag(F,_Old),set_prolog_flag(F,V),!.
 set_bugger_flag(F,V):-create_prolog_flag(F,V,[term]).
 
 
-:- meta_predicate moo_hide_childs(^).
+:- meta_predicate moo_hide_childs(:).
+:- module_transparent moo_hide_childs/0.
 
 :- meta_predicate atLeastOne3(+,^,^).
 :- meta_predicate atLeastOne0(^,^).
@@ -189,12 +190,13 @@ set_bugger_flag(F,V):-create_prolog_flag(F,V,[term]).
 :- meta_predicate notrace_call(^).
 :- meta_predicate debugCallF(^).
 
+:- module_transparent user_use_module/1.
 % user_use_module(What):-!, ensure_loaded(What).
-user_use_module(logicmoo(What)):- !, '@'(use_module(logicmoo(What)),'user').
-user_use_module(library(What)):- !, use_module(library(What)).
-user_use_module(What):- use_module(What). % '@'(use_module(What),'user').
+% user_use_module(logicmoo(What)):- !, '@'(use_module(logicmoo(What)),'user').
+% user_use_module(library(What)):- !, use_module(library(What)).
+user_use_module(What):- '@'(use_module(What),'user').
 
-:-user_use_module(logicmoo('logicmoo_util/logicmoo_util_library.pl')).
+:- '@'(use_module(logicmoo_util_library), 'user').
 
 
 :-dynamic inside_loop_check/1.
@@ -220,11 +222,6 @@ loop_check(BC,B,_TODO):-
     call(B),
     ignore(retract(inside_loop_check(BC)))).
 
-
-/*
-:-user_use_module(logicmoo('logicmoo_util/logicmoo_util_ctx_frame.pl')).
-:-user_use_module(logicmoo('logicmoo_util/logicmoo_util_strings.pl')).
-*/
 
  % cli_notrace(+Call) is nondet.
  % use call/1 with trace turned off
@@ -422,11 +419,10 @@ cmust(_):-bugger_flag(release,true),!.
 cmust(Call):-atLeastOne0(will_debug_else_throw(cmust(Call),Call),Call).
 
 % gmust is must with cmust
-gmust(True,Call):-catch((Call,True->true;throw(retry(gmust(True,Call)))),retry(gmust(True,_)),(trace,Call,True)).
+gmust(True,Call):-catch((Call,(True->true;throw(retry(gmust(True,Call))))),retry(gmust(True,_)),(trace,Call,True)).
 
 % must is used declaring the predicate must suceeed
-must(Call):-notrace(skipWrapper),!,Call.
-must(C):-atLeastOne0((dmsg(must(C)),debugCallF(C)),C).
+must(C):-atLeastOne0(debugCallWhy(must(C),C),C).
 
 throwOnFailure(Call):-atLeastOne0(throw(throwOnFailure(Call)),Call).
 ignoreOnError(CX):-ignore(catch(CX,_,true)).
@@ -434,7 +430,7 @@ ignoreOnError(CX):-ignore(catch(CX,_,true)).
 pause_trace(_):- notrace(((debug,visible(+all),leash(+exception),leash(+call)))),trace.
 
 debugCall(C):-notrace,dmsg(debugCall(C)),dumpST, pause_trace(errored(C)),ggtrace,C.
-debugCallWhy(Why, C):-notrace,dmsg(error(debugCallWhy(Why, C))),dumpST, pause_trace(debugCallWhy(Why, C)),ggtrace,C.
+debugCallWhy(Why, C):-notrace,dmsg(error(debugCallWhy(Why, C))),dumpST, pause_trace(debugCallWhy(Why, C)),grtrace,C.
 debugCallF(C):-notrace,dmsg(debugCallF(C)),dumpST, pause_trace(failed(C)),gftrace,C.
 
 debugOnError(C):- !, C.
@@ -591,19 +587,21 @@ programmer_error(E):-trace, randomVars(E),dmsg('~q~n',[error(E)]),trace,randomVa
 
 
 :-dhideTrace(atLeastOne/1).
-atLeastOne(Call):- atLeastOne0(will_debug_else_throw(atLeastOne(Call),Call),Call).
+atLeastOne(C):-atLeastOne0(debugCallWhy(atLeastOne(C),C),C).
 
 :-dhideTrace(atLeastOne0/2).
 % now using gensym counter instead of findall (since findall can make tracing difficult)
-atLeastOne0(_OnFail,Call):-!,Call.
+
+%old findall version
+atLeastOne0(_Else,OneA):-copy_term(OneA,One),findall(One,call(One),OneL),[_|_]=OneL,!,member(OneA,OneL).
+atLeastOne0(Else,_OneA):-!,Else.
+
+% better version I think but makes more tracing
 atLeastOne0(OnFail,Call):- gensym(atLeastOneCounter,Sym),flag(Sym,_,0),!, atLeastOne3(Sym,OnFail,Call).
 atLeastOne3(Sym,_NFail,Call):-call(Call),flag(Sym,C,C+1).
 atLeastOne3(Sym,OnFail,_All):-flag(Sym,Old,0),!, Old==0, % if old > 0 we want to fail 
          call(OnFail).
 
-%old findall version
-%atLeastOne1(OneA,_Else):-copy_term(OneA,One), findall(One,call(One),OneL),[_|_]=OneL,!,member(OneA,OneL).
-%atLeastOne1(_OneA,Else):-Else.
 
 
 

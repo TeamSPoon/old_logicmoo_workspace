@@ -26,17 +26,14 @@
 :- set_prolog_flag(double_quotes, atom).
 :- set_prolog_flag(double_quotes, string).
 
-% :- use_module(logicmoo_util_all).
-
-:- use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)).
-:- use_module(logicmoo(logicmoo_util/logicmoo_util_library)).
-:- use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)).
-:- use_module(logicmoo(logicmoo_util/logicmoo_util_strings)).
-:- use_module(logicmoo(logicmoo_util/logicmoo_util_terms)).
-:- use_module(logicmoo(logicmoo_util/logicmoo_util_dcg)).
-
-:- use_module(logicmoo(vworld/moo)).
-:- use_module(logicmoo(vworld/dbase)).
+:- '@'((use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)),
+         use_module(logicmoo(logicmoo_util/logicmoo_util_library)),
+         use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)),
+         use_module(logicmoo(logicmoo_util/logicmoo_util_strings)),
+         use_module(logicmoo(logicmoo_util/logicmoo_util_terms)),
+         use_module(logicmoo(logicmoo_util/logicmoo_util_dcg)),
+         use_module(logicmoo(vworld/moo)),
+         use_module(logicmoo(vworld/dbase))),'user').
 
 
 /*
@@ -117,63 +114,61 @@ make_qlfs:-
 :- catch(user_use_module(logicmoo(pldata/withvars_988)),_,true).
 
 
-:- ensure_moo_loaded(logicmoo(vworld/dbase_formattypes)).
-
 % logicmoo vworld mud server
-:- ensure_moo_loaded(logicmoo(vworld/world)).
-:- ensure_moo_loaded(logicmoo(vworld/toploop_npc)).
-:- ensure_moo_loaded(logicmoo(vworld/toploop_telnet)).
+:- user_use_module(logicmoo(vworld/world)).
+:- user_use_module(logicmoo(vworld/toploop_npc)).
+:- user_use_module(logicmoo(vworld/toploop_telnet)).
 
 
-:- ensure_moo_loaded(logicmoo(vworld/parser_e2c)).
-:- ensure_moo_loaded(logicmoo(vworld/parser_imperative)).
-:- ensure_moo_loaded(logicmoo(vworld/moo_testing)).
+:- user_use_module(logicmoo(vworld/parser_e2c)).
+:- user_use_module(logicmoo(vworld/parser_imperative)).
+:- user_use_module(logicmoo(vworld/moo_testing)).
 
 
 % NPC planners
-:- ensure_moo_loaded(logicmoo('mobs/monster.pl')).
+:- user_use_module(logicmoo('mobs/monster.pl')).
 
-:- ensure_moo_loaded(logicmoo('actions/look.pl')).
+:- user_use_module(logicmoo('actions/look.pl')).
 
 % :-module(user).
 %:-prolog.
 % end_of_file.
 
-:- ensure_moo_loaded(logicmoo('mobs/predator.pl')).
-:- ensure_moo_loaded(logicmoo('mobs/explorer.pl')).
-:- ensure_moo_loaded(logicmoo('mobs/prey.pl')).
-:- ensure_moo_loaded(logicmoo('mobs/mobs_conf.pl')).
-:- ensure_moo_loaded(logicmoo('mobs/vacuum.pl')).
+:- user_use_module(logicmoo('mobs/predator.pl')).
+:- user_use_module(logicmoo('mobs/explorer.pl')).
+:- user_use_module(logicmoo('mobs/prey.pl')).
+:- user_use_module(logicmoo('mobs/mobs_conf.pl')).
+:- user_use_module(logicmoo('mobs/vacuum.pl')).
 % :- include_moo_files('../src_incoming/mobs/?*.pl').
 
 
 % Action/Commands implementation
-:- ensure_moo_loaded(logicmoo('actions/drink.pl')).
-:- ensure_moo_loaded(logicmoo('actions/actions_db.pl')).
-:- ensure_moo_loaded(logicmoo('actions/attack.pl')).
-:- ensure_moo_loaded(logicmoo('actions/inventory.pl')).
-:- ensure_moo_loaded(logicmoo('actions/push.pl')).
-:- ensure_moo_loaded(logicmoo('actions/where.pl')).
-:- ensure_moo_loaded(logicmoo('actions/climb.pl')).
-:- ensure_moo_loaded(logicmoo('actions/move.pl')).
-:- ensure_moo_loaded(logicmoo('actions/any.pl')).
-:- ensure_moo_loaded(logicmoo('actions/drop.pl')).
-:- ensure_moo_loaded(logicmoo('actions/help.pl')).
-:- ensure_moo_loaded(logicmoo('actions/logon.pl')).
-:- ensure_moo_loaded(logicmoo('actions/get_set.pl')).
-:- ensure_moo_loaded(logicmoo('actions/sit.pl')).
-:- ensure_moo_loaded(logicmoo('actions/actions_conf.pl')).
-:- ensure_moo_loaded(logicmoo('actions/take.pl')).
-:- ensure_moo_loaded(logicmoo('actions/chat.pl')).
-:- ensure_moo_loaded(logicmoo('actions/use.pl')).
-:- ensure_moo_loaded(logicmoo('actions/stats.pl')).
-:- ensure_moo_loaded(logicmoo('actions/eat.pl')).
-:- ensure_moo_loaded(logicmoo('actions/teleport.pl')).
+:- user_use_module(logicmoo('actions/drink.pl')).
+:- user_use_module(logicmoo('actions/actions_db.pl')).
+:- user_use_module(logicmoo('actions/attack.pl')).
+:- user_use_module(logicmoo('actions/inventory.pl')).
+:- user_use_module(logicmoo('actions/push.pl')).
+:- user_use_module(logicmoo('actions/where.pl')).
+:- user_use_module(logicmoo('actions/climb.pl')).
+:- user_use_module(logicmoo('actions/move.pl')).
+:- user_use_module(logicmoo('actions/any.pl')).
+:- user_use_module(logicmoo('actions/drop.pl')).
+:- user_use_module(logicmoo('actions/help.pl')).
+:- user_use_module(logicmoo('actions/logon.pl')).
+:- user_use_module(logicmoo('actions/get_set.pl')).
+:- user_use_module(logicmoo('actions/sit.pl')).
+:- user_use_module(logicmoo('actions/actions_conf.pl')).
+:- user_use_module(logicmoo('actions/take.pl')).
+:- user_use_module(logicmoo('actions/chat.pl')).
+:- user_use_module(logicmoo('actions/use.pl')).
+:- user_use_module(logicmoo('actions/stats.pl')).
+:- user_use_module(logicmoo('actions/eat.pl')).
+:- user_use_module(logicmoo('actions/teleport.pl')).
 % :- include_moo_files('../src_incoming/actions/?*.pl').
 
 
 % standard footer to clean up any header defined states
-%:- ensure_moo_loaded(logicmoo(vworld/moo_footer)).
+%:- user_use_module(logicmoo(vworld/moo_footer)).
 
 % Define the agents traits, both for your agent and the world inhabitants. 
 % agent name and stats ([] = defaults).
@@ -197,10 +192,10 @@ make_qlfs:-
 % :- user_use_module(logicmoo(vworld/moo_header)).
 
 % These contain the definition of the object types.
-:- ensure_moo_loaded(logicmoo('objs/objs_misc_monster.pl')). 
+:- user_use_module(logicmoo('objs/objs_misc_monster.pl')). 
 
 % Load the map file (*.map.pl) appropriate for the world being used.
-:- ensure_moo_loaded(logicmoo('rooms/vacuum.map.pl')).
+:- user_use_module(logicmoo('rooms/vacuum.map.pl')).
 
 % puts world into running state
 % :- must(old_setup).

@@ -29,6 +29,7 @@
          */
          toUppercase/2,
          toLowercase/2,
+         any_to_atom/2,
          toPropercase/2,
          toCamelcase/2,
 

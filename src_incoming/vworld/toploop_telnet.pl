@@ -102,8 +102,8 @@ tick_tock:-
 do_player_action(VA):- debug, foc_current_player(Agent), do_player_action(Agent,VA),!.
 
 do_player_action(Agent,CMD):-var(CMD),!,fmt('unknown_var_command(~q,~q).',[Agent,CMD]).
-do_player_action(_,EOF):- end_of_file == EOF, tick_tock.
-do_player_action(_,''):-tick_tock.
+do_player_action(_,EOF):- end_of_file == EOF, !, tick_tock.
+do_player_action(_,''):-!, tick_tock.
 do_player_action(Agent,CMD):- call_agent_command(Agent, CMD),!.
 % do_player_action(Agent,CMD):- fmt('unknown_call_command(~q,~q).', trace, call_agent_command(Agent, CMD),!.
 do_player_action(Agent,CMD):-fmt('skipping_unknown_call_command(~q,~q).',[Agent,CMD]).

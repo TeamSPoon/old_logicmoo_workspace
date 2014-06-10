@@ -12,7 +12,6 @@
 % general assistance Dr. Donald Nute
 %
 */
-
 :- module(world,
 	[
         call_agent_command/2,
@@ -69,10 +68,12 @@
 
  ]).
 
+
 :-discontiguous create_instance_0/3.
 
 :-export((
-          create_instance/2,create_instance/3,
+          create_instance/2,
+          create_instance/3,
           create_instance_0/3,
           create_agent/1,
           create_agent/2)).
@@ -81,13 +82,6 @@
 
 :- include(logicmoo(vworld/moo_header)).
 :- moodb:register_module_type(utility).
-
-:- include(logicmoo('vworld/world_2d')).
-:- include(logicmoo('vworld/world_agent')).
-:- include(logicmoo('vworld/world_text')).
-:- include(logicmoo('vworld/world_effects')).
-:- include(logicmoo('vworld/world_events')).
-:- include(logicmoo('vworld/world_spawning')).
 
 :- meta_predicate intersect_pred(+,+,+,+,?,-).
 :- meta_predicate cached(0).
@@ -240,10 +234,16 @@ create_instance_0(T,Type,List):-moo:subclass(Type,MetaType),moo:createableType(M
    clr(atloc(P,_)),
    put_in_world(P).
 
-moo:createableType(type).
-f(X,Y):- hotrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci(XF,YF)))).
+%moo:createableType(type).
+%f(X,Y):- hotrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci(XF,YF)))).
 
 moo:type_default_props(_,agent,last_command(stand)).
 
+:- include(logicmoo('vworld/world_2d')).
+:- include(logicmoo('vworld/world_agent')).
+:- include(logicmoo('vworld/world_text')).
+:- include(logicmoo('vworld/world_effects')).
+:- include(logicmoo('vworld/world_events')).
+:- include(logicmoo('vworld/world_spawning')).
 
 :- include(logicmoo(vworld/moo_footer)).

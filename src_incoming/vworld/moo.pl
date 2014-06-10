@@ -51,12 +51,14 @@
 :- set_prolog_flag(double_quotes, atom).
 :- set_prolog_flag(double_quotes, string).
 
-:- use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)).
-:- use_module(logicmoo(logicmoo_util/logicmoo_util_library)).
-:- use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)).
-:- use_module(logicmoo(logicmoo_util/logicmoo_util_strings)).
-:- use_module(logicmoo(logicmoo_util/logicmoo_util_terms)).
-:- use_module(logicmoo(logicmoo_util/logicmoo_util_dcg)).
+:- '@'((use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)),
+         use_module(logicmoo(logicmoo_util/logicmoo_util_library)),
+         use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)),
+         use_module(logicmoo(logicmoo_util/logicmoo_util_strings)),
+         use_module(logicmoo(logicmoo_util/logicmoo_util_terms)),
+         use_module(logicmoo(logicmoo_util/logicmoo_util_dcg))),'user').
+
+% :- once(context_module(user);(trace,context_module(CM),writeq(context_module(CM)))).
 
 :-dynamic(moodb:dbase_mod/1).
 moodb:dbase_mod(dbase).
@@ -120,8 +122,10 @@ end_transform_moo_preds:- retractall(moodb:ended_transform_moo_preds),asserta(mo
 :-module_transparent(do_term_expansions/0).
 :-module_transparent(check_term_expansions/0).
 
-do_term_expansions:- always_transform_heads,not(prevent_transform_moo_preds),!.
-do_term_expansions:- context_module(CM),may_moo_term_expand(CM),!, not(ended_transform_moo_preds), not(prevent_transform_moo_preds).
+do_term_expansions:- context_module(CM), notrace(moodb:do_term_expansions(CM)).
+do_term_expansions(_):- always_transform_heads,not(prevent_transform_moo_preds),!.
+do_term_expansions(CM):- may_moo_term_expand(CM),!, not(ended_transform_moo_preds), not(prevent_transform_moo_preds).
+
 check_term_expansions:- not(do_term_expansions).
 
 :- dynamic registered_module_type/2.

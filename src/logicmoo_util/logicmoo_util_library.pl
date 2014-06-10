@@ -11,6 +11,7 @@
         [dynamic_transparent/1,
          upcase_atom_safe/2,
          get_module_of/2,
+         call_n_times/2,
          concat_atom_safe/3,
          makeArgIndexes/1,
          contains_singletons/1,
@@ -45,7 +46,7 @@
          make_list/3,
          multi_transparent/1]).
 
-:- '@'(use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)),'user').
+:- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)), 'user').
 
 % :-user_use_module(logicmoo(logicmoo_util/logicmoo_util_strings)).
 % :-user_use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)).
@@ -207,6 +208,7 @@ strip_f_module(P,P):-atom(P),!.
 strip_f_module(P,F):- notrace(string(P);is_list(P);atomic(P)), text_to_string(P,S),!,atom_string(F,S).
 strip_f_module(P,P).
 
+
 functor_safe(M:P,M:F,A):-var(P),atom(M),!,functor(P,F,A).
 functor_safe(P,F,A):-var(P),!,strip_f_module(F,F0),functor(P,F0,A).
 functor_safe(P,F,A):-compound(P),!,functor_safe_compound(P,F,A).
@@ -218,7 +220,16 @@ functor_safe_compound(P,F,A):- functor(P,F,A).
 functor_safe_compound(P,F,A):- var(F),strip_f_module(P,P0),!,functor(P0,F0,A),strip_f_module(F0,F),!.
 functor_safe_compound(P,F,A):- strip_f_module(P,P0),strip_f_module(F,F0),!,functor(P0,F0,A).
 
+% :- moo_hide_childs(functor_safe/2).
+% :- moo_hide_childs(functor_safe/3).
+
 :- meta_predicate at_start(0).
+
+call_n_times(0,_Goal):-!.
+call_n_times(1,Goal):-!,Goal.
+call_n_times(N,Goal):-between(2,N,_),Goal.
+call_n_times(_,Goal):-Goal.
+
 
 :-dynamic(at_started/1).
 at_start(Goal):-

@@ -73,7 +73,7 @@ start_servers :- startup_mod:if_version_greater(70111,user_use_module(logicmoo(l
 :- if_flag_true(fullStart, run_debug:start_servers).
 
 % [Required] load and start mud
-:- include(logicmoo('vworld/moo_startup')).
+:- ensure_loaded(logicmoo('vworld/moo_startup')).
 
 
 
@@ -91,8 +91,8 @@ load_default_game :- load_game(logicmoo('rooms/startrek.all.pl')).
 run_setup:-
    nodebug,
    debug,  
-   at_start(load_default_game),
-   register_timer_thread(npc_ticker,1,npc_tick_tock).
+   at_start(load_default_game),!,
+   register_timer_thread(npc_ticker,1,npc_tick_tock),!.
 
 run:-
    login_and_run.
@@ -123,7 +123,56 @@ ht:- do_player_action('s'),
 
 :- at_start(run_setup).
 
-:- at_start(run).
+
+:- noguitracer.
+
+% :- at_start(run).
+%:- run_setup.
+
+% do some sanity testing
+ht:- do_player_action('s'),
+   do_player_action(look),
+   do_player_action('s'),
+   do_player_action('s'),
+   do_player_action('e'),
+   do_player_action('e'),
+   do_player_action(look),
+   do_player_action('s'),
+   do_player_action('s').
+
+% :- at_start(start_servers).
+
+moo:mud_test(test_movedist,
+ (
+  foc_current_player(P),
+   test_name("teleport to main enginering"),
+   do_player_action('tp Area1000'),
+  test_true(req(inRegion(P,'Area1000'))),
+  % test_true(req(atloc(P,'Area1000'))),
+   test_name("set the move dist to 5 meters"),
+   do_player_action('@set movedist 5'),
+   test_name("going 5 meters"),
+   do_player_action('n'),
+   test_name("must be now be in corridor"),
+   test_true(req(inRegion(P,'Area1001'))),
+   do_player_action('@set movedist 1'),
+   call_n_times(5, do_player_action('s')),
+   do_player_action('s'),
+   test_name("must be now be back in engineering"),
+   test_true(req(inRegion(P,'Area1000'))))).
+
+moo:mud_test(drop_take,
+ (
+  do_player_action('drop food'),
+  do_player_action('take food')
+)).
+
+%:- run_mud_tests.
+
+:- at_start((debug,run_mud_tests)).
+
+:- at_start((debug,run)).
+
 
 % So scripted versions don't just exit
 :- at_start(prolog).

@@ -29,6 +29,8 @@ moo:grid_key( dt=dirt).
 moo:grid_key( ot=outlet).
 
 
+moo:type_grid(two,1, [ed,ed]).
+
 
 moo:type_grid(storage,1, [ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed]).
 moo:type_grid(storage,2, [ed,dt,dt,--,--,--,--,--,--,hw,hw,--,--,--,--,--,--,--,--,ed]).

@@ -362,5 +362,4 @@ doorLocation(_Room,0,0,_Z,nw).
 doorLocation(_Room,6,0,_Z,sw).
 doorLocation(_Room,_X,_Y,_Z,_Dir):-!,fail.
 
-% :- include(logicmoo(vworld/moo_footer)).
 
