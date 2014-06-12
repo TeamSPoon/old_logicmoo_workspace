@@ -40,6 +40,7 @@
          stringToCodelist/2,
          trim/2,
          clean_codes/2,
+         either_starts_with_icase/2,
          all_upper_atom/1,
          convert_to_string/2,
          atom_contains/2,
@@ -402,6 +403,7 @@ map_tree_to_list(_,IN,IN):-trace,must_assign([IN],IN).
 
 equals_icase(A,B):-string_ci(A,U),string_ci(B,U).
 starts_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),atom_concat(UB,_,UA).
+either_starts_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),(atom_concat(UB,_,UA);atom_concat(UA,_,UB)).
 starts_or_ends_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),(atom_concat(UB,_,UA);atom_concat(_,UA,UB)).
 ends_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),atom_concat(_,UB,UA).
 

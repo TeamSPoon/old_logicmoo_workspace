@@ -24,7 +24,7 @@
                    object_match/2,
                    object_string/2,
                    order_descriptions/3,
-                   get_specifier_text/2,
+                   get_term_specifier_text/2,
                    parseForTypes//2]).
 
 
@@ -34,6 +34,19 @@
 :- include(logicmoo(vworld/moo_header)).
 
 :- moo:register_module_type(utility).
+
+
+% =====================================================================================================================
+% get_agent_text_command/4
+% =====================================================================================================================
+:-export(get_agent_text_command/4).
+
+get_agent_text_command(Agent,VERB,AgentR,CMD):-debugOnError(loop_check(get_agent_text_command_0(Agent,VERB,AgentR,CMD),fail)).
+
+get_agent_text_command_0(Agent,ListIn,AgentR,CMD):- 
+   atLeastOneOrElse((between(1,4,Len),length(ListIn,Len),call_no_cuts(moo:agent_text_command(Agent,ListIn,AgentR,CMD))),
+       atLeastOneOrElse((call_no_cuts(moo:agent_text_command(Agent,ListIn,AgentR,CMD))),
+           (not(ListIn=[_|_]),call_no_cuts(moo:agent_text_command(Agent,[ListIn],AgentR,CMD))))).
 
 % ===========================================================
 % PARSE command
@@ -158,9 +171,9 @@ object_match(S,Obj):-
 
 :-debug.
 
-%dmsg_parserm(_).
+dmsg_parserm(_):-!.
 dmsg_parserm(D):-dmsg(D).
-%dmsg_parserm(_,_).
+dmsg_parserm(_,_):-!.
 dmsg_parserm(F,A):-dmsg(F,A).
 
 % ===========================================================
@@ -220,7 +233,7 @@ pos_word_formula('infinitive',Verb,Formula):- 'infinitive'(TheWord, Verb, _, _G1
 verb_alias_to_verb(IVERB,SVERB):- moo:verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.
 verb_alias_to_verb(IVERB,SVERB):-specifiedItemType(IVERB,verb,SVERB), IVERB \= SVERB.
 
-verb_matches("go",VERB):-!,VERB=go.
+% verb_matches("go",VERB):-!,VERB=go.
 verb_matches(SVERB,VERB):-samef(VERB,SVERB).
 
 parse_vp_templates(_Agent,SVERB,_ARGS,TEMPLATES):-
@@ -272,7 +285,6 @@ bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
 :-style_check(+singleton).
 
 moo:term_specifier_text(Dir,dir):-member_ci(Dir,[n,s,e,w,ne,nw,se,sw,u,d]).
-
 
 moo:term_specifier_text(Text,Subclass):-dyn:subclass(Subclass,spatialthing),mud_isa(X,Subclass),req(keyword(X,Text)).
 
@@ -350,16 +362,16 @@ parseFmt(and([L|List]),Term1) --> dcgAnd(parseForIsa(L,Term1),parseForIsa(and(Li
 parseFmt(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{specifiedItemType(String,Type,Term)}.
 
 specifiedItemType([String],Type,StringO):-nonvar(String),!,specifiedItemType(String,Type,StringO).
-specifiedItemType(String,Type,Inst) :- term_specifier_text(Inst,Type), equals_icase(Inst,String),!.
+specifiedItemType(String,Type,Inst) :- get_term_specifier_text(Inst,Type),starts_with_icase(Inst,String),!.
 specifiedItemType(String,Type,Inst):- instances_of_type(Inst,Type),object_match(String,Inst),!.
-specifiedItemType(String,Type,Longest) :- findall(Inst, (get_specifier_text(Inst,Type),starts_or_ends_with_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
+specifiedItemType(String,Type,Longest) :- findall(Inst, (get_term_specifier_text(Inst,Type),starts_or_ends_with_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
 specifiedItemType(A,T,AA):- is_ft(T), checkAnyType(tell(_),A,T,AAA),!,AA=AAA.
 specifiedItemType(A,T,AA):- checkAnyType(tell(parse),A,T,AAA),AA=AAA.
 
 instances_of_type(Inst,Type):- setof(Inst-Type,mud_isa(Inst,Type),Set),member(Inst-Type,Set).
 % instances_of_type(Inst,Type):- atom(Type), Term =..[Type,Inst], logOnError(req(Term)).
 
-get_specifier_text(Text,Type):- moo:term_specifier_text(Text,Type).
+get_term_specifier_text(Text,Type):- call_no_cuts(moo:term_specifier_text(Text,Type)).
 
 % :- include(logicmoo(vworld/moo_footer)).
 

@@ -94,10 +94,6 @@ call_agent_command_is_list(A,PeriodAtEnd,Result):-append(New,[(.)],PeriodAtEnd),
 
 % call_agent_command_is_list(A,LIST):- debug_or_throw(call_agent_command_is_list(A,LIST)),!.
 
-:-export(get_agent_text_command/4).
-get_agent_text_command(Agent,[VERB|SENT],AgentR,CMD):-!, once(moo:agent_text_command(Agent,[VERB|SENT],AgentR,CMD)).
-get_agent_text_command(Agent,VERB,AgentR,CMD):- once(moo:agent_text_command(Agent,[VERB],AgentR,CMD)).
-
 % =====================================================================================================================
 % call_agent_action_maybe_fail/2 -->  my_call_agent_action_maybe_fail/2
 % =====================================================================================================================

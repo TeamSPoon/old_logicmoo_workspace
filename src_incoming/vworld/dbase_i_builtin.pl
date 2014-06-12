@@ -82,7 +82,7 @@ moo:term_anglify(term_anglify(Term,Text),[prolog(Term),is,converted,to,english,u
 
 dyn:singleValued(type_max_damage(type,int)).
 
-dyn:multiValued(verb_alias(string,string)).
+dyn:argsIsa(verb_alias(string,string)).
 
 dyn:multiValued(label_type_props(string,type,list(props))).
 
