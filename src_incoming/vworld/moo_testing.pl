@@ -28,7 +28,7 @@
 
 % do some sanity testing (expects the startrek world is loaded)
 run_mud_tests:-
-  forall(dyn:mud_test(Name,Test),run_mud_test(Name,Test)).
+  forall(moo:mud_test(Name,Test),run_mud_test(Name,Test)).
 
 moo:action_help(tests,"run run_mud_tests/0").
 

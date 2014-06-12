@@ -10,10 +10,13 @@ term_listing(P,List):-term_listing_0(P,List).
 term_listing_0(Atom,UList):-
    ignore((catch(listing(Atom),_,fail))),
    doall(((
-   synth_clause_db(Atom,H,B),
+   synth_clause_for(Atom,H,B),
    use_term_listing(UList,H,B),
    show_term_listing(H,B),
    fail))).
+
+synth_clause_for(C,H,B):-compound(C),!,synth_clause_comp(C,H,B).
+synth_clause_for(_Atom,H,B):- cur_predicates(List),!,member(H,List),synth_clause_db(H,B).
 
 synth_clause_comp(H,H,info(Props)):-pred_info(H,Props).
 synth_clause_comp(H,B):-predicate_property_h(H,number_of_clauses(_)),!,clause(H,B).
@@ -22,8 +25,6 @@ synth_clause_comp(H,H,database_req):-req(H).
 synth_clause_db(H,info(Props)):- pred_info(H,Props).
 synth_clause_db(H,B):-predicate_property_h(H,number_of_clauses(_)),!,clause(H,B).
 
-synth_clause(C,H,B):-compound(C),!,synth_clause_comp(C,H,B).
-synth_clause(_Atom,H,B):- cur_predicates(List),!,member(H,List),synth_clause_db(H,B).
 
 
 use_term_listing([],_,_):-!.
