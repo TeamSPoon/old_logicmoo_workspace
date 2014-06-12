@@ -2,7 +2,7 @@
 export OLDPWD="`pwd`"
 export NEWPWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/src && pwd )"
 #export SWIPL=/usr/local/lib/swipl-7.1.11/bin/x86_64-linux/swipl
-export RUNFILE="run_debug.pl"
+export RUNFILE="run.pl"
 if [ $# -eq 0 ] 
  then
     echo "No arguments supplied"
