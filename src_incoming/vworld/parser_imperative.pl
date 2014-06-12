@@ -188,10 +188,10 @@ parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL):- !,
 
 
 parse_agent_text_command_1(Agent,VERB,ARGS,NewAgent,GOAL):- 
-   call_no_cuts(moo:agent_text_command(Agent,[VERB|ARGS],NewAgent,GOAL)).
+   get_agent_text_command(Agent,[VERB|ARGS],NewAgent,GOAL).
 
 parse_agent_text_command_1(Agent,SVERB,ARGS,NewAgent,GOAL):- 
-   call_no_cuts(moo:agent_text_command(Agent,[VERB|ARGS],NewAgent,GOAL)),
+   get_agent_text_command(Agent,[VERB|ARGS],NewAgent,GOAL),
    verb_matches(SVERB,VERB).
 
 % parses a verb phrase and retuns one interpretation (action)
@@ -223,15 +223,15 @@ verb_alias_to_verb(IVERB,SVERB):-specifiedItemType(IVERB,verb,SVERB), IVERB \= S
 verb_matches("go",VERB):-!,VERB=go.
 verb_matches(SVERB,VERB):-samef(VERB,SVERB).
 
-parse_vp_templates(Agent,SVERB,ARGS,TEMPLATES):-
+parse_vp_templates(_Agent,SVERB,_ARGS,TEMPLATES):-
    findall([VERB|TYPEARGS],
     ((     
-     call_no_cuts(type_action_help(_What,TEMPL,_)),
+      get_type_action_help(_What,TEMPL,_),
     % mud_isa(Agent,What),
      TEMPL=..[VERB|TYPEARGS],
      verb_matches(SVERB,VERB))),
      TEMPLATES_FA),
-    ( TEMPLATES_FA=[] -> trace_or_throw(noTemplates(Agent,SVERB,ARGS)); true),
+    % ( TEMPLATES_FA=[] -> (dmsg(noTemplates(Agent,SVERB,ARGS)),!,fail); true),
    sort(TEMPLATES_FA,TEMPLATES),!.
    
 % parses a verb phrase and retuns multiple interps

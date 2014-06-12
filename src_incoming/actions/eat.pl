@@ -31,7 +31,7 @@ moo:agent_call_command(Agent,eat(SObj)) :-
         object_match(SObj,Obj),
 	worth(Agent,eat,Obj),
 	del(possess(Agent,Obj)),
-	moo:update_charge(Agent,eat).
+	call_update_charge(Agent,eat).
 
 moo:update_charge(Agent,eat) :-
 	del(charge(Agent,Old)),

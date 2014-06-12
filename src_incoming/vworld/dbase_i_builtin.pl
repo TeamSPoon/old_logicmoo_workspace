@@ -225,7 +225,6 @@ dyn:subft(integer,number).
 dyn:subft(dice,int).
 
 dyn:formattype(FormatType):-dyn:subclass(FormatType,formattype).
-dyn:formattype(FormatType):-dbase:holds_t(isa, FormatType, formattype).
 
 moo:type_default_props(self,food,[height(0)]).
 

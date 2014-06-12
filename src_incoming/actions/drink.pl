@@ -22,7 +22,7 @@ moo:agent_call_command(Agent,drink(SObj)) :-
         object_match(SObj,Obj),
 	worth(Agent,drink,Obj),
 	del(possess(Agent,Obj)),
-	moo:update_charge(Agent,eat).
+	call_update_charge(Agent,eat).
 
 moo:update_charge(Agent,drink) :-
 	del(charge(Agent,Old)),

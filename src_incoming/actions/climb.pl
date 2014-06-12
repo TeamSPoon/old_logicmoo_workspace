@@ -29,18 +29,18 @@ moo:agent_call_command(Agent,climb(Dir)) :-
 	move_dir_target(LOC,Dir,XXYY),
 	can_move_into(LOC,XXYY),
 	in_world_move(_,Agent,Dir),
-	moo:update_stats(Agent,trip),
-	moo:update_charge(Agent,climb).
+	call_update_stats(Agent,trip),
+	call_update_charge(Agent,climb).
 % Object is too high to climb, or it is another agent. 
 moo:agent_call_command(Agent,climb(Dir)) :-
 	
 	\+ climbable(Agent,Dir),
-	moo:update_stats(Agent,pulled),
-	moo:update_charge(Agent,climb).
+	call_update_stats(Agent,pulled),
+	call_update_charge(Agent,climb).
 % Successful climb
 moo:agent_call_command(Agent,climb(Dir)) :-	
 	in_world_move(_,Agent,Dir),
-	moo:update_charge(Agent,climb).
+	call_update_charge(Agent,climb).
 
 % Test to see if agent can climb the object
 climbable(Agent,Dir) :-

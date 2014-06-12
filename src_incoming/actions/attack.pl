@@ -26,7 +26,7 @@ moo:agent_call_command(Agent,attack(Dir)) :-
 	move_dir_target(LOC,Dir,XXYY),
 	atloc(What,XXYY),
 	damage_foe(Agent,What,hit),
-	moo:update_charge(Agent,attack).
+	call_update_charge(Agent,attack).
 
 % Destroy small objects (food, etc.)
 moo:agent_call_command(Agent,attack(Dir)) :-	
@@ -35,7 +35,7 @@ moo:agent_call_command(Agent,attack(Dir)) :-
 	atloc(What,XXYY),	
 	props(What,weight(1)),
 	destroy_object(XXYY,What),
-	moo:update_charge(Agent,attack).
+	call_update_charge(Agent,attack).
 
 % Hit a big object... causes damage to agent attacking
 moo:agent_call_command(Agent,attack(Dir)) :-	
@@ -44,16 +44,16 @@ moo:agent_call_command(Agent,attack(Dir)) :-
 	atloc(What,XXYY),	
 	What \== 0,
 	props(What,weight(_)),
-	moo:update_stats(Agent,bash),
-	moo:update_charge(Agent,attack).
+	call_update_stats(Agent,bash),
+	call_update_charge(Agent,attack).
 
 % Hit nothing (empty space)... causes a little damage
 moo:agent_call_command(Agent,attack(Dir)) :-	
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	not(atloc(_,XXYY)),
-	moo:update_stats(Agent,wiff),
-	moo:update_charge(Agent,attack).
+	call_update_stats(Agent,wiff),
+	call_update_charge(Agent,attack).
 
 % Check to see if agent being attacked is carrying an 
 % object which provides defence

@@ -27,8 +27,8 @@ moo:agent_call_command(Agent,push(Dir)) :-
 	atloc(What,XXYY),
 	integer(What),
 	in_world_move(_,Agent,Dir),
-	moo:update_stats(Agent,strain),
-	moo:update_charge(Agent,push).
+	call_update_stats(Agent,strain),
+	call_update_charge(Agent,push).
 
 % Pushing what cannot be pushed
 % Some damage and loss of charge (same as normal push)
@@ -37,8 +37,8 @@ moo:agent_call_command(Agent,push(Dir)) :-
 	move_dir_target(LOC,Dir,XXYY),
 	atloc(What,XXYY),
 	\+ pushable(Agent,What,XXYY,Dir),
-	moo:update_stats(Agent,hernia),
-	moo:update_charge(Agent,push).
+	call_update_stats(Agent,hernia),
+	call_update_charge(Agent,push).
 
 % A successful PUSH
 moo:agent_call_command(Agent,push(Dir)) :-	
@@ -47,7 +47,7 @@ moo:agent_call_command(Agent,push(Dir)) :-
 	atloc(What,XXYY),
 	move_object(XXYY,What,Dir),
 	in_world_move(_,Agent,Dir),
-	moo:update_charge(Agent,push).
+	call_update_charge(Agent,push).
 
 % Can the Object be pushed?
 pushable(Agent,Obj,LOC,Dir) :-

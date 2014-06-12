@@ -255,7 +255,7 @@ check_for_fall(LOC,XXYY,Agent) :-
 	props(LowObj,height(Hl)),
 	Hd is Hh - Hl,
 	Hd > 1,
-	moo:update_stats(Agent,fall).
+	call_update_stats(Agent,fall).
 check_for_fall(_,_,_).
 
 

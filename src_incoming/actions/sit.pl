@@ -15,13 +15,15 @@ is_posture(stand).
 is_posture(lay).
 is_posture(kneel).
 
+moo:agent_text_command(Agent,[Sit],Agent,Sit) :-is_posture(Sit).
+
 moo:action_help(Posture,text("sets and agent's posture to ",Posture)):-is_posture(Posture).
 
 % Sit - do nothing.
 moo:agent_call_command(Agent,Sit) :-is_posture(Sit),
         fmt('agent ~w is now ~wing ',[Agent,Sit]),
         padd(Agent,posture(Sit)),
-	moo:update_charge(Agent,Sit).
+	call_update_charge(Agent,Sit).
 
 moo:update_charge(Agent,Sit) :- is_posture(Sit), padd(Agent,[charge(-1)]).
 

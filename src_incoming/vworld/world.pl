@@ -174,7 +174,6 @@ create_agent(P):-create_agent(P,[]).
 create_agent(P,List):-must(create_instance_0(P,agent,List)).
 
 formattype(FormatType):-dyn:subclass(FormatType,formattype).
-formattype(FormatType):-dbase:holds_t(isa, FormatType, formattype).
 
 create_instance(What,Type,Props):-number(What),trace_or_throw(create_instance(What,Type,Props)).
 create_instance(What,Type,Props):-create_instance_0(What,Type,Props),dmsg(done(create_instance(What,Type,Props))),!.

@@ -67,10 +67,10 @@ call_agent_command_maybe_fail(_Gent,Atom,done(OneCmd)):- atom(Atom), catch((
              doall((call_expanded(OneCmd),fmt('Yes: ~w',[VARS]))))),_,fail),!.
 
 % atom with stuff
-call_agent_command_maybe_fail(Agent,Atom,Result):-once((atom(Atom),atomSplit(Atom,List),length(List,Len))),Len>1,call_agent_command_maybe_fail(Agent,List,Result),!.
+call_agent_command_maybe_fail(Agent,Atom,Result):-once((atom(Atom),atomSplit(Atom,List),length(List,Len))),Len>1,!,call_agent_command_maybe_fail(Agent,List,Result),!.
 
 % other stuff
-call_agent_command_maybe_fail(Agent,Comp,Result):- compound(Comp),safe_univ(Comp,List),call_agent_command_is_list(Agent,List,Result),!.
+call_agent_command_maybe_fail(Agent,Comp,Result):- compound(Comp),safe_univ(Comp,List),!,call_agent_command_is_list(Agent,List,Result),!.
 
 % =====================================================================================================================
 % call_agent_command_is_list/2 -->  call_agent_action/2
@@ -78,24 +78,25 @@ call_agent_command_maybe_fail(Agent,Comp,Result):- compound(Comp),safe_univ(Comp
 % join up @ verbs 
 call_agent_command_is_list(Ag,[A,B|REST],Result):- atom(A),atom(B),member(A,['@']),atom_concat(A,B,C),!,call_agent_command_is_list(Ag,[C|REST],Result),!.
 
-call_agent_command_is_list(Agent,[VERB|SENT],Result):-
-   once((call_no_cuts(moo:agent_text_command(Agent,[VERB|SENT],AgentR,CMD)),
-   safe_univ(CMDOLD ,[VERB|SENT]),
-   once(CMDOLD\=CMD;Agent\=AgentR))),
-   call_agent_action_maybe_fail(AgentR,CMD,Result),!.
-
 call_agent_command_is_list(Agent,[VERB|ARGS],Result):-
      once(( parser_imperative:parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD))),
-      must(call_agent_action_maybe_fail(NewAgent,CMD,Result)),!.
+      (call_agent_action_maybe_fail(NewAgent,CMD,Result)),!.
 
-call_agent_command_is_list(A,[L,I|IST],Result):- atom(L), safe_univ(CMD , [L,I|IST]), call_agent_action_maybe_fail(A,CMD,Result),!.
+call_agent_command_is_list(Agent,[VERB|SENT],Result):-
+   get_agent_text_command(Agent,[VERB|SENT],AgentR,CMD),
+   safe_univ(CMDOLD ,[VERB|SENT]),   
+   once(CMDOLD\=CMD;Agent\=AgentR),call_agent_action_maybe_fail(AgentR,CMD,Result),!.
+
 call_agent_command_is_list(A,[L|IST],Result):- atom(L), safe_univ(CMD , [L|IST]), call_agent_action_maybe_fail(A,CMD,Result),!.
-call_agent_command_is_list(A,[L],Result):- call_agent_action_maybe_fail(A,L,Result),!. 
 
 % remove period at end
 call_agent_command_is_list(A,PeriodAtEnd,Result):-append(New,[(.)],PeriodAtEnd),!,call_agent_command_maybe_fail(A,New,Result),!.
 
 % call_agent_command_is_list(A,LIST):- debug_or_throw(call_agent_command_is_list(A,LIST)),!.
+
+:-export(get_agent_text_command/4).
+get_agent_text_command(Agent,[VERB|SENT],AgentR,CMD):-!, once(moo:agent_text_command(Agent,[VERB|SENT],AgentR,CMD)).
+get_agent_text_command(Agent,VERB,AgentR,CMD):- once(moo:agent_text_command(Agent,[VERB],AgentR,CMD)).
 
 % =====================================================================================================================
 % call_agent_action_maybe_fail/2 -->  my_call_agent_action_maybe_fail/2

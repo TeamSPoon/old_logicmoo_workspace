@@ -129,7 +129,6 @@ testOpenCyc/0]).
 
 hook:decl_database_hook(AR,C):- record_on_thread(dbase_change,changing(AR,C)).
 record_on_thread(Dbase_change,O):- thread_self(ID),capturing_changes(ID,Dbase_change),!,Z=..[Dbase_change,ID,O],assertz(Z).
-record_on_thread(Dbase_change,O):- ignore((thread_self(ID),Z=..[Dbase_change,ID,O],assertz(Z))).
 
 :- decl_mpred(ft_info,2).
 :- decl_mpred(subft,2).
@@ -1061,6 +1060,7 @@ db_tell_isa_hooked(I,T):- is_creatable_type(ST),holds_t(subclass,T,ST),call_afte
 %db_tell_isa_hooked(food5,'Weapon'):-trace_or_throw(db_tell_isa(food5,'Weapon')).
 %db_tell_isa_hooked(I,T):-dmsg((told(db_tell_isa(I,T)))).
 
+define_ft(FT):- db_tell_isa(FT,formattype).
 
 get_isa_backchaing(A,T):-var(T),!,get_isa_asserted_0(A,T).
 get_isa_backchaing(_,A):- not(defined_type(A)),!,fail.
@@ -1071,11 +1071,14 @@ get_isa_backchaing(A,Fmt):- get_isa_asserted(A,Fmt).
 
 get_isa_asserted(A,Fmt):-get_isa_asserted_0(A,Fmt).
 
-get_isa_asserted_0(A,argsIsa):- mpred_functor(argsIsa),!, mpred_prop(_,argsIsa(A)).
+get_isa_asserted_0(A,ArgsIsa):- nonvar(ArgsIsa),mpred_functor(ArgsIsa,A,Prop),!, mpred_prop(_,Prop).
 get_isa_asserted_0(A,Fmt):- call_t(dac(d,a,no_c,no_mt),isa,A,Fmt).
+get_isa_asserted_0(A,ArgsIsa):- mpred_functor(ArgsIsa,A,Prop),!, mpred_prop(_,Prop).
 
-mpred_functor(argsIsa).
-mpred_functor(singleValued).
+mpred_functor(argsIsa,A,argsIsa(A)).
+mpred_functor(singleValued,_,singleValued).
+mpred_functor(multi,_,multi(_)).
+mpred_functor(multiValued,_,multiValued(_)).
 
 
 equivRule_call(A,B):- holds_t(equivRule,A,B).
@@ -1142,10 +1145,13 @@ db_op0(Op,nameString(A,S0)):- determinerRemoved(S0,String,S),!,db_op(Op, nameStr
 db_op0(Op,Term):- notrace((equivRule_call(Term,NewTerm),not(contains_singletons(NewTerm)))),db_op(Op,NewTerm).
 db_op0(Op,Term):- notrace((forwardRule_call(Term,NewTerm),not(contains_singletons(NewTerm)))),db_op(Op,NewTerm).
 
-db_op0(tell(_OldV),mpred(A)):- decl_mpred(A),!.
-db_op0(tell(_OldV),singleValued(Term)):- !,add(mpred(Term)),add_mpred_prop(Term,singleValued).
-db_op0(tell(OldV),multiValued(Term)):- !,functor_safe(Term,_F,A),db_op(tell(OldV),mpred(Term,multi(A))).
-db_op0(tell(_OldV),isa(A,mpred)):- decl_mpred(A),!.
+db_op0(tell(_OldV), subclass(I,T)):- (atomic(I)->define_type(I);true) ,  (atomic(T)->define_type(T);true), fail.
+db_op0(tell(_OldV), subft(I,T)):- (atomic(I)->define_ft(I);true) ,  (atomic(T)->define_ft(T);true), fail.
+
+db_op0(tell(_OldV),mpred(A)):- !,decl_mpred(A),!.
+db_op0(tell(_OldV),isa(A,mpred)):- !,decl_mpred(A),!.
+db_op0(tell(_OldV),singleValued(Term)):- !,decl_mpred(Term),add_mpred_prop(Term,singleValued).
+db_op0(tell(_OldV),multiValued(Term)):- !,functor_safe(Term,_,A),decl_mpred(Term),add_mpred_prop(Term,[multiValued,multi(A)]).
 
 db_op0(ask(Must),get_isa(Term,Var)):- !,call_must(Must,get_isa_asserted(Term,Var)).
 db_op0(ask(Must),isa(Term,Var)):- !,call_must(Must,get_isa_backchaing(Term,Var)).

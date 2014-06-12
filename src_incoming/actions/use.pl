@@ -11,7 +11,7 @@
 
 :- moo:register_module_type(command).
 
-mpred(action_verb_useable(verb,term(mpred),type,term(mpred))).
+dyn:argsIsa(action_verb_useable(verb,term(mpred),type,term(mpred))).
 
 moo:action_verb_useable(wear,wearing,wearable,stowed).
 moo:action_verb_useable(hold,holding,wieldable,stowed).
@@ -35,12 +35,12 @@ moo:agent_call_command(Agent,SENT) :-
 	props(Obj, weight =< 1),
 	worth(Agent,USE,Obj),
 	do_permanence(USE,Agent,Obj),
-	moo:update_charge(Agent,USE).
+	call_update_charge(Agent,USE).
 %Nothing to use
 moo:agent_call_command(Agent,SENT) :-
   get_use_verbs(USE,_USING,_USABLE,_STOWED),
     SENT=..[USE,_Obj],
-	moo:update_charge(Agent,USE),
+	call_update_charge(Agent,USE),
 	add(failure(Agent,USE)).
 
 % Is the obect going to stick around after usen, either as is

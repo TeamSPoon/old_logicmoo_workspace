@@ -19,11 +19,11 @@ synth_clause_for(C,H,B):-compound(C),!,synth_clause_comp(C,H,B).
 synth_clause_for(_Atom,H,B):- cur_predicates(List),!,member(H,List),synth_clause_db(H,B).
 
 synth_clause_comp(H,H,info(Props)):-pred_info(H,Props).
-synth_clause_comp(H,B):-predicate_property_h(H,number_of_clauses(_)),!,clause(H,B).
-synth_clause_comp(H,H,database_req):-req(H).
+synth_clause_comp(H,B):-predicate_property_h(H,number_of_clauses(_)),ok_pred(H),clause(H,B).
+% synth_clause_comp(H,H,database_req):-req(H).
 
 synth_clause_db(H,info(Props)):- pred_info(H,Props).
-synth_clause_db(H,B):-predicate_property_h(H,number_of_clauses(_)),!,clause(H,B).
+synth_clause_db(H,B):-predicate_property_h(H,number_of_clauses(_)),ok_pred(H),clause(H,B).
 
 
 
@@ -49,19 +49,20 @@ use_term_listing(HO,HO):- synth_clause_db(H,B), use_term_listing(HO,H,B).
 
 :-dynamic cur_predicates/1.
 cur_predicates(List):-setof(P,(cur_predicate(P),ok_pred(P)),List),asserta(cur_predicates(List)),!.
-cur_predicate(P):-current_predicate(_:F/A),functor(P,F,A).
+%cur_predicate(P):-current_predicate(_:F/A),functor(P,F,A).
 cur_predicate(P):-current_predicate(F/A),functor(P,F,A).
-cur_predicate(P):-predicate_property_h(P,_).
+%cur_predicate(P):-predicate_property_h(P,_).
 
 predicate_property_h(H,P):- predicate_property(H,P).
 
 ok_pred(P):-not(bad_pred(P)).
-bad_pred(P):-predicate_property(P,foriegn).
+bad_pred(P):-functor(P,F,A),arg(_,v(db_op/_,db_op00/_,db_op0/_,db_op_loop/_,do_expand_args_l/3),F/A).
+bad_pred(P):-predicate_property(P,autoloaded(_)).
+bad_pred(P):-predicate_property(P,imported_from(_)),predicate_property(P,static).
+bad_pred(P):-predicate_property(P,foreign).
 bad_pred(P):-predicate_property(P,nodebug).
-bad_pred(P):-functor(P,F,A),arg(_,v(db_op/_,db_op00/_,db_op0/_,db_op_loop/_),F/A).
-bad_pred(P):-predicate_property(P,imported_from(M)),predicate_property(P,static).
 
-pred_info(H,Props):- findall(PP,predicate_property_h(H,PP),Props1),findall(used_by(M),predicate_property(M:H,_),Props2),append(Props1,Props2,Props3),sort(Props3,Props).
+pred_info(H,Props):- findall(PP,predicate_property_h(H,PP),Props1),/*findall(used_by(M),predicate_property(M:H,_),Props2),*/ ignore(Props2=[]),append(Props1,Props2,Props3),sort(Props3,Props).
 
 
 show_term_listing(H,true):- !, show_term_listing(H).

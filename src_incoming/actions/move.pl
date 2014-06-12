@@ -20,9 +20,9 @@
 
 :- decl_mpred(movedist/2).
 
-moo:agent_text_command(Agent,[DirSS],Agent,move(Dir)):- catch(((any_to_atom(DirSS,Dir),grtrace,get_specifier_text(Dir,dir))),_,fail),!.
+moo:agent_text_command(Agent,[DirSS],Agent,move(Dir)):- nonvar(DirSS),catch(((any_to_atom(DirSS,Dir),get_specifier_text(Dir,dir))),_,fail),!.
 
-moo:agent_text_command(Agent,[DirSS],Agent,move(DirS)):- catch(((any_to_atom(DirSS,DirS),get_specifier_text(Dir,dir),catch((atom_concat(Dir,N,DirS),(atom_number(N,_))),_,fail))),_,fail).
+moo:agent_text_command(Agent,[DirSS],Agent,move(DirS)):-nonvar(DirSS), catch(((any_to_atom(DirSS,DirS),get_specifier_text(Dir,dir),catch((atom_concat(Dir,N,DirS),(atom_number(N,_))),_,fail))),_,fail).
 
 moo:agent_call_command(Agnt,Cmd):- functor(Cmd,move,_),!,
    must(move_command(Agnt,Cmd)).
@@ -69,8 +69,8 @@ move_command_1(Agent,Dir) :-
          ObjHt2 > ObjHt,
          ObjHt2 > 1,
 	!,
-	moo:update_stats(Agent,collide),
-	moo:update_charge(Agent,move),
+	call_update_stats(Agent,collide),
+	call_update_charge(Agent,move),
         raise_location_event(XXYY,collide(Agent,Obj2)),
    throw(giveup(collide(Agent,Obj2))).
 
@@ -82,8 +82,8 @@ move_command_1(Agent,Dir):-
 	is_3d(XXYY),
         atloc(Agent2,XXYY),
 	mud_isa(Agent2,agent),
-	moo:update_stats(Agent,collide),
-	moo:update_charge(Agent,move),
+	call_update_stats(Agent,collide),
+	call_update_charge(Agent,move),
         raise_location_event(XXYY,collide(Agent,Agent2)),
    throw(giveup(collide(Agent,Agent2))).
 
@@ -91,7 +91,7 @@ move_command_1(Agent,Dir):-
 %Move successfully
 move_command_1(Agent,Dir) :-
 	in_world_move(_,Agent,Dir),
-	moo:update_charge(Agent,move).
+	call_update_charge(Agent,move).
 
 %Record keeping
 
@@ -107,7 +107,7 @@ moo:action_info(go(dir)).
 moo:agent_call_command(Agent,go(Dir)) :-
 	atloc(Agent,LOC),
         in_world_move(LOC,Agent,Dir),
-	moo:update_charge(Agent,move).
+	call_update_charge(Agent,move).
 
 
 :- include(logicmoo(vworld/moo_footer)).

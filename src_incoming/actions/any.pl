@@ -32,12 +32,12 @@ moo:agent_call_command(Agent,ACT) :-
       action_requires_states(Agent,StateRules,REQS),
       action_removes_states(Agent,StateRules,REMS),
       action_adds_states(Agent,StateRules,ADDS),
-     moo:update_charge(Agent,VERB),
+     call_update_charge(Agent,VERB),
      ((
          req(REQS)) ->
          ((clr(REMS),
          add(ADDS),
-         moo:update_charge(Agent,VERB)));	
+         call_update_charge(Agent,VERB)));	
 %Nothing to use
       add(failure(Agent,SENT))).
 
