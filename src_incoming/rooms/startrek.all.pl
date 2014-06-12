@@ -23,7 +23,7 @@ dyn:type_grid('SpaceInAHOC',3, [--,--,--,--,--]).
 dyn:type_grid('SpaceInAHOC',4, [--,--,--,--,--]).
 dyn:type_grid('SpaceInAHOC',5, [--,--,--,--,--]).
 */
-% center of room is 3,3,1 (rooms ranges are (1-5,1-5,1-5)
+% center of room is 3,3,1 (rooms ranges are (1-5,1-5,1-5))
 
 % :- style_check(-singleton).
 :-set_prolog_flag(double_quotes,string).
@@ -38,8 +38,8 @@ predicates([
   pathName(region,dir,string),
   inRegion(agent,'BPVLocation'),
   possess(agent,'ProtectiveAttire'),
-  possess(agent,'PortableObject'),
   possess(agent,'Weapon'),
+  possess(agent,'PortableObject'),
   wearing(agent,'ProtectiveAttire'),
   wearing(agent,'PortableObject'),
 
@@ -494,10 +494,12 @@ somethingIsa('Area1037',['BPVLocation','Indoors-IsolatedFromOutside','SpaceInAHO
 somethingIsa('Area1040',['BPVLocation','FreeSpaceContent']).
 somethingIsa('Area1041',['BPVLocation','FreeSpaceContent']).
 somethingIsa('ShipMap123',[item]).
-verbOverride('ShipMap123',examine(this),
-  prologCall(fmt("
-STARSHIP ENTERPRISE
 
+:-style_check(-atom).
+/*
+verbOverride('ShipMap123',
+  examine(this),
+  prologCall(fmt("
              Turbolift               |                Ten Forward
                1010                  |                  1021
                  |                   |                     |
@@ -514,8 +516,15 @@ STARSHIP ENTERPRISE
                1000                  |                  1011
                                      |
               DECK 1                 |                DECK 2
+-------------------------------------+----------------------------------------
+"))).
+
+
+verbOverride('ShipMap123',examine(this),
+  prologCall(fmt("
+STARSHIP ENTERPRISE                                    
 -------------------------------------+-----------------------------------------
-                                     |
+
              Turbolift               |      Ready-----Bridge
                1032                  |     Room 1035    1038         
                  |                   |                    |
@@ -535,6 +544,7 @@ STARSHIP ENTERPRISE
 
 
 "))).
+*/
 %somethingIsa('Area4075',['BPVLocation']).
 
  /* found 141 for somethingIsa(_G1422,_G1423). */ 
@@ -917,7 +927,7 @@ somethingDescription('Area1004',["The Brig","You're in the dimly lit Brig","This
 *      **********************                     *
 *      ***********************  _________         *
 *              *****        ***(___  ____(        *
-*                            ***** \\ \\*           *
+*                            ***** \\ \\*          *
 *                             **********          *
 *                                                 *
 *          You are currently on deck 1            *

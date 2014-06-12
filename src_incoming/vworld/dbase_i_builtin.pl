@@ -12,7 +12,7 @@
 % the world is run.
 %
 % props(Obj,height(ObjHt))  == k(height,Obj,ObjHt) == rdf(Obj,height,ObjHt) == height(Obj,ObjHt)
-% padd(Obj,height(ObjHt))  == padd(height,Obj,ObjHt,...) == add(QueryForm)
+% padd(Obj,height(ObjHt))  == padd(height,Obj,ObjHt,...) == dyn(QueryForm)
 % kretract[all](Obj,height(ObjHt))  == kretract[all](Obj,height,ObjHt) == pretract[all](height,Obj,ObjHt) == del[all](QueryForm)
 % keraseall(AnyTerm).
 %
@@ -29,9 +29,9 @@
 :- (do_term_expansions->true;throw(not_term_expansions)).
 
 dyn:createableType(type).
-dyn:type(mpred).
+dyn:type(dyn:mpred).
 dyn:type(singleValued).
-dyn:expand_args(eachOf,subclass(eachOf(multiValued,negationByFailure,singleValued),mpred)).
+dyn:expand_args(eachOf,subclass(eachOf(multiValued,negationByFailure,singleValued),dyn:mpred)).
 
 % =================================================================================================
 % BEGIN world English
@@ -81,15 +81,15 @@ dyn:term_anglify(determinerString(Obj,Text),[np(Obj),is,uses,string(Text),as,a,d
 dyn:term_anglify(nameString(Obj,Text),[np(Obj),is,refered,to,as,string(Text)]).
 dyn:term_anglify(dyn:term_anglify(Term,Text),[prolog(Term),is,converted,to,english,using,prolog(Text)]).
 
-mpred(type_max_damage(type,int)).
+dyn:mpred(type_max_damage(type,int)).
 
-mpred(verb_alias(string,string)).
+dyn:mpred(verb_alias(string,string)).
 
-mpred(label_type_props(string,type,list(props))).
+dyn:mpred(label_type_props(string,type,list(props))).
 
-mpred(type_grid(type,int,term)).
+dyn:mpred(type_grid(type,int,term)).
 
-mpred(action_rules(agent,verb,term(object),term(list(props)))).
+dyn:mpred(action_rules(agent,verb,term(object),term(list(props)))).
 
 dyn:type_max_damage(object,500).
 dyn:type_max_charge(object,120).
@@ -115,6 +115,8 @@ verb_after_arg(_,_,1).
 
 :- begin_transform_moo_preds.
 
+% forwardRule(inRegion(O,Region),atloc(O,LOC)):-
+
 dbase_t(inRegion,O,Region):-atloc(O,LOC),world:locationToRegion(LOC,Region).
 dbase_t(inRegion,apath(Region,Dir),Region):- holds_t(pathBetween,Region,Dir,_To).
 
@@ -124,7 +126,7 @@ db_resultIsa(apath,areaPath).
 
 
 % prolog code
-dyn:mpred(CallSig,[ask_module(M),assert_with_pred(add),query_with_pred(call)]):-db_prop_prolog(M,CallSig).
+dyn:mpred(CallSig,[ask_module(M),assert_with_pred(dyn),query_with_pred(call)]):-db_prop_prolog(M,CallSig).
 
 
 % db_prop_prolog(world,nearby(object,object)).
@@ -149,21 +151,21 @@ dyn:mpred(label_type(string,type),[singleValued]).
 dyn:mpred(look:get_feet(agent,list(spatial)),[]).
 dyn:mpred(look:get_near(agent,list(spatial)),[ask_module(look)]).
 */
-mpred(get_precepts(agent,list(spatial)),[ask_module(look)]).
-mpred(mud_test(term,prolog)).
+dyn:mpred(get_precepts(agent,list(spatial)),[ask_module(look)]).
+dyn:argsIsa(mud_test(term,prolog)).
 
-mpred(assert_with_pred(mpred,term)).
-mpred(multi(mpred,int)).
-mpred(ask_predicate(mpred,term)).
-mpred(equivRule(term,term)).
+dyn:mpred(assert_with_pred(dyn:mpred,term)).
+dyn:mpred(multi(dyn:mpred,int)).
+dyn:mpred(ask_predicate(dyn:mpred,term)).
+dyn:mpred(equivRule(term,term)).
 
 dyn:subclass(text,formattype).
 
-mpred(action_help(verb,text)).
+dyn:mpred(action_help(verb,text)).
 
 argsIsa(agent_text_command(agent,text,agent,verb)).
 
-mpred(description(term,text),[assert_with_pred(assert_description),ask_predicate(query_description)]).
+dyn:mpred(description(term,text),[assert_with_pred(assert_description),ask_predicate(query_description)]).
 
 
 
@@ -266,7 +268,7 @@ dyn:singleValued(str(agent,int)).
 dyn:singleValued(type_grid(regiontype,int,list(term))).
 dyn:singleValued(weight(object,int)).
 
-mpred(comment(term,string)).
+dyn:mpred(comment(term,string)).
 
 :-decl_mpred(needs_look/2).
 
@@ -313,12 +315,13 @@ multiValued(possess(agent,item)).
 multiValued(subclass(type,type)).
 multiValued(isa(term,type)).
 
-mpred(directions(term,list(term))).
+dyn:mpred(directions(term,list(term))).
 
 
 moo:action_info(list(term)).
 
-dyn:mpred(ask_module(mpred,atom)).
+dyn:mpred(ask_module(dyn:mpred,atom)).
+
 dyn:argsIsa(agent_call_command(agent,term(verb))).
 
 moo:agent_call_command(_Gent,list(Obj)):- term_listing(Obj).

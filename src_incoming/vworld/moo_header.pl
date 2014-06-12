@@ -20,14 +20,16 @@
 :- set_prolog_flag(verbose_load,true).
 % logicmoo vworld mud server
 
+hdr_debug(_,_):-!.
+hdr_debug(F,A):-'format'(F,A).
 
 :- context_module(Ctx),
    asserta(moo:loading_module_h(Ctx)),
-    'format'('% moo_header: ~q.~n',[loading_module_h(Ctx)]).
+    hdr_debug('% moo_header: ~q.~n',[loading_module_h(Ctx)]).
 
-:- call((context_module(Ctx),(( may_moo_term_expand(Ctx) -> true; asserta(may_moo_term_expand(Ctx)), 'format'('% moo_header: ~q.~n',[may_moo_term_expand(Ctx)]))))).
+:- call((context_module(Ctx),(( may_moo_term_expand(Ctx) -> true; asserta(may_moo_term_expand(Ctx)), hdr_debug('% moo_header: ~q.~n',[may_moo_term_expand(Ctx)]))))).
 
-:- do_term_expansions -> true; (context_module(Ctx),begin_transform_moo_preds,'format'('% moo_header: begin_transform_moo_preds in ~q.~n',[Ctx])).
+:- do_term_expansions -> true; (context_module(Ctx),begin_transform_moo_preds,hdr_debug('% moo_header: begin_transform_moo_preds in ~q.~n',[Ctx])).
 
 
 end_of_file.

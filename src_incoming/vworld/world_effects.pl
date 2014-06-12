@@ -60,14 +60,10 @@ worth(_,_,_).
 % Check to see if any of the objects should be placed in the world as it runs.
 
 
-set_stats(Agent,[]) :-
-	add(str(Agent,2)),
-	add(height(Agent,2)),
-	add(stm(Agent,2)),
-	add(spd(Agent,2)).
+set_stats(Agent,[]) :- set_stats(Agent,[str(2),height(2),stm(2),spd(2)]).
 
 set_stats(Agent,Traits) :-
-        clr(stat_total(Agent,0)),
+        clr(stat_total(Agent,_)),
 	add(stat_total(Agent,0)),
 	forall(member(Trait,Traits),
 	       ignore(catch(process_stats(Agent,Trait),_,true))),
@@ -80,13 +76,11 @@ process_stats(Agent,str(Y)) :-
 	add(damage(Agent,NewDam)),
 	del(stat_total(Agent,T)),
 	NT is T + Y,
-	add(stat_total(Agent,NT)).
+	add(stat_total(Agent,+NT)).
 
 process_stats(Agent,height(Ht)) :-
 	add(height(Agent,Ht)),
-	del(stat_total(Agent,T)),
-	NewT is T + Ht,
-	add(stat_total(Agent,NewT)).
+	add(stat_total(Agent,+Ht)).
 
 process_stats(Agent,stm(Stm)) :-
 	add(stm(Agent,Stm)),
@@ -98,16 +92,18 @@ process_stats(Agent,stm(Stm)) :-
 	add(charge(Agent,Charge)),
 	del(stat_total(Agent,Total)),
 	NewT is Total + Stm,
-	add(stat_total(Agent,NewT)).
+	add(stat_total(Agent,+NewT)).
 
 process_stats(Agent,spd(Spd)) :-
 	add(spd(Agent,Spd)),
 	del(stat_total(Agent,T)),
 	NewT is T + Spd,
-	add(stat_total(Agent,NewT)).
+	add(stat_total(Agent,+NewT)).
+
+process_stats(Agent,Stat) :- add(props(Agent,[Stat])).
 
 check_stat_total(Agent) :-
-	del(stat_total(Agent,Total)),
+	stat_total(Agent,Total),!,
 	Total > 12,
 	nl,
 	write('Agent '),

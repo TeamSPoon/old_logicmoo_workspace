@@ -1,4 +1,4 @@
-:- module(sit, []).
+:- module(sit, [is_posture/1]).
 /** <module> Agent Postures there and does nothing
 % Agent will loose a bit of charge, but heal a bit of damage
 % May 18, 1996

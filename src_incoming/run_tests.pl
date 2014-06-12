@@ -129,7 +129,7 @@ lundef :- A = [],
 run_setup:-
    nodebug,
    debug,
-   scan_db_prop,
+   %scan_db_prop,
    at_start(load_game(logicmoo('rooms/startrek.all.pl'))),
    register_timer_thread(npc_ticker,1,npc_tick_tock).
 
@@ -161,7 +161,7 @@ ht:- do_player_action('s'),
 
 :- at_start(start_servers).
 
-dyn:mud_test(test_movedist,
+moo:mud_test(test_movedist,
  (
   foc_current_player(P),
    test_name("teleport to main enginering"),
@@ -179,7 +179,7 @@ dyn:mud_test(test_movedist,
    test_name("must be now be back in engineering"),
    test_true(req(atloc(P,'Area1000'))))).
 
-dyn:mud_test(drop_take,
+moo:mud_test(drop_take,
  (
   do_player_action('drop food'),
   do_player_action('take food')

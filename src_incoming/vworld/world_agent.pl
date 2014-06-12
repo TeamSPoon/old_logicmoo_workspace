@@ -11,94 +11,104 @@
 
 /*
 % This file is "included" from world.pl 
-:-module(actr, [ call_agent_command/2,  call_agent_action/2 ]).
+:-module(actr, [ call_agent_command_maybe_fail/2,  call_agent_action_maybe_fail/2 ]).
 */
 
+% =====================================================================================================================
+% call_agent_command/2 -->  call_agent_command_maybe_fail/2
+% =====================================================================================================================
 
-% =====================================================================================================================
-% call_agent_command/2 -->  call_agent_action/2
-% =====================================================================================================================
+
+% atom with stuff
+call_agent_command(Agent,Atom):-once((atom(Atom),atomSplit(Atom,List),length(List,Len))),Len>1,!,call_agent_command(Agent,List),!.
 
 % join up @ verbs 
-call_agent_command(Ag,[A,B|REST]):- atom(A),atom(B),member(A,['@']),atom_concat(A,B,C),!,call_agent_command(Ag,[C|REST]).
+call_agent_command(Ag,[A,B|REST]):- atom(A),atom(B),member(A,['@']),atom_concat(A,B,C),!,call_agent_command(Ag,[C|REST]),!.
 
-call_agent_command(Agent,[VERB|ARGS]):-
-      debugOnError(parser_imperative:parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD)),
-      must(call_agent_action(NewAgent,CMD)),!.
+call_agent_command(Agent,CMD):-
+   ensure_session_id(Agent,SESSION,Pushed),!,
+      % start event
+     % raise_location_event(Where,notice(reciever,do(Agent,CMD))),
+     catch(( 
+       ignore(( 
+         once((debugOnError(once((call_agent_command_never_fail(Agent,CMD,Result)))),
+           % complete event
+           once(raise_location_event(Where,notice(reciever,done(Agent,Result)))));
+           % fail event
+              raise_location_event(Where,notice(reciever,failed(Agent,CMD))))))),E,fmt('call_agent_action_maybe_fail/2 Error ~q ',[E])),
+    (Pushed -> ignore(retract(thlocal:current_agent(SESSION,Agent)));true),!.
+
+
+call_agent_command_never_fail(Agent,CMD,Result):- catch(call_agent_command_maybe_fail(Agent,CMD,Result),E,(fmt('call_agent_command_never_fail ~q on ~q ~n',[E,CMD]),grtrace,fail)),!.
+call_agent_command_never_fail(Agent,CMD,Result):- bugger:isDebugging(parser), dumpST,grtrace, call_agent_command_maybe_fail(Agent,CMD,Result).
+
+
+% =====================================================================================================================
+% call_agent_command_maybe_fail/2 -->  call_agent_command_is_list/2
+% =====================================================================================================================
+
+%var
+call_agent_command_maybe_fail(Agent,VERB,Result):-var(VERB),Result=failed(var(VERB)),!,trace_or_throw(call_agent_command_maybe_fail(Agent,VERB)),!.
+
 
 % lists
-call_agent_command(A,Atom):-atom(Atom),atomSplit(Atom,List),!,call_agent_command(A,List).
+call_agent_command_maybe_fail(Agent,List,Result):- is_list(List),call_agent_command_is_list(Agent,List,Result),!.
+call_agent_command_maybe_fail(Agent,[VERB],Result):-!,call_agent_command_maybe_fail(Agent, VERB,Result),!.
+
+
+call_agent_command_maybe_fail(A,CMD,Result):- call_agent_action_maybe_fail(A,CMD,Result),!.
 
 % execute a prolog command including prolog/0
-call_agent_command(_Gent,Atom):- atom(Atom), catch((
+call_agent_command_maybe_fail(_Gent,Atom,done(OneCmd)):- atom(Atom), catch((
    (once((read_term_from_atom(Atom,OneCmd,[variables(VARS)]),
-      predicate_property(OneCmd,_),
-      fmt('doing command ~q~n',[OneCmd]))),!, doall((OneCmd,fmt('Yes: ~w',[VARS]))))),_,fail).
+      prolog_callable_expanded(OneCmd),
+      fmt('doing command ~q~n',[OneCmd]))),!, 
+             doall((call_expanded(OneCmd),fmt('Yes: ~w',[VARS]))))),_,fail),!.
+
+% atom with stuff
+call_agent_command_maybe_fail(Agent,Atom,Result):-once((atom(Atom),atomSplit(Atom,List),length(List,Len))),Len>1,call_agent_command_maybe_fail(Agent,List,Result),!.
+
+% other stuff
+call_agent_command_maybe_fail(Agent,Comp,Result):- compound(Comp),safe_univ(Comp,List),call_agent_command_is_list(Agent,List,Result),!.
+
+% =====================================================================================================================
+% call_agent_command_is_list/2 -->  call_agent_action/2
+% =====================================================================================================================
+% join up @ verbs 
+call_agent_command_is_list(Ag,[A,B|REST],Result):- atom(A),atom(B),member(A,['@']),atom_concat(A,B,C),!,call_agent_command_is_list(Ag,[C|REST],Result),!.
+
+call_agent_command_is_list(Agent,[VERB|SENT],Result):-
+   once((call_no_cuts(moo:agent_text_command(Agent,[VERB|SENT],AgentR,CMD)),
+   safe_univ(CMDOLD ,[VERB|SENT]),
+   once(CMDOLD\=CMD;Agent\=AgentR))),
+   call_agent_action_maybe_fail(AgentR,CMD,Result),!.
+
+call_agent_command_is_list(Agent,[VERB|ARGS],Result):-
+     once(( parser_imperative:parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD))),
+      must(call_agent_action_maybe_fail(NewAgent,CMD,Result)),!.
+
+call_agent_command_is_list(A,[L,I|IST],Result):- atom(L), safe_univ(CMD , [L,I|IST]), call_agent_action_maybe_fail(A,CMD,Result),!.
+call_agent_command_is_list(A,[L|IST],Result):- atom(L), safe_univ(CMD , [L|IST]), call_agent_action_maybe_fail(A,CMD,Result),!.
+call_agent_command_is_list(A,[L],Result):- call_agent_action_maybe_fail(A,L,Result),!. 
 
 % remove period at end
-call_agent_command(A,PeriodAtEnd):-append(New,[(.)],PeriodAtEnd),!,call_agent_command(A,New).
+call_agent_command_is_list(A,PeriodAtEnd,Result):-append(New,[(.)],PeriodAtEnd),!,call_agent_command_maybe_fail(A,New,Result),!.
 
-call_agent_command(A,[L,I|IST]):- atom(L), CMD =.. [L,I|IST],!, call_agent_action(A,CMD).
+% call_agent_command_is_list(A,LIST):- debug_or_throw(call_agent_command_is_list(A,LIST)),!.
 
-call_agent_command(A,CMD):- call_agent_action(A,CMD),!.
-
+% =====================================================================================================================
+% call_agent_action_maybe_fail/2 -->  my_call_agent_action_maybe_fail/2
+% =====================================================================================================================
 % All Actions must be called from here!
-call_agent_action(Agent,CMDI):-
-   ensure_session_id(Agent,SESSION,Pushed),
-      subst(CMDI,self,Agent,CMDI2),      
-      atloc(Agent,Where),
-      subst(CMDI2,here,Where,CMD),
-      % start event
-     % raise_location_event(Where,notice(reciever,do(Agent,CMD))),
-     catch(( ignore(( once((debugOnError(my_agent_call_command(Agent,CMD)),
-           % complete event
-           raise_location_event(Where,notice(reciever,done(Agent,CMD))));
-           % fail event
-              raise_location_event(Where,notice(reciever,failed(Agent,CMD))))))),E,fmt('call_agent_action/2 Error ~q ',[E])),
-    (Pushed -> ignore(retract(thlocal:current_agent(SESSION,Agent)));true).
+
+call_agent_action_maybe_fail(Agent,CMDI,Result):- is_list(CMDI),!,call_agent_command_is_list(Agent,CMDI,Result),!.
+call_agent_action_maybe_fail(Agent,CMDI,Result):- 
+    once(( subst(CMDI,self,Agent,CMDI2),      
+     (atloc(Agent,Where) -> subst(CMDI2,here,Where,CMD) ; CMD=CMDI2))),
+     call_no_cuts(moo:agent_call_command(Agent,CMD)),!,
+     Result=did(Agent,CMD),!.
 
 
-my_agent_call_command(Agent,CMD):- moo:agent_call_command(Agent,CMD),!.
-my_agent_call_command(Agent,CMD):- trace,moo:agent_call_command(Agent,CMD),!.
-
-
-/*
-% agent_text_command
-moo:agent_call_command(Agent,[VERB|SENT]) :- is_list([VERB|SENT]),
-  VERBSENT=[VERB|SENT],
-  trace,
-   moo:agent_text_command(Agent,[VERB|SENT],AgentR,CMD),grtrace,VERBSENT\=CMD,
-   moo:agent_call_command(AgentR,CMD),!.
-
-moo:agent_call_command(Agent,VERBSENT) :- compound(VERBSENT),not(is_list(VERBSENT)),
-   VERBSENT=..[VERB|SENT],
-   moo:agent_text_command(Agent,[VERB|SENT],AgentR,CMD),grtrace,VERBSENT\=CMD,
-   moo:agent_call_command(AgentR,CMD).
-*/
-
-/*
-test_te:- xcall_t((
- 
-
-  user:term_expansion(((call_agent_action(Agent,CMDI):-
-  (( ensure_session_id(Agent,SESSION,Pushed),
-      subst(CMDI,self,Agent,CMDI2),      
-      atloc(Agent,Where),
-      subst(CMDI2,here,Where,CMD),
-      % start event
-     % raise_location_event(Where,notice(reciever,do(Agent,CMD))),
-     catch(( ignore(( once((debugOnError(moo:agent_call_command(Agent,CMD)),
-           % complete event
-           raise_location_event(Where,notice(reciever,done(Agent,CMD))));
-           % fail event
-              raise_location_event(Where,notice(reciever,failed(Agent,CMD))))))),E,fmt('call_agent_action/2 Error ~q ',[E])),
-    (Pushed -> ignore(retract(thlocal:current_agent(SESSION,Agent)));true))))),TE), 
-
-  writeq(TE)
-  )).
-
-:-test_te.
-*/
 
 ensure_session_id(Agent,SESSION,fail):- get_session_id(SESSION),once(thlocal:current_agent(SESSION,Agent2)),Agent2==Agent,!.
 ensure_session_id(Agent,SESSION,true):- get_session_id(SESSION),asserta(thlocal:current_agent(SESSION,Agent)),!.
@@ -126,6 +136,8 @@ list_agents(Agents) :- agent_list(Agents), !.
 list_agents(Agents) :- % build cache
 	findall(NearAgent,req(agent(NearAgent)),Agents),
 	assert(agent_list(Agents)),!.
+
+:-export((agent_into_corpse/1, display_stats/1)).
 
 % When an agent dies, it turns into a corpse.
 % corpse is defined as an object in the *.objects.pl files

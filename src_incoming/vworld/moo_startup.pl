@@ -36,6 +36,17 @@
          use_module(logicmoo(vworld/dbase))),'user').
 
 
+
+% logicmoo vworld mud server
+:- user_use_module(logicmoo(vworld/world)).
+:- user_use_module(logicmoo(vworld/toploop_npc)).
+:- user_use_module(logicmoo(vworld/toploop_telnet)).
+
+
+:- user_use_module(logicmoo(vworld/parser_e2c)).
+:- user_use_module(logicmoo(vworld/parser_imperative)).
+:- user_use_module(logicmoo(vworld/moo_testing)).
+
 /*
 
  First time you run this 2 million clauses are qcompiled 
@@ -113,16 +124,6 @@ make_qlfs:-
 :- user_use_module(logicmoo(pldata/mworld0)).
 :- catch(user_use_module(logicmoo(pldata/withvars_988)),_,true).
 
-
-% logicmoo vworld mud server
-:- user_use_module(logicmoo(vworld/world)).
-:- user_use_module(logicmoo(vworld/toploop_npc)).
-:- user_use_module(logicmoo(vworld/toploop_telnet)).
-
-
-:- user_use_module(logicmoo(vworld/parser_e2c)).
-:- user_use_module(logicmoo(vworld/parser_imperative)).
-:- user_use_module(logicmoo(vworld/moo_testing)).
 
 
 % NPC planners

@@ -34,8 +34,8 @@ show_kb_preds(Agent,List):-
 show_kb_preds(Agent,LOC,List):-
       ignore(atloc(Agent,LOC)),
        locationToRegion(LOC,Region),
-         once((moo:repl_writer(Agent,WPred);WPred=default_repl_writer)),
-         once((moo:repl_to_string(Agent,ToSTR);ToSTR=default_repl_obj_to_string)),
+         once((thlocal:repl_writer(Agent,WPred);WPred=default_repl_writer)),
+         once((thlocal:repl_to_string(Agent,ToSTR);ToSTR=default_repl_obj_to_string)),
         subst(List,region,Region,ListR),
         show_kb_via_pred(WPred,ToSTR,ListR),!.
 
@@ -55,7 +55,7 @@ show_kb_via_pred_0(WPred,ToSTR,Call):- functor(Call,F,_), show_kb_via_pred_1(WPr
 
 show_kb_via_pred_1(WPred,ToSTR,F,all(Call)):-!,show_kb_via_pred_2(WPred,ToSTR,F,Call).
 show_kb_via_pred_1(WPred,ToSTR,F,once(Call)):-!,show_kb_via_pred_2(WPred,ToSTR,F,once(Call)).
-show_kb_via_pred_1(_WPred,_ToSTR,_F,call(Call)):-!,debugOnError(holds_tcall(Call)).
+show_kb_via_pred_1(_WPred,_ToSTR,_F,call(Call)):-!,debugOnError(call_expanded(Call)).
 show_kb_via_pred_1(WPred,ToSTR,F,Call):-show_kb_via_pred_2(WPred,ToSTR,F,Call).
 
 show_kb_via_pred_2(WPred0,ToSTRIn,F0,Call0):-
@@ -66,14 +66,14 @@ show_kb_via_pred_2(WPred0,ToSTRIn,F0,Call0):-
 
 show_kb_via_pred_3(WPred,ToSTR,fmt(SayIt),Type,GCall,NewValue):-!,
   % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
-      findall(NewValue,(catch(holds_tcall(GCall),Error, NewValue=Error), 
+      findall(NewValue,(catch(call_expanded(GCall),Error, NewValue=Error), 
              fmt(text(SayIt))),Count),
       (Count==[] ->
         fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(f1,F,Type)); true),!.
 
 show_kb_via_pred_3(WPred,ToSTR,fmt,Type,GCall,NewValue):-!,
   % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
-      findall(NewValue,(catch(holds_tcall(GCall),Error, NewValue=Error), 
+      findall(NewValue,(catch(call_expanded(GCall),Error, NewValue=Error), 
              fmt(GCall)),Count),
       (Count==[] ->
         fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(f2,F,Type)); true),!.
@@ -81,7 +81,7 @@ show_kb_via_pred_3(WPred,ToSTR,fmt,Type,GCall,NewValue):-!,
 
 show_kb_via_pred_3(WPred,ToSTR,output,Type,GCall,NewValue):-!,
   % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
-      findall(NewValue,(catch(holds_tcall(GCall),Error, NewValue=Error), 
+      findall(NewValue,(catch(call_expanded(GCall),Error, NewValue=Error), 
              fmt_holds_tcall(WPred,ToSTR,F,Type,NewValue)),Count),
       (Count==[] ->
         fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(f3,F,Type)); true),!.
@@ -89,14 +89,14 @@ show_kb_via_pred_3(WPred,ToSTR,output,Type,GCall,NewValue):-!,
 
 show_kb_via_pred_3(WPred,ToSTR,F,Type,GCall,NewValue):- canUseEnglish,!,
   % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
-      findall(NewValue,(catch(holds_tcall(GCall),Error, NewValue=Error), 
+      findall(NewValue,(catch(call_expanded(GCall),Error, NewValue=Error), 
              fmt(text(GCall))),Count),!,
       (Count==[] ->
         (fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(f4,F,Type))); true),!.
 
 show_kb_via_pred_3(WPred,ToSTR,F,Type,GCall,NewValue):-
   % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
-      findall(NewValue,(catch(holds_tcall(GCall),Error, NewValue=Error), 
+      findall(NewValue,(catch(call_expanded(GCall),Error, NewValue=Error), 
              fmt_holds_tcall(WPred,ToSTR,F,Type,NewValue)),Count),
       (Count==[] ->
         fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(f5,F,Type)); true),!.
@@ -203,9 +203,9 @@ fully_expand_2([T|Term],Out):-!,
    flatten_append(E,English,Out),!.
 fully_expand_2(Pred,Pred):-!.
 fully_expand_2(Pred,Out):-
-   Pred=..[F|ARGS],
+   safe_univ(Pred,[F|ARGS]),
    fully_expand_1_l(ARGS,NEWARGS),
-   Out=..[F|NEWARGS],!.
+   safe_univ(Out,[F|NEWARGS]),!.
 
 fully_expand_1_l([],[]):-!.
 fully_expand_1_l([T|Term],[E|English]):-!,

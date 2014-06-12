@@ -45,11 +45,11 @@ last_test_name(unknown).
 test_true(SomeGoal):- SomeGoal; (last_test_name(String),dmsg(moo_test(failed(String:SomeGoal)))).
 test_false(SomeGoal):- not(SomeGoal); (last_test_name(String),dmsg(moo_test(failed(String:SomeGoal)))).
 
-term_test(Obj):-
+term_test(Obj):- 
    doall((
-   dyn:mud_test(H,B),
+   moo:mud_test(H,B),
    use_term_listing(Obj,dyn:mud_test(H,B),true),
-   dyn:mud_test(H,B),
+   moo:mud_test(H,B),
    fail)).
 
 run_mud_test(Name,Test):-

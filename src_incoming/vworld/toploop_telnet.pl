@@ -45,12 +45,12 @@ login_and_run:-
   foc_current_player(P),
    ensure_player_stream_local(P,_,_),
    threads,
-   call_agent_command(P,'who'),
+   do_player_action(P,'who'),
    call_agent_command(P,'look'),
    fmt('~n~n~nHello ~w! Welcome to the MUD!~n',[P]),
    % sets some IO functions
-   with_assertions(moo:repl_writer(P,telnet_repl_writer),
-      with_assertions(moo:repl_to_string(P,telnet_repl_obj_to_string),
+   with_assertions(thlocal:repl_writer(P,telnet_repl_writer),
+      with_assertions(thlocal:repl_to_string(P,telnet_repl_obj_to_string),
      % runs the Telnet REPL
      run_player_telnet(P))),
    fmt('~n~nGoodbye ~w! ~n',[P]).
@@ -58,14 +58,12 @@ login_and_run:-
 run_player_telnet(P) :-    
       foc_current_player(P),
       get_session_id(O),
-      retractall(wants_logout(P)),
-      expand_head(thlocal:current_agent(O,P),HG),
-      must(moo:repl_writer(P,_)),!,
-      with_assertions(HG,
+      retractall(thlocal:wants_logout(P)),
+      must(thlocal:repl_writer(P,_)),!,
+      with_assertions(thlocal:current_agent(O,P),
        ((repeat,
         once(read_and_do_telnet(P)), 
-        wants_logout(P),
-        retract(wants_logout(P)),
+        retract(thlocal:wants_logout(P)),
         retractall(agent_message_stream(P,_,_))))).
 
 
@@ -105,8 +103,7 @@ do_player_action(Agent,CMD):-var(CMD),!,fmt('unknown_var_command(~q,~q).',[Agent
 do_player_action(_,EOF):- end_of_file == EOF, !, tick_tock.
 do_player_action(_,''):-!, tick_tock.
 do_player_action(Agent,CMD):- call_agent_command(Agent, CMD),!.
-do_player_action(Agent,CMD):- fmt('unknown_call_command(~q,~q).~n',[Agent,CMD]), call_agent_command(Agent, CMD),!.
-do_player_action(Agent,CMD):-fmt('skipping_unknown_call_command(~q,~q).~n',[Agent,CMD]).
+do_player_action(Agent,CMD):-fmt('skipping_unknown_player_action(~q,~q).~n',[Agent,CMD]).
 
 
 % ===========================================================
@@ -114,7 +111,7 @@ do_player_action(Agent,CMD):-fmt('skipping_unknown_call_command(~q,~q).~n',[Agen
 % ===========================================================
 look_brief(Agent):- not(props(Agent,needs_look(true))).
 look_brief(Agent):- prop(Agent,last_command,X),functor(X,look,_),!.
-look_brief(Agent):- clr(props(Agent,needs_look(true))),call_agent_action(Agent,look).
+look_brief(Agent):- clr(props(Agent,needs_look(true))),call_agent_command(Agent,look).
 
 telnet_repl_writer(_TL,call,term,Goal):-!,ignore(debugOnError(Goal)).
 telnet_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=t),fmt('~q=(~w)~q.~n',[N,TypeO,V]).

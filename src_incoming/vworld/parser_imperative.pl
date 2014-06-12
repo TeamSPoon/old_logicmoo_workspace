@@ -157,8 +157,11 @@ object_match(S,Obj):-
 
 :-debug.
 
-dmsg_parserm(_).
-dmsg_parserm(_,_).
+%dmsg_parserm(_).
+dmsg_parserm(D):-dmsg(D).
+%dmsg_parserm(_,_).
+dmsg_parserm(F,A):-dmsg(F,A).
+
 % ===========================================================
 % PARSER
 % ===========================================================
@@ -213,27 +216,27 @@ dyn:verb_alias('where is','where').
 
 pos_word_formula('infinitive',Verb,Formula):- 'infinitive'(TheWord, Verb, _, _G183), 'verbSemTrans'(TheWord, 0, 'TransitiveNPCompFrame', Formula, _, _).
 
-verb_alias_to_verb(IVERB,SVERB):-dyn:verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.
+verb_alias_to_verb(IVERB,SVERB):- dyn:verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.
 verb_alias_to_verb(IVERB,SVERB):-specifiedItemType(IVERB,verb,SVERB), IVERB \= SVERB.
 
 verb_matches("go",VERB):-!,VERB=go.
 verb_matches(SVERB,VERB):-samef(VERB,SVERB).
 
-parse_vp_templates(Agent,SVERB,_ARGS,TEMPLATES):-
+parse_vp_templates(_Agent,SVERB,_ARGS,TEMPLATES):-
    findall([VERB|TYPEARGS],
     ((     
-     moo:type_action_help(What,TEMPL,_),
-     mud_isa(Agent,What),
+     call_no_cuts(type_action_help(_What,TEMPL,_)),
+    % mud_isa(Agent,What),
      TEMPL=..[VERB|TYPEARGS],
      verb_matches(SVERB,VERB))),
      TEMPLATES_FA),
-   % (TEMPLATES=[]->throw(noTemplates(Agent,SVERB,ARGS));true),
+   % ( TEMPLATES_FA=[] -> throw(noTemplates(Agent,SVERB,ARGS)); true),
    sort(TEMPLATES_FA,TEMPLATES),!.
    
 % parses a verb phrase and retuns multiple interps
 parse_vp_real(Agent,SVERB,ARGS,GOALANDLEFTOVERS):-
    parse_vp_templates(Agent,SVERB,ARGS,TEMPLATES),
-   dmsg_parserm(("TEMPLATES"= ([SVERB,ARGS] = TEMPLATES))),
+   dmsg_parserm(("TEMPLATES"= ([SVERB|ARGS] = TEMPLATES))),
    TEMPLATES \= [],
    findall(LeftOver-GOAL,
      (( 
@@ -316,13 +319,15 @@ query_trans_sub(Sub,Super):-query_trans_sc(Sub,Super).
 
 query_trans_subft(FT,Sub):-dyn:subft(FT,Sub).
 query_trans_subft(FT,Sub):-dyn:subft(FT,A),dyn:subft(A,Sub).
-query_trans_subft(FT,Sub):-dyn:subft(FT,A),dyn:subft(A,B),dyn:subft(B,Sub).
+query_trans_subft(FT,Sub):-dyn:subft(FT,A),dyn:subft(A,B),dyn:subft(B,C),dyn:subft(C,Sub).
+
 query_trans_sc(FT,Sub):-dyn:subclass(FT,Sub).
 query_trans_sc(FT,Sub):-dyn:subclass(FT,A),dyn:subclass(A,Sub).
 query_trans_sc(FT,Sub):-dyn:subclass(FT,A),dyn:subclass(A,B),dyn:subclass(B,Sub).
+query_trans_sc(FT,Sub):-dyn:subclass(FT,A),dyn:subclass(A,B),dyn:subclass(B,C),dyn:subclass(C,Sub).
 
 
-parseFmtOrIsa(Sub, B, C, D):-parseFmt(Sub, B, C, D).
+parseFmtOrIsa(Sub, B, C, D):- parseFmt(Sub, B, C, D).
 
 parseFmt(_, _, [AT|_], _):- var(AT),!,fail.
 parseFmt(string,String)--> theString(String).
@@ -347,7 +352,8 @@ specifiedItemType([String],Type,StringO):-nonvar(String),!,specifiedItemType(Str
 specifiedItemType(String,Type,Inst) :- specifier_text(Inst,Type), equals_icase(Inst,String),!.
 specifiedItemType(String,Type,Inst):- instances_of_type(Inst,Type),object_match(String,Inst),!.
 specifiedItemType(String,Type,Longest) :- findall(Inst, (dyn:specifier_text(Inst,Type),starts_or_ends_with_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
-specifiedItemType(A,T,AA):- is_ft(T), correctFormatType(tell(_),A,T,AA),!.
+specifiedItemType(A,T,AA):- is_ft(T), checkAnyType(tell(_),A,T,AAA),!,AA=AAA.
+specifiedItemType(A,T,AA):- checkAnyType(tell(parse),A,T,AAA),AA=AAA.
 
 instances_of_type(Inst,Type):- setof(Inst-Type,mud_isa(Inst,Type),Set),member(Inst-Type,Set).
 % instances_of_type(Inst,Type):- atom(Type), Term =..[Type,Inst], logOnError(req(Term)).

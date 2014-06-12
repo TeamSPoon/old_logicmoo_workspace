@@ -43,6 +43,8 @@
          asserta_if_new/1,
          throw_if_true_else_fail/2,
          assert_if_new/1,
+         safe_univ/2,
+         bad_functor/1,
          make_list/3,
          multi_transparent/1]).
 
@@ -53,6 +55,14 @@
 
 lastMember(_E,List):-var(List),!,fail.
 lastMember(E,[H|List]):-lastMember(E,List);E=H.
+
+bad_functor(L) :- arg(_,v('|','.',[],':','/'),L).
+
+warn_bad_functor(L):-ignore((notrace(bad_functor(L)),!,grtrace,throw(bad_functor(L)))).
+
+safe_univ(Call,[L|List]):- not(is_list(Call)),Call =..[L|List],!,warn_bad_functor(L).
+safe_univ([L|List],[L|List]):- var(List),atomic(Call),!,grtrace,Call =.. [L|List],warn_bad_functor(L).
+safe_univ(Call,[L|List]):- catch(Call =.. [L|List],E,(format('~q~n',[E=safe_univ(Call,List)]))),warn_bad_functor(L).
 
 % =================================================================================
 % Utils
@@ -203,16 +213,16 @@ get_functor(Obj,F,0):- string(Obj),!,atom_string(F,Obj).
 get_functor(Obj,Obj,0):-not(compound(Obj)),!.
 get_functor(Obj,F,A):-functor(Obj,F,A).
 
-strip_f_module(_:P,F):-nonvar(P),!,strip_f_module(P,F).
-strip_f_module(P,P):-atom(P),!.
-strip_f_module(P,F):- notrace(string(P);is_list(P);atomic(P)), text_to_string(P,S),!,atom_string(F,S).
+strip_f_module(_:P,FA):-nonvar(P),!,strip_f_module(P,F),!,F=FA.
+strip_f_module(P,PA):-atom(P),!,P=PA.
+strip_f_module(P,FA):- notrace(string(P);is_list(P);atomic(P)), text_to_string(P,S),!,atom_string(F,S),!,F=FA.
 strip_f_module(P,P).
 
-
-functor_safe(M:P,M:F,A):-var(P),atom(M),!,functor(P,F,A).
-functor_safe(P,F,A):-var(P),!,strip_f_module(F,F0),functor(P,F0,A).
-functor_safe(P,F,A):-compound(P),!,functor_safe_compound(P,F,A).
-functor_safe(P,F,0):- notrace(string(P);atomic(P)), text_to_string(P,S),!,atom_string(F,S).
+functor_safe(P,F,A):-functor_safe0(P,F,A),!.
+functor_safe0(M:P,M:F,A):-var(P),atom(M),functor(P,F,A),!,warn_bad_functor(F).
+functor_safe0(P,F,A):-var(P),strip_f_module(F,F0),functor(P,F0,A),!,warn_bad_functor(F).
+functor_safe0(P,F,A):-compound(P),!,functor_safe_compound(P,F,A),warn_bad_functor(F).
+functor_safe0(P,F,0):- notrace(string(P);atomic(P)), text_to_string(P,S),!,atom_string(F,S),warn_bad_functor(F).
 functor_safe_compound((_,_),',',2).
 functor_safe_compound([_|_],'.',2).
 functor_safe_compound(_:P,F,A):- functor(P,F,A),!.

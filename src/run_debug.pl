@@ -120,13 +120,6 @@ ht:- do_player_action('s'),
 
 % :- at_start(run_debug:start_servers).
 
-:- at_start(run_setup).
-
-
-:- catch(noguitracer,_,fail).
-
-% :- at_start(run).
-%:- run_setup.
 
 % do some sanity testing
 ht:- do_player_action('s'),
@@ -166,18 +159,19 @@ dyn:mud_test(drop_take,
   do_player_action('take food')
 )).
 
-%:- run_mud_tests.
+:- at_start(must_det(run_setup)).
 
-:- at_start((debug,run_mud_tests)).
+:-must_det((foc_current_player(Agent),dmsg(foc_current_player(Agent)))).
+:-foc_current_player(Agent),must_det((atloc(Agent,Where))),dmsg(atloc(Agent,Where)).
 
+:- at_start((debug,must_det(run_mud_tests))).
+% :- at_start((debug,must_det(run))).
 
-:- at_start((debug,run)).
-
+end_of_file.
 
 % So scripted versions don't just exit
 :- at_start(prolog).
 
-end_of_file.
 
 :- doc_server(4088).
 

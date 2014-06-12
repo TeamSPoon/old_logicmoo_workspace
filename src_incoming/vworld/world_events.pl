@@ -11,8 +11,9 @@
 % This file is "included" from world.pl 
 */
 
+
 asInvoked(Cmd,[L|Ist]):-append([L|Ist],[],Foo),Foo\==[L|Ist],!,asInvoked(Cmd,Foo).
-asInvoked(Cmd,[L|Ist]):-atom(L),!, Cmd=..[L|Ist].
+asInvoked(Cmd,[L|Ist]):-atom(L),not(bad_functor(L)),!, Cmd=..[L|Ist].
 asInvoked(Cmd,[L|Ist]):-!,Cmd=..[asInvoked,L|Ist].
 asInvoked(Cmd,Cmd):-!.
 

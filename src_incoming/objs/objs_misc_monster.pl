@@ -235,7 +235,7 @@ max_damage(120).
 
 % :-end_module_type(dynamic).
 
-dyn:type_default_props(Inst,Type,[named(Inst),kwLabel(Lbl)|SP]):- dyn:label_type_props(Lbl,Type,SomeProps),flatten(SomeProps,SP).
+dyn:type_default_props(self,Type,[named(self),kwLabel(Lbl)|SP]):- dyn:label_type_props(Lbl,Type,SomeProps),flatten(SomeProps,SP).
 
 % Vacuum World example objects........
 dyn:label_type_props(wl,wall,[height(3),weight(4)]).

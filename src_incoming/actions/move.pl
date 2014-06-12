@@ -14,15 +14,15 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(command).
+:- register_module_type(command).
 
-:- moo:begin_transform_moo_preds.
+:- begin_transform_moo_preds.
 
-moo:agent_text_command(Agent,[DirSS],Agent,move(Dir)):- catch(((string_to_atom(DirSS,Dir),dyn:specifier_text(Dir,dir))),_,fail),!.
+:- decl_mpred(movedist/2).
 
-moo:agent_text_command(Agent,[DirSS],Agent,move(DirS)):- 
- catch(((string_to_atom(DirSS,DirS),dyn:specifier_text(Dir,dir),
-       catch((atom_concat(Dir,N,DirS),(atom_number(N,_))),_,fail))),_,fail).
+moo:agent_text_command(Agent,[DirSS],Agent,move(Dir)):- catch(((any_to_string(DirSS,Dir),grtrace,dyn:specifier_text(Dir,dir))),_,fail),!.
+
+moo:agent_text_command(Agent,[DirSS],Agent,move(DirS)):- catch(((string_to_atom(DirSS,DirS),dyn:specifier_text(Dir,dir),catch((atom_concat(Dir,N,DirS),(atom_number(N,_))),_,fail))),_,fail).
 
 moo:agent_call_command(Agnt,Cmd):- functor(Cmd,move,_),!,
    must(move_command(Agnt,Cmd)).

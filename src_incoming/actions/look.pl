@@ -42,11 +42,11 @@ moo:action_help(look(item), "Look at a speficific item").
 
 moo:agent_call_command(Agent,look(Dir)):-
    view_dirs(Agent,[[Dir,here],[Dir,Dir],[Dir,Dir,adjacent]],Percepts),
-   forall_member(P,Percepts,call_agent_action(Agent,examine(P))).
+   forall_member(P,Percepts,call_agent_command_maybe_fail(Agent,examine(P),_)).
 
 moo:agent_call_command(Agent,look(SObj)):-
    objects_match(Agent,SObj,Percepts),
-   forall_member(P,Percepts,call_agent_action(Agent,examine(P))).
+   forall_member(P,Percepts,call_agent_command_maybe_fail(Agent,examine(P),_)).
 
 moo:agent_call_command(Agent,look):- 
    get_session_id(O),

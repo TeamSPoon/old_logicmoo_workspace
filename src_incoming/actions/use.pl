@@ -5,7 +5,7 @@
 % This file defines the basic use (pick up) predicate
 %
 
-:- module(use, []).
+:- module(use, [use_verbs/4]).
 
 :- include(logicmoo(vworld/moo_header)).
 

@@ -15,7 +15,6 @@
 :- module(world,
 	[
         call_agent_command/2,
-        call_agent_action/2,
             world_mud_isa/2,
             isa_any/2,
           create_meta/4,
@@ -26,7 +25,7 @@
             prop_memb/2,
             move_dir_target/3,
             in_world_move/3, check_for_fall/3,
-            agent_into_corpse/1, display_stats/1,
+            
             reverse_dir/2,
             round_loc/8,
             round_loc_target/8,
@@ -89,17 +88,6 @@
 
 % is_property(P,A):- dyn:db_prop(_,C),functor(C,P,A2),A is A2-1.
 
-is_type(O):-is_type0(O).
-is_type0(T):-holds_t(label_type_props,_,T,_).
-is_type0(T):- holds_t(type_default_props,_,T,_).
-is_type0(OT):- holds_t(subclass,OT,_); holds_t(subclass,_,OT).
-is_type0(food).
-is_type0(explorer).
-is_type0(predator).
-is_type0(prey).
-is_type0(monster).
-is_type0(dir).
-is_type0(agent).
 
 isaOrSame(A,B):-A==B,!.
 isaOrSame(A,B):-world_mud_isa(A,B).
@@ -150,12 +138,15 @@ mud_isa_atom(O,T):- atom_concat(T,Int,O),catch(atom_number(Int,_),_,fail),!.
 
 create_meta(T,P,C,MT):-
    must(split_name_type(T,P,C)),
-   define_subtype(C,MT),
+   ifThen(ground(C:MT),add(subclass(C,MT))),
+
+   ifThen(ground(P:MT),((
    OP =.. [MT,P],
    dbase_mod(M),
-   assert_if_new(M:OP),
-   must(forall_member(E,[OP,isa(P,MT),isa(P,C)],must(add(E)))),
-   must(findall_type_default_props(P,C,Props)),!,
+   assert_if_new(M:OP)))),
+
+   must(forall_member(E,[OP,isa(P,MT),isa(P,C)],ignore((ground(E),must(add(E)))))),
+   must(findall_type_default_props(P,C,Props)),!,  
    must(padd(P,Props)),!.
 
 rez_to_inventory(Whom,T,P):-
@@ -181,14 +172,14 @@ dyn:subclass(string,formattype).
 
 
 create_agent(P):-create_agent(P,[]).
-create_agent(P,List):-must(create_instance(P,agent,List)).
+create_agent(P,List):-must(create_instance_0(P,agent,List)).
 
 formattype(FormatType):-dyn:subclass(FormatType,formattype).
 formattype(FormatType):-dbase:holds_t(isa, FormatType, formattype).
 
-define_type(Spec):-create_instance(Spec,type,[]).
-
-create_instance(What,Type,Props):- create_instance_0(What,Type,Props),!.
+create_instance(What,Type,Props):-number(What),trace_or_throw(create_instance(What,Type,Props)).
+create_instance(What,Type,Props):-create_instance_0(What,Type,Props),dmsg(done(create_instance(What,Type,Props))),!.
+create_instance(What,Type,Props):-dmsg(todo(create_instance(What,Type,Props))),!.
 
 :-discontiguous create_instance_0/3.
 
@@ -196,18 +187,18 @@ create_instance_0(What,FormatType,List):- FormatType\==type,
    formattype(FormatType),!,
    throw(formattype(FormatType,create_instance(What,FormatType,List))).
 
-create_instance_0(SubType,type,List):-!,
-   add(mud_isa(SubType,type)),
-      dbase_mod(M),
-      A = M:type(SubType),
-   assert_if_new(A),
-   padd(SubType,List).
+
+create_instance_0(SubType,type,List):-!,grtrace,
+   define_type(SubType),
+   add(props(SubType,[isa(type)|List])).
+  
+
 
 dyn:createableType(agent).
 dyn:subclass(actor,agent).
 
 create_instance_0(T,agent,List):-!,
-   retractall(agent_list(_)),
+   retractall(agent_list(_)),   
    must(create_meta(T,P,_,agent)),
    must(padd(P,List)),
    clr(atloc(P,_)),
@@ -223,11 +214,13 @@ create_instance_0(T,agent,List):-!,
    add(memory(P,directions([n,s,e,w,ne,nw,se,sw,u,d]))),!.
 
 dyn:createableType(region).
-create_instance_0(T,Type,List):- dyn:createableType(Type),
+create_instance_0(T,Type,List):- dyn:createableType(Type),!,
    create_meta(T,P,_,Type),!,
    padd(P,List).
 
-create_instance_0(T,Type,List):-dyn:subclass(Type,MetaType),dyn:createableType(MetaType),
+create_instance_0(T,Type,List):-
+   dyn:subclass(Type,MetaType),
+   dyn:createableType(MetaType),
    create_meta(T,P,_,MetaType),
    padd(P,mud_isa(Type)),
    padd(P,List),
@@ -237,7 +230,7 @@ create_instance_0(T,Type,List):-dyn:subclass(Type,MetaType),dyn:createableType(M
 %dyn:createableType(type).
 %f(X,Y):- hotrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci(XF,YF)))).
 
-dyn:type_default_props(_,agent,last_command(stand)).
+dyn:type_default_props(agent,last_command(stand)).
 
 :- include(logicmoo('vworld/world_2d')).
 :- include(logicmoo('vworld/world_agent')).

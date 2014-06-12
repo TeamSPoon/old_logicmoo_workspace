@@ -15,6 +15,8 @@
 
 :- moo:register_module_type(command).
 
+moo:action_info(take(item)).
+
 % Take something
 % Successfully picking something up
 moo:agent_call_command(Agent,take(SObj)) :-

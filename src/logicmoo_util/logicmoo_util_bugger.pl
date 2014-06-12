@@ -17,6 +17,8 @@
          module_predicates_are_exported/0,
          inside_loop_check/1,
          is_loop_checked/1,
+         must_det/1,
+         is_deterministic/1,
      programmer_error/1,
      forall_member/3,
      debugOnError0/1,
@@ -42,6 +44,7 @@
      dynamic_load_pl/1,
      term_to_message_string/2,
      atLeastOne/1,
+     isDebugging/1,
      ggtrace/0,
      gftrace/0,
      grtrace/0,
@@ -130,6 +133,8 @@
 :-multifile term_to_message_string/2.
 :-dynamic term_to_message_string/2.
 
+:- dynamic isDebugging/1.
+
 :-multifile was_module/2.
 :-dynamic was_module/2.
 :-module_transparent was_module/2.
@@ -174,6 +179,8 @@ set_bugger_flag(F,V):-create_prolog_flag(F,V,[term]).
 :- meta_predicate traceafter_call(^).
 :- meta_predicate if_prolog(*,^).
 :- meta_predicate must(^).
+:- meta_predicate must_det(^).
+:- meta_predicate atLeastOne4(^,^).
 :- meta_predicate debugOnError(^).
 :- meta_predicate debugOnError0(^).
 :- meta_predicate debugOnErrorIgnore(^).
@@ -422,6 +429,7 @@ cmust(Call):-atLeastOne0(will_debug_else_throw(cmust(Call),Call),Call).
 gmust(True,Call):-catch((Call,(True->true;throw(retry(gmust(True,Call))))),retry(gmust(True,_)),(trace,Call,True)).
 
 % must is used declaring the predicate must suceeed
+
 must(C):-atLeastOne0(debugCallWhy(must(C),C),C).
 
 throwOnFailure(Call):-atLeastOne0(throw(throwOnFailure(Call)),Call).
@@ -592,17 +600,28 @@ atLeastOne(C):-atLeastOne0(debugCallWhy(atLeastOne(C),C),C).
 :-dhideTrace(atLeastOne0/2).
 % now using gensym counter instead of findall (since findall can make tracing difficult)
 
+
+atLeastOne0(OnFail,Call):- is_deterministic(Call),!,atLeastOne4(OnFail,Call).
+
+% better version I think but makes more tracing
+atLeastOne0(OnFail,Call):- gensym(atLeastOneCounter,Sym),flag(Sym,_,0),!, atLeastOne3(Sym,OnFail,Call).
+
 %old findall version
 atLeastOne0(_Else,OneA):-copy_term(OneA,One),findall(One,call(One),OneL),[_|_]=OneL,!,member(OneA,OneL).
 atLeastOne0(Else,_OneA):-!,Else.
 
-% better version I think but makes more tracing
-atLeastOne0(OnFail,Call):- gensym(atLeastOneCounter,Sym),flag(Sym,_,0),!, atLeastOne3(Sym,OnFail,Call).
 atLeastOne3(Sym,_NFail,Call):-call(Call),flag(Sym,C,C+1).
 atLeastOne3(Sym,OnFail,_All):-flag(Sym,Old,0),!, Old==0, % if old > 0 we want to fail 
          call(OnFail).
 
 
+is_deterministic(Call):-predicate_property(Call,nodebug),!.
+is_deterministic(Call):-predicate_property(Call,foreign),!.
+
+must_det(C):- atLeastOne4(debugCallWhy(must(C),C),C).
+
+atLeastOne4(_OnFail,Call):-Call,!.
+atLeastOne4(OnFail,_Call):-OnFail.
 
 
 randomVars(Term):- random(R), StartR is round('*'(R,1000000)), !,

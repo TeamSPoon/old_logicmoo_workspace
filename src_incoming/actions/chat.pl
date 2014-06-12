@@ -4,7 +4,7 @@
 %
 */
 
-:- module(chat, [do_social/4]).
+:- module(chat, [do_social/4,socialVerb/1,socialCommand/3]).
 
 :- include(logicmoo(vworld/moo_header)).
 
