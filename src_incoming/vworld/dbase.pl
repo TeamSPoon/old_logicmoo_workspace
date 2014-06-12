@@ -995,10 +995,10 @@ split_name_type(C,P,C):- atom(C),C==food,gensym(C,P),!.
 split_name_type(C,P,C):- atom(C),trace,gensym(C,P),!.
 split_name_type(C,P,C):- string(C),trace,gensym(C,P),!.
 
-same(X,Y):- X=Y,!.
+same(X,Y):- samef(X,Y),!.
 same(X,Y):- compound(X),arg(1,X,Y),!.
 same(X,Y):- compound(Y),arg(1,Y,X),!.
-same(X,Y):- samef(X,Y).
+
 
 samef(X,Y):- X=Y,!.
 samef(X,Y):- hotrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci(XF,YF)))).

@@ -68,6 +68,7 @@ set_stats(Agent,Traits) :-
 	forall(member(Trait,Traits),
 	       ignore(catch(process_stats(Agent,Trait),_,true))),
 	       catch(check_stat_total(Agent),_,true).
+set_stats(Agent,Traits):-dmsg(failed(set_stats(Agent,Traits))).
 
 process_stats(Agent,str(Y)) :-
 	add(str(Agent,Y)),
@@ -103,8 +104,8 @@ process_stats(Agent,spd(Spd)) :-
 process_stats(Agent,Stat) :- add(props(Agent,[Stat])).
 
 check_stat_total(Agent) :-
-	stat_total(Agent,Total),!,
-	Total > 12,
+	req(stat_total(Agent,Total)),
+	Total > 12,!,
 	nl,
 	write('Agent '),
 	write(Agent),

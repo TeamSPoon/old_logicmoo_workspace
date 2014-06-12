@@ -15,6 +15,7 @@
 :- module(world,
 	[
         call_agent_command/2,
+        call_agent_command_maybe_fail/3,
             world_mud_isa/2,
             isa_any/2,
           create_meta/4,

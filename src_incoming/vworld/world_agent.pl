@@ -11,11 +11,11 @@
 
 /*
 % This file is "included" from world.pl 
-:-module(actr, [ call_agent_command_maybe_fail/2,  call_agent_action_maybe_fail/2 ]).
+:-module(actr, [ ]).
 */
 
 % =====================================================================================================================
-% call_agent_command/2 -->  call_agent_command_maybe_fail/2
+% call_agent_command/2 -->  call_agent_command_maybe_fail/3
 % =====================================================================================================================
 
 
