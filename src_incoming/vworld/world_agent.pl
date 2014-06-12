@@ -27,20 +27,21 @@ call_agent_command(Ag,[A,B|REST]):- atom(A),atom(B),member(A,['@']),atom_concat(
 
 call_agent_command(Agent,CMD):-
    ensure_session_id(Agent,SESSION,Pushed),!,
+   must(atloc(Agent,Where)),
       % start event
      % raise_location_event(Where,notice(reciever,do(Agent,CMD))),
-     catch(( 
+     once((catch(( 
        ignore(( 
          once((debugOnError(once((call_agent_command_never_fail(Agent,CMD,Result)))),
            % complete event
            once(raise_location_event(Where,notice(reciever,done(Agent,Result)))));
            % fail event
-              raise_location_event(Where,notice(reciever,failed(Agent,CMD))))))),E,fmt('call_agent_action_maybe_fail/2 Error ~q ',[E])),
+              raise_location_event(Where,notice(reciever,failed(Agent,CMD))))))),E,fmt('call_agent_action_maybe_fail/2 Error ~q ',[E])))),
     (Pushed -> ignore(retract(thlocal:current_agent(SESSION,Agent)));true),!.
 
 
-call_agent_command_never_fail(Agent,CMD,Result):- catch(call_agent_command_maybe_fail(Agent,CMD,Result),E,(fmt('call_agent_command_never_fail ~q on ~q ~n',[E,CMD]),grtrace,fail)),!.
-call_agent_command_never_fail(Agent,CMD,Result):- bugger:isDebugging(parser), dumpST,grtrace, call_agent_command_maybe_fail(Agent,CMD,Result).
+call_agent_command_never_fail(Agent,CMD,Result):- catch(once(call_agent_command_maybe_fail(Agent,CMD,Result)),E,(fmt('call_agent_command_never_fail ~q on ~q ~n',[E,CMD]),grtrace,fail)),!.
+call_agent_command_never_fail(Agent,CMD,Result):- bugger:isDebugging(parser),!, dumpST,grtrace, call_agent_command_maybe_fail(Agent,CMD,Result).
 
 
 % =====================================================================================================================

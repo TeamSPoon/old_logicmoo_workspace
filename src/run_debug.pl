@@ -165,7 +165,8 @@ dyn:mud_test(drop_take,
 :-foc_current_player(Agent),must_det((atloc(Agent,Where))),dmsg(atloc(Agent,Where)).
 
 :- at_start((debug,must_det(run_mud_tests))).
-% :- at_start((debug,must_det(run))).
+
+:- at_start((debug,must_det(run))).
 
 end_of_file.
 
