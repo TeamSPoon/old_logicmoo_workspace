@@ -56,9 +56,12 @@ startup_mod:if_version_greater(V,Goal):- current_prolog_flag(version,F), ((F > V
 % if we don't start cliopatria we have to manually start
 %
 % :- use_module('t:/devel/cliopatria/rdfql/sparql_runtime.pl').
+
 hard_work:- within_user(ensure_loaded(logicmoo(launchcliopatria))).
 slow_work:- with_assertions(moo:prevent_transform_moo_preds,within_user(hard_work)),retractall(prevent_transform_moo_preds).
-start_servers :- startup_mod:if_version_greater(70111,thread_create(_,slow_work,[alias(loading_code)])).
+thread_work:- thread_property(X, status(running)),X=loading_code,!.
+thread_work:- thread_create(slow_work,_,[alias(loading_code)]).
+start_servers :- startup_mod:if_version_greater(70111,thread_work).
 
 % startup_mod:start_servers
 % this is evil. Starts the old mudconsole, the experiment with Jan's
@@ -67,6 +70,9 @@ start_servers :- startup_mod:if_version_greater(70111,thread_create(_,slow_work,
 
 % [Required] load and start mud
 :- within_user(ensure_loaded(logicmoo(vworld/moo_startup))).
+
+% [Manditory] define load_default_game
+load_default_game:- load_game(logicmoo('rooms/startrek.all.pl')).
 
 startup_mod:run_setup_now:-
    within_user((

@@ -24,6 +24,7 @@
                    object_match/2,
                    object_string/2,
                    order_descriptions/3,
+                   get_specifier_text/2,
                    parseForTypes//2]).
 
 
@@ -209,20 +210,20 @@ parse_agent_text_command_11(Agent,SVERB,ARGS,NewAgent,GOAL):-parse_agent_text_co
 parse_agent_text_command_11(Agent,SVERB,ARGS,NewAgent,GOAL):-to_word_list(SVERB,L),!,L=[A,B|C],append([B|C],ARGS,BCARGS),
    debugOnError(parse_agent_text_command_1(Agent,A,BCARGS,NewAgent,GOAL)).
 
-dyn:verb_alias('l','look').
-dyn:verb_alias('s','move s').
-dyn:verb_alias('go','go').
-dyn:verb_alias('where is','where').
+moo:verb_alias('l','look').
+moo:verb_alias('s','move s').
+moo:verb_alias('go','go').
+moo:verb_alias('where is','where').
 
 pos_word_formula('infinitive',Verb,Formula):- 'infinitive'(TheWord, Verb, _, _G183), 'verbSemTrans'(TheWord, 0, 'TransitiveNPCompFrame', Formula, _, _).
 
-verb_alias_to_verb(IVERB,SVERB):- dyn:verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.
+verb_alias_to_verb(IVERB,SVERB):- moo:verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.
 verb_alias_to_verb(IVERB,SVERB):-specifiedItemType(IVERB,verb,SVERB), IVERB \= SVERB.
 
 verb_matches("go",VERB):-!,VERB=go.
 verb_matches(SVERB,VERB):-samef(VERB,SVERB).
 
-parse_vp_templates(_Agent,SVERB,_ARGS,TEMPLATES):-
+parse_vp_templates(Agent,SVERB,ARGS,TEMPLATES):-
    findall([VERB|TYPEARGS],
     ((     
      call_no_cuts(type_action_help(_What,TEMPL,_)),
@@ -230,7 +231,7 @@ parse_vp_templates(_Agent,SVERB,_ARGS,TEMPLATES):-
      TEMPL=..[VERB|TYPEARGS],
      verb_matches(SVERB,VERB))),
      TEMPLATES_FA),
-   % ( TEMPLATES_FA=[] -> throw(noTemplates(Agent,SVERB,ARGS)); true),
+    ( TEMPLATES_FA=[] -> trace_or_throw(noTemplates(Agent,SVERB,ARGS)); true),
    sort(TEMPLATES_FA,TEMPLATES),!.
    
 % parses a verb phrase and retuns multiple interps
@@ -270,10 +271,10 @@ bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
 
 :-style_check(+singleton).
 
-dyn:specifier_text(Dir,dir):-member_ci(Dir,[n,s,e,w,ne,nw,se,sw,u,d]).
+moo:term_specifier_text(Dir,dir):-member_ci(Dir,[n,s,e,w,ne,nw,se,sw,u,d]).
 
 
-dyn:specifier_text(Text,Subclass):-dyn:subclass(Subclass,spatialthing),mud_isa(X,Subclass),req(keyword(X,Text)).
+moo:term_specifier_text(Text,Subclass):-dyn:subclass(Subclass,spatialthing),mud_isa(X,Subclass),req(keyword(X,Text)).
 
 phrase_parseForTypes(TYPEARGS,GOODARGS,ARGS,LeftOver):-
    to_word_list(ARGS,ARGSL),!,
@@ -349,15 +350,16 @@ parseFmt(and([L|List]),Term1) --> dcgAnd(parseForIsa(L,Term1),parseForIsa(and(Li
 parseFmt(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{specifiedItemType(String,Type,Term)}.
 
 specifiedItemType([String],Type,StringO):-nonvar(String),!,specifiedItemType(String,Type,StringO).
-specifiedItemType(String,Type,Inst) :- specifier_text(Inst,Type), equals_icase(Inst,String),!.
+specifiedItemType(String,Type,Inst) :- term_specifier_text(Inst,Type), equals_icase(Inst,String),!.
 specifiedItemType(String,Type,Inst):- instances_of_type(Inst,Type),object_match(String,Inst),!.
-specifiedItemType(String,Type,Longest) :- findall(Inst, (dyn:specifier_text(Inst,Type),starts_or_ends_with_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
+specifiedItemType(String,Type,Longest) :- findall(Inst, (get_specifier_text(Inst,Type),starts_or_ends_with_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
 specifiedItemType(A,T,AA):- is_ft(T), checkAnyType(tell(_),A,T,AAA),!,AA=AAA.
 specifiedItemType(A,T,AA):- checkAnyType(tell(parse),A,T,AAA),AA=AAA.
 
 instances_of_type(Inst,Type):- setof(Inst-Type,mud_isa(Inst,Type),Set),member(Inst-Type,Set).
 % instances_of_type(Inst,Type):- atom(Type), Term =..[Type,Inst], logOnError(req(Term)).
 
+get_specifier_text(Text,Type):- moo:term_specifier_text(Text,Type).
 
 % :- include(logicmoo(vworld/moo_footer)).
 

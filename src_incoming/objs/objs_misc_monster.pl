@@ -226,7 +226,7 @@ Object applies:
 
 :-moo:register_module_type([world_types,parser]).
 
-label_type(Label,Type):-dyn:label_type_props(Label,Type,_).
+dyn:label_type(Label,Type):-dyn:label_type_props(Label,Type,_).
 
 % :-moo:register_module_type(dynamic).
 
@@ -235,7 +235,7 @@ max_damage(120).
 
 % :-end_module_type(dynamic).
 
-dyn:type_default_props(self,Type,[named(self),kwLabel(Lbl)|SP]):- dyn:label_type_props(Lbl,Type,SomeProps),flatten(SomeProps,SP).
+moo:type_default_props(self,Type,[named(self),kwLabel(Lbl)|SP]):- dyn:label_type_props(Lbl,Type,SomeProps),flatten(SomeProps,SP).
 
 % Vacuum World example objects........
 dyn:label_type_props(wl,wall,[height(3),weight(4)]).

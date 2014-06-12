@@ -17,7 +17,7 @@ moo:type_action_help(What,Syntax,text([makes,happen,List])):- moo:action_rules(A
 % Help - A command to tell an agent all the possible commands
 moo:agent_call_command(_Agent,help) :- doall((moo:type_action_help(A,B,C),fmt(type_action_help(A,B,C)))).
 
-dyn:specifier_text(Text,verb):- moo:type_action_help(_,A,_),nonvar(A),functor_safe(A,Text,_).
+moo:term_specifier_text(Text,verb):- moo:type_action_help(_,A,_),nonvar(A),functor_safe(A,Text,_).
 
 
 :- include(logicmoo(vworld/moo_footer)).

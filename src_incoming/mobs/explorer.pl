@@ -27,7 +27,7 @@ vette_idea(Agent,Act,Act):-dmsg(vette_idea(Agent,Act)).
 
 % dyn:label_type_props(explorer(ID),explorer,[]).
 
-dyn:world_agent_plan(_World,Agent,ActV):-
+moo:world_agent_plan(_World,Agent,ActV):-
    agent(Agent),
   % mud_isa(Agent,explorer),
    explorer_idea(Agent,Act),

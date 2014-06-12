@@ -17,7 +17,7 @@
 
 % Possible agent actions.
 
-dyn:world_agent_plan(_World,Agent,Act):-
+moo:world_agent_plan(_World,Agent,Act):-
    mud_isa(Agent,vacuum),
    vacuum_idea(Agent,Act).
 

@@ -11,18 +11,17 @@
 
 :-include(run_tests).
 
-
-% [Optionaly] load and start sparql server
-:- at_start(start_servers)
-
-% [Manditory] define load_default_game
-load_default_game :- load_game(logicmoo('rooms/startrek.all.pl')).
+% [Optionaly] re-define load_default_game
+% load_default_game:- load_game(logicmoo('rooms/startrek.all.pl')).
 
 % [Manditory] This loads the game and intializes
 :- at_start(run_setup).
 
 % [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
 :- register_timer_thread(npc_ticker,30,npc_tick).
+
+% [Optionaly] load and start sparql server
+%:- at_start(start_servers).
 
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
 :- at_start((debug,must_det(run))).

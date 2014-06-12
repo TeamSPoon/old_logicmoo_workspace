@@ -16,9 +16,9 @@ as_one_of(Type,oneOf(Type)).
 
 argIsa_call(Prop,N1,T):-once(var(Prop);not(number(N1))),trace_or_throw(argIsa_call(Prop,N1,T)).
 argIsa_call(_:Prop,N1,Type):-!,argIsa_call(Prop,N1,Type).
+argIsa_call(Prop,N1,TypeO):- findall(Type,argIsa_call_0(Prop,N1,Type),Types),Types=[_|_],!,as_one_of(Types,TypeO),!.
+argIsa_call(Prop/_,N1,Type):- !,argIsa_call(Prop,N1,Type),!.
 
-argIsa_call(Prop,N1,TypeO):- findall(Type,argIsa_call_0(Prop,N1,Type),Types),as_one_of(Types,TypeO).
-argIsa_call(Prop/_,N1,Type):-!,argIsa_call(Prop,N1,Type).
 argIsa_call(Prop,N1,Type):- argIsa_call_1(Prop,N1,Type),!.
 
 argIsa_call_0(Prop,N1,Type):-get_mpred_prop(Prop,argIsa(N1,Type)),!.
@@ -34,10 +34,10 @@ argIsa_call_0(agent_text_command,_,term).
 argIsa_call_0(term_anglify,_,term).
 argIsa_call_0(ask_modulee,_,term).
 argIsa_call_0(memory,2,term):-!.
-argIsa_call_0(Pred,N,Type):-argIsa_asserted(Pred,N,Type).
+argIsa_call_0(Pred,N,Type):- argIsa_asserted(Pred,N,Type).
 argIsa_call_0(Prop/_,N1,Type):-!,argIsa_call_0(Prop,N1,Type).
-argIsa_call_0(Func,N,Type):- get_functor(Func,F,_),F \= Func,argIsa_call_0(F,N,Type).
 argIsa_call_0(_,_,term).
+argIsa_call_0(Func,N,Type):- get_functor(Func,F,_),F \= Func,argIsa_call_0(F,N,Type).
 
 
 argIsa_asserted(Pred,N,Type):- get_mpred_prop(Pred,argsIsa(Templ)),!,arg(N,Templ,Type).
@@ -45,12 +45,12 @@ argIsa_asserted(Pred,N,Type):- holds_t(ft_info,Templ,formatted),functor(Templ,Pr
 argIsa_asserted(Pred,N,Type):- holds_t(isa,Templ,mpred),functor(Templ,Pred,A),A>0,!,arg(N,Templ,Type).
 argIsa_asserted(Pred,N,Type):- holds_t(argsIsa,Templ),get_functor(Templ,Pred),!,arg(N,Templ,Type).
 argIsa_asserted(Pred,N,Type):- holds_t(argIsa,Pred,N,Type),!.
-argIsa_asserted(Prop/_,N1,Type):-argIsa_asserted(Prop,N1,Type).
+argIsa_asserted(Prop/_,N1,Type):- nonvar(Prop), argIsa_asserted(Prop,N1,Type).
 
 
-argIsa_call_1(Prop,N1,Type):- is_2nd_order_holds(Prop),trace,dmsg(todo(define(argIsa_call(Prop,N1,'Second_Order_TYPE')))),
+argIsa_call_1(Prop,N1,Type):- is_2nd_order_holds(Prop),dmsg(todo(define(argIsa_call(Prop,N1,'Second_Order_TYPE')))),
    Type=argIsaFn(Prop,N1).
-argIsa_call_1(Prop,N1,Type):- trace, dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),
+argIsa_call_1(Prop,N1,Type):- dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),
    Type=argIsaFn(Prop,N1).
 
 db_quf(Op,M:C,Pretest,Template):-var(C),!,throw(var(db_quf(Op,M:C,Pretest,Template))).
@@ -304,7 +304,7 @@ detWithSpace(WithSpace,String):-ddeterminer0(String),atom_concat(String,' ',With
 detWithSpace(WithSpace,String):-ddeterminer1(String),atom_concat(String,' ',WithSpace).
 determinerRemoved(S0,Det,S):- nonvar(S0),detWithSpace(WithSpace,String),string_concat(WithSpace,S,S0),string_lower(String,Det).
 
-assert_description(dyn:description(A,S0)):-assert_description(A,S0).
+assert_description(description(A,S0)):-assert_description(A,S0).
 
 assert_description(A,S0):-nonvar(S0),string_concat('#$PunchingSomething ',S,S0),!,assert_description(A,S).
 

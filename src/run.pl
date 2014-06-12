@@ -8,10 +8,10 @@
 :- catch(noguitracer,_,true).
 
 % [Optionaly] load and start sparql server
-:- at_start(start_servers)
+:- at_start(start_servers).
 
-% [Manditory] define load_default_game
-load_default_game :- load_game(logicmoo('rooms/startrek.all.pl')).
+% [Optionaly] re-define load_default_game
+% load_default_game:- load_game(logicmoo('rooms/startrek.all.pl')).
 
 % [Manditory] This loads the game and intializes
 :- at_start(run_setup).

@@ -26,5 +26,10 @@ moo:agent_call_command(Agent,stats(SWhat)):-
          height(What,value)]))).
 
 
+moo:action_info(list(term)).
+
+moo:action_help(list(optional(term,self)), "Examine MUD listing of something").
+moo:agent_call_command(_Gent,list(Obj)):- term_listing(Obj).
+
 :- include(logicmoo(vworld/moo_footer)).
 

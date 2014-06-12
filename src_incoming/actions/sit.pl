@@ -21,9 +21,9 @@ moo:action_help(Posture,text("sets and agent's posture to ",Posture)):-is_postur
 moo:agent_call_command(Agent,Sit) :-is_posture(Sit),
         fmt('agent ~w is now ~wing ',[Agent,Sit]),
         padd(Agent,posture(Sit)),
-	dyn:update_charge(Agent,Sit).
+	moo:update_charge(Agent,Sit).
 
-dyn:update_charge(Agent,Sit) :- is_posture(Sit), padd(Agent,[charge(-1)]).
+moo:update_charge(Agent,Sit) :- is_posture(Sit), padd(Agent,[charge(-1)]).
 
 :- include(logicmoo(vworld/moo_footer)).
 

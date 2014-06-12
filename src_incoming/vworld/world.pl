@@ -87,8 +87,6 @@
 :- meta_predicate cached(0).
 :- meta_predicate show_kb_via_pred_3(*,*,*,*,^,?).
 
-% is_property(P,A):- dyn:db_prop(_,C),functor(C,P,A2),A is A2-1.
-
 
 isaOrSame(A,B):-A==B,!.
 isaOrSame(A,B):-world_mud_isa(A,B).
@@ -231,7 +229,7 @@ create_instance_0(T,Type,List):-
 %dyn:createableType(type).
 %f(X,Y):- hotrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci(XF,YF)))).
 
-dyn:type_default_props(agent,last_command(stand)).
+moo:type_default_props(self,agent,last_command(stand)).
 
 :- include(logicmoo('vworld/world_2d')).
 :- include(logicmoo('vworld/world_agent')).

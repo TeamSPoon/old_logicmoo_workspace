@@ -30,6 +30,8 @@
      user_use_module/1,
      dumpST/0,
      dumpST/1, 
+     trace_or_throw/1,
+     trace_or/1,
      os_to_prolog_filename/2,
      debugOnFailure0/1,
       op(1150,fx,meta_predicate_transparent),
@@ -127,6 +129,10 @@
      export_all_preds/1
 	 ]).
 
+trace_or(E):- dumpST(10),dmsg(E),grtrace,!.
+trace_or(E):- E.
+
+trace_or_throw(E):-trace_or(throw(E)).
 
 % :- use_module(library(prolog_stack)).
 

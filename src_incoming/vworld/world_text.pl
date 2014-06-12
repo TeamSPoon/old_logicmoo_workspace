@@ -133,8 +133,8 @@ is_leave_alone(parserm).
 % is_leave_alone(F):- moo:is_db_prop(F,_,_),!,fail.
 is_leave_alone(A):-failOnError((sub_atom(A,_,1,0,S),atom_number(S,_))),!.
 
-dyn:term_anglify(A,B):-local_term_anglify(A,B).
-dyn:term_anglify_np_last(Obj,T,String):- local_term_anglify_np_last(Obj,T,String).
+moo:term_anglify(A,B):-local_term_anglify(A,B).
+moo:term_anglify_np_last(Obj,T,String):- local_term_anglify_np_last(Obj,T,String).
 
 generatePhrase_local(Term,String):- debugOnError(( fully_expand(Term,EnglishM),!,
           % fmt('FR0=~q~n',[fully_expand(Term,EnglishM)]),
@@ -275,7 +275,7 @@ local_term_anglify(fN(Obj,T),String):- anglify_noun_known(Obj,T,String),!.
 % %enter_term_anglify(Obj,Obj):-!.
 
 
-dyn:term_anglify_np(Obj,Hint,String):-local_term_anglify_np(Obj,Hint,String).
+moo:term_anglify_np(Obj,Hint,String):-local_term_anglify_np(Obj,Hint,String).
 
 local_term_anglify_np(Obj,String):-mud_isa(Obj,Isa),local_term_anglify_np(Obj,Isa,String),!.
 local_term_anglify_np(Obj,String):-local_term_anglify_np(Obj,term,String).

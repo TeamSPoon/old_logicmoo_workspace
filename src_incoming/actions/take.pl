@@ -26,11 +26,11 @@ moo:agent_call_command(Agent,take(SObj)) :-
 	props(Obj,weight(1)),
 	worth(Agent,take,Obj),
 	permanence_take(take,Agent,Obj),
-	dyn:update_charge(Agent,take).
+	moo:update_charge(Agent,take).
 
 %Nothing to pick up
 moo:agent_call_command(Agent,take(_)) :-
-	dyn:update_charge(Agent,take),
+	moo:update_charge(Agent,take),
 	add(failure(Agent,take)).
 
 % Is the obect going to stick around after taken, either as is
@@ -53,7 +53,7 @@ check_permanence(take,Agent,_,Obj) :-
 check_permanence(take,_,_,_).
 
 % Record keeping
-dyn:update_charge(Agent,take) :-
+moo:update_charge(Agent,take) :-
       padd(Agent,[charge(-2)]).
 
 

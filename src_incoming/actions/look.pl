@@ -75,7 +75,7 @@ call_look(Agent,LOC):-
          all(get_feet(Agent,value)),
          get_near(Agent,value),
          get_percepts(Agent,value),         
-         movedist(Agent,value),
+         dyn:movedist(Agent,value),
          height_on_obj(Agent,value),
          success=look:success(Agent,value)
        ]).

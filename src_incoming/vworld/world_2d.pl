@@ -113,7 +113,7 @@ locs_near_i(L1,L2):- locationToRegion(L1,R),pathBetween_call(R,_,R2),in_grid(R2,
 region_near(R1,R2):-pathBetween_call(R1,_,R2).
 region_near(R1,R1).
 
-dyn:type_default_props(OfAgent,agent,[facing(F),atloc(L)]):-create_someval(facing,OfAgent,F),create_someval(atloc,OfAgent,L).
+moo:type_default_props(OfAgent,agent,[facing(F),atloc(L)]):-create_someval(facing,OfAgent,F),create_someval(atloc,OfAgent,L).
 
 put_in_world(Agent):-ensure_some(facing,Agent),!,ensure_some(atloc,Agent),!.
 
@@ -255,7 +255,7 @@ check_for_fall(LOC,XXYY,Agent) :-
 	props(LowObj,height(Hl)),
 	Hd is Hh - Hl,
 	Hd > 1,
-	dyn:update_stats(Agent,fall).
+	moo:update_stats(Agent,fall).
 check_for_fall(_,_,_).
 
 

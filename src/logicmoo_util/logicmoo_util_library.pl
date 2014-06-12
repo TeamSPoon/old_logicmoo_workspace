@@ -58,7 +58,7 @@ lastMember(E,[H|List]):-lastMember(E,List);E=H.
 
 bad_functor(L) :- arg(_,v('|','.',[],':','/'),L).
 
-warn_bad_functor(L):-ignore((notrace(bad_functor(L)),!,grtrace,throw(bad_functor(L)))).
+warn_bad_functor(L):-ignore((notrace(bad_functor(L)),!,trace_or_throw(bad_functor(L)))).
 
 safe_univ(Call,[L|List]):- not(is_list(Call)),Call =..[L|List],!,warn_bad_functor(L).
 safe_univ([L|List],[L|List]):- var(List),atomic(Call),!,grtrace,Call =.. [L|List],warn_bad_functor(L).

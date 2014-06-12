@@ -20,7 +20,7 @@
 :- include(logicmoo(vworld/moo_header)).
 :- moo:register_module_type(planning).
 
-dyn:world_agent_plan(_World,Agent,Act):-
+moo:world_agent_plan(_World,Agent,Act):-
    mud_isa(Agent,monster),
    monster_idea(Agent,Act).
    
@@ -50,7 +50,7 @@ monster_idea(Agent,move(Dir)) :-
 
 monster_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[corpse]).
 
-dyn:type_default_props(monster, [description(self,SFmt),wearing(tough_hide),possess(tough_hide)]):-sformat(SFmt,"Very scarey looking monster named ~w",[self]).
+moo:type_default_props(self,monster, [description(self,SFmt),wearing(tough_hide),possess(tough_hide)]):-sformat(SFmt,"Very scarey looking monster named ~w",[self]).
 
 
 

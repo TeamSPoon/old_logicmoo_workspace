@@ -29,18 +29,18 @@ moo:agent_call_command(Agent,climb(Dir)) :-
 	move_dir_target(LOC,Dir,XXYY),
 	can_move_into(LOC,XXYY),
 	in_world_move(_,Agent,Dir),
-	dyn:update_stats(Agent,trip),
-	dyn:update_charge(Agent,climb).
+	moo:update_stats(Agent,trip),
+	moo:update_charge(Agent,climb).
 % Object is too high to climb, or it is another agent. 
 moo:agent_call_command(Agent,climb(Dir)) :-
 	
 	\+ climbable(Agent,Dir),
-	dyn:update_stats(Agent,pulled),
-	dyn:update_charge(Agent,climb).
+	moo:update_stats(Agent,pulled),
+	moo:update_charge(Agent,climb).
 % Successful climb
 moo:agent_call_command(Agent,climb(Dir)) :-	
 	in_world_move(_,Agent,Dir),
-	dyn:update_charge(Agent,climb).
+	moo:update_charge(Agent,climb).
 
 % Test to see if agent can climb the object
 climbable(Agent,Dir) :-
@@ -54,17 +54,17 @@ climbable(Agent,Dir) :-
 	ObjHt > 1.
 
 %Record keeping
-dyn:update_charge(Agent,climb) :-
+moo:update_charge(Agent,climb) :-
 	del(charge(Agent,Old)),
 	New is Old - 5,
 	add(charge(Agent,New)).
 
-dyn:update_stats(Agent,trip) :- 
+moo:update_stats(Agent,trip) :- 
         del(damage(Agent,Old)),
 	New is Old - 3,
 	add(damage(Agent,New)).
 
-dyn:update_stats(Agent,pulled) :- 
+moo:update_stats(Agent,pulled) :- 
         del(damage(Agent,Old)),
 	New is Old - 2,
 	add(damage(Agent,New)),

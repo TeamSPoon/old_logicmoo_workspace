@@ -27,8 +27,8 @@ moo:agent_call_command(Agent,push(Dir)) :-
 	atloc(What,XXYY),
 	integer(What),
 	in_world_move(_,Agent,Dir),
-	dyn:update_stats(Agent,strain),
-	dyn:update_charge(Agent,push).
+	moo:update_stats(Agent,strain),
+	moo:update_charge(Agent,push).
 
 % Pushing what cannot be pushed
 % Some damage and loss of charge (same as normal push)
@@ -37,8 +37,8 @@ moo:agent_call_command(Agent,push(Dir)) :-
 	move_dir_target(LOC,Dir,XXYY),
 	atloc(What,XXYY),
 	\+ pushable(Agent,What,XXYY,Dir),
-	dyn:update_stats(Agent,hernia),
-	dyn:update_charge(Agent,push).
+	moo:update_stats(Agent,hernia),
+	moo:update_charge(Agent,push).
 
 % A successful PUSH
 moo:agent_call_command(Agent,push(Dir)) :-	
@@ -47,7 +47,7 @@ moo:agent_call_command(Agent,push(Dir)) :-
 	atloc(What,XXYY),
 	move_object(XXYY,What,Dir),
 	in_world_move(_,Agent,Dir),
-	dyn:update_charge(Agent,push).
+	moo:update_charge(Agent,push).
 
 % Can the Object be pushed?
 pushable(Agent,Obj,LOC,Dir) :-
@@ -96,9 +96,9 @@ squish_behind(_,_).
 crashbang(Obj) :- padd(Obj,[damage(-5)]).
 
 % Record keeping
-dyn:update_charge(Agent,push) :- padd(Agent,[charge(-6)]).
-dyn:update_stats(Agent,strain) :- padd(Agent,[damage(-2)]).
-dyn:update_stats(Agent,hernia) :- padd(Agent,[damage(-4),failure(hernia)]).
+moo:update_charge(Agent,push) :- padd(Agent,[charge(-6)]).
+moo:update_stats(Agent,strain) :- padd(Agent,[damage(-2)]).
+moo:update_stats(Agent,hernia) :- padd(Agent,[damage(-4),failure(hernia)]).
 
 :- include(logicmoo(vworld/moo_footer)).
 

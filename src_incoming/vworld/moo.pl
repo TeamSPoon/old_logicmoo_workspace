@@ -24,6 +24,7 @@
           is_holds_true/1,
           include_moo_files/1,
          current_context_module/1,         
+         mud_test/2,
          ensure_moo_loaded/1,
          do_all_of/1,
          call_after/2,
@@ -75,10 +76,11 @@ dbase_mod(dbase).
 :- dynamic_multifile_exported action_help/2.
 :- dynamic_multifile_exported type_action_help/3.
 
+:- dynamic_multifile_exported mud_test/2.
 :- dynamic_multifile_exported mpred_prop/2.
 :- dynamic_multifile_exported agent_call_command/2.
 :- dynamic_multifile_exported call_after_load/1.
-:- dynamic_multifile_exported world_agent_plan/3.
+:- dynamic_multifile_exported moo:world_agent_plan/3.
 :- dynamic_multifile_exported now_unused/1.
 :- dynamic_multifile_exported hook:decl_database_hook/2.
 :- dynamic_multifile_exported decl_mud_test/2.
@@ -86,6 +88,10 @@ dbase_mod(dbase).
 :- dynamic_multifile_exported registered_module_type/2.
 :- dynamic_multifile_exported (decl_coerce)/3.
 :- dynamic_multifile_exported agent_text_command/4.
+
+:- dynamic_multifile_exported((action_info/1,action_help/2,action_rules/4,type_action_help/3,term_specifier_text/2,action_verb_useable/4)).
+:- dynamic_multifile_exported((term_anglify/2,term_anglify_last/2, term_anglify_np/3,term_anglify_np_last/3)).
+:- dynamic_multifile_exported((update_charge/2,update_stats/2,type_default_props/3)).
 
 :- module_transparent register_module_type/1.
 :-thread_local thlocal:repl_writer/2.
@@ -280,10 +286,13 @@ decl_not_mpred(F/A):-!, decl_not_mpred(F,A).
 decl_not_mpred([A]):-!,decl_not_mpred(A).
 decl_not_mpred([A|L]):-!,decl_not_mpred(A),decl_not_mpred(L).
 decl_not_mpred((A,L)):-!,decl_not_mpred(A),decl_not_mpred(L).
-decl_not_mpred(M):-compound(M),functor(M,F,A),decl_not_mpred(F,A).
+decl_not_mpred(M):-compound(M),functor_safe(M,F,A),decl_not_mpred(F,A).
 decl_not_mpred(M):-throw(failed(decl_not_mpred(M))).
 
-decl_not_mpred(F,A):-asserta_new(never_use_holds_db(F,A,decl_not_mpred(F,A))).
+decl_not_mpred(F,A):-
+   asserta_new(never_use_holds_db(F,A,decl_not_mpred(F,A))),   
+   dynamic_multifile_exported(F,A),
+   add_mpred_prop(F/A,[ask_module(moo),assert_with_pred(hooked_asserta)]).
 
 :-dynamic(dbase_module_loaded/0).
 dbase_module_loaded:- 
@@ -368,32 +377,14 @@ current_context_module(Ctx):-context_module(Ctx).
 
 
 
-:- decl_mpred(db_prop/2).
-:- decl_mpred(subclass/2).
-
-:- decl_mpred(term_anglify_last/2).
-:- decl_mpred(term_anglify/2).
-
-:- decl_not_mpred action_info/1.
-:- decl_not_mpred action_help/2.
-:- decl_not_mpred type_action_help/3.
-
-:- decl_mpred action_rules/4.
+:- decl_mpred subclass/2.
 :- decl_mpred createableSubclassType(type,type).
 :- decl_mpred createableType(type).
 :- decl_mpred label_type_props/3.
 :- decl_mpred label_type/2.
-:- decl_mpred specifier_text/2.
 :- decl_mpred subclass/2.
-:- decl_mpred term_anglify/2.
-:- decl_mpred term_anglify_last/2.
-:- decl_mpred term_anglify_np/3.
-:- decl_mpred term_anglify_np_last/3.
-:- decl_mpred type_default_props/3.
 :- decl_mpred type_grid/3.
-:- decl_mpred update_charge/2.
-:- decl_mpred update_stats/2.
-:- decl_mpred use_usable/4.
+
 
 
 decl_coerce(_,_,_):-fail.

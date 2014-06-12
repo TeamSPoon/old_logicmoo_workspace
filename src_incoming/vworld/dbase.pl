@@ -46,7 +46,6 @@ cyclifyNew/2,
 cycQuery/1,
 cycQuery/2,
 prolog_callable_expanded/1,
-trace_or_throw/1,
 split_name_type/3,
 cycRetract/1,
 cycRetract/2,
@@ -372,7 +371,7 @@ call_after_game_load(Code):- call_after(moo:not_loading_game_file,Code).
 
 %  argIsa_call/3, use_term_listing/2,world_clear/1.
 
-:- dynamic db_prop_prolog/11.
+:- dynamic db_prop_prolog/2.
 
 % :- context_module(M),asserta(moo:dbase_mod(M)),dmsg(assert_if_new(moo:dbase_mod(M))).
 
@@ -1201,8 +1200,6 @@ db_op_unit(Op,_C0,Prop,ARGS):- grtrace,must((db_op_sentence(Op,Prop,ARGS,Unit),s
 db_op_unit(Op,C0,_Prop,_ARGS):- db_op_loop(Op,C0,db_op_exact(Op,C0)).
 
 
-trace_or_throw(E):-grtrace,throw(E).
-
 db_op_loop(Op,Unit,Result):- is_loop_checked(db_op0(Op,Unit)),!,call(Result).
 db_op_loop(Op,Unit,_Result):- db_op(Op,Unit).
 
@@ -1386,7 +1383,7 @@ valuedOrThrow1(_F,_A,_Obj,ARGS):- last(ARGS,unknown),!.
 valuedOrThrow1(F,A,Obj,ARGS):- trace_or_throw(is_single_valuedOrFail(F,A,Obj,ARGS)).
 
 
-findall_type_default_props(Inst,Type,TraitsO):- findall(Props,holds_t(type_default_props,Type,Props),Traits),flatten(Traits,TraitsM),!,subst(TraitsM,self,Inst,TraitsO).
+findall_type_default_props(Inst,Type,TraitsO):- findall(Props,moo:type_default_props(Inst,Type,Props),Traits),flatten(Traits,TraitsM),!,subst(TraitsM,self,Inst,TraitsO).
 
 
 replace_nth([],_N,_OldVar,_NewVar,[]):- !,trace_or_throw(missed_the_boat).
@@ -1526,10 +1523,12 @@ savedb:-
    tell('/tmp/lm/savedb'),make_db_listing,told),E,dmsg(savedb(E))).
 
 make_db_listing:-
- moo:dbase_mod(DBM),
- listing(DBM:dbase_t),
- listing(moo:agent_call_command),
- listing(moo:agent_call_command).
+ % moo:dbase_mod(DBM),
+ listing(dbase_t),
+ listing(dbase_f),
+ listing(moo:_),
+ listing(dyn:_).
+
 /*
 is_ft_except(S,List):- 
    dyn:ft_info(S,_);

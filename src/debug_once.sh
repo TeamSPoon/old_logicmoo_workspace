@@ -14,7 +14,8 @@ echo "You should not see this ever";
 reset -w
 echo -ne '\033]50;ClearScrollback\a'
 echo -en "\ec\e[3J"
-echo "Hit CTRL+C ${BASH_SOURCE[0]} ";
+echo `pwd`
+echo "Hit CTRL+C ${BASH_SOURCE[0]} $RUNFILE ";
 sleep 4;
 cd $NEWPWD
 swipl -f $RUNFILE

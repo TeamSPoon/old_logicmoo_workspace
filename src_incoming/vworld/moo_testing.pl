@@ -48,8 +48,8 @@ test_false(SomeGoal):- not(SomeGoal); (last_test_name(String),dmsg(moo_test(fail
 term_test(Obj):- 
    doall((
    moo:mud_test(H,B),
-   use_term_listing(Obj,dyn:mud_test(H,B),true),
-   moo:mud_test(H,B),
+   once(use_term_listing(Obj,((H,B)),true)),
+   once(run_mud_test(H,B)),
    fail)).
 
 run_mud_test(Name,Test):-

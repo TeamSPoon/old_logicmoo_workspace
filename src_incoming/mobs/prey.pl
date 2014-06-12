@@ -23,7 +23,7 @@
 % :- dynamic memory/2. 
 %:- dynamic agent_list/1.
 
-dyn:world_agent_plan(_World,Self,Act):-
+moo:world_agent_plan(_World,Self,Act):-
    mud_isa(Self,prey),
    prey_idea(Self,Act).
    
