@@ -56,7 +56,7 @@ moo:action_help(parse(prolog,list(term)),"Development test to parse some Text fo
 moo:agent_text_command(Agent,[parse,Type|List],Agent,parse(Type,List)).
 
 moo:agent_call_command(_Gent,parse(Type,StringM)):-
-   print_parse_for(Type,StringM,_Term,_LeftOver,fmt).
+   print_parse_for(fmt, Type,StringM,_Term,_LeftOver).
 
 
 % ===========================================================
@@ -70,7 +70,7 @@ moo:agent_call_command(Agent,parsetemps(StringM)):-
   to_word_list(StringM,[SVERB|ARGS]),
   get_vp_templates(Agent,SVERB,ARGS,TEMPLATES),fmt(templates=TEMPLATES),
   ignore((
-     print_parse_for(vp,StringM,Goal,LeftOver,fmt),
+     print_parse_for(fmt,vp,StringM,Goal,LeftOver),
      fmt([goal=Goal,lfto=LeftOver]))).
 
 % ===========================================================
@@ -266,7 +266,7 @@ get_vp_templates(_Agent,SVERB,_ARGS,TEMPLATES):-
    sort(TEMPLATES_FA,TEMPLATES),!.
    
 % parses a verb phrase and retuns multiple interps
-parse_vp_real(Agent,SVERB,ARGS,GOALANDLEFTOVERS):-
+parse_vp_real(Agent,SVERB,ARGS,Sorted):-
    get_vp_templates(Agent,SVERB,ARGS,TEMPLATES),
    dmsg_parserm(("TEMPLATES"= ([SVERB|ARGS] = TEMPLATES))),
    TEMPLATES \= [],
@@ -277,7 +277,8 @@ parse_vp_real(Agent,SVERB,ARGS,GOALANDLEFTOVERS):-
       phrase_parseForTypes(TYPEARGS,GOODARGS,ARGS,LeftOver),
       GOAL=..[VERB|GOODARGS])),
       GOALANDLEFTOVERS_FA),
-   sort(GOALANDLEFTOVERS_FA,GOALANDLEFTOVERS).
+   sort(GOALANDLEFTOVERS_FA,GOALANDLEFTOVERS),
+   predsort(bestParse,GOALANDLEFTOVERS,Sorted).
 
 chooseBestGoal([_LeftOver - GOAL],GOAL):-!.
 chooseBestGoal(GOALANDLEFTOVERS,GOAL):-
@@ -360,10 +361,10 @@ query_trans_sc(FT,Sub):-dyn:subclass(FT,A),dyn:subclass(A,B),dyn:subclass(B,C),d
 
 parseFmtOrIsa(Sub, B, C, D):- parseFmt(Sub, B, C, D).
 
-parseFmt(vp,Goal,Left,Right):-atLeastOnOrElse(parseFmt_vp1(self,Goal,Left,Right),parseFmt_vp2(self,Goal,Left,Right)).
+parseFmtOrIsa(vp,Goal,Left,Right):-atLeastOneOrElse(parseFmt_vp1(self,Goal,Left,Right),parseFmt_vp2(self,Goal,Left,Right)).
 
-parseFmt_vp1(Agent, do(NewAgent,Goal),[L|Left],[]):- parse_agent_text_command(self,SVERB,ARGS,NewAgent,Goal).
-parseFmt_vp2(Agent,Goal,           [L|Left],Right):- parse_vp_real(self,L,Left,List),!,member(Right-Goal,List).
+parseFmt_vp1(Agent, do(NewAgent,Goal),[SVERB|ARGS],[]):- parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,Goal).
+parseFmt_vp2(Agent,GOAL,[SVERB|ARGS],UNPARSED):- parse_vp_real(Agent,SVERB,ARGS,TRANSLATIONS),!,member(UNPARSED-GOAL,TRANSLATIONS).
 
 parseFmt(_, _, [AT|_], _):- var(AT),!,fail.
 parseFmt(string,String)--> theString(String).
