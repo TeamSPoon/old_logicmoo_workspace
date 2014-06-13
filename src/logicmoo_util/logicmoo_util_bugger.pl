@@ -25,6 +25,7 @@
      global_pathname/2,
      printAll/2,
      moo_hide_childs/1,
+     moo_hide_childs/2,
      debugOnFailure/1,
      module_notrace/1,
      user_use_module/1,
@@ -159,7 +160,7 @@ set_bugger_flag(F,V):-current_prolog_flag(F,_Old),set_prolog_flag(F,V),!.
 set_bugger_flag(F,V):-create_prolog_flag(F,V,[term]).
 
 
-:- meta_predicate moo_hide_childs(:).
+:- meta_predicate moo_hide_childs(0).
 :- module_transparent moo_hide_childs/0.
 
 :- meta_predicate atLeastOne3(+,^,^).
@@ -216,7 +217,7 @@ user_use_module(What):- '@'(use_module(What),'user').
 :- '@'(use_module(logicmoo_util_library), 'user').
 
 
-:-dynamic inside_loop_check/1.
+:-thread_local inside_loop_check/1.
 
 
 
@@ -230,11 +231,23 @@ user_use_module(What):- '@'(use_module(What),'user').
 loop_check_throw(B):- loop_check(B,((retractall(inside_loop_check(BC)),debugCallWhy(loop_check_throw(BC,B),loop_check_throw(B))))).
 loop_check_fail(B):- loop_check(B,(dmsg(once(loop_check_fail(B))),fail)).
 
-is_loop_checked(B):- copy_term(B,BC),numbervars(BC,0,_),!,inside_loop_check(BC).
+snumbervars(BC):-numbervars(BC,0,_,[singletons(true),attvar(skip)]).
 
-loop_check(B,TODO):- copy_term(B,BC),numbervars(BC,0,_),!, loop_check(BC,B,TODO).
-loop_check(BC,_B,TODO):-inside_loop_check(BC),!,call(TODO).
-loop_check(BC,B,_TODO):- 
+loop_check(B,TODO):- copy_term(B,BC),snumbervars(BC),!, loop_check(BC,B,TODO).
+
+
+is_loop_checked(B):- copy_term(B,BC),snumbervars(BC),!,inside_loop_check(BC).
+is_loop_checked(B):- copy_term(B,BC),snumbervars(BC),!,recorded(B,BC).
+/*
+loop_check(BC,B,TODO):-recorded(B,BC),!,call(TODO).
+loop_check(BC,B,_TODO):- !,
+    recorda(B,BC,Ref),
+    setup_call_cleanup(true,
+       call(B),
+       erase(Ref)).
+*/
+loop_check(BC,_B, TODO):-inside_loop_check(BC),!,call(TODO).
+loop_check(BC, B,_TODO):- 
     setup_call_cleanup(asserta(inside_loop_check(BC)),
     call(B),
     ignore(retract(inside_loop_check(BC)))).
@@ -451,9 +464,9 @@ ignoreOnError(CX):-ignore(catch(CX,_,true)).
 %debugCallF(C):-notrace,dmsg(debugCallF(C)),dumpST, pause_trace(failed(C)),gftrace,C.
 
 debugCallWhy(Why, C):-notrace,dmsg(Why),debugCallWhy2(Why, C).
-debugCallWhy2(failed(_Why), C):- gftrace,C.
-debugCallWhy2(thrown(_Why), C):- ggtrace,C.
-debugCallWhy2(_Why, C):- grtrace,C.
+debugCallWhy2(failed(_Why), C):- gftrace,dtrace,C.
+debugCallWhy2(thrown(_Why), C):- ggtrace,dtrace,C.
+debugCallWhy2(_Why, C):- grtrace,dtrace,C.
 
 
 debugOnError(C):- !, C.
@@ -1129,12 +1142,18 @@ moo_hide(PIn):-
  must(to_m_f_arity_pi(PIn,M,_F,_A,MPred)),
  moo_hide_childs(M,MPred).
 
+moo_hide_childs(M:F/A):-!,functor(Pred,F,A),moo_hide_childs(M:Pred).
+moo_hide_childs(F/A):-!,functor(Pred,F,A),moo_hide_childs(Pred).
+moo_hide_childs(M:Pred):- moo_hide_childs(M,Pred).
 
-moo_hide_childs(M:Pred):-
-  moo_hide_childs(M,Pred).
+moo_hide_childs(M,F/A):-!,functor(Pred,F,A),moo_hide_childs(M,Pred).
+
+% predicate_property(do_pending_db_ops,PP)
+% predicate_property_m(Pred,imported_from(M)):- predicate_property(Pred,imported_from(M)).
+% predicate_property_m(Pred,imported_from(M)):-predicate_property(M:Pred,M).
 
 moo_hide_childs(M,Pred):-
-  predicate_property(Pred,imported_from(M)),
+ % predicate_property_m(Pred,M),
  '$set_predicate_attribute'(M:Pred, trace, 0),
  '$set_predicate_attribute'(M:Pred, noprofile, 1),
  '$set_predicate_attribute'(M:Pred, hide_childs, 1),!.
@@ -1184,22 +1203,22 @@ bdmsg(D):-once(dmsg(D)).
 bugger_term_expansion(_,_):-!,fail.
 bugger_term_expansion(T,T3):- compound(T), once(bugger_t_expansion(T,T2)),T\=T2,!,catch(expand_term(T2,T3),_,fail).
 
-
+% though maybe dumptrace
 default_dumptrace(notrace(trace)).
 
-ggtrace:- default_dumptrace(DDT). ggtrace(DDT).
+ggtrace:- default_dumptrace(DDT), ggtrace(DDT).
 ggtrace(Trace):- 
-   notrace((visible(+all),visible(-unify),visible(+exception),
+   leash(-call),((visible(+all),visible(-unify),visible(+exception),
    leash(-all),leash(+exception),
    leash(+call))),Trace,leash(-call).
 
-gftrace:- default_dumptrace(DDT). gftrace(DDT).
+gftrace:- default_dumptrace(DDT), gftrace(DDT).
 gftrace(Trace):- 
-   notrace((visible(-all), visible(+fail),visible(+call),visible(+exception),
+   leash(-call),((visible(-all), visible(+fail),visible(+call),visible(+exception),
    leash(-all),leash(+exception),
    leash(+call))),Trace,leash(-call).
 
-grtrace:- default_dumptrace(DDT). grtrace(DDT).
+grtrace:- default_dumptrace(DDT), grtrace(DDT).
 grtrace(Trace):- notrace(( visible(+all),leash(+all))), Trace.
 
 
@@ -1211,7 +1230,7 @@ dumptrace:-tracing,!.
 dumptrace:-writeq(dumptrace),nl,get_single_char(C),writeq(keypress(C)),nl,dumptrace(C).
 dumptrace(0'd):-notrace(dumpST),!,fail.
 dumptrace(_):-notrace(dumpST(10)),fail.
-dumptrace(0'l):-show_and_do((leash(-call,trace))),!.
+dumptrace(0'l):-show_and_do((leash(-call))),!,trace.
 dumptrace(0't):-show_and_do((trace,trace)),!.
 dumptrace(0'g):-show_and_do(ggtrace(true)),!.
 dumptrace(0'r):-show_and_do(grtrace(true)),!.

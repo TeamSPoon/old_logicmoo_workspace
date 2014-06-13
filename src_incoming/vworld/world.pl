@@ -126,6 +126,7 @@ mud_isa(O,T):-world_mud_isa(O,T).
 
 world_mud_isa(O,T):- O==T,!.
 world_mud_isa(O,T):- var(O),var(T),!,isa_mc(T,_),anyInst(O),req(isa(O,T)).
+%world_mud_isa(O,T):-!,
 world_mud_isa(O,T):- cached(not_mud_isa(O,T)),!,fail.
 world_mud_isa(O,T):- req(isa(O,T)).
 world_mud_isa(_,T):- not(atom(T)),!,fail.

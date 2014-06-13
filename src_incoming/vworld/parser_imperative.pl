@@ -334,11 +334,13 @@ parseIsa(FT, B, C, D):-  dbase:call_tabled(parseIsa0(FT, B, C, D)).
 
 parseIsa0(FT, B, C, D):- list_tail(C,D),parseForIsa(FT, B, C, D).
 
+
 parseForIsa(actor,A,B,C) :- parseForIsa(agent,A,B,C).
-parseForIsa(optional(Type,_Who), Term, C, D) :- parseForIsa(Type, Term, C, D).
-parseForIsa(optional(_Type,Who), Who, D, D).
+parseForIsa(optional(Type,_Who), Term, C, D) :- nonvar(Type),parseForIsa(Type, Term, C, D).
+parseForIsa(optional(_Type,Who), Who, D, D):-!. %,nonvar(Who).
 
-
+parseForIsa(Var, _B, _C, _D):-var(Var),!,fail. % trace_or_throw(var_parseForIsa(Var, B, C, D)).
+% parseForIsa(Var, B, C, D):-var(Var),!,trace_or_throw(var_parseForIsa(Var, B, C, D)).
 parseForIsa(not(Type), Term, C, D) :-  dcgAnd(dcgNot(parseIsa(Type)), theText(Term), C, D).
 parseForIsa(FT, B, C, D):-to_word_list(C,O),O\=C,!,parseForIsa(FT, B, O, D).
 parseForIsa(FT, B, [AT|C], D) :- nonvar(AT),member_ci(AT,['at','the','a','an']),!,parseForIsa(FT, B, C, D).
@@ -359,9 +361,11 @@ query_trans_sc(FT,Sub):-dyn:subclass(FT,A),dyn:subclass(A,B),dyn:subclass(B,Sub)
 query_trans_sc(FT,Sub):-dyn:subclass(FT,A),dyn:subclass(A,B),dyn:subclass(B,C),dyn:subclass(C,Sub).
 
 
+parseFmtOrIsa(Var, _B, _C, _D):-var(Var),!,fail. % trace_or_throw(var_parseForIsa(Var, B, C, D)).
+% parseFmtOrIsa(Var, B, C, D):-var(Var),!,trace_or_throw(var_parseForIsa(Var, B, C, D)).
 parseFmtOrIsa(Sub, B, C, D):- parseFmt(Sub, B, C, D).
 
-parseFmtOrIsa(vp,Goal,Left,Right):-atLeastOneOrElse(parseFmt_vp1(self,Goal,Left,Right),parseFmt_vp2(self,Goal,Left,Right)).
+parseFmtOrIsa(vp,Goal,Left,Right):-!,atLeastOneOrElse(parseFmt_vp1(self,Goal,Left,Right),parseFmt_vp2(self,Goal,Left,Right)).
 
 parseFmt_vp1(Agent, do(NewAgent,Goal),[SVERB|ARGS],[]):- parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,Goal).
 parseFmt_vp2(Agent,GOAL,[SVERB|ARGS],UNPARSED):- parse_vp_real(Agent,SVERB,ARGS,TRANSLATIONS),!,member(UNPARSED-GOAL,TRANSLATIONS).

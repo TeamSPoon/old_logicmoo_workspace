@@ -29,17 +29,22 @@ moo:agent_text_command(Agent,[where,BE,X],Agent,where(X)):-member(BE,[is,are,be,
 
 % where 
 moo:agent_call_command(_Agent,where(SObj)) :-
-	atloc(Obj,LOC),
-        object_match(SObj,Obj),
-        fmt(cmdresult(where,atloc(Obj,LOC))).
+    forall(
+     (atloc(Obj,LOC), object_match(SObj,Obj)),
+        fmt(cmdresult(where,atloc(Obj,LOC)))).
 
 
-moo:agent_text_command(Agent,LIST,Agent,who(_)):-trace,LIST=[who].
+moo:agent_text_command(Agent,LIST,Agent,who(_)):-LIST=[who],trace.
 
 moo:action_help(who(optional(agent,_)),"Lists who is online (where they are at least)").
 
-moo:agent_call_command(_Gent,who(Agnt2)) :- C = (agent(Agnt2),dbase_t(inRegion,Agnt2,Where)), forall(db_query(_,C),fmt(cmdresult(who(Agnt2),inRegion(Agnt2,Where)))).
+get_inRegion(Agnt,Where):-inRegion(Agnt,Where).
+get_inRegion(Agnt,Where):-atloc(Agnt,Where).
 
+moo:agent_call_command(_Gent,who(Agent)) :- 
+     forall(agent(Agent),
+      once((get_inRegion(Agent,Where),
+            fmt(cmdresult(who(Agent),inRegion(Agent,Where)))))).
 
 :- include(logicmoo(vworld/moo_footer)).
 

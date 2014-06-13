@@ -56,8 +56,13 @@ call_agent_command_maybe_fail(Agent,VERB,Result):-var(VERB),Result=failed(var(VE
 call_agent_command_maybe_fail(Agent,List,Result):- is_list(List),call_agent_command_is_list(Agent,List,Result),!.
 call_agent_command_maybe_fail(Agent,[VERB],Result):-!,call_agent_command_maybe_fail(Agent, VERB,Result),!.
 
+% other stuff
+call_agent_command_maybe_fail(Agent,Comp,Result):- safe_univ(Comp,List),!,call_agent_command_is_list(Agent,List,Result),!.
 
-call_agent_command_maybe_fail(A,CMD,Result):- call_agent_action_maybe_fail(A,CMD,Result),!.
+% call_agent_command_maybe_fail(A,CMD,Result):- not(atomic(CMD)),!,fail.
+
+% atom with stuff
+call_agent_command_maybe_fail(Agent,Atom,Result):-once((atom(Atom),atomSplit(Atom,List),length(List,Len))),Len>1,!,call_agent_command_maybe_fail(Agent,List,Result),!.
 
 % execute a prolog command including prolog/0
 call_agent_command_maybe_fail(_Gent,Atom,done(OneCmd)):- atom(Atom), catch((
@@ -66,11 +71,8 @@ call_agent_command_maybe_fail(_Gent,Atom,done(OneCmd)):- atom(Atom), catch((
       fmt('doing command ~q~n',[OneCmd]))),!, 
              doall((call_expanded(OneCmd),fmt('Yes: ~w',[VARS]))))),_,fail),!.
 
-% atom with stuff
-call_agent_command_maybe_fail(Agent,Atom,Result):-once((atom(Atom),atomSplit(Atom,List),length(List,Len))),Len>1,!,call_agent_command_maybe_fail(Agent,List,Result),!.
+% call_agent_command_maybe_fail(A,CMD,Result):- call_agent_action_maybe_fail(A,CMD,Result),!.
 
-% other stuff
-call_agent_command_maybe_fail(Agent,Comp,Result):- compound(Comp),safe_univ(Comp,List),!,call_agent_command_is_list(Agent,List,Result),!.
 
 % =====================================================================================================================
 % call_agent_command_is_list/2 -->  call_agent_action/2

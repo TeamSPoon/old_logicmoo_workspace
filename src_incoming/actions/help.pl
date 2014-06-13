@@ -22,6 +22,11 @@ get_type_action_help_0(What,Syntax,text([makes,happen,List])):- call_no_cuts(moo
       safe_univ(Syntax,[Verb,Obj|Objs]), once(member(isa(Obj,Type),List);Type=term),ignore(Agent=an(What)),ignore(What=agent).
 
 
+action_info_db(TEMPL):- PRED=moo:agent_call_command(_,TEMPL) ,predicate_property(user:PRED,multifile),clause(PRED,_BODY,REF),nonvar(TEMPL),clause_property(REF,source(_S)).
+action_info_db(TEMPL):- PRED=moo:agent_text_command(_,_,_,TEMPL) ,predicate_property(user:PRED,multifile),clause(PRED,_BODY,REF),nonvar(TEMPL),clause_property(REF,source(_S)).
+
+moo:action_info(TEMPL):-action_info_db(TEMPL).
+
 commands_list(ListS):-findall(action_help(B,C,A),(get_type_action_help(A,B,C),numbervars(get_type_action_help(A,B,C),0,_,[attvar(skip),singletons(true)])),List),
    predsort(alpha_shorter,List,ListS).
 
