@@ -11,7 +11,7 @@
 :- module(parser_imperative, [
                    parse_agent_text_command/5,            
                    parse_agent_text_command_1/5,            
-                   parse_vp_templates/4,
+                   get_vp_templates/4,
                    parseIsa//2,
                    parseIsa0//2,
                    objects_match/3,
@@ -58,6 +58,24 @@ moo:agent_text_command(Agent,[parse,Type|List],Agent,parse(Type,List)).
 moo:agent_call_command(_Gent,parse(Type,StringM)):-
    print_parse_for(Type,StringM,_Term,_LeftOver,fmt).
 
+
+% ===========================================================
+% parsetemps command
+% ===========================================================
+moo:action_help(parsetemps(list(term)),"Development test to see what verb phrase heads are found. (uses get_vp_templates/4)  Usage: parsetemps who").
+
+moo:agent_text_command(Agent,[parsetemps|List],Agent,parsetemps(List)).
+
+moo:agent_call_command(Agent,parsetemps(StringM)):-
+  to_word_list(StringM,[SVERB|ARGS]),
+  get_vp_templates(Agent,SVERB,ARGS,TEMPLATES),fmt(templates=TEMPLATES),
+  ignore((
+     print_parse_for(vp,StringM,Goal,LeftOver,fmt),
+     fmt([goal=Goal,lfto=LeftOver]))).
+
+% ===========================================================
+% parse_for/2-N
+% ===========================================================
 parse_for(Type,StringM):- parse_for(Type,StringM, _Term).
 
 parse_for(Type,StringM, Term):-parse_for(Type,StringM, Term, []).
@@ -236,7 +254,7 @@ verb_alias_to_verb(IVERB,SVERB):-specifiedItemType(IVERB,verb,SVERB), IVERB \= S
 % verb_matches("go",VERB):-!,VERB=go.
 verb_matches(SVERB,VERB):-samef(VERB,SVERB).
 
-parse_vp_templates(_Agent,SVERB,_ARGS,TEMPLATES):-
+get_vp_templates(_Agent,SVERB,_ARGS,TEMPLATES):-
    findall([VERB|TYPEARGS],
     ((     
       get_type_action_help(_What,TEMPL,_),
@@ -249,7 +267,7 @@ parse_vp_templates(_Agent,SVERB,_ARGS,TEMPLATES):-
    
 % parses a verb phrase and retuns multiple interps
 parse_vp_real(Agent,SVERB,ARGS,GOALANDLEFTOVERS):-
-   parse_vp_templates(Agent,SVERB,ARGS,TEMPLATES),
+   get_vp_templates(Agent,SVERB,ARGS,TEMPLATES),
    dmsg_parserm(("TEMPLATES"= ([SVERB|ARGS] = TEMPLATES))),
    TEMPLATES \= [],
    findall(LeftOver-GOAL,
@@ -341,6 +359,11 @@ query_trans_sc(FT,Sub):-dyn:subclass(FT,A),dyn:subclass(A,B),dyn:subclass(B,C),d
 
 
 parseFmtOrIsa(Sub, B, C, D):- parseFmt(Sub, B, C, D).
+
+parseFmt(vp,Goal,Left,Right):-atLeastOnOrElse(parseFmt_vp1(self,Goal,Left,Right),parseFmt_vp2(self,Goal,Left,Right)).
+
+parseFmt_vp1(Agent, do(NewAgent,Goal),[L|Left],[]):- parse_agent_text_command(self,SVERB,ARGS,NewAgent,Goal).
+parseFmt_vp2(Agent,Goal,           [L|Left],Right):- parse_vp_real(self,L,Left,List),!,member(Right-Goal,List).
 
 parseFmt(_, _, [AT|_], _):- var(AT),!,fail.
 parseFmt(string,String)--> theString(String).

@@ -51,6 +51,7 @@
      ggtrace/0,
      gftrace/0,
      grtrace/0,
+     has_auto_trace/1,
      atLeastOne0/2,
 %     read_line_with_nl/3,
 	 unnumbervars/2,
@@ -147,6 +148,8 @@ trace_or_throw(E):-trace_or(throw(E)).
 :-module_transparent was_module/2.
 :-multifile evil_term/3.
 :-dynamic evil_term/3.
+
+:- thread_local has_auto_trace/1.
 
 % was_module(Mod,Exports) :- nop(was_module(Mod,Exports)).
 
@@ -1196,20 +1199,24 @@ gftrace(Trace):-
 grtrace:-grtrace(dumptrace).
 grtrace(Trace):- notrace(( visible(+all),leash(+all))), Trace.
 
+
+
 show_and_do(C):-dmsg(C),!,C.
+dtrace:-has_auto_trace(C),!,C.
+dtrace:-repeat,dumptrace.
 dumptrace:-tracing,!.
 dumptrace:-writeq(dumptrace),nl,get_single_char(C),writeq(keypress(C)),nl,dumptrace(C).
-dumptrace(0'd):-notrace(dumpST), dumptrace.
+dumptrace(0'd):-notrace(dumpST),!,fail.
 dumptrace(_):-notrace(dumpST(10)),fail.
-dumptrace(0'l):-show_and_do((leash(-call))).
-dumptrace(0't):-show_and_do((leash(+call),trace)).
-dumptrace(0'g):-show_and_do(ggtrace(true)).
-dumptrace(0'r):-show_and_do(grtrace(true)).
-dumptrace(0'f):-show_and_do(gftrace(true)).
-dumptrace(10):-dumptrace_leap.
-dumptrace(13):-dumptrace_leap.
-dumptrace(C):-writeq(unused_keypress(C)),dumptrace.
-dumptrace_leap:-true.
+dumptrace(0'l):-show_and_do((leash(-call))),!.
+dumptrace(0't):-show_and_do((leash(+call),trace)),!.
+dumptrace(0'g):-show_and_do(ggtrace(true)),!.
+dumptrace(0'r):-show_and_do(grtrace(true)),!.
+dumptrace(0'f):-show_and_do(gftrace(true)),!.
+dumptrace(10):-dumptrace_leap,!.
+dumptrace(13):-dumptrace_leap,!.
+dumptrace(C):-writeq(unused_keypress(C)),!,fail.
+dumptrace_leap:-trace.
 
 bugger_t_expansion(T,T):-not(compound(T)),!.
 bugger_t_expansion(T,AA):- T=..[F,A],unwrappabe(F),bdmsg(bugger_term_expansion(T)),bugger_t_expansion(A,AA),!.
