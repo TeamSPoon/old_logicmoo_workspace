@@ -23,6 +23,8 @@
 % [Optionaly] load and start sparql server
 %:- at_start(start_servers).
 
+:-repeat, trace, do_player_action('who'),fail.
+
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
 :- at_start((debug,must_det(run))).
 

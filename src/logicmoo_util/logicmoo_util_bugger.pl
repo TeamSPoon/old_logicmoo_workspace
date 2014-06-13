@@ -1184,19 +1184,22 @@ bdmsg(D):-once(dmsg(D)).
 bugger_term_expansion(_,_):-!,fail.
 bugger_term_expansion(T,T3):- compound(T), once(bugger_t_expansion(T,T2)),T\=T2,!,catch(expand_term(T2,T3),_,fail).
 
-ggtrace:-ggtrace(dumptrace).
+
+default_dumptrace(notrace(trace)).
+
+ggtrace:- default_dumptrace(DDT). ggtrace(DDT).
 ggtrace(Trace):- 
    notrace((visible(+all),visible(-unify),visible(+exception),
    leash(-all),leash(+exception),
    leash(+call))),Trace,leash(-call).
 
-gftrace:-gftrace(dumptrace).
+gftrace:- default_dumptrace(DDT). gftrace(DDT).
 gftrace(Trace):- 
    notrace((visible(-all), visible(+fail),visible(+call),visible(+exception),
    leash(-all),leash(+exception),
    leash(+call))),Trace,leash(-call).
 
-grtrace:-grtrace(dumptrace).
+grtrace:- default_dumptrace(DDT). grtrace(DDT).
 grtrace(Trace):- notrace(( visible(+all),leash(+all))), Trace.
 
 
@@ -1208,8 +1211,8 @@ dumptrace:-tracing,!.
 dumptrace:-writeq(dumptrace),nl,get_single_char(C),writeq(keypress(C)),nl,dumptrace(C).
 dumptrace(0'd):-notrace(dumpST),!,fail.
 dumptrace(_):-notrace(dumpST(10)),fail.
-dumptrace(0'l):-show_and_do((leash(-call))),!.
-dumptrace(0't):-show_and_do((leash(+call),trace)),!.
+dumptrace(0'l):-show_and_do((leash(-call,trace))),!.
+dumptrace(0't):-show_and_do((trace,trace)),!.
 dumptrace(0'g):-show_and_do(ggtrace(true)),!.
 dumptrace(0'r):-show_and_do(grtrace(true)),!.
 dumptrace(0'f):-show_and_do(gftrace(true)),!.

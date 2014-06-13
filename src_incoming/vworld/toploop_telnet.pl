@@ -97,8 +97,10 @@ tick_tock:-
 % USES PACKRAT PARSER 
 % ===========================================================
 
+:-export(do_player_action/1).
 do_player_action(VA):- debug, foc_current_player(Agent),!, do_player_action(Agent,VA),!.
 
+:-export(do_player_action/2).
 do_player_action(Agent,CMD):-var(CMD),!,fmt('unknown_var_command(~q,~q).',[Agent,CMD]).
 do_player_action(_,EOF):- end_of_file == EOF, !, tick_tock.
 do_player_action(_,''):-!, tick_tock.

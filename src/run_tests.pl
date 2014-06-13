@@ -49,6 +49,7 @@ moo:mud_test(test_movedist,
 
 :- at_start((debug,must_det(run_mud_tests))).
 
+
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
 % :- at_start(run).
 

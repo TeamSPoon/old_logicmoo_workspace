@@ -66,7 +66,8 @@ finishCycConnection/3,
 formatCyc/3,
 getCycConnection/3,
 getSurfaceFromChars/3,
-holds_f/1,holds_f/2,holds_f/3,holds_f/4,holds_f/5,holds_f/6,holds_f/7,holds_f/8,holds_t/1,holds_t/2,holds_t/3,holds_t/4,holds_t/5,holds_t/6,holds_t/7,holds_t/8,
+holds_f/1,holds_f/2,holds_f/3,holds_f/4,holds_f/5,holds_f/6,holds_f/7,holds_f/8,
+holds_t/1,holds_t/2,holds_t/3,holds_t/4,holds_t/5,holds_t/6,holds_t/7,holds_t/8,
 call_expanded/1,
 inside_clause_expansion/1,
 invokeSubL/1,
@@ -668,13 +669,12 @@ or_list([H|T], (H;OT)) :-
 % begin holds_t
 % ================================================================================
 which_t(dac(d,a,no_c,no_mt)).
-
 holds_t(P,A1,A2,A3,A4,A5,A6,A7):- isCycPredArity_ignoreable(P,7),which_t(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5,A6,A7);call_mt_t(DBS,P,A1,A2,A3,A4,A5,A6,A7,_,_);assertion_t([P,A1,A2,A3,A4,A5,A6,A7])).
 holds_t(P,A1,A2,A3,A4,A5,A6):- isCycPredArity_ignoreable(P,6),which_t(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5,A6);call_mt_t(DBS,P,A1,A2,A3,A4,A5,A6,_,_)).
 holds_t(P,A1,A2,A3,A4,A5):- isCycPredArity_ignoreable(P,5),which_t(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5);call_mt_t(DBS,P,A1,A2,A3,A4,A5,_,_)).
 holds_t(P,A1,A2,A3,A4):- isCycPredArity_ignoreable(P,4),which_t(DBS),(call_t(DBS,P,A1,A2,A3,A4);call_mt_t(DBS,P,A1,A2,A3,A4,_,_)).
 holds_t(P,A1,A2,A3):- isCycPredArity_ignoreable(P,3),which_t(DBS),(call_t(DBS,P,A1,A2,A3);call_mt_t(DBS,P,A1,A2,A3,_,_)).
-holds_t(P,A1,A2):- holds_relaxed_t(P,A1,A2).
+holds_t(P,A1,A2):- notrace(holds_relaxed_t(P,A1,A2)).
 holds_t(P,A1):- !,req(isa(A1,P)).
 holds_t(P,A1):- isCycPredArity_ignoreable(P,1),which_t(DBS),(call_t(DBS,P,A1);call_mt_t(DBS,P,A1,_,_)).
 
@@ -1543,6 +1543,10 @@ is_ft_except(S,List):-
         is_ft_except(S2,[S|List]) ;
              ((dyn:subft(S3,S) , is_ft_except(S3,[S,S2|List]))))))).
 */
+
+
+% dide some debugging
+:-forall(member(F,[holds_t,holds_f]),doall((between(1,8,A),functor(Pred,F,A),moo_hide_childs(Pred)))).
 
 
 
