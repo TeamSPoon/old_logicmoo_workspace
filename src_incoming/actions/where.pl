@@ -24,7 +24,7 @@ dyn:subclass(agent,object).
 dyn:subclass(item,object).
 
 moo:agent_text_command(Agent,[where,X],Agent,where(X)).
-moo:agent_text_command(Agent,[where,BE,X],Agent,where(X)):-member(BE,[is,are,be,were]).
+moo:agent_text_command(Agent,[where,BE,X],Agent,where(X)):-memberchk(BE,[is,are,be,were]).
 
 
 % where 
@@ -34,7 +34,7 @@ moo:agent_call_command(_Agent,where(SObj)) :-
         fmt(cmdresult(where,atloc(Obj,LOC)))).
 
 
-moo:agent_text_command(Agent,LIST,Agent,who(_)):-LIST=[who],trace.
+moo:agent_text_command(Agent,[who],Agent,who(_)).
 
 moo:action_help(who(optional(agent,_)),"Lists who is online (where they are at least)").
 

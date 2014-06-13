@@ -1080,15 +1080,10 @@ mpred_functor(singleValued,_,singleValued).
 mpred_functor(multi,_,multi(_)).
 mpred_functor(multiValued,_,multiValued(_)).
 
+
 equivRule_call(A,B):- holds_t(equivRule,A,B).
 equivRule_call(A,B):- holds_t(equivRule,B,A).
 forwardRule_call(A,B):- holds_t(forwardRule,B,A).
-
-good_for_chaining(_,_):-!.
-good_for_chaining(_Op,Term):-not(contains_singletons(Term)).
-db_rewrite(_Op,Term,NewTerm):-equivRule_call(Term,NewTerm).
-db_rewrite(_Op,Term,NewTerm):-forwardRule_call(Term,NewTerm).
-
 
 call_must(must,Call):- !,must(Call).
 call_must(Must,Call):- var(Must),!,Call.
@@ -1101,16 +1096,10 @@ call_must(_,Call):- call(Call).
 add_from_file(B,_):- contains_singletons(B),grtrace,dmsg(todo(add_from_file_contains_singletons(B))),!,fail.
 add_from_file(B,B):- db_op(tell(_OldV),B),!.
 
-do_pending_db_ops:- do_all_of(dbase_module_loaded).
-
-:-moo_hide_childs(dbase,do_pending_db_ops/0).
-
-db_op(ask(Must),Term):- !, db_op00(ask(Must),Term).
-db_op(Op,Term):- db_op00(Op,Term),do_pending_db_ops.
+db_op(Op,Term):- notrace(do_all_of(dbase_module_loaded)),db_op00(Op,Term),notrace((do_all_of(dbase_module_loaded))).
 
 
-
-db_op00(Op,isa(Term,Var)):- var(Var), (Op=ask(Must)-> call_must(Must,get_isa_asserted(Term,Var)) ; db_op0(Op,get_isa(Term,Var))).
+db_op00(Op,isa(Term,Var)):- var(Var),!,db_op0(Op,get_isa(Term,Var)).
 
 db_op00(ask(Must),isa(T,type)):- !,call_must(Must,defined_type(T)).
 db_op00(tell(_),isa(T,type)):- !,db_tell_isa(T,type).
@@ -1153,7 +1142,8 @@ db_op0(Op,EACH):- EACH=..[each|List],forall_member(T,List,db_op(Op,T)).
 db_op0(tell(_),description(A,E)):- !,must(once(assert_description(A,E))).
 db_op0(Op,nameString(A,S0)):- determinerRemoved(S0,String,S),!,db_op(Op, nameString(A,S)),db_op(tell(_OldV), determinerString(A,String)).
 
-db_op0(Op,Term):- good_for_chaining(Op,Term), db_rewrite(Op,Term,NewTerm),not(contains_singletons(NewTerm)),db_op(Op,NewTerm).
+db_op0(Op,Term):- notrace((equivRule_call(Term,NewTerm),not(contains_singletons(NewTerm)))),db_op(Op,NewTerm).
+db_op0(Op,Term):- notrace((forwardRule_call(Term,NewTerm),not(contains_singletons(NewTerm)))),db_op(Op,NewTerm).
 
 db_op0(tell(_OldV), subclass(I,T)):- (atomic(I)->define_type(I);true) ,  (atomic(T)->define_type(T);true), fail.
 db_op0(tell(_OldV), subft(I,T)):- (atomic(I)->define_ft(I);true) ,  (atomic(T)->define_ft(T);true), fail.
@@ -1163,7 +1153,7 @@ db_op0(tell(_OldV),isa(A,mpred)):- !,decl_mpred(A),!.
 db_op0(tell(_OldV),singleValued(Term)):- !,decl_mpred(Term),add_mpred_prop(Term,singleValued).
 db_op0(tell(_OldV),multiValued(Term)):- !,functor_safe(Term,_,A),decl_mpred(Term),add_mpred_prop(Term,[multiValued,multi(A)]).
 
-db_op0(ask(Must),get_isa(Term,Var)):- grtrace,!,call_must(Must,get_isa_asserted(Term,Var)).
+db_op0(ask(Must),get_isa(Term,Var)):- !,call_must(Must,get_isa_asserted(Term,Var)).
 db_op0(ask(Must),isa(Term,Var)):- !,call_must(Must,get_isa_backchaing(Term,Var)).
 
 db_op0(Op,isa(A,SubType)):- holds_t(createableSubclassType,SubType,Type),!,db_op(Op,isa(A,Type)),db_op(Op,isa(A,SubType)).
@@ -1216,7 +1206,7 @@ db_op_unit(Op,_C0,Prop,ARGS):- grtrace,must((db_op_sentence(Op,Prop,ARGS,Unit),s
 db_op_unit(Op,C0,_Prop,_ARGS):- db_op_loop(Op,C0,db_op_exact(Op,C0)).
 
 
-db_op_loop(Op,Unit, Result):- is_loop_checked(db_op0(Op,Unit)),!,call(Result).
+db_op_loop(Op,Unit,Result):- is_loop_checked(db_op0(Op,Unit)),!,call(Result).
 db_op_loop(Op,Unit,_Result):- db_op(Op,Unit).
 
 % ================================================
@@ -1250,7 +1240,6 @@ db_query_quf(Must,C):- db_quf(ask(Must),C,Pretest,Template),!,call_tabled(call_e
 
 
 call_expanded(true):- !.
-call_expanded(inRegion(A,B)):-atloc(A,xyz(B,_,_,_)),!.
 call_expanded(Goal):- get_mpred_prop(Goal,ask_module(Module)),!,Module:call(Goal).
 call_expanded(Goal):- prolog_callable(Goal),!,Goal.
 call_expanded(PreGoal):- force_expand(expand_goal(PreGoal,Goal)),PreGoal\=Goal,prolog_callable(Goal),!,Goal.

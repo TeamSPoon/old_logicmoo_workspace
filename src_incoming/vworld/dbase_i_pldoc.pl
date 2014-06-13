@@ -1,4 +1,5 @@
 
+term_listing([]):-!.
 term_listing(P):-term_listing(P,[]).
 term_listing(M:P,List):-!,term_listing(P,[module(M)|List]).
 term_listing(F/A,List):-atom(F),integer(A),!,functor(P,F,A),term_listing(P,[functor(F),arity(A)|List]).
@@ -27,7 +28,7 @@ synth_clause_db(H,B):-predicate_property_h(H,number_of_clauses(_)),ok_pred(H),cl
 
 
 
-use_term_listing([],_,_):-!.
+use_term_listing([],_,_):-!,fail.
 use_term_listing([F1],H,B):-use_term_listing_1(F1,H,B),!.
 use_term_listing([F1|FS],H,B):-use_term_listing_1(F1,H,B),!,use_term_listing(FS,H,B),!.
 use_term_listing(F1,H,B):-use_term_listing_1(F1,H,B),!.
@@ -39,8 +40,7 @@ use_term_listing_1(not(C),H,B):-nonvar(C),!,not(use_term_listing_1(C,H,B)).
 use_term_listing_1(module(_M),_H,_B):-!.
 use_term_listing_1(contains(HO),H,B):- !, use_term_listing_2((HO),H,B).
 use_term_listing_1((HO),H,B):- atom(HO),!, use_term_listing_2((HO),H,B).
-use_term_listing_1([F1|FS],H,B):-!,use_term_listing_1(F1,H,B),!,use_term_listing(FS,H,B).
-use_term_listing_1(_,_,_).
+use_term_listing_1(_,_,_):-grtrace.
 
 use_term_listing_2((HO),H,B):- not(compound(HO)),!, with_output_to(string(H1B1),write_canonical((H:-B))), (sub_atom_icasechk(HO,_,H1B1);sub_atom_icasechk(H1B1,_,HO)),!.
 use_term_listing_2((HO),H,B):-!, not(not(((subst((H:-B),HO,fov,H1B1), H1B1 \= (H:-B))))),!.

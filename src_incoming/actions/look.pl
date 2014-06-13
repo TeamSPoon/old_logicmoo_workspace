@@ -32,7 +32,7 @@
 can_sense(_Agent,visual,InList,InList,[]).
 
 moo:action_help(examine(item), "view details of item (see also @list)").
-moo:agent_call_command(_Gent,examine(SObj)):- term_listing(SObj).
+moo:agent_call_command(_Gent,examine(SObj)):- grtrace, term_listing(SObj).
 
 
 
