@@ -131,7 +131,6 @@ testOpenCyc/0]).
 hook:decl_database_hook(AR,C):- record_on_thread(dbase_change,changing(AR,C)).
 record_on_thread(Dbase_change,O):- thread_self(ID),capturing_changes(ID,Dbase_change),!,Z=..[Dbase_change,ID,O],assertz(Z).
 
-% :- decl_mpred(ft_info,2).
 :- decl_mpred(subft,2).
 
 :- meta_predicate call_no_cuts(^).
@@ -186,7 +185,6 @@ call_after_game_load(Code):- call_after(moo:not_loading_game_file,Code).
 :- decl_mpred(isa/2).
 :- decl_mpred(forwardRule/2).
 :- decl_mpred(equivRule/2).
-%:- decl_mpred(ft_info(formattype,term)).
 :- decl_mpred(subft(formattype,formattype)).
 :- decl_mpred(subclass(type,type)).
 :- decl_mpred(needs_look/2).
@@ -1001,10 +999,10 @@ same(X,Y):- compound(Y),arg(1,Y,X),!.
 samef(X,Y):- X=Y,!.
 samef(X,Y):- hotrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci(XF,YF)))).
 
-
+is_ft(formattype).
 is_ft(S):-  moo:ft_info(S,_).
-is_ft(S):-  holds_t(subft,S,_).
-is_ft(S):-  holds_t(subclass,S,formattype).
+is_ft(S):-  dbase_t(subft,S,_).
+is_ft(S):-  dbase_t(subclass,S,formattype).
 is_ft(S):-  holds_t(isa,S,formattype).
 
 
@@ -1048,10 +1046,9 @@ db_tell_isa(I,T):- get_isa_asserted(I,T),!.
 db_tell_isa(I,T):-doall(db_tell_isa_hooked(I,T)).
 
 db_tell_isa_hooked(I,T):- not(ground(db_tell_isa(I,T))), trace_or_throw(not(ground(db_tell_isa(I,T)))).
-db_tell_isa_hooked(I,T):- once((define_type(T),hooked_asserta(isa(I,T)))).
+% db_tell_isa_hooked(I,T):- once((define_type(T),hooked_asserta(isa(I,T)))).
 
-db_tell_isa_hooked(I,T):- notrace(( holds_t(subclass,T,ST))),db_op(tell(_OldV),isa(I,ST)).
-
+db_tell_isa_hooked(I,T):-asserta_new(dbase:dbase_t(isa,I,T)).
 % one of 4 special types
 db_tell_isa_hooked(I,T):- atom(T),is_creatable_type(T),call_after_game_load((world:create_instance(I,T,[]))).
 % sublass of 4 special types
@@ -1059,6 +1056,7 @@ db_tell_isa_hooked(I,T):- is_creatable_type(ST),holds_t(subclass,T,ST),call_afte
 
 %db_tell_isa_hooked(food5,'Weapon'):-trace_or_throw(db_tell_isa(food5,'Weapon')).
 %db_tell_isa_hooked(I,T):-dmsg((told(db_tell_isa(I,T)))).
+db_tell_isa_hooked(I,T):- dbase_t(subclass,T,ST),db_op(tell(_OldV),isa(I,ST)).
 
 define_ft(FT):- db_tell_isa(FT,formattype).
 
@@ -1151,13 +1149,15 @@ db_op0(Op,EACH):- EACH=..[each|List],forall_member(T,List,db_op(Op,T)).
 db_op0(tell(_),description(A,E)):- !,must(once(assert_description(A,E))).
 db_op0(Op,nameString(A,S0)):- determinerRemoved(S0,String,S),!,db_op(Op, nameString(A,S)),db_op(tell(_OldV), determinerString(A,String)).
 
-db_op0(Op,Term):- good_for_chaining(Op,Term), db_rewrite(Op,Term,NewTerm),not(contains_singletons(NewTerm)),db_op(Op,NewTerm).
+% db_op0(Op,Term):- hotrace(good_for_chaining(Op,Term)), db_rewrite(Op,Term,NewTerm),not(contains_singletons(NewTerm)),db_op(Op,NewTerm).
 
 db_op0(tell(_OldV), subclass(I,T)):- (atomic(I)->define_type(I);true) ,  (atomic(T)->define_type(T);true), fail.
 db_op0(tell(_OldV), subft(I,T)):- (atomic(I)->define_ft(I);true) ,  (atomic(T)->define_ft(T);true), fail.
 
 db_op0(tell(_OldV),mpred(A)):- !,decl_mpred(A),!.
 db_op0(tell(_OldV),isa(A,mpred)):- !,decl_mpred(A),!.
+db_op0(tell(_OldV),argsIsa(F,Term)):-!,hooked_asserta(dbase_t(argsIsa,F,Term)).
+db_op0(Op,argsIsa(Term)):- !, fix_fa(Term,F,_),!,db_op(Op,argsIsa(F, Term)).
 db_op0(tell(_OldV),singleValued(Term)):- !,decl_mpred(Term),add_mpred_prop(Term,singleValued).
 db_op0(tell(_OldV),multiValued(Term)):- !,functor_safe(Term,_,A),decl_mpred(Term),add_mpred_prop(Term,[multiValued,multi(A)]).
 
@@ -1228,7 +1228,7 @@ db_op_exact(u,C):- grtrace,db_quf(u,C,U,Template),call_expanded(U),Template,must
 db_op_exact(ra,C):- db_quf(ra,C,U,Template),!, doall((call_expanded(U),hooked_retractall(Template))).
 db_op_exact(retract,C):- must(db_quf(retract,C,U,Template)),!,call_expanded(U),!,hooked_retract(Template).
 db_op_exact(tell(OldV),W):- non_assertable(W,Why),dumpST,trace,throw_safe(todo(db_op(tell(OldV), non_assertable(Why,W)))).
-db_op_exact(tell(Must),C0):- db_quf(tell(Must),C0,U,C),!,must(call_expanded(U)),functor(C,F,A),( get_mpred_prop(F/A,singleValued) -> must(db_assert_sv(Must,C,F,A,_OldVOut1)) ; must(db_assert_mv(Must,C,F,A,_OldVOut2))).
+db_op_exact(tell(Must),C0):- db_quf(tell(Must),C0,U,C),!,must(call_expanded(U)),functor(C,F,A),( get_mpred_prop(F,A,singleValued) -> must(db_assert_sv(Must,C,F,A,_OldVOut1)) ; must(db_assert_mv(Must,C,F,A,_OldVOut2))).
 db_op_exact(tell(Must),C):- grtrace, functor(C,F,A),!, functor(FA,F,A), must((get_mpred_prop(FA,singleValued) -> must(db_assert_sv(Must,C,F,A,_OldVOut1)) ; must(db_assert_mv(Must,C,F,A,_OldVOut2)))).
 db_op_exact(Op,C):- trace_or_throw(unhandled(db_op_exact(Op,C))).
 
@@ -1388,7 +1388,7 @@ compare_n(Last,NewLast):- atomic(NewLast),not(atomic(Last)),trace_or_throw(incom
 member_or_e(E,[L|List]):- !,member(E,[L|List]).
 member_or_e(E,E).
 
-is_single_valuedOrFail(F,A,Obj,ARGS):- get_mpred_prop(F/A,singleValued),!,valuedOrThrow(F,A,Obj,ARGS),!.
+is_single_valuedOrFail(F,A,Obj,ARGS):- get_mpred_prop(F,A,singleValued),!,valuedOrThrow(F,A,Obj,ARGS),!.
 is_single_valuedOrFail(_,_,_,_):- fail.
 
 valuedOrThrow(F,_,Obj,ARGS):- holds_t(isa,Obj,T), findall_type_default_props(Obj,T,Props),Props=[_|_],Prop=..[F|ARGS], member_or_e(Prop,Props),!.
@@ -1417,8 +1417,8 @@ insert_into([Carry|ARGS],After,Insert,[Carry|NEWARGS]):-
    insert_into(ARGS,After1,Insert,NEWARGS).
 
 
-is_mpred_prolog(F,A):- get_mpred_prop(F/A,ask_module(_)), 
-   not(get_mpred_prop(F/A,query(_))),!.
+is_mpred_prolog(F,A):- get_mpred_prop(F,A,ask_module(_)), 
+   not(get_mpred_prop(F,A,query(_))),!.
 
 :- include(dbase_formattypes).
 
