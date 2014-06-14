@@ -1062,33 +1062,28 @@ db_tell_isa_hooked(I,T):- is_creatable_type(ST),holds_t(subclass,T,ST),call_afte
 
 define_ft(FT):- db_tell_isa(FT,formattype).
 
-get_isa_backchaing(A,T):-var(T),!,get_isa_asserted(A,T).
-
-get_isa_backchaing(_,T):- not(is_type(T)),!,fail.
+get_isa_backchaing(A,T):-var(T),!,get_isa_asserted_0(A,T).
+get_isa_backchaing(_,A):- not(is_type(A)),!,fail.
 get_isa_backchaing(A,formattype):- !,is_ft(A).
 get_isa_backchaing(A,type):- !, is_type(A).
 get_isa_backchaing(A,Fmt):- nonvar(Fmt),is_ft(Fmt),!,correctType(ask(once),A,Fmt,AA),!,A==AA,!.
 get_isa_backchaing(A,Fmt):- get_isa_asserted(A,Fmt).
 
+get_isa_asserted(A,Fmt):-get_isa_asserted_0(A,Fmt).
 
-get_isa_asserted(A,T):- call_t(dac(d,a,no_c,no_mt),T,A).
-get_isa_asserted(A,T):- nonvar(A),is_ft(A),!,arg(_,v(formattype,type),T).
-
+get_isa_asserted_0(A,ArgsIsa):- nonvar(ArgsIsa),mpred_functor(ArgsIsa,A,Prop),!, mpred_prop(_,_,Prop).
+get_isa_asserted_0(A,Fmt):- call_t(dac(d,a,no_c,no_mt),isa,A,Fmt).
+get_isa_asserted_0(A,ArgsIsa):- mpred_functor(ArgsIsa,A,Prop),!, mpred_prop(_,_,Prop).
 
 mpred_functor(argsIsa,A,argsIsa(A)).
 mpred_functor(singleValued,_,singleValued).
 mpred_functor(multi,_,multi(_)).
 mpred_functor(multiValued,_,multiValued(_)).
 
+
 equivRule_call(A,B):- holds_t(equivRule,A,B).
 equivRule_call(A,B):- holds_t(equivRule,B,A).
 forwardRule_call(A,B):- holds_t(forwardRule,B,A).
-
-good_for_chaining(_,_):-!.
-good_for_chaining(_Op,Term):-not(contains_singletons(Term)).
-db_rewrite(_Op,Term,NewTerm):-equivRule_call(Term,NewTerm).
-db_rewrite(_Op,Term,NewTerm):-forwardRule_call(Term,NewTerm).
-
 
 call_must(must,Call):- !,must(Call).
 call_must(Must,Call):- var(Must),!,Call.
@@ -1103,19 +1098,18 @@ add_from_file(B,B):- db_op(tell(_OldV),B),!.
 
 do_db_op_hooks:- once(ignore(do_all_of(dbase_module_loaded))).
 
-db_op(tell(OldV):- !, db_opp(tell(OldV),Term),do_db_op_hooks.
+db_op(tell(OldV),Term):- !, db_opp(tell(OldV),Term),do_db_op_hooks.
 db_op(Op,Term):- do_db_op_hooks,db_opp(Op,Term),do_db_op_hooks.
 
 
 db_opp(Op,isa(Term,Var)):- var(Var),!,db_op0(Op,get_isa(Term,Var)).
 
 db_opp(ask(Must),isa(T,type)):- !,call_must(Must,is_type(T)).
+db_opp(tell(_),isa(T,type)):- !,db_tell_isa(T,type).
 db_opp(tell(_),isa(T,Type)):- !,db_tell_isa(T,Type).
 
 db_opp(ask(_Must),true):- !.
 db_opp(tell(OldV),B):- !,loop_check(db_op0(tell(OldV),B),true). % true = we are already processing this assert
-
-
 db_opp(ask(Must),createableType(SubType)):- !, call_must(Must,is_creatable_type(SubType)).
 db_opp(ask(Must),Term):- !,loop_check(db_op0(ask(Must),Term),db_query_lc(Must,Term)).
 db_opp(Op,Term):- loop_check_throw(db_op0(Op,Term)).
@@ -1151,7 +1145,8 @@ db_op0(Op,EACH):- EACH=..[each|List],forall_member(T,List,db_op(Op,T)).
 db_op0(tell(_),description(A,E)):- !,must(once(assert_description(A,E))).
 db_op0(Op,nameString(A,S0)):- determinerRemoved(S0,String,S),!,db_op(Op, nameString(A,S)),db_op(tell(_OldV), determinerString(A,String)).
 
-db_op0(Op,Term):- db_rewrite(Term,NewTerm),not(contains_singletons(NewTerm)),db_op(Op,NewTerm).
+db_op0(Op,Term):- notrace((equivRule_call(Term,NewTerm),not(contains_singletons(NewTerm)))),db_op(Op,NewTerm).
+db_op0(Op,Term):- notrace((forwardRule_call(Term,NewTerm),not(contains_singletons(NewTerm)))),db_op(Op,NewTerm).
 
 db_op0(tell(_OldV), subclass(I,T)):- (atomic(I)->define_type(I);true) ,  (atomic(T)->define_type(T);true), fail.
 db_op0(tell(_OldV), subft(I,T)):- (atomic(I)->define_ft(I);true) ,  (atomic(T)->define_ft(T);true), fail.
@@ -1620,4 +1615,5 @@ hook:decl_database_hook(retract(_),C):- expire_tabled_list(C).
 "a burgandy Starfleet command uniform"
 
 */
+
 

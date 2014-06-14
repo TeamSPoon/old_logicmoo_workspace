@@ -41,7 +41,7 @@ moo:action_help(who(optional(agent,world)),"Lists who is online (where they are 
 get_inRegion(Agnt,Where):- dyn:inRegion(Agnt,Where).
 get_inRegion(Agnt,Where):- dyn:atloc(Agnt,Where).
 
-moo:agent_call_command(_Gent,who(W)) :- rtrace(mud_cmd_who(W)).
+moo:agent_call_command(_Gent,who(W)) :- mud_cmd_who(W).
 
 mud_cmd_who(world):-!,mud_cmd_who_1(_).
 mud_cmd_who(Who):- mud_cmd_who_1(Who).
