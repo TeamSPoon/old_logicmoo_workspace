@@ -1069,9 +1069,9 @@ get_isa_backchaing(A,Fmt):- get_isa_asserted(A,Fmt).
 
 get_isa_asserted(A,Fmt):-hotrace(get_isa_asserted_0(A,Fmt)).
 
-get_isa_asserted_0(A,ArgsIsa):- nonvar(ArgsIsa),mpred_functor(ArgsIsa,A,Prop),!, mpred_prop(_,_,Prop).
+get_isa_asserted_0(A,ArgsIsa):- nonvar(ArgsIsa),mpred_functor(ArgsIsa,A,Prop),!, get_mpred_prop(_,_,Prop).
 get_isa_asserted_0(A,Fmt):- call_t(dac(d,a,no_c,no_mt),isa,A,Fmt).
-get_isa_asserted_0(A,ArgsIsa):- mpred_functor(ArgsIsa,A,Prop),!, mpred_prop(_,_,Prop).
+get_isa_asserted_0(A,ArgsIsa):- mpred_functor(ArgsIsa,A,Prop),!, get_mpred_prop(_,_,Prop).
 
 mpred_functor(argsIsa,A,argsIsa(A)).
 mpred_functor(singleValued,_,singleValued).

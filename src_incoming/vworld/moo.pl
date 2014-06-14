@@ -73,6 +73,8 @@
 :-dynamic(dbase_mod/1).
 dbase_mod(dbase).
 
+:- dynamic mpred_arity/2, mpred_prop/3.
+
 hdr_debug(_,_):-!.
 hdr_debug(F,A):-'format'(F,A).
 
@@ -81,8 +83,6 @@ hdr_debug(F,A):-'format'(F,A).
 :- dynamic_multifile_exported type_action_help/3.
 :- dynamic_multifile_exported ft_info/2.
 :- dynamic_multifile_exported mud_test/2.
-:- dynamic_multifile_exported mpred_arity/2.
-:- dynamic_multifile_exported mpred_prop/3.
 :- dynamic_multifile_exported agent_call_command/2.
 :- dynamic_multifile_exported call_after_load/1.
 :- dynamic_multifile_exported moo:world_agent_plan/3.
@@ -227,18 +227,21 @@ member_or_e(E,[L|List]):-!,member(E,[L|List]).
 member_or_e(E,E).
 
 
-fix_fa(FA0,F,A):-var(FA0),throw(fix_fa(FA0,F,A)).
-fix_fa(_:FA0,F,A):-!,fix_fa(FA0,F,A).
-fix_fa(F/A,F,A):- debug,nonvar(F),number(A),!.
-fix_fa(FA,F,A):- debug, get_functor(FA,F),!,mpred_arity(F,A).
+fix_fa(FA,F,A):-var(FA),!,moo:mpred_arity(F,A),functor(FA,F,A).
+fix_fa(_:FA0,F,A):-!,fix_fa(FA0,F,A),!.
+fix_fa(FA,F,A):- compound(FA),!,functor(FA,F,A).
+fix_fa(F/A,F,A):- moo:mpred_arity(F,A).
+fix_fa(F/A,F,A):- !,number(A).
+fix_fa(FA,F,A):- moo:mpred_arity(F,A),functor(FA,F,A).
 
-get_mpred_prop(F,A,Prop):- mpred_prop_plus_assserted(F,A,Prop).
+get_mpred_prop(F,A,Prop):- fix_fa(FA,F,A), mpred_prop_plus_assserted(F,A,Prop).
 get_mpred_prop(FA,Prop):- fix_fa(FA,F,A),mpred_prop_plus_assserted(F,A,Prop).
 
 add_mpred_prop(_,Var):- var(Var),!.
 add_mpred_prop(_,[]):- !.
 add_mpred_prop(FA,[C|L]):-!, add_mpred_prop(FA,C),add_mpred_prop(FA,L),!.
-add_mpred_prop(F0,CL):- fix_fa(F0,F,A), asserta_new(mpred_prop(F,A,CL)), run_database_hooks(assert(a),mpred_prop(F,A,CL)).
+add_mpred_prop(F0,CL):- fix_fa(F0,F,A), asserta_new(mpred_prop(F,A,CL)),ignore((A>0,asserta_new(moo:mpred_arity(F,A)))),
+      run_database_hooks(assert(a),mpred_prop(F,A,CL)).
 
 rem_mpred_prop(_,Var):- var(Var),!.
 rem_mpred_prop(_,[]):- !.
@@ -344,17 +347,17 @@ decl_mpred0(Mt,Pred,Arity):-decl_mpred_now(Mt,Pred,Arity).
 decl_mpred_now(Mt,M:Pred,Arity):-var(Pred),!,decl_mpred_now(Mt,M:Pred,Arity).
 decl_mpred_now(Mt,_:Pred,Arity):- nonvar(Pred),!,decl_mpred_now(Mt,Pred,Arity).
 decl_mpred_now(Mt,Pred,0):-!,decl_mpred_now(Mt,Pred,2).
-decl_mpred_now(_,Pred,Arity):-mpred_arity(Pred,Arity),!.
+decl_mpred_now(_,Pred,Arity):-moo:mpred_arity(Pred,Arity),!.
 decl_mpred_now(Mt,Pred,Arity):-    
   ignore((Arity==1,define_type(Pred))),
       checkCycPred(Pred,Arity),
       assertz(moo:isRegisteredCycPred(Mt,Pred,Arity)).
 
-checkCycPreds:-mpred_arity(F,A),checkCycPred(F,A),fail.
+checkCycPreds:-moo:mpred_arity(F,A),checkCycPred(F,A),fail.
 checkCycPreds.
 
 
-mpred_arity(P,A):-isRegisteredCycPred(_,P,A).
+moo:mpred_arity(P,A):-isRegisteredCycPred(_,P,A).
 
 :-dynamic(never_use_holds_db/3).
 
@@ -389,8 +392,10 @@ coerce(What,_Type,NewThing):-NewThing = What.
 :- include(logicmoo(vworld/moo_header)).
 
 mpred_prop_plus_assserted(F,A,Prop):- mpred_prop(F,A,Prop).
-mpred_prop_plus_assserted(F,A,argsIsa(Templ)):- mpred_arity(F,A), functor(Templ,F,A),!,arg(_,v(argsIsa,multiValued,singleValued,negationByFailure,formatted,mpred,listValued),V),dbase:dbase_t(V,Templ),!.
-mpred_prop_plus_assserted(F,A,Prop):- mpred_arity(F,A),functor(Templ,F,A),arg(_,v(argsIsa,multiValued,singleValued,negationByFailure,formatted,mpred,listValued),Prop),dbase:dbase_t(Prop,Templ).
+mpred_prop_plus_assserted(F,A,argsIsa(Templ)):- moo:mpred_arity(F,A),functor(Templ,F,A),arg(_,v(argsIsa,multiValued,singleValued,negationByFailure,formatted,mpred,listValued),Prop),
+   dbase:dbase_t(Prop,Templ).
+mpred_prop_plus_assserted(F,A,Prop):-arg(_,v(argsIsa,multiValued,singleValued,negationByFailure,formatted,mpred,listValued),Prop),dbase:dbase_t(Prop,Templ),functor(Templ,F,_).
+mpred_prop_plus_assserted(F,A,Prop):-dbase:dbase_t(isa,F,Prop).
 
 
 define_type(Var):-var(Var),!,trace_or_throw(define_type(Var)).
