@@ -13,6 +13,7 @@
             equals_icase/2,
             string_ci/2,
             string_dedupe/2,
+            is_empty_string/1,
             member_ci/2,
                    string_equal_ci/2,
                    append_ci/3,
@@ -399,13 +400,14 @@ map_tree_to_list(Pred,IN,Output):-
   append(Left,[UT],OUTP),!, OUT =.. OUTP)),must_assign([OUT],Output).
 map_tree_to_list(_,IN,IN):-trace,must_assign([IN],IN).
 
-
+non_empty(A):-must_det(not(is_empty_string(A))).
+must_nonvar(A):-must_det(nonvar(A)).
 
 equals_icase(A,B):-string_ci(A,U),string_ci(B,U).
-starts_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),atom_concat(UB,_,UA).
-either_starts_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),(atom_concat(UB,_,UA);atom_concat(UA,_,UB)).
-starts_or_ends_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),(atom_concat(UB,_,UA);atom_concat(_,UA,UB)).
-ends_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),atom_concat(_,UB,UA).
+starts_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),non_empty(UB),atom_concat(UB,_,UA).
+either_starts_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),non_empty(UA),non_empty(UB),(atom_concat(UB,_,UA);atom_concat(UA,_,UB)).
+starts_or_ends_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),non_empty(UA),non_empty(UB),(atom_concat(UB,_,UA);atom_concat(_,UA,UB)).
+ends_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),non_empty(UB),atom_concat(_,UB,UA).
 
 string_dedupe(StringI,StringO):- to_word_list(StringI,Words),remove_predupes(Words,StringO).
 
@@ -414,16 +416,22 @@ remove_predupes([L|ListI],ListO):- member(L,["",''," ",' ']),!,remove_predupes(L
 remove_predupes([L|ListI], ListO):- (member_ci(L,ListI) -> remove_predupes(ListI,ListO) ; (remove_predupes(ListI,ListM),[L|ListM]=ListO)),!.
 
 member_ci(L,[List|I]):-!,member(LL2,[List|I]),string_equal_ci(LL2,L).
-member_ci(L,L):-to_word_list(L,ListI),member(LL2,ListI),string_equal_ci(LL2,L).
+member_ci(W,WL):-to_word_list(WL,ListI),member(LL2,ListI),string_equal_ci(LL2,W).
 
-string_ci(A,LIC):-hotrace((any_to_string(A,S),text_to_string(S,SS),string_lower(SS,SL),atomics_to_string(SLIC,"_",SL),atomics_to_string(SLIC," ",LIC))),!.
+string_ci(A,LIC):-var(A),!,A=LIC.
+string_ci(A,LIC):-hotrace((any_to_string(A,S),non_empty(A),text_to_string(S,SS),string_lower(SS,SL),atomics_to_string(SLIC,"_",SL),atomics_to_string(SLIC," ",LIC))),!.
 
 append_ci([],L1,L2):-string_equal_ci(L1,L2),!.
 append_ci([H1|T],L2,[H2|L3]) :- string_equal_ci(H1,H2),append_ci(T,L2,L3).
 
-string_equal_ci(L0,L1):-once(string_ci(L0,SL0)),string_ci(L1,SL0),!.
+string_equal_ci(L0,L1):- once(string_ci(L0,SL0)),string_ci(L1,SL0),!.
 string_equal_ci(L0,L0):-!.
 
+
+is_empty_string(A):-var(A),!.
+is_empty_string([]).
+is_empty_string('').
+is_empty_string("").
 
 to_word_list(A,S):-once(hotrace(to_word_list_0(A,S))).
 to_word_list_0(V,V):-var(V),!.
@@ -436,13 +444,17 @@ to_word_list_0(A,S):-atomSplit(A,S),!.
 to_word_list_0(Input,WList):- (string(Input);atom(Input)),(atomic_list_concat(WList," ",Input);WList=[Input]),!.
 to_word_list_0(Input,Input).
 
-str_contains_all([],_String):-!.
-str_contains_all(A,SL):-string_ci(SL,SLIC),SL\=SLIC,!,str_contains_all(A,SLIC).
-str_contains_all([A|Atoms],String):-
+str_contains_all([],_String):- dtrace.
+str_contains_all(_,String):- is_empty_string(String), dtrace.
+str_contains_all(A,SL):- string_ci(SL,SLIC),SL\=SLIC,!,str_contains_all(A,SLIC).
+str_contains_all(List,String):-str_contains_all0(List,String).
+
+str_contains_all0([],_).
+str_contains_all0([A|Atoms],String):-
       string_ci(A,L),
       sub_string(String,_,_,Aft,L),
       sub_string(String,Aft,_,0,SubString),!,
-      str_contains_all(Atoms,SubString).
+      str_contains_all0(Atoms,SubString).
 
 atoms_of(Var,[]):- (var(Var);Var==[]),!.
 atoms_of('$VAR',[]):-!.

@@ -44,8 +44,8 @@
 get_agent_text_command(Agent,VERB,AgentR,CMD):-debugOnError(loop_check(get_agent_text_command_0(Agent,VERB,AgentR,CMD),fail)).
 
 get_agent_text_command_0(Agent,ListIn,AgentR,CMD):- 
-   atLeastOneOrElse((between(1,4,Len),length(ListIn,Len),call_no_cuts(moo:agent_text_command(Agent,ListIn,AgentR,CMD))),
-       atLeastOneOrElse((call_no_cuts(moo:agent_text_command(Agent,ListIn,AgentR,CMD))),
+   one_must((between(1,4,Len),length(ListIn,Len),call_no_cuts(moo:agent_text_command(Agent,ListIn,AgentR,CMD))),
+       one_must((call_no_cuts(moo:agent_text_command(Agent,ListIn,AgentR,CMD))),
            (not(ListIn=[_|_]),call_no_cuts(moo:agent_text_command(Agent,[ListIn],AgentR,CMD))))).
 
 % ===========================================================
@@ -176,7 +176,9 @@ object_print_details(Print,Agent,O,DescSpecs,Skipped):-
    forall(mud_isa(O,S),object_print_details(Print,Agent,S,DescSpecs,[O|Skipped])) )).
 
 
+
 object_match(SObj,Obj):- isaOrSame(Obj,SObj).
+object_match(A,_Obj):- is_empty_string(A),dtrace.
 object_match(S,Obj):- 
    atoms_of(S,Atoms),
    current_agent_or_var(P),
@@ -189,9 +191,9 @@ object_match(S,Obj):-
 
 :-debug.
 
-dmsg_parserm(_):-!.
+% dmsg_parserm(_):-!.
 dmsg_parserm(D):-dmsg(D).
-dmsg_parserm(_,_):-!.
+% dmsg_parserm(_,_):-!.
 dmsg_parserm(F,A):-dmsg(F,A).
 
 % ===========================================================
@@ -365,7 +367,7 @@ parseFmtOrIsa(Var, _B, _C, _D):-var(Var),!,fail. % trace_or_throw(var_parseForIs
 % parseFmtOrIsa(Var, B, C, D):-var(Var),!,trace_or_throw(var_parseForIsa(Var, B, C, D)).
 parseFmtOrIsa(Sub, B, C, D):- parseFmt(Sub, B, C, D).
 
-parseFmtOrIsa(vp,Goal,Left,Right):-!,atLeastOneOrElse(parseFmt_vp1(self,Goal,Left,Right),parseFmt_vp2(self,Goal,Left,Right)).
+parseFmtOrIsa(vp,Goal,Left,Right):-!,must(parseFmt_vp1(self,Goal,Left,Right),parseFmt_vp2(self,Goal,Left,Right)).
 
 parseFmt_vp1(Agent, do(NewAgent,Goal),[SVERB|ARGS],[]):- parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,Goal).
 parseFmt_vp2(Agent,GOAL,[SVERB|ARGS],UNPARSED):- parse_vp_real(Agent,SVERB,ARGS,TRANSLATIONS),!,member(UNPARSED-GOAL,TRANSLATIONS).

@@ -6,6 +6,24 @@
 % Dec 13, 2035
 %
 */
+% :- module(world_2d,[]).
+
+:- export(((
+         check_for_fall/3,
+         dir_offset/5,
+         doorLocation/5,
+         grid_size/4,
+         in_grid/2,
+         in_grid_rnd/2,
+         in_world_move/3, 
+         is_3d/1,
+         loc_to_xy/4,
+         move_dir_target/3,
+         number_to_dir/3,  
+         reverse_dir/2,
+         round_loc/8,
+         round_loc_target/8,
+         to_3d/2))).
 
 /*
 % This file is "included" from world.pl 
@@ -192,6 +210,7 @@ compute_dir(Region1,X,Y,Z,Dir):-
    atomic_list_concat([NS,EW,UD],'',Dir),!.
 
 
+:-export(dir_offset/5).
 
 dir_offset(u,F,0,0,F).
 dir_offset(d,F,0,0,-F).
@@ -283,8 +302,8 @@ num_near(7,sw,here).
 num_near(8,s,here).
 num_near(9,se,here).
 
-num_near(0,u,here).
-num_near(5,d,here).
+num_near(0,d,here).
+num_near(5,u,here).
 
 % Translates numbers returned from scan_lists_aux/3 (the number of the location)
 % into thier relative directions.

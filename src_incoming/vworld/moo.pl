@@ -21,6 +21,7 @@
            rem_mpred_prop/2,
           is_2nd_order_holds/1,
           is_holds_false/1,
+          mpred_arity/2,
           is_holds_true/1,
           include_moo_files/1,
          current_context_module/1,         
@@ -31,6 +32,7 @@
 
          isRegisteredCycPred/3,
          get_mpred_prop/2,
+         get_mpred_prop/3,
          registerCycPredPlus2/1,
          term_expansion_local/2,
          run_database_hooks/2,
@@ -39,8 +41,7 @@
          end_module_type/1,
          enter_term_anglify/2,
          register_timer_thread/3,
-         defined_type/1,
-         is_defined_type/1,
+         is_type/1,
          define_type/1,
          scan_updates/0,
          type_action_help/3,
@@ -77,7 +78,8 @@ dbase_mod(dbase).
 :- dynamic_multifile_exported type_action_help/3.
 
 :- dynamic_multifile_exported mud_test/2.
-:- dynamic_multifile_exported mpred_prop/2.
+:- dynamic_multifile_exported mpred_arity/2.
+:- dynamic_multifile_exported mpred_prop/3.
 :- dynamic_multifile_exported agent_call_command/2.
 :- dynamic_multifile_exported call_after_load/1.
 :- dynamic_multifile_exported moo:world_agent_plan/3.
@@ -111,7 +113,7 @@ dbase_mod(dbase).
 
 not_loading_game_file:-not(loading_game_file(_)),loaded_game_file(_).
 
-:-dynamic loading_module_h/1, loading_game_file/1, loaded_game_file/1, is_defined_type/1.
+:-dynamic loading_module_h/1, loading_game_file/1, loaded_game_file/1.
 
 
 is_holds_true(Prop):- notrace((atom(Prop),is_holds_true0(Prop))),!.
@@ -136,9 +138,7 @@ hook:decl_database_hook(_,_):-fail.
 
 run_database_hooks(Type,Hook):- must(doall((copy_term(Hook,HCopy), hook:decl_database_hook(Type,HCopy)))).
 
-defined_type(A):-is_defined_type(A).
 
-define_type(Spec):- run_database_hooks(assert(z),is_defined_type(Spec)),assert_if_new(is_defined_type(Spec)).
 
 include_moo_files(Mask):- expand_file_name(Mask,X),
      forall(member(E,X),ensure_moo_loaded(E)).
@@ -148,6 +148,7 @@ module(M,Preds):-
     forall(member(P,Preds),export(P)).
 */
 scan_updates:-thread_property(X,alias(loading_code)),thread_property(X,status(running)),!.
+scan_updates:-!.
 scan_updates:-ignore(catch(make,_,true)).
 
 :-dynamic(isRegisteredCycPred/3).
@@ -222,23 +223,23 @@ member_or_e(E,[L|List]):-!,member(E,[L|List]).
 member_or_e(E,E).
 
 
-fix_fa(FA0,FA):-var(FA0),throw(fix_fa(FA0,FA)).
-fix_fa(_:FA0,FA):-!,fix_fa(FA0,FA).
-fix_fa(F/A,FA):- !,isRegisteredCycPred(_,F,A),functor(FA,F,A).
-fix_fa(FC,FA):- atomic(FC),!,get_functor(FC,F),!,isRegisteredCycPred(_,F,A),functor(FA,F,A).
-fix_fa(FA,FA). % functor(FA,F,A),isRegisteredCycPred(_,F,A).
+fix_fa(FA0,F,A):-var(FA0),throw(fix_fa(FA0,F,A)).
+fix_fa(_:FA0,F,A):-!,fix_fa(FA0,F,A).
+fix_fa(F/A,F,A):- debug,nonvar(F),number(A),!.
+fix_fa(FA,F,A):- debug, get_functor(FA,F),!,mpred_arity(F,A).
 
-get_mpred_prop(P,Prop):- notrace((fix_fa(P,FA),mpred_prop(FA,Prop))).
+get_mpred_prop(F,A,Prop):- mpred_prop_plus_assserted(F,A,Prop).
+get_mpred_prop(FA,Prop):- fix_fa(FA,F,A),mpred_prop_plus_assserted(F,A,Prop).
 
 add_mpred_prop(_,Var):- var(Var),!.
 add_mpred_prop(_,[]):- !.
 add_mpred_prop(FA,[C|L]):-!, add_mpred_prop(FA,C),add_mpred_prop(FA,L),!.
-add_mpred_prop(F0,CL):- fix_fa(F0,FA), asserta_new(mpred_prop(FA,CL)), run_database_hooks(assert(a),mpred_prop(FA,CL)).
+add_mpred_prop(F0,CL):- fix_fa(F0,F,A), asserta_new(mpred_prop(F,A,CL)), run_database_hooks(assert(a),mpred_prop(F,A,CL)).
 
 rem_mpred_prop(_,Var):- var(Var),!.
 rem_mpred_prop(_,[]):- !.
 rem_mpred_prop(FA,[C|L]):-!, rem_mpred_prop(FA,C),rem_mpred_prop(FA,L),!.
-rem_mpred_prop(F0,CL):- fix_fa(F0,FA), retractall(mpred_prop(FA,CL)), run_database_hooks(retract(all),mpred_prop(FA,CL)).
+rem_mpred_prop(F0,CL):- fix_fa(F0,F,A), retractall(mpred_prop(F,A,CL)), run_database_hooks(retract(all),mpred_prop(F,A,CL)).
 
 % ============================================
 % Prolog to Cyc Predicate Mapping
@@ -339,16 +340,17 @@ decl_mpred0(Mt,Pred,Arity):-decl_mpred_now(Mt,Pred,Arity).
 decl_mpred_now(Mt,M:Pred,Arity):-var(Pred),!,decl_mpred_now(Mt,M:Pred,Arity).
 decl_mpred_now(Mt,_:Pred,Arity):- nonvar(Pred),!,decl_mpred_now(Mt,Pred,Arity).
 decl_mpred_now(Mt,Pred,0):-!,decl_mpred_now(Mt,Pred,2).
-decl_mpred_now(_,Pred,Arity):-isRegisteredCycPred(_,Pred,Arity),!.
+decl_mpred_now(_,Pred,Arity):-mpred_arity(Pred,Arity),!.
 decl_mpred_now(Mt,Pred,Arity):-    
   ignore((Arity==1,define_type(Pred))),
       checkCycPred(Pred,Arity),
-      assertz(moo:isRegisteredCycPred(Mt,Pred,Arity)),
-      functor(Templ,Pred,Arity),
-      add_mpred_prop(Templ,arity(Pred,Arity)).
+      assertz(moo:isRegisteredCycPred(Mt,Pred,Arity)).
 
-checkCycPreds:-isRegisteredCycPred(_,F,A),checkCycPred(F,A),fail.
+checkCycPreds:-mpred_arity(F,A),checkCycPred(F,A),fail.
 checkCycPreds.
+
+
+mpred_arity(P,A):-isRegisteredCycPred(_,P,A).
 
 :-dynamic(never_use_holds_db/3).
 
@@ -375,6 +377,36 @@ current_context_module(Ctx):-loading_module_h(Ctx),!.
 current_context_module(Ctx):-context_module(Ctx).
 
 
+decl_coerce(_,_,_):-fail.
+coerce(What,Type,NewThing):- decl_coerce(What,Type,NewThing),!.
+coerce(What,_Type,NewThing):-NewThing = What.
+
+
+:- include(logicmoo(vworld/moo_header)).
+
+mpred_prop_plus_assserted(F,A,Prop):- mpred_prop(F,A,Prop).
+mpred_prop_plus_assserted(F,A,argsIsa(Templ)):- mpred_arity(F,A), functor(Templ,F,A),!,arg(_,v(argsIsa,multiValued,singleValued,negationByFailure,formatted,mpred,listValued),V),dbase:dbase_t(V,Templ),!.
+mpred_prop_plus_assserted(F,A,Prop):- mpred_arity(F,A),functor(Templ,F,A),arg(_,v(argsIsa,multiValued,singleValued,negationByFailure,formatted,mpred,listValued),Prop),dbase:dbase_t(Prop,Templ).
+
+
+define_type(Var):-var(Var),!,debug_or_throw(define_type(Var)).
+define_type(M:F):-!, '@'(define_type(F), M).
+define_type([]):-!.
+define_type([A]):-!,define_type(A).
+define_type([A|L]):-!,define_type(A),define_type(L).
+define_type((A,L)):-!,define_type(A),define_type(L).
+define_type(Spec):-is_type(Spec),!.
+
+define_type(Spec):- run_database_hooks(assert(z),isa(Spec,type)),assert_if_new(dbase:dbase_t(type,Spec)).
+
+is_type(Spec):- dbase:dbase_t(type, Spec).
+
+:- define_type((type,formattype,multiValued,singleValued,formatted,ppred,mpred,listValued)).
+
+:- meta_predicate tick_every(*,*,0).
+:- meta_predicate register_timer_thread(*,*,0).
+
+
 
 
 :- decl_mpred subclass/2.
@@ -386,16 +418,6 @@ current_context_module(Ctx):-context_module(Ctx).
 :- decl_mpred type_grid/3.
 
 
-
-decl_coerce(_,_,_):-fail.
-coerce(What,Type,NewThing):- decl_coerce(What,Type,NewThing),!.
-coerce(What,_Type,NewThing):-NewThing = What.
-
-
-
-
-:- meta_predicate tick_every(*,*,0).
-:- meta_predicate register_timer_thread(*,*,0).
 
 
 register_timer_thread(Name,_Seconds,_OnTick):-current_thread(Name,_Status).

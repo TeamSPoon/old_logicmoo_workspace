@@ -57,7 +57,7 @@ non_assertable/1,
 defaultMt/1,
 db_op/2,
 db_op0/2,
-db_op00/2,
+db_opp/2,
 db_query/2,
 del/1,
 ensureMt/1,
@@ -425,7 +425,7 @@ relax_term(P,P,Aic,Aic,Bic,Bic):- !.
 /*
 relax_term(P,P,A,A,Bi,Bc):- arg(_,v(subclass,isa),P),!,fail.
 relax_term(P,P,Ai,Ac,Bic,Bic):- when_met(nonvar(Ac), same_arg(same_or(isa),Ac,Ai)),!.
-relax_term(P,P,Ai,Ac,Bi,Bc):- defined_type(Ai),!,when_met(pred(nonvar,Ac), (same_arg(same_or(subclass),Ac,Ai),same_arg(same_or(equals),Bc,Bi))),!.
+relax_term(P,P,Ai,Ac,Bi,Bc):- is_type(Ai),!,when_met(pred(nonvar,Ac), (same_arg(same_or(subclass),Ac,Ai),same_arg(same_or(equals),Bc,Bi))),!.
 relax_term(P,P,Ai,Ac,Bi,Bc):- when_met(pred(nonvar,Ac),when_met(pred(nonvar,Bc), (same_arg(same_or(subclass),Ac,Ai),same_arg(same_or(equals),Bc,Bi)))).
 */
 
@@ -860,7 +860,7 @@ isCycPredArity0(P,A):- xcall_t(holds_t(arity,P,A)).
 isCycPredArity0(P,A):- xcall_t(holds_t(arityMax,P,A)).
 isCycPredArity0(holds,7):- !.
 isCycPredArity0(P,_):- is_2nd_order_holds(P),!,fail.
-isCycPredArity0(F,A):- integer(A),A>0,defined_type(F),!.
+isCycPredArity0(F,A):- integer(A),A>0,is_type(F),!.
 isCycPredArity0(P,A):- xcall_t(((holds_t(arityMin,P,A),not(holds_t(arityMax,P, _))))).
 
 
@@ -1026,7 +1026,7 @@ db_op_simpler(_,KB:Term,Term):- dbase_mod(KB).
 db_op_simpler(ask(_),MODULE:C0,call_expanded(MODULE:C0)):- atom(MODULE), nonvar(C0),not(not(predicate_property(C0,_PP))),!. % , functor(C0,F,A), dmsg(todo(unmodulize(F/A))), %trace_or_throw(module_form(MODULE:C0)),
                                                                              %    db_op(Op,C0).
 db_op_simpler(_,C0,C1):- C0=..[svo,Obj,Prop|ARGS],!,C1=..[p,Prop,Obj|ARGS],!.
-db_op_simpler(_,TypeTerm,props(Inst,[isa(Type)|PROPS])):- TypeTerm=..[Type,Inst|PROPS],defined_type(Type),!.
+db_op_simpler(_,TypeTerm,props(Inst,[isa(Type)|PROPS])):- TypeTerm=..[Type,Inst|PROPS],is_type(Type),!.
 db_op_simpler(_,DBASE_T,DBASE):- DBASE_T=..[HOLDS,P,A|ARGS],atom(P),is_holds_true(HOLDS),DBASE=..[P,A|ARGS].
 
 
@@ -1063,17 +1063,17 @@ db_tell_isa_hooked(I,T):- is_creatable_type(ST),holds_t(subclass,T,ST),call_afte
 define_ft(FT):- db_tell_isa(FT,formattype).
 
 get_isa_backchaing(A,T):-var(T),!,get_isa_asserted_0(A,T).
-get_isa_backchaing(_,A):- not(defined_type(A)),!,fail.
+get_isa_backchaing(_,A):- not(is_type(A)),!,fail.
 get_isa_backchaing(A,formattype):- !,is_ft(A).
-get_isa_backchaing(A,type):- !, defined_type(A).
+get_isa_backchaing(A,type):- !, is_type(A).
 get_isa_backchaing(A,Fmt):- nonvar(Fmt),is_ft(Fmt),!,correctType(ask(once),A,Fmt,AA),!,A==AA,!.
 get_isa_backchaing(A,Fmt):- get_isa_asserted(A,Fmt).
 
 get_isa_asserted(A,Fmt):-get_isa_asserted_0(A,Fmt).
 
-get_isa_asserted_0(A,ArgsIsa):- nonvar(ArgsIsa),mpred_functor(ArgsIsa,A,Prop),!, mpred_prop(_,Prop).
+get_isa_asserted_0(A,ArgsIsa):- nonvar(ArgsIsa),mpred_functor(ArgsIsa,A,Prop),!, mpred_prop(_,_,Prop).
 get_isa_asserted_0(A,Fmt):- call_t(dac(d,a,no_c,no_mt),isa,A,Fmt).
-get_isa_asserted_0(A,ArgsIsa):- mpred_functor(ArgsIsa,A,Prop),!, mpred_prop(_,Prop).
+get_isa_asserted_0(A,ArgsIsa):- mpred_functor(ArgsIsa,A,Prop),!, mpred_prop(_,_,Prop).
 
 mpred_functor(argsIsa,A,argsIsa(A)).
 mpred_functor(singleValued,_,singleValued).
@@ -1096,20 +1096,23 @@ call_must(_,Call):- call(Call).
 add_from_file(B,_):- contains_singletons(B),grtrace,dmsg(todo(add_from_file_contains_singletons(B))),!,fail.
 add_from_file(B,B):- db_op(tell(_OldV),B),!.
 
-db_op(Op,Term):- notrace(do_all_of(dbase_module_loaded)),db_op00(Op,Term),notrace((do_all_of(dbase_module_loaded))).
+do_db_op_hooks:- once(ignore(do_all_of(dbase_module_loaded))).
+
+db_op(tell(OldV):- !, db_opp(tell(OldV),Term),do_db_op_hooks.
+db_op(Op,Term):- do_db_op_hooks,db_opp(Op,Term),do_db_op_hooks.
 
 
-db_op00(Op,isa(Term,Var)):- var(Var),!,db_op0(Op,get_isa(Term,Var)).
+db_opp(Op,isa(Term,Var)):- var(Var),!,db_op0(Op,get_isa(Term,Var)).
 
-db_op00(ask(Must),isa(T,type)):- !,call_must(Must,defined_type(T)).
-db_op00(tell(_),isa(T,type)):- !,db_tell_isa(T,type).
-db_op00(tell(_),isa(T,Type)):- !,db_tell_isa(T,Type).
+db_opp(ask(Must),isa(T,type)):- !,call_must(Must,is_type(T)).
+db_opp(tell(_),isa(T,type)):- !,db_tell_isa(T,type).
+db_opp(tell(_),isa(T,Type)):- !,db_tell_isa(T,Type).
 
-db_op00(ask(_Must),true):- !.
-db_op00(tell(OldV),B):- !,loop_check(db_op0(tell(OldV),B),true). % true = we are already processing this assert
-db_op00(ask(Must),createableType(SubType)):- !, call_must(Must,is_creatable_type(SubType)).
-db_op00(ask(Must),Term):- !,loop_check(db_op0(ask(Must),Term),db_query_lc(Must,Term)).
-db_op00(Op,Term):- loop_check_throw(db_op0(Op,Term)).
+db_opp(ask(_Must),true):- !.
+db_opp(tell(OldV),B):- !,loop_check(db_op0(tell(OldV),B),true). % true = we are already processing this assert
+db_opp(ask(Must),createableType(SubType)):- !, call_must(Must,is_creatable_type(SubType)).
+db_opp(ask(Must),Term):- !,loop_check(db_op0(ask(Must),Term),db_query_lc(Must,Term)).
+db_opp(Op,Term):- loop_check_throw(db_op0(Op,Term)).
 
 db_op0(Op,Term):- not(compound(Term)),!,grtrace,throw_safe(nc(db_op0(Op,Term))).
 db_op0(Op,[holds_t,P|Args]):- atom(P),!,Goal=..[P|Args],db_op(Op,Goal).
@@ -1128,7 +1131,7 @@ db_op0(_Op,props(_Obj,[])):- !.
 db_op0(Op,props(Obj,[P])):- nonvar(P),!,db_op(Op,props(Obj,P)).
 db_op0(Op,props(Obj,[P|ROPS])):- !,db_op(Op,props(Obj,P)),db_op(Op,props(Obj,ROPS)).
 db_op0(Op,props(Obj,PropVal)):- safe_univ(PropVal,[Prop,NonVar|Val]),Obj==NonVar,!,db_op(Op,[holds_t,Prop,Obj|Val]).
-db_op0(Op,props(Obj,PropVal)):- PropVal=..[OP,Pred|Val],comparitiveOp(OP),not(comparitiveOp(Pred)),!,OPVAL=..[OP|Val],PropVal2=..[Pred,OPVAL],db_op0(Op,props(Obj,PropVal2)).
+db_op0(Op,props(Obj,PropVal)):- PropVal=..[OP,Pred|Val],comparitiveOp(OP),not(comparitiveOp(Pred)),!,OPVAL=..[OP|Val],PropVal2=..[Pred,OPVAL],db_op(Op,props(Obj,PropVal2)).
 db_op0(Op,props(Obj,PropVal)):- PropVal=..[Prop|Val],not(infix_op(Prop,_)),!,db_op(Op,[holds_t,Prop,Obj|Val]).
 db_op0(Op,props(Obj,PropVal)):- PropVal=..[Prop|Val],!,grtrace,db_op(Op,[holds_t,Prop,Obj|Val]).
 db_op0(Op,expand_args(Exp,Term)):- !,forall(do_expand_args(Exp,Term,O),db_op(Op,O)).
@@ -1173,7 +1176,7 @@ db_op0(Op,C0):- C0=..[Prop|ARGS],db_op_unit(Op,C0,Prop,ARGS).
 % db_op_unit/3
 % ================================================
 
-db_op_unit(Op,_C0,Prop,ARGS):-defined_type(Prop),trace_or_throw(db_op_unit(Op,defined_type(Prop),ARGS)).
+db_op_unit(Op,_C0,Prop,ARGS):-is_type(Prop),trace_or_throw(db_op_unit(Op,is_type(Prop),ARGS)).
 db_op_unit(Op,C0,isa,ARGS):-trace_or_throw(db_op_unit(Op,isa(C0),ARGS)).
 
 % impl/1

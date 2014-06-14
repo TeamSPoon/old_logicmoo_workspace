@@ -16,7 +16,9 @@
          module_predicates_are_exported/1,
          module_predicates_are_exported/0,
          inside_loop_check/1,
+         rtrace/1,
          is_loop_checked/1,
+         snumbervars/1,
          must_det/1,
          is_deterministic/1,
      programmer_error/1,
@@ -30,7 +32,8 @@
      module_notrace/1,
      user_use_module/1,
      dumpST/0,
-     dumpST/1, 
+     dumpST/1,
+     dtrace/0,
      trace_or_throw/1,
      trace_or/1,
      os_to_prolog_filename/2,
@@ -40,20 +43,18 @@
       meta_predicate_transparent/2,
      ifThen/2,
      nop/1,
-     atLeastOneOrElse/2,
      module_predicate/3,
      to_m_f_arity_pi/5,
      test_call/1,
      printAll/1,
      dynamic_load_pl/1,
      term_to_message_string/2,
-     atLeastOne/1,
      isDebugging/1,
      ggtrace/0,
      gftrace/0,
      grtrace/0,
      has_auto_trace/1,
-     atLeastOne0/2,
+     one_must/2,
 %     read_line_with_nl/3,
 	 unnumbervars/2,
 
@@ -163,9 +164,8 @@ set_bugger_flag(F,V):-create_prolog_flag(F,V,[term]).
 :- meta_predicate moo_hide_childs(0).
 :- module_transparent moo_hide_childs/0.
 
-:- meta_predicate atLeastOne3(+,^,^).
-:- meta_predicate atLeastOne0(^,^).
-:- meta_predicate atLeastOne(^).
+:- meta_predicate one_must(^,^).
+:- meta_predicate must(^).
 :- meta_predicate prolog_must_not(^).
 :- meta_predicate gmust(^,^).
 :- meta_predicate logOnFailure0(^).
@@ -191,7 +191,8 @@ set_bugger_flag(F,V):-create_prolog_flag(F,V,[term]).
 :- meta_predicate if_prolog(*,^).
 :- meta_predicate must(^).
 :- meta_predicate must_det(^).
-:- meta_predicate atLeastOne4(^,^).
+:- meta_predicate rtrace(^).
+:- meta_predicate must_det(^,^).
 :- meta_predicate debugOnError(^).
 :- meta_predicate debugOnError0(^).
 :- meta_predicate debugOnErrorIgnore(^).
@@ -260,7 +261,7 @@ loop_check(BC, B,_TODO):-
 
 % =========================================================================
  % false = use this wrapper, true = code is good and avoid using this wrapper
- skipWrapper:-false.
+ skipWrapper:-tracing.
  % false = hide this wrapper
  showHiddens:-true.
 
@@ -446,16 +447,14 @@ prolog_must(Call):-must(Call).
 
 % cmust is only used for type checking
 cmust(_):-bugger_flag(release,true),!.
-cmust(Call):-atLeastOne0(will_debug_else_throw(cmust(Call),Call),Call).
+cmust(Call):-one_must(Call,will_debug_else_throw(cmust(Call),Call)).
 
 % gmust is must with cmust
 gmust(True,Call):-catch((Call,(True->true;throw(retry(gmust(True,Call))))),retry(gmust(True,_)),(trace,Call,True)).
 
 % must is used declaring the predicate must suceeed
 
-must(C):-atLeastOne0(debugCallWhy(failed(must(C)),C),C).
-
-throwOnFailure(Call):-atLeastOne0(throw(throwOnFailure(Call)),Call).
+throwOnFailure(Call):-one_must(Call,throw(throwOnFailure(Call))).
 ignoreOnError(CX):-ignore(catch(CX,_,true)).
 
 % pause_trace(_):- notrace(((debug,visible(+all),leash(+exception),leash(+call)))),trace.
@@ -477,7 +476,7 @@ debugOnErrorEach(C):-prolog_ecall(1,debugOnError,C).
 debugOnErrorIgnore(C):-ignore(debugOnError(C)).
 
 debugOnFailure(C):-prolog_ecall(0,debugOnFailure0,C).
-debugOnFailure0(C):- atLeastOne0(debugCallWhy(failed(debugOnFailure0(C)),C),C).
+debugOnFailure0(C):- one_must(C,debugCallWhy(failed(debugOnFailure0(C)),C)).
 debugOnFailureEach(C):-prolog_ecall(1,debugOnFailure,C).
 debugOnFailureIgnore(C):-ignore(debugOnFailure(C)).
 
@@ -487,7 +486,7 @@ logOnErrorEach(C):-prolog_ecall(1,logOnError,C).
 logOnErrorIgnore(C):-ignore(logOnError(C)).
 
 logOnFailure(C):-prolog_ecall(0,logOnFailure0,C).
-logOnFailure0(C):- atLeastOne0(dmsg(logOnFailure(C)),C).
+logOnFailure0(C):- one_must(C,dmsg(logOnFailure(C))).
 logOnFailureEach(C):-prolog_ecall(1,logOnFailure,C).
 logOnFailureIgnore(C):-ignore(logOnFailure(C)).
 
@@ -622,36 +621,37 @@ prolog_must_l(H):-must(H).
 programmer_error(E):-trace, randomVars(E),dmsg('~q~n',[error(E)]),trace,randomVars(E),!,throw(E).
 
 
-:-dhideTrace(atLeastOne/1).
-atLeastOne(C):-atLeastOne0(debugCallWhy(failed(atLeastOne(C)),C),C).
+:-dhideTrace(must/1).
+must(C):-one_must(C,debugCallWhy(failed(must(C)),C)).
 
-atLeastOneOrElse(AtLeastOneOr,Else):-atLeastOne0(Else, AtLeastOneOr).
 
-:-dhideTrace(atLeastOne0/2).
+:-dhideTrace(one_must/2).
 % now using gensym counter instead of findall (since findall can make tracing difficult)
 
 
-atLeastOne0(OnFail,Call):- is_deterministic(Call),!,atLeastOne4(OnFail,Call).
+one_must(Call,OnFail):- is_deterministic(Call),!,must_det(Call,OnFail).
 
 % better version I think but makes more tracing
-atLeastOne0(OnFail,Call):- gensym(atLeastOneCounter,Sym),flag(Sym,_,0),!, atLeastOne3(Sym,OnFail,Call).
+one_must(Call,OnFail):- gensym(mustCounter,Sym),flag(Sym,_,0),!, must_flag(Sym,Call,OnFail).
 
 %old findall version
-atLeastOne0(_Else,OneA):-copy_term(OneA,One),findall(One,call(One),OneL),[_|_]=OneL,!,member(OneA,OneL).
-atLeastOne0(Else,_OneA):-!,Else.
+must_findall(OneA,_Else):-copy_term(OneA,One),findall(One,call(One),OneL),[_|_]=OneL,!,member(OneA,OneL).
+must_findall(_OneA,Else):-!,Else.
 
-atLeastOne3(Sym,_NFail,Call):-call(Call),flag(Sym,C,C+1).
-atLeastOne3(Sym,OnFail,_All):-flag(Sym,Old,0),!, Old==0, % if old > 0 we want to fail 
+must_flag(Sym,Call,_NFail):-call(Call),flag(Sym,C,C+1).
+must_flag(Sym,_All,OnFail):-flag(Sym,Old,0),!, Old==0, % if old > 0 we want to fail 
          call(OnFail).
 
-
+is_deterministic(not(_)).
+is_deterministic(forall(_,_,_)).
+is_deterministic(once(_)).
 is_deterministic(Call):-predicate_property(Call,nodebug),!.
 is_deterministic(Call):-predicate_property(Call,foreign),!.
 
-must_det(C):- atLeastOne4(debugCallWhy(failed(must_det(C)),C),C).
+must_det(C):- must_det(C,debugCallWhy(failed(must_det(C)),C)).
 
-atLeastOne4(_OnFail,Call):-Call,!.
-atLeastOne4(OnFail,_Call):-OnFail.
+must_det(Call,_OnFail):-Call,!.
+must_det(_Call,OnFail):-OnFail.
 
 
 randomVars(Term):- random(R), StartR is round('*'(R,1000000)), !,
@@ -1189,9 +1189,9 @@ moo_hide_showChilds(M,F,A,_MPred):-
 
 :-moo_hide_showChilds(bugger,prolog_ecall_fa,5).
 :-moo_hide_showChilds(bugger,prolog_ecall,3).
-:-moo_hide_showChilds(bugger,atLeastOne,1).
-:-moo_hide_showChilds(bugger,atLeastOne1,2).
-:-moo_hide_showChilds(bugger,atLeastOne3,3).
+:-moo_hide_showChilds(bugger,must,1).
+:-moo_hide_showChilds(bugger,must,2).
+:-moo_hide_showChilds(bugger,must_flag,3).
 
 
 % bugger_debug=off turns off just debugging about the debugger
@@ -1224,21 +1224,28 @@ grtrace(Trace):- notrace(( visible(+all),leash(+all))), Trace.
 
 
 show_and_do(C):-dmsg(C),!,C.
+dtrace:-tracing,!,visible(+all).
 dtrace:-has_auto_trace(C),!,C.
-dtrace:-repeat,dumptrace.
+dtrace:-repeat,dumptrace,!.
 dumptrace:-tracing,!.
-dumptrace:-writeq(dumptrace),nl,get_single_char(C),writeq(keypress(C)),nl,dumptrace(C).
-dumptrace(0'd):-notrace(dumpST),!,fail.
+dumptrace:-fmt(in_dumptrace),get_single_char(C),dumptrace(C).
+dumptrace(0'g):-notrace(dumpST),!,fail.
 dumptrace(_):-notrace(dumpST(10)),fail.
-dumptrace(0'l):-show_and_do((leash(-call))),!,trace.
-dumptrace(0't):-show_and_do((trace,trace)),!.
-dumptrace(0'g):-show_and_do(ggtrace(true)),!.
-dumptrace(0'r):-show_and_do(grtrace(true)),!.
-dumptrace(0'f):-show_and_do(gftrace(true)),!.
-dumptrace(10):-dumptrace_leap,!.
-dumptrace(13):-dumptrace_leap,!.
-dumptrace(C):-writeq(unused_keypress(C)),!,fail.
-dumptrace_leap:-trace.
+dumptrace(0'l):-show_and_do(ggtrace(true)).
+dumptrace(0't):-show_and_do(grtrace(trace)).
+dumptrace(0'f):-show_and_do(gftrace(true)).
+dumptrace(10):-dumptrace_ret,!.
+dumptrace(13):-dumptrace_ret,!.
+dumptrace(C):-dmsg(unused_keypress(C)),!,fail.
+
+dumptrace_ret:-trace.
+
+restore_trace(Goal):- tracing,!,Goal,trace.
+restore_trace(Goal):- Goal,notrace.
+
+rtrace(Goal):- restore_trace((
+   visible(+all),visible(-unify),visible(+exception),
+   leash(-all),leash(+exception),trace,Goal)).
 
 bugger_t_expansion(T,T):-not(compound(T)),!.
 bugger_t_expansion(T,AA):- T=..[F,A],unwrappabe(F),bdmsg(bugger_term_expansion(T)),bugger_t_expansion(A,AA),!.

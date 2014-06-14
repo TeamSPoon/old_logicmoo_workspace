@@ -1,4 +1,4 @@
-:- module(help, []).
+:- module(help, [show_help/0]).
 /** <module> A command to tell an agent all the possible commands
 % help.pl
 % Douglas Miles 2014
@@ -14,6 +14,13 @@ moo:type_action_help(agent, help(optional(string,"")), "shows this help").
 
 get_type_action_help(A,B,C):-get_type_action_help_0(A,B,C).
 
+:-export(get_type_action_templates/1).
+get_type_action_templates(Templ):-get_type_action_help_0(_,Templ,_),good_template(Templ).
+
+:-export(good_template/1).
+
+good_template(Templ):- \+ contains_singletons(Templ).
+
 get_type_action_help_0(isaFn(A),TEMPL,text(Text,'does: ',do(A2,TEMPL))):- get_agent_text_command(A,Text,A2,Goal),(nonvar(Goal)->TEMPL=Goal;TEMPL=Text).
 get_type_action_help_0(A,B,C):- call_no_cuts(moo:type_action_help(A,B,C)).
 get_type_action_help_0(_What,TEMPL,Help):- call_no_cuts(moo:action_help(TEMPL,Help)).
@@ -22,10 +29,9 @@ get_type_action_help_0(What,Syntax,text([makes,happen,List])):- call_no_cuts(moo
       safe_univ(Syntax,[Verb,Obj|Objs]), once(member(isa(Obj,Type),List);Type=term),ignore(Agent=an(What)),ignore(What=agent).
 
 
-action_info_db(TEMPL):- PRED=moo:agent_call_command(_,TEMPL) ,predicate_property(user:PRED,multifile),clause(PRED,_BODY,REF),nonvar(TEMPL),clause_property(REF,source(_S)).
-action_info_db(TEMPL):- PRED=moo:agent_text_command(_,_,_,TEMPL) ,predicate_property(user:PRED,multifile),clause(PRED,_BODY,REF),nonvar(TEMPL),clause_property(REF,source(_S)).
+action_info_db(TEMPL,S):- (PRED=moo:agent_call_command(_,TEMPL);PRED=moo:agent_text_command(_,_,_,TEMPL)) ,predicate_property(user:PRED,multifile),clause(PRED,_BODY,REF),nonvar(TEMPL),clause_property(REF,source(S)).
 
-moo:action_info(TEMPL):-action_info_db(TEMPL).
+moo:action_help(TEMPL,text(file,S,contains,TEMPL)):-action_info_db(TEMPL,S).
 
 commands_list(ListS):-findall(action_help(B,C,A),(get_type_action_help(A,B,C),numbervars(get_type_action_help(A,B,C),0,_,[attvar(skip),singletons(true)])),List),
    predsort(alpha_shorter,List,ListS).
@@ -39,7 +45,8 @@ alpha_shorter_1(OrderO, P1,P2):-get_functor(P1,F1,A1),get_functor(P2,F2,A2),comp
 
 
 % Help - A command to tell an agent all the possible commands
-moo:agent_call_command(_Agent,help) :- commands_list(ListS),forall(member(E,ListS),fmt(E)).
+show_help:- commands_list(ListS),forall(member(E,ListS),fmt(E)).
+moo:agent_call_command(_Agent,help) :- show_help.
 moo:agent_call_command(_Agent,help(Str)) :-commands_list(ListS),forall(member(E,ListS),write_string_if_contains(Str,E)).
 
 write_string_if_contains(Must,E):-ignore((with_output_to(string(Str),fmt(E)),str_contains_all([Must],Str),fmt(Str))).

@@ -82,7 +82,7 @@ moo:term_anglify(term_anglify(Term,Text),[prolog(Term),is,converted,to,english,u
 
 dyn:singleValued(type_max_damage(type,int)).
 
-dyn:argsIsa(verb_alias(string,string)).
+dyn:multiValued(verb_alias(string,string)).
 
 dyn:multiValued(label_type_props(string,type,list(props))).
 
@@ -143,8 +143,8 @@ argsIsa(sorts(type,list(type))).
 argsIsa(default_sv(singleValued,term)).
 
 % live another day to fight (meaning repl_to_string/1 for now is in prolog)
-% dyn:singleValued(repl_writer(agent,term),default_sv(look:default_repl_writer)).
-% dyn:singleValued(repl_to_string(agent,term),[singleValued,default_sv(look:default_repl_obj_to_string)]).
+%dyn:singleValued(repl_writer(agent,term),default_sv(look:default_repl_writer)).
+%dyn:singleValued(repl_to_string(agent,term),[singleValued,default_sv(look:default_repl_obj_to_string)]).
 
 dyn:multiValued(label_type(string,type),[singleValued]).
 
@@ -172,9 +172,6 @@ dyn:multiValued(description(term,text),[assert_with_pred(assert_description),ask
 
 
 dyn:type(item).
-dyn:type(T):-moo:defined_type(T).
-
-
 
 dyn:equivRule(nameString(apath(Region,Dir),Text),pathName(Region,Dir,Text)).
 dyn:equivRule(description(apath(Region,Dir),Text),pathName(Region,Dir,Text)).
@@ -269,6 +266,8 @@ dyn:singleValued(type_grid(regiontype,int,list(term))).
 dyn:singleValued(weight(object,int)).
 
 dyn:multiValued(comment(term,string)).
+
+:- must((argIsa_call_0(comment,2,W), W\=term)).
 
 :-decl_mpred(needs_look/2).
 

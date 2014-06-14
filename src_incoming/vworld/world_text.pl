@@ -7,6 +7,7 @@
 %
 %
 */
+% :- module(world_text,[]).
 
 :-export(fully_expand/2).
 

@@ -24,14 +24,9 @@
             pathBetween_call/3,
             obj_memb/2,
             prop_memb/2,
-            move_dir_target/3,
-            in_world_move/3, check_for_fall/3,
+
             
-            reverse_dir/2,
-            round_loc/8,
-            round_loc_target/8,
-            dir_offset/5,
-            number_to_dir/3,
+            
             isa_mc/2,
             list_agents/1,
             agent_list/1,
@@ -48,13 +43,7 @@
          init_location_grid/1,
          % test_te/0,
          grid_dist/3,
-         to_3d/2,
-         is_3d/1,
-         in_grid/2,
-         in_grid_rnd/2,
-         loc_to_xy/4,
-         grid_size/4,
-         doorLocation/5,
+
          foc_current_player/1,
          locationToRegion/2,
          init_location_grid/2,

@@ -1,5 +1,5 @@
 
-term_listing([]):-!.
+term_listing([]):-!,dtrace.
 term_listing(P):-term_listing(P,[]).
 term_listing(M:P,List):-!,term_listing(P,[module(M)|List]).
 term_listing(F/A,List):-atom(F),integer(A),!,functor(P,F,A),term_listing(P,[functor(F),arity(A)|List]).
@@ -8,6 +8,7 @@ term_listing(P,List):-not(is_list(P)),!,compound(P),term_listing_0(P,List).
 term_listing(P,List):-is_list(P),!,append(P,List,Append),term_listing_0(_,Append).
 term_listing(P,List):-term_listing_0(P,List).
 
+term_listing_0(Atom,[]):-!,term_listing_0(Atom,[contains(Atom)]).
 term_listing_0(Atom,UList):-
    ignore((catch(listing(Atom),_,fail))),
    doall(((

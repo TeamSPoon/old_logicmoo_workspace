@@ -34,17 +34,22 @@ moo:agent_call_command(_Agent,where(SObj)) :-
         fmt(cmdresult(where,atloc(Obj,LOC)))).
 
 
-moo:agent_text_command(Agent,[who],Agent,who(_)).
+moo:agent_text_command(Agent,[who],Agent,who(world)).
 
-moo:action_help(who(optional(agent,_)),"Lists who is online (where they are at least)").
+moo:action_help(who(optional(agent,world)),"Lists who is online (where they are at least)").
 
-get_inRegion(Agnt,Where):-inRegion(Agnt,Where).
-get_inRegion(Agnt,Where):-atloc(Agnt,Where).
+get_inRegion(Agnt,Where):- dyn:inRegion(Agnt,Where).
+get_inRegion(Agnt,Where):- dyn:atloc(Agnt,Where).
 
-moo:agent_call_command(_Gent,who(Agent)) :- 
-     forall(agent(Agent),
-      once((get_inRegion(Agent,Where),
-            fmt(cmdresult(who(Agent),inRegion(Agent,Where)))))).
+moo:agent_call_command(_Gent,who(W)) :- rtrace(mud_cmd_who(W)).
+
+mud_cmd_who(world):-!,mud_cmd_who_1(_).
+mud_cmd_who(Who):- mud_cmd_who_1(Who).
+
+mud_cmd_who_1(Who):-
+     forall(agent(Who),
+      once((get_inRegion(Who,Where),
+            fmt(cmdresult(who(Who),inRegion(Who,Where)))))).
 
 :- include(logicmoo(vworld/moo_footer)).
 

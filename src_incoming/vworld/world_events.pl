@@ -6,6 +6,7 @@
 % Dec 13, 2035
 %
 */
+% :- module(world_events,[]).
 
 /*
 % This file is "included" from world.pl 

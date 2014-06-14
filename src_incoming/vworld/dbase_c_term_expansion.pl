@@ -26,6 +26,8 @@ force_expand_head(G,GH):-force_head_expansion(G,GH),!.
 force_expand_goal(A, B) :- force_expand(expand_goal(A, B)).
 
 :-multifile(user:goal_expansion/2).
+
+:-thread_local inside_clause_expansion/1.
    
 set_list_len(List,A,NewList):-length(List,LL),A=LL,!,NewList=List.
 set_list_len(List,A,NewList):-length(List,LL),A>LL,length(NewList,A),append(List,_,NewList),!.
@@ -40,8 +42,8 @@ if_use_holds_db(F,A2,A):- use_holds_db(F,A2,A),!.
 if_use_holds_db(F,A,_):- integer(A),findall(n(File,Line),source_location(File,Line),SL),ignore(inside_clause_expansion(CE)),asserta(never_use_holds_db(F,A,discoveredInCode(F,A,SL,CE))),!,fail.
 
 use_holds_db(F,A,_):- never_use_holds_db(F,A,_),!,fail.
-use_holds_db(F,A2,A):- integer(A2), A is A2-2, isCycPredArity_Check(F,A),!.
-use_holds_db(F,A,A):- integer(A),defined_type(F),!.
+use_holds_db(F,A2,A):- integer(A2), A is A2-2, A>0, isCycPredArity_Check(F,A),!.
+use_holds_db(F,A,A):- integer(A),is_type(F),!.
 use_holds_db(F,A,A):- isCycPredArity_Check(F,A).
 
 ensure_moo_pred(F,A,A):- is_mpred_prolog(F,A),!.
@@ -61,8 +63,7 @@ mud_goal_expansion_0(G1,G2):- ((mud_pred_expansion(if_use_holds_db, holds_t - ho
 try_mud_head_expansion(G0,G2):- ((mud_head_expansion_0(G0,G1),!,expanded_different(G0, G1),!,moo:dbase_mod(DBASE))),prepend_module(G1,DBASE,G2).
 mud_head_expansion_0(G1,G2):- ((mud_pred_expansion(if_mud_asserted, dbase_t - dbase_f,G1,G2))),!.
 
-try_mud_asserted_expansion(G0,G2):-  is_compiling_sourcecode,
-    mud_asserted_expansion_0(G0,G1),!,expanded_different(G0, G1),while_capturing_changes(add_from_file(G1,G2),Changes),!,ignore((Changes\==[],dmsg(add(todo(Changes-G2))))).
+try_mud_asserted_expansion(G0,G2):-  is_compiling_sourcecode, mud_asserted_expansion_0(G0,G1),!,expanded_different(G0, G1),while_capturing_changes(add_from_file(G1,G2),Changes),!,trace,Changes\==[],dmsg(add(todo(Changes-G2))).
 mud_asserted_expansion_0(G1,G2):- ((mud_pred_expansion(if_mud_asserted, asserted_dbase_t - asserted_dbase_f,G1,G2))),!.
 
 is_compiling_sourcecode:- current_input(X),not((stream_property(X,file_no(0)))),prolog_load_context(source,F),not((moo:loading_game_file(_))),F=user.
@@ -88,7 +89,7 @@ expanded_different_1(G0,G1):- (var(G0);var(G1)),!,throw(expanded_different(G0,G1
 expanded_different_1(G0,G1):- G0 \= G1,!.
 
 
-attempt_clause_expansion(B,BR):- compound(B), copy_term(B,BC),numbervars(BC,0,_),!, attempt_clause_expansion(B,BC,BR).
+attempt_clause_expansion(B,BR):- compound(B), copy_term(B,BC),snumbervars(BC),!, attempt_clause_expansion(B,BC,BR).
 attempt_clause_expansion(_,BC,_):-inside_clause_expansion(BC),!,fail.
 attempt_clause_expansion(B,BC,BR):- 
     setup_call_cleanup(asserta(inside_clause_expansion(BC)),
@@ -114,7 +115,7 @@ force_head_expansion(H,HR):- force_expand(expand_term(H,HR)).
 mud_rule_expansion(H,True,HR):-True==true,!,force_clause_expansion(H,HR).  
 mud_rule_expansion(H,B,((HR:-BR))):-force_head_expansion(H,HR),force_expand_goal(B,BR),!.
 
-is_term_head(H):- (( \+ \+ inside_clause_expansion(H))),!.
+is_term_head(H):- (( \+ \+ (inside_clause_expansion(H0),!,H=H0))),!.
 %is_term_head(_):- inside_clause_expansion(_),!,fail.
 %is_term_head(H):-H=_, is_our_sources(H).
 

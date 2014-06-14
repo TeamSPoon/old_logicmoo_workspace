@@ -7,7 +7,7 @@
 % Dec 13, 2035
 %
 */
-
+% :- module(world_effects,[]).
 /*
 % This file is "included" from world.pl 
 */
