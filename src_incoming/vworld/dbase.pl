@@ -952,7 +952,7 @@ padd(Obj,Prop,Value):- must(nonvar(Prop)), PropValue=..[Prop,Value],!,padd(Obj,P
 %% prop(Obj,Prop,Value)
 prop(Obj,Prop,Value):- holds_t(Prop,Obj,Value).
 %% prop_or(Obj,Prop,Value,OrElse)
-prop_or(Obj,Prop,Value,OrElse):- atLeastOne0(Value=OrElse,prop(Obj,Prop,Value)).
+prop_or(Obj,Prop,Value,OrElse):- one_must(prop(Obj,Prop,Value),Value=OrElse).
 
 % TODO: canonicalize clauses first!
 with_kb_assertions([],Call):- !,Call.

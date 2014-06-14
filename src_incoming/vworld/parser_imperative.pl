@@ -259,7 +259,7 @@ verb_matches(SVERB,VERB):-samef(VERB,SVERB).
 get_vp_templates(_Agent,SVERB,_ARGS,TEMPLATES):-
    findall([VERB|TYPEARGS],
     ((     
-      get_type_action_help(_What,TEMPL,_),
+      get_type_action_templates(TEMPL),
     % mud_isa(Agent,What),
      TEMPL=..[VERB|TYPEARGS],
      verb_matches(SVERB,VERB))),
