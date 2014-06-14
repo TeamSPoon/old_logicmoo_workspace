@@ -14,13 +14,15 @@ as_one_of(Types,TypeO):-nonvar(TypeO),is_type(TypeO),!,member(TypeO,Types).
 as_one_of([Type],TypeO):-!,same_arg(same_or(subclass),Type,TypeO).
 as_one_of(Type,oneOf(Type)).
 
-argIsa_call(Prop,N1,T):-once(var(Prop);not(number(N1))),trace_or_throw(argIsa_call(Prop,N1,T)).
-argIsa_call(_:Prop,N1,Type):-!,argIsa_call(Prop,N1,Type).
-argIsa_call(Prop,N1,TypeO):- argIsa_call_0(Prop,N1,TypeO),!.
-argIsa_call(Prop,N1,TypeO):- findall(Type,argIsa_call_0(Prop,N1,Type),Types),Types=[_|_],!,as_one_of(Types,TypeO),!.
-argIsa_call(Prop/_,N1,Type):- !,argIsa_call(Prop,N1,Type),!.
+argIsa_call(Prop,N1,T):-hotrace(loop_check_throw(argIsa_call_nt(Prop,N1,T))).
 
-argIsa_call(Prop,N1,Type):- argIsa_call_1(Prop,N1,Type),!.
+argIsa_call_nt(Prop,N1,T):-once(var(Prop);not(number(N1))),trace_or_throw(argIsa_call(Prop,N1,T)).
+argIsa_call_nt(_:Prop,N1,Type):-!,argIsa_call_nt(Prop,N1,Type).
+argIsa_call_nt(Prop,N1,TypeO):- argIsa_call_0(Prop,N1,TypeO),!.
+argIsa_call_nt(Prop,N1,TypeO):- findall(Type,argIsa_call_0(Prop,N1,Type),Types),Types=[_|_],!,as_one_of(Types,TypeO),!.
+argIsa_call_nt(Prop/_,N1,Type):- !,argIsa_call_nt(Prop,N1,Type),!.
+
+argIsa_call_nt(Prop,N1,Type):- argIsa_call_1(Prop,N1,Type),!.
 
 argIsa_call_0(Prop,N1,Type):-get_mpred_prop(Prop,argIsa(N1,Type)),!.
 argIsa_call_0(isa,1,argIsaFn(isa,1)):-!.

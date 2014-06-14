@@ -674,7 +674,7 @@ holds_t(P,A1,A2,A3,A4,A5,A6):- isCycPredArity_ignoreable(P,6),which_t(DBS),(call
 holds_t(P,A1,A2,A3,A4,A5):- isCycPredArity_ignoreable(P,5),which_t(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5);call_mt_t(DBS,P,A1,A2,A3,A4,A5,_,_)).
 holds_t(P,A1,A2,A3,A4):- isCycPredArity_ignoreable(P,4),which_t(DBS),(call_t(DBS,P,A1,A2,A3,A4);call_mt_t(DBS,P,A1,A2,A3,A4,_,_)).
 holds_t(P,A1,A2,A3):- isCycPredArity_ignoreable(P,3),which_t(DBS),(call_t(DBS,P,A1,A2,A3);call_mt_t(DBS,P,A1,A2,A3,_,_)).
-holds_t(P,A1,A2):- notrace(holds_relaxed_t(P,A1,A2)).
+holds_t(P,A1,A2):- hotrace(holds_relaxed_t(P,A1,A2)).
 holds_t(P,A1):- !,req(isa(A1,P)).
 holds_t(P,A1):- isCycPredArity_ignoreable(P,1),which_t(DBS),(call_t(DBS,P,A1);call_mt_t(DBS,P,A1,_,_)).
 
@@ -842,7 +842,7 @@ is_creatable_type(Type):- holds_t([isa,Type,creatable_type]).
 arityMatches(A,S-E):- !, catch((system:between(S,E,OTHER),A=OTHER),_,(trace,system:between(S,E,OTHER),A=OTHER)).
 arityMatches(A,OTHER):- number(OTHER),!,A=OTHER.
 
-isCycPredArity_ignoreable(P,A):- notrace(ignore(isCycPredArity(P,A))).
+isCycPredArity_ignoreable(P,A):- hotrace(ignore(isCycPredArity(P,A))).
 
 isCycPredArity_Check(P,A):- isCycPredArity(P,A),!.
 isCycPredArity_Check(P,A):- get_mpred_prop(P/A,_),!.
@@ -1069,7 +1069,7 @@ get_isa_backchaing(A,type):- !, is_type(A).
 get_isa_backchaing(A,Fmt):- nonvar(Fmt),is_ft(Fmt),!,correctType(ask(once),A,Fmt,AA),!,A==AA,!.
 get_isa_backchaing(A,Fmt):- get_isa_asserted(A,Fmt).
 
-get_isa_asserted(A,Fmt):-get_isa_asserted_0(A,Fmt).
+get_isa_asserted(A,Fmt):-hotrace(get_isa_asserted_0(A,Fmt)).
 
 get_isa_asserted_0(A,ArgsIsa):- nonvar(ArgsIsa),mpred_functor(ArgsIsa,A,Prop),!, mpred_prop(_,_,Prop).
 get_isa_asserted_0(A,Fmt):- call_t(dac(d,a,no_c,no_mt),isa,A,Fmt).
@@ -1085,8 +1085,14 @@ equivRule_call(A,B):- holds_t(equivRule,A,B).
 equivRule_call(A,B):- holds_t(equivRule,B,A).
 forwardRule_call(A,B):- holds_t(forwardRule,B,A).
 
+good_for_chaining(_,_):-!.
+good_for_chaining(_Op,Term):-not(contains_singletons(Term)).
+db_rewrite(_Op,Term,NewTerm):-equivRule_call(Term,NewTerm).
+db_rewrite(_Op,Term,NewTerm):-forwardRule_call(Term,NewTerm).
+
+call_must(query,Call):- !,call(Call).
 call_must(must,Call):- !,must(Call).
-call_must(Must,Call):- var(Must),!,Call.
+% call_must(Must,Call):- var(Must),!,Call.
 call_must(once,Call):- !,once(Call).
 call_must(!,Call):- !,once(Call).
 call_must(_,Call):- call(Call).
@@ -1145,8 +1151,7 @@ db_op0(Op,EACH):- EACH=..[each|List],forall_member(T,List,db_op(Op,T)).
 db_op0(tell(_),description(A,E)):- !,must(once(assert_description(A,E))).
 db_op0(Op,nameString(A,S0)):- determinerRemoved(S0,String,S),!,db_op(Op, nameString(A,S)),db_op(tell(_OldV), determinerString(A,String)).
 
-db_op0(Op,Term):- notrace((equivRule_call(Term,NewTerm),not(contains_singletons(NewTerm)))),db_op(Op,NewTerm).
-db_op0(Op,Term):- notrace((forwardRule_call(Term,NewTerm),not(contains_singletons(NewTerm)))),db_op(Op,NewTerm).
+db_op0(Op,Term):- good_for_chaining(Op,Term), db_rewrite(Op,Term,NewTerm),not(contains_singletons(NewTerm)),db_op(Op,NewTerm).
 
 db_op0(tell(_OldV), subclass(I,T)):- (atomic(I)->define_type(I);true) ,  (atomic(T)->define_type(T);true), fail.
 db_op0(tell(_OldV), subft(I,T)):- (atomic(I)->define_ft(I);true) ,  (atomic(T)->define_ft(T);true), fail.
@@ -1157,7 +1162,7 @@ db_op0(tell(_OldV),singleValued(Term)):- !,decl_mpred(Term),add_mpred_prop(Term,
 db_op0(tell(_OldV),multiValued(Term)):- !,functor_safe(Term,_,A),decl_mpred(Term),add_mpred_prop(Term,[multiValued,multi(A)]).
 
 db_op0(ask(Must),get_isa(Term,Var)):- !,call_must(Must,get_isa_asserted(Term,Var)).
-db_op0(ask(Must),isa(Term,Var)):- !,call_must(Must,get_isa_backchaing(Term,Var)).
+db_op0(ask(Must),isa(Term,Var)):- !,call_must(Must,hotrace(get_isa_backchaing(Term,Var))).
 
 db_op0(Op,isa(A,SubType)):- holds_t(createableSubclassType,SubType,Type),!,db_op(Op,isa(A,Type)),db_op(Op,isa(A,SubType)).
 

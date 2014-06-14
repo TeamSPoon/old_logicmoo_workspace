@@ -50,6 +50,13 @@ moo:mud_test(test_movedist,
 :- at_start((debug,must_det(run_mud_tests))).
 
 
+% :- must((
+   trace,add(movedist(explorer(player1),4))
+   ,
+   findall(X,movedist(explorer(player1),X),L),length(L,1))).
+
+:-moo_hide_childs(dbase:record_on_thread/2).
+
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
 % :- at_start(run).
 

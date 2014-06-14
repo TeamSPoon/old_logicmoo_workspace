@@ -206,7 +206,6 @@ set_bugger_flag(F,V):-create_prolog_flag(F,V,[term]).
 :- meta_predicate printAll(^).
 :- meta_predicate prolog_must(^).
 :- meta_predicate showProfilerStatistics(^).
-:- meta_predicate notrace_call(^).
 %:- meta_predicate debugCallF(^).
 
 :- module_transparent user_use_module/1.
@@ -229,7 +228,7 @@ user_use_module(What):- '@'(use_module(What),'user').
 :- meta_predicate((loop_check(0,0))).
 
 
-loop_check_throw(B):- loop_check(B,((retractall(inside_loop_check(BC)),debugCallWhy(loop_check_throw(BC,B),loop_check_throw(B))))).
+loop_check_throw(B):- loop_check(B,((retractall(inside_loop_check(B)),debugCallWhy(loop_check_throw(B),loop_check_throw(B))))).
 loop_check_fail(B):- loop_check(B,(dmsg(once(loop_check_fail(B))),fail)).
 
 snumbervars(BC):-numbervars(BC,0,_,[singletons(true),attvar(skip)]).
@@ -253,7 +252,6 @@ loop_check(BC, B,_TODO):-
     call(B),
     ignore(retract(inside_loop_check(BC)))).
 
-
  % cli_notrace(+Call) is nondet.
  % use call/1 with trace turned off
  cli_notrace(Call):-tracing,notrace,!,call_cleanup(call(Call),trace).
@@ -265,8 +263,8 @@ loop_check(BC, B,_TODO):-
  % false = hide this wrapper
  showHiddens:-true.
 
-:- set_prolog_flag(backtrace_depth,   20).
-:- set_prolog_flag(backtrace_goal_depth, 10).
+:- set_prolog_flag(backtrace_depth,   200).
+:- set_prolog_flag(backtrace_goal_depth, 20).
 :- set_prolog_flag(backtrace_show_lines, true).
 % =========================================================================
 
@@ -281,7 +279,7 @@ ib_multi_transparent(MT):-multifile(MT),module_transparent(MT),dynamic(MT).
 
 % :-catch(guitracer,E,(writeq(E),nl)).
 
-moo_hide_show_childs(_):-showHiddens,!.
+% moo_hide_show_childs(_):-showHiddens,!.
 moo_hide_show_childs(X):-'$hide'(X),!.
 
 % ==========================================================
@@ -620,6 +618,8 @@ prolog_must_l(H):-must(H).
 
 programmer_error(E):-trace, randomVars(E),dmsg('~q~n',[error(E)]),trace,randomVars(E),!,throw(E).
 
+
+:-moo_hide_show_childs(hotrace/1).
 
 :-moo_hide_show_childs(must/1).
 must(C):-one_must(C,(rtrace(C),debugCallWhy(failed(must(C)),C))).
@@ -1087,17 +1087,17 @@ traceIf(Call):-ignore((Call,trace)).
 % hotrace(Goal).
 % Like notrace/1 it still skips over debugging Goal.
 % Unlike notrace/1, it allows traceing when excpetions are raised during Goal.
-hotrace(X):-!, tracing -> notrace(X) ; catch(notrace(X),E,(dmsg(E-X),grtrace,X)).
-% more accepable.. less usefull
-hotrace(X):- tracing -> notrace(X) ; X.
+hotrace(X):- tracing -> setup_call_cleanup(notrace,X,trace) ; X.
 
 
+/*
+% :- meta_predicate notrace_call(^).
 
 notrace_call(X):-notrace,catch(traceafter_call(X),E,(dmsg(E-X),trace,throw(E))).
 traceafter_call(X):-X,trace.
 traceafter_call(_):-tracing,fail.
 traceafter_call(_):-trace,fail.
-
+*/
 
 
 
@@ -1246,6 +1246,11 @@ restore_trace(Goal):- Goal,notrace.
 
 rtrace(Goal):- restore_trace((
    visible(+all),visible(-unify),visible(+exception),
+   leash(-all),leash(+exception),trace,Goal)).
+
+ftrace(Goal):- restore_trace((
+   visible(-all),visible(-unify),
+   visible(+fail),visible(+exception),
    leash(-all),leash(+exception),trace,Goal)).
 
 bugger_t_expansion(T,T):-not(compound(T)),!.
