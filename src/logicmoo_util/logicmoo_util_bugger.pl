@@ -281,8 +281,8 @@ ib_multi_transparent(MT):-multifile(MT),module_transparent(MT),dynamic(MT).
 
 % :-catch(guitracer,E,(writeq(E),nl)).
 
-dhideTrace(_):-showHiddens,!.
-dhideTrace(X):-'$hide'(X),!.
+moo_hide_show_childs(_):-showHiddens,!.
+moo_hide_show_childs(X):-'$hide'(X),!.
 
 % ==========================================================
 % can/will Tracer.
@@ -430,7 +430,7 @@ meta_predicate_transparent(_M,X):-
   %module_transparent(FA),
   %%meta_predicate(X),
   %trace(FA, -all),
-  %%dhideTrace(FA),
+  %%moo_hide_show_childs(FA),
   !)).
 
 forall_member(C,[C],Call):-!,once(Call).
@@ -554,8 +554,8 @@ bin_ecall(F,A,fail,throw(never_fail(F/A))):-member(F/A,[(retractall)/1]).
 bin_ecall(F,A,asis,true):-member(F/A,[('must')/1]).
 
 
-:-dhideTrace(prolog_ecall/2).
-:-dhideTrace(prolog_ecall/5).
+:-moo_hide_show_childs(prolog_ecall/2).
+:-moo_hide_show_childs(prolog_ecall/5).
 
 
 prolog_ecall(_,_,Call):-var(Call),!,trace,randomVars(Call).
@@ -621,11 +621,11 @@ prolog_must_l(H):-must(H).
 programmer_error(E):-trace, randomVars(E),dmsg('~q~n',[error(E)]),trace,randomVars(E),!,throw(E).
 
 
-:-dhideTrace(must/1).
-must(C):-one_must(C,(rtrace(C,debugCallWhy(failed(must(C)),C)))).
+:-moo_hide_show_childs(must/1).
+must(C):-one_must(C,(rtrace(C),debugCallWhy(failed(must(C)),C))).
 
 
-:-dhideTrace(one_must/2).
+:-moo_hide_show_childs(one_must/2).
 % now using gensym counter instead of findall (since findall can make tracing difficult)
 
 one_must(C1,C2,C3):-one_must(C1,one_must(C2,C3)).

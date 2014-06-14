@@ -155,6 +155,8 @@ xcall_form(G1,G1).
 mud_pred_expansion(_Prd,_HNH,G1,_):-not(compound(G1)),!,fail.
 mud_pred_expansion(_Prd,_HNH,_:G1,_):-var(G1),!,fail.
 mud_pred_expansion(_Prd,_HNH,_/_,_):-!,fail.
+mud_pred_expansion(_Prd,_HNH,(_,_),_):-!,fail.
+mud_pred_expansion(_Prd,_HNH,_:_/_,_):-!,fail.
 mud_pred_expansion(_Prd,_HNH,G1,G2):- functor_safe(G1,F,_),xcall_t==F,!,G2 = (G1),!.
 mud_pred_expansion(Pred,NHOLDS - HOLDS, not(G1) ,G2):-!,mud_pred_expansion(Pred,HOLDS - NHOLDS,G1,G2).
 mud_pred_expansion(Pred,NHOLDS - HOLDS, \+(G1) ,G2):-!,mud_pred_expansion(Pred,HOLDS - NHOLDS,G1,G2).

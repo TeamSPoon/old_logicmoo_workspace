@@ -1486,6 +1486,8 @@ call_no_cuts(_,C):- call_expanded(C).
 :- meta_predicate show_call(0).
 :- meta_predicate show_call0(0).
 
+:-moo_hide_childs(user:goal_expansion/2).
+:-moo_hide_childs(user:term_expansion/2).
 
 user:goal_expansion(G1,G3):- notrace((compound(G1), do_term_expansions)), once(try_mud_body_expansion(G1,G2)),expanded_different(G1,G2),G2=G3.
 
