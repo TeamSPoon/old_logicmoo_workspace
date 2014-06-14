@@ -104,7 +104,7 @@ isa_mc(region,regiontype).
 isa_mc(agent,agenttype).
 isa_mc(item,itemtype).
 
-isa_mc(FT,formattype):-dyn:ft_info(FT,_).
+isa_mc(FT,formattype):-moo:ft_info(FT,_).
 
 dyn:subclass(SubType,formattype):-isa_mc(SubType,formattype).
 

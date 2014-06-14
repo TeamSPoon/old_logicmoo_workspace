@@ -131,7 +131,7 @@ testOpenCyc/0]).
 hook:decl_database_hook(AR,C):- record_on_thread(dbase_change,changing(AR,C)).
 record_on_thread(Dbase_change,O):- thread_self(ID),capturing_changes(ID,Dbase_change),!,Z=..[Dbase_change,ID,O],assertz(Z).
 
-:- decl_mpred(ft_info,2).
+% :- decl_mpred(ft_info,2).
 :- decl_mpred(subft,2).
 
 :- meta_predicate call_no_cuts(^).
@@ -186,7 +186,7 @@ call_after_game_load(Code):- call_after(moo:not_loading_game_file,Code).
 :- decl_mpred(isa/2).
 :- decl_mpred(forwardRule/2).
 :- decl_mpred(equivRule/2).
-:- decl_mpred(ft_info(formattype,term)).
+%:- decl_mpred(ft_info(formattype,term)).
 :- decl_mpred(subft(formattype,formattype)).
 :- decl_mpred(subclass(type,type)).
 :- decl_mpred(needs_look/2).
@@ -1002,7 +1002,7 @@ samef(X,Y):- X=Y,!.
 samef(X,Y):- hotrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci(XF,YF)))).
 
 
-is_ft(S):-  holds_t(ft_info,S,_).
+is_ft(S):-  moo:ft_info(S,_).
 is_ft(S):-  holds_t(subft,S,_).
 is_ft(S):-  holds_t(subclass,S,formattype).
 is_ft(S):-  holds_t(isa,S,formattype).
@@ -1547,7 +1547,7 @@ make_db_listing:-
 
 /*
 is_ft_except(S,List):- 
-   dyn:ft_info(S,_);
+   moo:ft_info(S,_);
    not((member(S,List), 
       ((get_subft(S,S2) ,
         is_ft_except(S2,[S|List]) ;

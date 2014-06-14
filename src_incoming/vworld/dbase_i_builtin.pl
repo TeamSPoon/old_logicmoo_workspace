@@ -194,21 +194,21 @@ dyn:subclass(chargeable,item).
 dyn:subclass(wearable,item).
 
 
-dyn:ft_info(atom,atom(self)).
-dyn:ft_info(apath(region,dir),formatted).
-dyn:ft_info(string,string(self)).
-dyn:ft_info(number,number(self)).
-dyn:ft_info(type,isa(self,type)).
-dyn:ft_info(dir,any_to_dir(self,_)).
-dyn:ft_info(dice(int,int,int),formatted).
-dyn:ft_info(xyz(region,int,int,int),formatted).
-dyn:ft_info(list(type),formatted).
-dyn:ft_info(term,nonvar(self)).
-dyn:ft_info(id,nonvar(self)).
-dyn:ft_info(prolog,true).
-dyn:ft_info(rest,true).
-dyn:ft_info(var,var(self)).
-dyn:ft_info(action(prolog),formatted).
+moo:ft_info(atom,atom(self)).
+moo:ft_info(apath(region,dir),formatted).
+moo:ft_info(string,string(self)).
+moo:ft_info(number,number(self)).
+moo:ft_info(type,isa(self,type)).
+moo:ft_info(dir,any_to_dir(self,_)).
+moo:ft_info(dice(int,int,int),formatted).
+moo:ft_info(xyz(region,int,int,int),formatted).
+moo:ft_info(list(type),formatted).
+moo:ft_info(term,nonvar(self)).
+moo:ft_info(id,nonvar(self)).
+moo:ft_info(prolog,true).
+moo:ft_info(rest,true).
+moo:ft_info(var,var(self)).
+moo:ft_info(action(prolog),formatted).
 
 dyn:subft(var,prolog).
 dyn:subft(term,prolog).

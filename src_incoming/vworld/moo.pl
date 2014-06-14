@@ -79,7 +79,7 @@ hdr_debug(F,A):-'format'(F,A).
 :- dynamic_multifile_exported action_info/1.
 :- dynamic_multifile_exported action_help/2.
 :- dynamic_multifile_exported type_action_help/3.
-
+:- dynamic_multifile_exported ft_info/2.
 :- dynamic_multifile_exported mud_test/2.
 :- dynamic_multifile_exported mpred_arity/2.
 :- dynamic_multifile_exported mpred_prop/3.

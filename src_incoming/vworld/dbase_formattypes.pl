@@ -49,7 +49,7 @@ argIsa_asserted(Pred,N,Type):- is_ArgsIsa(Pred,_,Templ),arg(N,Templ,Type),nonvar
 argIsa_asserted(Prop/_,N1,Type):- nonvar(Prop), argIsa_asserted(Prop,N1,Type).
 
 is_ArgsIsa(Pred,A,Templ):- get_mpred_prop(Pred,A,argsIsa(Templ)).
-is_ArgsIsa(Pred,A,Templ):- holds_t(ft_info,Templ,formatted),functor(Templ,Pred,A).
+is_ArgsIsa(Pred,A,Templ):- moo:ft_info(Templ,formatted),functor(Templ,Pred,A).
 % is_ArgsIsa(Pred,A,Templ):- arg(_,v(argsIsa,multiValued,singleValued,formatted,mpred,listValued),V),dbase:dbase_t(V,Templ),functor(Templ, Pred,A).
 
 
@@ -140,9 +140,9 @@ inverse_args([A,R,G,S],[S,R,G,A]):-!.
 inverse_args([P,A,R,G,S],[S,A,R,G,P]):-!.
 
 term_is_ft(Term,Type):-
-   holds_t(ft_info,Type,How),
+   moo:ft_info(Type,How),
    correctType(tell(_OldV),Term,How,NewTerm),
-   NewTerm=Term.
+   NewTerm=Term,!.
 
 
 % =======================================================
@@ -222,6 +222,8 @@ correctType(_O,A,string,AA):- must(text_to_string(A,AA)).
 correctType(_O,A,term(_),AA):- must_equals(A,AA).
 correctType(_O,A,term,AA):- must_equals(A,AA).
 correctType(_O,A,text,AA):- must_equals(A,AA).
+correctType(_O,A,pred,AA):- any_to_atom(A,AA).
+correctType(_O,A,atom,AA):- any_to_atom(A,AA).
 correctType(_O,A,type,AA):- atom(A),define_type(A),must_equals(A,AA).
 correctType(_O,A,verb,AA):- must_equals(A,AA).
 
@@ -257,9 +259,9 @@ correctType(Op,Args,Types,NewArgs):-compound(Args), compound(Types),
 
 
 
-correctType(Op,A,Fmt,AA):- holds_t(ft_info,Fmt,formatted),!,correctFormatType(Op,A,formatted(Fmt),AA).
-correctType(_O,A,Fmt,A):- holds_t(ft_info,Fmt,Code),!,subst(Code,self,A,Call),debugOnError(req(Call)).   
-correctType(Op,A,Super,AA):- holds_t(subft,Sub,Super),Sub\=Super,correctFormatType(Op,A,Sub,AA).
+correctType(Op,A,Fmt,AA):- moo:ft_info(Fmt,formatted),!,correctFormatType(Op,A,formatted(Fmt),AA).
+correctType(_O,A,Fmt,A):- moo:ft_info(Fmt,Code),!,subst(Code,self,A,Call),debugOnError(req(Call)).   
+correctType(Op,A,Super,AA):- req(subft(Sub,Super)),Sub\=Super,correctFormatType(Op,A,Sub,AA).
 
 correctType(Op,Arg,Props,NewArg):- compound(Props),
    Props=..[F|TypesL],
@@ -377,12 +379,6 @@ show_call(add(A)):-
 show_call(C):-show_call0(C).
 
 show_call0(C):-debugOnError0(C). % dmsg(show_call(C)),C.      
-
-
-% =======================================================
-% correctArgsIsa/3
-% =======================================================
-
 
 
 
