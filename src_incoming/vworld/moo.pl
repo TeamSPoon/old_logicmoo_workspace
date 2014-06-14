@@ -401,9 +401,9 @@ define_type([A|L]):-!,define_type(A),define_type(L).
 define_type((A,L)):-!,define_type(A),define_type(L).
 define_type(Spec):-is_type(Spec),!.
 
-define_type(Spec):- run_database_hooks(assert(z),isa(Spec,type)),assert_if_new(dbase:dbase_t(type,Spec)).
+define_type(Spec):- run_database_hooks(assert(z),isa(Spec,type)),assert_if_new(dbase:dbase_t(isa,Spec,type)).
 
-is_type(Spec):- dbase:dbase_t(type, Spec).
+is_type(Spec):- dbase:dbase_t(isa, Spec,type).
 
 :- define_type((type,formattype,multiValued,singleValued,formatted,ppred,mpred,listValued)).
 

@@ -129,7 +129,7 @@ equivRule(multiValued(CallSig,[assert_with_pred(hooked_asserta),query_with_pred(
 
 
 dyn:ask_module(nearby(object,object),world).
-dyn:ask_module(mud_isa(object,type),world).
+% dyn:ask_module(mud_isa(object,type),world).
 % db_prop_prolog(world,mud_isa(object,type)).
 % db_prop_prolog(world,same(id,id)).
 
@@ -178,7 +178,7 @@ dyn:equivRule(description(apath(Region,Dir),Text),pathName(Region,Dir,Text)).
 
 % dbase_t(action_help,What,text("command is: ",What)):- holds_t(action_info,What).
 
-dyn:expand_args(subclass(eachOf(region,agent,gossup),channel)).
+dyn:expand_args(eachOf,subclass(eachOf(region,agent,gossup),channel)).
 
 dyn:subclass(agent,spatialthing).
 dyn:subclass(region,spatialthing).
@@ -209,6 +209,7 @@ moo:ft_info(prolog,true).
 moo:ft_info(rest,true).
 moo:ft_info(var,var(self)).
 moo:ft_info(action(prolog),formatted).
+moo:ft_info(formattype,formatted).
 
 dyn:subft(var,prolog).
 dyn:subft(term,prolog).
