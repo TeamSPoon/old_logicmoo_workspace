@@ -1,3 +1,4 @@
+
 /** <module>
 % Common place to reduce redundancy World utility prediates
 %
@@ -16,7 +17,7 @@
 	[
         call_agent_command/2,
         call_agent_command_maybe_fail/3,
-            world_mud_isa/2,
+
             isa_any/2,
           create_meta/4,
             put_in_world/1,
@@ -78,7 +79,7 @@
 
 
 isaOrSame(A,B):-A==B,!.
-isaOrSame(A,B):-world_mud_isa(A,B).
+isaOrSame(A,B):-mud_isa(A,B).
 
 intersect_pred(A,EF,B,LF,Tests,Results):-findall( A-B, ((member(A,EF),member(B,LF),once(Tests))), Results),[A-B|_]=Results.
 % is_property(P,_A),PROP=..[P|ARGS],CALL=..[P,Obj|ARGS],req(CALL).
@@ -108,35 +109,14 @@ isa_mc(FT,formattype):-moo:ft_info(FT,_).
 
 dyn:subclass(SubType,formattype):-isa_mc(SubType,formattype).
 
-not_mud_isa(agent,formattype).
-cached(G):-catch(G,_,fail).
-
-mud_isa(O,T):-world_mud_isa(O,T).
-
-world_mud_isa(O,T):- O==T,!.
-world_mud_isa(O,T):- var(O),var(T),!,isa_mc(T,_),anyInst(O),req(isa(O,T)).
-%world_mud_isa(O,T):-!,
-world_mud_isa(O,T):- cached(not_mud_isa(O,T)),!,fail.
-world_mud_isa(O,T):- req(isa(O,T)).
-world_mud_isa(_,T):- not(atom(T)),!,fail.
-world_mud_isa(O,T):- atom(O),!,mud_isa_atom(O,T).
-world_mud_isa(O,T):- compound(O),!,functor(O,T,_).
-
-mud_isa_atom(O,T):- atomic_list_concat([T,_|_],'-',O),!.
-mud_isa_atom(O,T):- atom_concat(T,Int,O),catch(atom_number(Int,_),_,fail),!.
+mud_isa(O,T):-req(isa(O,T)).
 
 create_meta(T,P,C,MT):-
    must(split_name_type(T,P,C)),
    ifThen(ground(C:MT),add(subclass(C,MT))),
-
-   ifThen(ground(P:MT),((
-   OP =.. [MT,P],
-   dbase_mod(M),
-   assert_if_new(M:OP)))),
-
-   must(forall_member(E,[OP,isa(P,MT),isa(P,C)],ignore((ground(E),must(add(E)))))),
-   must(findall_type_default_props(P,C,Props)),!,  
-   must(padd(P,Props)),!.
+   must(findall_type_default_props(P,C,Props)),!, 
+   dmsg(done(create_meta(T,P,C,MT,Props))),!,
+   must(padd(P,[isa(MT),isa(C)|Props])),!.
 
 rez_to_inventory(Whom,T,P):-
    create_meta(T,P,_,item),
@@ -166,8 +146,8 @@ create_agent(P,List):-must(create_instance_0(P,agent,List)).
 formattype(FormatType):-dyn:subclass(FormatType,formattype).
 
 create_instance(What,Type,Props):-number(What),trace_or_throw(create_instance(What,Type,Props)).
-create_instance(What,Type,Props):-create_instance_0(What,Type,Props),dmsg(done(create_instance(What,Type,Props))),!.
-create_instance(What,Type,Props):-dmsg(todo(create_instance(What,Type,Props))),!.
+create_instance(What,Type,Props):-loop_check(create_instance_0(What,Type,Props),true).
+create_instance(What,Type,Props):-dmsg(error(create_instance(What,Type,Props))),!.
 
 :-discontiguous create_instance_0/3.
 
@@ -191,7 +171,7 @@ create_instance_0(T,agent,List):-!,
    must(padd(P,List)),
    clr(atloc(P,_)),
    must(put_in_world(P)),
-   rez_to_inventory(P,food,_Food),
+   rez_to_inventory(P,food,_Food),   
    max_charge(NRG),
    max_damage(Dam),
    add(charge(P,NRG)),
@@ -210,7 +190,7 @@ create_instance_0(T,Type,List):-
    dyn:subclass(Type,MetaType),
    dyn:createableType(MetaType),
    create_meta(T,P,_,MetaType),
-   padd(P,mud_isa(Type)),
+   padd(P,isa(Type)),
    padd(P,List),
    clr(atloc(P,_)),
    put_in_world(P).
