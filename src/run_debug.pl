@@ -26,10 +26,10 @@
 %:-repeat, trace, do_player_action('who'),fail.
 
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
-%:- at_start((debug,must_det(run))).
+:- at_start((debug,must_det(run))).
 
 % So scripted versions don't just exit
-%:- at_start(prolog).
+:- at_start(prolog).
 
 
 

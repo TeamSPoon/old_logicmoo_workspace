@@ -113,7 +113,7 @@ mud_isa(O,T):-req(isa(O,T)).
 
 create_meta(T,P,C,MT):-
    must(split_name_type(T,P,C)),
-   ifThen(ground(C:MT),add(subclass(C,MT))),
+   ignore((ifThen(ground(C:MT),add(subclass(C,MT))))),
    must(findall_type_default_props(P,C,Props)),!, 
    dmsg(done(create_meta(T,P,C,MT,Props))),!,
    must(padd(P,[isa(MT),isa(C)|Props])),!.
@@ -146,8 +146,8 @@ create_agent(P,List):-must(create_instance_0(P,agent,List)).
 formattype(FormatType):-dyn:subclass(FormatType,formattype).
 
 create_instance(What,Type,Props):-number(What),trace_or_throw(create_instance(What,Type,Props)).
-create_instance(What,Type,Props):-loop_check(create_instance_0(What,Type,Props),true).
-create_instance(What,Type,Props):-dmsg(error(create_instance(What,Type,Props))),!.
+create_instance(What,Type,Props):-loop_check(create_instance_0(What,Type,Props),true),!.
+create_instance(What,Type,Props):-dmsg(todo(create_instance(What,Type,Props))),!.
 
 :-discontiguous create_instance_0/3.
 
@@ -164,6 +164,7 @@ create_instance_0(SubType,type,List):-!,grtrace,
 
 dyn:createableType(agent).
 dyn:subclass(actor,agent).
+dyn:subclass(explorer,agent).
 
 create_instance_0(T,agent,List):-!,
    retractall(agent_list(_)),   

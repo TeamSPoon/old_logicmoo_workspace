@@ -1102,7 +1102,7 @@ add_from_file(B,B):- db_op(tell(_OldV),B),!.
 
 do_db_op_hooks:- once(ignore(do_all_of(dbase_module_loaded))).
 
-db_op(tell(OldV),Term):- !, db_opp(tell(OldV),Term),do_db_op_hooks.
+db_op(tell(OldV),Term):- !, db_opp(tell(OldV),Term),!,do_db_op_hooks.
 db_op(Op,Term):- do_db_op_hooks,db_opp(Op,Term),do_db_op_hooks.
 
 

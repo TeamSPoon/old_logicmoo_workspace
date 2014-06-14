@@ -44,12 +44,13 @@ argIsa_call_0(_,_,term).
 argIsa_call_0(Func,N,Type):- get_functor(Func,F,_),F \= Func,argIsa_call_0(F,N,Type).
 
 
-argIsa_asserted(Pred,N,Type):- holds_t(argIsa,Pred,N,Type).
+argIsa_asserted(Pred,N,Type):- dbase_t(argIsa,Pred,N,Type),!.
 argIsa_asserted(Pred,N,Type):- is_ArgsIsa(Pred,_,Templ),arg(N,Templ,Type),nonvar(Type).
 argIsa_asserted(Prop/_,N1,Type):- nonvar(Prop), argIsa_asserted(Prop,N1,Type).
 
 is_ArgsIsa(Pred,A,Templ):- get_mpred_prop(Pred,A,argsIsa(Templ)).
 is_ArgsIsa(Pred,A,Templ):- moo:ft_info(Templ,formatted),functor(Templ,Pred,A).
+is_ArgsIsa(Pred,A,Templ):- dbase:dbase_t(_, Templ),compound(Templ),functor(Pred,A,Templ).
 % is_ArgsIsa(Pred,A,Templ):- arg(_,v(argsIsa,multiValued,singleValued,formatted,mpred,listValued),V),dbase:dbase_t(V,Templ),functor(Templ, Pred,A).
 
 
