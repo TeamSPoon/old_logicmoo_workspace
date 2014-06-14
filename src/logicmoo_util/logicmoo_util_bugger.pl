@@ -622,25 +622,26 @@ programmer_error(E):-trace, randomVars(E),dmsg('~q~n',[error(E)]),trace,randomVa
 
 
 :-dhideTrace(must/1).
-must(C):-one_must(C,debugCallWhy(failed(must(C)),C)).
+must(C):-one_must(C,(rtrace(C,debugCallWhy(failed(must(C)),C)))).
 
 
 :-dhideTrace(one_must/2).
 % now using gensym counter instead of findall (since findall can make tracing difficult)
 
+one_must(C1,C2,C3):-one_must(C1,one_must(C2,C3)).
 
 one_must(Call,OnFail):- is_deterministic(Call),!,must_det(Call,OnFail).
 
 % better version I think but makes more tracing
 one_must(Call,OnFail):- gensym(mustCounter,Sym),flag(Sym,_,0),!, must_flag(Sym,Call,OnFail).
 
-%old findall version
-must_findall(OneA,_Else):-copy_term(OneA,One),findall(One,call(One),OneL),[_|_]=OneL,!,member(OneA,OneL).
-must_findall(_OneA,Else):-!,Else.
-
 must_flag(Sym,Call,_NFail):-call(Call),flag(Sym,C,C+1).
 must_flag(Sym,_All,OnFail):-flag(Sym,Old,0),!, Old==0, % if old > 0 we want to fail 
          call(OnFail).
+
+%old findall version
+must_findall(OneA,_Else):-copy_term(OneA,One),findall(One,call(One),OneL),[_|_]=OneL,!,member(OneA,OneL).
+must_findall(_OneA,Else):-!,Else.
 
 is_deterministic(not(_)).
 is_deterministic(forall(_,_,_)).

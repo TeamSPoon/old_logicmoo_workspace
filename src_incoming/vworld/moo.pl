@@ -389,7 +389,7 @@ mpred_prop_plus_assserted(F,A,argsIsa(Templ)):- mpred_arity(F,A), functor(Templ,
 mpred_prop_plus_assserted(F,A,Prop):- mpred_arity(F,A),functor(Templ,F,A),arg(_,v(argsIsa,multiValued,singleValued,negationByFailure,formatted,mpred,listValued),Prop),dbase:dbase_t(Prop,Templ).
 
 
-define_type(Var):-var(Var),!,debug_or_throw(define_type(Var)).
+define_type(Var):-var(Var),!,trace_or_throw(define_type(Var)).
 define_type(M:F):-!, '@'(define_type(F), M).
 define_type([]):-!.
 define_type([A]):-!,define_type(A).

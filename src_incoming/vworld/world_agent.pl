@@ -95,7 +95,7 @@ call_agent_command_is_list(A,[L|IST],Result):- atom(L), safe_univ(CMD , [L|IST])
 % remove period at end
 call_agent_command_is_list(A,PeriodAtEnd,Result):-append(New,[(.)],PeriodAtEnd),!,call_agent_command_maybe_fail(A,New,Result),!.
 
-% call_agent_command_is_list(A,LIST):- debug_or_throw(call_agent_command_is_list(A,LIST)),!.
+% call_agent_command_is_list(A,LIST):- trace_or_throw(call_agent_command_is_list(A,LIST)),!.
 
 % =====================================================================================================================
 % call_agent_action_maybe_fail/2 -->  my_call_agent_action_maybe_fail/2

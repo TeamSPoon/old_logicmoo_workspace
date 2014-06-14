@@ -14,6 +14,7 @@
                    get_vp_templates/4,
                    parseIsa//2,
                    parseIsa0//2,
+                   parseForIsa//2,
                    objects_match/3,
                    dmsg_parserm/2,
                    dmsg_parserm/1,
@@ -196,6 +197,7 @@ dmsg_parserm(D):-dmsg(D).
 % dmsg_parserm(_,_):-!.
 dmsg_parserm(F,A):-dmsg(F,A).
 
+
 % ===========================================================
 % PARSER
 % ===========================================================
@@ -324,17 +326,32 @@ parseForTypes([TYPE|TYPES], [B|E], C, G) :-
         parseIsa(TYPE, B, C, F),
         parseForTypes(TYPES, E, F, G).
 
-% parseIsa(T)-->parseIsa(T,_).
+% this parseIsa(T)-->parseIsa(T,_).
 parseIsa(A, B, C) :-
         parseIsa(A, _, B, C).
 
-% parseIsa(not(T),Term) --> dcgAnd(dcgNot(parseIsa(T)),theText(Term)).
-
+% this parseIsa(not(T),Term) --> dcgAnd(dcgNot(parseIsa(T)),theText(Term)).
 parseIsa(_T, _, [AT|_], _):- var(AT),!,fail.
+
+parseIsa(FT, B, C, D):- var(FT),trace_or_throw(var_parseIsa(FT, B, C, D)).
+
 parseIsa(FT, B, C, D):- to_word_list(C,O),O\=C,!,parseIsa(FT, B, O, D).
 parseIsa(FT, B, C, D):-  dbase:call_tabled(parseIsa0(FT, B, C, D)).
 
 parseIsa0(FT, B, C, D):- list_tail(C,D),parseForIsa(FT, B, C, D).
+
+is_parsable_type(T):-is_ft(T).
+is_parsable_type(T):-is_type(T).
+is_parsable_type(vp).
+
+
+%:- begin_tests(test_bad_verb).
+
+test(test_bad_verb, [ true(
+       not(phrase(parseIsa(verb,ff),[ff],[]))
+       )] ).
+
+%:- end_tests(test_bad_verb).
 
 
 parseForIsa(actor,A,B,C) :- parseForIsa(agent,A,B,C).
@@ -345,7 +362,8 @@ parseForIsa(Var, _B, _C, _D):-var(Var),!,fail. % trace_or_throw(var_parseForIsa(
 % parseForIsa(Var, B, C, D):-var(Var),!,trace_or_throw(var_parseForIsa(Var, B, C, D)).
 parseForIsa(not(Type), Term, C, D) :-  dcgAnd(dcgNot(parseIsa(Type)), theText(Term), C, D).
 parseForIsa(FT, B, C, D):-to_word_list(C,O),O\=C,!,parseForIsa(FT, B, O, D).
-parseForIsa(FT, B, [AT|C], D) :- nonvar(AT),member_ci(AT,['at','the','a','an']),!,parseForIsa(FT, B, C, D).
+
+parseForIsa(FT, B, [AT|C], D) :- nonvar(AT),member_ci(AT,["at","the","a","an"]),!,parseForIsa(FT, B, C, D).
 parseForIsa(FT, B, C, D) :- query_trans_sub(FT,Sub), parseFmtOrIsa(Sub, B, C, D),!.
 parseForIsa(FT, B, C, D) :- query_trans_sub(Sub,FT), parseFmtOrIsa(Sub, B, C, D),!.
 parseForIsa(FT, B, C, D) :- parseFmtOrIsa(FT, B, C, D),!.

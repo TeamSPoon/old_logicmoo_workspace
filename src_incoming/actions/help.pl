@@ -49,6 +49,7 @@ show_help:- commands_list(ListS),forall(member(E,ListS),fmt(E)).
 moo:agent_call_command(_Agent,help) :- show_help.
 moo:agent_call_command(_Agent,help(Str)) :-commands_list(ListS),forall(member(E,ListS),write_string_if_contains(Str,E)).
 
+write_string_if_contains("",E):-!,ignore((with_output_to(string(Str),fmt(E)),fmt(Str))).
 write_string_if_contains(Must,E):-ignore((with_output_to(string(Str),fmt(E)),str_contains_all([Must],Str),fmt(Str))).
 
 moo:term_specifier_text(Text,verb):- get_type_action_help(_,A,_),nonvar(A),functor_safe(A,Text,_).
