@@ -12,6 +12,8 @@
             to_word_list/2,
             equals_icase/2,
             string_ci/2,
+            must_nonvar/1,
+            non_empty/1,
             string_dedupe/2,
             is_empty_string/1,
             member_ci/2,
@@ -401,7 +403,7 @@ map_tree_to_list(Pred,IN,Output):-
 map_tree_to_list(_,IN,IN):-trace,must_assign([IN],IN).
 
 non_empty(A):-must_det(not(is_empty_string(A))).
-must_nonvar(A):-must_det(nonvar(A)).
+must_nonvar(A):-must_det(nonvar(A),trace_or_throw(must_nonvar(A))).
 
 equals_icase(A,B):-string_ci(A,U),string_ci(B,U).
 starts_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),non_empty(UB),atom_concat(UB,_,UA).

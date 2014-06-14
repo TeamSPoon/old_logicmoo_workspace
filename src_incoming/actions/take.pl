@@ -40,17 +40,17 @@ permanence_take(take,Agent,Obj) :-
 	check_permanence(take,Agent,LOC,Obj),!,
         term_listing(Obj).
 
-check_permanence(take,_,_,Obj):-
+moo:check_permanence(take,_,_,Obj):-
         props(Obj,permanence(take,dissapears)),        
         atloc(Obj,LOC),
 	clr(atloc(Obj,LOC)).
-check_permanence(take,Agent,_,Obj) :-
+moo:check_permanence(take,Agent,_,Obj) :-
 	props(Obj,permanence(take,1)),
         atloc(Obj,LOC),
 	ignore(clr(atloc(Obj,LOC))),
 	add(possess(Agent,Obj)),
         (req(possess(Agent,Obj)) -> true; throw(req(possess(Agent,Obj)))).
-check_permanence(take,_,_,_).
+moo:check_permanence(take,_,_,_).
 
 % Record keeping
 moo:update_charge(Agent,take) :-

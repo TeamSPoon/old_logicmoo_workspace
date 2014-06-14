@@ -50,16 +50,16 @@ do_permanence(USE,Agent,Obj) :-
 	atloc(Obj,LOC),
 	check_permanence(USE,Agent,LOC,Obj).
 
-check_permanence(USE,_Agent,LOC,Obj) :-
+moo:check_permanence(USE,_Agent,LOC,Obj) :-
      get_use_verbs(USE,_USING,_USABLE,_STOWED),
 	props(Obj,permanence(USE,dissapears)),
 	del(atloc(Obj,LOC)).
-check_permanence(USE,Agent,LOC,Obj) :-
+moo:check_permanence(USE,Agent,LOC,Obj) :-
     get_use_verbs(USE,USING,_USABLE,_STOWED),
         props(Obj,permanence(USE,1)),
 	del(atloc(Obj,LOC)),
 	padd(Agent,USING,Obj).
-check_permanence(_,_,_,_).
+moo:check_permanence(USE,_,_,_):-get_use_verbs(USE,_USING,_USABLE,_STOWED),!.
 
 % Record keeping
 moo:update_charge(Agent,USE) :-

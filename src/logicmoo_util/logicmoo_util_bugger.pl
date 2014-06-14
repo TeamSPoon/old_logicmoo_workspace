@@ -20,6 +20,7 @@
          is_loop_checked/1,
          snumbervars/1,
          must_det/1,
+         must_det/2,
          is_deterministic/1,
      programmer_error/1,
      forall_member/3,
@@ -34,6 +35,7 @@
      dumpST/0,
      dumpST/1,
      dtrace/0,
+     dtrace/1,
      trace_or_throw/1,
      trace_or/1,
      os_to_prolog_filename/2,
@@ -269,18 +271,79 @@ loop_check(BC, B,_TODO):-
 % =========================================================================
 
 
-ib_multi_transparent(MT):-multifile(MT),module_transparent(MT),dynamic(MT).
+ib_multi_transparent33(MT):-multifile(MT),module_transparent(MT),dynamic(MT).
 
 :- multifile current_directory_search/1.
 :- module_transparent current_directory_search/1.
-:- ib_multi_transparent(formatter_hook/4).
+:- ib_multi_transparent33(formatter_hook/4).
 :- module_transparent(hotrace/1).
 
 
 % :-catch(guitracer,E,(writeq(E),nl)).
 
+
+
+% hide Pred from tracing
+to_m_f_arity_pi(M:Plain,M,F,A,PI):-!,to_m_f_arity_pi(Plain,M,F,A,PI).
+to_m_f_arity_pi(Term,M,F,A,PI):- strip_module(Term,M,Plain),Plain\=Term,!,to_m_f_arity_pi(Plain,M,F,A,PI).
+to_m_f_arity_pi(F/A,_M,F,A,PI):-functor(PI,F,A),!.
+to_m_f_arity_pi(PI,_M,F,A,PI):-functor(PI,F,A).
+
+with_preds((X,Y),M,F,A,PI,Call):-!,with_preds(X,M,F,A,PI,Call),with_preds(Y,M,F,A,PI,Call).
+with_preds([X],M,F,A,PI,Call):-!,with_preds(X,M,F,A,PI,Call).
+with_preds([X|Y],M,F,A,PI,Call):-!,with_preds(X,M,F,A,PI,Call),with_preds(Y,M,F,A,PI,Call).
+with_preds(M:X,_M,F,A,PI,Call):-!, with_preds(X,M,F,A,PI,Call).
+with_preds(X,M,F,A,PI,Call):-forall(to_m_f_arity_pi(X,M,F,A,PI),Call).
+
 % moo_hide_show_childs(_):-showHiddens,!.
-moo_hide_show_childs(X):-'$hide'(X),!.
+moo_hide_show_childs(X):- with_preds(X,_M,F,A,_PI,'$hide'(F/A)).
+
+
+ %=========================================
+ % Module Utils
+ %=========================================
+
+ % module_functor(PredImpl,Module,Pred,Arity).
+
+ module_functor(PredImpl,Module,Pred,Arity):-strip_module(PredImpl,Module,NewPredImpl),strip_arity(NewPredImpl,Pred,Arity).
+ strip_arity(Pred/Arity,Pred,Arity).
+ strip_arity(PredImpl,Pred,Arity):-functor(PredImpl,Pred,Arity).
+% moo_hide(+Pred).
+:-export(moo_hide/1).
+
+moo_hide(Preds):- with_preds(Preds,M,F,A,_PI,moo_hide_childs(M,F/A)).
+
+moo_hide_childs(Preds):- with_preds(Preds,M,_F,_A,PI,moo_hide_childs_0(M,PI)).
+
+moo_hide_childs(M,Preds):- with_preds(Preds,_M,_F,_A,PI,moo_hide_childs_0(M,PI)).
+
+% predicate_property(do_pending_db_ops,PP)
+% predicate_property_m(Pred,imported_from(M)):- predicate_property(Pred,imported_from(M)).
+% predicate_property_m(Pred,imported_from(M)):-predicate_property(M:Pred,M).
+
+moo_hide_childs_0(M,Pred):-
+ % predicate_property_m(Pred,M),
+ '$set_predicate_attribute'(M:Pred, trace, 1),
+ '$set_predicate_attribute'(M:Pred, noprofile, 1),
+ '$set_predicate_attribute'(M:Pred, hide_childs, 1),!.
+
+moo_hide_childs_0(N,MPred):-
+ predicate_property(MPred,imported_from(M)),
+  writeq(wont_hide(M,N,MPred)),nl.
+
+
+
+moo_hide_show_childs(M,F,A):-functor(MPred,F,A),moo_hide_show_childs(M,F,A,MPred).
+
+moo_hide_show_childs(M,_,_,MPred):-
+   not(predicate_property(_:MPred,imported_from(M))).
+
+moo_hide_show_childs(M,F,A,_MPred):-
+ % dmsg(moo_hide_show_childs(M,F,A,MPred)),
+ '$set_predicate_attribute'(M:F/A, trace, 0),
+ '$set_predicate_attribute'(M:F/A, noprofile, 1),
+ '$set_predicate_attribute'(M:F/A, hide_childs, 0),!.
+
 
 % ==========================================================
 % can/will Tracer.
@@ -461,9 +524,9 @@ ignoreOnError(CX):-ignore(catch(CX,_,true)).
 %debugCallF(C):-notrace,dmsg(debugCallF(C)),dumpST, pause_trace(failed(C)),gftrace,C.
 
 debugCallWhy(Why, C):-notrace,dmsg(Why),debugCallWhy2(Why, C).
-debugCallWhy2(failed(_Why), C):- gftrace,dtrace,C.
-debugCallWhy2(thrown(_Why), C):- ggtrace,dtrace,C.
-debugCallWhy2(_Why, C):- grtrace,dtrace,C.
+debugCallWhy2(failed(_Why), C):- gftrace,dtrace(C).
+debugCallWhy2(thrown(_Why), C):- ggtrace,dtrace(C).
+debugCallWhy2(_Why, C):- grtrace,dtrace(C).
 
 
 debugOnError(C):- !, C.
@@ -646,6 +709,9 @@ must_findall(_OneA,Else):-!,Else.
 is_deterministic(not(_)).
 is_deterministic(forall(_,_,_)).
 is_deterministic(once(_)).
+is_deterministic(var(_)).
+is_deterministic(nonvar(_)).
+is_deterministic(ground(_)).
 is_deterministic(Call):-predicate_property(Call,nodebug),!.
 is_deterministic(Call):-predicate_property(Call,foreign),!.
 
@@ -764,19 +830,6 @@ canonical_pathname(Absolute,AbsoluteB):-prolog_to_os_filename(AbsoluteA,Absolute
 
 alldiscontiguous:-!.
 
-
-% ===================================================================
-% Lowlevel printng
-% ===================================================================
-unnumbervars(STUFF,UN):-sformat(S,'~W',[STUFF,[quoted(true),character_escapes(true),module(user),numbervars(true),portray(false),double_quotes(true)]]),string_to_atom(S,Atom),atom_to_term(Atom,UN,_).
-
-open_list(V,V):-var(V).
-open_list(A,B):-append(A,_,B).
-
-unnumbervars_nil(X,Y):-!,unnumbervars(X,Y).
-
-:-dynamic(numbered_var(_,_)).
-collect_temp_vars(VARS):-!,(setof(=(Name,Number),numbered_var(Name,Number),VARS);VARS=[]).
 
 % ==========================================================
 % Sending Notes
@@ -950,7 +1003,7 @@ clauseST(ClRef,Goal = HB):- ignore(((clause(Head, Body, ClRef),copy_term(((Head 
    findall(Prop,(member(Prop,[source(_),line_count(_),file(_),fact,erased]),clause_property(ClRef,Prop)),Goal).
 
 
-:-ib_multi_transparent(seenNote/1).
+:-ib_multi_transparent33(seenNote/1).
 
 sendNote(X):-var(X),!.
 sendNote(X):-seenNote(X),!.
@@ -971,7 +1024,8 @@ sendNote(To,From,Subj,Message,Vars):-
 safe_numbervars(X):-get_time(T),convert_time(T,_A,_B,_C,_D,_E,_F,G),!,safe_numbervars(X,'$VAR',G,_).
 safe_numbervars(Copy,X,Z):-numbervars(Copy,X,Z,[attvar(skip)]).
 safe_numbervars(Copy,_,X,Z):-numbervars(Copy,X,Z,[attvar(skip)]).
-%unnumbervars(X,Y):-term_to_atom(X,A),atom_to_term(A,Y,_).
+
+unnumbervars(X,Y):-term_to_atom(X,A),atom_to_term(A,Y,_).
 
 
 withFormatter(Lang,From,Vars,SForm):-formatter_hook(Lang,From,Vars,SForm),!.
@@ -994,7 +1048,7 @@ writeFailureLog(E,X):-
 % Some prologs have a printf() type predicate.. so I made up fmtString/fmt in the Cyc code that calls the per-prolog mechaism
 % in SWI it''s formzat/N and sformat/N
 % ========================================================================================
-:-ib_multi_transparent(isConsoleOverwritten/0).
+:-ib_multi_transparent33(isConsoleOverwritten/0).
 
 
 fmtString(X,Y,Z):-sformat(X,Y,Z).
@@ -1106,17 +1160,6 @@ traceafter_call(_):-trace,fail.
 
 
 
- %=========================================
- % Module Utils
- %=========================================
-
- % module_functor(PredImpl,Module,Pred,Arity).
-
- module_functor(PredImpl,Module,Pred,Arity):-strip_module(PredImpl,Module,NewPredImpl),strip_arity(NewPredImpl,Pred,Arity).
- strip_arity(Pred/Arity,Pred,Arity).
- strip_arity(PredImpl,Pred,Arity):-functor(PredImpl,Pred,Arity).
-
-
  %:-interactor.
 
 export_all_preds:-source_location(File,_Line),module_property(M,file(File)),!,export_all_preds(M).
@@ -1126,42 +1169,9 @@ export_all_preds(ModuleName):-forall(current_predicate(ModuleName:F/A),
 
 
 
-% hide Pred from tracing
-to_m_f_arity_pi(Term,M,F,A,PI):- strip_module(Term,M,Plain),Plain\=Term,!,
-to_m_f_arity_pi(Plain,M,F,A,PI).
-to_m_f_arity_pi(M:Plain,M,F,A,PI):-!,
-to_m_f_arity_pi(Plain,M,F,A,PI).
-to_m_f_arity_pi(F/A,_M,F,A,PI):-functor(PI,F,A),!.
-to_m_f_arity_pi(PI,_M,F,A,PI):-!,functor(PI,F,A).
 
 
-% moo_hide(+Pred).
-:-export(moo_hide/1).
 
-moo_hide(_PIn):-showHiddens,!.
-moo_hide(PIn):-
- must(to_m_f_arity_pi(PIn,M,_F,_A,MPred)),
- moo_hide_childs(M,MPred).
-
-moo_hide_childs(M:F/A):-!,functor(Pred,F,A),moo_hide_childs(M:Pred).
-moo_hide_childs(F/A):-!,functor(Pred,F,A),moo_hide_childs(Pred).
-moo_hide_childs(M:Pred):- moo_hide_childs(M,Pred).
-
-moo_hide_childs(M,F/A):-!,functor(Pred,F,A),moo_hide_childs(M,Pred).
-
-% predicate_property(do_pending_db_ops,PP)
-% predicate_property_m(Pred,imported_from(M)):- predicate_property(Pred,imported_from(M)).
-% predicate_property_m(Pred,imported_from(M)):-predicate_property(M:Pred,M).
-
-moo_hide_childs(M,Pred):-
- % predicate_property_m(Pred,M),
- '$set_predicate_attribute'(M:Pred, trace, 0),
- '$set_predicate_attribute'(M:Pred, noprofile, 1),
- '$set_predicate_attribute'(M:Pred, hide_childs, 1),!.
-
-moo_hide_childs(N,MPred):-
- predicate_property(MPred,imported_from(M)),
-  writeq(wont_hide(M,N,MPred)),nl.
 
 
 %%:-user:(forall(current_predicate(bugger:FA),bugger:moo_hide(bugger:FA))).
@@ -1171,28 +1181,18 @@ moo_hide_childs(N,MPred):-
 module_notrace(M):- forall(predicate_property(P,imported_from(M)),bugger:moo_hide(M:P)).
 
 
-moo_hide_showChilds(M,F,A):-functor(MPred,F,A),moo_hide_showChilds(M,F,A,MPred).
-
-moo_hide_showChilds(M,_,_,MPred):-
-   not(predicate_property(_:MPred,imported_from(M))).
-
-moo_hide_showChilds(M,F,A,_MPred):-
- % dmsg(moo_hide_showChilds(M,F,A,MPred)),
- '$set_predicate_attribute'(M:F/A, trace, 0),
- '$set_predicate_attribute'(M:F/A, noprofile, 1),
- '$set_predicate_attribute'(M:F/A, hide_childs, 0),!.
 
 :- module_notrace(bugger).
 :- module_notrace(logicmoo_util_strings).
 
 
-:-source_location(File,_Line),module_property(M,file(File)),!,forall(current_predicate(M:F/A),moo_hide_showChilds(M,F,A)).
+:-source_location(File,_Line),module_property(M,file(File)),!,forall(current_predicate(M:F/A),moo_hide_show_childs(M,F,A)).
 
-:-moo_hide_showChilds(bugger,prolog_ecall_fa,5).
-:-moo_hide_showChilds(bugger,prolog_ecall,3).
-:-moo_hide_showChilds(bugger,must,1).
-:-moo_hide_showChilds(bugger,must,2).
-:-moo_hide_showChilds(bugger,must_flag,3).
+:-moo_hide_show_childs(bugger,prolog_ecall_fa,5).
+:-moo_hide_show_childs(bugger,prolog_ecall,3).
+:-moo_hide_show_childs(bugger,must,1).
+:-moo_hide_show_childs(bugger,must,2).
+:-moo_hide_show_childs(bugger,must_flag,3).
 
 
 % bugger_debug=off turns off just debugging about the debugger
@@ -1225,6 +1225,7 @@ grtrace(Trace):- notrace(( visible(+all),leash(+all))), Trace.
 
 
 show_and_do(C):-dmsg(C),!,C.
+dtrace(C):-dtrace,C.
 dtrace:-tracing,!,visible(+all).
 dtrace:-has_auto_trace(C),!,C.
 dtrace:-repeat,dumptrace,!.
@@ -1300,9 +1301,9 @@ module_predicates_are_exported0(ModuleName):-
       not(member(F/A,List))), Private),
    module_predicates_are_not_exported_list(ModuleName,Private).
 
-module_predicates_are_not_exported_list(ModuleName,Private):-length(Private,Len),dmsg(module_predicates_are_not_exported_list(ModuleName,Len)),!.
+module_predicates_are_not_exported_list(ModuleName,Private):- once((length(Private,Len),dmsg(module_predicates_are_not_exported_list(ModuleName,Len)))),fail.
 module_predicates_are_not_exported_list(ModuleName,Private):- forall(member(F/A,Private),
-     ((dmsg(export(ModuleName:F/A)),
+     (( % dmsg(export(ModuleName:F/A)),
                    ModuleName:export(F/A)))).
 
 % make meta_predicate's module_transparent
@@ -1313,5 +1314,8 @@ module_meta_predicates_are_transparent(ModuleName):-
                    (module_transparent(ModuleName:F/A)))).
 
 
-%:- module_meta_predicates_are_transparent(bugger).
+:- module_predicates_are_exported(bugger).
+:- module_meta_predicates_are_transparent(bugger).
+
+:-module_property(bugger, exports(List)),moo_hide_show_childs(List).
 

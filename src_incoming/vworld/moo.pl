@@ -29,7 +29,8 @@
          ensure_moo_loaded/1,
          do_all_of/1,
          call_after/2,
-
+          fix_fa/3,
+         hdr_debug/2,
          isRegisteredCycPred/3,
          get_mpred_prop/2,
          get_mpred_prop/3,
@@ -72,6 +73,8 @@
 :-dynamic(dbase_mod/1).
 dbase_mod(dbase).
 
+hdr_debug(_,_):-!.
+hdr_debug(F,A):-'format'(F,A).
 
 :- dynamic_multifile_exported action_info/1.
 :- dynamic_multifile_exported action_help/2.
@@ -90,6 +93,7 @@ dbase_mod(dbase).
 :- dynamic_multifile_exported registered_module_type/2.
 :- dynamic_multifile_exported (decl_coerce)/3.
 :- dynamic_multifile_exported agent_text_command/4.
+:- dynamic_multifile_exported check_permanence/4.
 
 :- dynamic_multifile_exported((action_info/1,action_help/2,action_rules/4,type_action_help/3,term_specifier_text/2,action_verb_useable/4)).
 :- dynamic_multifile_exported((term_anglify/2,term_anglify_last/2, term_anglify_np/3,term_anglify_np_last/3)).

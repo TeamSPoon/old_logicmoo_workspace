@@ -10,6 +10,8 @@
 moo:action_help('@get'(optional(term,self),term),text("@get term to a property")).
 moo:action_help('@set'(optional(term,self),atom,term),text("@sets term to a property")).
 
+moo:agent_text_command(Agent,['@set',Prop0,Value0],Agent,'@set'(Agent,Prop0,Value0)).
+
 moo:agent_call_command(Agent,'@set'(Obj0,Prop0,Value0)) :- subst(game_assert(k(Prop0,Obj0,Value0)),self,Agent,K),dmsg(K),debugOnError(K).
 
 moo:agent_call_command(Agent,'@get'(Obj0,Prop0)) :- subst(k(Prop0,Obj0,Value),self,Agent,K), 

@@ -124,6 +124,7 @@ object_string(O,String):-object_string(_,O,1-4,String),!.
 object_string(Agent,O,DescSpecs,String):- fail,
  with_output_to(string(StringI),
    object_print_details(format,Agent,O,DescSpecs,[type,item,agent])),
+  must(StringI\=[]),
    string_dedupe(StringI,String),!.
 
 % object_string(Agent,O,DescSpecs,String):-object_string_list1(Agent,O,DescSpecs,String),!.
@@ -170,20 +171,20 @@ object_print_details(Print,Agent,O,DescSpecs,Skipped):-
    once(member(O,Skipped);
   (
    call(Print,' ~w ',[O]),
-   forall((holds_t(keyword,O,KW),meets_desc_spec(KW,DescSpecs)),call(Print,' ~w ',[KW])),
-   forall((holds_t(nameString,O,KW)/*,meets_desc_spec(KW,DescSpecs)*/),call(Print,' ~w ',[KW])),
+   forall((req(keyword(O,KW)),meets_desc_spec(KW,DescSpecs)),call(Print,' ~w ',[KW])),
+   forall((req(nameString(O,KW))/*,meets_desc_spec(KW,DescSpecs)*/),call(Print,' ~w ',[KW])),
    (mud_isa(O,type);forall((mud_isa(O,S), meets_desc_spec(mud_isa(O,S),DescSpecs)),call(Print,' ~w ',[mud_isa(S)]))),
    ignore((order_descriptions(O,DescSpecs,List),forall_member(M,List,call(Print,' ~w ',[M])))),
    forall(mud_isa(O,S),object_print_details(Print,Agent,S,DescSpecs,[O|Skipped])) )).
 
 
 
-object_match(SObj,Obj):- isaOrSame(Obj,SObj).
-object_match(A,_Obj):- is_empty_string(A),dtrace.
+object_match(SObj,Obj):-non_empty(SObj),non_empty(Obj), isaOrSame(Obj,SObj).
 object_match(S,Obj):- 
    atoms_of(S,Atoms),
    current_agent_or_var(P),
-   object_string(P,Obj,0-5,String),!,
+   must((once((object_string(P,Obj,0-5,String))),nonvar(String),
+   non_empty(String))),!,
    string_ci(String,LString),!,
    str_contains_all(Atoms,LString).
 
@@ -410,10 +411,10 @@ parseFmt(and([L|List]),Term1) --> dcgAnd(parseForIsa(L,Term1),parseForIsa(and(Li
 parseFmt(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{specifiedItemType(String,Type,Term)}.
 
 specifiedItemType([String],Type,StringO):-nonvar(String),!,specifiedItemType(String,Type,StringO).
+specifiedItemType(A,T,AA):- nonvar(T), is_ft(T),!, checkAnyType(tell(_),A,T,AAA),!,AA=AAA.
 specifiedItemType(String,Type,Inst) :- get_term_specifier_text(Inst,Type),starts_with_icase(Inst,String),!.
 specifiedItemType(String,Type,Inst):- instances_of_type(Inst,Type),object_match(String,Inst),!.
 specifiedItemType(String,Type,Longest) :- findall(Inst, (get_term_specifier_text(Inst,Type),starts_or_ends_with_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
-specifiedItemType(A,T,AA):- is_ft(T), checkAnyType(tell(_),A,T,AAA),!,AA=AAA.
 specifiedItemType(A,T,AA):- checkAnyType(tell(parse),A,T,AAA),AA=AAA.
 
 instances_of_type(Inst,Type):- setof(Inst-Type,mud_isa(Inst,Type),Set),member(Inst-Type,Set).

@@ -16,7 +16,7 @@ echo -ne '\033]50;ClearScrollback\a'
 echo -en "\ec\e[3J"
 echo `pwd`
 echo "Hit CTRL+C ${BASH_SOURCE[0]} $RUNFILE ";
-sleep 4;
+sleep 1;
 cd $NEWPWD
 swipl -f $RUNFILE
 cd $OLDPWD

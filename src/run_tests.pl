@@ -50,7 +50,7 @@ moo:mud_test(test_movedist,
 :- at_start((debug,must_det(run_mud_tests))).
 
 
-% :- must((
+svTest :- must((
    trace,add(movedist(explorer(player1),4))
    ,
    findall(X,movedist(explorer(player1),X),L),length(L,1))).
