@@ -17,9 +17,13 @@ was_run_dbg_pl:-is_startup_file('run_debug.pl').
 % load_default_game:- load_game(logicmoo('rooms/startrek.all.pl')).
 
 
-:- at_start(with_assertions(moo:prevent_transform_moo_preds,within_user(ignore(catch(include(logicmoo(candc/parser_boxer)),_,true))))).
+start_boxer:-
+   include(logicmoo(candc/parser_boxer)),
+   fmt("Press Ctrl-D to start the mud!"),
+   at_start(prolog).
 
-% :- at_start(prolog).
+:- at_start(with_assertions(moo:prevent_transform_moo_preds,within_user(ignore(catch(start_boxer,_,true))))).
+
 
 % [Manditory] This loads the game and initializes so test can be ran
 :- if_flag_true(was_run_dbg_pl, at_start(run_setup)).
