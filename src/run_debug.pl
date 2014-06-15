@@ -17,7 +17,7 @@ was_run_dbg_pl:-is_startup_file('run_debug.pl').
 % load_default_game:- load_game(logicmoo('rooms/startrek.all.pl')).
 
 
-:- at_start(with_assertions(moo:prevent_transform_moo_preds,within_user(include(logicmoo(candc/parser_boxer))))).
+:- at_start(with_assertions(moo:prevent_transform_moo_preds,within_user(ignore(catch(include(logicmoo(candc/parser_boxer)),_,true))))).
 
 % :- at_start(prolog).
 
