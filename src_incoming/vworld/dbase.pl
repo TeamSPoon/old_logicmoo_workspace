@@ -706,6 +706,8 @@ cholds_t(CALL):- safe_univ(CALL,[P|LIST]),holds_t([P|LIST]).
 cholds_t_p2(P,LIST):- safe_univ(CALL,[holds_t,P|LIST]),call(CALL).
 
 
+dbase_t(isa, I , C):- dbase_t(C, I).
+
 dbase_t(List):- is_list(List),!,Call=..[dbase_t|List],Call.
 dbase_t(List):- holds_t(List).
 
