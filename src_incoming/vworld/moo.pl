@@ -229,9 +229,11 @@ member_or_e(E,E).
 
 fix_fa(FA,F,A):-var(FA),!,moo:mpred_arity(F,A),functor(FA,F,A).
 fix_fa(_:FA0,F,A):-!,fix_fa(FA0,F,A),!.
-fix_fa(FA,F,A):- compound(FA),!,functor(FA,F,A).
+fix_fa(F,F,A):-atom(F),moo:mpred_arity(F,A).
 fix_fa(F/A,F,A):- moo:mpred_arity(F,A).
-fix_fa(F/A,F,A):- !,number(A).
+fix_fa(F/A,F,A):- number(A),!.
+fix_fa(FA,F,A):- compound(FA),functor(FA,F,_),moo:mpred_arity(F,A),!.
+fix_fa(FA,F,A):- compound(FA),functor(FA,F,A),!.
 fix_fa(FA,F,A):- moo:mpred_arity(F,A),functor(FA,F,A).
 
 get_mpred_prop(F,A,Prop):- fix_fa(FA,F,A), mpred_prop_plus_assserted(F,A,Prop).
@@ -275,7 +277,7 @@ decl_mpred(Mt:Term):-
    decl_mpred(Mt,Pred,Arity),!.
 
 decl_mpred(M):-var(M),throw(instanciation_error(decl_mpred(M))).
-decl_mpred(AB):-decl_mpred0(AB),!.
+decl_mpred(AB):-must(decl_mpred0(AB)),!.
 decl_mpred(M):-throw(failed(decl_mpred(M))).
 
 decl_mpred0(M:F):-!, '@'(decl_mpred(F), M).

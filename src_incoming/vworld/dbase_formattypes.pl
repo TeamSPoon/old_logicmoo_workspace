@@ -262,7 +262,7 @@ correctType(Op,Args,Types,NewArgs):-compound(Args), compound(Types),
 
 correctType(Op,A,Fmt,AA):- moo:ft_info(Fmt,formatted),!,correctFormatType(Op,A,formatted(Fmt),AA).
 correctType(_O,A,Fmt,A):- moo:ft_info(Fmt,Code),!,subst(Code,self,A,Call),debugOnError(req(Call)).   
-correctType(Op,A,Super,AA):- req(subft(Sub,Super)),Sub\=Super,correctFormatType(Op,A,Sub,AA).
+correctType(Op,A,Super,AA):- req(subft(Sub,Super)),Sub\=Super,correctType(Op,A,Sub,AA).
 
 correctType(Op,Arg,Props,NewArg):- compound(Props),
    Props=..[F|TypesL],

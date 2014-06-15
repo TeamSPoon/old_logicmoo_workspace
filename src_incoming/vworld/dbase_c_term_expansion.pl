@@ -63,10 +63,14 @@ mud_goal_expansion_0(G1,G2):- ((mud_pred_expansion(if_use_holds_db, holds_t - ho
 try_mud_head_expansion(G0,G2):- ((mud_head_expansion_0(G0,G1),!,expanded_different(G0, G1),!,moo:dbase_mod(DBASE))),prepend_module(G1,DBASE,G2).
 mud_head_expansion_0(G1,G2):- ((mud_pred_expansion(if_mud_asserted, dbase_t - dbase_f,G1,G2))),!.
 
-try_mud_asserted_expansion(G0,G2):-  is_compiling_sourcecode, mud_asserted_expansion_0(G0,G1),!,expanded_different(G0, G1),while_capturing_changes(add_from_file(G1,G2),Changes),!,trace,Changes\==[],dmsg(add(todo(Changes-G2))).
+try_mud_asserted_expansion(G0,G2):-  is_compiling_sourcecode, 
+   mud_asserted_expansion_0(G0,G1),!,
+   expanded_different(G0, G1),
+   while_capturing_changes(add_from_file(G1,G2),Changes),!,ignore((Changes\==[],dmsg(add(todo(Changes-G2))))).
 mud_asserted_expansion_0(G1,G2):- ((mud_pred_expansion(if_mud_asserted, asserted_dbase_t - asserted_dbase_f,G1,G2))),!.
 
 is_compiling_sourcecode:- current_input(X),not((stream_property(X,file_no(0)))),prolog_load_context(source,F),not((moo:loading_game_file(_))),F=user.
+is_compiling_sourcecode:-!.
 
 while_capturing_changes(Call,Changes):-thread_self(ID),with_assertions_1ce(capturing_changes(ID,_),(Call,get_dbase_changes(ID,Changes),clear_dbase_changes(ID))).
 

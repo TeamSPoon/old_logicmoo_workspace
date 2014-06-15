@@ -84,11 +84,11 @@ dyn:singleValued(type_max_damage(type,int)).
 
 dyn:multiValued(verb_alias(string,string)).
 
-dyn:multiValued(label_type_props(string,type,list(props))).
+dyn:multiValued(label_type_props(string,type,list(term(property)))).
 
 dyn:multiValued(type_grid(type,int,term)).
 
-dyn:multiValued(action_rules(agent,verb,term(object),term(list(props)))).
+dyn:multiValued(action_rules(agent,verb,term(object),term(list(term(property))))).
 
 dyn:type_max_damage(object,500).
 dyn:type_max_charge(object,120).

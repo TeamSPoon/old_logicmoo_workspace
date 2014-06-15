@@ -843,7 +843,7 @@ arityMatches(A,OTHER):- number(OTHER),!,A=OTHER.
 isCycPredArity_ignoreable(P,A):- hotrace(ignore(isCycPredArity(P,A))).
 
 isCycPredArity_Check(P,A):- isCycPredArity(P,A),!.
-isCycPredArity_Check(P,A):- get_mpred_prop(P/A,_),!.
+isCycPredArity_Check(P,A):- get_mpred_prop(P,A,_),!.
 
 isCycPredArity(P,A):- loop_check_throw(isCycPredArity_lc(P,A)).
 isCycPredArity_lc(_:P,A):- nonvar(P),!,isCycPredArity(P,A).
@@ -1229,7 +1229,7 @@ db_op_exact(ra,C):- db_quf(ra,C,U,Template),!, doall((call_expanded(U),hooked_re
 db_op_exact(retract,C):- must(db_quf(retract,C,U,Template)),!,call_expanded(U),!,hooked_retract(Template).
 db_op_exact(tell(OldV),W):- non_assertable(W,Why),dumpST,trace,throw_safe(todo(db_op(tell(OldV), non_assertable(Why,W)))).
 db_op_exact(tell(Must),C0):- db_quf(tell(Must),C0,U,C),!,must(call_expanded(U)),functor(C,F,A),( get_mpred_prop(F,A,singleValued) -> must(db_assert_sv(Must,C,F,A,_OldVOut1)) ; must(db_assert_mv(Must,C,F,A,_OldVOut2))).
-db_op_exact(tell(Must),C):- grtrace, functor(C,F,A),!, functor(FA,F,A), must((get_mpred_prop(FA,singleValued) -> must(db_assert_sv(Must,C,F,A,_OldVOut1)) ; must(db_assert_mv(Must,C,F,A,_OldVOut2)))).
+db_op_exact(tell(Must),C):- grtrace, functor(C,F,A), must((get_mpred_prop(F,_,singleValued) -> must(db_assert_sv(Must,C,F,A,_OldVOut1)) ; must(db_assert_mv(Must,C,F,A,_OldVOut2)))).
 db_op_exact(Op,C):- trace_or_throw(unhandled(db_op_exact(Op,C))).
 
 % ================================================
