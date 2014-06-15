@@ -14,13 +14,13 @@
         term_test/1,
         test_false/1,
         last_test_name/1,
-        run_mud_test_code/1]).
+        test_call/1]).
 
-:- dynamic(was_test_name/1).
-:- meta_predicate run_mud_test_code(0).
-:- meta_predicate run_mud_test(*,0).
-:- meta_predicate test_true(0).
-:- meta_predicate test_false(0).
+:- thread_local was_test_name/1.
+:- meta_predicate test_call(+).
+:- meta_predicate run_mud_test(?,^).
+:- meta_predicate test_true(^).
+:- meta_predicate test_false(^).
 
 
 :- include(logicmoo(vworld/moo_header)).
@@ -37,13 +37,31 @@ moo:agent_call_command(_Agent,tests) :- scan_updates, run_mud_tests.
 
 moo:action_help(test(term),"run tests containing term").
 
-moo:agent_call_command(_Gent,test(Obj)):- term_test(Obj).
+moo:agent_call_command(Agent,test(Obj)):-foc_current_player(Agent),term_test(Obj).
 
-test_name(String):-dmsg(moo_test(named(String))),retractall(was_test_name(_)),asserta(was_test_name(String)).
-last_test_name(String):-was_test_name(String),!.
+
+test_name(String):-fmt(start_moo_test(named(String))),asserta(was_test_name(String)).
+last_test_name(String):- was_test_name(String),!.
 last_test_name(unknown).
-test_true(SomeGoal):- SomeGoal; (last_test_name(String),dmsg(moo_test(failed(String:SomeGoal)))).
-test_false(SomeGoal):- not(SomeGoal); (last_test_name(String),dmsg(moo_test(failed(String:SomeGoal)))).
+
+test_result(Result):-test_result(Result,true).
+test_result(Result,SomeGoal):- last_test_name(String),fmt(Result:test_mini_result(Result:String,SomeGoal)).
+
+from_here(_:SomeGoal):-!,functor(SomeGoal,F,_),atom_concat('test',_,F).
+from_here(SomeGoal):-!,functor(SomeGoal,F,_),atom_concat('test',_,F).
+
+
+
+test_call(X):- var(X),!, throw(var(test_call(X))).
+test_call(meta_callable(String,test_name(String))):-!,string(String).
+test_call(meta_call(X)):- !,test_call0(X).
+test_call(Goal):- meta_interp(test_call,Goal).
+
+test_call0(SomeGoal):- from_here(SomeGoal),!,call_expanded(SomeGoal).
+test_call0(SomeGoal):- dmsg(call_expanded(SomeGoal)), catch(SomeGoal,E,(test_result(error(E),SomeGoal),!,fail)).
+
+test_true(SomeGoal):-  once(((test_call(SomeGoal),!,test_result(passed,SomeGoal));test_result(failed,SomeGoal))).
+test_false(SomeGoal):- test_true(not(SomeGoal)).
 
 term_test(Obj):- 
    doall((
@@ -53,11 +71,6 @@ term_test(Obj):-
    fail)).
 
 run_mud_test(Name,Test):-
-   dmsg(tests(run_mud_test(Name))),
-   once(catch((run_mud_test_code(Test),dmsg(tests(passed_mud_test(Name)))),E,dmsg(tests(fail_mud_test(E, Name))));dmsg(tests(fail_mud_test(Name)))).
-
-% TODO (not use call/1)
-run_mud_test_code(Test):-call(Test).
-
-
+   fmt(begin_mud_test(Name)),
+   once(catch((test_call(Test),fmt(completed_mud_test(Name))),E,fmt(error_mud_test(E, Name)));fmt(tests(incomplet_mud_test(Name)))).
 

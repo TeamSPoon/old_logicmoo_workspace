@@ -163,7 +163,7 @@ initialize :-
 	initial_data(X),
 	assert_list(X), !.
 initialize :-
-	error(301,[initialization,error]).
+	local_error(301,[initialization,local_error]).
 
 % working storage is represented by database terms stored
 % under the key "fact"
@@ -323,7 +323,7 @@ process([Action|Rest],LHS) :-
 	take(Action,LHS),
 	!,process(Rest,LHS).
 process([Action|Rest],LHS) :-
-	error(201,[Action,fails]).
+	local_error(201,[Action,fails]).
 
 % if its retract, use the reference numbers stored in the Lrefs list,
 % otherwise just take the action
@@ -359,7 +359,7 @@ take(call(X)) :- call(X).
 % logic for retraction
 
 retr(all,LHS) :-retrall(LHS),!.
-retr(N,[]) :- error(202,['retract error, no ',N]), !.
+retr(N,[]) :- local_error(202,['retract local_error, no ',N]), !.
 retr(N,[N:Prem|_]) :- retract_ws(fact(Prem,_)),!.
 retr(N,[_|Rest]) :- !,retr(N,Rest).
 
@@ -479,7 +479,7 @@ find_slot(req(C,N,S,F,V), SlotList) :-
 	frame(X, HigherSlots),
 	find_slot(req(C,N,S,F,V), HigherSlots), !.
 find_slot(Req,_) :-
-	error(99,['frame error looking for:',Req]).
+	local_error(99,['frame local_error looking for:',Req]).
 
 facet_val(req(C,N,S,F,V),FacetList) :-
 	FV =.. [F,V],
@@ -517,7 +517,7 @@ uptf(Class,Name,UList) :-
 	asserta( frinst(Class,Name,NewList,TimeStamp) ),
 	!.
 uptf(Class,Name,UList) :-
-	error(105,[update,failed,Class,Name,UList]).
+	local_error(105,[update,failed,Class,Name,UList]).
 
 genid(G) :-
 	retract(gid(N)),
@@ -569,7 +569,7 @@ check_add_demons(_,_).
 del_frame(Class) :-
 	retract(frame(Class,_)).
 del_frame(Class) :-
-	error(203,['No frame',Class,'to delete']).
+	local_error(203,['No frame',Class,'to delete']).
 
 del_frame(Class, UList) :-
 	old_slots(Class,SlotList),
@@ -586,7 +586,7 @@ delf(Class,Name) :-
 	retract( frinst(Class,Name,_,_) ),
 	!.
 delf(Class,Name) :-
-	error(103,['No instance of ',Class,' for ',Name]).
+	local_error(103,['No instance of ',Class,' for ',Name]).
 
 delf(Class,Name,UList) :-
 	old_flots(Class,Name,SlotList),
@@ -608,7 +608,7 @@ del_slot(req(C,N,S,F,V),SlotList,[S-FL2|SL2]) :-
 	remove(S-FacetList,SlotList,SL2),
 	del_facet(req(C,N,S,F,V),FacetList,FL2).
 del_slot(Req,_,_) :-
-	error(104,['del_slot - unable to remove',Req]).
+	local_error(104,['del_slot - unable to remove',Req]).
 
 del_facet(req(C,N,S,F,V),FacetList,FL) :-
 	FV =.. [F,V],
@@ -621,7 +621,7 @@ del_facet(req(C,N,S,F,V),FacetList,[FNew|FL]) :-
 	FNew =.. [F,NewValList],	
 	!, check_del_demons(req(C,N,S,F,V),FacetList).
 del_facet(Req,_,_) :-
-	error(105,['del_facet - unable to remove',Req]).
+	local_error(105,['del_facet - unable to remove',Req]).
 
 check_del_demons(req(C,N,S,F,V),FacetList) :-
 	get_frame(C,S-del(Del)), !,
@@ -678,9 +678,9 @@ is_on(X,[Y|Z]) :- is_on(X,Z).
 
 error_threshold(100).
 
-error(NE,_) :- error_threshold(N), N > NE, !, fail.
-error(NE,E) :-
-	nl, write('*** '),write(error-NE),tab(1),
+local_error(NE,_) :- error_threshold(N), N > NE, !, fail.
+local_error(NE,E) :-
+	nl, write('*** '),write(local_error-NE),tab(1),
 	write_line(E),
 	!, fail.
 

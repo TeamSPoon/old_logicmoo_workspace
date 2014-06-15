@@ -23,7 +23,7 @@
 :- module(dbase,[add/1,
 force_expand_goal/2,
 force_expand_head/2,
-argIsa_call/3,
+argIsa_call/4,
 assertThrough/1,
 assertThrough/2,
 balanceBinding/2,
@@ -663,32 +663,48 @@ or_list([H], H) :- !.
 or_list([H|T], (H;OT)) :- 
 	or_list(T, OT).
 
+
+
 % ================================================================================
 % begin holds_t
 % ================================================================================
+holds_t(P,A1,A2,A3,A4,A5,A6,A7):- req(holds_t(P,A1,A2,A3,A4,A5,A6,A7)).
+holds_t(P,A1,A2,A3,A4,A5,A6):- req(holds_t(P,A1,A2,A3,A4,A5,A6)).
+holds_t(P,A1,A2,A3,A4,A5):- req(holds_t(P,A1,A2,A3,A4,A5)).
+holds_t(P,A1,A2,A3,A4):- req(holds_t(P,A1,A2,A3,A4)).
+holds_t(P,A1,A2,A3):- req(holds_t(P,A1,A2,A3)).
+holds_t(P,A1,A2):- req(holds_t(P,A1,A2)).
+holds_t(P,A1):- req(holds_t(P,A1)).
+holds_t(G):- req(G).
+
+
+% ================================================================================
+% begin cholds_t
+% ================================================================================
 which_t(dac(d,a,no_c,no_mt)).
-holds_t(P,A1,A2,A3,A4,A5,A6,A7):- isCycPredArity_ignoreable(P,7),which_t(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5,A6,A7);call_mt_t(DBS,P,A1,A2,A3,A4,A5,A6,A7,_,_);assertion_t([P,A1,A2,A3,A4,A5,A6,A7])).
-holds_t(P,A1,A2,A3,A4,A5,A6):- isCycPredArity_ignoreable(P,6),which_t(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5,A6);call_mt_t(DBS,P,A1,A2,A3,A4,A5,A6,_,_)).
-holds_t(P,A1,A2,A3,A4,A5):- isCycPredArity_ignoreable(P,5),which_t(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5);call_mt_t(DBS,P,A1,A2,A3,A4,A5,_,_)).
-holds_t(P,A1,A2,A3,A4):- isCycPredArity_ignoreable(P,4),which_t(DBS),(call_t(DBS,P,A1,A2,A3,A4);call_mt_t(DBS,P,A1,A2,A3,A4,_,_)).
-holds_t(P,A1,A2,A3):- isCycPredArity_ignoreable(P,3),which_t(DBS),(call_t(DBS,P,A1,A2,A3);call_mt_t(DBS,P,A1,A2,A3,_,_)).
-holds_t(P,A1,A2):- hotrace(holds_relaxed_t(P,A1,A2)).
-holds_t(P,A1):- !,req(isa(A1,P)).
-holds_t(P,A1):- isCycPredArity_ignoreable(P,1),which_t(DBS),(call_t(DBS,P,A1);call_mt_t(DBS,P,A1,_,_)).
+cholds_t(P,A1,A2,A3,A4,A5,A6,A7):- isCycPredArity_ignoreable(P,7),which_t(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5,A6,A7);call_mt_t(DBS,P,A1,A2,A3,A4,A5,A6,A7,_,_);assertion_t([P,A1,A2,A3,A4,A5,A6,A7])).
+cholds_t(P,A1,A2,A3,A4,A5,A6):- isCycPredArity_ignoreable(P,6),which_t(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5,A6);call_mt_t(DBS,P,A1,A2,A3,A4,A5,A6,_,_)).
+cholds_t(P,A1,A2,A3,A4,A5):- isCycPredArity_ignoreable(P,5),which_t(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5);call_mt_t(DBS,P,A1,A2,A3,A4,A5,_,_)).
+cholds_t(P,A1,A2,A3,A4):- isCycPredArity_ignoreable(P,4),which_t(DBS),(call_t(DBS,P,A1,A2,A3,A4);call_mt_t(DBS,P,A1,A2,A3,A4,_,_)).
+cholds_t(P,A1,A2,A3):- isCycPredArity_ignoreable(P,3),which_t(DBS),(call_t(DBS,P,A1,A2,A3);call_mt_t(DBS,P,A1,A2,A3,_,_)).
+cholds_t(P,A1,A2):- hotrace(cholds_relaxed_t(P,A1,A2)).
+cholds_t(P,A1):- !,req(isa(A1,P)).
+cholds_t(P,A1):- isCycPredArity_ignoreable(P,1),which_t(DBS),(call_t(DBS,P,A1);call_mt_t(DBS,P,A1,_,_)).
 
 % holds_relaxed_t(Arity, P, A):- Arity == arity,!,isCycPredArity(P,A).
 %holds_relaxed_t(Mpred, FA, [Prop]):- Mpred==mpred,!,get_mpred_prop(FA,Prop).
-holds_relaxed_t(P,A1,A2):- isCycPredArity_ignoreable(P,2),which_t(DBS),!,relax_term(P,PR,A1,R1,A2,R2),holds_relaxed_0_t(DBS,PR,R1,R2).
-holds_relaxed_0_t(DBS,P,A1,A2):- call_t(DBS,P,A1,A2).
-holds_relaxed_0_t(DBS,P,A1,A2):- call_mt_t(DBS,P,A1,A2,_,_).
-holds_relaxed_0_t(DBS,P,A1,A2):- ground((P,A1)), TEMPL=..[P,T1,_],dbase_t(default_sv,TEMPL,A2),req(isa(A1,T1)),!.
+cholds_relaxed_t(P,A1,A2):- isCycPredArity_ignoreable(P,2),which_t(DBS),!,relax_term(P,PR,A1,R1,A2,R2),cholds_relaxed_0_t(DBS,PR,R1,R2).
+cholds_relaxed_0_t(DBS,P,A1,A2):- call_t(DBS,P,A1,A2).
+cholds_relaxed_0_t(DBS,P,A1,A2):- call_mt_t(DBS,P,A1,A2,_,_).
+cholds_relaxed_0_t(DBS,P,A1,A2):- ground((P,A1)), TEMPL=..[P,T1,_],dbase_t(default_sv,TEMPL,A2),req(isa(A1,T1)),!.
 
 
-holds_t([AH,P|LIST]):- is_holds_true(AH),!,holds_t_p2(P,LIST).
-holds_t([AH,P|LIST]):- is_holds_false(AH),!,holds_f_p2(P,LIST).
-holds_t([P|LIST]):- !,holds_t_p2(P,LIST).
-holds_t(CALL):- safe_univ(CALL,[P|LIST]),holds_t([P|LIST]).
-holds_t_p2(P,LIST):- safe_univ(CALL,[holds_t,P|LIST]),call(CALL).
+cholds_t([AH,P|LIST]):- is_holds_true(AH),!,cholds_t_p2(P,LIST).
+cholds_t([AH,P|LIST]):- is_holds_false(AH),!,holds_f_p2(P,LIST).
+cholds_t([P|LIST]):- !,cholds_t_p2(P,LIST).
+cholds_t(CALL):- safe_univ(CALL,[P|LIST]),holds_t([P|LIST]).
+cholds_t_p2(P,LIST):- safe_univ(CALL,[holds_t,P|LIST]),call(CALL).
+
 
 dbase_t(List):- is_list(List),!,Call=..[dbase_t|List],Call.
 dbase_t(List):- holds_t(List).
@@ -772,8 +788,8 @@ holds_relaxed_0_f(DBS,P,A1,A2):- call_mt_f(DBS,P,A1,A2,_,_).
 
 
 holds_f([AH,P|LIST]):- is_holds_true(AH),!,holds_f_p2(P,LIST).
-holds_f([AH,P|LIST]):- is_holds_false(AH),!,holds_t_p2(P,LIST).
-holds_f([P|LIST]):- !,holds_t_p2(P,LIST).
+holds_f([AH,P|LIST]):- is_holds_false(AH),!,cholds_t_p2(P,LIST).
+holds_f([P|LIST]):- !,cholds_t_p2(P,LIST).
 holds_f(CALL):- CALL=..[P|LIST],holds_f([P|LIST]).
 holds_f_p2(P,LIST):- CALL=..[holds_f,P|LIST],call(CALL).
 
@@ -843,7 +859,7 @@ arityMatches(A,OTHER):- number(OTHER),!,A=OTHER.
 isCycPredArity_ignoreable(P,A):- hotrace(ignore(isCycPredArity(P,A))).
 
 isCycPredArity_Check(P,A):- isCycPredArity(P,A),!.
-isCycPredArity_Check(P,A):- get_mpred_prop(P,A,_),!.
+% isCycPredArity_Check(P,A):- mpred_arity(P,A),!. % get_mpred_prop(P,AA,_),!,integer(AA),A=AA.
 
 isCycPredArity(P,A):- loop_check_throw(isCycPredArity_lc(P,A)).
 isCycPredArity_lc(_:P,A):- nonvar(P),!,isCycPredArity(P,A).
@@ -927,7 +943,7 @@ oncely(Call):-once(Call).
 :- dynamic(non_assertable/1).
 non_assertable(WW,isVar):- var(WW),!.
 non_assertable(_:WW,Why):- !,non_assertable(WW,Why).
-non_assertable(WW,Why):- compound(WW),functor(WW,F,A),!,never_use_holds_db(F,A,Why).
+non_assertable(WW,Why):- compound(WW),functor(WW,F,A),!,never_use_holds_db(F,A,Why),!.
 % non_assertable(WW,Why):- db_prop_game_assert
 
 % replaced the 1st with the 2nd and better version of retract
@@ -1019,13 +1035,25 @@ is_ft(S):-  holds_t(isa,S,formattype).
 
 expand_goal_correct_argIsa(A,B):- force_expand_goal(A,B).
 
-db_op_simpler(_,KB:Term,Term):- is_kb_module(KB).
-db_op_simpler(_,KB:Term,Term):- dbase_mod(KB).
-db_op_simpler(ask(_),MODULE:C0,call_expanded(MODULE:C0)):- atom(MODULE), nonvar(C0),not(not(predicate_property(C0,_PP))),!. % , functor(C0,F,A), dmsg(todo(unmodulize(F/A))), %trace_or_throw(module_form(MODULE:C0)),
-                                                                             %    db_op(Op,C0).
-db_op_simpler(_,C0,C1):- C0=..[svo,Obj,Prop|ARGS],!,C1=..[p,Prop,Obj|ARGS],!.
-db_op_simpler(_,TypeTerm,props(Inst,[isa(Type)|PROPS])):- TypeTerm=..[Type,Inst|PROPS],is_type(Type),!.
-db_op_simpler(_,DBASE_T,DBASE):- DBASE_T=..[HOLDS,P,A|ARGS],atom(P),is_holds_true(HOLDS),DBASE=..[P,A|ARGS].
+% db_op_simpler(ask(_),MODULE:C0,call_expanded(call,MODULE:C0)):- atom(MODULE), nonvar(C0),not(not(predicate_property(C0,_PP))),!. % , functor(C0,F,A), dmsg(todo(unmodulize(F/A))), %trace_or_throw(module_form(MODULE:C0)), %   db_op(Op,C0).
+db_op_simpler(_,TypeTerm,props(Inst,[isa(Type)|PROPS])):- TypeTerm=..[Type,Inst|PROPS],nonvar(Inst),is_type(Type),!.
+
+
+%db_op_manditory(_,KB:Term,Term):- is_kb_module(KB).
+%db_op_manditory(_,KB:Term,Term):- dbase_mod(KB).
+db_op_manditory(_,_:Term,Term).
+db_op_manditory(_,C0,[Prop,Obj|ARGS]):- C0=..[svo,Obj,Prop|ARGS],!.
+db_op_manditory(_,DBASE_T,[P,A|ARGS]):- DBASE_T=..[HOLDS,P,A|ARGS],is_holds_true_not_hilog(HOLDS).
+db_op_manditory(_,[HOLDS,P,A|ARGS],[P,A|ARGS]):- is_holds_true_not_hilog(HOLDS).
+db_op_manditory(_,[P,A|ARGS],DBASE):- var(P),!,hilog_functor(HILOG),DBASE=..[HILOG,P,A|ARGS].
+db_op_manditory(_,[P,A|ARGS],DBASE):- atom(P),!,DBASE=..[P,A|ARGS].
+db_op_manditory(_,[P,A|ARGS],DBASE):- nonvar(P),dtrace, DBASE=..[P,A|ARGS].
+db_op_manditory(_,TypeTerm,props(Inst,[isa(Type)|PROPS])):- TypeTerm=..[Type,Inst|PROPS],nonvar(Inst),is_type(Type),!.
+
+
+db_op_simpler_wlc(ask(Must),Wild,Simpler):- !,hotrace(db_op_simpler(ask(Must),Wild,Simpler)),not(is_loop_checked(req(Simpler))),!.
+db_op_simpler_wlc(tell(Must),Wild,Simpler):- !,hotrace(db_op_simpler(tell(Must),Wild,Simpler)),not(is_loop_checked(add(Simpler))),!.
+db_op_simpler_wlc(Op,Wild,Simpler):- !,hotrace(db_op_simpler(Op,Wild,Simpler)),not(is_loop_checked(db_op0(Op,Simpler))),!.
 
 
 db_op_sentence(_Op,Prop,ARGS,C0):- must(atom(Prop)), C0=..[Prop|ARGS],!.
@@ -1100,37 +1128,50 @@ call_must(_,Call):- call(Call).
 add_from_file(B,_):- contains_singletons(B),grtrace,dmsg(todo(add_from_file_contains_singletons(B))),!,fail.
 add_from_file(B,B):- db_op(tell(_OldV),B),!.
 
-do_db_op_hooks:- once(ignore(do_all_of(dbase_module_loaded))).
+do_db_op_hooks:- hotrace(once(ignore(do_all_of(dbase_module_loaded)))).
 
 db_op(tell(OldV),Term):- !, db_opp(tell(OldV),Term),!,do_db_op_hooks.
 db_op(Op,Term):- do_db_op_hooks,db_opp(Op,Term),do_db_op_hooks.
 
+% ================================================
+% db_opp/2
+% ================================================
 
 db_opp(Op,isa(Term,Var)):- var(Var),!,db_op0(Op,get_isa(Term,Var)).
+
+db_opp(Op,Wild):- db_op_manditory(Op,Wild,Simpler),Wild\=Simpler,!,db_op(Op,Simpler).
 
 db_opp(ask(Must),isa(T,type)):- !,call_must(Must,is_type(T)).
 db_opp(tell(_),isa(T,type)):- !,db_tell_isa(T,type).
 db_opp(tell(_),isa(T,Type)):- !,db_tell_isa(T,Type).
 
-db_opp(ask(_Must),true):- !.
-db_opp(tell(OldV),B):- !,loop_check(db_op0(tell(OldV),B),true). % true = we are already processing this assert
 db_opp(ask(Must),createableType(SubType)):- !, call_must(Must,is_creatable_type(SubType)).
-db_opp(ask(Must),Term):- !,loop_check(db_op0(ask(Must),Term),db_query_lc(Must,Term)).
+
+db_opp(tell(OldV),B):- !,loop_check_term(db_op0(tell(OldV),B),add(B),true). % true = we are already processing this assert
+db_opp(ask(Must),B):- !,loop_check_term(db_op0(ask(Must),B),req(B),db_query(Must,B)). % true = we are already processing this assert
 db_opp(Op,Term):- loop_check_throw(db_op0(Op,Term)).
 
+% ================================================
+% db_op0/2
+% ================================================
+
 db_op0(Op,Term):- not(compound(Term)),!,grtrace,throw_safe(nc(db_op0(Op,Term))).
-db_op0(Op,[holds_t,P|Args]):- atom(P),!,Goal=..[P|Args],db_op(Op,Goal).
+
 db_op0(Op,KB:Term):- is_kb_module(KB),!,db_op(Op,Term).
 db_op0(Op,KB:Term):- dbase_mod(KB),!,db_op(Op,Term).
+
 db_op0(Op,Term):- record_on_thread(dbase_opcall,db_op(Op,Term)),fail.
+
 db_op0(Op,(':- '(A))):- must((expand_goal_correct_argIsa(A,AA))),expanded_different(A,AA),!,db_op(Op, (':- '(A))).
-db_op0(tell(_OldV),(':-'(A))):- !, must((expand_goal_correct_argIsa(A,AA),call_expanded(AA))).
-db_op0(retract,(C1;C2)):- !,trace,once((db_op(retract,C1),db_op(retract,C2))).
+
+db_op0(tell(_OldV),(':-'(A))):- !, must((expand_goal_correct_argIsa(A,AA),call_expanded_for(call,AA))).
+db_op0(retract,(C1;C2)):- !,dtrace,once((db_op(retract,C1),db_op(retract,C2))).
 db_op0(tell(OldV),(C1;C2)):- !,db_op(tell(OldV),C1),!,db_op(tell(OldV),C2),!.
 db_op0(ra,(C1;C2)):- !,must(db_op(ra,C1)),must(db_op(ra,C2)).
 db_op0(Op,(C1,C2)):- !,db_op(Op,C1),db_op(Op,C2).
-db_op0(ask(_Must),props(Obj,Props)):- var(Props),!,findall(Prop,(dbase_t([P,Obj|REST]),Prop=..[P|REST]),Props).
-db_op0(Op,props(Obj,Open)):- var(Open),!,throw_safe(db_op(Op,props(Obj,Open))).
+
+db_op0(ask(Must),props(Obj,Props)):- var(Props),!,findall(Prop,call_must(Must,dbase_t([P,Obj|REST]),Prop=..[P|REST]),Props).
+db_op0(Op ,props(Obj,Open)):- var(Open),!,throw_safe(db_op(Op,props(Obj,Open))).
 db_op0(_Op,props(_Obj,[])):- !.
 db_op0(Op,props(Obj,[P])):- nonvar(P),!,db_op(Op,props(Obj,P)).
 db_op0(Op,props(Obj,[P|ROPS])):- !,db_op(Op,props(Obj,P)),db_op(Op,props(Obj,ROPS)).
@@ -1138,14 +1179,17 @@ db_op0(Op,props(Obj,PropVal)):- safe_univ(PropVal,[Prop,NonVar|Val]),Obj==NonVar
 db_op0(Op,props(Obj,PropVal)):- PropVal=..[OP,Pred|Val],comparitiveOp(OP),not(comparitiveOp(Pred)),!,OPVAL=..[OP|Val],PropVal2=..[Pred,OPVAL],db_op(Op,props(Obj,PropVal2)).
 db_op0(Op,props(Obj,PropVal)):- PropVal=..[Prop|Val],not(infix_op(Prop,_)),!,db_op(Op,[holds_t,Prop,Obj|Val]).
 db_op0(Op,props(Obj,PropVal)):- PropVal=..[Prop|Val],!,grtrace,db_op(Op,[holds_t,Prop,Obj|Val]).
+
 db_op0(Op,expand_args(Exp,Term)):- !,forall(do_expand_args(Exp,Term,O),db_op(Op,O)).
 db_op0(Op,somethingIsa(A,List)):- !,forall_member(E,List,db_op(Op, isa(A,E))).
 db_op0(Op,somethingDescription(A,List)):- !,forall_member(E,List,db_op(Op, description(A,E))).
 db_op0(Op,objects(Type,List)):- !,forall_member(I,List,db_op(Op,isa(I,Type))).
 db_op0(Op,sorts(Type,List)):- !,forall_member(I,List,db_op(Op, subclass(I,Type))).
 db_op0(Op,predicates(List)):- !,forall_member(T,List,db_op(Op,mpred(T))).
-db_op0(Op,db_op_exact(Term)):- !,db_op_exact(Op,Term).
 db_op0(Op,EACH):- EACH=..[each|List],forall_member(T,List,db_op(Op,T)).
+
+db_op0(Op,db_op_exact(Term)):- !,db_op_exact(Op,Term).
+ 
 db_op0(tell(_),description(A,E)):- !,must(once(assert_description(A,E))).
 db_op0(Op,nameString(A,S0)):- determinerRemoved(S0,String,S),!,db_op(Op, nameString(A,S)),db_op(tell(_OldV), determinerString(A,String)).
 
@@ -1156,25 +1200,24 @@ db_op0(tell(_OldV), subft(I,T)):- (atomic(I)->define_ft(I);true) ,  (atomic(T)->
 
 db_op0(tell(_OldV),mpred(A)):- !,decl_mpred(A),!.
 db_op0(tell(_OldV),isa(A,mpred)):- !,decl_mpred(A),!.
+
+db_op0(ask(Must),get_isa(Term,Var)):- !,call_must(Must,get_isa_asserted(Term,Var)).
+db_op0(ask(Must),isa(Term,Var)):- !,call_must(Must,hotrace(get_isa_backchaing(Term,Var))).
+db_op0(Op,isa(A,SubType)):- holds_t(createableSubclassType,SubType,Type),!,db_op(Op,isa(A,Type)),db_op(Op,isa(A,SubType)).
+
 db_op0(tell(_OldV),argsIsa(F,Term)):-!,hooked_asserta(dbase_t(argsIsa,F,Term)).
 db_op0(Op,argsIsa(Term)):- !, fix_fa(Term,F,_),!,db_op(Op,argsIsa(F, Term)).
 db_op0(tell(_OldV),singleValued(Term)):- !,decl_mpred(Term),add_mpred_prop(Term,singleValued).
 db_op0(tell(_OldV),multiValued(Term)):- !,functor_safe(Term,_,A),decl_mpred(Term),add_mpred_prop(Term,[multiValued,multi(A)]).
-
-db_op0(ask(Must),get_isa(Term,Var)):- !,call_must(Must,get_isa_asserted(Term,Var)).
-db_op0(ask(Must),isa(Term,Var)):- !,call_must(Must,hotrace(get_isa_backchaing(Term,Var))).
-
-db_op0(Op,isa(A,SubType)):- holds_t(createableSubclassType,SubType,Type),!,db_op(Op,isa(A,Type)),db_op(Op,isa(A,SubType)).
-
-db_op0(ask(Must),argIsa(P,N,T)):- call_must(Must, (get_mpred_prop(P,argsIsa(ArgsIsa)),arg(N,ArgsIsa,T),must(nonvar(T)))).
+db_op0(ask(Must),argIsa(P,N,T)):- call_must(Must,(get_mpred_prop(P,argsIsa(ArgsIsa)),arg(N,ArgsIsa,T),must(nonvar(T)))).
 
 
-db_op0(Op,Wild):- db_op_simpler(Op,Wild,Simpler),not(is_loop_checked(db_op0(Op,Simpler))),!,db_op(Op,Simpler).
+db_op0(Op,Wild):- db_op_simpler_wlc(Op,Wild,Simpler),!,db_op(Op,Simpler).
 
-db_op0(tell(OldV),Term):- Term =..[Type,A],!,db_op(tell(OldV),isa(A,Type)).
+db_op0(Op,Term):- Term =..[Type,A],!,db_op(Op,isa(A,Type)).
+db_op0(Op,A):- hotrace(must(once(correctArgsIsa(Op,A,AA)))),expanded_different(A,AA),!,must(db_op(Op,AA)).
 
-db_op0(Op,A):- must(once(correctArgsIsa(Op,A,AA))),expanded_different(A,AA),!,must(db_op(Op,AA)).
-
+db_op0(ask(Must),Goal):- prolog_callable(Goal),!,call_must(Must,call_expanded_for(call,Goal)).
 db_op0(Op,C0):- C0=..[Prop|ARGS],db_op_unit(Op,C0,Prop,ARGS).
 
 % ================================================
@@ -1224,11 +1267,11 @@ db_op_exact(Op,C):- C=..[SubType,Arg],db_op_loop(Op,isa(Arg,SubType),fail),!.
 db_op_exact(ask(Must), Term):- !,db_query(Must,Term).
 db_op_exact(query, Term):- !,db_query(findall,Term).
 db_op_exact(must, Term):- !,db_query(must,Term).
-db_op_exact(u,C):- grtrace,db_quf(u,C,U,Template),call_expanded(U),Template,must(ground(Template)),!,ignore(hooked_retractall(Template)).
-db_op_exact(ra,C):- db_quf(ra,C,U,Template),!, doall((call_expanded(U),hooked_retractall(Template))).
-db_op_exact(retract,C):- must(db_quf(retract,C,U,Template)),!,call_expanded(U),!,hooked_retract(Template).
+db_op_exact(u,C):- grtrace,db_quf(u,C,U,Template),call_expanded_for(quf,U),Template,must(ground(Template)),!,ignore(hooked_retractall(Template)).
+db_op_exact(ra,C):- db_quf(ra,C,U,Template),!, doall((call_expanded_for(quf,U),hooked_retractall(Template))).
+db_op_exact(retract,C):- must(db_quf(retract,C,U,Template)),!,call_expanded_for(quf,U),!,hooked_retract(Template).
 db_op_exact(tell(OldV),W):- non_assertable(W,Why),dumpST,trace,throw_safe(todo(db_op(tell(OldV), non_assertable(Why,W)))).
-db_op_exact(tell(Must),C0):- db_quf(tell(Must),C0,U,C),!,must(call_expanded(U)),functor(C,F,A),( get_mpred_prop(F,A,singleValued) -> must(db_assert_sv(Must,C,F,A,_OldVOut1)) ; must(db_assert_mv(Must,C,F,A,_OldVOut2))).
+db_op_exact(tell(Must),C0):- db_quf(tell(Must),C0,U,C),!,must(call_expanded_for(quf,U)),functor(C,F,A),( get_mpred_prop(F,A,singleValued) -> must(db_assert_sv(Must,C,F,A,_OldVOut1)) ; must(db_assert_mv(Must,C,F,A,_OldVOut2))).
 db_op_exact(tell(Must),C):- grtrace, functor(C,F,A), must((get_mpred_prop(F,_,singleValued) -> must(db_assert_sv(Must,C,F,A,_OldVOut1)) ; must(db_assert_mv(Must,C,F,A,_OldVOut2)))).
 db_op_exact(Op,C):- trace_or_throw(unhandled(db_op_exact(Op,C))).
 
@@ -1236,7 +1279,7 @@ db_op_exact(Op,C):- trace_or_throw(unhandled(db_op_exact(Op,C))).
 % db_query/1
 % ================================================
 
-db_query(Must,LC):- loop_check_throw(db_query_lc(Must,LC)).
+db_query(Must,LC):- loop_check(db_query_lc(Must,LC),call_expanded_for(req,LC)).
 
 db_query_lc(Must,(C0->C1;C2)):- !, (db_query(once,C0) -> db_query(Must,C1) ; db_query(Must,C2)).
 db_query_lc(Must,(C0->C1)):- !, (db_query(once,C0) -> db_query(Must,C1)).
@@ -1244,17 +1287,62 @@ db_query_lc(Must,(C1;C2)):- !, db_query(Must,C1) ; db_query(Must,C2).
 db_query_lc(Must,(C1,C2)):- !, db_query(query,C1) , db_query(Must,C2).
 db_query_lc(Must,Term):- findall(a(Term),db_query_quf(Must,Term),List),list_to_set_safe(List,Set),!,member(a(Term),Set).
 
-db_query_quf(Must,C):- db_quf(ask(Must),C,Pretest,Template),!,call_tabled(call_expanded(Pretest)),call_must(Must,call_expanded(Template)).
+db_query_quf(Must,C):- db_quf(ask(Must),C,Pretest,Template),!,call_tabled(call_expanded_for(quf,Pretest)),call_must(Must,call_expanded_for(req,Template)).
 
 
-call_expanded(true):- !.
-call_expanded(Goal):- get_mpred_prop(Goal,ask_module(Module)),!,Module:call(Goal).
-call_expanded(Goal):- prolog_callable(Goal),!,Goal.
-call_expanded(PreGoal):- force_expand(expand_goal(PreGoal,Goal)),PreGoal\=Goal,prolog_callable(Goal),!,Goal.
-call_expanded(PreGoal):- force_expand(expand_term(PreGoal,Goal)),PreGoal\=Goal,prolog_callable(Goal),!,dumpST,grtrace,Goal.
-call_expanded(_:PreGoal):-call_expanded(PreGoal).
-call_expanded(Goal):- dmsg(todo(failure(Goal))),!,dumpST,grtrace,req(Goal).
+:- meta_predicate meta_interp(0,+).
 
+meta_interp_signal(meta_call(V)):-!,nonvar(V).
+meta_interp_signal(meta_callable(_,_)).
+meta_interp_signal(_:meta_call(V)):-!,nonvar(V).
+meta_interp_signal(_:meta_callable(_,_)).
+
+
+
+meta_interp(_CE,A):- leash(+all),meta_interp_signal(A),!,fail.
+meta_interp(CE,A):- var(A),!, throw(meta_interp(CE,A)).
+meta_interp(_,_:true):-!.
+%right thing i thought 
+%meta_interp(CE,M:A):-!, '@'(meta_interp(CE,A),M).
+meta_interp(CE,A):- call(CE, meta_callable(A,NewA)),!,NewA.
+meta_interp(CE,not(A)):-!,not(meta_interp(CE,A)).
+meta_interp(CE,once(A)):-!,once(meta_interp(CE,A)).
+meta_interp(CE,(A;B)):-!,meta_interp(CE,A);meta_interp(CE,B).
+meta_interp(CE,(A->B)):-!,meta_interp(CE,A)->meta_interp(CE,B).
+meta_interp(CE,(A->B;C)):-!,(meta_interp(CE,A)->meta_interp(CE,B);meta_interp(CE,C)).
+meta_interp(CE,(A,!)):-!,meta_interp(CE,A),!.
+meta_interp(CE,(A,B)):-!,meta_interp(CE,A),meta_interp(CE,B).
+meta_interp(CE,[A]):-!,meta_interp(CE,A).
+meta_interp(CE,[A|B]):-!,meta_interp(CE,A),meta_interp(CE,B).
+%meta_interp(_CE,!):- !, cut_block(!).
+meta_interp(CE,_:A):- !, call(CE,meta_call(A)).
+meta_interp(CE,_:A):-!, meta_interp(CE,A).
+meta_interp(CE,A):- call(CE,meta_call(A)).
+
+
+call_expanded(X):-with_assertions(hga_wrapper(dbase_t,holds_t,dbase_t),call_expanded_s(X)).
+call_expanded_for(quf,X):-with_assertions(hga_wrapper(dbase_t,holds_t,dbase_t),call_expanded_s(X)).
+call_expanded_for(call,X):-with_assertions(hga_wrapper(dbase_t,holds_t,dbase_t),call_expanded_s(X)).
+
+call_expanded_for(req,X):-with_assertions(hga_wrapper(dbase_t,cholds_t,dbase_t),call_expanded_s(X)).
+
+
+:- meta_predicate call_expanded(+).
+
+call_expanded_s(X):- var(X),!, throw(var(call_expanded(X))).
+call_expanded_s(meta_callable(_Goal,_Result)):-!,fail.
+call_expanded_s(meta_call(X)):- !,call_expanded0(X).
+call_expanded_s(Goal):- meta_interp(call_expanded,Goal).
+
+call_expanded0(_:PreGoal):-!, call_expanded_s(PreGoal).
+call_expanded0(meta_callable(_Goal,_Result)):-!,fail.
+call_expanded0(Goal):- get_mpred_prop(Goal,ask_module(Module)),!,dtrace,Module:call(Goal).
+call_expanded0(Goal):- prolog_callable(Goal),!,Goal.
+call_expanded0(PreGoal):- force_expand(expand_goal(PreGoal,Goal)),PreGoal\=Goal,prolog_callable(Goal),!,Goal.
+call_expanded0(PreGoal):- force_expand(expand_term(PreGoal,Goal)),PreGoal\=Goal,prolog_callable(Goal),!,Goal.
+call_expanded0(PreGoal):- hilog_functor(HILOG),PreGoal=..[P|LIST], P \= HILOG,!,safe_univ(Goal,[HILOG,P|LIST]),!,Goal.
+call_expanded0(Goal):- dtrace, dmsg(todo(failure(Goal))),!,dumpST,grtrace,req(Goal).
+%call_expanded0(Goal):- meta_interp(call_expanded,Goal).
 
 
 
@@ -1467,7 +1555,6 @@ call_no_cuts(_,C):- call_expanded(C).
 
 
 :- meta_predicate compare_op(*,2,?,?).
-:- meta_predicate call_expanded(^).
 
 :- meta_predicate call_tabled0(?,?,?,?).
 :- meta_predicate call_tabled(?).
@@ -1535,13 +1622,14 @@ gload:- load_game(logicmoo('rooms/startrek.all.pl')).
 % savedb:- !.
 savedb:- 
  catch((   
-   make_directory('/tmp/lm/'),
+   ignore(catch(make_directory('/tmp/lm/'),_,true)),
    tell('/tmp/lm/savedb'),make_db_listing,told),E,dmsg(savedb(E))).
 
 make_db_listing:-
  % moo:dbase_mod(DBM),
- listing(dbase_t),
- listing(dbase_f),
+%   listing(dbase_t),
+ %  listing(dbase_f),
+   listing(dbase:_),
  listing(moo:_),
  listing(dyn:_).
 

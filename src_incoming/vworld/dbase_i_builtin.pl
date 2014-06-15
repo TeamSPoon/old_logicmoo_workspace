@@ -224,8 +224,6 @@ dyn:subft(dice,int).
 
 dyn:formattype(FormatType):-dyn:subclass(FormatType,formattype).
 
-moo:type_default_props(self,food,[height(0)]).
-
 moo:term_specifier_text(Text,pred):- get_mpred_prop(_,arity(Text,_)).
 
 % single valued
@@ -247,7 +245,6 @@ dyn:singleValued(chargeRemaining(chargable,int)).
 dyn:singleValued(damage(agent,int)).
 dyn:singleValued(defence(agent,int)).
 dyn:singleValued(facing(agent,dir)).
-dyn:singleValued(height(agent,int)).
 dyn:singleValued(inRegion(term,region)).
 dyn:singleValued(last_command(agent,command)).
 dyn:singleValued(location_center(region,xyz(region,int,int,int))).
@@ -267,6 +264,9 @@ dyn:singleValued(type_grid(regiontype,int,list(term))).
 dyn:singleValued(weight(object,int)).
 
 dyn:multiValued(comment(term,string)).
+
+dyn:singleValued(height(agent,int)).
+moo:type_default_props(self,food,[height(0)]).
 
 :- must((argIsa_call_0(comment,2,W), W\=term)).
 

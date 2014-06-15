@@ -13,7 +13,13 @@
 
 :-export(within_user/1).
 
-within_user(Call):- context_module(CM),setup_call_cleanup(true,(module(user),'@'(Call,'user')),module(CM)).
+:- export(is_startup_file/1).
+
+is_startup_file(Name):- current_prolog_flag(os_argv,ArgV),member(Named,ArgV),atom_concat(Name,_,Named),!.
+
+
+within_user(Call):- '@'(Call,'user').
+
 % ======================================================
 % Configure the logicmoo utilities into the file path
 % :- include('logicmoo_util/logicmoo_util_header').
@@ -52,21 +58,21 @@ startup_mod:if_version_greater(V,Goal):- current_prolog_flag(version,F), ((F > V
 % [Optionaly 1st run] tell where ClioPatria is located and restart for the 2nd run
 %:- set_setting(cliopatria_binding:path, '/devel/ClioPatria'), save_settings('moo_settings.db').
 
-% [Optionaly] load and start sparql server
-% if we don't start cliopatria we have to manually start
-%
-% :- use_module('t:/devel/cliopatria/rdfql/sparql_runtime.pl').
 
-hard_work:- within_user(ensure_loaded(logicmoo(launchcliopatria))).
+% We don't start cliopatria we here. We have to manually start
+%  with  ?- start_servers.
+hard_work:- 
+   ensure_loaded(logicmoo(launchcliopatria)),
+   % use_module('t:/devel/cliopatria/rdfql/sparql_runtime.pl'),
+   ensure_loaded(logicmoo(testwebconsole)),
+   !.
+
 slow_work:- with_assertions(moo:prevent_transform_moo_preds,within_user(hard_work)),retractall(prevent_transform_moo_preds).
 thread_work:- thread_property(X, status(running)),X=loading_code,!.
 thread_work:- thread_create(slow_work,_,[alias(loading_code)]).
+
 start_servers :- startup_mod:if_version_greater(70111,thread_work).
 
-% startup_mod:start_servers
-% this is evil. Starts the old mudconsole, the experiment with Jan's
-% webconsole. We're not using that
-% :- startup_mod:if_version_greater(70109,http_mud_server).
 
 % [Required] load and start mud
 :- within_user(ensure_loaded(logicmoo(vworld/moo_startup))).

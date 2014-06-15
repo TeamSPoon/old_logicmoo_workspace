@@ -58,8 +58,11 @@ lastMember(E,[H|List]):-lastMember(E,List);E=H.
 
 bad_functor(L) :- arg(_,v('|','.',[],':','/'),L).
 
-warn_bad_functor(L):-ignore((notrace(bad_functor(L)),!,trace_or_throw(bad_functor(L)))).
+warn_bad_functor(L):-ignore((notrace(bad_functor(L)),!,dumpST,dtrace,trace_or_throw(bad_functor(L)))).
 
+safe_univ(M:Call,[N:L|List]):- nonvar(M),nonvar(N),!,safe_univ(Call,[L|List]).
+safe_univ(Call,[M:L|List]):- nonvar(M),!,safe_univ(Call,[L|List]).
+safe_univ(M:Call,[L|List]):- nonvar(M),!,safe_univ(Call,[L|List]).
 safe_univ(Call,[L|List]):- not(is_list(Call)),Call =..[L|List],!,warn_bad_functor(L).
 safe_univ([L|List],[L|List]):- var(List),atomic(Call),!,grtrace,Call =.. [L|List],warn_bad_functor(L).
 safe_univ(Call,[L|List]):- catch(Call =.. [L|List],E,(format('~q~n',[E=safe_univ(Call,List)]))),warn_bad_functor(L).
@@ -158,8 +161,10 @@ make_list(E,1,[E]):-!.
 make_list(E,N,[E|List]):- M1 is N - 1, make_list(E,M1,List),!.
 
 :- meta_predicate get_module_of_4(0,+,+,-).
+get_module_of_4(_P,F,A,ModuleName):- current_module(ModuleName),module_property(ModuleName, exports(List)),member(F/A,List),!.
 get_module_of_4(_P,F,A,M):- current_predicate(M0:F0/A0),F0=F,A0=A,!,M=M0.
 get_module_of_4(P,F,A,M):-throw((get_module_of_4(P,F,A,M))).
+
 /*
 get_module_of_4(_P,F,A,M):- current_predicate(F0/A0),F0=F,A0=A,!,moo:dbase_mod(M).
 get_module_of_4(_P,F,A,_M):-trace, dbase:isCycPredArity(F,A),!,fail.

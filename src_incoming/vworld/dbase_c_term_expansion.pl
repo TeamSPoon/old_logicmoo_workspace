@@ -33,23 +33,24 @@ set_list_len(List,A,NewList):-length(List,LL),A=LL,!,NewList=List.
 set_list_len(List,A,NewList):-length(List,LL),A>LL,length(NewList,A),append(List,_,NewList),!.
 set_list_len(List,A,NewList):-length(NewList,A),append(NewList,_,List),!.
 
-if_mud_asserted(F,A2,_):-is_mpred_prolog(F,A2),!,fail.
-if_mud_asserted(F,A2,A):-use_holds_db(F,A2,A).
+if_mud_asserted(F,A2,_,_Why):-is_mpred_prolog(F,A2),!,fail.
+if_mud_asserted(F,A2,A,Why):-using_holds_db(F,A2,A,Why).
 
-if_use_holds_db(F,A2,_):- is_mpred_prolog(F,A2),!,fail.
-if_use_holds_db(F,A,_):-  never_use_holds_db(F,A,_Why),!,fail.
-if_use_holds_db(F,A2,A):- use_holds_db(F,A2,A),!.
-if_use_holds_db(F,A,_):- integer(A),findall(n(File,Line),source_location(File,Line),SL),ignore(inside_clause_expansion(CE)),asserta(never_use_holds_db(F,A,discoveredInCode(F,A,SL,CE))),!,fail.
+if_use_holds_db(F,A2,_,_):- is_mpred_prolog(F,A2),!,fail.
+if_use_holds_db(F,A,_,_):-  never_use_holds_db(F,A,_Why),!,fail.
+if_use_holds_db(F,A2,A,Why):- using_holds_db(F,A2,A,Why),!.
+if_use_holds_db(F,A,_,_):- integer(A),findall(n(File,Line),source_location(File,Line),SL),ignore(inside_clause_expansion(CE)),asserta(moo:never_use_holds_db_file(F,A,discoveredInCode(F,A,SL,CE))),!,fail.
 
-use_holds_db(F,A,_):- never_use_holds_db(F,A,_),!,fail.
-use_holds_db(F,A2,A):- integer(A2), A is A2-2, A>0, isCycPredArity_Check(F,A),!.
-use_holds_db(F,A,A):- integer(A),is_type(F),!.
-use_holds_db(F,A,A):- isCycPredArity_Check(F,A).
+using_holds_db(F,A,_,_):- never_use_holds_db(F,A,_),!,fail.
+using_holds_db(F,A2,A,m2(F,A2,isCycPredArity_Check)):- integer(A2), A is A2-2, A>0, isCycPredArity_Check(F,A),!.
+using_holds_db(F,A,A,is_type(F/A)):- integer(A), is_type(F),!, must(A>0).
+using_holds_db(F,A,A,isCycPredArity_Check):- isCycPredArity_Check(F,A).
+using_holds_db(F,A,A,W):-!,fail,trace_or_throw(wont(using_holds_db(F,A,A,W))).
 
-ensure_moo_pred(F,A,A):- is_mpred_prolog(F,A),!.
-ensure_moo_pred(F,A,_):- never_use_holds_db(F,A,Why),!,throw(never_use_holds_db(F,A,Why)).
-ensure_moo_pred(F,A,NewA):- use_holds_db(F,A,NewA),!.
-ensure_moo_pred(F,A,A):- dmsg(once(decl_mpred(F,A))),moo:decl_mpred(F,A).
+ensure_moo_pred(F,A,A,is_mpred_prolog):- is_mpred_prolog(F,A),!.
+ensure_moo_pred(F,A,_,_):- never_use_holds_db(F,A,Why),!,throw(never_use_holds_db(F,A,Why)).
+ensure_moo_pred(F,A,NewA,Why):- using_holds_db(F,A,NewA,Why),!.
+ensure_moo_pred(F,A,A,Why):- dmsg(once(ensure(Why):decl_mpred(F,A))),moo:decl_mpred(F,A).
 
 is_kb_module(Moo):-atom(Moo),member(Moo,[add,dyn,kb,opencyc]).
 is_kb_mt_module(Moo):-atom(Moo),member(Moo,[moomt,kbmt,mt]).
@@ -57,17 +58,35 @@ is_kb_mt_module(Moo):-atom(Moo),member(Moo,[moomt,kbmt,mt]).
 prepend_module(_:C,M,M:C):-!.
 prepend_module(C,M,M:C).
 
+negate_wrapper(nil,_):-!,fail.
+negate_wrapper(holds_t,holds_f).
+negate_wrapper(dbase_t,dbase_f).
+negate_wrapper(asserted_dbase_t,asserted_dbase_f).
+negate_wrapper(Dbase_t,Dbase_f):-atom_concat(Dbase,'_t',Dbase_t),atom_concat(Dbase,'_f',Dbase_f).
+
+:-thread_local hga_wrapper/3.
+hga_wrapper(dbase_t,holds_t,dbase_t).
+
+get_goal_wrappers(if_use_holds_db, Holds_t , N):- hga_wrapper(_,Holds_t,_),!,negate_wrapper(Holds_t,N),!.
+get_goal_wrappers(if_use_holds_db, holds_t , holds_f).
+
+get_head_wrappers(if_mud_asserted, Holds_t , N):- hga_wrapper(Holds_t,_,_),!,negate_wrapper(Holds_t,N),!.
+get_head_wrappers(if_mud_asserted, dbase_t , dbase_f).
+
+get_asserted_wrappers(if_mud_asserted, Holds_t , N):-  hga_wrapper(_,_,Holds_t),!,negate_wrapper(Holds_t,N),!.
+get_asserted_wrappers(if_mud_asserted, dbase_t , dbase_t).
+
 try_mud_body_expansion(G0,G2):- ((mud_goal_expansion_0(G0,G1),!,expanded_different(G0, G1),!,moo:dbase_mod(DBASE))),prepend_module(G1,DBASE,G2).
-mud_goal_expansion_0(G1,G2):- ((mud_pred_expansion(if_use_holds_db, holds_t - holds_f,G1,G2))).
+mud_goal_expansion_0(G1,G2):- ((get_goal_wrappers(If_use_holds_db, Holds_t , Holds_f),!,Holds_t\=nil ,  mud_pred_expansion(If_use_holds_db, Holds_t - Holds_f,G1,G2))).
 
 try_mud_head_expansion(G0,G2):- ((mud_head_expansion_0(G0,G1),!,expanded_different(G0, G1),!,moo:dbase_mod(DBASE))),prepend_module(G1,DBASE,G2).
-mud_head_expansion_0(G1,G2):- ((mud_pred_expansion(if_mud_asserted, dbase_t - dbase_f,G1,G2))),!.
+mud_head_expansion_0(G1,G2):- ((get_head_wrappers(If_mud_asserted, Dbase_t , Dbase_f),!,Dbase_t\=nil, mud_pred_expansion(If_mud_asserted, Dbase_t - Dbase_f,G1,G2))),!.
 
 try_mud_asserted_expansion(G0,G2):-  is_compiling_sourcecode, 
    mud_asserted_expansion_0(G0,G1),!,
    expanded_different(G0, G1),
    while_capturing_changes(add_from_file(G1,G2),Changes),!,ignore((Changes\==[],dmsg(add(todo(Changes-G2))))).
-mud_asserted_expansion_0(G1,G2):- ((mud_pred_expansion(if_mud_asserted, asserted_dbase_t - asserted_dbase_f,G1,G2))),!.
+mud_asserted_expansion_0(G1,G2):- ((get_asserted_wrappers(If_mud_asserted, Asserted_dbase_t , Asserted_dbase_f),!,Asserted_dbase_t\=nil,mud_pred_expansion(If_mud_asserted, Asserted_dbase_t - Asserted_dbase_f,G1,G2))),!.
 
 is_compiling_sourcecode:- current_input(X),not((stream_property(X,file_no(0)))),prolog_load_context(source,F),not((moo:loading_game_file(_))),F=user.
 is_compiling_sourcecode:-!.
@@ -143,13 +162,13 @@ univ_left0(M,M:Comp,List):- Comp=..List,!.
 
 holds_form(G1,HOLDS,G2):-
       functor_safe(G1,F,A),
-      ensure_moo_pred(F,A,NewA),!,            
+      ensure_moo_pred(F,A,NewA,_),!,            
       G1=..[F|List], set_list_len(List,NewA,NewList), 
       univ_left(G2,[HOLDS,F|NewList]),!.
 
 xcall_form(G1,G2):- nonvar(G1),
       functor_safe(G1,F,A),
-      ensure_moo_pred(F,A,NewA),
+      ensure_moo_pred(F,A,NewA,_),
       G1=..[F|List], set_list_len(List,NewA,NewList), 
       univ_left(G2,[F|NewList]),!.
 xcall_form(G1,G1).
@@ -164,6 +183,7 @@ mud_pred_expansion(_Prd,_HNH,_:_/_,_):-!,fail.
 mud_pred_expansion(_Prd,_HNH,G1,G2):- functor_safe(G1,F,_),xcall_t==F,!,G2 = (G1),!.
 mud_pred_expansion(Pred,NHOLDS - HOLDS, not(G1) ,G2):-!,mud_pred_expansion(Pred,HOLDS - NHOLDS,G1,G2).
 mud_pred_expansion(Pred,NHOLDS - HOLDS, \+(G1) ,G2):-!,mud_pred_expansion(Pred,HOLDS - NHOLDS,G1,G2).
+mud_pred_expansion(Prd,HNH,_:M:G1,G2):- !,mud_pred_expansion(Prd,HNH,M:G1,G2).
 
 mud_pred_expansion(Pred, HNH, G0 ,G2):-
  functor_safe(G0,F,1),G1=..[F,MP],
@@ -177,7 +197,7 @@ mud_pred_expansion(Pred, HNH, G0 ,G2):-
 mud_pred_expansion(Pred,HNH, Moo:G0,G3):- nonvar(Moo),is_kb_module(Moo),
    xcall_form(G0,G1),
    functor_safe(G1,F,A),
-   ensure_moo_pred(F,A,_),
+   ensure_moo_pred(F,A,_,_Why),
    mud_pred_expansion_0(Pred,HNH,G1,G2),!,G2=G3.
 
 mud_pred_expansion(Pred,HNH, Moo:G1,G3):-  nonvar(Moo),!, mud_pred_expansion_0(Pred,HNH,Moo:G1,G2),!,G2=G3.
@@ -197,7 +217,7 @@ mud_pred_expansion_2(Pred,F,A,HNH,ArgList,G2):-member(F,[':','.']),!,throw(mud_p
 mud_pred_expansion_2(Pred,F,_,HNH,ArgList,G2):- is_holds_true(F),holds_form_l(Pred,ArgList,HNH,G2).
 mud_pred_expansion_2(Pred,F,_,HOLDS - NHOLDS,ArgList,G2):- is_holds_false(F),holds_form_l(Pred,ArgList,NHOLDS - HOLDS,G2).
 % mud_pred_expansion_2(Pred,F,A,HNH,ArgList,G2):-is_2nd_order_holds(F),!,throw(mud_pred_expansion_2(Pred,F,A,HNH,ArgList,G2)).
-mud_pred_expansion_2(Pred,F,A,HNH,ArgList,G2):- call(Pred,F,A,_),holds_form_l(Pred,[F|ArgList],HNH,G2).
+mud_pred_expansion_2(Pred,F,A,HNH,ArgList,G2):- call(Pred,F,A,_,_),holds_form_l(Pred,[F|ArgList],HNH,G2).
 
 holds_form_l(Pred,[G1],HNH,G2):-
    compound(G1),not(is_list(G1)),!,

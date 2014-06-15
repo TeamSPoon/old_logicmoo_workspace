@@ -11,9 +11,12 @@
 
 :- module(moo,
         [ coerce/3,     
+        dbIsas/2,
           op(1150,fx,((decl_mpred))),          
           op(1150,fx,((decl_not_mpred))),       
           (decl_not_mpred)/1,
+          is_holds_true_not_hilog/1,
+          hilog_functor/1,
           (decl_not_mpred/2),
           add_mpred_prop/2,
            not_loading_game_file/0,
@@ -70,7 +73,7 @@
 
 % :- once(context_module(user);(trace,context_module(CM),writeq(context_module(CM)))).
 
-:-dynamic(dbase_mod/1).
+:- dynamic_multifile_exported dbase_mod/1.
 dbase_mod(dbase).
 
 :- dynamic mpred_arity/2, mpred_prop/3.
@@ -122,7 +125,7 @@ not_loading_game_file:-not(loading_game_file(_)),loaded_game_file(_).
 
 is_holds_true(Prop):- notrace((atom(Prop),is_holds_true0(Prop))),!.
 
-is_holds_true0(Prop):-arg(_,p(k,p,holds,holds_t,dbase_t,asserted_dbase_t,assertion_t,assertion),Prop).
+is_holds_true0(Prop):-arg(_,p(cholds_t, k,p,holds,holds_t,dbase_t,asserted_dbase_t,assertion_t,assertion),Prop).
 
 is_2nd_order_holds(Prop):- is_holds_true(Prop) ; is_holds_false(Prop).
 
@@ -232,12 +235,14 @@ fix_fa(_:FA0,F,A):-!,fix_fa(FA0,F,A),!.
 fix_fa(F,F,A):-atom(F),moo:mpred_arity(F,A).
 fix_fa(F/A,F,A):- moo:mpred_arity(F,A).
 fix_fa(F/A,F,A):- number(A),!.
-fix_fa(FA,F,A):- compound(FA),functor(FA,F,_),moo:mpred_arity(F,A),!.
-fix_fa(FA,F,A):- compound(FA),functor(FA,F,A),!.
+fix_fa(FA/_,F,A):-!,fix_fa(FA,F,A).
+fix_fa(FA,F,A):- compound(FA),functor(FA,F,A), ( (moo:mpred_arity(F,AA), AA=A) -> true  ; arg(_,vv(A,AA),A) ).
 fix_fa(FA,F,A):- moo:mpred_arity(F,A),functor(FA,F,A).
+fix_fa(FA,F,A):- atom(FA),!,FA=F, ( (moo:mpred_arity(F,AA), AA=A) -> true  ; arg(_,vv(A,AA),A) ).
+fix_fa(FA,F,A):-get_functor(FA,FA2),!,fix_fa(FA2,F,A).
 
-get_mpred_prop(F,A,Prop):- fix_fa(FA,F,A), mpred_prop_plus_assserted(F,A,Prop).
-get_mpred_prop(FA,Prop):- fix_fa(FA,F,A),mpred_prop_plus_assserted(F,A,Prop).
+get_mpred_prop(FA,A,Prop):- fix_fa(FA,F,A), mpred_prop_plus_assserted(F,A,Prop).
+get_mpred_prop(FA,Prop):- fix_fa(FA/_,F,A),mpred_prop_plus_assserted(F,A,Prop).
 
 add_mpred_prop(_,Var):- var(Var),!.
 add_mpred_prop(_,[]):- !.
@@ -299,15 +304,13 @@ decl_not_mpred((A,L)):-!,decl_not_mpred(A),decl_not_mpred(L).
 decl_not_mpred(M):-compound(M),functor_safe(M,F,A),decl_not_mpred(F,A).
 decl_not_mpred(M):-throw(failed(decl_not_mpred(M))).
 
+:-dynamic_multifile_exported never_use_holds_db_file/3,can_use_holds_db_file/3.
+
 decl_not_mpred(F,A):-
-   asserta_new(never_use_holds_db(F,A,decl_not_mpred(F,A))),   
+   asserta_new(never_use_holds_db_file(F,A,decl_not_mpred(F,A))),   
    dynamic_multifile_exported(F,A),
    add_mpred_prop(F/A,[ask_module(moo),assert_with_pred(hooked_asserta)]).
 
-:-dynamic(dbase_module_loaded/0).
-dbase_module_loaded:- 
-   %module_property(dbase,exports(List)),member(add/1,List),
-   predicate_property(dbase:add(_),_),!,asserta((dbase_module_loaded:-!)).
 
 call_after(When,C):- When,!,do_all_of(When),once(must(C)).
 call_after(When,C):- assert_if_new(will_call_after(When,C)).
@@ -338,7 +341,7 @@ decl_mpred0(Term,Mt):- !,
    get_functor(Term,Pred,Arity),
    decl_mpred(Mt,Pred,Arity).
 
-
+                                               
 decl_mpred(A,B,C):-loop_check(decl_mpred0(A,B,C),dmsg(todo(loop_check(decl_mpred0(A,B,C))))),!.
 
 decl_mpred0(Mt,Pred,Arity):-decl_mpred_now(Mt,Pred,Arity).
@@ -361,19 +364,28 @@ checkCycPreds.
 
 moo:mpred_arity(P,A):-isRegisteredCycPred(_,P,A).
 
-:-dynamic(never_use_holds_db/3).
 
+moo:can_use_holds_db_file(F,A,hilog_pred(F)):- hilog_functor(F),!,between(2,8,A).
+
+never_use_holds_db(F,A,mt(Mt)):- isRegisteredCycPred(Mt,F,A),!,fail.
+never_use_holds_db(F,A,W):-moo:never_use_holds_db_file(F,A,W),!.
+never_use_holds_db(F,A,W):-moo:can_use_holds_db_file(F,A,W),!,fail.
 never_use_holds_db(agent_call_command,2,coded(agent_call_command,2)).
+never_use_holds_db('-->',_,oper('-->')):-!.
 never_use_holds_db(':-',1,oper(':-')):-!.
 never_use_holds_db(op,_,oper(op)):-!.
 never_use_holds_db(decl_mpred,_,oper(decl_mpred)):-!.
 
-never_use_holds_db(Builtin,Int,pp(Builtin/Int,G,PP)):-integer(Int), functor(G,Builtin,Int),member(PP,[imported_from(system),foreign,built_in]),predicate_property(G,PP),!.
-never_use_holds_db(F,_,is_2nd_order_holds):- is_2nd_order_holds(F),!.
+never_use_holds_db(F,A,pp(F/A,G,PP)):-integer(A), functor(G,F,A),member(PP,[built_in,imported_from(system),foreign]),predicate_property(G,PP),!,asserta(never_use_holds_db_file(F,A,PP)).
+never_use_holds_db(F,A,is_2nd_order_holds(F)):- is_2nd_order_holds(F),!,asserta(moo:never_use_holds_db_file(F,A,is_2nd_order_holds(F,A))).
+never_use_holds_db(F,A,symbol(F/A)):-atom_chars(F,[C|_]),not(char_type(C,alpha)),!,
+   asserta(moo:never_use_holds_db_file(F,A,symbol(F/A))).   
+never_use_holds_db(F,A,_):-asserta(moo:can_use_holds_db_file(F,A,canUse(F/A))),!,fail.
 
 checkCycPred(:,2):-!,trace, dumpST, throw(checkCycPred(:,2)).
 checkCycPred(F,A):-never_use_holds_db(F,A,Why),throw(never_use_holds_db(F,A,Why)).
 checkCycPred(F,A):-copy_term(checkCycPred(F,A),CALL),catch(checkCycPred0(F,A),E,dmsg(E=CALL)).
+checkCycPred0(_,_):-!.
 checkCycPred0(F,A):-functor(P,F,A),compile_predicates([F/A]),get_module_of(P,_M).
 
 
@@ -391,13 +403,34 @@ coerce(What,Type,NewThing):- decl_coerce(What,Type,NewThing),!.
 coerce(What,_Type,NewThing):-NewThing = What.
 
 
+:-dynamic(dbase_module_loaded/0).
+dbase_module_loaded:- 
+   %module_property(dbase,exports(List)),member(add/1,List),
+   predicate_property(dbase:add(_),_),!,asserta((dbase_module_loaded:-!)).
+
+btp:- call((context_module(Ctx),(( may_moo_term_expand(Ctx) -> true; asserta(may_moo_term_expand(Ctx)), hdr_debug('% moo_header: ~q.~n',[may_moo_term_expand(Ctx)]))))).
+btp:- do_term_expansions -> true; (context_module(Ctx),begin_transform_moo_preds,hdr_debug('% moo_header: begin_transform_moo_preds in ~q.~n',[Ctx])).
+
 :- include(logicmoo(vworld/moo_header)).
 
+hilog_functor(dbase:cholds_t).
+
+is_holds_true_not_hilog(HOLDS):-is_holds_true(HOLDS),\+ hilog_functor(HOLDS).
+
+dbIsas(I,C):- dbase:dbase_t(isa,II,C),same_pred(I,II).
+dbIsas(I,C):- dbase:dbase_t(C,II),same_pred(I,II).
+
+same_pred(I,II):-I=II,!.
+same_pred(I,II):- get_functor(I,F),must(F\=':'),get_functor(II,F),!.
+
+:-listing(dbIsas/2).
+
+argsIsaProps(Prop):- arg(_,v(argsIsa,multiValued,singleValued,negationByFailure,formatted,mpred,listValued),Prop).
+
 mpred_prop_plus_assserted(F,A,Prop):- mpred_prop(F,A,Prop).
-mpred_prop_plus_assserted(F,A,argsIsa(Templ)):- moo:mpred_arity(F,A),functor(Templ,F,A),arg(_,v(argsIsa,multiValued,singleValued,negationByFailure,formatted,mpred,listValued),Prop),
-   dbase:dbase_t(Prop,Templ).
-mpred_prop_plus_assserted(F,A,Prop):-arg(_,v(argsIsa,multiValued,singleValued,negationByFailure,formatted,mpred,listValued),Prop),dbase:dbase_t(Prop,Templ),functor(Templ,F,_).
-mpred_prop_plus_assserted(F,A,Prop):-dbase:dbase_t(isa,F,Prop).
+mpred_prop_plus_assserted(F,A,argsIsa(Templ)):-moo:mpred_arity(F,A),functor(Templ,F,A),argsIsaProps(Prop),dbIsas(Templ,Prop),functor(Templ,F,_).
+mpred_prop_plus_assserted(F,_A,Prop):-argsIsaProps(Prop),dbIsas(Templ,Prop),functor(Templ,F,_).
+mpred_prop_plus_assserted(F,_A,Prop):-dbIsas(F,Prop).
 
 
 define_type(Var):-var(Var),!,trace_or_throw(define_type(Var)).

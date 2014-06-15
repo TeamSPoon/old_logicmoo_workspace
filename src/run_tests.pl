@@ -2,24 +2,6 @@
 
 :-include(run_common).
 
-% [Optionally] load and start sparql server
-%:- at_start(start_servers)
-
-% [Optionaly] re-define load_default_game
-% load_default_game:- load_game(logicmoo('rooms/startrek.all.pl')).
-
-% [Manditory] This loads the game and intializes
-:- at_start(run_setup).
-
-% tests to see if we have: "player1"
-:-must_det((foc_current_player(Agent),dmsg(foc_current_player(Agent)))).
-
-% tests to see if we have: "atloc"
-:-foc_current_player(Agent),must_det((atloc(Agent,Where))),dmsg(atloc(Agent,Where)).
-
-% tests to see if we have: "inRegion"
-:-foc_current_player(Agent),must_det((inRegion(Agent,Where))),dmsg(inRegion(Agent,Where)).
-
 % define tests locally
 moo:mud_test(drop_take,
  (
@@ -47,21 +29,53 @@ moo:mud_test(test_movedist,
    test_true(req(inRegion(P,'Area1000'))))).
 
 
-:- at_start((debug,must_det(run_mud_tests))).
+% Was this our startup file?
+was_runs_tests_pl:-is_startup_file('run_tests.pl').
 
+% [Optionally] load and start sparql server
+%:- at_start(start_servers)
 
-svTest :- must((
-   trace,add(movedist(explorer(player1),4))
+% [Optionaly] Add some game content
+:- if_flag_true(was_runs_tests_pl, add_game_content(logicmoo('rooms/startrek.all.pl'))).
+
+defined_local_test:-
+   test_name("tests to see if we have: player1"),
+   test_true(must_det((foc_current_player(Agent),dmsg(foc_current_player(Agent))))).
+
+defined_local_test:-
+   test_name("tests to see if we have: atloc"),
+   test_true((foc_current_player(Agent),must_det((atloc(Agent,Where)),dmsg(atloc(Agent,Where))))).
+
+defined_local_test:- 
+   test_name("tests to see if we have: singleValued on movedist"),
+   must((
+   add(movedist(explorer(player1),3))
    ,
    findall(X,movedist(explorer(player1),X),L),length(L,1))).
 
-:-moo_hide_childs(dbase:record_on_thread/2).
+defined_local_test_failing:-
+   test_name("tests to see if we have: inRegion"),
+   test_true((foc_current_player(Agent),must_det((inRegion(Agent,Where))),dmsg(inRegion(Agent,Where)))).
+
+moo:mud_test("local sanity tests", doall(defined_local_test)).
+
+:- moo_hide_childs(dbase:record_on_thread/2).
+
+% [Manditory] This loads the game and initializes so test can be ran
+:- if_flag_true(was_runs_tests_pl, at_start(run_setup)).
+
+% the real tests now (once)
+now_run_local_tests:- doall(defined_local_test).
+:- if_flag_true(was_runs_tests_pl,at_start(must_det(run_mud_tests))).
+
+% the local tests each reload (once)
+:- if_flag_true(was_runs_tests_pl, now_run_local_tests).
 
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
-% :- at_start(run).
+:- if_flag_true(was_runs_tests_pl, at_start(run)).
 
 % So scripted versions don't just exit
-% :- at_start(prolog).
+:- if_flag_true(was_runs_tests_pl,at_start(prolog)).
 
 
 

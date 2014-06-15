@@ -47,7 +47,7 @@
      nop/1,
      module_predicate/3,
      to_m_f_arity_pi/5,
-     test_call/1,
+     % test_call/1,
      printAll/1,
      dynamic_load_pl/1,
      term_to_message_string/2,
@@ -64,6 +64,7 @@
      flush_output_safe/1,
 
      loop_check/2,
+     loop_check_term/3,
          loop_check_throw/1,
          loop_check_fail/1,
 
@@ -185,7 +186,7 @@ set_bugger_flag(F,V):-create_prolog_flag(F,V,[term]).
 :- meta_predicate tryCatchIgnore(^).
 :- meta_predicate logOnError0(^).
 :- meta_predicate failOnError(^).
-:- meta_predicate test_call(^).
+% :- meta_predicate test_call(^).
 :- meta_predicate cmust(^).
 %:- meta_predicate debugCall(^).
 :- meta_predicate prolog_ecall(*,1,?).
@@ -226,8 +227,11 @@ user_use_module(What):- '@'(use_module(What),'user').
 :- module_transparent(loop_check_fail/1).
 :- module_transparent(loop_check_throw/1).
 :- module_transparent(loop_check/2).
-:- meta_predicate((loop_check_throw(0))).
-:- meta_predicate((loop_check(0,0))).
+:- module_transparent(loop_check_term/3).
+:- meta_predicate((loop_check_term(^,+,^))).
+:- meta_predicate((loop_check_throw(^))).
+:- meta_predicate((loop_check_fail(^))).
+:- meta_predicate((loop_check(^,^))).
 
 
 loop_check_throw(B):- loop_check(B,((retractall(inside_loop_check(B)),debugCallWhy(loop_check_throw(B),loop_check_throw(B))))).
@@ -236,6 +240,7 @@ loop_check_fail(B):- loop_check(B,(dmsg(once(loop_check_fail(B))),fail)).
 snumbervars(BC):-numbervars(BC,0,_,[singletons(true),attvar(skip)]).
 
 loop_check(B,TODO):- copy_term(B,BC),snumbervars(BC),!, loop_check(BC,B,TODO).
+loop_check_term(B,TERM,TODO):- copy_term(TERM,BC),snumbervars(BC),!, loop_check(BC,B,TODO).
 
 
 is_loop_checked(B):- copy_term(B,BC),snumbervars(BC),!,inside_loop_check(BC).
@@ -1106,7 +1111,7 @@ os_to_prolog_filename(OS,PL):-absolute_file_name(OS,OSP),OS \= OSP,!,os_to_prolo
 % =================================================================================
 % Utils
 % =================================================================================
-test_call(G):-writeln(G),ignore(once(catch(G,E,writeln(E)))).
+% test_call(G):-writeln(G),ignore(once(catch(G,E,writeln(E)))).
 
 nop(_).
 

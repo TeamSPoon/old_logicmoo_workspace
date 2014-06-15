@@ -24,11 +24,6 @@
    asserta(moo:loading_module_h(Ctx)),
     hdr_debug('% moo_header: ~q.~n',[loading_module_h(Ctx)]).
 
-:- call((context_module(Ctx),(( may_moo_term_expand(Ctx) -> true; asserta(may_moo_term_expand(Ctx)), hdr_debug('% moo_header: ~q.~n',[may_moo_term_expand(Ctx)]))))).
-
-:- do_term_expansions -> true; (context_module(Ctx),begin_transform_moo_preds,hdr_debug('% moo_header: begin_transform_moo_preds in ~q.~n',[Ctx])).
-
-
 
 :- moo:dbase_mod(DBASE), 
           DBASE:(dynamic((
@@ -161,6 +156,7 @@
           dbase_f/5,
           dbase_f/6,
           dbase_f/7))).
+
 
 end_of_file.
 

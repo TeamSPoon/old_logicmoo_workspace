@@ -67,6 +67,13 @@
 		</Folder>
 	</CustomFolders>
 	<Files AutoFolders="PackageView">
+		<Folder Name="src_modules/candc">
+			<F
+				N="src_modules/candc/*.pl"
+				Recurse="1"
+				Refilter="0"
+				Excludes=""/>
+		</Folder>
 		<Folder Name="src_modules/nl_system">
 			<F
 				N="src_modules/nl_system/*.*"

@@ -179,7 +179,7 @@ list_to_atomics_list0([],[]):-!.
 
 fully_expand(I,OOF):-copy_term(I,C),flatten([C],FC),fully_expand_0(FC,O),flatten([O],OF),fully_expand_0(OF,OOF).
 
-fully_expand_0(FC,O):-catch(fully_expand_1(FC,O),E,(trace,dmsg(exact_message(error(E,fully_expand_1(FC,O)))),fail)),!.
+fully_expand_0(FC,O):-catch(fully_expand_1(FC,O),E,(trace,dmsg(exact_message(error_m(E,fully_expand_1(FC,O)))),fail)),!.
 fully_expand_0(FC,O):-catch((trace,fully_expand_1(FC,O)),_,fail).
 
 fully_expand_1(Var,Var):-var(Var),!.

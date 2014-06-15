@@ -27,7 +27,8 @@ test_exists(O):-dyn:region(O).
 test_anyInst(O):-dyn:type(O).
 test_anyInst(O):-test_exists(O).
 
-:- listing(inventory:_).
+% helps for testings
+% :- listing(inventory:_).
 
 :- include(logicmoo(vworld/moo_footer)).
 

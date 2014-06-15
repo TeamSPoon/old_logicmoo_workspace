@@ -3,6 +3,8 @@
 
 */
 
+% Was this our startup file?
+was_run_dbg_pl:-is_startup_file('run_debug.pl').
 
 :- catch(guitracer,_,true).
 :- set_prolog_flag(verbose_load,true).
@@ -14,22 +16,31 @@
 % [Optionaly] re-define load_default_game
 % load_default_game:- load_game(logicmoo('rooms/startrek.all.pl')).
 
-% [Manditory] This loads the game and intializes
-:- at_start(run_setup).
+% :- include(logicmoo(candc/parser_boxer)).
+
+% :- at_start(prolog).
+
+% [Manditory] This loads the game and initializes so test can be ran
+:- if_flag_true(was_run_dbg_pl, at_start(run_setup)).
+
+% the real tests now (once)
+now_run_local_tests:- doall(defined_local_test).
+:- if_flag_true(was_run_dbg_pl,at_start(must_det(run_mud_tests))).
+
+% the local tests each reload (once)
+:- if_flag_true(was_run_dbg_pl, now_run_local_tests).
 
 % [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
 :- register_timer_thread(npc_ticker,30,npc_tick).
 
-% [Optionaly] load and start sparql server
-%:- at_start(start_servers).
-
 %:-repeat, trace, do_player_action('who'),fail.
 
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
-:- at_start((debug,must_det(run))).
+:- if_flag_true(was_run_dbg_pl, at_start(run)).
 
 % So scripted versions don't just exit
-:- at_start(prolog).
+:- if_flag_true(was_run_dbg_pl,at_start(prolog)).
+
 
 
 
