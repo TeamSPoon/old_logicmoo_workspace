@@ -780,7 +780,7 @@ holds_f(P,A1,A2,A3,A4,A5,A6):- isCycPredArity_ignoreable(P,6),which_f(DBS),(call
 holds_f(P,A1,A2,A3,A4,A5):- isCycPredArity_ignoreable(P,5),which_f(DBS),(call_f(DBS,P,A1,A2,A3,A4,A5);call_mt_f(DBS,P,A1,A2,A3,A4,A5,_,_)).
 holds_f(P,A1,A2,A3,A4):- isCycPredArity_ignoreable(P,4),which_f(DBS),(call_f(DBS,P,A1,A2,A3,A4);call_mt_f(DBS,P,A1,A2,A3,A4,_,_)).
 holds_f(P,A1,A2,A3):- isCycPredArity_ignoreable(P,3),which_f(DBS),(call_f(DBS,P,A1,A2,A3);call_mt_f(DBS,P,A1,A2,A3,_,_)).
-holds_f(P,A1,A2):- holds_relaxed_t(P,A1,A2).
+holds_f(P,A1,A2):- holds_relaxed_f(P,A1,A2).
 holds_f(P,A1):- isCycPredArity_ignoreable(P,1),which_f(DBS),(call_f(DBS,P,A1);call_mt_f(DBS,P,A1,_,_)).
 
 
@@ -1172,7 +1172,7 @@ db_op0(tell(OldV),(C1;C2)):- !,db_op(tell(OldV),C1),!,db_op(tell(OldV),C2),!.
 db_op0(ra,(C1;C2)):- !,must(db_op(ra,C1)),must(db_op(ra,C2)).
 db_op0(Op,(C1,C2)):- !,db_op(Op,C1),db_op(Op,C2).
 
-db_op0(ask(Must),props(Obj,Props)):- var(Props),!,findall(Prop,call_must(Must,dbase_t([P,Obj|REST]),Prop=..[P|REST]),Props).
+db_op0(ask(Must),props(Obj,Props)):- var(Props),!,findall(Prop,(call_must(Must,dbase_t([P,Obj|REST])),Prop=..[P|REST]),Props).
 db_op0(Op ,props(Obj,Open)):- var(Open),!,throw_safe(db_op(Op,props(Obj,Open))).
 db_op0(_Op,props(_Obj,[])):- !.
 db_op0(Op,props(Obj,[P])):- nonvar(P),!,db_op(Op,props(Obj,P)).
@@ -1292,7 +1292,7 @@ db_query_lc(Must,Term):- findall(a(Term),db_query_quf(Must,Term),List),list_to_s
 db_query_quf(Must,C):- db_quf(ask(Must),C,Pretest,Template),!,call_tabled(call_expanded_for(quf,Pretest)),call_must(Must,call_expanded_for(req,Template)).
 
 
-:- meta_predicate meta_interp(0,+).
+:- meta_predicate meta_interp(1,+).
 
 meta_interp_signal(meta_call(V)):-!,nonvar(V).
 meta_interp_signal(meta_callable(_,_)).

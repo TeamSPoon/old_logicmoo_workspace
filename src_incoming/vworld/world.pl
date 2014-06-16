@@ -74,7 +74,7 @@
 :- moo:register_module_type(utility).
 
 :- meta_predicate intersect_pred(+,+,+,+,?,-).
-:- meta_predicate cached(0).
+% :- meta_predicate cached(0).
 :- meta_predicate show_kb_via_pred_3(*,*,*,*,^,?).
 
 

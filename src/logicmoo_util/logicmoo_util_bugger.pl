@@ -190,7 +190,7 @@ set_bugger_flag(F,V):-create_prolog_flag(F,V,[term]).
 :- meta_predicate cmust(^).
 %:- meta_predicate debugCall(^).
 :- meta_predicate prolog_ecall(*,1,?).
-:- meta_predicate traceafter_call(^).
+%:- meta_predicate traceafter_call(^).
 :- meta_predicate if_prolog(*,^).
 :- meta_predicate must(^).
 :- meta_predicate must_det(^).

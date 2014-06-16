@@ -32,6 +32,8 @@ moo:mud_test(test_movedist,
 % Was this our startup file?
 was_runs_tests_pl:-is_startup_file('run_tests.pl').
 
+:- catch(noguitracer,_,true).
+
 % [Optionally] load and start sparql server
 %:- at_start(start_servers)
 

@@ -12,6 +12,12 @@
             to_word_list/2,
             equals_icase/2,
             string_ci/2,
+            replace_periods/2,
+            replace_periods_string_list/2,
+            to_list_of_sents/2,
+            convert_members/3,
+            replace_in_string/4,
+            replace_in_string/5,
             must_nonvar/1,
             non_empty/1,
             string_dedupe/2,
@@ -435,12 +441,66 @@ is_empty_string([]).
 is_empty_string('').
 is_empty_string("").
 
+
+% Meta-Interp that appends the arguments to the calls
+convert_members([], InOut,InOut).
+convert_members([A,!|B], In,Out):- !, convert_members(A,In,M),!,convert_members(B,M,Out).
+convert_members([A|B], In,Out):- !, convert_members(A,In,M),convert_members(B,M,Out).
+convert_members(once(Call), In,Out):- !, convert_members(Call, In,Out),!.
+convert_members(ht(Call), In,Out):- !, Call=..[P|MID],CallOut=..[P,In|MID],call(CallOut,Out).
+convert_members(ico(In,Call,Out), In,Out):-  Call=..[P|MID],CallOut=..[P,In|MID],call(CallOut,Out).
+convert_members(cio(In,Call,Out), In,Out):-  call(Call,In,Out).
+convert_members(ic(InOut,Call), InOut,InOut):-  call(Call).
+convert_members(call(Call), InOut,InOut):-  call(Call).
+convert_members(Call, In,Out):- call(Call,In,Out).
+
+replace_in_string(SepChars, PadChars,Repl, A,C):- split_string(A,SepChars,PadChars,B),atomics_to_string(B,Repl,C).
+
+replace_in_string(SepChars,Repl,A,C):- atomics_to_string(B,SepChars,A),atomics_to_string(B,Repl,C).
+
+replace_periods(A,S):-  
+ convert_members([    
+   %  white space
+    replace_in_string("\r"," "),
+    replace_in_string("\n"," "),
+    % replace_in_string("\s"," "),
+    replace_in_string("'"," apostraphyMARK "),
+    replace_in_string("\t"," "),
+    % only remove leading and trailing white space
+   % at(split_string("", "\s\t\n")),
+    % respace the spaces
+    replace_in_string(" ", " ", " "),
+    % add a space on the end
+    ht(string_concat(" ")),
+    replace_in_string("?"," ? "),
+    replace_in_string("!"," ! "),
+    replace_in_string("."," . "),
+    % replace periods
+   replace_in_string(". "," periodMARK ")
+   ],A,S).
+
+% ?- replace_periods_string_list("hi there bub. how are you.",X),to_list_of_sents(X,L).
+% X = [hi, there, bub, '.', how, are, you, '.'],
+% L = [[hi, there, bub, '.'], [how, are, you, '.']] .
+%
+% ?- replace_periods_string_list("hi there bub! how are you?",X),to_list_of_sents(X,L).
+% X = [hi, there, bub, !, how, are, you, ?],
+% L = [[hi, there, bub, !], [how, are, you, ?]] .
+
+to_list_of_sents([],[]).
+to_list_of_sents(WList,[sent(FirstSent)|Groups]):-append(Left,[Last|Rest],WList),member(Last,['.','?','!']),!,append(Left,[Last],FirstSent),!,to_list_of_sents(Rest,Groups).
+to_list_of_sents(WList,[sent(WList)]).
+
+replace_periods_string_list(A,S):-replace_periods(A,AR),to_word_list(AR,WL),subst(WL,periodMARK,'.',WLS),subst(WLS,apostraphyMARK,'\'',S).
+
 to_word_list(A,S):-once(hotrace(to_word_list_0(A,S))).
 to_word_list_0(V,V):-var(V),!.
 to_word_list_0([A],[A]):-number(A),!.
 to_word_list_0([],[]):-!.
 to_word_list_0("",[]):-!.
 to_word_list_0('',[]):-!.
+to_word_list_0(A,S):-atom(A),text_to_string(A,S),to_word_list_0(A,S),!.
+%to_word_list_0(A,WList):-string(A),Final=" (period) ",replace_periods(A,Final,S),not(A=S),!,to_word_list_0(S,WList).
 to_word_list_0([A,B|C],[A,B|C]):-atom(A),atom(B),!.
 to_word_list_0(A,S):-atomSplit(A,S),!.
 to_word_list_0(Input,WList):- (string(Input);atom(Input)),(atomic_list_concat(WList," ",Input);WList=[Input]),!.
