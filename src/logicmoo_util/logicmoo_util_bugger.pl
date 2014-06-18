@@ -11,6 +11,7 @@
 */
 :-module(bugger,[
      was_module/2,
+     with_dmsg/2,
      evil_term/3,
          module_meta_predicates_are_transparent/1,
          module_predicates_are_exported/1,
@@ -19,6 +20,8 @@
          rtrace/1,
          is_loop_checked/1,
          snumbervars/1,
+         safe_numbervars/1,
+         safe_numbervars/2,
          must_det/1,
          must_det/2,
          is_deterministic/1,
@@ -59,6 +62,7 @@
      one_must/2,
 %     read_line_with_nl/3,
 	 unnumbervars/2,
+         renumbervars/2,
 
      flush_output_safe/0,
      flush_output_safe/1,
@@ -87,6 +91,8 @@
      logOnFailure/1,  % Fails unless [+Ignore]
 
      throwOnFailure/1, % Throws unless [Fail or Debug]
+
+     must_each/1,  % list block must succeed once .. it smartly only debugs to the last failures
 
      % cant ignore - Throws but can be set to [Throw, Fail or Ignore or Debug]
      must/1, % must succeed at least once
@@ -193,6 +199,7 @@ set_bugger_flag(F,V):-create_prolog_flag(F,V,[term]).
 %:- meta_predicate traceafter_call(^).
 :- meta_predicate if_prolog(*,^).
 :- meta_predicate must(^).
+:- meta_predicate must_each(^).
 :- meta_predicate must_det(^).
 :- meta_predicate rtrace(^).
 :- meta_predicate must_det(^,^).
@@ -228,7 +235,7 @@ user_use_module(What):- '@'(use_module(What),'user').
 :- module_transparent(loop_check_throw/1).
 :- module_transparent(loop_check/2).
 :- module_transparent(loop_check_term/3).
-:- meta_predicate((loop_check_term(^,+,^))).
+:- meta_predicate((loop_check_term(^,-,^))).
 :- meta_predicate((loop_check_throw(^))).
 :- meta_predicate((loop_check_fail(^))).
 :- meta_predicate((loop_check(^,^))).
@@ -408,7 +415,7 @@ hideRest:- fail, logicmoo_util_library:buggerDir(BuggerDir),
 hideRest:- functor_source_file(system,_P,F,A,_File),hideTraceMFA(system,F,A,-all), fail.
 hideRest.
 
-:- meta_predicate(hideTrace(:,+)).
+:- meta_predicate(hideTrace(:,-)).
 :- meta_predicate with_output_to_stream(*,0).
 
 functor_source_file(M,P,F,A,File):-functor_source_file0(M,P,F,A,File). % must(ground((M,F,A,File))),must(user:nonvar(P)).
@@ -534,12 +541,13 @@ debugCallWhy2(thrown(_Why), C):- ggtrace,dtrace(C).
 debugCallWhy2(_Why, C):- grtrace,dtrace(C).
 
 
-debugOnError(C):- !, C.
+% debugOnError(C):- !, C.
+debugOnError(C):- !,debugOnError0(C).
 debugOnError(C):-prolog_ecall(0,debugOnError0,C).
-debugOnError0(C):- !, C.
-debugOnError0(C):- catch(C,E,debugCallWhy(thrown(E),C)).
-debugOnErrorEach(C):-prolog_ecall(1,debugOnError,C).
-debugOnErrorIgnore(C):-ignore(debugOnError(C)).
+%debugOnError0(C):- !, C.
+debugOnError0(C):- catch(C,E,call_cleanup(debugCallWhy(thrown(E),C),throw(E))).
+debugOnErrorEach(C):-prolog_ecall(1,debugOnError0,C).
+debugOnErrorIgnore(C):-ignore(debugOnError0(C)).
 
 debugOnFailure(C):-prolog_ecall(0,debugOnFailure0,C).
 debugOnFailure0(C):- one_must(C,debugCallWhy(failed(debugOnFailure0(C)),C)).
@@ -690,8 +698,14 @@ programmer_error(E):-trace, randomVars(E),dmsg('~q~n',[error(E)]),trace,randomVa
 :-moo_hide_show_childs(hotrace/1).
 
 :-moo_hide_show_childs(must/1).
-must(C):-one_must(C,(rtrace(C),debugCallWhy(failed(must(C)),C))).
+must(C):- debugOnError(one_must(C,(rtrace(C),debugCallWhy(failed(must(C)),C)))).
 
+must_each(List):-var(List),trace_or_throw(var_must_each(List)).
+must_each([List]):-!,must(List).
+must_each([E|List]):-!,must(E),must_each0(List).
+must_each0(List):-var(List),trace_or_throw(var_must_each(List)).
+must_each0([]):-!.
+must_each0([E|List]):-E,must_each0(List).
 
 :-moo_hide_show_childs(one_must/2).
 % now using gensym counter instead of findall (since findall can make tracing difficult)
@@ -879,10 +893,18 @@ logger_property(todo,once,true).
 
 :-debug(todo).
 
-dmsg(V):- (dmsg0(V)).
+:- thread_local is_with_dmsg/1.
+
+with_dmsg(Functor,Goal):-
+   with_assertions(is_with_dmsg(Functor),Goal).
+   
+
+dmsg(V):- is_with_dmsg(FP),!,FP=..FPL,append(FPL,[V],VVL),VV=..VVL,once(dmsg0(VV)).
+dmsg(V):- once(dmsg0(V)).
 dmsg0(_):- bugger_flag(opt_debug=off),!.
-dmsg0(V):-var(V),!,ggtrace,throw(dmsg(V)).
+dmsg0(V):-var(V),!,dmsg0(dmsg_var(V)).
 dmsg0(warn(V)):- print_message(warning,V).
+dmsg0(skip_dmsg(_)):-!.
 dmsg0(C):-functor(C,Topic,_),debugging(Topic,_True_or_False),!,logger_property(Topic,once,true),!,
       (dmsg_log(Topic,_Time,C) -> true ; ((get_time(Time),asserta(dmsg_log(todo,Time,C)),!,dmsg2(C)))).
 dmsg0(C):-((copy_term(C,Stuff), randomVars(Stuff),!,dmsg2(Stuff))).
@@ -1022,16 +1044,24 @@ sendNote(To,From,Subj,Message,Vars):-
 	dmsg(sendNote(To,From,Subj,Message,Vars))))).
 
 % ========================================================================================
-% safe_numbervars/1 (just simpler safe_numbervars.. will use a rand9ome start point so if a partially numbered getPrologVars wont get dup getPrologVars
+% safe_numbervars/1 (just simpler safe_numbervars.. will use a rand9ome start point so if a partially numbered getPrologVars wont get dup getPrologVars)
 % Each prolog has a specific way it could unnumber the result of a safe_numbervars
 % ========================================================================================
 
-safe_numbervars(X):-get_time(T),convert_time(T,_A,_B,_C,_D,_E,_F,G),!,safe_numbervars(X,'$VAR',G,_).
+safe_numbervars(E,EE):-duplicate_term(E,EE),safe_numbervars(EE),get_gtime(G),numbervars(EE,'$VAR',G,[attvar(skip)]),
+   term_variables(EE,AttVars),forall(member(V,AttVars),(copy_term(V,VC,Gs),V='$VAR'(VC=Gs))).
+   
+
+get_gtime(G):- get_time(T),convert_time(T,_A,_B,_C,_D,_E,_F,G).
+
+safe_numbervars(X):-get_gtime(G),safe_numbervars(X,'$VAR',G,_).
+
 safe_numbervars(Copy,X,Z):-numbervars(Copy,X,Z,[attvar(skip)]).
 safe_numbervars(Copy,_,X,Z):-numbervars(Copy,X,Z,[attvar(skip)]).
 
 unnumbervars(X,Y):-term_to_atom(X,A),atom_to_term(A,Y,_).
 
+renumbervars(X,Z):-unnumbervars(X,Y),safe_numbervars(Y,Z).
 
 withFormatter(Lang,From,Vars,SForm):-formatter_hook(Lang,From,Vars,SForm),!.
 withFormatter(_Lang,From,_Vars,SForm):-sformat(SForm,'~w',[From]).
@@ -1146,8 +1176,9 @@ traceIf(Call):-ignore((Call,trace)).
 % hotrace(Goal).
 % Like notrace/1 it still skips over debugging Goal.
 % Unlike notrace/1, it allows traceing when excpetions are raised during Goal.
-hotrace(X):- tracing -> setup_call_cleanup(notrace,X,trace) ; X.
+hotrace(X):- tracing -> traceafter_call(X) ; restore_trace(X).
 
+traceafter_call(X):- call_cleanup(restore_trace((leash(-all),visible(-all),X)),(leash(+call), trace)).
 
 /*
 % :- meta_predicate notrace_call(^).
@@ -1247,8 +1278,8 @@ dumptrace(C):-dmsg(unused_keypress(C)),!,fail.
 
 dumptrace_ret:-trace.
 
-restore_trace(Goal):- tracing,!,Goal,trace.
-restore_trace(Goal):- Goal,notrace.
+restore_trace(Goal):-  tracing,notrace,!,'$leash'(Old, Old),'$visible'(OldV, OldV),call_cleanup(Goal,(('$leash'(_, Old),'$visible'(_, OldV),trace),trace)).
+restore_trace(Goal):-  '$leash'(Old, Old),'$visible'(OldV, OldV),call_cleanup(Goal,((notrace,'$leash'(_, Old),'$visible'(_, OldV)))).
 
 rtrace(Goal):- restore_trace((
    visible(+all),visible(-unify),visible(+exception),

@@ -111,9 +111,10 @@ any_to_atom(A,A):-atom(A),!.
 any_to_atom(T,A):-sformat(S,'~w',[T]),atom_string(A,S).
           
 atomic_list_concat_safe(O,''):- O=[],!.
-atomic_list_concat_safe([Atom|Bonus],V):-atomic(Atom),atom_concat(Atom,NV,V),!,atomic_list_concat_safe(Bonus,NV).
+atomic_list_concat_safe([Atom,A2|Bonus],V):-atomic(Atom),atomic(A2),atom_concat(Atom,A2,A3),!,atomic_list_concat_safe([A3|Bonus],V).
+atomic_list_concat_safe([Atom|Bonus],V):-atomic(Atom),atomic(V),atom_concat(Atom,NV,V),!,atomic_list_concat_safe(Bonus,NV).
 atomic_list_concat_safe([D1,Atom|Bonus],V):-var(D1),atomic(Atom),sub_atom(V, NBefore, _Len, _NumAfter, Atom),
-      sub_atom(V, 0, NBefore, _, D1), !, atomic_list_concat_safe([D1,Atom|Bonus],V).
+      sub_atom(V, 0, NBefore, _, D1), atomic_list_concat_safe([D1,Atom|Bonus],V).
 atomic_list_concat_safe([V],V):-!.
 
 

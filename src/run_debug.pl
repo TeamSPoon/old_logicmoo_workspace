@@ -26,7 +26,7 @@ was_run_dbg_pl:-is_startup_file('run_debug.pl').
 start_boxer:-
    threads,
    ensure_loaded(logicmoo(candc/parser_boxer)),
-   make,
+   % make,
    fmt("Press Ctrl-D to start the mud!"),
    at_start(prolog).
 

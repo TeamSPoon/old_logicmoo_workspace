@@ -236,9 +236,9 @@ fix_fa(F,F,A):-atom(F),moo:mpred_arity(F,A).
 fix_fa(F/A,F,A):- moo:mpred_arity(F,A).
 fix_fa(F/A,F,A):- number(A),!.
 fix_fa(FA/_,F,A):-!,fix_fa(FA,F,A).
-fix_fa(FA,F,A):- compound(FA),functor(FA,F,A), ( (moo:mpred_arity(F,AA), AA=A) -> true  ; arg(_,vv(A,AA),A) ).
+fix_fa(FA,F,AR):- compound(FA),functor(FA,F,A), (moo:mpred_arity(F,AA) -> (AA=A -> ignore(AR=A)  ; arg(_,vv(A,AA),AR) ) ; ignore(AR=A) ).
 fix_fa(FA,F,A):- moo:mpred_arity(F,A),functor(FA,F,A).
-fix_fa(FA,F,A):- atom(FA),!,FA=F, ( (moo:mpred_arity(F,AA), AA=A) -> true  ; arg(_,vv(A,AA),A) ).
+fix_fa(FA,F,AR):- atom(FA),!,FA=F, A=0, (moo:mpred_arity(F,AA) -> (AA=A -> ignore(AR=A)  ; arg(_,vv(A,AA),AR) ) ; ignore(AR=A) ).
 fix_fa(FA,F,A):-get_functor(FA,FA2),!,fix_fa(FA2,F,A).
 
 get_mpred_prop(FA,A,Prop):- fix_fa(FA,F,A), mpred_prop_plus_assserted(F,A,Prop).
