@@ -285,7 +285,6 @@ list_to_atom(Names,SName):- list_to_set(Names,Uniq),atomic_list_concat(Uniq,SNam
 
 atom_subst_change(A,F,R,K):-atom_subst(A,F,R,K),!,A\=K.
 
-var_name_shorten(Atom,OName):-atom(Atom),!,var_name_shorten([Atom],OName),!.
 var_name_shorten(SName,OName):-atom_subst_change(SName,'Individual','-N-',AName),var_name_shorten(AName,OName).
 var_name_shorten(SName,OName):-atom_subst_change(SName,'Event','-V-',AName),var_name_shorten(AName,OName).
 var_name_shorten(SName,OName):-atom_subst_change(SName,'Adverb','-R-',AName),var_name_shorten(AName,OName).
