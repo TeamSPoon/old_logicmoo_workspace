@@ -18,6 +18,7 @@
           is_holds_true_not_hilog/1,
           hilog_functor/1,
           (decl_not_mpred/2),
+          is_compiling_clause/0,
           add_mpred_prop/2,
            not_loading_game_file/0,
            never_use_holds_db/3,
@@ -172,9 +173,14 @@ end_transform_moo_preds:- retractall(ended_transform_moo_preds),asserta(ended_tr
 %:-module_transparent(do_term_expansions/1).
 %:-module_transparent(check_term_expansions/0).
 
+:-thread_local is_compiling_clause/0.
+
+is_compiling:-is_compiling_clause;compiling.
+
 do_term_expansions:- context_module(CM), notrace(do_term_expansions(CM)).
 do_term_expansions(_):- thread_self(ID),always_expand_on_thread(ID),!.
 do_term_expansions(_):- always_transform_heads,not(prevent_transform_moo_preds),!.
+do_term_expansions(_):- is_compiling_clause.
 do_term_expansions(CM):- may_moo_term_expand(CM),!, not(ended_transform_moo_preds), not(prevent_transform_moo_preds).
 
 check_term_expansions:- not(do_term_expansions).

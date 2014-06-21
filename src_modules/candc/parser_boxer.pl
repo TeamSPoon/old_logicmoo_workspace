@@ -14,7 +14,6 @@ user:file_search_path(lex,        logicmoo('candc/src/prolog/boxer/lex')).
 :- discontiguous sem/5.
 
 :- use_module(boxer(input)).
-:- use_module(library(lists)).
 :- use_module(semlib(drs2fol)).
 :- use_module(semlib(drs2tacitus)).
 :- use_module(semlib(errors)).
@@ -35,9 +34,6 @@ user:file_search_path(lex,        logicmoo('candc/src/prolog/boxer/lex')).
 
 
 
-
-avar(V):-var(V),!.
-avar('$VAR'(_)).
 
 :- ensure_loaded(boxer(boxer)).
 
@@ -268,15 +264,14 @@ rename_vars2(Result,ResultOut):-
 
 rename_vars_r(Replacer, Result,ResultIn,ResultO):- copy_term(ResultIn,ResultM),rename_vars_l(Replacer,Result,ResultM,ResultO).
 
-qvar(Cvar):-atom(Cvar),atom_concat('?',_,Cvar).
 
 % replacer1(_,_ResultIn,_ResultO):-!,fail.
 replacer1(tok(Int,You),ResultIn,ResultO):-   integer(Int),varify(You,Int,Var),subst(ResultIn,Int,Var,ResultO).
 
-replacer3(named(IVar,You),ResultIn,ResultO):- avar(IVar),atom(You),varify(You,IVar,Var),subst(ResultIn,IVar,Var,ResultO).
+replacer3(named(IVar,You),ResultIn,ResultO):- isVarOrVAR(IVar),atom(You),varify(You,IVar,Var),subst(ResultIn,IVar,Var,ResultO).
 
 % replacer4(_,_,_):-!,fail.
-replacer4(isa(IVar,_),ResultIn,ResultO):- (avar(IVar);qvar(IVar)),var_guess_name(IVar,ResultIn,You),atom(You),varify(You,IVar,Var),subst(ResultIn,IVar,Var,ResultO).
+replacer4(isa(IVar,_),ResultIn,ResultO):- (isVarOrVAR(IVar);isQVar(IVar)),var_guess_name(IVar,ResultIn,You),atom(You),varify(You,IVar,Var),subst(ResultIn,IVar,Var,ResultO).
 
 var_guess_name(Var,ResultIn,AName):-findall(Name,(sub_term(CALL,ResultIn),name_from_term(Var,CALL,Name)),Names),list_to_atom(Names,SName),
    var_name_shorten(SName,AName),!.
@@ -302,12 +297,12 @@ name_from_term(Var,named(Var,Col),Name):-to_atom(Col,Name).
 
 %replacer2(_,_,_,_):-!,fail.
 replacer2(_,V,_,_):-not(compound(V)),!,fail.
-replacer2(_,V,_,_):-avar(V),!,fail.
+replacer2(_,V,_,_):-isVarOrVAR(V),!,fail.
 replacer2(_,tagV(Cvar, VAR),ResultIn,ResultO):-!,subst(ResultIn,VAR,Cvar,ResultO).
-% replacer2(ResultInfo,CALL,ResultIn,ResultO):- CALL=..[_,VAR|_],avar(VAR),sub_term(tagV(Cvar, VAR),ResultInfo), qvar(Cvar), subst(ResultIn,VAR,Cvar,ResultO).
-% replacer2(tagV(Cvar, VAR),ResultIn,ResultO):- qvar(Cvar),avar(VAR),subst(ResultIn,VAR,Cvar,ResultO).
+% replacer2(ResultInfo,CALL,ResultIn,ResultO):- CALL=..[_,VAR|_],isVarOrVAR(VAR),sub_term(tagV(Cvar, VAR),ResultInfo), isQVar(Cvar), subst(ResultIn,VAR,Cvar,ResultO).
+% replacer2(tagV(Cvar, VAR),ResultIn,ResultO):- isQVar(Cvar),isVarOrVAR(VAR),subst(ResultIn,VAR,Cvar,ResultO).
 
-rename_vars_l(_Replacer,R,Result,Result):-avar(R),!.
+rename_vars_l(_Replacer,R,Result,Result):-isVarOrVAR(R),!.
 rename_vars_l(_Replacer,C,Result,Result):-not(compound(C)),!.
 rename_vars_l( Replacer,[L|List],ResultIn,ResultO):-!,rename_vars_l(Replacer,L,ResultIn,ResultM),rename_vars_l(Replacer,List,ResultM,ResultO),!.
 rename_vars_l( Replacer,Directive,ResultIn,ResultO):- call(Replacer,Directive,ResultIn,ResultO),!.
@@ -320,7 +315,7 @@ ato_atom(A,A).
 
 to_atom(A,AA):-atom(A),ato_atom(A,AA),!.
 to_atom(A,A):-atomic(A),!.
-to_atom(T,A):-avar(T),!,with_output_to(atom(A),write(T)),!.
+to_atom(T,A):-isVarOrVAR(T),!,with_output_to(atom(A),write(T)),!.
 to_atom(T,A):-arg(1,T,TT),!,to_atom(TT,A).
 
 varify(YouA,IntA,Var):- to_atom(YouA,You),to_atom(IntA,Int), atom_concat(You,Int,YouInt),!,
@@ -384,7 +379,7 @@ assert_drs(E):- not(ground(E)),numbervars(E),must(ground(E)),assert_drs(E).
 assert_drs(E):- not(ground(E)),trace,safe_numbervars(E,EE),trace,!,must(ground(EE)),assert_drs(EE).
 
 assert_drs(E):- loop_check_clauses(assert_drs(E),assert_drsdata(E)).
-assert_drs(E):- avar(E),!. % , assert_drsdata((erorr_var(E))).
+assert_drs(E):- isVarOrVAR(E),!. % , assert_drsdata((erorr_var(E))).
 assert_drs([]).
 assert_drs(E):- not(compound(E)),!,trace,assert_drsdata((erorr_nc(E))).
 assert_drs(true(E)):-assert_drs_holds(E).
@@ -439,7 +434,7 @@ assert_drs(isaVarPos(Var,Male,Pos)):-
 assert_drs(t(POS,Recliner,Rule,PropList,R2004)):-assert_drs(word(R2004:PropList)),assert_drs_holds(tagV,R2004,V),arg(1,Rule,V),isaVarPos(V,Recliner,POS),assert_drs(Rule).
 
 assert_drs(E):- is_list(E),!,assert_drs_list(E).
-assert_drs(lam(V,E)):-avar(V),not(avar(E)),assert_drs(E).
+assert_drs(lam(V,E)):-isVarOrVAR(V),not(isVarOrVAR(E)),assert_drs(E).
 assert_drs(ba(E)):-!,assert_drs(E).
 assert_drs(drs(Vars,Formulas)):-!, assert_drs(vars(Vars)),expand_drs_args(Formulas,EEL),assert_drsdata(EEL).
 assert_drs(xdrs(Vars,Formulas)):-!,assert_drs(words(Vars)),expand_drs_args(Formulas,EEL),assert_drsdata(EEL).
@@ -477,7 +472,7 @@ drs_filter(later(_,_)).
 % assert_drsdata/1
 % ------------------------------------------------------------------
 
-% assert_drsdata(E):- avar(E),!,assert_drsdata((erorr_var0(E))).
+% assert_drsdata(E):- isVarOrVAR(E),!,assert_drsdata((erorr_var0(E))).
 assert_drsdata(E):- not(compound(E)),!,assert_drsdata((erorr_nc0(E))).
 assert_drsdata(E):- assert_drsdata_0(E),!.
 
@@ -499,7 +494,7 @@ assert_drsdata_0(E):-
 ignore_drs_term([]:[]).
 ignore_drs_term(lam(R10, R10)).
 
-expand_drs_args(V,V):- (avar(V);not(compound(V))),!.
+expand_drs_args(V,V):- (isVarOrVAR(V);not(compound(V))),!.
 expand_drs_args([],[]):-!.
 expand_drs_args(skip(N,[A|B]),BB):-length(Len,N),append(Len,Rest,[A|B]),expand_drs_args(Rest,RestCleaned),append(Len,RestCleaned,BB),!.
 expand_drs_args([A|B],BB):-

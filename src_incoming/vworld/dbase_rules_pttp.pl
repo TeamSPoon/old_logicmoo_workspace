@@ -1,23 +1,574 @@
-/** <module> 
-% Still working on (and testing) but will provide the memoization (not really, just iterative deepening search) inference for Logicmoo Later
+:-module(dbase_rules_pttp,[ nnf/2, dnf/2, def_nnf/5, make_matrix/3,pttp1/2,
+        op(400,fy,-),    % negation
+	op(500,xfy,&),   % conjunction
+	op(600,xfy,v),   % disjunction
+	op(650,xfy,=>),  % implication
+	op(680,xfy,<=>), % equivalence
+        op( 500, fy, ~),    % negation
+       op( 500, fy, all),  % universal quantifier
+       op( 500, fy, ex),   % existential quantifier
+       op( 500,xfy, :),
+       nnf/4,
+       pttp_test/2,
+       do_pttp_test/1
+        ]).
+
+:- thread_local int_query/6.
+:- thread_local int_query/7.
+
+unimplemented:-throw(unimplemented).
+
+%%% ****f* PTTP_Examples/chang_lee_example1
+%%% DESCRIPTION
+%%%   Prove that in an associative system with left and right
+%%%   solutions, there is a right identity element.
+%%% NOTES
+%%%   this is problem GRP028-4 in TPTP
+%%%
+%%%   this and the other chang_lee examples are taken from
+%%%   C.L. Chang and R.C.T. Lee,
+%%%   Symbolic Logic and Mechanical Theorem Proving,
+%%%   Academic Press, New York, 1973, pp. 298-305.
+%%%
+%%%   the result of executing these examples
+%%%   can be seen in the file pttp-examples.typescript
+%%%
+%%%   this problem contains only Horn clauses
+%%%   (clauses with at most one positive literal)
+%%%   so neither contrapositives nor more than one
+%%%   instance of an all negative query are required
+%%%   for completeness
+%%%
+%%%   so clauses are written in implication form to
+%%%   suppress generation of unnecessary contrapositives
+%%%   and the negation of the query is not included
+%%% SEE ALSO
+%%%   chang_lee_example7, chang_lee_example8
+%%% SOURCE
+
+do_pttp_test(TestName):- forall(pttp_test(TestName,Data),(retractall(int_query(_,_,_,_,_,_,_)),retractall(int_query(_,_,_,_,_,_)),once(pttp(Data)),prove(query))).
+
+pttp_test(logicmoo_example1,
+	((
+          motherOf(joe,sue),
+          (motherOf(X,Y) => female(Y)),
+          (sonOf(Y,X) => (motherOf(X,Y);fatherOf(X,Y))),          
+          (query:-female(Y))
+	))).
+
+pttp_test(logicmoo_example1_holds,
+	((
+          firstOrder(motherOf,joe,sue),
+          (firstOrder(motherOf,X,Y) => firstOrder(female,Y)),
+          (firstOrder(sonOf,Y,X) => (firstOrder(motherOf,X,Y);firstOrder(fatherOf,X,Y))),          
+          (query:-firstOrder(female,Y))
+	))).
+
+%  int_kbholds(sonOf,gun,phil,A,B,C,C,D,E,F):-D=[G,[1,F,A,B]|H],E=[G|H].
+%  int_not_kbholds(female,gun,A,B,C,C,D,E,F):-D=[G,[-2,F,A,B]|H],E=[G|H].
+%  int_query(A,B,C,D,E,F,G):- (E=[H,[3,query,A,B]|I],J=[H|I]),firstOrder(K,phil,gun,A,B,C,D,J,F).
+%  firstOrder(A,B,C,D,E,F,G,H,I):-J=firstOrder(A,B,C), (identical_member(J,D)->fail; (identical_member(J,E),!;unifiable_member(J,E)),G=F,H=[K,[red,J,D,E]|L],I=[K|L];int_kbholds(A,B,C,D,E,F,G,H,I,J)).
+%  not_kbholds(A,B,C,D,E,F,G,H):-I=firstOrder(A,B), (identical_member(I,D)->fail; (identical_member(I,C),!;unifiable_member(I,C)),F=E,G=[J,[redn,I,C,D]|K],H=[J|K];int_not_kbholds(A,B,C,D,E,F,G,H,I)).
+pttp_test(logicmoo_example2,
+	((
+          firstOrder(sonOf,gun,phil),
+          not(firstOrder(female,gun)),
+          (query:-firstOrder(What,phil,gun))
+          % What = fatherOf
+	))).
+
+pttp_test(logicmoo_example3,
+	((
+          (secondOrder(genls,SubClass,SuperClass) & firstOrder(SubClass,Instance) => firstOrder(SuperClass,Instance)),
+          (secondOrder(genlPreds,P1,P2) & firstOrder(P1,A) => firstOrder(P2,A)),
+          (secondOrder(genlPreds,P1,P2) & firstOrder(P1,A,B) => firstOrder(P2,A,B)),
+          (secondOrder(genlPreds,P1,P2) & firstOrder(P1,A,B,C) => firstOrder(P2,A,B,C)),
+          (secondOrder(genlPreds,P1,P2) & firstOrder(P1,A,B,C,D) => firstOrder(P2,A,B,C,D)),
+          (secondOrder(genlInverse,P1,P2) & firstOrder(P1,A,B) => firstOrder(P2,B,A)),
+
+          (secondOrder(irreflexive,P) & firstOrder(P,A,B) => ~ firstOrder(P,B,A)),
+
+           (secondOrder(P,A,B)<=>firstOrder(P,A,B)),
+           secondOrder(genlInverse,parentOf,sonOf),
+           secondOrder(genlPreds,motherOf,parentOf),
+           
+           secondOrder(irreflexive,sonOf),
+           
+
+          (query:- not(firstOrder(sonOf,gun,phil)))
+          % Expected true
+	))):- fail.
+
+          % (all X:( all Y : (motherOf(X,Y)) => (bellyButton(X) , older(X,Y) , female(Y)) )),
+
+make_matrix_pttp(In,Out):-  % trace,
+   nnf(In,[],MOut,_),
+  % make_matrix(In,MOut,[def]),
+   delist_junts(MOut,Out),   
+   % 'format'('Tranforms: ~q ~n -> ~q ~n -> ~q ~n~n',[In,MOut,Out]),
+   !.
+
+delist_junts(A,A):-isVar(A),!.
+delist_junts(-A,AA):-!, negated_literal(A,AA).
+delist_junts((A:-B),(C:-D)):- delist_junts(A,C), delist_junts(B,D).
+delist_junts((A,B),(C,D)):- delist_junts(A,C), delist_junts(B,D).
+delist_junts((A;B),(C;D)):- delist_junts(A,C), delist_junts(B,D).
+delist_junts(A,A).
+
+delist_junts([[In]],Out):-!,delist_lit(In,Out).
+delist_junts(InList,Out):-apply_to_elements(InList,delist_lit,OutList),!,disjoin_list(OutList,Out).
+delist_junts(Out,Out).
+
+disjoin_list([Out],Out):-!.
+disjoin_list((A,B),(C;D)):- disjoin_list(A,C), disjoin_list(B,D).
+disjoin_list([Out|List],(Out ; ListO)):-disjoin_list(List,ListO).
+disjoin_list(Out,Out):-!.
+conjoin_list([Out],Out):-!.
+conjoin_list([Out|List],(Out,ListO)):-conjoin_list(List,ListO).
+conjoin_list(Out,Out):-!.
+
+delist_lit(In,Out):- delist_lit0(In,Out).
+delist_lit0(-In,Out):- !,negated_literal(In,Out).
+delist_lit0([In],Out):- !,delist_lit0(In,Out).
+delist_lit0([],truef).
+delist_lit0([A|B],Out):-apply_to_elements([A|B],delist_lit,OutList),conjoin_list(OutList,Out).
+delist_lit0(Out,Out).
+
+
+pttp_test(chang_lee_example1,
+	((
+		p(g(X,Y),X,Y),
+		p(X,h(X,Y),Y),
+		(p(U,Z,W) :- p(X,Y,U) , p(Y,Z,V) , p(X,V,W)),
+		(p(X,V,W) :- p(X,Y,U) , p(Y,Z,V) , p(U,Z,W)),
+		(query :- p(k(X),X,k(X)))
+	))).
+
+%%% ***
+%%% ****f* PTTP_Examples/chang_lee_example2
+%%% DESCRIPTION
+%%%   In an associative system with an identity element,
+%%%   if the square of every element is the identity,
+%%%   the system is commutative.
+%%% NOTES
+%%%   this is problem GRP001-5 in TPTP
+%%% SOURCE
+
+pttp_test(chang_lee_example2,
+	((
+		p(e,X,X),
+		p(X,e,X),
+		p(X,X,e),
+		p(a,b,c),
+		(p(U,Z,W) :- p(X,Y,U) , p(Y,Z,V) , p(X,V,W)),
+		(p(X,V,W) :- p(X,Y,U) , p(Y,Z,V) , p(U,Z,W)),
+		(query :- p(b,a,c))
+	))).
+
+%%% ***
+%%% ****f* PTTP_Examples/chang_lee_example3
+%%% DESCRIPTION
+%%%   In a group the left identity is also a right identity.
+%%% NOTES
+%%%   this is problem GRP003-1 in TPTP
+%%% SOURCE
+
+pttp_test(chang_lee_example3,
+	((
+          p(e,X,X),
+          p(i(X),X,e),
+          (p(U,Z,W) :- p(X,Y,U) , p(Y,Z,V) , p(X,V,W)),
+          (p(X,V,W) :- p(X,Y,U) , p(Y,Z,V) , p(U,Z,W)),
+          (query :- p(a,e,a))
+	))).
+
+
+%%% ***
+%%% ****f* PTTP_Examples/chang_lee_example4
+%%% DESCRIPTION
+%%%   In a group with left inverse and left identity
+%%%   every element has a right inverse.
+%%% NOTES
+%%%   this is problem GRP004-1 in TPTP
+%%% SOURCE
+pttp_test(chang_lee_example4,
+	((
+          p(e,X,X),
+          p(i(X),X,e),
+          (p(U,Z,W) :- p(X,Y,U) , p(Y,Z,V) , p(X,V,W)),
+          (p(X,V,W) :- p(X,Y,U) , p(Y,Z,V) , p(U,Z,W)),
+          (query :- p(a,X,e))
+	))).
+
+
+%%% ***
+%%% ****f* PTTP_Examples/chang_lee_example5
+%%% DESCRIPTION
+%%%   If S is a nonempty subset of a group such that
+%%%   if x,y belong to S, then x*inv(y) belongs to S,
+%%%   then the identity e belongs to S.
+%%% NOTES
+%%%   this is problem GRP005-1 in TPTP
+%%% SOURCE
+
+pttp_test(chang_lee_example5,
+	pttp((
+		p(e,X,X),
+		p(X,e,X),
+		p(X,i(X),e),
+		p(i(X),X,e),
+		s(a),
+		(s(Z) :- s(X) , s(Y) , p(X,i(Y),Z)),
+		(p(U,Z,W) :- p(X,Y,U) , p(Y,Z,V) , p(X,V,W)),
+		(p(X,V,W) :- p(X,Y,U) , p(Y,Z,V) , p(U,Z,W)),
+		(query :- s(e))
+	))).
+
+%%% ***
+%%% ****f* PTTP_Examples/chang_lee_example6
+%%% DESCRIPTION
+%%%   If S is a nonempty subset of a group such that
+%%%   if x,y belong to S, then x*inv(y) belongs to S,
+%%%   then S contains inv(x) whenever it contains x.
+%%% NOTES
+%%%   this is problem GRP006-1 in TPTP
+%%% SOURCE
+
+chang_lee_example6 :-
+	pttp((
+		p(e,X,X),
+		p(X,e,X),
+		p(X,i(X),e),
+		p(i(X),X,e),
+		s(b),
+		(s(Z) :- s(X) , s(Y) , p(X,i(Y),Z)),
+		(p(U,Z,W) :- p(X,Y,U) , p(Y,Z,V) , p(X,V,W)),
+		(p(X,V,W) :- p(X,Y,U) , p(Y,Z,V) , p(U,Z,W)),
+		(query :- s(i(b)))
+	)),
+	fail.
+chang_lee_example6 :-
+	prove(query).
+%%% ***
+%%% ****f* PTTP_Examples/chang_lee_example7
+%%% DESCRIPTION
+%%%   If a is a prime and a = b*b/c*c then a divides b.
+%%% NOTES
+%%%   this is problem NUM014-1 in TPTP
+%%%
+%%%   this problem is non-Horn
+%%%   so clauses are written in disjunction form to
+%%%   result in generation of all contrapositives
+%%%
+%%%   because the query is ground, it is unnecessary
+%%%   for its negation to be included
+%%% SEE ALSO
+%%%   chang_lee_example1, chang_lee_example8
+%%% SOURCE
+
+chang_lee_example7 :-
+	pttp((
+		p(a),
+		m(a,s(c),s(b)),
+		m(X,X,s(X)),
+		(not_m(X,Y,Z) ; m(Y,X,Z)),
+		(not_m(X,Y,Z) ; d(X,Z)),
+		(not_p(X) ; not_m(Y,Z,U) ; not_d(X,U) ; d(X,Y) ; d(X,Z)),
+		(query :- d(a,b))
+	)),
+	fail.
+chang_lee_example7 :-
+	prove(query).
+%%% ***
+%%% ****f* PTTP_Examples/chang_lee_example8
+%%% DESCRIPTION
+%%%    Any number greater than one has a prime divisor.
+%%% NOTES
+%%%   this is problem NUM015-1 in TPTP
+%%%
+%%%   this problem is non-Horn
+%%%   so clauses are written in disjunction form to
+%%%   result in generation of all contrapositives
+%%%
+%%%   the negation of the query is included
+%%%   to allow multiple instances to be used in
+%%%   the proof (and yield an indefinite answer)
+%%% SEE ALSO
+%%%   chang_lee_example1, chang_lee_example7
+%%% SOURCE
+
+chang_lee_example8 :-
+	pttp((
+		l(1,a),
+		d(X,X),
+		(p(X) ; d(g(X),X)),
+		(p(X) ; l(1,g(X))),
+		(p(X) ; l(g(X),X)),
+		(not_p(X) ; not_d(X,a)),		% negation of query
+		(not_d(X,Y) ; not_d(Y,Z) ; d(X,Z)),
+		(not_l(1,X) ; not_l(X,a) ; p(f(X))),
+		(not_l(1,X) ; not_l(X,a) ; d(f(X),X)),
+		(query :- (p(X) , d(X,a)))
+	)),
+	fail.
+chang_lee_example8 :-
+	prove(query).
+%%% ***
+%%% ****f* PTTP_Examples/chang_lee_example9
+%%% DESCRIPTION
+%%%   There exist infinitely many primes.
+%%% NOTES
+%%%   this is problem NUM016-2 in TPTP
+%%% SOURCE
+
+chang_lee_example9 :-
+	pttp((
+		l(X,f(X)),
+		not_l(X,X),
+		(not_l(X,Y) ; not_l(Y,X)),
+		(not_d(X,f(Y)) ; l(Y,X)),
+		(p(X) ; d(h(X),X)),
+		(p(X) ; p(h(X))),
+		(p(X) ; l(h(X),X)),
+		(not_p(X) ; not_l(a,X) ; l(f(a),X)),	% negation of query
+		(query :- p(X) , l(a,X) , not_l(f(a),X))
+	)),
+	fail.
+chang_lee_example9 :-
+	prove(query).
+%%% ***
+%%% ****f* PTTP_Examples/overbeek_example4
+%%% DESCRIPTION
+%%%   Show that Kalman's shortest single axiom for the
+%%%   equivalential calculus, XGK, can be derived from the
+%%%   Meredith single axiom PYO.
+%%% NOTES
+%%%   a harder problem than the Chang and Lee examples
+%%%   from Overbeek's competition problems
+%%%
+%%%   this is problem LCL024-1 in TPTP
+%%% SOURCE
+
+overbeek_example4 :-
+	pttp((
+		p(e(X,e(e(Y,e(Z,X)),e(Z,Y)))),
+		(p(Y) :- p(e(X,Y)), p(X)),
+		(query :- p(e(e(e(a,e(b,c)),c),e(b,a))))
+	)),
+	fail.
+overbeek_example4 :-
+	prove(query,100,0,2).	% cost 30 proof
+%%% ***
+
+
+%% File: def_mm.pl  -  Version: 1.01  -  Date: 07 June 2007
+%%
+%% Purpose: Transform first-order formulae into clausal form
+%%
+%% Author:  Jens Otten
+%% Web:     www.leancop.de
+%%
+%% Usage:   make_matrix(F,M,S).  % where F is a first-order formula,
+%%                               % S is a list of settings, and M is
+%%                               % the (definitional) clausal form
+%%
+%% Example: make_matrix(ex Y: (all X: ((p(Y) => p(X))) ),Matrix,[]).
+%%          Matrix = [[-(p(X1))], [p(1 ^ [X1])]]
+%%
+%% Copyright: (c) 1999-2007 by Jens Otten
+%% License:   GNU General Public License
+
+
+% definitions of logical connectives and quantifiers
+
+:- op(1130, xfy, <=>). % equivalence
+:- op(1110, xfy, =>).  % implication
+%                      % disjunction (;)
+%                      % conjunction (,)
+:- op( 500, fy, ~).    % negation
+:- op( 500, fy, all).  % universal quantifier
+:- op( 500, fy, ex).   % existential quantifier
+:- op( 500,xfy, :).
+
+
+% ------------------------------------------------------------------
+%  make_matrix(+Fml,-Matrix,+Settings)
+%    -  transform first-order formula into set of clauses (matrix)
 %
-% Project LogicMoo: A MUD server written in Prolog
-% Maintainer: Douglas Miles
-% Dec 13, 2035
+%  Fml, Matrix: first-order formula and matrix
 %
-*/
+%  Settings: list of settings, which can contain def, nodef and conj;
+%            if it contains nodef/def, no definitional transformation
+%            or a complete definitional transformation is done,
+%            otherwise a definitional transformation is done for
+%            the conjecture and the standard transformation is done
+%            for the axioms; conjecture is marked if conj is given
+%
+%  Syntax of Fml: negation '~', disjunction ';', conjunction ',',
+%      implication '=>', equivalence '<=>', universal/existential
+%      quantifier 'all X:<Formula>'/'ex X:<Formula>' where 'X' is a
+%      Prolog variable, and atomic formulae are Prolog atoms.
+%
+%  Example: make_matrix(ex Y:(all X:((p(Y) => p(X)))),Matrix,[]).
+%           Matrix = [[-(p(X1))], [p(1 ^ [X1])]]
 
-% :- visible(+all), leash(-exit),leash(-fail),leash(-call),leash(-redo),leash(+exception).
+make_matrix(Fml,Matrix,Set) :-
+    univar(Fml,[],F1),
+    ( member(conj,Set), F1=(A=>C) -> F2=((A,#)=>(#,C)) ; F2=F1 ),
+    ( member(nodef,Set) ->
+       def_nnf(F2,NNF,1,_,nnf), dnf(NNF,DNF)
+       ;
+       \+member(def,Set), F2=(B=>D) ->
+        def_nnf(~(B),NNF,1,I,nnf), dnf(NNF,DNF1),
+        def_nnf(D,DNF2,I,_,def), DNF=(DNF2;DNF1)
+        ;
+        def_nnf(F2,DNF,1,_,def)
+    ),
+    mat(DNF,M),
+    ( member(reo(I),Set) -> mreorder(M,Matrix,I) ; Matrix=M ).
 
-prolog_engine(swi).
+% ------------------------------------------------------------------
+%  def_nnf(+Fml,-DEF)  -  transform formula into a definitional
+%                         Skolemized negation normal form (DEF)
+%  Fml, DEF: first-order formula and formula in DEF
+%
+%  make_matrix( 
+%
+%  def_nnf(all X: ((bellyButton(X) , older(X,Y) , female(Y))  => ex Y : (motherOf(X,Y))),T,1,DEF,D).
+% T = ((~bellyButton(1^[]);~older(1^[], _G814);~female(_G814));motherOf(1^[], _G814)),
+% DEF = 2.
+%
+%  Example: def_nnf(ex Y:(all X:((p(Y) => p(X)))),T,1,DEF,D).
+%           DEF = ~ p(X1) ; p(1 ^ [X1])
 
-%%:- user_use_module('../../src/logicmoo_util/logicmoo_util_all.pl').
-assert_if_new(X):-catch(X,_,fail),!.
-assert_if_new(X):-assertz(X).
+def_nnf(Fml,DEF,I,I1,Set) :-
+    def(Fml,[],NNF,DEF1,_,I,I1,Set), def(DEF1,NNF,DEF).
 
-fmt(X,Y):-'format'(X,Y).
-fmt(X,Y,Z):-'format'(X,Y,Z).
+def([],Fml,Fml).
+def([(A,(B;C))|DefL],DEF,Fml) :- !, def([(A,B),(A,C)|DefL],DEF,Fml).
+def([A|DefL],DEF,Fml) :- def(DefL,(A;DEF),Fml).
 
+def(Fml,FreeV,NNF,DEF,Paths,I,I1,Set) :-
+    ( Fml = ~(~A)      -> Fml1 = A;
+      Fml = ~(all X:F) -> Fml1 = (ex X: ~F);
+      Fml = ~(ex X:F)  -> Fml1 = (all X: ~F);
+      Fml = ~((A ; B)) -> Fml1 = ((~A , ~B));
+      Fml = ~((A , B)) -> Fml1 = (~A ; ~B);
+      Fml = (A => B)   -> Fml1 = (~A ; B);
+      Fml = ~((A => B))-> Fml1 = ((A , ~B));
+      Fml = (A <=> B)  ->
+      ( Set=def        -> Fml1 = ((A => B) , (B => A));
+                          Fml1 = ((A , B) ; (~A , ~B)) );
+      Fml = ~((A<=>B)) -> Fml1 = ((A , ~B) ; (~A , B)) ), !,
+    def(Fml1,FreeV,NNF,DEF,Paths,I,I1,Set).
+
+def((ex X:F),FreeV,NNF,DEF,Paths,I,I1,Set) :- !,
+    def(F,[X|FreeV],NNF,DEF,Paths,I,I1,Set).
+
+def((all X:Fml),FreeV,NNF,DEF,Paths,I,I1,Set) :- !,
+    copy_term((X,Fml,FreeV),((I^FreeV),Fml1,FreeV)), I2 is I+1,
+    def(Fml1,FreeV,NNF,DEF,Paths,I2,I1,Set).
+
+def((A ; B),FreeV,NNF,DEF,Paths,I,I1,Set) :- !,
+    def(A,FreeV,NNF1,DEF1,Paths1,I,I2,Set),
+    def(B,FreeV,NNF2,DEF2,Paths2,I2,I1,Set),
+    append(DEF1,DEF2,DEF), Paths is Paths1 * Paths2,
+    (Paths1 > Paths2 -> NNF = (NNF2;NNF1);
+                        NNF = (NNF1;NNF2)).
+
+def((A , B),FreeV,NNF,DEF,Paths,I,I1,Set) :- !,
+    def(A,FreeV,NNF3,DEF3,Paths1,I,I2,Set),
+    ( NNF3=(_;_), Set=def -> append([(~I2^FreeV,NNF3)],DEF3,DEF1),
+                             NNF1=I2^FreeV, I3 is I2+1 ;
+                             DEF1=DEF3, NNF1=NNF3, I3 is I2 ),
+    def(B,FreeV,NNF4,DEF4,Paths2,I3,I4,Set),
+    ( NNF4=(_;_), Set=def -> append([(~I4^FreeV,NNF4)],DEF4,DEF2),
+                             NNF2=I4^FreeV, I1 is I4+1 ;
+                             DEF2=DEF4, NNF2=NNF4, I1 is I4 ),
+    append(DEF1,DEF2,DEF), Paths is Paths1 + Paths2,
+    (Paths1 > Paths2 -> NNF = (NNF2,NNF1);
+                        NNF = (NNF1,NNF2)).
+
+def(Lit,_,Lit,[],1,I,I,_).
+
+% ------------------------------------------------------------------
+%  dnf(+NNF,-DNF)  -  transform formula in NNF into formula in DNF
+%  NNF, DNF: formulae in NNF and DNF
+%
+%  Example: dnf(((p;~p),(q;~q)),DNF).
+%           DNF = (p, q ; p, ~ q) ; ~ p, q ; ~ p, ~ q
+
+dnf(((A;B),C),(F1;F2)) :- !, dnf((A,C),F1), dnf((B,C),F2).
+dnf((A,(B;C)),(F1;F2)) :- !, dnf((A,B),F1), dnf((A,C),F2).
+dnf((A,B),F) :- !, dnf(A,A1), dnf(B,B1),
+    ( (A1=(C;D);B1=(C;D)) -> dnf((A1,B1),F) ; F=(A1,B1) ).
+dnf((A;B),(A1;B1)) :- !, dnf(A,A1), dnf(B,B1).
+dnf(Lit,Lit).
+
+% ------------------------------------------------------------------
+%  mat(+DNF,-Matrix)  -  transform formula in DNF into matrix
+%  DNF, Matrix: formula in DNF, matrix
+%
+%  Example: mat(((p, q ; p, ~ q) ; ~ p, q ; ~ p, ~ q),Matrix).
+%           Matrix = [[p, q], [p, -(q)], [-(p), q], [-(p), -(q)]]
+
+mat((A;B),M) :- !, mat(A,MA), mat(B,MB), append(MA,MB,M).
+mat((A,B),M) :- !, (mat(A,[CA]),mat(B,[CB]) -> union2(CA,CB,M);M=[]).
+mat(~Lit,[[-Lit]]) :- !.
+mat(Lit,[[Lit]]).
+
+% ------------------------------------------------------------------
+%  univar(+Fml,[],-Fml1)  -  rename variables
+%  Fml, Fml1: first-order formulae
+%
+%  Example: univar((all X:(p(X) => (ex X:p(X)))),[],F1).
+%           F1 = all Y : (p(Y) => ex Z : p(Z))
+
+univar(X,_,X)  :- (atomic(X);var(X);X==[[]]), !.
+univar(F,Q,F1) :-
+    F=..[A,B|T], ( (A=ex;A=all) -> B=(X:C), delete2(Q,X,Q1),
+    copy_term((X,C,Q1),(Y,D,Q1)), univar(D,[Y|Q],D1), F1=..[A,Y:D1] ;
+    univar(B,Q,B1), univar(T,Q,T1), F1=..[A,B1|T1] ).
+
+% ------------------------------------------------------------------
+%  union2/member2 - union and member for lists without unification
+
+union2([],L,[L]).
+union2([X|L1],L2,M) :- member2(X,L2), !, union2(L1,L2,M).
+union2([X|_],L2,M)  :- (-Xn=X;-X=Xn) -> member2(Xn,L2), !, M=[].
+union2([X|L1],L2,M) :- union2(L1,[X|L2],M).
+
+member2(X,[Y|_]) :- X==Y, !.
+member2(X,[_|T]) :- member2(X,T).
+
+% ------------------------------------------------------------------
+%  delete2 - delete variable from list
+
+delete2([],_,[]).
+delete2([X|T],Y,T1) :- X==Y, !, delete2(T,Y,T1).
+delete2([X|T],Y,[X|T1]) :- delete2(T,Y,T1).
+
+% ------------------------------------------------------------------
+%  mreorder - reorder clauses
+
+mreorder(M,M,0) :- !.
+mreorder(M,M1,I) :-
+    length(M,L), K is L//3, append(A,D,M), length(A,K),
+    append(B,C,D), length(C,K), mreorder2(C,A,B,M2), I1 is I-1,
+    mreorder(M2,M1,I1).
+
+mreorder2([],[],C,C).
+mreorder2([A|A1],[B|B1],[C|C1],[A,B,C|M1]) :- mreorder2(A1,B1,C1,M1).
+
+
+
+ 
+% ?- make_matrix(all X:((bellyButton(X) , older(X,Y) , female(Y))  => ex Y : (motherOf(X,Y))),D,[]).
+
+pnf2pl(PNF,Prolog):- make_matrix(PNF,NNF,SET),Prolog=nnf(NNF,SET).
+
+
+   
 
 %%% ****h* PTTP/PTTP
 %%% COPYRIGHT
@@ -195,6 +746,102 @@ fmt(X,Y,Z):-'format'(X,Y,Z).
 %%%   Its argument is a conjunction of formulas to be compiled.
 %%% SOURCE
 
+
+%:-      module(nnf,[nnf/2]).
+
+:-      op(400,fy,-),    % negation
+	op(500,xfy,&),   % conjunction
+	op(600,xfy,v),   % disjunction
+	op(650,xfy,=>),  % implication
+	op(680,xfy,<=>). % equivalence
+
+% -----------------------------------------------------------------
+%  nnf(+Fml,?NNF)
+%
+% Fml is a first-order formula and NNF its Skolemized negation 
+% normal form.
+%
+% Syntax of Fml:
+%  negation: '-', disj: 'v', conj: '&', impl: '=>', eqv: '<=>',
+%  quant. 'all(X,<Formula>)', where 'X' is a prolog variable.
+%
+% Syntax of NNF: negation: '-', disj: ';', conj: ',', quant.:
+%  'all(X,<Formula>)', where 'X' is a prolog variable.
+%
+% Example:  nnf(ex(Y, all(X, (f(Y) => f(X)))),NNF).
+%           NNF =  all(_A,(-(f(all(X,f(ex)=>f(X))));f(_A)))) ?
+
+nnf(Fml,NNF) :- nnf(Fml,[],NNF,_).
+
+% -----------------------------------------------------------------
+%  nnf(+Fml,+FreeV,-NNF,-Paths)
+%
+% Fml,NNF:    See above.
+% FreeV:      List of free variables in Fml.
+% Paths:      Number of disjunctive paths in Fml.
+
+nnf_pre_clean(Atomic,Atomic,[]):-atomic(Atomic),!.
+nnf_pre_clean(Atomic,Atomic,[]):-isVar(Atomic),!.
+nnf_pre_clean(pttp(A),AA,Vars):- !,nnf_pre_clean(A,AA,Vars).
+nnf_pre_clean([A|B],[AA|BB],Vars):-
+   nnf_pre_clean(A,AA,Vars1),
+   nnf_pre_clean(B,BB,Vars2),
+   append(Vars1,Vars2,Vars).
+nnf_pre_clean(C,CC,Vars):-
+   C=..[A|B],
+   nnf_pre_clean_functor(A,AA,Vars1),
+   nnf_pre_clean(B,BB,Vars2),
+   append(Vars1,Vars2,Vars),
+   CC=..[AA|BB],!.
+
+nnf_pre_clean_functor(and,(,),[]).
+nnf_pre_clean_functor(or,(;),[]).
+nnf_pre_clean_functor(~,(-),[]).
+nnf_pre_clean_functor(not,(-),[]).
+nnf_pre_clean_functor(implies,(->),[]).
+nnf_pre_clean_functor(imp,(->),[]).
+nnf_pre_clean_functor(forall,(all),[]).
+nnf_pre_clean_functor(exists,(ex),[]).
+nnf_pre_clean_functor(A,A,[]).
+
+nnf(Fml,FreeV,NNF,Paths):-
+   nnf_pre_clean(Fml,Clean,FreeV),
+   nnf_clean(Clean,FreeV,NNF,Paths).
+
+nnf_clean(Fml,FreeV,NNF,Paths) :-   
+	(Fml = -(-A)      -> Fml1 = A;
+	 Fml = -all(X,F)  -> Fml1 = ex(X,-F);
+	 Fml = -ex(X,F)   -> Fml1 = all(X,-F);
+	 Fml = -(A v B)   -> Fml1 = (-A & -B);
+	 Fml = -(A & B)   -> Fml1 = (-A v -B);
+	 Fml = (A => B)   -> Fml1 = (-A v B);
+	 Fml = -(A => B)  -> Fml1 = A & -B;
+	 Fml = (A <=> B)  -> Fml1 = (A & B) v (-A & -B);
+	 Fml = -(A <=> B) -> Fml1 = (A & -B) v (-A & B)),!,
+	nnf_clean(Fml1,FreeV,NNF,Paths).
+
+nnf_clean(all(X,F),FreeV,all(X,NNF),Paths) :- !,
+	nnf_clean(F,[X|FreeV],NNF,Paths).
+
+nnf_clean(ex(X,Fml),FreeV,NNF,Paths) :- !,
+	copy_term((X,Fml,FreeV),(sk(X,Fml),Fml1,FreeV)),
+	nnf_clean(Fml1,FreeV,NNF,Paths).
+
+nnf_clean((A & B),FreeV,(NNF1,NNF2),Paths) :- !,
+	nnf_clean(A,FreeV,NNF1,Paths1),
+	nnf_clean(B,FreeV,NNF2,Paths2),
+	Paths is Paths1 * Paths2.
+
+nnf_clean((A v B),FreeV,NNF,Paths) :- !,
+	nnf_clean(A,FreeV,NNF1,Paths1),
+	nnf_clean(B,FreeV,NNF2,Paths2),
+	Paths is Paths1 + Paths2,
+	(Paths1 > Paths2 -> NNF = (NNF2;NNF1);
+		            NNF = (NNF1;NNF2)).
+
+nnf_clean(Lit,_,Lit,1).
+
+
 pttp(X) :-
 	timed_call(pttp1(X,Y),'PTTP to Prolog translation'),
 	!,
@@ -240,8 +887,11 @@ prove(Goal,Max,Min) :-
 prove(Goal,Max) :-
 	prove(Goal,Max,0,1,[],_).
 
+prove(Goal) :-!,
+	prove(Goal,100,0,1,[],_).
 prove(Goal) :-
 	prove(Goal,1000000,0,1,[],_).
+
 %%% ***
 
 %%% ****if* PTTP/linearize
@@ -304,6 +954,8 @@ linearize_args(TermIn,TermOut,VarsIn,VarsOut,MatchesIn,MatchesOut,I,N) :-
 %%%   unify(X,Y) is similar to Prolog's X=Y, except that operations
 %%%   like unify(X,f(X)) fail rather than create circular terms.
 %%% SOURCE
+
+unify(X,Y) :-!, unify_with_occurs_check(X,Y).
 
 unify(X,Y) :-
 	var(X) ->
@@ -486,8 +1138,6 @@ make_wrapper(DefinedPreds,[P,N],Result) :-
 %%%   that would be created by make_wrapper
 %%% SOURCE
 
-:-dynamic int_query/7.
-
 query(PosAncestors,NegAncestors,DepthIn,DepthOut,ProofIn,ProofOut) :-
 	int_query(PosAncestors,NegAncestors,DepthIn,DepthOut,ProofIn,ProofOut,query).
 %%% ***
@@ -639,7 +1289,10 @@ clauses((A , B),L,WffNum1,WffNum2) :-
 	clauses(A,L1,WffNum1,W),
 	clauses(B,L2,W,WffNum2),
 	conjoin(L1,L2,L).
-clauses(A,L,WffNum1,WffNum2) :-
+
+clauses(PNF,L,WffNum1,WffNum2):- once(make_matrix_pttp(PNF,Out)),clauses1(Out,L,WffNum1,WffNum2).
+
+clauses1(A,L,WffNum1,WffNum2) :-
 	write_clause_with_number(A,WffNum1),
 	head_literals(A,Lits),
 	clauses2(A,Lits,L,WffNum1),
@@ -655,24 +1308,19 @@ clauses2(A,[Lit|Lits],L,WffNum) :-
 		conjoin((Lit :- Body),L1,L)).
 clauses2(_,[],true,_).
 
-:- style_check(-singleton).
-
 head_literals(Wff,L) :-
-	(Wff = (A :- B) ->	% contrapositives not made for A :- ... inputs
+	Wff = (A :- B) ->	% contrapositives not made for A :- ... inputs
 		head_literals(A,L);
-	(Wff = (A , B) ->
+	Wff = (A , B) ->
 		head_literals(A,L1),
 		head_literals(B,L2),
 		list_union(L1,L2,L);
-	(Wff = (A ; B) ->
+	Wff = (A ; B) ->
 		head_literals(A,L1),
 		head_literals(B,L2),
 		list_union(L1,L2,L);
 	%true ->
-		L = [Wff]))).
-
-:- style_check(+singleton).
-
+		L = [Wff].
 
 body_for_head_literal(Head,Wff,Body) :-
 	Wff = (A :- B) ->
@@ -692,7 +1340,6 @@ body_for_head_literal(Head,Wff,Body) :-
 		Body = false;
 	%true ->
 		negated_literal(Wff,Body).
-
 %%% ***
 %%% ****if* PTTP/predicates
 %%% DESCRIPTION
@@ -724,9 +1371,6 @@ predicates(Wff,L) :-
 %%%   with head predicate P/N.
 %%% SOURCE
 
-:- style_check(-singleton).
-
-
 procedure(P,N,Clauses,Proc) :-
 	Clauses = (A , B) ->
 		procedure(P,N,A,ProcA),
@@ -737,16 +1381,12 @@ procedure(P,N,Clauses,Proc) :-
 	%true ->
 		Proc = true.
 
-:- style_check(+singleton).
-
-
 procedures([[P,N]|Preds],Clauses,Procs) :-
 	procedure(P,N,Clauses,Proc),
 	procedures(Preds,Clauses,Procs2),
 	conjoin(Proc,Procs2,Procs).
 procedures([],_Clauses,true).
 %%% ***
-
 
 %%% ****if* PTTP/add_features
 %%% SOURCE
@@ -797,8 +1437,6 @@ add_features((Head :- Body),(Head1 :- Body1)) :-
 %%% ***
 %%% ****if* PTTP/add_args
 %%% SOURCE
-
-:- style_check(-singleton).
 
 add_args(Body,PosGoal,GoalAtom,HeadArgs,
          PosAncestors,NegAncestors,
@@ -884,9 +1522,6 @@ add_args(Body,PosGoal,GoalAtom,HeadArgs,
 		New = yes.
 %%% ***
 
-:- style_check(+singleton).
-
-
 %%% ****if* PTTP/pttp1
 %%% SOURCE
 
@@ -908,13 +1543,15 @@ pttp1(X,Y) :-
 %%% ****if* PTTP/pttp2
 %%% SOURCE
 
+pttp_assert(Y):-assert(Y),copy_term(Y,YY),numbervars(YY),dmsg(pttp_assert(YY)).
+
+pttp_assert(A,_) :-				% 2-ary predicate for use as
+	pttp_assert(A).			% apply_to_conjuncts argument
+
+pttp2(Y) :- 
+	apply_to_conjuncts(Y,pttp_assert,_),!.
 
 pttp2(Y) :-
-%	nl,
-%	write('PTTP output formulas:'),
-	apply_to_conjuncts(Y,asserted_write_clause,_).
-
-pttp2a(Y) :-
 %	nl,
 %	write('PTTP output formulas:'),
 %	apply_to_conjuncts(Y,write_clause,_),
@@ -974,10 +1611,10 @@ proof_depth([[[_,_,PosAnc,NegAnc]|L]|PrfEnd],N) :-
 %%% ****if* PTTP/pttp_functor
 %%% DESCRIPTION
 %%%   Sometimes the `functor' predicate doesn't work as expected and
-%%%   a more comprehensive predicate is needed.  The `pttp_functor'
+%%%   a more comprehensive predicate is needed.  The pttp_functor'
 %%%   predicate overcomes the problem of functor(X,13,0) causing
 %%%   an error in Symbolics Prolog.  You may need to use it if
-%%%   functor' in your Prolog system fails to construct or decompose
+%%%   `functor' in your Prolog system fails to construct or decompose
 %%%   terms that are numbers or constants.
 %%% SOURCE
 
@@ -1082,9 +1719,9 @@ disjoin(A,B,C) :-
 %%% ***
 %%% ****if* PTTP/negated_functor
 %%% SOURCE
-negated_functor(F,NotF) :- !, (atom_concat('not_',NotF,F);atom_concat('not_',F,NotF)),!.
-
-negated_functor(F,NotF) :- 
+negated_functor(-,_):-!,trace,fail.
+negated_functor(~,_):-!,trace,fail.
+negated_functor(F,NotF) :-
 	name(F,L),
 	name(not_,L1),
 	(list_append(L1,L2,L) ->
@@ -1096,14 +1733,19 @@ negated_functor(F,NotF) :-
 %%% ****if* PTTP/negated_literal
 %%% SOURCE
 
-negated_literal(Lit,NotLit) :-
+negated_literal(-A,B):-negated_literal(A,AA),!,negated_literal(AA,B).
+negated_literal(A,B):-var(B),!,negated_literal_0(A,B).
+negated_literal(A,-B):-negated_literal(B,BB),!,negated_literal_0(A,B).
+negated_literal(A,B):-negated_literal_0(A,B).
+negated_literal_0(Lit,NotLit) :-
 	Lit =.. [F1|L1],
 	negated_functor(F1,F2),
 	(var(NotLit) ->
 		NotLit =.. [F2|L1];
 	%true ->
-		NotLit =.. [F2|L2],
-		L1 == L2).
+	       
+               ( NotLit =.. [F2|L2],
+		L1 == L2) ).
 %%% ***
 %%% ****if* PTTP/negative_functor
 %%% SOURCE
@@ -1159,13 +1801,10 @@ apply_to_elements([X|L],P,Result) :-
 	apply_to_elements(L,P,L1),
 	conjoin(X1,L1,Result).
 apply_to_elements([],_,true).
+
 %%% ***
 %%% ****if* PTTP/write_clause
 %%% SOURCE
-
-asserted_write_clause(X):-assert(X),fmt('~q,~n',[X]).
-asserted_write_clause(X,_):-asserted_write_clause(X).
-
 
 write_clause(A) :-
 	nl,
@@ -1281,304 +1920,6 @@ builtin(unifiable_member,_).
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-%%% ****f* PTTP_Examples/chang_lee_example1
-%%% DESCRIPTION
-%%%   Prove that in an associative system with left and right
-%%%   solutions, there is a right identity element.
-%%% NOTES
-%%%   this is problem GRP028-4 in TPTP
-%%%
-%%%   this and the other chang_lee examples are taken from
-%%%   C.L. Chang and R.C.T. Lee,
-%%%   Symbolic Logic and Mechanical Theorem Proving,
-%%%   Academic Press, New York, 1973, pp. 298-305.
-%%%
-%%%   the result of executing these examples
-%%%   can be seen in the file pttp-examples.typescript
-%%%
-%%%   this problem contains only Horn clauses
-%%%   (clauses with at most one positive literal)
-%%%   so neither contrapositives nor more than one
-%%%   instance of an all negative query are required
-%%%   for completeness
-%%%
-%%%   so clauses are written in implication form to
-%%%   suppress generation of unnecessary contrapositives
-%%%   and the negation of the query is not included
-%%% SEE ALSO
-%%%   chang_lee_example7, chang_lee_example8
-%%% SOURCE
-
-chang_lee_example1 :-
-	pttp((
-		p(g(X,Y),X,Y),
-		p(X,h(X,Y),Y),
-		(p(U,Z,W) :- p(X,Y,U) , p(Y,Z,V) , p(X,V,W)),
-		(p(X,V,W) :- p(X,Y,U) , p(Y,Z,V) , p(U,Z,W)),
-		(query :- p(k(X),X,k(X)))
-	)),
-	fail.				% clear stack used in compilation
-chang_lee_example1 :-
-	prove(query).			% run query with fresh stack
-%%% ***
-%%% ****f* PTTP_Examples/chang_lee_example2
-%%% DESCRIPTION
-%%%   In an associative system with an identity element,
-%%%   if the square of every element is the identity,
-%%%   the system is commutative.
-%%% NOTES
-%%%   this is problem GRP001-5 in TPTP
-%%% SOURCE
-
-chang_lee_example2 :-
-	pttp((
-		p(e,X,X),
-		p(X,e,X),
-		p(X,X,e),
-		p(a,b,c),
-		(p(U,Z,W) :- p(X,Y,U) , p(Y,Z,V) , p(X,V,W)),
-		(p(X,V,W) :- p(X,Y,U) , p(Y,Z,V) , p(U,Z,W)),
-		(query :- p(b,a,c))
-	)),
-	fail.
-chang_lee_example2 :-
-	prove(query).
-%%% ***
-%%% ****f* PTTP_Examples/chang_lee_example3
-%%% DESCRIPTION
-%%%   In a group the left identity is also a right identity.
-%%% NOTES
-%%%   this is problem GRP003-1 in TPTP
-%%% SOURCE
-
-chang_lee_example3 :-
-	pttp((
-		p(e,X,X),
-		p(i(X),X,e),
-		(p(U,Z,W) :- p(X,Y,U) , p(Y,Z,V) , p(X,V,W)),
-		(p(X,V,W) :- p(X,Y,U) , p(Y,Z,V) , p(U,Z,W)),
-		(query :- p(a,e,a))
-	)),
-	fail.
-chang_lee_example3 :-
-	prove(query).
-%%% ***
-%%% ****f* PTTP_Examples/chang_lee_example4
-%%% DESCRIPTION
-%%%   In a group with left inverse and left identity
-%%%   every element has a right inverse.
-%%% NOTES
-%%%   this is problem GRP004-1 in TPTP
-%%% SOURCE
-
-chang_lee_example4 :-
-	pttp((
-		p(e,X,X),
-		p(i(X),X,e),
-		(p(U,Z,W) :- p(X,Y,U) , p(Y,Z,V) , p(X,V,W)),
-		(p(X,V,W) :- p(X,Y,U) , p(Y,Z,V) , p(U,Z,W)),
-		(query :- p(a,X,e))
-	)),
-	fail.
-chang_lee_example4 :-
-	prove(query).
-%%% ***
-%%% ****f* PTTP_Examples/chang_lee_example5
-%%% DESCRIPTION
-%%%   If S is a nonempty subset of a group such that
-%%%   if x,y belong to S, then x*inv(y) belongs to S,
-%%%   then the identity e belongs to S.
-%%% NOTES
-%%%   this is problem GRP005-1 in TPTP
-%%% SOURCE
-
-chang_lee_example5 :-
-	pttp((
-		p(e,X,X),
-		p(X,e,X),
-		p(X,i(X),e),
-		p(i(X),X,e),
-		s(a),
-		(s(Z) :- s(X) , s(Y) , p(X,i(Y),Z)),
-		(p(U,Z,W) :- p(X,Y,U) , p(Y,Z,V) , p(X,V,W)),
-		(p(X,V,W) :- p(X,Y,U) , p(Y,Z,V) , p(U,Z,W)),
-		(query :- s(e))
-	)),
-	fail.
-chang_lee_example5 :-
-	prove(query).
-%%% ***
-%%% ****f* PTTP_Examples/chang_lee_example6
-%%% DESCRIPTION
-%%%   If S is a nonempty subset of a group such that
-%%%   if x,y belong to S, then x*inv(y) belongs to S,
-%%%   then S contains inv(x) whenever it contains x.
-%%% NOTES
-%%%   this is problem GRP006-1 in TPTP
-%%% SOURCE
-
-chang_lee_example6 :-
-	pttp((
-		p(e,X,X),
-		p(X,e,X),
-		p(X,i(X),e),
-		p(i(X),X,e),
-		s(b),
-		(s(Z) :- s(X) , s(Y) , p(X,i(Y),Z)),
-		(p(U,Z,W) :- p(X,Y,U) , p(Y,Z,V) , p(X,V,W)),
-		(p(X,V,W) :- p(X,Y,U) , p(Y,Z,V) , p(U,Z,W)),
-		(query :- s(i(b)))
-	)),
-	fail.
-chang_lee_example6 :-
-	prove(query).
-%%% ***
-%%% ****f* PTTP_Examples/chang_lee_example7
-%%% DESCRIPTION
-%%%   If a is a prime and a = b*b/c*c then a divides b.
-%%% NOTES
-%%%   this is problem NUM014-1 in TPTP
-%%%
-%%%   this problem is non-Horn
-%%%   so clauses are written in disjunction form to
-%%%   result in generation of all contrapositives
-%%%
-%%%   because the query is ground, it is unnecessary
-%%%   for its negation to be included
-%%% SEE ALSO
-%%%   chang_lee_example1, chang_lee_example8
-%%% SOURCE
-
-chang_lee_example7 :-
-	pttp((
-		p(a),
-		m(a,s(c),s(b)),
-		m(X,X,s(X)),
-		(not_m(X,Y,Z) ; m(Y,X,Z)),
-		(not_m(X,Y,Z) ; d(X,Z)),
-		(not_p(X) ; not_m(Y,Z,U) ; not_d(X,U) ; d(X,Y) ; d(X,Z)),
-		(query :- d(a,b))
-	)),
-	fail.
-chang_lee_example7 :-
-	prove(query).
-%%% ***
-%%% ****f* PTTP_Examples/chang_lee_example8
-%%% DESCRIPTION
-%%%    Any number greater than one has a prime divisor.
-%%% NOTES
-%%%   this is problem NUM015-1 in TPTP
-%%%
-%%%   this problem is non-Horn
-%%%   so clauses are written in disjunction form to
-%%%   result in generation of all contrapositives
-%%%
-%%%   the negation of the query is included
-%%%   to allow multiple instances to be used in
-%%%   the proof (and yield an indefinite answer)
-%%% SEE ALSO
-%%%   chang_lee_example1, chang_lee_example7
-%%% SOURCE
-
-chang_lee_example8 :-
-	pttp((
-		l(1,a),
-		d(X,X),
-		(p(X) ; d(g(X),X)),
-		(p(X) ; l(1,g(X))),
-		(p(X) ; l(g(X),X)),
-		(not_p(X) ; not_d(X,a)),		% negation of query
-		(not_d(X,Y) ; not_d(Y,Z) ; d(X,Z)),
-		(not_l(1,X) ; not_l(X,a) ; p(f(X))),
-		(not_l(1,X) ; not_l(X,a) ; d(f(X),X)),
-		(query :- (p(X) , d(X,a)))
-	)),
-	fail.
-chang_lee_example8 :-
-	prove(query).
-%%% ***
-%%% ****f* PTTP_Examples/chang_lee_example9
-%%% DESCRIPTION
-%%%   There exist infinitely many primes.
-%%% NOTES
-%%%   this is problem NUM016-2 in TPTP
-%%% SOURCE
-
-chang_lee_example9 :-
-	pttp((
-		l(X,f(X)),
-		not_l(X,X),
-		(not_l(X,Y) ; not_l(Y,X)),
-		(not_d(X,f(Y)) ; l(Y,X)),
-		(p(X) ; d(h(X),X)),
-		(p(X) ; p(h(X))),
-		(p(X) ; l(h(X),X)),
-		(not_p(X) ; not_l(a,X) ; l(f(a),X)),	% negation of query
-		(query :- p(X) , l(a,X) , not_l(f(a),X))
-	)),
-	fail.
-chang_lee_example9 :-
-	prove(query).
-%%% ***
-%%% ****f* PTTP_Examples/overbeek_example4
-%%% DESCRIPTION
-%%%   Show that Kalman's shortest single axiom for the
-%%%   equivalential calculus, XGK, can be derived from the
-%%%   Meredith single axiom PYO.
-%%% NOTES
-%%%   a harder problem than the Chang and Lee examples
-%%%   from Overbeek's competition problems
-%%%
-%%%   this is problem LCL024-1 in TPTP
-%%% SOURCE
-
-overbeek_example4 :-
-	pttp((
-		p(e(X,e(e(Y,e(Z,X)),e(Z,Y)))),
-		(p(Y) :- p(e(X,Y)), p(X)),
-		(query :- p(e(e(e(a,e(b,c)),c),e(b,a))))
-	)),
-	fail.
-overbeek_example4 :-
-	prove(query,100,0,2).	% cost 30 proof
-
-overbeek_example5 :- 
-   pttp((
-   		not_isa(X,X),
-		(not_l(X,Y) ; not_l(Y,X)),
-%%% ***
-
-end_of_file.
-
-
 %%% ****h* PTTP/PTTP-dalit
 %%% COPYRIGHT
 %%%   Copyright (c) 1988-2003 Mark E. Stickel, SRI International, Menlo Park, CA 94025  USA
@@ -1607,7 +1948,7 @@ end_of_file.
 %%%               Mark E. Stickel
 %%%  
 %%%   This file contains changes to PTTP to use
-%%%   depth-first iterative deepening search with bound on
+%%%   depth-first iterative deepening dalit_search with bound on
 %%%   D_Alit (maximum number of A-literals on a branch)
 %%%   instead of
 %%%   D_Inf (total number of subgoals).
@@ -1616,66 +1957,66 @@ end_of_file.
 %%%   to replace changed definitions.
 %%% SOURCE
 
-prove_D_Alit(Goal,Max,Min,Inc,ProofIn,ProofOut) :-
+dalit_prove(Goal,Max,Min,Inc,ProofIn,ProofOut) :-
 	expand_input_proof(ProofIn,PrfEnd),
 	PrevInc is Min + 1,
-	add_args(Goal,_,_,[],_,_,[],[],DepthIn,[PrfEnd|PrfEnd],ProofOut1,Goal1,_),
+	dalit_add_args(Goal,_,_,[],_,_,[],[],DepthIn,[PrfEnd|PrfEnd],ProofOut1,Goal1,_),
 	!,
-	timed_call(search(Goal1,Max,Min,Inc,PrevInc,DepthIn),'Proof'),
+	timed_call(dalit_search(Goal1,Max,Min,Inc,PrevInc,DepthIn),'Proof'),
 	contract_output_proof(ProofOut1,ProofOut),
 	write_proof(ProofOut1),
 	nl.
 
-prove_D_Alit(Goal,Max,Min,Inc,ProofIn) :-
-	prove_D_Alit(Goal,Max,Min,Inc,ProofIn,_).
+dalit_prove(Goal,Max,Min,Inc,ProofIn) :-
+	dalit_prove(Goal,Max,Min,Inc,ProofIn,_).
 
-prove_D_Alit(Goal,Max,Min,Inc) :-
-	prove_D_Alit(Goal,Max,Min,Inc,[],_).
+dalit_prove(Goal,Max,Min,Inc) :-
+	dalit_prove(Goal,Max,Min,Inc,[],_).
 
-prove_D_Alit(Goal,Max,Min) :-
-	prove_D_Alit(Goal,Max,Min,1,[],_).
+dalit_prove(Goal,Max,Min) :-
+	dalit_prove(Goal,Max,Min,1,[],_).
 
-prove_D_Alit(Goal,Max) :-
-	prove_D_Alit(Goal,Max,0,1,[],_).
+dalit_prove(Goal,Max) :-
+	dalit_prove(Goal,Max,0,1,[],_).
 
-prove_D_Alit(Goal) :-
-	prove_D_Alit(Goal,10000,0,1,[],_).
+dalit_prove(Goal) :-
+	dalit_prove(Goal,10000,0,1,[],_).
 
-search_cost_D_Alit(Body,HeadArgs,N) :-
-	Body = search_cost(M) ->
+dalit_search_cost(Body,HeadArgs,N) :-
+	Body = dalit_search_cost(M) ->
 		N = M;
 	Body = (A , B) ->
-		(A = search_cost(M) ->	% if first conjunct is search_cost(M),
-			N = M;		% search cost of conjunction is M
+		(A = dalit_search_cost(M) ->	% if first conjunct is dalit_search_cost(M),
+			N = M;		% dalit_search cost of conjunction is M
 		%true ->
-			search_cost(A,HeadArgs,N1),
-			search_cost(B,HeadArgs,N2),
+			dalit_search_cost(A,HeadArgs,N1),
+			dalit_search_cost(B,HeadArgs,N2),
 			max(N1,N2,N));
 	Body = (A ; B) ->
-		search_cost(A,HeadArgs,N1),
-		search_cost(B,HeadArgs,N2),
+		dalit_search_cost(A,HeadArgs,N1),
+		dalit_search_cost(B,HeadArgs,N2),
 		min(N1,N2,N);
 	builtin(Body) ->
 		N = 0;
 	%true ->
 		N = 1.
 
-search_D_Alit(_Goal,Max,Min,_Inc,_PrevInc,_DepthIn) :-
+dalit_search(_Goal,Max,Min,_Inc,_PrevInc,_DepthIn) :-
 	Min > Max,
 	!,
 	fail.
-search_D_Alit(Goal,_Max,Min,_Inc,PrevInc,DepthIn) :-
+dalit_search(Goal,_Max,Min,_Inc,PrevInc,DepthIn) :-
         write_search_progress(Min),
 	DepthIn = Min,
 	call(Goal),
 	true.			% should fail if solution found previously
-search_D_Alit(Goal,Max,Min,Inc,_PrevInc,DepthIn) :-
+dalit_search(Goal,Max,Min,Inc,_PrevInc,DepthIn) :-
 	Min1 is Min + Inc,
-	search(Goal,Max,Min1,Inc,Inc,DepthIn).
+	dalit_search(Goal,Max,Min1,Inc,Inc,DepthIn).
 
-make_wrapper(_DefinedPreds,[query,0],true) :-
+dalit_make_wrapper(_DefinedPreds,[dalit_query,0],true) :-
 	!.
-make_wrapper(DefinedPreds,[P,N],Result) :-
+dalit_make_wrapper(DefinedPreds,[P,N],Result) :-
 	functor(Goal,P,N),
 	Goal =.. [P|Args],
 	ExtraArgs = [PosAncestors,NegAncestors,DepthIn,ProofIn,ProofOut],
@@ -1716,13 +2057,13 @@ make_wrapper(DefinedPreds,[P,N],Result) :-
 			   	(Reduce;
 				 IntHead))).
 
-query_D_Alit(PosAncestors,NegAncestors,DepthIn,ProofIn,ProofOut) :-
-	int_query(PosAncestors,NegAncestors,DepthIn,ProofIn,ProofOut,query).
+dalit_query(PosAncestors,NegAncestors,DepthIn,ProofIn,ProofOut) :-
+	int_query(PosAncestors,NegAncestors,DepthIn,ProofIn,ProofOut,dalit_query).
 
-add_features_D_Alit((Head :- Body),(Head1 :- Body1)) :-
-	(functor(Head,query,_) ->
+dalit_add_features((Head :- Body),(Head1 :- Body1)) :-
+	(functor(Head,dalit_query,_) ->
 		Head2 = Head,
-		add_args(Body,yes,query,[],
+		dalit_add_args(Body,yes,dalit_query,[],
 		         PosAncestors,NegAncestors,
 			 PosAncestors,NegAncestors,
 		         DepthIn,
@@ -1735,7 +2076,7 @@ add_features_D_Alit((Head :- Body),(Head1 :- Body1)) :-
 		%true ->
 			PosGoal = yes),
 		Head =.. [_|HeadArgs],
-		add_args(Body,PosGoal,GoalAtom,HeadArgs,
+		dalit_add_args(Body,PosGoal,GoalAtom,HeadArgs,
                          PosAncestors,NegAncestors,
 			 NewPosAncestors,NewNegAncestors,
 		         Depth1,
@@ -1749,7 +2090,7 @@ add_features_D_Alit((Head :- Body),(Head1 :- Body1)) :-
 		%true ->
 			NewPosAncestors = PosAncestors,
 			PushAnc = (NewNegAncestors = [GoalAtom|NegAncestors])),
-		search_cost(Body,HeadArgs,Cost),
+		dalit_search_cost(Body,HeadArgs,Cost),
 		test_and_decrement_search_cost_expr(DepthIn,Cost,Depth1,TestExp),
 		conjoin(PushAnc,Body2,Body4),
 		conjoin(Matches,Body4,Body5),
@@ -1763,20 +2104,20 @@ add_features_D_Alit((Head :- Body),(Head1 :- Body1)) :-
 		    L1),
 	Head1 =.. [IntP|L1].
 
-add_args_D_Alit(Body,PosGoal,GoalAtom,HeadArgs,
+dalit_add_args(Body,PosGoal,GoalAtom,HeadArgs,
          PosAncestors,NegAncestors,
 	 NewPosAncestors,NewNegAncestors,
 	 DepthIn,
 	 ProofIn,ProofOut,
 	 Body1,New) :-
 	Body = (A , B) ->
-		add_args_D_Alit(A,PosGoal,GoalAtom,HeadArgs,
+		dalit_add_args(A,PosGoal,GoalAtom,HeadArgs,
                          PosAncestors,NegAncestors,
 			 NewPosAncestors,NewNegAncestors,
 		         DepthIn,
 			 ProofIn,Proof1,
 		         A1,New),
-		add_args_D_Alit(B,PosGoal,GoalAtom,HeadArgs,
+		dalit_add_args(B,PosGoal,GoalAtom,HeadArgs,
 		         PosAncestors,NegAncestors,
 			 NewPosAncestors,NewNegAncestors,
 			 DepthIn,
@@ -1785,7 +2126,7 @@ add_args_D_Alit(Body,PosGoal,GoalAtom,HeadArgs,
 		conjoin(A1,B1,Body1);
 	Body = (A ; B) ->
 		unimplemented;
-	functor(Body,search_cost,_) ->
+	functor(Body,dalit_search_cost,_) ->
 		ProofOut = ProofIn,
 		Body1 = true;
 	Body = infer_by(N) ->
@@ -1795,7 +2136,7 @@ add_args_D_Alit(Body,PosGoal,GoalAtom,HeadArgs,
 			N1 is - N),
 		Body1 = (ProofIn = [Prf,[N1,GoalAtom,PosAncestors,NegAncestors]|PrfEnd],
 			 ProofOut = [Prf|PrfEnd]);
-	Body = search_cost(N) ->
+	Body = dalit_search_cost(N) ->
 		ProofOut = ProofIn,
 		Body1 = true;
 	builtin(Body) ->
@@ -1811,4 +2152,6 @@ add_args_D_Alit(Body,PosGoal,GoalAtom,HeadArgs,
 		Body1 =.. L1,
 		New = yes.
 %%% ***
+:-do_pttp_test(_X).
+:-prolog.
 

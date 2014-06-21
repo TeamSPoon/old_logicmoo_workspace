@@ -411,6 +411,7 @@ call_after_game_load(Code):- call_after(moo:not_loading_game_file,Code).
 :- def_meta_predicate(assertion_t,1,1).
 :- def_meta_predicate(assertion_f,1,1).
 
+:- user_use_module(dbase_rules_pttp).
 :-include(dbase_i_coroutining).
 
 callable_tf(P,2):- arity_pred(P),!,fail.

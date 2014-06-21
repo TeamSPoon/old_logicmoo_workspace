@@ -44,7 +44,7 @@ possible_combination( settheor,   alg_lukasiewicz ).
 %%
 
 check_membership( KB, Instance, Concept, Degree, Restr ) :-
-	atom( KB ),
+        % atom(KB),
 	yadlr_concept_name( KB, Concept ),
 	yadlr_instance_name( KB, Instance ),
 	T =.. [Concept,Instance],

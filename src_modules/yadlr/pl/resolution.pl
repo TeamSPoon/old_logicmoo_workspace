@@ -68,15 +68,19 @@ set_proof_tree_log( yes ) :-
 	!,
 	retractall( use_proof_tree_log(_) ),
 	assert_if_new( use_proof_tree_log(yes) ),
-	open( 'resolution.log', write, _, [type(text),alias(yadlr_logfile)] ).
+	open( 'resolution.log', write,Stream, [type(text)] ), % ,alias(yadlr_logfile)
+        asserta(yadlr_logfile(Stream)).
+
 set_proof_tree_log( File ) :-
 	retractall( use_proof_tree_log(_) ),
-	assert_if_new( use_proof_tree_log(yes) ),
-	open( File, write, _, [type(text),alias(yadlr_logfile)] ).
+	assert_if_new( use_proof_tree_log(yes) ),        
+	open( File, write, Stream, [type(text)] ), % ,alias(yadlr_logfile)
+        asserta(yadlr_logfile(Stream)).
 
 unset_proof_tree_log :-
 	set_proof_tree_log( no ),
-	close( yadlr_logfile ).
+        yadlr_logfile(Stream),
+	close( Stream ).
 
 msg_proof_tree( Depth, StepType, OpenList, RestrVars ) :-
 	use_proof_tree_log( yes ),
@@ -530,3 +534,4 @@ prove( KB, Query, FuzzyDegree, Open, Restr ) :-
 	less_fuzzy( Degree, FuzzyDegree ),
 	prove_clauses( KB, 0, Clauses, Open, [Degree], RestrVars ),
 	fmt_range( RestrVars, Restr ).
+

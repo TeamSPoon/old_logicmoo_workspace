@@ -11,6 +11,10 @@
 */
 :-module(logicmoo_util_dcg,[
          do_dcg_util_tests/0,
+         isVar/1,
+         isQVar/1,
+         isVarOrVAR/1,
+
          dcgAnd//2,
          dumpList/1,
          dcgOr//2,
@@ -61,6 +65,12 @@
 :- meta_predicate dcgWhile(?,//,?,?).
 :- meta_predicate decl_dcgTest(?,?).
 :- meta_predicate decl_dcgTest(?,?,?).
+
+
+isVarOrVAR(V):-var(V),!.
+isVarOrVAR('$VAR'(_)).
+isVar(V):-isVarOrVAR(V);isQVar(V).
+isQVar(Cvar):-atom(Cvar),atom_concat('?',_,Cvar).
 
 :-dynamic 
    decl_dcgTest/2,

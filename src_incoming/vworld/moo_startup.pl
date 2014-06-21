@@ -35,8 +35,6 @@
          use_module(logicmoo(vworld/moo)),
          use_module(logicmoo(vworld/dbase))),'user').
 
-end_of_file.
-
 
 % logicmoo vworld mud server
 :- user_use_module(logicmoo(vworld/world)).

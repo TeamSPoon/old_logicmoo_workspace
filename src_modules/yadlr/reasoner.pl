@@ -5,6 +5,15 @@
 %% Created: 6-2-2007
 %% This file is in the public domain.
 
+% yadlr alias
+user:file_search_path(yadlr, X) :- getenv('LOGICMOO_HOME',MOO),atom_concat(MOO,'/src_modules/yadlr/pl', X).
+
+% aleph alias must resolve to the directory where aleph.pl exists.
+% you can download aleph from http://www.comlab.ox.ac.uk/oucl/research/areas/machlearn/Aleph/aleph.pl
+user:file_search_path(aleph, X) :- getenv('LOGICMOO_HOME',MOO),atom_concat(MOO,'/src_modules/aleph', X).
+
+user:file_search_path(logicmoo, X) :- getenv('LOGICMOO_HOME',MOO),atom_concat(MOO,'/src', X).
+
 :- visible(+all), leash(-exit),leash(-fail),leash(-call),leash(-redo).
 
 dmsg(X):-fmt(';; ~q. ~n',[X]).
@@ -23,18 +32,17 @@ assert_if_new(X):-assertz(X).
 fmt(X,Y):-'format'(X,Y).
 fmt(X,Y,Z):-'format'(X,Y,Z).
 
-
 remove_duplicates([], []).
 remove_duplicates([Elem|L], [Elem|NL]) :- delete(L, Elem, Temp), remove_duplicates(Temp, NL).
 
-yadlr_retract(KB):-retractKB(KB).
-
 :- assert_if_new( use_inference_engine(resolution) ).
 :- assert_if_new( use_algebra(alg_lukasiewicz) ).
+:- ensure_loaded('pl/dllearn').
 :- use_module('pl/yadlr').
-:- use_module('pl/resolution').
+%:- use_module('pl/resolution').
 %:- use_module('pl/prodlr').
 
+:- consult(domain).
 
 /*
 CURRENTLY SUPPORTED SYNTAX:
@@ -65,5 +73,6 @@ N :== Integer
 % :-consult('abstract-alc.pl').
 % :-consult('simple-alc.pl').
 
+askres( KB, Query):- prove( KB, Query, _FuzzyDegree, _Open, _Restr ).
 
 :-preparation.

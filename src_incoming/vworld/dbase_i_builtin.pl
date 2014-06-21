@@ -116,6 +116,8 @@ verb_after_arg(_,_,1).
 
 % forwardRule(inRegion(O,Region),atloc(O,LOC)):-
 
+:-trace.
+
 dbase_t(inRegion,O,Region):-atloc(O,LOC),world:locationToRegion(LOC,Region).
 dbase_t(inRegion,apath(Region,Dir),Region):- holds_t(pathBetween,Region,Dir,_To).
 

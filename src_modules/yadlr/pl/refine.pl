@@ -66,7 +66,7 @@ refine(A, B) :-
     ->  refine_bot(A, B) 
       ; refine_lazy(A, B).
 
-refine_lazy(false, Clause) :-
+refine_lazy(nil, Clause) :-
    lith(HeadTemplate),
    functor(HeadTemplate, Name, Arity),
    functor(Head, Name, Arity),  
@@ -113,7 +113,7 @@ unordered_subset(Set, SubSet):-
   subset(NSubSet,Set),
   permutation(NSubSet, SubSet).
 
-refine_bot(false, Clause) :-
+refine_bot(nil, Clause) :-
     bottom(BottomClause),
     BottomClause = (Head:-Body),
     has_pieces(Body, BottomClauseList),
