@@ -22,6 +22,7 @@
          snumbervars/1,
          safe_numbervars/1,
          safe_numbervars/2,
+         loop_check_clauses/2,
          must_det/1,
          must_det/2,
          is_deterministic/1,
@@ -248,7 +249,18 @@ snumbervars(BC):-numbervars(BC,0,_,[singletons(true),attvar(skip)]).
 
 loop_check(B,TODO):- copy_term(B,BC),snumbervars(BC),!, loop_check(BC,B,TODO).
 loop_check_term(B,TERM,TODO):- copy_term(TERM,BC),snumbervars(BC),!, loop_check(BC,B,TODO).
+loop_check_clauses(B,TODO):- copy_term(B,BC),snumbervars(BC),!, loop_check(BC,call_skipping_n_clauses(1,B),TODO).
 
+to_list_of(_,[Rest],Rest):-!.
+to_list_of(RL,[R|Rest],LList):-
+      to_list_of(RL,R,L),
+      to_list_of(RL,Rest,List),
+      LList=..[RL,L,List],!.
+
+call_or_list(Rest):-to_list_of(';',Rest,List),List.
+
+call_skipping_n_clauses(N,H):-
+   findall(B,clause(H,B),L),length(L,LL),!,LL>N,length(Skip,N),append(Skip,Rest,L),!,call_or_list(Rest).
 
 is_loop_checked(B):- copy_term(B,BC),snumbervars(BC),!,inside_loop_check(BC).
 is_loop_checked(B):- copy_term(B,BC),snumbervars(BC),!,recorded(B,BC).

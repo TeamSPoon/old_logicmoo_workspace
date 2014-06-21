@@ -18,6 +18,7 @@
             convert_members/3,
             replace_in_string/4,
             replace_in_string/5,
+            atom_subst/4,
             must_nonvar/1,
             non_empty/1,
             string_dedupe/2,
@@ -436,6 +437,8 @@ append_ci([H1|T],L2,[H2|L3]) :- string_equal_ci(H1,H2),append_ci(T,L2,L3).
 string_equal_ci(L0,L1):- once(string_ci(L0,SL0)),string_ci(L1,SL0),!.
 string_equal_ci(L0,L0):-!.
 
+atom_subst(A,F,R,K):-replace_in_string(F,R,A,K),!.
+
 
 is_empty_string(A):-var(A),!.
 is_empty_string([]).
@@ -457,6 +460,7 @@ convert_members(Call, In,Out):- call(Call,In,Out).
 
 replace_in_string(SepChars, PadChars,Repl, A,C):- split_string(A,SepChars,PadChars,B),atomics_to_string(B,Repl,C).
 
+replace_in_string(F,R,A,K):-atom(A),!,atom_string(A,S),replace_in_string(F,R,S,C),atom_string(K,C).
 replace_in_string(SepChars,Repl,A,C):- atomics_to_string(B,SepChars,A),atomics_to_string(B,Repl,C).
 
 replace_periods(A,S):-  

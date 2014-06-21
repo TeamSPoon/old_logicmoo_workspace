@@ -29,6 +29,7 @@
          maplist_safe/2,
          maplist_safe/3,
          subst/4,
+         predsubst/3,
          wsubst/4,
          remove_dupes/2,
          list_to_set_safe/2,
@@ -109,6 +110,33 @@ doall(C):-ignore((C,fail)).
 in_thread_and_join(Goal):-in_thread_and_join(Goal,_Status).
 :- meta_predicate in_thread_and_join(0,+).
 in_thread_and_join(Goal,Status):-thread_create(Goal,ID,[]),thread_join(ID,Status).
+
+
+% ===================================================================
+% Substitution based on Pred
+% ===================================================================
+
+% Usage: predsubst(+Fml,+Pred,?FmlSk)
+
+predsubst(A,Pred, D):- 
+      catch(notrace(nd_predsubst(A,Pred,D)),_,fail),!.
+predsubst(A,_B,A).
+
+nd_predsubst(  Var, Pred,SUB ) :- call(Pred,Var,SUB).
+nd_predsubst(  Var, _,Var ) :- var(Var),!.
+nd_predsubst(  P, Pred, P1 ) :- functor(P,_,N),nd_predsubst1( Pred, P, N, P1 ).
+
+nd_predsubst1( _,  P, 0, P  ).
+nd_predsubst1( Pred,  P, N, P1 ) :- N > 0, P =.. [F|Args], 
+            nd_predsubst2( Pred,  Args, ArgS ),
+            nd_predsubst2( Pred, [F], [FS] ),  
+            P1 =.. [FS|ArgS].
+
+nd_predsubst2( _, [], [] ).
+nd_predsubst2( Pred, [A|As], [Sk|AS] ) :- call(Pred,A,Sk), !, nd_predsubst2( Pred, As, AS).
+nd_predsubst2( Pred, [A|As], [A|AS]  ) :- var(A), !, nd_predsubst2( Pred, As, AS).
+nd_predsubst2( Pred, [A|As], [Ap|AS] ) :- nd_predsubst( A,Pred,Ap ),nd_predsubst2( Pred, As, AS).
+nd_predsubst2( _, L, L ).
 
 % ===================================================================
 % Substitution based on ==
