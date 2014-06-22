@@ -411,8 +411,62 @@ call_after_game_load(Code):- call_after(moo:not_loading_game_file,Code).
 :- def_meta_predicate(assertion_t,1,1).
 :- def_meta_predicate(assertion_f,1,1).
 
-:- user_use_module(dbase_rules_pttp).
 :-include(dbase_i_coroutining).
+
+/*
+took(logicmoo_example1, success, 0.00019672599999998042).
+took(logicmoo_example1_holds, success, 0.00019862799999992298).
+took(logicmoo_example2, success, 0.00041965599999982395).
+took(chang_lee_example1, success, 0.0003453970000002471).
+took(chang_lee_example2, success, 25.950020179).
+took(chang_lee_example3, success, 0.0001518709999999146).
+took(chang_lee_example4, success, 0.00016846299999784264).
+took(chang_lee_example5, success, 0.0004118619999999851).
+took(chang_lee_example6, success, 20.269434864).
+took(chang_lee_example7, success, 0.0005044489999974644).
+XRay writing compiled clauses ... ERROR: assert/1: Cannot represent due to cyclic_term'
+
+*/
+%:- user_use_module(dbase_rules_xray).
+:- user_use_module(dbase_rules_pttp).
+/*
+took(logicmoo_example1, success, 0.00022064099999985487).
+took(logicmoo_example1_holds, success, 0.00020874199999987297).
+took(logicmoo_example2, success, 0.00042750399999991195).
+took(chang_lee_example1, success, 0.0003601799999999322).
+took(chang_lee_example2, success, 26.210047015).
+took(chang_lee_example3, success, 0.00016319299999878467).
+took(chang_lee_example4, success, 0.00016233199999859949).
+took(chang_lee_example5, success, 0.00034287200000093776).
+took(chang_lee_example6, success, 20.232917918).
+took(chang_lee_example7, success, 0.0005417630000010831).
+took(chang_lee_example8, success, 0.00019861100000184706).
+*/
+% dalit_version
+/*
+took(logicmoo_example1, failure, 0.0010554120000001443).
+took(logicmoo_example1_holds, failure, 0.001101244999999862).
+took(logicmoo_example2, failure, 0.0012024239999999242).
+took(chang_lee_example1, failure, 0.0013265609999999484).
+took(chang_lee_example2, failure, 0.0013745810000000969).
+took(chang_lee_example3, failure, 0.0014636169999999726).
+took(chang_lee_example4, failure, 0.0014039070000000375).
+took(chang_lee_example5, failure, 0.0014299669999999765).
+took(chang_lee_example6, failure, 0.001745270000000021).
+took(chang_lee_example7, failure, 0.0017748500000001055).
+took(chang_lee_example8, failure, 0.00177948200000011).
+
+*/
+
+
+:-do_pttp_test(_X).
+
+:-pttp_assert(test123).
+:-pttp_query(test123).
+
+:-prolog.
+
+
 
 callable_tf(P,2):- arity_pred(P),!,fail.
 callable_tf(F,A):- functor_safe(P,F,A),predicate_property(P,_),!.
