@@ -84,6 +84,6 @@ show_file_search_path:-'format'('% ~q.~n',[forall(user:file_search_path(_,_))]),
   forall(user:file_search_path(A,B),'format'('% ~q.~n',[user:file_search_path(A,B)])).
 % :-show_file_search_path.
 
-:- list_undefined.
+% :- list_undefined.
 :- logicmoo_util_dcg:do_dcg_util_tests.
 
