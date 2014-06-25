@@ -253,7 +253,9 @@ pttp_assert(X) :-
 %%%   clause 'query :- ...'.  The query can then be proved by 'prove(query)'.
 %%% SOURCE
 
-prove(Goal,Max,Min,Inc,ProofIn,ProofOut) :-
+prove(Goal,Max,Min,Inc,ProofIn,ProofOut) :- prove_inc(Goal,Max,Min,Inc,ProofIn,ProofOut).
+
+prove_inc(Goal,Max,Min,Inc,ProofIn,ProofOut) :-
 	expand_input_proof(ProofIn,PrfEnd),
 	PrevInc is Min + 1,
 	add_args(Goal,_,_,[],_,_,[],[],DepthIn,DepthOut,[PrfEnd|PrfEnd],ProofOut1,Goal1,_),
@@ -273,12 +275,10 @@ prove(Goal,Max,Min) :-
 	prove(Goal,Max,Min,1,[],_).
 
 prove(Goal,Max) :-
-	prove(Goal,Max,0,1,[],_).
+	prove(Goal,Max,2,3).
 
-prove(Goal) :-!,
-	prove(Goal,100,0,1,[],_).
-prove(Goal) :-
-	prove(Goal,1000000,0,1,[],_).
+prove(Goal) :- prove(Goal,15).
+%prove(Goal) :-  prove(Goal,1000000,0,1,[],_).
 
 %%% ***
 
@@ -343,75 +343,8 @@ linearize_args(TermIn,TermOut,VarsIn,VarsOut,MatchesIn,MatchesOut,I,N) :-
 %%%   like unify(X,f(X)) fail rather than create circular terms.
 %%% SOURCE
 
-unify(X,Y) :-!, unify_with_occurs_check(X,Y).
+unify(X,Y) :- unify_with_occurs_check(X,Y).
 
-unify(X,Y) :-
-	var(X) ->
-		(var(Y) ->
-			X = Y;
-		%true ->
-			functor(Y,_,N),
-			(N = 0 ->
-				true;
-			N = 1 ->
-				arg(1,Y,Y1), not_occurs_in(X,Y1);
-			%true ->
-				not_occurs_in_args(X,Y,N)),
-			X = Y);
-	var(Y) ->
-		functor(X,_,N),
-		(N = 0 ->
-			true;
-		N = 1 ->
-			arg(1,X,X1), not_occurs_in(Y,X1);
-		%true ->
-			not_occurs_in_args(Y,X,N)),
-		X = Y;
-	%true ->
-		functor(X,F,N),
-		functor(Y,F,N),
-		(N = 0 ->
-			true;
-		N = 1 ->
-			arg(1,X,X1), arg(1,Y,Y1), unify(X1,Y1);
-		%true ->
-			unify_args(X,Y,N)).
-
-unify_args(X,Y,N) :-
-	N = 2 ->
-		arg(2,X,X2), arg(2,Y,Y2), unify(X2,Y2),
-		arg(1,X,X1), arg(1,Y,Y1), unify(X1,Y1);
-	%true ->
-		arg(N,X,Xn), arg(N,Y,Yn), unify(Xn,Yn),
-		N1 is N - 1, unify_args(X,Y,N1).
-%%% ***
-%%% ****if* PTTP/not_occurs_in
-%%% DESCRIPTION
-%%%   not_occurs_in(Var,Term) fails if variable Var occurs inside
-%%%   Term and succeeds otherwise.
-%%% SOURCE
-
-not_occurs_in(Var,Term) :-
-	Var == Term ->
-		fail;
-	var(Term) ->
-		true;
-	%true ->
-		functor(Term,_,N),
-		(N = 0 ->
-			true;
-		N = 1 ->
-			arg(1,Term,Arg1), not_occurs_in(Var,Arg1);
-		%true ->
-			not_occurs_in_args(Var,Term,N)).
-
-not_occurs_in_args(Var,Term,N) :-
-	N = 2 ->
-		arg(2,Term,Arg2), not_occurs_in(Var,Arg2),
-		arg(1,Term,Arg1), not_occurs_in(Var,Arg1);
-	%true ->
-		arg(N,Term,ArgN), not_occurs_in(Var,ArgN),
-		N1 is N - 1, not_occurs_in_args(Var,Term,N1).
 %%% ***
 
 %%% ****if* PTTP/test_and_decrement_search_cost_expr
@@ -422,7 +355,10 @@ test_and_decrement_search_cost_expr(DepthIn,Cost,Depth1,Expr) :-
 		Depth1 = DepthIn,
 		Expr = true;
 	%true ->
-		Expr = (DepthIn >= Cost , Depth1 is DepthIn - Cost).
+		Expr = test_and_decrement_search_cost(DepthIn,Cost,Depth1).
+
+test_and_decrement_search_cost(DepthIn,Cost,Depth1):- DepthIn >= Cost , Depth1 is DepthIn - Cost.
+
 %%% ***
 %%% ****if* PTTP/search_cost
 %%% DESCRIPTION
@@ -459,17 +395,21 @@ search_cost(Body,HeadArgs,N) :-
 %%%   the fact that the DepthIn and DepthOut arguments of
 %%%   search are also the DepthIn and DepthOut arguments of Goal.
 %%% SOURCE
+search(Goal,Max,Min,Inc,PrevInc,DepthIn,DepthOut):-search0(Goal,Max,Min,Inc,PrevInc,DepthIn,DepthOut).
 
-search(_Goal,Max,Min,_Inc,_PrevInc,_DepthIn,_DepthOut) :-
+search0(Goal,Max,Min,Inc,PrevInc,DepthIn,DepthOut):- % trace,
+        search1(Goal,Max,Min,Inc,PrevInc,DepthIn,DepthOut).
+
+search1(_Goal,Max,Min,_Inc,_PrevInc,_DepthIn,_DepthOut) :-
 	Min > Max,
 	!,
 	fail.
-search(Goal,_Max,Min,_Inc,PrevInc,DepthIn,DepthOut) :-
+search1(Goal,_Max,Min,_Inc,PrevInc,DepthIn,DepthOut) :-
         write_search_progress(Min),
 	DepthIn = Min,
 	catch(call(Goal),E,trace),
 	DepthOut < PrevInc.	% fail if solution found previously
-search(Goal,Max,Min,Inc,_PrevInc,DepthIn,DepthOut) :-
+search1(Goal,Max,Min,Inc,_PrevInc,DepthIn,DepthOut) :-
 	Min1 is Min + Inc,
 	search(Goal,Max,Min1,Inc,Inc,DepthIn,DepthOut).
 %%% ***
@@ -479,7 +419,9 @@ search(Goal,Max,Min,Inc,_PrevInc,DepthIn,DepthOut) :-
 
 make_wrapper(_DefinedPreds,[query,0],true) :-
 	!.
-make_wrapper(DefinedPreds,[P,N],Result) :-
+make_wrapper(DefinedPreds,[P,N],Result):- must_det(make_wrapper0(DefinedPreds,[P,N],Result)). % ,dmsg(pp(Result)).
+
+make_wrapper0(DefinedPreds,[P,N],Result) :-
 	functor(Goal,P,N),
 	Goal =.. [P|Args],
 	ExtraArgs = [PosAncestors,NegAncestors,DepthIn,DepthOut,ProofIn,ProofOut],
@@ -737,24 +679,52 @@ body_for_head_literal(Head,Wff,Body) :-
 %%%   predicates returns a list of the predicates appearing in a formula.
 %%% SOURCE
 
+is_functor_like_search(Search):-atom(Search),arg(_,vv(search,prove),Search).
+
+is_functor_like_firstOrder(Search):-atom(Search),arg(_,vv(firstOrder,prove),Search).
+
+predicates(Wff,[]):-not(compound(Wff)),!.
+predicates([Lw],L):- predicates(Lw,L),!.
+predicates([Lw|ISTw],L):- !,
+   predicates(Lw,L1),
+   predicates(ISTw,L2),
+   union(L2,L1,L).
+
+predicates(Wff,L):- functor(Wff,Search,_),is_functor_like_search(Search),arg(1,Wff,X),predicates(X,L),!.
+
 predicates(Wff,L) :-
-	Wff = (A :- B) ->
-		predicates(A,L1),
-		predicates(B,L2),
-		list_union(L2,L1,L);
-	Wff = (A , B) ->
-		predicates(A,L1),
-		predicates(B,L2),
-		list_union(L2,L1,L);
-	Wff = (A ; B) ->
-		predicates(A,L1),
-		predicates(B,L2),
-		list_union(L2,L1,L);
-	builtin(Wff) ->
-		L = [];
-	%true ->
-		functor(Wff,F,N),
-		L = [[F,N]].
+        Wff = (A :- B) ->
+                predicates(A,L1),
+                predicates(B,L2),
+                union(L2,L1,L);
+        Wff = (A , B) ->
+                predicates(A,L1),
+                predicates(B,L2),
+                union(L2,L1,L);
+        Wff = (A ; B) ->
+                predicates(A,L1),
+                predicates(B,L2),
+                union(L2,L1,L);
+        functor(Wff,search,_) ->        % list predicates in first argument of search
+                arg(1,Wff,X),
+                predicates(X,L);
+        builtin(Wff) ->
+                L = [];
+        %true ->
+                functor(Wff,F,N),
+                L = [[F,N]].
+
+
+
+predicates(Wff,L) :- functor(Wff,F,A), predicates(Wff,F,A,L).
+
+skipped_functor(F):- fail,is_2nd_order_holds(F).
+
+predicates(Wff,F,___,L):- logical_functor(F), Wff=..[_|ARGS], predicates(ARGS,L).
+predicates(Wff,F,A,  L):- builtin(F,A), Wff=..[_|ARGS], predicates(ARGS,L).
+% predicates(Wff,F,___,L):- skipped_functor(F), Wff=..[_|ARGS], predicates(ARGS,L).
+predicates(Wff,F,A,[[F,A]|L]):- Wff=..[_|ARGS], predicates(ARGS,L).
+
 %%% ***
 %%% ****if* PTTP/procedure
 %%% DESCRIPTION
@@ -780,12 +750,74 @@ procedures([[P,N]|Preds],Clauses,Procs) :-
 procedures([],_Clauses,true).
 %%% ***
 
+head_body_was(_,_).
+
 %%% ****if* PTTP/add_features
 %%% SOURCE
+add_features((Head :- Body),NewHeadBody):- 
+   must_det(add_features0((Head :- Body),(Head1 :- Body1))),
+   must_det(new_head_body(Head, Body,Head1 ,Body1,NewHeadBody)).
 
-add_features((Head :- Body),(Head1 :- Body1)) :-
+%new_head_body(Head, Body,Head1 ,Body1,(Head1 :- Body1)):-!.
+% new_head_body(Head, Body,Head1 ,Body1,(Head1 :- head_body_was(Head, Body), Body1)):- arg_checks()
+new_head_body(Head, infer_by(ProofID),Head1 ,Body1,(Head1 :- Body1)):- ground(Head),!.
+new_head_body(Head, Body,Head1 ,Body1,(Head1 :- Body1)):- is_query_lit(Head),!.
+new_head_body(Head, Body,Head1 ,Body1,(Head1 :- Body1)):- 
+   true. 
+   %   dmsg(pp((head_features(Head1) :-head_body_was(Head, Body), Body1))).
+
+call_proof(Call,_):-catch(call(Call),E,fail).
+
+add_features0((Head :- Body),(Head :- Body1)):-builtin(Head),!, add_features_hb(Head , Body , _Head1 , Body1).
+add_features0(B,A):- add_features1(B,A).
+
+add_features1((Head :- Body),(Head1 :- Body1)) :- (ground(Head);is_query_lit(Head)),!, add_features_hb_normal(Head , Body , Head1 , Body1).
+
+add_features1((Head :- Body),(Head1 :- Body1)) :- add_features_hb(Head , Body , Head1 , Body1).
+
+add_features_hb(Head , Body ,Head1 , Body1) :-
   
-	(is_query_lit(Head) ->
+       linearize(Head,Head2,[],_,true,Matches),
+       (negative_literal(Head) ->
+               PosGoal = no;
+       %true ->
+               PosGoal = yes),
+       Head =.. [_|HeadArgs],
+  
+       add_args(Body,
+          PosGoal,GoalAtom,HeadArgs,
+          PosAncestors,NegAncestors,
+          NewPosAncestors,NewNegAncestors,
+          Depth1,DepthOut,
+          ProofIn,ProofOut,
+                Body2,New),
+
+       (var(New) ->
+               PushAnc = true;
+
+       PosGoal = yes ->
+               NewNegAncestors = NegAncestors,
+               PushAnc = (NewPosAncestors = [GoalAtom|PosAncestors]);
+       %true -> ( PosGoal == false)
+               NewPosAncestors = PosAncestors,
+               PushAnc = (NewNegAncestors = [GoalAtom|NegAncestors])),
+
+       search_cost(Body,HeadArgs,Cost),
+       test_and_decrement_search_cost_expr(DepthIn,Cost,Depth1,TestExp),
+       conjoin(PushAnc,Body2,Body4),
+       conjoin(Matches,Body4,Body5),
+       conjoin(TestExp,Body5,Body1),
+     
+     add_head_args(Head2,
+          PosGoal,GoalAtom,HeadArgs,
+          PosAncestors,NegAncestors,
+          NewPosAncestors,NewNegAncestors,
+          DepthIn,DepthOut,
+          ProofIn,ProofOut,Head1,New).
+
+add_features_hb_normal(Head , Body ,Head1 , Body1) :-
+  
+       ( is_query_lit(Head) ->
 		Head2 = Head,
 		add_args(Body,yes,query,[],
 		         PosAncestors,NegAncestors,
@@ -800,44 +832,51 @@ add_features((Head :- Body),(Head1 :- Body1)) :-
 		%true ->
 			PosGoal = yes),
 		Head =.. [_|HeadArgs],
+            
 		add_args(Body,PosGoal,GoalAtom,HeadArgs,
                          PosAncestors,NegAncestors,
 			 NewPosAncestors,NewNegAncestors,
 		         Depth1,DepthOut,
 			 ProofIn,ProofOut,
-			 Body2,New),
+			 Body2,New),    
+
 		(var(New) ->
 			PushAnc = true;
+
 		PosGoal = yes ->
 			NewNegAncestors = NegAncestors,
 			PushAnc = (NewPosAncestors = [GoalAtom|PosAncestors]);
-		%true ->
+		%true -> ( PosGoal == false)
 			NewPosAncestors = PosAncestors,
 			PushAnc = (NewNegAncestors = [GoalAtom|NegAncestors])),
+
+                test_and_decrement_search_cost_expr(DepthIn,Cost,Depth1,TestExp),
+
 		search_cost(Body,HeadArgs,Cost),
-		test_and_decrement_search_cost_expr(DepthIn,Cost,Depth1,TestExp),
 		conjoin(PushAnc,Body2,Body4),
 		conjoin(Matches,Body4,Body5),
 		conjoin(TestExp,Body5,Body1)),
+     
     	Head2 =.. [P|L],
 	internal_functor(P,IntP),
-	list_append(L,[PosAncestors,NegAncestors,
+	list_append(L,
+                    [PosAncestors,NegAncestors,
 		       DepthIn,DepthOut,
 		       ProofIn,ProofOut,
 		       GoalAtom],
 		    L1),
 	Head1 =.. [IntP|L1].
+
 %%% ***
 %%% ****if* PTTP/add_args
 %%% SOURCE
 
-add_args(Body,PosGoal,GoalAtom,HeadArgs,
+add_args((A , B),PosGoal,GoalAtom,HeadArgs,
          PosAncestors,NegAncestors,
 	 NewPosAncestors,NewNegAncestors,
 	 DepthIn,DepthOut,
 	 ProofIn,ProofOut,
 	 Body1,New) :-
-	Body = (A , B) ->
 		add_args(A,PosGoal,GoalAtom,HeadArgs,
                          PosAncestors,NegAncestors,
 			 NewPosAncestors,NewNegAncestors,
@@ -850,9 +889,15 @@ add_args(Body,PosGoal,GoalAtom,HeadArgs,
 		         Depth1,DepthOut,
 			 Proof1,ProofOut,
                          B1,New),
-		conjoin(A1,B1,Body1);
-	Body = (A ; B) ->
-		add_args(A,PosGoal,GoalAtom,HeadArgs,
+		conjoin(A1,B1,Body1),!.
+
+add_args((A ; B),PosGoal,GoalAtom,HeadArgs,
+         PosAncestors,NegAncestors,
+	 NewPosAncestors,NewNegAncestors,
+	 DepthIn,DepthOut,
+	 ProofIn,ProofOut,
+	 Body1,New) :-
+               add_args(A,PosGoal,GoalAtom,HeadArgs,
 		         PosAncestors,NegAncestors,
 			 NewPosAncestors,NewNegAncestors,
 		         DepthA,DepthOut,
@@ -864,7 +909,8 @@ add_args(Body,PosGoal,GoalAtom,HeadArgs,
 		         DepthB,DepthOut,
 			 ProofIn,ProofOut,
 			 B2,New),
-		search_cost(A,HeadArgs,CostA),
+   trace,
+                search_cost(A,HeadArgs,CostA),
 		search_cost(B,HeadArgs,CostB),
 		(CostA < CostB ->
 			DepthA = DepthIn,
@@ -883,38 +929,76 @@ add_args(Body,PosGoal,GoalAtom,HeadArgs,
 			DepthB = DepthIn,
 			A1 = A2,
 			B1 = B2),
-		disjoin(A1,B1,Body1);
-	functor(Body,search_cost,_) ->
-		DepthOut = DepthIn,
-		ProofOut = ProofIn,
-		Body1 = true;
-	Body = infer_by(N) ->
-		DepthOut = DepthIn,
-		(PosGoal = yes -> 
+		disjoin(A1,B1,Body1).
+
+add_args(Search_cost,_PosGoal,_GoalAtom,_HeadArgs,_PosAncestors,_NegAncestors,_NewPosAncestors,_NewNegAncestors,Depth,Depth,Proof,Proof,true,_New):- functor(Search_cost,search_cost,_),!.
+
+add_args(infer_by(N),PosGoal,GoalAtom,_HeadArgs,
+         PosAncestors,NegAncestors,
+	 _NewPosAncestors,_NewNegAncestors,
+	 Depth,Depth,
+	 ProofIn,ProofOut,
+	 Body1,_New) :-
+    (PosGoal = yes -> 
 			N1 = N;
 		%true ->  % atom in proof is negation of actual literal
 			N1 is - N),
-		Body1 = (ProofIn = [Prf,[N1,GoalAtom,PosAncestors,NegAncestors]|PrfEnd],
-			 ProofOut = [Prf|PrfEnd]);
-	Body = search_cost(N) ->
-		DepthOut = DepthIn,
-		ProofOut = ProofIn,
-		Body1 = true;
-	builtin(Body) ->
-		DepthOut = DepthIn,
-		ProofOut = ProofIn,
-		Body1 = Body;
-	%true ->
-		Body =.. L,
-		list_append(L,
-                       [NewPosAncestors,NewNegAncestors,
-		        DepthIn,DepthOut,
-			ProofIn,ProofOut],
-		       L1),
-		Body1 =.. L1,
-		New = yes.
-%%% ***
+    Body1 = (ProofIn = [Prf,[N1,GoalAtom,PosAncestors,NegAncestors]|PrfEnd],
+			 ProofOut = [Prf|PrfEnd]).
 
+add_args(Body,_PosGoal,_GoalAtom,_HeadArgs,_PosAncestors,_NegAncestors,_NewPosAncestors,_NewNegAncestors,Depth,Depth,Proof,Proof,Body,_New):- builtin(Body),!.
+
+% normal lit
+add_args(BodyIn,
+         _PosGoal,_GoalAtom,_HeadArgs,
+         _PosAncestors,_NegAncestors,
+	 NewPosAncestors,NewNegAncestors,
+	 DepthIn,DepthOut,
+	 ProofIn,ProofOut,
+	 Body1,New) :-
+   correct_lit(BodyIn,Body), 
+    Body =.. L,
+    list_append(L, [NewPosAncestors,NewNegAncestors,DepthIn,DepthOut,ProofIn,ProofOut], L1),
+    Body11 =.. L1,
+    Body1 = call_proof(Body11,Body),
+    New = yes.
+
+correct_lit(B,A):-once(correct_lit0(B,A)),B==A,!.
+correct_lit(B,A):-once(correct_lit0(B,A)),!. % dmsg(once(correct_lit0(B,A))),term_variables(B,BV),term_variables(A,AV),must(AV==BV).
+
+correct_lit0(Body,Body):-not(compound(Body)),!.
+correct_lit0(BodyIn,Body):- var(BodyIn),trace_or_throw(correct_lit(BodyIn,Body)).
+correct_lit0(BodyIn,Body):- functor(BodyIn,F,A),BodyIn=..[F|List],correct_lit(BodyIn,F,A,List,Body).
+
+correct_lit(BodyIn,F,_,_,Body):- atom_concat('not_',_,F),!,negated_literal(BodyIn,Neg),!,correct_lit(Neg,NegBody),negated_literal(NegBody,Body).
+correct_lit(BodyIn,F,A,L,Body):- is_holds_false(F),trace_or_throw(correct_lit(BodyIn,F,A,L,Body)).
+correct_lit(BodyIn,F,_,[L|IST],Body):- is_holds_true(F),correct_true(L,IST,Body).
+correct_lit(BodyIn,F,_,[L|IST],Body):- correct_true(F,[L|IST],Body).
+
+do_not_wrap(F):-not(atom(F)),!,fail.
+do_not_wrap(F):-arg(_,vv(query),F).
+do_not_wrap(F):-atom_concat('int_',_,F).
+
+correct_true(F,[L|IST],Body):- do_not_wrap(F),Body=..[F,L|IST].
+correct_true(F,[L|IST],Body):- atom(F),builtin(F,_),Body=..[F,L|IST].
+%correct_true(F,L,Body):- var(F),!,trace_or_throw(correct_true(F,L,Body)).
+correct_true(F,[L|IST],Body):- Body =..[firstOrder,F,L|IST].
+
+add_head_args(HeadIn,
+          _PosGoal,GoalAtom,_HeadArgs,
+          PosAncestors,NegAncestors,
+          _NewPosAncestors,_NewNegAncestors,
+          DepthIn,DepthOut,
+          ProofIn,ProofOut,
+          Head1,_New):-
+     correct_lit(HeadIn,Head),
+        Head =.. [P|L],
+	internal_functor(P,IntP),
+	list_append(L, [PosAncestors,NegAncestors, DepthIn,DepthOut, ProofIn,ProofOut, GoalAtom], L1),
+	Head1 =.. [IntP|L1].
+
+
+%%% ***
 %%% ****if* PTTP/pttp1
 %%% SOURCE
 
@@ -922,15 +1006,14 @@ pttp1(X,Y) :-
 	nl,
 	write('PTTP input formulas:'),
 	clauses(X,X0,1,_),		% prints and transforms input clauses
-	nl,
 	apply_to_conjuncts(X0,add_features,X8),
-	predicates(X8,IntPreds0),
-	list_reverse(IntPreds0,IntPreds1),
+	must_det(predicates(X8,IntPreds0)),
+	must_det((list_reverse(IntPreds0,IntPreds1),
 	procedures(IntPreds1,X8,IntProcs),
-	predicates(X0,Preds0),
+	must_det(predicates(X0,Preds0)),
 	list_reverse(Preds0,Preds),
 	apply_to_elements(Preds,make_wrapper(IntPreds1),Procs),
-	conjoin(IntProcs,Procs,Y),
+	conjoin(IntProcs,Procs,Y))),
 	!.
 %%% ***
 %%% ****if* PTTP/pttp2
@@ -1207,13 +1290,15 @@ write_clause(A,_) :-				% 2-ary predicate for use as
 %%% ***
 %%% ****if* PTTP/write_clause_with_number
 %%% SOURCE
-
+   
 write_clause_with_number(A,WffNum) :-
 	nl,
 	write_indent_for_number(WffNum),
 	write(WffNum),
 	write('  '),
-	write(A),
+        copy_term(A,AA),
+        numbervars(AA,0,_,[attvar(skip),singletons(true)]),
+	write(AA),
 	write(.).
 
 write_indent_for_number(N) :-
@@ -1269,7 +1354,9 @@ builtin(T) :-
 	functor(T,F,N),
 	builtin(F,N).
 
+builtin(V,A):-var(V),!,trace_or_throw(builtin(V,A)).
 builtin(!,0).
+builtin(call_proof,2).
 builtin(true,0).
 builtin(false,0).
 builtin(fail,0).
@@ -1304,10 +1391,12 @@ builtin(test_and_decrement_search_cost,_).
 builtin(unify,_).
 builtin(identical_member,_).
 builtin(unifiable_member,_).
-%builtin(F,A):-moo:isRegisteredCycPred(Mt,F,A),!,fail.
+builtin(F,_):- atom_concat(_,'_int',F),!.
+builtin(F,A):-moo:isRegisteredCycPred(Mt,F,A),!,fail.
 %builtin(F,A):-functor(P,F,A),predicate_property(P,_).
 %%% ***
 
+end_of_file.
 
 
 %%% ****h* PTTP/PTTP-dalit

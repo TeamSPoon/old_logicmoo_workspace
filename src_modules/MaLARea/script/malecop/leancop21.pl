@@ -38,10 +38,10 @@ prove(F,Proof) :- prove2(F,[cut,comp(7)],Proof).
 prove2(F,Set,Proof) :-
     (F=[_|_] -> M=F ; make_matrix(F,M,Set)),
     retract_all(lit(_,_,_)), (member([-(#)],M) -> S=conj ; S=pos),
-    assert_clauses(M,S), prove(1,Set,Proof).
+    trace,assert_clauses(M,S), prove(1,Set,Proof).
 
 prove(PathLim,Set,Proof) :-
-    \+member(scut,Set) -> prove([-(#)],[],PathLim,[],Set,[Proof]) ;
+    \+ member(scut,Set) -> prove([-(#)],[],PathLim,[],Set,[Proof]) ;
     lit(#,C,_) -> prove(C,[-(#)],PathLim,[],Set,Proof1),
     Proof=[C|Proof1].
 prove(PathLim,Set,Proof) :-

@@ -884,10 +884,16 @@ indent_e(X):-XX is X -1,!,write(' '), indent_e(XX).
 fmt0(X,Y,Z):-catch((format(X,Y,Z),flush_output_safe(X)),E,dmsg(E)).
 fmt0(X,Y):-catch((format(X,Y),flush_output_safe),E,dmsg(E)).
 fmt0(X):-catch(text_to_string(X,S),_,fail),'format'('~w',[S]),!.
-fmt0(X):- (atom(X) -> catch((format(X,[]),flush_output_safe),E,dmsg(E)) ; (term_to_message_string(X,M) -> 'format'('~q~n',[M]);'format'('~q~n',[X]))).
+fmt0(X):- (atom(X) -> catch((format(X,[]),flush_output_safe),E,dmsg(E)) ; (term_to_message_string(X,M) -> 'format'('~q~n',[M]);fmt_or_pp(X))).
 fmt(X):-fresh_line,fmt0(X).
 fmt(X,Y):-fresh_line,fmt0(X,Y),!.
 fmt(X,Y,Z):- fmt0(X,Y,Z),!.
+
+
+fmt_portray_clause(X):- unnumbervars(X,Y),!,numbervars(Y), portray_clause(Y).
+fmt_or_pp(pp((X:-Y))):-!,fmt_portray_clause((X:-Y)),!.
+fmt_or_pp(pp(X)):-!,functor(X,F,A),fmt_portray_clause((pp(F,A):-X)),!.
+fmt_or_pp(X):-'format'('~q~n',[X]).
 
 dfmt(X):- with_output_to_stream(user_error,fmt(X)).
 dfmt(X,Y):- with_output_to_stream(user_error,fmt(X,Y)).
@@ -1071,7 +1077,7 @@ safe_numbervars(X):-get_gtime(G),safe_numbervars(X,'$VAR',G,_).
 safe_numbervars(Copy,X,Z):-numbervars(Copy,X,Z,[attvar(skip)]).
 safe_numbervars(Copy,_,X,Z):-numbervars(Copy,X,Z,[attvar(skip)]).
 
-unnumbervars(X,Y):-term_to_atom(X,A),atom_to_term(A,Y,_).
+unnumbervars(X,Y):-with_output_to(atom(A),write_term(X,[numbervars(true),quoted(true)])),atom_to_term(A,Y,_),!.
 
 renumbervars(X,Z):-unnumbervars(X,Y),safe_numbervars(Y,Z).
 

@@ -33,6 +33,8 @@ append([Ls|As],Rs) :-
 
 :- op(100,fy,-). % due to problems with -3^[] as (-3)^[] instead of -(3^[])
 
+renvars(X,Y):-with_output_to(atom(A),write_term(X,[numbervars(true),quoted(true)])),atom_to_term(A,Y,_),!.
+
 %%%
 
 tptp2leancop(Files,Settings) :-
@@ -54,22 +56,15 @@ dump_global_info(Settings):-
 	( member(dumpterms(DumpFile1),Settings) -> dump_dnf_termhashs(DumpFile1); true ), 
 	( member(dumpdnf2axioms(DumpFile2),Settings) -> dump_dnf2axioms(DumpFile2); true ). 
 
-tptp2leancop_main(Files,Settings):-
-	   member(File,Files),
-	   tell(user_error),
-	   write('% '),
-	   write(File),
-	   write('...'),
-	   told,
-	   tptp2leancop_database(File,Settings,R),
-	   tell(user_error),
-	   writeln(done),
-	   ( name(File,Ns),append(Ns,".leancop",Fs),name(NewFile,Fs),
-	     save_leancop(NewFile,R) -> true
-	    ),
-	   told,
-	   fail.
+tptp2leancop_main(Files,Settings):-forall(member(File,Files),tptp2leancop_main1(File,Settings)).
 
+tptp2leancop_main1(File,Settings):-
+	   'format'(user_error,'% processing ~w ...',[File]),
+	   tptp2leancop_database(File,Settings,R),
+	   'format'(user_error,' done ~n',[]),
+	   atom_concat(File,'.leancop',NewFile),
+	   save_leancop(NewFile,R),	   
+	   told.
 
 
 dump_dnf2axioms(DumpFile) :-
@@ -205,10 +200,9 @@ numbervars_distinct(X,Out) :-
 %%%%%%
 
 save_leancop(File,List) :-
-    open(File,write,Stream), 
-    ( forall(member(L,List),(copy_term(L,C), numbervars(C,0,_), print(Stream,C),write(Stream,'.'),nl(Stream)))
-    -> close(Stream) ; close(Stream), fail )
-    .
+ tell(File),
+ forall(member(L,List),(copy_term(L,C), numbervars(C,0,_),'format'('~q.~n',[C]))),
+ told.
     
 %%%
 
@@ -578,3 +572,15 @@ read_file_lines(File, List):-
        open(File,read,S),
        read_lines(S,List),
        close(S),!.
+
+
+%% dumpsyms(DumpFile)
+%% dumpterms(DumpFile1)
+%% dumpdnf2axioms(DumpFile2)
+:-tptp2leancop(['CSR075+2.p'],[dumpsyms(d1),dumpterms(d2),dumpdnf2axioms(d3)]).
+:-tell(d4).
+:- listing(dnf/5).
+:- listing(index_2_axioms/2).
+:-retractall(skolem(invalid, _, _)).
+:- listing(skolem/3).
+:-told.

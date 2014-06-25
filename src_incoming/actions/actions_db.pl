@@ -80,14 +80,14 @@ end_of_file.
 
 *************************************************************************/
 
-:- use_module('NLPModules/Actions/execute',[k/1,notk/1,add/1,del/1]).
+:- use_module('NLPModules/Actions/execute',[holds/1,notk/1,add/1,del/1]).
 
 % TODO: Design the addition and deletion of the player effects.  
 % TODO: Translate into PKS syntax:
 % 1. Delete the pecentage symbol
 % 2. Check if PKS accepts variables without question mark
 % 3. Define all the predicates, functions and constants
-% 4. Replace the letters k by K
+% 4. Replace the letters holds by K
 % 5. In the preconditions, replace commas by ^
 % 6. In the effects replace commas by ;
 
@@ -114,7 +114,7 @@ end_of_file.
 % <!--
 look(agent(Agent),theme(Theme)) :- % -->
 %   <preconds>
-	k(here(Theme)),
+	holds(here(Theme)),
 %	</preconds>
 %	<effects>
 	add(hold(Theme,Agent)),
@@ -129,7 +129,7 @@ look(agent(Agent),theme(Theme)) :- % -->
 look(agent(Agent),theme(Theme)) :- % -->
 %   <preconds>
 	notk(here(Theme)),
-	k(visible(Theme)),
+	holds(visible(Theme)),
 %	</preconds>
 %	<effects>
 	add(describe(Theme)).
@@ -142,10 +142,10 @@ look(agent(Agent),theme(Theme)) :- % -->
 % <!--
 take(agent(Agent),theme(Theme),source(Source)) :- % -->
 %       <preconds>
-	k(takeable(Theme)),
-	k(accessible(Theme)),
+	holds(takeable(Theme)),
+	holds(accessible(Theme)),
 	notk(hold(Agent,Theme)),
-	k(hasdetail(Source,Theme)),
+	holds(hasdetail(Source,Theme)),
 %	</preconds>
 %	<effects>
 	del(hasdetail(Source,Theme)),
@@ -159,10 +159,10 @@ take(agent(Agent),theme(Theme),source(Source)) :- % -->
 % <!--
 take(agent(Agent),theme(Theme),source(Source)) :- % -->
 %       <preconds>
-	k(takeable(Theme)),
-	k(accessible(Theme)),
+	holds(takeable(Theme)),
+	holds(accessible(Theme)),
 	notk(hold(Agent,Theme)),
-	k(hold(Source,Theme)),
+	holds(hold(Source,Theme)),
 %	</preconds>
 %	<effects>
 	del(hold(Source,Theme)),
@@ -176,10 +176,10 @@ take(agent(Agent),theme(Theme),source(Source)) :- % -->
 % <!--
 unlock(agent(Agent),theme(Theme),instrument(Instrument)) :- % -->
 %   <preconds>
-	k(accessible(Theme)),
-	k(locked(Theme)),
+	holds(accessible(Theme)),
+	holds(locked(Theme)),
 	pk(fitsin(Instrument,Theme)),
-	k(hold(Agent,Instrument)),
+	holds(hold(Agent,Instrument)),
 %	</preconds>
 %	<effects>
 	del(locked(Theme)),
@@ -195,11 +195,11 @@ unlock(agent(Agent),theme(Theme),instrument(Instrument)) :- % -->
 % <!--
 lock(agent(Agent),theme(Theme),instrument(Instrument)) :- % -->
 %   <preconds>
-	k(accessible(Theme)),
-	k(closed(Theme)),
-	k(unlocked(Theme)),
-	k(fitsin(Instrument,Theme)),
-	k(hold(Agent,Instrument)),
+	holds(accessible(Theme)),
+	holds(closed(Theme)),
+	holds(unlocked(Theme)),
+	holds(fitsin(Instrument,Theme)),
+	holds(hold(Agent,Instrument)),
 %	</preconds>
 %	<effects>
 	del(unlocked(Theme)),
@@ -213,10 +213,10 @@ lock(agent(Agent),theme(Theme),instrument(Instrument)) :- % -->
 % <!--
 open(agent(Agent),object(Object)) :- % -->
 %   <preconds>
-	k(openclosecontainer(Object)),
-	k(closed(Object)),
-	k(unlocked(Object)),
-	k(accessible(Object)),
+	holds(openclosecontainer(Object)),
+	holds(closed(Object)),
+	holds(unlocked(Object)),
+	holds(accessible(Object)),
 %	</preconds>
 %	<effects>
 	del(closed(Object)),
@@ -231,9 +231,9 @@ open(agent(Agent),object(Object)) :- % -->
 % <!--
 shut(agent(Agent),object(Object)) :- % -->
 %   <preconds>
-	k(openclosecontainer(Object)),
-	k(open(Object)),
-	k(accessible(Object)),
+	holds(openclosecontainer(Object)),
+	holds(open(Object)),
+	holds(accessible(Object)),
 %	</preconds>
 %	<effects>
 	del(open(Object)),
@@ -247,9 +247,9 @@ shut(agent(Agent),object(Object)) :- % -->
 % <!--
 eat(ingestor(Ingestor),ingestible(Ingestible)) :- % -->
 %   <preconds>
-	k(edible(Ingestible)),
+	holds(edible(Ingestible)),
 	notk(disgusting(Ingestible)),
-	k(hold(Ingestor,Ingestible)),
+	holds(hold(Ingestor,Ingestible)),
 %	</preconds>
 %	<effects>
 	del(hold(Ingestor,Ingestible)),
@@ -264,8 +264,8 @@ eat(ingestor(Ingestor),ingestible(Ingestible)) :- % -->
 % <!--
 drop(agent(Agent),theme(Theme),goal(Goal)) :- % -->
 %       <preconds>
-	k(hold(Goal,Agent)),
-	k(hold(Agent,Theme)),
+	holds(hold(Goal,Agent)),
+	holds(hold(Agent,Theme)),
 %	</preconds>
 %	<effects>
 	del(hold(Agent,Theme)),
@@ -280,9 +280,9 @@ drop(agent(Agent),theme(Theme),goal(Goal)) :- % -->
 % <!--
 throw(agent(Agent),theme(Theme),goal(Goal)) :- % -->
 %       <preconds>
-	k(hold(Agent,Theme)),
-	k(alive(Theme)),
-	k(genericcontainer(Goal)),
+	holds(hold(Agent,Theme)),
+	holds(alive(Theme)),
+	holds(genericcontainer(Goal)),
 %	</preconds>
 %	<effects>
 	del(hold(Agent,Theme)),
@@ -299,9 +299,9 @@ throw(agent(Agent),theme(Theme),goal(Goal)) :- % -->
 % <!--
 put(agent(Agent),theme(Theme),goal(Goal)) :- % -->
 %	<preconds>
-	k(hold(Agent,Theme)),
-	k(genericcontainer(Goal)),
-	k(accessible(Goal)),
+	holds(hold(Agent,Theme)),
+	holds(genericcontainer(Goal)),
+	holds(accessible(Goal)),
 %	</preconds>
 %	<effects>
 	del(hold(Agent,Theme)),
@@ -316,9 +316,9 @@ put(agent(Agent),theme(Theme),goal(Goal)) :- % -->
 % <!--
 put(agent(Agent),theme(Theme),goal(Goal)) :- % -->
 %	<preconds>
-	k(hold(Agent,Theme)),
+	holds(hold(Agent,Theme)),
 	notk(genericcontainer(Goal)),
-	k(accessible(Goal)),
+	holds(accessible(Goal)),
 %	</preconds>
 %	<effects>
 	del(hold(Agent,Theme)),
@@ -332,9 +332,9 @@ put(agent(Agent),theme(Theme),goal(Goal)) :- % -->
 % <!--
 wear(agent(Agent),theme(Theme)) :- % -->
 %	<preconds>
-	k(hold(Agent,Theme)),
-	k(accessible(Theme)),
-	k(wearable(Theme)),
+	holds(hold(Agent,Theme)),
+	holds(accessible(Theme)),
+	holds(wearable(Theme)),
 %	</preconds>
 %	<effects>
 	del(hold(Agent,Theme)),
@@ -349,9 +349,9 @@ wear(agent(Agent),theme(Theme)) :- % -->
 % <!--
 kiss(agent(Agent),entity(Entity)) :- % -->
 %	<preconds>
-	k(alive(Entity)),
-	k(accessible(Entity)),
-	k(beautiful(Agent)),
+	holds(alive(Entity)),
+	holds(accessible(Entity)),
+	holds(beautiful(Agent)),
 %	</preconds>
 %	<effects>
 	add(happy(Entity)),
@@ -366,8 +366,8 @@ kiss(agent(Agent),entity(Entity)) :- % -->
 % <!--
 kiss(agent(Agent),entity(Entity)) :- % -->
 %	<preconds>
-	k(alive(Entity)),
-	k(accessible(Entity)),
+	holds(alive(Entity)),
+	holds(accessible(Entity)),
 	notk(beautiful(Agent)),
 %	</preconds>
 %	<effects>
@@ -389,9 +389,9 @@ kiss(agent(Agent),entity(Entity)) :- % -->
 % <!--
 kill(killer(Killer),victim(Victim),instrument(Instrument)) :- % -->
 %	<preconds>
-	k(alive(Victim)),
-	k(easytokill(Victim)),
-	k(accessible(Victim)),
+	holds(alive(Victim)),
+	holds(easytokill(Victim)),
+	holds(accessible(Victim)),
 %	</preconds>
 %	<effects>
 	del(alive(Victim)),
@@ -406,9 +406,9 @@ kill(killer(Killer),victim(Victim),instrument(Instrument)) :- % -->
 % <!--
 kill(killer(Killer),victim(Victim),instrument(Instrument)) :- % -->
 %	<preconds>
-	k(alive(Victim)),
-	k(accessible(Victim)),
-	k(weapon(Instrument)),
+	holds(alive(Victim)),
+	holds(accessible(Victim)),
+	holds(weapon(Instrument)),
 %	</preconds>
 %	<effects>
 	del(alive(Victim)),
@@ -422,9 +422,9 @@ kill(killer(Killer),victim(Victim),instrument(Instrument)) :- % -->
 % <!--
 standup(protagonist(Protagonist),source(Source),goal(Goal)) :- % -->
 %	<preconds>
-	k(hold(Source,Protagonist)),
-	k(seated(Protagonist)),
-	k(hold(Goal,Source)),
+	holds(hold(Source,Protagonist)),
+	holds(seated(Protagonist)),
+	holds(hold(Goal,Source)),
 %	</preconds>
 %	<effects>
 	del(hold(Source,Protagonist)),
@@ -438,10 +438,10 @@ standup(protagonist(Protagonist),source(Source),goal(Goal)) :- % -->
 % <!--
 sitdown(protagonist(Protagonist),source(Source),goal(Goal)) :- % -->
 %	<preconds>
-	k(hold(Source,Protagonist)),
+	holds(hold(Source,Protagonist)),
 	notk(seated(Protagonist)),
-	k(seating(Goal)),
-	k(hold(Source,Goal)),
+	holds(seating(Goal)),
+	holds(hold(Source,Goal)),
 %	</preconds>
 %	<effects>
 	del(hold(Source,Protagonist)),
@@ -455,11 +455,11 @@ sitdown(protagonist(Protagonist),source(Source),goal(Goal)) :- % -->
 % <!--
 move(protagonist(Protagonist),exit(Exit),goal(Goal),source(Source)) :- % -->
 %	<preconds>
-	k(here(Source)),
-	% I'd like to add here k(hereroom(Room)), k(hasexit(Room,Exit))
+	holds(here(Source)),
+	% I'd like to add here holds(hereroom(Room)), holds(hasexit(Room,Exit))
 	notk(seated(Protagonist)),
-	k(hasexit(Source,Exit)),
-	k(leadsto(Exit,Goal)),
+	holds(hasexit(Source,Exit)),
+	holds(leadsto(Exit,Goal)),
 %	</preconds>
 %	<effects>
 	del(hold(Source,Protagonist)),

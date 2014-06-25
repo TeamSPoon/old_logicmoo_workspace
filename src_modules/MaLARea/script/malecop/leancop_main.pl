@@ -11,6 +11,7 @@
 %% Copyright: (c) 2009 by Jens Otten
 %% License:   GNU General Public License
 
+:- set_prolog_flag(verbose_load,true).
 
 :- assert(prolog(swi)).  % Prolog dialect: eclipse, sicstus, swi
 :- dynamic(axiom_path/1).
@@ -71,3 +72,7 @@ output_result(File,Matrix,Proof,Result,Conj) :-
     ( var(Out) -> true ; print('Start of proof'), print(Out),
       print(File), nl, leancop_proof(Matrix,Proof),
       print('End of proof'), print(Out), print(File), nl ).
+
+:-[ bootstrap_dnf ].
+
+

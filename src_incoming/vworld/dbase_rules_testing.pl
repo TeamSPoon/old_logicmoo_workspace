@@ -1,10 +1,15 @@
 :- discontiguous(pttp_test/2).
 
+
 do_pttp_test(TestName):- forall(pttp_test(TestName,Data),
                                 (                                 
                                  dmsg(do_pttp_test(TestName)),
-                                 retractall(query(_,_,_,_)),                                
-                                 retractall(int_query(_,_,_,_,_,_,_)),retractall(int_query(_,_,_,_,_,_)),
+                                 eraseall(int_query,_),
+                                 /*
+                                 eraseall(int_not_firstOrder,_),
+                                 eraseall(not_firstOrder,_),
+                                 eraseall(int_firstOrder,_),
+                                 eraseall(firstOrder,_),*/
                                  once(pttp_assert(Data)),once((ignore(call_print_tf(prove_timed(TestName,query))),sleep(1))))),
                               listing(took).
 
@@ -26,17 +31,26 @@ call_print_tf(G):- dmsg(failed_finally(G)),sleep(5).
 
 unimplemented:-throw(unimplemented).
 
-pttp_assert_int([Y]):-!,pttp_assert_int(Y).
-pttp_assert_int([Y|L]):-!,pttp_assert_int(Y),pttp_assert_int(L).
-pttp_assert_int(Y):-assert(Y),copy_term(Y,YY),numbervars(YY),dmsg(pttp_assert_int(YY)).
+pttp_assert_int([Y]):-pttp_assert_int(Y),!.
+pttp_assert_int([Y|L]):-!,pttp_assert_int(Y),pttp_assert_int(L),!.
+
+%firstOrder -> holds_t
+%not_firstOrder -> holds_f
+%int_firstOrder -> dbase_t
+%int_not_firstOrder -> dbase_f
+
+pttp_assert_int(Y):- assertz_if_new(Y). % , copy_term(Y,YY),numbervars(YY),dmsg(pttp_assert_int(YY)),!.
 
 pttp_assert_int(A,_) :-				% 2-ary predicate for use as
 	pttp_assert_int(A).			% apply_to_conjuncts argument
 
-
+:- export int_query/6, int_query/7.
 :- thread_local(is_query_functor/1).
 :- thread_local int_query/6.
 :- thread_local int_query/7.
+
+%eraseall(M:F,A):-!,functor(C,F,A),forall(clause(M:C,_,X),erase(X)).
+%eraseall(F,A):-functor(C,F,A),forall(clause(C,_,X),erase(X)).
 
 is_query_functor(query).
 
@@ -45,10 +59,13 @@ is_query_lit(Q):- functor(Q,F,_),atom_concat('quer',_,F).
 
 get_int_query(Int_query):- is_query_functor(X),atom_concat('int_',X,Int_query).
 
-
 pttp_query(Y):- term_variables(Y,Vars),gensym(query_pttp,Q),Z=..[Q|Vars],
     atom_concat('int_',Q,Int_query).
     with_assertions(is_query_functor(Q), (pttp_assert_int(((Z:-Y))), prove(Int_query))).
+
+:-export(pttp_query/1).
+:-export(pttp_assert/1).
+:-export(pttp_assert_int/1).
 
 
 /*
@@ -101,7 +118,7 @@ pttp_test(logicmoo_example2,
 
 logicmoo_example3:-xray_test(logicmoo_example3).
 
-pttp_test(logicmoo_example3,
+pttp_test(logicmoo_example3_will_fail,
 	((
           (secondOrder(genls,SubClass,SuperClass) & firstOrder(SubClass,Instance) => firstOrder(SuperClass,Instance)),
           (secondOrder(genlPreds,P1,P2) & firstOrder(P1,A) => firstOrder(P2,A)),
@@ -123,7 +140,7 @@ pttp_test(logicmoo_example3,
 
           (query:- not(firstOrder(sonOf,gun,phil)))
           % Expected true
-	))):-fail.
+	))).
 
           % (all X:( all Y : (motherOf(X,Y)) => (bellyButton(X) , older(X,Y) , female(Y)) )),
 
@@ -321,7 +338,7 @@ pttp_test(chang_lee_example9,
 		(p(X) ; l(h(X),X)),
 		(not_p(X) ; not_l(a,X) ; l(f(a),X)),	% negation of query
 		(query :- p(X) , l(a,X) , not_l(f(a),X))
-	))):-fail. % skips this test
+	))).
 
 %%% ***
 %%% ****f* PTTP_Examples/overbeek_example4

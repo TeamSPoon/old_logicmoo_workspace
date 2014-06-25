@@ -24,6 +24,7 @@
          exists_file_safe/1,
          exists_directory_safe/1,
          def_meta_predicate/3,
+         eraseall/2,
          time_file_safe/2,
          throw_safe/1,
          maplist_safe/2,
@@ -40,11 +41,18 @@
          at_start/1,
          in_thread_and_join/1,
          in_thread_and_join/2,
+         functor_h/2,
          asserta_new/1,
+         as_clause/3,
          asserta_if_new/1,
+         assertz_if_new/1,
+         assertz_if_new_clause/1,
+         assertz_if_new_clause/2,
          throw_if_true_else_fail/2,
          assert_if_new/1,
          safe_univ/2,
+         clause_asserted/2,
+         clause_asserted/1,
          bad_functor/1,
          make_list/3,
          multi_transparent/1]).
@@ -85,21 +93,40 @@ makeArgIndexes(_NEW,_F).
 
 
 % peekAttributes/2,pushAttributes/2,pushCateElement/2.
-:- meta_predicate asserta_new(:),asserta_if_new(:),assertz_new(:),assertz_if_new(:),assert_if_new(:).
+:- module_transparent asserta_new(:),asserta_if_new(:),assertz_new(:),assertz_if_new(:),assert_if_new(:),assertz_if_new_clause(:),assertz_if_new_clause(:,:),clause_asserted(0,0),clause_asserted(0),eraseall/2.
+%:- meta_predicate asserta_new(:),asserta_if_new(:),assertz_new(:),assertz_if_new(:),assert_if_new(:),assertz_if_new_clause(:),assertz_if_new_clause(:,:),clause_asserted(0,0),clause_asserted(0).
 asserta_new(_Ctx,NEW):-ignore(retractall(NEW)),asserta(NEW).
 writeqnl(_Ctx,NEW):- fmt('~q.~n',[NEW]),!.
+
+eraseall(M:F,A):-!,forall((current_predicate(M:F/A),functor(C,F,A)),forall(clause(M:C,_,X),erase(X))).
+eraseall(F,A):-forall((current_predicate(M:F/A),functor(C,F,A)),forall(clause(M:C,_,X),erase(X))).
 
 asserta_new(NEW):-ignore(retractall(NEW)),asserta(NEW).
 assertz_new(NEW):-ignore(retractall(NEW)),assertz(NEW).
 
-assert_if_new(N):-catch(N,_,fail),!.
+assert_if_new(N):-clause_asserted(N),!.
 assert_if_new(N):-assert(N),!.
 
-assertz_if_new(N):-catch(N,_,fail),!.
+assertz_if_new(N):-clause_asserted(N),!.
 assertz_if_new(N):-assertz(N),!.
 
-asserta_if_new(N):-catch(N,_,fail),!.
+asserta_if_new(N):-clause_asserted(N),!.
 asserta_if_new(N):-asserta(N),!.
+
+assertz_if_new_clause(C):- as_clause(C,H,B),assertz_if_new_clause(H,B).
+
+assertz_if_new_clause(H,B):-clause_asserted(H,B),!.
+assertz_if_new_clause(H,B):-assertz((H:-B)).
+
+clause_asserted(C):- as_clause(C,H,B),clause_asserted(H,B).
+
+clause_asserted(H,B):- not(not(( functor_h(H,HH),functor_h(B,BB),clause(HH,BB),numbervars(HH+BB),numbervars(H+B),!, H+B == HH+BB ))).
+
+as_clause( ((H :- B)),H,B):-!.
+as_clause( H,  H,  true).
+
+functor_h(H,H):-var(H),!.
+functor_h(H,HH):-functor(H,F,A),functor(HH,F,A).
 
 :- meta_predicate doall(0).
 doall(C):-ignore((C,fail)).

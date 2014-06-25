@@ -126,12 +126,13 @@ not_loading_game_file:-not(loading_game_file(_)),loaded_game_file(_).
 
 is_holds_true(Prop):- notrace((atom(Prop),is_holds_true0(Prop))),!.
 
-is_holds_true0(Prop):-arg(_,p(cholds_t, k,p,holds,holds_t,dbase_t,asserted_dbase_t,assertion_t,assertion),Prop).
+% k,p,..
+is_holds_true0(Prop):-arg(_,vvv(holds,holds_t,dbase_t,asserted_dbase_t,assertion_t,assertion,secondOrder,firstOrder),Prop).
 
 is_2nd_order_holds(Prop):- is_holds_true(Prop) ; is_holds_false(Prop).
 
 % is_holds_false(Prop):-notrace((atom(Prop),once((is_holds_false0(Prop,Stem),is_holds_true0(Stem))))).
-is_holds_false(Prop):-member(Prop,[not,nholds,holds_f,dbase_f,aint,assertion_f,asserted_dbase_f,retraction]).
+is_holds_false(Prop):-member(Prop,[not,nholds,holds_f,dbase_f,aint,assertion_f,asserted_dbase_f,retraction,not_secondOrder,not_firstOrder]).
 
 is_holds_false0(Prop,Stem):-atom_concat('not_',Stem,Prop).
 is_holds_false0(Prop,Stem):-atom_concat(Stem,'_not',Prop).

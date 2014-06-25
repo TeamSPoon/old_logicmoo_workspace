@@ -31,17 +31,35 @@ nnf(Fml,NNFOUT) :- nnf(Fml,[],NNF,_),NNFOUT=NNF.
 % FreeV:      List of free variables in Fml.
 % Paths:      Number of disjunctive paths in Fml.
 
-nnf_pre_clean(Atomic,Atomic,[]):-atomic(Atomic),!.
-nnf_pre_clean(Atomic,Atomic,[]):-isVar(Atomic),!.
-nnf_pre_clean(pttp(A),AA,Vars):- !,nnf_pre_clean(A,AA,Vars).
-nnf_pre_clean([A|B],[AA|BB],Vars):-!,
-   nnf_pre_clean(A,AA,Vars1),
-   nnf_pre_clean(B,BB,Vars2),
+nnf_pre_clean(_Type,Atomic,Atomic,[]):-atomic(Atomic),!.
+nnf_pre_clean(_Type,Atomic,Atomic,[]):-isVar(Atomic),!.
+nnf_pre_clean(Type,pttp(A),AA,Vars):- !,nnf_pre_clean(Type,A,AA,Vars).
+nnf_pre_clean(Type,[A|B],[AA|BB],Vars):-!,
+   nnf_pre_clean(Type,A,AA,Vars1),
+   nnf_pre_clean(Type,B,BB,Vars2),
    append(Vars1,Vars2,Vars).
-nnf_pre_clean(C,CC,Vars):-
+
+nnf_pre_clean(_Type,C,CC,Vars):-
+   C=..[A|B],
+   logical_functor(A),!,
+   nnf_pre_clean_functor(A,AA,Vars1),!,
+   nnf_pre_clean(sent,B,BB,Vars2),
+   append(Vars1,Vars2,Vars),
+   CC=..[AA|BB],!.
+
+nnf_pre_clean(Type,CIN,CC,Vars):-
+   Type == sent,
+   correct_lit(CIN,C),
    C=..[A|B],
    nnf_pre_clean_functor(A,AA,Vars1),!,
-   nnf_pre_clean(B,BB,Vars2),
+   nnf_pre_clean(arg,B,BB,Vars2),
+   append(Vars1,Vars2,Vars),
+   CC=..[AA|BB],!.
+
+nnf_pre_clean(Type,C,CC,Vars):-
+   C=..[A|B],
+   nnf_pre_clean_functor(A,AA,Vars1),!,
+   nnf_pre_clean(Type,B,BB,Vars2),
    append(Vars1,Vars2,Vars),
    CC=..[AA|BB],!.
 
@@ -61,18 +79,28 @@ nnf_post_clean(C,CC,Vars):-
    append(Vars1,Vars2,Vars),
    CC=..[AA|BB],!.
 
+
+logical_functor(X):-atom(X),nnf_pre_clean_functor(A,B,_),(X==A;X==B),!.
+
 nnf_pre_clean_functor(and,(,),[]).
 nnf_pre_clean_functor(or,(;),[]).
+nnf_pre_clean_functor('::',(:),[]).
 nnf_pre_clean_functor(~,(-),[]).
 nnf_pre_clean_functor(not,(-),[]).
-nnf_pre_clean_functor(implies,(->),[]).
-nnf_pre_clean_functor(imp,(->),[]).
+nnf_pre_clean_functor(implies,(=>),[]).
+nnf_pre_clean_functor(imp,(=>),[]).
+nnf_pre_clean_functor(->,(=>),[]).
+nnf_pre_clean_functor(entailed_from,(:-),[]).
+nnf_pre_clean_functor(implied_by,(:-),[]).
+nnf_pre_clean_functor(forAll,(all),[]).
+nnf_pre_clean_functor(thereExists,(ex),[]).
 nnf_pre_clean_functor(forall,(all),[]).
 nnf_pre_clean_functor(exists,(ex),[]).
+nnf_pre_clean_functor(A,A,[]):-atom(A).
 nnf_pre_clean_functor(A,A,[]).
 
 nnf(Fml,FreeV,CleanNNF,Paths):-
-   nnf_pre_clean(Fml,Clean,FreeV),
+   nnf_pre_clean(sent,Fml,Clean,FreeV),
    nnf_clean(Clean,FreeV,NNF,Paths),
    nnf_post_clean(NNF,CleanNNF,FreeV).
 

@@ -10,6 +10,8 @@
 %% Copyright: (c) 2010 by Jiri Vyskocil
 %% License:   GNU General Public License
 
+:- set_prolog_flag(verbose_load,true).
+
 :- dynamic(ai_advisor/0).  % with for mat: ai_advisor(server_location:port)
 :- dynamic(cache_table/2). % form at: cache_table(<query>,<table_functor_name>)
 :- dynamic(dnf/4).         % dnf table with format: dnf(Index,Type,Clause,Ground)
@@ -23,7 +25,7 @@
 :- dynamic(unshared_skolem_lit/5).
 :- dynamic(problem_id/1).
 
-%:- assert(best_lit_mode(original_leancop)). 
+:- assert(best_lit_mode(original_leancop)). 
 % original_leancop
 % naive_and_complete
 % naive
@@ -103,6 +105,9 @@ leancop_get_result(File,Conj,Matrix,Settings,Advisor_In,Advisor_Out,Proof,Result
 %% Copyright: (c) 1999-2008 by Jens Otten
 %% License:   GNU General Public License
 
+/*
+prove(((p,all X:(p=>q(X)))=>all Y:q(Y)),[[q(a)], [[-(q(X)),p],[[-(p)]]]])
+*/
 
 % :- [def_mm].  % load program for clausal form translation
 
@@ -700,7 +705,7 @@ prove([Lit|Cla],Path,PathLength,PathLim,Lem,Set,Advisor_In,Advisor_Out,Proof) :-
          member(NegL,Path), unify_with_occurs_check(NegL,NegLit),
          Cla1=[], Proof1=[]
          ;
-          writeln('@'),
+          true, % write('@'),
           (
             machine_learning_of_subtrees -> 
                copy_term([NegLit|Path],Real_Input),flag(best_lit_attempts,PAST,PAST) 
@@ -764,14 +769,20 @@ assert_clauses2([L|C],C1,G,Index,Functor) :-
     X=..[Functor,L2,L,C2,G,Index],assert(X), 
     assert_clauses2(C,C3,G,Index,Functor).
 
-assert_renvar([],[]).
-assert_renvar([F|FunL],[F1|FunL1]) :-
+% DNF version: will overewrite the prev
+% assert_renvar(FunL,FunL1):-leancop_dnf_assert_renvar(FunL,FunL1).
+
+leancop_dnf_assert_renvar([],[]).
+leancop_dnf_assert_renvar([F|FunL],[F1|FunL1]) :-
     ( var(F) -> true ; F=..[Fu|Arg], assert_renvar(Arg,Arg1),
       F1=..[Fu|Arg1] ), assert_renvar(FunL,FunL1).
 
 %%% output of leanCoP proof
 
-leancop_proof(Mat,Proof) :-
+% DNF version: will overewrite the prev
+% leancop_proof(Mat,Proof):- leancop_dnf_leancop_proof(Mat,Proof).
+
+leancop_dnf_leancop_proof(Mat,Proof) :-
     proof(compact) -> leancop_compact_proof(Proof) ;
     proof(connect) -> leancop_connect_proof(Mat,Proof) ;
     proof(readable_with_global_index) -> leancop_readable_proof_with_global_index(Mat,Proof) ;
@@ -969,4 +980,4 @@ list_to_disjunction([L|Ls],'|'(TL,TLs)) :- !,
 literal_to_tptp(-(T),'~'(T)) :- !.
 literal_to_tptp(T,T) :- !.
 
-
+:- leancop_dnf('CSR075+2.p.leancop',[conj,dumpsyms(d1),dumpterms(d2),dumpdnf2axioms(d3)],R),writeq(R).

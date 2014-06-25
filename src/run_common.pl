@@ -15,7 +15,7 @@
 
 :- export(is_startup_file/1).
 
-is_startup_file(Name):- current_prolog_flag(os_argv,ArgV),member(Named,ArgV),atom_concat(Name,_,Named),!.
+is_startup_file(Name):- current_prolog_flag(os_argv,ArgV),member(Named,ArgV),atom(Named),atom_concat(Name,_,Named),!.
 
 
 within_user(Call):- '@'(Call,'user').

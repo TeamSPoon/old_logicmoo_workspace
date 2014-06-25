@@ -14,8 +14,8 @@
 %
 
 %
-% props(Obj,height(ObjHt))  == k(Obj,height,ObjHt) == p(height,Obj,ObjHt) == height(Obj,ObjHt)
-% padd(Obj,height(ObjHt))  == add(p(height,Obj,ObjHt)) == add(p(height,Obj,ObjHt)) == add(height(Obj,ObjHt))
+% props(Obj,height(ObjHt))  == svo(Obj,height,ObjHt) == holds(height,Obj,ObjHt) == height(Obj,ObjHt)
+% padd(Obj,height(ObjHt))  == add(holds(height,Obj,ObjHt)) == add(holds(height,Obj,ObjHt)) == add(height(Obj,ObjHt))
 */
 
 :- module(look, [ get_percepts/2,  get_near/2, get_feet/2, height_on_obj/2, can_sense/5 , call_look/2]).

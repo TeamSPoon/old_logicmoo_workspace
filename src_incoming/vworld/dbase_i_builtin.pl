@@ -11,7 +11,7 @@
 % File used as storage place for all predicates which change as
 % the world is run.
 %
-% props(Obj,height(ObjHt))  == k(height,Obj,ObjHt) == rdf(Obj,height,ObjHt) == height(Obj,ObjHt)
+% props(Obj,height(ObjHt))  == holds(height,Obj,ObjHt) == rdf(Obj,height,ObjHt) == height(Obj,ObjHt)
 % padd(Obj,height(ObjHt))  == padd(height,Obj,ObjHt,...) == dyn(QueryForm)
 % kretract[all](Obj,height(ObjHt))  == kretract[all](Obj,height,ObjHt) == pretract[all](height,Obj,ObjHt) == del[all](QueryForm)
 % keraseall(AnyTerm).
@@ -116,7 +116,7 @@ verb_after_arg(_,_,1).
 
 % forwardRule(inRegion(O,Region),atloc(O,LOC)):-
 
-:-trace.
+% :-trace.
 
 dbase_t(inRegion,O,Region):-atloc(O,LOC),world:locationToRegion(LOC,Region).
 dbase_t(inRegion,apath(Region,Dir),Region):- holds_t(pathBetween,Region,Dir,_To).

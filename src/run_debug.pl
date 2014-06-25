@@ -23,6 +23,7 @@ was_run_dbg_pl:-is_startup_file('run_debug.pl').
 %:- at_start(start_servers).
 % commented out except on run
 
+start_boxer:-!.
 start_boxer:-
    threads,
    ensure_loaded(logicmoo(candc/parser_boxer)),
