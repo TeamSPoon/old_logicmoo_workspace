@@ -20,11 +20,12 @@ argIsa_call_nt(_O,F,N,Type):-argIsa_call_nt(F,N,Type).
 
 argIsa_call_nt(F,N,Type):-once(var(F);not(number(N))),trace_or_throw(argIsa_call(F,N,Type)).
 argIsa_call_nt(_:F,N,Type):-!,argIsa_call_nt(F,N,Type),!.
+argIsa_call_nt(F/_,N,Type):- !,argIsa_call_nt(F,N,Type),!.
 argIsa_call_nt(F,N,Type):- argIsa_call_0(F,N,Type),!.
 argIsa_call_nt(F,N,Type):- argIsa_asserted(F,N,Type),!.
+argIsa_call_nt(F,N,Type):- is_ArgsIsa(F,_,Templ),arg(N,Templ,Type),nonvar(Type),!.
 argIsa_call_nt(F,N,Type):- argIsa_call_1(F,N,Type),!.
 argIsa_call_nt(F,N,Type):- findall(T,argIsa_call_0(F,N,Type),T),Types=[_|_],!,as_one_of(Types,Type),!.
-argIsa_call_nt(F/_,N,Type):- !,argIsa_call_nt(F,N,Type),!.
 
 argIsa_call_0(F/_,N1,Type):-!,argIsa_call_0(F,N1,Type).
 argIsa_call_0(agent_text_command,_,term).
@@ -58,7 +59,8 @@ argIsa_asserted(F/_,N,Type):- nonvar(F), argIsa_asserted(F,N,Type).
 
 is_ArgsIsa(F,A,Templ):- get_mpred_prop(F,A,argsIsa(Templ)).
 is_ArgsIsa(F,A,Templ):- moo:ft_info(Templ,formatted),functor(Templ,F,A).
-is_ArgsIsa(F,A,Templ):- dbase:dbase_t(_, Templ),compound(Templ),functor(F,A,Templ).
+is_ArgsIsa(F,_,Templ):- dbase:dbase_t(_, Templ),compound(Templ),functor(F,_,Templ).
+is_ArgsIsa(F,_,Templ):- moo:argsIsaProps(Prop),  dbase:dbase_t(Prop, Templ),compound(Templ),functor(F,_,Templ).
 
 
 argIsa_call_1(Prop,N1,Type):- is_2nd_order_holds(Prop),dmsg(todo(define(argIsa_call(Prop,N1,'Second_Order_TYPE')))),dumpST,dtrace,

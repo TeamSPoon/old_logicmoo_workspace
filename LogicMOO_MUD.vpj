@@ -61,22 +61,5 @@
 				Refilter="0"
 				Excludes=""/>
 		</Folder>
-		<Folder Name="src_incoming/vworld">
-			<F N="src_incoming/vworld/moo_loadall.pl"/>
-		</Folder>
-		<Folder Name="src_modules/leanCOP">
-			<F
-				N="src_modules/leanCOP/*.*"
-				Recurse="1"
-				Refilter="0"
-				Excludes=""/>
-		</Folder>
-		<Folder Name="src_modules/MaLARea/script/malecop">
-			<F
-				N="src_modules/MaLARea/script/malecop/*.*"
-				Recurse="1"
-				Refilter="0"
-				Excludes=""/>
-		</Folder>
 	</Files>
 </Project>

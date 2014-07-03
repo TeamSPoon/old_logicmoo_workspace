@@ -120,7 +120,7 @@ assertz_if_new_clause(H,B):-assertz((H:-B)).
 
 clause_asserted(C):- as_clause(C,H,B),clause_asserted(H,B).
 
-clause_asserted(H,B):- not(not(( functor_h(H,HH),functor_h(B,BB),clause(HH,BB),numbervars(HH+BB),numbervars(H+B),!, H+B == HH+BB ))).
+clause_asserted(H,B):- not(not(( functor_h(H,HH),functor_h(B,BB),!,clause(HH,BB), B =@= BB , H =@= HH ,! ))).
 
 as_clause( ((H :- B)),H,B):-!.
 as_clause( H,  H,  true).

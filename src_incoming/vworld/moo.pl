@@ -77,7 +77,7 @@
 :- dynamic_multifile_exported dbase_mod/1.
 dbase_mod(dbase).
 
-:- dynamic mpred_arity/2, mpred_prop/3.
+:- dynamic is_mpred_arity/2, mpred_prop/3.
 
 hdr_debug(_,_):-!.
 hdr_debug(F,A):-'format'(F,A).
@@ -104,6 +104,7 @@ hdr_debug(F,A):-'format'(F,A).
 :- dynamic_multifile_exported((update_charge/2,update_stats/2,type_default_props/3)).
 
 :- module_transparent register_module_type/1.
+
 :-thread_local thlocal:repl_writer/2.
 :-thread_local thlocal:repl_to_string/2.
 :-thread_local thlocal:current_agent/2.
@@ -237,15 +238,14 @@ member_or_e(E,[L|List]):-!,member(E,[L|List]).
 member_or_e(E,E).
 
 
-fix_fa(FA,F,A):-var(FA),!,moo:mpred_arity(F,A),functor(FA,F,A).
+fix_fa(FA,F,A):-var(FA),!,mpred_arity(F,A),functor(FA,F,A).
 fix_fa(_:FA0,F,A):-!,fix_fa(FA0,F,A),!.
-fix_fa(F,F,A):-atom(F),moo:mpred_arity(F,A).
-fix_fa(F/A,F,A):- moo:mpred_arity(F,A).
+fix_fa(F,F,A):-atom(F),!,mpred_arity(F,A).
 fix_fa(F/A,F,A):- number(A),!.
 fix_fa(FA/_,F,A):-!,fix_fa(FA,F,A).
-fix_fa(FA,F,AR):- compound(FA),functor(FA,F,A), (moo:mpred_arity(F,AA) -> (AA=A -> ignore(AR=A)  ; arg(_,vv(A,AA),AR) ) ; ignore(AR=A) ).
-fix_fa(FA,F,A):- moo:mpred_arity(F,A),functor(FA,F,A).
-fix_fa(FA,F,AR):- atom(FA),!,FA=F, A=0, (moo:mpred_arity(F,AA) -> (AA=A -> ignore(AR=A)  ; arg(_,vv(A,AA),AR) ) ; ignore(AR=A) ).
+fix_fa(FA,F,AR):- compound(FA),functor(FA,F,A), (mpred_arity(F,AA) -> (AA=A -> ignore(AR=A)  ; arg(_,vv(A,AA),AR) ) ; ignore(AR=A) ).
+fix_fa(FA,F,A):- mpred_arity(F,A),functor(FA,F,A).
+fix_fa(FA,F,AR):- atom(FA),!,FA=F, A=0, (mpred_arity(F,AA) -> (AA=A -> ignore(AR=A)  ; arg(_,vv(A,AA),AR) ) ; ignore(AR=A) ).
 fix_fa(FA,F,A):-get_functor(FA,FA2),!,fix_fa(FA2,F,A).
 
 get_mpred_prop(FA,A,Prop):- fix_fa(FA,F,A), mpred_prop_plus_assserted(F,A,Prop).
@@ -254,7 +254,8 @@ get_mpred_prop(FA,Prop):- fix_fa(FA/_,F,A),mpred_prop_plus_assserted(F,A,Prop).
 add_mpred_prop(_,Var):- var(Var),!.
 add_mpred_prop(_,[]):- !.
 add_mpred_prop(FA,[C|L]):-!, add_mpred_prop(FA,C),add_mpred_prop(FA,L),!.
-add_mpred_prop(F0,CL):- fix_fa(F0,F,A), asserta_new(mpred_prop(F,A,CL)),ignore((A>0,asserta_new(moo:mpred_arity(F,A)))),
+add_mpred_prop(F0,CL):- 
+ fix_fa(F0,F,A), must_det(A>0), asserta_new(mpred_prop(F,A,CL)),ignore((A>0,asserta_new(is_mpred_arity(F,A)))),
       run_database_hooks(assert(a),mpred_prop(F,A,CL)).
 
 rem_mpred_prop(_,Var):- var(Var),!.
@@ -359,17 +360,19 @@ decl_mpred0(Mt,Pred,Arity):-decl_mpred_now(Mt,Pred,Arity).
 decl_mpred_now(Mt,M:Pred,Arity):-var(Pred),!,decl_mpred_now(Mt,M:Pred,Arity).
 decl_mpred_now(Mt,_:Pred,Arity):- nonvar(Pred),!,decl_mpred_now(Mt,Pred,Arity).
 decl_mpred_now(Mt,Pred,0):-!,decl_mpred_now(Mt,Pred,2).
-decl_mpred_now(_,Pred,Arity):-moo:mpred_arity(Pred,Arity),!.
+decl_mpred_now(_,Pred,Arity):-moo:isRegisteredCycPred(_,Pred,Arity),!.
 decl_mpred_now(Mt,Pred,Arity):-    
+   % dmsg(decl_mpred_now(Pred,Arity)),
   ignore((Arity==1,define_type(Pred))),
       checkCycPred(Pred,Arity),
-      assertz(moo:isRegisteredCycPred(Mt,Pred,Arity)).
+      assertz_if_new(moo:isRegisteredCycPred(Mt,Pred,Arity)).
 
-checkCycPreds:-moo:mpred_arity(F,A),checkCycPred(F,A),fail.
+checkCycPreds:-mpred_arity(F,A),checkCycPred(F,A),fail.
 checkCycPreds.
 
 
-moo:mpred_arity(P,A):-isRegisteredCycPred(_,P,A).
+mpred_arity(P,A):-moo:isRegisteredCycPred(_,P,A).
+mpred_arity(P,A):-is_mpred_arity(P,A).
 
 
 moo:can_use_holds_db_file(F,A,hilog_pred(F)):- hilog_functor(F),!,between(2,8,A).
@@ -435,8 +438,7 @@ same_pred(I,II):- get_functor(I,F),must(F\=':'),get_functor(II,F),!.
 argsIsaProps(Prop):- arg(_,v(argsIsa,multiValued,singleValued,negationByFailure,formatted,mpred,listValued),Prop).
 
 mpred_prop_plus_assserted(F,A,Prop):- mpred_prop(F,A,Prop).
-mpred_prop_plus_assserted(F,A,argsIsa(Templ)):-moo:mpred_arity(F,A),functor(Templ,F,A),argsIsaProps(Prop),dbIsas(Templ,Prop),functor(Templ,F,_).
-mpred_prop_plus_assserted(F,_A,Prop):-argsIsaProps(Prop),dbIsas(Templ,Prop),functor(Templ,F,_).
+mpred_prop_plus_assserted(F,A,argsIsa(Templ)):- mpred_arity(F,A),functor(Templ,F,A),moo:argsIsaProps(Prop),dbIsas(Templ,Prop),functor(Templ,F,_).
 mpred_prop_plus_assserted(F,_A,Prop):-dbIsas(F,Prop).
 
 
@@ -456,8 +458,6 @@ is_type(Spec):- dbase:dbase_t(isa, Spec,type).
 
 :- meta_predicate tick_every(*,*,0).
 :- meta_predicate register_timer_thread(*,*,0).
-
-
 
 
 :- decl_mpred subclass/2.

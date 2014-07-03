@@ -4,12 +4,9 @@
 do_pttp_test(TestName):- forall(pttp_test(TestName,Data),
                                 (                                 
                                  dmsg(do_pttp_test(TestName)),
-                                 eraseall(int_query,_),
-                                 /*
-                                 eraseall(int_not_firstOrder,_),
-                                 eraseall(not_firstOrder,_),
-                                 eraseall(int_firstOrder,_),
-                                 eraseall(firstOrder,_),*/
+                                 eraseall(int_query,_),                                 
+                               %  eraseall(int_not_firstOrder,_),
+                               %  eraseall(int_firstOrder,_),
                                  once(pttp_assert(Data)),once((ignore(call_print_tf(prove_timed(TestName,query))),sleep(1))))),
                               listing(took).
 
@@ -39,12 +36,16 @@ pttp_assert_int([Y|L]):-!,pttp_assert_int(Y),pttp_assert_int(L),!.
 %int_firstOrder -> dbase_t
 %int_not_firstOrder -> dbase_f
 
-pttp_assert_int(Y):- assertz_if_new(Y). % , copy_term(Y,YY),numbervars(YY),dmsg(pttp_assert_int(YY)),!.
+:- thread_local hooking_pttp_assert_int/1.
+:- export(hooking_pttp_assert_int/1).
+
+pttp_assert_int(Y):- hooking_pttp_assert_int(Hooker),!,dmsg(numbervars(pttp_assert_int_hooked(Hooker,Y))),call(Hooker,Y).
+pttp_assert_int(Y):- must(assertz_if_new(Y)). % , copy_term(Y,YY),numbervars(YY),dmsg(pttp_assert_int(YY)),!.
 
 pttp_assert_int(A,_) :-				% 2-ary predicate for use as
 	pttp_assert_int(A).			% apply_to_conjuncts argument
 
-:- export int_query/6, int_query/7.
+:- export((int_query/6, int_query/7)).
 :- thread_local(is_query_functor/1).
 :- thread_local int_query/6.
 :- thread_local int_query/7.
@@ -120,8 +121,8 @@ logicmoo_example3:-xray_test(logicmoo_example3).
 
 pttp_test(logicmoo_example3_will_fail,
 	((
-          (secondOrder(genls,SubClass,SuperClass) & firstOrder(SubClass,Instance) => firstOrder(SuperClass,Instance)),
-          (secondOrder(genlPreds,P1,P2) & firstOrder(P1,A) => firstOrder(P2,A)),
+          ((secondOrder(genls,SubClass,SuperClass) & firstOrder(SubClass,Instance)) => firstOrder(SuperClass,Instance)),
+          ((secondOrder(genlPreds,P1,P2) & firstOrder(P1,A)) => firstOrder(P2,A)),
           (secondOrder(genlPreds,P1,P2) & firstOrder(P1,A,B) => firstOrder(P2,A,B)),
           (secondOrder(genlPreds,P1,P2) & firstOrder(P1,A,B,C) => firstOrder(P2,A,B,C)),
           % (secondOrder(genlPreds,P1,P2) & firstOrder(P1,A,B,C,D) => firstOrder(P2,A,B,C,D)),
@@ -131,7 +132,7 @@ pttp_test(logicmoo_example3_will_fail,
            (~firstOrder(P,B,A) :- secondOrder(irreflexive,P) & firstOrder(P,A,B)),
            % (secondOrder(irreflexive,P) & firstOrder(P,A,B) => ~ firstOrder(P,B,A)),
 
-           (~ secondOrder(P,A,B)<=> ~firstOrder(P,A,B)),
+        %   (~ secondOrder(P,A,B)<=> ~firstOrder(P,A,B)),
            secondOrder(genlInverse,parentOf,sonOf),
          %  secondOrder(arg1Isa,genlInverse
            secondOrder(genlPreds,motherOf,parentOf),
@@ -140,7 +141,7 @@ pttp_test(logicmoo_example3_will_fail,
 
           (query:- not(firstOrder(sonOf,gun,phil)))
           % Expected true
-	))).
+	))):-fail.
 
           % (all X:( all Y : (motherOf(X,Y)) => (bellyButton(X) , older(X,Y) , female(Y)) )),
 
@@ -276,6 +277,9 @@ pttp_test(chang_lee_example6,
 %%%   chang_lee_example1, chang_lee_example8
 %%% SOURCE
 
+:-decl_mpred(m/3).
+:-decl_mpred(p/1).
+:-decl_mpred(d/2).
 pttp_test(chang_lee_example7,
 	((
 		p(a),
