@@ -445,6 +445,15 @@ took(chang_lee_example8, success, 0.0003523059999999134).
 took(chang_lee_example9, success, 0.3166319040000003).
 */
 
+
+do_pttp_tests:-do_pttp_test(_ALL).
+do_pttp_tests:-pttp_assert(test123).
+do_pttp_tests:-pttp_query(test123).
+% do_pttp_tests:-prolog.
+
+:-is_startup_file('run_debug.pl')->doall(do_pttp_tests);true.
+
+
 callable_tf(P,2):- arity_pred(P),!,fail.
 callable_tf(F,A):- functor_safe(P,F,A),predicate_property(P,_),!.
 :- dynamic(useExternalDBs/0).
@@ -658,7 +667,7 @@ arityMatches(A,OTHER):- number(OTHER),!,A=OTHER.
 isCycPredArity_ignoreable(P,A):- hotrace(ignore(isCycPredArity(P,A))).
 
 isCycPredArity_Check(P,A):- isCycPredArity(P,A),!.
-% isCycPredArity_Check(P,A):- moo:mpred_arity(P,A),!. % get_mpred_prop(P,AA,_),!,integer(AA),A=AA.
+% isCycPredArity_Check(P,A):- mpred_arity(P,A),!. % get_mpred_prop(P,AA,_),!,integer(AA),A=AA.
 
 isCycPredArity(P,A):- loop_check_throw(isCycPredArity_lc(P,A)).
 isCycPredArity_lc(_:P,A):- nonvar(P),!,isCycPredArity(P,A).
@@ -1459,11 +1468,6 @@ hook:decl_database_hook(retract(_),C):- expire_tabled_list(C).
 
 :- module_predicates_are_exported(dbase).
 :- module_meta_predicates_are_transparent(dbase). 
-do_pttp_tests:-do_pttp_test(_ALL).
-do_pttp_tests:-pttp_assert(test123).
-do_pttp_tests:-pttp_query(test123).
-% do_pttp_tests:-prolog.
-:-export(do_pttp_tests/0).
 
 
 

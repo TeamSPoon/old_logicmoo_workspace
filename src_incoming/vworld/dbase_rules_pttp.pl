@@ -17,126 +17,6 @@
 :- style_check(+discontiguous).
 :- style_check(-singleton).
 
-% :- dynamic firstOrder/8.
-
-:-export((wrapper_made/2)).
-wrapper_made(query,0).
-wrapper_made(not_firstOrder,2).  % arity 1
-wrapper_made(not_firstOrder,3).
-wrapper_made(not_firstOrder,4).
-wrapper_made(not_firstOrder,5). % arity 4
-
-wrapper_made(firstOrder,2).
-wrapper_made(firstOrder,3).
-wrapper_made(firstOrder,4).
-wrapper_made(firstOrder,5).
-
-firstOrder(A, B, D, E, G, F, H, I) :-
-    guard_argsIsa(A, B),
-    C=firstOrder(A, B), ( identical_member(C, D) -> fail ; 
-    ( identical_member(C, E), !; unifiable_member(C, E)), F=G, H=[J, [red, C, D, E]|K], I=[J|K]; 
-    int_firstOrder(A, B, D, E, G, F, H, I, C)).
-
-% :- dynamic firstOrder/9.
-
-firstOrder(A, B, C, E, F, H, G, I, J) :-
- guard_argsIsa(A, B, C),
- D=firstOrder(A, B, C), ( identical_member(D, E)
- -> fail
- ; ( identical_member(D, F), !
- ; unifiable_member(D, F)
- ), G=H, I=[K, [red, D, E, F]|L], J=[K|L]
- ; int_firstOrder(A, B, C, E, F, H, G, I, J, D)
- ).
-
-% :- dynamic firstOrder/10.
-
-firstOrder(A, B, C, D, F, G, I, H, J, K) :-
- guard_argsIsa(A, B, C, D),
- E=firstOrder(A, B, C, D), ( identical_member(E, F)
- -> fail
- ; ( identical_member(E, G), !
- ; unifiable_member(E, G)
- ), H=I, J=[L, [red, E, F, G]|M], K=[L|M]
- ; int_firstOrder(A, B, C, D, F, G, I, H, J, K, E)
- ).
-
-% :- dynamic firstOrder/11.
-
-firstOrder(A, B, C, D, E, G, H, J, I, K, L) :-
- guard_argsIsa(A, B, C, D, E),
- F=firstOrder(A, B, C, D, E), ( identical_member(F, G)
- -> fail
- ; ( identical_member(F, H), !
- ; unifiable_member(F, H)
- ), I=J, K=[M, [red, F, G, H]|N], L=[M|N]
- ; int_firstOrder(A, B, C, D, E, G, H, J, I, K, L, F)
- ).
-
-
-%:- dynamic not_firstOrder/8.
-
-not_firstOrder(A, B, D, E, G, F, H, I) :-
-    guard_argsIsa(A, B),
-    C=not_firstOrder(A, B), ( identical_member(C, D) -> fail ; ( identical_member(C, E), !; unifiable_member(C, E)), F=G, H=[J, [red, C, D, E]|K], I=[J|K]; int_not_firstOrder(A, B, D, E, G, F, H, I, C)).
-
-%:- dynamic not_firstOrder/9.
-
-not_firstOrder(A, B, C, E, F, H, G, I, J) :-
-  guard_argsIsa(A, B, C),
- D=not_firstOrder(A, B, C), ( identical_member(D, E)
- -> fail
- ; ( identical_member(D, F), !
- ; unifiable_member(D, F)
- ), G=H, I=[K, [red, D, E, F]|L], J=[K|L]
- ; int_not_firstOrder(A, B, C, E, F, H, G, I, J, D)
- ).
-
-%:- dynamic not_firstOrder/10.
-
-not_firstOrder(A, B, C, D, F, G, I, H, J, K) :-
- guard_argsIsa(A, B, C, D),
- E=not_firstOrder(A, B, C, D), ( identical_member(E, F)
- -> fail
- ; ( identical_member(E, G), !
- ; unifiable_member(E, G)
- ), H=I, J=[L, [red, E, F, G]|M], K=[L|M]
- ; int_not_firstOrder(A, B, C, D, F, G, I, H, J, K, E)
- ).
-
-%:- dynamic not_firstOrder/11.
-
-not_firstOrder(A, B, C, D, E, G, H, J, I, K, L) :-
- guard_argsIsa(A, B, C, D, E),
- F=not_firstOrder(A, B, C, D, E), ( identical_member(F, G)
- -> fail
- ; ( identical_member(F, H), !
- ; unifiable_member(F, H)
- ), I=J, K=[M, [red, F, G, H]|N], L=[M|N]
- ; int_not_firstOrder(A, B, C, D, E, G, H, J, I, K, L, F)
- ).
-
-guard_arity(_P,_A):-!.
-guard_arity(P,A):- var(P),!, mpred_arity(P,A).
-guard_arity(P,A):- mpred_arity(P,A),!.
-% guard_arity(P,A):- dumpST,dtrace.
-
-guard_argsIsa(A, B, C, D, E):- guard_arity(A,4),guard_argIsa(A,1,B),guard_argIsa(A,2,C),guard_argIsa(A,3,D),guard_argIsa(A,4,E).
-guard_argsIsa(A, B, C, D):- guard_arity(A,3),guard_argIsa(A,1,B),guard_argIsa(A,2,C),guard_argIsa(A,3,D).
-% guard_argsIsa(A, B, C):- A=B,B=C,!,fail.
-guard_argsIsa(A, B, C):-     
-   guard_arity(A,2),guard_argIsa(A,1,B),guard_argIsa(A,2,C).
-guard_argsIsa(A, B):- guard_arity(A,1),guard_argIsa(A,1,B).
-
-guard_argIsa(_F,_N,_Arg):-!. % todo let call next line
-guard_argIsa(_F,_N,Arg):-var(Arg),!. % cant do much about it?
-guard_argIsa(F,N,Arg):-argIsa_call(ask(query),F,N,Type),guard_isa(Arg,Type).
-
-guard_isa(Arg,_Type):-var(Arg),!.
-guard_isa(_Arg,_Type).
-
-
-
 %%% ****f* PTTP_Examples/chang_lee_example1
 %%% DESCRIPTION
 %%%   Prove that in an associative system with left and right
@@ -527,7 +407,7 @@ search1(_Goal,Max,Min,_Inc,_PrevInc,_DepthIn,_DepthOut) :-
 search1(Goal,_Max,Min,_Inc,PrevInc,DepthIn,DepthOut) :-
         write_search_progress(Min),
 	DepthIn = Min,
-	catch(call(Goal),E,((dmsg(E),trace,Goal))),
+	catch(call(Goal),E,trace),
 	DepthOut < PrevInc.	% fail if solution found previously
 search1(Goal,Max,Min,Inc,_PrevInc,DepthIn,DepthOut) :-
 	Min1 is Min + Inc,
@@ -537,14 +417,11 @@ search1(Goal,Max,Min,Inc,_PrevInc,DepthIn,DepthOut) :-
 %%% ****if* PTTP/make_wrapper
 %%% SOURCE
 
-make_wrapper(_DefinedPreds,[query,0],true) :- !.
-make_wrapper(_DefinedPreds,[F,A],true):-wrapper_made(F,A),!.
-
-make_wrapper(DefinedPreds,[P,N],Result):- must_det(make_wrapper0(DefinedPreds,[P,N],Result)).
+make_wrapper(_DefinedPreds,[query,0],true) :-
+	!.
+make_wrapper(DefinedPreds,[P,N],Result):- must_det(make_wrapper0(DefinedPreds,[P,N],Result)). % ,dmsg(pp(Result)).
 
 make_wrapper0(DefinedPreds,[P,N],Result) :-
-     asserta(is_wrapper_made(P,N)),
-     dmsg(make_wrapper(P,N)),
 	functor(Goal,P,N),
 	Goal =.. [P|Args],
 	ExtraArgs = [PosAncestors,NegAncestors,DepthIn,DepthOut,ProofIn,ProofOut],
@@ -746,30 +623,23 @@ clauses((A , B),L,WffNum1,WffNum2) :-
 	clauses(B,L2,W,WffNum2),
 	conjoin(L1,L2,L).
 
-clauses(PNF,L,WffNum1,WffNum2):- 
-   write_clause_with_number(pnf(PNF),WffNum1),
-   once(nnf(PNF,Out)),
-   clauses1(Out,L,WffNum1,WffNum2).
+clauses(PNF,L,WffNum1,WffNum2):- once(nnf(PNF,Out)),clauses1(Out,L,WffNum1,WffNum2).
 
 clauses1(A,L,WffNum1,WffNum2) :-
-	% write_clause_with_number((A),WffNum1),
+	write_clause_with_number(A,WffNum1),
 	head_literals(A,Lits),
-        clauses2(A,1,Lits,L,WffNum1),
-        write_clause_with_number((L),WffNum1),
+	clauses2(A,Lits,L,WffNum1),
 	WffNum2 is WffNum1 + 1.
 
-clauses2(A,CLN,[Lit|Lits],L,WffNum) :-
-    CLN2 is CLN + 1,
-    INFNUM is WffNum +(CLN/100), % not what breaks test 7
+clauses2(A,[Lit|Lits],L,WffNum) :-
 	body_for_head_literal(Lit,A,Body1),
 	(Body1 == false ->
 		L = true;
 	%true ->
-               linearize(Lit,NewLit,[],_,Body1,Body2),
-		conjoin(infer_by(INFNUM),Body2,Body),
-		clauses2(A,CLN2,Lits,L1,WffNum),
-		conjoin((NewLit :- Body),L1,L)).
-clauses2(_,_,[],true,_).
+		conjoin(infer_by(WffNum),Body1,Body),
+		clauses2(A,Lits,L1,WffNum),
+		conjoin((Lit :- Body),L1,L)).
+clauses2(_,[],true,_).
 
 head_literals(Wff,L) :-
 	Wff = (A :- B) ->	% contrapositives not made for A :- ... inputs
@@ -896,7 +766,7 @@ new_head_body(Head, Body,Head1 ,Body1,(Head1 :- Body1)):-
    true. 
    %   dmsg(pp((head_features(Head1) :-head_body_was(Head, Body), Body1))).
 
-call_proof(Call,_):- catch(call(Call),E,((dmsg(E),trace,Call))).
+call_proof(Call,_):-catch(call(Call),E,fail).
 
 add_features0((Head :- Body),(Head :- Body1)):-builtin(Head),!, add_features_hb(Head , Body , _Head1 , Body1).
 add_features0(B,A):- add_features1(B,A).
@@ -1100,7 +970,6 @@ correct_lit0(Body,Body):-not(compound(Body)),!.
 correct_lit0(BodyIn,Body):- var(BodyIn),trace_or_throw(correct_lit(BodyIn,Body)).
 correct_lit0(BodyIn,Body):- functor(BodyIn,F,A),BodyIn=..[F|List],correct_lit(BodyIn,F,A,List,Body).
 
-correct_lit(-BodyIn,F,A,L,-Body):- correct_lit(BodyIn,F,A,L,Body).
 correct_lit(BodyIn,F,_,_,Body):- atom_concat('not_',_,F),!,negated_literal(BodyIn,Neg),!,correct_lit(Neg,NegBody),negated_literal(NegBody,Body).
 correct_lit(BodyIn,F,A,L,Body):- is_holds_false(F),trace_or_throw(correct_lit(BodyIn,F,A,L,Body)).
 correct_lit(BodyIn,F,_,[L|IST],Body):- is_holds_true(F),correct_true(L,IST,Body).
@@ -1112,8 +981,8 @@ do_not_wrap(F):-atom_concat('int_',_,F).
 
 correct_true(F,[L|IST],Body):- do_not_wrap(F),Body=..[F,L|IST].
 correct_true(F,[L|IST],Body):- atom(F),builtin(F,_),Body=..[F,L|IST].
-% correct_true(F,L,Body):- var(F),!,trace_or_throw(correct_true(F,L,Body)).
-correct_true(F,[L|IST],Body):- Body =..[firstOrder,F,L|IST],ignore((nonvar(F),length([L|IST],Arity),decl_mpred(F,Arity))).
+%correct_true(F,L,Body):- var(F),!,trace_or_throw(correct_true(F,L,Body)).
+correct_true(F,[L|IST],Body):- Body =..[firstOrder,F,L|IST].
 
 add_head_args(HeadIn,
           _PosGoal,GoalAtom,_HeadArgs,
@@ -1138,7 +1007,6 @@ pttp1(X,Y) :-
 	write('PTTP input formulas:'),
 	clauses(X,X0,1,_),		% prints and transforms input clauses
 	apply_to_conjuncts(X0,add_features,X8),
-        
 	must_det(predicates(X8,IntPreds0)),
 	must_det((list_reverse(IntPreds0,IntPreds1),
 	procedures(IntPreds1,X8,IntProcs),
@@ -1324,7 +1192,8 @@ disjoin(A,B,C) :-
 %%% ***
 %%% ****if* PTTP/negated_functor
 %%% SOURCE
-negated_functor(Connective,B):- logical_functor(Connective), !,trace_or_throw(((negated_functor(Connective,B):- logical_functor(Connective)))).
+negated_functor(-,_):-!,trace,fail.
+negated_functor(~,_):-!,trace,fail.
 negated_functor(F,NotF) :-
 	name(F,L),
 	name(not_,L1),
@@ -1337,10 +1206,8 @@ negated_functor(F,NotF) :-
 %%% ****if* PTTP/negated_literal
 %%% SOURCE
 
-negated_literal(A,B):-isVar(A),!,trace_or_throw(negated_literal(A,B)).
-negated_literal(A,B):-not(compound(A)),!,trace_or_throw(((negated_literal(A,B):-not(compound(A))))).
 negated_literal(-A,B):-negated_literal(A,AA),!,negated_literal(AA,B).
-negated_literal(A,B):- var(B),!,negated_literal_0(A,B).
+negated_literal(A,B):-var(B),!,negated_literal_0(A,B).
 negated_literal(A,-B):-negated_literal(B,BB),!,negated_literal_0(A,B).
 negated_literal(A,B):-negated_literal_0(A,B).
 negated_literal_0(Lit,NotLit) :-
@@ -1423,17 +1290,16 @@ write_clause(A,_) :-				% 2-ary predicate for use as
 %%% ***
 %%% ****if* PTTP/write_clause_with_number
 %%% SOURCE
-
-write_clause_with_number(((A,B)),WffNum) :- write_clause_with_number(A,WffNum),write_clause_with_number(B,WffNum).
+   
 write_clause_with_number(A,WffNum) :-
 	nl,
 	write_indent_for_number(WffNum),
 	write(WffNum),
 	write('  '),
-        write_fresh_vars(A),
+        copy_term(A,AA),
+        numbervars(AA,0,_,[attvar(skip),singletons(true)]),
+	write(AA),
 	write(.).
-
-write_fresh_vars(A):- copy_term(A,AA),numbervars(AA,0,_,[attvar(skip),singletons(true)]),write(AA).
 
 write_indent_for_number(N) :-
 	((number(N) , N <  100) -> write(' ') ; true),
@@ -1515,7 +1381,6 @@ builtin(>,2).
 builtin(<,2).
 builtin(>=,2).
 builtin(=<,2).
-builtin(Guard,_):-atom_concat('guard',_,Guard).
 builtin(is,2).
 builtin(display,1).
 builtin(write,1).

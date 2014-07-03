@@ -75,23 +75,20 @@ nnf_post_clean([A|B],[AA|BB],Vars):-
 nnf_post_clean(C,CC,Vars):-
    C=..[A|B],
    A=AA, % nnf_post_clean_functor(A,AA,Vars1),
-   nnf_post_clean(B,BB,Vars),
+   nnf_post_clean(B,BB,Vars2),
+   append(Vars1,Vars2,Vars),
    CC=..[AA|BB],!.
 
 
 logical_functor(X):-atom(X),nnf_pre_clean_functor(A,B,_),(X==A;X==B),!.
 
 nnf_pre_clean_functor(and,(,),[]).
-nnf_pre_clean_functor((&),(,),[]).
-nnf_pre_clean_functor((v),(;),[]).
-nnf_pre_clean_functor((,),(,),[]).
 nnf_pre_clean_functor(or,(;),[]).
 nnf_pre_clean_functor('::',(:),[]).
-nnf_pre_clean_functor((~),(-),[]).
+nnf_pre_clean_functor(~,(-),[]).
 nnf_pre_clean_functor(not,(-),[]).
 nnf_pre_clean_functor(implies,(=>),[]).
 nnf_pre_clean_functor(imp,(=>),[]).
-nnf_pre_clean_functor(equiv,(<=>),[]).
 nnf_pre_clean_functor(->,(=>),[]).
 nnf_pre_clean_functor(entailed_from,(:-),[]).
 nnf_pre_clean_functor(implied_by,(:-),[]).
@@ -110,15 +107,15 @@ nnf(Fml,FreeV,CleanNNF,Paths):-
 nnf_clean(Atomic,_,Atomic,1):-atomic(Atomic),!.
 nnf_clean(Atomic,_,Atomic,1):-isVar(Atomic),!.
 nnf_clean(Fml,FreeV,NNF,Paths) :-   
-	(Fml = (-(- A))      -> Fml1 = A;
-	 Fml = (-all(X,F))  -> Fml1 = ex(X,-F);
-	 Fml = (-ex(X,F))   -> Fml1 = all(X,-F);
-	 Fml = (-((A ; B)))   -> Fml1 = (-A , -B);
-	 Fml = (-((A , B)))   -> Fml1 = (-A ; -B);
-	 Fml = (A => B)   -> Fml1 = (-A ; B);
-	 Fml = -(A => B)  -> Fml1 = (A , -B);
-	 Fml = (A <=> B)  -> Fml1 = ((A , B) ; (-A , -B)) ;
-	 Fml = -(A <=> B) -> Fml1 = ((A , -B) ; (-A , B))),!,
+	(Fml = -(-A)      -> Fml1 = A;
+	 Fml = -all(X,F)  -> Fml1 = ex(X,-F);
+	 Fml = -ex(X,F)   -> Fml1 = all(X,-F);
+	 Fml = -(A v B)   -> Fml1 = (-A & -B);
+	 Fml = -(A & B)   -> Fml1 = (-A v -B);
+	 Fml = (A => B)   -> Fml1 = (-A v B);
+	 Fml = -(A => B)  -> Fml1 = A & -B;
+	 Fml = (A <=> B)  -> Fml1 = (A & B) v (-A & -B);
+	 Fml = -(A <=> B) -> Fml1 = (A & -B) v (-A & B)),!,
 	nnf_clean(Fml1,FreeV,NNF,Paths).
 
 nnf_clean(all(X,F),FreeV,all(X,NNF),Paths) :- !,
@@ -128,12 +125,12 @@ nnf_clean(ex(X,Fml),FreeV,NNF,Paths) :- !,
 	copy_term((X,Fml,FreeV),(sk(X,Fml),Fml1,FreeV)),
 	nnf_clean(Fml1,FreeV,NNF,Paths).
 
-nnf_clean((A , B),FreeV,(NNF1,NNF2),Paths) :- !,
+nnf_clean((A & B),FreeV,(NNF1,NNF2),Paths) :- !,
 	nnf_clean(A,FreeV,NNF1,Paths1),
 	nnf_clean(B,FreeV,NNF2,Paths2),
 	Paths is Paths1 * Paths2.
 
-nnf_clean((A ; B),FreeV,NNF,Paths) :- !,
+nnf_clean((A v B),FreeV,NNF,Paths) :- !,
 	nnf_clean(A,FreeV,NNF1,Paths1),
 	nnf_clean(B,FreeV,NNF2,Paths2),
 	Paths is Paths1 + Paths2,
