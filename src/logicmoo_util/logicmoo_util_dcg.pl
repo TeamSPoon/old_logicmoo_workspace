@@ -317,4 +317,3 @@ testPhrase(Dcg,English):-
          nl,dumpList(Left).
 
 
-

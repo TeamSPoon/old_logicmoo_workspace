@@ -451,6 +451,7 @@ do_pttp_tests:-pttp_assert(test123).
 do_pttp_tests:-pttp_query(test123).
 % do_pttp_tests:-prolog.
 
+% fast here
 :-is_startup_file('run_debug.pl')->doall(do_pttp_tests);true.
 
 

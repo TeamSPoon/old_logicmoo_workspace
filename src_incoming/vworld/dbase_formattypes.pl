@@ -14,19 +14,19 @@ as_one_of(Types,Type):-nonvar(Type),is_type(Type),!,member(Type,Types).
 as_one_of([Type],TypeO):-!,same_arg(same_or(subclass),Type,TypeO).
 as_one_of(Types,oneOf(Types)).
 
+argIsa_call(_:F,N,Type):-!,argIsa_call(F,N,Type),!.
+argIsa_call(F/_,N,Type):-!,argIsa_call(F,N,Type),!.
+argIsa_call(FA,N,Type):- compound(FA),!,functor(FA,F,_),!,argIsa_call(F,N,Type).
 argIsa_call(Op,F,N,Type):-hotrace(loop_check(argIsa_call_nt(Op,F,N,Type),Type=term)),must(nonvar(Type)).
 
 argIsa_call_nt(_O,F,N,Type):-argIsa_call_nt(F,N,Type).
 
 argIsa_call_nt(F,N,Type):-once(var(F);not(number(N))),trace_or_throw(argIsa_call(F,N,Type)).
-argIsa_call_nt(_:F,N,Type):-!,argIsa_call_nt(F,N,Type),!.
 argIsa_call_nt(F,N,Type):- argIsa_call_0(F,N,Type),!.
 argIsa_call_nt(F,N,Type):- argIsa_asserted(F,N,Type),!.
 argIsa_call_nt(F,N,Type):- argIsa_call_1(F,N,Type),!.
 argIsa_call_nt(F,N,Type):- findall(T,argIsa_call_0(F,N,Type),T),Types=[_|_],!,as_one_of(Types,Type),!.
-argIsa_call_nt(F/_,N,Type):- !,argIsa_call_nt(F,N,Type),!.
 
-argIsa_call_0(F/_,N1,Type):-!,argIsa_call_0(F,N1,Type).
 argIsa_call_0(agent_text_command,_,term).
 argIsa_call_0(comment,2,string).
 argIsa_call_0(isa,1,argIsaFn(isa,1)).
@@ -34,8 +34,6 @@ argIsa_call_0(isa,2,type).
 argIsa_call_0(directions,2,list(dir)).
 argIsa_call_0(equivRule,_,term).
 argIsa_call_0(formatted,_,term).
-argIsa_call_0(F,N,Type):-is_type(F),!,(N=1 -> Type=F;Type=term(props)).
-
 argIsa_call_0(memory,2,term).
 argIsa_call_0(subclass,_,type).
 argIsa_call_0(term_anglify,_,term).
@@ -44,17 +42,13 @@ argIsa_call_0(type_max_charge,2,int).
 argIsa_call_0(type_max_damage,1,type).
 argIsa_call_0(type_max_damage,2,int).
 argIsa_call_0(Arity,N,T):-arity_pred(Arity),!,arg(N,vv(term,int,int),T).
-argIsa_call_0(ask_module,_,term).
-argIsa_call_0(Func,N,Type):- get_functor(Func,F,_),F \= Func,argIsa_call_0(F,N,Type).
+argIsa_call_0(F,N,Type):-is_type(F),!,(N=1 -> Type=F;Type=term(props)).
 argIsa_call_0(ask_module,_,term).
 argIsa_call_0(HILOG,_,term):-hilog_functor(HILOG).
 
 
-
 argIsa_asserted(F,N,Type):- dbase_t(argIsa,F,N,Type),!.
 argIsa_asserted(F,N,Type):- is_ArgsIsa(F,_,Templ),arg(N,Templ,Type),nonvar(Type).
-argIsa_asserted(F,N,Type):- get_mpred_prop(F,argIsa(N,Type)),!.
-argIsa_asserted(F/_,N,Type):- nonvar(F), argIsa_asserted(F,N,Type).
 
 is_ArgsIsa(F,A,Templ):- get_mpred_prop(F,A,argsIsa(Templ)).
 is_ArgsIsa(F,A,Templ):- moo:ft_info(Templ,formatted),functor(Templ,F,A).
