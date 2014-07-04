@@ -422,7 +422,7 @@ ends_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),non_empty(UB),atom_concat(
 string_dedupe(StringI,StringO):- to_word_list(StringI,Words),remove_predupes(Words,StringO).
 
 remove_predupes([],[]).
-remove_predupes([L|ListI],ListO):- member(L,["",''," ",' ']),!,remove_predupes(ListI,ListO),!.
+remove_predupes(ListI,ListO):- member(L0,["",''," ",' ']),member(L0,ListI),delete(ListI,L0,ListM),!,remove_predupes(ListM,ListO),!.
 remove_predupes([L|ListI], ListO):- (member_ci(L,ListI) -> remove_predupes(ListI,ListO) ; (remove_predupes(ListI,ListM),[L|ListM]=ListO)),!.
 
 member_ci(L,[List|I]):-!,member(LL2,[List|I]),string_equal_ci(LL2,L).

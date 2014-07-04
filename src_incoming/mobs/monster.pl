@@ -50,7 +50,7 @@ monster_idea(Agent,move(Dir)) :-
 
 monster_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[corpse]).
 
-moo:type_default_props(self,monster, [description(self,SFmt),wearing(tough_hide),possess(tough_hide)]):-sformat(SFmt,"Very scarey looking monster named ~w",[self]).
+moo:default_type_props(Instance,monster, [description(Instance,SFmt),wearing(tough_hide),possess(tough_hide)]):-sformat(SFmt,"Very screy looking monster named ~w",[Instance]).
 
 
 

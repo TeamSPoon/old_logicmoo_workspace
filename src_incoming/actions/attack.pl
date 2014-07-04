@@ -10,6 +10,7 @@
 %
 */
 
+% :- module(user). 
 :- module(attack, []).
 
 :- include(logicmoo(vworld/moo_header)).

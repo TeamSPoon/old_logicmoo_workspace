@@ -67,7 +67,7 @@ hard_work:-
    ensure_loaded(logicmoo(testwebconsole)),
    !.
 
-slow_work:- with_assertions(moo:prevent_transform_moo_preds,within_user(at_start(hard_work))).
+slow_work:- with_assertions( moo:prevent_transform_moo_preds , within_user(at_start(hard_work))).
 thread_work:- thread_property(X, status(running)),X=loading_code,!.
 thread_work:- thread_create(slow_work,_,[alias(loading_code)]).
 

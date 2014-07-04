@@ -5,13 +5,14 @@
 % This file defines the basic use (pick up) predicate
 %
 
+% :- module(user). 
 :- module(use, []).
 
 :- include(logicmoo(vworld/moo_header)).
 
 :- moo:register_module_type(command).
 
-dyn:argsIsa(action_verb_useable(verb,term(mpred),type,term(mpred))).
+moo:argsIsa(action_verb_useable(verb,term(mpred),type,term(mpred))).
 
 moo:action_verb_useable(wear,wearing,wearable,stowed).
 moo:action_verb_useable(hold,holding,wieldable,stowed).
@@ -19,7 +20,7 @@ moo:action_verb_useable(use,using,usable,stowed).
 moo:action_verb_useable(drink,drinking,drinkable,holding).
 moo:action_verb_useable(stow,stowed,stowable,holding).
 
-moo:action_help(Syntax,String):-moo:action_verb_useable(Stow,Stowed,Stowable,Holding),Syntax=..[Stow,Stowable],
+moo:action_info(Syntax,String):-moo:action_verb_useable(Stow,Stowed,Stowable,Holding),Syntax=..[Stow,Stowable],
    sformat(String,'~w a ~w that you are/have ~w so it will be ~w.',[Stow,Stowable,Holding,Stowed]).
 
 get_use_verbs(USE,USING,USABLE,STOWED):-moo:action_verb_useable(USE,USING,USABLE,STOWED).
@@ -52,7 +53,8 @@ do_permanence(USE,Agent,Obj) :-
 
 moo:check_permanence(USE,_Agent,LOC,Obj) :-
      get_use_verbs(USE,_USING,_USABLE,_STOWED),
-	props(Obj,permanence(USE,dissapears)),
+	props(Obj,permanence(USE,Dissapears)),
+	member(Dissapears,[dissapears,0]),
 	del(atloc(Obj,LOC)).
 moo:check_permanence(USE,Agent,LOC,Obj) :-
     get_use_verbs(USE,USING,_USABLE,_STOWED),

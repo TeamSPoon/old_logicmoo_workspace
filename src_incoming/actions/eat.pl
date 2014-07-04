@@ -15,6 +15,7 @@
 % It will destroy something, even if it is not food... talk about a garbage disposal. 
 */
 
+% :- module(user). 
 :- module(eat, []).
 
 :- include(logicmoo(vworld/moo_header)).

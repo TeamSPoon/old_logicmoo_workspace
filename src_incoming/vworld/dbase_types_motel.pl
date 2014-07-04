@@ -1,7 +1,7 @@
 /** <module> 
 % Still working on (and testing) but will provide the type inference for Logicmoo Later
 %
-% Project LogicMoo: A MUD server written in Prolog
+% Project Logicmoo: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
@@ -10,25 +10,20 @@
 /*
 
 nt: notice(explorer(player1),do(explorer(player1),prolog)). 
-
-?-
-translate(implies(and(isa(X,C),genls(C,SC)),isa(X,SC)),X).
+ 1 ?- translate(implies(and(isa(X,C),genls(C,SC)),isa(X,SC)),X).
 X = [cl([isa(X, SC)], [and(isa(X, C), genls(C, SC))])].
 
 
-?-
-translate(exists(Z,implies(and([isa(X,C),genls(C,SC)]),isa(X,SC),knows(X,Z))),F).
+- translate(exists(Z,implies(and([isa(X,C),genls(C,SC)]),isa(X,SC),knows(X,Z))),F).
 F = [cl([implies(and([isa(X, C), genls(C, SC)]), isa(X, SC), knows(X, f1))], [])].
 
-?-
-translate(exists(Z,implies(and([isa(X,C),genls(C,SC)]),and([isa(X,SC),knows(X,Z)]))),F).
+4 ?- translate(exists(Z,implies(and([isa(X,C),genls(C,SC)]),and([isa(X,SC),knows(X,Z)]))),F).
 F = [cl([isa(X, SC)], [isa(X, C), genls(C, SC)]), cl([knows(X, f2)], [isa(X, C), genls(C, SC)])].
 
-?-
-translate(exists(Z,implies(and([isa(X,C),allHasPred(C,Pred)]),holds(Pred,X,Z))),F).
+5 ?- translate(exists(Z,implies(and([isa(X,C),allHasPred(C,Pred)]),holds(Pred,X,Z))),F).
 F = [cl([holds(Pred, X, f3)], [isa(X, C), allHasPred(C, Pred)])].
 
-?- 
+6 ?- 
 
 
 
@@ -14509,7 +14504,7 @@ completeParameter([P1,P2,P3,P4],P1,P2,P3,P4) :-
  * @(#) initCall.pl 1.4@(#)
  *
 */
-:- dmsg('MOTEL v0.8 Copyright (c) 1993, Patrick Brandmeier, Ullrich Hustadt (LOGICMOO HACKED)  Renate Schmidt, Jan Timm. All rights preserved.').
+:- write('MOTEL v0.8 Copyright (c) 1993, Patrick Brandmeier, Ullrich Hustadt (LOGICMOO HACKED)  Renate Schmidt, Jan Timm. All rights preserved.').
 /*
 :- nl, nl.
 :- write('Welcome to MOTEL (Version 0.8 July 1993)').
@@ -14546,10 +14541,17 @@ motel_term_expansion(_KB,H,B,true):- call(H).
 
 nopS(_).
 
+/*
 user:term_expansion((:-CALL),(:-CALL)):-!.
 user:term_expansion((H:-B),':-'(nopS(Out))):- in_motel_kb(KB),!, motel_term_expansion(KB,H,B,Out).
 user:term_expansion(H,':-'(nopS(Out))):- in_motel_kb(KB),!, motel_term_expansion(KB,H,true,Out).
+*/
 
+motel_at_all_term_expansion((:-CALL),(:-CALL)):-!.
+motel_at_all_term_expansion((H:-B),':-'(nopS(Out))):- in_motel_kb(KB),!, motel_term_expansion(KB,H,B,Out).
+motel_at_all_term_expansion(H,':-'(nopS(Out))):- in_motel_kb(KB),!, motel_term_expansion(KB,H,true,Out).
+
+user:term_expansion(A,B):- fail, motel_at_all_term_expansion(A,B).
 
 
 :-asserta(in_motel_kb(fssKB)).

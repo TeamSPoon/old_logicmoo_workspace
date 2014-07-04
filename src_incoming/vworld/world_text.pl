@@ -17,7 +17,7 @@
 % local_decl_db_prop(repl_writer(agent,term),[singleValued,default(default_repl_writer)]).
 % local_decl_db_prop(repl_to_string(agent,term),[singleValued,default(default_repl_obj_to_string)]).
 
-default_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=o),fmt('~q=(~w )~q.~n',[N,TypeO,V]).
+default_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=o),fmt('~q=(~w)~q.~n',[N,TypeO,V]).
 default_repl_obj_to_string(O,Type,toString(TypeO,O)):-copy_term(Type,TypeO),ignore(TypeO=o).
 
 
@@ -238,9 +238,9 @@ local_term_anglify(np(P),English):- local_term_anglify_np(P,English).
 local_term_anglify(noun_phrase(P),English):- local_term_anglify_np(P,English).
 
 local_term_anglify(notice(Who,What),[np(Who),notices,What]).
-local_term_anglify(fN(Region,region),[(String)]):- nameString(Region,String),!.
+local_term_anglify(fN(Region,region),[(String)]):- nameStrings(Region,String),!.
 
-local_term_anglify(fN(Region,region),[nameString1(String)]):- holds_t(nameString,Region,String),!.
+local_term_anglify(fN(Region,region),[nameString1(String)]):- holds_t(nameStrings,Region,String),!.
 
 
 local_term_anglify([P|L],English):-!, local_term_anglify(P,PE),local_term_anglify(L,LE),!,flatten_append(PE,LE,English),!.
@@ -288,8 +288,8 @@ local_term_anglify_np(string(Obj),string,Obj):- !.
 local_term_anglify_np(Obj,string,Obj):- !.
 
 local_term_anglify_np_last(Obj,Hint,String):- anglify_noun_known(Obj,Hint,String),!.
-local_term_anglify_np_last(Obj,FT,String):- is_ft(FT),correctFormatType(tell(_),Obj,FT,String),!.
-local_term_anglify_np_last(Obj,Type,[prolog(Obj)]):-is_ft(Type),!.
+local_term_anglify_np_last(Obj,FT,String):- formattype(FT),correctFormatType(tell(_),Obj,FT,String),!.
+local_term_anglify_np_last(Obj,Type,[prolog(Obj)]):-formattype(Type),!.
 local_term_anglify_np_last(Obj,Type,[the,Type,prolog(Obj)]):-!.
 local_term_anglify_np_last(apath(Region,Dir),_,[a,fN(Dir,dir),'-ern',way,from,fN(Region,np)]):-!.
 local_term_anglify_np_last(Obj,Type,[prolog(Obj),fN,Type]):-!.
@@ -297,13 +297,13 @@ local_term_anglify_np_last(Obj,_,[the,noun,with,token,Obj]):-!.
 
 
 % anglify_noun_known(Self,_Hint,[you]):- current_agent(Self),!.
-anglify_noun_known(Obj,FT,String):- is_ft(FT),correctFormatType(tell(_),Obj,FT,String),!.
+anglify_noun_known(Obj,FT,String):- formattype(FT),correctFormatType(tell(_),Obj,FT,String),!.
 anglify_noun_known(explorer(StringO),_Hint, [StringO]).
 anglify_noun_known(Obj,_Hint,[right,here]):- current_agent(Self),atloc(Self,Obj),!.
 anglify_noun_known(Obj,_Hint,[here]):- current_agent(Self),req(inRegion(Self,Obj)),!.
-anglify_noun_known(Obj,_Hint,StringO):- findall(String,holds_t(nameString,Obj,String),List),List\=[],sort_by_strlen(List,[StringO|_]),!.
+anglify_noun_known(Obj,_Hint,StringO):- findall(String,holds_t(nameStrings,Obj,String),List),List\=[],sort_by_strlen(List,[StringO|_]),!.
 %anglify_noun_known(Obj,_Hint,String):-
-%nameString(X,Y,_,_)
+%nameStrings(X,Y,_,_)
 
 
 :-  moo:end_transform_moo_preds.
@@ -404,7 +404,7 @@ description('Area1006', "Eight round transport pads have been arranged in a circ
 description('Area1042', "Transporter Beam").
 description('Area1042', "YouFindYourself in a transporter beam").
 description('Area1042', "All you can see is blue flashing light").
-description('Area1042', "It feels fN though your body is racing around at high speeds").
+description('Area1042', "It feels as though your body is racing around at high speeds").
 description('Area1042', "As you try to look down at your body, you realize that there's nothing there!").
 description('Area1007', "You step through the doors and find yourself in a large school room").
 description('Area1007', "Various tables and chairs are set up all around the room, and many paintings and drawings have been attached to the walls").
@@ -508,7 +508,7 @@ description('Area1028', "small partition at the northern part of the room contai
 description('Area1029', "Science Lab").
 description('Area1029', "You're in the Enterprise science lab").
 description('Area1029', "strange looking machine sits in theMiddleOf the room, up on a slightly raised platform").
-description('Area1029', "It looks fN though something(or someone) could be placed inside, hooked up to the multitude of wires and cables, and have scientific tests performed on it(or them)").
+description('Area1029', "It looks as though something(or someone) could be placed inside, hooked up to the multitude of wires and cables, and have scientific tests performed on it(or them)").
 description('Area1029', "complex looking computer console is facing this machine").
 description('Area1029', "Around the rest of the room are counterops with with the odd computer terminal").
 description('Area1031', "Cargo Bay 2").
@@ -530,7 +530,7 @@ description('Area1036', "Two small curved ramps on either side of the room lead 
 description('Area1035', "Picard's Ready Room").
 description('Area1035', "You're standing in Captain Picard's ready room").
 description('Area1035', "long couch has been placed beside the door, while a large U shaped desk is located by the northern wall").
-description('Area1035', "small computer screen is sitting on the desk, fN well fN several other papers and documents").
+description('Area1035', "small computer screen is sitting on the desk, as well as several other papers and documents").
 description('Area1035', "single high window beside the desk looks into space, and a fish tank is located in the northwestern corner of the room").
 description('Area1038', "Main Bridge - Lower Half").
 description('Area1038', "YouFindYourself on the lower half of the main bridge of the USS Enterprise").

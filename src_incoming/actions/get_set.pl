@@ -1,3 +1,4 @@
+% :- module(user). 
 :- module(get_set, []).
 /** <module> Agent changes one of their own variables
 % Douglas Miles 2014
@@ -7,10 +8,11 @@
 
 :- moo:register_module_type(command).
 
-moo:action_help('@get'(optional(term,self),term),text("@get term to a property")).
-moo:action_help('@set'(optional(term,self),atom,term),text("@sets term to a property")).
+moo:action_info('@get'(optional(term,self),term),text("@get term to a property")).
+moo:action_info('@set'(optional(term,self),atom,term),text("@sets term to a property")).
 
 moo:agent_text_command(Agent,['@set',Prop0,Value0],Agent,'@set'(Agent,Prop0,Value0)).
+moo:agent_text_command(Agent,['@','set',Prop0,Value0],Agent,'@set'(Agent,Prop0,Value0)).
 
 moo:agent_call_command(Agent,'@set'(Obj0,Prop0,Value0)) :- subst(game_assert(holds(Prop0,Obj0,Value0)),self,Agent,K),dmsg(K),debugOnError(K).
 

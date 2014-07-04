@@ -1,3 +1,4 @@
+% :- module(user). 
 :- module(actions_conf, []).
 
 end_of_file.

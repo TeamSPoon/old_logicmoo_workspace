@@ -10,6 +10,7 @@
 % files are formatted.
 %
 */
+% :- module(user). 
 :- module(push, []).
 
 :- include(logicmoo(vworld/moo_header)).

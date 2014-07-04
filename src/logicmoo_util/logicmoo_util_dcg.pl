@@ -224,7 +224,7 @@ dcgNone --> [].
 
 dcgOptional(A)--> dcgOnce(dcgOr(A,dcgNone)).
 
-dcgTraceOnFailure(X):-once(X;(trace,X)).
+dcgTraceOnFailure(X):-once(X;(dtrace,X)).
 
 capitalized([W|Text]) --> theText([W|Text]),{atom_codes(W,[C|_Odes]),is_upper(C)}.
 
@@ -315,5 +315,6 @@ testPhrase(Dcg,English):-
          phrase(Dcg,Tagged,Left),
          nl,nl,writeq(left),         
          nl,dumpList(Left).
+
 
 

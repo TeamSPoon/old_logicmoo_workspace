@@ -9,6 +9,7 @@
 % Dec 13, 2035
 % Douglas Miles
 */
+% :- module(user). 
 :- module(climb, []).
 
 :- include(logicmoo(vworld/moo_header)).
@@ -32,7 +33,8 @@ moo:agent_call_command(Agent,climb(Dir)) :-
 	call_update_stats(Agent,trip),
 	call_update_charge(Agent,climb).
 % Object is too high to climb, or it is another agent. 
-moo:agent_call_command(Agent,climb(Dir)) :-	
+moo:agent_call_command(Agent,climb(Dir)) :-
+	
 	\+ climbable(Agent,Dir),
 	call_update_stats(Agent,pulled),
 	call_update_charge(Agent,climb).

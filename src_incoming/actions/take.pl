@@ -9,6 +9,7 @@
 % This file defines the basic take (pick up) predicate
 %
 */
+% :- module(user). 
 :- module(take, []).
 
 :- include(logicmoo(vworld/moo_header)).
@@ -41,7 +42,8 @@ permanence_take(take,Agent,Obj) :-
         term_listing(Obj).
 
 moo:check_permanence(take,_,_,Obj):-
-        props(Obj,permanence(take,dissapears)),        
+        props(Obj,permanence(take,Dissapears)), 
+		member(Dissapears,[0,dissapears]),
         atloc(Obj,LOC),
 	clr(atloc(Obj,LOC)).
 moo:check_permanence(take,Agent,_,Obj) :-

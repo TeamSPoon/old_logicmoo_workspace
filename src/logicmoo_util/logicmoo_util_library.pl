@@ -119,15 +119,17 @@ assertz_if_new_clause(H,B):-clause_asserted(H,B),!.
 assertz_if_new_clause(H,B):-assertz((H:-B)).
 
 clause_asserted(C):- as_clause(C,H,B),clause_asserted(H,B).
+clause_asserted(H,B):- predicate_property(H,number_of_clauses(_)),functor_h(H,HH),functor_h(B,BB),!,clause(HH,BB), B =@= BB , H =@= HH.
 
-clause_asserted(H,B):- B==true,!,(ground(H)->(clause(H,true),!);not(not((snumbervars(H),clause(H,true))))).
-clause_asserted(H,B):- functor_h(H,HH),functor_h(B,BB),!,clause(HH,BB), B =@= BB , H =@= HH ,! 
+:-meta_predicate clause_safe(:, ?).
+:-module_transparent clause_safe/2.
+:-export(clause_safe/2).
+clause_safe(M:H,B):-(nonvar(H)->true;(current_predicate(M:F/A),functor(H,F,A))),predicate_property(M:H,number_of_clauses(_)),clause(H,B).
 
 as_clause( ((H :- B)),H,B):-!.
 as_clause( H,  H,  true).
 
-functor_h(H,H):-var(H),!.
-functor_h(H,HH):-functor(H,F,A),functor(HH,F,A).
+functor_h(H,HH):- notrace(( var(H) -> HH=H ; (functor(H,F,A),functor(HH,F,A)) )).
 
 :- meta_predicate doall(0).
 doall(C):-ignore((C,fail)).
@@ -219,11 +221,11 @@ make_list(E,N,[E|List]):- M1 is N - 1, make_list(E,M1,List),!.
 :- meta_predicate get_module_of_4(0,+,+,-).
 get_module_of_4(_P,F,A,ModuleName):- current_module(ModuleName),module_property(ModuleName, exports(List)),member(F/A,List),!.
 get_module_of_4(_P,F,A,M):- current_predicate(M0:F0/A0),F0=F,A0=A,!,M=M0.
-get_module_of_4(P,F,A,M):-throw((get_module_of_4(P,F,A,M))).
+get_module_of_4(P,F,A,M):-trace_or_throw((get_module_of_4(P,F,A,M))).
 
 /*
 get_module_of_4(_P,F,A,M):- current_predicate(F0/A0),F0=F,A0=A,!,moo:dbase_mod(M).
-get_module_of_4(_P,F,A,_M):-trace, dbase:isCycPredArity(F,A),!,fail.
+get_module_of_4(_P,F,A,_M):-trace, isCycPredArity(F,A),!,fail.
 get_module_of_4(P,F,A,M):- trace, debugCall(get_module_of_4(P,F,A,M)).
 */
 
@@ -239,7 +241,7 @@ get_module_of(P,M):-functor(P,F,A),get_module_of_4(P,F,A,M).
 :- meta_predicate def_meta_predicate(0,+,+).
 
 def_meta_predicate(M:F,S,E):-!,doall(((between(S,E,N),make_list('?',N,List),CALL=..[F|List],'@'(meta_predicate(CALL),M)))).
-def_meta_predicate(F,S,E):-throw((def_meta_predicate(F,S,E))).
+def_meta_predicate(F,S,E):- trace_or_throw(def_meta_predicate(F,S,E)).
 
 :- meta_predicate dynamic_multifile_exported(0), dynamic_multifile_exported(+,+), dynamic_multifile_exported(+,+,+).
 
@@ -255,7 +257,7 @@ dynamic_multifile_exported(M, F/A ):-!,dynamic_multifile_exported(M,F,A).
 
 
 dynamic_multifile_exported(M,F,A):- integer(A),atom(M),atom(F),!, '@'(( dynamic(F/A), multifile(F/A), M:export(F/A)), M).
-dynamic_multifile_exported(M,F,A):-throw((dynamic_multifile_exported(M,F,A))).
+dynamic_multifile_exported(M,F,A):- trace_or_throw((dynamic_multifile_exported(M,F,A))).
 
 flatten_dedupe(Percepts0,Percepts):-
    flatten([Percepts0],Percepts1),remove_dupes(Percepts1,Percepts).
@@ -268,7 +270,7 @@ remove_dupes([I|In],[I|Out],Shown):-remove_dupes(In,Out,[I|Shown]).
 
 get_functor(Obj,F):-get_functor(Obj,F,_).
 
-get_functor(Obj,F,_):-var(Obj),throw(get_functor(Obj,F)).
+get_functor(Obj,F,_):-var(Obj),trace_or_throw(get_functor(Obj,F)).
 get_functor(_:Obj,F,A):-!,get_functor(Obj,F,A).
 get_functor(Obj,F,0):- string(Obj),!,atom_string(F,Obj).
 get_functor(Obj,Obj,0):-not(compound(Obj)),!.
@@ -305,7 +307,7 @@ call_n_times(_,Goal):-Goal.
 :-dynamic(at_started/1).
 at_start(Goal):-
 	copy_term(Goal,Named),
-	numbervars(Named,1,_),
+	numbervars(Named,0,_,[attvar(skip),singletons(true)]),
 	copy_term(Named,Named2),
         (    at_started(Named)
 	->
@@ -314,7 +316,7 @@ at_start(Goal):-
 	     catch(
 		 (assert(at_started(Named2)),debugOnFailure0((Goal))),
 		 E,
-		 (retractall(at_started(Named2)),throw(E)))
+		 (retractall(at_started(Named2)),trace_or_throw(E)))
 	).
 
 dynamic_multifile(Pred/N):-
@@ -349,7 +351,7 @@ multi_transparent(X):-functor(X,F,A),multi_transparent(F/A),!.
 
 :- module_transparent(library_directory/1).
 
-throw_safe(Exc):-throw(Exc).
+throw_safe(Exc):-trace_or_throw(Exc).
 atom_concat_safe(L,R,A):- ((atom(A),(atom(L);atom(R))) ; ((atom(L),atom(R)))), !, atom_concat(L,R,A),!.
 exists_file_safe(File):-bugger:must(atomic(File)),exists_file(File).
 exists_directory_safe(File):-bugger:must(atomic(File)),exists_directory(File).
@@ -386,7 +388,7 @@ maplist_safe(Pred,LISTIN, LIST):-!, findall(EE, ((member(E,LISTIN),debugOnFailur
 
 hasLibrarySupport :- absolute_file_name(logicmoo('logicmoo_util/logicmoo_util_library.pl'),File),exists_file(File).
 
-throwNoLib:- trace,absolute_file_name('.',Here), buggerFile(BuggerFile), listing(library_directory), throw(error(existence_error(url, BuggerFile), context(_, status(404, [BuggerFile, from( Here) ])))).
+throwNoLib:- trace,absolute_file_name('.',Here), buggerFile(BuggerFile), listing(library_directory), trace_or_throw(error(existence_error(url, BuggerFile), context(_, status(404, [BuggerFile, from( Here) ])))).
 
 addLibraryDir :- buggerDir(Here),atom_concat(Here,'/..',UpOne), absolute_file_name(UpOne,AUpOne),asserta(user:library_directory(AUpOne)).
 
@@ -421,7 +423,7 @@ pred_term_parts_l(Pred,[A|L],TERMS):-!,pred_term_parts(Pred,A,AP),pred_term_part
 pred_term_parts_l(Pred,Term,TERMS):-pred_term_parts(Pred,Term,TERMS),!.
 pred_term_parts_l(_,_Term,[]).
 
-throw_if_true_else_fail(T,E):- once(hotrace(T)),throw(throw_if_true_else_fail(E:T)).
+throw_if_true_else_fail(T,E):- once(hotrace(T)),trace_or_throw(throw_if_true_else_fail(E:T)).
 
 list_retain(PL,Pred,Result):- throw_if_true_else_fail(not(is_list(PL)),list_retain(PL,Pred,Result)).
 list_retain([],_Pred,[]):-!.

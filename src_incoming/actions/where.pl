@@ -12,16 +12,17 @@
 % It will destroy something, even if it is not food... talk about a garbage disposal. 
 */
 
+% :- module(user). 
 :- module(where, []).
 
 :- include(logicmoo(vworld/moo_header)).
 
 :- moo:register_module_type(command).
 
-moo:action_help(where(object),"Tells where something is").
+moo:action_info(where(object),"Tells where something is").
 
-dyn:subclass(agent,object).
-dyn:subclass(item,object).
+moo:subclass(agent,object).
+moo:subclass(item,object).
 
 moo:agent_text_command(Agent,[where,X],Agent,where(X)).
 moo:agent_text_command(Agent,[where,BE,X],Agent,where(X)):-memberchk(BE,[is,are,be,were]).
@@ -36,10 +37,10 @@ moo:agent_call_command(_Agent,where(SObj)) :-
 
 moo:agent_text_command(Agent,[who],Agent,who(world)).
 
-moo:action_help(who(optional(agent,world)),"Lists who is online (where they are at least)").
+moo:action_info(who(optional(agent,world)),"Lists who is online (where they are at least)").
 
-get_inRegion(Agnt,Where):- dyn:inRegion(Agnt,Where).
-get_inRegion(Agnt,Where):- dyn:atloc(Agnt,Where).
+get_inRegion(Agnt,Where):- inRegion(Agnt,Where).
+get_inRegion(Agnt,Where):- atloc(Agnt,Where).
 
 moo:agent_call_command(_Gent,who(W)) :- mud_cmd_who(W).
 

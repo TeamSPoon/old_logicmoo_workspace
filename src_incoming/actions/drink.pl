@@ -5,14 +5,14 @@
 % Will (theoretically) only be used in conjuction with take action
 %
 % It will destroy something, even if it is not food... talk about a garbage disposal. 
-
+% :- module(user). 
 :- module(drink, []).
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(command).
+:- register_module_type(command).
 
-moo:action_help(drink(drinkable),"Drink a Drinkable Item").
+moo:action_info(drink(drinkable),"Drink a Drinkable Item").
 
 % Eat something held
 % Check to make sure it's in the agents possession... 

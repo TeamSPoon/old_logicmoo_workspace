@@ -1,7 +1,7 @@
 /** <module> 
 % This module defines the way we lay out 2-D grids into room
 %
-% Project LogicMoo: A MUD server written in Prolog
+% Project Logicmoo: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
@@ -48,12 +48,12 @@ room_center(Room,X,Y,Z):-
       grid_size(Room,MaxX,MaxY,MaxZ),
       center_xyz(MaxX,X),
       center_xyz(MaxY,Y),
-      center_xyz(MaxZ,Z),!.
-      % doing it ! dmsg(todo("get room size and calc center ",Room)).
+      center_xyz(MaxZ,Z),!,
+      dmsg(todo("get room size and calc center ",Room)).
 
 
-locationToRegion(xyz(Room,_,_,_),Region2):-!,locationToRegion(Room,Region2).
-locationToRegion(Obj,Obj):-mud_isa(Obj,region),!. % inRegion(Obj,Room).
+locationToRegion(xyz(Room,_,_,_),Region2):-nonvar(Room),!,locationToRegion(Room,Region2).
+locationToRegion(Obj,Obj):-nonvar(Obj),mud_isa(Obj,region),!. % inRegion(Obj,Room).
 
 loc_to_xy(LOC,X,Y,xyz(Room,X,Y,1)):- locationToRegion(LOC,Room),!.
 loc_to_xy(Room,X,Y,xyz(Room,X,Y,1)).
@@ -62,11 +62,11 @@ is_3d(LOC):- compound(LOC).
 
 % Quintus random(1,MaxX,X) and random(1,MaxY,Y)
 grid_size(Room,MaxX,MaxY,MaxZ):- fail,
-   dyn:type_grid(What,1,L),
+    tbox:type_grid(What,1,L),
    mud_isa(Room,What),!,
    maxZ(MaxZ),
 	length(L,MaxX),
-	findall(1,dyn:type_grid(What,_,_),LL),
+	findall(1, tbox:type_grid(What,_,_),LL),
 	length(LL,MaxY),!.
 
 grid_size(_Room,MaxX,MaxY,MaxZ):- MaxX = 5 , MaxY = 5 , maxZ(MaxZ) ,!.
@@ -109,7 +109,7 @@ init3(LocName,LocType,xyz(LocName,_,Y,1),[]) :-
 	init2(LocName,LocType,X,1).
 
 init3(LocName,LocType,xyz(LocName,X,Y,1),[O|T]) :-
-	label_type(O,Type),
+	moo:label_type(O,Type),
            rez_object(xyz(LocName,X,Y,1),Type),
 	K is X + 1,
 	init3(LocName,LocType,xyz(LocName,K,Y,1),T).
@@ -124,6 +124,7 @@ locs_near(L1,L2):- nonvar(L1),nonvar(L2),L2=xyz(_,_,_,_),locationToRegion(L1,R),
 locs_near(L1,L2):- nonvar(L1),nonvar(L2),locationToRegion(L1,R1),locationToRegion(L2,R2),!,region_near(R1,R2).
 locs_near(L1,L2):-region_near(R1,R2),in_grid(R1,L1),in_grid(R2,L2).
 
+% :- decl_not_mpred(locs_near_i,2).
 :-export(locs_near_i/2).
 locs_near_i(L1,L2):- locationToRegion(L1,R),in_grid(R,L2).
 locs_near_i(L1,L2):- locationToRegion(L1,R),pathBetween_call(R,_,R2),in_grid(R2,L2).
@@ -131,35 +132,50 @@ locs_near_i(L1,L2):- locationToRegion(L1,R),pathBetween_call(R,_,R2),in_grid(R2,
 region_near(R1,R2):-pathBetween_call(R1,_,R2).
 region_near(R1,R1).
 
-moo:type_default_props(OfAgent,agent,[facing(F),atloc(L)]):-create_someval(facing,OfAgent,F),create_someval(atloc,OfAgent,L).
+moo:default_type_props(OfAgent,agent,[facing(F),atloc(L)]):-create_someval(facing,OfAgent,F),create_someval(atloc,OfAgent,L).
 
 put_in_world(Agent):-ensure_some(facing,Agent),!,ensure_some(atloc,Agent),!.
 
 ensure_some(Property,OfAgent):- prop(OfAgent, Property,_),!.
-ensure_some(Property,OfAgent):- create_someval(Property,OfAgent,Value),padd(OfAgent,Property,Value).
+ensure_some(Property,OfAgent):- create_someval(Property,OfAgent,Value),!,padd(OfAgent,Property,Value).
 
 create_someval(facing,_Agent,Dir) :- my_random_member(Dir,[n,s,e,w,ne,nw,se,sw]).
 create_someval(atloc,Agent,Where) :- 
    defaultRegion(Agent,Region),
    in_grid(Region,Where),
    unoccupied(Where),!.
-create_someval(atloc,_Agent,Loc) :- find_unoccupied(Loc).
 
-defaultRegion(Agent,Region):- inRegion(Agent,Region),!.
-defaultRegion(_Agent,Region):- inRegion(_,Region),!.
-defaultRegion(_Agent,Region):- trace, Region = 'Area1000'.
+%create_someval(atloc,_Agent,Loc) :- must((create_random(xyz/3,Loc,unoccupied(Loc)))).
+create_someval(Pred,_Arg1,Value) :- must((mpred_arity(Pred,Last),argIsa_call(Pred,Last,Type),create_random(Type,Value,nonvar(Value)))).
+
+create_random(XYZ/_,Value,Test):- atom(XYZ),!,create_random(XYZ,Value,Test).
+create_random(XYZ,Value,Test):- atom(XYZ),atom_concat('random_',XYZ,Pred),Call=..[Pred,Value],predicate_property(Call,_),Call,Test,!.
+create_random(XYZ,Value,Test):- findall(V,req(isa(V,XYZ)),Possibles),randomize_list(Possibles,Randomized),!,member(Value,Randomized),Test,!.
+create_random(XYZ,Value,Test):- trace_or_throw(failed(create_random(XYZ,Value,Test))).
+
+isa(X,Y):-loop_check(req(isa(X,Y)),is_asserted(isa(X,Y))).
+
+actualRegion(Agent,Region):- req(atloc(Agent,LOC)),locationToRegion(LOC,Region),!.
+actualRegion(Agent,Region):- req(inRegion(Agent,Region)),!.
+
+defaultRegion(Agent,Region):- actualRegion(Agent,Region),!.
+defaultRegion(_Agent,Region):- actualRegion(_,Region),!.
+defaultRegion(_Agent,Region):- create_random(region,Region,true).
+defaultRegion(_Agent,Region):- Region = 'Area1000'.
 
 
-decide_region(LOC):- findall(O,region(O),LOCS),my_random_member(LOC,LOCS).
+% random_region(LOC):- findall(O,isa(O,region),LOCS),my_random_member(LOC,LOCS).
 
 :-export(my_random_member/2).
 
 my_random_member(LOC,LOCS):- length(LOCS,Len),Len>0, X is random(Len),nth0(X,LOCS,LOC).
-find_unoccupied(Where):-
-   must(decide_region(LOC)),
+randomize_list(LOCS,[LOC|LOCS]):- length(LOCS,Len),Len>0, X is random(Len),nth0(X,LOCS,LOC).
+
+random_xyz(Where):-
+   must(create_random(region,LOC,true)),
    in_grid_rnd(LOC,Where),
    unoccupied(Where),!.
-find_unoccupied('Area1000'):- trace, throw(game_not_loaded).
+random_xyz(xyz('Area1000',1,1,1)):-  trace_or_throw(game_not_loaded).
 
 unoccupied(_X):-!. %%not(atloc(_,X)).
 
@@ -224,7 +240,7 @@ dir_offset(se,F,F,F,0).
 dir_offset(nw,F,-F,-F,0).
 dir_offset(here,_,0,0,0).
 
-
+hook:decl_database_hook(retract(_),atloc(Agent,_)):-padd(Agent,needs_look(true)).
 
 % dir_mult(X,Y,Z,X1,Y1,Z1,X2,Y2,Z2):- X2 is X * X1,Y2 is Y * Y1,Z2 is Z * Z1.
 
@@ -236,9 +252,9 @@ in_world_move(LOC,Agent,DirS) :-
         ignore(atloc(Agent,LOC)),
         in_world_move0(LOC,Agent,Dir),
         atloc(Agent,LOC2),
-        must(LOC2 \== LOC),
-        padd(Agent,[needs_look(true)]).
-  
+        must(LOC2 \== LOC),!.
+
+
 in_world_move0(LOC,Agent,Dir) :-
         padd(Agent,facing(Dir)),
    ignore(atloc(Agent,LOC)),

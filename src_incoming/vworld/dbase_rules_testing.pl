@@ -4,7 +4,7 @@
 do_pttp_test(TestName):- forall(pttp_test(TestName,Data),
                                 (                                 
                                  dmsg(do_pttp_test(TestName)),
-                                 eraseall(int_query,_),
+                                 eraseall(int_query,_),                                 
                                  /*
                                  eraseall(int_not_firstOrder,_),
                                  eraseall(not_firstOrder,_),
@@ -33,7 +33,6 @@ unimplemented:-throw(unimplemented).
 
 pttp_assert_int([Y]):-pttp_assert_int(Y),!.
 pttp_assert_int([Y|L]):-!,pttp_assert_int(Y),pttp_assert_int(L),!.
-
 %firstOrder -> holds_t
 %not_firstOrder -> holds_f
 %int_firstOrder -> dbase_t
@@ -140,7 +139,7 @@ pttp_test(logicmoo_example3_will_fail,
 
           (query:- not(firstOrder(sonOf,gun,phil)))
           % Expected true
-	))):-fail. % skip test
+	))).
 
           % (all X:( all Y : (motherOf(X,Y)) => (bellyButton(X) , older(X,Y) , female(Y)) )),
 

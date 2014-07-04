@@ -1,3 +1,4 @@
+% :- module(user). 
 :- module(inventory, [inventory/2]).
 /** <module> A command to  ...
 % Douglas Miles 2014
@@ -5,14 +6,14 @@
 */
 :- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(command).
+:- register_module_type(command).
 
 :-debug.
 
 % ====================================================
 % the entire inventory system
 % ====================================================
-moo:action_help(inventory(optional(agent,self)), "Examine an inventory").
+moo:action_info(inventory(optional(agent,self)), "Examine an inventory").
 moo:agent_call_command(Agent,inventory(Who)):- show_kb_preds(Agent,inventory(Who,value)).
 
 % Get only the Inv (inventory)
@@ -21,11 +22,11 @@ inventory0(Agent, Inv) :-
 	findall(Poss,possess(Agent,Poss),Inv).
 
 
-test_exists(O):-dyn:item(O).
-test_exists(O):-kb:agent(O).
-test_exists(O):-dyn:region(O).
-test_anyInst(O):-dyn:type(O).
-test_anyInst(O):-test_exists(O).
+test_exists(O):- item(O).
+test_exists(O):- agent(O).
+test_exists(O):- region(O).
+test_anyInst(O):- type(O).
+test_anyInst(O):- test_exists(O).
 
 % helps for testings
 % :- listing(inventory:_).

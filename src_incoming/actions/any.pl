@@ -10,6 +10,7 @@
 %  action_adds_states(Agent,StateRules,ADDS),
 % 
 
+% :- module(user). 
 :- module(any, []).
 
 action_adds_states(_Agent,List,Adds):-findall(A,member(_ -> A,List),Adds).

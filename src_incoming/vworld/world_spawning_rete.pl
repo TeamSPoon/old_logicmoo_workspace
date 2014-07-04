@@ -2,7 +2,7 @@
 %  laying out new objects in the mud based on some frame rules (using RETE method)
 %
 %
-% Project LogicMoo: A MUD server written in Prolog
+% Project Logicmoo: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
@@ -945,7 +945,7 @@ go :-
 	!,go.
 go :-
 	conflict_set([]),
-	finished, !.			% supplied in dyn for what to do at end
+	finished, !.			% supplied in  tbox for what to do at end
 go :-
 	message(119).
 

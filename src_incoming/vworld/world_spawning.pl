@@ -3,7 +3,7 @@
 %  laying out new objects in the mud based on some frame rules
 %
 %
-% Project LogicMoo: A MUD server written in Prolog
+% Project Logicmoo: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
@@ -55,9 +55,10 @@ csdmsg(M):-'format'('% ~q. ~n', [M]).
 :-style_check(-discontiguous).
 
 
-callStub(P,F,A):- predicate_property(P,number_of_clauses(N)),(N==1 -> (csdmsg(failed(callStub(P,F,A),!,fail))); ((functor(PP,F,A),csdmsg(callStub(P,F,A)),retractall((PP:-callStub(PP,F,A))),callStub(P,F,A)))).
+callStub_rete(P,F,A):- predicate_property(P,number_of_clauses(N)),(N==1 -> (csdmsg(failed(callStub_rete(P,F,A),!,fail))); ((functor(PP,F,A),csdmsg(callStub_rete(P,F,A)),retractall((PP:-callStub_rete(PP,F,A))),callStub_rete(P,F,A)))).
 
-createStub(F,A):- dynamic(F/A),!. %%,functor(P,F,A),asserta((P:-callStub(P,F,A))).
+
+createStub_rete(F,A):- dynamic(F/A),!. %%,functor(P,F,A),asserta((P:-callStub_rete(P,F,A))).
 
 
 :- forall(member(F/A,[
@@ -81,8 +82,7 @@ createStub(F,A):- dynamic(F/A),!. %%,functor(P,F,A),asserta((P:-callStub(P,F,A))
       rul/3,
       varg/1,
       nid/1
-      ]),createStub(F,A)).
-
+      ]),createStub_rete(F,A)).
 
 
 % FOOPS - an integration of frames, forward chaining with LEX and MEA,
@@ -146,7 +146,7 @@ do(_) :- write('invalid command'),nl.
 
 % loads the rules (Prolog terms) into the Prolog database
 
-load :- reconsult('room.dyn'),!.
+load :- reconsult('room. tbox'),!.
 load :-
 	write('Enter the file name in single quotes (ex. ''room.fkb''.): '),
 	read(F),
@@ -156,7 +156,7 @@ load :-
 
 initialize :-
 	setchron(1),
-	createStub(instantiation,1),
+	createStub_rete(instantiation,1),
 	delf(all),
 	assert(mea(no)),
 	assert(gid(100)),

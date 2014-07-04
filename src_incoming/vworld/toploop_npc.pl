@@ -1,7 +1,7 @@
 /** <module> 
 % Uses timers to make sure all Agents get a chance to do their things
 %
-% Project LogicMoo: A MUD server written in Prolog
+% Project Logicmoo: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
@@ -19,7 +19,7 @@
 :- meta_predicate agent_call_safely(?,?,?).
 
 :- include(logicmoo(vworld/moo_header)).
-:- moo:begin_transform_moo_preds.
+% :- moo:begin_transform_moo_preds.
 :- dynamic(npc_tick_tock_time/1).
 npc_tick_tock_time(300).
 
@@ -34,7 +34,7 @@ npc_tick:-
 join_npcs_long_running.
 
 % skip manually controled agents
-npc_controller(simple_world_agent_plan,Who):- isa(Who,activeAgent),not(agent_message_stream(Who,_,_)).
+npc_controller(simple_world_agent_plan,Who):- isa(Who,activeAgent),not(toploop_telnet:agent_message_stream(Who,_,_)).
 
 tick_controller(simple_world_agent_plan,Who):- tick(Who).
 
@@ -73,17 +73,17 @@ do_agent_call_plan_command(A,C):-
 
 idea(Who,IdeaS):- findall(Idea,(get_world_agent_plan(current,Who,Idea),dmsg(get_world_agent_plan(current,Who,Idea))),IdeaS),(IdeaS==[]->dmsg(noidea(idea(Who)));true).
 
-moo:action_help(npc_timer(int),"sets how often to let NPCs run").
-moo:action_help(tock,"Makes All NPCs do something brilliant").
-moo:action_help(tick(agent),"Makes some agent do something brilliant").
-moo:action_help(idea(optional(agent,self)),"Makes some agent (or self) think of something brilliant").
-moo:action_help(tick,"Makes *your* agent do something brilliant").
-moo:action_help(prolog(prolog),"Call prolog toploop").
+moo:action_info(npc_timer(int),"sets how often to let NPCs run").
+moo:action_info(tock,"Makes All NPCs do something brilliant").
+moo:action_info(tick(agent),"Makes some agent do something brilliant").
+moo:action_info(idea(optional(agent,self)),"Makes some agent (or self) think of something brilliant").
+moo:action_info(tick,"Makes *your* agent do something brilliant").
+moo:action_info(prolog(prolog),"Call prolog toploop").
 
 moo:agent_text_command(Agent,[prolog,X],Agent,prologCall(X)).
 moo:agent_text_command(Agent,[prolog],Agent,prologCall(prolog)).
 
-warnOnError(X):-catch(X,E,dmsg( error(E:X) )).
+warnOnError(X):-catch(X,E,dmsg(error(E:X))).
 
 moo:agent_call_command(Agent,prologCall(C)) :- agent_call_safely(Agent,C).
 moo:agent_call_command(Agent,prolog(C)) :- agent_call_safely(Agent,C).
@@ -95,7 +95,8 @@ agent_call_safely(RC,X,Vars) :-  '@'(notrace((warnOnError(doall(((X,flag(RC,CC,C
 atom_to_term_safe(A,T,O):-catch(atom_to_term(A,T,O),_,fail),T\==end_of_file.
 any_to_callable(S,X,Vs):-string(C),!,string_to_atom(S,C),atom_to_term_safe(C,X,Vs).
 any_to_callable(C,X,Vs):-atom(C),!,atom_to_term_safe(C,X,Vs).
-any_to_callable(C,X,Vs):-force_expand(expand_goal(C,X)),term_variables((C,X),Vs),!.
+any_to_callable(C,X,Vs):- (expand_goal(C,X)),term_variables((C,X),Vs),!.
+% any_to_callable(C,X,Vs):-force_expand(expand_goal(C,X)),term_variables((C,X),Vs),!.
 
 moo:agent_call_command(_Agent,npc_timer(Time)):-retractall(npc_tick_tock_time(_)),asserta(npc_tick_tock_time(Time)).
 moo:agent_call_command(Who,tick) :-  debugOnError(tick(Who)).

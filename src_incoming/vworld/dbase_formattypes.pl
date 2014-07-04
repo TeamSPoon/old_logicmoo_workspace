@@ -1,6 +1,135 @@
 /** <module> 
 % This is mainly used by the moo_loader but also needed everywhere
 %
+% Project Logicmoo: A MUD server written in Prolog
+% Maintainer: Douglas Miles
+% Dec 13, 2035
+%
+*/
+% =======================================================
+:- module(dbase_formattypes, [
+          term_is_ft/2,
+          formattype/1,
+          format_complies/3,
+          any_to_value/2,
+          any_to_number/2,
+          atom_to_value/2,
+          any_to_dir/2]).
+
+:- include(logicmoo('vworld/moo_header.pl')).
+
+term_is_ft(Term,Type):-
+   moo:ft_info(Type,How),
+   format_complies(Term,How,NewTerm),
+   ignore(NewTerm=Term).
+
+
+formattype(S):-   moo:ft_info(S,_).
+formattype(S):-   moo:subft(S,_).
+formattype(S):-moo:subclass(S,formattype).
+formattype(S):-mud_isa(S,formattype).
+
+/*
+is_decl_ft_except(S,List):-
+   moo:ft_info(S,_);
+   not((member(S,List), 
+      ((moo:subft(S,S2) ,
+        is_decl_ft_except(S2,[S|List]) ;
+             ((moo:subft(S3,S) , is_decl_ft_except(S3,[S,S2|List]))))))).
+*/
+
+moo:ft_info(atom,atom(self)).
+moo:ft_info(apath(region,dir),formatted).
+moo:ft_info(string,string(self)).
+moo:ft_info(number,number(self)).
+moo:ft_info(type,type(self)).
+moo:ft_info(dir,any_to_dir(self,_)).
+moo:ft_info(dice(int,int,int),formatted).
+moo:ft_info(xyz(region,int,int,int),formatted).
+moo:ft_info(list(type),formatted).
+moo:ft_info(term,nonvar(self)).
+moo:ft_info(id,nonvar(self)).
+moo:ft_info(prolog,true).
+moo:ft_info(rest,true).
+moo:ft_info(var,var(self)).
+moo:ft_info(action(prolog),formatted).
+
+moo:subft(var,prolog).
+moo:subft(term,prolog).
+moo:subft(atom,term).
+moo:subft(string,term).
+% moo:subft(number,term).
+moo:subft(id,term).
+
+moo:subft(int,integer).
+moo:subft(integer,number).
+moo:subft(dice,int).
+
+format_complies(A,Type,A):- var(Type),!,trace,throw(failure(format_complies(A,Type))).
+format_complies(A,string,AA):- ignoreOnError(text_to_string(A,AA)).
+format_complies(A,int,AA):- any_to_number(A,AA).
+format_complies(A,number,AA):- any_to_number(A,AA).
+format_complies(A,integer,AA):- any_to_number(A,AA).
+format_complies(A,Fmt,AA):- moo:ft_info(Fmt,formatted),!,format_complies(A,formatted(Fmt),AA).
+format_complies(A,Fmt,A):- moo:ft_info(Fmt,Code),!,subst(Code,self,A,Call),Call.   
+format_complies(A,number,AA):- must(any_to_number(A,AA)).
+format_complies(A,dir,AA):- any_to_dir(A,AA).
+format_complies([A|AA],list(T),LIST):-!,findall(OT,((member(O,[A|AA]),format_complies(O,T,OT))),LIST).
+format_complies(A,list(T),[OT]):-!,format_complies(A,T,OT).
+format_complies(A,same(A),A):-!.
+format_complies([],formatted([]),[]):-!.
+format_complies([H|T],formatted([H2|T2]),[H3|T3]):-
+   format_complies(H,H2,H3),
+   format_complies(T,formatted(T2),T3).
+format_complies(Args,formatted(Types),NewArgs):- compound(Args),compound(Types),
+   functor(Args,F,N),functor(Types,F,N),functor(NewArgs,F,N),
+   Args=..[F|ArgsL],
+   Types=..[F|TypesL],
+   NewArgs=..[F|NewArgsL],!,   
+   format_complies(ArgsL,TypesL,NewArgsL).
+format_complies(A,Super,AA):- moo:subft(Sub,Super),format_complies(A,Sub,AA).
+  
+
+
+any_to_value(V,Term):-atom(V),!,atom_to_value(V,Term).
+any_to_value(A,A).
+
+
+any_to_number(N,N):- number(N),!.
+any_to_number(dice(A,B,C),N):- ground(A),roll_dice(A,B,C,N),!.
+any_to_number(A,N):-atom(A),atom_to_value(A,V),A\=V,any_to_number(V,N).
+any_to_number(A,N):- catch(number_string(N,A),_,fail).
+
+
+roll_dice(Rolls,_,Bonus,Result):- Rolls < 0, !, Result is Bonus.
+roll_dice(Rolls,Sided,Bonus,Result):- LessRolls is Rolls-1, roll_dice(LessRolls,Sided, Bonus + random(Sided) +1, Result).
+
+
+atom_to_value(V,Term):-not(atom(V)),!,any_to_value(V,Term).
+% 56
+atom_to_value(V,Term):- catch((read_term_from_atom(V,Term,[variable_names([])])),_,fail),!.
+% 18d18+4000
+atom_to_value(V,dice(T1,T2,+T3)):- atomic_list_concat_safe([D1,'d',D2,'+',D3],V), atom_to_value(D1,T1),atom_to_value(D2,T2),atom_to_value(D3,T3),!.
+atom_to_value(V,dice(T1,T2,-T3)):- atomic_list_concat_safe([D1,'d',D2,'-',D3],V), atom_to_value(D1,T1),atom_to_value(D2,T2),atom_to_value(D3,T3),!.
+
+any_to_dir(D,D):-var(D),!.
+any_to_dir(D,D):-dir_offset(D,_,_,_,_),!.
+any_to_dir(A,D):-p2c_dir2(D,A),!.
+any_to_dir(S,D):-string(S),string_to_atom(S,A),any_to_dir(A,D),!.
+any_to_dir(D,O):-atom(D),sub_atom(D, 0, 1, _, S),toLowercase(S,L),p2c_dir2(L,O),!.
+
+p2c_dir2('s','South-Directly').
+p2c_dir2('w','West-Directly').
+p2c_dir2('u','Up-Directly').
+p2c_dir2('d','Down-Directly').
+p2c_dir2('e','East-Directly').
+p2c_dir2('n','North-Directly').
+
+end_of_file.
+
+/** <module> 
+% This is mainly used by the moo_loader but also needed everywhere
+%
 % Project LogicMoo: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
@@ -14,19 +143,20 @@ as_one_of(Types,Type):-nonvar(Type),is_type(Type),!,member(Type,Types).
 as_one_of([Type],TypeO):-!,same_arg(same_or(subclass),Type,TypeO).
 as_one_of(Types,oneOf(Types)).
 
-argIsa_call(_:F,N,Type):-!,argIsa_call(F,N,Type),!.
-argIsa_call(F/_,N,Type):-!,argIsa_call(F,N,Type),!.
-argIsa_call(FA,N,Type):- compound(FA),!,functor(FA,F,_),!,argIsa_call(F,N,Type).
 argIsa_call(Op,F,N,Type):-hotrace(loop_check(argIsa_call_nt(Op,F,N,Type),Type=term)),must(nonvar(Type)).
 
 argIsa_call_nt(_O,F,N,Type):-argIsa_call_nt(F,N,Type).
 
-argIsa_call_nt(F,N,Type):-once(var(F);not(number(N))),trace_or_throw(argIsa_call(F,N,Type)).
+argIsa_call_nt(F,N,Type):- once(var(F);not(number(N))),dtrace,once(var(F);not(number(N))),trace_or_throw(once(var(F);not(number(N)))->argIsa_call(F,N,Type)).
+argIsa_call_nt(_:F,N,Type):-!,argIsa_call_nt(F,N,Type),!.
+argIsa_call_nt(F/_,N,Type):- !,argIsa_call_nt(F,N,Type),!.
 argIsa_call_nt(F,N,Type):- argIsa_call_0(F,N,Type),!.
 argIsa_call_nt(F,N,Type):- argIsa_asserted(F,N,Type),!.
+argIsa_call_nt(F,N,Type):- is_ArgsIsa(F,_,Templ),arg(N,Templ,Type),nonvar(Type),!,trace_or_throw((is_ArgsIsa(F,_,Templ),arg(N,Templ,Type),nonvar(Type))).
 argIsa_call_nt(F,N,Type):- argIsa_call_1(F,N,Type),!.
 argIsa_call_nt(F,N,Type):- findall(T,argIsa_call_0(F,N,Type),T),Types=[_|_],!,as_one_of(Types,Type),!.
 
+argIsa_call_0(F/_,N1,Type):-!,argIsa_call_0(F,N1,Type).
 argIsa_call_0(agent_text_command,_,term).
 argIsa_call_0(comment,2,string).
 argIsa_call_0(isa,1,argIsaFn(isa,1)).
@@ -34,6 +164,8 @@ argIsa_call_0(isa,2,type).
 argIsa_call_0(directions,2,list(dir)).
 argIsa_call_0(equivRule,_,term).
 argIsa_call_0(formatted,_,term).
+argIsa_call_0(F,N,Type):-is_type(F),!,(N=1 -> Type=F;Type=term(props)).
+
 argIsa_call_0(memory,2,term).
 argIsa_call_0(subclass,_,type).
 argIsa_call_0(term_anglify,_,term).
@@ -42,17 +174,22 @@ argIsa_call_0(type_max_charge,2,int).
 argIsa_call_0(type_max_damage,1,type).
 argIsa_call_0(type_max_damage,2,int).
 argIsa_call_0(Arity,N,T):-arity_pred(Arity),!,arg(N,vv(term,int,int),T).
-argIsa_call_0(F,N,Type):-is_type(F),!,(N=1 -> Type=F;Type=term(props)).
+argIsa_call_0(ask_module,_,term).
+argIsa_call_0(Func,N,Type):- get_functor(Func,F,_),F \= Func,argIsa_call_0(F,N,Type).
 argIsa_call_0(ask_module,_,term).
 argIsa_call_0(HILOG,_,term):-hilog_functor(HILOG).
 
 
+
 argIsa_asserted(F,N,Type):- dbase_t(argIsa,F,N,Type),!.
 argIsa_asserted(F,N,Type):- is_ArgsIsa(F,_,Templ),arg(N,Templ,Type),nonvar(Type).
+argIsa_asserted(F,N,Type):- get_mpred_prop(F,argIsa(N,Type)),!.
+argIsa_asserted(F/_,N,Type):- nonvar(F), argIsa_asserted(F,N,Type).
 
 is_ArgsIsa(F,A,Templ):- get_mpred_prop(F,A,argsIsa(Templ)).
 is_ArgsIsa(F,A,Templ):- moo:ft_info(Templ,formatted),functor(Templ,F,A).
-is_ArgsIsa(F,A,Templ):- dbase:dbase_t(_, Templ),compound(Templ),functor(F,A,Templ).
+is_ArgsIsa(F,_,Templ):- dbase:dbase_t(_, Templ),compound(Templ),functor(F,_,Templ).
+is_ArgsIsa(F,_,Templ):- moo:argsIsaProps(Prop),  dbase:dbase_t(Prop, Templ),compound(Templ),functor(F,_,Templ).
 
 
 argIsa_call_1(Prop,N1,Type):- is_2nd_order_holds(Prop),dmsg(todo(define(argIsa_call(Prop,N1,'Second_Order_TYPE')))),dumpST,dtrace,
@@ -61,10 +198,10 @@ argIsa_call_1(Prop,N1,Type):- dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),
    Type=argIsaFn(Prop,N1).
 
 db_quf(Op,M:C,Pretest,Template):-var(C),!,throw(var(db_quf(Op,M:C,Pretest,Template))).
-db_quf(Op,','(C,D),','(C2,D2),','(C3,D3)):-!,db_quf(Op,C,C2,C3),db_quf(Op,D,D2,D3).
 db_quf(Op,_:C,Pretest,Template):-nonvar(C),!,db_quf(Op,C,Pretest,Template).
+db_quf(Op,','(C,D),','(C2,D2),','(C3,D3)):-!,db_quf(Op,C,C2,C3),db_quf(Op,D,D2,D3).
 db_quf(Op,C,Pretest,Template):- C=..[Holds,OBJ|ARGS],is_holds_true(Holds),atom(OBJ),!,C1=..[OBJ|ARGS],db_quf(Op,C1,Pretest,Template).
-
+db_quf(_Op,C,true,C):- C=..[Holds,OBJ|_],is_holds_true(Holds),var(OBJ),!.
 db_quf(Op,C,Pretest,Template):- C=..[Prop,OBJ|ARGS],
       functor(C,Prop,A),
       translate_args(Op,Prop,A,OBJ,2,ARGS,NEWARGS,true,Pretest),
@@ -131,7 +268,7 @@ translateListOps(Op,Prop,Obj,Type,VAL,[L|LIST],G,GO2):-
    translateOneArg(Op,Prop,Obj,Type,L,VAL,G,GO),
    translateListOps(Op,Prop,Obj,Type,VAL,LIST,GO,GO2).
 
-compare_op(Type,F,OLD,VAL):-nop(Type),call((trace,call(F,OLD,VAL))),!.
+compare_op(Type,F,OLD,VAL):-nop(Type),call((dtrace,call(F,OLD,VAL))),!.
 
 % start of database
 % These will all be deleted at start of run
@@ -143,8 +280,23 @@ inverse_args([P,A,R,G,S],[S,A,R,G,P]):-!.
 
 term_is_ft(Term,Type):-
    moo:ft_info(Type,How),
-   correctType(tell(_OldV),Term,How,NewTerm),
-   NewTerm=Term,!.
+   correctFormatType(query(_HLDS,_OldV),Term,How,NewTerm),!,
+   sameArgTypes(NewTerm,Term).
+
+sameArgTypes(A,C):-same(A,C);(pl_arg_type(C,CT),pl_arg_type(A,AT),!,typesOverlap(AT,CT)).
+typesOverlap(AT,AT).
+
+pl_arg_type_or_functor(Arg,Type):- pl_arg_type(Arg,T) , (T==compound -> functor(Arg,Type,_); ( (T==list,T=[_|_])-> T=[Type|_] ;Type=T)) .
+
+pl_arg_type(Arg,Type):- 
+      var(Arg) -> Type =var;
+      integer(Arg) -> Type =integer;
+      number(Arg) -> Type =float;
+      string(Arg) -> Type =string;
+      atom(Arg) -> Type =atom;
+      is_list(Arg) -> Type =list;
+      compound(Arg) -> Type =compound;
+         Arg = Type.
 
 
 % =======================================================
@@ -160,7 +312,7 @@ correctArgsIsa(_,NC,NC):-not(compound(NC)),!.
 correctArgsIsa(Op,M:A,MAA):- nonvar(M),!,correctArgsIsa(Op,A,AA),M:AA=MAA.
 correctArgsIsa(Op,A,AA):- correctArgsIsa0(Op,A,AA),nonvar(AA),!.
 correctArgsIsa(Op,A,AA):- grtrace,correctArgsIsa0(Op,A,AA).
-correctArgsIsa(Op,A,Type,A):- trace,dmsg(warn(not(correctArgsIsa(Op,A,Type)))).
+correctArgsIsa(Op,A,Type,A):- dtrace,dmsg(warn(not(correctArgsIsa(Op,A,Type)))).
 
 correctArgsIsa0(Op,A,AA):-A =..[KP,Prop|Args],atom(Prop),is_holds_true(KP),!,
    discoverAndCorrectArgsIsa(Op,Prop,1,Args,AArgs),
@@ -181,17 +333,20 @@ discoverAndCorrectArgsIsa(Op,Prop,N1,[A|Args],Out):-
    discoverAndCorrectArgsIsa(Op,Prop,N2,Args,AArgs),
     Out = [AA|AArgs].
 
+correctAnyType(_Op,A,_Type,AA):- var(A),!,must_det(var(AA)),must_det(A=AA),!.
 correctAnyType(Op,A,Type,AA):- var(A),correctType(Op,A,Type,AA),must_det(var(AA)),must_det(A==AA),!.
-correctAnyType(Op,A,Type,AA):- correctType(Op,A,Type,AA),nonvar(AA),!.
+correctAnyType(Op,A,Type,AA):- var(Type),trace_or_throw(correctAnyType(Op,A,Type,AA)).
+% TODO snags on new tpyes correctAnyType(Op,A,Type,AA):- correctType(Op,A,Type,AA),nonvar(AA),!.
 correctAnyType(Op,A,Type,AA):- one_must(correctType(Op,A,Type,AA),A=AA).
-correctAnyType(Op,A,Type,A):- trace,dmsg(warn(not(correctAnyType(Op,A,Type)))).
+correctAnyType(Op,A,Type,A):- dtrace,dmsg(warn(not(correctAnyType(Op,A,Type)))).
 
 %  @set movedist 4
 
 correctFormatType(Op,A,Type,AA):- var(A),correctType(Op,A,Type,AA),must_det(var(AA)),must_det(A==AA),!.
+correctFormatType(Op,A,Type,AA):- var(Type),trace_or_throw(correctFormatType(Op,A,Type,AA)).
 correctFormatType(Op,A,Type,AA):- correctType(Op,A,Type,AA),nonvar(AA),!.
 correctFormatType(Op,A,Type,AA):- grtrace,correctType(Op,A,Type,AA).
-correctFormatType(Op,A,Type,A):- trace,dmsg(warn(not(correctFormatType(Op,A,Type)))).
+correctFormatType(Op,A,Type,A):- dtrace,dmsg(warn(not(correctFormatType(Op,A,Type)))).
 
 :-export(checkAnyType/4).
 
@@ -199,13 +354,13 @@ checkAnyType(Op,A,Type,AA):- var(A),correctType(Op,A,Type,AA),must_det(var(AA)),
 checkAnyType(Op,A,Type,AA):- correctType(Op,A,Type,AA),nonvar(AA),!.
 
 
-correctType_gripe(Op,A,Fmt,AA):- is_ft(Fmt),!,trace_or_throw(correctType(is_ft_correctFormatType(Op,A,Fmt,AA))).
-correctType_gripe(Op,A,Type,AA):-atom(Type),must_equals(A,AA),
+correctType_gripe(Op,A,Fmt,AA):- formattype(Fmt),!,trace_or_throw(correctType(is_ft_correctFormatType(Op,A,Fmt,AA))).
+correctType_gripe(Op,A,Type,AA):- fail,atom(Type),must_equals(A,AA),
       dmsg(todo(isa_assert_type(Type))),
       define_type(Type),can_coerce(Op),dtrace,
       add(isa(A,Type)),!.
 
-correctType_gripe(Op,A,C,A):-must(ground(A)),trace, dmsg(todo(define(correctType(Op,A,C,'ConvertedArg')))),throw(retry(_)).
+correctType_gripe(Op,A,C,A):-must(ground(A)),dtrace, dmsg(todo(define(correctType(Op,A,C,'ConvertedArg')))),throw(retry(_)).
 correctType_gripe(Op,A,Type,NewArg):-trace_or_throw(failure(correctType(Op,A,Type,NewArg))).
 
 can_coerce(notta).
@@ -216,12 +371,15 @@ correctType(Op,A,Type,AA):- var(Type),trace_or_throw(correctType(Op,A,Type,AA)).
 correctType(_O,A,Type,AA):- (var(A);var(Type)),!, must(must_equals(A,AA)).
 correctType(_O,A,argIsaFn(_,_),AA):-must_equals(A,AA). % !. %any_to_value(O,V).  %missing
 correctType(_O,A,dir,AA):- any_to_dir(A,AA).
+correctType(Op,+A,Type,+AA):-correctType(Op,A,Type,AA).
+correctType(Op,-A,Type,-AA):-correctType(Op,A,Type,AA).
 correctType(Op,A,integer,AA):-!,correctType(Op,A,int,AA).
 correctType(_O,A,int,AA):- any_to_number(A,AA).
 correctType(_O,A,number,AA):- must(any_to_number(A,AA)).
 correctType(_O,A,prolog,AA):- must_equals(A,AA).
 correctType(_O,A,string,AA):- must(text_to_string(A,AA)).
 correctType(_O,A,term(_),AA):- must_equals(A,AA).
+correctType(_O,A,Type,AA):- compound(A),atom(Type),functor_safe(A,Type,_), must_equals(A,AA).
 correctType(_O,A,term,AA):- must_equals(A,AA).
 correctType(_O,A,text,AA):- must_equals(A,AA).
 correctType(_O,A,pred,AA):- any_to_atom(A,AA).
@@ -229,8 +387,9 @@ correctType(_O,A,atom,AA):- any_to_atom(A,AA).
 correctType(_O,A,type,AA):- atom(A),define_type(A),must_equals(A,AA).
 correctType(_O,A,verb,AA):- must_equals(A,AA).
 
-correctType(ask(Must),A,xyz(Region, int, int, int),xyz(AA, _, _, _)):-atom(A),correctAnyType(ask(Must),A,Region,AA).
-correctType(Op,[A|AA],list(T),LIST):-!,findall(OT,((member(O,[A|AA]),correctAnyType(Op,O,T,OT))),LIST).
+correctType(query(HLDS,Must),A,xyz(Region, int, int, int),xyz(AA, _, _, _)):-atom(A),correctAnyType(query(HLDS,Must),A,Region,AA).
+correctType(_Op,A,list(_),AA):- A == [],!,A=AA.
+correctType(Op,[A|AA],list(T),[L|LIST]):-!, correctType(Op,A,T,L), correctType(Op,AA,list(T),LIST).
 correctType(Op,A,list(T),[OT]):-!,correctAnyType(Op,A,T,OT).
 correctType(_O,A,same(T),AA):-must_equals(T,AA),must_equals(A,AA).
 correctType(Op,A,oneOf(List),AA):-!,member(Type,List),correctType(Op,A,Type,AA).
@@ -263,7 +422,7 @@ correctType(Op,Args,Types,NewArgs):-compound(Args), compound(Types),
 
 correctType(Op,A,Fmt,AA):- moo:ft_info(Fmt,formatted),!,correctFormatType(Op,A,formatted(Fmt),AA).
 correctType(_O,A,Fmt,A):- moo:ft_info(Fmt,Code),!,subst(Code,self,A,Call),debugOnError(req(Call)).   
-correctType(Op,A,Super,AA):- req(subft(Sub,Super)),Sub\=Super,correctType(Op,A,Sub,AA).
+correctType(Op,A,Super,AA):- formattype(Super),req(subft(Sub,Super)),Sub\=Super,correctType(Op,A,Sub,AA).
 
 correctType(Op,Arg,Props,NewArg):- compound(Props),
    Props=..[F|TypesL],
@@ -271,7 +430,7 @@ correctType(Op,Arg,Props,NewArg):- compound(Props),
    correctArgsIsa(Op,C,CC),
    CC=..[F,NewArg|_].
 
-correctType(_O,A,Type,AA):-not(is_ft(Type)),is_type(Type),get_isa_backchaing(A,Type),!,must_equals(A,AA).
+correctType(_O,A,Type,AA):-not(formattype(Type)),is_type(Type),get_isa_backchaing(A,Type),!,must_equals(A,AA).
 
 
 
@@ -284,6 +443,7 @@ must_equals(A,AA):-must_det(A=AA).
 
 
 any_to_value(V,Term):-atom(V),!,atom_to_value(V,Term).
+any_to_value(A,V):-any_to_number(A,V).
 any_to_value(A,A).
 
 
@@ -375,13 +535,6 @@ learnArgIsaInst(K,Num,Arg):-number(Arg),!,learnArgIsa(K,Num,number).
 learnArgIsaInst(_,_,_).
 
 
-show_call(add(A)):-
-   correctArgsIsa(tell(_OldV),A,AA),
-   show_call0(add(AA)),!.
-show_call(C):-show_call0(C).
 
-show_call0(C):-debugOnError0(C). % dmsg(show_call(C)),C.      
-
-
-
+:- include(logicmoo('vworld/moo_footer.pl')).
 

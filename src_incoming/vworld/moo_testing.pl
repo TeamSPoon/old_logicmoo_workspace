@@ -1,7 +1,7 @@
 /** <module> 
 % A MUD testing API is defined here
 %
-% Project LogicMoo: A MUD server written in Prolog
+% Project Logicmoo: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
@@ -30,12 +30,12 @@
 run_mud_tests:-
   forall(moo:mud_test(Name,Test),run_mud_test(Name,Test)).
 
-moo:action_help(tests,"run run_mud_tests/0").
+moo:action_info(tests,"run run_mud_tests/0").
 
 moo:agent_call_command(_Agent,tests) :- scan_updates, run_mud_tests.
 
 
-moo:action_help(test(term),"run tests containing term").
+moo:action_info(test(term),"run tests containing term").
 
 moo:agent_call_command(Agent,test(Obj)):-foc_current_player(Agent),term_test(Obj).
 
@@ -63,7 +63,7 @@ test_call0(SomeGoal):- dmsg(call_expanded(SomeGoal)), catch(SomeGoal,E,(test_res
 test_true(SomeGoal):-  once(((test_call(SomeGoal),!,test_result(passed,SomeGoal));test_result(failed,SomeGoal))).
 test_false(SomeGoal):- test_true(not(SomeGoal)).
 
-term_test(Obj):- 
+term_test(Obj):-
    doall((
    moo:mud_test(H,B),
    once(use_term_listing(Obj,((H,B)),true)),
@@ -73,4 +73,8 @@ term_test(Obj):-
 run_mud_test(Name,Test):-
    fmt(begin_mud_test(Name)),
    once(catch((test_call(Test),fmt(completed_mud_test(Name))),E,fmt(error_mud_test(E, Name)));fmt(tests(incomplet_mud_test(Name)))).
+
+%:- module_predicates_are_exported.
+
+% :- module_meta_predicates_are_transparent(moo_testing).
 

@@ -8,6 +8,7 @@
 % This file defines the basic drop predicate
 % 
 */
+% :- module(user). 
 :- module(drop, []).
 
 :- include(logicmoo(vworld/moo_header)).
@@ -23,7 +24,7 @@ moo:agent_call_command(Agent,drop(SObj)) :-
 	del(possess(Agent,Obj)),
 	atloc(Agent,LOC),
 	add(atloc(Obj,LOC)),
-	call_update_charge(Agent,drop).
+	must(call_update_charge(Agent,drop)).
 
 %Nothing to drop
 moo:agent_call_command(Agent,drop(_)) :-
@@ -36,7 +37,9 @@ moo:update_charge(Agent,drop) :-
 	New is Old - 1,
 	add(charge(Agent,New)).
 
+moo:agent_text_command(Agent,[drop,X],Agent,drop(X)).
 
+%:-must_det(show_call(get_agent_text_command(agent1,[drop,item1],_R,_CMD))).
 
 :- include(logicmoo(vworld/moo_footer)).
 

@@ -12,7 +12,7 @@
 % the world is run.
 %
 % props(Obj,height(ObjHt))  == holds(height,Obj,ObjHt) == rdf(Obj,height,ObjHt) == height(Obj,ObjHt)
-% padd(Obj,height(ObjHt))  == padd(height,Obj,ObjHt,...) == dyn(QueryForm)
+% padd(Obj,height(ObjHt))  == padd(height,Obj,ObjHt,...) ==  moo(QueryForm)
 % kretract[all](Obj,height(ObjHt))  == kretract[all](Obj,height,ObjHt) == pretract[all](height,Obj,ObjHt) == del[all](QueryForm)
 % keraseall(AnyTerm).
 %
@@ -24,13 +24,14 @@
 :- decl_mpred(assert_with_pred,2).
 :- begin_transform_moo_preds.
 
+moo:subclass(createableType,type).
 
 :- (do_term_expansions->true;throw(not_term_expansions)).
 
-dyn:createableType(type).
-dyn:type(multiValued).
-dyn:type(singleValued).
-dyn:expand_args(eachOf,subclass(eachOf(multiValued,negationByFailure,singleValued),mpred)).
+moo:createableType(type).
+moo:type(multiValued).
+moo:type(singleValued).
+moo:expand_args(eachOf,subclass(eachOf(multiValued,negationByFailure,singleValued),mpred)).
 
 % =================================================================================================
 % BEGIN world English
@@ -38,38 +39,40 @@ dyn:expand_args(eachOf,subclass(eachOf(multiValued,negationByFailure,singleValue
 % :- style_check(-discontiguous).
 :-debug.
 
+:- decl_dynamic_prolog(moo:term_anglify_args/6).
+
 moo:term_anglify_last(Head,English):-compound(Head),
-   functor(Head,F,A),A>1,
-   not(ends_with_icase(F,"Fn")),not(starts_with_icase(F,"SKF-")),
-   atom_codes(F,[C|_]),code_type(C,lower),
-   Head=..[F|ARGS],
-   term_anglify_args(Head,F,A,ARGS,singleValued,English).
+functor(Head,F,A),A>1,
+not(ends_with_icase(F,"Fn")),not(starts_with_icase(F,"SKF-")),
+atom_codes(F,[C|_]),code_type(C,lower),
+Head=..[F|ARGS],
+term_anglify_args(Head,F,A,ARGS,singleValued,English).
 
 moo:term_anglify(Head,EnglishO):-
-      get_mpred_prop(Head,Info),member(Info,[singleValued,multi(_)]),
-      Head=..[F|ARGS],
-      term_anglify_args(Head,F,1,ARGS,Info,English),world:fully_expand(English,EnglishO),!.
+   get_mpred_prop(Head,Info),member(Info,[singleValued,multi(_)]),
+   Head=..[F|ARGS],
+   term_anglify_args(Head,F,1,ARGS,Info,English),world:fully_expand(English,EnglishO),!.
 
 
 moo:term_anglify_args(Head,F,A,ARGS,multi(Which),English):- !,replace_nth(ARGS,Which,_OldVar,NewVar,NEWARGS),trace,!,
-      NewHead=..[F|NEWARGS], findall(NewVar,req(NewHead),ListNewVar),list_to_set_safe(ListNewVar,SetNewVar),NewVar=list(SetNewVar),
-      term_anglify_args(Head,F,A,NewHead,singleValued,English).
+   NewHead=..[F|NEWARGS], findall(NewVar,req(NewHead),ListNewVar),list_to_set_safe(ListNewVar,SetNewVar),NewVar=list(SetNewVar),
+   term_anglify_args(Head,F,A,NewHead,singleValued,English).
 
 /*
 
 term_expansion((term_anglify_args(_Head,F,A,ARGS0,singleValued,English):- add_arg_parts_of_speech(F,1,ARGS0,ARGS),verb_after_arg(F,A,After),
-   insert_into(ARGS,After,verbFn(F),NEWARGS),
-   world:fully_expand(NEWARGS,English),X),O).
+insert_into(ARGS,After,verbFn(F),NEWARGS),
+world:fully_expand(NEWARGS,English),X),O).
 
 */
 term_anglify_args(_Head,F,A,ARGS0,singleValued,English):- add_arg_parts_of_speech(F,1,ARGS0,ARGS),verb_after_arg(F,A,After),
-   insert_into(ARGS,After,verbFn(F),NEWARGS),
-   world:fully_expand(NEWARGS,English),!.
+insert_into(ARGS,After,verbFn(F),NEWARGS),
+world:fully_expand(NEWARGS,English),!.
 
 unCamelCase(S,String):-any_to_string(S,Str),S\=Str,!,unCamelCase(Str,String),!.
 unCamelCase("",""):-!.
 unCamelCase(S,String):-sub_string(S,0,1,_,Char),sub_string(S,1,_,0,Rest),unCamelCase(Rest,RestString),string_lower(Char,NewChar),
-  (Char\=NewChar->atomics_to_string(['_',NewChar,RestString],String);atomics_to_string([Char,RestString],String)),!.
+(Char\=NewChar->atomics_to_string(['_',NewChar,RestString],String);atomics_to_string([Char,RestString],String)),!.
 
 moo:term_anglify(verbFn(isa),[is,a]):-!.
 moo:term_anglify(verbFn(F),[is|UL]):-not(string_lower(F,F)),unCamelCase(F,U),atomics_to_string(UL,"_",U).
@@ -77,21 +80,21 @@ moo:term_anglify(verbFn(F),[is,F]):-atom_concat(_,'ing',F).
 moo:term_anglify(verbFn(F),[F,is]).
 % moo:term_anglify(prolog(Term),String):-term_to_atom(Term,Atom),any_to_string(Atom,String).
 moo:term_anglify(determinerString(Obj,Text),[np(Obj),is,uses,string(Text),as,a,determiner]).
-moo:term_anglify(nameString(Obj,Text),[np(Obj),is,refered,to,as,string(Text)]).
+moo:term_anglify(nameStrings(Obj,Text),[np(Obj),is,refered,to,as,string(Text)]).
 moo:term_anglify(term_anglify(Term,Text),[prolog(Term),is,converted,to,english,using,prolog(Text)]).
 
-dyn:singleValued(type_max_damage(type,int)).
+moo:singleValued(type_max_damage(type,int)).
 
-dyn:multiValued(verb_alias(string,string)).
+moo:multiValued(verb_alias(string,string)).
 
-dyn:multiValued(label_type_props(string,type,list(term(property)))).
+moo:multiValued(label_type_props(string,type,list(term(property)))).
 
-dyn:multiValued(type_grid(type,int,term)).
+moo:multiValued(type_grid(type,int,term)).
 
-dyn:multiValued(action_rules(agent,verb,term(object),term(list(term(property))))).
+moo:multiValued(action_rules(agent,verb,term(object),term(list(term(property))))).
 
-dyn:type_max_damage(object,500).
-dyn:type_max_charge(object,120).
+moo:type_max_damage(object,500).
+moo:type_max_charge(object,120).
 
 
 add_arg_parts_of_speech(_F,_N,[],[]).
@@ -104,9 +107,11 @@ verb_after_arg(_,_,1).
 
 
 :- style_check(+discontiguous).
+:- style_check(-discontiguous).
 
 :- decl_mpred(default_sv, 2).
 :- decl_mpred(ask_module, 2).
+
 
 % =================================================================================================
 % BEGIN world database
@@ -118,8 +123,14 @@ verb_after_arg(_,_,1).
 
 % :-trace.
 
-dbase_t(inRegion,O,Region):-atloc(O,LOC),world:locationToRegion(LOC,Region).
-dbase_t(inRegion,apath(Region,Dir),Region):- holds_t(pathBetween,Region,Dir,_To).
+:-decl_mpred(pathBetween,3).
+:-decl_mpred(atloc,2).
+:-decl_mpred(damage,2).
+
+
+inRegion(apath(Region,Dir),Region):- is_asserted(pathBetween(Region,Dir,_To)).
+inRegion(O,Region):-req(atloc(O,LOC)),world:locationToRegion(LOC,Region).
+inRegion(O,Region):-is_asserted(inRegion(O,Region)).
 
 db_prop_format(apath(region,dir),areaPath).
 db_prop_format(dice(int,int,int),int).
@@ -130,71 +141,69 @@ db_resultIsa(apath,areaPath).
 equivRule(multiValued(CallSig,[assert_with_pred(hooked_asserta),query_with_pred(call)]),prologPredicate(CallSig)).
 
 
-dyn:ask_module(nearby(object,object),world).
-% dyn:ask_module(mud_isa(object,type),world).
+moo:ask_module(nearby(object,object),world).
+%  moo:ask_module(mud_isa(object,type),world).
 % db_prop_prolog(world,mud_isa(object,type)).
 % db_prop_prolog(world,same(id,id)).
 
 
-dyn:argsIsa(somethingIsa(term,list(type))).
-argsIsa(somethingDescription(term,list(string))).
-argsIsa(objects(type,list(id))).
-argsIsa(predicates(list(functor))).
-argsIsa(sorts(type,list(type))).
+moo:argsIsa(somethingIsa(term,list(type))).
+moo:argsIsa(somethingDescription(term,list(string))).
+moo:argsIsa(objects(type,list(id))).
+moo:argsIsa(predicates(list(functor))).
+moo:argsIsa(sorts(type,list(type))).
 
-argsIsa(default_sv(singleValued,term)).
+moo:argsIsa(default_sv(singleValued,term)).
 
 % live another day to fight (meaning repl_to_string/1 for now is in prolog)
-%dyn:singleValued(repl_writer(agent,term),default_sv(look:default_repl_writer)).
-%dyn:singleValued(repl_to_string(agent,term),[singleValued,default_sv(look:default_repl_obj_to_string)]).
+% moo:singleValued(repl_writer(agent,term),default_sv(look:default_repl_writer)).
+% moo:singleValued(repl_to_string(agent,term),[singleValued,default_sv(look:default_repl_obj_to_string)]).
 
-dyn:multiValued(label_type(string,type),[singleValued]).
+moo:multiValued(moo:label_type(string,type),[singleValued]).
 
 
 /*
-dyn:listValued(look:get_feet(agent,list(spatial)),[]).
-dyn:listValued(look:get_near(agent,list(spatial)),[ask_module(look)]).
+moo:listValued(look:get_feet(agent,list(spatial)),[]).
+moo:listValued(look:get_near(agent,list(spatial)),[ask_module(look)]).
 */
-dyn:listValued(get_precepts(agent,list(spatial)),[ask_module(look)]).
-dyn:argsIsa(mud_test(term,prolog)).
+moo:listValued(get_precepts(agent,list(spatial)),[ask_module(look)]).
+moo:argsIsa(mud_test(term,prolog)).
 
-dyn:multiValued(assert_with_pred(multiValued,term)).
-dyn:negationByFailure(multi(multiValued,int)).
-dyn:multiValued(ask_predicate(multiValued,term)).
-dyn:multiValued(equivRule(term,term)).
+moo:multiValued(assert_with_pred(multiValued,term)).
+moo:negationByFailure(multi(multiValued,int)).
+moo:multiValued(ask_predicate(multiValued,term)).
+moo:multiValued(equivRule(term,term)).
 
-dyn:subclass(text,formattype).
+moo:subclass(text,formattype).
 
-dyn:argsIsa(action_help(verb,text)).
+moo:argsIsa(action_info(verb,text)).
 
-argsIsa(agent_text_command(agent,text,agent,verb)).
+moo:argsIsa(agent_text_command(agent,text,agent,goal)).
 
-dyn:multiValued(description(term,text),[assert_with_pred(assert_description),ask_predicate(query_description)]).
-
-
-
-dyn:type(item).
-
-dyn:equivRule(nameString(apath(Region,Dir),Text),pathName(Region,Dir,Text)).
-dyn:equivRule(description(apath(Region,Dir),Text),pathName(Region,Dir,Text)).
-
-% dbase_t(action_help,What,text("command is: ",What)):- holds_t(action_info,What).
-
-dyn:expand_args(eachOf,subclass(eachOf(region,agent,gossup),channel)).
-
-dyn:subclass(agent,spatialthing).
-dyn:subclass(region,spatialthing).
-dyn:subclass(object,spatialthing).
-dyn:subclass(item,spatialthing).
+moo:multiValued(description(term,text),[assert_with_pred(assert_description),ask_predicate(query_description)]).
 
 
-dyn:subclass(drinkable,item).
-dyn:subclass(possessable,item).
-dyn:subclass(useable,item).
-dyn:subclass(eatable,item).
-dyn:subclass(chargeable,item).
-dyn:subclass(wearable,item).
 
+moo:type(item).
+
+moo:equivRule(nameStrings(apath(Region,Dir),Text),pathName(Region,Dir,Text)).
+moo:equivRule(description(apath(Region,Dir),Text),pathName(Region,Dir,Text)).
+
+% dbase_t(action_info,What,text("command is: ",What)):- holds_t(action_info,What).
+
+moo:expand_args(eachOf,subclass(eachOf(region,agent,gossup),channel)).
+
+moo:subclass(agent,spatialthing).
+moo:subclass(region,spatialthing).
+moo:subclass(object,spatialthing).
+moo:subclass(item,spatialthing).
+
+moo:subclass(drinkable,item).
+moo:subclass(possessable,item).
+moo:subclass(useable,item).
+moo:subclass(eatable,item).
+moo:subclass(chargeable,item).
+moo:subclass(wearable,item).
 
 moo:ft_info(atom,atom(self)).
 moo:ft_info(apath(region,dir),formatted).
@@ -213,94 +222,94 @@ moo:ft_info(var,var(self)).
 moo:ft_info(action(prolog),formatted).
 moo:ft_info(formattype,formatted).
 
-dyn:subft(var,prolog).
-dyn:subft(term,prolog).
-dyn:subft(atom,term).
-dyn:subft(string,term).
-% dyn:subft(number,term).
-dyn:subft(id,term).
+moo:subft(var,prolog).
+moo:subft(term,prolog).
+moo:subft(atom,term).
+moo:subft(string,term).
+%  moo:subft(number,term).
+moo:subft(id,term).
 
-dyn:subft(int,integer).
-dyn:subft(integer,number).
-dyn:subft(dice,int).
+moo:subft(int,integer).
+moo:subft(integer,number).
+moo:subft(dice,int).
 
-dyn:formattype(FormatType):-dyn:subclass(FormatType,formattype).
+% moo:formattype(FormatType):-moo:subclass(FormatType,formattype).
 
 moo:term_specifier_text(Text,pred):- get_mpred_prop(_,arity(Text,_)).
 
 % single valued
-dyn:subclass(agent,object).
-dyn:subclass(item,object).
+moo:subclass(agent,object).
+moo:subclass(item,object).
 
 
-dyn:multiValued(pathName(region,dir,string)).
-dyn:multiValued(verbOverride(term,action,action)).
+moo:multiValued(pathName(region,dir,string)).
+moo:multiValued(verbOverride(term,action,action)).
 
-dyn:singleValued(atloc(object,xyz(region,int,int,int))).
-dyn:singleValued(act_turn(agent,int)).
-dyn:singleValued(armorLevel(possessable,int)).
-dyn:singleValued(attack(agent,int)).
-dyn:singleValued(charge(agent,int)).
-dyn:singleValued(stat_total(agent,int)).
-dyn:singleValued(chargeCapacity(chargable,int)).
-dyn:singleValued(chargeRemaining(chargable,int)).
-dyn:singleValued(damage(agent,int)).
-dyn:singleValued(defence(agent,int)).
-dyn:singleValued(facing(agent,dir)).
-dyn:singleValued(inRegion(term,region)).
-dyn:singleValued(last_command(agent,command)).
-dyn:singleValued(location_center(region,xyz(region,int,int,int))).
-dyn:singleValued(movedist(agent,number)).
-dyn:singleValued(mudBareHandDamage(agent,dice)).
-dyn:singleValued(mudLevelOf(possessable,int)).
-dyn:singleValued(mudMaxHitPoints(agent,int)).
-dyn:singleValued(mudToHitArmorClass0(agent,int)).
-dyn:singleValued(pathBetween(region,dir,region)).
-dyn:singleValued(permanence(item,verb,int)).
-dyn:singleValued(score(object,int)).
-dyn:singleValued(spawn_rate(propFn(subclass(object)),int)).
-dyn:singleValued(spd(agent,int)).
-dyn:singleValued(stm(agent,int)).
-dyn:singleValued(str(agent,int)).
-dyn:singleValued(type_grid(regiontype,int,list(term))).
-dyn:singleValued(weight(object,int)).
+moo:singleValued(atloc(object,xyz(region,int,int,int))).
+moo:singleValued(act_turn(agent,int)).
+moo:singleValued(armorLevel(possessable,int)).
+moo:singleValued(attack(agent,int)).
+moo:singleValued(charge(agent,int)).
+moo:singleValued(stat_total(agent,int)).
+moo:singleValued(chargeCapacity(chargable,int)).
+moo:singleValued(chargeRemaining(chargable,int)).
+moo:singleValued(damage(agent,int)).
+moo:singleValued(defence(agent,int)).
+moo:singleValued(facing(agent,dir)).
+moo:singleValued(inRegion(term,region)).
+moo:singleValued(last_command(agent,command)).
+moo:singleValued(location_center(region,xyz(region,int,int,int))).
+moo:singleValued(movedist(agent,number)).
+moo:singleValued(mudBareHandDamage(agent,dice)).
+moo:singleValued(mudLevelOf(possessable,int)).
+moo:singleValued(mudMaxHitPoints(agent,int)).
+moo:singleValued(mudToHitArmorClass0(agent,int)).
+moo:singleValued(pathBetween(region,dir,region)).
+moo:singleValued(permanence(item,verb,int)).
+moo:singleValued(score(object,int)).
+moo:singleValued(spawn_rate(propFn(subclass(object)),int)).
+moo:singleValued(spd(agent,int)).
+moo:singleValued(stm(agent,int)).
+moo:singleValued(str(agent,int)).
+moo:singleValued(type_grid(regiontype,int,list(term))).
+moo:singleValued(weight(object,int)).
 
-dyn:multiValued(comment(term,string)).
+moo:multiValued(comment(term,string)).
 
-dyn:singleValued(height(agent,int)).
-moo:type_default_props(self,food,[height(0)]).
+moo:singleValued(height(agent,int)).
+moo:default_type_props(self,food,[height(0)]).
 
 :- must((argIsa_call_0(comment,2,W), W\=term)).
 
 :-decl_mpred(needs_look/2).
 
-dyn:negationByFailure(needs_look(agent,boolean)). 
+moo:negationByFailure(needs_look(agent,boolean)). 
 
-dyn:subclass(areaPath,door).
-dyn:subclass(door,item).
+moo:subclass(areaPath,door).
+moo:subclass(door,item).
 
-dyn:subclass(dir,string).
-dyn:subclass(string,text).
-dyn:subclass(text,term).
+moo:subft(dir,string).
+moo:subft(string,text).
+moo:subft(text,term).
 
 
 :-debug.
 
 % flags
-dyn:negationByFailure(agent(id)).
-dyn:negationByFailure(item(id)).
-dyn:negationByFailure(region(id)).
-dyn:negationByFailure(type(id)).
+moo:negationByFailure(agent(id)).
+moo:negationByFailure(item(id)).
+moo:negationByFailure(region(id)).
+moo:negationByFailure(type(id)).
 
-dyn:negationByFailure(thinking(agent)).
-dyn:negationByFailure(deleted(id)).
+moo:negationByFailure(thinking(agent)).
+moo:negationByFailure(deleted(id)).
 
 
-dyn:multiValued(description(term,text),[assert_with_pred(assert_description)]).
+moo:multiValued(description(term,text),[assert_with_pred(assert_description)]).
 
 multiValued(verbAsWell(term,action,action)).
 multiValued(failure(agent,action)).
-multiValued(nameString(term,string)).
+multiValued(nameStrings(term,string)).
 multiValued(determinerString(term,string)).
 multiValued(descriptionHere(term,string)).
 
@@ -317,11 +326,11 @@ multiValued(possess(agent,item)).
 multiValued(subclass(type,type)).
 multiValued(isa(term,type)).
 
-dyn:listValued(directions(term,list(term))).
+moo:listValued(directions(term,list(term))).
 
-dyn:multiValued(ask_module(multiValued,atom)).
+moo:multiValued(ask_module(multiValued,atom)).
 
-dyn:argsIsa(agent_call_command(agent,term(verb))).
+moo:argsIsa(agent_call_command(agent,term(verb))).
 
 
 % =================================================================================================

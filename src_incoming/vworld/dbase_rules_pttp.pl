@@ -981,7 +981,7 @@ do_not_wrap(F):-atom_concat('int_',_,F).
 
 correct_true(F,[L|IST],Body):- do_not_wrap(F),Body=..[F,L|IST].
 correct_true(F,[L|IST],Body):- atom(F),builtin(F,_),Body=..[F,L|IST].
-%correct_true(F,L,Body):- var(F),!,trace_or_throw(correct_true(F,L,Body)).
+% correct_true(F,L,Body):- var(F),!,trace_or_throw(correct_true(F,L,Body)).
 correct_true(F,[L|IST],Body):- Body =..[firstOrder,F,L|IST].
 
 add_head_args(HeadIn,
@@ -1207,7 +1207,7 @@ negated_functor(F,NotF) :-
 %%% SOURCE
 
 negated_literal(-A,B):-negated_literal(A,AA),!,negated_literal(AA,B).
-negated_literal(A,B):-var(B),!,negated_literal_0(A,B).
+negated_literal(A,B):- var(B),!,negated_literal_0(A,B).
 negated_literal(A,-B):-negated_literal(B,BB),!,negated_literal_0(A,B).
 negated_literal(A,B):-negated_literal_0(A,B).
 negated_literal_0(Lit,NotLit) :-
@@ -1290,7 +1290,7 @@ write_clause(A,_) :-				% 2-ary predicate for use as
 %%% ***
 %%% ****if* PTTP/write_clause_with_number
 %%% SOURCE
-   
+
 write_clause_with_number(A,WffNum) :-
 	nl,
 	write_indent_for_number(WffNum),

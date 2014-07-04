@@ -6,15 +6,28 @@
 % July 10,1996
 % John Eikenberry
 %
-% Project LogicMoo: A MUD server written in Prolog
+% Project Logicmoo: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
 */
+
+
 :- set_prolog_flag(verbose_load,true).
 
 
 % These three are for use with Quintus
+
+:- include(logicmoo('vworld/moo_header.pl')).
+
+include_moo_files(Mask):- expand_file_name(Mask,X),
+     forall(member(E,X),user_use_module(E)).
+
+in_user_startup(Call):- '@'(user:Call,user).
+
+:- '@'(use_module(logicmoo('vworld/moo.pl')),'user').
+
+% standard header used in all files that all modules are loaded (therefore useful for when(?) the day comes that modules *can*only*see their explicitly imported modules)
 %:- prolog_flag(unknown,error,fail). % Not sure if this is needed for Quintus
 %:- use_module(library(random)).
 %:- use_module(library(date)).
@@ -32,8 +45,7 @@
          use_module(logicmoo(logicmoo_util/logicmoo_util_strings)),
          use_module(logicmoo(logicmoo_util/logicmoo_util_terms)),
          use_module(logicmoo(logicmoo_util/logicmoo_util_dcg)),
-         use_module(logicmoo(vworld/moo)),
-         use_module(logicmoo(vworld/dbase))),'user').
+         use_module(logicmoo(vworld/moo))),'user').
 
 
 % logicmoo vworld mud server
@@ -42,7 +54,8 @@
 :- user_use_module(logicmoo(vworld/toploop_telnet)).
 
 
-:- user_use_module(logicmoo(vworld/parser_e2c)).
+% :- user_use_module(logicmoo(vworld/parser_e2c)).
+:- user_use_module(logicmoo(dbase/dbase_formattypes)).
 :- user_use_module(logicmoo(vworld/parser_imperative)).
 :- user_use_module(logicmoo(vworld/moo_testing)).
 
@@ -124,7 +137,11 @@ make_qlfs:-
 :- catch(user_use_module(logicmoo(pldata/withvars_988)),_,true).
 
 
+% These contain the definition of the object types.
+:- in_user_startup(ensure_loaded(logicmoo('objs/objs_misc_monster.pl'))). 
 
+% Load the map file (*.map.pl) appropriate for the world being used.
+:- in_user_startup(ensure_loaded(logicmoo('rooms/vacuum.map.pl'))).
 % NPC planners
 :- user_use_module(logicmoo('mobs/monster.pl')).
 
@@ -134,15 +151,19 @@ make_qlfs:-
 %:-prolog.
 % end_of_file.
 
+/*
 :- user_use_module(logicmoo('mobs/predator.pl')).
 :- user_use_module(logicmoo('mobs/explorer.pl')).
 :- user_use_module(logicmoo('mobs/prey.pl')).
 :- user_use_module(logicmoo('mobs/mobs_conf.pl')).
 :- user_use_module(logicmoo('mobs/vacuum.pl')).
-% :- include_moo_files('../src_incoming/mobs/?*.pl').
+*/
+:- include_moo_files('../src_incoming/mobs/?*.pl').
 
+:- user_use_module(logicmoo('vworld/moo_loader.pl')).
 
 % Action/Commands implementation
+/*
 :- user_use_module(logicmoo('actions/drink.pl')).
 :- user_use_module(logicmoo('actions/actions_db.pl')).
 :- user_use_module(logicmoo('actions/attack.pl')).
@@ -164,11 +185,10 @@ make_qlfs:-
 :- user_use_module(logicmoo('actions/stats.pl')).
 :- user_use_module(logicmoo('actions/eat.pl')).
 :- user_use_module(logicmoo('actions/teleport.pl')).
-% :- include_moo_files('../src_incoming/actions/?*.pl').
+*/
+:- include_moo_files('../src_incoming/actions/?*.pl').
 
 
-% standard footer to clean up any header defined states
-%:- user_use_module(logicmoo(vworld/moo_footer)).
 
 % Define the agents traits, both for your agent and the world inhabitants. 
 % agent name and stats ([] = defaults).
@@ -187,6 +207,13 @@ make_qlfs:-
 :-create_agent(explorer(2),[]).
 */
 
+:- begin_transform_moo_preds.
+
+moo:agent_text_command(Agent,[run,Term], Agent,prologCall(Term)).
+
+% [Optionaly] Start the telent server
+:-at_start(toploop_telnet:start_mud_telnet(4000)).
+
 
 % standard header used in all files that all modules are loaded (therefore useful for when(?) the day comes that modules *can*only*see their explicitly imported modules)
 % :- user_use_module(logicmoo(vworld/moo_header)).
@@ -203,6 +230,8 @@ make_qlfs:-
 % [Optionaly] Start the telnet server
 
 
+% standard footer to clean up any header defined states
+:- include(logicmoo('vworld/moo_footer.pl')).
 /*
 % Load datalog
 :- if_flag_true(fullStart, ((use_module(logicmoo('des/des.pl')),
@@ -259,12 +288,5 @@ lundef :- A = [],
   ==
 
 */
-
-:- begin_transform_moo_preds.
-
-moo:agent_text_command(Agent,[run,Term], Agent,prologCall(Term)).
-
-
-:-at_start(toploop_telnet:start_mud_telnet(4000)).
 
 

@@ -8,7 +8,8 @@
 % Revision:  $Revision: 1.3 $
 % Revised At:   $Date: 2002/06/06 15:43:15 $
 % ===================================================================
-:-module(parser_e2c,[
+
+:- module(parser_e2c,[
          e2c/1,
          e2c/2,
          getVarAtom/2, 
@@ -28,10 +29,9 @@
 
 idGen(X):-flag(idGen,X,X+1).
 
-%:- ensure_loaded(logicmoo('vworld/dbase.pl')).
 :- moo:begin_transform_moo_preds.
 
-:- retractall(moo:prevent_transform_moo_preds).
+% :- retractall(moo:prevent_transform_moo_preds).
 
 % Semantic Interpretation
 /* from Bratko chapter 17 page 455.
@@ -595,7 +595,7 @@ posm_c( Term,'SimpleNoun',normal,Proper) :-
       'formerName'(Proper, Term);
       'scientificName'(Proper, Term);
       'termStrings-GuessedFromName'(Proper, Term);
-      'nameString'(Proper, Term).
+      'nameStrings'(Proper, Term).
 
 %'abbreviationString-PN'('India', ['IND']).
 posm_c( Term,'ProperNoun',normal,Proper) :- 
@@ -867,7 +867,7 @@ cycPred('abnormal').
 cycPred('scientificName').
 cycPred('keWeakSuggestionPreds').
 cycPred('sharedNotes').
-cycPred('nameString').
+cycPred('nameStrings').
 cycPred('termStrings').
 cycPred('interArgReln1-3').
 cycPred('termStrings-GuessedFromName').
@@ -2215,7 +2215,7 @@ poStr(CycL,String):-
       'termStrings'(CycL,String, _,_);
       'termStrings-GuessedFromName'(CycL,String, _,_);
       'prettyName'(CycL,String, _,_);
-      'nameString'(CycL,String, _,_);
+      'nameStrings'(CycL,String, _,_);
       'nicknames'(CycL,String, _,_);
       'preferredTermStrings'(CycL,String, _,_).
 

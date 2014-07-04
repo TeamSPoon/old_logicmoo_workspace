@@ -2,7 +2,7 @@
 % Initial Telnet/Text console 
 % ALL telnet client business logic is here (removed from everywhere else!)
 %
-% Project LogicMoo: A MUD server written in Prolog
+% Project Logicmoo: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
@@ -15,7 +15,6 @@
                   show_room_grid/1,
                   inst_label/2,
                   display_grid_labels/0,
-                  wants_logout/1,
                   telnet_repl_writer/4,
                   telnet_repl_obj_to_string/3,
                   start_mud_telnet/1,
@@ -25,16 +24,14 @@
 
 :- dynamic agent_message_stream/3, telnet_fmt_shown/3.
 
-:- meta_predicate show_room_grid_single(*,*,0).
-:- meta_predicate telnet_repl_writer(*,*,*,^).
+:- meta_predicate toploop_telnet:show_room_grid_single(*,*,0).
 
 :- include(logicmoo(vworld/moo_header)).
 
 :- moo:register_module_type(utility).
 
-:- dynamic wants_logout/1.
-
-:- decl_mpred(label_type,2).
+:- thread_local thlocal:wants_logout/1.
+:- multifile thlocal:wants_logout/1.
 
 % ===========================================================
 % TELNET REPL + READER
@@ -44,7 +41,7 @@ start_mud_telnet(Port):- telnet_server(Port, [allow(_ALL),call_pred(login_and_ru
 login_and_run:-
   foc_current_player(P),
    ensure_player_stream_local(P,_,_),
-   threads,
+  threads,
    do_player_action(P,'who'),
    call_agent_command(P,'look'),
    fmt('~n~n~nHello ~w! Welcome to the MUD!~n',[P]),
@@ -55,15 +52,18 @@ login_and_run:-
      run_player_telnet(P))),
    fmt('~n~nGoodbye ~w! ~n',[P]).
 
+:- multifile thlocal:wants_logout/1.
+:- thread_local thlocal:wants_logout/1.
+
 run_player_telnet(P) :-    
       foc_current_player(P),
       get_session_id(O),
       retractall(thlocal:wants_logout(P)),
       must(thlocal:repl_writer(P,_)),!,
-      with_assertions(thlocal:current_agent(O,P),
+      with_assertions(thlocal:session_agent(O,P),
        ((repeat,
         once(read_and_do_telnet(P)), 
-        retract(thlocal:wants_logout(P)),
+      retract(thlocal:wants_logout(P)),
         retractall(agent_message_stream(P,_,_))))).
 
 
@@ -87,11 +87,16 @@ prompt_read(Prompt,Atom):-
 	read_line_to_codes(In,Codes),
         foc_current_player(P),
          (is_list(Codes)-> atom_codes(Atom,Codes);
-           (assert(wants_logout(P)),Atom='quit')),!.
+           (assert(thlocal:wants_logout(P)),Atom='quit')),!.
 
 tick_tock:-
            scan_updates,!,fmt('tick tock',[]),sleep(1),!.
 
+
+scan_updates:-ignore(catch(make,_,true)).
+
+
+hook:decl_database_hook(Type,C):- ignore((current_agent(Agent),not(not(contains_term(C,Agent))),dmsg(database_hook(Type,C)))).
 
 % ===========================================================
 % USES PACKRAT PARSER 
@@ -111,9 +116,9 @@ do_player_action(Agent,CMD):-fmt('skipping_unknown_player_action(~q,~q).~n',[Age
 % ===========================================================
 % DEFAULT TELNET "LOOK"
 % ===========================================================
-look_brief(Agent):- not(props(Agent,needs_look(true))).
+look_brief(Agent):- not(props(Agent,needs_look(true))),!.
 look_brief(Agent):- prop(Agent,last_command,X),functor(X,look,_),!.
-look_brief(Agent):- clr(props(Agent,needs_look(true))),call_agent_command(Agent,look).
+look_brief(Agent):- look_as(Agent).
 
 telnet_repl_writer(_TL,call,term,Goal):-!,ignore(debugOnError(Goal)).
 telnet_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=t),fmt('~q=(~w)~q.~n',[N,TypeO,V]).
@@ -132,7 +137,7 @@ write_pretty(Percepts) :-
 write_pretty_aux(Rest,Rest,5).
 write_pretty_aux([[]|Tail],Return,Column) :-
 	Ctemp is Column + 1,
-	label_type(Obj,0),
+	moo:label_type(Obj,0),
 	write(Obj), write(' '),
 	write_pretty_aux(Tail,Return,Ctemp).
 write_pretty_aux([[dark]|Tail],Return,Column) :-
@@ -141,7 +146,7 @@ write_pretty_aux([[dark]|Tail],Return,Column) :-
 	write_pretty_aux(Tail,Return,Ctemp).
 write_pretty_aux([[Head]|Tail], Return, Column) :-
 	Ctemp is Column + 1,
-	label_type(Map,Head),
+	moo:label_type(Map,Head),
 	write(Map), write(' '),
 	write_pretty_aux(Tail, Return, Ctemp).
 write_pretty_aux([[Agent]|Tail],Return,Column) :-
@@ -182,8 +187,8 @@ show_room_grid_single(_Room,LOC,_OutsideTest):- atloc(Obj,LOC),inst_label(Obj,La
 show_room_grid_single(_Room,LOC,_OutsideTest):- atloc(_Obj,LOC),write('..'), !.
 show_room_grid_single(_Room,_LOC,_OutsideTest):- write('--'), !.
 
-inst_label(Obj,Label):-label_type(Label,Obj),!.
-inst_label(Obj,Label):-  props(Obj,nameString(Val)),Val\=Obj,inst_label(Val,Label),!.
+inst_label(Obj,Label):-moo:label_type(Label,Obj),!.
+inst_label(Obj,Label):-  props(Obj,nameStrings(Val)),Val\=Obj,inst_label(Val,Label),!.
 inst_label(Obj,Label):-  props(Obj,named(Val)),Val\=Obj,inst_label(Val,Label),!.
 inst_label(Obj,Label):-  props(Obj,isa(Val)),Val\=Obj,inst_label(Val,Label),!.
 inst_label(Obj,SLabe2):-term_to_atom(Obj,SLabel),sub_atom(SLabel,1,2,_,SLabe2),!.
@@ -214,7 +219,7 @@ show_room_grid(Room,Old,N,N) :-
 show_room_grid(Room,Y,X,N) :-
       loc_to_xy(Room,X,Y,LOC),
 	atloc(Obj,LOC),
-        props(Obj,isa(agent)),
+        props(Obj,ofclass(agent)),
 	list_agents(Agents),
 	obj_memb(Agent,Agents),
 	atloc(Agent,LOC),
@@ -225,8 +230,8 @@ show_room_grid(Room,Y,X,N) :-
 show_room_grid(Room,Y,X,N) :-
         loc_to_xy(Room,X,Y,LOC),
 	atloc(Obj,LOC),
-        prop(Obj,isa,Class),
-	label_type(Label,Class),
+        prop(Obj,ofclass,Class),
+	moo:label_type(Label,Class),
 	write(Label), write(' '),
 	XX is X + 1,
 	!,
@@ -244,7 +249,7 @@ show_room_grid(Room,Y,X,N) :-
 % Used to display the labels of the grid locations. (the key to the map).
 % Used at end of run.
 display_grid_labels :-
-	findall([Label,Name],label_type(Label,Name),List),
+	findall([Label,Name],moo:label_type(Label,Name),List),
 	forall(prop_memb([Label,Name],List),
 	           (write(Label), write('='), write(Name), write(' '))),
 		   nl.

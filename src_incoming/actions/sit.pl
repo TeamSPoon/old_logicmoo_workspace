@@ -1,3 +1,4 @@
+% :- module(user). 
 :- module(sit, [is_posture/1]).
 /** <module> Agent Postures there and does nothing
 % Agent will loose a bit of charge, but heal a bit of damage
@@ -16,8 +17,7 @@ is_posture(lay).
 is_posture(kneel).
 
 moo:agent_text_command(Agent,[Sit],Agent,Sit) :-is_posture(Sit).
-
-moo:action_help(Posture,text("sets and agent's posture to ",Posture)):-is_posture(Posture).
+moo:action_info(Posture,text("sets and agent's posture to ",Posture)):-is_posture(Posture).
 
 % Sit - do nothing.
 moo:agent_call_command(Agent,Sit) :-is_posture(Sit),
