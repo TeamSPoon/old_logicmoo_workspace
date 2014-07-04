@@ -15,9 +15,6 @@
 
 :- set_prolog_flag(verbose_load,true).
 
-
-% These three are for use with Quintus
-
 :- include(logicmoo('vworld/moo_header.pl')).
 
 include_moo_files(Mask):- expand_file_name(Mask,X),

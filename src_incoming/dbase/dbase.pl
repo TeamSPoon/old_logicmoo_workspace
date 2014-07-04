@@ -795,8 +795,8 @@ ensure_clause(HEAD,_F,_A,BODY):-assertz((HEAD:-BODY)),
 nameStrings(apath(Region,Dir),Text):- pathName(Region,Dir,Text).
 description(apath(Region,Dir),Text):- pathName(Region,Dir,Text).
 
-scan_mpred_prop.
 
+scan_mpred_prop:-forall(mpred_prop(Pred,Prop),hooked_asserta(mpred_prop(Pred,Prop))).
 /*scan_mpred_prop:-
    dbase_mod(DBM),
    '@'(forall(mpred(ArgTypes,PropTypes),debugOnError0( define_mpred_prop(ArgTypes,PropTypes))),DBM).
