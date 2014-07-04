@@ -243,7 +243,7 @@ get_module_of(P,M):-functor(P,F,A),get_module_of_4(P,F,A,M).
 def_meta_predicate(M:F,S,E):-!,doall(((between(S,E,N),make_list('?',N,List),CALL=..[F|List],'@'(meta_predicate(CALL),M)))).
 def_meta_predicate(F,S,E):- trace_or_throw(def_meta_predicate(F,S,E)).
 
-:- meta_predicate dynamic_multifile_exported(0), dynamic_multifile_exported(+,+), dynamic_multifile_exported(+,+,+).
+:- meta_predicate dynamic_multifile_exported(0), dynamic_multifile_exported(-,-), dynamic_multifile_exported(-,-,-).
 
 dynamic_multifile_exported(M:FA):- !,dynamic_multifile_exported(M,FA).
 dynamic_multifile_exported( FA ):- leash(+call),trace, !, current_module(M),trace,dynamic_multifile_exported(M,FA).

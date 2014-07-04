@@ -20,7 +20,7 @@ show_term_listing(H,B):- show_term_listing((H:-B)).
 show_term_listing(H):- writeq(H),write('.'),nl,!.
 */
 
-
+:-export((term_listing/1)).
 term_listing([]):-!,dtrace.
 term_listing(P):-term_listing(P,[]).
 term_listing(M:P,List):-!,term_listing(P,[module(M)|List]).
@@ -45,6 +45,7 @@ synth_clause_db(H,info(Props)):- pred_info(H,Props).
 synth_clause_db(H,B):-once((predicate_property_h(H,number_of_clauses(_)),ok_pred(H))),clause(H,B).
 % synth_clause_db(H,database_req):-req(H).
 
+:-export((use_term_listing/3)).
 use_term_listing([],_,_):-!,fail.
 use_term_listing([F1],H,B):-!,use_term_listing_1(F1,H,B),!.
 use_term_listing([F1|FS],H,B):-!,use_term_listing_1(F1,H,B),!,use_term_listing(FS,H,B),!.

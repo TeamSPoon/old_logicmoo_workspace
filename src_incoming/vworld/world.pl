@@ -13,11 +13,10 @@
 %
 */
 
-% :- module(user). 
 :- module(world,
 	[
         call_agent_command/2,
-        call_agent_action/2,
+       % call_agent_action/2,
             mud_isa/2,
             isa_any/2,
             put_in_world/1,
@@ -101,6 +100,7 @@
 
 is_property(P,A):- db_prop(_,C),functor(C,P,A2),A is A2-1.
 
+/*
 is_type(O):-is_type0(O).
 is_type0(T):-moo:label_type_props(_,T,_).
 is_type0(T):-moo:default_type_props(_,T,_).
@@ -112,6 +112,7 @@ is_type0(prey).
 is_type0(monster).
 is_type0(dir).
 is_type0(agent).
+*/
 
 isaOrSame(A,B):-A==B,!.
 isaOrSame(A,B):-mud_isa(A,B).
@@ -145,14 +146,17 @@ moo:subclass(SubType,formattype):-isa_mc(SubType,formattype).
 not_mud_isa(agent,formattype).
 cached(G):-catch(G,_,fail).
 
-mud_isa(O,T):- O==T,!.
-mud_isa(O,T):- var(O),var(T),!,isa_mc(T,_),anyInst(O),mud_isa(O,T).
-mud_isa(O,T):- cached(not_mud_isa(O,T)),!,fail.
-mud_isa(O,T):- props(O,ofclass(T)).
-mud_isa(O,T):- props(O,isa(T)).
-mud_isa(_,T):- (atom(T);var(T)),!,fail.
-mud_isa(O,T):- compound(O),!,functor(O,T,_).
-mud_isa(O,T):- atom(O),!,mud_isa_atom(O,T).
+mud_isa(O,T):- loop_check(mud_isa_any(O,T),fail).
+
+mud_isa_any(O,T):- stack_check(300),O==T,!.
+mud_isa_any(O,T):- var(O),var(T),!,isa_mc(T,_),anyInst(O),mud_isa_any(O,T).
+mud_isa_any(O,T):- cached(not_mud_isa(O,T)),!,fail.
+mud_isa_any(O,T):- atom(T),!,Call=..[T,O],predicate_property(Call,_),!,Call.
+mud_isa_any(O,T):- props(O,ofclass(T)).
+mud_isa_any(O,T):- props(O,isa(T)).
+mud_isa_any(_,T):- (atom(T);var(T)),!,fail.
+mud_isa_any(O,T):- compound(O),!,functor(O,T,_).
+mud_isa_any(O,T):- atom(O),!,mud_isa_atom(O,T).
 
 mud_isa_atom(O,T):- atomic_list_concat([T,_|_],'-',O),!.
 mud_isa_atom(O,T):- atom_concat(T,Int,O),catch(atom_number(Int,_),_,fail),!.
@@ -167,6 +171,7 @@ create_meta(T,P,C,MT):-
    OP =.. [MT,P],
    dbase_mod(M),
    assert_if_new(M:OP),
+   % must(forall_member(E,[OP,isa(P,MT),isa(P,C)],must(add(E)))),
    must(forall_member(E,[OP,ofclass(P,MT),ofclass(P,C)],must(add(E)))),
    must(findall_type_default_props(P,C,Props)),!,
    must(padd(P,Props)),!.
@@ -196,7 +201,7 @@ moo:subclass(string,formattype).
 create_agent(P):-create_agent(P,[]).
 create_agent(P,List):-must(create_instance(P,agent,List)).
 
-define_type(Spec):-create_instance(Spec,type,[]).
+% define_type(Spec):-create_instance(Spec,type,[]).
 
 create_instance(What,Type,Props):- create_instance_0(What,Type,Props),!.
 
@@ -256,6 +261,8 @@ create_instance_0(T,Type,List):-
 moo:createableType(type).
 
 split_name_type(T,T,C):-compound(T),functor(T,C,_),!.
+split_name_type(T,T,C):-atomic_list_concat_safe([C,'-',B],T),!.
+split_name_type(T,T,C):-atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),catch(number_codes(_,Digits),_,fail),atom_codes(C,Type),!.
 split_name_type(T,T,C):-atom(T),atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),catch(number_codes(_,Digits),_,fail),atom_codes(C,Type),!.
 split_name_type(C,P,C):-atom(C),C==food,gensym(C,P),!.
 split_name_type(C,P,C):-atom(C),trace,gensym(C,P),!.

@@ -31,7 +31,7 @@ moo:subclass(createableType,type).
 moo:createableType(type).
 moo:type(multiValued).
 moo:type(singleValued).
-moo:expand_args(eachOf,subclass(eachOf(multiValued,negationByFailure,singleValued),mpred)).
+moo:expand_args(eachOf,subclass(eachOf(multiValued,negationByFailure,argsIsa,singleValued),mpred)).
 
 % =================================================================================================
 % BEGIN world English
@@ -39,18 +39,18 @@ moo:expand_args(eachOf,subclass(eachOf(multiValued,negationByFailure,singleValue
 % :- style_check(-discontiguous).
 :-debug.
 
-:- decl_dynamic_prolog(moo:term_anglify_args/6).
+%:- decl_dynamic_prolog(moo:term_anglify_args/6).
 
 moo:term_anglify_last(Head,English):-compound(Head),
-functor(Head,F,A),A>1,
-not(ends_with_icase(F,"Fn")),not(starts_with_icase(F,"SKF-")),
-atom_codes(F,[C|_]),code_type(C,lower),
-Head=..[F|ARGS],
-term_anglify_args(Head,F,A,ARGS,singleValued,English).
-
-moo:term_anglify(Head,EnglishO):-
-   get_mpred_prop(Head,Info),member(Info,[singleValued,multi(_)]),
+   functor(Head,F,A),A>1,
+   not(ends_with_icase(F,"Fn")),not(starts_with_icase(F,"SKF-")),
+   atom_codes(F,[C|_]),code_type(C,lower),
    Head=..[F|ARGS],
+   term_anglify_args(Head,F,A,ARGS,singleValued,English).
+
+moo:term_anglify(Head,EnglishO):- compound(Head),
+   Head=..[F|ARGS],mpred_prop(F,Info),
+   member(Info,[singleValued,multi(_)]),   
    term_anglify_args(Head,F,1,ARGS,Info,English),world:fully_expand(English,EnglishO),!.
 
 
@@ -100,7 +100,7 @@ moo:type_max_charge(object,120).
 add_arg_parts_of_speech(_F,_N,[],[]).
 add_arg_parts_of_speech(F,N,[A|ARGS0],[ARG|ARGS]):-argIsa_call_or_undressed(F,N,A,ARG),N1 is N+1, add_arg_parts_of_speech(F,N1,ARGS0,ARGS).
 
-argIsa_call_or_undressed(F,N,Obj,fN(Obj,Type)):-argIsa_call_0(F,N,Type),!.
+argIsa_call_or_undressed(F,N,Obj,fN(Obj,Type)):- argIsa_call_0(F,N,Type),!.
 argIsa_call_or_undressed(_F,_N,Obj,Obj).
 
 verb_after_arg(_,_,1).
@@ -235,7 +235,7 @@ moo:subft(dice,int).
 
 % moo:formattype(FormatType):-moo:subclass(FormatType,formattype).
 
-moo:term_specifier_text(Text,pred):- get_mpred_prop(_,arity(Text,_)).
+moo:term_specifier_text(Text,pred):- mpred_prop(Text,arity(_)).
 
 % single valued
 moo:subclass(agent,object).
@@ -279,9 +279,9 @@ moo:multiValued(comment(term,string)).
 moo:singleValued(height(agent,int)).
 moo:default_type_props(self,food,[height(0)]).
 
-:- must((argIsa_call_0(comment,2,W), W\=term)).
+% :- must((argIsa_call_0(comment,2,W), W\=term)).
 
-:-decl_mpred(needs_look/2).
+:-decl_mpred(needs_look,2).
 
 moo:negationByFailure(needs_look(agent,boolean)). 
 

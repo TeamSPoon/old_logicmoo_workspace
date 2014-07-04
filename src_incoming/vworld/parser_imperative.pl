@@ -86,7 +86,7 @@ get_agent_text_command_0(Agent,ListIn,AgentR,CMD):-
 % ===========================================================
 moo:action_info(_Human_Player,debug(term),"Development Usage: debug  the blue backpack").
 
-moo:agent_call_command(_Gent,debug(Term)):- prologCall(debug(Term)).
+moo:agent_call_command(Agent,debug(Term)):- agent_call_safely(Agent,debug(Term)).
 
 % ===========================================================
 % PARSE command
@@ -120,6 +120,7 @@ parse_for(Type,StringM, Term):-parse_for(Type,StringM, Term, []).
 list_tail(_,[]).
 list_tail(String,LeftOver):-ground(String),to_word_list(String,List),length(List,L),!,between(1,L,X),length(LeftOver,X).
 
+:-export(parse_for/4).
 parse_for(Type,StringM,Term,LeftOver):-
    to_word_list(StringM,String),  
    list_tail(String,LeftOver),

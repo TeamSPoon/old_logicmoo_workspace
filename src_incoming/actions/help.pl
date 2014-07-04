@@ -10,6 +10,9 @@
 
 moo:action_info(agent, help, "shows this help").
 moo:action_info(agent, help(optional(string,"")), "shows this help").
+moo:action_info(agent, What,Help):-moo:action_info(What,Help).
+moo:action_info(What,text("command is: ",What)):- moo:action_info(What).
+
 
 :-export(get_type_action_help_commands_list/3).
 

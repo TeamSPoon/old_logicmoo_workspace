@@ -50,7 +50,7 @@ moo:agent_call_command(Agent,look(SObj)):-
    objects_match(Agent,SObj,Percepts),
    forall_member(P,Percepts,call_agent_action(Agent,examine(P))).
 
-moo:agent_call_command(Agent,look):- !,look_as(Agent).
+moo:agent_call_command(Agent,look):- !,must(look_as(Agent)).
 
 :-export(look_as/1).
 look_as(Agent):-
@@ -85,7 +85,7 @@ call_look(Agent,LOC):-
          get_percepts(Agent,value),         
          movedist(Agent,value),
          height_on_obj(Agent,value),
-         success=look:success(Agent,value)
+         success=world:success(Agent,value)
        ]).
 
 

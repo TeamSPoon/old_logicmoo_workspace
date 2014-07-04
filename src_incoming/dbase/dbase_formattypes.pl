@@ -11,6 +11,7 @@
           term_is_ft/2,
           formattype/1,
           format_complies/3,
+	  %        argIsa_call_0/3,
           any_to_value/2,
           any_to_number/2,
           atom_to_value/2,
@@ -24,10 +25,10 @@ term_is_ft(Term,Type):-
    ignore(NewTerm=Term).
 
 
-formattype(S):-   moo:ft_info(S,_).
-formattype(S):-   moo:subft(S,_).
-formattype(S):-moo:subclass(S,formattype).
-formattype(S):-mud_isa(S,formattype).
+formattype(S):- moo:ft_info(S,_).
+formattype(S):- moo:subft(S,_).
+% formattype(S):- moo:subclass(S,formattype).
+% formattype(S):-mud_isa(S,formattype).
 
 /*
 is_decl_ft_except(S,List):-
@@ -137,7 +138,7 @@ end_of_file.
 */
 % =======================================================
 
-:-decl_mpred(subft/2).
+:-decl_mpred(subft,2).
 
 as_one_of(Types,Type):-nonvar(Type),is_type(Type),!,member(Type,Types).
 as_one_of([Type],TypeO):-!,same_arg(same_or(subclass),Type,TypeO).
@@ -183,10 +184,10 @@ argIsa_call_0(HILOG,_,term):-hilog_functor(HILOG).
 
 argIsa_asserted(F,N,Type):- dbase_t(argIsa,F,N,Type),!.
 argIsa_asserted(F,N,Type):- is_ArgsIsa(F,_,Templ),arg(N,Templ,Type),nonvar(Type).
-argIsa_asserted(F,N,Type):- get_mpred_prop(F,argIsa(N,Type)),!.
+argIsa_asserted(F,N,Type):- mpred_prop(F,argIsa(N,Type)),!.
 argIsa_asserted(F/_,N,Type):- nonvar(F), argIsa_asserted(F,N,Type).
 
-is_ArgsIsa(F,A,Templ):- get_mpred_prop(F,A,argsIsa(Templ)).
+is_ArgsIsa(F,A,Templ):- mpred_prop(F,argsIsa(Templ)).
 is_ArgsIsa(F,A,Templ):- moo:ft_info(Templ,formatted),functor(Templ,F,A).
 is_ArgsIsa(F,_,Templ):- dbase:dbase_t(_, Templ),compound(Templ),functor(F,_,Templ).
 is_ArgsIsa(F,_,Templ):- moo:argsIsaProps(Prop),  dbase:dbase_t(Prop, Templ),compound(Templ),functor(F,_,Templ).
@@ -341,7 +342,7 @@ correctAnyType(Op,A,Type,AA):- one_must(correctType(Op,A,Type,AA),A=AA).
 correctAnyType(Op,A,Type,A):- dtrace,dmsg(warn(not(correctAnyType(Op,A,Type)))).
 
 %  @set movedist 4
-
+:-export((correctFormatType/4)).
 correctFormatType(Op,A,Type,AA):- var(A),correctType(Op,A,Type,AA),must_det(var(AA)),must_det(A==AA),!.
 correctFormatType(Op,A,Type,AA):- var(Type),trace_or_throw(correctFormatType(Op,A,Type,AA)).
 correctFormatType(Op,A,Type,AA):- correctType(Op,A,Type,AA),nonvar(AA),!.

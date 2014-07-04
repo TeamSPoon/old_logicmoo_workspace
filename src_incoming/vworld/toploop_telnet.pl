@@ -89,11 +89,13 @@ prompt_read(Prompt,Atom):-
          (is_list(Codes)-> atom_codes(Atom,Codes);
            (assert(thlocal:wants_logout(P)),Atom='quit')),!.
 
+:-export(scan_updates/0).
+
 tick_tock:-
-           scan_updates,!,fmt('tick tock',[]),sleep(1),!.
+           scan_updates,!,fmt('tick tock',[]),sleep(0.1),!.
 
 
-scan_updates:-ignore(catch(make,_,true)).
+scan_updates:- ignore((thread_self(main),ignore((catch(make,E,dmsg(E)))))).
 
 
 hook:decl_database_hook(Type,C):- ignore((current_agent(Agent),not(not(contains_term(C,Agent))),dmsg(database_hook(Type,C)))).
@@ -117,7 +119,7 @@ do_player_action(Agent,CMD):-fmt('skipping_unknown_player_action(~q,~q).~n',[Age
 % DEFAULT TELNET "LOOK"
 % ===========================================================
 look_brief(Agent):- not(props(Agent,needs_look(true))),!.
-look_brief(Agent):- prop(Agent,last_command,X),functor(X,look,_),!.
+look_brief(Agent):- prop(Agent,last_command,X),nonvar(X),functor(X,look,_),!.
 look_brief(Agent):- look_as(Agent).
 
 telnet_repl_writer(_TL,call,term,Goal):-!,ignore(debugOnError(Goal)).
@@ -178,11 +180,10 @@ show_room_grid_new(Room):-
    once(show_room_grid_single(Room,LOC,OutsideTest)),fail.
 show_room_grid_new(_):-nl.
 
+door_label(R,Dir,'  '):- pathBetween_call(R,Dir,SP),atomic(SP).
 
-door_label(R,Dir,'  '):-pathBetween_call(R,Dir,SP),atomic(SP).
-
-show_room_grid_single(Room, xyz(Room,X,Y,Z),OutsideTest):- OutsideTest, doorLocation(Room,X,Y,Z,Dir), door_label(Room,Dir,Label),write(Label),!.
-show_room_grid_single(_Room,_LOC,OutsideTest):-OutsideTest,!,write('[]'),!.
+show_room_grid_single(Room, xyz(Room,X,Y,Z),OutsideTest):- call(OutsideTest), doorLocation(Room,X,Y,Z,Dir),door_label(Room,Dir,Label),write(Label),!.
+show_room_grid_single(_Room,_LOC,OutsideTest):- call(OutsideTest),!,write('[]'),!.
 show_room_grid_single(_Room,LOC,_OutsideTest):- atloc(Obj,LOC),inst_label(Obj,Label), write(Label), !.
 show_room_grid_single(_Room,LOC,_OutsideTest):- atloc(_Obj,LOC),write('..'), !.
 show_room_grid_single(_Room,_LOC,_OutsideTest):- write('--'), !.

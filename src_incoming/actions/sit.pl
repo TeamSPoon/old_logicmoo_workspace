@@ -1,5 +1,5 @@
 % :- module(user). 
-:- module(sit, [is_posture/1]).
+:- module(sit, [posture/1]).
 /** <module> Agent Postures there and does nothing
 % Agent will loose a bit of charge, but heal a bit of damage
 % May 18, 1996
@@ -11,21 +11,25 @@
 
 :- moo:register_module_type(command).
 
-is_posture(sit).
-is_posture(stand).
-is_posture(lay).
-is_posture(kneel).
+:- decl_mpred(posture/1,formattype).
 
-moo:agent_text_command(Agent,[Sit],Agent,Sit) :-is_posture(Sit).
-moo:action_info(Posture,text("sets and agent's posture to ",Posture)):-is_posture(Posture).
+posture(sit).
+posture(stand).
+posture(lay).
+posture(kneel).
 
-% Sit - do nothing.
-moo:agent_call_command(Agent,Sit) :-is_posture(Sit),
+:-decl_mpred(stance(agent,posture),[singleValued]).
+
+moo:agent_text_command(Agent,[Sit],Agent,Sit):- posture(Sit).
+moo:action_info(Posture,text("sets and agent's stance to ",Posture)):-posture(Posture).
+
+% Sit and do nothing.
+moo:agent_call_command(Agent,Sit):- posture(Sit),
         fmt('agent ~w is now ~wing ',[Agent,Sit]),
-        padd(Agent,posture(Sit)),
+        padd(Agent,stance(Sit)),
 	call_update_charge(Agent,Sit).
 
-moo:update_charge(Agent,Sit) :- is_posture(Sit), padd(Agent,[charge(-1)]).
+moo:update_charge(Agent,Sit) :- posture(Sit), padd(Agent,[charge(-1)]).
 
 :- include(logicmoo(vworld/moo_footer)).
 

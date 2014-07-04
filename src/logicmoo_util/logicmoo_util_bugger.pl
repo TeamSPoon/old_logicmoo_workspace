@@ -291,7 +291,7 @@ snumbervars(BC):-numbervars(BC,0,_,[singletons(true),attvar(skip)]).
 
 loop_check(B,TODO):- copy_term(B,BC),snumbervars(BC),!, loop_check(BC,B,TODO).
 loop_check_term(B,TERM,TODO):- copy_term(TERM,BC),snumbervars(BC),!, loop_check(BC,B,TODO).
-loop_check_clauses(B,TODO):- copy_term(B,BC),snumbervars(BC),!, loop_check(BC,call_skipping_n_clauses(1,B),TODO).
+loop_check_clauses(B,TODO):- copy_term(B,BC),snumbervars(BC),!, loop_check(call_skipping_n_clauses(1,B),BC,TODO).
 
 to_list_of(_,[Rest],Rest):-!.
 to_list_of(RL,[R|Rest],LList):-

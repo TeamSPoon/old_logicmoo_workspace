@@ -34,7 +34,9 @@ grid_dist(L1,L2,Dist):- to_3d(L1,L13D),to_3d(L2,L23D),dist(L13D,L23D,Dist),!.
 
 dist(_,_,5).
 
-pathBetween_call(From,Dir,To):-any_to_dir(Dir,Dir2),holds_t(pathBetween,From,Dir2,To),same(Dir,Dir2).
+% pathBetween_call(From,DirS,To):-string(DirS),!,atom_string(Dir,DirS),!,any_to_dir(Dir,Dir2),pathBetween(From,Dir2,To),same(Dir,Dir2).
+pathBetween_call_0(From,Dir,To):-any_to_dir(Dir,Dir2),pathBetween(From,Dir2,To),same(Dir,Dir2).
+pathBetween_call(From,Dir,To):-pathBetween_call_0(From,DirS,To), same(Dir,DirS).
    
 % 5x5 rooms are average
 %% to_3d(L1,L13D):-compound(L1)->L13D=L1; room_center(L1,X,Y,Z), L13D = xyz(L1,X,Y,Z).
@@ -146,7 +148,7 @@ create_someval(atloc,Agent,Where) :-
    unoccupied(Where),!.
 
 %create_someval(atloc,_Agent,Loc) :- must((create_random(xyz/3,Loc,unoccupied(Loc)))).
-create_someval(Pred,_Arg1,Value) :- must((mpred_arity(Pred,Last),argIsa_call(Pred,Last,Type),create_random(Type,Value,nonvar(Value)))).
+create_someval(Pred,_Arg1,Value) :- must((moo:mpred_arity(Pred,Last),argIsa_call(Pred,Last,Type),create_random(Type,Value,nonvar(Value)))).
 
 create_random(XYZ/_,Value,Test):- atom(XYZ),!,create_random(XYZ,Value,Test).
 create_random(XYZ,Value,Test):- atom(XYZ),atom_concat('random_',XYZ,Pred),Call=..[Pred,Value],predicate_property(Call,_),Call,Test,!.

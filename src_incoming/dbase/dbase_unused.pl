@@ -27,7 +27,7 @@ argIsa_call/4,
 assertThrough/1,
 assertThrough/2,
 balanceBinding/2,
-do_expand_args/3,
+
 call_no_cuts/1,
 call_no_cuts/2,
 force_expand/1,
@@ -815,21 +815,6 @@ kb_update(New,OldV):- db_op_int(tell(OldV),New).
 world_clear(Named):- dmsg('Clearing world database: ~q.',[Named]).
 
 
-do_expand_args(Exp,Term,Out):- compound(Term),!,do_expand_args_c(Exp,Term,Out).
-do_expand_args(_,Term,Term).
-
-do_expand_args_c(Exp,[L|IST],Out):- !,do_expand_args_l(Exp,[L|IST],Out).
-do_expand_args_c(Exp,Term,Out):- Term=..[P|ARGS],do_expand_args_pa(Exp,P,ARGS,Out).
-
-do_expand_args_pa(Exp,Exp,ARGS,Out):- !,member(Out,ARGS).
-do_expand_args_pa(Exp,P,ARGS,Out):- do_expand_args_l(Exp,ARGS,EARGS), Out=..[P|EARGS].
-
-
-
-do_expand_args_l(_,A,A):- var(A),!.
-do_expand_args_l(_,[],[]):- !.
-do_expand_args_l(Exp,[A|RGS],[E|ARGS]):- do_expand_args(Exp,A,E),do_expand_args_l(Exp,RGS,ARGS).
-
 
 :-export(glean_pred_props_maybe/1).
 glean_pred_props_maybe(_:G):-!,compound(G),glean_pred_props_maybe(G).
@@ -1345,6 +1330,7 @@ replace_nth([T|FARGS],A,OLD,[T|FARGO]):-
 
 into_mpred_aform(C,CP,CA):-into_mpred_form(C,CP),into_assertion_form(C,CA),!.
 
+hooked_asserta(end_of_file).
 hooked_asserta(C):- into_mpred_aform(C,CP,CA),hooked_asserta(CP,CA).
 hooked_assertz(C):- into_mpred_aform(C,CP,CA),hooked_assertz(CP,CA).
 hooked_retract(C):- into_mpred_aform(C,CP,CA),hooked_retract(CP,CA).
@@ -1491,8 +1477,8 @@ insert_into([Carry|ARGS],After,Insert,[Carry|NEWARGS]):-
 
 moo:default_type_props(_,food,[height(0)]).
 
-is_mpred_prolog(F,A):- get_mpred_prop(F,A,ask_module(_)), 
-   not(get_mpred_prop(F,A,query(_))),!.
+is_mpred_prolog(F,_A):- get_mpred_prop(F,ask_module(_)), 
+   not(mpred_prop(F,query(_))),!.
 
 :- include(dbase_formattypes).
 

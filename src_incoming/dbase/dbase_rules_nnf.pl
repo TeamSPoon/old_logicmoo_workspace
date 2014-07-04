@@ -74,9 +74,8 @@ nnf_post_clean([A|B],[AA|BB],Vars):-
    append(Vars1,Vars2,Vars).
 nnf_post_clean(C,CC,Vars):-
    C=..[A|B],
-   A=AA, % nnf_post_clean_functor(A,AA,Vars1),
-   nnf_post_clean(B,BB,Vars2),
-   append(Vars1,Vars2,Vars),
+   A=AA,
+   nnf_post_clean(B,BB,Vars),
    CC=..[AA|BB],!.
 
 
