@@ -290,6 +290,38 @@ call_expanded(_Doing,G,_,_):-call_asserted(G).
 % call_expanded(Doing,G,F,A):-add_mpred_prop(F,A,dbase_t),!,call_expanded(G).
 % call_expanded(Doing,G,_,_):-dtrace,!,G.
 
+:- dynamic_multifile_exported((
+          dbase_t/1,
+          dbase_t/2,
+          dbase_t/3,
+          dbase_t/4,
+          dbase_t/5,
+          dbase_t/6,
+          dbase_t/7,
+          asserted_dbase_t/1,
+          asserted_dbase_t/2,
+          asserted_dbase_t/3,
+          asserted_dbase_t/4,
+          asserted_dbase_t/5,
+          asserted_dbase_t/6,
+          asserted_dbase_t/7,
+          assertion_f/1,
+          assertion_t/1,
+          asserted_dbase_f/1,
+          asserted_dbase_f/2,
+          asserted_dbase_f/3,
+          asserted_dbase_f/4,
+          asserted_dbase_f/5,
+          asserted_dbase_f/6,
+          asserted_dbase_f/7,
+          dbase_f/1,
+          dbase_f/2,
+          dbase_f/3,
+          dbase_f/4,
+          dbase_f/5,
+          dbase_f/6,
+          dbase_f/7)).
+
 dbase_t([AH,P|LIST]):- is_holds_true(AH),!,dbase_t_p2(P,LIST).
 dbase_t([AH,P|LIST]):- is_holds_false(AH),!,dbase_f([P|LIST]).
 dbase_t([P|LIST]):- !,dbase_t_p2(P,LIST).
@@ -298,7 +330,7 @@ dbase_t(CALL):- safe_univ(CALL,[P|LIST]),dbase_t([P|LIST]).
 dbase_t_p2(P,LIST):- safe_univ(CALL,[dbase_t,P|LIST]),call(CALL).
 
 % ================================================
-% hooked_assert*/1 hooked_retract*/1
+% hooked_assert/1 hooked_retract/1
 % ================================================
 
 ensure_predicate_reachable(M,C):-once((predicate_property(C,imported_from(Other)),M\=Other,
@@ -346,12 +378,12 @@ hooked_retractall(C):- into_mpred_aform(C,CP,CA),hooked_retractall(CP,CA).
 
 hooked_asserta(CP,_CA):- singletons_throw_or_fail(hooked_asserta(CP)).
 hooked_asserta(_CP,CA):- asserted_clause(CA),!.
-hooked_asserta(CP,CA):- run_database_hooks_local(assert_with(a),CP),asserta_cloc(CA).
+hooked_asserta(CP,CA):- asserta_cloc(CA),run_database_hooks_local(assert(a),CP).
 
 
 hooked_assertz(CP,_CA):- singletons_throw_or_fail(hooked_assertz(CP)).
 hooked_assertz(_CP,CA):- asserted_clause(CA),!.
-hooked_assertz(CP,CA):- run_database_hooks_local(assert_with(z),CP),assertz_cloc(CA).
+hooked_assertz(CP,CA):- assertz_cloc(CA),run_database_hooks_local(assert(z),CP).
 
 hooked_retract(CP,_CA):- nonground_throw_or_fail(hooked_retract(CP)).
 hooked_retract(CP,CA):- must_det(asserted_clause(CA)),!,run_database_hooks_local(retract(one),CP), ignore(retract_cloc(CA)).
@@ -438,16 +470,14 @@ db_assert_sv_lc(C,F,A):-
    update_value(OLD,UPDATE,NEW),
    hooked_asserta(CNEW),!.
 
-
-
 defaultArgValue(facing(_,_),_,_,"n"):-!.
 defaultArgValue(damage(_,_),_,_,500):-!.
-defaultArgValue(_,F,A,OLD):- argIsa_call(F,A,Type),defaultTypeValue(Type,OLD),!.
-defaultArgValue(_,F,A,OLD):-argIsa_call(F,A,Type),trace,defaultTypeValue(Type,OLD),!.
+defaultArgValue(Info,F,A,OLD):- argIsa_call(F,A,Type),defaultTypeValue(Info,Type,OLD),!.
+defaultArgValue(Info,F,A,OLD):-argIsa_call(F,A,Type),trace,defaultTypeValue(Info,Type,OLD),!.
 
-defaultTypeValue(dir,"n").
-defaultTypeValue(int,0).
-defaultTypeValue(Type,0):-dmsg(fake_defaultValue(Type,0)).
+defaultTypeValue(_Info,dir,"n").
+defaultTypeValue(_Info,int,0).
+defaultTypeValue(Info,Type,Out):-dmsg(fake_defaultValue(Info,Type,0)),!,Out=0.
 
 replace_arg(C,A,OLD,CC):- 
    C=..FARGS,

@@ -991,12 +991,8 @@ get_isa_backchaing(A,Fmt):- get_isa_asserted(A,Fmt).
 get_isa_asserted(A,Fmt):-hotrace(get_isa_asserted_0(A,Fmt)).
 
 get_isa_asserted_0(A,Fmt):- is_asserted(dbase_t(isa,A,Fmt)).
-%get_isa_asserted_0(A,ArgsIsa):- nonvar(ArgsIsa),mpred_functor(ArgsIsa,A,Prop),!, get_mpred_prop(_,_,Prop).
+get_isa_asserted_0(A,ArgsIsa):- nonvar(ArgsIsa),argsIsaProps(ArgsIsa),!, mpred_prop(A,Prop).
 
-mpred_functor(argsIsa,A,argsIsa(A)).
-mpred_functor(singleValued,_,singleValued).
-mpred_functor(multi,_,multi(_)).
-mpred_functor(multiValued,_,multiValued(_)).
 
 % subclass(Sub,Sup):-add(subclass(Sub,Sup)).
 
@@ -1189,7 +1185,7 @@ db_op_exact(u,C):- grtrace,db_quf(u,C,U,Template),call_expanded(U),Template,must
 db_op_exact(ra,C):- db_quf(ra,C,U,Template),!, doall((call_expanded(U),hooked_retractall(Template))).
 db_op_exact(retract,C):- must(db_quf(retract,C,U,Template)),!,call_expanded(U),!,hooked_retract(Template).
 db_op_exact(tell(OldV),W):- non_assertable(W,Why),trace_or_throw(todo(db_op(tell(OldV), non_assertable(Why,W)))).
-db_op_exact(tell(Must),C0):- db_quf(tell(Must),C0,U,C),!,must(call_expanded(U)),functor(C,F,A),( get_mpred_prop(F,A,singleValued) -> must(db_assert_sv(Must,C,F,A,_OldVOut1)) ; must(db_assert_mv(Must,C,F,A,_OldVOut2))).
+db_op_exact(tell(Must),C0):- db_quf(tell(Must),C0,U,C),!,must(call_expanded(U)),functor(C,F,A),( get_mpred_prop(F,singleValued) -> must(db_assert_sv(Must,C,F,A,_OldVOut1)) ; must(db_assert_mv(Must,C,F,A,_OldVOut2))).
 db_op_exact(tell(Must),C):- grtrace, functor(C,F,A), must((get_mpred_prop(F,_,singleValued) -> must(db_assert_sv(Must,C,F,A,_OldVOut1)) ; must(db_assert_mv(Must,C,F,A,_OldVOut2)))).
 db_op_exact(Must, Term):- !,call_expanded_for(Must,Term).
 db_op_exact(Op,C):- trace_or_throw(unhandled(db_op_exact(Op,C))).

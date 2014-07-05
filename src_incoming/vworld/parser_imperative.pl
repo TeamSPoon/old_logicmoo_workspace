@@ -241,6 +241,8 @@ parse_agent_text_command(Agent,VERB,[PT2|ARGS],NewAgent,GOAL):-
    parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL),!,
    dmsg_parserm(special_succeed_parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL)),!.
 
+parse_agent_text_command(Agent,PROLOGTERM,[],Agent,prologCall(PROLOGTERM)):- predicate_property(PROLOGTERM,_),!.
+
 parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL):-
  dmsg(failed_parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL)),debugging(parser),
  debug,visible(+all),leash(+all),trace,

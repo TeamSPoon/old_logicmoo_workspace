@@ -1,3 +1,4 @@
+% =======================================================
 /** <module> 
 % This is mainly used by the moo_loader but also needed everywhere
 %
@@ -8,36 +9,30 @@
 */
 % =======================================================
 :- module(dbase_formattypes, [
-          term_is_ft/2,
-          formattype/1,
-          format_complies/3,
-	  %        argIsa_call_0/3,
-          any_to_value/2,
+          any_to_dir/2,
           any_to_number/2,
+          any_to_value/2,
+          argIsa_call/4,
+          argIsa_call_0/3,
           atom_to_value/2,
-          any_to_dir/2]).
+          formattype/1,
+          term_is_ft/2,
+          pl_arg_type/2,
+          p2c_dir2/2
+          ]).
+
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
-term_is_ft(Term,Type):-
-   moo:ft_info(Type,How),
-   format_complies(Term,How,NewTerm),
-   ignore(NewTerm=Term).
+:-export(split_name_type/3).
+split_name_type(T,T,C):- compound(T),functor(T,C,_),!.
+split_name_type(T,T,C):-atomic_list_concat_safe([C,'-',_],T),atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),catch(number_codes(_,Digits),_,fail),atom_codes(C,Type),!.
+split_name_type(T,T,C):- atom(T),atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),catch(number_codes(_,Digits),_,fail),atom_codes(C,Type),!.
+split_name_type(C,P,C):- atom(C),C==food,gensym(C,P),!.
+split_name_type(C,P,C):- atom(C),dmsg(atom(C)),gensym(C,P),!.
+split_name_type(C,P,C):- string(C),gensym(C,P),!.
 
 
-formattype(S):- moo:ft_info(S,_).
-formattype(S):- moo:subft(S,_).
-% formattype(S):- moo:subclass(S,formattype).
-% formattype(S):-mud_isa(S,formattype).
-
-/*
-is_decl_ft_except(S,List):-
-   moo:ft_info(S,_);
-   not((member(S,List), 
-      ((moo:subft(S,S2) ,
-        is_decl_ft_except(S2,[S|List]) ;
-             ((moo:subft(S3,S) , is_decl_ft_except(S3,[S,S2|List]))))))).
-*/
 
 moo:ft_info(atom,atom(self)).
 moo:ft_info(apath(region,dir),formatted).
@@ -64,139 +59,94 @@ moo:subft(id,term).
 
 moo:subft(int,integer).
 moo:subft(integer,number).
-moo:subft(dice,int).
+moo:subft(dice,int).  
 
-format_complies(A,Type,A):- var(Type),!,trace,throw(failure(format_complies(A,Type))).
-format_complies(A,string,AA):- ignoreOnError(text_to_string(A,AA)).
-format_complies(A,int,AA):- any_to_number(A,AA).
-format_complies(A,number,AA):- any_to_number(A,AA).
-format_complies(A,integer,AA):- any_to_number(A,AA).
-format_complies(A,Fmt,AA):- moo:ft_info(Fmt,formatted),!,format_complies(A,formatted(Fmt),AA).
-format_complies(A,Fmt,A):- moo:ft_info(Fmt,Code),!,subst(Code,self,A,Call),Call.   
-format_complies(A,number,AA):- must(any_to_number(A,AA)).
-format_complies(A,dir,AA):- any_to_dir(A,AA).
-format_complies([A|AA],list(T),LIST):-!,findall(OT,((member(O,[A|AA]),format_complies(O,T,OT))),LIST).
-format_complies(A,list(T),[OT]):-!,format_complies(A,T,OT).
-format_complies(A,same(A),A):-!.
-format_complies([],formatted([]),[]):-!.
-format_complies([H|T],formatted([H2|T2]),[H3|T3]):-
-   format_complies(H,H2,H3),
-   format_complies(T,formatted(T2),T3).
-format_complies(Args,formatted(Types),NewArgs):- compound(Args),compound(Types),
-   functor(Args,F,N),functor(Types,F,N),functor(NewArgs,F,N),
-   Args=..[F|ArgsL],
-   Types=..[F|TypesL],
-   NewArgs=..[F|NewArgsL],!,   
-   format_complies(ArgsL,TypesL,NewArgsL).
-format_complies(A,Super,AA):- moo:subft(Sub,Super),format_complies(A,Sub,AA).
-  
+:-export(formattype/1).
+formattype(S):-   moo:ft_info(S,_).
+formattype(S):-   moo:subft(S,_).
 
+term_is_ft(Term,Type):- 
+   formattype(Type),
+   once(trans_subft_info(Type,How)),
+   correctFormatType(query(_HLDS,_OldV),Term,How,NewTerm),!,
+   sameArgTypes(NewTerm,Term).
 
-any_to_value(V,Term):-atom(V),!,atom_to_value(V,Term).
-any_to_value(A,A).
+trans_subft_info(FT,Info):-moo:ft_info(FT,Info),!.
+trans_subft_info(FT,Info):-trans_subft(Sub,FT),moo:ft_info(Sub,Info),!.
+trans_subft_info(FT,Info):-trans_subft(FT,Sub),moo:ft_info(Sub,Info),!.
+trans_subft(FT,Sub):-moo:subft(FT,Sub).
+trans_subft(FT,Sub):-moo:subft(FT,A),moo:subft(A,Sub).
+trans_subft(FT,Sub):-moo:subft(FT,A),moo:subft(A,B),moo:subft(B,Sub).
 
+sameArgTypes(A,C):-same(A,C);(pl_arg_type(C,CT),pl_arg_type(A,AT),!,typesOverlap(AT,CT)).
+typesOverlap(AT,AT).
 
-any_to_number(N,N):- number(N),!.
-any_to_number(dice(A,B,C),N):- ground(A),roll_dice(A,B,C,N),!.
-any_to_number(A,N):-atom(A),atom_to_value(A,V),A\=V,any_to_number(V,N).
-any_to_number(A,N):- catch(number_string(N,A),_,fail).
+pl_arg_type_or_functor(Arg,Type):- pl_arg_type(Arg,T) , (T==compound -> functor(Arg,Type,_); ( (T==list,T=[_|_])-> T=[Type|_] ;Type=T)) .
 
+pl_arg_type(Arg,Type):- 
+      var(Arg) -> Type =var;
+      integer(Arg) -> Type =integer;
+      number(Arg) -> Type =float;
+      string(Arg) -> Type =string;
+      atom(Arg) -> Type =atom;
+      is_list(Arg) -> Type =list;
+      compound(Arg) -> Type =compound;
+         Arg = Type.
 
-roll_dice(Rolls,_,Bonus,Result):- Rolls < 0, !, Result is Bonus.
-roll_dice(Rolls,Sided,Bonus,Result):- LessRolls is Rolls-1, roll_dice(LessRolls,Sided, Bonus + random(Sided) +1, Result).
-
-
-atom_to_value(V,Term):-not(atom(V)),!,any_to_value(V,Term).
-% 56
-atom_to_value(V,Term):- catch((read_term_from_atom(V,Term,[variable_names([])])),_,fail),!.
-% 18d18+4000
-atom_to_value(V,dice(T1,T2,+T3)):- atomic_list_concat_safe([D1,'d',D2,'+',D3],V), atom_to_value(D1,T1),atom_to_value(D2,T2),atom_to_value(D3,T3),!.
-atom_to_value(V,dice(T1,T2,-T3)):- atomic_list_concat_safe([D1,'d',D2,'-',D3],V), atom_to_value(D1,T1),atom_to_value(D2,T2),atom_to_value(D3,T3),!.
-
-any_to_dir(D,D):-var(D),!.
-any_to_dir(D,D):-dir_offset(D,_,_,_,_),!.
-any_to_dir(A,D):-p2c_dir2(D,A),!.
-any_to_dir(S,D):-string(S),string_to_atom(S,A),any_to_dir(A,D),!.
-any_to_dir(D,O):-atom(D),sub_atom(D, 0, 1, _, S),toLowercase(S,L),p2c_dir2(L,O),!.
-
-p2c_dir2('s','South-Directly').
-p2c_dir2('w','West-Directly').
-p2c_dir2('u','Up-Directly').
-p2c_dir2('d','Down-Directly').
-p2c_dir2('e','East-Directly').
-p2c_dir2('n','North-Directly').
-
-end_of_file.
-
-/** <module> 
-% This is mainly used by the moo_loader but also needed everywhere
-%
-% Project LogicMoo: A MUD server written in Prolog
-% Maintainer: Douglas Miles
-% Dec 13, 2035
-%
-*/
-% =======================================================
-
-:-decl_mpred(subft,2).
+mpred_arity_pred(P):- nonvar(P),arg(_,a(arity,arityMax,arityMin),P).
 
 as_one_of(Types,Type):-nonvar(Type),is_type(Type),!,member(Type,Types).
 as_one_of([Type],TypeO):-!,same_arg(same_or(subclass),Type,TypeO).
 as_one_of(Types,oneOf(Types)).
 
+argIsa_call(Op,_:F,N,Type):-!,argIsa_call(Op,F,N,Type),!.
+argIsa_call(Op,F/_,N,Type):- !,argIsa_call(Op,F,N,Type),!.
+argIsa_call(Op,Func,N,Type):- compound(Func),!,functor(Func,F,_),argIsa_call(Op,F,N,Type),!.
 argIsa_call(Op,F,N,Type):-hotrace(loop_check(argIsa_call_nt(Op,F,N,Type),Type=term)),must(nonvar(Type)).
 
 argIsa_call_nt(_O,F,N,Type):-argIsa_call_nt(F,N,Type).
 
 argIsa_call_nt(F,N,Type):- once(var(F);not(number(N))),dtrace,once(var(F);not(number(N))),trace_or_throw(once(var(F);not(number(N)))->argIsa_call(F,N,Type)).
-argIsa_call_nt(_:F,N,Type):-!,argIsa_call_nt(F,N,Type),!.
-argIsa_call_nt(F/_,N,Type):- !,argIsa_call_nt(F,N,Type),!.
 argIsa_call_nt(F,N,Type):- argIsa_call_0(F,N,Type),!.
 argIsa_call_nt(F,N,Type):- argIsa_asserted(F,N,Type),!.
-argIsa_call_nt(F,N,Type):- is_ArgsIsa(F,_,Templ),arg(N,Templ,Type),nonvar(Type),!,trace_or_throw((is_ArgsIsa(F,_,Templ),arg(N,Templ,Type),nonvar(Type))).
 argIsa_call_nt(F,N,Type):- argIsa_call_1(F,N,Type),!.
 argIsa_call_nt(F,N,Type):- findall(T,argIsa_call_0(F,N,Type),T),Types=[_|_],!,as_one_of(Types,Type),!.
 
-argIsa_call_0(F/_,N1,Type):-!,argIsa_call_0(F,N1,Type).
 argIsa_call_0(agent_text_command,_,term).
 argIsa_call_0(comment,2,string).
+argIsa_call_0(predicates,1,list(term)).
 argIsa_call_0(isa,1,argIsaFn(isa,1)).
 argIsa_call_0(isa,2,type).
 argIsa_call_0(directions,2,list(dir)).
 argIsa_call_0(equivRule,_,term).
 argIsa_call_0(formatted,_,term).
+argIsa_call_0(inRegion,2,region).
 argIsa_call_0(F,N,Type):-is_type(F),!,(N=1 -> Type=F;Type=term(props)).
 
 argIsa_call_0(memory,2,term).
 argIsa_call_0(subclass,_,type).
 argIsa_call_0(term_anglify,_,term).
+argIsa_call_0(subft,_,term).
 argIsa_call_0(type_max_charge,1,type).
 argIsa_call_0(type_max_charge,2,int).
 argIsa_call_0(type_max_damage,1,type).
 argIsa_call_0(type_max_damage,2,int).
-argIsa_call_0(Arity,N,T):-arity_pred(Arity),!,arg(N,vv(term,int,int),T).
+argIsa_call_0(Arity,N,T):-mpred_arity_pred(Arity),!,arg(N,vv(term,int,int),T).
 argIsa_call_0(ask_module,_,term).
-argIsa_call_0(Func,N,Type):- get_functor(Func,F,_),F \= Func,argIsa_call_0(F,N,Type).
 argIsa_call_0(ask_module,_,term).
-argIsa_call_0(HILOG,_,term):-hilog_functor(HILOG).
+% argIsa_call_0(HILOG,_,term):-hilog_functor(HILOG).
 
 
-
-argIsa_asserted(F,N,Type):- dbase_t(argIsa,F,N,Type),!.
-argIsa_asserted(F,N,Type):- is_ArgsIsa(F,_,Templ),arg(N,Templ,Type),nonvar(Type).
+% argIsa_asserted(F,N,Type):- dbase_t(argIsa,F,N,Type),!.
 argIsa_asserted(F,N,Type):- mpred_prop(F,argIsa(N,Type)),!.
-argIsa_asserted(F/_,N,Type):- nonvar(F), argIsa_asserted(F,N,Type).
-
-is_ArgsIsa(F,A,Templ):- mpred_prop(F,argsIsa(Templ)).
-is_ArgsIsa(F,A,Templ):- moo:ft_info(Templ,formatted),functor(Templ,F,A).
-is_ArgsIsa(F,_,Templ):- dbase:dbase_t(_, Templ),compound(Templ),functor(F,_,Templ).
-is_ArgsIsa(F,_,Templ):- moo:argsIsaProps(Prop),  dbase:dbase_t(Prop, Templ),compound(Templ),functor(F,_,Templ).
-
+argIsa_asserted(F,N,Type):- mpred_prop(F,argsIsa(Types)),arg(N,Types,Type),nonvar(Type),!.
 
 argIsa_call_1(Prop,N1,Type):- is_2nd_order_holds(Prop),dmsg(todo(define(argIsa_call(Prop,N1,'Second_Order_TYPE')))),dumpST,dtrace,
    Type=argIsaFn(Prop,N1).
 argIsa_call_1(Prop,N1,Type):- dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),
    Type=argIsaFn(Prop,N1).
+
+
 
 db_quf(Op,M:C,Pretest,Template):-var(C),!,throw(var(db_quf(Op,M:C,Pretest,Template))).
 db_quf(Op,_:C,Pretest,Template):-nonvar(C),!,db_quf(Op,C,Pretest,Template).
@@ -279,27 +229,6 @@ inverse_args([AR,G,S],[S,G,AR]):-!.
 inverse_args([A,R,G,S],[S,R,G,A]):-!.
 inverse_args([P,A,R,G,S],[S,A,R,G,P]):-!.
 
-term_is_ft(Term,Type):-
-   moo:ft_info(Type,How),
-   correctFormatType(query(_HLDS,_OldV),Term,How,NewTerm),!,
-   sameArgTypes(NewTerm,Term).
-
-sameArgTypes(A,C):-same(A,C);(pl_arg_type(C,CT),pl_arg_type(A,AT),!,typesOverlap(AT,CT)).
-typesOverlap(AT,AT).
-
-pl_arg_type_or_functor(Arg,Type):- pl_arg_type(Arg,T) , (T==compound -> functor(Arg,Type,_); ( (T==list,T=[_|_])-> T=[Type|_] ;Type=T)) .
-
-pl_arg_type(Arg,Type):- 
-      var(Arg) -> Type =var;
-      integer(Arg) -> Type =integer;
-      number(Arg) -> Type =float;
-      string(Arg) -> Type =string;
-      atom(Arg) -> Type =atom;
-      is_list(Arg) -> Type =list;
-      compound(Arg) -> Type =compound;
-         Arg = Type.
-
-
 % =======================================================
 % correctArgsIsa/3
 % =======================================================
@@ -309,8 +238,13 @@ moo:decl_coerce(A,Type,AA):- correctAnyType(tell(_),A,Type,AA).
 
 same_vars(T1,T2):-term_variables(T1,V1),term_variables(T2,V2),!,V1==V2.
 
+:-export(correctArgsIsa/2).
+:-export(correctArgsIsa/3).
+correctArgsIsa(In,Out):-correctArgsIsa(query(_,_),In,Out).
+
 correctArgsIsa(_,NC,NC):-not(compound(NC)),!.
 correctArgsIsa(Op,M:A,MAA):- nonvar(M),!,correctArgsIsa(Op,A,AA),M:AA=MAA.
+correctArgsIsa(_Op,G,G):- functor(G,F,A),arg(_,vv(subclass/_),F/A),!.
 correctArgsIsa(Op,A,AA):- correctArgsIsa0(Op,A,AA),nonvar(AA),!.
 correctArgsIsa(Op,A,AA):- grtrace,correctArgsIsa0(Op,A,AA).
 correctArgsIsa(Op,A,Type,A):- dtrace,dmsg(warn(not(correctArgsIsa(Op,A,Type)))).
@@ -342,7 +276,7 @@ correctAnyType(Op,A,Type,AA):- one_must(correctType(Op,A,Type,AA),A=AA).
 correctAnyType(Op,A,Type,A):- dtrace,dmsg(warn(not(correctAnyType(Op,A,Type)))).
 
 %  @set movedist 4
-:-export((correctFormatType/4)).
+
 correctFormatType(Op,A,Type,AA):- var(A),correctType(Op,A,Type,AA),must_det(var(AA)),must_det(A==AA),!.
 correctFormatType(Op,A,Type,AA):- var(Type),trace_or_throw(correctFormatType(Op,A,Type,AA)).
 correctFormatType(Op,A,Type,AA):- correctType(Op,A,Type,AA),nonvar(AA),!.
@@ -366,6 +300,85 @@ correctType_gripe(Op,A,Type,NewArg):-trace_or_throw(failure(correctType(Op,A,Typ
 
 can_coerce(notta).
 
+/*
+/*
+discoverAndCorrectArgsIsa(_Prop,_N1,[],[]):-!.
+discoverAndCorrectArgsIsa(Prop,N1,[A|Args],[AA|AArgs]):-
+   %dbase:
+   argIsa_call(Prop,N1,Type),
+   must(isa_assert_g(A,Type,AA)),
+   N2 is N1+1,
+   discoverAndCorrectArgsIsa(Prop,N2,Args,AArgs).
+
+isa_assert_g(A,_,AA):-var(A),!,A=AA.
+isa_assert_g(A,Type,AA):-
+  cmust(ground(A:Type)),
+  gmust(ground(AA),
+        isa_assert(A,Type,AA)).
+  
+
+
+fisa_assert(A,integer,AA):-!,isa_assert(A,int,AA).
+fisa_assert(A,int,AA):- must(any_to_number(A,AA)).
+fisa_assert(A,number,AA):- must(any_to_number(A,AA)).
+fisa_assert(A,string,AA):- must(text_to_string(A,AA)).
+fisa_assert(A,dir,AA):- must(string_to_atom(A,AA)).
+
+
+isa_assert(A,Type,A):- once(var(A);var(Type)),!,trace,throw(failure(isa_assert(A,Type))).
+isa_assert(A,Type,AA):-fisa_assert(A,Type,AA),!.
+isa_assert(A,Type,AA):-format_complies(A,Type,AA),!.
+isa_assert(O,argIsaFn(_,_),O):-!. %any_to_value(O,V).  %missing
+isa_assert(A,type,A):-atom(A),define_type(A).
+isa_assert(A,term,A):-!. %% must(ground(A)).
+isa_assert([A|AA],list(T),LIST):-!,findall(OT,((member(O,[A|AA]),isa_assert_g(O,T,OT))),LIST).
+isa_assert(A,list(T),[OT]):-!,isa_assert_g(A,T,OT).
+isa_assert([],[],[]):-!.
+isa_assert(A,Type,A):-atom(Type),
+      dmsg(todo(isa_assert_type(Type))),
+      define_type(Type),
+      C=..[Type,A],
+      dmsg(todo(skipping(game_assert(C)))),!.
+isa_assert([H|T],[H2|T2],[H3|T3]):-!,
+   isa_assert_g(H,H2,H3),isa_assert(T,T2,T3).
+isa_assert(Args,Types,NewArgs):-compound(Args), compound(Types),
+   functor(Args,F,N),functor(Types,F,N),functor(NewArgs,F,N),
+   Args=..[F|ArgsL],
+   Types=..[F|TypesL],
+   NewArgs=..[F|NewArgsL],
+   isa_assert(ArgsL,TypesL,NewArgsL).
+isa_assert(Arg,Props,NewArg):- compound(Props),
+   Props=..[F|TypesL],
+   C=..[F,Arg|TypesL],
+   correctArgsIsa(C,CC),
+   CC=..[F,NewArg|_].
+isa_assert(A,C,A):-must(ground(A)),dmsg(todo(define(isa_assert(A,C,'ConvertedArg')))),throw(retry(_)).
+
+isa_assert(A,Type,_NewArg):-throw(failure(isa_assert(A,Type))).
+
+*/
+
+holdsFunctor(k).
+holdsFunctor(p).
+holdsFunctor(holds).
+holdsFunctor(X):-is_2nd_order_holds(X).
+
+
+correctArgsIsa(A,AA):-
+   functor(A,_,1),!,
+   must(any_to_value(A,AA)),
+   cmust(ground(AA)).
+
+correctArgsIsa(M:A,M:AA):-!,correctArgsIsa(A,AA).
+correctArgsIsa(A,AA):-A =..[KP,Prop|Args],atom(Prop),holdsFunctor(KP),!,
+   discoverAndCorrectArgsIsa(Prop,1,Args,AArgs),
+   AA =..[Prop|AArgs].
+
+correctArgsIsa(A,AA):-A =..[Prop|Args],
+   discoverAndCorrectArgsIsa(Prop,1,Args,AArgs),
+   AA =..[Prop|AArgs].
+
+*/
 :- style_check(+singleton).
 
 correctType(Op,A,Type,AA):- var(Type),trace_or_throw(correctType(Op,A,Type,AA)).
@@ -431,7 +444,7 @@ correctType(Op,Arg,Props,NewArg):- compound(Props),
    correctArgsIsa(Op,C,CC),
    CC=..[F,NewArg|_].
 
-correctType(_O,A,Type,AA):-not(formattype(Type)),is_type(Type),get_isa_backchaing(A,Type),!,must_equals(A,AA).
+correctType(_O,A,Type,AA):-not(formattype(Type)),is_type(Type),mud_isa(A,Type),!,must_equals(A,AA).
 
 
 
@@ -442,22 +455,19 @@ must_equals(A,AA):-must_det(A=AA).
   
 :- style_check(+singleton).
 
-
+:-export(any_to_value/2).
 any_to_value(V,Term):-atom(V),!,atom_to_value(V,Term).
 any_to_value(A,V):-any_to_number(A,V).
 any_to_value(A,A).
 
 
+:-export(any_to_number/2).
 any_to_number(N,N):- number(N),!.
 any_to_number(dice(A,B,C),N):- ground(A),roll_dice(A,B,C,N),!.
 any_to_number(A,N):-atom(A),atom_to_value(A,V),A\=V,any_to_number(V,N).
 any_to_number(A,N):- catch(number_string(N,A),_,fail).
 
-
-roll_dice(Rolls,_,Bonus,Result):- Rolls < 0, !, Result is Bonus.
-roll_dice(Rolls,Sided,Bonus,Result):- LessRolls is Rolls-1, roll_dice(LessRolls,Sided, Bonus + random(Sided) +1, Result).
-
-
+:-export(atom_to_value/2).
 atom_to_value(V,Term):-not(atom(V)),!,any_to_value(V,Term).
 % 56
 atom_to_value(V,Term):- catch((read_term_from_atom(V,Term,[variable_names([])])),_,fail),!.
@@ -473,59 +483,18 @@ any_to_dir(S,D):-string(S),string_to_atom(S,A),any_to_dir(A,D),!.
 any_to_dir(D,O):-atom(D),sub_atom(D, 0, 1, _, S),toLowercase(S,L),p2c_dir2(L,O),!.
 
 
-detWithSpace(WithSpace,String):-ddeterminer0(String),atom_concat(String,' ',WithSpace).
-detWithSpace(WithSpace,String):-ddeterminer1(String),atom_concat(String,' ',WithSpace).
-determinerRemoved(S0,Det,S):- nonvar(S0),detWithSpace(WithSpace,String),string_concat(WithSpace,S,S0),string_lower(String,Det).
 
-assert_description(description(A,S0)):-assert_description(A,S0).
-
-assert_description(A,S0):-nonvar(S0),string_concat('#$PunchingSomething ',S,S0),!,assert_description(A,S).
-
-assert_description(A,S0):-determinerRemoved(S0,String,S),!,assert_description(A,S),add(determinerString(A,String)).
-assert_description(A,S0):-
-   string_to_atom(S0,S),
-   atomic_list_concat(Words,' ',S),
-   atomic_list_concat(Sents,'.',S),!,
-   length(Words,Ws),
-   must(assert_description(A,S,S0,Ws,Sents,Words)).
-% "NOBACKSTAB","ACT_STAY_ZONE","MEMORY"
-assert_description(A,S,_S0,Ws,_Sents,_Words):- Ws<3,  
-   atomic_list_concat([K,V],': ',S),!,add_description_kv(A,K,V).
-assert_description(A,S,_S0,Ws,_Sents,_Words):- Ws<3,
-   atomic_list_concat([K,V],'=',S),!,add_description_kv(A,K,V).
-%#$PunchingSomething mudBareHandDamage: 10d10+75
-
-assert_description(A,_S,_S0,1,_,[Word]):-add_description_word(A,Word).
-
-assert_description(A,S,S0,Ws,Sents,['#$PunchingSomething',B|C]):-assert_description(A,S,S0,Ws,Sents,[B|C]).
-assert_description(A,S,S0,Ws,Sents,[Det,B|C]):-ddeterminer(Det,L),assert_description(A,S,S0,Ws,Sents,[B|C]),add(determinerString(A,L)).
-assert_description(A,S,S0,Ws,_Sents,_Words):-Ws>3,is_here_String(S),!,show_call(add(descriptionHere(A,S0))).
-assert_description(A,_S,S0,_Ws,_Sents,_Words):-show_call(add(comment(A,S0))).
-
-is_here_String(S):- atomic_list_concat_safe([_,is,_,here,_],S).
-is_here_String(S):- atomic_list_concat_safe([_,here],S).
-is_here_String(S):- atomic_list_concat_safe([_,is,here,_],S).
+roll_dice(Rolls,_,Bonus,Result):- Rolls < 0, !, Result is Bonus.
+roll_dice(Rolls,Sided,Bonus,Result):- LessRolls is Rolls-1, roll_dice(LessRolls,Sided, Bonus + random(Sided) +1, Result).
 
 
-ddeterminer1('A').
-ddeterminer1('An').
-ddeterminer1('The').
-ddeterminer0(a).
-ddeterminer0(an).
-ddeterminer0(the).
-ddeterminer(L,L):-ddeterminer0(L).
-ddeterminer(U,L):-string_lower(U,L),U\=L,!,ddeterminer0(L).
+p2c_dir2('s','South-Directly').
+p2c_dir2('w','West-Directly').
+p2c_dir2('u','Up-Directly').
+p2c_dir2('d','Down-Directly').
+p2c_dir2('e','East-Directly').
+p2c_dir2('n','North-Directly').
 
-add_description_word(A,Word):- string_upper(Word,Word),string_lower(Word,Flag),string_to_atom(Flag,Atom),show_call(add(isa(A,Atom))).
-add_description_word(A,Word):- string_lower(Word,Word),show_call(add(keyword(A,Word))).
-add_description_word(A,Word):- string_lower(Word,Lower),show_call(add(keyword(A,Lower))).
-
-
-add_description_kv(A,K,V):- atom_concat('#$PunchingSomething ',Key,K),!,add_description_kv(A,Key,V).
-add_description_kv(A,K,V):- atom_concat('+',Key,K),!,add_description_kv(A,Key,V).
-add_description_kv(A,K,V):-atom_to_value(V,Term),C=..[K,A,Term],
-   learnArgIsaInst(K,2,V),
-   decl_mpred(K,2),show_call(add(C)).
 
 learnArgIsa(P,N,_):-argIsa_asserted(P,N,_),!.
 learnArgIsa(P,N,T):-dmsg((skipping(learnArgIsa(P,N,T)))),!.
@@ -534,7 +503,6 @@ learnArgIsa(P,N,T):-grtrace, add(argIsa(P,N,T)).
 learnArgIsaInst(K,Num,Arg):-integer(Arg),!,learnArgIsa(K,Num,int).
 learnArgIsaInst(K,Num,Arg):-number(Arg),!,learnArgIsa(K,Num,number).
 learnArgIsaInst(_,_,_).
-
 
 
 :- include(logicmoo('vworld/moo_footer.pl')).

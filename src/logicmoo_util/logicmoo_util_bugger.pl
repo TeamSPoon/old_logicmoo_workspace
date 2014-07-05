@@ -985,7 +985,7 @@ dmsg1(warn(V)):- print_message(warning,V).
 dmsg1(skip_dmsg(_)):-!.
 dmsg1(C):-functor(C,Topic,_),debugging(Topic,_True_or_False),!,logger_property(Topic,once,true),!,
       (dmsg_log(Topic,_Time,C) -> true ; ((get_time(Time),asserta(dmsg_log(todo,Time,C)),!,dmsg2(C)))).
-dmsg1(C):-((copy_term(C,Stuff), randomVars(Stuff),!,dmsg2(Stuff))).
+dmsg1(C):-((copy_term(C,Stuff), snumbervars(Stuff),!,dmsg2(Stuff))).
 
 dmsg2(T):-!,
 	((

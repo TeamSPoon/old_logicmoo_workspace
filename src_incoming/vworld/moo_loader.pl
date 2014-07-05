@@ -10,7 +10,7 @@
 :- module(moo_loader, [
           finish_processing_game/0, 
           game_assert/1,
-          isa_assert/3,
+          % isa_assert/3,
           gload/0,
           correctArgsIsa/2,
           pgs/1,
@@ -52,86 +52,12 @@ savedb:-
    dbase_mod(DBM),
    tell(savedb),listing(DBM:_),told.
 
-discoverAndCorrectArgsIsa(_Prop,_N1,[],[]):-!.
-discoverAndCorrectArgsIsa(Prop,N1,[A|Args],[AA|AArgs]):-
-   %dbase:
-   argIsa_call(Prop,N1,Type),
-   must(isa_assert_g(A,Type,AA)),
-   N2 is N1+1,
-   discoverAndCorrectArgsIsa(Prop,N2,Args,AArgs).
-
-isa_assert_g(A,_,AA):-var(A),!,A=AA.
-isa_assert_g(A,Type,AA):-
-  cmust(ground(A:Type)),
-  gmust(ground(AA),
-        isa_assert(A,Type,AA)).
-  
-
-
-fisa_assert(A,integer,AA):-!,isa_assert(A,int,AA).
-fisa_assert(A,int,AA):- must(any_to_number(A,AA)).
-fisa_assert(A,number,AA):- must(any_to_number(A,AA)).
-fisa_assert(A,string,AA):- must(text_to_string(A,AA)).
-fisa_assert(A,dir,AA):- must(string_to_atom(A,AA)).
-
-
-isa_assert(A,Type,A):- once(var(A);var(Type)),!,trace,throw(failure(isa_assert(A,Type))).
-isa_assert(A,Type,AA):-fisa_assert(A,Type,AA),!.
-isa_assert(A,Type,AA):-format_complies(A,Type,AA),!.
-isa_assert(O,argIsaFn(_,_),O):-!. %any_to_value(O,V).  %missing
-isa_assert(A,type,A):-atom(A),define_type(A).
-isa_assert(A,term,A):-!. %% must(ground(A)).
-isa_assert([A|AA],list(T),LIST):-!,findall(OT,((member(O,[A|AA]),isa_assert_g(O,T,OT))),LIST).
-isa_assert(A,list(T),[OT]):-!,isa_assert_g(A,T,OT).
-isa_assert([],[],[]):-!.
-isa_assert(A,Type,A):-atom(Type),
-      dmsg(todo(isa_assert_type(Type))),
-      define_type(Type),
-      C=..[Type,A],
-      dmsg(todo(skipping(game_assert(C)))),!.
-isa_assert([H|T],[H2|T2],[H3|T3]):-!,
-   isa_assert_g(H,H2,H3),isa_assert(T,T2,T3).
-isa_assert(Args,Types,NewArgs):-compound(Args), compound(Types),
-   functor(Args,F,N),functor(Types,F,N),functor(NewArgs,F,N),
-   Args=..[F|ArgsL],
-   Types=..[F|TypesL],
-   NewArgs=..[F|NewArgsL],
-   isa_assert(ArgsL,TypesL,NewArgsL).
-isa_assert(Arg,Props,NewArg):- compound(Props),
-   Props=..[F|TypesL],
-   C=..[F,Arg|TypesL],
-   correctArgsIsa(C,CC),
-   CC=..[F,NewArg|_].
-isa_assert(A,C,A):-must(ground(A)),dmsg(todo(define(isa_assert(A,C,'ConvertedArg')))),throw(retry(_)).
-
-isa_assert(A,Type,_NewArg):-throw(failure(isa_assert(A,Type))).
-
-
-
-holdsFunctor(k).
-holdsFunctor(p).
-holdsFunctor(holds).
-
-correctArgsIsa(A,AA):-
-   functor(A,_,1),!,
-   must(any_to_value(A,AA)),
-   cmust(ground(AA)).
-
-correctArgsIsa(M:A,M:AA):-!,correctArgsIsa(A,AA).
-
-correctArgsIsa(A,AA):-A =..[KP,Prop|Args],atom(Prop),holdsFunctor(KP),!,
-   discoverAndCorrectArgsIsa(Prop,1,Args,AArgs),
-   AA =..[Prop|AArgs].
-
-correctArgsIsa(A,AA):-A =..[Prop|Args],
-   discoverAndCorrectArgsIsa(Prop,1,Args,AArgs),
-   AA =..[Prop|AArgs].
 
 game_assert((':-'(A))):-hotrace(A),!.
 
 game_assert(d(s)):-grtrace.
 
-game_assert(A):-must(once(correctArgsIsa(A,AA))),must(once(pgs(AA))),!.
+game_assert(A):-must(once(correctArgsIsa(tell(game_assert),A,AA))),must(once(pgs(AA))),!.
 
 % pgs(A):- fail, A=..[SubType,Arg], moo:createableType(SubType,Type),!,AA =.. [Type,Arg],
 %      dbadd0(AA), assert_if_new(moo:call_after_load(create_instance(Arg,SubType,[debugInfo(moo:createableType(AA,SubType,Type))]))).   

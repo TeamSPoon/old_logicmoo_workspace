@@ -169,9 +169,7 @@ correct_args_length([F|List],[F|NewList]):-
    length(List,A),
    must_det(ensure_moo_pred(F,A,NewA,_)),!,            
       set_list_len(List,NewA,NewList).
-      
-functor_check_univ(M:G1,F,List):-atom(M),member(M,[dbase]),!,functor_check_univ(G1,F,List),!.
-functor_check_univ(G1,F,List):-must_det(compound(G1)),must_det(G1 \= _:_),must_det(G1 \= _/_),G1=..[F|List],!.
+
 
 xcall_form(G1,G2):-must_det(xcall_form0(G1,G2)).
 xcall_form0(G1,G2):-

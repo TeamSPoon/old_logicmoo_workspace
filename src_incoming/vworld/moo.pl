@@ -99,7 +99,7 @@ gather_fact_heads(M,H):- (nonvar(M)->true; member(M,[dbase,moo,world,user,hook])
 
 
 hook:decl_database_hook(assert(_),Fact):-
-            ignore((compound(Fact),Fact=..[F,Arg1|PROPS],mpred_functor(F),!,            
+            ignore((compound(Fact),Fact=..[F,Arg1|PROPS],argsIsaProps(F),!,            
             decl_mpred(Arg1,[F|PROPS]))).
 
 
@@ -107,8 +107,6 @@ hook:decl_database_hook(assert(_),Fact):-
 % ========================================
 % mpred_props database
 % ========================================
-
-mpred_functor(F):-member(F,[multiValued,negationByFailure,listValued,argsIsa,singleValued]).
 
 :-export(argsIsaProps/1).
 argsIsaProps(Prop):- arg(_,v(argsIsa,multiValued,singleValued,negationByFailure,formatted,mpred,listValued),Prop).
@@ -136,7 +134,6 @@ body_req(F,A,HEAD):-mpred_prop(F,default(V)),arg(A,HEAD,V).
 user_export(_):- dbase_mod(user),!.
 user_export(Prop/Arity):- 
    dbase_mod(M), '@'( M:export(Prop/Arity) , M).
-
 
 % ============================================
 % Prolog to Cyc Predicate Mapping
@@ -171,21 +168,41 @@ decl_mpred(F,arity(A)):-assert_if_new(mpred_arity(F,A)),!.
 decl_mpred(F,external(Module)):- not(dbase_mod(Module)),mpred_arity(F,A),functor(HEAD,F,A),must(predicate_property(Module:HEAD,_)),!.
 decl_mpred(F,interArgIsa):- not((mpred_prop(F,external(Module)),not(dbase_mod(Module)))),declare_dbase_local(F),!.
 decl_mpred(_,_).
+
+      
+functor_check_univ(M:G1,F,List):-atom(M),member(M,[dbase]),!,functor_check_univ(G1,F,List),!.
+functor_check_univ(G1,F,List):-must_det(compound(G1)),must_det(G1 \= _:_),must_det(G1 \= _/_),G1=..[F|List],!.
+
+:-export(glean_pred_props_maybe/1).
+glean_pred_props_maybe(_:G):-!,compound(G),glean_pred_props_maybe(G).
+glean_pred_props_maybe(G):-compound(G),functor(G,F,_),argsIsaProps(F),G=..[F,Arg1|RGS],!,add_mpred_prop_gleaned(Arg1,[F|RGS]),!.
+
+add_mpred_prop_gleaned(Arg1,FRGS):-functor_check_univ(Arg1,F,ARGSISA),add_mpred_prop_gleaned_4(Arg1,F,ARGSISA,FRGS).
+add_mpred_prop_gleaned_4(Arg1,_F,[ARG|_],FRGS):-nonvar(ARG),!,decl_mpred(Arg1,[argsIsa(Arg1)|FRGS]).
+add_mpred_prop_gleaned_4(Arg1,_F,_,FRGS):-add_mpred_prop(Arg1,FRGS).
+
+user:term_expansion(G,_):- notrace((once(glean_pred_props_maybe(G)),fail)).
+
 % ========================================
 % is_holds_true/is_holds_false
 % ========================================
 
+:-export(hilog_functor/1).
 hilog_functor(dbase_t).
 
+:-export(is_holds_true_not_hilog/1).
 is_holds_true_not_hilog(HOLDS):-is_holds_true(HOLDS),\+ hilog_functor(HOLDS).
 
+:-export(is_holds_true/1).
 is_holds_true(Prop):- notrace((atom(Prop),is_holds_true0(Prop))),!.
 
 % k,p,..
 is_holds_true0(Prop):-arg(_,vvv(holds,holds_t,dbase_t,asserted_dbase_t,assertion_t,assertion,secondOrder,firstOrder),Prop).
 
+:-export(is_2nd_order_holds/1).
 is_2nd_order_holds(Prop):- is_holds_true(Prop) ; is_holds_false(Prop).
 
+:-export(is_holds_false/1).
 % is_holds_false(Prop):-notrace((atom(Prop),once((is_holds_false0(Prop,Stem),is_holds_true0(Stem))))).
 is_holds_false(Prop):-member(Prop,[not,nholds,holds_f,dbase_f,aint,assertion_f,asserted_dbase_f,retraction,not_secondOrder,not_firstOrder]).
 
