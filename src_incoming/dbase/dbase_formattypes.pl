@@ -147,7 +147,7 @@ argIsa_call_1(Prop,N1,Type):- dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),
    Type=argIsaFn(Prop,N1).
 
 
-
+:-export(db_quf/4).
 db_quf(Op,M:C,Pretest,Template):-var(C),!,throw(var(db_quf(Op,M:C,Pretest,Template))).
 db_quf(Op,_:C,Pretest,Template):-nonvar(C),!,db_quf(Op,C,Pretest,Template).
 db_quf(Op,','(C,D),','(C2,D2),','(C3,D3)):-!,db_quf(Op,C,C2,C3),db_quf(Op,D,D2,D3).
@@ -160,7 +160,7 @@ db_quf(Op,C,Pretest,Template):- C=..[Prop,OBJ|ARGS],
 
 translate_args(_O,_Prop,_A,_OBJ,_N,[],[],GIN,GIN).
 translate_args(Op,Prop,A,OBJ,N1,[ARG|S],[NEW|ARGS],GIN,GOALS):-
-   argIsa_call(Op,Prop/A,N1,Type),
+   must(argIsa_call(Op,Prop,N1,Type)),
    translateOneArg(Op,Prop,OBJ,Type,ARG,NEW,GIN,GMID),
    N2 is N1 +1,
    translate_args(Op,Prop,A,OBJ,N2,S,ARGS,GMID,GOALS).
@@ -219,11 +219,12 @@ translateListOps(Op,Prop,Obj,Type,VAL,[L|LIST],G,GO2):-
    translateOneArg(Op,Prop,Obj,Type,L,VAL,G,GO),
    translateListOps(Op,Prop,Obj,Type,VAL,LIST,GO,GO2).
 
-compare_op(Type,F,OLD,VAL):-nop(Type),call((dtrace,call(F,OLD,VAL))),!.
+compare_op(Type,F,OLD,VAL):-nop(Type),show_call((call(F,OLD,VAL))),!.
 
 % start of database
 % These will all be deleted at start of run
 
+:-export(inverse_args/2).
 inverse_args([AR,GS],[GS,AR]):-!.
 inverse_args([AR,G,S],[S,G,AR]):-!.
 inverse_args([A,R,G,S],[S,R,G,A]):-!.

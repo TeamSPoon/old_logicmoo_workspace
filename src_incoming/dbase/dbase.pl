@@ -12,6 +12,7 @@
 % Douglas Miles
 */
 
+:- '@'(use_module(logicmoo(vworld/moo)),'user').
 :- '@'(use_module(dbase_formattypes),'user').
 
 :- export((
@@ -32,6 +33,14 @@
  memory/2, padd/2, padd/3, pathName/3, possess/2, prop/3, prop_or/4, props/2, region/1, req/1, scan_mpred_prop/0, score/2, stm/2, term_listing/1, facing/2,
  thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, nameStrings/2, description/2, pathBetween/3, act_turn/2.
 
+:- dbase_mod(M),dynamic_multifile_exported((
+          M:dbase_t/1,
+          M:dbase_t/2,
+          M:dbase_t/3,
+          M:dbase_t/4,
+          M:dbase_t/5,
+          M:dbase_t/6,
+          M:dbase_t/7)).
 
 :-dynamic(weight/2).
 :-dynamic(movedist/2).
@@ -132,7 +141,7 @@ with_kb_assertions(With,Call):-
 
 
 
-world_clear(Named):-fmt('Clearing world database: ~q.',[Named]).
+world_clear(Named):-fmt('Clearing world database: ~q.~n',[Named]).
 
 pred_as_is(F,_):-mpred_prop(F,flag),!.
 pred_as_is(F,_):-mpred_prop(F,external(_)),!.

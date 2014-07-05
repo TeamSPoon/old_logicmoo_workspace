@@ -1032,9 +1032,10 @@ dmsg(_,F):-F==[-1];F==[[-1]].
 
 :- export(show_call/1).
 show_call(M:add(A)):-!, show_call0(M:add(A)),!.
+% show_call(M:must(C)):- !, M:must(C).
 show_call(C):-one_must((show_call0(C),dmsg(succeed(C))),dmsg(failed_show_call(C))).
 
-show_call0(C):-debugOnError0(C). % dmsg(show_call(C)),C.      
+show_call0(C):-C. % debugOnError0(C). % dmsg(show_call(C)),C.      
 
 
 :-dynamic(user:logLevel/2).
@@ -1370,21 +1371,24 @@ grtrace(Trace):- notrace(( visible(+all),leash(+all))), Trace.
 
 show_and_do(C):-dmsg(C),!,C.
 dtrace(C):-dtrace,C.
-dtrace:-tracing,!,visible(+all),leash(+all).
+dtrace:-tracing,!,leash(+all),visible(+all),trace.
 dtrace:-has_auto_trace(C),!,C.
 dtrace:-repeat,dumptrace,!.
+
 dumptrace:-tracing,!.
 dumptrace:-fmt(in_dumptrace),get_single_char(C),dumptrace(C).
 dumptrace(0'g):-notrace(dumpST),!,fail.
 dumptrace(_):-notrace(dumpST(10)),fail.
 dumptrace(0'l):-show_and_do(ggtrace(true)).
+dumptrace(0'b):-prolog,!,fail.
+dumptrace(0't):-trace,!.
 dumptrace(0't):-show_and_do(grtrace(trace)).
 dumptrace(0'f):-show_and_do(gftrace(true)).
 dumptrace(10):-dumptrace_ret,!.
 dumptrace(13):-dumptrace_ret,!.
 dumptrace(C):-dmsg(unused_keypress(C)),!,fail.
 
-dumptrace_ret:-trace.
+dumptrace_ret:-leash(+call),trace.
 
 restore_trace(Goal):-  tracing,notrace,!,'$leash'(Old, Old),'$visible'(OldV, OldV),call_cleanup(Goal,(('$leash'(_, Old),'$visible'(_, OldV),trace),trace)).
 restore_trace(Goal):-  '$leash'(Old, Old),'$visible'(OldV, OldV),call_cleanup(Goal,((notrace,'$leash'(_, Old),'$visible'(_, OldV)))).

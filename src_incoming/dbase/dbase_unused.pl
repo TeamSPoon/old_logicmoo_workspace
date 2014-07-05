@@ -1009,6 +1009,9 @@ db_rewrite(_Op,Term,NewTerm):-forwardRule_call(Term,NewTerm).
 %% hook:dmsg_hook(db_op(query(HLDS,call),dbase:holds_t(ft_info,type,'$VAR'(_)))):-dtrace.
 
 call_must(query,Call):- !,call(Call).
+call_must(query(Must,_),Call):- !,call_must(Must,Call).
+call_must(tell(Must),Call):- !,call_must(Must,Call).
+call_must(ask(Must),Call):- !,call_must(Must,Call).
 call_must(must,Call):- !,must(Call).
 % call_must(Must,Call):- var(Must),!,Call.
 call_must(once,Call):- !,once(Call).
@@ -1714,7 +1717,7 @@ dbase_t(inRegion, A, C) :-
 dbase_t(inRegion, A, B) :-
         is_asserted(inRegion(A, B)).
 dbase_t(subclass, A, formattype) :-
-        world:isa_mc(A, formattype).
+        world:isa(A, formattype).
 dbase_t(createableSubclassType, B, A) :-
     world:
     (   dbase:holds_t(createableType, A),

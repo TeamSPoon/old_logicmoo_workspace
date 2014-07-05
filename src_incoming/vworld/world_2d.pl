@@ -55,7 +55,7 @@ room_center(Room,X,Y,Z):-
 
 
 locationToRegion(xyz(Room,_,_,_),Region2):-nonvar(Room),!,locationToRegion(Room,Region2).
-locationToRegion(Obj,Obj):-nonvar(Obj),mud_isa(Obj,region),!. % inRegion(Obj,Room).
+locationToRegion(Obj,Obj):-nonvar(Obj),isa(Obj,region),!. % inRegion(Obj,Room).
 
 loc_to_xy(LOC,X,Y,xyz(Room,X,Y,1)):- locationToRegion(LOC,Room),!.
 loc_to_xy(Room,X,Y,xyz(Room,X,Y,1)).
@@ -65,7 +65,7 @@ is_3d(LOC):- compound(LOC).
 % Quintus random(1,MaxX,X) and random(1,MaxY,Y)
 grid_size(Room,MaxX,MaxY,MaxZ):- fail,
     tbox:type_grid(What,1,L),
-   mud_isa(Room,What),!,
+   isa(Room,What),!,
    maxZ(MaxZ),
 	length(L,MaxX),
 	findall(1, tbox:type_grid(What,_,_),LL),
@@ -91,11 +91,11 @@ in_grid_rnd(LocName,xyz(LocName,1,1,1)).
 
 
 init_location_grid(LocName):-
-        mud_isa(LocName,LocType),
+        isa(LocName,LocType),
         init_location_grid(LocName,LocType),!.
 
 init_location_grid(LocName,LocType):-
-        mud_isa(LocName,LocType),
+        isa(LocName,LocType),
         init2(LocName,LocType,1,1).
 
 % process map file (world.map.pl)
@@ -138,14 +138,14 @@ moo:default_type_props(OfAgent,agent,[facing(F),atloc(L)]):-create_someval(facin
 
 put_in_world(Agent):-ensure_some(facing,Agent),!,ensure_some(atloc,Agent),!.
 
-ensure_some(Property,OfAgent):- prop(OfAgent, Property,_),!.
+ensure_some(Property,OfAgent):- prop_or(OfAgent, Property,Value,failed),Value \= failed,!.
 ensure_some(Property,OfAgent):- create_someval(Property,OfAgent,Value),!,padd(OfAgent,Property,Value).
 
 create_someval(facing,_Agent,Dir) :- my_random_member(Dir,[n,s,e,w,ne,nw,se,sw]).
 create_someval(atloc,Agent,Where) :- 
-   defaultRegion(Agent,Region),
-   in_grid(Region,Where),
-   unoccupied(Where),!.
+   must(defaultRegion(Agent,Region)),
+   must(in_grid(Region,Where)),
+   must(unoccupied(Where)),!.
 
 %create_someval(atloc,_Agent,Loc) :- must((create_random(xyz/3,Loc,unoccupied(Loc)))).
 create_someval(Pred,_Arg1,Value) :- must((moo:mpred_arity(Pred,Last),argIsa_call(Pred,Last,Type),create_random(Type,Value,nonvar(Value)))).
@@ -155,14 +155,13 @@ create_random(XYZ,Value,Test):- atom(XYZ),atom_concat('random_',XYZ,Pred),Call=.
 create_random(XYZ,Value,Test):- findall(V,req(isa(V,XYZ)),Possibles),randomize_list(Possibles,Randomized),!,member(Value,Randomized),Test,!.
 create_random(XYZ,Value,Test):- trace_or_throw(failed(create_random(XYZ,Value,Test))).
 
-isa(X,Y):-loop_check(req(isa(X,Y)),is_asserted(isa(X,Y))).
 
 actualRegion(Agent,Region):- req(atloc(Agent,LOC)),locationToRegion(LOC,Region),!.
 actualRegion(Agent,Region):- req(inRegion(Agent,Region)),!.
 
 defaultRegion(Agent,Region):- actualRegion(Agent,Region),!.
 defaultRegion(_Agent,Region):- actualRegion(_,Region),!.
-defaultRegion(_Agent,Region):- create_random(region,Region,true).
+defaultRegion(_Agent,Region):- must(create_random(region,Region,true)).
 defaultRegion(_Agent,Region):- Region = 'Area1000'.
 
 
@@ -193,9 +192,9 @@ calc_xyz(Region1,Dir,force(X1,Y1,Z1),X2,Y2,Z2):-
 move_dir_target(RegionXYZ,Dir,XXYY):-
    move_dir_target(RegionXYZ,Dir,1,XXYY).
 move_dir_target(RegionXYZ,Dir,Force,XXYY):-
-   hotrace(calc_xyz(RegionXYZ,Dir,force(Force,Force,Force),X,Y,Z)),
-   hotrace(locationToRegion(RegionXYZ,Region1)),
-   hotrace(round_loc_target(Region1,X,Y,Z,Region2,X2,Y2,Z2)),
+   (calc_xyz(RegionXYZ,Dir,force(Force,Force,Force),X,Y,Z)),
+   (locationToRegion(RegionXYZ,Region1)),
+   (round_loc_target(Region1,X,Y,Z,Region2,X2,Y2,Z2)),
    XXYY = xyz(Region2,X2,Y2,Z2),!,
    must(ground(XXYY)),
    check_ahead_for_ground(XXYY).
@@ -366,7 +365,7 @@ list_object_dir_near(List,Type,Dir) :-
 
 scan_lists_aux([Loc|_],Type,N,N) :-
 	member(Obj,Loc),
-        mud_isa(Obj,Type),
+        isa(Obj,Type),
 	!.
 scan_lists_aux([_|Rest],Type,M,N) :-
 	Mtemp is M + 1,

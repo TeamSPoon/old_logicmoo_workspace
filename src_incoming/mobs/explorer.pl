@@ -29,7 +29,7 @@ moo:label_type_props(explorer(_),explorer,[]).
 
 moo:world_agent_plan(_World,Agent,ActV):-
    agent(Agent),
-  % mud_isa(Agent,explorer),
+  % isa(Agent,explorer),
    explorer_idea(Agent,Act),
    vette_idea(Agent,Act,ActV).
 
@@ -39,14 +39,14 @@ explorer_idea(Agent,eat(Elixer)) :-
 	Damage < 15,
    inventory(Agent,List),
    obj_memb(Elixer,List),
-   mud_isa(Elixer,elixer).
+   isa(Elixer,elixer).
 
 explorer_idea(Agent,eat(food)) :-
 	charge(Agent,Charge),
 	Charge < 150,
    inventory(Agent,List),
    obj_memb(Food,List),
-   mud_isa(Food,food).
+   isa(Food,food).
 
 explorer_idea(Agent,take(Good)) :-
 	get_feet(Agent,What),

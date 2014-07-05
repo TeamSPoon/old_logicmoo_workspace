@@ -32,7 +32,7 @@ moo:agent_call_command(Agent,SENT) :-
     SENT=..[USE,Obj],
 	possess(Agent,Obj),
         prop(Agent,STOWED,Obj),
-	mud_isa(Obj,USABLE),
+	isa(Obj,USABLE),
 	props(Obj, weight =< 1),
 	worth(Agent,USE,Obj),
 	do_permanence(USE,Agent,Obj),

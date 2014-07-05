@@ -153,7 +153,7 @@ write_pretty_aux([[Head]|Tail], Return, Column) :-
 	write_pretty_aux(Tail, Return, Ctemp).
 write_pretty_aux([[Agent]|Tail],Return,Column) :-
 	Ctemp is Column + 1,
-	mud_isa(Agent,agent),
+	isa(Agent,agent),
 	write('Ag'), write(' '),
 	write_pretty_aux(Tail,Return,Ctemp).
 write_pretty_aux([[_|_]|Tail],Return,Column) :-
@@ -240,7 +240,7 @@ show_room_grid(Room,Y,X,N) :-
 show_room_grid(Room,Y,X,N) :-
       loc_to_xy(Room,X,Y,LOC),
 	atloc(Agent,LOC),
-	mud_isa(Agent,agent),
+	isa(Agent,agent),
 	write('Ag'), write(' '),
 	XX is X + 1,
 	!,

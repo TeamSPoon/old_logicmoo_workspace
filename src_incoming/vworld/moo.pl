@@ -153,12 +153,19 @@ user_export(Prop/Arity):-
 %
 % ============================================
 
-:- export((decl_mpred/2)).
-
+:-dynamic_multifile_exported((loading_module_h/1, loading_game_file/2, loaded_game_file/2)).
 not_loading_game_file:-not(loading_game_file(_,_)),loaded_game_file(_,_).
 
-:-dynamic loading_module_h/1, loading_game_file/2, loaded_game_file/2.
 
+:- dynamic_multifile_exported((decl_mpred/1)).
+decl_mpred([]):-!.
+decl_mpred(M:F):-atom(M),!,'@'(decl_mpred(F),M).
+decl_mpred([H|T]):-!,decl_mpred(H),decl_mpred(T).
+decl_mpred((H,T)):-!,decl_mpred(H),decl_mpred(T).
+decl_mpred(F/A):-!,decl_mpred(F,A).
+decl_mpred(C):-decl_mpred(C,[]).
+
+:-dynamic_multifile_exported(decl_mpred/2).
 decl_mpred(C,More):-compound(C),!,functor(C,F,A),decl_mpred(F,arity(A)),decl_mpred(F,More),!,decl_mpred(F,argsIsa(C)),!.
 decl_mpred(F,A):-number(A),!,decl_mpred(F,arity(A)),!.
 decl_mpred(_,[]):-!.
@@ -186,6 +193,16 @@ user:term_expansion(G,_):- notrace((once(glean_pred_props_maybe(G)),fail)).
 % ========================================
 % is_holds_true/is_holds_false
 % ========================================
+
+
+:- dbase_mod(M),dynamic_multifile_exported((
+          M:dbase_t/1,
+          M:dbase_t/2,
+          M:dbase_t/3,
+          M:dbase_t/4,
+          M:dbase_t/5,
+          M:dbase_t/6,
+          M:dbase_t/7)).
 
 :-export(hilog_functor/1).
 hilog_functor(dbase_t).

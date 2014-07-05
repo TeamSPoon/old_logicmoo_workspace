@@ -172,7 +172,7 @@ object_string_list1(Agent,O,DescSpecs,String):-
    list_to_set(StringI,String).
 
 save_ol_e(OS,E):-string(E),!,to_word_list(E,WL),save_ol_list(OS,WL),!.
-save_ol_e(OS,mud_isa(A)):-!,save_ol_e(OS,A).
+save_ol_e(OS,isa(A)):-!,save_ol_e(OS,A).
 save_ol_e(OS,E):-is_list(E),!,save_ol_list(OS,E).
 save_ol_e(OS,E):-append([E],_,AE),!,append(_,AE,OS),!.
 
@@ -191,7 +191,7 @@ object_string_list2(Agent,O,DescSpecs,String):-
 
 save_fmt_e(OS,E):-string(E),!,to_word_list(E,WL),save_fmt_list(OS,WL),!.
 save_fmt_e(OS,E):-is_list(E),!,save_fmt_list(OS,E).
-save_fmt_e(OS,mud_isa(A)):-!,save_fmt_e(OS,A).
+save_fmt_e(OS,isa(A)):-!,save_fmt_e(OS,A).
 save_fmt_e(OS,E):-retractall(object_string_used(OS,E)),assert(object_string_used(OS,E)).
 
 save_fmt(OS,' ~w ',[A]):-!,save_fmt_e(OS,A),!.
@@ -207,9 +207,9 @@ object_print_details(Print,Agent,O,DescSpecs,Skipped):-
    call(Print,' ~w ',[O]),
    forall((req(keyword(O,KW)),meets_desc_spec(KW,DescSpecs)),call(Print,' ~w ',[KW])),
    forall((req(nameStrings(O,KW))/*,meets_desc_spec(KW,DescSpecs)*/),call(Print,' ~w ',[KW])),
-   (mud_isa(O,type);forall((mud_isa(O,S), meets_desc_spec(mud_isa(O,S),DescSpecs)),call(Print,' ~w ',[mud_isa(S)]))),
+   (isa(O,type);forall((isa(O,S), meets_desc_spec(isa(O,S),DescSpecs)),call(Print,' ~w ',[isa(S)]))),
    ignore((order_descriptions(O,DescSpecs,List),forall_member(M,List,call(Print,' ~w ',[M])))),
-   forall(mud_isa(O,S),object_print_details(Print,Agent,S,DescSpecs,[O|Skipped])) )).
+   forall(isa(O,S),object_print_details(Print,Agent,S,DescSpecs,[O|Skipped])) )).
 
 
 
@@ -452,7 +452,7 @@ specifiedItemType(A,T,AA):- checkAnyType(tell(parse),A,T,AAA),AA=AAA.
 checkAnyType(_Op,A,Type,AA):- var(A),isa_assert(A,Type,AA),must_det(var(AA)),must_det(A==AA),!.
 checkAnyType(_Op,A,Type,AA):- isa_assert(A,Type,AA),nonvar(AA),!.
 
-instances_of_type(Inst,Type):- setof(Inst-Type,mud_isa(Inst,Type),Set),member(Inst-Type,Set).
+instances_of_type(Inst,Type):- setof(Inst-Type,isa(Inst,Type),Set),member(Inst-Type,Set).
 % instances_of_type(Inst,Type):- atom(Type), Term =..[Type,Inst], logOnError(req(Term)).
 % longest_string(?Order, @Term1, @Term2)
 longest_string(Order,TStr1,TStr2):-

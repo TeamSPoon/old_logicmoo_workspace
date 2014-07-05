@@ -23,7 +23,7 @@ moo:agent_text_command(Agent,[Say|What],Agent,CMD):-
 % ask joe about some text
 chat_to_callcmd(Agent,ask,What,CMD):-append([Whom,about],About,What),!,chat_command_parse_2(Agent,ask,Whom,About,CMD).
 % ask joe some text
-chat_to_callcmd(Agent,ask,What,CMD):-append([Whom],About,What),mud_isa(Whom,agent),!,chat_command_parse_2(Agent,ask,Whom,About,CMD).
+chat_to_callcmd(Agent,ask,What,CMD):-append([Whom],About,What),isa(Whom,agent),!,chat_command_parse_2(Agent,ask,Whom,About,CMD).
 % say to joe some text 
 chat_to_callcmd(Agent,Say,What,CMD):-append([to,Whom],Text,What),!,chat_command_parse_2(Agent,Say,Whom,Text,CMD).
 % say some text to joe

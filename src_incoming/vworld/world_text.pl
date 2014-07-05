@@ -279,7 +279,7 @@ local_term_anglify(fN(Obj,T),String):- anglify_noun_known(Obj,T,String),!.
 
 moo:term_anglify_np(Obj,Hint,String):-local_term_anglify_np(Obj,Hint,String).
 
-local_term_anglify_np(Obj,String):-mud_isa(Obj,Isa),local_term_anglify_np(Obj,Isa,String),!.
+local_term_anglify_np(Obj,String):-isa(Obj,Isa),local_term_anglify_np(Obj,Isa,String),!.
 local_term_anglify_np(Obj,String):-local_term_anglify_np(Obj,term,String).
 
 % specific noun searching

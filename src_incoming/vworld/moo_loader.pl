@@ -36,10 +36,12 @@ load_game(File):-absolute_file_name(File,Path),see(Path),
 finish_processing_game:- in_finish_processing_game,!.
 finish_processing_game:- assert(in_finish_processing_game),fail.
 finish_processing_game:- ignore(scan_mpred_prop),fail.
+finish_processing_game:- dmsg(begin_finish_processing_game),fail.
 finish_processing_game:- retract(moo:call_after_load(A)),once(must(A)),fail.
 finish_processing_game:- ignore(scan_mpred_prop),fail.
 finish_processing_game:- retract(moo:call_after_load(A)),once(must(A)),fail.
 finish_processing_game:- rescan_dbase_t,fail.
+finish_processing_game:- dmsg(end_finish_processing_game),fail.
 finish_processing_game:- savedb,fail.
 finish_processing_game:- retract(in_finish_processing_game).
 finish_processing_game.
@@ -73,9 +75,9 @@ pgs(nameStrings(A,S0)):- determinerRemoved(S0,String,S),!,game_assert(nameString
 
 % skip formatter types
 pgs(A):- A=..[SubType,_],member(SubType,[string,action,dir]),!.
-pgs(C):- C=..[SubType,Arg],isa_mc(FT,formattype),functor(FT,SubType,A),(A==0->true;functor(Arg,_,A)),!.
+pgs(C):- C=..[SubType,Arg],isa(FT,formattype),functor(FT,SubType,A),(A==0->true;functor(Arg,_,A)),!.
 
-pgs(A):- A=..[SubType,Arg], member(SubType,[agent,item, type, region]),!,
+pgs(A):- A=..[SubType,Arg], moo:createableType(SubType),!,
       dbadd0(A),
       assert_if_new(moo:call_after_load(create_instance(Arg,SubType,[]))).   
 

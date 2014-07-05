@@ -142,8 +142,8 @@ equivRule(multiValued(CallSig,[assert_with_pred(hooked_asserta),query_with_pred(
 
 
 moo:ask_module(nearby(object,object),world).
-%  moo:ask_module(mud_isa(object,type),world).
-% db_prop_prolog(world,mud_isa(object,type)).
+%  moo:ask_module(isa(object,type),world).
+% db_prop_prolog(world,isa(object,type)).
 % db_prop_prolog(world,same(id,id)).
 
 

@@ -36,7 +36,6 @@
             round_loc_target/8,
             dir_offset/5,
             number_to_dir/3,
-            isa_mc/2,
             list_agents/1,
             agent_list/1,
             check_for_fall/3,
@@ -115,7 +114,7 @@ is_type0(agent).
 */
 
 isaOrSame(A,B):-A==B,!.
-isaOrSame(A,B):-mud_isa(A,B).
+isaOrSame(A,B):-isa(A,B).
 
 intersect(A,EF,B,LF,Tests,Results):-findall( A-B, ((member(A,EF),member(B,LF),once(Tests))), Results),[A-B|_]=Results.
 % is_property(P,_A),PROP=..[P|ARGS],CALL=..[P,Obj|ARGS],req(CALL).
@@ -135,28 +134,26 @@ metaclass(itemtype).
 metaclass(formattype).
 
 
-isa_mc(region,regiontype).
-isa_mc(agent,agenttype).
-isa_mc(item,itemtype).
+moo:isa(X,Y):-loop_check(mud_isa(X,Y),moo:is_asserted(isa(X,Y))).
+moo:isa(region,regiontype).
+moo:isa(agent,agenttype).
+moo:isa(item,itemtype).
 
-isa_mc(FT,formattype):-moo:ft_info(FT,_).
-
-moo:subclass(SubType,formattype):-isa_mc(SubType,formattype).
+%moo:subclass(SubType,formattype):-isa(SubType,formattype).
 
 not_mud_isa(agent,formattype).
 cached(G):-catch(G,_,fail).
 
-mud_isa(O,T):- loop_check(mud_isa_any(O,T),fail).
+mud_isa(O,T):- loop_check(mud_isa_lc(O,T),fail).
 
-mud_isa_any(O,T):- stack_check(300),O==T,!.
-mud_isa_any(O,T):- var(O),var(T),!,isa_mc(T,_),anyInst(O),mud_isa_any(O,T).
-mud_isa_any(O,T):- cached(not_mud_isa(O,T)),!,fail.
-mud_isa_any(O,T):- atom(T),!,Call=..[T,O],predicate_property(Call,_),!,Call.
-mud_isa_any(O,T):- props(O,ofclass(T)).
-mud_isa_any(O,T):- props(O,isa(T)).
-mud_isa_any(_,T):- (atom(T);var(T)),!,fail.
-mud_isa_any(O,T):- compound(O),!,functor(O,T,_).
-mud_isa_any(O,T):- atom(O),!,mud_isa_atom(O,T).
+mud_isa_lc(O,T):- stack_check(300),O==T,!.
+mud_isa_lc(O,T):- var(O),var(T),!,isa(T,type),anyInst(O),isa(O,T).
+mud_isa_lc(O,T):- cached(not_mud_isa(O,T)),!,fail.
+mud_isa_lc(O,T):- atom(T),Call =.. [T,O],predicate_property(Call,_),!,Call.
+mud_isa_lc(O,T):- req(isa(O,T)).
+mud_isa_lc(_,T):- (atom(T);var(T)),!,fail.
+mud_isa_lc(O,T):- compound(O),!,functor(O,T,_).
+mud_isa_lc(O,T):- atom(O),!,mud_isa_atom(O,T).
 
 mud_isa_atom(O,T):- atomic_list_concat([T,_|_],'-',O),!.
 mud_isa_atom(O,T):- atom_concat(T,Int,O),catch(atom_number(Int,_),_,fail),!.
@@ -189,7 +186,9 @@ moo:subclass(food,item).
 
 moo:createableType(FT):- formattype(FT),!,fail.
 moo:createableType(item).
-moo:createableType(S,T):- moo:createableType(T),req(subclass(S,T)).
+moo:createableType(SubType):-member(SubType,[agent,item, type, formattype, region]).
+
+moo:createableSubclassType(S,T):- moo:createableType(T),req(subclass(S,T)).
 %moo:createableType(T,T):-nonvar(T),moo:createableType(T).
 
 moo:subclass(int,formattype).
@@ -231,8 +230,7 @@ moo:subclass(explorer,agent).
 create_instance_0(T,agent,List):-!,
    retractall(agent_list(_)),
    must(create_meta(T,P,_,agent)),
-   must(padd(P,List)),
-   clr(atloc(P,_)),
+   must(padd(P,List)),   
    must(put_in_world(P)),
    rez_to_inventory(P,food,_Food),
    max_charge(NRG),
@@ -260,13 +258,6 @@ create_instance_0(T,Type,List):-
 
 moo:createableType(type).
 
-split_name_type(T,T,C):-compound(T),functor(T,C,_),!.
-split_name_type(T,T,C):-atomic_list_concat_safe([C,'-',B],T),!.
-split_name_type(T,T,C):-atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),catch(number_codes(_,Digits),_,fail),atom_codes(C,Type),!.
-split_name_type(T,T,C):-atom(T),atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),catch(number_codes(_,Digits),_,fail),atom_codes(C,Type),!.
-split_name_type(C,P,C):-atom(C),C==food,gensym(C,P),!.
-split_name_type(C,P,C):-atom(C),trace,gensym(C,P),!.
-split_name_type(C,P,C):-string(C),trace,gensym(C,P),!.
 
 same(X,Y):- X=Y,!.
 same(X,Y):- compound(X),arg(1,X,Y),!.

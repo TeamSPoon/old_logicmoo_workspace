@@ -21,7 +21,7 @@ moo:on_world_load :- retractall(spawn_objects(_)).
 
 growth :-
 	findall(([Obj,Chance]),
-	    props(Obj,spawn_rate(Chance)),
+	    prop(Obj,spawn_rate,Chance),
 	    Objects),
 	assert(spawn_objects(Objects)).
 

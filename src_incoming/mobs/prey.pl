@@ -24,7 +24,7 @@
 %:- dynamic agent_list/1.
 
 moo:world_agent_plan(_World,Self,Act):-
-   mud_isa(Self,prey),
+   isa(Self,prey),
    prey_idea(Self,Act).
    
 % Possible agent actions.
