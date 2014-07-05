@@ -148,18 +148,6 @@ pred_as_is(F,_):-mpred_prop(F,external(_)),!.
 pred_as_is(p,_):-!,fail.
 pred_as_is(k,_):-!,fail.
 
-/*
-getCompare(Op, O, P > N,PreCall,VAL>N,db_op(Op,PreCall),false):-
-	atom(P),integer(N),PreCall=..[P,O,VAL],!.
-getCompare(Op, Obj, Compare,PreCall,Condition,db_op(Op,PreCall),false):-
-      functor(Compare,F,_),(additiveOp(F);comparitiveOp(F)),!,
-      arg(1,Compare,Prop),
-      PreCall=..[Prop,Obj,VAL],
-      copy_term(Compare,Condition),trace,
-      nb_setarg(1,Condition,VAL),
-      throw(props(Obj, Compare)).
-*/
-
 type(T):-moo:subclass(A,B),(T=B;T=A).
 type(item).
 
@@ -277,9 +265,8 @@ db_forall(Op,C):-!,trace,throw(unhandled(db_forall(Op,C))).
 call_expanded_for_sv(WhatNot,F,A,G,OUT):- nonvar(OUT),replace_arg(G,A,NEW,CC),!,call_expanded_for_sv_2(WhatNot,F,A,CC,NEW),!,NEW=OUT.
 call_expanded_for_sv(WhatNot,F,A,G,OUT):- call_expanded_for_sv_2(WhatNot,F,A,G,OUT),!.
 
-call_expanded_for_sv_2(_WhatNot,F,A,G,_OUT):-call_expanded([],G,F,A),!.
-call_expanded_for_sv_2(_WhatNot,F,A,G,OUT):- defaultArgValue(G,F,A,OUT),!.
-% call_expanded_for_sv_2(_WhatNot,F,A,G,OUT):-ignore(OUT=0).
+call_expanded_for_sv_2(WhatNot,F,A,G,_OUT):-call_expanded([whatnot(WhatNot)],G,F,A),!.
+call_expanded_for_sv_2(WhatNot,F,A,G,OUT):- defaultArgValue(WhatNot:G,F,A,OUT),!.
 
 :-export(call_expanded/1).
 %:-export(call_expanded/1).
@@ -474,15 +461,18 @@ db_assert_sv_lc(C,F,A):-
    replace_arg(COLD,A,NEW,CNEW),
    replace_arg(CNEW,A,_,CBLANK),!,
    call_expanded_for_sv(forAssert,F,A,COLD,OLD),
-   ignore((hooked_retractall(CBLANK))),
-   ignore((hooked_retractall(COLD))),
    update_value(OLD,UPDATE,NEW),
-   hooked_asserta(CNEW),!.
+   ((NEW==OLD)-> dmsg(no_updatedb_assert_sv_lc(C));
+   ((
+      ignore((hooked_retractall(CBLANK))),
+      ignore((nonvar(COLD),hooked_retractall(COLD))),   
+      hooked_asserta(CNEW)))),!.
 
 defaultArgValue(facing(_,_),_,_,"n"):-!.
 defaultArgValue(damage(_,_),_,_,500):-!.
+
+defaultArgValue(Info,F,_A,OLD):- mpred_prop(F,default(OLD)),!,dmsg(real_defaultValue(Info,F,default(OLD))).
 defaultArgValue(Info,F,A,OLD):- argIsa_call(F,A,Type),defaultTypeValue(Info,Type,OLD),!.
-defaultArgValue(Info,F,A,OLD):-argIsa_call(F,A,Type),trace,defaultTypeValue(Info,Type,OLD),!.
 
 defaultTypeValue(_Info,dir,"n").
 defaultTypeValue(_Info,int,0).
@@ -523,10 +513,10 @@ clause_present(C,_,1):- !, clause(C,true).
 clause_present(C,F,A):- with_assertions(clause_present_lookup_local(C,F,A),clause_present_1(C,F,A)).
 
 clause_present_1(C,_,_):- debugOnError(C).
-% clause_present_1(C,_F,_A):-predicate_property(C,foreign),!,throw(predicate_property(C,foreign)),!,fail.
+% clause_present_1(C,_F,_A):-predicate_property(C,foreign),!,trace_or_throw(predicate_property(C,foreign)),!,fail.
 % clause_present_1(C,_F,_A):-clause(C,true),!.
 clause_present_1(C0,_F,A):- A>1, arg(A,C0,NEW),string(NEW),!,copy_term(C0,C),
-   setarg(A,C,OLD),C,string_chars(NEW,[S|C1]),string_chars(OLD,[S|C2]),C1=C2,trace,dmsg(present(C)).
+   setarg(A,C,OLD),C,string_chars(NEW,[S|C1]),string_chars(OLD,[S|C2]),C1=C2,dtrace,dmsg(present(C)).
 %clause_present_1(C,F,A):- A>1, arg(A,C,NEW),snonvar(NEW),!,setarg(A,C,OLD),clause_present(C,F,A),pl_arg_type(NEW,string),string_chars(NEW,[S|C1]),string_chars(OLD,[S|C2]),C1=C2,dmsg(present(C)).
 
 
@@ -615,6 +605,7 @@ is_asserted_gaf(Fact):-was_asserted_gaf(Fact).
 member_or_e(E,[L|List]):-!,member(E,[L|List]).
 member_or_e(E,E).
 
+/*
 is_single_valuedOrFail(F,A,Obj,ARGS):- mpred_prop(F,singleValued),!,valuedOrThrow(F,A,Obj,ARGS),!.
 is_single_valuedOrFail(_,_,_,_):- fail.
 
@@ -622,7 +613,7 @@ valuedOrThrow(F,_,Obj,ARGS):- holds_t(isa,Obj,T), findall_type_default_props(Obj
 valuedOrThrow(F,A,Obj,ARGS):- valuedOrThrow1(F,A,Obj,ARGS).
 valuedOrThrow1(_F,_A,_Obj,ARGS):- last(ARGS,unknown),!.
 valuedOrThrow1(F,A,Obj,ARGS):- trace_or_throw(is_single_valuedOrFail(F,A,Obj,ARGS)).
-
+*/
 
 replace_nth([],_N,_OldVar,_NewVar,[]):- !,trace_or_throw(missed_the_boat).
 replace_nth([OldVar|ARGS],1,OldVar,NewVar,[NewVar|ARGS]):- !.
@@ -792,7 +783,7 @@ mpred_prop_game_assert(sorts(type,list(type))).
 %mpred(CallSig,[external(M)]):-mpred_prop_prolog(M:CallSig).
 :-dynamic(mpred_prop_prolog/1).
 mpred_prop_prolog(world:nearby(object,object)).
-%mpred_prop_prolog(world:mud_isa(object,type)).
+%mpred_prop_prolog(world:isa(object,type)).
 %mpred_prop_prolog(world:same(id,id)).
 
 
@@ -823,6 +814,7 @@ multiValued(isa(term,type)).
 %mpred(ArgTypes,PropTypes):-moo:decl_mpred_prop(ArgTypes,PropTypes).
 % somethingIsa('NpcCol1012-Ensign732',['NpcCol1012',actor,'MaleAnimal']).
 
+:-dynamic_multifile_exported((needs_look/2)).
 
 ensure_clause(HEAD,_,_,_BODY):-not(not((numbervars(clause(HEAD,BODY),'$VAR',0,_),clause(HEAD,BODY)))),!.
 % ensure_clause(HEAD,F,A,_):-pred_as_is(F,A), !.
@@ -833,6 +825,9 @@ ensure_clause(HEAD,_F,_A,BODY):-assertz((HEAD:-BODY)),
 
 nameStrings(apath(Region,Dir),Text):- pathName(Region,Dir,Text).
 description(apath(Region,Dir),Text):- pathName(Region,Dir,Text).
+
+:- decl_mpred(needs_look/2,[extentKnown]).
+:- decl_mpred(mudMaxHitPoints(agent,int)).
 
 
 scan_mpred_prop:-forall(mpred_prop(Pred,Prop),hooked_asserta(mpred_prop(Pred,Prop))).

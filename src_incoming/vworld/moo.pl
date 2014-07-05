@@ -47,7 +47,7 @@ dbase_mod(moo).
 % ========================================
 % assert/retract hooks
 % ========================================
-:- include(logicmoo(dbase/dbase_rules_nnf)).
+% :- include(logicmoo(dbase/dbase_rules_nnf)).
 
 
 % hooks are declared as
@@ -159,13 +159,15 @@ not_loading_game_file:-not(loading_game_file(_,_)),loaded_game_file(_,_).
 
 :- dynamic_multifile_exported((decl_mpred/1)).
 decl_mpred([]):-!.
-decl_mpred(M:F):-atom(M),!,'@'(decl_mpred(F),M).
+decl_mpred(M:FA):-atom(M),!,'@'(decl_mpred(FA),M).
 decl_mpred([H|T]):-!,decl_mpred(H),decl_mpred(T).
 decl_mpred((H,T)):-!,decl_mpred(H),decl_mpred(T).
 decl_mpred(F/A):-!,decl_mpred(F,A).
 decl_mpred(C):-decl_mpred(C,[]).
 
 :-dynamic_multifile_exported(decl_mpred/2).
+decl_mpred(M:FA,More):-!,decl_mpred(FA,[decl_mpred(M)|More]).
+decl_mpred(F/A,More):-!,decl_mpred(F,arity(A)),decl_mpred(F,More),!.
 decl_mpred(C,More):-compound(C),!,functor(C,F,A),decl_mpred(F,arity(A)),decl_mpred(F,More),!,decl_mpred(F,argsIsa(C)),!.
 decl_mpred(F,A):-number(A),!,decl_mpred(F,arity(A)),!.
 decl_mpred(_,[]):-!.

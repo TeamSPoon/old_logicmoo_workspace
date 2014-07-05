@@ -102,7 +102,7 @@ as_one_of(Types,oneOf(Types)).
 argIsa_call(Op,_:F,N,Type):-!,argIsa_call(Op,F,N,Type),!.
 argIsa_call(Op,F/_,N,Type):- !,argIsa_call(Op,F,N,Type),!.
 argIsa_call(Op,Func,N,Type):- compound(Func),!,functor(Func,F,_),argIsa_call(Op,F,N,Type),!.
-argIsa_call(Op,F,N,Type):-hotrace(loop_check(argIsa_call_nt(Op,F,N,Type),Type=term)),must(nonvar(Type)).
+argIsa_call(Op,F,N,Type):-hotrace((loop_check((argIsa_call_nt(Op,F,N,Type),!),Type=term),must(nonvar(Type)))).
 
 argIsa_call_nt(_O,F,N,Type):-argIsa_call_nt(F,N,Type).
 
@@ -240,15 +240,21 @@ moo:decl_coerce(A,Type,AA):- correctAnyType(tell(_),A,Type,AA).
 same_vars(T1,T2):-term_variables(T1,V1),term_variables(T2,V2),!,V1==V2.
 
 :-export(correctArgsIsa/2).
-:-export(correctArgsIsa/3).
-correctArgsIsa(In,Out):-correctArgsIsa(query(_,_),In,Out).
+correctArgsIsa(In,Out):- correctArgsIsa(query(_,_),In,Out),!.
 
+:-export(correctArgsIsa/3).
 correctArgsIsa(_,NC,NC):-not(compound(NC)),!.
 correctArgsIsa(Op,M:A,MAA):- nonvar(M),!,correctArgsIsa(Op,A,AA),M:AA=MAA.
+correctArgsIsa(_Op,A,AA):-
+   functor(A,_,1),!,
+   must(any_to_value(A,AA)),
+   cmust(ground(AA)).
 correctArgsIsa(_Op,G,G):- functor(G,F,A),arg(_,vv(subclass/_),F/A),!.
 correctArgsIsa(Op,A,AA):- correctArgsIsa0(Op,A,AA),nonvar(AA),!.
 correctArgsIsa(Op,A,AA):- grtrace,correctArgsIsa0(Op,A,AA).
-correctArgsIsa(Op,A,Type,A):- dtrace,dmsg(warn(not(correctArgsIsa(Op,A,Type)))).
+
+:-export(correctArgsIsa/4).
+correctArgsIsa(Op,A,Type,AA):- trace_and_throw(warn(not(correctArgsIsa(Op,A,Type,AA)))).
 
 correctArgsIsa0(Op,A,AA):-A =..[KP,Prop|Args],atom(Prop),is_holds_true(KP),!,
    discoverAndCorrectArgsIsa(Op,Prop,1,Args,AArgs),
@@ -302,7 +308,7 @@ correctType_gripe(Op,A,Type,NewArg):-trace_or_throw(failure(correctType(Op,A,Typ
 can_coerce(notta).
 
 /*
-/*
+
 discoverAndCorrectArgsIsa(_Prop,_N1,[],[]):-!.
 discoverAndCorrectArgsIsa(Prop,N1,[A|Args],[AA|AArgs]):-
    %dbase:
@@ -358,7 +364,7 @@ isa_assert(A,C,A):-must(ground(A)),dmsg(todo(define(isa_assert(A,C,'ConvertedArg
 isa_assert(A,Type,_NewArg):-throw(failure(isa_assert(A,Type))).
 
 */
-
+/*
 holdsFunctor(k).
 holdsFunctor(p).
 holdsFunctor(holds).
@@ -445,7 +451,7 @@ correctType(Op,Arg,Props,NewArg):- compound(Props),
    correctArgsIsa(Op,C,CC),
    CC=..[F,NewArg|_].
 
-correctType(_O,A,Type,AA):-not(formattype(Type)),is_type(Type),mud_isa(A,Type),!,must_equals(A,AA).
+correctType(_O,A,Type,AA):-not(formattype(Type)),is_type(Type),isa(A,Type),!,must_equals(A,AA).
 
 
 

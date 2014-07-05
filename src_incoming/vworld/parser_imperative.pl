@@ -274,7 +274,7 @@ moo:verb_alias('s','move s').
 moo:verb_alias('go','go').
 moo:verb_alias('where is','where').
 
-pos_word_formula('infinitive',Verb,Formula):- 'infinitive'(TheWord, Verb, _, _G183), 'verbSemTrans'(TheWord, 0, 'TransitiveNPCompFrame', Formula, _, _).
+% pos_word_formula('infinitive',Verb,Formula):- 'infinitive'(TheWord, Verb, _, _G183), 'verbSemTrans'(TheWord, 0, 'TransitiveNPCompFrame', Formula, _, _).
 
 verb_alias_to_verb(IVERB,SVERB):- moo:verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.
 verb_alias_to_verb(IVERB,SVERB):-specifiedItemType(IVERB,verb,SVERB), IVERB \= SVERB.
@@ -449,8 +449,8 @@ specifiedItemType(String,Type,Inst):- instances_of_type(Inst,Type),object_match(
 specifiedItemType(String,Type,Longest) :- findall(Inst, (get_term_specifier_text(Inst,Type),starts_or_ends_with_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
 specifiedItemType(A,T,AA):- checkAnyType(tell(parse),A,T,AAA),AA=AAA.
 
-checkAnyType(_Op,A,Type,AA):- var(A),isa_assert(A,Type,AA),must_det(var(AA)),must_det(A==AA),!.
-checkAnyType(_Op,A,Type,AA):- isa_assert(A,Type,AA),nonvar(AA),!.
+checkAnyType(Op,A,Type,AA):- var(A),correctAnyType(Op,A,Type,AA),must_det(var(AA)),must_det(A==AA),!.
+checkAnyType(Op,A,Type,AA):- correctAnyType(Op,A,Type,AA),nonvar(AA),!.
 
 instances_of_type(Inst,Type):- setof(Inst-Type,isa(Inst,Type),Set),member(Inst-Type,Set).
 % instances_of_type(Inst,Type):- atom(Type), Term =..[Type,Inst], logOnError(req(Term)).
