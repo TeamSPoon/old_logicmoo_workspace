@@ -19,7 +19,7 @@
  add/1, add0/1, agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, ofclass/2, clr/1, damage/2, db_op/2, atloc/2, 
  mpred_prop_g/1, mpred_prop_game_assert/1, del/1, failure/2, grid/4, inRegion/2, isa/2, item/1, 
  memory/2, padd/2, padd/3, pathName/3, possess/2, prop/3, prop_or/4, props/2, region/1, req/1, scan_mpred_prop/0, score/2, stm/2, term_listing/1,  facing/2,
- thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, nameStrings/2, description/2, pathBetween/3, act_turn/2,
+ thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, nameStrings/2, description/2, pathBetween/3, agent_turnnum/2,
  dbase_mod/1,
  clause_present_1/3,
  object/1,
@@ -31,7 +31,7 @@
    add/1, add0/1, agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, ofclass/2, clr/1, damage/2, db_op/2, atloc/2,
  mpred_prop_g/1, mpred_prop_game_assert/1, del/1, failure/2, grid/4, isa/2, item/1, 
  memory/2, padd/2, padd/3, pathName/3, possess/2, prop/3, prop_or/4, props/2, region/1, req/1, scan_mpred_prop/0, score/2, stm/2, term_listing/1, facing/2,
- thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, nameStrings/2, description/2, pathBetween/3, act_turn/2.
+ thinking/1, type/1, use_term_listing/2, wearing/2, world_clear/1, str/2 ,facing/2, height/2, act_term/2, nameStrings/2, description/2, pathBetween/3, agent_turnnum/2.
 
 :- dbase_mod(M),dynamic_multifile_exported((
           M:dbase_t/1,
@@ -653,10 +653,10 @@ argsIsa(pathName(region,dir,string)).
 argsIsa(verbOverride(term,action,action),[dynamic_in_module]).
 
 moo:singleValued(atloc(object,xyz(region,int,int,int))).
-moo:singleValued(act_turn(agent,int)).
+moo:singleValued(agent_turnnum(agent,int)).
 moo:singleValued(armorLevel(possessable,int)).
 moo:singleValued(attack(agent,int)).
-moo:singleValued(charge(agent,int)).
+moo:singleValued(charge(agent,int),[default(500)]).
 moo:singleValued(chargeCapacity(chargable,int)).
 moo:singleValued(chargeRemaining(chargable,int)).
 moo:singleValued(damage(agent,int)).
@@ -682,6 +682,14 @@ moo:singleValued(type_grid(regiontype,int,list(term))).
 moo:singleValued(weight(object,int)).
 moo:singleValued(ArgTypes):-mpred_prop_g(ArgTypes).
 
+
+singleValued(type_max_charge(type,int)).
+singleValued(max_charge(term,int)).
+singleValued(type_max_damage(type,int)).
+singleValued(max_damage(term,int)).
+
+
+
 :-dynamic(mudToHitArmorClass0/2).
 % :- include('dbase_i_builtin').
 
@@ -693,7 +701,7 @@ moo:singleValued(ArgTypes):-mpred_prop_g(ArgTypes).
  weight/2,
  permanence/3,
       act_term/2,
-      act_turn/2,
+      agent_turnnum/2,
       agent_doing/2,
       agent_done/2,
       atloc/2,
@@ -730,7 +738,7 @@ chargeRemaining/2,
  weight/2,
  permanence/3,
       act_term/2,
-      act_turn/2,
+      agent_turnnum/2,
       agent_doing/2,
       agent_done/2,
       atloc/2,
@@ -755,7 +763,7 @@ mpred_prop_format(apath(region,dir),areaPath).
 mpred_prop_format(dice(int,int,int),int).
 
 
-db_resultIsa(apath,areaPath).
+moo:resultIsa(apath,areaPath).
 moo:subclass(areaPath,door).
 moo:subclass(door,item).
 
@@ -833,17 +841,44 @@ description(apath(Region,Dir),Text):- pathName(Region,Dir,Text).
 :- decl_mpred(needs_look/2,[extentKnown]).
 :- decl_mpred(mudMaxHitPoints(agent,int)).
 
+:-export(scan_mpred_prop/0).
+scan_mpred_prop:-forall(mpred_prop(Pred,Prop),hooked_assertz(mpred_prop(Pred,Prop))),fail.
+scan_mpred_prop:-remove_duplicated_facts,fail.
+scan_mpred_prop:-forall(mpred_prop(Pred,Prop),run_database_hooks(assert(z),mpred_prop(Pred,Prop))),fail.
+scan_mpred_prop:-remove_duplicated_facts.
 
-scan_mpred_prop:-forall(mpred_prop(Pred,Prop),hooked_asserta(mpred_prop(Pred,Prop))).
-/*scan_mpred_prop:-
-   dbase_mod(DBM),
-   '@'(forall(mpred(ArgTypes,PropTypes),debugOnError0( define_mpred_prop(ArgTypes,PropTypes))),DBM).
-*/
-
-load_motel:- defrole([],time_state,restr(time,period)).
 
 :- scan_mpred_prop.
 
+
+flatten_into_set(L,S):-flatten(L,F),list_to_set(F,S).
+
+:-export(get_type_props/2).
+get_type_props(Type,PropList):-findall(PropU,(call_no_cuts(moo:default_type_props(Inst,Type,Prop)),subst(Prop,Inst,self,PropU)),PropS),flatten_into_set(PropS,PropList).
+
+instance_missing_props(I,PS):-setof(T,isa(I,T),TS),setof(TP,(member(T,TS),get_type_props(T,TP)),ListOfPropLists),flatten_into_set(ListOfPropLists,LPS),
+      findall(P,(member(P,LPS),inst_missing_prop(I,P)),PS),!.
+
+      
+inst_missing_prop(I,P):-P=..[F|Args],inst_missing_prop(I,F,Args).
+
+inst_missing_prop(_I,F,_Args):-not(mpred_prop(F,singleValued)),!,fail.
+inst_missing_prop(_I,F,_Args):-mpred_prop(F,flag),!,fail.
+inst_missing_prop(I,F,Args):-C=..[F,I|Args],get_sv_argnum(F,[I|Args],A),arg(A,C,_Default),replace_arg(C,A,BLANK,COLD),ignore(req(COLD)),!,nonvar(BLANK).
+
+
+get_sv_argnum(F,Args,ArgNum):-once(mpred_prop(F,functionalArg(ArgNum));length(Args,ArgNum)).
+
+:-export(scan_default_props/0).
+scan_default_props:- 
+   setof(CT,createableType(CT),CTS),dmsg(scan_default_props(types(CTS))),
+   setof(I,(member(CT,CTS),isa(I,CT)),IS),dmsg(scan_default_props(set(IS))),
+   forall(member(I,IS),
+          (instance_missing_props(I,PS),show_call(padd(I,PS)))).
+
+      
+
+% load_motel:- defrole([],time_state,restr(time,period)).
 % :-load_motel.
 
 :- include(logicmoo('vworld/moo_footer.pl')).

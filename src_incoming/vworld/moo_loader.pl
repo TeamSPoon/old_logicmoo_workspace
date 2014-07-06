@@ -39,7 +39,9 @@ finish_processing_game:- dmsg(begin_finish_processing_game),fail.
 finish_processing_game:- retract(moo:call_after_load(A)),once(must(A)),fail.
 finish_processing_game:- ignore(scan_mpred_prop),fail.
 finish_processing_game:- retract(moo:call_after_load(A)),once(must(A)),fail.
-finish_processing_game:- rescan_dbase_t,fail.
+finish_processing_game:- once(rescan_dbase_t),fail.
+finish_processing_game:- once(scan_default_props),fail.
+finish_processing_game:- once(rescan_dbase_t),fail.
 finish_processing_game:- dmsg(end_finish_processing_game),fail.
 finish_processing_game:- savedb,fail.
 finish_processing_game:- retract(in_finish_processing_game).

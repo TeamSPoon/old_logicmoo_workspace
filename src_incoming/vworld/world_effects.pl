@@ -20,20 +20,16 @@
 % Score any points?
 worth(Agent,Action,Obj) :-
 	props(Obj,act_affect(Action,score(S))),
-	del(score(Agent,Y)),
-	X is Y + S,
-	add(score(Agent,X)),
+	add(score(Agent,+S)),
 	fail. % fail to check for charge too
 % Charge up those batteries
 worth(Agent,Action,Obj) :-
            props(Obj,act_affect(Action,charge(NRG))),
 	req(charge(Agent,Chg)),
 	req(stm(Agent,Stm)),
-	max_charge(Max),
+	max_charge(Agent,Max),
 	(Chg + NRG) < (((Stm * 10) -20) + Max),
-	del(charge(Agent,Y)),
-	X is Y + NRG,
-	add(charge(Agent,X)),
+	add(charge(Agent,+NRG)),
 	fail. % fail to check for healing
 % Heal
 worth(Agent,Action,Obj) :-
@@ -41,7 +37,7 @@ worth(Agent,Action,Obj) :-
 	req((damage(Agent,Dam),
              stm(Agent,Stm),
              str(Agent,Str))),
-	max_damage(Max),
+	max_damage(Agent,Max),
 	(Dam + Hl) < ((((Stm * 10) -20) + ((Str * 5) - 10)) + Max),
 	del(charge(Agent,Y)),
 	X is Y + Hl,
@@ -77,12 +73,10 @@ set_stats(Agent,Traits):-dmsg(failed(set_stats(Agent,Traits))).
 
 process_stats(Agent,str(Y)) :-
 	add(str(Agent,Y)),
-	must(del(damage(Agent,Dam))),
+	damage(Agent,Dam),
 	NewDam is (Dam + ((Y * 5) - 10)),
 	add(damage(Agent,NewDam)),
-	del(stat_total(Agent,T)),
-	NT is T + Y,
-	add(stat_total(Agent,+NT)).
+	add(stat_total(Agent,+Y)).
 
 process_stats(Agent,height(Ht)) :-
 	add(height(Agent,Ht)),
@@ -90,15 +84,13 @@ process_stats(Agent,height(Ht)) :-
 
 process_stats(Agent,stm(Stm)) :-
 	add(stm(Agent,Stm)),
-	del(damage(Agent,Dam)),
+	req(damage(Agent,Dam)),
 	NewDam is (((Stm * 10) - 20) + Dam),
 	add(damage(Agent,NewDam)),
-	del(charge(Agent,NRG)),
+	req(charge(Agent,NRG)),
 	Charge is (((Stm * 10) - 20) + NRG),
 	add(charge(Agent,Charge)),
-	del(stat_total(Agent,Total)),
-	NewT is Total + Stm,
-	add(stat_total(Agent,+NewT)).
+	add(stat_total(Agent,+Stm)).
 
 process_stats(Agent,spd(Spd)) :-
 	add(spd(Agent,Spd)),

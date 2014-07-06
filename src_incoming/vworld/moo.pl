@@ -578,7 +578,7 @@ define_type(Spec):- asserta_if_new(is_type(Spec)), assertz(dbase_t(isa,Spec,type
 define_type_if_atom(T):- compound(T),!.
 define_type_if_atom(T):- ignore((atom(T),not(number(T)),define_type(T))).
 
-hook:decl_database_hook(assert(_A_or_Z),label_type_props(_,T,_)):- define_type_if_atom(T).
+hook:decl_database_hook(assert(_A_or_Z),label_type_props(Lbl,T,Props)):- hooked_assertz(default_type_props(self,T,[label(self,Lbl)|Props])).
 hook:decl_database_hook(assert(_A_or_Z),default_type_props(_,T,_)):- define_type_if_atom(T).
 hook:decl_database_hook(assert(_A_or_Z),subclass(S,C)):-define_type_if_atom(S),define_type_if_atom(C).
 

@@ -191,7 +191,7 @@ setTemplate(_).
 :-setTemplate class_template(light_switch, [color(cream),size(small)],[shape(rectangular),material(plastic),texture(smooth)]).
 :-setTemplate class_template(ball, [color(red),size(medium)],[shape(spherical),material(rubber),texture(bumpy)]).
 :-setTemplate class_template(coffee, [color(black,brown),size(small)],[shape(fluid),material(liquid),texture(wet)]).
-:-setTemplate class_template(coffee_cup, [color(black,brown),size(small)],[shape(fluid),material(liquid),texture(wet)]).
+:-setTemplate class_template(coffee_cup, [color(black),color(brown),size(small)],[shape(fluid),material(liquid),texture(wet)]).
 :-setTemplate class_template(sofa, [color([blue,dark]),size([large,wide,long])],[shape(polyhedral),material([poplin,wood]),texture(ribbed),weight(125)]).
 :-setTemplate class_template(easy_chair, [color(blue),size([large,narrow])],[shape(polyhedral),material([poplin,wood]),texture(ribbed),weight(75)]).
 :-setTemplate class_template(coffee_table, [color([brown,shiney]),size(medium)],[shape(circular),material(wood),texture(smooth),weight(35)]).

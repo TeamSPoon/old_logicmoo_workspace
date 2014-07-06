@@ -56,7 +56,7 @@ moo:check_permanence(take,_,_,_).
 
 % Record keeping
 moo:update_charge(Agent,take) :-
-      padd(Agent,[charge(-2)]).
+      padd(Agent,charge(-2)).
 
 
 

@@ -246,7 +246,7 @@ moo:multiValued(pathName(region,dir,string)).
 moo:multiValued(verbOverride(term,action,action)).
 
 moo:singleValued(atloc(object,xyz(region,int,int,int))).
-moo:singleValued(act_turn(agent,int)).
+moo:singleValued(agent_turnnum(agent,int)).
 moo:singleValued(armorLevel(possessable,int)).
 moo:singleValued(attack(agent,int)).
 moo:singleValued(charge(agent,int)).
@@ -325,6 +325,11 @@ multiValued(grid(region,int,int,object)).
 multiValued(possess(agent,item)).
 multiValued(subclass(type,type)).
 multiValued(isa(term,type)).
+
+singleValued(type_max_charge(type,int)).
+singleValued(max_charge(term,int)).
+singleValued(type_max_damage(type,int)).
+singleValued(max_damage(term,int)).
 
 moo:listValued(directions(term,list(term))).
 

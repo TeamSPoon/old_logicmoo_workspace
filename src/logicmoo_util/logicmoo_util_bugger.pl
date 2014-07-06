@@ -305,7 +305,7 @@ is_loop_checked(B):- make_key(B,BC),!,inside_loop_check(BC).
 
 loop_check(B,TODO):- make_key(B,BC),!, loop_check_term(B,BC,TODO).
 
-loop_check_clauses(B,TODO):- copy_term(B,BC),snumbervars(BC),!, loop_check(call_skipping_n_clauses(1,B),BC,TODO).
+loop_check_clauses(B,TODO):- make_key(B,BC), loop_check_term(call_skipping_n_clauses(1,B),BC,TODO).
 
 loop_check_term(_B,BC, TODO):- inside_loop_check(BC),!,call(TODO).
 loop_check_term(B,BC, _TODO):- setup_call_cleanup(asserta(inside_loop_check(BC)),B,ignore(retract(inside_loop_check(BC)))).

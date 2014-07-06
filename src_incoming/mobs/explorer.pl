@@ -25,7 +25,7 @@ vette_idea(Agent,Act,Act):-var(Act),!,dmsg(vette_idea(Agent,Act)).
 vette_idea(_,sit,sit):-!.
 vette_idea(Agent,Act,Act):-dmsg(vette_idea(Agent,Act)).
 
-moo:label_type_props(explorer(_),explorer,[]).
+moo:label_type_props('Px',explorer,[]).
 
 moo:world_agent_plan(_World,Agent,ActV):-
    agent(Agent),

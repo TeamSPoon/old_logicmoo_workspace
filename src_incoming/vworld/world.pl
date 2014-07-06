@@ -97,9 +97,9 @@
 
 
 
-is_property(P,A):- db_prop(_,C),functor(C,P,A2),A is A2-1.
 
 /*
+is_property(P,A):- mpred_prop(_,C),functor(C,P,A2),A is A2-1.
 is_type(O):-is_type0(O).
 is_type0(T):-moo:label_type_props(_,T,_).
 is_type0(T):-moo:default_type_props(_,T,_).
@@ -184,7 +184,7 @@ moo:subclass(wearable,item).
 moo:subclass(knife,item).
 moo:subclass(food,item).
 
-moo:createableType(FT):- formattype(FT),!,fail.
+moo:createableType(FT):- nonvar(FT),formattype(FT),!,fail.
 moo:createableType(item).
 moo:createableType(SubType):-member(SubType,[agent,item, type, formattype, region]).
 
@@ -227,17 +227,21 @@ moo:createableType(agent).
 moo:subclass(actor,agent).
 moo:subclass(explorer,agent).
 
+
+moo:max_charge(T,NRG):- moo:type_max_charge(AgentType,NRG),isa(T,AgentType).
+moo:max_damage(T,Dam):- moo:type_max_damage(AgentType,Dam),isa(T,AgentType).
+
 create_instance_0(T,agent,List):-!,
    retractall(agent_list(_)),
    must(create_meta(T,P,_,agent)),
    must(padd(P,List)),   
    must(put_in_world(P)),
    rez_to_inventory(P,food,_Food),
-   max_charge(NRG),
-   max_damage(Dam),
+   req(max_charge(T,NRG)),
+   moo:max_damage(T,Dam),
    add(charge(P,NRG)),
    add(damage(P,Dam)),
-   add(act_turn(P,0)),
+   add(agent_turnnum(P,0)),
    add(score(P,0)),
    set_stats(P,List),
    add(memory(P,directions([n,s,e,w,ne,nw,se,sw,u,d]))),!.

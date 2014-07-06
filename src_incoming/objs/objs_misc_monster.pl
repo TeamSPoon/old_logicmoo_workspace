@@ -220,18 +220,19 @@ Object applies:
 
 %
 */
-:- module(objects, [ max_charge/1, max_damage/1 ]).
+:- module(objects, [  ]).
 
 :- include(logicmoo(vworld/moo_header)).
 
 :-moo:register_module_type([world_types,parser]).
 
- moo:label_type(Label,Type):- moo:label_type_props(Label,Type,_).
+moo:label_type(Label,Type):- moo:label_type_props(Label,Type,_).
 
 % :-moo:register_module_type(dynamic).
 
-max_charge(500).
-max_damage(120).
+moo:type_max_charge(agent,500).
+moo:type_max_damage(agent,120).
+
 
 % :-end_module_type(dynamic).
 

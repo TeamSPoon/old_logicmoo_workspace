@@ -195,7 +195,7 @@ call_after_game_load(Code):- call_after_next(moo:not_loading_game_file,Code).
  weight/2,
  permanence/3,
       act_term/2,
-      act_turn/2,
+      agent_turnnum/2,
       agent_doing/2,
       agent_done/2,
       atloc/2,
