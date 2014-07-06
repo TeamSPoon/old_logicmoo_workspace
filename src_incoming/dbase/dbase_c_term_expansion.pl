@@ -37,7 +37,7 @@ set_list_len(List,A,NewList):-length(NewList,A),append(NewList,_,List),!.
 if_mud_asserted(F,A2,_,_Why):-is_mpred_prolog(F,A2),!,fail.
 if_mud_asserted(F,A2,A,Why):-using_holds_db(F,A2,A,Why).
 
-declare_as_code(F,A):-findall(n(File,Line),source_location(File,Line),SL),ignore(inside_clause_expansion(CE)),add_mpred_prop(F,A,as_is(discoveredInCode(SL,CE))),!.
+declare_as_code(F,A):-findall(n(File,Line),source_location(File,Line),SL),ignore(inside_clause_expansion(CE)),decl_mpred(F,as_is(discoveredInCode(SL,CE))),!.
 
 :-export(if_use_holds_db/4).
 if_use_holds_db(F,A2,_,_):- is_mpred_prolog(F,A2),!,fail.

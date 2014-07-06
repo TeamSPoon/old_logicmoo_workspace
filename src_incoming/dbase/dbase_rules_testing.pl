@@ -88,7 +88,7 @@ pttp_test(logicmoo_example1,
 	))).
 
 
-logicmoo_example1_holds:-xray_test(logicmoo_example1_holds).
+logicmoo_example1_holds:-do_pttp_test(logicmoo_example1_holds).
 
 pttp_test(logicmoo_example1_holds,
 	((
@@ -99,7 +99,7 @@ pttp_test(logicmoo_example1_holds,
 	))).
 
 
-logicmoo_example2:-xray_test(logicmoo_example2).
+logicmoo_example2:-do_pttp_test(logicmoo_example2).
 
 %  int_kbholds(sonOf,gun,phil,A,B,C,C,D,E,F):-D=[G,[1,F,A,B]|H],E=[G|H].
 %  int_not_kbholds(female,gun,A,B,C,C,D,E,F):-D=[G,[-2,F,A,B]|H],E=[G|H].
@@ -115,7 +115,7 @@ pttp_test(logicmoo_example2,
 	))).
 
 
-logicmoo_example3:-xray_test(logicmoo_example3).
+logicmoo_example3:-do_pttp_test(logicmoo_example3).
 
 pttp_test(logicmoo_example3_will_fail,
 	((

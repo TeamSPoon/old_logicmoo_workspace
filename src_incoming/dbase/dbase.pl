@@ -96,6 +96,13 @@ holds_t(G):- req(G).
 
 
 :-include(dbase_i_pldoc).
+:-include(dbase_i_coroutining).
+:-export(makeConstant/1).
+makeConstant(X):-trace_or_throw(makeConstant(X)).
+:-export(cycAssert/2).
+cycAssert(A,B):-trace_or_throw(cycAssert(A,B)).
+:-discontiguous(singleValued/2).
+:-discontiguous(multiValued/1).
 % =================================================================================================
 % world database
 % =================================================================================================
@@ -217,7 +224,7 @@ db_op_4(Op,p,_,C0):- C0=..[p,Prop|ARGS],C1=..[Prop|ARGS],!,db_op(Op,C1),!.
 db_op_4(Op,k,_,C0):- C0=..[k,Prop|ARGS],C1=..[Prop|ARGS],!,db_op(Op,C1),!.
 db_op_4(Op,p,_,C0):- C0=..[p,Prop|ARGS],C1=..[Prop|ARGS],!,db_op(Op,C1),!.
 db_op_4(Op,svo,_,C0):- C0=..[svo,Obj,Prop|ARGS],C1=..[Prop,Obj|ARGS],!,db_op(Op,C1),!.
-db_op_4(q,Fmt,1,C0):-formattype(Fmt),!,C0=..[_,A],format_complies(A,Fmt,_).
+db_op_4(q,Fmt,1,C0):-formattype(Fmt),!,C0=..[_,A],term_is_ft(A,Fmt).
 db_op_4(a,Fmt,1,_C0):-formattype(Fmt),!,dmsg(todo(dont_assert_is_decl_ft(Fmt))),!.
 db_op_4(Op,Prop,_,C0):- 
    C0=..[Prop|ARGS],db_op_disj(Op,Prop,ARGS).
@@ -504,7 +511,7 @@ pl_arg_type(Arg,Type):-
 :-thread_local clause_present_lookup_local/3.
 
 clause_present(C):-notrace((functor(C,F,A),clause_present(C,F,A))).
-clause_present(C,F,1):-C=..[F,A], formattype(F), format_complies(A,F,_).
+clause_present(C,F,1):-C=..[F,A], formattype(F),!, term_is_ft(A,F).
 clause_present(C,_F,_A):- not(predicate_property(C,_)),!,fail.
 clause_present(C,_F,_A):- predicate_property(C,foreign),!,fail.
 clause_present(C,_F,_A):- not(ground(C)),!,fail.

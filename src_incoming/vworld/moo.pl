@@ -120,7 +120,7 @@ declare_dbase_local(F):- assert_if_new(mpred_prop(F,hasStub)),fail.
 declare_dbase_local(F):- mpred_prop(F,isStatic),!.
 declare_dbase_local(F):- not(mpred_arity(F,A)),trace_or_throw(not(mpred_arity(F,A))).
 declare_dbase_local(F):- must(mpred_arity(F,A)), dynamic(F/A), user_export(F/A),
-   dynamic_multifile_exported(F/A),   
+   multifile(F/A),   
    functor(HEAD,F,A),HEAD=..[F|_ARGS],ensure_clause(HEAD,F,A,body_req(F,A,HEAD)),
    assert_if_new(mpred_prop(F,hasStub)).
 
@@ -188,7 +188,7 @@ glean_pred_props_maybe(G):-compound(G),functor(G,F,_),argsIsaProps(F),G=..[F,Arg
 
 add_mpred_prop_gleaned(Arg1,FRGS):-functor_check_univ(Arg1,F,ARGSISA),add_mpred_prop_gleaned_4(Arg1,F,ARGSISA,FRGS).
 add_mpred_prop_gleaned_4(Arg1,_F,[ARG|_],FRGS):-nonvar(ARG),!,decl_mpred(Arg1,[argsIsa(Arg1)|FRGS]).
-add_mpred_prop_gleaned_4(Arg1,_F,_,FRGS):-add_mpred_prop(Arg1,FRGS).
+add_mpred_prop_gleaned_4(Arg1,_F,_,FRGS):-decl_mpred(Arg1,FRGS).
 
 user:term_expansion(G,_):- notrace((once(glean_pred_props_maybe(G)),fail)).
 
@@ -380,12 +380,6 @@ into_mpred_form(X,_H,_P,_A,X).
 
 
 
-create_queryPred(H,B):-functor(H,HF,HA),functor(B,BF,BA),
-      dynamic_multifile_exported((HF / HA)), 
-      dynamic_multifile_exported((BF / BA)),
-      asserta((H :- call_no_cuts(B))).
-
-
 % ========================================
 % include_moo_files(MASK)
 % ========================================
@@ -524,20 +518,13 @@ do_all_of(When):- ignore(( once(moo:will_call_after(When,_)), repeat, retract(mo
                            call(A), not(moo:will_call_after(When,_)))),!.
 
 
-%:- create_queryPred(createableType(A) , createableType(A)).
-%:- create_queryPred(createableType(A,B) , createableType(A,B)).
 
 :- dynamic_multifile_exported(subclass/2).
-%:- create_queryPred(subclass(A,B) , subclass(A,B)).
+:- dynamic_multifile_exported(decl_coerce/3).
 
-
-:- create_queryPred(qqcall_update_charge(A,B) , update_charge(A,B)).
-:- create_queryPred(qqcall_update_charge(A,B) , update_stats(A,B)).
-
-
-:- create_queryPred(coerce0(A,B,C) , decl_coerce(A,B,C)).
 
 decl_coerce(_,_,_):-fail.
+:-export(coerce/3).
 coerce(What,Type,NewThing):-decl_coerce(What,Type,NewThing),!.
 coerce(What,_Type,NewThing):-NewThing = What.
 
@@ -638,8 +625,9 @@ term_expansion_local(((H1:-B1)),H2B2):- !,
       B2 = '@'((nop(CM), B1), CM ),
       module_transparent((P/A)),
       % copy_term(H2,META), meta_predicate(META),
-      dynamic_multifile_exported(P/A),
+      dynamic(P/A),
       export(P/A),
+      multifile(P/A),
       ignore(H2B2 = ((H2 :- B2))),!.
 
 term_expansion_local(X,Y):- compound(X),loading_module_h(CM),functor(X,F,A),term_expand_local(CM,X,F,A,Y).

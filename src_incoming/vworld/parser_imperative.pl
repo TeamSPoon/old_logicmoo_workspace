@@ -67,7 +67,7 @@ moo:agent_call_command(Agent,parsetemps(StringM)):-
   to_word_list(StringM,[SVERB|ARGS]),
   get_vp_templates(Agent,SVERB,ARGS,TEMPLATES),fmt(templates=TEMPLATES),
   ignore((
-     print_parse_for(fmt,vp,StringM,Goal,LeftOver),
+     parse_for(vp,StringM,Goal,LeftOver),
      fmt([goal=Goal,lfto=LeftOver]))).
 
 % ===========================================================

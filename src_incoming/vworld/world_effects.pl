@@ -27,7 +27,7 @@ worth(Agent,Action,Obj) :-
            props(Obj,act_affect(Action,charge(NRG))),
 	req(charge(Agent,Chg)),
 	req(stm(Agent,Stm)),
-	max_charge(Agent,Max),
+	moo:max_charge(Agent,Max),
 	(Chg + NRG) < (((Stm * 10) -20) + Max),
 	add(charge(Agent,+NRG)),
 	fail. % fail to check for healing
@@ -37,11 +37,9 @@ worth(Agent,Action,Obj) :-
 	req((damage(Agent,Dam),
              stm(Agent,Stm),
              str(Agent,Str))),
-	max_damage(Agent,Max),
+	req(max_damage(Agent,Max)),
 	(Dam + Hl) < ((((Stm * 10) -20) + ((Str * 5) - 10)) + Max),
-	del(charge(Agent,Y)),
-	X is Y + Hl,
-	add(charge(Agent,X)),
+	add(charge(Agent,+Hl)),
 	!.
 worth(_,_,_).
 

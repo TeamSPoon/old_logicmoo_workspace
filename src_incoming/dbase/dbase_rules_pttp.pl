@@ -1392,7 +1392,7 @@ builtin(unify,_).
 builtin(identical_member,_).
 builtin(unifiable_member,_).
 builtin(F,_):- atom_concat(_,'_int',F),!.
-builtin(F,A):-moo:isRegisteredCycPred(Mt,F,A),!,fail.
+builtin(F,_):-moo:mpred_prop(F,as_is(_)),!. %,fail.
 %builtin(F,A):-functor(P,F,A),predicate_property(P,_).
 %%% ***
 

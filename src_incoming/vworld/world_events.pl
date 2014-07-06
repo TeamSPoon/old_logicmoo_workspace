@@ -13,7 +13,7 @@
 */
 
 
-asInvoked(Cmd,[L|Ist]):-depth_check(400),once(append([L|Ist],[],Foo)),Foo\==[L|Ist],!,asInvoked(Cmd,Foo).
+asInvoked(Cmd,[L|Ist]):-stack_check(400),once(append([L|Ist],[],Foo)),Foo\==[L|Ist],!,asInvoked(Cmd,Foo).
 asInvoked(Cmd,[L|Ist]):-atom(L),not(bad_functor(L)),!, Cmd=..[L|Ist].
 asInvoked(Cmd,[L|Ist]):-!,Cmd=..[asInvoked,L|Ist].
 asInvoked(Cmd,Cmd):-!.

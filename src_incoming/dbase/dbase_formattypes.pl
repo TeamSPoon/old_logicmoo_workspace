@@ -96,7 +96,7 @@ pl_arg_type(Arg,Type):-
 mpred_arity_pred(P):- nonvar(P),arg(_,a(arity,arityMax,arityMin),P).
 
 as_one_of(Types,Type):-nonvar(Type),is_type(Type),!,member(Type,Types).
-as_one_of([Type],TypeO):-!,same_arg(same_or(subclass),Type,TypeO).
+as_one_of([Type],TypeO):-!,moo:same_arg(same_or(subclass),Type,TypeO).
 as_one_of(Types,oneOf(Types)).
 
 argIsa_call(Op,_:F,N,Type):-!,argIsa_call(Op,F,N,Type),!.
@@ -254,7 +254,7 @@ correctArgsIsa(Op,A,AA):- correctArgsIsa0(Op,A,AA),nonvar(AA),!.
 correctArgsIsa(Op,A,AA):- grtrace,correctArgsIsa0(Op,A,AA).
 
 :-export(correctArgsIsa/4).
-correctArgsIsa(Op,A,Type,AA):- trace_and_throw(warn(not(correctArgsIsa(Op,A,Type,AA)))).
+correctArgsIsa(Op,A,Type,AA):- trace_or_throw(warn(not(correctArgsIsa(Op,A,Type,AA)))).
 
 correctArgsIsa0(Op,A,AA):-A =..[KP,Prop|Args],atom(Prop),is_holds_true(KP),!,
    discoverAndCorrectArgsIsa(Op,Prop,1,Args,AArgs),

@@ -88,6 +88,7 @@ warnOnError(X):-catch(X,E,dmsg(error(E:X))).
 moo:agent_call_command(Agent,prologCall(C)) :- agent_call_safely(Agent,C).
 moo:agent_call_command(Agent,prolog(C)) :- agent_call_safely(Agent,C).
 
+:-export(agent_call_safely/2).
 agent_call_safely(_Agnt,C):- any_to_callable(C,X,Vars), !, gensym(result_count_,RC),flag(RC,_,0),agent_call_safely(RC,X,Vars),flag(RC,CC,CC),fmt(result_count(CC)).
 agent_call_safely(RC,X,[]) :- !, '@'(notrace((warnOnError(doall(((X,flag(RC,CC,CC+1),fmt(cmdresult(X,true)))))))),user).
 agent_call_safely(RC,X,Vars) :-  '@'(notrace((warnOnError(doall(((X,flag(RC,CC,CC+1),fmt(cmdresult(X,Vars)))))))),user).

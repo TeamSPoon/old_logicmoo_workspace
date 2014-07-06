@@ -109,7 +109,7 @@ add_ornode_var2(X,Y,OrNode) :-
 		put_attr(Y,dif_arg,vardif([],[OrNode-X]))
 	).
 
-attr_unify_hook(vardif(V1,V2),Other) :-
+vardif:attr_unify_hook(vardif(V1,V2),Other) :-
 	( var(Other) ->
 		reverse_lookups(V1,Other,OrNodes1,NV1),
 		or_one_fails(OrNodes1),
@@ -228,7 +228,7 @@ filter_dead_ors([Or-Y|Rest],List) :-
    X, then return a goal, otherwise don't because someone else will.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-attribute_goals(Var) -->
+vardiff:attribute_goals(Var) -->
 	(   { get_attr(Var, dif_arg, vardif(Ors,_)) } ->
 	    or_nodes(Ors, Var)
 	;   or_node(Var)
@@ -274,6 +274,7 @@ samef(X,Y):- X=Y,!.
 samef(X,Y):- hotrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci(XF,YF)))).
 
 
+:-export(same_arg/3).
 
 same_arg(_How,X,Y):-var(X),var(Y),!,grtrace,X=Y.
 same_arg(equals,X,Y):-!, unify_with_occurs_check(X,Y).
@@ -285,7 +286,7 @@ same_arg(same_or(subclass),Sub,Sup):- holds_t(subclass,Sub,Sup),!.
 same_arg(same_or(isa),X,Y):- same_arg(equals,X,Y).
 same_arg(same_or(isa),I,Sup):- !, holds_t(isa,I,Sup),!.
 
-same_arg(same_or(Pred),X,Y):- same_arg(equals,X,Y).
+same_arg(same_or(_Pred),X,Y):- same_arg(equals,X,Y).
 same_arg(same_or(Pred),I,Sup):- holds_t(Pred,I,Sup),!.
 
 % same_arg(I,X):- promp_yn('~nSame Objects: ~q==~q ?',[I,X]).
@@ -300,6 +301,7 @@ promp_yn(Fmt,A):- format(Fmt,A),get_single_char(C),C=121.
 	trigger(+, 0),
 	trigger_disj(+, 0),
 	trigger_conj(+, +, 0).
+
 
 /** <module> Conditional coroutining
 
@@ -451,7 +453,7 @@ suspend_list([V=W|Unifier],Goal) :-
 	),
 	suspend_list(Unifier,Goal).
 
-attr_unify_hook(call(Goal), Other) :- 
+varcall:attr_unify_hook(call(Goal), Other) :- 
 	(   get_attr(Other, when_met, call(GOTher))
 	->  del_attr(Other, when_met),
 	    Goal, GOTher
@@ -460,7 +462,7 @@ attr_unify_hook(call(Goal), Other) :-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-attribute_goals(V) -->
+varcall:attribute_goals(V) -->
 	{ get_attr(V, when_met, Attr) },
 	when_goals(Attr).
 

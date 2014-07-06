@@ -94,7 +94,7 @@ prompt_read(Prompt,Atom):-
 tick_tock:-
            scan_updates,!,fmt('tick tock',[]),sleep(0.1),!.
 
-
+scan_updates:- !.
 scan_updates:- ignore((thread_self(main),ignore((catch(make,E,dmsg(E)))))).
 
 
