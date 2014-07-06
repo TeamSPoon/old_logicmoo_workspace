@@ -58,8 +58,7 @@
 			<F
 				N="src_incoming/*.*"
 				Recurse="1"
-				Refilter="0"
-				Excludes=""/>
+				Excludes="*unused.*"/>
 		</Folder>
 		<Folder Name="src_modules/leanCOP">
 			<F
