@@ -230,7 +230,7 @@ is_holds_false0(Prop,Stem):-atom_concat(Stem,'_not',Prop).
 is_holds_false0(Prop,Stem):-atom_concat(Stem,'_false',Prop).
 is_holds_false0(Prop,Stem):-atom_concat(Stem,'_f',Prop).
 
-:- dynamic_multifile_exported (decl_coerce)/3.
+:- dynamic_multifile_exported((decl_coerce)/3).
 
 :-decl_mpred(singleValued,1).
 

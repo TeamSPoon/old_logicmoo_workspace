@@ -160,7 +160,10 @@ mud_isa_atom(O,T):- atom_concat(T,Int,O),catch(atom_number(Int,_),_,fail),!.
 
 define_subtype(O,T):-assert_if_new(moo:subclass(O,T)).
 
-findall_type_default_props(Inst,Type,TraitsO):-findall(Props,moo:default_type_props(Inst,Type,Props),Traits),flatten(Traits,TraitsO),!.
+findall_type_default_props(Inst,Type,TraitsO):-
+   findall(Props,each_default_type_props(Inst,Type,Props),Traits),flatten_set(Traits,TraitsO),!.
+
+each_default_type_props(Inst,Type,Props):-call_no_cuts(moo:default_type_props(Inst,Type,Props)).
 
 create_meta(T,P,C,MT):-
    must(split_name_type(T,P,C)),

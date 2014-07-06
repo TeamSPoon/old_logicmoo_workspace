@@ -37,7 +37,7 @@
          get_functor/2,
          get_functor/3,
          functor_safe/3,
-         flatten_dedupe/2,
+         flatten_set/2,
          at_start/1,
          in_thread_and_join/1,
          in_thread_and_join/2,
@@ -259,8 +259,10 @@ dynamic_multifile_exported(M, F/A ):-!,dynamic_multifile_exported(M,F,A).
 dynamic_multifile_exported(M,F,A):- integer(A),atom(M),atom(F),!, '@'(( dynamic(F/A), multifile(F/A), M:export(F/A)), M).
 dynamic_multifile_exported(M,F,A):- trace_or_throw((dynamic_multifile_exported(M,F,A))).
 
-flatten_dedupe(Percepts0,Percepts):-
-   flatten([Percepts0],Percepts1),remove_dupes(Percepts1,Percepts).
+:-export(flatten_set/2).
+flatten_set(L,S):-flatten([L],F),list_to_set(F,S),!.
+%flatten_set(Percepts0,Percepts):- flatten([Percepts0],Percepts1),remove_dupes(Percepts1,Percepts).
+
 
 remove_dupes(In,Out):-remove_dupes(In,Out,[]).
 

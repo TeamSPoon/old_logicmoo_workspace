@@ -607,15 +607,6 @@ is_asserted_gaf(Fact):-was_asserted_gaf(Fact).
 member_or_e(E,[L|List]):-!,member(E,[L|List]).
 member_or_e(E,E).
 
-/*
-is_single_valuedOrFail(F,A,Obj,ARGS):- mpred_prop(F,singleValued),!,valuedOrThrow(F,A,Obj,ARGS),!.
-is_single_valuedOrFail(_,_,_,_):- fail.
-
-valuedOrThrow(F,_,Obj,ARGS):- holds_t(isa,Obj,T), findall_type_default_props(Obj,T,Props),Props=[_|_],Prop=..[F|ARGS], member_or_e(Prop,Props),!.
-valuedOrThrow(F,A,Obj,ARGS):- valuedOrThrow1(F,A,Obj,ARGS).
-valuedOrThrow1(_F,_A,_Obj,ARGS):- last(ARGS,unknown),!.
-valuedOrThrow1(F,A,Obj,ARGS):- trace_or_throw(is_single_valuedOrFail(F,A,Obj,ARGS)).
-*/
 
 replace_nth([],_N,_OldVar,_NewVar,[]):- !,trace_or_throw(missed_the_boat).
 replace_nth([OldVar|ARGS],1,OldVar,NewVar,[NewVar|ARGS]):- !.
@@ -640,8 +631,6 @@ insert_into(ARGS,0,Insert,[Insert|ARGS]):- !.
 insert_into([Carry|ARGS],After,Insert,[Carry|NEWARGS]):- 
    After1 is After - 1,
    insert_into(ARGS,After1,Insert,NEWARGS).
-
-moo:default_type_props(_,food,[height(0)]).
 
 moo:term_specifier_text(Text,pred):- mpred_prop(Text,arity(_)).
 
@@ -674,7 +663,7 @@ moo:singleValued(mudMaxHitPoints(agent,int),[dynamic_in_module]).
 moo:singleValued(mudToHitArmorClass0(agent,int)).
 moo:singleValued(permanence(item,verb,int)).
 moo:singleValued(score(object,int)).
-moo:singleValued(spawn_rate(subclass(object),int)).
+moo:singleValued(spawn_rate(propFn(subclass(object)),int)).
 moo:singleValued(spd(agent,int)).
 moo:singleValued(stm(agent,int)).
 moo:singleValued(str(agent,int)).
@@ -682,6 +671,7 @@ moo:singleValued(type_grid(regiontype,int,list(term))).
 moo:singleValued(weight(object,int)).
 moo:singleValued(ArgTypes):-mpred_prop_g(ArgTypes).
 
+:-dynamic(spawn_rate/2).
 
 singleValued(type_max_charge(type,int)).
 singleValued(max_charge(term,int)).
@@ -851,14 +841,11 @@ scan_mpred_prop:-remove_duplicated_facts.
 :- scan_mpred_prop.
 
 
-flatten_into_set(L,S):-flatten(L,F),list_to_set(F,S).
-
 :-export(get_type_props/2).
-get_type_props(Type,PropList):-findall(PropU,(call_no_cuts(moo:default_type_props(Inst,Type,Prop)),subst(Prop,Inst,self,PropU)),PropS),flatten_into_set(PropS,PropList).
+get_type_props(Type,PropList):-call_tabled(type(Type)),findall(PropU,(findall_type_default_props(Inst,Type,Prop),subst(Prop,Inst,self,PropU)),PropS),flatten_set(PropS,PropList).
 
-instance_missing_props(I,PS):-setof(T,isa(I,T),TS),setof(TP,(member(T,TS),get_type_props(T,TP)),ListOfPropLists),flatten_into_set(ListOfPropLists,LPS),
-      findall(P,(member(P,LPS),inst_missing_prop(I,P)),PS),!.
 
+instance_missing_props(I,LPS,PS):- findall(P,(member(P,LPS),inst_missing_prop(I,P)),PS),!.
       
 inst_missing_prop(I,P):-P=..[F|Args],inst_missing_prop(I,F,Args).
 
@@ -869,12 +856,20 @@ inst_missing_prop(I,F,Args):-C=..[F,I|Args],get_sv_argnum(F,[I|Args],A),arg(A,C,
 
 get_sv_argnum(F,Args,ArgNum):-once(mpred_prop(F,functionalArg(ArgNum));length(Args,ArgNum)).
 
+forall_setof(ForEach,Call):-
+   findall(ForEach,ForEach,ForEachAll),
+   list_to_set(ForEachAll,Set),!,
+   ignore(forall(member(ForEach,Set),Call)).
+
 :-export(scan_default_props/0).
+
+scan_default_props:- dmsg(todo(fix(scan_default_props,"to not set atloc/2"))),!.
 scan_default_props:- 
-   setof(CT,createableType(CT),CTS),dmsg(scan_default_props(types(CTS))),
-   setof(I,(member(CT,CTS),isa(I,CT)),IS),dmsg(scan_default_props(set(IS))),
-   forall(member(I,IS),
-          (instance_missing_props(I,PS),show_call(padd(I,PS)))).
+ forall_setof(get_type_props(Type,PropList),
+    forall_setof(isa(I,Type), 
+         ignore((not(Type == I),instance_missing_props(I,PropList,Missing),dmsg(scan_default_props(I,Type,missing_from(Missing,PropList))),padd(I,Missing))))),!,
+ remove_duplicated_facts.
+scan_default_props.
 
       
 

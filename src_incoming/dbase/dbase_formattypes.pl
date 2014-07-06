@@ -373,10 +373,10 @@ isa_assert(A,Type,_NewArg):-throw(failure(isa_assert(A,Type))).
 
 correctType(Op,A,Type,AA):- var(Type),trace_or_throw(correctType(Op,A,Type,AA)).
 correctType(_O,A,Type,AA):- (var(A);var(Type)),!, must(must_equals(A,AA)).
+correctType(Op,+A,Type,+AA):-!,correctType(Op,A,Type,AA).
+correctType(Op,-A,Type,-AA):-!,correctType(Op,A,Type,AA).
 correctType(_O,A,argIsaFn(_,_),AA):-must_equals(A,AA). % !. %any_to_value(O,V).  %missing
 correctType(_O,A,dir,AA):- any_to_dir(A,AA).
-correctType(Op,+A,Type,+AA):-correctType(Op,A,Type,AA).
-correctType(Op,-A,Type,-AA):-correctType(Op,A,Type,AA).
 correctType(Op,A,integer,AA):-!,correctType(Op,A,int,AA).
 correctType(_O,A,int,AA):- any_to_number(A,AA).
 correctType(_O,A,number,AA):- must(any_to_number(A,AA)).
