@@ -264,7 +264,6 @@ moo:singleValued(mudBareHandDamage(agent,dice)).
 moo:singleValued(mudLevelOf(possessable,int)).
 moo:singleValued(mudMaxHitPoints(agent,int)).
 moo:singleValued(mudToHitArmorClass0(agent,int)).
-moo:singleValued(pathBetween(region,dir,region)).
 moo:singleValued(permanence(item,verb,int)).
 moo:singleValued(score(object,int)).
 moo:singleValued(spawn_rate(propFn(subclass(object)),int)).
@@ -275,6 +274,7 @@ moo:singleValued(type_grid(regiontype,int,list(term))).
 moo:singleValued(weight(object,int)).
 
 moo:multiValued(comment(term,string)).
+moo:multiValued(pathBetween(region,dir,region)).
 
 moo:singleValued(height(agent,int)).
 moo:default_type_props(self,food,[height(0)]).

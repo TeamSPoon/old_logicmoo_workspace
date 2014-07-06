@@ -26,48 +26,8 @@
 
 :- register_module_type(utility).
 
-% =====================================================================================================================
-% call_no_cuts/4
-% =====================================================================================================================
-
-/*
-:-export((call_no_cuts/1)).
-call_no_cuts(CALL):-clause(CALL,TEST),call_no_cuts_0(TEST).
-
-call_no_cuts_0(true):-!.
-call_no_cuts_0((!)):-!.
-call_no_cuts_0((A,B)):-!.call_no_cuts_0(A),call_no_cuts_0(B).
-call_no_cuts_0(C):-call(C).
-*/
-
-:-debug.
-
-:-export((call_tabled/1)).
-:- meta_predicate call_tabled(0).
-:- module_transparent call_tabled/1.
-:- dynamic(call_tabled_list/2).
-
-make_key(CC,Key):- copy_term(CC,Key),numbervars(Key,'$VAR',0,_),!.
-
 hook:decl_database_hook(assert(_),C):- expire_tabled_list(C).
 hook:decl_database_hook(retract(_),C):- expire_tabled_list(C).
-
-expire_tabled_list(T):- CT= call_tabled_list(Key,List),doall(((CT,any_term_overlap(T,Key:List),retract(CT)))).
-
-any_term_overlap(T1,T2):- atoms_of(T1,A1),atoms_of(T2,A2),!,member(A,A1),member(A,A2),!.
-call_tabled(findall(A,B,C)):- !,findall_tabled(A,B,C).
-call_tabled(C):- copy_term(C,CC),numbervars(CC,'$VAR',0,_),call_tabled(C,C).
-call_tabled(CC,C):- make_key(CC,Key),call_tabled0(Key,C,C,List),!,member(C,List).
-call_tabled0(Key,_,_,List):- call_tabled_list(Key,List),!.
-call_tabled0(Key,E,C,List):- findall(E,C,List1),list_to_set(List1,List),asserta_if_ground(call_tabled_list(Key,List)),!.
-
-findall_tabled(Result,C,List):- make_key(Result^C,RKey),findall_tabled4(Result,C,RKey,List).
-findall_tabled4(_,_,RKey,List):- call_tabled_list(RKey,List),!.
-findall_tabled4(Result,C,RKey,List):- findall(Result,call_tabled(C),RList),list_to_set(RList,List),asserta_if_ground(call_tabled_list(RKey,List)).
-
-asserta_if_ground(_):- !.
-asserta_if_ground(G):- ground(G),asserta(G),!.
-asserta_if_ground(_).
 
 
 % =====================================================================================================================
@@ -343,7 +303,7 @@ phrase_parseForTypes(TYPEARGS,GOODARGS,ARGS,LeftOver):-
 
 phrase_parseForTypes_l(TYPEARGS,GOODARGS,ARGSL,LeftOver):-
     catch(phrase(parseForTypes(TYPEARGS,GOODARGS),ARGSL,LeftOver),_,fail),!.    
-phrase_parseForTypes_l(TypesIn,Out,In,[]):- length(TypesIn,L),between(1,4,L),length(In,L),must(Out=In),!,dmsg(fake_phrase_parseForTypes_l(TypesIn=In)).
+phrase_parseForTypes_l(TypesIn,Out,In,[]):- length(TypesIn,L),between(1,4,L),length(In,L),must(Out=In),!,dmsg(fake_phrase_parseForTypes_l(foreach_isa(In,TypesIn))).
 phrase_parseForTypes_l(TYPEARGS,GOODARGS,ARGSL,LeftOver):-
     debugOnError(phrase(parseForTypes(TYPEARGS,GOODARGS),ARGSL,LeftOver)).    
 

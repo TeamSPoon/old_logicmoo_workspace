@@ -364,28 +364,8 @@ isa_assert(A,C,A):-must(ground(A)),dmsg(todo(define(isa_assert(A,C,'ConvertedArg
 isa_assert(A,Type,_NewArg):-throw(failure(isa_assert(A,Type))).
 
 */
-/*
-holdsFunctor(k).
-holdsFunctor(p).
-holdsFunctor(holds).
-holdsFunctor(X):-is_2nd_order_holds(X).
 
 
-correctArgsIsa(A,AA):-
-   functor(A,_,1),!,
-   must(any_to_value(A,AA)),
-   cmust(ground(AA)).
-
-correctArgsIsa(M:A,M:AA):-!,correctArgsIsa(A,AA).
-correctArgsIsa(A,AA):-A =..[KP,Prop|Args],atom(Prop),holdsFunctor(KP),!,
-   discoverAndCorrectArgsIsa(Prop,1,Args,AArgs),
-   AA =..[Prop|AArgs].
-
-correctArgsIsa(A,AA):-A =..[Prop|Args],
-   discoverAndCorrectArgsIsa(Prop,1,Args,AArgs),
-   AA =..[Prop|AArgs].
-
-*/
 :- style_check(+singleton).
 
 correctType(Op,A,Type,AA):- var(Type),trace_or_throw(correctType(Op,A,Type,AA)).

@@ -22,8 +22,8 @@
          module_predicates_are_exported/1,
          module_predicates_are_exported/0,
          inside_loop_check/1,
-         rtrace/1,
          is_loop_checked/1,
+         rtrace/1,
          snumbervars/1,
          safe_numbervars/1,
          safe_numbervars/2,
@@ -289,9 +289,6 @@ loop_check_fail(B):- loop_check(B,(dmsg(once(loop_check_fail(B))),fail)).
 
 snumbervars(BC):-numbervars(BC,0,_,[singletons(true),attvar(skip)]).
 
-loop_check(B,TODO):- copy_term(B,BC),snumbervars(BC),!, loop_check(BC,B,TODO).
-loop_check_term(B,TERM,TODO):- copy_term(TERM,BC),snumbervars(BC),!, loop_check(BC,B,TODO).
-loop_check_clauses(B,TODO):- copy_term(B,BC),snumbervars(BC),!, loop_check(call_skipping_n_clauses(1,B),BC,TODO).
 
 to_list_of(_,[Rest],Rest):-!.
 to_list_of(RL,[R|Rest],LList):-
@@ -304,21 +301,14 @@ call_or_list(Rest):-to_list_of(';',Rest,List),List.
 call_skipping_n_clauses(N,H):-
    findall(B,clause(H,B),L),length(L,LL),!,LL>N,length(Skip,N),append(Skip,Rest,L),!,call_or_list(Rest).
 
-is_loop_checked(B):- copy_term(B,BC),snumbervars(BC),!,inside_loop_check(BC).
-is_loop_checked(B):- copy_term(B,BC),snumbervars(BC),!,recorded(B,BC).
-/*
-loop_check(BC,B,TODO):-recorded(B,BC),!,call(TODO).
-loop_check(BC,B,_TODO):- !,
-    recorda(B,BC,Ref),
-    setup_call_cleanup(true,
-       call(B),
-       erase(Ref)).
-*/
-loop_check(BC,_B, TODO):-inside_loop_check(BC),!,call(TODO).
-loop_check(BC, B,_TODO):- 
-    setup_call_cleanup(asserta(inside_loop_check(BC)),
-    call(B),
-    ignore(retract(inside_loop_check(BC)))).
+is_loop_checked(B):- make_key(B,BC),!,inside_loop_check(BC).
+
+loop_check(B,TODO):- make_key(B,BC),!, loop_check_term(B,BC,TODO).
+
+loop_check_clauses(B,TODO):- copy_term(B,BC),snumbervars(BC),!, loop_check(call_skipping_n_clauses(1,B),BC,TODO).
+
+loop_check_term(_B,BC, TODO):- inside_loop_check(BC),!,call(TODO).
+loop_check_term(B,BC, _TODO):- setup_call_cleanup(asserta(inside_loop_check(BC)),B,ignore(retract(inside_loop_check(BC)))).
 
  % cli_notrace(+Call) is nondet.
  % use call/1 with trace turned off
@@ -1314,10 +1304,11 @@ export_all_preds(ModuleName):-forall(current_predicate(ModuleName:F/A),
 module_notrace(M):- forall(predicate_property(P,imported_from(M)),bugger:moo_hide(M:P)).
 
 
-
+% =====================================================================================================================
+:-export((call_no_cuts/1)).
+% =====================================================================================================================
 :- module_transparent call_no_cuts/1.
 :- meta_predicate call_no_cuts(0).
-:-export((call_no_cuts/1)).
 call_no_cuts(CALL):-clause(CALL,TEST),call_no_cuts_0(TEST).
 
 call_no_cuts_0(true):-!.
@@ -1325,11 +1316,40 @@ call_no_cuts_0((!)):-!.
 call_no_cuts_0((A,B)):-!.call_no_cuts_0(A),call_no_cuts_0(B).
 call_no_cuts_0(C):-call(C).
 
+% =====================================================================================================================
+:-export((call_tabled/1)).
+% =====================================================================================================================
+:- meta_predicate call_tabled(0).
+:- module_transparent call_tabled/1.
+:- dynamic(call_tabled_list/2).
+
+make_key(CC,CC):- ground(CC),!.
+make_key(CC,Key):- copy_term(CC,Key),numbervars(Key,'$VAR',0,_),!.
+
+expire_tabled_list(T):- CT= call_tabled_list(Key,List),doall(((CT,any_term_overlap(T,Key:List),retract(CT)))).
+
+any_term_overlap(T1,T2):- atoms_of(T1,A1),atoms_of(T2,A2),!,member(A,A1),member(A,A2),!.
+call_tabled(findall(A,B,C)):- !,findall_tabled(A,B,C).
+call_tabled(C):- copy_term(C,CC),numbervars(CC,'$VAR',0,_),call_tabled(C,C).
+call_tabled(CC,C):- make_key(CC,Key),call_tabled0(Key,C,C,List),!,member(C,List).
+call_tabled0(Key,_,_,List):- call_tabled_list(Key,List),!.
+call_tabled0(Key,E,C,List):- findall(E,C,List1),list_to_set(List1,List),asserta_if_ground(call_tabled_list(Key,List)),!.
+
+findall_tabled(Result,C,List):- make_key(Result^C,RKey),findall_tabled4(Result,C,RKey,List).
+findall_tabled4(_,_,RKey,List):- call_tabled_list(RKey,List),!.
+findall_tabled4(Result,C,RKey,List):- findall(Result,call_tabled(C),RList),list_to_set(RList,List),asserta_if_ground(call_tabled_list(RKey,List)).
 
 
+asserta_if_ground(_):- !.
+asserta_if_ground(G):- ground(G),asserta(G),!.
+asserta_if_ground(_).
+
+
+% =====================================================================================================================
 :- module_notrace(bugger).
+% =====================================================================================================================
 :- module_notrace(logicmoo_util_strings).
-
+% =====================================================================================================================
 
 :-source_location(File,_Line),module_property(M,file(File)),!,forall(current_predicate(M:F/A),moo_hide_show_childs(M,F,A)).
 

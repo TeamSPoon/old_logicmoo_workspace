@@ -529,8 +529,10 @@ argIsa_call(isa,2,type):-!.
 argIsa_call(act_affect,_,term):-!.
 argIsa_call(ofclass,2,type):-!.
 argIsa_call(memory,2,term):-!.
-argIsa_call(Prop,N1,Type):-mpred_prop(Prop,argIsa(N1, Type)),!.
-argIsa_call(Prop,N1,Type):-dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),
+argIsa_call(Prop,N1,Type):- mpred_prop(Prop,argIsa(N1, Type)),!.
+argIsa_call(F,N,Type):- mpred_prop(F,argsIsa(Types)),arg(N,Types,Type),nonvar(Type),!.
+argIsa_call(F,N,Type):- mpred_prop_game_assert(Types),functor(Types,F,_),arg(N,Types,Type),nonvar(Type),!.
+argIsa_call(Prop,N1,Type):- dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),
    Type=argIsaFn(Prop,N1).
 
 db_forall_quf(C,Pretest,Template):- C=..[Prop,OBJ|ARGS],
@@ -670,7 +672,6 @@ moo:singleValued(mudBareHandDamage(agent,dice)).
 moo:singleValued(mudLevelOf(possessable,int)).
 moo:singleValued(mudMaxHitPoints(agent,int),[dynamic_in_module]).
 moo:singleValued(mudToHitArmorClass0(agent,int)).
-moo:singleValued(pathBetween(region,dir,region)).
 moo:singleValued(permanence(item,verb,int)).
 moo:singleValued(score(object,int)).
 moo:singleValued(spawn_rate(subclass(object),int)).
@@ -680,6 +681,7 @@ moo:singleValued(str(agent,int)).
 moo:singleValued(type_grid(regiontype,int,list(term))).
 moo:singleValued(weight(object,int)).
 moo:singleValued(ArgTypes):-mpred_prop_g(ArgTypes).
+
 :-dynamic(mudToHitArmorClass0/2).
 % :- include('dbase_i_builtin').
 
@@ -790,9 +792,9 @@ mpred_prop_prolog(world:nearby(object,object)).
 % multiValued
 %multiValued(G,AT,[ordered|LIST]):-multiValued(G,LIST),functor(G,_,AT).
 
+moo:multiValued(pathBetween(region,dir,region)).
 multiValued(named(term,term),[genlpreds(id)]).
 multiValued(ofclass(term,type),[alias(isa)]).
-%multiValued(G,[]):-multiValued(G).
 
 multiValued(failure(agent,action)).
 multiValued(nameStrings(term,string)).
@@ -807,6 +809,8 @@ multiValued(grid(region,int,int,object)).
 multiValued(possess(agent,item)).
 multiValued(subclass(type,type)).
 multiValued(isa(term,type)).
+moo:argsIsa(somethingIsa(term,list(type))).
+moo:argsIsa(somethingDescription(term,list(string))).
 
 :-decl_mpred(repl_writer(agent,term),[singleValued,default(look:default_repl_writer)]).
 :-decl_mpred(repl_to_string(agent,term),[singleValued,default(look:default_repl_obj_to_string)]).

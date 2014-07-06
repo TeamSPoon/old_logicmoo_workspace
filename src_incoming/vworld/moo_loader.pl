@@ -12,7 +12,6 @@
           game_assert/1,
           % isa_assert/3,
           gload/0,
-          correctArgsIsa/2,
           pgs/1,
           load_game/1
           ]).
@@ -54,11 +53,8 @@ savedb:-
    dbase_mod(DBM),
    tell(savedb),listing(DBM:_),told.
 
-
-game_assert((':-'(A))):-hotrace(A),!.
-
-game_assert(d(s)):-grtrace.
-
+game_assert(':-'(A)):- must(A),!.
+game_assert(d(s)):-dtrace.
 game_assert(A):-must(once(correctArgsIsa(tell(game_assert),A,AA))),must(once(pgs(AA))),!.
 
 % pgs(A):- fail, A=..[SubType,Arg], moo:createableType(SubType,Type),!,AA =.. [Type,Arg],
