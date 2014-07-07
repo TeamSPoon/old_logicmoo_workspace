@@ -331,6 +331,9 @@ list_to_atomics_list0([E|EnglishF],[A|EnglishA]):-
    list_to_atomics_list0(EnglishF,EnglishA),!.
 list_to_atomics_list0([],[]):-!.
 
+:-export(atomic_list_concat_catch/3).
+atomic_list_concat_catch(List,Sep,Atom):-catch(atomic_list_concat(List,Sep,Atom),E,(dumpST,dmsg(E:atomic_list_concat(List,Sep,Atom)),!,fail)).
+
 
 catch_read_term_from_atom(Sub,Term,NewOnes):-catch(read_term_from_atom(Sub,Term,[module(user),variable_names(NewOnes)]),_,fail),Term\==end_of_file.
 

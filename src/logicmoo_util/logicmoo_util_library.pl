@@ -72,9 +72,12 @@ warn_bad_functor(L):-ignore((notrace(bad_functor(L)),!,dumpST,dtrace,trace_or_th
 safe_univ(M:Call,[N:L|List]):- nonvar(M),nonvar(N),!,safe_univ(Call,[L|List]).
 safe_univ(Call,[M:L|List]):- nonvar(M),!,safe_univ(Call,[L|List]).
 safe_univ(M:Call,[L|List]):- nonvar(M),!,safe_univ(Call,[L|List]).
-safe_univ(Call,[L|List]):- not(is_list(Call)),Call =..[L|List],!,warn_bad_functor(L).
+safe_univ(Call,[L|List]):- not(is_list(Call)), Call =..[L|List],!,warn_bad_functor(L).
 safe_univ([L|List],[L|List]):- var(List),atomic(Call),!,grtrace,Call =.. [L|List],warn_bad_functor(L).
-safe_univ(Call,[L|List]):- catch(Call =.. [L|List],E,(format('~q~n',[E=safe_univ(Call,List)]))),warn_bad_functor(L).
+safe_univ(Call,[L|List]):- catch(Call =.. [L|List],E,(dumpST,'format'('~q~n',[E=safe_univ(Call,List)]))),warn_bad_functor(L).
+
+:-export(append_term/3).
+append_term(Call,E,CallE):- Call=..List, append(List,[E],ListE), CallE=..ListE.
 
 % =================================================================================
 % Utils
@@ -84,7 +87,7 @@ safe_univ(Call,[L|List]):- catch(Call =.. [L|List],E,(format('~q~n',[E=safe_univ
 :-dynamic(argNFound/3).
 % :-index(argNFound(1,1,1)).
 
-makeArgIndexes(CateSig):-functor(CateSig,F,_),makeArgIndexes(CateSig,F),!.
+makeArgIndexes(CateSig):-functor_catch(CateSig,F,_),makeArgIndexes(CateSig,F),!.
 makeArgIndexes(CateSig,F):- argNumsTracked(F,Atom,Number),arg(Number,CateSig,Arg),user:nonvar(Arg),
      %%Number<10,user:nonvar(Arg),atom_number(Atom,Number),
      assert_if_new(argNFound(F,Atom,Arg)),fail.
@@ -98,8 +101,8 @@ makeArgIndexes(_NEW,_F).
 asserta_new(_Ctx,NEW):-ignore(retractall(NEW)),asserta(NEW).
 writeqnl(_Ctx,NEW):- fmt('~q.~n',[NEW]),!.
 
-eraseall(M:F,A):-!,forall((current_predicate(M:F/A),functor(C,F,A)),forall(clause(M:C,_,X),erase(X))).
-eraseall(F,A):-forall((current_predicate(M:F/A),functor(C,F,A)),forall(clause(M:C,_,X),erase(X))).
+eraseall(M:F,A):-!,forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(clause(M:C,_,X),erase(X))).
+eraseall(F,A):-forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(clause(M:C,_,X),erase(X))).
 
 asserta_new(NEW):-ignore(retractall(NEW)),asserta(NEW).
 assertz_new(NEW):-ignore(retractall(NEW)),assertz(NEW).
@@ -124,12 +127,12 @@ clause_asserted(H,B):- predicate_property(H,number_of_clauses(_)),functor_h(H,HH
 :-meta_predicate clause_safe(:, ?).
 :-module_transparent clause_safe/2.
 :-export(clause_safe/2).
-clause_safe(M:H,B):-(nonvar(H)->true;(current_predicate(M:F/A),functor(H,F,A))),predicate_property(M:H,number_of_clauses(_)),clause(H,B).
+clause_safe(M:H,B):-(nonvar(H)->true;(current_predicate(M:F/A),functor_catch(H,F,A))),predicate_property(M:H,number_of_clauses(_)),clause(H,B).
 
 as_clause( ((H :- B)),H,B):-!.
 as_clause( H,  H,  true).
 
-functor_h(H,HH):- notrace(( var(H) -> HH=H ; (functor(H,F,A),functor(HH,F,A)) )).
+functor_h(H,HH):- notrace(( var(H) -> HH=H ; (functor_catch(H,F,A),functor_catch(HH,F,A)) )).
 
 :- meta_predicate doall(0).
 doall(C):-ignore((C,fail)).
@@ -154,7 +157,7 @@ predsubst(A,_B,A).
 
 nd_predsubst(  Var, Pred,SUB ) :- call(Pred,Var,SUB).
 nd_predsubst(  Var, _,Var ) :- var(Var),!.
-nd_predsubst(  P, Pred, P1 ) :- functor(P,_,N),nd_predsubst1( Pred, P, N, P1 ).
+nd_predsubst(  P, Pred, P1 ) :- functor_catch(P,_,N),nd_predsubst1( Pred, P, N, P1 ).
 
 nd_predsubst1( _,  P, 0, P  ).
 nd_predsubst1( Pred,  P, N, P1 ) :- N > 0, P =.. [F|Args], 
@@ -175,11 +178,11 @@ nd_predsubst2( _, L, L ).
 % Usage: subst(+Fml,+X,+Sk,?FmlSk)
 
 subst(A,B,C,D):- 
-      catch(notrace(nd_subst(A,B,C,D)),_,fail),!.
+      catch(notrace(nd_subst(A,B,C,D)),E,(dumpST,dmsg(E:nd_subst(A,B,C,D)),fail)),!.
 subst(A,_B,_C,A).
 
 nd_subst(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
-nd_subst(  P, X,Sk, P1 ) :- functor(P,_,N),nd_subst1( X, Sk, P, N, P1 ).
+nd_subst(  P, X,Sk, P1 ) :- functor_catch(P,_,N),nd_subst1( X, Sk, P, N, P1 ).
 
 nd_subst1( _,  _, P, 0, P  ).
 nd_subst1( X, Sk, P, N, P1 ) :- N > 0, P =.. [F|Args], 
@@ -200,7 +203,7 @@ wsubst(A,B,C,D):-
 wsubst(A,_B,_C,A).
 
 weak_nd_subst(  Var, VarS,SUB,SUB ) :- nonvar(Var),Var=VarS,!.
-weak_nd_subst(        P, X,Sk,        P1 ) :- functor(P,_,N),weak_nd_subst1( X, Sk, P, N, P1 ).
+weak_nd_subst(        P, X,Sk,        P1 ) :- functor_catch(P,_,N),weak_nd_subst1( X, Sk, P, N, P1 ).
 
 weak_nd_subst1( _,  _, P, 0, P  ).
 
@@ -231,11 +234,11 @@ get_module_of_4(P,F,A,M):- trace, debugCall(get_module_of_4(P,F,A,M)).
 
 :- meta_predicate get_module_of(0,-).
 get_module_of(V,M):-var(V),!,current_module(M).
-get_module_of(F/A,M):-!,functor(P,F,A),!,get_module_of(P,M).
+get_module_of(F/A,M):-!,functor_catch(P,F,A),!,get_module_of(P,M).
 get_module_of(P,M):-predicate_property(P,imported_from(M)),!.
 get_module_of(P,M):-predicate_property(_:P,imported_from(M)),!.
 get_module_of(MM:_,M):-!,MM=M.
-get_module_of(P,M):-functor(P,F,A),get_module_of_4(P,F,A,M).
+get_module_of(P,M):-functor_catch(P,F,A),get_module_of_4(P,F,A,M).
 
 
 :- meta_predicate def_meta_predicate(0,+,+).
@@ -276,7 +279,7 @@ get_functor(Obj,F,_):-var(Obj),trace_or_throw(get_functor(Obj,F)).
 get_functor(_:Obj,F,A):-!,get_functor(Obj,F,A).
 get_functor(Obj,F,0):- string(Obj),!,atom_string(F,Obj).
 get_functor(Obj,Obj,0):-not(compound(Obj)),!.
-get_functor(Obj,F,A):-functor(Obj,F,A).
+get_functor(Obj,F,A):-functor_catch(Obj,F,A).
 
 strip_f_module(_:P,FA):-nonvar(P),!,strip_f_module(P,F),!,F=FA.
 strip_f_module(P,PA):-atom(P),!,P=PA.
@@ -284,16 +287,16 @@ strip_f_module(P,FA):- notrace(string(P);is_list(P);atomic(P)), text_to_string(P
 strip_f_module(P,P).
 
 functor_safe(P,F,A):-functor_safe0(P,F,A),!.
-functor_safe0(M:P,M:F,A):-var(P),atom(M),functor(P,F,A),!,warn_bad_functor(F).
-functor_safe0(P,F,A):-var(P),strip_f_module(F,F0),functor(P,F0,A),!,warn_bad_functor(F).
+functor_safe0(M:P,M:F,A):-var(P),atom(M),functor_catch(P,F,A),!,warn_bad_functor(F).
+functor_safe0(P,F,A):-var(P),strip_f_module(F,F0),functor_catch(P,F0,A),!,warn_bad_functor(F).
 functor_safe0(P,F,A):-compound(P),!,functor_safe_compound(P,F,A),warn_bad_functor(F).
 functor_safe0(P,F,0):- notrace(string(P);atomic(P)), text_to_string(P,S),!,atom_string(F,S),warn_bad_functor(F).
 functor_safe_compound((_,_),',',2).
 functor_safe_compound([_|_],'.',2).
-functor_safe_compound(_:P,F,A):- functor(P,F,A),!.
-functor_safe_compound(P,F,A):- functor(P,F,A).
-functor_safe_compound(P,F,A):- var(F),strip_f_module(P,P0),!,functor(P0,F0,A),strip_f_module(F0,F),!.
-functor_safe_compound(P,F,A):- strip_f_module(P,P0),strip_f_module(F,F0),!,functor(P0,F0,A).
+functor_safe_compound(_:P,F,A):- functor_catch(P,F,A),!.
+functor_safe_compound(P,F,A):- functor_catch(P,F,A).
+functor_safe_compound(P,F,A):- var(F),strip_f_module(P,P0),!,functor_catch(P0,F0,A),strip_f_module(F0,F),!.
+functor_safe_compound(P,F,A):- strip_f_module(P,P0),strip_f_module(F,F0),!,functor_catch(P0,F0,A).
 
 % :- moo_hide_childs(functor_safe/2).
 % :- moo_hide_childs(functor_safe/3).
@@ -302,8 +305,7 @@ functor_safe_compound(P,F,A):- strip_f_module(P,P0),strip_f_module(F,F0),!,funct
 
 call_n_times(0,_Goal):-!.
 call_n_times(1,Goal):-!,Goal.
-call_n_times(N,Goal):-between(2,N,_),Goal.
-call_n_times(_,Goal):-Goal.
+call_n_times(N,Goal):-doall((between(2,N,_),once(Goal))),Goal.
 
 
 :-dynamic(at_started/1).
@@ -342,14 +344,14 @@ dynamic_transparent([X]):-dynamic_transparent(X),!.
 dynamic_transparent([X|Xs]):-!,dynamic_transparent(X),dynamic_transparent(Xs),!.
 dynamic_transparent(M:F/A):-!, module_transparent(M:F/A),dynamic(M:F/A).
 dynamic_transparent(F/A):-!,multi_transparent(user:F/A).
-dynamic_transparent(X):-functor(X,F,A),dynamic_transparent(F/A),!.
+dynamic_transparent(X):-functor_catch(X,F,A),dynamic_transparent(F/A),!.
 
 multi_transparent([]):-!.
 multi_transparent([X]):-multi_transparent(X),!.
 multi_transparent([X|Xs]):-!,multi_transparent(X),multi_transparent(Xs),!.
 multi_transparent(M:F/A):-!, module_transparent(M:F/A),dynamic(M:F/A),multifile(M:F/A).
 multi_transparent(F/A):-!,multi_transparent(user:F/A).
-multi_transparent(X):-functor(X,F,A),multi_transparent(F/A),!.
+multi_transparent(X):-functor_catch(X,F,A),multi_transparent(F/A),!.
 
 :- module_transparent(library_directory/1).
 
@@ -407,7 +409,7 @@ addLibraryDir :- buggerDir(Here),atom_concat(Here,'/..',UpOne), absolute_file_na
 
 term_parts(A,[A]):- not(compound(A)),!.
 term_parts([A|L],TERMS):-!,term_parts_l([A|L],TERMS).
-term_parts(Comp,[P/A|TERMS]):- functor(Comp,P,A), Comp=..[P|List],term_parts_l(List,TERMS).
+term_parts(Comp,[P/A|TERMS]):- functor_catch(Comp,P,A), Comp=..[P|List],term_parts_l(List,TERMS).
 
 term_parts_l(Var,[open(Var),Var]):-var(Var),!.
 term_parts_l([],[]):-!.

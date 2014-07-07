@@ -32,10 +32,7 @@ moo:agent_call_command(Agent,drop(_)) :-
 	add(failure(Agent,drop)).
 
 % Record keeping
-moo:update_charge(Agent,drop) :-
-	del(charge(Agent,Old)),
-	New is Old - 1,
-	add(charge(Agent,New)).
+moo:update_charge(Agent,drop) :- add(charge(Agent,-1)).
 
 moo:agent_text_command(Agent,[drop,X],Agent,drop(X)).
 

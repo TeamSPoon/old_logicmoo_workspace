@@ -35,7 +35,8 @@ hook:decl_database_hook(retract(_),C):- expire_tabled_list(C).
 % =====================================================================================================================
 :-export(get_agent_text_command/4).
 
-get_agent_text_command(Agent,VERBOrListIn,AgentR,CMD):-debugOnError(loop_check(get_agent_text_command_0(Agent,VERBOrListIn,AgentR,CMD),fail)).
+get_agent_text_command(Agent,VERBOrListIn,AgentR,CMD):-
+   debugOnError(loop_check(get_agent_text_command_0(Agent,VERBOrListIn,AgentR,CMD),fail)).
 
 get_agent_text_command_0(Agent,ListIn,AgentR,CMD):- 
    (is_list(ListIn) -> UseList=ListIn ; UseList=[ListIn]),
@@ -90,23 +91,59 @@ parse_for(Type,StringM,Term,LeftOver):-
       fmt('Success! parse \'~q\' "~q" = ~q   (leftover=~q) . ~n',[Type,String,Term,LeftOver]);
       fmt('No Success.~n',[])).
 
-
-meets_desc_spec(T,_L):- term_to_atom(T,S0),string_to_atom(S0,A),atomic_list_concat([_,_|_],'mudBareHandDa',A),!,fail.
+meets_desc_spec(T,_L):- term_to_atom(T,S0),string_to_atom(S0,A),atomic_list_concat_catch([_,_|_],'mudBareHandDa',A),!,fail.
 meets_desc_spec(_,[]):-!.
 meets_desc_spec(S,[DS|SL]):-!,meets_desc_spec(S,DS),meets_desc_spec(S,SL),!.
 meets_desc_spec(S,From-To):-!, desc_len(S,Len),!, between(From,To,Len).
 meets_desc_spec(_,_).
 
 desc_len(S0,Region):- term_to_atom(S0,S),
-   atomic_list_concat(Words,' ',S),length(Words,Ws),atomic_list_concat(Sents,'.',S),length(Sents,Ss),Region is Ss+Ws,!.
+   atomic_list_concat_catch(Words,' ',S),length(Words,Ws),atomic_list_concat_catch(Sents,'.',S),length(Sents,Ss),Region is Ss+Ws,!.
 
 order_descriptions(O,DescSpecs,ListO):-findall(S,(description(O,S),meets_desc_spec(S,DescSpecs)),Rev),reverse(Rev,List),delete_repeats(List,ListO).
 
 delete_repeats([],[]):-!.
 delete_repeats([Region|List],[Region|ListO]):-delete(List,Region,ListM), delete_repeats(ListM,ListO),!.
 
-objects_match(SObj,Inv,List):-
-   findall(Obj, (member(Obj,Inv),object_match(SObj,Obj)), List).
+:-export(objects_match_for_agent/3).
+objects_match_for_agent(Agent,Text,ObjList):- objects_match_for_agent(Agent,Text,[possess(Agent,value),same(atloc),same(inRegion),agent,item,region],ObjList).  
+:-export(objects_match_for_agent/4).
+objects_match_for_agent(Agent,Text,Match,ObjList):- objects_for_agent(Agent,or([text_means(Agent,Text,value),and([or(Match),object_match(Text,value)])]),ObjList).  
+
+text_means(Agent,Text,Agent):- equals_icase(Text,"self"),!.
+text_means(Agent,Text,Loc):- equals_icase(Text,"here"),where_atloc(Agent,Loc).
+text_means(_Agent,_Text,_Value):-!,fail.
+
+relates(Agent,Relation,Obj):-loop_check_clauses(relates(Agent,Relation,Obj),fail).
+relates(Agent,Relation,Obj):-text_means(Agent,Relation,Obj),!.
+relates(_    ,Relation,Obj):- atom(Relation),is_type(Relation),!,isa(Obj,Relation).
+relates(_    ,Relation,Obj):-contains_term(Relation,value),subst(Relation,value,Obj,Call),!,req(Call).
+relates(Agent,same(Relation),Obj):- !, relates(Agent,Relation,Value),relates(Obj,Relation,Value).
+relates(Agent,Relation,Obj):- atom(Relation),!, prop(Agent,Relation,Obj).
+relates(_    ,Relation,Obj):-contains_term(Relation,Obj),!,req(Relation).
+relates(Agent,Relation,Obj):-contains_term(Relation,Agent),append_term(Relation,Obj,Call),!,req(Call).
+relates(Agent,Relation,Obj):-objects_for_agent(Agent,Relation,MatchList),MatchList\=[],!,member(MatchList,Obj).
+
+
+objects_for_agent(_Agent,and([]),[]):-!.
+objects_for_agent(_Agent,or([]),[]):-!.
+
+objects_for_agent(Agent,or([Possible|Relations]),MatchList):-!,
+   objects_for_agent(Agent,Possible,L1),
+   objects_for_agent(Agent,Relations,L2),
+   append(L1,L2,MatchListL),!,
+   list_to_set(MatchListL,MatchList),!.
+
+objects_for_agent(Agent,members(List,Relations),MatchList):-!, findall(Obj,(member(Obj,List),relates(Agent,Relations,Obj)),MatchListL),list_to_set(MatchListL,MatchList),!.
+
+objects_for_agent(Agent,and([Possible|Relations]),MatchList):-!,
+   objects_for_agent(Agent,Possible,L1),
+   objects_for_agent(Agent,members(L1,Relations),MatchListL),
+   list_to_set(MatchListL,MatchList),!.
+objects_for_agent(Agent,Relation,MatchList):- findall(Obj, relates(Agent,Relation,Obj), MatchListL),list_to_set(MatchListL,MatchList),!.
+
+
+objects_match(Text,Possibles,MatchList):- findall(Obj,(member(Obj,Possibles),object_match(Text,Obj)), MatchList).
 
 :-dynamic object_string_used/2.
 
@@ -197,20 +234,21 @@ parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL):-
    dmsg_parserm(succeed_parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL)),!.
 
 parse_agent_text_command(Agent,VERB,[PT2|ARGS],NewAgent,GOAL):-
-   atomic_list_concat([VERB,PT2],'_',SVERB),
+   atomic_list_concat_catch([VERB,PT2],'_',SVERB),
    parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL),!,
    dmsg_parserm(special_succeed_parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL)),!.
 
-parse_agent_text_command(Agent,PROLOGTERM,[],Agent,prologCall(PROLOGTERM)):- predicate_property(PROLOGTERM,_),!.
+parse_agent_text_command(Agent,PROLOGTERM,[],Agent,prologCall(PROLOGTERM)):- must(nonvar(PROLOGTERM)),predicate_property(PROLOGTERM,_),!.
 
 parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL):-
- dmsg(failed_parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL)),debugging(parser),
+ dmsg(failed_parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL)),
+ debugging(parser),
  debug,visible(+all),leash(+all),trace,
  parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL),!.
 
 % try directly parsing first
 parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL):- 
-   call_no_cuts(moo:agent_text_command(Agent,[SVERB|ARGS],NewAgent,GOAL)),!.   
+   call_no_cuts(moo:agent_text_command(Agent,[SVERB|ARGS],NewAgent,GOAL)),nonvar(NewAgent),nonvar(GOAL),!.   
 
 % try indirectly parsing
 parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL):- 
@@ -230,6 +268,7 @@ parse_agent_text_command_0(Agent,IVERB,ARGS,NewAgent,GOAL):-
    parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL).
 
 moo:verb_alias('l','look').
+moo:verb_alias('lo','look').
 moo:verb_alias('s','move s').
 moo:verb_alias('go','go').
 moo:verb_alias('where is','where').

@@ -15,7 +15,7 @@
 moo:argsIsa(action_verb_useable(verb,term(mpred),type,term(mpred))).
 
 moo:action_verb_useable(wear,wearing,wearable,stowed).
-moo:action_verb_useable(hold,holding,wieldable,stowed).
+moo:action_verb_useable(wield,wielding,wieldable,stowed).
 moo:action_verb_useable(use,using,usable,stowed).
 moo:action_verb_useable(drink,drinking,drinkable,holding).
 moo:action_verb_useable(stow,stowed,stowable,holding).

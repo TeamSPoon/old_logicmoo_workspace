@@ -21,6 +21,7 @@ show_term_listing(H):- writeq(H),write('.'),nl,!.
 */
 
 :-export((term_listing/1)).
+term_listing([]):-!.
 term_listing([]):-!,dtrace.
 term_listing(P):-term_listing(P,[]).
 term_listing(M:P,List):-!,term_listing(P,[module(M)|List]).

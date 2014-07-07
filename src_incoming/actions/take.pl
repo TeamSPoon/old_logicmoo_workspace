@@ -20,12 +20,13 @@ moo:action_info(take(item)).
 
 % Take something
 % Successfully picking something up
-moo:agent_call_command(Agent,take(SObj)) :-
-	atloc(Agent,LOC),
-	atloc(Obj,LOC),
-        object_match(SObj,Obj),
-	props(Obj,weight(1)),
-	worth(Agent,take,Obj),
+moo:agent_call_command(Agent,take(SObj)) :- 
+	notrace(once((inRegion(Agent,LOC),
+              inRegion(Obj,LOC),
+              not(possess(Agent,Obj)),
+              object_match(SObj,Obj)))),
+	nop((ignore(props(Obj,weight<2)),
+	ignore(worth(Agent,take,Obj)))),
 	permanence_take(take,Agent,Obj),
 	call_update_charge(Agent,take).
 
@@ -38,8 +39,8 @@ moo:agent_call_command(Agent,take(_)) :-
 % or in the agent's possession.
 permanence_take(take,Agent,Obj) :-
 	atloc(Agent,LOC),
-	check_permanence(take,Agent,LOC,Obj),!,
-        term_listing(Obj).
+	check_permanence(take,Agent,LOC,Obj),!.
+        %term_listing(Obj).
 
 moo:check_permanence(take,_,_,Obj):-
         props(Obj,permanence(take,Dissapears)), 
@@ -52,6 +53,12 @@ moo:check_permanence(take,Agent,_,Obj) :-
 	ignore(clr(atloc(Obj,LOC))),
 	add(possess(Agent,Obj)),
         (req(possess(Agent,Obj)) -> true; throw(req(possess(Agent,Obj)))).
+moo:check_permanence(take,Agent,_,Obj) :-
+        atloc(Obj,LOC),
+	ignore(clr(atloc(Obj,LOC))),
+	add(possess(Agent,Obj)),
+        (req(possess(Agent,Obj)) -> true; throw(req(possess(Agent,Obj)))).
+
 moo:check_permanence(take,_,_,_).
 
 % Record keeping

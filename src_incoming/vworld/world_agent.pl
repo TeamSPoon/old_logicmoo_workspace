@@ -15,27 +15,34 @@
 :-module(actr, [ call_agent_command/2,  call_agent_action/2 ]).
 */
 
+:-export(parse_agent_text_command_checked/5).
+parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):- parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD), nonvar(NewAgent),nonvar(CMD),!. % not(functor(CMD,prologCall,_)),!.
+parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):- trace, parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD).
+
 must_ac(G):- show_call(must(G)).
 % =====================================================================================================================
 % call_agent_command/2 -->  call_agent_action/2
 % =====================================================================================================================
 % execute a prolog command including prolog/0
+call_agent_command(Agent,Var):-var(Var),trace_or_throw(call_agent_command(Agent,Var)).
+
 call_agent_command(Agent,[VERB|ARGS]):-
-      debugOnError(parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD)),
+      debugOnError(parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD)),
       must_ac(hook:call_agent_action(NewAgent,CMD)),!.
 
 % lists
-call_agent_command(A,Atom):-atom(Atom),atomSplit(Atom,List),!,call_agent_command(A,List).
+call_agent_command(A,Atom):-atom(Atom),atomSplit(Atom,List),must(is_list(List)),!,call_agent_command(A,List).
 
 % prolog command
 call_agent_command(_Gent,Atom):- atom(Atom), catch((
    (once((read_term_from_atom(Atom,OneCmd,[variables(VARS)]),
       predicate_property(OneCmd,_),
-      fmt('doing command ~q~n',[OneCmd]))),!, doall((OneCmd,fmt('Yes: ~w',[VARS]))))),_,fail).
+      fmt('doing command ~q~n',[OneCmd]))),!, doall((OneCmd,fmt('Yes: ~w',[VARS]))))),E,(dmsg(E),fail)).
 
 % remove period at end
 call_agent_command(A,PeriodAtEnd):-append(New,[(.)],PeriodAtEnd),!,call_agent_command(A,New).
 
+% concat the '@'
 call_agent_command(Ag,[A,B|REST]):- atom(A),atom(B),A=='@',atom_concat(A,B,C),!,call_agent_command(Ag,[C|REST]).
 
 call_agent_command(A,[L,I|IST]):- atom(L), CMD =.. [L,I|IST],!, must_ac(hook:call_agent_action(A,CMD)).
@@ -43,20 +50,32 @@ call_agent_command(A,[L,I|IST]):- atom(L), CMD =.. [L,I|IST],!, must_ac(hook:cal
 call_agent_command(A,CMD):- must_ac(hook:call_agent_action(A,CMD)),!.
 
 % All Actions must be called from here!
+hook:call_agent_action(Agent,CMDI):-var(CMDI),trace_or_throw(hook:call_agent_action(Agent,CMDI)).
 hook:call_agent_action(Agent,CMDI):-
-      subst(CMDI,self,Agent,CMDI2),
-      thread_self(TS),
-      asserta(thlocal:session_agent(TS,Agent)),
-      atloc(Agent,Where),
-      subst(CMDI2,here,Where,CMD),
-      % start event
-      raise_location_event(Where,notice(reciever,do(Agent,CMD))),
-     catch(( ignore(( once((debugOnError(moo:agent_call_command(Agent,CMD)),
-           % complete event
-           raise_location_event(Where,notice(reciever,done(Agent,CMD))));
-           % fail event
-              raise_location_event(Where,notice(reciever,failed(Agent,CMD))))))),E,fmt('call_agent_action/2 Error ~q ',[E])),
-  retract(thlocal:session_agent(TS,Agent)).
+   subst(CMDI,self,Agent,CMD),
+   thread_self(TS),
+   (TS=main -> Wrapper = call ; Wrapper = notrace),
+   with_assertions(thlocal:session_agent(TS,Agent),
+     with_assertions(agent_current_action(Agent,CMD),
+      call(Wrapper, call_agent_action_lc(Agent,CMD)))).
+
+:-export(where_atloc/2).
+where_atloc(Agent,Where):-atloc(Agent,Where),!.
+where_atloc(Agent,Where):-inRegion(Agent,Where),!.
+where_atloc(_Agent,'OffStage'):-!.
+
+call_agent_action_lc(Agent,CMD):-
+   % start event
+   where_atloc(Agent,Where),
+   raise_location_event(Where,notice(reciever,begin(Agent,CMD))),
+   flush_output,
+   catch(call_agent_where_action_lc(Agent,Where,CMD),E,fmt('call_agent_action/2 Error ~q ',[E])).
+
+
+% complete event
+call_agent_where_action_lc(Agent,Where,CMD):- moo:agent_call_command(Agent,CMD),flush_output,!,raise_location_event(Where,notice(reciever,done(Agent,CMD))),!.
+% fail event
+call_agent_where_action_lc(Agent,Where,CMD):- raise_location_event(Where,notice(reciever,failed(Agent,CMD))),!.
 
 
 get_session_id(IDIn):-current_input(ID),is_stream(ID),!,ID=IDIn.

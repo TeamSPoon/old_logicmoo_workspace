@@ -25,16 +25,15 @@ get_type_action_templates(Templ):- get_type_action_help_0(_,Templ,_),good_templa
 
 good_template(Templ):- \+ contains_singletons(Templ).
 
-get_type_action_help_0(isaFn(A),TEMPL,text(Text,'does: ',do(A2,TEMPL))):- get_agent_text_command(A,Text,A2,Goal),(nonvar(Goal)->TEMPL=Goal;TEMPL=Text).
-get_type_action_help_0(A,B,C):- call_no_cuts(moo:action_info(A,B,C)).
+get_type_action_help_0(isaFn(A),TEMPL,text(Text,'does: ',do(A2,TEMPL))):- between(1,5,L),length(Text,L),get_agent_text_command(A,Text,A2,Goal),(nonvar(Goal)->TEMPL=Goal;TEMPL=Text).
+get_type_action_help_0(A,B,C):-            call_no_cuts(moo:action_info(A,B,C)).
 get_type_action_help_0(_What,TEMPL,Help):- call_no_cuts(moo:action_info(TEMPL,Help)).
-get_type_action_help_0(_What,TEMPL,S):- call_no_cuts(moo:action_info(TEMPL)),sformat(S,'Prolog looks like: ~q',[TEMPL]).
-get_type_action_help_0(What,Syntax,text([makes,happen,List])):- call_no_cuts(moo:action_rules(Agent,Verb,[Obj|Objs],List)),
-      safe_univ(Syntax,[Verb,Obj|Objs]), once(member(isa(Obj,Type),List);Type=term),ignore(Agent=an(What)),ignore(What=agent).
+get_type_action_help_0(_What,TEMPL,S):-    call_no_cuts(moo:action_info(TEMPL)),sformat(S,'Prolog looks like: ~q',[TEMPL]).
+get_type_action_help_0(What,Syntax,text([makes,happen,List])):- call_no_cuts(moo:action_rules(Agent,Verb,[Obj|Objs],List)),atom(Verb),safe_univ(Syntax,[Verb,Obj|Objs]), once(member(isa(Obj,Type),List);Type=term),ignore(Agent=an(What)),ignore(What=agent).
 
 
 action_info_db(TEMPL,S):- (PRED=moo:agent_call_command(_,TEMPL);PRED=moo:agent_text_command(_,_,_,TEMPL)) ,
-   predicate_property(user:PRED,multifile),clause(PRED,_BODY,REF),nonvar(TEMPL),clause_property(REF,source(S)).
+   predicate_property(user:PRED,multifile),clause(PRED,_BODY,REF),nonvar(TEMPL),clause_property(REF,file(S)).
 
 moo:action_info(something,TEMPL,text(file,S,contains,TEMPL)):-action_info_db(TEMPL,S),not(moo:action_info(TEMPL,_Help)).
 
@@ -60,8 +59,8 @@ write_string_if_contains(Must,E):-ignore((with_output_to(string(Str),fmt(E)),str
 
 moo:term_specifier_text(Text,verb):- get_type_action_templates(A),nonvar(A),functor_safe(A,Text,_).
 
-moo:agent_text_command(Agent,[Who],Agent,Cmd):- get_type_action_templates(Syntax),Syntax=..[Who,optional(_,Default)],Cmd=..[Who,Default].
-moo:agent_text_command(Agent,[Who,Type],Agent,Cmd):- get_type_action_templates(Syntax),Syntax=..[Who,optional(Type,_)],Cmd=..[Who,Type].
+moo:agent_text_command(Agent,[Who],Agent,Cmd):- nonvar(Who), get_type_action_templates(Syntax),Syntax=..[Who,optional(_,Default)],Cmd=..[Who,Default].
+moo:agent_text_command(Agent,[Who,Type],Agent,Cmd):- get_type_action_templates(Syntax),nonvar(Who),Syntax=..[Who,optional(Type,_)],Cmd=..[Who,Type].
 
 :- include(logicmoo(vworld/moo_footer)).
 

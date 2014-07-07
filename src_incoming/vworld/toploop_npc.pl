@@ -80,13 +80,13 @@ moo:action_info(idea(optional(agent,self)),"Makes some agent (or self) think of 
 moo:action_info(tick,"Makes *your* agent do something brilliant").
 moo:action_info(prolog(prolog),"Call prolog toploop").
 
-moo:agent_text_command(Agent,[prolog,X],Agent,prologCall(X)).
+moo:agent_text_command(Agent,[prolog,X],Agent,prologCall(X)):-ignore(X=someCode),
 moo:agent_text_command(Agent,[prolog],Agent,prologCall(prolog)).
 
 warnOnError(X):-catch(X,E,dmsg(error(E:X))).
 
-moo:agent_call_command(Agent,prologCall(C)) :- agent_call_safely(Agent,C).
-moo:agent_call_command(Agent,prolog(C)) :- agent_call_safely(Agent,C).
+moo:agent_call_command(Agent,prologCall(C)) :-  must(nonvar(C)), agent_call_safely(Agent,C).
+moo:agent_call_command(Agent,prolog(C)) :- must(nonvar(C)),agent_call_safely(Agent,C).
 
 :-export(agent_call_safely/2).
 agent_call_safely(_Agnt,C):- any_to_callable(C,X,Vars), !, gensym(result_count_,RC),flag(RC,_,0),agent_call_safely(RC,X,Vars),flag(RC,CC,CC),fmt(result_count(CC)).

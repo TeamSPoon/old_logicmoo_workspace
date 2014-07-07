@@ -183,8 +183,8 @@ additiveOp(-).
 additiveOp((/)).
 
 
-db_op(q,Term):-!, db_op0(q,Term).
-db_op(Op,Term):-must(db_op0(Op,Term)).
+db_op(q,Term):-!, loop_check(db_op0(q,Term),fail).
+db_op(Op,Term):- must(db_op0(Op,Term)).
 
 
 
@@ -213,10 +213,10 @@ db_op0(Op,props(Obj,PropVal)):-
    !,PropVal=..[Prop|Vals],
 	Call=..[Prop,Obj|Vals],
 	db_op(Op,Call).
-db_op0(Op,C0):-functor(C0,F,A),db_op_4(Op,F,A,C0),!.
+db_op0(Op,C0):-functor_catch(C0,F,A),db_op_4(Op,F,A,C0),!.
 
 db_op_4(Op,:,2,_MODULE:C0):-!,/*throw(module_form(MODULE:C0)),*/
-  functor(C0,F,A),
+  functor_catch(C0,F,A),
   dmsg(todo(unmodulize(F/A))),
   db_op(Op,C0).
 db_op_4(Op,k,_,C0):- C0=..[k,Prop|ARGS],C1=..[Prop|ARGS],!,db_op(Op,C1),!.
@@ -263,9 +263,9 @@ db_forall('q',C):-!,db_forall_quf(C,U,Template),!,U, debugOnError(Template).
 db_forall(u,C):- trace,db_forall_quf(C,U,Template),U,Template,must(ground(Template)),!,ignore(hooked_retractall(Template)).
 db_forall(ra,C):-db_forall_quf(C,U,Template), doall((U,hooked_retractall(Template))).
 db_forall(ra,C):-ignore(hooked_retractall(C)).
-db_forall(a,C0):- db_forall_quf(C0,U,C),must(U),functor(C,F,A),!, (mpred_prop(F,singleValued) -> must(db_assert_sv(C,F,A)) ; must(db_assert_mv(C,F,A))).
+db_forall(a,C0):- db_forall_quf(C0,U,C),must(U),functor_catch(C,F,A),!, (mpred_prop(F,singleValued) -> must(db_assert_sv(C,F,A)) ; must(db_assert_mv(C,F,A))).
 
-db_forall(a,C):- functor(C,F,A),!, (mpred_prop(F,singleValued) -> must(db_assert_sv(C,F,A)) ; must(db_assert_mv(C,F,A))).
+db_forall(a,C):- functor_catch(C,F,A),!, (mpred_prop(F,singleValued) -> must(db_assert_sv(C,F,A)) ; must(db_assert_mv(C,F,A))).
 db_forall(r,C):- ground(C),hooked_retractall(C),!.
 db_forall(Op,C):-!,trace,throw(unhandled(db_forall(Op,C))).
 
@@ -278,7 +278,7 @@ call_expanded_for_sv_2(WhatNot,F,A,G,OUT):- defaultArgValue(WhatNot:G,F,A,OUT),!
 :-export(call_expanded/1).
 %:-export(call_expanded/1).
 call_expanded(G):-debugOnError(G).
-%call_expanded(G) :- functor(G,F,A),call_expanded([],G,F,A).
+%call_expanded(G) :- functor_catch(G,F,A),call_expanded([],G,F,A).
 
 :-export(call_expanded/4).
 call_expanded(_Doing,V,_F,_A):-var(V),!,trace_or_throw(var_call_expanded(V)).
@@ -328,9 +328,10 @@ call_expanded(_Doing,G,_,_):-call_asserted(G).
 dbase_t([AH,P|LIST]):- is_holds_true(AH),!,dbase_t_p2(P,LIST).
 dbase_t([AH,P|LIST]):- is_holds_false(AH),!,dbase_f([P|LIST]).
 dbase_t([P|LIST]):- !,dbase_t_p2(P,LIST).
-dbase_t(not(CALL)):-dbase_f(CALL).
-dbase_t(CALL):- safe_univ(CALL,[P|LIST]),dbase_t([P|LIST]).
-dbase_t_p2(P,LIST):- safe_univ(CALL,[dbase_t,P|LIST]),call(CALL).
+dbase_t(not(CALL)):-!,dbase_f(CALL).
+dbase_t(CALL):- compound(CALL),!,CALL =..[P|LIST],dbase_t([P|LIST]).
+dbase_t_p2(P,[L|IST]):-atom(P),is_holds_true(P),!,dbase_t_p2(L,IST).
+dbase_t_p2(P,LIST):- CALL=..[dbase_t,P,LIST],call(CALL).
 
 % ================================================
 % hooked_assert/1 hooked_retract/1
@@ -348,7 +349,7 @@ singletons_throw_or_fail(C):- contains_singletons(C),trace_or_throw(contains_sin
 nonground_throw_or_fail(C):- throw_if_true_else_fail(not(ground(C)),C).
 
 
-into_assertion_form_trans(G,was_asserted_gaf(G)):- functor(G,F,_),mpred_prop(F,isStatic).
+into_assertion_form_trans(G,was_asserted_gaf(G)):- functor_catch(G,F,_),mpred_prop(F,isStatic).
 
 /*
 into_assertion_form(M:H,G):-atom(M),!,into_assertion_form(H,G).
@@ -510,7 +511,7 @@ pl_arg_type(Arg,Type):-
 
 :-thread_local clause_present_lookup_local/3.
 
-clause_present(C):-notrace((functor(C,F,A),clause_present(C,F,A))).
+clause_present(C):-notrace((functor_catch(C,F,A),clause_present(C,F,A))).
 clause_present(C,F,1):-C=..[F,A], formattype(F),!, term_is_ft(A,F).
 clause_present(C,_F,_A):- not(predicate_property(C,_)),!,fail.
 clause_present(C,_F,_A):- predicate_property(C,foreign),!,fail.
@@ -538,7 +539,7 @@ argIsa_call(ofclass,2,type):-!.
 argIsa_call(memory,2,term):-!.
 argIsa_call(Prop,N1,Type):- mpred_prop(Prop,argIsa(N1, Type)),!.
 argIsa_call(F,N,Type):- mpred_prop(F,argsIsa(Types)),arg(N,Types,Type),nonvar(Type),!.
-argIsa_call(F,N,Type):- mpred_prop_game_assert(Types),functor(Types,F,_),arg(N,Types,Type),nonvar(Type),!.
+argIsa_call(F,N,Type):- mpred_prop_game_assert(Types),functor_catch(Types,F,_),arg(N,Types,Type),nonvar(Type),!.
 argIsa_call(Prop,N1,Type):- dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),
    Type=argIsaFn(Prop,N1).
 
@@ -563,7 +564,7 @@ translateOneArg(_Prop,_O,_Type,VAR,VAR,G,G):-atomic(VAR),!.
 
 % props(Obj,size < 2).
 translateOneArg(Prop,O,Type,ARG,OLD,G,(GETTER,COMPARE,G)):-
-       functor(ARG,F,2), comparitiveOp(F),!,
+       functor_catch(ARG,F,2), comparitiveOp(F),!,
        ARG=..[F,Prop,VAL],
        GETTER=..[Prop,O,OLD],
        COMPARE= compare_op(Type,F,OLD,VAL),!.
@@ -574,7 +575,7 @@ translateOneArg(Prop,O,Type,oneOf(VAL,LIST),VAL,G,(GO,G)):-
 
 % padd(Obj,size + 2).
 translateOneArg(Prop,O,_Type,ARG,NEW,G,(GETTER,STORE,G)):-
-       functor(ARG,F,2), additiveOp(F),!,
+       functor_catch(ARG,F,2), additiveOp(F),!,
        ARG=..[F,Prop,VAL],
        GETTER=..[Prop,O,OLD],
        STORE= update_value(OLD,VAL,NEW),!.
@@ -623,11 +624,11 @@ replace_nth([Carry|ARGS],Which,OldVar,NewVar,[Carry|NEWARGS]):-
 
 update_value(OLD,NEW,NEXT):- var(NEW),!,trace_or_throw(logicmoo_bug(update_value(OLD,NEW,NEXT))).
 update_value(OLD,NEW,NEWV):- (OLD=@=NEW;var(OLD)),!,compute_value_no_dice(NEW,NEWV).
-update_value(OLDI,+X,NEW):- compute_value(OLDI,OLD),catch(NEW is OLD + X,_,fail),!.
-update_value(OLDI,-X,NEW):- compute_value(OLDI,OLD),catch(NEW is OLD - X,_,fail),!.
+update_value(OLDI,+X,NEW):- compute_value(OLDI,OLD),number(OLD),catch(NEW is OLD + X,_,fail),!.
+update_value(OLDI,-X,NEW):- compute_value(OLDI,OLD),number(OLD),catch(NEW is OLD - X,_,fail),!.
 update_value(_OLD,NEW,NEWV):-compute_value(NEW,NEWV).
 
-compute_value_no_dice(NEW,NEW):-functor(NEW,dice,_),!.
+compute_value_no_dice(NEW,NEW):-functor_catch(NEW,dice,_),!.
 compute_value_no_dice(NEW,NEWV):-compute_value(NEW,NEWV).
 
 compute_value(NEW,NEWV):-catch(NEWV is NEW,_,fail),!.
@@ -774,6 +775,15 @@ moo:subclass(dir,string).
 :-decl_mpred(thinking(agent),[flag]).
 :-decl_mpred(deleted(id),[flag]).
 
+
+% database backing impls
+% builtin = prolog native
+% dynamic = prolog dynamic assert/call
+% dbase_t = a dbase_t/N
+% pttp = pttp _int compiled
+% cyc = 
+% type =
+
 % multivalued
 %mpred(G,[multi(AT)|LIST]):-multiValued(G,AT,LIST).
 
@@ -795,7 +805,7 @@ mpred_prop_prolog(world:nearby(object,object)).
 
 
 % multiValued
-%multiValued(G,AT,[ordered|LIST]):-multiValued(G,LIST),functor(G,_,AT).
+%multiValued(G,AT,[ordered|LIST]):-multiValued(G,LIST),functor_catch(G,_,AT).
 
 moo:multiValued(pathBetween(region,dir,region)).
 multiValued(named(term,term),[genlpreds(id)]).
@@ -824,12 +834,6 @@ moo:argsIsa(somethingDescription(term,list(string))).
 % somethingIsa('NpcCol1012-Ensign732',['NpcCol1012',actor,'MaleAnimal']).
 
 :-dynamic_multifile_exported((needs_look/2)).
-
-ensure_clause(HEAD,_,_,_BODY):-not(not((numbervars(clause(HEAD,BODY),'$VAR',0,_),clause(HEAD,BODY)))),!.
-% ensure_clause(HEAD,F,A,_):-pred_as_is(F,A), !.
-ensure_clause(HEAD,_F,_A,BODY):-assertz((HEAD:-BODY)),
-   % this is just to catch asserts at these predicates that are supposed to be contained.. We dont really want them compiled
-   nop(compile_predicates([HEAD])).
 
 
 nameStrings(apath(Region,Dir),Text):- pathName(Region,Dir,Text).

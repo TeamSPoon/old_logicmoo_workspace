@@ -65,8 +65,8 @@ set_stats(Agent,Traits) :-
         clr(stat_total(Agent,_)),
 	add(stat_total(Agent,0)),
 	forall(member(Trait,Traits),
-	       ignore(catch(process_stats(Agent,Trait),_,true))),
-	       catch(check_stat_total(Agent),_,true).
+	       ignore(catch(process_stats(Agent,Trait),E,dmsg(E:process_stats(Agent,Trait))))),
+               ignore(catch(check_stat_total(Agent),E2,dmsg(E2:check_stat_total(Agent)))).
 set_stats(Agent,Traits):-dmsg(failed(set_stats(Agent,Traits))).
 
 process_stats(Agent,str(Y)) :-
@@ -92,9 +92,7 @@ process_stats(Agent,stm(Stm)) :-
 
 process_stats(Agent,spd(Spd)) :-
 	add(spd(Agent,Spd)),
-	del(stat_total(Agent,T)),
-	NewT is T + Spd,
-	add(stat_total(Agent,+NewT)).
+	add(stat_total(Agent,+Spd)).
 
 process_stats(Agent,Stat) :- add(props(Agent,[Stat])).
 

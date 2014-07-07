@@ -98,7 +98,8 @@ scan_updates:- !.
 scan_updates:- ignore((thread_self(main),ignore((catch(make,E,dmsg(E)))))).
 
 
-hook:decl_database_hook(Type,C):- ignore((current_agent(Agent),not(not(contains_term(C,Agent))),dmsg(database_hook(Type,C)))).
+hook:decl_database_hook(Type,C):- ignore((current_agent(Agent),not(not((inRegion(Agent,Region),contains_term(C,Region)))),dmsg(region_database_hook(Type,C)))).
+hook:decl_database_hook(Type,C):- ignore((current_agent(Agent),not(not(contains_term(C,Agent))),dmsg(agent_database_hook(Type,C)))).
 
 % ===========================================================
 % USES PACKRAT PARSER 

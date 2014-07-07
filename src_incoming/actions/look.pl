@@ -36,21 +36,20 @@ moo:action_info(examine(item), "view details of item (see also @list)").
 moo:agent_call_command(_Gent,examine(SObj)):- term_listing(SObj).
 
 
-
 moo:action_info(look, "generalized look in region").
 moo:action_info(look(dir), "Look in a direction").
 moo:action_info(look(item), "Look at a speficific item").
 
-moo:agent_call_command(Agent,look(here)):- !,look_as(Agent).
-moo:agent_call_command(Agent,look(Dir)):-
+moo:agent_call_command(Agent,look):- !,must(look_as(Agent)).
+moo:agent_call_command(Agent,look(here)):- look_as(Agent),!.
+moo:agent_call_command(Agent,look(Dir)):- get_term_specifier_text(Dir,dir),!,
    view_dirs(Agent,[[Dir,here],[Dir,Dir],[Dir,Dir,adjacent]],Percepts),
    forall_member(P,Percepts,hook:call_agent_action(Agent,examine(P))).
 
 moo:agent_call_command(Agent,look(SObj)):-
-   objects_match(Agent,SObj,Percepts),
+   objects_match_for_agent(Agent,SObj,item,Percepts),
    forall_member(P,Percepts,hook:call_agent_action(Agent,examine(P))).
 
-moo:agent_call_command(Agent,look):- !,must(look_as(Agent)).
 
 :-export(look_as/1).
 look_as(Agent):-

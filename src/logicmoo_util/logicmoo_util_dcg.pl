@@ -123,7 +123,7 @@ atomics_to_string_str0([S|Text],Sep,String):-
    atomics_to_string_str0(Text,Sep,StrR),!,
    atomics_to_string([StrL,StrR],Sep,String).
 
-% theString(String,Sep) --> [S|Text], {atomic_list_concat([S|Text],Sep,String),!}.
+% theString(String,Sep) --> [S|Text], {atomic_list_concat_catch([S|Text],Sep,String),!}.
 theString(String,Sep) --> [S|Text], {atomics_to_string_str([S|Text],Sep,String),!}.
 
 decl_dcgTest_startsWith([a,b|_],theCode(X=1),X==1).

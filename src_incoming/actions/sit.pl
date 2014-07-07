@@ -13,10 +13,10 @@
 
 :- decl_mpred(posture/1,formattype).
 
-posture(sit).
-posture(stand).
-posture(lay).
-posture(kneel).
+moo:posture(sit).
+moo:posture(stand).
+moo:posture(lay).
+moo:posture(kneel).
 
 :-decl_mpred(stance(agent,posture),[singleValued]).
 

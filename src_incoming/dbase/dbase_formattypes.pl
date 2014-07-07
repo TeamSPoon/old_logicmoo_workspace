@@ -15,7 +15,7 @@
           argIsa_call/4,
           argIsa_call_0/3,
           atom_to_value/2,
-          formattype/1,
+         % formattype/1,
           term_is_ft/2,
           pl_arg_type/2,
           p2c_dir2/2
@@ -61,9 +61,10 @@ moo:subft(int,integer).
 moo:subft(integer,number).
 moo:subft(dice,int).  
 
-:-export(formattype/1).
-formattype(S):-   moo:ft_info(S,_).
-formattype(S):-   moo:subft(S,_).
+:-dynamic(moo:formattype/1).
+:-export(moo:formattype/1).
+moo:formattype(S):-   moo:ft_info(S,_).
+moo:formattype(S):-   moo:subft(S,_).
 
 term_is_ft(Term,Type):- 
    formattype(Type),

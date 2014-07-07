@@ -153,9 +153,9 @@ mud_isa_lc(O,T):- atom(T),Call =.. [T,O],predicate_property(Call,_),!,Call.
 mud_isa_lc(O,T):- req(isa(O,T)).
 mud_isa_lc(_,T):- (atom(T);var(T)),!,fail.
 mud_isa_lc(O,T):- compound(O),!,functor(O,T,_).
-mud_isa_lc(O,T):- atom(O),!,mud_isa_atom(O,T).
+mud_isa_lc(O,T):- atom(O),atom(T),!,mud_isa_atom(O,T).
 
-mud_isa_atom(O,T):- atomic_list_concat([T,_|_],'-',O),!.
+mud_isa_atom(O,T):- atomic_list_concat_catch([T,_|_],'-',O),!.
 mud_isa_atom(O,T):- atom_concat(T,Int,O),catch(atom_number(Int,_),_,fail),!.
 
 define_subtype(O,T):-assert_if_new(moo:subclass(O,T)).

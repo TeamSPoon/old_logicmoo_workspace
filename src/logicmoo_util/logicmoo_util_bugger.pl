@@ -148,8 +148,10 @@
      export_all_preds/1
 	 ]).
 
-trace_or(E):- dmsg(E),dtrace,!.
+trace_or(E):- dumpST,dmsg(E),dtrace,!.
 trace_or(E):- E.
+
+functor_catch(P,F,A):-catch(functor(P,F,A),E,(dumpST,dmsg(E:functor(P,F,A)),dtrace)).
 
 trace_or_throw(E):-trace_or(throw(E)).
 
@@ -342,8 +344,8 @@ ib_multi_transparent33(MT):-multifile(MT),module_transparent(MT),dynamic(MT).
 % hide Pred from tracing
 to_m_f_arity_pi(M:Plain,M,F,A,PI):-!,to_m_f_arity_pi(Plain,M,F,A,PI).
 to_m_f_arity_pi(Term,M,F,A,PI):- strip_module(Term,M,Plain),Plain\=Term,!,to_m_f_arity_pi(Plain,M,F,A,PI).
-to_m_f_arity_pi(F/A,_M,F,A,PI):-functor(PI,F,A),!.
-to_m_f_arity_pi(PI,_M,F,A,PI):-functor(PI,F,A).
+to_m_f_arity_pi(F/A,_M,F,A,PI):-functor_catch(PI,F,A),!.
+to_m_f_arity_pi(PI,_M,F,A,PI):-functor_catch(PI,F,A).
 
 with_preds((X,Y),M,F,A,PI,Call):-!,with_preds(X,M,F,A,PI,Call),with_preds(Y,M,F,A,PI,Call).
 with_preds([X],M,F,A,PI,Call):-!,with_preds(X,M,F,A,PI,Call).
@@ -363,7 +365,7 @@ moo_hide_show_childs(X):- with_preds(X,_M,F,A,_PI,'$hide'(F/A)).
 
  module_functor(PredImpl,Module,Pred,Arity):-strip_module(PredImpl,Module,NewPredImpl),strip_arity(NewPredImpl,Pred,Arity).
  strip_arity(Pred/Arity,Pred,Arity).
- strip_arity(PredImpl,Pred,Arity):-functor(PredImpl,Pred,Arity).
+ strip_arity(PredImpl,Pred,Arity):-functor_catch(PredImpl,Pred,Arity).
 % moo_hide(+Pred).
 :-export(moo_hide/1).
 
@@ -389,7 +391,7 @@ moo_hide_childs_0(N,MPred):-
 
 
 
-moo_hide_show_childs(M,F,A):-functor(MPred,F,A),moo_hide_show_childs(M,F,A,MPred).
+moo_hide_show_childs(M,F,A):-functor_catch(MPred,F,A),moo_hide_show_childs(M,F,A,MPred).
 
 moo_hide_show_childs(M,_,_,MPred):-
    not(predicate_property(_:MPred,imported_from(M))).
@@ -463,7 +465,7 @@ hideRest.
 :- meta_predicate with_output_to_stream(*,0).
 
 functor_source_file(M,P,F,A,File):-functor_source_file0(M,P,F,A,File). % must(ground((M,F,A,File))),must(user:nonvar(P)).
-functor_source_file0(M,P,F,A,File):-current_predicate(F/A),functor(P,F,A),source_file(P,File),predicate_module(P,M).
+functor_source_file0(M,P,F,A,File):-current_predicate(F/A),functor_catch(P,F,A),source_file(P,File),predicate_module(P,M).
 
 predicate_module(P,M):- predicate_property(P,imported_from(M)),!.
 predicate_module(M:_,M):-!. %strip_module(P,M,_F),!.
@@ -482,8 +484,8 @@ hideTrace(M:A,T):-!,hideTraceMP(M,A,T),!.
 hideTrace(MA,T):-hideTraceMP(_,MA,T),!.
 
 hideTraceMP(M,F/A,T):-!,hideTraceMFA(M,F,A,T),!.
-hideTraceMP(M,P,T):-functor(P,F,0),trace,hideTraceMFA(M,F,_A,T),!.
-hideTraceMP(M,P,T):-functor(P,F,A),hideTraceMFA(M,F,A,T),!.
+hideTraceMP(M,P,T):-functor_catch(P,F,0),trace,hideTraceMFA(M,F,_A,T),!.
+hideTraceMP(M,P,T):-functor_catch(P,F,A),hideTraceMFA(M,F,A,T),!.
 
 tryCatchIgnore(MFA):- catch(MFA,_E,true). %%dmsg(tryCatchIgnoreError(MFA:E))),!.
 tryCatchIgnore(_MFA):- !. %%dmsg(tryCatchIgnoreFailed(MFA)).
@@ -492,7 +494,7 @@ tryHide(_MFA):-showHiddens,!.
 tryHide(MFA):- tryCatchIgnore('$hide'(MFA)).
 
 hideTraceMFA(_,M:F,A,T):-!,hideTraceMFA(M,F,A,T),!.
-hideTraceMFA(M,F,A,T):-user:nonvar(A),functor(P,F,A),predicate_property(P,imported_from(IM)),IM \== M,!,nop(dmsg(doHideTrace(IM,F,A,T))),hideTraceMFA(IM,F,A,T),!.
+hideTraceMFA(M,F,A,T):-user:nonvar(A),functor_catch(P,F,A),predicate_property(P,imported_from(IM)),IM \== M,!,nop(dmsg(doHideTrace(IM,F,A,T))),hideTraceMFA(IM,F,A,T),!.
 hideTraceMFA(M,F,A,T):-hideTraceMFAT(M,F,A,T),!.
 
 hideTraceMFAT(M,F,A,T):-doHideTrace(M,F,A,T),!.
@@ -527,7 +529,7 @@ ifThen(When,Do):-When->Do;true.
 % :- current_predicate(F/N),trace(F/N, -all),fail.
 /*
 traceAll:- current_predicate(user:F/N),
-  functor(P,F,N),
+  functor_catch(P,F,N),
   local_predicate(P,F/N),
   trace(F/N, +fail),fail.
 traceAll:- not((predicate_property(clearCateStack/1,_))),!.
@@ -541,7 +543,7 @@ meta_predicate_transparent(M,(X,Y)):-!,meta_predicate_transparent(M,X),meta_pred
 meta_predicate_transparent(_M,X):-atom(X),!.
 meta_predicate_transparent(_M,X):-
   debugOnFailureEach((
-  arg(1,X,A),functor(X,F,_),
+  arg(1,X,A),functor_catch(X,F,_),
   FA=F/A,
   dynamic_if_missing(FA),
   %module_transparent(FA),
@@ -632,7 +634,7 @@ local_predicate(_,_/N):-N>7,!,fail.
 local_predicate(P,_):-predicate_property(P,built_in),!,fail.
 local_predicate(P,_):-predicate_property(P,imported_from(_)),!,fail.
 %local_predicate(P,_):-predicate_property(P,file(F)),!,atom_contains666(F,'aiml_'),!.
-local_predicate(P,F/N):-functor(P,F,N),!,fail.
+local_predicate(P,F/N):-functor_catch(P,F,N),!,fail.
 
 %atom_contains666(F,C):- hotrace((atom(F),atom(C),sub_atom(F,_,_,_,C))).
 
@@ -686,7 +688,7 @@ prolog_ecall(_,_,Call):-var(Call),!,trace,randomVars(Call).
 
 prolog_ecall(_,_,Call):-skipWrapper,!,Call.
 prolog_ecall(BDepth,OnCall, (X->Y;Z)):-!,(prolog_ecall(BDepth,OnCall,X) -> prolog_ecall(BDepth,OnCall,Y) ; prolog_ecall(BDepth,OnCall,Z)).
-prolog_ecall(BDepth,OnCall,Call):-functor(Call,F,A),prolog_ecall_fa(BDepth,OnCall,F,A,Call).
+prolog_ecall(BDepth,OnCall,Call):-functor_catch(Call,F,A),prolog_ecall_fa(BDepth,OnCall,F,A,Call).
 
 % fake = true
 prolog_ecall_fa(_,_,F,A,Call):-
@@ -710,7 +712,7 @@ prolog_ecall_fa(BDepth,OnCall,F,1,Call):-
 prolog_ecall_fa(BDepth,OnCall,F,A,Call):-
   on_prolog_ecall(F,A,unwrap,true),!,
   Call=..[F|OArgs],
-  functor(Copy,F,A),
+  functor_catch(Copy,F,A),
   Copy=..[F|NArgs],
   replace_elements(OArgs,E,prolog_ecall(BDepth,OnCall,E),NArgs),
   call(Copy).
@@ -780,7 +782,7 @@ is_deterministic(M:G):-atom(M),!,is_deterministic(G).
 is_deterministic(not(_)).
 is_deterministic(forall(_,_,_)).
 is_deterministic(once(_)).
-is_deterministic(functor(_,_,_)).
+is_deterministic(functor_catch(_,_,_)).
 is_deterministic(_ =.. _).
 is_deterministic(var(_)).
 is_deterministic(nonvar(_)).
@@ -807,13 +809,13 @@ prolog_must_not(_Call):-!.
 
 
 
-dynamic_if_missing(F/A):-functor(X,F,A),predicate_property(X,_),!.
+dynamic_if_missing(F/A):-functor_catch(X,F,A),predicate_property(X,_),!.
 dynamic_if_missing(F/A):- dynamic([F/A]).
 
 
-%%%retractall(E):- retractall(E),functor(E,File,A),dynamic(File/A),!.
+%%%retractall(E):- retractall(E),functor_catch(E,File,A),dynamic(File/A),!.
 
-pp_listing(Pred):- functor(Pred,File,A),functor(FA,File,A),listing(File),nl,findall(NV,predicate_property(FA,NV),LIST),writeq(LIST),nl,!.
+pp_listing(Pred):- functor_catch(Pred,File,A),functor_catch(FA,File,A),listing(File),nl,findall(NV,predicate_property(FA,NV),LIST),writeq(LIST),nl,!.
 
 % =================================================================================
 % Utils
@@ -822,7 +824,7 @@ pp_listing(Pred):- functor(Pred,File,A),functor(FA,File,A),listing(File),nl,find
 printPredCount(Msg,Pred,N1):- compound(Pred), debugOnFailureEach((arg(_,Pred,NG))),user:nonvar(NG),!,
   findall(Pred,Pred,LEFTOVERS),length(LEFTOVERS,N1),dmsg(num_clauses(Msg,Pred,N1)),!.
 
-printPredCount(Msg,Pred,N1):-!,functor(Pred,File,A),functor(FA,File,A), predicate_property(FA,number_of_clauses(N1)),dmsg(num_clauses(Msg,File/A,N1)),!.
+printPredCount(Msg,Pred,N1):-!,functor_catch(Pred,File,A),functor_catch(FA,File,A), predicate_property(FA,number_of_clauses(N1)),dmsg(num_clauses(Msg,File/A,N1)),!.
 
 
 
@@ -869,8 +871,8 @@ showProfilerStatistics(FileMatch):-
 
 
 :- meta_predicate bugger:unify_listing(0).
-unify_listing(FileMatch):-functor(FileMatch,F,A),unify_listing(FileMatch,F,A),!.
-unify_listing_header(FileMatch):-functor(FileMatch,F,A),unify_listing_header(FileMatch,F,A),!.
+unify_listing(FileMatch):-functor_catch(FileMatch,F,A),unify_listing(FileMatch,F,A),!.
+unify_listing_header(FileMatch):-functor_catch(FileMatch,F,A),unify_listing_header(FileMatch,F,A),!.
 
 
 :- meta_predicate bugger:unify_listing(0,*,*).
@@ -888,7 +890,7 @@ printAll(Call,Print):- flag(printAll,_,0), forall((Call,flag(printAll,N,N+1)),(f
 printAll(_Call,Print):- flag(printAll,PA,0),(fmt('~n /* found ~q for ~q. ~n */ ~n',[PA,Print])).
 
 contains_term(SearchThis,Find):-Find==SearchThis,!.
-contains_term(SearchThis,Find):-compound(SearchThis),functor(SearchThis,Func,_),(Func==Find;arg(_,SearchThis,Arg),contains_term(Arg,Find)).
+contains_term(SearchThis,Find):-compound(SearchThis),functor_catch(SearchThis,Func,_),(Func==Find;arg(_,SearchThis,Arg),contains_term(Arg,Find)).
 
 % =================================================================================
 % Utils
@@ -938,7 +940,7 @@ fmt(X,Y,Z):- fmt0(X,Y,Z),!.
 
 fmt_portray_clause(X):- unnumbervars(X,Y),!,numbervars(Y), portray_clause(Y).
 fmt_or_pp(pp((X:-Y))):-!,fmt_portray_clause((X:-Y)),!.
-fmt_or_pp(pp(X)):-!,functor(X,F,A),fmt_portray_clause((pp(F,A):-X)),!.
+fmt_or_pp(pp(X)):-!,functor_catch(X,F,A),fmt_portray_clause((pp(F,A):-X)),!.
 fmt_or_pp(X):-'format'('~q~n',[X]).
 
 dfmt(X):- with_output_to_stream(user_error,fmt(X)).
@@ -973,7 +975,7 @@ dmsg0(V):- notrace(dmsg1(V)),!, hotrace(doall(( hook:dmsg_hook(V)))).
 
 dmsg1(warn(V)):- print_message(warning,V).
 dmsg1(skip_dmsg(_)):-!.
-dmsg1(C):-functor(C,Topic,_),debugging(Topic,_True_or_False),!,logger_property(Topic,once,true),!,
+dmsg1(C):-functor_catch(C,Topic,_),debugging(Topic,_True_or_False),!,logger_property(Topic,once,true),!,
       (dmsg_log(Topic,_Time,C) -> true ; ((get_time(Time),asserta(dmsg_log(todo,Time,C)),!,dmsg2(C)))).
 dmsg1(C):-((copy_term(C,Stuff), snumbervars(Stuff),!,dmsg2(Stuff))).
 
@@ -991,7 +993,7 @@ dmsg2(T):-!,
 
 % never gets here due to cut above 
 dmsg2([]):-!.
-dmsg2(LF):-functor(LF,F,_),loggerReFmt(F,LR), ((LR==F,is_stream(F))->loggerFmtReal(F,LF,[]);dmsg(LR,LF,[])),!.
+dmsg2(LF):-functor_catch(LF,F,_),loggerReFmt(F,LR), ((LR==F,is_stream(F))->loggerFmtReal(F,LF,[]);dmsg(LR,LF,[])),!.
 dmsg2([A|L]):-!,dmsg('% ~q~n',[[A|L]]).
 dmsg2(Comp):-bugger:evil_term(_,Comp,Comp2),!,dmsg('% ~q~n',[Comp2]).
 dmsg2(Stuff):-!,dmsg('% ~q~n',[Stuff]).
@@ -1110,7 +1112,7 @@ getPFA1(_,Attr,no(Attr)).
 
 getPFA2(Frame,Attr,Goal):- catch((prolog_frame_attribute(Frame,Attr,Goal)),E,Goal=[error(Attr,E)]),!.
 
-clauseST(ClRef,clause=Goal):- findall(V,(member(Prop,[source(V),line_count(V)]),clause_property(ClRef,Prop)),Goal).
+clauseST(ClRef,clause=Goal):- findall(V,(member(Prop,[file(V),line_count(V)]),clause_property(ClRef,Prop)),Goal).
 
 clauseST(ClRef,Goal = HB):- ignore(((clause(Head, Body, ClRef),copy_term(((Head :- Body)),HB)))),
    numbervars(HB,0,_),
@@ -1224,7 +1226,6 @@ os_to_prolog_filename(OS,PL):-atom_concat_safe(BeforeSlash,'/',OS),os_to_prolog_
 os_to_prolog_filename(OS,PL):-absolute_file_name(OS,OSP),OS \= OSP,!,os_to_prolog_filename(OSP,PL).
 
 
-
 % =================================================================================
 % Utils
 % =================================================================================
@@ -1240,7 +1241,7 @@ debugFmtList1(Value,Value):-var(Value),!.
 debugFmtList1(Name=Number,Name=Number):-number(Number).
 debugFmtList1(Name=Value,Name=Value):-var(Value),!.
 debugFmtList1(Name=Value,Name=(len:Len)):-copy_term(Value,ValueO),append(ValueO,[],ValueO),is_list(ValueO),length(ValueO,Len),!.
-debugFmtList1(Name=Value,Name=(F:A)):-functor(Value,F,A).
+debugFmtList1(Name=Value,Name=(F:A)):-functor_catch(Value,F,A).
 debugFmtList1(Value,shown(Value)).
 
 % ===============================================================================================
@@ -1288,7 +1289,7 @@ traceafter_call(_):-trace,fail.
 export_all_preds:-source_location(File,_Line),module_property(M,file(File)),!,export_all_preds(M).
 
 export_all_preds(ModuleName):-forall(current_predicate(ModuleName:F/A),
-                   ((export(F/A),functor(P,F,A),moo_hide(ModuleName:P)))).
+                   ((export(F/A),functor_catch(P,F,A),moo_hide(ModuleName:P)))).
 
 
 
@@ -1313,7 +1314,8 @@ call_no_cuts(CALL):-clause(CALL,TEST),call_no_cuts_0(TEST).
 
 call_no_cuts_0(true):-!.
 call_no_cuts_0((!)):-!.
-call_no_cuts_0((A,B)):-!.call_no_cuts_0(A),call_no_cuts_0(B).
+call_no_cuts_0((A,B)):-!,call_no_cuts_0(A),call_no_cuts_0(B).
+call_no_cuts_0((A;B)):-!,call_no_cuts_0(A);call_no_cuts_0(B).
 call_no_cuts_0(C):-call(C).
 
 % =====================================================================================================================
@@ -1449,7 +1451,7 @@ bugger_expand_term(T,_):- bdmsg(bugger_expand_term(T)),fail.
 
 % user:term_expansion((H:-G),(H:-G2)):- bugger_term_expansion(G,G2).
 
-module_predicate(ModuleName,F,A):-current_predicate(ModuleName:F/A),functor(P,F,A),
+module_predicate(ModuleName,F,A):-current_predicate(ModuleName:F/A),functor_catch(P,F,A),
    not((( predicate_property(ModuleName:P,imported_from(IM)),IM\==ModuleName ))).
 
 :-module_transparent(module_predicates_are_exported/0).
@@ -1476,7 +1478,7 @@ module_predicates_are_not_exported_list(ModuleName,Private):- forall(member(F/A,
 
 % make meta_predicate's module_transparent
 module_meta_predicates_are_transparent(ModuleName):-
-    forall((module_predicate(ModuleName,F,A),functor(P,F,A), once((predicate_property(ModuleName:P,(meta_predicate( P ))),
+    forall((module_predicate(ModuleName,F,A),functor_catch(P,F,A), once((predicate_property(ModuleName:P,(meta_predicate( P ))),
             not(predicate_property(ModuleName:P,(transparent))),P=..[F|Args], memberchk(':',Args) ))),
                    (dmsg(todo(module_transparent(ModuleName:F/A))),
                    (module_transparent(ModuleName:F/A)))).
@@ -1487,4 +1489,17 @@ module_meta_predicates_are_transparent(ModuleName):-
 
 :-module_property(bugger, exports(List)),moo_hide_show_childs(List).
 
+% bugger_prolog_exception_hook(error(syntax_error(operator_expected),_),_,_,_).
+bugger_prolog_exception_hook(error(instantiation_error,Info),_,_,_):- dumpST, dmsg(prolog_exception_hook(error(instantiation_error,Info))).
 
+user:prolog_exception_hook(A,B,C,D):-once(copy_term(A,AA)),catch(( once(bugger_prolog_exception_hook(AA,B,C,D))),_,fail),fail.
+
+/*
+user:prolog_exception_hook(error(syntax_error(_,_),_),_,_,_):- !,fail.
+user:prolog_exception_hook(error(number_error(_,_),_),_,_,_):- !,fail.
+user:prolog_exception_hook(error(existence_error(text,_),context(system:text_to_string/2,_)),_,_,_):-!,fail.
+user:prolog_exception_hook(error(type_error(E,E1),C2),_,_,_):- !,copy_term(error(type_error(E,E1),C2),Info),dmsg(prolog_exception_hook(Info)),fail.
+user:prolog_exception_hook(error(existence_error(evaluable,E1),C2),_,_,_):- !,fail,copy_term(error(existence_error(evaluable,E1),C2),Info),dmsg(prolog_exception_hook(Info)),fail.
+user:prolog_exception_hook(error(existence_error(E,E1),C2),_,_,_):- !,copy_term(error(existence_error(E,E1),C2),Info),dmsg(prolog_exception_hook(Info)),fail.
+user:prolog_exception_hook(error(Ex,In0),ExOut,Frame,CatcherFrame):-copy_term(error(Ex,In0),ExIn),once(dumpST),dmsg(prolog_exception_hook(ExIn,ExOut,Frame,CatcherFrame)),fail.
+*/

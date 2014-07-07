@@ -206,7 +206,7 @@ make_qlfs:-
 
 :- begin_transform_moo_preds.
 
-moo:agent_text_command(Agent,[run,Term], Agent,prologCall(Term)).
+moo:agent_text_command(Agent,[run,Term], Agent,prologCall(Term)):- ignore(Term=someCode).
 
 % [Optionaly] Start the telent server
 :-at_start(toploop_telnet:start_mud_telnet(4000)).

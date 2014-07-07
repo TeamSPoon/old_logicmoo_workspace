@@ -51,8 +51,8 @@ dbase_mod(moo).
 
 
 % hooks are declared as
-% hook:decl_database_hook(assert(A_or_Z),Fact).
-% hook:decl_database_hook(retract(One_or_All),Fact).
+%        hook:decl_database_hook(assert(A_or_Z),Fact):- ...
+%        hook:decl_database_hook(retract(One_or_All),Fact):- ...
 :- dynamic_multifile_exported hook:decl_database_hook/2.
 
 run_database_hooks(Type,M:Hook):-atom(M),!,moo:run_database_hooks(Type,Hook).
@@ -93,14 +93,12 @@ reduce_fact_heads(M,H,CL1,CL2):-
    forall(member(C,CL2),assertz(M:C)))).
 
 gather_fact_heads(M,H):- (nonvar(M)->true; member(M,[dbase,moo,world,user,hook])), current_predicate(M:F/A), 
-  once((once((A>0,atom(F),F\=(:),var(H), debugOnError(functor(H,F,A)))),compound(H),predicate_property(M:H,number_of_clauses(_)),
+  once((once((A>0,atom(F),F\=(:),var(H), debugOnError(functor_catch(H,F,A)))),compound(H),predicate_property(M:H,number_of_clauses(_)),
   not((arg(_,vv(system,bugger,logicmoo_util_dcg,user),M);predicate_property(M:H,imported_from(_)))))).
 
 
 
-hook:decl_database_hook(assert(_),Fact):-
-            ignore((compound(Fact),Fact=..[F,Arg1|PROPS],argsIsaProps(F),!,            
-            decl_mpred(Arg1,[F|PROPS]))).
+hook:decl_database_hook(assert(_),Fact):- ignore((compound(Fact),Fact=..[F,Arg1|PROPS],argsIsaProps(F),decl_mpred(Arg1,[F|PROPS]))).
 
 
 
@@ -108,27 +106,44 @@ hook:decl_database_hook(assert(_),Fact):-
 % mpred_props database
 % ========================================
 
+ensure_clause(HEAD,_,_,_BODY):-not(not((numbervars(clause(HEAD,BODY),'$VAR',0,_),clause(HEAD,BODY)))),!.
+% ensure_clause(HEAD,F,A,_):-pred_as_is(F,A), !.
+ensure_clause(HEAD,_F,_A,BODY):-assertz((HEAD:-BODY)),
+   % this is just to catch asserts at these predicates that are supposed to be contained.. We dont really want them compiled
+   nop(compile_predicates([HEAD])).
+
+
+
 :-export(argsIsaProps/1).
 argsIsaProps(Prop):- arg(_,v(argsIsa,multiValued,singleValued,negationByFailure,formatted,mpred,listValued),Prop).
 
 
+:-dynamic_multifile_exported(hook:body_req/3).
+hook:body_req(F,_,HEAD):- mpred_prop(F,external(Module)),!,call(Module:HEAD).
+% hook:body_req(isa,2,_):-!,fail.
+hook:body_req(_,_,HEAD):- req(HEAD).
+hook:body_req(_,_,HEAD):- dbase_t(HEAD).
+hook:body_req(F,A,HEAD):- mpred_prop(F,default(V)),arg(A,HEAD,V).
 
 % pass 2
-
 declare_dbase_local(F):- mpred_prop(F,hasStub),!.
 declare_dbase_local(F):- assert_if_new(mpred_prop(F,hasStub)),fail.
 declare_dbase_local(F):- mpred_prop(F,isStatic),!.
 declare_dbase_local(F):- not(mpred_arity(F,A)),trace_or_throw(not(mpred_arity(F,A))).
-declare_dbase_local(F):- must(mpred_arity(F,A)), dynamic(F/A), user_export(F/A),
-   multifile(F/A),   
-   functor(HEAD,F,A),HEAD=..[F|_ARGS],ensure_clause(HEAD,F,A,body_req(F,A,HEAD)),
-   assert_if_new(mpred_prop(F,hasStub)).
+declare_dbase_local(F):- must(mpred_arity(F,A)),declare_dbase_local(F,A).
 
+declare_dbase_local(F,A):- mpred_prop(F,stubType(Stub)),dmsg(mpred_prop(F,A,stubType(Stub))),!.
+declare_dbase_local(F,A):- declare_dbase_local(F,A,dynamic),!.
 
-body_req(F,_A,HEAD):- mpred_prop(F,external(Module)),!,call(Module:HEAD).
-%body_req(isa,2,_):-!,fail.
-%body_req(_,_,HEAD):- req(HEAD).
-body_req(F,A,HEAD):-mpred_prop(F,default(V)),arg(A,HEAD,V).
+declare_dbase_local(F,_,Stub):-assert_if_new(mpred_prop(F,stubType(Stub))),fail.
+declare_dbase_local(F,A,dynamic):-declare_dbase_local_dynamic(F,A),!.
+declare_dbase_local(F,A,Stub):- trace_or_throw(declare_dbase_local(F,A,Stub)).
+
+declare_dbase_local_dynamic(F,A):-functor_catch(P,F,A),predicate_property(P,imported_from(system)),!,dmsg(predicate_property(P,imported_from(system))).
+
+declare_dbase_local_dynamic(F,A):- dbase_mod(M), user_export(F/A), '@'((multifile(F/A),dynamic(F/A)),M),   
+   functor_catch(HEAD,F,A),HEAD=..[F|_ARGS],ensure_clause(HEAD,F,A,hook:body_req(F,A,HEAD)),dmsg(mpred_prop(F,A,stubType(dynamic))),!.
+
 
 
 user_export(_):- dbase_mod(user),!.
@@ -156,6 +171,7 @@ user_export(Prop/Arity):-
 :-dynamic_multifile_exported((loading_module_h/1, loading_game_file/2, loaded_game_file/2)).
 not_loading_game_file:-not(loading_game_file(_,_)),loaded_game_file(_,_).
 
+:- dynamic_multifile_exported posture/1.
 
 :- dynamic_multifile_exported((decl_mpred/1)).
 decl_mpred([]):-!.
@@ -168,14 +184,14 @@ decl_mpred(C):-decl_mpred(C,[]).
 :-dynamic_multifile_exported(decl_mpred/2).
 decl_mpred(M:FA,More):-!,decl_mpred(FA,[decl_mpred(M)|More]).
 decl_mpred(F/A,More):-!,decl_mpred(F,arity(A)),decl_mpred(F,More),!.
-decl_mpred(C,More):-compound(C),!,functor(C,F,A),decl_mpred(F,arity(A)),decl_mpred(F,More),!,decl_mpred(F,argsIsa(C)),!.
+decl_mpred(C,More):-compound(C),!,functor_catch(C,F,A),decl_mpred(F,arity(A)),decl_mpred(F,More),!,decl_mpred(F,argsIsa(C)),!.
 decl_mpred(F,A):-number(A),!,decl_mpred(F,arity(A)),!.
 decl_mpred(_,[]):-!.
 decl_mpred(F,[Prop|Types]):-!,decl_mpred(F,Prop),!,decl_mpred(F,Types),!.
 decl_mpred(F,Prop):-assert_if_new(mpred_prop(F,Prop)),fail.
-decl_mpred(F,arity(A)):-assert_if_new(mpred_arity(F,A)),!.
-decl_mpred(F,external(Module)):- not(dbase_mod(Module)),mpred_arity(F,A),functor(HEAD,F,A),must(predicate_property(Module:HEAD,_)),!.
-decl_mpred(F,interArgIsa):- not((mpred_prop(F,external(Module)),not(dbase_mod(Module)))),declare_dbase_local(F),!.
+decl_mpred(F,arity(A)):-assert_if_new(mpred_arity(F,A)),fail.
+decl_mpred(F,external(Module)):- not(dbase_mod(Module)),mpred_arity(F,A),functor_catch(HEAD,F,A),must(predicate_property(Module:HEAD,_)),!.
+decl_mpred(F,_):- not((mpred_prop(F,external(Module)),not(dbase_mod(Module)))),declare_dbase_local(F),!.
 decl_mpred(_,_).
 
       
@@ -184,7 +200,7 @@ functor_check_univ(G1,F,List):-must_det(compound(G1)),must_det(G1 \= _:_),must_d
 
 :-export(glean_pred_props_maybe/1).
 glean_pred_props_maybe(_:G):-!,compound(G),glean_pred_props_maybe(G).
-glean_pred_props_maybe(G):-compound(G),functor(G,F,_),argsIsaProps(F),G=..[F,Arg1|RGS],!,add_mpred_prop_gleaned(Arg1,[F|RGS]),!.
+glean_pred_props_maybe(G):-compound(G),functor_catch(G,F,_),argsIsaProps(F),G=..[F,Arg1|RGS],!,add_mpred_prop_gleaned(Arg1,[F|RGS]),!.
 
 add_mpred_prop_gleaned(Arg1,FRGS):-functor_check_univ(Arg1,F,ARGSISA),add_mpred_prop_gleaned_4(Arg1,F,ARGSISA,FRGS).
 add_mpred_prop_gleaned_4(Arg1,_F,[ARG|_],FRGS):-nonvar(ARG),!,decl_mpred(Arg1,[argsIsa(Arg1)|FRGS]).
@@ -341,13 +357,13 @@ into_asserted_form(_X,F,A,Call):-Call=..[dbase_t,F|A].
 :- meta_predicate(call_after_game_load(-)).
 call_after_game_load(Code):- call_after_next(moo:not_loading_game_file,Code).
 
-hook:into_assertion_form_trans_hook(G,was_asserted_gaf(G)):- functor(G,F,_A),mpred_prop(F,isStatic),!.
+hook:into_assertion_form_trans_hook(G,was_asserted_gaf(G)):- functor_catch(G,F,_A),mpred_prop(F,isStatic),!.
 
 :-export(into_assertion_form/2).
 into_assertion_form(M:H,G):-atom(M),!,into_assertion_form(H,G).
 into_assertion_form(H,G):- call_no_cuts((hook:into_assertion_form_trans_hook(H,G))),expanded_different(H,G),!.
 into_assertion_form(H,GO):-expand_term( (H :- true) , C ), reduce_clause(C,G),expanded_different(H,G),!,into_assertion_form(G,GO),!.
-into_assertion_form(X,O):- functor(X,F,A),into_assertion_form_via_mpred(X,F,A,O),!.
+into_assertion_form(X,O):- functor_catch(X,F,A),into_assertion_form_via_mpred(X,F,A,O),!.
 into_assertion_form(X,O):- into_assertion_form(dbase_t,X,O),!.
 
 into_assertion_form_via_mpred(X,F,_A,O):- mpred_prop(F,dynamic_in_module),!,X=O.
@@ -457,7 +473,7 @@ enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_np_last(X,Y),Body
 
 
 /*
-fix_fa(FA,F,A):-var(FA),!,mpred_arity(F,A),functor(FA,F,A).
+fix_fa(FA,F,A):-var(FA),!,mpred_arity(F,A),functor_catch(FA,F,A).
 fix_fa(_:FA0,F,A):-!,fix_fa(FA0,F,A),!.
 
 fix_fa(F,F,A):-atom(F),!,mpred_arity(F,A).
@@ -467,15 +483,15 @@ fix_fa(FA,F0,A0):- fix_fa0(FA,F,A), fix_fa1(F, A,F0,A0).
 fix_fa0(_:FA,F,A):-!,fix_fa0(FA,F,A).
 fix_fa0(F/A,F,A):-!.
 fix_fa0(F,F,_):-atom(F),!.
-fix_fa0(FA,F,A):-functor(FA,F,A).
+fix_fa0(FA,F,A):-functor_catch(FA,F,A).
 
 fix_fa1(F,A,F0,A0):-not(atom(F)),trace_or_throw(fix_fa1(F,A,F0,A0)).
 fix_fa1(F,A,F,A0):- number(A),A0=A.
 fix_fa1(F,A,F,A):- mpred_arity(F,A).
 */
 /*
-fix_fa1(FA,F,AR):- compound(FA),functor(FA,F,A), (mpred_arity(F,AA) -> (AA=A -> ignore(AR=A)  ; arg(_,vv(A,AA),AR) ) ; ignore(AR=A) ).
-fix_fa1(FA,F,A):- mpred_arity(F,A),functor(FA,F,A).
+fix_fa1(FA,F,AR):- compound(FA),functor_catch(FA,F,A), (mpred_arity(F,AA) -> (AA=A -> ignore(AR=A)  ; arg(_,vv(A,AA),AR) ) ; ignore(AR=A) ).
+fix_fa1(FA,F,A):- mpred_arity(F,A),functor_catch(FA,F,A).
 fix_fa1(FA,F,AR):- atom(FA),!,FA=F, A=0, (mpred_arity(F,AA) -> (AA=A -> ignore(AR=A)  ; arg(_,vv(A,AA),AR) ) ; ignore(AR=A) ).
 fix_fa1(FA,F,A):-get_functor(FA,FA2),!,fix_fa(FA2,F,A).
 */
@@ -620,7 +636,7 @@ term_expansion_local(_:B1,B2):-!,term_expansion_local(B1,B2),!.
 
 term_expansion_local(((H1:-B1)),H2B2):- !,
    nonvar(B1),  current_context_module(CM),!,        
-      functor(H1,F,A), atom_concat(P,'_hook',F),!,atomic_list_concat([_,_|_],'_',P),
+      functor_catch(H1,F,A), atom_concat(P,'_hook',F),!,atomic_list_concat_catch([_,_|_],'_',P),
       H1=..[F|ARGS], H2=..[P|ARGS],
       B2 = '@'((nop(CM), B1), CM ),
       module_transparent((P/A)),
@@ -630,7 +646,7 @@ term_expansion_local(((H1:-B1)),H2B2):- !,
       multifile(P/A),
       ignore(H2B2 = ((H2 :- B2))),!.
 
-term_expansion_local(X,Y):- compound(X),loading_module_h(CM),functor(X,F,A),term_expand_local(CM,X,F,A,Y).
+term_expansion_local(X,Y):- compound(X),loading_module_h(CM),functor_catch(X,F,A),term_expand_local(CM,X,F,A,Y).
 
 
 

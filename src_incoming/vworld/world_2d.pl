@@ -224,7 +224,7 @@ compute_dir(Region1,X,Y,Z,Dir):-
    ((X<1 -> EW=w ; X > MaxX -> EW=e ; EW= ''),
    (Y<1 -> NS=n ; Y > MaxY -> NS=s ; NS= ''),
    (Z<1 -> UD=d ; Z > MaxZ -> UD=u ; UD= '')),
-   atomic_list_concat([NS,EW,UD],'',Dir),!.
+   atomic_list_concat_catch([NS,EW,UD],'',Dir),!.
 
 
 :-export(dir_offset/5).
