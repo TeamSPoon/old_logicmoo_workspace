@@ -180,7 +180,7 @@ moo:argsIsa(action_info(verb,text)).
 
 moo:argsIsa(agent_text_command(agent,text,agent,goal)).
 
-moo:multiValued(description(term,text),[assert_with_pred(assert_description),ask_predicate(query_description)]).
+moo:multiValued(description(term,text),[assert_with_pred(add_description),ask_predicate(query_description)]).
 
 
 

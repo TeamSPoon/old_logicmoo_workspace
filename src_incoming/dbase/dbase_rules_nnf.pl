@@ -78,6 +78,7 @@ nnf_post_clean(C,CC,Vars):-
    nnf_post_clean(B,BB,Vars),
    CC=..[AA|BB],!.
 
+:-export(logical_functor/1).
 
 logical_functor(X):-atom(X),nnf_pre_clean_functor(A,B,_),(X==A;X==B),!.
 
@@ -88,7 +89,7 @@ nnf_pre_clean_functor(~,(-),[]).
 nnf_pre_clean_functor(not,(-),[]).
 nnf_pre_clean_functor(implies,(=>),[]).
 nnf_pre_clean_functor(imp,(=>),[]).
-nnf_pre_clean_functor(->,(=>),[]).
+%nnf_pre_clean_functor(->,(=>),[]).
 nnf_pre_clean_functor(entailed_from,(:-),[]).
 nnf_pre_clean_functor(implied_by,(:-),[]).
 nnf_pre_clean_functor(forAll,(all),[]).

@@ -80,7 +80,7 @@ moo:action_info(idea(optional(agent,self)),"Makes some agent (or self) think of 
 moo:action_info(tick,"Makes *your* agent do something brilliant").
 moo:action_info(prolog(prolog),"Call prolog toploop").
 
-moo:agent_text_command(Agent,[prolog,X],Agent,prologCall(X)):-ignore(X=someCode),
+moo:agent_text_command(Agent,[prolog,X],Agent,prologCall(X)):-ignore(X=someCode).
 moo:agent_text_command(Agent,[prolog],Agent,prologCall(prolog)).
 
 warnOnError(X):-catch(X,E,dmsg(error(E:X))).

@@ -1050,6 +1050,9 @@ loggerFmtReal(S,F,A):-
     fmt(S,F,A),
     flush_output_safe(S),!.
 
+
+ 
+
 :-moo_hide_childs(stack_depth/1).
 :-moo_hide_childs(stack_check/1).
 :-moo_hide_childs(stack_check/2).
@@ -1490,10 +1493,12 @@ module_meta_predicates_are_transparent(ModuleName):-
 :-module_property(bugger, exports(List)),moo_hide_show_childs(List).
 
 % bugger_prolog_exception_hook(error(syntax_error(operator_expected),_),_,_,_).
-bugger_prolog_exception_hook(error(instantiation_error,Info),_,_,_):- dumpST, dmsg(prolog_exception_hook(error(instantiation_error,Info))).
+bugger_prolog_exception_hook(Info,_,_,_):- bugger_error_info(Info),!, dumpST,dmsg(prolog_exception_hook(Info)), dtrace.
+
+bugger_error_info(C):-contains_var(instantiation_error,C).
+bugger_error_info(C):-contains_var(existence_error(procedure,s/0),C).
 
 user:prolog_exception_hook(A,B,C,D):-once(copy_term(A,AA)),catch(( once(bugger_prolog_exception_hook(AA,B,C,D))),_,fail),fail.
-
 /*
 user:prolog_exception_hook(error(syntax_error(_,_),_),_,_,_):- !,fail.
 user:prolog_exception_hook(error(number_error(_,_),_),_,_,_):- !,fail.

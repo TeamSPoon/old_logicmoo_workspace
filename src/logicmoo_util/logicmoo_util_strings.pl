@@ -437,8 +437,9 @@ string_ci(A,LIC):-hotrace((any_to_string(A,S),non_empty(A),text_to_string(S,SS),
 append_ci([],L1,L2):-string_equal_ci(L1,L2),!.
 append_ci([H1|T],L2,[H2|L3]) :- string_equal_ci(H1,H2),append_ci(T,L2,L3).
 
-string_equal_ci(L0,L1):- once(string_ci(L0,SL0)),string_ci(L1,SL0),!.
 string_equal_ci(L0,L0):-!.
+string_equal_ci(L0,L1):- once(string_ci(L0,SL0)),string_ci(L1,SL1),!,SL0=SL1.
+
 
 atom_subst(A,F,R,K):-replace_in_string(F,R,A,K),!.
 
@@ -532,7 +533,6 @@ atoms_of(Atom,[]):-number(Atom),!.
 atoms_of(Atom,[Atom]):-atomic(Atom),!.
 atoms_of([H|T],L):-atoms_of(H,HL),atoms_of(T,TL),append(HL,TL,L),!.
 atoms_of(C,L):-C=..CL,atoms_of(CL,L),!.
-
 
 sort_by_strlen(List,Sorted):-predsort(longest_string,List,Sorted).
 

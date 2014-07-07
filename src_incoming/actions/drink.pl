@@ -24,9 +24,6 @@ moo:agent_call_command(Agent,drink(SObj)) :-
 	del(possess(Agent,Obj)),
 	call_update_charge(Agent,eat).
 
-moo:update_charge(Agent,drink) :-
-	del(charge(Agent,Old)),
-	New is Old - 1,
-	add(charge(Agent,New)).
+moo:update_charge(Agent,drink) :- add(charge(Agent,-1)).
 
 :- include(logicmoo(vworld/moo_footer)).

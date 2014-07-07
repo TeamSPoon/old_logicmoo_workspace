@@ -135,9 +135,11 @@ metaclass(formattype).
 
 
 moo:isa(X,Y):-loop_check(mud_isa(X,Y),moo:is_asserted(isa(X,Y))).
+/*
 moo:isa(region,regiontype).
 moo:isa(agent,agenttype).
 moo:isa(item,itemtype).
+*/
 
 %moo:subclass(SubType,formattype):-isa(SubType,formattype).
 

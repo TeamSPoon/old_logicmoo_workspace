@@ -135,9 +135,16 @@ pgs(A):-fmt('skipping ~q.',[A]).
 */
 detWithSpace(WithSpace,String):-ddeterminer0(String),atom_concat(String,' ',WithSpace).
 detWithSpace(WithSpace,String):-ddeterminer1(String),atom_concat(String,' ',WithSpace).
-determinerRemoved(S0,Det,S):- detWithSpace(WithSpace,String),string_concat(WithSpace,S,S0),string_lower(String,Det).
-add_description(A,S0):-string_concat('#$PunchingSomething ',S,S0),!,add_description(A,S).
 
+:-export(determinerRemoved/3).
+determinerRemoved(S0,Det,S):- detWithSpace(WithSpace,String),string_concat(WithSpace,S,S0),string_lower(String,Det).
+
+
+:-export(assert_description/2).
+assert_description(A,B):-add_description(A,B).
+
+:-export(add_description/2).
+add_description(A,S0):-string_concat('#$PunchingSomething ',S,S0),!,add_description(A,S).
 add_description(A,S0):-determinerRemoved(S0,String,S),!,add_description(A,S),game_assert(determinerString(A,String)).
 add_description(A,S0):-
    string_to_atom(S0,S),

@@ -171,6 +171,8 @@ user_export(Prop/Arity):-
 :-dynamic_multifile_exported((loading_module_h/1, loading_game_file/2, loaded_game_file/2)).
 not_loading_game_file:-not(loading_game_file(_,_)),loaded_game_file(_,_).
 
+get_mpred_prop(F,P):-mpred_prop(F,P),!.
+
 :- dynamic_multifile_exported posture/1.
 
 :- dynamic_multifile_exported((decl_mpred/1)).
@@ -194,7 +196,7 @@ decl_mpred(F,external(Module)):- not(dbase_mod(Module)),mpred_arity(F,A),functor
 decl_mpred(F,_):- not((mpred_prop(F,external(Module)),not(dbase_mod(Module)))),declare_dbase_local(F),!.
 decl_mpred(_,_).
 
-      
+
 functor_check_univ(M:G1,F,List):-atom(M),member(M,[dbase]),!,functor_check_univ(G1,F,List),!.
 functor_check_univ(G1,F,List):-must_det(compound(G1)),must_det(G1 \= _:_),must_det(G1 \= _/_),G1=..[F|List],!.
 
@@ -389,7 +391,7 @@ into_mpred_form(H,GO):- once((expand_term( (H :- true) , C ), reduce_clause(C,G)
 into_mpred_form(X,O):- X=..[F,P|A],into_mpred_form(X,F,P,A,O),!.
 
 % TODO confirm negations
-into_mpred_form(_X,H,P,A,O):-is_holds_true(H),(atom(P)->O=..[P|A];O=..[cholds_t,P|A]).
+into_mpred_form(_X,H,P,A,O):-is_holds_true(H),(atom(P)->O=..[P|A];O=..[dbase_t,P|A]).
 into_mpred_form(_X,H,P,A,O):-is_holds_false(H),(atom(P)->(G=..[P|A],O=not(G));O=..[cholds_f,P|A]).
 into_mpred_form(X,_H,_P,_A,X).
 

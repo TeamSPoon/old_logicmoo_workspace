@@ -445,7 +445,7 @@ specifiedItemType([String],Type,StringO):-nonvar(String),!,specifiedItemType(Str
 specifiedItemType(A,T,AA):- nonvar(T), formattype(T),!, checkAnyType(tell(_),A,T,AAA),!,AA=AAA.
 specifiedItemType(String,Type,Inst) :- get_term_specifier_text(Inst,Type),equals_icase(Inst,String),!.
 specifiedItemType(String,Type,Inst):- instances_of_type(Inst,Type),object_match(String,Inst),!.
-specifiedItemType(String,Type,Longest) :- findall(Inst, (get_term_specifier_text(Inst,Type),starts_or_ends_with_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
+specifiedItemType(String,Type,Longest) :- findall(Inst, (get_term_specifier_text(Inst,Type),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
 specifiedItemType(A,T,AA):- checkAnyType(tell(parse),A,T,AAA),AA=AAA.
 
 checkAnyType(Op,A,Type,AA):- var(A),correctAnyType(Op,A,Type,AA),must_det(var(AA)),must_det(A==AA),!.

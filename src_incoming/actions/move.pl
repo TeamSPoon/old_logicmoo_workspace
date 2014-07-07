@@ -23,12 +23,10 @@
 % :- dynamic(movedist/2).
 % :- decl_mpred(movedist/2,[argsIsa(movedist(agent,int)),singleValued,ask_module(move),query(call)]).
 
-moo:agent_text_command(Agent,[Dir],Agent,move(Dir)):-  get_term_specifier_text(Dir,dir).
 moo:agent_text_command(Agent,[DirSS],Agent,move(DirS)):- nonvar(DirSS),catch(((get_term_specifier_text(Dir,dir), any_to_atom(DirSS,DirS),catch((atom_concat(Dir,N,DirS),(atom_number(N,_))),_,fail))),_,fail).
-moo:agent_text_command(Agent,[DirSS],Agent,move(Dir)):- nonvar(DirSS),catch(((get_term_specifier_text(Dir,dir),any_to_atom(DirSS,DirA),either_starts_with_icase(DirA,Dir))),_,fail),!.
+moo:agent_text_command(Agent,[DirSS],Agent,move(Dir)):- get_term_specifier_text(Dir,dir),catch((any_to_atom(DirSS,DirA),any_to_atom(Dir,DirA)),_,fail),!.
 
-moo:agent_call_command(Agnt,Cmd):- functor(Cmd,move,_),!,
-   must(move_command(Agnt,Cmd)).
+moo:agent_call_command(Agnt,Cmd):- compound(Cmd),functor(Cmd,move,_),!,must(move_command(Agnt,Cmd)).
 
 moo:action_info(move(dir)).
 
