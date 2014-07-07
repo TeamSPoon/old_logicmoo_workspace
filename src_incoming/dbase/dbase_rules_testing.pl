@@ -11,7 +11,7 @@ do_pttp_test(TestName):- forall(pttp_test(TestName,Data),
                                  eraseall(int_firstOrder,_),
                                  eraseall(firstOrder,_),*/
                                  once(pttp_assert(Data)),once((ignore(call_print_tf(prove_timed(TestName,query))),sleep(1))))),
-                              listing(took).
+                              listing(pttp_test_took).
 
 prove_timed(TestName,A):- 
    statistics(cputime, D),
@@ -21,13 +21,15 @@ prove_timed(TestName,A):-
         ),
         statistics(cputime, C),
         F is C-D,
-        assert(took(TestName,B,F)),!,
+        assert(pttp_test_took(TestName,B,F)),!,
         B=success.
 
 
 call_print_tf(G):- G,dmsg(succceeded(G)).
 call_print_tf(G):- dmsg(failed_finally(G)),sleep(5).
 
+:-export(do_pttp_tests/0).
+do_pttp_tests:-do_pttp_test(_).
 
 unimplemented:-throw(unimplemented).
 
@@ -65,7 +67,6 @@ pttp_query(Y):- term_variables(Y,Vars),gensym(query_pttp,Q),Z=..[Q|Vars],
 :-export(pttp_query/1).
 :-export(pttp_assert/1).
 :-export(pttp_assert_int/1).
-
 
 /*
 pttp_assert(X) :-

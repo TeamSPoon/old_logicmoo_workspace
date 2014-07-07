@@ -35,7 +35,7 @@ start_boxer:-
 :- at_start(with_assertions(moo:prevent_transform_moo_preds,within_user(ignore(catch(start_boxer,_,true))))).
 
 % [Optional] Testing PTTP
-% :-is_startup_file('run_debug.pl')->doall(do_pttp_tests);true.
+:-is_startup_file('run_debug.pl')->doall(do_pttp_tests);true.
 
 
 % [Manditory] This loads the game and initializes so test can be ran

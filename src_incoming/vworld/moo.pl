@@ -117,13 +117,13 @@ ensure_clause(HEAD,_F,_A,BODY):-assertz((HEAD:-BODY)),
 :-export(argsIsaProps/1).
 argsIsaProps(Prop):- arg(_,v(argsIsa,multiValued,singleValued,negationByFailure,formatted,mpred,listValued),Prop).
 
-
 :-dynamic_multifile_exported(hook:body_req/3).
-hook:body_req(F,_,HEAD):- mpred_prop(F,external(Module)),!,call(Module:HEAD).
+not_dupe(HEAD):-not(clause(HEAD,true)).
+hook:body_req(F,_,HEAD):- mpred_prop(F,external(Module)),!,call(Module:HEAD),not_dupe(HEAD).
 % hook:body_req(isa,2,_):-!,fail.
-hook:body_req(_,_,HEAD):- req(HEAD).
-hook:body_req(_,_,HEAD):- dbase_t(HEAD).
-hook:body_req(F,A,HEAD):- mpred_prop(F,default(V)),arg(A,HEAD,V).
+hook:body_req(_,_,HEAD):- req(HEAD),not_dupe(HEAD).
+hook:body_req(_,_,HEAD):- dbase_t(HEAD),not_dupe(HEAD).
+hook:body_req(F,A,HEAD):- mpred_prop(F,default(V)),arg(A,HEAD,V),not_dupe(HEAD).
 
 % pass 2
 declare_dbase_local(F):- mpred_prop(F,hasStub),!.

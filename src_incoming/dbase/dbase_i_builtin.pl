@@ -26,7 +26,7 @@
 
 moo:subclass(createableType,type).
 
-:- (do_term_expansions->true;throw(not_term_expansions)).
+% :- (do_term_expansions->true;throw(not_term_expansions)).
 
 moo:createableType(type).
 moo:type(multiValued).
@@ -246,20 +246,20 @@ moo:multiValued(pathName(region,dir,string)).
 moo:multiValued(verbOverride(term,action,action)).
 
 moo:singleValued(atloc(object,xyz(region,int,int,int))).
-moo:singleValued(agent_turnnum(agent,int)).
+moo:singleValued(agent_turnnum(agent,int(0))).
 moo:singleValued(armorLevel(possessable,int)).
 moo:singleValued(attack(agent,int)).
-moo:singleValued(charge(agent,int)).
+moo:singleValued(charge(agent,int(500))).
 moo:singleValued(stat_total(agent,int)).
 moo:singleValued(chargeCapacity(chargable,int)).
 moo:singleValued(chargeRemaining(chargable,int)).
 moo:singleValued(damage(agent,int)).
 moo:singleValued(defence(agent,int)).
-moo:singleValued(facing(agent,dir)).
+moo:singleValued(facing(agent,dir(n))).
 moo:singleValued(inRegion(term,region)).
 moo:singleValued(last_command(agent,command)).
 moo:singleValued(location_center(region,xyz(region,int,int,int))).
-moo:singleValued(movedist(agent,number)).
+moo:singleValued(movedist(agent,int(1))).
 moo:singleValued(mudBareHandDamage(agent,dice)).
 moo:singleValued(mudLevelOf(possessable,int)).
 moo:singleValued(mudMaxHitPoints(agent,int)).

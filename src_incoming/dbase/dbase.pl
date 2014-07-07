@@ -689,7 +689,9 @@ singleValued(max_damage(term,int)).
 
 
 :-dynamic(mudToHitArmorClass0/2).
-% :- include('dbase_i_builtin').
+:- include(dbase_i_builtin).
+
+:- user_use_module(dbase_rules_pttp).
 
 :- multifile((
      type/1, agent/1, item/1, region/1,

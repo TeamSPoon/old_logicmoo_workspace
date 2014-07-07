@@ -292,7 +292,7 @@ correctFormatType(Op,A,Type,AA):- var(A),correctType(Op,A,Type,AA),must_det(var(
 correctFormatType(Op,A,Type,AA):- var(Type),trace_or_throw(correctFormatType(Op,A,Type,AA)).
 correctFormatType(Op,A,Type,AA):- correctType(Op,A,Type,AA),nonvar(AA),!.
 correctFormatType(Op,A,Type,AA):- grtrace,correctType(Op,A,Type,AA).
-correctFormatType(Op,A,Type,A):- dtrace,dmsg(warn(not(correctFormatType(Op,A,Type)))).
+correctFormatType(Op,A,Type,A):- dmsg(todo(not(correctFormatType(Op,A,Type)))).
 
 :-export(checkAnyType/4).
 
