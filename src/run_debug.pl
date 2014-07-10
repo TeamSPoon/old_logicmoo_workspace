@@ -20,7 +20,7 @@ was_run_dbg_pl:-is_startup_file('run_debug.pl').
 % starts in forground
 %:- at_start(slow_work).
 % starts in thread (the the above was commented out)
-%:- at_start(start_servers).
+:- at_start(start_servers).
 % commented out except on run
 
 start_boxer:-!.
