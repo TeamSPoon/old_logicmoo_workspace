@@ -6,7 +6,7 @@
 % Was this our startup file?
 was_run_dbg_pl:-is_startup_file('run_debug.pl').
 
-:- catch(guitracer,_,true).
+% :- catch(guitracer,_,true).
 :- set_prolog_flag(verbose_load,true).
 
 :- debug.
