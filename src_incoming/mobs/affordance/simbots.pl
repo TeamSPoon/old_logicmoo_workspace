@@ -36,16 +36,17 @@ moo:defined_affordance([objType=furnature,actionVerb="BumpIntoBarrier",
 
 % yet every minute you are alive, god wishes to punish you
 moo:defined_affordance([objType=self,actionVerb="LiveAtLeastAMinute",
-maximumDistance=2000,
-'Energy'=100*-0.1,
-'Hunger'=100*-1,
-'Bladder'=100*-1,
-'Hygiene'=100*0,
-'Room'=100*-1,
-'Social'=100*-1,
-'Fun'=100*-1,
-'GenerallySadToHappy'=100*-1,
-'Comfort'=100*-1]).
+   maximumDistance=2000,
+   'Energy'=100*-1,
+   'UnBored'=100*-100,
+   'Hunger'=100*-1,
+   'Bladder'=100*-1,
+   'Hygiene'=100*0,
+   'Room'=100*-1,
+   'Social'=100*-1,
+   'Fun'=100*-1,
+   'GenerallySadToHappy'=100*-1,
+   'Comfort'=100*-1 ]).
 
 moo:defined_affordance([objType="Shower",
 actionVerb="CleanBodyWithObject",
@@ -73,7 +74,7 @@ textName="Wash Hands",
 'Hygiene'=10*10,
 actionVerb="CleanTheObject"]).
 
-moo:defined_affordance([objType="BigThing",require(size>8)]).
+moo:defined_affordance([objType="BigThing",require(size > 8)]).
 
 % moo:defined_affordance([actionVerb="AttachToSelf",textName="Attach it",slAnim=anim_RPS_PAPER,'Comfort'=20*20,'LispScript'="(progn (TheBot.AttachToSelf Target))"]).
 
@@ -213,19 +214,19 @@ slAnim=anim_DRINK,
 slGrab=true]).
 
 moo:defined_affordance([objType="Treadmill",
-actionVerb="ExcersizeUsingObject",
-textName="Tread the mill",
-slSit=true]).
+   actionVerb="ExcersizeUsingObject",
+   textName="Tread the mill",
+   slSit=true]).
 
 moo:defined_affordance([objType="FixedLamp",
-stringMatch="*floorlamp",
-stringMatch="lamp",
-stringMatch="lantern",
-stringMatch="lightbulb",
-stringMatch="lighting",
-actionVerb="TouchTheObject",
-textName="flip the switch",
-slAnim=anim_AIM_BAZOOKA_R]).
+   stringMatch="*floorlamp",
+   stringMatch="lamp",
+   stringMatch="lantern",
+   stringMatch="lightbulb",
+   stringMatch="lighting",
+   actionVerb="TouchTheObject",
+   textName="flip the switch",
+   slAnim=anim_AIM_BAZOOKA_R]).
 
 moo:defined_affordance([objType="Pooltable",
 stringMatch="*pool table*",
@@ -264,13 +265,13 @@ acceptsChild="Bread",
 actionVerb="PlaceSomethingAtObject"]).
 
 moo:defined_affordance([objType="TrashContainer",
-stringMatch="garbage*c",
-stringMatch="trash*c",
-stringMatch="trash*bin",
-stringMatch="waste",
-stringMatch="recycle*bin",
-acceptsChild="TakeTheObject",
-actionVerb="PlaceSomethingAtObject"]).
+   stringMatch="garbage*c",
+   stringMatch="trash*c",
+   stringMatch="trash*bin",
+   stringMatch="waste",
+   stringMatch="recycle*bin",
+   acceptsChild="TakeTheObject",
+   actionVerb="PlaceSomethingAtObject"]).
 
 moo:defined_affordance([objType="Bookcase",
 stringMatch="*Bookcase",
@@ -379,30 +380,30 @@ textName="Take it",
 'AcceptsParent'="Avatar"]).
 
 moo:defined_affordance([objType=sittable,actionVerb="SleepOnObject",
-textName="Lay on",
-slSit=true,
-slAnim=anim_SLEEP,
-'Comfort'=5*5,
-'Energy'=20*20]).
+   textName="Lay on",
+   slSit=true,
+   slAnim=anim_SLEEP,
+   'Comfort'=5*5,
+   'Energy'=20*20]).
 
 moo:defined_affordance([alsoType=visible,actionVerb="CleanTheObject",
-textName="Clean",
-slAnim=anim_FINGER_WAG,
-'Fun'=-2*2,
-'Energy'=0*-1]).
+   textName="Clean",
+   slAnim=anim_FINGER_WAG,
+   'Fun'=-2*2,
+   'Energy'=0*-1]).
 
 moo:defined_affordance([alsoType=visible,actionVerb="ObserveObject",
-textName="Observe",
-maximumDistance=5,
-slAnim=anim_CLAP,
-'Fun'=2*1,
-'Energy'=0*-1]).
+   textName="Observe",
+   maximumDistance=5,
+   slAnim=anim_CLAP,
+   'Fun'=2*1,
+   'Energy'=0*-1]).
 
 moo:defined_affordance([objType=takeable,actionVerb="CleanBodyWithObject",
-textName="Wash",
-slAnim=anim_RPS_PAPER,
-'Comfort'=0*10,
-'Hygiene'=20*10]).
+   textName="Wash",
+   slAnim=anim_RPS_PAPER,
+   'Comfort'=0*10,
+   'Hygiene'=20*10]).
 
 moo:defined_affordance([objType=sittable,actionVerb="ExcersizeUsingObject",
 textName="Excersize",

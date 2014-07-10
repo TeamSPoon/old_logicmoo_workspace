@@ -468,7 +468,12 @@ make_wrapper0(DefinedPreds,[P,N],Result) :-
 %%%   that would be created by make_wrapper
 %%% SOURCE
 
-query(PosAncestors,NegAncestors,DepthIn,DepthOut,ProofIn,ProofOut) :-
+% 3 = suc(suc(1))
+% 3/67 = div(suc(suc(1)),67)
+
+
+query(PosAncestors,NegAncestors,DepthIn,DepthOut,ProofIn,ProofOut) :- 
+  % current_agent(Agent), 'EP_cog'(Agent,Cog), DepthIn is DepthInIn - Cog,
   get_int_query(Int_query),
 	call(Int_query,PosAncestors,NegAncestors,DepthIn,DepthOut,ProofIn,ProofOut,query).
 

@@ -14,6 +14,8 @@
 
 :- '@'(use_module(logicmoo(vworld/moo)),'user').
 :- '@'(use_module(dbase_formattypes),'user').
+:-dynamic(multiValued/1).
+:-dynamic(multiValued/2).
 
 :- export((
  add/1, add0/1, agent/1, agent_doing/2, agent_done/2, argIsa_call/3, charge/2, ofclass/2, clr/1, damage/2, db_op/2, atloc/2, 
@@ -85,13 +87,13 @@ moo:agent_call_command(_Gent,list(Obj)):- term_listing(Obj).
 % begin holds_t
 % ================================================================================
 :-export((holds_t/1,holds_t/2,holds_t/3,holds_t/4,holds_t/5,holds_t/6,holds_t/7,holds_t/8)).
-holds_t(P,A1,A2,A3,A4,A5,A6,A7):- req(p(P,A1,A2,A3,A4,A5,A6,A7)).
-holds_t(P,A1,A2,A3,A4,A5,A6):- req(p(P,A1,A2,A3,A4,A5,A6)).
-holds_t(P,A1,A2,A3,A4,A5):- req(p(P,A1,A2,A3,A4,A5)).
-holds_t(P,A1,A2,A3,A4):- req(p(P,A1,A2,A3,A4)).
-holds_t(P,A1,A2,A3):- req(p(P,A1,A2,A3)).
-holds_t(P,A1,A2):- req(p(P,A1,A2)).
-holds_t(P,A1):- req(p(P,A1)).
+holds_t(P,A1,A2,A3,A4,A5,A6,A7):- req(dbase_t(P,A1,A2,A3,A4,A5,A6,A7)).
+holds_t(P,A1,A2,A3,A4,A5,A6):- req(dbase_t(P,A1,A2,A3,A4,A5,A6)).
+holds_t(P,A1,A2,A3,A4,A5):- req(dbase_t(P,A1,A2,A3,A4,A5)).
+holds_t(P,A1,A2,A3,A4):- req(dbase_t(P,A1,A2,A3,A4)).
+holds_t(P,A1,A2,A3):- req(dbase_t(P,A1,A2,A3)).
+holds_t(P,A1,A2):- req(dbase_t(P,A1,A2)).
+holds_t(P,A1):- req(dbase_t(P,A1)).
 holds_t(G):- req(G).
 
 
@@ -133,6 +135,7 @@ world_clear(Named):-fmt('Clearing world database: ~q.~n',[Named]).
 pred_as_is(F,_):-mpred_prop(F,flag),!.
 pred_as_is(F,_):-mpred_prop(F,external(_)),!.
 pred_as_is(p,_):-!,fail.
+pred_as_is(dbase_t,_):-!,fail.
 pred_as_is(k,_):-!,fail.
 
 type(T):-moo:subclass(A,B),(T=B;T=A).
@@ -151,7 +154,7 @@ moo:subclass(wearable,item).
 
 :- meta_predicate hooked_asserta(^), hooked_assertz(^), hooked_retract(^), hooked_retractall(^).
 
-:- meta_predicate del(^),clr(^),add(^),req(^), db_op(-,-).
+:- meta_predicate del(-),clr(-),add(-),req(-), db_op(-,-).
 
 % Found new meta-predicates in iteration 1 (0.281 sec)
 %:- meta_predicate db_op_exact(?,?,?,0).
@@ -288,14 +291,14 @@ db_tell_isa_hooked(_,T):- define_type(T).
 db_tell_isa_hooked(I,T):- extentKnown(T),asserta_if_new(moo:dbase_t(T,I)).
 
 db_tell_isa_hooked(I,_):- glean_pred_props_maybe(I),fail.
-db_tell_isa_hooked(I,T):- argsIsaProps(T),add_mpred_prop(I,T).
+db_tell_isa_hooked(I,T):- argsIsaProps(T),decl_mpred(I,T).
 
 % db_tell_isa_hooked(I,T):- motel:defconcept(I,and([lexicon,T])).
 % db_tell_isa_hooked(I,T):- motel:defprimconcept(I,T).
 
 db_tell_isa_hooked(food5,'Weapon'):-trace_or_throw(db_tell_isa(food5,'Weapon')).
 
-db_tell_isa_hooked(I,T):-dmsg((told(db_tell_isa(I,T)))).
+% db_tell_isa_hooked(I,T):-dmsg((told(db_tell_isa(I,T)))).
 
 
 clauses_of(F,H,B):-current_predicate(F/A),functor(H,F,A),clause(H,B).
@@ -308,7 +311,7 @@ db_tell_isa_hooked_after(I,T):- is_creatable_type(T),!, db_tell_isa_hooked_creat
 db_tell_isa_hooked_after(I,T):- extentKnown(ST),impliedSubClass(T,ST),db_op_int(tell(asap),isa(I,ST)).
 db_tell_isa_hooked_after(I,T):- db_tell_isa_hooked_creation(I,T).
 
-extentKnown(Ext):- arg(_,p(type,dir,formattype,string),Ext).
+extentKnown(Ext):- arg(_,dbase_t(type,dir,formattype,string),Ext).
 extentKnown(ST):-is_creatable_type(ST).
 extentKnown(F):-argsIsaProps(F).
 extentKnown(F):-get_isa_asserted(F,extentKnown).
@@ -404,9 +407,8 @@ db_op0(Op,Term):- not(compound(Term)),!,trace_or_throw(nc(db_op0(Op,Term))).
 db_op0(Op,KB:Term):- is_kb_module(KB),!,db_op(Op,Term).
 db_op0(Op,KB:Term):- dbase_mod(KB),!,db_op(Op,Term).
 
-% db_op0(Op,Wild):-dmsg(db_op(Op,Wild)),fail.
 
-db_op0(Op,(':-'(A))):- must((expand_goal_correct_argIsa(A,AA))),expanded_different(A,AA),!,db_op(Op, (':-'(AA))).
+% db_op0(Op,(':-'(A))):- must((expand_goal_correct_argIsa(A,AA))),expanded_different(A,AA),!,db_op(Op, (':-'(AA))).
 
 db_op0(Op,[dbase_t,Class,Inst]):-!,db_op0(Op,isa(Inst,Class)).
 db_op0(Op,[cholds_f,Class,Inst]):-!,db_op0(Op,isnt(Inst,Class)).
@@ -448,7 +450,7 @@ db_op0(Op,EACH):- EACH=..[each|List],forall_member(T,List,db_op(Op,T)).
 
 db_op0(Op,db_op_exact(Term)):- !,db_op_exact(Op,Term).
  
-db_op0(tell(_),description(A,E)):- !,must(once(assert_description(A,E))).
+db_op0(tell(_),description(A,E)):- once(must(assert_description(A,E))),!,db_op0(tell(_),descriptionHere(A,E)).
 db_op0(Op,nameStrings(A,S0)):- nonvar(S0),determinerRemoved(S0,String,S),!,db_op(Op, nameStrings(A,S)),db_op(tell(_OldV), determinerString(A,String)).
 
 % db_op0(Op,Term):- hotrace(good_for_chaining(Op,Term)), db_rewrite(Op,Term,NewTerm),not(contains_singletons(NewTerm)),db_op(Op,NewTerm).
@@ -460,10 +462,9 @@ db_op0(query(HLDS,Must),get_isa(Term,Var)):- !,call_must(query(HLDS,Must),get_is
 db_op0(query(HLDS,Must),isa(Term,Var)):- !,call_must(query(HLDS,Must),hotrace(get_isa_backchaing(Term,Var))).
 db_op0(Op,isa(A,SubType)):- dbase_t(createableSubclassType,SubType,Type),!,db_op(Op,isa(A,Type)),db_op(Op,isa(A,SubType)).
 
-db_op0(tell(_OldV),argsIsa(F,Term)):-!,hooked_asserta(dbase_t(argsIsa,F,Term)).
-db_op0(Op,argsIsa(Term)):- !,decl_mpred(Term),!,db_op(Op,argsIsa(Term, Term)).
-db_op0(tell(_OldV),singleValued(Term)):- !,decl_mpred(Term),add_mpred_prop(Term,singleValued).
-db_op0(tell(_OldV),multiValued(Term)):- !,functor_safe(Term,_,A),decl_mpred(Term),add_mpred_prop(Term,[multiValued,multi(A)]).
+db_op0(tell(_OldV),argsIsa(F,Term)):-!,hooked_asserta(dbase_t(argsIsa,F,Term)),!,decl_mpred(Term),!.
+db_op0(tell(_OldV),singleValued(Term)):- !,decl_mpred(Term),decl_mpred(Term,singleValued).
+db_op0(tell(_OldV),multiValued(Term)):- !,functor_safe(Term,_,A),decl_mpred(Term),decl_mpred(Term,[multiValued,multi(A)]).
 db_op0(query(HLDS,Must),argIsa(P,N,T)):- call_must(query(HLDS,Must),(get_mpred_prop(P,argsIsa(ArgsIsa)),arg(N,ArgsIsa,T),must(nonvar(T)))).
 
 db_op0(tell(_),Term):- glean_pred_props_maybe(Term),fail.
@@ -503,7 +504,6 @@ db_op_unit(Op,_C0,Prop,ARGS):-
       db_op_sentence(Op,Prop,ARGS,Unit2),!,
       (db_op_loop(Op,Unit2,fail);db_op_exact(Op,Unit1)).
       
-
 % assert_with_pred/1
 db_op_unit(tell(_),C0,Prop,_RGS):- get_mpred_prop(Prop,assert_with_pred(How)),!,grtrace,must(atom(How)), call(run_database_hooks(assert(z)),C0), call(How,C0).
 
@@ -560,7 +560,7 @@ call_expanded(Doing,G,F,A):-not(member(dbase_t,Doing)),mpred_prop(F,dbase_t),!,c
 
 % call_expanded(Doing,G,_,_):-predicate_property(M:G,_),!,call(M:G).
 call_expanded(_Doing,G,_,_):-call_asserted(G).
-% call_expanded(Doing,G,F,A):-add_mpred_prop(F,A,dbase_t),!,call_expanded(G).
+% call_expanded(Doing,G,F,A):-decl_mpred(F,dbase_t),!,call_expanded(G).
 % call_expanded(Doing,G,_,_):-dtrace,!,G.
 
 :- dynamic_multifile_exported((
@@ -649,7 +649,6 @@ hooked_assertz(C):- into_mpred_aform(C,CP,CA),hooked_assertz(CP,CA).
 hooked_retract(C):- into_mpred_aform(C,CP,CA),hooked_retract(CP,CA).
 hooked_retractall(C):- into_mpred_aform(C,CP,CA),hooked_retractall(CP,CA).
 
-
 hooked_asserta(CP,_CA):- singletons_throw_or_fail(hooked_asserta(CP)).
 hooked_asserta(_CP,CA):- asserted_clause(CA),!.
 hooked_asserta(CP,CA):- asserta_cloc(CA),run_database_hooks_local(assert(a),CP).
@@ -710,16 +709,44 @@ database_real(P,C):- debugOnError(call(P,C)).
 % call_must/2
 % ================================================
 :-export((call_must/2)).
-call_must(q,Call):- !,call(Call).
-call_must(query,Call):- !,call(Call).
-call_must(query(Must,_),Call):- !,call_must(Must,Call).
+
+call_must(Must,M:Call):- atom(M),!,call_must(Must,Call).
+call_must(M:Must,Call):- atom(M),!,call_must(Must,Call).
+call_must(query(Must,call),Call):- !,call_must(Must,Call).
+call_must(query(call,Must),Call):- !,call_must(Must,Call).
+call_must(query(Must,HOLDS),Call):- !,call_must(HOLDS,call_must(Must,Call)).
 call_must(tell(Must),Call):- !,call_must(Must,Call).
 call_must(ask(Must),Call):- !,call_must(Must,Call).
-call_must(must,Call):- !,must(Call).
-% call_must(Must,Call):- var(Must),!,Call.
-call_must(once,Call):- !,once(Call).
-call_must(!,Call):- !,once(Call).
-call_must(_,Call):- call(Call).
+call_must(!,Call):- !,call_must(once,Call).
+call_must(Must,Call):- functor(Call,F,_),term_variables(Call,Vs),call_must(Must,F,Vs,Call).
+
+call_must(singleValued,F,Vs,Call):- !,once(call_must_all(singleValued,F,Vs,Call)).
+call_must(once,F,Vs,Call):- !,once(call_must_all(once,F,Vs,Call)).
+call_must(must,F,Vs,Call):- !,must(call_must_all(must,F,Vs,Call)).
+call_must(Op,F,[],Call):- !,once(call_must_all(Op,F,[],Call)).
+call_must(Op,F,Vs,Call):- call_must_all(Op,F,Vs,Call).
+
+
+call_must_all(_,subclass,_Vs,C):-!,dbase_and_is_asserted(subclass,C).
+call_must_all(_,get_isa_backchaing,Vs,C):-!,callm(get_isa_backchaing,C).
+
+% call_must_all(Op, F,Vs,Wild):-dmsg(call_must(Op,Wild)),fail.
+call_must_all(assertedOnly,F,_Vs,C):-!,dbase_and_is_asserted(F,C).
+call_must_all(req, _ ,[],C):- !, req(C),!.
+call_must_all(_ ,F,[],Call):-!,callm(F,Call),!.
+% call_must_all(_ ,F,_Vs,C):-dbase_and_is_asserted(F,C).
+call_must_all(_ ,F,Vs,Call):- setof(Vs,callm(F,Call),VVs),member(Vs,VVs).
+
+callm(F,C):-not(predicate_property(C,_)),!,dbase_t_only(F,C).
+callm(_,C):-C.
+
+dbase_and_is_asserted(_,C):-clause(C,true).
+dbase_and_is_asserted(dbase_t,C):-C=..[_,L|IST],!,nonvar(L),CC=..[L|IST],clause(CC,true).
+dbase_and_is_asserted(_,C):-C=..[L|IST],CC=..[dbase_t,L|IST],clause(CC,true).
+
+dbase_t_only(dbase_t,C):-!,clause(C,true).
+dbase_t_only(_,C):- dbase_t(C).
+
 
 % ================================================
 % db_assert_[mv|sv]/3
@@ -1160,8 +1187,13 @@ scan_mpred_prop:-remove_duplicated_facts.
 :-export(get_type_props/2).
 get_type_props(Type,PropList):-call_tabled(type(Type)),findall(PropU,(findall_type_default_props(Inst,Type,Prop),subst(Prop,Inst,self,PropU)),PropS),flatten_set(PropS,PropList).
 
-
+:-export(instance_missing_props/3).
 instance_missing_props(I,LPS,PS):- findall(P,(member(P,LPS),inst_missing_prop(I,P)),PS),!.
+
+:-export(get_inst_default_props/3).
+get_inst_default_props(I,PropListL,Missing):-
+    findall(PropList,(get_type_props(Type,PropList),isa(I,Type)),PropListS),flatten_set(PropListS,PropListL),
+       instance_missing_props(I,PropListL,Missing).
       
 inst_missing_prop(I,P):-P=..[F|Args],inst_missing_prop(I,F,Args).
 
@@ -1172,6 +1204,7 @@ inst_missing_prop(I,F,Args):-C=..[F,I|Args],get_sv_argnum(F,[I|Args],A),arg(A,C,
 
 get_sv_argnum(F,Args,ArgNum):-once(mpred_prop(F,functionalArg(ArgNum));length(Args,ArgNum)).
 
+:-export(forall_setof/2).
 forall_setof(ForEach,Call):-
    findall(ForEach,ForEach,ForEachAll),
    list_to_set(ForEachAll,Set),!,
@@ -1179,12 +1212,14 @@ forall_setof(ForEach,Call):-
 
 :-export(scan_default_props/0).
 
-scan_default_props:- dmsg(todo(fix(scan_default_props,"to not set atloc/2"))),!.
+% scan_default_props:- dmsg(todo(fix(scan_default_props,"to not set atloc/2"))),!.
 scan_default_props:- 
  forall_setof(get_type_props(Type,PropList),
     forall_setof(isa(I,Type), 
-         ignore((not(Type == I),instance_missing_props(I,PropList,Missing),dmsg(scan_default_props(I,Type,missing_from(Missing,PropList))),padd(I,Missing))))),!,
- remove_duplicated_facts.
+         ignore((not(Type == I),
+         once(instance_missing_props(I,PropList,Missing)),Missing\=[],
+         dmsg(scan_default_props(I,Type,missing_from(Missing,PropList))),
+         padd(I,Missing))))),!,remove_duplicated_facts.
 scan_default_props.
 
       

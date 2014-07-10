@@ -97,9 +97,11 @@ tick_tock:-
 scan_updates:- !.
 scan_updates:- ignore((thread_self(main),ignore((catch(make,E,dmsg(E)))))).
 
+hook:decl_database_hook(Type,C):- current_agent(Agent),interesting_to_player(Type,Agent,C).
 
-hook:decl_database_hook(Type,C):- ignore((current_agent(Agent),not(not((inRegion(Agent,Region),contains_term(C,Region)))),dmsg(region_database_hook(Type,C)))).
-hook:decl_database_hook(Type,C):- ignore((current_agent(Agent),not(not(contains_term(C,Agent))),dmsg(agent_database_hook(Type,C)))).
+interesting_to_player(Type,Agent,C):-not(not(contains_term(C,Agent))),dmsg(agent_database_hook(Type,C)),!.
+interesting_to_player(Type,Agent,C):-inRegion(Agent,Region),not(not(contains_term(C,Region))),dmsg(region_database_hook(Type,C)),!.
+interesting_to_player(Type,Agent,C):-inRegion(Agent,Region),inRegion(Other,Region),not(not(contains_term(C,Other))),!,dmsg(other_database_hook(Type,C)),!.
 
 % ===========================================================
 % USES PACKRAT PARSER 
@@ -119,7 +121,7 @@ do_player_action(Agent,CMD):-fmt('skipping_unknown_player_action(~q,~q).~n',[Age
 % ===========================================================
 % DEFAULT TELNET "LOOK"
 % ===========================================================
-look_brief(Agent):- not(props(Agent,needs_look(true))),!.
+look_brief(Agent):- not(prop(Agent,needs_look,true)),!.
 look_brief(Agent):- prop(Agent,last_command,X),nonvar(X),functor(X,look,_),!.
 look_brief(Agent):- look_as(Agent).
 

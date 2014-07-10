@@ -73,7 +73,7 @@ call_look(Agent,LOC):-
          call(show_room_grid(region)),
          atloc(Agent,value),
          nameStrings(region,value),
-         description(region,value),
+         descriptionHere(region,value),
          events=deliverable_location_events(Agent,LOC,value),
          path(D) = pathBetween_call(region,D,value),
          path(D) = pathName(region,D,value),

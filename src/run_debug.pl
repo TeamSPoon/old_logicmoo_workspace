@@ -35,7 +35,7 @@ start_boxer:-
 :- at_start(with_assertions(moo:prevent_transform_moo_preds,within_user(ignore(catch(start_boxer,_,true))))).
 
 % [Optional] Testing PTTP
-% :-is_startup_file('run_debug.pl')->doall(do_pttp_tests);true.
+:-is_startup_file('run_debug.pl')->doall(do_pttp_tests);true.
 
 
 % [Manditory] This loads the game and initializes so test can be ran
@@ -66,5 +66,50 @@ now_run_local_tests_dbg :- doall(defined_local_test).
 
 
 
+/*
 
+PTTP input formulas:
+  1  firstOrder(motherOf,joe,sue).
+  2  not_firstOrder(motherOf,_,A);firstOrder(female,A).
+  3  not_firstOrder(sonOf,B,A);firstOrder(motherOf,A,B);firstOrder(fatherOf,A,B).
+  4  query:-firstOrder(female,_).
+PTTP to Prolog translation time: 0.0028555670000001143 seconds
+
+Prolog compilation time: 0.0004133299999997675 seconds
+2.
+Proof time: 4.34149999994915e-5 seconds
+Proof:
+length = 2, depth = 1
+Goal#  Wff#  Wff Instance
+-----  ----  ------------
+  [0]    4   query :- [1].
+  [1]    2      firstOrder(female,sue) :- [2].
+  [2]    1         firstOrder(motherOf,joe,sue).
+Proof end.
+%                    succceeded(prove_timed(logicmoo_example1,query))
+%                do_pttp_test(logicmoo_example1_holds)
+
+PTTP input formulas:
+  1  firstOrder(motherOf,joe,sue).
+  2  not_firstOrder(motherOf,_,A);firstOrder(female,A).
+  3  not_firstOrder(sonOf,B,A);firstOrder(motherOf,A,B);firstOrder(fatherOf,A,B).
+  4  query:-firstOrder(female,_).
+PTTP to Prolog translation time: 0.0024834679999994336 seconds
+
+Prolog compilation time: 0.00039567500000003974 seconds
+2.
+Proof time: 3.7734999999372576e-5 seconds
+Proof:
+length = 2, depth = 1
+Goal#  Wff#  Wff Instance
+-----  ----  ------------
+  [0]    4   query :- [1].
+  [1]    2      firstOrder(female,sue) :- [2].
+  [2]    1         firstOrder(motherOf,joe,sue).
+Proof end.
+%                    succceeded(prove_timed(logicmoo_example1_holds,query))
+%                do_pttp_test(logicmoo_example2)
+
+
+*/
 

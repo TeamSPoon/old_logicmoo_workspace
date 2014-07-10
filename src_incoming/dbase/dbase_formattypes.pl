@@ -25,12 +25,15 @@
 :- include(logicmoo('vworld/moo_header.pl')).
 
 :-export(split_name_type/3).
-split_name_type(T,T,C):- compound(T),functor(T,C,_),!.
-split_name_type(T,T,C):-atomic_list_concat_safe([C,'-',_],T),atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),catch(number_codes(_,Digits),_,fail),atom_codes(C,Type),!.
-split_name_type(T,T,C):- atom(T),atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),catch(number_codes(_,Digits),_,fail),atom_codes(C,Type),!.
-split_name_type(C,P,C):- atom(C),C==food,gensym(C,P),!.
-split_name_type(C,P,C):- atom(C),dmsg(atom(C)),gensym(C,P),!.
-split_name_type(C,P,C):- string(C),gensym(C,P),!.
+split_name_type(Suggest,InstName,Type):-show_call(must_det(split_name_type_0(Suggest,InstName,Type))),!.
+split_name_type_0(FT,FT,formattype):-formattype(FT).
+%split_name_type_0(T,T,type):-is_type(T).
+split_name_type_0(T,T,C):- compound(T),functor(T,C,_).
+split_name_type_0(T,T,C):- atomic_list_concat_safe([C,'-',_],T).
+split_name_type_0(T,T,C):- atom(T),atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),catch(number_codes(_,Digits),_,fail),atom_codes(C,Type).
+split_name_type_0(C,P,C):- atom(C),C==food,gensym(C,P).
+split_name_type_0(C,P,C):- atom(C),dmsg(atom(C)),gensym(C,P).
+split_name_type_0(C,P,C):- string(C),gensym(C,P).
 
 
 
@@ -109,10 +112,11 @@ argIsa_call_nt(_O,F,N,Type):-argIsa_call_nt(F,N,Type).
 
 argIsa_call_nt(F,N,Type):- once(var(F);not(number(N))),dtrace,once(var(F);not(number(N))),trace_or_throw(once(var(F);not(number(N)))->argIsa_call(F,N,Type)).
 argIsa_call_nt(F,N,Type):- argIsa_call_0(F,N,Type),!.
-argIsa_call_nt(F,N,Type):- argIsa_asserted(F,N,Type),!.
-argIsa_call_nt(F,N,Type):- argIsa_call_1(F,N,Type),!.
+argIsa_call_nt(F,N,Type):- argIsa_asserted(F,N,Type),!,asserta(argIsa_call_0(F,N,Type)).
+argIsa_call_nt(F,N,Type):- argIsa_call_1(F,N,Type),!,asserta(argIsa_call_0(F,N,Type)).
 argIsa_call_nt(F,N,Type):- findall(T,argIsa_call_0(F,N,Type),T),Types=[_|_],!,as_one_of(Types,Type),!.
 
+:-dynamic(argIsa_call_0/3).
 argIsa_call_0(agent_text_command,_,term).
 argIsa_call_0(comment,2,string).
 argIsa_call_0(predicates,1,list(term)).
@@ -122,7 +126,7 @@ argIsa_call_0(directions,2,list(dir)).
 argIsa_call_0(equivRule,_,term).
 argIsa_call_0(formatted,_,term).
 argIsa_call_0(inRegion,2,region).
-argIsa_call_0(F,N,Type):-is_type(F),!,(N=1 -> Type=F;Type=term(props)).
+argIsa_call_0(F,N,Type):-is_type(F),!,(N=1 -> Type=F;Type=term(prop)).
 
 argIsa_call_0(memory,2,term).
 argIsa_call_0(subclass,_,type).

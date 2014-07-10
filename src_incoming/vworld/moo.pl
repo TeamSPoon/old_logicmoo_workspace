@@ -8,7 +8,6 @@
 % Dec 13, 2035
 %
 */
-% :- module(user). 
 :- module(moo,[coerce/3, current_context_module/1,
     rescan_dbase_t_once/0,
     rescan_dbase_t/0,
@@ -112,18 +111,37 @@ ensure_clause(HEAD,_F,_A,BODY):-assertz((HEAD:-BODY)),
    % this is just to catch asserts at these predicates that are supposed to be contained.. We dont really want them compiled
    nop(compile_predicates([HEAD])).
 
-
+:-export(argsIsaFunctor/1).
+argsIsaFunctor(Prop):- argsIsaProps(Prop).
 
 :-export(argsIsaProps/1).
-argsIsaProps(Prop):- arg(_,v(argsIsa,multiValued,singleValued,negationByFailure,formatted,mpred,listValued),Prop).
+argsIsaProps(Prop):- 
+	arg(_,v(argsIsa,multiValued,singleValued,
+		negationByFailure,formatted,mpred,listValued),Prop).
 
-:-dynamic_multifile_exported(hook:body_req/3).
-not_dupe(HEAD):-not(clause(HEAD,true)).
-hook:body_req(F,_,HEAD):- mpred_prop(F,external(Module)),!,call(Module:HEAD),not_dupe(HEAD).
-% hook:body_req(isa,2,_):-!,fail.
-hook:body_req(_,_,HEAD):- req(HEAD),not_dupe(HEAD).
-hook:body_req(_,_,HEAD):- dbase_t(HEAD),not_dupe(HEAD).
-hook:body_req(F,A,HEAD):- mpred_prop(F,default(V)),arg(A,HEAD,V),not_dupe(HEAD).
+:-dynamic_multifile_exported(hook:body_req/4).
+not_dupe(HEAD):-predicate_property(HEAD,number_of_clauses(N)),N>1,not(clause(HEAD,true)).
+
+hook:body_req(F,A,HEAD,HEAD_T):- predicate_property(HEAD,number_of_clauses(1)),!,body_req_0(F,A,HEAD,HEAD_T).
+hook:body_req(F,A,HEAD,HEAD_T):- body_req_0(F,A,HEAD,HEAD_T),not_dupe(HEAD).
+
+:-dynamic_multifile_exported(body_req_0/4).
+body_req_0(F,A,HEAD,HEAD_T):- mpred_prop(F,needsLoopCheck),!,loop_check(body_req_lc(F,A,HEAD,HEAD_T),fail).
+body_req_0(F,A,HEAD,HEAD_T):- body_req_lc(F,A,HEAD,HEAD_T).
+
+:-dynamic_multifile_exported(body_req_lc/4).
+body_req_lc(F,A,HEAD,HEAD_T):- arg(A,HEAD,V), body_req_1(F,A,HEAD,V,HEAD_T).
+
+body_req_1(F,A,HEAD,V,HEAD_T):- ground(HEAD),!,body_req_2(F,A,HEAD,V,HEAD_T),!.
+body_req_1(F,A,HEAD,V,HEAD_T):- body_req_2(F,A,HEAD,V,HEAD_T).
+
+% body_req_2(F,A,HEAD,V,HEAD_T):- one_must(body_req_3(F,A,HEAD,HEAD_T),mpred_prop(F,default(V))).
+body_req_2(F,A,HEAD,_,HEAD_T):- body_req_3(F,A,HEAD,HEAD_T).
+
+body_req_3(_,_,_ , HEAD_T):- HEAD_T.
+body_req_3(F,_,HEAD,  _):- mpred_prop(F,external(Module)),!,call(Module:HEAD).
+body_req_3(F,A,HEAD,HEAD_T):- predicate_property(HEAD,number_of_clauses(N)),N>1,!,fail. % body_req is unneeded now
+body_req_3(F,_,HEAD,  _):- not(mpred_prop(F,extentKnown)), req(HEAD).
 
 % pass 2
 declare_dbase_local(F):- mpred_prop(F,hasStub),!.
@@ -142,7 +160,11 @@ declare_dbase_local(F,A,Stub):- trace_or_throw(declare_dbase_local(F,A,Stub)).
 declare_dbase_local_dynamic(F,A):-functor_catch(P,F,A),predicate_property(P,imported_from(system)),!,dmsg(predicate_property(P,imported_from(system))).
 
 declare_dbase_local_dynamic(F,A):- dbase_mod(M), user_export(F/A), '@'((multifile(F/A),dynamic(F/A)),M),   
-   functor_catch(HEAD,F,A),HEAD=..[F|_ARGS],ensure_clause(HEAD,F,A,hook:body_req(F,A,HEAD)),dmsg(mpred_prop(F,A,stubType(dynamic))),!.
+   functor_catch(HEAD,F,A),
+   HEAD=..[F|ARGS],
+   HEAD_T=..[dbase_t,F|ARGS],
+   ensure_clause(HEAD,F,A,hook:body_req(F,A,HEAD,HEAD_T)),!.
+   
 
 
 
