@@ -53,8 +53,10 @@ rescandb:-finish_processing_game.
 gload:- load_game(logicmoo('rooms/startrek.all.pl')).
 
 savedb:-
+ catch((
    dbase_mod(DBM),
-   tell(savedb),listing(DBM:_),told.
+   tell('/tmp/savedb'),
+   listing(DBM:_),told),E,dmsg(E)).
 
 game_assert(':-'(A)):- must(A),!.
 game_assert(d(s)):-dtrace.
