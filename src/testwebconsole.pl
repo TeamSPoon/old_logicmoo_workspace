@@ -4,7 +4,7 @@
 
 :- use_module(library(http/html_write)).
 
-:- mc_start([title('Logicmoo MUD'), allow(_)]).
+start_webclient:- mc_start([title('Logicmoo MUD'), allow(_)]).
 
 %%	age(-Age)
 %
