@@ -17,6 +17,7 @@
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
+:-export(include_moo_files/2).
 include_moo_files(Mask):- expand_file_name(Mask,X),
      forall(member(E,X),user_use_module(E)).
 
