@@ -1498,13 +1498,9 @@ bugger_prolog_exception_hook(Info,_,_,_):- bugger_error_info(Info),!, dumpST,dms
 bugger_error_info(C):-contains_var(instantiation_error,C).
 bugger_error_info(C):-contains_var(existence_error(procedure,s/0),C).
 
+
+% have to load this module here so we dont take ownership of prolog_exception_hook/4.
+:- user_use_module(library(prolog_stack)).
+
 user:prolog_exception_hook(A,B,C,D):-once(copy_term(A,AA)),catch(( once(bugger_prolog_exception_hook(AA,B,C,D))),_,fail),fail.
-/*
-user:prolog_exception_hook(error(syntax_error(_,_),_),_,_,_):- !,fail.
-user:prolog_exception_hook(error(number_error(_,_),_),_,_,_):- !,fail.
-user:prolog_exception_hook(error(existence_error(text,_),context(system:text_to_string/2,_)),_,_,_):-!,fail.
-user:prolog_exception_hook(error(type_error(E,E1),C2),_,_,_):- !,copy_term(error(type_error(E,E1),C2),Info),dmsg(prolog_exception_hook(Info)),fail.
-user:prolog_exception_hook(error(existence_error(evaluable,E1),C2),_,_,_):- !,fail,copy_term(error(existence_error(evaluable,E1),C2),Info),dmsg(prolog_exception_hook(Info)),fail.
-user:prolog_exception_hook(error(existence_error(E,E1),C2),_,_,_):- !,copy_term(error(existence_error(E,E1),C2),Info),dmsg(prolog_exception_hook(Info)),fail.
-user:prolog_exception_hook(error(Ex,In0),ExOut,Frame,CatcherFrame):-copy_term(error(Ex,In0),ExIn),once(dumpST),dmsg(prolog_exception_hook(ExIn,ExOut,Frame,CatcherFrame)),fail.
-*/
+
