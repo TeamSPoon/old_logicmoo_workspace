@@ -25,7 +25,7 @@
 :- include(logicmoo('vworld/moo_header.pl')).
 
 :-export(split_name_type/3).
-split_name_type(Suggest,InstName,Type):-show_call(must_det(split_name_type_0(Suggest,InstName,Type))),!.
+split_name_type(Suggest,InstName,Type):- must_det(split_name_type_0(Suggest,InstName,Type)),!.
 split_name_type_0(FT,FT,formattype):-formattype(FT).
 %split_name_type_0(T,T,type):-is_type(T).
 split_name_type_0(T,T,C):- compound(T),functor(T,C,_).

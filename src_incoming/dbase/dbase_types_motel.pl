@@ -1,3 +1,6 @@
+
+end_of_file.
+
 /** <module> 
 % Still working on (and testing) but will provide the type inference for Logicmoo Later
 %

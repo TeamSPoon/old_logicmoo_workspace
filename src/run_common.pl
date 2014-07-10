@@ -78,7 +78,7 @@ start_servers :- startup_mod:if_version_greater(70111,thread_work).
 :- within_user(ensure_loaded(logicmoo(vworld/moo_startup))).
 
 % [Manditory] define load_default_game
-load_default_game:- load_game(logicmoo('rooms/startrek.all.pl')).
+load_default_game:- load_game(logicmoo('rooms/startrek.all.plmoo')).
 
 startup_mod:run_setup_now:-
    within_user((

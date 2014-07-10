@@ -163,7 +163,7 @@ moo:argsIsa(default_sv(singleValued,term)).
 % moo:singleValued(repl_writer(agent,term),default_sv(look:default_repl_writer)).
 % moo:singleValued(repl_to_string(agent,term),[singleValued,default_sv(look:default_repl_obj_to_string)]).
 
-moo:multiValued(moo:label_type(string,type),[singleValued]).
+moo:multiValued(label_type(string,type),[singleValued]).
 
 
 /*

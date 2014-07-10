@@ -17,6 +17,8 @@
 :- style_check(-discontiguous).
 :- style_check(-atom).
 
+assertOnLoad(X):-game_assert(X).
+
 % ==================================================
 % Mud Dictionary
 % ==================================================

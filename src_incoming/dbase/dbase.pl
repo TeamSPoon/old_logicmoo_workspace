@@ -857,6 +857,7 @@ must_asserta(C):-
       must(ground(C)),
       must(hooked_asserta(C)),!.
 
+/*
 argIsa_call(isa,1,argIsaFn(isa,1)):-!.
 argIsa_call(isa,2,type):-!.
 argIsa_call(act_affect,_,term):-!.
@@ -928,6 +929,7 @@ compare_n(Last,NewLast):- number(NewLast),not(number(Last)),trace_or_throw(incom
 compare_n(NewLast,Last):- atomic(NewLast),not(atomic(Last)),trace_or_throw(incomparable_terms(Last,NewLast)).
 compare_n(Last,NewLast):- atomic(NewLast),not(atomic(Last)),trace_or_throw(incomparable_terms(Last,NewLast)).
 
+*/
 
 
 :-dynamic(was_asserted_gaf/1).

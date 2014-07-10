@@ -2,7 +2,7 @@
 
 
 do_pttp_test(TestName):- forall(pttp_test(TestName,Data),
-                                (                                 
+                                catch((ignore(((                                 
                                  dmsg(do_pttp_test(TestName)),
                                  eraseall(int_query,_),                                 
                                  /*
@@ -10,7 +10,7 @@ do_pttp_test(TestName):- forall(pttp_test(TestName,Data),
                                  eraseall(not_firstOrder,_),
                                  eraseall(int_firstOrder,_),
                                  eraseall(firstOrder,_),*/
-                                 once(pttp_assert(Data)),once((ignore(call_print_tf(prove_timed(TestName,query))),sleep(1))))),
+                                 once(pttp_assert(Data)),once((ignore(call_print_tf(prove_timed(TestName,query))),sleep(1))))))),E,dmsg(TestName:E))),
                               listing(pttp_test_took).
 
 prove_timed(TestName,A):- 

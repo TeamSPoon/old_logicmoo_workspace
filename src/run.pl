@@ -11,7 +11,7 @@
 :- at_start(start_servers).
 
 % [Optionaly] re-define load_default_game
-% load_default_game:- load_game(logicmoo('rooms/startrek.all.pl')).
+% load_default_game:- load_game(logicmoo('rooms/startrek.all.plmoo')).
 
 % [Manditory] This loads the game and intializes
 :- at_start(run_setup).

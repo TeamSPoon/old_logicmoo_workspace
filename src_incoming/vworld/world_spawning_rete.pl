@@ -8,6 +8,8 @@
 %
 */
 
+end_of_file.
+
 
 moo:on_world_load :- retractall(spawn_objects(_)).
 

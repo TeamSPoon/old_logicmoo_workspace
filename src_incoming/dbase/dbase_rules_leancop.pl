@@ -1,3 +1,6 @@
+
+end_of_file.
+
 :-module(dbase_rules_leancop,[
       op(400,fy,-),    % negation
       op(500,xfy,&),   % conjunction

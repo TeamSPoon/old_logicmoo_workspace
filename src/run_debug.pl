@@ -14,13 +14,13 @@ was_run_dbg_pl:-is_startup_file('run_debug.pl').
 :-include(run_tests).
 
 % [Optionaly] re-define load_default_game
-% load_default_game:- load_game(logicmoo('rooms/startrek.all.pl')).
+% load_default_game:- load_game(logicmoo('rooms/startrek.all.plmoo')).
 
 % [Optionaly] load and start sparql server
 % starts in forground
 %:- at_start(slow_work).
 % starts in thread (the the above was commented out)
-:- at_start(start_servers).
+%:- at_start(start_servers).
 % commented out except on run
 
 start_boxer:-!.
@@ -35,7 +35,7 @@ start_boxer:-
 :- at_start(with_assertions(moo:prevent_transform_moo_preds,within_user(ignore(catch(start_boxer,_,true))))).
 
 % [Optional] Testing PTTP
-:-is_startup_file('run_debug.pl')->doall(do_pttp_tests);true.
+% :-is_startup_file('run_debug.pl')->doall(do_pttp_tests);true.
 
 
 % [Manditory] This loads the game and initializes so test can be ran
@@ -44,7 +44,7 @@ start_boxer:-
 
 % the real tests now (once)
 now_run_local_tests_dbg :- doall(defined_local_test).
-:- if_flag_true(was_run_dbg_pl,at_start(must_det(run_mud_tests))).
+% :- if_flag_true(was_run_dbg_pl,at_start(must_det(run_mud_tests))).
 
 % the local tests each reload (once)
 :- if_flag_true(was_run_dbg_pl, now_run_local_tests_dbg).
@@ -55,6 +55,8 @@ now_run_local_tests_dbg :- doall(defined_local_test).
 % nasty way i debuged parser
 %:-repeat, trace, do_player_action('who'),fail.
 
+:-do_player_action("scansrc").
+
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
 :- if_flag_true(was_run_dbg_pl, at_start(run)).
 
@@ -63,7 +65,6 @@ now_run_local_tests_dbg :- doall(defined_local_test).
 
 %:- kill_term_expansion.
 %:- prolog.
-
 
 
 /*

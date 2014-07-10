@@ -16,8 +16,8 @@
 */
 
 :-export(parse_agent_text_command_checked/5).
-parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):- parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD), nonvar(NewAgent),nonvar(CMD),!. % not(functor(CMD,prologCall,_)),!.
-parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):- trace, parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD).
+parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):- parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD), must((nonvar(NewAgent),nonvar(CMD))),!. % not(functor(CMD,prologCall,_)),!.
+parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):- debugging(parser), trace, parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD).
 
 must_ac(G):- show_call(must(G)).
 % =====================================================================================================================
@@ -25,6 +25,8 @@ must_ac(G):- show_call(must(G)).
 % =====================================================================================================================
 % execute a prolog command including prolog/0
 call_agent_command(Agent,Var):-var(Var),trace_or_throw(call_agent_command(Agent,Var)).
+
+call_agent_command(Agent,Text):-string(Text),atom_string(Atom,Text),!,call_agent_command(Agent,Atom).
 
 call_agent_command(Agent,[VERB|ARGS]):-
       debugOnError(parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD)),

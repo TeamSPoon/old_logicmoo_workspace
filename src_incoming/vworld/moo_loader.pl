@@ -50,7 +50,7 @@ finish_processing_game.
 rescandb:-finish_processing_game.
 
 % gload:- load_game(savedb),!.
-gload:- load_game(logicmoo('rooms/startrek.all.pl')).
+gload:- load_game(logicmoo('rooms/startrek.all.plmoo')).
 
 savedb:-
  catch((
