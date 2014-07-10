@@ -19,12 +19,14 @@
 % :-dynamic user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
 
 :- dynamic_multifile_exported hook:decl_database_hook/2.
+
+end_of_file.
+
+
 :- dynamic_multifile_exported moo:ft_info/2.
 :- dynamic_multifile_exported moo:subft/2.
 :- dynamic_multifile_exported moo:type/1.
 
-
-end_of_file.
 
 %  very very first import
 :- within_user(ensure_loaded(logicmoo('vworld/moo.pl'))).
