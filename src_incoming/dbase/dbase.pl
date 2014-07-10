@@ -728,7 +728,7 @@ call_must(Op,F,Vs,Call):- call_must_all(Op,F,Vs,Call).
 
 
 call_must_all(_,subclass,_Vs,C):-!,dbase_and_is_asserted(subclass,C).
-call_must_all(_,get_isa_backchaing,Vs,C):-!,callm(get_isa_backchaing,C).
+call_must_all(_,get_isa_backchaing,_Vs,C):-!,callm(get_isa_backchaing,C).
 
 % call_must_all(Op, F,Vs,Wild):-dmsg(call_must(Op,Wild)),fail.
 call_must_all(assertedOnly,F,_Vs,C):-!,dbase_and_is_asserted(F,C).
@@ -928,10 +928,7 @@ compare_n(Last,NewLast):- number(NewLast),not(number(Last)),trace_or_throw(incom
 compare_n(NewLast,Last):- atomic(NewLast),not(atomic(Last)),trace_or_throw(incomparable_terms(Last,NewLast)).
 compare_n(Last,NewLast):- atomic(NewLast),not(atomic(Last)),trace_or_throw(incomparable_terms(Last,NewLast)).
 
-:- assert_if_new(mpred_prop(inRegion,isStatic)).
-moo:inRegion(O,Region):-atloc(O,LOC),locationToRegion(LOC,Region).
-moo:inRegion(apath(Region,Dir),Region):-pathBetween(Region,Dir,_To).
-moo:inRegion(O,Region):-is_asserted_gaf(inRegion(O,Region)).
+
 
 :-dynamic(was_asserted_gaf/1).
 

@@ -136,11 +136,12 @@ body_req_1(F,A,HEAD,V,HEAD_T):- ground(HEAD),!,body_req_2(F,A,HEAD,V,HEAD_T),!.
 body_req_1(F,A,HEAD,V,HEAD_T):- body_req_2(F,A,HEAD,V,HEAD_T).
 
 % body_req_2(F,A,HEAD,V,HEAD_T):- one_must(body_req_3(F,A,HEAD,HEAD_T),mpred_prop(F,default(V))).
+body_req_2(F,A,HEAD,_,HEAD_T):- mpred_prop(F,call_tabled),!, call_tabled(body_req_3(F,A,HEAD,HEAD_T)).
 body_req_2(F,A,HEAD,_,HEAD_T):- body_req_3(F,A,HEAD,HEAD_T).
 
-body_req_3(_,_,_ , HEAD_T):- HEAD_T.
+body_req_3(_,_,_    ,HEAD_T):- HEAD_T.
 body_req_3(F,_,HEAD,  _):- mpred_prop(F,external(Module)),!,call(Module:HEAD).
-body_req_3(F,A,HEAD,HEAD_T):- predicate_property(HEAD,number_of_clauses(N)),N>1,!,fail. % body_req is unneeded now
+body_req_3(_,_,HEAD,  _):- predicate_property(HEAD,number_of_clauses(N)),N>1,!,fail. % body_req is unneeded now
 body_req_3(F,_,HEAD,  _):- not(mpred_prop(F,extentKnown)), req(HEAD).
 
 % pass 2

@@ -128,9 +128,13 @@ verb_after_arg(_,_,1).
 :-decl_mpred(damage,2).
 
 
-inRegion(apath(Region,Dir),Region):- is_asserted(pathBetween(Region,Dir,_To)).
-inRegion(O,Region):-req(atloc(O,LOC)),world:locationToRegion(LOC,Region).
-inRegion(O,Region):-is_asserted(inRegion(O,Region)).
+:- assert_if_new(mpred_prop(inRegion,call_tabled)).
+
+moo:inRegion(X,Y):-call_tabled(repeats_inRegion(X,Y)).
+%repeats_inRegion(O,Region):-atloc(O,LOC),locationToRegion(LOC,Region).
+repeats_inRegion(apath(Region,Dir),Region):-pathBetween(Region,Dir,_To).
+repeats_inRegion(O,Region):-is_asserted_gaf(inRegion(O,Region)).
+repeats_inRegion(O,Region):-is_asserted(inRegion(O,Region)).
 
 db_prop_format(apath(region,dir),areaPath).
 db_prop_format(dice(int,int,int),int).
