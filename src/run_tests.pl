@@ -86,11 +86,6 @@ now_run_local_tests:- doall(defined_local_test).
 % the local tests each reload (once)
 :- if_flag_true(was_runs_tests_pl, now_run_local_tests).
 
-% [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
-:- if_flag_true(was_runs_tests_pl, at_start(run)).
 
-% So scripted versions don't just exit
-:- if_flag_true(was_runs_tests_pl,at_start(prolog)).
-
-
+:- if_flag_true(was_runs_tests_pl, halt).
 
