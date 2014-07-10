@@ -227,7 +227,8 @@ dmsg_parserm(F,A):-ignore((debugging(parser),dmsg(F,A))).
 % ===========================================================
 % PARSER
 % ===========================================================
-% :-debug(parser).
+:-debug(parser).
+:-nodebug(parser).
 
 parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL):-
   parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL),
@@ -243,7 +244,7 @@ parse_agent_text_command(Agent,PROLOGTERM,[],Agent,prologCall(PROLOGTERM)):- mus
 parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL):-
  dmsg(failed_parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL)),
  debugging(parser),
- debug,visible(+all),leash(+all),trace,
+ debug,visible(+all),leash(+all), trace,
  parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL),!.
 
 % try directly parsing first
