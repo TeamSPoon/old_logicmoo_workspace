@@ -86,6 +86,6 @@ now_run_local_tests:- doall(defined_local_test).
 % the local tests each reload (once)
 :- if_flag_true(was_runs_tests_pl, now_run_local_tests).
 
-
+% halt if this was the script file
 :- if_flag_true(was_runs_tests_pl, halt).
 
