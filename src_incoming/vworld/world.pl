@@ -96,23 +96,6 @@
 :- include(logicmoo('vworld/world_spawning.pl')).
 
 
-
-
-/*
-is_property(P,A):- mpred_prop(_,C),functor(C,P,A2),A is A2-1.
-type(O):-is_type0(O).
-is_type0(T):-moo:label_type_props(_,T,_).
-is_type0(T):-moo:default_type_props(_,T,_).
-is_type0(OT):- moo:subclass(OT,_); moo:subclass(_,OT).
-is_type0(food).
-is_type0(explorer).
-is_type0(predator).
-is_type0(prey).
-is_type0(monster).
-is_type0(dir).
-is_type0(agent).
-*/
-
 isaOrSame(A,B):-A==B,!.
 isaOrSame(A,B):-isa(A,B).
 

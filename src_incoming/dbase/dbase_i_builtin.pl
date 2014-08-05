@@ -140,9 +140,9 @@ term_anglify(term_anglify(Term,Text),[prolog(Term),is,converted,to,english,using
 
 multiValued(verb_alias(string,string)).
 
-multiValued(label_type_props(string,type,list(term(property)))).
+%multiValued(label_type_props(string,type,list(term(property)))).
 
-multiValued(type_grid(type,int,term)).
+%multiValued(type_grid(type,int,term)).
 
 multiValued(action_rules(agent,verb,term(obj),term(list(term(property))))).
 
@@ -303,14 +303,14 @@ argsIsa(default_sv(singleValued,int,term)).
 % singleValued(repl_writer(agent,term),default_sv(2,look:default_repl_writer)).
 % singleValued(repl_to_string(agent,term),[singleValued,default_sv(2,look:default_repl_obj_to_string)]).
 
-multiValued(label_type(string,type),[singleValued]).
+%multiValued(label_type(string,type),[singleValued]).
 
 
 /*
-listValued(look:get_feet(agent,list(spatial)),[]).
-listValued(look:get_near(agent,list(spatial)),[ask_module(look)]).
+listValued(look:get_feet(agent,list(spatialthing)),[]).
+listValued(look:get_near(agent,list(spatialthing)),[ask_module(look)]).
 */
-listValued(get_precepts(agent,list(spatial)),[ask_module(look)]).
+listValued(get_precepts(agent,list(spatialthing)),[ask_module(look)]).
 argsIsa(mud_test(term,prolog)).
 
 multiValued(assert_with_pred(multiValued,term)).
@@ -398,6 +398,10 @@ multiValued(pathBetween(region,dir,region)).
 multiValued(default_type_props(id,type,list(voprop))).
 
 default_type_props(self,food,[height(0)]).
+
+default_type_props(self,spatialthing,[height(0)]).
+
+
 
 % :- must((argIsa_call_0(comment,2,W), W\=term)).
 

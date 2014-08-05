@@ -193,16 +193,18 @@ into_assertable_form(Dbase_t,_X,F,A,Call):-Call=..[Dbase_t,F|A].
 :-dynamic_multifile_exported(into_mpred_form/2).
 
 into_mpred_form(M:X,O):- atom(M),!,into_mpred_form(X,O),!.
-into_mpred_form(was_asserted_gaf(H),G):-!,into_mpred_form(H,G),!.
-into_mpred_form(C,isa(I,T)):-was_isa(C,I,T),!.
-into_mpred_form(H,GO):- with_assertions(into_form_code,once((expand_term( (H :- true) , C ), reduce_clause(C,G)))),expanded_different(H,G),!,into_mpred_form(G,GO),!.
-into_mpred_form(X,O):- X=..[F,P|A],into_mpred_form(X,F,P,A,O),!.
+into_mpred_form(G,O):- functor(G,F,A),G=..[F,P|ARGS],!,into_mpred_form(G,F,P,A,ARGS,O),!.
 
 % TODO confirm negations
-into_mpred_form(_X,H,P,A,O):-is_holds_true(H),(atom(P)->O=..[P|A];O=..[dbase_t,P|A]).
-into_mpred_form(_X,H,P,A,O):-is_holds_false(H),(atom(P)->(G=..[P|A],O=not(G));O=..[cholds_f,P|A]).
-into_mpred_form(X,_,_,_,isa(I,C)):-was_isa(X,I,C),!.
-into_mpred_form(X,_H,_P,_A,X).
+into_mpred_form(_,':-',C,1,_,':-'(C)):-!.
+into_mpred_form(H,_,_,_,_,GO):- with_assertions(into_form_code,once((expand_term( (H :- true) , C ), reduce_clause(C,G)))),expanded_different(H,G),!,into_mpred_form(G,GO),!.
+into_mpred_form(_,not,C,1,_,not(O)):-into_mpred_form(C,O),!.
+into_mpred_form(G,F,C,1,_,O):-predicate_property(G,builtin),!,into_mpred_form(C,OO),O=..[F,OO].
+into_mpred_form(C,_,_,_,_,isa(I,T)):-was_isa(C,I,T),!.
+into_mpred_form(_X,H,P,N,A,O):-is_holds_true(H),(atom(P)->O=..[P|A];O=..[dbase_t,P|A]).
+into_mpred_form(_X,H,P,N,A,O):-is_holds_false(H),(atom(P)->(G=..[P|A],O=not(G));O=..[cholds_f,P|A]).
+into_mpred_form(X,_,_,_,_,isa(I,C)):-was_isa(X,I,C),!.
+into_mpred_form(X,_H,_P,_N,_A,X).
 
 
 % ========================================
@@ -289,9 +291,8 @@ ensure_predicate_reachable(M,C):-once((predicate_property(C,imported_from(Other)
                                        '@'((M:dynamic(C),M:export(C)),M),user:import(M:C))),fail.
 ensure_predicate_reachable(_,_).
 
-ensure_dbase_t_stub(F,A):- declare_dbase_local_dynamic_really(moo,F,A).
 
-ensure_predicate_reachable(M,C,dbase_t,Ap1):-C=..[_,F|_RGS],A is Ap1 -1, ensure_dbase_t_stub(F,A).
+ensure_predicate_reachable(M,C,dbase_t,Ap1):-C=..[_,F|_RGS],A is Ap1 -1, declare_dbase_local_dynamic_really(M,F,A).
 
 singletons_throw_or_fail(_):- is_stable,!,fail.
 singletons_throw_or_fail(C):- contains_singletons(C),trace_or_throw(contains_singletons(C)).
@@ -660,6 +661,8 @@ decl_mpred_prolog(M,PI,F/A):-
 % :- decl_mpred posture/1.
 % :- dynamic_multifile_exported((decl_mpred/1)).
 
+:-dmsg_hide(game_assert).
+:-dmsg_hide(db_op_exact).
 
 functor_check_univ(M:G1,F,List):-atom(M),member(M,[dbase,moo]),!,functor_check_univ(G1,F,List),!.
 functor_check_univ(G1,F,List):-must_det(compound(G1)),must_det(G1 \= _:_),must_det(G1 \= _/_),G1=..[F|List],!.
@@ -739,8 +742,11 @@ is_holds_false0(Prop,Stem):-atom_concat(Stem,'_f',Prop).
 :- dynamic_multifile_exported check_permanence/4.
 :- dynamic_multifile_exported call_after_load/1.
 :- dynamic_multifile_exported decl_mud_test/2.
+
 :- dynamic_multifile_exported default_type_props/3.
 :- dynamic_multifile_exported label_type_props/3.
+:- dynamic_multifile_exported label_type/2.
+
 :- decl_mpred_hybrid subclass/2.
 :- dynamic_multifile_exported term_specifier_text/2.
 :- decl_mpred_hybrid type_grid/3.
@@ -928,10 +934,9 @@ disjointWith(formattype,item).
 disjointWith(formattype,obj).
 disjointWith(formattype,region).
 disjointWith(createableType,nonCreatableType).
-disjointWith(A,B):-ground(A:B),!,disjointWith_ground(A,B).
-disjointWith_ground(A,B):- A=B,!,fail.
-disjointWith_ground(A,B):- asserted_or_trans_subclass(A,AS),asserted_or_trans_subclass(B,BS),(is_asserted(disjointWith(AS,BS));is_asserted(disjointWith(BS,AS))).
-disjointWith_ground(A,B):- once((type_isa(A,AT),type_isa(B,BT))),AT \= BT.
+disjointWith(A,B):- A=B,!,fail.
+disjointWith(A,B):- asserted_or_trans_subclass(A,AS),asserted_or_trans_subclass(B,BS),(is_asserted(disjointWith(AS,BS));is_asserted(disjointWith(BS,AS))).
+disjointWith(A,B):- once((type_isa(A,AT),type_isa(B,BT))),AT \= BT.
 
 hook:decl_database_hook(assert(_),Fact):- check_was_known_false(Fact).
 
@@ -942,7 +947,7 @@ check_was_known_false(Fact):-ignore(((is_known_false(Fact),was_known_false(Fact)
 % ================================================
 % fact_checked/2, fact_loop_checked/2
 % ================================================
-:-meta_module_transparent(fact_checked(-,0)).
+:-meta_module_transparent(fact_checked(0,0)).
 
 fact_checked(Fact,Call):- no_loop_check(fact_checked0(Fact,Call)).
 fact_checked0(Fact,Call):- not(ground(Fact)),!,Call.
@@ -1135,6 +1140,7 @@ is_asserted_mpred(G):-fact_loop_checked(G,asserted_mpred_clause(G)).
 
 :-dynamic(was_asserted_gaf/1).
 :-dynamic_multifile_exported(was_asserted_gaf/1).
+:-export(asserted_mpred_clause/1).
 asserted_mpred_clause(naf(C)):-!,not(is_asserted(C)).
 asserted_mpred_clause(C):- (functor(C,dbase_t,_);functor(C,holds_t,_)),!,trace_or_throw(use_code(is_asserted(C))).
 asserted_mpred_clause(C):-was_asserted_gaf(C).
@@ -1217,7 +1223,6 @@ do_expand_args_l(Exp,[A|RGS],[E|ARGS]):- do_expand_args(Exp,A,E),do_expand_args_
 /*
 :- decl_mpred_hybrid((createableSubclassType(type,type))).
 :- decl_mpred_hybrid((creatableType(type))).
-% :- decl_mpred_hybrid moo:label_type/2.
 :- decl_mpred_hybrid type_grid/3.
 */
 :- decl_mpred_hybrid(((formatted/1,

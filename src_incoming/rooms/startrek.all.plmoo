@@ -493,6 +493,7 @@ somethingIsa('Area1038',['BPVLocation','Indoors-IsolatedFromOutside','SpaceInAHO
 somethingIsa('Area1037',['BPVLocation','Indoors-IsolatedFromOutside','SpaceInAHOC']).
 somethingIsa('Area1040',['BPVLocation','FreeSpaceContent']).
 somethingIsa('Area1041',['BPVLocation','FreeSpaceContent']).
+inRegion('ShipMap123','Area1000').
 somethingIsa('ShipMap123',[item]).
 verbOverride('ShipMap123',examine(this),
   prologCall(fmt("

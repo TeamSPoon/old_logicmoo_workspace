@@ -185,18 +185,20 @@ show_room_grid_new(_):-nl.
 
 door_label(R,Dir,'  '):- pathBetween_call(R,Dir,SP),atomic(SP).
 
+asserted_atloc(O,L):-is_asserted(atloc(O,L)).
+
 show_room_grid_single(Room, xyz(Room,X,Y,Z),OutsideTest):- call(OutsideTest), doorLocation(Room,X,Y,Z,Dir),door_label(Room,Dir,Label),write(Label),!.
 show_room_grid_single(_Room,_LOC,OutsideTest):- call(OutsideTest),!,write('[]'),!.
-show_room_grid_single(_Room,LOC,_OutsideTest):- atloc(Obj,LOC),inst_label(Obj,Label), write(Label), !.
-show_room_grid_single(_Room,LOC,_OutsideTest):- atloc(_Obj,LOC),write('..'), !.
+show_room_grid_single(_Room,LOC,_OutsideTest):- asserted_atloc(Obj,LOC),inst_label(Obj,Label), write(Label), !.
+show_room_grid_single(_Room,LOC,_OutsideTest):- asserted_atloc(_Obj,LOC),write('..'), !.
 show_room_grid_single(_Room,_LOC,_OutsideTest):- write('--'), !.
 
-inst_label(Obj,Label):-moo:label_type(Label,Obj),!.
-inst_label(Obj,Label):-  props(Obj,nameStrings(Val)),Val\=Obj,inst_label(Val,Label),!.
-inst_label(Obj,Label):-  props(Obj,named(Val)),Val\=Obj,inst_label(Val,Label),!.
-inst_label(Obj,Label):-  props(Obj,isa(Val)),Val\=Obj,inst_label(Val,Label),!.
 inst_label(Obj,SLabe2):-term_to_atom(Obj,SLabel),sub_atom(SLabel,1,2,_,SLabe2),!.
 inst_label(Obj,SLabe2):-term_to_atom(Obj,SLabel),sub_atom(SLabel,0,2,_,SLabe2),!.
+inst_label(Obj,Label):- moo:label_type(Label,Obj),!.
+inst_label(Obj,Label):-  aprops(Obj,nameStrings(Val)),Val\=Obj,inst_label(Val,Label),!.
+inst_label(Obj,Label):-  aprops(Obj,named(Val)),Val\=Obj,!,inst_label(Val,Label),!.
+inst_label(Obj,Label):-  aprops(Obj,isa(Val)),Val\=Obj,inst_label(Val,Label),!.
 inst_label(_Obj,'&&').
 
 % ===================================================================
@@ -222,18 +224,18 @@ show_room_grid(Room,Old,N,N) :-
 	show_room_grid(Room,New,1,N).
 show_room_grid(Room,Y,X,N) :-
       loc_to_xy(Room,X,Y,LOC),
-	atloc(Obj,LOC),
+	asserted_atloc(Obj,LOC),
         props(Obj,isa(agent)),
 	list_agents(Agents),
 	obj_memb(Agent,Agents),
-	atloc(Agent,LOC),
+	asserted_atloc(Agent,LOC),
 	write('Region1+'), write(' '),
 	XX is X + 1,
 	!,
 	show_room_grid(Room,Y,XX,N).
 show_room_grid(Room,Y,X,N) :-
         loc_to_xy(Room,X,Y,LOC),
-	atloc(Obj,LOC),
+	asserted_atloc(Obj,LOC),
         prop(Obj,isa,Class),
 	moo:label_type(Label,Class),
 	write(Label), write(' '),
@@ -242,7 +244,7 @@ show_room_grid(Room,Y,X,N) :-
 	show_room_grid(Room,Y,XX,N).
 show_room_grid(Room,Y,X,N) :-
       loc_to_xy(Room,X,Y,LOC),
-	atloc(Agent,LOC),
+	asserted_atloc(Agent,LOC),
 	isa(Agent,agent),
 	write('Ag'), write(' '),
 	XX is X + 1,

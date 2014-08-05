@@ -30,7 +30,7 @@ generate_candidate_arg_values(Prop,N,Obj):-call_vars_tabled(Obj,generate_candida
 
 generate_candidate_arg_values0(Prop,N,R):- cached_isa(Prop,extentKnown),arg(N,vv(Obj,Value),R),!,is_asserted(dbase_t(Prop,Obj,Value)).
 generate_candidate_arg_values0(Prop,N,Obj):- once((argIsa_asserted(Prop,N,Type),type_has_instances(Type))),!,cached_isa(Obj,Type).
-generate_candidate_arg_values0(Prop,1,R):- arg(N,vv(Obj,Value),R),!,is_asserted(dbase_t(Prop,Obj,Value)).
+generate_candidate_arg_values0(Prop,N,R):- arg(N,vv(Obj,Value),R),!,is_asserted(dbase_t(Prop,Obj,Value)).
 
 type_has_instances(Type):-  atom(Type),Type\=term,Type\=type,not_ft(Type),isa(_,Type),!.
 
@@ -51,14 +51,15 @@ choose_current(Prop,Obj,Value):- findall(choose_each(Prop,Obj,Value),choose_each
 
 choose_one(Prop,Obj,Value):- choose_asserted(Prop,Obj,RValue),!,Value=RValue.
 choose_one(Prop,Obj,    _):- Call=.. [Prop,Obj,_],noDefaultValues(Call),!,fail.
-choose_one(Prop,Obj,Value):- fallback_value(Prop,Obj,DValue),!,Value = DValue,padd(Obj,Prop,Value).
+choose_one(Prop,Obj,Value):- must_det(with_fallbacks(with_fallbacksg(fallback_value(Prop,Obj,DValue)))),!,Value = DValue,padd(Obj,Prop,Value).
 choose_one(Prop,Obj,Value):- var(Value),create_someval(Prop,Obj,Value),padd(Obj,Prop,Value).
 
 choose_each(Prop,Obj,Value):- mpred_prop(Prop, extentKnown),!,choose_asserted(Prop,Obj,Value).
 choose_each(Prop,Obj,Value):- one_must(choose_asserted(Prop,Obj,Value),(fallback_value(Prop,Obj,Value),maybe_cache(Prop,Obj,Value,Obj))).
 
-choose_asserted(Prop,Obj,Value):- dbase_t(Prop,Obj,Value). % ,must_det(is_asserted(dbase_t(Prop,Obj,Value))).
-choose_asserted(Prop,Obj,Value):- is_asserted(dbase_t(Prop,Obj,Value)).
+% choose_asserted(Prop,Obj,Value):- dbase_t(Prop,Obj,Value). % ,must_det(is_asserted(dbase_t(Prop,Obj,Value))).
+choose_asserted(Prop,Obj,Value):- var(Obj),!,is_asserted(dbase_t(Prop,Obj,Value)).
+choose_asserted(Prop,Obj,Value):- call_mpred(dbase_t(Prop,Obj,Value)).
 choose_asserted(Prop,Obj,Value):- transitive_other(Prop,Obj,What),call(Prop,What,Value),maybe_cache(Prop,Obj,Value,What).
       
 maybe_cache(Prop,Obj,Value,_What):-is_asserted(dbase_t(Prop,Obj,Value)),!.
@@ -144,9 +145,9 @@ hook:decl_database_hook(assert(_),atloc(R,W)):- isa(R,region),trace_or_throw(atl
 
 
 hook:deduce_facts(atloc(Obj,LOC),inRegion(Obj,Region)):-locationToRegion(LOC,Region).
+hook:deduce_facts(inRegion(Obj,_),atloc(Obj,LOC)):- put_in_world(Obj),must_det(atloc(Obj,LOC)).
 hook:deduce_facts(inRegion(_,Region),isa(Region,region)).
 hook:deduce_facts(inRegion(Obj,_),isa(Obj,obj)).
-hook:deduce_facts(inRegion(Obj,_),atloc(Obj,LOC)):- put_in_world(Obj),must_det(atloc(Obj,LOC)).
 
 hook:deduce_facts(Fact,mpred_prop(AF,[argsIsa(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],argsIsaProps(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,
                 ArgTs=..[AF|ARGS],!,must_det(ground(ARGS)).
@@ -164,17 +165,15 @@ hook:deduce_facts(Term,NewTerm):- hotrace(good_for_chaining(Op,Term)), db_rewrit
 
 
 fix_argIsa(F,N,dir(Val),dir):-add(mpred_prop(F,default_sv(N,Val))),!.
+fix_argIsa(F,N,int(Val),int):-add(mpred_prop(F,default_sv(N,Val))),!.
 fix_argIsa(_,_,list(Type),list(Type)):-!.
-fix_argIsa(F,N,Type,F):-compound(Type),Type=..[F,Val],get_isa_backchaing(Val,F),add(mpred_prop(F,default_sv(N,Val))),!.
+fix_argIsa(F,N,Type,F):-compound(Type),Type=..[F,Val],get_isa_backchaing(Val,F),decl_mpred(F,default_sv(N,Val)),!.
 fix_argIsa(_,_,Arg,Arg).
 
 fix_argsIsas(_,_,[],[]):-!.
 fix_argsIsas(F,N,[Arg|TList],[G|List]):-
-   fix_argIsa(F,N,Arg,G),
-   N1 is N + 1,
-   fix_argsIsas(F,N1,TList,List).
+   fix_argIsa(F,N,Arg,G), N1 is N + 1,fix_argsIsas(F,N1,TList,List),!.
 
-fix_argsIsas(F,N,ArgTList,GList):-
 hook:decl_database_hook(assert(_),argsIsa(ArgTs)):-
    ArgTs=..[F|ArgTList],
    fix_argsIsas(F,1,ArgTList,GList),

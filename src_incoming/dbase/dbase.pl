@@ -27,8 +27,9 @@
    add/1, 
    clr/1,
    db_op/2,
+   areq/1,
   del/1,  
-  padd/2, padd/3, prop/3, prop_or/4, props/2, req/1, term_listing/1, 
+  padd/2, padd/3, prop/3, prop_or/4, props/2,aprops/2, req/1, term_listing/1, 
   use_term_listing/2,  world_clear/1,  
    with_kb_assertions/2
   )).
@@ -143,8 +144,8 @@ dbase_mod(moo).
 
 %:- multifile argsIsa/2.
 
-:- meta_predicate man:with_assertions(:,0).
-:- meta_predicate world:intersect(?,0,?,0,0,-).
+%:- meta_predicate man:with_assertions(:,0).
+%:- meta_predicate world:intersect(?,0,?,0,0,-).
 
 %% :- meta_predicate del(0),clr(0),add(0),add0(0),req(0), db_op(0,0,0).
 
@@ -471,6 +472,9 @@ non_assertable(WW,notAssertable(Why)):- compound(WW),functor_catch(WW,F,_),mpred
 % non_assertable(WW,as_is(Why)):- compound(WW),functor_catch(WW,F,_),!,mpred_prop(F,as_is(Why)),!.
 % non_assertable(WW,Why):- db_prop_game_assert
 
+:-thread_local assertedOnly/1.
+:-thread_local with_callMPred/1.
+
 % replaced the 1st with the 2nd and better version of retract
 % del(C0):- db_op_int(retract,C0)
 %% del(RetractOne)    <--  del(C0):- ignore((db_op(query(HLDS,Must),C0),!,db_op('retract',C0))).
@@ -480,9 +484,11 @@ del(C0):- dmsg(failed(del(C0))),!,fail.
 clr(C0):- db_op_int(ra,C0).
 %% req(Query)
 req(C0):- db_op_int(query(dbase_t,req),C0).
+areq(C0):- with_assertions(assertedOnly(_),db_op_int(query(dbase_t,assertedOnly),C0)).
 mreq(C0):- must(req(C0)).
 %% props(Obj,QueryPropSpecs)
 props(Obj,PropSpecs):- req(props(Obj,PropSpecs)).
+aprops(Obj,PropSpecs):- areq(props(Obj,PropSpecs)).
 %% add(Assertion)
 add(C0):- must_det((db_op_int(tell(add), C0), extreme_debug(req(C0)))),!.
 %% padd(Obj,PropSpecs)
@@ -737,7 +743,6 @@ holds_args(HOLDS,LIST):- compound(HOLDS),HOLDS=..[H|LIST],is_holds_true(H),!.
 % db_op(query(HLDS,Must),creatableType(SubType)):- !, call_must(Must,is_creatable_type(SubType)).
 db_op(tell(_),props(_Obj,Props)):- Props ==[], !.
 
-db_op(Op,isa(Term,Var)):- var(Var),!,db_op(Op,isa(Term,Var)).
 db_op(query(Dbase_t, Req), must(Call)):-!,must(db_op(query(Dbase_t, Req), Call)).
 
 db_op(a,Wild):-!,db_op(tell(assertion),Wild).
@@ -757,7 +762,8 @@ db_op(Op,Term):- loop_check_throw(db_op0(Op,Term)).
 :-moo_hide_childs(db_op0/2).
 
 db_op0(tell(assertion),end_of_file):-!.
-db_op0(Op,Term):- not(compound(Term)),!,trace_or_throw(nc(db_op0(Op,Term))).
+db_op0(Op,Term):- stack_check(1000),not(compound(Term)),!,trace_or_throw(nc(db_op0(Op,Term))).
+db_op0(Op,props(Obj,nameStrings(Str))):-!, db_op0(Op,nameStrings(Obj,Str)).
 
 db_op0(Op,KB:Term):- is_kb_module(KB),!,db_op(Op,Term).
 db_op0(Op,KB:Term):- dbase_mod(KB),!,db_op(Op,Term).
@@ -918,16 +924,22 @@ call_expanded_for_sv_2(_WhatNot,F,A,G,OUT):- defaultArgValue(G,F,A,OUT),!.
 
 :-export(call_expanded/1).
 %:-export(call_expanded/1).
-%call_expanded(G):-debugOnError(G).
-call_expanded(G) :- functor_catch(G,F,A),call_expanded([],G,F,A).
-
+call_expanded(true):-!.
+call_expanded(G):-compound(G),!,call_expanded([],G).
+call_expanded(G):- trace_or_throw(var_call_expanded(G)).
+:-export(call_expanded/2).
+call_expanded(Doing,G):- functor(G,F,A),call_expanded(Doing,G,F,A).
 :-export(call_expanded/4).
-call_expanded(_Doing,V,_F,_A):-var(V),!,trace_or_throw(var_call_expanded(V)).
 call_expanded(_Doing,true,_F,_A):-!.
+call_expanded(Doing,G,dbase_t,A):-G=..[dbase_t,P|ARGS],!,into_mpred_form(G,dbase_t,P,A,ARGS,O),!,call_expanded(Doing,O).
+call_expanded(_Doing,G,F,_A):-predicate_property(G,visible),not(mpred_prop(F,_)),!,debugOnError(G).
+call_expanded(Doing,G,F,A):-not(member(singleValued,Doing)),mpred_prop(F,singleValued),arg(1,G,NonVar),nonvar(NonVar),!,once(call_expanded([singleValued|Doing],G,F,A)).
 call_expanded(Doing,G,F,A):-not(member(ask_module(_),Doing)),mpred_prop(F,ask_module(M)),!,'@'(M:call(call_expanded([ask_module(M)|Doing],M:G,F,A)),M).
-call_expanded(Doing,G,F,A):-not(member(query(_),Doing)),mpred_prop(F,query(M)),!,call_expanded([query(M)|Doing],call(M,G),F,A).
-call_expanded(Doing,G,F,A):-not(member(is_asserted,Doing)),!,is_asserted(G);call_expanded([is_asserted|Doing],G,F,A).
-call_expanded(Doing,G,F,A):-not(member(call_mpred,Doing)),!,(call_mpred(F,G);call_expanded([call_mpred|Doing],G,F,A)).
+call_expanded(Doing,G,F,A):-not(member(query_with_pred(_),Doing)),mpred_prop(F,query_with_pred(M)),!,call_expanded([query_with_pred(M)|Doing],call(M,G),F,A).
+call_expanded(Doing,G,F,A):-not(member(assertedOnly,Doing)),!,is_asserted(G);call_expanded([assertedOnly|Doing],G,F,A).
+call_expanded(_Doing,G,F,_A):-assertedOnly(F),!,is_asserted(G).
+call_expanded(_Doing,G,F,_A):-with_callMPred(F),!,call_mpred(F,G).
+call_expanded(Doing,G,F,A):-not(member(with_callMPred,Doing)),!,(call_mpred(F,G);call_expanded([with_callMPred|Doing],G,F,A)).
 
 
 :-export((dbase_t/1,dbase_t/2)).
@@ -1009,7 +1021,7 @@ call_must_all0(_,subclass,_Vs,C):-!,is_asserted(subclass,C).
 call_must_all0(_,get_isa_backchaing,_Vs,C):-!,C.
 
 % call_must_all0(Op, F,Vs,Wild):-dmsg(call_must(Op,Wild)),fail.
-call_must_all0(assertedOnly,F,_Vs,C):-!,asserted_clause(F,C).
+call_must_all0(assertedOnly,_,_Vs,C):-!,dtrace,is_asserted(C).
 call_must_all0(_ ,F,[],Call):-!,call_mpred(F,Call),!.
 call_must_all0(_ ,F,_Vs,Call):-not(arg(_,Call,vvar)),!,call_mpred(F,Call),!.
 call_must_all0(_ ,F,Vs,Call):- setof(Vs,call_mpred(F,Call),VVs),member(Vs,VVs).
@@ -1034,7 +1046,7 @@ naf(Goal):-not(req(Goal)).
 :-export((db_assert_mv/4)).
 db_assert_mv(_Must,end_of_file,_,_):-!.
 % db_assert_mv(_Must,C,_F,_A):- hooked_assertz(C),!.
-db_assert_mv(_Must,C,F,_A):- (mpred_prop(F,ordered) -> hooked_assertz(C) ; hooked_asserta(C)).
+db_assert_mv(Must,C,F,A):- dmsg(db_assert_mv(Must,C,F,A)), must_det(mpred_prop(F,ordered) -> hooked_assertz(C) ; hooked_asserta(C)).
 
 
 % assert_with to tell(OldV) singlevalue pred
@@ -1082,10 +1094,11 @@ db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):- same_arg(equals,OLD,NE
 db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):-
    dmsg(db_assert_sv(COLD,'__replace__',CNEW)),
    must_det(hooked_retract(COLD)),
+   replace_arg(C,A,_,CBLANK),hooked_retractall(CBLANK),
    must_det(hooked_asserta_confirmed(CNEW,A,NEW)),!.
 
 qreq(COLD):-functor(COLD,F,A),functor(COLD_AT_ALL,F,A),
-   with_assertions(noDefaultTypeValues(COLD), 
+   with_assertions(noRandomValues(COLD), 
      with_assertions(noDefaultValues(COLD),
                    (no_loop_check(  %listing(bugger:inside_loop_check/1),
                      call_expanded([whatnot(COLD)],COLD,F,A)))) ),!.
@@ -1094,17 +1107,14 @@ qreq2(COLD):-qreq(COLD),!.
 qreq2(COLD):-functor(COLD,F,A),functor(COLD_AT_ALL,F,A),
    listing(bugger:inside_loop_check/1),
    retractall(bugger:inside_loop_check(_)),
-   with_assertions(noDefaultTypeValues(COLD), 
-     with_assertions(noDefaultValues(COLD),
-                   ((  %listing(bugger:inside_loop_check/1),
-                     call_expanded([whatnot(COLD)],COLD,F,A)))) ),!.
+   dtrace,qreq(COLD).
 
 :-style_check(+singleton).
 
 confirm_hook(CNEW:NEW=@=CNOW:NOW):-
    var(NOW),               
    qreq(CNOW),
-   show_call(CNEW:NEW=@=CNOW:NOW),!.
+   logOnFailure(CNEW:NEW=@=CNOW:NOW),!.
 
 % Expect CNEW to be what is found
 hooked_asserta_confirmed(CNEW,A,NEW):-
@@ -1116,13 +1126,26 @@ hooked_asserta_confirmed(CNEW,A,NEW):-
 hooked_asserta_confirmed(CNEW,A,NEW):-
    replace_arg(CNEW,A,NOW,CNOW),
    dtrace,
-   show_call((req(CNOW),CNEW:NEW=@=CNOW:NOW)),!.
+   logOnFailure((req(CNOW),CNEW:NEW=@=CNOW:NOW)),!.
 hooked_asserta_confirmed(CNEW,A,NEW):-dmsg(unconfirmed(hooked_asserta_confirmed(CNEW,A,NEW))).
 
 :-export((noDefaultValues/1)).
 :-thread_local noDefaultValues/1.
-:-export((noDefaultTypeValues/1)).
-:-thread_local noDefaultTypeValues/1.
+:-export((noRandomValues/1)).
+:-thread_local noRandomValues/1.
+
+:-meta_predicate_transparent(with_fallbacks(0)).
+with_fallbacks(Call):-with_no_assertions(noDefaultValues(_),Call).
+
+:-meta_predicate_transparent(with_fallbacksg(0)).
+with_fallbacksg(Call):-with_no_assertions(noRandomValues(_),Call).
+
+:-meta_predicate_transparent(with_no_fallbacksg(0)).
+with_no_fallbacksg(Call):-with_assertions(noRandomValues(_),Call).
+
+:-meta_predicate_transparent(with_no_fallbacks(0)).
+with_no_fallbacks(Call):-with_assertions(noDefaultValues(_),Call).
+
 
 
 no_fallback(subclass,2).
@@ -1135,20 +1158,23 @@ fallback_value(_Prop,Obj,_Value):-var(Obj),!,fail.
 fallback_value(Prop,Obj,Value):-Call=..[Prop,Obj,_], with_assertions(noDefaultValues(Call),defaultArgValue(Call,Prop,2,ValueR)),!,Value=ValueR.
 
 :-export(defaultArgValue/4).
-defaultArgValue(Call,_,_,_):- stack_check(1000),noDefaultValues(Call),!,fail.
-defaultArgValue(_,F,_,_):- noDefaultValues(F),!,fail.
-defaultArgValue(Call,F,A,OLD):- mpred_prop(F,default_sv(A,OLD)),!,dmsg(fallback_value(Call,F,default_sv(A,OLD))).
+defaultArgValue(Call,F,A,OLD):- stack_check(1000), mpred_prop(F,default_sv(A,OLD)),!,dmsg(fallback_value(Call,F,default_sv(A,OLD))).
 defaultArgValue(facing(_,_),_,2,"n"):-!.
 defaultArgValue(change(_,_),_,2,200):-!.
 defaultArgValue(damage(_,_),_,2,500):-!.
-defaultArgValue(Call,F,LastPlus1,Value):- arg(1,Call,I),nonvar(I),isa(I,Type),catch(get_type_props(Type,PropList),_,fail),Last is LastPlus1 - 1,
+defaultArgValue(Call,F,A,Value):-Call=..[F,P|Args],defaultArgValue(Call,F,A,P,Args,Value).
+
+defaultArgValue(Call,F,A,P,Args,Value):-var(P),!,argIsa_call(F,A,Type),defaultTypeValue(Call,Type,Value),!,dmsg(using_defaultTypeValue(Call,Type,Value)).
+defaultArgValue(_Call,F,2,P,[Arg],Arg):-create_someval(F,P,Arg),!. 
+defaultArgValue(Call,F,LastPlus1,I,Args,Value):- isa(I,Type),catch(get_type_props(Type,PropList),_,fail),Last is LastPlus1 - 1,
       functor(Prop,F,Last),member(Prop,PropList),show_call(arg(Last,Prop,Value)),!.
 
-defaultArgValue(Call,F,A,OLD):- argIsa_call(F,A,Type),defaultTypeValue(Call,Type,OLD),!,dmsg(using_defaultArgValue(Call,F,A,OLD)).
+defaultArgValue(Call,F,A,P,Args,Value):-argIsa_call(F,A,Type),defaultTypeValue(Call,Type,Value),!,dmsg(using_defaultTypeValue(Call,Type,Value)).
 
 
-defaultTypeValue(Call,_,_):- noDefaultTypeValues(Call),!,fail.
-defaultTypeValue(_,Type,_):- noDefaultTypeValues(Type),!,fail.
+
+defaultTypeValue(Call,_,_):- noRandomValues(Call),!,fail.
+defaultTypeValue(_,Type,_):- noRandomValues(Type),!,fail.
 defaultTypeValue(_Info,dir,"n").
 defaultTypeValue(_Info,int,0).
 defaultTypeValue(Call,Type,Out):- create_random(Type,ROut,nonvar(ROut)),dmsg(fake_defaultValue(Call,Type,ROut=Out)),!,Out=ROut.
@@ -1239,7 +1265,7 @@ cycAssert(A,B):-trace_or_throw(cycAssert(A,B)).
 
 :-export(get_type_props/2).
 
-get_type_props(Type,PropList):- loop_check(get_type_props_lc(Type,PropList),fail).
+get_type_props(Type,PropList):- with_no_fallbacks(with_no_fallbacksg(loop_check(get_type_props_lc(Type,PropList),fail))).
 get_type_props_lc(Type,PropList):- call_tabled(type(Type)),
    findall(PropU,(findall_type_default_props(Inst,Type,Prop),subst(Prop,Inst,self,PropU)),PropS),flatten_set([PropS],PropList),PropList\=[].
 
@@ -1297,6 +1323,7 @@ game_assert_later(Goal):-assert_if_new(moo:call_after_load(Goal)).
 :-'$hide'(game_assert/1).
 game_assert(A):-A==end_of_file,!.
 game_assert(A):- in_prolog_source_code,!, must_det(assertz_local_game_clause(A)).
+game_assert(A):- into_mpred_form(A,F),not(A=@=F),!,game_assert(F).
 game_assert(A):- dmsg(game_assert(A)),fail.
 game_assert(A):- not(compound(A)),!,trace_or_throw(not_compound(game_assert(A))).
 game_assert(Call):- loop_check(game_assert_thread_override(Call),fail),!.

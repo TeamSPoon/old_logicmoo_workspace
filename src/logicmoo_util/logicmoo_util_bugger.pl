@@ -486,8 +486,6 @@ outside_loop_check_term(B,BC,Call):- retract(inside_loop_check(Which)),!,
 outside_loop_check_term(_,_,Call):- !, Call.
 outside_loop_check_term(_,_,Call):- outside_loop_check_thread(Call).
 
-dmsg_hide(Term):-asserta(dmsg_hidden(Term)).
-
  % cli_notrace(+Call) is nondet.
  % use call/1 with trace turned off
  cli_notrace(Call):-tracing,cnotrace,!,call_cleanup(call(Call),trace).
@@ -718,20 +716,6 @@ traceAll:-findall(_,(member(F,[member/2,dmsg/1,takeout/3,findall/3,clearCateStac
 */
 traceAll:-!.
 
-
-meta_predicate_transparent(X):-strip_module(X,M,F),!, meta_predicate_transparent(M,F).
-meta_predicate_transparent(M,(X,Y)):-!,meta_predicate_transparent(M,X),meta_predicate_transparent(M,Y),!.
-meta_predicate_transparent(_M,X):-atom(X),!.
-meta_predicate_transparent(_M,X):-
-  debugOnFailureEach((
-  arg(1,X,A),functor_catch(X,F,_),
-  FA=F/A,
-  dynamic_if_missing(FA),
-  %module_transparent(FA),
-  %%meta_predicate(X),
-  %trace(FA, -all),
-  %%moo_hide_show_childs(FA),
-  !)).
 
 forall_member(C,[C],Call):-!,once(Call).
 forall_member(C,C1,Call):-forall(member(C,C1),once(Call)).
@@ -1005,12 +989,44 @@ prolog_must_not(_Call):-!.
 
 
 dynamic_if_missing(F/A):-functor_catch(X,F,A),predicate_property(X,_),!.
-dynamic_if_missing(F/A):- dynamic([F/A]).
+dynamic_if_missing(F/A):-dynamic([F/A]).
 
+
+meta_predicate_transparent(M:F):-!,meta_predicate_transparent(M,F).
+meta_predicate_transparent(X):-strip_module(X,M,F),!, meta_predicate_transparent(M,F).
+
+meta_predicate_transparent(M,(X,Y)):-!,meta_predicate_transparent(M,X),meta_predicate_transparent(M,Y),!.
+meta_predicate_transparent(_M,X):-atom(X),!.
+meta_predicate_transparent(M,X):-
+ '@'(((functor(X,F,A),
+  FA=F/A,export(FA),
+  meta_predicate(X),
+  module_transparent(FA))),M).
+
+:-meta_predicate_transparent(meta_predicate_transparent(0)).
 
 %%%retractall(E):- retractall(E),functor_catch(E,File,A),dynamic(File/A),!.
 
 pp_listing(Pred):- functor_catch(Pred,File,A),functor_catch(FA,File,A),listing(File),nl,findall(NV,predicate_property(FA,NV),LIST),writeq(LIST),nl,!.
+
+
+:- meta_predicate_transparent(with_assertions(?,?)).
+with_assertions( [],Call):- !,Call.
+with_assertions( [With|MORE],Call):- !,with_assertions(With,with_assertions(MORE,Call)).
+with_assertions( (With,MORE),Call):- !,with_assertions(With,with_assertions(MORE,Call)).
+with_assertions(With,Call):- setup_call_cleanup(asserta(With),Call,must(retract(With))).
+
+:-meta_predicate_transparent(with_no_assertions(?,?)).
+with_no_assertions(Head,Call):-with_assertions((Head:-!,fail),Call).
+
+
+:-thread_local(dmsg_hidden/1).
+:-meta_predicate_transparent(with_no_dmsg(?)).
+with_no_dmsg(Call):-with_no_assertions(dmsg_hidden(_),Call).
+
+dmsg_hide(Term):-asserta(dmsg_hidden(Term)).
+dmsg_show(Term):-ignore(retract(dmsg_hidden(Term))).
+dmsg_showall(Term):-ignore(retractall(dmsg_hidden(Term))).
 
 % =================================================================================
 % Utils
@@ -1171,6 +1187,8 @@ dmsg0(V):- cnotrace(dmsg1(V)),!, hotrace(doall(( hook:dmsg_hook(V)))).
 
 dmsg1(warn(V)):- print_message(warning,V).
 dmsg1(skip_dmsg(_)):-!.
+dmsg1(C):-dmsg_hidden(C),!.
+dmsg1(C):-functor_catch(C,Topic,_),dmsg_hidden(Topic),!.
 dmsg1(C):-functor_catch(C,Topic,_),debugging(Topic,_True_or_False),!,logger_property(Topic,once,true),!,
       (dmsg_log(Topic,_Time,C) -> true ; ((get_time(Time),asserta(dmsg_log(todo,Time,C)),!,dmsg2(C)))).
 dmsg1(C):-((copy_term(C,Stuff), snumbervars(Stuff),!,dmsg2(Stuff))).
@@ -1215,19 +1233,17 @@ dmsg(L,F):-loggerReFmt(L,LR),loggerFmtReal(LR,F,[]).
 dmsg(_,F):-F==[-1];F==[[-1]].
 
 
+:- meta_predicate_transparent show_call0(0).
+show_call0(C):-C. % debugOnError0(C). % dmsg(show_call(C)),C.      
 
-:- meta_predicate show_call(0).
-:- export(show_call/1).
+:- meta_predicate_transparent show_call(0).
 show_call(M:add(A)):-!, show_call0(M:add(A)),!.
 % show_call(M:must(C)):- !, M:must(C).
 show_call(C):-one_must((show_call0(C),dmsg(succeed(C))),((dmsg(failed_show_call(C)),trace))).
 
 :- meta_predicate logOnFailure(0).
 :- export(logOnFailure/1).
-logOnFailure(C):-one_must(C,(dmsg(failed_show_call(C)),trace,!,fail)).
-
-:- meta_predicate show_call0(0).
-show_call0(C):-C. % debugOnError0(C). % dmsg(show_call(C)),C.      
+logOnFailure(C):-one_must(C,(dmsg(failed_show_call(C)),!,fail)).
 
 
 :-dynamic(user:logLevel/2).

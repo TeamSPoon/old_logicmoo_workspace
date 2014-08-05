@@ -35,7 +35,7 @@ grid_dist(L1,L2,Dist):- to_3d(L1,L13D),to_3d(L2,L23D),dist(L13D,L23D,Dist),!.
 dist(_,_,5).
 
 % pathBetween_call(From,DirS,To):-string(DirS),!,atom_string(Dir,DirS),!,any_to_dir(Dir,Dir2),pathBetween(From,Dir2,To),same(Dir,Dir2).
-pathBetween_call_0(From,Dir,To):-any_to_dir(Dir,Dir2),pathBetween(From,Dir2,To),same(Dir,Dir2).
+pathBetween_call_0(From,Dir,To):-any_to_dir(Dir,Dir2),asserted_mpred_clause(pathBetween(From,Dir2,To)),same(Dir,Dir2).
 pathBetween_call(From,Dir,To):-pathBetween_call_0(From,DirS,To), same(Dir,DirS).
    
 % 5x5 rooms are average
@@ -144,9 +144,13 @@ inside_of(Obj,What):-is_asserted(possess(What,Obj)).
 inside_of(Obj,What):-is_asserted(contains(What,Obj)).
 inside_of(Obj,What):-is_asserted(wearing(What,Obj)).
 
+put_in_world(self):-!.
 put_in_world(Agent):-loop_check(put_in_world_lc(Agent),true),!.
+put_in_world_lc(Obj):-is_asserted(atloc(Obj,_)),!.
 put_in_world_lc(Obj):-inside_of(Obj,What),ensure_in_world(What),!.
-put_in_world_lc(Obj):-choose_for(facing,Obj,_),!,must_det((choose_for(atloc,Obj,LOC),nonvar(LOC))).
+put_in_world_lc(Obj):-with_fallbacksg(with_fallbacks(put_in_world_lc_gen(Obj))),!.
+
+put_in_world_lc_gen(Obj):-choose_for(facing,Obj,_),!,must_det((choose_for(atloc,Obj,LOC),nonvar(LOC))).
 
 
 ensure_in_world(What):-must_det(put_in_world(What)).
@@ -155,8 +159,10 @@ ensure_in_world(What):-must_det(put_in_world(What)).
 
 create_someval(Prop,Obj,LOC):- ground(Prop-Obj-LOC),!,dmsg(create_someval(Prop,Obj,LOC)).
 create_someval(atloc,Obj,LOC) :- must_det(nonvar(Obj)),
-   must_det(defaultRegion(Obj,Region)),
+   must_det(actualRegion(Obj,Region)),
    must_det((in_grid(Region,LOC),unoccupied(Obj,LOC))),!.
+
+create_someval(inRegion,Obj,Region) :- actualRegion(Obj,Region),!.
 
 create_someval(Prop,Obj,_):- Call=.. [Prop,Obj,_],noDefaultValues(Call),!,fail.
 create_someval(Prop,Obj,Value):- fallback_value(Prop,Obj,DValue),!,Value=DValue.
@@ -170,8 +176,9 @@ create_random(Type,Value,Test):- trace_or_throw(failed(create_random(Type,Value,
 create_random(int,3,Test):-call(Test),dmsg(create_random(int,3,Test)),dtrace.
 
 
-actualRegion(Agent,Region):- is_asserted(atloc(Agent,LOC)),locationToRegion(LOC,Region),!.
-actualRegion(Agent,Region):- is_asserted(inRegion(Agent,Region)),!.
+actualRegion(Obj,Region):- is_asserted(inRegion(Obj,Region)),!.
+actualRegion(Obj,Region):- is_asserted(atloc(Obj,LOC)),locationToRegion(LOC,Region),!.
+actualRegion(apath(Region,_),Region):-!.
 
 defaultRegion(Agent,Region):- actualRegion(Agent,Region),!.
 defaultRegion(_Agent,Region):- must_det(create_random(region,Region,true)).
@@ -192,7 +199,9 @@ random_xyz(LOC):-
 
 random_xyz(xyz('Area1000',1,1,1)):-  trace_or_throw(game_not_loaded).
 
-unoccupied(Obj,X):- loop_check(unoccupied_lc(Obj,X),not(atloc(_,X))).
+unoccupied(_Obj,Loc):- not(is_asserted(atloc(_,Loc))),!.
+unoccupied(_,_):-!.
+unoccupied(Obj,Loc):- loop_check(unoccupied_lc(Obj,Loc),not(is_asserted(atloc(_,Loc)))),!.
 unoccupied_lc(Obj,Loc):- is_occupied(Loc,What),!,What=Obj.
 unoccupied_lc(_,_).
 
