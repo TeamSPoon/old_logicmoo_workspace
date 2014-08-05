@@ -1,17 +1,17 @@
 /** <module> 
 % This file contains the definitions for the objects in the world
-% To create a new world, simply change the object definitions as
+% To create a new world, simply change the item definitions as
 % described below (or in manual)
 %
 % *******Object definitions*******
 %.
 % Use the fmt moo:label_type_props(label,typecode,[property1,property2,etc.]]).
-% label is whats used to refer to the object in the running world
-% typecode is whats used to refer to the object for initialization (see world.pl)
+% label is whats used to refer to the item in the running world
+% typecode is whats used to refer to the item for initialization (see world.pl)
 %
 % **All objects require height() and weight() properties
 % **Even locations you want empty require height(0) to be defined
-% **If permanence(take,) is not defined for an object that can be picked
+% **If permanence(take,) is not defined for an item that can be picked
 %   up (ie take()), it is assumed to be permanence(take,2) (ie never goes away).
 %
 % The properties are as follows:
@@ -20,7 +20,7 @@
 % ---> 1  = very small, can be steped over.
 % ---> 2  = low, blocks movement, but can be climbed onto.
 % ---> 3+ = high, blocks sight and movement, can be climbed on from objects of
-%           one less height. Eg. an agent on object height(2) can climb onto an object
+%           one less height. Eg. an agent on item height(2) can climb onto an item
 %           with height(3).
 % ---> 10 = Edge of world. Can't ever be seen over or climbed onto.
 % **** Negative numbers can be used for N, this is good for pits, etc.
@@ -33,7 +33,7 @@
 %
 % # act_energy(Action,N) where N is any positive or negative integer (not 0)
 % ---> N is the amount of charge agent receives or loses 
-%      from doing that Action on the object defined.
+%      from doing that Action on the item defined.
 %
 % # act_score(Action,N) where N is any positive or negative integer (not 0)
 % ---> N is the score the agent recieves from doing Action on the
@@ -41,12 +41,12 @@
 %
 % # act_heal(Action,N) where N is any positive or negative integer
 % --->N is the amount of damage the agent heals (or takes) from
-%        doing Action on object defined.
+%        doing Action on item defined.
 %
 % # permanence(take,N) where N ranges from 0-2.
-% ---> dissapears = 0 = object dissapears when taken.
-% ---> 1 = object is held when taken, can be eaten/destroyed (see eat.pl)
-% ---> 2 = object stays where it is but something else (charge,score)
+% ---> dissapears = 0 = item dissapears when taken.
+% ---> 1 = item is held when taken, can be eaten/destroyed (see eat.pl)
+% ---> 2 = item stays where it is but something else (charge,score)
 %          is usually accumulated.
 %
 % # attack(N) where N is some positive or negative interger.
@@ -57,7 +57,7 @@
 % ---> N points of damage are subtracted (added) to an incoming attack.
 %
 % # spawn_rate(N) 
-% ---> N% chance per turn of this object being placed in the world.
+% ---> N% chance per turn of this item being placed in the world.
 %	
 % July 7, 1996
 % John Eikenberry
@@ -68,7 +68,7 @@
 Object Flags and Types
 Object types:
 
-This is a list of all the types an object can be. This is not a bitvector,
+This is a list of all the types an item can be. This is not a bitvector,
 but a single number from this list:
 
 1    LIGHT          Item is a light source.
@@ -82,7 +82,7 @@ but a single number from this list:
 9    ARMOR          Item is armor.
 10   POTION         Item is a magical potion.
 11   WORN           Item is worn, but not armor.
-12   OTHER          Miscellaneous object with no special properties.
+12   OTHER          Miscellaneous item with no special properties.
 13   TRASH          Trash -- junked by cleaners, not bought by shopkeepers.
 14   TRAP           Currently not implemented.  Do not use.
 15   CONTAINER      Item is a container.
@@ -130,10 +130,10 @@ Extra flags for objects:
 29)  UNSEEN          makes objects that can only be seen with holylight. Players 
                      can still interact with these objects, however. The idea is 
                      that room descriptions can now be created describing the 
-                     object in a room and the player can interact with the room desc
+                     item in a room and the player can interact with the room desc
                      instead of having a room desc be a mere backdrop. The upside 
                      to this, better than leaving a long desc blank, is that imms 
-                     can see and will know when such an object is in the room 
+                     can see and will know when such an item is in the room 
                      with a player. 
 
 
@@ -161,7 +161,7 @@ Permanent effects:
 
 A bitvector with the following meaning;
 
-When wearing an object with this flag, 
+When wearing an item with this flag, 
  1) BLIND       The wearer goes blind
  2) INVIS       The wearer becomes invisible
  3) DET-ALIGN   The wearer detects alignments

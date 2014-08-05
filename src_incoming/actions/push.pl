@@ -17,7 +17,7 @@
 
 :- moo:register_module_type(command).
 
-moo:action_info(push(dir)).
+moo:actiontype(push(dir)).
 
 % Push a box
 % Nothing to push... agent moves and takes a little damage.
@@ -67,7 +67,7 @@ pushable(Agent,Obj,LOC,Dir) :-
 	(\+ anything_behind(LOC,Dir);
 	crashbang(Obj)).
 
-% Is the location behind the pushed object/agent empty (or near empty).
+% Is the location behind the pushed item/agent empty (or near empty).
 anything_behind(LOC,Dir) :-
 	move_dir_target(LOC,Dir,XXYY),
 	atloc(What,XXYY),

@@ -15,8 +15,8 @@
 :- register_module_type(command).
 :- multifile thlocal:wants_logout/1.
 
-moo:action_info(login(string)).
-moo:action_info(rename(string)).
+moo:action_info(login(string),"(Re)Login using the name string").
+moo:action_info(rename(string),"Rename your player").
 
 % logon
 moo:agent_text_command(Agent,[login,NewName],Agent,rename(NewName)).

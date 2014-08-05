@@ -45,14 +45,14 @@ get_agent_text_command_0(Agent,ListIn,AgentR,CMD):-
 % ===========================================================
 % DEBUG/NODEBUG command
 % ===========================================================
-moo:action_info(_Human_Player,debug(term),"Development Usage: debug  the blue backpack").
+moo:type_action_info(human_player,debug(term),"Development Usage: debug  the blue backpack").
 
 moo:agent_call_command(Agent,debug(Term)):- agent_call_safely(Agent,debug(Term)).
 
 % ===========================================================
 % PARSE command
 % ===========================================================
-moo:action_info(_Human_Player,parse(prolog,list(term)),"Development test to parse some Text for a human.  Usage: parse 'item' the blue backpack").
+moo:type_action_info(human_player,parse(prolog,list(term)),"Development test to parse some Text for a human.  Usage: parse 'item' the blue backpack").
 
 moo:agent_call_command(_Gent,parse(Type,StringM)):-
    parse_for(Type,StringM,_Term,_LeftOver).
@@ -60,7 +60,7 @@ moo:agent_call_command(_Gent,parse(Type,StringM)):-
 % ===========================================================
 % parsetemps command
 % ===========================================================
-moo:action_info(parsetemps(list(term)),"Development test to see what verb phrase heads are found. (uses get_vp_templates/4)  Usage: parsetemps who").
+moo:type_action_info(human_player,parsetemps(list(term)),"Development test to see what verb phrase heads are found. (uses get_vp_templates/4)  Usage: parsetemps who").
 
 moo:agent_text_command(Agent,[parsetemps|List],Agent,parsetemps(List)).
 
@@ -116,7 +116,7 @@ text_means(_Agent,_Text,_Value):-!,fail.
 
 relates(Agent,Relation,Obj):-loop_check_clauses(relates(Agent,Relation,Obj),fail).
 relates(Agent,Relation,Obj):-text_means(Agent,Relation,Obj),!.
-relates(_    ,Relation,Obj):- atom(Relation),is_type(Relation),!,isa(Obj,Relation).
+relates(_    ,Relation,Obj):- atom(Relation),type(Relation),!,isa(Obj,Relation).
 relates(_    ,Relation,Obj):-contains_term(Relation,value),subst(Relation,value,Obj,Call),!,req(Call).
 relates(Agent,same(Relation),Obj):- !, relates(Agent,Relation,Value),relates(Obj,Relation,Value).
 relates(Agent,Relation,Obj):- atom(Relation),!, prop(Agent,Relation,Obj).
@@ -334,8 +334,12 @@ bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
 
 moo:term_specifier_text(Dir,dir):-member(Dir,[n,s,e,w,ne,nw,se,sw,u,d]).
 
-
-moo:term_specifier_text(Text,Subclass):-moo:subclass(Subclass,spatialthing),isa(X,Subclass),req(keyword(X,Text)).
+moo:term_specifier_text(Text,Subclass):- 
+   not(memberchk(Subclass,[dir,'TemporallyExistingThing'])),
+   once((get_isa_asserted(X,Subclass),
+   arg_to_var(text,Text,TextVar),
+   req(keyword(X,TextVar)),   
+   same_arg(text,TextVar,Text))). % dmsg(todo(term_specifier_text(Text,Subclass))),transitive_subclass(Subclass,spatialthing).
 
 phrase_parseForTypes(TYPEARGS,GOODARGS,ARGS,LeftOver):-
    to_word_list(ARGS,ARGSL),!,
@@ -369,7 +373,7 @@ parseIsa(FT, B, C, D):-  dbase:call_tabled(parseIsa0(FT, B, C, D)).
 parseIsa0(FT, B, C, D):- list_tail(C,D),parseForIsa(FT, B, C, D).
 
 is_parsable_type(T):-formattype(T).
-is_parsable_type(T):-is_type(T).
+is_parsable_type(T):-type(T).
 is_parsable_type(vp).
 
 
@@ -402,16 +406,12 @@ parseForIsa(FT, B, C, D) :- query_trans_sub(Sub,FT), parseFmtOrIsa(Sub, B, C, D)
 parseForIsa(FT, B, C, D) :- parseFmtOrIsa(FT, B, C, D),!.
 
 query_trans_sub(Sub,Super):-query_trans_subft(Sub,Super).
-query_trans_sub(Sub,Super):-query_trans_sc(Sub,Super).
+query_trans_sub(Sub,Super):-transitive_subclass(Sub,Super).
 
 query_trans_subft(FT,Sub):-moo:subft(FT,Sub).
 query_trans_subft(FT,Sub):-moo:subft(FT,A),moo:subft(A,Sub).
 query_trans_subft(FT,Sub):-moo:subft(FT,A),moo:subft(A,B),moo:subft(B,Sub).
 
-query_trans_sc(FT,Sub):-subclass(FT,Sub).
-query_trans_sc(FT,Sub):-subclass(FT,A),subclass(A,Sub).
-query_trans_sc(FT,Sub):-subclass(FT,A),subclass(A,B),subclass(B,Sub).
-query_trans_sc(FT,Sub):-subclass(FT,A),subclass(A,B),subclass(B,C),subclass(C,Sub).
 
 
 parseFmtOrIsa(Var, _B, _C, _D):-var(Var),!,fail. % trace_or_throw(var_parseForIsa(Var, B, C, D)).

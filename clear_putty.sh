@@ -1,4 +1,4 @@
-#/1bin/sh
+#!/bin/sh
         clear
 	reset -w
 	echo -ne '\033]50;ClearScrollback\a'

@@ -82,11 +82,10 @@ string_lower(M,U):-toLowercase(M,U).
 :- use_module(logicmoo_util_bugger).
 :- meta_predicate map_tree_to_list(2,?,*).
 
-ib_multi_transparent(MT):-multifile(MT),dynamic(MT),module_transparent(MT).
 
-:- ib_multi_transparent(camelSplitters/1).
+:- meta_module_transparent(camelSplitters(+)).
 
-:- ib_multi_transparent(to_string_hook/3).
+:- meta_module_transparent(to_string_hook(-,-,+)).
 
 camelSplitters(V):-member(V,[' ','-','_',':','mt','doom','Mt','Doom']).
 
@@ -528,6 +527,11 @@ str_contains_all0([A|Atoms],String):-
       str_contains_all0(Atoms,SubString).
 
 atoms_of(Var,[]):- (var(Var);Var==[]),!.
+atoms_of(':',[]).
+atoms_of('moo',[]).
+atoms_of('dbase_t',[]).
+atoms_of(',',[]).
+atoms_of(':-',[]).
 atoms_of('$VAR',[]):-!.
 atoms_of(Atom,[]):-number(Atom),!.
 atoms_of(Atom,[Atom]):-atomic(Atom),!.

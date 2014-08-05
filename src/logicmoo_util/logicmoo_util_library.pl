@@ -17,13 +17,8 @@
          contains_singletons/1,
          doall/1,
          atom_concat_safe/3,
-         op(1150,fx,(dynamic_multifile_exported)),
-         dynamic_multifile_exported/3,
-         dynamic_multifile_exported/2,
-         dynamic_multifile_exported/1,
          exists_file_safe/1,
          exists_directory_safe/1,
-         def_meta_predicate/3,
          eraseall/2,
          time_file_safe/2,
          throw_safe/1,
@@ -69,12 +64,14 @@ bad_functor(L) :- arg(_,v('|','.',[],':','/'),L).
 
 warn_bad_functor(L):-ignore((notrace(bad_functor(L)),!,dumpST,dtrace,trace_or_throw(bad_functor(L)))).
 
-safe_univ(M:Call,[N:L|List]):- nonvar(M),nonvar(N),!,safe_univ(Call,[L|List]).
-safe_univ(Call,[M:L|List]):- nonvar(M),!,safe_univ(Call,[L|List]).
-safe_univ(M:Call,[L|List]):- nonvar(M),!,safe_univ(Call,[L|List]).
-safe_univ(Call,[L|List]):- not(is_list(Call)), Call =..[L|List],!,warn_bad_functor(L).
-safe_univ([L|List],[L|List]):- var(List),atomic(Call),!,grtrace,Call =.. [L|List],warn_bad_functor(L).
-safe_univ(Call,[L|List]):- catch(Call =.. [L|List],E,(dumpST,'format'('~q~n',[E=safe_univ(Call,List)]))),warn_bad_functor(L).
+safe_univ(Call,List):-hotrace(safe_univ0(Call,List)),!.
+
+safe_univ0(M:Call,[N:L|List]):- nonvar(M),nonvar(N),!,safe_univ0(Call,[L|List]).
+safe_univ0(Call,[M:L|List]):- nonvar(M),!,safe_univ(Call,[L|List]).
+safe_univ0(M:Call,[L|List]):- nonvar(M),!,safe_univ(Call,[L|List]).
+safe_univ0(Call,[L|List]):- not(is_list(Call)), Call =..[L|List],!,warn_bad_functor(L).
+safe_univ0([L|List],[L|List]):- var(List),atomic(Call),!,grtrace,Call =.. [L|List],warn_bad_functor(L).
+safe_univ0(Call,[L|List]):- catch(Call =.. [L|List],E,(dumpST,'format'('~q~n',[E=safe_univ(Call,List)]))),warn_bad_functor(L).
 
 :-export(append_term/3).
 append_term(Call,E,CallE):- Call=..List, append(List,[E],ListE), CallE=..ListE.
@@ -96,13 +93,13 @@ makeArgIndexes(_NEW,_F).
 
 
 % peekAttributes/2,pushAttributes/2,pushCateElement/2.
-:- module_transparent asserta_new(:),asserta_if_new(:),assertz_new(:),assertz_if_new(:),assert_if_new(:),assertz_if_new_clause(:),assertz_if_new_clause(:,:),clause_asserted(0,0),clause_asserted(0),eraseall/2.
+:- module_transparent asserta_new(:),asserta_if_new(:),assertz_new(:),assertz_if_new(:),assert_if_new(:),assertz_if_new_clause(:),assertz_if_new_clause(:,:),clause_asserted(0,0),clause_asserted(0),eraseall(-,-).
 %:- meta_predicate asserta_new(:),asserta_if_new(:),assertz_new(:),assertz_if_new(:),assert_if_new(:),assertz_if_new_clause(:),assertz_if_new_clause(:,:),clause_asserted(0,0),clause_asserted(0).
 asserta_new(_Ctx,NEW):-ignore(retractall(NEW)),asserta(NEW).
 writeqnl(_Ctx,NEW):- fmt('~q.~n',[NEW]),!.
 
-eraseall(M:F,A):-!,forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(clause(M:C,_,X),erase(X))).
-eraseall(F,A):-forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(clause(M:C,_,X),erase(X))).
+eraseall(M:F,A):-!,forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(clause_safe(M:C,_,X),erase(X))).
+eraseall(F,A):-forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(clause_safe(M:C,_,X),erase(X))).
 
 asserta_new(NEW):-ignore(retractall(NEW)),asserta(NEW).
 assertz_new(NEW):-ignore(retractall(NEW)),assertz(NEW).
@@ -122,12 +119,22 @@ assertz_if_new_clause(H,B):-clause_asserted(H,B),!.
 assertz_if_new_clause(H,B):-assertz((H:-B)).
 
 clause_asserted(C):- as_clause(C,H,B),clause_asserted(H,B).
-clause_asserted(H,B):- predicate_property(H,number_of_clauses(_)),functor_h(H,HH),functor_h(B,BB),!,clause(HH,BB), B =@= BB , H =@= HH.
+
+clause_asserted(H,_):- not(predicate_property(H,number_of_clauses(_))),!,fail.
+clause_asserted(H,true):-!,clause(H,true).
+clause_asserted(H,B):-functor_h(H,HH),functor_h(B,BB),!,clause(HH,BB), H =@= HH, B =@= BB .
 
 :-meta_predicate clause_safe(:, ?).
 :-module_transparent clause_safe/2.
 :-export(clause_safe/2).
-clause_safe(M:H,B):-(nonvar(H)->true;(current_predicate(M:F/A),functor_catch(H,F,A))),predicate_property(M:H,number_of_clauses(_)),clause(H,B).
+
+clause_safe(M:H,B):-!,debugOnError(clause(M:H,B)).
+clause_safe(H,B):-!,debugOnError(clause(H,B)).
+
+clause_safe(M:H,B):-!,clause_safe(M,H,B).
+clause_safe(H,B):-!,clause_safe(_,H,B).
+clause_safe(M,string(S),B):- trace_or_throw(clause_safe(M,string(S),B)).
+clause_safe(M,H,B):-  (nonvar(H)->true;(current_predicate(M:F/A),functor(H,F,A))),predicate_property(M:H,number_of_clauses(_)),clause(H,B).
 
 as_clause( ((H :- B)),H,B):-!.
 as_clause( H,  H,  true).
@@ -139,8 +146,15 @@ doall(C):-ignore((C,fail)).
 
 :- user_use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)).
 
+proccess_status(_,exited(called(Det,Goal)),called(Goal2)):- Det = true,!,must_det(Goal=Goal2).
+proccess_status(ID,exited(called(Det,Goal)),called(Goal2)):- dmsg(nondet_proccess_status(ID,exited(called(Det,Goal)),called(Goal2))),!,must_det(Goal=Goal2).
+proccess_status(ID,true,Want):- dmsg(proccess_status(ID,true,Want)),!.
+proccess_status(ID,false,Want):- dmsg(failed_proccess_status(ID,false,Want)),!,fail.
+proccess_status(ID,exception(Status),Want):- dmsg(exception(Status, ID,false,Want)),!,throw(Status).
+proccess_status(ID,exited(Other),Want):-dmsg(wierd_proccess_status(ID,exited(Other),Want)),!.
+
 :- meta_predicate in_thread_and_join(0).
-in_thread_and_join(Goal):-in_thread_and_join(Goal,_Status).
+in_thread_and_join(Goal):-thread_create((Goal,deterministic(Det),thread_exit(called(Det,Goal))),ID,[detatched(false)]),thread_join(ID,Status),proccess_status(ID,Status,called(Goal)).
 :- meta_predicate in_thread_and_join(0,+).
 in_thread_and_join(Goal,Status):-thread_create(Goal,ID,[]),thread_join(ID,Status).
 
@@ -177,9 +191,12 @@ nd_predsubst2( _, L, L ).
 
 % Usage: subst(+Fml,+X,+Sk,?FmlSk)
 
-subst(A,B,C,D):- 
+subst(A,B,C,D):-var(A),!,dmsg(subst(A,B,C,D)),dumpST,dtrace,subst0(A,B,C,D).
+subst(A,B,C,D):-subst0(A,B,C,D).
+
+subst0(A,B,C,D):- 
       catch(notrace(nd_subst(A,B,C,D)),E,(dumpST,dmsg(E:nd_subst(A,B,C,D)),fail)),!.
-subst(A,_B,_C,A).
+subst0(A,_B,_C,A).
 
 nd_subst(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
 nd_subst(  P, X,Sk, P1 ) :- functor_catch(P,_,N),nd_subst1( X, Sk, P, N, P1 ).
@@ -240,32 +257,9 @@ get_module_of(P,M):-predicate_property(_:P,imported_from(M)),!.
 get_module_of(MM:_,M):-!,MM=M.
 get_module_of(P,M):-functor_catch(P,F,A),get_module_of_4(P,F,A,M).
 
-
-:- meta_predicate def_meta_predicate(0,+,+).
-
-def_meta_predicate(M:F,S,E):-!,doall(((between(S,E,N),make_list('?',N,List),CALL=..[F|List],'@'(meta_predicate(CALL),M)))).
-def_meta_predicate(F,S,E):- trace_or_throw(def_meta_predicate(F,S,E)).
-
-:- meta_predicate dynamic_multifile_exported(0), dynamic_multifile_exported(-,-), dynamic_multifile_exported(-,-,-).
-
-dynamic_multifile_exported(M:FA):- !,dynamic_multifile_exported(M,FA).
-dynamic_multifile_exported( FA ):- leash(+call),trace, !, current_module(M),trace,dynamic_multifile_exported(M,FA).
-
-dynamic_multifile_exported(_,M:F/A):-!,dynamic_multifile_exported(M,F,A).
-dynamic_multifile_exported(_, M:F ):-!,dynamic_multifile_exported(M,F).
-dynamic_multifile_exported(M, [A] ):-!,dynamic_multifile_exported(M,A).
-dynamic_multifile_exported(M,[A|L]):-!,dynamic_multifile_exported(M,A),dynamic_multifile_exported(M,L).
-dynamic_multifile_exported(M,(A,L)):-!,dynamic_multifile_exported(M,A),dynamic_multifile_exported(M,L).
-dynamic_multifile_exported(M, F/A ):-!,dynamic_multifile_exported(M,F,A).
-
-
-dynamic_multifile_exported(M,F,A):- integer(A),atom(M),atom(F),!, '@'(( dynamic(F/A), multifile(F/A), M:export(F/A)), M).
-dynamic_multifile_exported(M,F,A):- trace_or_throw((dynamic_multifile_exported(M,F,A))).
-
 :-export(flatten_set/2).
 flatten_set(L,S):-flatten([L],F),list_to_set(F,S),!.
 %flatten_set(Percepts0,Percepts):- flatten([Percepts0],Percepts1),remove_dupes(Percepts1,Percepts).
-
 
 remove_dupes(In,Out):-remove_dupes(In,Out,[]).
 

@@ -223,7 +223,7 @@ show_room_grid(Room,Old,N,N) :-
 show_room_grid(Room,Y,X,N) :-
       loc_to_xy(Room,X,Y,LOC),
 	atloc(Obj,LOC),
-        props(Obj,ofclass(agent)),
+        props(Obj,isa(agent)),
 	list_agents(Agents),
 	obj_memb(Agent,Agents),
 	atloc(Agent,LOC),
@@ -234,7 +234,7 @@ show_room_grid(Room,Y,X,N) :-
 show_room_grid(Room,Y,X,N) :-
         loc_to_xy(Room,X,Y,LOC),
 	atloc(Obj,LOC),
-        prop(Obj,ofclass,Class),
+        prop(Obj,isa,Class),
 	moo:label_type(Label,Class),
 	write(Label), write(' '),
 	XX is X + 1,

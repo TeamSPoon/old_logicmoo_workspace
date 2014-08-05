@@ -90,12 +90,9 @@ current_agent_or_var(P):- once(current_agent(PIn)),P=PIn,!.
 current_agent_or_var(_).
 
 foc_current_player(P):- current_agent(P),!.
-foc_current_player(P):- get_session_id(O),generate_new_player(P), !, asserta(thlocal:session_agent(O,P)).
+foc_current_player(P):- get_session_id(O),generate_new_player(P), !, asserta(thlocal:session_agent(O,P)),assert_isa(P,human_player),must_det(create_agent(P)).
 
-generate_new_player(P) :-
-  gensym(player,N),
-   P=explorer(N),
-   must(create_agent(P)).
+generate_new_player(P) :- gensym(player,N),P=explorer(N),assert_isa(P,explorer),assert_isa(P,player).
 
 
 % Lists all the agents in the run. Except for other monsters.

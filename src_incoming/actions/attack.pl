@@ -18,7 +18,7 @@
 :- moo:register_module_type(command).
 
 % attack joe ->translates-> attack nw
-moo:action_info(attack(dir)).
+moo:actiontype(attack(dir)).
 
 % Attack
 % Successful Attack

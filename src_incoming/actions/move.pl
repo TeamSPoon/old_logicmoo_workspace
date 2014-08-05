@@ -28,7 +28,7 @@ moo:agent_text_command(Agent,[DirSS],Agent,move(Dir)):- get_term_specifier_text(
 
 moo:agent_call_command(Agnt,Cmd):- compound(Cmd),functor(Cmd,move,_),!,must(move_command(Agnt,Cmd)).
 
-moo:action_info(move(dir)).
+moo:action_info(move(dir),"Move in a direction").
 
 % dir###
 move_command(Agent,move(DirSS)) :- catch((string_to_atom(DirSS,DirS),
@@ -104,7 +104,7 @@ moo:update_stats(Agent,fall) :- padd(Agent,damage,-10).
 
 % cheating but to test
 
-moo:action_info(go(dir)).
+moo:actiontype(go(dir)).
 moo:agent_call_command(Agent,go(Dir)) :-
 	atloc(Agent,LOC),
         in_world_move(LOC,Agent,Dir),

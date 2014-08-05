@@ -28,7 +28,7 @@ moo:agent_call_command(Agent,stats(SWhat)):-
          height(What,value)]))),!.
 
 
-moo:action_info(list(term)).
+moo:action_info(list(term),"grep for a term").
 
 
 moo:singleValued(namespaced1:'EP_cog'(agent,value(random(30)))).

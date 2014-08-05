@@ -1,3 +1,4 @@
+:-dynamic(dnf/5).
 dnf(1,conjecture,[member(_,'Org1_1'),#(leancop_problem_1)],n,_).
 dnf(2,axiom,[-instance(instance,'BinaryPredicate')],g,_).
 dnf(3,axiom,[-domain(instance,1,'Entity')],g,_).
@@ -24015,12 +24016,12 @@ dnf(23767,axiom,[-instance('SubstringFn','Function')],g,_).
 dnf(23768,axiom,[-instance('SubstringFn','QuaternaryRelation')],g,_).
 dnf(23769,axiom,[-instance('SubstringFn','Entity')],g,_).
 dnf(23770,axiom,[-instance('SubstringFn','Abstract')],g,_).
-dnf(23771,axiom,[-instance(format,'Relation')],g,_).
-dnf(23772,axiom,[-instance(format,'InheritableRelation')],g,_).
-dnf(23773,axiom,[-instance(format,'TernaryRelation')],g,_).
-dnf(23774,axiom,[-instance(format,'Predicate')],g,_).
-dnf(23775,axiom,[-instance(format,'Entity')],g,_).
-dnf(23776,axiom,[-instance(format,'Abstract')],g,_).
+dnf(23771,axiom,[-instance('format','Relation')],g,_).
+dnf(23772,axiom,[-instance('format','InheritableRelation')],g,_).
+dnf(23773,axiom,[-instance('format','TernaryRelation')],g,_).
+dnf(23774,axiom,[-instance('format','Predicate')],g,_).
+dnf(23775,axiom,[-instance('format','Entity')],g,_).
+dnf(23776,axiom,[-instance('format','Abstract')],g,_).
 dnf(23777,axiom,[-instance(wants,'Relation')],g,_).
 dnf(23778,axiom,[-instance(wants,'InheritableRelation')],g,_).
 dnf(23779,axiom,[-instance(wants,'Predicate')],g,_).

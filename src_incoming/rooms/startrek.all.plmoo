@@ -67,8 +67,8 @@ agent('NpcCol1008-OBrien696').
 agent('NpcCol1009-Wesley716').
 agent('NpcCol1010-Livingston726').
 agent('NpcCol1011-Spot727').
-agent('NpcCol1012-Ensign728').
 agent('NpcCol1012-Ensign732').
+agent('NpcCol1012-Ensign728').
 agent('NpcCol1012-Ensign736').
 agent('NpcCol1012-Ensign740').
 agent('NpcCol1012-Ensign744').

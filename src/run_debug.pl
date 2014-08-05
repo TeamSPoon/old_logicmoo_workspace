@@ -13,6 +13,9 @@ was_run_dbg_pl:-is_startup_file('run_debug.pl').
 
 :-include(run_tests).
 
+:- module(user).
+:- module(moo).
+
 % [Optionaly] re-define load_default_game
 % load_default_game:- load_game(logicmoo('rooms/startrek.all.plmoo')).
 
@@ -35,27 +38,35 @@ start_boxer:-
 :- at_start(with_assertions(moo:prevent_transform_moo_preds,within_user(ignore(catch(start_boxer,_,true))))).
 
 % [Optional] Testing PTTP
-% :-is_startup_file('run_debug.pl')->doall(do_pttp_tests);true.
+% :-is_startup_file('run_debug.pl')->doall(do_pttp_test(_));true.
 
 
 % [Manditory] This loads the game and initializes so test can be ran
 :- if_flag_true(was_run_dbg_pl, at_start(run_setup)).
 
-
-% the real tests now (once)
-now_run_local_tests_dbg :- doall(defined_local_test).
-% :- if_flag_true(was_run_dbg_pl,at_start(must_det(run_mud_tests))).
-
 % the local tests each reload (once)
+now_run_local_tests_dbg :- doall(defined_local_test).
 :- if_flag_true(was_run_dbg_pl, now_run_local_tests_dbg).
 
-% [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
-:- register_timer_thread(npc_ticker,30,npc_tick).
+:-must_det(show_call((atloc('NpcCol1012-Ensign728',X),nonvar(X)))).
 
-% nasty way i debuged parser
-%:-repeat, trace, do_player_action('who'),fail.
+% nasty way i debug the parser
+:- do_player_action('who').
+% :-repeat, trace, do_player_action('who'),fail.
+
 
 :-do_player_action("scansrc").
+
+%:-trace.
+
+
+% [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
+% :- register_timer_thread(npc_ticker,30,npc_tick).
+
+% the real tests now (once)
+:- if_flag_true(was_run_dbg_pl,at_start(must_det(run_mud_tests))).
+
+:- prolog.
 
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
 :- if_flag_true(was_run_dbg_pl, at_start(run)).

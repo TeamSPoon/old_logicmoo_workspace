@@ -28,6 +28,7 @@ stringToWord([S|L],W):-!,textCached([S|L],[lex,W|_]).
 stringToWord(S,W):-textCached([S],[lex,W|_]).
 
      
+:-export(list_to_term/2).
 %list_to_term(X,Y):- balanceBinding(X,Y).
 list_to_term(X,Y):-nonvar(X),var(Y),!,list_to_terms_lr(X,Y).
 list_to_term(X,Y):-list_to_terms_rl(X,Y).
@@ -48,6 +49,7 @@ list_to_conjs_lr([],true):-!.
 list_to_conjs_lr([T],T):-!.
 list_to_conjs_lr([H|T],(H,TT)):-!,list_to_conjs_lr(T,TT).
    
+:-export(balanceBinding/2).
 balanceBinding(Binding,Binding):- (var(Binding);number(Binding)),!.
 balanceBinding(string(B),string(B)):-!.
 balanceBinding(Binding,BindingP):-atom(Binding),atom_concat('#$',BindingP,Binding),!.
@@ -290,6 +292,8 @@ cachable_query(isa(_,_)).
 % ===================================================================
 %  Cyc Assert
 % ===================================================================
+:- dynamic_multifile_exported mtForPred/2.
+
 cycAssert(Mt:CycL):-!,
    cycAssert(CycL,Mt).
 cycAssert(CycL):-
@@ -476,6 +480,7 @@ addPrologKB:- defaultMt(Mt),!,ensureMt(Mt),cycAssert('BaseKB':'genlMt'(Mt,'Infer
 % ===================================================================
 %  Predicates need and Assertion Mt
 % ===================================================================
+:-dynamic(mtForPred/2).
 
 mtForPred(CycL,Mt):-
    functor(CycL,Pred,_),
@@ -582,6 +587,7 @@ testOpenCyc:-halt.
 % ===================================================================
 % ===================================================================
 
+:-export(isSlot/1).
 isSlot(Var):-var(Var).
 isSlot('$VAR'(Var)):-number(Var).
 
@@ -953,6 +959,7 @@ valid(C)  :-   (65 =< C, C =< 90);    % A - Z
 % ===================================================================
 
 %%lowerCasePred(CycLPred)
+:-export(lowerCasePred/1).
 lowerCasePred(Pred):-atom(Pred),atom_codes(Pred,[_,_,C|_]),char_type(C,lower).
 
 

@@ -37,9 +37,10 @@ remove_undef_search:- ((
 
 
 moo:action_info(scansrc,"Scan for sourcecode modifed on filesystem and TeamSPoon. NOTE: only new files with this mask (src_incoming/*/?*.pl) are picked up on").
-moo:agent_call_command(Agent,scansrc):-  '@'(agent_call_safely(Agent,scansrc),'user').
+moo:agent_call_command(Agent,scansrc):-  once('@'(agent_call_safely(Agent,scansrc),'user')).
 
 :-export(scansrc/0).
+scansrc :- !.
 scansrc :- 
  ensure_loaded(library(make)),
  debugOnError((
@@ -52,6 +53,7 @@ scansrc :-
    % include_moo_files_not_included('../src_incoming/*/*/?*.pl'),
    % make,
    % include_moo_files_not_included('../src_incoming/*/?*.plmoo'),
+   rescandb,
    !)). 
 
 include_moo_files_not_included(Mask):- 

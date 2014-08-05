@@ -19,6 +19,7 @@
 % :-dynamic user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
 
 :- dynamic_multifile_exported hook:decl_database_hook/2.
+:- dynamic_multifile_exported hook:deduce_facts/2.
 
 end_of_file.
 
@@ -50,7 +51,7 @@ end_of_file.
 :- within_user(ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_dcg.pl'))).
 
 % make sure these get in early
-:- within_user(ensure_loaded(logicmoo('dbase/dbase_formattypes.pl'))).
+% :- within_user(ensure_loaded(logicmoo('dbase/dbase_formattypes.pl'))).
 
 % logicmoo vworld mud server
 :- within_user(ensure_loaded(logicmoo('vworld/world.pl'))).

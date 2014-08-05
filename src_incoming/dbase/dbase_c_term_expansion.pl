@@ -37,7 +37,7 @@ set_list_len(List,A,NewList):-length(NewList,A),append(NewList,_,List),!.
 if_mud_asserted(F,A2,_,_Why):-is_mpred_prolog(F,A2),!,fail.
 if_mud_asserted(F,A2,A,Why):-using_holds_db(F,A2,A,Why).
 
-declare_as_code(F,A):-findall(n(File,Line),source_location(File,Line),SL),ignore(inside_clause_expansion(CE)),decl_mpred(F,as_is(discoveredInCode(SL,CE))),!.
+declare_as_code(F,A):-findall(n(File,Line),source_location(File,Line),SL),ignore(inside_clause_expansion(CE)),decl_mpred(F,as_is(discoveredInCode(F/A,SL,CE))),!.
 
 :-export(if_use_holds_db/4).
 if_use_holds_db(F,A2,_,_):- is_mpred_prolog(F,A2),!,fail.
@@ -47,7 +47,7 @@ if_use_holds_db(F,A,_,_):- declare_as_code(F,A),fail.
 
 using_holds_db(F,A,_,_):- never_use_holds_db(F,A,_),!,fail.
 using_holds_db(F,A2,A,m2(F,A2,isCycPredArity_Check)):- integer(A2), A is A2-2, A>0, isCycPredArity_Check(F,A),!.
-using_holds_db(F,A,A,is_type(F/A)):- integer(A), is_type(F),!, must(A>0).
+using_holds_db(F,A,A,type(F/A)):- integer(A), type(F),!, must(A>0).
 using_holds_db(F,A,A,isCycPredArity_Check):- isCycPredArity_Check(F,A).
 using_holds_db(F,A,A,W):-integer(A),!,fail,trace_or_throw(wont(using_holds_db(F,A,A,W))).
 
@@ -99,8 +99,14 @@ try_mud_asserted_expansion(G0,G2):-  must(is_compiling_sourcecode),
    while_capturing_changes(add_from_file(G1,G2),Changes),!,ignore((Changes\==[],dmsg(add(todo(Changes-G2))))).
 mud_asserted_expansion_0(G1,G2):- ((get_asserted_wrappers(If_mud_asserted, Asserted_dbase_t , Asserted_dbase_f),!,Asserted_dbase_t\=nil,mud_pred_expansion(If_mud_asserted, Asserted_dbase_t - Asserted_dbase_f,G1,G2))),!.
 
+% :-export((is_compiling_sourcecode/1)).
 is_compiling_sourcecode:-moo:is_compiling,!.
-is_compiling_sourcecode:-compiling, current_input(X),not((stream_property(X,file_no(0)))),prolog_load_context(source,F),not((moo:loading_game_file(_))),F=user,!.
+is_compiling_sourcecode:-compiling, current_input(X),not((stream_property(X,file_no(0)))),prolog_load_context(source,F),not((moo:loading_game_file(_,_))),F=user,!.
+is_compiling_sourcecode:-compiling,dmsg(system_compiling),!.
+
+% :-export((capturing_changes/1)).
+:-thread_local capturing_changes/2.
+:-dynamic capturing_changes/2.
 
 while_capturing_changes(Call,Changes):-thread_self(ID),with_assertions(capturing_changes(ID,_),(Call,get_dbase_changes(ID,Changes),clear_dbase_changes(ID))).
 

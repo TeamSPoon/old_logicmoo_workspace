@@ -60,6 +60,13 @@
 				Recurse="1"
 				Excludes="*unused.*"/>
 		</Folder>
+		<Folder Name="src_incoming_next">
+			<F
+				N="src_incoming_next/*.*"
+				Recurse="1"
+				Refilter="0"
+				Excludes=""/>
+		</Folder>
 		<Folder Name="src_modules/leanCOP">
 			<F
 				N="src_modules/leanCOP/*.*"

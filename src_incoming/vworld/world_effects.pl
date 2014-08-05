@@ -71,7 +71,7 @@ set_stats(Agent,Traits):-dmsg(failed(set_stats(Agent,Traits))).
 
 process_stats(Agent,str(Y)) :-
 	add(str(Agent,Y)),
-	damage(Agent,Dam),
+	must_det((damage(Agent,Dam),number(Dam))),
 	NewDam is (Dam + ((Y * 5) - 10)),
 	add(damage(Agent,NewDam)),
 	add(stat_total(Agent,+Y)).

@@ -16,12 +16,12 @@
 
 :- moo:register_module_type(command).
 
-moo:action_info(take(item)).
+moo:actiontype(take(item)).
 
 % Take something
 % Successfully picking something up
 moo:agent_call_command(Agent,take(SObj)) :- 
-	notrace(once((inRegion(Agent,LOC),
+	hotrace(once((inRegion(Agent,LOC),
               inRegion(Obj,LOC),
               not(possess(Agent,Obj)),
               object_match(SObj,Obj)))),

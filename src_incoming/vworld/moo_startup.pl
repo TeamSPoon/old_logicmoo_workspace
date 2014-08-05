@@ -52,9 +52,9 @@ in_user_startup(Call):- '@'(user:Call,user).
 :- user_use_module(logicmoo(vworld/toploop_telnet)).
 
 
-% :- user_use_module(logicmoo(vworld/parser_e2c)).
-:- user_use_module(logicmoo(dbase/dbase_formattypes)).
+% :- user_use_module(logicmoo(dbase/dbase_formattypes)).
 :- user_use_module(logicmoo(vworld/parser_imperative)).
+:- user_use_module(logicmoo(vworld/parser_e2c)).
 :- user_use_module(logicmoo(vworld/moo_testing)).
 
 /*
@@ -135,11 +135,17 @@ make_qlfs:-
 :- catch(user_use_module(logicmoo(pldata/withvars_988)),_,true).
 
 
+
+:- user_use_module(logicmoo('vworld/moo_loader.pl')).
+
+:- load_data_file(logicmoo('dbase/dbase_i_builtin.pl')).
+
+
 % These contain the definition of the object types.
-:- in_user_startup(ensure_loaded(logicmoo('objs/objs_misc_monster.pl'))). 
+:- in_user_startup(ensure_plmoo_loaded(logicmoo('objs/objs_misc_monster.plmoo'))). 
 
 % Load the map file (*.map.pl) appropriate for the world being used.
-:- in_user_startup(ensure_loaded(logicmoo('rooms/vacuum.map.pl'))).
+:- in_user_startup(ensure_plmoo_loaded(logicmoo('rooms/vacuum.map.plmoo'))).
 % NPC planners
 :- user_use_module(logicmoo('mobs/monster.pl')).
 
@@ -158,7 +164,6 @@ make_qlfs:-
 */
 :- include_moo_files('../src_incoming/mobs/?*.pl').
 
-:- user_use_module(logicmoo('vworld/moo_loader.pl')).
 
 % Action/Commands implementation
 /*
@@ -217,10 +222,23 @@ moo:agent_text_command(Agent,[run,Term], Agent,prologCall(Term)):- ignore(Term=s
 % :- user_use_module(logicmoo(vworld/moo_header)).
 
 % These contain the definition of the object types.
-:- user_use_module(logicmoo('objs/objs_misc_monster.pl')). 
+
+:- ensure_plmoo_loaded(logicmoo('objs/objs_misc_household.plmoo')).
+
+:- ensure_plmoo_loaded(logicmoo('objs/objs_misc_monster.plmoo')).
 
 % Load the map file (*.map.pl) appropriate for the world being used.
-:- user_use_module(logicmoo('rooms/vacuum.map.pl')).
+:- ensure_plmoo_loaded(logicmoo('rooms/maze.map.plmoo')).
+:- ensure_plmoo_loaded(logicmoo('rooms/predator.map.plmoo')).
+:- ensure_plmoo_loaded(logicmoo('rooms/vacuum.map.plmoo')).
+
+% :- ensure_plmoo_loaded(logicmoo('rooms/*.plmoo')).
+
+% Load the map file (*.map.pl) appropriate for the mobs being used.
+%:- forall(files_matching(logicmoo('mobs/?*.plmoo'), X),dmsg(X)).
+%:- ensure_plmoo_loaded(logicmoo('mobs/?*.plmoo')).
+%:- ensure_plmoo_loaded(logicmoo('mobs/*/?*.plmoo')).
+
 
 % puts world into running state
 % :- must(old_setup).

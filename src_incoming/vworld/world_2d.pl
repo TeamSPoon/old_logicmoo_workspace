@@ -53,9 +53,10 @@ room_center(Room,X,Y,Z):-
       center_xyz(MaxZ,Z),!,
       dmsg(todo("get room size and calc center ",Room)).
 
-
+locationToRegion(Obj,Obj):-var(Obj),dmsg(warn(var_locationToRegion(Obj,Obj))),!.
 locationToRegion(xyz(Room,_,_,_),Region2):-nonvar(Room),!,locationToRegion(Room,Region2).
 locationToRegion(Obj,Obj):-nonvar(Obj),isa(Obj,region),!. % inRegion(Obj,Room).
+locationToRegion(Obj,Obj):-dmsg(warn(locationToRegion(Obj,Obj))),!.
 
 loc_to_xy(LOC,X,Y,xyz(Room,X,Y,1)):- locationToRegion(LOC,Room),!.
 loc_to_xy(Room,X,Y,xyz(Room,X,Y,1)).
@@ -136,32 +137,45 @@ region_near(R1,R1).
 
 moo:default_type_props(OfAgent,agent,[facing(F),atloc(L)]):-create_someval(facing,OfAgent,F),create_someval(atloc,OfAgent,L).
 
-put_in_world(Agent):-ensure_some(facing,Agent),!,ensure_some(atloc,Agent),!.
+moo:transitive_other(atloc,Obj,What):-inside_of(Obj,What).
 
-ensure_some(Property,OfAgent):- prop_or(OfAgent, Property,Value,failed),Value \= failed,!.
-ensure_some(Property,OfAgent):- create_someval(Property,OfAgent,Value),!,padd(OfAgent,Property,Value).
+:-export(inside_of/2).
+inside_of(Obj,What):-is_asserted(possess(What,Obj)).
+inside_of(Obj,What):-is_asserted(contains(What,Obj)).
+inside_of(Obj,What):-is_asserted(wearing(What,Obj)).
 
-create_someval(facing,_Agent,Dir) :- my_random_member(Dir,[n,s,e,w,ne,nw,se,sw]).
-create_someval(atloc,Agent,Where) :- 
-   must(defaultRegion(Agent,Region)),
-   must(in_grid(Region,Where)),
-   must(unoccupied(Where)),!.
-
-%create_someval(atloc,_Agent,Loc) :- must((create_random(xyz/3,Loc,unoccupied(Loc)))).
-create_someval(Pred,_Arg1,Value) :- must((moo:mpred_arity(Pred,Last),argIsa_call(Pred,Last,Type),create_random(Type,Value,nonvar(Value)))).
-
-create_random(XYZ/_,Value,Test):- atom(XYZ),!,create_random(XYZ,Value,Test).
-create_random(XYZ,Value,Test):- atom(XYZ),atom_concat('random_',XYZ,Pred),Call=..[Pred,Value],predicate_property(Call,_),Call,Test,!.
-create_random(XYZ,Value,Test):- findall(V,req(isa(V,XYZ)),Possibles),randomize_list(Possibles,Randomized),!,member(Value,Randomized),Test,!.
-create_random(XYZ,Value,Test):- trace_or_throw(failed(create_random(XYZ,Value,Test))).
+put_in_world(Agent):-loop_check(put_in_world_lc(Agent),true),!.
+put_in_world_lc(Obj):-inside_of(Obj,What),ensure_in_world(What),!.
+put_in_world_lc(Obj):-choose_for(facing,Obj,_),!,must_det((choose_for(atloc,Obj,LOC),nonvar(LOC))).
 
 
-actualRegion(Agent,Region):- req(atloc(Agent,LOC)),locationToRegion(LOC,Region),!.
-actualRegion(Agent,Region):- req(inRegion(Agent,Region)),!.
+ensure_in_world(What):-must_det(put_in_world(What)).
+
+:-export(create_someval/3).
+
+create_someval(Prop,Obj,LOC):- ground(Prop-Obj-LOC),!,dmsg(create_someval(Prop,Obj,LOC)).
+create_someval(atloc,Obj,LOC) :- must_det(nonvar(Obj)),
+   must_det(defaultRegion(Obj,Region)),
+   must_det((in_grid(Region,LOC),unoccupied(Obj,LOC))),!.
+
+create_someval(Prop,Obj,_):- Call=.. [Prop,Obj,_],noDefaultValues(Call),!,fail.
+create_someval(Prop,Obj,Value):- fallback_value(Prop,Obj,DValue),!,Value=DValue.
+create_someval(Pred,_Arg1,Value):- must_det_l([moo:mpred_arity(Pred,Last),argIsa_call(Pred,Last,Type),create_random(Type,Value,nonvar(Value))]).
+
+:-export(create_random/3).
+create_random(dir,Dir,Test) :- my_random_member(Dir,[n,s,e,w,ne,nw,se,sw]),Test,!.
+create_random(Type,Value,Test):- atom(Type),atom_concat('random_',Type,Pred),Call=..[Pred,Value],predicate_property(Call,_),Call,Test,!.
+create_random(Type,Value,Test):- findall(V,(get_isa_backchaing(V,Type)),Possibles),Possibles\=[],randomize_list(Possibles,Randomized),!,member(Value,Randomized),Test,!.
+create_random(Type,Value,Test):- trace_or_throw(failed(create_random(Type,Value,Test))).
+create_random(int,3,Test):-call(Test),dmsg(create_random(int,3,Test)),dtrace.
+
+
+actualRegion(Agent,Region):- is_asserted(atloc(Agent,LOC)),locationToRegion(LOC,Region),!.
+actualRegion(Agent,Region):- is_asserted(inRegion(Agent,Region)),!.
 
 defaultRegion(Agent,Region):- actualRegion(Agent,Region),!.
+defaultRegion(_Agent,Region):- must_det(create_random(region,Region,true)).
 defaultRegion(_Agent,Region):- actualRegion(_,Region),!.
-defaultRegion(_Agent,Region):- must(create_random(region,Region,true)).
 defaultRegion(_Agent,Region):- Region = 'Area1000'.
 
 
@@ -172,14 +186,18 @@ defaultRegion(_Agent,Region):- Region = 'Area1000'.
 my_random_member(LOC,LOCS):- length(LOCS,Len),Len>0, X is random(Len),nth0(X,LOCS,LOC).
 randomize_list(LOCS,[LOC|LOCS]):- length(LOCS,Len),Len>0, X is random(Len),nth0(X,LOCS,LOC).
 
-random_xyz(Where):-
-   must(create_random(region,LOC,true)),
-   in_grid_rnd(LOC,Where),
-   unoccupied(Where),!.
+random_xyz(LOC):-
+   must_det(create_random(region,Region,true)),
+   in_grid_rnd(Region,LOC).
+
 random_xyz(xyz('Area1000',1,1,1)):-  trace_or_throw(game_not_loaded).
 
-unoccupied(_X):-!. %%not(atloc(_,X)).
+unoccupied(Obj,X):- loop_check(unoccupied_lc(Obj,X),not(atloc(_,X))).
+unoccupied_lc(Obj,Loc):- is_occupied(Loc,What),!,What=Obj.
+unoccupied_lc(_,_).
 
+is_occupied(Loc,What):- is_asserted(atloc(What,Loc)),!.
+is_occupied(Loc,What):- locationToRegion(Loc,Region),inRegion(What,Region),ensure_in_world(What),atloc(What,Loc),!.
 
 % Used all over the place
 % Transforms location based on cardinal direction given
@@ -196,7 +214,7 @@ move_dir_target(RegionXYZ,Dir,Force,XXYY):-
    (locationToRegion(RegionXYZ,Region1)),
    (round_loc_target(Region1,X,Y,Z,Region2,X2,Y2,Z2)),
    XXYY = xyz(Region2,X2,Y2,Z2),!,
-   must(ground(XXYY)),
+   must_det(ground(XXYY)),
    check_ahead_for_ground(XXYY).
 
 
@@ -253,7 +271,7 @@ in_world_move(LOC,Agent,DirS) :-
         ignore(atloc(Agent,LOC)),
         in_world_move0(LOC,Agent,Dir),
         atloc(Agent,LOC2),
-        must(LOC2 \== LOC),!.
+        must_det(LOC2 \== LOC),!.
 
 
 in_world_move0(LOC,Agent,Dir) :-

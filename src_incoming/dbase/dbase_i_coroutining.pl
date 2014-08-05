@@ -274,17 +274,22 @@ samef(X,Y):- X=Y,!.
 samef(X,Y):- hotrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci(XF,YF)))).
 
 
+:-export(arg_to_var/3).
+arg_to_var(_Type,_String,_Var).
+
 :-export(same_arg/3).
 
 same_arg(_How,X,Y):-var(X),var(Y),!,grtrace,X=Y.
 same_arg(equals,X,Y):-!, unify_with_occurs_check(X,Y).
 same_arg(type(_Type),X,Y):-!, unify_with_occurs_check(X,Y).
 
+same_arg(text,X,Y):-!, string_equal_ci(X,Y).
+
 same_arg(same_or(equals),X,Y):- same_arg(equals,X,Y).
 same_arg(same_or(subclass),X,Y):- same_arg(equals,X,Y).
 same_arg(same_or(subclass),Sub,Sup):- holds_t(subclass,Sub,Sup),!.
 same_arg(same_or(isa),X,Y):- same_arg(equals,X,Y).
-same_arg(same_or(isa),I,Sup):- !, holds_t(isa,I,Sup),!.
+same_arg(same_or(isa),I,Sup):- !, holds_t(Sup,I),!.
 
 same_arg(same_or(_Pred),X,Y):- same_arg(equals,X,Y).
 same_arg(same_or(Pred),I,Sup):- holds_t(Pred,I,Sup),!.
@@ -469,7 +474,7 @@ varcall:attribute_goals(V) -->
 when_goals(det(trigger_determined(X, Y, G))) --> !,
 	(   { disj_goal(G, Disj, DG) }
 	->  disj_or(Disj, DG)
-	;   { G = dbase:trigger(C, Goal) }
+	;   { G = moo:trigger(C, Goal) }
 	->  [ when_met((?=(X,Y),C), Goal) ]
 	;   [ when_met(?=(X,Y), G) ]
 	).
@@ -479,28 +484,28 @@ when_goals(call(Conj)) -->
 when_conj_goals((A,B)) --> !,
 	when_conj_goals(A),
 	when_conj_goals(B).
-when_conj_goals(dbase:G) -->
+when_conj_goals(moo:G) -->
 	when_goal(G).
 
 when_goal(trigger_nonvar(X, G)) -->
 	(   { disj_goal(G, Disj, DG) }
 	->  disj_or(Disj, DG)
-	;   { G = dbase:trigger(C, Goal) }
+	;   { G = moo:trigger(C, Goal) }
 	->  [ when_met((nonvar(X),C), Goal) ]
 	;   [ when_met(nonvar(X),G) ]
 	).
 when_goal(trigger_ground(X, G)) -->
 	(   { disj_goal(G, Disj, DG) }
 	->  disj_or(Disj, DG)
-	;   { G = dbase:trigger(C, Goal) }
+	;   { G = moo:trigger(C, Goal) }
 	->  [ when_met((ground(X),C), Goal) ]
 	;   [ when_met(ground(X),G) ]
 	).
 when_goal(wake_det(_)) -->
 	[].
 
-disj_goal(dbase:check_disj(X, _, _), [], -) :- X == (-).
-disj_goal(dbase:check_disj(-, Or, DG), Or, DG).
+disj_goal(moo:check_disj(X, _, _), [], -) :- X == (-).
+disj_goal(moo:check_disj(-, Or, DG), Or, DG).
 
 disj_or([], _) --> [].
 disj_or(List, DG) -->

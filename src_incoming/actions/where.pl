@@ -19,10 +19,10 @@
 
 :- moo:register_module_type(command).
 
-moo:action_info(where(object),"Tells where something is").
+moo:action_info(where(obj),"Tells where something is").
 
-moo:subclass(agent,object).
-moo:subclass(item,object).
+moo:subclass(agent,obj).
+moo:subclass(item,obj).
 
 moo:agent_text_command(Agent,[where,X],Agent,where(X)).
 moo:agent_text_command(Agent,[where,BE,X],Agent,where(X)):-memberchk(BE,[is,are,be,were]).

@@ -8,10 +8,9 @@
 
 :- moo:register_module_type(command).
 
-moo:action_info(agent, help, "shows this help").
-moo:action_info(agent, help(optional(string,"")), "shows this help").
-moo:action_info(agent, What,Help):-moo:action_info(What,Help).
-moo:action_info(What,text("command is: ",What)):- moo:action_info(What).
+moo:type_action_info(human_player,help, "shows this help").
+moo:type_action_info(human_player,help(optional(string,"")), "shows this help").
+moo:type_action_info(What,text("command is: ",What)):- moo:actiontype(What).
 
 
 :-export(get_type_action_help_commands_list/3).
@@ -35,7 +34,7 @@ get_type_action_help_0(What,Syntax,text([makes,happen,List])):- call_no_cuts(moo
 action_info_db(TEMPL,S):- (PRED=moo:agent_call_command(_,TEMPL);PRED=moo:agent_text_command(_,_,_,TEMPL)) ,
    predicate_property(user:PRED,multifile),clause(PRED,_BODY,REF),nonvar(TEMPL),clause_property(REF,file(S)).
 
-moo:action_info(something,TEMPL,text(file,S,contains,TEMPL)):-action_info_db(TEMPL,S),not(moo:action_info(TEMPL,_Help)).
+moo:action_info(TEMPL,text(file,S,contains,TEMPL)):-action_info_db(TEMPL,S),not(clause_asserted(moo:action_info(TEMPL,_Help),true)).
 
 commands_list(ListS):-findall(action_info(B,C,A),(get_type_action_help_commands_list(A,B,C),
  numbervars(action_info(A,B,C),0,_,[attvar(skip),singletons(true)])),List),

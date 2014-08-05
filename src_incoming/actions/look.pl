@@ -179,7 +179,7 @@ check_for_blocks(Agent) :-
 check_for_blocks(_).
 
 % High enough to see over obstacles??
-% Check to see how tall the agent is and if they are standing on an object
+% Check to see how tall the agent is and if they are standing on an item
 height_on_obj(Agent,Ht) :-
 	atloc(Agent,LOC),
 	report(LOC,Objs),

@@ -27,6 +27,7 @@ npc_tick_tock:-
    npc_tick_tock_time(Time),sleep(Time),
    npc_tick.
 
+npc_tick:-!.
 npc_tick:-
    join_npcs_long_running,   
    forall(npc_controller(What,Who),in_thread_and_join(debugOnError(tick_controller(What,Who)))).

@@ -50,7 +50,7 @@ defined_local_test:-
 
 defined_local_test:-
    test_name("tests to see if we have: atloc"),
-   test_true((foc_current_player(Agent),must_det((atloc(Agent,Where)),dmsg(atloc(Agent,Where))))).
+   test_true((foc_current_player(Agent),must_det((atloc(Agent,Where),dmsg(atloc(Agent,Where)))))).
 
 defined_local_test:- 
    foc_current_player(Agent),
@@ -62,13 +62,13 @@ defined_local_test:-
    must(add(movedist(explorer(player1),3))),
    test_true(must((findall(X,movedist(explorer(player1),X),L),length(L,1)))).
 
-defined_local_test_failing:-
+defined_local_test:-
    test_name("tests to see if we have: inRegion"),
    test_true((foc_current_player(Agent),must_det((inRegion(Agent,Where))),dmsg(inRegion(Agent,Where)))).
 
-defined_local_test_failing:-
+defined_local_test:-
    test_name("tests to see if 'food' can be an item"),
-      parseIsa0(item, _G537410, [food], []).
+      test_true(parseIsa0(item, _G537410, [food], [])).
 
 moo:mud_test("local sanity tests", doall(defined_local_test)).
 
