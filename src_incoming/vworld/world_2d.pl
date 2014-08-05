@@ -180,10 +180,6 @@ actualRegion(Obj,Region):- is_asserted(inRegion(Obj,Region)),!.
 actualRegion(Obj,Region):- is_asserted(atloc(Obj,LOC)),locationToRegion(LOC,Region),!.
 actualRegion(apath(Region,_),Region):-!.
 
-defaultRegion(Agent,Region):- actualRegion(Agent,Region),!.
-defaultRegion(_Agent,Region):- must_det(create_random(region,Region,true)).
-defaultRegion(_Agent,Region):- actualRegion(_,Region),!.
-defaultRegion(_Agent,Region):- Region = 'Area1000'.
 
 
 % random_region(LOC):- findall(O,isa(O,region),LOCS),my_random_member(LOC,LOCS).

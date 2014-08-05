@@ -1041,6 +1041,8 @@ naf(Goal):-not(req(Goal)).
 % db_assert_[mv|sv]/3
 % ================================================
 
+:-dmsg_hide(db_assert_mv).
+:-dmsg_hide(db_assert_sv).
 
 % assert_with to tell(OldV) mutlivalue pred
 :-export((db_assert_mv/4)).
