@@ -15,6 +15,11 @@
 :- op(1120,fx,decl_mpred_prolog).
 :- op(1150,fx,decl_mpred_hybrid).
 
+
+ztrace:-dmsg(ztrace),dtrace.
+
+slow_kb_op(_):-true.
+
 % ========================================
 % decl_mpred_hybrid database
 % ========================================
@@ -83,10 +88,6 @@
 :- decl_mpred_hybrid(singleValued/1).
 :- discontiguous(singleValued/1).
 
-
-define_argType(F,N,ArgType):-decl_mpred(F,argIsa(N,ArgType)).
-
-
 :-include(dbase_i_deduce).
 
 % ================================================
@@ -97,7 +98,6 @@ define_argType(F,N,ArgType):-decl_mpred(F,argIsa(N,ArgType)).
 :-export(not_loading_game_file/0).
 not_loading_game_file:- not(moo:loading_game_file(_,_)),moo:loaded_game_file(_,_),!.
 
-
 :-include(dbase_i_isa_subclass).
 
 % ================================================
@@ -106,7 +106,7 @@ not_loading_game_file:- not(moo:loading_game_file(_,_)),moo:loaded_game_file(_,_
 
 hook:decl_database_hook(assert(_),Fact):- check_was_known_false(Fact).
 
-was_known_false(Fact):-is_known_false(Fact),retractall((is_known_false(_):-true)),dmsg(trace_or_throw(was_known_false(Fact))),dtrace.
+was_known_false(Fact):-is_known_false(Fact),retractall((is_known_false(_):-true)),dmsg(trace_or_throw(error+was_known_false(Fact))).
 
 check_was_known_false(Fact):-ignore(((is_known_false(Fact),was_known_false(Fact)))).
 

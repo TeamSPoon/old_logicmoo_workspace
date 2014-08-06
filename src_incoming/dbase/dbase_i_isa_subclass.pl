@@ -226,7 +226,7 @@ not_mud_isa(obj, formattype).
 not_mud_isa(formattype,formattype).
 not_mud_isa(subft,type).
 not_mud_isa('TemporallyExistingThing', 'TemporallyExistingThing').
-not_mud_isa(createableType,'TemporallyExistingThing').
+not_mud_isa(creatableType,'TemporallyExistingThing').
 not_mud_isa(X,type):-never_type(X).
 
 
@@ -297,7 +297,7 @@ disjointWith(region,obj).
 disjointWith(formattype,item).
 disjointWith(formattype,obj).
 disjointWith(formattype,region).
-disjointWith(createableType,nonCreatableType).
+disjointWith(creatableType,nonCreatableType).
 disjointWith(A,B):- A=B,!,fail.
 disjointWith(A,B):- asserted_or_trans_subclass(A,AS),asserted_or_trans_subclass(B,BS),(is_asserted(disjointWith(AS,BS));is_asserted(disjointWith(BS,AS))).
 disjointWith(A,B):- once((type_isa(A,AT),type_isa(B,BT))),AT \= BT.

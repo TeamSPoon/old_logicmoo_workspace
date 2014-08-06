@@ -22,7 +22,7 @@ atlocNear(Whom,Where):-nonvar(Where),!,findall(Whom,atlocNear0(Whom,Where),List)
 atlocNear(Whom,Where):-nonvar(Whom),!,findall(Where,atlocNear0(Whom,Where),List),list_to_set(List,Set),!,member(Where,Set).
 atlocNear(Whom,Where):-findall(Whom+Where,atlocNear0(Whom,Where),List),list_to_set(List,Set),!,member(Whom+Where,Set).
 
-atlocNear0(Whom,Where):-locs_near(Where,LOC),atloc(Whom,LOC).
+atlocNear0(Whom,Where):-locs_near(Where,LOC),is_asserted(atloc(Whom,LOC)).
 
 raise_location_event(Where,Event):- forall(atlocNear(Whom,Where),ignore(show_event_to(Whom,Event))).
 :-export(raise_location_event/2).

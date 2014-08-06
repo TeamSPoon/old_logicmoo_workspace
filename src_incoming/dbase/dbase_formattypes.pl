@@ -475,9 +475,7 @@ learnArgIsaInst(_,_,_).
 
 
 
-
-
-hook:deduce_facts(Fact,isa(Arg,Type)):- deduce_argIsa_facts(Fact,Arg,Type).
+hook:deduce_facts(Fact,isa(Arg,Type)):- slow_kb_op(deduce_argIsa_facts(Fact,Arg,Type)).
 
 
 call_argIsa_ForAssert(F,N,Type):-call_argIsa(F,N,Type),atom(Type),!,not(nonusefull_deduction_type(Type)),type(Type).
@@ -485,11 +483,14 @@ call_argIsa_ForAssert(F,N,Type):-call_argIsa(F,N,Type),atom(Type),!,not(nonusefu
 nonusefull_deduction_type(term).
 nonusefull_deduction_type(voprop).
 nonusefull_deduction_type(dir).
-
+nonusefull_deduction_type(Type):-creatableType(Type),!,fail.
 nonusefull_deduction_type(obj).
-nonusefull_deduction_type(Type):-formattype(Type).
+nonusefull_deduction_type(Type):-is_asserted(formattype(Type)).
 
-assert_deduced_arg_isa_facts(Fact):- ignore(((ground(Fact),forall(deduce_argIsa_facts(Fact,Arg,Type),add(isa(Arg,Type)))))).
+assert_deduced_arg_isa_facts(Fact):- slow_kb_op(assert_deduced_arg_isa_facts_0(Fact)),!.
+assert_deduced_arg_isa_facts_0(Fact):- ignore(((ground(Fact),forall(deduce_argIsa_facts(Fact,Arg,Type),add(isa(Arg,Type)))))).
+
+
 deduce_argIsa_facts(Fact,Arg,Type):- ground(Fact), functor(Fact,F,A),A>1, deduce_from_predicate(F), arg(N,Fact,Arg),ground(Arg),
    call_argIsa_ForAssert(F,N,Type),must_det(atom(Type)),must_det(ground(Arg)).
 

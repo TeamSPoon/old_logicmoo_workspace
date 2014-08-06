@@ -244,7 +244,7 @@ is_asserted_mpred(G):-fact_loop_checked(G,asserted_mpred_clause(G)).
 :-dynamic(was_asserted_gaf/1).
 :-dynamic_multifile_exported(was_asserted_gaf/1).
 :-export(asserted_mpred_clause/1).
-asserted_mpred_clause(naf(C)):-!,not(is_asserted(C)).
+asserted_mpred_clause(naf(C)):-nonvar(C),!,not(is_asserted(C)).
 asserted_mpred_clause(C):- (functor(C,dbase_t,_);functor(C,holds_t,_)),!,trace_or_throw(use_code(is_asserted(C))).
 asserted_mpred_clause(C):-was_asserted_gaf(C).
 asserted_mpred_clause(C):-dbase_t(C).
@@ -419,7 +419,8 @@ rescan_duplicated_facts(M,H):-!,rescan_duplicated_facts(M,H,true).
 rescan_duplicated_facts(M,H):-findall(H,(clause_safe(M:H,B),B==true),CL1), once((list_to_set(CL1,CL2),reduce_fact_heads(M,H,CL1,CL2))).
 rescan_duplicated_facts(M,H,BB):-notrace(doall((gather_fact_heads(M,H),BB=true,once((findall(C,(clause_safe(H,B),B=@=BB,reduce_clause((H:-B),C)),CL1),
                                                                      list_to_set(CL1,CL2),once(reduce_fact_heads(M,H,CL1,CL2))))))).
-rerun_database_hooks:-doall((gather_fact_heads(_M,H),forall(clause_safe(H,true),run_database_hooks(assert(z),H)))).
+
+rerun_database_hooks:-doall((gather_fact_heads(_M,H),forall(is_asserted(H),run_database_hooks(assert(z),H)))).
 
 
 

@@ -22,12 +22,10 @@
 :- dynamic_multifile_exported mpred_arity/2.
 :- dynamic_multifile_exported mpred_prop/2.
 
-
 hook:decl_database_hook(assert(_),Fact):- ignore((compound(Fact),Fact=..[F,Arg1|PROPS],argsIsaProps(F),decl_mpred(Arg1,[F|PROPS]))).
 hook:decl_database_hook(assert(_),mpred_prop(F,P)):- decl_mpred(F,P).
 hook:decl_database_hook(assert(_),isa(F,P)):- argsIsaProps(P),decl_mpred(F,P).
 hook:decl_database_hook(assert(_),mpred_prop(F,stubType(Stub))):-mpred_arity(F,A),declare_dbase_local(F,A,Stub).
-
 
 mpred_prop(mpred_prop,prologOnly).
 mpred_prop(mpred_arity,prologOnly).

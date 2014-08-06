@@ -19,9 +19,6 @@ last_arg_ground(_,A,HEAD):-arg(A,HEAD,Arg),!,ground(Arg).
 call_body_req(HEAD):- functor(HEAD,F,A),HEAD_T=..[F|ARGS],HEAD_T=..[dbase_t,F|ARGS],hook_body_req(F,A,HEAD,HEAD_T).
 
 
-ztrace:-dmsg(ztrace),dtrace.
-
-
 % ========================================================================================
 % BODY STUB
 % ========================================================================================
