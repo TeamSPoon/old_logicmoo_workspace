@@ -53,8 +53,8 @@ in_user_startup(Call):- '@'(user:Call,user).
 
 
 % :- user_use_module(logicmoo(dbase/dbase_formattypes)).
-:- user_use_module(logicmoo(vworld/parser_imperative)).
-:- user_use_module(logicmoo(vworld/parser_e2c)).
+:- user_use_module(logicmoo(parsing/parser_imperative)).
+:- user_use_module(logicmoo(parsing/parser_e2c)).
 :- user_use_module(logicmoo(vworld/moo_testing)).
 
 /*

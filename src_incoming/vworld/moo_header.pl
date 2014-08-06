@@ -59,7 +59,7 @@ end_of_file.
 :- within_user(ensure_loaded(logicmoo('vworld/moo_loader.pl'))).
 :- within_user(ensure_loaded(logicmoo('vworld/toploop_telnet.pl'))).
 :- within_user(ensure_loaded(logicmoo('vworld/toploop_npc.pl'))).
-:- within_user(ensure_loaded(logicmoo('vworld/parser_imperative.pl'))).
+:- within_user(ensure_loaded(logicmoo('parsing/parser_imperative.pl'))).
 :- within_user(ensure_loaded(logicmoo('vworld/moo_testing.pl'))).
 
 % NPC planners
