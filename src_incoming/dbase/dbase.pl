@@ -12,6 +12,150 @@
 % Douglas Miles
 */
 
+:- op(1120,fx,decl_mpred_prolog).
+:- op(1150,fx,decl_mpred_hybrid).
+
+% ========================================
+% decl_mpred_hybrid database
+% ========================================
+
+:- dynamic_multifile_exported action_info/2.
+:- dynamic_multifile_exported action_rules/4.
+:- dynamic_multifile_exported agent_call_command/2.
+:- dynamic_multifile_exported agent_text_command/4.
+:- dynamic_multifile_exported call_after_load/1.
+:- dynamic_multifile_exported check_permanence/4.
+:- dynamic_multifile_exported decl_mud_test/2.
+:- dynamic_multifile_exported default_type_props/3.
+:- dynamic_multifile_exported one_default_type_prop/3.
+:- dynamic_multifile_exported label_type/2.
+:- dynamic_multifile_exported label_type_props/3.
+:- dynamic_multifile_exported mud_test/2.
+:- dynamic_multifile_exported now_unused/1.
+:- dynamic_multifile_exported term_specifier_text/2.
+:- dynamic_multifile_exported type_action_info/3.
+:- dynamic_multifile_exported update_charge/2.
+:- dynamic_multifile_exported update_stats/2.
+:- dynamic_multifile_exported use_usable/4.
+:- dynamic_multifile_exported verb_alias/2.
+:- dynamic_multifile_exported world_agent_plan/3.
+:- dynamic_multifile_exported((actiontype/1,action_info/2,action_rules/4,type_action_info/3,term_specifier_text/2,action_verb_useable/4)).
+:- dynamic_multifile_exported((decl_coerce)/3).
+:- dynamic_multifile_exported((term_anglify/2,term_anglify_last/2, term_anglify_np/3,term_anglify_np_last/3)).
+:- dynamic_multifile_exported((update_charge/2,update_stats/2)).
+:- dynamic_multifile_exported(moo:ft_info/2).
+
+% ================================================
+% Thread Locals
+% ================================================
+:- thread_local thlocal:dbase_capture/2.
+:- thread_local thlocal:dbase_change/2.
+:- thread_local thlocal:dbase_opcall/2.
+:- thread_local thlocal:repl_to_string/2.
+:- thread_local thlocal:repl_writer/2.
+:- thread_local thlocal:session_agent/2.
+
+:- dynamic_multifile_exported thlocal:dbase_capture/2.
+:- dynamic_multifile_exported thlocal:session_agent/2.
+
+% ================================================
+% DBASE_T System
+% ================================================
+
+:-include(dbase_i_kb_store).
+
+% ================================================
+% MPRED_PROP System
+% ================================================
+
+:-include(dbase_i_mpred_props).
+:-include(dbase_i_mpred_stubs).
+
+:- op(1120,fx,decl_mpred_prolog).
+:- op(1150,fx,decl_mpred_hybrid).
+
+:- decl_mpred_hybrid last_command/2.
+:- decl_mpred_hybrid named/2, spd/2.
+:- decl_mpred_hybrid str/2. 
+:- decl_mpred_hybrid subclass/2.
+:- decl_mpred_hybrid type_grid/3.
+:- decl_mpred_hybrid(moo:subft/2).
+:- decl_mpred_hybrid(singleValued/1).
+:- discontiguous(singleValued/1).
+
+
+define_argType(F,N,ArgType):-decl_mpred(F,argIsa(N,ArgType)).
+
+
+:-include(dbase_i_deduce).
+
+% ================================================
+% ISA/GENLS Typesystem
+% ================================================
+
+:-dynamic_multifile_exported((loading_game_file/2, loaded_game_file/2)).
+:-export(not_loading_game_file/0).
+not_loading_game_file:- not(moo:loading_game_file(_,_)),moo:loaded_game_file(_,_),!.
+
+
+:-include(dbase_i_isa_subclass).
+
+% ================================================
+% A tiny bit of TMS
+% ================================================
+
+hook:decl_database_hook(assert(_),Fact):- check_was_known_false(Fact).
+
+was_known_false(Fact):-is_known_false(Fact),retractall((is_known_false(_):-true)),dmsg(trace_or_throw(was_known_false(Fact))),dtrace.
+
+check_was_known_false(Fact):-ignore(((is_known_false(Fact),was_known_false(Fact)))).
+
+hook:decl_database_hook(assert(_A_or_Z),label_type_props(Lbl,T,Props)):- add_w_hooks(default_type_props(self,T,[label(self,Lbl)|Props])).
+
+hook:decl_database_hook(assert(_A_or_Z),default_type_props(_,T,_)):- define_type_if_atom(T).
+
+hook:decl_database_hook(assert(_A_or_Z),mpred_prop(F,arity(A))):- ignore((A==1,define_type(F))) , ignore((atom(P),define_type(P))).
+
+
+% ========================================
+% enter_term_anglify(MASK)
+% ========================================
+
+enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
+enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_np(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
+enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_last(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
+enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_np_last(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
+
+
+
+:- dynamic_multifile_exported(decl_coerce/3).
+
+
+decl_coerce(_,_,_):-fail.
+
+:-dynamic_multifile_exported(coerce/3).
+
+coerce(What,Type,NewThing):-decl_coerce(What,Type,NewThing),!.
+coerce(What,_Type,NewThing):-NewThing = What.
+
+
+
+
+:- meta_predicate tick_every(*,*,0).
+:- meta_predicate register_timer_thread(*,*,0).
+
+:- decl_mpred_hybrid((nonCreatableType/1, type/1, subclass/2, argsIsa/1 ,creatableType/1, createableSubclassType/2)).
+
+/*
+:- decl_mpred_hybrid((createableSubclassType(type,type))).
+:- decl_mpred_hybrid((creatableType(type))).
+:- decl_mpred_hybrid type_grid/3.
+*/
+:- decl_mpred_hybrid(((formatted/1,
+                       contains/2))).
+
+
+
 :-op(1150,fx,export).
 
 :- '@'(use_module(logicmoo(vworld/moo)),'user').
@@ -163,242 +307,6 @@ dbase_mod(moo).
 moo:actiontype(list(term)).
 moo:agent_call_command(_Gent,list(Obj)):- term_listing(Obj).
 
-callable_tf(P,2):- arity_pred(P),!,fail.
-callable_tf(F,A):- functor_safe(P,F,A),predicate_property(P,_),!.
-:- dynamic(useExternalDBs/0).
-useExternalDBs:- fail.
-useDBMts:- fail, useExternalDBs.
-
-relax_term(P,P,Aic,Aic,Bic,Bic):- !.
-/*
-relax_term(P,P,A,A,Bi,Bc):- arg(_,v(subclass,isa),P),!,fail.
-relax_term(P,P,Ai,Ac,Bic,Bic):- when_met(nonvar(Ac), same_arg(same_or(isa),Ac,Ai)),!.
-relax_term(P,P,Ai,Ac,Bi,Bc):- is_type(Ai),!,when_met(pred(nonvar,Ac), (same_arg(same_or(subclass),Ac,Ai),same_arg(same_or(equals),Bc,Bi))),!.
-relax_term(P,P,Ai,Ac,Bi,Bc):- when_met(pred(nonvar,Ac),when_met(pred(nonvar,Bc), (same_arg(same_or(subclass),Ac,Ai),same_arg(same_or(equals),Bc,Bi)))).
-*/
-
-% ?- member(R,[a,b,c]),when_met(nonvar(Re), dbase:same_arg(same_or(termOfUnit),n,Re)),Re=R,write(chose(R)).
-
-% ================================================================================
-% begin holds_t
-% ================================================================================
-:-export((holds_t/1,holds_t/2,holds_t/3,holds_t/4,holds_t/5,holds_t/6,holds_t/7,holds_t/8)).
-holds_t(P,A1,A2,A3,A4,A5,A6,A7):- req(dbase_t(P,A1,A2,A3,A4,A5,A6,A7)).
-holds_t(P,A1,A2,A3,A4,A5,A6):- req(dbase_t(P,A1,A2,A3,A4,A5,A6)).
-holds_t(P,A1,A2,A3,A4,A5):- req(dbase_t(P,A1,A2,A3,A4,A5)).
-holds_t(P,A1,A2,A3,A4):- req(dbase_t(P,A1,A2,A3,A4)).
-holds_t(P,A1,A2,A3):- req(dbase_t(P,A1,A2,A3)).
-holds_t(P,A1,A2):- req(dbase_t(P,A1,A2)).
-holds_t(P,A1):- req(dbase_t(P,A1)).
-holds_t(G):- req(G).
-
-
-isCycPredArity_ignoreable(P,A):- mpred_prop(P,useCycPred), hotrace(ignore(mpred_arity(P,A))).
-
-dbase_which_next(dac(no_d,a,no_c,no_mt)).
-
-dbase_t(P,A1,A2,A3,A4,A5,A6,A7):- isCycPredArity_ignoreable(P,7),dbase_which_next(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5,A6,A7);call_mt_t(DBS,P,A1,A2,A3,A4,A5,A6,A7,_,_);assertion_t([P,A1,A2,A3,A4,A5,A6,A7])).
-dbase_t(P,A1,A2,A3,A4,A5,A6):- isCycPredArity_ignoreable(P,6),dbase_which_next(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5,A6);call_mt_t(DBS,P,A1,A2,A3,A4,A5,A6,_,_)).
-dbase_t(P,A1,A2,A3,A4,A5):- isCycPredArity_ignoreable(P,5),dbase_which_next(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5);call_mt_t(DBS,P,A1,A2,A3,A4,A5,_,_)).
-dbase_t(P,A1,A2,A3,A4):- isCycPredArity_ignoreable(P,4),dbase_which_next(DBS),(call_t(DBS,P,A1,A2,A3,A4);call_mt_t(DBS,P,A1,A2,A3,A4,_,_)).
-dbase_t(P,A1,A2,A3):- isCycPredArity_ignoreable(P,3),dbase_which_next(DBS),(call_t(DBS,P,A1,A2,A3);call_mt_t(DBS,P,A1,A2,A3,_,_)).
-dbase_t(P,A1,A2):- hotrace(cholds_relaxed_t(P,A1,A2)).
-% dbase_t(P,A1):- !,dbase_t(isa,A1,P).
-dbase_t(P,A1):- isCycPredArity_ignoreable(P,1),dbase_which_next(DBS),(call_t(DBS,P,A1);call_mt_t(DBS,P,A1,_,_)).
-
-% ================================================================================
-% begin cholds_t
-% ================================================================================
-which_t(dac(no_d,a,no_c,no_mt)).
-cholds_t(P,A1,A2,A3,A4,A5,A6,A7):- isCycPredArity_ignoreable(P,7),which_t(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5,A6,A7);call_mt_t(DBS,P,A1,A2,A3,A4,A5,A6,A7,_,_);assertion_t([P,A1,A2,A3,A4,A5,A6,A7])).
-cholds_t(P,A1,A2,A3,A4,A5,A6):- isCycPredArity_ignoreable(P,6),which_t(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5,A6);call_mt_t(DBS,P,A1,A2,A3,A4,A5,A6,_,_)).
-cholds_t(P,A1,A2,A3,A4,A5):- isCycPredArity_ignoreable(P,5),which_t(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5);call_mt_t(DBS,P,A1,A2,A3,A4,A5,_,_)).
-cholds_t(P,A1,A2,A3,A4):- isCycPredArity_ignoreable(P,4),which_t(DBS),(call_t(DBS,P,A1,A2,A3,A4);call_mt_t(DBS,P,A1,A2,A3,A4,_,_)).
-cholds_t(P,A1,A2,A3):- isCycPredArity_ignoreable(P,3),which_t(DBS),(call_t(DBS,P,A1,A2,A3);call_mt_t(DBS,P,A1,A2,A3,_,_)).
-cholds_t(P,A1,A2):- hotrace(cholds_relaxed_t(P,A1,A2)).
-% cholds_t(P,A1):- !,cholds_t(isa,A1,P).
-cholds_t(P,A1):- isCycPredArity_ignoreable(P,1),which_t(DBS),(call_t(DBS,P,A1);call_mt_t(DBS,P,A1,_,_)).
-
-cholds_relaxed_t(P,A1,A2):- isCycPredArity_ignoreable(P,2),which_t(DBS),
-      relax_term(P,PR,A1,R1,A2,R2),
-         cholds_relaxed_0_t(DBS,PR,R1,R2).
-
-cholds_relaxed_0_t(DBS,P,A1,A2):- call_t(DBS,P,A1,A2).
-cholds_relaxed_0_t(DBS,P,A1,A2):- call_mt_t(DBS,P,A1,A2,_,_).
-
-/*
-cholds_relaxed_0_t(dac(_,a,_,_),P,A1,A2):- assertion_t([P,A1,A2]).
-cholds_relaxed_0_t(dac(d,_,_,_),P,A1,A2):- dbase_t(P,A1,A2).
-cholds_relaxed_0_t(dac(_,_,_,h),P,A1,A2):- call_t(DBS,P,A1,A2).
-cholds_relaxed_0_t(DBS,P,A1,A2):- call_mt_t(DBS,P,A1,A2,_,_).
-cholds_relaxed_0_t(_DBS,P,A1,A2):- ground((P,A1)), TEMPL=..[P,T1,_],dbase_t(default_sv,TEMPL,2,A2),req(isa(A1,T1)),!.
-*/
-
-cholds_t([AH,P|LIST]):- is_holds_true(AH),!,cholds_t_p2(P,LIST).
-cholds_t([AH,P|LIST]):- is_holds_false(AH),!,holds_f_p2(P,LIST).
-cholds_t([P|LIST]):- !,cholds_t_p2(P,LIST).
-cholds_t(not(CALL)):-cholds_f(CALL).
-cholds_t(CALL):- safe_univ(CALL,[P|LIST]),cholds_t([P|LIST]).
-
-cholds_t_p2(P,LIST):- safe_univ(CALL,[cholds_t,P|LIST]),call(CALL).
-
-
-call_list_t(dac(d,_,_,_),CALL,_):- dbase_t(CALL).
-call_list_t(dac(_,a,_,_),_,List):- assertion_t(List).
-call_list_t(dac(_,_,c,_),CALL,_):- xcall_t(CALL).
-call_list_t(dac(_,_,_,h),CALL,_):- holds_t(CALL).
-
-call_t(DBS,P,A1,A2,A3,A4,A5,A6,A7):- callable_tf(P,7),List= [P,A1,A2,A3,A4,A5,A6,A7], CALL=..List, call_list_t(DBS,CALL,List).
-call_t(dac(_,_,_,h),P,A1,A2,A3,A4,A5,A6,A7):- holds_t(P,A1,A2,A3,A4,A5,A6,A7).
-
-call_t(dac(d,_,_,_),P,A1,A2,A3,A4,A5,A6):- dbase_t(P,A1,A2,A3,A4,A5,A6).
-call_t(dac(_,a,_,_),P,A1,A2,A3,A4,A5,A6):- assertion_t([P,A1,A2,A3,A4,A5,A6]).
-call_t(dac(_,_,c,_),P,A1,A2,A3,A4,A5,A6):- callable_tf(P,6),xcall_t(P,A1,A2,A3,A4,A5,A6).
-call_t(dac(_,_,_,h),P,A1,A2,A3,A4,A5,A6):- holds_t(P,A1,A2,A3,A4,A5,A6).
-
-call_t(dac(d,_,_,_),P,A1,A2,A3,A4,A5):- dbase_t(P,A1,A2,A3,A4,A5).
-call_t(dac(_,a,_,_),P,A1,A2,A3,A4,A5):- assertion_t([P,A1,A2,A3,A4,A5]).
-call_t(dac(_,_,c,_),P,A1,A2,A3,A4,A5):- callable_tf(P,5),xcall_t(P,A1,A2,A3,A4,A5).
-call_t(dac(_,_,_,h),P,A1,A2,A3,A4,A5):- holds_t(P,A1,A2,A3,A4,A5).
-
-call_t(dac(d,_,c,_),P,A1,A2,A3,A4):- dbase_t(P,A1,A2,A3,A4).
-call_t(dac(_,a,_,_),P,A1,A2,A3,A4):- assertion_t([P,A1,A2,A3,A4]).
-call_t(dac(_,_,c,_),P,A1,A2,A3,A4):- callable_tf(P,4),xcall_t(P,A1,A2,A3,A4).
-call_t(dac(_,_,_,h),P,A1,A2,A3,A4):- holds_t(P,A1,A2,A3,A4).
-
-call_t(dac(d,_,_,_),P,A1,A2,A3):- dbase_t(P,A1,A2,A3).
-call_t(dac(_,a,_,_),P,A1,A2,A3):- assertion_t([P,A1,A2,A3]).
-call_t(dac(_,_,c,_),P,A1,A2,A3):- callable_tf(P,3),xcall_t(P,A1,A2,A3).
-call_t(dac(_,_,_,h),P,A1,A2,A3):- holds_t(P,A1,A2,A3).
-
-call_t(dac(d,_,_,_),P,A1,A2):- dbase_t(P,A1,A2).
-call_t(dac(_,a,_,_),P,A1,A2):- assertion_t([P,A1,A2]).
-call_t(dac(_,_,c,_),P,A1,A2):- callable_tf(P,2),xcall_t(P,A1,A2).
-call_t(dac(_,_,_,h),P,A1,A2):- holds_t(P,A1,A2).
-
-call_t(dac(d,_,_,_),P,A1):- dbase_t(P,A1).
-call_t(dac(_,a,_,_),P,A1):- assertion_t([P,A1]).
-call_t(dac(_,_,c,_),P,A1):- callable_tf(P,1),xcall_t(P,A1).
-call_t(dac(_,_,_,h),P,A1):- holds_t(P,A1).
-
-call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- callable_tf(P,9),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],xcall_t(CALL).
-call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7,A8):- callable_tf(P,8),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],xcall_t(CALL).
-call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7):- callable_tf(P,7),CALL=..[P,A1,A2,A3,A4,A5,A6,A7],xcall_t(CALL).
-call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6):- callable_tf(P,6),xcall_t(P,A1,A2,A3,A4,A5,A6).
-call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4,A5):- callable_tf(P,5),xcall_t(P,A1,A2,A3,A4,A5).
-call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4):- callable_tf(P,4),xcall_t(P,A1,A2,A3,A4).
-call_mt_t(dac(_,_,_,mt),P,A1,A2,A3):- callable_tf(P,3),xcall_t(P,A1,A2,A3).
-call_mt_t(dac(_,_,_,mt),P,A1,A2):- callable_tf(P,3),xcall_t(P,A1,A2).
-
-xcall_t(P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],call(CALL).
-xcall_t(P,A1,A2,A3,A4,A5,A6,A7,A8):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],call(CALL).
-xcall_t(P,A1,A2,A3,A4,A5,A6,A7):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7],call(CALL).
-xcall_t(P,A1,A2,A3,A4,A5,A6):- call(P,A1,A2,A3,A4,A5,A6).
-xcall_t(P,A1,A2,A3,A4,A5):- call(P,A1,A2,A3,A4,A5).
-xcall_t(P,A1,A2,A3,A4):- call(P,A1,A2,A3,A4).
-xcall_t(P,A1,A2,A3):- call(P,A1,A2,A3).
-xcall_t(P,A1,A2):- call(P,A1,A2).
-xcall_t(P,A1):- call(P,A1).
-xcall_t(P):- call(P).
-
-assertion_t([AH,P|LIST]):- is_holds_true(AH),!,assertion_t([P|LIST]).
-assertion_t([AH,P|LIST]):- is_holds_false(AH),!,assertion_f([P|LIST]).
-% todo hook into loaded files!
-% assertion_t([P|LIST]):- Call=..[dbase_t,P|LIST],Call.
-assertion_t(_):- not(useExternalDBs),!,fail.
-assertion_t(C):-dmsg(enter_assertion_t(C)),fail.
-assertion_t([P|LIST]):- tiny_kb:'ASSERTION'(':TRUE-DEF',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
-assertion_t([P|LIST]):- tiny_kb:'ASSERTION'(':TRUE-MON',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
-assertion_t([P|LIST]):- append([assertion_holds_mworld0,P|LIST],[_,_],CallList),Call=..CallList, '@'(xcall_t(Call),mworld0).
-assertion_t([P|LIST]):- Call=..[assertion_holds,P|LIST], '@'(xcall_t(Call),hl_holds).
-
-% ================================================================================
-% end holds_t
-% ================================================================================
-
-
-% ================================================================================
-% begin holds_f
-% ================================================================================
-which_f(dac(d,no_a,no_c,no_mt)).
-
-holds_f(P,A1,A2,A3,A4,A5,A6,A7):- isCycPredArity_ignoreable(P,7),which_f(DBS),(call_f(DBS,P,A1,A2,A3,A4,A5,A6,A7);call_mt_f(DBS,P,A1,A2,A3,A4,A5,A6,A7,_,_);assertion_f([P,A1,A2,A3,A4,A5,A6,A7])).
-holds_f(P,A1,A2,A3,A4,A5,A6):- isCycPredArity_ignoreable(P,6),which_f(DBS),(call_f(DBS,P,A1,A2,A3,A4,A5,A6);call_mt_f(DBS,P,A1,A2,A3,A4,A5,A6,_,_)).
-holds_f(P,A1,A2,A3,A4,A5):- isCycPredArity_ignoreable(P,5),which_f(DBS),(call_f(DBS,P,A1,A2,A3,A4,A5);call_mt_f(DBS,P,A1,A2,A3,A4,A5,_,_)).
-holds_f(P,A1,A2,A3,A4):- isCycPredArity_ignoreable(P,4),which_f(DBS),(call_f(DBS,P,A1,A2,A3,A4);call_mt_f(DBS,P,A1,A2,A3,A4,_,_)).
-holds_f(P,A1,A2,A3):- isCycPredArity_ignoreable(P,3),which_f(DBS),(call_f(DBS,P,A1,A2,A3);call_mt_f(DBS,P,A1,A2,A3,_,_)).
-holds_f(P,A1,A2):- holds_relaxed_f(P,A1,A2).
-holds_f(P,A1):- isCycPredArity_ignoreable(P,1),which_f(DBS),(call_f(DBS,P,A1);call_mt_f(DBS,P,A1,_,_)).
-
-
-holds_relaxed_f(P,A1,A2):- isCycPredArity_ignoreable(P,2),which_f(DBS),!,relax_term(P,PR,A1,R1,A2,R2),holds_relaxed_0_f(DBS,PR,R1,R2).
-holds_relaxed_0_f(DBS,P,A1,A2):- call_f(DBS,P,A1,A2).
-holds_relaxed_0_f(DBS,P,A1,A2):- call_mt_f(DBS,P,A1,A2,_,_).
-
-
-holds_f([AH,P|LIST]):- is_holds_true(AH),!,holds_f_p2(P,LIST).
-holds_f([AH,P|LIST]):- is_holds_false(AH),!,cholds_t_p2(P,LIST).
-holds_f([P|LIST]):- !,cholds_t_p2(P,LIST).
-holds_f(CALL):- CALL=..[P|LIST],holds_f([P|LIST]).
-holds_f_p2(P,LIST):- CALL=..[holds_f,P|LIST],call(CALL).
-
-dbase_f(List):- is_list(List),!,Call=..[dbase_f|List],Call.
-dbase_f(List):- holds_f(List).
-
-
-call_f(_,P,A1,A2,A3,A4,A5,A6,A7):- callable_tf(P,7),List= [P,A1,A2,A3,A4,A5,A6,A7], CALL=..List,(assertion_f(List);dbase_f(CALL);xcall_f(CALL)).
-call_f(dac(d,_,_,_),P,A1,A2,A3,A4,A5,A6):- dbase_f(P,A1,A2,A3,A4,A5,A6).
-call_f(dac(_,a,_,_),P,A1,A2,A3,A4,A5,A6):- assertion_f([P,A1,A2,A3,A4,A5,A6]).
-call_f(dac(_,_,c,_),P,A1,A2,A3,A4,A5,A6):- callable_tf(P,6),xcall_f(P,A1,A2,A3,A4,A5,A6).
-call_f(dac(d,_,_,_),P,A1,A2,A3,A4,A5):- dbase_f(P,A1,A2,A3,A4,A5).
-call_f(dac(_,a,_,_),P,A1,A2,A3,A4,A5):- assertion_f([P,A1,A2,A3,A4,A5]).
-call_f(dac(_,_,c,_),P,A1,A2,A3,A4,A5):- callable_tf(P,5),xcall_f(P,A1,A2,A3,A4,A5).
-call_f(dac(d,_,_,_),P,A1,A2,A3,A4):- dbase_f(P,A1,A2,A3,A4).
-call_f(dac(_,a,_,_),P,A1,A2,A3,A4):- assertion_f([P,A1,A2,A3,A4]).
-call_f(dac(_,_,c,_),P,A1,A2,A3,A4):- callable_tf(P,4),xcall_f(P,A1,A2,A3,A4).
-call_f(dac(d,_,_,_),P,A1,A2,A3):- dbase_f(P,A1,A2,A3).
-call_f(dac(_,a,_,_),P,A1,A2,A3):- assertion_f([P,A1,A2,A3]).
-call_f(dac(_,_,c,_),P,A1,A2,A3):- callable_tf(P,3),xcall_f(P,A1,A2,A3).
-call_f(dac(d,_,_,_),P,A1,A2):- dbase_f(P,A1,A2).
-call_f(dac(_,a,_,_),P,A1,A2):- assertion_f([P,A1,A2]).
-call_f(dac(_,_,c,_),P,A1,A2):- callable_tf(P,2),xcall_f(P,A1,A2).
-call_f(dac(d,_,_,_),P,A1):- dbase_f(P,A1).
-call_f(dac(_,a,_,_),P,A1):- assertion_f([P,A1]).
-call_f(dac(_,_,c,_),P,A1):- callable_tf(P,1),xcall_f(P,A1).
-
-call_mt_f(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- callable_tf(P,9),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],xcall_f(CALL).
-call_mt_f(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7,A8):- callable_tf(P,8),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],xcall_f(CALL).
-call_mt_f(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7):- callable_tf(P,7),CALL=..[P,A1,A2,A3,A4,A5,A6,A7],xcall_f(CALL).
-call_mt_f(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6):- callable_tf(P,6),xcall_f(P,A1,A2,A3,A4,A5,A6).
-call_mt_f(dac(_,_,_,mt),P,A1,A2,A3,A4,A5):- callable_tf(P,5),xcall_f(P,A1,A2,A3,A4,A5).
-call_mt_f(dac(_,_,_,mt),P,A1,A2,A3,A4):- callable_tf(P,4),xcall_f(P,A1,A2,A3,A4).
-call_mt_f(dac(_,_,_,mt),P,A1,A2,A3):- callable_tf(P,3),xcall_f(P,A1,A2,A3).
-call_mt_f(dac(_,_,_,mt),P,A1,A2):- callable_tf(P,2),xcall_f(P,A1,A2).
-
-xcall_f(P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],\+ xcall_t(CALL).
-xcall_f(P,A1,A2,A3,A4,A5,A6,A7,A8):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],\+ xcall_t(CALL).
-xcall_f(P,A1,A2,A3,A4,A5,A6,A7):- CALL=..[P,A1,A2,A3,A4,A5,A6,A7],\+ xcall_t(CALL).
-xcall_f(P,A1,A2,A3,A4,A5,A6):- \+ xcall_t(P,A1,A2,A3,A4,A5,A6).
-xcall_f(P,A1,A2,A3,A4,A5):- \+ xcall_t(P,A1,A2,A3,A4,A5).
-xcall_f(P,A1,A2,A3,A4):- \+ xcall_t(P,A1,A2,A3,A4).
-xcall_f(P,A1,A2,A3):- \+ xcall_t(P,A1,A2,A3).
-xcall_f(P,A1,A2):- \+ xcall_t(P,A1,A2).
-xcall_f(P,A1):- \+ xcall_t(P,A1).
-xcall_f(P):- \+ xcall_t(P).
-
-assertion_f([AH,P|LIST]):- is_holds_true(AH),!,assertion_f([P|LIST]).
-assertion_f([AH,P|LIST]):- is_holds_false(AH),!,assertion_f([P|LIST]).
-% todo hook into loaded files!
-assertion_f(_):- not(useExternalDBs),!,fail.
-assertion_f([P|LIST]):- tiny_kb:'ASSERTION'(':FALSE-DEF',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
-assertion_f([P|LIST]):- tiny_kb:'ASSERTION'(':FALSE-MON',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
-
-
-% ================================================================================
-% end holds_f 
-% ================================================================================
-
-
 
 :-declare_dbase_local_dynamic(atloc,2).
 
@@ -409,22 +317,6 @@ assertion_f([P|LIST]):- tiny_kb:'ASSERTION'(':FALSE-MON',_,_UniversalVocabularyM
 % =================================================================================================
 % world database
 % =================================================================================================
-
-:-export(add_deduction/3).
-quiet_fact(Fact):-functor(Fact,F,A),quiet_fact(F,A).
-quiet_fact(isa,_).
-quiet_fact(argIsa,_).
-quiet_fact(mpred_prop,_).
-
-add_deduction(_Type,[],_How):-!.
-add_deduction(Type,[Fact|S],How):-!,add_deduction(Type,Fact,How),add_deduction(Type,S,How),!.
-add_deduction(Type,Fact,How):- ignore(loop_check_term(add_deduction_lc(Type,Fact,How),add_deduction_lc(Type,Fact),true)),!.
-
-add_deduction_lc(Type,Fact,_How):-quiet_fact(Fact),!,do_deduction_type(Type,Fact),!.
-add_deduction_lc(Type,Fact,How):-dmsg(add_deduction(Type,Fact,'_________from________',How)),do_deduction_type(Type,Fact),!.
-
-do_deduction_type(assert(_),Fact):-add(Fact).
-do_deduction_type(retract(_),Fact):-clr(Fact).
 
 
 % TODO: canonicalize clauses first!
@@ -460,20 +352,6 @@ extreme_debug(P):-nop(P).
 
 % :- moo:register_module_type(utility).
 
-% oncely later will throw an error if there where choice points left over by call
-oncely(:-(Call)):-!,Call,!.
-oncely(:-(Call)):-!,call_expanded(Call).
-oncely(Call):-once(Call).
-
-:- dynamic(non_assertable/1).
-non_assertable(WW,isVar(WW)):- var(WW),!.
-non_assertable(_:WW,Why):- !,non_assertable(WW,Why).
-non_assertable(WW,notAssertable(Why)):- compound(WW),functor_catch(WW,F,_),mpred_prop(F,notAssertable(Why)),!.
-% non_assertable(WW,as_is(Why)):- compound(WW),functor_catch(WW,F,_),!,mpred_prop(F,as_is(Why)),!.
-% non_assertable(WW,Why):- db_prop_game_assert
-
-:-thread_local assertedOnly/1.
-:-thread_local with_callMPred/1.
 
 % replaced the 1st with the 2nd and better version of retract
 % del(C0):- db_op_int(retract,C0)
@@ -582,98 +460,6 @@ retract_ar_fact(all,What):- copy_term(What,WO),ignore(once(WO)),must_det(What=@=
 retract_ar_fact(one,What):- predicate_property(What,dynamic),!, clause(What,true),retract(What:-true).
 retract_ar_fact(one,What):- predicate_property(What,_),!, clause_safe(What,true),!.
 retract_ar_fact(one,What):- dmsg(mssing(retract_ar_fact(one,What))).
-% ================================================
-% assert_isa/2
-% ================================================
-:-export assert_isa/2.
-
-assert_isa(I,T):- not(ground(I:T)),trace_or_throw(not(ground(assert_isa(I,T)))).
-assert_isa(I,T):- hotrace((loop_check(assert_isa_lc(I,T),true))).
-
-:-export assert_isa_lc/2.
-% skip formatter types
-assert_isa_lc(_I,T):- member(T,[string,action,dir]),!.
-assert_isa_lc(I,T):- hotrace(formattype(T)),!,dmsg(todo(dont_assert_is_ft(I,T))),!.
-assert_isa_lc(_,T):- once(define_type(T)),fail.
-assert_isa_lc(I,type):- define_type(I),!.
-assert_isa_lc(I,formattype):- define_ft(I),!.
-assert_isa_lc(I,T):- cannot_table_call(get_isa_asserted(I,T)),!.
-assert_isa_lc(I,T):- is_stable,!, hooked_asserta(isa(I,T)).
-assert_isa_lc(I,T):- must_det((hooked_asserta(isa(I,T)),logOnFailureIgnore(get_isa_backchaing(I,T)))).
-
-% ================================================
-% assert_isa HOOKS
-% ================================================
-hook:decl_database_hook(assert(_),DATA):-into_mpred_form(DATA,O),!,O=isa(I,T),hotrace(doall(assert_isa_hooked(I,T))).
-% hook:decl_database_hook(retract(_),isa(I,T)):-doall(db_retract_isa_hooked(I,T)).
-
-assert_isa_hooked(I,T):- not(ground(assert_isa(I,T))),!, trace_or_throw(not(ground(assert_isa(I,T)))).
-assert_isa_hooked(I,T):- asserta_if_new(moo:dbase_t(T,I)),fail.
-assert_isa_hooked(T,type):-!,define_type(T),!.
-assert_isa_hooked(T,formattype):-!,define_ft(T),!.
-assert_isa_hooked(Term,mpred):-!,decl_mpred(Term).
-assert_isa_hooked(Term,prologHybrid):-!,decl_mpred_hybrid(Term).
-assert_isa_hooked(Term,prologOnly):-!,decl_mpred_prolog(Term).
-assert_isa_hooked(I,_):- glean_pred_props_maybe(I),fail.
-assert_isa_hooked(I,T):- argsIsaProps(T),decl_mpred(I,T),fail.
-assert_isa_hooked(food5,'Weapon'):-trace_or_throw(assert_isa(food5,'Weapon')).
-
-% assert_isa_hooked(I,T):- motel:defconcept(I,and([lexicon,T])).
-% assert_isa_hooked(I,T):- motel:defprimconcept(I,T).
-% assert_isa_hooked(I,T):-dmsg((told(assert_isa(I,T)))).
-
-
-hook:decl_database_hook(assert(_),isa(I,T)):- doall(assert_isa_hooked_after(I,T)).
-
-assert_isa_hooked_after(_,type):-!.
-assert_isa_hooked_after(_,formattype):-!.
-assert_isa_hooked_after(_,T):-argsIsaProps(T),!.
-assert_isa_hooked_after(I,T):- is_creatable_type(T),!,assert_isa_hooked_creation(I,T).
-assert_isa_hooked_after(I,T):- not(extentKnown(T)),impliedSubClass(T,ST),extentKnown(ST),assert_isa(I,ST).
-%assert_isa_hooked_after(I,T):- assert_isa_hooked_creation(I,T).
-
-extentKnown(Ext):- arg(_,vv(type,dir,formattype,string),Ext).
-extentKnown(F):- is_creatable_type(F).
-extentKnown(F):- argsIsaProps(F).
-extentKnown(F):- is_asserted(isa(F,extentKnown)).
-
-
-% one of 4 special types
-assert_isa_hooked_creation(I,T):- is_creatable_type(T),!,call_after_game_load((world:create_instance(I,T,[]))).
-% sublass of 4 special types
-assert_isa_hooked_creation(I,T):- doall((is_creatable_type(ST),impliedSubClass(T,ST),call_after_game_load((world:create_instance(I,ST,[isa(T)]))))).
-
-:-export transitive_subclass_tst/2.
-transitive_subclass_tst(_,_):-!,fail.
-
-
-:-export(get_isa_backchaing/2).
-% get_isa_backchaing(A,T):- stack_depth(Level),Level>650,trace_or_throw(skip_dmsg_nope(failing_stack_overflow(get_isa_backchaing(A,T)))),!,fail.
-
-
-get_isa_backchaing(A,T):- hotrace((fact_loop_checked(isa(A,T),get_isa_backchaing_0(A,T)))).
-
-get_isa_backchaing_0(A,T):-  var(A),!,nonvar(T),setof(A,AT^(asserted_or_trans_subclass(AT,T),get_isa_asserted(A,AT)),List),!,member(A,List).
-get_isa_backchaing_0(A,T):-  var(T),!,setof(TT,AT^(get_isa_asserted(A,AT),asserted_or_trans_subclass(AT,TT)),List),!,member(T,List).
-get_isa_backchaing_0(A,T):-  get_isa_asserted(A,AT),asserted_or_trans_subclass(AT,T).
-
-not_ft(T):-asserted_or_trans_subclass(T,obj).
-
-:-export(get_isa_asserted/2).
-get_isa_asserted(A,T):- fact_loop_checked(isa(A,T),get_isa_asserted_0(A,T)).
-
-get_isa_asserted_0(A,T):- alt_dbase_t(T,A).
-get_isa_asserted_0(A,T):- nonvar(A),nonvar(T),cached_isa(T,formattype),!,term_is_ft(A,T).
-% get_isa_asserted_0(A,T):- compound(A),functor(A,F,_),!,get_isa_backchaing_1(F,T).
-get_isa_asserted_0(_,T):- not(atom(T)),!,fail.
-get_isa_asserted_0(A,T):- argsIsaProps(T),mpred_prop(A,T).
-get_isa_asserted_0(A,T):- atom(A),mud_isa_atom(A,T),!.
-
-
-mud_isa_atom(O,T):- atomic_list_concat_catch([T,_|_],'-',O),!.
-mud_isa_atom(O,T):- atom_concat(T,Int,O),catch(atom_number(Int,_),_,fail),!.
-
-cached_isa(I,T):-hotrace(get_isa_backchaing(I,T)).
 
 generated_fact(Fact):- ground(Fact),!,req(Fact).
 generated_fact(Fact):- (compound(Fact)-> true ; mpred_arity(F,A)), functor(Fact,F,A),Fact=..[F|Args],
@@ -731,7 +517,7 @@ univ_left0(M,M:Comp,List):- Comp=..List,!.
 
 hook:decl_database_hook(AR,C):- record_on_thread(dbase_change,changing(AR,C)).
 
-record_on_thread(Dbase_change,O):- thread_self(ID),capturing_changes(ID,Dbase_change),!,Z=..[Dbase_change,ID,O],assertz(Z).
+record_on_thread(Dbase_change,O):- thread_self(ID),thlocal:dbase_capture(ID,Dbase_change),!,Z=..[Dbase_change,ID,O],assertz(Z).
 
 holds_args([H|LIST],LISTO):- !, is_holds_true(H),!,LIST=LISTO.
 holds_args(HOLDS,LIST):- compound(HOLDS),HOLDS=..[H|LIST],is_holds_true(H),!.
@@ -740,13 +526,13 @@ holds_args(HOLDS,LIST):- compound(HOLDS),HOLDS=..[H|LIST],is_holds_true(H),!.
 % db_op/2
 % ================================================
 
-% db_op(query(HLDS,Must),creatableType(SubType)):- !, call_must(Must,is_creatable_type(SubType)).
+% db_op(query(HLDS,Must),creatableType(SubType)):- !, call_expanded_for(Must,is_creatable_type(SubType)).
 db_op(tell(_),props(_Obj,Props)):- Props ==[], !.
 
 db_op(query(Dbase_t, Req), must(Call)):-!,must(db_op(query(Dbase_t, Req), Call)).
 
 db_op(a,Wild):-!,db_op(tell(assertion),Wild).
-db_op(query(_HLDS,Must),isa(I,Type)):- !,call_must(Must,get_isa_backchaing(I,Type)).
+db_op(query(_HLDS,Must),isa(I,Type)):- !,call_expanded_for(Must,get_isa_backchaing(I,Type)).
 db_op(tell(_),isa(T,Type)):- !,assert_isa(T,Type),!.
 db_op(query(HLDS,call),Wild):- hotrace(transform_holds(HLDS,Wild,Simpler)),Wild\=Simpler,!,db_op(query(HLDS,call),Simpler).
 db_op(Op,Wild):- hilog_functor(HILOG),hotrace(transform_holds(HILOG,Wild,Simpler)),Wild\=Simpler,!,db_op(Op,Simpler).
@@ -792,7 +578,7 @@ db_op0(Op,and(C1,C2)):- !,db_op(Op,C1),db_op(Op,C2).
 db_op0(Op,(C1,C2)):- !,db_op(Op,C1),db_op(Op,C2).
 
 
-db_op0(query(HLDS,Must),props(Obj,Props)):- var(Props),!,findall(Prop,(call_must(query(HLDS,Must),dbase_t([P,Obj|REST])),Prop=..[P|REST]),Props).
+db_op0(query(HLDS,Must),props(Obj,Props)):- var(Props),!,findall(Prop,(call_expanded_for(query(HLDS,Must),dbase_t([P,Obj|REST])),Prop=..[P|REST]),Props).
 db_op0(Op ,props(Obj,Open)):- var(Open),!,trace_or_throw(db_op(Op,props(Obj,Open))).
 db_op0(_Op,props(_Obj,[])):- !.
 db_op0(Op,props(Obj,[P])):- nonvar(P),!,db_op(Op,props(Obj,P)).
@@ -826,12 +612,12 @@ db_op0(tell(_OldV),mpred(A)):- !,decl_mpred(A),!.
 db_op0(tell(_OldV),isa(A,mpred)):- !,decl_mpred(A),!.
 db_op0(tell(_OldV),isa(A,P)):- nonvar(P),functor(P,F,_),argsIsaProps(F),!,decl_mpred(A,P),!.
 
-db_op0(query(HLDS,Must),isa(Term,Var)):- !,call_must(query(HLDS,Must),hotrace(get_isa_backchaing(Term,Var))).
+db_op0(query(HLDS,Must),isa(Term,Var)):- !,call_expanded_for(query(HLDS,Must),hotrace(get_isa_backchaing(Term,Var))).
 db_op0(Op,isa(A,SubType)):- dbase_t(createableSubclassType,SubType,Type),!,db_op(Op,isa(A,Type)),db_op(Op,isa(A,SubType)).
 
 %db_op0(tell(_OldV),singleValued(Term)):- !,decl_mpred(Term),decl_mpred(Term,singleValued).
 %db_op0(tell(_OldV),multiValued(Term)):- !,functor_safe(Term,_,A),decl_mpred(Term),decl_mpred(Term,[multiValued,multi(A)]).
-db_op0(query(HLDS,Must),argIsa(P,N,T)):- call_must(query(HLDS,Must),(get_mpred_prop(P,argsIsa(ArgsIsa)),arg(N,ArgsIsa,T),must(nonvar(T)))).
+db_op0(query(HLDS,Must),argIsa(P,N,T)):- call_expanded_for(query(HLDS,Must),(get_mpred_prop(P,argsIsa(ArgsIsa)),arg(N,ArgsIsa,T),must(nonvar(T)))).
 
 
 db_op0(Op,A):- hotrace(must(once(correctArgsIsa(Op,A,AA)))), not(A=@=AA), !, db_op(Op,AA).
@@ -849,7 +635,7 @@ db_op0(Op,C0):- C0=..[Prop|ARGS],db_op_unit(Op,C0,Prop,ARGS).
 % db_op_unit/3
 % ================================================
 
-db_op_unit(query(HLDS,Must),_C0,Prop,ARGS):- get_mpred_prop(Prop,extentKnown),!,call_must(query(HLDS,Must),dbase_t_p2(Prop,ARGS)).
+db_op_unit(query(HLDS,Must),_C0,Prop,ARGS):- get_mpred_prop(Prop,extentKnown),!,call_expanded_for(query(HLDS,Must),dbase_t_p2(Prop,ARGS)).
 
 db_op_unit(Op,_C0,Prop,ARGS):- type_error_checking,!, cached_isa(Prop,type),trace_or_throw(db_op_unit(Op,type(Prop),ARGS)).
 
@@ -875,7 +661,7 @@ db_op_unit(Op,_C0,Prop,ARGS):-
       (db_op_loop(Op,Unit2,fail);db_op_exact(Op,Unit1)).
       
 % query_with_pred/1
-db_op_unit(query(Must,HLDS),C0,Prop,_RGS):- get_mpred_prop(Prop,query_with_pred(How)),!, call_must(query(Must,HLDS),call(How,C0)).
+db_op_unit(query(Must,HLDS),C0,Prop,_RGS):- get_mpred_prop(Prop,query_with_pred(How)),!, call_expanded_for(query(Must,HLDS),call(How,C0)).
 
 % assert_with_pred/1
 db_op_unit(tell(_),C0,Prop,_RGS):- get_mpred_prop(Prop,assert_with_pred(How)),!, must(nonvar(How)), once(ignore((call(How,C0), run_database_hooks(assert(z),C0)))).
@@ -909,37 +695,6 @@ db_op_exact(tell(Must),C):- grtrace, functor_catch(C,F,A), must_det((get_mpred_p
 %db_op_exact(Must, Term):- !,call_expanded_for(Must,Term).
 db_op_exact(Op,C):- trace_or_throw(unhandled(db_op_exact(Op,C))).
 
-:-export(call_expanded_for/2).
-call_expanded_for(Must,Call):- call_must(Must,Call).
-
-/*
-
-call_expanded_for_sv(WhatNot,F,A,G,OUT):- nonvar(OUT),replace_arg(G,A,NEW,CC),!,call_expanded_for_sv_2(WhatNot,F,A,CC,NEW),!,NEW=OUT.
-call_expanded_for_sv(WhatNot,F,A,G,OUT):- call_expanded_for_sv_2(WhatNot,F,A,G,OUT),!.
-
-call_expanded_for_sv_2(WhatNot,F,A,G,_OUT):-call_expanded([whatnot(WhatNot)],G,F,A),!.
-call_expanded_for_sv_2(_WhatNot,F,A,G,OUT):- defaultArgValue(G,F,A,OUT),!.
-
-*/
-
-:-export(call_expanded/1).
-%:-export(call_expanded/1).
-call_expanded(true):-!.
-call_expanded(G):-compound(G),!,call_expanded([],G).
-call_expanded(G):- trace_or_throw(var_call_expanded(G)).
-:-export(call_expanded/2).
-call_expanded(Doing,G):- functor(G,F,A),call_expanded(Doing,G,F,A).
-:-export(call_expanded/4).
-call_expanded(_Doing,true,_F,_A):-!.
-call_expanded(Doing,G,dbase_t,A):-G=..[dbase_t,P|ARGS],!,into_mpred_form(G,dbase_t,P,A,ARGS,O),!,call_expanded(Doing,O).
-call_expanded(_Doing,G,F,_A):-predicate_property(G,visible),not(mpred_prop(F,_)),!,debugOnError(G).
-call_expanded(Doing,G,F,A):-not(member(singleValued,Doing)),mpred_prop(F,singleValued),arg(1,G,NonVar),nonvar(NonVar),!,once(call_expanded([singleValued|Doing],G,F,A)).
-call_expanded(Doing,G,F,A):-not(member(ask_module(_),Doing)),mpred_prop(F,ask_module(M)),!,'@'(M:call(call_expanded([ask_module(M)|Doing],M:G,F,A)),M).
-call_expanded(Doing,G,F,A):-not(member(query_with_pred(_),Doing)),mpred_prop(F,query_with_pred(M)),!,call_expanded([query_with_pred(M)|Doing],call(M,G),F,A).
-call_expanded(Doing,G,F,A):-not(member(assertedOnly,Doing)),!,is_asserted(G);call_expanded([assertedOnly|Doing],G,F,A).
-call_expanded(_Doing,G,F,_A):-assertedOnly(F),!,is_asserted(G).
-call_expanded(_Doing,G,F,_A):-with_callMPred(F),!,call_mpred(F,G).
-call_expanded(Doing,G,F,A):-not(member(with_callMPred,Doing)),!,(call_mpred(F,G);call_expanded([with_callMPred|Doing],G,F,A)).
 
 
 :-export((dbase_t/1,dbase_t/2)).
@@ -989,53 +744,6 @@ dbase_t_p2(P,[L|IST]):-is_holds_true(P),!,dbase_t_p2(L,IST).
 dbase_t_p2(P,LIST):-is_holds_false(P),!,dbase_f(LIST).
 dbase_t_p2(P,LIST):- CALL=..[dbase_t,P|LIST],call(CALL).
 
-% ================================================
-% call_must/2
-% ================================================
-:-export((call_must/2)).
-
-call_must(Must,M:Call):- atom(M),!,call_must(Must,Call).
-call_must(M:Must,Call):- atom(M),!,call_must(Must,Call).
-call_must(query(Must,dbase_t),Call):- !,call_must(Must,Call).
-call_must(query(dbase_t,Must),Call):- !,call_must(Must,Call).
-call_must(query(Must,call),Call):- !,call_must(Must,Call).
-call_must(query(call,Must),Call):- !,call_must(Must,Call).
-call_must(query(_HOLDS,Must),Call):- !,call_must(Must,Call).
-call_must(tell(Must),Call):- !,call_must(Must,Call).
-call_must(ask(Must),Call):- !,call_must(Must,Call).
-call_must(!,Call):- !,call_must(once,Call).
-call_must(Must,Call):- functor_catch(Call,F,_),term_variables(Call,Vs),!,call_must_vars(Must,F,Vs,Call).
-
-call_must_vars(once,F,Vs,Call):- !,once(call_must_all(once,F,Vs,Call)).
-call_must_vars(must,F,Vs,Call):- !,must(call_must_all(must,F,Vs,Call)).
-call_must_vars(Op,F,[],Call):- !,once(call_must_all(Op,F,[],Call)).
-call_must_vars(Op,F,Vs,Call):- call_must_all(Op,F,Vs,Call).
-
-sc1(F,C):-(mpred_prop(F,nonGroundOK);in_prolog_source_code),!,C.
-sc1(_,C):-C, ignore((not(ground(C)),dmsg(non_ground_sc1(C)))).
-
-% call_must_all(Must,F,Vs,Call):- loop_check(sc1(F,call_must_all0(Must,F,Vs,Call)),(dmsg(failed_looped(call_must_all0(Must,F,Vs,Call))),!,fail)).
-call_must_all(Must,F,Vs,Call):- loop_check(sc1(F,call_must_all0(Must,F,Vs,Call)),fail).
-
-call_must_all0(_,subclass,_Vs,C):-!,is_asserted(subclass,C).
-call_must_all0(_,get_isa_backchaing,_Vs,C):-!,C.
-
-% call_must_all0(Op, F,Vs,Wild):-dmsg(call_must(Op,Wild)),fail.
-call_must_all0(assertedOnly,_,_Vs,C):-!,dtrace,is_asserted(C).
-call_must_all0(_ ,F,[],Call):-!,call_mpred(F,Call),!.
-call_must_all0(_ ,F,_Vs,Call):-not(arg(_,Call,vvar)),!,call_mpred(F,Call),!.
-call_must_all0(_ ,F,Vs,Call):- setof(Vs,call_mpred(F,Call),VVs),member(Vs,VVs).
-
-call_mpred(M:C):-atom(M),!,call_mpred(C).
-call_mpred(C):- compound(C),functor(C,F,_),!,call_mpred(F,C).
-call_mpred(_,C):- predicate_property(C,_),debugOnError(C),check_was_known_false(C).
-call_mpred(F,C):- not(mpred_prop(F,hasStub(body_req))),is_asserted(F,C).
-
-
-naf(Goal):-not(req(Goal)).
-
-:-decl_mpred_prolog(naf/1).
-:-decl_mpred_prolog(call_mpred/1).
 
 % ================================================
 % db_assert_[mv|sv]/3
@@ -1043,6 +751,7 @@ naf(Goal):-not(req(Goal)).
 
 :-dmsg_hide(db_assert_mv).
 :-dmsg_hide(db_assert_sv).
+:-dmsg_hide(db_op_exact).
 
 % assert_with to tell(OldV) mutlivalue pred
 :-export((db_assert_mv/4)).
@@ -1131,55 +840,8 @@ hooked_asserta_confirmed(CNEW,A,NEW):-
    logOnFailure((req(CNOW),CNEW:NEW=@=CNOW:NOW)),!.
 hooked_asserta_confirmed(CNEW,A,NEW):-dmsg(unconfirmed(hooked_asserta_confirmed(CNEW,A,NEW))).
 
-:-export((noDefaultValues/1)).
-:-thread_local noDefaultValues/1.
-:-export((noRandomValues/1)).
-:-thread_local noRandomValues/1.
-
-:-meta_predicate_transparent(with_fallbacks(0)).
-with_fallbacks(Call):-with_no_assertions(noDefaultValues(_),Call).
-
-:-meta_predicate_transparent(with_fallbacksg(0)).
-with_fallbacksg(Call):-with_no_assertions(noRandomValues(_),Call).
-
-:-meta_predicate_transparent(with_no_fallbacksg(0)).
-with_no_fallbacksg(Call):-with_assertions(noRandomValues(_),Call).
-
-:-meta_predicate_transparent(with_no_fallbacks(0)).
-with_no_fallbacks(Call):-with_assertions(noDefaultValues(_),Call).
-
-
-
-no_fallback(subclass,2).
-no_fallback(P,2):-not(mpred_prop(P,singleValued)).
-
-
-:-export(fallback_value/3).
-fallback_value(Prop,_Obj,_Value):-no_fallback(Prop,2),!,fail.
-fallback_value(_Prop,Obj,_Value):-var(Obj),!,fail.
-fallback_value(Prop,Obj,Value):-Call=..[Prop,Obj,_], with_assertions(noDefaultValues(Call),defaultArgValue(Call,Prop,2,ValueR)),!,Value=ValueR.
-
-:-export(defaultArgValue/4).
-defaultArgValue(Call,F,A,OLD):- stack_check(1000), mpred_prop(F,default_sv(A,OLD)),!,dmsg(fallback_value(Call,F,default_sv(A,OLD))).
-defaultArgValue(facing(_,_),_,2,"n"):-!.
-defaultArgValue(change(_,_),_,2,200):-!.
-defaultArgValue(damage(_,_),_,2,500):-!.
-defaultArgValue(Call,F,A,Value):-Call=..[F,P|Args],defaultArgValue(Call,F,A,P,Args,Value).
-
-defaultArgValue(Call,F,A,P,Args,Value):-var(P),!,argIsa_call(F,A,Type),defaultTypeValue(Call,Type,Value),!,dmsg(using_defaultTypeValue(Call,Type,Value)).
-defaultArgValue(_Call,F,2,P,[Arg],Arg):-create_someval(F,P,Arg),!. 
-defaultArgValue(Call,F,LastPlus1,I,Args,Value):- isa(I,Type),catch(get_type_props(Type,PropList),_,fail),Last is LastPlus1 - 1,
-      functor(Prop,F,Last),member(Prop,PropList),show_call(arg(Last,Prop,Value)),!.
-
-defaultArgValue(Call,F,A,P,Args,Value):-argIsa_call(F,A,Type),defaultTypeValue(Call,Type,Value),!,dmsg(using_defaultTypeValue(Call,Type,Value)).
-
-
-
-defaultTypeValue(Call,_,_):- noRandomValues(Call),!,fail.
-defaultTypeValue(_,Type,_):- noRandomValues(Type),!,fail.
-defaultTypeValue(_Info,dir,"n").
-defaultTypeValue(_Info,int,0).
-defaultTypeValue(Call,Type,Out):- create_random(Type,ROut,nonvar(ROut)),dmsg(fake_defaultValue(Call,Type,ROut=Out)),!,Out=ROut.
+:-include(dbase_i_propvals).
+:-include(dbase_i_call).
 
 replace_arg(C,A,OLD,CC):- 
    C=..FARGS,
@@ -1265,47 +927,11 @@ cycAssert(A,B):-trace_or_throw(cycAssert(A,B)).
 :- rescan_mpred_props.
 
 
-:-export(get_type_props/2).
-
-get_type_props(Type,PropList):- with_no_fallbacks(with_no_fallbacksg(loop_check(get_type_props_lc(Type,PropList),fail))).
-get_type_props_lc(Type,PropList):- call_tabled(type(Type)),
-   findall(PropU,(findall_type_default_props(Inst,Type,Prop),subst(Prop,Inst,self,PropU)),PropS),flatten_set([PropS],PropList),PropList\=[].
-
-
-:-export(instance_missing_props/3).
-instance_missing_props(I,LPS,PS):- findall(P,(member(P,LPS),inst_missing_prop(I,P)),PS),!.
-
-:-export(get_inst_default_props/3).
-get_inst_default_props(I,PropListL,Missing):-
-    findall(PropList,(get_type_props(Type,PropList),isa(I,Type)),PropListS),flatten_set(PropListS,PropListL),
-       instance_missing_props(I,PropListL,Missing).
-      
-inst_missing_prop(I,P):-P=..[F|Args],inst_missing_prop(I,F,Args).
-
-inst_missing_prop(_I,F,_Args):-not(mpred_prop(F,singleValued)),!,fail.
-inst_missing_prop(_I,F,_Args):-mpred_prop(F,flag),!,fail.
-inst_missing_prop(I,F,Args):-C=..[F,I|Args],get_sv_argnum(F,[I|Args],A),arg(A,C,_Default),replace_arg(C,A,BLANK,COLD),ignore(qreq(COLD)),!,var(BLANK).
-
-
-get_sv_argnum(F,Args,ArgNum):-once(mpred_prop(F,functionalArg(ArgNum));length(Args,ArgNum)).
-
 :-export(forall_setof/2).
 forall_setof(ForEach,Call):-
    findall(ForEach,ForEach,ForEachAll),
    list_to_set(ForEachAll,Set),!,
    ignore(forall(member(ForEach,Set),Call)).
-
-:-export(scan_default_props/0).
-
-scan_default_props:- loop_check(scan_default_props_lc,true).
-scan_default_props_lc:- dmsg(todo(fix(scan_default_props,"to not set atloc/2"))), fail,
-   once(forall_setof(get_type_props(Type,PropList),
-    forall_setof(isa(I,Type), 
-         ignore((not(Type == I),
-         once(instance_missing_props(I,PropList,Missing)),Missing\=[],
-         dmsg(scan_default_props(I,Type,missing_from(Missing,PropList))),
-         padd(I,Missing)))))),fail.
-scan_default_props_lc:-ignore(rescan_duplicated_facts).
 
 :-dynamic_multifile_exported((moo:was_imported_kb_content/1)).
 
@@ -1410,7 +1036,7 @@ game_assert_fast(C0):- ignore(assert_deduced_arg_isa_facts(C0)),add(C0),run_data
 mpred_prop(G,assert_with(game_assert)):- moo:assertionMacroHead(G).
 
 assertOnLoad(ClassTemplate):- compound(ClassTemplate), ClassTemplate=..[class_template,Type|Props],
-      flatten(Props,AllProps), !, assertOnLoad(default_type_props(self,Type,AllProps)).
+      flatten(Props,AllProps), !, assertOnLoad(default_type_props(Inst,Type,AllProps)).
 assertOnLoad(X):-game_assert(X).
 
 setTemplate(X):-game_assert(X).
@@ -1463,5 +1089,16 @@ user:term_expansion(CL,moo:was_imported_kb_content(CL)):- is_clause_moo_special(
 % :-load_motel.
 
 :- include(logicmoo('vworld/moo_footer.pl')).
+
+agent_text_command(_Agent,_Text,_AgentTarget,_Cmd):-fail.
+/*
+    coerce/3,
+    rescan_dbase_t_once/0,
+    rescan_dbase_t/0,
+          enter_term_anglify/2,
+           run_database_hooks/2,
+           agent_text_command/4,         
+*/
+:- rescan_mpred_props.
 
 

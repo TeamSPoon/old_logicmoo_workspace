@@ -53,10 +53,11 @@ room_center(Room,X,Y,Z):-
       center_xyz(MaxZ,Z),!,
       dmsg(todo("get room size and calc center ",Room)).
 
-locationToRegion(Obj,Obj):-var(Obj),dmsg(warn(var_locationToRegion(Obj,Obj))),!.
-locationToRegion(xyz(Room,_,_,_),Region2):-nonvar(Room),!,locationToRegion(Room,Region2).
-locationToRegion(Obj,Obj):-nonvar(Obj),isa(Obj,region),!. % inRegion(Obj,Room).
-locationToRegion(Obj,Obj):-dmsg(warn(locationToRegion(Obj,Obj))),!.
+locationToRegion(Obj,RegionIn):-locationToRegion_0(Obj,Region),!,RegionIn=Region.
+locationToRegion_0(Obj,Obj):-var(Obj),dmsg(warn(var_locationToRegion(Obj,Obj))),!.
+locationToRegion_0(xyz(Room,_,_,_),Region2):-nonvar(Room),!,locationToRegion_0(Room,Region2).
+locationToRegion_0(Obj,Obj):-nonvar(Obj),isa(Obj,region),!. % inRegion(Obj,Room).
+locationToRegion_0(Obj,Obj):-dmsg(warn(locationToRegion(Obj,Obj))),!.
 
 loc_to_xy(LOC,X,Y,xyz(Room,X,Y,1)):- locationToRegion(LOC,Room),!.
 loc_to_xy(Room,X,Y,xyz(Room,X,Y,1)).
@@ -146,6 +147,7 @@ inside_of(Obj,What):-is_asserted(wearing(What,Obj)).
 
 put_in_world(self):-!.
 put_in_world(Agent):-loop_check(put_in_world_lc(Agent),true),!.
+
 put_in_world_lc(Obj):-is_asserted(atloc(Obj,_)),!.
 put_in_world_lc(Obj):-inside_of(Obj,What),ensure_in_world(What),!.
 put_in_world_lc(Obj):-with_fallbacksg(with_fallbacks(put_in_world_lc_gen(Obj))),!.
@@ -162,7 +164,7 @@ create_someval(atloc,Obj,LOC) :- must_det(nonvar(Obj)),
    must_det(actualRegion(Obj,Region)),
    must_det((in_grid(Region,LOC),unoccupied(Obj,LOC))),!.
 
-create_someval(inRegion,Obj,Region) :- actualRegion(Obj,Region),!.
+% create_someval(inRegion,Obj,Region) :- actualRegion(Obj,Region),!.
 
 create_someval(Prop,Obj,_):- Call=.. [Prop,Obj,_],noDefaultValues(Call),!,fail.
 create_someval(Prop,Obj,Value):- fallback_value(Prop,Obj,DValue),!,Value=DValue.
@@ -195,7 +197,7 @@ random_xyz(LOC):-
 
 random_xyz(xyz('Area1000',1,1,1)):-  trace_or_throw(game_not_loaded).
 
-unoccupied(_Obj,Loc):- not(is_asserted(atloc(_,Loc))),!.
+unoccupied(_,Loc):- not(is_asserted(atloc(_,Loc))),!.
 unoccupied(_,_):-!.
 unoccupied(Obj,Loc):- loop_check(unoccupied_lc(Obj,Loc),not(is_asserted(atloc(_,Loc)))),!.
 unoccupied_lc(Obj,Loc):- is_occupied(Loc,What),!,What=Obj.

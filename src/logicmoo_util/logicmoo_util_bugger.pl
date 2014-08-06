@@ -198,6 +198,7 @@ with_pi(_, M:P ,Pred3):-!,with_pi(M,P,  Pred3).
 with_pi(M, F/A ,Pred3):-!,functor(P,F,A),M:with_pi(M,P,F/A,Pred3).
 with_pi(M, P ,Pred3):-  functor(P,F,A),M:with_pi(M,P,F/A,Pred3).
 
+:- export(with_pi/4).
 with_pi(M,P,F/A,Pred3):- ((integer(A),atom(M),atom(F),functor(P,F,A))),
    ('@'(call(Pred3,M,P,F/A),M)),!.
 with_pi(M,P,FA,Pred3):- trace_or_throw(invalide_args(Pred3,M,P,FA)).
@@ -223,6 +224,7 @@ def_meta_predicate(F,S,E):- trace_or_throw(def_meta_predicate(F,S,E)).
 % ----------
 
 :- export((dynamic_multifile_exported)/1).
+:- export((dynamic_multifile_exported)/3).
 :- meta_predicate(( dynamic_multifile_exported(:), dynamic_multifile_exported(-,-,-))).
 :- module_transparent((dynamic_multifile_exported)/1).
 dynamic_multifile_exported( M:FA ):- M:with_pi(M:FA,(dynamic_multifile_exported)).
@@ -1014,7 +1016,7 @@ pp_listing(Pred):- functor_catch(Pred,File,A),functor_catch(FA,File,A),listing(F
 with_assertions( [],Call):- !,Call.
 with_assertions( [With|MORE],Call):- !,with_assertions(With,with_assertions(MORE,Call)).
 with_assertions( (With,MORE),Call):- !,with_assertions(With,with_assertions(MORE,Call)).
-with_assertions(With,Call):- setup_call_cleanup(asserta(With),Call,must(retract(With))).
+with_assertions(With,Call):- copy_term(With,WithA), setup_call_cleanup(asserta(WithA),Call,must_det(retract(WithA))).
 
 :-meta_predicate_transparent(with_no_assertions(?,?)).
 with_no_assertions(Head,Call):-with_assertions((Head:-!,fail),Call).

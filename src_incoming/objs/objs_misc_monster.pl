@@ -236,7 +236,7 @@ moo:type_max_damage(agent,120).
 
 % :-end_module_type(dynamic).
 
-moo:default_type_props(self,Type,[named(self),kwLabel(Lbl)|SP]):-  moo:label_type_props(Lbl,Type,SomeProps),nonvar(Type),flatten(SomeProps,SP).
+moo:default_type_props(Self,Type,[named(Self),kwLabel(Lbl)|SP]):-  moo:label_type_props(Lbl,Type,SomeProps),nonvar(Type),flatten(SomeProps,SP).
 
 % Vacuum World example objects........
 moo:label_type_props(wl,wall,[height(3),weight(4)]).

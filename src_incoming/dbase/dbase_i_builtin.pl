@@ -140,9 +140,9 @@ term_anglify(term_anglify(Term,Text),[prolog(Term),is,converted,to,english,using
 
 multiValued(verb_alias(string,string)).
 
-%multiValued(label_type_props(string,type,list(term(property)))).
+prologOnly(label_type_props(string,type,list(term(property)))).
 
-%multiValued(type_grid(type,int,term)).
+prologOnly(type_grid(type,int,term)).
 
 multiValued(action_rules(agent,verb,term(obj),term(list(term(property))))).
 
@@ -369,7 +369,7 @@ singleValued(facing(obj,dir(n))).
 singleValued(facing(obj,dir)).
 singleValued(height(obj,int)).
 singleValued(objid(obj,id)).
-singleValued(inRegion(term,region)).
+singleValued(inRegion(obj,region)).
 singleValued(last_command(agent,command)).
 singleValued(location_center(region,xyz(region,int,int,int))).
 singleValued(movedist(agent,int(1))).
@@ -395,11 +395,13 @@ singleValued(height(obj,int)).
 multiValued(comment(term,string)).
 multiValued(pathBetween(region,dir,region)).
 
-multiValued(default_type_props(id,type,list(voprop))).
+prologOnly(default_type_props(id,type,list(voprop))).
+prologOnly(one_default_type_prop(id,type,voprop)).
 
-default_type_props(self,food,[height(0)]).
 
-default_type_props(self,spatialthing,[height(0)]).
+default_type_props(_,food,[height(0)]).
+
+one_default_type_prop(self,spatialthing,height(0)).
 
 
 

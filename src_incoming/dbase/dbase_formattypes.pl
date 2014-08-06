@@ -120,9 +120,11 @@ argIsa_call_0(formatted,_,term).
 argIsa_call_0(ft_info,1,formattype).
 argIsa_call_0(ft_info,2,term).
 argIsa_call_0(genlPreds,2,mpred).
+argIsa_call_0(inRegion,2,obj).
 argIsa_call_0(inRegion,2,region).
 argIsa_call_0(isa,1,term).
 argIsa_call_0(isa,2,type).
+argIsa_call_0(disjointWith,_,type).
 argIsa_call_0(memory,2,term).
 argIsa_call_0(mpred_prop,1,mpred).
 argIsa_call_0(mpred_prop,2,voprop).

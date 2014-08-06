@@ -44,7 +44,7 @@
             num_near/3,
             asInvoked/2,
             define_type/1,
-            findall_type_default_props/3,
+            
                        
           show_kb_via_pred/3,
           default_repl_obj_to_string/3,
@@ -131,23 +131,13 @@ cached(G):-catch(G,_,fail).
 define_subtype(O,T):- must_det(ground(O:T)), /*define_type(O), define_type(T),*/ add(subclass(O,T)).
 
 
-findall_type_default_props(Inst,Type,TraitsO):-nonvar(Inst),!,
-   findall(Props,each_default_type_props(Inst,Type,Props),Traits),flatten_set(Traits,TraitsO),!.
-findall_type_default_props(Inst,Type,TraitsO):-Inst=self,
-   findall(Props,each_default_type_props(Inst,Type,Props),Traits),flatten_set(Traits,TraitsO),!.
-
-each_default_type_props(Inst,Type,Props):-call_no_cuts(moo:default_type_props(Inst,Type,Props)).
-
 create_meta(T,P,C,MT):-
    must_det(split_name_type(T,P,CT)),
    ignore(C=CT),
    ignore(((ground(C:MT)),C\=MT,define_subtype(C,MT))),
       ignore(((ground(P:C)),add(isa(P,C)))),
       ignore(((ground(P:MT)),add(isa(P,MT)))),!.
-/*
-   must(findall_type_default_props(P,C,Props)),!,
-   must(padd(P,Props)),!.
-*/
+
 rez_to_inventory(Whom,T,P):-
    create_meta(T,P,_,item),
    padd(Whom,possess(P)).
@@ -258,10 +248,6 @@ moo:valueReset(charge,max_charge).
 
 */
 
-add_missing_instance_defaults(P):-
-   get_inst_default_props(P,_PropListL,Missing),
-   show_call(padd(P,Missing)).
-
 moo:creatableType(region).
 
 create_instance_0(T, item, List):-
@@ -305,11 +291,11 @@ same(X,Y):- samef(X,Y).
 samef(X,Y):- X=Y,!.
 samef(X,Y):- notrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci(XF,YF)))).
 
-moo:default_type_props(self,region,opaqueness(1)).
-moo:default_type_props(self,obj,opaqueness(100)).
-moo:default_type_props(self,item,listPrice(0)).
-moo:default_type_props(self,agent,last_command(stand)).
-moo:default_type_props(self,agent,[
+moo:default_type_props(_,region,opaqueness(1)).
+moo:default_type_props(_,obj,opaqueness(100)).
+moo:default_type_props(_,item,listPrice(0)).
+moo:default_type_props(_,agent,last_command(stand)).
+moo:default_type_props(_,agent,[
                        max_damage(500),
                        max_charge(200),
                        damage(500),

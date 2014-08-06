@@ -104,11 +104,7 @@ is_compiling_sourcecode:-moo:is_compiling,!.
 is_compiling_sourcecode:-compiling, current_input(X),not((stream_property(X,file_no(0)))),prolog_load_context(source,F),not((moo:loading_game_file(_,_))),F=user,!.
 is_compiling_sourcecode:-compiling,dmsg(system_compiling),!.
 
-% :-export((capturing_changes/1)).
-:-thread_local capturing_changes/2.
-:-dynamic capturing_changes/2.
-
-while_capturing_changes(Call,Changes):-thread_self(ID),with_assertions(capturing_changes(ID,_),(Call,get_dbase_changes(ID,Changes),clear_dbase_changes(ID))).
+while_capturing_changes(Call,Changes):-thread_self(ID),with_assertions(thlocal:dbase_capture(ID,_),(Call,get_dbase_changes(ID,Changes),clear_dbase_changes(ID))).
 
 clear_dbase_changes(ID):-retractall(thlocal:dbase_change(ID,_)).
 get_dbase_changes(ID,Changes):-findall(C,thlocal:dbase_change(ID,C),Changes).

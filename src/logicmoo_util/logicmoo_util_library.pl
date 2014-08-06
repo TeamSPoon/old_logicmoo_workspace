@@ -292,6 +292,24 @@ functor_safe_compound(P,F,A):- functor_catch(P,F,A).
 functor_safe_compound(P,F,A):- var(F),strip_f_module(P,P0),!,functor_catch(P0,F0,A),strip_f_module(F0,F),!.
 functor_safe_compound(P,F,A):- strip_f_module(P,P0),strip_f_module(F,F0),!,functor_catch(P0,F0,A).
 
+
+:- dynamic_multifile_exported((do_expand_args/3)).
+
+do_expand_args(Exp,Term,Out):- compound(Term),!,do_expand_args_c(Exp,Term,Out).
+do_expand_args(_,Term,Term).
+
+do_expand_args_c(Exp,[L|IST],Out):- !,do_expand_args_l(Exp,[L|IST],Out).
+do_expand_args_c(Exp,Term,Out):- Term=..[P|ARGS],do_expand_args_pa(Exp,P,ARGS,Out).
+
+do_expand_args_pa(Exp,Exp,ARGS,Out):- !,member(Out,ARGS).
+do_expand_args_pa(Exp,P,ARGS,Out):- do_expand_args_l(Exp,ARGS,EARGS), Out=..[P|EARGS].
+
+do_expand_args_l(_,A,A):- var(A),!.
+do_expand_args_l(_,[],[]):- !.
+do_expand_args_l(Exp,[A|RGS],[E|ARGS]):- do_expand_args(Exp,A,E),do_expand_args_l(Exp,RGS,ARGS).
+
+
+
 % :- moo_hide_childs(functor_safe/2).
 % :- moo_hide_childs(functor_safe/3).
 
