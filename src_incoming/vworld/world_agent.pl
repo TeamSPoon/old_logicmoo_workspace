@@ -71,11 +71,11 @@ call_agent_action_lc(Agent,CMD):-
    where_atloc(Agent,Where),
    raise_location_event(Where,notice(reciever,begin(Agent,CMD))),
    flush_output,
-   catch(call_agent_where_action_lc(Agent,Where,CMD),E,fmt('call_agent_action/2 Error ~q ',[E])).
+   catch(debugOnError(must_det(call_agent_where_action_lc(Agent,Where,CMD))),E,fmt('call_agent_action/2 Error ~q ',[E])).
 
 
 % complete event
-call_agent_where_action_lc(Agent,Where,CMD):- moo:agent_call_command(Agent,CMD),flush_output,!,raise_location_event(Where,notice(reciever,done(Agent,CMD))),!.
+call_agent_where_action_lc(Agent,Where,CMD):- debugOnError(moo:agent_call_command(Agent,CMD)),flush_output,!,raise_location_event(Where,notice(reciever,done(Agent,CMD))),!.
 % fail event
 call_agent_where_action_lc(Agent,Where,CMD):- raise_location_event(Where,notice(reciever,failed(Agent,CMD))),!.
 

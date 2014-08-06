@@ -73,8 +73,8 @@ choose_asserted(Prop,Obj,Value):- transitive_other(Prop,Obj,What),call(Prop,What
 maybe_cache(Prop,Obj,Value,What):-not(not(maybe_cache_0(Prop,Obj,Value,What))).
 
 checkNoArgViolation(isa,_Obj,_Value):-!.
-checkNoArgViolation(Prop,Obj,Value):-call_argIsa(Prop,2,Type),violatesType(Value,Type),trace_or_throw(violatesType_maybe_cache(Prop,Obj,Value:Type)).
-checkNoArgViolation(Prop,Obj,Value):-call_argIsa(Prop,1,Type),violatesType(Obj,Type),trace_or_throw(violatesType_maybe_cache(Prop,Obj:Type,Value)).
+checkNoArgViolation(Prop,Obj,Value):-call_argIsa(Prop,2,Type),violatesType(Value,Type),findall(OT,isa(Value,OT),OType),trace_or_throw(violatesType_maybe_cache(Prop,Obj,Value,OType\=Type)).
+checkNoArgViolation(Prop,Obj,Value):-call_argIsa(Prop,1,Type),violatesType(Obj,Type),findall(OT,isa(Obj,OT),OType),trace_or_throw(violatesType_maybe_cache(Prop,Obj,Value,OType\=Type)).
 checkNoArgViolation(_Prop,_Obj,_Value):-!.
 
 hook:decl_database_hook(assert(_),Fact):-Fact=..[Prop,Obj,Value],checkNoArgViolation(Prop,Obj,Value).
@@ -88,15 +88,22 @@ maybe_cache_0(Prop,Obj,Value,What):- padd(Obj,Prop,Value),
 :-dynamic_multifile_exported(on_change_once/3).
 :-dynamic_multifile_exported(on_change_always/3).
 
+unverifiableType(term).
+unverifiableType(voprop).
+unverifiableType(mpred).
+unverifiableType(fpred).
+unverifiableType(formattype).
+unverifiableType(type).
+unverifiableType(term(_)).
+unverifiableType(list(_)).
+
 violatesType(Value,Type):-var(Value),!,Type=var.
-violatesType(_,term):-!,fail.
-violatesType(_,type):-!,fail.
-violatesType(_,formattype):-!,fail.
+violatesType(_,Type):- unverifiableType(Type),!,fail.
+% violatesType(_,type):-!,fail.
 violatesType(Value,int):-number(Value),!,fail.
-violatesType(_,_):-!,fail.
-violatesType(apath(_,_),Type):-!,(Type\=areaPath,Type\=obj).
-violatesType(Value,Type):-compound(Type),!,not(term_is_ft(Value,Type)),!.
-violatesType(Value,Type):- no_loop_check(not(get_isa_backchaing(Value,Type))).
+%violatesType(apath(_,_),Type):-!,(Type\=areaPath,Type\=obj).
+violatesType(Value,Type):- compound(Type),!,not(term_is_ft(Value,Type)),!.
+violatesType(Value,Type):- once((get_isa_backchaing(Value,_))), no_loop_check(not(get_isa_backchaing(Value,Type))).
 
 hook:decl_database_hook(Type,Changer):- retract(on_change_once(Type,Changer,Call)),Call.
 hook:decl_database_hook(Type,Changer):- forall(on_change_always(Type,Changer,Call),Call).
@@ -141,20 +148,21 @@ defaultTypeValue(Call,Type,Out):- create_random(Type,ROut,nonvar(ROut)),dmsg(def
 :-export(findall_type_default_props/3).
 
 findall_type_default_props(Inst,Type,TraitsO):-nonvar(Inst),!,
-   findall(Props,each_default_type_props(Inst,Type,Props),Traits),flatten_set(Traits,TraitsO),!.
+   findall(Props,each_default_inst_type_props(Inst,Type,Props),Traits),flatten_set(Traits,TraitsO),!.
 
 findall_type_default_props(Inst,Type,TraitsO):- % Inst=self, 
-        findall(Props,each_default_type_props(Inst,Type,Props),Traits),flatten_set(Traits,TraitsO),!.
+        findall(Props,each_default_inst_type_props(Inst,Type,Props),Traits),flatten_set(Traits,TraitsO),!.
 
 
 get_type_with_default_props(Type):-call_tabled(get_type_with_default_props_0(Type)).
 
 get_type_with_default_props_0(Type):- is_asserted_clause(moo:one_default_type_prop(_,Type,_),_),nonvar(Type).
-get_type_with_default_props_0(Type):- is_asserted_clause(moo:default_type_props(_,Type,_),_),nonvar(Type).
+get_type_with_default_props_0(Type):- is_asserted_clause(moo:default_type_props(Type,_),_),nonvar(Type).
+get_type_with_default_props_0(Type):- is_asserted_clause(moo:default_inst_type_props(_,Type,_),_),nonvar(Type).
 get_type_with_default_props_0(Type):- is_asserted_clause(moo:label_type_props(_,Type,_),_),nonvar(Type).
 
-each_default_type_props(Inst,Type,[Prop]):-call_no_cuts(moo:one_default_type_prop(Inst,Type,Prop)).
-each_default_type_props(Inst,Type,Props):-call_no_cuts(moo:default_type_props(Inst,Type,Props)).
+each_default_inst_type_props(Inst,Type,[Prop]):-call_no_cuts(moo:one_default_type_prop(Inst,Type,Prop)).
+each_default_inst_type_props(_,Type,Props):-call_no_cuts(moo:default_type_props(Type,Props)).
 
 moo:one_default_type_prop(apath(Region,_Dir),areaPath,inRegion(Region)).
 

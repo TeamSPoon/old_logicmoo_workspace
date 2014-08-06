@@ -151,7 +151,7 @@ declare_dbase_local_dynamic(F,A):- dbase_mod(M), M:declare_dbase_local_dynamic(M
 
 :-export(declare_dbase_local_dynamic/3).
 declare_dbase_local_dynamic(M,F,0):- trace_or_throw(illegal_argument_declare_dbase_local_dynamic(M,F,0)).
-declare_dbase_local_dynamic(M,F,A):- cannot_override(F,A,Why),!,dmsg(once(cannot_override(F,A,Why))),nop(listing(M:F/A)).
+declare_dbase_local_dynamic(M,F,A):- cannot_override(F,A,Why),!,dmsg(todo(cannot_override(F,A,Why))),nop(listing(M:F/A)).
 declare_dbase_local_dynamic(M,F,A):- declare_dbase_local_dynamic_really(M,F,A).
 
 declare_dbase_local_dynamic_really(M,F,A):- functor(HEAD,F,A),'@'(clause_safe(HEAD,(hook:body_req(F,A,HEAD,_))),M),!.

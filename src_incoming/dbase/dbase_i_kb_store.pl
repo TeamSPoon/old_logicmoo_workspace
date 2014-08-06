@@ -207,7 +207,30 @@ add_w_hooks_fallback(Data,Gaf):-asserta_if_new(Data),asserta_if_new(Gaf),run_dat
 
 
 
+% ================================================
+% fact_checked/2, fact_loop_checked/2
+% ================================================
+:-meta_module_transparent(fact_checked(0,0)).
 
+fact_checked(Fact,Call):- no_loop_check(fact_checked0(Fact,Call)).
+fact_checked0(Fact,Call):- not(ground(Fact)),!,Call.
+fact_checked0(Fact,_):-is_known_true(Fact),!.
+fact_checked0(Fact,_):-is_known_false(Fact),!,fail.
+fact_checked0(_Fact,Call):-Call,!.
+% would only work outside a loop checker (so disable)
+% fact_checked0(Fact,_Call):- really_can_table_fact(Fact),asserta(is_known_false(Fact)),!,dmsg(is_known_false(Fact)),!,fail.
+
+really_can_table_fact(Fact):-really_can_table,functor(Fact,F,__),can_table_functor(F),!.
+
+
+can_table_functor(F):-cannot_table_functor(F),!,fail.
+can_table_functor(_).
+
+cannot_table_functor(atloc).
+cannot_table_functor(isa).
+
+:-meta_module_transparent(fact_loop_checked(-,0)).
+fact_loop_checked(Fact,Call):- fact_checked(Fact,loop_check(Call,fail)).
 
 % ================================================
 % is_asserted/1
@@ -306,7 +329,7 @@ ensure_predicate_reachable(_,_).
 
 ensure_predicate_reachable(M,C,dbase_t,Ap1):-C=..[_,F|_RGS],A is Ap1 -1, declare_dbase_local_dynamic_really(M,F,A).
 
-singletons_throw_or_fail(_):- is_stable,!,fail.
+% singletons_throw_or_fail(_):- is_stable,!,fail.
 singletons_throw_or_fail(C):- contains_singletons(C),trace_or_throw(contains_singletons(C)).
 nonground_throw_or_fail(C):- throw_if_true_else_fail(not(ground(C)),C).
 

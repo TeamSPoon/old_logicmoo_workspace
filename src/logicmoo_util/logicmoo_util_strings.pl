@@ -501,15 +501,16 @@ to_list_of_sents(WList,[sent(WList)]).
 
 replace_periods_string_list(A,S):-replace_periods(A,AR),to_word_list(AR,WL),subst(WL,periodMARK,'.',WLS),subst(WLS,apostraphyMARK,'\'',S).
 
-to_word_list(A,S):-once(hotrace(to_word_list_0(A,S))).
+to_word_list(A,SL):-once(hotrace(to_word_list_0(A,S))),S=SL.
 to_word_list_0(V,V):-var(V),!.
+to_word_list_0(Foo,V):-not(var(V)),trace_or_throw(to_word_list_0(Foo,V)).
 to_word_list_0([A],[A]):-number(A),!.
 to_word_list_0([],[]):-!.
 to_word_list_0("",[]):-!.
 to_word_list_0('',[]):-!.
-to_word_list_0(A,S):-atom(A),text_to_string(A,S),to_word_list_0(A,S),!.
 %to_word_list_0(A,WList):-string(A),Final=" (period) ",replace_periods(A,Final,S),not(A=S),!,to_word_list_0(S,WList).
 to_word_list_0([A,B|C],[A,B|C]):-atom(A),atom(B),!.
+to_word_list_0(A,WL):-atom(A),text_to_string(A,S),to_word_list_0(S,WL),!.
 to_word_list_0(A,S):-atomSplit(A,S),!.
 to_word_list_0(Input,WList):- (string(Input);atom(Input)),(atomic_list_concat(WList," ",Input);WList=[Input]),!.
 to_word_list_0(Input,Input).

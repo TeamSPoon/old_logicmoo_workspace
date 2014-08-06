@@ -52,12 +52,13 @@ hook:deduce_facts(Term,NewTerm):- hotrace(good_for_chaining(Op,Term)), db_rewrit
 fix_argIsa(F,N,dir(Val),dir):-add(mpred_prop(F,default_sv(N,Val))),!.
 fix_argIsa(F,N,int(Val),int):-add(mpred_prop(F,default_sv(N,Val))),!.
 fix_argIsa(_,_,list(Type),list(Type)):-!.
-fix_argIsa(F,N,Type,F):-compound(Type),Type=..[F,Val],get_isa_backchaing(Val,F),decl_mpred(F,default_sv(N,Val)),!.
+fix_argIsa(_,_,formatted(Type),formatted(Type)):-!.
 fix_argIsa(_,_,Arg,Arg).
+fix_argIsa(F,N,Type,F):-compound(Type),Type=..[F,Val],get_isa_backchaing(Val,F),decl_mpred(F,default_sv(N,Val)),!.
 
 fix_argsIsas(_,_,[],[]):-!.
 fix_argsIsas(F,N,[Arg|TList],[G|List]):-
-   fix_argIsa(F,N,Arg,G), N1 is N + 1,fix_argsIsas(F,N1,TList,List),!.
+   fix_argIsa(F,N,Arg,G),!, N1 is N + 1,fix_argsIsas(F,N1,TList,List),!.
 
 hook:decl_database_hook(assert(_),argsIsa(ArgTs)):-
    ArgTs=..[F|ArgTList],

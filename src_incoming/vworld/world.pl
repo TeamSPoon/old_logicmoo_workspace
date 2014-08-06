@@ -291,11 +291,11 @@ same(X,Y):- samef(X,Y).
 samef(X,Y):- X=Y,!.
 samef(X,Y):- notrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci(XF,YF)))).
 
-moo:default_type_props(_,region,opaqueness(1)).
-moo:default_type_props(_,obj,opaqueness(100)).
-moo:default_type_props(_,item,listPrice(0)).
-moo:default_type_props(_,agent,last_command(stand)).
-moo:default_type_props(_,agent,[
+moo:default_type_props(region,opaqueness(1)).
+moo:default_type_props(obj,opaqueness(100)).
+moo:default_type_props(item,listPrice(0)).
+moo:default_type_props(agent,last_command(stand)).
+moo:default_type_props(agent,[
                        max_damage(500),
                        max_charge(200),
                        damage(500),

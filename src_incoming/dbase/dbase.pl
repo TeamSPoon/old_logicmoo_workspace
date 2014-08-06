@@ -31,7 +31,8 @@ slow_kb_op(_):-true.
 :- dynamic_multifile_exported call_after_load/1.
 :- dynamic_multifile_exported check_permanence/4.
 :- dynamic_multifile_exported decl_mud_test/2.
-:- dynamic_multifile_exported default_type_props/3.
+:- dynamic_multifile_exported default_type_props/2.
+:- dynamic_multifile_exported default_inst_type_props/3.
 :- dynamic_multifile_exported one_default_type_prop/3.
 :- dynamic_multifile_exported label_type/2.
 :- dynamic_multifile_exported label_type_props/3.
@@ -110,9 +111,9 @@ was_known_false(Fact):-is_known_false(Fact),retractall((is_known_false(_):-true)
 
 check_was_known_false(Fact):-ignore(((is_known_false(Fact),was_known_false(Fact)))).
 
-hook:decl_database_hook(assert(_A_or_Z),label_type_props(Lbl,T,Props)):- add_w_hooks(default_type_props(self,T,[label(self,Lbl)|Props])).
+hook:decl_database_hook(assert(_A_or_Z),label_type_props(Lbl,T,Props)):- add_w_hooks(default_type_props(T,[label(Lbl)|Props])).
 
-hook:decl_database_hook(assert(_A_or_Z),default_type_props(_,T,_)):- define_type_if_atom(T).
+hook:decl_database_hook(assert(_A_or_Z),default_type_props(T,_)):- define_type_if_atom(T).
 
 hook:decl_database_hook(assert(_A_or_Z),mpred_prop(F,arity(A))):- ignore((A==1,define_type(F))) , ignore((atom(P),define_type(P))).
 
@@ -1036,7 +1037,7 @@ game_assert_fast(C0):- ignore(assert_deduced_arg_isa_facts(C0)),add(C0),run_data
 mpred_prop(G,assert_with(game_assert)):- moo:assertionMacroHead(G).
 
 assertOnLoad(ClassTemplate):- compound(ClassTemplate), ClassTemplate=..[class_template,Type|Props],
-      flatten(Props,AllProps), !, assertOnLoad(default_type_props(Inst,Type,AllProps)).
+      flatten(Props,AllProps), !, assertOnLoad(default_type_props(Type,AllProps)).
 assertOnLoad(X):-game_assert(X).
 
 setTemplate(X):-game_assert(X).

@@ -136,7 +136,7 @@ locs_near_i(L1,L2):- locationToRegion(L1,R),pathBetween_call(R,_,R2),in_grid(R2,
 region_near(R1,R2):-pathBetween_call(R1,_,R2).
 region_near(R1,R1).
 
-moo:default_type_props(OfAgent,agent,[facing(F),atloc(L)]):-ignore((nonvar(OfAgent),create_someval(facing,OfAgent,F),create_someval(atloc,OfAgent,L))).
+moo:default_inst_type_props(OfAgent,agent,[facing(F),atloc(L)]):-ignore((nonvar(OfAgent),create_someval(facing,OfAgent,F),create_someval(atloc,OfAgent,L))).
 
 moo:transitive_other(atloc,Obj,What):-inside_of(Obj,What).
 

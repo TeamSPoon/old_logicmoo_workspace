@@ -46,15 +46,17 @@ formattype_guessable(S):- moo:ft_info(S,_).
 term_is_ft(Term,Type):- var(Type),var(Term),!,member(Type,[var,prolog]).
 term_is_ft(Term,Type):- var(Term),!,member(Type,[var,term,prolog]).
 term_is_ft(Term,Type):- nonvar(Term),var(Type),!,formattype_guessable(Type),term_is_ft(Term,Type).
-term_is_ft(Term,Type):- 
-   is_asserted(formattype(Type)),
+term_is_ft(Term,Type):- must_det(formattype(Type)),
    once(trans_subft_info(Type,How)),
    correctFormatType(query(_HLDS,_OldV),Term,How,NewTerm),!,
    sameArgTypes(NewTerm,Term).
 
-trans_subft_info(FT,Info):-moo:ft_info(FT,Info),!.
-trans_subft_info(FT,Info):-trans_subft(Sub,FT),moo:ft_info(Sub,Info),!.
-trans_subft_info(FT,Info):-trans_subft(FT,Sub),moo:ft_info(Sub,Info),!.
+ft_info_how(FT,formatted(FT)):-moo:ft_info(FT,formatted).
+ft_info_how(FT,Info):-moo:ft_info(FT,Info),Info\=formatted.
+
+trans_subft_info(FT,Info):-ft_info_how(FT,Info).
+trans_subft_info(FT,Info):-trans_subft(Sub,FT),ft_info_how(Sub,Info),!.
+trans_subft_info(FT,Info):-trans_subft(FT,Sub),ft_info_how(Sub,Info),!.
 trans_subft(FT,Sub):-moo:subft(FT,Sub).
 trans_subft(FT,Sub):-moo:subft(FT,A),moo:subft(A,Sub).
 trans_subft(FT,Sub):-moo:subft(FT,A),moo:subft(A,B),moo:subft(B,Sub).
@@ -119,8 +121,8 @@ argIsa_call_0(facing,_,term).
 argIsa_call_0(formatted,_,term).
 argIsa_call_0(ft_info,1,formattype).
 argIsa_call_0(ft_info,2,term).
-argIsa_call_0(genlPreds,2,mpred).
-argIsa_call_0(inRegion,2,obj).
+argIsa_call_0(genlPreds,_,mpred).
+argIsa_call_0(inRegion,1,obj).
 argIsa_call_0(inRegion,2,region).
 argIsa_call_0(isa,1,term).
 argIsa_call_0(isa,2,type).
@@ -135,6 +137,9 @@ argIsa_call_0(subft,_,formattype).
 argIsa_call_0(subft,_,term).
 argIsa_call_0(term_anglify,_,term).
 argIsa_call_0(type_max_charge,1,type).
+
+argIsa_call_0(WP,_,mpred):-member(WP,[retract_with_pred,assert_with_pred,query_with_pred]).
+
 argIsa_call_0(type_max_charge,2,int).
 argIsa_call_0(type_max_damage,1,type).
 argIsa_call_0(type_max_damage,2,int).
@@ -268,7 +273,7 @@ same_vars(T1,T2):-term_variables(T1,V1),term_variables(T2,V2),!,V1==V2.
 correctArgsIsa(In,Out):- correctArgsIsa(query(must,dbase_t),In,Out),!.
 
 :-export(correctArgsIsa/3).
-correctArgsIsa(_,A,A):- is_stable,!.
+%correctArgsIsa(_,A,A):- is_stable,!.
 correctArgsIsa(_,NC,NC):-not(compound(NC)),!.
 correctArgsIsa(Op,M:A,MAA):- nonvar(M),!,correctArgsIsa(Op,A,AA),M:AA=MAA.
 correctArgsIsa(_Op,G,G):- functor(G,F,A),arg(_,vv(subclass/_,isa/_,':-'/_),F/A),!.
@@ -354,7 +359,10 @@ correctType(_O,A,string,AA):- must(text_to_string(A,AA)).
 correctType(_O,A,term(_),AA):- must_equals(A,AA).
 correctType(_O,A,term,AA):- must_equals(A,AA).
 correctType(_O,A,text,AA):- must_equals(A,AA).
+correctType(_O,A,mpred,AA):- any_to_atom(A,AA).
+correctType(_O,A,fpred,AA):- any_to_atom(A,AA).
 correctType(_O,A,pred,AA):- any_to_atom(A,AA).
+correctType(_O,A,formatted,AA):- dtrace, must_equals(A,AA).
 correctType(_O,A,atom,AA):- any_to_atom(A,AA).
 correctType(tell(_),A,type,AA):- atom(A),define_type(A),must_equals(A,AA).
 correctType(_O,A,verb,AA):- must_equals(A,AA).

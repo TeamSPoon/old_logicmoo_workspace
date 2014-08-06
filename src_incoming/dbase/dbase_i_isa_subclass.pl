@@ -146,7 +146,10 @@ get_isa_backchaing_v_nv(A,T):-setof(A,AT^(asserted_or_trans_subclass(AT,T),get_i
 
 get_isa_backchaing_0(A,T):-  var(A),nonvar(T),!,get_isa_backchaing_v_nv(A,T).
 get_isa_backchaing_0(A,T):-  var(T),!,setof(TT,AT^(get_isa_asserted(A,AT),asserted_or_trans_subclass(AT,TT)),List),!,member(T,List).
+get_isa_backchaing_0(A,T):-  nonvar(A),get_isa_backchaing_nv_nv(A,T).
 get_isa_backchaing_0(A,T):-  get_isa_asserted(A,AT),asserted_or_trans_subclass(AT,T).
+
+get_isa_backchaing_nv_nv(A,argsIsa):-!,compound(A).
 
 not_ft(T):-asserted_or_trans_subclass(T,obj).
 

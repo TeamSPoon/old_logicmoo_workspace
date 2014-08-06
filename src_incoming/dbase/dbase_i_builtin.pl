@@ -357,7 +357,7 @@ multiValued(verbOverride(term,action,action)).
 
 singleValued(agent_turnnum(agent,int(0))).
 singleValued(agent_turnnum(agent,int)).
-singleValued(armorLevel(possessable,int)).
+singleValued(armorLevel(wearable,int)).
 singleValued(attack(obj,int)).
 singleValued(charge(obj,int(500))).
 singleValued(charge(obj,int),[default_sv(2,500)]).
@@ -395,11 +395,11 @@ singleValued(height(obj,int)).
 multiValued(comment(term,string)).
 multiValued(pathBetween(region,dir,region)).
 
-prologOnly(default_type_props(id,type,list(voprop))).
+prologOnly(default_type_props(type,list(voprop))).
 prologOnly(one_default_type_prop(id,type,voprop)).
 
 
-default_type_props(_,food,[height(0)]).
+default_type_props(food,[height(0)]).
 
 one_default_type_prop(self,spatialthing,height(0)).
 
@@ -500,6 +500,11 @@ subclass(human_player,player).
 subclass(npc_player,player).
 subclass('MaleAnimal',player).
 subclass('FemaleAnimal',player).
+expand_args(eachOf,subclass(eachOf('PortableObject','ProtectiveAttire','SomethingToWear'),possessable)).
+expand_args(eachOf,subclass(eachOf('ProtectiveAttire','SomethingToWear'),wearable)).
+expand_args(eachOf,subclass(eachOf('ControlDevice'),chargable)).
+expand_args(eachOf,subclass(eachOf(posture),command)).
+
 
 equivRule(isa(Whom,npc_player),and(isa(Whom,player),naf(isa(Whom,human_player)))).
 
