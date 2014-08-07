@@ -954,22 +954,23 @@ is_deterministic(once(V)):-var(V),trace_or_throw(is_deterministic(var_once(V))).
 is_deterministic(M:G):-atom(M),!,is_deterministic(G).
 is_deterministic(Atomic):-atomic(Atomic),!.
 is_deterministic(Ground):-ground(Ground),!.
-is_deterministic(not(_)).
-is_deterministic(atom(_))
-is_deterministic(compound(_))
-is_deterministic(findall(_,_,_)).
-is_deterministic(once(_)).
 is_deterministic((_,Cut)):-Cut==!.
-is_deterministic(functor(_,_,_)).
-is_deterministic(functor_catch(_,_,_)).
-is_deterministic(_ =.. _).
-is_deterministic(var(_)).
-is_deterministic(nonvar(_)).
 is_deterministic(_ = _).
+is_deterministic(_ =@= _).
+is_deterministic(_ =.. _).
+is_deterministic(_ == _).
 is_deterministic(_ \= _).
 is_deterministic(_ \== _).
-is_deterministic(_ == _).
+is_deterministic(atom(_)).
+is_deterministic(compound(_)).
+is_deterministic(findall(_,_,_)).
+is_deterministic(functor(_,_,_)).
+is_deterministic(functor_catch(_,_,_)).
 is_deterministic(ground(_)).
+is_deterministic(nonvar(_)).
+is_deterministic(not(_)).
+is_deterministic(once(_)).
+is_deterministic(var(_)).
 %is_deterministic(Call):-predicate_property(Call,nodebug),!.
 %is_deterministic(Call):-predicate_property(Call,foreign),!.
 
