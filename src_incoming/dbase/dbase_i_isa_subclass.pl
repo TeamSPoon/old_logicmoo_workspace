@@ -21,26 +21,26 @@ never_type(mpred_prop).
 never_type(ft_info).
 never_type(F):- mpred_arity(F,A),!, A > 1.
 
-define_type(Spec):- never_type(Spec),!,trace_or_throw(never_type(Spec)).
-define_type(M:F):-!, '@'(define_type(F), M).
-define_type([]):-!.
-define_type([A]):-!,define_type(A).
-define_type([A|L]):-!,define_type(A),define_type(L).
-define_type((A,L)):-!,define_type(A),define_type(L).
+decl_type(Spec):- never_type(Spec),!,trace_or_throw(never_type(Spec)).
+decl_type(M:F):-!, '@'(decl_type(F), M).
+decl_type([]):-!.
+decl_type([A]):-!,decl_type(A).
+decl_type([A|L]):-!,decl_type(A),decl_type(L).
+decl_type((A,L)):-!,decl_type(A),decl_type(L).
 
 
-define_type(Spec):- compound(Spec),must_det(define_compound_as_type(Spec)).
-define_type(Spec):- decl_mpred(Spec,1),declare_dbase_local_dynamic(Spec,1), define_type_0(Spec).
+decl_type(Spec):- compound(Spec),must_det(define_compound_as_type(Spec)).
+decl_type(Spec):- decl_mpred(Spec,1),declare_dbase_local_dynamic(Spec,1), decl_type_unsafe(Spec).
 
-define_type_0(Spec):- dbase_t(type,Spec),!.
-define_type_0(Spec):- add_w_hooks(dbase_t(type,Spec),isa(Spec,type)).
+decl_type_unsafe(Spec):- dbase_t(type,Spec),!.
+decl_type_unsafe(Spec):- add_w_hooks(dbase_t(type,Spec),isa(Spec,type)).
 
 define_compound_as_type(Spec):- dbase_t(F,Spec),dmsg(once(define_compound_as_type(Spec,F))).
 define_compound_as_type(Spec):- add(resultIsa(Spec,type)).
 define_compound_as_type(Spec):- assertz_if_new(dbase_t(formattype,Spec)),dmsg(once(define_compound_as_type(Spec,formattype))).
 define_compound_as_type(Spec):- compound(Spec),trace_or_throw(never_compound_define_type(Spec)).
 
-:-forall(argsIsaProps(F),define_type(F)).
+:-forall(argsIsaProps(F),decl_type(F)).
 
 
 
@@ -56,15 +56,25 @@ define_ft_0(Spec):- add_w_hooks(dbase_t(formattype,Spec),isa(Spec,formattype)).
 
 %type(Spec):- is_asserted(isa(Spec,type)).
 
-define_type_if_atom(T):- compound(T),!.
-define_type_if_atom(T):- ignore((atom(T),not(number(T)),define_type(T))).
+:-export(decl_type_safe/1).
+decl_type_safe(T):- compound(T),!.
+decl_type_safe(T):- ignore((atom(T),not(number(T)),decl_type(T))).
 
-hook:decl_database_hook(assert(_A_or_Z),subclass(S,C)):-define_type_if_atom(S),define_type_if_atom(C).
+:-export(assert_subclass/2).
+assert_subclass(O,T):-assert_subclass_safe(O,T).
 
-:- define_type(type).
-:- define_type(extentKnown).
-:- define_type(creatableType).
-:- forall(argsIsaProps(Prop),(define_type(Prop),asserta(is_known_true(subclass(Prop,mpred))))).
+:-export(assert_subclass_safe/2).
+assert_subclass_safe(O,T):- ignore((nonvar(O),decl_type_safe(O))), ignore((nonvar(T),decl_type_safe(T),nonvar(O),not(formattype(O)),not(formattype(T)),add(subclass(O,T)))).
+
+:-export(assert_isa_safe/2).
+assert_isa_safe(O,T):- ignore((nonvar(O),nonvar(T),decl_type_safe(T),assert_isa(O,T))).
+
+hook:decl_database_hook(assert(_A_or_Z),subclass(S,C)):-decl_type_safe(S),decl_type_safe(C).
+
+:- decl_type(type).
+:- decl_type(extentKnown).
+:- decl_type(creatableType).
+:- forall(argsIsaProps(Prop),(decl_type(Prop),asserta(is_known_true(subclass(Prop,mpred))))).
 
 is_creatable_type(Type):- arg(_,vv(agent,item,region,concept),Type).
 is_creatable_type(Type):- atom(Type),call(is_asserted(isa(Type,creatableType))).
@@ -75,14 +85,14 @@ is_creatable_type(Type):- atom(Type),call(is_asserted(isa(Type,creatableType))).
 :-export assert_isa/2.
 
 assert_isa(I,T):- not(ground(I:T)),trace_or_throw(not(ground(assert_isa(I,T)))).
-assert_isa(I,T):- hotrace((loop_check(assert_isa_lc(I,T),true))).
+assert_isa(I,T):- ((loop_check(assert_isa_lc(I,T),true))).
 
 :-export assert_isa_lc/2.
 % skip formatter types
 assert_isa_lc(_I,T):- member(T,[string,action,dir]),!.
-assert_isa_lc(I,T):- hotrace(formattype(T)),!,dmsg(todo(dont_assert_is_ft(I,T))),!.
-assert_isa_lc(_,T):- once(define_type(T)),fail.
-assert_isa_lc(I,type):- define_type(I),!.
+assert_isa_lc(I,T):- hotrace(formattype(T)),!,dmsg(once(dont_assert_is_ft(I,T))),!.
+assert_isa_lc(_,T):- once(decl_type(T)),fail.
+assert_isa_lc(I,type):- decl_type(I),!.
 assert_isa_lc(I,formattype):- define_ft(I),!.
 assert_isa_lc(I,T):- cannot_table_call(isa_asserted(I,T)),!.
 assert_isa_lc(I,T):- is_stable,!, hooked_asserta(isa(I,T)).
@@ -96,7 +106,7 @@ hook:decl_database_hook(assert(_),DATA):-into_mpred_form(DATA,O),!,O=isa(I,T),ho
 
 assert_isa_hooked(I,T):- not(ground(assert_isa(I,T))),!, trace_or_throw(not(ground(assert_isa(I,T)))).
 assert_isa_hooked(I,T):- asserta_if_new(moo:dbase_t(T,I)),fail.
-assert_isa_hooked(T,type):-!,define_type(T),!.
+assert_isa_hooked(T,type):-!,decl_type(T),!.
 assert_isa_hooked(T,formattype):-!,define_ft(T),!.
 assert_isa_hooked(Term,mpred):-!,decl_mpred(Term).
 assert_isa_hooked(Term,prologHybrid):-!,decl_mpred_hybrid(Term).
@@ -149,23 +159,24 @@ isa_backchaing_0(A,T):-  var(T),!,setof(TT,AT^(isa_asserted(A,AT),asserted_or_tr
 isa_backchaing_0(A,T):-  nonvar(A),isa_backchaing_nv_nv(A,T).
 isa_backchaing_0(A,T):-  isa_asserted(A,AT),asserted_or_trans_subclass(AT,T).
 
+
 isa_backchaing_nv_nv(A,argsIsa):-!,compound(A).
 
-not_ft(T):-asserted_or_trans_subclass(T,obj).
+not_ft(T):-asserted_or_trans_subclass(T,spatialthing).
 
 :-export(isa_asserted/2).
 isa_asserted(A,T):- fact_loop_checked(isa(A,T),isa_asserted_0(A,T)).
 
-isa_asserted_0(A,T):- nonvar(A),nonvar(T),cached_isa(T,formattype),!,term_is_ft(A,T).
 isa_asserted_0(A,T):- alt_dbase_t(T,A).
+isa_asserted_0(A,T):- nonvar(A),nonvar(T),alt_dbase_t(T,formattype),!,term_is_ft(A,T).
 % isa_asserted_0(A,T):- compound(A),functor(A,F,_),!,isa_backchaing_1(F,T).
+isa_asserted_0(A,T):- atom(A),mud_isa_atom(A,T),!.
 isa_asserted_0(_,T):- not(atom(T)),!,fail.
 isa_asserted_0(A,T):- argsIsaProps(T),mpred_prop(A,T).
-isa_asserted_0(A,T):- atom(A),mud_isa_atom(A,T),!.
-
 
 mud_isa_atom(O,T):- atomic_list_concat_catch([T,_|_],'-',O),!.
 mud_isa_atom(O,T):- atom_concat(T,Int,O),catch(atom_number(Int,_),_,fail),!.
+
 
 cached_isa(I,T):-hotrace(isa_backchaing(I,T)).
 
@@ -173,11 +184,11 @@ cached_isa(I,T):-hotrace(isa_backchaing(I,T)).
 
 
 % ============================================
-% define_type/1
+% decl_type/1
 % ============================================
 :- decl_mpred_hybrid type/1.
 :- dynamic_multifile_exported never_type/1.
-:- dynamic_multifile_exported define_type/1.
+:- dynamic_multifile_exported decl_type/1.
 
 type(dir).
 type(type).

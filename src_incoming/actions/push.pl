@@ -99,7 +99,7 @@ crashbang(Obj) :- padd(Obj,[damage(-5)]).
 % Record keeping
 moo:update_charge(Agent,push) :- padd(Agent,[charge(-6)]).
 moo:update_stats(Agent,strain) :- padd(Agent,[damage(-2)]).
-moo:update_stats(Agent,hernia) :- padd(Agent,[damage(-4),failure(hernia)]).
+moo:update_stats(Agent,hernia) :- padd(Agent,[damage(-4),cmdfailure(hernia)]).
 
 :- include(logicmoo(vworld/moo_footer)).
 

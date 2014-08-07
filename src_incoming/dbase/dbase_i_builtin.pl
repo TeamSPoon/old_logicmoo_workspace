@@ -77,7 +77,7 @@ type(creatableType).
 
 
 :-add((expand_args(eachOf,subclass(eachOf(multiValued,negationByFailure,argsIsa,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),mpred)))).
-:-doall((argsIsaProps(F),define_type(F),add(subclass(F,relation)))).
+:-doall((argsIsaProps(F),decl_type(F),add(subclass(F,relation)))).
 
 :-decl_mpred_hybrid(repl_writer(agent,term),[singleValued,default_sv(2,look:default_repl_writer)]).
 :-decl_mpred_hybrid(repl_to_string(agent,term),[singleValued,default_sv(2,look:default_repl_obj_to_string)]).
@@ -228,7 +228,8 @@ genlPreds(mpred,mpred).
 
 %multiValued(ofclass(term,type),[alias(isa)]).
 
-multiValued(failure(agent,action)).
+multiValued(cmdsuccess(agent,action)).
+multiValued(cmdfailure(agent,action)).
 multiValued(nameStrings(term,string)).
 multiValued(determinerString(term,string)).
 multiValued(descriptionHere(term,string),ordered).
@@ -481,7 +482,6 @@ negationByFailure(deleted(id)).
 multiValued(description(term,text),[assert_with_pred(add_description)]).
 
 multiValued(verbAsWell(term,action,action)).
-multiValued(failure(agent,action)).
 multiValued(nameStrings(term,string)).
 multiValued(determinerString(term,string)).
 multiValued(descriptionHere(term,string)).

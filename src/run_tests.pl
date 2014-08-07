@@ -28,10 +28,10 @@ moo:mud_test(test_movedist,
    test_true(req(inRegion(P,'Area1000'))))).
 
 moo:mud_test(drop_take,
-  (do_player_action('create food'),
+  with_all_dmsg(((do_player_action('create food'),
   do_player_action('drop food'),
   do_player_action('take food'),
-  do_player_action('eat food'))).
+  do_player_action('eat food'))))).
 
 % Was this our startup file?
 was_runs_tests_pl:-is_startup_file('run_tests.pl').

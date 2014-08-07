@@ -3,7 +3,7 @@
 /** <module> A command to  ...
 % charge(Agent,Chg) = charge (amount of charge agent has)
 % damage(Agent,Dam) = damage
-% success(Agent,Suc) = checks success of last action (actually checks the failure predicate)
+% success(Agent,Suc) = checks success of last action (actually checks the cmdfailure predicate)
 % score(Agent,Scr) = score
 % to do this.
 % Douglas Miles 2014

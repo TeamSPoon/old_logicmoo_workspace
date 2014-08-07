@@ -3,7 +3,7 @@
 /** <module> A command to  ...
 % charge(Agent,Chg) = charge (amount of charge agent has)
 % damage(Agent,Dam) = damage
-% success(Agent,Suc) = checks success of last action (actually checks the failure predicate)
+% cmdsuccess(Agent,Suc) = checks success of last action (actually checks the cmdfailure predicate)
 % score(Agent,Scr) = score
 % to do this.
 % Douglas Miles 2014
@@ -12,34 +12,59 @@
 
 :- moo:register_module_type(command).
 
-% ====================================================
-% show the stats system
-% ====================================================
-moo:action_info(create(list(term)), "Creates a new object of Type1 + props").
 
-moo:agent_call_command(Agent,create(SWhat)):-  create_new_object(Agent,SWhat,1).
 
-create_new_object(Agent,[S|What]):-create_new_object(Agent,[S|What],1).
+% ====================================================
+% item rez (to stowed inventory)
+% ====================================================
+
+:-export(rez_to_inventory/3).
+rez_to_inventory(Agent,NameOrType,NewName):-   
+   create_meta(NameOrType,Clz,item,NewName),
+   padd(Agent,stowed(NewName)),
+   show_call(add(isa(NewName,Clz))),
+   padd(NewName,authorWas(rez_to_inventory(Agent,NameOrType,NewName))),
+   add_missing_instance_defaults(NewName).
+
+
+moo:action_info(rez(term),"Rezes a new 'item' of some NameOrType into stowed inventory").
+moo:agent_call_command(Agent,rez(NameOrType)):- nonvar(NameOrType),rez_to_inventory(Agent,NameOrType,_NewName).
+
+% ====================================================
+% object/type creation
+% ====================================================
+moo:action_info(create(list(term)), "Rezes a new 'spatialthing' or creates a new 'type' of some NameOrType and if it's an 'item' it will put in stowed inventory").
+
+moo:agent_call_command(Agent,create(SWhat)):- with_all_dmsg(must_det(create_new_object(Agent,SWhat))).
 
 :-decl_mpred_prolog(authorWas(term,term)).
 :-decl_mpred_prolog(current_pronoun(agent,string,term)).
 
-moo:agent_call_command(Agent,rez(NewType)):- nonvar(NewType), atloc(Agent,LOC), create_instance(NewType,item,[atloc(LOC)]).
+:-export(create_new_object/2).
 
-:-export(create_new_object/3).
-create_new_object(Agent,[S|What],ArgAt):-
-   split_name_type(S,I,C),
-   show_call(add(isa(I,C))),
-   padd(I,authorWas(Agent)),
-   padd(Agent,stowed,I),
-   padd(Agent,current_pronoun("it",I)),
-   get_inst_default_props(I,_All,Need),
-   show_call(padd(I,Need)),
-   ArgAt2 is ArgAt+1,
-   addPropInfo(Agent,I,What,ArgAt2),!.
-   
+create_new_object(Agent,[type,NameOfType|DefaultParams]):-!,create_new_type(Agent,[NameOfType|DefaultParams]).
 
-addPropInfo(Agent,I,What,ArgAt2):-dmsg(todo(addPropInfo(Agent,I,What,ArgAt2))).
+create_new_object(Agent,[NameOrType|Params]):-
+   create_meta(NameOrType,NewType,spatialthing,NewName),
+   assert_isa(NewName,NewType),
+   padd(NewName,authorWas(create_new_object(Agent,[NameOrType|Params]))),
+   padd(Agent,current_pronoun("it",NewName)),   
+   getPropInfo(Agent,NewName,Params,2,PropList),!,
+   padd(NewName,PropList),
+   ignore((isa(NewName,item),padd(Agent,stowed(NewName)))),
+   add_missing_instance_defaults(NewName).
+
+:-export(create_new_type/2).
+create_new_type(Agent,[NewName|DefaultParams]):-
+   decl_type(NewName),
+   padd(NewName,authorWas(create_new_type(Agent,[NewName|DefaultParams]))),
+   padd(Agent,current_pronoun("it",NewName)),
+   getPropInfo(Agent,NewName,DefaultParams,2,PropList),!,
+   add(default_type_props(NewName,PropList)).
+
+
+getPropInfo(_Agent,_NewName,PropsIn,N,[comment(text(need,to,parse,PropsIn,N))]).
+
 
 
 :- include(logicmoo(vworld/moo_footer)).

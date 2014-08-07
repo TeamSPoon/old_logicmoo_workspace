@@ -8,9 +8,13 @@
 
 :- moo:register_module_type(command).
 
+isa(human_player,agenttype).
+subclass(agenttype,type).
+
 moo:type_action_info(human_player,help, "shows this help").
 moo:type_action_info(human_player,help(optional(string,"")), "shows this help").
-moo:type_action_info(What,text("command is: ",What)):- moo:actiontype(What).
+
+moo:action_info(What,text("command is: ",What)):- moo:actiontype(What).
 
 
 :-export(get_type_action_help_commands_list/3).

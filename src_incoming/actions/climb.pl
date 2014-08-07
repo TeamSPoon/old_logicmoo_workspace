@@ -69,7 +69,7 @@ moo:update_stats(Agent,pulled) :-
         del(damage(Agent,Old)),
 	New is Old - 2,
 	add(damage(Agent,New)),
-	add(failure(Agent,pulled)).
+	(add_cmdfailure(Agent,pulled)).
 
 
 :- include(logicmoo(vworld/moo_footer)).

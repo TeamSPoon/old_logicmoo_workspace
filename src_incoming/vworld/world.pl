@@ -43,7 +43,7 @@
             list_object_dir_near/3,
             num_near/3,
             asInvoked/2,
-            define_type/1,
+            decl_type/1,
             
                        
           show_kb_via_pred/3,
@@ -111,9 +111,20 @@ exisitingThing(O):-region(O).
 anyInst(O):-type(O).
 anyInst(O):-exisitingThing(O).
 
-metaclass(regiontype).
-metaclass(agenttype).
-metaclass(itemtype).
+:-decl_type(metaclass).
+
+argsIsa(typeGenls(type,metaclass)).
+
+hook:decl_database_hook(assert(_),typeGenls(_,MC)):-assert_isa(MC,metaclass).
+
+hook:deduce_facts(typeGenls(T,MC),hook:deduce_facts(subclass(S,T),isa(S,MC))).
+
+typeGenls(region,regiontype).
+typeGenls(agent,agenttype).
+typeGenls(item,itemtype).
+
+subclass(sillyitem,item).
+
 metaclass(formattype).
 
 
@@ -128,19 +139,18 @@ moo:isa(item,itemtype).
 cached(G):-catch(G,_,fail).
 
 
-define_subtype(O,T):- must_det(ground(O:T)), /*define_type(O), define_type(T),*/ add(subclass(O,T)).
+:-export(create_meta/4).
+% if SuggestedName was 'food666' it'd like the SuggestedClass to be 'food' and the stystem name will remain 'food666'
+% if SuggestedName was 'food' it'd like the SuggestedClass to be 'food' and the stystem name will become a gensym like 'food1'
+create_meta(SuggestedName,SuggestedClass,BaseClass,SystemName):-
+   must_det(split_name_type(SuggestedName,SystemName,NewSuggestedClass)),
+   ignore(SuggestedClass=NewSuggestedClass),   
+   assert_subclass_safe(SuggestedClass,BaseClass),
+   assert_subclass_safe(NewSuggestedClass,BaseClass),
+   assert_isa_safe(SystemName,BaseClass),
+   assert_isa_safe(SystemName,NewSuggestedClass),
+   assert_isa_safe(SystemName,SuggestedClass).
 
-
-create_meta(T,P,C,MT):-
-   must_det(split_name_type(T,P,CT)),
-   ignore(C=CT),
-   ignore(((ground(C:MT)),C\=MT,define_subtype(C,MT))),
-      ignore(((ground(P:C)),add(isa(P,C)))),
-      ignore(((ground(P:MT)),add(isa(P,MT)))),!.
-
-rez_to_inventory(Whom,T,P):-
-   create_meta(T,P,_,item),
-   padd(Whom,stowed(P)).
 
 moo:subclass('Area',region).
 moo:nonCreatableType(int).
@@ -173,7 +183,7 @@ moo:isa(string,formattype).
 create_agent(P):-create_agent(P,[]).
 create_agent(P,List):-must_det(create_instance(P,agent,List)).
 
-% define_type(Spec):-create_instance(Spec,type,[]).
+% decl_type(Spec):-create_instance(Spec,type,[]).
 
 create_instance(What,Type,Props):- loop_check(create_instance_0(What,Type,Props),dmsg(already_create_instance(What,Type,Props))).
 
@@ -183,21 +193,10 @@ create_instance(What,Type,Props):- loop_check(create_instance_0(What,Type,Props)
 :- dynamic(is_creating_now/1).
 
 create_instance_0(What,Type,List):- (var(What);var(Type);var(List)),trace_or_throw((var_create_instance_0(What,Type,List))).
-
 create_instance_0(I,_,_):-is_creating_now(I),!.
 create_instance_0(I,_,_):-asserta_if_new(is_creating_now(I)),fail.
-
-create_instance_0(What,FormatType,List):- FormatType\==type, formattype(FormatType),!,
-   trace_or_throw(formattype(FormatType,create_instance(What,FormatType,List))).
-
-
-create_instance_0(_SubType,type,_List):-!.
-create_instance_0(SubType,type,List):-!,
-   add(isa(SubType,type)),
-      dbase_mod(M),
-      A = M:type(SubType),
-   assert_if_new(A),
-   padd(SubType,List).
+create_instance_0(What,FormatType,List):- FormatType\==type, formattype(FormatType),!,trace_or_throw(formattype(FormatType,create_instance(What,FormatType,List))).
+create_instance_0(SubType,type,List):-decl_type(SubType),padd(SubType,List).
 
 moo:creatableType(agent).
 moo:subclass(actor,agent).
@@ -213,11 +212,11 @@ moo:max_damage(T,Dam):- moo:type_max_damage(AgentType,Dam),isa(T,AgentType).
 
 punless(Cond,Action):- once((call(Cond);call(Action))).
 
-create_instance_0(T,Ag,List):- agent == Ag,
-  must_det(isa(T,agent)),
+create_instance_0(T,agent,List):-
   must_det_l([
    retractall(agent_list(_)),
-   create_meta(T,P,_,agent),
+   create_meta(T,_,agent,P),
+   must_det(isa(P,agent)),
    padd(P,List),   
    punless(possess(P,_),rez_to_inventory(P,food,_Food)),
    %reset_values(P),
@@ -256,13 +255,13 @@ create_instance_0(T, item, List):-
 create_instance_0(T,Type,List):-
   moo:createableSubclassType(Type,MetaType),
   must_det_l([
-   create_meta(T,P,Type,MetaType),
+   create_meta(T,Type,MetaType,P),
    padd(P,List),
    add_missing_instance_defaults(P)]). 
 
 create_instance_0(T,MetaType,List):-  
   must_det_l([
-   create_meta(T,P,Type,MetaType),
+   create_meta(T,Type,MetaType,P),
    padd(P,List),
    add_missing_instance_defaults(P)]). 
 
@@ -271,7 +270,7 @@ create_instance_0(T,MetaType,List):-
  dmsg(create_instance_0(T,MetaType,List)),
 leash(+call),trace,
   must_det_l([
-   create_meta(T,P,Type,MetaType),
+   create_meta(T,Type,MetaType,P),
    padd(P,List),
    put_in_world(P),   
    add_missing_instance_defaults(P)]). 

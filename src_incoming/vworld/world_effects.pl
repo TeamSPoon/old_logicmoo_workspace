@@ -44,6 +44,10 @@ worth(Agent,Action,Obj) :-
 worth(_,_,_).
 
 
+:-export(add_cmdfailure/2).
+add_cmdfailure(Agent,What):-add(cmdfailure(Agent,What)).
+
+hook:decl_database_hook(assert(_),cmdfailure(Agent,What)):- once(del(cmdsuccess(Agent,What));clr(cmdsuccess(Agent,_))).
 
 % Initialize world.
 % This keeps the old databases messing with new runs.
@@ -54,10 +58,10 @@ worth(_,_,_).
 % Check to see if any of the objects should be placed in the world as it runs.
 
 :-export(call_update_charge/2).
-call_update_charge(Agent,What):- doall(must(moo:update_charge(Agent,What))),!.
+call_update_charge(Agent,What):- padd(Agent,cmdsuccess(What)), doall(must(moo:update_charge(Agent,What))),!.
 
 :-export(call_update_stats/2).
-call_update_stats(Agent,What):- doall(must(moo:update_stats(Agent,What))),!.
+call_update_stats(Agent,What):- padd(Agent,cmdsuccess(What)), doall(must(moo:update_stats(Agent,What))),!.
 
 set_stats(Agent,[]) :- set_stats(Agent,[str(2),height(2),stm(2),spd(2)]).
 

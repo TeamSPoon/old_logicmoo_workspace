@@ -40,7 +40,7 @@ moo:agent_call_command(Agent,ACT) :-
          add(ADDS),
          call_update_charge(Agent,VERB)));	
 %Nothing to use
-      add(failure(Agent,SENT))).
+      (add_cmdfailure(Agent,SENT))).
 
 :- include(logicmoo(vworld/moo_footer)).
 

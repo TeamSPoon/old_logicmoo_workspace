@@ -94,7 +94,7 @@ argIsa_call_nt(_O,F,N,Type):-argIsa_call_nt(F,N,Type).
 
 :-export(argIsa_call/3).
 argIsa_call(F,N,Type):- argIsa_call_0(F,N,Type),!.
-argIsa_call(F,N,Type):- argIsa_asserted(F,N,Type),!,asserta(argIsa_call_0(F,N,Type)).
+argIsa_call(F,N,Type):- argIsa_asserted(F,N,Type),!.
 argIsa_call(F,N,Type):- argIsa_call_1(F,N,Type),!.
 
 
@@ -158,7 +158,7 @@ argIsa_call_0(F,_,term):-member(F/_,
 
 % argIsa_asserted(F,N,Type):- dbase_t(argIsa,F,N,Type),!.
 argIsa_asserted(F,N,Type):- argIsa_call_0(F,N,Type),!.
-argIsa_asserted(F,N,Type):- mpred_prop(F,argIsa(N,Type)),!.
+argIsa_asserted(F,N,Type):- get_mpred_prop(F,argIsa(N,Type)),!.
 argIsa_asserted(F,N,Type):- grab_argsIsa(F,Types),arg(N,Types,Type),nonvar(Type),!.
 argIsa_asserted(facing,_,term).
 
@@ -332,7 +332,7 @@ checkAnyType(Op,A,Type,AA):- correctType(Op,A,Type,AA),nonvar(AA),!.
 correctType_gripe(Op,A,Fmt,AA):- moo:formattype(Fmt),!,trace_or_throw(correctType(is_ft_correctFormatType(Op,A,Fmt,AA))).
 correctType_gripe(Op,A,Type,AA):- fail,atom(Type),must_equals(A,AA),
       dmsg(todo(isa_assert_type(Type))),
-      % define_type(Type),
+      % decl_type(Type),
       can_coerce(Op),dtrace,
       add(isa(A,Type)),!.
 
@@ -353,7 +353,7 @@ correctType(Op,A,askable,AA):-!,correctArgsIsa(Op,A,AA).
 correctType(_O,A,int,AA):- any_to_number(A,AA).
 correctType(_O,A,number,AA):- must(any_to_number(A,AA)).
 correctType(_O,A,prolog,AA):- must_equals(A,AA).
-correctType(_O,A,string,AA):- must(text_to_string(A,AA)).
+correctType(_O,A,string,AA):- must(any_to_string(A,AA)).
 correctType(_O,A,term(_),AA):- must_equals(A,AA).
 correctType(_O,A,term,AA):- must_equals(A,AA).
 correctType(_O,A,text,AA):- must_equals(A,AA).
@@ -362,7 +362,7 @@ correctType(_O,A,fpred,AA):- any_to_atom(A,AA).
 correctType(_O,A,pred,AA):- any_to_atom(A,AA).
 correctType(_O,A,formatted,AA):- dtrace, must_equals(A,AA).
 correctType(_O,A,atom,AA):- any_to_atom(A,AA).
-correctType(assert(_),A,type,AA):- atom(A),define_type(A),must_equals(A,AA).
+correctType(assert(_),A,type,AA):- atom(A),decl_type(A),must_equals(A,AA).
 correctType(_O,A,verb,AA):- must_equals(A,AA).
 correctType(_O,A,Type,AA):- compound(A),not(is_list(A)),atom(Type),functor_safe(A,Type,_), must_equals(A,AA).
 
@@ -493,7 +493,7 @@ nonusefull_deduction_type(Type):-creatableType(Type),!,fail.
 nonusefull_deduction_type(obj).
 nonusefull_deduction_type(Type):-is_asserted(formattype(Type)).
 
-assert_deduced_arg_isa_facts(Fact):- slow_kb_op(assert_deduced_arg_isa_facts_0(Fact)),!.
+assert_deduced_arg_isa_facts(Fact):- assert_deduced_arg_isa_facts_0(Fact),!.
 assert_deduced_arg_isa_facts_0(Fact):- ignore(((ground(Fact),forall(deduce_argIsa_facts(Fact,Arg,Type),add(isa(Arg,Type)))))).
 
 

@@ -34,7 +34,7 @@ moo:agent_call_command(Agent,take(SObj)) :-
 %Nothing to pick up
 moo:agent_call_command(Agent,take(_)) :-
 	call_update_charge(Agent,take),
-	add(failure(Agent,take)).
+	(add_cmdfailure(Agent,take)).
 
 % Is the obect going to stick around after taken, either as is
 % or in the agent's possession.

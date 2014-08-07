@@ -247,9 +247,9 @@ registerCycPredPlus2_3(_M,_PI,F/A2):-
 
 registerCycPredPlus2(P):-!,with_pi(P,registerCycPredPlus2_3).
 
-get_mpred_prop(F,genlInverse(P)):-!,genlInverse(F,P).
-get_mpred_prop(F,genlPreds(P)):-!,genlPreds(F,P).
-get_mpred_prop(F,P):-mpred_prop(F,P),!.
+get_mpred_prop(F,P):- mpred_prop(F,P).
+get_mpred_prop(Obj,PropVal):- safe_univ(PropVal,[Prop,NonVar|Val]),safe_univ(CallVal,[Prop,Obj,NonVar|Val]),call_mpred(CallVal).
+
 
 get_mpred_prop(F,_A,P):-get_mpred_prop(F,P).
 
@@ -354,8 +354,6 @@ decl_mpred_prolog(M,PI,F/A):-
 % :- decl_mpred posture/1.
 % :- dynamic_multifile_exported((decl_mpred/1)).
 
-:-dmsg_hide(game_assert).
-%:-dmsg_hide(db_op_exact).
 
 functor_check_univ(M:G1,F,List):-atom(M),member(M,[dbase,moo]),!,functor_check_univ(G1,F,List),!.
 functor_check_univ(G1,F,List):-must_det(compound(G1)),must_det(G1 \= _:_),must_det(G1 \= _/_),G1=..[F|List],!.

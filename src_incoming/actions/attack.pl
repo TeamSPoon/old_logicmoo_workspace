@@ -87,20 +87,14 @@ damage_foe(Agent,What,hit) :-
 	add(damage(What,NewDam)).
 
 % Record keeping
-moo:update_charge(Agent,attack) :-
-	del(charge(Agent,Old)),
-	New is Old - 5,
-	add(charge(Agent,New)).
-moo:update_stats(Agent,bash) :- 
-	del(damage(Agent,Old)),
-	New is Old - 2,
-	add(damage(Agent,New)),
-	add(failure(Agent,bash)).
+moo:update_charge(Agent,attack) :- uprop(charge(Agent,-5)).
+moo:update_stats(Agent,bash) :-  uprop(damage(Agent,-2)),
+	(add_cmdfailure(Agent,bash)).
 moo:update_stats(Agent,wiff) :- 
 	del(damage(Agent,Old)),
 	New is Old - 1,
 	add(damage(Agent,New)),
-	add(failure(Agent,bash)).
+	(add_cmdfailure(Agent,bash)).
 
 
 

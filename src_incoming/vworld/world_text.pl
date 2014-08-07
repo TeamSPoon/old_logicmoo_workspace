@@ -24,7 +24,7 @@ default_repl_obj_to_string(O,Type,toString(TypeO,O)):-copy_term(Type,TypeO),igno
 % Check to see if last action was successful or not
 :-export(success/2).
 success(Agent,no) :-
-	failure(Agent,_),!.
+	cmdfailure(Agent,_),!.
 success(_,yes).
 
 canUseEnglish:-true.

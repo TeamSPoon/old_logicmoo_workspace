@@ -109,13 +109,13 @@ hook:decl_database_hook(assert(_),Fact):- check_was_known_false(Fact).
 
 was_known_false(Fact):-is_known_false(Fact),retractall((is_known_false(_):-true)),dmsg(trace_or_throw(error+was_known_false(Fact))).
 
-check_was_known_false(Fact):-ignore(((is_known_false(Fact),was_known_false(Fact)))).
+check_was_known_false(Fact):- ignore(((is_known_false(Fact),was_known_false(Fact)))).
 
 hook:decl_database_hook(assert(_A_or_Z),label_type_props(Lbl,T,Props)):- add_w_hooks(default_type_props(T,[label(Lbl)|Props])).
 
-hook:decl_database_hook(assert(_A_or_Z),default_type_props(T,_)):- define_type_if_atom(T).
+hook:decl_database_hook(assert(_A_or_Z),default_type_props(T,_)):- decl_type_safe(T).
 
-hook:decl_database_hook(assert(_A_or_Z),mpred_prop(F,arity(A))):- ignore((A==1,define_type(F))) , ignore((atom(P),define_type(P))).
+hook:decl_database_hook(assert(_A_or_Z),mpred_prop(F,arity(A))):- ignore((A==1,decl_type(F))) , ignore((atom(P),decl_type(P))).
 
 
 % ========================================
@@ -225,7 +225,7 @@ coerce(What,_Type,NewThing):-NewThing = What.
       damage/2,
       description/2,
       facing/2,
-      failure/2,
+      cmdfailure/2,
       spd/2,
       grid/4,
       height/2,
@@ -378,7 +378,9 @@ props(Obj,PropSpecs):- req(props(Obj,PropSpecs)).
 aprops(Obj,PropSpecs):- areq(props(Obj,PropSpecs)).
 %% add(Assertion)
 add(C0):- must_det((db_op_int(assert(add), C0), extreme_debug(req(C0)))),!.
-%% padd(Obj,PropSpecs)
+%% uprop(Obj,PropSpecs) update the properties
+uprop(Obj,PropSpecs):- add(props(Obj,PropSpecs)).
+%% padd(Obj,Prop,Value)
 padd(Obj,PropSpecs):- add(props(Obj,PropSpecs)).
 %% padd(Obj,Prop,Value)
 padd(Obj,Prop,Value):- add(dbase_t(Prop,Obj,Value)).
@@ -563,7 +565,6 @@ db_op0(Op,props(Obj,nameStrings(Str))):-!, db_op0(Op,nameStrings(Obj,Str)).
 db_op0(Op,KB:Term):- is_kb_module(KB),!,db_op(Op,Term).
 db_op0(Op,KB:Term):- dbase_mod(KB),!,db_op(Op,Term).
 
-
 % db_op0(Op,(':-'(A))):- must((expand_goal_correct_argIsa(A,AA))),expanded_different(A,AA),!,db_op(Op, (':-'(AA))).
 
 db_op0(Op,[dbase_t,Class,Inst]):-!,db_op0(Op,isa(Inst,Class)).
@@ -587,7 +588,7 @@ db_op0(Op,(C1,C2)):- !,db_op(Op,C1),db_op(Op,C2).
 db_op0(Op,(C1;C2)):- !,db_op(Op,C1);db_op(Op,C2).
 
 
-db_op0(query(HLDS,Must),props(Obj,Props)):- var(Props),!,findall(Prop,(call_expanded_for(query(HLDS,Must),dbase_t([P,Obj|REST])),Prop=..[P|REST]),Props).
+db_op0(query(HLDS,Must),props(Obj,Props)):- nonvar(Obj),var(Props),!,gather_props_for(query(HLDS,Must),Obj,Props).
 db_op0(Op ,props(Obj,Open)):- var(Open),!,trace_or_throw(db_op(Op,props(Obj,Open))).
 db_op0(_Op,props(_Obj,[])):- !.
 db_op0(Op,props(Obj,[P])):- nonvar(P),!,db_op(Op,props(Obj,P)).
@@ -777,6 +778,7 @@ dbase_t_p2(P,LIST):- CALL=..[dbase_t,P|LIST],call(CALL).
 :-dmsg_hide(db_assert_mv).
 :-dmsg_hide(db_assert_sv).
 :-dmsg_hide(db_op_exact).
+:-dmsg_hide(game_assert).
 
 % assert_with to assert(OldV) mutlivalue pred
 :-export((db_assert_mv/4)).
@@ -923,7 +925,7 @@ cycAssert(A,B):-trace_or_throw(cycAssert(A,B)).
 
 :- include(dbase_i_cyc).
 
-:-decl_mpred(expand_args,2).
+:-decl_mpred_hybrid(expand_args,2).
 :-decl_mpred(objid,2).
 
 % flags
@@ -976,7 +978,7 @@ game_assert_handler(M:HB):-atom(M),!,game_assert_handler(HB).
 game_assert_handler(Call):-loop_check(game_assert_handler_lc(Call),true).
 
 game_assert_handler_lc(Call):- loop_check(game_assert_thread_override(Call),fail),!.  
-game_assert_handler_lc(type(A)):- must_det(define_type(A)),!.
+game_assert_handler_lc(type(A)):- must_det(decl_type(A)),!.
 game_assert_handler_lc(mpred_prop(A)):- decl_mpred(A),!.
 game_assert_handler_lc(mpred_prop(A,B)):- decl_mpred(A,B),!.
 game_assert_handler_lc(A):- A=..[Type,_], formattype(Type), trace_or_throw(formattype_ensure_skippable(A)),!.
@@ -995,7 +997,8 @@ game_assert_from_macropred(C):- loop_check(game_assert_from_macropred_lc(C),((dm
 game_assert_from_macropred_lc(A):-A==end_of_file,!.
 game_assert_from_macropred_lc(A):- not(compound(A)),!,trace_or_throw(not_compound(game_assert_from_macropred_lc(A))).
 game_assert_from_macropred_lc(':-'(A)):- predicate_property(A,_),!,must(logOnFailure(A)),!.
-game_assert_from_macropred_lc(':-'(A)):- trace_or_throw(missing_directive(A)),!.
+game_assert_from_macropred_lc(':-'(include(A))):- game_assert_handler(':-'(load_data_file(A))),!.
+game_assert_from_macropred_lc(':-'(A)):- dmsg(trace_or_throw(missing_directive(A))),!.
 game_assert_from_macropred_lc(':-'(Head,Body)):- must_det(assertz_local_game_clause(Head,Body)),!.
 game_assert_from_macropred_lc(RDF):- RDF=..[SVO,S,V,O],is_svo_functor(SVO),!,must_det(game_assert(dbase_t(V,S,O))).
 game_assert_from_macropred_lc(somethingIsa(A,List)):-forall_member(E,List,game_assert(isa(A,E))).
@@ -1055,18 +1058,22 @@ assertOnLoad(X):-game_assert(X).
 setTemplate(X):-game_assert(X).
 
 onSpawn(ClassFact):- ClassFact=..[Funct,InstA,DeclB],onSpawn(Funct,InstA,DeclB).
-
-onSpawn(ClassFact):- ClassFact=..[Funct,InstA],createByNameMangle(InstA,Inst),assert_isa(Inst,Funct).
+onSpawn(ClassFact):- ClassFact=..[Funct,InstA],createByNameMangle(InstA,Inst,Type2),assert_isa(Inst,Funct),assert_isa(Inst,Type2).
 
 englishServerInterface(SomeEnglish):-dmsg(todo(englishServerInterface(SomeEnglish))).
 
-onSpawn(Funct,DeclA,DeclB):- createByNameMangle(DeclA,IDA),!, createByNameMangle(DeclB,IDB),!, game_assert(dbase_t(Funct,IDA,IDB)).
+onSpawn(Funct,DeclA,DeclB):- 
+  with_assertions(deduceArgTypes(Funct),
+   ((createByNameMangle(DeclA,IDA,TypeA),!, createByNameMangle(DeclB,IDB,TypeB),!, 
+   assert_subclass_on_argIsa(Funct,1,TypeA),assert_subclass_on_argIsa(Funct,2,TypeB),
+   game_assert(dbase_t(Funct,IDA,IDB))))).
 
-createByNameMangle(InstA,Inst):- compound(InstA),!,functor_catch(InstA,Type,A),must(A==1),assert_isa(InstA,Type),InstA=Inst.
-createByNameMangle(InstA,_):- not(atom(InstA)),!,trace_or_throw(todo(not_atom_createByNameMangle(InstA))).
-createByNameMangle(Suggest,InstA):-split_name_type(Suggest,InstA,Type),assert_isa(InstA,Type).
-createByNameMangle(Type,InstA):- atom_concat(Type,'777',InstA),must_det(assert_isa(InstA,Type)).
-createByNameMangle(InstA,IDA):- gensym(InstA,IDA), englishServerInterface([create,InstA,IDA]).
+createByNameMangle(InstA,InstA,Type):-compound(InstA),InstA=..[Type|Props],assert_isa(InstA,Type),with_assertions(deduceArgTypes(_),padd(InstA,Props)).
+createByNameMangle(InstA,Inst,Type):- compound(InstA),!,functor_catch(InstA,Type,A),must(A==1),assert_isa(InstA,Type),InstA=Inst.
+createByNameMangle(InstA,_,Type):- not(atom(InstA)),!,trace_or_throw(todo(not_atom_createByNameMangle(InstA))).
+createByNameMangle(Suggest,InstA,Type):- once(split_name_type(Suggest,InstA,Type)),Suggest==InstA,assert_isa(InstA,Type).
+createByNameMangle(Type,InstA,Type):- atom_concat(Type,'777',InstA),must_det(assert_isa(InstA,Type)).
+createByNameMangle(InstA,IDA,Type):- gensym(InstA,IDA), englishServerInterface([create,InstA,IDA]).
 
 wfAssert(X):-game_assert(X). %  game_assert_later(X).
 

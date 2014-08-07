@@ -64,6 +64,8 @@ now_run_local_tests_dbg :- doall(defined_local_test).
 % [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
 % :- register_timer_thread(npc_ticker,30,npc_tick).
 
+:- prolog.
+
 % the real tests now (once)
 :- if_flag_true(was_run_dbg_pl,at_start(must_det(run_mud_tests))).
 
@@ -71,8 +73,6 @@ now_run_local_tests_dbg :- doall(defined_local_test).
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
 :- if_flag_true(was_run_dbg_pl, at_start(run)).
 
-
-:- prolog.
 
 % So scripted versions don't just exit
 :- if_flag_true(was_run_dbg_pl,at_start(prolog)).

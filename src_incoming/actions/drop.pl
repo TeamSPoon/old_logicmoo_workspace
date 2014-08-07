@@ -29,7 +29,7 @@ moo:agent_call_command(Agent,drop(SObj)) :-
 %Nothing to drop
 moo:agent_call_command(Agent,drop(_)) :-
 	call_update_charge(Agent,drop),
-	add(failure(Agent,drop)).
+	(add_cmdfailure(Agent,drop)).
 
 % Record keeping
 moo:update_charge(Agent,drop) :- add(charge(Agent,-1)).

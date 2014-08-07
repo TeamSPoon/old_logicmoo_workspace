@@ -73,13 +73,47 @@ choose_asserted(Prop,Obj,Value):- transitive_other(Prop,Obj,What),call(Prop,What
 
 maybe_cache(Prop,Obj,Value,What):-not(not(maybe_cache_0(Prop,Obj,Value,What))).
 
-checkNoArgViolation(isa,_Obj,_Value):-!.
-checkNoArgViolation(Prop,Obj,Value):-argIsa_call(Prop,2,Type),violatesType(Value,Type),findall(OT,isa(Value,OT),OType),trace_or_throw(violatesType_maybe_cache(Prop,Obj,Value,OType\=Type)).
-checkNoArgViolation(Prop,Obj,Value):-argIsa_call(Prop,1,Type),violatesType(Obj,Type),findall(OT,isa(Obj,OT),OType),trace_or_throw(violatesType_maybe_cache(Prop,Obj,Value,OType\=Type)).
-checkNoArgViolation(_Prop,_Obj,_Value):-!.
+:-export(checkNoArgViolation/1).
+checkNoArgViolation(Fact):-Fact=..[dbase_t,Prop|ObjValue],!,checkNoArgViolation_p_args(Prop,ObjValue),!.
+checkNoArgViolation(Fact):-Fact=..[Prop|ObjValue],!,checkNoArgViolation_p_args(Prop,ObjValue),!.
+checkNoArgViolation(_).
 
-hook:decl_database_hook(assert(_),Fact):-Fact=..[Prop,Obj,Value],checkNoArgViolation(Prop,Obj,Value).
-hook:decl_database_hook(assert(_),Fact):-Fact=..[dbase_t,Prop,Obj,Value],checkNoArgViolation(Prop,Obj,Value).
+checkNoArgViolation_p_args(isa,_).
+checkNoArgViolation_p_args(Prop,[Obj,Value]):-!,checkNoArgViolation(Prop,Obj,Value).
+checkNoArgViolation_p_args(Prop,[Obj,Value|_More]):-checkNoArgViolation(Prop,Obj,Value).
+checkNoArgViolation_p_args(_,_).
+
+:-thread_local deduceArgTypes/1.
+
+checkNoArgViolation(isa,_,_):-!.
+checkNoArgViolation(Prop,__,Value):-checkNoArgViolationOrDeduceInstead(Prop,2,Value),fail.
+checkNoArgViolation(Prop,Obj,__):-checkNoArgViolationOrDeduceInstead(Prop,1,Obj),fail.
+checkNoArgViolation(_,_,_):-!.
+
+checkNoArgViolationOrDeduceInstead(Prop,N,Obj):-argIsa_call(Prop,N,Type),not(unverifiableType(Type)),findall(OT,isa(Obj,OT),OType),checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type).
+
+
+checkNoArgViolationOrDeduceInstead(_Prop,_,Obj,_OType,_Type):-var(Obj),!.
+checkNoArgViolationOrDeduceInstead(Prop,N,[Obj],OType,Type):-!,checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type).
+checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type):- not(deduceArgTypes(Prop)),!,reallyCheckArgViolation(Prop,N,Obj,OType,Type).
+checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type):- deduce_argN(Prop,N,Obj,OType,Type),fail.
+checkNoArgViolationOrDeduceInstead(Prop,N,Obj,_,_):- argIsa_call(Prop,N,Type),findall(OT,isa(Obj,OT),OType),reallyCheckArgViolation(Prop,N,Obj,OType,Type).
+
+reallyCheckArgViolation(Prop,N,_Obj,_OType,argIsaFn(Prop,N)):-!.
+reallyCheckArgViolation(Prop,N,Obj,OType,Type):- violatesType(Obj,Type),trace_or_throw(violatesType_maybe_cache(Prop,N,Obj,OType\=Type)).
+
+
+assert_argIsa(Prop,N,Type):-add(argIsa(Prop,N,Type)).
+
+assert_subclass_on_argIsa(Prop,N,argIsaFn(Prop,N)):-!.
+assert_subclass_on_argIsa(Prop,N,_OType):-argIsa_call(Prop,N,PropType),PropType=argIsaFn(Prop,N),!. % , assert_argIsa(Prop,N,OType).
+assert_subclass_on_argIsa(Prop,N,OType):-argIsa_call(Prop,N,PropType),assert_subclass_safe(OType,PropType).
+
+deduce_argN(Prop,2,Obj,OType,argIsaFn(Prop, 2)):-atom_concat(Prop,'_value',Type),decl_type(Type),assert_argIsa(Prop,2,Type),deduce_argN(Prop,2,Obj,OType,Type).
+deduce_argN(Prop,N,Obj,[],Type):- Type \= argIsaFn(Prop,N), type(Type), assert_isa(Obj,Type),!.
+deduce_argN(Prop,N,_Obj,[OType|_],_Type):-assert_subclass_on_argIsa(Prop,N,OType),!.
+
+hook:decl_database_hook(assert(_),Fact):-checkNoArgViolation(Fact).
 
 maybe_cache_0(Prop,Obj,Value,_What):- checkNoArgViolation(Prop,Obj,Value).
 maybe_cache_0(Prop,Obj,Value,_What):-is_asserted(dbase_t(Prop,Obj,Value)),!.
@@ -91,7 +125,9 @@ maybe_cache_0(Prop,Obj,Value,What):- padd(Obj,Prop,Value),
 
 unverifiableType(term).
 unverifiableType(voprop).
+unverifiableType(id).
 unverifiableType(mpred).
+unverifiableType(text).
 unverifiableType(fpred).
 unverifiableType(formattype).
 unverifiableType(type).
@@ -163,7 +199,9 @@ get_type_with_default_props_0(Type):- is_asserted_clause(moo:default_inst_type_p
 get_type_with_default_props_0(Type):- is_asserted_clause(moo:label_type_props(_,Type,_),_),nonvar(Type).
 
 each_default_inst_type_props(Inst,Type,[Prop]):-call_no_cuts(moo:one_default_type_prop(Inst,Type,Prop)).
-each_default_inst_type_props(_,Type,Props):-call_no_cuts(moo:default_type_props(Type,Props)).
+each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(moo:default_inst_type_props(Inst,Type,Props)).
+each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(moo:default_type_props(Type,TProps)),subst(TProps,self,Inst,Props).
+each_default_inst_type_props(Inst,Type,[named(Inst),kwLabel(Lbl)|Props]):-call_no_cuts(moo:label_type_props(Lbl,Type,Props)).
 
 moo:one_default_type_prop(apath(Region,_Dir),areaPath,inRegion(Region)).
 
@@ -177,6 +215,8 @@ add_missing_instance_defaults(P):-
    get_inst_default_props(P,_PropListL,Missing),
    once(Missing=[];show_call(padd(P,Missing))).
 
+:-export(gather_props_for/3).
+gather_props_for(Op,Obj,Props):-findall(Prop,(length(REST,L),L<9,call_expanded_for(Op,dbase_t([P,Obj|REST])),Prop=..[P|REST]),Props).
 
 :-export(instance_missing_props/3).
 instance_missing_props(I,LPS,PS):- findall(P,(member(P,LPS),inst_missing_prop(I,P)),PS),!.

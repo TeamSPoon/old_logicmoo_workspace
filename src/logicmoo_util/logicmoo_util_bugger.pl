@@ -1026,8 +1026,10 @@ with_no_assertions(Head,Call):-with_assertions((Head:-!,fail),Call).
 
 
 :-thread_local(dmsg_hidden/1).
+:-meta_predicate_transparent(with_all_dmsg(?)).
+with_all_dmsg(Call):-with_no_assertions(dmsg_hidden(_),Call).
 :-meta_predicate_transparent(with_no_dmsg(?)).
-with_no_dmsg(Call):-with_no_assertions(dmsg_hidden(_),Call).
+with_no_dmsg(Call):-with_assertions(dmsg_hidden(_),Call).
 
 dmsg_hide(Term):-asserta(dmsg_hidden(Term)).
 dmsg_show(Term):-ignore(retract(dmsg_hidden(Term))).

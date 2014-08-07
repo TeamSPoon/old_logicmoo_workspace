@@ -54,7 +54,7 @@ move_command(Agent,DirS,DistS) :-
 move_command_1(Agent,Dir) :-
 	atloc(Agent,LOC),
         not(move_dir_target(LOC,Dir,_)),!,
-		add(failure(Agent,move)),
+		(add_cmdfailure(Agent,move)),
       throw(giveup(nopath(Agent,move))).
 
 % Run into something big, Ouch...
@@ -98,7 +98,7 @@ move_command_1(Agent,Dir) :-
 
 moo:update_charge(Agent,move) :- padd(Agent,charge,-4).
 
-moo:update_stats(Agent,collide) :- padd(Agent,damage,-5),add(failure(Agent,collide)).
+moo:update_stats(Agent,collide) :- padd(Agent,damage,-5),(add_cmdfailure(Agent,collide)).
 
 moo:update_stats(Agent,fall) :- padd(Agent,damage,-10).
 

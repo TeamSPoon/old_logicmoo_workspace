@@ -250,6 +250,7 @@ is_asserted(M:F,A,C):- atom(M),!,is_asserted(F,A,C).
 is_asserted(F,A,M:C):- atom(M),!,is_asserted(F,A,C).
 %  %  is_asserted(dbase_t,1,dbase_t(C)):-!,dbase_t(C).
 %  %  is_asserted(F,A,G):- is_asserted_lc_isa(F,A,G).
+% is_asserted(_,_,G):-was_isa(G,I,C),!,isa_asserted(I,C).
 is_asserted(dbase_t,_,C):-C=..[_,L|IST],atom(L),!,CC=..[L|IST],is_asserted_mpred(CC).
 %  %  is_asserted(Holds,_,C):-is_holds_true(Holds), C=..[_,L|IST],atom(L),!,CC=..[L|IST],is_asserted_mpred(CC).
 is_asserted(_,_,G):-is_asserted_mpred(G).
@@ -260,7 +261,7 @@ is_asserted_lc_isa(isa,2,isa(I,C)):-!,is_asserted_mpred_clause_isa(I,C).
 is_asserted_lc_isa(dbase_t,2,dbase_t(C,I)):-!,is_asserted_mpred_clause_isa(I,C).
 is_asserted_lc_isa(C,1,G):-arg(1,G,I),!,is_asserted_mpred_clause_isa(I,C).
 
-is_asserted_mpred_clause_isa(I,C):-is_asserted_mpred(isa(I,C)).
+% is_asserted_mpred_clause_isa(I,C):-is_asserted_mpred(isa(I,C)).
 
 is_asserted_mpred(G):-fact_loop_checked(G,asserted_mpred_clause(G)).
 
@@ -443,9 +444,11 @@ rescan_duplicated_facts(M,H):-findall(H,(clause_safe(M:H,B),B==true),CL1), once(
 rescan_duplicated_facts(M,H,BB):-notrace(doall((gather_fact_heads(M,H),BB=true,once((findall(C,(clause_safe(H,B),B=@=BB,reduce_clause((H:-B),C)),CL1),
                                                                      list_to_set(CL1,CL2),once(reduce_fact_heads(M,H,CL1,CL2))))))).
 
+
+
 rerun_database_hooks:-doall((gather_fact_heads(_M,H),forall(is_asserted(H),run_database_hooks(assert(z),H)))).
-
-
+rerun_database_hooks:-doall((is_asserted(subclass(I,C)),run_database_hooks(assert(z),subclass(I,C)))),fail.
+rerun_database_hooks:-doall((isa_asserted(I,C),run_database_hooks(assert(z),isa(I,C)))),fail.
 
 reduce_fact_heads(_M,_H,CL1,CL1):-!. % no change
 reduce_fact_heads(M,H,CL1,CL2):- 

@@ -58,7 +58,6 @@ prey_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[nut]).
 % maybe(N) == N chance of each agent spawning a new agent each turn
 
 moo:actiontype(spawn(type)).
-moo:actiontype(rez(type)).
 
 moo:agent_call_command(_Agent,spawn(prey)):-spawn.
 

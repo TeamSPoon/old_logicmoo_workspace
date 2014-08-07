@@ -14,6 +14,12 @@
 
 moo:argsIsa(action_verb_useable(verb,term(mpred),type,term(mpred))).
 
+
+expand_args(eachOf,subclass(eachOf('PortableObject','ProtectiveAttire',stowable),wieldable)).
+subclass('FluidReservoir',drinkable).
+subclass('Weapon',wieldable).
+subclass('ControlDevice',usable).
+
 moo:action_verb_useable(wear,wearing,wearable,stowed).
 moo:action_verb_useable(wield,wielding,wieldable,stowed).
 moo:action_verb_useable(use,using,usable,stowed).
@@ -42,7 +48,7 @@ moo:agent_call_command(Agent,SENT) :-
   get_use_verbs(USE,_USING,_USABLE,_STOWED),
     SENT=..[USE,_Obj],
 	call_update_charge(Agent,USE),
-	add(failure(Agent,USE)).
+	(add_cmdfailure(Agent,USE)).
 
 % Is the obect going to stick around after usen, either as is
 % or in the agent's possession.

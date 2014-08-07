@@ -89,10 +89,19 @@ call_expanded(_Doing,G,F,_A):-with_callMPred(F),!,call_mpred(F,G).
 call_expanded(Doing,G,F,A):-not(member(with_callMPred,Doing)),!,(call_mpred(F,G);call_expanded([with_callMPred|Doing],G,F,A)).
 
 
+check_mcall_ok(C):-checkNoArgViolation(C),check_was_known_false(C),!.
+check_mcall_ok(_).
+
 call_mpred(M:C):-atom(M),!,call_mpred(C).
 call_mpred(C):- compound(C),functor(C,F,_),!,call_mpred(F,C).
-call_mpred(_,C):- predicate_property(C,_),debugOnError(C),check_was_known_false(C).
-call_mpred(F,C):- not(mpred_prop(F,hasStub(body_req))),is_asserted(F,C).
+call_mpred(F,C):- not(predicate_property(C,_)),!,is_asserted(F,C).
+call_mpred(F,C):- mpred_prop(F,hasStub(body_req)),!,debugOnError(C),check_mcall_ok(C).
+call_mpred(F,C):- ground(C),!,call_mpred_g(F,C),!.
+call_mpred(F,C):- findall(C,is_asserted(F,C),Results),call_mpred_w_results(C,Results).
+call_mpred_w_results(C,Results):-member(C,Results).
+call_mpred_w_results(C,Results):-debugOnError(C),not(member(C,Results)),check_mcall_ok(C).
+call_mpred_g(F,C):-is_asserted(F,C),!.
+call_mpred_g(_,C):-debugOnError(C),!,check_mcall_ok(C).
 
 
 naf(Goal):-not(req(Goal)).
@@ -160,7 +169,9 @@ cholds_t(P,A1,A2):- hotrace(cholds_relaxed_t(P,A1,A2)).
 % cholds_t(P,A1):- !,cholds_t(isa,A1,P).
 cholds_t(P,A1):- isCycPredArity_ignoreable(P,1),which_t(DBS),(call_t(DBS,P,A1);call_mt_t(DBS,P,A1,_,_)).
 
-cholds_relaxed_t(P,A1,A2):- isCycPredArity_ignoreable(P,2),which_t(DBS),
+% cholds_relaxed_t(P,A1,A2):-var(A1),var(A2),!,dbase_t(P,A1,A2).
+cholds_relaxed_t(P,A1,A2):-
+  isCycPredArity_ignoreable(P,2),which_t(DBS),
       relax_term(P,PR,A1,R1,A2,R2),
          cholds_relaxed_0_t(DBS,PR,R1,R2).
 
@@ -242,11 +253,11 @@ xcall_t(P,A1,A2):- call(P,A1,A2).
 xcall_t(P,A1):- call(P,A1).
 xcall_t(P):- call(P).
 
+assertion_t(_):- not(useExternalDBs),!,fail.
 assertion_t([AH,P|LIST]):- is_holds_true(AH),!,assertion_t([P|LIST]).
 assertion_t([AH,P|LIST]):- is_holds_false(AH),!,assertion_f([P|LIST]).
 % todo hook into loaded files!
 % assertion_t([P|LIST]):- Call=..[dbase_t,P|LIST],Call.
-assertion_t(_):- not(useExternalDBs),!,fail.
 assertion_t(C):-dmsg(enter_assertion_t(C)),fail.
 assertion_t([P|LIST]):- tiny_kb:'ASSERTION'(':TRUE-DEF',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
 assertion_t([P|LIST]):- tiny_kb:'ASSERTION'(':TRUE-MON',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).

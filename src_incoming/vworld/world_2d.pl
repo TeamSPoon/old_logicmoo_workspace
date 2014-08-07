@@ -114,11 +114,18 @@ init3(LocName,LocType,xyz(LocName,_,Y,1),[]) :-
 
 init3(LocName,LocType,xyz(LocName,X,Y,1),[O|T]) :-
 	moo:label_type(O,Type),
-           rez_object(xyz(LocName,X,Y,1),Type),
+           rez_loc_object(xyz(LocName,X,Y,1),Type),
 	K is X + 1,
 	init3(LocName,LocType,xyz(LocName,K,Y,1),T).
 
 
+rez_loc_object(_,0):-!.
+rez_loc_object(XY,Type):-
+           gensym(Type,Name2),
+           Name = xyN(XY,Name2),           
+           assert_isa(Name,Type),
+           add(atloc(Name,XY)),!,
+           add_missing_instance_defaults(Name).
 
 nearby(X,Y):-atloc(X,L1),atloc(Y,L2),locs_near(L1,L2).
 
@@ -401,13 +408,6 @@ scan_lists_aux([_|Rest],Type,M,N) :-
 	Mtemp is M + 1,
 	!,
 	scan_lists_aux(Rest,Type,Mtemp,N).
-
-rez_object(_,0):-!.
-rez_object(XY,Type):-
-           gensym(Type,Name2),
-           Name =..[Type,xyN(XY,Name2)],
-           !,
-           add(atloc(Name,XY)),!.
 
 
 doorLocation(_Room,3,0,_Z,n).

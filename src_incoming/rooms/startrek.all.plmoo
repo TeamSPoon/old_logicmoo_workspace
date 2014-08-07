@@ -85,6 +85,7 @@ line_count(58).
 number_of_clauses(1).
 Pattern: wearing(_G1304,_G1305). 
  */
+somethingIsa('ArtifactCol1005-Boots673',['ArtifactCol1005','ProtectiveAttire','PortableObject','SomethingToWear']).
 wearing(vacuum(1),'ArtifactCol1005-Boots673').
 wearing(vacuum(1),'ArtifactCol1006-Comm-Badge674').
 wearing(vacuum(1),'ArtifactCol1003-Gold-Uniform675').
@@ -259,11 +260,13 @@ line_count(59).
 number_of_clauses(1).
 Pattern: inRegion(_G1375,_G1376). 
  */
+/*
 inRegion('Area1005-Object666','Area1005').
 inRegion('Area1008-Object667','Area1008').
 inRegion('Area1013-Object668','Area1013').
 inRegion('Area1016-Object669','Area1016').
 inRegion('Area1024-Object670','Area1024').
+*/
 inRegion('NpcCol1013-Alexander671','Area1025').
 inRegion(vacuum(1),'Area1010').
 inRegion(explorer(player1),'Area1000').
@@ -493,8 +496,8 @@ somethingIsa('Area1038',['BPVLocation','Indoors-IsolatedFromOutside','SpaceInAHO
 somethingIsa('Area1037',['BPVLocation','Indoors-IsolatedFromOutside','SpaceInAHOC']).
 somethingIsa('Area1040',['BPVLocation','FreeSpaceContent']).
 somethingIsa('Area1041',['BPVLocation','FreeSpaceContent']).
-inRegion('ShipMap123','Area1000').
 somethingIsa('ShipMap123',[item]).
+inRegion('ShipMap123','Area1000').
 verbOverride('ShipMap123',examine(this),
   prologCall(fmt("
 STARSHIP ENTERPRISE
