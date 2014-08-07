@@ -37,9 +37,9 @@ predicates([
   nameStrings(term,string),
   pathName(region,dir,string),
   inRegion(agent,'BPVLocation'),
-  possess(agent,'ProtectiveAttire'),
-  possess(agent,'Weapon'),
-  possess(agent,'PortableObject'),
+  stowed(agent,'ProtectiveAttire'),
+  stowed(agent,'Weapon'),
+  stowed(agent,'PortableObject'),
   wearing(agent,'ProtectiveAttire'),
   wearing(agent,'PortableObject'),
 
@@ -141,31 +141,31 @@ wearing('NpcCol1012-Ensign752','ArtifactCol1004-Blue-Uniform755').
 
  /* found 53 for wearing(_G1304,_G1305). */ 
 
-/* Prediate:  possess/2 
+/* Prediate:  stowed/2 
 interpreted.
 file('c:/development/opensim4opencog/bin/cynd/startrek/mudreader.pl').
 line_count(57).
 number_of_clauses(1).
-Pattern: possess(_G1328,_G1329). 
+Pattern: stowed(_G1328,_G1329). 
  */
-possess(vacuum(1),'ArtifactCol1000-Phaser676').
-possess(explorer(player1),'ArtifactCol1000-Phaser776').
-possess('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder681').
-possess('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder682').
-possess('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder683').
-possess('NpcCol1007-Guinan689','ArtifactCol1020-Tea690').
-possess('NpcCol1007-Guinan689','ArtifactCol1021-Synthehol691').
-possess('NpcCol1007-Guinan689','ArtifactCol1022-Ferengi-Ale692').
-possess('NpcCol1007-Guinan689','ArtifactCol1023-Romulan-Whisky693').
-possess('NpcCol1007-Guinan689','ArtifactCol1024-Lemonade-Prune-Juice694').
-possess('NpcCol1007-Guinan689','ArtifactCol1025-Vulcan-Beer695').
-possess('NpcCol1008-OBrien696','ArtifactCol1000-Phaser700').
-possess('NpcCol1006-Picard701','ArtifactCol1001-5-Phaser-Rifle705').
-possess('NpcCol1006-Picard701','ArtifactCol1011-5-Picards-Flute706').
-possess('NpcCol1005-Riker707','ArtifactCol1012-Trombone711').
-possess('NpcCol1002-Worf720','ArtifactCol1000-Phaser724').
+stowed(vacuum(1),'ArtifactCol1000-Phaser676').
+stowed(explorer(player1),'ArtifactCol1000-Phaser776').
+stowed('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder681').
+stowed('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder682').
+stowed('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder683').
+stowed('NpcCol1007-Guinan689','ArtifactCol1020-Tea690').
+stowed('NpcCol1007-Guinan689','ArtifactCol1021-Synthehol691').
+stowed('NpcCol1007-Guinan689','ArtifactCol1022-Ferengi-Ale692').
+stowed('NpcCol1007-Guinan689','ArtifactCol1023-Romulan-Whisky693').
+stowed('NpcCol1007-Guinan689','ArtifactCol1024-Lemonade-Prune-Juice694').
+stowed('NpcCol1007-Guinan689','ArtifactCol1025-Vulcan-Beer695').
+stowed('NpcCol1008-OBrien696','ArtifactCol1000-Phaser700').
+stowed('NpcCol1006-Picard701','ArtifactCol1001-5-Phaser-Rifle705').
+stowed('NpcCol1006-Picard701','ArtifactCol1011-5-Picards-Flute706').
+stowed('NpcCol1005-Riker707','ArtifactCol1012-Trombone711').
+stowed('NpcCol1002-Worf720','ArtifactCol1000-Phaser724').
 
- /* found 16 for possess(_G1328,_G1329). */ 
+ /* found 16 for stowed(_G1328,_G1329). */ 
 
 /* Prediate:  item/1 
 interpreted.
@@ -796,7 +796,7 @@ number_of_clauses(1).
 Pattern: somethingDescription(_G1470,_G1471). 
  */
 somethingDescription('NpcCol1000-Geordi684',["Lieutenant","Commander","Geordi","LaForge","Geordi LaForge","Lieutenant Commander Geordi LaForge is standing here","Geordi is the Chief Engineer of the Enterprise","He's blind, so he wears a special VISOR that lets him see things","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 3","mudMaxHitPoints: 12d12+3200","#$PunchingSomething mudBareHandDamage: 9d9+42","Geordi","Geordi LaForge","Lieutenant Commander Geordi LaForge is standing here","Geordi is the Chief Engineer of the Enterprise","He's blind, so he wears a special VISOR that lets him see things"]).
-somethingDescription(vacuum(1),["Lieutenant","Commander","Data","Android","Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He possess super-human strength, and is extremely tough","ACT_NICE_THIEF","AWARE","NOBACKSTAB","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOSUMMON","NOSLEEP","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 1","mudMaxHitPoints: 18d18+4000","#$PunchingSomething mudBareHandDamage: 10d10+75","Data","CycLBot","CycBot","CycBot1","Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He possess super-human strength, and is extremely tough"]).
+somethingDescription(vacuum(1),["Lieutenant","Commander","Data","Android","Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He stowed super-human strength, and is extremely tough","ACT_NICE_THIEF","AWARE","NOBACKSTAB","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOSUMMON","NOSLEEP","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 1","mudMaxHitPoints: 18d18+4000","#$PunchingSomething mudBareHandDamage: 10d10+75","Data","CycLBot","CycBot","CycBot1","Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He stowed super-human strength, and is extremely tough"]).
 somethingDescription(explorer(player1),["Lieutenant","Commander","Human","Player",
             "Explorer Player",
             "ACT_NICE_THIEF","AWARE","NOBACKSTAB","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOSUMMON",
@@ -1743,7 +1743,7 @@ docs ready */
 
 % TESTS
 
-actorStartState(agent,X,[inRegion(X,Y)|List]):-agent(X),inRegion(X,Y),findall(possess(X,P),possess(X,P),List1),findall(wearing(X,P),wearing(X,P),List2),flatten([List1,List2],List).
+actorStartState(agent,X,[inRegion(X,Y)|List]):-agent(X),inRegion(X,Y),findall(stowed(X,P),stowed(X,P),List1),findall(wearing(X,P),wearing(X,P),List2),flatten([List1,List2],List).
 initialStart([ 
 
 /*
@@ -1761,15 +1761,15 @@ inRegion('ArtifactCol1009-Tricorder761','Area1015').
 */
 %% printAll(actorStartState(agent,X,List),ss(agent,X,List)).
    ss(agent,'NpcCol1000-Geordi684',[inRegion('NpcCol1000-Geordi684','Area1000'),wearing('NpcCol1000-Geordi684','ArtifactCol1005-Boots685'),wearing('NpcCol1000-Geordi684','ArtifactCol1006-Comm-Badge686'),wearing('NpcCol1000-Geordi684','ArtifactCol1003-Gold-Uniform687'),wearing('NpcCol1000-Geordi684','ArtifactCol1008-VISOR688')]),
-   ss(agent,vacuum(1),[inRegion(vacuum(1),'Area1010'),possess(vacuum(1),'ArtifactCol1000-Phaser676'),wearing(vacuum(1),'ArtifactCol1005-Boots673'),wearing(vacuum(1),'ArtifactCol1006-Comm-Badge674'),wearing(vacuum(1),'ArtifactCol1003-Gold-Uniform675')]),
-   ss(agent,explorer(player1),[inRegion(explorer(player1),'Area1000'),possess(explorer(player1),'ArtifactCol1000-Phaser776'),wearing(explorer(player1),'ArtifactCol1005-Boots773'),wearing(explorer(player1),'ArtifactCol1006-Comm-Badge774'),wearing(explorer(player1),'ArtifactCol1003-Gold-Uniform775')]),
-   ss(agent,'NpcCol1002-Worf720',[inRegion('NpcCol1002-Worf720','Area1025'),possess('NpcCol1002-Worf720','ArtifactCol1000-Phaser724'),wearing('NpcCol1002-Worf720','ArtifactCol1005-Boots721'),wearing('NpcCol1002-Worf720','ArtifactCol1006-Comm-Badge722'),wearing('NpcCol1002-Worf720','ArtifactCol1003-Gold-Uniform723'),wearing('NpcCol1002-Worf720','ArtifactCol1007-Sash725')]),
-   ss(agent,'NpcCol1003-Dr-Crusher677',[inRegion('NpcCol1003-Dr-Crusher677','Area1015'),possess('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder681'),possess('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder682'),possess('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder683'),wearing('NpcCol1003-Dr-Crusher677','ArtifactCol1005-Boots678'),wearing('NpcCol1003-Dr-Crusher677','ArtifactCol1006-Comm-Badge679'),wearing('NpcCol1003-Dr-Crusher677','ArtifactCol1004-Blue-Uniform680')]),
+   ss(agent,vacuum(1),[inRegion(vacuum(1),'Area1010'),stowed(vacuum(1),'ArtifactCol1000-Phaser676'),wearing(vacuum(1),'ArtifactCol1005-Boots673'),wearing(vacuum(1),'ArtifactCol1006-Comm-Badge674'),wearing(vacuum(1),'ArtifactCol1003-Gold-Uniform675')]),
+   ss(agent,explorer(player1),[inRegion(explorer(player1),'Area1000'),stowed(explorer(player1),'ArtifactCol1000-Phaser776'),wearing(explorer(player1),'ArtifactCol1005-Boots773'),wearing(explorer(player1),'ArtifactCol1006-Comm-Badge774'),wearing(explorer(player1),'ArtifactCol1003-Gold-Uniform775')]),
+   ss(agent,'NpcCol1002-Worf720',[inRegion('NpcCol1002-Worf720','Area1025'),stowed('NpcCol1002-Worf720','ArtifactCol1000-Phaser724'),wearing('NpcCol1002-Worf720','ArtifactCol1005-Boots721'),wearing('NpcCol1002-Worf720','ArtifactCol1006-Comm-Badge722'),wearing('NpcCol1002-Worf720','ArtifactCol1003-Gold-Uniform723'),wearing('NpcCol1002-Worf720','ArtifactCol1007-Sash725')]),
+   ss(agent,'NpcCol1003-Dr-Crusher677',[inRegion('NpcCol1003-Dr-Crusher677','Area1015'),stowed('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder681'),stowed('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder682'),stowed('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder683'),wearing('NpcCol1003-Dr-Crusher677','ArtifactCol1005-Boots678'),wearing('NpcCol1003-Dr-Crusher677','ArtifactCol1006-Comm-Badge679'),wearing('NpcCol1003-Dr-Crusher677','ArtifactCol1004-Blue-Uniform680')]),
    ss(agent,'NpcCol1004-Troi712',[inRegion('NpcCol1004-Troi712','Area1007'),wearing('NpcCol1004-Troi712','ArtifactCol1005-Boots713'),wearing('NpcCol1004-Troi712','ArtifactCol1006-Comm-Badge714'),wearing('NpcCol1004-Troi712','ArtifactCol1004-Blue-Uniform715')]),
-   ss(agent,'NpcCol1005-Riker707',[inRegion('NpcCol1005-Riker707','Area1036'),possess('NpcCol1005-Riker707','ArtifactCol1012-Trombone711'),wearing('NpcCol1005-Riker707','ArtifactCol1005-Boots708'),wearing('NpcCol1005-Riker707','ArtifactCol1006-Comm-Badge709'),wearing('NpcCol1005-Riker707','ArtifactCol1002-Red-Uniform710')]),
-   ss(agent,'NpcCol1006-Picard701',[inRegion('NpcCol1006-Picard701','Area1035'),possess('NpcCol1006-Picard701','ArtifactCol1001-5-Phaser-Rifle705'),possess('NpcCol1006-Picard701','ArtifactCol1011-5-Picards-Flute706'),wearing('NpcCol1006-Picard701','ArtifactCol1005-Boots702'),wearing('NpcCol1006-Picard701','ArtifactCol1006-Comm-Badge703'),wearing('NpcCol1006-Picard701','ArtifactCol1002-Red-Uniform704')]),
-   ss(agent,'NpcCol1007-Guinan689',[inRegion('NpcCol1007-Guinan689','Area1021'),possess('NpcCol1007-Guinan689','ArtifactCol1020-Tea690'),possess('NpcCol1007-Guinan689','ArtifactCol1021-Synthehol691'),possess('NpcCol1007-Guinan689','ArtifactCol1022-Ferengi-Ale692'),possess('NpcCol1007-Guinan689','ArtifactCol1023-Romulan-Whisky693'),possess('NpcCol1007-Guinan689','ArtifactCol1024-Lemonade-Prune-Juice694'),possess('NpcCol1007-Guinan689','ArtifactCol1025-Vulcan-Beer695')]),
-   ss(agent,'NpcCol1008-OBrien696',[inRegion('NpcCol1008-OBrien696','Area1006'),possess('NpcCol1008-OBrien696','ArtifactCol1000-Phaser700'),wearing('NpcCol1008-OBrien696','ArtifactCol1005-Boots697'),wearing('NpcCol1008-OBrien696','ArtifactCol1006-Comm-Badge698'),wearing('NpcCol1008-OBrien696','ArtifactCol1003-Gold-Uniform699')]),
+   ss(agent,'NpcCol1005-Riker707',[inRegion('NpcCol1005-Riker707','Area1036'),stowed('NpcCol1005-Riker707','ArtifactCol1012-Trombone711'),wearing('NpcCol1005-Riker707','ArtifactCol1005-Boots708'),wearing('NpcCol1005-Riker707','ArtifactCol1006-Comm-Badge709'),wearing('NpcCol1005-Riker707','ArtifactCol1002-Red-Uniform710')]),
+   ss(agent,'NpcCol1006-Picard701',[inRegion('NpcCol1006-Picard701','Area1035'),stowed('NpcCol1006-Picard701','ArtifactCol1001-5-Phaser-Rifle705'),stowed('NpcCol1006-Picard701','ArtifactCol1011-5-Picards-Flute706'),wearing('NpcCol1006-Picard701','ArtifactCol1005-Boots702'),wearing('NpcCol1006-Picard701','ArtifactCol1006-Comm-Badge703'),wearing('NpcCol1006-Picard701','ArtifactCol1002-Red-Uniform704')]),
+   ss(agent,'NpcCol1007-Guinan689',[inRegion('NpcCol1007-Guinan689','Area1021'),stowed('NpcCol1007-Guinan689','ArtifactCol1020-Tea690'),stowed('NpcCol1007-Guinan689','ArtifactCol1021-Synthehol691'),stowed('NpcCol1007-Guinan689','ArtifactCol1022-Ferengi-Ale692'),stowed('NpcCol1007-Guinan689','ArtifactCol1023-Romulan-Whisky693'),stowed('NpcCol1007-Guinan689','ArtifactCol1024-Lemonade-Prune-Juice694'),stowed('NpcCol1007-Guinan689','ArtifactCol1025-Vulcan-Beer695')]),
+   ss(agent,'NpcCol1008-OBrien696',[inRegion('NpcCol1008-OBrien696','Area1006'),stowed('NpcCol1008-OBrien696','ArtifactCol1000-Phaser700'),wearing('NpcCol1008-OBrien696','ArtifactCol1005-Boots697'),wearing('NpcCol1008-OBrien696','ArtifactCol1006-Comm-Badge698'),wearing('NpcCol1008-OBrien696','ArtifactCol1003-Gold-Uniform699')]),
    ss(agent,'NpcCol1009-Wesley716',[inRegion('NpcCol1009-Wesley716','Area1016'),wearing('NpcCol1009-Wesley716','ArtifactCol1005-Boots717'),wearing('NpcCol1009-Wesley716','ArtifactCol1006-Comm-Badge718'),wearing('NpcCol1009-Wesley716','ArtifactCol1002-Red-Uniform719')]),
    ss(agent,'NpcCol1010-Livingston726',[inRegion('NpcCol1010-Livingston726','Area1035')]),
    ss(agent,'NpcCol1011-Spot727',[inRegion('NpcCol1011-Spot727','Area1003')]),

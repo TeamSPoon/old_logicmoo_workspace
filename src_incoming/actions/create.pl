@@ -21,18 +21,23 @@ moo:agent_call_command(Agent,create(SWhat)):-  create_new_object(Agent,SWhat,1).
 
 create_new_object(Agent,[S|What]):-create_new_object(Agent,[S|What],1).
 
+:-decl_mpred_prolog(authorWas(term,term)).
+:-decl_mpred_prolog(current_pronoun(agent,string,term)).
+
+moo:agent_call_command(Agent,rez(NewType)):- nonvar(NewType), atloc(Agent,LOC), create_instance(NewType,item,[atloc(LOC)]).
+
 :-export(create_new_object/3).
 create_new_object(Agent,[S|What],ArgAt):-
    split_name_type(S,I,C),
    show_call(add(isa(I,C))),
    padd(I,authorWas(Agent)),
-   padd(Agent,possess,I),
+   padd(Agent,stowed,I),
    padd(Agent,current_pronoun("it",I)),
    get_inst_default_props(I,_All,Need),
    show_call(padd(I,Need)),
    ArgAt2 is ArgAt+1,
-   addPropInfo(Agent,I,What,ArgAt2),
-   !,term_listing(I),!.
+   addPropInfo(Agent,I,What,ArgAt2),!.
+   
 
 addPropInfo(Agent,I,What,ArgAt2):-dmsg(todo(addPropInfo(Agent,I,What,ArgAt2))).
 

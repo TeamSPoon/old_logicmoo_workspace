@@ -35,6 +35,11 @@ type(extentKnown).
 argsIsa(ft_info(formattype,term)).
 argsIsa(subft(formattype,formattype)).
 
+:-decl_mpred_hybrid((genlInverse/2,genlPreds/2)).
+
+multiValued(genlInverse(mpred,mpred)).
+multiValued(genlPreds(mpred,mpred)).
+
 mpred_prop(subft, extentKnown).
 mpred_prop(ft_info, extentKnown).
 mpred_prop(subft, prologOnly).
@@ -50,7 +55,8 @@ creatableType('TemporallyExistingThing').
 
 multiValued(contains(container,obj)).
 multiValued(grid(region,int,int,obj)).
-multiValued(possess(agent,item)).
+multiValued(possess(agent,spatialthing)).
+genlPreds(possess,wearing).
 multiValued(subclass(type,type)).
 multiValued(isa(term,type)).
 argsIsa(somethingIsa(term,list(type))).
@@ -217,10 +223,8 @@ prologBuiltin(world:nearby(obj,obj)).
 multiValued(pathBetween(region,dir,region)).
 multiValued(named(term,term),[]).
 
-
-argsIsa(genlPreds(mpred,mpred)).
-:-must_det(call_argIsa(genlPreds,2,_Type)).
-genlPreds(named,objid).
+:-must_det(argIsa_call(genlPreds,2,_Type)).
+genlPreds(mpred,mpred).
 
 %multiValued(ofclass(term,type),[alias(isa)]).
 

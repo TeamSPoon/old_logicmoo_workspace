@@ -54,7 +54,7 @@ fix_argIsa(F,N,int(Val),int):-add(mpred_prop(F,default_sv(N,Val))),!.
 fix_argIsa(_,_,list(Type),list(Type)):-!.
 fix_argIsa(_,_,formatted(Type),formatted(Type)):-!.
 fix_argIsa(_,_,Arg,Arg).
-fix_argIsa(F,N,Type,F):-compound(Type),Type=..[F,Val],get_isa_backchaing(Val,F),decl_mpred(F,default_sv(N,Val)),!.
+fix_argIsa(F,N,Type,F):-compound(Type),Type=..[F,Val],isa_backchaing(Val,F),decl_mpred(F,default_sv(N,Val)),!.
 
 fix_argsIsas(_,_,[],[]):-!.
 fix_argsIsas(F,N,[Arg|TList],[G|List]):-

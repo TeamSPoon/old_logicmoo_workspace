@@ -140,7 +140,7 @@ create_meta(T,P,C,MT):-
 
 rez_to_inventory(Whom,T,P):-
    create_meta(T,P,_,item),
-   padd(Whom,possess(P)).
+   padd(Whom,stowed(P)).
 
 moo:subclass('Area',region).
 moo:nonCreatableType(int).

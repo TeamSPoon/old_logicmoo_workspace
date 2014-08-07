@@ -34,6 +34,7 @@ with_no_fallbacks(Call):-with_assertions(noDefaultValues(_),Call).
 
 :- dynamic_multifile_exported(transitive_other/3).
 
+choose_val(Prop,Obj,Value):- var(Obj),nonvar(Value),!,is_asserted(dbase_t(Prop,Obj,Value)).
 choose_val(Prop,Obj,Value):- choose_right(Prop,Obj,Value).
 
 generate_candidate_arg_values(Prop,N,Obj):-call_vars_tabled(Obj,generate_candidate_arg_values0(Prop,N,Obj)).
@@ -73,8 +74,8 @@ choose_asserted(Prop,Obj,Value):- transitive_other(Prop,Obj,What),call(Prop,What
 maybe_cache(Prop,Obj,Value,What):-not(not(maybe_cache_0(Prop,Obj,Value,What))).
 
 checkNoArgViolation(isa,_Obj,_Value):-!.
-checkNoArgViolation(Prop,Obj,Value):-call_argIsa(Prop,2,Type),violatesType(Value,Type),findall(OT,isa(Value,OT),OType),trace_or_throw(violatesType_maybe_cache(Prop,Obj,Value,OType\=Type)).
-checkNoArgViolation(Prop,Obj,Value):-call_argIsa(Prop,1,Type),violatesType(Obj,Type),findall(OT,isa(Obj,OT),OType),trace_or_throw(violatesType_maybe_cache(Prop,Obj,Value,OType\=Type)).
+checkNoArgViolation(Prop,Obj,Value):-argIsa_call(Prop,2,Type),violatesType(Value,Type),findall(OT,isa(Value,OT),OType),trace_or_throw(violatesType_maybe_cache(Prop,Obj,Value,OType\=Type)).
+checkNoArgViolation(Prop,Obj,Value):-argIsa_call(Prop,1,Type),violatesType(Obj,Type),findall(OT,isa(Obj,OT),OType),trace_or_throw(violatesType_maybe_cache(Prop,Obj,Value,OType\=Type)).
 checkNoArgViolation(_Prop,_Obj,_Value):-!.
 
 hook:decl_database_hook(assert(_),Fact):-Fact=..[Prop,Obj,Value],checkNoArgViolation(Prop,Obj,Value).
@@ -103,7 +104,7 @@ violatesType(_,Type):- unverifiableType(Type),!,fail.
 violatesType(Value,int):-number(Value),!,fail.
 %violatesType(apath(_,_),Type):-!,(Type\=areaPath,Type\=obj).
 violatesType(Value,Type):- compound(Type),!,not(term_is_ft(Value,Type)),!.
-violatesType(Value,Type):- once((get_isa_backchaing(Value,_))), no_loop_check(not(get_isa_backchaing(Value,Type))).
+violatesType(Value,Type):- once((isa_backchaing(Value,_))), no_loop_check(not(isa_backchaing(Value,Type))).
 
 hook:decl_database_hook(Type,Changer):- retract(on_change_once(Type,Changer,Call)),Call.
 hook:decl_database_hook(Type,Changer):- forall(on_change_always(Type,Changer,Call),Call).

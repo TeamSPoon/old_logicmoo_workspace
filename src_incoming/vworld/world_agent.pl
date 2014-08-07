@@ -75,9 +75,9 @@ call_agent_action_lc(Agent,CMD):-
 
 
 % complete event
-call_agent_where_action_lc(Agent,Where,CMD):- debugOnError(moo:agent_call_command(Agent,CMD)),flush_output,!,raise_location_event(Where,notice(reciever,done(Agent,CMD))),!.
+call_agent_where_action_lc(Agent,Where,CMD):- debugOnError(moo:agent_call_command(Agent,CMD)),flush_output,!,raise_location_event(Where,notice(reciever,done(Agent,CMD))),!,padd(Agent,last_command(CMD)).
 % fail event
-call_agent_where_action_lc(Agent,Where,CMD):- raise_location_event(Where,notice(reciever,failed(Agent,CMD))),!.
+call_agent_where_action_lc(Agent,Where,CMD):- raise_location_event(Where,notice(reciever,failed(Agent,CMD))),!,padd(Agent,last_command(CMD)).
 
 
 get_session_id(IDIn):-current_input(ID),is_stream(ID),!,ID=IDIn.

@@ -198,8 +198,8 @@ pttp_test(chang_lee_example3,
 %%% ***
 %%% ****f* PTTP_Examples/chang_lee_example4
 %%% DESCRIPTION
-%%%   In a group with left inverse and left identity
-%%%   every element has a right inverse.
+%%%   In a group with left genlInverse and left identity
+%%%   every element has a right genlInverse.
 %%% NOTES
 %%%   this is problem GRP004-1 in TPTP
 %%% SOURCE
@@ -487,8 +487,8 @@ chang_lee_example3 :-
 %%% ***
 %%% ****f* PTTP_Examples/chang_lee_example4
 %%% DESCRIPTION
-%%%   In a group with left inverse and left identity
-%%%   every element has a right inverse.
+%%%   In a group with left genlInverse and left identity
+%%%   every element has a right genlInverse.
 %%% NOTES
 %%%   this is problem GRP004-1 in TPTP
 %%% SOURCE

@@ -18,6 +18,7 @@ moo:type_action_info(What,text("command is: ",What)):- moo:actiontype(What).
 get_type_action_help_commands_list(A,B,C):-get_type_action_help_0(A,B,C).
 
 :-export(get_type_action_templates/1).
+get_type_action_templates(Templ):- moo:actiontype(Templ).
 get_type_action_templates(Templ):- get_type_action_help_0(_,Templ,_),good_template(Templ).
 
 :-export(good_template/1).
@@ -27,7 +28,7 @@ good_template(Templ):- \+ contains_singletons(Templ).
 get_type_action_help_0(isaFn(A),TEMPL,text(Text,'does: ',do(A2,TEMPL))):- between(1,5,L),length(Text,L),get_agent_text_command(A,Text,A2,Goal),(nonvar(Goal)->TEMPL=Goal;TEMPL=Text).
 get_type_action_help_0(A,B,C):-            call_no_cuts(moo:action_info(A,B,C)).
 get_type_action_help_0(_What,TEMPL,Help):- call_no_cuts(moo:action_info(TEMPL,Help)).
-get_type_action_help_0(_What,TEMPL,S):-    call_no_cuts(moo:action_info(TEMPL)),sformat(S,'Prolog looks like: ~q',[TEMPL]).
+get_type_action_help_0(_What,TEMPL,S):-    call_no_cuts(moo:actiontype(TEMPL)),sformat(S,'Prolog looks like: ~q',[TEMPL]).
 get_type_action_help_0(What,Syntax,text([makes,happen,List])):- call_no_cuts(moo:action_rules(Agent,Verb,[Obj|Objs],List)),atom(Verb),safe_univ(Syntax,[Verb,Obj|Objs]), once(member(isa(Obj,Type),List);Type=term),ignore(Agent=an(What)),ignore(What=agent).
 
 

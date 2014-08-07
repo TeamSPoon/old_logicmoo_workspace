@@ -214,8 +214,8 @@ add_w_hooks_fallback(Data,Gaf):-asserta_if_new(Data),asserta_if_new(Gaf),run_dat
 
 fact_checked(Fact,Call):- no_loop_check(fact_checked0(Fact,Call)).
 fact_checked0(Fact,Call):- not(ground(Fact)),!,Call.
-fact_checked0(Fact,_):-is_known_true(Fact),!.
 fact_checked0(Fact,_):-is_known_false(Fact),!,fail.
+%fact_checked0(Fact,_):-is_known_true(Fact),!.
 fact_checked0(_Fact,Call):-Call,!.
 % would only work outside a loop checker (so disable)
 % fact_checked0(Fact,_Call):- really_can_table_fact(Fact),asserta(is_known_false(Fact)),!,dmsg(is_known_false(Fact)),!,fail.

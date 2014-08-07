@@ -83,8 +83,6 @@ as_one_of(Types,Type):-nonvar(Type),moo:type(Type),!,member(Type,Types).
 as_one_of([Type],TypeO):-!,moo:same_arg(same_or(subclass),Type,TypeO).
 as_one_of(Types,oneOf(Types)).
 
-:-export(argIsa_call/3).
-argIsa_call(F,N,Type):-argIsa_call(query(dbase_t,must),F,N,Type).
 
 argIsa_call(Op,_:F,N,Type):-!,argIsa_call(Op,F,N,Type),!.
 argIsa_call(Op,F/_,N,Type):- !,argIsa_call(Op,F,N,Type),!.
@@ -94,15 +92,14 @@ argIsa_call(Op,F,N,Type):-hotrace((loop_check((argIsa_call_nt(Op,F,N,Type),!),Ty
 argIsa_call_nt(_O,F,N,Type):-argIsa_call_nt(F,N,Type).
 
 
-:-export(call_argIsa/3).
-
-call_argIsa(F,N,Type):- argIsa_asserted(F,N,Type),!,asserta(argIsa_call_0(F,N,Type)).
-call_argIsa(F,N,Type):- argIsa_call_0(F,N,Type),!.
-call_argIsa(F,N,Type):- argIsa_call_1(F,N,Type),!.
+:-export(argIsa_call/3).
+argIsa_call(F,N,Type):- argIsa_call_0(F,N,Type),!.
+argIsa_call(F,N,Type):- argIsa_asserted(F,N,Type),!,asserta(argIsa_call_0(F,N,Type)).
+argIsa_call(F,N,Type):- argIsa_call_1(F,N,Type),!.
 
 
 argIsa_call_nt(F,N,Type):- once(var(F);not(number(N))),dtrace,once(var(F);not(number(N))),trace_or_throw(once(var(F);not(number(N)))->argIsa_call(F,N,Type)).
-argIsa_call_nt(F,N,Type):- call_argIsa(F,N,Type).
+argIsa_call_nt(F,N,Type):- argIsa_call(F,N,Type),!.
 argIsa_call_nt(F,N,Type):- findall(T,argIsa_call_0(F,N,Type),T),Types=[_|_],!,as_one_of(Types,Type),!.
 
 
@@ -135,10 +132,11 @@ argIsa_call_0(resultIsa,2,type).
 argIsa_call_0(subclass,_,type).
 argIsa_call_0(subft,_,formattype).
 argIsa_call_0(subft,_,term).
+argIsa_call_0(stowed,_,term).
 argIsa_call_0(term_anglify,_,term).
 argIsa_call_0(type_max_charge,1,type).
 
-argIsa_call_0(WP,_,mpred):-member(WP,[retract_with_pred,assert_with_pred,query_with_pred]).
+argIsa_call_0(WP,_,mpred):-member(WP,[retract_with_pred,assert_with_pred,query_with_pred,genlPreds,genlInverse]).
 
 argIsa_call_0(type_max_charge,2,int).
 argIsa_call_0(type_max_damage,1,type).
@@ -264,7 +262,7 @@ inverse_args([P,A,R,G,S],[S,A,R,G,P]):-!.
 % =======================================================
 
 
-moo:decl_coerce(A,Type,AA):- correctAnyType(tell(_),A,Type,AA).
+moo:decl_coerce(A,Type,AA):- correctAnyType(assert(_),A,Type,AA).
 
 :-export(same_vars/2).
 same_vars(T1,T2):-term_variables(T1,V1),term_variables(T2,V2),!,V1==V2.
@@ -364,7 +362,7 @@ correctType(_O,A,fpred,AA):- any_to_atom(A,AA).
 correctType(_O,A,pred,AA):- any_to_atom(A,AA).
 correctType(_O,A,formatted,AA):- dtrace, must_equals(A,AA).
 correctType(_O,A,atom,AA):- any_to_atom(A,AA).
-correctType(tell(_),A,type,AA):- atom(A),define_type(A),must_equals(A,AA).
+correctType(assert(_),A,type,AA):- atom(A),define_type(A),must_equals(A,AA).
 correctType(_O,A,verb,AA):- must_equals(A,AA).
 correctType(_O,A,Type,AA):- compound(A),not(is_list(A)),atom(Type),functor_safe(A,Type,_), must_equals(A,AA).
 
@@ -486,7 +484,7 @@ learnArgIsaInst(_,_,_).
 hook:deduce_facts(Fact,isa(Arg,Type)):- slow_kb_op(deduce_argIsa_facts(Fact,Arg,Type)).
 
 
-call_argIsa_ForAssert(F,N,Type):-call_argIsa(F,N,Type),atom(Type),!,not(nonusefull_deduction_type(Type)),type(Type).
+call_argIsa_ForAssert(F,N,Type):-argIsa_call(F,N,Type),atom(Type),!,not(nonusefull_deduction_type(Type)),type(Type).
 
 nonusefull_deduction_type(term).
 nonusefull_deduction_type(voprop).

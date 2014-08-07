@@ -115,7 +115,7 @@ do_player_action(Agent,CMD):-var(CMD),!,fmt('unknown_var_command(~q,~q).',[Agent
 do_player_action(_,EOF):- end_of_file == EOF, !, tick_tock.
 do_player_action(_,''):-!, tick_tock.
 do_player_action(Agent,CMD):- call_agent_command(Agent, CMD),!.
-do_player_action(Agent,CMD):-fmt('skipping_unknown_player_action(~q,~q).~n',[Agent,CMD]).
+do_player_action(Agent,CMD):-fmt('skipping_unknown_player_action(~q,~q).~n',[Agent,CMD]),!,fail.
 
 
 % ===========================================================

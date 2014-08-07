@@ -20,11 +20,12 @@ moo:actiontype(take(item)).
 
 % Take something
 % Successfully picking something up
-moo:agent_call_command(Agent,take(SObj)) :- 
-	hotrace(once((inRegion(Agent,LOC),
-              inRegion(Obj,LOC),
-              not(possess(Agent,Obj)),
-              object_match(SObj,Obj)))),
+moo:agent_call_command(Agent,take(SObj)) :-
+	(once((inRegion(Agent,LOC),
+                       inRegion(Obj,LOC),nonvar(Obj),
+                       not(possess(Agent,Obj)),
+
+                       object_match(SObj,Obj)))),
 	nop((ignore(props(Obj,weight<2)),
 	ignore(worth(Agent,take,Obj)))),
 	permanence_take(take,Agent,Obj),

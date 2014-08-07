@@ -51,7 +51,7 @@ sc1(_,C):-C, ignore((not(ground(C)),dmsg(non_ground_sc1(C)))).
 call_expanded_for_all(Must,F,Vs,Call):- loop_check(sc1(F,call_expanded_for_all0(Must,F,Vs,Call)),fail).
 
 call_expanded_for_all0(_,subclass,_Vs,C):-!,is_asserted(subclass,C).
-call_expanded_for_all0(_,get_isa_backchaing,_Vs,C):-!,C.
+call_expanded_for_all0(_,isa_backchaing,_Vs,C):-!,C.
 
 % call_expanded_for_all0(Op, F,Vs,Wild):-dmsg(call_expanded_for(Op,Wild)),fail.
 call_expanded_for_all0(assertedOnly,_,_Vs,C):-!,dtrace,is_asserted(C).

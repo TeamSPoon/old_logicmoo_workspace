@@ -28,7 +28,7 @@ moo:agent_text_command(Agent,[Sit],Agent,Sit):- moo_posture(Sit).
 moo:action_info(Posture,text("sets and agent's stance to ",Posture)):-moo_posture(Posture).
 
 % Sit and do nothing.
-moo:agent_call_command(Agent,Sit):- moo_posture(Sit),
+moo:agent_call_command(Agent,Sit):- nonvar(Sit),moo_posture(Sit),
         fmt('agent ~w is now ~wing ',[Agent,Sit]),
         padd(Agent,stance(Sit)),
 	call_update_charge(Agent,Sit).

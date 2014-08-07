@@ -141,9 +141,14 @@ moo:default_inst_type_props(OfAgent,agent,[facing(F),atloc(L)]):-ignore((nonvar(
 moo:transitive_other(atloc,Obj,What):-inside_of(Obj,What).
 
 :-export(inside_of/2).
-inside_of(Obj,What):-is_asserted(possess(What,Obj)).
+inside_of(Obj,What):-is_asserted(stowed(What,Obj)).
 inside_of(Obj,What):-is_asserted(wearing(What,Obj)).
 inside_of(Obj,What):-is_asserted(contains(What,Obj)).
+
+genlInverse(inside_of,possess).
+genlInverse(wearing,inside_of).
+genlInverse(contains,inside_of).
+genlInverse(stowed,inside_of).
 
 put_in_world(self):-!.
 put_in_world(Agent):-loop_check(put_in_world_lc(Agent),true),!.
@@ -173,7 +178,7 @@ create_someval(Pred,_Arg1,Value):- must_det_l([moo:mpred_arity(Pred,Last),argIsa
 :-export(create_random/3).
 create_random(dir,Dir,Test) :- my_random_member(Dir,[n,s,e,w,ne,nw,se,sw]),Test,!.
 create_random(Type,Value,Test):- atom(Type),atom_concat('random_',Type,Pred),Call=..[Pred,Value],predicate_property(Call,_),Call,Test,!.
-create_random(Type,Value,Test):- findall(V,(get_isa_backchaing(V,Type)),Possibles),Possibles\=[],randomize_list(Possibles,Randomized),!,member(Value,Randomized),Test,!.
+create_random(Type,Value,Test):- findall(V,(isa_backchaing(V,Type)),Possibles),Possibles\=[],randomize_list(Possibles,Randomized),!,member(Value,Randomized),Test,!.
 create_random(Type,Value,Test):- trace_or_throw(failed(create_random(Type,Value,Test))).
 create_random(int,3,Test):-call(Test),dmsg(create_random(int,3,Test)),dtrace.
 

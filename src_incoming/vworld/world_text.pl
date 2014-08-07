@@ -292,7 +292,7 @@ local_term_anglify_np(string(Obj),string,Obj):- !.
 local_term_anglify_np(Obj,string,Obj):- !.
 
 local_term_anglify_np_last(Obj,Hint,String):- anglify_noun_known(Obj,Hint,String),!.
-local_term_anglify_np_last(Obj,FT,String):- formattype(FT),correctFormatType(tell(_),Obj,FT,String),!.
+local_term_anglify_np_last(Obj,FT,String):- formattype(FT),correctFormatType(assert(_),Obj,FT,String),!.
 local_term_anglify_np_last(Obj,Type,[prolog(Obj)]):-formattype(Type),!.
 local_term_anglify_np_last(Obj,Type,[the,Type,prolog(Obj)]):-!.
 local_term_anglify_np_last(apath(Region,Dir),_,[a,fN(Dir,dir),'-ern',way,from,fN(Region,np)]):-!.
@@ -301,7 +301,7 @@ local_term_anglify_np_last(Obj,_,[the,noun,with,token,Obj]):-!.
 
 
 % anglify_noun_known(Self,_Hint,[you]):- current_agent(Self),!.
-anglify_noun_known(Obj,FT,String):- formattype(FT),correctFormatType(tell(_),Obj,FT,String),!.
+anglify_noun_known(Obj,FT,String):- formattype(FT),correctFormatType(assert(_),Obj,FT,String),!.
 anglify_noun_known(explorer(StringO),_Hint, [StringO]).
 anglify_noun_known(Obj,_Hint,[right,here]):- current_agent(Self),atloc(Self,Obj),!.
 anglify_noun_known(Obj,_Hint,[here]):- current_agent(Self),req(inRegion(Self,Obj)),!.

@@ -200,7 +200,7 @@ mpred_arity('abbreviationString-PN', 2).
 
 make_functorskel(F,_):- fskel(F,_,_,_,_,_,_),!.
 make_functorskel(F,N):- mpred_arity(F,N),make_functorskel(F,N,SKEL),asserta(SKEL),!.
-make_functorskel(F,N):- ignore(mpred_arity(F,A)),dmsg(once(trace_or_throw(illegal_make_functorskel(F,N,A)))).
+make_functorskel(F,N):- ignore(mpred_arity(F,A)),dmsg(todo(trace_or_throw(illegal_make_functorskel(F,N,A)))).
 
 dbase2pred2svo(DBASE,PRED,svo(A,F,RGS)):-fskel(F,DBASE,PRED,A,RGS,_,_),!.
 dbase2pred2svo(DBASE,PRED,svo(A,F,RGS)):-compound(PRED),functor_catch(PRED,F,N),make_functorskel(F,N),!,fskel(F,DBASE,PRED,A,RGS,_,_),!.
@@ -247,8 +247,11 @@ registerCycPredPlus2_3(_M,_PI,F/A2):-
 
 registerCycPredPlus2(P):-!,with_pi(P,registerCycPredPlus2_3).
 
+get_mpred_prop(F,genlInverse(P)):-!,genlInverse(F,P).
+get_mpred_prop(F,genlPreds(P)):-!,genlPreds(F,P).
 get_mpred_prop(F,P):-mpred_prop(F,P),!.
-get_mpred_prop(F,_A,P):-mpred_prop(F,P).
+
+get_mpred_prop(F,_A,P):-get_mpred_prop(F,P).
 
 assert_arity(F,A):-not(atom(F)),trace_or_throw(assert_arity(F,A)).
 assert_arity(F,A):-not(integer(A)),trace_or_throw(assert_arity(F,A)).
@@ -293,7 +296,7 @@ decl_mpred(M):-loop_check(with_pi(M,decl_mpred_1),true).
 decl_mpred_1(_,F,F/0):-!,assert_if_new(dbase_t(mpred,F)).
 decl_mpred_1(M,PI,F/A):-
    decl_mpred(F,A),
-   ignore((ground(PI),decl_mpred(PI))),
+   ignore((ground(PI),compound(PI),decl_mpred(F,argsIsa(PI)))),
    decl_mpred(F,[ask_module(M)]).
 
 :-dynamic_multifile_exported(decl_mpred/2).
@@ -331,6 +334,7 @@ decl_mpred_2(F,_):- once((not((mpred_prop(F,external(Module)),not(dbase_mod(Modu
 decl_mpred(Mt,F,A):-decl_mpred(F,A),ignore((nonvar(Mt),decl_mpred(F,mt(Mt)))).
 
 :-op(0,fx,decl_mpred_prolog).
+:-export(decl_mpred_prolog/1).
 decl_mpred_prolog(P):- with_pi(P,decl_mpred_prolog).
 :-op(1120,fx,decl_mpred_prolog).
 
@@ -340,9 +344,9 @@ decl_mpred_prolog(M,PI,F/A):-
    assert_arity(F,A),
    decl_mpred(F,prologOnly),   
    decl_mpred(F,prologBuiltin),
+    decl_mpred(F,as_is(M:F/A)),
+    decl_mpred(F,ask_module(M)),
    ignore((ground(PI),decl_mpred(PI))),
-   decl_mpred(F,as_is(M:F/A)),
-   decl_mpred(F,ask_module(M)),
    decl_mpred(F,A)]).
 
 

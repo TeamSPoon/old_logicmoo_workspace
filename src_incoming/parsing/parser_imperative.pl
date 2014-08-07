@@ -243,7 +243,7 @@ parse_agent_text_command(Agent,PROLOGTERM,[],Agent,prologCall(PROLOGTERM)):- mus
 
 parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL):-
  dmsg(failed_parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL)),
- % debugging(parser),
+ debugging(parser),
  debug,visible(+all),leash(+all), dtrace,
  parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL),!.
 
@@ -264,9 +264,11 @@ parse_agent_text_command_0(Agent,SVERB,ARGS,Agent,GOAL):-
    must(chooseBestGoal(GOALANDLEFTOVERS,GOAL)),
    dmsg_parserm(parserm("chooseBestGoal"=GOAL)).
 
-parse_agent_text_command_0(Agent,IVERB,ARGS,NewAgent,GOAL):- 
-   verb_alias_to_verb(IVERB,SVERB),
-   parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL).
+parse_agent_text_command_0(Agent,IVERB,ARGS,NewAgent,GOAL):-
+   verb_alias_to_verb(IVERB,SVERB), IVERB\=SVERB,!,
+   parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL).
+
+parse_agent_text_command_0(Agent,IVERB,ARGS,Agent,GOAL):- nonvar(IVERB), string_to_atom(IVERB,VERB),GOAL=..[VERB|ARGS],!.
 
 moo:verb_alias('l','look').
 moo:verb_alias('lo','look').
@@ -336,7 +338,7 @@ moo:term_specifier_text(Dir,dir):-member(Dir,[n,s,e,w,ne,nw,se,sw,u,d]).
 
 moo:term_specifier_text(Text,Subclass):- 
    not(memberchk(Subclass,[dir,'TemporallyExistingThing'])),
-   once((get_isa_asserted(X,Subclass),
+   once((isa_asserted(X,Subclass),
    arg_to_var(text,Text,TextVar),
    req(keyword(X,TextVar)),   
    same_arg(text,TextVar,Text))). % dmsg(todo(term_specifier_text(Text,Subclass))),transitive_subclass(Subclass,spatialthing).
@@ -443,11 +445,11 @@ parseFmt(and([L|List]),Term1) --> dcgAnd(parseForIsa(L,Term1),parseForIsa(and(Li
 parseFmt(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{specifiedItemType(String,Type,Term)}.
 
 specifiedItemType([String],Type,StringO):-nonvar(String),!,specifiedItemType(String,Type,StringO).
-specifiedItemType(A,T,AA):- nonvar(T), formattype(T),!, checkAnyType(tell(_),A,T,AAA),!,AA=AAA.
+specifiedItemType(A,T,AA):- nonvar(T), formattype(T),!, checkAnyType(assert(_),A,T,AAA),!,AA=AAA.
 specifiedItemType(String,Type,Inst) :- get_term_specifier_text(Inst,Type),equals_icase(Inst,String),!.
 specifiedItemType(String,Type,Inst):- instances_of_type(Inst,Type),object_match(String,Inst),!.
 specifiedItemType(String,Type,Longest) :- findall(Inst, (get_term_specifier_text(Inst,Type),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
-specifiedItemType(A,T,AA):- checkAnyType(tell(parse),A,T,AAA),AA=AAA.
+specifiedItemType(A,T,AA):- checkAnyType(assert(parse),A,T,AAA),AA=AAA.
 
 checkAnyType(Op,A,Type,AA):- var(A),correctAnyType(Op,A,Type,AA),must_det(var(AA)),must_det(A==AA),!.
 checkAnyType(Op,A,Type,AA):- correctAnyType(Op,A,Type,AA),nonvar(AA),!.

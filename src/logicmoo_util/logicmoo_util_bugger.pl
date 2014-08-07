@@ -922,7 +922,7 @@ programmer_error(E):-trace, randomVars(E),dmsg('~q~n',[error(E)]),trace,randomVa
 :-moo_hide_show_childs(hotrace/1).
 
 :-moo_hide_show_childs(must/1).
-must(C):- is_deterministic(C),!,must_det(C).
+must(C):- not(not(is_deterministic(C))),!,must_det(C).
 must(C):- debugOnError(one_must(C,(rtrace(C),debugCallWhy(failed(must(C)),C)))).
 
 must_each(List):-var(List),trace_or_throw(var_must_each(List)).
@@ -955,6 +955,8 @@ is_deterministic(M:G):-atom(M),!,is_deterministic(G).
 is_deterministic(Atomic):-atomic(Atomic),!.
 is_deterministic(Ground):-ground(Ground),!.
 is_deterministic(not(_)).
+is_deterministic(atom(_))
+is_deterministic(compound(_))
 is_deterministic(findall(_,_,_)).
 is_deterministic(once(_)).
 is_deterministic((_,Cut)):-Cut==!.

@@ -95,9 +95,6 @@ spawn_prey(N) :-
 	spawn_prey(Ntemp).
 
 
-moo:agent_call_command(Agent,rez(NewType)):- atloc(Agent,LOC), create_instance(NewType,item,[atloc(LOC)]).
-
-
 :- include(logicmoo(vworld/moo_footer)).
 
 

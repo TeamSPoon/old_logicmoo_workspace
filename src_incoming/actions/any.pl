@@ -24,7 +24,7 @@ action_requires_states(_Agent,List,Preconds):-findall(A,(member(A,List),\+ funct
 moo:action_rules(_,_,_,_):-fail.
 
 moo:action_rules(Agent,use,[Obj],[possess(Agent,Obj),isa(Obj,useable),stowed(Agent,Obj)->using(Agent,Obj)]).
-moo:action_rules(Agent,stow,[Obj],[possess(Agent,Obj),isa(Obj,stowable),genlPreds(Using,controling),holds(Using,Agent,Obj)->stowed(Agent,Obj)]).
+moo:action_rules(Agent,stow,[Obj],[possess(Agent,Obj),isa(Obj,stowable),genlPreds(Using,controls),holds(Using,Agent,Obj)->stowed(Agent,Obj)]).
 
 % Use something
 moo:agent_call_command(Agent,ACT) :-

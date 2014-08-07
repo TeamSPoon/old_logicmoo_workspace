@@ -84,9 +84,9 @@ assert_isa_lc(I,T):- hotrace(formattype(T)),!,dmsg(todo(dont_assert_is_ft(I,T)))
 assert_isa_lc(_,T):- once(define_type(T)),fail.
 assert_isa_lc(I,type):- define_type(I),!.
 assert_isa_lc(I,formattype):- define_ft(I),!.
-assert_isa_lc(I,T):- cannot_table_call(get_isa_asserted(I,T)),!.
+assert_isa_lc(I,T):- cannot_table_call(isa_asserted(I,T)),!.
 assert_isa_lc(I,T):- is_stable,!, hooked_asserta(isa(I,T)).
-assert_isa_lc(I,T):- must_det((hooked_asserta(isa(I,T)),logOnFailureIgnore(get_isa_backchaing(I,T)))).
+assert_isa_lc(I,T):- must_det((hooked_asserta(isa(I,T)),logOnFailureIgnore(isa_backchaing(I,T)))).
 
 % ================================================
 % assert_isa HOOKS
@@ -134,40 +134,40 @@ assert_isa_hooked_creation(I,T):- doall((is_creatable_type(ST),impliedSubClass(T
 transitive_subclass_tst(_,_):-!,fail.
 
 
-:-export(get_isa_backchaing/2).
-% get_isa_backchaing(A,T):- stack_depth(Level),Level>650,trace_or_throw(skip_dmsg_nope(failing_stack_overflow(get_isa_backchaing(A,T)))),!,fail.
+:-export(isa_backchaing/2).
+% isa_backchaing(A,T):- stack_depth(Level),Level>650,trace_or_throw(skip_dmsg_nope(failing_stack_overflow(isa_backchaing(A,T)))),!,fail.
 
 
-get_isa_backchaing(A,T):- hotrace((fact_loop_checked(isa(A,T),get_isa_backchaing_0(A,T)))).
+isa_backchaing(A,T):- hotrace((fact_loop_checked(isa(A,T),isa_backchaing_0(A,T)))).
 
-get_isa_backchaing_v_nv(A,term):-nonvar(A),!.
-get_isa_backchaing_v_nv(_,var):-!.
-get_isa_backchaing_v_nv(A,T):-setof(A,AT^(asserted_or_trans_subclass(AT,T),get_isa_asserted(A,AT)),List),!,member(A,List).
+isa_backchaing_v_nv(A,term):-nonvar(A),!.
+isa_backchaing_v_nv(_,var):-!.
+isa_backchaing_v_nv(A,T):-setof(A,AT^(asserted_or_trans_subclass(AT,T),isa_asserted(A,AT)),List),!,member(A,List).
 
-get_isa_backchaing_0(A,T):-  var(A),nonvar(T),!,get_isa_backchaing_v_nv(A,T).
-get_isa_backchaing_0(A,T):-  var(T),!,setof(TT,AT^(get_isa_asserted(A,AT),asserted_or_trans_subclass(AT,TT)),List),!,member(T,List).
-get_isa_backchaing_0(A,T):-  nonvar(A),get_isa_backchaing_nv_nv(A,T).
-get_isa_backchaing_0(A,T):-  get_isa_asserted(A,AT),asserted_or_trans_subclass(AT,T).
+isa_backchaing_0(A,T):-  var(A),nonvar(T),!,isa_backchaing_v_nv(A,T).
+isa_backchaing_0(A,T):-  var(T),!,setof(TT,AT^(isa_asserted(A,AT),asserted_or_trans_subclass(AT,TT)),List),!,member(T,List).
+isa_backchaing_0(A,T):-  nonvar(A),isa_backchaing_nv_nv(A,T).
+isa_backchaing_0(A,T):-  isa_asserted(A,AT),asserted_or_trans_subclass(AT,T).
 
-get_isa_backchaing_nv_nv(A,argsIsa):-!,compound(A).
+isa_backchaing_nv_nv(A,argsIsa):-!,compound(A).
 
 not_ft(T):-asserted_or_trans_subclass(T,obj).
 
-:-export(get_isa_asserted/2).
-get_isa_asserted(A,T):- fact_loop_checked(isa(A,T),get_isa_asserted_0(A,T)).
+:-export(isa_asserted/2).
+isa_asserted(A,T):- fact_loop_checked(isa(A,T),isa_asserted_0(A,T)).
 
-get_isa_asserted_0(A,T):- nonvar(A),nonvar(T),cached_isa(T,formattype),!,term_is_ft(A,T).
-get_isa_asserted_0(A,T):- alt_dbase_t(T,A).
-% get_isa_asserted_0(A,T):- compound(A),functor(A,F,_),!,get_isa_backchaing_1(F,T).
-get_isa_asserted_0(_,T):- not(atom(T)),!,fail.
-get_isa_asserted_0(A,T):- argsIsaProps(T),mpred_prop(A,T).
-get_isa_asserted_0(A,T):- atom(A),mud_isa_atom(A,T),!.
+isa_asserted_0(A,T):- nonvar(A),nonvar(T),cached_isa(T,formattype),!,term_is_ft(A,T).
+isa_asserted_0(A,T):- alt_dbase_t(T,A).
+% isa_asserted_0(A,T):- compound(A),functor(A,F,_),!,isa_backchaing_1(F,T).
+isa_asserted_0(_,T):- not(atom(T)),!,fail.
+isa_asserted_0(A,T):- argsIsaProps(T),mpred_prop(A,T).
+isa_asserted_0(A,T):- atom(A),mud_isa_atom(A,T),!.
 
 
 mud_isa_atom(O,T):- atomic_list_concat_catch([T,_|_],'-',O),!.
 mud_isa_atom(O,T):- atom_concat(T,Int,O),catch(atom_number(Int,_),_,fail),!.
 
-cached_isa(I,T):-hotrace(get_isa_backchaing(I,T)).
+cached_isa(I,T):-hotrace(isa_backchaing(I,T)).
 
 
 
