@@ -32,7 +32,7 @@ split_name_type_0(S,P,C):- string(S),!,atom_string(A,S),split_name_type_0(A,P,C)
 split_name_type_0(FT,FT,formattype):-formattype(FT),trace_or_throw(formattype(FT)).
 split_name_type_0(T,T,C):- compound(T),functor(T,C,_).
 split_name_type_0(T,T,C):- notrace(atomic_list_concat_safe([C,'-',_],T)).
-split_name_type_0(T,T,C):- atom(T),atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),catch(number_codes(_,Digits),_,fail),atom_codes(C,Type).
+split_name_type_0(T,T,C):- atom(T),atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),ccatch(number_codes(_,Digits),_,fail),atom_codes(C,Type).
 split_name_type_0(C,P,C):- atom(C),gensym(C,P).
 
 :-dynamic(moo:formattype/1).
@@ -436,12 +436,12 @@ any_to_value(A,A).
 any_to_number(N,N):- number(N),!.
 any_to_number(dice(A,B,C),N):- ground(A),roll_dice(A,B,C,N),!.
 any_to_number(A,N):-atom(A),atom_to_value(A,V),A\=V,any_to_number(V,N).
-any_to_number(A,N):- catch(number_string(N,A),_,fail).
+any_to_number(A,N):- ccatch(number_string(N,A),_,fail).
 
 :-export(atom_to_value/2).
 atom_to_value(V,Term):-not(atom(V)),!,any_to_value(V,Term).
 % 56
-atom_to_value(V,Term):- catch((read_term_from_atom(V,Term,[variable_names([])])),_,fail),!.
+atom_to_value(V,Term):- ccatch((read_term_from_atom(V,Term,[variable_names([])])),_,fail),!.
 % 18d18+4000
 atom_to_value(V,dice(T1,T2,+T3)):- atomic_list_concat_safe([D1,'d',D2,'+',D3],V), atom_to_value(D1,T1),atom_to_value(D2,T2),atom_to_value(D3,T3),!.
 atom_to_value(V,dice(T1,T2,-T3)):- atomic_list_concat_safe([D1,'d',D2,'-',D3],V), atom_to_value(D1,T1),atom_to_value(D2,T2),atom_to_value(D3,T3),!.

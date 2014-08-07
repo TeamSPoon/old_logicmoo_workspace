@@ -348,7 +348,7 @@ phrase_parseForTypes(TYPEARGS,GOODARGS,ARGS,LeftOver):-
     phrase_parseForTypes_l(TYPEARGS,GOODARGS,ARGSL,LeftOver).
 
 phrase_parseForTypes_l(TYPEARGS,GOODARGS,ARGSL,LeftOver):-
-    catch(phrase(parseForTypes(TYPEARGS,GOODARGS),ARGSL,LeftOver),_,fail),!.    
+    ccatch(phrase(parseForTypes(TYPEARGS,GOODARGS),ARGSL,LeftOver),_,fail),!.    
 phrase_parseForTypes_l(TypesIn,Out,In,[]):- length(TypesIn,L),between(1,4,L),length(In,L),must(Out=In),!,dmsg(fake_phrase_parseForTypes_l(foreach_isa(In,TypesIn))).
 phrase_parseForTypes_l(TYPEARGS,GOODARGS,ARGSL,LeftOver):-
     debugOnError(phrase(parseForTypes(TYPEARGS,GOODARGS),ARGSL,LeftOver)).    

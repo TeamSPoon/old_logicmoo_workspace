@@ -16,7 +16,8 @@
 */
 
 :-export(parse_agent_text_command_checked/5).
-parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):- parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD), must((nonvar(NewAgent),nonvar(CMD))),!. % not(functor(CMD,prologCall,_)),!.
+parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):- 
+   catch(( parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD),nonvar(CMD),must(nonvar(NewAgent))),'$aborted',true),ignore((CMD=tick)),ignore((NewAgent=Agent)).
 parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):- debugging(parser), trace, parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD).
 
 must_ac(G):- show_call(must(G)).

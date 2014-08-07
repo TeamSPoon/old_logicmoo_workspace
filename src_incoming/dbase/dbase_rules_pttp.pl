@@ -407,7 +407,7 @@ search1(_Goal,Max,Min,_Inc,_PrevInc,_DepthIn,_DepthOut) :-
 search1(Goal,_Max,Min,_Inc,PrevInc,DepthIn,DepthOut) :-
         write_search_progress(Min),
 	DepthIn = Min,
-	catch(call(Goal),E,trace),
+	ccatch(call(Goal),E,trace),
 	DepthOut < PrevInc.	% fail if solution found previously
 search1(Goal,Max,Min,Inc,_PrevInc,DepthIn,DepthOut) :-
 	Min1 is Min + Inc,

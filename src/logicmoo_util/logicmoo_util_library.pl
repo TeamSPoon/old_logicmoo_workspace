@@ -71,7 +71,7 @@ safe_univ0(Call,[M:L|List]):- nonvar(M),!,safe_univ(Call,[L|List]).
 safe_univ0(M:Call,[L|List]):- nonvar(M),!,safe_univ(Call,[L|List]).
 safe_univ0(Call,[L|List]):- not(is_list(Call)), Call =..[L|List],!,warn_bad_functor(L).
 safe_univ0([L|List],[L|List]):- var(List),atomic(Call),!,grtrace,Call =.. [L|List],warn_bad_functor(L).
-safe_univ0(Call,[L|List]):- catch(Call =.. [L|List],E,(dumpST,'format'('~q~n',[E=safe_univ(Call,List)]))),warn_bad_functor(L).
+safe_univ0(Call,[L|List]):- ccatch(Call =.. [L|List],E,(dumpST,'format'('~q~n',[E=safe_univ(Call,List)]))),warn_bad_functor(L).
 
 :-export(append_term/3).
 append_term(Call,E,CallE):- Call=..List, append(List,[E],ListE), CallE=..ListE.
@@ -166,7 +166,7 @@ in_thread_and_join(Goal,Status):-thread_create(Goal,ID,[]),thread_join(ID,Status
 % Usage: predsubst(+Fml,+Pred,?FmlSk)
 
 predsubst(A,Pred, D):- 
-      catch(notrace(nd_predsubst(A,Pred,D)),_,fail),!.
+      ccatch(notrace(nd_predsubst(A,Pred,D)),_,fail),!.
 predsubst(A,_B,A).
 
 nd_predsubst(  Var, Pred,SUB ) :- call(Pred,Var,SUB).
@@ -195,7 +195,7 @@ subst(A,B,C,D):-var(A),!,dmsg(subst(A,B,C,D)),dumpST,dtrace,subst0(A,B,C,D).
 subst(A,B,C,D):-subst0(A,B,C,D).
 
 subst0(A,B,C,D):- 
-      catch(notrace(nd_subst(A,B,C,D)),E,(dumpST,dmsg(E:nd_subst(A,B,C,D)),fail)),!.
+      ccatch(notrace(nd_subst(A,B,C,D)),E,(dumpST,dmsg(E:nd_subst(A,B,C,D)),fail)),!.
 subst0(A,_B,_C,A).
 
 nd_subst(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
@@ -216,7 +216,7 @@ nd_subst2( _X, _Sk, L, L ).
 
 
 wsubst(A,B,C,D):- 
-      catch(notrace(weak_nd_subst(A,B,C,D)),_,fail),!.
+      ccatch(notrace(weak_nd_subst(A,B,C,D)),_,fail),!.
 wsubst(A,_B,_C,A).
 
 weak_nd_subst(  Var, VarS,SUB,SUB ) :- nonvar(Var),Var=VarS,!.
@@ -329,7 +329,7 @@ at_start(Goal):-
 	->
 	     true
 	;
-	     catch(
+	     ccatch(
 		 (assert(at_started(Named2)),debugOnFailure0((Goal))),
 		 E,
 		 (retractall(at_started(Named2)),trace_or_throw(E)))

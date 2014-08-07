@@ -134,7 +134,7 @@ gload:- load_game(logicmoo('rooms/startrek.all.plmoo')).
 
 :-export(savedb/0).
 savedb:-
- catch((
+ ccatch((
    rescan_dbase_t_once,
    ignore(catch(make_directory('/tmp/lm/'),_,true)),
    ignore(catch(delete_file('/tmp/lm/savedb'),E,(dmsg(E:delete_file('/tmp/lm/savedb')),dtrace))),   

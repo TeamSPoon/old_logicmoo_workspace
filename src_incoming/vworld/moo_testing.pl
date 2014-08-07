@@ -72,7 +72,7 @@ term_test(Obj):-
 
 run_mud_test(Name,Test):-
    fmt(begin_mud_test(Name)),
-   once(catch((test_call(Test),fmt(completed_mud_test(Name))),E,fmt(error_mud_test(E, Name)));fmt(tests(incomplet_mud_test(Name)))).
+   once(ccatch((test_call(Test),fmt(completed_mud_test(Name))),E,fmt(error_mud_test(E, Name)));fmt(tests(incomplet_mud_test(Name)))).
 
 %:- module_predicates_are_exported.
 

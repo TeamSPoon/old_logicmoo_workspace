@@ -25,7 +25,7 @@ call_body_req(HEAD):- functor(HEAD,F,A),HEAD_T=..[F|ARGS],HEAD_T=..[dbase_t,F|AR
 
 body_req_isa(I,C):- loop_check(body_req_isa_lc(I,C),alt_dbase_t(C,I)).
 
-body_req_isa_lc(I,C):-catch(isa_backchaing(I,C),_,alt_dbase_t(C,I)).
+body_req_isa_lc(I,C):-ccatch(isa_backchaing(I,C),_,alt_dbase_t(C,I)).
 
 alt_dbase_t(C,I):-clause(dbase_t(C,I),true).
 alt_dbase_t(C,I):-clause(isa(I,C),true).

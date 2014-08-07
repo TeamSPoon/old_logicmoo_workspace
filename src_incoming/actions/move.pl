@@ -46,7 +46,7 @@ get_move_dist(_Gent,1).
 move_command(Agent,DirS,DistS) :- 
    string_to_atom(DirS,Dir),
    any_to_number(DistS,Dist),
-   catch(doall((between(1,Dist,_),move_command_1(Agent,Dir))),giveup(_),true).
+   ccatch(doall((between(1,Dist,_),move_command_1(Agent,Dir))),giveup(_),true).
 
 
 
