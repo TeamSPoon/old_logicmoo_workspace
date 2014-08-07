@@ -25,7 +25,7 @@
 
 */
 
-:- module(parser_chat80, []).
+:- module(parser_chat80, [chat80/0]).
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
