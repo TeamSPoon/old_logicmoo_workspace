@@ -21,8 +21,14 @@
 
 */
 
+:- ensure_loaded(xgproc).	% XG generator
+
+:- load_plus_xg_file('clone.xg').
+:- load_plus_xg_file('lex.xg').
+:- compile_xg_clauses.
+% :- list('newg.pl').
 :- ensure_loaded(xgrun).	% XG runtimes
-:- ensure_loaded(newg).		% clone + lex
+% :- ensure_loaded(newg).		% clone + lex
 :- ensure_loaded(clotab).	% attachment tables
 :- ensure_loaded(newdict).	% syntactic dictionary
 :- ensure_loaded(slots).	% fits arguments into predicates
@@ -43,4 +49,14 @@
 :- ensure_loaded(newtop).	% top level
 
 
+
+
+bad_chat80 :-
+  told,
+  told,
+   repeat,
+   prompt(_,'Question: '),
+   trace,read_in(P),
+      control(report,P),
+      end(user).
 

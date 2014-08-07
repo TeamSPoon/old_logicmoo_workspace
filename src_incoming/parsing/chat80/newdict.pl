@@ -18,6 +18,7 @@
 |_________________________________________________________________________|
 
 */
+:- style_check(-discontiguous).
 
 % =================================================================
 % General Dictionary
@@ -105,7 +106,7 @@ root_form(3+plu).
 verb_root(be).
 verb_root(have).
 verb_root(do).
-
+   
 verb_form(am,be,pres+fin,1+sin).
 verb_form(are,be,pres+fin,2+sin).
 verb_form(is,be,pres+fin,3+sin).

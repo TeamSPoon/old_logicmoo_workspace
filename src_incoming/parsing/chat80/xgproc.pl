@@ -5,6 +5,8 @@
  :- op(500,fx,-).
 
 
+ ttynl:-nl.
+
 new_pred(P) :-
    recorded(P,'xg.pred',_), !.
 new_pred(P0) :-
@@ -12,26 +14,36 @@ new_pred(P0) :-
    recordz(P,'xg.pred',_),
    recordz('xg.pred',P,_).
 
-+(F) :-
-   consume0(F,+).
+% was +(F).
+load_plus_xg_file(F) :-
+   see(user),
+   consume0(F,+),
+   seen.
 
--(F) :-
-   consume0(F,-).
+% was -(F).
+load_minus_xg_file(F) :-
+   see(user),
+   consume0(F,-),
+   seen.
 
-consume0(F,Mode) :-
+
+consume0(F0,Mode) :-
+   Stat_key = clauses,
    seeing(Old),
-   statistics(heap,[H0,Hf0]),
+%   statistics(heap,[H0,Hf0]),
+    statistics(Stat_key,H0),
+    absolute_file_name(F0,F),
    see(F),
    tidy_consume(F,Mode),
- ( seeing(user), !; seen ),
+ ( (seeing(User2),User2=user), !; seen ),
    see(Old),
-   statistics(heap,[H,Hf]),
-   U is H-Hf-H0+Hf0,
+%   statistics(heap,[H,Hf]),
+ statistics(Stat_key,H),
+%   U is H-Hf-H0+Hf0,
+    U is H-H0,
    ttynl,
    display('** Grammar from file '),
-   display(F),
-   display(' : '),
-   display(U),
+   display(F),display(' : '),display(U),
    display(' words **'),
    ttynl, ttynl.
 
@@ -41,10 +53,11 @@ tidy_consume(F,Mode) :-
 tidy_consume(_,_).
 
 consume(F,Mode) :-
+   flag(read_terms,_,0),
    repeat,
       read(X),
-    ( X=end_of_file, !, clear;
-      process(X,Mode),
+    ( X=end_of_file, !, clear(F);
+      (flag(read_terms,T,T+1),process(X,Mode)),
          fail ).
 
 process((L-->R),Mode) :- !,
@@ -64,11 +77,11 @@ process(P,Mode) :-
    new_pred(P),
    assertz(P).
 
-clear :-
+clear(_F) :-
    recorded('xg.usurped',P,R0), erase(R0),
    recorded(P,'xg.usurped',R1), erase(R1),
    fail.
-clear.
+clear(F):- flag(read_terms,T,T),display(read(T,F)),ttynl,ttynl.
 
 usurping(+,_) :- !.
 usurping(-,P) :-
@@ -154,7 +167,7 @@ expandlist([X|L],S0,S,H0,H,(terminal(X,S0,S1,H0,H1),Y)) :-
 
 tag(P,A1,A2,A3,A4,Q) :-
    P=..[F|Args0],
-   conc(Args0,[A1,A2,A3,A4],Args),
+   conc_gx(Args0,[A1,A2,A3,A4],Args),
    Q=..[F|Args].
 
 and(true,P,P) :- !.
@@ -168,9 +181,9 @@ unwind([],H,H) :- !.
 unwind([T|Ts],H0,x(nogap,terminal,T,H)) :-
    unwind(Ts,H0,H).
 
-conc([],L,L) :- !.
-conc([X|L1],L2,[X|L3]) :-
-   conc(L1,L2,L3).
+conc_gx([],L,L) :- !.
+conc_gx([X|L1],L2,[X|L3]) :-
+   conc_gx(L1,L2,L3).
 
 list(File) :-
    telling(Old),
@@ -179,10 +192,24 @@ list(File) :-
    told,
    tell(Old).
 
+compile_xg_clauses :- recorded('xg.pred',P,_),functor(P,F,N),compile_predicates([F/N]),fail.
+compile_xg_clauses.
+
 list_clauses :-
    recorded('xg.pred',P,_),
    functor(P,F,N),
    listing(F/N),
    nl,
    fail.
+
 list_clauses.
+
+load_xg:-
+  load_plus_xg_file('clone.xg'),
+  load_plus_xg_file('lex.xg'),
+  compile_xg_clauses.
+
+go :- load_xg, list('newg.pl').
+
+
+end_of_file.

@@ -19,6 +19,9 @@
 
 */
 
+:- style_check(-discontiguous).
+:- style_check(-singleton).
+
 % NDTABL - Meta-information about database relations.
 
 nd(african,19,26).

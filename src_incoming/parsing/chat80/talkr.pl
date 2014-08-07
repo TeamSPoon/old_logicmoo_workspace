@@ -66,9 +66,11 @@ complex(\+P) :- complex(P).
 respond([]) :- display('Nothing satisfies your question.'), nl.
 respond([A|L]) :- reply(A), replies(L).
 
-answer((answer([]):-E)) :- !, holds(E,B), yesno(B).
-answer((answer([X]):-E)) :- !, seto(X,E,S), respond(S).
-answer((answer(X):-E)) :- seto(X,E,S), respond(S).
+answer(S1):- answer(S1,S),respond(S).
+
+answer((answer([]):-E),[B]) :- !, holds(E,B).
+answer((answer([X]):-E),S) :- !, seto(X,E,S).
+answer((answer(X):-E),S) :- seto(X,E,S).
 
 seto(X,E,S) :- setof(X,satisfy(E),S), !.
 seto(_X,_E,[]).
@@ -76,8 +78,8 @@ seto(_X,_E,[]).
 holds(E,true) :- satisfy(E), !.
 holds(_E,false).
 
-yesno(true) :- display('Yes.').
-yesno(false) :- display('No.').
+yesno(true):-display(' Yes. ').
+yesno(false):-display(' No.').
 
 replies([]) :- display('.').
 replies([A]) :- display(' and '), reply(A), display('.').
