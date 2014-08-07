@@ -224,47 +224,32 @@ transitive_subclass_l_r(FT,Sub):-dbase_t(subclass,FT,Sub).
 transitive_subclass_l_r(FT,Sub):-var(FT),!,transitive_subclass_r_l(FT,Sub).
 transitive_subclass_l_r(FT,Sub):-dbase_t(subclass,FT,A),dbase_t(subclass,A,Sub).
 transitive_subclass_l_r(FT,Sub):-dbase_t(subclass,FT,A),dbase_t(subclass,A,B),dbase_t(subclass,B,Sub).
-transitive_subclass_l_r(FT,Sub):-var(Sub),!,fail.
+transitive_subclass_l_r(_,Sub):-var(Sub),!,fail.
 transitive_subclass_l_r(FT,Sub):-dbase_t(subclass,FT,A),dbase_t(subclass,A,B),dbase_t(subclass,B,C),dbase_t(subclass,C,Sub).
 
 transitive_subclass_r_l(FT,Sub):-dbase_t(subclass,A,Sub),dbase_t(subclass,FT,A).
 transitive_subclass_r_l(FT,Sub):-dbase_t(subclass,B,Sub),dbase_t(subclass,A,B),dbase_t(subclass,FT,A).
-transitive_subclass_l_r(FT,Sub):-var(Sub),!,fail.
+transitive_subclass_r_l(_,Sub):-var(Sub),!,fail.
 transitive_subclass_r_l(FT,Sub):-dbase_t(subclass,C,Sub),dbase_t(subclass,B,C),dbase_t(subclass,A,B),dbase_t(subclass,FT,A).
 
 asserted_or_trans_subclass(A,A).
 asserted_or_trans_subclass(A,B):-transitive_subclass(A,B).
 
 :- export((transitive_bp/3)).
-transitive_bp(P,A,T):-fact_loop_checked(dbase_t(P,A,T),transitive_P_l_r(P,A,T)).
+transitive_bp(P,A,T):-(atom(P)->Fact =..[P,A,T];Fact =..[dbase_t,P,A,T]),fact_loop_checked(Fact,transitive_P_l_r(P,A,T)).
 
 transitive_P_l_r(P,FT,Sub):-dbase_t(P,FT,Sub).
 transitive_P_l_r(P,FT,Sub):-var(FT),!,transitive_P_r_l(P,FT,Sub).
 transitive_P_l_r(P,FT,Sub):-dbase_t(P,FT,A),dbase_t(P,A,Sub).
 transitive_P_l_r(P,FT,Sub):-dbase_t(P,FT,A),dbase_t(P,A,B),dbase_t(P,B,Sub).
-transitive_P_l_r(P,FT,Sub):-var(Sub),!,fail.
+transitive_P_l_r(_P,_FT,Sub):-var(Sub),!,fail.
 transitive_P_l_r(P,FT,Sub):-dbase_t(P,FT,A),dbase_t(P,A,B),dbase_t(P,B,C),dbase_t(P,C,Sub).
 
 transitive_P_r_l(P,FT,Sub):-dbase_t(P,A,Sub),dbase_t(P,FT,A).
 transitive_P_r_l(P,FT,Sub):-dbase_t(P,B,Sub),dbase_t(P,A,B),dbase_t(P,FT,A).
-transitive_P_l_r(P,FT,Sub):-var(Sub),!,fail.
+transitive_P_r_l(_P,_FT,Sub):-var(Sub),!,fail.
 transitive_P_r_l(P,FT,Sub):-dbase_t(P,C,Sub),dbase_t(P,B,C),dbase_t(P,A,B),dbase_t(P,FT,A).
 
-
-:- export((transitive_bp/3)).
-transitive_bp(P,A,T):-Call=..[P,A,T],fact_loop_checked(Call,transitive_P_l_r(P,A,T)).
-
-transitive_P_l_r(P,FT,Sub):-dbase_t(P,FT,Sub).
-transitive_P_l_r(P,FT,Sub):-var(FT),!,transitive_P_r_l(P,FT,Sub).
-transitive_P_l_r(P,FT,Sub):-dbase_t(P,FT,A),dbase_t(P,A,Sub).
-transitive_P_l_r(P,FT,Sub):-dbase_t(P,FT,A),dbase_t(P,A,B),dbase_t(P,B,Sub).
-transitive_P_l_r(P,FT,Sub):-var(Sub),!,fail.
-transitive_P_l_r(P,FT,Sub):-dbase_t(P,FT,A),dbase_t(P,A,B),dbase_t(P,B,C),dbase_t(P,C,Sub).
-
-transitive_P_r_l(P,FT,Sub):-dbase_t(P,A,Sub),dbase_t(P,FT,A).
-transitive_P_r_l(P,FT,Sub):-dbase_t(P,B,Sub),dbase_t(P,A,B),dbase_t(P,FT,A).
-transitive_P_l_r(P,FT,Sub):-var(Sub),!,fail.
-transitive_P_r_l(P,FT,Sub):-dbase_t(P,C,Sub),dbase_t(P,B,C),dbase_t(P,A,B),dbase_t(P,FT,A).
 
 :-dynamic_multifile_exported(not_mud_isa/2).
 not_mud_isa(agent,formattype).

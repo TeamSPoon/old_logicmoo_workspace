@@ -72,13 +72,14 @@ call_agent_action_lc(Agent,CMD):-
    where_atloc(Agent,Where),
    raise_location_event(Where,notice(reciever,begin(Agent,CMD))),
    flush_output,
-   catch(debugOnError(must_det(call_agent_where_action_lc(Agent,Where,CMD))),E,fmt('call_agent_action/2 Error ~q ',[E])).
+   doall((repeat,catch(call_agent_where_action_lc(Agent,Where,CMD),E,(fmt('call_agent_action/2 Error ~q ',[E]),dtrace,fail)))),!.
 
 
 % complete event
-call_agent_where_action_lc(Agent,Where,CMD):- debugOnError(moo:agent_call_command(Agent,CMD)),flush_output,!,raise_location_event(Where,notice(reciever,done(Agent,CMD))),!,padd(Agent,last_command(CMD)).
+call_agent_where_action_lc(Agent,Where,CMD):- debugOnError(moo:agent_call_command(Agent,CMD)),flush_output,
+      must_det_l([renumbervars(CMD,SCMD),raise_location_event(Where,notice(reciever,done(Agent,SCMD))),padd(Agent,last_command(SCMD)),flush_output]).
 % fail event
-call_agent_where_action_lc(Agent,Where,CMD):- raise_location_event(Where,notice(reciever,failed(Agent,CMD))),!,padd(Agent,last_command(CMD)).
+call_agent_where_action_lc(Agent,Where,CMD):- renumbervars(CMD,SCMD),raise_location_event(Where,notice(reciever,failed(Agent,SCMD))),!,padd(Agent,last_command(SCMD)).
 
 
 get_session_id(IDIn):-current_input(ID),is_stream(ID),!,ID=IDIn.

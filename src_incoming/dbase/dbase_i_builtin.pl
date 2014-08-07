@@ -384,7 +384,7 @@ singleValued(mudLevelOf(possessable,int)).
 singleValued(mudMaxHitPoints(agent,int)).
 singleValued(mudMaxHitPoints(agent,int),[prologHybrid]).
 singleValued(mudToHitArmorClass0(agent,int)).
-singleValued(permanence(item,verb,int)).
+singleValued(permanence(item,verb,term)).
 singleValued(score(obj,int)).
 singleValued(spawn_rate(propFn(subclass(obj)),int)).
 

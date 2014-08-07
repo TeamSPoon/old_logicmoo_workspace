@@ -13,6 +13,8 @@
 
 :-decl_mpred(moo:posture/1).
 
+subclass(command,action).
+
 moo:posture(sit).
 moo:posture(stand).
 moo:posture(lay).

@@ -86,8 +86,8 @@ non_assertable(WW,notAssertable(Why)):- compound(WW),functor_catch(WW,F,_),mpred
 % into_hilog_form/into_mpred_form
 % ========================================
 
-:-export(into_form_code/0).
-:-dynamic(into_form_code/0).
+:-thread_local(thlocal:into_form_code/0).
+:-dynamic_multifile_exported(thlocal:into_form_code/0).
 
 :-'$hide'(expanded_different/2).
 :-export(expanded_different/2).
@@ -113,7 +113,7 @@ was_isa(X,I,C):-compound(X),functor(X,C,1),!,arg(1,X,I),!.
 
 
 :-export(into_hilog_form/2).
-into_hilog_form(G0,G1):-with_assertions(into_form_code,into_hilog_form_ic(G0,G1)).
+into_hilog_form(G0,G1):-with_assertions(thlocal:into_form_code,into_hilog_form_ic(G0,G1)).
 
 into_hilog_form_ic(M:X,O):- atom(M),!,into_hilog_form_ic(X,O).
 into_hilog_form_ic(X,O):- X=..[F|A],into_hilog_form(X,F,A,O).
@@ -142,7 +142,7 @@ hook:into_assertable_form_trans_hook(G,F,_,was_asserted_gaf(G)):- mpred_prop(F,w
 :-dynamic_multifile_exported(into_assertable_form/2).
 into_assertable_form(M:H,G):-atom(M),!,into_assertable_form(H,G).
 % into_assertable_form(B,A):- save_in_dbase_t,!,into_hilog_form(B,A),!.
-into_assertable_form(G0,G1):-with_assertions(into_form_code,into_assertable_form_ic(G0,G1)).
+into_assertable_form(G0,G1):-with_assertions(thlocal:into_form_code,into_assertable_form_ic(G0,G1)).
 
 into_assertable_form_ic(H,G):- call_no_cuts((hook:into_assertable_form_trans_hook(H,G))),expanded_different(H,G),!.
 into_assertable_form_ic(H,GO):-expand_term( (H :- true) , C ), reduce_clause(C,G),expanded_different(H,G),!,into_assertable_form(G,GO),!.
@@ -155,7 +155,7 @@ into_assertable_form_via_mpred(X,F,_A,O):- not(mpred_prop(F,is_dbase_t)),!,X=O.
 
 :-dynamic_multifile_exported(into_assertable_form/3).
 into_assertable_form(HLDS,M:X,O):- atom(M),!,into_assertable_form(HLDS,X,O),!.
-into_assertable_form(HLDS,X,O):-with_assertions(into_form_code,(( X=..[F|A],into_assertable_form(HLDS, X,F,A,O)))),!.
+into_assertable_form(HLDS,X,O):-with_assertions(thlocal:into_form_code,(( X=..[F|A],into_assertable_form(HLDS, X,F,A,O)))),!.
 
 % TODO finish negations
 into_assertable_form(Dbase_t,X,Dbase_t,_A,X):-!.
@@ -171,7 +171,7 @@ into_mpred_form(G,O):- functor(G,F,A),G=..[F,P|ARGS],!,into_mpred_form(G,F,P,A,A
 
 % TODO confirm negations
 into_mpred_form(_,':-',C,1,_,':-'(C)):-!.
-into_mpred_form(H,_,_,_,_,GO):- with_assertions(into_form_code,once((expand_term( (H :- true) , C ), reduce_clause(C,G)))),expanded_different(H,G),!,into_mpred_form(G,GO),!.
+into_mpred_form(H,_,_,_,_,GO):- with_assertions(thlocal:into_form_code,once((expand_term( (H :- true) , C ), reduce_clause(C,G)))),expanded_different(H,G),!,into_mpred_form(G,GO),!.
 into_mpred_form(_,not,C,1,_,not(O)):-into_mpred_form(C,O),!.
 into_mpred_form(G,F,C,1,_,O):-predicate_property(G,builtin),!,into_mpred_form(C,OO),O=..[F,OO].
 into_mpred_form(C,_,_,_,_,isa(I,T)):-was_isa(C,I,T),!.

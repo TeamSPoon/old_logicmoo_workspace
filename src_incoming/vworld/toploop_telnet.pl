@@ -80,6 +80,7 @@ read_and_do_telnet(P):-
            sformat(S,'~w>',[P]),prompt_read(S,List),
             must(once(do_player_action(List))),!.
 
+:-export(prompt_read/1).
 prompt_read(Prompt,Atom):-
         fresh_line,
         fmt0('~n~w ',[Prompt]),

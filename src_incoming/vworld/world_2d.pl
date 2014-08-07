@@ -145,7 +145,7 @@ region_near(R1,R1).
 
 moo:default_inst_type_props(OfAgent,agent,[facing(F),atloc(L)]):-ignore((nonvar(OfAgent),create_someval(facing,OfAgent,F),create_someval(atloc,OfAgent,L))).
 
-moo:transitive_other(atloc,Obj,What):-inside_of(Obj,What).
+moo:transitive_other(atloc,1,Obj,What):-inside_of(Obj,What).
 
 :-export(inside_of/2).
 inside_of(Obj,What):-is_asserted(stowed(What,Obj)).

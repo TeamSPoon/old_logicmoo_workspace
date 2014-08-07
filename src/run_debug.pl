@@ -26,7 +26,7 @@ was_run_dbg_pl:-is_startup_file('run_debug.pl').
 %:- at_start(start_servers).
 % commented out except on run
 
-start_boxer:-!.
+start_boxer:- !.
 start_boxer:-
    threads,
    ensure_loaded(logicmoo(candc/parser_boxer)),
@@ -34,12 +34,15 @@ start_boxer:-
    fmt("Press Ctrl-D to start the mud!"),
    at_start(prolog).
 
+
+
 % [Optional] This loads boxer
 :- at_start(with_assertions(moo:prevent_transform_moo_preds,within_user(ignore(catch(start_boxer,_,true))))).
 
 % [Optional] Testing PTTP
 % :-is_startup_file('run_debug.pl')->doall(do_pttp_test(_));true.
 
+:- chat80.
 
 % [Manditory] This loads the game and initializes so test can be ran
 :- if_flag_true(was_run_dbg_pl, at_start(run_setup)).

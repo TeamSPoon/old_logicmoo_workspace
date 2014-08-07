@@ -64,7 +64,8 @@ moo:check_permanence(USE,_Agent,LOC,Obj) :-
 	del(atloc(Obj,LOC)).
 moo:check_permanence(USE,Agent,LOC,Obj) :-
     get_use_verbs(USE,USING,_USABLE,_STOWED),
-        props(Obj,permanence(USE,1)),
+        props(Obj,permanence(USE,Held)),
+        member(Held,[1,held]),
 	del(atloc(Obj,LOC)),
 	padd(Agent,USING,Obj).
 moo:check_permanence(USE,_,_,_):-get_use_verbs(USE,_USING,_USABLE,_STOWED),!.

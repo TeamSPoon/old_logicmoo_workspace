@@ -1102,7 +1102,7 @@ special_head(_,F):-get_mpred_prop(F,prologHybrid).
 special_head(_,F):-get_mpred_prop(F,hasStub(_)).
 
 
-user:term_expansion(CL,moo:was_imported_kb_content(CL)):- is_clause_moo_special(CL),not(into_form_code),
+user:term_expansion(CL,moo:was_imported_kb_content(CL)):- not(thlocal:into_form_code), is_clause_moo_special(CL),
    dmsg(assertz_local_game_clause(CL)),ignore(is_compiling_sourcecode),must_det(game_assert(CL)),!.
 
 % load_motel:- defrole([],time_state,restr(time,period)).

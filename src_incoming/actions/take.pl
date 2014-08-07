@@ -49,16 +49,19 @@ moo:check_permanence(take,_,_,Obj):-
         atloc(Obj,LOC),
 	clr(atloc(Obj,LOC)).
 moo:check_permanence(take,Agent,_,Obj) :-
-	props(Obj,permanence(take,1)),
+	props(Obj,permanence(take,Held)),
+           member(Held,[1,held]),
         atloc(Obj,LOC),
 	ignore(clr(atloc(Obj,LOC))),
 	add(possess(Agent,Obj)),
         (req(possess(Agent,Obj)) -> true; throw(req(possess(Agent,Obj)))).
-moo:check_permanence(take,Agent,_,Obj) :-
-        atloc(Obj,LOC),
-	ignore(clr(atloc(Obj,LOC))),
-	add(possess(Agent,Obj)),
+moo:check_permanence(take,Agent,_,Source) :-
+	props(Source,permanence(take,copy(What))),
+        create_new_object([What],Obj),
+         add(possess(Agent,Obj)),
         (req(possess(Agent,Obj)) -> true; throw(req(possess(Agent,Obj)))).
+moo:check_permanence(take,_Agent,_,Obj) :-
+        props(Obj,permanence(take,stays)),!.
 
 moo:check_permanence(take,_,_,_).
 

@@ -29,7 +29,6 @@
 hook:decl_database_hook(assert(_),C):- expire_tabled_list(C).
 hook:decl_database_hook(retract(_),C):- expire_tabled_list(C).
 
-
 % =====================================================================================================================
 % get_agent_text_command/4
 % =====================================================================================================================
@@ -268,7 +267,10 @@ parse_agent_text_command_0(Agent,IVERB,ARGS,NewAgent,GOAL):-
    verb_alias_to_verb(IVERB,SVERB), IVERB\=SVERB,!,
    parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL).
 
-parse_agent_text_command_0(Agent,IVERB,ARGS,Agent,GOAL):- nonvar(IVERB), string_to_atom(IVERB,VERB),GOAL=..[VERB|ARGS],!.
+parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,prologCall(call_mpred(PROLOGTERM))):- compound(PROLOGTERM),functor(PROLOGTERM,F,_),mpred_prop(F,_),!.
+         
+
+parse_agent_text_command_0(Agent,IVERB,ARGS,Agent,GOAL):- ground(IVERB), string_to_atom(IVERB,VERB),GOAL=..[VERB|ARGS],!.
 
 moo:verb_alias('l','look').
 moo:verb_alias('lo','look').

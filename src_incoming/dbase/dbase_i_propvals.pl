@@ -32,7 +32,7 @@ with_no_fallbacks(Call):-with_assertions(noDefaultValues(_),Call).
 
 
 
-:- dynamic_multifile_exported(transitive_other/3).
+:- dynamic_multifile_exported(transitive_other/4).
 
 choose_val(Prop,Obj,Value):- var(Obj),nonvar(Value),!,is_asserted(dbase_t(Prop,Obj,Value)).
 choose_val(Prop,Obj,Value):- choose_right(Prop,Obj,Value).
@@ -66,10 +66,15 @@ choose_each(Prop,Obj,Value):- mpred_prop(Prop, extentKnown),!,choose_asserted(Pr
 choose_each(Prop,Obj,Value):- one_must(choose_asserted(Prop,Obj,Value),(fallback_value(Prop,Obj,Value),maybe_cache(Prop,Obj,Value,Obj))).
 
 % choose_asserted(Prop,Obj,Value):- dbase_t(Prop,Obj,Value). % ,must_det(is_asserted(dbase_t(Prop,Obj,Value))).
-choose_asserted(Prop,Obj,Value):- var(Obj),!,is_asserted(dbase_t(Prop,Obj,Value)).
-choose_asserted(Prop,Obj,Value):- is_asserted(dbase_t(Prop,Obj,Value)).
-choose_asserted(Prop,Obj,Value):- call_mpred(dbase_t(Prop,Obj,Value)).
-choose_asserted(Prop,Obj,Value):- transitive_other(Prop,Obj,What),call(Prop,What,Value),maybe_cache(Prop,Obj,Value,What).
+% choose_asserted(Prop,Obj,Value):- is_asserted(dbase_t(Prop,Obj,Value)).
+choose_asserted(Prop,Obj,Value):- var(Obj),!,choose_asserted_mid_order(Prop,Obj,Value).
+choose_asserted(Prop,Obj,Value):- transitive_other(Prop,1,Obj,What),choose_asserted_mid_order(Prop,Obj,Value),maybe_cache(Prop,Obj,Value,What).
+
+choose_asserted_mid_order(Prop,Obj,Value):-loop_check(choose_asserted_mid_order_all(Prop,Obj,Value),fail).
+choose_asserted_mid_order_all(Prop,Obj,Value):- call_mpred(dbase_t(Prop,Obj,Value)).
+choose_asserted_mid_order_all(Prop,Obj,Value):- is_asserted(genlPreds(Prop,Other)),choose_asserted(Other,Obj,Value).
+choose_asserted_mid_order_all(Prop,Obj,Value):- is_asserted(genlInverse(Prop,Other)),choose_val(Other,Value,Obj).
+
 
 maybe_cache(Prop,Obj,Value,What):-not(not(maybe_cache_0(Prop,Obj,Value,What))).
 

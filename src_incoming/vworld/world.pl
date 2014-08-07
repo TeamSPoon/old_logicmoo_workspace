@@ -136,7 +136,7 @@ moo:isa(item,itemtype).
 
 %moo:subclass(SubType,formattype):-isa(SubType,formattype).
 
-cached(G):-catch(G,_,fail).
+cached(G):-ccatch(G,_,fail).
 
 
 :-export(create_meta/4).
