@@ -1387,7 +1387,9 @@ safe_numbervars(Copy,_,X,Z):-numbervars(Copy,X,Z,[attvar(skip)]).
 
 unnumbervars(X,Y):-with_output_to(atom(A),write_term(X,[numbervars(true),quoted(true)])),atom_to_term(A,Y,_),!.
 
+renumbervars(X,X):-ground(X),!.
 renumbervars(X,Z):-unnumbervars(X,Y),safe_numbervars(Y,Z).
+renumbervars(Y,Z):-safe_numbervars(Y,Z).
 
 withFormatter(Lang,From,Vars,SForm):-formatter_hook(Lang,From,Vars,SForm),!.
 withFormatter(_Lang,From,_Vars,SForm):-sformat(SForm,'~w',[From]).

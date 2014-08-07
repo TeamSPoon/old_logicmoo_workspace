@@ -31,6 +31,24 @@
 
 :- register_module_type(utility).
 
+% ===========================================================
+% CHAT80 command
+% ===========================================================
+moo:type_action_info(human_player,chat80(list(term)),"Development test CHAT-80 Text for a human.  Usage: CHAT80 Cant i see the blue backpack?").
+
+moo:agent_call_command(_Gent,chat80(StringM)):-  to_word_list(StringM,String),  must_det(control(report,String)).
+
+
+% ===========================================================
+% CHAT80 REPL
+% ===========================================================
+chat80 :-
+  told,
+   repeat,
+   prompt_read('CHAT80 Question: ',Atom),  
+   atomSplit(Atom,P),   
+      control(report,P).
+
 :- asserta(thlocal:into_form_code).   
 
 :- ensure_loaded(logicmoo(parsing/chat80/xgproc)).	% XG generator
@@ -65,16 +83,11 @@
 % testing
 :- ensure_loaded(logicmoo(parsing/chat80/newtop)).	% top level
 
-:- time(hi(logicmoo(parsing/chat80/demo))).
-
-chat80 :-
-  told,
-   repeat,
-   prompt_read('CHAT80 Question: ',Atom),
-   atomSplit(Atom,P),   
-      control(report,P).
+test_chat80_regressions:- time(hi(logicmoo(parsing/chat80/demo))).
 
 :- retract(thlocal:into_form_code).
+
+moo:mud_test(chat80_regressions,chat80_regressions).
 
 :- include(logicmoo('vworld/moo_footer.pl')).
 

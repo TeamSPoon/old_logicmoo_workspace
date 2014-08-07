@@ -69,18 +69,21 @@ where_atloc(_Agent,'OffStage'):-!.
 
 call_agent_action_lc(Agent,CMD):-
    % start event
-   where_atloc(Agent,Where),
-   raise_location_event(Where,notice(reciever,begin(Agent,CMD))),
-   flush_output,
-   doall((repeat,catch(call_agent_where_action_lc(Agent,Where,CMD),E,(fmt('call_agent_action/2 Error ~q ',[E]),dtrace,fail)))),!.
+ ignore((must_det_l([where_atloc(Agent,Where),
+   raise_location_event(Where,notice(reciever,begin(Agent,CMD))),   
+   catch(call_agent_where_action_lc(Agent,Where,CMD),E,(fmt('call_agent_action/2 Error ~q ',[E])))]))),!.
+
+:-export(send_command_completed_message/4).
+send_command_completed_message(Agent,Where,Done,CMD):-
+     ignore((must_det_l([flush_output,renumbervars(CMD,SCMD),Message =..[Done,Agent,SCMD],
+                raise_location_event(Where,notice(reciever,Message)),
+                padd(Agent,last_command(SCMD)),flush_output]))),!.
 
 
 % complete event
-call_agent_where_action_lc(Agent,Where,CMD):- debugOnError(moo:agent_call_command(Agent,CMD)),flush_output,
-      must_det_l([renumbervars(CMD,SCMD),raise_location_event(Where,notice(reciever,done(Agent,SCMD))),padd(Agent,last_command(SCMD)),flush_output]).
+call_agent_where_action_lc(Agent,Where,CMD):- debugOnError(moo:agent_call_command(Agent,CMD)),send_command_completed_message(Agent,Where,done,CMD),!.
 % fail event
-call_agent_where_action_lc(Agent,Where,CMD):- renumbervars(CMD,SCMD),raise_location_event(Where,notice(reciever,failed(Agent,SCMD))),!,padd(Agent,last_command(SCMD)).
-
+call_agent_where_action_lc(Agent,Where,CMD):-  send_command_completed_message(Agent,Where,failed,CMD),!. 
 
 get_session_id(IDIn):-current_input(ID),is_stream(ID),!,ID=IDIn.
 get_session_id(ID):-thread_self(ID).

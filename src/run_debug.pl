@@ -42,7 +42,6 @@ start_boxer:-
 % [Optional] Testing PTTP
 % :-is_startup_file('run_debug.pl')->doall(do_pttp_test(_));true.
 
-:- chat80.
 
 % [Manditory] This loads the game and initializes so test can be ran
 :- if_flag_true(was_run_dbg_pl, at_start(run_setup)).
