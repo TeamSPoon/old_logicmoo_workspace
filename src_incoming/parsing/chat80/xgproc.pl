@@ -56,32 +56,32 @@ consume(F,Mode) :-
    flag(read_terms,_,0),
    repeat,
       read(X),
-    ( X=end_of_file, !, clear(F);
-      (flag(read_terms,T,T+1),process(X,Mode)),
+    ( X=end_of_file, !, xg_clear(F);
+      (flag(read_terms,T,T+1),xg_process(X,Mode)),
          fail ).
 
-process((L-->R),Mode) :- !,
+xg_process((L-->R),Mode) :- !,
    expandlhs(L,S0,S,H0,H,P),
    expandrhs(R,S0,S,H0,H,Q),
    new_pred(P),
    usurping(Mode,P),
    assertz((P :- Q)), !.
-process(( :- G),_) :- !,
-   G.
-process((P :- Q),Mode) :-
+xg_process(( :- G),_) :- !, G.
+
+xg_process((P :- Q),Mode) :-
    usurping(Mode,P),
    new_pred(P),
    assertz((P :- Q)).
-process(P,Mode) :-
+xg_process(P,Mode) :-
    usurping(Mode,P),
    new_pred(P),
    assertz(P).
 
-clear(_F) :-
+xg_clear(_F) :-
    recorded('xg.usurped',P,R0), erase(R0),
    recorded(P,'xg.usurped',R1), erase(R1),
    fail.
-clear(F):- flag(read_terms,T,T),display(read(T,F)),ttynl,ttynl.
+xg_clear(F):- flag(read_terms,T,T),display(read(T,F)),ttynl,ttynl.
 
 usurping(+,_) :- !.
 usurping(-,P) :-
@@ -185,7 +185,7 @@ conc_gx([],L,L) :- !.
 conc_gx([X|L1],L2,[X|L3]) :-
    conc_gx(L1,L2,L3).
 
-list(File) :-
+xg_listing(File) :-
    telling(Old),
    tell(File),
    list_clauses,
@@ -209,7 +209,7 @@ load_xg:-
   load_plus_xg_file('lex.xg'),
   compile_xg_clauses.
 
-go :- load_xg, list('newg.pl').
+go :- load_xg, xg_listing('newg.pl').
 
 
 end_of_file.

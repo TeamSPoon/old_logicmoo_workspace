@@ -71,9 +71,9 @@ call_expanded_for_sv_2(_WhatNot,F,A,G,OUT):- defaultArgValue(G,F,A,OUT),!.
 
 :-export(call_expanded/1).
 %:-export(call_expanded/1).
+call_expanded(G):- var(G),!,trace_or_throw(var_call_expanded(G)).
 call_expanded(true):-!.
 call_expanded(G):-compound(G),!,call_expanded([],G).
-call_expanded(G):- trace_or_throw(var_call_expanded(G)).
 :-export(call_expanded/2).
 call_expanded(Doing,G):- functor(G,F,A),call_expanded(Doing,G,F,A).
 :-export(call_expanded/4).
@@ -113,7 +113,7 @@ naf(Goal):-not(req(Goal)).
 
 
 
-callable_tf(P,2):- arity_pred(P),!,fail.
+callable_tf(P,2):- mpred_arity_pred(P),!,fail.
 callable_tf(F,A):- functor_safe(P,F,A),predicate_property(P,_),!.
 :- dynamic(useExternalDBs/0).
 useExternalDBs:- fail.

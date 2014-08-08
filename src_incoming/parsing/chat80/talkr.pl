@@ -66,11 +66,11 @@ complex(\+P) :- complex(P).
 respond([]) :- display('Nothing satisfies your question.'), nl.
 respond([A|L]) :- reply(A), replies(L).
 
-answer(S1):- answer(S1,S),respond(S).
+answer(S1):- qplan_to_answers(S1,S),respond(S).
 
-answer((answer([]):-E),[B]) :- !, holds(E,B).
-answer((answer([X]):-E),S) :- !, seto(X,E,S).
-answer((answer(X):-E),S) :- seto(X,E,S).
+qplan_to_answers((answer([]):-E),[B]) :- !, holds(E,B).
+qplan_to_answers((answer([X]):-E),S) :- !, seto(X,E,S).
+qplan_to_answers((answer(X):-E),S) :- seto(X,E,S).
 
 seto(X,E,S) :- setof(X,satisfy(E),S), !.
 seto(_X,_E,[]).
@@ -97,11 +97,14 @@ satisfy(numberof(X,P,N)) :- !, setof(X,satisfy(P),S), length(S,N).
 satisfy(setof(X,P,S)) :- !, setof(X,satisfy(P),S).
 satisfy(+P) :- exceptionto(P), !, fail.
 satisfy(+_P) :- !.
-satisfy(X<Y) :- !, X<Y.
-satisfy(X=<Y) :- !, X=<Y.
+satisfy(P) :- not(canSort([X,Y])),!, call_mpred(P).
+satisfy(X<Y) :-  !, X<Y.
+satisfy(X=<Y) :-  !, X=<Y.
 satisfy(X>=Y) :- !, X>=Y.
 satisfy(X>Y) :- !, X>Y.
-satisfy(P) :- P.
+satisfy(P) :- call_mpred(P).
+
+canSort([X,Y]):-number(X),!,number(Y).
 
 exceptionto(P) :-
    functor(P,F,N), functor(P1,F,N),

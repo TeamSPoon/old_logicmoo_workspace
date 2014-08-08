@@ -174,7 +174,7 @@ locaton_s(class_template(RealObj,D1,D2,0),Place):-
 % class_template Descriptions
 % ==================================================
 
-:-dynamic(class_template/4).
+% :-dynamic(class_template/3).
 :-op(600,fx,setTemplate).
 
 
@@ -241,10 +241,17 @@ transform_property(Pro,Property):-
 transform_property(Property,Property).
 
 	  
+
+functor_member(Property,[]):-!,fail.
+functor_member(Property,Specification):-
+	functor(Property,S,_),!,
+	member(Super,Specification),
+	functor(Super,S,_).
+
 get_property(Type,Specification,Property):-
 	member(Property,Specification).
 get_property(Type,Specification,Property):-
-	object(Type,D1,D2),
+	class_template(Type,D1,D2), % was object/3
 	append(D1,D2,DD),
 	member(Property,DD),
 	not(functor_member(Property,Specification)).

@@ -252,3 +252,5 @@ scan_default_props_lc:- dmsg(todo(fix(scan_default_props,"to not set atloc/2")))
          padd(I,Missing)))))),fail.
 scan_default_props_lc:-ignore(rescan_duplicated_facts).
 
+:- include(logicmoo(parsing/parser_chat80)). 
+

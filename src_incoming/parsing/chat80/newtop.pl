@@ -20,7 +20,7 @@
 
 */
 
-
+:-export(must_test_80/3).
 must_test_80([what, rivers, are, there, ?], [sent([what, rivers, are, there, ?]), parse(whq(feature&river-B, s(np(3+plu, np_head(int_det(feature&river-B), [], river), []), verb(be, active, pres+fin, [], pos), [void], []))), sem((answer([A]):-river(A), A^true)), qplan((answer([B]):-river(B), B^true)), answers([amazon, amu_darya, amur, brahmaputra, colorado, congo_river, cubango, danube, don, elbe, euphrates, ganges, hwang_ho, indus, irrawaddy, lena, limpopo, mackenzie, mekong, mississippi, murray, niger_river, nile, ob, oder, orange, orinoco, parana, rhine, rhone, rio_grande, salween, senegal_river, tagus, vistula, volga, volta, yangtze, yenisei, yukon, zambesi])],[time(0.0)]).
 must_test_80([does, afghanistan, border, china, ?], [sent([does, afghanistan, border, china, ?]), parse(q(s(np(3+sin, name(afghanistan), []), verb(border, active, pres+fin, [], pos), [arg(dir, np(3+sin, name(china), []))], []))), sem((answer([]):-borders(afghanistan, china))), qplan((answer([]):-{borders(afghanistan, china)})), answers([true])],[time(0.0)]).
 must_test_80([what, is, the, capital, of, upper_volta, ?], [sent([what, is, the, capital, of, upper_volta, ?]), parse(whq(feature&city-B, s(np(3+sin, wh(feature&city-B), []), verb(be, active, pres+fin, [], pos), [arg(dir, np(3+sin, np_head(det(the(sin)), [], capital), [pp(prep(of), np(3+sin, name(upper_volta), []))]))], []))), sem((answer([A]):-capital(upper_volta, A))), qplan((answer([A]):-capital(upper_volta, A))), answers([ouagadougou])],[time(0.0010000000000000009)]).
@@ -50,20 +50,25 @@ must_test_80([what, countries, are, there, in, europe, ?], [sent([what, countrie
 
 /* Control loop */
 
+:-thread_local chat80_tracing/0.
+:-thread_local thlocal:theReporter/1.
+
 hi :-
    hi(user).
 
 hi(File) :-
    repeat,
       ask(File,P),
-      control(test_quiet,P), !,
-      end(File).
+      control80(P), !,
+      end_chat80(File).
+     
 
 ask(user,P) :- !,
-   prompt(_,'Question: '),
-   read_in(P).
-ask(F,P) :-
-   absolute_file_name(F,File),
+   prompt(_,'Question: '), read_in(P).
+
+ask(F,P):-compound(F),!,absolute_file_name(F,File),!,ask(File,P).
+
+ask(File,P) :-
    seeing(Old),
    see(File),
    read_in(P),
@@ -84,7 +89,7 @@ out(A) :-
    write(A).
 
 advance(X,N0,N) :-
-   uses(X,K),
+   uses_terms(X,K),
    M is N0+K,
  ( M>72, !,
       nl,
@@ -92,9 +97,9 @@ advance(X,N0,N) :-
    N is M+1,
       put(" ")).
 
-uses(nb(X),N) :- !,
+uses_terms(nb(X),N) :- !,
    chars(X,N).
-uses(X,N) :-
+uses_terms(X,N) :-
    chars(X,N).
 
 chars(X,N) :- atomic(X), !,
@@ -102,51 +107,78 @@ chars(X,N) :- atomic(X), !,
    length(L,N).
 chars(_,2).
 
-end(user) :- !.
-end(F) :- 
+end_chat80(user) :- !.
+end_chat80(F) :- 
    catch(close(F),_,seen).
 
-control(_FB,[bye,'.']) :- !,
-   display('Cheerio.'),
-   nl.
-control(_FB,[trace,'.']) :- !,
-   assert(tracing),
-   display('Tracing from now on!'), nl, fail.
-control(_FB,[do,not,trace,'.']) :-
-   retract(tracing), !,
-   display('No longer tracing.'), nl, fail.
-control(FB,U) :-
-   display(FB:U),
-   process_run(FB,U),
-   fail.
 
-process_run(Report,U) :- process_run_0(Report,U),!.
-process_run(_Report,U) :- trace,process_run_0(report,U),!.
 
-process_run_0(Report,U) :-
-   runtime(StartParse),   
-   sentence(E,U,[],[],[]),
-   runtime(StopParse),
+get_reporter(Report):-thlocal:theReporter(Report).
+get_reporter(Report):-Report=report.
+
+
+:-export(report/4).
+report(Item,Label,Time,Mode) :-
+  /* chat80_tracing,*/ !, 
+   nl, write(Label), write(': '), write(Time), write('sec.'), nl,
+   report_item(Mode,Item).
+report(_,_,_,_).
+
+is_bye(bye).
+is_bye(quit).
+is_bye(end_of_file).
+is_this([Text,'.'],Text).
+is_this([Text],Text).
+
+t1:- asserta(chat80_tracing),do_chat80(report,[what,rivers,are,there,?]).
+
+do_chat80(U):-process80(U).
+do_chat80(Report,U):-nonvar(Report),!,with_assertions(thlocal:theReporter(Report),do_chat80(U)).
+do_chat80(Report,U):-do_chat80(U),get_reporter(Report).
+
+process80(U) :- control80(U),!.
+process80(U) :- failure80(U).
+
+control80(Text) :- is_this(Text,Bye),is_bye(Bye),!,display('Cheerio.'),nl.
+control80(Text) :- is_this(Text,trace),!,assert(chat80_tracing),display('Tracing from now on!'), nl, fail.
+control80([do,not|Text]) :- is_this(Text,trace),!,retract(chat80_tracing), !,display('No longer chat80_tracing.'), nl, fail.
+control80([]) :- display('no input.'), nl, fail.
+control80(U):- parse_sentence(U).
+control80(U):- last(U,L),atom_length(L,AL),AL>1,member(NL,['?','.']),!,append(U,[NL],TRYAGAIN),control80(TRYAGAIN).
+control80(U):- once(to_word_list(U,WL)),WL\=U,!,control80(WL).
+
+parse_sentence(U):-to_word_list(U,WL),parse_sentence(WL,E,S,S1,Results).
+
+parse_sentence(U,E,S,S1,Results):-
+   get_reporter(Report),parse_sentence(U,Report,E,S,S1,Results).
+
+sentence_to_parsetree(U,E):-sentence(E,U,[],[],[]).
+
+parse_sentence(U,Report,E,S,S1,Results):-
+   get_runtime_seconds(StartParse),   
+   sentence_to_parsetree(U,E),
+   get_runtime_seconds(StopParse),
    ParseTime is StopParse - StartParse,
    call(Report,E,'Parse',ParseTime,tree),
-   runtime(StartSem),
-   logic(E,S), !,
-   runtime(StopSem),
+   ignore((get_runtime_seconds(StartSem),
+   parsetree_to_prelogic(E,S), !,
+   get_runtime_seconds(StopSem),
    SemTime is StopSem - StartSem,
    call(Report,S,'Semantics',SemTime,expr),
-   runtime(StartPlan),
-   qplan(S,S1), !,
+   ignore((get_runtime_seconds(StartPlan),
+   prelogic_to_qplan(S,S1), !,
    copy_term(S1,QP),
-   runtime(StopPlan),
+   get_runtime_seconds(StopPlan),
    TimePlan is StopPlan - StartPlan,
    call(Report,S1,'Planning',TimePlan,expr),
-   runtime(StartAns),
-   answer(S1,Results),!,
-   runtime(StopAns),
+   get_runtime_seconds(StartAns),
+   ignore((qplan_to_answers(S1,Results),!,
+   get_runtime_seconds(StopAns),
    TimeAns is StopAns - StartAns,
    call(Report,Results,'Reply',TimeAns,tree),
    WholeTime is ParseTime + SemTime + TimePlan + TimeAns,
-   check_test_80(U,[sent=(U),parse=(E),sem=(S),qplan=(QP),answers=(Results)],[time(WholeTime)]),!.
+   check_test_80(U,[sent=(U),parse=(E),sem=(S),qplan=(QP),answers=(Results)],[time(WholeTime)]))))))).
+
 
 check_test_80(U,List,Time):-must_test_80(U,BList,BTime),!,reportDif(U,List,BList,Time,BTime).
 check_test_80(U,List,Time):-reportDif(U,List,[],Time,[]).
@@ -154,50 +186,20 @@ check_test_80(U,List,Time):-reportDif(U,List,[],Time,[]).
 test_quiet(_,_,_,_).
 
 
+:-export(reportDif/5).
 reportDif(_U,List,BList,_Time,_BTime):-forall(member(N=V,List),ignore((member(N=BV,BList),not(BV = V), 'format'('~n1) ~q = ~q ~~n2) ~q = ~q ~n',[N,V,N,BV])))).
 
-process(U) :- process_run(test_quiet,U),!.
-process(U) :- failure(U).
 
-failure(U) :-
+failure80(U) :-
    display('I don''t understand! '+U), nl.
 
 
-report(Item,Label,Time,Mode) :-
-   tracing, !,
-   nl, write(Label), write(': '), write(Time), write('sec.'), nl,
-   report_item(Mode,Item).
-report(_,_,_,_).
-
-report_item(none,_).
-report_item(expr,Item) :-
-   write_tree(Item), nl.
-report_item(tree,Item) :-
-   print_tree(Item), nl.
-
-runtime(Time) :-
+get_runtime_seconds(Time) :-
    statistics(runtime,[MSec,_]),
    Time is MSec/1000.
 
-quote(A&R) :-
-   atom(A), !,
-   quote_amp(R).
-quote(_-_).
-quote(_--_).
-quote(_+_).
-quote(verb(_,_,_,_,_)).
-quote(wh(_)).
-quote(name(_)).
-quote(prep(_)).
-quote(det(_)).
-quote(quant(_,_)).
-quote(int_det(_)).
 
-quote_amp('$VAR'(_)) :- !.
-quote_amp(R) :-
-   quote(R).
-
-logic(S0,S) :-
+parsetree_to_prelogic(S0,S) :-
    i_sentence(S0,S1),
    clausify(S1,S2),
    simplify(S2,S).

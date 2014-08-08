@@ -255,7 +255,7 @@ fill_args(PI,With):-PI=..[_|ARGS],fill_args(ARGS,With).
    
 
 :-export(parent_goal/2).
-parent_goal(Term,Nth):- parent_frame_attribute(goal,Term,Nth,_RealNth).
+parent_goal(Term,Nth):- parent_frame_attribute(goal,Term,Nth,_RealNth,_FrameNum).
 :-export(parent_frame_attribute/5).
 parent_frame_attribute(Attrib,Term,Nth,RealNth,FrameNum):-notrace((ignore(Attrib=goal),prolog_current_frame(Frame),
                                                 current_frames(Frame,Attrib,5,NextList))),!,nth1(Nth,NextList,RealNth-FrameNum-Term).

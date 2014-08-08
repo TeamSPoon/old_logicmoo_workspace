@@ -34,6 +34,8 @@ set_list_len(List,A,NewList):-length(List,LL),A=LL,!,NewList=List.
 set_list_len(List,A,NewList):-length(List,LL),A>LL,length(NewList,A),append(List,_,NewList),!.
 set_list_len(List,A,NewList):-length(NewList,A),append(NewList,_,List),!.
 
+is_mpred_prolog(F,_):-get_mpred_prop(F,prologBuiltin).
+
 if_mud_asserted(F,A2,_,_Why):-is_mpred_prolog(F,A2),!,fail.
 if_mud_asserted(F,A2,A,Why):-using_holds_db(F,A2,A,Why).
 
@@ -44,6 +46,10 @@ if_use_holds_db(F,A2,_,_):- is_mpred_prolog(F,A2),!,fail.
 if_use_holds_db(F,A,_,_):-  never_use_holds_db(F,A,_Why),!,fail.
 if_use_holds_db(F,A2,A,Why):- using_holds_db(F,A2,A,Why),!.
 if_use_holds_db(F,A,_,_):- declare_as_code(F,A),fail.
+
+never_use_holds_db(F,N,Why):-trace_or_throw(todo(find_impl,never_use_holds_db(F,N,Why))).
+
+isCycPredArity_Check(F,A):-get_mpred_props(F,cycPred(A)).
 
 using_holds_db(F,A,_,_):- never_use_holds_db(F,A,_),!,fail.
 using_holds_db(F,A2,A,m2(F,A2,isCycPredArity_Check)):- integer(A2), A is A2-2, A>0, isCycPredArity_Check(F,A),!.

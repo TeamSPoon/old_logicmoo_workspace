@@ -13,8 +13,8 @@
 %
 */
 
-:- module(world,
-	[
+%:- module(world, [
+:-export((
         call_agent_command/2,
        % call_agent_action/2,
             %mud_isa/2,
@@ -67,9 +67,8 @@
          spread/0,
          growth/0,
          isaOrSame/2,
-         current_agent_or_var/1
-
- ]).
+         current_agent_or_var/1)).
+ % ]).
 
 
 :-discontiguous create_instance_0/3.
@@ -303,10 +302,6 @@ moo:default_type_props(agent,[
                        agent_turnnum(0),
                        score(1),
                        memory(P,directions([n,s,e,w,ne,nw,se,sw,u,d]))]).
-
-
-
-
 
 
 

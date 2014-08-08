@@ -185,4 +185,169 @@ end_module_type(CM,Type):-retractall(registered_module_type(CM,Type)).
 % :- include(logicmoo('vworld/moo_footer.pl')).
 
 
+end_of_file.
+
+
+moo:  ?- make.
+% Found new meta-predicates in iteration 1 (14.128 sec)
+% :- meta_predicate logicmoo_util_library:nd_predsubst2(2,*,*).
+% :- meta_predicate logicmoo_util_library:call_n_times(*,0).
+% :- meta_predicate logicmoo_util_library:throw_if_true_else_fail(^,*).
+% :- meta_predicate logicmoo_util_library:nd_predsubst(?,2,?).
+% :- meta_predicate logicmoo_util_library:pred_term_parts(1,?,*).
+% :- meta_predicate logicmoo_util_library:predsubst(?,2,?).
+% :- meta_predicate logicmoo_util_library:list_retain(*,1,*).
+% :- meta_predicate moo_loader:myDebugOnError(0).
+% :- meta_predicate logicmoo_util_strings:convert_members(2,?,?).
+% :- meta_predicate dbase_rules_pttp:timed_call(0,*).
+% :- meta_predicate dbase_rules_pttp:search1(0,*,*,*,*,*,*).
+% :- meta_predicate dbase_rules_pttp:call_proof(0,*).
+% :- meta_predicate dbase_rules_pttp:call_print_tf(0).
+% :- meta_predicate user:in_user_startup(0).
+% :- meta_predicate user:within_user(0).
+% :- meta_predicate moo_testing:test_call0(0).
+% :- meta_predicate moo:call_after_next(0,*).
+% :- meta_predicate moo:xcall_t(1,?).
+% :- meta_predicate moo:oncely(0).
+% :- meta_predicate moo:sc1(*,0).
+% :- meta_predicate moo:xcall_t(2,?,?).
+% :- meta_predicate moo:cached(0).
+% :- meta_predicate moo:simply_functors(2,*,*).
+% :- meta_predicate moo:hooked_asserta_confirmed(^,*,*).
+% :- meta_predicate moo:xcall_t(0).
+% :- meta_predicate moo:trigger_first(*,0).
+% :- meta_predicate moo:with_kb_assertions(:,0).
+% :- meta_predicate moo:show_cgoal(0).
+% :- meta_predicate moo:forall_setof(0,0).
+% :- meta_predicate moo:trigger_determined(*,*,0).
+% :- meta_predicate moo:check_disj(*,*,0).
+% :- meta_predicate moo:trigger_ground(*,0).
+% :- meta_predicate moo:trigger_pred(?,1,0).
+% :- meta_predicate moo:trigger_nonvar(*,0).
+% :- meta_predicate moo:parse_sentence(*,4,?,?,?,?).
+% :- meta_predicate moo:xcall_t(5,?,?,?,?,?).
+% :- meta_predicate moo:intersect(*,*,*,*,0,-).
+% :- meta_predicate moo:fact_checked0(*,0).
+% :- meta_predicate moo:xcall_t(4,?,?,?,?).
+% :- meta_predicate moo:compare_op(*,2,?,?).
+% :- meta_predicate moo:must_ac(^).
+% :- meta_predicate moo:xcall_f(2,?,?).
+% :- meta_predicate moo:xcall_f(1,?).
+% :- meta_predicate moo:add_w_hooks(^).
+% :- meta_predicate moo:xcall_t(3,?,?,?).
+% :- meta_predicate moo:create_random(*,*,0).
+% :- meta_predicate moo:xcall_t(6,?,?,?,?,?,?).
+% :- meta_predicate moo:db_op_loop(*,*,0).
+% :- meta_predicate moo:punless(0,0).
+% :- meta_predicate moo:game_call_head_body(*,^).
+% :- meta_predicate moo:exception(0).
+% :- meta_predicate moo:object_print_details(2,*,*,*,*).
+% :- meta_predicate moo:xcall_f(0).
+% :- meta_predicate moo:call_after(0,^).
+% :- meta_predicate moo:mud_pred_expansion_2(4,?,?,*,*,*).
+% :- meta_predicate moo:xcall_f(5,?,?,?,?,?).
+% :- meta_predicate moo:xcall_f(6,?,?,?,?,?,?).
+% :- meta_predicate moo:call_mpred_g(*,^).
+% :- meta_predicate moo:xcall_f(4,?,?,?,?).
+% :- meta_predicate moo:call_mpred_w_results(^,*).
+% :- meta_predicate bugger:must_flag(*,0,0).
+% :- meta_predicate bugger:dtrace(0).
+% :- meta_predicate bugger:show_and_do(0).
+% :- meta_predicate bugger:with_skip_bugger(0).
+% :- meta_predicate bugger:one_must(^,*,*).
+% :- meta_predicate bugger:restore_trace(0).
+% :- meta_predicate bugger:trace_or(0).
+% :- meta_predicate bugger:ggtrace(0).
+% :- meta_predicate bugger:call_no_cuts_0(0).
+% :- meta_predicate bugger:with_preds(*,*,*,*,*,0).
+% :- meta_predicate bugger:outside_loop_check_term(0,*,0).
+% :- meta_predicate bugger:grtrace(0).
+% :- meta_predicate bugger:once_if_ground(0).
+% :- meta_predicate bugger:gftrace(0).
+% :- meta_predicate bugger:logOnFailureIgnore(0).
+% :- meta_predicate bugger:outside_loop_check_thread(0).
+% :- meta_predicate bugger:must_findall(*,0).
+% :- meta_predicate toploop_telnet:telnet_repl_writer(*,*,*,^).
+% Restarting analysis ...
+% Found new meta-predicates in iteration 2 (13.698 sec)
+% :- meta_predicate logicmoo_util_library:pred_term_parts_l(1,*,*).
+% :- meta_predicate logicmoo_util_library:nd_predsubst1(2,*,*,*).
+% :- meta_predicate dbase_rules_pttp:search0(0,*,*,*,*,*,*).
+% :- meta_predicate moo:call_t(*,3,?,?,?).
+% :- meta_predicate moo:call_mt_f(*,2,?,?).
+% :- meta_predicate moo:call_mt_t(*,3,?,?,?).
+% :- meta_predicate moo:xcall_f(3,?,?,?).
+% :- meta_predicate moo:call_t(*,6,?,?,?,?,?,?).
+% :- meta_predicate moo:call_mt_t(*,5,?,?,?,?,?).
+% :- meta_predicate moo:call_t(*,2,?,?).
+% :- meta_predicate moo:call_list_t(*,0,*).
+% :- meta_predicate moo:call_mt_t(*,2,?,?).
+% :- meta_predicate moo:call_mt_f(*,6,?,?,?,?,?,?).
+% :- meta_predicate moo:call_t(*,1,?).
+% :- meta_predicate moo:call_mt_t(*,4,?,?,?,?).
+% :- meta_predicate moo:call_f(*,6,?,?,?,?,?,?).
+% :- meta_predicate moo:call_f(*,5,?,?,?,?,?).
+% :- meta_predicate moo:call_f(*,4,?,?,?,?).
+% :- meta_predicate moo:mud_pred_expansion_1(4,*,*,*).
+% :- meta_predicate moo:call_f(*,1,?).
+% :- meta_predicate moo:call_t(*,5,?,?,?,?,?).
+% :- meta_predicate moo:call_mt_t(*,6,?,?,?,?,?,?).
+% :- meta_predicate moo:call_t(*,4,?,?,?,?).
+% :- meta_predicate moo:call_mt_f(*,4,?,?,?,?).
+% :- meta_predicate moo:call_mt_f(*,5,?,?,?,?,?).
+% :- meta_predicate moo:call_f(*,2,?,?).
+% :- meta_predicate bugger:traceafter_call(0).
+% :- meta_predicate bugger:outside_loop_check(0,0).
+% :- meta_predicate bugger:debugCallWhy2(*,0).
+% :- meta_predicate bugger:ftrace(0).
+% Restarting analysis ...
+% Found new meta-predicates in iteration 3 (13.777 sec)
+% :- meta_predicate dbase_rules_pttp:search(0,*,*,*,*,*,*).
+% :- meta_predicate moo:cholds_t(6,?,?,?,?,?,?).
+% :- meta_predicate moo:cholds_t(5,?,?,?,?,?).
+% :- meta_predicate moo:mud_pred_expansion_0(4,*,*,*).
+% :- meta_predicate moo:holds_f(5,?,?,?,?,?).
+% :- meta_predicate moo:holds_f(1,?).
+% :- meta_predicate moo:holds_f(6,?,?,?,?,?,?).
+% :- meta_predicate moo:call_f(*,3,?,?,?).
+% :- meta_predicate moo:call_mt_f(*,3,?,?,?).
+% :- meta_predicate bugger:debugCallWhy(*,0).
+% :- meta_predicate moo:dbase_t(5,?,?,?,?,?).
+% :- meta_predicate moo:dbase_t(6,?,?,?,?,?,?).
+% Restarting analysis ...
+Warning: The predicates below are not defined. If these are defined
+Warning: at runtime using assert/1, use :- dynamic Name/Arity.
+Warning:
+Warning: moo:argIsa_ft/3, which is referenced by
+Warning:        /devel/logicmoo/src_incoming/dbase/dbase.pl:423:56: 1-st clause of moo:transform_functor_holds/5
+Warning: moo:can_coerce/1, which is referenced by
+Warning:        /devel/logicmoo/src_incoming/dbase/dbase_formattypes.pl:329:6: 2-nd clause of moo:correctType_gripe/4
+Warning: moo:cholds_f/1, which is referenced by
+Warning:        /devel/logicmoo/src_incoming/dbase/dbase_i_call.pl:192:21: 4-th clause of moo:cholds_t/1
+Warning: moo:functor_member/2, which is referenced by
+Warning:        2-nd clause of moo:get_property/3: 2-nd clause of moo:get_property/3
+Warning: moo:isCycPredArity_Check/2, which is referenced by
+Warning:        /devel/logicmoo/src_incoming/dbase/dbase_c_term_expansion.pl:49:84: 2-nd clause of moo:using_holds_db/4
+Warning:        /devel/logicmoo/src_incoming/dbase/dbase_c_term_expansion.pl:51:45: 4-th clause of moo:using_holds_db/4
+Warning: moo:isRegisteredCycPred/3, which is referenced by
+Warning:        /devel/logicmoo/src_incoming/dbase/dbase_i_cyc.pl:512:6: 1-st clause of moo:assertThrough/2
+Warning:        /devel/logicmoo/src_incoming/dbase/dbase_i_cyc.pl:487:3: 1-st clause of moo:mtForPred/2
+Warning:        /devel/logicmoo/src_incoming/dbase/dbase_i_cyc.pl:540:6: 1-st clause of moo:retractAllThrough/2
+Warning: moo:list_difference_eq/3, which is referenced by
+Warning:        /devel/logicmoo/src_incoming/dbase/dbase.pl:896:67: 2-nd clause of moo:list_update_op/3
+Warning: moo:object/3, which is referenced by
+Warning:        2-nd clause of moo:get_property/3: 2-nd clause of moo:get_property/3
+Warning: moo:pttp_expansions/2, which is referenced by
+Warning:        /devel/logicmoo/src_incoming/dbase/dbase_c_term_expansion.pl:142:29: 2-nd clause of moo:mud_rule_expansion/3
+Warning: moo:pttp_term_expansion/2, which is referenced by
+Warning:        /devel/logicmoo/src_incoming/dbase/dbase_c_term_expansion.pl:142:50: 2-nd clause of moo:mud_rule_expansion/3
+Warning: moo:trace_or_throw/2, which is referenced by
+Warning:        /devel/logicmoo/src_incoming/dbase/dbase.pl:992:27: 9-th clause of moo:game_assert_handler_lc/1
+Warning: nldata_dictionary_some01:cycAssert/2, which is referenced by
+Warning:        /devel/logicmoo/src_data/pldata/nldata_dictionary_some01.pl:390:0: 2-nd clause of nldata_dictionary_some01:rememberDictionary2/3
+Warning:        /devel/logicmoo/src_data/pldata/nldata_dictionary_some01.pl:392:12: 2-nd clause of nldata_dictionary_some01:rememberDictionary2/3
+Warning:        /devel/logicmoo/src_data/pldata/nldata_dictionary_some01.pl:397:8: 2-nd clause of nldata_dictionary_some01:rememberDictionary2/3
+Warning: nldata_dictionary_some01:makeConstant/1, which is referenced by
+Warning:        /devel/logicmoo/src_data/pldata/nldata_dictionary_some01.pl:386:32: 2-nd clause of nldata_dictionary_some01:rememberDictionary2/3
+true.
 

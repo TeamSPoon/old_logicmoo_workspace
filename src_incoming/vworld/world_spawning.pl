@@ -539,12 +539,12 @@ add_slots(C,N,X,SlotList,NewList) :-
 	add_slot(req(C,N,S,F,V),SlotList,NewList).
 
 add_slot(req(C,N,S,F,V),SlotList,[S-FL2|SL2]) :-
-	delete(S-FacetList,SlotList,SL2),
+	ws_delete(S-FacetList,SlotList,SL2),
 	add_facet(req(C,N,S,F,V),FacetList,FL2).
 
 add_facet(req(C,N,S,F,V),FacetList,[FNew|FL2]) :-
 	FX =.. [F,OldVal],
-	delete(FX,FacetList,FL2),
+	ws_delete(FX,FacetList,FL2),
 	add_newval(OldVal,V,NewVal),
 	!, check_add_demons(req(C,N,S,F,V),FacetList),
 	FNew =.. [F,NewVal].
@@ -564,12 +564,12 @@ check_add_demons(req(C,N,S,F,V),FacetList) :-
 check_add_demons(_,_).
 
 
-% delete a list of slot values
+% ws_delete a list of slot values
 
 del_frame(Class) :-
 	retract(frame(Class,_)).
 del_frame(Class) :-
-	local_error(203,['No frame',Class,'to delete']).
+	local_error(203,['No frame',Class,'to ws_delete']).
 
 del_frame(Class, UList) :-
 	old_slots(Class,SlotList),
@@ -666,9 +666,9 @@ print_slots([Slot|Rest]) :-
 
 % utilities
 
-delete(X,[],[]).
-delete(X,[X|Y],Y) :- !.
-delete(X,[Y|Z],[Y|W]) :- delete(X,Z,W).
+ws_delete(X,[],[]).
+ws_delete(X,[X|Y],Y) :- !.
+ws_delete(X,[Y|Z],[Y|W]) :- ws_delete(X,Z,W).
 
 remove(X,[X|Y],Y) :- !.
 remove(X,[Y|Z],[Y|W]) :- remove(X,Z,W).

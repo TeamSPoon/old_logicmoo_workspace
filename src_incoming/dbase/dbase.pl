@@ -45,6 +45,10 @@ slow_kb_op(_):-true.
 :- dynamic_multifile_exported use_usable/4.
 :- dynamic_multifile_exported verb_alias/2.
 :- dynamic_multifile_exported world_agent_plan/3.
+:- dynamic_multifile_exported contains/2.
+:- dynamic_multifile_exported longitude/2.
+:- dynamic_multifile_exported latitude/2.
+:- dynamic_multifile_exported region/1.
 :- dynamic_multifile_exported((actiontype/1,action_info/2,action_rules/4,type_action_info/3,term_specifier_text/2,action_verb_useable/4)).
 :- dynamic_multifile_exported((decl_coerce)/3).
 :- dynamic_multifile_exported((term_anglify/2,term_anglify_last/2, term_anglify_np/3,term_anglify_np_last/3)).
@@ -60,7 +64,9 @@ slow_kb_op(_):-true.
 :- thread_local thlocal:repl_to_string/2.
 :- thread_local thlocal:repl_writer/2.
 :- thread_local thlocal:session_agent/2.
+:- thread_local thlocal:enable_src_loop_checking/0.
 
+:- dynamic_multifile_exported thlocal:enable_src_loop_checking/2.
 :- dynamic_multifile_exported thlocal:dbase_capture/2.
 :- dynamic_multifile_exported thlocal:session_agent/2.
 
@@ -174,7 +180,7 @@ coerce(What,_Type,NewThing):-NewThing = What.
    db_op/2,
    areq/1,
   del/1,  
-  padd/2, padd/3, prop/3, prop_or/4, props/2,aprops/2, req/1, term_listing/1, 
+  padd/2, padd/3, prop/3, prop_or/4, props/2,aprops/2, uprop/2, uprop/1, req/1, term_listing/1, 
   use_term_listing/2,  world_clear/1,  
    with_kb_assertions/2
   )).
@@ -379,7 +385,8 @@ aprops(Obj,PropSpecs):- areq(props(Obj,PropSpecs)).
 %% add(Assertion)
 add(C0):- must_det((db_op_int(assert(add), C0), extreme_debug(req(C0)))),!.
 %% uprop(Obj,PropSpecs) update the properties
-uprop(Obj,PropSpecs):- add(props(Obj,PropSpecs)).
+uprop(Obj,PropSpecs):- uprop(props(Obj,PropSpecs)).
+uprop(C0):- add(C0).
 %% padd(Obj,Prop,Value)
 padd(Obj,PropSpecs):- add(props(Obj,PropSpecs)).
 %% padd(Obj,Prop,Value)
@@ -415,6 +422,8 @@ foreach_arg([ArgIn1|ARGS],ArgN1,ArgIn,ArgN,ArgOut,Call1,[ArgOut1|ARGSO]):-
       ArgN2 is ArgN + 1,
       foreach_arg(ARGS,ArgN2,ArgIn,ArgN,ArgOut,Call,ARGSO).
 
+% Warning: moo:argIsa_ft/3, which is referenced by
+% Warning:        /devel/logicmoo/src_incoming/dbase/dbase.pl:423:56: 1-st clause of moo:transform_functor_holds/5
 
 transform_functor_holds(_,F,ArgInOut,N,ArgInOut):- once(argIsa_ft(F,N,FT)),FT=term,!.
 transform_functor_holds(Op,_,ArgIn,_,ArgOut):- transform_holds(Op,ArgIn,ArgOut),!.
@@ -888,6 +897,20 @@ update_value(OLDI,-X,NEW):- compute_value(OLDI,OLD),number(OLD),catch(NEW is OLD
 update_value(OLDI,X,NEW):- number(X),X<0,compute_value(OLDI,OLD),number(OLD),catch(NEW is OLD + X,_,fail),!.
 update_value(_,NEW,NEWV):-compute_value_no_dice(NEW,NEWV),!.
 
+
+%%	list_difference_eq(+List, -Subtract, -Rest)
+%
+%	Delete all elements of Subtract from List and unify the result
+%	with Rest.  Element comparision is done using ==/2.
+
+list_difference_eq([],_,[]).
+list_difference_eq([X|Xs],Ys,L) :-
+	(   memberchk_eq(X,Ys)
+	->  list_difference_eq(Xs,Ys,L)
+	;   L = [X|T],
+	    list_difference_eq(Xs,Ys,T)
+	).
+
 list_update_op(OLDI,+X,NEW):-flatten_append(OLDI,X,NEW),!.
 list_update_op(OLDI,-X,NEW):-flatten([OLDI],OLD),flatten([X],XX),!,list_difference_eq(OLD,XX,NEW),!.
 
@@ -985,7 +1008,7 @@ game_assert_handler_lc(A):- A=..[Type,_], formattype(Type), trace_or_throw(forma
 game_assert_handler_lc(A):- A=..[Type,_], not(type(Type)), dmsg(todo(ensure_creatabe(Type))),fail.
 game_assert_handler_lc(Call):- game_assert_from_macropred(Call),!.
 game_assert_handler_lc(W):-must_det(game_assert_fast(W)),!.
-game_assert_handler_lc(A):-trace_or_throw('game_assert_handler_lc is skipping ~q.',[A]).
+game_assert_handler_lc(A):-trace_or_throw(fmt('game_assert_handler_lc is skipping ~q.',[A])).
 
 :-export(begin_prolog_source/0).
 :-export(end_prolog_source/0).
@@ -1092,7 +1115,6 @@ verb_after_arg(_,_,1).
 :- decl_mpred(default_sv, 3).
 :- decl_mpred(ask_module, 2).
 
-
 is_clause_moo_special(M:H,B):-atomic(M),!,is_clause_moo_special(H,B).
 is_clause_moo_special(H,_B):-compound(H),functor_catch(H,F,_),not(get_mpred_prop(F,prologBuiltin)),!,special_head(H,F),!.
 is_clause_moo_special(H,M:B):-atomic(M),!,is_clause_moo_special(H,B).
@@ -1104,6 +1126,9 @@ special_head(_,F):-get_mpred_prop(F,hasStub(_)).
 
 user:term_expansion(CL,moo:was_imported_kb_content(CL)):- not(thlocal:into_form_code), is_clause_moo_special(CL),
    dmsg(assertz_local_game_clause(CL)),ignore(is_compiling_sourcecode),must_det(game_assert(CL)),!.
+
+user:term_expansion((H:-B),(H:-NewBody)):- not(thlocal:into_form_code),thlocal:enable_src_loop_checking,
+   once(make_body_clause(H,B,NewBody)),expanded_different(NewBody,B),!,dmsg(thlocal:enable_src_loop_checking((H:-NewBody))).
 
 % load_motel:- defrole([],time_state,restr(time,period)).
 % :-load_motel.
@@ -1121,4 +1146,5 @@ agent_text_command(_Agent,_Text,_AgentTarget,_Cmd):-fail.
 */
 :- rescan_mpred_props.
 
-
+:- include(logicmoo(parsing/parser_imperative)).
+:- include(logicmoo(vworld/world)).

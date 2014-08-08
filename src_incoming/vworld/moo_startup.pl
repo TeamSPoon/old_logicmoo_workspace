@@ -47,15 +47,15 @@ in_user_startup(Call):- '@'(user:Call,user).
 
 
 % logicmoo vworld mud server
-:- user_use_module(logicmoo(vworld/world)).
+%:- user_use_module(logicmoo(vworld/world)).
 :- user_use_module(logicmoo(vworld/toploop_npc)).
 :- user_use_module(logicmoo(vworld/toploop_telnet)).
 
 
 % :- user_use_module(logicmoo(dbase/dbase_formattypes)).
-:- user_use_module(logicmoo(parsing/parser_imperative)).
+% :- user_use_module(logicmoo(parsing/parser_imperative)).
 :- user_use_module(logicmoo(parsing/parser_e2c)).
-:- user_use_module(logicmoo(parsing/parser_chat80)). 
+%:- user_use_module(logicmoo(parsing/parser_chat80)). 
 :- user_use_module(logicmoo(vworld/moo_testing)).
 
 /*

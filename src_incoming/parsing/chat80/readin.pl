@@ -24,7 +24,13 @@
 
 /* Read sentence */
 
-read_in(P):-initread(L),words(P,L,[]),!,to_nl.
+read_in(P):-current_input(I),read_line_to_codes(I,Codes),code_to_atomic_list(Codes,P).
+%code_to_atomic_list(end_of_file,[0]).
+code_to_atomic_list(end_of_file,end_of_file).
+code_to_atomic_list(end_of_file,O):-!,[bye]=O.
+code_to_atomic_list(end_of_file,O):-!,[]=O.
+code_to_atomic_list(Codes,P):-string_codes(S,Codes),atomic_list_concat(P, " ",S),!.
+%read_in(P):-initread(L),words(P,L,[]),!,to_nl.
 
 initread([K1,K2|U]):-get(K1),get0(K2),readrest(K2,U).
 

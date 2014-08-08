@@ -287,7 +287,7 @@ repeats_inRegion(apath(Region,Dir),Region):-call_vars_tabled([Region,Dir],To^pat
 multiValued(equivRule(term,term),nonGroundOK,prologOnly).
 
 % prolog code
-equivRule(multiValued(CallSig,[assert_with_pred(hooked_asserta),query_with_pred(call)]),prologBuiltin(CallSig)).
+equivRule(multiValued(CallSig,[assert_with_pred(hooked_asserta),retract_with_pred(hooked_retract),query_with_pred(call)]),prologBuiltin(CallSig)).
 
 
 ask_module(nearby(obj,obj),world).
@@ -339,11 +339,10 @@ multiValued(description(term,text),[assert_with_pred(add_description),retract_wi
 type(item).
 
 
-
 equivRule(nameStrings(apath(Region,Dir),Text),pathName(Region,Dir,Text)).
 equivRule(description(apath(Region,Dir),Text),pathName(Region,Dir,Text)).
 
-% dbase_t(action_info,What,text("command is: ",What)):- holds_t(action_info,What).
+% dbase_t(action_info,What,text("command is: ",What)):- holds_t(actiontype,What).
 
 
 

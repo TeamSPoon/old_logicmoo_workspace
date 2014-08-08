@@ -22,11 +22,11 @@
 % QPLAN - supplies the control information (ie. sequencing and cuts) needed
 %         for efficient execution of a query.
 
+% was called simply qplan
+prelogic_to_qplan((P:-Q),(P1:-Q1)) :- prelogic_to_qplan(P,Q,P1,Q1), !.
+prelogic_to_qplan(P,P).
 
-qplan((P:-Q),(P1:-Q1)) :- qplan(P,Q,P1,Q1), !.
-qplan(P,P).
-
-qplan(X0,P0,X,P) :-
+prelogic_to_qplan(X0,P0,X,P) :-
    numbervars(X0,0,I), variables(X0,0,Vg),
    numbervars(P0,I,N),
    mark(P0,L,0,Vl),

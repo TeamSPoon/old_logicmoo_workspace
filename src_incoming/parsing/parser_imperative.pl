@@ -7,7 +7,7 @@
 %
 */
 
-
+/*
 :- module(parser_imperative, [
                    parse_agent_text_command/5,            
                    parse_agent_text_command_0/5,            
@@ -20,7 +20,20 @@
                    order_descriptions/3,
                    get_term_specifier_text/2,
                    parseForTypes//2]).
+*/
 
+:-export((
+                   parse_agent_text_command/5,            
+                   parse_agent_text_command_0/5,            
+                   parseIsa//2,
+                   parseIsa0//2,
+                   parseForIsa//2,
+                   objects_match/3,
+                   object_match/2,
+                   object_string/2,
+                   order_descriptions/3,
+                   get_term_specifier_text/2,
+                   parseForTypes//2)).
 
 :- include(logicmoo('vworld/moo_header.pl')).
 

@@ -261,7 +261,7 @@ is_asserted_lc_isa(isa,2,isa(I,C)):-!,is_asserted_mpred_clause_isa(I,C).
 is_asserted_lc_isa(dbase_t,2,dbase_t(C,I)):-!,is_asserted_mpred_clause_isa(I,C).
 is_asserted_lc_isa(C,1,G):-arg(1,G,I),!,is_asserted_mpred_clause_isa(I,C).
 
-% is_asserted_mpred_clause_isa(I,C):-is_asserted_mpred(isa(I,C)).
+is_asserted_mpred_clause_isa(I,C):-alt_dbase_t(I,C).
 
 is_asserted_mpred(G):-fact_loop_checked(G,asserted_mpred_clause(G)).
 

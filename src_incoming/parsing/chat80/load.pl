@@ -21,7 +21,16 @@
 
 */
 
+%:-use_module(library(dialect)).
+%:-expects_dialect( quintus ).
+
+must_det_l(C):-!,once(C;(trace,C)).
+must_det_l((C1,C2)):-!,must_det_l(C1),!,must_det_l(C2),!.
+must_det_l([C]):-!,once(C;(trace,C)).
+must_det_l([C1|C2]):-must_det_l(C1),!,must_det_l(C2),!.
+
 :- ensure_loaded(xgproc).	% XG generator
+
 
 :- load_plus_xg_file('clone.xg').
 :- load_plus_xg_file('lex.xg').
@@ -51,7 +60,7 @@
 
 
 
-bad_chat80 :-
+old_chat80 :-
   told,
   told,
    repeat,
@@ -60,3 +69,4 @@ bad_chat80 :-
       control(report,P),
       end(user).
 
+    
