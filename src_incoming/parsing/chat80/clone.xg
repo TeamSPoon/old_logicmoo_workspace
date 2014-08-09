@@ -463,3 +463,5 @@ conj(conj(Conj,Ctx0),
      conj(Conj,Ctx),Left,Right,
      conj(Conj,Left,Right)) -->
    conj(Conj,Ctx0,Ctx).
+
+end_of_file.

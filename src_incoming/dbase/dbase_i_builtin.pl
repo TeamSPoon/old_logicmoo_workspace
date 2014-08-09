@@ -69,15 +69,21 @@ subclass(creatableType,type).
 
 % :- (do_term_expansions->true;throw(not_term_expansions)).
 
+
 %creatableType(type).
 type(item).
 type(multiValued).
 type(singleValued).
 type(creatableType).
-
+type(typeDeclarer).
 
 :-add((expand_args(eachOf,subclass(eachOf(multiValued,negationByFailure,argsIsa,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),mpred)))).
+
+:-add((expand_args(eachOf,isa(eachOf(multiValued,negationByFailure,argsIsa,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),typeDeclarer)))).
+
 :-doall((argsIsaProps(F),decl_type(F),add(subclass(F,relation)))).
+:-doall((argsIsaProps(F),decl_type(F),add(isa(F,typeDeclarer)))).
+
 
 :-decl_mpred_hybrid(repl_writer(agent,term),[singleValued,default_sv(2,look:default_repl_writer)]).
 :-decl_mpred_hybrid(repl_to_string(agent,term),[singleValued,default_sv(2,look:default_repl_obj_to_string)]).
@@ -279,10 +285,6 @@ subclass(wearable,item).
 
 :- assert_if_new(mpred_prop(inRegion,call_tabled)).
 
-inRegion(X,Y):-call_vars_tabled(Y,X^repeats_inRegion(X,Y)).
-%repeats_inRegion(O,Region):-atloc(O,LOC),locationToRegion(LOC,Region).
-repeats_inRegion(apath(Region,Dir),Region):-call_vars_tabled([Region,Dir],To^pathBetween(Region,Dir,To)).
-
 
 multiValued(equivRule(term,term),nonGroundOK,prologOnly).
 
@@ -394,18 +396,18 @@ singleValued(str(agent,int)).
 singleValued(type_grid(regiontype,int,list(term))).
 singleValued(weight(obj,int)).
 
-singleValued(height(obj,int)).
+singleValued(height(spatialthing,int)).
 
 multiValued(comment(term,string)).
 multiValued(pathBetween(region,dir,region)).
 
-prologOnly(default_type_props(type,list(voprop))).
-prologOnly(one_default_type_prop(id,type,voprop)).
+prologOnly(default_type_props(type,voprop)).
+prologOnly(default_inst_props(id,type,voprop)).
 
 
 default_type_props(food,[height(0)]).
 
-one_default_type_prop(self,spatialthing,height(0)).
+default_type_props(spatialthing,height(0)).
 
 
 
@@ -415,7 +417,10 @@ one_default_type_prop(self,spatialthing,height(0)).
 
 negationByFailure(needs_look(obj,boolean)). 
 
-singleValued(needs_look(obj,boolean),default_sv(2,false)). 
+singleValued(needs_look(agent,boolean),default_sv(2,false)). 
+
+
+default_type_props(agent,needs_look(false)).
 
 
 ft_info(action(prolog),formatted).

@@ -42,8 +42,6 @@ define_compound_as_type(Spec):- compound(Spec),trace_or_throw(never_compound_def
 
 :-forall(argsIsaProps(F),decl_type(F)).
 
-
-
 :-dynamic_multifile_exported(define_ft/1).
 define_ft(Spec):- never_type(Spec),!,trace_or_throw(never_ft(Spec)).
 define_ft(M:F):- !, '@'(define_ft(F), M).
@@ -148,7 +146,7 @@ transitive_subclass_tst(_,_):-!,fail.
 % isa_backchaing(A,T):- stack_depth(Level),Level>650,trace_or_throw(skip_dmsg_nope(failing_stack_overflow(isa_backchaing(A,T)))),!,fail.
 
 
-isa_backchaing(A,T):- hotrace((fact_loop_checked(isa(A,T),isa_backchaing_0(A,T)))).
+isa_backchaing(A,T):- fact_loop_checked(isa(A,T),isa_backchaing_0(A,T)).
 
 isa_backchaing_v_nv(A,term):-nonvar(A),!.
 isa_backchaing_v_nv(_,var):-!.
@@ -157,7 +155,7 @@ isa_backchaing_v_nv(A,T):-setof(A,AT^(asserted_or_trans_subclass(AT,T),isa_asser
 isa_backchaing_0(A,T):-  var(A),nonvar(T),!,isa_backchaing_v_nv(A,T).
 isa_backchaing_0(A,T):-  var(T),!,setof(TT,AT^(isa_asserted(A,AT),asserted_or_trans_subclass(AT,TT)),List),!,member(T,List).
 isa_backchaing_0(A,T):-  nonvar(A),isa_backchaing_nv_nv(A,T).
-isa_backchaing_0(A,T):-  isa_asserted(A,AT),asserted_or_trans_subclass(AT,T).
+isa_backchaing_0(A,T):-  asserted_or_trans_subclass(AT,T),isa_asserted(A,AT).
 
 
 isa_backchaing_nv_nv(A,argsIsa):-!,compound(A).
@@ -165,17 +163,41 @@ isa_backchaing_nv_nv(A,argsIsa):-!,compound(A).
 not_ft(T):-asserted_or_trans_subclass(T,spatialthing).
 
 :-export(isa_asserted/2).
-isa_asserted(A,T):- fact_loop_checked(isa(A,T),isa_asserted_0(A,T)).
+isa_asserted(A,T):- stack_check(1000),once_if_ground(fact_loop_checked(isa(A,T),isa_asserted_0(A,T)),_).
 
-isa_asserted_0(A,T):- alt_dbase_t(T,A).
-isa_asserted_0(A,T):- nonvar(A),nonvar(T),alt_dbase_t(T,formattype),!,term_is_ft(A,T).
-% isa_asserted_0(A,T):- compound(A),functor(A,F,_),!,isa_backchaing_1(F,T).
-isa_asserted_0(A,T):- atom(A),mud_isa_atom(A,T),!.
-isa_asserted_0(_,T):- not(atom(T)),!,fail.
-isa_asserted_0(A,T):- argsIsaProps(T),mpred_prop(A,T).
+isa_asserted_0(I,T):-clause(dbase_t(T,I),true).
+isa_asserted_0(I,T):-clause(isa(I,T),true).
+isa_asserted_0(I,T):-string(I),member(T,[string,text]).
+isa_asserted_0(I,T):-atom(I),isa_w_inst_atom(I,T).
+isa_asserted_0(_,T):-var(T),!,fail.
+isa_asserted_0(I,T):-atom(T),isa_w_type_atom(I,T).
+isa_asserted_0(I,T):-nonvar(I),isa_asserted(T,formattype),!,term_is_ft(I,T).
+isa_asserted_0(I,'&'(T1 , T2)):-nonvar(T1),var(T2),!,dif:dif(T1,T2),isa_backchaing(I,T1),transitive_subclass(T1,T2),isa_backchaing(I,T2).
+isa_asserted_0(I,'&'(T1 , T2)):-nonvar(T1),!,dif:dif(T1,T2),isa_backchaing(I,T1),isa_backchaing(I,T2).
+isa_asserted_0(I,(T1 ; T2)):-nonvar(T1),!,dif:dif(T1,T2),isa_backchaing(I,T1),isa_backchaing(I,T2).
 
-mud_isa_atom(O,T):- atomic_list_concat_catch([T,_|_],'-',O),!.
-mud_isa_atom(O,T):- atom_concat(T,Int,O),catch(atom_number(Int,_),_,fail),!.
+% isa_asserted_0(I,T):- compound(I),functor(I,F,_),!,isa_backchaing_1(F,T).
+
+isa_w_inst_atom(O,T):- atomic_list_concat_catch([T,_|_],'-',O),!.
+isa_w_inst_atom(O,T):- atom_concat(T,Int,O),catch(atom_number(Int,_),_,fail),!.
+isa_w_inst_atom(_,T):- T==atom. 
+
+isa_w_type_atom(I,formattype):- clause(ft_info(I,_),true).
+isa_w_type_atom(I,formattype):-!, clause(subft(I,_),true).
+isa_w_type_atom(I,T):- argsIsaProps(T),!,mpred_prop(I,T).
+isa_w_type_atom(I,T):- clause(mpred_prop(I,T),true).
+isa_w_type_atom(I,T):- G=..[T,I],once_if_ground(isa_atom_call(T,G),_).
+
+dont_call_type_arity_one(type).
+dont_call_type_arity_one(formattype).
+dont_call_type_arity_one(agenttype).
+
+isa_atom_call(T,G):-loop_check(isa_atom_call_lc(T,G),fail).
+
+isa_atom_call_lc(_,G):- predicate_property(G,builtin),!,G.
+isa_atom_call_lc(Type,_):-dont_call_type_arity_one(Type),!,fail.
+isa_atom_call_lc(_,G):- predicate_property(G,number_of_rules(R)),R>0,!,G.
+isa_atom_call_lc(_,G):- predicate_property(G,number_of_clauses(_)),!,clause(G,true).
 
 
 cached_isa(I,T):-hotrace(isa_backchaing(I,T)).
@@ -196,8 +218,10 @@ type(mpred).
 type(fpred).
 type(relation).
 type(creatableType).
+type(typeDeclarer).
 type(argsIsa).
 type(ArgsIsa):-argsIsaProps(ArgsIsa).
+type(F):-dbase_t(typeDeclarer,F).
 type(formattype).
 type(actiontype).
 type(region).
@@ -217,8 +241,24 @@ impliedSubClass(T,ST):-predicate_property(transitive_subclass(T,ST),_),!,call_ta
 :- export(asserted_subclass/2).
 asserted_subclass(T,ST):-dbase_t(subclass,T,ST).
 
+
+into_single_class(Var,VV):-var(Var),!, (nonvar(VV)->into_single_class(VV,Var);Var=VV).
+into_single_class(A,B):- compound(B),!, (compound(A) -> (into_single_class(A,AB),into_single_class(B,AB)) ; into_single_class(B,A) ).
+into_single_class('&'(A,Var),VV):-var(Var),!,into_single_class(A,VV).
+into_single_class('&'(A,B),VV):-!, into_single_class((B),VV);into_single_class((A),VV).
+into_single_class(A,A).
+
 :- export((transitive_subclass/2)).
-transitive_subclass(A,T):-fact_loop_checked(subclass(A,T),transitive_subclass_l_r(A,T)).
+transitive_subclass(_,T):-T==formattype,!,fail.
+transitive_subclass(A,_):-A==formattype,!,fail.
+
+transitive_subclass(A,T):- bad_idea,!,
+      into_single_class(A,AA),
+      into_single_class(T,TT),
+      fact_loop_checked(subclass(A,T),transitive_subclass_l_r(AA,TT)).
+
+transitive_subclass(A,T):- !,stack_check(1000),
+      fact_loop_checked(subclass(A,T),transitive_subclass_l_r(A,T)).
 
 transitive_subclass_l_r(FT,Sub):-dbase_t(subclass,FT,Sub).
 transitive_subclass_l_r(FT,Sub):-var(FT),!,transitive_subclass_r_l(FT,Sub).
@@ -232,7 +272,9 @@ transitive_subclass_r_l(FT,Sub):-dbase_t(subclass,B,Sub),dbase_t(subclass,A,B),d
 transitive_subclass_r_l(_,Sub):-var(Sub),!,fail.
 transitive_subclass_r_l(FT,Sub):-dbase_t(subclass,C,Sub),dbase_t(subclass,B,C),dbase_t(subclass,A,B),dbase_t(subclass,FT,A).
 
+      
 asserted_or_trans_subclass(A,A).
+% asserted_or_trans_subclass(A,AA):-compound(A),into_single_class(A,AA).
 asserted_or_trans_subclass(A,B):-transitive_subclass(A,B).
 
 :- export((transitive_bp/3)).
@@ -313,7 +355,8 @@ is_known_true(subclass(F,mpred)):-argsIsaProps(F).
 is_known_true(subclass(F,fpred)):-argsIsaProps(F).
 is_known_true(subclass(F,relation)):-argsIsaProps(F).
 
-has_free_args(C):-not(compound(C));not(not(arg(_,C,var))).
+:-export(has_free_args/1).
+has_free_args(C):- (not(compound(C));not(not(arg(_,C,var)))),!.
 
 :-dynamic_multifile_exported(is_known_false/1).
 % :-dynamic(is_known_false/1).

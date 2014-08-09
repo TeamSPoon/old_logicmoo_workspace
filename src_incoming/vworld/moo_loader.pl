@@ -8,8 +8,8 @@
 */
 :- module(moo_loader, []).
 
-:-dynamic current_world/1.
-current_world(current).
+:-dynamic thglobal:current_world/1.
+thglobal:current_world(current).
 
 :- meta_predicate show_load_call(0).
 
@@ -19,7 +19,7 @@ ensure_game_file(Mask):- ensure_plmoo_loaded(Mask).
 
 :-export(load_game/1).
 
-load_game(File):-current_world(World), load_game(World,File),!.
+load_game(File):-thglobal:current_world(World), load_game(World,File),!.
 load_game(World,File):- 
    world_clear(World),
    retractall(loaded_file_world_time(_,_,_)),
@@ -62,7 +62,7 @@ get_last_time_file(_,_,0).
 :-export(ensure_plmoo_loaded_each/1).
 ensure_plmoo_loaded_each(FileIn):-
    absolute_file_name(FileIn,File),
-   current_world(World),
+   thglobal:current_world(World),
    time_file_safe(File,NewTime),!,
    get_last_time_file(File,World,LastTime),
    (LastTime<NewTime -> reload_plmoo_file(File) ; true).
@@ -71,21 +71,21 @@ ensure_plmoo_loaded_each(FileIn):-
 
 reload_plmoo_file(FileIn):-
    absolute_file_name(FileIn,File),
-   current_world(World),
+   thglobal:current_world(World),
    retractall(loaded_file_world_time(File,World,_)),   
    dbase_mod(DBASE),'@'(load_data_file(World,File),DBASE).
 
 :-export(load_data_file/2).
-load_data_file(World,FileIn):- with_assertions(current_world(World),load_data_file(FileIn)).
+load_data_file(World,FileIn):- with_assertions(thglobal:current_world(World),load_data_file(FileIn)).
 
 :-export(load_data_file/1).
 load_data_file(FileIn):-
   absolute_file_name(FileIn,File),
-  current_world(World),
+  thglobal:current_world(World),
   time_file_safe(File,NewTime),
   assert(loaded_file_world_time(File,World,NewTime)), 
    dmsg(load_data_file(File,World,NewTime)),
-  with_assertions(moo:loading_game_file(World,File),
+  with_assertions(thglobal:loading_game_file(World,File),
    setup_call_cleanup(see(File),
     (load_game_name_stream(World),asserta_new(moo:loaded_game_file(World,File))), seen)).
    
@@ -101,7 +101,7 @@ ensure_mpred_stubs:- doall((mpred_prop(F,prologHybrid),mpred_arity(F,A),A>0,warn
 
 
 :-export(finish_processing_world/0).
-finish_processing_world:- loop_check(doall(finish_processing_game),true).
+finish_processing_world:- loop_check(with_assertions(thlocal:do_slow_kb_op_now,doall(finish_processing_game)),true).
 finish_processing_game:- dmsg(begin_finish_processing_game),fail.
 finish_processing_game:- ignore(rescan_mpred_props),fail.
 finish_processing_game:- forall(retract(moo:call_after_load(A)),once(must_det(A))),fail.
@@ -120,7 +120,7 @@ finish_processing_game.
 
 
 :-export(rescandb/0).
-rescandb:- forall(current_world(World),(findall(File,loaded_file_world_time(File,World,_),Files),forall(member(File,Files),ensure_plmoo_loaded_each(File)),finish_processing_world)).
+rescandb:- forall(thglobal:current_world(World),(findall(File,loaded_file_world_time(File,World,_),Files),forall(member(File,Files),ensure_plmoo_loaded_each(File)),finish_processing_world)).
 rescandb:-finish_processing_world.
 
 
@@ -210,7 +210,7 @@ add_description(description(I,S)):-add_description(I,S).
 
 :-export(add_description/2).
 add_description(A,S0):-string_concat('#$PunchingSomething ',S,S0),!,add_description(A,S).
-add_description(A,S0):-determinerRemoved(S0,String,S),!,add_description(A,S),game_assert(determinerString(A,String)).
+% add_description(A,S0):-determinerRemoved(S0,String,S),!,add_description(A,S),game_assert(determinerString(A,String)).
 add_description(A,S0):-
    string_to_atom(S0,S),
    atomic_list_concat(Words,' ',S),
@@ -231,8 +231,8 @@ add_description(A,_S,_S0,1,_,[Word]):-add_description_word(A,Word),!.
 %#$PunchingSomething ..
 add_description(A,S,S0,Ws,Sents,['#$PunchingSomething',B|C]):-add_description(A,S,S0,Ws,Sents,[B|C]).
 add_description(A,S,S0,Ws,Sents,[Det,B|C]):-ddeterminer(Det,L),add_description(A,S,S0,Ws,Sents,[B|C]),game_assert(determinerString(A,L)).
-add_description(A,S,S0,Ws,_Sents,_Words):-Ws>3,is_here_String(S),!,show_load_call(game_assert_fast(descriptionHere(A,S0))).
-add_description(A,_S,S0,_Ws,_Sents,_Words):-show_load_call(game_assert_fast(description(A,S0))).
+add_description(A,S,S0,Ws,_Sents,_Words):-Ws>3,is_here_String(S),text_to_string(S0,String),!,show_load_call(game_assert_fast(descriptionHere(A,String))).
+add_description(A,_S,S0,_Ws,_Sents,_Words):- text_to_string(S0,String),show_load_call(game_assert_fast(description(A,String))).
 
 is_here_String(S):- atomic_list_concat_safe([_,is,_,here,_],S).
 is_here_String(S):- atomic_list_concat_safe([_,here],S).

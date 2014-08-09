@@ -71,7 +71,7 @@ set_stats(Agent,Traits) :-
 	forall(member(Trait,Traits),
 	       ignore(catch(process_stats(Agent,Trait),E,dmsg(E:process_stats(Agent,Trait))))),
                ignore(catch(check_stat_total(Agent),E2,dmsg(E2:check_stat_total(Agent)))).
-set_stats(Agent,Traits):-dmsg(failed(set_stats(Agent,Traits))).
+set_stats(Agent,Traits):-dmsg(warn(failed(set_stats(Agent,Traits)))).
 
 process_stats(Agent,str(Y)) :-
 	add(str(Agent,Y)),

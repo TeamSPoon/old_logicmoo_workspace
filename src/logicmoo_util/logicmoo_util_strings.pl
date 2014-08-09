@@ -83,9 +83,9 @@ string_lower(M,U):-toLowercase(M,U).
 :- meta_predicate map_tree_to_list(2,?,*).
 
 
-:- meta_module_transparent(camelSplitters(+)).
+:- meta_predicate_transparent(camelSplitters(+)).
 
-:- meta_module_transparent(to_string_hook(-,-,+)).
+:- meta_predicate_transparent(to_string_hook(-,-,+)).
 
 camelSplitters(V):-member(V,[' ','-','_',':','mt','doom','Mt','Doom']).
 

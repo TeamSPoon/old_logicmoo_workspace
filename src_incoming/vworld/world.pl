@@ -112,6 +112,12 @@ anyInst(O):-exisitingThing(O).
 
 :-decl_type(metaclass).
 
+metaclass(formattype).
+metaclass(regiontype).
+metaclass(agenttype).
+metaclass(itemtype).
+metaclass(metaclass).
+
 argsIsa(typeGenls(type,metaclass)).
 
 hook:decl_database_hook(assert(_),typeGenls(_,MC)):-assert_isa(MC,metaclass).
@@ -123,9 +129,6 @@ typeGenls(agent,agenttype).
 typeGenls(item,itemtype).
 
 subclass(sillyitem,item).
-
-metaclass(formattype).
-
 
 /*
 moo:isa(region,regiontype).
@@ -217,13 +220,13 @@ create_instance_0(T,agent,List):-
    create_meta(T,_,agent,P),
    must_det(isa(P,agent)),
    padd(P,List),   
-   punless(possess(P,_),rez_to_inventory(P,food,_Food)),
+   % punless(possess(P,_),rez_to_inventory(P,food,_Food)),
+   rez_to_inventory(P,food,_Food),
    %reset_values(P),
    padd(P, [ max_damage(500),
                        max_charge(200),
                        damage(500),
                        charge(200),
-                       facing("n"),
                        agent_turnnum(0),
                        score(1)]),   
    set_stats(P,[]),
@@ -306,8 +309,8 @@ moo:default_type_props(agent,[
 
 
 
-
-
+possess(Who,Thing):-genlInverse(W,possess),call_mpred(dbase_t(W,Thing,Who)).
+possess(Who,Thing):-genlPreds(possess,W),call_mpred(dbase_t(W,Who,Thing)).
 
 
 :- include(logicmoo(vworld/moo_footer)).

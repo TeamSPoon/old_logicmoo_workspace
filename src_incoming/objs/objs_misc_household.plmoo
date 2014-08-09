@@ -155,8 +155,11 @@ subclass(room,region).
 :-onSpawn loc(candle,kitchen).
 
 
+/*
 :-dynamic(loc_s/2).
 
+
+(WAS FOR ANOTHER SYSTEM)
 
 locaton_s(class_template(RealObj,D1,D2,Weight),Place):-
 	loc(RealObj,Place),class_template(RealObj,D1,D2),
@@ -164,7 +167,7 @@ locaton_s(class_template(RealObj,D1,D2,Weight),Place):-
 locaton_s(class_template(RealObj,D1,D2,0),Place):-
 	loc(RealObj,Place), class_template(RealObj,D1,D2).	
 
-
+*/
 
 
 :-export(setTemplate/1).
@@ -179,8 +182,8 @@ locaton_s(class_template(RealObj,D1,D2,0),Place):-
 
 
 :-setTemplate class_template(candle, [color(blue),size(small)],[shape(triangular),material(wax),texture(sticky)]).
-:-setTemplate class_template(apple_type_a, [color(red),size(small)],[shape(round),is_a(fruit),texture(smooth)]).
-:-setTemplate class_template(apple_type_b, [color([green,pastel]),size(small)],[shape(round),is_a(fruit),texture(smooth)]).
+:-setTemplate class_template(red_apple, [color(red),size(small)],[shape(round),is_a(fruit),texture(smooth)]).
+:-setTemplate class_template(green_apple, [color([green,pastel]),size(small)],[shape(round),is_a(fruit),texture(smooth)]).
 :-setTemplate class_template(table, [color([blue,white]),size(large)],[shape(oval),material(wood),texture([bumpy,irregular]),weight(50)]).
 :-setTemplate class_template(pillow, [color(white),size(medium)],[shape(rectangular),material([cotton,flannel]),texture([fluffy,soft])]).
 :-setTemplate class_template(blanket, [color([green,dark]),size([large,bulky])],[shape(rectangular),material(rayon),texture([plush,soft])]).                                                              
@@ -223,6 +226,12 @@ locaton_s(class_template(RealObj,D1,D2,0),Place):-
 :-setTemplate class_template(torso, [color(like(skin))],[shape(unique)]).
 :-setTemplate class_template(skin, [color(unique)],[shape(unique)]).
 
+/****************************
+
+
+REST IS UNUSED 
+
+(WAS FOR ANOTHER SYSTEM)
 
 :-dynamic(property/2).
 :-dynamic(subpart/2).  
@@ -257,4 +266,4 @@ get_property(Type,Specification,Property):-
 	not(functor_member(Property,Specification)).
 
 
-
+*************/

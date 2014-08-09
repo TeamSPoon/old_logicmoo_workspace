@@ -147,8 +147,8 @@ i_adj(adj(Adj),TypeX-X,TypeV-V,_,
    aggr_adj(Adj,TypeV,TypeX,F).
 i_adj(sup(Op0,adj(Adj)),Type-X,Type-V,_,
       aggr(F,V,[Y,X],Head,'`'(P)&Pred),Head,'`'(true),Pred) :-
-   slotval_sign(Adj,Sign),
-   slotval_inverse(Op0,Sign,Op),
+   sign(Adj,Sign),
+   inverse(Op0,Sign,Op),
    i_sup_op(Op,F),
    attribute(Adj,Type,X,_,Y,P).
 i_adj(adj(Adj),TypeX-X,T,T,_,
@@ -240,10 +240,10 @@ i_pred(value(adj(Adj),wh(TypeY-Y)),Type-X,['`'(H)|As],As,[],_) :-
    attribute(Adj,Type,X,TypeY,Y,H).
 i_pred(comp(Op0,adj(Adj),NP),X,[P1 & P2 & '`'(P3),Q|As],As,Up,Id) :-
    i_np(NP,Y,Q,Up,Id,unit,[],[]),
-   slotval_sign(Adj,Sign),
+   sign(Adj,Sign),
    i_measure(X,Adj,Type,U,P1),
    i_measure(Y,Adj,Type,V,P2),
-   slotval_inverse(Op0,Sign,Op),
+   inverse(Op0,Sign,Op),
    measure_op(Op,U,V,P3).
 i_pred(pp(prep(Prep),NP),X,['`'(H),Q|As],As,Up,Id) :-
    i_np(NP,Y,Q,Up,Id,unit,[],[]),
@@ -279,12 +279,12 @@ measure_op(not+less,X,Y,\+exceeds(Y,X)).
 measure_op(more,X,Y,exceeds(X,Y)).
 measure_op(not+more,X,Y,\+exceeds(X,Y)).
 
-slotval_inverse(most,-,least).
-slotval_inverse(least,-,most).
-slotval_inverse(same,-,same).
-slotval_inverse(less,-,more).
-slotval_inverse(more,-,less).
-slotval_inverse(X,+,X).
+inverse(most,-,least).
+inverse(least,-,most).
+inverse(same,-,same).
+inverse(less,-,more).
+inverse(more,-,less).
+inverse(X,+,X).
 
 noun_template(Noun,TypeV,V,'`'(P),
       [slot(poss,TypeO,O,Os,index)|Slots]) :-

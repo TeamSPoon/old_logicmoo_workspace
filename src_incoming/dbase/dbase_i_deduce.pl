@@ -21,6 +21,9 @@
 
 hook:decl_database_hook(Type,Fact):- predicate_property(add_deduction(_,_),_),run_deduce_facts_from(Type,Fact).
 
+
+hook:decl_database_hook(_,mpred_prop('ArtifactCol1008-VISOR688', flagged_visor)):- trace_or_throw(mpred_prop('ArtifactCol1008-VISOR688', flagged_visor)).
+
 run_deduce_facts_from(Type,M:Fact):-atom(M),!,run_deduce_facts_from(Type,Fact).
 run_deduce_facts_from(Type,Fact):-loop_check(run_deduce_facts_from_lc(Type,Fact),true).
 run_deduce_facts_from_lc(Type,Fact):-doall((call_no_cuts(hook:deduce_facts(Fact,Deduction)),add_deduction(Type,Deduction,Fact))).
@@ -29,15 +32,16 @@ run_deduce_facts_from_lc(Type,Fact):-doall((call_no_cuts(hook:deduce_facts(Fact,
 hook:decl_database_hook(assert(_),atloc(R,W)):- isa(R,region),trace_or_throw(atloc(R,W)).
 
 
-hook:deduce_facts(atloc(Obj,LOC),inRegion(Obj,Region)):-locationToRegion(LOC,Region).
-hook:deduce_facts(inRegion(Obj,_),atloc(Obj,LOC)):- put_in_world(Obj),must_det(atloc(Obj,LOC)).
 hook:deduce_facts(inRegion(_,Region),isa(Region,region)).
 hook:deduce_facts(inRegion(Obj,_),isa(Obj,obj)).
 
 hook:deduce_facts(Fact,mpred_prop(AF,[argsIsa(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],argsIsaProps(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,
                 ArgTs=..[AF|ARGS],!,must_det(ground(ARGS)).
 
+
+hook:deduce_facts(argsIsa(ArgTs),mpred_prop(F,argsIsa(ArgTs))):-functor(F,ArgTs,_).
 hook:deduce_facts(mpred_prop(F,argsIsa(ArgTs)),argsIsa(ArgTs)):-functor(F,ArgTs,_).
+
 
 hook:deduce_facts(argsIsa(ArgTs),argIsa(F,A,Type)):-ztrace,functor(ArgTs,F,_),arg(A,ArgTs,Type).
 hook:deduce_facts(mpred_prop(F,argsIsa(ArgTs)),argIsa(F,A,Type)):-arg(A,ArgTs,Type).

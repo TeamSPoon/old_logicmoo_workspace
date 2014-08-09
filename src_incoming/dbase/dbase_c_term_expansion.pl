@@ -107,7 +107,7 @@ mud_asserted_expansion_0(G1,G2):- ((get_asserted_wrappers(If_mud_asserted, Asser
 
 % :-export((is_compiling_sourcecode/1)).
 is_compiling_sourcecode:-moo:is_compiling,!.
-is_compiling_sourcecode:-compiling, current_input(X),not((stream_property(X,file_no(0)))),prolog_load_context(source,F),not((moo:loading_game_file(_,_))),F=user,!.
+is_compiling_sourcecode:-compiling, current_input(X),not((stream_property(X,file_no(0)))),prolog_load_context(source,F),not((thglobal:loading_game_file(_,_))),F=user,!.
 is_compiling_sourcecode:-compiling,dmsg(system_compiling),!.
 
 while_capturing_changes(Call,Changes):-thread_self(ID),with_assertions(thlocal:dbase_capture(ID,_),(Call,get_dbase_changes(ID,Changes),clear_dbase_changes(ID))).

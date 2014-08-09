@@ -60,21 +60,19 @@ hi(File) :-
    repeat,
       ask(File,P),
       control80(P), !,
-      end_chat80(File).
-     
+      end(File).
 
 ask(user,P) :- !,
    prompt(_,'Question: '), read_in(P).
 
 ask(F,P):-compound(F),!,absolute_file_name(F,File),!,ask(File,P).
-
-ask(File,P) :-
+ask(F,P) :-
    seeing(Old),
-   see(File),
+   see(F),
    read_in(P),
   % nl,
    doing(P,0),
-  % nl,
+   nl,
    see(Old).
 
 doing([],_) :- !,nl.
@@ -89,7 +87,7 @@ out(A) :-
    write(A).
 
 advance(X,N0,N) :-
-   uses_terms(X,K),
+   uses(X,K),
    M is N0+K,
  ( M>72, !,
       nl,
@@ -97,9 +95,9 @@ advance(X,N0,N) :-
    N is M+1,
       put(" ")).
 
-uses_terms(nb(X),N) :- !,
+uses(nb(X),N) :- !,
    chars(X,N).
-uses_terms(X,N) :-
+uses(X,N) :-
    chars(X,N).
 
 chars(X,N) :- atomic(X), !,
@@ -107,8 +105,8 @@ chars(X,N) :- atomic(X), !,
    length(L,N).
 chars(_,2).
 
-end_chat80(user) :- !.
-end_chat80(F) :- 
+end(user) :- !.
+end(F) :- 
    catch(close(F),_,seen).
 
 
@@ -155,35 +153,35 @@ parse_sentence(U,E,S,S1,Results):-
 sentence_to_parsetree(U,E):-sentence(E,U,[],[],[]).
 
 parse_sentence(U,Report,E,S,S1,Results):-
-   get_runtime_seconds(StartParse),   
+   runtime(StartParse),   
    sentence_to_parsetree(U,E),
-   get_runtime_seconds(StopParse),
+   runtime(StopParse),
+
    ParseTime is StopParse - StartParse,
    call(Report,E,'Parse',ParseTime,tree),
-   ignore((get_runtime_seconds(StartSem),
+   runtime(StartSem),
    parsetree_to_prelogic(E,S), !,
-   get_runtime_seconds(StopSem),
+   runtime(StopSem),
    SemTime is StopSem - StartSem,
    call(Report,S,'Semantics',SemTime,expr),
-   ignore((get_runtime_seconds(StartPlan),
-   prelogic_to_qplan(S,S1), !,
+   runtime(StartPlan),
+   qplan(S,S1), !,
    copy_term(S1,QP),
-   get_runtime_seconds(StopPlan),
+   runtime(StopPlan),
    TimePlan is StopPlan - StartPlan,
    call(Report,S1,'Planning',TimePlan,expr),
-   get_runtime_seconds(StartAns),
-   ignore((qplan_to_answers(S1,Results),!,
-   get_runtime_seconds(StopAns),
+   runtime(StartAns),
+   qplan_to_answers(S1,Results),!,
+   runtime(StopAns),
    TimeAns is StopAns - StartAns,
    call(Report,Results,'Reply',TimeAns,tree),
    WholeTime is ParseTime + SemTime + TimePlan + TimeAns,
-   check_test_80(U,[sent=(U),parse=(E),sem=(S),qplan=(QP),answers=(Results)],[time(WholeTime)]))))))).
-
+   check_test_80(U,[sent=(U),parse=(E),sem=(S),qplan=(QP),answers=(Results)],[time(WholeTime)]),!.
 
 check_test_80(U,List,Time):-must_test_80(U,BList,BTime),!,reportDif(U,List,BList,Time,BTime).
 check_test_80(U,List,Time):-reportDif(U,List,[],Time,[]).
 
-test_quiet(_,_,_,_).
+test_quiet(A,B,C,D):-report(A,B,C,D).
 
 
 :-export(reportDif/5).
@@ -194,15 +192,46 @@ failure80(U) :-
    display('I don''t understand! '+U), nl.
 
 
-get_runtime_seconds(Time) :-
+report(Item,Label,Time,Mode) :-
+  % chat80_tracing, !,
+   nl, write(Label), write(': '), write(Time), write('sec.'), nl,
+   report_item(Mode,Item).
+report(_,_,_,_).
+
+report_item(none,_).
+report_item(expr,Item) :-!,
+   write_tree(Item), nl.
+report_item(tree,Item) :-!,
+   print_tree(Item), nl.
+report_item(_,Item) :-!,
+   print_tree(Item), nl.
+
+runtime(Time) :-
    statistics(runtime,[MSec,_]),
    Time is MSec/1000.
 
+quote(A&R) :-
+   atom(A), !,
+   quote_amp(R).
+quote(_-_).
+quote(_--_).
+quote(_+_).
+quote(verb(_,_,_,_,_)).
+quote(wh(_)).
+quote(name(_)).
+quote(prep(_)).
+quote(det(_)).
+quote(quant(_,_)).
+quote(int_det(_)).
+
+quote_amp('$VAR'(_)) :- !.
+quote_amp(R) :-
+   quote(R).
 
 parsetree_to_prelogic(S0,S) :-
    i_sentence(S0,S1),
    clausify(S1,S2),
-   simplify(S2,S).
+   must(simplify(S2,S)).
 
 simplify(C,(P:-R)) :- !,
    unequalise(C,(P:-Q)),

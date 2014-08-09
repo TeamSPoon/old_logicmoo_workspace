@@ -76,6 +76,8 @@ decl_mpred_hybrid(M,PI,F/A):-
      decl_mpred_stubtype(F,prologHybrid),
      decl_mpred_mfa(M,F,A).
 
+decl_mpred_hybrid(_CM,M,PI,F/A):-
+   decl_mpred_hybrid(M,PI,F/A).
 
 :-op(1150,fx,decl_mpred_hybrid).
 
@@ -113,6 +115,7 @@ mpred_arity(Prop,1):-argsIsaProps(Prop).
 % dbase_t(type,Prop):-mpred_arity(Prop,1).
 
 :-forall(argsIsaProps(F),dynamic(F/1)).
+
 
 % pass 2
 declare_dbase_local(F):- not(mpred_arity(F,A)),trace_or_throw(not(mpred_arity(F,A))).
@@ -241,6 +244,10 @@ make_functorskel(F,N,fskel(F,DBASE,Call,I,NList,MtVars,Call2)):-typical_mtvars(M
 % ============================================
 :-export(registerCycPredPlus2/1).
 
+
+registerCycPredPlus2_3(_CM,M,PI,F/A2):-
+  registerCycPredPlus2_3(M,PI,F/A2).
+
 registerCycPredPlus2_3(_M,_PI,F/A2):-   
   A is A2 - 2, decl_mpred_hybrid(F/A),decl_mpred(F,cycPlus2(A2)),decl_mpred(F,cycPred(A)).
 
@@ -248,7 +255,8 @@ registerCycPredPlus2_3(_M,_PI,F/A2):-
 registerCycPredPlus2(P):-!,with_pi(P,registerCycPredPlus2_3).
 
 get_mpred_prop(F,P):- mpred_prop(F,P).
-get_mpred_prop(Obj,PropVal):- safe_univ(PropVal,[Prop,NonVar|Val]),safe_univ(CallVal,[Prop,Obj,NonVar|Val]),call_mpred(CallVal).
+get_mpred_prop(Obj,PropVal):- safe_univ(PropVal,[Prop,NonVar|Val]),safe_univ(CallVal,[Prop,Obj,NonVar|Val]),
+     predicate_property(CallVal,_),!,call_mpred(CallVal).
 
 
 get_mpred_prop(F,_A,P):-get_mpred_prop(F,P).
@@ -259,7 +267,9 @@ assert_arity(F,A):-mpred_arity(F,A),assert_if_new(mpred_prop(F,arity(A))),!.
 assert_arity(F,A):-mpred_arity(F,1),dmsg(trace_or_throw(was_one_assert_arity(F,A))),!.
 assert_arity(argsIsa,2):-trace_or_throw(assert_arity_argsIsa(argsIsa,2)).
 assert_arity(ArgsIsa,0):-trace_or_throw(assert_arity(ArgsIsa,0)).
-assert_arity(F,A):-loop_check(assert_arity_lc(F,A),true).
+assert_arity(F,A):-loop_check(assert_arity_lc(F,A),true),!.
+assert_arity(F,A):-asserta(mmpred_arity(F,A)),!.
+assert_arity(F,A):-dmsg(failed_assert_arity(F,A)).
 
 assert_arity_lc(F,A):-
   retractall(mpred_prop(F,arity(_))),
@@ -307,6 +317,7 @@ decl_mpred_0(F,mpred):-!,assert_if_new(dbase_t(mpred,F)).
 decl_mpred_0(_,[]):-!.
 decl_mpred_0(M:FA,More):-atom(M),!,decl_mpred_0(FA,[ask_module(M)|More]).
 decl_mpred_0(F/A,More):-atom(F),!,decl_mpred_1(F,arity(A)),decl_mpred(F,More),!.
+decl_mpred_0(C,More):-string(C),!,dmsg( trace_or_throw(var_decl_mpred(C,More))).
 decl_mpred_0(C,More):-compound(C),C=..[F,Arg1|PROPS],argsIsaProps(F),!,ground(Arg1),decl_mpred(Arg1,[F,PROPS,More]).
 decl_mpred_0(C,More):-compound(C),!,functor_catch(C,F,A),decl_mpred_1(F,arity(A)),decl_mpred_0(F,More),!,ignore((ground(C),decl_mpred(F,argsIsa(C)))),!.
 decl_mpred_0(F,A):-number(A),!,decl_mpred_1(F,arity(A)),!.
@@ -332,6 +343,9 @@ decl_mpred_2(F,_):- once((not((mpred_prop(F,external(Module)),not(dbase_mod(Modu
 
 
 decl_mpred(Mt,F,A):-decl_mpred(F,A),ignore((nonvar(Mt),decl_mpred(F,mt(Mt)))).
+decl_mpred_1(_CM,M,PI,F/A):-
+   decl_mpred_1(M,PI,F/A).
+
 
 :-op(0,fx,decl_mpred_prolog).
 :-export(decl_mpred_prolog/1).
@@ -348,6 +362,10 @@ decl_mpred_prolog(M,PI,F/A):-
     decl_mpred(F,ask_module(M)),
    ignore((ground(PI),decl_mpred(PI))),
    decl_mpred(F,A)]).
+
+decl_mpred_prolog(_CM,M,PI,F/A):-
+   decl_mpred_prolog(M,PI,F/A).
+
 
 
 % :- decl_mpred((nameStrings/2,grid_key/1,on_world_load/0,label_type/2,creatableType/2)).

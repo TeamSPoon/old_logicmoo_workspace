@@ -21,7 +21,7 @@
          module_meta_predicates_are_transparent/1,
          module_predicates_are_exported/1,
          module_predicates_are_exported/0,
-         inside_loop_check/1,
+         tlbugger:inside_loop_check/1,
          is_loop_checked/1,
          rtrace/1,
          snumbervars/1,
@@ -52,8 +52,7 @@
      os_to_prolog_filename/2,
      debugOnFailure0/1,
       op(1150,fx,meta_predicate_transparent),
-      meta_predicate_transparent/1,
-      meta_predicate_transparent/2,
+      meta_predicate_transparent/1,      
      ifThen/2,
      nop/1,
      module_predicate/3,
@@ -77,8 +76,8 @@
 
      loop_check/2,
      loop_check_term/3,
-         loop_check_throw/1,
-         loop_check_fail/1,
+         % loop_check_throw/1,
+         %loop_check_fail/1,
 
      logOnErrorIgnore/1,
      debugOnErrorIgnore/1,
@@ -155,6 +154,8 @@
      export_all_preds/1
 	 ]).
 
+:-export bad_idea/0.
+bad_idea:-fail.
 
 /*
 :- export(static_predicate/1).
@@ -163,18 +164,49 @@
 static_predicate(FA):-once(predicate_property(FA,_)),not(predicate_property(FA,dynamic)).
 */
 
+% ===================================================================
+% Substitution based on ==
+% ===================================================================
+
+% Usage: dbgsubst(+Fml,+X,+Sk,?FmlSk)
+
+dbgsubst(A,B,C,D):-var(A),!,dmsg(dbgsubst(A,B,C,D)),dumpST,dtrace,dbgsubst0(A,B,C,D).
+dbgsubst(A,B,C,D):-dbgsubst0(A,B,C,D).
+
+dbgsubst0(A,B,C,D):- 
+      ccatch(notrace(nd_dbgsubst(A,B,C,D)),E,(dumpST,dmsg(E:nd_dbgsubst(A,B,C,D)),fail)),!.
+dbgsubst0(A,_B,_C,A).
+
+nd_dbgsubst(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
+nd_dbgsubst(  P, X,Sk, P1 ) :- functor_catch(P,_,N),nd_dbgsubst1( X, Sk, P, N, P1 ).
+
+nd_dbgsubst1( _,  _, P, 0, P  ).
+nd_dbgsubst1( X, Sk, P, N, P1 ) :- N > 0, P =.. [F|Args], 
+            nd_dbgsubst2( X, Sk, Args, ArgS ),
+            nd_dbgsubst2( X, Sk, [F], [FS] ),  
+            P1 =.. [FS|ArgS].
+
+nd_dbgsubst2( _,  _, [], [] ).
+nd_dbgsubst2( X, Sk, [A|As], [Sk|AS] ) :- X == A, !, nd_dbgsubst2( X, Sk, As, AS).
+nd_dbgsubst2( X, Sk, [A|As], [A|AS]  ) :- var(A), !, nd_dbgsubst2( X, Sk, As, AS).
+nd_dbgsubst2( X, Sk, [A|As], [Ap|AS] ) :- nd_dbgsubst( A,X,Sk,Ap ),nd_dbgsubst2( X, Sk, As, AS).
+nd_dbgsubst2( _X, _Sk, L, L ).
+
+
+
+% ----------
 :- export(static_predicate/3).
-:- meta_predicate(static_predicate(-,-,-)).
+:- meta_predicate(static_predicate(+,+,+)).
 static_predicate(M,F,A):- functor(FA,F,A),  once(M:predicate_property(FA,_)),not(M:predicate_property(FA,dynamic)),not((M:predicate_property(FA,imported_from(Where)),Where \= M)).
+
 
 :- export(dynamic_safe/1).
 :- meta_predicate(dynamic_safe(:)).
 :- module_transparent(dynamic_safe/1).
-dynamic_safe(M:FA):- M:with_mfa(M:FA,dynamic_safe).
 dynamic_safe(MFA):- with_mfa(MFA,dynamic_safe).
 
 :- export(dynamic_safe/3).
-:- meta_predicate(dynamic_safe(-,-,-)).
+:- meta_predicate(dynamic_safe(+,+,+)).
 :- module_transparent(dynamic_safe/3).
 dynamic_safe(M,F,A):- (static_predicate(M,F,A) -> true ; M:dynamic(M:F/A)). % , warn_module_dupes(M,F,A).
 
@@ -186,70 +218,93 @@ dynamic_safe(M,F,A):- (static_predicate(M,F,A) -> true ; M:dynamic(M:F/A)). % , 
 :- meta_predicate(with_pi(:,3)).
 with_pi([],_):-!.
 with_pi((P1,P2),Pred3):-!, with_pi(P1,Pred3),with_pi(P2,Pred3).
-with_pi(P  ,Pred3):- context_module(M),with_pi(M,P,Pred3),!.
+with_pi(P  ,Pred3):- context_module(M),with_pi_selected(M,M,P,Pred3),!.
 
-:- meta_predicate(with_pi(?,?,?,3)).
-with_pi(M,[P|L],Pred3):-!,with_pi(M,P,  Pred3),with_pi(M,L,Pred3).
-with_pi(M,(P,L),Pred3):-!,with_pi(M,P,  Pred3),with_pi(M,L,Pred3).
-with_pi(_M,[]  ,_Pred3):-!.
-with_pi(M,[P]  ,Pred3):-!,with_pi(M,P,  Pred3).
-with_pi(_, M:F/A,Pred3):-!,with_pi(M,F/A,Pred3).
-with_pi(_, M:P ,Pred3):-!,with_pi(M,P,  Pred3).
-with_pi(M, F/A ,Pred3):-!,functor(P,F,A),M:with_pi(M,P,F/A,Pred3).
-with_pi(M, P ,Pred3):-  functor(P,F,A),M:with_pi(M,P,F/A,Pred3).
+:- export(with_pi_selected/4).
+:- meta_predicate(with_pi_selected(+,+,+,+)).
+with_pi_selected(CM, M,[P|L],Pred3):-!,with_pi_selected(CM,M,P,  Pred3),with_pi_selected(CM,M,L,Pred3).
+with_pi_selected(CM,M,(P,L),Pred3):-!,with_pi_selected(CM,M,P,  Pred3),with_pi_selected(CM,M,L,Pred3).
+with_pi_selected(_CM,_M,[]  ,_Pred3):-!.
+with_pi_selected(CM,M,[P]  ,Pred3):-!,with_pi_selected(CM,M,P,  Pred3).
+with_pi_selected(CM,_, M:F/A,Pred3):-!,with_pi_selected(CM,M,F/A,Pred3).
+with_pi_selected(CM,_, M:P ,Pred3):-!,with_pi_selected(CM,M,P,  Pred3).
+with_pi_selected(CM,M, F/A ,Pred3):-!,functor(P,F,A),  with_pi_stub(CM,M,P,F/A,Pred3).
+with_pi_selected(CM,M, P ,Pred3):-  functor(P,F,A), with_pi_stub(CM,M,P,F/A,Pred3).
 
-:- export(with_pi/4).
-with_pi(M,P,F/A,Pred3):- ((integer(A),atom(M),atom(F),functor(P,F,A))),
-   ('@'(call(Pred3,M,P,F/A),M)),!.
-with_pi(M,P,FA,Pred3):- trace_or_throw(invalide_args(Pred3,M,P,FA)).
+:- export(with_pi_stub/5).
+with_pi_stub(CM, M,P, F/A , CM:Pred3):- ((integer(A),atom(M),atom(F),functor(P,F,A))),
+   ('@'(M:call(Pred3,CM, M,P,F/A),CM)),!.
+with_pi_stub(CM, M,P, F/A , Pred3):- ((integer(A),atom(M),atom(F),functor(P,F,A))),
+   ('@'(M:call(Pred3,CM, M,P,F/A),CM)),!.
+with_pi_stub(CM, M,P,FA,Pred3):- throw(invalide_args(CM, M,P,FA,Pred3)).
 % ----------
 
 :- export(with_mfa/2).
 :- module_transparent(with_mfa/2).
-:- meta_predicate(with_mfa(:,3)).
-with_mfa(M:P,Pred3):-!, M:with_pi(M,P,M:with_mfa_of(Pred3)).
-with_mfa(P  ,Pred3):- context_module(M),with_pi(M,P,with_mfa_of(Pred3)).
+:- meta_predicate(with_mfa(:,4)).
+with_mfa(P  ,Pred3):- with_pi(P,with_mfa_of(Pred3)).
 
-:- module_transparent(with_mfa_of/4).
-:- meta_predicate(with_mfa_of(3,-,-,-)).
-with_mfa_of(Pred3,M,_P,F/A):-M:call(Pred3,M,F,A).
+:- module_transparent(with_mfa_of/5).
+:- meta_predicate(with_mfa_of(3,+,+,+)).
+with_mfa_of(Pred3,_CM,M,_P,F/A):-M:call(Pred3,M,F,A).
 
-% ----------
 
-:- export(def_meta_predicate/3).
-:- meta_predicate def_meta_predicate(0,+,+).
-
-def_meta_predicate(M:F,S,E):-!,doall(((between(S,E,N),make_list('?',N,List),CALL=..[F|List],'@'(meta_predicate(CALL),M)))).
-def_meta_predicate(F,S,E):- trace_or_throw(def_meta_predicate(F,S,E)).
 % ----------
 
 :- export((dynamic_multifile_exported)/1).
-:- export((dynamic_multifile_exported)/3).
-:- meta_predicate(( dynamic_multifile_exported(:), dynamic_multifile_exported(-,-,-))).
+:- export((dynamic_multifile_exported)/4).
+:- meta_predicate(( dynamic_multifile_exported(:), dynamic_multifile_exported(+,+,+,+))).
 :- module_transparent((dynamic_multifile_exported)/1).
-dynamic_multifile_exported( M:FA ):- M:with_pi(M:FA,(dynamic_multifile_exported)).
 dynamic_multifile_exported( FA ):- with_pi(FA,(dynamic_multifile_exported)).
-dynamic_multifile_exported(M,_PI,F/A):- CALL='@'((dynamic_safe(M,F,A), M:multifile(M:F/A), M:export(M:F/A)),M),CALL. %,dmsg(dynamic_multifile_exported(CALL)).
+dynamic_multifile_exported(CM, M, _PI, F/A):- CALL='@'((dynamic_safe(M,F,A), 
+   M:multifile(F/A), 
+   CM:multifile(F/A),
+   M:export(F/A)),M),CALL. %,dmsg(dynamic_multifile_exported(CALL)).
 
 % ----------
 
-:- export(meta_module_transparent/1).
-:- module_transparent(meta_module_transparent/1).
-:- meta_predicate(( meta_module_transparent(:),  meta_module_transparent(-,-,-))).
-meta_module_transparent(M:P):-M:with_pi(M:P,meta_module_transparent).
-meta_module_transparent(MP):-with_pi(MP,meta_module_transparent).
-meta_module_transparent(M,PI,F/A):-   
-   dynamic_safe(M,F,A),
+:- export(((meta_predicate_transparent)/1)).
+:- meta_predicate(( meta_predicate_transparent(:),  meta_predicate_transparent(+,+,+,+))).
+meta_predicate_transparent(MP):-with_pi(MP,(meta_predicate_transparent)).
+
+meta_predicate_transparent(CM,M,PI,F/A):-
    M:module_transparent(F/A),
-   fill_args(PI,('?')),!,
-   M:meta_predicate(PI),
-   M:multifile(F/A),
-   M:export(F/A).
+   notrace((fill_args(PI,('?')),!,
+   dbgsubst(PI, (0),(0),PI1),
+   dbgsubst(PI1,(^),(0),PI2),
+   dbgsubst(PI2,(:),(:),PI3))),
+   M:meta_predicate(PI3),
+   dynamic_multifile_exported(CM, M,PI3,F/A).
 
 fill_args([Arg|More],With):-!,ignore(With=Arg),fill_args(More,With).
 fill_args([],_).
 fill_args(PI,With):-PI=..[_|ARGS],fill_args(ARGS,With).
 
+% use ccatch/3 to replace catch/3 works around SWI specific bugs when using $abort/0 and block/3
+% (ccatch/3 allows you to have these exceptions buggle past your block handlers)
+:- meta_predicate((ccatch(0, ?, 0))).
+bubbled_ex(block(_,_)).
+bubbled_ex('$aborted').
+bubbled_ex_check(E):-bubbled_ex(E),throw(E).
+bubbled_ex_check(_).
+ccatch(Goal,E,Recovery):- nonvar(E),!,catch(Goal,E,Recovery). % normal mode
+ccatch(Goal,E,Recovery):- catch(Goal,E,(bubbled_ex_check(E),Recovery)). % prevents promiscous mode
+
+:-export(functor_catch/3).
+functor_catch(P,F,A):-ccatch(functor(P,F,A),E,(dumpST,dmsg(E:functor(P,F,A)),dtrace)).
+
+:- meta_predicate_transparent(meta_predicate_transparent(0)).
+
+
+:- export(def_meta_predicate/3).
+:- meta_predicate_transparent((def_meta_predicate(0,+,+))).
+
+def_meta_predicate(M:F,S,E):-!,doall(((between(S,E,N),make_list('?',N,List),CALL=..[F|List],'@'(meta_predicate_transparent(CALL),M)))).
+def_meta_predicate(F,S,E):- trace_or_throw(def_meta_predicate(F,S,E)).
+
+
+:- meta_predicate_transparent((loop_check_term(0,?,0))).
+:- meta_predicate_transparent((loop_check(^,^))).
 
 
    
@@ -285,26 +340,16 @@ current_next_frames(_,_,_,[]).
 trace_or(E):- dumpST,dmsg(E),dtrace,!.
 trace_or(E):- E.
 
-% use ccatch/3 to replace catch/3 works around SWI specific bugs when using $abort/0 and block/3
-% (ccatch/3 allows you to have these exceptions buggle past your block handlers)
-:- meta_predicate((ccatch(0, ?, 0))).
-bubbled_ex(block(_,_)).
-bubbled_ex('$aborted').
-bubbled_ex_check(E):-bubbled_ex(E),throw(E).
-bubbled_ex_check(_).
-ccatch(Goal,E,Recovery):- nonvar(E),!,catch(Goal,E,Recovery). % normal mode
-ccatch(Goal,E,Recovery):- catch(Goal,E,(bubbled_ex_check(E),Recovery)). % prevents promiscous mode
+
 
 
 cnotrace:-notrace.
 
-:- meta_predicate(cnotrace(0)).
+:- meta_predicate_transparent(cnotrace(0)).
 :- module_transparent(cnotrace/1).
 :- export(cnotrace/1).
 cnotrace(C):-ccatch(hotrace(C),E,((dmsg(E=C),rtrace(C),trace_or_throw(E=C)))).
 
-:-export(functor_catch/3).
-functor_catch(P,F,A):-ccatch(functor(P,F,A),E,(dumpST,dmsg(E:functor(P,F,A)),dtrace)).
 
 trace_or_throw(E):-trace_or(throw(E)).
 
@@ -325,7 +370,7 @@ trace_or_throw(E):-trace_or(throw(E)).
 
 
 
-:- meta_predicate meta_interp(-,-).
+:- meta_predicate_transparent meta_interp(-,-).
 
 meta_interp_signal(meta_call(V)):-!,nonvar(V).
 meta_interp_signal(meta_callable(_,_)).
@@ -368,57 +413,57 @@ set_bugger_flag(F,V):-current_prolog_flag(F,_Old),set_prolog_flag(F,V),!.
 set_bugger_flag(F,V):-create_prolog_flag(F,V,[term]).
 
 
-:- meta_predicate moo_hide_childs(0).
+:- meta_predicate_transparent moo_hide_childs(0).
 :- module_transparent moo_hide_childs/0.
 
-:- meta_predicate one_must(^,^).
-:- meta_predicate must(^).
-:- meta_predicate prolog_must_not(^).
-:- meta_predicate gmust(^,^).
-:- meta_predicate logOnFailure0(^).
-:- meta_predicate debugOnError0(^).
-:- meta_predicate will_debug_else_throw(^,^).
-:- meta_predicate printAll(^,*).
-:- meta_predicate load_dirrective(^,*).
-:- meta_predicate debugOnFailure0(^).
-:- meta_predicate cli_notrace(^).
-:- meta_predicate printPredCount(*,^,*).
-:- meta_predicate ignoreOnError(^).
-:- meta_predicate traceIf(^).
-:- meta_predicate ifThen(^,^).
-:- meta_predicate prolog_ecall_fa(*,1,*,*,^).
-:- meta_predicate tryCatchIgnore(^).
-:- meta_predicate logOnError0(^).
-:- meta_predicate failOnError(^).
-% :- meta_predicate test_call(^).
-:- meta_predicate cmust(^).
-%:- meta_predicate debugCall(^).
-:- meta_predicate prolog_ecall(*,1,?).
-%:- meta_predicate traceafter_call(^).
-:- meta_predicate if_prolog(*,^).
-:- meta_predicate must(^).
-:- meta_predicate must_each(^).
-:- meta_predicate must_det(^).
-:- meta_predicate loop_check_clauses(0,?,0).
-:- meta_predicate loop_check_clauses(0,0).
-:- meta_predicate must_det_l(?).
-:- meta_predicate rtrace(^).
-:- meta_predicate one_must_det(+,^).
-:- meta_predicate rtraceOnError(^).
-:- meta_predicate debugOnError(^).
-:- meta_predicate debugOnError0(^).
-:- meta_predicate debugOnErrorIgnore(^).
-:- meta_predicate debugOnFailure0(^).
-:- meta_predicate forall_member(*,*,^).
-:- meta_predicate throwOnFailure(^).
-:- meta_predicate hotrace(^).
+:- meta_predicate_transparent one_must(^,^).
+:- meta_predicate_transparent must(^).
+:- meta_predicate_transparent prolog_must_not(^).
+:- meta_predicate_transparent gmust(^,^).
+:- meta_predicate_transparent logOnFailure0(^).
+:- meta_predicate_transparent debugOnError0(^).
+:- meta_predicate_transparent will_debug_else_throw(^,^).
+:- meta_predicate_transparent printAll(^,*).
+:- meta_predicate_transparent load_dirrective(^,*).
+:- meta_predicate_transparent debugOnFailure0(^).
+:- meta_predicate_transparent cli_notrace(^).
+:- meta_predicate_transparent printPredCount(*,^,*).
+:- meta_predicate_transparent ignoreOnError(^).
+:- meta_predicate_transparent traceIf(^).
+:- meta_predicate_transparent ifThen(^,^).
+:- meta_predicate_transparent prolog_ecall_fa(*,1,*,*,^).
+:- meta_predicate_transparent tryCatchIgnore(^).
+:- meta_predicate_transparent logOnError0(^).
+:- meta_predicate_transparent failOnError(^).
+% :- meta_predicate_transparent test_call(^).
+:- meta_predicate_transparent cmust(^).
+%:- meta_predicate_transparent debugCall(^).
+:- meta_predicate_transparent prolog_ecall(*,1,?).
+%:- meta_predicate_transparent traceafter_call(^).
+:- meta_predicate_transparent if_prolog(*,^).
+:- meta_predicate_transparent must(^).
+:- meta_predicate_transparent must_each(^).
+:- meta_predicate_transparent must_det(^).
+:- meta_predicate_transparent loop_check_clauses(^,?,^).
+:- meta_predicate_transparent loop_check_clauses(^,^).
+:- meta_predicate_transparent must_det_l(?).
+:- meta_predicate_transparent rtrace(^).
+:- meta_predicate_transparent one_must_det(+,^).
+:- meta_predicate_transparent rtraceOnError(^).
+:- meta_predicate_transparent debugOnError(^).
+:- meta_predicate_transparent debugOnError0(^).
+:- meta_predicate_transparent debugOnErrorIgnore(^).
+:- meta_predicate_transparent debugOnFailure0(^).
+:- meta_predicate_transparent forall_member(*,*,^).
+:- meta_predicate_transparent throwOnFailure(^).
+:- meta_predicate_transparent hotrace(^).
 % Restarting analysis ...
 % Found new meta-predicates in iteration 2 (^.:16 sec)
-:- meta_predicate prolog_must_l(^).
-:- meta_predicate printAll(^).
-:- meta_predicate prolog_must(^).
-:- meta_predicate showProfilerStatistics(^).
-%:- meta_predicate debugCallF(^).
+:- meta_predicate_transparent prolog_must_l(^).
+:- meta_predicate_transparent printAll(^).
+:- meta_predicate_transparent prolog_must(^).
+:- meta_predicate_transparent showProfilerStatistics(^).
+%:- meta_predicate_transparent debugCallF(^).
 
 :- module_transparent user_use_module/1.
 % user_use_module(What):-!, ensure_loaded(What).
@@ -429,8 +474,10 @@ user_use_module(What):- '@'(use_module(What),'user').
 :- '@'(use_module(logicmoo_util_library), 'user').
 
 
-:-export(inside_loop_check/1).
-:-thread_local inside_loop_check/1.
+:- thread_local tlbugger:disable_loop_checks/0.
+
+:- thread_local tlbugger:inside_loop_check/1.
+:- dynamic_multifile_exported(tlbugger:inside_loop_check/1).
 
 
 
@@ -439,27 +486,30 @@ user_use_module(What):- '@'(use_module(What),'user').
 :- module_transparent(loop_check/2).
 :- module_transparent(no_loop_check/1).
 :- export(no_loop_check/1).
-:- module_transparent(loop_check_fail/1).
-:- module_transparent(loop_check_throw/1).
-:- module_transparent(loop_check_term/3).
-:- meta_predicate((loop_check_term(^,-,^))).
-:- meta_predicate((loop_check_throw(^))).
-:- meta_predicate((loop_check_fail(^))).
-:- meta_predicate((loop_check(^,^))).
+%:- module_transparent(loop_check_fail/1).
+%:- module_transparent(loop_check_throw/1).
+%:- module_transparent(loop_check_term/3).
+%:- meta_predicate_transparent((loop_check_throw(0))).
+%:- meta_predicate_transparent((loop_check_fail(0))).
 
 
-:-thread_local can_table/0.
-:-thread_local cannot_table/0.
-can_table.
+:-thread_local thlocal:can_table/0.
+:-thread_local thlocal:cannot_table/0.
+thlocal:can_table.
 
-loop_check_throw(B):- loop_check(B,((retractall(inside_loop_check(B)),debugCallWhy(loop_check_throw(B),loop_check_throw(B))))).
-loop_check_fail(B):- loop_check(B,(dmsg(once(loop_check_fail(B))),fail)).
+% loop_check_throw(B):- loop_check(B,((retractall(tlbugger:inside_loop_check(B)),debugCallWhy(loop_check_throw(B),loop_check_throw(B))))).
+%loop_check_fail(B):- loop_check(B,(dmsg(once(loop_check_fail(B))),fail)).
 
 snumbervars(BC):-numbervars(BC,0,_,[singletons(true),attvar(skip)]).
 
-
+:-meta_predicate_transparent(once_if_ground(0)).
 once_if_ground(Call):-not(ground(Call)),!,Call.
 once_if_ground(Call):- once(Call).
+
+:-meta_predicate_transparent(once_if_ground(0,-)).
+once_if_ground(Call,T):-not(ground(Call)),!,Call,deterministic(D),(D=yes -> T= (!) ; T = true).
+once_if_ground(Call,!):-once(Call).
+
 
 to_list_of(_,[Rest],Rest):-!.
 to_list_of(RL,[R|Rest],LList):-
@@ -473,31 +523,37 @@ call_or_list(Rest):-to_list_of(';',Rest,List),!,call(List).
 call_skipping_n_clauses(N,H):-
    findall(B,clause_safe(H,B),L),length(L,LL),!,LL>N,length(Skip,N),append(Skip,Rest,L),!,call_or_list(Rest).
 
-is_loop_checked(B):- make_key(B,BC),!,inside_loop_check(BC).
-
-loop_check(B,TODO):- make_key(B,BC),!, loop_check_term(B,BC,TODO).
+is_loop_checked(B):- 
+       make_key(B,BC),!,tlbugger:inside_loop_check(BC).
 
 cannot_table_call(Call):- with_assertions(cannot_table,Call).
-no_loop_check(Call):- with_assertions(((inside_loop_check(_):-!,fail)),Call).
 
-loop_check_clauses(B,TODO):- loop_check_clauses(B,1,TODO).
+no_loop_check(B):- bad_idea,!,retractall(tlbugger:inside_loop_check(_)), with_assertions(tlbugger:disable_loop_checks,B).
+no_loop_check(B):- with_assertions(tlbugger:disable_loop_checks,B).
+
+loop_check_clauses(B,TODO):-  loop_check_clauses(B,1,TODO).
 loop_check_clauses(B,N,TODO):- make_key(B,BC), loop_check_term(call_skipping_n_clauses(N,B),BC,TODO).
 
-loop_check_term(_B,BC, TODO):- inside_loop_check(BC),!,call(TODO).
-loop_check_term(B,BC, _TODO):- setup_call_cleanup(asserta(inside_loop_check(BC)),call(B),ignore(retract(inside_loop_check(BC)))).
+loop_check(B, TODO):- make_key(B,BC),!, loop_check_term(B,BC,TODO).
 
+loop_check_term(_B, BC, TODO):- tlbugger:inside_loop_check(BC),!,nop(tlbugger:disable_loop_checks->dmsg(skip_disable_loop_checks(TODO));true),call(TODO).
+loop_check_term( B, BC,_TODO):- not(bad_idea),!,
+    setup_call_cleanup(asserta(tlbugger:inside_loop_check(BC)),B,
+     (ignore(retract((tlbugger:inside_loop_check(BC)))))).
+loop_check_term( B, BC,_TODO):- with_assertions(tlbugger:inside_loop_check(BC),B).
 
+/*
 outside_loop_check_thread(Call):-in_thread_and_join(Call).
 
 outside_loop_check(B,Call):- make_key(B,BC), outside_loop_check_term(B,BC,Call).
 
-outside_loop_check_term(B,BC,Call):- retract(inside_loop_check(Which)),!,
+outside_loop_check_term(B,BC,Call):- retract(tlbugger:inside_loop_check(Which)),!,
       (Which=BC -> 
-        setup_call_cleanup(true,call(B),asserta(inside_loop_check(Which)));  
-        setup_call_cleanup(true,outside_loop_check_term(B,BC,Call),asserta(inside_loop_check(Which)))).
+        setup_call_cleanup(true,call(B),asserta(tlbugger:inside_loop_check(Which)));  
+        setup_call_cleanup(true,outside_loop_check_term(B,BC,Call),asserta(tlbugger:inside_loop_check(Which)))).
 outside_loop_check_term(_,_,Call):- !, Call.
 outside_loop_check_term(_,_,Call):- outside_loop_check_thread(Call).
-
+*/
  % cli_notrace(+Call) is nondet.
  % use call/1 with trace turned off
  cli_notrace(Call):-tracing,cnotrace,!,call_cleanup(call(Call),trace).
@@ -652,8 +708,8 @@ hideRest:- fail, logicmoo_util_library:buggerDir(BuggerDir),
 hideRest:- functor_source_file(system,_P,F,A,_File),hideTraceMFA(system,F,A,-all), fail.
 hideRest.
 
-:- meta_predicate(hideTrace(:,-)).
-:- meta_predicate with_output_to_stream(*,0).
+:- meta_predicate_transparent(hideTrace(:,-)).
+:- meta_predicate_transparent with_output_to_stream(*,0).
 
 functor_source_file(M,P,F,A,File):-functor_source_file0(M,P,F,A,File). % must(ground((M,F,A,File))),must(user:nonvar(P)).
 functor_source_file0(M,P,F,A,File):-current_predicate(F/A),functor_catch(P,F,A),source_file(P,File),predicate_module(P,M).
@@ -1007,43 +1063,47 @@ dynamic_if_missing(F/A):-functor_catch(X,F,A),predicate_property(X,_),!.
 dynamic_if_missing(F/A):-dynamic([F/A]).
 
 
-meta_predicate_transparent(M:F):-!,meta_predicate_transparent(M,F).
-meta_predicate_transparent(X):-strip_module(X,M,F),!, meta_predicate_transparent(M,F).
-
-meta_predicate_transparent(M,(X,Y)):-!,meta_predicate_transparent(M,X),meta_predicate_transparent(M,Y),!.
-meta_predicate_transparent(_M,X):-atom(X),!.
-meta_predicate_transparent(M,X):-
- '@'(((functor(X,F,A),
-  FA=F/A,export(FA),
-  meta_predicate(X),
-  module_transparent(FA))),M).
-
-:-meta_predicate_transparent(meta_predicate_transparent(0)).
 
 %%%retractall(E):- retractall(E),functor_catch(E,File,A),dynamic(File/A),!.
 
 pp_listing(Pred):- functor_catch(Pred,File,A),functor_catch(FA,File,A),listing(File),nl,findall(NV,predicate_property(FA,NV),LIST),writeq(LIST),nl,!.
 
 
-:- meta_predicate_transparent(with_assertions(?,?)).
+:- meta_predicate_transparent(with_assertions(+,^)).
 with_assertions( [],Call):- !,Call.
 with_assertions( [With|MORE],Call):- !,with_assertions(With,with_assertions(MORE,Call)).
 with_assertions( (With,MORE),Call):- !,with_assertions(With,with_assertions(MORE,Call)).
-with_assertions(With,Call):- copy_term(With,WithA), setup_call_cleanup(asserta(WithA),Call,must_det(retract(WithA))).
+with_assertions( (With;MORE),Call):- !,with_assertions(With,Call);with_assertions(MORE,Call).
+with_assertions( -TL:With,Call):- !,with_no_assertions(TL:With,Call).
+with_assertions( +TL:With,Call):- !,with_assertions(TL:With,Call).
+with_assertions( -With,Call):- !,with_no_assertions(With,Call).
+with_assertions( +With,Call):- !,with_assertions(With,Call).
+with_assertions(THead,Call):- must_det(to_thread_head(THead,_M,Head,_H)),
+   copy_term( ( (Head  )), WithA),
+    setup_call_cleanup(asserta(WithA),Call,
+     (logOnFailure(retract((Head))))).
 
-:-meta_predicate_transparent(with_no_assertions(?,?)).
-with_no_assertions(Head,Call):-with_assertions((Head:-!,fail),Call).
+:-meta_predicate_transparent(with_no_assertions(+,^)).
+with_no_assertions(THead,Call):- !, with_assertions((THead:-!,fail),Call).
+with_no_assertions(THead,Call):-
+   must_det(to_thread_head(THead,M,Head,H)), 
+   copy_term((Head :- (!,fail)),WithA), 
+   setup_call_cleanup((asserta(WithA),must_det(clause(Head,TBODY))),Call,must_det(logOnFailure(retract((Head:-TBODY)));(functor(H,F,A),abolish(M:F/A),thread_local(M:F/A)))).
 
+to_thread_head((H:-B),TL,(HO:-user:B),HH):-to_thread_head(H,TL,HO,HH),!.
+to_thread_head(thglobal:Head,thglobal,thglobal:Head,Head):- must_det((predicate_property(thglobal:Head,(dynamic)),not(predicate_property(thglobal:Head,(thread_local))))).
+to_thread_head(TL:Head,TL,TL:Head,Head):-!, must_det(( predicate_property(TL:Head,(dynamic)),must_det(predicate_property(TL:Head,(thread_local))))),!.
+to_thread_head(Head,thlocal,thlocal:Head,Head):- must_det(( predicate_property(thlocal:Head,(dynamic)),predicate_property(thlocal:Head,(thread_local)))),!.
 
-:-thread_local(dmsg_hidden/1).
+:-thread_local(thlocal:dmsg_hidden/1).
 :-meta_predicate_transparent(with_all_dmsg(?)).
-with_all_dmsg(Call):-with_no_assertions(dmsg_hidden(_),Call).
+with_all_dmsg(Call):-with_no_assertions(thlocal:dmsg_hidden(_),Call).
 :-meta_predicate_transparent(with_no_dmsg(?)).
-with_no_dmsg(Call):-with_assertions(dmsg_hidden(_),Call).
+with_no_dmsg(Call):-with_assertions(thlocal:dmsg_hidden(_),Call).
 
-dmsg_hide(Term):-asserta(dmsg_hidden(Term)).
-dmsg_show(Term):-ignore(retract(dmsg_hidden(Term))).
-dmsg_showall(Term):-ignore(retractall(dmsg_hidden(Term))).
+dmsg_hide(Term):-asserta(thlocal:dmsg_hidden(Term)).
+dmsg_show(Term):-ignore(retract(thlocal:dmsg_hidden(Term))).
+dmsg_showall(Term):-ignore(retractall(thlocal:dmsg_hidden(Term))).
 
 % =================================================================================
 % Utils
@@ -1098,12 +1158,12 @@ showProfilerStatistics(FileMatch):-
 % ===============================================================================================
 
 
-:- meta_predicate bugger:unify_listing(0).
+:- meta_predicate_transparent bugger:unify_listing(0).
 unify_listing(FileMatch):-functor_catch(FileMatch,F,A),unify_listing(FileMatch,F,A),!.
 unify_listing_header(FileMatch):-functor_catch(FileMatch,F,A),unify_listing_header(FileMatch,F,A),!.
 
 
-:- meta_predicate bugger:unify_listing(0,*,*).
+:- meta_predicate_transparent bugger:unify_listing(0,*,*).
 unify_listing_header(FileMatch,F,A):- (fmt('~n/* Prediate: ~q / ~q ~n',[F,A,FileMatch])),fail.
 unify_listing_header(FileMatch,_F,_A):- printAll(predicate_property(FileMatch,PP),PP),fail.
 unify_listing_header(FileMatch,_F,_A):- (fmt('~n ~q. ~n */ ~n',[FileMatch])),fail.
@@ -1204,8 +1264,8 @@ dmsg0(V):- cnotrace(dmsg1(V)),!, hotrace(doall(( hook:dmsg_hook(V)))).
 
 dmsg1(warn(V)):- print_message(warning,V).
 dmsg1(skip_dmsg(_)):-!.
-dmsg1(C):-dmsg_hidden(C),!.
-dmsg1(C):-functor_catch(C,Topic,_),dmsg_hidden(Topic),!.
+dmsg1(C):-thlocal:dmsg_hidden(C),!.
+dmsg1(C):-functor_catch(C,Topic,_),thlocal:dmsg_hidden(Topic),!.
 dmsg1(C):-functor_catch(C,Topic,_),debugging(Topic,_True_or_False),!,logger_property(Topic,once,true),!,
       (dmsg_log(Topic,_Time,C) -> true ; ((get_time(Time),asserta(dmsg_log(todo,Time,C)),!,dmsg2(C)))).
 dmsg1(C):-((copy_term(C,Stuff), snumbervars(Stuff),!,dmsg2(Stuff))).
@@ -1256,9 +1316,12 @@ show_call0(C):-C. % debugOnError0(C). % dmsg(show_call(C)),C.
 :- meta_predicate_transparent show_call(0).
 show_call(M:add(A)):-!, show_call0(M:add(A)),!.
 % show_call(M:must(C)):- !, M:must(C).
-show_call(C):-one_must((show_call0(C),dmsg(succeed(C))),((dmsg(failed_show_call(C)),trace))).
+show_call(C):-one_must((show_call0(C),dmsg(succeed(C))),((dmsg(failed_show_call(C)),!,fail))).
 
-:- meta_predicate logOnFailure(0).
+:- meta_predicate_transparent show_call_failure(0).
+show_call_failure(C):-one_must((show_call0(C)),((dmsg(failed_show_call(C)),!,fail))).
+
+:- meta_predicate_transparent logOnFailure(0).
 :- export(logOnFailure/1).
 logOnFailure(C):-one_must(C,(dmsg(failed_show_call(C)),!,fail)).
 
@@ -1292,7 +1355,7 @@ loggerFmtReal(S,F,A):-
 stack_depth(Level):-once((prolog_current_frame(Frame),prolog_frame_attribute(Frame,level,Level))).
 stack_check(BreakIfOver):- stack_check_else(BreakIfOver, trace_or_throw(stack_check(BreakIfOver))).
 stack_check(BreakIfOver,Error):- stack_check_else(BreakIfOver, trace_or_throw(stack_check(BreakIfOver,Error))).
-stack_check_else(BreakIfOver,Call):- stack_depth(Level) ,  ( Level < BreakIfOver -> true ; (subst(Call,stack_lvl,Level,NewCall),NewCall)).
+stack_check_else(BreakIfOver,Call):- stack_depth(Level) ,  ( Level < BreakIfOver -> true ; (dbgsubst(Call,stack_lvl,Level,NewCall),NewCall)).
 
 % dumpstack_arguments.
 dumpST:-cnotrace(dumpST([max_depth(5000),numbervars(safe),show([level,goal,clause])])).
@@ -1510,7 +1573,7 @@ hotrace(X):- call(X).
 traceafter_call(X):- call_cleanup(restore_trace((leash(-all),visible(-all),X)),(leash(+call), trace)).
 
 /*
-% :- meta_predicate notrace_call(^).
+% :- meta_predicate_transparent notrace_call(^).
 
 notrace_call(X):-cnotrace,ccatch(traceafter_call(X),E,(dmsg(E-X),trace,throw(E))).
 traceafter_call(X):-X,trace.
@@ -1550,7 +1613,7 @@ module_notrace(M):- forall(predicate_property(P,imported_from(M)),bugger:moo_hid
 :-export((call_no_cuts/1)).
 % =====================================================================================================================
 :- module_transparent call_no_cuts/1.
-:- meta_predicate call_no_cuts(0).
+:- meta_predicate_transparent call_no_cuts(0).
 call_no_cuts(CALL):-clause_safe(CALL,TEST),call_no_cuts_0(TEST).
 
 call_no_cuts_0(true):-!.
@@ -1562,17 +1625,18 @@ call_no_cuts_0(C):-call(C).
 % =====================================================================================================================
 :-export((call_tabled/1)).
 % =====================================================================================================================
-:- meta_predicate call_tabled(^).
+:- meta_predicate_transparent call_tabled(^).
 :- module_transparent call_tabled/1.
 
-:- meta_predicate call_vars_tabled(?,^).
+:- meta_predicate_transparent call_vars_tabled(?,^).
 :- module_transparent call_vars_tabled/2.
 
-:- meta_predicate call_setof_tabled(?,^,-).
+:- meta_predicate_transparent call_setof_tabled(?,^,-).
 :- module_transparent call_setof_tabled/3.
 
 :- dynamic(call_tabled_list/2).
 
+:- meta_predicate_transparent(make_key(*,-)).
 make_key(CC,CC):- notrace(ground(CC)->Key=CC ;(copy_term(CC,Key),numbervars(Key,'$VAR',0,_))),!.
 
 expire_tabled_list(T):- atoms_of(T,A1), CT= call_tabled_list(Key,List),doall(((CT,once(any_term_overlap_atoms_of(A1,List);(not(member(Key,List)),any_term_overlap_atoms_of(A1,Key))),retractall(CT)))).
@@ -1593,7 +1657,7 @@ call_tabled0(Key,_,_,List):- call_tabled_list(Key,List),!.
 call_tabled0(Key,Vars,C,List):- really_can_table,!, no_loop_check(setof(Vars,C,List)),!,asserta_if_ground(call_tabled_list(Key,List)),!.
 call_tabled0(Key,Vars,C,List):- no_loop_check(setof(Vars,C,List)),!,asserta_if_ground(call_tabled_list(Key,List)),!.
 
-really_can_table:-not(cannot_table),can_table.
+really_can_table:-not(thlocal:cannot_table),thlocal:can_table.
 
 
 
@@ -1733,12 +1797,17 @@ module_predicates_are_not_exported_list(ModuleName,Private):- forall(member(F/A,
      (( % dmsg(export(ModuleName:F/A)),
                    ModuleName:export(F/A)))).
 
-% make meta_predicate's module_transparent
+arg_is_transparent(Arg):- member(Arg,[':','^']).
+arg_is_transparent(0).
+arg_is_transparent(Arg):- number(Arg).
+
+% make meta_predicate_transparent's module_transparent
 module_meta_predicates_are_transparent(ModuleName):-
-    forall((module_predicate(ModuleName,F,A),functor_catch(P,F,A), once((predicate_property(ModuleName:P,(meta_predicate( P ))),
-            not(predicate_property(ModuleName:P,(transparent))),P=..[F|Args], (member(X,[':','^']),memberchk(X,Args)) ))),
+    forall((module_predicate(ModuleName,F,A),functor_catch(P,F,A)), 
+      ignore(((predicate_property(ModuleName:P,(meta_predicate( P ))),
+            not(predicate_property(ModuleName:P,(transparent))), arg(_,P,Arg),arg_is_transparent(Arg)),
                    (dmsg(todo(module_transparent(ModuleName:F/A))),
-                   (module_transparent(ModuleName:F/A)))).
+                   (module_transparent(ModuleName:F/A)))))).
 
 
 :- module_predicates_are_exported(bugger).
@@ -1758,3 +1827,8 @@ bugger_error_info(C):-contains_var(existence_error(procedure,s/0),C).
 
 user:prolog_exception_hook(A,B,C,D):-once(copy_term(A,AA)),ccatch(( once(bugger_prolog_exception_hook(AA,B,C,D))),_,fail),fail.
 
+:-'$syspreds':'$hide'('$syspreds':leash/1).
+:-'$syspreds':'$hide'(leash/1).
+:-'$syspreds':'$hide'('$syspreds':visible/1).
+:-'$syspreds':'$hide'(visible/1).
+% :-'$set_predicate_attribute'(!, trace, 1).

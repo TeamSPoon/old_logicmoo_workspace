@@ -12,23 +12,25 @@
 % Douglas Miles
 */
 
+:- dynamic_multifile_exported hook:create_random_fact/1.
+:- dynamic_multifile_exported hook:create_random_instance/3.
 
-:-export((noDefaultValues/1)).
-:-thread_local noDefaultValues/1.
-:-export((noRandomValues/1)).
-:-thread_local noRandomValues/1.
+:-dynamic_multifile_exported((thlocal:noDefaultValues/1)).
+:-dynamic_multifile_exported((thlocal:noRandomValues/1)).
+:-dynamic_multifile_exported((thlocal:insideIREQ/1)).
+
 
 :-meta_predicate_transparent(with_fallbacks(0)).
-with_fallbacks(Call):-with_no_assertions(noDefaultValues(_),Call).
+with_fallbacks(Call):-with_no_assertions(thlocal:noDefaultValues(_),Call).
 
 :-meta_predicate_transparent(with_fallbacksg(0)).
-with_fallbacksg(Call):-with_no_assertions(noRandomValues(_),Call).
+with_fallbacksg(Call):-with_no_assertions(thlocal:noRandomValues(_),Call).
 
 :-meta_predicate_transparent(with_no_fallbacksg(0)).
-with_no_fallbacksg(Call):-with_assertions(noRandomValues(_),Call).
+with_no_fallbacksg(Call):-with_assertions(thlocal:noRandomValues(_),Call).
 
 :-meta_predicate_transparent(with_no_fallbacks(0)).
-with_no_fallbacks(Call):-with_assertions(noDefaultValues(_),Call).
+with_no_fallbacks(Call):-with_assertions(thlocal:noDefaultValues(_),Call).
 
 
 
@@ -59,31 +61,62 @@ choose_for(Prop,Obj,Value):- findall(choose_each(Prop,Obj,Value),choose_each(Pro
    member(choose_each(Prop,Obj,Value),Results).
 
 choose_one(Prop,Obj,Value):- choose_asserted(Prop,Obj,RValue),!,Value=RValue.
-choose_one(Prop,Obj,Value):- with_fallbacks(with_fallbacksg(fallback_value(Prop,Obj,RValue))),checkNoArgViolation(Prop,Obj,RValue),!,Value = RValue,padd(Obj,Prop,Value).
-choose_one(Prop,Obj,Value):- create_someval(Prop,Obj,RValue),checkNoArgViolation(Prop,Obj,RValue),!,Value = RValue,padd(Obj,Prop,Value).
+% was choose_one(Prop,Obj,Value):- with_fallbacks(with_fallbacksg(fallback_value(Prop,Obj,RValue))),checkNoArgViolation(Prop,Obj,RValue),!,Value = RValue,maybe_save(Obj,Prop,Value).
+choose_one(Prop,Obj,_Value):- Call=.. [Prop,Obj,_],thlocal:insideIREQ(Call),!,fail.
+choose_one(Prop,Obj,Value):- with_fallbacks(fallback_value(Prop,Obj,RValue)),ground(choose_one(Prop,Obj,RValue)),checkNoArgViolation(Prop,Obj,RValue),!,Value = RValue,save_fallback(Obj,Prop,Value).
+choose_one(Prop,Obj,Value):- create_someval(Prop,Obj,RValue),ground(create_someval(Prop,Obj,RValue)),ground(create_someval(Prop,Obj,RValue)),checkNoArgViolation(Prop,Obj,RValue),!,Value = RValue,save_fallback(Obj,Prop,Value).
 
 choose_each(Prop,Obj,Value):- mpred_prop(Prop, extentKnown),!,choose_asserted(Prop,Obj,Value).
 choose_each(Prop,Obj,Value):- one_must(choose_asserted(Prop,Obj,Value),(fallback_value(Prop,Obj,Value),maybe_cache(Prop,Obj,Value,Obj))).
 
 % choose_asserted(Prop,Obj,Value):- dbase_t(Prop,Obj,Value). % ,must_det(is_asserted(dbase_t(Prop,Obj,Value))).
 % choose_asserted(Prop,Obj,Value):- is_asserted(dbase_t(Prop,Obj,Value)).
-choose_asserted(Prop,Obj,Value):- var(Obj),!,choose_asserted_mid_order(Prop,Obj,Value).
-choose_asserted(Prop,Obj,Value):- transitive_other(Prop,1,Obj,What),choose_asserted_mid_order(Prop,Obj,Value),maybe_cache(Prop,Obj,Value,What).
+choose_asserted(Prop,Obj,Value):- choose_asserted_mid_order(Prop,Obj,Value).
+choose_asserted(Prop,Obj,Value):- nonvar(Obj),transitive_other(Prop,1,Obj,What),choose_asserted_mid_order(Prop,Obj,Value),maybe_cache(Prop,Obj,Value,What).
 
 choose_asserted_mid_order(Prop,Obj,Value):-loop_check(choose_asserted_mid_order_all(Prop,Obj,Value),fail).
 choose_asserted_mid_order_all(Prop,Obj,Value):- call_mpred(dbase_t(Prop,Obj,Value)).
+choose_asserted_mid_order_all(Prop,Obj,_Value):- Call=.. [Prop,Obj,_],thlocal:insideIREQ(Call),!,fail.
 choose_asserted_mid_order_all(Prop,Obj,Value):- is_asserted(genlPreds(Prop,Other)),choose_asserted(Other,Obj,Value).
 choose_asserted_mid_order_all(Prop,Obj,Value):- is_asserted(genlInverse(Prop,Other)),choose_val(Other,Value,Obj).
 
+:-export(create_someval/3).
+create_someval(Prop,Obj,Value):- ground(Prop-Obj-Value),!,dmsg(error_create_someval(Prop,Obj,Value)).
+create_someval(Prop,Obj,Value):- into_mpred_form(dbase_t(Prop,Obj,Value),Fact),asserted_or_deduced(Fact),!.
+create_someval(Prop,Obj,Value):- into_mpred_form(dbase_t(Prop,Obj,Value),Fact),not(thlocal:noRandomValues(Fact)),hook:create_random_fact(Fact),!.
+create_someval(Prop,Obj,_):- Call=.. [Prop,Obj,_],thlocal:noDefaultValues(Call),!,fail.
+create_someval(Prop,Obj,Value):- fallback_value(Prop,Obj,DValue),!,Value=DValue.
+create_someval(Pred,_Arg1,Value):- must_det_l([moo:mpred_arity(Pred,Last),argIsa_call(Pred,Last,Type),create_random(Type,Value,nonvar(Value))]).
 
+asserted_or_deduced(Fact):- is_asserted(Fact).
+asserted_or_deduced(Fact):- thlocal:noDefaultValues(Fact),!,fail.
+asserted_or_deduced(Fact):- hook:fact_maybe_deduced(Fact).
+asserted_or_deduced(Fact):- deducedSimply(Fact).
+
+:-export(my_random_member/2).
+my_random_member(LOC,LOCS):- length(LOCS,Len),Len>0, X is random(Len),nth0(X,LOCS,LOC).
+randomize_list(LOCS,[LOC|LOCS]):- length(LOCS,Len),Len>0, X is random(Len),nth0(X,LOCS,LOC).
+
+:-export(create_random/3).
+create_random(Type,Value,Test):- copy_term(create_random(Type,Value,Test),create_random(RType,RValue,RTest)),
+   hook:create_random_instance(RType,RValue,RTest),
+   correctType(RValue,Type,Value),must_det(Test).
+create_random(Type,Value,Test):- atom(Type),atom_concat('random_',Type,Pred),Call=..[Pred,Value],predicate_property(Call,_),Call,Test,!.
+create_random(Type,Value,Test):- findall(V,(isa_backchaing(V,Type)),Possibles),Possibles\=[],randomize_list(Possibles,Randomized),!,member(Value,Randomized),Test,!.
+create_random(Type,Value,Test):- trace_or_throw(failed(create_random(Type,Value,Test))).
+
+save_fallback(Obj,Prop,Value):-not(ground(padd(Obj,Prop,Value))),trace_or_throw(var_save_fallback(Obj,Prop,Value)).
+save_fallback(Obj,Prop,Value):-padd(Obj,Prop,Value).
 maybe_cache(Prop,Obj,Value,What):-not(not(maybe_cache_0(Prop,Obj,Value,What))).
 
 :-export(checkNoArgViolation/1).
+checkNoArgViolation(_):- not(bad_idea),!.
 checkNoArgViolation(Fact):-Fact=..[dbase_t,Prop|ObjValue],!,checkNoArgViolation_p_args(Prop,ObjValue),!.
 checkNoArgViolation(Fact):-Fact=..[Prop|ObjValue],!,checkNoArgViolation_p_args(Prop,ObjValue),!.
 checkNoArgViolation(_).
 
 checkNoArgViolation_p_args(isa,_).
+checkNoArgViolation_p_args(_,_):-thlocal:no_arg_type_error_checking,!.
 checkNoArgViolation_p_args(Prop,[Obj,Value]):-!,checkNoArgViolation(Prop,Obj,Value).
 checkNoArgViolation_p_args(Prop,[Obj,Value|_More]):-checkNoArgViolation(Prop,Obj,Value).
 checkNoArgViolation_p_args(_,_).
@@ -100,11 +133,12 @@ checkNoArgViolationOrDeduceInstead(Prop,N,Obj):-argIsa_call(Prop,N,Type),not(unv
 
 checkNoArgViolationOrDeduceInstead(_Prop,_,Obj,_OType,_Type):-var(Obj),!.
 checkNoArgViolationOrDeduceInstead(Prop,N,[Obj],OType,Type):-!,checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type).
-checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type):- not(deduceArgTypes(Prop)),!,reallyCheckArgViolation(Prop,N,Obj,OType,Type).
+checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type):- not(thlocal:deduceArgTypes(Prop)),!,reallyCheckArgViolation(Prop,N,Obj,OType,Type).
 checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type):- deduce_argN(Prop,N,Obj,OType,Type),fail.
 checkNoArgViolationOrDeduceInstead(Prop,N,Obj,_,_):- argIsa_call(Prop,N,Type),findall(OT,isa(Obj,OT),OType),reallyCheckArgViolation(Prop,N,Obj,OType,Type).
 
 reallyCheckArgViolation(Prop,N,_Obj,_OType,argIsaFn(Prop,N)):-!.
+reallyCheckArgViolation(_,_,_,List,Type):-memberchk(Type,List),!.
 reallyCheckArgViolation(Prop,N,Obj,OType,Type):- violatesType(Obj,Type),trace_or_throw(violatesType_maybe_cache(Prop,N,Obj,OType\=Type)).
 
 
@@ -118,12 +152,12 @@ deduce_argN(Prop,2,Obj,OType,argIsaFn(Prop, 2)):-atom_concat(Prop,'_value',Type)
 deduce_argN(Prop,N,Obj,[],Type):- Type \= argIsaFn(Prop,N), type(Type), assert_isa(Obj,Type),!.
 deduce_argN(Prop,N,_Obj,[OType|_],_Type):-assert_subclass_on_argIsa(Prop,N,OType),!.
 
-hook:decl_database_hook(assert(_),Fact):-checkNoArgViolation(Fact).
+hook:decl_database_hook(assert(_),Fact):-slow_kb_op(checkNoArgViolation(Fact)).
 
-maybe_cache_0(Prop,Obj,Value,_What):- checkNoArgViolation(Prop,Obj,Value).
-maybe_cache_0(Prop,Obj,Value,_What):-is_asserted(dbase_t(Prop,Obj,Value)),!.
+maybe_cache_0(Prop,Obj,Value,_What):- checkNoArgViolation(Prop,Obj,Value), is_asserted(dbase_t(Prop,Obj,Value)),!.
 maybe_cache_0(Prop,Obj,Value,What):- padd(Obj,Prop,Value),
-   into_mpred_form(dbase_t(Prop,What,_),Trigger),hooked_asserta(on_change_once(retract(_),Trigger,del(dbase_t(Prop,Obj,Value)))).
+  ignore((What\=Obj,
+   into_mpred_form(dbase_t(Prop,What,_),Trigger),hooked_asserta(on_change_once(retract(_),Trigger,del(dbase_t(Prop,Obj,Value)))))).
 
 :-dynamic_multifile_exported(on_change_once/3).
 :-dynamic_multifile_exported(on_change_always/3).
@@ -134,6 +168,8 @@ unverifiableType(id).
 unverifiableType(mpred).
 unverifiableType(text).
 unverifiableType(fpred).
+unverifiableType(dir).
+unverifiableType(string).
 unverifiableType(formattype).
 unverifiableType(type).
 unverifiableType(term(_)).
@@ -143,6 +179,8 @@ violatesType(Value,Type):-var(Value),!,Type=var.
 violatesType(_,Type):- unverifiableType(Type),!,fail.
 % violatesType(_,type):-!,fail.
 violatesType(Value,int):-number(Value),!,fail.
+violatesType(Value,Type):-atom(Type),isa_backchaing(Value,Type),!,fail.
+violatesType(Value,string):-string(Value),!,fail.
 %violatesType(apath(_,_),Type):-!,(Type\=areaPath,Type\=obj).
 violatesType(Value,Type):- compound(Type),!,not(term_is_ft(Value,Type)),!.
 violatesType(Value,Type):- once((isa_backchaing(Value,_))), no_loop_check(not(isa_backchaing(Value,Type))).
@@ -150,13 +188,17 @@ violatesType(Value,Type):- once((isa_backchaing(Value,_))), no_loop_check(not(is
 hook:decl_database_hook(Type,Changer):- retract(on_change_once(Type,Changer,Call)),Call.
 hook:decl_database_hook(Type,Changer):- forall(on_change_always(Type,Changer,Call),Call).
 
+/*
+% = falbacks come from...
+
+*/
 
 :-export(fallback_value/3).
 fallback_value(Prop,Obj,Value):- is_asserted(dbase_t(Prop,Obj,Value)),!.
 fallback_value(_Prop,Obj,_Value):-var(Obj),!,fail.
 fallback_value(Prop,_Obj,_Value):-no_fallback(Prop,2),!,fail.
 fallback_value(Prop,Obj,Value):-Call=..[Prop,Obj,Value], 
-   with_assertions(noDefaultValues(Call),defaultArgValue(Call,Prop,2,ValueR)),!,
+   with_assertions(thlocal:noDefaultValues(Call),defaultArgValue(Call,Prop,2,ValueR)),!,
    checkNoArgViolation(Prop,Obj,ValueR),
    Value=ValueR.
 
@@ -180,8 +222,8 @@ defaultArgValue(Call,F,LastPlus1,I,_Args,Value):- isa(I,Type),get_type_props(I,T
 defaultArgValue(Call,F,A,_P,_Args,Value):-argIsa_call(F,A,Type),defaultTypeValue(Call,Type,Value),!.
 
 
-defaultTypeValue(Call,_,_):- noRandomValues(Call),!,fail.
-defaultTypeValue(_,Type,_):- noRandomValues(Type),!,fail.
+defaultTypeValue(Call,_,_):- thlocal:noRandomValues(Call),!,fail.
+defaultTypeValue(_,Type,_):- thlocal:noRandomValues(Type),!,fail.
 defaultTypeValue(_Info,dir,"n").
 defaultTypeValue(_Info,int,0).
 defaultTypeValue(Call,Type,Out):- create_random(Type,ROut,nonvar(ROut)),dmsg(defaultArgValue(create_random(Call,Type,ROut=Out))),!,Out=ROut.
@@ -198,17 +240,15 @@ findall_type_default_props(Inst,Type,TraitsO):- % Inst=self,
 
 get_type_with_default_props(Type):-call_tabled(get_type_with_default_props_0(Type)).
 
-get_type_with_default_props_0(Type):- is_asserted_clause(moo:one_default_type_prop(_,Type,_),_),nonvar(Type).
+get_type_with_default_props_0(Type):- is_asserted_clause(moo:default_inst_props(_,Type,_),_),nonvar(Type).
 get_type_with_default_props_0(Type):- is_asserted_clause(moo:default_type_props(Type,_),_),nonvar(Type).
-get_type_with_default_props_0(Type):- is_asserted_clause(moo:default_inst_type_props(_,Type,_),_),nonvar(Type).
 get_type_with_default_props_0(Type):- is_asserted_clause(moo:label_type_props(_,Type,_),_),nonvar(Type).
 
-each_default_inst_type_props(Inst,Type,[Prop]):-call_no_cuts(moo:one_default_type_prop(Inst,Type,Prop)).
-each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(moo:default_inst_type_props(Inst,Type,Props)).
-each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(moo:default_type_props(Type,TProps)),subst(TProps,self,Inst,Props).
+each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(moo:default_inst_props(Inst,Type,TProps)),subst(TProps,self,Inst,Prop),flatten([Prop],Props).
+each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(moo:default_type_props(Type,TProps)),subst(TProps,self,Inst,Prop),flatten([Prop],Props).
 each_default_inst_type_props(Inst,Type,[named(Inst),kwLabel(Lbl)|Props]):-call_no_cuts(moo:label_type_props(Lbl,Type,Props)).
 
-moo:one_default_type_prop(apath(Region,_Dir),areaPath,inRegion(Region)).
+moo:default_inst_props(apath(Region,_Dir),areaPath,inRegion(Region)).
 
 :-export((get_type_props/3)).
 get_type_props(Inst,Type,PropList):- with_no_fallbacks(with_no_fallbacksg(loop_check(get_type_props_lc(Inst,Type,PropList),fail))).
@@ -235,7 +275,7 @@ inst_missing_prop(I,P):-P=..[F|Args],inst_missing_prop(I,F,Args).
 
 inst_missing_prop(_I,F,_Args):-not(mpred_prop(F,singleValued)),!,fail.
 inst_missing_prop(_I,F,_Args):-mpred_prop(F,flag),!,fail.
-inst_missing_prop(I,F,Args):-C=..[F,I|Args],get_sv_argnum(F,[I|Args],A),arg(A,C,_Default),replace_arg(C,A,BLANK,COLD),ignore(qreq(COLD)),!,var(BLANK).
+inst_missing_prop(I,F,Args):-C=..[F,I|Args],get_sv_argnum(F,[I|Args],A),arg(A,C,_Default),replace_arg(C,A,BLANK,COLD),ignore(ireq(COLD)),!,var(BLANK).
 
 get_sv_argnum(F,Args,ArgNum):-once(mpred_prop(F,functionalArg(ArgNum));length(Args,ArgNum)).
 

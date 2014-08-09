@@ -279,8 +279,8 @@ arg_to_var(_Type,_String,_Var).
 
 :-export(same_arg/3).
 
-same_arg(_How,X,Y):-var(X),var(Y),!,grtrace,X=Y.
-same_arg(equals,X,Y):-!, unify_with_occurs_check(X,Y).
+same_arg(_How,X,Y):-var(X),var(Y),!,X=Y.
+same_arg(equals,X,Y):-!,equals_call(X,Y).
 same_arg(type(_Type),X,Y):-!, unify_with_occurs_check(X,Y).
 
 same_arg(text,X,Y):-!, string_equal_ci(X,Y).

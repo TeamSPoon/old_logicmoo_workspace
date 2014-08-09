@@ -137,18 +137,12 @@ flows(R,C) :- flows(R,C,_).
 
 flows(R,C1,C2) :- river(R,L), links(L,C2,C1).
 
-:- retract((thlocal:enable_src_loop_checking)).
-
-
 first([X|_],X).
 
-/*
-% Same as from lists
-last([X],X).
+/*last([X],X).
 last([_|L],X) :- last(L,X).
 */
 
 links([X1,X2|_],X1,X2).
 links([_|L],X1,X2) :- links(L,X1,X2).
-
 

@@ -59,7 +59,7 @@ hook:call_agent_action(Agent,CMDI):-
    thread_self(TS),
    (TS=main -> Wrapper = call ; Wrapper = notrace),
    with_assertions(thlocal:session_agent(TS,Agent),
-     with_assertions(agent_current_action(Agent,CMD),
+     with_assertions(thlocal:agent_current_action(Agent,CMD),
       call(Wrapper, call_agent_action_lc(Agent,CMD)))).
 
 :-export(where_atloc/2).

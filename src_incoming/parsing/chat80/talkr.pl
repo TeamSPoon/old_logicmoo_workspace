@@ -97,14 +97,11 @@ satisfy(numberof(X,P,N)) :- !, setof(X,satisfy(P),S), length(S,N).
 satisfy(setof(X,P,S)) :- !, setof(X,satisfy(P),S).
 satisfy(+P) :- exceptionto(P), !, fail.
 satisfy(+_P) :- !.
-satisfy(P) :- not(canSort([X,Y])),!, call_mpred(P).
-satisfy(X<Y) :-  !, X<Y.
-satisfy(X=<Y) :-  !, X=<Y.
+satisfy(X<Y) :- !, X<Y.
+satisfy(X=<Y) :- !, X=<Y.
 satisfy(X>=Y) :- !, X>=Y.
 satisfy(X>Y) :- !, X>Y.
-satisfy(P) :- call_mpred(P).
-
-canSort([X,Y]):-number(X),!,number(Y).
+satisfy(P) :- P.
 
 exceptionto(P) :-
    functor(P,F,N), functor(P1,F,N),

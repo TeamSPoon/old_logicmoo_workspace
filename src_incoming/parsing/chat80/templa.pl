@@ -18,8 +18,6 @@
 |_________________________________________________________________________|
 
 */
-:- asserta((thlocal:enable_src_loop_checking)).
-:- dynamic_multifile_exported((moo:trans/9)).
 
 /* Nouns */
 
@@ -118,14 +116,11 @@ measure(million,measure&heads,[],million).
 units(large,measure&_).
 units(small,measure&_).
 
-slotval_sign(large,+).
-slotval_sign(small,-).
-slotval_sign(great,+).
+sign(large,+).
+sign(small,-).
+sign(great,+).
 
 /* Proportions and the like */
 
 comparator(proportion,_,V,[],proportion(V)).
 comparator(percentage,_,V,[],proportion(V)).
-
-:- retract((thlocal:enable_src_loop_checking)).
-

@@ -19,8 +19,98 @@ oncely(:-(Call)):-!,call_expanded(Call).
 oncely(Call):-once(Call).
 
 
-:-thread_local assertedOnly/1.
-:-thread_local with_callMPred/1.
+
+% ================================================
+% call_collect/2,4
+% ================================================
+call_collect(Ops,Call):-call_collect(Ops,Ops,Call,Call).
+
+call_collect(Ops,Flags,Call,Vars):-ground(Call),not(member(ground,Flags)),!,call_collect(Ops,[ground|Flags],Call,Vars).
+call_collect(Ops,Flags,Call,Vars):-predicate_property(Call,_),not(member(defined,Flags)),!,call_collect(Ops,[defined|Flags],Call,Vars).
+call_collect(Ops,Flags,Call,Vars):-call_collect_op(Ops,Flags,Call,Vars,[],Results),!,member(Vars,Results).
+
+% complete
+call_collect_op([],_Flags,_Call,_,Results,Results):-!.
+
+% early complete
+call_collect_op(_,Flags,Call,Vars,ResultsIn,ResultsOut):- member(firstValue,Flags),length(ResultsIn,L),L>0, member(Minus,[-(_),?(_)]), not(member(Minus,Flags)),!,
+   must_det(ResultsIn=ResultsOut),!.
+
+% push flag
+call_collect_op([flag(+Flag)|Op2],FlagsIn,Call,Vars,ResultsIn,ResultsOut):- !,
+   ord_union(FlagsIn,[Flag],NewFlags),
+   call_collect_op(Op2,NewFlags,Call,Vars,ResultsIn,ResultsOut).
+
+% remove flag
+call_collect_op([flag(-Flag)|Op2],FlagsIn,Call,Vars,ResultsIn,ResultsOut):- !,
+   ord_subtract(FlagsIn,[Flag],NewFlags),
+   call_collect_op(Op2,NewFlags,Call,Vars,ResultsIn,ResultsOut).
+
+% replace flags
+call_collect_op([flags(NewFlags)|Op2],_OldFlags,Call,Vars,ResultsIn,ResultsOut):- !,
+   call_collect_op(Op2,NewFlags,Call,Vars,ResultsIn,ResultsOut).
+
+% sequential opers
+call_collect_op([Op1|Op2],Flags,Call,Vars,ResultsIn,ResultsOut):- !,
+   call_collect_op(Op1,[doing(Op,Call)|Flags],Call,Vars,ResultsIn,ResultsMid),   
+   call_collect_op(Op2,[done(Op,Call)|Flags],Call,Vars,ResultsMid,ResultsOut).
+
+% with_assertions
+call_collect_op(with_assertions(Assertions,Op2),Flags,Call,Vars,ResultsIn,ResultsOut):- !,
+   with_assertions(Assertions, call_collect_op(Op2,Flags,Call,Vars,ResultsIn,ResultsOut)).
+
+% with_assertions
+call_collect_op(with_no_assertions(Assertions,Op2),Flags,Call,Vars,ResultsIn,ResultsOut):- !,
+   with_no_assertions(Assertions, call_collect_op(Op2,Flags,Call,Vars,ResultsIn,ResultsOut)).
+
+% add to set
+call_collect_op(+Op,Flags,Call,Vars,ResultsIn,ResultsOut):- !,
+   setof(Vars,call_one(Op,Flags,Call,Vars),ResultsN), 
+   ord_union(ResultsIn,ResultsN,ResultsOut).
+
+% remove from set
+call_collect_op(-Op,Flags,Call,Vars,ResultsIn,ResultsOut):- !,
+   setof(Vars,(member(Vars,ResultsIn),not(call_one(Op,Flags,Call,Vars))),ResultsOut).
+
+% retain only
+call_collect_op('?'(Op),Flags,Call,Vars,ResultsIn,ResultsOut):- !,
+   setof(Vars,(member(Vars,ResultsIn),call_one(Op,Flags,Call,Vars)),ResultsOut).
+
+% unknown option
+call_collect_op(Op,Flags,Call,Vars,ResultsIn,ResultsOut):- 
+   dmsg(error_call_collect(Op,Flags,Call,Vars,ResultsIn,ResultsOut)),
+     ResultsIn=ResultsOut.
+
+% ================================================
+% call_one/4
+% ================================================
+% and
+call_one((Op1,Op2),Flags,Call,Vars):-  call_collect(Op1,Flags,Call,Vars), call_collect(Op2,Flags,Call,Vars).
+% or
+call_one((Op1;Op2),Flags,Call,Vars):- call_collect(Op1,Flags,Call,Vars), call_collect(Op2,Flags,Call,Vars).
+% basic call
+call_one(call,_Flags,Call,Vars):- call(Call).
+% not
+call_one(not(Op1),Flags,Call,Vars):-  not(call_collect(Op1,Flags,Call,Vars)).
+% succeed vars
+call_one(v(Vars),_Flags,Call,Vars):-!.
+% succeed call
+call_one(c(Call),_Flags,Call,Vars):-!.
+% hook:deduce_facts
+call_one(deducedSimply,_Flags,Call,Vars):-!, deducedSimply(Call).
+% is_asserted
+call_one(asserted,_Flags,Call,Vars):-!, is_asserted(Call).
+% macro/1
+call_one(macro(Macro),_Flags,Call,Vars):- subst(Macro,c,Call,Macro1),subst(Macro1,v,Vars,Macro2),call(Macro2).
+% call something else
+call_one(Other,_Flags,Call,Vars):- call(Other,Call).
+
+
+
+deducedSimply(Call):- clause(hook:deduce_facts(Fact,Call),Body),nonvar(Fact),Body,dmsg((deducedSimply2(Call):-Fact)),!,show_call((is_asserted(Fact),ground(Call))).
+
+% deducedSimply(Call):- clause(hook:deduce_facts(Fact,Call),Body),nonvar(Fact),Body,ground(Call),dmsg((deducedSimply1(Call):-Fact)),show_call((is_asserted(Fact),ground(Call))).
+
 
 % ================================================
 % call_expanded_for/2
@@ -44,20 +134,21 @@ call_expanded_for_vars(must,F,Vs,Call):- !,must(call_expanded_for_all(must,F,Vs,
 call_expanded_for_vars(Op,F,[],Call):- !,once(call_expanded_for_all(Op,F,[],Call)).
 call_expanded_for_vars(Op,F,Vs,Call):- call_expanded_for_all(Op,F,Vs,Call).
 
+sc1(dbase_t_p2,C):-dtrace,trace_or_throw(sc1(dbase_t_p2,C)),!,C.
 sc1(F,C):-(mpred_prop(F,nonGroundOK);in_prolog_source_code),!,C.
 sc1(_,C):-C, ignore((not(ground(C)),dmsg(non_ground_sc1(C)))).
 
 % call_expanded_for_all(Must,F,Vs,Call):- loop_check(sc1(F,call_expanded_for_all0(Must,F,Vs,Call)),(dmsg(failed_looped(call_expanded_for_all0(Must,F,Vs,Call))),!,fail)).
 call_expanded_for_all(Must,F,Vs,Call):- loop_check(sc1(F,call_expanded_for_all0(Must,F,Vs,Call)),fail).
 
-call_expanded_for_all0(_,subclass,_Vs,C):-!,is_asserted(subclass,C).
-call_expanded_for_all0(_,isa_backchaing,_Vs,C):-!,C.
+%call_expanded_for_all0(_,subclass,_Vs,C):-!,is_asserted(subclass,C).
+%call_expanded_for_all0(_,isa_backchaing,_Vs,C):-!,C.
 
 % call_expanded_for_all0(Op, F,Vs,Wild):-dmsg(call_expanded_for(Op,Wild)),fail.
-call_expanded_for_all0(assertedOnly,_,_Vs,C):-!,dtrace,is_asserted(C).
-call_expanded_for_all0(_ ,F,[],Call):-!,call_mpred(F,Call),!.
-call_expanded_for_all0(_ ,F,_Vs,Call):-not(arg(_,Call,vvar)),!,call_mpred(F,Call),!.
-call_expanded_for_all0(_ ,F,Vs,Call):- setof(Vs,call_mpred(F,Call),VVs),member(Vs,VVs).
+call_expanded_for_all0(assertedOnly,F,_Vs,C):-!,with_assertions(thlocal:assertedOnly(F),call_mpred_real(F,Call)).
+call_expanded_for_all0(_ ,F,[],Call):-!,call_mpred_real(F,Call),!.
+call_expanded_for_all0(_ ,F,_Vs,Call):-not(has_free_args(Call)),!,call_mpred_real(F,Call),!.
+call_expanded_for_all0(_ ,F,Vs,Call):- setof(Vs,call_mpred_real(F,Call),VVs),member(Vs,VVs).
 
 /*
 
@@ -70,44 +161,59 @@ call_expanded_for_sv_2(_WhatNot,F,A,G,OUT):- defaultArgValue(G,F,A,OUT),!.
 */
 
 :-export(call_expanded/1).
-%:-export(call_expanded/1).
-call_expanded(G):- var(G),!,trace_or_throw(var_call_expanded(G)).
-call_expanded(true):-!.
-call_expanded(G):-compound(G),!,call_expanded([],G).
-:-export(call_expanded/2).
-call_expanded(Doing,G):- functor(G,F,A),call_expanded(Doing,G,F,A).
-:-export(call_expanded/4).
-call_expanded(_Doing,true,_F,_A):-!.
-call_expanded(Doing,G,dbase_t,A):-G=..[dbase_t,P|ARGS],!,into_mpred_form(G,dbase_t,P,A,ARGS,O),!,call_expanded(Doing,O).
-call_expanded(_Doing,G,F,_A):-predicate_property(G,visible),not(mpred_prop(F,_)),!,debugOnError(G).
-call_expanded(Doing,G,F,A):-not(member(singleValued,Doing)),mpred_prop(F,singleValued),arg(1,G,NonVar),nonvar(NonVar),!,once(call_expanded([singleValued|Doing],G,F,A)).
-call_expanded(Doing,G,F,A):-not(member(ask_module(_),Doing)),mpred_prop(F,ask_module(M)),!,'@'(M:call(call_expanded([ask_module(M)|Doing],M:G,F,A)),M).
-call_expanded(Doing,G,F,A):-not(member(query_with_pred(_),Doing)),mpred_prop(F,query_with_pred(M)),!,call_expanded([query_with_pred(M)|Doing],call(M,G),F,A).
-call_expanded(Doing,G,F,A):-not(member(assertedOnly,Doing)),!,is_asserted(G);call_expanded([assertedOnly|Doing],G,F,A).
-call_expanded(_Doing,G,F,_A):-assertedOnly(F),!,is_asserted(G).
-call_expanded(_Doing,G,F,_A):-with_callMPred(F),!,call_mpred(F,G).
-call_expanded(Doing,G,F,A):-not(member(with_callMPred,Doing)),!,(call_mpred(F,G);call_expanded([with_callMPred|Doing],G,F,A)).
+call_expanded(C):-call_mpred_real(C).
+:-export(call_mpred/1).
+call_mpred(C):- call_mpred_real(C).
+:-export(call_mpred/2).
+call_mpred(F,C):- call_mpred_real(F,C).
 
 
+check_mcall_ok(_):-!.
+check_mcall_ok(C):-functor(C,F,_),not(mpred_prop(F,_)),!,ignore(check_was_known_false(C)),!.
 check_mcall_ok(C):-checkNoArgViolation(C),check_was_known_false(C),!.
 check_mcall_ok(_).
 
-call_mpred(M:C):-atom(M),!,call_mpred(C).
-call_mpred(C):- compound(C),functor(C,F,_),!,call_mpred(F,C).
-call_mpred(F,C):- not(predicate_property(C,_)),!,is_asserted(F,C).
-call_mpred(F,C):- mpred_prop(F,hasStub(body_req)),!,debugOnError(C),check_mcall_ok(C).
-call_mpred(F,C):- ground(C),!,call_mpred_g(F,C),!.
-call_mpred(F,C):- findall(C,is_asserted(F,C),Results),call_mpred_w_results(C,Results).
-call_mpred_w_results(C,Results):-member(C,Results).
-call_mpred_w_results(C,Results):-debugOnError(C),not(member(C,Results)),check_mcall_ok(C).
-call_mpred_g(F,C):-is_asserted(F,C),!.
-call_mpred_g(_,C):-debugOnError(C),!,check_mcall_ok(C).
+call_mpred_real(G):- var(G),!,trace_or_throw(var_call_expanded(G)).
+call_mpred_real(M:C):-atom(M),!,call_mpred_real(C).
+call_mpred_real(true):-!.
+call_mpred_real(C):- compound(C),functor(C,F,_),!,call_mpred_real(F,C).
+call_mpred_real(C):- debugOnError(C).
+
+call_mpred_real(F,C):- mpred_prop(F,hasStub(body_req)),!,call_mpred_to_module(F,C).
+call_mpred_real(F,C):- mpred_prop(F,prologOnly),!,call_mpred_to_module_checked(F,C).
+call_mpred_real(F,C):- thlocal:assertedOnly(F),!,is_asserted(G).
+
+call_mpred_real(F,C):- (ground(C);mpred_prop(F,singleValued)),!,call_mpred_real_g(F,C),!.
+
+% nonground
+call_mpred_real(F,C):- not(mpred_prop(F,_)),!,call_mpred_to_module_checked(F,C).
+call_mpred_real(F,C):- not(predicate_property(C,_)),!,is_asserted(F,C).
+call_mpred_real(F,C):- setof(C,is_asserted(F,C),Results),call_mpred_real_w_results(C,Results).
+
+call_mpred_real_w_results(C,Results):-member(C,Results).
+call_mpred_real_w_results(C,Results):-predicate_property(C,_),!,call_mpred_to_module(F,C),not(member(C,Results)),check_mcall_ok(C).
+
+% ground
+call_mpred_real_g(F,C):- not(mpred_prop(F,_)),!,call_mpred_to_module_checked(F,C).
+call_mpred_real_g(F,C):- not(predicate_property(C,_)),!,is_asserted(F,C).
+call_mpred_real_g(_,C):- call_mpred_to_module_checked(F,C).
+call_mpred_real_g(F,C):- is_asserted(F,C).
+
+
+call_mpred_to_module_checked(F,C):-call_mpred_to_module(F,C),check_mcall_ok(C).
+
+call_mpred_to_module(F,C):- predicate_property(C,visible),not(mpred_prop(F,_)),!,debugOnError(C).
+call_mpred_to_module(F,C):- mpred_prop(F,query_with_pred(P)),PC=..[P,C],!,debugOnError(PC).
+call_mpred_to_module(F,C):- mpred_prop(F,ask_module(M)),context_module(M2),M\=M2,!,dmsg(calling_in_other_module(M2:M:debugOnError(C))),'@'(M:debugOnError(C),M).
+call_mpred_to_module(F,C):- not(predicate_property(C,_)),!,functor(C,F,A),dmsg(todo(non_existent(F/A,C))),!,fail,decl_mpred_hybrid(F,A),!,debugOnError(C).
+call_mpred_to_module(F,C):- debugOnError(C).
 
 
 naf(Goal):-not(req(Goal)).
 
 :-decl_mpred_prolog(naf/1).
-:-decl_mpred_prolog(call_mpred/1).
+:-decl_mpred_prolog(call_mpred_real/1).
+
 
 
 

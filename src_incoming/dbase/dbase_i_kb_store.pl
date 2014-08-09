@@ -86,13 +86,10 @@ non_assertable(WW,notAssertable(Why)):- compound(WW),functor_catch(WW,F,_),mpred
 % into_hilog_form/into_mpred_form
 % ========================================
 
-:-thread_local(thlocal:into_form_code/0).
-:-dynamic_multifile_exported(thlocal:into_form_code/0).
-
 :-'$hide'(expanded_different/2).
 :-export(expanded_different/2).
 
-expanded_different(G0,G1):-with_assertions(into_form_code,expanded_different_ic(G0,G1)).
+expanded_different(G0,G1):-with_assertions(thlocal:into_form_code,expanded_different_ic(G0,G1)).
 
 expanded_different_ic(G0,G1):-G0==G1,!,fail.
 expanded_different_ic(G0,G1):-expanded_different_1(G0,G1),!.
@@ -171,13 +168,14 @@ into_mpred_form(G,O):- functor(G,F,A),G=..[F,P|ARGS],!,into_mpred_form(G,F,P,A,A
 
 % TODO confirm negations
 into_mpred_form(_,':-',C,1,_,':-'(C)):-!.
+into_mpred_form(C,isa,_,2,_,C):-!.
 into_mpred_form(H,_,_,_,_,GO):- with_assertions(thlocal:into_form_code,once((expand_term( (H :- true) , C ), reduce_clause(C,G)))),expanded_different(H,G),!,into_mpred_form(G,GO),!.
 into_mpred_form(_,not,C,1,_,not(O)):-into_mpred_form(C,O),!.
 into_mpred_form(G,F,C,1,_,O):-predicate_property(G,builtin),!,into_mpred_form(C,OO),O=..[F,OO].
 into_mpred_form(C,_,_,_,_,isa(I,T)):-was_isa(C,I,T),!.
+into_mpred_form(_X,dbase_t,P,_N,A,O):-!,(atom(P)->O=..[P|A];O=..[dbase_t,P|A]).
 into_mpred_form(_X,H,P,_N,A,O):-is_holds_true(H),(atom(P)->O=..[P|A];O=..[dbase_t,P|A]).
 into_mpred_form(_X,H,P,_N,A,O):-is_holds_false(H),(atom(P)->(G=..[P|A],O=not(G));O=..[cholds_f,P|A]).
-into_mpred_form(X,_,_,_,_,isa(I,C)):-was_isa(X,I,C),!.
 into_mpred_form(X,_H,_P,_N,_A,X).
 
 
@@ -210,13 +208,14 @@ add_w_hooks_fallback(Data,Gaf):-asserta_if_new(Data),asserta_if_new(Gaf),run_dat
 % ================================================
 % fact_checked/2, fact_loop_checked/2
 % ================================================
-:-meta_module_transparent(fact_checked(0,0)).
+:- meta_predicate_transparent(fact_checked(0,0)).
 
-fact_checked(Fact,Call):- no_loop_check(fact_checked0(Fact,Call)).
+% fact_checked(Fact,Call):- no_loop_check(fact_checked0(Fact,Call)).
+fact_checked(Fact,Call):- loop_check(fact_checked0(Fact,Call),fail).
 fact_checked0(Fact,Call):- not(ground(Fact)),!,Call.
-fact_checked0(Fact,_):-is_known_false(Fact),!,fail.
-%fact_checked0(Fact,_):-is_known_true(Fact),!.
-fact_checked0(_Fact,Call):-Call,!.
+fact_checked0(Fact,_):- is_known_true(Fact),!.
+fact_checked0(Fact,_):- is_known_false(Fact),!,fail.
+fact_checked0(_Fact,Call):-Call,!. % ,asserta(is_known_true(Fact)).
 % would only work outside a loop checker (so disable)
 % fact_checked0(Fact,_Call):- really_can_table_fact(Fact),asserta(is_known_false(Fact)),!,dmsg(is_known_false(Fact)),!,fail.
 
@@ -229,7 +228,7 @@ can_table_functor(_).
 cannot_table_functor(atloc).
 cannot_table_functor(isa).
 
-:-meta_module_transparent(fact_loop_checked(-,0)).
+:-meta_predicate_transparent(fact_loop_checked(+,0)).
 fact_loop_checked(Fact,Call):- fact_checked(Fact,loop_check(Call,fail)).
 
 % ================================================
@@ -261,8 +260,11 @@ is_asserted_lc_isa(isa,2,isa(I,C)):-!,is_asserted_mpred_clause_isa(I,C).
 is_asserted_lc_isa(dbase_t,2,dbase_t(C,I)):-!,is_asserted_mpred_clause_isa(I,C).
 is_asserted_lc_isa(C,1,G):-arg(1,G,I),!,is_asserted_mpred_clause_isa(I,C).
 
-is_asserted_mpred_clause_isa(I,C):-alt_dbase_t(I,C).
+is_asserted_mpred_clause_isa(I,C):-isa_asserted(C,I).
 
+
+is_asserted_mpred(G):-var(G),!,trace_or_throw(var_is_asserted_mpred(G)).
+is_asserted_mpred(mpred_prop(F,P)):-!,mpred_prop(F,P).
 is_asserted_mpred(G):-fact_loop_checked(G,asserted_mpred_clause(G)).
 
 :-dynamic(was_asserted_gaf/1).
@@ -331,12 +333,12 @@ ensure_predicate_reachable(_,_).
 ensure_predicate_reachable(M,C,dbase_t,Ap1):-C=..[_,F|_RGS],A is Ap1 -1, declare_dbase_local_dynamic_really(M,F,A).
 
 % singletons_throw_or_fail(_):- is_stable,!,fail.
-singletons_throw_or_fail(C):- contains_singletons(C),trace_or_throw(contains_singletons(C)).
+singletons_throw_or_fail(C):- contains_singletons(C), (thlocal:adding_from_srcfile->dmsg(contains_singletons(C)); trace_or_throw(contains_singletons(C))).
 nonground_throw_or_fail(C):- throw_if_true_else_fail(not(ground(C)),C).
 
 
 into_assertable_form_trans(G,was_asserted_gaf(G)):- functor_catch(G,F,_),mpred_prop(F,was_asserted_gaf),!.
-into_assertable_form_trans(G,was_asserted_gaf(G)):- functor_catch(G,F,_),mpred_prop(F,query_with_pred(was_asserted_gaf)).
+into_assertable_form_trans(G,was_asserted_gaf(G)):- functor_catch(G,F,_),mpred_prop(F,query_with_pred(was_asserted_gaf)),!.
 
 /*
 into_assertable_form(M:H,G):-atom(M),!,into_assertable_form(H,G).

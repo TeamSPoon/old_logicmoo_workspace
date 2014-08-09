@@ -143,7 +143,7 @@ locs_near_i(L1,L2):- locationToRegion(L1,R),pathBetween_call(R,_,R2),in_grid(R2,
 region_near(R1,R2):-pathBetween_call(R1,_,R2).
 region_near(R1,R1).
 
-moo:default_inst_type_props(OfAgent,agent,[facing(F),atloc(L)]):-ignore((nonvar(OfAgent),create_someval(facing,OfAgent,F),create_someval(atloc,OfAgent,L))).
+moo:default_inst_props(OfAgent,agent,[facing(F),atloc(L)]):-ignore((nonvar(OfAgent),create_someval(facing,OfAgent,F),create_someval(atloc,OfAgent,L))).
 
 moo:transitive_other(atloc,1,Obj,What):-inside_of(Obj,What).
 
@@ -169,39 +169,32 @@ put_in_world_lc_gen(Obj):-choose_for(facing,Obj,_),!,must_det((choose_for(atloc,
 
 ensure_in_world(What):-must_det(put_in_world(What)).
 
-:-export(create_someval/3).
 
-create_someval(Prop,Obj,LOC):- ground(Prop-Obj-LOC),!,dmsg(create_someval(Prop,Obj,LOC)).
-create_someval(atloc,Obj,LOC) :- must_det(nonvar(Obj)),
-   must_det(actualRegion(Obj,Region)),
-   must_det((in_grid(Region,LOC),unoccupied(Obj,LOC))),!.
+:- dynamic_multifile_exported hook:decl_database_hook/2.
+:- dynamic_multifile_exported hook:deduce_facts/2.
+:- dynamic_multifile_exported hook:create_random_fact/1.
+:- dynamic_multifile_exported hook:create_random_instance/3.
+:- dynamic_multifile_exported hook:fact_maybe_deduced/1.
 
-% create_someval(inRegion,Obj,Region) :- actualRegion(Obj,Region),!.
+%  suggest a deducable fact that is probably not already asserted
+hook:fact_maybe_deduced(inRegion(Obj,Region)):- is_asserted(atloc(Obj,LOC)),locationToRegion(LOC,Region),!.
+hook:fact_maybe_deduced(inRegion(apath(Region,Dir),Region)):-is_asserted(pathBetween(Region,Dir,_)).
 
-create_someval(Prop,Obj,_):- Call=.. [Prop,Obj,_],noDefaultValues(Call),!,fail.
-create_someval(Prop,Obj,Value):- fallback_value(Prop,Obj,DValue),!,Value=DValue.
-create_someval(Pred,_Arg1,Value):- must_det_l([moo:mpred_arity(Pred,Last),argIsa_call(Pred,Last,Type),create_random(Type,Value,nonvar(Value))]).
+%  suggest a random fact that is probably not already true
+hook:create_random_fact(atloc(Obj,LOC)) :- must_det(nonvar(Obj)),!,asserted_or_deduced(inRegion(Obj,Region)),must_det((in_grid(Region,LOC),unoccupied(Obj,LOC))),!.
+hook:create_random_fact(inRegion(Obj,Region)) :- must_det(nonvar(Obj)),!,asserted_or_deduced(inRegion(Obj,Region)).
 
-:-export(create_random/3).
-create_random(dir,Dir,Test) :- my_random_member(Dir,[n,s,e,w,ne,nw,se,sw]),Test,!.
-create_random(Type,Value,Test):- atom(Type),atom_concat('random_',Type,Pred),Call=..[Pred,Value],predicate_property(Call,_),Call,Test,!.
-create_random(Type,Value,Test):- findall(V,(isa_backchaing(V,Type)),Possibles),Possibles\=[],randomize_list(Possibles,Randomized),!,member(Value,Randomized),Test,!.
-create_random(Type,Value,Test):- trace_or_throw(failed(create_random(Type,Value,Test))).
-create_random(int,3,Test):-call(Test),dmsg(create_random(int,3,Test)),dtrace.
+%  suggest random values
+hook:create_random_instance(dir,Dir,Test) :- my_random_member(Dir,[n,s,e,w,ne,nw,se,sw]),Test,!.
+hook:create_random_instance(int,3,Test):-call(Test),dmsg(create_random(int,3,Test)),dtrace.
 
-
-actualRegion(Obj,Region):- is_asserted(inRegion(Obj,Region)),!.
-actualRegion(Obj,Region):- is_asserted(atloc(Obj,LOC)),locationToRegion(LOC,Region),!.
-actualRegion(apath(Region,_),Region):-!.
-
+%  give required forward deductions
+hook:deduce_facts(atloc(Obj,LOC),inRegion(Obj,Region)):-must_det(nonvar(LOC)),locationToRegion(LOC,Region).
+hook:deduce_facts(inRegion(Obj,_),atloc(Obj,LOC)):-must_det(nonvar(Obj)), put_in_world(Obj),must_det(atloc(Obj,LOC)).
 
 
 % random_region(LOC):- findall(O,isa(O,region),LOCS),my_random_member(LOC,LOCS).
 
-:-export(my_random_member/2).
-
-my_random_member(LOC,LOCS):- length(LOCS,Len),Len>0, X is random(Len),nth0(X,LOCS,LOC).
-randomize_list(LOCS,[LOC|LOCS]):- length(LOCS,Len),Len>0, X is random(Len),nth0(X,LOCS,LOC).
 
 random_xyz(LOC):-
    must_det(create_random(region,Region,true)),
@@ -266,6 +259,7 @@ compute_dir(Region1,X,Y,Z,Dir):-
 
 :-export(dir_offset/5).
 
+% :-decl_mpred_hybrid(dir_offset(string,int,int,int,int)).
 dir_offset(u,F,0,0,F).
 dir_offset(d,F,0,0,-F).
 dir_offset(n,F,0,-F,0).

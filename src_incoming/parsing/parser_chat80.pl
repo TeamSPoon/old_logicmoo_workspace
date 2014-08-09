@@ -51,7 +51,9 @@ moo:agent_call_command(_Gent,chat80(StringM)):- do_chat80(StringM).
 % ===========================================================
 chat80 :- told, repeat, prompt_read('CHAT80> ',U),  to_word_list(U,WL),do_chat80(WL).
 
-:- asserta(thlocal:into_form_code).   
+%:- multifile(thlocal:into_form_code/0).
+%:- asserta(thlocal:into_form_code).
+
 
 :- include(logicmoo(parsing/chat80/xgproc)).	% XG generator
 
@@ -64,6 +66,7 @@ chat80 :- told, repeat, prompt_read('CHAT80> ',U),  to_word_list(U,WL),do_chat80
 :- include(logicmoo(parsing/chat80/xgrun)).	% XG runtimes
 % :- include(logicmoo(parsing/chat80/newg)).		% clone + lex
 
+%:- retract(thlocal:into_form_code).
 
 :- include(logicmoo(parsing/chat80/clotab)).	% attachment tables
 :- include(logicmoo(parsing/chat80/newdict)).	% syntactic dictionary
@@ -91,7 +94,8 @@ chat80 :- told, repeat, prompt_read('CHAT80> ',U),  to_word_list(U,WL),do_chat80
 :-export(test_chat80_regressions/0).
 test_chat80_regressions:- time(hi(logicmoo(parsing/chat80/demo))).
 
-:- retract(thlocal:into_form_code).
+
+:- retractall(thlocal:enable_src_loop_checking).
 
 
 moo:mud_test(chat80_regressions,test_chat80_regressions).

@@ -82,8 +82,9 @@ load_default_game:- load_game(logicmoo('rooms/startrek.all.plmoo')).
 
 startup_mod:run_setup_now:-
    within_user((
-   load_default_game,
-   register_timer_thread(npc_ticker,90,npc_tick))).
+   load_default_game
+   % TO UNDO register_timer_thread(npc_ticker,90,npc_tick)
+   )).
 
 run_setup:- within_user(at_start(startup_mod:run_setup_now)).
 

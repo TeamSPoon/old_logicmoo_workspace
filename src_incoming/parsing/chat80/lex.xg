@@ -91,3 +91,5 @@ conj(Conj,list,end) -->
 loc_pred(P) -->
    [W],
    {loc_pred(W,P)}.
+
+

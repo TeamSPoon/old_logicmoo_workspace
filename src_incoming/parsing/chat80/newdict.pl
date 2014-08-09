@@ -19,8 +19,7 @@
 
 */
 :- style_check(-discontiguous).
-:- asserta((thlocal:enable_src_loop_checking)).
-:- dynamic_multifile_exported((moo:trans/9)).
+
 % =================================================================
 % General Dictionary
 
@@ -237,7 +236,8 @@ noun_sin(river).
 noun_sin(sea).
 noun_sin(seamass).
 noun_sin(number).
-noun_sin(Sing):-noun_plu(_,Sing).
+noun_sin(agent).
+
 
 noun_plu(averages,average).
 noun_plu(totals,total).
@@ -264,8 +264,7 @@ noun_plu(rivers,river).
 noun_plu(seas,sea).
 noun_plu(seamasses,seamass).
 noun_plu(numbers,number).
-
-
+noun_plu(agents,agent).
 
 verb_root(border).
 verb_root(contain).
@@ -334,43 +333,4 @@ verb_type(flow,main+intrans).
 
 adverb(yesterday).
 adverb(tomorrow).
-
-
-
-:- retract((thlocal:enable_src_loop_checking)).
-
-
-:- asserta((thlocal:enable_src_loop_checking)).
-
-
-transverb_decl(use,agent,device,usedBy,inverted).
-transverb_decl(govern,city,country,capitol,inverted). transverb_decl(know,agent,agent,knowsPerson,noninverted).
-transverb_decl(know,agent,topic,knowsTopic,noninverted).
-
-
-create_formula(Capitol,[X,Y],inverted, dbase_t(Capitol,Y,X)).
-create_formula(Capitol,[X,Y],noninverted, dbase_t(Capitol,X,Y)).
-create_formula(Capitol,[X,Y],_, dbase_t(Capitol,X,Y)).
-
-add_sufix(Govern,Suffix,Governs):-atom_concat(Govern,Suffix,Governs).
-
-trans(Govern,City,X,Country,Y,Formula,[],_,_):- 
-      transverb_decl(Govern,City,Country,Capitol,Inverted),
-      create_formula(Capitol,[X,Y],Inverted,Formula).
-
-v_lex_type(Govern,trans):-transverb_decl(Govern,_,_,_,_).
-
-v_lex(Govern,Governs,Governing,Governed,Trans):-v_lex_type(Govern,Trans),add_sufix(Govern,'s',Governs),add_sufix(Govern,'ed',Governed),add_sufix(Govern,'ing',Governing),!.
-
-:- style_check(-singleton).
-
-verb_root(Govern):-v_lex(Govern,_Governs,Governing,Governed,Trans).
-regular_pres(Govern):-v_lex(Govern,Governs,Governing,Governed,Trans).
-regular_past(Governed,Govern):-v_lex(Govern,Governs,Governing,Governed,Trans).
-verb_type(Govern,main+Trans):-v_lex(Govern,Governs,Governing,Governed,Trans).
-verb_form(Governs,Govern,pres+fin,3+sin):-v_lex(Govern,Governs,Governing,Governed,Trans).
-verb_form(Governing,Govern,pres+part,_):-v_lex(Govern,Governs,Governing,Governed,Trans).
-
-
-:- retract((thlocal:enable_src_loop_checking)).
 
