@@ -35,6 +35,17 @@ start_boxer:-
    at_start(prolog).
 
 
+% [Required] Defines debug80
+debug80:- user:ensure_loaded(logicmoo(parsing/parser_talk)),
+          user:ensure_loaded(logicmoo(parsing/parser_chat80)),
+          decl_type(person),
+          remove_undef_search, 
+          ensure_plmoo_loaded(logicmoo('rooms/startrek.all.plmoo')),
+          t1,
+          prolog.
+
+% [Optional] Allows testing/debug of the chat80 system (withouyt loading the servers)
+% :- debug80.
 
 % [Optional] This loads boxer
 :- at_start(with_assertions(moo:prevent_transform_moo_preds,within_user(ignore(catch(start_boxer,_,true))))).

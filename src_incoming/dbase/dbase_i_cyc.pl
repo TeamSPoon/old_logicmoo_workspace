@@ -489,7 +489,8 @@ mtForPred(CycL,Mt):-
 mtForPred(_CycL,Mt):-defaultMt(Mt).
 
 
-isRegisteredCycPred(Mt,Pred,_A):-mpred_prop(F,mt(Mt)).
+isRegisteredCycPred(Mt,F,_A):-mpred_prop(F,mt(Mt)).
+
 % ============================================
 % Assert Side Effect Prolog to Cyc Predicate Mapping
 %

@@ -195,10 +195,11 @@ subst(A,B,C,D):-var(A),!,dmsg(subst(A,B,C,D)),dumpST,dtrace,subst0(A,B,C,D).
 subst(A,B,C,D):-subst0(A,B,C,D).
 
 subst0(A,B,C,D):- 
-      ccatch(notrace(nd_subst(A,B,C,D)),E,(dumpST,dmsg(E:nd_subst(A,B,C,D)),fail)),!.
+      ccatch(hotrace(nd_subst(A,B,C,D)),E,(dumpST,dmsg(E:nd_subst(A,B,C,D)),fail)),!.
 subst0(A,_B,_C,A).
 
 nd_subst(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
+nd_subst(  Var, _,_,Var ) :- var(Var),!.
 nd_subst(  P, X,Sk, P1 ) :- functor_catch(P,_,N),nd_subst1( X, Sk, P, N, P1 ).
 
 nd_subst1( _,  _, P, 0, P  ).

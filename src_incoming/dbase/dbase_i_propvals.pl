@@ -19,6 +19,9 @@
 :-dynamic_multifile_exported((thlocal:noRandomValues/1)).
 :-dynamic_multifile_exported((thlocal:insideIREQ/1)).
 
+:-export(test_for_thlocal/2).
+test_for_thlocal(Pred,Term):-call(Pred,Term),!.
+test_for_thlocal(Pred,Term):-compound(Term),functor(Term,F,_),call(Pred,F),!.
 
 :-meta_predicate_transparent(with_fallbacks(0)).
 with_fallbacks(Call):-with_no_assertions(thlocal:noDefaultValues(_),Call).
@@ -83,15 +86,15 @@ choose_asserted_mid_order_all(Prop,Obj,Value):- is_asserted(genlInverse(Prop,Oth
 :-export(create_someval/3).
 create_someval(Prop,Obj,Value):- ground(Prop-Obj-Value),!,dmsg(error_create_someval(Prop,Obj,Value)).
 create_someval(Prop,Obj,Value):- into_mpred_form(dbase_t(Prop,Obj,Value),Fact),asserted_or_deduced(Fact),!.
-create_someval(Prop,Obj,Value):- into_mpred_form(dbase_t(Prop,Obj,Value),Fact),not(thlocal:noRandomValues(Fact)),hook:create_random_fact(Fact),!.
-create_someval(Prop,Obj,_):- Call=.. [Prop,Obj,_],thlocal:noDefaultValues(Call),!,fail.
+create_someval(Prop,Obj,Value):- into_mpred_form(dbase_t(Prop,Obj,Value),Fact),not(test_for_thlocal(thlocal:noRandomValues,Fact)),hook:create_random_fact(Fact),!.
+create_someval(Prop,Obj,_):- Call=.. [Prop,Obj,_],test_for_thlocal(thlocal:noDefaultValues,Call),!,fail.
 create_someval(Prop,Obj,Value):- fallback_value(Prop,Obj,DValue),!,Value=DValue.
 create_someval(Pred,_Arg1,Value):- must_det_l([moo:mpred_arity(Pred,Last),argIsa_call(Pred,Last,Type),create_random(Type,Value,nonvar(Value))]).
 
 asserted_or_deduced(Fact):- is_asserted(Fact).
-asserted_or_deduced(Fact):- thlocal:noDefaultValues(Fact),!,fail.
-asserted_or_deduced(Fact):- hook:fact_maybe_deduced(Fact).
-asserted_or_deduced(Fact):- deducedSimply(Fact).
+asserted_or_deduced(Fact):- test_for_thlocal(thlocal:noDefaultValues,Fact),!,fail.
+asserted_or_deduced(Fact):- hook:fact_maybe_deduced(Fact),add(Fact).
+asserted_or_deduced(Fact):- deducedSimply(Fact),add(Fact).
 
 :-export(my_random_member/2).
 my_random_member(LOC,LOCS):- length(LOCS,Len),Len>0, X is random(Len),nth0(X,LOCS,LOC).
@@ -292,5 +295,5 @@ scan_default_props_lc:- dmsg(todo(fix(scan_default_props,"to not set atloc/2")))
          padd(I,Missing)))))),fail.
 scan_default_props_lc:-ignore(rescan_duplicated_facts).
 
-:- include(logicmoo(parsing/parser_chat80)). 
+% :- include(logicmoo(parsing/parser_chat80)). 
 

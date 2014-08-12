@@ -53,6 +53,7 @@
      debugOnFailure0/1,
       op(1150,fx,meta_predicate_transparent),
       meta_predicate_transparent/1,      
+      op(1150,fx,decl_thlocal),
      ifThen/2,
      nop/1,
      module_predicate/3,
@@ -154,7 +155,7 @@
      export_all_preds/1
 	 ]).
 
-:-export bad_idea/0.
+:-export((bad_idea/0)).
 bad_idea:-fail.
 
 /*
@@ -305,6 +306,22 @@ def_meta_predicate(F,S,E):- trace_or_throw(def_meta_predicate(F,S,E)).
 
 :- meta_predicate_transparent((loop_check_term(0,?,0))).
 :- meta_predicate_transparent((loop_check(^,^))).
+
+
+:- export(((decl_thlocal)/1)).
+:- meta_predicate(( decl_thlocal(+),  decl_thlocal(+,+,+,+))).
+decl_thlocal(M:P):-!,with_pi(M:P,(decl_thlocal)).
+decl_thlocal(P):-with_pi(thlocal:P,(decl_thlocal)).
+
+decl_thlocal(CM,M,PI,F/A):-
+   thread_local(M:F/A),
+   M:module_transparent(F/A),
+   notrace((fill_args(PI,('?')),!,
+   dbgsubst(PI, (0),(0),PI1),
+   dbgsubst(PI1,(^),(0),PI2),
+   dbgsubst(PI2,(:),(:),PI3))),
+   M:meta_predicate(PI3),
+   dynamic_multifile_exported(CM, M,PI3,F/A).
 
 
    
@@ -474,8 +491,6 @@ user_use_module(What):- '@'(use_module(What),'user').
 :- '@'(use_module(logicmoo_util_library), 'user').
 
 
-:- thread_local tlbugger:disable_loop_checks/0.
-
 :- thread_local tlbugger:inside_loop_check/1.
 :- dynamic_multifile_exported(tlbugger:inside_loop_check/1).
 
@@ -496,9 +511,6 @@ user_use_module(What):- '@'(use_module(What),'user').
 :-thread_local thlocal:can_table/0.
 :-thread_local thlocal:cannot_table/0.
 thlocal:can_table.
-
-% loop_check_throw(B):- loop_check(B,((retractall(tlbugger:inside_loop_check(B)),debugCallWhy(loop_check_throw(B),loop_check_throw(B))))).
-%loop_check_fail(B):- loop_check(B,(dmsg(once(loop_check_fail(B))),fail)).
 
 snumbervars(BC):-numbervars(BC,0,_,[singletons(true),attvar(skip)]).
 
@@ -523,51 +535,46 @@ call_or_list(Rest):-to_list_of(';',Rest,List),!,call(List).
 call_skipping_n_clauses(N,H):-
    findall(B,clause_safe(H,B),L),length(L,LL),!,LL>N,length(Skip,N),append(Skip,Rest,L),!,call_or_list(Rest).
 
+cannot_table_call(Call):- with_assertions(cannot_table,Call).
+
+% =========================================================================
+
 is_loop_checked(B):- 
        make_key(B,BC),!,tlbugger:inside_loop_check(BC).
 
-cannot_table_call(Call):- with_assertions(cannot_table,Call).
 
-no_loop_check(B):- bad_idea,!,retractall(tlbugger:inside_loop_check(_)), with_assertions(tlbugger:disable_loop_checks,B).
-no_loop_check(B):- with_assertions(tlbugger:disable_loop_checks,B).
+
+no_loop_check(Call):- with_no_assertions(tlbugger:inside_loop_check(_),Call).
 
 loop_check_clauses(B,TODO):-  loop_check_clauses(B,1,TODO).
 loop_check_clauses(B,N,TODO):- make_key(B,BC), loop_check_term(call_skipping_n_clauses(N,B),BC,TODO).
 
+% loop_check_throw(B):- loop_check(B,((retractall(tlbugger:inside_loop_check(B)),debugCallWhy(loop_check_throw(B),loop_check_throw(B))))).
+loop_check(B):- loop_check(B,fail).
 loop_check(B, TODO):- make_key(B,BC),!, loop_check_term(B,BC,TODO).
 
-loop_check_term(_B, BC, TODO):- tlbugger:inside_loop_check(BC),!,nop(tlbugger:disable_loop_checks->dmsg(skip_disable_loop_checks(TODO));true),call(TODO).
+loop_check_term(_B, BC, TODO):- tlbugger:inside_loop_check(BC),!,call(TODO).
 loop_check_term( B, BC,_TODO):- not(bad_idea),!,
     setup_call_cleanup(asserta(tlbugger:inside_loop_check(BC)),B,
      (ignore(retract((tlbugger:inside_loop_check(BC)))))).
 loop_check_term( B, BC,_TODO):- with_assertions(tlbugger:inside_loop_check(BC),B).
 
-/*
-outside_loop_check_thread(Call):-in_thread_and_join(Call).
 
-outside_loop_check(B,Call):- make_key(B,BC), outside_loop_check_term(B,BC,Call).
-
-outside_loop_check_term(B,BC,Call):- retract(tlbugger:inside_loop_check(Which)),!,
-      (Which=BC -> 
-        setup_call_cleanup(true,call(B),asserta(tlbugger:inside_loop_check(Which)));  
-        setup_call_cleanup(true,outside_loop_check_term(B,BC,Call),asserta(tlbugger:inside_loop_check(Which)))).
-outside_loop_check_term(_,_,Call):- !, Call.
-outside_loop_check_term(_,_,Call):- outside_loop_check_thread(Call).
-*/
- % cli_notrace(+Call) is nondet.
- % use call/1 with trace turned off
- cli_notrace(Call):-tracing,cnotrace,!,call_cleanup(call(Call),trace).
- cli_notrace(Call):-call(Call).
+% =========================================================================
+% cli_notrace(+Call) is nondet.
+% use call/1 with trace turned off
+cli_notrace(Call):-tracing,cnotrace,!,call_cleanup(call(Call),trace).
+cli_notrace(Call):-call(Call).
 
 % =========================================================================
 
- :- dynamic(skip_bugger/0).
+:- dynamic(skip_bugger/0).
 
- % false = use this wrapper, true = code is good and avoid using this wrapper
- skipWrapper:-skip_bugger.
- skipWrapper:-tracing.
- % false = hide this wrapper
- showHiddens:-true.
+% false = use this wrapper, true = code is good and avoid using this wrapper
+skipWrapper:-skip_bugger.
+skipWrapper:-tracing.
+% false = hide this wrapper
+showHiddens:-true.
 
 :- set_prolog_flag(backtrace_depth,   200).
 :- set_prolog_flag(backtrace_goal_depth, 20).
@@ -1078,10 +1085,10 @@ with_assertions( -TL:With,Call):- !,with_no_assertions(TL:With,Call).
 with_assertions( +TL:With,Call):- !,with_assertions(TL:With,Call).
 with_assertions( -With,Call):- !,with_no_assertions(With,Call).
 with_assertions( +With,Call):- !,with_assertions(With,Call).
-with_assertions(THead,Call):- must_det(to_thread_head(THead,_M,Head,_H)),
-   copy_term( ( (Head  )), WithA),
-    setup_call_cleanup(asserta(WithA),Call,
-     (logOnFailure(retract((Head))))).
+
+with_assertions(THead,Call):- 
+ must_det(to_thread_head(THead,M,_Head,H)),
+   copy_term(H,  WithA), !, setup_call_cleanup(M:asserta(WithA),Call,logOnFailure(M:retract(WithA))).
 
 :-meta_predicate_transparent(with_no_assertions(+,^)).
 with_no_assertions(THead,Call):- !, with_assertions((THead:-!,fail),Call).
@@ -1090,7 +1097,7 @@ with_no_assertions(THead,Call):-
    copy_term((Head :- (!,fail)),WithA), 
    setup_call_cleanup((asserta(WithA),must_det(clause(Head,TBODY))),Call,must_det(logOnFailure(retract((Head:-TBODY)));(functor(H,F,A),abolish(M:F/A),thread_local(M:F/A)))).
 
-to_thread_head((H:-B),TL,(HO:-user:B),HH):-to_thread_head(H,TL,HO,HH),!.
+to_thread_head((H:-B),TL,(HO:-B),(HH:-B)):-to_thread_head(H,TL,HO,HH),!.
 to_thread_head(thglobal:Head,thglobal,thglobal:Head,Head):- must_det((predicate_property(thglobal:Head,(dynamic)),not(predicate_property(thglobal:Head,(thread_local))))).
 to_thread_head(TL:Head,TL,TL:Head,Head):-!, must_det(( predicate_property(TL:Head,(dynamic)),must_det(predicate_property(TL:Head,(thread_local))))),!.
 to_thread_head(Head,thlocal,thlocal:Head,Head):- must_det(( predicate_property(thlocal:Head,(dynamic)),predicate_property(thlocal:Head,(thread_local)))),!.
@@ -1100,6 +1107,7 @@ to_thread_head(Head,thlocal,thlocal:Head,Head):- must_det(( predicate_property(t
 with_all_dmsg(Call):-with_no_assertions(thlocal:dmsg_hidden(_),Call).
 :-meta_predicate_transparent(with_no_dmsg(?)).
 with_no_dmsg(Call):-with_assertions(thlocal:dmsg_hidden(_),Call).
+with_no_dmsg(Shown,Call):-with_assertions(thlocal:dmsg_hidden(Shown),Call).
 
 dmsg_hide(Term):-asserta(thlocal:dmsg_hidden(Term)).
 dmsg_show(Term):-ignore(retract(thlocal:dmsg_hidden(Term))).
@@ -1715,8 +1723,8 @@ show_and_do(C):-dmsg(C),!,C.
 dtrace(C):-dtrace,C.
 
 %dtrace:- skipWrapper,!,dmsg(dtrace_skipWrapper).
-dtrace:-tracing,!,leash(+call),trace.
-dtrace:-has_auto_trace(C),!,C.
+dtrace:-tracing,!,write(dtrace),nl,notrace,leash(+call),dtrace.
+dtrace:-write(dtrace),nl,has_auto_trace(C),!,C.
 dtrace:-repeat,dumptrace,!.
 
 dumptrace:-tracing,!,leash(+call).
@@ -1737,11 +1745,11 @@ restore_trace(Goal):-  tracing, notrace,!,'$leash'(Old, Old),'$visible'(OldV, Ol
 restore_trace(Goal):-  '$leash'(Old, Old),'$visible'(OldV, OldV),call_cleanup(Goal,((notrace,'$leash'(_, Old),'$visible'(_, OldV)))).
 
 rtrace(Goal):- restore_trace((
-   cnotrace((visible(+all),visible(-unify),visible(+exception),
+   cnotrace((visible(+all),visible(+unify),visible(+exception),
    leash(-all),leash(+exception))),trace,Goal)).
 
 ftrace(Goal):- restore_trace((
-   visible(-all),visible(-unify),
+   visible(-all),visible(+unify),
    visible(+fail),visible(+exception),
    leash(-all),leash(+exception),trace,Goal)).
 

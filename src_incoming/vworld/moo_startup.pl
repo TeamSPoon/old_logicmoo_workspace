@@ -112,9 +112,11 @@ make_qlfs:-
  ensure_q_loaded(logicmoo('pldata/hl_holds')),
  ensure_q_loaded(logicmoo('pldata/mworld0')),
  ensure_q_loaded(logicmoo('pldata/mworld0_declpreds')),
- catch(ensure_q_loaded(logicmoo('pldata/withvars_988')),_,true).
+ catch(ensure_q_loaded(logicmoo('pldata/withvars_988')),_,true),
+ asserta(loaded_external_kbs).
 
 :- catch(logicmoo('pldata/mworld0_declpreds.qlf'),_,make_qlfs).
+
 
 /*
 

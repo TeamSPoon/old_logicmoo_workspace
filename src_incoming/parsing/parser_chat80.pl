@@ -51,8 +51,8 @@ moo:agent_call_command(_Gent,chat80(StringM)):- do_chat80(StringM).
 % ===========================================================
 chat80 :- told, repeat, prompt_read('CHAT80> ',U),  to_word_list(U,WL),do_chat80(WL).
 
-%:- multifile(thlocal:into_form_code/0).
-%:- asserta(thlocal:into_form_code).
+:- multifile(thlocal:into_form_code/0).
+:- asserta(thlocal:into_form_code).
 
 
 :- include(logicmoo(parsing/chat80/xgproc)).	% XG generator
@@ -62,11 +62,13 @@ chat80 :- told, repeat, prompt_read('CHAT80> ',U),  to_word_list(U,WL),do_chat80
 
 :- compile_xg_clauses.
 
+:- decl_mpred_hybrid(person/1).    
+
 % :- list('newg.pl').
 :- include(logicmoo(parsing/chat80/xgrun)).	% XG runtimes
 % :- include(logicmoo(parsing/chat80/newg)).		% clone + lex
 
-%:- retract(thlocal:into_form_code).
+% :- retract(thlocal:into_form_code).
 
 :- include(logicmoo(parsing/chat80/clotab)).	% attachment tables
 :- include(logicmoo(parsing/chat80/newdict)).	% syntactic dictionary
@@ -80,13 +82,15 @@ chat80 :- told, repeat, prompt_read('CHAT80> ',U),  to_word_list(U,WL),do_chat80
 :- include(logicmoo(parsing/chat80/ptree)).	% print trees
 :- include(logicmoo(parsing/chat80/aggreg)).	% aggregation operators
 
+:- include(logicmoo(parsing/chat80/typesystem/typesems)).
+/*
 :- include(logicmoo(parsing/chat80/world0)).     	% data base
 :- include(logicmoo(parsing/chat80/rivers)).
 :- include(logicmoo(parsing/chat80/cities)).
 :- include(logicmoo(parsing/chat80/countries)).
 :- include(logicmoo(parsing/chat80/contain)).
 :- include(logicmoo(parsing/chat80/borders)).
-
+*/
 % testing
 :- include(logicmoo(parsing/chat80/newtop)).	% top level
 
@@ -94,11 +98,16 @@ chat80 :- told, repeat, prompt_read('CHAT80> ',U),  to_word_list(U,WL),do_chat80
 :-export(test_chat80_regressions/0).
 test_chat80_regressions:- time(hi(logicmoo(parsing/chat80/demo))).
 
+:- retract(thlocal:into_form_code).
 
 :- retractall(thlocal:enable_src_loop_checking).
 
 
 moo:mud_test(chat80_regressions,test_chat80_regressions).
+
+:- context_module(CM),module_predicates_are_exported(CM).
+:- context_module(CM),module_meta_predicates_are_transparent(CM).
+% :- context_module(CM),module_property(CM, exports(List)),moo_hide_show_childs(List).
 
 % :- module_predicates_are_exported.
 

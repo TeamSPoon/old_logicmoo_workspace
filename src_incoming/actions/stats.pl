@@ -31,7 +31,6 @@ moo:agent_call_command(Agent,stats(SWhat)):-
 moo:action_info(list(term),"grep for a term").
 
 
-moo:singleValued(namespaced1:'EP_cog'(agent,value(random(30)))).
 
 /*
 There are 7 aptitudes in Eclipse Phase:

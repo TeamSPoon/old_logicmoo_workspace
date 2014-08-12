@@ -118,7 +118,7 @@ metaclass(agenttype).
 metaclass(itemtype).
 metaclass(metaclass).
 
-argsIsa(typeGenls(type,metaclass)).
+argsIsaInList(typeGenls(type,metaclass)).
 
 hook:decl_database_hook(assert(_),typeGenls(_,MC)):-assert_isa(MC,metaclass).
 

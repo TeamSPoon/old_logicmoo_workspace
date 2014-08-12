@@ -22,6 +22,8 @@
                   run_player_telnet/1,
                    login_and_run/0]).
 
+:- decl_thlocal wants_logout/1.
+
 :- dynamic agent_message_stream/3, telnet_fmt_shown/3.
 
 :- meta_predicate toploop_telnet:show_room_grid_single(*,*,0).
@@ -30,8 +32,6 @@
 
 :- moo:register_module_type(utility).
 
-:- thread_local thlocal:wants_logout/1.
-:- multifile thlocal:wants_logout/1.
 
 % ===========================================================
 % TELNET REPL + READER
@@ -52,8 +52,6 @@ login_and_run:-
      run_player_telnet(P))),
    fmt('~n~nGoodbye ~w! ~n',[P]).
 
-:- multifile thlocal:wants_logout/1.
-:- thread_local thlocal:wants_logout/1.
 
 run_player_telnet(P) :-    
       foc_current_player(P),

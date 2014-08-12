@@ -12,6 +12,8 @@
 % Douglas Miles
 */
 
+% nart_to_atomic(L,L):-!,atom(L).
+nart_to_atomic(L,L).
 
 never_type(Var):-var(Var),!,trace_or_throw(var_never_type(Var)).
 never_type('Area1000').
@@ -158,7 +160,7 @@ isa_backchaing_0(A,T):-  nonvar(A),isa_backchaing_nv_nv(A,T).
 isa_backchaing_0(A,T):-  asserted_or_trans_subclass(AT,T),isa_asserted(A,AT).
 
 
-isa_backchaing_nv_nv(A,argsIsa):-!,compound(A).
+isa_backchaing_nv_nv(A,argsIsaInList):-!,compound(A).
 
 not_ft(T):-asserted_or_trans_subclass(T,spatialthing).
 
@@ -219,7 +221,7 @@ type(fpred).
 type(relation).
 type(creatableType).
 type(typeDeclarer).
-type(argsIsa).
+% type(argsIsaInList).
 type(ArgsIsa):-argsIsaProps(ArgsIsa).
 type(F):-dbase_t(typeDeclarer,F).
 type(formattype).
@@ -299,6 +301,7 @@ not_mud_isa(item,formattype).
 not_mud_isa(type,formattype).
 not_mud_isa(obj, extentKnown).
 not_mud_isa(obj, creatableType).
+not_mud_isa(assertionMacroHead, formattype).
 not_mud_isa(obj, formattype).
 not_mud_isa(formattype,formattype).
 not_mud_isa(subft,type).
@@ -349,7 +352,7 @@ is_known_true(isa(formattype,nonCreatableType)).
 is_known_true(subclass(formattype,nonCreatableType)).
 is_known_true(isa('TemporallyExistingThing', 'creatableType')).
 is_known_true(isa(term,nonCreatableType)).
-is_known_true(subclass(argsIsa,relation)).
+is_known_true(subclass(argsIsaInList,relation)).
 is_known_true(subclass(fpred,relation)).
 is_known_true(subclass(F,mpred)):-argsIsaProps(F).
 is_known_true(subclass(F,fpred)):-argsIsaProps(F).

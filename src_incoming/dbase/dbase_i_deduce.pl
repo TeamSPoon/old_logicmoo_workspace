@@ -35,16 +35,16 @@ hook:decl_database_hook(assert(_),atloc(R,W)):- isa(R,region),trace_or_throw(atl
 hook:deduce_facts(inRegion(_,Region),isa(Region,region)).
 hook:deduce_facts(inRegion(Obj,_),isa(Obj,obj)).
 
-hook:deduce_facts(Fact,mpred_prop(AF,[argsIsa(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],argsIsaProps(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,
+hook:deduce_facts(Fact,mpred_prop(AF,[argsIsaInList(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],argsIsaProps(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,
                 ArgTs=..[AF|ARGS],!,must_det(ground(ARGS)).
 
 
-hook:deduce_facts(argsIsa(ArgTs),mpred_prop(F,argsIsa(ArgTs))):-functor(F,ArgTs,_).
-hook:deduce_facts(mpred_prop(F,argsIsa(ArgTs)),argsIsa(ArgTs)):-functor(F,ArgTs,_).
+hook:deduce_facts(argsIsaInList(ArgTs),mpred_prop(F,argsIsaInList(ArgTs))):-mpred_arity(F,A),functor(ArgTs,F,A).
+hook:deduce_facts(mpred_prop(F,argsIsaInList(ArgTs)),argsIsaInList(ArgTs)):-mpred_arity(F,A),functor(ArgTs,F,A).
 
 
-hook:deduce_facts(argsIsa(ArgTs),argIsa(F,A,Type)):-ztrace,functor(ArgTs,F,_),arg(A,ArgTs,Type).
-hook:deduce_facts(mpred_prop(F,argsIsa(ArgTs)),argIsa(F,A,Type)):-arg(A,ArgTs,Type).
+hook:deduce_facts(argsIsaInList(ArgTs),argIsa(F,A,Type)):-ztrace,functor(ArgTs,F,_),arg(A,ArgTs,Type).
+hook:deduce_facts(mpred_prop(F,argsIsaInList(ArgTs)),argIsa(F,A,Type)):-arg(A,ArgTs,Type).
 
 hook:deduce_facts(argIsa(F,_A,Type),[isa(Type,type),isa(F,relation)]):-atom(Type),not(dbase_t(Type,formattype)).
 
@@ -64,11 +64,11 @@ fix_argsIsas(_,_,[],[]):-!.
 fix_argsIsas(F,N,[Arg|TList],[G|List]):-
    fix_argIsa(F,N,Arg,G),!, N1 is N + 1,fix_argsIsas(F,N1,TList,List),!.
 
-hook:decl_database_hook(assert(_),argsIsa(ArgTs)):-
+hook:decl_database_hook(assert(_),argsIsaInList(ArgTs)):-
    ArgTs=..[F|ArgTList],
    fix_argsIsas(F,1,ArgTList,GList),
    Good=..[F|GList],
-   Good\=ArgTs,!,del(mpred_prop(F,argsIsa(ArgTs))),decl_mpred(F,argsIsa(Good)).
+   Good\=ArgTs,!,del(mpred_prop(F,argsIsaInList(ArgTs))),decl_mpred(F,argsIsaInList(Good)).
 
 :-export(add_deduction/3).
 quiet_fact(Fact):-functor(Fact,F,A),quiet_fact(F,A).
@@ -84,6 +84,7 @@ add_deduction_lc(Type,Fact,_How):-quiet_fact(Fact),!,do_deduction_type(Type,Fact
 add_deduction_lc(Type,Fact,How):-dmsg(add_deduction(Type,Fact,'_________from________',How)),do_deduction_type(Type,Fact),!.
 
 do_deduction_type(assert(_),Fact):-add(Fact).
+do_deduction_type(retract(_),Fact):-functor(Fact,F,A),(F=isa;F=mpred_prop;A=1),!.
 do_deduction_type(retract(_),Fact):-clr(Fact).
 
 

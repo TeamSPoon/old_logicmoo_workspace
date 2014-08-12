@@ -20,20 +20,13 @@
 
 */
 
+:-op(600,xfy,--).
+
+
 % Data for the World Database.
 % ---------------------------
 :- asserta((thlocal:enable_src_loop_checking)).
 
-
-:-op(600,xfy,--).
-
-exceeds(X--U,Y--U) :- !, X > Y.
-exceeds(X1--U1,X2--U2) :- ratio(U1,U2,M1,M2), X1*M1 > X2*M2.
-
-ratio(thousand,million,1,1000).
-ratio(million,thousand,1000,1).
-ratio(ksqmiles,sqmiles,1000,1).
-ratio(sqmiles,ksqmiles,1,1000).
 
 area(_X--ksqmiles).
 capital(C) :- capital(_X,C).

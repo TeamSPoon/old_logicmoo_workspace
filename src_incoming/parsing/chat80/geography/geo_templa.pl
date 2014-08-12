@@ -32,17 +32,38 @@ property(population,
          measure&heads,X,feature&_,Y,population(Y,X),[],_,_).
 
 thing(place,feature&place&_,X,place(X),[],_).
+thing(area,measure&area,X,area(X),[],_).
+thing(capital,feature&city,X,capital(X),[],_).
+thing(city,feature&city,X,city(X),[],_).
+thing(continent,feature&place&continent,X,continent(X),[],_).
+thing(country,feature&place&country,X,country(X),[],_).
+thing(latitude,measure&position,X,latitude(X),[],_).
+thing(longitude,measure&position,X,longitude(X),[],_).
+thing(ocean,feature&place&seamass,X,ocean(X),[],_).
 thing(person,_,X,person(X),[],_).
+thing(population,measure&heads,X,population(X),[],_).
+thing(region,feature&place&_,X,region(X),[],_).
+thing(river,feature&river,X,river(X),[],_).
+thing(sea,feature&place&seamass,X,sea(X),[],_).
+thing(seamass,feature&place&seamass,X,seamass(X),[],_).
 
 /* Proper nouns */
 
-name_template(X,feature&person) :- catch(person(X),_,fail).
+name_template(X,feature&circle) :- circle_of_latitude(X).
+name_template(X,feature&city) :- city(X).
+name_template(X,feature&place&continent) :- continent(X).
+name_template(X,feature&place&country) :- country(X).
+name_template(X,feature&place&_) :- region(X).
+name_template(X,feature&river) :- river(X).
+name_template(X,feature&place&seamass) :- seamass(X).
 
 /* Verbs */
 
-
+trans(border,
+      feature&place&_,X,feature&place&_,Y,borders(X,Y),[],_,_).
+trans(contain,feature&place&_,X,feature&_,Y,in(Y,X),[],_,_).
+trans(govern,feature&_,X,feature&place&country,Y,capital(Y,X),[],_,_).
 trans(exceed,measure&Type,X,measure&Type,Y,exceeds(X,Y),[],_,_).
-
 
 intrans(drain,feature&river,X,drains(X,Y),
    [slot(prep(into),feature&place&_,Y,_,free)],_).

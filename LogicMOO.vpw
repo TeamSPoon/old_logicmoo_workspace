@@ -7,6 +7,8 @@
 		<Project File="LogicmooDatabaseServer.vpj"/>
 		<Project File="logicserver.vpj"/>
 		<Project File="nl_system.vpj"/>
+		<Project File="src_data.vpj"/>
 		<Project File="SWI-Prolog.vpj"/>
+		<Project File="typesystem.vpj"/>
 	</Projects>
 </Workspace>

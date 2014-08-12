@@ -12,7 +12,7 @@
 
 :- moo:register_module_type(command).
 
-moo:argsIsa(action_verb_useable(verb,term(mpred),type,term(mpred))).
+moo:argsIsaInList(action_verb_useable(verb,term(mpred),type,term(mpred))).
 
 
 expand_args(eachOf,subclass(eachOf('PortableObject','ProtectiveAttire',stowable),wieldable)).

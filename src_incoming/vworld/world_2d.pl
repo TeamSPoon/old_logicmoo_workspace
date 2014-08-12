@@ -77,10 +77,11 @@ grid_size(_Room,MaxX,MaxY,MaxZ):- MaxX = 5 , MaxY = 5 , maxZ(MaxZ) ,!.
 
 maxZ(2).
 
-in_grid(LocName,xyz(LocName,X,Y,1)) :-
-   grid_size(LocName,MaxX,MaxY, _MaxZ),!,
-   between(1,MaxX,X),
-   between(1,MaxY,Y).
+in_grid(LocName,Var):-var(Var),!,in_grid_rnd(LocName,Var).
+in_grid(LocName,Var):-in_grid_no_rnd(LocName,Var).
+
+in_grid_no_rnd(LocName,xyz(LocName,X,Y,Z)) :-
+   grid_size(LocName,MaxX,MaxY, MaxZ),!,between(1,MaxX,X),between(1,MaxY,Y),between(1,MaxZ,Z).
 
 in_grid_rnd(LocName,xyz(LocName,X,Y,1)) :-
    grid_size(LocName,MaxX,MaxY, _MaxZ),!,
@@ -133,12 +134,12 @@ nearby(X,Y):-atloc(X,L1),atloc(Y,L2),locs_near(L1,L2).
 locs_near(L1,L2):- var(L1),nonvar(L2),!,locs_near(L2,L1).
 locs_near(L1,L2):- nonvar(L1),nonvar(L2),L2=xyz(_,_,_,_),locationToRegion(L1,R),!,call_tabled(locs_near_i(R,L2)).
 locs_near(L1,L2):- nonvar(L1),nonvar(L2),locationToRegion(L1,R1),locationToRegion(L2,R2),!,region_near(R1,R2).
-locs_near(L1,L2):-region_near(R1,R2),in_grid(R1,L1),in_grid(R2,L2).
+locs_near(L1,L2):-region_near(R1,R2),in_grid_no_rnd(R1,L1),in_grid_no_rnd(R2,L2).
 
 % :- decl_not_mpred(locs_near_i,2).
 :-export(locs_near_i/2).
-locs_near_i(L1,L2):- locationToRegion(L1,R),in_grid(R,L2).
-locs_near_i(L1,L2):- locationToRegion(L1,R),pathBetween_call(R,_,R2),in_grid(R2,L2).
+locs_near_i(L1,L2):- locationToRegion(L1,R),in_grid_no_rnd(R,L2).
+locs_near_i(L1,L2):- locationToRegion(L1,R),pathBetween_call(R,_,R2),in_grid_no_rnd(R2,L2).
 
 region_near(R1,R2):-pathBetween_call(R1,_,R2).
 region_near(R1,R1).
@@ -181,16 +182,16 @@ hook:fact_maybe_deduced(inRegion(Obj,Region)):- is_asserted(atloc(Obj,LOC)),loca
 hook:fact_maybe_deduced(inRegion(apath(Region,Dir),Region)):-is_asserted(pathBetween(Region,Dir,_)).
 
 %  suggest a random fact that is probably not already true
-hook:create_random_fact(atloc(Obj,LOC)) :- must_det(nonvar(Obj)),!,asserted_or_deduced(inRegion(Obj,Region)),must_det((in_grid(Region,LOC),unoccupied(Obj,LOC))),!.
-hook:create_random_fact(inRegion(Obj,Region)) :- must_det(nonvar(Obj)),!,asserted_or_deduced(inRegion(Obj,Region)).
+hook:create_random_fact(atloc(Obj,LOC)) :- nonvar(Obj),!,asserted_or_deduced(inRegion(Obj,Region)),must_det((in_grid_no_rnd(Region,LOC),unoccupied(Obj,LOC))),!.
+hook:create_random_fact(inRegion(Obj,Region)) :- nonvar(Obj),!,asserted_or_deduced(inRegion(Obj,Region)).
 
 %  suggest random values
 hook:create_random_instance(dir,Dir,Test) :- my_random_member(Dir,[n,s,e,w,ne,nw,se,sw]),Test,!.
-hook:create_random_instance(int,3,Test):-call(Test),dmsg(create_random(int,3,Test)),dtrace.
+hook:create_random_instance(int,3,Test):-call(Test),dmsg(create_random(int,3,Test)),dtrace,!,fail.
 
 %  give required forward deductions
-hook:deduce_facts(atloc(Obj,LOC),inRegion(Obj,Region)):-must_det(nonvar(LOC)),locationToRegion(LOC,Region).
-hook:deduce_facts(inRegion(Obj,_),atloc(Obj,LOC)):-must_det(nonvar(Obj)), put_in_world(Obj),must_det(atloc(Obj,LOC)).
+hook:deduce_facts(atloc(Obj,LOC),inRegion(Obj,Region)):- nonvar(LOC), locationToRegion(LOC,Region).
+hook:deduce_facts(inRegion(Obj,_Region),atloc(Obj,LOC)):- nonvar(Obj), put_in_world(Obj),must_det(atloc(Obj,LOC)).
 
 
 % random_region(LOC):- findall(O,isa(O,region),LOCS),my_random_member(LOC,LOCS).
@@ -198,13 +199,14 @@ hook:deduce_facts(inRegion(Obj,_),atloc(Obj,LOC)):-must_det(nonvar(Obj)), put_in
 
 random_xyz(LOC):-
    must_det(create_random(region,Region,true)),
-   in_grid_rnd(Region,LOC).
+   in_grid_rnd(Region,LOC),!.
 
 random_xyz(xyz('Area1000',1,1,1)):-  trace_or_throw(game_not_loaded).
 
 unoccupied(_,Loc):- not(is_asserted(atloc(_,Loc))),!.
 unoccupied(_,_):-!.
 unoccupied(Obj,Loc):- loop_check(unoccupied_lc(Obj,Loc),not(is_asserted(atloc(_,Loc)))),!.
+
 unoccupied_lc(Obj,Loc):- is_occupied(Loc,What),!,What=Obj.
 unoccupied_lc(_,_).
 
@@ -221,6 +223,7 @@ calc_xyz(Region1,Dir,force(X1,Y1,Z1),X2,Y2,Z2):-
 
 move_dir_target(RegionXYZ,Dir,XXYY):-
    move_dir_target(RegionXYZ,Dir,1,XXYY).
+
 move_dir_target(RegionXYZ,Dir,Force,XXYY):-
    (calc_xyz(RegionXYZ,Dir,force(Force,Force,Force),X,Y,Z)),
    (locationToRegion(RegionXYZ,Region1)),
@@ -281,26 +284,28 @@ hook:decl_database_hook(retract(_),atloc(Agent,_)):-padd(Agent,needs_look(true))
 % Move agent (usually). Used to relocate agent's location.
 in_world_move(LOC,Agent,DirS) :-
         string_to_atom(DirS,Dir),
-        ignore(atloc(Agent,LOC)),
-        in_world_move0(LOC,Agent,Dir),
-        atloc(Agent,LOC2),
-        must_det(LOC2 \== LOC),!.
+        ignore(is_asserted(atloc(Agent,LOC))),
+        must_det((with_assertions(thlocal:noDefaultValues(atloc),in_world_move0(LOC,Agent,Dir)),        
+         is_asserted(atloc(Agent,LOC2)),
+         LOC2 \== LOC)),!.
 
+can_world_move(LOC,_Agent,Dir) :- check_behind_for_ground(LOC), move_dir_target(LOC,Dir,_).
 
 in_world_move0(LOC,Agent,Dir) :-
-        padd(Agent,facing(Dir)),
-   ignore(atloc(Agent,LOC)),
+        padd(Agent,facing(Dir)),   
         check_behind_for_ground(LOC),
 	move_dir_target(LOC,Dir,XXYY),!,
+   must_det_l([
         dmsg(move_dir_target(LOC,Dir,XXYY)),
         locationToRegion(LOC,Region1),
         locationToRegion(XXYY,Region2),
-        clr(atloc(Agent,_)),
-        add(atloc(Agent,XXYY)),
+        ((add(atloc(Agent,XXYY)),
+        is_asserted(atloc(Agent,LOC2)),
+         LOC2 \== LOC)),
    ifThen(( Region1\==Region2) , raise_location_event(LOC,notice(reciever,leave(Agent,Region1,to(Dir))))),
         reverse_dir(Dir,Rev),
    ifThen(( Region1\==Region2) , raise_location_event(XXYY,notice(reciever,enter(Agent,Region2,from(Rev))))),!,
-	check_for_fall(LOC,XXYY,Agent).
+	check_for_fall(LOC,XXYY,Agent)]).
 
 check_behind_for_ground(LOC):-nonvar(LOC).
 check_ahead_for_ground(XXYY):-nonvar(XXYY),

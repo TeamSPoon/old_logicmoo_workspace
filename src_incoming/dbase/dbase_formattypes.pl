@@ -171,9 +171,9 @@ argIsa_asserted(F,N,Type):- grab_argsIsa(F,Types),arg(N,Types,Type),nonvar(Type)
 argIsa_asserted(facing,_,term).
 
 grab_argsIsa(resultIsa,resultIsa(fpred,type)).
-% grab_argsIsa(F,Types):- call_collect([flag(+firstValue),+debugOnError,+deducedSimply],mpred_prop(F,argsIsa(Types))).
-grab_argsIsa(F,Types):- mpred_prop(F,argsIsa(Types)).
-grab_argsIsa(F,Types):- deducedSimply(mpred_prop(F,argsIsa(Types))).
+% grab_argsIsa(F,Types):- call_collect([flag(+firstValue),+debugOnError,+deducedSimply],mpred_prop(F,argsIsaInList(Types))).
+grab_argsIsa(F,Types):- mpred_prop(F,argsIsaInList(Types)).
+grab_argsIsa(F,Types):- deducedSimply(mpred_prop(F,argsIsaInList(Types))).
 
 
 argIsa_call_1(Prop,N1,Type):- is_2nd_order_holds(Prop),dmsg(todo(define(argIsa_call(Prop,N1,'Second_Order_TYPE')))),dumpST,dtrace,

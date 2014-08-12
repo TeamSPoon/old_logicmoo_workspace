@@ -66,12 +66,13 @@ is_holds_true0(Prop):-arg(_,vvv(holds,holds_t,dbase_t,asserted_dbase_t,assertion
 is_2nd_order_holds(Prop):- is_holds_true(Prop) ; is_holds_false(Prop).
 
 :-export(is_holds_false/1).
-% is_holds_false(Prop):-notrace((atom(Prop),once((is_holds_false0(Prop,Stem),is_holds_true0(Stem))))).
-is_holds_false(Prop):-member(Prop,[not,nholds,holds_f,dbase_f,aint,assertion_f,asserted_dbase_f,retraction,not_secondOrder,not_firstOrder]).
+is_holds_false(Prop):-notrace((atom(Prop),is_holds_false0(Prop))).
 
+is_holds_false0(Prop):-member(Prop,[not,nholds,holds_f,dbase_f,aint,assertion_f,asserted_dbase_f,retraction,not_secondOrder,not_firstOrder]).
+%is_holds_false0(Prop):-is_holds_false0(Prop,Stem),is_holds_true0(Stem).
 is_holds_false0(Prop,Stem):-atom_concat('not_',Stem,Prop).
-is_holds_false0(Prop,Stem):-atom_concat(Stem,'_not',Prop).
-is_holds_false0(Prop,Stem):-atom_concat(Stem,'_false',Prop).
+%is_holds_false0(Prop,Stem):-atom_concat(Stem,'_not',Prop).
+%is_holds_false0(Prop,Stem):-atom_concat(Stem,'_false',Prop).
 is_holds_false0(Prop,Stem):-atom_concat(Stem,'_f',Prop).
 
 
@@ -251,6 +252,7 @@ is_asserted(F,A,M:C):- atom(M),!,is_asserted(F,A,C).
 %  %  is_asserted(F,A,G):- is_asserted_lc_isa(F,A,G).
 % is_asserted(_,_,G):-was_isa(G,I,C),!,isa_asserted(I,C).
 is_asserted(dbase_t,_,C):-C=..[_,L|IST],atom(L),!,CC=..[L|IST],is_asserted_mpred(CC).
+is_asserted(dbase_t,_,C):-C=..[_,nart(List)|IST],!,nart_to_atomic(List,L),atom(L),CC=..[L|IST],is_asserted_mpred(CC).
 %  %  is_asserted(Holds,_,C):-is_holds_true(Holds), C=..[_,L|IST],atom(L),!,CC=..[L|IST],is_asserted_mpred(CC).
 is_asserted(_,_,G):-is_asserted_mpred(G).
 
@@ -374,11 +376,10 @@ hooked_assertz(_CP,CA):- clause_asserted(CA),!.
 hooked_assertz(CP,CA):- assertz_cloc(CA),run_database_hooks_local(assert(z),CP).
 
 hooked_retract(CP,_CA):- nonground_throw_or_fail(hooked_retract(CP)).
-hooked_retract(CP,CA):- must_det(clause_asserted(CA)),!,run_database_hooks_local(retract(one),CP), ignore(retract_cloc(CA)).
-hooked_retract(CP,CA):- run_database_hooks_local(retract(one),CP), ignore(retract_cloc(CA)).
+hooked_retract(CP,CA):- ignore(show_call_failure(clause_asserted(CA))),!,ignore(retract_cloc(CA)),ignore(retract_cloc(CP)),run_database_hooks_local(retract(one),CP).
 
 hooked_retractall(CP,CA):- copy_term(CA,RT),once(retract_cloc(RT)),!,retractall_cloc(CA), run_database_hooks_local(retract(all),CP).
-hooked_retractall(CP,CA):- retractall_cloc(CA),run_database_hooks_local(retract(all),CP).
+hooked_retractall(CP,CA):- retractall_cloc(CA),run_database_hooks_local(retract(all),CP),retractall_cloc(CP).
 
 differnt_assert(G1,G2):- notrace(differnt_assert1(G1,G2)),dmsg(differnt_assert(G1,G2)),ztrace.
 
@@ -412,13 +413,13 @@ assertz_cloc(M,C):-database_real(assertz,M:C).
 retract_cloc(M:C):-atom(M),!,retract_cloc(M,C),!.
 retract_cloc( C ):-dbase_mod(M),retract_cloc(M,C),!.
 retract_cloc(M,C):-ensure_predicate_reachable(M,C),fail.
-retract_cloc(M,C):-clause_asserted(M:C,true),!.
+retract_cloc(M,C):-not(clause_asserted(M:C,true)),!.
 retract_cloc(M,C):-database_real(retract,M:C).
 
 retractall_cloc(M:C):-atom(M),!,retractall_cloc(M,C),!.
 retractall_cloc( C ):-dbase_mod(M),retractall_cloc(M,C),!.
 retractall_cloc(M,C):-ensure_predicate_reachable(M,C),fail.
-retractall_cloc(M,C):-clause_asserted(M:C,true),!.
+retractall_cloc(M,C):-not(clause_asserted(M:C,true)),!.
 retractall_cloc(M,C):-database_real(retractall,M:C).
 
 database_real(P,C):- debugOnError(call(P,C)).

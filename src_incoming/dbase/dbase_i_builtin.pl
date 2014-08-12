@@ -32,8 +32,8 @@ type(activeAgent).
 type(channel).
 type(extentKnown).
 
-argsIsa(ft_info(formattype,term)).
-argsIsa(subft(formattype,formattype)).
+argsIsaInList(ft_info(formattype,term)).
+argsIsaInList(subft(formattype,formattype)).
 
 :-decl_mpred_hybrid((genlInverse/2,genlPreds/2)).
 
@@ -59,8 +59,8 @@ multiValued(possess(agent,spatialthing)).
 genlPreds(possess,wearing).
 multiValued(subclass(type,type)).
 multiValued(isa(term,type)).
-argsIsa(somethingIsa(term,list(type))).
-argsIsa(somethingDescription(term,list(string))).
+argsIsaInList(somethingIsa(term,list(type))).
+argsIsaInList(somethingDescription(term,list(string))).
 
 :- decl_mpred_hybrid(assert_with_pred,2).
 :- begin_transform_moo_preds.
@@ -77,9 +77,9 @@ type(singleValued).
 type(creatableType).
 type(typeDeclarer).
 
-:-add((expand_args(eachOf,subclass(eachOf(multiValued,negationByFailure,argsIsa,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),mpred)))).
+:-add((expand_args(eachOf,subclass(eachOf(multiValued,negationByFailure,argsIsaInList,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),mpred)))).
 
-:-add((expand_args(eachOf,isa(eachOf(multiValued,negationByFailure,argsIsa,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),typeDeclarer)))).
+:-add((expand_args(eachOf,isa(eachOf(multiValued,negationByFailure,argsIsaInList,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),typeDeclarer)))).
 
 :-doall((argsIsaProps(F),decl_type(F),add(subclass(F,relation)))).
 :-doall((argsIsaProps(F),decl_type(F),add(isa(F,typeDeclarer)))).
@@ -117,7 +117,7 @@ term_anglify(Head,EnglishO):- compound(Head),
    term_anglify_args(Head,F,1,ARGS,Info,English),world:fully_expand(English,EnglishO),!.
 
 
-term_anglify_args(Head,F,A,ARGS,multi(Which),English):- !,replace_nth(ARGS,Which,_OldVar,NewVar,NEWARGS),trace,!,
+term_anglify_args(Head,F,A,ARGS,multi(Which),English):- !,replace_nth(ARGS,Which,_OldVar,NewVar,NEWARGS),!,
    NewHead=..[F|NEWARGS], findall(NewVar,req(NewHead),ListNewVar),list_to_set_safe(ListNewVar,SetNewVar),NewVar=list(SetNewVar),
    term_anglify_args(Head,F,A,NewHead,singleValued,English).
 
@@ -169,16 +169,16 @@ singleValued(atloc(obj,xyz(region,int,int,int))).
 
 :- begin_transform_moo_preds.
 
-argsIsa(forwardRule(term,term)).
+argsIsaInList(forwardRule(term,term)).
 % forwardRule(inRegion(O,Region),atloc(O,LOC)):-
 
 % 
 
 
-argsIsa(resultIsa(fpred,type)).
+argsIsaInList(resultIsa(fpred,type)).
 
 
-argsIsa(formatted_resultIsa(formattype,type)).
+argsIsaInList(formatted_resultIsa(formattype,type)).
 
 formatted_resultIsa(apath(region,dir),areaPath).
 formatted_resultIsa(dice(int,int,int),int).
@@ -243,7 +243,7 @@ multiValued(description(term,string)).
 multiValued(keyword(term,string)).
 multiValued(act_affect(term,term,term)).
 multiValued(memory(agent,term)).
-argsIsa(wearing(agent,wearable)).
+argsIsaInList(wearing(agent,wearable)).
 
 nameStrings(apath(Region,Dir),Text):- pathName(Region,Dir,Text).
 description(apath(Region,Dir),Text):- pathName(Region,Dir,Text).
@@ -252,8 +252,8 @@ subclass(agent,obj).
 subclass(item,obj).
 
 % single valued
-argsIsa(pathName(region,dir,string)).
-argsIsa(verbOverride(term,action,action),[prologHybrid]).
+argsIsaInList(pathName(region,dir,string)).
+argsIsaInList(verbOverride(term,action,action),[prologHybrid]).
 
 :-dynamic(spawn_rate/2).
 
@@ -298,13 +298,13 @@ ask_module(nearby(obj,obj),world).
 % db_prop_prolog(world,same(id,id)).
 
 
-argsIsa(somethingIsa(term,list(type))).
-argsIsa(somethingDescription(term,list(string))).
-argsIsa(objects(type,list(id))).
-argsIsa(predicates(list(functor))).
-argsIsa(sorts(type,list(type))).
+argsIsaInList(somethingIsa(term,list(type))).
+argsIsaInList(somethingDescription(term,list(string))).
+argsIsaInList(objects(type,list(id))).
+argsIsaInList(predicates(list(functor))).
+argsIsaInList(sorts(type,list(type))).
 
-argsIsa(default_sv(singleValued,int,term)).
+argsIsaInList(default_sv(singleValued,int,term)).
 
 % live another day to fight (meaning repl_to_string/1 for now is in prolog)
 % singleValued(repl_writer(agent,term),default_sv(2,look:default_repl_writer)).
@@ -318,7 +318,7 @@ listValued(look:get_feet(agent,list(spatialthing)),[]).
 listValued(look:get_near(agent,list(spatialthing)),[ask_module(look)]).
 */
 listValued(get_precepts(agent,list(spatialthing)),[ask_module(look)]).
-argsIsa(mud_test(term,prolog)).
+argsIsaInList(mud_test(term,prolog)).
 
 multiValued(assert_with_pred(multiValued,term)).
 negationByFailure(multi(multiValued,int)).
@@ -326,13 +326,13 @@ multiValued(ask_predicate(multiValued,term)).
 
 isa(text,formattype).
 
-argsIsa(type_action_info(agenttype,actiontype,text)).
-argsIsa(action_info(actiontype,text)).
-argsIsa(actiontype(term)).
-argsIsa(argIsa(relation,int,type)).
-argsIsa(argFormat(relation,int,formattype)).
+argsIsaInList(type_action_info(agenttype,actiontype,text)).
+argsIsaInList(action_info(actiontype,text)).
+argsIsaInList(actiontype(term)).
+argsIsaInList(argIsa(relation,int,type)).
+argsIsaInList(argFormat(relation,int,formattype)).
 
-argsIsa(agent_text_command(agent,text,agent,goal)).
+argsIsaInList(agent_text_command(agent,text,agent,goal)).
 
 multiValued(description(term,text),[assert_with_pred(add_description),retract_with_pred(remove_description),query_with_pred(query_description)]).
 
@@ -520,7 +520,7 @@ listValued(directions(term,list(term))).
 
 multiValued(ask_module(multiValued,atom)).
 
-argsIsa(agent_call_command(agent,term(verb))).
+argsIsaInList(agent_call_command(agent,term(verb))).
 
 type_max_damage(obj,500).
 type_max_charge(obj,120).

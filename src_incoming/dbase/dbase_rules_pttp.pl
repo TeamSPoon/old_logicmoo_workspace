@@ -473,7 +473,6 @@ make_wrapper0(DefinedPreds,[P,N],Result) :-
 
 
 query(PosAncestors,NegAncestors,DepthIn,DepthOut,ProofIn,ProofOut) :- 
-  % current_agent(Agent), 'EP_cog'(Agent,Cog), DepthIn is DepthInIn - Cog,
   get_int_query(Int_query),
 	call(Int_query,PosAncestors,NegAncestors,DepthIn,DepthOut,ProofIn,ProofOut,query).
 

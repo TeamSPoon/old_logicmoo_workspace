@@ -20,6 +20,11 @@
 */
 :- style_check(-discontiguous).
 
+:- op(600,xfy,--).
+:- op(450,xfy,((:))).
+:- op(400,xfy,((&))).
+:- op(300,fx,(('`'))).
+:- op(200,xfx,((--))).
 % =================================================================
 % General Dictionary
 
@@ -170,6 +175,53 @@ terminator(!,!).
 name(Name) :-
    name_template(Name,_), !.
 
+
+
+
+aggr_noun(average,_,_,average).
+aggr_noun(sum,_,_,total).
+aggr_noun(total,_,_,total).
+
+meta_noun(number,_,V,feature&_,X,P,numberof(X,P,V)).
+
+
+/* Adjectives */
+
+restriction(african,feature&_,X,african(X)).
+restriction(american,feature&_,X,american(X)).
+restriction(asian,feature&_,X,asian(X)).
+restriction(european,feature&_,X,european(X)).
+
+attribute(large,feature&place&_,X,measure&area,Y,area(X,Y)).
+attribute(small,feature&place&_,X,measure&area,Y,area(X,Y)).
+attribute(great,measure&Type,X,measure&Type,Y,exceeds(X,Y)).
+
+aggr_adj(average,_,_,average).
+aggr_adj(total,_,_,total).
+aggr_adj(minimum,_,_,minimum).
+aggr_adj(maximum,_,_,maximum).
+
+/* Measure */
+
+measure(ksqmile,measure&area,[],ksqmiles).
+measure(sqmile,measure&area,[],sqmiles).
+measure(degree,measure&position,[],degrees).
+measure(thousand,measure&heads,[],thousand).
+measure(million,measure&heads,[],million).
+
+units(large,measure&_).
+units(small,measure&_).
+
+sign(large,+).
+sign(small,-).
+sign(great,+).
+
+/* Proportions and the like */
+
+comparator(proportion,_,V,[],proportion(V)).
+comparator(percentage,_,V,[],proportion(V)).
+
+
 % =================================================================
 % Specialised Dictionary
 
@@ -182,10 +234,7 @@ adj(minimum,restr).
 adj(maximum,restr).
 adj(average,restr).
 adj(total,restr).
-adj(african,restr).
-adj(american,restr).
-adj(asian,restr).
-adj(european,restr).
+
 adj(great,quant).
 adj(big,quant).
 adj(small,quant).
@@ -220,23 +269,7 @@ noun_sin(ksqmile).
 noun_sin(thousand).
 noun_sin(million).
 noun_sin(time).
-noun_sin(place).
-noun_sin(area).
-noun_sin(capital).
-noun_sin(city).
-noun_sin(continent).
-noun_sin(country).
-noun_sin(latitude).
-noun_sin(longitude).
-noun_sin(ocean).
-noun_sin(person).
-noun_sin(population).
-noun_sin(region).
-noun_sin(river).
-noun_sin(sea).
-noun_sin(seamass).
 noun_sin(number).
-noun_sin(agent).
 
 
 noun_plu(averages,average).
@@ -248,65 +281,7 @@ noun_plu(ksqmiles,ksqmile).
 noun_plu(million,million).
 noun_plu(thousand,thousand).
 noun_plu(times,time).
-noun_plu(places,place).
-noun_plu(areas,area).
-noun_plu(capitals,capital).
-noun_plu(cities,city).
-noun_plu(continents,continent).
-noun_plu(countries,country).
-noun_plu(latitudes,latitude).
-noun_plu(longitudes,longitude).
-noun_plu(oceans,ocean).
-noun_plu(persons,person).  noun_plu(people,person).
-noun_plu(populations,population).
-noun_plu(regions,region).
-noun_plu(rivers,river).
-noun_plu(seas,sea).
-noun_plu(seamasses,seamass).
 noun_plu(numbers,number).
-noun_plu(agents,agent).
-
-verb_root(border).
-verb_root(contain).
-verb_root(drain).
-verb_root(exceed).
-verb_root(flow).
-verb_root(rise).
-verb_root(govern).
-
-regular_pres(rise).
-
-verb_form(rises,rise,pres+fin,3+sin).
-verb_form(rose,rise,past+fin,_).
-verb_form(risen,rise,past+part,_).
-
-regular_pres(border).
-
-regular_past(bordered,border).
-
-verb_form(borders,border,pres+fin,3+sin).
-verb_form(bordering,border,pres+part,_).
-
-regular_pres(contain).
-
-regular_past(contained,contain).
-
-verb_form(contains,contain,pres+fin,3+sin).
-verb_form(containing,contain,pres+part,_).
-
-regular_pres(drain).
-
-regular_past(drained,drain).
-
-verb_form(drains,drain,pres+fin,3+sin).
-verb_form(draining,drain,pres+part,_).
-
-regular_pres(govern).
-
-regular_past(governed,govern).
-
-verb_form(governs,govern,pres+fin,3+sin).
-verb_form(governing,govern,pres+part,_).
 
 regular_pres(exceed).
 
@@ -315,22 +290,17 @@ regular_past(exceeded,exceed).
 verb_form(exceeds,exceed,pres+fin,3+sin).
 verb_form(exceeding,exceed,pres+part,_).
 
-verb_type(rise,main+intrans).
-verb_type(border,main+trans).
-verb_type(contain,main+trans).
-verb_type(drain,main+intrans).
-verb_type(exceed,main+trans).
-verb_type(govern,main+trans).
-
-regular_pres(flow).
-
-regular_past(flowed,flow).
-
-verb_form(flows,flow,pres+fin,3+sin).
-verb_form(flowing,flow,pres+part,_).
-
-verb_type(flow,main+intrans).
 
 adverb(yesterday).
 adverb(tomorrow).
+
+
+
+exceeds(X--U,Y--U) :- !, X > Y.
+exceeds(X1--U1,X2--U2) :- ratio(U1,U2,M1,M2), X1*M1 > X2*M2.
+
+ratio(thousand,million,1,1000).
+ratio(million,thousand,1000,1).
+ratio(ksqmiles,sqmiles,1000,1).
+ratio(sqmiles,ksqmiles,1,1000).
 

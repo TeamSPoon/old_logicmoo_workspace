@@ -133,11 +133,12 @@ rescandb:-finish_processing_world.
 gload:- load_game(logicmoo('rooms/startrek.all.plmoo')).
 
 :-export(savedb/0).
+savedb:-!.
 savedb:-
- ccatch((
-   rescan_dbase_t_once,
+ catch(rescan_dbase_t_once,E,dmsg(rescan_dbase_t_once:E)),
+ catch((   
    ignore(catch(make_directory('/tmp/lm/'),_,true)),
-   ignore(catch(delete_file('/tmp/lm/savedb'),E,(dmsg(E:delete_file('/tmp/lm/savedb')),dtrace))),   
+   ignore(catch(delete_file('/tmp/lm/savedb'),E,(dmsg(E:delete_file('/tmp/lm/savedb'))))),   
    tell('/tmp/lm/savedb'),make_db_listing,told),E,dmsg(savedb(E))).
 
 

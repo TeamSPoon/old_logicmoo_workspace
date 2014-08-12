@@ -50,8 +50,8 @@ must_test_80([what, countries, are, there, in, europe, ?], [sent([what, countrie
 
 /* Control loop */
 
-:-thread_local chat80_tracing/0.
-:-thread_local thlocal:theReporter/1.
+:- decl_thlocal chat80_tracing/0.
+:- decl_thlocal theReporter/1.
 
 hi :-
    hi(user).
@@ -128,7 +128,7 @@ is_bye(end_of_file).
 is_this([Text,'.'],Text).
 is_this([Text],Text).
 
-t1:- asserta(chat80_tracing),do_chat80(report,[what,rivers,are,there,?]).
+t1:- asserta(chat80_tracing),do_chat80(report,[what, rplans, are, there, ?]).
 
 do_chat80(U):-process80(U).
 do_chat80(Report,U):-nonvar(Report),!,with_assertions(thlocal:theReporter(Report),do_chat80(U)).
