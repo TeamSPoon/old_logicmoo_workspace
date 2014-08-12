@@ -182,7 +182,7 @@ hook:fact_maybe_deduced(inRegion(Obj,Region)):- is_asserted(atloc(Obj,LOC)),loca
 hook:fact_maybe_deduced(inRegion(apath(Region,Dir),Region)):-is_asserted(pathBetween(Region,Dir,_)).
 
 %  suggest a random fact that is probably not already true
-hook:create_random_fact(atloc(Obj,LOC)) :- nonvar(Obj),!,asserted_or_deduced(inRegion(Obj,Region)),must_det((in_grid_no_rnd(Region,LOC),unoccupied(Obj,LOC))),!.
+hook:create_random_fact(atloc(Obj,LOC)) :- nonvar(Obj),!,asserted_or_deduced(inRegion(Obj,Region)),must_det((in_grid(Region,LOC),unoccupied(Obj,LOC))),!.
 hook:create_random_fact(inRegion(Obj,Region)) :- nonvar(Obj),!,asserted_or_deduced(inRegion(Obj,Region)).
 
 %  suggest random values

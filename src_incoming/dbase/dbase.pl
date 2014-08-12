@@ -94,7 +94,7 @@ slow_kb_op(_Slow):- !.
 :- dynamic_multifile_exported use_cyc_database/0.
 
 % TODO uncomment the next line without breaking it all!
-% use_cyc_database.
+use_cyc_database.
 
 % ================================================
 % DBASE_T System
