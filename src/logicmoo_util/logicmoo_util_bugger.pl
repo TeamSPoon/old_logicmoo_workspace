@@ -214,12 +214,12 @@ dynamic_safe(M,F,A):- (static_predicate(M,F,A) -> true ; M:dynamic(M:F/A)). % , 
 :-op(1150,fx,dynamic_safe).
 
 % ----------
-:- module_transparent within_module(?,?).
+:- module_transparent within_module(0,?).
 within_module(Call,M):-
-   context_module(CM),
-   module(M),
+   context_module(_CM),
+  % module(M),
    call_cleanup('@'( M:Call,M),
-        module(CM)).
+        true/*module(CM)*/).
 
 % ----------
 :-export(with_pi/2).

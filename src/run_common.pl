@@ -9,7 +9,13 @@
 :- portray_text(true).
 
 :-context_module(CM),assert(startup_mod:loading_from_cm(CM)).
-:-module(startup_mod).
+:-module(user).
+create_module(M):-module(M),asserta(M:this_is_a_module(M)),module(user).
+:-create_module(moo).
+:-create_module(hook).
+:-create_module(thlocal).
+:-create_module(thglobal).
+:-module(moo).
 
 :-export(within_user/1).
 

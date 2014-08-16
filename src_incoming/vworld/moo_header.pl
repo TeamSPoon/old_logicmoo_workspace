@@ -18,13 +18,13 @@
 % these do not get defined!?
 % :-dynamic user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
 
-:- dynamic_multifile_exported hook:decl_database_hook/1.
 :- dynamic_multifile_exported hook:decl_database_hook/2.
-:- dynamic_multifile_exported hook:decl_database_hook/3.
 :- dynamic_multifile_exported hook:deduce_facts/2.
 :- dynamic_multifile_exported hook:create_random_fact/1.
 :- dynamic_multifile_exported hook:create_random_instance/3.
 :- dynamic_multifile_exported hook:fact_maybe_deduced/1.
+
+:- dynamic_multifile_exported moo:term_anglify/2.
 
 end_of_file.
 
@@ -47,53 +47,4 @@ end_of_file.
 % This one is for use with SWI
 :- within_user(ensure_loaded(library(quintus))).
 
-% logicmoo utils shared with other systems
-:- within_user(ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_bugger.pl'))).
-:- within_user(ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_library.pl'))).
-:- within_user(ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_ctx_frame.pl'))).
-:- within_user(ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_strings.pl'))).
-:- within_user(ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_terms.pl'))).
-:- within_user(ensure_loaded(logicmoo('logicmoo_util/logicmoo_util_dcg.pl'))).
 
-% make sure these get in early
-% :- within_user(ensure_loaded(logicmoo('dbase/dbase_formattypes.pl'))).
-
-% logicmoo vworld mud server
-:- within_user(ensure_loaded(logicmoo('vworld/world.pl'))).
-% :- within_user(ensure_loaded(logicmoo('vworld/world_action.pl'))).
-:- within_user(ensure_loaded(logicmoo('vworld/moo_loader.pl'))).
-:- within_user(ensure_loaded(logicmoo('vworld/toploop_telnet.pl'))).
-:- within_user(ensure_loaded(logicmoo('vworld/toploop_npc.pl'))).
-:- within_user(ensure_loaded(logicmoo('parsing/parser_imperative.pl'))).
-:- within_user(ensure_loaded(logicmoo('vworld/moo_testing.pl'))).
-
-% NPC planners
-:- within_user(ensure_loaded(logicmoo('mobs/monster.pl'))).
-:- within_user(ensure_loaded(logicmoo('mobs/predator.pl'))).
-:- within_user(ensure_loaded(logicmoo('mobs/explorer.pl'))).
-:- within_user(ensure_loaded(logicmoo('mobs/prey.pl'))).
-:- within_user(ensure_loaded(logicmoo('mobs/vacuum.pl'))).
-
-% Action/Commands implementation
-
-:- expand_file_name('../src_incoming/actions/*.pl',X),
-     forall(member(E,X),within_user(ensure_loaded(E))).
-/*
-:- within_user(ensure_loaded(logicmoo('actions/any.pl'))).
-:- within_user(ensure_loaded(logicmoo('actions/drink.pl'))).
-:- within_user(ensure_loaded(logicmoo('actions/use.pl'))).
-:- within_user(ensure_loaded(logicmoo('actions/attack.pl'))).
-:- within_user(ensure_loaded(logicmoo('actions/push.pl'))).
-:- within_user(ensure_loaded(logicmoo('actions/climb.pl'))).
-:- within_user(ensure_loaded(logicmoo('actions/eat.pl'))).
-:- within_user(ensure_loaded(logicmoo('actions/move.pl'))).
-:- within_user(ensure_loaded(logicmoo('actions/drop.pl'))).
-:- within_user(ensure_loaded(logicmoo('actions/sit.pl'))).
-:- within_user(ensure_loaded(logicmoo('actions/look.pl'))).
-:- within_user(ensure_loaded(logicmoo('actions/take.pl'))).
-:- within_user(ensure_loaded(logicmoo('actions/logon.pl'))).
-:- within_user(ensure_loaded(logicmoo('actions/teleport.pl'))).
-:- within_user(ensure_loaded(logicmoo('actions/chat.pl'))).
-:- within_user(ensure_loaded(logicmoo('actions/help.pl'))).
-:- within_user(ensure_loaded(logicmoo('actions/get_set.pl'))).
-*/

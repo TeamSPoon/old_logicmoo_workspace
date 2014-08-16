@@ -218,14 +218,18 @@ call_mpred_to_module(F,C):- not(is_callable(C)),!,functor(C,F,A),dmsg(todo(non_e
    decl_mpred_hybrid(F/A),!,call_mpred_real(F,C).
 call_mpred_to_module(_,C):- call_maybe_backchain(C).
 
-call_maybe_backchain(C):- test_tl(thlocal:insideIREQ,C),predicate_property(C,number_of_clauses(_)),!,clause(C,Body),body_no_backchains(Body).
-call_maybe_backchain(C):- debugOnError(C).
 
-body_no_backchains(true):-!.
-body_no_backchains(M):-body_no_backchains_match(M),!,M.
+call_maybe_backchain(C):- loop_check(call_maybe_backchain_lc(C)).
 
-body_no_backchains_match(hook:body_req(_, _, _, _)).
-body_no_backchains_match(true).
+call_maybe_backchain_lc(C):- predicate_property(C,number_of_rules(N)),N>0,!,clause(C,Body),body_no_backchains(C,Body).
+call_maybe_backchain_lc(C):- debugOnError(C).
+
+body_no_backchains(_,true):-!.
+body_no_backchains(H,B):- body_no_backchains_match(B),!,not(test_tl(thlocal:insideIREQ,H)),B.
+body_no_backchains(H,_):- test_tl(thlocal:insideIREQ,H),!,fail.
+body_no_backchains(H,B):- call_mpred_body(H,B).
+
+body_no_backchains_match((!,hook:body_req(_, _, _, _))).
 
 naf(Goal):-not(req(Goal)).
 
@@ -389,7 +393,7 @@ kb_f(X):-assertion_f(X).
 :- export(assertion_t/1).
 
 assertion_t(Call):- thlocal:useOnlyExternalDBs,!,thglobal:use_cyc_database,with_no_assertions(useOnlyExternalDBs, kb_t(Call),fail).
-assertion_t(Call):- thglobal:use_cyc_database,with_assertions(with_assertions(thlocal:useOnlyExternalDBs,kb_t(Call))).
+assertion_t(Call):- thglobal:use_cyc_database,with_assertions(thlocal:useOnlyExternalDBs,kb_t(Call)).
 % assertion_t(Call):- with_assertions(thlocal:useOnlyExternalDBs,loop_check(req(Call))).
 
 

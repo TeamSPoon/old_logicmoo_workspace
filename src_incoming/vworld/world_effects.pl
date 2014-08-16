@@ -44,6 +44,11 @@ worth(Agent,Action,Obj) :-
 worth(_,_,_).
 
 
+% Check to see if last action was successful or not
+:-export(success/2).
+success(Agent,no) :- cmdfailure(Agent,_),!.
+success(_,yes).
+
 :-export(add_cmdfailure/2).
 add_cmdfailure(Agent,What):-add(cmdfailure(Agent,What)).
 

@@ -59,31 +59,34 @@ look_as(Agent):-
 
 
 :-export(call_look/2).
-call_look(Agent,LOC):-
+call_look(Agent,LOC):-  mmake, call(call_look_proc,Agent,LOC).
+
+call_look_proc(Agent,LOC):-
    clr(props(Agent,needs_look(true))),
-   add(props(Agent,needs_look(false))),
+   add(props(Agent,needs_look(false))),    
     show_kb_preds(Agent,LOC,
          [
       % TODO make this work
          %  why does this this work on Prolog REPL?
          %   with_output_to(string(Str),show_room_grid('Area1000'))
          %  but yet this doent?
-         show_room_grid(region) = with_output_to(string(value),show_room_grid(region)),
+         show_room_grid = once(with_output_to(string(value),show_room_grid(region))),
          % for now workarround is 
          call(show_room_grid(region)),
          atloc(Agent,value),
          nameStrings(region,value),
-         descriptionHere(region,value),
+         forEach(descriptionHere(region,Value),fmt(region_desc(Value))),
          events=deliverable_location_events(Agent,LOC,value),
          path(D) = pathBetween_call(region,D,value),
-         path(D) = pathName(region,D,value),
-         inRegion(value,region),
+         pathName(D) = pathName(region,D,value),
+         inRegion(value,region),       
          facing(Agent,value),
-         all(get_feet(Agent,value)),
+         get_feet(Agent,value),
          get_near(Agent,value),
          get_percepts(Agent,value),         
          movedist(Agent,value),
          height_on_obj(Agent,value),
+         listof(possess(Agent,value)),
          success=world:success(Agent,value)
        ]).
 

@@ -17,7 +17,7 @@ thglobal:current_world(current).
 
 ensure_game_file(Mask):- ensure_plmoo_loaded(Mask).
 
-:-export(load_game/1).
+:-meta_predicate_transparent(load_game/1).
 
 load_game(File):-thglobal:current_world(World), load_game(World,File),!.
 load_game(World,File):- 
@@ -27,8 +27,8 @@ load_game(World,File):-
       show_time(ensure_plmoo_loaded(File)),!,
       show_time(finish_processing_world))).
 
-:-export(filematch/2).
-:-export filematch/3.
+:-meta_predicate_transparent(filematch/2).
+:-meta_predicate_transparent filematch/3.
 filematch(Mask,File1):-filematch('./',Mask,File1).
 filematch(RelativeTo,Mask,File1):-absolute_file_name(Mask,File1,[expand(true),access(read),extensions(['',plmoo,pl]),file_errors(fail),solutions(all),relative_to(RelativeTo)]).
 
@@ -42,25 +42,25 @@ path_concat1('./',R,R):-!.
 path_concat1('.',R,R):-!.
 
 
-:-export(files_matching/2).
-:-export(files_matching/3).
+:-meta_predicate_transparent(files_matching/2).
+:-meta_predicate_transparent(files_matching/3).
 files_matching(Mask,File1):- files_matching('./',Mask,File1),access_file(File1,read),!.
 files_matching(_Prepend,Mask,File1):- compound(Mask),Mask=..[F,A],!,file_search_path(F,NextPrepend),files_matching(NextPrepend,A,File1),access_file(File1,read).
 files_matching(Prepend,Mask,File1):- filematch(Prepend,Mask,File1),access_file(File1,read).
 % files_matching(Prepend,Mask,File1):- path_concat(Prepend,Mask,PMask),expand_file_name(PMask,Files),Files\=[],!,member(File1,Files),access_file(File1,read).
 */
 
-:-export(ensure_plmoo_loaded/1).
+:-meta_predicate_transparent(ensure_plmoo_loaded/1).
 ensure_plmoo_loaded(Mask):-
   forall(filematch(Mask,File1),ensure_plmoo_loaded_each(File1)).
 
 :-dynamic(loaded_file_world_time/3).
-:-export(loaded_file_world_time/3).
-:-export(get_last_time_file/3).
+:-meta_predicate_transparent(loaded_file_world_time/3).
+:-meta_predicate_transparent(get_last_time_file/3).
 get_last_time_file(FileIn,World,LastTime):- absolute_file_name(FileIn,File),loaded_file_world_time(File,World,LastTime),!.
 get_last_time_file(_,_,0).
 
-:-export(ensure_plmoo_loaded_each/1).
+:-meta_predicate_transparent(ensure_plmoo_loaded_each/1).
 ensure_plmoo_loaded_each(FileIn):-
    absolute_file_name(FileIn,File),
    thglobal:current_world(World),
@@ -68,7 +68,7 @@ ensure_plmoo_loaded_each(FileIn):-
    get_last_time_file(File,World,LastTime),
    (LastTime<NewTime -> reload_plmoo_file(File) ; true).
 
-:-export(reload_plmoo_file/1).
+:-meta_predicate_transparent(reload_plmoo_file/1).
 
 reload_plmoo_file(FileIn):-
    absolute_file_name(FileIn,File),
@@ -76,10 +76,10 @@ reload_plmoo_file(FileIn):-
    retractall(loaded_file_world_time(File,World,_)),   
    dbase_mod(DBASE),'@'(load_data_file(World,File),DBASE).
 
-:-export(load_data_file/2).
+:-meta_predicate_transparent(load_data_file/2).
 load_data_file(World,FileIn):- with_assertions(thglobal:current_world(World),load_data_file(FileIn)).
 
-:-export(load_data_file/1).
+:-meta_predicate_transparent(load_data_file/1).
 load_data_file(FileIn):-
   absolute_file_name(FileIn,File),
   thglobal:current_world(World),
@@ -102,7 +102,7 @@ read_one_term(Stream,Term):- style_check(-atom), catch(once(( read_term(Stream,T
 rescan_mpred_stubs:- doall((mpred_prop(F,prologHybrid),mpred_arity(F,A),A>0,warnOnError(declare_dbase_local_dynamic(moo,F,A)))).
 
 
-:-export(finish_processing_world/0).
+:-meta_predicate_transparent(finish_processing_world/0).
 %:-meta_predicate(finish_processing_world).
 :-dynamic(finish_processing_world/0).
 :-module_transparent(finish_processing_world/0).
@@ -123,10 +123,10 @@ rescan_all:- doall_and_fail(rescan_dbase_facts).
 rescan_all:- doall_and_fail(rescan_default_props).
 rescan_all:- doall_and_fail(rescan_slow_kb_ops).
 
-:-export(rescan_all/0).
+:-meta_predicate_transparent(rescan_all/0).
 rescan_all.
 
-:-export(finish_processing_game/0).
+:-meta_predicate_transparent(finish_processing_game/0).
 finish_processing_game:- dmsg(begin_finish_processing_game),fail.
 finish_processing_game:- doall_and_fail(rescan_all).
 finish_processing_game:- doall_and_fail(rescan_all).
@@ -136,7 +136,7 @@ finish_processing_game:- dmsg(end_finish_processing_game),fail.
 finish_processing_game.
 
 
-:-export(rescandb/0).
+:-meta_predicate_transparent(rescandb/0).
 % rescandb:- forall(thglobal:current_world(World),(findall(File,loaded_file_world_time(File,World,_),Files),forall(member(File,Files),ensure_plmoo_loaded_each(File)),call(finish_processing_world))).
 rescandb:- call(finish_processing_world).
 
@@ -149,10 +149,10 @@ rescandb:- call(finish_processing_world).
 % gload:- load_game(savedb),!.
 gload:- load_game(logicmoo('rooms/startrek.all.plmoo')).
 
-:-export(savedb/0).
+:-meta_predicate_transparent(savedb/0).
 savedb:-!.
 savedb:- debugOnError(rsavedb),!.
-:-export(rsavedb/0).
+:-meta_predicate_transparent(rsavedb/0).
 rsavedb:-
  debugOnError(rescan_dbase_t_once),
  catch((   
@@ -161,7 +161,7 @@ rsavedb:-
    tell('/tmp/lm/savedb'),make_db_listing,told),E,dmsg(savedb(E))),!.
 
 
-:-export(make_db_listing/0).
+:-meta_predicate_transparent(make_db_listing/0).
 make_db_listing:-
  % moo:dbase_mod(DBM),
 %   listing(dbase_t),
@@ -216,19 +216,19 @@ make_db_listing:-
 detWithSpace(WithSpace,String):-ddeterminer0(String),atom_concat(String,' ',WithSpace).
 detWithSpace(WithSpace,String):-ddeterminer1(String),atom_concat(String,' ',WithSpace).
 
-:-export(determinerRemoved/3).
+:-meta_predicate_transparent(determinerRemoved/3).
 determinerRemoved(S0,Det,S):- fail,detWithSpace(WithSpace,String),string_concat(WithSpace,S,S0),string_lower(String,Det).
 
-:-export(query_description/1).
+:-meta_predicate_transparent(query_description/1).
 query_description(description(I,S)):-dbase_t(description,I,S).
 
-:-export(remove_description/1).
+:-meta_predicate_transparent(remove_description/1).
 remove_description(description(I,S)):- trace_or_throw(remove_description(description(I,S))).
 
-:-export(add_description/1).
+:-meta_predicate_transparent(add_description/1).
 add_description(description(I,S)):-add_description(I,S).
 
-:-export(add_description/2).
+:-meta_predicate_transparent(add_description/2).
 add_description(A,S0):-string_concat('#$PunchingSomething ',S,S0),!,add_description(A,S).
 % add_description(A,S0):-determinerRemoved(S0,String,S),!,add_description(A,S),game_assert(determinerString(A,String)).
 add_description(A,S0):-

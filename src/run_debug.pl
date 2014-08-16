@@ -11,9 +11,9 @@ was_run_dbg_pl:-is_startup_file('run_debug.pl').
 
 :- debug.
 
+% run_tests includes run_common 
 :-include(run_tests).
 
-:- module(user).
 :- module(moo).
 
 % [Optionaly] re-define load_default_game

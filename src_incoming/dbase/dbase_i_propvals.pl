@@ -31,7 +31,8 @@ with_no_fallbacksg(Fact):-with_assertions(thlocal:noRandomValues(_),Fact).
 :-meta_predicate_transparent(with_no_fallbacks(0)).
 with_no_fallbacks(Fact):-with_assertions(thlocal:noDefaultValues(_),Fact).
 
-
+:-meta_predicate_transparent(fallback/0).
+fallback:- not(thlocal:insideIREQ(_)).
 
 :- dynamic_multifile_exported(transitive_other/4).
 

@@ -100,6 +100,7 @@ foc_current_player(P):- get_session_id(O),generate_new_player(P), !, asserta(thl
 generate_new_player(P) :- gensym(player,N),P=explorer(N),assert_isa(P,explorer),assert_isa(P,player).
 
 
+
 % Lists all the agents in the run. Except for other monsters.
 list_agents(Agents) :- agent_list(Agents), !.
 list_agents(Agents) :- % build cache

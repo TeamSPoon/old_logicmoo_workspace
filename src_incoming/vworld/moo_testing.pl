@@ -17,10 +17,13 @@
         test_call/1]).
 
 :- thread_local was_test_name/1.
-:- meta_predicate test_call(+).
-:- meta_predicate run_mud_test(?,^).
-:- meta_predicate test_true(^).
-:- meta_predicate test_false(^).
+
+:- meta_predicate_transparent test_call(^).
+:- meta_predicate_transparent run_mud_test(?,^).
+:- meta_predicate_transparent test_true(^).
+:- meta_predicate_transparent test_false(^).
+:- meta_predicate_transparent term_test(^).
+:- meta_predicate_transparent run_mud_tests/0.
 
 
 :- include(logicmoo(vworld/moo_header)).

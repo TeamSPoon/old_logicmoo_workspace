@@ -16,6 +16,8 @@
 :- op(1120,fx,decl_mpred_prolog).
 :- op(1150,fx,decl_mpred_hybrid).
 
+:- include(logicmoo('vworld/moo_header.pl')).
+
 
 ztrace:-dmsg(ztrace),trace_or_throw(dtrace).
 
@@ -336,7 +338,6 @@ dbase_mod(moo).
 % Found new meta-predicates in iteration 1 (0.281 sec)
 %:- meta_predicate db_forall(?,?,?,0).
 
-:- include(logicmoo('vworld/moo_header.pl')).
 
 % :- include('dbase_types_motel').
 

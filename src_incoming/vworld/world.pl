@@ -46,10 +46,6 @@
             decl_type/1,
             
                        
-          show_kb_via_pred/3,
-          default_repl_obj_to_string/3,
-          default_repl_writer/4,
-          show_kb_preds/2,show_kb_preds/3,success/2,          
          init_location_grid/1,
          samef/2,
          grid_dist/3,
@@ -217,7 +213,7 @@ moo:subclass(explorer,agent).
 :-dynamic_multifile_exported(moo:type_max_charge/2).
 %:-dynamic_multifile_exported(moo:type_max_damage/2).
 
-moo:max_charge(T,NRG):- moo:type_max_charge(AgentType,NRG),isa(T,AgentType).
+moo:max_charge(T,NRG):- fallback, moo:type_max_charge(AgentType,NRG),isa(T,AgentType).
 %moo:max_damage(T,Dam):- moo:type_max_damage(AgentType,Dam),isa(T,AgentType).
 
 punless(Cond,Action):- once((call(Cond);call(Action))).

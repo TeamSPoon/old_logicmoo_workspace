@@ -13,14 +13,20 @@
 
 :- register_module_type(command).
 
-% :- export(found_undef/3).
-% found_undef(_,_,_).
-% :- dynamic undef/2.
+:- export(found_undef/3).
+found_undef(_,_,_).
+:- dynamic undef/2.
 
 % when we import new and awefull code base (the previous )this can be helpfull
 % we redfine list_undefined/1 .. this is the old version
+:- export(scansrc_list_undefined/1).
+scansrc_list_undefined(_):-!.
+scansrc_list_undefined(A):- real_list_undefined(A).
+
+list_undefined:-real_list_undefined([]).
+
 :- export(real_list_undefined/1).
-real_list_undefined(A):- 
+real_list_undefined(A):-
  merge_options(A, [module_class([user])], B),
         prolog_walk_code([undefined(trace), on_trace(found_undef)|B]),
         findall(C-D, retract(undef(C, D)), E),
@@ -34,24 +40,19 @@ real_list_undefined(A):-
 
 
 :- export(remove_undef_search/0).
-remove_undef_search:-!.
 remove_undef_search:- ((
  '@'(use_module(library(check)),'user'),
  redefine_system_predicate(check:list_undefined(_)),
  abolish(check:list_undefined/1),
  assert((check:list_undefined(A):- not(thread_self(main)),!, ignore(A=[]))),
  assert((check:list_undefined(A):- reload_library_index,  update_changed_files,call(thread_self(main)),!, ignore(A=[]))),
- assert((check:list_undefined(A):- ignore(A=[]),real_list_undefined(A))))).
+ assert((check:list_undefined(A):- ignore(A=[]),scansrc_list_undefined(A))))).
 
 
 moo:action_info(scansrc,"Scan for sourcecode modifed on filesystem and TeamSPoon. NOTE: only new files with this mask (src_incoming/*/?*.pl) are picked up on").
 moo:agent_call_command(Agent,scansrc):-  once('@'(agent_call_safely(Agent,scansrc),'user')).
 
-:-export(mmake/0).
-
-mmake:- update_changed_files.
 :-export(scansrc/0).
-scansrc :- !.
 scansrc :- 
  ensure_loaded(library(make)),
  debugOnError((
@@ -73,8 +74,12 @@ include_moo_files_not_included(Mask):-
 
 include_moo_file_ni(M):-absolute_file_name(M,EX,[expand(true),access(read),file_type(prolog)]),include_moo_file_ni_1(EX).
 
+:-export(mmake/0).
+mmake:- update_changed_files.
 :-export(update_changed_files/0).
 update_changed_files :-
+        set_prolog_flag(verbose_load,true),
+        ensure_loaded(library(make)),
 	findall(File, make:modified_file(File), Reload0),
 	list_to_set(Reload0, Reload),
 	(   prolog:make_hook(before, Reload)
@@ -96,7 +101,7 @@ include_moo_file_ni_1(M):- atomic_list_concat([_,_|_],'_c_',M),!.
 include_moo_file_ni_1(M):- source_file_property(M,_),!.
 include_moo_file_ni_1(M):- source_file_property(_,includes(M)),!.
 
-include_moo_file_ni_1(M):- '@'(ensure_loaded(M),user).
+include_moo_file_ni_1(M):- user_ensure_loaded(M).
 
 
 :- include(logicmoo(vworld/moo_footer)).
