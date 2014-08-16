@@ -26,29 +26,33 @@ was_run_dbg_pl:-is_startup_file('run_debug.pl').
 %:- at_start(start_servers).
 % commented out except on run
 
-start_boxer:- !.
 start_boxer:-
    threads,
    ensure_loaded(logicmoo(candc/parser_boxer)),
-   % make,
-   fmt("Press Ctrl-D to start the mud!"),
-   at_start(prolog).
+   % make,   
+   at_start(prolog_repl).
 
+
+prolog_repl:- nl,fmt("Press Ctrl-D to start the mud!"),nl,with_assertions(thglobal:use_cyc_database, prolog).
 
 % [Required] Defines debug80
-debug80:- user:ensure_loaded(logicmoo(parsing/parser_talk)),
-          user:ensure_loaded(logicmoo(parsing/parser_chat80)),
-          decl_type(person),
-          remove_undef_search, 
+debug80:- module(moo),
+          user_ensure_loaded(logicmoo(parsing/parser_talk)),
+          user_ensure_loaded(logicmoo(parsing/parser_chat80)),
+          decl_type(person),          
+          module(moo),
           ensure_plmoo_loaded(logicmoo('rooms/startrek.all.plmoo')),
-          t1,
-          prolog.
+          t1,          
+          prolog_repl.
 
-% [Optional] Allows testing/debug of the chat80 system (withouyt loading the servers)
-% :- debug80.
+
+debug_e2c:- with_assertions(thglobal:use_cyc_database,(module(parser_e2c),cache_the_posms,prolog_repl)).
+
+% [Optional] Interactively debug E2C
+% :- debug_e2c.
 
 % [Optional] This loads boxer
-:- at_start(with_assertions(moo:prevent_transform_moo_preds,within_user(ignore(catch(start_boxer,_,true))))).
+% :- at_start(with_assertions(moo:prevent_transform_moo_preds,within_user(ignore(catch(start_boxer,_,true))))).
 
 % [Optional] Testing PTTP
 % :-is_startup_file('run_debug.pl')->doall(do_pttp_test(_));true.
@@ -68,24 +72,34 @@ now_run_local_tests_dbg :- doall(defined_local_test).
 % :-repeat, trace, do_player_action('who'),fail.
 
 
-:-do_player_action("scansrc").
+% :-do_player_action("scansrc").
 
-%:-trace.
+% :-trace.
 
 :-doall((get_type_action_templates(Templates),dmsg(get_type_action_templates(Templates)))).
 
 % [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
 % :- register_timer_thread(npc_ticker,30,npc_tick).
 
-% :- prolog.
 
 % the real tests now (once)
 :- if_flag_true(was_run_dbg_pl,at_start(must_det(run_mud_tests))).
 
 
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
+:-do_player_action("look").
+
+
+:-forall(inRegion(O,L),dmsg(inRegion(O,L))).
+
+% :-forall(atloc(O,L),dmsg(atloc(O,L))).
+
+% [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
 :- if_flag_true(was_run_dbg_pl, at_start(run)).
 
+
+% [Optionaly] Allows testing/debug of the chat80 system (withouyt loading the servers)
+:- debug80.
 
 % So scripted versions don't just exit
 :- if_flag_true(was_run_dbg_pl,at_start(prolog)).

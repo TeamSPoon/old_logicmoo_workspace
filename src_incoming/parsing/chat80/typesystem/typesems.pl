@@ -1,3 +1,6 @@
+:- dynamic_multifile_exported moo:longitude/2.
+:- dynamic_multifile_exported moo:latitude/2.
+
 /*
 
  _____________________________________
@@ -27,7 +30,7 @@ must_test_80([where, is, the, largest, mstate, ?], [sent([where, is, the, larges
 must_test_80([which, mstates, are, social, ?], [sent([which, mstates, are, social, ?]), parse(whq(feature&concept&mstate-B, s(np(3+plu, np_head(int_det(feature&concept&mstate-B), [], mstate), []), verb(be, active, pres+fin, [], pos), [arg(pred, adj(social))], []))), sem((answer([A]):-mstate(A), social(A))), qplan((answer([A]):-social(A), {mstate(A)})), answers([albania, andorra, austria, belgium, bulgaria, cyprus, czechoslovakia, denmark, east_germany, eire, finland, france, greece, hungary, iceland, italy, liechtenstein, luxembourg, malta, monaco, netherlands, norway, poland, portugal, romania, san_marino, spain, sweden, switzerland, united_kingdom, west_germany, yugoslavia])],[time(0.0)]).
 must_test_80([which, mstate, '\'', s, consequent, is, london, ?], [sent([which, mstate, '\'', s, consequent, is, london, ?]), parse(whq(feature&concept&mstate-B, s(np(3+sin, np_head(det(the(sin)), [], consequent), [pp(poss, np(3+sin, np_head(int_det(feature&concept&mstate-B), [], mstate), []))]), verb(be, active, pres+fin, [], pos), [arg(dir, np(3+sin, name(london), []))], []))), sem((answer([A]):-mstate(A), consequent(A, london))), qplan((answer([A]):-consequent(A, london), {mstate(A)})), answers([united_kingdom])],[time(0.0010000000000000009)]).
 must_test_80([which, is, the, largest, humorous, mstate, ?], [sent([which, is, the, largest, humorous, mstate, ?]), parse(whq(feature&concept&mstate-B, s(np(3+sin, wh(feature&concept&mstate-B), []), verb(be, active, pres+fin, [], pos), [arg(dir, np(3+sin, np_head(det(the(sin)), [sup(most, adj(large)), adj(humorous)], mstate), []))], []))), sem((answer([A]):-B^ (setof(C:D, (mstate(D), utility_value(D, C), humorous(D)), B), aggregate(max, B, A)))), qplan((answer([D]):-C^ (setof(B:A, (humorous(A), {mstate(A)}, utility_value(A, B)), C), aggregate(max, C, D)))), answers([sudan])],[time(0.0)]).
-must_test_80([how, large, is, the, smallest, pyhsical, mstate, ?], [sent([how, large, is, the, smallest, pyhsical, mstate, ?]), parse(whq(measure&utility_value-B, s(np(3+sin, np_head(det(the(sin)), [sup(most, adj(small)), adj(pyhsical)], mstate), []), verb(be, active, pres+fin, [], pos), [arg(pred, value(adj(large), wh(measure&utility_value-B)))], []))), sem((answer([A]):-B^ (C^ (setof(D:E, (mstate(E), utility_value(E, D), pyhsical(E)), C), aggregate(min, C, B)), utility_value(B, A)))), qplan((answer([E]):-D^C^ (setof(B:A, (pyhsical(A), {mstate(A)}, utility_value(A, B)), C), aggregate(min, C, D), utility_value(D, E)))), answers([0--ksqmiles])],[time(0.0)]).
+must_test_80([how, large, is, the, smallest, physical, mstate, ?], [sent([how, large, is, the, smallest, physical, mstate, ?]), parse(whq(measure&utility_value-B, s(np(3+sin, np_head(det(the(sin)), [sup(most, adj(small)), adj(physical)], mstate), []), verb(be, active, pres+fin, [], pos), [arg(pred, value(adj(large), wh(measure&utility_value-B)))], []))), sem((answer([A]):-B^ (C^ (setof(D:E, (mstate(E), utility_value(E, D), physical(E)), C), aggregate(min, C, B)), utility_value(B, A)))), qplan((answer([E]):-D^C^ (setof(B:A, (physical(A), {mstate(A)}, utility_value(A, B)), C), aggregate(min, C, D), utility_value(D, E)))), answers([0--ksqmiles])],[time(0.0)]).
 must_test_80([what, is, the, need, that, complys_with, humorous, mstates, and, that, complys_with, logical, mstates, ?], [sent([what, is, the, need, that, complys_with, humorous, mstates, and, that, complys_with, logical, mstates, ?]), parse(whq(feature&concept&goal-B, s(np(3+sin, wh(feature&concept&goal-B), []), verb(be, active, pres+fin, [], pos), [arg(dir, np(3+sin, np_head(det(the(sin)), [], need), [conj(and, rel(feature&concept&goal-C, s(np(3+sin, wh(feature&concept&goal-C), []), verb(comply_with, active, pres+fin, [], pos), [arg(dir, np(3+plu, np_head(generic, [adj(humorous)], mstate), []))], [])), rel(feature&concept&goal-C, s(np(3+sin, wh(feature&concept&goal-C), []), verb(comply_with, active, pres+fin, [], pos), [arg(dir, np(3+plu, np_head(generic, [adj(logical)], mstate), []))], [])))]))], []))), sem((answer([A]):-need(A), B^ (mstate(B), humorous(B), complys_with(A, B)), C^ (mstate(C), logical(C), complys_with(A, C)))), qplan((answer([A]):-B^C^ (need(A), {complys_with(A, B), {humorous(B)}, {mstate(B)}}, {complys_with(A, C), {logical(C)}, {mstate(C)}}))), answers([energy_need])],[time(0.0020000000000000018)]).
 must_test_80([what, are, the, consequents, of, the, mstates, complying, the, baltic, ?], [sent([what, are, the, consequents, of, the, mstates, complying, the, baltic, ?]), parse(whq(feature&assertion-B, s(np(3+plu, wh(feature&assertion-B), []), verb(be, active, pres+fin, [], pos), [arg(dir, np(3+plu, np_head(det(the(plu)), [], consequent), [pp(prep(of), np(3+plu, np_head(det(the(plu)), [], mstate), [reduced_rel(feature&concept&mstate-D, s(np(3+plu, wh(feature&concept&mstate-D), []), verb(comply_with, active, inf, [prog], pos), [arg(dir, np(3+sin, name(baltic), []))], []))]))]))], []))), sem((answer([D]):-setof([A]:C, (mstate(A), complys_with(A, baltic), setof(B, consequent(A, B), C)), D))), qplan((answer([H]):-setof([E]:G, (mstate(E), complys_with(E, baltic), setof(F, consequent(E, F), G)), H))), answers([[[denmark]:[copenhagen], [east_germany]:[east_berlin], [finland]:[helsinki], [poland]:[warsaw], [soviet_union]:[moscow], [sweden]:[stockholm], [west_germany]:[bonn]]])],[time(0.0010000000000000009)]).
 must_test_80([which, mstates, are, complyed, by, two, wants, ?], [sent([which, mstates, are, complyed, by, two, wants, ?]), parse(whq(feature&concept&mstate-B, s(np(3+plu, np_head(int_det(feature&concept&mstate-B), [], mstate), []), verb(comply_with, passive, pres+fin, [], pos), [], [pp(prep(by), np(3+plu, np_head(quant(same, nb(2)), [], want), []))]))), sem((answer([A]):-mstate(A), numberof(B, (want(B), complys_with(B, A)), 2))), qplan((answer([B]):-numberof(A, (want(A), complys_with(A, B)), 2), {mstate(B)})), answers([egypt, iran, israel, saudi_arabia, turkey])],[time(0.0)]).
@@ -1897,7 +1900,7 @@ noun_plu(populations,population).
 noun_plu(scripts,script).
 noun_plu(rplans,rplan).
 noun_plu(wants,want).
-noun_plu(goales,goal).
+noun_plu(goals,goal).
 
 verb_root(comply_with).
 verb_root(contain).
@@ -1965,9 +1968,11 @@ loc_pred(east,prep(eastof)).
 loc_pred(west,prep(westof)).
 loc_pred(north,prep(northof)).
 loc_pred(south,prep(southof)).
+loc_pred('$prep',prep(prepNprep)).
 
+adj('$adj',restr).
 adj(humorous,restr).
-adj(pyhsical,restr).
+adj(physical,restr).
 adj(logical,restr).
 adj(social,restr).
 
@@ -2003,6 +2008,7 @@ property(longitude,measure&position,X,feature&_,Y,
          longitude(Y,X),[],_,_).
 property(population,
          measure&heads,X,feature&_,Y,population(Y,X),[],_,_).
+
 
 thing(concept,feature&concept&_,X,concept(X),[],_).
 thing(utility_value,measure&utility_value,X,utility_value(X),[],_).
@@ -2160,15 +2166,15 @@ utility_value(_X--ksqmiles).
 consequent(C) :- consequent(_X,C).
 assertion(C) :- assertion(C,_,_).
 mstate(C) :- mstate(C,_,_,_,_,_,_,_).
-latitude(_X--degrees).
-longitude(_X--degrees).
+moo:latitude(_X--degrees).
+moo:longitude(_X--degrees).
 concept(X) :- rtype(X); script(X); goal(X); mstate(X).
 population(_X--million).
 population(_X--thousand).
 script(R) :- in_rtype(R,_).
 
 humorous(X) :- in(X,jokebook).
-pyhsical(X) :- in(X,vworldbook).
+physical(X) :- in(X,vworldbook).
 logical(X) :- in(X,logicbook).
 social(X) :- in(X,socialbook).
 
@@ -2191,14 +2197,14 @@ circle_of_latitude(tropic_of_capricorn).
 circle_of_latitude(arctic_circle).
 circle_of_latitude(antarctic_circle).
 
-latitude(equator,0--degrees).
-latitude(tropic_of_cancer,23--degrees).
-latitude(tropic_of_capricorn,-23--degrees).
-latitude(arctic_circle,67--degrees).
-latitude(antarctic_circle,-67--degrees).
+moo:latitude(equator,0--degrees).
+moo:latitude(tropic_of_cancer,23--degrees).
+moo:latitude(tropic_of_capricorn,-23--degrees).
+moo:latitude(arctic_circle,67--degrees).
+moo:latitude(antarctic_circle,-67--degrees).
 
-latitude(C,L--degrees) :- mstate(C,_,L,_,_,_,_,_).
-longitude(C,L--degrees) :- mstate(C,_,_,L,_,_,_,_).
+moo:latitude(C,L--degrees) :- mstate(C,_,L,_,_,_,_,_).
+moo:longitude(C,L--degrees) :- mstate(C,_,_,L,_,_,_,_).
 
 utility_value(C,A--ksqmiles) :-
    mstate(C,_,_,_,A0,_,_,_), A is integer(A0/1000).

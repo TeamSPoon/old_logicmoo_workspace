@@ -144,7 +144,7 @@ locs_near_i(L1,L2):- locationToRegion(L1,R),pathBetween_call(R,_,R2),in_grid_no_
 region_near(R1,R2):-pathBetween_call(R1,_,R2).
 region_near(R1,R1).
 
-moo:default_inst_props(OfAgent,agent,[facing(F),atloc(L)]):-ignore((nonvar(OfAgent),create_someval(facing,OfAgent,F),create_someval(atloc,OfAgent,L))).
+% 345345  moo:default_inst_props(OfAgent,agent,[facing(F),atloc(L)]):-  dfsdfd ignore((nonvar(OfAgent),create_someval(facing,OfAgent,F),create_someval(atloc,OfAgent,L))).
 
 moo:transitive_other(atloc,1,Obj,What):-inside_of(Obj,What).
 
@@ -176,14 +176,20 @@ ensure_in_world(What):-must_det(put_in_world(What)).
 :- dynamic_multifile_exported hook:create_random_fact/1.
 :- dynamic_multifile_exported hook:create_random_instance/3.
 :- dynamic_multifile_exported hook:fact_maybe_deduced/1.
+:- dynamic_multifile_exported hook:fact_is_false/2.
 
-%  suggest a deducable fact that is probably not already asserted
+
+% facts that cant be true
+hook:fact_is_false(atloc(Obj,_LOC),inside_of(Obj,What)) :- nonvar(Obj),(inside_of(Obj,What)),!.
+hook:fact_is_false(inRegion(Obj,_LOC),inside_of(Obj,What)) :- nonvar(Obj),(inside_of(Obj,What)),!.
+
+%  suggest a deducable fact that is probably true but not already asserted
 hook:fact_maybe_deduced(inRegion(Obj,Region)):- is_asserted(atloc(Obj,LOC)),locationToRegion(LOC,Region),!.
 hook:fact_maybe_deduced(inRegion(apath(Region,Dir),Region)):-is_asserted(pathBetween(Region,Dir,_)).
 
-%  suggest a random fact that is probably not already true
-hook:create_random_fact(atloc(Obj,LOC)) :- nonvar(Obj),!,asserted_or_deduced(inRegion(Obj,Region)),must_det((in_grid(Region,LOC),unoccupied(Obj,LOC))),!.
-hook:create_random_fact(inRegion(Obj,Region)) :- nonvar(Obj),!,asserted_or_deduced(inRegion(Obj,Region)).
+%  suggest a random fact that is probably is not already true
+hook:create_random_fact(atloc(Obj,LOC)) :- nonvar(Obj),asserted_or_deduced(inRegion(Obj,Region)),!,((in_grid(Region,LOC),unoccupied(Obj,LOC),is_fact_consistent(atloc(Obj,LOC)))).
+hook:create_random_fact(inRegion(Obj,Region)) :- nonvar(Obj),not(is_asserted(inRegion(Obj,_))),asserted_or_deduced(inRegion(Obj,Region)).
 
 %  suggest random values
 hook:create_random_instance(dir,Dir,Test) :- my_random_member(Dir,[n,s,e,w,ne,nw,se,sw]),Test,!.
@@ -218,19 +224,30 @@ is_occupied(Loc,What):- locationToRegion(Loc,Region),inRegion(What,Region),ensur
 
 calc_xyz(Region1,Dir,force(X1,Y1,Z1),X2,Y2,Z2):-
    to_3d(Region1,xyz(_,X,Y,Z)),
-   dir_offset(Dir,1,OX,OY,OZ),
+   get_dir_offset(Dir,1,OX,OY,OZ),
    X2 is X+ (OX*X1), Y2 is Y+OY*Y1, Z2 is Z+OZ*Z1.
 
 move_dir_target(RegionXYZ,Dir,XXYY):-
    move_dir_target(RegionXYZ,Dir,1,XXYY).
 
-move_dir_target(RegionXYZ,Dir,Force,XXYY):-
-   (calc_xyz(RegionXYZ,Dir,force(Force,Force,Force),X,Y,Z)),
+
+move_dir_target(RegionXYZ,DirS,Force,XXYY):-
+   any_to_atom(DirS,Dir),
+   once(((calc_xyz(RegionXYZ,Dir,force(Force,Force,Force),X,Y,Z)),
    (locationToRegion(RegionXYZ,Region1)),
    (round_loc_target(Region1,X,Y,Z,Region2,X2,Y2,Z2)),
-   XXYY = xyz(Region2,X2,Y2,Z2),!,
+   XXYY = xyz(Region2,X2,Y2,Z2),
+   must_det(ground(XXYY)))),
+   check_ahead_for_ground(XXYY),!.
+
+move_dir_target(RegionXYZ,Dir,_Force,XXYY):-
+   any_to_string(Dir,DirS),
+   locationToRegion(RegionXYZ,Region1),
+   pathBetween_call(Region1,DirS,Region2),
+   in_grid_rnd(Region2,XXYY),
+   XXYY = xyz(Region2,_X2,_Y2,_Z2),
    must_det(ground(XXYY)),
-   check_ahead_for_ground(XXYY).
+   check_ahead_for_ground(XXYY),!.
 
 
 round_loc_target(Region1,X,Y,Z,Region3,X3,Y3,Z3):-
@@ -260,9 +277,16 @@ compute_dir(Region1,X,Y,Z,Dir):-
    atomic_list_concat_catch([NS,EW,UD],'',Dir),!.
 
 
+get_dir_offset(Dir,F,OX,OY,OZ):-
+  dir_offset(Dir,F,OX,OY,OZ),!.
+get_dir_offset(Dir,F,OX,OY,OZ):- any_to_atom(Dir,DirA),
+  dir_offset(DirA,F,OX,OY,OZ),!.
+get_dir_offset(Dir,F,OX,OY,OZ):- any_to_string(Dir,DirS),
+  dir_offset(DirS,F,OX,OY,OZ),!.
+
 :-export(dir_offset/5).
 
-% :-decl_mpred_hybrid(dir_offset(string,int,int,int,int)).
+% :-decl_mpred_hybrid(dir_offset(term,int,int,int,int)).
 dir_offset(u,F,0,0,F).
 dir_offset(d,F,0,0,-F).
 dir_offset(n,F,0,-F,0).
@@ -292,11 +316,12 @@ in_world_move(LOC,Agent,DirS) :-
 can_world_move(LOC,_Agent,Dir) :- check_behind_for_ground(LOC), move_dir_target(LOC,Dir,_).
 
 in_world_move0(LOC,Agent,Dir) :-
-        padd(Agent,facing(Dir)),   
+      any_to_string(Dir,DirS),
+        padd(Agent,facing(DirS)),   
         check_behind_for_ground(LOC),
 	move_dir_target(LOC,Dir,XXYY),!,
    must_det_l([
-        dmsg(move_dir_target(LOC,Dir,XXYY)),
+        dmsg(move_dir_target(LOC,DirS,XXYY)),
         locationToRegion(LOC,Region1),
         locationToRegion(XXYY,Region2),
         ((add(atloc(Agent,XXYY)),

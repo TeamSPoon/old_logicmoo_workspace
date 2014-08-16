@@ -159,20 +159,18 @@ moo:nonCreatableType(int).
 moo:nonCreatableType(term).
 moo:nonCreatableType(type).
 
-create_instance(P,What):-create_instance(P,What,[]).
-
 moo:subclass(wearable,item).
 moo:subclass(knife,item).
 moo:subclass(food,item).
 
-moo:creatableType(FT):- nonvar(FT),formattype(FT),!,fail.
-moo:creatableType(FT):- nonvar(FT),nonCreatableType(FT),!,fail.
-moo:creatableType(item). %  type, formattype, 
-moo:creatableType(SubType):-member(SubType,[agent,item,region]).
-moo:creatableType(S):- is_asserted(creatableType(T)), transitive_subclass(S,T).
+moo:createableType(FT):- nonvar(FT),formattype(FT),!,fail.
+moo:createableType(FT):- nonvar(FT),nonCreatableType(FT),!,fail.
+moo:createableType(item). %  type, formattype, 
+moo:createableType(SubType):-member(SubType,[agent,item,region]).
+moo:createableType(S):- is_asserted(createableType(T)), transitive_subclass(S,T).
 
-moo:createableSubclassType(S,T):- moo:creatableType(T),is_asserted(subclass(S,T)).
-moo:createableSubclassType(T,'TemporallyExistingThing'):- moo:creatableType(T).
+moo:createableSubclassType(S,T):- moo:createableType(T),is_asserted(subclass(S,T)).
+moo:createableSubclassType(T,'TemporallyExistingThing'):- moo:createableType(T).
 
 
 moo:isa(int,formattype).
@@ -187,7 +185,17 @@ create_agent(P,List):-must_det(create_instance(P,agent,List)).
 
 % decl_type(Spec):-create_instance(Spec,type,[]).
 
-create_instance(What,Type,Props):- loop_check(create_instance_0(What,Type,Props),dmsg(already_create_instance(What,Type,Props))).
+:-export(create_instance/1).
+create_instance(P):- must_det((isa(P,What),createableType(What))),must_det(create_instance(P,What,[])).
+:-export(create_instance/2).
+create_instance(P,What):-create_instance(P,What,[]).
+:-export(create_instance/3).
+create_instance(What,Type,Props):- loop_check(show_time(create_instance_now(What,Type,Props)),dmsg(already_create_instance(What,Type,Props))).
+
+create_instance_now(What,Type,Props):-
+  with_assertions(thlocal:skip_db_op_hooks,
+   with_no_assertions(thglobal:use_cyc_database, 
+     (split_name_type(What,Inst,_WhatType),assert_isa(Inst,Type), create_instance_0(What,Type,Props)))).
 
 :-discontiguous create_instance_0/3.
 
@@ -200,17 +208,17 @@ create_instance_0(I,_,_):-asserta_if_new(is_creating_now(I)),fail.
 create_instance_0(What,FormatType,List):- FormatType\==type, formattype(FormatType),!,trace_or_throw(formattype(FormatType,create_instance(What,FormatType,List))).
 create_instance_0(SubType,type,List):-decl_type(SubType),padd(SubType,List).
 
-moo:creatableType(agent).
+moo:createableType(agent).
 moo:subclass(actor,agent).
 moo:subclass(explorer,agent).
 
 :-dynamic_multifile_exported(moo:max_damage/2).
 :-dynamic_multifile_exported(moo:max_charge/2).
 :-dynamic_multifile_exported(moo:type_max_charge/2).
-:-dynamic_multifile_exported(moo:type_max_charge/2).
+%:-dynamic_multifile_exported(moo:type_max_damage/2).
 
 moo:max_charge(T,NRG):- moo:type_max_charge(AgentType,NRG),isa(T,AgentType).
-moo:max_damage(T,Dam):- moo:type_max_damage(AgentType,Dam),isa(T,AgentType).
+%moo:max_damage(T,Dam):- moo:type_max_damage(AgentType,Dam),isa(T,AgentType).
 
 punless(Cond,Action):- once((call(Cond);call(Action))).
 
@@ -218,7 +226,7 @@ create_instance_0(T,agent,List):-
   must_det_l([
    retractall(agent_list(_)),
    create_meta(T,_,agent,P),
-   must_det(isa(P,agent)),
+   mreq(isa(P,agent)),
    padd(P,List),   
    % punless(possess(P,_),rez_to_inventory(P,food,_Food)),
    rez_to_inventory(P,food,_Food),
@@ -249,10 +257,10 @@ moo:valueReset(charge,max_charge).
 
 */
 
-moo:creatableType(region).
+moo:createableType(region).
 
 create_instance_0(T, item, List):-
-   isa(T,What),What\=item, moo:creatableType(What),!,create_instance_0(T, What, List).
+   isa(T,What),What\=item, moo:createableType(What),!,create_instance_0(T, What, List).
 
 create_instance_0(T,Type,List):-
   moo:createableSubclassType(Type,MetaType),
@@ -279,7 +287,7 @@ leash(+call),trace,
 
 create_instance_0(What,Type,Props):- leash(+call),trace,dtrace,trace_or_throw(dmsg(assumed_To_HAVE_creted_isnance(What,Type,Props))),!.
 
-%moo:creatableType(type).
+%moo:createableType(type).
 
 
 
@@ -292,8 +300,11 @@ same(X,Y):- samef(X,Y).
 samef(X,Y):- X=Y,!.
 samef(X,Y):- notrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci(XF,YF)))).
 
+:-decl_mpred_hybrid(kwLabel(term,term)).
+:-decl_mpred_hybrid(opaqueness(term,percent)).
 moo:default_type_props(region,opaqueness(1)).
 moo:default_type_props(obj,opaqueness(100)).
+:-decl_mpred_hybrid(listPrice(item,number)).
 moo:default_type_props(item,listPrice(0)).
 moo:default_type_props(agent,last_command(stand)).
 moo:default_type_props(agent,[
@@ -304,13 +315,13 @@ moo:default_type_props(agent,[
                        facing("n"),
                        agent_turnnum(0),
                        score(1),
-                       memory(P,directions([n,s,e,w,ne,nw,se,sw,u,d]))]).
+                       memory(directions([n,s,e,w,ne,nw,se,sw,u,d]))]).
 
 
 
 
-possess(Who,Thing):-genlInverse(W,possess),call_mpred(dbase_t(W,Thing,Who)).
-possess(Who,Thing):-genlPreds(possess,W),call_mpred(dbase_t(W,Who,Thing)).
+possess(Who,Thing):-genlInverse(W,possess),into_mpred_form(dbase_t(W,Thing,Who),Call),call_mpred(Call).
+possess(Who,Thing):-genlPreds(possess,W),into_mpred_form(dbase_t(W,Who,Thing),Call),call_mpred(Call).
 
 
 :- include(logicmoo(vworld/moo_footer)).

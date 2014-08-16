@@ -214,6 +214,14 @@ dynamic_safe(M,F,A):- (static_predicate(M,F,A) -> true ; M:dynamic(M:F/A)). % , 
 :-op(1150,fx,dynamic_safe).
 
 % ----------
+:- module_transparent within_module(?,?).
+within_module(Call,M):-
+   context_module(CM),
+   module(M),
+   call_cleanup('@'( M:Call,M),
+        module(CM)).
+
+% ----------
 :-export(with_pi/2).
 :- module_transparent(with_pi/2).
 :- meta_predicate(with_pi(:,3)).
@@ -234,9 +242,9 @@ with_pi_selected(CM,M, P ,Pred3):-  functor(P,F,A), with_pi_stub(CM,M,P,F/A,Pred
 
 :- export(with_pi_stub/5).
 with_pi_stub(CM, M,P, F/A , CM:Pred3):- ((integer(A),atom(M),atom(F),functor(P,F,A))),
-   ('@'(M:call(Pred3,CM, M,P,F/A),CM)),!.
+   (within_module(M:call(Pred3,CM, M,P,F/A),CM)),!.
 with_pi_stub(CM, M,P, F/A , Pred3):- ((integer(A),atom(M),atom(F),functor(P,F,A))),
-   ('@'(M:call(Pred3,CM, M,P,F/A),CM)),!.
+   (within_module(M:call(Pred3,CM, M,P,F/A),CM)),!.
 with_pi_stub(CM, M,P,FA,Pred3):- throw(invalide_args(CM, M,P,FA,Pred3)).
 % ----------
 
@@ -246,7 +254,7 @@ with_pi_stub(CM, M,P,FA,Pred3):- throw(invalide_args(CM, M,P,FA,Pred3)).
 with_mfa(P  ,Pred3):- with_pi(P,with_mfa_of(Pred3)).
 
 :- module_transparent(with_mfa_of/5).
-:- meta_predicate(with_mfa_of(3,+,+,+)).
+:- meta_predicate(with_mfa_of(3,+,+,+,+)).
 with_mfa_of(Pred3,_CM,M,_P,F/A):-M:call(Pred3,M,F,A).
 
 
@@ -266,15 +274,20 @@ dynamic_multifile_exported(CM, M, _PI, F/A):- CALL='@'((dynamic_safe(M,F,A),
 
 :- export(((meta_predicate_transparent)/1)).
 :- meta_predicate(( meta_predicate_transparent(:),  meta_predicate_transparent(+,+,+,+))).
+meta_predicate_transparent(CM:M:F/A):- functor(PI,F,A), !, 
+   meta_predicate_transparent(CM,M,PI,F/A).
+meta_predicate_transparent(CM:F/A):- functor(PI,F,A), !, 
+   meta_predicate_transparent(CM,CM,PI,F/A).
 meta_predicate_transparent(MP):-with_pi(MP,(meta_predicate_transparent)).
 
 meta_predicate_transparent(CM,M,PI,F/A):-
+   (var(PI)->functor(PI,F,A);true),
    M:module_transparent(F/A),
    notrace((fill_args(PI,('?')),!,
    dbgsubst(PI, (0),(0),PI1),
    dbgsubst(PI1,(^),(0),PI2),
    dbgsubst(PI2,(:),(:),PI3))),
-   M:meta_predicate(PI3),
+   (compound(PI3) -> M:meta_predicate(PI3) ; true),
    dynamic_multifile_exported(CM, M,PI3,F/A).
 
 fill_args([Arg|More],With):-!,ignore(With=Arg),fill_args(More,With).
@@ -304,8 +317,11 @@ def_meta_predicate(M:F,S,E):-!,doall(((between(S,E,N),make_list('?',N,List),CALL
 def_meta_predicate(F,S,E):- trace_or_throw(def_meta_predicate(F,S,E)).
 
 
+:- meta_predicate_transparent((no_loop_check(^,^))).
+:- meta_predicate_transparent((no_loop_check(^))).
 :- meta_predicate_transparent((loop_check_term(0,?,0))).
 :- meta_predicate_transparent((loop_check(^,^))).
+:- meta_predicate_transparent((loop_check(^))).
 
 
 :- export(((decl_thlocal)/1)).
@@ -482,13 +498,16 @@ set_bugger_flag(F,V):-create_prolog_flag(F,V,[term]).
 :- meta_predicate_transparent showProfilerStatistics(^).
 %:- meta_predicate_transparent debugCallF(^).
 
+:- export((user_ensure_loaded/1)).
+:- module_transparent user_ensure_loaded/1.
+user_ensure_loaded(What):- !, within_module(ensure_loaded(What),'user').
+
 :- module_transparent user_use_module/1.
-% user_use_module(What):-!, ensure_loaded(What).
 % user_use_module(logicmoo(What)):- !, '@'(use_module(logicmoo(What)),'user').
 % user_use_module(library(What)):- !, use_module(library(What)).
-user_use_module(What):- '@'(use_module(What),'user').
+user_use_module(What):- within_module(use_module(What),'user').
 
-:- '@'(use_module(logicmoo_util_library), 'user').
+:- within_module(use_module(logicmoo_util_library), 'user').
 
 
 :- thread_local tlbugger:inside_loop_check/1.
@@ -537,26 +556,49 @@ call_skipping_n_clauses(N,H):-
 
 cannot_table_call(Call):- with_assertions(cannot_table,Call).
 
+% ===================================================================
+:-thread_local was_a_repeat/2.
+
+:-meta_predicate_transparent(no_repeats(0)).
+
+no_repeats(Call):-ground(Call),Call,!.
+no_repeats(Call):-make_key(Call,Key),retractall(was_a_repeat(Key, _)),no_repeats_key(Key,Call,Call).
+
+:-meta_predicate_transparent(no_repeats(+,0)).
+
+no_repeats(Vars,Call):-ground(Vars),Call,!.
+no_repeats(Vars,Call):-make_key(Vars:Call,Key),retractall(was_a_repeat(Key, _)),no_repeats_key(Key,Vars,Call).
+
+:-meta_predicate_transparent(no_repeats_key(+,+,0)).
+
+no_repeats_key(Key,Vars,Call):- call(Call), make_key(Vars,CallResult),not(was_a_repeat(Key,CallResult)),asserta(was_a_repeat(Key,CallResult)).
+no_repeats_key(Key, _ , _):- retractall(was_a_repeat(Key, _)),fail.
+
+
 % =========================================================================
 
 is_loop_checked(B):- 
        make_key(B,BC),!,tlbugger:inside_loop_check(BC).
 
 
+no_loop_check(B):- no_loop_check(B,fail).
+no_loop_check(B, TODO):- make_key(B,BC),!, no_loop_check(B,BC,TODO).
+no_loop_check(_B, BC, TODO):- tlbugger:inside_loop_check(BC),!,call(TODO).
+no_loop_check( B, BC,_TODO):- with_no_assertions(tlbugger:inside_loop_check(_),
+               setup_call_cleanup(asserta(tlbugger:inside_loop_check(BC)),B,(ignore(retract((tlbugger:inside_loop_check(BC))))))).
 
-no_loop_check(Call):- with_no_assertions(tlbugger:inside_loop_check(_),Call).
-
-loop_check_clauses(B,TODO):-  loop_check_clauses(B,1,TODO).
-loop_check_clauses(B,N,TODO):- make_key(B,BC), loop_check_term(call_skipping_n_clauses(N,B),BC,TODO).
-
+  
+%loop_check_clauses(B,TODO):-  loop_check_clauses(B,1,TODO).
+%loop_check_clauses(B,N,TODO):- make_key(B,BC), loop_check_term(call_skipping_n_clauses(N,B),BC,TODO).
 % loop_check_throw(B):- loop_check(B,((retractall(tlbugger:inside_loop_check(B)),debugCallWhy(loop_check_throw(B),loop_check_throw(B))))).
+
 loop_check(B):- loop_check(B,fail).
 loop_check(B, TODO):- make_key(B,BC),!, loop_check_term(B,BC,TODO).
 
+
 loop_check_term(_B, BC, TODO):- tlbugger:inside_loop_check(BC),!,call(TODO).
-loop_check_term( B, BC,_TODO):- not(bad_idea),!,
-    setup_call_cleanup(asserta(tlbugger:inside_loop_check(BC)),B,
-     (ignore(retract((tlbugger:inside_loop_check(BC)))))).
+loop_check_term( B, BC,_TODO):- !,  % %  not(bad_idea),!,
+    setup_call_cleanup(asserta(tlbugger:inside_loop_check(BC)),B, (ignore(retract((tlbugger:inside_loop_check(BC)))))).
 loop_check_term( B, BC,_TODO):- with_assertions(tlbugger:inside_loop_check(BC),B).
 
 
@@ -1235,8 +1277,8 @@ fmt(X,Y,Z):- fmt0(X,Y,Z),!.
 
 
 fmt_portray_clause(X):- unnumbervars(X,Y),!,numbervars(Y), portray_clause(Y).
-fmt_or_pp(pp((X:-Y))):-!,fmt_portray_clause((X:-Y)),!.
-fmt_or_pp(pp(X)):-!,functor_catch(X,F,A),fmt_portray_clause((pp(F,A):-X)),!.
+fmt_or_pp(portray((X:-Y))):-!,fmt_portray_clause((X:-Y)),!.
+fmt_or_pp(portray(X)):-!,functor_catch(X,F,A),fmt_portray_clause((pp(F,A):-X)),!.
 fmt_or_pp(X):-'format'('~q~n',[X]).
 
 dfmt(X):- with_output_to_stream(user_error,fmt(X)).
@@ -1249,6 +1291,15 @@ with_output_to_stream(Stream,Goal):-
          set_output(Saved)).
 
 :-dynamic dmsg_log/3.
+
+:-meta_predicate_transparent(show_time(:)).
+show_time(Call):-
+  statistics(runtime,[MSecStart,_]),   
+  ignore(show_call(Call)),
+  statistics(runtime,[MSecEnd,_]),
+   MSec is (MSecEnd-MSecStart),
+   Time is MSec/1000,
+   ignore((Time > 0.5 , dmsg('Time'(Time)=Call))).
 
 logger_property(todo,once,true).
 
@@ -1622,7 +1673,7 @@ module_notrace(M):- forall(predicate_property(P,imported_from(M)),bugger:moo_hid
 % =====================================================================================================================
 :- module_transparent call_no_cuts/1.
 :- meta_predicate_transparent call_no_cuts(0).
-call_no_cuts(CALL):-clause_safe(CALL,TEST),call_no_cuts_0(TEST).
+call_no_cuts(CALL):-clause_safe(CALL,TEST),call(TEST).
 
 call_no_cuts_0(true):-!.
 call_no_cuts_0((!)):-!.
@@ -1653,6 +1704,10 @@ any_term_overlap_atoms_of(A1,T2):-atoms_of(T2,A2),!,member(A,A1),member(A,A2),!.
 
 any_term_overlap(T1,T2):- atoms_of(T1,A1),atoms_of(T2,A2),!,member(A,A1),member(A,A2),!.
 
+:-meta_predicate_transparent(call_tabled_can(0)).
+
+call_tabled_can(Call):-with_assertions(thlocal:can_table,with_no_assertions(thlocal:cannot_table,call_tabled(Call))).
+
 call_tabled(setof(Vars,C,List)):- !,call_setof_tabled(Vars,C,List).
 call_tabled(findall(Vars,C,List)):- !,call_setof_tabled(Vars,C,List).
 call_tabled(C):- must_det(nonvar(C)), term_variables(C,Vars),!,call_vars_tabled(Vars,C).
@@ -1662,12 +1717,18 @@ call_vars_tabled(Vars,C):- call_setof_tabled(Vars,C,Set),!,member(Vars,Set).
 call_setof_tabled(Vars,C,List):- make_key(Vars+C,Key),call_tabled0(Key,Vars,C,List).
 
 call_tabled0(Key,_,_,List):- call_tabled_list(Key,List),!.
-call_tabled0(Key,Vars,C,List):- really_can_table,!, no_loop_check(setof(Vars,C,List)),!,asserta_if_ground(call_tabled_list(Key,List)),!.
-call_tabled0(Key,Vars,C,List):- no_loop_check(setof(Vars,C,List)),!,asserta_if_ground(call_tabled_list(Key,List)),!.
+call_tabled0(Key,Vars,C,List):- really_can_table,!,setof(Vars,C,List),!,asserta_if_ground(call_tabled_list(Key,List)),!.
+call_tabled0(_,Vars,C,List):- setof(Vars,C,List).
 
-really_can_table:-not(thlocal:cannot_table),thlocal:can_table.
+really_can_table:-not(test_tl(cannot_table)),test_tl(can_table).
 
 
+:-meta_predicate_transparent(test_tl(1,+)).
+test_tl(Pred,Term):-call(Pred,Term),!.
+test_tl(Pred,Term):-compound(Term),functor(Term,F,_),call(Pred,F),!.
+
+:-meta_predicate_transparent(test_tl(+)).
+test_tl(C):-call(thlocal:C).
 
 
 % asserta_if_ground(_):- !.
@@ -1840,3 +1901,4 @@ user:prolog_exception_hook(A,B,C,D):-once(copy_term(A,AA)),ccatch(( once(bugger_
 :-'$syspreds':'$hide'('$syspreds':visible/1).
 :-'$syspreds':'$hide'(visible/1).
 % :-'$set_predicate_attribute'(!, trace, 1).
+% :-hideTrace.

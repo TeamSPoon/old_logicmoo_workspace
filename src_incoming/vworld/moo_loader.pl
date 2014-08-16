@@ -21,10 +21,11 @@ ensure_game_file(Mask):- ensure_plmoo_loaded(Mask).
 
 load_game(File):-thglobal:current_world(World), load_game(World,File),!.
 load_game(World,File):- 
-   world_clear(World),
-   retractall(loaded_file_world_time(_,_,_)),
-  ensure_plmoo_loaded(File),!,
-  finish_processing_world.
+ with_no_assertions(thglobal:use_cyc_database,
+    ( world_clear(World),
+      retractall(loaded_file_world_time(_,_,_)),
+      show_time(ensure_plmoo_loaded(File)),!,
+      show_time(finish_processing_world))).
 
 :-export(filematch/2).
 :-export filematch/3.
@@ -87,7 +88,8 @@ load_data_file(FileIn):-
    dmsg(load_data_file(File,World,NewTime)),
   with_assertions(thglobal:loading_game_file(World,File),
    setup_call_cleanup(see(File),
-    (load_game_name_stream(World),asserta_new(moo:loaded_game_file(World,File))), seen)).
+    (load_game_name_stream(World),asserta_new(moo:loaded_game_file(World,File))), seen)),
+  dmsg(load_data_file_complete(File)),!.
    
 load_game_name_stream(_Name):- repeat,read_one_term(Term),myDebugOnError(game_assert(Term)),Term == end_of_file,!.
 load_game_name_stream(_Name,Stream):- repeat,read_one_term(Stream,Term),myDebugOnError(game_assert(Term)),Term == end_of_file,!.
@@ -97,31 +99,46 @@ myDebugOnError(Term):-catch(once((call(Term))),E,(dmsg(start_myDebugOnError(E=Te
 read_one_term(Term):- style_check(-atom), catch(once(( read_term(Term,[double_quotes(string)]))),E,(Term=error(E),dmsg(read_one_term(Term)))).
 read_one_term(Stream,Term):- style_check(-atom), catch(once(( read_term(Stream,Term,[double_quotes(string)]))),E,(Term=error(E),dmsg(read_one_term(Term)))).
 
-ensure_mpred_stubs:- doall((mpred_prop(F,prologHybrid),mpred_arity(F,A),A>0,warnOnError(declare_dbase_local_dynamic(moo,F,A)))).
+rescan_mpred_stubs:- doall((mpred_prop(F,prologHybrid),mpred_arity(F,A),A>0,warnOnError(declare_dbase_local_dynamic(moo,F,A)))).
 
 
 :-export(finish_processing_world/0).
+%:-meta_predicate(finish_processing_world).
+:-dynamic(finish_processing_world/0).
+:-module_transparent(finish_processing_world/0).
+
+:-meta_predicate_transparent(finish_processing_world/0).
+:-meta_predicate_transparent(finish_processing_game/0).
+:-meta_predicate_transparent(rescan_all/0).
+:-meta_predicate_transparent(doall_and_fail(0)).
+
 finish_processing_world:- loop_check(with_assertions(thlocal:do_slow_kb_op_now,doall(finish_processing_game)),true).
+
+doall_and_fail(Call):- show_time(once(doall(Call))),fail.
+
+rescan_all:- doall_and_fail(rescan_mpred_props).
+rescan_all:- doall_and_fail(rescan_dbase_ops).
+rescan_all:- doall_and_fail(rescan_game_loaded).
+rescan_all:- doall_and_fail(rescan_dbase_facts).
+rescan_all:- doall_and_fail(rescan_default_props).
+rescan_all:- doall_and_fail(rescan_slow_kb_ops).
+
+:-export(rescan_all/0).
+rescan_all.
+
+:-export(finish_processing_game/0).
 finish_processing_game:- dmsg(begin_finish_processing_game),fail.
-finish_processing_game:- ignore(rescan_mpred_props),fail.
-finish_processing_game:- forall(retract(moo:call_after_load(A)),once(must_det(A))),fail.
-finish_processing_game:- ignore(rescan_mpred_props),fail.
-finish_processing_game:- retract(moo:call_after_load(A)),once(must_det(A)),fail.
-finish_processing_game:- once(rescan_dbase_t),fail.
-finish_processing_game:- once(scan_default_props),fail.
-finish_processing_game:- once(rescan_dbase_t),fail.
-finish_processing_game:- dmsg(saving_gameb),fail.
-finish_processing_game:- ensure_mpred_stubs,fail.
-finish_processing_game:- do_after_game_file,fail.
-finish_processing_game:- do_db_op_hooks0,fail.
+finish_processing_game:- doall_and_fail(rescan_all).
+finish_processing_game:- doall_and_fail(rescan_all).
+finish_processing_game:- dmsg(saving_finish_processing_game),fail.
 finish_processing_game:- savedb,fail.
 finish_processing_game:- dmsg(end_finish_processing_game),fail.
 finish_processing_game.
 
 
 :-export(rescandb/0).
-rescandb:- forall(thglobal:current_world(World),(findall(File,loaded_file_world_time(File,World,_),Files),forall(member(File,Files),ensure_plmoo_loaded_each(File)),finish_processing_world)).
-rescandb:-finish_processing_world.
+% rescandb:- forall(thglobal:current_world(World),(findall(File,loaded_file_world_time(File,World,_),Files),forall(member(File,Files),ensure_plmoo_loaded_each(File)),call(finish_processing_world))).
+rescandb:- call(finish_processing_world).
 
 
 
@@ -134,12 +151,14 @@ gload:- load_game(logicmoo('rooms/startrek.all.plmoo')).
 
 :-export(savedb/0).
 savedb:-!.
-savedb:-
- catch(rescan_dbase_t_once,E,dmsg(rescan_dbase_t_once:E)),
+savedb:- debugOnError(rsavedb),!.
+:-export(rsavedb/0).
+rsavedb:-
+ debugOnError(rescan_dbase_t_once),
  catch((   
    ignore(catch(make_directory('/tmp/lm/'),_,true)),
    ignore(catch(delete_file('/tmp/lm/savedb'),E,(dmsg(E:delete_file('/tmp/lm/savedb'))))),   
-   tell('/tmp/lm/savedb'),make_db_listing,told),E,dmsg(savedb(E))).
+   tell('/tmp/lm/savedb'),make_db_listing,told),E,dmsg(savedb(E))),!.
 
 
 :-export(make_db_listing/0).
@@ -198,7 +217,7 @@ detWithSpace(WithSpace,String):-ddeterminer0(String),atom_concat(String,' ',With
 detWithSpace(WithSpace,String):-ddeterminer1(String),atom_concat(String,' ',WithSpace).
 
 :-export(determinerRemoved/3).
-determinerRemoved(S0,Det,S):- detWithSpace(WithSpace,String),string_concat(WithSpace,S,S0),string_lower(String,Det).
+determinerRemoved(S0,Det,S):- fail,detWithSpace(WithSpace,String),string_concat(WithSpace,S,S0),string_lower(String,Det).
 
 :-export(query_description/1).
 query_description(description(I,S)):-dbase_t(description,I,S).

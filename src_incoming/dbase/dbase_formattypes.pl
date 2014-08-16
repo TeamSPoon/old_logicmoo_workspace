@@ -41,9 +41,6 @@ split_name_type_0(C,P,C):- atom(C),gensym(C,P).
 % moo:formattype(S):-   is_asserted(moo:ft_info(S,_)).
 % moo:formattype(S):-   is_asserted(moo:subft(S,_)).
 
-:-decl_mpred_prolog(typeDeclarer/1).
-typeDeclarer(F):-dbase_t(typeDeclarer,F).
-
 formattype_guessable(S):- moo:ft_info(S,_).
 
 term_is_ft(Term,Type):- var(Type),var(Term),!,member(Type,[var,prolog]).
@@ -168,12 +165,15 @@ argIsa_call_0(F,_,term):-member(F/_,
 argIsa_asserted(F,N,Type):- argIsa_call_0(F,N,Type),!.
 argIsa_asserted(F,N,Type):- get_mpred_prop(F,argIsa(N,Type)),!.
 argIsa_asserted(F,N,Type):- grab_argsIsa(F,Types),arg(N,Types,Type),nonvar(Type),!.
+argIsa_asserted(_,_,term).
+argIsa_asserted(F,N,Type):- grab_argsIsa2(F,Types),arg(N,Types,Type),nonvar(Type),!.
 argIsa_asserted(facing,_,term).
 
 grab_argsIsa(resultIsa,resultIsa(fpred,type)).
 % grab_argsIsa(F,Types):- call_collect([flag(+firstValue),+debugOnError,+deducedSimply],mpred_prop(F,argsIsaInList(Types))).
 grab_argsIsa(F,Types):- mpred_prop(F,argsIsaInList(Types)).
-grab_argsIsa(F,Types):- deducedSimply(mpred_prop(F,argsIsaInList(Types))).
+grab_argsIsa(F,Types):- is_asserted(argsIsaInList(F,Types)).
+grab_argsIsa2(F,Types):- fail,deducedSimply(mpred_prop(F,argsIsaInList(Types))).
 
 
 argIsa_call_1(Prop,N1,Type):- is_2nd_order_holds(Prop),dmsg(todo(define(argIsa_call(Prop,N1,'Second_Order_TYPE')))),dumpST,dtrace,
@@ -469,6 +469,8 @@ is_any_dir(Dir):-any_to_dir_ns(Dir,_).
 
 any_to_dir(D,D):-var(D),!.
 any_to_dir(A,S):-any_to_dir_ns(A,D),any_to_string(D,S),!.
+any_to_dir(S,S):-string(S),!.
+
 any_to_dir_ns(D,D):-var(D),!.
 any_to_dir_ns(D,D):-dir_offset(D,_,_,_,_),!.
 any_to_dir_ns(A,D):-p2c_dir2(D,A),!.
@@ -508,7 +510,7 @@ call_argIsa_ForAssert(F,N,Type):-argIsa_call(F,N,Type),atom(Type),!,not(nonusefu
 nonusefull_deduction_type(term).
 nonusefull_deduction_type(voprop).
 nonusefull_deduction_type(dir).
-nonusefull_deduction_type(Type):-creatableType(Type),!,fail.
+nonusefull_deduction_type(Type):-createableType(Type),!,fail.
 nonusefull_deduction_type(obj).
 nonusefull_deduction_type(Type):-is_asserted(formattype(Type)).
 

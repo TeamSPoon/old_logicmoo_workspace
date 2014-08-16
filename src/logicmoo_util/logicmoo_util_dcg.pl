@@ -58,7 +58,7 @@
 :- meta_predicate dcgReorder(//,//,?,?).
 :- meta_predicate dcgAnd(//,//,//,?,?).
 :- meta_predicate dcgAnd(//,//,?,?).
-:- meta_predicate dcgStartsWith1(//,*,*).
+:- meta_predicate dcgStartsWith1(//,?,?).
 :- meta_predicate do_dcgTest_startsWith(?,//,?).
 :- meta_predicate theCode(?,?,?).
 :- meta_predicate decl_dcgTest_startsWith(?,?,?).
@@ -249,6 +249,7 @@ dcgStartsWith(TheType,SMORE,SMORE) :- phrase(TheType,SMORE,_).
 decl_dcgTest_startsWith("this is text",dcgStartsWith(theText([this,is]))).
 
 
+:-export(dcgStartsWith1//1).
 % 1) must be first in list 
 % 2) doesnt consume
 % 3) sees only 1 item

@@ -26,7 +26,7 @@ oncely(Call):-once(Call).
 call_collect(Ops,Call):-call_collect(Ops,Ops,Call,Call).
 
 call_collect(Ops,Flags,Call,Vars):-ground(Call),not(member(ground,Flags)),!,call_collect(Ops,[ground|Flags],Call,Vars).
-call_collect(Ops,Flags,Call,Vars):-predicate_property(Call,_),not(member(defined,Flags)),!,call_collect(Ops,[defined|Flags],Call,Vars).
+call_collect(Ops,Flags,Call,Vars):-is_callable(Call),not(member(defined,Flags)),!,call_collect(Ops,[defined|Flags],Call,Vars).
 call_collect(Ops,Flags,Call,Vars):-call_collect_op(Ops,Flags,Call,Vars,[],Results),!,member(Vars,Results).
 
 % complete
@@ -135,7 +135,7 @@ call_expanded_for_vars(Op,F,[],Call):- !,once(call_expanded_for_all(Op,F,[],Call
 call_expanded_for_vars(Op,F,Vs,Call):- call_expanded_for_all(Op,F,Vs,Call).
 
 sc1(dbase_t_p2,C):-dtrace,trace_or_throw(sc1(dbase_t_p2,C)),!,C.
-sc1(F,C):-(mpred_prop(F,nonGroundOK);thlocal:in_prolog_source_code),!,C.
+sc1(F,C):-(mpred_prop(F,nonGroundOK);test_tl(in_prolog_source_code)),!,C.
 sc1(_,C):-C, ignore((not(ground(C)),dmsg(non_ground_sc1(C)))).
 
 % call_expanded_for_all(Must,F,Vs,Call):- loop_check(sc1(F,call_expanded_for_all0(Must,F,Vs,Call)),(dmsg(failed_looped(call_expanded_for_all0(Must,F,Vs,Call))),!,fail)).
@@ -160,7 +160,11 @@ call_expanded_for_sv_2(_WhatNot,F,A,G,OUT):- defaultArgValue(G,F,A,OUT),!.
 
 */
 
-:-export(call_expanded/1).
+:-meta_predicate_transparent(is_callable(0)).
+is_callable(C):-predicate_property(C,_),!.
+
+:-meta_predicate_transparent(call_expanded(0)).
+call_expanded(C):-is_callable(C),!,debugOnError(C).
 call_expanded(C):-call_mpred_real(C).
 :-export(call_mpred/1).
 call_mpred(C):- call_mpred_real(C).
@@ -179,22 +183,26 @@ call_mpred_real(true):-!.
 call_mpred_real(C):- compound(C),functor(C,F,_),!,call_mpred_real(F,C).
 call_mpred_real(C):- debugOnError(C),!.
 
-call_mpred_real(F,C):- mpred_prop(F,hasStub(body_req)),!,call_mpred_to_module(F,C).
-call_mpred_real(F,C):- mpred_prop(F,prologOnly),!,call_mpred_to_module_checked(F,C).
+% if this next line compians .. that means it is borken so should be ocmmented out
+call_mpred_real(dbase_t,C):- into_mpred_form(C,MP),!,(call_mpred_real(MP)->must_det(call_mpred_real0(dbase_t,C));call_mpred_real0(dbase_t,C)).
+call_mpred_real(F,C):-call_mpred_real0(F,C).
 
-call_mpred_real(F,C):- (ground(C);mpred_prop(F,singleValued)),!,call_mpred_real_g(F,C),!.
+call_mpred_real0(F,C):- mpred_prop(F,hasStub(body_req)),!,call_mpred_to_module(F,C).
+call_mpred_real0(F,C):- mpred_prop(F,prologOnly),!,call_mpred_to_module_checked(F,C).
+
+call_mpred_real0(F,C):- (ground(C);mpred_prop(F,singleValued)),!,call_mpred_real_g(F,C),!.
 
 % nonground
-call_mpred_real(F,C):- not(mpred_prop(F,_)),!,call_mpred_to_module_checked(F,C).
-call_mpred_real(F,C):- not(predicate_property(C,_)),!,is_asserted(F,C).
-call_mpred_real(F,C):- setof(C,is_asserted(F,C),Results),call_mpred_real_w_results(C,F,Results).
+call_mpred_real0(F,C):- not(mpred_prop(F,_)),!,call_mpred_to_module_checked(F,C).
+call_mpred_real0(F,C):- not(is_callable(C)),!,is_asserted(F,C).
+call_mpred_real0(F,C):- setof(C,is_asserted(F,C),Results),call_mpred_real_w_results(C,F,Results).
 
 call_mpred_real_w_results(_F,C,Results):-member(C,Results).
-call_mpred_real_w_results( F,C,Results):-predicate_property(C,_),!,call_mpred_to_module(F,C),not(member(C,Results)),check_mcall_ok(C).
+call_mpred_real_w_results( F,C,Results):-is_callable(C),!,call_mpred_to_module(F,C),not(member(C,Results)),check_mcall_ok(C).
 
 % ground
 call_mpred_real_g(F,C):- not(mpred_prop(F,_)),!,call_mpred_to_module_checked(F,C).
-call_mpred_real_g(F,C):- not(predicate_property(C,_)),!,is_asserted(F,C).
+call_mpred_real_g(F,C):- not(is_callable(C)),!,is_asserted(F,C).
 call_mpred_real_g(F,C):- call_mpred_to_module_checked(F,C).
 call_mpred_real_g(F,C):- is_asserted(F,C).
 
@@ -206,11 +214,11 @@ call_mpred_to_module_checked(F,C):-call_mpred_to_module(F,C),check_mcall_ok(C).
 call_mpred_to_module(F,C):- predicate_property(C,visible),not(mpred_prop(F,_)),!,call_maybe_backchain(C).
 call_mpred_to_module(F,C):- mpred_prop(F,query_with_pred(P)),PC=..[P,C],!,call_maybe_backchain(PC).
 % call_mpred_to_module(F,C):- mpred_prop(F,ask_module(M2)),context_module(M),M\=M2,!,dmsg(calling_in_other_module(M:call_maybe_backchain(M2:C))),'@'(M:call_maybe_backchain(M2:C),M).
-call_mpred_to_module(F,C):- not(predicate_property(C,_)),!,functor(C,F,A),dmsg(todo(non_existent(F/A,C))),!,A>1,
+call_mpred_to_module(F,C):- not(is_callable(C)),!,functor(C,F,A),dmsg(todo(non_existent(F/A,C))),!,A>1,
    decl_mpred_hybrid(F/A),!,call_mpred_real(F,C).
 call_mpred_to_module(_,C):- call_maybe_backchain(C).
 
-call_maybe_backchain(C):- test_for_thlocal(thlocal:insideIREQ,C),predicate_property(C,number_of_clauses(_)),!,clause(C,Body),body_no_backchains(Body).
+call_maybe_backchain(C):- test_tl(thlocal:insideIREQ,C),predicate_property(C,number_of_clauses(_)),!,clause(C,Body),body_no_backchains(Body).
 call_maybe_backchain(C):- debugOnError(C).
 
 body_no_backchains(true):-!.
@@ -232,7 +240,7 @@ naf(Goal):-not(req(Goal)).
 callable_tf(P,2):- mpred_arity_pred(P),!,fail.
 callable_tf(F,A):- functor_safe(P,F,A),predicate_property(P,_),!.
 
-useDBMts:- loaded_external_kbs, thlocal:useExternalDBs,!.
+useDBMts:- loaded_external_kbs, test_tl(useOnlyExternalDBs),!.
 
 relax_term(P,P,Aic,Aic,Bic,Bic):- !.
 /*
@@ -370,7 +378,8 @@ xcall_t(P):- call(P).
 
 
 
-into_plist([P|LIST],[P|LIST]):-!.
+into_plist(PLIST,PLIST):- var(PLIST),!,between(2,19,X),length(PLIST,X).
+into_plist([P|LIST],[P|LIST]).
 into_plist(Call,PLIST):-Call=..PLIST.
 
 :- export(kb_f/1).
@@ -378,24 +387,48 @@ kb_f(X):-assertion_f(X).
 
 % todo hook into loaded files!
 :- export(assertion_t/1).
-assertion_t(_):-not(useDBMts),!,fail.
-assertion_t(Call):- use_cyc_database, into_plist(Call,PLIST),loop_check(kb_t2(PLIST),fail).
 
-:- export(kb_t/1).
-kb_t(Call):- with_no_assertions(thlocal:useExternalDBs,kb_t_1(Call)).
+assertion_t(Call):- thlocal:useOnlyExternalDBs,!,thglobal:use_cyc_database,with_no_assertions(useOnlyExternalDBs, kb_t(Call),fail).
+assertion_t(Call):- thglobal:use_cyc_database,with_assertions(with_assertions(thlocal:useOnlyExternalDBs,kb_t(Call))).
+% assertion_t(Call):- with_assertions(thlocal:useOnlyExternalDBs,loop_check(req(Call))).
 
-kb_t_1(Call):- into_plist(Call,PLIST),loop_check(kb_t2(PLIST),fail).
 
-tiny_kb_ASSERTION(_):- not(predicate_property('ASSERTION'(_,_,_,_,_),_)),!,fail.
+tiny_kb_ASSERTION(_):- not(is_callable('ASSERTION'(_,_,_,_,_))),!,fail.
 tiny_kb_ASSERTION(PLIST):- 'ASSERTION'(':TRUE-DEF',_,_UniversalVocabularyMt,_Vars,/*HL*/PLIST).
 tiny_kb_ASSERTION(PLIST):- 'ASSERTION'(':TRUE-MON',_,_UniversalVocabularyMt,_Vars,/*HL*/PLIST).
 
-kb_t2([AH|PLIST]):- is_holds_true(AH),!,kb_t2(PLIST).
-kb_t2([AH|PLIST]):- is_holds_false(AH),!,kb_f(PLIST).
-kb_t2(PLIST):- tiny_kb_ASSERTION(PLIST).
-kb_t2(PLIST):- once((append([assertion_holds_mworld0|PLIST],[_,_],CallList),Call=..CallList)), mworld0:catch(Call,E,(dmsg(E),fail)).  % '@'(Call,mworld0).
-kb_t2(PLIST):- Call=..[assertion_holds|PLIST], hl_holds:catch(Call,E,(dmsg(E),fail)). % '@'(Call,hl_holds).
-kb_t2(PLIST):- not(thlocal:useExternalDBs), req(PLIST).
+:-export((kb_t/1)).
+kb_t(Call):- into_plist(Call,PLIST),[AH|LIST]=PLIST,!, kb_t(AH,LIST,PLIST).
+
+kb_t(AH,_,PLIST):-var(AH),!,kbp_t(PLIST).
+kb_t(dbase_t,PLIST,_):- !,kbp_t(PLIST).
+kb_t(subclass,PLIST,_):- !,kbp_t([genls|PLIST]).
+kb_t(AH,PLIST,_):- is_holds_true(AH),!,kb_t(PLIST).
+kb_t(AH,PLIST,_):- is_holds_false(AH),!,kb_f(PLIST).
+kb_t(_,_,PLIST):- kbp_t(PLIST).
+
+:- export(kbp_t/1).
+kbp_t(_):- not(useDBMts),!,fail.
+% kbp_t(PLIST):- tiny_kb_ASSERTION(PLIST).
+kbp_t(PLIST):- append([assertion_holds_mworld0|PLIST],[_,_],CallList),Call=..CallList,mworld:is_callable(Call), mworld0:Call.  % '@'(Call,mworld0).
+kbp_t(PLIST):- Call=..[assertion_holds|PLIST],hl_holds:is_callable(Call), hl_holds:Call. % '@'(Call,hl_holds).
+% kbp_t(PLIST):- Call=..[ttholds|PLIST],tt0_00022_cycl:is_callable(Call), tt0_00022_cycl:Call. % '@'(Call,hl_holds).
+
+
+predicate_property_chk(P,PP):-predicate_property(P,PP),!.
+predicate_property_chk(P,PP):-warn(predicate_property_chk(P,PP)).
+
+callr(R):-retract(R).
+
+assert_to_dbase_t([isa,X,Y]):- Call=..[dbase_t,Y,X],assert_if_new(Call).
+assert_to_dbase_t(PLIST):- xform_plist(PLIST,PLISTO), Call=..[dbase_t|PLISTO],assert_if_new(Call).
+
+xform_plist([implied|PLIST],[implied,ALIST,Last]):-append(ALIST,[Last],PLIST),!.
+xform_plist(PLIST,PLIST):-!.
+
+:-export(kbp_to_dbase_t/0).
+kbp_to_dbase_t:-!.
+kbp_to_dbase_t:-forall(kbp2_t(PLIST),assert_to_dbase_t(PLIST)),retractall(thglobal:use_cyc_database),tell('a.txt'),listing(dbase_t),listing('ASSERTION'),told,dmsg(done_dbase_t).
 
 % ================================================================================
 % end holds_t

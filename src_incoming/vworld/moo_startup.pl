@@ -52,10 +52,6 @@ in_user_startup(Call):- '@'(user:Call,user).
 :- user_use_module(logicmoo(vworld/toploop_telnet)).
 
 
-% :- user_use_module(logicmoo(dbase/dbase_formattypes)).
-% :- user_use_module(logicmoo(parsing/parser_imperative)).
-:- user_use_module(logicmoo(parsing/parser_e2c)).
-%:- user_use_module(logicmoo(parsing/parser_chat80)). 
 :- user_use_module(logicmoo(vworld/moo_testing)).
 
 /*
@@ -112,8 +108,7 @@ make_qlfs:-
  ensure_q_loaded(logicmoo('pldata/hl_holds')),
  ensure_q_loaded(logicmoo('pldata/mworld0')),
  ensure_q_loaded(logicmoo('pldata/mworld0_declpreds')),
- catch(ensure_q_loaded(logicmoo('pldata/withvars_988')),_,true),
- asserta(loaded_external_kbs).
+ catch(ensure_q_loaded(logicmoo('pldata/withvars_988')),_,true).
 
 :- catch(logicmoo('pldata/mworld0_declpreds.qlf'),_,make_qlfs).
 
@@ -135,8 +130,18 @@ make_qlfs:-
 :- user_use_module(logicmoo(pldata/tt0_00022_cycl)).
 :- user_use_module(logicmoo(pldata/hl_holds)).
 :- user_use_module(logicmoo(pldata/mworld0)).
+:- user_use_module(logicmoo(pldata/transform_dump)).
 :- catch(user_use_module(logicmoo(pldata/withvars_988)),_,true).
 
+:- asserta(loaded_external_kbs),
+ hl_holds:retractall(assertion_holds(isa, '', 'Thing')),
+ show_call(kbp_to_dbase_t).
+
+
+% :- user_use_module(logicmoo(dbase/dbase_formattypes)).
+% :- user_use_module(logicmoo(parsing/parser_imperative)).
+:- user_ensure_loaded(logicmoo(parsing/parser_chat80)). 
+:- user_ensure_loaded(logicmoo(parsing/parser_e2c)).
 
 
 :- user_use_module(logicmoo('vworld/moo_loader.pl')).
@@ -290,7 +295,7 @@ lundef :- A = [],
             maplist(report_undefined, G)
         )).
 
-:- if_flag_true(fullStart,remove_undef_search).
+% :- if_flag_true(fullStart,remove_undef_search).
 
 
 /*

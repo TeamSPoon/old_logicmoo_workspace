@@ -185,35 +185,63 @@ nd_predsubst2( Pred, [A|As], [A|AS]  ) :- var(A), !, nd_predsubst2( Pred, As, AS
 nd_predsubst2( Pred, [A|As], [Ap|AS] ) :- nd_predsubst( A,Pred,Ap ),nd_predsubst2( Pred, As, AS).
 nd_predsubst2( _, L, L ).
 
+
+% ===================================================================
+% Substitution based on +PRED
+% ===================================================================
+
+% Usage: subst(+Pred,+Fml,+X,+Sk,?FmlSk)
+
+pred_subst(Pred,A,B,C,D):-  ccatch(hotrace(nd_pred_subst(Pred,A,B,C,D)),E,(dumpST,dmsg(E:nd_pred_subst(Pred,A,B,C,D)),fail)),!.
+pred_subst(_,A,_B,_C,A).
+
+nd_pred_subst(Pred,  Var, VarS,SUB,SUB ) :- call(Pred, Var,VarS),!.
+nd_pred_subst(_Pred,  Var, _,_,Var ) :- var(Var),!.
+
+nd_pred_subst(Pred,  P, X,Sk, P1 ) :- functor(P,_,N),nd_pred_subst1(Pred, X, Sk, P, N, P1 ).
+
+nd_pred_subst1(_Pred, _,  _, P, 0, P  ).
+nd_pred_subst1(Pred, X, Sk, P, N, P1 ) :- N > 0, univ_safe(Pred,P , [F|Args]), 
+            nd_pred_subst2(Pred, X, Sk, Args, ArgS ),
+            nd_pred_subst2(Pred, X, Sk, [F], [FS] ),  
+            univ_safe(P1 , [FS|ArgS]).
+
+nd_pred_subst2(_, _,  _, [], [] ).
+nd_pred_subst2(Pred, X, Sk, [A|As], [Sk|AS] ) :- call(Pred, X , A), !, nd_pred_subst2(Pred, X, Sk, As, AS).
+nd_pred_subst2(Pred, X, Sk, [A|As], [A|AS]  ) :- var(A), !, nd_pred_subst2(Pred, X, Sk, As, AS).
+nd_pred_subst2(Pred, X, Sk, [A|As], [Ap|AS] ) :- nd_pred_subst(Pred, A,X,Sk,Ap ),nd_pred_subst2(Pred, X, Sk, As, AS).
+nd_pred_subst2(_, _X, _Sk, L, L ).
+
+% dcgPredicate(M,F,A,P).
+
+univ_safe(P,[L|L1]):- nonvar(P), must_det((var(L);atom(L))),!,debugOnError(( P=..[L|L1] )).
+univ_safe(P,L):- must_det(is_list(L)),debugOnError((P=..L)).
+
 % ===================================================================
 % Substitution based on ==
 % ===================================================================
 
 % Usage: subst(+Fml,+X,+Sk,?FmlSk)
 
-subst(A,B,C,D):-var(A),!,dmsg(subst(A,B,C,D)),dumpST,dtrace,subst0(A,B,C,D).
-subst(A,B,C,D):-subst0(A,B,C,D).
-
-subst0(A,B,C,D):- 
-      ccatch(hotrace(nd_subst(A,B,C,D)),E,(dumpST,dmsg(E:nd_subst(A,B,C,D)),fail)),!.
-subst0(A,_B,_C,A).
+subst(A,B,C,D):-  ccatch(hotrace(nd_subst(A,B,C,D)),E,(dumpST,dmsg(E:nd_subst(A,B,C,D)),fail)),!.
+subst(A,_B,_C,A).
 
 nd_subst(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
 nd_subst(  Var, _,_,Var ) :- var(Var),!.
-nd_subst(  P, X,Sk, P1 ) :- functor_catch(P,_,N),nd_subst1( X, Sk, P, N, P1 ).
+
+nd_subst(  P, X,Sk, P1 ) :- functor(P,_,N),nd_subst1( X, Sk, P, N, P1 ).
 
 nd_subst1( _,  _, P, 0, P  ).
-nd_subst1( X, Sk, P, N, P1 ) :- N > 0, P =.. [F|Args], 
+nd_subst1( X, Sk, P, N, P1 ) :- N > 0, univ_safe(P , [F|Args]), 
             nd_subst2( X, Sk, Args, ArgS ),
             nd_subst2( X, Sk, [F], [FS] ),  
-            P1 =.. [FS|ArgS].
+            univ_safe(P1 , [FS|ArgS]).
 
 nd_subst2( _,  _, [], [] ).
 nd_subst2( X, Sk, [A|As], [Sk|AS] ) :- X == A, !, nd_subst2( X, Sk, As, AS).
 nd_subst2( X, Sk, [A|As], [A|AS]  ) :- var(A), !, nd_subst2( X, Sk, As, AS).
 nd_subst2( X, Sk, [A|As], [Ap|AS] ) :- nd_subst( A,X,Sk,Ap ),nd_subst2( X, Sk, As, AS).
 nd_subst2( _X, _Sk, L, L ).
-
 
 
 wsubst(A,B,C,D):- 

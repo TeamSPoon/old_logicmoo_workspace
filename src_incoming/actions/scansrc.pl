@@ -13,11 +13,9 @@
 
 :- register_module_type(command).
 
-:- export(found_undef/3).
-
-found_undef(_,_,_).
-
-:- dynamic undef/2.
+% :- export(found_undef/3).
+% found_undef(_,_,_).
+% :- dynamic undef/2.
 
 % when we import new and awefull code base (the previous )this can be helpfull
 % we redfine list_undefined/1 .. this is the old version
@@ -36,6 +34,7 @@ real_list_undefined(A):-
 
 
 :- export(remove_undef_search/0).
+remove_undef_search:-!.
 remove_undef_search:- ((
  '@'(use_module(library(check)),'user'),
  redefine_system_predicate(check:list_undefined(_)),
@@ -52,7 +51,7 @@ moo:agent_call_command(Agent,scansrc):-  once('@'(agent_call_safely(Agent,scansr
 
 mmake:- update_changed_files.
 :-export(scansrc/0).
-% scansrc :- !.
+scansrc :- !.
 scansrc :- 
  ensure_loaded(library(make)),
  debugOnError((

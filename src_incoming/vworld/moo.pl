@@ -16,6 +16,13 @@
          register_timer_thread/3]).
 
 :-dynamic_multifile_exported loading_module_h/1.
+:-dynamic_multifile_exported(mpred_prop/2).
+:-dynamic_multifile_exported(mpred_arity/2).
+mpred_prop(mpred_prop,prologOnly).
+mpred_prop(mpred_arity,prologOnly).
+mpred_arity(mpred_prop,2).
+mpred_arity(mpred_arity,2).
+
 
 :-export(is_stable/0).
 is_stable :- true.

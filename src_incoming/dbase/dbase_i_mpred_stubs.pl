@@ -25,38 +25,36 @@ call_body_req(HEAD):- functor(HEAD,F,A),HEAD_T=..[F|ARGS],HEAD_T=..[dbase_t,F|AR
 
 body_req_isa(I,C):-isa_backchaing(I,C).
 
-hook:body_req(F,A,HEAD,HEAD_T):-hook_body_req(F,A,HEAD,HEAD_T).
+body_call_cyckb(HEAD_T):-HEAD_T =.. [dbase_t|PLIST],!, thglobal:use_cyc_database, kbp_t(PLIST).
 
-hook_body_req(F,_A,_HEAD,_HEAD_T):- mpred_prop(F,prologOnly),!,fail.
+hook:body_req(F,A,HEAD,HEAD_T):- hotrace( hook_body_req(F,A,HEAD,HEAD_T)).
+
+hook_body_req(F,A,HEAD,HEAD_T):- mpred_prop(F,prologOnly),!,dmsg(warn(hook_body_req(F,A,HEAD,HEAD_T))),fail.
 hook_body_req(_,_,isa(I,C),_):- !, body_req_isa(I,C).
 hook_body_req(_,_,_,dbase_t(C,I)):- !, body_req_isa(I,C).
-% % % hook_body_req(F,A,HEAD,HEAD_T):- predicate_property(HEAD,number_of_clauses(1)),!,body_req_1(F,A,HEAD,HEAD_T).
-hook_body_req(F,A,HEAD,HEAD_T):- fail, ignore((clause(HEAD,(hook:body_req(F,A,HEAD,HEAD_T)), Ref),nth_clause(_, Nth, Ref), Nth > 1, 
-      asserta(':-'(HEAD,(hook:body_req(F,A,HEAD,HEAD_T)))))),fail. % ,erase(Ref))),fail.
-
-
-hook_body_req(_,_,_,dbase_t(Prop,Obj,LValue)):-!,choose_val(Prop,Obj,LValue).
-
-hook_body_req(F,A,HEAD,HEAD_T):- body_req_0(F,A,HEAD,HEAD_T).
+hook_body_req(_,_,_ ,HEAD_T):- thlocal:useOnlyExternalDBs,!, body_call_cyckb(HEAD_T).
+hook_body_req(F,A,HEAD,HEAD_T):- loop_check(body_req_0(F,A,HEAD,HEAD_T),fail).
 
 :-export(body_req_0/4).
-body_req_0(F,A,HEAD,HEAD_T):- not(ground(HEAD)),!,body_req_1(F,A,HEAD,HEAD_T).
-body_req_0(F,A,HEAD,HEAD_T):- body_req_3(F,A,HEAD,HEAD_T),!. % ,ignore((not(last_arg_ground(HEAD)),rtrace(body_req_0(F,A,HEAD,HEAD_T)))),not_dupe(HEAD).
+body_req_0(F,A,HEAD,HEAD_T):- not(ground(HEAD)),!,no_repeats(HEAD_T,body_req_1(F,A,HEAD,HEAD_T)).
+body_req_0(F,A,HEAD,HEAD_T):- body_req_1(F,A,HEAD,HEAD_T),!. 
 
 :-export(body_req_1/4).
 body_req_1(F,A,HEAD,HEAD_T):- mpred_prop(F,call_tabled),!, call_tabled(body_req_2(F,A,HEAD,HEAD_T)).
 body_req_1(F,A,HEAD,HEAD_T):- body_req_2(F,A,HEAD,HEAD_T).
 
+body_req_2(F,_,HEAD,  _):-    mpred_prop(F,external(Module)),!,call(Module:HEAD).
 body_req_2(F,A,HEAD,HEAD_T):- body_req_3(F,A,HEAD,HEAD_T).
 
-body_req_3(_,_,_    ,HEAD_T):- clause(HEAD_T,true).
-body_req_3(F,_,HEAD,  _):- mpred_prop(F,external(Module)),!,call(Module:HEAD).
-body_req_3(_,_,HEAD,_HEAD_T):- clause(HEAD,true).
-% body_req_3(_,_,HEAD,  _):- predicate_property(HEAD,number_of_clauses(N)),N>100,!,fail. % body_req is possibly unneeded now
-body_req_3(_F,_,HEAD,  _):- not(save_in_dbase_t),req(HEAD).
+body_req_3(_,_,_  , HEAD_T):- clause(HEAD_T,true).
+body_req_3(_,_,HEAD, _):- clause(HEAD,true),dmsg(warn(clause(HEAD,true))).
+body_req_3(_,_,HEAD, _):-  moo:hybrid_rule(HEAD,BODY),call_mpred_body(HEAD,BODY).
+body_req_3(F,_,_,dbase_t(F,Obj,LValue)):- choose_val(F,Obj,LValue).
+
+body_req_plus_cyc(F,_,_,HEAD_T):- mpred_prop(F,cycPlus2(_)),!,with_assertions(thglobal:use_cyc_database,body_call_cyckb(HEAD_T)).
 
 
-
+call_mpred_body(_HEAD,BODY):- debugOnError(BODY). % ,dmsg((succeed_hybrid_rule(HEAD:-BODY))).
 
 foo_b(b1).
 foo_b(b2):-!.

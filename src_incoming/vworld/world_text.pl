@@ -50,7 +50,8 @@ show_kb_via_pred(_,_,[]).
 show_kb_via_pred(WPred,ToSTR,[L|List]):-!,
    show_kb_via_pred(WPred,ToSTR,L),
    show_kb_via_pred(WPred,ToSTR,List).
-show_kb_via_pred(WPred,ToSTR,L):-!,ccatch((ignore(must_det(show_kb_via_pred_0(WPred,ToSTR,L));dmsg(failed(show_kb_via_pred_0(WPred,L))))),E,dmsg(error_failed(E,show_kb_via_pred_0(WPred,L)))).
+show_kb_via_pred(WPred,ToSTR,L):-!,
+   ccatch((ignore(must_det(show_kb_via_pred_0(WPred,ToSTR,L));dmsg(failed(show_kb_via_pred_0(WPred,L))))),E,dmsg(error_failed(E,show_kb_via_pred_0(WPred,L)))).
 
 :-export(show_kb_via_pred_0/3).
 show_kb_via_pred_0(WPred,ToSTR,F=Call):- !,show_kb_via_pred_1(WPred,ToSTR,F,Call).

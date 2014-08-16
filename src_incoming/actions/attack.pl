@@ -87,8 +87,8 @@ damage_foe(Agent,What,hit) :-
 	add(damage(What,NewDam)).
 
 % Record keeping
-moo:update_charge(Agent,attack) :- uprop(Agent,charge(-5)).
-moo:update_stats(Agent,bash) :-  uprop(Agent,damage(-2)),
+moo:update_charge(Agent,attack) :- upprop(Agent,charge(-5)).
+moo:update_stats(Agent,bash) :-  upprop(Agent,damage(-2)),
 	(add_cmdfailure(Agent,bash)).
 moo:update_stats(Agent,wiff) :- 
 	del(damage(Agent,Old)),

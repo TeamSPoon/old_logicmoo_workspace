@@ -17,12 +17,13 @@ synth_clause_db(H,info(Props)):- pred_info(H,Props).
 synth_clause_db(H,B):- predicate_property(M:H,number_of_clauses(_)),clause(M:H,B).
 
 :-export((use_term_listing/3)).
+use_term_listing(noinfo,_,info(_)):-!,fail. 
+use_term_listing(HO,H,B):- atom(HO),!, use_term_listing_2(exact,HO,H,B).
 use_term_listing([],_,_):-!.
 use_term_listing([F1],H,B):-!,use_term_listing(F1,H,B),!.
 use_term_listing([F1|FS],H,B):-!,use_term_listing(F1,H,B),!,use_term_listing(FS,H,B),!.
 use_term_listing((F1,FS),H,B):-!,use_term_listing(F1,H,B),!,use_term_listing(FS,H,B),!.
 use_term_listing((F1;FS),H,B):-!,use_term_listing(F1,H,B);use_term_listing(FS,H,B).
-use_term_listing(noinfo,_,info(_)):-!,fail. 
 use_term_listing(arity(A),H,_):-!,functor(H,_,A).
 use_term_listing(functor(F),H,_):-!,functor(H,F,_).
 use_term_listing(not(C),H,B):-nonvar(C),!,not(use_term_listing(C,H,B)).
@@ -34,23 +35,25 @@ use_term_listing(F/A,H,_):-atom(F),functor(H,F,A),!.
 use_term_listing(h(P),H,_):-!,use_term_listing(P,H,666666).
 use_term_listing(b(P),_,B):-!,use_term_listing(P,666666,B).
 use_term_listing(HO,H,B):- string(HO),!, use_term_listing_2(contains,HO,H,B).
-use_term_listing(HO,H,B):- atom(HO),!, use_term_listing_2(exact,HO,H,B).
 use_term_listing(contains(HO),H,B):-!, use_term_listing_2(contains,HO,H,B).
 use_term_listing(HO,H,B):- !,use_term_listing_2(exact,HO,H,B).
 
 use_term_listing_2(contains,HO,H,B):- any_to_string(HO,HS),!, with_output_to(string(H1B1),write_canonical((H:-B))), (sub_atom_icasechk(HS,_,H1B1);sub_atom_icasechk(H1B1,_,HS)),!.
-use_term_listing_2(exact,HO,H,B):- not(not((( subst((H:-B),HO,fov,H1B1), H1B1 \= (H:-B))))),!.
+use_term_listing_2(exact,HO,H,B):- contains_term(HO,(H:-B)).
 
 use_term_listing(HO,(H:-B)):-!, synth_clause_db(H,B), use_term_listing(HO,H,B).
 
 :-dynamic cur_predicates/1.
-cur_predicate(M:P,M:F/A):-  From=user,
+cur_predicate(M:P,M:F/A):- !, current_module(M),   
+   current_predicate(M:F/A),functor(P,F,A),once(predicate_property(user:P,imported_from(M))).
+
+cur_predicate(M:P,M:F/A):-  current=user,
    current_predicate(From:F/A),functor(P,F,A),once(predicate_property(From:P,imported_from(M))).
 
 % predicate_property_h(M:H,P):-atom(M),!,nonvar(H),predicate_property_h(M:H,P).
 predicate_property_h(H,P):- predicate_property(H,P).
 
-ok_pred(F/A):-!,functor(P,F,A),ok_pred(P).
+ok_pred(F/A):-!,functor(P,F,A),ok_pred(P),!.
 ok_pred(P):-not(bad_pred(P)).
 
 bad_pred(M:P):-!,atom(M),bad_pred(P). 

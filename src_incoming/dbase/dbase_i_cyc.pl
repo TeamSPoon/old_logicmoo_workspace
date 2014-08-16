@@ -15,7 +15,7 @@
 */
 
 :- meta_predicate isDebug(0).
-
+/*
 stringToWords([],[]).
 stringToWords(TheList,Words):-functor(TheList,'TheList',_),TheList=..[_|List],!,stringToWords(List,Words).
 stringToWords(string(S),Words):-!,stringToWords(S,Words).
@@ -26,7 +26,7 @@ stringToWords([S|Tring],[W|Words]):-stringToWord(S,W),stringToWords(Tring,Words)
 
 stringToWord([S|L],W):-!,textCached([S|L],[lex,W|_]).
 stringToWord(S,W):-textCached([S],[lex,W|_]).
-
+*/
      
 :-export(list_to_term/2).
 %list_to_term(X,Y):- balanceBinding(X,Y).
@@ -671,6 +671,7 @@ Vars = [=(CITIZEN,_h2866)|_h3347]
 
 ====================================================================*/
 
+:-export(getSurfaceFromChars/3).
 getSurfaceFromChars([],[EOF],_):- end_of_file == EOF, !.
 getSurfaceFromChars([41],[EOF],_):- end_of_file == EOF, !.
 

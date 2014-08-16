@@ -76,7 +76,8 @@ spawn_prey(10) :-
 	!.
 spawn_prey(N) :-
        Prey = prey(N),
-       findall_type_default_props(Prey,prey,Traits),
+       assert_isa(Prey,prey),
+       get_instance_default_props(Prey,Traits),
 	\+ agent_turnnum(Prey,_),
          req(max_charge(Prey,NRG)),
          req(max_damage(Prey,Dam)),
@@ -88,6 +89,7 @@ spawn_prey(N) :-
          clr(possess(Prey,_)),
 	set_stats(Prey,Traits),
 	put_in_world(Prey),
+        add_missing_instance_defaults(Prey),
 	!.
 spawn_prey(N) :-
 	Ntemp is N + 1,

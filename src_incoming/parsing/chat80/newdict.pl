@@ -212,9 +212,9 @@ measure(million,measure&heads,[],million).
 units(large,measure&_).
 units(small,measure&_).
 
-sign(large,+).
-sign(small,-).
-sign(great,+).
+adj_sign(large,+).
+adj_sign(small,-).
+adj_sign(great,+).
 
 /* Proportions and the like */
 

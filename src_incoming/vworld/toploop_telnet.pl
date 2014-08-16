@@ -195,9 +195,9 @@ show_room_grid_single(_Room,_LOC,_OutsideTest):- write('--'), !.
 inst_label(Obj,SLabe2):-term_to_atom(Obj,SLabel),sub_atom(SLabel,1,2,_,SLabe2),!.
 inst_label(Obj,SLabe2):-term_to_atom(Obj,SLabel),sub_atom(SLabel,0,2,_,SLabe2),!.
 inst_label(Obj,Label):- moo:label_type(Label,Obj),!.
-inst_label(Obj,Label):-  aprops(Obj,nameStrings(Val)),Val\=Obj,inst_label(Val,Label),!.
-inst_label(Obj,Label):-  aprops(Obj,named(Val)),Val\=Obj,!,inst_label(Val,Label),!.
-inst_label(Obj,Label):-  aprops(Obj,isa(Val)),Val\=Obj,inst_label(Val,Label),!.
+inst_label(Obj,Label):-  iprops(Obj,nameStrings(Val)),Val\=Obj,inst_label(Val,Label),!.
+inst_label(Obj,Label):-  iprops(Obj,named(Val)),Val\=Obj,!,inst_label(Val,Label),!.
+inst_label(Obj,Label):-  iprops(Obj,isa(Val)),Val\=Obj,inst_label(Val,Label),!.
 inst_label(_Obj,'&&').
 
 % ===================================================================

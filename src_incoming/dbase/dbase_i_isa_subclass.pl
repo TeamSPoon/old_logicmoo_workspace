@@ -72,12 +72,16 @@ assert_isa_safe(O,T):- ignore((nonvar(O),nonvar(T),decl_type_safe(T),assert_isa(
 hook:decl_database_hook(assert(_A_or_Z),subclass(S,C)):-decl_type_safe(S),decl_type_safe(C).
 
 :- decl_type(type).
-:- decl_type(extentKnown).
-:- decl_type(creatableType).
+:- decl_type(completeExtentAsserted).
+:- decl_type(createableType).
 :- forall(argsIsaProps(Prop),(decl_type(Prop),asserta(is_known_true(subclass(Prop,mpred))))).
 
 is_creatable_type(Type):- arg(_,vv(agent,item,region,concept),Type).
-is_creatable_type(Type):- atom(Type),call(is_asserted(isa(Type,creatableType))).
+is_creatable_type(Type):- atom(Type),call(is_asserted(isa(Type,createableType))).
+
+hook:decl_database_hook(assert(_A_or_Z),isa(W,createableType)):-decl_type_safe(W),call_after_game_load(forall(isa(I,W),create_instance(I,W))).
+hook:decl_database_hook(assert(_A_or_Z),isa(W,type)):-atom(W),atomic_list_concat(List,'_',W),!,length(List,2),!,
+   append(FirstPart,[Last],List),atom_length(Last,AL),AL>3,not(member(flagged,FirstPart)),atomic_list_concat(FirstPart,'_',_NewCol),show_call(assert_subclass_safe(W,Last)).
 
 % ================================================
 % assert_isa/2
@@ -126,13 +130,13 @@ assert_isa_hooked_after(_,type):-!.
 assert_isa_hooked_after(_,formattype):-!.
 assert_isa_hooked_after(_,T):-argsIsaProps(T),!.
 assert_isa_hooked_after(I,T):- is_creatable_type(T),!,assert_isa_hooked_creation(I,T).
-assert_isa_hooked_after(I,T):- not(extentKnown(T)),impliedSubClass(T,ST),extentKnown(ST),assert_isa(I,ST).
+assert_isa_hooked_after(I,T):- not(completeExtentAsserted(T)),impliedSubClass(T,ST),completeExtentAsserted(ST),assert_isa(I,ST).
 %assert_isa_hooked_after(I,T):- assert_isa_hooked_creation(I,T).
 
-extentKnown(Ext):- arg(_,vv(type,dir,formattype,string),Ext).
-extentKnown(F):- is_creatable_type(F).
-extentKnown(F):- argsIsaProps(F).
-extentKnown(F):- is_asserted(isa(F,extentKnown)).
+completeExtentAsserted(Ext):- arg(_,vv(type,dir,formattype,string),Ext).
+completeExtentAsserted(F):- is_creatable_type(F).
+completeExtentAsserted(F):- argsIsaProps(F).
+completeExtentAsserted(F):- is_asserted(isa(F,completeExtentAsserted)).
 
 
 % one of 4 special types
@@ -152,26 +156,29 @@ isa_backchaing(A,T):- fact_loop_checked(isa(A,T),isa_backchaing_0(A,T)).
 
 isa_backchaing_v_nv(A,term):-nonvar(A),!.
 isa_backchaing_v_nv(_,var):-!.
-isa_backchaing_v_nv(A,T):-setof(A,AT^(asserted_or_trans_subclass(AT,T),isa_asserted(A,AT)),List),!,member(A,List).
+isa_backchaing_v_nv(A,T):-setof(A,AT^(transitive_subclass_or_same(AT,T),isa_asserted(A,AT)),List),!,member(A,List).
 
 isa_backchaing_0(A,T):-  var(A),nonvar(T),!,isa_backchaing_v_nv(A,T).
-isa_backchaing_0(A,T):-  var(T),!,setof(TT,AT^(isa_asserted(A,AT),asserted_or_trans_subclass(AT,TT)),List),!,member(T,List).
+isa_backchaing_0(A,T):-  var(T),!,setof(TT,AT^(isa_asserted(A,AT),transitive_subclass_or_same(AT,TT)),List),!,member(T,List).
 isa_backchaing_0(A,T):-  nonvar(A),isa_backchaing_nv_nv(A,T).
-isa_backchaing_0(A,T):-  asserted_or_trans_subclass(AT,T),isa_asserted(A,AT).
+isa_backchaing_0(A,T):-  transitive_subclass_or_same(AT,T),isa_asserted(A,AT).
 
 
 isa_backchaing_nv_nv(A,argsIsaInList):-!,compound(A).
 
-not_ft(T):-asserted_or_trans_subclass(T,spatialthing).
+not_ft(T):-transitive_subclass_or_same(T,spatialthing).
 
 :-export(isa_asserted/2).
 isa_asserted(A,T):- stack_check(1000),once_if_ground(fact_loop_checked(isa(A,T),isa_asserted_0(A,T)),_).
 
 isa_asserted_0(I,T):-clause(dbase_t(T,I),true).
 isa_asserted_0(I,T):-clause(isa(I,T),true).
+isa_asserted_0(I,T):- fail, thglobal:use_cyc_database,kbp_t([isa,I,T]).
 isa_asserted_0(I,T):-string(I),member(T,[string,text]).
 isa_asserted_0(I,T):-atom(I),isa_w_inst_atom(I,T).
 isa_asserted_0(_,T):-var(T),!,fail.
+isa_asserted_0(I,formattype):-!,isa_w_type_atom(I,formattype).
+isa_asserted_0(I,type):-!,isa_w_type_atom(I,type).
 isa_asserted_0(I,T):-atom(T),isa_w_type_atom(I,T).
 isa_asserted_0(I,T):-nonvar(I),isa_asserted(T,formattype),!,term_is_ft(I,T).
 isa_asserted_0(I,'&'(T1 , T2)):-nonvar(T1),var(T2),!,dif:dif(T1,T2),isa_backchaing(I,T1),transitive_subclass(T1,T2),isa_backchaing(I,T2).
@@ -219,9 +226,10 @@ type(type).
 type(mpred).
 type(fpred).
 type(relation).
-type(creatableType).
+type(createableType).
 type(typeDeclarer).
 % type(argsIsaInList).
+% TODO decide if OK
 type(ArgsIsa):-argsIsaProps(ArgsIsa).
 type(F):-dbase_t(typeDeclarer,F).
 type(formattype).
@@ -275,9 +283,9 @@ transitive_subclass_r_l(_,Sub):-var(Sub),!,fail.
 transitive_subclass_r_l(FT,Sub):-dbase_t(subclass,C,Sub),dbase_t(subclass,B,C),dbase_t(subclass,A,B),dbase_t(subclass,FT,A).
 
       
-asserted_or_trans_subclass(A,A).
-% asserted_or_trans_subclass(A,AA):-compound(A),into_single_class(A,AA).
-asserted_or_trans_subclass(A,B):-transitive_subclass(A,B).
+transitive_subclass_or_same(A,A).
+% transitive_subclass_or_same(A,AA):-compound(A),into_single_class(A,AA).
+transitive_subclass_or_same(A,B):-transitive_subclass(A,B).
 
 :- export((transitive_bp/3)).
 transitive_bp(P,A,T):-(atom(P)->Fact =..[P,A,T];Fact =..[dbase_t,P,A,T]),fact_loop_checked(Fact,transitive_P_l_r(P,A,T)).
@@ -299,20 +307,20 @@ transitive_P_r_l(P,FT,Sub):-dbase_t(P,C,Sub),dbase_t(P,B,C),dbase_t(P,A,B),dbase
 not_mud_isa(agent,formattype).
 not_mud_isa(item,formattype).
 not_mud_isa(type,formattype).
-not_mud_isa(obj, extentKnown).
-not_mud_isa(obj, creatableType).
+not_mud_isa(obj, completeExtentAsserted).
+not_mud_isa(obj, createableType).
 not_mud_isa(assertionMacroHead, formattype).
 not_mud_isa(obj, formattype).
 not_mud_isa(formattype,formattype).
 not_mud_isa(subft,type).
 not_mud_isa('TemporallyExistingThing', 'TemporallyExistingThing').
-not_mud_isa(creatableType,'TemporallyExistingThing').
+not_mud_isa(createableType,'TemporallyExistingThing').
 not_mud_isa(X,type):-never_type(X).
 
 
 :-dynamic_multifile_exported(type_isa/2).
 
-type_isa(Type,creatableType):-arg(_,vv(agent,item,obj,region),Type),!.
+type_isa(Type,createableType):-arg(_,vv(agent,item,obj,region),Type),!.
 type_isa(ArgIsa,mpredtype):-argsIsaProps(ArgIsa),!.
 type_isa(Type,valuetype):-arg(_,vv(type,formattype,itemtype,valuetype,ppred,fpred),Type),!.
 type_isa(string,formattype):-!.
@@ -323,64 +331,72 @@ type_isa(Type,formattype):-formattype(Type),!. % text
 :-dynamic_multifile_exported(is_known_true/1).
 
 is_known_true(C):-has_free_args(C),!,fail.
-is_known_true(isa(container,extentKnown)).
-is_known_true(isa(extentKnown,extentKnown)).
-is_known_true(isa(type,extentKnown)).
+is_known_true(isa(container,completeExtentAsserted)).
+is_known_true(isa(completeExtentAsserted,completeExtentAsserted)).
+is_known_true(isa(type,completeExtentAsserted)).
 is_known_true(isa(gossup,channel)).
 is_known_true(subclass(region,channel)).
 is_known_true(subclass(agent,channel)).
-is_known_true(isa(agent,creatableType)).
-is_known_true(isa(region,creatableType)).
+is_known_true(isa(agent,createableType)).
+is_known_true(isa(region,createableType)).
 is_known_true(isa(_,id)).
 is_known_true(isa(_,term)).
-is_known_true(isa(singleValued, extentKnown)).
-is_known_true(isa(creatableType,extentKnown)).
-is_known_true(isa(formattype,extentKnown)).
+is_known_true(isa(singleValued, completeExtentAsserted)).
+is_known_true(isa(createableType,completeExtentAsserted)).
+is_known_true(isa(formattype,completeExtentAsserted)).
 is_known_true(isa(int,nonCreatableType)).
 is_known_true(isa(type,type)).
 is_known_true(isa(singleValued, type)).
-is_known_true(isa(extentKnown, type)).
-is_known_true(subclass(extentKnown, extentDecidable)).
+is_known_true(isa(completeExtentAsserted, type)).
+is_known_true(subclass(completeExtentAsserted, extentDecidable)).
 is_known_true(subclass(singleValued, extentDecidable)).
 is_known_true(subclass('MaleAnimal',agent)).
 is_known_true(subclass(X,X)).
 is_known_true(subclass(formattype,type)).
 is_known_true(isa(type,nonCreatableType)).
-is_known_true(isa(item,creatableType)).
-is_known_true(subclass(item,creatableType)).
+is_known_true(isa(item,createableType)).
+is_known_true(subclass(item,createableType)).
 is_known_true(isa(formattype,nonCreatableType)).
 is_known_true(subclass(formattype,nonCreatableType)).
-is_known_true(isa('TemporallyExistingThing', 'creatableType')).
+is_known_true(isa('TemporallyExistingThing', 'createableType')).
 is_known_true(isa(term,nonCreatableType)).
 is_known_true(subclass(argsIsaInList,relation)).
 is_known_true(subclass(fpred,relation)).
 is_known_true(subclass(F,mpred)):-argsIsaProps(F).
 is_known_true(subclass(F,fpred)):-argsIsaProps(F).
 is_known_true(subclass(F,relation)):-argsIsaProps(F).
+is_known_true(disjointWith(A,B)):-disjointWithT(A,B).
+
+
+:-dynamic_multifile_exported(disjointWith/2).
 
 :-export(has_free_args/1).
-has_free_args(C):- (not(compound(C));not(not(arg(_,C,var)))),!.
+has_free_args(C):- not(ground(C)), compound(C),not(not(arg(_,C,var))),!.
 
 :-dynamic_multifile_exported(is_known_false/1).
 % :-dynamic(is_known_false/1).
 is_known_false(C):-has_free_args(C),!,fail.
-is_known_false(isa(extentKnown,creatableType)).
+is_known_false(isa(completeExtentAsserted,createableType)).
 is_known_false(isa(X,Y)):-not_mud_isa(X,Y).
 is_known_false(Fact):-is_known_true(Fact),!,fail.
 is_known_false(subclass(spatialthing,'MaleAnimal')).
 is_known_false(subclass(Type,_)):-arg(_,vv(type,relation,spatialthing,formattype),Type).
 
-is_known_false(subclass(A,B)):-disjointWith(A,B).
-is_known_false(subclass(B,A)):-disjointWith(A,B).
+% is_known_false(subclass(A,B)):-disjointWith(A,B).
 
-disjointWith(agent,item).
-disjointWith(region,obj).
-disjointWith(formattype,item).
-disjointWith(formattype,obj).
-disjointWith(formattype,region).
-disjointWith(creatableType,nonCreatableType).
+disjointWith0(agent,item).
+disjointWith0(region,obj).
+disjointWith0(formattype,item).
+disjointWith0(formattype,obj).
+disjointWith0(formattype,region).
+disjointWith0(createableType,nonCreatableType).
+
+disjointWithT(A,B):-disjointWith0(A,B).
+disjointWithT(B,A):-disjointWith0(A,B).
+
 disjointWith(A,B):- A=B,!,fail.
-disjointWith(A,B):- asserted_or_trans_subclass(A,AS),asserted_or_trans_subclass(B,BS),(is_asserted(disjointWith(AS,BS));is_asserted(disjointWith(BS,AS))).
+disjointWith(A,B):-disjointWithT(A,B).
+disjointWith(A,B):-disjointWithT(AS,BS),transitive_subclass_or_same(A,AS),transitive_subclass_or_same(B,BS).
 disjointWith(A,B):- once((type_isa(A,AT),type_isa(B,BT))),AT \= BT.
 
 

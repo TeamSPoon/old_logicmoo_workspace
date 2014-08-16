@@ -30,7 +30,7 @@ type('TemporallyExistingThing').
 type(activeAgent).
 
 type(channel).
-type(extentKnown).
+type(completeExtentAsserted).
 
 argsIsaInList(ft_info(formattype,term)).
 argsIsaInList(subft(formattype,formattype)).
@@ -40,16 +40,18 @@ argsIsaInList(subft(formattype,formattype)).
 multiValued(genlInverse(mpred,mpred)).
 multiValued(genlPreds(mpred,mpred)).
 
-mpred_prop(subft, extentKnown).
-mpred_prop(ft_info, extentKnown).
-mpred_prop(subft, prologOnly).
-mpred_prop(ft_info,prologOnly).
+mpred_prop(subft, completeExtentAsserted).
+mpred_prop(ft_info, completeExtentAsserted).
+mpred_prop(subft/2, prologHybrid).
+mpred_prop(ft_info/2,prologHybrid).
+% mpred_prop(subft/2, prologOnly).
+% mpred_prop(ft_info/2,prologOnly).
 expand_args(eachOf,subclass(eachOf(region,agent,gossup),channel)).
 
 
 channel(gossup).
 
-creatableType('TemporallyExistingThing').
+createableType('TemporallyExistingThing').
 
 :-dynamic moo:type_max_damage/2. 
 
@@ -65,16 +67,16 @@ argsIsaInList(somethingDescription(term,list(string))).
 :- decl_mpred_hybrid(assert_with_pred,2).
 :- begin_transform_moo_preds.
 
-subclass(creatableType,type).
+subclass(createableType,type).
 
 % :- (do_term_expansions->true;throw(not_term_expansions)).
 
 
-%creatableType(type).
+%createableType(type).
 type(item).
 type(multiValued).
 type(singleValued).
-type(creatableType).
+type(createableType).
 type(typeDeclarer).
 
 :-add((expand_args(eachOf,subclass(eachOf(multiValued,negationByFailure,argsIsaInList,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),mpred)))).
@@ -152,9 +154,9 @@ term_anglify(term_anglify(Term,Text),[prolog(Term),is,converted,to,english,using
 
 multiValued(verb_alias(string,string)).
 
-prologOnly(label_type_props(string,type,list(term(property)))).
+prologHybrid(label_type_props(string,type,list(term(property)))).
 
-prologOnly(type_grid(type,int,term)).
+prologHybrid(type_grid(type,int,term)).
 
 multiValued(action_rules(agent,verb,term(obj),term(list(term(property))))).
 
@@ -454,9 +456,12 @@ subclass(region,spatialthing).
 subclass(useable,item).
 subclass(wearable,item).
 
+disjointWith(obj,region).
+
 formattype(voprop).
 %  subft(number,term).
 % subft(number,term).
+subft(percent,number).
 subft(atom,term).
 subft(dice,int).
 subft(dice,int).  
@@ -523,7 +528,9 @@ multiValued(ask_module(multiValued,atom)).
 argsIsaInList(agent_call_command(agent,term(verb))).
 
 type_max_damage(obj,500).
-type_max_charge(obj,120).
+type_max_charge(obj,130).
+
+default_type_props(item,charge(140)).
 
 
 % =================================================================================================

@@ -231,8 +231,9 @@ moo:label_type(Label,Type):- moo:label_type_props(Label,Type,_).
 
 % :-moo:register_module_type(dynamic).
 
-moo:type_max_charge(agent,500).
-moo:type_max_damage(agent,120).
+moo:type_max_charge(agent,120).
+
+default_type_props(agent,[max_damage(500)]).
 
 
 % :-end_module_type(dynamic).

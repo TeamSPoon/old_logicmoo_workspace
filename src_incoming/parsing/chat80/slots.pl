@@ -147,7 +147,7 @@ i_adj(adj(Adj),TypeX-X,TypeV-V,_,
    aggr_adj(Adj,TypeV,TypeX,F).
 i_adj(sup(Op0,adj(Adj)),Type-X,Type-V,_,
       aggr(F,V,[Y,X],Head,'`'(P)&Pred),Head,'`'(true),Pred) :-
-   sign(Adj,Sign),
+   adj_sign(Adj,Sign),
    inverse(Op0,Sign,Op),
    i_sup_op(Op,F),
    attribute(Adj,Type,X,_,Y,P).
@@ -240,7 +240,7 @@ i_pred(value(adj(Adj),wh(TypeY-Y)),Type-X,['`'(H)|As],As,[],_) :-
    attribute(Adj,Type,X,TypeY,Y,H).
 i_pred(comp(Op0,adj(Adj),NP),X,[P1 & P2 & '`'(P3),Q|As],As,Up,Id) :-
    i_np(NP,Y,Q,Up,Id,unit,[],[]),
-   sign(Adj,Sign),
+   adj_sign(Adj,Sign),
    i_measure(X,Adj,Type,U,P1),
    i_measure(Y,Adj,Type,V,P2),
    inverse(Op0,Sign,Op),
