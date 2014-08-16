@@ -80,34 +80,34 @@ show_kb_via_pred_1(WPred,ToSTR,F,Call):-show_kb_via_pred_2(WPred,ToSTR,F,Call).
 show_kb_via_pred_format_call(WPred0,ToSTRIn,Format0,Call0):-
    wsubst(Call0:Format0,value(ToSTR),value,Call:Format),
    ignore( ToSTR = (ToSTRIn) ),
-   subst([WPred0,ToSTR,Format,Call],value,NewValue,[WPred,ToSTROut,FormatOut,GCall]),
+   subst([WPred0,ToSTR,Format,Call],value,_NewValue,[WPred,ToSTROut,FormatOut,GCall]),
    show_kb_via_pred_fmt(WPred,ToSTROut,FormatOut,_UnkType,GCall).
 
 
-show_kb_via_pred_fmt(WPred,ToSTR,SayIt,Type,forEach(GCall)):-!,forall(call_expanded(GCall),show_kb_via_pred_0(WPred,ToSTR,SayIt)).     
+show_kb_via_pred_fmt(WPred,ToSTR,SayIt,_Type,forEach(GCall)):-!,forall(call_expanded(GCall),show_kb_via_pred_0(WPred,ToSTR,SayIt)).     
 show_kb_via_pred_fmt(WPred,ToSTR,SayIt,Type,listof(GCall)):-!,findall(SayIt,ccatch(call_expanded(GCall),Error,(dmsg(error(SayIt=Error:GCall)),fail)),Count),
-    merge_list_on_p(WPred,ToSTR,SayIt,Type,GCall,NewValue,Count).
+    merge_list_on_p(WPred,ToSTR,SayIt,Type,GCall,_NewValue,Count).
 show_kb_via_pred_fmt(WPred,ToSTR,SayIt,Type,GCall):-!,findall(SayIt,ccatch(call_expanded(GCall),Error,(dmsg(error(SayIt=Error:GCall)),fail)),Count),
-    merge_list_on_p(WPred,ToSTR,SayIt,Type,GCall,NewValue,Count).
+    merge_list_on_p(WPred,ToSTR,SayIt,Type,GCall,_NewValue,Count).
 
-merge_list_on_p(WPred,ToSTR,SayIt,Type,GCall,NewValue,[]):-
-  fmt_holds_tcall(WPred,ToSTR,SayIt,Type,notFound(f1SayIt,SayIt,Type)).
+merge_list_on_p(WPred,ToSTR,SayIt,Type,GCall,_NewValue,[]):-
+  fmt_holds_tcall(WPred,ToSTR,SayIt,Type,notFound(f1SayIt,SayIt,Type,GCall)).
 
-merge_list_on_p(WPred,ToSTR,SayIt,Type,GCall,NewValue,SayItList):-  SayIt = ( _ = _ ),!,
+merge_list_on_p(WPred,ToSTR,SayIt,Type,_GCall,_NewValue,SayItList):-  SayIt = ( _ = _ ),!,
   findall(K,(member(KV,SayItList),arg(1,KV,K)),Keys),
   list_to_set(Keys,KeySet),!,
      forall(member(K,KeySet),
         (findall(V,(member(KV,SayItList),arg(1,KV,K),arg(2,KV,V)),VS),
-          fmt_holds_tcall(WPred,ToSTR,K,Type,[VS]))).
+          fmt_holds_tcall(WPred,ToSTR,K,Type,VS))).
 
-merge_list_on_p(WPred,ToSTR,listof(SayIt),Type,GCall,NewValue,SayItList):-  % SayIt = ( _ = _ ),!,
+merge_list_on_p(WPred,ToSTR,_SayIt,Type,listof(_GCall),_NewValue,SayItList):-  
   findall(K,(member(KV,SayItList),arg(1,KV,K)),Keys),
   list_to_set(Keys,KeySet),!,
      forall(member(K,KeySet),
         (findall(KV,(member(KV,SayItList),arg(1,KV,K)),VS),
-          fmt_holds_tcall(WPred,ToSTR,K,Type,[VS]))).
+          fmt_holds_tcall(WPred,ToSTR,K,Type,VS))).
 
-merge_list_on_p(WPred,ToSTR, SayIt ,Type,GCall,NewValue,SayItList):- fmt_holds_tcall(WPred,ToSTR,text,Type,SayItList).
+merge_list_on_p(WPred,ToSTR, _SayIt ,Type,_GCall,_NewValue,SayItList):- fmt_holds_tcall(WPred,ToSTR,text,Type,SayItList).
 
 
 % merge_list_on_p(WPred,ToSTR, SayIt ,Type,GCall,NewValue,SayItList):- forall(member(KV,SayItList),fmt_holds_tcall_pred_trans(WPred,ToSTR,SayIt,Type,KV)).
