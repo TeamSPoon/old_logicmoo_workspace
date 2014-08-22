@@ -11,12 +11,13 @@
 
 :- module(parser_e2c,[
          e2c/1,
-         e2c/2,          
-         idGen/1]).
+         e2c/2
+         % idGen/1
+         ]).
 
 
 % ==============================================================================
-
+:- dynamic_multifile_exported hook:kbp_t_list_prehook/2.
 
 :-export(reorderClause/2).
 :-meta_predicate(reorderClause(?,?)).
@@ -30,7 +31,10 @@
 
 :- moo:register_module_type(utility).
 
-idGen(X):-flag(idGen,X,X+1).
+
+%  (parse-a-question-completely "Did George W. Bush fall off a bicycle?" #$RKFParsingMt '(:wff-check? t))
+
+% idGen(X):-flag(idGen,X,X+1).
 
 :- moo:begin_transform_moo_preds.
 
@@ -62,6 +66,8 @@ delete_eq([L|List],Item,[L|ListO]):-delete_eq(List,Item,ListO),!.
 
 :-meta_predicate(makeStringMatcher(+,+,-)).
 
+cyckb_t(PLIST):-kbp_t_list(PLIST).
+
 %makeStringMatcher(_ ,Var,Var):-var(Var),!.
 %makeStringMatcher(_ ,[],[]).
 makeStringMatcher(_ ,A,A):-not(compound(A)),!.
@@ -70,12 +76,13 @@ makeStringMatcher(Vars,(H,L),(HO,LO)):-!, makeStringMatcher(Vars,H,HO),makeStrin
 makeStringMatcher(Vars,(C->H;L),(CO->HO;LO)):-!, makeStringMatcher(Vars,C,CO),makeStringMatcher(Vars,H,HO),makeStringMatcher(Vars,L,LO).
 makeStringMatcher(Vars,(H->L),(HO->LO)):-!, makeStringMatcher(Vars,H,HO),makeStringMatcher(Vars,L,LO).
 makeStringMatcher(Vars,(H;L),(HO;LO)):-!, makeStringMatcher(Vars,H,HO),makeStringMatcher(Vars,L,LO).
-makeStringMatcher(Vars,'{}'(H),'{}'(HO)):- makeStringMatcher(Vars,H,HO).
-makeStringMatcher(Vars,not(H),not(HO)):- makeStringMatcher(Vars,H,HO).
-makeStringMatcher(Vars,once(H),once(HO)):- makeStringMatcher(Vars,H,HO).
+makeStringMatcher(Vars,'{}'(H),'{}'(HO)):- !,makeStringMatcher(Vars,H,HO).
+makeStringMatcher(Vars,not(H),not(HO)):- !,makeStringMatcher(Vars,H,HO).
+makeStringMatcher(Vars,once(H),once(HO)):- !,makeStringMatcher(Vars,H,HO).
+makeStringMatcher(Vars,V^(H),V^(HO)):- !,makeStringMatcher(Vars,H,HO).
 makeStringMatcher(_ ,call(H),call(H)):-!.
 makeStringMatcher(_ ,stringArg(StrVar,BodI),stringArgUC(StrVar,NewVar,BodO)):- !, vsubst(BodI,StrVar,NewVar,BodO).
-makeStringMatcher(Vars,BodI,BodO):- compound(BodI),functor(BodI,F, _),kbp_t([argIsa,F,N,StringType]),isa_stringType(StringType),arg(N,BodI,StrVar),!,
+makeStringMatcher(Vars,BodI,BodO):- compound(BodI),functor(BodI,F, _),cyckb_t([argIsa,F,N,StringType]),isa_stringType(StringType),arg(N,BodI,StrVar),!,
    makeStringMatcher(Vars,stringArg(StrVar,BodI),BodO). 
 makeStringMatcher(_ ,BodI,BodI):-!.
 
@@ -96,31 +103,28 @@ reorder_term_expansion((Head:-Body),Out):- compound(Body), can_reorderBody(Head,
    user:expand_term((Head:-reorderClause(Head,BodyLOut)),Out),dmsg(portray(Out)).
 
 strings_match:-true.
-can_reorder:-fail.
+can_reorder:-true.
 
 noreorder.
 reorder.
 
 :-meta_predicate_transparent(reorderClause(+,+)).
 reorderClause(_Head,[A]):- !,callClause(A).
-reorderClause(Head,[L|List]):- can_reorder, member(Call,List),compound(Call),ground(Call),dmsg(reorderClause(ground(Call),[L|List])),!,delete_eq(List,Call,ListO),!,callClause(Call),!,reorderClause(Head,[L|ListO]).
-reorderClause(Head,List):- can_reorder, once((member(Var^Call,List),ground(Var),delete_eq(List,Var^Call,ListO))),!,dmsg(reorderClause(nonvar(Var^Call),List)),callClause(Call),reorderClause(Head,ListO).
-reorderClause(Head,[X^A,Y^B,Z^C|List]):- can_reorder, compare(<,X,Z),!,dmsg(reorderClause([X^A,Y^B,Z^C])),callClause(C),reorderClause(Head,[X^A,Y^B|List]).
-reorderClause(Head,[X^A,Y^B|List]):- can_reorder, compare(<,X,Y),!,callClause(B),reorderClause(Head,[X^A|List]).
-reorderClause(Head,[ssz(User,Cyc),B|List]):- can_reorder, var(User),!,dmsg(reorderClause(Head,[B,ssz(User,Cyc)|List])), reorderClause(Head,[B,ssz(User,Cyc)|List]).
-reorderClause(Head,[A|List]):-!,callClause(A),reorderClause(Head,List).
+reorderClause(Head,[A|List]):- not(can_reorder),!,callClause(A),reorderClause(Head,List).
+reorderClause(Head, List):- member(Var^Call,List), nonvar(Var), !,delete_eq(List,Var^Call,ListO),!,callClause(Call),reorderClause(Head,ListO).
+reorderClause(Head,[A|List]):- !,callClause(A),reorderClause(Head,List).
 reorderClause(Head,C):- dmsg(warn(callClause((Head:-C)))),dtrace,callClause(C).
 
 vsubst(In,B,A,Out):-var(In),!,(In==B->Out=A;Out=In).
 vsubst(In,B,A,Out):-subst(In,B,A,Out).
 
 :-meta_predicate_transparent(callClause(+)) .
+callClause(_^C):-!,callClause(C).
+callClause(C):-debugOnError(C).
 callClause((C0->C1;C2)):-!,(callClause(C0)->callClause(C1);callClause(C2)).
 callClause((C1;C2)):-!,callClause(C1);callClause(C2).
 callClause((C1,C2)):-!,callClause(C1),callClause(C2).
 callClause([L|Ist]):- !, dmsg(callClause([L|Ist])),!,reorderClause(_ ,[L|Ist]).
-callClause(_^C):-!,debugOnError(C).
-callClause(C):-(debugOnError(C)).
 
 can_reorderBody(_ ,true):-!,fail.
 can_reorderBody(_ ,Body):-member(M,[noreorder,!,reorderClause,var,nonvar]),contains_term(Body,M),!,fail.
@@ -169,67 +173,20 @@ get_pl_type(List,list(proper)):-is_list(List),!.
 get_pl_type([_|_],list(improper)):-!.
 get_pl_type(C,compound(F,A)):-functor(C,F,A).
 
-pressz(User,Cyc,Call):-var(Cyc),nonvar(User), User=[V],!,pressz_v_1(User,Cyc,V,Call).
-pressz(User,Cyc,Call):-var(Cyc),nonvar(User), User=[V1,V2|V3],!,pressz_v_2(User,Cyc,[V1,V2|V3],Call).
-pressz(User,Cyc,ssz(User,Cyc)).
+pressz(User,Cyc,ssz(User,Cyc)):-var(Cyc),var(User),!,([Cyc]=User;(Cyc=User,User=[_|_])).
+pressz(User,Cyc,ssz(User,Cyc)):-ssz(User,Cyc).
 
-pressz_v_1(_User, Cyc,V,true):- atom(V),!, member(Cyc,[V,[V],string([V])]).
-pressz_v_1(User,  Cyc,V,(ssz(User,Cyc),atom(V))):- var(V),!. % ,member(Cyc,[   string([V]),  [V]  ,  V         ]).
-pressz_v_1(User,  Cyc,V,(ssz(User,Cyc),atom(V))).
-
-pressz_v_2(_User, Cyc,[V1,V2|V3],once(member(Cyc,[[V1,V2|V3],string([V1,V2|V3])]))):- var(V2),!.
-pressz_v_2(_User, Cyc,[V1,V2|V3],once(member(Cyc,[[V1,V2|V3],string([V1,V2|V3])]))):- atom(V2),!.
-% pressz_v_2(User,Cyc,[V1,V2|V3],( atom(V2))):- atom(V2),!, member(Cyc,[[V1,V2|V3],string([V1,V2|V3])]).
-
-
-ssz(User, CycString):-ground(CycString),!,stringToWords(CycString,Real),!,ssz2(User,Real).
-ssz(User, CycString):-nonvar(CycString),!,stringToWords(CycString,Real),!,ssz2(User,Real).
-ssz(User, CycString):-var(User),!,member(CycString,[[User],string([User]),User]).
-ssz([User], CycString):- !,member(CycString,[[User],string(User),User]),CycString\=[[_]].
-ssz([S1,S2|Ttr], CycString):-!,member(CycString,[[S1,S2|Ttr],string([S1,S2|Ttr])]).
-ssz(User, CycString):-atom(User),!,ssz([User], CycString).
-ssz(User, CycString):-nonvar(User),dmsg(ssz(User, CycString)),!,member(CycString,[string(User),User]).
-
-ssz2(StrOut,StrOut):-!.
-ssz2(User,Cyc):-nonvar(User),stringToWords(User,UserG),!,UserG=Cyc.
-
-:-export(stringToWords/2).
-stringToWords(Var,Var):-var(Var).
-stringToWords([],[]).
-stringToWords(string(S),Words):-!,stringToWords(S,Words).
-stringToWords([TheList|List],Words):-'TheList'== TheList,List=[_|_],!,stringToWords(List,Words).
-stringToWords([A],W):- !, stringToWords(A,W),!.
-stringToWords([S|Tring],NewString):- var(Tring),!,stringToWords(S,W),append(W,Tring,NewString),!.
-stringToWords([S|Tring],NewString):- Tring=[_|_],is_list(Tring),!,stringToWords(S,W),stringToWords(Tring,Words),append(W,Words,NewString),!.
-stringToWords([S|Tring],NewString):- Tring=[_|_],!,between(1,5,X),length(Tring,X),stringToWords(S,W),stringToWords(Tring,Words),append(W,Words,NewString),!.
-stringToWords(TheList,Words):-compound(TheList),functor(TheList,'TheList', _),TheList=..[_|List],!,stringToWords(List,Words).
-stringToWords(A,A):-is_list(A),!.
-stringToWords(A,[W]):-to_aword(A,W),!.
-
-
-reduceWordList(Var,Var):-var(Var),!.
-reduceWordList(string(S),Words):-!,reduceWordList(S,Words).
-reduceWordList([A],W):-reduceWordList(A,W),!.
-reduceWordList(A,W):-to_aword(A,W),!.
+ssz(User, CycString):-atom(CycString),!,[CycString]=User.
+ssz(User, CycString):-nonvar(CycString),!,CycString=User.
+% CycString is a var
+ssz(User, CycString):- var(User),!,([CycString]=User;(CycString=User,User=[_|_])).
+ssz([User], CycString):- atom(User),!,CycString=User.
+ssz(User, CycString):- not(is_list(User)),!,CycString=User.
+ssz([User], CycString):-!,CycString=User.
+ssz(User, CycString):-!,CycString=User.
 
 :-dynamic(textCached/2).
 
-
-
-to_string_words([],[]):-!.
-to_string_words([Eng|Lish],[E|Atoms]):-
- to_aword(Eng,E),!,
- to_string_words(Lish,Atoms).
-
-to_aword(Eng,Eng):-var(Eng),!.
-to_aword(string(A),W):-!,to_aword(A,W).
-to_aword([A],W):-!,to_aword(A,W).
-to_aword("",'').
-to_aword([],'').
-to_aword(Eng,W):-string(Eng),!,atom_string(E0,Eng),to_string_words(E0,E),to_aword(E,W).
-to_aword(Eng,N):-atom(Eng),atom_number(Eng,N),!.
-to_aword(Eng,Eng):-atom(Eng),!.
-to_aword(Eng,Eng).
 
 
 /*
@@ -250,8 +207,8 @@ to_aword(Eng,Eng).
 
 */
 :-export((dm1/0,dm2/0,dm3/0)).
-dm1:-mmake,e2c("I am seeing two books sitting on a shelf",F),portray_clause(F).
-% dm1:-e2c("I"),e2c("I am happy"),e2c("I saw wood"),e2c("I see two books"), e2c("I see two books sitting on a shelf").
+% dm1:-mmake,e2c("I am seeing two books sitting on a shelf",F),portray_clause(F).
+dm1:-e2c("I"),e2c("I am happy"),e2c("I saw wood"),e2c("I see two books"), e2c("I see two books sitting on a shelf").
 dm2:-e2c("AnyTemplate1 affects the NPTemplate2").
 dm3:-e2c("AnyTemplate1 at AnyTemplate2").
 
@@ -346,7 +303,7 @@ posMeans(String,POS,Form,CycL):-
 
 
 :-export(cache_the_posms/0).
-
+cache_the_posms:-!.
 cache_the_posms:- noreorder,
  with_assertions(thglobal:use_cyc_database,
      (retractall(posm_cached(_CW, _Phrase,POS, _Form, _CycL)),
@@ -561,8 +518,9 @@ stringToWordsListPOS(String,CycWords,POS):-
 stringToCycWord(String,CycWord):-  sanify_string(String,Sane), (stringToCycWord_0(Sane,CycWord)).
 
 stringToCycWord_0(String,CycWord):- 'baseForm'(CycWord,String).
+stringToCycWord_0([String],CycWord):- atom(String),toPropercase(String,UString),atom_concat(UString,'-TheWord',CycWord),once(cyckb_t([_,CycWord,_])),!.
 stringToCycWord_0(String,CycWord):- ground(CycWord),pos_4(String,CycWord,_,_),!.
-stringToCycWord_0(String,CycWord):-  meetsFormOrV(String,CycWord,_).
+stringToCycWord_0(String,CycWord):-  meetsFormOrViaPOS(String,CycWord,_).
 stringToCycWord_0(String,CycWord):-  meetsPos(String,CycWord,_).
 
 cycWordPosForm(POS,CycWord,Form):-        
@@ -570,7 +528,7 @@ cycWordPosForm(POS,CycWord,Form):-
 	 'posBaseForms'(CycWord,POS);
 	 'posForms'(CycWord,POS);
 	 'denotation'(CycWord,POS, _Arg, _CycL))),      
-	 'speechPartPreds'(POS, Form).
+	 speechPartPreds_transitive(POS, Form).
 
 sanify_string(String,Sane):-atom(String),!,trace_or_throw(sanify_string(String,Sane)).
 sanify_string(String,String):-sanify_string(String).
@@ -583,9 +541,21 @@ sanify_string([_,_]).
 pos(String,CycWord,Form,POS):- sanify_string(String,Sane), (pos_0(Sane,CycWord,Form,POS)).
 
 % pos_0(String,CycWord,Form,POS):-  pos_4(String,CycWord,Form,POS).
-pos_0(String,CycWord,Form,POS):-  'speechPartPreds'(POS, Form), ((meetsForm(String,CycWord,Form);meetsPos(String,CycWord,POS))).
+pos_0(String,CycWord,Form,POS):-  speechPartPreds_transitive(POS, Form), ((meetsForm(String,CycWord,Form);meetsPos(String,CycWord,POS))).
 
-pos_4(String,CycWord,Form,POS):-  'speechPartPreds'(POS, Form), stringArgUC(String, CycString, kbp_t([Form,CycWord,CycString])).
+
+string_cycword_form(Form,CycWord,String):-stringArgUC(String, CycString, (must_det((nonvar(CycWord);nonvar(CycString))),cyckb_t([Form,CycWord,CycString]))).
+
+pos_4(String,CycWord,Form,POS):- nonvar(String),var(CycWord),var(Form),var(POS),!,string_cycword_form(Form,CycWord,String),speechPartPreds_transitive(POS, Form).
+pos_4(String,CycWord,Form,POS):- speechPartPreds_transitive(POS, Form), string_cycword_form(Form,CycWord,String).
+
+speechPartPreds_transitive(POS, Form):- !, 'speechPartPreds'(POS, Form).
+speechPartPreds_transitive(SPOS, SForm):- speechPartPreds_transitive0(SPOS, SForm),must_det((nonvar(SForm),nonvar(SPOS))).
+speechPartPreds_transitive0(SPOS, SForm):- reorderBody('speechPartPreds'(POS, Form),SPOS^pred_or_same('genls',POS,SPOS),SForm^pred_or_same('genlPreds',Form,SForm)).
+
+pred_or_same(_,POS,POS).
+pred_or_same(Pred,POS,SPOS):- (nonvar(SPOS);nonvar(POS)),!,cyckb_t([Pred,POS,SPOS]).
+% pred_or_same(Pred,POS,SPOS):-cyckb_t([Pred,POS,MPOS]),cyckb_t([Pred,MPOS,SPOS]).
 
 % ==========================================================
 % meetsForm(String,CycWord,Form)
@@ -601,13 +571,15 @@ meetsForm(String,CycWord,Form):- genlPreds_different(Child,Form),meetsForm_0(Str
 meetsForm_0(String,CycWord,Form):- 'abbreviationForLexicalWord'(CycWord,Form, String).
 meetsForm_0(String,CycWord,Form):- pos_4(String,CycWord,Form,_).
 
+
+
+/*
 % Adjectives
 meetsForm_0(String,CycWord,'regularDegree'):-'regularDegree'(CycWord,String).
 meetsForm_0(String,CycWord,'comparativeDegree'):-'comparativeDegree'(CycWord,String).
 meetsForm_0(String,CycWord,'superlativeDegree'):-'superlativeDegree'(CycWord,String).
 meetsForm_0(String,CycWord,'nonGradableAdjectiveForm'):-'nonGradableAdjectiveForm'(CycWord,String).
 
-/*
 % Nouns
 meetsForm_0(String,CycWord,'singular'):-'singular'(CycWord,String).
 meetsForm_0(String,CycWord,'plural'):-'plural'(CycWord,String).
@@ -643,16 +615,16 @@ meetsForm_0(String,CycWord,'thirdPersonSg-Present'):-'thirdPersonSg-Present'(Cyc
 %meetsForm_0(String,CycWord,POS,Form):-ttholds(Form,CycWord,String). & inflNounPluralUnchecked
 
 stringAtomToWordForm([String],CycWord,Form):- nonvar(String),!,           
-	    'regularSuffix'(Form, Before, Suffix), % Suffix\=[],
+	    'regularSuffix'(Form, Before, Suffix), Suffix\='',
 	    words_concat(NewBaseString,Suffix,[String]),
-	    trace,meetsFormOrViaPOS([NewBaseString],CycWord,Before).
+	    meetsFormOrViaPOS([NewBaseString],CycWord,Before).
 stringAtomToWordForm([String],CycWord,Form):- !,
-	    'regularSuffix'(Form,Before,Suffix), % Suffix\=[],
+	    'regularSuffix'(Form,Before,Suffix),  Suffix\='',
             meetsFormOrViaPOS(NewString,CycWord,Before),
 	    words_concat(NewString,Suffix,[String]).
 	    
 meetsFormOrViaPOS(String,CycWord,Form):- meetsForm(String,CycWord,Form).
-% 'speechPartPreds'(POS, Form),meetsPos(String,CycWord,POS)
+% speechPartPreds_transitive(POS, Form),meetsPos(String,CycWord,POS)
 
 %'suffixString'('Y_AdjectiveProducing-TheSuffix', y, 'GeneralEnglishMt', v(v('Y_AdjectiveProducing-TheSuffix', y), A)).
 
@@ -922,7 +894,7 @@ get_wordage_list([],[]):-!.
 get_wordage_list(Words,[DCG|POSList]):- between(1,3,X),length(Pre,X),append(Pre,Rest,Words),get_wordage(Pre,DCG),get_wordage_list(Rest,POSList).
 get_wordage_list([W|Ords],[w(W)|POSList]):-get_wordage_list(Ords,POSList).
 
-get_wordage(Pre,wordage(Pre,Props)):- findall(Prop,string_props(Pre,Prop),Props).
+get_wordage(Pre,wordage(Pre,[txt(Pre)|Props])):- with_assertions(thlocal:useOnlyExternalDBs,setof(Prop,string_props(Pre,Prop),Props)).
 
 string_props(String,base(CycWord)):- 'baseForm'(CycWord,String).
 string_props(String,form(CycWord,Form)):-  meetsForm(String,CycWord,Form),notPrefixOrSuffix(CycWord).
@@ -930,7 +902,7 @@ string_props(String,pos(CycWord,POS)):-  meetsPos(String,CycWord,POS),notPrefixO
 
 % string_props(String,cycl(Form)):-  meetsForm(String,CycWord,Form),notPrefixOrSuffix(CycWord).
 
-notPrefixOrSuffix(CycWord):-not(kbp_t([isa, CycWord, 'LexicalPrefix'])),not(kbp_t([isa, CycWord, 'LexicalSuffix'])).
+notPrefixOrSuffix(CycWord):-not(cyckb_t([isa, CycWord, 'LexicalPrefix'])),not(cyckb_t([isa, CycWord, 'LexicalSuffix'])).
 
 get_pos_list([],[]):-!.
 get_pos_list(Words,[DCG|POSList]):- between(1,3,X),length(Pre,X),append(Pre,Rest,Words),get_dcg(DCG,Pre),get_pos_list(Rest,POSList).
@@ -1271,7 +1243,7 @@ proper_object(CycL) --> pos_cycl(Noun,CycL), { goodStart(noun_phrase,Noun) } .
 poStr(CycL,String):- stringArg(String, poStr0(CycL,String)).
 poStr0(CycL,String):- strings_match,
       'genlPreds'(FirstName,nameString),
-       moo:kbp_t([FirstName,CycL,String]).
+       moo:cyckb_t([FirstName,CycL,String]).
 
 poStr0(CycL,String):- strings_match,
       'initialismString'(CycL,String);
@@ -1448,7 +1420,7 @@ verb_phrase(Subj,Event,'and_adverbal'(Event,AdvCycL,CycL))  -->
 
 % unknown phrase has arity CycL + object %TODO rename subject/3 to noun_phrase/3
 verb_phrase(Subj,Event,and_concat(CycL)) --> [Verb],
-	 {atom(Verb),((words_concat('',Verb,Predicate),kbp_t(['arity',Predicate,N]));(kbp_t(['arity',Verb,N]),Predicate=Verb)),!},
+	 {atom(Verb),((words_concat('',Verb,Predicate),cyckb_t(['arity',Predicate,N]));(cyckb_t(['arity',Verb,N]),Predicate=Verb)),!},
 	 verb_phrase_arity(N,Predicate,Subj,Event,CycL).
 
 % :-index(verb_phrase_arity(0,0,0,0,0,0,0)).
@@ -1473,7 +1445,7 @@ verb_phrase(Subj,Event,(CycL)) -->
 %	 best_subject(Obj,true,CycL),
  %        best_subject_constituant(Target,Event,CycL,CycLO),
 	 {cvtWordPosCycL(CycVerb,'Verb',Verb),
-	 (atom(Verb),(atom_concat('',Verb,Predicate),kbp_t(['arity',Predicate,N]));(kbp_t(['arity',Verb,N]),Predicate=Verb)),!},
+	 (atom(Verb),(atom_concat('',Verb,Predicate),cyckb_t(['arity',Predicate,N]));(cyckb_t(['arity',Verb,N]),Predicate=Verb)),!},
 	  verb_phrase_arity(N,Predicate,Subj,Event,CycL),{varnameIdea(String,Event)}.
 	 
 % gen phrase 1
@@ -1879,7 +1851,7 @@ atom_junct2([W|S],[W|Words]):-atom_junct2(S,Words).
 :-module(parser_e2c).
 
 %:- debug, make:list_undefined. 
- % 'speechPartPreds'(X,Y).
+ % speechPartPreds_transitive(X,Y).
 %:- parser_e2c:prolog.
 
 %:- user:prolog.
@@ -1986,7 +1958,7 @@ cycPred('TTPred-thetaRoleFeat-Predicative').
 cycPred('TTPred-thetaRoleFeat-Canadian').
 cycPred('TTPred-thetaRoleFeat-Tutoiement').
 cycPred('TTPred-thetaRoleFeat-Etre').
-cycPred('speechPartPreds').
+cycPred(speechPartPreds_transitive).
 cycPred('genlPreds').
 cycPred('afterRemoving').
 cycPred('isa').

@@ -125,9 +125,10 @@ look_brief(Agent):- not(prop(Agent,needs_look,true)),!.
 look_brief(Agent):- must(prop(Agent,needs_look,true)),look_as(Agent).
 
 telnet_repl_writer(_TL,call,term,Goal):-!,ignore(debugOnError(Goal)).
-telnet_repl_writer(_TL,text,Type,[V]):-telnet_repl_writer(_TL,text,Type,V).
+telnet_repl_writer( TL,text,Type,[V]):-telnet_repl_writer(TL,text,Type,V).
 telnet_repl_writer(_TL,text,Type,V):-copy_term(Type,TypeO),ignore(TypeO=t),fmt('text(~q).~n',[V]).
 telnet_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=t),fmt('~q=(~w)~q.~n',[N,TypeO,V]).
+
 telnet_repl_obj_to_string(O,_TypeHint,O):-!.
 telnet_repl_obj_to_string(O,_TypeHint,S):- object_string(O,S),!.
 telnet_repl_obj_to_string(O,Type,toString(TypeO,O)):-copy_term(Type,TypeO),ignore(TypeO=s).

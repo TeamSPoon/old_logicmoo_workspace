@@ -234,8 +234,6 @@ multiValued(named(term,term),[]).
 :-must_det(argIsa_call(genlPreds,2,_Type)).
 genlPreds(mpred,mpred).
 
-%multiValued(ofclass(term,type),[alias(isa)]).
-
 multiValued(cmdsuccess(agent,action)).
 multiValued(cmdfailure(agent,action)).
 multiValued(nameStrings(term,string)).

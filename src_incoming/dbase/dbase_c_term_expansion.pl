@@ -49,7 +49,7 @@ if_use_holds_db(F,A,_,_):- declare_as_code(F,A),fail.
 
 never_use_holds_db(F,N,Why):-trace_or_throw(todo(find_impl,never_use_holds_db(F,N,Why))).
 
-isCycPredArity_Check(F,A):-get_mpred_props(F,cycPred(A)).
+isCycPredArity_Check(F,A):-get_mpred_prop(F,cycPred(A)).
 
 using_holds_db(F,A,_,_):- never_use_holds_db(F,A,_),!,fail.
 using_holds_db(F,A2,A,m2(F,A2,isCycPredArity_Check)):- integer(A2), A is A2-2, A>0, isCycPredArity_Check(F,A),!.
@@ -75,7 +75,6 @@ negate_wrapper(P,N):-trace_or_throw(unkown(negate_wrapper(P,N))).
 
 negate_wrapper0(holds_t,holds_f).
 negate_wrapper0(dbase_t,dbase_f).
-negate_wrapper0(cholds_t,cholds_f).
 negate_wrapper0(int_firstOrder,int_not_firstOrder).
 negate_wrapper0(firstOrder,not_firstOrder).
 negate_wrapper0(asserted_dbase_t,asserted_dbase_f).

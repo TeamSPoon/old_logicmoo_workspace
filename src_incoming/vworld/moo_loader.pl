@@ -24,8 +24,8 @@ load_game(World,File):-
  with_no_assertions(thglobal:use_cyc_database,
     ( world_clear(World),
       retractall(loaded_file_world_time(_,_,_)),
-      show_time(ensure_plmoo_loaded(File)),!,
-      show_time(finish_processing_world))).
+      time_call(ensure_plmoo_loaded(File)),!,
+      time_call(finish_processing_world))).
 
 :-meta_predicate_transparent(filematch/2).
 :-meta_predicate_transparent filematch/3.
@@ -114,7 +114,7 @@ rescan_mpred_stubs:- doall((mpred_prop(F,prologHybrid),mpred_arity(F,A),A>0,warn
 
 finish_processing_world:- loop_check(with_assertions(thlocal:do_slow_kb_op_now,doall(finish_processing_game)),true).
 
-doall_and_fail(Call):- show_time(once(doall(Call))),fail.
+doall_and_fail(Call):- time_call(once(doall(Call))),fail.
 
 rescan_all:- doall_and_fail(rescan_mpred_props).
 rescan_all:- doall_and_fail(rescan_dbase_ops).
@@ -154,7 +154,7 @@ savedb:-!.
 savedb:- debugOnError(rsavedb),!.
 :-meta_predicate_transparent(rsavedb/0).
 rsavedb:-
- debugOnError(rescan_dbase_t_once),
+ debugOnError(rescan_dbase_facts),
  catch((   
    ignore(catch(make_directory('/tmp/lm/'),_,true)),
    ignore(catch(delete_file('/tmp/lm/savedb'),E,(dmsg(E:delete_file('/tmp/lm/savedb'))))),   

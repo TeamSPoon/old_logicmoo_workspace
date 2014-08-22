@@ -25,7 +25,7 @@ call_body_req(HEAD):- functor(HEAD,F,A),HEAD_T=..[F|ARGS],HEAD_T=..[dbase_t,F|AR
 
 body_req_isa(I,C):-isa_backchaing(I,C).
 
-body_call_cyckb(HEAD_T):-HEAD_T =.. [dbase_t|PLIST],!, thglobal:use_cyc_database, kbp_t(PLIST).
+body_call_cyckb(HEAD_T):-HEAD_T =.. [dbase_t|PLIST], thglobal:use_cyc_database,!, kbp_t(PLIST).
 
 hook:body_req(F,A,HEAD,HEAD_T):- hook_body_req(F,A,HEAD,HEAD_T).
 
@@ -70,13 +70,16 @@ body_req_1(F,A,HEAD,HEAD_T):- body_req_2(F,A,HEAD,HEAD_T).
 body_req_2(F,_,HEAD,  _):-    mpred_prop(F,external(Module)),!,call(Module:HEAD).
 body_req_2(F,A,HEAD,HEAD_T):- body_req_with_rules(F,A,HEAD,HEAD_T).
 
+
 body_req_with_rules(_,_,_  , HEAD_T):- clause(HEAD_T, true).
 body_req_with_rules(_,_,HEAD, _):-     clause(HEAD,   true),dmsg(warn(clause(HEAD,true))).
 body_req_with_rules(_,_,HEAD, _):-  moo:hybrid_rule(HEAD,BODY),call_mpred_body(HEAD,BODY).
-body_req_with_rules(_,_,_,dbase_t(F,Obj,LValue)):- choose_val(F,Obj,LValue).
+body_req_with_rules(F,_,_,HEAD_T):- body_req_plus_cyc(F,_,_,HEAD_T).
+body_req_with_rules(_,_,_,dbase_t(F,Obj,LValue)):-  choose_val(F,Obj,LValue).
 
 body_req_no_rules(_,_,HEAD, _):-     clause(HEAD,  true).
 body_req_no_rules(_,_,_  , HEAD_T):- clause(HEAD_T,true).
+body_req_no_rules(F,_,_,HEAD_T):-body_req_plus_cyc(F,_,_,HEAD_T).
 
 
 body_req_plus_cyc(F,_,_,HEAD_T):- mpred_prop(F,cycPlus2(_)),!,with_assertions(thglobal:use_cyc_database,body_call_cyckb(HEAD_T)).

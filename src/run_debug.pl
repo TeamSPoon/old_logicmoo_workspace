@@ -36,20 +36,21 @@ start_boxer:-
 prolog_repl:- nl,fmt("Press Ctrl-D to start the mud!"),nl,with_assertions(thglobal:use_cyc_database, prolog).
 
 % [Required] Defines debug80
-debug80:- module(moo),
+debug80:- 
           user_ensure_loaded(logicmoo(parsing/parser_talk)),
           user_ensure_loaded(logicmoo(parsing/parser_chat80)),
           decl_type(person),          
-          module(moo),
           ensure_plmoo_loaded(logicmoo('rooms/startrek.all.plmoo')),
+          module(parser_chat80),
           t1,          
           prolog_repl.
 
 
-debug_e2c:- with_assertions(thglobal:use_cyc_database,(module(parser_e2c),cache_the_posms,prolog_repl)).
+% debug_e2c:- with_assertions(thglobal:use_cyc_database,(module(parser_e2c),cache_the_posms,prolog_repl)).
+debug_e2c:- with_assertions(thglobal:use_cyc_database,'@'((cache_the_posms,prolog_repl),'parser_e2c').
 
 % [Optional] Interactively debug E2C
-% :- debug_e2c.
+:- debug_e2c.
 
 % [Optional] This loads boxer
 % :- at_start(with_assertions(moo:prevent_transform_moo_preds,within_user(ignore(catch(start_boxer,_,true))))).
@@ -88,7 +89,6 @@ now_run_local_tests_dbg :- doall(defined_local_test).
 
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
 :-do_player_action("look").
-
 
 :-forall(inRegion(O,L),dmsg(inRegion(O,L))).
 

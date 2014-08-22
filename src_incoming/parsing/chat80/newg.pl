@@ -80,15 +80,15 @@ np(part(B, H), 3+C, _, indef, J, A, L, D, N, E, P) :-
 
 variable_q(C, A, E, B, F, G, H, x(gap, nonterminal, np(D, A, B, _, _, J, K), I)) :-
 	whq(C, A, D, E, F, G, H, I),
-	trace(J, K).
+	trace80(J, K).
 variable_q(D, E, compl, M, B, H, C, x(gap, nonterminal, pp(pp(A, F), compl, K, L), J)) :-
 	prep(A, B, G, C, I),
 	whq(D, E, F, _, G, H, I, J),
-	trace(K, L),
+	trace80(K, L),
 	compl_case(M).
 variable_q(B, A, compl, K, E, F, G, x(gap, nonterminal, adv_phrase(pp(C, np(A, np_head(int_det(B), [], D), [])), I, J), H)) :-
 	context_pron(C, D, E, F, G, H),
-	trace(I, J),
+	trace80(I, J),
 	verb_case(K).
 variable_q(A, _, compl, J, B, F, C, x(gap, nonterminal, pred(adj, value(D, wh(A)), I), H)) :-
 	terminal(how, B, E, C, G),
@@ -427,7 +427,7 @@ np_mods(A, B, J, [C|K], D, M, _, O, E, Q, F, S) :-
 	       P,
 	       F,
 	       R),
-	trace(G),
+	trace80(G),
 	plus(G, H, I),
 	minus(D, I, L),
 	plus(H, D, N),
@@ -461,7 +461,7 @@ np_mod(A, _, B, C, D, E, F, G, H) :-
 
 verb_mods([A|H], B, _, K, C, M, D, O) :-
 	verb_mod(A, B, F, C, L, D, N),
-	trace(E),
+	trace80(E),
 	plus(E, F, G),
 	minus(B, G, I),
 	plus(F, B, J),
@@ -587,14 +587,14 @@ rel(C, rel(D, G), L, A, N, B, P) :-
 	island(A, E, B, F),
 	variable(C, D, E, H, F, I),
 	s(G, J, H, M, I, O),
-	trace(K),
+	trace80(K),
 	minus(J, K, L),
 	dnalsi(M, N, O, P).
 
 
 variable(A, B, C, D, E, x(gap, nonterminal, np(np(A, wh(B), []), A, _, _, _, G, H), F)) :-
 	terminal(that, C, D, E, F),
-	trace(G, H).
+	trace80(G, H).
 variable(B, A, F, G, H, x(gap, nonterminal, np(C, D, E, _, _, J, K), I)) :-
 	wh(A,
 	   B,
@@ -605,7 +605,7 @@ variable(B, A, F, G, H, x(gap, nonterminal, np(C, D, E, _, _, J, K), I)) :-
 	   G,
 	   H,
 	   I),
-	trace(J, K).
+	trace80(J, K).
 variable(E, D, B, H, C, x(gap, nonterminal, pp(pp(A, F), compl, K, L), J)) :-
 	prep(A, B, G, C, I),
 	wh(D,
@@ -617,7 +617,7 @@ variable(E, D, B, H, C, x(gap, nonterminal, pp(pp(A, F), compl, K, L), J)) :-
 	   H,
 	   I,
 	   J),
-	trace(K, L),
+	trace80(K, L),
 	compl_case(M).
 
 
@@ -709,7 +709,7 @@ reduced_rel(C, reduced_rel(D, G), L, A, N, B, P) :-
 	island(A, E, B, F),
 	reduced_wh(C, D, E, H, F, I),
 	s(G, J, H, M, I, O),
-	trace(K),
+	trace80(K),
 	minus(J, K, L),
 	dnalsi(M, N, O, P).
 
@@ -717,11 +717,11 @@ reduced_rel(C, reduced_rel(D, G), L, A, N, B, P) :-
 reduced_wh(A, B, D, I, E, x(nogap, nonterminal, np(np(A, wh(B), []), A, N, _, _, L, M), x(nogap, nonterminal, verb_form(be, pres+fin, A, main), x(nogap, nonterminal, neg(_, C), x(nogap, nonterminal, pred(C, F, G), K))))) :-
 	neg(_, C, D, H, E, J),
 	pred(C, F, G, H, I, J, K),
-	trace(L, M),
+	trace80(L, M),
 	subj_case(N).
 reduced_wh(A, B, F, G, H, x(nogap, nonterminal, np(np(A, wh(B), []), A, L, _, _, J, K), x(nogap, nonterminal, verb(C, _, D, E), I))) :-
 	participle(C, D, E, F, G, H, I),
-	trace(J, K),
+	trace80(J, K),
 	subj_case(L).
 reduced_wh(A, B, I, J, K, x(nogap, nonterminal, np(E, F, C, G, _, M, N), x(gap, nonterminal, np(np(A, wh(B), []), A, D, _, _, O, P), L))) :-
 	s_all(H),
@@ -738,8 +738,8 @@ reduced_wh(A, B, I, J, K, x(nogap, nonterminal, np(E, F, C, G, _, M, N), x(gap, 
 	   J,
 	   K,
 	   L),
-	trace(M, N),
-	trace(O, P).
+	trace80(M, N),
+	trace80(O, P).
 
 
 verb(B, C, D, E, A, A, F, G) :-

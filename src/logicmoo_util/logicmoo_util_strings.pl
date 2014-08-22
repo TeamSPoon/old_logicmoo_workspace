@@ -368,7 +368,11 @@ vars_to_ucase_0([N=V|Vars],List):-
 
 atomSplit(In,List):- hotrace(( ground(In),
  any_to_string(In,String),atom_string(Atom,String),splt_words(Atom,List,Vars),vars_to_ucase(Vars,List))),!.
-atomSplit(Atom,WordsO):- 
+
+atomSplit(Atom,WordsO):-atomSplitEasy(Atom,WordsO),!.
+
+:-export(atomSplitEasy/2).
+atomSplitEasy(Atom,WordsO):- 
    hotrace((atomSplit(Atom,WordsO,[' ','\t','\n','\v','\f','\r',' ','!','"','#','$','%','&','\'',
     '(',')','*','+',',','-','.','/',':',';','<',
     '=','>','?','@','[',\,']','^','_',

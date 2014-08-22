@@ -186,7 +186,7 @@ create_instance(P):- must_det((isa(P,What),createableType(What))),must_det(creat
 :-export(create_instance/2).
 create_instance(P,What):-create_instance(P,What,[]).
 :-export(create_instance/3).
-create_instance(What,Type,Props):- loop_check(show_time(create_instance_now(What,Type,Props)),dmsg(already_create_instance(What,Type,Props))).
+create_instance(What,Type,Props):- loop_check(time_call(create_instance_now(What,Type,Props)),dmsg(already_create_instance(What,Type,Props))).
 
 create_instance_now(What,Type,Props):-
   with_assertions(thlocal:skip_db_op_hooks,

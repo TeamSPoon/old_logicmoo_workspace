@@ -49,16 +49,19 @@ scan_missing_stubs(F):-
    ignore((forall(mpred_missing_stubs(F,Stub),(mpred_arity(F,A),show_call(declare_dbase_local(F,A,Stub)))))).
 
 decl_mpred_pi(PI):-ignore((ground(PI),compound(PI),decl_mpred(PI))).
+:-export(decl_mpred_mfa/3).
 decl_mpred_mfa(_,M:F,A):-atom(M),!,decl_mpred_mfa(M,F,A).
+decl_mpred_mfa(M,FF,A):-var(M),!,context_module(M),!,decl_mpred_mfa(M,FF,A).
 decl_mpred_mfa(M,FF,A):-
    get_functor(FF,F,_),
    must_det_l([
      ignore((var(M),context_module(M),dmsg(decl_mpred_mfa(M,F,A)))),
      ignore((nonvar(M),asserta_if_new(mpred_prop(F,def_module(M))))),
      assert_arity(F,A),
-     declare_dbase_local(F,A),        
+     declare_dbase_local(F,A),
+     must_det(nonvar(M)),
     '@'((
-     (static_predicate(M,F,A)->true;M:dynamic(F/A)), 
+     (static_predicate(M,F,A)->true; M:dynamic(F/A)), 
      M:export(F/A),
      M:multifile(M:F/A)),M),
      scan_missing_stubs(F) ]).
@@ -178,12 +181,13 @@ declare_dbase_local_dynamic_really(M,F,A):-
    call(compile_predicates([HEAD])).
 
 hybrid_rule_term_expansion(':-'(_),_):-!,fail.
-hybrid_rule_term_expansion((HEAD:-true),was_imported_kb_content(HEAD)):-!,fail,compound(HEAD),functor(HEAD,F,_),mpred_prop(F,prologHybrid),add(HEAD).
-hybrid_rule_term_expansion((HEAD:-NEWBODY),moo:hybrid_rule(HEAD,NEWBODY)):-compound(HEAD),functor(HEAD,F,_),mpred_prop(F,prologHybrid).
+hybrid_rule_term_expansion((HEAD:-true),was_imported_kb_content(HEAD)):-!,fail,compound(HEAD),functor(HEAD,F,_),mpred_prop(F,prologHybrid),add(HEAD),!.
+hybrid_rule_term_expansion((HEAD:-NEWBODY),moo:hybrid_rule(HEAD,NEWBODY)):-compound(HEAD),functor(HEAD,F,_),mpred_prop(F,prologHybrid),!.
 hybrid_rule_term_expansion((HEAD:-NEWBODY),moo:hybrid_rule(HEAD,NEWBODY)):-compound(HEAD),functor(HEAD,F,_),mpred_arity(F,_),!.
+hybrid_rule_term_expansion((I:-_),_):-!,once((compound(I),functor(I,F,A),asserta_if_new(mpred_prolog_arity(F,A)))),!,fail.
 hybrid_rule_term_expansion(I,_):- once((compound(I),functor(I,F,A),asserta_if_new(mpred_prolog_arity(F,A)))),!,fail.
 
-user:term_expansion(I,O):-hybrid_rule_term_expansion(I,O).
+user:term_expansion(I,O):- hybrid_rule_term_expansion(I,O).
 
 declare_dbase_local_dynamic_plus_minus_2(F,AMinus2):-   
    decl_mpred(F,arity(AMinus2)),
@@ -302,8 +306,8 @@ assert_arity_lc(F,A):-
    
 
 :-export(rescan_missing_stubs/0).
-rescan_missing_stubs:-loop_check(show_time(rescan_missing_stubs_lc),true).
-rescan_missing_stubs_lc:- thglobal:use_cyc_database, once(with_assertions(thlocal:useExternalDBs,forall((kb_t(arity(F,A)),A>1,good_pred_relation_name(F,A),not(mpred_arity(F,A))),with_no_dmsg(decl_mpred_mfa,decl_mpred_hybrid(F,A))))),fail.
+rescan_missing_stubs:-loop_check(time_call(rescan_missing_stubs_lc),true).
+rescan_missing_stubs_lc:- once(thglobal:use_cyc_database), once(with_assertions(thlocal:useExternalDBs,forall((kb_t(arity(F,A)),A>1,good_pred_relation_name(F,A),not(mpred_arity(F,A))),with_no_dmsg(decl_mpred_mfa,decl_mpred_hybrid(F,A))))),fail.
 rescan_missing_stubs_lc:-notrace(ignore((forall(mpred_missing_stubs(F,Stub),(mpred_arity(F,A),show_call(declare_dbase_local(F,A,Stub))))))).
 
 good_pred_relation_name(F,A):-not(bad_pred_relation_name(F,A)).

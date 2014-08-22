@@ -118,11 +118,9 @@ assertz_if_new_clause(C):- as_clause(C,H,B),assertz_if_new_clause(H,B).
 assertz_if_new_clause(H,B):-clause_asserted(H,B),!.
 assertz_if_new_clause(H,B):-assertz((H:-B)).
 
-clause_asserted(C):- as_clause(C,H,B),clause_asserted(H,B).
+clause_asserted(C):- as_clause(C,H,B),!,clause_asserted(H,B).
 
-clause_asserted(H,_):- not(predicate_property(H,number_of_clauses(_))),!,fail.
-clause_asserted(H,true):-!,clause(H,true).
-clause_asserted(H,B):-functor_h(H,HH),functor_h(B,BB),!,clause(HH,BB), H =@= HH, B =@= BB .
+clause_asserted(H,B):- predicate_property(H,number_of_clauses(_)),nth_clause(H, _, Ref), clause(Head, Body, Ref),!,H=@=Head,Body=@=B.
 
 :-meta_predicate clause_safe(:, ?).
 :-module_transparent clause_safe/2.
@@ -201,7 +199,7 @@ nd_pred_subst(_Pred,  Var, _,_,Var ) :- var(Var),!.
 nd_pred_subst(Pred,  P, X,Sk, P1 ) :- functor(P,_,N),nd_pred_subst1(Pred, X, Sk, P, N, P1 ).
 
 nd_pred_subst1(_Pred, _,  _, P, 0, P  ).
-nd_pred_subst1(Pred, X, Sk, P, N, P1 ) :- N > 0, univ_safe(Pred,P , [F|Args]), 
+nd_pred_subst1(Pred, X, Sk, P, N, P1 ) :- N > 0, univ_safe(P , [F|Args]), 
             nd_pred_subst2(Pred, X, Sk, Args, ArgS ),
             nd_pred_subst2(Pred, X, Sk, [F], [FS] ),  
             univ_safe(P1 , [FS|ArgS]).

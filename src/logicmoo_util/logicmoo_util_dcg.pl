@@ -271,7 +271,8 @@ decl_dcgTest("this is text",dcgStartsWith0(theText([this,is]))).
 % DCG Tester
 % =======================================================
 
-do_dcg_util_tests:-
+:-export(do_dcg_util_tests/0).
+logicmoo_util_dcg:do_dcg_util_tests:-
    forall(decl_dcgTest(List,Phrase,Call),'@'((do_dcgTest(List,Phrase,Call)),logicmoo_util_dcg)),
    forall(decl_dcgTest_startsWith(List,Phrase,Call),'@'((do_dcgTest_startsWith(List,Phrase,Call)),logicmoo_util_dcg)).
 

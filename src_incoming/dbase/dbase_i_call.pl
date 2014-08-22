@@ -225,8 +225,8 @@ call_maybe_backchain_lc(C):- predicate_property(C,number_of_rules(N)),N>0,!,clau
 call_maybe_backchain_lc(C):- debugOnError(C).
 
 body_no_backchains(_,true):-!.
-body_no_backchains(H,B):- body_no_backchains_match(B),!,not(test_tl(thlocal:insideIREQ,H)),B.
 body_no_backchains(H,_):- test_tl(thlocal:insideIREQ,H),!,fail.
+body_no_backchains(_,B):- body_no_backchains_match(B),!,B.
 body_no_backchains(H,B):- call_mpred_body(H,B).
 
 body_no_backchains_match((!,hook:body_req(_, _, _, _))).
@@ -238,13 +238,9 @@ naf(Goal):-not(req(Goal)).
 
 
 
-
-
-
 callable_tf(P,2):- mpred_arity_pred(P),!,fail.
 callable_tf(F,A):- functor_safe(P,F,A),predicate_property(P,_),!.
 
-useDBMts:- loaded_external_kbs, test_tl(useOnlyExternalDBs),!.
 
 relax_term(P,P,Aic,Aic,Bic,Bic):- !.
 /*
@@ -259,73 +255,51 @@ relax_term(P,P,Ai,Ac,Bi,Bc):- when_met(pred(nonvar,Ac),when_met(pred(nonvar,Bc),
 % ================================================================================
 % begin holds_t
 % ================================================================================
-:-export((holds_t/1,holds_t/2,holds_t/3,holds_t/4,holds_t/5,holds_t/6,holds_t/7,holds_t/8)).
-holds_t(P,A1,A2,A3,A4,A5,A6,A7):- req(dbase_t(P,A1,A2,A3,A4,A5,A6,A7)).
-holds_t(P,A1,A2,A3,A4,A5,A6):- req(dbase_t(P,A1,A2,A3,A4,A5,A6)).
-holds_t(P,A1,A2,A3,A4,A5):- req(dbase_t(P,A1,A2,A3,A4,A5)).
-holds_t(P,A1,A2,A3,A4):- req(dbase_t(P,A1,A2,A3,A4)).
-holds_t(P,A1,A2,A3):- req(dbase_t(P,A1,A2,A3)).
-holds_t(P,A1,A2):- req(dbase_t(P,A1,A2)).
-holds_t(P,A1):- req(dbase_t(P,A1)).
-holds_t(G):- req(G).
 
 
 isCycPredArity_ignoreable(P,A):- ignore(mpred_prop(P,cycPred(A))),ignore(mpred_arity(P,A)).
 
-dbase_which_next(dac(no_d,a,no_c,no_mt)).
+dbase_which_next(dac(no_d,a,no_c,no_fallback)).
 
-dbase_t(P,A1,A2,A3,A4,A5,A6,A7):- isCycPredArity_ignoreable(P,7),dbase_which_next(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5,A6,A7);call_mt_t(DBS,P,A1,A2,A3,A4,A5,A6,A7,_,_);assertion_t([P,A1,A2,A3,A4,A5,A6,A7])).
-dbase_t(P,A1,A2,A3,A4,A5,A6):- isCycPredArity_ignoreable(P,6),dbase_which_next(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5,A6);call_mt_t(DBS,P,A1,A2,A3,A4,A5,A6,_,_)).
-dbase_t(P,A1,A2,A3,A4,A5):- isCycPredArity_ignoreable(P,5),dbase_which_next(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5);call_mt_t(DBS,P,A1,A2,A3,A4,A5,_,_)).
-dbase_t(P,A1,A2,A3,A4):- isCycPredArity_ignoreable(P,4),dbase_which_next(DBS),(call_t(DBS,P,A1,A2,A3,A4);call_mt_t(DBS,P,A1,A2,A3,A4,_,_)).
-dbase_t(P,A1,A2,A3):- isCycPredArity_ignoreable(P,3),dbase_which_next(DBS),(call_t(DBS,P,A1,A2,A3);call_mt_t(DBS,P,A1,A2,A3,_,_)).
-dbase_t(P,A1,A2):- hotrace(cholds_relaxed_t(P,A1,A2)).
-% dbase_t(P,A1):- !,dbase_t(isa,A1,P).
-dbase_t(P,A1):- isCycPredArity_ignoreable(P,1),dbase_which_next(DBS),(call_t(DBS,P,A1);call_mt_t(DBS,P,A1,_,_)).
+holds_t(P,A1,A2,A3,A4,A5,A6,A7):- isCycPredArity_ignoreable(P,7),dbase_which_next(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5,A6,A7);call_mt_t(DBS,P,A1,A2,A3,A4,A5,A6,A7,_,_);assertion_t([P,A1,A2,A3,A4,A5,A6,A7])).
+holds_t(P,A1,A2,A3,A4,A5,A6):- isCycPredArity_ignoreable(P,6),dbase_which_next(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5,A6);call_mt_t(DBS,P,A1,A2,A3,A4,A5,A6,_,_)).
+holds_t(P,A1,A2,A3,A4,A5):- isCycPredArity_ignoreable(P,5),dbase_which_next(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5);call_mt_t(DBS,P,A1,A2,A3,A4,A5,_,_)).
+holds_t(P,A1,A2,A3,A4):- isCycPredArity_ignoreable(P,4),dbase_which_next(DBS),(call_t(DBS,P,A1,A2,A3,A4);call_mt_t(DBS,P,A1,A2,A3,A4,_,_)).
+holds_t(P,A1,A2,A3):- isCycPredArity_ignoreable(P,3),dbase_which_next(DBS),(call_t(DBS,P,A1,A2,A3);call_mt_t(DBS,P,A1,A2,A3,_,_)).
+holds_t(P,A1,A2):- hotrace(holds_relaxed_t(P,A1,A2)).
+holds_t(P,A1):- isCycPredArity_ignoreable(P,1),dbase_which_next(DBS),(call_t(DBS,P,A1);call_mt_t(DBS,P,A1,_,_)).
 
-% ================================================================================
-% begin cholds_t
-% ================================================================================
-which_t(dac(no_d,a,no_c,no_mt)).
-cholds_t(P,A1,A2,A3,A4,A5,A6,A7):- isCycPredArity_ignoreable(P,7),which_t(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5,A6,A7);call_mt_t(DBS,P,A1,A2,A3,A4,A5,A6,A7,_,_);assertion_t([P,A1,A2,A3,A4,A5,A6,A7])).
-cholds_t(P,A1,A2,A3,A4,A5,A6):- isCycPredArity_ignoreable(P,6),which_t(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5,A6);call_mt_t(DBS,P,A1,A2,A3,A4,A5,A6,_,_)).
-cholds_t(P,A1,A2,A3,A4,A5):- isCycPredArity_ignoreable(P,5),which_t(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5);call_mt_t(DBS,P,A1,A2,A3,A4,A5,_,_)).
-cholds_t(P,A1,A2,A3,A4):- isCycPredArity_ignoreable(P,4),which_t(DBS),(call_t(DBS,P,A1,A2,A3,A4);call_mt_t(DBS,P,A1,A2,A3,A4,_,_)).
-cholds_t(P,A1,A2,A3):- isCycPredArity_ignoreable(P,3),which_t(DBS),(call_t(DBS,P,A1,A2,A3);call_mt_t(DBS,P,A1,A2,A3,_,_)).
-cholds_t(P,A1,A2):- hotrace(cholds_relaxed_t(P,A1,A2)).
-% cholds_t(P,A1):- !,cholds_t(isa,A1,P).
-cholds_t(P,A1):- isCycPredArity_ignoreable(P,1),which_t(DBS),(call_t(DBS,P,A1);call_mt_t(DBS,P,A1,_,_)).
 
-% cholds_relaxed_t(P,A1,A2):-var(A1),var(A2),!,dbase_t(P,A1,A2).
-cholds_relaxed_t(P,A1,A2):-
+% holds_relaxed_t(P,A1,A2):-var(A1),var(A2),!,dbase_t(P,A1,A2).
+holds_relaxed_t(P,A1,A2):-
   isCycPredArity_ignoreable(P,2),which_t(DBS),
       relax_term(P,PR,A1,R1,A2,R2),
-         cholds_relaxed_0_t(DBS,PR,R1,R2).
+         holds_relaxed_0_t(DBS,PR,R1,R2).
 
-cholds_relaxed_0_t(DBS,P,A1,A2):- call_t(DBS,P,A1,A2).
-cholds_relaxed_0_t(DBS,P,A1,A2):- call_mt_t(DBS,P,A1,A2,_,_).
+holds_relaxed_0_t(DBS,P,A1,A2):- call_t(DBS,P,A1,A2).
+holds_relaxed_0_t(DBS,P,A1,A2):- call_mt_t(DBS,P,A1,A2,_,_).
 
 /*
-cholds_relaxed_0_t(dac(_,a,_,_),P,A1,A2):- assertion_t([P,A1,A2]).
-cholds_relaxed_0_t(dac(d,_,_,_),P,A1,A2):- dbase_t(P,A1,A2).
-cholds_relaxed_0_t(dac(_,_,_,h),P,A1,A2):- call_t(DBS,P,A1,A2).
-cholds_relaxed_0_t(DBS,P,A1,A2):- call_mt_t(DBS,P,A1,A2,_,_).
-cholds_relaxed_0_t(_DBS,P,A1,A2):- ground((P,A1)), TEMPL=..[P,T1,_],dbase_t(default_sv,TEMPL,2,A2),req(isa(A1,T1)),!.
+holds_relaxed_0_t(dac(_,a,_,_),P,A1,A2):- assertion_t([P,A1,A2]).
+holds_relaxed_0_t(dac(d,_,_,_),P,A1,A2):- dbase_t(P,A1,A2).
+holds_relaxed_0_t(dac(_,_,_,h),P,A1,A2):- call_t(DBS,P,A1,A2).
+holds_relaxed_0_t(DBS,P,A1,A2):- call_mt_t(DBS,P,A1,A2,_,_).
+holds_relaxed_0_t(_DBS,P,A1,A2):- ground((P,A1)), TEMPL=..[P,T1,_],dbase_t(default_sv,TEMPL,2,A2),req(isa(A1,T1)),!.
 */
 
-cholds_t([AH,P|LIST]):- is_holds_true(AH),!,cholds_t_p2(P,LIST).
-cholds_t([AH,P|LIST]):- is_holds_false(AH),!,holds_f_p2(P,LIST).
-cholds_t([P|LIST]):- !,cholds_t_p2(P,LIST).
-cholds_t(not(CALL)):-cholds_f(CALL).
-cholds_t(CALL):- safe_univ(CALL,[P|LIST]),cholds_t([P|LIST]).
+holds_t([AH,P|LIST]):- is_holds_true(AH),!,holds_t_p2(P,LIST).
+holds_t([AH,P|LIST]):- is_holds_false(AH),!,holds_f_p2(P,LIST).
+holds_t([P|LIST]):- !,holds_t_p2(P,LIST).
+holds_t(not(CALL)):- holds_f(CALL).
+holds_t(CALL):- safe_univ(CALL,[P|LIST]),holds_t([P|LIST]).
 
-cholds_t_p2(P,LIST):- safe_univ(CALL,[cholds_t,P|LIST]),call(CALL).
+holds_t_p2(P,LIST):- safe_univ(CALL,[holds_t,P|LIST]),call(CALL).
 
 
 call_list_t(dac(d,_,_,_),CALL,_):- dbase_t(CALL).
 call_list_t(dac(_,a,_,_),_,List):- assertion_t(List).
 call_list_t(dac(_,_,c,_),CALL,_):- xcall_t(CALL).
-call_list_t(dac(_,_,_,h),CALL,_):- holds_t(CALL).
+call_list_t(dac(_,_,_,holds_t),CALL,_):- holds_t(CALL).
 
 call_t(DBS,P,A1,A2,A3,A4,A5,A6,A7):- callable_tf(P,7),List= [P,A1,A2,A3,A4,A5,A6,A7], CALL=..List, call_list_t(DBS,CALL,List).
 call_t(dac(_,_,_,h),P,A1,A2,A3,A4,A5,A6,A7):- holds_t(P,A1,A2,A3,A4,A5,A6,A7).
@@ -333,32 +307,32 @@ call_t(dac(_,_,_,h),P,A1,A2,A3,A4,A5,A6,A7):- holds_t(P,A1,A2,A3,A4,A5,A6,A7).
 call_t(dac(d,_,_,_),P,A1,A2,A3,A4,A5,A6):- dbase_t(P,A1,A2,A3,A4,A5,A6).
 call_t(dac(_,a,_,_),P,A1,A2,A3,A4,A5,A6):- assertion_t([P,A1,A2,A3,A4,A5,A6]).
 call_t(dac(_,_,c,_),P,A1,A2,A3,A4,A5,A6):- callable_tf(P,6),xcall_t(P,A1,A2,A3,A4,A5,A6).
-call_t(dac(_,_,_,h),P,A1,A2,A3,A4,A5,A6):- holds_t(P,A1,A2,A3,A4,A5,A6).
+call_t(dac(_,_,_,holds_t),P,A1,A2,A3,A4,A5,A6):- holds_t(P,A1,A2,A3,A4,A5,A6).
 
 call_t(dac(d,_,_,_),P,A1,A2,A3,A4,A5):- dbase_t(P,A1,A2,A3,A4,A5).
 call_t(dac(_,a,_,_),P,A1,A2,A3,A4,A5):- assertion_t([P,A1,A2,A3,A4,A5]).
 call_t(dac(_,_,c,_),P,A1,A2,A3,A4,A5):- callable_tf(P,5),xcall_t(P,A1,A2,A3,A4,A5).
-call_t(dac(_,_,_,h),P,A1,A2,A3,A4,A5):- holds_t(P,A1,A2,A3,A4,A5).
+call_t(dac(_,_,_,holds_t),P,A1,A2,A3,A4,A5):- holds_t(P,A1,A2,A3,A4,A5).
 
 call_t(dac(d,_,c,_),P,A1,A2,A3,A4):- dbase_t(P,A1,A2,A3,A4).
 call_t(dac(_,a,_,_),P,A1,A2,A3,A4):- assertion_t([P,A1,A2,A3,A4]).
 call_t(dac(_,_,c,_),P,A1,A2,A3,A4):- callable_tf(P,4),xcall_t(P,A1,A2,A3,A4).
-call_t(dac(_,_,_,h),P,A1,A2,A3,A4):- holds_t(P,A1,A2,A3,A4).
+call_t(dac(_,_,_,holds_t),P,A1,A2,A3,A4):- holds_t(P,A1,A2,A3,A4).
 
 call_t(dac(d,_,_,_),P,A1,A2,A3):- dbase_t(P,A1,A2,A3).
 call_t(dac(_,a,_,_),P,A1,A2,A3):- assertion_t([P,A1,A2,A3]).
 call_t(dac(_,_,c,_),P,A1,A2,A3):- callable_tf(P,3),xcall_t(P,A1,A2,A3).
-call_t(dac(_,_,_,h),P,A1,A2,A3):- holds_t(P,A1,A2,A3).
+call_t(dac(_,_,_,holds_t),P,A1,A2,A3):- holds_t(P,A1,A2,A3).
 
 call_t(dac(d,_,_,_),P,A1,A2):- dbase_t(P,A1,A2).
 call_t(dac(_,a,_,_),P,A1,A2):- assertion_t([P,A1,A2]).
 call_t(dac(_,_,c,_),P,A1,A2):- callable_tf(P,2),xcall_t(P,A1,A2).
-call_t(dac(_,_,_,h),P,A1,A2):- holds_t(P,A1,A2).
+call_t(dac(_,_,_,holds_t),P,A1,A2):- holds_t(P,A1,A2).
 
 call_t(dac(d,_,_,_),P,A1):- dbase_t(P,A1).
 call_t(dac(_,a,_,_),P,A1):- assertion_t([P,A1]).
 call_t(dac(_,_,c,_),P,A1):- callable_tf(P,1),xcall_t(P,A1).
-call_t(dac(_,_,_,h),P,A1):- holds_t(P,A1).
+call_t(dac(_,_,_,holds_t),P,A1):- holds_t(P,A1).
 
 call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- callable_tf(P,9),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],xcall_t(CALL).
 call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7,A8):- callable_tf(P,8),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],xcall_t(CALL).
@@ -380,65 +354,18 @@ xcall_t(P,A1,A2):- call(P,A1,A2).
 xcall_t(P,A1):- call(P,A1).
 xcall_t(P):- call(P).
 
-
-
-into_plist(PLIST,PLIST):- var(PLIST),!,between(2,19,X),length(PLIST,X).
-into_plist([P|LIST],[P|LIST]).
-into_plist(Call,PLIST):-Call=..PLIST.
-
-:- export(kb_f/1).
-kb_f(X):-assertion_f(X).
-
 % todo hook into loaded files!
 :- export(assertion_t/1).
 
-assertion_t(Call):- thlocal:useOnlyExternalDBs,!,thglobal:use_cyc_database,with_no_assertions(useOnlyExternalDBs, kb_t(Call),fail).
-assertion_t(Call):- thglobal:use_cyc_database,with_assertions(thlocal:useOnlyExternalDBs,kb_t(Call)).
+% assertion_t(Call):- thlocal:useOnlyExternalDBs,!,thglobal:use_cyc_database,with_no_assertions(thlocal:useOnlyExternalDBs,kb_t(Call)).
+assertion_t(Call):- thglobal:use_cyc_database,!,with_assertions(thlocal:useOnlyExternalDBs,kb_t(Call)).
 % assertion_t(Call):- with_assertions(thlocal:useOnlyExternalDBs,loop_check(req(Call))).
-
-
-tiny_kb_ASSERTION(_):- not(is_callable('ASSERTION'(_,_,_,_,_))),!,fail.
-tiny_kb_ASSERTION(PLIST):- 'ASSERTION'(':TRUE-DEF',_,_UniversalVocabularyMt,_Vars,/*HL*/PLIST).
-tiny_kb_ASSERTION(PLIST):- 'ASSERTION'(':TRUE-MON',_,_UniversalVocabularyMt,_Vars,/*HL*/PLIST).
-
-:-export((kb_t/1)).
-kb_t(Call):- into_plist(Call,PLIST),[AH|LIST]=PLIST,!, kb_t(AH,LIST,PLIST).
-
-kb_t(AH,_,PLIST):-var(AH),!,kbp_t(PLIST).
-kb_t(dbase_t,PLIST,_):- !,kbp_t(PLIST).
-kb_t(subclass,PLIST,_):- !,kbp_t([genls|PLIST]).
-kb_t(AH,PLIST,_):- is_holds_true(AH),!,kb_t(PLIST).
-kb_t(AH,PLIST,_):- is_holds_false(AH),!,kb_f(PLIST).
-kb_t(_,_,PLIST):- kbp_t(PLIST).
-
-:- export(kbp_t/1).
-kbp_t(_):- not(useDBMts),!,fail.
-% kbp_t(PLIST):- tiny_kb_ASSERTION(PLIST).
-kbp_t(PLIST):- append([assertion_holds_mworld0|PLIST],[_,_],CallList),Call=..CallList,mworld:is_callable(Call), mworld0:Call.  % '@'(Call,mworld0).
-kbp_t(PLIST):- Call=..[assertion_holds|PLIST],hl_holds:is_callable(Call), hl_holds:Call. % '@'(Call,hl_holds).
-% kbp_t(PLIST):- Call=..[ttholds|PLIST],tt0_00022_cycl:is_callable(Call), tt0_00022_cycl:Call. % '@'(Call,hl_holds).
-
-
-predicate_property_chk(P,PP):-predicate_property(P,PP),!.
-predicate_property_chk(P,PP):-warn(predicate_property_chk(P,PP)).
-
-callr(R):-retract(R).
-
-assert_to_dbase_t([isa,X,Y]):- Call=..[dbase_t,Y,X],assert_if_new(Call).
-assert_to_dbase_t(PLIST):- xform_plist(PLIST,PLISTO), Call=..[dbase_t|PLISTO],assert_if_new(Call).
-
-xform_plist([implied|PLIST],[implied,ALIST,Last]):-append(ALIST,[Last],PLIST),!.
-xform_plist(PLIST,PLIST):-!.
-
-:-export(kbp_to_dbase_t/0).
-kbp_to_dbase_t:-!.
-kbp_to_dbase_t:-forall(kbp2_t(PLIST),assert_to_dbase_t(PLIST)),retractall(thglobal:use_cyc_database),tell('a.txt'),listing(dbase_t),listing('ASSERTION'),told,dmsg(done_dbase_t).
 
 % ================================================================================
 % end holds_t
 % ================================================================================
 
-
+:-user_ensure_loaded(dbase_i_call_kb).
 
 % ================================================================================
 % begin holds_f
@@ -460,8 +387,8 @@ holds_relaxed_0_f(DBS,P,A1,A2):- call_mt_f(DBS,P,A1,A2,_,_).
 
 
 holds_f([AH,P|LIST]):- is_holds_true(AH),!,holds_f_p2(P,LIST).
-holds_f([AH,P|LIST]):- is_holds_false(AH),!,cholds_t_p2(P,LIST).
-holds_f([P|LIST]):- !,cholds_t_p2(P,LIST).
+holds_f([AH,P|LIST]):- is_holds_false(AH),!,holds_t_p2(P,LIST).
+holds_f([P|LIST]):- !, holds_f_p2(P,LIST).
 holds_f(CALL):- CALL=..[P|LIST],holds_f([P|LIST]).
 holds_f_p2(P,LIST):- CALL=..[holds_f,P|LIST],call(CALL).
 
@@ -512,7 +439,7 @@ xcall_f(P):- \+ xcall_t(P).
 assertion_f([AH,P|LIST]):- is_holds_true(AH),!,assertion_f([P|LIST]).
 assertion_f([AH,P|LIST]):- is_holds_false(AH),!,assertion_f([P|LIST]).
 % todo hook into loaded files!
-assertion_f(_):- not(useDBMts),!,fail.
+assertion_f(_):- not(loaded_external_kbs),!,fail.
 assertion_f([P|LIST]):- tiny_kb:'ASSERTION'(':FALSE-DEF',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
 assertion_f([P|LIST]):- tiny_kb:'ASSERTION'(':FALSE-MON',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
 

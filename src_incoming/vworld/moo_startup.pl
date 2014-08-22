@@ -99,19 +99,20 @@ ensure_q_loaded(File):-
    '@'(load_files(File,[if(not_loaded),qcompile(auto),expand(true),derived_from(Path)]),user).
 
 make_qlfs:-
- ensure_q_loaded(logicmoo('pldata/tiny_kb')),
+ %ensure_q_loaded(logicmoo('pldata/tiny_kb')),
  ensure_q_loaded(logicmoo('pldata/nldata_freq_pdat')),
  ensure_q_loaded(logicmoo('pldata/nldata_BRN_WSJ_LEXICON')),
  ensure_q_loaded(logicmoo('pldata/nldata_colloc_pdat')),
  ensure_q_loaded(logicmoo('pldata/nldata_cycl_pos0')),
  ensure_q_loaded(logicmoo('pldata/nldata_dictionary_some01')),
- ensure_q_loaded(logicmoo('pldata/tt0_00022_cycl')),
- ensure_q_loaded(logicmoo('pldata/hl_holds')),
- ensure_q_loaded(logicmoo('pldata/mworld0')),
- ensure_q_loaded(logicmoo('pldata/mworld0_declpreds')),
+ % ensure_q_loaded(logicmoo('pldata/tt0_00022_cycl')),
+ %ensure_q_loaded(logicmoo('pldata/hl_holds')),
+ %ensure_q_loaded(logicmoo('pldata/mworld0')),
+ %ensure_q_loaded(logicmoo('pldata/mworld0_declpreds')),
  catch(ensure_q_loaded(logicmoo('pldata/withvars_988')),_,true).
 
-:- catch(logicmoo('pldata/mworld0_declpreds.qlf'),_,make_qlfs).
+% :- catch(logicmoo('pldata/mworld0_declpreds.qlf'),_,make_qlfs).
+
 
 
 /*
@@ -122,21 +123,20 @@ make_qlfs:-
 
 */
 
-:- user_use_module(logicmoo(pldata/tiny_kb)).
+% :- user_use_module(logicmoo(pldata/tiny_kb)).
 :- user_use_module(logicmoo(pldata/nldata_freq_pdat)).
 :- user_use_module(logicmoo(pldata/nldata_BRN_WSJ_LEXICON)).
 :- user_use_module(logicmoo(pldata/nldata_colloc_pdat)).
 :- user_use_module(logicmoo(pldata/nldata_cycl_pos0)).
 :- user_use_module(logicmoo(pldata/nldata_dictionary_some01)).
-:- user_use_module(logicmoo(pldata/tt0_00022_cycl)).
-:- user_use_module(logicmoo(pldata/hl_holds)).
-:- user_use_module(logicmoo(pldata/mworld0)).
+% :- user_use_module(logicmoo(pldata/tt0_00022_cycl)).
+% :- user_use_module(logicmoo(pldata/hl_holds)).
+% :- user_use_module(logicmoo(pldata/mworld0)).
 :- user_use_module(logicmoo(pldata/transform_dump)).
-:- catch(user_use_module(logicmoo(pldata/withvars_988)),_,true).
+% :- catch(user_use_module(logicmoo(pldata/withvars_988)),_,true).
+:- catch(user_use_module(logicmoo(pldata/el_assertions)),_,true).
 
-:- asserta(loaded_external_kbs),
- hl_holds:retractall(assertion_holds(isa, '', 'Thing')),
- show_call(kbp_to_dbase_t).
+:- asserta(loaded_external_kbs),show_call(kbp_to_dbase_t).
 
 
 % :- user_use_module(logicmoo(dbase/dbase_formattypes)).

@@ -3,7 +3,7 @@
 portray(#(PP,Pred,Trace,Adv)) :-
    portray_bit(pp,PP,S0,S1),
    portray_bit(pred,Pred,S1,S2),
-   portray_bit(trace,Trace,S2,S3),
+   portray_bit(trace80,Trace,S2,S3),
    portray_bit(adv,Adv,S3,[]),
    write(S0).
 

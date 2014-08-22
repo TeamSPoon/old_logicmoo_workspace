@@ -210,21 +210,22 @@ dynamic_safe(MFA):- with_mfa(MFA,dynamic_safe).
 :- meta_predicate(dynamic_safe(+,+,+)).
 :- module_transparent(dynamic_safe/3).
 dynamic_safe(M,F,A):- (static_predicate(M,F,A) -> true ; M:dynamic(M:F/A)). % , warn_module_dupes(M,F,A).
-
 :-op(1150,fx,dynamic_safe).
 
 % ----------
-:- module_transparent within_module(0,?).
-within_module(Call,M):-
-   context_module(_CM),
-  % module(M),
-   call_cleanup('@'( M:Call,M),
-        true/*module(CM)*/).
+:- meta_predicate(within_module(0,?)).
+within_module(Call,M):- '@'(Call,M).
+:- meta_predicate(within_module_broken(0,?)).
+within_module_broken(Call,M):- context_module(CM), module(M), call_cleanup(Call, module(CM)).
+% system:@(A, B) :- call(@(A, B)).
+
+
+
 
 % ----------
 :-export(with_pi/2).
 :- module_transparent(with_pi/2).
-:- meta_predicate(with_pi(:,3)).
+:- meta_predicate(with_pi(:,4)).
 with_pi([],_):-!.
 with_pi((P1,P2),Pred3):-!, with_pi(P1,Pred3),with_pi(P2,Pred3).
 with_pi(P  ,Pred3):- context_module(M),with_pi_selected(M,M,P,Pred3),!.
@@ -250,7 +251,7 @@ with_pi_stub(CM, M,P,FA,Pred3):- throw(invalide_args(CM, M,P,FA,Pred3)).
 
 :- export(with_mfa/2).
 :- module_transparent(with_mfa/2).
-:- meta_predicate(with_mfa(:,4)).
+:- meta_predicate(with_mfa(:,3)).
 with_mfa(P  ,Pred3):- with_pi(P,with_mfa_of(Pred3)).
 
 :- module_transparent(with_mfa_of/5).
@@ -330,13 +331,14 @@ decl_thlocal(M:P):-!,with_pi(M:P,(decl_thlocal)).
 decl_thlocal(P):-with_pi(thlocal:P,(decl_thlocal)).
 
 decl_thlocal(CM,M,PI,F/A):-
+   (var(PI)->functor(PI,F,A);true),
    thread_local(M:F/A),
    M:module_transparent(F/A),
    notrace((fill_args(PI,('?')),!,
    dbgsubst(PI, (0),(0),PI1),
    dbgsubst(PI1,(^),(0),PI2),
    dbgsubst(PI2,(:),(:),PI3))),
-   M:meta_predicate(PI3),
+   (compound(PI3) -> M:meta_predicate(PI3) ; true),
    dynamic_multifile_exported(CM, M,PI3,F/A).
 
 
@@ -1292,8 +1294,8 @@ with_output_to_stream(Stream,Goal):-
 
 :-dynamic dmsg_log/3.
 
-:-meta_predicate_transparent(show_time(:)).
-show_time(Call):-
+:-meta_predicate_transparent(time_call(:)).
+time_call(Call):-
   statistics(runtime,[MSecStart,_]),   
   ignore(show_call(Call)),
   statistics(runtime,[MSecEnd,_]),

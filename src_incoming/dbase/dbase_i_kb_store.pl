@@ -114,7 +114,7 @@ was_isa(X,I,C):-compound(X),functor(X,C,1),!,arg(1,X,I),!.
 into_hilog_form(G0,G1):-with_assertions(thlocal:into_form_code,into_hilog_form_ic(G0,G1)).
 
 into_hilog_form_ic(M:X,O):- atom(M),!,into_hilog_form_ic(X,O).
-into_hilog_form_ic(X,O):-is_list(X),list_to_dbase_t(X,D),into_hilog_form_ic(D,O).
+into_hilog_form_ic(X,O):- is_list(X),list_to_dbase_t(X,D),into_hilog_form_ic(D,O).
 into_hilog_form_ic(X,O):- X=..[F|A],into_hilog_form(X,F,A,O).
 
 % TODO finish negations
@@ -125,8 +125,10 @@ into_hilog_form(X,dbase_t,_A,X).
 into_hilog_form(X,mpred_arity,_A,X).
 into_hilog_form(X,mpred_prop,_A,X).
 into_hilog_form(X,holds_t,_A,X).
-into_hilog_form(X,cholds_t,_A,X).
+into_hilog_form(X,holds_t,_A,X).
 into_hilog_form(_X,F,A,Call):-Call=..[dbase_t,F|A].
+
+list_to_dbase_t([P|List],DBASE_T):-P==dbase_t -> DBASE_T=..[P|List] ; DBASE_T=..[dbase_t,P|List].
 
 :- meta_predicate(call_after_game_load(+)).
 call_after_game_load(Code):- call_after_next(moo:after_game_load,Code).
@@ -159,7 +161,7 @@ into_assertable_form(HLDS,X,O):-with_assertions(thlocal:into_form_code,(( X=..[F
 % TODO finish negations
 into_assertable_form(Dbase_t,X,Dbase_t,_A,X):-!.
 into_assertable_form(Dbase_t,_X,holds_t,A,Call):-Call=..[Dbase_t|A].
-into_assertable_form(Dbase_t,_X,cholds_t,A,Call):-Call=..[Dbase_t|A].
+into_assertable_form(Dbase_t,_X,holds_t,A,Call):-Call=..[Dbase_t|A].
 into_assertable_form(Dbase_t,_X,HLDS,A,Call):- is_holds_true(HLDS), Call=..[Dbase_t|A].
 into_assertable_form(Dbase_t,_X,F,A,Call):-Call=..[Dbase_t,F|A].
 
@@ -179,7 +181,7 @@ into_mpred_form(G,F,C,1,_,O):-predicate_property(G,builtin),!,into_mpred_form(C,
 into_mpred_form(C,_,_,_,_,isa(I,T)):-was_isa(C,I,T),!.
 into_mpred_form(_X,dbase_t,P,_N,A,O):-!,(atom(P)->O=..[P|A];O=..[dbase_t,P|A]).
 into_mpred_form(_X,H,P,_N,A,O):-is_holds_true(H),(atom(P)->O=..[P|A];O=..[dbase_t,P|A]).
-into_mpred_form(_X,H,P,_N,A,O):-is_holds_false(H),(atom(P)->(G=..[P|A],O=not(G));O=..[cholds_f,P|A]).
+into_mpred_form(_X,H,P,_N,A,O):-is_holds_false(H),(atom(P)->(G=..[P|A],O=not(G));O=..[holds_f,P|A]).
 %into_mpred_form(PropsWas,props,_,2,_,Was):- props_into_mpred_form(PropsWas,Was).
 into_mpred_form(X,_H,_P,_N,_A,X).
 
@@ -353,7 +355,7 @@ ensure_predicate_reachable(_,_).
 ensure_predicate_reachable(M,C,dbase_t,Ap1):-C=..[_,F|_RGS],A is Ap1 -1, declare_dbase_local_dynamic_really(M,F,A).
 
 % singletons_throw_or_fail(_):- is_stable,!,fail.
-singletons_throw_or_fail(C):- contains_singletons(C), (test_tl(adding_from_srcfile) ->dmsg(contains_singletons(C)); trace_or_throw(contains_singletons(C))).
+singletons_throw_or_fail(C):- contains_singletons(C), (test_tl(thlocal:adding_from_srcfile) ->dmsg(contains_singletons(C)); trace_or_throw(contains_singletons(C))).
 nonground_throw_or_fail(C):- throw_if_true_else_fail(not(ground(C)),C).
 
 
@@ -396,7 +398,7 @@ hooked_assertz(CP,CA):- assertz_cloc(CA),run_database_hooks_local(assert(z),CP).
 hooked_retract(CP,_CA):- nonground_throw_or_fail(hooked_retract(CP)).
 hooked_retract(CP,CA):- ignore(show_call_failure(clause_asserted(CA))),!,ignore(retract_cloc(CA)),ignore(retract_cloc(CP)),run_database_hooks_local(retract(one),CP).
 
-hooked_retractall(CP,CA):- copy_term(CA,RT),once(retract_cloc(RT)),!,retractall_cloc(CA), run_database_hooks_local(retract(all),CP).
+% hooked_retractall(CP,CA):- copy_term(CA,CCA),once(retract_cloc(CCA)),!,retractall_cloc(CA), run_database_hooks_local(retract(all),CP).
 hooked_retractall(CP,CA):- retractall_cloc(CA),run_database_hooks_local(retract(all),CP),retractall_cloc(CP).
 
 differnt_assert(G1,G2):- notrace(differnt_assert1(G1,G2)),dmsg(differnt_assert(G1,G2)),ztrace.
@@ -431,13 +433,13 @@ assertz_cloc(M,C):-database_real(assertz,M:C).
 retract_cloc(M:C):-atom(M),!,retract_cloc(M,C),!.
 retract_cloc( C ):-dbase_mod(M),retract_cloc(M,C),!.
 retract_cloc(M,C):-ensure_predicate_reachable(M,C),fail.
-retract_cloc(M,C):-not(clause_asserted(M:C,true)),!.
-retract_cloc(M,C):-database_real(retract,M:C).
+%retract_cloc(M,C):-not(clause_asserted(M:C,true)),!.
+retract_cloc(M,C):- show_call_failure(database_real(retract,M:C)).
 
 retractall_cloc(M:C):-atom(M),!,retractall_cloc(M,C),!.
 retractall_cloc( C ):-dbase_mod(M),retractall_cloc(M,C),!.
 retractall_cloc(M,C):-ensure_predicate_reachable(M,C),fail.
-retractall_cloc(M,C):-not(clause_asserted(M:C,true)),!.
+%retractall_cloc(M,C):-not(clause_asserted(M:C,true)),!.
 retractall_cloc(M,C):-database_real(retractall,M:C).
 
 database_real(P,C):- into_assertable_form(C,DB),C \= DB,!,debugOnError(call(P,DB)).

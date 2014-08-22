@@ -18,12 +18,12 @@ wh_question(whq(X,S)) -->
 variable_q(X,Agmt,QCase,NPCase) ...
       np(NP,Agmt,NPCase,_,_,Set,Mask) -->
    whq(X,Agmt,NP,QCase),
-   {trace(Set,Mask)}.
+   {trace80(Set,Mask)}.
 variable_q(X,Agmt,compl,CCase) ...
  pp(pp(Prep,NP),compl,Set,Mask) -->
    prep(Prep),
    whq(X,Agmt,NP,_),
-   {trace(Set,Mask), compl_case(CCase)}.
+   {trace80(Set,Mask), compl_case(CCase)}.
 variable_q(X,Agmt,compl,VCase) ...
       adv_phrase(pp(Prep,
                   np(Agmt,
@@ -31,7 +31,7 @@ variable_q(X,Agmt,compl,VCase) ...
                     int_det(X),[],Noun),[])),
                  Set,Mask) -->
    context_pron(Prep,Noun),
-   {trace(Set,Mask), verb_case(VCase)}.
+   {trace80(Set,Mask), verb_case(VCase)}.
 variable_q(X,_,compl,VCase) ... 
       pred(adj,value(Adj,wh(X)),Mask) -->
    [how],
@@ -190,7 +190,7 @@ sup_op(most,not+more).
 
 np_mods(Agmt,Case,Mods0,[Mod|Mods],Set0,Set,_,Mask) -->
    np_mod(Agmt,Case,Mod,Set0,Mask0),
-   {trace(Trace), plus(Trace,Mask0,Mask1), minus(Set0,Mask1,Set1),
+   {trace80(Trace), plus(Trace,Mask0,Mask1), minus(Set0,Mask1,Set1),
     plus(Mask0,Set0,Mask2)},
    np_mods(Agmt,Case,Mods0,Mods,Set1,Set,Mask2,Mask).
 np_mods(_,_,Mods,Mods,Set,Set,Mask,Mask) --> [].
@@ -203,7 +203,7 @@ np_mod(Agmt,Case,WH,Set,Mask) -->
 
 verb_mods([Mod|Mods],Set0,_,Mask) -->
    verb_mod(Mod,Set0,Mask0),
-   {trace(Trace), plus(Trace,Mask0,Mask1), minus(Set0,Mask1,Set1),
+   {trace80(Trace), plus(Trace,Mask0,Mask1), minus(Set0,Mask1,Set1),
     plus(Mask0,Set0,Mask2)},
    verb_mods(Mods,Set1,Mask2,Mask).
 verb_mods([],_,Mask,Mask) --> [].
@@ -278,19 +278,19 @@ rel(Agmt,rel(X,S),Mask) -->
    island,
    variable(Agmt,X),
    s(S,Mask0),
-   {trace(Trace), minus(Mask0,Trace,Mask)},
+   {trace80(Trace), minus(Mask0,Trace,Mask)},
    dnalsi.
 
 variable(Agmt,X) ... np(np(Agmt,wh(X),[]),Agmt,_,_,_,Set,Mask) -->
    [that],
-   {trace(Set,Mask)}.
+   {trace80(Set,Mask)}.
 variable(Agmt0,X) ... np(NP,Agmt,NPCase,_,_,Set,Mask) -->
    wh(X,Agmt0,NP,Agmt,NPCase),
-   {trace(Set,Mask)}.
+   {trace80(Set,Mask)}.
 variable(Agmt0,X) ... pp(pp(Prep,NP),compl,Set,Mask) -->
    prep(Prep),
    wh(X,Agmt0,NP,Agmt,Case),
-   {trace(Set,Mask), compl_case(Case)}.
+   {trace80(Set,Mask), compl_case(Case)}.
 
 wh(X,Agmt,np(Agmt,wh(X),[]),Agmt,NPCase) -->
    rel_pron(Case),
@@ -323,7 +323,7 @@ reduced_rel(Agmt,reduced_rel(X,S),Mask) -->
    island,
    reduced_wh(Agmt,X),
    s(S,Mask0),
-   {trace(Trace), minus(Mask0,Trace,Mask)},
+   {trace80(Trace), minus(Mask0,Trace,Mask)},
    dnalsi.
 
 reduced_wh(Agmt,X),
@@ -333,18 +333,18 @@ reduced_wh(Agmt,X),
    pred(Neg,Pred,Mask) -->
    neg(_,Neg),
    pred(Neg,Pred,Mask),
-   {trace(Set0,Mask0), subj_case(NPCase)}.
+   {trace80(Set0,Mask0), subj_case(NPCase)}.
 reduced_wh(Agmt,X),
    np(np(Agmt,wh(X),[]),Agmt,NPCase,_,_,Set,Mask),
    verb(Verb,_,Type,Voice) -->
    participle(Verb,Type,Voice),
-   {trace(Set,Mask), subj_case(NPCase)}.
+   {trace80(Set,Mask), subj_case(NPCase)}.
 reduced_wh(AgmtX,X),
    np(Subj,Agmt,SCase,Def,_,Set0,Mask0) ...
    np(np(AgmtX,wh(X),[]),AgmtX,VCase,_,_,Set,Mask) -->
    {s_all(SAll), subj_case(SCase), verb_case(VCase)},
    np(Subj,Agmt,_,Def,subj,SAll,_),
-   {trace(Set0,Mask0), trace(Set,Mask)}.
+   {trace80(Set0,Mask0), trace80(Set,Mask)}.
 
 /* Verb phrase (less the complements) */
 

@@ -49,7 +49,7 @@ type_has_instances(Type):-  atom(Type),Type\=term,Type\=type,not_ft(Type),isa(_,
 
 choose_right(Prop,Obj,Value):- var(Obj),cached_isa(Prop,completeExtentAsserted),not(cached_isa(Prop,singleValued)),!,is_asserted(dbase_t(Prop,Obj,Value)).
 choose_right(Prop,Obj,Value):- var(Obj),findall(Obj,generate_candidate_arg_values(Prop,1,Obj),Objs),Objs\=[],!,member(Obj,Objs),nonvar(Obj),choose_for(Prop,Obj,Value).
-choose_right(Prop,Obj,Value):- var(Obj),dmsg(var_choose_right(Prop,Obj,Value)),!,is_asserted(dbase_t(Prop,Obj,Value)).
+choose_right(Prop,Obj,Value):- var(Obj),dtrace,dmsg(var_choose_right(Prop,Obj,Value)),!,is_asserted(dbase_t(Prop,Obj,Value)).
 choose_right(Prop,Obj,Value):- choose_for(Prop,Obj,RValue),RValue=Value.
 
 :-export(choose_for/3).
@@ -101,7 +101,7 @@ randomize_list(LOCS,[LOC|LOCS]):- length(LOCS,Len),Len>0, X is random(Len),nth0(
 :-export(create_random/3).
 create_random(Type,Value,Test):- copy_term(create_random(Type,Value,Test),create_random(RType,RValue,RTest)),
    hook:create_random_instance(RType,RValue,RTest),
-   correctType(RValue,Type,Value),must_det(Test).
+   checkAnyType(query(_,_),RValue,Type,Value),must_det(Test).
 create_random(Type,Value,Test):- atom(Type),atom_concat('random_',Type,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),Fact,Test,!.
 create_random(Type,Value,Test):- findall(V,(isa_backchaing(V,Type)),Possibles),Possibles\=[],randomize_list(Possibles,Randomized),!,member(Value,Randomized),Test,!.
 create_random(Type,Value,Test):- trace_or_throw(failed(create_random(Type,Value,Test))).
@@ -116,6 +116,7 @@ maybe_cache(Prop,Obj,Value,What):-not(not(maybe_cache_0(Prop,Obj,Value,What))).
 hook:decl_database_hook(assert(_),Fact):-slow_kb_op(checkNoArgViolation(Fact)).
 
 :-export(checkNoArgViolation/1).
+checkNoArgViolation(_).
 checkNoArgViolation(_):- not(bad_idea),!.
 checkNoArgViolation(Fact):-Fact=..[dbase_t,Prop|ObjValue],!,checkNoArgViolation_p_args(Prop,ObjValue),!.
 checkNoArgViolation(Fact):-Fact=..[Prop|ObjValue],!,checkNoArgViolation_p_args(Prop,ObjValue),!.

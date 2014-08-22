@@ -310,8 +310,8 @@ moo:  ?- make.
 % Restarting analysis ...
 % Found new meta-predicates in iteration 3 (13.777 sec)
 % :- meta_predicate dbase_rules_pttp:search(0,*,*,*,*,*,*).
-% :- meta_predicate moo:cholds_t(6,?,?,?,?,?,?).
-% :- meta_predicate moo:cholds_t(5,?,?,?,?,?).
+% :- meta_predicate moo:holds_t(6,?,?,?,?,?,?).
+% :- meta_predicate moo:holds_t(5,?,?,?,?,?).
 % :- meta_predicate moo:mud_pred_expansion_0(4,*,*,*).
 % :- meta_predicate moo:holds_f(5,?,?,?,?,?).
 % :- meta_predicate moo:holds_f(1,?).
@@ -329,8 +329,8 @@ Warning: moo:argIsa_ft/3, which is referenced by
 Warning:        /devel/logicmoo/src_incoming/dbase/dbase.pl:423:56: 1-st clause of moo:transform_functor_holds/5
 Warning: moo:can_coerce/1, which is referenced by
 Warning:        /devel/logicmoo/src_incoming/dbase/dbase_formattypes.pl:329:6: 2-nd clause of moo:correctType_gripe/4
-Warning: moo:cholds_f/1, which is referenced by
-Warning:        /devel/logicmoo/src_incoming/dbase/dbase_i_call.pl:192:21: 4-th clause of moo:cholds_t/1
+Warning: moo:holds_f/1, which is referenced by
+Warning:        /devel/logicmoo/src_incoming/dbase/dbase_i_call.pl:192:21: 4-th clause of moo:holds_t/1
 Warning: moo:functor_member/2, which is referenced by
 Warning:        2-nd clause of moo:get_property/3: 2-nd clause of moo:get_property/3
 Warning: moo:isCycPredArity_Check/2, which is referenced by

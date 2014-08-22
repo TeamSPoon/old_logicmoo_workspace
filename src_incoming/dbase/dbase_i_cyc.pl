@@ -14,6 +14,27 @@
 % Douglas Miles
 */
 
+:-user_ensure_loaded(new_cyc).
+
+:-dynamic(isCycUnavailable_known/1).
+:-dynamic(isCycAvailable_known/0).
+
+:-export(isCycAvailable/0).
+isCycAvailable:-isCycUnavailable_known(_),!,fail.
+isCycAvailable:-isCycAvailable_known,!.
+isCycAvailable:-checkCycAvailablity,isCycAvailable.
+
+:-export(isCycUnavailable/0).
+isCycUnavailable:-isCycUnavailable_known(_),!.
+isCycUnavailable:-isCycAvailable_known,!,fail.
+isCycUnavailable:-checkCycAvailablity,isCycUnavailable.
+
+:-export(checkCycAvailablity/0).
+checkCycAvailablity:- (isCycAvailable_known;isCycUnavailable_known),!.
+checkCycAvailablity:- ccatch((ignore((invokeSubL("(+ 1 1)",R))),(R==2->assert_if_new(isCycAvailable_known);assert_if_new(isCycUnavailable_known(R)))),E,assert_if_new(isCycUnavailable_known(E))),!.
+
+
+end_of_file.
 :- meta_predicate isDebug(0).
 /*
 stringToWords([],[]).
@@ -93,8 +114,6 @@ balanceBindingS([A|L],[AA|LL]):-balanceBinding(A,AA),balanceBindingS(L,LL).
 :-dynamic(cycMutex/2).
 :-dynamic(cycChatMode/1).
 
-isCycUnavailable :- true.
-
 getCycConnection(SocketId,OutStream,InStream):-
       retract(cycConnection(SocketId,OutStream,InStream)),
       assertz(cycConnectionUsed(SocketId,OutStream,InStream)),!.
@@ -103,13 +122,14 @@ getCycConnection(SocketId,OutStream,InStream):-
       tcp_socket(SocketId),
       tcp_connect(SocketId,'CycServer':3601),
       tcp_open_socket(SocketId, InStream, OutStream),!,
-      isDebug((fmt(user_error,'Connected to Cyc TCP Server {~w,~w}\n',[InStream,OutStream]),flush_output(user_error))),
+      isDebug((dmsg(user_error,'Connected to Cyc TCP Server {~w,~w}\n',[InStream,OutStream]),flush_output(user_error))),
       assertz(cycConnectionUsed(SocketId,OutStream,InStream)),!.
 
 finishCycConnection(SocketId,OutStream,InStream):-
       ignore(system:retractall(cycConnectionUsed(SocketId,OutStream,InStream))),
       asserta(cycConnection(SocketId,OutStream,InStream)),!.
-      
+
+:-export(cycStats/0).
 cycStats:- % will add more 
    listing(cycConnection),
    listing(cycConnectionUsed).
@@ -127,17 +147,18 @@ cycInit.
 
 invokeSubL(Send):-
       invokeSubLRaw(Send,Receive),
-      isDebug(fmt('~s',[Receive])).
+      isDebug(dmsg('~s',[Receive])).
 
 invokeSubL(Send,Receive):-
       invokeSubLRaw(Send,ReceiveCodes),
       atom_codes(Receive,ReceiveCodes).
 
-invokeSubLRaw(Send,Receive):-
+invokeSubLRaw(Send,Receive):-  
       getCycConnection(SocketId,OutStream,InStream),
-      printSubL(InStream,OutStream,Send),
-      readSubL(InStream,Get),!,
-      finishCycConnection(SocketId,OutStream,InStream),!,
+      call_cleanup(once((
+         printSubL(InStream,OutStream,Send),
+         readSubL(InStream,Get))),
+       finishCycConnection(SocketId,OutStream,InStream)),
       checkSubLError(Send,Get,Receive),!.
 
 checkSubLError(Send,[53,48,48,_|Info],Info):-!, %Error "500 "
@@ -167,8 +188,8 @@ printSubL(OutStream,Send):-
 
 
 formatCyc(OutStream,Format,Args):-
-      fmt(OutStream,Format,Args),
-      isDebug(fmt(user_error,Format,Args)),
+      dmsg(OutStream,Format,Args),
+      isDebug(dmsg(user_error,Format,Args)),
       flush_output(OutStream),!.
 
 readSubL(InStream,[G,E,T,Space|Response]):-
@@ -181,14 +202,15 @@ readSubL(InStream,[G,E,T,Space|Response]):-
 % ===================================================================
 % Lowlevel readCycLTermChars
 % ===================================================================
+:-export(readCycLTermChars/2).
 readCycLTermChars(InStream,Response):-
-   readCycLTermChars(InStream,Response,_).
+   must_det(readCycLTermChars(InStream,Response,_)).
    
-
+:-export(readCycLTermChars/3).
 readCycLTermChars(InStream,[Start|Response],Type):-
    peek_code(InStream,Start),
    readCycLTermCharsUntil(Start,InStream,Response,Type),
-   isDebug(fmt('cyc>~s (~w)~n',[Response,Type])).
+   isDebug(dmsg('cyc>~s (~w)~n',[Response,Type])).
 
 readCycLTermCharsUntil(34,InStream,Response,string):-!,
    get_code(InStream,_),
@@ -274,7 +296,7 @@ is_string_e2c([A,B|_]):-integer(A),integer(B).
 
 % Uncomment this next line to see Cyc debug messages
 
-% isDebug.
+isDebug.
 
 isDebug(Call):- isDebug -> ignore(once(Call)) ; true.
 
@@ -367,12 +389,12 @@ cycQueryReal(CycL,Mt,Result):-
       get_code(InStream,_E),!,% Takes the first paren
       repeat,
       (peek_code(InStream,PCode), 
-      isDebug(fmt('PCODE (~q)~n',[PCode])),
+      isDebug(dmsg('PCODE (~q)~n',[PCode])),
       ((member(PCode,[35,73]),finishCycConnection(SocketId,OutStream,InStream),!,fail);true), % 35 is No
       ((PCode=78,finishCycConnection(SocketId,OutStream,InStream),!);(    % 78 is Yes
       readCycL(InStream,Trim),
       peek_code(InStream,Code), 
-      isDebug(fmt('"~s" (~q)~n',[Trim,Code])),
+      isDebug(dmsg('"~s" (~q)~n',[Trim,Code])),
       ((Code\=32,!,finishCycConnection(SocketId,OutStream,InStream));(true)),
       getSurfaceFromChars(Trim,IResult,_),
       IResult=[Result],
@@ -473,9 +495,9 @@ ensureMt(Const):-
 defaultMt('PrologDataMt').
 
 
-addPrologKB:- defaultMt(Mt),!,ensureMt(Mt),cycAssert('BaseKB':'genlMt'(Mt,'InferencePSC')). % Puts the defaultMt/1 into Cyc 
+addPrologKB:- defaultMt(Mt),!,ensureMt(Mt),cycAssert(moo:'genlMt'(Mt,'InferencePSC'),'BaseKB'). % Puts the defaultMt/1 into Cyc 
 
-:- isCycUnavailable -> true ; addPrologKB.
+% :- at_start((isCycUnavailable -> true ; addPrologKB)).
 
 % ===================================================================
 %  Predicates need and Assertion Mt
@@ -627,7 +649,7 @@ isCycLTerminationStateChar(13,32):-reading_in_comment,!.
 isCycLTerminationStateChar(41,41):-flag('bracket_depth',X,X),(X<1),!.
 
 cyclReadStateChange(_):- reading_in_comment,!.
-cyclReadStateChange(34):-flag(prev_char,Char,Char),   % char 92 is "\" and will escape a quote mark
+cyclReadStateChange(34):-flag(prev_char,Char,Char),   % char 92 is "\\" and will escape a quote mark
       (Char=92 -> true;(retract(reading_in_string) ; assert(reading_in_string))),!.
 cyclReadStateChange(_):- reading_in_string,!.
 cyclReadStateChange(59):- assert(reading_in_comment),!.
@@ -669,7 +691,8 @@ Vars = [=('B',_h998)|_h1101]
 Clause = [goals,Iran,[not,[exists,[_h2866],[and,[citizens,Iran,_h2866],[relationExistsInstance,maleficiary,ViolentAction,_h2866]]]]]
 Vars = [=(CITIZEN,_h2866)|_h3347]
 
-====================================================================*/
+
+*/
 
 :-export(getSurfaceFromChars/3).
 getSurfaceFromChars([],[EOF],_):- end_of_file == EOF, !.
@@ -706,7 +729,7 @@ getSurfaceFromCharBalanced(Chars,WFFOut,VARSOut):-
 
 Removes out STANDARD tokens
 
-====================================================================*/
+--*/
 
 clean_sexpression([],[]).
 clean_sexpression([''|WFF],WFFClean):-clean_sexpression(WFF,WFFClean).
@@ -716,7 +739,7 @@ clean_sexpression([E|WFF],[E|WFFClean]):-clean_sexpression(WFF,WFFClean).
 
 /*===================================================================
 % Safe Entry Call Into ISO-Prolog tokenize_chars/2
-====================================================================*/
+--*/
 
 getCycLTokens(X,Z):-is_list(X),!,  tokenize_chars(X,Y),convert_the_atoms(Y,Z).
 getCycLTokens(X,[X]). 
@@ -752,7 +775,7 @@ ltrim(T,T).
 %  
 % =169 Parens Pairs at the First 2 levels  
 % 
-====================================================================*/
+--*/
 
 
 cycL([A]) --> expr(A).
