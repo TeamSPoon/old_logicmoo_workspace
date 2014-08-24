@@ -18,34 +18,35 @@
 |_________________________________________________________________________|
 
 */
+:- begin_dynamic_reader.
 
 /* Nouns */
 
-property(area,measure&area,X,feature&place&_,Y,area(Y,X),[],_,_).
-property(capital,feature&city,X,feature&place&country,Y,
+property_template80(area,measure&area,X,feature&place&_,Y,area(Y,X),[],_,_).
+property_template80(capital,feature&city,X,feature&place&country,Y,
          capital(Y,X),[],_,_).
-property(latitude,
+property_template80(latitude,
          measure&position,X,feature&_,Y,latitude(Y,X),[],_,_).
-property(longitude,measure&position,X,feature&_,Y,
+property_template80(longitude,measure&position,X,feature&_,Y,
          longitude(Y,X),[],_,_).
-property(population,
+property_template80(population,
          measure&heads,X,feature&_,Y,population(Y,X),[],_,_).
 
-thing(place,feature&place&_,X,place(X),[],_).
-thing(area,measure&area,X,area(X),[],_).
-thing(capital,feature&city,X,capital(X),[],_).
-thing(city,feature&city,X,city(X),[],_).
-thing(continent,feature&place&continent,X,continent(X),[],_).
-thing(country,feature&place&country,X,country(X),[],_).
-thing(latitude,measure&position,X,latitude(X),[],_).
-thing(longitude,measure&position,X,longitude(X),[],_).
-thing(ocean,feature&place&seamass,X,ocean(X),[],_).
-thing(person,_,X,person(X),[],_).
-thing(population,measure&heads,X,population(X),[],_).
-thing(region,feature&place&_,X,region(X),[],_).
-thing(river,feature&river,X,river(X),[],_).
-thing(sea,feature&place&seamass,X,sea(X),[],_).
-thing(seamass,feature&place&seamass,X,seamass(X),[],_).
+thing_template80(place,feature&place&_,X,place(X),[],_).
+thing_template80(area,measure&area,X,area(X),[],_).
+thing_template80(capital,feature&city,X,capital(X),[],_).
+thing_template80(city,feature&city,X,city(X),[],_).
+thing_template80(continent,feature&place&continent,X,continent(X),[],_).
+thing_template80(country,feature&place&country,X,country(X),[],_).
+thing_template80(latitude,measure&position,X,latitude(X),[],_).
+thing_template80(longitude,measure&position,X,longitude(X),[],_).
+thing_template80(ocean,feature&place&seamass,X,ocean(X),[],_).
+thing_template80(person,_,X,person(X),[],_).
+thing_template80(population,measure&heads,X,population(X),[],_).
+thing_template80(region,feature&place&_,X,region(X),[],_).
+thing_template80(river,feature&river,X,river(X),[],_).
+thing_template80(sea,feature&place&seamass,X,sea(X),[],_).
+thing_template80(seamass,feature&place&seamass,X,seamass(X),[],_).
 
 /* Proper nouns */
 

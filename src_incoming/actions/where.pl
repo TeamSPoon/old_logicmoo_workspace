@@ -39,7 +39,7 @@ moo:agent_text_command(Agent,[who],Agent,who(world)).
 
 moo:action_info(who(optional(agent,world)),"Lists who is online (where they are at least)").
 
-get_inRegion(Agnt,Where):- inRegion(Agnt,Where).
+get_inRegion(Agnt,Where):- localityOfObject(Agnt,Where).
 %get_inRegion(Agnt,Where):- atloc(Agnt,Where).
 
 moo:agent_call_command(_Gent,who(W)) :- mud_cmd_who(W).
@@ -50,7 +50,7 @@ mud_cmd_who(Who):- mud_cmd_who_1(Who).
 mud_cmd_who_1(Who):-
      forall(agent(Who),
       once((get_inRegion(Who,Where),
-            fmt(cmdresult(who(Who),inRegion(Who,Where)))))).
+            fmt(cmdresult(who(Who),localityOfObject(Who,Where)))))).
 
 :- include(logicmoo(vworld/moo_footer)).
 

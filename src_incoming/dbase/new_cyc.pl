@@ -10,6 +10,8 @@
 
 :-module(cyc,[
 	 cycInit/0,
+         op(700,xfx,'=^..'),
+         '=^..'/2,
 	 getCycConnection/4,
 	 finishCycConnection/3,
 	 converse/1,
@@ -2595,10 +2597,11 @@ interleave([Atom],_Space,[Atom]):-!.
 interleave([''|More],Space,[Space|Result]):-interleave(More,Space,Result),!.
 interleave([Atom|More],Space,[Atom,Space|Result]):-interleave(More,Space,Result),!.
 
-pterm_to_sterm(VAR,VAR):-isNonCompound(VAR),!.
-pterm_to_sterm([X|L],[Y|Ls]):-!,pterm_to_sterm(X,Y),pterm_to_sterm(L,Ls),!.
-pterm_to_sterm(X,Y):-compound(X),X=..L,pterm_to_sterm(L,Y),!.
-pterm_to_sterm(X,X).
+pterm_to_sterm(VAR,VAR):- \+ compound(VAR),!.
+pterm_to_sterm([X|L],[Y|Ls]):- !,pterm_to_sterm(X,Y),pterm_to_sterm(L,Ls),!.
+pterm_to_sterm(P,S):-P=..L, pterm_to_sterm(L,S).
+:- op(700,xfx,'=^..').
+P =^.. L :- pterm_to_sterm(P,L).
 
 % ===================================================================
 % Substitution based on ==

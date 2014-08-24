@@ -19,11 +19,8 @@ moo:actiontype(drop(item)).
 
 % Drop something
 moo:agent_call_command(Agent,drop(SObj)) :-
-	possess(Agent,Obj),
-        object_match(SObj,Obj),
-	del(possess(Agent,Obj)),
-	atloc(Agent,LOC),
-	add(atloc(Obj,LOC)),
+	possess(Agent,Obj),object_match(SObj,Obj),
+	possess(Agent,Obj),del(possess(Agent,Obj)),atloc(Agent,LOC),add(atloc(Obj,LOC)),
 	must(call_update_charge(Agent,drop)).
 
 %Nothing to drop

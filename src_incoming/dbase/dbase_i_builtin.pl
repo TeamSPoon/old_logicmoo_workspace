@@ -172,7 +172,7 @@ singleValued(atloc(obj,xyz(region,int,int,int))).
 :- begin_transform_moo_preds.
 
 argsIsaInList(forwardRule(term,term)).
-% forwardRule(inRegion(O,Region),atloc(O,LOC)):-
+% forwardRule(localityOfObject(O,Region),atloc(O,LOC)):-
 
 % 
 
@@ -283,7 +283,7 @@ subclass(wearable,item).
 :-decl_mpred_hybrid(damage,2).
 
 
-:- assert_if_new(mpred_prop(inRegion,call_tabled)).
+:- assert_if_new(mpred_prop(localityOfObject,call_tabled)).
 
 
 multiValued(equivRule(term,term),nonGroundOK,prologOnly).
@@ -375,7 +375,7 @@ singleValued(facing(obj,dir(n))).
 singleValued(facing(obj,dir)).
 singleValued(height(obj,int)).
 singleValued(objid(obj,id)).
-singleValued(inRegion(obj,region)).
+singleValued(localityOfObject(obj,region)).
 singleValued(last_command(agent,command)).
 singleValued(location_center(region,xyz(region,int,int,int))).
 singleValued(movedist(agent,int(1))).

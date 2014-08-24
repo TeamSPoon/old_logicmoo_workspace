@@ -56,7 +56,7 @@ room_center(Room,X,Y,Z):-
 locationToRegion(Obj,RegionIn):-locationToRegion_0(Obj,Region),!,RegionIn=Region.
 locationToRegion_0(Obj,Obj):-var(Obj),dmsg(warn(var_locationToRegion(Obj,Obj))),!.
 locationToRegion_0(xyz(Room,_,_,_),Region2):-nonvar(Room),!,locationToRegion_0(Room,Region2).
-locationToRegion_0(Obj,Obj):-nonvar(Obj),isa(Obj,region),!. % inRegion(Obj,Room).
+locationToRegion_0(Obj,Obj):-nonvar(Obj),isa(Obj,region),!. % localityOfObject(Obj,Room).
 locationToRegion_0(Obj,Obj):-dmsg(warn(locationToRegion(Obj,Obj))),!.
 
 loc_to_xy(LOC,X,Y,xyz(Room,X,Y,1)):- locationToRegion(LOC,Room),!.
@@ -181,23 +181,23 @@ ensure_in_world(What):-must_det(put_in_world(What)).
 
 % facts that cant be true
 hook:fact_is_false(atloc(Obj,_LOC),inside_of(Obj,What)) :- nonvar(Obj),(inside_of(Obj,What)),!.
-hook:fact_is_false(inRegion(Obj,_LOC),inside_of(Obj,What)) :- nonvar(Obj),(inside_of(Obj,What)),!.
+hook:fact_is_false(localityOfObject(Obj,_LOC),inside_of(Obj,What)) :- nonvar(Obj),(inside_of(Obj,What)),!.
 
 %  suggest a deducable fact that is probably true but not already asserted
-hook:fact_maybe_deduced(inRegion(Obj,Region)):- is_asserted(atloc(Obj,LOC)),locationToRegion(LOC,Region),!.
-hook:fact_maybe_deduced(inRegion(apath(Region,Dir),Region)):-is_asserted(pathBetween(Region,Dir,_)).
+hook:fact_maybe_deduced(localityOfObject(Obj,Region)):- is_asserted(atloc(Obj,LOC)),locationToRegion(LOC,Region),!.
+hook:fact_maybe_deduced(localityOfObject(apath(Region,Dir),Region)):-is_asserted(pathBetween(Region,Dir,_)).
 
 %  suggest a random fact that is probably is not already true
-hook:create_random_fact(atloc(Obj,LOC)) :- nonvar(Obj),asserted_or_deduced(inRegion(Obj,Region)),!,((in_grid(Region,LOC),unoccupied(Obj,LOC),is_fact_consistent(atloc(Obj,LOC)))).
-hook:create_random_fact(inRegion(Obj,Region)) :- nonvar(Obj),not(is_asserted(inRegion(Obj,_))),asserted_or_deduced(inRegion(Obj,Region)).
+hook:create_random_fact(atloc(Obj,LOC)) :- nonvar(Obj),asserted_or_deduced(localityOfObject(Obj,Region)),!,((in_grid(Region,LOC),unoccupied(Obj,LOC),is_fact_consistent(atloc(Obj,LOC)))).
+hook:create_random_fact(localityOfObject(Obj,Region)) :- nonvar(Obj),not(is_asserted(localityOfObject(Obj,_))),asserted_or_deduced(localityOfObject(Obj,Region)).
 
 %  suggest random values
 hook:create_random_instance(dir,Dir,Test) :- my_random_member(Dir,[n,s,e,w,ne,nw,se,sw]),Test,!.
 hook:create_random_instance(int,3,Test):-call(Test),dmsg(create_random(int,3,Test)),dtrace,!,fail.
 
 %  give required forward deductions
-hook:deduce_facts(atloc(Obj,LOC),inRegion(Obj,Region)):- nonvar(LOC), locationToRegion(LOC,Region).
-hook:deduce_facts(inRegion(Obj,_Region),atloc(Obj,LOC)):- nonvar(Obj), put_in_world(Obj),must_det(atloc(Obj,LOC)).
+hook:deduce_facts(atloc(Obj,LOC),localityOfObject(Obj,Region)):- nonvar(LOC), locationToRegion(LOC,Region).
+hook:deduce_facts(localityOfObject(Obj,_Region),atloc(Obj,LOC)):- nonvar(Obj), put_in_world(Obj),must_det(atloc(Obj,LOC)).
 
 
 % random_region(LOC):- findall(O,isa(O,region),LOCS),my_random_member(LOC,LOCS).
@@ -217,7 +217,7 @@ unoccupied_lc(Obj,Loc):- is_occupied(Loc,What),!,What=Obj.
 unoccupied_lc(_,_).
 
 is_occupied(Loc,What):- is_asserted(atloc(What,Loc)),!.
-is_occupied(Loc,What):- locationToRegion(Loc,Region),inRegion(What,Region),ensure_in_world(What),atloc(What,Loc),!.
+is_occupied(Loc,What):- locationToRegion(Loc,Region),localityOfObject(What,Region),ensure_in_world(What),atloc(What,Loc),!.
 
 % Used all over the place
 % Transforms location based on cardinal direction given

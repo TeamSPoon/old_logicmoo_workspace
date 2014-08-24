@@ -181,7 +181,7 @@ declare_dbase_local_dynamic_really(M,F,A):-
    call(compile_predicates([HEAD])).
 
 hybrid_rule_term_expansion(':-'(_),_):-!,fail.
-hybrid_rule_term_expansion((HEAD:-true),was_imported_kb_content(HEAD)):-!,fail,compound(HEAD),functor(HEAD,F,_),mpred_prop(F,prologHybrid),add(HEAD),!.
+hybrid_rule_term_expansion((HEAD:-true),moo:was_imported_kb_content(hybrid_rule_term_expansion,HEAD)):-!,fail,compound(HEAD),functor(HEAD,F,_),mpred_prop(F,prologHybrid),add(HEAD),!.
 hybrid_rule_term_expansion((HEAD:-NEWBODY),moo:hybrid_rule(HEAD,NEWBODY)):-compound(HEAD),functor(HEAD,F,_),mpred_prop(F,prologHybrid),!.
 hybrid_rule_term_expansion((HEAD:-NEWBODY),moo:hybrid_rule(HEAD,NEWBODY)):-compound(HEAD),functor(HEAD,F,_),mpred_arity(F,_),!.
 hybrid_rule_term_expansion((I:-_),_):-!,once((compound(I),functor(I,F,A),asserta_if_new(mpred_prolog_arity(F,A)))),!,fail.

@@ -21,8 +21,8 @@ moo:actiontype(take(item)).
 % Take something
 % Successfully picking something up
 moo:agent_call_command(Agent,take(SObj)) :-
-	(once((inRegion(Agent,LOC),
-                       inRegion(Obj,LOC),nonvar(Obj),
+	(once((localityOfObject(Agent,LOC),
+                       localityOfObject(Obj,LOC),nonvar(Obj),
                        not(possess(Agent,Obj)),
 
                        object_match(SObj,Obj)))),

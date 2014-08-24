@@ -31,8 +31,13 @@
 
 :- moo:register_module_type(utility).
 
+:-thread_local thlocal:allowTT/0.
+:-thread_local thlocal:omitCycWordForms/0.
 
-%  (parse-a-question-completely "Did George W. Bush fall off a bicycle?" #$RKFParsingMt '(:wff-check? t))
+
+%  (parse-a-question-completely "Did George W. Bush fall off a bicycle?" #$RKFParsingMt 
+% '(:wff-check? t)
+% )
 
 % idGen(X):-flag(idGen,X,X+1).
 
@@ -66,7 +71,6 @@ delete_eq([L|List],Item,[L|ListO]):-delete_eq(List,Item,ListO),!.
 
 :-meta_predicate(makeStringMatcher(+,+,-)).
 
-cyckb_t(PLIST):-kbp_t_list(PLIST).
 
 %makeStringMatcher(_ ,Var,Var):-var(Var),!.
 %makeStringMatcher(_ ,[],[]).
@@ -82,12 +86,14 @@ makeStringMatcher(Vars,once(H),once(HO)):- !,makeStringMatcher(Vars,H,HO).
 makeStringMatcher(Vars,V^(H),V^(HO)):- !,makeStringMatcher(Vars,H,HO).
 makeStringMatcher(_ ,call(H),call(H)):-!.
 makeStringMatcher(_ ,stringArg(StrVar,BodI),stringArgUC(StrVar,NewVar,BodO)):- !, vsubst(BodI,StrVar,NewVar,BodO).
-makeStringMatcher(Vars,BodI,BodO):- compound(BodI),functor(BodI,F, _),cyckb_t([argIsa,F,N,StringType]),isa_stringType(StringType),arg(N,BodI,StrVar),!,
+makeStringMatcher(Vars,BodI,BodO):- compound(BodI),functor(BodI,F, _),cyckb_t(argIsa,F,N,StringType),isa_stringType(StringType),arg(N,BodI,StrVar),!,
    makeStringMatcher(Vars,stringArg(StrVar,BodI),BodO). 
 makeStringMatcher(_ ,BodI,BodI):-!.
 
 isa_stringType('CharacterString').
 isa_stringType('SubLString').
+isa_stringType('SubLListOfStrings').
+isa_stringType(['ListOfTypeFn', X]):-atom(X),isa_stringType(X).
 
 :-meta_predicate(stringmatcher_term_expansion(+,-)).
 stringmatcher_term_expansion((Head:-Body),Out):- compound(Body), 
@@ -135,12 +141,18 @@ conj_to_list((A,B),AB):-!,conj_to_list(A,AL),conj_to_list(B,BL),append(AL,BL,AB)
 conj_to_list((A),[A]).
 
 
-stringArgUC(User,Cyc,CallWithCyc):- ( ground(User) -> (ssz(User,Cyc),CallWithCyc)  ; (pressz(User,Cyc,Call) , CallWithCyc, Call)).
-
 stringArg(User,CallWithUser):- dtrace,vsubst(no_repeats(CallWithUser),User,Cyc,CallWithCyc),!, (ground(User) -> (ssz(User,Cyc),CallWithCyc)  ; (CallWithCyc, ssz(User,Cyc))).
 
 e2c_term_expansion(In,Out):- stringmatcher_term_expansion(In,Out),!.
 e2c_term_expansion(In,Out):- reorder_term_expansion(In,Out),!.
+
+
+stringArgUC(User,Cyc,CallWithCyc):- must_det(var(Cyc)),!,stringArgUC2(User,Cyc,CallWithCyc).
+stringArgUC2(User,Cyc,CallWithCyc):- var(User),!,CallWithCyc,cycStringToString(Cyc,User).
+stringArgUC2([User,U2|MORE],Cyc,CallWithCyc):- Cyc=[User,U2|MORE],!,CallWithCyc.
+stringArgUC2([User],Cyc,CallWithCyc):- Cyc=User,!,CallWithCyc,atom(Cyc).
+
+cycStringToString(Cyc,User):- (atom(Cyc)->User=[Cyc];User=Cyc),!.
 
 user:term_expansion(I,O):-e2c_term_expansion(I,O).
 
@@ -151,15 +163,15 @@ to_simple_wl([L|T],[L|T]):-!.
 to_simple_wl(L,[L]):-!.
 
 notground(V):-notrace(not(ground(V))).
-term_atoms(Term,Vs):-findall(A,(arg(_,Term,A),atom(A),A\=[]),Vs).
+term_atoms(Term,Vs):-findall(A,(arg(_,Term,A),non_blankWord(A),A\=[],atom(A)),Vs).
 
-words_append(L,R,LRS):-stringToWords(L,LS),!,stringToWords(R,RS),!,append(LS,RS,LRS),!.
-words_concat(Prefix,Suffix,String):- reduceWordList(Prefix,A),reduceWordList(Suffix,B),reduceWordList(String,C),
-   term_atoms(atom_concat(A,B,C),Vs),length(Vs,L),!,L > 1,atom_concat_er(A,B,C).
+words_append(L,R,LRS):-stringToWords(L,LS),stringToWords(R,RS),stringToWords(LRS,LRLIST),append(LS,RS,LRLIST).
+words_concat(PreAffix,Affix,String):- reduceWordList(PreAffix,A),reduceWordList(Affix,B),reduceWordList(String,C),!,
+   term_atoms(atom_concat(A,B,C),Vs),length(Vs,L),!,L > 1,atom_concat_er(A,B,C), !,non_blankWord(A),!,non_blankWord(B),non_blankWord(C).
 
-atom_concat_er(A,B,C):-nonvar(A),nonvar(B),atom_concat(_,B,A),C=A,!.
-atom_concat_er(A,B,C):-nonvar(A),nonvar(B),atom_concat(A,_,B),C=B,!.
-atom_concat_er(A,B,C):-atom_concat(A,B,C).
+atom_concat_er(A,B,C):-atom(A),atom(B),atom_concat(Other,B,A),C=A,non_blankWord(Other),!.
+atom_concat_er(A,B,C):-atom(A),atom(B),atom_concat(A,Other,B),C=B,non_blankWord(Other),!.
+atom_concat_er(A,B,C):-atom(A),atom(B),atom_concat(A,B,C),!.
 
 
 get_pl_type(Term,var):-var(Term),!.
@@ -172,18 +184,6 @@ get_pl_type(Term,number(other)):-number(Term),!.
 get_pl_type(List,list(proper)):-is_list(List),!.
 get_pl_type([_|_],list(improper)):-!.
 get_pl_type(C,compound(F,A)):-functor(C,F,A).
-
-pressz(User,Cyc,ssz(User,Cyc)):-var(Cyc),var(User),!,([Cyc]=User;(Cyc=User,User=[_|_])).
-pressz(User,Cyc,ssz(User,Cyc)):-ssz(User,Cyc).
-
-ssz(User, CycString):-atom(CycString),!,[CycString]=User.
-ssz(User, CycString):-nonvar(CycString),!,CycString=User.
-% CycString is a var
-ssz(User, CycString):- var(User),!,([CycString]=User;(CycString=User,User=[_|_])).
-ssz([User], CycString):- atom(User),!,CycString=User.
-ssz(User, CycString):- not(is_list(User)),!,CycString=User.
-ssz([User], CycString):-!,CycString=User.
-ssz(User, CycString):-!,CycString=User.
 
 :-dynamic(textCached/2).
 
@@ -206,9 +206,23 @@ ssz(User, CycString):-!,CycString=User.
 %'genTemplate-Constrained'('isa', ['quotedCollection', ':ARG2'], ['NPIsNP-NLSentenceFn', ['BestCycLPhraseFn', ':ARG1'], ['BestDetNbarFn-Indefinite', ['TermParaphraseFn', ':ARG2']]]).
 
 */
+:-dynamic(e2c_result/1).
+:-export(e2c_result/1).
 :-export((dm1/0,dm2/0,dm3/0)).
-% dm1:-mmake,e2c("I am seeing two books sitting on a shelf",F),portray_clause(F).
-dm1:-e2c("I"),e2c("I am happy"),e2c("I saw wood"),e2c("I see two books"), e2c("I see two books sitting on a shelf").
+
+dm1:-
+  mmake,
+   e2c("I am happy when I am seeing two books sitting on a shelf",F),portray_clause(F),
+   forall(clause(e2c_result(Text),O),retractall((e2c_result(Text):-O))),
+   forall(descriptionTest(_,Texts),forall(member(Text,Texts),doE2CTest(Text))),
+   findall(((was(LEN,TEXT):-PROPS)),(is_wordage_cache(TEXT, wordage(_,PROPS)),length(PROPS,LEN)),LIST),sort(LIST,SET),reverse(SET,RSET),
+   forall(member(R,RSET),portray_clause(R)).
+
+doE2CTest(Text):- atomic(Text),atom_contains(Text,'  '),!.
+doE2CTest(Text):- clause(e2c_result(Text),_),!.
+doE2CTest(Text):- e2c(Text,F),asserta((e2c_result(Text):- F)),portray_clause(F),!.
+
+% dm1:-e2c("I"),e2c("I am happy"),e2c("I saw wood"),e2c("I see two books"), e2c("I see two books sitting on a shelf").
 dm2:-e2c("AnyTemplate1 affects the NPTemplate2").
 dm3:-e2c("AnyTemplate1 at AnyTemplate2").
 
@@ -282,7 +296,7 @@ phrase_orig(RuleSet, Input, Rest) :-
 dont_cache.
 posm_cached.
 
-posm_cached(CycWord,String,POS,Form,CycL):-posm_c_gen(String,POS,Form,CycL),pos(String,CycWord,Form,POS).
+posm_cached(CycWord,String,POS,Form,CycL):-posm_c_gen(String,POS,Form,CycL),fillInPosAndForm(String,CycWord,Form,POS).
 
 % ===================================================================
 
@@ -290,11 +304,9 @@ posm_cached(CycWord,String,POS,Form,CycL):-posm_c_gen(String,POS,Form,CycL),pos(
 % posMeans
 % ============================================================================
 
-posMeans(String,POS,Form,CycL):-
-      posm_cached,!,
-      posm_cached(_CycWord,String,POS,Form,CycL).
-
 posMeans(String,POS,Form,CycL):- dont_cache,!, posm_c_gen( String,POS,Form,CycL).
+posMeans(String,POS,Form,CycL):- posm_cached,!, posm_cached(_CycWord,String,POS,Form,CycL).
+
 
 posMeans(String,POS,Form,CycL):-
       cache_the_posms,
@@ -329,66 +341,95 @@ correctArgIsas(X, _ ,X).
 % :-asserta(reorder_term_expansion).
 :-asserta(stringmatcher_term_expansion).
 
+multiStringMatch([W|List],[W|_]):-is_list(List),!.
+multiStringMatch(W,[W|_]):-atom(W),!.
+multiStringMatch([W|_],[W|_]):-atom(W),!.
+multiStringMatch([W|_],[W|_]).
+multiStringMatch(W,[W|_]).
+
+
+% ============================================================================
+% POSM_GEN_CACHE MULTI
+% ============================================================================
+posm_c_gen_multi(String,POS,Form,CycL):-no_repeats(posm_c_gen_multi_0(String,POS,Form,CycL)).
+
+
 %'multiWordString'([health, care], 'Organize-TheWord', 'SimpleNoun', 'MedicalCareOrganization').
-posm_c_gen( String,POS,Form,CycL):- 'multiWordString'(Words, CycWord,POS, CycL),
-	 pos(Eng,CycWord,Form,POS),words_append(Words,Eng,String).
+posm_c_gen_multi_0(String,POS,Form,CycL):- 
+   reorderBody('multiWordString'(Words, CycWord,POS, CycL), fillInPosAndForm(Eng,CycWord,Form,POS), String^words_append(Words,Eng,String)).
 
 %'genPhrase'('MedicalCareProvider', 'AgentiveNoun', 'agentive-Sg', [health, care, provider]).
-posm_c_gen( String,POS,Form,CycL):-
-        'genPhrase'(CycL,POS,Form, String).
-
-%'headMedialString'([dimensionless], 'Unit-TheWord', [of, measure], 'SimpleNoun', 'DimensionlessUnitOfMeasure').
-posm_c_gen( String,POS,Form,CycL):-'headMedialString'(WordsBef,CycWord,WordsAft,POS, CycL),
-	 pos(Eng,CycWord,Form,POS),words_append(WordsBef,Eng,PhrasingLeft),words_append(PhrasingLeft,WordsAft,String).
+posm_c_gen_multi_0( String,POS,Form,CycL):- 'genPhrase'(CycL,POS,Form, String).
 
 %'compoundString'('Movement-TheWord', [of, fluid], 'MassNoun', 'FluidFlowEvent').
-posm_c_gen( String,POS,Form,CycL):-'compoundString'(CycWord,Words,POS, CycL),
-	 pos(Eng,CycWord,Form,POS),words_append(Eng,Words,String).
+posm_c_gen_multi_0( String,POS,Form,CycL):- reorderBody('compoundString'(CycWord,Words,POS, CycL),Eng^fillInPosAndForm(Eng,CycWord,Form,POS),String^words_append(Eng,Words,String)).
 
 %'prepCollocation'('Beset-TheWord', 'Adjective', 'By-TheWord').      
-posm_c_gen( String,POS,Form2,'PrepCollocationFn'(CycWord1,POS,CycWord2)):-'prepCollocation'(CycWord1,POS, CycWord2),
-	 pos(Eng1,CycWord1,_Form1,_POS1),pos(Eng2,CycWord2,Form2,_POS2), words_append(Eng1,Eng2,String).
+posm_c_gen_multi_0( String,POS,Form2,'PrepCollocationFn'(CycWord1,POS,CycWord2)):- 
+      reorderBody(POS^'prepCollocation'(CycWord1,POS, CycWord2),
+	 stringToCycWord(Eng1,CycWord1),Form2^meetsForm(Eng2,CycWord2,Form2), String^words_append(Eng1,Eng2,String)).
+
+%'headMedialString'([dimensionless], 'Unit-TheWord', [of, measure], 'SimpleNoun', 'DimensionlessUnitOfMeasure').
+posm_c_gen_multi_0( String,POS,Form,CycL):- reorderBody('headMedialString'(WordsBef,CycWord,WordsAft,POS, CycL),
+	 fillInPosAndForm(Eng,CycWord,Form,POS),PhrasingLeft^words_append(WordsBef,Eng,PhrasingLeft),String^words_append(PhrasingLeft,WordsAft,String)).
 
 
-%TODO 'abbreviationForString'([scatology], [scat]).  'abbreviationForMultiWordString'([political], 'Science-TheWord', 'massNumber', [poli, sci]).
-%'abbreviationForLexicalWord'('Kilogram-TheWord', 'singular', [kg]).
+% ============================================================================
+% POSM_GEN_CACHE PLUS MULTI
+% ============================================================================
+
+%TODO 'abbreviationForString'([scatology], [scat]).  
+%TODO 'abbreviationForMultiWordString'([political], 'Science-TheWord', 'massNumber', [poli, sci]).
+%TODO 'abbreviationForLexicalWord'('Kilogram-TheWord', 'singular', [kg]).
 
 
 %'initialismString'('CodeOfConduct', [coc]).
-posm_c_gen( Term,'SimpleNoun',normal,Proper) :- 
-      'initialismString'(Proper,Term);
+posm_c_gen( StrVar,'SimpleNoun',normal,Proper) :- 
+  stringArgUC(StrVar,Term,
+      (('initialismString'(Proper,Term);
       'formerName'(Proper, Term);
       'scientificName'(Proper, Term);
       'termStrings-GuessedFromName'(Proper, Term);
-      'nameStrings'(Proper, Term).
+      'nameStrings'(Proper, Term)))).
 
 %'abbreviationString-PN'('India', ['IND']).
-posm_c_gen( Term,'ProperNoun',normal,Proper) :- 
-      'initialismString'('CodeOfConduct',Term);
+posm_c_gen( StrVar,'ProperNoun',normal,Proper) :- 
+  stringArgUC(StrVar,Term,
+      (('initialismString'(Proper,Term);
       'abbreviationString-PN'(Proper, Term);
       'preferredNameString'(Proper, Term);
       'countryName-LongForm'(Proper, Term);
-      'countryName-ShortForm'(Proper, Term).
+      'countryName-ShortForm'(Proper, Term)))).
 
-posm_c_gen( Eng,POS,Form,CycL):-posm_c_gen_unify(_CycWord,Eng,POS,Form,CycL).
+posm_c_gen(String,POS,Form,CycL):- String=[_|_],!,posm_c_gen_multi(String,POS,Form,CycL).
 
-posm_c_gen_unify(CycWord, Eng,POS,Form,CycL):- cwposm_build(CycWord,Eng,POS,Form,CycL),pos(Eng,CycWord,Form,POS).
+posm_c_gen(Eng,POS,Form,CycL):-posm_c_gen_unify(_CycWord,Eng,POS,Form,CycL).
+
+posm_c_gen_unify(CycWord,Eng,POS,Form,CycL):- cwposm_build(CycWord,POS,CycL),
+   ignore((var(Form)->meetsForm(Eng,CycWord,Form);true)),
+   once(meetsPos(Eng,CycWord,POS);((var(Eng)->stringToCycWord_0(Eng,CycWord);fail))).
+   
+   
 
 % posm_c_gen( Eng,POS,Form,CycL):-posTT(CycWord,Eng,POS,Form),tthold('denotation',CycWord,POS, _Num, CycL).
 
+% ============================================================================
+% POSM_GEN_CACHE CYCWORDS
+% ============================================================================
 
 %'denotation'('Capacity-TheWord', 'SimpleNoun', 0, 'Volume').
-cwposm_build(CycWord, _Eng,POS,_Form,CycL):-'denotation'(CycWord,POS, _Num, CycL).
+cwposm_build(CycWord, POS,CycL):-'denotation'(CycWord,POS, _Num, CycL).
 
 %'preferredGenUnit'('on-Physical', 'Preposition-Directional-Telic', 'On-TheWord').
-cwposm_build(CycWord, _MISSING_Eng,POS, _MISSING_Form,CycL):-'preferredGenUnit'(CycL,POS, CycWord).
+cwposm_build(CycWord, POS,CycL):-'preferredGenUnit'(CycL,POS, CycWord).
 
 %'denotationRelatedTo'('Can-TheWord', 'Verb', 0, 'PreservingFood').
-%cwposm_build(CycWord, _MISSING_Eng,POS,Form,'DenotationRelatedToFn'(CycL)):-'denotationRelatedTo'(CycWord,POS, _ , CycL).
-cwposm_build(CycWord, _MISSING_Eng,POS,_MISSING_Form,CycL):-'denotationRelatedTo'(CycWord,POS, _ , CycL).
+%cwposm_build(CycWord, POS,'DenotationRelatedToFn'(CycL)):-'denotationRelatedTo'(CycWord,POS, _ , CycL).
+cwposm_build(CycWord, POS,CycL):-'denotationRelatedTo'(CycWord,POS, _ , CycL).
 
-cwposm_build(CycWord, _MISSING_Eng,_MISSING_POS, _MISSING_Form, meaningOfWord(CycWord)):-
-   not('denotation'(CycWord, _ , _ , CycL)), not('denotationRelatedTo'(CycWord, _ , _ , CycL)), not('preferredGenUnit'(CycL, _ , CycWord)).
+cwposm_build(CycWord,_MISSING_POS, meaningOfWord(CycWord)):-
+   not('denotation'(CycWord, _ , _ , CycL)),
+  not('denotationRelatedTo'(CycWord, _ , _ , CycL)), not('preferredGenUnit'(CycL, _ , CycWord)).
    
 %'relationIndicators'('catalyst', 'Catalyst-TheWord', 'Verb').
 
@@ -478,23 +519,55 @@ isCycWord(CycWord) --> {hotrace(stringToCycWord(String,CycWord))},literal(String
 
 
 % ==========================================================
-meetsPos(String,CycWord,POS):-  sanify_string(String,Sane), meetsPos_0(Sane,CycWord,POS).
-meetsPos(_String,_CycWord,POS):- var(POS),!,fail.
-meetsPos(String,CycWord,POS):-'genls'(Child,POS),Child\=POS, meetsPos(String,CycWord,Child).
+% meetsPos
+% ==========================================================
+meetsPos(String,CycWord,POS):-  sanify_string(String,Sane),no_repeats(meetsPos_0(Sane,CycWord,POS)).
 
-meetsPos_0(String,CycWord,POS):- pos_4(String,CycWord,_Form,POS).
-meetsPos_0(String,CycWord,POS):- stringArgUC(String,CycString,'partOfSpeech'(CycWord,POS,CycString)).
-meetsPos_0([String],CycWord,'Verb'):- atom(String),meetsPosVerb(String,CycWord).
-meetsPos_0(String,CycWord,POS):- memberchk(POS,['Noun','Adjective','Verb','Adverb']), stringArg(String,'wnS'(CycWord, _ , String,POS, _ , _)).
-meetsPos_0(String,CycWord,'Adjective'):-'wnS'(CycWord, _ , String, 'AdjectiveSatellite', _ , _). 
-meetsPos_0(String,CycWord,POS):- 'prefixString'(CycWord, Prefix), words_concat(Prefix, _ ,String), 'derivationalAffixBasePOS'(CycWord,POS).
+meetsPos_0(String,CycWord,POS):- stack_check(1000),one_must(meetsPos_1(String,CycWord,POS),one_must(meetsPos_2(String,CycWord,POS),one_must(meetsPos_3(String,CycWord,POS),meetsPos_4(String,CycWord,POS)))).
+meetsPos_0(_String,_CycWord,POS):- var(POS),!,fail.
+meetsPos_0(String,CycWord,FormNotPOS):- is_speechPartPred_any(FormNotPOS),!,meetsForm(String,CycWord,FormNotPOS).
+meetsPos_0(String,CycWord,POS):-'genls'(Child,POS),Child\=POS, meetsPos_0(String,CycWord,Child).
+
+meetsPos_1(String,CycWord,POS):- has_wordage(String),!,is_wordage_prop(String, pos(_, CycWord, POS)).
+
+meetsPos_2(String,CycWord,POS):- stringArgUC(String,CycString,'partOfSpeech'(CycWord,POS,CycString)).
+meetsPos_2(String,CycWord,POS):- reorderBody(meetsForm(String,CycWord,Form),POS^speechPartPreds_transitive(POS, Form)).
+meetsPos_2([String],CycWord,POS):- atom(String),stringAtomToPOS([String],CycWord,POS).
+
+meetsPos_3(String,CycWord,POS):- with_assertions(thlocal:allowTT,meetsPos_2(String,CycWord,POS)).
+
+meetsPos_4(String,CycWord,POS):-  member(POS,['Noun','Adjective','Verb','Adverb']), stringArg(String,'wnS'(CycWord, _ , String,POS, _ , _)).
+meetsPos_4(String,CycWord,'Adjective'):- 'wnS'(CycWord, _ , String, 'AdjectiveSatellite', _ , _). 
+ 
+
+stringAtomToPOS([String],CycWord,'Verb'):- meetsPosVerb([String],CycWord).
+
+stringAtomToPOS(String,['WordWithPrefixFn', CycAffix, CycWord ],POS):- 
+     'derivationalAffixBasePOS'(CycAffix,POS),
+     'prefixString'(CycAffix, Affix),
+      words_concat(Affix, BaseString ,String),
+      stringToCycWord([BaseString],CycWord).
+
+stringAtomToPOS(String,['WordWithSuffixFn', CycWord, CycAffix],POS):-
+     reorderBody(
+     'denotation'(['WordWithSuffixFn', CycWord, CycAffix], POS,_,_),
+      String^('suffixString'(CycAffix,Affix),words_concat(BaseString,Affix,String),stringToCycWord([BaseString],CycWord))).
+     
+
+'suffixString'(CycAffix,Affix):-'variantOfSuffix'(CycAffix,Affix).
+'variantOfSuffix'(CycAffix,Affix):- 'phoneticVariantOfSuffix'(CycAffix,Affix,_BaseType).
+
+'prefixString'(CycAffix,Affix):-'variantOfPrefix'(CycAffix,Affix).
+'variantOfPrefix'(CycAffix,Affix):- 'phoneticVariantOfPrefix'(CycAffix,Affix,_BaseType).
 
 %meetsPos(String,CycWord,'Noun'):-atom(String),meetsPosNoun(String,CycWord).
 
-meetsPosVerb([String],CycWord):-reorderBody(String^word_concat(S,'ed',String),CycWord^meetsPos(S,CycWord,'Verb')).
-meetsPosVerb([String],CycWord):-reorderBody(String^atom_concat(S,'s',String),CycWord^meetsPos(S,CycWord,'Verb')).
+% TODO require infinitive
+meetsPosVerb([String],CycWord):-reorderBody(String^atom_concat(S,'d',String),atom_concat(_,'e',S),CycWord^meetsPos([S],CycWord,'Verb')).
+meetsPosVerb([String],CycWord):-reorderBody(String^atom_concat(S,'ed',String),CycWord^meetsPos([S],CycWord,'Verb')). 
+meetsPosVerb([String],CycWord):-reorderBody(String^atom_concat(S,'ded',String),CycWord^meetsPos([S],CycWord,'Verb')). % like embedded
+meetsPosVerb([String],CycWord):-reorderBody(String^atom_concat(S,'s',String),CycWord^meetsPos([S],CycWord,'Verb')). % TODO add or require intransitivity and infinitive
 % ==========================================================
-
 
 % Wordnet
 wordToWNPOS(CycWord,WNWord,POS):-'denotationPlaceholder'(CycWord,POS, _ , WNWord).
@@ -503,27 +576,48 @@ wordToWNPOS(CycWord,WNWord,POS):-'denotationPlaceholder'(CycWord,POS, _ , WNWord
 % ==========================================================
 % String to WordsList - Form /POS
 % ==========================================================
-stringToWordsListForm(String,[CycWord|Words],Form):- 
-         'abbreviationForCompoundString'(CycWord,WordList,Form,String),
+stringToWordsListForm(String,[CycWord|Words],FormOrPOS):- 
+       stringArgUC(String,CycString,'abbreviationForCompoundString'(CycWord,WordList,FormOrPOS,CycString)),
 	 stringToWords(WordList,Words).
 
 stringToWordsListPOS(String,CycWords,POS):- 
-      'abbreviationForMultiWordString'(List,Word,POS,String),
+      stringArgUC(String,CycString,'abbreviationForMultiWordString'(List,CycWord,POS,CycString)),
       stringToWordsListForm(List,Words, _),
-      append(Words,[Word],CycWords).
+      append(Words,[CycWord],CycWords).
 
-%stringToCycWord0([S|L],W):-textCached([S|L],[lex,W|_]).
-%stringToCycWord0(S,W):-textCached([S],[lex,W|_]).
 
-stringToCycWord(String,CycWord):-  sanify_string(String,Sane), (stringToCycWord_0(Sane,CycWord)).
+% ==========================================================
+% String to CycWord 
+% ==========================================================
+cycWordToPossibleStrings(CycWord,StringAtom):- call_tabled(cycWordToPossibleStrings_0(CycWord,StringAtom)).
+cycWordToPossibleStrings_0(_,[StringAtom]):- nonvar(StringAtom),StringAtom='',!,fail. 
+cycWordToPossibleStrings_0(CycWord,String):- cyckb_t(Form,CycWord,CycString),is_speechPartPred_any(Form),cycStringToString(CycString,String).
+cycWordToPossibleStrings_0(CycWord,StringAtom):- atom(CycWord),stringToCycWord_0(StringAtom2,CycWord),[StringAtom] = StringAtom2.
 
-stringToCycWord_0(String,CycWord):- 'baseForm'(CycWord,String).
-stringToCycWord_0([String],CycWord):- atom(String),toPropercase(String,UString),atom_concat(UString,'-TheWord',CycWord),once(cyckb_t([_,CycWord,_])),!.
-stringToCycWord_0(String,CycWord):- ground(CycWord),pos_4(String,CycWord,_,_),!.
-stringToCycWord_0(String,CycWord):-  meetsFormOrViaPOS(String,CycWord,_).
-stringToCycWord_0(String,CycWord):-  meetsPos(String,CycWord,_).
+stringToCycWord_never([String],_):-nonvar(String),String='',!,fail.
+stringToCycWord_never([String],CycWord):-ground(stringToCycWord_never(String,CycWord)),
+   once(cycWordToPossibleStrings(CycWord,_)),!,
+   not(((cycWordToPossibleStrings(CycWord,StringSample),equals_icase(StringSample,String)))),!.
 
-cycWordPosForm(POS,CycWord,Form):-        
+is_stringWord(String):-stringToCycWord(String,_CycWord).
+
+stringToCycWord([EMPTY],_CycWord):- is_blankWord(EMPTY),!,fail.
+stringToCycWord(String,CycWord):-
+ not(stringToCycWord_never(String,CycWord)),
+  with_assertions(thlocal:allowTT,
+   one_must(stringToCycWord_0(String,CycWord),
+      one_must(stringToCycWord_1(String,CycWord),
+         stringToCycWord_2(String,CycWord)))),notPrefixOrSuffix(CycWord).
+
+
+stringToCycWord_0(String,CycWord):-  meetsForm_1(String,CycWord,_).
+stringToCycWord_0(String,CycWord):-  meetsPos_2(String,CycWord,_).
+
+stringToCycWord_1([String],CycWord):- atom(String),not(compound(CycWord)),once(toPropercase(String,UString)),atom_concat(UString,'-TheWord',CycWord),cyckb_t(_,CycWord,_),!.
+
+stringToCycWord_2(String,CycWord):- var(String),nonvar(CycWord),cycWordToPossibleStrings(CycWord,String).
+
+cycWordPosForm_Likely(POS,CycWord,Form):-        
 	 (('preferredGenUnit'(_CycL,POS, CycWord);
 	 'posBaseForms'(CycWord,POS);
 	 'posForms'(CycWord,POS);
@@ -536,94 +630,102 @@ sanify_string(String,String):-sanify_string(String).
 % sanify_string([_|Tring]):-length(Tring,RLen),!,between(0,1,RLen).
 sanify_string([_]).
 sanify_string([_,_]).
+sanify_string([_,_,_]).
 
 %pos(String,CycWord,Form,POS):- 'lex'(Form, CycWord, String),'lexMap'(_PosForms, CycWord,POS).
-pos(String,CycWord,Form,POS):- sanify_string(String,Sane), (pos_0(Sane,CycWord,Form,POS)).
+fillInPosAndForm(String,CycWord,Form,POS):- ignore(pos_0(String,CycWord,Form,POS)).
+
 
 % pos_0(String,CycWord,Form,POS):-  pos_4(String,CycWord,Form,POS).
-pos_0(String,CycWord,Form,POS):-  speechPartPreds_transitive(POS, Form), ((meetsForm(String,CycWord,Form);meetsPos(String,CycWord,POS))).
 
+pos_0(String,CycWord,Form,POS):- (nonvar(String);nonvar(CycWord)),!,meetsForm_1(Form,CycWord,String),speechPartPreds_transitive(POS, Form).
+pos_0(String,CycWord,Form,POS):- speechPartPreds_transitive(POS, Form), meetsForm_1(Form,CycWord,String).
 
-string_cycword_form(Form,CycWord,String):-stringArgUC(String, CycString, (must_det((nonvar(CycWord);nonvar(CycString))),cyckb_t([Form,CycWord,CycString]))).
+% ==========================================================
+% speechPartPreds HACKS
+% ==========================================================
 
-pos_4(String,CycWord,Form,POS):- nonvar(String),var(CycWord),var(Form),var(POS),!,string_cycword_form(Form,CycWord,String),speechPartPreds_transitive(POS, Form).
-pos_4(String,CycWord,Form,POS):- speechPartPreds_transitive(POS, Form), string_cycword_form(Form,CycWord,String).
-
-speechPartPreds_transitive(POS, Form):- !, 'speechPartPreds'(POS, Form).
-speechPartPreds_transitive(SPOS, SForm):- speechPartPreds_transitive0(SPOS, SForm),must_det((nonvar(SForm),nonvar(SPOS))).
-speechPartPreds_transitive0(SPOS, SForm):- reorderBody('speechPartPreds'(POS, Form),SPOS^pred_or_same('genls',POS,SPOS),SForm^pred_or_same('genlPreds',Form,SForm)).
+speechPartPreds_transitive(POS,Form):-speechPartPreds_asserted(POS,Form).
+speechPartPreds_asserted(POS, Form):- is_speechPartPred_tt(Form),posName(POS),atom_contains(Form,POS).
+speechPartPreds_asserted(POS, Form):- cyckb_t('basicSpeechPartPreds',POS, Form).
+speechPartPreds_asserted(POS, Form):- cyckb_t('mostSpecificSpeechPartPreds',POS, Form).
+speechPartPreds_asserted(POS, Form):- cyckb_t('speechPartPreds',POS, Form).
+%speechPartPreds_asserted(SPOS, SForm):- speechPartPreds_transitive0(SPOS, SForm),must_det((nonvar(SForm),nonvar(SPOS))).
+%speechPartPreds_asserted(SPOS, SForm):- reorderBody('speechPartPreds'(POS, Form),SPOS^pred_or_same('genls',POS,SPOS),SForm^pred_or_same('genlPreds',Form,SForm)).
 
 pred_or_same(_,POS,POS).
-pred_or_same(Pred,POS,SPOS):- (nonvar(SPOS);nonvar(POS)),!,cyckb_t([Pred,POS,SPOS]).
-% pred_or_same(Pred,POS,SPOS):-cyckb_t([Pred,POS,MPOS]),cyckb_t([Pred,MPOS,SPOS]).
+pred_or_same(Pred,POS,SPOS):- (nonvar(SPOS);nonvar(POS)),!,cyckb_t(Pred,POS,SPOS).
+% pred_or_same(Pred,POS,SPOS):-cyckb_t(Pred,POS,MPOS),cyckb_t(Pred,MPOS,SPOS).
+
+:- expire_tabled_list(all).
+
+is_speechPartPred(Form):-is_speechPartPred_nontt(Form).
+is_speechPartPred(Form):-is_speechPartPred_tt(Form).
+
+is_speechPartPred_any(Form):-is_speechPartPred_nontt_ever(Form).
+is_speechPartPred_any(Form):-is_speechPartPred_tt_ever(Form).
+
+is_speechPartPred_tt(Form):- thlocal:allowTT,!,is_speechPartPred_tt_ever(Form).
+is_speechPartPred_tt_ever(Form):- atom(Form),atom_concat(infl,_,Form),
+  call_tabled_can(setof(F,((el_holds(isa,F,'Predicate','ThoughtTreasureMt',[amt('ThoughtTreasureMt')|_]),atom(F),atom_concat(infl,_,F))),Forms)),!,member(Form,Forms).
+
+is_speechPartPred_nontt(Form):- not(thlocal:omitCycWordForms),!,is_speechPartPred_nontt_ever(Form).
+is_speechPartPred_nontt_ever(Form):- call_tabled_can(setof(F,(is_speechPartPred_0(F),not(is_speechPartPred_tt_ever(F))),Forms)),!,member(Form,Forms).
+
+is_speechPartPred_0('baseForm').
+is_speechPartPred_0(Form):-speechPartPreds_asserted(_,Form).
+is_speechPartPred_0(Form):-argIsa(Form,1, 'LexicalWord'),cyckb_t(arity,Form,2).
+is_speechPartPred_0(Form):-argIsa(Form,1, 'EnglishWord'),cyckb_t(arity,Form,2).
+is_speechPartPred_0(Form):-cyckb_t(isa,Form,'SpeechPartPredicate').
+is_speechPartPred_0(Form):-cyckb_t(genlPreds,Form,'wordStrings').
+
+
+is_SpeechPart(POS):-cyckb_t(isa,POS,'SpeechPart').
+
+argIsa(Form,1, 'LexicalWord'):-is_speechPartPred_tt(Form).
+argIsa(Form,2, 'CharacterString'):-is_speechPartPred_tt(Form).
+
 
 % ==========================================================
 % meetsForm(String,CycWord,Form)
 % ==========================================================
+meetsForm80(String,RootString,form80(MainPlusTrans,main+trans)):-!,fail.
 
-meetsForm(String,CycWord,Form):-  sanify_string(String,Sane), (meetsForm_0(Sane,CycWord,Form)).
-meetsForm([String],CycWord,Form):- stringAtomToWordForm([String],CycWord,Form).
-meetsForm(_String,_CycWord,Form):- var(Form),!,fail.
-meetsForm(String,CycWord,Form):- genlPreds_different(Child,Form),meetsForm_0(String,CycWord,Child).
+% ==========================================================
+% meetsForm(String,CycWord,Form)
+% ==========================================================
  
+meetsForm(String,CycWord,Form):-  sanify_string(String,Sane), no_repeats(meetsForm_0(Sane,CycWord,Form)).
+
+meetsForm_0(String,CycWord,Form):- one_must( meetsForm_1(String,CycWord,Form),meetsForm_2(String,CycWord,Form)).
+meetsForm_0(_String,_CycWord,Form):- var(Form),!,fail.
+meetsForm_0(String,CycWord,Form):- is_SpeechPart(Form),!,meetsPos(String,CycWord,Form).
+meetsForm_0(String,CycWord,Form):- genlPreds_different(Child,Form),meetsForm_1(String,CycWord,Child).
+
+meetsForm_1(String,CycWord,Form):- has_wordage(String),is_wordage_prop(String, form(_, CycWord, _)),!,is_wordage_prop(String, form(_, CycWord, Form)).
+% meetsForm_1(String,CycWord,Form):-nonvar(String),stringListToWordForm(String,CycWord,Form).
 %'abbreviationForLexicalWord'('Kilogram-TheWord', 'singular', [kg])
-%meetsForm_0(String,CycWord,Form):-nonvar(String),stringListToWordForm(String,CycWord,Form).
-meetsForm_0(String,CycWord,Form):- 'abbreviationForLexicalWord'(CycWord,Form, String).
-meetsForm_0(String,CycWord,Form):- pos_4(String,CycWord,Form,_).
+meetsForm_1(String,CycWord,Form):- 'abbreviationForLexicalWord'(CycWord,Form, String).
+meetsForm_1(String,CycWord,Form):- 
+                      stringArgUC(String, CycString, (((once(nonvar(CycWord);atom(CycString))),                        
+                                 cyckb_t(Form,CycWord,CycString),is_speechPartPred(Form),notPrefixOrSuffix(CycWord)))).
+meetsForm_1([String],CycWord,Form):- stringAtomToWordForm([String],CycWord,Form).
 
 
+meetsForm_2(String,CycWord,POS):- with_assertions(thlocal:allowTT,meetsForm_1(String,CycWord,POS)).
 
-/*
-% Adjectives
-meetsForm_0(String,CycWord,'regularDegree'):-'regularDegree'(CycWord,String).
-meetsForm_0(String,CycWord,'comparativeDegree'):-'comparativeDegree'(CycWord,String).
-meetsForm_0(String,CycWord,'superlativeDegree'):-'superlativeDegree'(CycWord,String).
-meetsForm_0(String,CycWord,'nonGradableAdjectiveForm'):-'nonGradableAdjectiveForm'(CycWord,String).
-
-% Nouns
-meetsForm_0(String,CycWord,'singular'):-'singular'(CycWord,String).
-meetsForm_0(String,CycWord,'plural'):-'plural'(CycWord,String).
-%meetsForm_0(String,CycWord,'nonPlural-Generic'):-'nonPlural-Generic'(CycWord,String).
-
-meetsForm_0(String,CycWord,'agentive-Mass'):-'agentive-Mass'(CycWord,String).
-meetsForm_0(String,CycWord,'agentive-Pl'):-'agentive-Pl'(CycWord,String).
-meetsForm_0(String,CycWord,'agentive-Sg'):-'agentive-Sg'(CycWord,String).
-%meetsForm_0(String,CycWord,'singular-Feminine'):-'singular-Feminine'(CycWord,String).
-%meetsForm_0(String,CycWord,'singular-Masculine'):-'singular-Masculine'(CycWord,String).
-%meetsForm_0(String,CycWord,'singular-Neuter'):-'singular-Neuter'(CycWord,String).
-meetsForm_0(String,CycWord,'massNumber'):-'massNumber'(CycWord,String).
-meetsForm_0(String,CycWord,'pnSingular'):-'pnSingular'(CycWord,String).
-meetsForm_0(String,CycWord,'pnMassNumber'):-'pnMassNumber'(CycWord,String).
-
-
-% Adverbs
-meetsForm_0(String,CycWord,'regularAdverb'):-'regularAdverb'(CycWord,String).
-meetsForm_0(String,CycWord,'superlativeAdverb'):-'superlativeAdverb'(CycWord,String).
-
-% Verbs
-meetsForm_0(String,CycWord,'infinitive'):-'infinitive'(CycWord,String).
-meetsForm_0(String,CycWord,'perfect'):-'perfect'(CycWord,String).
-meetsForm_0(String,CycWord,'presentParticiple'):-'presentParticiple'(CycWord,String).
-meetsForm_0(String,CycWord,'pastTense-Universal'):-'pastTense-Universal'(CycWord,String).
-meetsForm_0(String,CycWord,'presentTense-Universal'):-'presentTense-Universal'(CycWord,String).
-meetsForm_0(String,CycWord,'firstPersonSg-Present'):-'firstPersonSg-Present'(CycWord,String).
-meetsForm_0(String,CycWord,'secondPersonSg-Present'):-'secondPersonSg-Present'(CycWord,String).
-meetsForm_0(String,CycWord,'nonThirdSg-Present'):-'nonThirdSg-Present'(CycWord,String).
-meetsForm_0(String,CycWord,'thirdPersonSg-Present'):-'thirdPersonSg-Present'(CycWord,String).
-*/
-
-%meetsForm_0(String,CycWord,POS,Form):-ttholds(Form,CycWord,String). & inflNounPluralUnchecked
-
+stringAtomToWordForm([String],CycWord,Form):- nonvar(CycWord),!,stringAtomToWordForm([String],NewCycWord,Form),!,CycWord=NewCycWord.
 stringAtomToWordForm([String],CycWord,Form):- nonvar(String),!,           
-	    'regularSuffix'(Form, Before, Suffix), Suffix\='',
-	    words_concat(NewBaseString,Suffix,[String]),
-	    meetsFormOrViaPOS([NewBaseString],CycWord,Before).
-stringAtomToWordForm([String],CycWord,Form):- !,
-	    'regularSuffix'(Form,Before,Suffix),  Suffix\='',
-            meetsFormOrViaPOS(NewString,CycWord,Before),
-	    words_concat(NewString,Suffix,[String]).
+	    'regularSuffix'(Form, Before, Affix), Affix\='',
+	    words_concat(BaseString,Affix,[String]),
+	    meetsForm([BaseString],CycWord,Before).
+stringAtomToWordForm([String],CycWord,Form):- 
+	    'regularSuffix'(Form,Before,Affix),  Affix\='',
+            meetsForm([BaseString],CycWord,Before),
+	    words_concat(BaseString,Affix,[String]).
+
+  
 	    
-meetsFormOrViaPOS(String,CycWord,Form):- meetsForm(String,CycWord,Form).
 % speechPartPreds_transitive(POS, Form),meetsPos(String,CycWord,POS)
 
 %'suffixString'('Y_AdjectiveProducing-TheSuffix', y, 'GeneralEnglishMt', v(v('Y_AdjectiveProducing-TheSuffix', y), A)).
@@ -633,6 +735,48 @@ meetsFormOrViaPOS(String,CycWord,Form):- meetsForm(String,CycWord,Form).
 
 %'compoundStringDenotesArgInReln'('Actor-TheWord', [remaining, afterwards], 'CountNoun', 'postActors', 2, 'GeneralEnglishMt', v(v('Actor-TheWord', 'CountNoun', 'postActors', afterwards, remaining), A)).
 %'multiWordStringDenotesArgInReln'([unchanged], 'Actor-TheWord', 'SimpleNoun', 'unchangedActors', 2, 'GeneralEnglishMt', v(v('Actor-TheWord', 'SimpleNoun', 'unchangedActors', unchanged), A)).
+
+
+
+/*
+% Adjectives
+meetsForm_1(String,CycWord,'regularDegree'):-'regularDegree'(CycWord,String).
+meetsForm_1(String,CycWord,'comparativeDegree'):-'comparativeDegree'(CycWord,String).
+meetsForm_1(String,CycWord,'superlativeDegree'):-'superlativeDegree'(CycWord,String).
+meetsForm_1(String,CycWord,'nonGradableAdjectiveForm'):-'nonGradableAdjectiveForm'(CycWord,String).
+
+% Nouns
+meetsForm_1(String,CycWord,'singular'):-'singular'(CycWord,String).
+meetsForm_1(String,CycWord,'plural'):-'plural'(CycWord,String).
+%meetsForm_1(String,CycWord,'nonPlural-Generic'):-'nonPlural-Generic'(CycWord,String).
+
+meetsForm_1(String,CycWord,'agentive-Mass'):-'agentive-Mass'(CycWord,String).
+meetsForm_1(String,CycWord,'agentive-Pl'):-'agentive-Pl'(CycWord,String).
+meetsForm_1(String,CycWord,'agentive-Sg'):-'agentive-Sg'(CycWord,String).
+%meetsForm_1(String,CycWord,'singular-Feminine'):-'singular-Feminine'(CycWord,String).
+%meetsForm_1(String,CycWord,'singular-Masculine'):-'singular-Masculine'(CycWord,String).
+%meetsForm_1(String,CycWord,'singular-Neuter'):-'singular-Neuter'(CycWord,String).
+meetsForm_1(String,CycWord,'massNumber'):-'massNumber'(CycWord,String).
+meetsForm_1(String,CycWord,'pnSingular'):-'pnSingular'(CycWord,String).
+meetsForm_1(String,CycWord,'pnMassNumber'):-'pnMassNumber'(CycWord,String).
+
+
+% Adverbs
+meetsForm_1(String,CycWord,'regularAdverb'):-'regularAdverb'(CycWord,String).
+meetsForm_1(String,CycWord,'superlativeAdverb'):-'superlativeAdverb'(CycWord,String).
+
+% Verbs
+meetsForm_1(String,CycWord,'infinitive'):-'infinitive'(CycWord,String).
+meetsForm_1(String,CycWord,'perfect'):-'perfect'(CycWord,String).
+meetsForm_1(String,CycWord,'presentParticiple'):-'presentParticiple'(CycWord,String).
+meetsForm_1(String,CycWord,'pastTense-Universal'):-'pastTense-Universal'(CycWord,String).
+meetsForm_1(String,CycWord,'presentTense-Universal'):-'presentTense-Universal'(CycWord,String).
+meetsForm_1(String,CycWord,'firstPersonSg-Present'):-'firstPersonSg-Present'(CycWord,String).
+meetsForm_1(String,CycWord,'secondPersonSg-Present'):-'secondPersonSg-Present'(CycWord,String).
+meetsForm_1(String,CycWord,'nonThirdSg-Present'):-'nonThirdSg-Present'(CycWord,String).
+meetsForm_1(String,CycWord,'thirdPersonSg-Present'):-'thirdPersonSg-Present'(CycWord,String).
+*/
+
 
 
 % ==========================================================
@@ -661,7 +805,7 @@ clean_posm_cache:-
       fail.
 
 clean_posm_cache:-tell(foo2),
-noreorder,
+   noreorder,
    listing(real_posm_cached),
    listing(real_posm_cachedTT),
    told.
@@ -798,7 +942,243 @@ fdelete([Replace|Rest],F,[Replace|Out]):-
 %:-ensure_loaded(opencyc_chatterbot_data).
 
 
-% end_of_file.
+
+
+
+/* Prediate:  descriptionTest/2 
+interpreted.
+file('c:/development/opensim4opencog/bin/cynd/startrek/mudreader.pl').
+line_count(33).
+number_of_clauses(1).
+Pattern: descriptionTest(_G1470,_G1471). 
+ */
+descriptionTest('NpcCol1000-Geordi684',["Lieutenant","Commander","Geordi","LaForge","Geordi LaForge","Lieutenant Commander Geordi LaForge is standing here","Geordi is the Chief Engineer of the Enterprise","He's blind, so he wears a special VISOR that lets him see things","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 3","mudMaxHitPoints: 12d12+3200","#$PunchingSomething mudBareHandDamage: 9d9+42","Geordi","Geordi LaForge","Lieutenant Commander Geordi LaForge is standing here","Geordi is the Chief Engineer of the Enterprise","He's blind, so he wears a special VISOR that lets him see things"]).
+descriptionTest('NpcCol1002-Worf720',["Lieutenant","Worf","Klingon","Lieutenant Worf","Lieutenant Worf is here, looking pretty mean","Worf is the first Klingon to have joined Starfleet","He's Chief of Security of the Enterprise, and he's plenty strong","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 2","mudMaxHitPoints: 12d12+3400","#$PunchingSomething mudBareHandDamage: 9d9+60","Worf","Lieutenant Worf","Lieutenant Worf is here, looking pretty mean","Worf is the first Klingon to have joined Starfleet","He's Chief of Security of the Enterprise, and he's plenty strong"]).
+descriptionTest(vacuum(1),["Lieutenant","Commander","Data","Android"]).
+descriptionTest(v12,["Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He stowed super-human strength, and is extremely tough","ACT_NICE_THIEF","AWARE","NOBACKSTAB","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOSUMMON","NOSLEEP","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 1","mudMaxHitPoints: 18d18+4000","#$PunchingSomething mudBareHandDamage: 10d10+75","Data","CycLBot","CycBot","CycBot1","Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He stowed super-human strength, and is extremely tough"]).
+descriptionTest(explorer(player1),["Lieutenant","Commander","Human","Player",
+            "Explorer Player",
+            "ACT_NICE_THIEF","AWARE","NOBACKSTAB","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOSUMMON",
+            "NOSLEEP","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 1","mudMaxHitPoints: 18d18+4000",
+            "#$PunchingSomething mudBareHandDamage: 10d10+75","Player","Player","Human",
+            "Logged on player character"]).
+descriptionTest('NpcCol1002-Worf720',["Lieutenant","Worf","Klingon","Lieutenant Worf","Lieutenant Worf is here, looking pretty mean","Worf is the first Klingon to have joined Starfleet","He's Chief of Security of the Enterprise, and he's plenty strong","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 2","mudMaxHitPoints: 12d12+3400","#$PunchingSomething mudBareHandDamage: 9d9+60","Worf","Lieutenant Worf","Lieutenant Worf is here, looking pretty mean","Worf is the first Klingon to have joined Starfleet","He's Chief of Security of the Enterprise, and he's plenty strong"]).
+descriptionTest('NpcCol1003-Dr-Crusher677',["Doctor","Beverly","Crusher","Doctor Crusher","Lieutenant Beverly Crusher is here, looking for someone to heal","Doctor Crusher is the Enterprise's Chief Medical Officer","Wesley is her son","Her husband was killed years ago in an accident on another starship which was also commanded by Captain Picard","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 3","mudMaxHitPoints: 12d12+3200","#$PunchingSomething mudBareHandDamage: 9d9+42","Dr. Crusher","Doctor Crusher","Lieutenant Beverly Crusher is here, looking for someone to heal","Doctor Crusher is the Enterprise's Chief Medical Officer","Wesley is her son","Her husband was killed years ago in an accident on another starship which was also commanded by Captain Picard"]).
+descriptionTest('NpcCol1004-Troi712',["Counselor","Deanna","Troi","Counselor Troi","Counselor Deanna Troi is here","Counselor Troi is the ship's main counselor","She's half betazoid, which means that she can read people's minds","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 3","mudMaxHitPoints: 12d12+3200","#$PunchingSomething mudBareHandDamage: 9d9+42","Troi","Counselor Troi","Counselor Deanna Troi is here","Counselor Troi is the ship's main counselor","She's half betazoid, which means that she can read people's minds"]).
+descriptionTest('NpcCol1005-Riker707',["Commander","William","Riker","Commander Riker","Commander William Riker is here, staring at you","Commander Riker is the Enterprise's first officer","He's in charge of keeping the crew in line","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 2","mudMaxHitPoints: 12d12+3200","#$PunchingSomething mudBareHandDamage: 9d9+52","Riker","Commander Riker","Commander William Riker is here, staring at you","Commander Riker is the Enterprise's first officer","He's in charge of keeping the crew in line"]).
+descriptionTest('NpcCol1006-Picard701',["Captain","Jean","Luc","Jean-Luc","Picard","Captain Picard","Captain Jean-Luc Picard is standing here, watching you","Captain Picard is a very important man","He's in charge of Starfleet's flagship, the Enterprise","He's very smart, and very wise","Don't mess with him!","ACT_NICE_THIEF","AWARE","NOBACKSTAB","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOSUMMON","NOSLEEP","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_SANCTUARY","NPC_NOTRACK","+mudToHitArmorClass0: 0","mudMaxHitPoints: 20d20+5000","#$PunchingSomething mudBareHandDamage: 12d12+75","Picard","Captain Picard","Captain Jean-Luc Picard is standing here, watching you","Captain Picard is a very important man","He's in charge of Starfleet's flagship, the Enterprise","He's very smart, and very wise","Don't mess with him!"]).
+descriptionTest('NpcCol1007-Guinan689',["Guinan","Guinan","Guinan is here, tending the bar","Guinan is a strange being","She's lived for thousands of years and experienced many things, but now she's decided to work on the Enterprise as a bartender","ACT_SENTINEL","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 4","mudMaxHitPoints: 12d12+2600","#$PunchingSomething mudBareHandDamage: 9d9+36","Guinan","Guinan","Guinan is here, tending the bar","Guinan is a strange being","She's lived for thousands of years and experienced many things, but now she's decided to work on the Enterprise as a bartender"]).
+descriptionTest('NpcCol1008-OBrien696',["Chief","O'Brien","Transporter","Chief O'Brien","Chief O'Brien is here, waiting to teleport you somewhere","Chief O'Brien is the transporter chief on the Enterprise","It's his job to make sure everyone arrives(and leaves) in one piece, instead of trillions of atoms","ACT_SENTINEL","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 4","mudMaxHitPoints: 12d12+2600","#$PunchingSomething mudBareHandDamage: 9d9+36","O'Brien","Chief O'Brien","Chief O'Brien is here, waiting to teleport you somwhere","Chief O'Brien is the transporter chief on the Enterprise","It's his job to make sure everyone arrives(and leaves) in one piece, instead of trillions of atoms"]).
+descriptionTest('NpcCol1009-Wesley716',["Wesley","Crusher","Wesley","Wesley Crusher is here, eagerly trying to earn your praise","Wesley Crusher is not even an official officer, but he serves as an acting Ensign on the bridge","He got this position only because Captain Picard feels guilty about killing his father","ACT_STAY_ZONE","ACT_WIMPY","wimpy mobile will try to flee when it gets low on hit points. A mobile which is both aggressive and wimpy will not attack a player that is awake","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 12d12+1400","#$PunchingSomething mudBareHandDamage: 9d9+24","Wesley","Wesley","Wesley Crusher is here, eagerly trying to earn your praise","Wesley Crusher is not even an official officer, but he serves as an acting Ensign on the bridge","He got this position only because Captain Picard feels guilty about killing his father"]).
+descriptionTest('NpcCol1010-Livingston726',["Livingston","fish","Livingston","Livingston the fish is here, swimming about in his tank","Livingston is Captain Picard's pet fish","He's some sort of exotic breed, and he's expensive to feed and keep alive","ACT_SENTINEL","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 12d12+800","#$PunchingSomething mudBareHandDamage: 9d9+14","Livingston","Livingston","Livingston the fish is here, swimming about in his tank","Livingston is Captain Picard's pet fish","He's some sort of exotic breed, and he's expensive to feed and keep alive"]).
+descriptionTest('NpcCol1011-Spot727',["spot","the","cat","Spot","Spot, Data's pet cat, is sitting here looking at you","Spot is Data's orange coloured cat","Data is always trying to become more human, so he thinks that having a pet might help him achieve his goal","ACT_SENTINEL","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 12d12+800","#$PunchingSomething mudBareHandDamage: 9d9+14","Spot","Spot","Spot, Data's pet cat, is sitting here looking at you","Spot is Data's orange coloured cat","Data is always trying to become more human, so he thinks that having a pet might help him achieve his goal"]).
+descriptionTest('NpcCol1012-Ensign728',["ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time"]).
+descriptionTest('NpcCol1012-Ensign732',["ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time"]).
+descriptionTest('NpcCol1012-Ensign736',["ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time"]).
+descriptionTest('NpcCol1012-Ensign740',["ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time"]).
+descriptionTest('NpcCol1012-Ensign744',["ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time"]).
+descriptionTest('NpcCol1012-Ensign748',["ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time"]).
+descriptionTest('NpcCol1012-Ensign752',["ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time"]).
+descriptionTest('NpcCol1013-Alexander671',["alexander","rozhenko","alexander rozhenko","Alexander Rozhenko is here, practicing laughing hour","Alexander Rozhenko is Worf's son","His mother was half human and half Klingon, so Alexander is 3/4 Klingon","He's quite small, but since he's a Klingon he's very strong","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Alexander","alexander rozhenko","Alexander Rozhenko is here, practicing laughing hour","Alexander Rozhenko is Worf's son","His mother was half human and half Klingon, so Alexander is 3/4 Klingon","He's quite small, but since he's a Klingon he's very strong"]).
+descriptionTest('ArtifactCol1000-Phaser676',["standard","issue","starfleet","phaser","a standard issue phaser","A standard issue Starfleet phaser has been left here","damageNumberDice 5","damageSizeDice 5","WeaponBlasting","These phasers are the standard weapon of Starfleet officers. It offers decent damage for its fairly small size","Phaser","a standard issue phaser"]).
+descriptionTest('ArtifactCol1000-Phaser776',["standard","issue","starfleet","phaser","a standard issue phaser","A standard issue Starfleet phaser has been left here","damageNumberDice 5","damageSizeDice 5","WeaponBlasting","These phasers are the standard weapon of Starfleet officers. It offers decent damage for its fairly small size","Phaser","a standard issue phaser"]).
+descriptionTest('ArtifactCol1000-Phaser700',["standard","issue","starfleet","phaser","a standard issue phaser","A standard issue Starfleet phaser has been left here","damageNumberDice 5","damageSizeDice 5","WeaponBlasting","These phasers are the standard weapon of Starfleet officers. It offers decent damage for its fairly small size","Phaser","a standard issue phaser"]).
+descriptionTest('ArtifactCol1000-Phaser724',["standard","issue","starfleet","phaser","a standard issue phaser","A standard issue Starfleet phaser has been left here","damageNumberDice 5","damageSizeDice 5","WeaponBlasting","These phasers are the standard weapon of Starfleet officers. It offers decent damage for its fairly small size","Phaser","a standard issue phaser"]).
+descriptionTest('ArtifactCol1001-5-Phaser-Rifle705',["phaser","rifle","a phaser rifle","A large phaser rifle is lying here","damageNumberDice 7","damageSizeDice 6","WeaponBlasting","This phaser rifle looks pretty powerful. These weapons are used mainly on assault type missions, where power is important","5 Phaser Rifle","a phaser rifle"]).
+descriptionTest('ArtifactCol1002-Red-Uniform704',["burgandy","starfleet","command","uniform","a burgandy Starfleet command uniform","A neatly folded burgandy Starfleet command uniform is lying here","armorLevel: 10","These uniforms are worn by command officers on Federation starships. It's kind of tight, but it looks pretty good","Red Uniform","a burgandy Starfleet command uniform"]).
+descriptionTest('ArtifactCol1002-Red-Uniform710',["burgandy","starfleet","command","uniform","a burgandy Starfleet command uniform","A neatly folded burgandy Starfleet command uniform is lying here","armorLevel: 10","These uniforms are worn by command officers on Federation starships. It's kind of tight, but it looks pretty good","Red Uniform","a burgandy Starfleet command uniform"]).
+descriptionTest('ArtifactCol1002-Red-Uniform719',["burgandy","starfleet","command","uniform","a burgandy Starfleet command uniform","A neatly folded burgandy Starfleet command uniform is lying here","armorLevel: 10","These uniforms are worn by command officers on Federation starships. It's kind of tight, but it looks pretty good","Red Uniform","a burgandy Starfleet command uniform"]).
+descriptionTest('ArtifactCol1002-Red-Uniform739',["burgandy","starfleet","command","uniform","a burgandy Starfleet command uniform","A neatly folded burgandy Starfleet command uniform is lying here","armorLevel: 10","These uniforms are worn by command officers on Federation starships. It's kind of tight, but it looks pretty good","Red Uniform","a burgandy Starfleet command uniform"]).
+descriptionTest('ArtifactCol1002-Red-Uniform743',["burgandy","starfleet","command","uniform","a burgandy Starfleet command uniform","A neatly folded burgandy Starfleet command uniform is lying here","armorLevel: 10","These uniforms are worn by command officers on Federation starships. It's kind of tight, but it looks pretty good","Red Uniform","a burgandy Starfleet command uniform"]).
+descriptionTest('ArtifactCol1003-Gold-Uniform675',["gold","starfleet","engineering","uniform","a gold Starfleet engineering uniform","A neatly folded gold Starfleet engineering uniform is lying here","armorLevel: 10","These uniforms are worn by engineering officers on Federation starships. It's kind of tight, but it looks pretty good","Gold Uniform","a gold Starfleet engineering uniform"]).
+descriptionTest('ArtifactCol1003-Gold-Uniform775',["gold","starfleet","engineering","uniform","a gold Starfleet engineering uniform","A neatly folded gold Starfleet engineering uniform is lying here","armorLevel: 10","These uniforms are worn by engineering officers on Federation starships. It's kind of tight, but it looks pretty good","Gold Uniform","a gold Starfleet engineering uniform"]).
+descriptionTest('ArtifactCol1003-Gold-Uniform687',["gold","starfleet","engineering","uniform","a gold Starfleet engineering uniform","A neatly folded gold Starfleet engineering uniform is lying here","armorLevel: 10","These uniforms are worn by engineering officers on Federation starships. It's kind of tight, but it looks pretty good","Gold Uniform","a gold Starfleet engineering uniform"]).
+descriptionTest('ArtifactCol1003-Gold-Uniform699',["gold","starfleet","engineering","uniform","a gold Starfleet engineering uniform","A neatly folded gold Starfleet engineering uniform is lying here","armorLevel: 10","These uniforms are worn by engineering officers on Federation starships. It's kind of tight, but it looks pretty good","Gold Uniform","a gold Starfleet engineering uniform"]).
+descriptionTest('ArtifactCol1003-Gold-Uniform723',["gold","starfleet","engineering","uniform","a gold Starfleet engineering uniform","A neatly folded gold Starfleet engineering uniform is lying here","armorLevel: 10","These uniforms are worn by engineering officers on Federation starships. It's kind of tight, but it looks pretty good","Gold Uniform","a gold Starfleet engineering uniform"]).
+descriptionTest('ArtifactCol1003-Gold-Uniform731',["gold","starfleet","engineering","uniform","a gold Starfleet engineering uniform","A neatly folded gold Starfleet engineering uniform is lying here","armorLevel: 10","These uniforms are worn by engineering officers on Federation starships. It's kind of tight, but it looks pretty good","Gold Uniform","a gold Starfleet engineering uniform"]).
+descriptionTest('ArtifactCol1003-Gold-Uniform735',["gold","starfleet","engineering","uniform","a gold Starfleet engineering uniform","A neatly folded gold Starfleet engineering uniform is lying here","armorLevel: 10","These uniforms are worn by engineering officers on Federation starships. It's kind of tight, but it looks pretty good","Gold Uniform","a gold Starfleet engineering uniform"]).
+descriptionTest('ArtifactCol1004-Blue-Uniform680',["blue","starfleet","medical","uniform","a blue Starfleet medical uniform","A neatly folded blue Starfleet medical uniform is lying here","armorLevel: 10","These uniforms are worn by medical officers on Federation starships. It's kind of tight, but it looks pretty good","Blue Uniform","a blue Starfleet medical uniform"]).
+descriptionTest('ArtifactCol1004-Blue-Uniform715',["blue","starfleet","medical","uniform","a blue Starfleet medical uniform","A neatly folded blue Starfleet medical uniform is lying here","armorLevel: 10","These uniforms are worn by medical officers on Federation starships. It's kind of tight, but it looks pretty good","Blue Uniform","a blue Starfleet medical uniform"]).
+descriptionTest('ArtifactCol1004-Blue-Uniform747',["blue","starfleet","medical","uniform","a blue Starfleet medical uniform","A neatly folded blue Starfleet medical uniform is lying here","armorLevel: 10","These uniforms are worn by medical officers on Federation starships. It's kind of tight, but it looks pretty good","Blue Uniform","a blue Starfleet medical uniform"]).
+descriptionTest('ArtifactCol1004-Blue-Uniform751',["blue","starfleet","medical","uniform","a blue Starfleet medical uniform","A neatly folded blue Starfleet medical uniform is lying here","armorLevel: 10","These uniforms are worn by medical officers on Federation starships. It's kind of tight, but it looks pretty good","Blue Uniform","a blue Starfleet medical uniform"]).
+descriptionTest('ArtifactCol1004-Blue-Uniform755',["blue","starfleet","medical","uniform","a blue Starfleet medical uniform","A neatly folded blue Starfleet medical uniform is lying here","armorLevel: 10","These uniforms are worn by medical officers on Federation starships. It's kind of tight, but it looks pretty good","Blue Uniform","a blue Starfleet medical uniform"]).
+descriptionTest('ArtifactCol1005-Boots673',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+
+
+
+descriptionTest('ArtifactCol1005-Boots773',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+descriptionTest('ArtifactCol1005-Boots678',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+descriptionTest('ArtifactCol1005-Boots685',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+descriptionTest('ArtifactCol1005-Boots697',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+descriptionTest('ArtifactCol1005-Boots702',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+descriptionTest('ArtifactCol1005-Boots708',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+descriptionTest('ArtifactCol1005-Boots713',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+descriptionTest('ArtifactCol1005-Boots717',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+descriptionTest('ArtifactCol1005-Boots721',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+descriptionTest('ArtifactCol1005-Boots729',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+descriptionTest('ArtifactCol1005-Boots733',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+descriptionTest('ArtifactCol1005-Boots737',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+descriptionTest('ArtifactCol1005-Boots741',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+descriptionTest('ArtifactCol1005-Boots745',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+descriptionTest('ArtifactCol1005-Boots749',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+descriptionTest('ArtifactCol1005-Boots753',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+descriptionTest('ArtifactCol1006-Comm-Badge674',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+descriptionTest('ArtifactCol1006-Comm-Badge774',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+descriptionTest('ArtifactCol1006-Comm-Badge679',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+descriptionTest('ArtifactCol1006-Comm-Badge686',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1",
+                     "These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+descriptionTest('ArtifactCol1006-Comm-Badge698',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+descriptionTest('ArtifactCol1006-Comm-Badge703',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+descriptionTest('ArtifactCol1006-Comm-Badge709',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+descriptionTest('ArtifactCol1006-Comm-Badge714',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+descriptionTest('ArtifactCol1006-Comm-Badge718',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+descriptionTest('ArtifactCol1006-Comm-Badge722',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+descriptionTest('ArtifactCol1006-Comm-Badge730',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+descriptionTest('ArtifactCol1006-Comm-Badge734',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+descriptionTest('ArtifactCol1006-Comm-Badge738',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+descriptionTest('ArtifactCol1006-Comm-Badge742',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+descriptionTest('ArtifactCol1006-Comm-Badge746',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+descriptionTest('ArtifactCol1006-Comm-Badge750',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+descriptionTest('ArtifactCol1006-Comm-Badge754',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+descriptionTest('ArtifactCol1007-Sash725',["worf's","worf","sash","Worf's sash","Worf's silver chain sash has been left here","armorLevel: 8","Worf's sash is some sort of Klingon clothing. Worf always wears it, which makes you wonder how you managed to get a hold of it..","Sash","Worf's sash"]).
+descriptionTest('ArtifactCol1008-VISOR688',["geordi","geordi's","visor","Geordi's VISOR","Geordi's VISOR is lying here","armorLevel: 2","Geordi's VISOR was made specially for him, because he's blind. This piece of equipment allows him to see things, but differently than normal eyes. I wonder how Geordi is managing, now that you've stolen his only way of seeing?","VISOR","Geordi's VISOR"]).
+descriptionTest('ArtifactCol1009-Medical-Tricorder681',["medical","tricorder","a medical Tricorder","A medical Tricorder is lying here, ready to be used","mudLevelOf: 10","chargeCapacity: 5","chargeRemaining: 5","This medical Tricorder is used to heal small wounds and cuts. While it isn't made for major injuries, it can help you limp home. To use, hold it and then use it","Medical Tricorder","a medical Tricorder"]).
+descriptionTest('ArtifactCol1009-Medical-Tricorder682',["medical","tricorder","a medical Tricorder","A medical Tricorder is lying here, ready to be used","mudLevelOf: 10","chargeCapacity: 5","chargeRemaining: 5","This medical Tricorder is used to heal small wounds and cuts. While it isn't made for major injuries, it can help you limp home. To use, hold it and then use it","Medical Tricorder","a medical Tricorder"]).
+descriptionTest('ArtifactCol1009-Medical-Tricorder683',["medical","tricorder","a medical Tricorder","A medical Tricorder is lying here, ready to be used","mudLevelOf: 10","chargeCapacity: 5","chargeRemaining: 5","This medical Tricorder is used to heal small wounds and cuts. While it isn't made for major injuries, it can help you limp home. To use, hold it and then use it","Medical Tricorder","a medical Tricorder"]).
+descriptionTest('ArtifactCol1009-Tricorder759',["medical","tricorder","a medical Tricorder","A medical Tricorder is lying here, ready to be used","mudLevelOf: 10","chargeCapacity: 5","chargeRemaining: 5","This medical Tricorder is used to heal small wounds and cuts. While it isn't made for major injuries, it can help you limp home. To use, hold it and then use it","Tricorder","a medical Tricorder"]).
+descriptionTest('ArtifactCol1009-Tricorder760',["medical","tricorder",
+                     "a medical Tricorder","A medical Tricorder is lying here, ready to be used",
+                     "mudLevelOf: 10",
+                     "chargeCapacity: 5",
+                     "chargeRemaining: 5",
+                     "This medical Tricorder is used to heal small wounds and cuts. While it isn't made for major injuries, it can help you limp home. To use, hold it and then use it",
+                     "Tricorder","a medical Tricorder"]).
+descriptionTest('ArtifactCol1009-Tricorder761',["medical","tricorder","a medical Tricorder","A medical Tricorder is lying here, ready to be used","mudLevelOf: 10","chargeCapacity: 5","chargeRemaining: 5","This medical Tricorder is used to heal small wounds and cuts. While it isn't made for major injuries, it can help you limp home. To use, hold it and then use it","Tricorder","a medical Tricorder"]).
+descriptionTest('ArtifactCol1010-Dilithium-Crystal756',["dilithium","crystal","a dilithium crystal","A shard of dilithium crystal is lying here","maybe a #$LightingDevice","Dilithium crystals are used to power warp cores of starships. This particular crystal is glowing brightly, and gives off a blue-ish tinge","Dilithium Crystal","a dilithium crystal"]).
+descriptionTest('ArtifactCol1010-Dilithium-Crystal757',["dilithium","crystal","a dilithium crystal","A shard of dilithium crystal is lying here","maybe a #$LightingDevice","Dilithium crystals are used to power warp cores of starships. This particular crystal is glowing brightly, and gives off a blue-ish tinge","Dilithium Crystal","a dilithium crystal"]).
+descriptionTest('ArtifactCol1010-Dilithium-Crystal758',["dilithium","crystal","a dilithium crystal","A shard of dilithium crystal is lying here","maybe a #$LightingDevice","Dilithium crystals are used to power warp cores of starships. This particular crystal is glowing brightly, and gives off a blue-ish tinge","Dilithium Crystal","a dilithium crystal"]).
+descriptionTest('ArtifactCol1011-5-Picards-Flute706',["picard","picard's","flute","Picard's flute","Captain Picard's wooden flute is sitting here","Captain Picard recieved this flute when he lost his memory and was stuck on some strange world. Now, he plays it to relieve stress","5 Picard's Flute","Picard's flute"]).
+descriptionTest('ArtifactCol1012-Trombone711',["riker","riker's","trombone","Riker's trombone","Commander Riker's trombone has been placed here","Commander Riker considers himself to be a talented jazz musician. He practices on this trombone all the time","Trombone","Riker's trombone"]).
+descriptionTest('ArtifactCol1020-Tea690',["tea","cup","a small cup","A small cup of tea is sitting here","Tea","a small cup"]).
+descriptionTest('ArtifactCol1021-Synthehol691',["wine","bottle","synthehol","a synthehol","A bottle of synthehol is standing here","Synthehol","a synthehol"]).
+descriptionTest('ArtifactCol1022-Ferengi-Ale692',["ale","ferengi","bottle","a Ferengi bottle","A bottle of Ferengi ale is sitting here","Ferengi Ale","a Ferengi bottle"]).
+descriptionTest('ArtifactCol1023-Romulan-Whisky693',["whisky","whiskey","romulan","bottle","a Romulan bottle","A bottle of Romulan whiskey is sitting here","Romulan Whisky","a Romulan bottle"]).
+descriptionTest('ArtifactCol1024-Lemonade-Prune-Juice694',["lemonade","prune","juice","glass","a small glass","A small glass of prune juice is sitting here","Lemonade","Prune Juice","a small glass"]).
+descriptionTest('ArtifactCol1025-Vulcan-Beer695',["beer","vulcan","bottle","a Vulcan bottle","A bottle of Vulcan beer is standing here","Vulcan Beer","a Vulcan bottle"]).
+descriptionTest('Area1000',["Main Engineering","You find yourself in the middle of main engineering","The room is longer than it is wide, and it has fairly low ceilings","Computer terminals cover all the walls, and a large table built into the floor sits in the middle of the room","At the far end of the room you see the warp core, a large pulsating vertical tube"]).
+descriptionTest('Area1002',["A Corridor","You find yourself in the middle of a well lit corridor on the Enterprise","It isn't very wide, and the light beige walls have been rounded, making the corridor an oval shape"]).
+descriptionTest('Area1001',["Geordi's Quarters","You're in the middle of Geordi's quarters","The room is sparsely decorated, due to the fact that Geordi is blind","A small personal computer sits on a desk against the western wall, in between two windows that look out into space","A neatly made bed has been placed against the northern wall"]).
+descriptionTest('Area1005',["A Corridor","You find yourself in the middle of a well lit corridor on the Enterprise","It isn't very wide, and the light beige walls have been rounded, making the corridor an oval shape","You notice a tiny computer panel embedded into the wall"]).
+descriptionTest('Area1003',["Data's Quarters","You're in the middle of Data's quarters","Some easils and paintings have been left scattered around the southern part of the room, while a huge computer screen showing a cross section of the Enterprise covers the entire northern wall","In front of the screen is a large desk, which is covered in computer controls","You can't see a bed in this room, but you figure it's because Data doesn't sleep"]).
+descriptionTest('Area1004',["The Brig","You're in the dimly lit Brig","This is where all the criminals and prisoners are kept while on board the Enterprise","Three fairly large cells can been seen in the southern part of the room, and they're all empty","A computer control panel is situated in the northwestern corner of the room, which is where the force fields for the cells are controlled",'The panel says:
+
+***************************************************
+*                                                 *
+*            NCC-1701-D - ENTERPRISE              *
+*                                                 *
+*              *****                              *
+*      **********************                     *
+*      ***********************  _________         *
+*              *****        ***(___  ____(        *
+*                            ***** \\ \\*           *
+*                             **********          *
+*                                                 *
+*          You are currently on deck 1            *
+*                                                 *
+***************************************************
+']).
+descriptionTest('Area1008',["A Corridor","You find yourself in the middle of a well lit corridor on the Enterprise","It isn't very wide, and the light beige walls have been rounded, making the corridor an oval shape","You see the holodeck's control panel beside the holodeck door, and it has some information on it"]).
+descriptionTest('Area1006',["Transporter Room","You're in the Enterprise transporter room","A computer terminal is sitting near the southern wall, where the transporter chief can control the transporters","Eight round transport pads have been arranged in a circle, on a raised platform against the northern wall"]).
+descriptionTest('Area1042',["Transporter Beam","You find yourself in a transporter beam","All you can see is blue flashing light","It feels as though your body is racing around at high speeds","As you try to look down at your body, you realize that there's nothing there!"]).
+descriptionTest('Area1007',["School","You step through the doors and find yourself in a large school room","Various tables and chairs are set up all around the room, and many paintings and drawings have been attached to the walls","Several computer consoles with a children's interface on them can be seen on the tables"]).
+descriptionTest('Area1010',["Turbolift","You're in the turbolift","The turbolift walls have been rounded off, making it in the shape of a tube","Several vertical rows of lights make this place very well lit","From here, you can access the other decks on the Enterprise"]).
+descriptionTest('Area1009',["Holodeck 2","You're now on Holodeck 2","The room is just a large cube, with jet black walls and a yellow grid painted on the floors, the walls, and the ceiling","This is where different programs can be loaded and experienced, which seem totally real","Right now, this holodeck is not functioning",'
+***************************************************
+*                                                 *
+*            NCC-1701-D - "ENTERPRISE"            *
+*                    HOLODECK 2                   *
+*                                                 *
+*              STATUS : Inactive                  *
+*     CURRENT PROGRAM : N/A                       *
+*            SAFETIES : N/A                       *
+*                                                 *
+*    NOTE: Starfleet is not responsible for       *
+*          any injuries incurred while on this    *
+*          holodeck!                              *
+*                                                 *
+* WARNING: While the safeties are disabled, you   *
+*          CAN be injured, or even killed.        *
+*                                                 *
+***************************************************']).
+descriptionTest('Area1011',["Turbolift","You're in the turbolift","The turbolift walls have been rounded off, making it in the shape of a tube","Several vertical rows of lights make this place very well lit","From here, you can accessthe other decks on the Enterprise"]).
+descriptionTest('Area1013',["A Corridor","You find yourself in the middle of a well lit corridor on the Enterprise","It isn't very wide, and the light beige walls have been rounded, making the corridor an oval shape","You notice a tiny computer panel embedded into the wall"]).
+descriptionTest('Area1032',["Turbolift","You're in the turbolift","The turbolift walls have been rounded off, making it in the shape of a tube","Several vertical rows of lights make this place very well lit","From here, you can access the other decks on the Enterprise"]).
+descriptionTest('Area1012',["Cargo Bay 1","You're in the main cargo bay of the Enterprise","It's quite a large room, with a very high ceiling and a lot of floor space","You can see several hundred plastic crates and barrels with the Starfleet insignia on them stacked right up to the ceiling"]).
+descriptionTest('Area1016',["A Corridor","You find yourself in the middle of a well lit corridor on the Enterprise","It isn't very wide, and the light beige walls have been rounded, making the corridor an oval shape","You see the holodeck's control panel beside the holodeck door, and it has some information on it"]).
+descriptionTest('Area1014',["Riker's Quarters","You've arrived in Riker's quarters","The room is very neat and tidy, with a couch and several chairs aranged around a coffee table by the eastern wall","A small partition at the northern part of the room seperates his sleeping area with the rest of the room"]).
+descriptionTest('Area1015',["Sick Bay","You're in the middle of the Enterprise's Sick Bay","About a dozen beds are arranged along the walls of the room, while several carts covered with medical supplies are scattered around the room","A large glass window in the northern part of the room separates the doctor's office with the rest of the room",'
+***************************************************
+*                                                 *
+*            NCC-1701-D - "ENTERPRISE"            *
+*                    HOLODECK 4                   *
+*                                                 *
+*              STATUS : Active                    *
+*     CURRENT PROGRAM : Sherlock Holmes (19th     *
+*                       century London)           *
+*            SAFETIES : Disabled                  *
+*                                                 *
+*    NOTE: Starfleet is not responsible for       *
+*          any injuries incurred while on this    *
+*          holodeck!                              *
+*                                                 *
+* WARNING: While the safeties are disabled, you   *
+*          CAN be injured, or even killed.        *
+*                                                 *
+*             ---ENTER WHEN READY---              *
+*                                                 *
+*************************************************** ']).
+descriptionTest('Area1019',["A Corridor","You find yourself in the middle of a well lit corridor on the Enterprise","It isn't very wide, and the light beige walls have been rounded, making the corridor an oval shape"]).
+descriptionTest('Area1017',["Holodeck 4 Entrance - A Narrow Alley","You emerge into a dark narrow alley","Tall dark brick buildings block your way north and south","You can see that the windows on the buildings are fairly high, and some have been boarded up","The smell from the rotting food and garbage mixing with the foul water on the ground is unbearable","You can hear the sounds of a bustling marketpace to the east","The archway leading out of the holodeck is west"]).
+descriptionTest('Area1018',["Crusher's Quarters","You're in Doctor Crusher's quarters","Several different paintings are attached to the walls, and you also notice a few sculptures","A neatly made bed is located by the northern wall, in between two large windows looking out into space"]).
+descriptionTest('Area1021',["Ten Forward","You're now in Ten Forward, the entertainment room of the Enterprise","The entire northern wall is covered with windows looking out into space, while two large wooden doors with the Starfleet insignia stamped on them face south","Many round metal tables are scattered around the room, surrounded by metal chairs","A long bar spans almost the entire length of the southern part of the room, and about two dozen bar stools are sitting in front of it","It's very noisy in here, due to all the talking and laughing"]).
+descriptionTest('Area1020',["Enterprise Security","You're standing in the dimly lit Enterprise Security","Weapons lockers cover all of the walls, except along the northern wall, where a large glass window protects dozens of different phasors, blaster rifles, and other high tech weapons","Three long tables surrounded by chairs stretch across the room"]).
+descriptionTest('Area1022',["Shuttle Bay","You're in the main shuttle bay of the Enterprise","It's quite a large room, with a very high ceiling and a lot of floor space","You can see three different shuttle crafts sitting here, waiting to be flown","A large grey door leads into space"]).
+descriptionTest('Area1024',["A Corridor","You find yourself in the middle of a well lit corridor on the Enterprise","It isn't very wide, and the light beige walls have been rounded, making the corridor an oval shape","You notice a tiny computer panel embedded into the wall"]).
+descriptionTest('Area1039',["Outer Space by the Enterprise","You're floating in outer space right beside the USS Enterprise","You can see stars in every direction, which provide the only light here","You feel very cold","A large grey door leads into the Enterprise's Shuttle Bay"]).
+descriptionTest('Area1023',["Troi's Quarters","You're in Counselor Deanna Troi's quarters","Several different paintings have been hung from the walls, and a small couch and a recliner are positioned around a coffee table","A neatly made bed is partially hidden behind a curtain at the northern part of the room"]).
+descriptionTest('Area1027',["A Corridor","You find yourself in the middle of a well lit corridor on the Enterprise","It isn't very wide, and the light beige walls have been rounded, making the corridor an oval shape",
+"
+***************************************************
+*                                                 *
+*            NCC-1701-D - ENTERPRISE            *
+*                                                 *
+*              *****                              *
+*      **********************                     *
+*      ***********************  _________         *
+*              *****        ***(___  ____(        *
+*                            ***** \\ \\*           *
+*                             **********          *
+*                                                 *
+*          You are currently on deck 3            *
+*                                                 *
+***************************************************
+"]).
+descriptionTest('Area1025',["Worf's Quarters","You're in Worf's quarters","A small table is sitting in the southeastern corner, and on it is a small potted plant","An impressive selection of Klingon weapons have been mounted on the northern wall, and a partition splits this room with Worf's bedroom to the east"]).
+descriptionTest('Area1026',["Enterprise Gym","You emerge into the Enterprise gym","The room is quite large, with a soft grey floor","A set of lockers against the southern wall contain all of the necessary equipment needed for using the gym","A thick stack of mats have been piled high in one corner, which can be used for different activities","Captain Picard likes to come here to practice his fencing"]).
+descriptionTest('Area1030',["A Corridor","You find yourself in the middle of a well lit corridor on the Enterprise","It isn't very wide, and the light beige walls have been rounded, making the corridor an oval shape"]).
+descriptionTest('Area1028',["Picard's Quarters","You find yourself standing by the door of Captain Picard's quarters","He isn't very fond of visitors, but you decide to stay and have a look around","You can see several different ancient artifacts on tables and small pedestals, and a large wooden wardrobe is facing south","A comfortable looking recliner with a matching footrest sits beside the door, along with a bright reading lamp and end table","Two large windows offer a great view of space","A small partition at the northern part of the room contains Picard's sleeping area"]).
+descriptionTest('Area1029',["Science Lab","You're in the Enterprise science lab","A strange looking machine sits in the middle of the room, up on a slightly raised platform","It looks as though something(or someone) could be placed inside, hooked up to the multitude of wires and cables, and have scientific tests performed on it(or them)","A complex looking computer console is facing this machine","Around the rest of the room are counterops with with the odd computer terminal"]).
+descriptionTest('Area1031',["Cargo Bay 2","You're in the cargo bay 2 of the Enterprise","It's quite a large room, with a very high ceiling and a lot of floor space","You can see several hundred plastic crates and barrels with the Starfleet insignia on them stacked right up to the ceiling"]).
+descriptionTest('Area1033',["Turbolift","You're in the turbolift","The turbolift walls have been rounded off, making it in the shape of a tube","Several vertical rows of lights make this place very well lit","From here, you can access the other decks on the Enterprise"]).
+descriptionTest('Area1034',["Turbolift","You're in the turbolift","The turbolift walls have been rounded off, making it in the shape of a tube","Several vertical rows of lights make this place very well lit","From here, you can access the other decks on the Enterprise"]).
+descriptionTest('Area1036',["Main Bridge - Upper Half","You find yourself on the upper half of the main bridge of the USS Enterprise","Directly in front of you is a thick railing that contains many different computer panels used for the tactical systems of the ship","The entire southern wall is covered with computer consoles, where the ship's main systems are controlled","Two small curved ramps on either side of the room lead north to the lower part of the bridge, and a large circular skylight shows the space outside the ship"]).
+descriptionTest('Area1035',["Picard's Ready Room","You're standing in Captain Picard's ready room","A long couch has been placed beside the door, while a large U shaped desk is located by the northern wall","A small computer screen is sitting on the desk, as well as several other papers and documents","A single high window beside the desk looks into space, and a fish tank is located in the northwestern corner of the room","This is where the Captain makes all of his important decisions"]).
+descriptionTest('Area1038',["Main Bridge - Lower Half","You find yourself on the lower half of the main bridge of the USS Enterprise","An enormous view screen covers almost the entire northern wall, and is currently displaying a view of the stars rushing by","Three large chairs in the northern part of the room, in front of the railing, face the screen","This is where the Captain, Commander Riker, and Counselor Troi sit","Two computer consoles with built in chairs rest about ten feet in front of the chairs, also facing the view screen","This is where the ship's pilot and information officer sit"]).
+descriptionTest('Area1037',["Conference Room","You're in the conference room of the Enterprise","A large glass rectangular table sits in the middle of the room, surrounded by about a dozen comfortable looking office chairs","The entire eastern wall is covered with windows, looking out into space","This is where the senior officers of the Enterprise meet and discuss important issues"]).
+descriptionTest('Area1040',["Outer Space","You're floating in outer space right above the USS Enterprise","You can see stars in every direction, which provide the only light here","You feel very cold"]).
+descriptionTest('Area1041',["Outer Space","You're floating in outer space right above the USS Enterprise","You can see stars in every direction, which provide the only light here","You feel very cold"]).
+
+
 % =================================================================
 % english2Kif
 % Contact: $Author: dmiles $@users.sourceforge.net ;
@@ -821,7 +1201,7 @@ clientEvent(Channel,Agent,english(phrase(Input,Codes), _)):-
 
 
 e2c(English):- english2Kif(English).
-e2c(English,CycLOut):- english2Kif(English,CycLOut).
+e2c(English,CycLOut):- english2Kif(English,CycLOut),!.
 
 english2Kif(Sentence):- noreorder, english2Kif(Sentence,Kif),fmt(Kif).
 
@@ -843,27 +1223,53 @@ english2Kif:-english2Kif('i am happy').
 % ===================================================================
    
 
-convertToWordage2(C,C).
-
+convertToWordage(Var,Var):-var(Var),!.
 convertToWordage([],['True']):-!.
-convertToWordage(Atom,C):-to_word_list(Atom,List),!,
-      idioms(chat,List,ListExpanded),!,
-      convertToWordage2(ListExpanded,C),!.
-      %isDebug(fmt('~q<br>',[C])),!.
+convertToWordage(Atom,C):- not(is_list(Atom)),!,
+   must_det(to_word_list(Atom,List)),
+   must_det(convertToWordage(List,C)),!.
 
-convertToWordage(Words,C):-is_list(Words),
-      removeRepeats(Words,NoRepeats),!,
-      convertToWordage(noRepeats(NoRepeats),C),!.
+convertToWordage(Words,C):- 
+      removeBlanks(Words,WordsO),
+  Words \= WordsO,!,
+   must_det(convertToWordage(WordsO,C)).
 
-convertToWordage(noRepeats(NoRepeats),Next):-!,
-      fdelete(NoRepeats,['Hm','hm','ah','uh','Uh','Um','um'],WordsNoIT),!,
+convertToWordage(Words,C):- fail,
+      must_det(idioms(e2c,Words,WordsO)), % was chat
+   Words \= WordsO,!,
+   must_det(convertToWordage(WordsO,C)).
+
+  
+convertToWordage(Words,C):-  fail,
+      removeRepeats(Words,WordsO),
+   Words \= WordsO,!,
+   must_det(convertToWordage(WordsO,C)).
+
+convertToWordage(Words,Next):-
+      fdelete(Words,['Hm','hm','ah','uh','Uh','Um','um'],WordsNoIT),!,
       vsubst(WordsNoIT,i,'I',Next),!.
-%e2c(English,CycLOut)   
+
+convertToWordage(O,O).
 
 removeRepeats(WordsNoIT,WordsNoITO):-
       removeRepeats1(WordsNoIT,M),
       removeRepeats2(M,WordsNoITO),!.
-     
+removeRepeats(WordsNoIT,WordsNoIT).
+
+removeBlanks([],[]):-!.
+removeBlanks([H|T],TT):- is_blankWord(H),!,removeBlanks(T,TT),!.
+removeBlanks([H|T],[H|TT]):- removeBlanks(T,TT),!.
+
+
+non_blankWord(Var):-var(Var),!,fail.
+non_blankWord(B):-is_blankWord(B),!,fail.
+non_blankWord(_).
+
+is_blankWord(Var):-var(Var),!,fail.
+is_blankWord('').
+is_blankWord('\n').
+is_blankWord([]).
+is_blankWord([A]):-!,is_blankWord(A).
 
 % ================================
 % local helpers
@@ -890,19 +1296,250 @@ wordageToKif(Symbol,Words,_Quest,Kif) :- not(memberchk(Symbol,[('.'),('?'),('!')
 wordageToKif(_Symbol,Words,_Quest,words(Words)).
 wordageToKif(_Symbol,Words,_Quest,posList(POSList,Words)):-get_pos_list(Words,POSList).
 
+% =================================================================
+% wordageToKif
+% =================================================================
+
+:-export(notPrefixOrSuffix/1).
+notPrefixOrSuffix(CycWord):- not(cyckb_t(isa, CycWord, 'LexicalPrefix')),not(cyckb_t(isa, CycWord, 'LexicalSuffix')).
+is_cycWord_chk(CycWord):- cyckb_t(isa,CycWord,'EnglishWord'),!.
+
+usefull_wordage(Var):-var(Var),!,fail.
+usefull_wordage(wordage(_,Props)):-!,usefull_wordage(Props).
+usefull_wordage([txt([_,_|_])]):-!,fail. 
+usefull_wordage(X):-member(form(_,_,_),X).
+
+
+get_wordage_list(Words,O):- dictionary(slang,B,A),stringToWords(B,Didnt),stringToWords(A,NewList),append_ci(Didnt,Rest,Words),append(NewList,Rest,Ws),Words\=Ws,!,get_wordage_list(Ws,O).
+
+
 get_wordage_list([],[]):-!.
-get_wordage_list(Words,[DCG|POSList]):- between(1,3,X),length(Pre,X),append(Pre,Rest,Words),get_wordage(Pre,DCG),get_wordage_list(Rest,POSList).
-get_wordage_list([W|Ords],[w(W)|POSList]):-get_wordage_list(Ords,POSList).
+% get_wordage_list(Words,O):- dictionary(contractions,Didnt,NewList), append_ci(Didnt,Rest,Words),append(NewList,Rest,Ws),Words\=Ws,!,get_wordage_list(Ws,O).
+get_wordage_list([W,'\'','nt'|Rest],O):- equals_icase(W,'do'), get_wordage_list([do,not|Rest],O).
+get_wordage_list([W,'\'','ve'|Rest],O):-get_wordage_list([W,have|Rest],O).
+get_wordage_list([W,'\'','re'|Rest],O):-get_wordage_list([W,are|Rest],O).
+get_wordage_list([W,'\'','nt'|Rest],O):-get_wordage_list([W,not|Rest],O).
+get_wordage_list([W,'\'','s'|Rest],O):-get_wordage_list([W,'appostrophyS'|Rest],O).
+% O'Brien
+get_wordage_list(['O','\'',Dell|Rest],[DCG|POSList]):-atom_concat('O\'',Dell,Pre),!,must_det((get_wordage([Pre],DCG),get_wordage_list(Rest,POSList))).
+get_wordage_list([Word,'s'|Rest],[DCG|POSList]):-atomic_list_concat([Word,'s'],'',Pre),get_wordage([Pre],DCG),usefull_wordage(DCG),!,get_wordage_list(Rest,POSList).
+get_wordage_list([Word,'\'',Contr|Rest],[DCG|POSList]):-atomic_list_concat([Word,'\'',Contr],'',Pre),get_wordage([Pre],DCG),usefull_wordage(DCG),!,get_wordage_list(Rest,POSList).
+get_wordage_list([W|Words],[DCG|POSList]):- parse_singularly(W),get_wordage([W],DCG),usefull_wordage(DCG),!,get_wordage_list(Words,POSList).
+get_wordage_list([W|Words],[DCG|POSList]):- not(parse_singularly(W)),member(X,[2,1,3]),length(Pre,X),append(Pre,Rest,[W|Words]),get_wordage(Pre,DCG),usefull_wordage(DCG),!,get_wordage_list(Rest,POSList).
+get_wordage_list([W|Words],[w(W)|POSList]):-get_wordage_list(Words,POSList).
 
-get_wordage(Pre,wordage(Pre,[txt(Pre)|Props])):- with_assertions(thlocal:useOnlyExternalDBs,setof(Prop,string_props(Pre,Prop),Props)).
+parse_singularly(W):-string(W),string_to_atom(W,A),!,parse_singularly(A).
+parse_singularly(W):-not(atom(W)),!.
+parse_singularly(W):-atom(W),atom_length(W,L),L<3.
 
-string_props(String,base(CycWord)):- 'baseForm'(CycWord,String).
-string_props(String,form(CycWord,Form)):-  meetsForm(String,CycWord,Form),notPrefixOrSuffix(CycWord).
-string_props(String,pos(CycWord,POS)):-  meetsPos(String,CycWord,POS),notPrefixOrSuffix(CycWord).
+has_wordage(String):-is_wordage_cache(String,_).
+is_wordage_prop(String,Prop):-is_wordage_cache(String, wordage(_,Props)),!,member(Prop,Props).
+is_wordage_prop(String,Prop):-is_wordage_cache(String,Props),!,member(Prop,Props).
 
-% string_props(String,cycl(Form)):-  meetsForm(String,CycWord,Form),notPrefixOrSuffix(CycWord).
+:-dynamic(is_wordage_cache/2).
+:-export(is_wordage_cache/2).
+get_wordage([of, the],_Props):-!,fail.
 
-notPrefixOrSuffix(CycWord):-not(cyckb_t([isa, CycWord, 'LexicalPrefix'])),not(cyckb_t([isa, CycWord, 'LexicalSuffix'])).
+get_wordage(A,Props):-atom(A),!,get_wordage([A],Props).
+get_wordage(Pre,Props):-is_wordage_cache(Pre,Props),!.
+get_wordage(Pre,Props):-do_get_wordage(Pre,Props),!,ignore((usefull_wordage(Props),asserta(is_wordage_cache(Pre,Props)))).
+do_get_wordage(Pre,wordage(Pre,More)):- 
+  must_det(( with_no_assertions(thlocal:omitCycWordForms,
+     with_no_assertions(thlocal:allowTT,
+        with_assertions(thlocal:useOnlyExternalDBs,(findall(Prop,string_props(1,Pre,Prop),UProps),get_more_props(Pre,UProps,More))))))).
+   
+
+
+get_more_props(_,Props,Props):- memberchk(form(_,_,_),Props),memberchk(pos(_,_,_),Props),!.
+get_more_props(Pre,Props,More):-
+ with_no_assertions(thlocal:omitCycWordForms,
+   with_assertions(thlocal:allowTT,
+     with_assertions(thlocal:useOnlyExternalDBs,((findall(Prop,string_props(2,Pre,Prop),UProps),
+      flatten([UProps,Props],UMore),list_to_set(UMore,More)))))).
+
+hard_words(X):-member(X,[
+tricorder,
+teleport,
+recieved,
+picard,
+located,
+incurred,
+ensigns,
+dilithium,
+betazoid,
+alexander,
+'READY-',
+'INVIS',
+'Enterprise\'s',
+worf,
+wimpy,
+vulcan,
+turbolift,
+synthehol,
+starfleet,
+somwhere,
+rozhenko,
+romulan,
+riker,
+phasors,
+phasers,
+phaser,
+mudMaxHitPoints,
+mudLevelOf,
+mudBareHandDamage,
+marketpace,
+managed,
+holodeck,
+geordi,
+ferengi,
+embedded,
+easils,
+damageSizeDice,
+damageNumberDice,
+chargeRemaining,
+chargeCapacity,
+bustling,
+burgandy,
+\,
++,
+***,
+********,
+********************,
+*********************,
+'|',
+'you\'ve',
+'worf\'s',
+'Worf',
+'WIMPY',
+'WeaponBlasting',
+'USS',
+'Turbolift',
+'Troi\'s',
+'Tricorder',
+'there\'s',
+'Synthehol',
+'Starfleet\'s',
+'ship\'s',
+'she\'s',
+'says:\n\n***************************************************\n',
+'riker\'s',
+'picard\'s',
+'Phaser',
+'people\'s',
+'NPC',
+'NOTRACK',
+'NOSUMMON',
+'NOSLEEP',
+'NOCHARM',
+'NOBLIND',
+'NOBASH',
+'NOBACKSTAB',
+'NCC',
+'Logged',
+'Lemonade\'Prune',
+'it\'s',
+'holodeck\'s',
+'Holodeck',
+'he\'s',
+'_______',
+'____/___',
+'___',
+'_/',
+'_',
+'\n***************************************************\n',
+'\n',
+'9d9',
+'8d8',
+'800',
+'5000',
+'4000',
+'3400',
+'2600',
+'20d20',
+'18d18',
+'1701',
+'1600',
+'1400',
+'12d12',
+'10d10',
+'-ENTER',
+'+mudToHitArmorClass0',
+'*\n**************************************************',
+'*\n***********************************************',
+'*\n',
+'***(_',
+'$PunchingSomething',
+'$LightingDevice',
+'"']).
+
+:-decl_mpred_hybrid(properNameStrings,2).
+properNames(['Geordi',
+'Guinan',
+'LaForge',
+'Troi',
+'Picard',
+'Rozhenko',
+'Riker',
+'O\'Brien',
+'Crusher',
+'Data',
+'CycLBot',
+'CycBot1',
+'CycBot',
+'Romulan',
+'Starfleet',
+'Klingon',
+'Ferengi']).
+
+:-export(list_wordage/0).
+
+list_wordage:- listing(is_wordage_cache),retractall(is_wordage_cache(_,_)).
+
+:-list_wordage.
+% string_props(Pass,String,posMeans(POS,Form,CycL)):-posMeans(String,POS,Form,CycL).
+string_props(Pass,String,tt(Pass,CycWord,Form)):- 
+ with_assertions(thlocal:omitCycWordForms, with_assertions(thlocal:allowTT,(meetsForm(String,CycWord,Form),atom(Form),atom_concat(infl,_,Form),notPrefixOrSuffix(CycWord)))).
+string_props(1,[Num],number(Num)):-number(Num).
+string_props(1,[Atom],number(Num)):-atom_number(Atom,Num).
+string_props(1,Text,txt(Text)).
+string_props(Pass,[Num],Props):-number(Num),atom_number(Atom,Num),!,string_props(Pass,[Atom],Props).
+string_props(2,String,base(CycWord)):- stringToCycWord(String,CycWord).
+string_props(2,[String],Props):-toLowercase(String,Lower),String\=Lower,string_props(3,[Lower],Props).
+string_props(Pass,String,form(Pass,CycWord,Form)):- Pass\=2, meetsForm(String,CycWord,Form),notPrefixOrSuffix(CycWord).
+string_props(Pass,String,pos(3,CycWord,POS)):- Pass\=2, meetsPos(String,CycWord,POS),notPrefixOrSuffix(CycWord).
+
+
+%string_props(Pass,[String],PredProps):-!,  is_speechPartPred_tt(Pred),cyckb_t(Pred,CycWord,String),pred_props(Pred,CycWord,PredProps).
+%string_props(Pass,String,PredProps):- is_speechPartPred_tt(Pred),cyckb_t(Pred,CycWord,String),pred_props(Pred,CycWord,PredProps).
+
+posName(POS):-member(POS,['Preposition','Verb','Conjunction','Determiner','Pronoun','Adjective','Noun','Adverb','Number','Punctuation','Quantifier','QuantifyingIndexical']).
+posAttrib(POS):-posName(POS).
+posAttrib(POS):-member(POS,['Untensed','Tensed','Aux','Be','Do']).
+posAttrib(POS):-posAttrib_lc(POS).
+
+posAttrib_lc(POS):-member(POS,['NonSingular','NonPlural','Expletive','ThirdPerson','NonThird','SecondPerson','FirstPerson','Mass','Agentive','Gerundive',
+                              'Nongradable','Gradable',
+                       'Singular','Present','Indicative','Participle','Universal','Infinitive','Generic','Superlative','Plural',
+                        'Indefinite','Past','Particle','WH','Denominal',
+                       'Simple','Count','Proper','Active','Passive','Unchecked','Object','Possessive','Feminine','Masculine','Neuter',
+                       'Reciprocal','Reflexive','SubjectOrObject','Subject','PasseSimple','Future']).
+
+posSubProp(SUB,POS):-member(SUB-POS,['firstPerson'-'Pronoun','Sg'-'Singular','Pl'-'Plural','gerund'-'Gerundive','3rd'-'ThirdPerson','1st'-'FirstPerson','2nd'-'SecondPerson', 'pn'-'Proper']).
+posSubProp(SUB,POS):-posAttrib_lc(POS),string_lower(POS,Low),string_to_atom(Low,SUB).
+
+pred_props(Compound,_,_):-compound(Compound),!,fail.
+pred_props(NI,_,_):- atom_contains(NI,'NameInitial'),!,fail.
+pred_props(_,Compound,_):-compound(Compound),!,fail.
+pred_props(_,'He-TheWord',_):-!,fail.
+pred_props(Pred,CycWord,form(2,CycWord,Pred)).
+pred_props(Pred,CycWord,pos(2,CycWord,POS)):-
+ posAttrib(POS),
+ atom_contains(Pred,POS).
+pred_props(Pred,CycWord,pos(3,CycWord,POS)):- posSubProp(SUB,POS),atom_contains(Pred,SUB),not(atom_contains(Pred,POS)).
+
+
+% string_props(Pass,String,cycl(Form)):-  meetsForm(String,CycWord,Form),notPrefixOrSuffix(CycWord).
+
 
 get_pos_list([],[]):-!.
 get_pos_list(Words,[DCG|POSList]):- between(1,3,X),length(Pre,X),append(Pre,Rest,Words),get_dcg(DCG,Pre),get_pos_list(Rest,POSList).
@@ -922,7 +1559,6 @@ is_dcg_pred(M,F,A,P):-A >= 2, functor(P,F,A),M:predicate_property(P,number_of_ru
 is_dcg_pred_pass2(M,F,A,P,B):- pred_contains_term('==',B,phrase).
 is_dcg_pred_pass2(M,F,A,P,B):- ((P=..[F|ARGS],append(_LDCG,[S,E],[F|ARGS]), S =@= [_|_], pred_contains_term('=@=',B, _=_ ))).
 :- style_check(+singleton).
-
 
 
 
@@ -1235,15 +1871,15 @@ proper_object(CycL) --> dcgStartsWith1(isPOS(DET)),{ cantStart(noun_phrase,DET),
 proper_object(CycL) --> theText([S,S2]),{poStr(CycL,[S,S2|String])},theText(String).
 proper_object(CycL) --> theText([String]),{poStr(CycL,[String])}.
 proper_object(multFn(Multiply,Collection)) --> [String],
-	 {'unitOfMeasurePrefixString'(Multiply, Prefix),
-	 words_concat(Prefix,Rest,String),!,phrase(collection(Collection),[Rest])}.
+	 {'unitOfMeasurePrefixString'(Multiply, Affix),
+	 words_concat(Affix,Rest,String),!,phrase(collection(Collection),[Rest])}.
 proper_object(CycL) --> pos_cycl(Noun,CycL), { goodStart(noun_phrase,Noun) } .
 
 
 poStr(CycL,String):- stringArg(String, poStr0(CycL,String)).
 poStr0(CycL,String):- strings_match,
       'genlPreds'(FirstName,nameString),
-       moo:cyckb_t([FirstName,CycL,String]).
+       moo:cyckb_t(FirstName,CycL,String).
 
 poStr0(CycL,String):- strings_match,
       'initialismString'(CycL,String);
@@ -1420,7 +2056,7 @@ verb_phrase(Subj,Event,'and_adverbal'(Event,AdvCycL,CycL))  -->
 
 % unknown phrase has arity CycL + object %TODO rename subject/3 to noun_phrase/3
 verb_phrase(Subj,Event,and_concat(CycL)) --> [Verb],
-	 {atom(Verb),((words_concat('',Verb,Predicate),cyckb_t(['arity',Predicate,N]));(cyckb_t(['arity',Verb,N]),Predicate=Verb)),!},
+	 {atom(Verb),((words_concat('',Verb,Predicate),cyckb_t('arity',Predicate,N));(cyckb_t('arity',Verb,N),Predicate=Verb)),!},
 	 verb_phrase_arity(N,Predicate,Subj,Event,CycL).
 
 % :-index(verb_phrase_arity(0,0,0,0,0,0,0)).
@@ -1445,7 +2081,7 @@ verb_phrase(Subj,Event,(CycL)) -->
 %	 best_subject(Obj,true,CycL),
  %        best_subject_constituant(Target,Event,CycL,CycLO),
 	 {cvtWordPosCycL(CycVerb,'Verb',Verb),
-	 (atom(Verb),(atom_concat('',Verb,Predicate),cyckb_t(['arity',Predicate,N]));(cyckb_t(['arity',Verb,N]),Predicate=Verb)),!},
+	 (atom(Verb),(atom_concat('',Verb,Predicate),cyckb_t('arity',Predicate,N));(cyckb_t('arity',Verb,N),Predicate=Verb)),!},
 	  verb_phrase_arity(N,Predicate,Subj,Event,CycL),{varnameIdea(String,Event)}.
 	 
 % gen phrase 1
@@ -1670,7 +2306,7 @@ frame_template('RegularAdjFrame',Subj,Result,Extras) -->noun_phrase(Subj,true,Ex
 
 removeRepeats1([],[]):-!.
 removeRepeats1([H|T],[HH|TT]):- stringToString(H,HH),!,removeRepeats1(T,TT).
-removeRepeats1([H,H1|Rest],Out):-toLowercase(H,H1),!,removeRepeats1([H|Rest],Out).
+removeRepeats1([H,H1|Rest],Out):-once(toLowercase(H,HL)),H1=HL,!,removeRepeats1([H|Rest],Out).
 removeRepeats1([H|Rest],[H|Out]):-removeRepeats1(Rest,Out).
 removeRepeats1(X,X).
 
@@ -3033,7 +3669,7 @@ adj_phrase(Subj,Formula) -->  [A],{phrase_meaning_adj([A],Subj,Formula)}.
 
 %'adjSemTrans'('Cloud-TheWord', 0, 'RegularAdjFrame', ['weather', ':NOUN', 'Cloudy']).
 phrase_meaning_adj(String,Subj,CycL):-
-	 pos(String,CycWord,Form,'Adjective'),      
+	 pos(String,CycWord,_Form,'Adjective'),      
 	 'adjSemTrans'(CycWord, _ , _ , Formula),
 	 Repl='CollectionOfFn'(Subj),
 	 %posMeans(String,'Verb',POS,WordMeaning),
@@ -3243,7 +3879,7 @@ verb_frame([is,a,subclass,of],CycWord,Arity,CycPred,['genls',':SUBJECT',':OBJECT
 verb_frame([is,a],CycWord,Arity,CycPred,['isa',':SUBJECT',':OBJECT']).
 
 verb_frame(VerbPhrase,CycWord,Arity,CycPred,Formula):-
-      pos(VerbPhrase,CycWord,Form,'Verb'),      
+      pos(VerbPhrase,CycWord,_Form,'Verb'),      
       'verbSemTrans'(CycWord, _ , 'TransitiveNPCompFrame', Formula),
       (contains_obliqe(Formula) -> Arity=3;Arity=2).
 

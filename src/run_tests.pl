@@ -12,7 +12,7 @@ moo:mud_test(test_movedist,
   test_name("now we are really somewhere"),
    test_true(req(atloc(P,_Somewhere))),
   test_name("in main engineering?"),
-   test_true(req(inRegion(P,'Area1000'))),
+   test_true(req(localityOfObject(P,'Area1000'))),
    test_name("set the move dist to 5 meters"),
    do_player_action('@set movedist 5'),
    test_name("going 5 meters"),
@@ -20,12 +20,12 @@ moo:mud_test(test_movedist,
    do_player_action('move e'),
    do_player_action('move n'),
    test_name("must be now be in corridor"),
-   test_true(req(inRegion(P,'Area1002'))),
+   test_true(req(localityOfObject(P,'Area1002'))),
    do_player_action('@set movedist 1'),
    call_n_times(5, do_player_action('s')),
    do_player_action('move s'),
    test_name("must be now be back in engineering"),
-   test_true(req(inRegion(P,'Area1000'))))).
+   test_true(req(localityOfObject(P,'Area1000'))))).
 
 moo:mud_test(drop_take,
   with_all_dmsg(((do_player_action('create food'),
@@ -63,8 +63,8 @@ defined_local_test:-
    test_true(must((findall(X,movedist(explorer(player1),X),L),length(L,1)))).
 
 defined_local_test:-
-   test_name("tests to see if we have: inRegion"),
-   test_true((foc_current_player(Agent),must_det((inRegion(Agent,Where))),dmsg(inRegion(Agent,Where)))).
+   test_name("tests to see if we have: localityOfObject"),
+   test_true((foc_current_player(Agent),must_det((localityOfObject(Agent,Where))),dmsg(localityOfObject(Agent,Where)))).
 
 defined_local_test:-
    test_name("tests to see if 'food' can be an item"),

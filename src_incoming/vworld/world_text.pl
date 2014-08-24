@@ -205,7 +205,7 @@ local_term_anglify_np_last(Obj,_,[the,noun,with,token,Obj]):-!.
 anglify_noun_known(Obj,FT,String):- formattype(FT),correctFormatType(assert(_),Obj,FT,String),!.
 anglify_noun_known(explorer(StringO),_Hint, [StringO]).
 anglify_noun_known(Obj,_Hint,[right,here]):- current_agent(Self),atloc(Self,Obj),!.
-anglify_noun_known(Obj,_Hint,[here]):- current_agent(Self),req(inRegion(Self,Obj)),!.
+anglify_noun_known(Obj,_Hint,[here]):- current_agent(Self),req(localityOfObject(Self,Obj)),!.
 anglify_noun_known(Obj,_Hint,StringO):- findall(String,holds_t(nameStrings,Obj,String),List),List\=[],sort_by_strlen(List,[StringO|_]),!.
 %anglify_noun_known(Obj,_Hint,String):-
 %nameStrings(X,Y,_,_)

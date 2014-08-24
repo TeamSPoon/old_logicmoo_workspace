@@ -36,7 +36,7 @@ predicates([
 % dynamic startrek
   nameStrings(term,string),
   pathName(region,dir,string),
-  inRegion(agent,'BPVLocation'),
+  localityOfObject(agent,'BPVLocation'),
   stowed(agent,'ProtectiveAttire'),
   stowed(agent,'Weapon'),
   stowed(agent,'PortableObject'),
@@ -253,49 +253,49 @@ item('ArtifactCol1025-Vulcan-Beer695').
 
  /* found 75 for item(_G1352). */ 
 
-/* Prediate:  inRegion/2 
+/* Prediate:  localityOfObject/2 
 interpreted.
 file('c:/development/opensim4opencog/bin/cynd/startrek/mudreader.pl').
 line_count(59).
 number_of_clauses(1).
-Pattern: inRegion(_G1375,_G1376). 
+Pattern: localityOfObject(_G1375,_G1376). 
  */
 /*
-inRegion('Area1005-Object666','Area1005').
-inRegion('Area1008-Object667','Area1008').
-inRegion('Area1013-Object668','Area1013').
-inRegion('Area1016-Object669','Area1016').
-inRegion('Area1024-Object670','Area1024').
+localityOfObject('Area1005-Object666','Area1005').
+localityOfObject('Area1008-Object667','Area1008').
+localityOfObject('Area1013-Object668','Area1013').
+localityOfObject('Area1016-Object669','Area1016').
+localityOfObject('Area1024-Object670','Area1024').
 */
-inRegion('NpcCol1013-Alexander671','Area1025').
-inRegion(vacuum(1),'Area1010').
-inRegion(explorer(player1),'Area1000').
-inRegion('NpcCol1003-Dr-Crusher677','Area1015').
-inRegion('NpcCol1000-Geordi684','Area1000').
-inRegion('NpcCol1007-Guinan689','Area1021').
-inRegion('NpcCol1008-OBrien696','Area1006').
-inRegion('NpcCol1006-Picard701','Area1035').
-inRegion('NpcCol1005-Riker707','Area1036').
-inRegion('NpcCol1004-Troi712','Area1007').
-inRegion('NpcCol1009-Wesley716','Area1016').
-inRegion('NpcCol1002-Worf720','Area1025').
-inRegion('NpcCol1010-Livingston726','Area1035').
-inRegion('NpcCol1011-Spot727','Area1003').
-inRegion('NpcCol1012-Ensign728','Area1000').
-inRegion('NpcCol1012-Ensign732','Area1004').
-inRegion('NpcCol1012-Ensign736','Area1011').
-inRegion('NpcCol1012-Ensign740','Area1020').
-inRegion('NpcCol1012-Ensign744','Area1024').
-inRegion('NpcCol1012-Ensign748','Area1022').
-inRegion('NpcCol1012-Ensign752','Area1036').
-inRegion('ArtifactCol1010-Dilithium-Crystal756','Area1000').
-inRegion('ArtifactCol1010-Dilithium-Crystal757','Area1000').
-inRegion('ArtifactCol1010-Dilithium-Crystal758','Area1000').
-inRegion('ArtifactCol1009-Tricorder759','Area1015').
-inRegion('ArtifactCol1009-Tricorder760','Area1015').
-inRegion('ArtifactCol1009-Tricorder761','Area1015').
+localityOfObject('NpcCol1013-Alexander671','Area1025').
+localityOfObject(vacuum(1),'Area1010').
+localityOfObject(explorer(player1),'Area1000').
+localityOfObject('NpcCol1003-Dr-Crusher677','Area1015').
+localityOfObject('NpcCol1000-Geordi684','Area1000').
+localityOfObject('NpcCol1007-Guinan689','Area1021').
+localityOfObject('NpcCol1008-OBrien696','Area1006').
+localityOfObject('NpcCol1006-Picard701','Area1035').
+localityOfObject('NpcCol1005-Riker707','Area1036').
+localityOfObject('NpcCol1004-Troi712','Area1007').
+localityOfObject('NpcCol1009-Wesley716','Area1016').
+localityOfObject('NpcCol1002-Worf720','Area1025').
+localityOfObject('NpcCol1010-Livingston726','Area1035').
+localityOfObject('NpcCol1011-Spot727','Area1003').
+localityOfObject('NpcCol1012-Ensign728','Area1000').
+localityOfObject('NpcCol1012-Ensign732','Area1004').
+localityOfObject('NpcCol1012-Ensign736','Area1011').
+localityOfObject('NpcCol1012-Ensign740','Area1020').
+localityOfObject('NpcCol1012-Ensign744','Area1024').
+localityOfObject('NpcCol1012-Ensign748','Area1022').
+localityOfObject('NpcCol1012-Ensign752','Area1036').
+localityOfObject('ArtifactCol1010-Dilithium-Crystal756','Area1000').
+localityOfObject('ArtifactCol1010-Dilithium-Crystal757','Area1000').
+localityOfObject('ArtifactCol1010-Dilithium-Crystal758','Area1000').
+localityOfObject('ArtifactCol1009-Tricorder759','Area1015').
+localityOfObject('ArtifactCol1009-Tricorder760','Area1015').
+localityOfObject('ArtifactCol1009-Tricorder761','Area1015').
 
- /* found 32 for inRegion(_G1375,_G1376). */ 
+ /* found 32 for localityOfObject(_G1375,_G1376). */ 
 
 /* Prediate:  region/1 
 interpreted.
@@ -497,7 +497,7 @@ somethingIsa('Area1037',['BPVLocation','Indoors-IsolatedFromOutside','SpaceInAHO
 somethingIsa('Area1040',['BPVLocation','FreeSpaceContent']).
 somethingIsa('Area1041',['BPVLocation','FreeSpaceContent']).
 somethingIsa('ShipMap123',[item]).
-inRegion('ShipMap123','Area1000').
+localityOfObject('ShipMap123','Area1000').
 verbOverride('ShipMap123',examine(this),
   prologCall(fmt("
 STARSHIP ENTERPRISE
@@ -1452,7 +1452,7 @@ substate_classes(physical_obj, P,
 
 substate_classes(agent, P,
        [
-        [inRegion(P,L)]
+        [localityOfObject(P,L)]
        ]).
 
 substate_classes(railv, V,
@@ -1746,44 +1746,44 @@ docs ready */
 
 % TESTS
 
-actorStartState(agent,X,[inRegion(X,Y)|List]):-agent(X),inRegion(X,Y),findall(stowed(X,P),stowed(X,P),List1),findall(wearing(X,P),wearing(X,P),List2),flatten([List1,List2],List).
+actorStartState(agent,X,[localityOfObject(X,Y)|List]):-agent(X),localityOfObject(X,Y),findall(stowed(X,P),stowed(X,P),List1),findall(wearing(X,P),wearing(X,P),List2),flatten([List1,List2],List).
 initialStart([ 
 
 /*
-inRegion('Area1005-Object666','Area1005').
-inRegion('Area1008-Object667','Area1008').
-inRegion('Area1013-Object668','Area1013').
-inRegion('Area1016-Object669','Area1016').
-inRegion('Area1024-Object670','Area1024').
-inRegion('ArtifactCol1010-Dilithium-Crystal756','Area1000').
-inRegion('ArtifactCol1010-Dilithium-Crystal757','Area1000').
-inRegion('ArtifactCol1010-Dilithium-Crystal758','Area1000').
-inRegion('ArtifactCol1009-Tricorder759','Area1015').
-inRegion('ArtifactCol1009-Tricorder760','Area1015').
-inRegion('ArtifactCol1009-Tricorder761','Area1015').
+localityOfObject('Area1005-Object666','Area1005').
+localityOfObject('Area1008-Object667','Area1008').
+localityOfObject('Area1013-Object668','Area1013').
+localityOfObject('Area1016-Object669','Area1016').
+localityOfObject('Area1024-Object670','Area1024').
+localityOfObject('ArtifactCol1010-Dilithium-Crystal756','Area1000').
+localityOfObject('ArtifactCol1010-Dilithium-Crystal757','Area1000').
+localityOfObject('ArtifactCol1010-Dilithium-Crystal758','Area1000').
+localityOfObject('ArtifactCol1009-Tricorder759','Area1015').
+localityOfObject('ArtifactCol1009-Tricorder760','Area1015').
+localityOfObject('ArtifactCol1009-Tricorder761','Area1015').
 */
 %% printAll(actorStartState(agent,X,List),ss(agent,X,List)).
-   ss(agent,'NpcCol1000-Geordi684',[inRegion('NpcCol1000-Geordi684','Area1000'),wearing('NpcCol1000-Geordi684','ArtifactCol1005-Boots685'),wearing('NpcCol1000-Geordi684','ArtifactCol1006-Comm-Badge686'),wearing('NpcCol1000-Geordi684','ArtifactCol1003-Gold-Uniform687'),wearing('NpcCol1000-Geordi684','ArtifactCol1008-VISOR688')]),
-   ss(agent,vacuum(1),[inRegion(vacuum(1),'Area1010'),stowed(vacuum(1),'ArtifactCol1000-Phaser676'),wearing(vacuum(1),'ArtifactCol1005-Boots673'),wearing(vacuum(1),'ArtifactCol1006-Comm-Badge674'),wearing(vacuum(1),'ArtifactCol1003-Gold-Uniform675')]),
-   ss(agent,explorer(player1),[inRegion(explorer(player1),'Area1000'),stowed(explorer(player1),'ArtifactCol1000-Phaser776'),wearing(explorer(player1),'ArtifactCol1005-Boots773'),wearing(explorer(player1),'ArtifactCol1006-Comm-Badge774'),wearing(explorer(player1),'ArtifactCol1003-Gold-Uniform775')]),
-   ss(agent,'NpcCol1002-Worf720',[inRegion('NpcCol1002-Worf720','Area1025'),stowed('NpcCol1002-Worf720','ArtifactCol1000-Phaser724'),wearing('NpcCol1002-Worf720','ArtifactCol1005-Boots721'),wearing('NpcCol1002-Worf720','ArtifactCol1006-Comm-Badge722'),wearing('NpcCol1002-Worf720','ArtifactCol1003-Gold-Uniform723'),wearing('NpcCol1002-Worf720','ArtifactCol1007-Sash725')]),
-   ss(agent,'NpcCol1003-Dr-Crusher677',[inRegion('NpcCol1003-Dr-Crusher677','Area1015'),stowed('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder681'),stowed('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder682'),stowed('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder683'),wearing('NpcCol1003-Dr-Crusher677','ArtifactCol1005-Boots678'),wearing('NpcCol1003-Dr-Crusher677','ArtifactCol1006-Comm-Badge679'),wearing('NpcCol1003-Dr-Crusher677','ArtifactCol1004-Blue-Uniform680')]),
-   ss(agent,'NpcCol1004-Troi712',[inRegion('NpcCol1004-Troi712','Area1007'),wearing('NpcCol1004-Troi712','ArtifactCol1005-Boots713'),wearing('NpcCol1004-Troi712','ArtifactCol1006-Comm-Badge714'),wearing('NpcCol1004-Troi712','ArtifactCol1004-Blue-Uniform715')]),
-   ss(agent,'NpcCol1005-Riker707',[inRegion('NpcCol1005-Riker707','Area1036'),stowed('NpcCol1005-Riker707','ArtifactCol1012-Trombone711'),wearing('NpcCol1005-Riker707','ArtifactCol1005-Boots708'),wearing('NpcCol1005-Riker707','ArtifactCol1006-Comm-Badge709'),wearing('NpcCol1005-Riker707','ArtifactCol1002-Red-Uniform710')]),
-   ss(agent,'NpcCol1006-Picard701',[inRegion('NpcCol1006-Picard701','Area1035'),stowed('NpcCol1006-Picard701','ArtifactCol1001-5-Phaser-Rifle705'),stowed('NpcCol1006-Picard701','ArtifactCol1011-5-Picards-Flute706'),wearing('NpcCol1006-Picard701','ArtifactCol1005-Boots702'),wearing('NpcCol1006-Picard701','ArtifactCol1006-Comm-Badge703'),wearing('NpcCol1006-Picard701','ArtifactCol1002-Red-Uniform704')]),
-   ss(agent,'NpcCol1007-Guinan689',[inRegion('NpcCol1007-Guinan689','Area1021'),stowed('NpcCol1007-Guinan689','ArtifactCol1020-Tea690'),stowed('NpcCol1007-Guinan689','ArtifactCol1021-Synthehol691'),stowed('NpcCol1007-Guinan689','ArtifactCol1022-Ferengi-Ale692'),stowed('NpcCol1007-Guinan689','ArtifactCol1023-Romulan-Whisky693'),stowed('NpcCol1007-Guinan689','ArtifactCol1024-Lemonade-Prune-Juice694'),stowed('NpcCol1007-Guinan689','ArtifactCol1025-Vulcan-Beer695')]),
-   ss(agent,'NpcCol1008-OBrien696',[inRegion('NpcCol1008-OBrien696','Area1006'),stowed('NpcCol1008-OBrien696','ArtifactCol1000-Phaser700'),wearing('NpcCol1008-OBrien696','ArtifactCol1005-Boots697'),wearing('NpcCol1008-OBrien696','ArtifactCol1006-Comm-Badge698'),wearing('NpcCol1008-OBrien696','ArtifactCol1003-Gold-Uniform699')]),
-   ss(agent,'NpcCol1009-Wesley716',[inRegion('NpcCol1009-Wesley716','Area1016'),wearing('NpcCol1009-Wesley716','ArtifactCol1005-Boots717'),wearing('NpcCol1009-Wesley716','ArtifactCol1006-Comm-Badge718'),wearing('NpcCol1009-Wesley716','ArtifactCol1002-Red-Uniform719')]),
-   ss(agent,'NpcCol1010-Livingston726',[inRegion('NpcCol1010-Livingston726','Area1035')]),
-   ss(agent,'NpcCol1011-Spot727',[inRegion('NpcCol1011-Spot727','Area1003')]),
-   ss(agent,'NpcCol1012-Ensign728',[inRegion('NpcCol1012-Ensign728','Area1000'),wearing('NpcCol1012-Ensign728','ArtifactCol1005-Boots729'),wearing('NpcCol1012-Ensign728','ArtifactCol1006-Comm-Badge730'),wearing('NpcCol1012-Ensign728','ArtifactCol1003-Gold-Uniform731')]),
-   ss(agent,'NpcCol1012-Ensign732',[inRegion('NpcCol1012-Ensign732','Area1004'),wearing('NpcCol1012-Ensign732','ArtifactCol1005-Boots733'),wearing('NpcCol1012-Ensign732','ArtifactCol1006-Comm-Badge734'),wearing('NpcCol1012-Ensign732','ArtifactCol1003-Gold-Uniform735')]),
-   ss(agent,'NpcCol1012-Ensign736',[inRegion('NpcCol1012-Ensign736','Area1011'),wearing('NpcCol1012-Ensign736','ArtifactCol1005-Boots737'),wearing('NpcCol1012-Ensign736','ArtifactCol1006-Comm-Badge738'),wearing('NpcCol1012-Ensign736','ArtifactCol1002-Red-Uniform739')]),
-   ss(agent,'NpcCol1012-Ensign740',[inRegion('NpcCol1012-Ensign740','Area1020'),wearing('NpcCol1012-Ensign740','ArtifactCol1005-Boots741'),wearing('NpcCol1012-Ensign740','ArtifactCol1006-Comm-Badge742'),wearing('NpcCol1012-Ensign740','ArtifactCol1002-Red-Uniform743')]),
-   ss(agent,'NpcCol1012-Ensign744',[inRegion('NpcCol1012-Ensign744','Area1024'),wearing('NpcCol1012-Ensign744','ArtifactCol1005-Boots745'),wearing('NpcCol1012-Ensign744','ArtifactCol1006-Comm-Badge746'),wearing('NpcCol1012-Ensign744','ArtifactCol1004-Blue-Uniform747')]),
-   ss(agent,'NpcCol1012-Ensign748',[inRegion('NpcCol1012-Ensign748','Area1022'),wearing('NpcCol1012-Ensign748','ArtifactCol1005-Boots749'),wearing('NpcCol1012-Ensign748','ArtifactCol1006-Comm-Badge750'),wearing('NpcCol1012-Ensign748','ArtifactCol1004-Blue-Uniform751')]),
-   ss(agent,'NpcCol1012-Ensign752',[inRegion('NpcCol1012-Ensign752','Area1036'),wearing('NpcCol1012-Ensign752','ArtifactCol1005-Boots753'),wearing('NpcCol1012-Ensign752','ArtifactCol1006-Comm-Badge754'),wearing('NpcCol1012-Ensign752','ArtifactCol1004-Blue-Uniform755')]),
-   ss(agent,'NpcCol1013-Alexander671',[inRegion('NpcCol1013-Alexander671','Area1025')])
+   ss(agent,'NpcCol1000-Geordi684',[localityOfObject('NpcCol1000-Geordi684','Area1000'),wearing('NpcCol1000-Geordi684','ArtifactCol1005-Boots685'),wearing('NpcCol1000-Geordi684','ArtifactCol1006-Comm-Badge686'),wearing('NpcCol1000-Geordi684','ArtifactCol1003-Gold-Uniform687'),wearing('NpcCol1000-Geordi684','ArtifactCol1008-VISOR688')]),
+   ss(agent,vacuum(1),[localityOfObject(vacuum(1),'Area1010'),stowed(vacuum(1),'ArtifactCol1000-Phaser676'),wearing(vacuum(1),'ArtifactCol1005-Boots673'),wearing(vacuum(1),'ArtifactCol1006-Comm-Badge674'),wearing(vacuum(1),'ArtifactCol1003-Gold-Uniform675')]),
+   ss(agent,explorer(player1),[localityOfObject(explorer(player1),'Area1000'),stowed(explorer(player1),'ArtifactCol1000-Phaser776'),wearing(explorer(player1),'ArtifactCol1005-Boots773'),wearing(explorer(player1),'ArtifactCol1006-Comm-Badge774'),wearing(explorer(player1),'ArtifactCol1003-Gold-Uniform775')]),
+   ss(agent,'NpcCol1002-Worf720',[localityOfObject('NpcCol1002-Worf720','Area1025'),stowed('NpcCol1002-Worf720','ArtifactCol1000-Phaser724'),wearing('NpcCol1002-Worf720','ArtifactCol1005-Boots721'),wearing('NpcCol1002-Worf720','ArtifactCol1006-Comm-Badge722'),wearing('NpcCol1002-Worf720','ArtifactCol1003-Gold-Uniform723'),wearing('NpcCol1002-Worf720','ArtifactCol1007-Sash725')]),
+   ss(agent,'NpcCol1003-Dr-Crusher677',[localityOfObject('NpcCol1003-Dr-Crusher677','Area1015'),stowed('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder681'),stowed('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder682'),stowed('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder683'),wearing('NpcCol1003-Dr-Crusher677','ArtifactCol1005-Boots678'),wearing('NpcCol1003-Dr-Crusher677','ArtifactCol1006-Comm-Badge679'),wearing('NpcCol1003-Dr-Crusher677','ArtifactCol1004-Blue-Uniform680')]),
+   ss(agent,'NpcCol1004-Troi712',[localityOfObject('NpcCol1004-Troi712','Area1007'),wearing('NpcCol1004-Troi712','ArtifactCol1005-Boots713'),wearing('NpcCol1004-Troi712','ArtifactCol1006-Comm-Badge714'),wearing('NpcCol1004-Troi712','ArtifactCol1004-Blue-Uniform715')]),
+   ss(agent,'NpcCol1005-Riker707',[localityOfObject('NpcCol1005-Riker707','Area1036'),stowed('NpcCol1005-Riker707','ArtifactCol1012-Trombone711'),wearing('NpcCol1005-Riker707','ArtifactCol1005-Boots708'),wearing('NpcCol1005-Riker707','ArtifactCol1006-Comm-Badge709'),wearing('NpcCol1005-Riker707','ArtifactCol1002-Red-Uniform710')]),
+   ss(agent,'NpcCol1006-Picard701',[localityOfObject('NpcCol1006-Picard701','Area1035'),stowed('NpcCol1006-Picard701','ArtifactCol1001-5-Phaser-Rifle705'),stowed('NpcCol1006-Picard701','ArtifactCol1011-5-Picards-Flute706'),wearing('NpcCol1006-Picard701','ArtifactCol1005-Boots702'),wearing('NpcCol1006-Picard701','ArtifactCol1006-Comm-Badge703'),wearing('NpcCol1006-Picard701','ArtifactCol1002-Red-Uniform704')]),
+   ss(agent,'NpcCol1007-Guinan689',[localityOfObject('NpcCol1007-Guinan689','Area1021'),stowed('NpcCol1007-Guinan689','ArtifactCol1020-Tea690'),stowed('NpcCol1007-Guinan689','ArtifactCol1021-Synthehol691'),stowed('NpcCol1007-Guinan689','ArtifactCol1022-Ferengi-Ale692'),stowed('NpcCol1007-Guinan689','ArtifactCol1023-Romulan-Whisky693'),stowed('NpcCol1007-Guinan689','ArtifactCol1024-Lemonade-Prune-Juice694'),stowed('NpcCol1007-Guinan689','ArtifactCol1025-Vulcan-Beer695')]),
+   ss(agent,'NpcCol1008-OBrien696',[localityOfObject('NpcCol1008-OBrien696','Area1006'),stowed('NpcCol1008-OBrien696','ArtifactCol1000-Phaser700'),wearing('NpcCol1008-OBrien696','ArtifactCol1005-Boots697'),wearing('NpcCol1008-OBrien696','ArtifactCol1006-Comm-Badge698'),wearing('NpcCol1008-OBrien696','ArtifactCol1003-Gold-Uniform699')]),
+   ss(agent,'NpcCol1009-Wesley716',[localityOfObject('NpcCol1009-Wesley716','Area1016'),wearing('NpcCol1009-Wesley716','ArtifactCol1005-Boots717'),wearing('NpcCol1009-Wesley716','ArtifactCol1006-Comm-Badge718'),wearing('NpcCol1009-Wesley716','ArtifactCol1002-Red-Uniform719')]),
+   ss(agent,'NpcCol1010-Livingston726',[localityOfObject('NpcCol1010-Livingston726','Area1035')]),
+   ss(agent,'NpcCol1011-Spot727',[localityOfObject('NpcCol1011-Spot727','Area1003')]),
+   ss(agent,'NpcCol1012-Ensign728',[localityOfObject('NpcCol1012-Ensign728','Area1000'),wearing('NpcCol1012-Ensign728','ArtifactCol1005-Boots729'),wearing('NpcCol1012-Ensign728','ArtifactCol1006-Comm-Badge730'),wearing('NpcCol1012-Ensign728','ArtifactCol1003-Gold-Uniform731')]),
+   ss(agent,'NpcCol1012-Ensign732',[localityOfObject('NpcCol1012-Ensign732','Area1004'),wearing('NpcCol1012-Ensign732','ArtifactCol1005-Boots733'),wearing('NpcCol1012-Ensign732','ArtifactCol1006-Comm-Badge734'),wearing('NpcCol1012-Ensign732','ArtifactCol1003-Gold-Uniform735')]),
+   ss(agent,'NpcCol1012-Ensign736',[localityOfObject('NpcCol1012-Ensign736','Area1011'),wearing('NpcCol1012-Ensign736','ArtifactCol1005-Boots737'),wearing('NpcCol1012-Ensign736','ArtifactCol1006-Comm-Badge738'),wearing('NpcCol1012-Ensign736','ArtifactCol1002-Red-Uniform739')]),
+   ss(agent,'NpcCol1012-Ensign740',[localityOfObject('NpcCol1012-Ensign740','Area1020'),wearing('NpcCol1012-Ensign740','ArtifactCol1005-Boots741'),wearing('NpcCol1012-Ensign740','ArtifactCol1006-Comm-Badge742'),wearing('NpcCol1012-Ensign740','ArtifactCol1002-Red-Uniform743')]),
+   ss(agent,'NpcCol1012-Ensign744',[localityOfObject('NpcCol1012-Ensign744','Area1024'),wearing('NpcCol1012-Ensign744','ArtifactCol1005-Boots745'),wearing('NpcCol1012-Ensign744','ArtifactCol1006-Comm-Badge746'),wearing('NpcCol1012-Ensign744','ArtifactCol1004-Blue-Uniform747')]),
+   ss(agent,'NpcCol1012-Ensign748',[localityOfObject('NpcCol1012-Ensign748','Area1022'),wearing('NpcCol1012-Ensign748','ArtifactCol1005-Boots749'),wearing('NpcCol1012-Ensign748','ArtifactCol1006-Comm-Badge750'),wearing('NpcCol1012-Ensign748','ArtifactCol1004-Blue-Uniform751')]),
+   ss(agent,'NpcCol1012-Ensign752',[localityOfObject('NpcCol1012-Ensign752','Area1036'),wearing('NpcCol1012-Ensign752','ArtifactCol1005-Boots753'),wearing('NpcCol1012-Ensign752','ArtifactCol1006-Comm-Badge754'),wearing('NpcCol1012-Ensign752','ArtifactCol1004-Blue-Uniform755')]),
+   ss(agent,'NpcCol1013-Alexander671',[localityOfObject('NpcCol1013-Alexander671','Area1025')])
    ]).
 
 

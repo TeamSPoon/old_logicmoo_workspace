@@ -52,6 +52,8 @@ when_debugging(_,_).
 :- decl_thlocal thlocal:useOnlyExternalDBs/0.
 :- decl_thlocal with_callMPred/1.
 :- decl_thlocal skip_db_op_hooks/0.
+:- decl_thlocal thlocal:in_dynamic_reader/1.
+
 
 :- dynamic_multifile_exported hybrid_rule/2.
 
@@ -228,7 +230,7 @@ coerce(What,_Type,NewThing):-NewThing = What.
    agent/1, agent_doing/2, agent_done/2, charge/2,damage/2, atloc/2, failure/2, grid/4, isa/2, item/1, 
   memory/2,  pathName/3, possess/2,  region/1, score/2, stm/2,   facing/2,
    % type/1,
-   inRegion/2,
+   localityOfObject/2,
    
   thinking/1,   wearing/2, 
   %str/2,
@@ -323,7 +325,7 @@ chargeRemaining/2,
       str/2,
       wearing/2)).
 
-:-multifile inRegion/2.
+:-multifile localityOfObject/2.
 /*
 
 dbase_mod(moo).
@@ -1066,8 +1068,9 @@ forall_setof(ForEach,Call):-
    list_to_set(ForEachAll,Set),!,
    ignore(forall(member(ForEach,Set),Call)).
 
-:-dynamic_multifile_exported((moo:was_imported_kb_content/1)).
+:-dynamic_multifile_exported((moo:was_imported_kb_content/2)).
 
+:-decl_mpred_prolog(moo:was_imported_kb_content/2).
 
 is_clause_moo_special((Head :- Body)):-!, is_clause_moo_special(Head,Body).
 is_clause_moo_special(C):- is_clause_moo_special(C,true).
@@ -1244,13 +1247,34 @@ special_head(_,F):-mpred_prop(F,prologOnly),!,fail.
 special_head(_,F):-mpred_prop(F,prologHybrid).
 special_head(_,F):-mpred_prop(F,hasStub(_)).
 
+:-export(thlocal:in_dynamic_reader/1).
+
+:-export(begin_dynamic_reader/0).
+begin_dynamic_reader:-  dynamic_multifile_exported((moo:was_imported_kb_content/2)),
+  !. %  must_det(( prolog_load_context(file,Source),asserta(thlocal:in_dynamic_reader(Source)))).
+:-export(end_dynamic_reader/0).
+end_dynamic_reader:-  
+  !. % must_det(( prolog_load_context(file,Source),retract(thlocal:in_dynamic_reader(Source)))).
+
+:-export(inside_dynamic_reader/0).
+inside_dynamic_reader :- prolog_load_context(file,Source),test_tl(thlocal:in_dynamic_reader(Source)),!.
+inside_dynamic_reader :- prolog_load_context(source,Source),test_tl(thlocal:in_dynamic_reader(Source)),!.
+
+user:term_expansion(CL,moo:was_imported_kb_content(inside_dynamic_reader,CL)):- not((get_functor(CL,F),F=was_imported_kb_content)),not(test_tl(into_form_code)),
+ % ==== why we assert
+   not(is_clause_moo_special(CL)),inside_dynamic_reader,
+% ==== do it
+   dmsg(assertz_inside_dynamic_reader(CL)),ignore(is_compiling_sourcecode),with_assertions(thlocal:adding_from_srcfile,must_det(game_assert(CL))),!.
+
+user:term_expansion(CL,moo:was_imported_kb_content(is_clause_moo_special,CL)):- not((get_functor(CL,F),F=was_imported_kb_content)), not(test_tl(into_form_code)),
+% ==== why we assert
+   is_clause_moo_special(CL),  not(inside_dynamic_reader), 
+% ==== do it
+   dmsg(assertz_is_clause_moo_special(CL)),ignore(is_compiling_sourcecode),with_assertions(thlocal:adding_from_srcfile,must_det(game_assert(CL))),!.
 
 user:term_expansion((H:-B),Out):- fail,test_tl(enable_src_loop_checking),
    with_assertions(thlocal:adding_from_srcfile,
     once((once(make_body_clause(H,B,NewBody)),(B \= NewBody),!,dmsg(thlocal:enable_src_loop_checking((H:-NewBody)))))),Out=(H:-NewBody).
-
-user:term_expansion(CL,moo:was_imported_kb_content(CL)):- not(test_tl(into_form_code)), is_clause_moo_special(CL), 
-  dmsg(assertz_local_game_clause(CL)),ignore(is_compiling_sourcecode),with_assertions(thlocal:adding_from_srcfile,must_det(game_assert(CL))),!.
 
 % load_motel:- defrole([],time_state,restr(time,period)).
 % :-load_motel.

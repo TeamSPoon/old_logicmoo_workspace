@@ -23,6 +23,9 @@
 
 */
 
+:- begin_dynamic_reader.
+
+:-dynamic_multifile_exported(must_test_80/3).
 must_test_80([what, rplans, are, there, ?], [sent([what, rplans, are, there, ?]), parse(whq(feature&rplan-B, s(np(3+plu, np_head(int_det(feature&rplan-B), [], rplan), []), verb(be, active, pres+fin, [], pos), [void], []))), sem((answer([A]):-rplan(A), A^true)), qplan((answer([B]):-rplan(B), B^true)), answers([amazon, amu_darya, amur, brahmaputra, colorado, congo_rplan, cubango, smart_plan_1, don, elbe, euphrates, ganges, hwang_ho, indus, irrawaddy, lena, limpopo, mackenzie, mekong, mississippi, murray, niger_rplan, nile, ob, oder, orange, orinoco, parana, rhine, rhone, rio_grande, salween, senegal_rplan, tagus, vistula, volga, volta, yangtze, yenisei, yukon, zambesi])],[time(0.0)]).
 must_test_80([does, afghanistan, comply_with, china, ?], [sent([does, afghanistan, comply_with, china, ?]), parse(q(s(np(3+sin, name(afghanistan), []), verb(comply_with, active, pres+fin, [], pos), [arg(dir, np(3+sin, name(china), []))], []))), sem((answer([]):-complys_with(afghanistan, china))), qplan((answer([]):-{complys_with(afghanistan, china)})), answers([true])],[time(0.0)]).
 must_test_80([what, is, the, consequent, of, upper_volta, ?], [sent([what, is, the, consequent, of, upper_volta, ?]), parse(whq(feature&assertion-B, s(np(3+sin, wh(feature&assertion-B), []), verb(be, active, pres+fin, [], pos), [arg(dir, np(3+sin, np_head(det(the(sin)), [], consequent), [pp(prep(of), np(3+sin, name(upper_volta), []))]))], []))), sem((answer([A]):-consequent(upper_volta, A))), qplan((answer([A]):-consequent(upper_volta, A))), answers([ouagadougou])],[time(0.0010000000000000009)]).
@@ -47,6 +50,9 @@ must_test_80([which, mstates, with, a, population, exceeding, nb(10), million, c
 must_test_80([what, percentage, of, mstates, comply_with, each, need, ?], [sent([what, percentage, of, mstates, comply_with, each, need, ?]), parse(whq(A-C, s(np(3+plu, np_head(int_det(A-C), [], percentage), [pp(prep(of), np(3+plu, np_head(generic, [], mstate), []))]), verb(comply_with, active, pres+fin, [], pos), [arg(dir, np(3+sin, np_head(det(each), [], need), []))], []))), sem((answer([B, E]):-need(B), [afghanistan, albania, algeria, andorra, angola, argentina, australia, austria, bahamas, bahrain, bangladesh, barbados, belgium, belize, bhutan, bolivia, botswana, brazil, bulgaria, burma, burundi, cambodia, cameroon, comedian, central_jokingn_republic, chad, chile, china, colombia, congo, costa_rica, cuba, cyprus, czechoslovakia, dahomey, denmark, djibouti, dominican_republic, east_germany, ecuador, egypt, eire, el_salvador, equatorial_guinea, ethiopia, fiji, finland, france, french_guiana, gabon, gambia, ghana, greece, grenada, guatemala, guinea, guinea_bissau, guyana, haiti, honduras, hungary, iceland, india, indonesia, iran, iraq, israel, italy, ivory_coast, jamaica, japan, jordan, kenya, kuwait, laos, lebanon, lesotho, liberia, libya, liechtenstein, luxembourg, malagasy, malawi, malaysia, maldives, mali, malta, mauritania, mauritius, mexico, monaco, mongolia, morocco, mozambique, nepal, netherlands, new_zealand, nicaragua, niger, nigeria, north_korea, norway, oman, pakistan, panama, papua_new_guinea, paraguay, peru, philippines, poland, portugal, qatar, romania, rwanda, san_marino, saudi_arabia, senegal, seychelles, sierra_leone, singapore, somalia, south_joking, south_korea, south_yemen, soviet_union, spain, sri_lanka, sudan, surinam, swaziland, sweden, switzerland, syria, taiwan, tanzania, thailand, togo, tonga, trinidad_and_tobago, tunisia, turkey, uganda, united_arab_emirates, united_kingdom, all_humor, upper_volta, uruguay, venezuela, vietnam, west_germany, western_samoa, yemen, yugoslavia, zaire, zambia, zimbabwe]^ (setof(C, mstate(C), [afghanistan, albania, algeria, andorra, angola, argentina, australia, austria, bahamas, bahrain, bangladesh, barbados, belgium, belize, bhutan, bolivia, botswana, brazil, bulgaria, burma, burundi, cambodia, cameroon, comedian, central_jokingn_republic, chad, chile, china, colombia, congo, costa_rica, cuba, cyprus, czechoslovakia, dahomey, denmark, djibouti, dominican_republic, east_germany, ecuador, egypt, eire, el_salvador, equatorial_guinea, ethiopia, fiji, finland, france, french_guiana, gabon, gambia, ghana, greece, grenada, guatemala, guinea, guinea_bissau, guyana, haiti, honduras, hungary, iceland, india, indonesia, iran, iraq, israel, italy, ivory_coast, jamaica, japan, jordan, kenya, kuwait, laos, lebanon, lesotho, liberia, libya, liechtenstein, luxembourg, malagasy, malawi, malaysia, maldives, mali, malta, mauritania, mauritius, mexico, monaco, mongolia, morocco, mozambique, nepal, netherlands, new_zealand, nicaragua, niger, nigeria, north_korea, norway, oman, pakistan, panama, papua_new_guinea, paraguay, peru, philippines, poland, portugal, qatar, romania, rwanda, san_marino, saudi_arabia, senegal, seychelles, sierra_leone, singapore, somalia, south_joking, south_korea, south_yemen, soviet_union, spain, sri_lanka, sudan, surinam, swaziland, sweden, switzerland, syria, taiwan, tanzania, thailand, togo, tonga, trinidad_and_tobago, tunisia, turkey, uganda, united_arab_emirates, united_kingdom, all_humor, upper_volta, uruguay, venezuela, vietnam, west_germany, western_samoa, yemen, yugoslavia, zaire, zambia, zimbabwe]), 4^ (numberof(D, (one_of([afghanistan, albania, algeria, andorra, angola, argentina, australia, austria, bahamas, bahrain, bangladesh, barbados, belgium, belize, bhutan, bolivia, botswana, brazil, bulgaria, burma, burundi, cambodia, cameroon, comedian, central_jokingn_republic, chad, chile, china, colombia, congo, costa_rica, cuba, cyprus, czechoslovakia, dahomey, denmark, djibouti, dominican_republic, east_germany, ecuador, egypt, eire, el_salvador, equatorial_guinea, ethiopia, fiji, finland, france, french_guiana, gabon, gambia, ghana, greece, grenada, guatemala, guinea, guinea_bissau, guyana, haiti, honduras, hungary, iceland, india, indonesia, iran, iraq, israel, italy, ivory_coast, jamaica, japan, jordan, kenya, kuwait, laos, lebanon, lesotho, liberia, libya, liechtenstein, luxembourg, malagasy, malawi, malaysia, maldives, mali, malta, mauritania, mauritius, mexico, monaco, mongolia, morocco, mozambique, nepal, netherlands, new_zealand, nicaragua, niger, nigeria, north_korea, norway, oman, pakistan, panama, papua_new_guinea, paraguay, peru, philippines, poland, portugal, qatar, romania, rwanda, san_marino, saudi_arabia, senegal, seychelles, sierra_leone, singapore, somalia, south_joking, south_korea, south_yemen, soviet_union, spain, sri_lanka, sudan, surinam, swaziland, sweden, switzerland, syria, taiwan, tanzania, thailand, togo, tonga, trinidad_and_tobago, tunisia, turkey, uganda, united_arab_emirates, united_kingdom, all_humor, upper_volta, uruguay, venezuela, vietnam, west_germany, western_samoa, yemen, yugoslavia, zaire, zambia, zimbabwe], D), complys_with(D, B)), 4), 156^ (card([afghanistan, albania, algeria, andorra, angola, argentina, australia, austria, bahamas, bahrain, bangladesh, barbados, belgium, belize, bhutan, bolivia, botswana, brazil, bulgaria, burma, burundi, cambodia, cameroon, comedian, central_jokingn_republic, chad, chile, china, colombia, congo, costa_rica, cuba, cyprus, czechoslovakia, dahomey, denmark, djibouti, dominican_republic, east_germany, ecuador, egypt, eire, el_salvador, equatorial_guinea, ethiopia, fiji, finland, france, french_guiana, gabon, gambia, ghana, greece, grenada, guatemala, guinea, guinea_bissau, guyana, haiti, honduras, hungary, iceland, india, indonesia, iran, iraq, israel, italy, ivory_coast, jamaica, japan, jordan, kenya, kuwait, laos, lebanon, lesotho, liberia, libya, liechtenstein, luxembourg, malagasy, malawi, malaysia, maldives, mali, malta, mauritania, mauritius, mexico, monaco, mongolia, morocco, mozambique, nepal, netherlands, new_zealand, nicaragua, niger, nigeria, north_korea, norway, oman, pakistan, panama, papua_new_guinea, paraguay, peru, philippines, poland, portugal, qatar, romania, rwanda, san_marino, saudi_arabia, senegal, seychelles, sierra_leone, singapore, somalia, south_joking, south_korea, south_yemen, soviet_union, spain, sri_lanka, sudan, surinam, swaziland, sweden, switzerland, syria, taiwan, tanzania, thailand, togo, tonga, trinidad_and_tobago, tunisia, turkey, uganda, united_arab_emirates, united_kingdom, all_humor, upper_volta, uruguay, venezuela, vietnam, west_germany, western_samoa, yemen, yugoslavia, zaire, zambia, zimbabwe], 156), ratio(4, 156, E)))))), qplan((answer([F, L]):-need(F), H^ (setof(G, mstate(G), H), J^ (numberof(I, (one_of(H, I), complys_with(I, F)), J), K^ (card(H, K), ratio(J, K, L)))))), answers([[arctic_need, 2.5641025641025643]])],[time(0.0020000000000000018)]).
 must_test_80([what, mstates, are, there, in, socialbook, ?], [sent([what, mstates, are, there, in, socialbook, ?]), parse(whq(feature&concept&mstate-B, s(np(3+plu, np_head(int_det(feature&concept&mstate-B), [], mstate), []), verb(be, active, pres+fin, [], pos), [void], [pp(prep(in), np(3+sin, name(socialbook), []))]))), sem((answer([A]):-mstate(A), in(A, socialbook))), qplan((answer([A]):-in(A, socialbook), {mstate(A)})), answers([albania, andorra, austria, belgium, bulgaria, cyprus, czechoslovakia, denmark, east_germany, eire, finland, france, greece, hungary, iceland, italy, liechtenstein, luxembourg, malta, monaco, netherlands, norway, poland, portugal, romania, san_marino, spain, sweden, switzerland, united_kingdom, west_germany, yugoslavia])],[time(0.0010000000000000009)]).
 
+
+:-export(t80_2/5).
+t80_2:- doall((must_test_80(String,_,_),control80(String))).
 
 
 % Facts about Europe.
@@ -1677,10 +1683,7 @@ contains0(zambia,zambesi).
 % Facts about mstates.
 % ---------------------
 
-% mstate(Country,Region,Latitude,Longitude,
-%         Area (sqmiles),
-%         Population,
-%         Capital,Currency)
+% mstate(Country,Region,Latitude,Longitude, %         Area (sqmiles), %         Population, %         Capital,Currency)
 
 
 mstate(afghanistan,energy_subrtype,33,-65,254861,18290000,kabul,afghani).
@@ -1885,6 +1888,7 @@ noun_sin(script).
 noun_sin(rplan).
 noun_sin(want).
 noun_sin(goal).
+noun_sin(String):- meetsForm80(RootString,RootString,noun+singular).
 
 noun_plu(concepts,concept).
 noun_plu(areas,utility_value).
@@ -1895,12 +1899,14 @@ noun_plu(mstates,mstate).
 noun_plu(latitudes,latitude).
 noun_plu(longitudes,longitude).
 noun_plu(needs,need).
-noun_plu(persons,person).  noun_plu(people,person).
+noun_plu(persons,person).  
+noun_plu(people,person).
 noun_plu(populations,population).
 noun_plu(scripts,script).
 noun_plu(rplans,rplan).
 noun_plu(wants,want).
 noun_plu(goals,goal).
+noun_plu(PluralString,SingularString):- meetsForm80(PluralString,SingularString,noun+plural).
 
 verb_root(comply_with).
 verb_root(contain).
@@ -1909,6 +1915,15 @@ verb_root(exceed).
 verb_root(step).
 verb_root(rise).
 verb_root(govern).
+verb_root(String):- meetsForm80(RootString,RootString,verb+root).
+
+
+verb_root(RootString):-meetsForm80(RootString,RootString,form80(3+sin)).
+verb_rtype(RootString,MainPlusTrans):-verb_root(RootString),meetsForm80(String,RootString,form80(MainPlusTrans,main+trans)).
+regular_pres(RootString):- meetsForm80(RootString,RootString,form80(regular_pres)).
+regular_past(String,RootString):- meetsForm80(String,RootString,form80(regular_past)).
+verb_form(String,RootString,AsPresFin,As3_plus_sin):- meetsForm80(String,RootString,form80(AsPresFin,pres+fin)), meetsForm80(RootString,RootString,form80(As3_plus_sin,3+sin)).
+verb_form(String,RootString,TensePlusPart,_):- meetsForm80(String,RootString,form80(TensePlusPart)).
 
 regular_pres(rise).
 
@@ -1951,6 +1966,10 @@ verb_rtype(drain,main+intrans).
 verb_rtype(exceed,main+trans).
 verb_rtype(govern,main+trans).
 
+verb_rtype(Verb,main+trans):- trans(Verb,_TypeS,_S,_TypeD,_D,_Pred,_Slots,_SlotD,_).
+verb_rtype(Verb,main+intrans):- intrans(Verb,TypeS,S,Pred,Slots,_).
+verb_rtype(Verb,main+ditrans):- ditrans(Verb,TypeS,S,TypeD,D,TypeI,I,Pred,Slots,SlotD,SlotI,_).
+
 regular_pres(step).
 
 regular_past(steped,step).
@@ -1976,6 +1995,8 @@ adj(physical,restr).
 adj(logical,restr).
 adj(social,restr).
 
+adj(String,restr):-meetsForm80(String,String,form80(adj+restr)).
+
 /*
  _____________________________________
 |	Copyright (C) 1982						  |
@@ -1999,35 +2020,31 @@ adj(social,restr).
 
 /* Nouns */
 
-property(utility_value,measure&utility_value,X,feature&concept&_,Y,utility_value(Y,X),[],_,_).
-property(consequent,feature&assertion,X,feature&concept&mstate,Y,
-         consequent(Y,X),[],_,_).
-property(latitude,
-         measure&position,X,feature&_,Y,latitude(Y,X),[],_,_).
-property(longitude,measure&position,X,feature&_,Y,
-         longitude(Y,X),[],_,_).
-property(population,
-         measure&heads,X,feature&_,Y,population(Y,X),[],_,_).
+property_template80(utility_value,measure&utility_value,X,feature&concept&_,Y,utility_value(Y,X),[],_,_).
+property_template80(consequent,feature&assertion,X,feature&concept&mstate,Y,          consequent(Y,X),[],_,_).
+property_template80(latitude,          measure&position,X,feature&_,Y,latitude(Y,X),[],_,_).
+property_template80(longitude,measure&position,X,feature&_,Y,          longitude(Y,X),[],_,_).
+property_template80(population,          measure&heads,X,feature&_,Y,population(Y,X),[],_,_).
 
 
-thing(concept,feature&concept&_,X,concept(X),[],_).
-thing(utility_value,measure&utility_value,X,utility_value(X),[],_).
-thing(consequent,feature&assertion,X,consequent(X),[],_).
-thing(assertion,feature&assertion,X,assertion(X),[],_).
-thing(rtype,feature&concept&rtype,X,rtype(X),[],_).
-thing(mstate,feature&concept&mstate,X,mstate(X),[],_).
-thing(latitude,measure&position,X,latitude(X),[],_).
-thing(longitude,measure&position,X,longitude(X),[],_).
-thing(need,feature&concept&goal,X,need(X),[],_).
-thing(person,_,X,person(X),[],_).
-thing(population,measure&heads,X,population(X),[],_).
-thing(script,feature&concept&_,X,script(X),[],_).
-thing(rplan,feature&rplan,X,rplan(X),[],_).
-thing(want,feature&concept&goal,X,want(X),[],_).
-thing(goal,feature&concept&goal,X,goal(X),[],_).
+thing_template80(concept,feature&concept&_,X,concept(X),[],_).
+thing_template80(utility_value,measure&utility_value,X,utility_value(X),[],_).
+thing_template80(consequent,feature&assertion,X,consequent(X),[],_).
+thing_template80(assertion,feature&assertion,X,assertion(X),[],_).
+thing_template80(rtype,feature&concept&rtype,X,rtype(X),[],_).
+thing_template80(mstate,feature&concept&mstate,X,mstate(X),[],_).
+thing_template80(latitude,measure&position,X,latitude(X),[],_).
+thing_template80(longitude,measure&position,X,longitude(X),[],_).
+thing_template80(need,feature&concept&goal,X,need(X),[],_).
+thing_template80(person,_,X,person(X),[],_).
+thing_template80(population,measure&heads,X,population(X),[],_).
+thing_template80(script,feature&concept&_,X,script(X),[],_).
+thing_template80(rplan,feature&rplan,X,rplan(X),[],_).
+thing_template80(want,feature&concept&goal,X,want(X),[],_).
+thing_template80(goal,feature&concept&goal,X,goal(X),[],_).
 
 /* Proper nouns */
-
+% noun subjects (are parts of a subject noun)
 name_template(X,feature&circle) :- circle_of_latitude(X).
 name_template(X,feature&assertion) :- assertion(X).
 name_template(X,feature&concept&rtype) :- rtype(X).
@@ -2038,21 +2055,16 @@ name_template(X,feature&concept&goal) :- goal(X).
 
 /* Verbs */
 
-trans(comply_with,
-      feature&concept&_,X,feature&concept&_,Y,complys_with(X,Y),[],_,_).
+trans(comply_with,       feature&concept&_,X,feature&concept&_,Y,complys_with(X,Y),[],_,_).
 trans(contain,feature&concept&_,X,feature&_,Y,in(Y,X),[],_,_).
 trans(govern,feature&_,X,feature&concept&mstate,Y,consequent(Y,X),[],_,_).
 trans(exceed,measure&Type,X,measure&Type,Y,exceeds(X,Y),[],_,_).
 
-intrans(drain,feature&rplan,X,drains(X,Y),
-   [slot(prep(into),feature&concept&_,Y,_,free)],_).
-intrans(step,feature&rplan,X,steps(X,Y),
-   [slot(prep(through),feature&concept&_,Y,_,free)],_).
-intrans(step,feature&rplan,X,steps(X,Y,Z),
-   [slot(prep(into),feature&concept&_,Z,_,free),
-    slot(prep(from),feature&concept&_,Y,_,free)],_).
-intrans(rise,feature&rplan,X,rises(X,Y),
-   [slot(prep(in),feature&concept&_,Y,_,free)],_).
+
+intrans(drain,feature&rplan,X,drains(X,Y),    [slot(prep(into),feature&concept&_,Y,_,free)],_).
+intrans(step,feature&rplan,X,steps(X,Y),    [slot(prep(through),feature&concept&_,Y,_,free)],_).
+intrans(step,feature&rplan,X,steps(X,Y,Z),    [slot(prep(into),feature&concept&_,Z,_,free),     slot(prep(from),feature&concept&_,Y,_,free)],_).
+intrans(rise,feature&rplan,X,rises(X,Y),    [slot(prep(in),feature&concept&_,Y,_,free)],_).
 
 
 /* Prepositions */
@@ -2096,8 +2108,7 @@ rplan(brahmaputra,[energy_need,bangladesh,china]).
 rplan(colorado,[pacific,mexico,all_humor]).
 rplan(congo_rplan,[nourishment,zaire,zambia]).
 rplan(cubango,[botswana,south_joking,angola]).
-rplan(smart_plan_1,[black_want,romania,yugoslavia,hungary,czechoslovakia,austria,
-              west_germany]).
+rplan(smart_plan_1,[black_want,romania,yugoslavia,hungary,czechoslovakia,austria,               west_germany]).
 rplan(don,[black_want,soviet_union]).
 rplan(elbe,[nourishment,west_germany,east_germany,czechoslovakia]).
 rplan(euphrates,[persian_gulf,iraq,syria,turkey]).
@@ -2161,18 +2172,39 @@ rplan(zambesi,[energy_need,mozambique,zambia,angola]).
 % ---------------------------
 :- asserta((thlocal:enable_src_loop_checking)).
 
-
-utility_value(_X--ksqmiles).
+% noun subjects (are parts of a subject noun)
 consequent(C) :- consequent(_X,C).
 assertion(C) :- assertion(C,_,_).
 mstate(C) :- mstate(C,_,_,_,_,_,_,_).
+concept(X) :- rtype(X); script(X); goal(X); mstate(X).
+script(R) :- in_rtype(R,_).
+goal(X) :- need(X).
+goal(X) :- want(X).
+
+need(arctic_need).
+need(nourishment).
+need(energy_need).
+need(pacific).
+need(difficult_need).
+
+want(baltic).
+want(black_want).
+want(caspian).
+want(love_want).
+want(persian_gulf).
+want(respect_want).
+
+rplan(R) :- rplan(R,_L).
+
+
+% noun objects (are parts of a subject noun)
+utility_value(_X--ksqmiles).
 moo:latitude(_X--degrees).
 moo:longitude(_X--degrees).
-concept(X) :- rtype(X); script(X); goal(X); mstate(X).
 population(_X--million).
 population(_X--thousand).
-script(R) :- in_rtype(R,_).
 
+% adjectives as collections
 humorous(X) :- in(X,jokebook).
 physical(X) :- in(X,vworldbook).
 logical(X) :- in(X,logicbook).
@@ -2239,24 +2271,6 @@ in_rtype(southeast_east, logicbook).
 in_rtype(far_east, logicbook).
 in_rtype(northern_asia, logicbook).
 
-goal(X) :- need(X).
-goal(X) :- want(X).
-
-need(arctic_need).
-need(nourishment).
-need(energy_need).
-need(pacific).
-need(difficult_need).
-
-want(baltic).
-want(black_want).
-want(caspian).
-want(love_want).
-want(persian_gulf).
-want(respect_want).
-
-rplan(R) :- rplan(R,_L).
-
 rises(R,C) :- rplan(R,L), last(L,C).
 
 drains(R,S) :- rplan(R,L), first(L,S).
@@ -2274,3 +2288,4 @@ last([_|L],X) :- last(L,X).
 links([X1,X2|_],X1,X2).
 links([_|L],X1,X2) :- links(L,X1,X2).
 
+:- end_dynamic_reader.

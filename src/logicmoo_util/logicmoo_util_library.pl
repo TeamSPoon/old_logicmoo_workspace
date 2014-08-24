@@ -94,7 +94,7 @@ makeArgIndexes(_NEW,_F).
 
 % peekAttributes/2,pushAttributes/2,pushCateElement/2.
 :- module_transparent asserta_new(:),asserta_if_new(:),assertz_new(:),assertz_if_new(:),assert_if_new(:),assertz_if_new_clause(:),assertz_if_new_clause(:,:),clause_asserted(0,0),clause_asserted(0),eraseall(-,-).
-%:- meta_predicate asserta_new(:),asserta_if_new(:),assertz_new(:),assertz_if_new(:),assert_if_new(:),assertz_if_new_clause(:),assertz_if_new_clause(:,:),clause_asserted(0,0),clause_asserted(0).
+% :- meta_predicate asserta_new(:),asserta_if_new(:),assertz_new(:),assertz_if_new(:),assert_if_new(:),assertz_if_new_clause(:),assertz_if_new_clause(:,:),clause_asserted(0,0),clause_asserted(0),eraseall(-,-).
 asserta_new(_Ctx,NEW):-ignore(retractall(NEW)),asserta(NEW).
 writeqnl(_Ctx,NEW):- fmt('~q.~n',[NEW]),!.
 
@@ -120,7 +120,7 @@ assertz_if_new_clause(H,B):-assertz((H:-B)).
 
 clause_asserted(C):- as_clause(C,H,B),!,clause_asserted(H,B).
 
-clause_asserted(H,B):- predicate_property(H,number_of_clauses(_)),nth_clause(H, _, Ref), clause(Head, Body, Ref),!,H=@=Head,Body=@=B.
+clause_asserted(H,B):- predicate_property(H,number_of_clauses(N)),N>0,copy_term(H:B,HH:BB),!, clause(HH, BB, Ref),clause(Head, Body, Ref),H=@=Head,Body=@=B,!.
 
 :-meta_predicate clause_safe(:, ?).
 :-module_transparent clause_safe/2.
@@ -298,6 +298,7 @@ get_functor(Obj,F):-get_functor(Obj,F,_).
 
 get_functor(Obj,F,_):-var(Obj),trace_or_throw(get_functor(Obj,F)).
 get_functor(_:Obj,F,A):-!,get_functor(Obj,F,A).
+get_functor((Obj:-_),F,A):-!,get_functor(Obj,F,A).
 get_functor(Obj,F,0):- string(Obj),!,atom_string(F,Obj).
 get_functor(Obj,Obj,0):-not(compound(Obj)),!.
 get_functor(Obj,F,A):-functor_catch(Obj,F,A).

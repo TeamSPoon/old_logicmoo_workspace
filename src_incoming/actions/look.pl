@@ -79,7 +79,7 @@ call_look_proc(Agent,LOC):-
          events=deliverable_location_events(Agent,LOC,value),
          path(D) = pathBetween_call(region,D,value),
          pathName(D) = pathName(region,D,value),
-         inRegion(value,region),       
+         localityOfObject(value,region),       
          facing(Agent,value),
          get_feet(Agent,value),
          get_near(Agent,value),

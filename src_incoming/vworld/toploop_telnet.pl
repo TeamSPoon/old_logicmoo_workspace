@@ -58,11 +58,13 @@ run_player_telnet(P) :-
       get_session_id(O),
       retractall(thlocal:wants_logout(P)),
       must(thlocal:repl_writer(P,_)),!,
+    with_no_assertions(thglobal:use_cyc_database,
+     with_no_assertions(thlocal:useOnlyExternalDBs, 
       with_assertions(thlocal:session_agent(O,P),
        ((repeat,
         once(read_and_do_telnet(P)), 
       retract(thlocal:wants_logout(P)),
-        retractall(agent_message_stream(P,_,_))))).
+        retractall(agent_message_stream(P,_,_))))))).
 
 
 ensure_player_stream_local(P,Input,Output):-
@@ -99,8 +101,8 @@ scan_updates:- ignore((thread_self(main),ignore((catch(make,E,dmsg(E)))))).
 hook:decl_database_hook(Type,C):- current_agent(Agent),interesting_to_player(Type,Agent,C).
 
 interesting_to_player(Type,Agent,C):-not(not(contains_term(C,Agent))),dmsg(agent_database_hook(Type,C)),!.
-interesting_to_player(Type,Agent,C):-inRegion(Agent,Region),not(not(contains_term(C,Region))),dmsg(region_database_hook(Type,C)),!.
-interesting_to_player(Type,Agent,C):-inRegion(Agent,Region),inRegion(Other,Region),not(not(contains_term(C,Other))),!,dmsg(other_database_hook(Type,C)),!.
+interesting_to_player(Type,Agent,C):-localityOfObject(Agent,Region),not(not(contains_term(C,Region))),dmsg(region_database_hook(Type,C)),!.
+interesting_to_player(Type,Agent,C):-localityOfObject(Agent,Region),localityOfObject(Other,Region),not(not(contains_term(C,Other))),!,dmsg(other_database_hook(Type,C)),!.
 
 % ===========================================================
 % USES PACKRAT PARSER 

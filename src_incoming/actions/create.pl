@@ -22,7 +22,7 @@
 rez_to_inventory(Agent,NameOrType,NewName):-   
    create_meta(NameOrType,Clz,item,NewName),
    padd(Agent,stowed(NewName)),
-   show_call(add(isa(NewName,Clz))),
+   add(isa(NewName,Clz)),
    padd(NewName,authorWas(rez_to_inventory(Agent,NameOrType,NewName))),
    add_missing_instance_defaults(NewName).
 

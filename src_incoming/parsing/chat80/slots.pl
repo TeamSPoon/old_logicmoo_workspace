@@ -288,12 +288,12 @@ inverse(X,+,X).
 
 noun_template(Noun,TypeV,V,'`'(P),
       [slot(poss,TypeO,O,Os,index)|Slots]) :-
-   property(Noun,TypeV,V,TypeO,O,P,Slots,Os,_).
+   property_template80(Noun,TypeV,V,TypeO,O,P,Slots,Os,_).
 noun_template(Noun,TypeV,V,aggr(F,V,[],'`'(true),'`'(true)),
    [slot(prep(of),TypeS,_,_,free)]) :-
    aggr_noun(Noun,TypeV,TypeS,F).
 noun_template(Noun,Type,X,'`'(P),Slots) :-
-   thing(Noun,Type,X,P,Slots,_).
+   thing_template80(Noun,Type,X,P,Slots,_).
 noun_template(Noun,TypeV,V,apply(F,P),
       [slot(prep(of),TypeX,X,_,apply)]) :-
    meta_noun(Noun,TypeV,V,TypeX,X,P,F).

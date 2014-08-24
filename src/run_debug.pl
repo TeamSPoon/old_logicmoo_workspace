@@ -47,7 +47,7 @@ debug80:-
 
 
 % debug_e2c:- with_assertions(thglobal:use_cyc_database,(module(parser_e2c),cache_the_posms,prolog_repl)).
-debug_e2c:- with_assertions(thglobal:use_cyc_database,'@'((cache_the_posms,prolog_repl),'parser_e2c').
+debug_e2c:- with_assertions(thglobal:use_cyc_database,'@'((cache_the_posms,prolog_repl),'parser_e2c')).
 
 % [Optional] Interactively debug E2C
 :- debug_e2c.
@@ -90,7 +90,7 @@ now_run_local_tests_dbg :- doall(defined_local_test).
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
 :-do_player_action("look").
 
-:-forall(inRegion(O,L),dmsg(inRegion(O,L))).
+:-forall(localityOfObject(O,L),dmsg(localityOfObject(O,L))).
 
 % :-forall(atloc(O,L),dmsg(atloc(O,L))).
 

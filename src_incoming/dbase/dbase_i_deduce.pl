@@ -32,8 +32,8 @@ run_deduce_facts_from_lc(Type,Fact):-doall((call_no_cuts(hook:deduce_facts(Fact,
 hook:decl_database_hook(assert(_),atloc(R,W)):- isa(R,region),trace_or_throw(atloc(R,W)).
 
 
-hook:deduce_facts(inRegion(_,Region),isa(Region,region)).
-hook:deduce_facts(inRegion(Obj,_),isa(Obj,obj)).
+hook:deduce_facts(localityOfObject(_,Region),isa(Region,region)).
+hook:deduce_facts(localityOfObject(Obj,_),isa(Obj,obj)).
 
 hook:deduce_facts(Fact,mpred_prop(AF,[argsIsaInList(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],argsIsaProps(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,
                 ArgTs=..[AF|ARGS],!,must_det(ground(ARGS)).

@@ -1697,9 +1697,10 @@ call_no_cuts_0(C):-call(C).
 
 :- dynamic(call_tabled_list/2).
 
-:- meta_predicate_transparent(make_key(*,-)).
-make_key(CC,CC):- notrace(ground(CC)->Key=CC ;(copy_term(CC,Key),numbervars(Key,'$VAR',0,_))),!.
+:- meta_predicate_transparent(make_key(^,-)).
+make_key(CC,KeyA):- notrace(ground(CC)->Key=CC ;(copy_term(CC,Key),numbervars(Key,'$VAR',0,_))),!,KeyA=Key. % ,term_to_atom(Key,KeyA).
 
+expire_tabled_list(all):-!,retractall(call_tabled_list(_,_)).
 expire_tabled_list(T):- atoms_of(T,A1), CT= call_tabled_list(Key,List),doall(((CT,once(any_term_overlap_atoms_of(A1,List);(not(member(Key,List)),any_term_overlap_atoms_of(A1,Key))),retractall(CT)))).
 
 any_term_overlap_atoms_of(A1,T2):-atoms_of(T2,A2),!,member(A,A1),member(A,A2),!.

@@ -179,11 +179,17 @@ toLowercase(MiXed,CASED):-compound(MiXed),MiXed=..MList,toLowercase(MList,UList)
 toLowercase(A,A).
 
 toPropercase(VAR,VAR):-var(VAR),!.
+toPropercase(Left,VAR):-nonvar(VAR),!,toPropercase(Left,New),!,VAR=New.
 toPropercase([],[]):-!.
-toPropercase([CX|Y],[D3|YY]):-!,toPropercase(CX,D3),toPropercase(Y,YY).
-toPropercase(D3,DD3):-atom(D3),camelSplitters(V),concat_atom([L,I|ST],V,D3),toPropercase([L,I|ST],LIST2),toPropercase(V,VV),concat_atom(LIST2,VV,DD3).
-toPropercase(CX,Y):-atom(CX),name(CX,[S|SS]),char_type(S,to_lower(NA)),name(NA,[N]),name(Y,[N|SS]),!.
+toPropercase([CX|Y],[D3|YY]):- must_det(toPropercase(CX,D3)),must_det(toPropercase(Y,YY)).
 toPropercase(MiXed,UPPER):-compound(MiXed),MiXed=..MList,toPropercase(MList,UList),!,UPPER=..UList.
+toPropercase(D3,D3):-not(atom(D3)),!.
+toPropercase('',''):-!.
+toPropercase(A,U):-atom_length(A,1),toUppercase(A,U),!.
+toPropercase('_','_'):-!.
+toPropercase('_','-'):-!.
+toPropercase(D3,DD3):- camelSplitters(V),concat_atom([L,I|ST],V,D3),L \='',I \='',toPropercase([L,I|ST],LIST2),toPropercase(V,VV),concat_atom(LIST2,VV,DD3),!.
+toPropercase(CX,Y):- name(CX,[S|SS]),char_type(S,to_lower(NA)),name(NA,[N]),name(Y,[N|SS]),!.
 toPropercase(A,A).
 
 
@@ -366,7 +372,7 @@ vars_to_ucase_0([N=V|Vars],List):-
    ignore(N=V),
    vars_to_ucase_0(Vars,List).
 
-atomSplit(In,List):- hotrace(( ground(In),
+atomSplit(In,List):- fail,hotrace(( ground(In),
  any_to_string(In,String),atom_string(Atom,String),splt_words(Atom,List,Vars),vars_to_ucase(Vars,List))),!.
 
 atomSplit(Atom,WordsO):-atomSplitEasy(Atom,WordsO),!.
@@ -437,12 +443,38 @@ member_ci(W,WL):-to_word_list(WL,ListI),member(LL2,ListI),string_equal_ci(LL2,W)
 string_ci(A,LIC):-var(A),!,A=LIC.
 string_ci(A,LIC):-hotrace((any_to_string(A,S),non_empty(A),text_to_string(S,SS),string_lower(SS,SL),atomics_to_string(SLIC,"_",SL),atomics_to_string(SLIC," ",LIC))),!.
 
-append_ci([],L1,L2):-string_equal_ci(L1,L2),!.
-append_ci([H1|T],L2,[H2|L3]) :- string_equal_ci(H1,H2),append_ci(T,L2,L3).
+:-export(append_ci/3).
+append_ci(A1,A2,A3):-to_word_list(A1,L1),to_word_list(A2,L2),to_word_list(A3,L3),!, append_ci0(L1,L2,L3),!.
 
-string_equal_ci(L0,L0):-!.
-string_equal_ci(L0,L1):- once(string_ci(L0,SL0)),string_ci(L1,SL1),!,SL0=SL1.
+append_ci0([],L1,L2):-string_equal_ci(L1,L2),!.
+append_ci0(L,L2,R):-divide_list(L,H1,L1),divide_list(R,H2,L3),string_equal_ci(H1,H2),!,append_ci0(L1,L2,L3).
 
+divide_list(L,L0,LT):-is_list(L),!,length(L,X),X1 is X-1,between(1,X1,RS),length(LT,RS),append(L0,LT,L).
+divide_list(L,L0,LT):-append(L0,LT,L).
+
+string_equal_ci(L0,L1):- to_word_list(L0,WL0),to_word_list(L1,WL1),!,string_equal_ci0(WL0,WL1),!.
+
+string_equal_ci0([],_):-!,fail.
+string_equal_ci0(_,[]):-!,fail.
+string_equal_ci0(L0,R0):-string_equal_ci1(L0,R0),!.
+string_equal_ci0(L,R):-divide_list(L,L0,LT),divide_list(R,R0,RT),string_equal_ci1(L0,R0),!,string_equal_ci0(LT,RT).
+
+string_equal_ci1(A0,A0):-!.
+string_equal_ci1([],_):-!,fail.
+string_equal_ci1(_,[]):-!,fail.
+string_equal_ci1(A0,B0):-as_nc_str(A0,AR),as_nc_str(B0,BR), AR = BR.
+
+
+as_nc_str([A0,'\'',B0],AS):-atomic_list_concat([A0,'\'',B0],'',AO),as_nc_str(AO,AS).
+as_nc_str([A0,'\'',B0],AS):-as_nc_str([A0,B0],AS).
+as_nc_str([A0,Ommitable,B0],AS):- once(ommitable(Ommitable)), as_nc_str([A0,B0],AS).
+as_nc_str([Ommitable,B0],AS):- once(ommitable(Ommitable)), as_nc_str([B0],AS).
+as_nc_str([A0,B0],AS):-atom_concat(A0,B0,AO),as_nc_str(AO,AS).
+as_nc_str(A0,AS):-any_to_string(A0,AS).
+% as_nc_str(A0,A0).
+
+ommitable(O):-is_empty_string(O).
+ommitable(O):-string_to_atom(O,A),atom_length(A,L),!,L<2.
 
 atom_subst(A,F,R,K):-replace_in_string(F,R,A,K),!.
 

@@ -135,6 +135,7 @@ call_after_game_load(Code):- call_after_next(moo:after_game_load,Code).
 
 hook:into_assertable_form_trans_hook(G,Dbase):- functor_catch(G,F,A),hook:into_assertable_form_trans_hook(G,F,A,Dbase).
 hook:into_assertable_form_trans_hook(G,F,_,(G)):- mpred_prop(F,prologBuiltin),!.
+hook:into_assertable_form_trans_hook(G,F,_,(G)):- mpred_prop(F,prologOnly),!.
 hook:into_assertable_form_trans_hook(G,F,_,(G)):- mpred_prop(F,as_is(_)),!.
 hook:into_assertable_form_trans_hook(G,F,_,Dbase):-mpred_prop(F,prologHybrid),!,into_hilog_form(G,Dbase).
 hook:into_assertable_form_trans_hook(G,F,_,Dbase):-mpred_prop(F,is_dbase_t),!,into_hilog_form(G,Dbase).
@@ -356,7 +357,7 @@ ensure_predicate_reachable(M,C,dbase_t,Ap1):-C=..[_,F|_RGS],A is Ap1 -1, declare
 
 % singletons_throw_or_fail(_):- is_stable,!,fail.
 singletons_throw_or_fail(C):- contains_singletons(C), (test_tl(thlocal:adding_from_srcfile) ->dmsg(contains_singletons(C)); trace_or_throw(contains_singletons(C))).
-nonground_throw_or_fail(C):- throw_if_true_else_fail(not(ground(C)),C).
+nonground_throw_or_fail(C):- not(ground(C)), (test_tl(thlocal:adding_from_srcfile) ->dmsg(not_ground(C)); trace_or_throw(not_ground(C))).
 
 
 into_assertable_form_trans(G,was_asserted_gaf(G)):- functor_catch(G,F,_),mpred_prop(F,was_asserted_gaf),!.
@@ -460,10 +461,10 @@ rescan_duplicated_facts(M,H):-!,rescan_duplicated_facts(M,H,true).
 rescan_duplicated_facts(M,H):-findall(H,(clause_safe(M:H,B),B==true),CL1), once((list_to_set(CL1,CL2),reduce_fact_heads(M,H,CL1,CL2))).
 rescan_duplicated_facts(M,H,BB):-notrace(doall((gather_fact_heads(M,H),BB=true,once((findall(C,(clause_safe(H,B),B=@=BB,reduce_clause((H:-B),C)),CL1),
                                                                      list_to_set(CL1,CL2),once(reduce_fact_heads(M,H,CL1,CL2))))))).
-
-rerun_database_hooks:-doall((gather_fact_heads(_M,H),forall(is_asserted(H),run_database_hooks(assert(z),H)))).
-rerun_database_hooks:-doall((is_asserted(subclass(I,C)),run_database_hooks(assert(z),subclass(I,C)))),fail.
-rerun_database_hooks:-doall((isa_asserted(I,C),run_database_hooks(assert(z),isa(I,C)))),fail.
+rerun_database_hooks:-!.
+rerun_database_hooks:-call_timed(doall((gather_fact_heads(_M,H),forall(is_asserted(H),run_database_hooks(assert(z),H))))),fail.
+rerun_database_hooks:-call_timed(doall((is_asserted(subclass(I,C)),run_database_hooks(assert(z),subclass(I,C))))),fail.
+rerun_database_hooks:-call_timed(doall((isa_asserted(I,C),run_database_hooks(assert(z),isa(I,C))))),fail.
 
 reduce_fact_heads(_M,_H,CL1,CL1):-!. % no change
 reduce_fact_heads(M,H,CL1,CL2):- 

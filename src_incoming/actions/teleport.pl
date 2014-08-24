@@ -31,14 +31,14 @@ moo:action_info(teleport(item,region),"teleport the item somewhere").
 moo:agent_call_command(Agent,teleport):-
    props(Agent,charge>10),
    clr(atloc(Agent,_)),
-   clr(inRegion(Agent,_)),
+   clr(localityOfObject(Agent,_)),
    put_in_world(Agent).
 
 %targeted
 moo:agent_call_command(_Agent,teleport_to(Other,Where)):-
    moo:coerce(Other,agent,Target),
    moo:coerce(Where,region,Location),
-   clr(inRegion(Target,_)),
+   clr(localityOfObject(Target,_)),
    clr(atloc(Target,_)),
    to_3d(Location,Where3D),
    add(atloc(Target,Where3D)).
@@ -48,7 +48,7 @@ moo:agent_call_command(_Agent,teleport_to(Other,Where)):-
 moo:agent_call_command(Agent,tp(Where)):-
    moo:coerce(Agent,agent,Target),
    moo:coerce(Where,region,Location),
-   clr(inRegion(Target,_)),
+   clr(localityOfObject(Target,_)),
    clr(atloc(Target,_)),
    to_3d(Location,Where3D),
    add(atloc(Target,Where3D)).

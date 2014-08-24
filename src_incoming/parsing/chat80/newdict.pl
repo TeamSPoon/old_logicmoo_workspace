@@ -28,6 +28,15 @@
 % =================================================================
 % General Dictionary
 
+:-begin_dynamic_reader.
+
+% partOfSpeech(conj).
+% partOfSpeech(pronoun).
+
+argsIsaInList(int_pron(pronoun,speech_subtype)).
+argsIsaInList(noun_sin(noun)).
+argsIsaInList(int_art(article,var,speech_subtype,gaf)).
+
 conj(and).
 conj(or).
 

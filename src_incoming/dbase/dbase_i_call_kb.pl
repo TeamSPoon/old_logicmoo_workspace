@@ -2,9 +2,7 @@
 
 :-module(dbase_i_call_kb,[]).
 
-into_plist(PLIST,PLIST):- var(PLIST),!,between(2,19,X),length(PLIST,X).
-into_plist([P|LIST],[P|LIST]).
-into_plist(Call,PLIST):-Call=..PLIST.
+
 
 :- export(kb_f/1).
 kb_f(X):-assertion_f(X).
@@ -32,40 +30,137 @@ get_assertions(PLIST,PROPS):-between(2,19,X),length(PLISTIn,X),kbp_t_list(PLISTI
 
 nv1000(S):-numbervars(S,100,_,[singletons(true),attvar(skip)]).
 
+
+% length(SENT,N),N>1,append(SENT,[MT,Props],PLIST),apply(el_holds,PLIST),member(Var,SENT),var(Var).
+% length(SENT,N),N>1,kbp_t_list(SENT,Proof),member(Var,SENT),var(Var).
+
 :-export((kb_t/1)).
 kb_t(Call):- into_plist(Call,PLIST),[AH|LIST]=PLIST,!, kb_t(AH,LIST,PLIST).
 
+into_plist(PLIST,PLIST):- var(PLIST),!,between(2,19,X),length(PLIST,X).
+into_plist([P|LIST],[P|LIST]):-var(P),!.
+into_plist([dbase_t|PLIST],PLIST).  % dbase_t is our versuion of '$holds' or call/N
+into_plist(plist(P,LIST),[P|LIST]).
+into_plist(Call,PLIST):-Call=..PLIST. % finally the fallthrue
+
 kb_t(AH,_,PLIST):-var(AH),!,kbp_t(PLIST).
-kb_t(dbase_t,PLIST,_):- !,kbp_t(PLIST).
-kb_t(subclass,PLIST,_):- !,kbp_t([genls|PLIST]).
-kb_t(AH,PLIST,_):- is_holds_true(AH),!,kb_t(PLIST).
-kb_t(AH,PLIST,_):- is_holds_false(AH),!,kb_f(PLIST).
+kb_t(dbase_t,PLIST,_):- !,kbp_t(PLIST).  % dbase_t is our versuion of '$holds' or call/N
+kb_t(subclass,PLIST,_):- !,kbp_t([genls|PLIST]). % rewrite hack for SUMO callers
+kb_t(AH,PLIST,_):- is_holds_true(AH),!,kb_t(PLIST). % is_holds_true/1 is temp disabled for speed
+kb_t(AH,PLIST,_):- is_holds_false(AH),!,kb_f(PLIST). % is_holds_false(not).
 kb_t(_,_,PLIST):- kbp_t(PLIST).
 
 :-export(kbp_t/1). 
+
 kbp_t(_):- not(loaded_external_kbs),!,fail.
 % kbp_t(PLIST):- ground(PLIST),!,no_repeats(call_no_cuts(hook:kbp_t_list_prehook(PLIST,PLISTO))),kbp_t_list(PLISTO).
-kbp_t(PLIST):- hook:kbp_t_list_prehook(PLIST,PLISTO),kbp_t_list(PLISTO).
+% kbp_t(PLIST):- hook:kbp_t_list_prehook(PLIST,PLISTO),kbp_t_list(PLISTO).
+kbp_t(PLIST):- kbp_t_list(PLIST). % append(PLIST,[_MT,_PROOF],PLISTO), apply(el_holds,PLISTO).  % el_holds has 2 extra args our callers shouldnt be forced to use.. but this is a big slowdown
 
+
+:-export(link_to_holds2/2).
+link_to_holds2(Pred,TargetPred):- 
+  doall((between(2,12,X),length(PLIST,X),append(PLIST,[_MT],PLISTMT),append(PLISTMT,[_PROOF],PLISTMTPROOF),
+         X2 is X + 2,
+         dynamic_multifile_exported(Pred/X),        
+         nop(dynamic_multifile_exported(TargetPred/X2)),        
+          A=..[Pred|PLIST],
+          B=..[TargetPred|PLISTMTPROOF],              
+         assertz_if_new((A:-B)))).
+
+:-export(link_to_holds/2).
+link_to_holds(Pred,TargetPred):- 
+  doall((between(2,12,X),length(PLIST,X),
+         dynamic_multifile_exported(Pred/X),          
+         nop(dynamic_multifile_exported(TargetPred/X)),          
+          A=..[Pred|PLIST],
+          B=..[TargetPred|PLIST],              
+         assertz_if_new((A:-B)))).
+
+:-export(link_to_holds_list/2).
+link_to_holds_list(Pred,TargetPred):- 
+  doall((between(2,12,X),length(PLIST,X),
+         dynamic_multifile_exported(Pred/X),          
+         dynamic_multifile_exported(TargetPred/1),          
+          A=..[Pred|PLIST],
+          B=..[TargetPred,PLIST],              
+         assertz_if_new((A:-B)))).
+
+/*
+cyckb_t(P,A1,A2,A3,A4,A5,A6,A7):- el_holds(P,A1,A2,A3,A4,A5,A6,A7,_,_).
+cyckb_t(P,A1,A2,A3,A4,A5,A6,A7):- dbase_t([P,A1,A2,A3,A4,A5,A6,A7]).
+cyckb_t(P,A1,A2,A3,A4,A5,A6):- el_holds(P,A1,A2,A3,A4,A5,A6,_,_).
+cyckb_t(P,A1,A2,A3,A4,A5,A6):- dbase_t([P,A1,A2,A3,A4,A5,A6]).
+cyckb_t(P,A1,A2,A3,A4,A5):-el_holds(P,A1,A2,A3,A4,A5,_,_).
+cyckb_t(P,A1,A2,A3,A4,A5):- dbase_t([P,A1,A2,A3,A4,A5]).
+cyckb_t(P,A1,A2,A3,A4):- el_holds(P,A1,A2,A3,A4,_,_).
+cyckb_t(P,A1,A2,A3,A4):- dbase_t([P,A1,A2,A3,A4]).
+cyckb_t(P,A1,A2,A3):- el_holds(P,A1,A2,A3,_,_).
+cyckb_t(P,A1,A2,A3):- dbase_t([P,A1,A2,A3]).
+cyckb_t(P,A1,A2):- el_holds(P,A1,A2,_,_).
+cyckb_t(P,A1,A2):- dbase_t([P,A1,A2]).
+cyckb_t(P,A1):- el_holds(P,A1,_,_).
+cyckb_t(P,A1):- dbase_t([P,A1]).
+*/
+
+:- link_to_holds2(cyckb_t,el_holds).
+
+:-export(cyckb_t/1).
+cyckb_t(PLIST):- apply(cyckb_t,PLIST).
+
+:-export(noGenlPreds/1).
+noGenlPreds(coGenlPreds).
+noGenlPreds(isa).
+noGenlPreds(genls).
+noGenlPreds(X):-not(atom(X)),!.
+noGenlPreds(_).
+
+:- link_to_holds_list(cyckb_t,cyckb_t_via_genlPreds).
+cyckb_t_via_genlPreds([GP|_]):- noGenlPreds(GP),!,fail.
+cyckb_t_via_genlPreds([GP,A,B]):- loop_check(cyckb_t(genlInverse,P,GP)), P\=GP, loop_check(cyckb_t([P,B,A])).
+cyckb_t_via_genlPreds([GP|LIST]):- loop_check(cyckb_t(genlPreds,P,GP)), P\=GP, loop_check(cyckb_t([P|LIST])).
+
+
+:- link_to_holds_list(cyckb_t,cyckb_t_via_implies).
+cyckb_t_via_implies(CONSEQ):- fail, loop_check(cyckb_t_implies(ANTE,CONSEQ)), loop_check(cyckb_t_call(ANTE)).
+
+cyckb_t_call(ANTE):- nop(cyckb_t_call(ANTE)),!,fail.
+cyckb_t_implies(ANTE,CONSEQ):- nop(cyckb_t_implies(ANTE,CONSEQ)),!,fail.
+
+:-thread_local thlocal:useDbase_t/0.
 
 hook:kbp_t_list_prehook(PLIST,PLIST).
 
 :-export(kbp_t_list/1). 
-kbp_t_list(PLIST):- !,  append([el_holds|PLIST],[_MT,_PropsV],CallList),Call=..CallList,Call.
-% the cut above was intending to comment out the next line
-kbp_t_list(PLIST):-kbp_t_list(PLIST,_,_Proof).
+kbp_t_list(PLIST):- thlocal:useDbase_t, dbase_t(PLIST).
+kbp_t_list(PLIST):- apply(cyckb_t,PLIST).
+
 
 :-export(kbp_t_list/2). 
+% kbp_t_list(PLIST,dbase_t(PLIST)):- thlocal:useDbase_t,  dbase_t(PLIST).
+kbp_t_list(PLIST,Proof):- kbp_t_list(PLIST,_,Proof).
 
-kbp_t_list(PLIST,Proof):- kbp_t_list(PLIST,_,Ref),clause(Head, Body, Ref),proof_from_clause(Head, Body, Proof).
+% 
+%  current_predicate(F/A),functor(P,F,A),predicate_property(P,number_of_clauses(N)),dif(B,true), clause(P, B, Ref),B\=(!,_), B=true.
 
 :-export(kbp_t_list/3). 
 % kbp_t_list(PLIST):- tiny_kb_ASSERTION(PLIST).
-kbp_t_list(PLIST,[amt(MT)|PropsV], Ref):- !,  append([el_holds|PLIST],[MT,PropsV],CallList),Call=..CallList,Call,clause(Call,true,Ref).
-% the cut above was intending to comment out these next lines
-% kbp_t_list(PLIST,[amt(MT)|PropsV], mworld0:Call):- append([assertion_holds_mworld0|PLIST],[MT,Props],CallList),Call=..CallList,mworld:is_callable(Call), mworld0:Call,get_varsp(Props,PropsV).
-% kbp_t_list(PLIST,[], hl_holds:Call):- Call=..[assertion_holds|PLIST],hl_holds:is_callable(Call),hl_holds:Call.
-% kbp_t_list(PLIST,[amt('ThoughtTreasureMt')],tt0_00022_cycl:Call):- Call=..[ttholds|PLIST],tt0_00022_cycl:is_callable(Call), tt0_00022_cycl:Call. % '@'(Call,hl_holds).
+kbp_t_list(PLIST,[amt(dbase_t)],Proof):- thlocal:useDbase_t,  CallList = [dbase_t|PLIST],Call=..CallList,/*Call,*/ clause(Call,true,Ref),clause(Head, Body, Ref),proof_from_clause(Head, Body, Proof).
+kbp_t_list(PLIST,Props,Proof):- is_list(PLIST),!,kbp_t_list_1(PLIST,Props,Proof).
+kbp_t_list(PLIST,Props,Proof):- kbp_t_list_0(PLIST,Props,Proof).
+
+kbp_t_list_0(PLIST,Props,Proof):- between(3,2,N), length(PLIST,N),kbp_t_list_1(PLIST,Props,Proof).
+kbp_t_list_0(PLIST,Props,Proof):- between(4,12,N), length(PLIST,N),kbp_t_list_1(PLIST,Props,Proof).
+
+kbp_t_list_1(PLIST,[amt(MT)|PropsV], Proof):- append(PLIST,[MT,PropsV],CallList),!,prove_calllist(el_holds,CallList,Proof).
+% kbp_t_list_1(PLIST,[cyckb_t], Proof):- CallList = [cyckb_t|PLIST],prove_calllist(cyckb_t,CallList,Proof).
+
+prove_calllist(Functor,CallList,Proof):- Call =.. [Functor|CallList], clause(Call, true,Ref),clause(PHead, PBody, Ref),proof_from_clause(PHead, PBody, Proof).
+prove_calllist(Functor,CallList,Proof):- dif(Body,true), Head =.. [Functor|CallList],clause(Head, Body, Ref),must_det(not(Body=true)),Body,clause(PHead, PBody, Ref),proof_from_clause(PHead, PBody, Proof).
+
+:-export(kb_mt/2).
+kb_mt(C,MT):- into_plist(C,PLIST),!,  append([el_holds|PLIST],[MT,_PropsV],CallList),Call=..CallList,Call.
+kb_mt(C,dbase_t):- thlocal:useDbase_t, dbase_t(C).
 
 
 proof_from_clause(Head, true, Head):-!.

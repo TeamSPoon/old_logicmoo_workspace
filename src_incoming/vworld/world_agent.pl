@@ -64,7 +64,7 @@ hook:call_agent_action(Agent,CMDI):-
 
 :-export(where_atloc/2).
 where_atloc(Agent,Where):-atloc(Agent,Where),!.
-where_atloc(Agent,Where):-inRegion(Agent,Where),!.
+where_atloc(Agent,Where):-localityOfObject(Agent,Where),!.
 where_atloc(_Agent,'OffStage'):-!.
 
 call_agent_action_lc(Agent,CMD):-

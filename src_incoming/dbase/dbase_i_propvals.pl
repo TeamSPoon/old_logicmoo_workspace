@@ -36,6 +36,7 @@ fallback:- not(thlocal:insideIREQ(_)).
 
 :- dynamic_multifile_exported(transitive_other/4).
 
+choose_val(Prop,Obj,Value):- thlocal:useOnlyExternalDBs,!, body_call_cyckb(dbase_t(Prop,Obj,Value)).
 choose_val(Prop,Obj,Value):- var(Obj),nonvar(Value),!,is_asserted(dbase_t(Prop,Obj,Value)).
 choose_val(Prop,Obj,Value):- choose_right(Prop,Obj,Value).
 
@@ -47,9 +48,11 @@ generate_candidate_arg_values0(Prop,N,R):- arg(N,vv(Obj,Value),R),!,is_asserted(
 
 type_has_instances(Type):-  atom(Type),Type\=term,Type\=type,not_ft(Type),isa(_,Type),!.
 
-choose_right(Prop,Obj,Value):- var(Obj),cached_isa(Prop,completeExtentAsserted),not(cached_isa(Prop,singleValued)),!,is_asserted(dbase_t(Prop,Obj,Value)).
-choose_right(Prop,Obj,Value):- var(Obj),findall(Obj,generate_candidate_arg_values(Prop,1,Obj),Objs),Objs\=[],!,member(Obj,Objs),nonvar(Obj),choose_for(Prop,Obj,Value).
-choose_right(Prop,Obj,Value):- var(Obj),dtrace,dmsg(var_choose_right(Prop,Obj,Value)),!,is_asserted(dbase_t(Prop,Obj,Value)).
+choose_right(Prop,Obj,Value):- thlocal:useOnlyExternalDBs,!, body_call_cyckb(dbase_t(Prop,Obj,Value)).
+choose_right(Prop,Obj,Value):- nonvar(Obj),!,choose_for(Prop,Obj,RValue),RValue=Value.
+choose_right(Prop,Obj,Value):- cached_isa(Prop,completeExtentAsserted),not(cached_isa(Prop,singleValued)),!,is_asserted(dbase_t(Prop,Obj,Value)).
+choose_right(Prop,Obj,Value):- findall(Obj,generate_candidate_arg_values(Prop,1,Obj),Objs),Objs\=[],!,member(Obj,Objs),nonvar(Obj),choose_for(Prop,Obj,Value).
+choose_right(Prop,Obj,Value):- dmsg(var_choose_right(Prop,Obj,Value)),!,dtrace,is_asserted(dbase_t(Prop,Obj,Value)).
 choose_right(Prop,Obj,Value):- choose_for(Prop,Obj,RValue),RValue=Value.
 
 :-export(choose_for/3).
@@ -263,7 +266,7 @@ each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(moo:default_inst_pro
 each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(moo:default_type_props(Type,TProps)),subst(TProps,self,Inst,Prop),flatten([Prop],Props).
 each_default_inst_type_props(_,Type,[kwLabel(Lbl)|Props]):-call_no_cuts(moo:label_type_props(Lbl,Type,Props)).
 
-moo:default_inst_props(apath(Region,_Dir),areaPath,[inRegion(Region)]).
+moo:default_inst_props(apath(Region,_Dir),areaPath,[localityOfObject(Region)]).
 
 
 :-export((add_missing_instance_defaults/1)).
