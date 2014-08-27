@@ -8,8 +8,7 @@
 %
 */
 
-:- module(toploop_telnet, [
-                  agent_message_stream/3,
+:- module(toploop_telnet, [                  
                   do_player_action/1,
                   look_brief/1,
                   show_room_grid/1,
@@ -24,7 +23,7 @@
 
 :- decl_thlocal wants_logout/1.
 
-:- dynamic agent_message_stream/3, telnet_fmt_shown/3.
+:- dynamic thglobal:agent_message_stream/3, telnet_fmt_shown/3.
 
 :- meta_predicate toploop_telnet:show_room_grid_single(*,*,0).
 
@@ -46,11 +45,13 @@ login_and_run:-
    call_agent_command(P,'look'),
    fmt('~n~n~nHello ~w! Welcome to the MUD!~n',[P]),
    % sets some IO functions
+   call_cleanup((
    with_assertions(thlocal:repl_writer(P,telnet_repl_writer),
       with_assertions(thlocal:repl_to_string(P,telnet_repl_obj_to_string),
      % runs the Telnet REPL
-     run_player_telnet(P))),
-   fmt('~n~nGoodbye ~w! ~n',[P]).
+     run_player_telnet(P))),  
+    fmt('~n~nGoodbye ~w! ~n',[P])),
+     retractall(thlocal:session_agent(_,P))).
 
 
 run_player_telnet(P) :-    
@@ -64,31 +65,36 @@ run_player_telnet(P) :-
        ((repeat,
         once(read_and_do_telnet(P)), 
       retract(thlocal:wants_logout(P)),
-        retractall(agent_message_stream(P,_,_))))))).
+        retractall(thglobal:agent_message_stream(P,_,_))))))).
 
 
 ensure_player_stream_local(P,Input,Output):-
    current_input(Input),
    current_output(Output),
-   (agent_message_stream(P,Input,Output)->true;
-      ((retractall(agent_message_stream(P,_,_)),
-     assert(agent_message_stream(P,Input,Output))))),!.
+   (thglobal:agent_message_stream(P,Input,Output)->true;
+      ((retractall(thglobal:agent_message_stream(P,_,_)),
+     assert(thglobal:agent_message_stream(P,Input,Output))))),!.
 
 read_and_do_telnet(P):-
    ensure_player_stream_local(P,_,_),
          must(ignore(look_brief(P))),!,
-           sformat(S,'~w>',[P]),prompt_read(S,List),
+           sformat(S,'~w>',[P]),prompt_read_telnet(S,List),
             must(once(do_player_action(List))),!.
+
+
+:-export(prompt_read/2).
+prompt_read_telnet(Prompt,Atom):-
+     foc_current_player(P),
+      prompt_read(Prompt,IAtom),
+      (IAtom==end_of_file -> (assert(thlocal:wants_logout(P)),Atom='quit') ; IAtom=Atom).
 
 :-export(prompt_read/2).
 prompt_read(Prompt,Atom):-
         fresh_line,
         fmt0('~n~w ',[Prompt]),
         current_input(In),
-	read_line_to_codes(In,Codes),
-        foc_current_player(P),
-         (is_list(Codes)-> atom_codes(Atom,Codes);
-           (assert(thlocal:wants_logout(P)),Atom='quit')),!.
+	read_line_to_codes(In,Codes),   
+        (is_list(Codes)-> atom_codes(Atom,Codes); Atom=Codes),!.
 
 :-export(scan_updates/0).
 
@@ -101,8 +107,8 @@ scan_updates:- ignore((thread_self(main),ignore((catch(make,E,dmsg(E)))))).
 hook:decl_database_hook(Type,C):- current_agent(Agent),interesting_to_player(Type,Agent,C).
 
 interesting_to_player(Type,Agent,C):-not(not(contains_term(C,Agent))),dmsg(agent_database_hook(Type,C)),!.
-interesting_to_player(Type,Agent,C):-localityOfObject(Agent,Region),not(not(contains_term(C,Region))),dmsg(region_database_hook(Type,C)),!.
-interesting_to_player(Type,Agent,C):-localityOfObject(Agent,Region),localityOfObject(Other,Region),not(not(contains_term(C,Other))),!,dmsg(other_database_hook(Type,C)),!.
+interesting_to_player(Type,Agent,C):-is_asserted(localityOfObject(Agent,Region)),not(not(contains_term(C,Region))),dmsg(region_database_hook(Type,C)),!.
+interesting_to_player(Type,Agent,C):-is_asserted(localityOfObject(Agent,Region)),is_asserted(localityOfObject(Other,Region)),not(not(contains_term(C,Other))),!,dmsg(other_database_hook(Type,C)),!.
 
 % ===========================================================
 % USES PACKRAT PARSER 

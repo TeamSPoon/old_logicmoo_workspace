@@ -66,17 +66,17 @@ complex(\+P) :- complex(P).
 respond([]) :- display('Nothing satisfies your question.'), nl.
 respond([A|L]) :- reply(A), replies(L).
 
-answer(S1):- qplan_to_answers(S1,S),respond(S).
+answer80(S1):- answer80(S1,S),respond(S).
 
-qplan_to_answers((answer([]):-E),[B]) :- !, holds(E,B).
-qplan_to_answers((answer([X]):-E),S) :- !, seto(X,E,S).
-qplan_to_answers((answer(X):-E),S) :- seto(X,E,S).
+answer80((answer80([]):-E),[B]) :- !, holds_truthvalue(E,B).
+answer80((answer80([X]):-E),S) :- !, seto(X,E,S).
+answer80((answer80(X):-E),S) :- seto(X,E,S).
 
 seto(X,E,S) :- setof(X,satisfy(E),S), !.
 seto(_X,_E,[]).
 
-holds(E,true) :- satisfy(E), !.
-holds(_E,false).
+holds_truthvalue(E,true) :- satisfy(E), !.
+holds_truthvalue(_E,false).
 
 yesno(true):-display(' Yes. ').
 yesno(false):-display(' No.').

@@ -52,7 +52,6 @@ hook_body_req(F,A,HEAD,HEAD_T):-
 body_req_maybe_rules(F,A,HEAD,HEAD_T):- ground(HEAD),body_req_with_rules(F,A,HEAD,HEAD_T),!.
 body_req_maybe_rules(F,A,HEAD,HEAD_T):- body_req_no_rules(F,A,HEAD,HEAD_T).
 
-
 % fact check and break
 body_req_begin_panic(_,_,HEAD,HEAD_T):- copy_term(HEAD,COPY),HEAD_T,!,dmsg(looping(COPY)).
 
@@ -73,16 +72,18 @@ body_req_2(F,A,HEAD,HEAD_T):- body_req_with_rules(F,A,HEAD,HEAD_T).
 
 body_req_with_rules(_,_,_  , HEAD_T):- clause(HEAD_T, true).
 body_req_with_rules(_,_,HEAD, _):-     clause(HEAD,   true),dmsg(warn(clause(HEAD,true))).
-body_req_with_rules(_,_,HEAD, _):-  moo:hybrid_rule(HEAD,BODY),call_mpred_body(HEAD,BODY).
-body_req_with_rules(F,_,_,HEAD_T):- body_req_plus_cyc(F,_,_,HEAD_T).
-body_req_with_rules(_,_,_,dbase_t(F,Obj,LValue)):-  choose_val(F,Obj,LValue).
+body_req_with_rules(F,A,HEAD,HEAD_T):-body_req_only_rules(F,A,HEAD,HEAD_T).
+
+body_req_only_rules(_,_,HEAD, _):-  moo:hybrid_rule(HEAD,BODY),call_mpred_body(HEAD,BODY).
+body_req_only_rules(F,_,_,HEAD_T):- body_req_plus_cyc(F,_,_,HEAD_T).
+body_req_only_rules(_,_,_,dbase_t(F,Obj,LValue)):-  choose_val(F,Obj,LValue).
 
 body_req_no_rules(_,_,HEAD, _):-     clause(HEAD,  true).
 body_req_no_rules(_,_,_  , HEAD_T):- clause(HEAD_T,true).
-body_req_no_rules(F,_,_,HEAD_T):-body_req_plus_cyc(F,_,_,HEAD_T).
+body_req_no_rules(F,_,_,HEAD_T):- body_req_plus_cyc(F,_,_,HEAD_T).
 
 
-body_req_plus_cyc(F,_,_,HEAD_T):- mpred_prop(F,cycPlus2(_)),!,with_assertions(thglobal:use_cyc_database,body_call_cyckb(HEAD_T)).
+body_req_plus_cyc(F,_,_,HEAD_T):-  mpred_prop(F,cycPlus2(_)),thlocal:useOnlyExternalDBs,!,with_assertions(thglobal:use_cyc_database,body_call_cyckb(HEAD_T)).
 
 call_mpred_body(HEAD,BODY):- loop_check(call_mpred_body_lc(HEAD,BODY)).
 

@@ -21,22 +21,34 @@
 
 :- dynamic_multifile_exported mpred_arity/2.
 :- dynamic_multifile_exported mpred_prop/2.
+:- dynamic_multifile_exported never_type/1.
 
 hook:decl_database_hook(assert(_),Fact):- ignore((compound(Fact),Fact=..[F,Arg1|PROPS],argsIsaProps(F),decl_mpred(Arg1,[F|PROPS]))).
-hook:decl_database_hook(assert(_),mpred_prop(F,P)):- decl_mpred(F,P).
 hook:decl_database_hook(assert(_),isa(F,P)):- argsIsaProps(P),decl_mpred(F,P).
 hook:decl_database_hook(assert(_),mpred_prop(F,stubType(Stub))):-mpred_arity(F,A),declare_dbase_local(F,A,Stub).
+hook:decl_database_hook(assert(_),mpred_prop(F,arity(A))):- ignore((A==1,atom(F),not(never_type(F)),not(mpred_prop(F,prologOnly)),decl_type(F))).
+hook:decl_database_hook(assert(_),mpred_prop(F,P)):- decl_mpred(F,P).
 
 mpred_prop(mpred_prop,prologOnly).
 mpred_prop(mpred_arity,prologOnly).
+mpred_prop(never_type,prologOnly).
 mpred_prop(subft, completeExtentAsserted).
 mpred_prop(ft_info, completeExtentAsserted).
 mpred_arity(argsIsaInList,1).
 mpred_arity(mpred_prop,2).
 mpred_arity(mpred_arity,2).
+mpred_arity(never_type,1).
 mpred_arity(singleValued,1).
 mpred_arity(term_anglify,2).
-mpred_arity(equivRule,2)
+mpred_arity(equivRule,2).
+
+never_type(Var):-var(Var),!,trace_or_throw(var_never_type(Var)).
+never_type('Area1000').
+never_type(subft).
+never_type(must).
+never_type(mpred_prop).
+never_type(ft_info).
+never_type(F):- mpred_arity(F,A),!, A > 1.
 
 :-op(0,fx,((decl_mpred_hybrid))).
 :-export((decl_mpred_hybrid)/1).
@@ -270,7 +282,8 @@ make_functorskel(F,N,fskel(F,DBASE,Call,I,NList,MtVars,Call2)):-typical_mtvars(M
 registerCycPredPlus2_3(_CM,M,PI,F/A2):-
   registerCycPredPlus2_3(M,PI,F/A2).
 
-registerCycPredPlus2_3(_M,_PI,F/A2):-   
+registerCycPredPlus2_3(_M,_PI,F/A2):- 
+  ignore((A2==3,assertz_if_new(never_type(F)))),
   A is A2 - 2, decl_mpred_hybrid(F/A),
   decl_mpred(F,cycPlus2(A2)),decl_mpred(F,cycPred(A)).
 
@@ -278,7 +291,7 @@ registerCycPredPlus2_3(_M,_PI,F/A2):-
 registerCycPredPlus2(P):-!,with_pi(P,registerCycPredPlus2_3).
 
 get_mpred_prop(F,P):- mpred_prop(F,P).
-get_mpred_prop(Obj,PropVal):- safe_univ(PropVal,[Prop,NonVar|Val]),safe_univ(CallVal,[Prop,Obj,NonVar|Val]),
+get_mpred_prop(Obj,PropVal):- fail, safe_univ(PropVal,[Prop,NonVar|Val]),safe_univ(CallVal,[Prop,Obj,NonVar|Val]),
      predicate_property(CallVal,_),!,call_mpred(CallVal).
 
 
@@ -389,14 +402,17 @@ decl_mpred_prolog(P):- with_pi(P,decl_mpred_prolog).
 :-op(1120,fx,decl_mpred_prolog).
 
 decl_mpred_prolog(M,PI,F/A):-
-  must_det_l([   
-   % retractall(mpred_prop(F,_)),
-   assert_arity(F,A),
+  must_det_l([  
+  debugOnError(assert_if_new(mpred_prop(F,prologOnly))),
+  debugOnError(assert_if_new(mpred_arity(F,A))),
+  assert_arity(F,A),
+   % retractall(mpred_prop(F,_)),   
    decl_mpred(F,prologOnly),   
    decl_mpred(F,prologBuiltin),
     decl_mpred(F,as_is(M:F/A)),
     decl_mpred(F,ask_module(M)),
    ignore((ground(PI),decl_mpred(PI))),
+ %   dynamic_multifile_exported(M,M,PI,F/A),
    decl_mpred(F,A)]).
 
 decl_mpred_prolog(_CM,M,PI,F/A):-

@@ -641,10 +641,10 @@ bposToCPos(r,'Adverb').
 bposToCPos(wrb,'WHAdverb').
 
 /*
-%37.  "      Simple double quote
+%37.  "      Simple double quote"
 %38.  $      Dollar sign
 %39.  #      Pound sign
-%40.  `      Left single quote
+%40.  `      Left single quote `
 %41.  '      Right single quote
 %42.  ``     Left double quote
 %43.  ''     Right double quote

@@ -18,7 +18,7 @@ moo:agent_text_command(Agent,['@','get',Prop0],Agent,'@get'(Agent,Prop0)).
 moo:agent_text_command(Agent,['@_set',Prop0,Value0],Agent,'@set'(Agent,Prop0,Value0)).
 moo:agent_text_command(Agent,['@_get',Prop0],Agent,'@get'(Agent,Prop0)).
 
-moo:agent_call_command(Agent,'@set'(Obj0,Prop0,Value0)) :- subst(game_assert(dbase_t(Prop0,Obj0,Value0)),self,Agent,K),dmsg(K),debugOnError(K).
+moo:agent_call_command(Agent,'@set'(Obj0,Prop0,Value0)) :- subst(add(dbase_t(Prop0,Obj0,Value0)),self,Agent,K),dmsg(K),debugOnError(K).
 
 moo:agent_call_command(Agent,'@get'(Obj0,Prop0)) :- subst(dbase_t(Prop0,Obj0,Value),self,Agent,K), 
                                                         ccatch((findall(Value,(req(K),fmt(K)),L),

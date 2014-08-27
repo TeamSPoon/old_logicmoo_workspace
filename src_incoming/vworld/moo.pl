@@ -18,10 +18,13 @@
 :-dynamic_multifile_exported loading_module_h/1.
 :-dynamic_multifile_exported(mpred_prop/2).
 :-dynamic_multifile_exported(mpred_arity/2).
+:-dynamic_multifile_exported(never_type/1).
 mpred_prop(mpred_prop,prologOnly).
 mpred_prop(mpred_arity,prologOnly).
+mpred_prop(never_type,prologOnly).
 mpred_arity(mpred_prop,2).
 mpred_arity(mpred_arity,2).
+mpred_arity(never_type,1).
 
 
 :-export(is_stable/0).
@@ -216,7 +219,6 @@ moo:  ?- make.
 % :- meta_predicate moo:call_after_next(0,*).
 % :- meta_predicate moo:xcall_t(1,?).
 % :- meta_predicate moo:oncely(0).
-% :- meta_predicate moo:sc1(*,0).
 % :- meta_predicate moo:xcall_t(2,?,?).
 % :- meta_predicate moo:cached(0).
 % :- meta_predicate moo:simply_functors(2,*,*).
@@ -246,7 +248,7 @@ moo:  ?- make.
 % :- meta_predicate moo:xcall_t(6,?,?,?,?,?,?).
 % :- meta_predicate moo:db_op_loop(*,*,0).
 % :- meta_predicate moo:punless(0,0).
-% :- meta_predicate moo:game_call_head_body(*,^).
+% :- meta_predicate moo:call_mpred_body(*,^).
 % :- meta_predicate moo:exception(0).
 % :- meta_predicate moo:object_print_details(2,*,*,*,*).
 % :- meta_predicate moo:xcall_f(0).
@@ -349,7 +351,7 @@ Warning:        /devel/logicmoo/src_incoming/dbase/dbase_c_term_expansion.pl:142
 Warning: moo:pttp_term_expansion/2, which is referenced by
 Warning:        /devel/logicmoo/src_incoming/dbase/dbase_c_term_expansion.pl:142:50: 2-nd clause of moo:mud_rule_expansion/3
 Warning: moo:trace_or_throw/2, which is referenced by
-Warning:        /devel/logicmoo/src_incoming/dbase/dbase.pl:992:27: 9-th clause of moo:game_assert_handler_lc/1
+Warning:        /devel/logicmoo/src_incoming/dbase/dbase.pl:992:27: 9-th clause of moo:add_handler_lc/1
 Warning: nldata_dictionary_some01:cycAssert/2, which is referenced by
 Warning:        /devel/logicmoo/src_data/pldata/nldata_dictionary_some01.pl:390:0: 2-nd clause of nldata_dictionary_some01:rememberDictionary2/3
 Warning:        /devel/logicmoo/src_data/pldata/nldata_dictionary_some01.pl:392:12: 2-nd clause of nldata_dictionary_some01:rememberDictionary2/3

@@ -37,7 +37,8 @@ nv1000(S):-numbervars(S,100,_,[singletons(true),attvar(skip)]).
 :-export((kb_t/1)).
 kb_t(Call):- into_plist(Call,PLIST),[AH|LIST]=PLIST,!, kb_t(AH,LIST,PLIST).
 
-into_plist(PLIST,PLIST):- var(PLIST),!,between(2,19,X),length(PLIST,X).
+:-export(into_plist/2).
+into_plist(PLIST,PLIST):- var(PLIST),!,between(2,12,X),length(PLIST,X).
 into_plist([P|LIST],[P|LIST]):-var(P),!.
 into_plist([dbase_t|PLIST],PLIST).  % dbase_t is our versuion of '$holds' or call/N
 into_plist(plist(P,LIST),[P|LIST]).

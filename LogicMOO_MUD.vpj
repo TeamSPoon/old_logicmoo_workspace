@@ -54,6 +54,9 @@
 				N="src/logicmoo_util/*.*"
 				Recurse="1"/>
 		</Folder>
+		<Folder Name="src_data/pldata">
+			<F N="src_data/pldata/nldata_talk_db_pdat.pl"/>
+		</Folder>
 		<Folder Name="src_incoming">
 			<F
 				N="src_incoming/*.*"

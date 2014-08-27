@@ -129,6 +129,8 @@ make_qlfs:-
 :- user_use_module(logicmoo(pldata/nldata_colloc_pdat)).
 :- user_use_module(logicmoo(pldata/nldata_cycl_pos0)).
 :- user_use_module(logicmoo(pldata/nldata_dictionary_some01)).
+:- load_files([logicmoo(pldata/nldata_talk_db_pdat)],[expand(true),if(changed),qcompile(auto)]).
+
 % :- user_use_module(logicmoo(pldata/tt0_00022_cycl)).
 % :- user_use_module(logicmoo(pldata/hl_holds)).
 % :- user_use_module(logicmoo(pldata/mworld0)).
@@ -141,8 +143,9 @@ make_qlfs:-
 
 % :- user_use_module(logicmoo(dbase/dbase_formattypes)).
 % :- user_use_module(logicmoo(parsing/parser_imperative)).
+:- user_ensure_loaded(logicmoo(parsing/parser_e2c)). 
 :- user_ensure_loaded(logicmoo(parsing/parser_chat80)). 
-:- user_ensure_loaded(logicmoo(parsing/parser_e2c)).
+:- user_ensure_loaded(logicmoo(parsing/parser_talk)). 
 
 
 :- user_use_module(logicmoo('vworld/moo_loader.pl')).

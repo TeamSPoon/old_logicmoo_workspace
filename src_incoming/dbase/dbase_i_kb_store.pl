@@ -81,7 +81,7 @@ non_assertable(WW,isVar(WW)):- var(WW),!.
 non_assertable(_:WW,Why):- !,non_assertable(WW,Why).
 non_assertable(WW,notAssertable(Why)):- compound(WW),functor_catch(WW,F,_),mpred_prop(F,notAssertable(Why)),!.
 % non_assertable(WW,as_is(Why)):- compound(WW),functor_catch(WW,F,_),!,mpred_prop(F,as_is(Why)),!.
-% non_assertable(WW,Why):- db_prop_game_assert
+% non_assertable(WW,Why):- db_prop_add
 
 % ========================================
 % into_hilog_form/into_mpred_form
@@ -131,6 +131,7 @@ into_hilog_form(_X,F,A,Call):-Call=..[dbase_t,F|A].
 list_to_dbase_t([P|List],DBASE_T):-P==dbase_t -> DBASE_T=..[P|List] ; DBASE_T=..[dbase_t,P|List].
 
 :- meta_predicate(call_after_game_load(+)).
+call_after_game_load(Code):- moo:after_game_load,!, call_after_next(moo:after_game_load_completed_pass2,Code).
 call_after_game_load(Code):- call_after_next(moo:after_game_load,Code).
 
 hook:into_assertable_form_trans_hook(G,Dbase):- functor_catch(G,F,A),hook:into_assertable_form_trans_hook(G,F,A,Dbase).
@@ -220,10 +221,10 @@ run_database_hooks_2(Type,Hook):- copy_term(Hook,HCopy),doall(call_no_cuts(hook:
 
 
 add_w_hooks(Gaf):- catch(hooked_asserta(Gaf), error(existence_error(procedure, _Call), context(_, _)),add_w_hooks_fallback(Gaf,Gaf)).
-add_w_hooks(Data,Gaf):- catch((hooked_asserta(Data,Gaf)), error(existence_error(procedure, _Call), context(_, _)),add_w_hooks_fallback(Data,Gaf)).
+% add_w_hooks(Data,Gaf):- catch((hooked_asserta(Gaf,Data)), error(existence_error(procedure, _Call), context(_, _)),add_w_hooks_fallback(Data,Gaf)).
 
-add_w_hooks_fallback(Gaf,Gaf):-asserta_if_new(Gaf),run_database_hooks(assert(z),Gaf).
-add_w_hooks_fallback(Data,Gaf):-asserta_if_new(Data),asserta_if_new(Gaf),run_database_hooks_1(assert(z),Gaf).
+add_w_hooks_fallback(Data,Gaf):-Gaf==Data,!,dmsg(add_w_hooks_fallback_1(Data,Gaf)), dtrace,  asserta_if_new(Gaf),run_database_hooks(assert(z),Gaf).
+add_w_hooks_fallback(Data,Gaf):-dmsg(add_w_hooks_fallback_2(Data,Gaf)), dtrace, asserta_if_new(Data),asserta_if_new(Gaf),run_database_hooks_1(assert(z),Gaf).
 
 
 
@@ -300,9 +301,9 @@ asserted_mpred_clause(C):-dbase_t(C).
 asserted_mpred_clause(C):-clause_asserted(C).
 % asserted_mpred_clause(C):- asserted_mpred_clause_hardwork(C).
 
-asserted_mpred_clause_hardwork(C):-clause_asserted(C,moo:game_call_head_body(C,Call)),   
+asserted_mpred_clause_hardwork(C):-clause_asserted(C,moo:call_mpred_body(C,Call)),   
                     must_det(ground(Call)), 
-                    moo:game_call_head_body(C,Call).
+                    moo:call_mpred_body(C,Call).
 asserted_mpred_clause_hardwork(C):- has_free_args(C),!,fail.
 asserted_mpred_clause_hardwork(C):- hook:deduce_facts(Body, C),req(Body),must_det(ground(Body)),!.
 
@@ -317,26 +318,28 @@ is_asserted_clause(Head,true):-is_asserted(Head).
 % Prolog will_call_after/do_all_of
 % ============================================
 
-:-dynamic(moo:will_call_after/2).
+:-dynamic(thglobal:will_call_after/2).
 
 call_after(When,C):- When,!,do_all_of(When),must_det(C),!.
 call_after(When,C):- assert_next(When,C),!.
 
 assert_next(_,_:true):-!.
 assert_next(_,true):-!.
-assert_next(When,C):- clause_asserted(moo:will_call_after(When,logOnFailure(C))),!.
-assert_next(When,C):- assertz_if_new(moo:will_call_after(When,logOnFailure(C))).
+assert_next(When,C):- clause_asserted(thglobal:will_call_after(When,logOnFailure(C))),!.
+% assert_next(When,C):- nonground_throw_or_fail(C).
+assert_next(When,C):- retractall(thglobal:will_call_after(When,logOnFailure(C))),!, assertz_if_new(thglobal:will_call_after(When,logOnFailure(C))).
 
 call_after_next(When,C):- ignore((When,!,do_all_of(When))),assert_next(When,C).
 
 :-export(do_all_of/1).
-do_all_of(When):- loop_check(do_all_of_lc(When),true).
-do_all_of_lc(When):- not(moo:will_call_after(When,_)),!.
-do_all_of_lc(When):- repeat, 
-   forall(retract(moo:will_call_after(When,A)), 
-      % dmsg(doingNow(When,A)),
-                           call(A)), 
-     not(moo:will_call_after(When,_)).
+do_all_of(When):- loop_check(do_all_of_lc(When),true),!.
+do_all_of_lc(When):- not(thglobal:will_call_after(When,_)),!.
+do_all_of_lc(When):-  repeat,do_stuff_of_lc(When), not(more_to_do(When)).
+
+more_to_do(When):-predicate_property(thglobal:will_call_after(When,_),number_of_clauses(N)),!,N<1.
+
+do_stuff_of_lc(When):-not(more_to_do(When)),!.
+do_stuff_of_lc(When):- thglobal:will_call_after(When,A),!,retract(thglobal:will_call_after(When,A)),!,call(A),!.
 
 
 % ================================================
@@ -397,10 +400,23 @@ hooked_assertz(_CP,CA):- clause_asserted(CA),!.
 hooked_assertz(CP,CA):- assertz_cloc(CA),run_database_hooks_local(assert(z),CP).
 
 hooked_retract(CP,_CA):- nonground_throw_or_fail(hooked_retract(CP)).
-hooked_retract(CP,CA):- ignore(show_call_failure(clause_asserted(CA))),!,ignore(retract_cloc(CA)),ignore(retract_cloc(CP)),run_database_hooks_local(retract(one),CP).
+hooked_retract(_CP,CA):- once(show_call_failure(clause_asserted(CA))),fail.
+hooked_retract(CP,CA):-    copy_term(CP,CCP),
+   ignore(retract_cloc(CA)),
+   ignore((differnt_assert(CA,CP),retract_cloc(CP))),
+   run_database_hooks_local(retract(one),CCP).
+
+%hooked_retractall(CP,_CA):- nonground_throw_or_fail(hooked_retractall(CP)).
+hooked_retractall(_CP,CA):- once(show_call_failure(clause_asserted(CA))),fail.
+hooked_retractall(CP,CA):-
+   copy_term(CP,CCP),
+   ignore(retractall_cloc(CA)),
+   ignore((differnt_assert(CA,CP),retractall_cloc(CP))),
+   run_database_hooks_local(retract(all),CCP).
 
 % hooked_retractall(CP,CA):- copy_term(CA,CCA),once(retract_cloc(CCA)),!,retractall_cloc(CA), run_database_hooks_local(retract(all),CP).
-hooked_retractall(CP,CA):- retractall_cloc(CA),run_database_hooks_local(retract(all),CP),retractall_cloc(CP).
+% hooked_retractall(CP,CA):- run_database_hooks_local(retract(all),CP), retractall_cloc(CA),ignore((CA \= CP, catch(retractall(CP),_,true))).
+
 
 differnt_assert(G1,G2):- notrace(differnt_assert1(G1,G2)),dmsg(differnt_assert(G1,G2)),ztrace.
 
@@ -419,7 +435,7 @@ show_cgoal(G):- % dmsg(show_cgoal(G)),
 asserta_cloc(M:C):-atom(M),!,asserta_cloc(M,C),!.
 asserta_cloc( C ):-dbase_mod(M),asserta_cloc(M,C),!.
 asserta_cloc(M,C):-ensure_predicate_reachable(M,C),fail.
-asserta_cloc(_M,C):-singletons_throw_or_fail(C).
+asserta_cloc(M,C):-singletons_throw_or_fail(M:C).
 asserta_cloc(M,C):-clause_asserted(M:C,true),!.
 asserta_cloc(M,C):-database_real(asserta,M:C).
 
@@ -427,24 +443,27 @@ asserta_cloc(M,C):-database_real(asserta,M:C).
 assertz_cloc(M:C):-atom(M),!,assertz_cloc(M,C),!.
 assertz_cloc( C ):-dbase_mod(M),assertz_cloc(M,C),!.
 assertz_cloc(M,C):-ensure_predicate_reachable(M,C),fail.
-assertz_cloc(_M,C):-singletons_throw_or_fail(C).
+assertz_cloc(M,C):-singletons_throw_or_fail(M:C).
 assertz_cloc(M,C):-clause_asserted(M:C,true),!.
 assertz_cloc(M,C):-database_real(assertz,M:C).
 
 retract_cloc(M:C):-atom(M),!,retract_cloc(M,C),!.
 retract_cloc( C ):-dbase_mod(M),retract_cloc(M,C),!.
 retract_cloc(M,C):-ensure_predicate_reachable(M,C),fail.
-%retract_cloc(M,C):-not(clause_asserted(M:C,true)),!.
-retract_cloc(M,C):- show_call_failure(database_real(retract,M:C)).
+%retract_cloc(M,C):-show_call_failure(not(clause_asserted(M:C))),!,fail.
+retract_cloc(M,C):- database_real(retract,M:C).
 
 retractall_cloc(M:C):-atom(M),!,retractall_cloc(M,C),!.
 retractall_cloc( C ):-dbase_mod(M),retractall_cloc(M,C),!.
 retractall_cloc(M,C):-ensure_predicate_reachable(M,C),fail.
-%retractall_cloc(M,C):-not(clause_asserted(M:C,true)),!.
+%retractall_cloc(M,C):-not(clause_asserted(M:C)),!.
 retractall_cloc(M,C):-database_real(retractall,M:C).
 
-database_real(P,C):- into_assertable_form(C,DB),C \= DB,!,debugOnError(call(P,DB)).
-database_real(P,C):- debugOnError(call(P,C)).
+database_real(P,C):- 
+    copy_term(C,CC),
+      ignore((once((into_assertable_form(CC,DB), get_functor(C,CF),get_functor(DB,DBF))),DBF \== CF, 
+        dmsg(warn_into_assertable_form(P,C,DB)),show_call_failure(debugOnError(call(P,DB))))),
+      show_call_failure(debugOnError(call(P,C))).
 
 
 % ========================================

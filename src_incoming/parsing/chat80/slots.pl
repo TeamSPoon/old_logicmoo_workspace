@@ -37,7 +37,7 @@ i_sentence(whq(X,S),question([X],P)) :-
 i_sentence(imp(s(_,Verb,VArgs,VMods)),imp(V,Args)) :-
    i_verb(Verb,V,_,active,pos,Slots0,[],transparent),
    i_verb_args(VArgs,[],[],Slots0,Slots,Args,Args0,Up,-0),
-   conc(Up,VMods,Mods),
+   conc80(Up,VMods,Mods),
    i_verb_mods(Mods,_,[],Slots,Args0,Up,+0).
 
 i_np(there,Y,quant(void,_X,'`'(true),'`'(true),[],Y),[],_,_,XA,XA).
@@ -82,7 +82,7 @@ i_np_mods(Mods,_,[],'`'(true),[],Mods,_,_).
 i_np_mods([Mod|Mods],X,Slots0,Pred0,QMods0,Up,Id,Index) :-
    i_np_mod(Mod,X,Slots0,Slots,
             Pred0,Pred,QMods0,QMods,Up0,-Id,Index),
-   conc(Up0,Mods,Mods0),
+   conc80(Up0,Mods,Mods0),
    i_np_mods(Mods0,X,Slots,Pred,QMods,Up,+Id,Index).
 i_np_mods(Mods,_,[Slot|Slots],'`'(true),QMods,Mods,Id,_) :-
    i_voids([Slot|Slots],QMods,Id).
@@ -108,7 +108,7 @@ i_np_mod(pp(Prep,NP),
       X,Slots0,Slots,Pred,Pred,[QMod|QMods],QMods,Up,Id0,Index0) :-
    i_np_head(NP,Y,Q,LDet,LDet0,LX,LPred,LQMods,LSlots0,Id0),
    i_bind(Prep,Slots0,Slots1,X,Y,Id0,Function,P,PSlots,XArg),
-   conc(PSlots,Slots1,Slots),
+   conc80(PSlots,Slots1,Slots),
    i_np_modify(Function,P,Q,QMod,Index0,Index),
    held_arg(XArg,[],LSlots0,LSlots,Id0,Id),
    i_np_rest(NP,LDet,LDet0,LX,LPred,LQMods,LSlots,Up,Id,Index).
@@ -159,9 +159,9 @@ i_adj(adj(Adj),TypeX-X,T,T,_,
 i_s('s'(Subj,Verb,VArgs,VMods),Pred,Up,Id) :-
    i_verb(Verb,P,Tense,Voice,Neg,Slots0,XA0,Meta),
    i_subj(Voice,Subj,Slots0,Slots1,QSubj,SUp,'-'('-'(Id))),
-   conc(SUp,VArgs,TArgs),
+   conc80(SUp,VArgs,TArgs),
    i_verb_args(TArgs,XA0,XA,Slots1,Slots,Args0,Args,Up0,'+'('-'(Id))),
-   conc(Up0,VMods,Mods),
+   conc80(Up0,VMods,Mods),
    i_verb_mods(Mods,Tense,XA,Slots,Args,Up,+Id),
    reshape_pred(Meta,QSubj,Neg,P,Args0,Pred).
 
@@ -199,7 +199,7 @@ subj_case(passive,s_subj).
 fill_verb([],XA,XA,Slots,Slots,Args,Args,[],_).
 fill_verb([Node|Nodes0],XA0,XA,Slots0,Slots,Args0,Args,Up,Id) :-
    verb_slot(Node,XA0,XA1,Slots0,Slots1,Args0,Args1,Up0,-Id),
-   conc(Up0,Nodes0,Nodes),
+   conc80(Up0,Nodes0,Nodes),
    fill_verb(Nodes,XA1,XA,Slots1,Slots,Args1,Args,Up,+Id).
 
 verb_slot(pp(Prep,NP),
@@ -216,7 +216,7 @@ verb_slot(pp(prep(Prep),NP),
    i_np_head(NP,Y,Q,LDet,LDet0,LX,LPred,LQMods,LSlots0,Id0),
    held_arg(XArg,[],LSlots0,LSlots,Id0,Id),
    i_np_rest(NP,LDet,LDet0,LX,LPred,LQMods,LSlots,Up,Id,free),
-   conc(PSlots,Slots1,Slots).
+   conc80(PSlots,Slots1,Slots).
 verb_slot(arg(SCase,NP),
       XArg0,XArg,Slots0,Slots,[Q|Args],Args,Up,Id) :-
    i_np(NP,X,Q,Up,Id,unit,XArg0,XArg),
@@ -288,12 +288,12 @@ inverse(X,+,X).
 
 noun_template(Noun,TypeV,V,'`'(P),
       [slot(poss,TypeO,O,Os,index)|Slots]) :-
-   property_template80(Noun,TypeV,V,TypeO,O,P,Slots,Os,_).
+   property(Noun,TypeV,V,TypeO,O,P,Slots,Os,_).
 noun_template(Noun,TypeV,V,aggr(F,V,[],'`'(true),'`'(true)),
    [slot(prep(of),TypeS,_,_,free)]) :-
    aggr_noun(Noun,TypeV,TypeS,F).
 noun_template(Noun,Type,X,'`'(P),Slots) :-
-   thing_template80(Noun,Type,X,P,Slots,_).
+   thing(Noun,Type,X,P,Slots,_).
 noun_template(Noun,TypeV,V,apply(F,P),
       [slot(prep(of),TypeX,X,_,apply)]) :-
    meta_noun(Noun,TypeV,V,TypeX,X,P,F).
@@ -360,6 +360,6 @@ index(index(_I)).
 % ================================================================
 % Utilities
 
-conc([],L,L).
-conc([X|L1],L2,[X|L3]) :-
-   conc(L1,L2,L3).
+conc80([],L,L).
+conc80([X|L1],L2,[X|L3]) :-
+   conc80(L1,L2,L3).

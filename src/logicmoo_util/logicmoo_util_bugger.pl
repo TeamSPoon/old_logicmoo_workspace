@@ -318,11 +318,12 @@ def_meta_predicate(M:F,S,E):-!,doall(((between(S,E,N),make_list('?',N,List),CALL
 def_meta_predicate(F,S,E):- trace_or_throw(def_meta_predicate(F,S,E)).
 
 
-:- meta_predicate_transparent((no_loop_check(^,^))).
-:- meta_predicate_transparent((no_loop_check(^))).
+:- meta_predicate_transparent((no_loop_check(0,0))).
+:- meta_predicate_transparent((no_loop_check(0))).
+:- meta_predicate_transparent((no_loop_check_unsafe(0))).
 :- meta_predicate_transparent((loop_check_term(0,?,0))).
-:- meta_predicate_transparent((loop_check(^,^))).
-:- meta_predicate_transparent((loop_check(^))).
+:- meta_predicate_transparent((loop_check(0,0))).
+:- meta_predicate_transparent((loop_check(0))).
 
 
 :- export(((decl_thlocal)/1)).
@@ -341,8 +342,6 @@ decl_thlocal(CM,M,PI,F/A):-
    (compound(PI3) -> M:meta_predicate(PI3) ; true),
    dynamic_multifile_exported(CM, M,PI3,F/A).
 
-
-   
 
 :-export(parent_goal/2).
 parent_goal(Term,Nth):- parent_frame_attribute(goal,Term,Nth,_RealNth,_FrameNum).
@@ -582,11 +581,14 @@ no_repeats_key(Key, _ , _):- retractall(was_a_repeat(Key, _)),fail.
 is_loop_checked(B):- 
        make_key(B,BC),!,tlbugger:inside_loop_check(BC).
 
+no_loop_check_unsafe(B):- with_no_assertions(tlbugger:inside_loop_check(_),B).
 
-no_loop_check(B):- no_loop_check(B,fail).
+no_loop_check(B):- with_no_assertions(tlbugger:inside_loop_check(_),loop_check(B,trace_or_throw(no_loop_check(B)))).
+% no_loop_check(B):- no_loop_check(B,fail).
 no_loop_check(B, TODO):- make_key(B,BC),!, no_loop_check(B,BC,TODO).
 no_loop_check(_B, BC, TODO):- tlbugger:inside_loop_check(BC),!,call(TODO).
-no_loop_check( B, BC,_TODO):- with_no_assertions(tlbugger:inside_loop_check(_),
+no_loop_check( B, BC,_TODO):-
+   with_no_assertions(tlbugger:inside_loop_check(_),
                setup_call_cleanup(asserta(tlbugger:inside_loop_check(BC)),B,(ignore(retract((tlbugger:inside_loop_check(BC))))))).
 
   
@@ -1229,9 +1231,10 @@ printAll(FileMatch):-printAll(FileMatch,FileMatch).
 printAll(Call,Print):- flag(printAll,_,0), forall((Call,flag(printAll,N,N+1)),(fmt('~q.~n',[Print]))),fail.
 printAll(_Call,Print):- flag(printAll,PA,0),(fmt('~n /* found ~q for ~q. ~n */ ~n',[PA,Print])).
 
+/*
 contains_term(SearchThis,Find):-Find==SearchThis,!.
 contains_term(SearchThis,Find):-compound(SearchThis),functor_catch(SearchThis,Func,_),(Func==Find;arg(_,SearchThis,Arg),contains_term(Arg,Find)).
-
+*/
 % =================================================================================
 % Utils
 % =================================================================================

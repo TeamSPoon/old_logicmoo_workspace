@@ -60,8 +60,8 @@ test_call(meta_callable(String,test_name(String))):-!,string(String).
 test_call(meta_call(X)):- !,test_call0(X).
 test_call(Goal):- meta_interp(test_call,Goal).
 
-test_call0(SomeGoal):- from_here(SomeGoal),!,call_expanded(SomeGoal).
-test_call0(SomeGoal):- dmsg(call_expanded(SomeGoal)), catch(SomeGoal,E,(test_result(error(E),SomeGoal),!,fail)).
+test_call0(SomeGoal):- from_here(SomeGoal),!,req(SomeGoal).
+test_call0(SomeGoal):- dmsg(req(SomeGoal)), catch(SomeGoal,E,(test_result(error(E),SomeGoal),!,fail)).
 
 test_true(SomeGoal):-  once(((test_call(SomeGoal),!,test_result(passed,SomeGoal));test_result(failed,SomeGoal))).
 test_false(SomeGoal):- test_true(not(SomeGoal)).

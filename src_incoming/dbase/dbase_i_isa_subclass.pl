@@ -15,13 +15,6 @@
 % nart_to_atomic(L,L):-!,atom(L).
 nart_to_atomic(L,L).
 
-never_type(Var):-var(Var),!,trace_or_throw(var_never_type(Var)).
-never_type('Area1000').
-never_type(subft).
-never_type(must).
-never_type(mpred_prop).
-never_type(ft_info).
-never_type(F):- mpred_arity(F,A),!, A > 1.
 
 decl_type(Spec):- never_type(Spec),!,trace_or_throw(never_type(Spec)).
 decl_type(M:F):-!, '@'(decl_type(F), M).
@@ -35,7 +28,7 @@ decl_type(Spec):- compound(Spec),must_det(define_compound_as_type(Spec)).
 decl_type(Spec):- decl_mpred(Spec,1),declare_dbase_local_dynamic(Spec,1), decl_type_unsafe(Spec).
 
 decl_type_unsafe(Spec):- dbase_t(type,Spec),!.
-decl_type_unsafe(Spec):- add_w_hooks(dbase_t(type,Spec),isa(Spec,type)).
+decl_type_unsafe(Spec):- add_w_hooks(isa(Spec,type)),asserta_if_new(dbase_t(type,Spec)).
 
 define_compound_as_type(Spec):- dbase_t(F,Spec),dmsg(once(define_compound_as_type(Spec,F))).
 define_compound_as_type(Spec):- add(resultIsa(Spec,type)).
@@ -52,7 +45,7 @@ define_ft(Spec):- define_ft_0(Spec).
 
 define_ft_0(Spec):- dbase_t(formattype,Spec),!.
 define_ft_0(Spec):- dbase_t(type,Spec),dmsg(once(maybe_converting_plain_type_to_formattype(Spec))),fail.
-define_ft_0(Spec):- add_w_hooks(dbase_t(formattype,Spec),isa(Spec,formattype)).
+define_ft_0(Spec):- add_w_hooks(isa(Spec,formattype)),asserta_if_new(dbase_t(formattype,Spec)).
 
 %type(Spec):- is_asserted(isa(Spec,type)).
 
@@ -148,7 +141,6 @@ assert_isa_hooked_creation(I,T):- doall((is_creatable_type(ST),impliedSubClass(T
 transitive_subclass_tst(_,_):-!,fail.
 
 
-:-export(isa_backchaing/2).
 % isa_backchaing(A,T):- stack_depth(Level),Level>650,trace_or_throw(skip_dmsg_nope(failing_stack_overflow(isa_backchaing(A,T)))),!,fail.
 
 

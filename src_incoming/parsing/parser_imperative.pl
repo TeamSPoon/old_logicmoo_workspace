@@ -281,7 +281,7 @@ parse_agent_text_command_0(Agent,IVERB,ARGS,NewAgent,GOAL):-
    parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL).
 
 parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,prologCall(call_mpred(PROLOGTERM))):- compound(PROLOGTERM),functor(PROLOGTERM,F,_),mpred_prop(F,_),!.
-parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,prologCall(call_expanded(PROLOGTERM))):- compound(PROLOGTERM),is_callable(PROLOGTERM),!.
+parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,prologCall(req(PROLOGTERM))):- compound(PROLOGTERM),is_callable(PROLOGTERM),!.
          
 
 parse_agent_text_command_0(Agent,IVERB,ARGS,Agent,GOAL):- ground(IVERB), string_to_atom(IVERB,VERB),GOAL=..[VERB|ARGS],!.

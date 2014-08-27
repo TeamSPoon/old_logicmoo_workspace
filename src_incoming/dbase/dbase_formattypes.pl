@@ -103,7 +103,7 @@ argIsa_call_nt(F,N,Type):- argIsa_call(F,N,Type),!.
 argIsa_call_nt(F,N,Type):- findall(T,argIsa_call_0(F,N,Type),T),Types=[_|_],!,as_one_of(Types,Type),!.
 
 
-:-dynamic(argIsa_call_0/3).
+:-dynamic_multifile_exported(argIsa_call_0/3).
 argIsa_call_0(agent_text_command,_,term).
 argIsa_call_0(argIsa,1,relation).
 argIsa_call_0(argIsa,2,int).
@@ -163,8 +163,8 @@ argIsa_call_0(F,_,term):-member(F/_,
 
 % argIsa_asserted(F,N,Type):- dbase_t(argIsa,F,N,Type),!.
 argIsa_asserted(F,N,Type):- argIsa_call_0(F,N,Type),!.
-argIsa_asserted(F,N,Type):- get_mpred_prop(F,argIsa(N,Type)),!.
-argIsa_asserted(F,N,Type):- grab_argsIsa(F,Types),arg(N,Types,Type),nonvar(Type),!.
+argIsa_asserted(F,N,Type):- get_mpred_prop(F,argIsa(N,Type)),!,asserta(argIsa_call_0(F,N,Type)).
+argIsa_asserted(F,N,Type):- grab_argsIsa(F,Types),arg(N,Types,Type),nonvar(Type),!,asserta(argIsa_call_0(F,N,Type)),!.
 argIsa_asserted(_,_,term).
 argIsa_asserted(F,N,Type):- grab_argsIsa2(F,Types),arg(N,Types,Type),nonvar(Type),!.
 argIsa_asserted(facing,_,term).
@@ -421,7 +421,7 @@ correctType(Op,Args,Types,NewArgs):-compound(Args), compound(Types),
 
 
 correctType(Op,A,Fmt,AA):- moo:ft_info(Fmt,formatted),!,correctFormatType(Op,A,formatted(Fmt),AA).
-correctType(_O,A,Fmt,A):- moo:ft_info(Fmt,Code),!,subst(Code,self,A,Call),with_assertions(thlocal:no_arg_type_error_checking,show_call_failure(call_expanded(Call))).   
+correctType(_O,A,Fmt,A):- moo:ft_info(Fmt,Code),!,subst(Code,self,A,Call),with_assertions(thlocal:no_arg_type_error_checking,show_call_failure(req(Call))).   
 correctType(Op,A,Super,AA):- formattype(Super),req(subft(Sub,Super)),Sub\=Super,correctType(Op,A,Sub,AA).
 
 correctType(Op,Arg,Props,NewArg):- compound(Props),
@@ -513,6 +513,8 @@ nonusefull_deduction_type(dir).
 nonusefull_deduction_type(Type):-createableType(Type),!,fail.
 nonusefull_deduction_type(obj).
 nonusefull_deduction_type(Type):-is_asserted(formattype(Type)).
+
+assert_deduced_arg_isa_facts(Fact):- !, ignore(((ground(Fact),forall(deduce_argIsa_facts(Fact,Arg,Type),add(isa(Arg,Type)))))).
 
 assert_deduced_arg_isa_facts(Fact):- slow_kb_op(assert_deduced_arg_isa_facts_0(Fact)),!.
 assert_deduced_arg_isa_facts_0(Fact):- ignore(((ground(Fact),forall(deduce_argIsa_facts(Fact,Arg,Type),add(isa(Arg,Type)))))).

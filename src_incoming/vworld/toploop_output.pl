@@ -63,7 +63,7 @@ show_kb_via_pred_0(WPred,ToSTR,F = Call):- contains_term(Call,value), !,show_kb_
 show_kb_via_pred_0(WPred,ToSTR,F = Call):- !,show_kb_via_pred_format_call(WPred,ToSTR, F = Call ,Call).
 show_kb_via_pred_0(WPred,ToSTR,forEach(Call,Show)):-!, show_kb_via_pred_format_call(WPred,ToSTR, Show, forEach(Call)).
 show_kb_via_pred_0(WPred,ToSTR,fmt(Show)):- !, show_kb_via_pred_format_call(WPred,ToSTR, Show ,true).
-show_kb_via_pred_0(WPred,ToSTR,call(Call)):- !,  with_output_to(string(Value),call_expanded(Call)),
+show_kb_via_pred_0(WPred,ToSTR,call(Call)):- !,  with_output_to(string(Value),req(Call)),
       fmt(Value),
       show_kb_via_pred_0(WPred,ToSTR,fmt(Value)).
 
@@ -73,7 +73,7 @@ show_kb_via_pred_0(WPred,ToSTR,Call):- functor(Call,F,_), show_kb_via_pred_1(WPr
 
 show_kb_via_pred_1(WPred,ToSTR,F,all(Call)):-!,show_kb_via_pred_2(WPred,ToSTR,F,Call).
 show_kb_via_pred_1(WPred,ToSTR,F,once(Call)):-!,show_kb_via_pred_2(WPred,ToSTR,F,once(Call)).
-show_kb_via_pred_1(_WPred,_ToSTR,_F,call(Call)):-!,debugOnError(call_expanded(Call)).
+show_kb_via_pred_1(_WPred,_ToSTR,_F,call(Call)):-!,debugOnError(req(Call)).
 show_kb_via_pred_1(WPred,ToSTR,F,Call):-show_kb_via_pred_2(WPred,ToSTR,F,Call).
 
 
@@ -84,10 +84,10 @@ show_kb_via_pred_format_call(WPred0,ToSTRIn,Format0,Call0):-
    show_kb_via_pred_fmt(WPred,ToSTROut,FormatOut,_UnkType,GCall).
 
 
-show_kb_via_pred_fmt(WPred,ToSTR,SayIt,_Type,forEach(GCall)):-!,forall(call_expanded(GCall),show_kb_via_pred_0(WPred,ToSTR,SayIt)).     
-show_kb_via_pred_fmt(WPred,ToSTR,SayIt,Type,listof(GCall)):-!,findall(SayIt,ccatch(call_expanded(GCall),Error,(dmsg(error(SayIt=Error:GCall)),fail)),Count),
+show_kb_via_pred_fmt(WPred,ToSTR,SayIt,_Type,forEach(GCall)):-!,forall(req(GCall),show_kb_via_pred_0(WPred,ToSTR,SayIt)).     
+show_kb_via_pred_fmt(WPred,ToSTR,SayIt,Type,listof(GCall)):-!,findall(SayIt,ccatch(req(GCall),Error,(dmsg(error(SayIt=Error:GCall)),fail)),Count),
     merge_list_on_p(WPred,ToSTR,SayIt,Type,GCall,_NewValue,Count).
-show_kb_via_pred_fmt(WPred,ToSTR,SayIt,Type,GCall):-!,findall(SayIt,ccatch(call_expanded(GCall),Error,(dmsg(error(SayIt=Error:GCall)),fail)),Count),
+show_kb_via_pred_fmt(WPred,ToSTR,SayIt,Type,GCall):-!,findall(SayIt,ccatch(req(GCall),Error,(dmsg(error(SayIt=Error:GCall)),fail)),Count),
     merge_list_on_p(WPred,ToSTR,SayIt,Type,GCall,_NewValue,Count).
 
 merge_list_on_p(WPred,ToSTR,SayIt,Type,GCall,_NewValue,[]):-
@@ -124,14 +124,14 @@ show_kb_via_pred_2(WPred0,ToSTRIn,F0,Call0):-
 
 show_kb_via_pred_3(WPred,ToSTR,fmt(SayIt),Type,GCall,NewValue):-!,
   % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
-      findall(NewValue,(ccatch(call_expanded(GCall),Error, NewValue=Error), 
+      findall(NewValue,(ccatch(req(GCall),Error, NewValue=Error), 
              fmt((SayIt))),Count),
       (Count==[] ->
         fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(f1,F,Type)); true),!.
 
 show_kb_via_pred_3(WPred,ToSTR,fmt,Type,GCall,NewValue):-!,
   % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
-      findall(NewValue,(ccatch(call_expanded(GCall),Error, NewValue=Error), 
+      findall(NewValue,(ccatch(req(GCall),Error, NewValue=Error), 
              fmt(GCall)),Count),
       (Count==[] ->
         fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(f2,F,Type)); true),!.
@@ -139,7 +139,7 @@ show_kb_via_pred_3(WPred,ToSTR,fmt,Type,GCall,NewValue):-!,
 
 show_kb_via_pred_3(WPred,ToSTR,output,Type,GCall,NewValue):-!,
   % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
-      findall(NewValue,(ccatch(call_expanded(GCall),Error, NewValue=Error), 
+      findall(NewValue,(ccatch(req(GCall),Error, NewValue=Error), 
              fmt_holds_tcall(WPred,ToSTR,F,Type,NewValue)),Count),
       (Count==[] ->
         fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(f3,F,Type)); true),!.
@@ -147,14 +147,14 @@ show_kb_via_pred_3(WPred,ToSTR,output,Type,GCall,NewValue):-!,
 
 show_kb_via_pred_3(WPred,ToSTR,F,Type,GCall,NewValue):- canUseEnglish,!,
   % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
-      findall(NewValue,(ccatch(call_expanded(GCall),Error, NewValue=Error), 
+      findall(NewValue,(ccatch(req(GCall),Error, NewValue=Error), 
              fmt_holds_tcall(WPred,ToSTR,text,Type,GCall)),Count),!,
       (Count==[] ->
         (fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(f4,F,Type))); true),!.
 
 show_kb_via_pred_3(WPred,ToSTR,F,Type,GCall,NewValue):-
   % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
-      findall(NewValue,(ccatch(call_expanded(GCall),Error, NewValue=Error), 
+      findall(NewValue,(ccatch(req(GCall),Error, NewValue=Error), 
              fmt_holds_tcall(WPred,ToSTR,F,Type,NewValue)),Count),
       (Count==[] ->
         fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(f5,F,Type)); true),!.

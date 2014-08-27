@@ -38,6 +38,7 @@
          in_thread_and_join/2,
          functor_h/2,
          asserta_new/1,
+         assertz_new/1,
          as_clause/3,
          asserta_if_new/1,
          assertz_if_new/1,

@@ -69,7 +69,7 @@ quantifier_pron(Det,Noun) -->
    [W],
    {quantifier_pron(W,Det,Noun)}.
 
-context_pron(prep(in),place) --> [where].
+context_pron(prep(In),Place) --> [Where] , {contextWH(In,Place,Where)}.
 context_pron(prep(at),time) --> [when].
 
 number(nb(I),Number) -->

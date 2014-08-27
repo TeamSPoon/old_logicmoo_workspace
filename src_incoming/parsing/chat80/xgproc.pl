@@ -11,6 +11,7 @@ new_pred(P) :-
    recorded(P,'xg.pred',_), !.
 new_pred(P0) :-
    functor(P0,F,N), functor(P,F,N),
+   dynamic_multifile_exported(F/N),
    recordz(P,'xg.pred',_),
    recordz('xg.pred',P,_).
 
@@ -192,7 +193,8 @@ xg_listing(File) :-
    told,
    tell(Old).
 
-compile_xg_clauses :- recorded('xg.pred',P,_),functor(P,F,N),compile_predicates([F/N]),fail.
+compile_xg_clauses :- recorded('xg.pred',P,_),functor(P,F,N),dynamic_multifile_exported(F/N),fail.
+% compile_xg_clauses :- recorded('xg.pred',P,_),functor(P,F,N),compile_predicates([F/N]),fail.
 compile_xg_clauses.
 
 list_clauses :-

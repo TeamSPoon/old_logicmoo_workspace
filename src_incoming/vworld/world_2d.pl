@@ -175,6 +175,7 @@ ensure_in_world(What):-must_det(put_in_world(What)).
 :- dynamic_multifile_exported hook:deduce_facts/2.
 :- dynamic_multifile_exported hook:create_random_fact/1.
 :- dynamic_multifile_exported hook:create_random_instance/3.
+:- dynamic_multifile_exported hook:fact_always_true/1.
 :- dynamic_multifile_exported hook:fact_maybe_deduced/1.
 :- dynamic_multifile_exported hook:fact_is_false/2.
 
@@ -182,6 +183,11 @@ ensure_in_world(What):-must_det(put_in_world(What)).
 % facts that cant be true
 hook:fact_is_false(atloc(Obj,_LOC),inside_of(Obj,What)) :- nonvar(Obj),(inside_of(Obj,What)),!.
 hook:fact_is_false(localityOfObject(Obj,_LOC),inside_of(Obj,What)) :- nonvar(Obj),(inside_of(Obj,What)),!.
+
+% facts that must be true 
+%  suggest a deducable fact that is always defiantely true but not maybe asserted
+hook:fact_always_true(localityOfObject(apath(Region,Dir),Region)):-is_asserted(pathBetween(Region,Dir,_)).
+hook:fact_always_true(localityOfObject(Obj,Region)):- is_asserted(atloc(Obj,LOC)),locationToRegion(LOC,Region),!.
 
 %  suggest a deducable fact that is probably true but not already asserted
 hook:fact_maybe_deduced(localityOfObject(Obj,Region)):- is_asserted(atloc(Obj,LOC)),locationToRegion(LOC,Region),!.

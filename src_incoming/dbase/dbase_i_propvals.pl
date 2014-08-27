@@ -93,6 +93,7 @@ create_someval(Prop,Obj,Value):- fallback_value(Prop,Obj,DValue),!,Value=DValue.
 create_someval(Pred,_Arg1,Value):- must_det_l([moo:mpred_arity(Pred,Last),argIsa_call(Pred,Last,Type),create_random(Type,Value,nonvar(Value))]).
 
 asserted_or_deduced(Fact):- is_asserted(Fact),!.
+asserted_or_deduced(Fact):- hook:fact_always_true(Fact),must_det(is_fact_consistent(Fact)),!,add(Fact).
 asserted_or_deduced(Fact):- test_tl(thlocal:noDefaultValues,Fact),!,fail.
 asserted_or_deduced(Fact):- hook:fact_maybe_deduced(Fact),is_fact_consistent(Fact),add(Fact).
 asserted_or_deduced(Fact):- deducedSimply(Fact),is_fact_consistent(Fact),add(Fact).
@@ -106,6 +107,7 @@ create_random(Type,Value,Test):- copy_term(create_random(Type,Value,Test),create
    hook:create_random_instance(RType,RValue,RTest),
    checkAnyType(query(_,_),RValue,Type,Value),must_det(Test).
 create_random(Type,Value,Test):- atom(Type),atom_concat('random_',Type,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),Fact,Test,!.
+create_random(Type,Value,Test):- compound(Type),get_functor(Type,F),isa(F,W),atom_concat('random_',F,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),Fact,Test,!.
 create_random(Type,Value,Test):- findall(V,(isa_backchaing(V,Type)),Possibles),Possibles\=[],randomize_list(Possibles,Randomized),!,member(Value,Randomized),Test,!.
 create_random(Type,Value,Test):- trace_or_throw(failed(create_random(Type,Value,Test))).
 
@@ -116,8 +118,6 @@ save_fallback(Obj,Prop,Value):-not(ground(padd(Obj,Prop,Value))),trace_or_throw(
 save_fallback(Obj,Prop,Value):-is_fact_consistent(dbase_t(Prop,Obj,Value)),padd(Obj,Prop,Value).
 maybe_cache(Prop,Obj,Value,What):-not(not(maybe_cache_0(Prop,Obj,Value,What))).
 
-hook:decl_database_hook(assert(_),Fact):-slow_kb_op(checkNoArgViolation(Fact)).
-
 :-export(checkNoArgViolation/1).
 checkNoArgViolation(_).
 checkNoArgViolation(_):- not(bad_idea),!.
@@ -125,7 +125,15 @@ checkNoArgViolation(Fact):-Fact=..[dbase_t,Prop|ObjValue],!,checkNoArgViolation_
 checkNoArgViolation(Fact):-Fact=..[Prop|ObjValue],!,checkNoArgViolation_p_args(Prop,ObjValue),!.
 checkNoArgViolation(_).
 
+dont_check_args(Fact):-functor(Fact,F,A),dont_check_args(F,A).
+dont_check_args(isa,2).
+dont_check_args(mpred_prop,2).
+dont_check_args(mpred_arity,2).
+dont_check_args(A,1):-atom(A).
+
+
 checkNoArgViolation_p_args(isa,_).
+checkNoArgViolation_p_args(F,List):-is_list(List),length(List,A),dont_check_args(F,A),!.
 checkNoArgViolation_p_args(_,_):- test_tl(no_arg_type_error_checking),!.
 checkNoArgViolation_p_args(Prop,[Obj,Value]):-!,checkNoArgViolation(Prop,Obj,Value).
 checkNoArgViolation_p_args(Prop,[Obj,Value|_More]):-checkNoArgViolation(Prop,Obj,Value).
@@ -204,6 +212,8 @@ is_fact_consistent(Fact):-is_asserted(Fact),!.
 is_fact_consistent(Fact):-into_mpred_form(Fact,MForm), not(hook:fact_is_false(MForm,_Why)).
 
 hook:decl_database_hook(assert(_),Fact):- hook:fact_is_false(Fact,Why),trace_or_throw(hook:fact_is_false(Fact,Why)).
+
+hook:decl_database_hook(assert(_),Fact):- ignore((not(dont_check_args(Fact)),slow_kb_op(checkNoArgViolation(Fact)))).
 
 
 :-export(fallback_value/3).

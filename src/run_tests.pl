@@ -70,6 +70,9 @@ defined_local_test:-
    test_name("tests to see if 'food' can be an item"),
       test_true(parseIsa0(item, _G537410, [food], [])).
 
+defined_local_test:- 
+   test_name("Tests our action templates"), doall((get_type_action_templates(Templates),dmsg(get_type_action_templates(Templates)))).
+
 moo:mud_test("local sanity tests", doall(defined_local_test)).
 
 

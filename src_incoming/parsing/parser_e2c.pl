@@ -523,7 +523,11 @@ isCycWord(CycWord) --> {hotrace(stringToCycWord(String,CycWord))},literal(String
 % ==========================================================
 meetsPos(String,CycWord,POS):-  sanify_string(String,Sane),no_repeats(meetsPos_0(Sane,CycWord,POS)).
 
-meetsPos_0(String,CycWord,POS):- stack_check(1000),one_must(meetsPos_1(String,CycWord,POS),one_must(meetsPos_2(String,CycWord,POS),one_must(meetsPos_3(String,CycWord,POS),meetsPos_4(String,CycWord,POS)))).
+meetsPos_0(String,CycWord,POS):- stack_check(1000),one_must(meetsPos_1(String,CycWord,POS),
+     one_must(meetsPos_2(String,CycWord,POS),
+     one_must(meetsPos_3(String,CycWord,POS),
+     one_must(meetsPos_4(String,CycWord,POS),
+     meetsPos_5(String,CycWord,POS))))).
 meetsPos_0(_String,_CycWord,POS):- var(POS),!,fail.
 meetsPos_0(String,CycWord,FormNotPOS):- is_speechPartPred_any(FormNotPOS),!,meetsForm(String,CycWord,FormNotPOS).
 meetsPos_0(String,CycWord,POS):-'genls'(Child,POS),Child\=POS, meetsPos_0(String,CycWord,Child).
@@ -532,12 +536,13 @@ meetsPos_1(String,CycWord,POS):- has_wordage(String),!,is_wordage_prop(String, p
 
 meetsPos_2(String,CycWord,POS):- stringArgUC(String,CycString,'partOfSpeech'(CycWord,POS,CycString)).
 meetsPos_2(String,CycWord,POS):- reorderBody(meetsForm(String,CycWord,Form),POS^speechPartPreds_transitive(POS, Form)).
-meetsPos_2([String],CycWord,POS):- atom(String),stringAtomToPOS([String],CycWord,POS).
 
-meetsPos_3(String,CycWord,POS):- with_assertions(thlocal:allowTT,meetsPos_2(String,CycWord,POS)).
+meetsPos_3([String],CycWord,POS):- atom(String),stringAtomToPOS([String],CycWord,POS).
 
-meetsPos_4(String,CycWord,POS):-  member(POS,['Noun','Adjective','Verb','Adverb']), stringArg(String,'wnS'(CycWord, _ , String,POS, _ , _)).
-meetsPos_4(String,CycWord,'Adjective'):- 'wnS'(CycWord, _ , String, 'AdjectiveSatellite', _ , _). 
+meetsPos_4(String,CycWord,POS):- with_assertions(thlocal:allowTT,meetsPos_2(String,CycWord,POS)).
+
+meetsPos_5(String,CycWord,POS):-  member(POS,['Noun','Adjective','Verb','Adverb']), stringArg(String,'wnS'(CycWord, _ , String,POS, _ , _)).
+meetsPos_5(String,CycWord,'Adjective'):- 'wnS'(CycWord, _ , String, 'AdjectiveSatellite', _ , _). 
  
 
 stringAtomToPOS([String],CycWord,'Verb'):- meetsPosVerb([String],CycWord).
@@ -689,7 +694,7 @@ argIsa(Form,2, 'CharacterString'):-is_speechPartPred_tt(Form).
 % ==========================================================
 % meetsForm(String,CycWord,Form)
 % ==========================================================
-meetsForm80(String,RootString,form80(MainPlusTrans,main+trans)):-!,fail.
+meetsForm80(String,RootString,form80(MainPlusTrans,main+trans)):-!,fail,nop(String,RootString,form80(MainPlusTrans,main+trans)).
 
 % ==========================================================
 % meetsForm(String,CycWord,Form)
@@ -1274,12 +1279,13 @@ is_blankWord([A]):-!,is_blankWord(A).
 % ================================
 % local helpers
 % ================================
-optionalText(X) --> { length(X,L),L > 0, L < 33 } , X.
+optionalText(X) --> { length(X,L),L > 0, L < 33 } , theText(X).
 optionalText(_) --> [].
 
-theVariable(Atom)--> [Atom].
-theVariable(Atom)--> [Longer],{atom_concat(':',Atom,Longer)}.
+theVariable(Atom)--> theText([Longer]),{atom_concat(':',Atom,Longer)}.
+theVariable(Atom)--> theText([Atom]).
 
+isShortcut(X)--> theText(X).
 % =================================================================
 % wordageToKif
 % =================================================================
@@ -1495,7 +1501,7 @@ properNames(['Geordi',
 
 list_wordage:- listing(is_wordage_cache),retractall(is_wordage_cache(_,_)).
 
-:-list_wordage.
+% :-list_wordage.
 % string_props(Pass,String,posMeans(POS,Form,CycL)):-posMeans(String,POS,Form,CycL).
 string_props(Pass,String,tt(Pass,CycWord,Form)):- 
  with_assertions(thlocal:omitCycWordForms, with_assertions(thlocal:allowTT,(meetsForm(String,CycWord,Form),atom(Form),atom_concat(infl,_,Form),notPrefixOrSuffix(CycWord)))).
@@ -1540,10 +1546,11 @@ pred_props(Pred,CycWord,pos(3,CycWord,POS)):- posSubProp(SUB,POS),atom_contains(
 
 % string_props(Pass,String,cycl(Form)):-  meetsForm(String,CycWord,Form),notPrefixOrSuffix(CycWord).
 
+:-dynamic(word_no_pos/1).
 
 get_pos_list([],[]):-!.
 get_pos_list(Words,[DCG|POSList]):- between(1,3,X),length(Pre,X),append(Pre,Rest,Words),get_dcg(DCG,Pre),get_pos_list(Rest,POSList).
-get_pos_list([W|Ords],[w(W)|POSList]):-get_pos_list(Ords,POSList).
+get_pos_list([W|Ords],[w(W)|POSList]):-assert_if_new(word_no_pos(W)),get_pos_list(Ords,POSList).
    
 get_dcg(DCG,Pre):- dcgPredicate(parser_e2c,F,_,P),once((P=..[F|ARGS],append(LDCG,[S,E],[F|ARGS]),S=Pre,E=[])),call(P),DCG=..LDCG.
 
@@ -2018,7 +2025,7 @@ verb_phrase(_ , _ , _ ) --> dcgStartsWith1(isPOS(DET)),{ cantStart(verb_phrase,D
 
 verb_phrase_after_nouns(Subj,Event,exists(Subj)) --> [].
 
-verb_phrase_after_nouns(Subj,Event,exists(Subj,'verb_phrase')) --> [verb_phrase].
+verb_phrase_after_nouns(Subj,Event,exists(Subj,'verb_phrase')) --> isShortcut('verb_phrase').
 
 verb_phrase_after_nouns(Subj,Event,CycL) --> verb_phrase(Subj,Event,CycL).
 

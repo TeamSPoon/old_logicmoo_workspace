@@ -19,7 +19,7 @@
 
 */
 
-clausify(question(V0,P),(answer(V):-B)) :-
+clausify(question(V0,P),(answer80(V):-B)) :-
    quantify(P,Quants,[],R0),
    split_quants(question(V0),Quants,HQuants,[],BQuants,[]),
    chain_apply(BQuants,R0,R1),

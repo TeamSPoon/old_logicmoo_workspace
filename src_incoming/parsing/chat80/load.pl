@@ -51,13 +51,12 @@
 
 
 
-old_chat80 :-
+bad_chat80 :-
   told,
   told,
    repeat,
    prompt(_,'Question: '),
-   trace,read_in(P),
-      control(report,P),
+   trace,read_sent(P),
+      control80(report,P),
       end(user).
 
-    

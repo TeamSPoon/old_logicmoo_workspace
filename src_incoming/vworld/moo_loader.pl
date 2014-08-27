@@ -85,14 +85,13 @@ load_data_file(FileIn):-
   thglobal:current_world(World),
   time_file_safe(File,NewTime),
   assert(loaded_file_world_time(File,World,NewTime)), 
-   dmsg(load_data_file(File,World,NewTime)),
+   dmsg(load_data_file(File,World,NewTime)),!,
   with_assertions(thglobal:loading_game_file(World,File),
-   setup_call_cleanup(see(File),
-    (load_game_name_stream(World),asserta_new(moo:loaded_game_file(World,File))), seen)),
+   setup_call_cleanup(see(File),(load_game_name_stream(World),asserta_new(thglobal:loaded_game_file(World,File)),!), seen)),
   dmsg(load_data_file_complete(File)),!.
    
-load_game_name_stream(_Name):- repeat,read_one_term(Term),myDebugOnError(game_assert(Term)),Term == end_of_file,!.
-load_game_name_stream(_Name,Stream):- repeat,read_one_term(Stream,Term),myDebugOnError(game_assert(Term)),Term == end_of_file,!.
+load_game_name_stream(_Name):- repeat,read_one_term(Term),myDebugOnError(add(Term)),Term == end_of_file,!.
+load_game_name_stream(_Name,Stream):- repeat,read_one_term(Stream,Term),myDebugOnError(add(Term)),Term == end_of_file,!.
 
 myDebugOnError(Term):-catch(once((call(Term))),E,(dmsg(start_myDebugOnError(E=Term)),trace,rtrace(call(Term)),dmsg(stop_myDebugOnError(E=Term)),trace)).
 
@@ -230,7 +229,8 @@ add_description(description(I,S)):-add_description(I,S).
 
 :-meta_predicate_transparent(add_description/2).
 add_description(A,S0):-string_concat('#$PunchingSomething ',S,S0),!,add_description(A,S).
-% add_description(A,S0):-determinerRemoved(S0,String,S),!,add_description(A,S),game_assert(determinerString(A,String)).
+% add_description(A,S0):-determinerRemoved(S0,String,S),!,add_description(A,S),add(determinerString(A,String)).
+add_description(A,S0):-loop_check(add_description(A,S0),true).
 add_description(A,S0):-
    string_to_atom(S0,S),
    atomic_list_concat(Words,' ',S),
@@ -250,9 +250,9 @@ add_description(A,_S,_S0,1,_,[Word]):-add_description_word(A,Word),!.
 
 %#$PunchingSomething ..
 add_description(A,S,S0,Ws,Sents,['#$PunchingSomething',B|C]):-add_description(A,S,S0,Ws,Sents,[B|C]).
-add_description(A,S,S0,Ws,Sents,[Det,B|C]):-ddeterminer(Det,L),add_description(A,S,S0,Ws,Sents,[B|C]),game_assert(determinerString(A,L)).
-add_description(A,S,S0,Ws,_Sents,_Words):-Ws>3,is_here_String(S),text_to_string(S0,String),!,show_load_call(game_assert_fast(descriptionHere(A,String))).
-add_description(A,_S,S0,_Ws,_Sents,_Words):- text_to_string(S0,String),show_load_call(game_assert_fast(description(A,String))).
+add_description(A,S,S0,Ws,Sents,[Det,B|C]):-ddeterminer(Det,L),add_description(A,S,S0,Ws,Sents,[B|C]),add(determinerString(A,L)).
+add_description(A,S,S0,Ws,_Sents,_Words):-Ws>3,is_here_String(S),text_to_string(S0,String),!,show_load_call(add(descriptionHere(A,String))).
+add_description(A,_S,S0,_Ws,_Sents,_Words):- text_to_string(S0,String),show_load_call(add_fast(description(A,String))).
 
 is_here_String(S):- atomic_list_concat_safe([_,is,_,here,_],S).
 is_here_String(S):- atomic_list_concat_safe([_,here],S).
@@ -268,24 +268,24 @@ ddeterminer0(the).
 ddeterminer(L,L):-ddeterminer0(L).
 ddeterminer(U,L):-string_lower(U,L),U\=L,!,ddeterminer0(L).
 
-add_description_word(A,Word):- string_upper(Word,Word),string_lower(Word,Flag),string_to_atom(Flag,Atom),atom_concat(flagged_,Atom,FAtom),show_load_call(game_assert(isa(A,FAtom))).
-add_description_word(A,Word):- string_lower(Word,Word),show_load_call(game_assert(keyword(A,Word))).
-add_description_word(A,Word):- string_lower(Word,Lower),show_load_call(game_assert(keyword(A,Lower))).
+add_description_word(A,Word):- string_upper(Word,Word),string_lower(Word,Flag),string_to_atom(Flag,Atom),atom_concat(flagged_,Atom,FAtom),show_load_call(add(isa(A,FAtom))).
+add_description_word(A,Word):- string_lower(Word,Word),show_load_call(add(keyword(A,Word))).
+add_description_word(A,Word):- string_lower(Word,Lower),show_load_call(add(keyword(A,Lower))).
 
 
 add_description_kv(A,K,V):- atom_concat('#$PunchingSomething ',Key,K),!,add_description_kv(A,Key,V).
 add_description_kv(A,K,V):- atom_concat('+',Key,K),!,add_description_kv(A,Key,V).
-add_description_kv(A,K,V):-atom_to_value(V,Term),C=..[K,A,Term],show_load_call(game_assert(C)).
+add_description_kv(A,K,V):-atom_to_value(V,Term),C=..[K,A,Term],show_load_call(add(C)).
 
 
 % =======================================================
 
-show_load_call(game_assert_fast(A)):-
+show_load_call(add(A)):-
    correctArgsIsa(A,AA),
-   logOnFailure(game_assert_fast(AA)).
-show_load_call(game_assert(A)):-
+   logOnFailure(add(AA)).
+show_load_call(add(A)):-
    correctArgsIsa(A,AA),
-   logOnFailure(game_assert(AA)).
+   logOnFailure(add(AA)).
 show_load_call(C):- 
    logOnFailure(debugOnError(C)).
 

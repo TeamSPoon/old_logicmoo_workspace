@@ -39,8 +39,8 @@ direct_to_agent(Whom,NewEvent):- dmsg(could_not(direct_to_agent(Whom,NewEvent)))
 
 
 %%:-export(direct_to_agent/2).
-ensure_agent_stream(Whom,Input,Output):- agent_message_stream(Whom,Input,Output),is_stream(Input),is_stream(Output),!.
-ensure_agent_stream(Whom,_Input,_Output):-ignore(retract(agent_message_stream(Whom,_,_))),!,fail.
+ensure_agent_stream(Whom,Input,Output):- thglobal:agent_message_stream(Whom,Input,Output),is_stream(Input),is_stream(Output),!.
+ensure_agent_stream(Whom,_Input,_Output):-ignore(retract(thglobal:agent_message_stream(Whom,_,_))),!,fail.
 
 :-export(deliverable_location_events/3).
 

@@ -165,18 +165,23 @@ an_s --> [].
 determiner(Det,Number,Def) --> det(Det,Number,Def).
 determiner(Det,Number,Def) --> quant_phrase(Det,Number,Def).
 
+% Measure is X
 quant_phrase(quant(Op,Quant),Number,Def) -->
    quant(Op,Def),
    number(Quant,Number).
 
+% Measure is more / less than
 quant(Op,indef) -->
    neg_adv(Op0,Op),
    comp_adv(Op0),
    [than].
+
+% Measure is at least / most
 quant(Op,indef) -->
    [at],
    sup_adv(Adv),
    {sup_op(Adv,Op)}.
+
 quant(the,def) --> [the].
 quant(same,indef) --> [].
 
@@ -239,13 +244,18 @@ comp_phrase(comp(Comp,Adj,Arg),Mask) -->
    {np_no_trace(NPNT), prep_case(Case)},
    np(Arg,_,Case,_,compl,NPNT,Mask).
 
+% Measure is Numerically More
 comp(Comp,Adj) -->
    comp_adv(Comp),
    adj(quant,Adj),
    [than].
+
+% Measure is NON-Numerically More
 comp(more,Adj) -->
    rel_adj(Adj),
    [than].
+
+% Measure is same
 comp(same,Adj) -->
    [as],
    adj(quant,Adj),

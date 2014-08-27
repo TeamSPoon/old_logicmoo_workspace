@@ -34,7 +34,7 @@ npc_tick:-
 join_npcs_long_running.
 
 % skip manually controled agents
-npc_controller(simple_world_agent_plan,Who):- isa(Who,activeAgent),not(toploop_telnet:agent_message_stream(Who,_,_)).
+npc_controller(simple_world_agent_plan,Who):- isa(Who,activeAgent),not(thglobal:agent_message_stream(Who,_,_)).
 
 tick_controller(simple_world_agent_plan,Who):- tick(Who).
 
@@ -81,7 +81,8 @@ moo:action_info(tick,"Makes *your* agent do something brilliant").
 moo:action_info(prolog(prolog),"Call prolog toploop").
 
 moo:agent_text_command(Agent,[prolog,X],Agent,prologCall(X)):-ignore(X=someCode).
-moo:agent_text_command(Agent,[prolog],Agent,prologCall(prolog)).
+moo:agent_text_command(Agent,[prolog],Agent,prologCall(user:prolog_repl)).
+moo:agent_text_command(Agent,[tlocals],Agent,prologCall(user:tlocals)).
 
 warnOnError(X):-catch(X,E,dmsg(error(E:X))).
 

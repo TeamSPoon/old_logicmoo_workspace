@@ -52,7 +52,7 @@ success(_,yes).
 :-export(add_cmdfailure/2).
 add_cmdfailure(Agent,What):-add(cmdfailure(Agent,What)).
 
-hook:decl_database_hook(assert(_),cmdfailure(Agent,What)):- once(del(cmdsuccess(Agent,What));clr(cmdsuccess(Agent,_))).
+hook:decl_database_hook(assert(_),cmdfailure(Agent,What)):- once(idel(cmdsuccess(Agent,What));clr(cmdsuccess(Agent,_))).
 
 % Initialize world.
 % This keeps the old databases messing with new runs.
