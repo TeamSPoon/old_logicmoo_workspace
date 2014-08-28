@@ -86,9 +86,10 @@ type(typeDeclarer).
 :-doall((argsIsaProps(F),decl_type(F),add(subclass(F,relation)))).
 :-doall((argsIsaProps(F),decl_type(F),add(isa(F,typeDeclarer)))).
 
-
-:-decl_mpred_hybrid(repl_writer(agent,term),[singleValued,default_sv(2,look:default_repl_writer)]).
-:-decl_mpred_hybrid(repl_to_string(agent,term),[singleValued,default_sv(2,look:default_repl_obj_to_string)]).
+:-decl_mpred_prolog(repl_writer(agent,term)).
+%:-decl_mpred_hybrid(repl_writer(agent,term),[singleValued,default_sv(2,look:default_repl_writer)]).
+:-decl_mpred_prolog(repl_to_string(agent,term)).
+%:-decl_mpred_hybrid(repl_to_string(agent,term),[singleValued,default_sv(2,look:default_repl_obj_to_string)]).
 
 %mpred(ArgTypes,PropTypes):-decl_mpred_prop(ArgTypes,PropTypes).
 % somethingIsa('NpcCol1012-Ensign732',['NpcCol1012',actor,'MaleAnimal']).

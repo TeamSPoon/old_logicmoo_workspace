@@ -28,7 +28,9 @@ decl_type(Spec):- compound(Spec),must_det(define_compound_as_type(Spec)).
 decl_type(Spec):- decl_mpred(Spec,1),declare_dbase_local_dynamic(Spec,1), decl_type_unsafe(Spec).
 
 decl_type_unsafe(Spec):- dbase_t(type,Spec),!.
-decl_type_unsafe(Spec):- add_w_hooks(isa(Spec,type)),asserta_if_new(dbase_t(type,Spec)).
+decl_type_unsafe(Spec):- hooked_asserta(isa(Spec,type)),asserta_if_new(dbase_t(type,Spec)).
+
+:- decl_mpred_hybrid(typeDeclarer/1).
 
 define_compound_as_type(Spec):- dbase_t(F,Spec),dmsg(once(define_compound_as_type(Spec,F))).
 define_compound_as_type(Spec):- add(resultIsa(Spec,type)).
@@ -45,7 +47,7 @@ define_ft(Spec):- define_ft_0(Spec).
 
 define_ft_0(Spec):- dbase_t(formattype,Spec),!.
 define_ft_0(Spec):- dbase_t(type,Spec),dmsg(once(maybe_converting_plain_type_to_formattype(Spec))),fail.
-define_ft_0(Spec):- add_w_hooks(isa(Spec,formattype)),asserta_if_new(dbase_t(formattype,Spec)).
+define_ft_0(Spec):- hooked_asserta(isa(Spec,formattype)),asserta_if_new(dbase_t(formattype,Spec)).
 
 %type(Spec):- is_asserted(isa(Spec,type)).
 
@@ -143,7 +145,7 @@ transitive_subclass_tst(_,_):-!,fail.
 
 % isa_backchaing(A,T):- stack_depth(Level),Level>650,trace_or_throw(skip_dmsg_nope(failing_stack_overflow(isa_backchaing(A,T)))),!,fail.
 
-
+:-decl_mpred_prolog(isa_backchaing/2).
 isa_backchaing(A,T):- fact_loop_checked(isa(A,T),isa_backchaing_0(A,T)).
 
 isa_backchaing_v_nv(A,term):-nonvar(A),!.

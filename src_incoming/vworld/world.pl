@@ -159,6 +159,7 @@ moo:subclass(wearable,item).
 moo:subclass(knife,item).
 moo:subclass(food,item).
 
+
 moo:createableType(FT):- nonvar(FT),formattype(FT),!,fail.
 moo:createableType(FT):- nonvar(FT),nonCreatableType(FT),!,fail.
 moo:createableType(item). %  type, formattype, 
@@ -247,7 +248,7 @@ reset_values(I):- forall(moo:valueReset(To,From),reset_value(I,To,From)).
 reset_value(I,To,From):- prop(I,From,FromV), padd(I,To,FromV),!.
 reset_value(I,To,From):- prop(I,From,FromV), padd(I,To,FromV),!.
    
-   (contains_term(V,value),get_value(P,V,Result)) -> subst(V,P,self)
+   (contains_var(V,value),get_value(P,V,Result)) -> subst(V,P,self)
    argIsa(P,SVArgNum,Type),
    is_term_ft(V,Type),
 

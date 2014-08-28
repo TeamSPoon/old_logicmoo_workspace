@@ -18,9 +18,9 @@
 % local_decl_db_prop(repl_to_string(agent,term),[singleValued,default_sv(2,default_repl_obj_to_string)]).
 
 :-export(default_repl_writer/4).
-default_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=o),fmt('~q=(~w)~q.~n',[N,TypeO,V]).
+default_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=o),fmt('~q=D(~w)~q.~n',[N,TypeO,V]).
 :-export(default_repl_obj_to_string/3).
-default_repl_obj_to_string(O,Type,toString(TypeO,O)):-copy_term(Type,TypeO),ignore(TypeO=o).
+default_repl_obj_to_string(O,Type,toStringD(TypeO,O)):-copy_term(Type,TypeO),ignore(TypeO=o).
 
 
 canUseEnglish:-true.
@@ -47,19 +47,19 @@ show_kb_via_pred(WPred,ToSTR,[L|List]):-!,
    show_kb_via_pred(WPred,ToSTR,L),
    show_kb_via_pred(WPred,ToSTR,List).
 show_kb_via_pred(WPred,ToSTR,L):-!,
-   ccatch((ignore(must_det(show_kb_via_pred_0(WPred,ToSTR,L));dmsg(failed(show_kb_via_pred_0(WPred,L))))),E,dmsg(error_failed(E,show_kb_via_pred_0(WPred,L)))).
+  no_loop_check( ccatch((ignore(must_det(show_kb_via_pred_0(WPred,ToSTR,L));dmsg(failed(show_kb_via_pred_0(WPred,L))))),E,dmsg(error_failed(E,show_kb_via_pred_0(WPred,L))))).
 
 
 
 :-export(show_kb_via_pred_0/3).
 
-show_kb_via_pred_0(WPred,ToSTR,listof(Call)):- contains_term(Call,value),subst(Call,value,P,PCall),subst(Call,value,PS,PSCall),!,
+show_kb_via_pred_0(WPred,ToSTR,listof(Call)):- contains_var(Call,value),subst(Call,value,P,PCall),subst(Call,value,PS,PSCall),!,
                                                show_kb_via_pred_0(WPred,ToSTR,forEach(findall(P,PCall,PS),fmt(PSCall))).
 
 show_kb_via_pred_0(WPred,ToSTR,listof(Call)):- !,show_kb_via_pred_format_call(WPred,ToSTR,Call,listof(Call)).
                                                
 
-show_kb_via_pred_0(WPred,ToSTR,F = Call):- contains_term(Call,value), !,show_kb_via_pred_format_call(WPred,ToSTR,F = value, Call).
+show_kb_via_pred_0(WPred,ToSTR,F = Call):- contains_var(Call,value), !,show_kb_via_pred_format_call(WPred,ToSTR,F = value, Call).
 show_kb_via_pred_0(WPred,ToSTR,F = Call):- !,show_kb_via_pred_format_call(WPred,ToSTR, F = Call ,Call).
 show_kb_via_pred_0(WPred,ToSTR,forEach(Call,Show)):-!, show_kb_via_pred_format_call(WPred,ToSTR, Show, forEach(Call)).
 show_kb_via_pred_0(WPred,ToSTR,fmt(Show)):- !, show_kb_via_pred_format_call(WPred,ToSTR, Show ,true).

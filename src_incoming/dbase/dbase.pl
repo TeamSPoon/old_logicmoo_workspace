@@ -40,6 +40,7 @@ shrink_clause( HB,HB).
 :- decl_thlocal adding_from_srcfile/0.
 :- decl_thlocal agent_current_action/2.
 :- decl_thlocal dbase_capture/2.
+:- decl_thlocal thlocal:caller_module/2.
 :- decl_thlocal dbase_change/2.
 :- decl_thlocal dbase_opcall/2.
 :- decl_thlocal deduceArgTypes/1.
@@ -68,17 +69,6 @@ shrink_clause( HB,HB).
 
 :- dynamic_multifile_exported loaded_external_kbs/0.
 
-
-:- dynamic_multifile_exported do_slow_kb_op_later/1.
-
-
-slow_kb_op(Slow):- test_tl(do_slow_kb_op_now),!,debugOnError(Slow).
-slow_kb_op(Slow):- asserta_if_new(do_slow_kb_op_later(Slow)),!.
-
-:-export(rescan_slow_kb_ops/0).
-
-rescan_slow_kb_ops:-!.
-rescan_slow_kb_ops:- loop_check(forall(retract(do_slow_kb_op_later(Slow)),must_det(Slow)),true).
 
 % ========================================
 % decl_mpred_hybrid database
@@ -146,18 +136,6 @@ rescan_slow_kb_ops:- loop_check(forall(retract(do_slow_kb_op_later(Slow)),must_d
 
 :-include(dbase_i_deduce).
 
-% ================================================
-% ISA/GENLS Typesystem
-% ================================================
-
-:-dynamic_multifile_exported((thglobal:loading_game_file/2, thglobal:loaded_game_file/2)).
-
-moo:after_game_load:- not(thglobal:loading_game_file(_,_)),thglobal:loaded_game_file(_,_),!.
-
-
-% dmsg(already_time_TODO_call_after_game_load(Code)),dtrace,debugOnError(Code).
-after_game_load_completed_pass2:-fail.
-
 
 :-include(dbase_i_isa_subclass).
 
@@ -171,11 +149,52 @@ was_known_false(Fact):-is_known_false(Fact),retractall((is_known_false(_):-true)
 
 check_was_known_false(Fact):- ignore(((is_known_false(Fact),was_known_false(Fact)))).
 
-hook:decl_database_hook(assert(_A_or_Z),label_type_props(Lbl,T,Props)):- add_w_hooks(default_type_props(T,[kwLabel(Lbl)|Props])).
+hook:decl_database_hook(assert(_A_or_Z),label_type_props(Lbl,T,Props)):- hooked_asserta(default_type_props(T,[kwLabel(Lbl)|Props])).
 
 hook:decl_database_hook(assert(_A_or_Z),default_type_props(T,_)):- decl_type_safe(T).
 
 hook:decl_database_hook(assert(_A_or_Z),mpred_prop(F,_)):- must_det(atom(F)).
+
+
+% ================================================
+% Agenda system - source file loading
+% ================================================
+
+:-dynamic_multifile_exported((thglobal:loading_game_file/2, thglobal:loaded_game_file/2)).
+
+moo:after_game_load:- not(thglobal:loading_game_file(_,_)),thglobal:loaded_game_file(_,_),!.
+
+% when all previous tasks have completed
+moo:after_game_load_pass2:- not(thglobal:will_call_after(moo:after_game_load,_)).
+:- meta_predicate(call_after_game_load(0)).
+% call_after_game_load(Code):- moo:after_game_load,!, call_after_next(moo:after_game_load_pass2,Code).
+call_after_game_load(Code):- call_after_next(moo:after_game_load,Code).
+
+:-export(rescan_game_loaded/0).
+rescan_game_loaded:- ignore((moo:after_game_load, loop_check(call_after(moo:after_game_load, true ),true))).
+
+:-export(rescan_game_loaded/0).
+rescan_game_loaded_pass2:- ignore((moo:after_game_load, loop_check(call_after(moo:after_game_load_pass2,  dmsg(rescan_game_loaded_pass2_comlpete)),true))).
+
+% ================================================
+% Agenda system - standard database
+% ================================================
+
+% do_db_op_hooks:-!.
+do_db_op_hooks:- loop_check(rescan_dbase_ops,true).
+
+:-export(rescan_slow_kb_ops/0).
+
+rescan_slow_kb_ops:-!.
+rescan_slow_kb_ops:- loop_check(forall(retract(do_slow_kb_op_later(Slow)),must_det(Slow)),true).
+
+:-export(rescan_dbase_ops/0).
+rescan_dbase_ops:- test_tl(skip_db_op_hooks),!.
+rescan_dbase_ops:- do_all_of(dbase_module_ready),rescan_game_loaded.
+
+:- dynamic_multifile_exported do_slow_kb_op_later/1.
+slow_kb_op(Slow):- test_tl(do_slow_kb_op_now),!,debugOnError(Slow).
+slow_kb_op(Slow):- asserta_if_new(do_slow_kb_op_later(Slow)),!.
 
 
 % ========================================
@@ -454,8 +473,8 @@ ireq(C0):- with_assertions([+insideIREQ(_), +thlocal:noDefaultValues(_),+thlocal
 % -  props(Obj,QueryPropSpecs)
 props(Obj,PropSpecs):- req(props(Obj,PropSpecs)).
 iprops(Obj,PropSpecs):- ireq(props(Obj,PropSpecs)).
-% -  add(Assertion)
-add_fast(C0):- must_det((db_op_int(assert(add), C0), xtreme_debug(req(C0)))),!.
+% -  add_fast(Assertion)
+add_fast(C0):- must_det((db_op(assert(add), C0), xtreme_debug(req(C0)))),!.
 % -  upprop(Obj,PropSpecs) update the properties
 upprop(Obj,PropSpecs):- upprop(props(Obj,PropSpecs)).
 upprop(C0):- add(C0).
@@ -486,47 +505,7 @@ expand_goal_correct_argIsa(A,B):- expand_goal(A,B).
 % db_op_simpler(query(HLDS,_),MODULE:C0,req(call,MODULE:C0)):- atom(MODULE), nonvar(C0),not(not(predicate_property(C0,_PP))),!. % , functor_catch(C0,F,A), dmsg(todo(unmodulize(F/A))), %trace_or_throw(module_form(MODULE:C0)), %   db_op(Op,C0).
 db_op_simpler(_,TypeTerm,props(Inst,[isa(Type)|PROPS])):- TypeTerm=..[Type,Inst|PROPS],nonvar(Inst),typeDeclarer(Type),!.
 
-foreach_arg(ARGS,_N,_ArgIn,_ArgN,_ArgOut,_Call,ARGS):-not(compound(ARGS)),!.
-foreach_arg([ArgIn1|ARGS],ArgN1,ArgIn,ArgN,ArgOut,Call1,[ArgOut1|ARGSO]):-
-     copy_term( a(ArgIn1,ArgOut1,ArgN1,Call1), a(ArgIn,ArgOut,ArgN,Call) ),
-      call(Call),
-      ArgN2 is ArgN + 1,
-      foreach_arg(ARGS,ArgN2,ArgIn,ArgN,ArgOut,Call,ARGSO).
 
-% Warning: moo:argIsa_ft/3, which is referenced by
-% Warning:        /devel/logicmoo/src_incoming/dbase/dbase.pl:423:56: 1-st clause of moo:transform_functor_holds/5
-
-transform_functor_holds(_,F,ArgInOut,N,ArgInOut):- once(argIsa_ft(F,N,FT)),FT=term,!.
-transform_functor_holds(Op,_,ArgIn,_,ArgOut):- transform_holds(Op,ArgIn,ArgOut),!.
-
-
-transform_holds(H,In,Out):- once(transform_holds_3(H,In,Out)),!,ignore((In\=Out,fail,dmsg(transform_holds(H,In,Out)))).
-
-transform_holds_3(_,A,A):-not(compound(A)),!.
-transform_holds_3(_,props(Obj,Props),props(Obj,Props)):-!.
-transform_holds_3(_,A,A):-functor_catch(A,F,N), predicate_property(A,_),mpred_prop(F,arity(N)),!.
-transform_holds_3(Op,M:Term,OUT):-atom(M),!,transform_holds_3(Op,Term,OUT).
-transform_holds_3(HLDS,[P,A|ARGS],DBASE):- var(P),!,DBASE=..[HLDS,P,A|ARGS].
-transform_holds_3(HLDS, ['[|]'|ARGS],DBASE):- trace_or_throw(list_transform_holds_3(HLDS,['[|]'|ARGS],DBASE)).
-transform_holds_3(Op,[SVOFunctor,Obj,Prop|ARGS],OUT):- is_svo_functor(SVOFunctor),!,transform_holds_3(Op,[Prop,Obj|ARGS],OUT).
-transform_holds_3(_,[P|ARGS],[P|ARGS]):- not(atom(P)),!,dmsg(transform_holds_3),trace_or_throw(dtrace).
-transform_holds_3(Op,[HOLDS,P,A|ARGS],OUT):- is_holds_true(HOLDS),!,transform_holds_3(Op,[P,A|ARGS],OUT).
-transform_holds_3(HLDS,[HOLDS,P,A|ARGS],OUT):- HLDS==HOLDS, !, transform_holds_3(HLDS,[P,A|ARGS],OUT).
-
-transform_holds_3(_,[Type,Inst],isa(Inst,Type)):-must_det(type(Type)).
-transform_holds_3(_,HOLDS,isa(I,C)):- was_isa(HOLDS,I,C),!.
-transform_holds_3(_,HOLDS,isa(I,C)):- holds_args(HOLDS,[ISA,I,C]),ISA==isa,!.
-
-transform_holds_3(Op,[Logical|ARGS],OUT):- 
-         call(call,logical_functor(Logical)),!,must(not(is_svo_functor(Logical))),
-         must_det(foreach_arg(ARGS,1,ArgIn,ArgN,ArgOut,transform_functor_holds(Op,Logical,ArgIn,ArgN,ArgOut),LARGS)),
-         OUT=..[Logical|LARGS].
-
-transform_holds_3(_,[props,Obj,Props],props(Obj,Props)).
-transform_holds_3(_,[Type,Inst|PROPS],props(Inst,[isa(Type)|PROPS])):- nonvar(Inst), not(Type=props), cached_isa(Type,typeDeclarer),must_det(not(never_type(Type))),!.
-transform_holds_3(_,[P,A|ARGS],DBASE):- atom(P),!,DBASE=..[P,A|ARGS].
-transform_holds_3(_,[P,A|ARGS],DBASE):- !, nonvar(P),dumpST,trace_or_throw(dtrace), DBASE=..[P,A|ARGS].
-transform_holds_3(Op,DBASE_T,OUT):- DBASE_T=..[P,A|ARGS],!,transform_holds_3(Op,[P,A|ARGS],OUT).
 
 
 db_op_simpler_wlc(query(HLDS,Must),Wild,Simpler):- !,call(call,db_op_simpler(query(HLDS,Must),Wild,Simpler)),not(is_loop_checked(req(Simpler))),!.
@@ -578,8 +557,8 @@ db_rewrite(_Op,Term,NewTerm):-equivRule_call(Term,NewTerm).
 db_rewrite(_Op,Term,NewTerm):-forwardRule_call(Term,NewTerm).
 
 :-export(simply_functors/3).
-simply_functors(Db_pred,query(HLDS,Must),Wild):- once(transform_holds(HLDS,Wild,Simpler)),Wild\=Simpler,!,call(Db_pred,query(HLDS,Must),Simpler).
-simply_functors(Db_pred,Op,Wild):- hilog_functor(HILOG),once(transform_holds(HILOG,Wild,Simpler)),Wild\=Simpler,!,call(Db_pred,Op,Simpler).
+simply_functors(Db_pred,query(HLDS,Must),Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=Simpler,!,call(Db_pred,query(HLDS,Must),Simpler).
+simply_functors(Db_pred,Op,Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=Simpler,!,call(Db_pred,Op,Simpler).
 
 
 % -  hook:dmsg_hook(db_op(query(HLDS,call),moo:holds_t(ft_info,type,'$VAR'(_)))):-trace_or_throw(dtrace).
@@ -590,20 +569,7 @@ simply_functors(Db_pred,Op,Wild):- hilog_functor(HILOG),once(transform_holds(HIL
 add_from_file(B,_):- contains_singletons(B),trace_or_throw(dtrace),dmsg(todo(add_from_file_contains_singletons(B))),!,fail.
 add_from_file(B,B):- db_op(assert(_OldV),B),!.
 
-% do_db_op_hooks:-!.
-do_db_op_hooks:- loop_check(rescan_dbase_ops,true).
-
-:-export(rescan_dbase_ops/0).
-rescan_dbase_ops:- test_tl(skip_db_op_hooks),!.
-rescan_dbase_ops:- do_all_of(dbase_module_ready),rescan_game_loaded.
-
-:-export(rescan_game_loaded/0).
-rescan_game_loaded:- ignore((moo:after_game_load, loop_check(call_after(moo:after_game_load, true),true))).
-
-:-export(rescan_game_loaded/0).
-rescan_game_started:- ignore((moo:after_game_load, loop_check(call_after(moo:after_game_load_completed_pass2, true),true))).
-
-
+% runs previously required ops fisrt
 db_op_int(assert(Op),Term):- !, db_op(assert(Op),Term).
 db_op_int(Op,Term):- do_db_op_hooks,db_op(Op,Term),do_db_op_hooks.
 
@@ -617,9 +583,6 @@ hook:decl_database_hook(AR,C):- record_on_thread(dbase_change,changing(AR,C)).
 
 record_on_thread(Dbase_change,O):- thread_self(ID),thlocal:dbase_capture(ID,Dbase_change),!,Z=..[Dbase_change,ID,O],assertz(Z).
 
-holds_args([H|LIST],LISTO):- !, is_holds_true(H),!,LIST=LISTO.
-holds_args(HOLDS,LIST):- compound(HOLDS),HOLDS=..[H|LIST],is_holds_true(H),!.
-
 
 % ================================================
 % db_op/2
@@ -629,13 +592,8 @@ holds_args(HOLDS,LIST):- compound(HOLDS),HOLDS=..[H|LIST],is_holds_true(H),!.
 db_op(assert(_),props(_Obj,Props)):- Props ==[], !.
 db_op(a,Wild):-!,db_op(assert(a),Wild).
 db_op(query(Dbase_t, Req), must(Call)):-!, must(db_op(query(Dbase_t, Req), Call)).
-
-db_op(query(HLDS,Must),Wild):- transform_holds(HLDS,Wild,B),!, loop_check_term(db_op0(query(HLDS,Must),B),req(B),is_asserted(B)).
-db_op(query(HLDS,Must),B):-!, loop_check_term(db_op0(query(HLDS,Must),B),req(B),is_asserted(B)). 
-
-db_op(Op,Wild):- hilog_functor(HILOG),call(call,transform_holds(HILOG,Wild,Simpler)),Wild\=Simpler,!,db_op(Op,Simpler).
+db_op(query(HLDS,Must),B):-!, loop_check_term(db_op0(query(HLDS,Must),B),req(B),loop_check_term(call_mpred(B),req2(B),show_call(is_asserted(B)))). 
 db_op(assert(OldV),B):- !,loop_check_term(db_op0(assert(OldV),B),add(B),true),!. % true = we are already processing this assert
-
 db_op(Op,Term):- loop_check(db_op0(Op,Term),trace_or_throw(loop_check(db_op0(Op,Term)))).
 
 % ================================================
@@ -649,8 +607,9 @@ db_op0(assert(assertion),end_of_file):-!.
 db_op0(Op,Term):- stack_check(1000),not(compound(Term)),!,trace_or_throw(nc(db_op0(Op,Term))).
 db_op0(Op,props(Obj,nameStrings(Str))):-!, db_op0(Op,nameStrings(Obj,Str)).
 
-db_op0(Op,KB:Term):- is_kb_module(KB),!,db_op(Op,Term).
-db_op0(Op,KB:Term):- dbase_mod(KB),!,db_op(Op,Term).
+db_op0(Op,MT:Term):- is_kb_module(MT),!,with_assertions(thlocal:caller_module(kb,MT),db_op(Op,Term)).
+db_op0(Op,DB:Term):- dbase_mod(DB),!,with_assertions(thlocal:caller_module(db,DB),db_op(Op,Term)).
+db_op0(Op,KB:Term):- atom(KB),!,with_assertions(thlocal:caller_module(prolog,KB),db_op(Op,Term)).
 
 % db_op0(Op,(':-'(A))):- must((expand_goal_correct_argIsa(A,AA))),expanded_different(A,AA),!,db_op(Op, (':-'(AA))).
 
@@ -697,7 +656,7 @@ db_op0(Op,sorts(Type,List)):- !,forall_member(I,List,db_op(Op, subclass(I,Type))
 db_op0(Op,predicates(List)):- !,forall_member(T,List,db_op(Op,mpred(T))).
 db_op0(Op,EACH):- EACH=..[each|List],forall_member(T,List,db_op(Op,T)).
 
-db_op0(Op,Wild):- into_mpred_form(Wild,Simpler) ,Wild \= Simpler,!,db_op0(Op,Simpler).
+db_op0(Op,Wild):- into_mpred_form(Wild,Simpler), Wild \=@= Simpler,!,db_op0(Op,Simpler).
 db_op0(Op,db_op_exact(Term)):- !,db_op_exact(Op,Term).
  
 db_op0(assert(_),description(A,E)):- once(must(add_description(A,E))),!,db_op0(assert(_),descriptionHere(A,E)).
@@ -720,7 +679,7 @@ db_op0(Op,isa(A,SubType)):- dbase_t(createableSubclassType,SubType,Type),!,db_op
 db_op0(query(HLDS,Must),argIsa(P,N,T)):- call_expanded_for(query(HLDS,Must),(get_mpred_prop(P,argsIsaInList(ArgsIsa)),arg(N,ArgsIsa,T),must(nonvar(T)))).
 
 
-db_op0(Op,A):- call(call,must(once(correctArgsIsa(Op,A,AA)))), not(A=@=AA), !, db_op(Op,AA).
+db_op0(Op,A):- must_det(once(correctArgsIsa(Op,A,AA))), A \=@= AA, !, db_op(Op,AA).
 
 db_op0(assert(_),Term):- glean_pred_props_maybe(Term),fail.
 
@@ -1101,26 +1060,19 @@ add_later(Fact):- call_after_game_load(add(Fact)).
 :-export(add/1).
 :-moo_hide_childs(add/1).
 add(A):-A==end_of_file,!.
-% game_ assert(A):- tes t_tl(in_prolog_source_code),!, must_det(assertz_local_game_clause(A)).
-add(A):- into_mpred_form(A,F),not(A=@=F),!,add(F).
-add(A):- not(compound(A)),!,trace_or_throw(not_compound(add(A))).
-add(Call):- loop_check(thlocal:add_thread_override(Call),fail),!.
-add(Call):-add_from_macropred(Call),!.
-add(M:HB):-atom(M),!, must_det(add(HB)).
-add(A):-must_det(correctArgsIsa(assert(add),A,AA)),must_det(add_handler(AA)),!.
-
-add_handler(M:HB):-atom(M),!,add_handler(HB).
-add_handler(Call):-loop_check(add_handler_lc(Call),true).
-
-add_handler_lc(Call):- loop_check(thlocal:add_thread_override(Call),fail),!.  
-add_handler_lc(type(A)):- must_det(decl_type(A)),!.
-add_handler_lc(mpred_prop(A)):- decl_mpred(A),!.
-add_handler_lc(mpred_prop(A,B)):- decl_mpred(A,B),!.
-add_handler_lc(A):- A=..[Type,_], formattype(Type), trace_or_throw(formattype_ensure_skippable(A)),!.
-add_handler_lc(A):- A=..[Type,_], not(type(Type)), dmsg(todo(ensure_creatabe(Type))),fail.
-add_handler_lc(C0):- ignore(assert_deduced_arg_isa_facts(C0)),add_fast(C0),run_database_hooks_local(assert(z),C0).
-add_handler_lc(W):-must_det(add_fast(W)),!.
-add_handler_lc(A):-trace_or_throw(fmt('add_handler_lc is skipping ~q.',[A])).
+add(A):- not(compound(A)),!,trace_or_throw(not_compound(add(A))),!.
+add(mpred_prop(A)):- decl_mpred(A),!.
+add(mpred_prop(A,B)):- decl_mpred(A,B),!.
+add(Call):- loop_check(thlocal:add_thread_override(Call)),!.
+add(Call):- add_from_macropred(Call),!.
+add(M:HB):-atom(M),!, must_det(add(HB)),!.
+add(A):- into_mpred_form(A,F), A \=@=F,!,add(F). 
+add(A):- must_det(once(correctArgsIsa(assert(add),A,AA))),A \=@= AA,!,add(AA),!.
+add(type(A)):- must_det(decl_type(A)),!.
+add(A):- A=..[Type,_], formattype(Type), trace_or_throw(formattype_ensure_skippable(A)),!.
+add(A):- A=..[Type,_], not(type(Type)), dmsg(todo(ensure_creatabe(Type))),fail.
+add(C0):- nop(assert_deduced_arg_isa_facts(C0)),must_det(add_fast(C0)),!,must_det(once(run_database_hooks(assert(z),C0))),!.
+add(A):-trace_or_throw(fmt('add is skipping ~q.',[A])).
 
 :-export(begin_prolog_source/0).
 :-export(end_prolog_source/0).
@@ -1132,50 +1084,65 @@ add_from_macropred(C):- loop_check(add_from_macropred_lc(C),((dmsg(loopING_add_f
 add_from_macropred_lc(A):-A==end_of_file,!.
 add_from_macropred_lc(A):- not(compound(A)),!,trace_or_throw(not_compound(add_from_macropred_lc(A))).
 add_from_macropred_lc(':-'(A)):- predicate_property(A,_),!,must(logOnFailure(A)),!.
-add_from_macropred_lc(':-'(include(A))):- add_handler(':-'(load_data_file(A))),!.
+add_from_macropred_lc(':-'(include(A))):- add(':-'(load_data_file(A))),!.
 add_from_macropred_lc(':-'(A)):- dmsg(trace_or_throw(missing_directive(A))),!.
 add_from_macropred_lc(':-'(Head,true)):- !, add(Head).
-add_from_macropred_lc(':-'(Head,Body)):- must_det(assertz_local_game_rule(Head,Body)),!.
+add_from_macropred_lc(':-'(Head,Body)):- must_det(assertz_local_game_clause(Head,Body)),!.
 add_from_macropred_lc(RDF):- RDF=..[SVO,S,V,O],is_svo_functor(SVO),!,must_det(add(dbase_t(V,S,O))).
+add_from_macropred_lc(ClassTemplate):- compound(ClassTemplate), ClassTemplate=..[item_template,Type|Props],
+   assert_isa(Type,createableType),
+   assert_isa(Type,type),
+   add(subclass(Type,item)),   
+   flatten(Props,AllProps), !, show_call(add(default_type_props(Type,AllProps))).
+/*
 add_from_macropred_lc(somethingIsa(A,List)):-forall_member(E,List,add(isa(A,E))).
 add_from_macropred_lc(somethingDescription(A,List)):-forall_member(E,List,add(description(A,E))).
 add_from_macropred_lc(objects(Type,List)):-forall_member(I,List,add(isa(I,Type))).
 add_from_macropred_lc(sorts(Type,List)):-forall_member(I,List,add(subclass(I,Type))).
 add_from_macropred_lc(predicates(List)):-forall_member(T,List,add(mpred_prop(T))).
 add_from_macropred_lc(description(A,E)):- add_description(A,E).
-add_from_macropred_lc(ClassTemplate):- compound(ClassTemplate), ClassTemplate=..[item_template,Type|Props],
-   assert_isa(Type,createableType),
-   assert_isa(Type,type),
-   add(subclass(Type,item)),   
-   flatten(Props,AllProps), !, show_call(add(default_type_props(Type,AllProps))).
 add_from_macropred_lc(nameStrings(A,S0)):- determinerRemoved(S0,String,S),!,add(nameStrings(A,S)),add(determinerString(A,String)).
 add_from_macropred_lc(Call):- fail, predicate_property(Call, number_of_rules(_)),not(predicate_property(Call, dynamic)),nop(dmsg(assert_to_static(Call))),fail.
 add_from_macropred_lc(d(s)):-dumpST, trace_or_throw(dtrace).
+*/
 add_from_macropred_lc(M:HB):-atom(M),!,add_from_macropred_lc(HB).
 
 :-export((assertz_local_game_clause/1)).
-assertz_local_game_clause((':-'(Body))):-!,must_det(show_call(Body)).
-assertz_local_game_clause(Before):- hybrid_rule_term_expansion(Before,Replaced),Before \== Replaced,!, assertz_local_game_clause(Replaced).
-assertz_local_game_clause((Head :- Body)):-!, assertz_local_game_clause(Head,Body).
-assertz_local_game_clause(C):- assertz_local_game_clause(C,true).
+assertz_local_game_clause(Before):- expand_term(Before,Replaced),Before \=@= Replaced,!, assertz_local_game_clause(Replaced).
+assertz_local_game_clause((':-'(Body))):-!,must_det(show_call(Body)),!.
+assertz_local_game_clause((Head :- Body)):- !,assertz_local_game_clause(Head,Body),!.
+assertz_local_game_clause(C):- assertz_local_game_clause(C,true),!.
+
+assertz_local_game_clause(Head,Body):- (var(Head);var(Body)),!,trace_or_throw(var_assertz_local_game_clause(Head,Body)).
+assertz_local_game_clause(Head,Body):- clause_asserted((':-'(Head,Body))),!.
+assertz_local_game_clause(Head,Body):- ExpIn = (Head:-Body),  expand_term(ExpIn,Exp),Exp \=@= ExpIn,!,assertz_local_game_clause(Exp),!.
+assertz_local_game_clause(Head,Body):- get_predicate_type(Head,Type),!,must_det(assertz_local_game_clause(Type,Head,Body)),!.
 
 
-assertz_local_game_clause(H,B):- '@'(add(H:-B),'moo').
-
-
-
-assertz_local_game_rule(Head,Body):- (var(Head);var(Body)),!,trace_or_throw(var_assertz_local_game_clause0(Head,Body)).
-assertz_local_game_rule(Head,Body):- clause_asserted((':-'(Head,Body))),!.
-assertz_local_game_rule(Head,BodyIn):- functor(Head,F,_),mpred_prop(F,prologHybrid),hybrid_rule_term_expansion((Head:-BodyIn),Out),assertz_if_new(Out),!.
-assertz_local_game_rule(Head,BodyIn):- once(make_body_clause(Head,BodyIn,Body)),assertz_local_game_rule_here(Head,Body).
-
-% assertz_local_game_rule_here(Head,true):-functor(Head,_,N),N<3, not(last_arg_ground(Head)),singletons_throw_or_fail((Head)).
-assertz_local_game_rule_here(Head,true):-!,with_assertions(thlocal:adding_from_srcfile,add(Head)),!.
-assertz_local_game_rule_here(Head,Body):- hybrid_rule_term_expansion((Head:-Body),Exp),!,assertz_if_new(Exp),dmsg(made_specal_clause1(Exp)),!.
-assertz_local_game_rule_here(Head,Body):-!,assertz_if_new_clause(moo:hybrid_rule(Head,Body)),dmsg(made_specal_clause2(Head,Body)),!.
-assertz_local_game_rule_here(Head,Body):-assertz_if_new_clause(Head,Body),dmsg(made_specal_clause3(Head,Body)).
+assertz_local_game_clause(callable(prologOnly),Head,Body):- must_det(assertz_if_new_clause(Head,Body)),dmsg(used_clause_as_prologOnly(Head,Body)).
+assertz_local_game_clause(callable(static),Head,Body):- must_det(assertz_if_new_clause(Head,Body)),dmsg(eRROR_maybe_used_clause_as_prologOnly(Head,Body)).
+assertz_local_game_clause(_,Head,true):- !,with_assertions(thlocal:adding_from_srcfile,add(Head)),!.
+assertz_local_game_clause(callable(prologHybrid),Head,Body):-!, assertz_if_new_clause(moo:hybrid_rule(Head,Body),true),dmsg(used_clause_as_hybridRule(Head,Body)).
+assertz_local_game_clause(Type,Head,BodyIn):- once(make_body_clause(Head,BodyIn,Body)),must_det(assertz_if_new_clause(Head,Body)),dmsg(used_clause_as_unknown(Type,Head,Body)).
+assertz_local_game_clause(Type,Head,Body):- must_det(assertz_if_new_clause(Head,Body)),dmsg(used_clause_as(Type,Head,Body)).
 
 special_wrapper_body(W):-get_body_functor(W,F,_),!,special_wrapper_functor(F).
+
+get_predicate_type(Head,Type):-get_functor(Head,F,A),!,get_predicate_type(Head,F,A,Type).
+get_predicate_type(F,A,Type):-functor(P,F,A),get_predicate_type(P,F,A,Type).
+
+get_predicate_type(Head,F,A,Type):-atom(Head),!,dmsg(get_predicate_type(Head,F,A,Type)),get_predicate_type(_,Head,A,Type).
+get_predicate_type(Head,_,_,Type):-compound(Head),!,get_functor(Head,F,A),get_predicate_type4(Head,F,A,Type).
+get_predicate_type(_,F,A,Type):-atom(F),number(A),!,functor(Head,F,A),get_predicate_type4(Head,F,A,Type).
+get_predicate_type(Head,F,A,Type):-must(mpred_arity(F,A)),functor(Head,F,A),get_predicate_type4(Head,F,A,Type).
+
+get_predicate_type4(P,F,A,T):-get_predicate_type5(P,F,A,T),!.
+
+get_predicate_type5(_,F,_,callable(Type)):-member(Type,[prologOnly,prologHybrid]),mpred_prop(F,Type).
+get_predicate_type5(P,_,_,unknown):-not(predicate_property(P,_)),dmsg(warn_pp(not(predicate_property(P,_)))).
+get_predicate_type5(P,_,_,callable(dynamic)):-predicate_property(P,dynamic).
+get_predicate_type5(_,_,_,callable(static)).
+
 
 special_wrapper_functor(call_mpred_body).
 special_wrapper_functor(body_req).
@@ -1187,7 +1154,7 @@ make_body_clause(_Head,Body,Body):-atomic(Body),!.
 make_body_clause(_Head,Body,Body):-special_wrapper_body(Body),!.
 make_body_clause(Head,Body,moo:call_mpred_body(Head,Body)).
 
-mpred_prop(G,assert_with(add)):- moo:assertionMacroHead(G).
+mpred_prop(G,assert_with(add)):- atom(G),moo:assertionMacroHead(G).
 
 assertOnLoad(X):-add_later(X).
 
@@ -1270,21 +1237,21 @@ end_dynamic_reader:-
 inside_dynamic_reader :- prolog_load_context(file,Source),test_tl(thlocal:in_dynamic_reader(Source)),!.
 inside_dynamic_reader :- prolog_load_context(source,Source),test_tl(thlocal:in_dynamic_reader(Source)),!.
 
-user:term_expansion(CL,moo:was_imported_kb_content(inside_dynamic_reader,CL)):- not((get_functor(CL,F),F=was_imported_kb_content)),not(test_tl(into_form_code)),
+user:term_expansion(CL,moo:was_imported_kb_content(inside_dynamic_reader,CL)):-not(thlocal:into_form_code), not((get_functor(CL,F),F=was_imported_kb_content)),
  % ==== why we assert
    not(is_clause_moo_special(CL)),inside_dynamic_reader,
 % ==== do it
    dmsg(assertz_inside_dynamic_reader(CL)),ignore(is_compiling_sourcecode),with_assertions(thlocal:adding_from_srcfile,must_det(add(CL))),!.
 
-user:term_expansion(CL,moo:was_imported_kb_content(is_clause_moo_special,CL)):- not((get_functor(CL,F),F=was_imported_kb_content)), not(test_tl(into_form_code)),
+user:term_expansion(CL,moo:was_imported_kb_content(is_clause_moo_special,CL)):-not(thlocal:into_form_code), not((get_functor(CL,F),F=was_imported_kb_content)),
 % ==== why we assert
    is_clause_moo_special(CL),  not(inside_dynamic_reader), 
 % ==== do it
-   dmsg(assertz_is_clause_moo_special(CL)),ignore(is_compiling_sourcecode),with_assertions(thlocal:adding_from_srcfile,must_det(add(CL))),!.
+   dmsg(addingGaf(CL)),ignore(is_compiling_sourcecode),with_assertions(thlocal:adding_from_srcfile,must_det(add(CL))),!.
 
 user:term_expansion((H:-B),Out):- fail,test_tl(enable_src_loop_checking),
    with_assertions(thlocal:adding_from_srcfile,
-    once((once(make_body_clause(H,B,NewBody)),(B \= NewBody),!,dmsg(thlocal:enable_src_loop_checking((H:-NewBody)))))),Out=(H:-NewBody).
+    once((once(make_body_clause(H,B,NewBody)),(B \=@= NewBody),!,dmsg(thlocal:enable_src_loop_checking((H:-NewBody)))))),Out=(H:-NewBody).
 
 % load_motel:- defrole([],time_state,restr(time,period)).
 % :-load_motel.
@@ -1296,7 +1263,6 @@ agent_text_command(_Agent,_Text,_AgentTarget,_Cmd):-fail.
     coerce/3,
     rescan_dbase_facts/0,
           enter_term_anglify/2,
-           run_database_hooks/2,
            agent_text_command/4,         
 */
 

@@ -46,8 +46,8 @@ login_and_run:-
    fmt('~n~n~nHello ~w! Welcome to the MUD!~n',[P]),
    % sets some IO functions
    call_cleanup((
-   with_assertions(thlocal:repl_writer(P,telnet_repl_writer),
-      with_assertions(thlocal:repl_to_string(P,telnet_repl_obj_to_string),
+   with_assertions(repl_writer(P,telnet_repl_writer),
+      with_assertions(repl_to_string(P,telnet_repl_obj_to_string),
      % runs the Telnet REPL
      run_player_telnet(P))),  
     fmt('~n~nGoodbye ~w! ~n',[P])),
@@ -106,9 +106,9 @@ scan_updates:- ignore((thread_self(main),ignore((catch(make,E,dmsg(E)))))).
 
 hook:decl_database_hook(Type,C):- current_agent(Agent),interesting_to_player(Type,Agent,C).
 
-interesting_to_player(Type,Agent,C):-not(not(contains_term(C,Agent))),dmsg(agent_database_hook(Type,C)),!.
-interesting_to_player(Type,Agent,C):-is_asserted(localityOfObject(Agent,Region)),not(not(contains_term(C,Region))),dmsg(region_database_hook(Type,C)),!.
-interesting_to_player(Type,Agent,C):-is_asserted(localityOfObject(Agent,Region)),is_asserted(localityOfObject(Other,Region)),not(not(contains_term(C,Other))),!,dmsg(other_database_hook(Type,C)),!.
+interesting_to_player(Type,Agent,C):- contains_var(C,Agent),dmsg(agent_database_hook(Type,C)),!.
+interesting_to_player(Type,Agent,C):-is_asserted(localityOfObject(Agent,Region)),contains_var(C,Region),dmsg(region_database_hook(Type,C)),!.
+interesting_to_player(Type,Agent,C):-is_asserted(localityOfObject(Agent,Region)),is_asserted(localityOfObject(Other,Region)),contains_var(C,Other),!,dmsg(other_database_hook(Type,C)),!.
 
 % ===========================================================
 % USES PACKRAT PARSER 

@@ -13,7 +13,7 @@
 */
 
 :-meta_predicate_transparent(call_mpred(0)).
-:-meta_predicate_transparent(call_mpred(+,0)).
+:-meta_predicate_transparent(call_mpred(+,+)).
 :-decl_mpred_prolog(call_mpred/1).
 
 % oncely later will throw an error if there where choice points left over by call
@@ -120,11 +120,10 @@ deducedSimply(Call):- clause(hook:deduce_facts(Fact,Call),Body),not(is_asserted(
 % ================================================
 :-export((call_expanded_for/2)).
 
-call_expanded_for(req,Call):- is_callable(Call),!,Call.
 call_expanded_for(req,Call):- !,call_mpred(Call).
+call_expanded_for(must,Call):- !,must(call_mpred(Call)).
 call_expanded_for(assertedOnly,Call):- !,with_assertions(thlocal:insideIREQ(F),call_mpred(F,Call)).
 call_expanded_for(once,Call):- !,once(call_mpred(Call)).
-call_expanded_for(_Req,Call):- is_callable(Call),!,Call.
 call_expanded_for(_Req,Call):- !,call_mpred(Call).
 
 
@@ -143,46 +142,50 @@ call_mpred_fast(true):-!.
 call_mpred_fast(C):-call_mpred(C).
 
 call_mpred(G):- var(G),!,trace_or_throw(var_call_expanded(G)).
-call_mpred(M:C):-atom(M),!,call_mpred(C).
 call_mpred(true):-!.
-call_mpred(C):- compound(C),functor(C,F,_),!,call_mpred(F,C).
-call_mpred(C):- debugOnError(C),!.  % just atoms
+call_mpred(M:C):-atom(M),!,with_assertions(thlocal:caller_module(prolog,M),call_mpred_0(C)).
+call_mpred(C):-call_mpred_0(C).
 
-% if this next line compians .. that means it is borken so should be ocmmented out
-call_mpred(dbase_t,C):- !, into_mpred_form(C,MP),!,call_mpred(MP).
+call_mpred_0(C):- compound(C),!,functor(C,F,_),!,call_mpred(F,C).
+call_mpred_0(C):- debugOnError(C),!.  % just atoms
+
+% call_mpred_1(F,G):-loop_check(call_mpred(F,G),trace_or_throw(call_mpred(F,G))).
+
+call_mpred(_,C):- into_mpred_form(C,MP),MP\=@=C,!,call_mpred(MP).
+call_mpred(dbase_t,C):- trace_or_throw(not_into_mpred_form(C)),!.
+call_mpred(F,C):- mpred_prop(F,prologOnly),!,must_det(is_callable(C)),!,debugOnError(C).
 
 % lazy hooking up of new preds
 call_mpred(F,C):- not(is_callable(C)),!,functor(C,F,A),dmsg(todo(non_existent(F/A,C))),!,A>1,
-   decl_mpred_hybrid0(F/A),!,call_mpred(F,C).
+   decl_mpred_hybrid(F/A),!,call_mpred(F,C).
 
-
-
-call_mpred(F,C):- (ground(C);mpred_prop(F,singleValued)),!,call_mpred_real_g(F,C),!.
-
+call_mpred(F,C):- ground(C),!,call_mpred_real_g(F,C),!.
 
 % nonground
-call_mpred(F,C):- is_callable(C),mpred_prop(F,prologOnly),!,debugOnError(C).
-call_mpred(F,C):- setof(C,is_asserted(F,C),Results),call_merge_asserted_results(C,F,Results).
+call_mpred(F,C):- findall(C,is_asserted(F,C),Results),no_repeats(call_merge_asserted_results(F,C,Results)).
 
 call_merge_asserted_results(_F,C,Results):-member(C,Results).
 call_merge_asserted_results( F,C,Results):-call_only_backchain(F,C),not(member(C,Results)),check_mcall_ok(C).
 
 % ground
-call_mpred_real_g(F,C):- mpred_prop(F,prologOnly),!,debugOnError(C),!.
+% call_mpred_real_g(F,C):- mpred_prop(F,prologOnly),!,debugOnError(C),!.
 call_mpred_real_g(F,C):- is_asserted(F,C),!.
 call_mpred_real_g(F,C):- call_only_backchain_checked(F,C),!.
+% for now the above line calls C as well
+% call_mpred_real_g(_,C):- loop_check(C,fail).
 
 
 call_only_backchain_checked(F,C):-call_only_backchain(F,C),check_mcall_ok(C).
 
 
-call_only_backchain(F,C):- mpred_prop(F,query_with_pred(P)),PC=..[P,C],!,req(PC).
 
 % call_only_backchain(F,C):- mpred_prop(F,ask_module(M2)),context_module(M),M\=M2,!,dmsg(calling_in_other_module(M:call_only_backchain(M2:C))),'@'(M:call_only_backchain(M2:C),M).
 
+call_only_backchain(F,C):-  no_repeats(call_only_backchain_0(F,C)).
 
-call_only_backchain(F,C):- loop_check(call_only_backchain_lc(F,C)).
+call_only_backchain_0(F,C):- loop_check(C,call_only_backchain_lc(F,C)).
 
+call_only_backchain_lc(F,C):- mpred_prop(F,query_with_pred(P)),PC=..[P,C],!,req(PC).
 call_only_backchain_lc(F,C):- mpred_prop(F,prologOnly),!,predicate_property(C,number_of_rules(N)),N>0,!,clause(C,Body),body_no_backchains(C,Body).
 call_only_backchain_lc(_,C):- moo:hybrid_rule(C,BODY),call_mpred_body(C,BODY).
 % TODO call_only_backchain_lc(_,_,_,dbase_t(F,Obj,LValue)):-  choose_val(F,Obj,LValue).

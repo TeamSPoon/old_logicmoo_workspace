@@ -242,7 +242,7 @@ moo:  ?- make.
 % :- meta_predicate moo:must_ac(^).
 % :- meta_predicate moo:xcall_f(2,?,?).
 % :- meta_predicate moo:xcall_f(1,?).
-% :- meta_predicate moo:add_w_hooks(^).
+% :- meta_predicate moo:hooked_asserta(^).
 % :- meta_predicate moo:xcall_t(3,?,?,?).
 % :- meta_predicate moo:create_random(*,*,0).
 % :- meta_predicate moo:xcall_t(6,?,?,?,?,?,?).
@@ -252,7 +252,7 @@ moo:  ?- make.
 % :- meta_predicate moo:exception(0).
 % :- meta_predicate moo:object_print_details(2,*,*,*,*).
 % :- meta_predicate moo:xcall_f(0).
-% :- meta_predicate moo:call_after(0,^).
+:- meta_predicate moo:call_after(0,^).
 % :- meta_predicate moo:mud_pred_expansion_2(4,?,?,*,*,*).
 % :- meta_predicate moo:xcall_f(5,?,?,?,?,?).
 % :- meta_predicate moo:xcall_f(6,?,?,?,?,?,?).

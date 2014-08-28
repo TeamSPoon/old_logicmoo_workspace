@@ -39,7 +39,7 @@ use_term_listing(contains(HO),H,B):-!, use_term_listing_2(contains,HO,H,B).
 use_term_listing(HO,H,B):- !,use_term_listing_2(exact,HO,H,B).
 
 use_term_listing_2(contains,HO,H,B):- any_to_string(HO,HS),!, with_output_to(string(H1B1),write_canonical((H:-B))), (sub_atom_icasechk(HS,_,H1B1);sub_atom_icasechk(H1B1,_,HS)),!.
-use_term_listing_2(exact,HO,H,B):- contains_term(HO,(H:-B)).
+use_term_listing_2(exact,HO,H,B):- contains_var(HO,(H:-B)).
 
 use_term_listing(HO,(H:-B)):-!, synth_clause_db(H,B), use_term_listing(HO,H,B).
 

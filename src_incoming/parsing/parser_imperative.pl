@@ -129,11 +129,11 @@ text_means(_Agent,_Text,_Value):-fail.
 relates(Agent,Relation,Obj):-loop_check(relates_lc(Agent,Relation,Obj),fail).
 relates_lc(Agent,Relation,Obj):-text_means(Agent,Relation,Obj),!.
 relates_lc(_    ,Relation,Obj):- atom(Relation),type(Relation),!,isa(Obj,Relation).
-relates_lc(_    ,Relation,Obj):-contains_term(Relation,value),subst(Relation,value,Obj,Call),!,req(Call).
+relates_lc(_    ,Relation,Obj):-contains_var(Relation,value),subst(Relation,value,Obj,Call),!,req(Call).
 relates_lc(Agent,same(Relation),Obj):- !, relates(Agent,Relation,Value),relates(Obj,Relation,Value).
 relates_lc(Agent,Relation,Obj):- atom(Relation),!, prop(Agent,Relation,Obj).
-relates_lc(_    ,Relation,Obj):-contains_term(Relation,Obj),!,req(Relation).
-relates_lc(Agent,Relation,Obj):-contains_term(Relation,Agent),append_term(Relation,Obj,Call),!,req(Call).
+relates_lc(_    ,Relation,Obj):-contains_var(Relation,Obj),!,req(Relation).
+relates_lc(Agent,Relation,Obj):-contains_var(Relation,Agent),append_term(Relation,Obj,Call),!,req(Call).
 relates_lc(Agent,Relation,Obj):-objects_for_agent(Agent,Relation,MatchList),MatchList\=[],!,member(MatchList,Obj).
 
 

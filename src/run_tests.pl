@@ -71,6 +71,14 @@ defined_local_test:-
       test_true(parseIsa0(item, _G537410, [food], [])).
 
 defined_local_test:- 
+      test_name("nudity test"), 
+       test_true_req(wearing(explorer(player1), 'ArtifactCol1003-Gold-Uniform775')).
+
+defined_local_test:- 
+      test_name("genlInverse test"), 
+       test_true_req(possess(explorer(player1), 'ArtifactCol1003-Gold-Uniform775')).
+
+defined_local_test:- 
    test_name("Tests our action templates"), doall((get_type_action_templates(Templates),dmsg(get_type_action_templates(Templates)))).
 
 moo:mud_test("local sanity tests", doall(defined_local_test)).

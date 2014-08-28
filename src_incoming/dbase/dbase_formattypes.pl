@@ -382,7 +382,7 @@ correctType(assert(_),A,type,AA):- atom(A),decl_type(A),must_equals(A,AA).
 correctType(_O,A,verb,AA):- must_equals(A,AA).
 correctType(_O,A,Type,AA):- compound(A),not(is_list(A)),atom(Type),functor_safe(A,Type,_), must_equals(A,AA).
 
-correctType(_O,A,Type,AA):- compound(Type),contains_term(Type,self),predicate_property(Type,_),!,
+correctType(_O,A,Type,AA):- compound(Type),contains_var(Type,self),predicate_property(Type,_),!,
    subst(Type,self,A,Call1),
    subst(Call1,value,AA,Call2),!,
       show_call(Call2),ignore(AA=A).

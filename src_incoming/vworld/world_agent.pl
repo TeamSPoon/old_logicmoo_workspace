@@ -89,6 +89,7 @@ get_session_id(IDIn):-current_input(ID),is_stream(ID),!,ID=IDIn.
 get_session_id(ID):-thread_self(ID).
 
 :-export(current_agent/1).
+:-decl_mpred_prolog(current_agent/1).
 current_agent(PIn):-get_session_id(O),thlocal:session_agent(O,P),!,P=PIn.
 
 current_agent_or_var(P):- once(current_agent(PIn)),P=PIn,!.

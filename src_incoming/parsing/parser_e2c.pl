@@ -98,7 +98,7 @@ isa_stringType(['ListOfTypeFn', X]):-atom(X),isa_stringType(X).
 :-meta_predicate(stringmatcher_term_expansion(+,-)).
 stringmatcher_term_expansion((Head:-Body),Out):- compound(Body), 
    % stringmatcher_term_expansion,
-   not(contains_term(Body,strings_match)),
+   not(contains_var(Body,strings_match)),
    (( makeStringMatcher(Head,Body,NewBody) )),!,Body\=NewBody, 
    user:expand_term((Head:-strings_match,NewBody),Out),dmsg(portray(Out)).
 
@@ -133,8 +133,8 @@ callClause((C1,C2)):-!,callClause(C1),callClause(C2).
 callClause([L|Ist]):- !, dmsg(callClause([L|Ist])),!,reorderClause(_ ,[L|Ist]).
 
 can_reorderBody(_ ,true):-!,fail.
-can_reorderBody(_ ,Body):-member(M,[noreorder,!,reorderClause,var,nonvar]),contains_term(Body,M),!,fail.
-can_reorderBody(_ ,Body):-member(M,[reorder]),contains_term(Body,M),!.
+can_reorderBody(_ ,Body):-member(M,[noreorder,!,reorderClause,var,nonvar]),contains_var(Body,M),!,fail.
+can_reorderBody(_ ,Body):-member(M,[reorder]),contains_var(Body,M),!.
 can_reorderBody(Head, _):- reorder_term_expansion,compound(Head),functor(Head, _ ,A),A > 0.
 
 conj_to_list((A,B),AB):-!,conj_to_list(A,AL),conj_to_list(B,BL),append(AL,BL,AB).
@@ -154,7 +154,7 @@ stringArgUC2([User],Cyc,CallWithCyc):- Cyc=User,!,CallWithCyc,atom(Cyc).
 
 cycStringToString(Cyc,User):- (atom(Cyc)->User=[Cyc];User=Cyc),!.
 
-user:term_expansion(I,O):-e2c_term_expansion(I,O).
+user:term_expansion(I,O):- not(thlocal:into_form_code),e2c_term_expansion(I,O).
 
 % ===================================================================
 

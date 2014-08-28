@@ -116,8 +116,8 @@ ensure_clause(HEAD,_,_,BODY):- clause_asserted(HEAD , BODY),!.
 % ensure_clause(HEAD,F,A,_):-pred_as_is(F,A), !.
 ensure_clause(HEAD,F,_A,BODY):- assertz((HEAD:-BODY)),
    get_body_functor(BODY,BodyFunctor,_),
-   add_w_hooks(mpred_prop(F,prologHybrid)),
-   add_w_hooks(mpred_prop(F,hasStub(BodyFunctor))),
+   hooked_asserta(mpred_prop(F,prologHybrid)),
+   hooked_asserta(mpred_prop(F,hasStub(BodyFunctor))),
    % this is just to catch asserts at these predicates that are supposed to be contained.. We dont really want them compiled
    nop(((compile_predicates([HEAD])),must_det(static_predicate(HEAD)))).
 
@@ -147,8 +147,8 @@ declare_dbase_local(F,A):- forall(mpred_prop(F,stubType(Stub)),declare_dbase_loc
 declare_dbase_local(F,A,_Stub):- assert_arity(F,A),fail.
 declare_dbase_local(F,_,_):- mpred_prop(F,prologOnly),!. % retractall(mpred_prop(F,stubType(_Stub))).
 declare_dbase_local(F,_,Stub):- mpred_prop(F,hasStub(Stub)),!.
-declare_dbase_local(F,_,Stub):- add_w_hooks(mpred_prop(F,stubType(Stub))),fail.
-declare_dbase_local(F,_,Stub):- add_w_hooks(mpred_prop(F,hasStub(Stub))),fail.
+declare_dbase_local(F,_,Stub):- hooked_asserta(mpred_prop(F,stubType(Stub))),fail.
+declare_dbase_local(F,_,Stub):- hooked_asserta(mpred_prop(F,hasStub(Stub))),fail.
 declare_dbase_local(F,A,prologHybrid):- must_det(declare_dbase_local_dynamic(F,A)),!.
 declare_dbase_local(F,A,Stub):- trace_or_throw(unknown_stubtype_declare_dbase_local(F,A,Stub)).
 
@@ -192,14 +192,15 @@ declare_dbase_local_dynamic_really(M,F,A):-
    asserta_if_new((HEAD :- BODY)),
    call(compile_predicates([HEAD])).
 
-hybrid_rule_term_expansion(':-'(_),_):-!,fail.
-hybrid_rule_term_expansion((HEAD:-true),moo:was_imported_kb_content(hybrid_rule_term_expansion,HEAD)):-!,fail,compound(HEAD),functor(HEAD,F,_),mpred_prop(F,prologHybrid),add(HEAD),!.
-hybrid_rule_term_expansion((HEAD:-NEWBODY),moo:hybrid_rule(HEAD,NEWBODY)):-compound(HEAD),functor(HEAD,F,_),mpred_prop(F,prologHybrid),!.
-hybrid_rule_term_expansion((HEAD:-NEWBODY),moo:hybrid_rule(HEAD,NEWBODY)):-compound(HEAD),functor(HEAD,F,_),mpred_arity(F,_),!.
+hybrid_rule_term_expansion(file,':-'(_),_):-!,fail.
+hybrid_rule_term_expansion(file,HEAD,_):-not(compound(HEAD)),!,fail.
+hybrid_rule_term_expansion(file,(HEAD:-true),':-'(add(HEAD))):-get_functor(HEAD,F),mpred_prop(F,prologHybrid),add(HEAD),!.
+hybrid_rule_term_expansion(file,(HEAD:-NEWBODY),moo:hybrid_rule(HEAD,NEWBODY)):-get_functor(HEAD,F),mpred_prop(F,prologHybrid),!.
+
 hybrid_rule_term_expansion((I:-_),_):-!,once((compound(I),functor(I,F,A),asserta_if_new(mpred_prolog_arity(F,A)))),!,fail.
 hybrid_rule_term_expansion(I,_):- once((compound(I),functor(I,F,A),asserta_if_new(mpred_prolog_arity(F,A)))),!,fail.
 
-user:term_expansion(I,O):- hybrid_rule_term_expansion(I,O).
+user:term_expansion(I,O):-not(thlocal:into_form_code),get_functor(I,F),mpred_prop(F,prologHybrid),hybrid_rule_term_expansion(file,I,O).
 
 declare_dbase_local_dynamic_plus_minus_2(F,AMinus2):-   
    decl_mpred(F,arity(AMinus2)),
@@ -312,8 +313,8 @@ assert_arity_lc(F,A):-
   retractall(mpred_prop(F,arity(_))),
   retractall(mpred_arity(F,_)),
    must_det(good_pred_relation_name(F,A)),
-    add_w_hooks(mpred_arity(F,A)),
-    add_w_hooks(mpred_prop(F,arity(A))),!.
+    hooked_asserta(mpred_arity(F,A)),
+    hooked_asserta(mpred_prop(F,arity(A))),!.
     
    % ignore((forall(mpred_missing_stubs(F,Stub),show_call(declare_dbase_local(F,A,Stub))))).
    
@@ -343,7 +344,7 @@ mpred_prop_ordered(Pred,Prop):-mpred_prop(Pred,Prop),not(first_mpred_props(Prop)
 
 rescan_mpred_props:- loop_check(rescan_mpred_props_lc,true).
 rescan_mpred_props_lc:-rescan_duplicated_facts(moo,mpred_prop(_,_)),fail.
-rescan_mpred_props_lc:-time(forall(mpred_prop_ordered(Pred,Prop),add_w_hooks(mpred_prop(Pred,Prop)))),fail.
+rescan_mpred_props_lc:-time(forall(mpred_prop_ordered(Pred,Prop),hooked_asserta(mpred_prop(Pred,Prop)))),fail.
 rescan_mpred_props_lc:-rescan_missing_stubs.
 rescan_mpred_props_lc.
 
@@ -382,7 +383,7 @@ decl_mpred_1(F,prologHybrid):- declare_dbase_local_dynamic(F).
 decl_mpred_1(F,cycPlus2(A)):- declare_dbase_local_dynamic_plus_2(F,A).
 
 decl_mpred_1(F,Prop):-mpred_prop(F,Prop),!.
-decl_mpred_1(F,Prop):-add_w_hooks(mpred_prop(F,Prop)),fail.
+decl_mpred_1(F,Prop):-hooked_asserta(mpred_prop(F,Prop)),fail.
 
 decl_mpred_1(F,A):-once(decl_mpred_2(F,A)).
 
@@ -424,7 +425,6 @@ decl_mpred_prolog(_CM,M,PI,F/A):-
 % :- decl_mpred posture/1.
 % :- dynamic_multifile_exported((decl_mpred/1)).
 
-:- decl_mpred_hybrid(typeDeclarer/1).
 
 functor_check_univ(M:G1,F,List):-atom(M),member(M,[dbase,moo]),!,functor_check_univ(G1,F,List),!.
 functor_check_univ(G1,F,List):-must_det(compound(G1)),must_det(G1 \= _:_),must_det(G1 \= _/_),G1=..[F|List],!.
@@ -438,6 +438,6 @@ add_mpred_prop_gleaned(Arg1,FRGS):-functor_check_univ(Arg1,F,ARGSISA),add_mpred_
 add_mpred_prop_gleaned_4(Arg1,_F,[ARG|_],FRGS):-nonvar(ARG),!,decl_mpred(Arg1,[argsIsaInList(Arg1)|FRGS]).
 add_mpred_prop_gleaned_4(Arg1,_F,_,FRGS):-decl_mpred(Arg1,FRGS).
 
-user:term_expansion(G,_):- notrace((once(glean_pred_props_maybe(G)),fail)).
+user:term_expansion(G,_):- not(thlocal:into_form_code),notrace((once(glean_pred_props_maybe(G)),fail)).
 
 

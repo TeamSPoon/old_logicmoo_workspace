@@ -48,6 +48,7 @@ last_test_name(String):- was_test_name(String),!.
 last_test_name(unknown).
 
 test_result(Result):-test_result(Result,true).
+
 test_result(Result,SomeGoal):- last_test_name(String),fmt(Result:test_mini_result(Result:String,SomeGoal)).
 
 from_here(_:SomeGoal):-!,functor(SomeGoal,F,_),atom_concat('test',_,F).
@@ -63,7 +64,8 @@ test_call(Goal):- meta_interp(test_call,Goal).
 test_call0(SomeGoal):- from_here(SomeGoal),!,req(SomeGoal).
 test_call0(SomeGoal):- dmsg(req(SomeGoal)), catch(SomeGoal,E,(test_result(error(E),SomeGoal),!,fail)).
 
-test_true(SomeGoal):-  once(((test_call(SomeGoal),!,test_result(passed,SomeGoal));test_result(failed,SomeGoal))).
+test_true_req(Req):- test_true(req(Req)).
+test_true(SomeGoal):- once(((test_call(SomeGoal),!,test_result(passed,SomeGoal));test_result(failed,SomeGoal))).
 test_false(SomeGoal):- test_true(not(SomeGoal)).
 
 term_test(Obj):-
