@@ -413,7 +413,7 @@ decl_mpred_prolog(M,PI,F/A):-
     decl_mpred(F,as_is(M:F/A)),
     decl_mpred(F,ask_module(M)),
    ignore((ground(PI),decl_mpred(PI))),
- %   dynamic_multifile_exported(M,M,PI,F/A),
+  dynamic_multifile_exported(M,M,PI,F/A),
    decl_mpred(F,A)]).
 
 decl_mpred_prolog(_CM,M,PI,F/A):-

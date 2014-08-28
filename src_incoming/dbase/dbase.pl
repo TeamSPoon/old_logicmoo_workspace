@@ -455,11 +455,10 @@ mdel(C0):- dmsg(warn(failed(mdel(C0)))),!,fail.
 % -  clr(Retractall)
 clr(C0):- db_op_int(retract(all),C0),verify_sanity(ireq(C0)->dmsg(warn(incomplete_CLR(C0)));true).
 
-% -  oreq(Query) = query with P note
+% -  preq(Query) = query with P note
 preq(P,C0):- db_op_int(query(dbase_t,P),C0).
 
 % -  req(Query) = Normal query
-req(true):- !.
 req(C0):- db_op_int(query(dbase_t,req),C0).
 
 % -  mreq(Query) = Forced Full query
@@ -557,8 +556,8 @@ db_rewrite(_Op,Term,NewTerm):-equivRule_call(Term,NewTerm).
 db_rewrite(_Op,Term,NewTerm):-forwardRule_call(Term,NewTerm).
 
 :-export(simply_functors/3).
-simply_functors(Db_pred,query(HLDS,Must),Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=Simpler,!,call(Db_pred,query(HLDS,Must),Simpler).
-simply_functors(Db_pred,Op,Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=Simpler,!,call(Db_pred,Op,Simpler).
+simply_functors(Db_pred,query(HLDS,Must),Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=@=Simpler,!,call(Db_pred,query(HLDS,Must),Simpler).
+simply_functors(Db_pred,Op,Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=@=Simpler,!,call(Db_pred,Op,Simpler).
 
 
 % -  hook:dmsg_hook(db_op(query(HLDS,call),moo:holds_t(ft_info,type,'$VAR'(_)))):-trace_or_throw(dtrace).
@@ -572,7 +571,6 @@ add_from_file(B,B):- db_op(assert(_OldV),B),!.
 % runs previously required ops fisrt
 db_op_int(assert(Op),Term):- !, db_op(assert(Op),Term).
 db_op_int(Op,Term):- do_db_op_hooks,db_op(Op,Term),do_db_op_hooks.
-
 
 univ_left(Comp,[M:P|List]):- nonvar(M),univ_left0(M, Comp, [P|List]),!.
 univ_left(Comp,[H,M:P|List]):- nonvar(M),univ_left0(M,Comp,[H,P|List]),!.
@@ -591,6 +589,7 @@ record_on_thread(Dbase_change,O):- thread_self(ID),thlocal:dbase_capture(ID,Dbas
 % db_op(query(HLDS,Must),createableType(SubType)):- !, call_expanded_for(Must,is_creatable_type(SubType)).
 db_op(assert(_),props(_Obj,Props)):- Props ==[], !.
 db_op(a,Wild):-!,db_op(assert(a),Wild).
+db_op(query(_,Must),NC):- not(compound(NC)),!,call_expanded_for(Must,NC).
 db_op(query(Dbase_t, Req), must(Call)):-!, must(db_op(query(Dbase_t, Req), Call)).
 db_op(query(HLDS,Must),B):-!, loop_check_term(db_op0(query(HLDS,Must),B),req(B),loop_check_term(call_mpred(B),req2(B),show_call(is_asserted(B)))). 
 db_op(assert(OldV),B):- !,loop_check_term(db_op0(assert(OldV),B),add(B),true),!. % true = we are already processing this assert
@@ -604,7 +603,7 @@ db_op(Op,Term):- loop_check(db_op0(Op,Term),trace_or_throw(loop_check(db_op0(Op,
 db_op0(query(_HLDS,Must),isa(I,Type)):- !,call_expanded_for(Must,isa_backchaing(I,Type)).
 db_op0(assert(_),isa(T,Type)):- !,assert_isa(T,Type),!.
 db_op0(assert(assertion),end_of_file):-!.
-db_op0(Op,Term):- stack_check(1000),not(compound(Term)),!,trace_or_throw(nc(db_op0(Op,Term))).
+db_op0(Op,Term):- stack_check(1000),var(Term),!,trace_or_throw(nc(db_op0(Op,Term))).
 db_op0(Op,props(Obj,nameStrings(Str))):-!, db_op0(Op,nameStrings(Obj,Str)).
 
 db_op0(Op,MT:Term):- is_kb_module(MT),!,with_assertions(thlocal:caller_module(kb,MT),db_op(Op,Term)).
@@ -676,10 +675,12 @@ db_op0(Op,isa(A,SubType)):- dbase_t(createableSubclassType,SubType,Type),!,db_op
 
 %db_op0(assert(_OldV),singleValued(Term)):- !,decl_mpred(Term),decl_mpred(Term,singleValued).
 %db_op0(assert(_OldV),multiValued(Term)):- !,functor_safe(Term,_,A),decl_mpred(Term),decl_mpred(Term,[multiValued,multi(A)]).
+
 db_op0(query(HLDS,Must),argIsa(P,N,T)):- call_expanded_for(query(HLDS,Must),(get_mpred_prop(P,argsIsaInList(ArgsIsa)),arg(N,ArgsIsa,T),must(nonvar(T)))).
-
-
 db_op0(Op,A):- must_det(once(correctArgsIsa(Op,A,AA))), A \=@= AA, !, db_op(Op,AA).
+db_op0(Op,Wild):- transform_holds(dbase_t,Wild,Simpler), Wild \=@= Simpler,!,dmsg(transform_holds(Wild->Simpler)),db_op0(Op,Simpler).
+
+
 
 db_op0(assert(_),Term):- glean_pred_props_maybe(Term),fail.
 

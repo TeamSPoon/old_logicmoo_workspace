@@ -6,7 +6,8 @@
 :- multifile user:file_search_path/2.
 :- dynamic   user:file_search_path/2.
 
-logicmoo_util_all:if_flag_true(Flag,Goal):- catch(Flag,_,fail)->catch(Goal,E,throw(if_flag_true(E)));true.
+%logicmoo_util_all:if_flag_true(Flag,Goal):- catch(Flag,_,fail)->catch(Goal,E,throw(if_flag_true(E)));true.
+logicmoo_util_all:if_flag_true(Flag,Goal):- catch(Flag,E,(dmsg(E:Flag),fail)) -> must(Goal); true.
 
 join_path33(A,B,C):-exists_directory(B)->B=C;directory_file_path(A,B,C).
 

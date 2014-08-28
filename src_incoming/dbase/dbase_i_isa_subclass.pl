@@ -84,17 +84,17 @@ hook:decl_database_hook(assert(_A_or_Z),isa(W,type)):-atom(W),atomic_list_concat
 :-export assert_isa/2.
 
 assert_isa(I,T):- not(ground(I:T)),trace_or_throw(not(ground(assert_isa(I,T)))).
-assert_isa(I,T):- ((loop_check(assert_isa_lc(I,T),true))).
+assert_isa(I,T):- loop_check(assert_isa_lc(I,T),true).
 
 :-export assert_isa_lc/2.
 % skip formatter types
-assert_isa_lc(_I,T):- member(T,[string,action,dir]),!.
-assert_isa_lc(I,T):- hotrace(formattype(T)),!,dmsg(once(dont_assert_is_ft(I,T))),!.
+assert_isa_lc(_I,T):- member(T,[string,action,dir,apath]),!.
+assert_isa_lc(I,T):- hotrace(formattype(T)),(compound(I)->true;dmsg(once(dont_assert_is_ft(I,T)))).
 assert_isa_lc(_,T):- once(decl_type(T)),fail.
 assert_isa_lc(I,type):- decl_type(I),!.
 assert_isa_lc(I,formattype):- define_ft(I),!.
 assert_isa_lc(I,T):- cannot_table_call(isa_asserted(I,T)),!.
-assert_isa_lc(I,T):- is_stable,!, hooked_asserta(isa(I,T)).
+%assert_isa_lc(I,T):- is_stable,!, hooked_asserta(isa(I,T)).
 assert_isa_lc(I,T):- must_det((hooked_asserta(isa(I,T)),logOnFailureIgnore(isa_backchaing(I,T)))).
 
 % ================================================
