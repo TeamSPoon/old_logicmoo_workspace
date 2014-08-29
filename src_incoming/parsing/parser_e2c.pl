@@ -99,7 +99,7 @@ isa_stringType(['ListOfTypeFn', X]):-atom(X),isa_stringType(X).
 stringmatcher_term_expansion((Head:-Body),Out):- compound(Body), 
    % stringmatcher_term_expansion,
    not(contains_var(Body,strings_match)),
-   (( makeStringMatcher(Head,Body,NewBody) )),!,Body\=NewBody, 
+   (( makeStringMatcher(Head,Body,NewBody) )),!,Body\=@=NewBody, 
    user:expand_term((Head:-strings_match,NewBody),Out),dmsg(portray(Out)).
 
 :-meta_predicate(reorder_term_expansion(+,-)).
@@ -163,7 +163,7 @@ to_simple_wl([L|T],[L|T]):-!.
 to_simple_wl(L,[L]):-!.
 
 notground(V):-notrace(not(ground(V))).
-term_atoms(Term,Vs):-findall(A,(arg(_,Term,A),non_blankWord(A),A\=[],atom(A)),Vs).
+term_atoms(Term,Vs):-findall(A,(arg(_,Term,A),non_blankWord(A),A\=@=[],atom(A)),Vs).
 
 words_append(L,R,LRS):-stringToWords(L,LS),stringToWords(R,RS),stringToWords(LRS,LRLIST),append(LS,RS,LRLIST).
 words_concat(PreAffix,Affix,String):- reduceWordList(PreAffix,A),reduceWordList(Affix,B),reduceWordList(String,C),!,
@@ -501,7 +501,7 @@ goodStart(noun_phrase,'SubjectPronoun').
 canStart(PhraseType,POS):-goodStart(PhraseType,POS),!.
 
 cantStart(PhraseType,POS):-canStart(PhraseType,POS),!,fail.
-cantStart(PhraseType,POS):-goodStart(OtherPhraseType,POS),OtherPhraseType\=PhraseType,!.
+cantStart(PhraseType,POS):-goodStart(OtherPhraseType,POS),OtherPhraseType\=@=PhraseType,!.
 cantStart(PhraseType,POS):-dmsg(cantStart(PhraseType,POS)),!.
 
 % ==========================================================
@@ -511,7 +511,7 @@ cantStart(PhraseType,POS):-dmsg(cantStart(PhraseType,POS)),!.
 % TODO  cycWordForISA
 cycWordForISA(_CycWord,_EventIsa):-fail.  
 
-genlPreds_different(Child,Form):-genlPreds(Child,Form), Child\=Form.
+genlPreds_different(Child,Form):-genlPreds(Child,Form), Child\=@=Form.
 
 % peace atal beh - 695-1297
 %isCycWord(CycWord) --> {var(CycWord),!,trace}.
@@ -530,7 +530,7 @@ meetsPos_0(String,CycWord,POS):- stack_check(1000),one_must(meetsPos_1(String,Cy
      meetsPos_5(String,CycWord,POS))))).
 meetsPos_0(_String,_CycWord,POS):- var(POS),!,fail.
 meetsPos_0(String,CycWord,FormNotPOS):- is_speechPartPred_any(FormNotPOS),!,meetsForm(String,CycWord,FormNotPOS).
-meetsPos_0(String,CycWord,POS):-'genls'(Child,POS),Child\=POS, meetsPos_0(String,CycWord,Child).
+meetsPos_0(String,CycWord,POS):-'genls'(Child,POS),Child\=@=POS, meetsPos_0(String,CycWord,Child).
 
 meetsPos_1(String,CycWord,POS):- has_wordage(String),!,is_wordage_prop(String, pos(_, CycWord, POS)).
 
@@ -672,10 +672,10 @@ is_speechPartPred_any(Form):-is_speechPartPred_tt_ever(Form).
 
 is_speechPartPred_tt(Form):- thlocal:allowTT,!,is_speechPartPred_tt_ever(Form).
 is_speechPartPred_tt_ever(Form):- atom(Form),atom_concat(infl,_,Form),
-  call_tabled_can(setof(F,((el_holds(isa,F,'Predicate','ThoughtTreasureMt',[amt('ThoughtTreasureMt')|_]),atom(F),atom_concat(infl,_,F))),Forms)),!,member(Form,Forms).
+  call_tabled_can(findall_nodupes(F,((el_holds(isa,F,'Predicate','ThoughtTreasureMt',[amt('ThoughtTreasureMt')|_]),atom(F),atom_concat(infl,_,F))),Forms)),!,member(Form,Forms).
 
 is_speechPartPred_nontt(Form):- not(thlocal:omitCycWordForms),!,is_speechPartPred_nontt_ever(Form).
-is_speechPartPred_nontt_ever(Form):- call_tabled_can(setof(F,(is_speechPartPred_0(F),not(is_speechPartPred_tt_ever(F))),Forms)),!,member(Form,Forms).
+is_speechPartPred_nontt_ever(Form):- call_tabled_can(no_repeats(Form,(is_speechPartPred_0(Form),not(is_speechPartPred_tt_ever(Form))))).
 
 is_speechPartPred_0('baseForm').
 is_speechPartPred_0(Form):-speechPartPreds_asserted(_,Form).
@@ -689,7 +689,6 @@ is_SpeechPart(POS):-cyckb_t(isa,POS,'SpeechPart').
 
 argIsa(Form,1, 'LexicalWord'):-is_speechPartPred_tt(Form).
 argIsa(Form,2, 'CharacterString'):-is_speechPartPred_tt(Form).
-
 
 % ==========================================================
 % meetsForm(String,CycWord,Form)
@@ -721,11 +720,11 @@ meetsForm_2(String,CycWord,POS):- with_assertions(thlocal:allowTT,meetsForm_1(St
 
 stringAtomToWordForm([String],CycWord,Form):- nonvar(CycWord),!,stringAtomToWordForm([String],NewCycWord,Form),!,CycWord=NewCycWord.
 stringAtomToWordForm([String],CycWord,Form):- nonvar(String),!,           
-	    'regularSuffix'(Form, Before, Affix), Affix\='',
+	    'regularSuffix'(Form, Before, Affix), Affix\=@='',
 	    words_concat(BaseString,Affix,[String]),
 	    meetsForm([BaseString],CycWord,Before).
 stringAtomToWordForm([String],CycWord,Form):- 
-	    'regularSuffix'(Form,Before,Affix),  Affix\='',
+	    'regularSuffix'(Form,Before,Affix),  Affix\=@='',
             meetsForm([BaseString],CycWord,Before),
 	    words_concat(BaseString,Affix,[String]).
 
@@ -1236,18 +1235,18 @@ convertToWordage(Atom,C):- not(is_list(Atom)),!,
 
 convertToWordage(Words,C):- 
       removeBlanks(Words,WordsO),
-  Words \= WordsO,!,
+  Words \=@= WordsO,!,
    must_det(convertToWordage(WordsO,C)).
 
 convertToWordage(Words,C):- fail,
       must_det(idioms(e2c,Words,WordsO)), % was chat
-   Words \= WordsO,!,
+   Words \=@= WordsO,!,
    must_det(convertToWordage(WordsO,C)).
 
   
 convertToWordage(Words,C):-  fail,
       removeRepeats(Words,WordsO),
-   Words \= WordsO,!,
+   Words \=@= WordsO,!,
    must_det(convertToWordage(WordsO,C)).
 
 convertToWordage(Words,Next):-
@@ -1316,11 +1315,11 @@ usefull_wordage([txt([_,_|_])]):-!,fail.
 usefull_wordage(X):-member(form(_,_,_),X).
 
 
-get_wordage_list(Words,O):- dictionary(slang,B,A),stringToWords(B,Didnt),stringToWords(A,NewList),append_ci(Didnt,Rest,Words),append(NewList,Rest,Ws),Words\=Ws,!,get_wordage_list(Ws,O).
+get_wordage_list(Words,O):- dictionary(slang,B,A),stringToWords(B,Didnt),stringToWords(A,NewList),append_ci(Didnt,Rest,Words),append(NewList,Rest,Ws),Words\=@=Ws,!,get_wordage_list(Ws,O).
 
 
 get_wordage_list([],[]):-!.
-% get_wordage_list(Words,O):- dictionary(contractions,Didnt,NewList), append_ci(Didnt,Rest,Words),append(NewList,Rest,Ws),Words\=Ws,!,get_wordage_list(Ws,O).
+% get_wordage_list(Words,O):- dictionary(contractions,Didnt,NewList), append_ci(Didnt,Rest,Words),append(NewList,Rest,Ws),Words\=@=Ws,!,get_wordage_list(Ws,O).
 get_wordage_list([W,'\'','nt'|Rest],O):- equals_icase(W,'do'), get_wordage_list([do,not|Rest],O).
 get_wordage_list([W,'\'','ve'|Rest],O):-get_wordage_list([W,have|Rest],O).
 get_wordage_list([W,'\'','re'|Rest],O):-get_wordage_list([W,are|Rest],O).
@@ -1510,9 +1509,9 @@ string_props(1,[Atom],number(Num)):-atom_number(Atom,Num).
 string_props(1,Text,txt(Text)).
 string_props(Pass,[Num],Props):-number(Num),atom_number(Atom,Num),!,string_props(Pass,[Atom],Props).
 string_props(2,String,base(CycWord)):- stringToCycWord(String,CycWord).
-string_props(2,[String],Props):-toLowercase(String,Lower),String\=Lower,string_props(3,[Lower],Props).
-string_props(Pass,String,form(Pass,CycWord,Form)):- Pass\=2, meetsForm(String,CycWord,Form),notPrefixOrSuffix(CycWord).
-string_props(Pass,String,pos(3,CycWord,POS)):- Pass\=2, meetsPos(String,CycWord,POS),notPrefixOrSuffix(CycWord).
+string_props(2,[String],Props):-toLowercase(String,Lower),String\=@=Lower,string_props(3,[Lower],Props).
+string_props(Pass,String,form(Pass,CycWord,Form)):- Pass\=@=2, meetsForm(String,CycWord,Form),notPrefixOrSuffix(CycWord).
+string_props(Pass,String,pos(3,CycWord,POS)):- Pass\=@=2, meetsPos(String,CycWord,POS),notPrefixOrSuffix(CycWord).
 
 
 %string_props(Pass,[String],PredProps):-!,  is_speechPartPred_tt(Pred),cyckb_t(Pred,CycWord,String),pred_props(Pred,CycWord,PredProps).
@@ -1833,7 +1832,7 @@ det_object(PN,CycL,CycL) --> proper_object(PN).
 
 %'multiWordSemTrans'([intended, recipient, of], 'Communicate-TheWord', 'SimpleNoun', 'RegularNounFrame', 'communicationTarget'(A, ':NOUN'), 'EnglishMt', v(v('Communicate-TheWord', 'RegularNounFrame', 'SimpleNoun', 'communicationTarget', ':NOUN', intended, of, recipient), ['?X'=A|B])).
 object(Subj,In,'and'(In,Out)) --> [S],
-   {'multiWordSemTrans'([S|String],CycWord,POS, NextFrame,Template),POS \= 'Adjective'},
+   {'multiWordSemTrans'([S|String],CycWord,POS, NextFrame,Template),POS \=@= 'Adjective'},
      String,isCycWord(CycWord), frame_template(NextFrame,Subj,Result,Extras),
     {apply_frame(Template,Subj,Event,Obj,Result,Out)}.
 
@@ -2093,7 +2092,7 @@ verb_phrase(Subj,Event,(CycL)) -->
 	 
 % gen phrase 1
 verb_phrase(Subj,Event,gen_phrase1(Call,Result)) --> [S],
-	    {S\=is, 'genFormat'(Predicate,['~a',S|Template],ArgsI),
+	    {S\=@=is, 'genFormat'(Predicate,['~a',S|Template],ArgsI),
 	    (compound(ArgsI) -> trasfromArgs(ArgsI,Args) ; Args=[1,2]),
 	    length(Args,Size),functor(Call,Predicate,Size),atom(Predicate),
 	    placeVars([Subj|Blanks],Args,Call)},

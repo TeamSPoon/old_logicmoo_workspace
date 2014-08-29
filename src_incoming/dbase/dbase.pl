@@ -253,7 +253,7 @@ coerce(What,_Type,NewThing):-NewThing = What.
    db_op/2,
    ireq/1,
   del/1,  
-  padd/2, padd/3, prop/3, prop_or/4, props/2, iprops/2, upprop/2, ireq/1, mreq/1, upprop/1, req/1, term_listing/1, 
+  padd/2, padd/3, prop/3, prop_or/4, props/2, iprops/2, upprop/2,add_fast/1, ireq/1, mreq/1, upprop/1, req/1, term_listing/1, 
   use_term_listing/2,  world_clear/1,  
    with_kb_assertions/2
   )).
@@ -1121,9 +1121,10 @@ assertz_local_game_clause(Head,Body):- get_predicate_type(Head,Type),!,must_det(
 
 
 assertz_local_game_clause(callable(prologOnly),Head,Body):- must_det(assertz_if_new_clause(Head,Body)),dmsg(used_clause_as_prologOnly(Head,Body)).
-assertz_local_game_clause(callable(static),Head,Body):- must_det(assertz_if_new_clause(Head,Body)),dmsg(eRROR_maybe_used_clause_as_prologOnly(Head,Body)).
+assertz_local_game_clause(callable(static),Head,Body):- must_det(assertz_if_new_clause(Head,Body)),trace_or_throw(eRROR_maybe_used_clause_as_prologOnly(Head,Body)).
 assertz_local_game_clause(_,Head,true):- !,with_assertions(thlocal:adding_from_srcfile,add(Head)),!.
-assertz_local_game_clause(callable(prologHybrid),Head,Body):-!, assertz_if_new_clause(moo:hybrid_rule(Head,Body),true),dmsg(used_clause_as_hybridRule(Head,Body)).
+assertz_local_game_clause(callable(prologHybrid),Head,Body):-!, assertz_if_new_clause(moo:hybrid_rule(Head,Body),true),dmsg(used_clause_as_hybridRule(Head,Body)),
+   decl_mpred_hybrid(F/A),!,declare_dbase_local_dynamic_really(moo,F,A).
 assertz_local_game_clause(Type,Head,BodyIn):- once(make_body_clause(Head,BodyIn,Body)),must_det(assertz_if_new_clause(Head,Body)),dmsg(used_clause_as_unknown(Type,Head,Body)).
 assertz_local_game_clause(Type,Head,Body):- must_det(assertz_if_new_clause(Head,Body)),dmsg(used_clause_as(Type,Head,Body)).
 

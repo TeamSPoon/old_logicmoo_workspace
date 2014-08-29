@@ -889,7 +889,7 @@ open_list(A,B):-append(A,_,B).
 
 unnumbervars_nil(X,Y):-!,unnumbervars_a2t(X,Y).
 
-collect_temp_vars(VARS):-!,(setof(=(Name,Number),numbered_var(Name,Number,_),VARS);VARS=[]).
+collect_temp_vars(VARS):-!,(findall_nodupes(=(Name,Number),numbered_var(Name,Number,_),VARS);VARS=[]).
 
 %================================================================
 % STRING TOKENIZATION                            

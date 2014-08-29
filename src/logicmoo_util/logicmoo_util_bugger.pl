@@ -199,7 +199,7 @@ nd_dbgsubst2( _X, _Sk, L, L ).
 % ----------
 :- export(static_predicate/3).
 :- meta_predicate(static_predicate(+,+,+)).
-static_predicate(M,F,A):- functor(FA,F,A),  once(M:predicate_property(FA,_)),not(M:predicate_property(FA,dynamic)),not((M:predicate_property(FA,imported_from(Where)),Where \= M)).
+static_predicate(M,F,A):- functor(FA,F,A),  once(M:predicate_property(FA,_)),not(M:predicate_property(FA,dynamic)),not((M:predicate_property(FA,imported_from(Where)),Where \== M)).
 
 
 :- export(dynamic_safe/1).
@@ -530,7 +530,21 @@ user_use_module(What):- within_module(use_module(What),'user').
 :-thread_local tlbugger:cannot_table/0.
 tlbugger:can_table.
 
-snumbervars(BC):-numbervars(BC,0,_,[singletons(true),attvar(skip)]).
+cannot_table_call(Call):- with_assertions(tlbugger:cannot_table,Call).
+
+% ===================================================
+
+numbervars_impl(Term,Functor,Start,End):- numbervars(Term,Start,End,[attvar(bind),functor_name(Functor),singletons(true)]).
+
+:-export(snumbervars/3).
+snumbervars(Term,Functor,End):- atom(Functor),!,numbervars_impl(Term,Functor,0,End).
+snumbervars(Term,Start,End):- integer(Start),!,numbervars_impl(Term,'$VAR',Start,End).
+:-export(snumbervars/4).
+snumbervars(Term,Start,End,_):-snumbervars(Term,Start,End).
+:-export(snumbervars/1).
+snumbervars(Term):-numbervars(Term,0,_End).
+
+% ===================================================
 
 :-meta_predicate_transparent(once_if_ground(0)).
 once_if_ground(Call):-not(ground(Call)),!,Call.
@@ -540,6 +554,7 @@ once_if_ground(Call):- once(Call).
 once_if_ground(Call,T):-not(ground(Call)),!,Call,deterministic(D),(D=yes -> T= (!) ; T = true).
 once_if_ground(Call,!):-once(Call).
 
+% ===================================================
 
 to_list_of(_,[Rest],Rest):-!.
 to_list_of(RL,[R|Rest],LList):-
@@ -547,31 +562,135 @@ to_list_of(RL,[R|Rest],LList):-
       to_list_of(RL,Rest,List),
       LList=..[RL,L,List],!.
 
+% ===================================================
+
 call_or_list([Rest]):-!,call(Rest).
 call_or_list(Rest):-to_list_of(';',Rest,List),!,call(List).
 
 call_skipping_n_clauses(N,H):-
    findall(B,clause_safe(H,B),L),length(L,LL),!,LL>N,length(Skip,N),append(Skip,Rest,L),!,call_or_list(Rest).
 
-cannot_table_call(Call):- with_assertions(tlbugger:cannot_table,Call).
-
 % ===================================================================
-:-thread_local was_a_repeat/2.
 
-:-meta_predicate_transparent(no_repeats(0)).
+% ===================================================
+% 
+% no_repeats(:Call) 
+%  (uses newval_or_fail/2)
+%
+% Like call/1 but ony succeeds only unique variabes
+% 
+% logicmoo_mud:  ?- no_repeats(member(X,[3,1,1,1,3,2])).
+% X = 3 ;
+% X = 1 ;
+% X = 2.
+% ===================================================
+:- export(no_repeats/1).
+:- meta_predicate no_repeats(0).
+% no_repeats(Call):- !,no_repeats_av(Call).
+no_repeats(Call):- CONS = [_], term_variables(Call,Vars), call(Call), newval_or_fail(CONS,Vars).
 
-no_repeats(Call):-ground(Call),Call,!.
-no_repeats(Call):-make_key(Call,Key),retractall(was_a_repeat(Key, _)),no_repeats_key(Key,Call,Call).
+% ===================================================
+% 
+% no_repeats(+Vars,:Call) 
+%  (uses newval_or_fail/2)
+% 
+% Like call/1 but ony succeeds on unique free variabes
+% 
+% logicmoo_mud:  ?- no_repeats( X , member(X-Y,[3-2,1-4,1-5,2-1])).
+% X = 3, Y = 2 ;
+% X = 1, Y = 4 ;
+% X = 2, Y = 1.
+% ===================================================
+:- export(no_repeats/2).
+:- meta_predicate no_repeats(+,0).
+% no_repeats(Vs,Call):- !,no_repeats_av(Vs,Call).
+no_repeats(Vars,Call):- CONS = [_],  call(Call), newval_or_fail(CONS,Vars).
 
-:-meta_predicate_transparent(no_repeats(+,0)).
+:-export(newval_or_fail/2).
+:-meta_predicate(newval_or_fail(+,+)).
+%  i skip checking the car each time
+newval_or_fail(CONS,VAL):-CONS = [CAR|CDR], VAL \== CAR,  ( CDR==[] ->  nb_setarg(2, CONS, [VAL]) ; newval_or_fail(CDR,VAL)). 
 
-no_repeats(Vars,Call):-ground(Vars),Call,!.
-no_repeats(Vars,Call):-make_key(Vars:Call,Key),retractall(was_a_repeat(Key, _)),no_repeats_key(Key,Vars,Call).
+% ==========================================================
+%    is newval_or_fail/2  - a little term db to track if we've seen a term or not
+% 
+% written out for understanding  
+% 
+% newval_or_fail(cons(Vars,_),Vars):-!,fail.
+% newval_or_fail(CONS,Vars):- CONS = '.'(_,[]), !,nb_setarg(2, CONS, '.'(Vars,[])).
+% newval_or_fail(CONS,Vars):- CONS = '.'(Var,_),var(Var), !,nb_setarg(1, CONS, Vars).   % should we even bother to look here?
+% newval_or_fail(cons(_,Nxt),Vars):- newval_or_fail_2(Nxt,Vars).
+%
+% (combined into one rule for immplementing)
+% ==========================================================
+:- export(newval_or_fail/2).
+:- meta_predicate newval_or_fail(?,?).
+% What may I do to simplify or speed up the below fo combine to the caller?
+%  i skip checking the car each time
+% what can be done to speed up?
+%  perhapes starting ourt with an array? vv(_,_,_,_,_).
+% and grow with a.. vv(_,_,_,_,vv(_,_,_,_,vv(_,_,_,_,_))) ? 
 
-:-meta_predicate_transparent(no_repeats_key(+,+,0)).
 
-no_repeats_key(Key,Vars,Call):- call(Call), make_key(Vars,CallResult),not(was_a_repeat(Key,CallResult)),asserta(was_a_repeat(Key,CallResult)).
-no_repeats_key(Key, _ , _):- retractall(was_a_repeat(Key, _)),fail.
+
+% ===================================================
+%
+%  no_repeats_av/1 - Filter repeats using coroutining
+%
+% Same as no_repeats(:Call) (so same as call/1 but fitered)
+%
+% (everytime we see new value.. we add it to dif/2 in an attributed variable that we have a refernce in a compound)
+% Cehcked via ?- dif(AVar,Foo), get_attrs(AVar,ATTRS1), get_attrs(AVar,ATTRS2), ATTRS1==ATTRS2.
+%
+%  So the variable binding gerts rejected several frames below your code? ( are we nipping away futile bindings?)
+% 
+% however ..
+%     does that mess with anything in code that we are calling?
+%  Could some peice of code been required to see some binding to make a side effect come about?
+%  
+%  (uses newval_or_fail/2)
+%
+% logicmoo_mud:  ?- no_repeats_av(member(X,[3,1,1,1,3,2])).
+% X = 3 ;
+% X = 1 ;
+% X = 2.
+%
+% attributed variable verson of getting filtered bindings
+% ===================================================
+
+:-export(no_repeats_av/1).
+:-meta_predicate(no_repeats_av(0)).
+no_repeats_av(Call):-term_variables(Call,VarList), no_repeats_avl(VarList,Call).
+
+
+:-export(no_repeats_av/2).
+:-meta_predicate(no_repeats_av(+,0)).
+no_repeats_av(Var,Call):- var(Var),!,no_repeats_avar(Var,Call).
+no_repeats_av(VarList,Call):- no_repeats_avl(VarList,Call).
+
+
+:-export(no_repeats_avl/2).
+:-meta_predicate(no_repeats_avl(+,0)).
+no_repeats_avl([],Call):-!,Call,!.
+no_repeats_avl([Var],Call):- !,no_repeats_avar(Var,Call).
+no_repeats_avl(VarList,Call):-no_repeats_av_prox(VarList,Call).
+
+:-export(no_repeats_avar/2).
+:-meta_predicate(no_repeats_avar(+,0)).
+no_repeats_avar(AVar,Call):- get_attr(AVar,dif,vardif(CONS,[])),!,work_with_attvar(AVar,Call,CONS,true).
+no_repeats_avar(Var,Call):- no_repeats_av_prox(Var,Call).
+
+:-export(no_repeats_av_prox/2).
+:-meta_predicate(no_repeats_av_prox(+,0)).
+no_repeats_av_prox(VarList,Call):- create_vardif(AVar,CONS), !,VarList=AVar, !,work_with_attvar(AVar,Call,CONS,del_attr(AVar,dif)).
+
+:-export(create_vardif/2).
+:-meta_predicate(create_vardif(+,+)).
+create_vardif(AVar,CONS):- dif(AVar,comquatz),get_attr(AVar,dif,vardif(CONS,[])),!.
+
+:-export(work_with_attvar/4).
+:-meta_predicate(work_with_attvar(+,0,+,0)).
+work_with_attvar(AVar,Call,CONS,ExitHook):- call_cleanup(( call(Call), newval_or_fail(CONS,(dif(-)-AVar))),ExitHook).
 
 
 % =========================================================================
@@ -638,7 +757,7 @@ ib_multi_transparent33(MT):-multifile(MT),module_transparent(MT),dynamic_safe(MT
 
 % hide Pred from tracing
 to_m_f_arity_pi(M:Plain,M,F,A,PI):-!,to_m_f_arity_pi(Plain,M,F,A,PI).
-to_m_f_arity_pi(Term,M,F,A,PI):- strip_module(Term,M,Plain),Plain\=Term,!,to_m_f_arity_pi(Plain,M,F,A,PI).
+to_m_f_arity_pi(Term,M,F,A,PI):- strip_module(Term,M,Plain),Plain\==Term,!,to_m_f_arity_pi(Plain,M,F,A,PI).
 to_m_f_arity_pi(F/A,_M,F,A,PI):-functor(PI,F,A),!.
 to_m_f_arity_pi(PI,_M,F,A,PI):-functor(PI,F,A).
 
@@ -956,7 +1075,7 @@ default_ecall(onerror,fail,none).
 default_ecall(onerror,error,reuse).
 
 
-on_prolog_ecall_override(F,A,Var,_SentValue, Value):- on_prolog_ecall(F,A,Var,Value), Value \= reuse,!.
+on_prolog_ecall_override(F,A,Var,_SentValue, Value):- on_prolog_ecall(F,A,Var,Value), Value \== reuse,!.
 on_prolog_ecall_override(_F,_A,_Var, Value, Value).
 
 bin_ecall(F,A,unwrap,true):-member(F/A,[(';')/2,(',')/2,('->')/2,('call')/1]).
@@ -982,7 +1101,7 @@ prolog_ecall(BDepth,OnCall,Call):-functor_catch(Call,F,A),prolog_ecall_fa(BDepth
 prolog_ecall_fa(_,_,F,A,Call):-
   on_prolog_ecall(F,A,fake,true),!,
   atom_concat(F,'_FaKe_Binding',FAKE),
-  numbervars(Call,FAKE,0,_),
+  snumbervars(Call,FAKE,0),
   dmsg(error(fake(succeed,Call))),!.
 
 % A=0 , (unwrap = true ; asis = true)
@@ -1061,7 +1180,7 @@ is_deterministic(_ = _).
 is_deterministic(_ =@= _).
 is_deterministic(_ =.. _).
 is_deterministic(_ == _).
-is_deterministic(_ \= _).
+is_deterministic(_ \== _).
 is_deterministic(_ \== _).
 is_deterministic(atom(_)).
 is_deterministic(compound(_)).
@@ -1092,7 +1211,7 @@ one_must_det(_Call,OnFail):-OnFail,!.
 
 randomVars(Term):- random(R), StartR is round('*'(R,1000000)), !,
  ignore(Start=StartR),
- numbervars(Term, Start, _End, [attvar(skip),functor_name('$VAR')]).
+ snumbervars(Term, Start, _).
 
 prolog_must_not(Call):-Call,!,trace,!,programmer_error(prolog_must_not(Call)).
 prolog_must_not(_Call):-!.
@@ -1230,8 +1349,9 @@ printAll(FileMatch):-printAll(FileMatch,FileMatch).
 printAll(Call,Print):- flag(printAll,_,0), forall((Call,flag(printAll,N,N+1)),(fmt('~q.~n',[Print]))),fail.
 printAll(_Call,Print):- flag(printAll,PA,0),(fmt('~n /* found ~q for ~q. ~n */ ~n',[PA,Print])).
 
+
 /*
-contains_term_unifiable(SearchThis,Find):-Find==SearchThis,!.
+contains_term_unifiable(SearchThis,Find):-Find=SearchThis,!.
 contains_term_unifiable(SearchThis,Find):-compound(SearchThis),functor_catch(SearchThis,Func,_),(Func==Find;arg(_,SearchThis,Arg),contains_term_unifiable(Arg,Find)).
 */
 % =================================================================================
@@ -1478,7 +1598,7 @@ getPFA2(Frame,Attr,Goal):- ccatch((prolog_frame_attribute(Frame,Attr,Goal)),E,Go
 clauseST(ClRef,clause=Goal):- findall(V,(member(Prop,[file(V),line_count(V)]),clause_property(ClRef,Prop)),Goal).
 
 clauseST(ClRef,Goal = HB):- ignore(((clause(Head, Body, ClRef),copy_term(((Head :- Body)),HB)))),
-   numbervars(HB,0,_),
+   snumbervars(HB,0,_),
    findall(Prop,(member(Prop,[source(_),line_count(_),file(_),fact,erased]),clause_property(ClRef,Prop)),Goal).
 
 
@@ -1500,16 +1620,16 @@ sendNote(To,From,Subj,Message,Vars):-
 % Each prolog has a specific way it could unnumber the result of a safe_numbervars
 % ========================================================================================
 
-safe_numbervars(E,EE):-duplicate_term(E,EE),safe_numbervars(EE),get_gtime(G),numbervars(EE,'$VAR',G,[attvar(skip)]),
+safe_numbervars(E,EE):-duplicate_term(E,EE),safe_numbervars(EE),get_gtime(G),snumbervars(EE,'$VAR',G,[attvar(bind)]),
    term_variables(EE,AttVars),forall(member(V,AttVars),(copy_term(V,VC,Gs),V='$VAR'(VC=Gs))).
    
 
 get_gtime(G):- get_time(T),convert_time(T,_A,_B,_C,_D,_E,_F,G).
 
-safe_numbervars(X):-get_gtime(G),safe_numbervars(X,'$VAR',G,_).
+safe_numbervars(X):-get_gtime(G),snumbervars(X,G,_).
 
-safe_numbervars(Copy,X,Z):-numbervars(Copy,X,Z,[attvar(skip)]).
-safe_numbervars(Copy,_,X,Z):-numbervars(Copy,X,Z,[attvar(skip)]).
+safe_numbervars(Copy,X,Z):-snumbervars(Copy,X,Z,[attvar(bind)]).
+safe_numbervars(Copy,_,X,Z):-snumbervars(Copy,X,Z,[attvar(bind)]).
 
 unnumbervars(X,Y):-with_output_to(atom(A),write_term(X,[numbervars(true),quoted(true)])),atom_to_term(A,Y,_),!.
 
@@ -1588,7 +1708,7 @@ os_to_prolog_filename(OS,PL):-current_directory_search(CurrentDir),join_path(Cur
 
 os_to_prolog_filename(OS,PL):-atom(OS),atomic_list_concat([X,Y|Z],'\\',OS),atomic_list_concat([X,Y|Z],'/',OPS),!,os_to_prolog_filename(OPS,PL).
 os_to_prolog_filename(OS,PL):-atom_concat_safe(BeforeSlash,'/',OS),os_to_prolog_filename(BeforeSlash,PL).
-os_to_prolog_filename(OS,PL):-absolute_file_name(OS,OSP),OS \= OSP,!,os_to_prolog_filename(OSP,PL).
+os_to_prolog_filename(OS,PL):-absolute_file_name(OS,OSP),OS \== OSP,!,os_to_prolog_filename(OSP,PL).
 
 
 % =================================================================================
@@ -1696,13 +1816,15 @@ call_no_cuts_0(C):-call(C).
 :- meta_predicate_transparent call_vars_tabled(?,0).
 :- module_transparent call_vars_tabled/2.
 
+
 :- meta_predicate_transparent call_setof_tabled(?,0,-).
+:- meta_predicate_transparent findall_nodupes(?,0,-).
 :- module_transparent call_setof_tabled/3.
 
 :- dynamic(call_tabled_list/2).
 
 :- meta_predicate_transparent(make_key(0,-)).
-make_key(CC,KeyA):- notrace(ground(CC)->Key=CC ;(copy_term(CC,Key),numbervars(Key,'$VAR',0,_))),!,KeyA=Key. % ,term_to_atom(Key,KeyA).
+make_key(CC,KeyA):- notrace(ground(CC)->Key=CC ;(copy_term(CC,Key,_),snumbervars(Key,0,_))),!,KeyA=Key. % ,term_to_atom(Key,KeyA).
 
 expire_tabled_list(all):-!,retractall(call_tabled_list(_,_)).
 expire_tabled_list(T):- atoms_of(T,A1), CT= call_tabled_list(Key,List),doall(((CT,once(any_term_overlap_atoms_of(A1,List);(not(member(Key,List)),any_term_overlap_atoms_of(A1,Key))),retractall(CT)))).
@@ -1723,9 +1845,12 @@ call_vars_tabled(Vars,C):- call_setof_tabled(Vars,C,Set),!,member(Vars,Set).
 
 call_setof_tabled(Vars,C,List):- make_key(Vars+C,Key),call_tabled0(Key,Vars,C,List).
 
+findall_nodupes(Vs,C,List):- ground(Vs),!,(C->List=[Vs];List=[]).
+findall_nodupes(Vs,C,L):- findall(Vs,C,L).
+
 call_tabled0(Key,_,_,List):- call_tabled_list(Key,List),!.
-call_tabled0(Key,Vars,C,List):- really_can_table,!,setof(Vars,C,List),!,asserta_if_ground(call_tabled_list(Key,List)),!.
-call_tabled0(_,Vars,C,List):- setof(Vars,C,List).
+call_tabled0(Key,Vars,C,List):- really_can_table,!,findall_nodupes(Vars,C,List),!,asserta_if_ground(call_tabled_list(Key,List)),!.
+call_tabled0(_,Vars,C,List):- findall_nodupes(Vars,C,List).
 
 really_can_table:-not(test_tl(tlbugger:cannot_table)),test_tl(tlbugger:can_table).
 
@@ -1766,7 +1891,7 @@ bdmsg(_):-!.
 bdmsg(D):-once(dmsg(D)).
 
 bugger_term_expansion(_,_):-!,fail.
-bugger_term_expansion(T,T3):- compound(T), once(bugger_t_expansion(T,T2)),T\=T2,!,ccatch(expand_term(T2,T3),_,fail).
+bugger_term_expansion(T,T3):- compound(T), once(bugger_t_expansion(T,T2)),T\==T2,!,ccatch(expand_term(T2,T3),_,fail).
 
 % though maybe dumptrace
 default_dumptrace(trace).
@@ -1914,3 +2039,4 @@ user:prolog_exception_hook(A,B,C,D):-once(copy_term(A,AA)),ccatch(( once(bugger_
 :-'$syspreds':'$hide'(visible/1).
 % :-'$set_predicate_attribute'(!, trace, 1).
 % :-hideTrace.
+

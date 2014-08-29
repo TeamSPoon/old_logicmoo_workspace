@@ -345,7 +345,7 @@ correctType_gripe(Op,A,Fmt,AA):- moo:formattype(Fmt),!,trace_or_throw(correctTyp
 correctType_gripe(Op,A,Type,AA):- fail,atom(Type),must_equals(A,AA),
       dmsg(todo(isa_assert_type(Type))),
       % decl_type(Type),
-      can_coerce(Op),dtrace,
+      thlocal:can_coerce(Op),dmsg(warning(add(isa(A,Type)))),dtrace,
       add(isa(A,Type)),!.
 
 correctType_gripe(Op,A,C,A):-must(ground(A)),dtrace, dmsg(todo(define(correctType(Op,A,C,'ConvertedArg')))),throw(retry(_)).

@@ -470,7 +470,7 @@ specifiedItemType(A,T,AA):- checkAnyType(assert(parse),A,T,AAA),AA=AAA.
 checkAnyType(Op,A,Type,AA):- var(A),correctAnyType(Op,A,Type,AA),must_det(var(AA)),must_det(A==AA),!.
 checkAnyType(Op,A,Type,AA):- correctAnyType(Op,A,Type,AA),nonvar(AA),!.
 
-instances_of_type(Inst,Type):- setof(Inst-Type,isa(Inst,Type),Set),member(Inst-Type,Set).
+instances_of_type(Inst,Type):- no_repeats(isa(Inst,Type)).
 % instances_of_type(Inst,Type):- atom(Type), Term =..[Type,Inst], logOnError(req(Term)).
 % longest_string(?Order, @Term1, @Term2)
 longest_string(Order,TStr1,TStr2):-

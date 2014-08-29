@@ -158,6 +158,9 @@ genlInverse(wearing,inside_of).
 genlInverse(contains,inside_of).
 genlInverse(stowed,inside_of).
 
+% mud_test(stowed_is_possessing):- 
+
+
 put_in_world(self):-!.
 put_in_world(Agent):-loop_check(put_in_world_lc(Agent),true),!.
 

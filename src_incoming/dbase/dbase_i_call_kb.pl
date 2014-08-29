@@ -28,7 +28,7 @@ big_kb_ASSERTION(PLIST,[dir(DIR),refcl(A1437)|PROPS]):- 'ASSERTION'(TRUTH, _DNF,
 get_assertions(PLIST,PROPS):-tiny_kb_ASSERTION(PLISTIn,PROPS),nv1000(PLISTIn-PROPS),fix_sentence(PLISTIn,PLIST).
 get_assertions(PLIST,PROPS):-between(2,19,X),length(PLISTIn,X),kbp_t_list(PLISTIn,PROPS,_),nv1000(PLISTIn-PROPS),fix_sentence(PLISTIn,PLIST).
 
-nv1000(S):-numbervars(S,100,_,[singletons(true),attvar(skip)]).
+nv1000(S):-numbervars(S,100,_,[singletons(true),attvar(bind)]).
 
 
 % length(SENT,N),N>1,append(SENT,[MT,Props],PLIST),apply(el_holds,PLIST),member(Var,SENT),var(Var).
@@ -174,9 +174,9 @@ proof_from_clause(Head, Body, ((Head:- Body))).
 move_kb_assertions_matching(PLIST,Match,Replace,Where):- 
 %   dmsg(move_kb_assertions_matching(PLIST,Match,Replace,to(Where))),
         doall((kbp_t_list(PLIST,Call),
-           foreach(retract(Call),
-           subst(PLIST:Call,Match,Replace,NewPLIST:NewCall),
-           assert_to_db_list(Where,[rewrite,NewPLIST,NewCall])))).
+           forall(retract(Call),
+           (subst(PLIST:Call,Match,Replace,NewPLIST:NewCall),
+           assert_to_db_list(Where,[rewrite,NewPLIST,NewCall]))))).
 
 
 assert_to_db_list(HOLDS,PLIST):- safe_univ(Call,[HOLDS|PLIST]), assert(assert_next(Call)).

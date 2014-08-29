@@ -2371,7 +2371,7 @@ open_list(A,B):-append(A,_,B).
 
 unnumbervars_nil(X,Y):-!,unnumbervars(X,Y).
 
-collect_temp_vars(VARS):-!,(setof(=(Name,Number),numbered_var(Name,Number),VARS);VARS=[]).
+collect_temp_vars(VARS):-!,(findall_nodups(=(Name,Number),numbered_var(Name,Number),VARS);VARS=[]).
 
 %================================================================
 % STRING TOKENIZATION                            
@@ -2760,8 +2760,8 @@ writeFileToStream(Dest,Filename):-
 % ========================================================================================
 
 safe_numbervars(X):-get_time(T),convert_time(T,A,B,C,D,E,F,G),!,safe_numbervars(X,'$VAR',G,_).
-safe_numbervars(Copy,X,Z):-numbervars(Copy,X,Z,[attvar(skip)]).
-safe_numbervars(Copy,_,X,Z):-numbervars(Copy,X,Z,[attvar(skip)]).
+safe_numbervars(Copy,X,Z):-numbervars(Copy,X,Z,[attvar(bind)]).
+safe_numbervars(Copy,_,X,Z):-numbervars(Copy,X,Z,[attvar(bind)]).
 %unnumbervars(X,Y):-term_to_atom(X,A),atom_to_term(A,Y,_).
 
 % ========================================================================================

@@ -71,14 +71,18 @@ test_false(SomeGoal):- test_true(not(SomeGoal)).
 
 run_mud_test(Filter):-
    doall((
-   member(F/A,[mud_test/A]),   
+   member(F/A,[mud_test/0,mud_test/1,mud_test/2]),   
    current_predicate(M:F/A),
    functor(H,F,A),
    not(predicate_property(M:H,imported_from(_))),
    clause(M:H,B),
-   use_term_listing(Filter,H,B),
-   once(run_mud_test(H,B)),
+   use_term_listing(Filter,M:H,B),
+   once(run_mud_test_clause(M:H,B)),
    fail)).
+
+run_mud_test_clause(M:mud_test,B):- must((contains_term(test_name(Name),nonvar(Name)))),!, M:run_mud_test(Name,B).
+run_mud_test_clause(M:mud_test(Name),B):- !, M:run_mud_test(Name,B).
+run_mud_test_clause(M:mud_test(Name,Test),B):- forall(B,M:run_mud_test(Name,Test)).
 
 run_mud_test(Name,Test):-
    fmt(begin_mud_test(Name)),

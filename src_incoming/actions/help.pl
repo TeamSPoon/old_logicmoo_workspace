@@ -39,7 +39,7 @@ action_info_db(TEMPL,S):- (PRED=moo:agent_call_command(_,TEMPL);PRED=moo:agent_t
 moo:action_info(TEMPL,text(file,S,contains,TEMPL)):-action_info_db(TEMPL,S),not(clause_asserted(moo:action_info(TEMPL,_Help),true)).
 
 commands_list(ListS):-findall(action_info(B,C,A),(get_type_action_help_commands_list(A,B,C),
- numbervars(action_info(A,B,C),0,_,[attvar(skip),singletons(true)])),List),
+ numbervars(action_info(A,B,C),0,_,[attvar(bind),singletons(true)])),List),
    predsort(alpha_shorter,List,ListS).
 
 alpha_shorter(OrderO, P1,P2):-arg(1,P1,O1),arg(1,P2,O2),!,alpha_shorter_1(OrderO, O1,O2),!.

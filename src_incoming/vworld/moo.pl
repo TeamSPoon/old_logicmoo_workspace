@@ -329,8 +329,6 @@ Warning: at runtime using assert/1, use :- dynamic Name/Arity.
 Warning:
 Warning: moo:argIsa_ft/3, which is referenced by
 Warning:        /devel/logicmoo/src_incoming/dbase/dbase.pl:423:56: 1-st clause of moo:transform_functor_holds/5
-Warning: moo:can_coerce/1, which is referenced by
-Warning:        /devel/logicmoo/src_incoming/dbase/dbase_formattypes.pl:329:6: 2-nd clause of moo:correctType_gripe/4
 Warning: moo:holds_f/1, which is referenced by
 Warning:        /devel/logicmoo/src_incoming/dbase/dbase_i_call.pl:192:21: 4-th clause of moo:holds_t/1
 Warning: moo:functor_member/2, which is referenced by

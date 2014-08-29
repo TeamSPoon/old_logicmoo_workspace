@@ -1301,7 +1301,7 @@ write_clause_with_number(A,WffNum) :-
 	write(WffNum),
 	write('  '),
         copy_term(A,AA),
-        numbervars(AA,0,_,[attvar(skip),singletons(true)]),
+        numbervars(AA,0,_,[attvar(bind),singletons(true)]),
 	write(AA),
 	write(.).
 

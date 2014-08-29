@@ -68,16 +68,16 @@ call_collect_op(with_no_assertions(Assertions,Op2),Flags,Call,Vars,ResultsIn,Res
 
 % add to set
 call_collect_op(+Op,Flags,Call,Vars,ResultsIn,ResultsOut):- !,
-   setof(Vars,call_one(Op,Flags,Call,Vars),ResultsN), 
+   findall_nodupes(Vars,call_one(Op,Flags,Call,Vars),ResultsN), 
    ord_union(ResultsIn,ResultsN,ResultsOut).
 
 % remove from set
 call_collect_op(-Op,Flags,Call,Vars,ResultsIn,ResultsOut):- !,
-   setof(Vars,(member(Vars,ResultsIn),not(call_one(Op,Flags,Call,Vars))),ResultsOut).
+   findall_nodupes(Vars,(member(Vars,ResultsIn),not(call_one(Op,Flags,Call,Vars))),ResultsOut).
 
 % retain only
 call_collect_op('?'(Op),Flags,Call,Vars,ResultsIn,ResultsOut):- !,
-   setof(Vars,(member(Vars,ResultsIn),call_one(Op,Flags,Call,Vars)),ResultsOut).
+   findall_nodupes(Vars,(member(Vars,ResultsIn),call_one(Op,Flags,Call,Vars)),ResultsOut).
 
 % unknown option
 call_collect_op(Op,Flags,Call,Vars,ResultsIn,ResultsOut):- 

@@ -6,15 +6,15 @@ term_listing(Match):-
    ignore((catch(listing(Match),_,fail))),
    doall((
       synth_clause_for(H,B),
-      ok_pred(H),
+      once(ok_pred(H)),
       once(use_term_listing(Match,H,B)),
       show_term_listing(H,B),
       fail)).
 
 synth_clause_for(H,B):- cur_predicate(H,_),synth_clause_db(H,B).
 
-synth_clause_db(H,info(Props)):- pred_info(H,Props).
-synth_clause_db(H,B):- predicate_property(M:H,number_of_clauses(_)),clause(M:H,B).
+synth_clause_db(H,info(Props)):- once(pred_info(H,Props)).
+synth_clause_db(H,B):- predicate_property(M:H,number_of_clauses(_)),!,clause(M:H,B).
 
 :-export((use_term_listing/3)).
 use_term_listing(noinfo,_,info(_)):-!,fail. 
@@ -44,14 +44,9 @@ use_term_listing_2(exact,HO,H,B):- contains_var(HO,(H:-B)).
 use_term_listing(HO,(H:-B)):-!, synth_clause_db(H,B), use_term_listing(HO,H,B).
 
 :-dynamic cur_predicates/1.
-cur_predicate(M:P,M:F/A):- !, current_module(M),   
-   current_predicate(M:F/A),functor(P,F,A),once(predicate_property(user:P,imported_from(M))).
+cur_predicate(M:P,M:F/A):-
+   current_predicate(M:F/A),functor(P,F,A),not(predicate_property(user:P,imported_from(_))).
 
-cur_predicate(M:P,M:F/A):-  current=user,
-   current_predicate(From:F/A),functor(P,F,A),once(predicate_property(From:P,imported_from(M))).
-
-% predicate_property_h(M:H,P):-atom(M),!,nonvar(H),predicate_property_h(M:H,P).
-predicate_property_h(H,P):- predicate_property(H,P).
 
 ok_pred(F/A):-!,functor(P,F,A),ok_pred(P),!.
 ok_pred(P):-not(bad_pred(P)).

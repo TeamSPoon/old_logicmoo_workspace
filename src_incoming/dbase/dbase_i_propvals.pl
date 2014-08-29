@@ -61,8 +61,7 @@ choose_for(Prop,Obj,Value):- var(Obj),trace_or_throw(var_choose_for(Prop,Obj,Val
 choose_for(Prop,Obj,Value):- not(is_fact_consistent(dbase_t(Prop,Obj,Value))),!,fail.
 choose_for(Prop,Obj,Value):- mpred_prop(Prop,singleValued),!,choose_one(Prop,Obj,Value),!.
 choose_for(Prop,Obj,Value):- nonvar(Value),!,choose_each(Prop,Obj,RValue),!,RValue=Value.
-choose_for(Prop,Obj,Value):- findall(choose_each(Prop,Obj,Value),choose_each(Prop,Obj,Value),Results),Results \== [],!,
-   member(choose_each(Prop,Obj,Value),Results).
+choose_for(Prop,Obj,Value):- no_repeats(choose_each(Prop,Obj,Value)).
 
 choose_one(Prop,Obj,Value):- choose_asserted(Prop,Obj,RValue),!,Value=RValue.
 % was choose_one(Prop,Obj,Value):- with_fallbacks(with_fallbacksg(fallback_value(Prop,Obj,RValue))),checkNoArgViolation(Prop,Obj,RValue),!,Value = RValue,maybe_save(Obj,Prop,Value).

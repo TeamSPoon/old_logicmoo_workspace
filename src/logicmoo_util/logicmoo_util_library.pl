@@ -352,7 +352,7 @@ call_n_times(N,Goal):-doall((between(2,N,_),once(Goal))),Goal.
 :-dynamic(at_started/1).
 at_start(Goal):-
 	copy_term(Goal,Named),
-	numbervars(Named,0,_,[attvar(skip),singletons(true)]),
+	numbervars(Named,0,_,[attvar(bind),singletons(true)]),
 	copy_term(Named,Named2),
         (    at_started(Named)
 	->
@@ -482,4 +482,4 @@ identical_member(X,[_|L]) :-
 	'identical_member'(X,L).
 
 
-contains_singletons(Term):- not(ground(Term)),not(not((term_variables(Term,Vs),numbervars(Term,0,_,[attvar(skip),singletons(true)]),member('$VAR'('_'),Vs)))).
+contains_singletons(Term):- not(ground(Term)),not(not((term_variables(Term,Vs),numbervars(Term,0,_,[attvar(bind),singletons(true)]),member('$VAR'('_'),Vs)))).

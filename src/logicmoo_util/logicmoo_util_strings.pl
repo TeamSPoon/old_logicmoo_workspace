@@ -425,10 +425,21 @@ map_tree_to_list(_,IN,IN):-trace,must_assign([IN],IN).
 non_empty(A):-must_det(not(is_empty_string(A))).
 must_nonvar(A):-one_must(nonvar(A),trace_or_throw(must_nonvar(A))).
 
+
+both_empty(A,B):-empty_string(A),!,empty_string(B),nop(dmsg(both_empty(A,B))).
+either_empty(A,B):- (empty_string(B);empty_string(A)),!,nop(dmsg(either_empty(A,B))).
+
+equals_icase(A,B):-both_empty(A,B),!.
+equals_icase(A,B):-either_empty(A,B),!,fail.
 equals_icase(A,B):-string_ci(A,U),string_ci(B,U).
+starts_with_icase(A,B):-either_empty(A,B),!,fail.
 starts_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),non_empty(UB),atom_concat(UB,_,UA).
+starts_with_icase(A,B):-both_empty(A,B),dmsg(warn(equals_icase(A,B))).
+either_starts_with_icase(A,B):-either_empty(A,B),!,fail.
 either_starts_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),non_empty(UA),non_empty(UB),(atom_concat(UB,_,UA);atom_concat(UA,_,UB)).
+starts_or_ends_with_icase(A,B):-either_empty(A,B),!,fail.
 starts_or_ends_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),non_empty(UA),non_empty(UB),(atom_concat(UB,_,UA);atom_concat(_,UA,UB)).
+ends_with_icase(A,B):-either_empty(A,B),!,fail.
 ends_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),non_empty(UB),atom_concat(_,UB,UA).
 
 string_dedupe(StringI,StringO):- to_word_list(StringI,Words),remove_predupes(Words,StringO).

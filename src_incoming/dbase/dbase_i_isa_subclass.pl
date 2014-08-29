@@ -150,10 +150,10 @@ isa_backchaing(A,T):- fact_loop_checked(isa(A,T),isa_backchaing_0(A,T)).
 
 isa_backchaing_v_nv(A,term):-nonvar(A),!.
 isa_backchaing_v_nv(_,var):-!.
-isa_backchaing_v_nv(A,T):-setof(A,AT^(transitive_subclass_or_same(AT,T),isa_asserted(A,AT)),List),!,member(A,List).
+isa_backchaing_v_nv(A,T):-no_repeats([A],(transitive_subclass_or_same(AT,T),isa_asserted(A,AT))).
 
 isa_backchaing_0(A,T):-  var(A),nonvar(T),!,isa_backchaing_v_nv(A,T).
-isa_backchaing_0(A,T):-  var(T),!,setof(TT,AT^(isa_asserted(A,AT),transitive_subclass_or_same(AT,TT)),List),!,member(T,List).
+isa_backchaing_0(A,T):-  var(T),!,no_repeats([T],(isa_asserted(A,AT),transitive_subclass_or_same(AT,T))).
 isa_backchaing_0(A,T):-  nonvar(A),isa_backchaing_nv_nv(A,T).
 isa_backchaing_0(A,T):-  transitive_subclass_or_same(AT,T),isa_asserted(A,AT).
 
