@@ -668,6 +668,8 @@ no_repeats_av(Call):-term_variables(Call,VarList), no_repeats_avl(VarList,Call).
 
 :-export(no_repeats_av/2).
 :-meta_predicate(no_repeats_av(+,0)).
+no_repeats_av(VarList,Call):- !, filter_repeats(VarList,Call).
+
 no_repeats_av(Var,Call):- var(Var),!,no_repeats_avar(Var,Call).
 no_repeats_av(VarList,Call):- no_repeats_avl(VarList,Call).
 
