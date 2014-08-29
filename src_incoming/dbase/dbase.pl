@@ -1117,7 +1117,7 @@ assertz_local_game_clause(C):- assertz_local_game_clause(C,true),!.
 assertz_local_game_clause(Head,Body):- (var(Head);var(Body)),!,trace_or_throw(var_assertz_local_game_clause(Head,Body)).
 assertz_local_game_clause(Head,Body):- clause_asserted((':-'(Head,Body))),!.
 assertz_local_game_clause(Head,Body):- ExpIn = (Head:-Body),  expand_term(ExpIn,Exp),Exp \=@= ExpIn,!,assertz_local_game_clause(Exp),!.
-assertz_local_game_clause(Head,Body):- get_predicate_type(Head,Type),!,must_det(assertz_local_game_clause(Type,Head,Body)),!.
+assertz_local_game_clause(Head,Body):- get_mpred_type(Head,Type),!,must_det(assertz_local_game_clause(Type,Head,Body)),!.
 
 
 assertz_local_game_clause(callable(prologOnly),Head,Body):- must_det(assertz_if_new_clause(Head,Body)),dmsg(used_clause_as_prologOnly(Head,Body)).
@@ -1130,20 +1130,20 @@ assertz_local_game_clause(Type,Head,Body):- must_det(assertz_if_new_clause(Head,
 
 special_wrapper_body(W):-get_body_functor(W,F,_),!,special_wrapper_functor(F).
 
-get_predicate_type(Head,Type):-get_functor(Head,F,A),!,get_predicate_type(Head,F,A,Type).
-get_predicate_type(F,A,Type):-functor(P,F,A),get_predicate_type(P,F,A,Type).
+get_mpred_type(Head,Type):-get_functor(Head,F,A),!,get_mpred_type(Head,F,A,Type).
+get_mpred_type(F,A,Type):-functor(P,F,A),get_mpred_type(P,F,A,Type).
 
-get_predicate_type(Head,F,A,Type):-atom(Head),!,dmsg(get_predicate_type(Head,F,A,Type)),get_predicate_type(_,Head,A,Type).
-get_predicate_type(Head,_,_,Type):-compound(Head),!,get_functor(Head,F,A),get_predicate_type4(Head,F,A,Type).
-get_predicate_type(_,F,A,Type):-atom(F),number(A),!,functor(Head,F,A),get_predicate_type4(Head,F,A,Type).
-get_predicate_type(Head,F,A,Type):-must(mpred_arity(F,A)),functor(Head,F,A),get_predicate_type4(Head,F,A,Type).
+get_mpred_type(Head,F,A,Type):-atom(Head),mpred_arity(Head,A),!,dmsg(get_mpred_type(Head,F,A,Type)),get_mpred_type(Head,A,Type).
+get_mpred_type(Head,_,_,Type):-compound(Head),!,get_functor(Head,F,A),get_mpred_type4(Head,F,A,Type).
+get_mpred_type(_,F,A,Type):-atom(F),number(A),!,functor(Head,F,A),get_mpred_type4(Head,F,A,Type).
+get_mpred_type(Head,F,A,Type):-must(mpred_arity(F,A)),functor(Head,F,A),get_mpred_type4(Head,F,A,Type).
 
-get_predicate_type4(P,F,A,T):-get_predicate_type5(P,F,A,T),!.
+get_mpred_type4(P,F,A,T):-get_mpred_type5(P,F,A,T),!.
 
-get_predicate_type5(_,F,_,callable(Type)):-member(Type,[prologOnly,prologHybrid]),mpred_prop(F,Type).
-get_predicate_type5(P,_,_,unknown):-not(predicate_property(P,_)),dmsg(warn_pp(not(predicate_property(P,_)))).
-get_predicate_type5(P,_,_,callable(dynamic)):-predicate_property(P,dynamic).
-get_predicate_type5(_,_,_,callable(static)).
+get_mpred_type5(_,F,_,callable(Type)):-member(Type,[prologOnly,prologHybrid]),mpred_prop(F,Type).
+get_mpred_type5(P,_,_,unknown):-not(predicate_property(P,_)),dmsg(warn_pp(not(predicate_property(P,_)))).
+get_mpred_type5(P,_,_,callable(dynamic)):-predicate_property(P,dynamic),!.
+get_mpred_type5(_,_,_,callable(static)).
 
 
 special_wrapper_functor(call_mpred_body).

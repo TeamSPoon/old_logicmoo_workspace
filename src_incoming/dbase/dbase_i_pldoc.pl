@@ -58,7 +58,13 @@ bad_pred(P):-not(predicate_property(P,number_of_clauses(_))).
 bad_pred(P):-predicate_property(P,imported_from(_)),predicate_property(P,static).
 bad_pred(P):-predicate_property(P,foreign).
 
-pred_info(H,Props):- findall(PP,predicate_property_h(H,PP),Props1),/*findall(used_by(M),predicate_property(M:H,_),Props2),*/ ignore(Props2=[]),append(Props1,Props2,Props3),sort(Props3,Props).
+pred_info(H,Props):- findall(PP,predicate_property_h(H,PP),Props).
+
+predicate_property_h(H,PP):-predicate_property(H,PP).
+predicate_property_h(H,PP):-get_functor(H,F),!,mpred_props_v(F,PP).
+mpred_props_v(F,PP):-is_asserted(mpred_prop(F,PP)).
+mpred_props_v(F,PP):-is_asserted([PP,F]).
+mpred_props_v(F,mped_type(Type)):-once(get_mpred_type(F,Type)).
 
 
 show_term_listing(H,true):- !, show_term_listing(H).

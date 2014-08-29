@@ -572,6 +572,10 @@ call_skipping_n_clauses(N,H):-
 
 % ===================================================================
 
+:-thread_local tlbugger:attributedVars.
+
+tlbugger:attributedVars.
+
 % ===================================================
 % 
 % no_repeats(:Call) 
@@ -586,7 +590,7 @@ call_skipping_n_clauses(N,H):-
 % ===================================================
 :- export(no_repeats/1).
 :- meta_predicate no_repeats(0).
-% no_repeats(Call):- !,no_repeats_av(Call).
+no_repeats(Call):- tlbugger:attributedVars,!,no_repeats_av(Call).
 no_repeats(Call):- CONS = [_], term_variables(Call,Vars), call(Call), newval_or_fail(CONS,Vars).
 
 % ===================================================
@@ -603,12 +607,11 @@ no_repeats(Call):- CONS = [_], term_variables(Call,Vars), call(Call), newval_or_
 % ===================================================
 :- export(no_repeats/2).
 :- meta_predicate no_repeats(+,0).
-% no_repeats(Vs,Call):- !,no_repeats_av(Vs,Call).
+no_repeats(Vs,Call):- tlbugger:attributedVars,!,no_repeats_av(Vs,Call).
 no_repeats(Vars,Call):- CONS = [_],  call(Call), newval_or_fail(CONS,Vars).
 
 :-export(newval_or_fail/2).
 :-meta_predicate(newval_or_fail(+,+)).
-%  i skip checking the car each time
 newval_or_fail(CONS,VAL):-CONS = [CAR|CDR], VAL \== CAR,  ( CDR==[] ->  nb_setarg(2, CONS, [VAL]) ; newval_or_fail(CDR,VAL)). 
 
 % ==========================================================
@@ -677,21 +680,67 @@ no_repeats_avl(VarList,Call):-no_repeats_av_prox(VarList,Call).
 
 :-export(no_repeats_avar/2).
 :-meta_predicate(no_repeats_avar(+,0)).
-no_repeats_avar(AVar,Call):- get_attr(AVar,dif,vardif(CONS,[])),!,work_with_attvar(AVar,Call,CONS,true).
+no_repeats_avar(AVar,Call):- get_attr(AVar,dif,VARDIF),!,work_with_attvar(AVar,Call,VARDIF,true).
+no_repeats_avar(AVar,Call):- tlbugger:attributedVars,!, create_vardif(AVar,VARDIF), !,VarList=AVar, !,work_with_attvar(AVar,Call,VARDIF,del_attr(AVar,dif)).
 no_repeats_avar(Var,Call):- no_repeats_av_prox(Var,Call).
 
 :-export(no_repeats_av_prox/2).
 :-meta_predicate(no_repeats_av_prox(+,0)).
-no_repeats_av_prox(VarList,Call):- create_vardif(AVar,CONS), !,VarList=AVar, !,work_with_attvar(AVar,Call,CONS,del_attr(AVar,dif)).
+no_repeats_av_prox(VarList,Call):- create_vardif(AVar,VARDIF), !,VarList=AVar, !,work_with_attvar(AVar,Call,VARDIF,del_attr(AVar,dif)).
 
 :-export(create_vardif/2).
 :-meta_predicate(create_vardif(+,+)).
-create_vardif(AVar,CONS):- dif(AVar,comquatz),get_attr(AVar,dif,vardif(CONS,[])),!.
+create_vardif(AVar,VARDIF):- dif(AVar,comquatz),get_attr(AVar,dif,VARDIF),!.
 
 :-export(work_with_attvar/4).
 :-meta_predicate(work_with_attvar(+,0,+,0)).
-work_with_attvar(AVar,Call,CONS,ExitHook):- call_cleanup(( call(Call), newval_or_fail(CONS,(dif(-)-AVar))),ExitHook).
+work_with_attvar(AVar,Call,VARDIF,ExitHook):- VARDIF = vardif(CONS,[]),  call_cleanup((  ( call(Call), newval_or_fail_attrib_vardif_cons(VARDIF, CONS, (dif(-)-AVar)))),ExitHook).
 
+
+:-export(newval_or_fail_attrib_vardif_cons/3).
+:-meta_predicate(newval_or_fail_attrib_vardif_cons(+,+,+)).
+newval_or_fail_attrib_vardif_cons(VARDIF,CONS,VAL):- CONS = [CAR|CDR], VAL \== CAR,  ( CDR==[] ->  nb_setarg(1, VARDIF, [VAL|CONS]) ; newval_or_fail_attrib_vardif_cons(VARDIF,CDR,VAL)). 
+
+
+
+
+filter_repeats(AVar,Call):-
+      % 1 =  make globals storage compounds
+      LVAL= lastResult(comquatz),
+      LATTR = lastDifHolderState([]),
+
+      % 2a = create intial vardiff 
+      dif(AVar,comquatz),
+
+      % 2b = refernce it
+      get_attr(AVar,dif,DIFHOLDER),
+
+      % 3 = DIFHOLDER now looks like "vardif([_G190299-comquatz], [])"
+      %  store it's arg1  into lastDifHolderState
+      arg(1,DIFHOLDER,SAVE), nb_setarg(1,LATTR,SAVE),
+     
+       % would a cut go here? 
+
+      call_cleanup((( 
+
+          % 4 = get the last saved attributes and set them from line 3 or 8
+          arg(1,LATTR,LAST_DIFHOLDER_STATE),  nb_setarg(1, DIFHOLDER, LAST_DIFHOLDER_STATE),
+         
+          % 5 = get the last result and add it to the dif (saved from line 7)
+          arg(1,LVAL,LR), dif(AVar,LR),
+
+          % 6 = call 
+          call(Call), 
+
+          % 7 = save our new val
+          nb_setarg(1,LVAL,AVar)
+
+          % 8 = save the new difholder state into lastDifHolderState
+          arg(1,DIFHOLDER, NEW_DIFHOLDER_STATE), nb_setarg(1,LATTR, NEW_DIFHOLDER_STATE)
+
+          % 9 = REDO TO Line 4
+
+          )),del_attr(AVar,dif)).  % 10  = clean up for Line 2 needed?
 
 % =========================================================================
 

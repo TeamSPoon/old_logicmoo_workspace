@@ -39,6 +39,11 @@
 :- use_module(library(lists)).
 :- set_prolog_flag(generate_debug_info, false).
 
+
+
+% mdif(A,B):- tlbugger:attributedVars,!,dif(A,B).
+mdif(_,_).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 dif_arg(X,Y) :-
 	dif_c_c(X,Y,_).

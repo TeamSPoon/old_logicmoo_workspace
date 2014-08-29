@@ -37,8 +37,8 @@ fallback:- not(thlocal:insideIREQ(_)).
 :- dynamic_multifile_exported(transitive_other/4).
 
 choose_val(Prop,Obj,Value):- thlocal:useOnlyExternalDBs,!, body_call_cyckb(dbase_t(Prop,Obj,Value)).
-choose_val(Prop,Obj,Value):- var(Obj),nonvar(Value),!,is_asserted(dbase_t(Prop,Obj,Value)).
-choose_val(Prop,Obj,Value):- choose_right(Prop,Obj,Value).
+choose_val(Prop,Obj,Value):- var(Obj),nonvar(Value),!,mdif(Obj,Value),is_asserted(dbase_t(Prop,Obj,Value)).
+choose_val(Prop,Obj,Value):- mdif(Obj,Value),choose_right(Prop,Obj,Value).
 
 generate_candidate_arg_values(Prop,N,Obj):-call_vars_tabled(Obj,generate_candidate_arg_values0(Prop,N,Obj)).
 

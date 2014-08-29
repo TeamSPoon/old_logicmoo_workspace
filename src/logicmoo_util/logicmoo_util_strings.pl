@@ -429,7 +429,6 @@ must_nonvar(A):-one_must(nonvar(A),trace_or_throw(must_nonvar(A))).
 both_empty(A,B):-empty_string(A),!,empty_string(B),nop(dmsg(both_empty(A,B))).
 either_empty(A,B):- (empty_string(B);empty_string(A)),!,nop(dmsg(either_empty(A,B))).
 
-equals_icase(A,B):-both_empty(A,B),!.
 equals_icase(A,B):-either_empty(A,B),!,fail.
 equals_icase(A,B):-string_ci(A,U),string_ci(B,U).
 starts_with_icase(A,B):-either_empty(A,B),!,fail.

@@ -194,14 +194,14 @@ isa_w_type_atom(I,T):- G=..[T,I],once_if_ground(isa_atom_call(T,G),_).
 dont_call_type_arity_one(type).
 dont_call_type_arity_one(formattype).
 dont_call_type_arity_one(agenttype).
+dont_call_type_arity_one(F):-mpred_prop(F,stubType(prologHybrid)),!.
 
 isa_atom_call(T,G):-loop_check(isa_atom_call_lc(T,G),fail).
 
 isa_atom_call_lc(_,G):- predicate_property(G,builtin),!,G.
 isa_atom_call_lc(Type,_):-dont_call_type_arity_one(Type),!,fail.
+isa_atom_call_lc(_,G):- predicate_property(G,number_of_clauses(_)),!,clause(G,B),call_mpred_body(G,B).
 isa_atom_call_lc(_,G):- predicate_property(G,number_of_rules(R)),R>0,!,G.
-isa_atom_call_lc(_,G):- predicate_property(G,number_of_clauses(_)),!,clause(G,true).
-
 
 cached_isa(I,T):-hotrace(isa_backchaing(I,T)).
 

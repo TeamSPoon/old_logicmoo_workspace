@@ -190,6 +190,7 @@ show_room_grid(Room) :- ignore(show_room_grid_new(Room)),!.
 % ===================================================================
 % show_room_grid_new(Room)
 % ===================================================================
+:-export(show_room_grid_new/1).
 show_room_grid_new(Room):-
    grid_size(Room,Xs,Ys,_Zs),
    Ys1 is Ys+1,Xs1 is Xs+1,
