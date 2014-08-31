@@ -14,6 +14,9 @@
 */
 
 
+
+
+
 amzi_timer(T1):-get_time(T1).
 
 

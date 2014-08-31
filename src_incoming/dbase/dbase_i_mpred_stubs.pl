@@ -86,7 +86,7 @@ body_req_no_rules(F,_,_,HEAD_T):- body_req_plus_cyc(F,_,_,HEAD_T).
 body_req_plus_cyc(F,_,_,HEAD_T):-  mpred_prop(F,cycPlus2(_)),thlocal:useOnlyExternalDBs,!,with_assertions(thglobal:use_cyc_database,body_call_cyckb(HEAD_T)).
 
 call_mpred_body(_,true):-!.
-call_mpred_body(HEAD,BODY):- loop_check(call_mpred_body_lc(HEAD,BODY)).
+call_mpred_body(HEAD,BODY):- no_repeats(loop_check(call_mpred_body_lc(HEAD,BODY))).
 
 call_mpred_body_lc(_HEAD,BODY):- debugOnError(BODY).
 

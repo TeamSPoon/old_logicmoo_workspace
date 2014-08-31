@@ -523,7 +523,7 @@ isCycWord(CycWord) --> {hotrace(stringToCycWord(String,CycWord))},literal(String
 % ==========================================================
 meetsPos(String,CycWord,POS):-  sanify_string(String,Sane),no_repeats(meetsPos_0(Sane,CycWord,POS)).
 
-meetsPos_0(String,CycWord,POS):- stack_check(1000),one_must(meetsPos_1(String,CycWord,POS),
+meetsPos_0(String,CycWord,POS):- stack_check,one_must(meetsPos_1(String,CycWord,POS),
      one_must(meetsPos_2(String,CycWord,POS),
      one_must(meetsPos_3(String,CycWord,POS),
      one_must(meetsPos_4(String,CycWord,POS),

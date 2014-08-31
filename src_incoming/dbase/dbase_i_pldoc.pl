@@ -58,13 +58,7 @@ bad_pred(P):-not(predicate_property(P,number_of_clauses(_))).
 bad_pred(P):-predicate_property(P,imported_from(_)),predicate_property(P,static).
 bad_pred(P):-predicate_property(P,foreign).
 
-pred_info(H,Props):- findall(PP,predicate_property_h(H,PP),Props).
-
-predicate_property_h(H,PP):-predicate_property(H,PP).
-predicate_property_h(H,PP):-get_functor(H,F),!,mpred_props_v(F,PP).
-mpred_props_v(F,PP):-is_asserted(mpred_prop(F,PP)).
-mpred_props_v(F,PP):-is_asserted([PP,F]).
-mpred_props_v(F,mped_type(Type)):-once(get_mpred_type(F,Type)).
+pred_info(H,Props):- findall(PP,mpred_prop(H,PP),Props).
 
 
 show_term_listing(H,true):- !, show_term_listing(H).
@@ -72,4 +66,60 @@ show_term_listing(H,B):- show_term_listing((H:-B)).
 
 show_term_listing(H):- not(not((snumbervars(H),writeq(H),write('.'),nl))),!.
 
+
+
+
+show_all(Call):-doall((show_call(Call))).
+
+alt_calls(call).
+alt_calls(mpred_call).
+alt_calls(is_asserted).
+alt_calls(dbase_t).
+alt_calls(req).
+alt_calls(mreq).
+alt_calls(ireq).
+
+showall(Call):- doall(show_call(Call)).
+
+findallCall(Args,Functor,ICallL,ICallLL):-  findall(Args,call(Functor,Args),ICallL),findall(Functor:C,member(C,ICallL),ICallLL).
+
+sreq(Call):-
+ into_mpred_form(Call,MCall),get_functor(MCall,MF), findall(P,pred_info(MF,P),Props),dmsg(props=Props),
+   dmsg(call=Call),dmsg(call=MCall),
+ % some calls remember deduced fasts and we need to prevent that
+ with_assertions(readOnlyDatabases,
+                (
+           (is_callable(Call)-> findallCall(Call,call,CallL,CallLL) ; (CallL=[];CallLL=[])),
+                 findallCall(Call,mpred_call,MCallL,MCallLL),
+                 findallCall(Call,dbase_t,DCallL,DCallLL),
+                 findallCall(Call,is_asserted,ACallL,ACallLL),
+                 findallCall(Call,req,RCallL,RCallLL),
+                 findallCall(Call,ireq,ICallL,ICallLL))),
+   flatten([CallL,MCallL,DCallL,ACallL,RCallL,ICallL],ALL),
+   flatten([CallLL,MCallLL,DCallLL,ACallLL,RCallLL,ICallLL],WITHFUNCTOR),
+   list_to_set(ALL,SET),
+                 showDif(SET,call,CallL,WITHFUNCTOR),
+                 showDif(SET,mpred_call,MCallL,WITHFUNCTOR),
+                 showDif(SET,dbase_t,DCallL,WITHFUNCTOR),
+                 showDif(SET,is_asserted,ACallL,WITHFUNCTOR),
+                 showDif(SET,req,RCallL,WITHFUNCTOR),
+                 showDif(SET,ireq,ICallL,WITHFUNCTOR).
+
+showDif(SET,Named,LIST,_WITHFUNCTOR):-
+      list_to_set(LIST,ULIST),
+      length(SET,SL),
+      length(LIST,LL),
+      length(ULIST,UL),
+      fmt(Named=[l(LL),s(SL),u(UL)]),
+      nl,
+      showListWithCounts(ULIST,LIST),nl.
+
+showListWithCounts(ULIST,[]):- fmt(ulist=ULIST).
+showListWithCounts([],ALL):- fmt(missing=ALL).
+showListWithCounts(ULIST,LIST):-ULIST=LIST,fmt(same=ULIST).
+showListWithCounts(ULIST,LIST):-showCounts(ULIST,LIST).
+showCounts([],_).
+showCounts([H|L],OTHER):- occurrences_of_term(H,OTHER,N),write_count(H,N),showCounts(L,OTHER).
+
+write_count(H,N):- writeq(H:N),write(', ').
 

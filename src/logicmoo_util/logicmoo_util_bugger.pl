@@ -23,13 +23,11 @@
          module_predicates_are_exported/0,
          tlbugger:inside_loop_check/1,
          is_loop_checked/1,
-         rtrace/1,
          snumbervars/1,
          safe_numbervars/1,
          safe_numbervars/2,
          loop_check_clauses/3,
          loop_check_clauses/2,
-         must_det/1,
          must_det_l/1,
          one_must_det/2,
          is_deterministic/1,
@@ -43,10 +41,8 @@
      debugOnFailure/1,
      module_notrace/1,
      user_use_module/1,
-     dumpST/0,
      dumpST/1,
      dtrace/0,
-     dtrace/1,
      trace_or_throw/1,
      trace_or/1,
      os_to_prolog_filename/2,
@@ -80,32 +76,40 @@
          % loop_check_throw/1,
          %loop_check_fail/1,
 
-     logOnErrorIgnore/1,
-     debugOnErrorIgnore/1,
      %debugCall/1,
      debugCallWhy/2,
      %debugCallF/1,
-
-     % can ignore
-     failOnError/1, % for wrapping code may throw to indicate failure
-
-     ignoreOnError/1, % same
-
+   
+      dumpST/0,
+      
+      dtrace/1,
+      export_all_preds/0,
      debugOnError/1, % Throws unless [Fail or Debug]
      logOnError/1, % Succeeds unless no error and failure occured
 
+     ignoreOnError/1, % same
+        debugOnErrorIgnore/1,
 
-     debugOnFailure/1, % Succeeds but can be set to [Fail or Debug]
-     logOnFailure/1,  % Fails unless [+Ignore]
-
+        must_det/1, % must leave no coice points behind 
      throwOnFailure/1, % Throws unless [Fail or Debug]
-
-     must_each/1,  % list block must succeed once .. it smartly only debugs to the last failures
 
      % cant ignore - Throws but can be set to [Throw, Fail or Ignore or Debug]
      must/1, % must succeed at least once
+     ftrace/1, % tells me why a call didn't succeed once
      cmust/1, % doesnt run on release
      gmust/2, % like must/1 but arg2 must be ground at exit
+    
+     rtrace/1,  % trace why choice points are left over
+     must_each/1,  % list block must succeed once .. it smartly only debugs to the last failures
+     logOnErrorIgnore/1,
+     debugOnFailure/1, % Succeeds but can be set to [Fail or Debug]
+     logOnFailure/1,  % Fails unless [+Ignore]
+          % can ignore
+     failOnError/1, % for wrapping code may throw to indicate failure
+   must_not_repeat/1,  % predicate must never bind the same arguments the same way twice
+
+
+
      prolog_must/1,
      prolog_must_l/1,
 
@@ -161,6 +165,7 @@ bad_idea:-fail.
 :- module_transparent(static_predicate/1).
 static_predicate(FA):-once(predicate_property(FA,_)),not(predicate_property(FA,dynamic)).
 */
+filter_repeats:-fail.
 
 % ===================================================================
 % Substitution based on ==
@@ -327,6 +332,7 @@ def_meta_predicate(M:F,S,E):-!,doall(((between(S,E,N),make_list('?',N,List),CALL
 def_meta_predicate(F,S,E):- trace_or_throw(def_meta_predicate(F,S,E)).
 
 
+:- meta_predicate_transparent((loop_check_local(0,0))).
 :- meta_predicate_transparent((no_loop_check(0,0))).
 :- meta_predicate_transparent((no_loop_check(0))).
 :- meta_predicate_transparent((no_loop_check_unsafe(0))).
@@ -417,7 +423,7 @@ meta_interp_signal(_:meta_call(V)):-!,nonvar(V).
 meta_interp_signal(_:meta_callable(_,_)).
 
 :-export(meta_interp/2).
-meta_interp(CE,A):- notrace((var(A);not(stack_check(300)))),!, throw(meta_interp(CE,A)).
+meta_interp(CE,A):- notrace((var(A);not(stack_check))),!, throw(meta_interp(CE,A)).
 meta_interp(_CE,A):- leash(+all),meta_interp_signal(A),!,fail.
 meta_interp(CE,M:X):- atom(M),!,meta_interp(CE,X).
 meta_interp(_,true):-!.
@@ -510,7 +516,10 @@ user_use_module(What):- within_module(use_module(What),'user').
 
 
 :- thread_local tlbugger:inside_loop_check/1.
-:- dynamic_multifile_exported(tlbugger:inside_loop_check/1).
+:- module_transparent(tlbugger:inside_loop_check/1).
+
+:- thread_local tlbugger:inside_loop_check_local/1.
+:- module_transparent(tlbugger:inside_loop_check_local/1).
 
 
 
@@ -531,6 +540,8 @@ user_use_module(What):- within_module(use_module(What),'user').
 tlbugger:can_table.
 
 cannot_table_call(Call):- with_assertions(tlbugger:cannot_table,Call).
+
+:-use_module(logicmoo_util_coroutining_was).
 
 % ===================================================
 
@@ -574,7 +585,11 @@ call_skipping_n_clauses(N,H):-
 
 :-thread_local tlbugger:attributedVars.
 
-tlbugger:attributedVars.
+% tlbugger:attributedVars.
+
+:-export(must_not_repeat/1).
+:-meta_predicate(must_not_repeat(0)).
+must_not_repeat(C):-call(C).
 
 % ===================================================
 % 
@@ -642,8 +657,8 @@ newval_or_fail(CONS,VAL):-CONS = [CAR|CDR], VAL \== CAR,  ( CDR==[] ->  nb_setar
 %
 % Same as no_repeats(:Call) (so same as call/1 but fitered)
 %
-% (everytime we see new value.. we add it to dif/2 in an attributed variable that we have a refernce in a compound)
-% Cehcked via ?- dif(AVar,Foo), get_attrs(AVar,ATTRS1), get_attrs(AVar,ATTRS2), ATTRS1==ATTRS2.
+% (everytime we see new value.. we add it to was/2 in an attributed variable that we have a refernce in a compound)
+% Cehcked via ?- was(AVar,Foo), get_attrs(AVar,ATTRS1), get_attrs(AVar,ATTRS2), ATTRS1==ATTRS2.
 %
 %  So the variable binding gerts rejected several frames below your code? ( are we nipping away futile bindings?)
 % 
@@ -663,12 +678,13 @@ newval_or_fail(CONS,VAL):-CONS = [CAR|CDR], VAL \== CAR,  ( CDR==[] ->  nb_setar
 
 :-export(no_repeats_av/1).
 :-meta_predicate(no_repeats_av(0)).
-no_repeats_av(Call):-term_variables(Call,VarList), no_repeats_avl(VarList,Call).
+no_repeats_av(Call):-  term_variables(Call,VarList), flag(oddeven,X,X+1),
+  ((VarList=[] ; 1 is X mod 3) -> Call ; 
+   ((1 is X mod 2 ->  no_repeats_av_prox(VarList,Call); (CONS = [_],  call(Call), newval_or_fail(CONS,VarList))))).
 
 
 :-export(no_repeats_av/2).
 :-meta_predicate(no_repeats_av(+,0)).
-no_repeats_av(VarList,Call):- !, filter_repeats(VarList,Call).
 
 no_repeats_av(Var,Call):- var(Var),!,no_repeats_avar(Var,Call).
 no_repeats_av(VarList,Call):- no_repeats_avl(VarList,Call).
@@ -682,96 +698,92 @@ no_repeats_avl(VarList,Call):-no_repeats_av_prox(VarList,Call).
 
 :-export(no_repeats_avar/2).
 :-meta_predicate(no_repeats_avar(+,0)).
-no_repeats_avar(AVar,Call):- get_attr(AVar,dif,VARDIF),!,work_with_attvar(AVar,Call,VARDIF,true).
-no_repeats_avar(AVar,Call):- tlbugger:attributedVars,!, create_vardif(AVar,VARDIF), !,VarList=AVar, !,work_with_attvar(AVar,Call,VARDIF,del_attr(AVar,dif)).
+no_repeats_avar(VarList,Call):- filter_repeats, !, filter_repeats(VarList,Call).
+no_repeats_avar(AVar,Call):- get_attr(AVar,was,VARWAS),!,work_with_attvar(AVar,Call,VARWAS,true).
+no_repeats_avar(AVar,Call):- tlbugger:attributedVars,!, create_varwas(AVar,VARWAS), !,work_with_attvar(AVar,Call,VARWAS,del_attr(AVar,was)).
 no_repeats_avar(Var,Call):- no_repeats_av_prox(Var,Call).
 
 :-export(no_repeats_av_prox/2).
 :-meta_predicate(no_repeats_av_prox(+,0)).
-no_repeats_av_prox(VarList,Call):- create_vardif(AVar,VARDIF), !,VarList=AVar, !,work_with_attvar(AVar,Call,VARDIF,del_attr(AVar,dif)).
+no_repeats_av_prox(VarList,Call):- filter_repeats,!, filter_repeats(VarList,Call).
+no_repeats_av_prox(VarList,Call):- create_varwas(AVar,VARWAS), !,VarList=AVar, !,work_with_attvar(AVar,Call,VARWAS,del_attr(AVar,was)).
 
-:-export(create_vardif/2).
-:-meta_predicate(create_vardif(+,+)).
-create_vardif(AVar,VARDIF):- dif(AVar,comquatz),get_attr(AVar,dif,VARDIF),!.
+:-export(create_varwas/2).
+:-meta_predicate(create_varwas(+,+)).
+create_varwas(AVar,VARWAS):- was(AVar,_Comquatz),get_attr(AVar,was,VARWAS),!.
 
 :-export(work_with_attvar/4).
 :-meta_predicate(work_with_attvar(+,0,+,0)).
-work_with_attvar(AVar,Call,VARDIF,ExitHook):- VARDIF = vardif(CONS,[]),  call_cleanup((  ( call(Call), newval_or_fail_attrib_vardif_cons(VARDIF, CONS, (dif(-)-AVar)))),ExitHook).
+work_with_attvar(AVar,Call,VARWAS,ExitHook):- VARWAS = varwas(CONS,[]),  call_cleanup((  ( call(Call), newval_or_fail_attrib_varwas_cons(VARWAS, CONS, (was(-)-AVar)))),ExitHook).
 
 
-:-export(newval_or_fail_attrib_vardif_cons/3).
-:-meta_predicate(newval_or_fail_attrib_vardif_cons(+,+,+)).
-newval_or_fail_attrib_vardif_cons(VARDIF,CONS,VAL):- CONS = [CAR|CDR], VAL \== CAR,  ( CDR==[] ->  nb_setarg(1, VARDIF, [VAL|CONS]) ; newval_or_fail_attrib_vardif_cons(VARDIF,CDR,VAL)). 
+:-export(newval_or_fail_attrib_varwas_cons/3).
+:-meta_predicate(newval_or_fail_attrib_varwas_cons(+,+,+)).
+newval_or_fail_attrib_varwas_cons(VARWAS,CONS,VAL):- CONS = [CAR|CDR], VAL \== CAR,  ( CDR==[] ->  ((arg(1, VARWAS, FIRSTCONS),nb_setarg(1, VARWAS, [VAL|FIRSTCONS]))) ; newval_or_fail_attrib_varwas_cons(VARWAS,CDR,VAL)). 
 
 
 
-
-filter_repeats(AVar,Call):-
+:-export(filter_repeats/2).
+:-meta_predicate(filter_repeats(+,0)).
+filter_repeats(AVar,Call):- 
       % 1 =  make globals storage compounds
-      LVAL= lastResult(comquatz),
-      LATTR = lastDifHolderState([]),
+      LVAL= lastResult(_),
+      LATTR = lastWasHolderState([]),
 
-      % 2a = create intial vardiff 
-      dif(AVar,comquatz),
+      % 2a = create intial varwas 
+      was(AVar,_),
 
       % 2b = refernce it
-      get_attr(AVar,dif,DIFHOLDER),
+      get_attr(AVar,was,WASHOLDER),
 
-      % 3 = DIFHOLDER now looks like "vardif([_G190299-comquatz], [])"
+      % 3 = WASHOLDER now looks like "varwas([_G190299-comquatz], [])"
       %  store it's arg1  into lastDifHolderState
-      arg(1,DIFHOLDER,SAVE), nb_setarg(1,LATTR,SAVE),
+      arg(1,WASHOLDER,SAVE), nb_setarg(1,LATTR,SAVE),
      
        % would a cut go here? 
-
+      !,
       call_cleanup((( 
-
+        
           % 4 = get the last saved attributes and set them from line 3 or 8
-          arg(1,LATTR,LAST_DIFHOLDER_STATE),  nb_setarg(1, DIFHOLDER, LAST_DIFHOLDER_STATE),
+          arg(1,LATTR,LAST_WASHOLDER_STATE),  nb_setarg(1, WASHOLDER, LAST_WASHOLDER_STATE),
          
-          % 5 = get the last result and add it to the dif (saved from line 7)
-          arg(1,LVAL,LR), dif(AVar,LR),
+          % 5 = get the last result and add it to the was (saved from line 7)
+          arg(1,LVAL,LR), was(AVar,LR),
 
           % 6 = call 
           call(Call), 
 
           % 7 = save our new val
-          nb_setarg(1,LVAL,AVar)
+          nb_setarg(1,LVAL,AVar),
 
-          % 8 = save the new difholder state into lastDifHolderState
-          arg(1,DIFHOLDER, NEW_DIFHOLDER_STATE), nb_setarg(1,LATTR, NEW_DIFHOLDER_STATE)
+          % 8 = save the new washolder state into lastWasHolderState
+          arg(1,WASHOLDER, NEW_WASHOLDER_STATE), nb_setarg(1,LATTR, NEW_WASHOLDER_STATE)
 
           % 9 = REDO TO Line 4
 
-          )),del_attr(AVar,dif)).  % 10  = clean up for Line 2 needed?
+          )),del_attr(AVar,was)).  % 10  = clean up for Line 2 needed?
 
 % =========================================================================
 
-is_loop_checked(B):- 
-       make_key(B,BC),!,tlbugger:inside_loop_check(BC).
-
+is_loop_checked(B):-  make_key(B,BC),!,tlbugger:inside_loop_check(BC).
 no_loop_check_unsafe(B):- with_no_assertions(tlbugger:inside_loop_check(_),B).
 
-no_loop_check(B):- with_no_assertions(tlbugger:inside_loop_check(_),loop_check(B,trace_or_throw(no_loop_check(B)))).
-% no_loop_check(B):- no_loop_check(B,fail).
-no_loop_check(B, TODO):- make_key(B,BC),!, no_loop_check(B,BC,TODO).
-no_loop_check(_B, BC, TODO):- tlbugger:inside_loop_check(BC),!,call(TODO).
-no_loop_check( B, BC,_TODO):-
-   with_no_assertions(tlbugger:inside_loop_check(_),
-               setup_call_cleanup(asserta(tlbugger:inside_loop_check(BC)),B,(ignore(retract((tlbugger:inside_loop_check(BC))))))).
-
-  
-%loop_check_clauses(B,TODO):-  loop_check_clauses(B,1,TODO).
-%loop_check_clauses(B,N,TODO):- make_key(B,BC), loop_check_term(call_skipping_n_clauses(N,B),BC,TODO).
-% loop_check_throw(B):- loop_check(B,((retractall(tlbugger:inside_loop_check(B)),debugCallWhy(loop_check_throw(B),loop_check_throw(B))))).
+no_loop_check(B):- no_loop_check(B,trace_or_throw(loop_to_no_loop_check(B))).
+no_loop_check(B, TODO):-  with_no_assertions(tlbugger:inside_loop_check(_),loop_check_local(B,TODO)).
 
 loop_check(B):- loop_check(B,fail).
 loop_check(B, TODO):- make_key(B,BC),!, loop_check_term(B,BC,TODO).
 
+% loop_check_local(B):- loop_check_local(B,trace_or_throw(syntax_loop_check_local(B))).
+loop_check_local(B,TODO):-  % make_key(B,BC),
+   term_to_atom(B,BC),!, 
+    ( \+(tlbugger:inside_loop_check_local(BC)) ->
+         setup_call_cleanup(asserta(tlbugger:inside_loop_check_local(BC)),B, retract((tlbugger:inside_loop_check_local(BC))));
+         call(TODO) ).
+      
 
-loop_check_term(_B, BC, TODO):- tlbugger:inside_loop_check(BC),!,call(TODO).
-loop_check_term( B, BC,_TODO):- !,  % %  not(bad_idea),!,
-    setup_call_cleanup(asserta(tlbugger:inside_loop_check(BC)),B, (ignore(retract((tlbugger:inside_loop_check(BC)))))).
-loop_check_term( B, BC,_TODO):- with_assertions(tlbugger:inside_loop_check(BC),B).
+loop_check_term(B,BC,TODO):-  ( \+(tlbugger:inside_loop_check(BC)) -> setup_call_cleanup(asserta(tlbugger:inside_loop_check(BC)),B, retract((tlbugger:inside_loop_check(BC)))) ;call(TODO) ).
+
 
 
 % =========================================================================
@@ -1318,9 +1330,9 @@ to_thread_head(Head,thlocal,thlocal:Head,Head):-!, slow_sanity(( predicate_prope
 to_thread_head(Head,tlbugger,tlbugger:Head,Head):- slow_sanity(( predicate_property(tlbugger:Head,(dynamic)),predicate_property(tlbugger:Head,(thread_local)))).
 
 :-thread_local(tlbugger:dmsg_hidden/1).
-:-meta_predicate_transparent(with_all_dmsg(?)).
+:-meta_predicate_transparent(with_all_dmsg(0)).
 with_all_dmsg(Call):-with_no_assertions(tlbugger:dmsg_hidden(_),Call).
-:-meta_predicate_transparent(with_no_dmsg(?)).
+:-meta_predicate_transparent(with_no_dmsg(0)).
 with_no_dmsg(Call):-with_assertions(tlbugger:dmsg_hidden(_),Call).
 with_no_dmsg(Shown,Call):-with_assertions(tlbugger:dmsg_hidden(Shown),Call).
 
@@ -1489,17 +1501,28 @@ with_dmsg(Functor,Goal):-
 :-dynamic hook:dmsg_hook/1.
 :-multifile hook:dmsg_hook/1.
 
+contains_atom(V,A):-V=@=A.
+contains_atom(V,A):-compound(V),atom(A),!,functor(V,A,_).
+contains_atom(V,A):-compound(V),arg(_,V,O),contains_atom(O,A).
+
+
+
+
+
 dmsg(V):- tlbugger:is_with_dmsg(FP),!,FP=..FPL,append(FPL,[V],VVL),VV=..VVL,once(dmsg0(VV)).
 dmsg(V):- once(dmsg0(V)).
 dmsg0(_):- bugger_flag(opt_debug=off),!.
 dmsg0(V):-var(V),!,dmsg0(dmsg_var(V)).
 
-dmsg0(V):- cnotrace(dmsg1(V)),!, hotrace(doall(( hook:dmsg_hook(V)))).
+dmsg0(V):- notrace(dmsg1(V)),!, hotrace(doall(( hook:dmsg_hook(V)))).
 
-dmsg1(warn(V)):- print_message(warning,V).
+/*
+dmsg1(trace_or_throw(V)):- dumpST(15),print_message(warning,V),fail.
+dmsg1(error(V)):- print_message(warning,V),fail.
+dmsg1(warn(V)):- dumpST(6),print_message(warning,V),fail.
+*/
 dmsg1(skip_dmsg(_)):-!.
-dmsg1(C):-tlbugger:dmsg_hidden(C),!.
-dmsg1(C):-functor_catch(C,Topic,_),tlbugger:dmsg_hidden(Topic),!.
+dmsg1(C):-tlbugger:dmsg_hidden(V),((contains_atom(C,V);contains_term(C,V))),!.
 dmsg1(C):-functor_catch(C,Topic,_),debugging(Topic,_True_or_False),!,logger_property(Topic,once,true),!,
       (dmsg_log(Topic,_Time,C) -> true ; ((get_time(Time),asserta(dmsg_log(todo,Time,C)),!,dmsg2(C)))).
 dmsg1(C):-((copy_term(C,Stuff), snumbervars(Stuff),!,dmsg2(Stuff))).
@@ -1584,20 +1607,23 @@ loggerFmtReal(S,F,A):-
  
 
 :-moo_hide_childs(stack_depth/1).
+:-moo_hide_childs(stack_check/0).
 :-moo_hide_childs(stack_check/1).
 :-moo_hide_childs(stack_check/2).
 stack_depth(Level):-notrace((prolog_current_frame(Frame),prolog_frame_attribute(Frame,level,Level))).
+
+stack_check:-stack_check(3000).
 stack_check(BreakIfOver):- stack_check_else(BreakIfOver, trace_or_throw(stack_check(BreakIfOver))).
 stack_check(BreakIfOver,Error):- stack_check_else(BreakIfOver, trace_or_throw(stack_check(BreakIfOver,Error))).
 stack_check_else(BreakIfOver,Call):- stack_depth(Level) ,  ( Level < BreakIfOver -> true ; (dbgsubst(Call,stack_lvl,Level,NewCall),NewCall)).
 
 % dumpstack_arguments.
-dumpST:-cnotrace(dumpST([max_depth(5000),numbervars(safe),show([level,goal,clause])])).
+dumpST:-notrace(dumpST(5000)).
 
 dumpST(_):-bugger_flag(opt_debug=off),!.
 dumpST(Opts):- prolog_current_frame(Frame),dumpST(Frame,Opts).
 
-dumpST(Frame,MaxDepth):-integer(MaxDepth),!,dumpST(Frame,[max_depth(MaxDepth)]).
+dumpST(Frame,MaxDepth):-integer(MaxDepth),!,dumpST(Frame,[max_depth(MaxDepth),numbervars(safe),show([level,goal,clause])]).
 dumpST(Frame,Opts):-var(Opts),!,dumpST(Frame,5000).
 dumpST(Frame,Opts):-is_list(Opts),!,dumpST(1,Frame,Opts).
 dumpST(Frame,Opts):-dumpST(1,Frame,[Opts]).
@@ -1875,7 +1901,7 @@ call_no_cuts_0(C):-call(C).
 :- dynamic(call_tabled_list/2).
 
 :- meta_predicate_transparent(make_key(0,-)).
-make_key(CC,KeyA):- notrace(ground(CC)->Key=CC ;(copy_term(CC,Key,_),snumbervars(Key,0,_))),!,KeyA=Key. % ,term_to_atom(Key,KeyA).
+make_key(CC,KeyA):- notrace(ground(CC)->KeyA=CC ;(copy_term(CC,Key,_),snumbervars(Key,0,_))),!,KeyA=Key. % ,term_to_atom(Key,KeyA).
 
 expire_tabled_list(all):-!,retractall(call_tabled_list(_,_)).
 expire_tabled_list(T):- atoms_of(T,A1), CT= call_tabled_list(Key,List),doall(((CT,once(any_term_overlap_atoms_of(A1,List);(not(member(Key,List)),any_term_overlap_atoms_of(A1,Key))),retractall(CT)))).

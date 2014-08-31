@@ -61,10 +61,11 @@ look_as(Agent):-
 :-export(call_look/2).
 call_look(Agent,LOC):-  mmake, call(call_look_proc,Agent,LOC).
 
+:-decl_mpred_prolog(call_look_proc/3).
 call_look_proc(Agent,LOC):-
    clr(props(Agent,needs_look(true))),
    add(props(Agent,needs_look(false))),    
-    show_kb_preds(Agent,LOC,
+    toploop_output:show_kb_preds(Agent,LOC,
          [
       % TODO make this work
          %  why does this this work on Prolog REPL?
@@ -89,7 +90,6 @@ call_look_proc(Agent,LOC):-
          listof(possess(Agent,value)),
          success=world:success(Agent,value)
        ]).
-
 
 
 looking(Agent):- get_session_id(O), thlocal:session_agent(O,Agent),!.

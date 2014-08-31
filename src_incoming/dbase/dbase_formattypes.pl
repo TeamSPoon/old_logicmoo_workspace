@@ -29,7 +29,7 @@
 :- '$hide'(split_name_type/3).
 split_name_type(Suggest,InstName,Type):- must_det(split_name_type_0(Suggest,NewInstName,NewType)),!,must((NewInstName=InstName,NewType=Type)).
 split_name_type_0(S,P,C):- string(S),!,atom_string(A,S),split_name_type_0(A,P,C).
-split_name_type_0(FT,FT,formattype):-formattype(FT),trace_or_throw(formattype(FT)).
+split_name_type_0(FT,FT,formattype):-formattype(FT),dmsg(trace_or_throw(formattype(FT))),fail.
 split_name_type_0(T,T,C):- compound(T),functor(T,C,_).
 split_name_type_0(T,T,C):- notrace(atomic_list_concat_safe([C,'-',_],T)).
 split_name_type_0(T,T,C):- atom(T),atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),ccatch(number_codes(_,Digits),_,fail),atom_codes(C,Type).
@@ -282,8 +282,8 @@ same_vars(T1,T2):-term_variables(T1,V1),term_variables(T2,V2),!,V1==V2.
 correctArgsIsa(In,Out):- correctArgsIsa(query(must,dbase_t),In,Out),!.
 
 :-export(correctArgsIsa/3).
-correctArgsIsa(_,A,A):- not(bad_idea),!.
-correctArgsIsa(_,A,A):- is_stable,!.
+correctArgsIsa(_,A,A):- bad_idea,!.
+correctArgsIsa(_,A,A):- is_release,!.
 correctArgsIsa(_,NC,NC):-not(compound(NC)),!.
 correctArgsIsa(Op,M:A,MAA):- nonvar(M),!,correctArgsIsa(Op,A,AA),M:AA=MAA.
 correctArgsIsa(_Op,G,G):- functor(G,F,A),arg(_,vv(subclass/_,isa/_,':-'/_),F/A),!.
@@ -317,7 +317,7 @@ discoverAndCorrectArgsIsa(Op,Prop,N1,[A|Args],Out):-
 
 :-export(correctAnyType/4).
 
-% correctAnyType(_,A,_,A):-is_stable.
+% correctAnyType(_,A,_,A):-is_release.
 
 correctAnyType(_Op,A,_Type,AA):- var(A),!,must_det(var(AA)),must_det(A=AA),!.
 correctAnyType(Op,A,Type,AA):- var(A),correctType(Op,A,Type,AA),must_det(var(AA)),must_det(A==AA),!.

@@ -50,7 +50,7 @@ in_user_startup(Call):- '@'(user:Call,user).
 %:- user_use_module(logicmoo(vworld/world)).
 :- user_use_module(logicmoo(vworld/toploop_npc)).
 :- user_use_module(logicmoo(vworld/toploop_telnet)).
-:- user_use_module(logicmoo(vworld/toploop_output)).
+:- user_ensure_loaded(logicmoo(vworld/toploop_output)).
 
 
 :- user_use_module(logicmoo(vworld/moo_testing)).

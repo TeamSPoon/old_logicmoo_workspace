@@ -61,13 +61,15 @@ user:file_search_path(logicmoo,Dir):-
 locally_to_dir(Locally,Dir):-logicmoo_runtime_dir(RunDir), join_path33(RunDir,Locally,Directory),my_absolute_file_name(Directory,Dir),exists_directory(Dir),!.
 locally_to_dir(Directory,Dir):-my_absolute_file_name(Directory,Dir),exists_directory(Dir),!.
 
-:- use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)).
-:- use_module(logicmoo(logicmoo_util/logicmoo_util_library)).
-:- use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)).
-:- use_module(logicmoo(logicmoo_util/logicmoo_util_strings)).
-:- use_module(logicmoo(logicmoo_util/logicmoo_util_terms)).
-:- use_module(logicmoo(logicmoo_util/logicmoo_util_dcg)).
-:- use_module(logicmoo(logicmoo_util/logicmoo_util_library)).
+:- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)), 'user').
+:- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_library)), 'user').
+:- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)), 'user').
+:- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_strings)), 'user').
+:- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_terms)), 'user').
+:- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_dcg)), 'user').
+:- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_library)), 'user').
+:- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_coroutining_was)), 'user').
+:- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_coroutining_iz)), 'user').
 
 /*
 win_fork(G,SERVIO,PID):-atom_concat('swipl-win.exe ',G,AC),writeq(win_fork(AC,SERVIO)),nl,

@@ -41,6 +41,11 @@
 :- dynamic_multifile_exported det/7.
 :- dynamic_multifile_exported sentence/5.
 :- dynamic_multifile_exported noun/6.
+/*
+:- dynamic_multifile_exported latitude/2.
+:- dynamic_multifile_exported longitude/2.
+:- dynamic_multifile_exported contains/2.
+*/
 :- style_check(+discontiguous).
 :- asserta((thlocal:enable_src_loop_checking)).
 
@@ -149,8 +154,8 @@ test_chat80_regressions:- time(hi('../src_incoming/parsing/chat80/demo')).
 
 moo:mud_test(chat80_regressions,test_chat80_regressions).
 
-:- context_module(CM),module_predicates_are_exported(CM).
-:- context_module(CM),module_meta_predicates_are_transparent(CM).
+% :- context_module(CM),module_predicates_are_exported(CM).
+% :- context_module(CM),module_meta_predicates_are_transparent(CM).
 % :- context_module(CM),module_property(CM, exports(List)),moo_hide_show_childs(List).
 
 % :- include(logicmoo('vworld/moo_footer.pl')).

@@ -25,6 +25,8 @@ default_repl_obj_to_string(O,Type,toStringD(TypeO,O)):-copy_term(Type,TypeO),ign
 
 canUseEnglish:-true.
 
+:-export(show_kb_preds/3).
+
 :-export(show_kb_preds/2).
 show_kb_preds(Agent,List):- mmake,
       ignore(atloc(Agent,LOC)),
@@ -37,7 +39,7 @@ show_kb_preds(Agent,LOC,List):-
          once((thlocal:repl_writer(Agent,WPred);WPred=default_repl_writer)),
          once((thlocal:repl_to_string(Agent,ToSTR);ToSTR=default_repl_obj_to_string)),
         subst(List,region,Region,ListR),
-        show_kb_via_pred(WPred,ToSTR,ListR),!.
+        must(show_kb_via_pred(WPred,ToSTR,ListR)),!.
 
 
 

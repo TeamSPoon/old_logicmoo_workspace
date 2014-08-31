@@ -31,7 +31,7 @@
             in_world_move/3, check_for_fall/3,
             agent_into_corpse/1, display_stats/1,
             reverse_dir/2,
-            same/2,
+            
             round_loc/8,
             round_loc_target/8,
             dir_offset/5,
@@ -47,7 +47,6 @@
             
                        
          init_location_grid/1,
-         samef/2,
          grid_dist/3,
          to_3d/2,
          is_3d/1,
@@ -58,7 +57,7 @@
          foc_current_player/1,
          locationToRegion/2,
          init_location_grid/2,
-         set_stats/2,
+         
          worth/3,
          spread/0,
          growth/0,
@@ -106,24 +105,26 @@ exisitingThing(O):-region(O).
 anyInst(O):-type(O).
 anyInst(O):-exisitingThing(O).
 
+/*
+
 :-decl_type(metaclass).
 
 metaclass(formattype).
 metaclass(regiontype).
 metaclass(agenttype).
 metaclass(itemtype).
-metaclass(metaclass).
+% isa(metaclass,metaclass).
 
-argsIsaInList(typeGenls(type,metaclass)).
+% argsIsaInList(typeGenls(type,metaclass)).
 
-hook:decl_database_hook(assert(_),typeGenls(_,MC)):-assert_isa(MC,metaclass).
+% hook:decl_database_hook(assert(_),typeGenls(_,MC)):-assert_isa(MC,metaclass).
 
-hook:deduce_facts(typeGenls(T,MC),hook:deduce_facts(subclass(S,T),isa(S,MC))).
+% hook:deduce_facts(typeGenls(T,MC),hook:deduce_facts(subclass(S,T),isa(S,MC))).
 
 typeGenls(region,regiontype).
 typeGenls(agent,agenttype).
 typeGenls(item,itemtype).
-
+*/
 subclass(sillyitem,item).
 
 /*
@@ -187,7 +188,7 @@ create_instance(P):- must_det((isa(P,What),createableType(What))),must_det(creat
 :-export(create_instance/2).
 create_instance(P,What):-create_instance(P,What,[]).
 :-export(create_instance/3).
-create_instance(What,Type,Props):- loop_check(time_call(create_instance_now(What,Type,Props)),dmsg(already_create_instance(What,Type,Props))).
+create_instance(What,Type,Props):- loop_check_local(time_call(create_instance_now(What,Type,Props)),dmsg(already_create_instance(What,Type,Props))).
 
 create_instance_now(What,Type,Props):-
  with_assertions(thlocal:skip_db_op_hooks,
@@ -231,14 +232,14 @@ create_instance_0(T,agent,List):-
    padd(P,List),   
    % punless(possess(P,_),rez_to_inventory(P,food,_Food)),
    rez_to_inventory(P,food,_Food),
-   %reset_values(P),
+   %reset_values(P),   
    padd(P, [ max_damage(500),
                        max_charge(200),
                        damage(500),
                        charge(200),
                        agent_turnnum(0),
                        score(1)]),   
-   set_stats(P,[]),
+   % set_stats(P,[]),
    put_in_world(P),
    add_missing_instance_defaults(P)]).
    
@@ -292,15 +293,6 @@ create_instance_0(What,Type,Props):- leash(+call),trace,dtrace,trace_or_throw(dm
 
 
 
-same(X,Y):- X=Y,!.
-same(X,Y):- compound(X),arg(1,X,Y),!.
-same(X,Y):- compound(Y),arg(1,Y,X),!.
-same(X,Y):- samef(X,Y).
-
-
-samef(X,Y):- X=Y,!.
-samef(X,Y):- notrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci(XF,YF)))).
-
 :-decl_mpred_hybrid(kwLabel(term,term)).
 :-decl_mpred_hybrid(opaqueness(term,percent)).
 moo:default_type_props(region,opaqueness(1)).
@@ -321,8 +313,8 @@ moo:default_type_props(agent,[
 
 
 
-possess(Who,Thing):-genlInverse(W,possess),into_mpred_form(dbase_t(W,Thing,Who),Call),call_mpred(Call).
-possess(Who,Thing):-genlPreds(possess,W),into_mpred_form(dbase_t(W,Who,Thing),Call),call_mpred(Call).
+% already convered possess(Who,Thing):-genlInverse(W,possess),into_mpred_form(dbase_t(W,Thing,Who),Call),call_mpred(Call).
+% already convered possess(Who,Thing):-genlPreds(possess,W),into_mpred_form(dbase_t(W,Who,Thing),Call),call_mpred(Call).
 
 
 :- include(logicmoo(vworld/moo_footer)).

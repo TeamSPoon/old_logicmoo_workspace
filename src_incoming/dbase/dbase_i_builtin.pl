@@ -79,9 +79,9 @@ type(singleValued).
 type(createableType).
 type(typeDeclarer).
 
-:-add((expand_args(eachOf,subclass(eachOf(multiValued,negationByFailure,argsIsaInList,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),mpred)))).
+:-add((expand_args(eachOf,subclass(eachOf(multiValued,ordered,negationByFailure,argsIsaInList,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),mpred)))).
 
-:-add((expand_args(eachOf,isa(eachOf(multiValued,negationByFailure,argsIsaInList,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),typeDeclarer)))).
+:-add((expand_args(eachOf,isa(eachOf(multiValued,ordered,negationByFailure,argsIsaInList,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),typeDeclarer)))).
 
 :-doall((argsIsaProps(F),decl_type(F),add(subclass(F,relation)))).
 :-doall((argsIsaProps(F),decl_type(F),add(isa(F,typeDeclarer)))).
@@ -391,6 +391,7 @@ singleValued(score(obj,int)).
 singleValued(spawn_rate(propFn(subclass(obj)),int)).
 
 singleValued(spd(agent,int)).
+
 singleValued(stat_total(agent,int)).
 singleValued(stm(agent,int)).
 singleValued(str(agent,int)).

@@ -365,6 +365,8 @@ verb_script(Verb,main+ditrans):- ditrans(Verb,TypeS,S,TypeD,D,TypeI,I,Pred,Slots
 verb_script(Verb,main+trans):- plt,talk_db(transitive,Verb,_,_,_,_).
 verb_script(Verb,main+intrans):-plt,talk_db(intransitive,Verb,_,_,_,_).
 
+:-style_check(-singleton).
+
 verb_root(Govern):-plt,talk_db(_Verb_i,Govern,_Governs,_GovernedImperfect,_Governing,_Governed).
 regular_pres(Govern):-plt,talk_db(_,Govern,_Governs,_GovernedImperfect,_Governing,_Governed).
 regular_past(Governed,Govern):-plt,talk_db(_,Govern,_Governs,_GovernedImperfect,_Governing,Governed).
@@ -381,6 +383,8 @@ regular_past(Form,Verb):- meetsForm80(Form,Verb,form80(regular_past)).
 verb_form(Form,Verb,AsPresFin,As3_plus_sin):- meetsForm80(Form,Verb,form80(AsPresFin,pres+fin)), meetsForm80(Verb,Verb,form80(As3_plus_sin,3+sin)).
 verb_form(Form,Verb,TensePlusPart,_):- meetsForm80(Form,Verb,form80(TensePlusPart)).
 regular_pres(Verb):- verb_root(Verb).
+
+:-style_check(+singleton).
 
 
 

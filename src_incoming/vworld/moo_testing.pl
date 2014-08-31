@@ -55,8 +55,6 @@ test_result(Result,SomeGoal):- last_test_name(String),fmt(Result:test_mini_resul
 from_here(_:SomeGoal):-!,functor(SomeGoal,F,_),atom_concat('test',_,F).
 from_here(SomeGoal):-!,functor(SomeGoal,F,_),atom_concat('test',_,F).
 
-
-
 test_call(X):- var(X),!, throw(var(test_call(X))).
 test_call(meta_callable(String,test_name(String))):-!,string(String).
 test_call(meta_call(X)):- show_call(test_call0(X)).

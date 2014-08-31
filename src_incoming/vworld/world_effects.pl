@@ -72,7 +72,7 @@ set_stats(Agent,[]) :- set_stats(Agent,[str(2),height(2),stm(2),spd(2)]).
 
 set_stats(Agent,Traits) :-
         clr(stat_total(Agent,_)),
-	add(stat_total(Agent,0)),
+        add(stat_total(Agent,0)),	
 	forall(member(Trait,Traits),
 	       ignore(catch(process_stats(Agent,Trait),E,dmsg(E:process_stats(Agent,Trait))))),
                ignore(catch(check_stat_total(Agent),E2,dmsg(E2:check_stat_total(Agent)))).

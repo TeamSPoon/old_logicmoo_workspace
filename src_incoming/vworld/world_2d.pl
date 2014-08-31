@@ -184,7 +184,7 @@ ensure_in_world(What):-must_det(put_in_world(What)).
 
 
 % facts that cant be true
-hook:fact_is_false(atloc(Obj,_LOC),inside_of(Obj,What)) :- nonvar(Obj),(inside_of(Obj,What)),!.
+hook:fact_is_false(atloc(Obj,LOC),inside_of(Obj,What)) :- nonvar(Obj),(inside_of(Obj,What)),not(atloc(What,LOC)).
 hook:fact_is_false(localityOfObject(Obj,_LOC),inside_of(Obj,What)) :- nonvar(Obj),(inside_of(Obj,What)),!.
 
 % facts that must be true 

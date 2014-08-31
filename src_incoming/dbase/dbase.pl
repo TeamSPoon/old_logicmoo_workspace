@@ -136,6 +136,7 @@ shrink_clause( HB,HB).
 
 :-include(dbase_i_deduce).
 
+% :-ensure_loaded(dbase_ext_was).
 
 :-include(dbase_i_isa_subclass).
 
@@ -181,7 +182,7 @@ rescan_game_loaded_pass2:- ignore((moo:after_game_load, loop_check(call_after(mo
 % ================================================
 
 % do_db_op_hooks:-!.
-do_db_op_hooks:- loop_check(rescan_dbase_ops,true).
+do_db_op_hooks:- loop_check_local(rescan_dbase_ops,true).
 
 :-export(rescan_slow_kb_ops/0).
 
@@ -190,7 +191,11 @@ rescan_slow_kb_ops:- loop_check(forall(retract(do_slow_kb_op_later(Slow)),must_d
 
 :-export(rescan_dbase_ops/0).
 rescan_dbase_ops:- test_tl(skip_db_op_hooks),!.
-rescan_dbase_ops:- do_all_of(dbase_module_ready),rescan_game_loaded.
+rescan_dbase_ops:- rescan_module_ready,rescan_game_loaded.
+
+:-thread_local thlocal:in_rescan_module_ready/0.
+rescan_module_ready:- thlocal:in_rescan_module_ready,!.
+rescan_module_ready:- with_assertions(thlocal:in_rescan_module_ready,loop_check_local(do_all_of(dbase_module_ready),true)).
 
 :- dynamic_multifile_exported do_slow_kb_op_later/1.
 slow_kb_op(Slow):- test_tl(do_slow_kb_op_now),!,debugOnError(Slow).
@@ -248,7 +253,7 @@ coerce(What,_Type,NewThing):-NewThing = What.
 
 
 :- export(( 
-   add/1, 
+   (add)/1, 
    clr/1,
    db_op/2,
    ireq/1,
@@ -283,7 +288,7 @@ coerce(What,_Type,NewThing):-NewThing = What.
           M:dbase_t/10,
           M:dbase_t/11)).
 
-:-dynamic(weight/2).
+% :-dynamic((weight/2)).
 % :-dynamic(subclass/2).
 :-export(subclass/2).
 
@@ -322,9 +327,10 @@ coerce(What,_Type,NewThing):-NewThing = What.
 
 logical_functor(X):-atom(X),member(X,[',',';']).
 
+:- dynamic stat_total/2.
+:- decl_mpred_prolog(stat_total/2).
 
 :- decl_mpred_hybrid((
-stat_total/2,
 armorLevel/2,
 mudLevelOf/2,
 mudToHitArmorClass0/2,
@@ -417,9 +423,11 @@ pred_as_is(p,_):-!,fail.
 pred_as_is(dbase_t,_):-!,fail.
 pred_as_is(k,_):-!,fail.
 
-xtreme_debug(P):-nop(P).
-verify_sanity(P):- !,nop(P).
-verify_sanity(P):- P.
+xtreme_debug(P):- is_release,!,nop(P).
+xtreme_debug(P):- not_is_release, verify_sanity(P).
+verify_sanity(P):- is_release,!,nop(P).
+verify_sanity(P):- debugOnError(P),!.
+verify_sanity(P):- dmsg('$ERROR_incomplete_SANITY'(P)),!.
 
 
 :- meta_predicate hooked_asserta(^), hooked_assertz(^), hooked_retract(^), hooked_retractall(^).
@@ -438,42 +446,54 @@ verify_sanity(P):- P.
 
 
 % :- moo:register_module_type(utility).
+% ================================================
+% db_reop/2  RE-CURSED and CHECKED 
+% ================================================
+db_reop(query(_HLDS,Must),Call) :- !,preq(Must,Call).
+db_reop(OP,DATA):-no_loop_check(db_reop0(OP,DATA)).
+db_reop0(change(assert,_),Call) :- !,add_fast(Call).
+db_reop0(change(retract,one),Call) :- !,del(Call).
+db_reop0(change(retract,all),Call) :- !,clr(Call).
+db_reop0(OP,Call) :- dmsg(warn(db_reop(OP,Call))),db_op0(OP,Call).
 
 
-% replaced the 1st with the 2nd and better version of retract
-% del(C0):- db_op_int(retract(once),C0)
-% -  del(RetractOne)    <--  del(C0):- ignore((db_op(query(HLDS,Must),C0),!,db_op(retract(one),C0))).
+% -  del(RetractOne) 
 del(C0):- ireq(C0),!,idel(C0),!.
 del(C0):- mreq(C0),!,mdel(C0),!.
 
-idel(C0):- must_det(db_op_int(retract(one),C0)), verify_sanity(ireq(C0)->dmsg(warn(incomplete_I_DEL(C0)));true).
+idel(C0):- db_op_int(change(retract,one),C0), verify_sanity(ireq(C0)->(dmsg(warn(incomplete_I_DEL(C0))),fail);true),!.
 idel(C0):- dmsg(warn(failed(idel(C0)))),!,fail.
 
-mdel(C0):- must_det(db_op_int(retract(one),C0)), verify_sanity(mreq(C0)->dmsg(warn(incomplete_M_DEL(C0)));true).
+mdel(C0):- db_op_int(change(retract,one),C0), verify_sanity(mreq(C0)->(dmsg(warn(incomplete_M_DEL(C0))),fail);true),!.
 mdel(C0):- dmsg(warn(failed(mdel(C0)))),!,fail.
 
 % -  clr(Retractall)
-clr(C0):- db_op_int(retract(all),C0),verify_sanity(ireq(C0)->dmsg(warn(incomplete_CLR(C0)));true).
+clr(C0):- db_op_int(change(retract,all),C0),verify_sanity(ireq(C0)->(dmsg(warn(incomplete_CLR(C0))));true).
 
 % -  preq(Query) = query with P note
 preq(P,C0):- db_op_int(query(dbase_t,P),C0).
 
 % -  req(Query) = Normal query
-req(C0):- db_op_int(query(dbase_t,req),C0).
+req(C0):- preq(req,C0).
 
 % -  mreq(Query) = Forced Full query
-mreq(C0):- no_loop_check(with_assertions([-insideIREQ(_),-thlocal:noDefaultValues(_),-thlocal:noRandomValues(_)],preq(must,C0))).
+mreq(C0):- rescan_module_ready,no_loop_check(with_assertions([-insideIREQ(_),-thlocal:noDefaultValues(_),-thlocal:noRandomValues(_)],preq(must,C0))).
 
 
 % -  ireq(Query) = Normal query (May not use second order logic) (must be asserted on isntance) (used mainly by 2nd order logic to avoid looping)
-ireq(C0):- with_assertions([+insideIREQ(_), +thlocal:noDefaultValues(_),+thlocal:noRandomValues(_)],preq(ireq,C0)).
+ireq(C0):- rescan_module_ready,no_loop_check(with_assertions([+insideIREQ(_), +thlocal:noDefaultValues(_),+thlocal:noRandomValues(_)],preq(ireq,C0))).
 
 
 % -  props(Obj,QueryPropSpecs)
 props(Obj,PropSpecs):- req(props(Obj,PropSpecs)).
 iprops(Obj,PropSpecs):- ireq(props(Obj,PropSpecs)).
 % -  add_fast(Assertion)
-add_fast(C0):- must_det((db_op(assert(add), C0), xtreme_debug(req(C0)))),!.
+% add_fast(C0):- must_det((add_fast_unchecked(C0), xtreme_debug(once(ireq(C0);(with_all_dmsg((debug(blackboard),show_call(add_fast_unchecked(C0)),rtrace(add_fast_unchecked(C0)),dtrace(ireq(C0))))))))),!.
+add_fast(C0):- must_det((add_fast_unchecked(C0), xtreme_debug(ireq(C0)->true;dmsg(warn(failed_ireq(C0)))))),!.
+
+:-export(add_fast_unchecked/1).
+add_fast_unchecked(C0):-must_det(db_op(change(assert,add), C0)).
+
 % -  upprop(Obj,PropSpecs) update the properties
 upprop(Obj,PropSpecs):- upprop(props(Obj,PropSpecs)).
 upprop(C0):- add(C0).
@@ -488,7 +508,7 @@ prop_or(Obj,Prop,Value,OrElse):- one_must(dbase_t(Prop,Obj,Value),Value=OrElse).
 
 
 kb_update(New,OldV):- req(New),!,OldV=New.
-kb_update(New,OldV):- db_op_int(assert(OldV),New).
+kb_update(New,OldV):- db_op_int(change(assert,OldV),New).
 
 :-decl_thlocal((record_on_thread/2)).
 
@@ -508,7 +528,6 @@ db_op_simpler(_,TypeTerm,props(Inst,[isa(Type)|PROPS])):- TypeTerm=..[Type,Inst|
 
 
 db_op_simpler_wlc(query(HLDS,Must),Wild,Simpler):- !,call(call,db_op_simpler(query(HLDS,Must),Wild,Simpler)),not(is_loop_checked(req(Simpler))),!.
-db_op_simpler_wlc(assert(Must),Wild,Simpler):- !,call(call,db_op_simpler(assert(Must),Wild,Simpler)),not(is_loop_checked(add(Simpler))),!.
 db_op_simpler_wlc(Op,Wild,Simpler):- !,call(call,db_op_simpler(Op,Wild,Simpler)),not(is_loop_checked(db_op0(Op,Simpler))),!.
 
 
@@ -566,10 +585,10 @@ simply_functors(Db_pred,Op,Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=@=S
 % db_op_int/2
 % ================================================
 add_from_file(B,_):- contains_singletons(B),trace_or_throw(dtrace),dmsg(todo(add_from_file_contains_singletons(B))),!,fail.
-add_from_file(B,B):- db_op(assert(_OldV),B),!.
+add_from_file(B,B):- db_op(change(assert,_OldV),B),!.
 
 % runs previously required ops fisrt
-db_op_int(assert(Op),Term):- !, db_op(assert(Op),Term).
+db_op_int(change(Assert,Op),Term):- !, db_op(change(Assert,Op),Term).
 db_op_int(Op,Term):- do_db_op_hooks,db_op(Op,Term),do_db_op_hooks.
 
 univ_left(Comp,[M:P|List]):- nonvar(M),univ_left0(M, Comp, [P|List]),!.
@@ -587,106 +606,99 @@ record_on_thread(Dbase_change,O):- thread_self(ID),thlocal:dbase_capture(ID,Dbas
 % ================================================
 
 % db_op(query(HLDS,Must),createableType(SubType)):- !, call_expanded_for(Must,is_creatable_type(SubType)).
-db_op(assert(_),props(_Obj,Props)):- Props ==[], !.
-db_op(a,Wild):-!,db_op(assert(a),Wild).
+db_op(change(_,_),props(_Obj,Props)):- Props ==[], !.
 db_op(query(_,Must),NC):- not(compound(NC)),!,call_expanded_for(Must,NC).
 db_op(query(Dbase_t, Req), must(Call)):-!, must(db_op(query(Dbase_t, Req), Call)).
-db_op(query(HLDS,Must),B):-!, loop_check_term(db_op0(query(HLDS,Must),B),req(B),loop_check_term(call_mpred(B),req2(B),show_call(is_asserted(B)))). 
-db_op(assert(OldV),B):- !,loop_check_term(db_op0(assert(OldV),B),add(B),true),!. % true = we are already processing this assert
-db_op(Op,Term):- loop_check(db_op0(Op,Term),trace_or_throw(loop_check(db_op0(Op,Term)))).
+db_op(query(HLDS,Must),B):-!, loop_check_term(db_op0(query(HLDS,Must),B),req(B),((loop_check_term(call_mpred(B),req2(B),show_call(is_asserted(B)))))). 
+db_op(change(assert,CB2),B):- !,loop_check(db_op0(change(assert,CB2),B),must((dmsg(warn(looping(db_op(change(assert,CB2),B)))),hooked_asserta(B)))),!. % true = we are already processing this assert
+db_op(change(retract,CB2),B):- !,loop_check(db_op0(change(retract,CB2),B),must((dmsg(warn(looping(db_op(change(retract,CB2),B)))),hooked_retract(B)))),!. % true = we are already processing this retract
+db_op(Op,Term):- loop_check_local(db_op0(Op,Term),trace_or_throw(loop_check(db_op0(Op,Term)))).
 
 % ================================================
 % db_op0/2  SIMPLISTIC REWRITE (this is not the PRECANONICALIZER)
 % ================================================
 :-moo_hide_childs(db_op0/2).
 
+db_op0(Op,G):- when_debugging(blackboard,dmsg(db_op0(Op,G))),fail.
 db_op0(query(_HLDS,Must),isa(I,Type)):- !,call_expanded_for(Must,isa_backchaing(I,Type)).
-db_op0(assert(_),isa(T,Type)):- !,assert_isa(T,Type),!.
-db_op0(assert(assertion),end_of_file):-!.
-db_op0(Op,Term):- stack_check(1000),var(Term),!,trace_or_throw(nc(db_op0(Op,Term))).
-db_op0(Op,props(Obj,nameStrings(Str))):-!, db_op0(Op,nameStrings(Obj,Str)).
+db_op0(_,end_of_file):-!.
+db_op0(Op,Term):- stack_check,var(Term),!,trace_or_throw(nc(db_op0(Op,Term))).
+%db_op0(Op,props(Obj,nameStrings(Str))):-!, db_op0(Op,nameStrings(Obj,Str)).
 
-db_op0(Op,MT:Term):- is_kb_module(MT),!,with_assertions(thlocal:caller_module(kb,MT),db_op(Op,Term)).
-db_op0(Op,DB:Term):- dbase_mod(DB),!,with_assertions(thlocal:caller_module(db,DB),db_op(Op,Term)).
-db_op0(Op,KB:Term):- atom(KB),!,with_assertions(thlocal:caller_module(prolog,KB),db_op(Op,Term)).
+db_op0(Op,MT:Term):- is_kb_module(MT),!,with_assertions(thlocal:caller_module(kb,MT),db_reop(Op,Term)).
+db_op0(Op,DB:Term):- dbase_mod(DB),!,with_assertions(thlocal:caller_module(db,DB),db_reop(Op,Term)).
+db_op0(Op,KB:Term):- atom(KB),!,with_assertions(thlocal:caller_module(prolog,KB),db_reop(Op,Term)).
 
-% db_op0(Op,(':-'(A))):- must((expand_goal_correct_argIsa(A,AA))),expanded_different(A,AA),!,db_op(Op, (':-'(AA))).
+% db_op0(Op,(':-'(A))):- must((expand_goal_correct_argIsa(A,AA))),expanded_different(A,AA),!,db_reop(Op, (':-'(AA))).
 
-db_op0(Op,[dbase_t,Class,Inst]):-!,db_op0(Op,isa(Inst,Class)).
-db_op0(Op,[holds_f,Class,Inst]):-!,db_op0(Op,isnt(Inst,Class)).
+db_op0(Op,[dbase_t,Class,Inst]):-!,db_reop(Op,isa(Inst,Class)).
+db_op0(Op,[holds_f,Class,Inst]):-!,db_reop(Op,isnt(Inst,Class)).
 
-db_op0(Op,[dbase_t,P|List]):-nonvar(P),univ_left(G2,[P|List]),!,db_op(Op,G2).
-db_op0(Op,[holds_f,P|List]):-nonvar(P),univ_left(G2,[P|List]),!,db_op(Op,not(G2)).
+db_op0(Op,[dbase_t,P|List]):-nonvar(P),univ_left(G2,[P|List]),!,db_reop(Op,G2).
+db_op0(Op,[holds_f,P|List]):-nonvar(P),univ_left(G2,[P|List]),!,db_reop(Op,not(G2)).
 
 db_op0(Op,G1):- functor_check_univ(G1,F,[P|ListL]),List=[P|ListL],
-      (is_holds_true(F) -> (nonvar(P) -> (univ_left(G2,List),db_op(Op,G2)); db_op(Op,[dbase_t|List])) ;
-      (is_holds_false(F) -> (nonvar(P) -> (univ_left(G2,List),db_op(Op,not(G2))); db_op(Op,[holds_f|List]));
+      (is_holds_true(F) -> (nonvar(P) -> (univ_left(G2,List),db_reop(Op,G2)); db_reop(Op,[dbase_t|List])) ;
+      (is_holds_false(F) -> (nonvar(P) -> (univ_left(G2,List),db_reop(Op,not(G2))); db_reop(Op,[holds_f|List]));
       fail)).
 
-db_op0(Op,Term):- call(call,record_on_thread(dbase_opcall,db_op(Op,Term))),fail.
+db_op0(Op,Term):- call(call,record_on_thread(dbase_opcall,db_reop(Op,Term))),fail.
 
-db_op0(assert(_OldV),(':-'(A))):- !, must((expand_goal_correct_argIsa(A,AA),req(AA))).
-db_op0(assert(OldV),(C1;C2)):- !,db_op(assert(OldV),C1),!,db_op(assert(OldV),C2),!.
-db_op0(retract(All),(C1;C2)):- !,must_det(db_op(retract(All),C1)),must_det(db_op(retract(All),C2)).
-db_op0(Op,and(C1,C2)):- !,db_op(Op,C1),db_op(Op,C2).
-db_op0(Op,(C1,C2)):- !,db_op(Op,C1),db_op(Op,C2).
-db_op0(Op,(C1;C2)):- !,db_op(Op,C1);db_op(Op,C2).
+db_op0(change(Dir,_OldV),(':-'(A))):- must(Dir=assert), !, must((expand_goal_correct_argIsa(A,AA),req(AA))).
+db_op0(change(CA1,CB2),(C1;C2)):- !, (db_reop(change(CA1,CB2),C1);db_reop(change(CA1,CB2),C2)),!.
+db_op0(Op,and(C1,C2)):- !,db_reop(Op,C1),db_reop(Op,C2).
+db_op0(Op,(C1,C2)):- !,db_reop(Op,C1),db_reop(Op,C2).
+db_op0(Op,(C1;C2)):- !,db_reop(Op,C1);db_reop(Op,C2).
 
 
 db_op0(query(HLDS,Must),props(Obj,Props)):- nonvar(Obj),var(Props),!,gather_props_for(query(HLDS,Must),Obj,Props).
 
 
-db_op0(Op,props(Obj,Open)):- var(Open),!,trace_or_throw(db_op(Op,props(Obj,Open))).
+db_op0(Op,props(Obj,Open)):- var(Open),!,trace_or_throw(db_reop(Op,props(Obj,Open))).
 db_op0(_Op,props(_Obj,[])):- !.
-db_op0(Op,props(Obj,[P])):- nonvar(P),!,db_op(Op,props(Obj,P)).
-db_op0(Op,props(Obj,[P|ROPS])):- !,db_op(Op,props(Obj,P)),db_op(Op,props(Obj,ROPS)).
-db_op0(Op,props(Obj,PropVal)):- atom(PropVal),!,Call=..[PropVal,Obj],!,db_op(Op,Call).
-db_op0(Op,props(Obj,PropVal)):- safe_univ(PropVal,[Prop,NonVar|Val]),Obj==NonVar,!,db_op(Op,[dbase_t,Prop,Obj|Val]).
-db_op0(Op,props(Obj,PropVal)):- PropVal=..[OP,Pred|Val],comparitiveOp(OP),not(comparitiveOp(Pred)),!,OPVAL=..[OP|Val],PropVal2=..[Pred,OPVAL],db_op(Op,props(Obj,PropVal2)).
-db_op0(Op,props(Obj,PropVal)):- PropVal=..[Prop|Val],not(infix_op(Prop,_)),!,db_op(Op,[dbase_t,Prop,Obj|Val]).
-db_op0(Op,props(Obj,PropVal)):- PropVal=..[Prop|Val],!,trace_or_throw(dtrace),db_op(Op,[dbase_t,Prop,Obj|Val]).
+db_op0(Op,props(Obj,[P])):- nonvar(P),!,db_reop(Op,props(Obj,P)).
+db_op0(Op,props(Obj,[P|ROPS])):- !,db_reop(Op,props(Obj,P)),db_op0(Op,props(Obj,ROPS)).
+db_op0(Op,props(Obj,PropVal)):- atom(PropVal),!,Call=..[PropVal,Obj],!,db_reop(Op,Call).
+db_op0(Op,props(Obj,PropVal)):- safe_univ(PropVal,[Prop,NonVar|Val]),Obj==NonVar,!,db_reop(Op,[dbase_t,Prop,Obj|Val]).
+db_op0(Op,props(Obj,PropVal)):- PropVal=..[OP,Pred|Val],comparitiveOp(OP),not(comparitiveOp(Pred)),!,OPVAL=..[OP|Val],PropVal2=..[Pred,OPVAL],db_reop(Op,props(Obj,PropVal2)).
+db_op0(Op,props(Obj,PropVal)):- PropVal=..[Prop|Val],not(infix_op(Prop,_)),!,db_reop(Op,[dbase_t,Prop,Obj|Val]).
+db_op0(Op,props(Obj,PropVal)):- PropVal=..[Prop|Val],!,trace_or_throw(dtrace),db_reop(Op,[dbase_t,Prop,Obj|Val]).
 
-db_op0(query(HLDS,Must),expand_args(Exp,Term)):- !, forall(do_expand_args(Exp,Term,O),no_loop_check(db_op(query(HLDS,Must),O))).
-db_op0(Op,expand_args(Exp,Term)):- !,forall(do_expand_args(Exp,Term,O),db_op(Op,O)).
-db_op0(Op,somethingIsa(A,List)):- !,forall_member(E,List,db_op(Op, isa(A,E))).
-db_op0(Op,somethingDescription(A,List)):- !,forall_member(E,List,db_op(Op, description(A,E))).
-db_op0(Op,objects(Type,List)):- !,forall_member(I,List,db_op(Op,isa(I,Type))).
-db_op0(Op,sorts(Type,List)):- !,forall_member(I,List,db_op(Op, subclass(I,Type))).
-db_op0(Op,predicates(List)):- !,forall_member(T,List,db_op(Op,mpred(T))).
-db_op0(Op,EACH):- EACH=..[each|List],forall_member(T,List,db_op(Op,T)).
+db_op0(query(HLDS,Must),expand_args(Exp,Term)):- !, forall(do_expand_args(Exp,Term,O),no_loop_check(db_reop(query(HLDS,Must),O))).
+db_op0(Op,expand_args(Exp,Term)):- !,forall(do_expand_args(Exp,Term,O),db_reop(Op,O)).
+db_op0(Op,somethingIsa(A,List)):- !,forall_member(E,List,must(db_reop(Op, isa(A,E)))).
+db_op0(Op,somethingDescription(A,List)):- !,forall_member(E,List, must(db_reop(Op, description(A,E)))).
+db_op0(Op,objects(Type,List)):- !,forall_member(I,List,must(db_reop(Op,isa(I,Type)))).
+db_op0(Op,sorts(Type,List)):- !,forall_member(I,List,must(db_reop(Op, subclass(I,Type)))).
+db_op0(Op,predicates(List)):- !,forall_member(T,List,must(db_reop(Op,mpred(T)))).
+db_op0(Op,EACH):- EACH=..[each|List],forall_member(T,List,must(db_reop(Op,T))).
 
-db_op0(Op,Wild):- into_mpred_form(Wild,Simpler), Wild \=@= Simpler,!,db_op0(Op,Simpler).
 db_op0(Op,db_op_exact(Term)):- !,db_op_exact(Op,Term).
  
-db_op0(assert(_),description(A,E)):- once(must(add_description(A,E))),!,db_op0(assert(_),descriptionHere(A,E)).
-db_op0(Op,nameStrings(A,S0)):- nonvar(S0),determinerRemoved(S0,String,S),!,db_op(Op, nameStrings(A,S)),db_op(assert(_OldV), determinerString(A,String)).
+% use assert_with_pred db_op0(change(assert,_)),description(A,E)):- once(must(add_description(A,E))),fail. % db_reop(change(CA1,CB2),descriptionHere(A,E)).
+db_op0(Op,nameStrings(A,S0)):- nonvar(S0),determinerRemoved(S0,String,S),!,db_reop(Op, nameStrings(A,S)),add(determinerString(A,String)).
 
-% db_op0(Op,Term):- call(call,good_for_chaining(Op,Term)), db_rewrite(Op,Term,NewTerm),not(contains_singletons(NewTerm)),db_op(Op,NewTerm).
 
-db_op0(assert(_OldV),argsIsaInList(Term)):-!,decl_mpred(Term),!.
-db_op0(assert(_OldV),Term):-compound(Term),functor(Term,F,_),argsIsaProps(F),decl_mpred(Term),!.
-db_op0(assert(_OldV),argsIsaInList(F,Term)):-compound(Term),!,must_det(functor(Term,F,_)),decl_mpred(Term),!.
-db_op0(assert(_OldV),mpred(A)):- !,decl_mpred(A),!.
-db_op0(assert(_OldV),isa(A,mpred)):- !,decl_mpred(A),!.
-db_op0(assert(_OldV),isa(A,P)):- nonvar(P),functor(P,F,_),argsIsaProps(F),!,decl_mpred(A,P),!.
-
+db_op0(Op,props(Obj,nameStrings(Str))):-!,db_reop(Op,nameStrings(Obj,Str)).
 db_op0(query(HLDS,Must),isa(Term,Var)):- !,call_expanded_for(query(HLDS,Must),call(call,isa_backchaing(Term,Var))).
-db_op0(Op,isa(A,SubType)):- dbase_t(createableSubclassType,SubType,Type),!,db_op(Op,isa(A,Type)),db_op(Op,isa(A,SubType)).
-
-%db_op0(assert(_OldV),singleValued(Term)):- !,decl_mpred(Term),decl_mpred(Term,singleValued).
-%db_op0(assert(_OldV),multiValued(Term)):- !,functor_safe(Term,_,A),decl_mpred(Term),decl_mpred(Term,[multiValued,multi(A)]).
-
+db_op0(Op,isa(A,SubType)):- dbase_t(createableSubclassType,SubType,Type),!,db_reop(Op,isa(A,Type)),db_reop(Op,isa(A,SubType)).
 db_op0(query(HLDS,Must),argIsa(P,N,T)):- call_expanded_for(query(HLDS,Must),(get_mpred_prop(P,argsIsaInList(ArgsIsa)),arg(N,ArgsIsa,T),must(nonvar(T)))).
-db_op0(Op,A):- must_det(once(correctArgsIsa(Op,A,AA))), A \=@= AA, !, db_op(Op,AA).
-db_op0(Op,Wild):- transform_holds(dbase_t,Wild,Simpler), Wild \=@= Simpler,!,dmsg(transform_holds(Wild->Simpler)),db_op0(Op,Simpler).
+
+db_op0(change(_,_),Term):- glean_pred_props_maybe(Term),fail.
 
 
 
-db_op0(assert(_),Term):- glean_pred_props_maybe(Term),fail.
+db_op0(Op,Wild):- into_mpred_form(Wild,Simpler), acceptable_xform( Wild , Simpler),dmsg(into_mpred_form(Op,Wild->Simpler)), !,db_reop(Op,Simpler).
+db_op0(Op,A):- must_det(once(correctArgsIsa(Op,A,AA))),acceptable_xform(  A , AA),dmsg(correctArgsIsa(Op,A->AA)), !, db_reop(Op,AA).
+db_op0(Op,Wild):- transform_holds(dbase_t,Wild,Simpler),acceptable_xform(  Wild , Simpler),!,dmsg(transform_holds(Op,Wild->Simpler)),db_reop(Op,Simpler).
+% db_op0(Op,Term):- call(call,good_for_chaining(Op,Term)), db_rewrite(Op,Term,NewTerm),not(contains_singletons(NewTerm)),db_reop(Op,NewTerm).
+% db_op0(Op,Wild):- dsfdf db_op_simpler_wlc(Op,Wild,Simpler),!,db_reop(Op,Simpler).
 
-% db_op0(Op,Wild):- dsfdf db_op_simpler_wlc(Op,Wild,Simpler),!,db_op(Op,Simpler).
+db_op0(change(DIR,_),argsIsaInList(Term)):- must(DIR==assert),!,show_call(decl_mpred(Term)),!.
 
-db_op0(Op,Term):- type_error_checking,!, Term =..[Type,A],!,db_op(Op,isa(A,Type)).
+db_op0(change(DIR,_),isa(T,Type)):- must(DIR==assert),!,assert_isa(T,Type),!.
+
+db_op0(Op,Term):- type_error_checking,!, Term =..[Type,A],!,db_reop(Op,isa(A,Type)).
 
 db_op0(Op,C0):- C0=..[Prop|ARGS],db_op_unit(Op,C0,Prop,ARGS).
 
@@ -703,10 +715,10 @@ db_op_unit(Op,C0,isa,ARGS):- type_error_checking,!, trace_or_throw(db_op_unit(Op
 db_op_unit(Op,C0,Prop,_ARGS):- get_mpred_prop(Prop,use_db_op(Other)),!,call(Other,Op,C0).
 
 % assert_with_pred/1
-db_op_unit(assert(A),C0,Prop,_RGS):- get_mpred_prop(Prop,assert_with_pred(How)),!, must(nonvar(How)), once(ignore((call(How,C0), run_database_hooks(assert(A),C0)))).
+db_op_unit(change(assert,A),C0,Prop,_RGS):- get_mpred_prop(Prop,assert_with_pred(How)),!, must(nonvar(How)), once(ignore((call(How,C0), run_database_hooks(assert(A),C0)))).
 
 % retract_with_pred/1
-db_op_unit(retract(A),C0,Prop,_RGS):- get_mpred_prop(Prop,retract_with_pred(How)),!, must(nonvar(How)), once(ignore((call(How,C0), run_database_hooks(retract(A),C0)))).
+db_op_unit(change(retract,A),C0,Prop,_RGS):- get_mpred_prop(Prop,retract_with_pred(How)),!, must(nonvar(How)), once(ignore((call(How,C0), run_database_hooks(retract(A),C0)))).
 
 
 % db_op_unit(query(HLDS,Must),_C0,Prop,ARGS):- bad_idea, get_mpred_prop(Prop,extentAsserted),!,call_expanded_for(query(HLDS,Must),dbase_t_p2(Prop,ARGS)).
@@ -718,60 +730,32 @@ db_op_unit(query(Must,HLDS),C0,Prop,_RGS):- get_mpred_prop(Prop,query_with_pred(
 % plain prop
 db_op_unit(Op,_C0,Prop,ARGS):- once((db_op_sentence(Op,Prop,ARGS,Unit),same_vars(ARGS,Unit))), db_op_exact(Op,Unit).
 
-
+% if is IREQ then fail
 db_op_unit(Op,C0,_Prop,_ARGS):- test_tl(thlocal:insideIREQ,C0),!,must_det(query(_Must,_HLDS)=Op),fail.
 
 % genlInverse/2
-db_op_unit(Op,_C0,Prop,ARGS):- 
-   get_mpred_prop(Prop,genlInverse(Other)),inverse_args(ARGS,Inverse), db_op_sentence(Op,Other,Inverse,Unit1), db_op_exact(Op,Unit1).
+db_op_unit(Op,_C0,Prop,ARGS):- dbase_t(genlInverse,Prop,Other), inverse_args(ARGS,Inverse), db_op_sentence(Op,Other,Inverse,Unit1), db_op_exact(Op,Unit1).
 
 % genlPreds/2
-db_op_unit(Op,_C0,Prop,ARGS):- 
-   get_mpred_prop(Prop,genlPreds(Other)),  db_op_sentence(Op,Other,ARGS,Unit1), db_op_exact(Op,Unit1).
-
-
-/*
-
-% impl/1
-db_op_unit(Op,_C0,Prop,ARGS):- get_mpred_prop(Prop,impl(Other)),db_op_sentence(Op,Other,ARGS,Unit),db_op_loop(Op,Unit,fail).
-
-% alias/1
-db_op_unit(Op,_C0,Prop,ARGS):- bad_idea, get_mpred_prop(Prop,alias(Other)),!,db_op_sentence(Op,Other,ARGS,Unit),!,db_op_loop(Op,Unit,trace_or_throw(db_op_unit(Op,alias(Other),Prop,ARGS))).
-
-
- cant get here
-db_op_unit(Op,_C0,Prop,ARGS):- trace_or_throw(dtrace),must_det((db_op_sentence(Op,Prop,ARGS,Unit),same_vars(ARGS,Unit))),!, db_op_loop(Op,Unit,db_op_exact(Op,Unit)).
-db_op_unit(Op,C0,_Prop,_ARGS):- db_op_loop(Op,C0,db_op_exact(Op,C0)).
-
-
-db_op_unit(Op,C0,Prop,ARGS):- 
-      get_mpred_prop(Prop,genlPreds(Other)),must(atom(Other)),  
-      db_op_sentence(Op,Other,ARGS,Unit1),
-      db_op_sentence(Op,Prop,ARGS,Unit2),!,
-      (db_op_loop(Op,Unit2,fail);db_op_exact(Op,Unit1)).
-
-
-*/
-
-
+db_op_unit(Op,_C0,Prop,ARGS):- dbase_t(genlPreds,Prop,Other),  db_op_sentence(Op,Other,ARGS,Unit1), db_op_exact(Op,Unit1).
 
 db_op_loop(Op,Unit,Result):- is_loop_checked(db_op0(Op,Unit)),!,call(Result).
-db_op_loop(Op,Unit,_Result):- db_op(Op,Unit).
+db_op_loop(Op,Unit,_Result):- db_reop(Op,Unit).
 
 % ================================================
 % db_op_exact/2
 % ================================================
-db_op_exact(Op,G):- G=..[SubType,Arg],must_det(type(SubType)),db_op_loop(Op,isa(Arg,SubType),fail),!.
+db_op_exact(Op,G):- G=..[_SubType,_Arg],not(prolog_side_effects(G)),dmsg(todo(ensure_Usable(Op,G))),fail.
 db_op_exact(query(HLDS,Must),Term):- !,call_expanded_for(query(HLDS,Must),Term).
 db_op_exact(query, Term):- !,call_expanded_for(findall,Term).
 db_op_exact(must, Term):- !,call_expanded_for(must,Term).
 db_op_exact(u,C):- trace_or_throw(dtrace),db_quf(u,C,U,Template),call_mpred_fast(U),Template,must(ground(Template)),!,ignore(hooked_retractall(Template)).
 db_op_exact(Op,G):- when_debugging(blackboard,dmsg(db_op_exact(Op,G))),fail.
-db_op_exact(retract(all),C):- !, db_quf(retract(all),C,U,Template),!, when_debugging(retract,dtrace), doall((call_mpred_fast(U),hooked_retractall(Template))).
-db_op_exact(retract(A),C):- must(db_quf(retract(A),C,U,Template)),!,  when_debugging(retract,dtrace), call_mpred_fast(U),!,hooked_retract(Template).
-db_op_exact(assert(OldV),W):- non_assertable(W,Why),trace_or_throw(todo(db_op(assert(OldV), non_assertable(Why,W)))).
-db_op_exact(assert(Must),C0):- db_quf(assert(Must),C0,U,C),!,must(call_mpred_fast(U)),functor_catch(C,F,A),( get_mpred_prop(F,singleValued) -> must(db_assert_sv(Must,C,F,A)) ; must(db_assert_mv(Must,C,F,A))).
-db_op_exact(assert(Must),C):- trace_or_throw(dtrace),functor_catch(C,F,A), must_det((get_mpred_prop(F,singleValued) -> must_det(db_assert_sv(assert(Must),C,F,A)) ; must(db_assert_mv(assert(Must),C,F,A)))).
+db_op_exact(change(retract,all),C):- !, db_quf(change(retract,all),C,U,Template),!, when_debugging(retract,dtrace), doall((call_mpred_fast(U),hooked_retractall(Template))).
+db_op_exact(change(retract,A),C):- must(db_quf(change(retract,A),C,U,Template)),!,  when_debugging(retract,dtrace), call_mpred_fast(U),!,hooked_retract(Template).
+db_op_exact(change(Assert,OldV),W):- non_assertable(W,Why),trace_or_throw(todo(db_op(change(Assert,OldV), non_assertable(Why,W)))).
+db_op_exact(change(assert,Must),C0):- db_quf(change(assert,Must),C0,U,C),!,must(call_mpred_fast(U)),functor_catch(C,F,A),( get_mpred_prop(F,singleValued) -> must(db_assert_sv(Must,C,F,A)) ; must(db_assert_mv(Must,C,F,A))).
+db_op_exact(change(assert,Must),C):- trace_or_throw(dtrace),functor_catch(C,F,A), must_det((get_mpred_prop(F,singleValued) -> must_det(db_assert_sv(assert(Must),C,F,A)) ; must(db_assert_mv(assert(Must),C,F,A)))).
 %db_op_exact(Must, Term):- !,call_expanded_for(Must,Term).
 db_op_exact(Op,C):- trace_or_throw(unhandled(db_op_exact(Op,C))).
 
@@ -842,10 +826,13 @@ dbase_t_p2(P,LIST):- CALL=..[dbase_t,P|LIST],call(CALL),debugOnError((CALL)).
 
 :-dmsg_hide(db_assert_mv).
 :-dmsg_hide(db_assert_sv).
+
 :-dmsg_hide(db_op_exact).
 :-dmsg_hide(add).
+:-dmsg_hide(assert_isa).
 
-% assert_with to assert(OldV) mutlivalue pred
+
+% assert_with to change(CA1,CB2) mutlivalue pred
 :-export((db_assert_mv/4)).
 db_assert_mv(_Must,end_of_file,_,_):-!.
 % db_assert_mv(_Must,C,_F,_A):- hooked_assertz(C),!.
@@ -853,7 +840,7 @@ db_assert_mv(Must,C,F,A):- test_tl(thlocal:adding_from_srcfile), dmsg(db_assert_
 db_assert_mv(Must,C,F,A):- dmsg(db_assert_mv(Must,C,F,A)), must_det(mpred_prop(F,ordered) -> hooked_assertz(C) ; hooked_asserta(C)).
 
 
-% assert_with to assert(OldV) singlevalue pred
+% assert_with to change(CA1,CB2) singlevalue pred
 :-export((db_assert_sv/4)).
 %db_assert_sv(_Must,C,F,A):- throw_if_true_else_fail(contains_singletons(C),db_assert_sv(C,F,A)).
 db_assert_sv(Must,C,F,A):- ignore(( loop_check(db_assert_sv_lc(Must,C,F,A),true))).
@@ -872,8 +859,7 @@ db_assert_sv_now(Must,C,F,A, REPLACE):- db_assert_sv_replace(Must,C,F,A, REPLACE
 db_assert_sv_update(Must,C,F,A,UPDATE):-
    replace_arg(C,A,OLD,COLD),
    % prefer updated values to come from instances but will settle with anything legal
-   once(ireq(COLD);mreq(COLD)), 
-   must_det(ground(COLD)),
+   must_det((once(ireq(COLD);mreq(COLD)),ground(COLD))),
    update_value(OLD,UPDATE,NEW),!,
    db_assert_sv_replace(Must,C,F,A,NEW),!.
 
@@ -903,7 +889,7 @@ db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):- unify_with_occurs_chec
 db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):- equals_call(OLD,NEW),!,dmsg(db_assert_sv_same(COLD,'__same__',CNEW)),trace_or_throw(dtrace).
 db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):-
    dmsg(db_assert_sv(COLD,'__replace__',CNEW)),
-   must_det((del(COLD), not(ireq(COLD)))),
+   ignore(show_call_failure((del(COLD), not(ireq(COLD))))),
    %replace_arg(C,A,_,CBLANK),must_det(clr(CBLANK)),hooked_retractall(CBLANK),   
    must_det(hooked_asserta_confirmed(CNEW,A,NEW)),!.
 
@@ -922,7 +908,7 @@ confirm_hook(CNEW:NEW=@=CNOW:NOW):-
 
 confirm_hook(CNEW:NEW=@=CNOW:NOW):-
    dmsg(warn(failed_i_a_req(CNOW,expected(CNEW)))),
-   must_det((mreq(CNOW),(CNEW:NEW=@=CNOW:NOW))),!.
+   verify_sanity((mreq(CNOW),(CNEW:NEW=@=CNOW:NOW))),!.
 
 
 
@@ -1058,9 +1044,9 @@ add_later(Fact):- call_after_game_load(add(Fact)).
 :-decl_thlocal add_thread_override/1.
 % thlocal:add_thread_override(A):-add_from_macropred(A),!.
 
-:-export(add/1).
+:-export((add/1)).
 :-moo_hide_childs(add/1).
-add(A):-A==end_of_file,!.
+add(A):- A==end_of_file,!.
 add(A):- not(compound(A)),!,trace_or_throw(not_compound(add(A))),!.
 add(mpred_prop(A)):- decl_mpred(A),!.
 add(mpred_prop(A,B)):- decl_mpred(A,B),!.
@@ -1068,7 +1054,7 @@ add(Call):- loop_check(thlocal:add_thread_override(Call)),!.
 add(Call):- add_from_macropred(Call),!.
 add(M:HB):-atom(M),!, must_det(add(HB)),!.
 add(A):- into_mpred_form(A,F), A \=@=F,!,add(F). 
-add(A):- must_det(once(correctArgsIsa(assert(add),A,AA))),A \=@= AA,!,add(AA),!.
+add(A):- must_det(once(correctArgsIsa(change(assert,add),A,AA))),A \=@= AA,!,add(AA),!.
 add(type(A)):- must_det(decl_type(A)),!.
 add(A):- A=..[Type,_], formattype(Type), trace_or_throw(formattype_ensure_skippable(A)),!.
 add(A):- A=..[Type,_], not(type(Type)), dmsg(todo(ensure_creatabe(Type))),fail.
@@ -1140,11 +1126,15 @@ get_mpred_type(Head,F,A,Type):-must(mpred_arity(F,A)),functor(Head,F,A),get_mpre
 
 get_mpred_type4(P,F,A,T):-get_mpred_type5(P,F,A,T),!.
 
-get_mpred_type5(_,F,_,callable(Type)):-member(Type,[prologOnly,prologHybrid]),mpred_prop(F,Type).
-get_mpred_type5(P,_,_,unknown):-not(predicate_property(P,_)),dmsg(warn_pp(not(predicate_property(P,_)))).
-get_mpred_type5(P,_,_,callable(dynamic)):-predicate_property(P,dynamic),!.
-get_mpred_type5(_,_,_,callable(static)).
+get_mpred_type5(_,F,_,callable(Type)):-member(Type,[prologOnly,prologHybrid,type]),mpred_prop(F,Type).
+get_mpred_type5(P,_,_,W):-compound(P),!,pp_has(P,W).
+get_mpred_type5(_,F,A,W):-atom(F),current_predicate(F/A),functor(P,F,A),!,pp_has(P,W).
+get_mpred_type5(F,_,A,W):-atom(F),current_predicate(F/A),functor(P,F,A),!,pp_has(P,W).
+get_mpred_type5(_P,_F,_A,funknown):-!. % dmsg(warn_pp(not(predicate_property(P,F,A)))).
 
+pp_has(P,callable(dynamic)):-predicate_property(P,dynamic),!.
+pp_has(P,callable(static)):-predicate_property(P,dynamic),!.
+pp_has(_,unknown).
 
 special_wrapper_functor(call_mpred_body).
 special_wrapper_functor(body_req).
@@ -1156,7 +1146,6 @@ make_body_clause(_Head,Body,Body):-atomic(Body),!.
 make_body_clause(_Head,Body,Body):-special_wrapper_body(Body),!.
 make_body_clause(Head,Body,moo:call_mpred_body(Head,Body)).
 
-mpred_prop(G,assert_with(add)):- atom(G),moo:assertionMacroHead(G).
 
 assertOnLoad(X):-add_later(X).
 

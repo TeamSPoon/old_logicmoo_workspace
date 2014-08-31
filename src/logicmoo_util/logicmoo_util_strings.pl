@@ -22,7 +22,7 @@
             must_nonvar/1,
             non_empty/1,
             string_dedupe/2,
-            is_empty_string/1,
+            empty_string/1,
             member_ci/2,
                    string_equal_ci/2,
                    append_ci/3,
@@ -422,7 +422,7 @@ map_tree_to_list(Pred,IN,Output):-
   append(Left,[UT],OUTP),!, OUT =.. OUTP)),must_assign([OUT],Output).
 map_tree_to_list(_,IN,IN):-trace,must_assign([IN],IN).
 
-non_empty(A):-must_det(not(is_empty_string(A))).
+non_empty(A):-must_det(not(empty_string(A))).
 must_nonvar(A):-one_must(nonvar(A),trace_or_throw(must_nonvar(A))).
 
 
@@ -483,16 +483,16 @@ as_nc_str([A0,B0],AS):-atom_concat(A0,B0,AO),as_nc_str(AO,AS).
 as_nc_str(A0,AS):-any_to_string(A0,AS).
 % as_nc_str(A0,A0).
 
-ommitable(O):-is_empty_string(O).
+ommitable(O):-empty_string(O).
 ommitable(O):-string_to_atom(O,A),atom_length(A,L),!,L<2.
 
 atom_subst(A,F,R,K):-replace_in_string(F,R,A,K),!.
 
 
-is_empty_string(A):-var(A),!.
-is_empty_string([]).
-is_empty_string('').
-is_empty_string("").
+empty_string(A):-var(A),!.
+empty_string([]).
+empty_string('').
+empty_string("").
 
 
 % Meta-Interp that appends the arguments to the calls
@@ -562,7 +562,7 @@ to_word_list_0(Input,WList):- (string(Input);atom(Input)),(atomic_list_concat(WL
 to_word_list_0(Input,Input).
 
 str_contains_all([],_String):- dtrace.
-str_contains_all(_,String):- is_empty_string(String), dtrace.
+str_contains_all(_,String):- empty_string(String), dtrace.
 str_contains_all(A,SL):- string_ci(SL,SLIC),SL\=SLIC,!,str_contains_all(A,SLIC).
 str_contains_all(List,String):-str_contains_all0(List,String).
 

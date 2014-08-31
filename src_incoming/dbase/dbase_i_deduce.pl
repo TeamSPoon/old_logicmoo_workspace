@@ -25,7 +25,7 @@ hook:decl_database_hook(Type,Fact):- predicate_property(add_deduction(_,_),_),ru
 hook:decl_database_hook(_,mpred_prop('ArtifactCol1008-VISOR688', flagged_visor)):- trace_or_throw(mpred_prop('ArtifactCol1008-VISOR688', flagged_visor)).
 
 run_deduce_facts_from(Type,M:Fact):-atom(M),!,run_deduce_facts_from(Type,Fact).
-run_deduce_facts_from(Type,Fact):-loop_check(run_deduce_facts_from_lc(Type,Fact),true).
+run_deduce_facts_from(Type,Fact):-loop_check_local(run_deduce_facts_from_lc(Type,Fact),true).
 run_deduce_facts_from_lc(Type,Fact):-doall((call_no_cuts(hook:deduce_facts(Fact,Deduction)),add_deduction(Type,Deduction,Fact))).
 
 
@@ -87,5 +87,12 @@ do_deduction_type(assert(_),Fact):-add(Fact).
 do_deduction_type(retract(_),Fact):-functor(Fact,F,A),(F=isa;F=mpred_prop;A=1),!.
 do_deduction_type(retract(_),Fact):-clr(Fact).
 
-
-
+/*
+a :- b. % a if b
+a :- b,c. % a if b and c.
+a :- b;c. % a if b or c.
+a :- \++ b. % a if b is not provable
+a :- \++ b. % a if b is not provable
+a :- not b. % a if b fails
+a :- b -> c;d. % a if (if b then c else d)
+*/

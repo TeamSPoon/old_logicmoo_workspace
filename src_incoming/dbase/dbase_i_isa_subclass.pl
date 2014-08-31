@@ -69,7 +69,7 @@ hook:decl_database_hook(assert(_A_or_Z),subclass(S,C)):-decl_type_safe(S),decl_t
 :- decl_type(type).
 :- decl_type(completeExtentAsserted).
 :- decl_type(createableType).
-:- forall(argsIsaProps(Prop),(decl_type(Prop),asserta(is_known_true(subclass(Prop,mpred))))).
+:- forall(argsIsaProps(Prop),(decl_type(Prop),asserta(is_known_trew(subclass(Prop,mpred))))).
 
 is_creatable_type(Type):- arg(_,vv(agent,item,region,concept),Type).
 is_creatable_type(Type):- atom(Type),call(is_asserted(isa(Type,createableType))).
@@ -82,6 +82,7 @@ hook:decl_database_hook(assert(_A_or_Z),isa(W,type)):-atom(W),atomic_list_concat
 % assert_isa/2
 % ================================================
 :-export assert_isa/2.
+:-dynamic_multifile_exported i_countable/1.
 
 assert_isa(I,T):- not(ground(I:T)),trace_or_throw(not(ground(assert_isa(I,T)))).
 assert_isa(I,T):- loop_check(assert_isa_lc(I,T),true).
@@ -90,21 +91,38 @@ assert_isa(I,T):- loop_check(assert_isa_lc(I,T),true).
 % skip formatter types
 assert_isa_lc(_I,T):- member(T,[string,action,dir,apath]),!.
 assert_isa_lc(I,T):- hotrace(formattype(T)),(compound(I)->true;dmsg(once(dont_assert_is_ft(I,T)))).
+assert_isa_lc(I,T):- cannot_table_call(isa_asserted(I,T)),!.
 assert_isa_lc(_,T):- once(decl_type(T)),fail.
 assert_isa_lc(I,type):- decl_type(I),!.
 assert_isa_lc(I,formattype):- define_ft(I),!.
-assert_isa_lc(I,T):- cannot_table_call(isa_asserted(I,T)),!.
-%assert_isa_lc(I,T):- is_stable,!, hooked_asserta(isa(I,T)).
+assert_isa_lc(I,_):- not(mpred_prop(I,_)),not(type(I)),show_call(assert_if_new(i_countable(I))),fail.
+assert_isa_lc(I,T):- is_release,!, hooked_asserta(isa(I,T)).
 assert_isa_lc(I,T):- must_det((hooked_asserta(isa(I,T)),logOnFailureIgnore(isa_backchaing(I,T)))).
+
+is_counted_for_parse(I):-i_countable(I),not(excluded(I)),!.
+excluded(apath(_, _)).
+excluded(I):-type(I).
+excluded(I):-formattype(I).
+excluded(I):-mpred_prop(_,argsIsaInList(I)).
+excluded(I):-type(I).
+excluded(apath(_ = _)).
+
+instance_for_parse(I):-is_counted_for_parse(I).
+insttype_for_parse(I):-findall(C,(instance_for_parse(I),isa(I,C)),List),list_to_set(List,Set),member(I,Set).
+
 
 % ================================================
 % assert_isa HOOKS
 % ================================================
+hook:decl_database_hook(_,subclass(_,_)):-retractall(dbase_t(_,isa,_,_)),retractall(dbase_t(_,subclass,_,_)).
 hook:decl_database_hook(assert(_),DATA):-into_mpred_form(DATA,O),!,O=isa(I,T),hotrace(doall(assert_isa_hooked(I,T))).
 % hook:decl_database_hook(retract(_),isa(I,T)):-doall(db_retract_isa_hooked(I,T)).
 
+assert_isa_hooked(A,_):-retractall(dbase_t(cache_I_L,isa,A,_)),fail.
+assert_isa_hooked(F,T):-argsIsaProps(T),decl_mpred(F,T),fail.
 assert_isa_hooked(I,T):- not(ground(assert_isa(I,T))),!, trace_or_throw(not(ground(assert_isa(I,T)))).
 assert_isa_hooked(I,T):- asserta_if_new(moo:dbase_t(T,I)),fail.
+
 assert_isa_hooked(T,type):-!,decl_type(T),!.
 assert_isa_hooked(T,formattype):-!,define_ft(T),!.
 assert_isa_hooked(Term,mpred):-!,decl_mpred(Term).
@@ -121,9 +139,9 @@ assert_isa_hooked(food5,'Weapon'):-trace_or_throw(assert_isa(food5,'Weapon')).
 
 hook:decl_database_hook(assert(_),isa(I,T)):- doall(assert_isa_hooked_after(I,T)).
 
+assert_isa_hooked_after(F,T):-argsIsaProps(T),!,decl_mpred(F,T).
 assert_isa_hooked_after(_,type):-!.
 assert_isa_hooked_after(_,formattype):-!.
-assert_isa_hooked_after(_,T):-argsIsaProps(T),!.
 assert_isa_hooked_after(I,T):- is_creatable_type(T),!,assert_isa_hooked_creation(I,T).
 assert_isa_hooked_after(I,T):- not(completeExtentAsserted(T)),impliedSubClass(T,ST),completeExtentAsserted(ST),assert_isa(I,ST).
 %assert_isa_hooked_after(I,T):- assert_isa_hooked_creation(I,T).
@@ -132,6 +150,8 @@ completeExtentAsserted(Ext):- arg(_,vv(type,dir,formattype,string),Ext).
 completeExtentAsserted(F):- is_creatable_type(F).
 completeExtentAsserted(F):- argsIsaProps(F).
 completeExtentAsserted(F):- is_asserted(isa(F,completeExtentAsserted)).
+
+
 
 
 % one of 4 special types
@@ -153,17 +173,36 @@ isa_backchaing_v_nv(_,var):-!.
 isa_backchaing_v_nv(A,T):-no_repeats([A],(transitive_subclass_or_same(AT,T),isa_asserted(A,AT))).
 
 isa_backchaing_0(A,T):-  var(A),nonvar(T),!,isa_backchaing_v_nv(A,T).
-isa_backchaing_0(A,T):-  var(T),!,no_repeats([T],(isa_asserted(A,AT),transitive_subclass_or_same(AT,T))).
-isa_backchaing_0(A,T):-  nonvar(A),isa_backchaing_nv_nv(A,T).
-isa_backchaing_0(A,T):-  transitive_subclass_or_same(AT,T),isa_asserted(A,AT).
+isa_backchaing_0(A,T):-  var(A),!,var(T),!,isa_asserted(A,AT),transitive_subclass_or_same(AT,T).
+isa_backchaing_0(A,T):-  nonvar(T),isa_backchaing_nv_nv(A,T),!.
+isa_backchaing_0(A,T):-  build_isa_inst_list_cache(A,_,T,CALL),CALL.
+
+% ==========================
+% taxonomicPair(isa,subclass)
+% ==========================
+
+% A->TL = (isa_asserted_0(A,AT),transitive_subclass_or_same(AT,TL))
+build_isa_inst_list_cache(A,Isa,B,(!,dbase_t(cache_I_I,Isa,A,B))):- Isa=isa, nonvar(A),once(dbase_t(cache_I_I,Isa,A,_)),!.
+build_isa_inst_list_cache(A,Isa,B,(!,dbase_t(cache_I_I,Isa,A,B))):- Isa=isa, nonvar(A),
+      forall(((isa_asserted_0(A,AT),transitive_subclass_or_same(AT,T))),
+      assertz_if_new(dbase_t(cache_I_I,Isa,A,T))).
+      
+
+% A->TL = transitive_subclass(T,TL)..
+build_genls_inst_list_cache(A,Subclass,B,dbase_t(cache_I_I,Subclass,A,B)):- Subclass=subclass, nonvar(A),once(dbase_t(cache_I_I,Subclass,A,_)),!.
+build_genls_inst_list_cache(A,Subclass,B,dbase_t(cache_I_I,Subclass,A,B)):- Subclass=subclass, nonvar(A),forall(transitive_subclass(A,T),assertz_if_new(dbase_t(cache_I_I,Subclass,A,T))).
+
+
 
 
 isa_backchaing_nv_nv(A,argsIsaInList):-!,compound(A).
+isa_backchaing_nv_nv(I,T):-compound(I),functor(I,F,_),isa_backchaing(F,T).
 
 not_ft(T):-transitive_subclass_or_same(T,spatialthing).
 
 :-export(isa_asserted/2).
-isa_asserted(A,T):- stack_check(1000),once_if_ground(fact_loop_checked(isa(A,T),isa_asserted_0(A,T)),_).
+isa_asserted(A,T):- nonvar(A),build_isa_inst_list_cache(A,_,T,CALL),CALL.
+isa_asserted(A,T):- stack_check,once_if_ground(fact_loop_checked(isa(A,T),isa_asserted_0(A,T)),_).
 
 isa_asserted_0(I,T):-clause(dbase_t(T,I),true).
 isa_asserted_0(I,T):-clause(isa(I,T),true).
@@ -204,8 +243,6 @@ isa_atom_call_lc(_,G):- predicate_property(G,number_of_clauses(_)),!,clause(G,B)
 isa_atom_call_lc(_,G):- predicate_property(G,number_of_rules(R)),R>0,!,G.
 
 cached_isa(I,T):-hotrace(isa_backchaing(I,T)).
-
-
 
 
 % ============================================
@@ -261,7 +298,7 @@ transitive_subclass(A,T):- bad_idea,!,
       into_single_class(T,TT),
       fact_loop_checked(subclass(A,T),transitive_subclass_l_r(AA,TT)).
 
-transitive_subclass(A,T):- !,stack_check(1000),
+transitive_subclass(A,T):- !,stack_check,
       fact_loop_checked(subclass(A,T),transitive_subclass_l_r(A,T)).
 
 transitive_subclass_l_r(FT,Sub):-dbase_t(subclass,FT,Sub).
@@ -279,6 +316,7 @@ transitive_subclass_r_l(FT,Sub):-dbase_t(subclass,C,Sub),dbase_t(subclass,B,C),d
       
 transitive_subclass_or_same(A,A).
 % transitive_subclass_or_same(A,AA):-compound(A),into_single_class(A,AA).
+transitive_subclass_or_same(A,B):-nonvar(A),!,build_genls_inst_list_cache(A,subclass,B,Call),Call.
 transitive_subclass_or_same(A,B):-transitive_subclass(A,B).
 
 :- export((transitive_bp/3)).
@@ -297,6 +335,78 @@ transitive_P_r_l(_P,_FT,Sub):-var(Sub),!,fail.
 transitive_P_r_l(P,FT,Sub):-dbase_t(P,C,Sub),dbase_t(P,B,C),dbase_t(P,A,B),dbase_t(P,FT,A).
 
 
+
+
+:-dynamic_multifile_exported(type_isa/2).
+
+type_isa(Type,createableType):-arg(_,vv(agent,item,obj,region),Type),!.
+type_isa(ArgIsa,mpredtype):-argsIsaProps(ArgIsa),!.
+type_isa(Type,valuetype):-arg(_,vv(type,formattype,itemtype,valuetype,ppred,fpred),Type),!.
+type_isa(string,formattype):-!.
+type_isa(Type,valuetype):-arg(_,vv(concept,channel,place,dir,region),Type),!.
+type_isa(Type,formattype):-formattype(Type),!. % text
+%type_isa(_,valuetype).
+
+:-dynamic_multifile_exported(is_known_trew/1).
+:-dynamic_multifile_exported(is_known_true/1).
+
+is_known_true(C):-has_free_args(C),!,trace_or_throw(has_free_args(is_known_trew,C)).
+is_known_true(F):-is_known_false0(F),!,fail.
+is_known_true(isa(X,spatialthing)):- is_asserted(isa(X,_)),is_known_false0(isa(X,type)),is_known_false0(isa(X,formattype)),is_known_false0(isa(X,mpred)).
+
+is_known_trew(isa(container,completeExtentAsserted)).
+% is_known_trew(isa(formattype,metaclass)).
+is_known_trew(isa(completeExtentAsserted,completeExtentAsserted)).
+is_known_trew(isa(type,completeExtentAsserted)).
+is_known_trew(isa(gossup,channel)).
+is_known_trew(subclass(region,channel)).
+is_known_trew(subclass(agent,channel)).
+is_known_trew(isa(agent,createableType)).
+is_known_trew(isa(region,createableType)).
+is_known_trew(isa(_,id)).
+is_known_trew(isa(apath(_,_),areaPath)).
+is_known_trew(isa(apath(_,_),apath)).
+is_known_trew(isa(_,term)).
+is_known_trew(isa(singleValued, completeExtentAsserted)).
+is_known_trew(isa(createableType,completeExtentAsserted)).
+is_known_trew(isa(formattype,completeExtentAsserted)).
+is_known_trew(isa(int,nonCreatableType)).
+is_known_trew(isa(type,type)).
+is_known_trew(isa(singleValued, type)).
+is_known_trew(isa(completeExtentAsserted, type)).
+is_known_trew(subclass(completeExtentAsserted, extentDecidable)).
+is_known_trew(subclass(singleValued, extentDecidable)).
+is_known_trew(subclass('MaleAnimal',agent)).
+is_known_trew(subclass(X,X)).
+is_known_trew(subclass(formattype,type)).
+is_known_trew(isa(type,nonCreatableType)).
+is_known_trew(isa(item,createableType)).
+is_known_trew(subclass(item,createableType)).
+is_known_trew(isa(formattype,nonCreatableType)).
+is_known_trew(subclass(formattype,nonCreatableType)).
+is_known_trew(isa('TemporallyExistingThing', 'createableType')).
+is_known_trew(isa(term,nonCreatableType)).
+is_known_trew(subclass(argsIsaInList,relation)).
+is_known_trew(subclass(fpred,relation)).
+is_known_trew(subclass(F,mpred)):-argsIsaProps(F).
+is_known_trew(subclass(F,fpred)):-argsIsaProps(F).
+is_known_trew(subclass(F,relation)):-argsIsaProps(F).
+is_known_trew(disjointWith(A,B)):-disjointWithT(A,B).
+
+
+:-dynamic_multifile_exported(is_known_false/1).
+% :-dynamic(is_known_false/1).
+is_known_false(C):-has_free_args(C),!,fail.
+is_known_false(F):-is_known_trew(F),!,fail.
+
+:-dynamic_multifile_exported(is_known_false0/1).
+is_known_false0(isa(regiontype,formattype)).
+is_known_false0(isa(formattype,formattype)).
+is_known_false0(isa(X,spatialthing)):- type(X);formattype(X);mpred(X).
+is_known_false0(isa(completeExtentAsserted,createableType)).
+is_known_false0(isa(X,Y)):-!,not_mud_isa(X,Y).
+is_known_false0(subclass(Type,_)):-arg(_,vv(type,relation,spatialthing,formattype),Type).
+
 :-dynamic_multifile_exported(not_mud_isa/2).
 not_mud_isa(agent,formattype).
 not_mud_isa(item,formattype).
@@ -312,69 +422,10 @@ not_mud_isa(createableType,'TemporallyExistingThing').
 not_mud_isa(X,type):-never_type(X).
 
 
-:-dynamic_multifile_exported(type_isa/2).
-
-type_isa(Type,createableType):-arg(_,vv(agent,item,obj,region),Type),!.
-type_isa(ArgIsa,mpredtype):-argsIsaProps(ArgIsa),!.
-type_isa(Type,valuetype):-arg(_,vv(type,formattype,itemtype,valuetype,ppred,fpred),Type),!.
-type_isa(string,formattype):-!.
-type_isa(Type,valuetype):-arg(_,vv(concept,channel,place,dir,region),Type),!.
-type_isa(Type,formattype):-formattype(Type),!. % text
-%type_isa(_,valuetype).
-
-:-dynamic_multifile_exported(is_known_true/1).
-
-is_known_true(C):-has_free_args(C),!,fail.
-is_known_true(isa(container,completeExtentAsserted)).
-is_known_true(isa(completeExtentAsserted,completeExtentAsserted)).
-is_known_true(isa(type,completeExtentAsserted)).
-is_known_true(isa(gossup,channel)).
-is_known_true(subclass(region,channel)).
-is_known_true(subclass(agent,channel)).
-is_known_true(isa(agent,createableType)).
-is_known_true(isa(region,createableType)).
-is_known_true(isa(_,id)).
-is_known_true(isa(_,term)).
-is_known_true(isa(singleValued, completeExtentAsserted)).
-is_known_true(isa(createableType,completeExtentAsserted)).
-is_known_true(isa(formattype,completeExtentAsserted)).
-is_known_true(isa(int,nonCreatableType)).
-is_known_true(isa(type,type)).
-is_known_true(isa(singleValued, type)).
-is_known_true(isa(completeExtentAsserted, type)).
-is_known_true(subclass(completeExtentAsserted, extentDecidable)).
-is_known_true(subclass(singleValued, extentDecidable)).
-is_known_true(subclass('MaleAnimal',agent)).
-is_known_true(subclass(X,X)).
-is_known_true(subclass(formattype,type)).
-is_known_true(isa(type,nonCreatableType)).
-is_known_true(isa(item,createableType)).
-is_known_true(subclass(item,createableType)).
-is_known_true(isa(formattype,nonCreatableType)).
-is_known_true(subclass(formattype,nonCreatableType)).
-is_known_true(isa('TemporallyExistingThing', 'createableType')).
-is_known_true(isa(term,nonCreatableType)).
-is_known_true(subclass(argsIsaInList,relation)).
-is_known_true(subclass(fpred,relation)).
-is_known_true(subclass(F,mpred)):-argsIsaProps(F).
-is_known_true(subclass(F,fpred)):-argsIsaProps(F).
-is_known_true(subclass(F,relation)):-argsIsaProps(F).
-is_known_true(disjointWith(A,B)):-disjointWithT(A,B).
-
-
 :-dynamic_multifile_exported(disjointWith/2).
 
 :-export(has_free_args/1).
 has_free_args(C):- not(ground(C)), compound(C),not(not(arg(_,C,var))),!.
-
-:-dynamic_multifile_exported(is_known_false/1).
-% :-dynamic(is_known_false/1).
-is_known_false(C):-has_free_args(C),!,fail.
-is_known_false(isa(completeExtentAsserted,createableType)).
-is_known_false(isa(X,Y)):-not_mud_isa(X,Y).
-is_known_false(Fact):-is_known_true(Fact),!,fail.
-is_known_false(subclass(spatialthing,'MaleAnimal')).
-is_known_false(subclass(Type,_)):-arg(_,vv(type,relation,spatialthing,formattype),Type).
 
 % is_known_false(subclass(A,B)):-disjointWith(A,B).
 

@@ -17,259 +17,13 @@
 */
 
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% This module implements the dif_arg/2 constraint. It constraints two terms
-% to be not identical.
-%
-%	Author: 	Tom Schrijvers, K.U.Leuven
-% 	E-mail: 	Tom.Schrijvers@cs.kuleuven.ac.be
-%	Copyright:	2003-2004, K.U.Leuven
-%
-% Update 7/3/2004:
-%   Now uses unifiable/3. It enables dif_arg/2 to work with infinite terms.
-% Update 11/3/2004:
-%   Cleaned up code. Now uses just one or node for every call to dif_arg/2.
-% Update Jul 8, 2005 (JW)
-%   Fixed spelling unifyable --> unifiable
-% Update Sep 4, 2007 (JW)
-%   Added support for current_prolog_flag(occurs_check, error) case
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 :- use_module(library(lists)).
-:- set_prolog_flag(generate_debug_info, false).
-
 
 
 % mdif(A,B):- tlbugger:attributedVars,!,dif(A,B).
 mdif(_,_).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-dif_arg(X,Y) :-
-	dif_c_c(X,Y,_).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% types of attributes?
-% 	vardif: X is a variable
-%%	node(Parent,Children,Variables,Counter)
-
-dif_c_c(X,Y,OrNode) :-
-	(	( current_prolog_flag(occurs_check, error) ->
-			catch(unifiable(X,Y,Unifier), error(occurs_check(_,_),_), fail)
-		  ;
-			unifiable(X,Y,Unifier)
-		) ->
-		( Unifier == [] ->
-			or_one_fail(OrNode)
-		;
-			dif_c_c_l(Unifier,OrNode)
-		)
-	;
-		or_succeed(OrNode)
-	).
-
-
-dif_c_c_l(Unifier,OrNode) :-
-	length(Unifier,N),
-	extend_ornode(OrNode,N,List,Tail),
-	dif_c_c_l_aux(Unifier,OrNode,List,Tail).
-
-extend_ornode(OrNode,N,List,Vars) :-
-	( get_attr(OrNode,dif_arg,Attr) ->
-		Attr = node(M,Vars),
-		O is N + M - 1
-	;
-		O = N,
-		Vars = []
-	),
-	put_attr(OrNode,dif_arg,node(O,List)).
-
-dif_c_c_l_aux([],_,List,List).
-dif_c_c_l_aux([X=Y|Unifier],OrNode,List,Tail) :-
-	List = [X=Y|Rest],
-	add_ornode(X,Y,OrNode),
-	dif_c_c_l_aux(Unifier,OrNode,Rest,Tail).
-
-add_ornode(X,Y,OrNode) :-
-	add_ornode_var1(X,Y,OrNode),
-	( var(Y) ->
-		add_ornode_var2(X,Y,OrNode)
-	;
-		true
-	).
-
-add_ornode_var1(X,Y,OrNode) :-
-	( get_attr(X,dif_arg,Attr) ->
-		Attr = vardif(V1,V2),
-		put_attr(X,dif_arg,vardif([OrNode-Y|V1],V2))
-	;
-		put_attr(X,dif_arg,vardif([OrNode-Y],[]))
-	).
-
-add_ornode_var2(X,Y,OrNode) :-
-	( get_attr(Y,dif_arg,Attr) ->
-		Attr = vardif(V1,V2),
-		put_attr(Y,dif_arg,vardif(V1,[OrNode-X|V2]))
-	;
-		put_attr(Y,dif_arg,vardif([],[OrNode-X]))
-	).
-
-vardif:attr_unify_hook(vardif(V1,V2),Other) :-
-	( var(Other) ->
-		reverse_lookups(V1,Other,OrNodes1,NV1),
-		or_one_fails(OrNodes1),
-		get_attr(Other,dif_arg,OAttr),
-		OAttr = vardif(OV1,OV2),
-		reverse_lookups(OV1,Other,OrNodes2,NOV1),
-		or_one_fails(OrNodes2),
-		remove_obsolete(V2,Other,NV2),
-		remove_obsolete(OV2,Other,NOV2),
-		append(NV1,NOV1,CV1),
-		append(NV2,NOV2,CV2),
-		( CV1 == [], CV2 == [] ->
-			del_attr(Other,dif_arg)
-		;
-			put_attr(Other,dif_arg,vardif(CV1,CV2))
-		)
-	;
-		verify_compounds(V1,Other),
-		verify_compounds(V2,Other)
-	).
-
-remove_obsolete([], _, []).
-remove_obsolete([N-Y|T], X, L) :-
-        (   Y==X ->
-            remove_obsolete(T, X, L)
-        ;   L=[N-Y|RT],
-            remove_obsolete(T, X, RT)
-        ).
-
-reverse_lookups([],_,[],[]).
-reverse_lookups([N-X|NXs],Value,Nodes,Rest) :-
-	( X == Value ->
-		Nodes = [N|RNodes],
-		Rest = RRest
-	;
-		Nodes = RNodes,
-		Rest = [N-X|RRest]
-	),
-	reverse_lookups(NXs,Value,RNodes,RRest).
-
-verify_compounds([],_).
-verify_compounds([Node-Y|Rest],X) :-
-	( var(Y) ->
-		true
-	;
-		dif_c_c(X,Y,Node)
-	),
-	verify_compounds(Rest,X).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-or_succeed(OrNode) :-
-	( attvar(OrNode) ->
-		get_attr(OrNode,dif_arg,Attr),
-		Attr = node(_Counter,Pairs),
-		del_attr(OrNode,dif_arg),
-		OrNode = (-),
-		del_or_dif(Pairs)
-	;
-		true
-	).
-
-or_one_fails([]).
-or_one_fails([N|Ns]) :-
-	or_one_fail(N),
-	or_one_fails(Ns).
-
-or_one_fail(OrNode) :-
-	( attvar(OrNode) ->
-		get_attr(OrNode,dif_arg,Attr),
-		Attr = node(Counter,Pairs),
-		NCounter is Counter - 1,
-		( NCounter == 0 ->
-			fail
-		;
-			put_attr(OrNode,dif_arg,node(NCounter,Pairs))
-		)
-	;
-		fail
-	).
-
-del_or_dif([]).
-del_or_dif([X=Y|Xs]) :-
-	cleanup_dead_nodes(X),
-	cleanup_dead_nodes(Y),
-	del_or_dif(Xs).
-
-cleanup_dead_nodes(X) :-
- 	( attvar(X) ->
- 		get_attr(X,dif_arg,Attr),
-		Attr = vardif(V1,V2),
-		filter_dead_ors(V1,NV1),
-		filter_dead_ors(V2,NV2),
-		( NV1 == [], NV2 == [] ->
-			del_attr(X,dif_arg)
-		;
-			put_attr(X,dif_arg,vardif(NV1,NV2))
-		)
-	;
-		true
-	).
-
-filter_dead_ors([],[]).
-filter_dead_ors([Or-Y|Rest],List) :-
-	( var(Or) ->
-		List = [Or-Y|NRest]
-	;
-		List = NRest
-	),
-	filter_dead_ors(Rest,NRest).
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-   The attribute of a variable X is vardif/2. The first argument is a
-   list of pairs. The first component of each pair is an OrNode. The
-   attribute of each OrNode is node/2. The second argument of node/2
-   is a list of equations A = B. If the LHS of the first equation is
-   X, then return a goal, otherwise don't because someone else will.
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-vardiff:attribute_goals(Var) -->
-	(   { get_attr(Var, dif_arg, vardif(Ors,_)) } ->
-	    or_nodes(Ors, Var)
-	;   or_node(Var)
-	).
-
-or_node(O) -->
-        (   { get_attr(O, dif_arg, node(_, Pairs)) } ->
-            { eqs_lefts_rights(Pairs, As, Bs) },
-            mydif(As, Bs),
-            { del_attr(O, dif_arg) }
-        ;   []
-        ).
-
-or_nodes([], _)       --> [].
-or_nodes([O-_|Os], X) -->
-	(   { get_attr(O, dif_arg, node(_, Eqs)) } ->
-            (   { Eqs = [LHS=_|_], LHS == X } ->
-                { eqs_lefts_rights(Eqs, As, Bs) },
-                mydif(As, Bs),
-                { del_attr(O, dif_arg) }
-            ;   []
-            )
-        ;   [] % or-node already removed
-        ),
-	or_nodes(Os, X).
-
-mydif([X], [Y]) --> !, [dif_arg(X, Y)].
-mydif(Xs0, Ys0) --> [dif_arg(X,Y)],
-        { reverse(Xs0, Xs), reverse(Ys0, Ys), % follow original order
-          X =.. [f|Xs], Y =.. [f|Ys] }.
-
-eqs_lefts_rights([], [], []).
-eqs_lefts_rights([A=B|ABs], [A|As], [B|Bs]) :-
-        eqs_lefts_rights(ABs, As, Bs).
-
-
+:-export((samef/2,same/2)).
 same(X,Y):- samef(X,Y),!.
 same(X,Y):- compound(X),arg(1,X,Y),!.
 same(X,Y):- compound(Y),arg(1,Y,X),!.
@@ -308,7 +62,7 @@ promp_yn(Fmt,A):- format(Fmt,A),get_single_char(C),C=121.
 :- meta_predicate
 	when_met(+, 0),
 	suspend_list(+, 0),
-	trigger(+, 0),
+	varcall:trigger(+, 0),
 	trigger_disj(+, 0),
 	trigger_conj(+, +, 0).
 
@@ -370,19 +124,19 @@ trigger_first(true, Goal) :- !,
 trigger_first(nonvar(X), Goal) :- !,
 	'$suspend'(X, when_met, trigger_nonvar(X, Goal)).
 trigger_first(Cond, Goal) :- 
-	trigger(Cond, Goal).
+	varcall:trigger(Cond, Goal).
 
-trigger(nonvar(X),Goal) :- 
+varcall:trigger(nonvar(X),Goal) :- 
 	trigger_nonvar(X,Goal).
-trigger(ground(X),Goal) :- 
+varcall:trigger(ground(X),Goal) :- 
 	trigger_ground(X,Goal).
-trigger(?=(X,Y),Goal) :- 
+varcall:trigger(?=(X,Y),Goal) :- 
 	trigger_determined(X,Y,Goal).
-trigger(pred(X,Pred),Goal) :- 
+varcall:trigger(pred(X,Pred),Goal) :- 
 	trigger_pred(X,Pred,Goal).
-trigger((G1,G2),Goal) :- 
+varcall:trigger((G1,G2),Goal) :- 
 	trigger_conj(G1,G2,Goal).
-trigger(or(GL),Goal) :- 
+varcall:trigger(or(GL),Goal) :- 
 	trigger_disj(GL, check_disj(_DisjID,GL,Goal)).
 
 trigger_nonvar(X, Goal) :- 
@@ -430,11 +184,11 @@ wake_det(Det) :-
 	).
 
 trigger_conj(G1,G2,Goal) :- 
-	trigger(G1, trigger(G2,Goal)).
+	varcall:trigger(G1, varcall:trigger(G2,Goal)).
 
 trigger_disj([],_).
 trigger_disj([H|T], G) :- 
-	trigger(H, G),
+	varcall:trigger(H, G),
 	trigger_disj(T, G).
 
 
@@ -479,7 +233,7 @@ varcall:attribute_goals(V) -->
 when_goals(det(trigger_determined(X, Y, G))) --> !,
 	(   { disj_goal(G, Disj, DG) }
 	->  disj_or(Disj, DG)
-	;   { G = moo:trigger(C, Goal) }
+	;   { G = varcall:varcall:trigger(C, Goal) }
 	->  [ when_met((?=(X,Y),C), Goal) ]
 	;   [ when_met(?=(X,Y), G) ]
 	).
@@ -495,14 +249,14 @@ when_conj_goals(moo:G) -->
 when_goal(trigger_nonvar(X, G)) -->
 	(   { disj_goal(G, Disj, DG) }
 	->  disj_or(Disj, DG)
-	;   { G = moo:trigger(C, Goal) }
+	;   { G = moo:varcall:trigger(C, Goal) }
 	->  [ when_met((nonvar(X),C), Goal) ]
 	;   [ when_met(nonvar(X),G) ]
 	).
 when_goal(trigger_ground(X, G)) -->
 	(   { disj_goal(G, Disj, DG) }
 	->  disj_or(Disj, DG)
-	;   { G = moo:trigger(C, Goal) }
+	;   { G = moo:varcall:trigger(C, Goal) }
 	->  [ when_met((ground(X),C), Goal) ]
 	;   [ when_met(ground(X),G) ]
 	).
@@ -522,3 +276,67 @@ or_list([H|T], (H;OT)) :-
 	or_list(T, OT).
 
 
+
+
+% :- module(domain, [ domain/2  ]). % Var, ?Domain
+:- use_module(library(ordsets)).
+domain(X, Dom) :-
+      var(Dom), !,
+      get_attr(X, domain, Dom).
+domain(X, List) :-
+      list_to_ord_set(List, Domain),
+      put_attr(Y, domain, Domain),
+      X = Y.
+% An attributed variable with attribute value Domain has been
+% assigned the value Y
+domain:attr_unify_hook(Domain, Y) :-
+   ( get_attr(Y, domain, Dom2)
+   -> ord_intersection(Domain, Dom2, NewDomain),
+   ( NewDomain == []
+   -> fail
+   ; NewDomain = [Value]
+   -> Y = Value
+   ; put_attr(Y, domain, NewDomain)
+   )
+   ; var(Y)
+   -> put_attr( Y, domain, Domain )
+   ; ord_memberchk(Y, Domain)
+).
+% Translate attributes from this module to residual goals
+domain:attribute_goals(X) -->
+      { get_attr(X, domain, List) },
+      [domain(X, List)].
+
+
+
+
+
+isac(X, Dom) :-
+      var(Dom), !,
+      get_attr(X, isac, Dom).
+isac(X, List) :-
+      list_to_ord_set(List, Domain),
+      put_attr(Y, isac, Domain),
+      X = Y.
+% An attributed variable with attribute value Domain has been
+% assigned the value Y
+isac:attr_unify_hook(Domain, Y):-
+   ( get_attr(Y, isac, Dom2)
+   -> ord_union(Domain, Dom2, NewDomain),
+   ( (fail,NewDomain == [])
+   -> fail
+   ; (fail,NewDomain = [Value])
+   -> Y = Value
+   ; put_attr(Y, isac, NewDomain)
+   )
+   ; var(Y)
+   -> put_attr( Y, isac, Domain )
+   ; ( ord_union(Domain, [isLike(Y)], NewDomain),   put_attr(Y, isac, NewDomain))).
+
+
+
+% Translate attributes from this module to residual goals
+isac:attribute_goals(X) -->
+      { get_attr(X, isac, List) },
+      [isac(X, List)].
+  

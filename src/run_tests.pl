@@ -27,11 +27,17 @@ moo:mud_test(test_movedist,
    test_name("must be now be back in engineering"),
    test_true(req(localityOfObject(P,'Area1000'))))).
 
+moo:mud_test(create_gensym_named,
+  with_all_dmsg(((do_player_action('create food999'),
+  foc_current_player(P),
+  must(( req(( possess(P,Item),isa(Item,food))))) .
+
 moo:mud_test(drop_take,
   with_all_dmsg(((do_player_action('create food'),
   do_player_action('drop food'),
   do_player_action('take food'),
   do_player_action('eat food'))))).
+
 
 % Was this our startup file?
 was_runs_tests_pl:-is_startup_file('run_tests.pl').
@@ -80,6 +86,9 @@ defined_local_test:-
 
 defined_local_test:- 
    test_name("Tests our action templates"), doall((get_type_action_templates(Templates),dmsg(get_type_action_templates(Templates)))).
+
+
+:-call_mpred(show_room_grid('Area1000')).
 
 moo:mud_test("local sanity tests", doall(defined_local_test)).
 

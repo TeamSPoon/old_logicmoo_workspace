@@ -230,7 +230,7 @@ no_fallback(subclass,2).
 no_fallback(P,2):-not(mpred_prop(P,singleValued)).
 
 :-export(defaultArgValue/4).
-defaultArgValue(Fact,F,A,OLD):- stack_check(1000), mpred_prop(F,default_sv(A,OLD)),!,dmsg(defaultArgValue(fallback_value(Fact,F,default_sv(A,OLD)))).
+defaultArgValue(Fact,F,A,OLD):- stack_check, mpred_prop(F,default_sv(A,OLD)),!,dmsg(defaultArgValue(fallback_value(Fact,F,default_sv(A,OLD)))).
 defaultArgValue(facing(_,_),_,2,"n"):-!.
 defaultArgValue(change(_,_),_,2,200):-!.
 defaultArgValue(damage(_,_),_,2,500):-!.
@@ -280,7 +280,7 @@ moo:default_inst_props(apath(Region,_Dir),areaPath,[localityOfObject(Region)]).
 
 :-export((add_missing_instance_defaults/1)).
 add_missing_instance_defaults(P):-
-   loop_check(add_missing_instance_defaults_lc(P)).
+   loop_check_local(add_missing_instance_defaults_lc(P),true).
 add_missing_instance_defaults_lc(P):-
    get_inst_default_props(P,_PropListL,Missing),
    once(Missing=[];show_call(padd(P,Missing))).
@@ -308,7 +308,7 @@ get_sv_argnum(F,Args,ArgNum):-once(mpred_prop(F,functionalArg(ArgNum));length(Ar
 
 :-export(rescan_default_props/0).
 
-rescan_default_props:- loop_check(rescan_default_props_lc,true).
+rescan_default_props:- loop_check_local(rescan_default_props_lc,true).
 % rescan_default_props_lc:- dmsg(todo(fix(rescan_default_props,"to not set atloc/2"))),!,
 rescan_default_props_lc:-
    once((forall_setof(get_type_default_props(Type,PropList),
@@ -321,7 +321,7 @@ rescan_default_props_lc:-
           dmsg(rescan_default_props_for(I,Type,missing_from(Missing))),
           padd(I,Missing))))))))))),fail.
 
-rescan_default_props_lc:-ignore(rescan_duplicated_facts).
+rescan_default_props_lc:-ignore(loop_check_local(rescan_duplicated_facts,true)).
 
 
 % :- include(logicmoo(parsing/parser_chat80)). 
