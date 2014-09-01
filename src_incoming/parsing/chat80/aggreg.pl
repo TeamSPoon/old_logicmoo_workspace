@@ -98,10 +98,10 @@ u_total([V:_|R],T) :-
 u_sum(X--U,Y--U,Z--U) :- !,
    Z is X+Y.
 u_sum(X--U,Y--U1,Z--U) :-
-   ratio(U,U1,M,M1), M>M1, !,
+   ratio_db(U,U1,M,M1), M>M1, !,
    Z is X + (Y*M1)/M.
 u_sum(X--U1,Y--U,Z--U) :-
-   ratio(U,U1,M,M1), M>M1, !,
+   ratio_db(U,U1,M,M1), M>M1, !,
    Z is (X*M1)/M + Y.
 
 u_maxs([V:X|Set],List) :-

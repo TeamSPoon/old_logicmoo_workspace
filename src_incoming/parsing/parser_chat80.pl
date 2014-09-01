@@ -131,6 +131,7 @@ chat80 :- with_assertions(tracing80,
 
 
 :- include(logicmoo(parsing/chat80/world0)).     	% data base
+% :- ensure_loaded(logicmoo(parsing/chat80/world0)).     	% data base
 
 /*
 :- include(logicmoo(parsing/chat80/rivers)).

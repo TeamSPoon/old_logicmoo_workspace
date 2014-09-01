@@ -139,19 +139,19 @@ varcall:trigger((G1,G2),Goal) :-
 varcall:trigger(or(GL),Goal) :- 
 	trigger_disj(GL, check_disj(_DisjID,GL,Goal)).
 
-trigger_nonvar(X, Goal) :- 
+varcall:trigger_nonvar(X, Goal) :- 
 	(   nonvar(X)
 	->  call(Goal)
 	;   '$suspend'(X, when_met, trigger_nonvar(X, Goal))
 	).
 
-trigger_pred(X,Pred, Goal) :- 
+varcall:trigger_pred(X,Pred, Goal) :- 
 	(   call(Pred, X)
 	->  call(Goal)
 	;   '$suspend'(X, when_met, trigger_pred(X,Pred, Goal))
 	).
 
-trigger_ground(X, Goal) :- 
+varcall:trigger_ground(X, Goal) :- 
 	term_variables(X, Vs),
 	(   Vs = [H]
 	->  '$suspend'(H, when_met, trigger_ground(H, Goal))
@@ -161,7 +161,7 @@ trigger_ground(X, Goal) :-
 	;   call(Goal)
 	).
 
-trigger_determined(X, Y, Goal) :- 
+varcall:trigger_determined(X, Y, Goal) :- 
 	unifiable(X, Y, Unifier), !,
 	(   Unifier == []
 	->  call(Goal)

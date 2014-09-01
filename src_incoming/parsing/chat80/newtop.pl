@@ -40,14 +40,14 @@ hi(Callback,File):-
      open(FOpen,read, Fd, [alias(FOpen)]),
       see(Fd),
     repeat,
-      ask(Fd,P),
+      ask80(Fd,P),
       control80(Callback,P), !),end(FOpen)).
 
-ask(user,P) :- !,
+ask80(user,P) :- !,
    prompt(_,'Question: '),
    read_sent(P).
 
-ask(F,P) :- read_sent(P), doing(P,0),!.
+ask80(_F,P) :- read_sent(P), doing(P,0),!.
 
 doing([],_) :- !,nl.
 doing([X|L],N0) :-
@@ -86,9 +86,13 @@ end(F) :-
 
 
 :-dynamic_multifile_exported(control80/1).
-control80(U):-control80(report,U).
+control80(U):-with_assertions(thlocal:tracing80,control80(report,U)).
 
 :-dynamic_multifile_exported(control80/2).
+
+control80(Callback,NotList):-not(is_list(NotList)),to_word_list(NotList,List),NotList \=@= List,!,
+   control80(Callback,List).
+
 control80(Callback,[bye,'.']) :- !,
    call(Callback,"Goodbye",'control80',!,call),
    display('Cheerio.'),nl.
@@ -103,14 +107,13 @@ control80(Callback,[do,not,trace,'.']) :-
    call(Callback,retract(thlocal:tracing80),'thlocal:tracing80',false,boolean),
    display('No longer thlocal:tracing80.'), nl, fail.
 
-control80(Callback,U) :-
-   get_prev_run_results(U,BList,BTime),
-   process_run_diff(Callback,U,BList,BTime),!.
+control80(Callback,U) :- ignore(process_run(Callback,U,List,Time)), d2,writeq(List:Time),d2.
+   
 
 :-dynamic_multifile_exported(process_run_diff/4).
-process_run_diff(Callback,U,BList,BTime):-
-   process_run(Callback,U,List,Time),
-   reportDif(U,List,BList,Time,BTime),!.
+process_run_diff(Callback,U,BList,BTime):- process_run(Callback,U,List,Time),
+   ignore((reportDif(U,List,BList,Time,BTime))),!.
+   
 
 get_prev_run_results(U,List,Time):-must_test_801(U,List,Time),!.
 get_prev_run_results(U,List,Time):-must_test_80(U,List,Time),!.
@@ -127,35 +130,42 @@ process_run(Callback,U,List,Time):-
 process_run(Callback,StartParse,U,List,Time):-process_run_real(Callback,StartParse,U,List,Time).
 process_run(Callback,Start,U,[sent=(U),parse=(E),sem=(error),qplan=(error),answers=(failed)],[time(WholeTime)]):-   
          runtime(Stop),WholeTime is Stop-Start,
-         display('Failed after '-WholeTime-' to understand: '+U), nl.
+         display(Callback - 'Failed after '-WholeTime-' to understand: '+ [sent=(U),parse=(E),sem=(error),qplan=(error),answers=(failed)] ), nl.
 
+if_try(Cond,DoAll):-Cond,!,DoAll.
+if_try(_,_):-sleep(1).
 
+dl:-'format'('~n% =========================================================================================================~n',[]).
+d2:-'format'('~n% -------------------------------=====================================================~n',[]).
 :-dynamic_multifile_exported(process_run_real/5).
 process_run_real(Callback,StartParse,U,[sent=(U),parse=(E),sem=(S),qplan=(QP),answers=(Results)],[time(WholeTime)]) :-
+   dl,
+   flag(sentenceTrial,_,0),
    ignore((var(Callback),Callback=report)),
    call(Callback,U,'Sentence'(Callback),0,expr),
    ignore((var(StartParse),runtime(StartParse))),
-   sentence(E,U,[],[],[]),
+   if_try(nonvar(U),sentence(E,U,[],[],[])),
    runtime(StopParse),
    ParseTime is StopParse - StartParse,
-   call(Callback,E,'Parse',ParseTime,tree),
+   call(Callback,E,'Parse',ParseTime,expr),   
    runtime(StartSem),
-   logic(E,S),!,
+   once((if_try(nonvar(E),logic(E,S)))),
    runtime(StopSem),
    SemTime is StopSem - StartSem,
    call(Callback,S,'Semantics',SemTime,expr),
    runtime(StartPlan),
-   qplan(S,S1),
+   once(if_try(nonvar(S),qplan(S,S1))),
    copy_term(S1,QP),
    runtime(StopPlan),
    TimePlan is StopPlan - StartPlan,
-   call(Callback,S1,'Planning',TimePlan,expr),
+   if_try(S\=S1,call(Callback,S1,'Planning',TimePlan,expr)),
    runtime(StartAns),
-   answer80(S1,Results),!,
+   nonvar(S1),once(answer80(S1,Results)), Results\=[],
    runtime(StopAns),
    TimeAns is StopAns - StartAns,
-   call(Callback,Results,'Reply',TimeAns,tree),
-   WholeTime is ParseTime + SemTime + TimePlan + TimeAns.
+   call(Callback,Results,'Reply',TimeAns,expr),
+   WholeTime is ParseTime + SemTime + TimePlan + TimeAns,
+   dl.
 
 
 :-dynamic_multifile_exported(test_quiet/4).
@@ -168,6 +178,7 @@ report(Item,Label,Time,Mode) :- thlocal:tracing80, !,
 report(_,_,_,_).
 
 report_item(none,_).
+report_item(_,Var):-var(Var),!,write('FAILED'),nl.
 report_item(expr,Item) :-
    write_tree(Item), nl.
 report_item(tree,Item) :-

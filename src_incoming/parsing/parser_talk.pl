@@ -5,7 +5,7 @@
 :- op(50,xfx,+).
 :- op(510,xfy,=>).
 :- op(1200,xfx,-->).
-:- op(100,fx,¹).
+:- op(100,fx,'`').
 % exampels 
 must_test_talkpl("bertrand wrote principia").
 must_test_talkpl("is bertrand an author").
@@ -195,7 +195,7 @@ noun_lf(student,  X^student(X) ).
 
 noun_lf(Plur,  X^isa(X,Sing)) :- talk_db(noun1,Sing,Plur).
 
-adj_lf(Sing,  X^adjIsa(X,Sing)) :- adj(Sing,restr).
+adj_lf(Sing,  X^adjIsa(X,Sing)) :- adj_db(Sing,restr).
 
 pn_lf(begriffsschrift ,begriffsschrift).
 pn_lf(bertrand ,bertrand ).
@@ -206,7 +206,7 @@ pn_lf(lunar  ,lunar ).
 pn_lf(principia ,principia ).
 pn_lf(shrdlu  ,shrdlu ).
 pn_lf(terry  ,terry ).
-pn_lf(Name  ,Name ):-name_template(Name,_).
+pn_lf(Name  ,Name ):- name_template_db(Name,_).
 
 
 %           nonfinite, pres+fin, past+fin,  past+part,  pres+part,  LF
@@ -226,7 +226,7 @@ rov_lf(want, wants, wanted, wanted, wanting,  ((X^want(Y,X,Comp))^S) ^(X^Comp) ^
 
 %semantics is partially execution of 
 % NP ^VP ^Y ^NP(X want(Y,X,VP(X)))
-%((X^¹want(Y,X,Comp))^S) ^(X^Comp) ^Y ^S, % form of VP required:
+%((X^ '`'(want(Y,X,Comp)))^S) ^(X^Comp) ^Y ^S, % form of VP required:
 %infinitival).
 
 aux_lf(to ,  infinitival/nonfinite , VP^VP).

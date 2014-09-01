@@ -156,7 +156,7 @@ iz:attr_unify_hook(variz(V1,V2),Other) :-
 		verify_compounds(V2,Other)
 	).
 
-remove_obsolete(X,_,X):- wasiz,!.
+% todo remove_obsolete(X,_,X):- is_wasiz,!.
 remove_obsolete([], _, []).
 remove_obsolete([N-Y|T], X, L) :-
         (   Y==X ->

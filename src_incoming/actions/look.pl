@@ -88,6 +88,8 @@ call_look_proc(Agent,LOC):-
          movedist(Agent,value),
          height_on_obj(Agent,value),
          listof(possess(Agent,value)),
+         inventory(Agent,Percepts),
+         
          success=world:success(Agent,value)
        ]).
 

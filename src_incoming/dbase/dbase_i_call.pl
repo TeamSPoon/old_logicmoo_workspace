@@ -407,8 +407,8 @@ assertion_f([AH,P|LIST]):- is_holds_true(AH),!,assertion_f([P|LIST]).
 assertion_f([AH,P|LIST]):- is_holds_false(AH),!,assertion_f([P|LIST]).
 % todo hook into loaded files!
 assertion_f(_):- not(loaded_external_kbs),!,fail.
-assertion_f([P|LIST]):- tiny_kb:'ASSERTION'(':FALSE-DEF',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
-assertion_f([P|LIST]):- tiny_kb:'ASSERTION'(':FALSE-MON',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
+assertion_f([P|LIST]):- 'TINYKB-ASSERTION'(':FALSE-DEF',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
+assertion_f([P|LIST]):- 'TINYKB-ASSERTION'(':FALSE-MON',_,_UniversalVocabularyMt,_Vars,/*HL*/[P|LIST]).
 
 
 % ================================================================================

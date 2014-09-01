@@ -47,11 +47,12 @@ create_new_object(Agent,[type,NameOfType|DefaultParams]):-!,create_new_type(Agen
 create_new_object(Agent,[NameOrType|Params]):-
    create_meta(NameOrType,NewType,spatialthing,NewName),
    assert_isa(NewName,NewType),
+   add(subclass(NewType,item)),
    padd(NewName,authorWas(create_new_object(Agent,[NameOrType|Params]))),
    padd(Agent,current_pronoun("it",NewName)),   
    getPropInfo(Agent,NewName,Params,2,PropList),!,
    padd(NewName,PropList),
-   ignore((isa(NewName,item),padd(Agent,stowed(NewName)))),
+   must((isa(NewName,item),padd(Agent,stowed(NewName)))),
    add_missing_instance_defaults(NewName).
 
 :-export(create_new_type/2).

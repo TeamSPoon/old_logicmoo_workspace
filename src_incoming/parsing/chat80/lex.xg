@@ -1,95 +1,75 @@
 /* Parts of speech */
 
-noun(Noun,Agmt) -->
-   [W],
-   {noun_form(W,Noun,Agmt)}.
+noText --> [].
+theText1(W1)-->[W1].
+theText1(W1,_CYCPOS)-->[W1]. % compatible_pos_db(CW,CYCPOS),cw_db(W1,CW)
+theText([W1])-->theText1(W1).
+theText([W1,W2])--> {!}, theText1(W1),theText1(W2).
+theText(DCG)--> {nonvar(DCG)}, DCG.
 
-det(det(Det),Number,Def) -->
-   [W],
-   {det(W,Number,Det,Def)}.
-det(generic,_,generic) --> [].
 
-adj(Type,adj(Adj)) -->
-   [Adj],
-   {adj(Adj,Type)}.
+optText1(_,_)--> noText.
+optText1(W,POS)--> theText1(W,POS).
 
-prep(prep(Prep)) -->
-   [Prep],
-   {prep(Prep)}.
+optText(Text) --> noText.
+optText(Text) --> theText(Text).
 
-rel_adj(adj(Adj)) -->
-   [RAdj],
-   {rel_adj(RAdj,Adj)}.
+textOpt(Text) --> theText(Text).
+textOpt(Text) --> noText.
 
-sup_adj(adj(Adj)) -->
-   [SAdj],
-   {sup_adj(SAdj,Adj)}.
+noun(Noun,Agmt) --> theText1(W,'Noun'), {no_repeats(noun_form_db(W,Noun,Agmt))}.
 
-comp_adv(less) --> [less].
-comp_adv(more) --> [more].
+det(det(Det),Number,Def) --> theText1(W,'Determiner'), {no_repeats(det_db(W,Number,Det,Def))}.
+det(generic,_,generic) --> noText.
 
-sup_adv(least) --> [least].
-sup_adv(most) --> [most].
+adj(Type,adj(Adj)) --> theText1(Adj,'Adjective'), {no_repeats(adj_db(Adj,Type))}.
 
-rel_pron(Case) -->
-   [W],
-   {rel_pron(W,Case)}.
+prep(prep(Prep)) --> theText1(Prep,'Proposition'), {no_repeats(prep_db(Prep))}.
 
-verb_form(Verb,Tense,Agmt,Role) -->
-   [W],
-   {verb_form(W,Verb,Tense,Agmt)}.
+rel_adj(adj(Adj)) --> theText1(RAdj,'Adjective'), {no_repeats(rel_adj_db(RAdj,Adj))}.
 
-name(Name) -->
-   opt_the,
-   [Name],
-   {name(Name)}.
+sup_adj(adj(Adj)) --> theText1(SAdj,'Adjective'), {no_repeats(sup_adj_db(SAdj,Adj))}.
 
-int_art(X,plu,quant(same,wh(X))) --> [how,many].
-int_art(X,Agmt,DX) -->
-   [Art],
-   {int_art(Art,X,Agmt,DX)}.
 
-int_pron(Case) -->
-   [Pron],
-   {int_pron(Pron,Case)}.
+%comp_adv(less) --> [less].
+%comp_adv(more) --> [more].
+comp_adv(W) --> theText1(W,'Adverb'),{no_repeats(comp_adv_db(W))}.
 
-adverb(adv(Adv)) -->
-   [Adv],
-   {adverb(Adv)}.
+%sup_adv(least) --> [least].
+%sup_adv(most) --> [most].
+sup_adv(W) --> theText1(W,'Adverb'),{no_repeats(sup_adv_db(W))}.
 
-poss_pron(pronoun(Gender),Person+Number) -->
-   [W],
-   {poss_pron(W,Gender,Person,Number)}.
+rel_pron(Case) --> theText1(W), {no_repeats(rel_pron_db(W,Case))}.
 
-pers_pron(pronoun(Gender),Person+Number,Case) -->
-   [W],
-   {pers_pron(W,Gender,Person,Number,Case)}.
+verb_form(Verb,Tense,Agmt,Role) --> theText1(W), {no_repeats(verb_form_db(W,Verb,Tense,Agmt))}.
 
-quantifier_pron(Det,Noun) -->
-   [W],
-   {quantifier_pron(W,Det,Noun)}.
+name(Name) --> opt_the, theText1(Name), {no_repeats(name_db(Name))}.
 
-context_pron(prep(In),Place) --> [Where] , {contextWH(In,Place,Where)}.
-context_pron(prep(at),time) --> [when].
+% covered next int_art (X,plu,quant(same,wh(X))) --> [how,many].
+int_art(X,plu,quant(same,wh(X))) --> theText(HowMany),{how_many_db(HowMany)}.
+int_art(X,Agmt,DX) --> theText1(Art,'Determiner'), {no_repeats(int_art_db(Art,X,Agmt,DX))}.
 
-number(nb(I),Number) -->
-   [W],
-   {number(W,I,Number)}.
+int_pron(Case) --> theText1(Pron,'Pronoun'), {no_repeats(int_pron_db(Pron,Case))}.
 
-terminator(Type) -->
-   [Term],
-   {terminator(Term,Type)}.
+adverb(adv(Adv)) --> theText1(Adv,'Adverb'), {no_repeats(adverb_db(Adv))}.
 
-opt_the --> [].
-opt_the --> [the].
+poss_pron(pronoun(Gender),Person+Number) --> theText1(W,'Pronoun'), {no_repeats(poss_pron_db(W,Gender,Person,Number))}.
 
-conj(_,list,list) --> [','].
-conj(Conj,list,end) -->
-   [Conj],
-   {conj(Conj)}.
+pers_pron(pronoun(Gender),Person+Number,Case) --> theText1(W,'Pronoun'), {pers_pron_db(W,Gender,Person,Number,Case)}.
 
-loc_pred(P) -->
-   [W],
-   {loc_pred(W,P)}.
+quantifier_pron(Det,Noun) --> theText1(W,'Pronoun'),{no_repeats(quantifier_pron_db(W,Det,Noun))}.
+
+context_pron(prep(In),Place) --> theText1(Where,'Pronoun') , {no_repeats(context_pron_db(In,Place,Where))}.
+
+number(nb(I),Number) --> theText1(W,'Number-SP'), {no_repeats(number_db(W,I,Number))}.
+
+terminator(Type) --> theText1(Term,'Symbol-SP'), {no_repeats(terminator_db(Term,Type))}.
+
+opt_the --> optText1(the,'Determiner').
+
+conj_list(_,list,list) --> theText1(',','Symbol-SP').
+conj_list(Conj,list,end) --> theText1(Conj,'Conjunction'), {no_repeats(conj_db(Conj))}.
+
+loc_pred_prep(P,OFPREP) --> theText1(W), {no_repeats(loc_pred_prep_db(W,P,OFPREP))}.
 
 

@@ -143,6 +143,8 @@ virtualrule(X) :-
       new_pred(P),
       asserta((P :- virtual(Y,Hx,Hy))) ).
 
+expandrhs(X,S0,S,H0,H,Y) :- var(X),!,
+   tag(X,S0,S,H0,H,Y).
 expandrhs((X1,X2),S0,S,H0,H,Y) :- !,
    expandrhs(X1,S0,S1,H0,H1,Y1),
    expandrhs(X2,S1,S,H1,H,Y2),
@@ -165,6 +167,9 @@ expandlist([],S,S,H,H,true).
 expandlist([X],S0,S,H0,H,terminal(X,S0,S,H0,H) ) :- !.
 expandlist([X|L],S0,S,H0,H,(terminal(X,S0,S1,H0,H1),Y)) :-
    expandlist(L,S1,S,H1,H,Y).
+
+tag(P,A1,A2,A3,A4,QQ) :- var(P),!,
+ QQ = phraseXG(P,A1,A2,A3,A4).
 
 tag(P,A1,A2,A3,A4,Q) :-
    P=..[F|Args0],

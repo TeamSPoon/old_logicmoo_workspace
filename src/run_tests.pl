@@ -30,7 +30,7 @@ moo:mud_test(test_movedist,
 moo:mud_test(create_gensym_named,
   with_all_dmsg(((do_player_action('create food999'),
   foc_current_player(P),
-  must(( req(( possess(P,Item),isa(Item,food))))) .
+  must(( req(( possess(P,Item),isa(Item,food))))))))) .
 
 moo:mud_test(drop_take,
   with_all_dmsg(((do_player_action('create food'),

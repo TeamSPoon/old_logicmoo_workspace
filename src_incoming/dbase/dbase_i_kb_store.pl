@@ -362,6 +362,7 @@ asserted_mpred_clause(C):- (functor(C,dbase_t,_);functor(C,holds_t,_)),!,trace_o
 asserted_mpred_clause(C):-was_asserted_gaf(C).
 asserted_mpred_clause(C):-dbase_t(C).
 asserted_mpred_clause(C):-clause_asserted(C).
+asserted_mpred_clause(C):-hook:fact_always_true(C).
 asserted_mpred_clause(H):-not(ground(H)),predicate_property(H,number_of_clauses(_)),clause(H,true).
 % asserted_mpred_clause(C):- asserted_mpred_clause_hardwork(C).
 
@@ -546,9 +547,9 @@ rescan_duplicated_facts(M,H):-findall(H,(clause_safe(M:H,B),B==true),CL1), once(
 rescan_duplicated_facts(M,H,BB):-notrace(doall((gather_fact_heads(M,H),BB=true,once((findall(C,(clause_safe(H,B),B=@=BB,reduce_clause((H:-B),C)),CL1),
                                                                      list_to_set(CL1,CL2),once(reduce_fact_heads(M,H,CL1,CL2))))))).
 rerun_database_hooks:-!.
-rerun_database_hooks:-call_timed(doall((gather_fact_heads(_M,H),forall(is_asserted(H),run_database_hooks(assert(z),H))))),fail.
-rerun_database_hooks:-call_timed(doall((is_asserted(subclass(I,C)),run_database_hooks(assert(z),subclass(I,C))))),fail.
-rerun_database_hooks:-call_timed(doall((isa_asserted(I,C),run_database_hooks(assert(z),isa(I,C))))),fail.
+rerun_database_hooks:-timed_call(doall((gather_fact_heads(_M,H),forall(is_asserted(H),run_database_hooks(assert(z),H))))),fail.
+rerun_database_hooks:-timed_call(doall((is_asserted(subclass(I,C)),run_database_hooks(assert(z),subclass(I,C))))),fail.
+rerun_database_hooks:-timed_call(doall((isa_asserted(I,C),run_database_hooks(assert(z),isa(I,C))))),fail.
 
 reduce_fact_heads(_M,_H,CL1,CL1):-!. % no change
 reduce_fact_heads(M,H,CL1,CL2):- 

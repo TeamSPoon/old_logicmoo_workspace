@@ -183,8 +183,8 @@ locaton_s(item_template(RealObj,D1,D2,0),Place):-
 
 
 :-setTemplate item_template(candle, [color(blue),size(small)],[shape(triangular),material(wax),texture(sticky)]).
-:-setTemplate item_template(red_apple, [color(red),size(small)],[shape(round),is_a(fruit),texture(smooth)]).
-:-setTemplate item_template(green_apple, [color([green,pastel]),size(small)],[shape(round),is_a(fruit),texture(smooth)]).
+:-setTemplate item_template(red_apple, [color(red),size(small)],[shape(round),isa(fruit),texture(smooth)]).
+:-setTemplate item_template(green_apple, [color([green,pastel]),size(small)],[shape(round),isa(fruit),texture(smooth)]).
 :-setTemplate item_template(table, [color([blue,white]),size(large)],[shape(oval),material(wood),texture([bumpy,irregular]),weight(50)]).
 :-setTemplate item_template(pillow, [color(white),size(medium)],[shape(rectangular),material([cotton,flannel]),texture([fluffy,soft])]).
 :-setTemplate item_template(blanket, [color([green,dark]),size([large,bulky])],[shape(rectangular),material(rayon),texture([plush,soft])]).                                                              
@@ -196,8 +196,8 @@ locaton_s(item_template(RealObj,D1,D2,0),Place):-
 :-setTemplate item_template(envelope, [color(white),size(small)],[shape(rectangular),material(paper),texture(smooth)]).
 :-setTemplate item_template(desk, [color([brown,shiney]),size(large)],[shape([cubular,rectangular]),texture([smooth,ridged]),weight(175)]).
 :-setTemplate item_template(washing_machine, [color(white),size(large)],[shape([cubular,square]),material(metal),texture(smooth),weight(125)]).
-:-setTemplate item_template(broccoli, [color(green),size(small)],[shape(like(tree)),is_a(vegetable),texture([porous,bumpy])]).                                                                    
-:-setTemplate item_template(crackers, [color(tan),is_a(bread)],[shape([circular,flat]),size(small),texture([dry,coarse])]).
+:-setTemplate item_template(broccoli, [color(green),size(small)],[shape(like(tree)),isa(vegetable),texture([porous,bumpy])]).                                                                    
+:-setTemplate item_template(crackers, [color(tan),isa(bread)],[shape([circular,flat]),size(small),texture([dry,coarse])]).
 :-setTemplate item_template(computer, [color(grey),material(plastic)],[shape([cubular,rectangular]),size(medium),texture(smooth)]).
 :-setTemplate item_template(stamp, [color(polychromatic),size(tiny,thin)],[shape(square),material(paper),texture([smooth,sticky])]).
 :-setTemplate item_template(coat, [color(black),size([medium,fits])],[shape(like(torso)),material([wool,cotton,rayon ]),texture(coarse)]).

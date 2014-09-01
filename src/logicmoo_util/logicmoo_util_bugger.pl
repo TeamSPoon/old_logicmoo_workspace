@@ -107,7 +107,19 @@
           % can ignore
      failOnError/1, % for wrapping code may throw to indicate failure
    must_not_repeat/1,  % predicate must never bind the same arguments the same way twice
+/*
 
+debug(+Topic, +Format, +Arguments)
+Prints a message using format(Format, Arguments) if Topic unies with a topic
+enabled with debug/1.
+debug/nodebug(+Topic [>le])
+Enables/disables messages for which Topic unies. If >le is added, the debug
+messages are appended to the given le.
+assertion(:Goal)
+Assumes that Goal is true. Prints a stack-dump and traps to the debugger otherwise.
+This facility is derived from the assert() macro as used in C, renamed
+for obvious reasons.
+*/
 
 
      prolog_must/1,

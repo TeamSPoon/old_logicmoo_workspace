@@ -12,6 +12,8 @@
 % Douglas Miles
 */
 
+:- dynamic_multifile_exported hook:fact_always_true/1.
+
 % nart_to_atomic(L,L):-!,atom(L).
 nart_to_atomic(L,L).
 
@@ -197,6 +199,7 @@ build_genls_inst_list_cache(A,Subclass,B,dbase_t(cache_I_I,Subclass,A,B)):- Subc
 
 isa_backchaing_nv_nv(A,argsIsaInList):-!,compound(A).
 isa_backchaing_nv_nv(I,T):-compound(I),functor(I,F,_),isa_backchaing(F,T).
+isa_backchaing_nv_nv(I,T):-atom(T),!,catch(call(T,I),_,fail).
 
 not_ft(T):-transitive_subclass_or_same(T,spatialthing).
 
@@ -209,6 +212,7 @@ isa_asserted_0(I,T):-clause(isa(I,T),true).
 isa_asserted_0(I,T):- fail, thglobal:use_cyc_database,kbp_t([isa,I,T]).
 isa_asserted_0(I,T):-string(I),member(T,[string,text]).
 isa_asserted_0(I,T):-atom(I),isa_w_inst_atom(I,T).
+isa_asserted_0(I,T):-hook:fact_always_true(isa(I,T)).
 isa_asserted_0(_,T):-var(T),!,fail.
 isa_asserted_0(I,formattype):-!,isa_w_type_atom(I,formattype).
 isa_asserted_0(I,type):-!,isa_w_type_atom(I,type).

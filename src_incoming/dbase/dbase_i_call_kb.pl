@@ -196,7 +196,7 @@ kbp_to_dbase_0:- once(time_call(hide_empty_strings)),fail.
 % kbp_to_dbase_0:- once(time_call(convert_easy_strings2)),fail.
 kbp_to_dbase_0:- time_call(drain_assert_next_buffer),!.
 
-kbp_to_dbase_no_more:- forall((into_plist(_Call,PLIST),kbp_t(PLIST)),assert_to_db_list(PLIST)),
+kbp_to_dbase_no_more:- forall((into_plist(_Call,PLIST),kbp_t(PLIST)),assert_to_db_list(_F,PLIST)),
    retractall(thglobal:use_cyc_database),tell('a.txt'),listing(dbase_t),listing('ASSERTION'),told,dmsg(done_dbase_t).
 
 

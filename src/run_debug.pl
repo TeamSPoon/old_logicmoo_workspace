@@ -147,6 +147,8 @@ debug_talk:- debug_repl(parser_talk,t3).
 % [Optional] Interactively debug E2C
 % :- debug_e2c.
 
+:-debug80.
+
 % the local tests each reload (once)
 now_run_local_tests_dbg :- doall(defined_local_test).
 :- if_flag_true(was_run_dbg_pl, now_run_local_tests_dbg).

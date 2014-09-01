@@ -19,10 +19,9 @@
 
 */
 
-:-dynamic(adv_template/4).
-:-dynamic(complete_aggr/7).
-:-dynamic(ditrans/12).
-:-dynamic(standard/4).
+:-dynamic(adv_template_db/4).
+:-dynamic(ditrans_LF/12).
+:-dynamic(standard_adj_db/4).
 
 :- op(450,xfy,((:))).
 :- op(400,xfy,((&))).
@@ -66,15 +65,15 @@ i_np_head0(np_head(Det,Adjs,Noun),X,T,Det,Head0,Pred0,Pred,Slots) :-
 i_np_head0(np_head(int_det(V),Adjs,Noun),
       Type-X,Type-X,Det,'`'(true),Pred,Pred,
       [slot(prep(of),Type,X,_,comparator)]) :-
-   comparator(Noun,Type,V,Adjs,Det).
+   comparator_db(Noun,Type,V,Adjs,Det).
 i_np_head0(np_head(quant(Op0,N),Adjs,Noun),
       Type-X,Type-X,void,'`'(P),Pred,Pred,[]) :-
-   measure(Noun,Type,Adjs,Units),
-   conversion(N,Op0,Type,V,Op),
-   measure_op(Op,X,V--Units,P).
+   measure_unit_type_db(Noun,Type,Adjs,Units),
+   pos_conversion_db(N,Op0,Type,V,Op),
+   measure_op_db(Op,X,V--Units,P).
 i_np_head0(name(Name),
       Type-Name,Type-Name,id,'`'(true),Pred,Pred,[]) :-
-   name_template(Name,Type).
+   no_repeats(name_template_db(Name,Type)).
 i_np_head0(wh(X),X,X,id,'`'(true),Pred,Pred,[]).
 
 %i_np_mods([],_,[],'`'(true),[],[],_,_).
@@ -141,20 +140,20 @@ i_adjs([Adj|Adjs],X,T,T0,Head0,Head,Pred0,Pred) :-
    i_adjs(Adjs,X,T1,T0,Head1,Head,Pred1,Pred).
 
 i_adj(adj(Adj),Type-X,T,T,Head,Head,'`'(P)&Pred,Pred) :-
-   restriction(Adj,Type,X,P).
+   no_repeats(restriction_LF(Adj,Type,X,P)).
 i_adj(adj(Adj),TypeX-X,TypeV-V,_,
    aggr(F,V,[X],Head,Pred),Head,'`'(true),Pred) :-
-   aggr_adj(Adj,TypeV,TypeX,F).
+   aggr_adj_db(Adj,TypeV,TypeX,F).
 i_adj(sup(Op0,adj(Adj)),Type-X,Type-V,_,
       aggr(F,V,[Y,X],Head,'`'(P)&Pred),Head,'`'(true),Pred) :-
-   adj_sign(Adj,Sign),
-   inverse(Op0,Sign,Op),
+   adj_sign_db(Adj,Sign),
+   inverse_db(Op0,Sign,Op),
    i_sup_op(Op,F),
-   attribute(Adj,Type,X,_,Y,P).
+   no_repeats(attribute_db(Adj,Type,X,_,Y,P)).
 i_adj(adj(Adj),TypeX-X,T,T,_,
       Head,Head,quant(void,TypeX-Y,'`'(P),'`'(Q)&Pred,[],_),Pred) :-
-   attribute(Adj,TypeX,X,_,Y,P),
-   standard(Adj,TypeX,Y,Q).
+   attribute_db(Adj,TypeX,X,_,Y,P),
+   standard_adj_db(Adj,TypeX,Y,Q).
 
 i_s('s'(Subj,Verb,VArgs,VMods),Pred,Up,Id) :-
    i_verb(Verb,P,Tense,Voice,Neg,Slots0,XA0,Meta),
@@ -167,7 +166,7 @@ i_s('s'(Subj,Verb,VArgs,VMods),Pred,Up,Id) :-
 
 i_verb(verb(Root,Voice,Tense,_Aspect,Neg),
       P,Tense,Voice,Det,Slots,XArg,Meta) :-
-   verb_template(Root,P,Slots,XArg,Meta),
+   slot_verb_template(Root,P,Slots,XArg,Meta),
    i_neg(Neg,Det).
 
 reshape_pred(transparent,S,N,P,A,pred(S,N,P,A)).
@@ -187,14 +186,14 @@ i_neg(pos,id).
 i_neg(neg,not).
 
 i_subj(Voice,Subj,Slots0,Slots,Quant,Up,Id) :-
-   subj_case(Voice,Case),
+   active_passive_subjcase(Voice,Case),
    verb_slot(arg(Case,Subj),[],[],Slots0,Slots,[Quant],[],Up,Id).
 
 i_verb_args(VArgs,XA0,XA,Slots0,Slots,Args0,Args,Up,Id) :-
    fill_verb(VArgs,XA0,XA,Slots0,Slots,Args0,Args,Up,Id).
 
-subj_case(active,subj).
-subj_case(passive,s_subj).
+active_passive_subjcase(active,subj).
+active_passive_subjcase(passive,s_subj).
 
 fill_verb([],XA,XA,Slots,Slots,Args,Args,[],_).
 fill_verb([Node|Nodes0],XA0,XA,Slots0,Slots,Args0,Args,Up,Id) :-
@@ -223,7 +222,7 @@ verb_slot(arg(SCase,NP),
    in_slot(Slots0,Case,X,Id,Slots,_),
    deepen_case(SCase,Case).
 verb_slot(adverb(Adv),XA,XA,Slots0,Slots,['`'(P)|Args],Args,[],Id) :-
-   adv_template(Adv,Case,X,P),
+   no_repeats(adv_template_db(Adv,Case,X,P)),
    in_slot(Slots0,Case,X,Id,Slots,_).
 verb_slot(arg(pred,AP),XA,XA,Slots0,Slots,Args0,Args,Up,Id) :-
    in_slot(Slots0,pred,X,Id,Slots,_),
@@ -237,28 +236,28 @@ i_pred(conj(Conj,Left,Right),X,
 i_pred(AP,T,['`'(Head)&Pred|As],As,[],_) :-
    i_adj(AP,T,_,_,Head,true,Pred,'`'(true)).
 i_pred(value(adj(Adj),wh(TypeY-Y)),Type-X,['`'(H)|As],As,[],_) :-
-   attribute(Adj,Type,X,TypeY,Y,H).
+   attribute_db(Adj,Type,X,TypeY,Y,H).
 i_pred(comp(Op0,adj(Adj),NP),X,[P1 & P2 & '`'(P3),Q|As],As,Up,Id) :-
    i_np(NP,Y,Q,Up,Id,unit,[],[]),
-   adj_sign(Adj,Sign),
+   adj_sign_db(Adj,Sign),
    i_measure(X,Adj,Type,U,P1),
    i_measure(Y,Adj,Type,V,P2),
-   inverse(Op0,Sign,Op),
-   measure_op(Op,U,V,P3).
+   inverse_db(Op0,Sign,Op),
+   measure_op_db(Op,U,V,P3).
 i_pred(pp(prep(Prep),NP),X,['`'(H),Q|As],As,Up,Id) :-
    i_np(NP,Y,Q,Up,Id,unit,[],[]),
-   adjunction(Prep,X,Y,H).
+   adjunction_lf(Prep,X,Y,H).
 
 i_adjoin(with,TS-S,TV-Y,[slot(prep(of),TV,Z,_,free)],
 	held_arg(poss,-_Id,TS-S),
 	Y=Z).
 i_adjoin(Prep,X,Y,[],[],P) :-
-   adjunction(Prep,X,Y,P).
+   no_repeats(adjunction_lf(Prep,X,Y,P)).
 
 i_measure(Type-X,Adj,Type,X,'`'(true)) :-
-   units(Adj,Type).
+   no_repeats(units_db(Adj,Type)).
 i_measure(TypeX-X,Adj,TypeY,Y,quant(void,TypeY-Y,'`'(P),'`'(true),[],_)) :-
-   attribute(Adj,TypeX,X,TypeY,Y,P).
+   no_repeats(attribute_db(Adj,TypeX,X,TypeY,Y,P)).
 
 i_verb_mods(Mods,_,XA,Slots0,Args0,Up,Id) :-
    fill_verb(Mods,XA,[],Slots0,Slots,Args0,Args,Up,-Id),
@@ -269,61 +268,48 @@ slot_tag(slot(_,Type,X,Id,_),Type-X,Id).
 i_sup_op(least,min).
 i_sup_op(most,max).
 
-conversion(wh(Type-X),same,Type,X,id).
-conversion(nb(N),Op,_,N,Op).
+pos_conversion_db(wh(Type-X),same,Type,X,id).
+pos_conversion_db(nb(N),Op,_,N,Op).
 
-measure_op(id,X,X,true).
-measure_op(same,X,Y,X=Y).
-measure_op(less,X,Y,exceeds(Y,X)).
-measure_op(not+less,X,Y,\+exceeds(Y,X)).
-measure_op(more,X,Y,exceeds(X,Y)).
-measure_op(not+more,X,Y,\+exceeds(X,Y)).
-
-inverse(most,-,least).
-inverse(least,-,most).
-inverse(same,-,same).
-inverse(less,-,more).
-inverse(more,-,less).
-inverse(X,+,X).
 
 noun_template(Noun,TypeV,V,'`'(P),
       [slot(poss,TypeO,O,Os,index)|Slots]) :-
-   property(Noun,TypeV,V,TypeO,O,P,Slots,Os,_).
+   no_repeats(property_LF(Noun,TypeV,V,TypeO,O,P,Slots,Os,_)).
 noun_template(Noun,TypeV,V,aggr(F,V,[],'`'(true),'`'(true)),
    [slot(prep(of),TypeS,_,_,free)]) :-
-   aggr_noun(Noun,TypeV,TypeS,F).
+   aggr_noun_db(Noun,TypeV,TypeS,F).
 noun_template(Noun,Type,X,'`'(P),Slots) :-
-   thing(Noun,Type,X,P,Slots,_).
+   no_repeats(thing_LF(Noun,Type,X,P,Slots,_)).
 noun_template(Noun,TypeV,V,apply(F,P),
       [slot(prep(of),TypeX,X,_,apply)]) :-
-   meta_noun(Noun,TypeV,V,TypeX,X,P,F).
+   meta_noun_db(Noun,TypeV,V,TypeX,X,P,F).
 
-verb_template(have,Y=Z,
+slot_verb_template(have,Y=Z,
 		[slot(subj,TypeS,S,-Id,free),
 		 slot(dir,TypeV,Y,_,free),
 		 slot(prep(of),TypeV,Z,_,free)],
 		held_arg(poss,-(-(+Id)),TypeS-S), have).
-verb_template(have,Y=Z,
+slot_verb_template(have,Y=Z,
 	[slot(subj,TypeS,S,-(-(Id)),free),
 	 slot(dir,TypeV,Y,_,free),
 	 slot(prep(as),TypeV,Z,_,free)],
 	held_arg(poss,-(-(-(+Id))),TypeS-S), have).
-verb_template(Verb,Pred,
+slot_verb_template(Verb,Pred,
       [slot(subj,TypeS,S,_,free)|Slots],[],transparent) :-
-   verb_type(Verb,_+Kind),
-   verb_kind(Kind,Verb,TypeS,S,Pred,Slots).
+   no_repeats(verb_type_db(Verb,_+Kind)),
+   slot_verb_kind(Kind,Verb,TypeS,S,Pred,Slots).
 
-verb_kind(be,_,TypeS,S,S=A,[slot(dir,TypeS,A,_,free)]).
-verb_kind(be,_,TypeS,S,true,[slot(pred,TypeS,S,_,free)]).
-verb_kind(intrans,Verb,TypeS,S,Pred,Slots) :-
-   intrans(Verb,TypeS,S,Pred,Slots,_).
-verb_kind(trans,Verb,TypeS,S,Pred,
+slot_verb_kind(be,_,TypeS,S,S=A,[slot(dir,TypeS,A,_,free)]).
+slot_verb_kind(be,_,TypeS,S,true,[slot(pred,TypeS,S,_,free)]).
+slot_verb_kind(intrans,Verb,TypeS,S,Pred,Slots) :-
+   intrans_LF(Verb,TypeS,S,Pred,Slots,_).
+slot_verb_kind(trans,Verb,TypeS,S,Pred,
       [slot(dir,TypeD,D,SlotD,free)|Slots]) :-
-   trans(Verb,TypeS,S,TypeD,D,Pred,Slots,SlotD,_).
-verb_kind(ditrans,Verb,TypeS,S,Pred,
+   no_repeats(trans_LF(Verb,TypeS,S,TypeD,D,Pred,Slots,SlotD,_)).
+slot_verb_kind(ditrans,Verb,TypeS,S,Pred,
       [slot(dir,TypeD,D,SlotD,free),
        slot(ind,TypeI,I,SlotI,free)|Slots]) :-
-   ditrans(Verb,TypeS,S,TypeD,D,TypeI,I,Pred,Slots,SlotD,SlotI,_).
+   ditrans_LF(Verb,TypeS,S,TypeD,D,TypeI,I,Pred,Slots,SlotD,SlotI,_).
 
 deepen_case(prep(at),time).
 deepen_case(s_subj,dir).

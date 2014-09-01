@@ -158,6 +158,9 @@
 :-module_transparent(user:nart/3).
 
 
+:-dynamic(constant/4).
+:-multifile(constant/4).
+
 cyc:cyc_magic.
 
 current_file(FileBase,Dir):-current_stream(File,read,_Stream),atom(File),is_absolute_file_name(File),
@@ -1963,7 +1966,7 @@ registerCycPred(Mt,Pred,Arity):-
 %
 % ============================================
 
-user:exception(undefined_predicate, Pred ,retry):- isCycOption(hookCycPredicates,true),cycDefineOrFail(Pred).
+% user:exception(undefined_predicate, Pred ,retry):- isCycOption(hookCycPredicates,true),cycDefineOrFail(Pred).
 
 cycDefineOrFail(Mod:Pred/Arity):-atom_concat('#$',_,Pred),
       cycDefineOrFail(Mod,Pred,Arity).
