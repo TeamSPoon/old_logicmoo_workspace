@@ -68,6 +68,7 @@ int_pron_db(which,undef).
 int_pron_db(who,subj).
 int_pron_db(whom,compl).
 
+int_art_db(how,X,_,int_det(X)).
 int_art_db(what,X,_,int_det(X)).
 int_art_db(which,X,_,int_det(X)).
 
@@ -211,7 +212,10 @@ pers_pron_db(he,masc,3,sin,subj).
 pers_pron_db(she,fem,3,sin,subj).
 pers_pron_db(it,neut,3,sin,_).
 pers_pron_db(we,_,1,plu,subj).
-pers_pron_db(them,_,3,plu,subj).
+% dmiles added
+pers_pron_db(they,_,3,plu,subj).
+% dmiles removed
+% pers_pron_db(them,_,3,plu,subj).
 pers_pron_db(me,_,1,sin,compl(_)).
 pers_pron_db(him,masc,3,sin,compl(_)).
 pers_pron_db(her,fem,3,sin,compl(_)).
@@ -360,6 +364,8 @@ maybe_noun_or_adj(T):- var(T)->true;(atom(T),not(ccw_db(T,_))).
 
 % 
 % chat80("how many types are there?").
+% chat80("what formattypes are types?").
+
 %  chat80("how are you?").
 % chat80("you flow").
 
