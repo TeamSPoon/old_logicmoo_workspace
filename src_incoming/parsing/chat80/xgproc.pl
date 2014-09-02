@@ -4,27 +4,39 @@
  :- op(500,fx,+).
  :- op(500,fx,-).
 
+:-thread_local xgproc:current_xg_module/1.
+:-thread_local xgproc:current_xg_filename/1.
+:-dynamic user:current_xg_pred/4.
+:-multifile user:current_xg_pred/4.
 
- ttynl:-nl.
 
-new_pred(P) :-
-   recorded(P,'xg.pred',_), !.
-new_pred(P0) :-
-   functor(P0,F,N), functor(P,F,N),
-   dynamic_multifile_exported(F/N),
+abolish_xg(Prop):- ignore(xgproc:current_xg_module(M)),
+  doall((user:current_xg_pred(M,F,N,Props),member(Prop,Props),member(Prop,Props),
+                 ignore((memberchk(xg_pred=P,Props),dmsg(abolising(current_xg_pred(M,F,N,Props))),predicate_property(P,number_of_clauses(NC)),flag(xg_assertions,A,A-NC))),
+                 abolish(F,N),retractall(user:current_xg_pred(M,F,N,_)))).
+
+new_pred(P):- must(xgproc:current_xg_module(M)),new_pred(M,P).
+new_pred(M,P0):- functor(P0,F,A),functor(P,F,A),new_pred(M,P,F,A),!.
+
+new_pred(M,_,F,A):- user:current_xg_pred(M,F,A,_),!.
+new_pred(_,P,_,_):- recorded(P,'xg.pred',_), !.
+new_pred(M,P,F,A) :-   
+   dynamic_multifile_exported(M:F/A),
+   findall(K=V,(((K=xg_source,xgproc:current_xg_filename(V));(prolog_load_context(K,V),not(member(K,[stream,directory,variable_names])));((seeing(S),member(G,[(K=file,P=file_name(V)),(K=position,P=position(V))]),G,stream_property(S,P))))),Props),
+   assert_if_new(user:current_xg_pred(M,F,A,[xg_source=F,xg_ctx=M,xg_fa=(F/A),xg_pred=P|Props])),
    recordz(P,'xg.pred',_),
    recordz('xg.pred',P,_).
 
 % was +(F).
-load_plus_xg_file(F) :-
+load_plus_xg_file(CM,F) :-
    see(user),
-   consume0(F,+),
+   with_assertions(xgproc:current_xg_module(CM),consume0(F,+)),
    seen.
 
 % was -(F).
-load_minus_xg_file(F) :-
+load_minus_xg_file(CM,F) :-
    see(user),
-   consume0(F,-),
+   with_assertions(xgproc:current_xg_module(CM),consume0(F,-)),
    seen.
 
 
@@ -35,18 +47,19 @@ consume0(F0,Mode) :-
     statistics(Stat_key,H0),
     absolute_file_name(F0,F),
    see(F),
-   tidy_consume(F,Mode),
+   abolish_xg(xg_source=F),
+   with_assertions(xgproc:current_xg_filename(F),tidy_consume(F,Mode)),
  ( (seeing(User2),User2=user), !; seen ),
    see(Old),
 %   statistics(heap,[H,Hf]),
  statistics(Stat_key,H),
 %   U is H-Hf-H0+Hf0,
     U is H-H0,
-   ttynl,
+   nl,
    display('** Grammar from file '),
    display(F),display(' : '),display(U),
    display(' words **'),
-   ttynl, ttynl.
+   nl, nl.
 
 tidy_consume(F,Mode) :-
    consume(F,Mode),
@@ -57,7 +70,7 @@ consume(F,Mode) :-
    flag(read_terms,_,0),
    repeat,
       read(X),
-    ( X=end_of_file, !, xg_clear(F);
+    ( X=end_of_file, !, xg_complete(F);
       (flag(read_terms,T,T+1),xg_process(X,Mode)),
          fail ).
 
@@ -66,23 +79,25 @@ xg_process((L-->R),Mode) :- !,
    expandrhs(R,S0,S,H0,H,Q),
    new_pred(P),
    usurping(Mode,P),
-   assertz((P :- Q)), !.
+   xg_assertz((P :- Q)), !.
 xg_process(( :- G),_) :- !, G.
 
 xg_process((P :- Q),Mode) :-
    usurping(Mode,P),
    new_pred(P),
-   assertz((P :- Q)).
+   xg_assertz((P :- Q)).
 xg_process(P,Mode) :-
    usurping(Mode,P),
    new_pred(P),
-   assertz(P).
+   xg_assertz(P).
 
-xg_clear(_F) :-
+xg_assertz(P):- flag(xg_assertions,A,A+1),xgproc:current_xg_module(M),M:assertz(P).
+
+xg_complete(_F) :-
    recorded('xg.usurped',P,R0), erase(R0),
    recorded(P,'xg.usurped',R1), erase(R1),
    fail.
-xg_clear(F):- flag(read_terms,T,T),display(read(T,F)),ttynl,ttynl.
+xg_complete(F):- flag(read_terms,T,T),display(read(T,F)),nl,nl.
 
 usurping(+,_) :- !.
 usurping(-,P) :-
@@ -113,9 +128,9 @@ expandlhs(T,S0,S,H0,H1,Q) :-
 flatten0(X,L0,L) :- nonvar(X),!,
    flatten(X,L0,L).
 flatten0(_,_,_) :-
-   ttynl,
+   nl,
    display('! Variable as a non-terminal in the lhs of a grammar rule'),
-   ttynl,
+   nl,
    fail.
 
 flatten((X...Y),L0,L) :- !,
@@ -216,7 +231,7 @@ load_xg:-
   load_plus_xg_file('lex.xg'),
   compile_xg_clauses.
 
-go :- load_xg, xg_listing('newg.pl').
+go_xg :- load_xg, xg_listing('newg.pl').
 
 
 end_of_file.

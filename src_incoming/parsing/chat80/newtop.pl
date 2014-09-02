@@ -107,12 +107,10 @@ control80(Callback,[do,not,trace,'.']) :-
    call(Callback,retract(thlocal:tracing80),'thlocal:tracing80',false,boolean),
    display('No longer thlocal:tracing80.'), nl, fail.
 
-control80(Callback,U) :- ignore(process_run(Callback,U,List,Time)), d2,writeq(List:Time),d2.
+control80(Callback,U) :- with_assertions(thlocal:tracing80, call_in_banner(U,(ignore(process_run(Callback,U,List,Time))))),fail.
    
-
-:-dynamic_multifile_exported(process_run_diff/4).
-process_run_diff(Callback,U,BList,BTime):- process_run(Callback,U,List,Time),
-   ignore((reportDif(U,List,BList,Time,BTime))),!.
+:-export(chat80/1).
+chat80(U):-ignore(control80(U)).
    
 
 get_prev_run_results(U,List,Time):-must_test_801(U,List,Time),!.
@@ -122,33 +120,50 @@ get_prev_run_results(_,[],[]).
 
 reportDif(_U,List,BList,_Time,_BTime):-forall(member(N=V,List),ignore((member(N=BV,BList),not(BV = V), 'format'('~n1) ~q = ~q ~~n2) ~q = ~q ~n',[N,V,N,BV])))).
 
+:-dynamic_multifile_exported(process_run_diff/4).
+process_run_diff(Callback,U,BList,BTime):-
+ call_in_banner(U,( process_run(Callback,U,List,Time),
+   ignore((reportDif(U,List,BList,Time,BTime))))),!.
+   
+
 :-dynamic_multifile_exported(process_run/4).   
 process_run(Callback,U,List,Time):-
   runtime(StartParse),   
   process_run(Callback,StartParse,U,List,Time),!.
 
-process_run(Callback,StartParse,U,List,Time):-process_run_real(Callback,StartParse,U,List,Time).
-process_run(Callback,Start,U,[sent=(U),parse=(E),sem=(error),qplan=(error),answers=(failed)],[time(WholeTime)]):-   
+call_in_banner(U,Call):- p2(begin:U),call_cleanup(Call,p2(end:U)).
+process_run(Callback,StartParse,U,List,Time):-    
+    process_run_real(Callback,StartParse,U,List,Time) *-> true; process_run_unreal(Callback,StartParse,U,List,Time).
+    
+   
+process_run_unreal(Callback,Start,U,[sent=(U),parse=(E),sem=(error),qplan=(error),answers=(failed)],[time(WholeTime)]):-   
          runtime(Stop),WholeTime is Stop-Start,
          display(Callback - 'Failed after '-WholeTime-' to understand: '+ [sent=(U),parse=(E),sem=(error),qplan=(error),answers=(failed)] ), nl.
 
 if_try(Cond,DoAll):-Cond,!,DoAll.
-if_try(_,_):-sleep(1).
+if_try(_,_):-sleep(1),!.
 
-dl:-'format'('~n% =========================================================================================================~n',[]).
-d2:-'format'('~n% -------------------------------=====================================================~n',[]).
+p3:-'format'('~n% =========================================================================================================~n',[]).
+p2(begin:Term):-!, p3, p4(Term),p1.
+p2(end:Term):-!, p1, p4(Term),p3.
+p2(Term):- p3, p4(Term), p3.
+p1:-'format'('~n% ---------------------------------------------------------------------------------------------------~n',[]).
+p4(Term):-'format'('~n%                       ~q~n',[Term]).
+
 :-dynamic_multifile_exported(process_run_real/5).
 process_run_real(Callback,StartParse,U,[sent=(U),parse=(E),sem=(S),qplan=(QP),answers=(Results)],[time(WholeTime)]) :-
-   dl,
+   p1,
    flag(sentenceTrial,_,0),
    ignore((var(Callback),Callback=report)),
    call(Callback,U,'Sentence'(Callback),0,expr),
-   ignore((var(StartParse),runtime(StartParse))),
-   if_try(nonvar(U),sentence(E,U,[],[],[])),
+   ignore((var(StartParse),runtime(StartParse))),!,
+   if_try(nonvar(U),no_repeats(sentence(E,U,[],[],[]))),
+   once((
    runtime(StopParse),
    ParseTime is StopParse - StartParse,
    call(Callback,E,'Parse',ParseTime,expr),   
-   runtime(StartSem),
+   (flag(sentenceTrial,T,T), T>100 -> (!,fail) ; true),
+   runtime(StartSem))),
    once((if_try(nonvar(E),logic(E,S)))),
    runtime(StopSem),
    SemTime is StopSem - StartSem,
@@ -165,7 +180,7 @@ process_run_real(Callback,StartParse,U,[sent=(U),parse=(E),sem=(S),qplan=(QP),an
    TimeAns is StopAns - StartAns,
    call(Callback,Results,'Reply',TimeAns,expr),
    WholeTime is ParseTime + SemTime + TimePlan + TimeAns,
-   dl.
+   p1.
 
 
 :-dynamic_multifile_exported(test_quiet/4).
@@ -174,7 +189,7 @@ test_quiet(_,_,_,_).
 :-dynamic_multifile_exported(report/4).
 report(Item,Label,Time,Mode) :- thlocal:tracing80, !,
    nl, write(Label), write(': '), write(Time), write('sec.'), nl,
-   report_item(Mode,Item).
+   report_item(Mode,Item),!.
 report(_,_,_,_).
 
 report_item(none,_).
@@ -184,7 +199,7 @@ report_item(expr,Item) :-
 report_item(tree,Item) :-
    print_tree(Item), nl.
 
-runtime(Time) :- statistics(runtime,[MSec,_]), Time is MSec/1000.
+runtime(Time) :- statistics(runtime,[MSec,_]), Time is MSec/1000,!.
 
 quote(A&R) :-
    atom(A), !,

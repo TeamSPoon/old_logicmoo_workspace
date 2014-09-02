@@ -25,6 +25,13 @@ clausify(question(V0,P),(answer80(V):-B)) :-
    chain_apply(BQuants,R0,R1),
    head_vars(HQuants,B,R1,V,V0).
 
+clausify(assertion(V0,P),(assertion80(V):-B)) :-
+   quantify(P,Quants,[],R0),
+   split_quants(question(V0),Quants,HQuants,[],BQuants,[]),
+   chain_apply(BQuants,R0,R1),
+   head_vars(HQuants,B,R1,V,V0).
+
+
 quantify(quant(Det,X,Head,Pred,Args,Y),Above,Right,true) :-
    close_tree(Pred,P2),
    quantify_args(Args,AQuants,P1),

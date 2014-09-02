@@ -213,6 +213,7 @@ isa_asserted_0(I,T):- fail, thglobal:use_cyc_database,kbp_t([isa,I,T]).
 isa_asserted_0(I,T):-string(I),member(T,[string,text]).
 isa_asserted_0(I,T):-atom(I),isa_w_inst_atom(I,T).
 isa_asserted_0(I,T):-hook:fact_always_true(isa(I,T)).
+isa_asserted_0(I,T):-mpred_prop(I,T).
 isa_asserted_0(_,T):-var(T),!,fail.
 isa_asserted_0(I,formattype):-!,isa_w_type_atom(I,formattype).
 isa_asserted_0(I,type):-!,isa_w_type_atom(I,type).

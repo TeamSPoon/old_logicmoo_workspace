@@ -224,17 +224,44 @@ relax_term(P,P,Ai,Ac,Bi,Bc):- when_met(pred(nonvar,Ac),when_met(pred(nonvar,Bc),
 % ================================================================================
 
 
-isCycPredArity_ignoreable(P,A):- ignore(mpred_prop(P,cycPred(A))),ignore(mpred_arity(P,A)).
+dbase_t(C,I):- fail,loop_check_term(isa_backchaing(I,C),dbase_t(C,I),fail).
 
-dbase_which_next(dac(no_d,a,no_c,no_fallback)).
+%dbase_t([P|LIST]):- !,dbase_plist_t(P,LIST).
+%dbase_t(naf(CALL)):-!,not(dbase_t(CALL)).
+%dbase_t(not(CALL)):-!,dbase_f(CALL).
+dbase_t(CALL):- into_plist(CALL,[P|LIST]),dbase_plist_t(P,LIST).
+dbase_plist_t(P,[]):-!,dbase_t(P).
+dbase_plist_t(P,LIST):-var(P),!,CALL=..[dbase_t,P|LIST],debugOnError((CALL)).
+dbase_plist_t(dbase_t,LIST):-!, CALL=..[dbase_t|LIST],call(CALL),debugOnError((CALL)).
+dbase_plist_t(mpred_prop,[C,I]):-!,ground(I:C),mpred_prop(C,I).
+dbase_plist_t(isa,[I,C]):-!,dbase_t(C,I).
+dbase_plist_t(P,_):-never_dbase_mpred(P),!,fail.
+dbase_plist_t(P,[L|IST]):-is_holds_true(P),!,dbase_plist_t(L,IST).
+dbase_plist_t(P,LIST):-is_holds_false(P),!,dbase_f(LIST).
+dbase_plist_t(P,LIST):- CALL=..[dbase_t,P|LIST],call(CALL),debugOnError((CALL)).
 
-holds_t(P,A1,A2,A3,A4,A5,A6,A7):- isCycPredArity_ignoreable(P,7),dbase_which_next(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5,A6,A7);call_mt_t(DBS,P,A1,A2,A3,A4,A5,A6,A7,_,_);assertion_t([P,A1,A2,A3,A4,A5,A6,A7])).
-holds_t(P,A1,A2,A3,A4,A5,A6):- isCycPredArity_ignoreable(P,6),dbase_which_next(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5,A6);call_mt_t(DBS,P,A1,A2,A3,A4,A5,A6,_,_)).
-holds_t(P,A1,A2,A3,A4,A5):- isCycPredArity_ignoreable(P,5),dbase_which_next(DBS),(call_t(DBS,P,A1,A2,A3,A4,A5);call_mt_t(DBS,P,A1,A2,A3,A4,A5,_,_)).
-holds_t(P,A1,A2,A3,A4):- isCycPredArity_ignoreable(P,4),dbase_which_next(DBS),(call_t(DBS,P,A1,A2,A3,A4);call_mt_t(DBS,P,A1,A2,A3,A4,_,_)).
-holds_t(P,A1,A2,A3):- isCycPredArity_ignoreable(P,3),dbase_which_next(DBS),(call_t(DBS,P,A1,A2,A3);call_mt_t(DBS,P,A1,A2,A3,_,_)).
-holds_t(P,A1,A2):- hotrace(holds_relaxed_t(P,A1,A2)).
-holds_t(P,A1):- isCycPredArity_ignoreable(P,1),dbase_which_next(DBS),(call_t(DBS,P,A1);call_mt_t(DBS,P,A1,_,_)).
+loop_check_mpred(Call):- !, fail,not(thlocal:insideIREQ(_)),loop_check_local(ireq(Call),fail).
+% loop_check_mpred(Call):-loop_check_local(call_mpred(dbase_t,Call),fail).
+
+dbase_t(P,A1,A2,A3,A4,A5,A6,A7):- loop_check_mpred(dbase_t(P,A1,A2,A3,A4,A5,A6,A7)).
+dbase_t(P,A1,A2,A3,A4,A5,A6):- loop_check_mpred(dbase_t(P,A1,A2,A3,A4,A5,A6)).
+dbase_t(P,A1,A2,A3,A4,A5):- loop_check_mpred(dbase_t(P,A1,A2,A3,A4,A5)).
+dbase_t(P,A1,A2,A3,A4):- loop_check_mpred(dbase_t(P,A1,A2,A3,A4)).
+dbase_t(P,A1,A2,A3):- loop_check_mpred(dbase_t(P,A1,A2,A3)).
+dbase_t(P,A1,A2):- loop_check_mpred(dbase_t(P,A1,A2)).
+
+isCycPredArity_ignoreable(F,A):- ignore(mpred_prop(F,cycPred(A))),ignore(mpred_arity(F,A)).
+
+which_t(dac(d,a_notnow,c,no_fallback)).
+
+holds_t(P,A1,A2,A3,A4,A5,A6,A7):- isCycPredArity_ignoreable(P,7),which_t(DBS),(call_which_t(DBS,P,A1,A2,A3,A4,A5,A6,A7);call_mt_t(DBS,P,A1,A2,A3,A4,A5,A6,A7,_,_);assertion_t([P,A1,A2,A3,A4,A5,A6,A7])).
+holds_t(P,A1,A2,A3,A4,A5,A6):- isCycPredArity_ignoreable(P,6),which_t(DBS),(call_which_t(DBS,P,A1,A2,A3,A4,A5,A6);call_mt_t(DBS,P,A1,A2,A3,A4,A5,A6,_,_)).
+holds_t(P,A1,A2,A3,A4,A5):- isCycPredArity_ignoreable(P,5),which_t(DBS),(call_which_t(DBS,P,A1,A2,A3,A4,A5);call_mt_t(DBS,P,A1,A2,A3,A4,A5,_,_)).
+holds_t(P,A1,A2,A3,A4):- isCycPredArity_ignoreable(P,4),which_t(DBS),(call_which_t(DBS,P,A1,A2,A3,A4);call_mt_t(DBS,P,A1,A2,A3,A4,_,_)).
+holds_t(P,A1,A2,A3):- isCycPredArity_ignoreable(P,3),which_t(DBS),(call_which_t(DBS,P,A1,A2,A3);call_mt_t(DBS,P,A1,A2,A3,_,_)).
+%holds_t(P,A1,A2):- hotrace(holds_relaxed_t(P,A1,A2)).
+holds_t(P,A1,A2):- isCycPredArity_ignoreable(P,2),which_t(DBS),(call_which_t(DBS,P,A1,A2);call_mt_t(DBS,P,A1,A2,_,_)).
+holds_t(P,A1):- isCycPredArity_ignoreable(P,1),which_t(DBS),(call_which_t(DBS,P,A1);call_mt_t(DBS,P,A1,_,_)).
 
 
 % holds_relaxed_t(P,A1,A2):-var(A1),var(A2),!,dbase_t(P,A1,A2).
@@ -243,63 +270,63 @@ holds_relaxed_t(P,A1,A2):-
       relax_term(P,PR,A1,R1,A2,R2),
          holds_relaxed_0_t(DBS,PR,R1,R2).
 
-holds_relaxed_0_t(DBS,P,A1,A2):- call_t(DBS,P,A1,A2).
+holds_relaxed_0_t(DBS,P,A1,A2):- call_which_t(DBS,P,A1,A2).
 holds_relaxed_0_t(DBS,P,A1,A2):- call_mt_t(DBS,P,A1,A2,_,_).
 
 /*
 holds_relaxed_0_t(dac(_,a,_,_),P,A1,A2):- assertion_t([P,A1,A2]).
 holds_relaxed_0_t(dac(d,_,_,_),P,A1,A2):- dbase_t(P,A1,A2).
-holds_relaxed_0_t(dac(_,_,_,h),P,A1,A2):- call_t(DBS,P,A1,A2).
+holds_relaxed_0_t(dac(_,_,_,h),P,A1,A2):- call_which_t(DBS,P,A1,A2).
 holds_relaxed_0_t(DBS,P,A1,A2):- call_mt_t(DBS,P,A1,A2,_,_).
 holds_relaxed_0_t(_DBS,P,A1,A2):- ground((P,A1)), TEMPL=..[P,T1,_],dbase_t(default_sv,TEMPL,2,A2),req(isa(A1,T1)),!.
 */
 
-holds_t([AH,P|LIST]):- is_holds_true(AH),!,holds_t_p2(P,LIST).
+holds_t([AH,P|LIST]):- is_holds_true(AH),!,holds_plist_t(P,LIST).
 holds_t([AH,P|LIST]):- is_holds_false(AH),!,holds_f_p2(P,LIST).
-holds_t([P|LIST]):- !,holds_t_p2(P,LIST).
-holds_t(not(CALL)):- holds_f(CALL).
-holds_t(CALL):- safe_univ(CALL,[P|LIST]),holds_t([P|LIST]).
+holds_t([P|LIST]):- !,holds_plist_t(P,LIST).
+holds_t(not(CALL)):- !, holds_f(CALL).
+holds_t(CALL):- '=..'(CALL,PLIST),holds_t(PLIST).
 
-holds_t_p2(P,LIST):- safe_univ(CALL,[holds_t,P|LIST]),call(CALL).
+holds_plist_t(P,LIST):- apply(holds_t,[P|LIST]).
 
 
-call_list_t(dac(d,_,_,_),CALL,_):- dbase_t(CALL).
-call_list_t(dac(_,a,_,_),_,List):- assertion_t(List).
-call_list_t(dac(_,_,c,_),CALL,_):- xcall_t(CALL).
-call_list_t(dac(_,_,_,holds_t),CALL,_):- holds_t(CALL).
+call_whichlist_t(dac(d,_,_,_),CALL,_):- dbase_t(CALL).
+call_whichlist_t(dac(_,a,_,_),_,List):- assertion_t(List).
+call_whichlist_t(dac(_,_,c,_),CALL,_):- xcall_t(CALL).
+call_whichlist_t(dac(_,_,_,holds_t),CALL,_):- holds_t(CALL).
 
-call_t(DBS,P,A1,A2,A3,A4,A5,A6,A7):- callable_tf(P,7),List= [P,A1,A2,A3,A4,A5,A6,A7], CALL=..List, call_list_t(DBS,CALL,List).
-call_t(dac(_,_,_,h),P,A1,A2,A3,A4,A5,A6,A7):- holds_t(P,A1,A2,A3,A4,A5,A6,A7).
+call_which_t(DBS,P,A1,A2,A3,A4,A5,A6,A7):- callable_tf(P,7),List= [P,A1,A2,A3,A4,A5,A6,A7], CALL=..List, call_whichlist_t(DBS,CALL,List).
+call_which_t(dac(_,_,_,h),P,A1,A2,A3,A4,A5,A6,A7):- holds_t(P,A1,A2,A3,A4,A5,A6,A7).
 
-call_t(dac(d,_,_,_),P,A1,A2,A3,A4,A5,A6):- dbase_t(P,A1,A2,A3,A4,A5,A6).
-call_t(dac(_,a,_,_),P,A1,A2,A3,A4,A5,A6):- assertion_t([P,A1,A2,A3,A4,A5,A6]).
-call_t(dac(_,_,c,_),P,A1,A2,A3,A4,A5,A6):- callable_tf(P,6),xcall_t(P,A1,A2,A3,A4,A5,A6).
-call_t(dac(_,_,_,holds_t),P,A1,A2,A3,A4,A5,A6):- holds_t(P,A1,A2,A3,A4,A5,A6).
+call_which_t(dac(d,_,_,_),P,A1,A2,A3,A4,A5,A6):- dbase_t(P,A1,A2,A3,A4,A5,A6).
+call_which_t(dac(_,a,_,_),P,A1,A2,A3,A4,A5,A6):- assertion_t([P,A1,A2,A3,A4,A5,A6]).
+call_which_t(dac(_,_,c,_),P,A1,A2,A3,A4,A5,A6):- callable_tf(P,6),xcall_t(P,A1,A2,A3,A4,A5,A6).
+call_which_t(dac(_,_,_,holds_t),P,A1,A2,A3,A4,A5,A6):- holds_t(P,A1,A2,A3,A4,A5,A6).
 
-call_t(dac(d,_,_,_),P,A1,A2,A3,A4,A5):- dbase_t(P,A1,A2,A3,A4,A5).
-call_t(dac(_,a,_,_),P,A1,A2,A3,A4,A5):- assertion_t([P,A1,A2,A3,A4,A5]).
-call_t(dac(_,_,c,_),P,A1,A2,A3,A4,A5):- callable_tf(P,5),xcall_t(P,A1,A2,A3,A4,A5).
-call_t(dac(_,_,_,holds_t),P,A1,A2,A3,A4,A5):- holds_t(P,A1,A2,A3,A4,A5).
+call_which_t(dac(d,_,_,_),P,A1,A2,A3,A4,A5):- dbase_t(P,A1,A2,A3,A4,A5).
+call_which_t(dac(_,a,_,_),P,A1,A2,A3,A4,A5):- assertion_t([P,A1,A2,A3,A4,A5]).
+call_which_t(dac(_,_,c,_),P,A1,A2,A3,A4,A5):- callable_tf(P,5),xcall_t(P,A1,A2,A3,A4,A5).
+call_which_t(dac(_,_,_,holds_t),P,A1,A2,A3,A4,A5):- holds_t(P,A1,A2,A3,A4,A5).
 
-call_t(dac(d,_,c,_),P,A1,A2,A3,A4):- dbase_t(P,A1,A2,A3,A4).
-call_t(dac(_,a,_,_),P,A1,A2,A3,A4):- assertion_t([P,A1,A2,A3,A4]).
-call_t(dac(_,_,c,_),P,A1,A2,A3,A4):- callable_tf(P,4),xcall_t(P,A1,A2,A3,A4).
-call_t(dac(_,_,_,holds_t),P,A1,A2,A3,A4):- holds_t(P,A1,A2,A3,A4).
+call_which_t(dac(d,_,c,_),P,A1,A2,A3,A4):- dbase_t(P,A1,A2,A3,A4).
+call_which_t(dac(_,a,_,_),P,A1,A2,A3,A4):- assertion_t([P,A1,A2,A3,A4]).
+call_which_t(dac(_,_,c,_),P,A1,A2,A3,A4):- callable_tf(P,4),xcall_t(P,A1,A2,A3,A4).
+call_which_t(dac(_,_,_,holds_t),P,A1,A2,A3,A4):- holds_t(P,A1,A2,A3,A4).
 
-call_t(dac(d,_,_,_),P,A1,A2,A3):- dbase_t(P,A1,A2,A3).
-call_t(dac(_,a,_,_),P,A1,A2,A3):- assertion_t([P,A1,A2,A3]).
-call_t(dac(_,_,c,_),P,A1,A2,A3):- callable_tf(P,3),xcall_t(P,A1,A2,A3).
-call_t(dac(_,_,_,holds_t),P,A1,A2,A3):- holds_t(P,A1,A2,A3).
+call_which_t(dac(d,_,_,_),P,A1,A2,A3):- dbase_t(P,A1,A2,A3).
+call_which_t(dac(_,a,_,_),P,A1,A2,A3):- assertion_t([P,A1,A2,A3]).
+call_which_t(dac(_,_,c,_),P,A1,A2,A3):- callable_tf(P,3),xcall_t(P,A1,A2,A3).
+call_which_t(dac(_,_,_,holds_t),P,A1,A2,A3):- holds_t(P,A1,A2,A3).
 
-call_t(dac(d,_,_,_),P,A1,A2):- dbase_t(P,A1,A2).
-call_t(dac(_,a,_,_),P,A1,A2):- assertion_t([P,A1,A2]).
-call_t(dac(_,_,c,_),P,A1,A2):- callable_tf(P,2),xcall_t(P,A1,A2).
-call_t(dac(_,_,_,holds_t),P,A1,A2):- holds_t(P,A1,A2).
+call_which_t(dac(d,_,_,_),P,A1,A2):- dbase_t(P,A1,A2).
+call_which_t(dac(_,a,_,_),P,A1,A2):- assertion_t([P,A1,A2]).
+call_which_t(dac(_,_,c,_),P,A1,A2):- callable_tf(P,2),xcall_t(P,A1,A2).
+call_which_t(dac(_,_,_,holds_t),P,A1,A2):- holds_t(P,A1,A2).
 
-call_t(dac(d,_,_,_),P,A1):- dbase_t(P,A1).
-call_t(dac(_,a,_,_),P,A1):- assertion_t([P,A1]).
-call_t(dac(_,_,c,_),P,A1):- callable_tf(P,1),xcall_t(P,A1).
-call_t(dac(_,_,_,holds_t),P,A1):- holds_t(P,A1).
+call_which_t(dac(d,_,_,_),P,A1):- dbase_t(P,A1).
+call_which_t(dac(_,a,_,_),P,A1):- assertion_t([P,A1]).
+call_which_t(dac(_,_,c,_),P,A1):- callable_tf(P,1),xcall_t(P,A1).
+call_which_t(dac(_,_,_,holds_t),P,A1):- holds_t(P,A1).
 
 call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7,A8,A9):- callable_tf(P,9),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8,A9],xcall_t(CALL).
 call_mt_t(dac(_,_,_,mt),P,A1,A2,A3,A4,A5,A6,A7,A8):- callable_tf(P,8),CALL=..[P,A1,A2,A3,A4,A5,A6,A7,A8],xcall_t(CALL).
@@ -354,7 +381,7 @@ holds_relaxed_0_f(DBS,P,A1,A2):- call_mt_f(DBS,P,A1,A2,_,_).
 
 
 holds_f([AH,P|LIST]):- is_holds_true(AH),!,holds_f_p2(P,LIST).
-holds_f([AH,P|LIST]):- is_holds_false(AH),!,holds_t_p2(P,LIST).
+holds_f([AH,P|LIST]):- is_holds_false(AH),!,holds_plist_t(P,LIST).
 holds_f([P|LIST]):- !, holds_f_p2(P,LIST).
 holds_f(CALL):- CALL=..[P|LIST],holds_f([P|LIST]).
 holds_f_p2(P,LIST):- CALL=..[holds_f,P|LIST],call(CALL).

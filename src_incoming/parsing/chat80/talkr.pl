@@ -89,6 +89,9 @@ reply(N--U) :- !, write(N), display(' '), write(U).
 reply(X) :- write(X).
 
 satisfy((P,Q)) :- !, satisfy(P), satisfy(Q).
+%satisfy((P;Q)) :- !, satisfy(P) ; satisfy(Q).
+%satisfy((P->Q;R)) :- !, satisfy(P) -> satisfy(Q) ; satisfy(R).
+%satisfy((P->Q)) :- !, satisfy(P) -> satisfy(Q).
 satisfy({P}) :- !, satisfy(P), !.
 satisfy(_X^P) :- !, satisfy(P).
 satisfy(\+P) :- satisfy(P), !, fail.
@@ -102,6 +105,7 @@ satisfy(X=<Y) :- !, X=<Y.
 satisfy(X>=Y) :- !, X>=Y.
 satisfy(X>Y) :- !, X>Y.
 satisfy(P) :- P.
+%satisfy(P) :- call_mpred(P).
 
 exceptionto(P) :-
    functor(P,F,N), functor(P1,F,N),

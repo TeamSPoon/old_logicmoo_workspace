@@ -28,3 +28,11 @@ gap(x(gap,_,_,_)).
 gap([]).
 
 virtual(NT,x(_,nonterminal,NT,X),X).
+
+phraseXG(P,A1,A2,A3,A4):-
+   safe_univ(P,[F|Args0]),
+   dtrace,
+   conc_gx(Args0,[A1,A2,A3,A4],Args),
+   Q=..[F|Args], 
+   call(Q).
+

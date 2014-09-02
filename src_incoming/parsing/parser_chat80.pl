@@ -36,11 +36,13 @@
 
 % :- register_module_type(utility).
 
+
 :- dynamic_multifile_exported moo:contains/2.
 :- dynamic_multifile_exported moo:trans/9.
 :- dynamic_multifile_exported det/7.
 :- dynamic_multifile_exported sentence/5.
 :- dynamic_multifile_exported noun/6.
+
 /*
 :- dynamic_multifile_exported latitude/2.
 :- dynamic_multifile_exported longitude/2.
@@ -103,13 +105,13 @@ chat80 :- with_assertions(tracing80,
 
 :- include(logicmoo(parsing/chat80/xgproc)).	% XG generator
 
-:- load_plus_xg_file(logicmoo(parsing/chat80/'clone.xg')).
-:- load_plus_xg_file(logicmoo(parsing/chat80/'lex.xg')).
+:- context_module(CM),load_plus_xg_file(CM,logicmoo(parsing/chat80/'clone.xg')).
+:- context_module(CM),load_plus_xg_file(CM,logicmoo(parsing/chat80/'lex.xg')).
 
 :- compile_xg_clauses.
 :- xg_listing('newg.pl').
 
-:- decl_mpred_hybrid(person/1).    
+% :- decl_mpred_hybrid(person/1).    
 
 % :- list('newg.pl').
 :- include(logicmoo(parsing/chat80/xgrun)).	% XG runtimes
@@ -155,10 +157,9 @@ test_chat80_regressions:- time(hi('../src_incoming/parsing/chat80/demo')).
 
 moo:mud_test(chat80_regressions,test_chat80_regressions).
 
-% :- context_module(CM),module_predicates_are_exported(CM).
-% :- context_module(CM),module_meta_predicates_are_transparent(CM).
+:- context_module(CM),module_predicates_are_exported(CM).
+:- context_module(CM),all_module_predicates_are_transparent(CM).
 % :- context_module(CM),module_property(CM, exports(List)),moo_hide_show_childs(List).
 
 % :- include(logicmoo('vworld/moo_footer.pl')).
-
 

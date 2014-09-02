@@ -2,7 +2,6 @@
 /** <module> An Implementation a MUD server in SWI-Prolog
 
 */
-
 :-include(run_common).
 
 :- catch(noguitracer,_,true).

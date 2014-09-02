@@ -274,6 +274,7 @@ coerce(What,_Type,NewThing):-NewThing = What.
   %str/2,
   facing/2, height/2, act_term/2, nameStrings/2, description/2, pathBetween/3, agent_turnnum/2.
 
+:- must(dbase_mod(moo)).
 
 :- dbase_mod(M),dynamic_multifile_exported((
           % M:dbase_t/1,
@@ -287,6 +288,19 @@ coerce(What,_Type,NewThing):-NewThing = What.
           M:dbase_t/9,
           M:dbase_t/10,
           M:dbase_t/11)).
+
+:- dbase_mod(M),dynamic_multifile_exported((
+          % M:holds_t/1,
+          M:holds_t/2,
+          M:holds_t/3,
+          M:holds_t/4,
+          M:holds_t/5,
+          M:holds_t/6,
+          M:holds_t/7,
+          M:holds_t/8,
+          M:holds_t/9,
+          M:holds_t/10,
+          M:holds_t/11)).
 
 % :-dynamic((weight/2)).
 % :-dynamic(subclass/2).
@@ -367,7 +381,6 @@ chargeRemaining/2,
 :-multifile localityOfObject/2.
 /*
 
-dbase_mod(moo).
 :- context_module(M),
    asserta(dbase_mod(M)),
    dmsg(assert_if_new(dbase_mod(M))).
@@ -798,26 +811,9 @@ db_op_exact(Op,C):- trace_or_throw(unhandled(db_op_exact(Op,C))).
           dbase_f/7)).
 
 
-dbase_t(C,I):- fail,loop_check_term(isa_backchaing(I,C),dbase_t(C,I),fail).
-
-%dbase_t([P|LIST]):- !,dbase_t_p2(P,LIST).
-%dbase_t(naf(CALL)):-!,not(dbase_t(CALL)).
-%dbase_t(not(CALL)):-!,dbase_f(CALL).
-dbase_t(CALL):- into_plist(CALL,[P|LIST]),dbase_t_p2(P,LIST).
-
 
 never_dbase_mpred(mpred_prop).
 never_dbase_mpred(mpred_arity).
-
-dbase_t_p2(P,[]):-!,dbase_t(P).
-dbase_t_p2(P,LIST):-var(P),!,CALL=..[dbase_t,P|LIST],debugOnError((CALL)).
-dbase_t_p2(dbase_t,LIST):-!, CALL=..[dbase_t|LIST],call(CALL),debugOnError((CALL)).
-dbase_t_p2(mpred_prop,[C,I]):-!,ground(I:C),mpred_prop(C,I).
-dbase_t_p2(isa,[I,C]):-!,dbase_t(C,I).
-dbase_t_p2(P,_):-never_dbase_mpred(P),!,fail.
-dbase_t_p2(P,[L|IST]):-is_holds_true(P),!,dbase_t_p2(L,IST).
-dbase_t_p2(P,LIST):-is_holds_false(P),!,dbase_f(LIST).
-dbase_t_p2(P,LIST):- CALL=..[dbase_t,P|LIST],call(CALL),debugOnError((CALL)).
 
 
 % ================================================

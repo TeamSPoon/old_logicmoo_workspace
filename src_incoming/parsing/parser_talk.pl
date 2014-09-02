@@ -212,7 +212,7 @@ pn_lf(Name  ,Name ):- name_template_db(Name,_).
 %           nonfinite, pres+fin, past+fin,  past+part,  pres+part,  LF
 talk_iv_lf( halt,      halts,    halted,    halted,     halting,    X^doing(X,halt)).
 
-talk_iv_lf( Write,     Writes,   Wrote,     Written,    Writing,    X^Y^dbase_t(Writes,X,Y)) :- talk_db(intransitive,Write,Writes,Wrote,Writing,Written).
+talk_iv_lf( Write,     Writes,   Wrote,     Written,    Writing,    X^Y^holds_t(Writes,X,Y)) :- talk_db(intransitive,Write,Writes,Wrote,Writing,Written).
 
 %           nonfinite, pres+fin, past+fin,  past+part,  pres+part,  LF
 talk_tv_lf( write,     writes,   wrote,     written,    writing,    X^Y^writes(X,Y)). 
@@ -220,7 +220,7 @@ talk_tv_lf( meet,      meets,    met,       met,        meeting,    X^Y^meets(X,
 talk_tv_lf( concern, concerns, concerned, concerned, concerning,   X^Y^concerns(X,Y)).
 talk_tv_lf( run,  runs, ran, run,  running, X^Y^runs(X,Y)).
 
-talk_tv_lf( Write,     Writes,   Wrote,     Written,    Writing,    X^Y^dbase_t(Writes,X,Y)) :- talk_db(transitive,Write,Writes,Wrote,Writing,Written).
+talk_tv_lf( Write,     Writes,   Wrote,     Written,    Writing,    X^Y^holds_t(Writes,X,Y)) :- talk_db(transitive,Write,Writes,Wrote,Writing,Written).
 
 rov_lf(want, wants, wanted, wanted, wanting,  ((X^want(Y,X,Comp))^S) ^(X^Comp) ^Y ^S,infinitival).
 

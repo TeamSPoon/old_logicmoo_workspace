@@ -28,16 +28,21 @@
 :- op(300,fx,(('`'))).
 :- op(200,xfx,((--))).
 
-i_sentence(q(S),question([],P)) :-
+i_sentence(q(S),question([],P)) :- !,
    i_s(S,P,[],0).
-i_sentence(whq(X,S),question([X],P)) :-
+i_sentence(whq(X,S),question([X],P)) :- !,
+   i_s(S,P,[],0).
+i_sentence(decl(S),assertion([],P)) :- !,
    i_s(S,P,[],0).
 
-i_sentence(imp(s(_,Verb,VArgs,VMods)),imp(V,Args)) :-
+i_sentence(imp(s(_,Verb,VArgs,VMods)),imp(V,Args)) :- !,
    i_verb(Verb,V,_,active,pos,Slots0,[],transparent),
    i_verb_args(VArgs,[],[],Slots0,Slots,Args,Args0,Up,-0),
    conc80(Up,VMods,Mods),
    i_verb_mods(Mods,_,[],Slots,Args0,Up,+0).
+
+i_sentence(S,assertion([],P)) :-
+   i_s(S,P,[],0).
 
 i_np(there,Y,quant(void,_X,'`'(true),'`'(true),[],Y),[],_,_,XA,XA).
 i_np(NP,Y,Q,Up,Id0,Index,XA0,XA) :-

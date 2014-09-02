@@ -20,7 +20,6 @@
 
 */
 :-discontiguous(verb_type_db_0/2).
-:-discontiguous(verb_type_db_0/2).
 :-discontiguous(verb_root_db/1).
 :-discontiguous(verb_form_db/4).
 :-discontiguous(trans_LF/9).
@@ -39,9 +38,9 @@
 :- op(300,fx,(('`'))).
 :- op(200,xfx,((--))).
 
-:- dynamic_multifile_exported((moo:trans_LF/9)).
+:- dynamic_multifile_exported((trans_LF/9)).
 
-:- begin_dynamic_reader.
+% :- begin_dynamic_reader.
 :- asserta((thlocal:enable_src_loop_checking)).
 
 
@@ -235,40 +234,18 @@ noun_plu_db(regions,region).
 noun_plu_db(rivers,river).
 noun_plu_db(seas,sea).
 noun_plu_db(seamasses,seamass).
-noun_plu_db(types,type).
-noun_plu_db(TS,T):- noun_plu_db_via_types(TS,T).
-
-% control80("how many oceans are seas?").
-% control80("how many types are formattypes?").
-%  control80("how are you?").
-% control80("you flow").
-
-phraseXG(P,A1,A2,A3,A4):-
-   safe_univ(P,[F|Args0]),
-   dtrace,
-   conc_gx(Args0,[A1,A2,A3,A4],Args),
-   Q=..[F|Args], 
-   call(Q).
-
-
-noun_plu_db_via_types(TS,T):- maybe_noun_or_adj(T),maybe_noun_or_adj(TS), (atom(TS)->atom_concat(T,'s',TS);true),type(T),atom(T),atom_concat(T,'s',TS).
-
-maybe_noun_or_adj(T):- var(T)->true;(atom(T),not(ccw_db(T,_))).
 
 noun_plu_db(PluralString,SingularString):- meetsForm80(PluralString,SingularString,noun+plural).
 noun_sin_db(Singular):- meetsForm80(Singular,Singular,noun+singular).
 noun_sin_db(Singular):-noun_plu_db(_,Singular).
 
-%hook:fact_always_true(isa(Type,type)):- clause(thing_LF(Type,feature&_,_X,_,[],_),true).
-%hook:fact_always_true(isa(Type,type)):- clause(restriction_LF(Type,feature&_,_X,_),true).
-
 thing_LF(continent,feature&place&continent,X,continent(X),[],_).
 thing_LF(ocean,feature&place&seamass,X,ocean(X),[],_).
 thing_LF(river,feature&river,X,river(X),[],_).
 thing_LF(sea,feature&place&seamass,X,sea(X),[],_).
-thing_LF(Type,feature&Type,X,isa(X,Type),[],_):- loop_check(type(Type)).
 thing_LF(seamass,feature&place&seamass,X,seamass(X),[],_).
 thing_LF(region,feature&place&_,X,region80(X),[],_).
+
 
 /* WHICH WHICH DENOTES A  */
 
@@ -355,6 +332,106 @@ noun_plu_db(countries,country).
 thing_LF(country,feature&place&country,X,country(X),[],_).
 country(C) :- country(C,_,_,_,_,_,_,_).
 country(iran,middle_east,33,-53,636363,32001000,tehran,rial).
+
+
+% =================================================================
+%  A PROPERTY IS SPECIALIZION OF A MPRED THAT IS PRESENT ON TYPE
+% =================================================================
+
+
+noun_plu_db(types,type).
+thing_LF(type,feature&type&_,X,type(X),[],_).
+noun_plu_db(formattypes,formattype).
+thing_LF(formattype,feature&formattype&_,X,formattype(X),[],_).
+
+noun_plu_db(TS,T):- noun_plu_db_via_types(TS,T).
+
+thing_LF(Type,TYPEMASK,X,isa(X,Type),[],_):- plt,loop_check(type(Type)),atom(Type),gen_typemask(Type,TYPEMASK).
+restriction_LF(Type,TYPEMASK,X,isa(X,Type)):- plt,loop_check(type(Type)),atom(Type),gen_typemask(Type,TYPEMASK).
+
+
+gen_typemask(Type,measure&Type&_):-formattype(Type),!.
+gen_typemask(Type,feature&Type&_).
+gen_typemask(_,feature&_).
+
+
+noun_plu_db_via_types(TS,T):- maybe_noun_or_adj(T),maybe_noun_or_adj(TS), (atom(TS)->atom_concat(T,'s',TS);true),type(T),atom(T),atom_concat(T,'s',TS).
+maybe_noun_or_adj(T):- var(T)->true;(atom(T),not(ccw_db(T,_))).
+
+% 
+% chat80("how many types are there?").
+%  chat80("how are you?").
+% chat80("you flow").
+
+test_chat80(U):-must(chat80(U)).
+
+t11:- 
+   test_chat80("how many postures are there?"),
+   test_chat80("what are the postures?"),
+   test_chat80("how many oceans are seas?"),
+   test_chat80("how many oceans are seasmasses?"),
+   test_chat80("how many types are there?"),
+   test_chat80("how many formattypes are there?"),
+   test_chat80("how many formattypes are there?"),
+   !.
+
+/* A PROPERTY  */
+
+
+noun_plu_db(properties,property).
+thing_LF(property,feature&mpred,X,objectProperty(X),[],_).
+property_LF(property,feature&mpred,X,feature&type&_,Y, hasPropertyOrValue(Y,X),[],_,_).
+
+/* IS A SPECILIZATION OF A MPRED */
+
+noun_plu_db(mpreds,mpred).
+thing_LF(mpred,feature&mpred,X,mpred(X),[],_).
+
+objectProperty(P) :- hasProperty(_,P).
+
+hasPropertyOrValue(T,PorV):- (PorV=P;PorV=V), hasPropertyValue(T,P,V),(PorV=P;PorV=V).
+
+hasProperty(Type,P):-hasPropertyValue(Type,P,_).
+
+hasPropertyValue(SomeType,P,SomeVType):-mpred_arity(P,A),A>=2,argIsa_call(P,1,SomeType),argIsa_call(P,A,SomeVType).
+hasPropertyValue(Type,P,Area) :- property_LF(Area,_Measure&Area,_X,feature&TYPELIST,_Y,Pred,[],_,_),deepestType(TYPELIST,Type),get_1st_order_functor(Pred,P),deepestType(TYPELIST,Type).
+
+get_1st_order_functor(Pred,P):-not(compound(Pred)),!,P=Pred.
+get_1st_order_functor(Pred,P):-get_functor(Pred,F),(is_2nd_order_holds(F)->((arg(1,Pred,A),!,get_1st_order_functor(A,P)));P=F).
+
+/* THAT IS HAD */
+/*
+trans_LF(has,feature&mpred,X,feature&type,Y,hasProperty(Y,X),[],_,_).
+verb_root_db(has).
+regular_pres_db(has).
+regular_past_db(had,has).
+verb_form_db(has,has,pres+fin,3+sin).
+verb_form_db(having,has,pres+part,_).
+verb_type_db_0(has,main+trans).
+*/
+/* BY  SOME TYPE */
+
+
+deepestType(TYPE,_):-var(TYPE),!,fail.
+deepestType(TYPE&Next,Type):-var(Next),!,Type=TYPE.
+deepestType(_&LIST,Type):-!,deepestType(LIST,Type).
+deepestType(TYPE,Type):-Type=TYPE.
+
+typeAssignableTo(Type,SomeType):-transitive_subclass(Type,SomeType).
+typeAssignableTo(_Type,SomeType):-formattype(SomeType).
+
+
+%hook:fact_always_true(isa(Type,type)):- clause(thing_LF(Type,feature&_,_X,_,[],_),true).
+%hook:fact_always_true(isa(Type,type)):- clause(restriction_LF(Type,feature&_,_X,_),true).
+
+
+type_allowed(feature&TYPEMASK,Type):-nonvar(TYPEMASK),!,type_allowed(TYPEMASK,Type),!.
+type_allowed(TM,Type):-gen_typemask(Type,TM).
+
+type_allowed0(NV&TypeM,Type):-nonvar(NV),!,type_allowed(TypeM,Type).
+type_allowed0(TypeM,Type):-Type==TypeM,!.
+type_allowed0(TypeM&_,Type):- Type==TypeM,!.
+
 
 
 % =================================================================
@@ -496,10 +573,10 @@ property_LF(longitude,measure&position,X,feature&_,Y,longitude80(Y,X),[],_,_).
 property_LF(latitude, measure&position,X,feature&_,Y,latitude80(Y,X),[],_,_).
 noun_plu_db(longitudes,longitude). noun_plu_db(latitudes,latitude).
 
-longitude(C,L--degrees) :- country(C,_,_,L,_,_,_,_).
+longitude80(C,L--degrees) :- country(C,_,_,L,_,_,_,_).
 latitude80(C,L--degrees) :- country(C,_,L,_,_,_,_,_).
 
-longitude(_X--degrees).
+longitude80(_X--degrees).
 latitude80(_X--degrees).
 
 latitude80(tropic_of_capricorn,-23--degrees).
@@ -533,6 +610,7 @@ westof(X1,X2) :- longitude(X1,L1), longitude(X2,L2), exceeds(L1,L2).
 % "Population is having a quantitity"
 % ------------------------------
 noun_plu_db(populations,population).
+
 thing_LF(population,measure&countables,X,population(X),[],_).
 
 property_LF(population, measure&countables,X,feature&_,Y,population(Y,X),[],_,_).
@@ -546,6 +624,23 @@ population(_X--thousand).
 measure_unit_type_db(thousand,measure&countables,[],thousand).
 measure_unit_type_db(million,measure&countables,[],million).
 
+% ------------------------------
+/*
+
+ % BREAKS THINGS?
+
+noun_sin_db(QuantProp):- quantity_props_db(_OfType,QuantProp).
+
+thing_LF(QuantProp,measure&OfType,X,denotesQuantity(X,OfType),[],_):- quantity_props_db(OfType,QuantProp).
+property_LF(QuantProp, measure&OfType,X,feature&_,Y,holds_t(QuantProp,Y,X),[],_,_):- quantity_props_db(OfType,QuantProp).
+
+quantity_props_db(inches,height).
+
+denotesQuantity(_X--million,Countables):-quantity_props_db(Countables,_).
+denotesQuantity(_X--thousand,Countables):-quantity_props_db(Countables,_).
+denotesQuantity(N, Countables):-number(N),quantity_props_db(Countables,_).
+*/
+
 
 % ------------------------------
 % "Contains" Inversion of the 'in' relation.
@@ -558,8 +653,8 @@ verb_form_db(contains,contain,pres+fin,3+sin).
 verb_form_db(containing,contain,pres+part,_).
 trans_LF(contain,feature&place&_,X,feature&_,Y,in(Y,X),[],_,_).
 
-contains(X,Y) :- contains0(X,Y).
-contains(X,Y) :- contains0(X,W), contains(W,Y).
+contains80(X,Y) :- contains0(X,Y).
+contains80(X,Y) :- contains0(X,W), contains80(W,Y).
 
 contains0(america,north_america).
 
@@ -572,7 +667,7 @@ context_pron_db(at,time,when).
 
 adjunction_lf(in,feature&_-X,feature&place&_-Y,in(X,Y)).
 
-in(X,Y) :- var(X), nonvar(Y), !, contains(Y,X).
+in(X,Y) :- var(X), nonvar(Y), !, contains80(Y,X).
 in(X,Y) :- in0(X,W), ( W=Y ; in(W,Y) ).
 
 in0(X,Y) :- in_continent(X,Y).
@@ -581,6 +676,8 @@ in0(X,Y) :- country(X,Y,_,_,_,_,_,_).
 in0(X,Y) :- flows(X,Y).
 
 in_continent(middle_east,  asia).
+
+
 
 
 % =================================================================
@@ -631,7 +728,7 @@ flow_links([_|L],X1,X2) :- flow_links(L,X1,X2).
 
 
 % ------------------------------
-/* Measure of Mass */
+/* Measure of Mass Nouns*/
 % ------------------------------
 
 noun_plu_db(areas,area).
@@ -648,6 +745,32 @@ ratio_db(sqmiles,ksqmiles,1,1000).
 ratio_db(ksqmiles,sqmiles,1000,1).
 noun_plu_db(ksqmiles,ksqmile).
 noun_plu_db(sqmiles,sqmile).
+
+/*
+
+property_measured_in_db(area,sqmile,sqmiles).
++
+property_LF(area,measure&area,X,feature&place&_,Y,areaOf(Y,X),[],_,_).
+
+->
+
+noun_plu_db(areas,area).
+thing_LF(area,measure&area,X,isa_area(X),[],_).
+property_LF(area,measure&area,X,feature&place&_,Y,areaOf(Y,X),[],_,_).
+areaOf(C,A--ksqmiles) :- country(C,_,_,_,A0,_,_,_), A is integer(A0/1000).
+isa_area(_X--ksqmiles).
+
+
+measure_unit_type_db(sqmile,measure&area,[],sqmiles).
+measure_unit_type_db(ksqmile,measure&area,[],ksqmiles).
+
+ratio_db(sqmiles,ksqmiles,1,1000).
+ratio_db(ksqmiles,sqmiles,1000,1).
+noun_plu_db(ksqmiles,ksqmile).
+noun_plu_db(sqmiles,sqmile).
+
+
+*/
 
 
 /* Measure of Proportions and the like */
@@ -721,8 +844,8 @@ rel_adj_db(Bigger,Big):-plt,talk_db(comp,Big,Bigger).
 attribute_db(small,feature&place&_,X,measure&area,Y,areaOf(X,Y)).
 attribute_db(large,feature&place&_,X,measure&area,Y,areaOf(X,Y)).
 
-attribute_db(small,feature&Place&_,X,measure&Area,Y,dbase_t(AreaPred,X,Y)):-type_measured_by_pred_db(Place,Area,AreaPred).
-attribute_db(large,feature&Place&_,X,measure&Area,Y,dbase_t(AreaPred,X,Y)):-type_measured_by_pred_db(Place,Area,AreaPred).
+attribute_db(small,feature&Place&_,X,measure&Area,Y,holds_t(AreaPred,X,Y)):-type_measured_by_pred_db(Place,Area,AreaPred).
+attribute_db(large,feature&Place&_,X,measure&Area,Y,holds_t(AreaPred,X,Y)):-type_measured_by_pred_db(Place,Area,AreaPred).
 
 type_measured_by_pred_db(human,feet,height).
 
@@ -780,10 +903,11 @@ chat80 what are the items?
 chat80 how many items are there?
 chat80 how many types are there?
 chat80 how many postures are there?
-chat80 what are the postures that are verbs?
-chat80 how many rivers are rivers?
+chat80("what are the postures that are verbs?")
+chat80("how many rivers are rivers?").
 chat80 you flow to the ocean
 */
+
 
 current_dcg_predicate(F/A):-current_predicate(F/A).
 

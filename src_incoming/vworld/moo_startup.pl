@@ -143,9 +143,9 @@ make_qlfs:-
 
 % :- user_use_module(logicmoo(dbase/dbase_formattypes)).
 % :- user_use_module(logicmoo(parsing/parser_imperative)).
-:- user_ensure_loaded(logicmoo(parsing/parser_e2c)). 
-:- user_ensure_loaded(logicmoo(parsing/parser_chat80)). 
 :- user_ensure_loaded(logicmoo(parsing/parser_talk)). 
+:- user_ensure_loaded(logicmoo(parsing/parser_e2c)). 
+:- within_module(ensure_loaded(logicmoo(parsing/parser_chat80)),moo). 
 
 
 :- user_use_module(logicmoo('vworld/moo_loader.pl')).

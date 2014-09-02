@@ -61,6 +61,9 @@
 lastMember(_E,List):-var(List),!,fail.
 lastMember(E,[H|List]):-lastMember(E,List);E=H.
 
+:-export(functor_catch/3).
+functor_catch(P,F,A):-ccatch(functor(P,F,A),E,(dumpST,dmsg(E:functor(P,F,A)),dtrace)).
+
 bad_functor(L) :- arg(_,v('|','.',[],':','/'),L).
 
 warn_bad_functor(L):-ignore((notrace(bad_functor(L)),!,dumpST,dtrace,trace_or_throw(bad_functor(L)))).

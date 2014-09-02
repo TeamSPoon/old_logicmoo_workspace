@@ -14,7 +14,7 @@ was_run_dbg_pl:-is_startup_file('run_debug.pl').
 % run_tests includes run_common 
 :-include(run_tests).
 
-:- module(moo).
+:- debug.
 
 % [Optionaly] re-define load_default_game
 % load_default_game:- load_game(logicmoo('rooms/startrek.all.plmoo')).
@@ -103,15 +103,23 @@ tlocal_show(M,F,A,P,_ON,TF):-
 prolog_repl:- nl,fmt("Press Ctrl-D to start the mud!"),nl,catch(tlocals,E,dmsg(tlocals==E)),prolog.
 
 
-debug_repl(Module,CallFirst):- !,         
+debug_repl_w_cyc(Module,CallFirst):- !,         
           with_assertions(thlocal:useOnlyExternalDBs,
             with_assertions(thglobal:use_cyc_database,
-                ((user_ensure_loaded(logicmoo(parsing/parser_talk)),
-                user_ensure_loaded(logicmoo(parsing/parser_chat80)),
-                decl_type(person),          
+               ((decl_type(person),          
                 ensure_plmoo_loaded(logicmoo('rooms/startrek.all.plmoo')),
                 module(Module),
-                show_call(CallFirst), prolog_repl)))).
+                show_call(CallFirst), 
+                prolog_repl)))).
+
+debug_repl_wo_cyc(Module,CallFirst):- !,         
+          with_no_assertions(thlocal:useOnlyExternalDBs,
+            with_assertions(thglobal:use_cyc_database,
+               ((decl_type(person),          
+                ensure_plmoo_loaded(logicmoo('rooms/startrek.all.plmoo')),
+                module(Module),
+                show_call(CallFirst), 
+                prolog_repl)))).
 
 %  bug.. swi does not maintain context_module(CM) outside
 %  of the current caller (so we have no idea what the real context module is!?!
@@ -123,7 +131,7 @@ debug_repl_m(Module,CallFirst):-
             module(CM)).
 
 % [Required] Defines debug80
-debug80:- debug_repl(parser_chat80,t1).
+debug80:- moo:parser_chat80_module(M),debug_repl_wo_cyc(M,M:t1).
 
 
 % [Required] Defines debug_e2c

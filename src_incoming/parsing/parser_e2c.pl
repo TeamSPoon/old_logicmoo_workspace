@@ -2490,7 +2490,7 @@ atom_junct2([W|S],[W|Words]):-atom_junct2(S,Words).
 :- module_meta_predicates_are_transparent(parser_e2c).
 
 :-  moo:end_transform_moo_preds.
-:-module(parser_e2c).
+% :-module(parser_e2c).
 
 %:- debug, make:list_undefined. 
  % speechPartPreds_transitive(X,Y).
