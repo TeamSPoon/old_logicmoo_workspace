@@ -77,7 +77,7 @@ must_test_80([what, percentage, of, countries, border, each, ocean, ?], [sent([w
 must_test_80([what, countries, are, there, in, europe, ?], [sent([what, countries, are, there, in, europe, ?]), parse(whq(feature&place&country-B, s(np(3+plu, np_head(int_det(feature&place&country-B), [], country), []), verb(be, active, pres+fin, [], pos), [void], [pp(prep(in), np(3+sin, name(europe), []))]))), sem((answer([A]):-country(A), in(A, europe))), qplan((answer([A]):-in(A, europe), {country(A)})), answers([albania, andorra, austria, belgium, bulgaria, cyprus, czechoslovakia, denmark, east_germany, eire, finland, france, greece, hungary, iceland, italy, liechtenstein, luxembourg, malta, monaco, netherlands, norway, poland, portugal, romania, san_marino, spain, sweden, switzerland, united_kingdom, west_germany, yugoslavia])],[time(0.0010000000000000009)]).
 
 :-export(t2/0).
-t2:- with_assertions(tracing80,with_no_assertions(thglobal:use_cyc_database,forall(must_test_80(U,R,O),process_run_diff(report,U,R,O)))).
+t2:- with_assertions(tracing80,with_no_assertions(thlocal:old_text,with_no_assertions(thglobal:use_cyc_database,forall(must_test_80(U,R,O),process_run_diff(report,U,R,O))))).
 
 
 % ===========================================================

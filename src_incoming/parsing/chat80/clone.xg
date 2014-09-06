@@ -55,7 +55,7 @@ whq(X,3+No,np(3+No,wh(X),[]),Case) --> int_pron(Case).
 int_det(X,3+Agmt) --> whose(X,Agmt).
 int_det(X,3+Agmt) --> int_art(X,Agmt).
 
-whose(X,Agmt), np_head0(wh(X),Agmt,proper), gen_marker --> [whose].
+whose(X,Agmt), np_head0(wh(X),Agmt,proper), gen_marker --> theText1(whose).
 
 question(QCase,NPCase,S) -->
    {subj_qustion_db(QCase), is_to_role_case(subj,_,NPCase)},
@@ -159,15 +159,15 @@ possessive(Kernel0,Agmt0,_,[],Mods0,
               [pp(poss,np(Agmt0,Kernel0,Mods0))|PostMods1],
               Kernel,Agmt,Type,PostMods,Mods).
 possessive(Kernel,Agmt,Type,PostMods,Mods,
-           Kernel,Agmt,Type,PostMods,Mods) --> [].
+           Kernel,Agmt,Type,PostMods,Mods) --> noText.
 
 % this next "[the]" cannot be replaced with theText1(the)!
-gen_case, [the] --> gen_marker.
+gen_case, [the] --> {thlocal:old_text},gen_marker.
+gen_case, [w(the,_)] --> gen_marker.
 
-gen_marker --> [''''], an_s.
+gen_marker --> theText1(''''), an_s.
 
-an_s --> [s].
-an_s --> [].
+an_s --> textOpt([s]).
 
 /* Determiners */
 

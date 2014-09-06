@@ -65,7 +65,7 @@ terminator_db(.,_).
 terminator_db(?,?).
 terminator_db(!,!).
 
-plt:-! ,fail.
+plt:-! ,thlocal:chat80_interactive.
 plt :- thlocal:usePlTalk.
 
 adverb_db(Quickly):-plt,talk_db(adv,Quickly),not_ccw(Quickly).
@@ -176,11 +176,11 @@ verb_form_db(were,be,past+fin,_+plu).
 verb_form_db(been,be,past+part,_).
 verb_form_db(being,be,pres+part,_).
 
-:-dynamic old_text/0.
+:-thread_local thlocal:old_text/0.
 
-old_text.
+thlocal:old_text.
 
-w_to_w2(W,W):-old_text,!.
+w_to_w2(W,W):-thlocal:old_text,!.
 
 w_to_w2(w(Txt,Props),w(Txt,Props)):-!.
 w_to_w2(w(X),w(X,open)):-!.
@@ -188,7 +188,7 @@ w_to_w2(U,w(U,open)):-compound(U),!.
 w_to_w2(S,w(A,open)):-atom_string(A,S),!.
 w_to_w2(X,w(X,open)):-!.
 
-memoize_pos_to_db(WHY,_CYCPOS,W1,W1):- old_text,!, WHY. %  w(W1,DATA)
+memoize_pos_to_db(WHY,_CYCPOS,W1,W1):- thlocal:old_text,!, WHY. %  w(W1,DATA)
 memoize_pos_to_db(WHY,_CYCPOS,W2,W1):- W2= w(W1,open),!,WHY,must(nb_setarg(2,W2,set(WHY))).
 memoize_pos_to_db(WHY,_CYCPOS,W2,W1):- W2= w(W1,set(WHY2)),!,WHY2=WHY.
 memoize_pos_to_db(WHY,CYCPOS,W2,W1):- W2= w(W1,DATA), trace,
@@ -439,10 +439,10 @@ maybe_noun_or_adj(T):- var(T)->true;(atom(T),not_ccw(T)).
 % 
 % chat80("how many types are there?").
 % chat80("what formattypes are types?").
-
+% test_chat80( [which,is,the,largest,african,country,?]).
 %  chat80("how are you?").
 % test_chat80("you flow").
-
+:-export(test_chat80/1).
 test_chat80(U):- with_assertions(thlocal:chat80_interactive, must(chat80(U))).
 
 t11:- 
