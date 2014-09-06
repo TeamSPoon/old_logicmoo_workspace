@@ -10,7 +10,7 @@ if [ $# -eq 0 ]
     export RUNFILE="$1"
 fi
 
-while [ 1 ]
+while [ $? -eq 0 ]
 do
         echo "You should not see this ever";
         cd $OLDPWD
@@ -23,4 +23,5 @@ do
         ./debug_once.sh $RUNFILE
         cd $OLDPWD
 done
+exit $?
 

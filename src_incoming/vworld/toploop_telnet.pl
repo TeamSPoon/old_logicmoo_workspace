@@ -139,7 +139,7 @@ telnet_repl_writer(_TL,text,Type,V):-copy_term(Type,TypeO),ignore(TypeO=t),fmt('
 telnet_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=t),fmt('~q=(~w)~q.~n',[N,TypeO,V]).
 
 telnet_repl_obj_to_string(O,_TypeHint,O):-!.
-telnet_repl_obj_to_string(O,_TypeHint,S):- object_string(O,S),!.
+telnet_repl_obj_to_string(O,_TypeHint,S):- must(object_string(O,S)),!.
 telnet_repl_obj_to_string(O,Type,toString(TypeO,O)):-copy_term(Type,TypeO),ignore(TypeO=s).
 
 merge_elements(V,V):-not(is_list((V))),!.

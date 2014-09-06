@@ -86,18 +86,21 @@ t2:- with_assertions(tracing80,with_no_assertions(thglobal:use_cyc_database,fora
 moo:type_action_info(human_player,chat80(list(term)),"Development test CHAT-80 Text for a human.  Usage: CHAT80 Cant i see the blue backpack?").
 
 moo:agent_call_command(_Gent,chat80([])):- chat80.
-moo:agent_call_command(_Gent,chat80(StringM)):- control80(StringM).  
+moo:agent_call_command(_Gent,chat80(StringM)):- chat80(StringM).  
 
 
 % ===========================================================
 % CHAT80 REPL
 % ===========================================================
+:-thread_local thlocal:chat80_interactive/0.
+
 :-export(chat80/0).
 chat80 :- with_assertions(tracing80,
+           with_assertions(thlocal:chat80_interactive,
             with_no_assertions(thlocal:useOnlyExternalDBs,
              with_no_assertions(thglobal:use_cyc_database,
                   with_assertions(usePlTalk, (told, repeat, prompt_read('CHAT80> ',U),  
-                            to_word_list(U,WL),((WL==[bye];WL==[end,'_',of,'_',file];control80(WL)))))))).
+                            to_word_list(U,WL),((WL==[bye];WL==[end,'_',of,'_',file];control80(WL))))))))).
 
 :- multifile(thlocal:into_form_code/0).
 :- asserta(thlocal:into_form_code).
@@ -148,8 +151,7 @@ chat80 :- with_assertions(tracing80,
 
 
 :-export(test_chat80_regressions/0).
-test_chat80_regressions:- time(hi('../src_incoming/parsing/chat80/demo')).
-
+test_chat80_regressions:- time(t2).
 :- retract(thlocal:into_form_code).
 
 :- retractall(thlocal:enable_src_loop_checking).

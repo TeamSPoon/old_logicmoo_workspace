@@ -192,12 +192,13 @@ create_instance(What,Type,Props):- loop_check_local(time_call(create_instance_no
 
 create_instance_now(What,Type,Props):-
  with_assertions(thlocal:skip_db_op_hooks,
+  with_assertions(thlocal:deduceArgTypes(_),
   with_no_assertions(thlocal:useOnlyExternalDBs,
    with_no_assertions(thlocal:noRandomValues(_),
      with_no_assertions(thlocal:insideIREQ(_),   
       with_no_assertions(thlocal:noDefaultValues(_),
         with_no_assertions(thglobal:use_cyc_database, 
-     ((split_name_type(What,Inst,_WhatType),assert_isa(Inst,Type), create_instance_0(What,Type,Props))))))))).
+     ((split_name_type(What,Inst,_WhatType),assert_isa(Inst,Type), create_instance_0(What,Type,Props)))))))))).
 
 :-discontiguous create_instance_0/3.
 

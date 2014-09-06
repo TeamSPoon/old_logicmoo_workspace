@@ -68,6 +68,13 @@
 		</Folder>
 	</CustomFolders>
 	<Files AutoFolders="PackageView">
+		<Folder Name="src_incoming/ext">
+			<F
+				N="src_incoming/ext/*.*"
+				Recurse="1"
+				Refilter="0"
+				Excludes=""/>
+		</Folder>
 		<Folder Name="src_incoming/parsing/chat80">
 			<F N="src_incoming/parsing/chat80/aggreg.pl"/>
 			<F N="src_incoming/parsing/chat80/clone.xg"/>
@@ -76,11 +83,8 @@
 			<F N="src_incoming/parsing/chat80/lex.xg"/>
 			<F N="src_incoming/parsing/chat80/load.pl"/>
 			<F N="src_incoming/parsing/chat80/log"/>
-			<F N="src_incoming/parsing/chat80/ndtabl.pl"/>
 			<F N="src_incoming/parsing/chat80/newdict.pl"/>
-			<F N="src_incoming/parsing/chat80/newg.pl"/>
 			<F N="src_incoming/parsing/chat80/newtop.pl"/>
-			<F N="src_incoming/parsing/chat80/oldg.pl"/>
 			<F N="src_incoming/parsing/chat80/portray.pl"/>
 			<F N="src_incoming/parsing/chat80/ptree.pl"/>
 			<F N="src_incoming/parsing/chat80/qplan.pl"/>
@@ -89,22 +93,8 @@
 			<F N="src_incoming/parsing/chat80/scopes.pl"/>
 			<F N="src_incoming/parsing/chat80/slots.pl"/>
 			<F N="src_incoming/parsing/chat80/talkr.pl"/>
-			<F N="src_incoming/parsing/chat80/templa.pl"/>
 			<F N="src_incoming/parsing/chat80/xgproc.pl"/>
 			<F N="src_incoming/parsing/chat80/xgrun.pl"/>
-		</Folder>
-		<Folder Name="src_incoming/parsing/chat80/geography">
-			<F N="src_incoming/parsing/chat80/geography/borders.pl"/>
-			<F N="src_incoming/parsing/chat80/geography/cities.pl"/>
-			<F N="src_incoming/parsing/chat80/geography/contain.pl"/>
-			<F N="src_incoming/parsing/chat80/geography/countries.pl"/>
-			<F N="src_incoming/parsing/chat80/geography/geo_lex_newdict.pl"/>
-			<F N="src_incoming/parsing/chat80/geography/geo_templa.pl"/>
-			<F N="src_incoming/parsing/chat80/geography/rivers.pl"/>
-			<F N="src_incoming/parsing/chat80/geography/world0.pl"/>
-		</Folder>
-		<Folder Name="src_incoming/parsing/chat80/typesystem">
-			<F N="src_incoming/parsing/chat80/typesystem/typesems.pl"/>
 		</Folder>
 	</Files>
 </Project>

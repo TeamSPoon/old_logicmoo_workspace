@@ -90,7 +90,7 @@ non_assertable(WW,notAssertable(Why)):- compound(WW),functor_catch(WW,F,_),mpred
 :-'$hide'(expanded_different/2).
 :-export(expanded_different/2).
 
-expanded_different(G0,G1):-with_assertions(thlocal:into_form_code,expanded_different_ic(G0,G1)).
+expanded_different(G0,G1):-call(expanded_different_ic(G0,G1)).
 
 expanded_different_ic(G0,G1):-G0==G1,!,fail.
 expanded_different_ic(G0,G1):-expanded_different_1(G0,G1),!.
@@ -103,7 +103,7 @@ expanded_different_1(G0,G1):- G0 \= G1,!.
 
 
 :-export(into_hilog_form/2).
-into_hilog_form(G0,G1):-with_assertions(thlocal:into_form_code,into_hilog_form_ic(G0,G1)).
+into_hilog_form(G0,G1):-call(into_hilog_form_ic(G0,G1)).
 
 into_hilog_form_ic(M:X,O):- atom(M),!,into_hilog_form_ic(X,O).
 into_hilog_form_ic(X,O):- is_list(X),list_to_dbase_t(X,D),into_hilog_form_ic(D,O).
@@ -134,10 +134,10 @@ hook:into_assertable_form_trans_hook(G,F,_,was_asserted_gaf(G)):- mpred_prop(F,w
 :-dynamic_multifile_exported(into_assertable_form/2).
 into_assertable_form(M:H,G):-atom(M),!,into_assertable_form(H,G).
 % into_assertable_form(B,A):- save_in_dbase_t,!,into_hilog_form(B,A),!.
-into_assertable_form(G0,G1):-with_assertions(thlocal:into_form_code,into_assertable_form_ic(G0,G1)).
+into_assertable_form(G0,G1):-call(into_assertable_form_ic(G0,G1)).
 
 into_assertable_form_ic(H,G):- call_no_cuts((hook:into_assertable_form_trans_hook(H,G))),expanded_different(H,G),!.
-into_assertable_form_ic(H,GO):-expand_term( (H :- true) , C ), reduce_clause(C,G),expanded_different(H,G),!,into_assertable_form(G,GO),!.
+% into_assertable_form_ic(H,GO):-expand_term( (H :- true) , C ), reduce_clause(C,G),expanded_different(H,G),!,into_assertable_form(G,GO),!.
 into_assertable_form_ic(X,O):- functor_catch(X,F,A),into_assertable_form_via_mpred(X,F,A,O),!.
 into_assertable_form_ic(X,O):- into_assertable_form(dbase_t,X,O),!.
 
@@ -147,7 +147,7 @@ into_assertable_form_via_mpred(X,F,_A,O):- not(mpred_prop(F,is_dbase_t)),!,X=O.
 
 :-dynamic_multifile_exported(into_assertable_form/3).
 into_assertable_form(HLDS,M:X,O):- atom(M),!,into_assertable_form(HLDS,X,O),!.
-into_assertable_form(HLDS,X,O):-with_assertions(thlocal:into_form_code,(( X=..[F|A],into_assertable_form(HLDS, X,F,A,O)))),!.
+into_assertable_form(HLDS,X,O):-call((( X=..[F|A],into_assertable_form(HLDS, X,F,A,O)))),!.
 
 % TODO finish negations
 into_assertable_form(Dbase_t,X,Dbase_t,_A,X):-!.
@@ -170,7 +170,7 @@ into_mpred_form_lc(G,O):- functor(G,F,A),G=..[F,P|ARGS],!,into_mpred_form(G,F,P,
 into_mpred_form(_,F,_,1,[C],O):-alt_calls(F),!,into_mpred_form(C,O),!.
 into_mpred_form(_,':-',C,1,_,':-'(C)):-!.
 into_mpred_form(C,isa,_,2,_,C):-!.
-into_mpred_form(H,_,_,_,_,GO):- with_assertions(thlocal:into_form_code,once((expand_term( (H :- true) , C ), reduce_clause(C,G)))),expanded_different(H,G),!,into_mpred_form(G,GO),!.
+% into_mpred_form(H,_,_,_,_,GO):- call(once((expand_term( (H :- true) , C ), reduce_clause(C,G)))),expanded_different(H,G),!,into_mpred_form(G,GO),!.
 into_mpred_form(_,not,C,1,_,not(O)):-into_mpred_form(C,O),!.
 into_mpred_form(G,F,_,_,_,G):-mpred_prop(F,prologBuiltin),!.
 into_mpred_form(G,F,_,1,_,G):-mpred_prop(F,mped_type(callable(prologOnly))),!.
@@ -297,10 +297,10 @@ run_database_hooks_2(Type,Hook):- copy_term(Hook,HCopy),doall(call_no_cuts(hook:
 :- meta_predicate_transparent(fact_checked(?,0)).
 
 
-fact_checked(Fact,Call):- not(ground(Fact)),!,no_loop_check(call(no_repeats,(Call)),fail).
+fact_checked(Fact,Call):- not(ground(Fact)),!,no_loop_check(Call,fail).
 fact_checked(Fact,_):- is_known_false0(Fact),!,fail.
-fact_checked(Fact,_):- is_known_true(Fact),!.
-fact_checked(Fact,Call):- no_loop_check(call(call,(Call)),fail),(really_can_table_fact(Fact,true)->asserta(is_known_trew(Fact));true).
+fact_checked(Fact,_):- is_known_trew(Fact),!.
+fact_checked(Fact,Call):- no_loop_check(Call,fail),(really_can_table_fact(Fact,true)->asserta(is_known_trew(Fact));true).
 % fact_checked0(_Fact,Call):- asserta(is_known_false(Fact)),!,fail.
 % would only work outside a loop checker (so disable)
 % fact_checked0(Fact,_Call):- really_can_table_fact(Fact),asserta(is_known_false(Fact)),!,dmsg(is_known_false(Fact)),!,fail.
@@ -315,7 +315,7 @@ cannot_table_functor(atloc,_).
 cannot_table_functor(isa,false).
 
 :-meta_predicate_transparent(fact_loop_checked(+,0)).
-fact_loop_checked(Fact,Call):- fact_checked(Fact,loop_check(Call,is_asserted(Fact))).
+fact_loop_checked(Fact,Call):- no_repeats(fact_checked(Fact,loop_check(Call,is_asserted(Fact)))).
 
 % ================================================
 % is_asserted/1

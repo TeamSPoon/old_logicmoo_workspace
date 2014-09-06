@@ -425,11 +425,11 @@ printTime(G,T0) :-
 	call(G),
 	getRuntime(T1),
 	T is T1 - T0,
-	format('Total runtime ~3d sec.~n', [T]).
+	'format'('Total runtime ~3d sec.~n', [T]).
 printTime(_,T0) :-
 	getRuntime(T1),
 	T is T1 - T0,
-	format('Total runtime ~3d sec.~n', [T]),
+	'format'('Total runtime ~3d sec.~n', [T]),
 	!,
 	fail.
 
@@ -2896,11 +2896,11 @@ getStat(CN,CST,RN,RST,T) :-
 printStat :-
 	!,
 	getStat(CN,CST,RN,RST,T),
-	format('Concepts classified:         ~d~n',CN),
-	format('Subsumption tests performed: ~d~n',CST),
-	format('Roles    classified:         ~d~n',RN),
-	format('Subsumption tests performed: ~d~n',RST),
-	format('Total runtime:               ~3d sec.~2n',T),
+	'format'('Concepts classified:         ~d~n',CN),
+	'format'('Subsumption tests performed: ~d~n',CST),
+	'format'('Roles    classified:         ~d~n',RN),
+	'format'('Subsumption tests performed: ~d~n',RST),
+	'format'('Total runtime:               ~3d sec.~2n',T),
 	!.
 
 buildOrdering(Env,MS,CTree,RTree) :- 
@@ -3749,7 +3749,7 @@ solveConstraint(Env,MS,(card,app((FF:R),X),Rel,N),(M,S),hyp(HYPS),ab(D),call(CAL
 %	cCS(CALLS,SolveHead),
 %	CALLS1 = [SolveHead|CALLS],
 	length(CALLS,XXX),
-%	format('trying ~d  solve(~w(~w)) ~w ~w~n',[XXX,R,X,Rel,N]),
+%	'format'('trying ~d  solve(~w(~w)) ~w ~w~n',[XXX,R,X,Rel,N]),
 	collectAllFillers(Env,MS,R,X,HYPS,D,CALLS,S),
 	computeNumber(S,Rel,(M,PTAbox)),
 	continueSolve(Env,MS,(card,app((FF:R),X),Rel,N),hyp(HYPS),ab(D),call(CALLS),(M,PTAbox),PT),
@@ -4214,7 +4214,7 @@ constructMLMark(in(_,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(_),_),LoopCheck) 
  * which is added to the call stack. If AX1 is `no' then the MLMark is
  * not added to the call stack at all.
  * S1 is used in the construction of InHead. If S1 is a variable, any 
- * rule can be used to prove the call. If S1 is `user' then only user
+ * rule can be used to prove the call. If S1 is user' then only user
  * provided rules may be used. If S1 is `system' then only system provided
  * rules may be used.
  *
@@ -4999,9 +4999,9 @@ initEnvironment(EnvName) :-
 
 assertInRules(Env) :-
 	assertz((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
-		 ifOption(traceOutput,yes,(length(CALL,Depth), format('trying ~d  in(~w,~w)~n',[Depth,CN,CON]))),
+		 ifOption(traceOutput,yes,(length(CALL,Depth), 'format'('trying ~d  in(~w,~w)~n',[Depth,CN,CON]))),
 	kb_in(Env,pr(5),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT),
-		 ifOption(traceOutput,yes,(length(CALL,Depth), format('succeeded ~d  in(~w,~w)~n',[Depth,CN,CON]))))),
+		 ifOption(traceOutput,yes,(length(CALL,Depth), 'format'('succeeded ~d  in(~w,~w)~n',[Depth,CN,CON]))))),
 % There are no kb_in clauses with priority 4 at the moment (07.10.92)
 %	assertz((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
 %	kb_in(Env,pr(4),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT))),
@@ -6642,7 +6642,7 @@ example(72) :-
         % nicht langsam, da umwelttypen nicht glauben, da\3 Katalysatoren ein
         % Auto langsam machen.
         %
-        % Wir k"onnen auch in diesem Fall fragen, unter welchen Umst"anden
+        % Wir k""onnen auch in diesem Fall fragen, unter welchen Umst"anden
         % pk den polo f"ur sein Wunschauto halten w"urde:
         %
         % abduce([b(want,pk)],H,elementOf(polo,wunsch_auto),E).
@@ -7179,7 +7179,7 @@ get_Env_World(EnvName,MS,Env,World) :-
 % Author:       Ullrich Hustadt
 % Address:      Max-Planck-Institut for Computer Science
 %               Im Stadtwald
-%               6600 Saarbr"ucken
+%               6600 Saarbr""ucken
 %               Germany
 % Email:        Ullrich.Hustadt@mpi-sb.mpg.de
 % Copyright:    (C) 1993 Ullrich Hustadt
@@ -9007,7 +9007,7 @@ namesInTerm(L,[(Type,L)],Type) :-
 % Author:       Ullrich Hustadt
 % Address:      Max-Planck-Institut for Computer Science
 %               Im Stadtwald
-%               6600 Saarbr"ucken
+%               6600 Saarbr""ucken
 %               Germany
 % Email:        Ullrich.Hustadt@mpi-sb.mpg.de
 % Copyright:    (C) 1993 Ullrich Hustadt
@@ -10900,7 +10900,7 @@ sb_disjoint(EnvName,MS,CName1,CName2):-
 /*----------------------------------------------------------------------------
  * sb_expand(CName1,CName2)
  * erlaubt die Erweiterung der Definition eines bereits existierenden Konzeptes,
- * der Konstruktor fuegt zu einem bestehenden Konzept ein weiteres "Vaterkonzept
+ * der Konstruktor fuegt zu einem bestehenden Konzept ein weiteres ""Vaterkonzept
  * hinzu, die Moeglichkeit der Erweiterung ist also analog zur Definition der 
  * Konzepte.
  *------------------------------------------*/

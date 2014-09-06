@@ -78,6 +78,15 @@ link_to_holds(Pred,TargetPred):-
           B=..[TargetPred|PLIST],              
          assertz_if_new((A:-B)))).
 
+:-export(link_to_holds_DYNAMIC/2).
+link_to_holds_DYNAMIC(Pred,TargetPred):- 
+  doall((between(2,12,X),length(PLIST,X),
+         dynamic_multifile_exported(Pred/X),          
+         dynamic_multifile_exported(TargetPred/X),          
+          A=..[Pred|PLIST],
+          B=..[TargetPred|PLIST],              
+         assertz_if_new((A:-B)))).
+
 :-export(link_to_holds_list/2).
 link_to_holds_list(Pred,TargetPred):- 
   doall((between(2,12,X),length(PLIST,X),
@@ -103,11 +112,11 @@ cyckb_t(P,A1,A2):- dbase_t([P,A1,A2]).
 cyckb_t(P,A1):- el_holds(P,A1,_,_).
 cyckb_t(P,A1):- dbase_t([P,A1]).
 */
-
-:- link_to_holds2(cyckb_t,el_holds).
+:-dynamic(el_holds_DISABLED_KB/0).
+:- link_to_holds_DYNAMIC(cyckb_t,el_holds_DISABLED_KB).
 
 :-export(cyckb_t/1).
-cyckb_t(PLIST):- apply(cyckb_t,PLIST).
+cyckb_t(PLIST):- fail,throw(el_holds_DISABLED_KB), apply(cyckb_t,PLIST).
 
 :-export(noGenlPreds/1).
 noGenlPreds(coGenlPreds).

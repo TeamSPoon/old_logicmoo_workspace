@@ -58,7 +58,7 @@
 			<F
 				N="src_incoming/*.*"
 				Recurse="1"
-				Excludes="*unused.*"/>
+				Excludes="*unused.*;*.orig;*.ba*"/>
 		</Folder>
 		<Folder Name="src_incoming_next">
 			<F
@@ -77,9 +77,7 @@
 		<Folder Name="src_modules/MaLARea/script/malecop">
 			<F
 				N="src_modules/MaLARea/script/malecop/*.*"
-				Recurse="1"
-				Refilter="0"
-				Excludes=""/>
+				Recurse="1"/>
 		</Folder>
 	</Files>
 </Project>

@@ -1,5 +1,5 @@
 % :- module(user). 
-:- module(inventory, [inventory/2]).
+:- module(inventory, [inventory/2,inventory1/2]).
 /** <module> A command to  ...
 % Douglas Miles 2014
 % inventory(Agt,Inv) = inventory (anything the agent has taken
@@ -22,6 +22,10 @@ inventory0(Agent, Inv) :-
 	findall(Poss,inventory1(Agent,Poss),Inv).
 
 inventory1(Agent,Poss):-inside_of(Poss,Agent).
+
+:-decl_mpred_hybrid(possess(agent,obj)).
+
+possess(Agent,Poss):-inventory1(Agent,Poss).
 
 test_exists(O):- item(O).
 test_exists(O):- agent(O).

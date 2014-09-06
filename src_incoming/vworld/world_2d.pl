@@ -120,7 +120,7 @@ init3(LocName,LocType,xyz(LocName,X,Y,1),[O|T]) :-
 	init3(LocName,LocType,xyz(LocName,K,Y,1),T).
 
 
-rez_loc_object(_,0):-!.
+% rez_loc_object(_,0):-!.
 rez_loc_object(XY,Type):-
            gensym(Type,Name2),
            Name = xyN(XY,Name2),           
@@ -149,12 +149,15 @@ region_near(R1,R1).
 moo:transitive_other(atloc,1,Obj,What):-inside_of(Obj,What).
 
 :-export(inside_of/2).
+/*
 inside_of(Obj,What):-is_asserted(stowed(What,Obj)).
-inside_of(Obj,What):-is_asserted(wearing(What,Obj)).
+inside_of(Obj,What):-is_asserted(wearsClothing(What,Obj)).
 inside_of(Obj,What):-is_asserted(contains(What,Obj)).
+*/
+
 
 genlInverse(inside_of,possess).
-genlInverse(wearing,inside_of).
+genlInverse(wearsClothing,inside_of).
 genlInverse(contains,inside_of).
 genlInverse(stowed,inside_of).
 
@@ -182,8 +185,11 @@ ensure_in_world(What):-must_det(put_in_world(What)).
 :- dynamic_multifile_exported hook:fact_maybe_deduced/1.
 :- dynamic_multifile_exported hook:fact_is_false/2.
 
+:-decl_mpred_hybrid(inside_of(obj,obj)).
 
 % facts that cant be true
+
+hook:fact_is_false(atloc(Obj,_LOC),inside_of(Obj,What)) :- nonvar(Obj),is_asserted(inside_of(Obj,What)),not(isa(What,region)).
 hook:fact_is_false(atloc(Obj,LOC),inside_of(Obj,What)) :- nonvar(Obj),(inside_of(Obj,What)),not(atloc(What,LOC)).
 hook:fact_is_false(localityOfObject(Obj,_LOC),inside_of(Obj,What)) :- nonvar(Obj),(inside_of(Obj,What)),!.
 

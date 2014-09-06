@@ -20,7 +20,7 @@ subclass('FluidReservoir',drinkable).
 subclass('Weapon',wieldable).
 subclass('ControlDevice',usable).
 
-moo:action_verb_useable(wear,wearing,wearable,stowed).
+moo:action_verb_useable(wear,wearsClothing,wearable,stowed).
 moo:action_verb_useable(wield,wielding,wieldable,stowed).
 moo:action_verb_useable(use,using,usable,stowed).
 moo:action_verb_useable(drink,drinking,drinkable,holding).

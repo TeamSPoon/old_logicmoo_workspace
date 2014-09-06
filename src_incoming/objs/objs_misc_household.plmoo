@@ -199,19 +199,20 @@ locaton_s(item_template(RealObj,D1,D2,0),Place):-
 :-setTemplate item_template(broccoli, [color(green),size(small)],[shape(like(tree)),isa(vegetable),texture([porous,bumpy])]).                                                                    
 :-setTemplate item_template(crackers, [color(tan),isa(bread)],[shape([circular,flat]),size(small),texture([dry,coarse])]).
 :-setTemplate item_template(computer, [color(grey),material(plastic)],[shape([cubular,rectangular]),size(medium),texture(smooth)]).
-:-setTemplate item_template(stamp, [color(polychromatic),size(tiny,thin)],[shape(square),material(paper),texture([smooth,sticky])]).
+:-setTemplate item_template(stamp, [color(polychromatic),size([tiny,thin])],[shape(square),material(paper),texture([smooth,sticky])]).
 :-setTemplate item_template(coat, [color(black),size([medium,fits])],[shape(like(torso)),material([wool,cotton,rayon ]),texture(coarse)]).
 :-setTemplate item_template(pants, [color(black),size([medium,fits])],[shape(like(ass)),material([denim]),texture(coarse)]).
 :-setTemplate item_template(nani, [color(brown),color(white),size(medium)],[shape(like(teddy_bear)),material(plush),texture([fuzzy,soft])]).
 :-setTemplate item_template(light_switch, [color(cream),size(small)],[shape(rectangular),material(plastic),texture(smooth)]).
+% :- onSpan((etrace)).
 :-setTemplate item_template(ball, [color(red),size(medium)],[shape(spherical),material(rubber),texture(bumpy)]).
-:-setTemplate item_template(coffee, [color(black,brown),size(small)],[shape(fluid),material(liquid),texture(wet)]).
+:-setTemplate item_template(coffee, [color([black,brown]),size(small)],[shape(fluid),material(liquid),texture(wet)]).
 :-setTemplate item_template(coffee_cup, [color(black),color(brown),size(small)],[shape(cuplike),material(glass),texture(smooth)]).
 :-setTemplate item_template(sofa, [color([blue,dark]),size([large,wide,long])],[shape(polyhedral),material([poplin,wood]),texture(ribbed),weight(125)]).
 :-setTemplate item_template(easy_chair, [color(blue),size([large,narrow])],[shape(polyhedral),material([poplin,wood]),texture(ribbed),weight(75)]).
 :-setTemplate item_template(coffee_table, [color([brown,shiney]),size(medium)],[shape(circular),material(wood),texture(smooth),weight(35)]).
-:-setTemplate item_template(book_type_a, [color(green),color(white),color(black),size(small)],[shape(cubular,rectangular),material(paper),texture(smooth)]).
-:-setTemplate item_template(book_type_b, [color(pink),color(white),color(black),size(small)],[shape(cubular,rectangular),material(paper),texture(smooth)]).
+:-setTemplate item_template(book_type_a, [color(green),color(white),color(black),size(small)],[shape([cubular,rectangular]),material(paper),texture(smooth)]).
+:-setTemplate item_template(book_type_b, [color(pink),color(white),color(black),size(small)],[shape([cubular,rectangular]),material(paper),texture(smooth)]).
 :-setTemplate item_template(bookcase, [color([brown,dark,shiney]),size(large)],[shape([square,concave_polyhedron]),material(wood),texture(smooth),weight(60)]).
 :-setTemplate item_template(dresser, [color([brown,shiney]),size(large)],[shape([rectangular,polyhedral]),material(wood),texture(smooth),weight(45)]).
 :-setTemplate item_template(top_drawer, [color([brown,shiney]),size(medium)],[shape([rectangular,concave_polyhedron]),material(wood),texture(smooth)]). 

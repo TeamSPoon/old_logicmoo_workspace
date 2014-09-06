@@ -71,7 +71,6 @@
 			<F N="src/cliopatria_binding.pl"/>
 			<F N="src/daemon.pl"/>
 			<F N="src/launchcliopatria.pl"/>
-			<F N="src/logicmoo_31088_1.pl"/>
 			<F N="src/run.pl"/>
 			<F N="src/run_common.pl"/>
 			<F N="src/run_debug.pl"/>

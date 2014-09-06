@@ -122,7 +122,7 @@ get_percepts0(Agent,Percepts) :-
 	view_vectors(Dirs),
 	check_for_blocks(Agent),
 	view_dirs(Agent,Dirs,Tmp_percepts),
-	alter_view(Dirs,Tmp_percepts,Percepts))),
+	alter_view(Agent,Dirs,Tmp_percepts,Percepts))),
 	!.
 
 % Look at locations immediately around argent
@@ -169,17 +169,21 @@ near_vectors([[nw,here],[n,here],[ne,here],
 	[w,here],[d,u],[e,here],
 	[sw,here],[s,here],[se,here]]).
 
-% Series of predicates to modify agents vision so return 'dar' for locations
+:-decl_mpred_prolog(look:visually_blocked(agent,list)).
+
+:-listing(visually_blocked).
+
+% Series of predicates to modify agents vision so return 'dar(k)' for locations
 % which are blocked from view
-check_for_blocks(_Agent) :-!.
+% check_for_blocks(_Agent) :-!.
 check_for_blocks(Agent) :-
 	height_on_obj(Agent,Ht),
-	clr(blocks(_)),
+	clr(visually_blocked(Agent,_)),
 	Dirs = [[n,here],[s,here],[e,here],[w,here],
 	[ne,here],[nw,here],[se,here],[sw,here]],
 	view_dirs(Agent,Dirs,Percepts),
 	blocked_percepts(Ht,Dirs,Percepts,[],Blocked_Percepts),
-	add(blocks(Blocked_Percepts)).
+	add(visually_blocked(Agent,Blocked_Percepts)).
 check_for_blocks(_).
 
 % High enough to see over obstacles??
@@ -216,17 +220,17 @@ block_coverage(e,e,[[e,e],[e,ne],[e,se]]).
 block_coverage(D1,D2,[[D1,D2]]).
 
 % These three predicates modifies Percepts so that blocked locations return 'dark'
-alter_view([],[],[]).
-alter_view([[D1,D2]|Drest],[TP|TPrest],[P|Prest]) :-
-	mem_test(D1,D2,YorN),
-	alter_view(Drest,TPrest,Prest),
+alter_view(_Agent,[],[],[]).
+alter_view(Agent,[[D1,D2]|Drest],[TP|TPrest],[P|Prest]) :-
+	mem_test(Agent,D1,D2,YorN),
+	alter_view(Agent,Drest,TPrest,Prest),
 	dark_if_yes(YorN,[TP],P).
 
-mem_test(D1,D2,YorN) :-
-	blocks(Bdirs),
+mem_test(Agent,D1,D2,YorN) :-
+	visually_blocked(Agent,Bdirs),
 	prop_memb([D1,D2],Bdirs),
 	YorN = yes.
-mem_test(_,_,no).
+mem_test(_Agent,_,_,no).
 
 dark_if_yes(yes,_,[dark]).
 %dark_if_yes(no,[[]],[]).
@@ -268,7 +272,7 @@ report(LOC,List) :-
 % Converts the objects seen... basically to weed out the 0's the empty locations report
 mask([],What,What).
 mask([K|Tail],SoFar,What) :-
-	integer(K),
+	(K)=nil,
 	!,
 	mask(Tail, SoFar,What).
 mask([Head|Tail],SoFar,What) :-

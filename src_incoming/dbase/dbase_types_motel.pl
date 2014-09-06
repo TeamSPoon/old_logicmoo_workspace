@@ -1,5 +1,5 @@
 
-end_of_file.
+
 
 /** <module> 
 % Still working on (and testing) but will provide the type inference for Logicmoo Later
@@ -9134,7 +9134,7 @@ namesInTerm(L,[(Type,L)],Type) :-
 % Author:       Ullrich Hustadt
 % Address:      Max-Planck-Institut for Computer Science
 %               Im Stadtwald
-%               6600 Saarbr"ucken
+%               6600 Saarbr""ucken
 %               Germany
 % Email:        Ullrich.Hustadt@mpi-sb.mpg.de
 % Copyright:    (C) 1993 Ullrich Hustadt
@@ -11027,7 +11027,7 @@ sb_disjoint(EnvName,MS,CName1,CName2):-
 /*----------------------------------------------------------------------------
  * sb_expand(CName1,CName2)
  * erlaubt die Erweiterung der Definition eines bereits existierenden Konzeptes,
- * der Konstruktor fuegt zu einem bestehenden Konzept ein weiteres "Vaterkonzept
+ * der Konstruktor fuegt zu einem bestehenden Konzept ein weiteres ""Vaterkonzept
  * hinzu, die Moeglichkeit der Erweiterung ist also analog zur Definition der 
  * Konzepte.
  *------------------------------------------*/
@@ -14550,7 +14550,7 @@ user:term_expansion((H:-B),':-'(nopS(Out))):- in_motel_kb(KB),!, motel_term_expa
 user:term_expansion(H,':-'(nopS(Out))):- in_motel_kb(KB),!, motel_term_expansion(KB,H,true,Out).
 */
 
-motel_at_all_term_expansion((:-CALL),(:-CALL)):-!.
+motel_at_all_term_expansion((:-CALL),(:-CALL)):-!,expand_goal(CALL1,CALL2),CALL1\=@=CALL2.
 motel_at_all_term_expansion((H:-B),':-'(nopS(Out))):- in_motel_kb(KB),!, motel_term_expansion(KB,H,B,Out).
 motel_at_all_term_expansion(H,':-'(nopS(Out))):- in_motel_kb(KB),!, motel_term_expansion(KB,H,true,Out).
 

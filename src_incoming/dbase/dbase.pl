@@ -191,7 +191,7 @@ rescan_slow_kb_ops:- loop_check(forall(retract(do_slow_kb_op_later(Slow)),must_d
 
 :-export(rescan_dbase_ops/0).
 rescan_dbase_ops:- test_tl(skip_db_op_hooks),!.
-rescan_dbase_ops:- rescan_module_ready,rescan_game_loaded.
+rescan_dbase_ops:- rescan_module_ready.
 
 :-thread_local thlocal:in_rescan_module_ready/0.
 rescan_module_ready:- thlocal:in_rescan_module_ready,!.
@@ -337,7 +337,7 @@ coerce(What,_Type,NewThing):-NewThing = What.
       score/2,
       stm/2,      
       str/2,
-      wearing/2)).
+      wearsClothing/2)).
 
 logical_functor(X):-atom(X),member(X,[',',';']).
 
@@ -685,6 +685,7 @@ db_op0(Op,objects(Type,List)):- !,forall_member(I,List,must(db_reop(Op,isa(I,Typ
 db_op0(Op,sorts(Type,List)):- !,forall_member(I,List,must(db_reop(Op, subclass(I,Type)))).
 db_op0(Op,predicates(List)):- !,forall_member(T,List,must(db_reop(Op,mpred(T)))).
 db_op0(Op,EACH):- EACH=..[each|List],forall_member(T,List,must(db_reop(Op,T))).
+db_op0(change(assert,_),mpred_prop(F,A)):- !,must(decl_mpred(F,A)).
 
 db_op0(Op,db_op_exact(Term)):- !,db_op_exact(Op,Term).
  
@@ -1044,17 +1045,11 @@ add_later(Fact):- call_after_game_load(add(Fact)).
 :-moo_hide_childs(add/1).
 add(A):- A==end_of_file,!.
 add(A):- not(compound(A)),!,trace_or_throw(not_compound(add(A))),!.
-add(mpred_prop(A)):- decl_mpred(A),!.
-add(mpred_prop(A,B)):- decl_mpred(A,B),!.
 add(Call):- loop_check(thlocal:add_thread_override(Call)),!.
 add(Call):- add_from_macropred(Call),!.
 add(M:HB):-atom(M),!, must_det(add(HB)),!.
-add(A):- into_mpred_form(A,F), A \=@=F,!,add(F). 
-add(A):- must_det(once(correctArgsIsa(change(assert,add),A,AA))),A \=@= AA,!,add(AA),!.
 add(type(A)):- must_det(decl_type(A)),!.
-add(A):- A=..[Type,_], formattype(Type), trace_or_throw(formattype_ensure_skippable(A)),!.
-add(A):- A=..[Type,_], not(type(Type)), dmsg(todo(ensure_creatabe(Type))),fail.
-add(C0):- nop(assert_deduced_arg_isa_facts(C0)),must_det(add_fast(C0)),!,must_det(once(run_database_hooks(assert(z),C0))),!.
+add(A):-must(add_fast(A)),!.
 add(A):-trace_or_throw(fmt('add is skipping ~q.',[A])).
 
 :-export(begin_prolog_source/0).
@@ -1072,11 +1067,13 @@ add_from_macropred_lc(':-'(A)):- dmsg(trace_or_throw(missing_directive(A))),!.
 add_from_macropred_lc(':-'(Head,true)):- !, add(Head).
 add_from_macropred_lc(':-'(Head,Body)):- must_det(assertz_local_game_clause(Head,Body)),!.
 add_from_macropred_lc(RDF):- RDF=..[SVO,S,V,O],is_svo_functor(SVO),!,must_det(add(dbase_t(V,S,O))).
+add_from_macropred_lc(A):- into_mpred_form(A,F), A \=@=F,!,add_from_macropred(F). 
 add_from_macropred_lc(ClassTemplate):- compound(ClassTemplate), ClassTemplate=..[item_template,Type|Props],
    assert_isa(Type,createableType),
    assert_isa(Type,type),
    add(subclass(Type,item)),   
-   flatten(Props,AllProps), !, show_call(add(default_type_props(Type,AllProps))).
+   flatten(Props,AllProps),!,
+   show_call(add(default_type_props(Type,AllProps))).
 /*
 add_from_macropred_lc(somethingIsa(A,List)):-forall_member(E,List,add(isa(A,E))).
 add_from_macropred_lc(somethingDescription(A,List)):-forall_member(E,List,add(description(A,E))).
@@ -1253,11 +1250,11 @@ agent_text_command(_Agent,_Text,_AgentTarget,_Cmd):-fail.
            agent_text_command/4,         
 */
 
-:- include(logicmoo(parsing/parser_imperative)).
 :- include(logicmoo(vworld/world)).
 :-'$hide'(rescan_dbase_ops/0).
 :-'$hide'(do_db_op_hooks/0).
 %:- rescan_missing_stubs.
 %:- rescan_mpred_props.
+
 
 

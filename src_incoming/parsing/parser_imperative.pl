@@ -7,7 +7,6 @@
 %
 */
 
-/*
 :- module(parser_imperative, [
                    parse_agent_text_command/5,            
                    parse_agent_text_command_0/5,            
@@ -17,10 +16,9 @@
                    objects_match/3,
                    object_match/2,
                    object_string/2,
-                   order_descriptions/3,
                    get_term_specifier_text/2,
                    parseForTypes//2]).
-*/
+
 
 :-export((
                    parse_agent_text_command/5,            
@@ -30,8 +28,7 @@
                    parseForIsa//2,
                    objects_match/3,
                    object_match/2,
-                   object_string/2,
-                   order_descriptions/3,
+                   object_string/2,                   
                    get_term_specifier_text/2,
                    parseForTypes//2)).
 
@@ -112,10 +109,6 @@ meets_desc_spec(_,_).
 desc_len(S0,Region):- term_to_atom(S0,S),
    atomic_list_concat_catch(Words,' ',S),length(Words,Ws),atomic_list_concat_catch(Sents,'.',S),length(Sents,Ss),Region is Ss+Ws,!.
 
-order_descriptions(O,DescSpecs,ListO):-findall(S,(description(O,S),meets_desc_spec(S,DescSpecs)),Rev),reverse(Rev,List),delete_repeats(List,ListO).
-
-delete_repeats([],[]):-!.
-delete_repeats([Region|List],[Region|ListO]):-delete(List,Region,ListM), delete_repeats(ListM,ListO),!.
 
 :-export(objects_match_for_agent/3).
 objects_match_for_agent(Agent,Text,ObjList):- objects_match_for_agent(Agent,Text,[possess(Agent,value),same(atloc),same(localityOfObject),agent,item,region],ObjList).  
@@ -157,78 +150,56 @@ objects_for_agent(Agent,Relation,MatchList):- findall(Obj, relates(Agent,Relatio
 
 objects_match(Text,Possibles,MatchList):- findall(Obj,(member(Obj,Possibles),object_match(Text,Obj)), MatchList).
 
-:-dynamic object_string_used/2.
-
-
 
 object_string(O,String):-object_string(_,O,1-4,String),!.
+object_string_0_5(O,String):-object_string(_,O,0-5,String),!.
 
-% fast maybe works slower in long run
-object_string(Agent,O,DescSpecs,String):- fail,
- with_output_to(string(StringI),
-   object_print_details(format,Agent,O,DescSpecs,[type,item,agent])),
-  must(StringI\=[]),
-   string_dedupe(StringI,String),!.
-
-% object_string(Agent,O,DescSpecs,String):-object_string_list1(Agent,O,DescSpecs,String),!.
-object_string(Agent,O,DescSpecs,String):-object_string_list2(Agent,O,DescSpecs,String).
-
-object_string_list1(Agent,O,DescSpecs,String):- 
-   OpenList = _,
-   object_print_details(save_ol(OpenList),Agent,O,DescSpecs,[type,item,agent]),   
-   OpenList = StringI,
-   append(OpenList,[],StringI),
-   list_to_set(StringI,String).
-
-save_ol_e(OS,E):-string(E),!,to_word_list(E,WL),save_ol_list(OS,WL),!.
-save_ol_e(OS,isa(A)):-!,save_ol_e(OS,A).
-save_ol_e(OS,E):-is_list(E),!,save_ol_list(OS,E).
-save_ol_e(OS,E):-append([E],_,AE),!,append(_,AE,OS),!.
-
-save_ol(OS,' ~w ',[A]):-!,save_ol_e(OS,A),!.
-save_ol(OS,'~w',[A]):-!,save_ol_e(OS,A),!.
-save_ol(OS,Fmt,[A|KW]):-sformat(Str,Fmt,[A|KW]),to_word_list(Str,WL),save_ol_list(OS,WL),!.
-save_ol_list(_,[]):-!.
-save_ol_list(OS,[E|L]):-!,save_ol_e(OS,E),!,save_ol_list(OS,L),!.
-
-% slow but works
-object_string_list2(Agent,O,DescSpecs,String):- 
-   gensym(object_string,OS),
-   object_print_details(save_fmt(OS),Agent,O,DescSpecs,[type,item,agent]),   
-   findall(Str,retract(object_string_used(OS,Str)),StringI),
-   list_to_set(StringI,String).
-
-save_fmt_e(OS,E):-string(E),!,to_word_list(E,WL),save_fmt_list(OS,WL),!.
-save_fmt_e(OS,E):-is_list(E),!,save_fmt_list(OS,E).
-save_fmt_e(OS,isa(A)):-!,save_fmt_e(OS,A).
-save_fmt_e(OS,E):-retractall(object_string_used(OS,E)),assert(object_string_used(OS,E)).
+:-export(object_string/4).
+:-dynamic object_string_fmt/3.
+object_string(_,O,DescSpecs,String):- object_string_fmt(O,DescSpecs,String),!.
+object_string(Agent,O,DescSpecs,String):- String = [O], 
+   object_print_details(save_fmt(String),Agent,O,DescSpecs,[type,item,agent,channel]),
+   asserta(object_string_fmt(O,DescSpecs,String)),!.
 
 save_fmt(OS,' ~w ',[A]):-!,save_fmt_e(OS,A),!.
+save_fmt(OS,' ~w',[A]):-!,save_fmt_e(OS,A),!.
 save_fmt(OS,'~w',[A]):-!,save_fmt_e(OS,A),!.
-save_fmt(OS,Fmt,[A|KW]):-sformat(Str,Fmt,[A|KW]),to_word_list(Str,WL),save_fmt_list(OS,WL),!.
-save_fmt_list(_,[]):-!.
-save_fmt_list(OS,[E|L]):-!,save_fmt_e(OS,E),!,save_fmt_list(OS,L),!.
+save_fmt(OS,Fmt,[A|KW]):-sformat(Str,Fmt,[A|KW]),to_word_list(Str,WL),save_fmt_e(OS,WL),!.
+
+save_fmt_e(O,A):-atom(A),save_fmt_a(O,A),!.
+save_fmt_e(O,[E|L]):-!,save_fmt_e(O,E),!,save_fmt_e(O,L),!.
+save_fmt_e(O,isa(A)):-!,must(save_fmt_e(O,A)).
+save_fmt_e(_,E):-compound(E),!. % cycPred(_),mped_type(_),cycPlus2(_),hasStub(_),def_module(_),stubType(_),arity(_),mped_type(_)
+save_fmt_e(O,E):- string(E),!,must((to_word_list(E,WL),save_fmt_e(O,WL))),!.
+save_fmt_e(O,E):- member(E,O) -> true ; (O=[_|CDR],nb_setarg(2,O,[E|CDR])).
+
+save_fmt_a(_,A):-atom_length(A,L),L =< 1,!.
+save_fmt_a(O,E):-atom_contains(E,'-'),!,must((to_word_list(E,WL),save_fmt_e(O,WL))),!.
+save_fmt_a(O,E):-member(E,[obj,value,the,is,spatialthing,prologHybrid,prologOnly,relation,mpred,'',[]]),O\== E,!.
 
 
+object_name_is_descriptive(O):- (isa(O,type);isa(O,mpred);isa(O,typeDeclarer);isa(O,valuetype),isa(O,name_is_descriptive)).
+
+:-export(object_print_details/5).
 object_print_details(Print,Agent,O,DescSpecs,Skipped):-
-   once(member(O,Skipped);
+   member(O,Skipped) -> true ;
   (
-   call(Print,' ~w ',[O]),
-   forall((req(keyword(O,KW)),meets_desc_spec(KW,DescSpecs)),call(Print,' ~w ',[KW])),
-   forall((req(nameStrings(O,KW))/*,meets_desc_spec(KW,DescSpecs)*/),call(Print,' ~w ',[KW])),
-   (isa(O,type);forall((isa(O,S), meets_desc_spec(isa(O,S),DescSpecs)),call(Print,' ~w ',[isa(S)]))),
-   ignore((order_descriptions(O,DescSpecs,List),forall_member(M,List,call(Print,' ~w ',[M])))),
-   forall(isa(O,S),object_print_details(Print,Agent,S,DescSpecs,[O|Skipped])) )).
+   ignore((atom(O),to_word_list(O,WL),call(Print,' ~w ',[WL]))),
+   forall(is_asserted(keyword(O,KW)),ignore((meets_desc_spec(KW,DescSpecs)->call(Print,' ~w ',[KW])))),
+   forall(is_asserted(nameStrings(O,KW)),call(Print,' ~w ',[KW])),
+   (object_name_is_descriptive(O) -> true ; 
+    (( 
+       forall(is_asserted(descriptionHere(O,KW)),ignore((meets_desc_spec(KW,DescSpecs)->call(Print,' ~w ',[KW])))),
+       forall(isa(O,S),object_print_details(Print,Agent,S,DescSpecs,[O|Skipped])))))).
 
 
-
-object_match(SObj,Obj):-non_empty(SObj),non_empty(Obj), isaOrSame(Obj,SObj).
-object_match(S,Obj):- 
-   atoms_of(S,Atoms),
+object_match(String,Obj):-non_empty(String),non_empty(Obj), isaOrSame(Obj,String).
+object_match(S,Obj):-   
    current_agent_or_var(P),
    must((once((object_string(P,Obj,0-5,String))),nonvar(String),
    non_empty(String))),!,
    string_ci(String,LString),!,
+   atoms_of(S,Atoms),
    str_contains_all(Atoms,LString).
 
 

@@ -27,12 +27,12 @@ moo:mud_test(test_movedist,
    test_name("must be now be back in engineering"),
    test_true(req(localityOfObject(P,'Area1000'))))).
 
-moo:mud_test(create_gensym_named,
+moo:mud_test_level2(create_gensym_named,
   with_all_dmsg(((do_player_action('create food999'),
   foc_current_player(P),
   must(( req(( possess(P,Item),isa(Item,food))))))))) .
 
-moo:mud_test(drop_take,
+moo:mud_test_level2(drop_take,
   with_all_dmsg(((do_player_action('create food'),
   do_player_action('drop food'),
   do_player_action('take food'),
@@ -59,6 +59,15 @@ defined_local_test:-
    test_true((foc_current_player(Agent),must_det((atloc(Agent,Where),dmsg(atloc(Agent,Where)))))).
 
 defined_local_test:- 
+   test_name("tests to see if we have: atloc"),
+   test_true((foc_current_player(Agent),must_det((atloc(Agent,Where),dmsg(atloc(Agent,Where)))))).
+
+defined_local_test:- 
+   test_name("tests to see if our clothing doesnt: atloc"),
+   test_false(not(atloc('ArtifactCol1003-Gold-Uniform775',_X))).
+
+    
+defined_local_test:- 
    foc_current_player(Agent),
    test_name("tests to see if we have: argIsas on charge"),
    test_true(correctArgsIsa(charge(Agent,_),_)).
@@ -72,13 +81,9 @@ defined_local_test:-
    test_name("tests to see if we have: localityOfObject"),
    test_true((foc_current_player(Agent),must_det((localityOfObject(Agent,Where))),dmsg(localityOfObject(Agent,Where)))).
 
-defined_local_test:-
-   test_name("tests to see if 'food' can be an item"),
-      test_true(parseIsa0(item, _G537410, [food], [])).
-
 defined_local_test:- 
       test_name("nudity test"), 
-       test_true_req(wearing(explorer(player1), 'ArtifactCol1003-Gold-Uniform775')).
+       test_true_req(wearsClothing(explorer(player1), 'ArtifactCol1003-Gold-Uniform775')).
 
 defined_local_test:- 
       test_name("genlInverse test"), 
@@ -87,11 +92,40 @@ defined_local_test:-
 defined_local_test:- 
    test_name("Tests our action templates"), doall((get_type_action_templates(Templates),dmsg(get_type_action_templates(Templates)))).
 
+defined_local_test:-
+   test_name("tests to see if 'food' can be an item"),
+      test_true(parseIsa0(item, _G537410, [food], [])).
 
-:-call_mpred(show_room_grid('Area1000')).
+% ---------------------------------------------------------------------------------------------
+defined_local_test:-
+  test_name("Tests our types to populate bad_instance/2 at level 5"),
+  retractall(is_instance_consistent(_,_)),
+  retractall(bad_instance(_,_)),
+  forall(subclass(T,spatialthing),check_consistent(T,1000)),
+  listing(bad_instance/2).
+
+:-thread_local thlocal:is_checking_instance/1.
+
+:-decl_mpred_prolog(user:check_consistent(term,int)).
+:-decl_mpred_prolog(user:is_instance_consistent(term,int)).
+:-decl_mpred_prolog(user:bad_instance(term,why)).
+:-decl_mpred_prolog(user:is_checking_instance(term)).
+
+check_consistent(Obj,Scope):-var(Scope),!,check_consistent(Obj,0).
+check_consistent(Obj,Scope):-is_instance_consistent(Obj,Was),!,Was>=Scope.
+check_consistent(Obj,_):- thlocal:is_checking_instance(Obj),!.
+check_consistent(Obj,Scope):- with_assertions(thlocal:is_checking_instance(Obj),doall(check_consistent_0(Obj,Scope))).
+check_consistent_0(Obj,Scope):- once((catchv((doall(((clause(hook:hooked_check_consistent(Obj,AvScope),Body),once(var(AvScope); (AvScope =< Scope) ),Body))),assert_if_new(is_instance_consistent(Obj,Scope))),E,assert_if_new(bad_instance(Obj,E))))),fail.
+check_consistent_0(Type,Scope):- once(type(Type)),
+ catchv((forall(isa(Obj,Type),check_consistent(Obj,Scope)),
+                                                   assert_if_new(is_instance_consistent(Type,Scope))),E,assert_if_new(bad_instance(Type,E))),fail.
+
+hook:hooked_check_consistent(Obj,20):-must(object_string(_,Obj,0-5,String)),dmsg(checked_consistent(object_string(_,Obj,0-5,String))).
+% ---------------------------------------------------------------------------------------------
+
+defined_local_test:-call_mpred(show_room_grid('Area1000')).
 
 moo:mud_test("local sanity tests", doall(defined_local_test)).
-
 
 
 :- moo_hide_childs(dbase:record_on_thread/2).
@@ -109,3 +143,37 @@ now_run_local_tests:- doall(defined_local_test).
 % halt if this was the script file
 :- if_flag_true(was_runs_tests_pl, halt).
 
+
+end_of_file.
+
+
+
+
+40 thousand line codebase
+
+100 * 360+180 
+
+
+I am not some great prolog proggrammer.. butt the opposite and needed to code like i was
+
+
+so i've continue to use these cetain practices
+At the time I also developed a web based testing based framework as well (this was back before swi proliog had a built in webserver) 
+But it is just natural events.. later on I'll expantin its usage as well
+
+must/1  - code must succeed semi deterministally
+
+must_det/1 - must leave no coice points behind after the body completes
+
+
+dumpST
+
+
+rtrace/1 tracceing must_det/1
+
+ftrace/1 tracing must/1
+
+warnOnErrors/1  keep going but put recogniable garbage into variables 
+
+
+even in i parser library .. i am seeing people have to awakwardly pass arround state that is not releated to the DCG  they are parsing .. and that state cannot always be created in the same order as the sentence

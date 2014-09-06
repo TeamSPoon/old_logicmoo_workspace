@@ -14,7 +14,7 @@
 % Douglas Miles
 */
 
-:-user_ensure_loaded(new_cyc).
+:-user_ensure_loaded(logicmoo(ext/moo_ext_cyc_new)).
 
 :-dynamic(isCycUnavailable_known/1).
 :-dynamic(isCycAvailable_known/0).

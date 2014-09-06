@@ -50,7 +50,7 @@ monster_idea(Agent,move(Dir)) :-
 
 monster_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[corpse]).
 
-moo:default_inst_props(Instance,monster,[description(fmt("Very screy looking monster named ~w",[Instance])),wearing(tough_hide),possess(tough_hide)]).
+moo:default_inst_props(Instance,monster,[description(fmt("Very screy looking monster named ~w",[Instance])),wearsClothing(tough_hide),possess(tough_hide)]).
 
 :- include(logicmoo(vworld/moo_footer)).
 

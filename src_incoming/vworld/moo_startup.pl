@@ -142,9 +142,11 @@ make_qlfs:-
 
 
 % :- user_use_module(logicmoo(dbase/dbase_formattypes)).
-% :- user_use_module(logicmoo(parsing/parser_imperative)).
+:- user_use_module(logicmoo(parsing/parser_imperative)).
 :- user_ensure_loaded(logicmoo(parsing/parser_talk)). 
 :- user_ensure_loaded(logicmoo(parsing/parser_e2c)). 
+%:- user_ensure_loaded(logicmoo(dbase/dbase_ext_lisp)).
+%:- user_ensure_loaded(logicmoo(dbase/dbase_ext_chr)).
 :- within_module(ensure_loaded(logicmoo(parsing/parser_chat80)),moo). 
 
 

@@ -87,6 +87,8 @@ hook:decl_database_hook(assert(_A_or_Z),isa(W,type)):-atom(W),atomic_list_concat
 :-dynamic_multifile_exported i_countable/1.
 
 assert_isa(I,T):- not(ground(I:T)),trace_or_throw(not(ground(assert_isa(I,T)))).
+assert_isa(_,term):-!.
+assert_isa(_,term(_)):-!.
 assert_isa(I,T):- loop_check(assert_isa_lc(I,T),true).
 
 :-export assert_isa_lc/2.
@@ -168,7 +170,7 @@ transitive_subclass_tst(_,_):-!,fail.
 % isa_backchaing(A,T):- stack_depth(Level),Level>650,trace_or_throw(skip_dmsg_nope(failing_stack_overflow(isa_backchaing(A,T)))),!,fail.
 
 :-decl_mpred_prolog(isa_backchaing/2).
-isa_backchaing(A,T):- fact_loop_checked(isa(A,T),isa_backchaing_0(A,T)).
+isa_backchaing(A,T):- fact_loop_checked(isa(A,T),no_repeats(isa_backchaing_0(A,T))).
 
 isa_backchaing_v_nv(A,term):-nonvar(A),!.
 isa_backchaing_v_nv(_,var):-!.
@@ -204,16 +206,19 @@ isa_backchaing_nv_nv(I,T):-atom(T),!,catch(call(T,I),_,fail).
 not_ft(T):-transitive_subclass_or_same(T,spatialthing).
 
 :-export(isa_asserted/2).
-isa_asserted(A,T):- nonvar(A),build_isa_inst_list_cache(A,_,T,CALL),CALL.
-isa_asserted(A,T):- stack_check,once_if_ground(fact_loop_checked(isa(A,T),isa_asserted_0(A,T)),_).
+isa_asserted(A,T):-no_repeats(isa_asserted_nr(A,T)).
+isa_asserted_nr(A,T):- nonvar(A),build_isa_inst_list_cache(A,_,T,CALL),CALL.
+isa_asserted_nr(A,T):- stack_check,fact_loop_checked(isa(A,T),isa_asserted_0(A,T)).
 
+isa_asserted_0(I,T):- ((thlocal:useOnlyExternalDBs,!);thglobal:use_cyc_database),(kbp_t([isa,I,T]);kbp_t([T,I])).
 isa_asserted_0(I,T):-clause(dbase_t(T,I),true).
 isa_asserted_0(I,T):-clause(isa(I,T),true).
-isa_asserted_0(I,T):- fail, thglobal:use_cyc_database,kbp_t([isa,I,T]).
-isa_asserted_0(I,T):-string(I),member(T,[string,text]).
+isa_asserted_0(I,T):-string(I),!,member(T,[string,text]).
+isa_asserted_0(I,T):-integer(I),!,member(T,[int,number,value]).
+isa_asserted_0(I,T):-number(I),!,member(T,[number,float,value]).
 isa_asserted_0(I,T):-atom(I),isa_w_inst_atom(I,T).
 isa_asserted_0(I,T):-hook:fact_always_true(isa(I,T)).
-isa_asserted_0(I,T):-mpred_prop(I,T).
+isa_asserted_0(I,T):-mpred_prop(I,T),T\=mped_type(funknown).
 isa_asserted_0(_,T):-var(T),!,fail.
 isa_asserted_0(I,formattype):-!,isa_w_type_atom(I,formattype).
 isa_asserted_0(I,type):-!,isa_w_type_atom(I,type).
@@ -225,8 +230,8 @@ isa_asserted_0(I,(T1 ; T2)):-nonvar(T1),!,dif:dif(T1,T2),isa_backchaing(I,T1),is
 
 % isa_asserted_0(I,T):- compound(I),functor(I,F,_),!,isa_backchaing_1(F,T).
 
-isa_w_inst_atom(O,T):- atomic_list_concat_catch([T,_|_],'-',O),!.
-isa_w_inst_atom(O,T):- atom_concat(T,Int,O),catch(atom_number(Int,_),_,fail),!.
+%isa_w_inst_atom(O,T):- atomic_list_concat_catch([T,_|_],'-',O),!.
+%isa_w_inst_atom(O,T):- atom_concat(T,Int,O),catch(atom_number(Int,_),_,fail),!.
 isa_w_inst_atom(_,T):- T==atom. 
 
 isa_w_type_atom(I,formattype):- clause(ft_info(I,_),true).
@@ -285,6 +290,7 @@ impliedSubClass(T,ST):-ground(T:ST),is_known_false(subclass(T,ST)),!,fail.
 impliedSubClass(T,ST):-predicate_property(transitive_subclass(T,ST),_),!,call_tabled(transitive_subclass(T,ST)).
 
 :- export(asserted_subclass/2).
+asserted_subclass(I,T):- ((thlocal:useOnlyExternalDBs,!);thglobal:use_cyc_database),(kbp_t([genls,I,T])).
 asserted_subclass(T,ST):-dbase_t(subclass,T,ST).
 
 
@@ -297,26 +303,10 @@ into_single_class(A,A).
 :- export((transitive_subclass/2)).
 transitive_subclass(_,T):-T==formattype,!,fail.
 transitive_subclass(A,_):-A==formattype,!,fail.
-
-transitive_subclass(A,T):- bad_idea,!,
-      into_single_class(A,AA),
-      into_single_class(T,TT),
-      fact_loop_checked(subclass(A,T),transitive_subclass_l_r(AA,TT)).
-
-transitive_subclass(A,T):- !,stack_check,
-      fact_loop_checked(subclass(A,T),transitive_subclass_l_r(A,T)).
-
-transitive_subclass_l_r(FT,Sub):-dbase_t(subclass,FT,Sub).
-transitive_subclass_l_r(FT,Sub):-var(FT),!,transitive_subclass_r_l(FT,Sub).
-transitive_subclass_l_r(FT,Sub):-dbase_t(subclass,FT,A),dbase_t(subclass,A,Sub).
-transitive_subclass_l_r(FT,Sub):-dbase_t(subclass,FT,A),dbase_t(subclass,A,B),dbase_t(subclass,B,Sub).
-transitive_subclass_l_r(_,Sub):-var(Sub),!,fail.
-transitive_subclass_l_r(FT,Sub):-dbase_t(subclass,FT,A),dbase_t(subclass,A,B),dbase_t(subclass,B,C),dbase_t(subclass,C,Sub).
-
-transitive_subclass_r_l(FT,Sub):-dbase_t(subclass,A,Sub),dbase_t(subclass,FT,A).
-transitive_subclass_r_l(FT,Sub):-dbase_t(subclass,B,Sub),dbase_t(subclass,A,B),dbase_t(subclass,FT,A).
-transitive_subclass_r_l(_,Sub):-var(Sub),!,fail.
-transitive_subclass_r_l(FT,Sub):-dbase_t(subclass,C,Sub),dbase_t(subclass,B,C),dbase_t(subclass,A,B),dbase_t(subclass,FT,A).
+transitive_subclass(A,T):- bad_idea,!, into_single_class(A,AA), into_single_class(T,TT), fact_loop_checked(subclass(A,T),transitive_subclass_l_r(AA,TT)).
+transitive_subclass(I,T):- stack_check,((thlocal:useOnlyExternalDBs,!);thglobal:use_cyc_database),
+   fact_loop_checked(subclass(I,T),transitive_P_l_r(cyckb_t,genls,I,T)).
+transitive_subclass(A,T):- fact_loop_checked(subclass(A,T),transitive_P_l_r(dbase_t,subclass,A,T)).
 
       
 transitive_subclass_or_same(A,A).
@@ -324,21 +314,17 @@ transitive_subclass_or_same(A,A).
 transitive_subclass_or_same(A,B):-nonvar(A),!,build_genls_inst_list_cache(A,subclass,B,Call),Call.
 transitive_subclass_or_same(A,B):-transitive_subclass(A,B).
 
-:- export((transitive_bp/3)).
-transitive_bp(P,A,T):-(atom(P)->Fact =..[P,A,T];Fact =..[dbase_t,P,A,T]),fact_loop_checked(Fact,transitive_P_l_r(P,A,T)).
+transitive_P_l_r(DB,P,FT,Sub):-call(DB,P,FT,Sub).
+transitive_P_l_r(DB,P,FT,Sub):-var(FT),!,transitive_P_r_l(DB,P,FT,Sub).
+transitive_P_l_r(DB,P,FT,Sub):-call(DB,P,FT,A),call(DB,P,A,Sub).
+transitive_P_l_r(DB,P,FT,Sub):-call(DB,P,FT,A),call(DB,P,A,B),call(DB,P,B,Sub).
+transitive_P_l_r(_,_P,_FT,Sub):-var(Sub),!,fail.
+transitive_P_l_r(DB,P,FT,Sub):-call(DB,P,FT,A),call(DB,P,A,B),call(DB,P,B,C),call(DB,P,C,Sub).
 
-transitive_P_l_r(P,FT,Sub):-dbase_t(P,FT,Sub).
-transitive_P_l_r(P,FT,Sub):-var(FT),!,transitive_P_r_l(P,FT,Sub).
-transitive_P_l_r(P,FT,Sub):-dbase_t(P,FT,A),dbase_t(P,A,Sub).
-transitive_P_l_r(P,FT,Sub):-dbase_t(P,FT,A),dbase_t(P,A,B),dbase_t(P,B,Sub).
-transitive_P_l_r(_P,_FT,Sub):-var(Sub),!,fail.
-transitive_P_l_r(P,FT,Sub):-dbase_t(P,FT,A),dbase_t(P,A,B),dbase_t(P,B,C),dbase_t(P,C,Sub).
-
-transitive_P_r_l(P,FT,Sub):-dbase_t(P,A,Sub),dbase_t(P,FT,A).
-transitive_P_r_l(P,FT,Sub):-dbase_t(P,B,Sub),dbase_t(P,A,B),dbase_t(P,FT,A).
-transitive_P_r_l(_P,_FT,Sub):-var(Sub),!,fail.
-transitive_P_r_l(P,FT,Sub):-dbase_t(P,C,Sub),dbase_t(P,B,C),dbase_t(P,A,B),dbase_t(P,FT,A).
-
+transitive_P_r_l(DB,P,FT,Sub):-call(DB,P,A,Sub),call(DB,P,FT,A).
+transitive_P_r_l(DB,P,FT,Sub):-call(DB,P,B,Sub),call(DB,P,A,B),call(DB,P,FT,A).
+transitive_P_r_l(_,_P,_FT,Sub):-var(Sub),!,fail.
+transitive_P_r_l(DB,P,FT,Sub):-call(DB,P,C,Sub),call(DB,P,B,C),call(DB,P,A,B),call(DB,P,FT,A).
 
 
 
@@ -415,8 +401,6 @@ is_known_false0(subclass(Type,_)):-arg(_,vv(type,relation,spatialthing,formattyp
 :-dynamic_multifile_exported(not_mud_isa/2).
 not_mud_isa(agent,formattype).
 not_mud_isa(item,formattype).
-not_mud_isa(type,formattype).
-not_mud_isa(obj, completeExtentAsserted).
 not_mud_isa(obj, createableType).
 not_mud_isa(assertionMacroHead, formattype).
 not_mud_isa(obj, formattype).
@@ -424,6 +408,9 @@ not_mud_isa(formattype,formattype).
 not_mud_isa(subft,type).
 not_mud_isa('TemporallyExistingThing', 'TemporallyExistingThing').
 not_mud_isa(createableType,'TemporallyExistingThing').
+not_mud_isa(Type,formattype):- \+ (dbase_t(formattype, Type)).
+not_mud_isa(Type, assertionMacroHead):- \+ (mpred_prop(Type, assertionMacroHead)).
+not_mud_isa(Type, completeExtentAsserted):- \+ (mpred_prop(Type, completeExtentAsserted)).
 not_mud_isa(X,type):-never_type(X).
 
 

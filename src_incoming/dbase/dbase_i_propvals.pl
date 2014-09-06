@@ -159,15 +159,20 @@ reallyCheckArgViolation(_,_,_,List,Type):-memberchk(Type,List),!.
 reallyCheckArgViolation(Prop,N,Obj,OType,Type):- violatesType(Obj,Type),trace_or_throw(violatesType_maybe_cache(Prop,N,Obj,OType\=Type)).
 
 
-assert_argIsa(Prop,N,Type):-add(argIsa(Prop,N,Type)).
+assert_argIsa(Prop,N,Type):-show_call(add(argIsa(Prop,N,Type))).
 
 assert_subclass_on_argIsa(Prop,N,argIsaFn(Prop,N)):-!.
 assert_subclass_on_argIsa(Prop,N,_OType):-argIsa_call(Prop,N,PropType),PropType=argIsaFn(Prop,N),!. % , assert_argIsa(Prop,N,OType).
 assert_subclass_on_argIsa(Prop,N,OType):-argIsa_call(Prop,N,PropType),assert_subclass_safe(OType,PropType).
 
-deduce_argN(Prop,2,Obj,OType,argIsaFn(Prop, 2)):-atom_concat(Prop,'_value',Type),decl_type(Type),assert_argIsa(Prop,2,Type),deduce_argN(Prop,2,Obj,OType,Type).
-deduce_argN(Prop,N,Obj,[],Type):- Type \= argIsaFn(Prop,N), type(Type), assert_isa(Obj,Type),!.
-deduce_argN(Prop,N,_Obj,[OType|_],_Type):-assert_subclass_on_argIsa(Prop,N,OType),!.
+
+suggestedType(Prop,N,_,argIsaFn(Prop, N),FinalType):- mpred_arity(Prop,N), atom_concat(Prop,'_value',FinalType),!,decl_type(FinalType).
+suggestedType( _ ,_,_ ,FinalType,FinalType):-atom(FinalType),type(FinalType),not(formattype(FinalType)),!.
+suggestedType( _ ,_,Possibles,_ ,FinalType):- member(FinalType,[mpred,type,formattype,text,region,agent,item,obj,spatialthing]),member(FinalType,Possibles),!.
+
+deduce_argN(Prop,N,_,ObjectTypes,Type):- suggestedType(Prop,N,ObjectTypes,Type,FinalType),FinalType\=Type,assert_argIsa(Prop,N,FinalType).
+deduce_argN(_ ,_ ,Obj,[],Type):- type(Type), assert_isa(Obj,Type),!.
+deduce_argN(Prop,N,_,[OType|_],_Type):-assert_subclass_on_argIsa(Prop,N,OType),!.
 
 maybe_cache_0(Prop,Obj,Value,_What):- checkNoArgViolation(Prop,Obj,Value), is_asserted(dbase_t(Prop,Obj,Value)),!.
 maybe_cache_0(Prop,Obj,Value,What):- padd(Obj,Prop,Value),

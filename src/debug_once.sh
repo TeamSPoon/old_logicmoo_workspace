@@ -18,6 +18,6 @@ echo `pwd`
 echo "Hit CTRL+C ${BASH_SOURCE[0]} $RUNFILE ";
 sleep 1;
 cd $NEWPWD
-swipl -f $RUNFILE
+swipl -L128G -G128G -T128G -f $RUNFILE
 cd $OLDPWD
-
+exit $?

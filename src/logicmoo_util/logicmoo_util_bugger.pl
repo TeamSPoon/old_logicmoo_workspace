@@ -183,7 +183,6 @@ filter_repeats:-fail.
 % ===================================================================
 % Substitution based on ==
 % ===================================================================
-
 % Usage: dbgsubst(+Fml,+X,+Sk,?FmlSk)
 
 :-export(dbgsubst/4).
@@ -395,8 +394,8 @@ current_next_frames(Attrib,Nth,Frame,NextList):-
 current_next_frames(_,_,_,[]).
 
 
-trace_or(E):- dumpST,dmsg(E),dtrace,!.
-trace_or(E):- E.
+trace_or(E):- dumpST,dmsg(E),trace,dtrace,!.
+trace_or(E):- trace,E.
 
 
 
@@ -409,7 +408,7 @@ cnotrace:-notrace.
 cnotrace(C):-catchv(hotrace(C),E,((dmsg(E=C),rtrace(C),trace_or_throw(E=C)))).
 :-'$hide'(cnotrace/1).
 
-trace_or_throw(E):-trace_or(throw(E)).
+trace_or_throw(E):- trace_or(throw(E)).
 
 % :- use_module(library(prolog_stack)).
 
@@ -616,10 +615,18 @@ must_not_repeat(C):-call(C).
 % X = 1 ;
 % X = 2.
 % ===================================================
+
+memberchk_eq(X, [Y|Ys]) :-
+  (   X == Y
+    ->  true
+     ;   memberchk_eq(X, Ys)
+   ).
+
 :- export(no_repeats/1).
 :- meta_predicate no_repeats(0).
 % no_repeats(Call):- tlbugger:attributedVars,!,no_repeats_av(Call).
-no_repeats(Call):- term_variables(Call,Vars), !, no_repeats0(Vars,Call).
+
+no_repeats(Call):- hotrace((ground(Call) -> ((traceok(Call),!)) ; (CONS = [_], traceok(Call), notrace(( \+ memberchk_eq(Call,CONS) , nb_setarg(2, CONS, [Call])))))).
 
 % ===================================================
 % 
@@ -637,13 +644,13 @@ no_repeats(Call):- term_variables(Call,Vars), !, no_repeats0(Vars,Call).
 :- meta_predicate no_repeats(+,0).
 :- meta_predicate no_repeats0(+,0).
 % no_repeats(Vs,Call):- tlbugger:attributedVars,!,no_repeats_av(Vs,Call).
-no_repeats(Vars,Call):- hotrace((term_variables(Vars,TV),no_repeats0(TV,traceok(Call)))).
-no_repeats0([],Call):- !,Call,!.
-no_repeats0(Vars,Call):- CONS = [_],  call(Call), notrace( newval_or_fail(CONS,Vars)).
+
+no_repeats(Vs,Call):- ground(Vs),!,Call,!.
+no_repeats(Vs,Call):- CONS=[_], call(Call),notrace((\+ memberchk_eq(Vs,CONS) , nb_setarg(2, CONS, [Vs]))).
 
 :-export(newval_or_fail/2).
 :-meta_predicate(newval_or_fail(+,+)).
-newval_or_fail(CONS,VAL):-CONS = [CAR|CDR], VAL \== CAR,  ( CDR==[] ->  nb_setarg(2, CONS, [VAL]) ; newval_or_fail(CDR,VAL)). 
+newval_or_fail(CONS,VAL):- CONS = [CAR|CDR], VAL \== CAR,  ( CDR==[] ->  nb_setarg(2, CONS, [VAL]) ; newval_or_fail(CDR,VAL)). 
 
 % ==========================================================
 %    is newval_or_fail/2  - a little term db to track if we've seen a term or not
@@ -666,6 +673,20 @@ newval_or_fail(CONS,VAL):-CONS = [CAR|CDR], VAL \== CAR,  ( CDR==[] ->  nb_setar
 % and grow with a.. vv(_,_,_,_,vv(_,_,_,_,vv(_,_,_,_,_))) ? 
 
 
+
+
+:- meta_predicate
+        succeeds_n_times(0, -).
+
+succeeds_n_times(Goal, Times) :-
+        Counter = counter(0),
+        (   Goal,
+            arg(1, Counter, N0),
+            N is N0 + 1,
+            nb_setarg(1, Counter, N),
+            fail
+        ;   arg(1, Counter, Times)
+        ).
 
 % ===================================================
 %
@@ -791,8 +812,8 @@ loop_check(B):- loop_check(B,fail).
 loop_check(B, TODO):- make_key(B,BC),!, loop_check_term(B,BC,TODO).
 
 % loop_check_local(B):- loop_check_local(B,trace_or_throw(syntax_loop_check_local(B))).
-loop_check_local(B,TODO):-  % make_key(B,BC),
-   term_to_atom(B,BC),!, 
+loop_check_local(B,TODO):- make_key(B,BC),
+   % term_to_atom(B,BC),!, 
     ( \+(tlbugger:inside_loop_check_local(BC)) ->
          setup_call_cleanup(asserta(tlbugger:inside_loop_check_local(BC)),B, retract((tlbugger:inside_loop_check_local(BC))));
          call(TODO) ).
@@ -1241,7 +1262,7 @@ programmer_error(E):-trace, randomVars(E),dmsg('~q~n',[error(E)]),trace,randomVa
 
 :-moo_hide_show_childs(must/1).
 
-must(C):- catchv((C *-> true ; debugCallWhy(failed(must(C)),traceok(C))),E,debugCallWhy(thrown(E),traceok(C))).
+must(C):- catchv((C *-> true ; debugCallWhy(failed(must(C)),C)),E,debugCallWhy(thrown(E),C)).
 
 must_each(List):-var(List),trace_or_throw(var_must_each(List)).
 must_each([List]):-!,must(List).
@@ -1536,7 +1557,7 @@ dmsg(V):- once(dmsg0(V)).
 dmsg0(_):- bugger_flag(opt_debug=off),!.
 dmsg0(V):-var(V),!,dmsg0(dmsg_var(V)).
 
-dmsg0(V):- notrace(dmsg1(V)),!, hotrace(doall(( hook:dmsg_hook(V)))).
+dmsg0(V):- notrace(doall((once(dmsg1(V)),hook:dmsg_hook(V)))),!.
 
 /*
 dmsg1(trace_or_throw(V)):- dumpST(15),print_message(warning,V),fail.
@@ -1648,16 +1669,16 @@ dumpST(Opts):- prolog_current_frame(Frame),dumpST(Frame,Opts).
 dumpST(Frame,MaxDepth):-integer(MaxDepth),!,dumpST(Frame,[max_depth(MaxDepth),numbervars(safe),show([level,goal,clause])]).
 dumpST(Frame,Opts):-var(Opts),!,dumpST(Frame,5000).
 dumpST(Frame,Opts):-is_list(Opts),!,dumpST(1,Frame,Opts).
-dumpST(Frame,Opts):-dumpST(1,Frame,[Opts]).
+dumpST(Frame,Opts):-show_call(dumpST(1,Frame,[Opts])).
 
 get_m_opt(Opts,Max_depth,D100,RetVal):-E=..[Max_depth,V],(((member(E,Opts),nonvar(V)))->RetVal=V;RetVal=D100).
 
 dumpST(N,Frame,Opts):-
-   dumpST(N,Frame,Opts,Out),
-   get_m_opt(Opts,numbervars,-1,Start),
+  must(( dumpST(N,Frame,Opts,Out))),
+   must((get_m_opt(Opts,numbervars,-1,Start),
    neg1_numbervars(Out,Start,ROut),
    reverse(ROut,RROut),
-   ignore((forall(member(E,RROut),fdmsg(E)))).
+   ignore((forall(member(E,RROut),fdmsg(E)))))).
 
 neg1_numbervars(T,-1,T):-!.
 neg1_numbervars(Out,Start,ROut):-copy_term(Out,ROut),integer(Start),!,safe_numbervars(ROut,Start,_).
@@ -1850,7 +1871,7 @@ traceIf(Call):-ignore((Call,trace)).
 % Unlike cnotrace/1, it allows traceing when excpetions are raised during Goal.
 %hotrace(C):- skipWrapper,!,notrace(C).
 :-moo_hide_childs(hotrace/1).
-hotrace(X):- tracing -> with_assertions(tlbugger:wastracing,call_cleanup((notrace,call(X)),trace)) ; call(X).
+hotrace(X):- ( tracing -> with_assertions(tlbugger:wastracing,call_cleanup((nop(notrace),call(X)),trace)) ; call(X) ).
 
 
 :-'$hide'(hotrace/1).
@@ -1927,6 +1948,7 @@ call_no_cuts_0(C):-call(C).
 make_key(CC,KeyA):- notrace(ground(CC)->KeyA=CC ;(copy_term(CC,Key,_),snumbervars(Key,0,_))),!,KeyA=Key. % ,term_to_atom(Key,KeyA).
 
 expire_tabled_list(all):-!,retractall(call_tabled_list(_,_)).
+expire_tabled_list(_):-!,retractall(call_tabled_list(_,_)).
 expire_tabled_list(T):- atoms_of(T,A1), CT= call_tabled_list(Key,List),doall(((CT,once(any_term_overlap_atoms_of(A1,List);(not(member(Key,List)),any_term_overlap_atoms_of(A1,Key))),retractall(CT)))).
 
 any_term_overlap_atoms_of(A1,T2):-atoms_of(T2,A2),!,member(A,A1),member(A,A2),!.
@@ -1945,12 +1967,12 @@ call_vars_tabled(Vars,C):- call_setof_tabled(Vars,C,Set),!,member(Vars,Set).
 
 call_setof_tabled(Vars,C,List):- make_key(Vars+C,Key),call_tabled0(Key,Vars,C,List).
 
-findall_nodupes(Vs,C,List):- ground(Vs),!,(C->List=[Vs];List=[]).
-findall_nodupes(Vs,C,L):- findall(Vs,C,L).
+findall_nodupes(Vs,C,List):- ground(Vs),!,(C->List=[Vs];List=[]),!.
+findall_nodupes(Vs,C,L):- setof(Vs,C,L).
 
 call_tabled0(Key,_,_,List):- call_tabled_list(Key,List),!.
 call_tabled0(Key,Vars,C,List):- really_can_table,!,findall_nodupes(Vars,C,List),!,asserta_if_ground(call_tabled_list(Key,List)),!.
-call_tabled0(_,Vars,C,List):- findall_nodupes(Vars,C,List).
+call_tabled0(_,Vars,C,List):- findall_nodupes(Vars,C,List),!.
 
 really_can_table:-not(test_tl(tlbugger:cannot_table)),test_tl(tlbugger:can_table).
 
@@ -2013,7 +2035,7 @@ grtrace(Trace):- notrace(( visible(+all),leash(+all))), Trace.
 
 
 
-show_and_do(C):-dmsg(C),!,C.
+show_and_do(C):-dmsg(C),!,traceok(C).
 
 dtrace:-dtrace(trace).
 
@@ -2039,7 +2061,7 @@ dumptrace(_,10):-dumptrace_ret,!.
 dumptrace(_,13):-dumptrace_ret,!.
 dumptrace(_,C):-dmsg(unused_keypress(C)),!,fail.
 
-dumptrace_ret:-leash(+call),trace,visible(+all).
+dumptrace_ret:-leash(+all),visible(+all),visible(+unify),trace.
 
 restore_trace(Goal):-  tracing, notrace,!,'$leash'(Old, Old),'$visible'(OldV, OldV),call_cleanup(Goal,(('$leash'(_, Old),'$visible'(_, OldV),trace),trace)).
 restore_trace(Goal):-  '$leash'(Old, Old),'$visible'(OldV, OldV),call_cleanup(Goal,((notrace,'$leash'(_, Old),'$visible'(_, OldV)))).

@@ -18,10 +18,10 @@ moo:action_info(What,text("command is: ",What)):- moo:actiontype(What).
 
 
 :-export(get_type_action_help_commands_list/3).
-get_type_action_help_commands_list(A,B,C):-get_type_action_help_0(A,B,C).
+get_type_action_help_commands_list(A,B,C):-no_repeats(get_type_action_help_0(A,B,C)).
 
 :-export(get_type_action_templates/1).
-get_type_action_templates(Templ):- get_type_action_help_0(_,Templ,_),good_template(Templ).
+get_type_action_templates(Templ):- no_repeats((get_type_action_help_0(_,Templ,_),good_template(Templ))).
 
 :-export(good_template/1).
 good_template(Templ):- \+ contains_singletons(Templ).

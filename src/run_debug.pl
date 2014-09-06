@@ -133,6 +133,8 @@ debug_repl_m(Module,CallFirst):-
 % [Required] Defines debug80
 debug80:- moo:parser_chat80_module(M),debug_repl_wo_cyc(M,M:t1).
 
+% [Optionaly] Allows testing/debug of the chat80 system (withouyt loading the servers)
+:- parser_chat80:t1.
 
 % [Required] Defines debug_e2c
 debug_e2c:- debug_repl(parser_e2c,cache_the_posms).
@@ -152,10 +154,10 @@ debug_talk:- debug_repl(parser_talk,t3).
 % [Manditory] This loads the game and initializes so test can be ran
 :- if_flag_true(was_run_dbg_pl, at_start(run_setup)).
 
+:- finish_processing_world.
+
 % [Optional] Interactively debug E2C
 % :- debug_e2c.
-
-:-debug80.
 
 % the local tests each reload (once)
 now_run_local_tests_dbg :- doall(defined_local_test).
@@ -167,11 +169,9 @@ now_run_local_tests_dbg :- doall(defined_local_test).
 :- do_player_action('who').
 % :-repeat, trace, do_player_action('who'),fail.
 
-
 % :-do_player_action("scansrc").
 
 % :-trace.
-
 
 
 % [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
@@ -181,20 +181,43 @@ now_run_local_tests_dbg :- doall(defined_local_test).
 % the real tests now (once)
 :- if_flag_true(was_run_dbg_pl,at_start(must_det(run_mud_tests))).
 
-
-% [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
+% more tests even
 :-do_player_action("look").
 
 :-forall(localityOfObject(O,L),dmsg(localityOfObject(O,L))).
 
-% :-forall(atloc(O,L),dmsg(atloc(O,L))).
-
-% [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
-:- if_flag_true(was_run_dbg_pl, at_start(run)).
+moo:must_test("tests to see if poorly canonicalized code (unrestricted quantification) will not be -too- inneffienct",
+   forall(atloc(O,L),dmsg(atloc(O,L)))).
 
 
 % [Optionaly] Allows testing/debug of the chat80 system (withouyt loading the servers)
 % :- debug80.
+/*
+
+explorer(player1)> prolog statistics
+notice(you,begin(you,prologCall(statistics)))
+statistics.
+188.523 seconds cpu time for 282,024,744 inferences
+1,004,265 atoms, 14,959 functors, 11,578 predicates, 176 modules, 268,104,937 VM-codes
+
+                       Limit    Allocated       In use
+Local  stack :137,438,953,472      126,976       41,032 Bytes
+Global stack :137,438,953,472  805,302,256  669,634,856 Bytes
+Trail  stack :137,438,953,472      129,016        2,448 Bytes
+
+1 garbage collections gained 41,528 bytes in 0.000 seconds.
+2 atom garbage collections gained 19,741 atoms in 1.360 seconds.
+Stack shifts: 4 local, 22 global, 20 trail in 0.038 seconds.
+2 threads, 0 finished threads used 0.000 seconds.
+true.
+
+cmdresult(statistics,true)
+
+*/
+
+% [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
+:- if_flag_true(was_run_dbg_pl, at_start(run)).
+
 
 % So scripted versions don't just exit
 :- if_flag_true(was_run_dbg_pl,at_start(prolog)).

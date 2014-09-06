@@ -115,19 +115,23 @@ finish_processing_world:- loop_check_local(with_assertions(thlocal:do_slow_kb_op
 
 doall_and_fail(Call):- time_call(once(doall(Call))),fail.
 
-rescan_all:- doall_and_fail(rescan_mpred_props).
-rescan_all:- doall_and_fail(rescan_dbase_ops).
+
+:-export(etrace/0).
+etrace:-leash(-all),leash(+exception),trace.
+
+% rescan_all:- etrace,fail.
 rescan_all:- doall_and_fail(rescan_game_loaded).
+rescan_all:- doall_and_fail(rescan_dbase_ops).
 rescan_all:- doall_and_fail(rescan_dbase_facts).
 rescan_all:- doall_and_fail(rescan_default_props).
 rescan_all:- doall_and_fail(rescan_slow_kb_ops).
+rescan_all:- doall_and_fail(rescan_mpred_props).
 
 :-meta_predicate_transparent(rescan_all/0).
 rescan_all.
 
 :-meta_predicate_transparent(finish_processing_game/0).
 finish_processing_game:- dmsg(begin_finish_processing_game),fail.
-finish_processing_game:- doall_and_fail(rescan_all).
 finish_processing_game:- doall_and_fail(rescan_all).
 finish_processing_game:- dmsg(saving_finish_processing_game),fail.
 finish_processing_game:- savedb,fail.
@@ -270,9 +274,9 @@ ddeterminer0(the).
 ddeterminer(L,L):-ddeterminer0(L).
 ddeterminer(U,L):-string_lower(U,L),U\=L,!,ddeterminer0(L).
 
-add_description_word(A,Word):- string_upper(Word,Word),string_lower(Word,Flag),string_to_atom(Flag,Atom),atom_concat(flagged_,Atom,FAtom),show_load_call(hooked_asserta(isa(A,FAtom))).
-add_description_word(A,Word):- string_lower(Word,Word),show_load_call(hooked_asserta(keyword(A,Word))).
-add_description_word(A,Word):- string_lower(Word,Lower),show_load_call(hooked_asserta(keyword(A,Lower))).
+add_description_word(A,Word):- string_upper(Word,Word),string_lower(Word,Flag),string_to_atom(Flag,Atom),atom_concat(flagged_,Atom,FAtom),fast_add((isa(A,FAtom))).
+add_description_word(A,Word):- string_lower(Word,Word),fast_add((keyword(A,Word))).
+add_description_word(A,Word):- string_lower(Word,Lower),fast_add((keyword(A,Lower))).
 
 
 add_description_kv(A,K,V):- atom_concat('#$PunchingSomething ',Key,K),!,add_description_kv(A,Key,V).
@@ -282,7 +286,7 @@ add_description_kv(A,K,V):-atom_to_value(V,Term),C=..[K,A,Term],show_load_call(a
 
 % =======================================================
 
-show_load_call(hooked_asserta(C)):- !, hooked_asserta(C),!.
+fast_add(C):- correctArgsIsa(change(assert,add),C,CC),!, add(CC),!.
 
 show_load_call(C):- 
    logOnFailure(debugOnError(show_call(C))).

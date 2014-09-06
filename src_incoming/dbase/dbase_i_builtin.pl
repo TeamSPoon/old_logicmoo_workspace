@@ -58,7 +58,7 @@ createableType('TemporallyExistingThing').
 multiValued(contains(container,obj)).
 multiValued(grid(region,int,int,obj)).
 multiValued(possess(agent,spatialthing)).
-genlPreds(possess,wearing).
+genlPreds(possess,wearsClothing).
 multiValued(subclass(type,type)).
 multiValued(isa(term,type)).
 argsIsaInList(somethingIsa(term,list(type))).
@@ -71,6 +71,7 @@ subclass(createableType,type).
 
 % :- (do_term_expansions->true;throw(not_term_expansions)).
 
+:-dynamic(monster/1).
 
 %createableType(type).
 type(item).
@@ -502,7 +503,7 @@ multiValued(keyword(term,string)).
 multiValued(kwLabel(term,string)).
 multiValued(act_affect(item,verb,term(effect))).
 multiValued(memory(agent,term)).
-multiValued(wearing(agent,wearable)).
+multiValued(wearsClothing(agent,wearable)).
 multiValued(grid(region,int,int,obj)).
 multiValued(possess(agent,item)).
 multiValued(subclass(type,type)).

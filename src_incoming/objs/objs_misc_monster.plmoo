@@ -260,8 +260,8 @@ moo:label_type_props(ed,edge,[height(10),weight(4)]).
 moo:label_type_props(dr,door,[height(3),weight(2)]).
 
 %Empty Location
-% You *have* to use 0 as the id of the empty location.
-moo:label_type_props(--,0,[]).
+% You *have* to use 0 as the id of the empty location. (no way!)
+moo:label_type_props(--,var,[]).
 
 % What an agent turns into upon death.
 % Must be named corpse (or edit abent_to_corpse/1 in lib.pl.

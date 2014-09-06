@@ -25,7 +25,7 @@ call_body_req(HEAD):- functor(HEAD,F,A),HEAD_T=..[F|ARGS],HEAD_T=..[dbase_t,F|AR
 
 body_req_isa(I,C):-isa_backchaing(I,C).
 
-body_call_cyckb(HEAD_T):-HEAD_T =.. [dbase_t|PLIST], thglobal:use_cyc_database,!, kbp_t(PLIST).
+body_call_cyckb(HEAD_T):-el_holds_DISABLED_KB, HEAD_T =.. [dbase_t|PLIST], thglobal:use_cyc_database,!, no_repeats(kbp_t(PLIST)).
 
 hook:body_req(F,A,HEAD,HEAD_T):- hook_body_req(F,A,HEAD,HEAD_T).
 
@@ -33,9 +33,11 @@ hook:body_req(F,A,HEAD,HEAD_T):- hook_body_req(F,A,HEAD,HEAD_T).
 hook_body_req(F,A,HEAD,HEAD_T):- mpred_prop(F,prologOnly),!,dmsg(warn(hook_body_req(F,A,HEAD,HEAD_T))),fail.
 hook_body_req(_,_,isa(I,C),_):- !, body_req_isa(I,C).
 hook_body_req(_,_,_,dbase_t(C,I)):- !, body_req_isa(I,C).
+
 hook_body_req(_,_,_ ,HEAD_T):- thlocal:useOnlyExternalDBs,!, body_call_cyckb(HEAD_T).
 % loop checking is not usefull (why the cut was added)
-hook_body_req(F,A,HEAD,HEAD_T):- !, body_req_normal(F,A,HEAD,HEAD_T).
+hook_body_req(F,A,HEAD,HEAD_T):- !, no_repeats(body_req_normal(F,A,HEAD,HEAD_T)).
+/*
 hook_body_req(F,A,HEAD,HEAD_T):- 
       loop_check(body_req_normal(F,A,HEAD,HEAD_T),
 % this makes sense
@@ -46,7 +48,7 @@ hook_body_req(F,A,HEAD,HEAD_T):-
       loop_check(body_req_no_rules(F,A,HEAD,HEAD_T),
       loop_check(body_req_begin_panic(F,A,HEAD,HEAD_T),
       loop_check(body_req_end_panic(F,A,HEAD,HEAD_T),fail))))))).
-
+*/
 
 % this is sober
 body_req_maybe_rules(F,A,HEAD,HEAD_T):- ground(HEAD),body_req_with_rules(F,A,HEAD,HEAD_T),!.
