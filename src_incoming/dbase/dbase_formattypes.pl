@@ -101,6 +101,7 @@ argIsa_call(F,N,Type):- argIsa_call_0(F,N,Type),!.
 argIsa_call(F,N,Type):- argIsa_asserted(F,N,Type),!.
 argIsa_call(F,N,Type):- argIsa_call_1(F,N,Type),!.
 
+
 argIsa_call_nt(F,N,Type):- once(var(F);not(number(N))),dtrace,once(var(F);not(number(N))),trace_or_throw(once(var(F);not(number(N)))->argIsa_call(F,N,Type)).
 argIsa_call_nt(F,N,Type):- argIsa_call(F,N,Type),!.
 argIsa_call_nt(F,N,Type):- findall(T,argIsa_call_0(F,N,Type),T),Types=[_|_],!,as_one_of(Types,Type),!.
@@ -161,8 +162,8 @@ grab_argsIsa(resultIsa,resultIsa(fpred,type)).
 % grab_argsIsa(F,Types):- call_collect([flag(+firstValue),+debugOnError,+deducedSimply],mpred_prop(F,argsIsaInList(Types))).
 grab_argsIsa(F,Types):- mpred_prop(F,argsIsaInList(Types)).
 grab_argsIsa(F,Types):- is_asserted(argsIsaInList(F,Types)).
-
 grab_argsIsa2(F,Types):- fail,deducedSimply(mpred_prop(F,argsIsaInList(Types))).
+
 
 argIsa_call_1(Prop,N1,Type):- is_2nd_order_holds(Prop),dmsg(todo(define(argIsa_call(Prop,N1,'Second_Order_TYPE')))),dumpST,dtrace,
    Type=argIsaFn(Prop,N1).
@@ -363,6 +364,7 @@ correctType(Op,-A,Type,-AA):-nonvar(A),!,correctType(Op,A,Type,AA).
 correctType(_O,A,dir,AA):- any_to_dir(A,AA).
 correctType(Op,A,integer,AA):-!,correctType(Op,A,int,AA).
 correctType(Op,A,askable,AA):-!,correctArgsIsa(Op,A,AA).
+
 correctType(_O,A,int,AA):- any_to_number(A,AA).
 correctType(_O,A,number,AA):- must(any_to_number(A,AA)).
 correctType(_O,A,prolog,AA):- must_equals(A,AA).
@@ -371,7 +373,7 @@ correctType(_O,A,term(_),AA):- must_equals(A,AA).
 correctType(_O,Obj,argIsaFn(Prop,N),AA):-must_equals(Obj,AA),
    ignore((thlocal:deduceArgTypes(_),findall(OT,isa(Obj,OT),OType),
          show_call(deduce_argN(Prop,N,Obj,OType,argIsaFn(Prop,N))))),!.
-correctType(_O,A,term,AA):-  must_equals(A,AA).
+correctType(_O,A,term,AA):- must_equals(A,AA).
 correctType(_O,A,text,AA):- must_equals(A,AA).
 correctType(_O,A,mpred,AA):- any_to_atom(A,AA).
 correctType(_O,A,fpred,AA):- any_to_atom(A,AA).

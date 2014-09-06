@@ -90,7 +90,7 @@ non_assertable(WW,notAssertable(Why)):- compound(WW),functor_catch(WW,F,_),mpred
 :-'$hide'(expanded_different/2).
 :-export(expanded_different/2).
 
-expanded_different(G0,G1):-call(expanded_different_ic(G0,G1)).
+expanded_different(G0,G1):-with_assertions(thlocal:into_form_code,expanded_different_ic(G0,G1)).
 
 expanded_different_ic(G0,G1):-G0==G1,!,fail.
 expanded_different_ic(G0,G1):-expanded_different_1(G0,G1),!.
@@ -103,7 +103,7 @@ expanded_different_1(G0,G1):- G0 \= G1,!.
 
 
 :-export(into_hilog_form/2).
-into_hilog_form(G0,G1):-call(into_hilog_form_ic(G0,G1)).
+into_hilog_form(G0,G1):-with_assertions(thlocal:into_form_code,into_hilog_form_ic(G0,G1)).
 
 into_hilog_form_ic(M:X,O):- atom(M),!,into_hilog_form_ic(X,O).
 into_hilog_form_ic(X,O):- is_list(X),list_to_dbase_t(X,D),into_hilog_form_ic(D,O).
@@ -134,10 +134,10 @@ hook:into_assertable_form_trans_hook(G,F,_,was_asserted_gaf(G)):- mpred_prop(F,w
 :-dynamic_multifile_exported(into_assertable_form/2).
 into_assertable_form(M:H,G):-atom(M),!,into_assertable_form(H,G).
 % into_assertable_form(B,A):- save_in_dbase_t,!,into_hilog_form(B,A),!.
-into_assertable_form(G0,G1):-call(into_assertable_form_ic(G0,G1)).
+into_assertable_form(G0,G1):-with_assertions(thlocal:into_form_code,into_assertable_form_ic(G0,G1)).
 
 into_assertable_form_ic(H,G):- call_no_cuts((hook:into_assertable_form_trans_hook(H,G))),expanded_different(H,G),!.
-% into_assertable_form_ic(H,GO):-expand_term( (H :- true) , C ), reduce_clause(C,G),expanded_different(H,G),!,into_assertable_form(G,GO),!.
+into_assertable_form_ic(H,GO):-expand_term( (H :- true) , C ), reduce_clause(C,G),expanded_different(H,G),!,into_assertable_form(G,GO),!.
 into_assertable_form_ic(X,O):- functor_catch(X,F,A),into_assertable_form_via_mpred(X,F,A,O),!.
 into_assertable_form_ic(X,O):- into_assertable_form(dbase_t,X,O),!.
 

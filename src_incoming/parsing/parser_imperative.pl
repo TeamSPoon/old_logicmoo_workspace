@@ -28,7 +28,7 @@
                    parseForIsa//2,
                    objects_match/3,
                    object_match/2,
-                   object_string/2,                   
+                   object_string/2,
                    get_term_specifier_text/2,
                    parseForTypes//2)).
 
@@ -162,7 +162,7 @@ object_string(Agent,O,DescSpecs,String):- String = [O],
    asserta(object_string_fmt(O,DescSpecs,String)),!.
 
 save_fmt(OS,' ~w ',[A]):-!,save_fmt_e(OS,A),!.
-save_fmt(OS,' ~w',[A]):-!,save_fmt_e(OS,A),!.
+save_fmt(OS,'~w',[A]):-!,save_fmt_e(OS,A),!.
 save_fmt(OS,'~w',[A]):-!,save_fmt_e(OS,A),!.
 save_fmt(OS,Fmt,[A|KW]):-sformat(Str,Fmt,[A|KW]),to_word_list(Str,WL),save_fmt_e(OS,WL),!.
 
@@ -194,7 +194,7 @@ object_print_details(Print,Agent,O,DescSpecs,Skipped):-
 
 
 object_match(String,Obj):-non_empty(String),non_empty(Obj), isaOrSame(Obj,String).
-object_match(S,Obj):-   
+object_match(S,Obj):- 
    current_agent_or_var(P),
    must((once((object_string(P,Obj,0-5,String))),nonvar(String),
    non_empty(String))),!,

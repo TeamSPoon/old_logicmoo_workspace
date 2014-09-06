@@ -1,3 +1,14 @@
+% ===================================================================
+% File 'parser_e2c.pl'
+% Purpose: Attempto Controlled English to CycL conversions from SWI-Prolog  
+% This implementation is an incomplete proxy for CycNL and likely will not work as well
+% Maintainer: Douglas Miles
+% Contact: $Author: dmiles $@users.sourceforge.net ;
+% Version: 'parser_e2c.pl' 1.0.0
+% Revision:  $Revision: 1.3 $
+% Revised At:   $Date: 2002/06/06 15:43:15 $
+% ===================================================================
+
 /*
 
  _________________________________________________________________________
@@ -54,10 +65,10 @@ terminator_db(.,_).
 terminator_db(?,?).
 terminator_db(!,!).
 
-plt:-!. % ,fail.
+plt:-! ,fail.
 plt :- thlocal:usePlTalk.
 
-adverb_db(Quickly):-plt,talk_db(adv,Quickly),not(ccw_db(Quickly,_)).
+adverb_db(Quickly):-plt,talk_db(adv,Quickly),not_ccw(Quickly).
 
 conj_db(and).
 conj_db(or).
@@ -134,8 +145,8 @@ prep_db(into).
 prep_db(through).
 prep_db(Above):-plt,talk_db(preposition,Above).
 
-noun_form_db(Plu,Sin,plu) :- noun_plu_db(Plu,Sin).
-noun_form_db(Sin,Sin,sin) :- noun_sin_db(Sin).
+noun_form_db(Plu,Sin,plu) :- noun_plu_db(Plu,Sin),not_ccw(Plu).
+noun_form_db(Sin,Sin,sin) :- noun_sin_db(Sin),not_ccw(Sin).
 
 verb_form_db(V,V,inf,_) :- verb_root_db(V).
 verb_form_db(V,V,pres+fin,Agmt) :-
@@ -156,7 +167,7 @@ verb_root_db(do).
    
 verb_form_db(am,be,pres+fin,1+sin).
 verb_form_db(are,be,pres+fin,2+sin).
-verb_form_db(is,be,pres+fin,3+sin).
+verb_form_db((is),be,pres+fin,3+sin).
 verb_form_db(are,be,pres+fin,_+plu).
 verb_form_db(was,be,past+fin,1+sin).
 verb_form_db(were,be,past+fin,2+sin).
@@ -224,6 +235,9 @@ pers_pron_db(them,_,3,plu,compl(_)).
 
 
 how_many_db([how,many]).
+
+pronoun_LF(Argree2B,C,MoreIn,X,Y,MoreOut,PronounType):-fail.
+pronoun_LF(Argree2B,FemMasc,MoreIn,X,Y,[adj(Argree2B)|MoreIn],typeOf(FemMasc,Argree2B,X,Y)):-!,fail,trace.
 
 % =================================================================
 % PROPER INSTANCES OF
@@ -360,16 +374,16 @@ gen_typemask(_,feature&_).
 
 
 noun_plu_db_via_types(TS,T):- maybe_noun_or_adj(T),maybe_noun_or_adj(TS), (atom(TS)->atom_concat(T,'s',TS);true),type(T),atom(T),atom_concat(T,'s',TS).
-maybe_noun_or_adj(T):- var(T)->true;(atom(T),not(ccw_db(T,_))).
+maybe_noun_or_adj(T):- var(T)->true;(atom(T),not_ccw(T)).
 
 % 
 % chat80("how many types are there?").
 % chat80("what formattypes are types?").
 
 %  chat80("how are you?").
-% chat80("you flow").
+% test_chat80("you flow").
 
-test_chat80(U):-must(chat80(U)).
+test_chat80(U):- with_assertions(thlocal:chat80_interactive, must(chat80(U))).
 
 t11:- 
    test_chat80("how many postures are there?"),
@@ -479,19 +493,20 @@ adj_db(american,restr).
 adj_db(asian,restr).
 adj_db(european,restr).
 
+not_ccw(W):-not(ccw_db1(W,_)),!.
 % closed class words
 ccw_db(W,C):-no_repeats(ccw_db0(W,C);ccw_db3(W,C)).
 ccw_db0(W,C):-one_must(ccw_db1(W,C),ccw_db2(W,C)).
-ccw_db1(W,'Number-SP'):-number_db(W,_,_).
-ccw_db1(W,'Symbol-SP'):-terminator_db(W,_).
+ccw_db1(W,'Number-SP'):-no_repeats(W,number_db(W,_,_)).
+ccw_db1(W,'Symbol-SP'):-no_repeats(W,terminator_db(W,_)).
 ccw_db1(W,'Preposition'):-prep_db(W),not(ccw_db1(W,'Determiner')).
 ccw_db1(W,'Pronoun'):-pron_db(W).
 ccw_db1(W,'Conjunction'):-conj_db(W).
 ccw_db1(W,'Determiner'):-det_db(W).
-ccw_db1(W,'Conjunction'):-partOfSpeech(_,'SubordinatingConjunction',W).
-ccw_db1(W,'Pronoun'):-cyckb_t('pronounStrings',_,W).
-ccw_db2(W,'Preposition'):-talk_db(preposition,W).
-ccw_db3(W,C):-ccw_db4(W,C),not(loop_check(adj_db(W,_))),not(ccw_db1(W,_)).
+ccw_db1(W,'Conjunction'):-no_repeats(W,partOfSpeech(_,'SubordinatingConjunction',W)).
+ccw_db1(W,'Pronoun'):-no_repeats(W,cyckb_t('pronounStrings',_,W)).
+ccw_db2(W,'Preposition'):-no_repeats(W,talk_db(preposition,W)).
+ccw_db3(W,C):-ccw_db4(W,C),not(loop_check(adj_db(W,_))),not_ccw(W).
 ccw_db4(W,'Verb'):-nonvar(W),verb_form_db(W,_,pres+_,_),!.
 ccw_db4(W,'Verb'):-verb_form_db(W,_,pres+_,_).
 
@@ -506,13 +521,13 @@ cw_db1(W,C):-ccw_db(W,C).
 cw_db1(W,C):-ocw_db(W,C),dif(C,OC),not(ocw_db(W,OC)).
 cw_db2(W,C):-one_must(ocw_db0(W,C),ocw_db1(W,C)).
 
-ocw_db(W,'Verb'):-verb_form_db(W,_,_,_),not(ccw_db(W,CCW)),CCW\=W.
+ocw_db(W,'Verb'):-no_repeats(W,(verb_form_db(W,_,_,_),not(ccw_db(W,CCW)),CCW\=W)).
 ocw_db(W,C):-ocw_db0(W,C).
 
 ocw_db0(W,C):-one_must(ocw_db1(W,C),ocw_db3(W,C)).
 ocw_db1(W,'Interjection'):-talk_db(interj,W).
 ocw_db1(W,'Adverb'):-adverb_db(W),not(ocw_db2(W,_)).
-ocw_db1(W,C):-ocw_db2(W,C),not(ccw_db(W,_)).
+ocw_db1(W,C):-ocw_db2(W,C),not_ccw(W).
 ocw_db2(W,'Noun'):-noun_plu_db(W,_).
 ocw_db2(W,'Adjective'):-adj_db(W,_).
 ocw_db2(W,'Noun'):-noun_plu_db(_,W).
@@ -521,7 +536,7 @@ ocw_db3(W,SPOS):- 'suffixString'(CycWord,String),String\='',atom_concat(_First,S
 simplePOS(POS,SIMP):-posName(SIMP),atom_concat(_,SIMP,POS).
 
 
-restriction_LF(AdjNounEan,feature&_,X,adjIsa(X,AdjNounEan)):- plt, adj_db(AdjNounEan,restr),not(ccw_db(AdjNounEan,_)).
+restriction_LF(AdjNounEan,feature&_,X,adjIsa(X,AdjNounEan)):- plt, adj_db(AdjNounEan,restr),not_ccw(AdjNounEan).
 adjIsa(E,C):- call_mpred(isa_backchaing(E,C)).
 adj_db(AdjNounEan,restr):- plt,talk_db(adj,AdjNounEan),talk_db(noun1,AdjNounEan,_).
 adj_db(AdjRestr,restr):-plt,talk_db(adj,AdjRestr),not(adj_db(AdjRestr,quant)),not(adverb_db(AdjRestr)).
@@ -930,6 +945,8 @@ length_between(S,E,Left):-between(S,E,X),length(Left,X).
 
 :-dynamic_multifile_exported(must_test_801/3).
 
+must_test_801([which, are, the, largest, african, countries, ?], [ parse(whq(feature&place&country-B, s(np(3+sin, wh(feature&place&country-B), []), verb(be, active, pres+fin, [], pos), [arg(dir, np(3+sin, np_head(det(the(sin)), [sup(most, adj(large)), adj(african)], country), []))], []))), sem((answer80([A]):-B^ (setof(C:D, (country(D), area(D, C), african(D)), B), aggregate(max, B, A)))), qplan((answer80([D]):-C^ (setof(B:A, (african(A), {country(A)}, area(A, B)), C), aggregate(max, C, D)))), 
+answers([sudan])],[time(0.0)]).
 must_test_801([what, rivers, are, there, ?], [sent([what, rivers, are, there, ?]), parse(whq(feature&river-B, s(np(3+plu, np_head(int_det(feature&river-B), [], river), []), verb(be, active, pres+fin, [], pos), [void], []))), sem((answer80([A]):-river(A), A^true)), qplan((answer80([B]):-river(B), B^true)), 
 answers([amazon, amu_darya, amur, brahmaputra, colorado, congo_river, cubango, danube, don, elbe, euphrates, ganges, hwang_ho, indus, irrawaddy, lena, limpopo, mackenzie, mekong, mississippi, murray, niger_river, nile, ob, oder, orange, orinoco, parana, rhine, rhone, rio_grande, salween, senegal_river, tagus, vistula, volga, volta, yangtze, yenisei, yukon, zambesi])],[time(0.0)]).
 must_test_801([does, afghanistan, border, china, ?], [sent([does, afghanistan, border, china, ?]), parse(q(s(np(3+sin, name(afghanistan), []), verb(border, active, pres+fin, [], pos), [arg(dir, np(3+sin, name(china), []))], []))), sem((answer80([]):-borders(afghanistan, china))), qplan((answer80([]):-{borders(afghanistan, china)})), 

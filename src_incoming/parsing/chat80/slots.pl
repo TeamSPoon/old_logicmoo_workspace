@@ -53,8 +53,16 @@ i_np(NP,Y,Q,Up,Id0,Index,XA0,XA) :-
 i_np_head(np(_,Kernel,_),Y,
       quant(Det,T,Head,Pred0,QMods,Y),
       Det,Det0,X,Pred,QMods,Slots,_Id) :-
-   i_np_head0(Kernel,X,T,Det0,Head,Pred0,Pred,Slots),
-   Type-_=Y, Type-_=T.
+   no_repeats(i_np_head0(Kernel,X,T,Det0,Head,Pred0,Pred,Slots)),
+   Type-_=Y, Type-_=T,!.
+
+i_np_head(np(Argree2B,C,MoreIn),Y,Quant,Det,Det0,X,Pred,QMods,Slots0,Id0):- thlocal:chat80_interactive,!,
+  trace,pronoun_LF(Argree2B,C,MoreIn,X,Y,MoreOut,PronounType),
+  i_np_head(np(Argree2B,np_head(generic,MoreOut,PronounType),MoreIn),Y,Quant,Det,Det0,X,Pred,QMods,Slots0,Id0).
+
+i_np_head(Argree2B,Y,Quant,Det,Det0,X,Pred,QMods,Slots0,Id0):- thlocal:chat80_interactive,!,
+  trace,pronoun_LF(Argree2B,[],[],X,Y,MoreOut,PronounType),
+  i_np_head(np(Argree2B,np_head(generic,MoreOut,PronounType),MoreOut),Y,Quant,Det,Det0,X,Pred,QMods,Slots0,Id0).
 
 i_np_rest(np(_,_,Mods),Det,Det0,X,Pred,QMods,Slots,Up,Id,Index) :-
    index_args(Det0,Index,Id,Det,IndexA),
@@ -301,7 +309,7 @@ slot_verb_template(have,Y=Z,
 	held_arg(poss,-(-(-(+Id))),TypeS-S), have).
 slot_verb_template(Verb,Pred,
       [slot(subj,TypeS,S,_,free)|Slots],[],transparent) :-
-   no_repeats(verb_type_db(Verb,_+Kind)),
+   no_repeats(verb_type_db(Verb,_+Kind)),!,
    slot_verb_kind(Kind,Verb,TypeS,S,Pred,Slots).
 
 slot_verb_kind(be,_,TypeS,S,S=A,[slot(dir,TypeS,A,_,free)]).

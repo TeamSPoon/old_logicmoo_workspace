@@ -1257,4 +1257,3 @@ agent_text_command(_Agent,_Text,_AgentTarget,_Cmd):-fail.
 %:- rescan_mpred_props.
 
 
-

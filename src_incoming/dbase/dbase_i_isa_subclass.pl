@@ -401,6 +401,8 @@ is_known_false0(subclass(Type,_)):-arg(_,vv(type,relation,spatialthing,formattyp
 :-dynamic_multifile_exported(not_mud_isa/2).
 not_mud_isa(agent,formattype).
 not_mud_isa(item,formattype).
+not_mud_isa(type,formattype).
+not_mud_isa(obj, completeExtentAsserted).
 not_mud_isa(obj, createableType).
 not_mud_isa(assertionMacroHead, formattype).
 not_mud_isa(obj, formattype).

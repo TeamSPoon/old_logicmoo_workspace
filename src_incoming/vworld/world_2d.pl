@@ -148,13 +148,11 @@ region_near(R1,R1).
 
 moo:transitive_other(atloc,1,Obj,What):-inside_of(Obj,What).
 
+:-decl_mpred_hybrid(inside_of/2).
 :-export(inside_of/2).
-/*
 inside_of(Obj,What):-is_asserted(stowed(What,Obj)).
 inside_of(Obj,What):-is_asserted(wearsClothing(What,Obj)).
 inside_of(Obj,What):-is_asserted(contains(What,Obj)).
-*/
-
 
 genlInverse(inside_of,possess).
 genlInverse(wearsClothing,inside_of).

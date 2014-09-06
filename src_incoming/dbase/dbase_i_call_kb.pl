@@ -86,7 +86,6 @@ link_to_holds_DYNAMIC(Pred,TargetPred):-
           A=..[Pred|PLIST],
           B=..[TargetPred|PLIST],              
          assertz_if_new((A:-B)))).
-
 :-export(link_to_holds_list/2).
 link_to_holds_list(Pred,TargetPred):- 
   doall((between(2,12,X),length(PLIST,X),
@@ -112,6 +111,7 @@ cyckb_t(P,A1,A2):- dbase_t([P,A1,A2]).
 cyckb_t(P,A1):- el_holds(P,A1,_,_).
 cyckb_t(P,A1):- dbase_t([P,A1]).
 */
+
 :-dynamic(el_holds_DISABLED_KB/0).
 :- link_to_holds_DYNAMIC(cyckb_t,el_holds_DISABLED_KB).
 

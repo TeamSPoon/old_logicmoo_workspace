@@ -157,7 +157,7 @@ declare_dbase_local(F):- must_det(mpred_arity(F,A)),declare_dbase_local(F,A).
 declare_dbase_local(F,A):- assert_arity(F,A),fail.
 declare_dbase_local(F,_):- mpred_prop(F,prologOnly),!.
 declare_dbase_local(F,A):- forall(mpred_prop(F,stubType(Stub)),declare_dbase_local(F,A,Stub)),!.
-% declare_dbase_local(F,A):- declare_dbase_local(F,A,prologHybrid),!.
+%declare_dbase_local(F,A):- declare_dbase_local(F,A,prologHybrid),!.
 
 declare_dbase_local(F,A,_Stub):- assert_arity(F,A),fail.
 declare_dbase_local(F,_,_):- mpred_prop(F,prologOnly),!. % retractall(mpred_prop(F,stubType(_Stub))).
@@ -339,7 +339,7 @@ assert_arity_lc(F,A):-
    
 
 :-export(rescan_missing_stubs/0).
-rescan_missing_stubs:- loop_check_local(time_call(rescan_missing_stubs_lc),true).
+rescan_missing_stubs:-loop_check_local(time_call(rescan_missing_stubs_lc),true).
 rescan_missing_stubs_lc:- once(thglobal:use_cyc_database), once(with_assertions(thlocal:useOnlyExternalDBs,forall((kb_t(arity(F,A)),A>1,good_pred_relation_name(F,A),not(mpred_arity(F,A))),with_no_dmsg(decl_mpred_mfa,decl_mpred_hybrid(F,A))))),fail.
 rescan_missing_stubs_lc:- hotrace((doall((mpred_missing_stubs(F,Stub),mpred_arity(F,A),declare_dbase_local(F,A,Stub))))).
 
