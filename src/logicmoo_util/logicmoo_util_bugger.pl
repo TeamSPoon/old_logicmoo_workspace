@@ -629,7 +629,7 @@ memberchk_eq(X, [Y|Ys]) :-
 % no_repeats(Call):- tlbugger:attributedVars,!,no_repeats_av(Call).
 
 no_repeats(Call):- hotrace((ground(Call) -> ((traceok(Call),!)) ; (CONS = [_], traceok(Call), notrace(( \+ memberchk_eq(Call,CONS) , nb_setarg(2, CONS, [Call])))))).
-no_repeatsU(Call):- hotrace((ground(Call) -> ((traceok(Call),!)) ; (CONS = [_], traceok(Call), notrace(( \+ memberchk(Call,CONS) , nb_setarg(2, CONS, [Call])))))).
+no_repeatsU(Call):- hotrace((ground(Call) -> ((traceok(Call),!)) ; (CONS = [_], traceok(Call), notrace(( \+ member(Call,CONS) , nb_setarg(2, CONS, [Call])))))).
 
 % ===================================================
 % 

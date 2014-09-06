@@ -150,11 +150,21 @@ p2(Term):- p3, p4(Term), p3.
 p1:-'format'('~n% ---------------------------------------------------------------------------------------------------~n',[]).
 p4(Term):-'format'('~n%                       ~q~n',[Term]).
 
+words_to_w2(U,W2):-var(U),must(W2=U).
+words_to_w2([],W2):-must(W2=[]).
+words_to_w2(U,W2):-not(is_list(U)),to_word_list(U,List),U \=@= List,!,words_to_w2(List,W2).
+
+words_to_w2(U,W2):-not(compound(U)),must(W2=U).
+words_to_w2([W|WL],[W2|W2L]):-w_to_w2(W,W2),words_to_w2(WL,W2L).
+
+
+
 :-dynamic_multifile_exported(process_run_real/5).
-process_run_real(Callback,StartParse,U,[sent=(U),parse=(E),sem=(S),qplan=(QP),answers=(Results)],[time(WholeTime)]) :-
+process_run_real(Callback,StartParse,UIn,[sent=(U),parse=(E),sem=(S),qplan=(QP),answers=(Results)],[time(WholeTime)]) :-
    p1,
    flag(sentenceTrial,_,0),
    ignore((var(Callback),Callback=report)),
+   words_to_w2(UIn,U),!,
    call(Callback,U,'Sentence'(Callback),0,expr),
    ignore((var(StartParse),runtime(StartParse))),!,
    (if_try(nonvar(U),sentence(E,U,[],[],[])) *-> call(Callback,U,'POS Sentence'(Callback),0,expr); (call(Callback,U,'Rewire Sentence'(Callback),0,expr),!,fail)),

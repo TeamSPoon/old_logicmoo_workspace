@@ -176,6 +176,66 @@ verb_form_db(were,be,past+fin,_+plu).
 verb_form_db(been,be,past+part,_).
 verb_form_db(being,be,pres+part,_).
 
+:-dynamic old_text/0.
+
+old_text.
+
+w_to_w2(W,W):-old_text,!.
+
+w_to_w2(w(Txt,Props),w(Txt,Props)):-!.
+w_to_w2(w(X),w(X,open)):-!.
+w_to_w2(U,w(U,open)):-compound(U),!.
+w_to_w2(S,w(A,open)):-atom_string(A,S),!.
+w_to_w2(X,w(X,open)):-!.
+
+memoize_pos_to_db(WHY,_CYCPOS,W1,W1):- old_text,!, WHY. %  w(W1,DATA)
+memoize_pos_to_db(WHY,_CYCPOS,W2,W1):- W2= w(W1,open),!,WHY,must(nb_setarg(2,W2,set(WHY))).
+memoize_pos_to_db(WHY,_CYCPOS,W2,W1):- W2= w(W1,set(WHY2)),!,WHY2=WHY.
+memoize_pos_to_db(WHY,CYCPOS,W2,W1):- W2= w(W1,DATA), trace,
+  ( DATA==open -> ((pos_to_db_precache(W1,GOODL),dmsg(W1=GOODL),nb_setarg(2,W2,GOODL))) ; DATA=GOODL ),!,
+ (GOODL==[] -> WHY ; member(WHY-CYCPOS,GOODL)).
+
+pos_to_db_precache(W,GOODL):-   
+ findall(WHY-CYCPOS,
+  (member(theTextC(W,CYCPOS,WHY),
+    [    theTextC(W,'Pronoun',context_pron_db(In,Place,W)),
+         theTextC(W,'Pronoun',rel_pron_db(W,Case)),
+         theTextC(W,'Pronoun',quantifier_pron_db(W,Det,Noun)),
+         theTextC(W,'Pronoun',poss_pron_db(W,Gender,Person,Number)),
+         theTextC(W,'Pronoun',pers_pron_db(W,Gender,Person,Number,Case)),
+         theTextC(W,'Preposition',loc_pred_prep_db(W,P,OFPREP)),
+         theTextC(W,'Number-SP',number_db(W,I,Number)),
+         theTextC(W,'Determiner',det_db(W,Number,Det,Def)),
+         theTextC(W,'Symbol-SP',terminator_db(W,Type)),
+         theTextC(W,'Symbol-SP',W=','),
+         theTextC(W,'Pronoun',int_pron_db(W,Case)),
+         theTextC(Prep,'Preposition',prep_db(Prep)),
+         theTextC(Name,'ProperNoun',name_db(Name)),
+         theTextC(Conj,'Conjunction',conj_db(Conj)),      
+         theTextC(Art,'Determiner', int_art_db(Art,X,Agmt,DX)),
+         theTextC(W,'Noun',noun_form_db(W,Noun,Agmt)),
+         theTextC(W,'Adjective',rel_adj_db(W,NW)),
+         theTextC(W,'Adjective',sup_adj_db(W,NW)),
+         theTextC(W,'Adjective',adj_db(W,Type)),
+         theTextC(W,'Adverb',comp_adv_db(W)),
+         theTextC(W,'Adverb',sup_adv_db(W)),
+         theTextC(W,'Adverb',adverb_db(W)),
+         theTextC(W,VerbPOS,v_db(W,Verb,Tense,Agmt,VerbPOS))]),
+            no_repeats(WHY)),GOODL),
+            ignore((GOODL==[],dmsg(W=[]))),!.
+
+posVerbOrAuxVerb(being,be,pres+part,_BEING).
+posVerbOrAuxVerb(_,be,_,'BeAux').
+posVerbOrAuxVerb(_,have,_,'HaveAux').
+posVerbOrAuxVerb(_,can,_,'Verb'). % _TINCAN
+posVerbOrAuxVerb(_,do,_,'DoAux').
+posVerbOrAuxVerb(_,_,_+part,'Verb').
+posVerbOrAuxVerb(_,_,_,'Verb').
+
+v_db(W,Verb,Tense,Agmt,POSVerbOrAuxVerb):-verb_form_db(W,Verb,Tense,Agmt),once(posVerbOrAuxVerb(W,Verb,Tense,POSVerbOrAuxVerb)).
+% v_db(W,Verb,Tense,Agmt,'Verb'):-!,verb_form_db(W,Verb,Tense,Agmt).
+v_db(W,Verb,pres+_,_,'Modal'):-el_holds(partOfSpeech,Should_TheWord,'Modal',W,_,_),el_holds('presentTense-Universal',Should_TheWord,Verb,_,_).
+
 verb_type_db_0(be,aux+be).
 
 regular_pres_db(have).

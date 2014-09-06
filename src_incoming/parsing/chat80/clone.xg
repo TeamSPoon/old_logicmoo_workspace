@@ -370,10 +370,10 @@ reduced_wh(AgmtX,X),
 
 verb(verb(Root,Voice,Time+fin,Aspect,Neg),Agmt,Type,Voice) -->
    verb_form(Root0,Time+fin,Agmt,Role),
-   {verb_type_db(Root0,Type0)},
+   {must(verb_type_db(Root0,Type0))},
    neg_opt(Type0,Neg),
    rest_verb(Role,Root0,Root,Voice,Aspect),
-   {verb_type_db(Root,Type)}.
+   {must(verb_type_db(Root,Type)),!}.
 
 neg_opt(aux+_,neg) --> theText1(not).
 neg_opt(_,pos) --> noText.
