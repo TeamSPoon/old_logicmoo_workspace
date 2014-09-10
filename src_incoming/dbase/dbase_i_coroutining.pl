@@ -336,7 +336,7 @@ isac(X, List) :-
 
 col_size(C,S):-isa(C,completeExtentKnown),!,setof(E,isa(E,C),L),length(L,S).
 col_size(C,1000000):-isa(C,formattype),!.
-col_size(C,1000):-isa(C,formattype),!.
+col_size(_,1000).
 
 comp_col(Comp,Col1,Col2):-col_size(Col1,S1),col_size(Col2,S2),compare(Comp,S1,S2).
 
