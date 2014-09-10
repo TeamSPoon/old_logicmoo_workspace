@@ -21,6 +21,8 @@
 |_________________________________________________________________________|
 
 */
+:- dynamic_multifile_exported((contains0/2,country/8,city/3,borders/2,in_continent/2)).
+:- dynamic_multifile_exported moo:contains/2.
 
 
 

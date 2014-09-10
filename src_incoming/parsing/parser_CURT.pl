@@ -13,6 +13,7 @@
          ]).
 
 % ==============================================================================
-:- rexport('CURT/curtPPDRT').
-:- rexport('CURT/advertentCURT').
+% :- reexport('CURT/curtPPDRT').
+% :- reexport('CURT/advertentCurt').
+
 

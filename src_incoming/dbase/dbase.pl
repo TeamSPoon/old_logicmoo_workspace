@@ -61,6 +61,7 @@ shrink_clause( HB,HB).
 :- decl_thlocal thlocal:in_dynamic_reader/1.
 :- decl_thlocal thlocal:tracing80/0.
 :- decl_thlocal thlocal:usePlTalk/0.
+:- decl_thlocal thlocal:useAltPOS/0.
 
 :- dynamic_multifile_exported(thlocal:tracing80/0).
 :- dynamic_multifile_exported(thlocal:usePlTalk/0).
@@ -113,14 +114,14 @@ shrink_clause( HB,HB).
 % DBASE_T System
 % ================================================
 
-:-include(dbase_i_kb_store).
+:-ensure_loaded(dbase_i_kb_store).
 
 % ================================================
 % MPRED_PROP System
 % ================================================
 
-:-include(dbase_i_mpred_props).
-:-include(dbase_i_mpred_stubs).
+:-ensure_loaded(dbase_i_mpred_props).
+:-ensure_loaded(dbase_i_mpred_stubs).
 
 :- op(1120,fx,decl_mpred_prolog).
 :- op(1150,fx,decl_mpred_hybrid).
@@ -134,11 +135,11 @@ shrink_clause( HB,HB).
 :- decl_mpred_hybrid(singleValued/1).
 :- discontiguous(singleValued/1).
 
-:-include(dbase_i_deduce).
+:-ensure_loaded(dbase_i_deduce).
 
 % :-ensure_loaded(dbase_ext_was).
 
-:-include(dbase_i_isa_subclass).
+:-ensure_loaded(dbase_i_isa_subclass).
 
 % ================================================
 % A tiny bit of TMS
@@ -246,7 +247,7 @@ coerce(What,_Type,NewThing):-NewThing = What.
 :- '@'(use_module(logicmoo(vworld/moo)),'user').
 % :- '@'(use_module(dbase_formattypes),'user').
 
-:-include(dbase_formattypes).
+:-ensure_loaded(dbase_formattypes).
 
 %:- trace, (dynamic_multifile_exported  moo:obj/1). 
 %:- trace, (dynamic_multifile_exported  obj/1). 
@@ -398,7 +399,7 @@ chargeRemaining/2,
 %:- meta_predicate db_forall(?,?,?,0).
 
 
-% :- include('dbase_types_motel').
+% :- ensure_loaded('dbase_types_motel').
 
 % :- user_use_module(dbase_rules_pttp).
 
@@ -410,8 +411,8 @@ moo:agent_call_command(_Gent,list(Obj)):- term_listing(Obj).
 
 :-declare_dbase_local_dynamic(atloc,2).
 
-:-include(dbase_i_pldoc).
-:-include(dbase_i_coroutining).
+:-ensure_loaded(dbase_i_pldoc).
+:-ensure_loaded(dbase_i_coroutining).
 %:-discontiguous(singleValued/2).
 %:-discontiguous(multiValued/1).
 % =================================================================================================
@@ -918,8 +919,8 @@ hooked_asserta_confirmed(CNEW,A,NEW):-
 
 hooked_asserta_confirmed(CNEW,A,NEW):-dmsg(unconfirmed(hooked_asserta_confirmed(CNEW,A,NEW))).
 
-:-include(dbase_i_propvals).
-:-include(dbase_i_call).
+:-ensure_loaded(dbase_i_propvals).
+:-ensure_loaded(dbase_i_call).
 
 :-moo_hide_childs(replace_arg/4).
 replace_arg(C,A,OLD,CC):- 
@@ -999,11 +1000,11 @@ makeConstant(X):-trace_or_throw(makeConstant(X)).
 cycAssert(A,B):-trace_or_throw(cycAssert(A,B)).
 */
 
-:- include(dbase_c_term_expansion).
+:- ensure_loaded(dbase_c_term_expansion).
 
-:- include(dbase_i_db_preds).
+:- ensure_loaded(dbase_i_db_preds).
 
-:- include(dbase_i_cyc).
+:- ensure_loaded(dbase_i_cyc).
 
 :- decl_mpred_hybrid(expand_args,2). 
 
@@ -1062,7 +1063,7 @@ add_from_macropred(C):- loop_check(add_from_macropred_lc(C),((dmsg(loopING_add_f
 add_from_macropred_lc(A):-A==end_of_file,!.
 add_from_macropred_lc(A):- not(compound(A)),!,trace_or_throw(not_compound(add_from_macropred_lc(A))).
 add_from_macropred_lc(':-'(A)):- predicate_property(A,_),!,must(logOnFailure(A)),!.
-add_from_macropred_lc(':-'(include(A))):- add(':-'(load_data_file(A))),!.
+add_from_macropred_lc(':-'(ensure_loaded(A))):- add(':-'(load_data_file(A))),!.
 add_from_macropred_lc(':-'(A)):- dmsg(trace_or_throw(missing_directive(A))),!.
 add_from_macropred_lc(':-'(Head,true)):- !, add(Head).
 add_from_macropred_lc(':-'(Head,Body)):- must_det(assertz_local_game_clause(Head,Body)),!.
@@ -1240,7 +1241,7 @@ user:term_expansion((H:-B),Out):- fail,test_tl(enable_src_loop_checking),
 % load_motel:- defrole([],time_state,restr(time,period)).
 % :-load_motel.
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- ensure_loaded(logicmoo('vworld/moo_footer.pl')).
 
 agent_text_command(_Agent,_Text,_AgentTarget,_Cmd):-fail.
 /*
@@ -1250,7 +1251,7 @@ agent_text_command(_Agent,_Text,_AgentTarget,_Cmd):-fail.
            agent_text_command/4,         
 */
 
-:- include(logicmoo(vworld/world)).
+:- ensure_loaded(logicmoo(vworld/world)).
 :-'$hide'(rescan_dbase_ops/0).
 :-'$hide'(do_db_op_hooks/0).
 %:- rescan_missing_stubs.

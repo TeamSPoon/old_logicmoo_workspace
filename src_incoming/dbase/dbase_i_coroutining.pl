@@ -280,6 +280,7 @@ or_list([H|T], (H;OT)) :-
 
 % :- module(domain, [ domain/2  ]). % Var, ?Domain
 :- use_module(library(ordsets)).
+:-export(domain/2).
 domain(X, Dom) :-
       var(Dom), !,
       get_attr(X, domain, Dom).
@@ -287,6 +288,17 @@ domain(X, List) :-
       list_to_ord_set(List, Domain),
       put_attr(Y, domain, Domain),
       X = Y.
+
+:-export(extend_domain/2).
+extend_domain(X, DomL):- init_dom(X, Dom2), ord_union(Dom2, DomL, NewDomain),put_attr( X, domain, NewDomain ).
+
+:-export(extend_dom/2).
+extend_dom(X, DomE):-  init_dom(X, Dom2),ord_add_element(Dom2, DomE, NewDomain),put_attr( X, domain, NewDomain ).
+
+:-export(init_dom/2).
+init_dom(X,Dom):-get_attr(X, domain, Dom),!.
+init_dom(X,Dom):-Dom =[_], put_attr(X, domain, Dom),!.
+
 % An attributed variable with attribute value Domain has been
 % assigned the value Y
 domain:attr_unify_hook(Domain, Y) :-
@@ -302,6 +314,9 @@ domain:attr_unify_hook(Domain, Y) :-
    -> put_attr( Y, domain, Domain )
    ; ord_memberchk(Y, Domain)
 ).
+
+
+
 % Translate attributes from this module to residual goals
 domain:attribute_goals(X) -->
       { get_attr(X, domain, List) },
@@ -310,7 +325,7 @@ domain:attribute_goals(X) -->
 
 
 
-
+:-export(isac/2).
 isac(X, Dom) :-
       var(Dom), !,
       get_attr(X, isac, Dom).
@@ -318,6 +333,15 @@ isac(X, List) :-
       list_to_ord_set(List, Domain),
       put_attr(Y, isac, Domain),
       X = Y.
+
+col_size(C,S):-isa(C,completeExtentKnown),!,setof(E,isa(E,C),L),length(L,S).
+col_size(C,1000000):-isa(C,formattype),!.
+col_size(C,1000):-isa(C,formattype),!.
+
+comp_col(Comp,Col1,Col2):-col_size(Col1,S1),col_size(Col2,S2),compare(Comp,S1,S2).
+
+inst_isac(X, List):- predsort(comp_col,List,SList),isac_gen(X,SList).
+
 % An attributed variable with attribute value Domain has been
 % assigned the value Y
 isac:attr_unify_hook(Domain, Y):-
@@ -331,7 +355,12 @@ isac:attr_unify_hook(Domain, Y):-
    )
    ; var(Y)
    -> put_attr( Y, isac, Domain )
-   ; ( ord_union(Domain, [isLike(Y)], NewDomain),   put_attr(Y, isac, NewDomain))).
+   ;  isac_chk(Y,Domain)).
+
+isac_chk(E,Cs):-once(isac_gen(E,Cs)).
+
+isac_gen(_, []).
+isac_gen(Y, [H|List]):-isa(Y,H),!,isac_gen(Y, List).
 
 
 

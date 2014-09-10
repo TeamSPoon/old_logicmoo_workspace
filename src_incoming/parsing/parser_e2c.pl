@@ -693,7 +693,7 @@ argIsa(Form,2, 'CharacterString'):-is_speechPartPred_tt(Form).
 % ==========================================================
 % meetsForm(String,CycWord,Form)
 % ==========================================================
-meetsForm80(String,RootString,form80(MainPlusTrans,main+trans)):-!,fail,nop(String,RootString,form80(MainPlusTrans,main+trans)).
+meetsForm80(String,RootString,form80(MainPlusTrans,main+tv)):-!,fail,nop(String,RootString,form80(MainPlusTrans,main+tv)).
 
 % ==========================================================
 % meetsForm(String,CycWord,Form)

@@ -177,6 +177,9 @@ now_run_local_tests_dbg :- doall(defined_local_test).
 % [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
 % :- register_timer_thread(npc_ticker,30,npc_tick).
 
+:-kellerStorage:kellerStorageTestSuite.
+
+:-curt80.
 
 % the real tests now (once)
 :- if_flag_true(was_run_dbg_pl,at_start(must_det(run_mud_tests))).

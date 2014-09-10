@@ -50,19 +50,20 @@ i_np(NP,Y,Q,Up,Id0,Index,XA0,XA) :-
    held_arg(XA0,XA,Slots0,Slots,Id0,Id),
    i_np_rest(NP,Det,Det0,X,Pred,QMods,Slots,Up,Id,Index).
 
-i_np_head(np(_,Kernel,_),Y,
-      quant(Det,T,Head,Pred0,QMods,Y),
-      Det,Det0,X,Pred,QMods,Slots,_Id) :-
+i_np_head(K,Y,Q,Det,Det0,X,Pred,QMods,Slots,_Id) :-
+   kyqdhq(K,Kernel,Y,Q,Det,T,Head,Pred0,QMods), %   K= np(_,Kernel,_),Y=Y, Q = quant(Det,T,Head,Pred0,QMods,Y),
    no_repeats(i_np_head0(Kernel,X,T,Det0,Head,Pred0,Pred,Slots)),
    Type-_=Y, Type-_=T,!.
 
-i_np_head(np(Argree2B,C,MoreIn),Y,Quant,Det,Det0,X,Pred,QMods,Slots0,Id0):- thlocal:chat80_interactive,!,
-  trace,pronoun_LF(Argree2B,C,MoreIn,X,Y,MoreOut,PronounType),
-  i_np_head(np(Argree2B,np_head(generic,MoreOut,PronounType),MoreIn),Y,Quant,Det,Det0,X,Pred,QMods,Slots0,Id0).
+/*
+i_np_head(np(_,Kernel,_),Y,quant(Det,T,Head,Pred0,QMods,Y),Det,Det0,X,Pred,QMods,Slots,_Id) :- fail,
+   no_repeats(i_np_head0(Kernel,X,T,Det0,Head,Pred0,Pred,Slots)),
+   Type-_=Y, Type-_=T,!.
+*/
 
-i_np_head(Argree2B,Y,Quant,Det,Det0,X,Pred,QMods,Slots0,Id0):- thlocal:chat80_interactive,!,
-  trace,pronoun_LF(Argree2B,[],[],X,Y,MoreOut,PronounType),
-  i_np_head(np(Argree2B,np_head(generic,MoreOut,PronounType),MoreOut),Y,Quant,Det,Det0,X,Pred,QMods,Slots0,Id0).
+i_np_head(NPKIn,YIn,QUANTIn,DetIn,Det0,X,Pred,QMods,Slots,Id) :- thlocal:useAltPOS,
+   no_repeats(np_head_rewrite(NPKIn,YIn,QUANTIn,X,DetIn,NPK,Y,QUANT,Det)),
+  i_np_head(NPK,Y,QUANT,Det,Det0,X,Pred,QMods,Slots,Id).
 
 i_np_rest(np(_,_,Mods),Det,Det0,X,Pred,QMods,Slots,Up,Id,Index) :-
    index_args(Det0,Index,Id,Det,IndexA),
@@ -86,7 +87,7 @@ i_np_head0(np_head(quant(Op0,N),Adjs,Noun),
    measure_op_db(Op,X,V--Units,P).
 i_np_head0(name(Name),
       Type-Name,Type-Name,id,'`'(true),Pred,Pred,[]) :-
-   no_repeats(name_template_db(Name,Type)).
+   no_repeats(name_template_db(Name,Type)). %leave singltom so i can rembm er to come back to it
 i_np_head0(wh(X),X,X,id,'`'(true),Pred,Pred,[]).
 
 %i_np_mods([],_,[],'`'(true),[],[],_,_).
@@ -314,9 +315,9 @@ slot_verb_template(Verb,Pred,
 
 slot_verb_kind(be,_,TypeS,S,S=A,[slot(dir,TypeS,A,_,free)]).
 slot_verb_kind(be,_,TypeS,S,true,[slot(pred,TypeS,S,_,free)]).
-slot_verb_kind(intrans,Verb,TypeS,S,Pred,Slots) :-
+slot_verb_kind(iv,Verb,TypeS,S,Pred,Slots) :-
    intrans_LF(Verb,TypeS,S,Pred,Slots,_).
-slot_verb_kind(trans,Verb,TypeS,S,Pred,
+slot_verb_kind(tv,Verb,TypeS,S,Pred,
       [slot(dir,TypeD,D,SlotD,free)|Slots]) :-
    no_repeats(trans_LF(Verb,TypeS,S,TypeD,D,Pred,Slots,SlotD,_)).
 slot_verb_kind(ditrans,Verb,TypeS,S,Pred,
@@ -340,7 +341,7 @@ index_slot(free,_,unit).
 index_slot(apply,_,apply).
 index_slot(comparator,_,comparator).
 
-index_args(det(the(plu)),unit,I,set(I),index(I)) :- !.
+index_args(det(the(pl)),unit,I,set(I),index(I)) :- !.
 index_args(int_det(X),index(I),_,int_det(I,X),unit) :- !.
 index_args(generic,apply,_,lambda,unit) :-!.
 index_args(D,comparator,_,id,unit) :-
@@ -351,7 +352,7 @@ index_args(det(D),I,_,I,I) :-
    index(I), !.
 index_args(D,I,_,D,I).
 
-indexable(the(plu)).
+indexable(the(pl)).
 indexable(all).
 
 index(index(_I)).

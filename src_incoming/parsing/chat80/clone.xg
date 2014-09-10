@@ -50,6 +50,7 @@ whq(X,Agmt,NP,undef) -->
    int_det(X,Agmt),
    {is_s_all(SAll)},
    np(NP,Agmt,_,_,subj,SAll,_).
+whq(X,3+No,np(3+No,wh(X),[adj(lf(Case))]),Case) --> {thlocal:useAltPOS}, int_pron(Case).
 whq(X,3+No,np(3+No,wh(X),[]),Case) --> int_pron(Case).
 
 int_det(X,3+Agmt) --> whose(X,Agmt).
@@ -90,7 +91,7 @@ imperative(imp(S)) -->
 
 imperative_verb,
    [you],
-   verb_form(Root,imp+fin,2+sin,main) -->
+   verb_form(Root,imp+fin,2+sg,main) -->
    verb_form(Root,inf,_,_).
 
 /* Basic sentence (actually, declarative sentence) */
@@ -124,7 +125,7 @@ np(part(Det,NP),3+Number,_,indef,Role,Set,Mask) -->
    determiner(Det,Number,indef),
    theText1(of),
    {is_s_all(SAll), is_prep_case(Case)},
-   np(NP,3+plu,Case,def,Role,SAll,Mask).
+   np(NP,3+pl,Case,def,Role,SAll,Mask).
 
 np_head(Kernel,Agmt,Type,PostMods,Mods) -->
    np_head0(Kernel0,Agmt0,Type0),
@@ -139,14 +140,15 @@ np_compls(common,Agmt,Case,Mods,Set0,Mask) -->
 
 /* Nuclear noun phrase */
 
-np_head0(name(Name),3+sin,def+proper) --> name(Name).
+np_head0(name(Name),3+sg,def+proper) --> name(Name).
+
 np_head0(np_head(Det,Adjs,Head),3+Number,Def+common) -->
    determiner(Det,Number,Def),
    adjs_opt(Adjs),
    noun(Head,Number).
 np_head0(Pronoun,Agmt,def+proper), apos_s_or_apos -->
    poss_pron(Pronoun,Agmt).
-np_head0(np_head(Det,[],Noun),3+sin,indef+common) -->
+np_head0(np_head(Det,[],Noun),3+sg,indef+common) -->
    quantifier_pron(Det,Noun).
 
 /* Possessive construction */
@@ -407,7 +409,7 @@ participle(verb(Root,Voice,inf,Aspect,Neg),Type,Voice) -->
    verb_form(Root,Tense,_,_),
    {participle_vt(Tense,Voice,Aspect), verb_type_db(Root,Type)}.
 
-passive_vt(_+trans).
+passive_vt(_+tv).
 passive_vt(_+ditrans).
 
 participle_vt(pres+part,active,[prog]).
@@ -424,7 +426,7 @@ verb_args(_+Type,Voice,AdvArgs,Mask0,Mask) -->
    verb_args(Type,Voice,Args,Mask0,Mask).
 
 % prefers to leave off obj
-verb_args(trans,active,[arg(dir,Dir)],_,Mask) -->
+verb_args(tv,active,[arg(dir,Dir)],_,Mask) -->
    verb_arg(np,Dir,Mask).
 verb_args(ditrans,_,[arg(Case,NP)|Obj],_,Mask) -->
    verb_arg(np,NP,Mask0),
@@ -475,9 +477,9 @@ advs_opt(R,R,_) --> noText.
 adj_phrase(P,Nil) --> adj(_,P), { is_empty(Nil) }.
 adj_phrase(P,Mask) -->  comp_phrase(P,Mask).
 
-no_args_vt(trans).
+no_args_vt(tv).
 no_args_vt(ditrans).
-no_args_vt(intrans).
+no_args_vt(iv).
 
 /* Conjunctions */
 

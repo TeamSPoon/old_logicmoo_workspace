@@ -24,6 +24,7 @@
          all_module_predicates_are_transparent/1,
          tlbugger:inside_loop_check/1,
          is_loop_checked/1,
+         is_module_loop_checked/2,
          snumbervars/1,
          safe_numbervars/1,
          safe_numbervars/2,
@@ -343,6 +344,9 @@ catchv(Goal,E,Recovery):- catch(Goal,E,(bubbled_ex_check(E),Recovery)). % preven
 def_meta_predicate(M:F,S,E):-!,doall(((between(S,E,N),make_list('?',N,List),CALL=..[F|List],'@'(meta_predicate_transparent(CALL),M)))).
 def_meta_predicate(F,S,E):- trace_or_throw(def_meta_predicate(F,S,E)).
 
+:- meta_predicate_transparent((loop_check_module(?,0))).
+:- meta_predicate_transparent((loop_check_module(?,0,0))).
+:- meta_predicate_transparent((no_loop_check_module(0,?,0))).
 
 :- meta_predicate_transparent((loop_check_local(0,0))).
 :- meta_predicate_transparent((no_loop_check(0,0))).
@@ -530,8 +534,8 @@ user_use_module(What):- within_module(use_module(What),'user').
 :- thread_local tlbugger:inside_loop_check/1.
 :- module_transparent(tlbugger:inside_loop_check/1).
 
-:- thread_local tlbugger:inside_loop_check_local/1.
-:- module_transparent(tlbugger:inside_loop_check_local/1).
+:- thread_local tlbugger:inside_loop_check_local/2.
+:- module_transparent(tlbugger:inside_loop_check_local/2).
 
 
 
@@ -806,21 +810,28 @@ filter_repeats(AVar,Call):-
 % =========================================================================
 
 is_loop_checked(B):-  make_key(B,BC),!,tlbugger:inside_loop_check(BC).
+is_module_loop_checked(Module, B):- (var(B)->true;make_key(B,BC)),!,tlbugger:inside_loop_check_local(Module,BC).
+
 no_loop_check_unsafe(B):- with_no_assertions(tlbugger:inside_loop_check(_),B).
 
 no_loop_check(B):- no_loop_check(B,trace_or_throw(loop_to_no_loop_check(B))).
 no_loop_check(B, TODO):-  with_no_assertions(tlbugger:inside_loop_check(_),loop_check_local(B,TODO)).
 
+no_loop_check_module( Module, B, TODO):-  with_no_assertions(tlbugger:inside_loop_check_local(Module,_),loop_check_local(B,TODO)).
+
 loop_check(B):- loop_check(B,fail).
 loop_check(B, TODO):- make_key(B,BC),!, loop_check_term(B,BC,TODO).
 
+loop_check_local(B):- loop_check_local(B,trace_or_throw(syntax_loop_check_local(B))).
+loop_check_local(B,TODO):- loop_check_module(current,B,TODO).
+
 % loop_check_local(B):- loop_check_local(B,trace_or_throw(syntax_loop_check_local(B))).
-loop_check_local(B,TODO):- make_key(B,BC),
+loop_check_module(Module,B):-loop_check_module(Module,B,fail).
+loop_check_module(Module,B,TODO):- make_key(B,BC), LC = tlbugger:inside_loop_check_local(Module,BC),
    % term_to_atom(B,BC),!, 
-    ( \+(tlbugger:inside_loop_check_local(BC)) ->
-         setup_call_cleanup(asserta(tlbugger:inside_loop_check_local(BC)),B, retract((tlbugger:inside_loop_check_local(BC))));
+    ( \+(LC) ->
+         setup_call_cleanup(asserta(LC),B,retract(LC));
          call(TODO) ).
-      
 
 loop_check_term(B,BC,TODO):-  ( \+(tlbugger:inside_loop_check(BC)) -> setup_call_cleanup(asserta(tlbugger:inside_loop_check(BC)),B, retract((tlbugger:inside_loop_check(BC)))) ;call(TODO) ).
 
@@ -2145,6 +2156,13 @@ all_module_predicates_are_transparent(ModuleName):-
       ignore((
             not(predicate_property(ModuleName:P,(transparent))),
                    (dmsg(todo(module_transparent(ModuleName:F/A)))),
+                   (module_transparent(ModuleName:F/A))))).
+
+quiet_all_module_predicates_are_transparent(ModuleName):-
+    forall((module_predicate(ModuleName,F,A),functor(P,F,A)), 
+      ignore((
+            not(predicate_property(ModuleName:P,(transparent))),
+                   nop(dmsg(todo(module_transparent(ModuleName:F/A)))),
                    (module_transparent(ModuleName:F/A))))).
 
 

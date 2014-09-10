@@ -107,7 +107,7 @@ control80(Callback,[do,not,trace,'.']) :-
    call(Callback,retract(thlocal:tracing80),'thlocal:tracing80',false,boolean),
    display('No longer thlocal:tracing80.'), nl, fail.
 
-control80(Callback,U) :- with_assertions(thlocal:tracing80, call_in_banner(U,(ignore(process_run(Callback,U,List,Time))))),fail.
+control80(Callback,U) :- with_assertions(thlocal:tracing80, call_in_banner(U,(ignore(process_run(Callback,U,_List,_Time))))),fail.
    
 :-export(chat80/1).
 chat80(U):-ignore(control80(U)).
@@ -157,22 +157,24 @@ words_to_w2(U,W2):-not(is_list(U)),to_word_list(U,List),U \=@= List,!,words_to_w
 words_to_w2(U,W2):-not(compound(U)),must(W2=U).
 words_to_w2([W|WL],[W2|W2L]):-w_to_w2(W,W2),words_to_w2(WL,W2L).
 
-
+% sent_to_parsed(U,E):-!,sentence(E,U,[],[],[]).
+sent_to_parsed(U,E):- one_must(sent_to_parsed_0(U,E),with_assertions(thlocal:useAltPOS,sent_to_parsed_0(U,E))).
+sent_to_parsed_0(U,E):-one_must(sentence(E,U,[],[],[]),with_assertions(thlocal:usePlTalk,sentence(E,U,[],[],[]))).
 
 :-dynamic_multifile_exported(process_run_real/5).
 process_run_real(Callback,StartParse,UIn,[sent=(U),parse=(E),sem=(S),qplan=(QP),answers=(Results)],[time(WholeTime)]) :-
-   p1,
    flag(sentenceTrial,_,0),
    ignore((var(Callback),Callback=report)),
    words_to_w2(UIn,U),!,
    call(Callback,U,'Sentence'(Callback),0,expr),
    ignore((var(StartParse),runtime(StartParse))),!,
-   (if_try(nonvar(U),sentence(E,U,[],[],[])) *-> call(Callback,U,'POS Sentence'(Callback),0,expr); (call(Callback,U,'Rewire Sentence'(Callback),0,expr),!,fail)),
+   (if_try(nonvar(U),sent_to_parsed(U,E)) *-> call(Callback,U,'POS Sentence'(Callback),0,expr); (call(Callback,U,'Rewire Sentence'(Callback),0,expr),!,fail)),
+   (flag(sentenceTrial,TZ,TZ), TZ>5 -> (!) ; true),
    once((
    runtime(StopParse),
    ParseTime is StopParse - StartParse,
    call(Callback,E,'Parse',ParseTime,expr),   !,
-   (flag(sentenceTrial,T,T+1), T>10 -> (!,fail) ; true),
+   (flag(sentenceTrial,TZ2,TZ2+1), TZ2>5 -> (!,fail) ; true),
    runtime(StartSem))),
    once((if_try(nonvar(E),logic(E,S)))),
    runtime(StopSem),
@@ -180,7 +182,7 @@ process_run_real(Callback,StartParse,UIn,[sent=(U),parse=(E),sem=(S),qplan=(QP),
    call(Callback,S,'Semantics',SemTime,expr),
    runtime(StartPlan),
    once(if_try(nonvar(S),qplan(S,S1))),
-   copy_term(S1,QP),
+   copy_term80(S1,QP),
    runtime(StopPlan),
    TimePlan is StopPlan - StartPlan,
    if_try(S\=S1,call(Callback,S1,'Planning',TimePlan,expr)),
@@ -266,7 +268,7 @@ revand(P,true,P) :- !.
 revand(P,Q,(Q,P)).
 
 unequalise(C0,C) :-
-   numbervars(C0,1,N),
+   numbervars80(C0,1,N),
    functor(V,v,N),
    functor(M,v,N),
    inv_map(C0,V,M,C).

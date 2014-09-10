@@ -23,7 +23,7 @@
 /* Print term as a tree */
 
 print_tree(T) :-
-   numbervars(T,1,_),
+   numbervars80(T,1,_),
    pt(T,0), nl, fail.
 print_tree(_).
 

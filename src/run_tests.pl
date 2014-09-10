@@ -96,6 +96,8 @@ defined_local_test:-
    test_name("tests to see if 'food' can be an item"),
       test_true(parseIsa0(item, _G537410, [food], [])).
 
+defined_local_test:-call_mpred(show_room_grid('Area1000')).
+
 % ---------------------------------------------------------------------------------------------
 defined_local_test:-
   test_name("Tests our types to populate bad_instance/2 at level 5"),
@@ -123,7 +125,6 @@ check_consistent_0(Type,Scope):- once(type(Type)),
 hook:hooked_check_consistent(Obj,20):-must(object_string(_,Obj,0-5,String)),dmsg(checked_consistent(object_string(_,Obj,0-5,String))).
 % ---------------------------------------------------------------------------------------------
 
-defined_local_test:-call_mpred(show_room_grid('Area1000')).
 
 moo:mud_test("local sanity tests", doall(defined_local_test)).
 

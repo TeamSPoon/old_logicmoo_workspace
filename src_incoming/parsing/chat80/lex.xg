@@ -1,9 +1,14 @@
 /* Parts of speech */
-
+/*
 theTextC(W1,CYCPOS,Y=W1)  --> {thlocal:old_text,!},[W1],{W1=Y}.
 theTextC(W1,CYCPOS,Y=W1)  --> {!},[w(W1,_)],{W1=Y}.
-
 theTextC(W1,CYCPOS,WHY) --> [W2],{memoize_pos_to_db(WHY,CYCPOS,W2,W1)}.
+see newdict.pl
+*/
+
+theTextL(W1,CYCPOS,Y=W1)  --> {thlocal:old_text,!},theText(W1),{W1=Y}.
+theTextL(W1,CYCPOS,Y=W1)  --> {!},theText(W1),{W1=Y}.
+theTextL(W1,CYCPOS,WHY) --> theText(W1),{call(WHY)}.
 
 noText --> [].
 
@@ -14,10 +19,10 @@ theText1(W1,_CYCPOS)-->{thlocal:old_text,!},[W1]. % compatible_pos_db(CW,CYCPOS)
 theText1(Txt,_CYCPOS)--> [w(Txt,_)].
 
 
+theText(Text)--> {is_list(Text),!},theText_cl(Text).
 theText([W1])-->theText1(W1).
 theText([W1,W2])--> {!}, theText1(W1),theText1(W2).
 theText(DCG)--> {!,nonvar(DCG)}, DCG.
-theText(Text)--> {is_list(Text),!},theText_cl(Text).
 theText(Text)--> {Text=@=[_|_],!},theText_ol(Text).
 theText(Text)--> {var(Text),dmsg(theText_DCG_VAR(DCG)),!},theText_ol(Text).
 theText(DCG)--> {dmsg(theText_DCG(DCG)),dtrace,nonvar(DCG)},DCG.
@@ -45,7 +50,6 @@ optText(Text) --> theText(Text).
 
 textOpt(Text) --> theText(Text).
 textOpt(Text) --> noText.
-
 
 
 
@@ -77,9 +81,9 @@ verb_form(Verb,Tense,Agmt,Role) --> theText1(W), {no_repeats(verb_form_db(W,Verb
 
 name(Name) --> opt_the, theText1(Name), {no_repeats(name_db(Name))}.
 
-% covered next int_art (X,plu,quant(same,wh(X))) --> [how,many].
+% covered next int_art (X,pl,quant(same,wh(X))) --> [how,many].
 
-int_art(X,plu,quant(same,wh(X))) --> theText(HowMany),{how_many_db(HowMany)}.
+int_art(X,pl,quant(same,wh(X))) --> theText(HowMany),{how_many_db(HowMany)}.
 
 int_art(X,Agmt,DX) --> theText1(Art,'Determiner'), {no_repeats(int_art_db(Art,X,Agmt,DX))}.
 
@@ -136,9 +140,9 @@ verb_form(Verb,Tense,Agmt,Role) --> theTextC(W,VerbPOS,v_db(W,Verb,Tense,Agmt,Ve
 
 name(Name) --> opt_the,theTextC(Name,'ProperNoun',name_db(Name)).
 
-% covered next int_art (X,plu,quant(same,wh(X))) --> [how,many].
+% covered next int_art (X,pl,quant(same,wh(X))) --> [how,many].
 
-int_art(X,plu,quant(same,wh(X))) --> { how_many_db(HowMany) },theText(HowMany).
+int_art(X,pl,quant(same,wh(X))) --> { how_many_db(HowMany) },theText(HowMany).
 
 int_art(X,Agmt,DX) --> theTextC(Art,_Determiner, int_art_db(Art,X,Agmt,DX) ).
 
@@ -196,9 +200,9 @@ verb_form(Verb,Tense,Agmt,Role) --> theText1(W), {no_repeats(verb_form_db(W,Verb
 
 name(Name) --> opt_the, theText1(Name), {no_repeats(name_db(Name))}.
 
-% covered next int_art (X,plu,quant(same,wh(X))) --> [how,many].
+% covered next int_art (X,pl,quant(same,wh(X))) --> [how,many].
 
-int_art(X,plu,quant(same,wh(X))) --> theText(HowMany),{how_many_db(HowMany)}.
+int_art(X,pl,quant(same,wh(X))) --> theText(HowMany),{how_many_db(HowMany)}.
 
 int_art(X,Agmt,DX) --> theText1(Art,'Determiner'), {no_repeats(int_art_db(Art,X,Agmt,DX))}.
 

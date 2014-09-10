@@ -696,7 +696,7 @@ reduce([store, St, E1], [store, St, Next1]) :-
 reduce(P1, Next) :-
   ctx_p(P1, [apply, Nonproc|Vs], Next,
         [raise, ['make-cond','can\'t apply non-procedure']], normal),
-'format'('~p~n',[Nonproc]),
+ 'format'('~p~n',[Nonproc]),
   nonproc(Nonproc), v_s(Vs).
 reduce(P1, Next) :-
   ctx_p(P1, [apply, Proc|Vs_V], Next,
@@ -1051,7 +1051,6 @@ bir_v_3(X, [_, _, E3]) :-
 %%% evaluator
 evaluate(Str) :-
   parse(Str, Obj),
-  'format'('~n parsed : ~q. ~n',[Obj]),
   eval([store,[[x,0]],Obj], Ret),
   print_program(Ret).
 
@@ -1174,7 +1173,7 @@ print_list(St, CAR, CDR) :-
   print_obj(St, CDR), !.
 
 
-gen_atom(X) :- gensym('#:G', XX),assertion(X=XX).
+gen_atom(X) :- (atom(X)->true;gensym('#:G', X)).
 gen_num(X) :- gensym('', Y), atom_number(Y, X).
 
 %% If your Prolog system does not have gensym/1, you can use following  code
@@ -1187,7 +1186,6 @@ gen_num(X) :- gensym('', Y), atom_number(Y, X).
 % gen_num(X) :- number(X), assert(num_content(X)), !.
 % gen_num(X) :- num_content(X),retract(num_content(X)), !,
 %  Y is X+1, assert(num_content(Y)).
-
 
 :- evaluate("(car '(a b c))").
 

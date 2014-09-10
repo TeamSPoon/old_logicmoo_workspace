@@ -248,7 +248,7 @@ all(each).
 all(any).
 
 some(a).
-some(the(sin)).
+some(the(sg)).
 some(some).
 
 apply_set([],X,true:P,S,setof(X,P,S)).
@@ -297,7 +297,7 @@ weak0(a).
 weak0(all).
 weak0(some).
 weak0(every).
-weak0(the(sin)).
+weak0(the(sg)).
 weak0(notall).
 
 lower(question(_),Q,quant(det(a),X,P,Y)) :-
