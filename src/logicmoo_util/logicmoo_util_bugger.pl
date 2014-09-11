@@ -1533,7 +1533,7 @@ fmt(X,Y):-fresh_line,fmt0(X,Y),!.
 fmt(X,Y,Z):- fmt0(X,Y,Z),!.
 
 
-fmt_portray_clause(X):- unnumbervars(X,Y),!,numbervars(Y), portray_clause(Y).
+fmt_portray_clause(X):- unnumbervars(X,Y),!,snumbervars(Y), portray_clause(Y).
 fmt_or_pp(portray((X:-Y))):-!,fmt_portray_clause((X:-Y)),!.
 fmt_or_pp(portray(X)):-!,functor(X,F,A),fmt_portray_clause((pp(F,A):-X)),!.
 fmt_or_pp(X):-'format'('~q~n',[X]).

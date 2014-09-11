@@ -157,9 +157,15 @@ words_to_w2(U,W2):-not(is_list(U)),to_word_list(U,List),U \=@= List,!,words_to_w
 words_to_w2(U,W2):-not(compound(U)),must(W2=U).
 words_to_w2([W|WL],[W2|W2L]):-w_to_w2(W,W2),words_to_w2(WL,W2L).
 
-% sent_to_parsed(U,E):-!,sentence(E,U,[],[],[]).
-sent_to_parsed(U,E):- one_must(sent_to_parsed_0(U,E),with_assertions(thlocal:useAltPOS,sent_to_parsed_0(U,E))).
-sent_to_parsed_0(U,E):-one_must(sentence(E,U,[],[],[]),with_assertions(thlocal:usePlTalk,sentence(E,U,[],[],[]))).
+
+sent_to_parsed(U,E):- deepen_pos(sentence(E,U,[],[],[])).
+
+:-export(deepen_pos/1).
+:-meta_predicate(deepen_pos(0)).
+deepen_pos(Call):- one_must(deepen_pos_0(Call),with_assertions(thlocal:useAltPOS,deepen_pos_0(Call))).
+:-export(deepen_pos_0/1).
+:-meta_predicate(deepen_pos_0(0)).
+deepen_pos_0(Call):-one_must(Call,with_assertions(thlocal:usePlTalk,Call)).
 
 :-dynamic_multifile_exported(process_run_real/5).
 process_run_real(Callback,StartParse,UIn,[sent=(U),parse=(E),sem=(S),qplan=(QP),answers=(Results)],[time(WholeTime)]) :-
@@ -168,12 +174,12 @@ process_run_real(Callback,StartParse,UIn,[sent=(U),parse=(E),sem=(S),qplan=(QP),
    words_to_w2(UIn,U),!,
    call(Callback,U,'Sentence'(Callback),0,expr),
    ignore((var(StartParse),runtime(StartParse))),!,
-   (if_try(nonvar(U),sent_to_parsed(U,E)) *-> call(Callback,U,'POS Sentence'(Callback),0,expr); (call(Callback,U,'Rewire Sentence'(Callback),0,expr),!,fail)),
+   (if_try(nonvar(U),sent_to_parsed(U,E)) *-> ignore((U\==UIn,call(Callback,U,'POS Sentence'(Callback),0,expr))); (call(Callback,U,'Rewire Sentence'(Callback),0,expr),!,fail)),
    (flag(sentenceTrial,TZ,TZ), TZ>5 -> (!) ; true),
    once((
    runtime(StopParse),
    ParseTime is StopParse - StartParse,
-   call(Callback,E,'Parse',ParseTime,expr),   !,
+   call(Callback,E,'Parse',ParseTime,portray),   !,
    (flag(sentenceTrial,TZ2,TZ2+1), TZ2>5 -> (!,fail) ; true),
    runtime(StartSem))),
    once((if_try(nonvar(E),logic(E,S)))),
@@ -206,6 +212,8 @@ report(_,_,_,_).
 
 report_item(none,_).
 report_item(_,Var):-var(Var),!,write('FAILED'),nl.
+report_item(portray,Item) :-
+   portray_clause((Item:-Item)), nl.
 report_item(expr,Item) :-
    write_tree(Item), nl.
 report_item(tree,Item) :-

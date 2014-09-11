@@ -93,7 +93,7 @@ tlocal_show(M,F,A,P,_ON,TF):-
    findall(' -'(yes(Prop)),(predicate_property(M:P,Prop),not(member(Prop,[number_of_rules(0),number_of_clauses(0),/*thread_local,*/volatile,dynamic,visible,interpreted]))),Props3),
    findall(' -'(not(Prop)),(member(Prop,[number_of_clauses(_),thread_local,volatile,dynamic,visible,exported,interpreted]),not(predicate_property(M:P,Prop))),Props4),   
    flatten([[Props1],[Props2],[Props3],[Props4],[TF/A]],PropsR),
-   numbervars(PropsR,0,_,[singletons(true),ignore(skip)]),
+   numbervars(PropsR,0,_,[singletons(true),attvars(skip)]),
    reverse(PropsR,Props),
    fmt(Props),!.
 

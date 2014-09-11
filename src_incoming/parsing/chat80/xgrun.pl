@@ -20,6 +20,12 @@
 
 */
 
+:- op(1001,xfy,...).
+:- op(1101,xfx,'--->').
+:- op(500,fx,+).
+:- op(500,fx,-).
+
+
 terminal(T,S,S,x(_,terminal,T,X),X).
 terminal(T,[T|S],S,X,X) :-
    gap(X).

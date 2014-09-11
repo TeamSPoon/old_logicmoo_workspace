@@ -59,14 +59,15 @@
 % :- begin_dynamic_reader.
 :- asserta((thlocal:enable_src_loop_checking)).
 
-verb_type_to_kind(Var,Var):-var(Var),!.
-verb_type_to_kind(_+Type,Kind):-!,verb_type_to_kind(Type,Kind),!.
-verb_type_to_kind(Var,Var).
+verb_type_to_kind(Var,Var2):-(var(Var);nonvar(Var2)),!,trace_or_throw(var_verb_type_to_kind(Var,Var2)).
+verb_type_to_kind(Aux+Have,tv):-Aux == aux, Have == have.
+verb_type_to_kind(_+Type,Kind):-must(nonvar(Type)),!,verb_type_to_kind(Type,Kind),!,must(not(Kind=have)).
+verb_type_to_kind(Kind,Kind):-must(not(Kind=have)).
 
 verb_type_db(Verb,Type):-one_must(no_repeats(verb_type_db_0(Verb,Type)),verb_type_db_1(Verb,Type)).
-verb_type_db_1(_Verb,main+ditrans(_)).
 verb_type_db_1(_Verb,main+tv).
 verb_type_db_1(_Verb,main+iv).
+verb_type_db_1(Verb,main+ditrans(_)):-talk_db(iv,Verb,_,_,_,_). % ditrans(_)
 
 txt_there_db(there,there).
 txt_not_db(not,not).
@@ -171,6 +172,8 @@ prep_db(Above):-plt_call(Above,'Preposition',talk_db(preposition,Above)).
 
 noun_form_db(Plu,Sin,pl) :- noun_plu_db(Plu,Sin),not_ccw(Plu).
 noun_form_db(Sin,Sin,sg) :- noun_sin_db(Sin),not_ccw(Sin).
+noun_form_db(Sin,Sin,sg):-text_bpos(Sin,'nn').
+noun_form_db(Sin,Sin,sg):-text_bpos(N,Sin,'nn'),N>=0.5 .
 
 verb_form_db(V,V,inf,_) :- verb_root_db(V).
 verb_form_db(V,V,pres+fin,Agmt) :-
@@ -185,9 +188,12 @@ root_form_db(2+_).
 root_form_db(1+pl).
 root_form_db(3+pl).
 
-verb_root_db(be).
-verb_root_db(have).
-verb_root_db(do).
+verb_root_db(BE):-aux_verb_root_db(BE).
+
+
+aux_verb_root_db(be).
+aux_verb_root_db(have).
+aux_verb_root_db(do).
    
 verb_form_db(am,be,pres+fin,1+sg).
 verb_form_db(are,be,pres+fin,2+sg).
@@ -212,12 +218,20 @@ w_to_w2(U,w(U,open)):-compound(U),!.
 w_to_w2(S,w(A,open)):-atom_string(A,S),!.
 w_to_w2(X,w(X,open)):-!.
 
-%theTextC(W1,CYCPOS,Y=W1)  --> {thlocal:old_text,!},[W1],{W1=Y}.
+%theTextC(W1,CYCPOS,Y=W1)  ---> {thlocal:old_text,!},[W1],{W1=Y}.
 theTextC(A,_,F=A,B,C,D,E) :-thlocal:old_text, !,terminal(A, B, C, D, E),A=F,is_sane_nv(A).
-%theTextC(W1,CYCPOS,Y=W1)  --> {!},[w(W1,_)],{W1=Y}.
+%theTextC(W1,CYCPOS,Y=W1)  ---> {!},[w(W1,_)],{W1=Y}.
 theTextC(A,_,F=A,B,C,D,E) :- !,terminal(w(A, _), B, C, D, E),A=F,is_sane_nv(A).
-%theTextC(W1,CYCPOS,WHY) --> [W2],{memoize_pos_to_db(WHY,CYCPOS,W2,W1)}.
-theTextC(H,F,E,A,B,C,D) :- is_sane(C), terminal(G, A, B, C, D),memoize_pos_to_db(E, F, G, H),is_sane_nv(H).
+%theTextC(W1,CYCPOS,WHY) ---> [W2],{memoize_pos_to_db(WHY,CYCPOS,W2,W1)}.
+theTextC(H,F,E,A,B,C,D) :- fail, is_sane(C), terminal(G, A, B, C, D),memoize_pos_to_db(E, F, G, H),is_sane_nv(H).
+
+/*
+theTextC(W1,_CYCPOS,Y=W1) ---> {thlocal:old_text,!},[W1],{W1=Y}.
+%theTextC(W1,_CYCPOS,Y=W1) ---> {!},[w(W1,_)],{W1=Y}.
+theTextC(A,_,F=A,B,C,D,E) :- !,terminal(w(A, _), B, C, D, E),A=F,is_sane_nv(A).
+theTextC(W1,_CYCPOS,WHY) ---> {thlocal:old_text,!},[W1],WHY.
+% theTextC(W1,CYCPOS,WHY) ---> {trace_or_throw(memoize_pos_to_db(WHY,CYCPOS,W2,W1))},[W2],{memoize_pos_to_db(WHY,CYCPOS,W2,W1)}.
+*/
 
 is_sane(C):-must((term_depth(C,D),D<100)).
 is_sane_nv(C):-must((nonvar(C),term_depth(C,D),D<100)).
@@ -251,7 +265,7 @@ pos_to_db_precache(W,GOODL):-
          theTextC(W,'Symbol-SP',W=','),
          theTextC(W,'Pronoun',int_pron_db(W,Case)),
          theTextC(Prep,'Preposition',prep_db(Prep)),
-         theTextC(Name,'ProperNoun',name_db(Name,_)),
+         theTextC(Name,'ProperNoun',name_db([Name],_)),
          theTextC(Conj,'Conjunction',conj_db(Conj)),      
          theTextC(Art,'Determiner', int_art_db(Art,_X,Agmt,_DX)),
          theTextC(W,'Noun',noun_form_db(W,Noun,Agmt)),
@@ -352,6 +366,14 @@ np_head_rewrite(np(Argree2B,C,MoreIn),Y,Quant,X,Det,np(Argree2B,np_head(generic,
 %np_head_rewrite(np(Argree2B,pronoun(B),[]),Y,Quant,X,Det,np(Argree2B,np_head(generic,[],dbase_t(typeOf,X,Y,B,Argree2B),[]),[]),Y,Quant,Det):- !.
 
 
+:-export(kill_talk_db_bad_verbs/0).
+kill_talk_db_bad_verbs:-!.
+kill_talk_db_bad_verbs:-doall(((
+         talk_db(noun1,Sky,Skies),
+         talk_db(tv,Sky,Skies,Skied,Skying,Skied),
+         retract(nldata_talk_db_pdat:talk_db(tv,Sky,Skies,Skied,Skying,Skied)),
+         assert(nldata_talk_db_pdat:talk_db(tv,Skying,Skying,Skied,Skying,Skied)),
+         dmsg(retract_talk_db(tv,Sky,Skies,Skied,Skying,Skied))))).
 
 % =================================================================
 % PROPER INSTANCES OF
@@ -500,22 +522,25 @@ maybe_noun_or_adj(T):- var(T)->true;(atom(T),not_ccw(T)).
 test_chat80(U):- with_assertions(thlocal:chat80_interactive, must(chat80(U))).
 
 t11:- 
-   test_chat80("how many postures are there?"),
-   test_chat80("what are the postures?"),
-   test_chat80("how many oceans are seas?"),
-   test_chat80("how many oceans are seasmasses?"),
+   %test_chat80("how many postures are there?"),
+   %test_chat80("what are the postures?"),
+   %test_chat80("how many oceans are seas?"),
+   %test_chat80("how many oceans are seasmasses?"),
    test_chat80("how many types are there?"),
    test_chat80("how many formattypes are there?"),
-   test_chat80("how many formattypes are there?"),
+   test_chat80("what formattypes are there?"),
    !.
 
-ditrans_LF(do,in,
-   feature&_,X,
-   feature&_,Y,
-   feature&_,Z,
-   do(in,X,Y,Z),[],
-   _,_,_).
 
+ditrans_LF(Verb,Prep,
+   feature&X1,X,
+   feature&Y1,Y,
+   feature&Z1,Z,
+   callDitrans(Verb,Prep,X1,Y1,Z1,X,Y,Z),[],
+   _,_,_):-!.
+
+
+callDitrans(Verb,Prep,X1,Y1,Z1,verbPrep(subj:X1,Verb,Prep),verbPrep(o:Y1,Verb,Prep),verbPrep(io:Z1,Verb,Prep)).
 
 /* A PROPERTY  */
 
@@ -580,9 +605,11 @@ type_allowed0(TypeM&_,Type):- Type==TypeM,!.
 % Having Referant Proper nouns
 % =================================================================
 :-export(name_template_db/2).
-name_db(Name,Name) :-
+name_db([black,sea],black_sea).
+name_db([upper,volta],upper_volta).
+name_db([Name],Name) :-
    name_template_db(Name,_), !.
-name_db(Name,Name) :- thlocal:useAltPOS, loop_check(not(cw_db(Name,_))).
+name_db([Name],Name) :- thlocal:useAltPOS, loop_check(not(cw_db_code(Name,_))).
 
 name_template_db(X,feature&circle) :- circle_of_latitude(X).
 name_template_db(X,feature&city) :- city(X).
@@ -646,9 +673,11 @@ ccw_db4(W,VPOS):-v_db(W,_,PP,NumPlu,VPOS),once(loop_check_module(chat80,obviousl
 
 compatible_pos_db(_MostLikley,_Wanted).
 
-cw_db(W,C):-ccw_db(W,C).
-cw_db(W,C):-nonvar(W),!,cw_db0(W,WC),!,C=WC.
-cw_db(W,C):-cw_db0(W,C).
+cw_db(W,C):-deepen_pos(cw_db_code(W,C)).
+
+cw_db_code(W,C):-ccw_db(W,C).
+cw_db_code(W,C):-nonvar(W),!,cw_db0(W,WC),!,C=WC.
+cw_db_code(W,C):-cw_db0(W,C).
 
 cw_db0(W,C):-one_must(cw_db1(W,C),cw_db2(W,C)).
 cw_db1(W,C):-ccw_db(W,C).
@@ -694,7 +723,7 @@ verb_form_db(VerbPL,Verb,pres+fin,_):- thlocal:useAltPOS ,plt_call(VerbPL,'Verb'
 verb_form_db(Imperfect,Verb,past+fin,_):-plt_call(Imperfect,'Verb',(nop(imperfect),talk_db(_,Verb,_VerbPL,Imperfect,_Active,_PastPart))).
 verb_form_db(PastPart,Verb,past+part,_):-plt_call((PastPart),'Verb',(nop(past_part),talk_db(_,Verb,_VerbPL,_Imperfect,_Active,PastPart))).
 
-verb_form_db(VerbS,Verb,pres+part,_+sg):-plt_call(VerbS,'Verb',((nop(root_active),(atom(VerbS)->atom_concat(Verb,'s',VerbS);true),cw_db(Verb,'Verb'),atom(Verb),atom_concat(Verb,'s',VerbS)))).
+verb_form_db(VerbS,Verb,pres+part,_+sg):-plt_call(VerbS,'Verb',((nop(root_active),(atom(VerbS)->atom_concat(Verb,'s',VerbS);true),cw_db_code(Verb,'Verb'),atom(Verb),atom_concat(Verb,'s',VerbS)))).
 
 
 verb_root_db(Verb):-meetsForm80(Verb,Verb,form80(verb+root)).
@@ -1090,7 +1119,7 @@ must_test_801([what, rivers, are, there, ?], [sent([what, rivers, are, there, ?]
 answers([amazon, amu_darya, amur, brahmaputra, colorado, congo_river, cubango, danube, don, elbe, euphrates, ganges, hwang_ho, indus, irrawaddy, lena, limpopo, mackenzie, mekong, mississippi, murray, niger_river, nile, ob, oder, orange, orinoco, parana, rhine, rhone, rio_grande, salween, senegal_river, tagus, vistula, volga, volta, yangtze, yenisei, yukon, zambesi])],[time(0.0)]).
 must_test_801([does, afghanistan, border, china, ?], [sent([does, afghanistan, border, china, ?]), parse(q(s(np(3+sg, nameOf(afghanistan), []), verb(border, active, pres+fin, [], pos), [arg(dir, np(3+sg, name(china), []))], []))), sem((answer80([]):-borders(afghanistan, china))), qplan((answer80([]):-{borders(afghanistan, china)})), 
 answers([true])],[time(0.0)]).
-must_test_801([what, is, the, capital, of, upper_volta, ?], [sent([what, is, the, capital, of, upper_volta, ?]), parse(whq(feature&city-B, s(np(3+sg, wh(feature&city-B), []), verb(be, active, pres+fin, [], pos), [arg(dir, np(3+sg, np_head(det(the(sg)), [], capital), [pp(prep(of), np(3+sg, name(upper_volta), []))]))], []))), sem((answer80([A]):-capital(upper_volta, A))), qplan((answer80([A]):-capital(upper_volta, A))), 
+must_test_801([what, is, the, capital, of, upper,volta, ?], [sent([what, is, the, capital, of, upper,volta, ?]), parse(whq(feature&city-B, s(np(3+sg, wh(feature&city-B), []), verb(be, active, pres+fin, [], pos), [arg(dir, np(3+sg, np_head(det(the(sg)), [], capital), [pp(prep(of), np(3+sg, name(upper_volta), []))]))], []))), sem((answer80([A]):-capital(upper_volta, A))), qplan((answer80([A]):-capital(upper_volta, A))), 
 answers([ouagadougou])],[time(0.0010000000000000009)]).
 must_test_801([where, is, the, largest, country, ?], [sent([where, is, the, largest, country, ?]), parse(whq(feature&place&A-B, s(np(3+sg, np_head(det(the(sg)), [sup(most, adj(large))], country), []), verb(be, active, pres+fin, [], pos), [arg(pred, pp(prep(in), np(_, np_head(int_det(feature&place&A-B), [], place), [])))], []))), sem((answer80([A]):-B^ (C^ (setof(D:E, (country(E), area(E, D)), C), aggregate(max, C, B)), place(A), in(B, A)))), qplan((answer80([F]):-E^D^ (setof(C:B, (country(B), area(B, C)), D), aggregate(max, D, E), in(E, F), {place(F)}))), 
 answers([asia, northern_asia])],[time(0.0009999999999999731)]).
@@ -1110,7 +1139,7 @@ must_test_801([is, there, more, than, one, country, in, each, continent, ?], [se
 answers([false])],[time(0.0010000000000000009)]).
 must_test_801([is, there, some, ocean, that, does, not, border, any, country, ?], [sent([is, there, some, ocean, that, does, not, border, any, country, ?]), parse(q(s(there, verb(be, active, pres+fin, [], pos), [arg(dir, np(3+sg, np_head(det(some), [], ocean), [rel(feature&place&seamass-B, s(np(3+sg, wh(feature&place&seamass-B), []), verb(border, active, pres+fin, [], neg), [arg(dir, np(3+sg, np_head(det(any), [], country), []))], []))]))], []))), sem((answer80([]):-A^ (ocean(A), \+B^ (country(B), borders(A, B))))), qplan((answer80([]):-A^{ocean(A), {\+B^ (borders(A, B), {country(B)})}})), 
 answers([true])],[time(0.0010000000000000009)]).
-must_test_801([what, are, the, countries, from, which, a, river, flows, into, the, black_sea, ?], [sent([what, are, the, countries, from, which, a, river, flows, into, the, black_sea, ?]), parse(whq(feature&place&country-B, s(np(3+pl, wh(feature&place&country-B), []), verb(be, active, pres+fin, [], pos), [arg(dir, np(3+pl, np_head(det(the(pl)), [], country), [rel(feature&place&country-D, s(np(3+sg, np_head(det(a), [], river), []), verb(flow, active, pres+fin, [], pos), [], [pp(prep(from), np(3+pl, wh(feature&place&country-D), [])), pp(prep(into), np(3+sg, name(black_sea), []))]))]))], []))), sem((answer80([A]):-setof(B, (country(B), C^ (river(C), flows(C, B, black_sea))), A))), qplan((answer80([C]):-setof(B, A^ (flows(A, B, black_sea), {country(B)}, {river(A)}), C))), 
+must_test_801([what, are, the, countries, from, which, a, river, flows, into, the, black, sea, ?], [sent([what, are, the, countries, from, which, a, river, flows, into, the, black_sea, ?]), parse(whq(feature&place&country-B, s(np(3+pl, wh(feature&place&country-B), []), verb(be, active, pres+fin, [], pos), [arg(dir, np(3+pl, np_head(det(the(pl)), [], country), [rel(feature&place&country-D, s(np(3+sg, np_head(det(a), [], river), []), verb(flow, active, pres+fin, [], pos), [], [pp(prep(from), np(3+pl, wh(feature&place&country-D), [])), pp(prep(into), np(3+sg, name(black_sea), []))]))]))], []))), sem((answer80([A]):-setof(B, (country(B), C^ (river(C), flows(C, B, black_sea))), A))), qplan((answer80([C]):-setof(B, A^ (flows(A, B, black_sea), {country(B)}, {river(A)}), C))), 
 answers([[romania]])],[time(0.0010000000000000009)]).
 must_test_801([which, countries, have, a, population, exceeding, nb(10), million, ?], [sent([which, countries, have, a, population, exceeding, nb(10), million, ?]), parse(whq(feature&place&country-B, s(np(3+pl, np_head(int_det(feature&place&country-B), [], country), []), verb(have, active, pres+fin, [], pos), [arg(dir, np(3+sg, np_head(det(a), [], population), [reduced_rel(measure&countables-C, s(np(3+sg, wh(measure&countables-C), []), verb(exceed, active, inf, [prog], pos), [arg(dir, np(3+pl, np_head(quant(same, nb(10)), [], million), []))], []))]))], []))), sem((answer80([A]):-country(A), B^ (exceeds(B, 10--million), population(A, B)))), qplan((answer80([A]):-B^ (country(A), {population(A, B), {exceeds(B, 10--million)}}))), 
 answers([malaysia, uganda])],[time(0.0010000000000000009)]).

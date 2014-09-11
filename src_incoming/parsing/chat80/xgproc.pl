@@ -1,8 +1,7 @@
 /* Translation of XGs */
 
  :- op(1001,xfy,...).
- :- op(500,fx,+).
- :- op(500,fx,-).
+:- op(1200,xfx,'--->').
 
 :-thread_local xgproc:current_xg_module/1.
 :-thread_local xgproc:current_xg_filename/1.
@@ -27,6 +26,20 @@ new_pred(M,P,F,A) :-
    recordz(P,'xg.pred',_),
    recordz('xg.pred',P,_).
 
+:-thread_local tlxgproc:do_xg_process_te/0.
+:-export(xg_process_te_clone/5).
+xg_process_te_clone(L,R,_Mode,P,Q):- expandlhs(L,S0,S,H0,H,P), expandrhs(R,S0,S,H0,H,Q).  %new_pred(P),usurping(Mode,P),!.
+
+:-export(xg_process_te_clone/3).
+xg_process_te_clone((H ... T --> R),Mode,((P :- Q))) :- !, xg_process_te_clone((H ... T),R,Mode,P,Q).
+xg_process_te_clone((L --> R),Mode,((P :- Q))) :- !,xg_process_te_clone(L,R,Mode,P,Q).
+
+user:term_expansion(In,Out):-compound(In),functor(In,'-->',_), tlxgproc:do_xg_process_te, xg_process_te_clone(In,+,Out).
+user:term_expansion((H ... T ---> R),((P :- Q))) :- !, xg_process_te_clone((H ... T),R,+,P,Q).
+user:term_expansion((L ---> R),((P :- Q))) :- !,xg_process_te_clone(L,R,+,P,Q).
+
+
+load_plus_xg_file(CM,F) :- with_assertions(xgproc:current_xg_module(CM),with_assertions(tlxgproc:do_xg_process_te,ensure_loaded(F))),!.
 % was +(F).
 load_plus_xg_file(CM,F) :-
    see(user),
@@ -73,6 +86,13 @@ consume(F,Mode) :-
     ( X=end_of_file, !, xg_complete(F);
       (flag(read_terms,T,T+1),xg_process(X,Mode)),
          fail ).
+
+xg_process((L ---> R),Mode) :- !,
+   expandlhs(L,S0,S,H0,H,P),
+   expandrhs(R,S0,S,H0,H,Q),
+   new_pred(P),
+   usurping(Mode,P),
+   xg_assertz((P :- Q)), !.
 
 xg_process((L-->R),Mode) :- !,
    expandlhs(L,S0,S,H0,H,P),

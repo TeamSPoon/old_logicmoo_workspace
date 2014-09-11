@@ -106,7 +106,8 @@ code_list_to_next_command(end_of_file,end_of_file).
 code_list_to_next_command(NewCodes,Atom):-append(Left,[EOL],NewCodes),EOL<33,!,code_list_to_next_command(Left,Atom).
 code_list_to_next_command([EOL|NewCodes],Atom):-EOL<33,!,code_list_to_next_command(NewCodes,Atom).
 code_list_to_next_command([],'look').
-code_list_to_next_command(NewCodes,Atom):-atom_codes(Atom,NewCodes).
+code_list_to_next_command([91|REST],TERM):- catchv((atom_codes(A,[91|REST]),atom_to_term(A,TERM,[])),_,fail),!.
+code_list_to_next_command(NewCodes,Atom):-atom_codes(Atom,NewCodes),!.
 
 :-export(scan_updates/0).
 

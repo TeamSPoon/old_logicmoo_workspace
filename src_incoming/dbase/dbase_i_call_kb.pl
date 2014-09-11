@@ -114,10 +114,11 @@ cyckb_t(P,A1):- dbase_t([P,A1]).
 
 :-dynamic(el_holds_DISABLED_KB/0).
 :-export(el_holds_DISABLED_KB/0).
-:- link_to_holds_DYNAMIC(cyckb_t,el_holds_DISABLED_KB).
+%:- link_to_holds_DYNAMIC(cyckb_t,el_holds_DISABLED_KB).
+:- link_to_holds2(cyckb_t,el_holds).
 
 :-export(cyckb_t/1).
-cyckb_t(PLIST):- fail,throw(el_holds_DISABLED_KB), apply(cyckb_t,PLIST).
+cyckb_t(PLIST):- not(el_holds_DISABLED_KB), apply(cyckb_t,PLIST).
 
 :-export(noGenlPreds/1).
 noGenlPreds(coGenlPreds).

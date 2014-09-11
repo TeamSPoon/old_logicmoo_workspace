@@ -43,7 +43,7 @@ i_sentence(imp(s(_,Verb,VArgs,VMods)),imp(V,Args)) :- !,
 i_sentence(S,assertion([],P)) :-
    i_s(S,P,[],0).
 
-i_np(there(_Why),Y,quant(void(_Meaning),_X,'`'(true),'`'(true),[],Y),[],_,_,XA,XA).
+i_np(there,Y,quant(void(_Meaning),_X,'`'(true),'`'(true),[],Y),[],_,_,XA,XA).
 i_np(NP,Y,Q,Up,Id0,Index,XA0,XA) :-
    i_np_head(NP,Y,Q,Det,Det0,X,Pred,QMods,Slots0,Id0),
    held_arg(XA0,XA,Slots0,Slots,Id0,Id),
@@ -309,8 +309,8 @@ slot_verb_template(have,Y=Z,
 	held_arg(poss,-(-(-(+Id))),TypeS-S), have,tv).
 slot_verb_template(Verb,Pred,
       [slot(subj,TypeS,S,_,free)|Slots],[],transparent,Kind) :-
-   no_repeats(verb_type_db(Verb,_+Kind)),!,
-   slot_verb_kind(Kind,Verb,TypeS,S,Pred,Slots).
+   no_repeats(verb_type_db(Verb,_+Kind)),
+   must(slot_verb_kind(Kind,Verb,TypeS,S,Pred,Slots)).
 
 slot_verb_kind(be,_,TypeS,S,S=A,[slot(dir,TypeS,A,_,free)]).
 slot_verb_kind(be,_,TypeS,S,true,[slot(pred,TypeS,S,_,free)]).
@@ -323,6 +323,10 @@ slot_verb_kind(ditrans(Prep),Verb,TypeS,S,Pred,
       [slot(dir,TypeD,D,SlotD,free),
        slot(ind,TypeI,I,SlotI,free)|Slots]) :-
    no_repeats_dc(DC0,ditrans_LF(Verb,Prep,TypeS,S,TypeD,D,TypeI,I,Pred,Slots,SlotD,SlotI,DC0)).
+slot_verb_kind(_,Verb,TypeS,S,Pred,
+      [slot(dir,TypeD,D,SlotD,free),
+       slot(ind,TypeI,I,SlotI,free)|Slots]) :-
+   no_repeats_dc(DC0,ditrans_LF(Verb,_Prep,TypeS,S,TypeD,D,TypeI,I,Pred,Slots,SlotD,SlotI,DC0)).
 
 deepen_case(prep(at),time).
 deepen_case(s_subj,dir).
