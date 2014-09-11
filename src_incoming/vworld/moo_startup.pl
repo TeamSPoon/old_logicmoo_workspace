@@ -136,7 +136,12 @@ make_qlfs:-
 % :- user_use_module(logicmoo(pldata/mworld0)).
 :- user_use_module(logicmoo(pldata/transform_dump)).
 % :- catch(user_use_module(logicmoo(pldata/withvars_988)),_,true).
-:- catch(user_use_module(logicmoo(pldata/el_assertions)),_,true).
+download_and_install_el:-
+  shell('wget -N http://www.logicmoo.org/devel/logicmoo/src_data/pldata/el_assertions.zip',_),
+  shell('unzip -u -d ../src_data/pldata/ el_assertions.zip'),
+  catch(user_use_module(logicmoo(pldata/el_assertions)),E,fmt('Cant use el_assertions',E)).
+
+:- catch(user_use_module(logicmoo(pldata/el_assertions)),_,download_and_install_el).
 
 :- asserta(loaded_external_kbs),show_call(kbp_to_dbase_t).
 
