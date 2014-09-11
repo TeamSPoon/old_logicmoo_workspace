@@ -113,6 +113,7 @@ cyckb_t(P,A1):- dbase_t([P,A1]).
 */
 
 :-dynamic(el_holds_DISABLED_KB/0).
+:-export(el_holds_DISABLED_KB/0).
 :- link_to_holds_DYNAMIC(cyckb_t,el_holds_DISABLED_KB).
 
 :-export(cyckb_t/1).

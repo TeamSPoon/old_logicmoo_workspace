@@ -25,8 +25,8 @@
                          info/0,
                          infix/0,
                          prefix/0,
-			 evaluate/2,
-			 evaluate/3,
+			 evaluate_mc2/2,
+			 evaluate_mc2/3,
 			 satisfy/4]).
 
 :- use_module(comsemPredicates,[memberList/2,
@@ -45,15 +45,15 @@
    Evaluate a formula in an example model
 ========================================================================*/
 
-evaluate(Formula,Example):-
-   evaluate(Formula,Example,[]).
+evaluate_mc2(Formula,Example):-
+   evaluate_mc3(Formula,Example,[]).
 
 
 /*========================================================================
    Evaluate a formula in an example model wrt an assignment
 ========================================================================*/
 
-evaluate(Formula,Example,Assignment):-
+evaluate_mc2(Formula,Example,Assignment):-
    example(Example,Model),
    satisfy(Formula,Model,Assignment,Result),
    printStatus(Result).
@@ -403,8 +403,8 @@ info:-
    format('~n> ------------------------------------------------------------------------- <',[]),
    format('~n> modelChecker2.pl, by Patrick Blackburn and Johan Bos                      <',[]),
    format('~n>                                                                           <',[]),
-   format('~n> ?- evaluate(F,E).          - evaluate a formula in a model                <',[]),
-   format('~n> ?- evaluate(F,E,A).        - evaluate a formula in a model wrt assignment <',[]),
+   format('~n> ?- evaluate_mc2(F,E).          - evaluate_mc2 a formula in a model                <',[]),
+   format('~n> ?- evaluate_mc2(F,E,A).        - evaluate_mc2 a formula in a model wrt assignment <',[]),
    format('~n> ?- modelCheckerTestSuite.  - run the test suite                           <',[]),  
    format('~n> ?- infix.                  - switch to infix printing mode                <',[]),
    format('~n> ?- prefix.                 - switch to prefix printing mode               <',[]),

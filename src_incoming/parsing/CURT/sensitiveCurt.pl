@@ -21,7 +21,7 @@
 
 *************************************************************************/
 
-:- module(curt,[curt/0,infix/0,prefix/0]).
+:- module(curt,[curt/0,curtUpdate/3,infix/0,prefix/0]).
 
 :- use_module(callInference,[callTPandMB/6]).
 

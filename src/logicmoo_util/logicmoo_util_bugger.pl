@@ -655,6 +655,19 @@ no_repeatsU(Call):- hotrace((ground(Call) -> ((traceok(Call),!)) ; (CONS = [_], 
 no_repeats(Vs,Call):- ground(Vs),!,Call,!.
 no_repeats(Vs,Call):- CONS=[_], call(Call),notrace((\+ memberchk_eq(Vs,CONS) , nb_setarg(2, CONS, [Vs]))).
 
+% for dont-care vars
+:- export(no_repeats_dc/2).
+:- meta_predicate no_repeats_dc(+,0).
+no_repeats_dc(Vs,Call):- term_variables(Call,CV),term_variables(Vs,VsL),subtract_eq(CV,VsL,NewVs),no_repeats(NewVs,Call).
+
+subtract_eq([], _, []) :- !.
+subtract_eq([A|C], B, D) :-
+        memberchk_eq(A, B), !,
+        subtract_eq(C, B, D).
+subtract_eq([A|B], C, [A|D]) :-
+        subtract_eq(B, C, D).
+
+
 :-export(newval_or_fail/2).
 :-meta_predicate(newval_or_fail(+,+)).
 newval_or_fail(CONS,VAL):- CONS = [CAR|CDR], VAL \== CAR,  ( CDR==[] ->  nb_setarg(2, CONS, [VAL]) ; newval_or_fail(CDR,VAL)). 

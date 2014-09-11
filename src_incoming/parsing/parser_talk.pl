@@ -35,7 +35,7 @@ m :- talkpl.
 :-export(talkpl/0).
 talkpl :- with_assertions(tracing80,
              with_no_assertions(thglobal:use_cyc_database,
-                  with_assertions(usePlTalk, (told, repeat, prompt_read('TALKPL> ',U),  
+                  with_assertions(thlocal:usePlTalk, (told, repeat, prompt_read('TALKPL> ',U),  
                             to_word_list(U,WL),(WL==[bye];WL==[end,'_',of,'_',file];talkpl(WL)))))).
 
 :-export(talkpl/1).

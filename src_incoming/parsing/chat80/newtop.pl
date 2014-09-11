@@ -219,9 +219,9 @@ quote(A&R) :-
 quote(_-_).
 quote(_--_).
 quote(_+_).
-quote(verb(_,_,_,_,_)).
+quote(verb(_,_,_,_,_,_Kind)).
 quote(wh(_)).
-quote(name(_)).
+quote(nameOf(_)).
 quote(prep(_)).
 quote(det(_)).
 quote(quant(_,_)).

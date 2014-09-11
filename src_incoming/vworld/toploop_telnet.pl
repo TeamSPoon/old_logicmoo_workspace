@@ -23,7 +23,7 @@
 
 :- decl_thlocal wants_logout/1.
 
-:- dynamic thglobal:agent_message_stream/3, telnet_fmt_shown/3.
+:- dynamic thglobal:agent_message_stream/3, telnet_fmt_shown/3, thglobal:player_command_stack/2.
 
 :- meta_predicate toploop_telnet:show_room_grid_single(*,*,0).
 
@@ -86,15 +86,27 @@ read_and_do_telnet(P):-
 prompt_read_telnet(Prompt,Atom):-
      foc_current_player(P),
       prompt_read(Prompt,IAtom),
-      (IAtom==end_of_file -> (assert(thlocal:wants_logout(P)),Atom='quit') ; IAtom=Atom).
+      (IAtom==end_of_file -> (assert(thlocal:wants_logout(P)),Atom='quit') ; IAtom=Atom),!.
 
 :-export(prompt_read/2).
 prompt_read(Prompt,Atom):-
         fresh_line,
         fmt0('~n~w ',[Prompt]),
-        current_input(In),
-	read_line_to_codes(In,Codes),   
-        (is_list(Codes)-> atom_codes(Atom,Codes); Atom=Codes),!.
+        current_input(In),!,
+        repeat,read_code_list_or_next_command(In,Atom),!.
+
+read_code_list_or_next_command(In,Atom):- must(thglobal:agent_message_stream(P,In,_)),retract(thglobal:player_command_stack(P,Atom)),!.
+read_code_list_or_next_command(In,end_of_file):- at_end_of_stream(In),!.
+read_code_list_or_next_command(In,Atom):- (var(In)->current_input(In);true),wait_for_input([In], Ready, 1),!,  member(In,Ready),
+  read_pending_input(In,CodesL,[]),!,is_list(CodesL),CodesL\==[],
+   ((last(CodesL,EOL),member(EOL,[10,13])) -> code_list_to_next_command(CodesL,Atom); 
+    (read_line_to_codes(In,CodesR), (is_list(CodesR)-> (append(CodesL,CodesR,NewCodes),code_list_to_next_command(NewCodes,Atom)); Atom=CodesR))),!.
+
+code_list_to_next_command(end_of_file,end_of_file).
+code_list_to_next_command(NewCodes,Atom):-append(Left,[EOL],NewCodes),EOL<33,!,code_list_to_next_command(Left,Atom).
+code_list_to_next_command([EOL|NewCodes],Atom):-EOL<33,!,code_list_to_next_command(NewCodes,Atom).
+code_list_to_next_command([],'look').
+code_list_to_next_command(NewCodes,Atom):-atom_codes(Atom,NewCodes).
 
 :-export(scan_updates/0).
 

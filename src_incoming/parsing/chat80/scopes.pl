@@ -196,9 +196,9 @@ unit_det(lambda).
 unit_det(quant(_,_)).
 unit_det(det(_)).
 unit_det(question(_)).
-unit_det(id).
-unit_det(void).
-unit_det(not).
+unit_det(id(_Why)).
+unit_det(void(_Meaning)).
+unit_det(not(_Why)).
 unit_det(generic).
 unit_det(int_det(_)).
 unit_det(proportion(_)).
@@ -211,8 +211,8 @@ apply(proportion(_Type-V),_,X,P,Y,Q,
       S^(setof(X,P,S),
          N^(numberof(Y,(one_of(S,Y),Q),N),
             M^(card(S,M),ratio(N,M,V))))).
-apply(id,_,X,P,X,Q,(P,Q)).
-apply(void,_,X,P,X,Q,X^(P,Q)).
+apply(id(_Why),_,X,P,X,Q,(P,Q)).
+apply(void(_Meaning),_,X,P,X,Q,X^(P,Q)).
 apply(set,_,Index:X,P0,S,Q,S^(P,Q)) :-
    apply_set(Index,X,P0,S,P).
 apply(int_det(Type-X),Type,X,P,X,Q,(P,Q)).
@@ -234,8 +234,8 @@ quant_op(same,X,X,P,P).
 quant_op(Op,X,Y,P,X^(P,F)) :-
    quant_op(Op,X,Y,F).
 
-quant_op(not+more,X,Y,X=<Y).
-quant_op(not+less,X,Y,X>=Y).
+quant_op(not(_Why)+more,X,Y,X=<Y).
+quant_op(not(_Why)+less,X,Y,X>=Y).
 quant_op(less,X,Y,X<Y).
 quant_op(more,X,Y,X>Y).
 
@@ -264,12 +264,12 @@ governs(Det0,Det) :-
  ( index_det(Det,_);
    Det=det(_);
    Det=quant(_,_)).
-governs(_,void).
+governs(_,void(_There)).
 governs(_,lambda).
-governs(_,id).
+governs(_,id(_Why)).
 governs(det(each),question([_|_])).
 governs(det(each),det(each)).
-governs(det(any),not).
+governs(det(any),not(_Why)).
 governs(quant(same,wh(_)),Det) :-
    weak(Det).
 governs(det(Strong),Det) :-
@@ -311,10 +311,10 @@ setifiable(det(all)).
 % =================================================================
 % Operators (currently, identity, negation and 'and')
 
-op_apply(id,P,P).
-op_apply(not,P,\+P).
+op_apply(id(_Why),P,P).
+op_apply(not(_Why),P,\+P).
 
-bubble(not,det(any),det(every)) :- !.
+bubble(not(_Why),det(any),det(every)) :- !.
 bubble(_,D,D).
 
 

@@ -55,12 +55,17 @@ curtHelp:-
    Curt's output
 ========================================================================*/
 
-curtOutput([]).
+curtOutput([]):-!.
 
-curtOutput([Move|Moves]):-
-   realiseMove(Move,Output),
+curtOutput([Move|Moves]):-!,
+   assertion(realiseMove(Move,Output)),
    format('~nCurt: ~p~n',[Output]),
    curtOutput(Moves).
+
+curtOutput(Move):-
+   assertion(realiseMove(Move,Output)),
+   format('~nCurt: ~p~n',[Output]).
+
 
 
 /*========================================================================

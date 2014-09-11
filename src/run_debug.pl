@@ -179,14 +179,13 @@ now_run_local_tests_dbg :- doall(defined_local_test).
 
 :-kellerStorage:kellerStorageTestSuite.
 
-:-curt80.
+% :-curt80.
 
 % the real tests now (once)
 :- if_flag_true(was_run_dbg_pl,at_start(must_det(run_mud_tests))).
 
 % more tests even
 :-do_player_action("look").
-
 :-forall(localityOfObject(O,L),dmsg(localityOfObject(O,L))).
 
 moo:must_test("tests to see if poorly canonicalized code (unrestricted quantification) will not be -too- inneffienct",
@@ -219,6 +218,9 @@ cmdresult(statistics,true)
 */
 
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
+
+:-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,look)).
+:-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,chat80)).
 :- if_flag_true(was_run_dbg_pl, at_start(run)).
 
 

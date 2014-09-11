@@ -22,7 +22,7 @@
 *************************************************************************/
 
 :- use_module(comsemPredicates,[infix/0,prefix/0]).
-
+:- ensure_loaded(comsemOperators).
 
 /*========================================================================
    Syntax-Semantics Rules 

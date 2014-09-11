@@ -14,6 +14,28 @@
 
 % ==============================================================================
 % :- reexport('CURT/curtPPDRT').
-% :- reexport('CURT/advertentCurt').
+:- reexport('CURT/advertentCurt').
+
+% ===========================================================
+% CURT80 command
+% ===========================================================
+moo:type_action_info(human_player,curt80(list(term)),"Development test CURT Text for a human.  Usage: CURT80 Cant i see the blue backpack?").
+
+moo:agent_call_command(_Gent,curt80([])):- curt80.
+moo:agent_call_command(_Gent,curt80(StringM)):- curt80(StringM).  
 
 
+% ===========================================================
+% CURT80 REPL
+% ===========================================================
+:-thread_local thlocal:curt80_interactive/0.
+curt80 :- with_assertions(tracing80,
+           with_assertions(thlocal:chat80_interactive,
+            with_assertions(thlocal:useOnlyExternalDBs,
+             with_assertions(thglobal:use_cyc_database,
+              (told, repeat, prompt_read('CURT80> ',U),  
+                            to_word_list(U,WL),((WL==[bye];WL==[end,'_',of,'_',file];((mmake,curt80(WL,State),State==stop))))))))).
+
+curt80(Input,State):-  curtUpdate(Input,CurtsMoves,State), 
+   curtOutput(CurtsMoves).
+   
