@@ -547,7 +547,7 @@ to_list_of_sents(WList,[sent(WList)]).
 
 replace_periods_string_list(A,S):-replace_periods(A,AR),to_word_list(AR,WL),subst(WL,periodMARK,'.',WLS),subst(WLS,apostraphyMARK,'\'',S).
 
-to_word_list(A,SL):-once(hotrace(to_word_list_0(A,S))),S=SL.
+to_word_list(A,SL):-once(hotrace((to_word_list_0(A,S0),(is_list(S0)->delete(S0,'',S);S=S0)))),must(S=SL).
 to_word_list_0(V,V):-var(V),!.
 to_word_list_0(Foo,V):-not(var(V)),trace_or_throw(to_word_list_0(Foo,V)).
 to_word_list_0([A],[A]):-number(A),!.

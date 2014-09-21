@@ -37,7 +37,7 @@
 :-dynamic_multifile_exported(ditrans_LF/13).
 :-discontiguous(regular_pres_db/1).
 :-discontiguous(regular_past_db/2).
-:-discontiguous(noun_form_db/3).
+:-discontiguous(noun_form_db_0/3).
 :-discontiguous(loc_pred_prep_db/3).
 
 
@@ -56,6 +56,8 @@
 
 :- dynamic_multifile_exported((trans_LF/9)).
 
+:-retractall(nldata_BRN_WSJ_LEXICON:text_bpos(the,nn)).
+
 % :- begin_dynamic_reader.
 :- asserta((thlocal:enable_src_loop_checking)).
 
@@ -65,9 +67,11 @@ verb_type_to_kind(_+Type,Kind):-must(nonvar(Type)),!,verb_type_to_kind(Type,Kind
 verb_type_to_kind(Kind,Kind):-must(not(Kind=have)).
 
 verb_type_db(Verb,Type):-one_must(no_repeats(verb_type_db_0(Verb,Type)),verb_type_db_1(Verb,Type)).
+
+verb_type_db_1( Look,main+iv):- iv_finsg(_Looks, Look),!.
 verb_type_db_1(_Verb,main+tv).
 verb_type_db_1(_Verb,main+iv).
-verb_type_db_1(Verb,main+ditrans(_)):-talk_db(iv,Verb,_,_,_,_). % ditrans(_)
+verb_type_db_1(Verb,main+ditrans(_)):- plt2, talk_db(iv,Verb,_,_,_,_). % ditrans(_)
 
 txt_there_db(there,there).
 txt_not_db(not,not).
@@ -84,14 +88,19 @@ terminator_db(?,?).
 terminator_db(!,!).
 
 plt:- thlocal:usePlTalk,!.
+plt2:- thlocal:useAltPOS,!.
 % plt:- thlocal:chat80_interactive,!.
 
+no_loop_local(Call):-loop_check_module(chat80,Call,fail).
 not_violate(NotCCW,POS):-loop_check_module(chat80,(ccw_db(NotCCW,CC)->CC=POS;true),fail).
 
 :-meta_predicate(plt_call(+,+,0)).
+:-meta_predicate(plt2_call(+,+,0)).
 % plt_call(Goal):-plt,!,no_repeats(Goal),dmsg(succeed_plt_call(Goal)).
 plt_call(NotCCW,_POS,_Goal):-member(NotCCW,['?','river','borders']),!,fail.
 plt_call(NotCCW,POS,Goal):-plt,!,loop_check_module(chat80,no_repeats(Goal)),not_violate(NotCCW,POS),must(once(not_violate(NotCCW,POS);(dmsg(succeed_plt_call(NotCCW,POS,Goal)),!,fail))).
+plt2_call(NotCCW,_POS,_Goal):-member(NotCCW,['?','river','borders']),!,fail.
+plt2_call(NotCCW,POS,Goal):-plt2,!,loop_check_module(chat80,no_repeats(Goal)),not_violate(NotCCW,POS),must(once(not_violate(NotCCW,POS);(dmsg(succeed_plt_call(NotCCW,POS,Goal)),!,fail))).
 
 adverb_db(Quickly):-plt_call(Quickly,'Adverb',(talk_db(adv,Quickly))).
 
@@ -156,6 +165,7 @@ quantifier_pron_db(nothing,no,thing).
 prep_db(as).
 prep_db(at).
 noun_plu_db(times,time).
+noun_plu_db(Liaisons, Liaison):- noun_pl(Liaisons, Liaison, _Human).
 adverb_db(yesterday).
 adverb_db(tomorrow).
 
@@ -170,10 +180,13 @@ prep_db(into).
 prep_db(through).
 prep_db(Above):-plt_call(Above,'Preposition',talk_db(preposition,Above)).
 
-noun_form_db(Plu,Sin,pl) :- noun_plu_db(Plu,Sin),not_ccw(Plu).
-noun_form_db(Sin,Sin,sg) :- noun_sin_db(Sin),not_ccw(Sin).
-noun_form_db(Sin,Sin,sg):-text_bpos(Sin,'nn').
-noun_form_db(Sin,Sin,sg):-text_bpos(N,Sin,'nn'),N>=0.5 .
+
+noun_form_db(Plu,Sin,PS):- noun_form_db_0(Plu,Sin,PS),must(Sin\==the).
+
+noun_form_db_0(Plu,Sin,pl) :- noun_plu_db(Plu,Sin),not_ccw(Plu).
+noun_form_db_0(Sin,Sin,sg) :- noun_sin_db(Sin),not_ccw(Sin).
+noun_form_db_0(Sin,Sin,sg):-text_bpos(Sin,'nn'),not_ccw(Sin).
+noun_form_db_0(Sin,Sin,sg):-text_bpos(N,Sin,'nn'),N>=0.5 ,not_ccw(Sin).
 
 verb_form_db(V,V,inf,_) :- verb_root_db(V).
 verb_form_db(V,V,pres+fin,Agmt) :-
@@ -268,7 +281,7 @@ pos_to_db_precache(W,GOODL):-
          theTextC(Name,'ProperNoun',name_db([Name],_)),
          theTextC(Conj,'Conjunction',conj_db(Conj)),      
          theTextC(Art,'Determiner', int_art_db(Art,_X,Agmt,_DX)),
-         theTextC(W,'Noun',noun_form_db(W,Noun,Agmt)),
+         theTextC(W,'Noun',noun_form_db_0(W,Noun,Agmt)),
          theTextC(W,'Adjective',rel_adj_db(W,NW)),
          theTextC(W,'Adjective',sup_adj_db(W,NW)),
          theTextC(W,'Adjective',adj_db(W,Type)),
@@ -354,8 +367,8 @@ pers_pron_db(them,agentgroup,3,pl,compl(_)).
 how_many_db([how,many]).
 
 pronoun_LF(_Argree2B,np_head(generic,ADJS,Type),_MoreIn,_X,_Y,_ADJLIST,_OUT):-contains_var(typeOf,some(Type,ADJS)),!,fail.
-pronoun_LF(Argree2B,pronoun(FemMasc),MoreIn,X,_Y,[adj(lf(X,nlAgreement(X,Argree2B)&dbase_t(typeOf,X,FemMasc)))|MoreIn],FemMasc):- thlocal:useAltPOS,!.
-pronoun_LF(Argree2B,FemMasc,MoreIn,X,_Y,[adj(lf(X,nlAgreement(X,Argree2B)&dbase_t(typeOf,X,FemMasc)))|MoreIn],FemMasc):-thlocal:useAltPOS.
+pronoun_LF(Argree2B,pronoun(FemMasc),MoreIn,X,_Y,[adj(lf(X,nlAgreement(X,Argree2B)&dbase_t(typeOf,X,FemMasc)))|MoreIn],FemMasc):-nonvar(Argree2B),nonvar(FemMasc), thlocal:useAltPOS,!.
+pronoun_LF(Argree2B,FemMasc,MoreIn,X,_Y,[adj(lf(X,nlAgreement(X,Argree2B)&dbase_t(typeOf,X,FemMasc)))|MoreIn],FemMasc):-nonvar(Argree2B),nonvar(FemMasc),thlocal:useAltPOS.
 
 kyqdhq(K,Kernel,Y,Q,Det,T,Head,Pred0,QMods):-  K= np(_,Kernel,_),Y=Y, Q = quant(Det,T,Head,Pred0,QMods,Y),dmsg(good_kyqdhq(K,Kernel,Y,Q,Det,T,Head,Pred0,QMods)),!.
 kyqdhq(K,Kernel,Y,Q,Det,T,Head,Pred0,QMods):-  thlocal:useAltPOS,thlocal:chat80_interactive,dmsg(unused_kyqdhq(K,Kernel,Y,Q,Det,T,Head,Pred0,QMods)),fail.
@@ -498,10 +511,14 @@ thing_LF(type,feature&type&_,X,type(X),[],_).
 noun_plu_db(formattypes,formattype).
 thing_LF(formattype,feature&formattype&_,X,formattype(X),[],_).
 
+thing_LF(Type,feature&Type&_,X,isa(X,Type),[],_):-plt,type(Type).
+
 noun_plu_db(TS,T):- noun_plu_db_via_types(TS,T).
 
-thing_LF(Type,TYPEMASK,X,isa(X,Type),[],_):- plt_call(Type,'Noun',((loop_check_module(chat80,type(Type)),atom(Type),gen_typemask(Type,TYPEMASK)))).
-restriction_LF(Type,TYPEMASK,X,isa(X,Type)):- plt_call(Type,'Noun',((loop_check_module(chat80,type(Type)),atom(Type),gen_typemask(Type,TYPEMASK)))).
+thing_LF(Type,TYPEMASK,X,isa(X,Type),[],_):- atom(Type), plt_call(Type,'Noun',((loop_check_module(chat80,type(Type)),atom(Type),gen_typemask(Type,TYPEMASK)))).
+restriction_LF(Type,TYPEMASK,X,isa(X,Type)):- atom(Type), plt_call(Type,'Noun',((loop_check_module(chat80,type(Type)),atom(Type),gen_typemask(Type,TYPEMASK)))).
+restriction_LF(Type,TYPEMASK,X,isa(X,Type)):- atom(Type), plt2, once(cw_db(Type,Adj)),Adj='Adjective',gen_typemask(Type,TYPEMASK).
+
 
 
 gen_typemask(Type,measure&Type&_):-formattype(Type),!.
@@ -518,18 +535,23 @@ maybe_noun_or_adj(T):- var(T)->true;(atom(T),not_ccw(T)).
 % test_chat80( [which,is,the,largest,african,country,?]).
 %  chat80("how are you?").
 % test_chat80("you flow").
-:-export(test_chat80/1).
-test_chat80(U):- with_assertions(thlocal:chat80_interactive, must(chat80(U))).
 
 t11:- 
-   %test_chat80("how many postures are there?"),
-   %test_chat80("what are the postures?"),
+   test_chat80("how many postures are there?"),
+   test_chat80("what are the postures?"),
+   test_chat80("what are the types?"),
    %test_chat80("how many oceans are seas?"),
    %test_chat80("how many oceans are seasmasses?"),
    test_chat80("how many types are there?"),
    test_chat80("how many formattypes are there?"),
    test_chat80("what formattypes are there?"),
    !.
+
+t22 :-
+   test_chat80("how many countries are in antarctica?"),
+   test_chat80("how many countries are in australia?").
+
+t33:- test_chat80('I do not know if the can can do the dance called the can can.').
 
 
 ditrans_LF(Verb,Prep,
@@ -698,9 +720,9 @@ ocw_db3(W,SPOS):-plt_call(W,POS,with_assertions(thlocal:useOnlyExternalDBs, (( '
 
 simplePOS(POS,SIMP):-posName(SIMP),atom_concat(_,SIMP,POS).
 
-%restriction_LF(lf(X,Formula),feature&_,X,Formula):-nonvar(Formula),!.
-%restriction_LF(lf(Formula),feature&_,_X,Formula):-nonvar(Formula),!.
-restriction_LF(AdjNounEan,feature&_,X,adjIsa(X,AdjNounEan)):- plt_call(AdjNounEan,'Adjective',( adj_db(AdjNounEan,restr),not_ccw(AdjNounEan) )).
+restriction_LF(lf(X,Formula),feature&_,X,Formula):-nonvar(Formula),!.
+restriction_LF(lf(Formula),feature&_,_X,Formula):-nonvar(Formula),!.
+restriction_LF(AdjNounEan,feature&_,X,adjIsa(X,AdjNounEan)):-atom(AdjNounEan), plt_call(AdjNounEan,'Adjective',( adj_db(AdjNounEan,restr),not_ccw(AdjNounEan) )).
 adjIsa(E,C):- call_mpred(isa_backchaing(E,C)).
 adj_db(AdjNounEan,restr):- plt_call(AdjNounEan,'Adjective',(talk_db(adj,AdjNounEan),talk_db(noun1,AdjNounEan,_))).
 adj_db(AdjRestr,restr):-plt_call(AdjRestr,'Adjective',(talk_db(adj,AdjRestr),not(adj_db(AdjRestr,quant)),not(adverb_db(AdjRestr)))).
@@ -708,7 +730,7 @@ adj_db(AdjRestr,restr):-meetsForm80(AdjRestr,AdjRestr,form80(adj+restr)).
 
 
 verb_type_db_0(Verb,main+tv)  :-plt_call(Verb,'Verb', trans_LF(Verb,_,_,_,_,_,_,_,_)).
-verb_type_db_0(Verb,main+iv):-plt_call(Verb,'Verb',  intrans_LF(Verb,_,_,_,_,_)).
+verb_type_db_0(Verb,main+iv):-plt_call(Verb,'Verb',  verb_LF(iv,Verb,_,_,_,_,_)).
 verb_type_db_0(Verb,main+ditrans(Prep)):- plt_call(Verb,'Verb',  ditrans_LF(Verb,Prep,_,_,_,_,_,_,_,_,_,_,_)).
 
 verb_type_db_0(Verb,main+TIV):-plt_call(Verb,'Verb', talk_db(TIV,Verb,_,_,_,_)).
@@ -719,7 +741,7 @@ verb_root_db(Govern):-plt_call(Govern,'Verb',(nop(verb_root_db),talk_db(_Verb_i,
 regular_pres_db(Govern):-plt_call(Govern,'Verb',(nop(regular_pres_db),talk_db(_,Govern,_Governs,_GovernedImperfect,_Governing,_Governed))).
 regular_past_db(Governed,Govern):-plt_call(Governed,'Verb',(nop(regular_past_db),talk_db(_,Govern,_Governs,_GovernedImperfect,_Governing,Governed))).
 verb_form_db(Active,Verb,pres+part,_):-plt_call((Active),'Verb',((nop(active),talk_db(_,Verb,_VerbPL,_Imperfect,Active,_PastPart)))).
-verb_form_db(VerbPL,Verb,pres+fin,_):- thlocal:useAltPOS ,plt_call(VerbPL,'Verb',(nop(verb_ptl),talk_db(_,Verb,VerbPL,_Imperfect,_Active,_PastPart))).
+verb_form_db(VerbPL,Verb,pres+fin,_):- thlocal:useAltPOS ,plt2_call(VerbPL,'Verb',(nop(verb_ptl),talk_db(_,Verb,VerbPL,_Imperfect,_Active,_PastPart))).
 verb_form_db(Imperfect,Verb,past+fin,_):-plt_call(Imperfect,'Verb',(nop(imperfect),talk_db(_,Verb,_VerbPL,Imperfect,_Active,_PastPart))).
 verb_form_db(PastPart,Verb,past+part,_):-plt_call((PastPart),'Verb',(nop(past_part),talk_db(_,Verb,_VerbPL,_Imperfect,_Active,PastPart))).
 
@@ -883,7 +905,7 @@ verb_form_db(rises,rise,pres+fin,3+sg).
 verb_form_db(rose,rise,past+fin,_).
 verb_form_db(risen,rise,past+part,_).
 verb_type_db_0(rise,main+iv).
-intrans_LF(rise,feature&river,X,rises(X,Y), [slot(prep(in),feature&place&_,Y,_,free)],_).
+verb_LF(iv,rise,feature&river,X,rises(X,Y), [slot(prep(in),feature&place&_,Y,_,free)],_).
 
 rises(R,C) :- river_pathlist(R,L), last(L,C).
 
@@ -894,7 +916,7 @@ regular_past_db(drained,drain).
 verb_form_db(drains,drain,pres+fin,3+sg).
 verb_form_db(draining,drain,pres+part,_).
 verb_type_db_0(drain,main+iv).
-intrans_LF(drain,feature&river,X,drains(X,Y), [slot(prep(into),feature&place&_,Y,_,free)],_).
+verb_LF(iv,drain,feature&river,X,drains(X,Y), [slot(prep(into),feature&place&_,Y,_,free)],_).
 
 drains(R,S) :- river_pathlist(R,L), first(L,S).
 
@@ -906,8 +928,24 @@ regular_past_db(flowed,flow).
 verb_form_db(flows,flow,pres+fin,3+sg).
 verb_form_db(flowing,flow,pres+part,_).
 verb_type_db_0(flow,main+iv).
-intrans_LF(flow,feature&river,X,flows(X,Y), [slot(prep(through),feature&place&_,Y,_,free)],_).
-intrans_LF(flow,feature&river,X,flows(X,Y,Z), [slot(prep(into),feature&place&_,Z,_,free), slot(prep(from),feature&place&_,Y,_,free)],_). 
+verb_LF(iv,flow,feature&river,X,flows(X,Y), [slot(prep(through),feature&place&_,Y,_,free)],_).
+verb_LF(iv,flow,feature&river,X,flows(X,Y,Z), [slot(prep(into),feature&place&_,Z,_,free), slot(prep(from),feature&place&_,Y,_,free)],_). 
+
+
+
+verb_root_db(Look):- clex_verb(_Formed,Look,_Iv,_Finsg).
+regular_pres_db(Look):-no_loop_local(verb_root_db(Look)).
+regular_past_db(Looked,Look):-clex_verb(Looked,Look,_Iv,pp).
+verb_form_db(Looks,Look,pres+fin,3+sg):- clex_verb(Looks,Look,_,finsg).
+verb_form_db(LookPL,Look,pres+fin,3+pl):- clex_verb(LookPL,Look,_,infpl).
+verb_form_db(Looking,Look,pres+part,_):- (atom(Looking)->atom_concat(Look,'ing',Looking);var(Looking)),no_loop_local(verb_root_db(Look)),atom(Look),atom_concat(Look,'ing',Looking).
+verb_type_db_0(Look,main+ITDV):- clex_verb(_Formed,Look,ITDV,_Finsg).
+verb_LF(_,Assign,feature&_,X,dbase_t(Assign,X,Y), [slot(prep(To),feature&_,Y,_,free)],_):- clex_verb(_Assigned, Assign, dv(To),_).
+verb_LF(_,Look,feature&_,X,dbase_t(Look,X,Y), [slot(prep(At),feature&_,Y,_,free)],_):- (tv_infpl(S,S);tv_finsg(S,S)),atomic_list_concat([Look,At],'-',S).
+
+% verb_LF(iv,Look,feature&_,X,dbase_t(Look,X,Y,Z), [slot(prep(at),feature&_,Z,_,free), slot(prep(with),feature&_,Y,_,free)],_). 
+
+
 
 flows(R,C) :- flows(R,C,_).
 flows(R,C1,C2) :- river_pathlist(R,L), flow_links(L,C2,C1).
@@ -961,14 +999,18 @@ noun_plu_db(sqmiles,sqmile).
 
 */
 
+thing_LF(CountNoun,feature&_,X,isa(X,RootNoun),[],_):-  clex_noun(CountNoun, RootNoun,_,_,_),not(ratio_db(RootNoun,_,_,_)).
+thing_LF(CountNoun,feature&_,X,adjIsa2(X,RootNoun),[],_):- clex_adj(CountNoun, RootNoun,_),not(ratio_db(RootNoun,_,_,_)).
+
+
 
 /* Measure of Proportions and the like */
-noun_form_db(proportion,proportion,_).
+noun_form_db_0(proportion,proportion,X):-member(X,[pl,sg]).
 comparator_db(proportion,_,V,[],proportion(V)).
 noun_plu_db(degrees,degree).
 measure_unit_type_db(degree,measure&position,[],degrees).
 comparator_db(percentage,_,V,[],proportion(V)).
-noun_form_db(percentage,percentage,_).
+noun_form_db_0(percentage,percentage,X):-member(X,[pl,sg]).
 noun_plu_db(thousand,thousand).
 noun_plu_db(million,million).
 ratio_db(million,thousand,1000,1).
@@ -1006,7 +1048,7 @@ regular_past_db(exceeded,exceed).
 verb_form_db(exceeds,exceed,pres+fin,3+sg).
 verb_form_db(exceeding,exceed,pres+part,_).
 trans_LF(exceed,measure&Type,X,measure&Type,Y,exceeds(X,Y),[],_,_).
-attribute_db(great,measure&Type,X,measure&Type,Y,exceeds(X,Y)).
+attribute_LF(great,measure&Type,X,measure&Type,Y,exceeds(X,Y)).
 
 
 measure_op_db(id(_Why),X,X,true).
@@ -1026,15 +1068,17 @@ inverse_db(X,+,X).
 exceeds(X--U,Y--U) :- !, X > Y.
 exceeds(X1--U1,X2--U2) :- ratio_db(U1,U2,M1,M2), X1*M1 > X2*M2.
 
-sup_adj_db(Biggest,Big):-plt_call(Big,'Adjective',plt_call(Biggest,'Adjective',talk_db(superl,Big,Biggest))).
-
+sup_adj_db(Biggest,Big):-plt2_call(Big,'Adjective',plt2_call(Biggest,'Adjective',talk_db(superl,Big,Biggest))).
+sup_adj_db(Biggest,Big):-plt_call(Big,'Adjective',plt_call(Biggest,'Adjective',adj_itr_sup(Biggest,Big))).
 % /* Comparative */
-rel_adj_db(Bigger,Big):-plt_call(Big,'Adjective',plt_call(Bigger,'Adjective',talk_db(comp,Big,Bigger))).
-attribute_db(small,feature&place&_,X,measure&area,Y,areaOf(X,Y)).
-attribute_db(large,feature&place&_,X,measure&area,Y,areaOf(X,Y)).
+rel_adj_db(Bigger,Big):-plt2_call(Big,'Adjective',plt_call(Bigger,'Adjective',talk_db(comp,Big,Bigger))).
+rel_adj_db(Bigger,Big):-plt_call(Big,'Adjective',plt_call(Bigger,'Adjective',adj_itr_comp(Bigger,Big))).
 
-attribute_db(small,feature&Place&_,X,measure&Area,Y,holds_t(AreaPred,X,Y)):-type_measured_by_pred_db(Place,Area,AreaPred).
-attribute_db(large,feature&Place&_,X,measure&Area,Y,holds_t(AreaPred,X,Y)):-type_measured_by_pred_db(Place,Area,AreaPred).
+attribute_LF(small,feature&place&_,X,measure&area,Y,areaOf(X,Y)).
+attribute_LF(large,feature&place&_,X,measure&area,Y,areaOf(X,Y)).
+
+attribute_LF(small,feature&Place&_,X,measure&Area,Y,holds_t(AreaPred,X,Y)):-type_measured_by_pred_db(Place,Area,AreaPred).
+attribute_LF(large,feature&Place&_,X,measure&Area,Y,holds_t(AreaPred,X,Y)):-type_measured_by_pred_db(Place,Area,AreaPred).
 
 type_measured_by_pred_db(human,feet,height).
 
@@ -1113,8 +1157,6 @@ length_between(S,E,Left):-between(S,E,X),length(Left,X).
 
 :-dynamic_multifile_exported(must_test_801/3).
 
-must_test_801([which, are, the, largest, african, countries, ?], [ parse(whq(feature&place&country-B, s(np(3+sg, wh(feature&place&country-B), []), verb(be, active, pres+fin, [], pos), [arg(dir, np(3+sg, np_head(det(the(sg)), [sup(most, adj(large)), adj(african)], country), []))], []))), sem((answer80([A]):-B^ (setof(C:D, (country(D), area(D, C), african(D)), B), aggregate(max, B, A)))), qplan((answer80([D]):-C^ (setof(B:A, (african(A), {country(A)}, area(A, B)), C), aggregate(max, C, D)))), 
-answers([sudan])],[time(0.0)]).
 must_test_801([what, rivers, are, there, ?], [sent([what, rivers, are, there, ?]), parse(whq(feature&river-B, s(np(3+pl, np_head(int_det(feature&river-B), [], river), []), verb(be, active, pres+fin, [], pos), [void], []))), sem((answer80([A]):-river(A), A^true)), qplan((answer80([B]):-river(B), B^true)), 
 answers([amazon, amu_darya, amur, brahmaputra, colorado, congo_river, cubango, danube, don, elbe, euphrates, ganges, hwang_ho, indus, irrawaddy, lena, limpopo, mackenzie, mekong, mississippi, murray, niger_river, nile, ob, oder, orange, orinoco, parana, rhine, rhone, rio_grande, salween, senegal_river, tagus, vistula, volga, volta, yangtze, yenisei, yukon, zambesi])],[time(0.0)]).
 must_test_801([does, afghanistan, border, china, ?], [sent([does, afghanistan, border, china, ?]), parse(q(s(np(3+sg, nameOf(afghanistan), []), verb(border, active, pres+fin, [], pos), [arg(dir, np(3+sg, name(china), []))], []))), sem((answer80([]):-borders(afghanistan, china))), qplan((answer80([]):-{borders(afghanistan, china)})), 
@@ -1172,12 +1214,12 @@ answers([united_kingdom])],[time(0.0010000000000000009)]).
 must_test_803([what, are, the, continents, no, country, in, which, contains, more, than, two, cities, whose, population, exceeds, nb(1), million, ?], [sent([what, are, the, continents, no, country, in, which, contains, more, than, two, cities, whose, population, exceeds, nb(1), million, ?]), parse(whq(feature&place&continent-B, s(np(3+pl, wh(feature&place&continent-B), []), verb(be, active, pres+fin, [], pos), [arg(dir, np(3+pl, np_head(det(the(pl)), [], continent), [rel(feature&place&continent-D, s(np(3+sg, np_head(det(no), [], country), [pp(prep(in), np(3+pl, wh(feature&place&continent-D), []))]), verb(contain, active, pres+fin, [], pos), [arg(dir, np(3+pl, np_head(quant(more, nb(2)), [], city), [rel(feature&city-G, s(np(3+sg, np_head(det(the(sg)), [], population), [pp(poss, np(3+pl, wh(feature&city-G), []))]), verb(exceed, active, pres+fin, [], pos), [arg(dir, np(3+sg, np_head(quant(same, nb(1)), [], million), []))], []))]))], []))]))], []))), 
 sem((answer80([F]):-setof(A, (continent(A), \+B^ (country(B), in(B, A), E^ (numberof(C, (city(C), D^ (population(C, D), exceeds(D, 1--million)), in(C, B)), E), E>2))), F))), qplan((answer80([L]):-setof(G, (continent(G), \+H^ (country(H), in(H, G), K^ (numberof(I, (city(I), J^ (population(I, J), exceeds(J, 1--million)), in(I, H)), K), K>2))), L))), 
 answers([[africa, america, antarctica, asia, australasia, europe]])],[time(0.05499999999999999)]).
+must_test_801([which, are, the, largest, african, countries, ?], [ parse(whq(feature&place&country-B, s(np(3+sg, wh(feature&place&country-B), []), verb(be, active, pres+fin, [], pos), [arg(dir, np(3+sg, np_head(det(the(sg)), [sup(most, adj(large)), adj(african)], country), []))], []))), sem((answer80([A]):-B^ (setof(C:D, (country(D), area(D, C), african(D)), B), aggregate(max, B, A)))), qplan((answer80([D]):-C^ (setof(B:A, (african(A), {country(A)}, area(A, B)), C), aggregate(max, C, D)))), 
+answers([sudan])],[time(0.0)]).
 
 
 :-export((t1/0,t12/0,t13/0)).
 t1:- with_no_assertions(thglobal:use_cyc_database,with_assertions(thlocal:tracing80, forall(must_test_801(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
 t12:- with_no_assertions(thglobal:use_cyc_database,with_assertions(thlocal:tracing80, forall(must_test_802(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
 t13:- with_no_assertions(thglobal:use_cyc_database,with_assertions(thlocal:tracing80, forall(must_test_803(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
-
-
 

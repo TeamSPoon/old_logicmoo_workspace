@@ -16,5 +16,15 @@ prefix(lib, 'http://www.swi-prolog.org/rdf/library/').
 prefix(vann, 'http://purl.org/vocab/vann/').
 prefix(graphviz, 'http://www.graphviz.org/').
 prefix(cpack, 'http://cliopatria.swi-prolog.org/schema/cpack#').
+prefix(pl, 'http://purl.org/ontology/swipl/').
+prefix(log, 'http://www.w3.org/2000/10/swap/log#').
+prefix(list, 'http://www.w3.org/2000/10/swap/list#').
+prefix(af, 'http://purl.org/ontology/af/').
+prefix(vamp, 'http://purl.org/ontology/vamp/').
+prefix(mo, 'http://purl.org/ontology/mo/').
+prefix(to, 'http://purl.org/ontology/tonality/').
+prefix(tl, 'http://purl.org/NET/c4dm/timeline.owl#').
+prefix(event, 'http://purl.org/NET/c4dm/event.owl#').
+prefix(t, 'http://purl.org/ontology/tabling/').
 prefix(logicmoo, 'http://onto.ui.sav.sk/agents.owl#').
 prefix(skosxl, 'http://www.w3.org/2008/05/skos-xl#').

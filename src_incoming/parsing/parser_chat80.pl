@@ -86,6 +86,8 @@ t2:- with_assertions(tracing80,with_no_assertions(thlocal:old_text,with_no_asser
 t2_process_run_diff(report,U,R,O):- copy_term80(U,UU),
    process_run_diff(report,U,R,O),!,nop( with_assertions(thlocal:usePlTalk,process_run_diff(report,UU,[],[]))),!.
 
+:- ensure_loaded(logicmoo('src_data/pldata/clex_lexicon')).
+
 % ===========================================================
 % CHAT80 command
 % ===========================================================
@@ -104,7 +106,7 @@ chat80 :- with_assertions(tracing80,
             with_no_assertions(thlocal:useOnlyExternalDBs,
              with_no_assertions(thglobal:use_cyc_database,
               (told, repeat, prompt_read('CHAT80> ',U),  
-                            to_word_list(U,WL),((WL==[bye];WL==[end,'_',of,'_',file];(mmake,control80(WL))))))))).
+                            to_word_list(U,WL),((WL==[bye];WL==[end,'_',of,'_',file];(mmake,once(chat80(WL)),fail)))))))).
 
 :- multifile(thlocal:into_form_code/0).
 :- asserta(thlocal:into_form_code).

@@ -110,8 +110,22 @@ control80(Callback,[do,not,trace,'.']) :-
 control80(Callback,U) :- with_assertions(thlocal:tracing80, call_in_banner(U,(ignore(process_run(Callback,U,_List,_Time))))),fail.
    
 :-export(chat80/1).
-chat80(U):-ignore(control80(U)).
+chat80(U):-
+ with_assertions(tracing80,
+           with_assertions(thlocal:chat80_interactive,
+            with_no_assertions(thlocal:useOnlyExternalDBs,
+             with_no_assertions(thglobal:use_cyc_database,
+              ignore(control80(U)))))).
+
+:-export(test_chat80/1).
+test_chat80(U):-
+ with_assertions(tracing80,
+           with_assertions(thlocal:chat80_interactive,
+            with_no_assertions(thlocal:useOnlyExternalDBs,
+             with_no_assertions(thglobal:use_cyc_database,
+              ignore(control80(U)))))).
    
+
 
 get_prev_run_results(U,List,Time):-must_test_801(U,List,Time),!.
 get_prev_run_results(U,List,Time):-must_test_80(U,List,Time),!.
@@ -179,21 +193,21 @@ process_run_real(Callback,StartParse,UIn,[sent=(U),parse=(E),sem=(S),qplan=(QP),
    once((
    runtime(StopParse),
    ParseTime is StopParse - StartParse,
-   call(Callback,E,'Parse',ParseTime,portray),   !,
+   call(Callback,E,'Parse',ParseTime,portray),  
    (flag(sentenceTrial,TZ2,TZ2+1), TZ2>5 -> (!,fail) ; true),
    runtime(StartSem))),
-   once((if_try(nonvar(E),logic(E,S)))),
+   once((if_try(nonvar(E),deepen_pos(logic(E,S))))),
    runtime(StopSem),
    SemTime is StopSem - StartSem,
    call(Callback,S,'Semantics',SemTime,expr),
    runtime(StartPlan),
-   once(if_try(nonvar(S),qplan(S,S1))),
+   once(if_try(nonvar(S),deepen_pos(qplan(S,S1)))),
    copy_term80(S1,QP),
    runtime(StopPlan),
    TimePlan is StopPlan - StartPlan,
    if_try(S\=S1,call(Callback,S1,'Planning',TimePlan,expr)),
    runtime(StartAns),
-   nonvar(S1),once(answer80(S1,Results)), Results\=[],!,
+   nonvar(S1),once(deepen_pos(answer80(S1,Results))), Results\=[],!,
    runtime(StopAns),
    TimeAns is StopAns - StartAns,
    call(Callback,Results,'Reply',TimeAns,expr),
@@ -207,8 +221,14 @@ test_quiet(_,_,_,_).
 :-dynamic_multifile_exported(report/4).
 report(Item,Label,Time,Mode) :- thlocal:tracing80, !,
    nl, write(Label), write(': '), write(Time), write('sec.'), nl,
-   report_item(Mode,Item),!.
+   safely_call_ro(report_item(Mode,Item)),!.
 report(_,_,_,_).
+
+
+call_with_limits(Copy):-call_with_time_limit(10,call_with_depth_limit(call_with_inference_limit(Copy,10000,_),500,_)).
+
+safely_call_ro(Call):-copy_term(Call,Copy),catchv(call_with_limits(Copy),E,dmsg(error_safely_call(E,in,Copy))).
+safely_call(Call):-copy_term(Call,Copy),catchv((Copy,Call=Copy),E,dmsg(error_safely_call(E,in,Copy))).
 
 report_item(none,_).
 report_item(_,Var):-var(Var),!,write('FAILED'),nl.
@@ -244,10 +264,14 @@ logic(S0,S) :-
    clausify(S1,S2),
    simplify(S2,S).
 
+simplify(C,C0):-dmsg(var_simplify(C,C0)),fail.
+simplify(C,C):-var(C),!.
 simplify(C,(P:-R)) :- !,
    unequalise(C,(P:-Q)),
    simplify(Q,R,true).
 
+simplify(C,C0,C1):-var(C),dmsg(var_simplify(C,C0,C1)),fail.
+simplify(C,C,R):-var(C),!,R=C.
 simplify(setof(X,P0,S),R,R0) :- !,
    simplify(P0,P,true),
    revand(R0,setof(X,P,S),R).
@@ -279,8 +303,12 @@ unequalise(C0,C) :-
    numbervars80(C0,1,N),
    functor(V,v,N),
    functor(M,v,N),
-   inv_map(C0,V,M,C).
+   inv_map_enter(C0,V,M,C).
 
+inv_map_enter(C0,V,M,C):- catch(inv_map(C0,V,M,C),too_deep(Why),(dmsg(Why),dtrace(inv_map(C0,V,M,C)))).
+
+inv_map(Var,V,M,T) :- stack_depth(X), X> 400, throw(too_deep(inv_map(Var,V,M,T))).
+inv_map(Var,V,M,T) :- stack_check(500), var(Var),dmsg(var_inv_map(Var,V,M,T)),!,Var==T.
 inv_map('$VAR'(I),V,_,X) :- !,
    arg(I,V,X).
 inv_map(A=B,V,M,T) :- !,

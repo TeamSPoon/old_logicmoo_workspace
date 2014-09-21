@@ -247,6 +247,7 @@ verb_mods([Mod|Mods],Set0,_,Mask) --->
    verb_mods(Mods,Set1,Mask2,Mask).
 verb_mods([],_,Mask,Mask) ---> noText.
 
+% verb_mod(_,_,_) ---> theText1(WordVerb),{cw_db(WordVerb,V),member(V,['Verb','Symbol-SP']),!,fail}.
 verb_mod(Adv,Set,Nil) ---> {is_adv(Set)}, adverb(Adv), {is_empty(Nil)}.
 verb_mod(PP,Set,Mask) ---> pp(PP,compl,Set,Mask).
 verb_mod(Adv,Set,Mask) ---> adv_phrase(Adv,Set,Mask).
@@ -269,6 +270,7 @@ adjs_opt([Adj|Adjs]) --->
 adjs_opt([]) ---> noText.
 
 pre_adj(Adj) ---> adj(_,Adj).
+pre_adj(poss(Pronoun,Agreement)) ---> poss_pron(Pronoun,Agreement).
 pre_adj(Adj) --->  sup_phrase(Adj).
 
 sup_phrase(sup(most,Adj)) ---> sup_adj(Adj).

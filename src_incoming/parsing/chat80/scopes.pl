@@ -178,7 +178,7 @@ split_quants(Det0,[Quant|Quants],Above,Above0,Below,Below0) :-
 
 compare_dets(Det0,Q,[quant(Det,X,P,Y)|Above],Above,Below,Below) :-
    open_quant(Q,Det1,X,P,Y),
-   governs(Det1,Det0), !,
+   governs_det(Det1,Det0), !,
    bubble(Det0,Det1,Det).
 compare_dets(Det0,Q0,Above,Above,[Q|Below],Below) :-
    lower(Det0,Q0,Q).
@@ -255,24 +255,24 @@ apply_set([],X,true:P,S,setof(X,P,S)).
 apply_set([I|Is],X,Range:P,S,
       setof([I|Is]:V,(Range,setof(X,P,V)),S)).
 
-
-governs(Det,set(J)) :-
+governs_det(Det,_Det0):-must(nonvar(Det)),fail.
+governs_det(Det,set(J)) :-
    index_det(Det,I),
    I \== J.
-governs(Det0,Det) :-
+governs_det(Det0,Det) :-
    index_det(Det0,_),
  ( index_det(Det,_);
    Det=det(_);
    Det=quant(_,_)).
-governs(_,void(_There)).
-governs(_,lambda).
-governs(_,id(_Why)).
-governs(det(each),question([_|_])).
-governs(det(each),det(each)).
-governs(det(any),not(_Why)).
-governs(quant(same,wh(_)),Det) :-
+governs_det(_,void(_There)).
+governs_det(_,lambda).
+governs_det(_,id(_Why)).
+governs_det(det(each),question([_|_])).
+governs_det(det(each),det(each)).
+governs_det(det(any),not(_Why)).
+governs_det(quant(same,wh(_)),Det) :-
    weak(Det).
-governs(det(Strong),Det) :-
+governs_det(det(Strong),Det) :-
    strong0(Strong),
    weak(Det).
 

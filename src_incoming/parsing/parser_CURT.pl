@@ -14,7 +14,9 @@
 
 % ==============================================================================
 % :- reexport('CURT/curtPPDRT').
-:- reexport('CURT/advertentCurt').
+:- ['CURT/advertentCurt'].
+
+
 
 % ===========================================================
 % CURT80 command
@@ -37,5 +39,5 @@ curt80 :- with_assertions(tracing80,
                             to_word_list(U,WL),((WL==[bye];WL==[end,'_',of,'_',file];((mmake,curt80(WL,State),State==stop))))))))).
 
 curt80(Input,State):-  curtUpdate(Input,CurtsMoves,State), 
-   curtOutput(CurtsMoves).
+   curtPredicates:curtOutput(CurtsMoves).
    
