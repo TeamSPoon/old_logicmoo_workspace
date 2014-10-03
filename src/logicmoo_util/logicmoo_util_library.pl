@@ -29,14 +29,13 @@
          wsubst/4,
          remove_dupes/2,
          list_to_set_safe/2,
-         get_functor/2,
-         get_functor/3,
+         functor_h/2,
+         functor_h/3,
          functor_safe/3,
          flatten_set/2,
          at_start/1,
          in_thread_and_join/1,
-         in_thread_and_join/2,
-         functor_h/2,
+         in_thread_and_join/2,        
          asserta_new/1,
          assertz_new/1,
          as_clause/3,
@@ -141,7 +140,6 @@ clause_safe(M,H,B):-  (nonvar(H)->true;(current_predicate(M:F/A),functor(H,F,A))
 as_clause( ((H :- B)),H,B):-!.
 as_clause( H,  H,  true).
 
-functor_h(H,HH):- notrace(( var(H) -> HH=H ; (functor_catch(H,F,A),functor_catch(HH,F,A)) )).
 
 :- meta_predicate doall(0).
 doall(C):-ignore((C,fail)).
@@ -298,14 +296,18 @@ remove_dupes([],[],_):-!.
 remove_dupes([I|In],Out,Shown):-member(I,Shown),!,remove_dupes(In,Out,Shown).
 remove_dupes([I|In],[I|Out],Shown):-remove_dupes(In,Out,[I|Shown]).
 
-get_functor(Obj,F):-get_functor(Obj,F,_).
+functor_h(Obj,F):-functor_h(Obj,F,_).
 
-get_functor(Obj,F,_):-var(Obj),trace_or_throw(get_functor(Obj,F)).
-get_functor(_:Obj,F,A):-!,get_functor(Obj,F,A).
-get_functor((Obj:-_),F,A):-!,get_functor(Obj,F,A).
-get_functor(Obj,F,0):- string(Obj),!,atom_string(F,Obj).
-get_functor(Obj,Obj,0):-not(compound(Obj)),!.
-get_functor(Obj,F,A):-functor_catch(Obj,F,A).
+functor_h(Obj,F,_):-var(Obj),trace_or_throw(functor_h(Obj,F)).
+functor_h(Obj,F,A):-var(Obj),!,(number(A)->functor(Obj,F,A);((current_predicate(F/A);throw(var_functor_h(Obj,F,A))))).
+functor_h(F/A,F,A):-number(A),!,( atom(F) ->  true ; current_predicate(F/A)).
+functor_h(':'(_,Obj),F,A):-nonvar(Obj),!,functor_h(Obj,F,A).
+functor_h(M:_,F,A):- atom(M),!, ( M=F -> current_predicate(F/A) ; current_predicate(M:F/A)).
+functor_h(':-'(Obj),F,A):-!,functor_h(Obj,F,A).
+functor_h(':-'(Obj,_),F,A):-!,functor_h(Obj,F,A).
+functor_h(Obj,F,0):- string(Obj),!,atom_string(F,Obj).
+functor_h(Obj,Obj,0):-not(compound(Obj)),!.
+functor_h(Obj,F,A):-functor_catch(Obj,F,A).
 
 strip_f_module(_:P,FA):-nonvar(P),!,strip_f_module(P,F),!,F=FA.
 strip_f_module(P,PA):-atom(P),!,P=PA.

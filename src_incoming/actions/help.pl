@@ -45,7 +45,7 @@ commands_list(ListS):-findall(action_info(B,C,A),(get_type_action_help_commands_
 alpha_shorter(OrderO, P1,P2):-arg(1,P1,O1),arg(1,P2,O2),!,alpha_shorter_1(OrderO, O1,O2),!.
 alpha_shorter(OrderO, P1,P2):-alpha_shorter_1(OrderO, P1,P2),!.
 
-alpha_shorter_1(OrderO, P1,P2):-get_functor(P1,F1,A1),get_functor(P2,F2,A2),compare(OrderF,F1,F2), 
+alpha_shorter_1(OrderO, P1,P2):-functor_h(P1,F1,A1),functor_h(P2,F2,A2),compare(OrderF,F1,F2), 
  (OrderF \== '=' -> OrderO=OrderF ;
   (compare(OrderA,A1,A2), (OrderA \== '=' -> OrderO=OrderA ; compare(OrderO,P1,P2)))).
 

@@ -55,7 +55,7 @@ define_ft_0(Spec):- hooked_asserta(isa(Spec,formattype)),asserta_if_new(dbase_t(
 
 :-export(decl_type_safe/1).
 decl_type_safe(T):- compound(T),!.
-decl_type_safe(T):- ignore((atom(T),not(number(T)),decl_type(T))).
+decl_type_safe(T):- ignore((atom(T),not(never_type(T)),not(number(T)),decl_type(T))).
 
 :-export(assert_subclass/2).
 assert_subclass(O,T):-assert_subclass_safe(O,T).
@@ -176,6 +176,7 @@ isa_backchaing_v_nv(A,term):-nonvar(A),!.
 isa_backchaing_v_nv(_,var):-!.
 isa_backchaing_v_nv(A,T):-no_repeats([A],(transitive_subclass_or_same(AT,T),isa_asserted(A,AT))).
 
+:-export(isa_backchaing_0/2).
 isa_backchaing_0(A,T):-  var(A),nonvar(T),!,isa_backchaing_v_nv(A,T).
 isa_backchaing_0(A,T):-  var(A),!,var(T),!,isa_asserted(A,AT),transitive_subclass_or_same(AT,T).
 isa_backchaing_0(A,T):-  nonvar(T),isa_backchaing_nv_nv(A,T),!.
@@ -218,7 +219,7 @@ isa_asserted_0(I,T):-integer(I),!,member(T,[int,number,value]).
 isa_asserted_0(I,T):-number(I),!,member(T,[number,float,value]).
 isa_asserted_0(I,T):-atom(I),isa_w_inst_atom(I,T).
 isa_asserted_0(I,T):-hook:fact_always_true(isa(I,T)).
-isa_asserted_0(I,T):-mpred_prop(I,T),T\=mped_type(funknown).
+isa_asserted_0(I,T):-mpred_prop(I,T),T\=mped_type(_).
 isa_asserted_0(_,T):-var(T),!,fail.
 isa_asserted_0(I,formattype):-!,isa_w_type_atom(I,formattype).
 isa_asserted_0(I,type):-!,isa_w_type_atom(I,type).
@@ -262,6 +263,8 @@ cached_isa(I,T):-hotrace(isa_backchaing(I,T)).
 :- dynamic_multifile_exported never_type/1.
 :- dynamic_multifile_exported decl_type/1.
 
+never_type(explorer(player2)).
+
 type(dir).
 type(type).
 type(mpred).
@@ -303,7 +306,7 @@ into_single_class(A,A).
 :- export((transitive_subclass/2)).
 transitive_subclass(_,T):-T==formattype,!,fail.
 transitive_subclass(A,_):-A==formattype,!,fail.
-transitive_subclass(A,T):- bad_idea,!, into_single_class(A,AA), into_single_class(T,TT), fact_loop_checked(subclass(A,T),transitive_subclass_l_r(AA,TT)).
+transitive_subclass(A,T):- bad_idea,!, into_single_class(A,AA), into_single_class(T,TT), fact_loop_checked(subclass(A,T),transitive_P_l_r(dbase_t,subclass,AA,TT)).
 transitive_subclass(I,T):- stack_check,((thlocal:useOnlyExternalDBs,!);thglobal:use_cyc_database),
    fact_loop_checked(subclass(I,T),transitive_P_l_r(cyckb_t,genls,I,T)).
 transitive_subclass(A,T):- fact_loop_checked(subclass(A,T),transitive_P_l_r(dbase_t,subclass,A,T)).

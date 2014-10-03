@@ -86,6 +86,11 @@ shrink_clause( HB,HB).
 :- dynamic_multifile_exported label_type/2.
 :- dynamic_multifile_exported label_type_props/3.
 :- dynamic_multifile_exported mud_test/2.
+:- dynamic_multifile_exported mud_test/1.
+:- dynamic_multifile_exported mud_test/0.
+:- dynamic_multifile_exported mud_test_local/2.
+:- dynamic_multifile_exported mud_test_local/1.
+:- dynamic_multifile_exported mud_test_local/0.
 :- dynamic_multifile_exported now_unused/1.
 :- dynamic_multifile_exported term_specifier_text/2.
 :- dynamic_multifile_exported type_action_info/3.
@@ -103,7 +108,7 @@ shrink_clause( HB,HB).
 :- dynamic_multifile_exported((decl_coerce)/3).
 :- dynamic_multifile_exported((term_anglify/2,term_anglify_last/2, term_anglify_np/3,term_anglify_np_last/3)).
 :- dynamic_multifile_exported((update_charge/2,update_stats/2)).
-:- dynamic_multifile_exported(moo:ft_info/2).
+:- dynamic_multifile_exported(ft_info/2).
 
 :- dynamic_multifile_exported thglobal:use_cyc_database/0.
 
@@ -1110,11 +1115,11 @@ assertz_local_game_clause(Type,Head,Body):- must_det(assertz_if_new_clause(Head,
 
 special_wrapper_body(W):-get_body_functor(W,F,_),!,special_wrapper_functor(F).
 
-get_mpred_type(Head,Type):-get_functor(Head,F,A),!,get_mpred_type(Head,F,A,Type).
+get_mpred_type(Head,Type):-functor_h(Head,F,A),!,get_mpred_type(Head,F,A,Type).
 get_mpred_type(F,A,Type):-functor(P,F,A),get_mpred_type(P,F,A,Type).
 
 get_mpred_type(Head,F,A,Type):-atom(Head),mpred_arity(Head,A),!,dmsg(get_mpred_type(Head,F,A,Type)),get_mpred_type(Head,A,Type).
-get_mpred_type(Head,_,_,Type):-compound(Head),!,get_functor(Head,F,A),get_mpred_type4(Head,F,A,Type).
+get_mpred_type(Head,_,_,Type):-compound(Head),!,functor_h(Head,F,A),get_mpred_type4(Head,F,A,Type).
 get_mpred_type(_,F,A,Type):-atom(F),number(A),!,functor(Head,F,A),get_mpred_type4(Head,F,A,Type).
 get_mpred_type(Head,F,A,Type):-must(mpred_arity(F,A)),functor(Head,F,A),get_mpred_type4(Head,F,A,Type).
 
@@ -1222,13 +1227,13 @@ end_dynamic_reader:-
 inside_dynamic_reader :- prolog_load_context(file,Source),test_tl(thlocal:in_dynamic_reader(Source)),!.
 inside_dynamic_reader :- prolog_load_context(source,Source),test_tl(thlocal:in_dynamic_reader(Source)),!.
 
-user:term_expansion(CL,moo:was_imported_kb_content(inside_dynamic_reader,CL)):-not(thlocal:into_form_code), not((get_functor(CL,F),F=was_imported_kb_content)),
+user:term_expansion(CL,moo:was_imported_kb_content(inside_dynamic_reader,CL)):-not(thlocal:into_form_code), not((functor_h(CL,F),F=was_imported_kb_content)),
  % ==== why we assert
    not(is_clause_moo_special(CL)),inside_dynamic_reader,
 % ==== do it
    dmsg(assertz_inside_dynamic_reader(CL)),ignore(is_compiling_sourcecode),with_assertions(thlocal:adding_from_srcfile,must_det(add(CL))),!.
 
-user:term_expansion(CL,moo:was_imported_kb_content(is_clause_moo_special,CL)):-not(thlocal:into_form_code), not((get_functor(CL,F),F=was_imported_kb_content)),
+user:term_expansion(CL,moo:was_imported_kb_content(is_clause_moo_special,CL)):-not(thlocal:into_form_code), not((functor_h(CL,F),F=was_imported_kb_content)),
 % ==== why we assert
    is_clause_moo_special(CL),  not(inside_dynamic_reader), 
 % ==== do it
@@ -1257,4 +1262,11 @@ agent_text_command(_Agent,_Text,_AgentTarget,_Cmd):-fail.
 %:- rescan_missing_stubs.
 %:- rescan_mpred_props.
 
+
+
+:-ensure_loaded(logicmoo(planner/dbase_i_hyhtn)).
+
+% ================================================
+% MPRED_PROP System
+% ================================================
 

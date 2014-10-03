@@ -34,7 +34,7 @@ npc_tick:-
 join_npcs_long_running.
 
 % skip manually controled agents
-npc_controller(simple_world_agent_plan,Who):- isa(Who,activeAgent),not(thglobal:agent_message_stream(Who,_,_)).
+npc_controller(simple_world_agent_plan,Who):- isa(Who,activeAgent),not(thglobal:agent_message_stream(Who,_,_,_)).
 
 tick_controller(simple_world_agent_plan,Who):- tick(Who).
 

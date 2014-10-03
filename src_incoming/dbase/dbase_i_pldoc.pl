@@ -84,7 +84,7 @@ showall(Call):- doall(show_call(Call)).
 findallCall(Args,Functor,ICallL,ICallLL):-  findall(Args,call(Functor,Args),ICallL),findall(Functor:C,member(C,ICallL),ICallLL).
 
 sreq(Call):-
- into_mpred_form(Call,MCall),get_functor(MCall,MF), findall(P,pred_info(MF,P),Props),dmsg(props=Props),
+ into_mpred_form(Call,MCall),functor_h(MCall,MF), findall(P,pred_info(MF,P),Props),dmsg(props=Props),
    dmsg(call=Call),dmsg(call=MCall),
  % some calls remember deduced fasts and we need to prevent that
  with_assertions(readOnlyDatabases,

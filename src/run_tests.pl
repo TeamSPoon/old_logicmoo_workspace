@@ -50,56 +50,55 @@ was_runs_tests_pl:-is_startup_file('run_tests.pl').
 % [Optionaly] Add some game content
 :- if_flag_true(was_runs_tests_pl, load_game(logicmoo('rooms/startrek.all.plmoo'))).
 
-defined_local_test:-
+moo:mud_test_local:-
    test_name("tests to see if we have: player1"),
    test_true(must_det((foc_current_player(Agent),dmsg(foc_current_player(Agent))))).
 
-defined_local_test:-
+moo:mud_test_local:-
    test_name("tests to see if we have: atloc"),
    test_true((foc_current_player(Agent),must_det((atloc(Agent,Where),dmsg(atloc(Agent,Where)))))).
 
-defined_local_test:- 
+moo:mud_test_local:- 
    test_name("tests to see if we have: atloc"),
    test_true((foc_current_player(Agent),must_det((atloc(Agent,Where),dmsg(atloc(Agent,Where)))))).
 
-defined_local_test:- 
+moo:mud_test_local:- 
    test_name("tests to see if our clothing doesnt: atloc"),
    test_false(not(atloc('ArtifactCol1003-Gold-Uniform775',_X))).
-
     
-defined_local_test:- 
+moo:mud_test_local:- 
    foc_current_player(Agent),
    test_name("tests to see if we have: argIsas on charge"),
    test_true(correctArgsIsa(charge(Agent,_),_)).
 
-defined_local_test:- 
+moo:mud_test_local:- 
    test_name("tests to see if we have: singleValued on movedist"),
    must(add(movedist(explorer(player1),3))),
    test_true(must((findall(X,movedist(explorer(player1),X),L),length(L,1)))).
 
-defined_local_test:-
+moo:mud_test_local:-
    test_name("tests to see if we have: localityOfObject"),
    test_true((foc_current_player(Agent),must_det((localityOfObject(Agent,Where))),dmsg(localityOfObject(Agent,Where)))).
 
-defined_local_test:- 
+moo:mud_test_local:- 
       test_name("nudity test"), 
        test_true_req(wearsClothing(explorer(player1), 'ArtifactCol1003-Gold-Uniform775')).
 
-defined_local_test:- 
+moo:mud_test_local:- 
       test_name("genlInverse test"), 
        test_true_req(possess(explorer(player1), 'ArtifactCol1003-Gold-Uniform775')).
 
-defined_local_test:- 
+moo:mud_test_local:- 
    test_name("Tests our action templates"), doall((get_type_action_templates(Templates),dmsg(get_type_action_templates(Templates)))).
 
-defined_local_test:-
+moo:mud_test_local:-
    test_name("tests to see if 'food' can be an item"),
       test_true(parseIsa0(item, _G537410, [food], [])).
 
-defined_local_test:-call_mpred(show_room_grid('Area1000')).
+moo:mud_test_local:-call_mpred(show_room_grid('Area1000')).
 
 % ---------------------------------------------------------------------------------------------
-defined_local_test:-
+moo:mud_test_local:-
   test_name("Tests our types to populate bad_instance/2 at level 5"),
   retractall(is_instance_consistent(_,_)),
   retractall(bad_instance(_,_)),
@@ -126,7 +125,7 @@ hook:hooked_check_consistent(Obj,20):-must(object_string(_,Obj,0-5,String)),dmsg
 % ---------------------------------------------------------------------------------------------
 
 
-moo:mud_test("local sanity tests", doall(defined_local_test)).
+moo:mud_test("local sanity tests", doall(moo:mud_test_local)).
 
 
 :- moo_hide_childs(dbase:record_on_thread/2).
@@ -135,7 +134,7 @@ moo:mud_test("local sanity tests", doall(defined_local_test)).
 :- if_flag_true(was_runs_tests_pl, at_start(run_setup)).
 
 % the real tests now (once)
-now_run_local_tests:- doall(defined_local_test).
+now_run_local_tests:- doall(moo:mud_test_local).
 :- if_flag_true(was_runs_tests_pl,at_start(must_det(run_mud_tests))).
 
 % the local tests each reload (once)

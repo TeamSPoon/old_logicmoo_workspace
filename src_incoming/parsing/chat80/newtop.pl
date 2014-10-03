@@ -225,10 +225,11 @@ report(Item,Label,Time,Mode) :- thlocal:tracing80, !,
 report(_,_,_,_).
 
 
-call_with_limits(Copy):-call_with_time_limit(10,call_with_depth_limit(call_with_inference_limit(Copy,10000,_),500,_)).
+call_with_limits(Copy):- (A=_,call_with_limits0(((call(Copy),A=completed))), (A==completed -> true; (trace,Copy))).
+call_with_limits0(Copy):-call_with_time_limit(10,call_with_depth_limit(call_with_inference_limit(Copy,10000,_),500,_)).
 
-safely_call_ro(Call):-copy_term(Call,Copy),catchv(call_with_limits(Copy),E,dmsg(error_safely_call(E,in,Copy))).
-safely_call(Call):-copy_term(Call,Copy),catchv((Copy,Call=Copy),E,dmsg(error_safely_call(E,in,Copy))).
+safely_call_ro(Call):-copy_term(Call,Copy),catchv(call_with_limits(Copy),E,(dmsg(error_safely_call(E,in,Copy)),!,fail)).
+safely_call(Call):-copy_term(Call,Copy),catchv((Copy,Call=Copy),E,(dmsg(error_safely_call(E,in,Copy)),!,fail)).
 
 report_item(none,_).
 report_item(_,Var):-var(Var),!,write('FAILED'),nl.
@@ -261,11 +262,16 @@ quote_amp(R) :-
 
 logic(S0,S) :-
    i_sentence(S0,S1),
-   clausify(S1,S2),
-   simplify(S2,S).
+   clausify80(S1,S2),
+   once(simplify(S2,S)),!.
 
-simplify(C,C0):-dmsg(var_simplify(C,C0)),fail.
-simplify(C,C):-var(C),!.
+logic(S0,S) :- 
+  thlocal:chat80_interactive,plt,
+   must((i_sentence(S0,S1),
+   clausify80(S1,S2),
+   simplify(S2,S))),!.
+
+simplify(C,C0):-var(C),dmsg(var_simplify(C,C0)),!,fail.
 simplify(C,(P:-R)) :- !,
    unequalise(C,(P:-Q)),
    simplify(Q,R,true).

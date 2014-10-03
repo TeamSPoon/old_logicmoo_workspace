@@ -14,8 +14,6 @@ was_run_dbg_pl:-is_startup_file('run_debug.pl').
 % run_tests includes run_common 
 :-include(run_tests).
 
-:- debug.
-
 % [Optionaly] re-define load_default_game
 % load_default_game:- load_game(logicmoo('rooms/startrek.all.plmoo')).
 
@@ -25,82 +23,6 @@ was_run_dbg_pl:-is_startup_file('run_debug.pl').
 % starts in thread (the the above was commented out)
 %:- at_start(start_servers).
 % commented out except on run
-
-start_boxer:-
-   threads,
-   ensure_loaded(logicmoo(candc/parser_boxer)),
-   % make,   
-   at_start(prolog_repl).
-
-:-thread_local thlocal:test1234_TRUE/1.
-
-thlocal:test1234_TRUE(5).
-
-:-thread_local thlocal:test1234_OFF/1.
-
-thlocal:test1234_OFF(_):-!,fail.
-
-:-thread_local thlocal:test1234_FALSE/1.
-
-
-
-:- export(tlocals/0).
-:- module_transparent(tlocals/0).
-tlocals:- 
-   tlocals(false),
-   tlocals(all).
-
-tlocals(SHOW):- 
-   doall((current_module(M),M\==thglobal,M\==thlocal,current_predicate(M:F/A),functor(P,F,A),predicate_property(M:P,thread_local),tlocal(M,F,A,SHOW))),
-   doall(tlocal(thglobal,SHOW)),
-   doall(tlocal(thlocal,SHOW)),!.
-
-:- meta_predicate_transparent(tlocal/2).
-tlocal(M,ON):- forall(current_predicate(M:F/A), tlocal(M,F,A,ON)).
-
-:- meta_predicate_transparent(tlocal/4).
-tlocal(M,F,A,ON):- functor(P,F,A), not(predicate_property(M:P,imported_from(_))), once((tlocal_0(M,P,ON,TF),must_det(tlocal_show(M,F,A,P,ON,TF)))).
-
-
-:- meta_predicate_transparent(tlocal_0/4).
-tlocal_0(M,P,ON,TF):- ccatch(tlocal_1(M,P,ON,TF),ERROR,(dmsg(ERROR),
-       ((contains_var(error,ON);contains_var(all,ON)), 
-         TF=' .???. '(M:P,ERROR)))),!.     
-
-:- meta_predicate_transparent(tlocal_1/4).
-tlocal_1(M,P,ON,TF):- '@'(M:call(M:P),M),!,
-        (contains_var(on,ON),contains_var(true,ON);contains_var(all,ON)),!,
-         TF=' .XXX. '(M:P),!.
-tlocal_1(M,P,ON,TF):-  predicate_property(M:P,number_of_clauses(N)),N>0,!, 
-        (contains_var(off,ON);contains_var(all,ON)),!,
-         nth_clause(P, 1, Ref),clause(Head, Body, Ref),shrink_clause(Head,Body,FCL),
-         TF=' .OFF. '(M:FCL),!.
-
-:- meta_predicate_transparent(tlocal_2/4).
-tlocal_2(M,P,ON,TF):- tlocal_1(M,P,ON,TF),!.
-tlocal_2(M,P,ON,TF):-
-        (contains_var(false,ON);contains_var(all,ON)),!,
-         TF=' . - . '(M:P),!.
-
-:- meta_predicate_transparent(shrink_clause/3).
-shrink_clause(P,Body,Prop):- (Body==true-> Prop=P ; (Prop= (P:-Body))).
-   
-:- meta_predicate_transparent(tlocal_show/6).
-tlocal_show(M,F,A,P,_ON,TF):-
-   copy_term(P,PL),
-   must_det((predicate_property(M:P,number_of_clauses(_)) -> findall(Prop,(clause(M:PL,Body),shrink_clause(PL,Body,Prop)),Props1);Props1=[no_clause_Access])),
-   findall(' ++'(Prop),mpred_prop(F,Prop),Props2),
-   findall(' -'(yes(Prop)),(predicate_property(M:P,Prop),not(member(Prop,[number_of_rules(0),number_of_clauses(0),/*thread_local,*/volatile,dynamic,visible,interpreted]))),Props3),
-   findall(' -'(not(Prop)),(member(Prop,[number_of_clauses(_),thread_local,volatile,dynamic,visible,exported,interpreted]),not(predicate_property(M:P,Prop))),Props4),   
-   flatten([[Props1],[Props2],[Props3],[Props4],[TF/A]],PropsR),
-   numbervars(PropsR,0,_,[singletons(true),attvars(skip)]),
-   reverse(PropsR,Props),
-   fmt(Props),!.
-
-
-
-:-export(prolog_repl/0).
-prolog_repl:- nl,fmt("Press Ctrl-D to start the mud!"),nl,catch(tlocals,E,dmsg(tlocals==E)),prolog.
 
 
 debug_repl_w_cyc(Module,CallFirst):- !,         
@@ -127,21 +49,21 @@ debug_repl_m(Module,CallFirst):-
         context_module(CM),
           call_cleanup(
             (module(Module),
-              debug_repl(Module,CallFirst)),
+              debug_repl_wo_cyc(Module,CallFirst)),
             module(CM)).
 
 % [Required] Defines debug80
 debug80:- moo:parser_chat80_module(M),debug_repl_wo_cyc(M,M:t1).
 
 % [Optionaly] Allows testing/debug of the chat80 system (withouyt loading the servers)
-:- parser_chat80:t1.
+% :- parser_chat80:t1.
 
 % [Required] Defines debug_e2c
-debug_e2c:- debug_repl(parser_e2c,cache_the_posms).
+debug_e2c:- debug_repl_wo_cyc(parser_e2c,cache_the_posms).
 
 
 % [Required] Defines debug_talk
-debug_talk:- debug_repl(parser_talk,t3).
+debug_talk:- debug_repl_wo_cyc(parser_talk,t3).
 
 
 % [Optional] This loads boxer
@@ -160,16 +82,15 @@ debug_talk:- debug_repl(parser_talk,t3).
 % :- debug_e2c.
 
 % the local tests each reload (once)
-now_run_local_tests_dbg :- doall(defined_local_test).
-:- if_flag_true(was_run_dbg_pl, now_run_local_tests_dbg).
+now_run_local_tests_dbg :- doall(moo:mud_test_local).
 
 :-must_det(show_call((atloc('NpcCol1012-Ensign728',X),nonvar(X)))).
 
 % nasty way i debug the parser
-:- do_player_action('who').
+moo:mud_test_local :- do_player_action('who').
 % :-repeat, trace, do_player_action('who'),fail.
 
-% :-do_player_action("scansrc").
+% moo:mud_test_local :-do_player_action("scansrc").
 
 % :-trace.
 
@@ -177,19 +98,23 @@ now_run_local_tests_dbg :- doall(defined_local_test).
 % [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
 % :- register_timer_thread(npc_ticker,30,npc_tick).
 
-:-kellerStorage:kellerStorageTestSuite.
+moo:mud_test_local :-kellerStorage:kellerStorageTestSuite.
 
 % :-curt80.
 
 % the real tests now (once)
-:- if_flag_true(was_run_dbg_pl,at_start(must_det(run_mud_tests))).
+% moo:mud_test_local :- if_flag_true(was_run_dbg_pl,at_start(must_det(run_mud_tests))).
+
+% :- if_flag_true(was_run_dbg_pl, doall(now_run_local_tests_dbg)).
 
 % more tests even
-:-do_player_action("look").
-:-forall(localityOfObject(O,L),dmsg(localityOfObject(O,L))).
+moo:mud_test_local :-do_player_action("look").
+moo:mud_test_local :-forall(localityOfObject(O,L),dmsg(localityOfObject(O,L))).
 
 moo:must_test("tests to see if poorly canonicalized code (unrestricted quantification) will not be -too- inneffienct",
    forall(atloc(O,L),dmsg(atloc(O,L)))).
+
+
 
 
 % [Optionaly] Allows testing/debug of the chat80 system (withouyt loading the servers)
@@ -216,20 +141,21 @@ true.
 cmdresult(statistics,true)
 
 */
-
+:-forall(current_prolog_flag(N,V),dmsg(N=V)).
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
-
-:-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,look)).
-:-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,chat80)).
+% :-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,who)).
+% :-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,look)).
+% :-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,chat80)).
 :- if_flag_true(was_run_dbg_pl, at_start(run)).
 
 
 % So scripted versions don't just exit
-:- if_flag_true(was_run_dbg_pl,at_start(prolog)).
+%:- if_flag_true(was_run_dbg_pl,at_start(prolog)).
 
 %:- kill_term_expansion.
 %:- prolog.
 
+% :-proccess_command_line.
 
 /*
 

@@ -9,6 +9,10 @@
 :- portray_text(true).
 
 :-module(user).
+
+:- multifile( entailment:rdf /3 ).
+
+
 :-context_module(CM),assert(startup_mod:loading_from_cm(CM)).
 create_module(M):-context_module(CM),module(M),asserta(M:this_is_a_module(M)),writeq(switching_back_to_module(CM)),module(CM).
 :-create_module(user).
@@ -17,10 +21,19 @@ create_module(M):-context_module(CM),module(M),asserta(M:this_is_a_module(M)),wr
 :-create_module(thglobal).
 :-create_module(moo).
 
+
 :-module_transparent moo:parser_chat80_module/1.
 :-multifile moo:parser_chat80_module/1.
 :-export((moo:parser_chat80_module/1)).
 moo:parser_chat80_module(moo).
+
+
+:-export(prolog_repl/0).
+prolog_repl:- nl,fmt("Press Ctrl-D to start the mud!"),nl,catch(tlocals,E,dmsg(tlocals==E)),prolog.
+
+:- set_prolog_flag(gui,false).
+:- set_prolog_flag(history,1000).
+:- set_prolog_flag(history,1000).
 
 :-export(within_user/1).
 :-export(is_startup_file/1).
@@ -67,6 +80,12 @@ startup_mod:if_version_greater(V,Goal):- current_prolog_flag(version,F), ((F > V
 % [Optionaly 1st run] tell where ClioPatria is located and restart for the 2nd run
 %:- set_setting(cliopatria_binding:path, '/devel/ClioPatria'), save_settings('moo_settings.db').
 
+start_boxer:-
+   threads,
+   ensure_loaded(logicmoo(candc/parser_boxer)),
+   % make,   
+   at_start(prolog_repl).
+
 
 % We don't start cliopatria we here. We have to manually start
 %  with  ?- start_servers.
@@ -86,12 +105,9 @@ start_servers :- startup_mod:if_version_greater(70111,thread_work).
 % [Required] load and start mud
 :- within_user(ensure_loaded(logicmoo(vworld/moo_startup))).
 
-% [Manditory] define load_default_game
-load_default_game:- load_game(logicmoo('rooms/startrek.all.plmoo')).
-
 startup_mod:run_setup_now:-
    within_user((
-   load_default_game
+   load_game(logicmoo('rooms/startrek.all.plmoo'))
    % TO UNDO register_timer_thread(npc_ticker,90,npc_tick)
    )).
 

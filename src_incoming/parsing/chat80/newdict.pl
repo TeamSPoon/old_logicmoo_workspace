@@ -69,9 +69,9 @@ verb_type_to_kind(Kind,Kind):-must(not(Kind=have)).
 verb_type_db(Verb,Type):-one_must(no_repeats(verb_type_db_0(Verb,Type)),verb_type_db_1(Verb,Type)).
 
 verb_type_db_1( Look,main+iv):- iv_finsg(_Looks, Look),!.
-verb_type_db_1(_Verb,main+tv).
+verb_type_db_1(Verb,main+ditrans(_)):-!, plt2, talk_db(iv,Verb,_,_,_,_). % ditrans(_)
+verb_type_db_1(_Verb,main+tv):-!.
 verb_type_db_1(_Verb,main+iv).
-verb_type_db_1(Verb,main+ditrans(_)):- plt2, talk_db(iv,Verb,_,_,_,_). % ditrans(_)
 
 txt_there_db(there,there).
 txt_not_db(not,not).
@@ -326,6 +326,17 @@ verb_form_db(done,do,past+part,_).
 
 verb_type_db_0(do,aux+ditrans(_)).
 
+
+modal(can,could,able).
+
+:-style_check(-singleton).
+regular_pres_db(Can):-modal(Can,Could,Able).
+verb_form_db(Could,Can,pres+fin,3+sg):-modal(Can,Could,Able).
+verb_form_db(Could,Can,past+fin,_):-modal(Can,Could,Able).
+verb_form_db(Can,Can,pres+part,_):-modal(Can,Could,Able).
+verb_form_db(Able,Can,past+part,_):-modal(Can,Could,Able).
+% verb_type_db_0(Can,aux+ditrans(_)):-modal(Can,Could,Able).
+:-style_check(+singleton).
 % =================================================================
 % PRONOUN DB
 % =================================================================
@@ -388,7 +399,7 @@ clause_head_arg1_wrong(Call):-arg(1,Call,LFType),arg(2,Call,Word),clause_head_ar
 
 clause_head_arg1_wrong(_,Word,LFType):- Word==river,!,LFType \== thing.
 clause_head_arg1_wrong(_,Word,LFType):- Word==country,!,LFType \== thing.
-clause_head_arg1_wrong(_,Word,LFType):- Word==percentage,!.
+clause_head_arg1_wrong(_,Word,_LFType):- Word==percentage,!.
 clause_head_arg1_wrong(_Call,_Word,_LFType):-!,fail.
 /*
 clause_head_arg1_wrong(Call,Word,LFType):- must(nonvar(LFType)),
@@ -643,7 +654,7 @@ hasPropertyValue(SomeType,P,SomeVType):-mpred_arity(P,A),A>=2,argIsa_call(P,1,So
 hasPropertyValue(Type,P,Area) :- deduce_subj_obj_LF(property,Area,_Measure&Area,_X,feature&TYPELIST,_Y,Pred),deepestType(TYPELIST,Type),get_1st_order_functor(Pred,P),deepestType(TYPELIST,Type).
 
 get_1st_order_functor(Pred,P):-not(compound(Pred)),!,P=Pred.
-get_1st_order_functor(Pred,P):-get_functor(Pred,F),(is_2nd_order_holds(F)->((arg(1,Pred,A),!,get_1st_order_functor(A,P)));P=F).
+get_1st_order_functor(Pred,P):-functor_h(Pred,F),(is_2nd_order_holds(F)->((arg(1,Pred,A),!,get_1st_order_functor(A,P)));P=F).
 
 /* THAT IS HAD */
 /*

@@ -210,10 +210,10 @@ was_isa(X,I,C):-compound(X),functor(X,C,1),!,arg(1,X,I),maybe_typep(C/1),not(pro
 :-export(prolog_side_effects/1).
 prolog_side_effects(G):-var(G),!,fail.
 prolog_side_effects(F/A):- ((integer(A);current_predicate(F/A)),functor(G,F,A)), prolog_side_effects(G).
-prolog_side_effects(G):-get_functor(G,F),mpred_prop(F,sideEffect),!.
+prolog_side_effects(G):-functor_h(G,F),mpred_prop(F,sideEffect),!.
 prolog_side_effects(G):-predicate_property(G,number_of_rules(N)),N >0,clause(G,(B,_)),compound(B),!.
 prolog_side_effects(G):-predicate_property(G,exported),!.
-prolog_side_effects(G):-get_functor(G,F),mpred_prop(F,prologBuiltin),!.
+prolog_side_effects(G):-functor_h(G,F),mpred_prop(F,prologBuiltin),!.
 prolog_side_effects(G):-mpred_prop(G,mped_type(callable(prologOnly))),!.
 prolog_side_effects(P):-atom(P),!,prolog_side_effects(P/_).
 
@@ -221,7 +221,7 @@ prolog_side_effects(P):-atom(P),!,prolog_side_effects(P/_).
 :-export(maybe_typep/1).
 maybe_typep(F/A):- ((integer(A);current_predicate(F/A)),functor(G,F,A)), maybe_typep(G),!.
 maybe_typep(G):-prolog_side_effects(G),!,fail.
-maybe_typep(G):-get_functor(G,F),(mpred_prop(F,type);typeDeclarer(F)),!. %  ;type(F);formattype(F)
+maybe_typep(G):-functor_h(G,F),(mpred_prop(F,type);typeDeclarer(F)),!. %  ;type(F);formattype(F)
 maybe_typep(F):-atom(F),!,maybe_typep(F/_).
 
 
@@ -525,7 +525,7 @@ retractall_cloc(M,C):-database_real(retractall,M:C).
 
 database_real(P,C):- 
     copy_term(C,CC),
-      ignore((once((into_assertable_form(CC,DB), get_functor(C,CF),get_functor(DB,DBF))),DBF \== CF, 
+      ignore((once((into_assertable_form(CC,DB), functor_h(C,CF),functor_h(DB,DBF))),DBF \== CF, 
         dmsg(warn_into_assertable_form(P,C,DB)),show_call_failure(debugOnError(call(P,DB))))),
       show_call_failure(debugOnError(call(P,C))).
 

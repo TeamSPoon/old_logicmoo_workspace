@@ -118,7 +118,7 @@ chat80 :- with_assertions(tracing80,
 :- context_module(CM),load_plus_xg_file(CM,logicmoo(parsing/chat80/'lex.xg')).
 
 :- compile_xg_clauses.
-:- xg_listing('newg.pl').
+% :- xg_listing('newg.pl').
 
 % :- decl_mpred_hybrid(person/1).    
 

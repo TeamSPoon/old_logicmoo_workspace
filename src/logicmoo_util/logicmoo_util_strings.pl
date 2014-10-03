@@ -573,6 +573,7 @@ str_contains_all0([A|Atoms],String):-
       sub_string(String,Aft,_,0,SubString),!,
       str_contains_all0(Atoms,SubString).
 
+
 atoms_of(Var,[]):- (var(Var);Var==[]),!.
 atoms_of(':',[]).
 atoms_of('moo',[]).
@@ -582,7 +583,7 @@ atoms_of(':-',[]).
 atoms_of('$VAR',[]):-!.
 atoms_of(Atom,[]):-number(Atom),!.
 atoms_of(Atom,[Atom]):-atomic(Atom),!.
-atoms_of([H|T],L):-atoms_of(H,HL),atoms_of(T,TL),append(HL,TL,L),!.
+atoms_of([H|T],L):-!,atoms_of(H,HL),atoms_of(T,TL),append(HL,TL,L),!.
 atoms_of(C,L):-C=..CL,atoms_of(CL,L),!.
 
 sort_by_strlen(List,Sorted):-predsort(longest_string,List,Sorted).

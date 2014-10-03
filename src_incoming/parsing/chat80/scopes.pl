@@ -19,25 +19,26 @@
 
 */
 
-clausify(question(V0,P),(answer80(V):-B)) :-
+clausify80(question(V0,P),(answer80(V):-B)) :-
    quantify(P,Quants,[],R0),
    split_quants(question(V0),Quants,HQuants,[],BQuants,[]),
    chain_apply(BQuants,R0,R1),
    head_vars(HQuants,B,R1,V,V0).
 
-clausify(assertion(V0,P),(assertion80(V):-B)) :-
+clausify80(assertion(V0,P),(assertion80(V):-B)) :- nonvar(P),
    quantify(P,Quants,[],R0),
    split_quants(question(V0),Quants,HQuants,[],BQuants,[]),
    chain_apply(BQuants,R0,R1),
    head_vars(HQuants,B,R1,V,V0).
 
+quantify(PQ,Above,Right,PQT):-var(PQ),dmsg(var_quantify(PQ,Above,Right,PQT)),!,fail.
 
-quantify(quant(Det,X,Head,Pred,Args,Y),Above,Right,true) :-
+quantify(quant(Det,X,Head,Pred,Args,Y),Above,Right,true) :- nonvar(Pred),
    close_tree(Pred,P2),
    quantify_args(Args,AQuants,P1),
    split_quants(Det,AQuants,Above,[Q|Right],Below,[]),
    pre_apply(Head,Det,X,P1,P2,Y,Below,Q).
-quantify(conj(Conj,LPred,LArgs,RPred,RArgs),Up,Up,P) :-
+quantify(conj(Conj,LPred,LArgs,RPred,RArgs),Up,Up,P) :-  nonvar(LPred),
    close_tree(LPred,LP0),
    quantify_args(LArgs,LQs,LP1),
    chain_apply(LQs,(LP0,LP1),LP),

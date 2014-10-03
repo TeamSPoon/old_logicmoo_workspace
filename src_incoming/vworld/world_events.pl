@@ -30,7 +30,7 @@ raise_location_event(Where,Event):- forall(atlocNear(Whom,Where),ignore(show_eve
 
 show_event_to(Whom,Event):-subst(Event,reciever,you,NewEventM),subst(NewEventM,Whom,you,NewEvent),direct_to_agent(Whom,NewEvent),!.
 direct_to_agent(Whom,NewEvent):- 
-      ensure_agent_stream(Whom,Session,Output),
+      get_agent_stream(Whom,Session,Output),
       with_assertions(thlocal:session_agent(Session,Whom),ignoreOnError((with_output_to_stream(Output,fmt(NewEvent))))),!.
 
 direct_to_agent(_Whom,_NewEvent):-!.
@@ -39,8 +39,8 @@ direct_to_agent(Whom,NewEvent):- dmsg(could_not(direct_to_agent(Whom,NewEvent)))
 
 
 %%:-export(direct_to_agent/2).
-ensure_agent_stream(Whom,Input,Output):- thglobal:agent_message_stream(Whom,Input,Output),is_stream(Input),is_stream(Output),!.
-ensure_agent_stream(Whom,_Input,_Output):-ignore(retract(thglobal:agent_message_stream(Whom,_,_))),!,fail.
+get_agent_stream(Whom,Input,Output):- thglobal:agent_message_stream(Whom,_,Input,Output),is_stream(Input),is_stream(Output),!.
+get_agent_stream(Whom,_Input,_Output):-ignore(retract(thglobal:agent_message_stream(Whom,_,_,_))),!,fail.
 
 :-export(deliverable_location_events/3).
 

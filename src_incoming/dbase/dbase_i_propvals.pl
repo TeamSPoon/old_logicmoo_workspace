@@ -106,7 +106,7 @@ create_random(Type,Value,Test):- copy_term(create_random(Type,Value,Test),create
    hook:create_random_instance(RType,RValue,RTest),
    checkAnyType(query(_,_),RValue,Type,Value),must_det(Test).
 create_random(Type,Value,Test):- atom(Type),atom_concat('random_',Type,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),Fact,Test,!.
-create_random(Type,Value,Test):- compound(Type),get_functor(Type,F),isa(F,_),atom_concat('random_',F,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),Fact,Test,!.
+create_random(Type,Value,Test):- compound(Type),functor_h(Type,F),isa(F,_),atom_concat('random_',F,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),Fact,Test,!.
 create_random(Type,Value,Test):- findall(V,(isa_backchaing(V,Type)),Possibles),Possibles\=[],randomize_list(Possibles,Randomized),!,member(Value,Randomized),Test,!.
 create_random(Type,Value,Test):- trace_or_throw(failed(create_random(Type,Value,Test))).
 

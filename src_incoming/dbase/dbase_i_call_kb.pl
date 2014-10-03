@@ -3,11 +3,11 @@
 :-module(dbase_i_call_kb,[]).
 
 
-
+:- dynamic(assertion_f/1).
 :- export(kb_f/1).
 kb_f(X):-assertion_f(X).
 
-
+/*
 get_props(TRUTH,VARS,missing,VARSP):-!,get_props(TRUTH,VARS,notmissing,[_|VARSP]),!.
 get_props(':TRUE-DEF',VARS,MT,[amt(MT)|VARSP]):-get_varsp(VARS,VARSP),!.
 get_props(':FALSE-DEF',VARS,MT,[amt(MT),truth(':FALSE')|VARSP]):-get_varsp(VARS,VARSP),!.
@@ -27,6 +27,8 @@ big_kb_ASSERTION(PLIST,[dir(DIR),refcl(A1437)|PROPS]):- 'ASSERTION'(TRUTH, _DNF,
 % get_assertions(PLIST,PROPS):-big_kb_ASSERTION(PLISTIn,PROPS),nv1000(PLISTIn-PROPS),fix_sentence(PLISTIn,PLIST).
 get_assertions(PLIST,PROPS):-tiny_kb_ASSERTION(PLISTIn,PROPS),nv1000(PLISTIn-PROPS),fix_sentence(PLISTIn,PLIST).
 get_assertions(PLIST,PROPS):-between(2,19,X),length(PLISTIn,X),kbp_t_list(PLISTIn,PROPS,_),nv1000(PLISTIn-PROPS),fix_sentence(PLISTIn,PLIST).
+
+*/
 
 nv1000(S):-numbervars(S,100,_,[singletons(true),attvar(bind)]).
 

@@ -95,10 +95,12 @@ current_agent(PIn):-get_session_id(O),thlocal:session_agent(O,P),!,P=PIn.
 current_agent_or_var(P):- once(current_agent(PIn)),P=PIn,!.
 current_agent_or_var(_).
 
-foc_current_player(P):- current_agent(P),!.
-foc_current_player(P):- get_session_id(O),generate_new_player(P), !, asserta(thlocal:session_agent(O,P)),assert_isa(P,human_player),must_det(create_agent(P)).
+foc_current_player(P):- current_agent(P),nonvar(P),!.
+foc_current_player(P):- get_session_id(O),generate_new_player(P), !,
+  retractall((thlocal:session_agent(O,P))),
+  asserta(thlocal:session_agent(O,P)),assert_isa(P,human_player),must_det(create_agent(P)).
 
-generate_new_player(P) :- gensym(player,N),P=explorer(N),assert_isa(P,explorer),assert_isa(P,player).
+generate_new_player(P) :- must((gensym(player,N),P=explorer(N),assert_isa(P,explorer),assert_isa(P,player),assert_isa(P,agent))).
 
 
 

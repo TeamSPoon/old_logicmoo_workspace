@@ -2,6 +2,12 @@
 /** <module> An Implementation a MUD server in SWI-Prolog
 
 */
+
+
+:-redefine_system_predicate(system:halt).
+:-abolish(system:halt,0).
+system:halt:- format('the halting problem is now solved!').
+
 :-include(run_common).
 
 :- catch(noguitracer,_,true).
