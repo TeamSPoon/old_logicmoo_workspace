@@ -8,6 +8,13 @@
 */
 :- module(moo_loader, []).
 
+:-dynamic(registered_game_file/1).
+:-export(declare_load_game/1).
+declare_load_game(File):-asserta_if_new(registered_game_file(File)).
+
+:-export(load_game_files/0).
+load_game_files :- forall(registered_game_file(File),load_game(File)).
+
 :-dynamic thglobal:current_world/1.
 thglobal:current_world(current).
 

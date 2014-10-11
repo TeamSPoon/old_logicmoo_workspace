@@ -48,7 +48,7 @@ was_runs_tests_pl:-is_startup_file('run_tests.pl').
 %:- at_start(start_servers)
 
 % [Optionaly] Add some game content
-:- if_flag_true(was_runs_tests_pl, load_game(logicmoo('rooms/startrek.all.plmoo'))).
+:- if_flag_true(was_runs_tests_pl, declare_load_game(logicmoo('rooms/startrek.all.plmoo'))).
 
 moo:mud_test_local:-
    test_name("tests to see if we have: player1"),

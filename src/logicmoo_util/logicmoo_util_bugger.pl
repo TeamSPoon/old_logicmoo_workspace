@@ -402,8 +402,29 @@ current_next_frames(_,_,_,[]).
 trace_or(E):- dumpST,dmsg(E),trace,dtrace,!.
 trace_or(E):- trace,E.
 
+has_gui_debug :- getenv('DISPLAY',NV),NV\==''.
 
 
+:-export(set_no_debug/0).
+
+set_no_debug:- 
+   retractall(ifCanTrace),
+   retractall(ifWontTrace),asserta(ifWontTrace),
+   notrace, nodebug,
+   set_prolog_flag(report_error,false),   
+   set_prolog_flag(debug_on_error,false),
+   set_prolog_flag(debug, false),   
+   set_prolog_flag(query_debug_settings, debug(false, false)),
+   catch(noguitracer,_,true),
+   set_prolog_flag(gui_tracer, false),
+   leash(-all),
+   visible(-cut_call),!.
+
+
+
+:- export(nodebugx/1).
+:- module_transparent(nodebugx/1).
+nodebugx(X):- set_no_debug,notrace(X).
 
 cnotrace:-notrace.
 
@@ -1429,11 +1450,20 @@ with_assertions( not(With),Call):- !,with_no_assertions(With,Call).
 with_assertions( -With,Call):- !,with_no_assertions(With,Call).
 with_assertions( +With,Call):- !,with_assertions(With,Call).
 
+with_assertions(op(N,XFY,OP),Call):-!,
+     (current_op(PN,XFY,OP);PN=0),!,
+     (PN==N -> Call ; setup_call_cleanup(op(N,XFY,OP),Call,op(PN,XFY,OP))).
+
 % with_assertions(THead,Call):- functor(THead,F,_),b_setval(F,THead).
-with_assertions(THead,Call):- 
+
+with_assertions(THead,Call):- ground(THead),!,
+ must_det(to_thread_head(THead,M,_Head,WithA)),
+   ( M:WithA -> Call ; setup_call_cleanup(M:asserta(WithA),Call,must_det(M:retract(WithA)))).
+
+with_assertions(THead,Call):- !,
  must_det(to_thread_head(THead,M,_Head,H)),
    copy_term(H,  WithA), !,
-   ( M:WithA -> Call ; setup_call_cleanup(M:asserta(WithA),Call,must_det(M:retract(WithA)))).
+   setup_call_cleanup(M:asserta(WithA),Call,must_det(M:retract(WithA))).
 
 with_assertions(THead,Call):- 
  must_det(to_thread_head(THead,M,_Head,H)),
@@ -1649,13 +1679,20 @@ with_dmsg(Functor,Goal):-
 :-dynamic hook:dmsg_hook/1.
 :-multifile hook:dmsg_hook/1.
 
-contains_atom(V,A):-V=@=A.
-contains_atom(V,A):-compound(V),atom(A),!,functor(V,A,_).
-contains_atom(V,A):-compound(V),arg(_,V,O),contains_atom(O,A).
+contains_atom(V,A):-sub_term(VV,V),nonvar(VV),functor(VV,A,_).
+
+:- export(matches_term/2).
+matches_term(Filter,_):- var(Filter),!.
+matches_term(Filter,Term):- var(Term),!,Filter=var.
+matches_term(Filter,Term):- ( \+ \+ (matches_term0(Filter,Term))),!.
+matches_term0(Filter,Term):- Term = Filter.
+matches_term0(Filter,Term):- atomic(Filter),!,contains_atom(Term,Filter).
+matches_term0(F/A,Term):- (var(A)->member(A,[0,1,2,3,4]);true), functor(Filter,F,A), matches_term0(Filter,Term).
+matches_term0(Filter,Term):- sub_term(STerm,Term),nonvar(STerm),matches_term0(Filter,STerm),!.
 
 
 
-dmsg(V):- (once(dmsg0(V))).
+dmsg(V):- notrace(once(dmsg0(V))).
 :-'$hide'(dmsg/1).
 
 dmsg0(V):- tlbugger:is_with_dmsg(FP),!,FP=..FPL,append(FPL,[V],VVL),VV=..VVL,once(dmsg0(VV)).
@@ -1668,7 +1705,7 @@ dmsg1(error(V)):- print_message(warning,V),fail.
 dmsg1(warn(V)):- dumpST(6),print_message(warning,V),fail.
 */
 dmsg1(skip_dmsg(_)):-!.
-dmsg1(C):-tlbugger:dmsg_hidden(V),((contains_atom(C,V);contains_term(C,V))),!.
+dmsg1(C):-tlbugger:dmsg_hidden(Hide),matches_term(Hide,C),!.
 dmsg1(ansi(Ctrl,Msg)):- ansicall(Ctrl,dmsg1(Msg)).
 dmsg1(C):-functor(C,Topic,_),debugging(Topic,_True_or_False),!,logger_property(Topic,once,true),!,
       (dmsg_log(Topic,_Time,C) -> true ; ((get_time(Time),asserta(dmsg_log(todo,Time,C)),!,dmsg2(C)))).
@@ -1760,20 +1797,21 @@ colormsg(Ctrl,Msg):- fresh_line,ansicall(Ctrl,fmt0(Msg)),fresh_line.
 :-export(ansicall/2).
 ansicall(Ctrl,Call):- current_output(Out), ansicall(Out,Ctrl,Call).
 
-ansi_control_conv(warn,Ctrl):- ansi_control_conv(warning,Ctrl).
+ansi_control_conv([],[]):-!.
+ansi_control_conv([H|T],HT):-!,ansi_control_conv(H,HH),!,ansi_control_conv(T,TT),!,flatten([HH,TT],HT),!.
+ansi_control_conv(warn,Ctrl):- !, ansi_control_conv(warning,Ctrl),!.
 ansi_control_conv(Level,Ctrl):- ansi_term:level_attrs(Level,Ansi),Level\=Ansi,!,ansi_control_conv(Ansi,Ctrl).
 ansi_control_conv(Color,Ctrl):- ansi_term:ansi_color(Color,_),!,ansi_control_conv(fg(Color),Ctrl).
-ansi_control_conv(Ctrl,Ctrl).
+ansi_control_conv(Ctrl,CtrlO):-flatten([Ctrl],CtrlO),!.
 
-ansicall(Out,CtrlIn,Call):-
-  ansi_control_conv(CtrlIn,Ctrl),
-   retractall(last_used_color(Ctrl)),asserta(last_used_color(Ctrl)),ansicall0(Out,Ctrl,Call),!.
+ansicall(Out,CtrlIn,Call):- once(ansi_control_conv(CtrlIn,Ctrl)),  CtrlIn\=Ctrl,!,ansicall(Out,Ctrl,Call).
+ansicall(Out,Ctrl,Call):-
+   retractall(last_used_color(_)),asserta(last_used_color(Ctrl)),ansicall0(Out,Ctrl,Call),!.
 
 ansicall0(Out,[Ctrl|Set],Call):-!, ansicall0(Out,Ctrl,ansicall0(Out,Set,Call)).
 ansicall0(_,[],Call):-!,Call.
-ansicall0(Out,CtrlIn,Call):- 
-   ansi_control_conv(CtrlIn,Ctrl),
-   must(sgr_code_plus_off(Ctrl, OnCode, OffCode)),!,
+ansicall0(Out,Ctrl,Call):-
+   must(sgr_code_on_off(Ctrl, OnCode, OffCode)),!,
      keep_line_pos(Out, (format(Out, '\e[~wm', [OnCode]))),
 	call_cleanup(Call,
            keep_line_pos(Out, (format(Out, '\e[~wm', [OffCode])))).
@@ -1781,8 +1819,8 @@ ansicall0(Out,CtrlIn,Call):-
 ansicall(S,Set,Call):-
      call_cleanup((
          stream_property(S, tty(true)), current_prolog_flag(color_term, true), !,
-	(is_list(Ctrl) ->  maplist(sgr_code_plus_off, Ctrl, Codes, OffCodes), 
-          atomic_list_concat(Codes, (';'), OnCode) atomic_list_concat(OffCodes, (';'), OffCode) ;   sgr_code_plus_off(Ctrl, OnCode, OffCode)),
+	(is_list(Ctrl) ->  maplist(sgr_code_on_off, Ctrl, Codes, OffCodes), 
+          atomic_list_concat(Codes, (';'), OnCode) atomic_list_concat(OffCodes, (';'), OffCode) ;   sgr_code_on_off(Ctrl, OnCode, OffCode)),
         keep_line_pos(S, (format(S,'\e[~wm', [OnCode])))),
 	call_cleanup(Call,keep_line_pos(S, (format(S, '\e[~wm', [OffCode]))))).
 
@@ -1801,8 +1839,21 @@ keep_line_pos(S, G) :-
 :-dynamic(term_color0/2).
 mesg_color(T,[blink(slow),fg(red),hbg(black)]):-var(T),!.
 mesg_color(T,C):-functor(T,F,_),member(F,[color,ansi]),compound(T),arg(1,T,C),nonvar(C).
-mesg_color(T,C):-defined_message_color(T,C),!.
+mesg_color(T,C):-defined_message_color(Pattern,C),matches_term(Pattern,T),!.
 mesg_color(T,C):-functor_h(T,F,_),!,functor_color(F,C),!.
+
+:-export(defined_message_color/2).
+:-dynamic(defined_message_color/2).
+
+defined_message_color(todo,[fg(red),bg(black),underline]).
+defined_message_color(error,[fg(red),hbg(black),bold]).
+defined_message_color(warn,[fg(black),hbg(red),bold]).
+
+functor_color(F,C):- defined_message_color(F,C),!.
+functor_color(F,C):- defined_message_color(F/_,C),!.
+functor_color(F,C):- term_color0(F,C),!.
+functor_color(F,C):- next_color(C),asserta(term_color0(F,C)),!.
+
 
 :-dynamic(last_used_color/1).
 
@@ -1825,17 +1876,6 @@ unliked_ctrl(X):-is_list(X),member(E,X),nonvar(E),unliked_ctrl(E).
 fg_color(LU,FG):-member(fg(FG),LU),FG\=white,!.
 fg_color(LU,FG):-member(hfg(FG),LU),FG\=white,!.
 fg_color(_,default).
-
-:-export(defined_message_color/2).
-:-dynamic(defined_message_color/2).
-
-defined_message_color(todo,[fg(red),bg(black),underline]).
-defined_message_color(error,[fg(red),hbg(black),bold]).
-defined_message_color(warn,[fg(black),hbg(red),bold]).
-
-functor_color(F,C):- defined_message_color(F,C),!.
-functor_color(F,C):- term_color0(F,C),!.
-functor_color(F,C):- next_color(C),asserta(term_color0(F,C)),!.
 
 :-export(random_color/1).
 random_color([reset,M,FG,BG,font(Font)]):-Font is random(8),
@@ -1867,27 +1907,31 @@ contrasting_color(_,default).
 :-thread_local(ansi_prop/2).
 
 sgr_on_code(Ctrl,OnCode):- ansi_term:sgr_code(Ctrl,OnCode),!.
-sgr_on_code(-Ctrl,OffCode):-  nonvar(Ctrl), sgr_off_code(Ctrl,OffCode).
+sgr_on_code(blink, 6).
+sgr_on_code(-Ctrl,OffCode):-  nonvar(Ctrl), sgr_off_code(Ctrl,OffCode),!.
+sgr_on_code(Foo,7):-format(user_error,'~MISSING: n~q~n',[sgr_on_code(Foo,7)]),!.
 
 sgr_off_code(Ctrl,OnCode):-ansi_term:off_code(Ctrl,OnCode),!.
-sgr_off_code(fg(_), CurFG):-ansi_prop(fg,CurFG)->true;CurFG=39.
-sgr_off_code(bg(_), CurBG):-ansi_prop(ng,CurBG)->true;CurBG=49.
+sgr_off_code(- Ctrl,OnCode):- nonvar(Ctrl), sgr_on_code(Ctrl,OnCode),!.
+sgr_off_code(fg(_), CurFG):- (ansi_prop(fg,CurFG)->true;CurFG=39),!.
+sgr_off_code(bg(_), CurBG):- (ansi_prop(ng,CurBG)->true;CurBG=49),!.
 sgr_off_code(bold, 21).
 sgr_off_code(italic_and_franktur, 23).
 sgr_off_code(franktur, 23).
 sgr_off_code(italic, 23).
 sgr_off_code(underline, 24).
 sgr_off_code(blink, 25).
+sgr_off_code(blink(_), 25).
 sgr_off_code(negative, 27).
 sgr_off_code(conceal, 28).
 sgr_off_code(crossed_out, 29).
 sgr_off_code(framed, 54).
 sgr_off_code(overlined, 55).
-sgr_off_code(-Ctrl,OnCode):- nonvar(Ctrl), sgr_on_code(Ctrl,OnCode).
 sgr_off_code(_,0).
 
 
-sgr_code_plus_off(Ctrl,OnCode,Off):-sgr_on_code(Ctrl,OnCode),sgr_on_code(-Ctrl,Off).
+sgr_code_on_off(Ctrl,OnCode,OffCode):-sgr_on_code(Ctrl,OnCode),sgr_off_code(Ctrl,OffCode),!.
+sgr_code_on_off(Ctrl,OnCode,OffCode):-sgr_on_code(Ctrl,OnCode),sgr_off_code(Ctrl,OffCode),!.
 
 
 % ansicall(Ctrl,Msg):- msg_to_string(Msg,S),fresh_line,catchv(ansifmt(Ctrl,'~w~n',[S]),_,catchv(ansifmt(fg(Ctrl),'~w',[S]),_,'format'('~q (~w)~n',[ansicall(Ctrl,Msg),S]))),fresh_line.

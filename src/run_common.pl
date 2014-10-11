@@ -89,13 +89,15 @@ start_boxer:-
 
 % We don't start cliopatria we here. We have to manually start
 %  with  ?- start_servers.
-hard_work:- 
+hard_work:-
+   with_assertions(op(200,fy,'@'),
+   ((
+ %  use_module('t:/devel/cliopatria/rdfql/sparql_runtime.pl'),
    ensure_loaded(logicmoo(launchcliopatria)),
-   % use_module('t:/devel/cliopatria/rdfql/sparql_runtime.pl'),
-   ensure_loaded(logicmoo(testwebconsole)),
-   !.
+   ensure_loaded(logicmoo(testwebconsole))))),!.
 
 slow_work:- with_assertions( moo:prevent_transform_moo_preds , within_user(at_start(hard_work))).
+
 thread_work:- thread_property(X, status(running)),X=loading_code,!.
 thread_work:- thread_create(slow_work,_,[alias(loading_code)]).
 
@@ -107,7 +109,7 @@ start_servers :- startup_mod:if_version_greater(70111,thread_work).
 
 startup_mod:run_setup_now:-
    within_user((
-   load_game(logicmoo('rooms/startrek.all.plmoo'))
+      load_game_files
    % TO UNDO register_timer_thread(npc_ticker,90,npc_tick)
    )).
 

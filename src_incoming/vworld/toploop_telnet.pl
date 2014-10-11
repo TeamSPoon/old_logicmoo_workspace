@@ -74,7 +74,7 @@ run_player_telnet(WantsPlayer):-
    connect_player(WantsPlayer,P),
    set_tty_control,
    fmt('~n~n~nHello ~w! Welcome to the MUD!~n',[P]),
-   colormsg([blinking,fg(red)],"this is blinking red!"),
+   colormsg([blink,fg(red)],"this is blinking red!"),
    call_cleanup((   
    with_assertions(repl_writer(P,telnet_repl_writer),
       with_assertions(repl_to_string(P,telnet_repl_obj_to_string),
@@ -87,7 +87,7 @@ run_player_telnet(WantsPlayer):-
 run_player_local(Wants) :-
     connect_player(Wants,P),
      thread_self(Id),
-      noguitracer,
+      set_prolog_flag(gui_tracer, false),
       foc_current_player(P),
       get_session_id(O),
       retractall(thlocal:wants_logout(P)),
@@ -117,18 +117,6 @@ set_tty_control:-
    set_prolog_flag(tty_control, true),
    colormsg(green,"this is green!"))).
 
-set_no_debug:- 
-   retractall(ifCanTrace),
-   retractall(ifWontTrace),asserta(ifWontTrace),
-   notrace,
-   nodebug,
-   set_prolog_flag(debug, false),   
-   set_prolog_flag(query_debug_settings, debug(false, false)),
-   noguitracer,
-   set_prolog_flag(gui_tracer, false),
-   leash(-all),
-   visible(-cut_call),!.
-        
 
 ensure_player_stream_local(P):-  
   current_input(In),current_output(Out),
@@ -145,9 +133,8 @@ set_player_stream(P,Id,In,Out):-
 
 read_and_do_telnet(P):-
    ensure_player_stream_local(P),
-         must(ignore(look_brief(P))),!,
-         (thread_has_console -> HC = '>~w>'; HC = '~w> '),
-           sformat(S,HC,[P]),prompt_read_telnet(S,List),
+         must(ignore(look_brief(P))),!,         
+           sformat(S,'~w> ',[P]),prompt_read_telnet(S,List),
             must(once(do_player_action(List))),!.
 
 
@@ -158,9 +145,8 @@ prompt_read_telnet(Prompt,Atom):-
       (IAtom==end_of_file -> (assert(thlocal:wants_logout(P)),Atom='quit') ; IAtom=Atom),!.
 
 :-export(prompt_read/2).
-prompt_read(Prompt,Atom):-
-        fresh_line,        
-        fmt0('~w',[Prompt]),flush_output,        
+prompt_read(Prompt,Atom):-        
+        ansi_format([reset,hfg(white),bold],'~w',[Prompt]),flush_output,        
         repeat,read_code_list_or_next_command(Atom),!.
 
 read_code_list_or_next_command(Atom):-current_input(In),read_code_list_or_next_command(In,Atom),!.

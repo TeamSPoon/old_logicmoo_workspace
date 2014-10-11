@@ -10,22 +10,22 @@ system:halt:- format('the halting problem is now solved!').
 
 :-include(run_common).
 
-:- catch(noguitracer,_,true).
+:- set_no_debug,set_prolog_flag(report_error,false).
 
 % [Optionaly] load and start sparql server
-:- at_start(start_servers).
+:- at_start(nodebugx(start_servers)).
 
 % [Optionaly] re-define load_default_game
-load_default_game:- load_game(logicmoo('rooms/startrek.all.plmoo')).
+:- declare_load_game(logicmoo('rooms/startrek.all.plmoo')).
 
 % [Manditory] This loads the game and intializes
-:- at_start(run_setup).
+:- at_start(nodebugx(run_setup)).
 
 % [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
-:- register_timer_thread(npc_ticker,30,npc_tick).
+:- register_timer_thread(npc_ticker,30,nodebugx(npc_tick)).
 
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
-:- at_start(run).
+:- at_start(nodebugx(run)).
 
 % So scripted versions don't just exit
 :- at_start(prolog).
