@@ -10,13 +10,14 @@
 % files are formatted.
 %
 */
+% :- module(user). 
 :- module(push, []).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- moo:register_module_type(command).
 
-moo:decl_action(push(dir)).
+moo:actiontype(push(dir)).
 
 % Push a box
 % Nothing to push... agent moves and takes a little damage.
@@ -27,8 +28,8 @@ moo:agent_call_command(Agent,push(Dir)) :-
 	atloc(What,XXYY),
 	integer(What),
 	in_world_move(_,Agent,Dir),
-	moo:update_stats(Agent,strain),
-	moo:update_charge(Agent,push).
+	call_update_stats(Agent,strain),
+	call_update_charge(Agent,push).
 
 % Pushing what cannot be pushed
 % Some damage and loss of charge (same as normal push)
@@ -37,8 +38,8 @@ moo:agent_call_command(Agent,push(Dir)) :-
 	move_dir_target(LOC,Dir,XXYY),
 	atloc(What,XXYY),
 	\+ pushable(Agent,What,XXYY,Dir),
-	moo:update_stats(Agent,hernia),
-	moo:update_charge(Agent,push).
+	call_update_stats(Agent,hernia),
+	call_update_charge(Agent,push).
 
 % A successful PUSH
 moo:agent_call_command(Agent,push(Dir)) :-	
@@ -47,7 +48,7 @@ moo:agent_call_command(Agent,push(Dir)) :-
 	atloc(What,XXYY),
 	move_object(XXYY,What,Dir),
 	in_world_move(_,Agent,Dir),
-	moo:update_charge(Agent,push).
+	call_update_charge(Agent,push).
 
 % Can the Object be pushed?
 pushable(Agent,Obj,LOC,Dir) :-
@@ -66,7 +67,7 @@ pushable(Agent,Obj,LOC,Dir) :-
 	(\+ anything_behind(LOC,Dir);
 	crashbang(Obj)).
 
-% Is the location behind the pushed object/agent empty (or near empty).
+% Is the location behind the pushed item/agent empty (or near empty).
 anything_behind(LOC,Dir) :-
 	move_dir_target(LOC,Dir,XXYY),
 	atloc(What,XXYY),
@@ -96,10 +97,10 @@ squish_behind(_,_).
 crashbang(Obj) :- padd(Obj,[damage(-5)]).
 
 % Record keeping
-moo:decl_update_charge(Agent,push) :- padd(Agent,[charge(-6)]).
-moo:decl_update_stats(Agent,strain) :- padd(Agent,[damage(-2)]).
-moo:decl_update_stats(Agent,hernia) :- padd(Agent,[damage(-4),failure(hernia)]).
+moo:update_charge(Agent,push) :- padd(Agent,[charge(-6)]).
+moo:update_stats(Agent,strain) :- padd(Agent,[damage(-2)]).
+moo:update_stats(Agent,hernia) :- padd(Agent,[damage(-4),cmdfailure(hernia)]).
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 
 

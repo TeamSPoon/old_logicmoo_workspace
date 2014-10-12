@@ -5,65 +5,74 @@
 % This file defines the basic use (pick up) predicate
 %
 
+% :- module(user). 
 :- module(use, []).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- moo:register_module_type(command).
+
+moo:argsIsaInList(action_verb_useable(verb,term(mpred),type,term(mpred))).
 
 
+expand_args(eachOf,subclass(eachOf('PortableObject','ProtectiveAttire',stowable),wieldable)).
+subclass('FluidReservoir',drinkable).
+subclass('Weapon',wieldable).
+subclass('ControlDevice',usable).
 
-moo:use_usable(wear,wearing,wearable,stowed).
-moo:use_usable(hold,holding,wieldable,stowed).
-moo:use_usable(use,using,usable,stowed).
-moo:use_usable(drink,drinking,drinkable,holding).
-moo:use_usable(stow,stowed,stowable,holding).
+moo:action_verb_useable(wear,wearsClothing,wearable,stowed).
+moo:action_verb_useable(wield,wielding,wieldable,stowed).
+moo:action_verb_useable(use,using,usable,stowed).
+moo:action_verb_useable(drink,drinking,drinkable,holding).
+moo:action_verb_useable(stow,stowed,stowable,holding).
 
-moo:decl_action(Syntax,String):-moo:use_usable(Stow,Stowed,Stowable,Holding),Syntax=..[Stow,Stowable],
+moo:action_info(Syntax,String):-moo:action_verb_useable(Stow,Stowed,Stowable,Holding),Syntax=..[Stow,Stowable],
    sformat(String,'~w a ~w that you are/have ~w so it will be ~w.',[Stow,Stowable,Holding,Stowed]).
 
-use_verbs(USE,USING,USABLE,STOWED):-moo:use_usable(USE,USING,USABLE,STOWED).
+get_use_verbs(USE,USING,USABLE,STOWED):-moo:action_verb_useable(USE,USING,USABLE,STOWED).
 
 % Use something
 % Successfully picking something up
 moo:agent_call_command(Agent,SENT) :-
-  use_verbs(USE,_USING,USABLE,STOWED),
+  get_use_verbs(USE,_USING,USABLE,STOWED),
     SENT=..[USE,Obj],
 	possess(Agent,Obj),
         prop(Agent,STOWED,Obj),
-	mud_isa(Obj,USABLE),
+	isa(Obj,USABLE),
 	props(Obj, weight =< 1),
 	worth(Agent,USE,Obj),
 	do_permanence(USE,Agent,Obj),
-	moo:update_charge(Agent,USE).
+	call_update_charge(Agent,USE).
 %Nothing to use
 moo:agent_call_command(Agent,SENT) :-
-  use_verbs(USE,_USING,_USABLE,_STOWED),
+  get_use_verbs(USE,_USING,_USABLE,_STOWED),
     SENT=..[USE,_Obj],
-	moo:update_charge(Agent,USE),
-	add(failure(Agent,USE)).
+	call_update_charge(Agent,USE),
+	(add_cmdfailure(Agent,USE)).
 
 % Is the obect going to stick around after usen, either as is
 % or in the agent's possession.
 do_permanence(USE,Agent,Obj) :-
-  use_verbs(USE,_USING,_USABLE,_STOWED),
+  get_use_verbs(USE,_USING,_USABLE,_STOWED),
 	atloc(Obj,LOC),
 	check_permanence(USE,Agent,LOC,Obj).
 
-check_permanence(USE,_Agent,LOC,Obj) :-
-     use_verbs(USE,_USING,_USABLE,_STOWED),
-	props(Obj,permanence(USE,0)),
+moo:check_permanence(USE,_Agent,LOC,Obj) :-
+     get_use_verbs(USE,_USING,_USABLE,_STOWED),
+	props(Obj,permanence(USE,Dissapears)),
+	member(Dissapears,[dissapears,0]),
 	del(atloc(Obj,LOC)).
-check_permanence(USE,Agent,LOC,Obj) :-
-    use_verbs(USE,USING,_USABLE,_STOWED),
-        props(Obj,permanence(USE,1)),
+moo:check_permanence(USE,Agent,LOC,Obj) :-
+    get_use_verbs(USE,USING,_USABLE,_STOWED),
+        props(Obj,permanence(USE,Held)),
+        member(Held,[1,held]),
 	del(atloc(Obj,LOC)),
-	add(k(USING,Agent,Obj)).
-check_permanence(_,_,_,_).
+	padd(Agent,USING,Obj).
+moo:check_permanence(USE,_,_,_):-get_use_verbs(USE,_USING,_USABLE,_STOWED),!.
 
 % Record keeping
-moo:decl_update_charge(Agent,USE) :-
-    use_verbs(USE,_USING,_USABLE,_STOWED),
+moo:update_charge(Agent,USE) :-
+    get_use_verbs(USE,_USING,_USABLE,_STOWED),
       padd(Agent,[charge(-2)]).
 
 
@@ -71,5 +80,5 @@ moo:decl_update_charge(Agent,USE) :-
 
 
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 

@@ -15,16 +15,16 @@
 % Declare the module name and the exported (public) predicates.
 :- module(prey,[]).
 
-:- include(logicmoo('vworld/moo_header.pl')).
-:- register_module_type(planning).
-:- register_module_type(command).
+:- include(logicmoo(vworld/moo_header)).
+:- moo:register_module_type(planning).
+:- moo:register_module_type(command).
 
 % Predicates asserted during run.
 % :- dynamic memory/2. 
 %:- dynamic agent_list/1.
 
 moo:world_agent_plan(_World,Self,Act):-
-   mud_isa(Self,prey),
+   isa(Self,prey),
    prey_idea(Self,Act).
    
 % Possible agent actions.
@@ -57,8 +57,7 @@ prey_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[nut]).
 % spawn new prey
 % maybe(N) == N chance of each agent spawning a new agent each turn
 
-moo:decl_action(spawn(type)).
-moo:decl_action(rez(type)).
+moo:actiontype(spawn(type)).
 
 moo:agent_call_command(_Agent,spawn(prey)):-spawn.
 
@@ -77,27 +76,26 @@ spawn_prey(10) :-
 	!.
 spawn_prey(N) :-
        Prey = prey(N),
-       findall_type_default_props(Prey,prey,Traits),
-	\+ act_turn(Prey,_),
-         max_charge(NRG),
-         max_damage(Dam),
+       assert_isa(Prey,prey),
+       get_instance_default_props(Prey,Traits),
+	\+ agent_turnnum(Prey,_),
+         req(max_charge(Prey,NRG)),
+         req(max_damage(Prey,Dam)),
          clr(charge(Prey,_)),
          clr(damage(Prey,_)),
          add(charge(Prey,NRG)),
          add(damage(Prey,Dam)),
-         add(act_turn(Prey,1)),
+         add(agent_turnnum(Prey,1)),
          clr(possess(Prey,_)),
 	set_stats(Prey,Traits),
 	put_in_world(Prey),
+        add_missing_instance_defaults(Prey),
 	!.
 spawn_prey(N) :-
 	Ntemp is N + 1,
 	spawn_prey(Ntemp).
 
 
-moo:agent_call_command(Agent,rez(NewType)):- atloc(Agent,LOC), create_instance(NewType,item,[atloc(LOC)]).
-
-
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 
 

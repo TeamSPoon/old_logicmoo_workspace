@@ -10,22 +10,22 @@
 %
 */
 
+% :- module(user). 
 :- module(move, []).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo(vworld/moo_header)).
 
 :- register_module_type(command).
 
-moo:agent_text_command(Agent,[DirSS],Agent,move(Dir)):- catch(((string_to_atom(DirSS,Dir),moo:specifier_text(Dir,dir))),_,fail),!.
+% :- begin_transform_moo_preds.
 
-moo:agent_text_command(Agent,[DirSS],Agent,move(DirS)):- 
- catch(((string_to_atom(DirSS,DirS),moo:specifier_text(Dir,dir),
-       catch((atom_concat(Dir,N,DirS),(atom_number(N,_))),_,fail))),_,fail).
 
-moo:agent_call_command(Agnt,Cmd):- functor(Cmd,move,_),!,
-   must(move_command(Agnt,Cmd)).
+moo:agent_text_command(Agent,[DirSS],Agent,move(DirS)):- nonvar(DirSS),catch(((get_term_specifier_text(Dir,dir), any_to_atom(DirSS,DirS),catch((atom_concat(Dir,N,DirS),(atom_number(N,_))),_,fail))),_,fail).
+moo:agent_text_command(Agent,[DirSS],Agent,move(Dir)):- get_term_specifier_text(Dir,dir),catch((any_to_atom(DirSS,DirA),any_to_atom(Dir,DirA)),_,fail),!.
 
-moo:decl_action(move(dir)).
+moo:agent_call_command(Agnt,Cmd):- compound(Cmd),functor(Cmd,move,_),!,must(move_command(Agnt,Cmd)).
+
+moo:action_info(move(dir),"Move in a direction").
 
 % dir###
 move_command(Agent,move(DirSS)) :- catch((string_to_atom(DirSS,DirS),
@@ -35,7 +35,7 @@ move_command(Agent,move(DirSS)) :- catch((string_to_atom(DirSS,DirS),
 move_command(Agent,move(Dir)) :-
 	    get_move_dist(Agent,Dist),
             move_command(Agent,Dir,Dist).
-
+ 
 get_move_dist(Agent,Dist):-req(movedist(Agent,Dist)),!.
 get_move_dist(_Gent,1).
 
@@ -43,7 +43,7 @@ get_move_dist(_Gent,1).
 move_command(Agent,DirS,DistS) :- 
    string_to_atom(DirS,Dir),
    any_to_number(DistS,Dist),
-   catch(doall((between(1,Dist,_),move_command_1(Agent,Dir))),giveup(_),true).
+   ccatch(doall((between(1,Dist,_),move_command_1(Agent,Dir))),giveup(_),true).
 
 
 
@@ -51,7 +51,7 @@ move_command(Agent,DirS,DistS) :-
 move_command_1(Agent,Dir) :-
 	atloc(Agent,LOC),
         not(move_dir_target(LOC,Dir,_)),!,
-		add(failure(Agent,move)),
+		(add_cmdfailure(Agent,move)),
       throw(giveup(nopath(Agent,move))).
 
 % Run into something big, Ouch...
@@ -67,8 +67,8 @@ move_command_1(Agent,Dir) :-
          ObjHt2 > ObjHt,
          ObjHt2 > 1,
 	!,
-	moo:update_stats(Agent,collide),
-	moo:update_charge(Agent,move),
+	call_update_stats(Agent,collide),
+	call_update_charge(Agent,move),
         raise_location_event(XXYY,collide(Agent,Obj2)),
    throw(giveup(collide(Agent,Obj2))).
 
@@ -79,9 +79,9 @@ move_command_1(Agent,Dir):-
 	move_dir_target(LOC,Dir,XXYY),
 	is_3d(XXYY),
         atloc(Agent2,XXYY),
-	mud_isa(Agent2,agent),
-	moo:update_stats(Agent,collide),
-	moo:update_charge(Agent,move),
+	isa(Agent2,agent),
+	call_update_stats(Agent,collide),
+	call_update_charge(Agent,move),
         raise_location_event(XXYY,collide(Agent,Agent2)),
    throw(giveup(collide(Agent,Agent2))).
 
@@ -89,25 +89,25 @@ move_command_1(Agent,Dir):-
 %Move successfully
 move_command_1(Agent,Dir) :-
 	in_world_move(_,Agent,Dir),
-	moo:update_charge(Agent,move).
+	call_update_charge(Agent,move).
 
 %Record keeping
 
-moo:decl_update_charge(Agent,move) :- padd(Agent,charge,-4).
+moo:update_charge(Agent,move) :- padd(Agent,charge,-4).
 
-moo:decl_update_stats(Agent,collide) :- padd(Agent,damage,-5),add(failure(Agent,collide)).
+moo:update_stats(Agent,collide) :- padd(Agent,damage,-5),(add_cmdfailure(Agent,collide)).
 
-moo:decl_update_stats(Agent,fall) :- padd(Agent,damage,-10).
+moo:update_stats(Agent,fall) :- padd(Agent,damage,-10).
 
 % cheating but to test
 
-moo:decl_action(go(dir)).
+moo:actiontype(go(dir)).
 moo:agent_call_command(Agent,go(Dir)) :-
 	atloc(Agent,LOC),
         in_world_move(LOC,Agent,Dir),
-	moo:update_charge(Agent,move).
+	call_update_charge(Agent,move).
 
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 
 

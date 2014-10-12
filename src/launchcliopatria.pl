@@ -67,7 +67,7 @@ add_relative_search_path(Alias, Rel) :-
 
 :- load_conf_d([ 'config-enabled' ], []).
 
-:- ensure_loaded(logicmoo('vworld/dbase_rdf_entailment.pl')).
+:- ensure_loaded(logicmoo(dbase/dbase_rdf_entailment)).
 
 
 % Get back normal verbosity of the toplevel.

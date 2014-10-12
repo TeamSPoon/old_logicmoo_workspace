@@ -8,6 +8,8 @@
 %
 */
 
+end_of_file.
+
 
 moo:on_world_load :- retractall(spawn_objects(_)).
 
@@ -945,7 +947,7 @@ go :-
 	!,go.
 go :-
 	conflict_set([]),
-	finished, !.			% supplied in kb for what to do at end
+	finished, !.			% supplied in  tbox for what to do at end
 go :-
 	message(119).
 

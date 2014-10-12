@@ -1,12 +1,16 @@
+/** <module> 
+% This module is the CircleMUD configurator
+*/
 
-:- use_module(logicmoo('mobs/monster.pl')).
-:- use_module(logicmoo('mobs/predator.pl')).
-:- use_module(logicmoo('mobs/explorer.pl')).
-:- use_module(logicmoo('mobs/prey.pl')).
-:- use_module(logicmoo('mobs/vacuum.pl')).
-
+:- module(mobs_conf,[]).
 
 end_of_file.
+
+:- user_use_module(logicmoo('mobs/monster.pl')).
+:- user_use_module(logicmoo('mobs/predator.pl')).
+:- user_use_module(logicmoo('mobs/explorer.pl')).
+:- user_use_module(logicmoo('mobs/prey.pl')).
+:- user_use_module(logicmoo('mobs/vacuum.pl')).
 
 
 Mob Flags

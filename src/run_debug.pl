@@ -2,169 +2,205 @@
 /** <module> An Implementation a MUD server in SWI-Prolog
 
 */
-:- use_module(library(settings)).
 
-:- dynamic(fullStart/0).
-:- guitracer.
+% Was this our startup file?
+was_run_dbg_pl:-is_startup_file('run_debug.pl').
 
+% :- catch(guitracer,_,true).
+:- set_prolog_flag(verbose_load,true).
 
-% ======================================================
-% Configure the logicmoo utilities into the file path
-% :- include('logicmoo_util/logicmoo_util_header').
-% :- use_module('logicmoo_util/logicmoo_util_all.pl').
-% And adds the local directories to file search path of logicmoo(..)
-% ======================================================
-:- use_module('logicmoo_util/logicmoo_util_all.pl').
+:- debug.
 
-% one more case of not clear what's the good way to do this.
-% Add your own path to weblog for now
-user:file_search_path(weblog, 'C:/docs/Prolog/weblog/weblog/prolog').
-user:file_search_path(weblog, 'C:/Users/Administrator/AppData/Roaming/SWI-Prolog/pack/weblog').
-user:file_search_path(weblog, '/usr/local/lib/swipl-7.1.11/pack/weblog/prolog').
-user:file_search_path(cliopatria, '/devel/ClioPatria').
-user:file_search_path(cliopatria, 't:/devel/ClioPatria').
+% run_tests includes run_common 
+:-include(run_tests).
 
-
-:- use_module(library(settings)).
-
-:- user:file_search_path(cliopatria,SP),
-   exists_directory(SP),
-   writeq(user:file_search_path(cliopatria,SP)),nl.
-   %set_setting_default(cliopatria_binding:path, SP).
-   %save_settings('moo_settings.db').
-   %%setting(cliopatria_binding:path, atom, SP, 'Path to root of cliopatria install'),!.
-
-:- ensure_loaded(logicmoo('http/user_page')).
-
-:- meta_predicate(if_version_greater(?,0)).
-
-if_version_greater(V,Goal):- current_prolog_flag(version,F), ((F > V) -> call(Goal) ; true).
-
-% set to false because we don't want to use the mudconsole
-:- if_flag_true(false, if_version_greater(70109,ensure_loaded(logicmoo('mudconsole/mudconsolestart')))).
-
-% [Optionaly 1st run] tell where ClioPatria is located and restart for the 2nd run
-%:- set_setting(cliopatria_binding:path, '/devel/ClioPatria'), save_settings('moo_settings.db').
+% [Optionaly] re-define load_default_game
+% load_default_game:- load_game(logicmoo('rooms/startrek.all.plmoo')).
 
 % [Optionaly] load and start sparql server
-% if we don't start cliopatria we have to manually start
-%
-start_servers :- if_version_greater(70111,ensure_loaded(logicmoo(launchcliopatria))).
+% starts in forground
+%:- at_start(slow_work).
+% starts in thread (the the above was commented out)
+%:- at_start(start_servers).
+% commented out except on run
 
-% start_servers
-% this is evil. Starts the old mudconsole, the experiment with Jan's
-% webconsole. We're not using that
-% :- if_version_greater(70109,http_mud_server).
 
-:- if_flag_true(fullStart, start_servers).
+debug_repl_w_cyc(Module,CallFirst):- !,         
+          with_assertions(thlocal:useOnlyExternalDBs,
+            with_assertions(thglobal:use_cyc_database,
+               ((decl_type(person),          
+                ensure_plmoo_loaded(logicmoo('rooms/startrek.all.plmoo')),
+                module(Module),
+                show_call(CallFirst), 
+                prolog_repl)))).
 
-% [Required] load and start mud
-:- ensure_loaded(logicmoo('vworld/moo_startup')).
+debug_repl_wo_cyc(Module,CallFirst):- !,         
+          with_no_assertions(thlocal:useOnlyExternalDBs,
+            with_assertions(thglobal:use_cyc_database,
+               ((decl_type(person),          
+                ensure_plmoo_loaded(logicmoo('rooms/startrek.all.plmoo')),
+                module(Module),
+                show_call(CallFirst), 
+                prolog_repl)))).
 
+%  bug.. swi does not maintain context_module(CM) outside
+%  of the current caller (so we have no idea what the real context module is!?!
+debug_repl_m(Module,CallFirst):- 
+        context_module(CM),
+          call_cleanup(
+            (module(Module),
+              debug_repl_wo_cyc(Module,CallFirst)),
+            module(CM)).
+
+% [Required] Defines debug80
+debug80:- moo:parser_chat80_module(M),debug_repl_wo_cyc(M,M:t1).
+
+% [Optionaly] Allows testing/debug of the chat80 system (withouyt loading the servers)
+% :- parser_chat80:t1.
+
+% [Required] Defines debug_e2c
+debug_e2c:- debug_repl_wo_cyc(parser_e2c,cache_the_posms).
+
+
+% [Required] Defines debug_talk
+debug_talk:- debug_repl_wo_cyc(parser_talk,t3).
+
+
+% [Optional] This loads boxer
+% :- at_start(with_assertions(moo:prevent_transform_moo_preds,within_user(ignore(catch(start_boxer,_,true))))).
+
+% [Optional] Testing PTTP
+% :-is_startup_file('run_debug.pl')->doall(do_pttp_test(_));true.
+
+
+% [Manditory] This loads the game and initializes so test can be ran
+:- if_flag_true(was_run_dbg_pl, at_start(run_setup)).
+
+:- finish_processing_world.
+
+% [Optional] Interactively debug E2C
+% :- debug_e2c.
+
+% the local tests each reload (once)
+now_run_local_tests_dbg :- doall(moo:mud_test_local).
+
+:-must_det(show_call((atloc('NpcCol1012-Ensign728',X),nonvar(X)))).
+
+% nasty way i debug the parser
+moo:mud_test_local :- do_player_action('who').
+% :-repeat, trace, do_player_action('who'),fail.
+
+% moo:mud_test_local :-do_player_action("scansrc").
+
+% :-trace.
+
+
+% [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
+% :- register_timer_thread(npc_ticker,30,npc_tick).
+
+moo:mud_test_local :-kellerStorage:kellerStorageTestSuite.
+
+% :-curt80.
+
+% the real tests now (once)
+% moo:mud_test_local :- if_flag_true(was_run_dbg_pl,at_start(must_det(run_mud_tests))).
+
+% :- if_flag_true(was_run_dbg_pl, doall(now_run_local_tests_dbg)).
+
+% more tests even
+moo:mud_test_local :-do_player_action("look").
+moo:mud_test_local :-forall(localityOfObject(O,L),dmsg(localityOfObject(O,L))).
+
+moo:must_test("tests to see if poorly canonicalized code (unrestricted quantification) will not be -too- inneffienct",
+   forall(atloc(O,L),dmsg(atloc(O,L)))).
+
+
+
+
+% [Optionaly] Allows testing/debug of the chat80 system (withouyt loading the servers)
+% :- debug80.
 /*
-% Load datalog
-:- if_flag_true(fullStart, ((ensure_loaded(logicmoo('des/des.pl')),
-  flush_output,
-  init_des,
-  display_status,
- %  des,
-   !))).
+
+explorer(player1)> prolog statistics
+notice(you,begin(you,prologCall(statistics)))
+statistics.
+188.523 seconds cpu time for 282,024,744 inferences
+1,004,265 atoms, 14,959 functors, 11,578 predicates, 176 modules, 268,104,937 VM-codes
+
+                       Limit    Allocated       In use
+Local  stack :137,438,953,472      126,976       41,032 Bytes
+Global stack :137,438,953,472  805,302,256  669,634,856 Bytes
+Trail  stack :137,438,953,472      129,016        2,448 Bytes
+
+1 garbage collections gained 41,528 bytes in 0.000 seconds.
+2 atom garbage collections gained 19,741 atoms in 1.360 seconds.
+Stack shifts: 4 local, 22 global, 20 trail in 0.038 seconds.
+2 threads, 0 finished threads used 0.000 seconds.
+true.
+
+cmdresult(statistics,true)
 
 */
+:-forall(current_prolog_flag(N,V),dmsg(N=V)).
+% [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
+% :-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,who)).
+% :-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,look)).
+% :-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,chat80)).
+:- if_flag_true(was_run_dbg_pl, at_start(run)).
 
-moo:agent_text_command(Agent,[run,Term], Agent,prologCall(Term)).
-
-
-:- use_module(library(check)).
-:- at_start(check:list_undefined).
-
-% GOLOG SYSTEM WITHOUT FLUX (Default Commented Out)
-%:- if_flag_true(fullStart,ensure_loaded(logicmoo('indigolog/indigolog_main_swi.pl'))).
-
-% FLUX AGENT SYSTEM WITHOUT GOLOG (Default Commented Out)
-%:- if_flag_true(fullStart,ensure_loaded(logicmoo('indigolog/flux_main_swi.pl'))).
-
-% FLUX AGENT SYSTEM WITH GOLOG
-% :- if_flag_true(true,ensure_loaded(logicmoo('indigolog/indigolog_main_swi_flux.pl'))).
-
-% LOGICMOO DATABASE LOGIC ENGINE SERVER
-%:- if_flag_true(true,ensure_loaded(logicmoo('database/logicmoo.swi'))).
-
-% when we import new and awefull code base (the previous )this can be helpfull
-% we redfine list_undefined/1 .. this is the old version
-lundef :- A = [],
-       check:( merge_options(A, [module_class([user])], B),
-        prolog_walk_code([undefined(trace), on_trace(found_undef)|B]),
-        findall(C-D, retract(undef(C, D)), E),
-        (   E==[]
-        ->  true
-        ;   print_message(warning, check(undefined_predicates)),
-            keysort(E, F),
-            group_pairs_by_key(F, G),
-            maplist(report_undefined, G)
-        )).
-
-:- if_flag_true(fullStart,
-(
- redefine_system_predicate(check:list_undefined(_)),
- abolish(check:list_undefined/1),
- assert((check:list_undefined(A):- not(thread_self(main)),!, ignore(A=[]))),
- assert((check:list_undefined(A):- ignore(A=[]))))).
-
-
-/*
-  ==
-  ?- [library(mudconsole)].
-  ?- mc_start.				% opens browser
-
-   or else http_mud_server
-
-  ?- mc_format('Hello ~w', [world]).
-  ?- mc_html(p(['Hello ', b(world)])).
-  ?- mc_ask([age(Age)], [p('How old are you'), input([name(age)])]).
-  Age = 24.				% type 24 <enter>
-  ==
-
-*/
-
-% [Optionaly] Put a telnet client handler on the main console
-% :- at_start(login_and_run).
-run_setup:-
-   nodebug,
-   debug,
-   scan_db_prop,
-   at_start(load_game(logicmoo('rooms/startrek.all.pl'))),
-   register_timer_thread(npc_ticker,1,npc_tick_tock).
-
-run:-
-   login_and_run.
-
-% LOGICMOO LOGICSERVER DATA (Defaut uncommented)
-:- if_flag_true(fullStart, ensure_loaded(logicmoo('data/mworld0.pldata'))).
-
-% :- if_flag_true(fullStart, load_game(logicmoo('rooms/startrek.all.pl'))).
-
-%:- register_timer_thread(npc_ticker,30,npc_tick).
-
-:- noguitracer.
-
-% :- at_start(run).
-:- run_setup.
-
-% do some sanity testing
-ht:- do_player_action('s'),
-   do_player_action(look),
-   do_player_action('s'),
-   do_player_action('s'),
-   do_player_action('e'),
-   do_player_action('e'),
-   do_player_action(look),
-   do_player_action('s'),
-   do_player_action('s').
-
-:- at_start(start_servers).
-
-:- at_start(run).
 
 % So scripted versions don't just exit
-:- at_start(prolog).
+%:- if_flag_true(was_run_dbg_pl,at_start(prolog)).
+
+%:- kill_term_expansion.
+%:- prolog.
+
+% :-proccess_command_line.
+
+/*
+
+PTTP input formulas:
+  1  firstOrder(motherOf,joe,sue).
+  2  not_firstOrder(motherOf,_,A);firstOrder(female,A).
+  3  not_firstOrder(sonOf,B,A);firstOrder(motherOf,A,B);firstOrder(fatherOf,A,B).
+  4  query:-firstOrder(female,_).
+PTTP to Prolog translation time: 0.0028555670000001143 seconds
+
+Prolog compilation time: 0.0004133299999997675 seconds
+2.
+Proof time: 4.34149999994915e-5 seconds
+Proof:
+length = 2, depth = 1
+Goal#  Wff#  Wff Instance
+-----  ----  ------------
+  [0]    4   query :- [1].
+  [1]    2      firstOrder(female,sue) :- [2].
+  [2]    1         firstOrder(motherOf,joe,sue).
+Proof end.
+%                    succceeded(prove_timed(logicmoo_example1,query))
+%                do_pttp_test(logicmoo_example1_holds)
+
+PTTP input formulas:
+  1  firstOrder(motherOf,joe,sue).
+  2  not_firstOrder(motherOf,_,A);firstOrder(female,A).
+  3  not_firstOrder(sonOf,B,A);firstOrder(motherOf,A,B);firstOrder(fatherOf,A,B).
+  4  query:-firstOrder(female,_).
+PTTP to Prolog translation time: 0.0024834679999994336 seconds
+
+Prolog compilation time: 0.00039567500000003974 seconds
+2.
+Proof time: 3.7734999999372576e-5 seconds
+Proof:
+length = 2, depth = 1
+Goal#  Wff#  Wff Instance
+-----  ----  ------------
+  [0]    4   query :- [1].
+  [1]    2      firstOrder(female,sue) :- [2].
+  [2]    1         firstOrder(motherOf,joe,sue).
+Proof end.
+%                    succceeded(prove_timed(logicmoo_example1_holds,query))
+%                do_pttp_test(logicmoo_example2)
+
+
+*/
+

@@ -18,11 +18,11 @@
 % :- dynamic memory/2.
 
 % Possible agent actions.
-:- include(logicmoo('vworld/moo_header.pl')).
-:- register_module_type(planning).
+:- include(logicmoo(vworld/moo_header)).
+:- moo:register_module_type(planning).
 
 moo:world_agent_plan(_World,Agent,Act):-
-   mud_isa(Agent,predator),
+   isa(Agent,predator),
    predator_idea(Agent,Act).
 
 predator_idea(Agent,eat(Corpse)) :-
@@ -30,10 +30,10 @@ predator_idea(Agent,eat(Corpse)) :-
 	Charge < 100,
 	inventory(Agent, List),                
 	obj_memb(Corpse,List),
-        mud_isa(Corpse,corpse).
+        isa(Corpse,corpse).
 predator_idea(Agent,take(What)) :-
 	get_feet(Agent,What),
-	mud_isa(What,corpse).
+	isa(What,corpse).
 predator_idea(Agent,move(Dir)) :-
 	get_percepts(Agent,List),
 	list_object_dir_sensed(_,List,corpse(_),Dir).
@@ -51,4 +51,4 @@ predator_idea(Agent,Act) :-
       move_or_sit_memory_idea(Agent,Act,[nut]).
 
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).

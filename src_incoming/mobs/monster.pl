@@ -17,11 +17,11 @@
 % :- dynamic  agent_list/1.
 
 % Possible agent actions.
-:- include(logicmoo('vworld/moo_header.pl')).
-:- register_module_type(planning).
+:- include(logicmoo(vworld/moo_header)).
+:- moo:register_module_type(planning).
 
 moo:world_agent_plan(_World,Agent,Act):-
-   mud_isa(Agent,monster),
+   isa(Agent,monster),
    monster_idea(Agent,Act).
    
 monster_idea(Agent,eat(Food)) :-
@@ -50,11 +50,9 @@ monster_idea(Agent,move(Dir)) :-
 
 monster_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[corpse]).
 
-moo:type_default_props(Instance,monster, [description(Instance,SFmt),wearing(tough_hide),possess(tough_hide)]):-sformat(SFmt,"Very screy looking monster named ~w",[Instance]).
+moo:default_inst_props(Instance,monster,[description(fmt("Very screy looking monster named ~w",[Instance])),wearsClothing(tough_hide),possess(tough_hide)]).
 
-
-
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 
 
 

@@ -7,132 +7,42 @@
 %
 %
 */
+% :- module(world_text,[]).
+%      default_repl_obj_to_string/3,default_repl_writer/4,show_kb_via_pred/3,show_kb_preds/2,show_kb_preds/3,success/2
+:- include(logicmoo(vworld/moo_header)).
 
 :-export(fully_expand/2).
 
-:- begin_transform_cyc_preds.
+:- moo:begin_prolog_source.
 
-local_decl_db_prop(repl_writer(agent,term),[singleValued,default(default_repl_writer)]).
-local_decl_db_prop(repl_to_string(agent,term),[singleValued,default(default_repl_obj_to_string)]).
+:- moo:begin_transform_moo_preds.
 
-default_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=o),fmt('~q=(~w )~q.~n',[N,TypeO,V]).
-default_repl_obj_to_string(O,Type,toString(TypeO,O)):-copy_term(Type,TypeO),ignore(TypeO=o).
-
-
-% Check to see if last action was successful or not
-success(Agent,no) :-
-	failure(Agent,_),!.
-success(_,yes).
-
-canUseEnglish:-true.
-
-show_kb_preds(Agent,List):-
-      ignore(atloc(Agent,LOC)),
-      show_kb_preds(Agent,LOC,List).
-
-show_kb_preds(Agent,LOC,List):-
-      ignore(atloc(Agent,LOC)),
-       locationToRegion(LOC,Region),
-       must(holds_t(repl_writer,Agent,WPred)),
-        must(holds_t(repl_to_string,Agent,ToSTR)),
-        subst(List,region,Region,ListR),
-        show_kb_via_pred(WPred,ToSTR,ListR),!.
-
-
-
-
-show_kb_via_pred(_,_,[]).
-show_kb_via_pred(WPred,ToSTR,[L|List]):-!,
-   show_kb_via_pred(WPred,ToSTR,L),
-   show_kb_via_pred(WPred,ToSTR,List).
-show_kb_via_pred(WPred,ToSTR,L):-!,catch((ignore(show_kb_via_pred_0(WPred,ToSTR,L);dmsg(failed(show_kb_via_pred_0(WPred,L))))),E,dmsg(error_failed(E,show_kb_via_pred_0(WPred,L)))).
-
-show_kb_via_pred_0(WPred,ToSTR,F=Call):- !,show_kb_via_pred_1(WPred,ToSTR,F,Call).
-show_kb_via_pred_0(WPred,ToSTR,once(Call)):- !,functor(Call,F,_), show_kb_via_pred_1(WPred,ToSTR,F,once(Call)).
-show_kb_via_pred_0(WPred,ToSTR,all(Call)):- !,functor(Call,F,_), show_kb_via_pred_1(WPred,ToSTR,F,all(Call)).
-show_kb_via_pred_0(WPred,ToSTR,Call):- functor(Call,F,_), show_kb_via_pred_1(WPred,ToSTR,F,Call).
-
-show_kb_via_pred_1(WPred,ToSTR,F,all(Call)):-!,show_kb_via_pred_2(WPred,ToSTR,F,Call).
-show_kb_via_pred_1(WPred,ToSTR,F,once(Call)):-!,show_kb_via_pred_2(WPred,ToSTR,F,once(Call)).
-show_kb_via_pred_1(_WPred,_ToSTR,_F,call(Call)):-!,debugOnError(holds_tcall(Call)).
-show_kb_via_pred_1(WPred,ToSTR,F,Call):-show_kb_via_pred_2(WPred,ToSTR,F,Call).
-
-show_kb_via_pred_2(WPred0,ToSTRIn,F0,Call0):-
-      wsubst(Call0,value(ToSTR),value,Call),
-      ignore( ToSTR = (ToSTRIn) ),
-      subst([WPred0,ToSTR,F0,Call],value,NewValue,[WPred,ToSTROut,F,GCall]),
-      show_kb_via_pred_3(WPred,ToSTROut,F,_UnkType,GCall,NewValue).
-
-show_kb_via_pred_3(WPred,ToSTR,fmt(SayIt),Type,GCall,NewValue):-!,
-  % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
-      findall(NewValue,(catch(holds_tcall(GCall),Error, NewValue=Error), 
-             fmt(text(SayIt))),Count),
-      (Count==[] ->
-        fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(f1,F,Type)); true),!.
-
-show_kb_via_pred_3(WPred,ToSTR,fmt,Type,GCall,NewValue):-!,
-  % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
-      findall(NewValue,(catch(holds_tcall(GCall),Error, NewValue=Error), 
-             fmt(GCall)),Count),
-      (Count==[] ->
-        fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(f2,F,Type)); true),!.
-
-
-show_kb_via_pred_3(WPred,ToSTR,output,Type,GCall,NewValue):-!,
-  % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
-      findall(NewValue,(catch(holds_tcall(GCall),Error, NewValue=Error), 
-             fmt_holds_tcall(WPred,ToSTR,F,Type,NewValue)),Count),
-      (Count==[] ->
-        fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(f3,F,Type)); true),!.
-
-
-show_kb_via_pred_3(WPred,ToSTR,F,Type,GCall,NewValue):- canUseEnglish,!,
-  % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
-      findall(NewValue,(catch(holds_tcall(GCall),Error, NewValue=Error), 
-             fmt(text(GCall))),Count),!,
-      (Count==[] ->
-        (fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(f4,F,Type))); true),!.
-
-show_kb_via_pred_3(WPred,ToSTR,F,Type,GCall,NewValue):-
-  % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
-      findall(NewValue,(catch(holds_tcall(GCall),Error, NewValue=Error), 
-             fmt_holds_tcall(WPred,ToSTR,F,Type,NewValue)),Count),
-      (Count==[] ->
-        fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(f5,F,Type)); true),!.
-
-
-fmt_holds_tcall(WPred,ToSTR,F,Type,NewValue):-flatten([NewValue],ValueList), NewValue\=ValueList,fmt_holds_tcall(WPred,ToSTR,F,Type,ValueList),!.
-fmt_holds_tcall(WPred,ToSTR,N,Type,[V]):-fmt_holds_tcall_pred(WPred,ToSTR,N,Type,V),!.
-fmt_holds_tcall(WPred,ToSTR,N,Type,[V|VV]):-remove_dupes([V|VV],RVs),reverse(RVs,Vs),fmt_holds_tcall_pred(WPred,ToSTR,N,Type,Vs),!.
-fmt_holds_tcall(WPred,ToSTR,N,Type,V):-fmt_holds_tcall_pred(WPred,ToSTR,N,Type,V),!.
-
-fmt_holds_tcall_pred(WPred,ToSTR,N,Type,[L|List]):-!, doall((member(V,[L|List]),fmt_holds_tcall_pred_trans(WPred,ToSTR,N,Type,V))).
-fmt_holds_tcall_pred(WPred,ToSTR,N,Type,V0):-fmt_holds_tcall_pred_trans(WPred,ToSTR,N,Type,V0).
-
-fmt_holds_tcall_pred_trans(WPred,ToSTR,N,Type,V0):-must((debugOnError(call(ToSTR,V0,Type,V)),!,debugOnError(call(WPred,_Tn,N,Type,V)))).
 
 % ===========================================
-% generatePhrase(+Term,-English).
+% generatePhrase_local(+Term,-English).
 % Generate english version of a message
 % ===========================================
+:-export(generatePhrase_local/2).
+
 bugger:term_to_message_string(T,T):-var(T),!.
-bugger:term_to_message_string(text(T),M):-debugOnError(generatePhrase(T,M)),!.
-bugger:term_to_message_string(fmt(T),M):-debugOnError(generatePhrase(T,M)),!.
+bugger:term_to_message_string(T,T):-!.
+bugger:term_to_message_string(text(T),M):-debugOnError(generatePhrase_local(T,M)),!.
+bugger:term_to_message_string(fmt(T),M):-debugOnError(generatePhrase_local(T,M)),!.
 bugger:term_to_message_string(C,C):-compound(C),functor(C,F,_),is_leave_alone(F),!.
-bugger:term_to_message_string((T),M):-failOnError(generatePhrase(T,M)),!.
+bugger:term_to_message_string((T),M):-failOnError(generatePhrase_local(T,M)),!.
 bugger:term_to_message_string(T,T):-!.
 
 is_leave_alone(exact_message).
 is_leave_alone(todo).
 is_leave_alone((error)).
 is_leave_alone(parserm).
-is_leave_alone(F):-is_db_prop(F,_,_),!,fail.
+% is_leave_alone(F):- moo:is_db_prop(F,_,_),!,fail.
 is_leave_alone(A):-failOnError((sub_atom(A,_,1,0,S),atom_number(S,_))),!.
 
 moo:term_anglify(A,B):-local_term_anglify(A,B).
 moo:term_anglify_np_last(Obj,T,String):- local_term_anglify_np_last(Obj,T,String).
 
-generatePhrase(Term,String):- debugOnError(( fully_expand(Term,EnglishM),!,
+generatePhrase_local(Term,String):- debugOnError(( fully_expand(Term,EnglishM),!,
           % fmt('FR0=~q~n',[fully_expand(Term,EnglishM)]),
           fully_expand(EnglishM,EnglishG),fix_grammar(EnglishG,English) , join_for_string(English,String))),!.
 
@@ -145,9 +55,6 @@ local_grammar_correction([room,are],[room,is]).
 local_grammar_correction([in,region,here],[is,here]).
 local_grammar_correction([X,X],[X]):-member(X,[is,are]).
  
-append_ci([],L1,L2):-string_equal_ci(L1,L2),!.
-append_ci([H1|T],L2,[H2|L3]) :- string_equal_ci(H1,H2),append_ci(T,L2,L3).
-
 get_grammar_correction(C1,C2):-
    local_grammar_correction(W1,W2),to_word_list(W1,C1),to_word_list(W2,C2).
 
@@ -177,8 +84,8 @@ list_to_atomics_list0([],[]):-!.
 
 fully_expand(I,OOF):-copy_term(I,C),flatten([C],FC),fully_expand_0(FC,O),flatten([O],OF),fully_expand_0(OF,OOF).
 
-fully_expand_0(FC,O):-catch(fully_expand_1(FC,O),E,(trace,dmsg(exact_message(error(E,fully_expand_1(FC,O)))),fail)),!.
-fully_expand_0(FC,O):-catch((trace,fully_expand_1(FC,O)),_,fail).
+fully_expand_0(FC,O):-ccatch(fully_expand_1(FC,O),E,(trace,dmsg(exact_message(error_m(E,fully_expand_1(FC,O)))),fail)),!.
+%fully_expand_0(FC,O):-ccatch((trace,fully_expand_1(FC,O)),_,fail).
 
 fully_expand_1(Var,Var):-var(Var),!.
 fully_expand_1([],[]):-!.
@@ -202,9 +109,9 @@ fully_expand_2([T|Term],Out):-!,
    flatten_append(E,English,Out),!.
 fully_expand_2(Pred,Pred):-!.
 fully_expand_2(Pred,Out):-
-   Pred=..[F|ARGS],
+   safe_univ(Pred,[F|ARGS]),
    fully_expand_1_l(ARGS,NEWARGS),
-   Out=..[F|NEWARGS],!.
+   safe_univ(Out,[F|NEWARGS]),!.
 
 fully_expand_1_l([],[]):-!.
 fully_expand_1_l([T|Term],[E|English]):-!,
@@ -236,9 +143,9 @@ local_term_anglify(np(P),English):- local_term_anglify_np(P,English).
 local_term_anglify(noun_phrase(P),English):- local_term_anglify_np(P,English).
 
 local_term_anglify(notice(Who,What),[np(Who),notices,What]).
-local_term_anglify(fN(Region,region),[(String)]):- nameString(Region,String),!.
+local_term_anglify(fN(Region,region),[(String)]):- nameStrings(Region,String),!.
 
-local_term_anglify(fN(Region,region),[nameString1(String)]):- holds_t(nameString,Region,String),!.
+local_term_anglify(fN(Region,region),[nameString1(String)]):- holds_t(nameStrings,Region,String),!.
 
 
 local_term_anglify([P|L],English):-!, local_term_anglify(P,PE),local_term_anglify(L,LE),!,flatten_append(PE,LE,English),!.
@@ -276,7 +183,7 @@ local_term_anglify(fN(Obj,T),String):- anglify_noun_known(Obj,T,String),!.
 
 moo:term_anglify_np(Obj,Hint,String):-local_term_anglify_np(Obj,Hint,String).
 
-local_term_anglify_np(Obj,String):-mud_isa(Obj,Isa),local_term_anglify_np(Obj,Isa,String),!.
+local_term_anglify_np(Obj,String):-isa(Obj,Isa),local_term_anglify_np(Obj,Isa,String),!.
 local_term_anglify_np(Obj,String):-local_term_anglify_np(Obj,term,String).
 
 % specific noun searching
@@ -286,8 +193,8 @@ local_term_anglify_np(string(Obj),string,Obj):- !.
 local_term_anglify_np(Obj,string,Obj):- !.
 
 local_term_anglify_np_last(Obj,Hint,String):- anglify_noun_known(Obj,Hint,String),!.
-local_term_anglify_np_last(Obj,FT,String):- is_decl_ft(FT),isa_assert(Obj,FT,String),!.
-local_term_anglify_np_last(Obj,Type,[prolog(Obj)]):-is_decl_ft(Type),!.
+local_term_anglify_np_last(Obj,FT,String):- formattype(FT),correctFormatType(assert(_),Obj,FT,String),!.
+local_term_anglify_np_last(Obj,Type,[prolog(Obj)]):-formattype(Type),!.
 local_term_anglify_np_last(Obj,Type,[the,Type,prolog(Obj)]):-!.
 local_term_anglify_np_last(apath(Region,Dir),_,[a,fN(Dir,dir),'-ern',way,from,fN(Region,np)]):-!.
 local_term_anglify_np_last(Obj,Type,[prolog(Obj),fN,Type]):-!.
@@ -295,16 +202,16 @@ local_term_anglify_np_last(Obj,_,[the,noun,with,token,Obj]):-!.
 
 
 % anglify_noun_known(Self,_Hint,[you]):- current_agent(Self),!.
-anglify_noun_known(Obj,FT,String):- is_decl_ft(FT),isa_assert(Obj,FT,String),!.
+anglify_noun_known(Obj,FT,String):- formattype(FT),correctFormatType(assert(_),Obj,FT,String),!.
 anglify_noun_known(explorer(StringO),_Hint, [StringO]).
 anglify_noun_known(Obj,_Hint,[right,here]):- current_agent(Self),atloc(Self,Obj),!.
-anglify_noun_known(Obj,_Hint,[here]):- current_agent(Self),req(inRegion(Self,Obj)),!.
-anglify_noun_known(Obj,_Hint,StringO):- findall(String,holds_t(nameString,Obj,String),List),List\=[],sort_by_strlen(List,[StringO|_]),!.
+anglify_noun_known(Obj,_Hint,[here]):- current_agent(Self),req(localityOfObject(Self,Obj)),!.
+anglify_noun_known(Obj,_Hint,StringO):- findall(String,holds_t(nameStrings,Obj,String),List),List\=[],sort_by_strlen(List,[StringO|_]),!.
 %anglify_noun_known(Obj,_Hint,String):-
-%nameString(X,Y,_,_)
+%nameStrings(X,Y,_,_)
 
 
-:- end_transform_cyc_preds.
+:-  moo:end_transform_moo_preds.
 
 
 end_of_file.
@@ -402,7 +309,7 @@ description('Area1006', "Eight round transport pads have been arranged in a circ
 description('Area1042', "Transporter Beam").
 description('Area1042', "YouFindYourself in a transporter beam").
 description('Area1042', "All you can see is blue flashing light").
-description('Area1042', "It feels fN though your body is racing around at high speeds").
+description('Area1042', "It feels as though your body is racing around at high speeds").
 description('Area1042', "As you try to look down at your body, you realize that there's nothing there!").
 description('Area1007', "You step through the doors and find yourself in a large school room").
 description('Area1007', "Various tables and chairs are set up all around the room, and many paintings and drawings have been attached to the walls").
@@ -506,7 +413,7 @@ description('Area1028', "small partition at the northern part of the room contai
 description('Area1029', "Science Lab").
 description('Area1029', "You're in the Enterprise science lab").
 description('Area1029', "strange looking machine sits in theMiddleOf the room, up on a slightly raised platform").
-description('Area1029', "It looks fN though something(or someone) could be placed inside, hooked up to the multitude of wires and cables, and have scientific tests performed on it(or them)").
+description('Area1029', "It looks as though something(or someone) could be placed inside, hooked up to the multitude of wires and cables, and have scientific tests performed on it(or them)").
 description('Area1029', "complex looking computer console is facing this machine").
 description('Area1029', "Around the rest of the room are counterops with with the odd computer terminal").
 description('Area1031', "Cargo Bay 2").
@@ -528,7 +435,7 @@ description('Area1036', "Two small curved ramps on either side of the room lead 
 description('Area1035', "Picard's Ready Room").
 description('Area1035', "You're standing in Captain Picard's ready room").
 description('Area1035', "long couch has been placed beside the door, while a large U shaped desk is located by the northern wall").
-description('Area1035', "small computer screen is sitting on the desk, fN well fN several other papers and documents").
+description('Area1035', "small computer screen is sitting on the desk, as well as several other papers and documents").
 description('Area1035', "single high window beside the desk looks into space, and a fish tank is located in the northwestern corner of the room").
 description('Area1038', "Main Bridge - Lower Half").
 description('Area1038', "YouFindYourself on the lower half of the main bridge of the USS Enterprise").

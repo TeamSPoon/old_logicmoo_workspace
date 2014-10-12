@@ -17,17 +17,19 @@
 % Declare the module name and the exported (public) predicates.
 :- module(explorer,[]).
 
-:- include(logicmoo('vworld/moo_header.pl')).
-:- register_module_type(planning).
+:- include(logicmoo(vworld/moo_header)).
+:- moo:register_module_type(planning).
 
 
+vette_idea(Agent,Act,Act):-var(Act),!,dmsg(vette_idea(Agent,Act)).
+vette_idea(_,sit,sit):-!.
 vette_idea(Agent,Act,Act):-dmsg(vette_idea(Agent,Act)).
 
-moo:label_type_props(explorer(_),explorer,[]).
+moo:label_type_props('Px',explorer,[]).
 
 moo:world_agent_plan(_World,Agent,ActV):-
    agent(Agent),
-  % mud_isa(Agent,explorer),
+  % isa(Agent,explorer),
    explorer_idea(Agent,Act),
    vette_idea(Agent,Act,ActV).
 
@@ -37,14 +39,14 @@ explorer_idea(Agent,eat(Elixer)) :-
 	Damage < 15,
    inventory(Agent,List),
    obj_memb(Elixer,List),
-   mud_isa(Elixer,elixer).
+   isa(Elixer,elixer).
 
 explorer_idea(Agent,eat(food)) :-
 	charge(Agent,Charge),
 	Charge < 150,
    inventory(Agent,List),
    obj_memb(Food,List),
-   mud_isa(Food,food).
+   isa(Food,food).
 
 explorer_idea(Agent,take(Good)) :-
 	get_feet(Agent,What),
@@ -90,6 +92,6 @@ explorer_idea(Agent,sit) :-
 	add(memory(Agent,directions(New))).
 
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 
 

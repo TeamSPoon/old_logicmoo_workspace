@@ -5,14 +5,14 @@
 % Will (theoretically) only be used in conjuction with take action
 %
 % It will destroy something, even if it is not food... talk about a garbage disposal. 
-
+% :- module(user). 
 :- module(drink, []).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo(vworld/moo_header)).
 
 :- register_module_type(command).
 
-moo:decl_action(drink(drinkable),"Drink a Drinkable Item").
+moo:action_info(drink(drinkable),"Drink a Drinkable Item").
 
 % Eat something held
 % Check to make sure it's in the agents possession... 
@@ -22,11 +22,8 @@ moo:agent_call_command(Agent,drink(SObj)) :-
         object_match(SObj,Obj),
 	worth(Agent,drink,Obj),
 	del(possess(Agent,Obj)),
-	moo:update_charge(Agent,eat).
+	call_update_charge(Agent,eat).
 
-moo:decl_update_charge(Agent,drink) :-
-	del(charge(Agent,Old)),
-	New is Old - 1,
-	add(charge(Agent,New)).
+moo:update_charge(Agent,drink) :- add(charge(Agent,-1)).
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).

@@ -25,4 +25,7 @@ src_modules/
 src_data/*.*
 src/savedb
 src_incoming/savedb
+hidden_todo/
+*.qlf
+withvars_988.*
 

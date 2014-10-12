@@ -25,6 +25,7 @@
                    declare_relation/3, add_to_relation/3,
                    concept_select/3, forall_select/4, atleast_select/5, atmost_select/5, self_select/3,
                    relation_path/3, relation_path/1, concept_name/1, concept_name_or_not/1, num/1,
+                   concept/3,
                    legitimate_literal/1, thread_itemfunctor/1]).
 
 :- assert_if_new(user:use_algebra(alg_lukasiewicz)).

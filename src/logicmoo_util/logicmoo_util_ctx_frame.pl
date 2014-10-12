@@ -26,25 +26,22 @@
 % .. that was a "hint" to where you could fastforward the backwards search .. end named binding context also had a "index" to when you leave a named block.. 
 % you could quickly reset the top of an index.
 
-:-module(ctx_frame,[ctxHideIfNeeded/3,
+:-module(ctx_frame,[
          lastMember/2,
          lastMember/3,
          pushCtxFrame/3,
          getCtxValue/3,
          makeLocalContext/2,
          appendAttributes/4,
-         with_assertions/2,
          currentContext/2]).
 
-:-use_module(logicmoo('logicmoo_util/logicmoo_util_library.pl')).
-:-use_module(logicmoo('logicmoo_util/logicmoo_util_bugger.pl')).
+
+:-use_module(logicmoo(logicmoo_util/logicmoo_util_library)).
+:-use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)).
+:-use_module(logicmoo(logicmoo_util/logicmoo_util_library)).
 
 currentContext(Name,X):-hotrace(makeLocalContext(Name,X)),!.
 
-with_assertions([],Call):- !,Call.
-with_assertions([With|MORE],Call):-!,with_assertions(With,with_assertions(MORE,Call)).
-with_assertions(With,Call):- !,setup_call_cleanup(asserta(With),Call,must(retract(With))).
-% with_assertions(With,Call):- setup_call_cleanup(asserta(With,Ref),Call,erase(Ref)).
 
 % ===================================================================
 :-dynamic(no_cyclic_terms).
@@ -177,7 +174,7 @@ lastMember2(E,List):-to_open_list(_,Closed,_Open,List),reverse(Closed,Rev),membe
 
 %lastMember(End,List) :- append(_,[End|_],List).
 
-ctxHideIfNeeded(_Ctx,Before,After):-hideIfNeeded(Before,After),!.
+bugger:evil_term(_Ctx,Before,After):-hideIfNeeded(Before,After),!.
 
 hideIfNeeded(I,I):- (var(I);atomic(I)),!.
 hideIfNeeded([I|_],ctx):-nonvar(I),I=frame(_,_,_),!.
@@ -207,5 +204,4 @@ mergeAppend0(L,R,A):-append(L,R,A).
 
 eqmember(E,List):-copy_term_numvars(E:List,E0:List0),member(E0,List0).
 copy_term_numvars(OLD,NEW):-copy_term(OLD,NEW),numbervars(NEW,0,_).
-
 

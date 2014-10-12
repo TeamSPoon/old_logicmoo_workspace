@@ -14,15 +14,16 @@
 %
 
 %
-% props(Obj,height(ObjHt))  == k(Obj,height,ObjHt) == p(height,Obj,ObjHt) == height(Obj,ObjHt)
+% props(Obj,height(ObjHt))  == svo(Obj,height,ObjHt) == p(height,Obj,ObjHt) == height(Obj,ObjHt)
 % padd(Obj,height(ObjHt))  == add(p(height,Obj,ObjHt)) == add(p(height,Obj,ObjHt)) == add(height(Obj,ObjHt))
 */
 
+% :- module(user). 
 :- module(look, [ get_percepts/2,  get_near/2, get_feet/2, height_on_obj/2, can_sense/5 , call_look/2]).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- moo:register_module_type(command).
 
 :- dynamic blocks/1.
 
@@ -31,60 +32,69 @@
 % can_sense(Agent,Sense,InList,CanDetect,CantDetect).
 can_sense(_Agent,visual,InList,InList,[]).
 
-moo:decl_action(examine(item), "view details of item (see also @list)").
+moo:action_info(examine(item), "view details of item (see also @list)").
 moo:agent_call_command(_Gent,examine(SObj)):- term_listing(SObj).
 
 
+moo:action_info(look, "generalized look in region").
+moo:action_info(look(dir), "Look in a direction").
+moo:action_info(look(item), "Look at a speficific item").
 
-moo:decl_action(look, "generalized look in region").
-moo:decl_action(look(dir), "Look in a direction").
-moo:decl_action(look(item), "Look at a speficific item").
-
-moo:agent_call_command(Agent,look(Dir)):-
+moo:agent_call_command(Agent,look):- !,must(look_as(Agent)).
+moo:agent_call_command(Agent,look(here)):- look_as(Agent),!.
+moo:agent_call_command(Agent,look(Dir)):- get_term_specifier_text(Dir,dir),!,
    view_dirs(Agent,[[Dir,here],[Dir,Dir],[Dir,Dir,adjacent]],Percepts),
-   forall_member(P,Percepts,call_agent_action(Agent,examine(P))).
+   forall_member(P,Percepts,hook:call_agent_action(Agent,examine(P))).
 
 moo:agent_call_command(Agent,look(SObj)):-
-   objects_match(Agent,SObj,Percepts),
-   forall_member(P,Percepts,call_agent_action(Agent,examine(P))).
+   objects_match_for_agent(Agent,SObj,item,Percepts),
+   forall_member(P,Percepts,hook:call_agent_action(Agent,examine(P))).
 
-moo:agent_call_command(Agent,look):- 
+
+:-export(look_as/1).
+look_as(Agent):-
    get_session_id(O),
-   with_assertions(thlocal:current_agent(O,Agent),
+   with_assertions(thlocal:session_agent(O,Agent),
         ((atloc(Agent,LOC),call_look(Agent,LOC)))).
 
 
-call_look(Agent,LOC):-
-    show_kb_preds(Agent,LOC,
+:-export(call_look/2).
+call_look(Agent,LOC):-  mmake, call(call_look_proc,Agent,LOC).
+
+:-decl_mpred_prolog(call_look_proc/3).
+call_look_proc(Agent,LOC):-
+   clr(props(Agent,needs_look(true))),
+   add(props(Agent,needs_look(false))),    
+    toploop_output:show_kb_preds(Agent,LOC,
          [
       % TODO make this work
          %  why does this this work on Prolog REPL?
          %   with_output_to(string(Str),show_room_grid('Area1000'))
          %  but yet this doent?
-         % show_room_grid(region) = with_output_to(string(value),show_room_grid(region)),
+         show_room_grid = once(with_output_to(string(value),show_room_grid(region))),
          % for now workarround is 
-         output=call(show_room_grid(region)),
+         call(show_room_grid(region)),
          atloc(Agent,value),
-         nameString(region,value),
-         description(region,value),
+         nameStrings(region,value),
+         forEach(descriptionHere(region,Value),fmt(region_desc(Value))),
          events=deliverable_location_events(Agent,LOC,value),
-         fmt(path(D)=value) = pathBetween_call(region,D,value),
-         path(D) = pathName(region,D,value),
-         inRegion(value,region),
+         path(D) = pathBetween_call(region,D,value),
+         pathName(D) = pathName(region,D,value),
+         localityOfObject(value,region),       
          facing(Agent,value),
-         all(get_feet(Agent,value)),
+         get_feet(Agent,value),
          get_near(Agent,value),
          get_percepts(Agent,value),         
          movedist(Agent,value),
          height_on_obj(Agent,value),
-         success=look:success(Agent,value)
+         listof(possess(Agent,value)),
+         inventory(Agent,value),         
+         success=world:success(Agent,value)
        ]).
 
 
-
-looking(Agent):- get_session_id(O), thlocal:current_agent(O,Agent),!.
-looking(Agent):- mud_isa(Agent,agent).
-% looking(Agent):- thinking(Agent).
+looking(Agent):- get_session_id(O), thlocal:session_agent(O,Agent),!.
+looking(Agent):- agent(Agent). % ,thinking(Agent).
 
 % ********** TOP LEVEL PREDICATE: this is the predicate agents use to look
 % Look, reports everything not blocked up to two locations away
@@ -103,20 +113,21 @@ get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
 
 
 % Get only the Percepts
-moo:db_prop(look:get_percepts(agent,list(spatial))).
-get_percepts(Agent,Percepts) :- get_percepts0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts).
+
+% :-decl_mpred(get_percepts(agent,list(spatialthing)),[ask_module(look)]).
+get_percepts(Agent,Percepts) :- get_percepts0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts).
 get_percepts0(Agent,Percepts) :-
   call((
 	looking(Agent),
 	view_vectors(Dirs),
 	check_for_blocks(Agent),
 	view_dirs(Agent,Dirs,Tmp_percepts),
-	alter_view(Dirs,Tmp_percepts,Percepts))),
+	alter_view(Agent,Dirs,Tmp_percepts,Percepts))),
 	!.
 
 % Look at locations immediately around argent
-moo:db_prop(look:get_near(agent,list(spatial))).
-get_near(Agent,PerceptsO):- get_near0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
+% :-decl_mpred(look:get_near(agent,list(spatialthing)),[ask_module(look)]).
+get_near(Agent,PerceptsO):- get_near0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
    
 get_near0(Agent,Percepts) :-
   call((
@@ -125,8 +136,8 @@ get_near0(Agent,Percepts) :-
 	view_dirs(Agent,Dirs,Percepts))),!.
 
 % Look only at location agent is currently in.
-moo:db_prop(look:get_feet(agent,list(spatial))).
-get_feet(Agent,PerceptsO) :-  get_feet0(Agent,Percepts0),!,flatten_dedupe(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
+% :-decl_mpred(look:get_feet(agent,list(spatialthing)),[ask_module(look)]).
+get_feet(Agent,PerceptsO) :-  get_feet0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
 
 get_feet0(Agent,Percepts):-
   call((
@@ -158,21 +169,25 @@ near_vectors([[nw,here],[n,here],[ne,here],
 	[w,here],[d,u],[e,here],
 	[sw,here],[s,here],[se,here]]).
 
-% Series of predicates to modify agents vision so return 'dar' for locations
+:-decl_mpred_prolog(look:visually_blocked(agent,list)).
+
+:-listing(visually_blocked).
+
+% Series of predicates to modify agents vision so return 'dar(k)' for locations
 % which are blocked from view
-check_for_blocks(_Agent) :-!.
+% check_for_blocks(_Agent) :-!.
 check_for_blocks(Agent) :-
 	height_on_obj(Agent,Ht),
-	clr(blocks(_)),
+	clr(visually_blocked(Agent,_)),
 	Dirs = [[n,here],[s,here],[e,here],[w,here],
 	[ne,here],[nw,here],[se,here],[sw,here]],
 	view_dirs(Agent,Dirs,Percepts),
 	blocked_percepts(Ht,Dirs,Percepts,[],Blocked_Percepts),
-	add(blocks(Blocked_Percepts)).
+	add(visually_blocked(Agent,Blocked_Percepts)).
 check_for_blocks(_).
 
 % High enough to see over obstacles??
-% Check to see how tall the agent is and if they are standing on an object
+% Check to see how tall the agent is and if they are standing on an item
 height_on_obj(Agent,Ht) :-
 	atloc(Agent,LOC),
 	report(LOC,Objs),
@@ -205,17 +220,17 @@ block_coverage(e,e,[[e,e],[e,ne],[e,se]]).
 block_coverage(D1,D2,[[D1,D2]]).
 
 % These three predicates modifies Percepts so that blocked locations return 'dark'
-alter_view([],[],[]).
-alter_view([[D1,D2]|Drest],[TP|TPrest],[P|Prest]) :-
-	mem_test(D1,D2,YorN),
-	alter_view(Drest,TPrest,Prest),
+alter_view(_Agent,[],[],[]).
+alter_view(Agent,[[D1,D2]|Drest],[TP|TPrest],[P|Prest]) :-
+	mem_test(Agent,D1,D2,YorN),
+	alter_view(Agent,Drest,TPrest,Prest),
 	dark_if_yes(YorN,[TP],P).
 
-mem_test(D1,D2,YorN) :-
-	blocks(Bdirs),
+mem_test(Agent,D1,D2,YorN) :-
+	visually_blocked(Agent,Bdirs),
 	prop_memb([D1,D2],Bdirs),
 	YorN = yes.
-mem_test(_,_,no).
+mem_test(_Agent,_,_,no).
 
 dark_if_yes(yes,_,[dark]).
 %dark_if_yes(no,[[]],[]).
@@ -257,12 +272,12 @@ report(LOC,List) :-
 % Converts the objects seen... basically to weed out the 0's the empty locations report
 mask([],What,What).
 mask([K|Tail],SoFar,What) :-
-	integer(K),
+	(K)=nil,
 	!,
 	mask(Tail, SoFar,What).
 mask([Head|Tail],SoFar,What) :-
 	mask(Tail,[Head|SoFar],What).
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 
 

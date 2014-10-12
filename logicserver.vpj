@@ -67,6 +67,20 @@
 		</Folder>
 	</CustomFolders>
 	<Files AutoFolders="PackageView">
+		<Folder Name="src_modules/aleph">
+			<F
+				N="src_modules/aleph/*.*"
+				Recurse="1"
+				Refilter="0"
+				Excludes=""/>
+		</Folder>
+		<Folder Name="src_modules/MaLARea">
+			<F
+				N="src_modules/MaLARea/*.*"
+				Recurse="1"
+				Refilter="0"
+				Excludes=""/>
+		</Folder>
 		<Folder Name="src_modules/pdl-tableau">
 			<F
 				N="src_modules/pdl-tableau/*.*"

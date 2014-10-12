@@ -8,6 +8,30 @@
 % Revised At:   $Date: 2002/07/11 21:57:28 $
 % ===================================================================
 :-module(logicmoo_util_strings,[
+            atoms_of/2,
+            to_word_list/2,
+            equals_icase/2,
+            string_ci/2,
+            replace_periods/2,
+            replace_periods_string_list/2,
+            to_list_of_sents/2,
+            convert_members/3,
+            replace_in_string/4,
+            replace_in_string/5,
+            atom_subst/4,
+            must_nonvar/1,
+            non_empty/1,
+            string_dedupe/2,
+            empty_string/1,
+            member_ci/2,
+                   string_equal_ci/2,
+                   append_ci/3,
+                   starts_with_icase/2,
+                   sort_by_strlen/2,
+                   remove_predupes/2,
+                   ends_with_icase/2,
+                   str_contains_all/2,
+                   starts_or_ends_with_icase/2,
          quoteAtomString/2,
          unquoteAtom/2,
          /*
@@ -15,16 +39,18 @@
          */
          toUppercase/2,
          toLowercase/2,
+         any_to_atom/2,
          toPropercase/2,
          toCamelcase/2,
 
          is_string/1,
          is_codelist/1,
          is_charlist/1,
-
+         string_to_atom_safe/2,
          stringToCodelist/2,
          trim/2,
          clean_codes/2,
+         either_starts_with_icase/2,
          all_upper_atom/1,
          convert_to_string/2,
          atom_contains/2,
@@ -32,13 +58,19 @@
          isWhitespace/1,
          atomSplit/2,
          atomic_list_concat_safe/2,
-         any_to_string/2
+         any_to_string/2,
+         atom_contains/2
          %string_chars/2
          % text_to_string/2,
          %string_upper/2,
          %string_lower/2
 
    ]).
+
+:-import(bugger:must/1).
+
+string_to_atom_safe(ISO,LISTO):-LISTO==[],!,string_to_atom(ISO,'').
+string_to_atom_safe(ISO,LISTO):-string_to_atom(ISO,LISTO).
 
 /*
 string_chars(S,C):-atom_chars(S,C).
@@ -47,14 +79,13 @@ string_upper(M,U):-toUppercase(M,U).
 string_lower(M,U):-toLowercase(M,U).
 */
 
-:-use_module(logicmoo('logicmoo_util/logicmoo_util_library.pl')).
-:-use_module(logicmoo('logicmoo_util/logicmoo_util_bugger.pl')).
+:- use_module(logicmoo_util_bugger).
+:- meta_predicate map_tree_to_list(2,?,*).
 
-ib_multi_transparent(MT):-multifile(MT),dynamic(MT),module_transparent(MT).
 
-:- ib_multi_transparent(camelSplitters/1).
+:- meta_predicate_transparent(camelSplitters(+)).
 
-:- ib_multi_transparent(to_string_hook/3).
+:- meta_predicate_transparent(to_string_hook(-,-,+)).
 
 camelSplitters(V):-member(V,[' ','-','_',':','mt','doom','Mt','Doom']).
 
@@ -74,13 +105,16 @@ clean_out_atom(X,Y):-atom_codes(X,C),clean_codes(C,D),!,atom_codes(X,D),!,Y=X.
 
 all_upper_atom(X):-toUppercase(X,N),!,N=X.
 
-atom_contains(F,C):- notrace((atom(F),atom(C),sub_atom(F,_,_,_,C))).
+atom_contains(F0,C0):- notrace((any_to_atom(F0,F),any_to_atom(C0,C),sub_atom(F,_,_,_,C))).
 
+any_to_atom(A,A):-atom(A),!.
+any_to_atom(T,A):-sformat(S,'~w',[T]),atom_string(A,S).
           
 atomic_list_concat_safe(O,''):- O=[],!.
-atomic_list_concat_safe([Atom|Bonus],V):-atomic(Atom),atom_concat(Atom,NV,V),!,atomic_list_concat_safe(Bonus,NV).
+atomic_list_concat_safe([Atom,A2|Bonus],V):-atomic(Atom),atomic(A2),atom_concat(Atom,A2,A3),!,atomic_list_concat_safe([A3|Bonus],V).
+atomic_list_concat_safe([Atom|Bonus],V):-atomic(Atom),atomic(V),atom_concat(Atom,NV,V),!,atomic_list_concat_safe(Bonus,NV).
 atomic_list_concat_safe([D1,Atom|Bonus],V):-var(D1),atomic(Atom),sub_atom(V, NBefore, _Len, _NumAfter, Atom),
-      sub_atom(V, 0, NBefore, _, D1), !, atomic_list_concat_safe([D1,Atom|Bonus],V).
+      sub_atom(V, 0, NBefore, _, D1), atomic_list_concat_safe([D1,Atom|Bonus],V).
 atomic_list_concat_safe([V],V):-!.
 
 
@@ -101,7 +135,7 @@ list_replace(List,Char,Replace,NewList):-
 	append(NewLeft,NewRight,NewList),!.
 list_replace(List,_Char,_Replace,List):-!.
 
-term_to_string(I,IS):- catch(string_to_atom(IS,I),_,fail),!.
+term_to_string(I,IS):- ccatch(string_to_atom(IS,I),_,fail),!.
 term_to_string(I,IS):- term_to_atom(I,A),string_to_atom(IS,A),!.
 
 % ===========================================================
@@ -145,11 +179,17 @@ toLowercase(MiXed,CASED):-compound(MiXed),MiXed=..MList,toLowercase(MList,UList)
 toLowercase(A,A).
 
 toPropercase(VAR,VAR):-var(VAR),!.
+toPropercase(Left,VAR):-nonvar(VAR),!,toPropercase(Left,New),!,VAR=New.
 toPropercase([],[]):-!.
-toPropercase([CX|Y],[D3|YY]):-!,toPropercase(CX,D3),toPropercase(Y,YY).
-toPropercase(D3,DD3):-atom(D3),camelSplitters(V),concat_atom([L,I|ST],V,D3),toPropercase([L,I|ST],LIST2),toPropercase(V,VV),concat_atom(LIST2,VV,DD3).
-toPropercase(CX,Y):-atom(CX),name(CX,[S|SS]),char_type(S,to_lower(NA)),name(NA,[N]),name(Y,[N|SS]),!.
+toPropercase([CX|Y],[D3|YY]):- must_det(toPropercase(CX,D3)),must_det(toPropercase(Y,YY)).
 toPropercase(MiXed,UPPER):-compound(MiXed),MiXed=..MList,toPropercase(MList,UList),!,UPPER=..UList.
+toPropercase(D3,D3):-not(atom(D3)),!.
+toPropercase('',''):-!.
+toPropercase(A,U):-atom_length(A,1),toUppercase(A,U),!.
+toPropercase('_','_'):-!.
+toPropercase('_','-'):-!.
+toPropercase(D3,DD3):- camelSplitters(V),concat_atom([L,I|ST],V,D3),L \='',I \='',toPropercase([L,I|ST],LIST2),toPropercase(V,VV),concat_atom(LIST2,VV,DD3),!.
+toPropercase(CX,Y):- name(CX,[S|SS]),char_type(S,to_lower(NA)),name(NA,[N]),name(Y,[N|SS]),!.
 toPropercase(A,A).
 
 
@@ -286,8 +326,8 @@ any_to_string0(Atom,String):-string(Atom),Atom=String,!.
 any_to_string0(Atom,String):-atom(Atom),atom_string(Atom,String),!.
 any_to_string0([Atom],String):-atom(Atom),atom_string(Atom,String),!.
 any_to_string0(A,""):-nonvar(A),member(A,[[],'',""]),!.
-any_to_string0(List,String):-catch(text_to_string(List,String),_,fail),!.
-any_to_string0(List,String):-is_list(List), (catch(atomics_to_string(List, ' ', String),_,fail);((list_to_atomics_list0(List,AList),catch(atomics_to_string(AList, ' ', String),_,fail)))),!.
+any_to_string0(List,String):-ccatch(text_to_string(List,String),_,fail),!.
+any_to_string0(List,String):-is_list(List), (ccatch(atomics_to_string(List, ' ', String),_,fail);((list_to_atomics_list0(List,AList),ccatch(atomics_to_string(AList, ' ', String),_,fail)))),!.
 any_to_string0(List,String):-sformat(String,'~q',[List]).
 
 list_to_atomics_list0(Var,A):-var(Var),!,any_to_string(Var,A),!.
@@ -296,11 +336,14 @@ list_to_atomics_list0([E|EnglishF],[A|EnglishA]):-
    list_to_atomics_list0(EnglishF,EnglishA),!.
 list_to_atomics_list0([],[]):-!.
 
+:-export(atomic_list_concat_catch/3).
+atomic_list_concat_catch(List,Sep,Atom):-ccatch(atomic_list_concat(List,Sep,Atom),E,(dumpST,dmsg(E:atomic_list_concat(List,Sep,Atom)),!,fail)).
 
-catch_read_term_from_atom(Sub,Term,NewOnes):-catch(read_term_from_atom(Sub,Term,[module(user),variable_names(NewOnes)]),_,fail),Term\==end_of_file.
 
-splt_words(Atom,Terms,Var):- catch((hotrace(once(splt_words_0(Atom,Terms,Var)))),_,fail),!.
-splt_words(Atom,Words1,[]):- catch(atomic_list_concat(Words1,' ',Atom),_,fail),!.
+catch_read_term_from_atom(Sub,Term,NewOnes):-ccatch(read_term_from_atom(Sub,Term,[module(user),variable_names(NewOnes)]),_,fail),Term\==end_of_file.
+
+splt_words(Atom,Terms,Var):- ccatch((hotrace(once(splt_words_0(Atom,Terms,Var)))),_,fail),!.
+splt_words(Atom,Words1,[]):- ccatch(atomic_list_concat(Words1,' ',Atom),_,fail),!.
 splt_words_0('',[],[]):-!.
 splt_words_0(Atom,[Term|List],Vars):- atom_length(Atom,To),between(0,To,X), 
       sub_atom(Atom,0,Len,X,Sub),Len>0,
@@ -329,9 +372,13 @@ vars_to_ucase_0([N=V|Vars],List):-
    ignore(N=V),
    vars_to_ucase_0(Vars,List).
 
-atomSplit(In,List):- hotrace(( ground(In),
+atomSplit(In,List):- fail,hotrace(( ground(In),
  any_to_string(In,String),atom_string(Atom,String),splt_words(Atom,List,Vars),vars_to_ucase(Vars,List))),!.
-atomSplit(Atom,WordsO):- 
+
+atomSplit(Atom,WordsO):-atomSplitEasy(Atom,WordsO),!.
+
+:-export(atomSplitEasy/2).
+atomSplitEasy(Atom,WordsO):- 
    hotrace((atomSplit(Atom,WordsO,[' ','\t','\n','\v','\f','\r',' ','!','"','#','$','%','&','\'',
     '(',')','*','+',',','-','.','/',':',';','<',
     '=','>','?','@','[',\,']','^','_',
@@ -359,4 +406,191 @@ interleave([Atom],_Space,[Atom]):-!.
 interleave([''|More],Space,[Space|Result]):-interleave(More,Space,Result),!.
 interleave([Atom|More],Space,[Atom,Space|Result]):-interleave(More,Space,Result),!.
 
+
+
+%================================================================
+% decends tree
+%================================================================
+
+map_tree_to_list(_,PATTERN,Output):- (var(PATTERN);number(PATTERN)),!,must_assign([PATTERN],Output).
+map_tree_to_list(_,[],OUT):-!,must_assign([],OUT).
+map_tree_to_list(Pred,IN,Output):- once(call(Pred,IN,MID)),must((MID=IN -> flatten([MID],OUT) ; map_tree_to_list(Pred,MID,OUT))),!,must_assign(OUT=Output).
+map_tree_to_list(Pred,[I|IN],Output):-!,debugOnFailureEach((map_tree_to_list(Pred,I,O1),map_tree_to_list(Pred,IN,O2),!,append(O1,O2,OUT))),!,must_assign(OUT=Output).
+map_tree_to_list(Pred,IN,Output):-atom(IN),!,must((atomSplit(IN,MID),!,map_tree_to_list(Pred,MID,OUT))),!,must_assign(OUT=Output).
+map_tree_to_list(Pred,IN,Output):-
+ must((compound(IN), IN=..INP, append(Left,[Last],INP), map_tree_to_list(Pred,Last,UT),!,
+  append(Left,[UT],OUTP),!, OUT =.. OUTP)),must_assign([OUT],Output).
+map_tree_to_list(_,IN,IN):-trace,must_assign([IN],IN).
+
+non_empty(A):-must_det(not(empty_string(A))).
+must_nonvar(A):-one_must(nonvar(A),trace_or_throw(must_nonvar(A))).
+
+
+both_empty(A,B):-empty_string(A),!,empty_string(B),nop(dmsg(both_empty(A,B))).
+either_empty(A,B):- (empty_string(B);empty_string(A)),!,nop(dmsg(either_empty(A,B))).
+
+equals_icase(A,B):-either_empty(A,B),!,fail.
+equals_icase(A,B):-string_ci(A,U),string_ci(B,U).
+starts_with_icase(A,B):-either_empty(A,B),!,fail.
+starts_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),non_empty(UB),atom_concat(UB,_,UA).
+starts_with_icase(A,B):-both_empty(A,B),dmsg(warn(equals_icase(A,B))).
+either_starts_with_icase(A,B):-either_empty(A,B),!,fail.
+either_starts_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),non_empty(UA),non_empty(UB),(atom_concat(UB,_,UA);atom_concat(UA,_,UB)).
+starts_or_ends_with_icase(A,B):-either_empty(A,B),!,fail.
+starts_or_ends_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),non_empty(UA),non_empty(UB),(atom_concat(UB,_,UA);atom_concat(_,UA,UB)).
+ends_with_icase(A,B):-either_empty(A,B),!,fail.
+ends_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),non_empty(UB),atom_concat(_,UB,UA).
+
+string_dedupe(StringI,StringO):- to_word_list(StringI,Words),remove_predupes(Words,StringO).
+
+remove_predupes([],[]).
+remove_predupes(ListI,ListO):- member(L0,["",''," ",' ']),member(L0,ListI),delete(ListI,L0,ListM),!,remove_predupes(ListM,ListO),!.
+remove_predupes([L|ListI], ListO):- (member_ci(L,ListI) -> remove_predupes(ListI,ListO) ; (remove_predupes(ListI,ListM),[L|ListM]=ListO)),!.
+
+member_ci(L,[List|I]):-!,member(LL2,[List|I]),string_equal_ci(LL2,L).
+member_ci(W,WL):-to_word_list(WL,ListI),member(LL2,ListI),string_equal_ci(LL2,W).
+
+string_ci(A,LIC):-var(A),!,A=LIC.
+string_ci(A,LIC):-hotrace((any_to_string(A,S),non_empty(A),text_to_string(S,SS),string_lower(SS,SL),atomics_to_string(SLIC,"_",SL),atomics_to_string(SLIC," ",LIC))),!.
+
+:-export(append_ci/3).
+append_ci(A1,A2,A3):-to_word_list(A1,L1),to_word_list(A2,L2),to_word_list(A3,L3),!, append_ci0(L1,L2,L3),!.
+
+append_ci0([],L1,L2):-string_equal_ci(L1,L2),!.
+append_ci0(L,L2,R):-divide_list(L,H1,L1),divide_list(R,H2,L3),string_equal_ci(H1,H2),!,append_ci0(L1,L2,L3).
+
+divide_list(L,L0,LT):-is_list(L),!,length(L,X),X1 is X-1,between(1,X1,RS),length(LT,RS),append(L0,LT,L).
+divide_list(L,L0,LT):-append(L0,LT,L).
+
+string_equal_ci(L0,L1):- to_word_list(L0,WL0),to_word_list(L1,WL1),!,string_equal_ci0(WL0,WL1),!.
+
+string_equal_ci0([],_):-!,fail.
+string_equal_ci0(_,[]):-!,fail.
+string_equal_ci0(L0,R0):-string_equal_ci1(L0,R0),!.
+string_equal_ci0(L,R):-divide_list(L,L0,LT),divide_list(R,R0,RT),string_equal_ci1(L0,R0),!,string_equal_ci0(LT,RT).
+
+string_equal_ci1(A0,A0):-!.
+string_equal_ci1([],_):-!,fail.
+string_equal_ci1(_,[]):-!,fail.
+string_equal_ci1(A0,B0):-as_nc_str(A0,AR),as_nc_str(B0,BR), AR = BR.
+
+
+as_nc_str([A0,'\'',B0],AS):-atomic_list_concat([A0,'\'',B0],'',AO),as_nc_str(AO,AS).
+as_nc_str([A0,'\'',B0],AS):-as_nc_str([A0,B0],AS).
+as_nc_str([A0,Ommitable,B0],AS):- once(ommitable(Ommitable)), as_nc_str([A0,B0],AS).
+as_nc_str([Ommitable,B0],AS):- once(ommitable(Ommitable)), as_nc_str([B0],AS).
+as_nc_str([A0,B0],AS):-atom_concat(A0,B0,AO),as_nc_str(AO,AS).
+as_nc_str(A0,AS):-any_to_string(A0,AS).
+% as_nc_str(A0,A0).
+
+ommitable(O):-empty_string(O).
+ommitable(O):-string_to_atom(O,A),atom_length(A,L),!,L<2.
+
+atom_subst(A,F,R,K):-replace_in_string(F,R,A,K),!.
+
+
+empty_string(A):-var(A),!.
+empty_string([]).
+empty_string('').
+empty_string("").
+
+
+% Meta-Interp that appends the arguments to the calls
+convert_members([], InOut,InOut).
+convert_members([A,!|B], In,Out):- !, convert_members(A,In,M),!,convert_members(B,M,Out).
+convert_members([A|B], In,Out):- !, convert_members(A,In,M),convert_members(B,M,Out).
+convert_members(once(Call), In,Out):- !, convert_members(Call, In,Out),!.
+convert_members(ht(Call), In,Out):- !, Call=..[P|MID],CallOut=..[P,In|MID],call(CallOut,Out).
+convert_members(ico(In,Call,Out), In,Out):-  Call=..[P|MID],CallOut=..[P,In|MID],call(CallOut,Out).
+convert_members(cio(In,Call,Out), In,Out):-  call(Call,In,Out).
+convert_members(ic(InOut,Call), InOut,InOut):-  call(Call).
+convert_members(call(Call), InOut,InOut):-  call(Call).
+convert_members(Call, In,Out):- call(Call,In,Out).
+
+replace_in_string(SepChars, PadChars,Repl, A,C):- split_string(A,SepChars,PadChars,B),atomics_to_string(B,Repl,C).
+
+replace_in_string(F,R,A,K):-atom(A),!,atom_string(A,S),replace_in_string(F,R,S,C),atom_string(K,C).
+replace_in_string(SepChars,Repl,A,C):- atomics_to_string(B,SepChars,A),atomics_to_string(B,Repl,C).
+
+replace_periods(A,S):-  
+ convert_members([    
+   %  white space
+    replace_in_string("\r"," "),
+    replace_in_string("\n"," "),
+    % replace_in_string("\s"," "),
+    replace_in_string("'"," apostraphyMARK "),
+    replace_in_string("\t"," "),
+    % only remove leading and trailing white space
+   % at(split_string("", "\s\t\n")),
+    % respace the spaces
+    replace_in_string(" ", " ", " "),
+    % add a space on the end
+    ht(string_concat(" ")),
+    replace_in_string("?"," ? "),
+    replace_in_string("!"," ! "),
+    replace_in_string("."," . "),
+    % replace periods
+   replace_in_string(". "," periodMARK ")
+   ],A,S).
+
+% ?- replace_periods_string_list("hi there bub. how are you.",X),to_list_of_sents(X,L).
+% X = [hi, there, bub, '.', how, are, you, '.'],
+% L = [[hi, there, bub, '.'], [how, are, you, '.']] .
+%
+% ?- replace_periods_string_list("hi there bub! how are you?",X),to_list_of_sents(X,L).
+% X = [hi, there, bub, !, how, are, you, ?],
+% L = [[hi, there, bub, !], [how, are, you, ?]] .
+
+to_list_of_sents([],[]).
+to_list_of_sents(WList,[sent(FirstSent)|Groups]):-append(Left,[Last|Rest],WList),member(Last,['.','?','!']),!,append(Left,[Last],FirstSent),!,to_list_of_sents(Rest,Groups).
+to_list_of_sents(WList,[sent(WList)]).
+
+replace_periods_string_list(A,S):-replace_periods(A,AR),to_word_list(AR,WL),subst(WL,periodMARK,'.',WLS),subst(WLS,apostraphyMARK,'\'',S).
+
+to_word_list(A,SL):-once(hotrace((to_word_list_0(A,S0),(is_list(S0)->delete(S0,'',S);S=S0)))),must(S=SL).
+to_word_list_0(V,V):-var(V),!.
+to_word_list_0(Foo,V):-not(var(V)),trace_or_throw(to_word_list_0(Foo,V)).
+to_word_list_0([A],[A]):-number(A),!.
+to_word_list_0([],[]):-!.
+to_word_list_0("",[]):-!.
+to_word_list_0('',[]):-!.
+%to_word_list_0(A,WList):-string(A),Final=" (period) ",replace_periods(A,Final,S),not(A=S),!,to_word_list_0(S,WList).
+to_word_list_0([A,B|C],[A,B|C]):-atom(A),atom(B),!.
+to_word_list_0(A,WL):-atom(A),text_to_string(A,S),to_word_list_0(S,WL),!.
+to_word_list_0(A,S):-atomSplit(A,S),!.
+to_word_list_0(Input,WList):- (string(Input);atom(Input)),(atomic_list_concat(WList," ",Input);WList=[Input]),!.
+to_word_list_0(Input,Input).
+
+str_contains_all([],_String):- dtrace.
+str_contains_all(_,String):- empty_string(String), dtrace.
+str_contains_all(A,SL):- string_ci(SL,SLIC),SL\=SLIC,!,str_contains_all(A,SLIC).
+str_contains_all(List,String):-str_contains_all0(List,String).
+
+str_contains_all0([],_).
+str_contains_all0([A|Atoms],String):-
+      string_ci(A,L),
+      sub_string(String,_,_,Aft,L),
+      sub_string(String,Aft,_,0,SubString),!,
+      str_contains_all0(Atoms,SubString).
+
+
+atoms_of(Var,[]):- (var(Var);Var==[]),!.
+atoms_of(':',[]).
+atoms_of('moo',[]).
+atoms_of('dbase_t',[]).
+atoms_of(',',[]).
+atoms_of(':-',[]).
+atoms_of('$VAR',[]):-!.
+atoms_of(Atom,[]):-number(Atom),!.
+atoms_of(Atom,[Atom]):-atomic(Atom),!.
+atoms_of([H|T],L):-!,atoms_of(H,HL),atoms_of(T,TL),append(HL,TL,L),!.
+atoms_of(C,L):-C=..CL,atoms_of(CL,L),!.
+
+sort_by_strlen(List,Sorted):-predsort(longest_string,List,Sorted).
+
+% longest_string(?Order, @Term1, @Term2)
+longest_string(Order,TStr1,TStr2):-
+   text_to_string(TStr1,Str1),string_length(Str1,L1),
+   text_to_string(TStr2,Str2),string_length(Str2,L2),
+   compare(Order,L2-Str2,L1-Str1).
 

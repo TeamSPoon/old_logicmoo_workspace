@@ -10,7 +10,13 @@
 % ===================================================================
 */
 :-module(logicmoo_util_dcg,[
+         do_dcg_util_tests/0,
+         isVar/1,
+         isQVar/1,
+         isVarOrVAR/1,
+
          dcgAnd//2,
+         dumpList/1,
          dcgOr//2,
          dcgNot//1,
          theString//1,
@@ -28,34 +34,43 @@
 	 ]).
 
  
- :- meta_predicate logicmoo_util_dcg:dcgOnce(//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgOr(//,//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgOr(//,//,//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgTraceOnFailure(0).
- :- meta_predicate logicmoo_util_dcg:dcgAnd(//,//,//,//,?,?).
- :- meta_predicate logicmoo_util_dcg:theAll(//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgLeftOf(//,*,*,*).
- :- meta_predicate logicmoo_util_dcg:dcgIgnore(//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgAndRest(//,*,*,*).
- :- meta_predicate logicmoo_util_dcg:do_dcgTest(*,//,0).
- :- meta_predicate logicmoo_util_dcg:dcgOr(//,//,//,//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgStartsWith0(//,?,*).
- :- meta_predicate logicmoo_util_dcg:suggestVar(2,*,?).
- :- meta_predicate logicmoo_util_dcg:dcgBoth(//,//,*,*).
- :- meta_predicate logicmoo_util_dcg:dcgZeroOrMore(//,?,*).
- :- meta_predicate logicmoo_util_dcg:dcgMid(//,*,//,*,?).
- :- meta_predicate logicmoo_util_dcg:dcgOr(//,//,//,//,//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgNot(//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgStartsWith(//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgOneOrMore(//,?,*).
- :- meta_predicate logicmoo_util_dcg:dcgOnceOr(//,//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgReorder(//,//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgAnd(//,//,//,?,?).
- :- meta_predicate logicmoo_util_dcg:dcgAnd(//,//,?,?).
-%   :- meta_predicate logicmoo_util_dcg:theCode(0,*,*).
- :- meta_predicate logicmoo_util_dcg:dcgStartsWith1(//,*,*).
+:- meta_predicate dcgOnce(//,?,?).
+:- meta_predicate dcgOr(//,//,?,?).
+:- meta_predicate dcgOr(//,//,//,?,?).
+:- meta_predicate dcgTraceOnFailure(0).
+:- meta_predicate dcgAnd(//,//,//,//,?,?).
+:- meta_predicate theAll(//,?,?).
+:- meta_predicate dcgLeftOf(//,*,*,*).
+:- meta_predicate dcgIgnore(//,?,?).
+:- meta_predicate dcgAndRest(//,*,*,*).
+:- meta_predicate do_dcgTest(*,//,0).
+:- meta_predicate dcgOr(//,//,//,//,?,?).
+:- meta_predicate dcgStartsWith0(//,?,*).
+:- meta_predicate suggestVar(2,*,?).
+:- meta_predicate dcgBoth(//,//,*,*).
+:- meta_predicate dcgZeroOrMore(//,?,*).
+:- meta_predicate dcgMid(//,*,//,*,?).
+:- meta_predicate dcgOr(//,//,//,//,//,?,?).
+:- meta_predicate dcgNot(//,?,?).
+:- meta_predicate dcgStartsWith(//,?,?).
+:- meta_predicate dcgOneOrMore(//,?,*).
+:- meta_predicate dcgOnceOr(//,//,?,?).
+:- meta_predicate dcgReorder(//,//,?,?).
+:- meta_predicate dcgAnd(//,//,//,?,?).
+:- meta_predicate dcgAnd(//,//,?,?).
+:- meta_predicate dcgStartsWith1(//,?,?).
+:- meta_predicate do_dcgTest_startsWith(?,//,?).
+:- meta_predicate theCode(?,?,?).
+:- meta_predicate decl_dcgTest_startsWith(?,?,?).
+:- meta_predicate dcgWhile(?,//,?,?).
+:- meta_predicate decl_dcgTest(?,?).
+:- meta_predicate decl_dcgTest(?,?,?).
 
 
+isVarOrVAR(V):-var(V),!.
+isVarOrVAR('$VAR'(_)).
+isVar(V):-isVarOrVAR(V);isQVar(V).
+isQVar(Cvar):-atom(Cvar),atom_concat('?',_,Cvar).
 
 :-dynamic 
    decl_dcgTest/2,
@@ -63,11 +78,11 @@
    decl_dcgTest_startsWith/2,
    decl_dcgTest_startsWith/3.
 
-
-:-include('logicmoo_util_header.pl').
-:-use_module(logicmoo('logicmoo_util/logicmoo_util_bugger.pl')).
-:-use_module(logicmoo('logicmoo_util/logicmoo_util_strings.pl')).
-
+:- '@'((use_module(logicmoo(logicmoo_util/logicmoo_util_library)),
+        use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)),        
+         use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)),
+         use_module(logicmoo(logicmoo_util/logicmoo_util_strings)),
+         use_module(logicmoo(logicmoo_util/logicmoo_util_terms))),'user').
 
 decl_dcgTest(X,Y):- nonvar(Y),!,do_dcgTest(X,Y,true).
 decl_dcgTest(X,Y,Z):- nonvar(Y),!,do_dcgTest(X,Y,Z).
@@ -108,7 +123,7 @@ atomics_to_string_str0([S|Text],Sep,String):-
    atomics_to_string_str0(Text,Sep,StrR),!,
    atomics_to_string([StrL,StrR],Sep,String).
 
-% theString(String,Sep) --> [S|Text], {atomic_list_concat([S|Text],Sep,String),!}.
+% theString(String,Sep) --> [S|Text], {atomic_list_concat_catch([S|Text],Sep,String),!}.
 theString(String,Sep) --> [S|Text], {atomics_to_string_str([S|Text],Sep,String),!}.
 
 decl_dcgTest_startsWith([a,b|_],theCode(X=1),X==1).
@@ -209,7 +224,7 @@ dcgNone --> [].
 
 dcgOptional(A)--> dcgOnce(dcgOr(A,dcgNone)).
 
-dcgTraceOnFailure(X):-once(X;(trace,X)).
+dcgTraceOnFailure(X):-once(X;(dtrace,X)).
 
 capitalized([W|Text]) --> theText([W|Text]),{atom_codes(W,[C|_Odes]),is_upper(C)}.
 
@@ -234,6 +249,7 @@ dcgStartsWith(TheType,SMORE,SMORE) :- phrase(TheType,SMORE,_).
 decl_dcgTest_startsWith("this is text",dcgStartsWith(theText([this,is]))).
 
 
+:-export(dcgStartsWith1//1).
 % 1) must be first in list 
 % 2) doesnt consume
 % 3) sees only 1 item
@@ -255,7 +271,8 @@ decl_dcgTest("this is text",dcgStartsWith0(theText([this,is]))).
 % DCG Tester
 % =======================================================
 
-doTests:-
+:-export(do_dcg_util_tests/0).
+logicmoo_util_dcg:do_dcg_util_tests:-
    forall(decl_dcgTest(List,Phrase,Call),'@'((do_dcgTest(List,Phrase,Call)),logicmoo_util_dcg)),
    forall(decl_dcgTest_startsWith(List,Phrase,Call),'@'((do_dcgTest_startsWith(List,Phrase,Call)),logicmoo_util_dcg)).
 
@@ -274,24 +291,24 @@ decl_dcgTest(List,Phrase,true):-decl_dcgTest(List,Phrase).
 decl_dcgTest_startsWith(List,Phrase,true):-decl_dcgTest_startsWith(List,Phrase).
 
 
-to_word_list(A,S):-once(hotrace(to_word_list_0(A,S))).
-to_word_list_0(V,V):-var(V),!.
-to_word_list_0([A],[A]):-number(A),!.
-to_word_list_0([],[]):-!.
-to_word_list_0("",[]):-!.
-to_word_list_0('',[]):-!.
-to_word_list_0([A,B|C],[A,B|C]):-atom(A),atom(B),!.
-to_word_list_0(A,S):-atomSplit(A,S),!.
-to_word_list_0(Input,WList):- (string(Input);atom(Input)),(atomic_list_concat(WList," ",Input);WList=[Input]),!.
-to_word_list_0(Input,Input).
 
-:-source_location(File,_Line),module_property(M,file(File)),!,forall(current_predicate(M:F/A),M:export(F/A)).
+% :-source_location(File,_Line),module_property(M,file(File)),!,forall(current_predicate(M:F/A),M:export(F/A)).
 
-:-doTests.
+     
+
+
+dumpList(B):- currentContext(dumpList,Ctx),dumpList(Ctx,B).
+dumpList(_,AB):-dmsg(dumpList(AB)),!.
+
+dumpList(_,[]):-!.
+%dumpList(Ctx,[A|B]):-!,fmt(Ctx,A),dumpList(Ctx,B),!.
+%dumpList(Ctx,B):-fmt(Ctx,dumpList(B)).
 
 end_of_file.
 
 sentenceTagger(English,Tagged).
+
+
 
 
 
@@ -300,5 +317,6 @@ testPhrase(Dcg,English):-
          phrase(Dcg,Tagged,Left),
          nl,nl,writeq(left),         
          nl,dumpList(Left).
+
 
 

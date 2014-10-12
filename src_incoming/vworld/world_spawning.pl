@@ -14,6 +14,9 @@
 */
 
 
+
+
+
 amzi_timer(T1):-get_time(T1).
 
 
@@ -21,7 +24,7 @@ moo:on_world_load :- retractall(spawn_objects(_)).
 
 growth :-
 	findall(([Obj,Chance]),
-	    props(Obj,spawn_rate(Chance)),
+	    prop(Obj,spawn_rate,Chance),
 	    Objects),
 	assert(spawn_objects(Objects)).
 
@@ -55,23 +58,23 @@ csdmsg(M):-'format'('% ~q. ~n', [M]).
 :-style_check(-discontiguous).
 
 
-callStub(P,F,A):- predicate_property(P,number_of_clauses(N)),(N==1 -> (csdmsg(failed(callStub(P,F,A),!,fail))); ((functor(PP,F,A),csdmsg(callStub(P,F,A)),retractall((PP:-callStub(PP,F,A))),callStub(P,F,A)))).
+callStub_rete(P,F,A):- predicate_property(P,number_of_clauses(N)),(N==1 -> (csdmsg(failed(callStub_rete(P,F,A),!,fail))); ((functor(PP,F,A),csdmsg(callStub_rete(P,F,A)),retractall((PP:-callStub_rete(PP,F,A))),callStub_rete(P,F,A)))).
 
-createStub(F,A):- dynamic(F/A),!. % functor(P,F,A),asserta((P:-callStub(P,F,A))).
 
+createStub_rete(F,A):- dynamic(F/A),!. %%,functor(P,F,A),asserta((P:-callStub_rete(P,F,A))).
 
 
 :- forall(member(F/A,[
-      conflict_set/1,  
+     % conflict_set/1,  
       cls/0,  
-      create_instance/3,  
+      %create_instance/3,  
       frinst/4,  
       list/1,  
       mea/1,  
-      prop_memb/2,  
+      %prop_memb/2,  
       spawn_objects/1,  
-      string_integer/2,  
-      string_list/2,  
+     % string_integer/2,  
+     % string_list/2,  
       frame/2,
       old_flots/3,
       instantiation/1,
@@ -82,7 +85,7 @@ createStub(F,A):- dynamic(F/A),!. % functor(P,F,A),asserta((P:-callStub(P,F,A)))
       rul/3,
       varg/1,
       nid/1
-      ]),createStub(F,A)).
+      ]),createStub_rete(F,A)).
 
 
 % FOOPS - an integration of frames, forward chaining with LEX and MEA,
@@ -146,7 +149,7 @@ do(_) :- write('invalid command'),nl.
 
 % loads the rules (Prolog terms) into the Prolog database
 
-load :- reconsult('room.kb'),!.
+load :- reconsult('room. tbox'),!.
 load :-
 	write('Enter the file name in single quotes (ex. ''room.fkb''.): '),
 	read(F),
@@ -156,14 +159,14 @@ load :-
 
 initialize :-
 	setchron(1),
-	createStub(instantiation,1),
+	createStub_rete(instantiation,1),
 	delf(all),
 	assert(mea(no)),
 	assert(gid(100)),
 	initial_data(X),
 	assert_list(X), !.
 initialize :-
-	error(301,[initialization,error]).
+	local_error(301,[initialization,local_error]).
 
 % working storage is represented by database terms stored
 % under the key "fact"
@@ -323,7 +326,7 @@ process([Action|Rest],LHS) :-
 	take(Action,LHS),
 	!,process(Rest,LHS).
 process([Action|Rest],LHS) :-
-	error(201,[Action,fails]).
+	local_error(201,[Action,fails]).
 
 % if its retract, use the reference numbers stored in the Lrefs list,
 % otherwise just take the action
@@ -359,7 +362,7 @@ take(call(X)) :- call(X).
 % logic for retraction
 
 retr(all,LHS) :-retrall(LHS),!.
-retr(N,[]) :- error(202,['retract error, no ',N]), !.
+retr(N,[]) :- local_error(202,['retract local_error, no ',N]), !.
 retr(N,[N:Prem|_]) :- retract_ws(fact(Prem,_)),!.
 retr(N,[_|Rest]) :- !,retr(N,Rest).
 
@@ -479,7 +482,7 @@ find_slot(req(C,N,S,F,V), SlotList) :-
 	frame(X, HigherSlots),
 	find_slot(req(C,N,S,F,V), HigherSlots), !.
 find_slot(Req,_) :-
-	error(99,['frame error looking for:',Req]).
+	local_error(99,['frame local_error looking for:',Req]).
 
 facet_val(req(C,N,S,F,V),FacetList) :-
 	FV =.. [F,V],
@@ -517,7 +520,7 @@ uptf(Class,Name,UList) :-
 	asserta( frinst(Class,Name,NewList,TimeStamp) ),
 	!.
 uptf(Class,Name,UList) :-
-	error(105,[update,failed,Class,Name,UList]).
+	local_error(105,[update,failed,Class,Name,UList]).
 
 genid(G) :-
 	retract(gid(N)),
@@ -539,12 +542,12 @@ add_slots(C,N,X,SlotList,NewList) :-
 	add_slot(req(C,N,S,F,V),SlotList,NewList).
 
 add_slot(req(C,N,S,F,V),SlotList,[S-FL2|SL2]) :-
-	delete(S-FacetList,SlotList,SL2),
+	ws_delete(S-FacetList,SlotList,SL2),
 	add_facet(req(C,N,S,F,V),FacetList,FL2).
 
 add_facet(req(C,N,S,F,V),FacetList,[FNew|FL2]) :-
 	FX =.. [F,OldVal],
-	delete(FX,FacetList,FL2),
+	ws_delete(FX,FacetList,FL2),
 	add_newval(OldVal,V,NewVal),
 	!, check_add_demons(req(C,N,S,F,V),FacetList),
 	FNew =.. [F,NewVal].
@@ -564,12 +567,12 @@ check_add_demons(req(C,N,S,F,V),FacetList) :-
 check_add_demons(_,_).
 
 
-% delete a list of slot values
+% ws_delete a list of slot values
 
 del_frame(Class) :-
 	retract(frame(Class,_)).
 del_frame(Class) :-
-	error(203,['No frame',Class,'to delete']).
+	local_error(203,['No frame',Class,'to ws_delete']).
 
 del_frame(Class, UList) :-
 	old_slots(Class,SlotList),
@@ -586,7 +589,7 @@ delf(Class,Name) :-
 	retract( frinst(Class,Name,_,_) ),
 	!.
 delf(Class,Name) :-
-	error(103,['No instance of ',Class,' for ',Name]).
+	local_error(103,['No instance of ',Class,' for ',Name]).
 
 delf(Class,Name,UList) :-
 	old_flots(Class,Name,SlotList),
@@ -608,7 +611,7 @@ del_slot(req(C,N,S,F,V),SlotList,[S-FL2|SL2]) :-
 	remove(S-FacetList,SlotList,SL2),
 	del_facet(req(C,N,S,F,V),FacetList,FL2).
 del_slot(Req,_,_) :-
-	error(104,['del_slot - unable to remove',Req]).
+	local_error(104,['del_slot - unable to remove',Req]).
 
 del_facet(req(C,N,S,F,V),FacetList,FL) :-
 	FV =.. [F,V],
@@ -621,7 +624,7 @@ del_facet(req(C,N,S,F,V),FacetList,[FNew|FL]) :-
 	FNew =.. [F,NewValList],	
 	!, check_del_demons(req(C,N,S,F,V),FacetList).
 del_facet(Req,_,_) :-
-	error(105,['del_facet - unable to remove',Req]).
+	local_error(105,['del_facet - unable to remove',Req]).
 
 check_del_demons(req(C,N,S,F,V),FacetList) :-
 	get_frame(C,S-del(Del)), !,
@@ -666,9 +669,9 @@ print_slots([Slot|Rest]) :-
 
 % utilities
 
-delete(X,[],[]).
-delete(X,[X|Y],Y) :- !.
-delete(X,[Y|Z],[Y|W]) :- delete(X,Z,W).
+ws_delete(X,[],[]).
+ws_delete(X,[X|Y],Y) :- !.
+ws_delete(X,[Y|Z],[Y|W]) :- ws_delete(X,Z,W).
 
 remove(X,[X|Y],Y) :- !.
 remove(X,[Y|Z],[Y|W]) :- remove(X,Z,W).
@@ -678,9 +681,9 @@ is_on(X,[Y|Z]) :- is_on(X,Z).
 
 error_threshold(100).
 
-error(NE,_) :- error_threshold(N), N > NE, !, fail.
-error(NE,E) :-
-	nl, write('*** '),write(error-NE),tab(1),
+local_error(NE,_) :- error_threshold(N), N > NE, !, fail.
+local_error(NE,E) :-
+	nl, write('*** '),write(local_error-NE),tab(1),
 	write_line(E),
 	!, fail.
 

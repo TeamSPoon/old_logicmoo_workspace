@@ -211,7 +211,7 @@ lock(agent(Agent),theme(Theme),instrument(Instrument)) :- % -->
 % <action name="open">
 %	<params>Agent,Object</params>
 % <!--
-open(agent(Agent),object(Object)) :- % -->
+open(agent(Agent),item(Object)) :- % -->
 %   <preconds>
 	k(openclosecontainer(Object)),
 	k(closed(Object)),
@@ -229,7 +229,7 @@ open(agent(Agent),object(Object)) :- % -->
 % <action name="shut">
 %	<params>Agent,Object</params>
 % <!--
-shut(agent(Agent),object(Object)) :- % -->
+shut(agent(Agent),item(Object)) :- % -->
 %   <preconds>
 	k(openclosecontainer(Object)),
 	k(open(Object)),

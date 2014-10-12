@@ -10,14 +10,15 @@
 %
 */
 
+% :- module(user). 
 :- module(attack, []).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- moo:register_module_type(command).
 
 % attack joe ->translates-> attack nw
-moo:decl_action(attack(dir)).
+moo:actiontype(attack(dir)).
 
 % Attack
 % Successful Attack
@@ -26,7 +27,7 @@ moo:agent_call_command(Agent,attack(Dir)) :-
 	move_dir_target(LOC,Dir,XXYY),
 	atloc(What,XXYY),
 	damage_foe(Agent,What,hit),
-	moo:update_charge(Agent,attack).
+	call_update_charge(Agent,attack).
 
 % Destroy small objects (food, etc.)
 moo:agent_call_command(Agent,attack(Dir)) :-	
@@ -35,7 +36,7 @@ moo:agent_call_command(Agent,attack(Dir)) :-
 	atloc(What,XXYY),	
 	props(What,weight(1)),
 	destroy_object(XXYY,What),
-	moo:update_charge(Agent,attack).
+	call_update_charge(Agent,attack).
 
 % Hit a big object... causes damage to agent attacking
 moo:agent_call_command(Agent,attack(Dir)) :-	
@@ -44,30 +45,30 @@ moo:agent_call_command(Agent,attack(Dir)) :-
 	atloc(What,XXYY),	
 	What \== 0,
 	props(What,weight(_)),
-	moo:update_stats(Agent,bash),
-	moo:update_charge(Agent,attack).
+	call_update_stats(Agent,bash),
+	call_update_charge(Agent,attack).
 
 % Hit nothing (empty space)... causes a little damage
 moo:agent_call_command(Agent,attack(Dir)) :-	
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	not(atloc(_,XXYY)),
-	moo:update_stats(Agent,wiff),
-	moo:update_charge(Agent,attack).
+	call_update_stats(Agent,wiff),
+	call_update_charge(Agent,attack).
 
 % Check to see if agent being attacked is carrying an 
 % object which provides defence
 check_for_defence(Agent,Def) :-
 	findall(Poss,possess(Agent,Poss),Inv),
 	member(Obj,Inv),
-	props(Obj,act(_,defence(Def))).
+	props(Obj,act_affect(_,defence(Def))).
 check_for_defence(_,0).
 
 % Check to see if attacking agent has a weapon
 check_for_weapon(Agent,Wpn) :-
 	findall(Poss,possess(Agent,Poss),Inv),
         member(Obj,Inv),
-        props(Obj,act(_,attack(Wpn))).
+        props(Obj,act_affect(_,attack(Wpn))).
 
 check_for_weapon(_,0).
 
@@ -86,23 +87,17 @@ damage_foe(Agent,What,hit) :-
 	add(damage(What,NewDam)).
 
 % Record keeping
-moo:decl_update_charge(Agent,attack) :-
-	del(charge(Agent,Old)),
-	New is Old - 5,
-	add(charge(Agent,New)).
-moo:decl_update_stats(Agent,bash) :- 
-	del(damage(Agent,Old)),
-	New is Old - 2,
-	add(damage(Agent,New)),
-	add(failure(Agent,bash)).
-moo:decl_update_stats(Agent,wiff) :- 
+moo:update_charge(Agent,attack) :- upprop(Agent,charge(-5)).
+moo:update_stats(Agent,bash) :-  upprop(Agent,damage(-2)),
+	(add_cmdfailure(Agent,bash)).
+moo:update_stats(Agent,wiff) :- 
 	del(damage(Agent,Old)),
 	New is Old - 1,
 	add(damage(Agent,New)),
-	add(failure(Agent,bash)).
+	(add_cmdfailure(Agent,bash)).
 
 
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 
 

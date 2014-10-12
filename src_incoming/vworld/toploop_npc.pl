@@ -11,11 +11,15 @@
           npc_tick/0,
           join_npcs_long_running/0,npc_tick_tock/0,npc_tick_tock_time/1,
           npc_controller/2,   
+          warnOnError/1,
           get_world_agent_plan/3,
           tick_controller/2]).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- meta_predicate warnOnError(0).
+:- meta_predicate agent_call_safely(?,?,?).
 
+:- include(logicmoo(vworld/moo_header)).
+% :- moo:begin_transform_moo_preds.
 :- dynamic(npc_tick_tock_time/1).
 npc_tick_tock_time(300).
 
@@ -30,11 +34,10 @@ npc_tick:-
 join_npcs_long_running.
 
 % skip manually controled agents
-npc_controller(simple_world_agent_plan,Who):- call(dbase:agent(Who)),not(agent_message_stream(Who,_,_)).
+npc_controller(simple_world_agent_plan,Who):- isa(Who,activeAgent),not(thglobal:agent_message_stream(Who,_,_,_)).
 
 tick_controller(simple_world_agent_plan,Who):- tick(Who).
 
-ggtrace:- visible(+all), leash(-exit),leash(-fail),leash(-call),leash(-redo).
 %:-ggtrace.
 
 move_or_sit_memory_idea(Agent,move(Dir),[Outlet]) :-
@@ -52,7 +55,7 @@ move_or_sit_memory_idea(Agent,sit,_) :-
 
 tick(Who):-
    findall(Idea,get_world_agent_plan(current,Who,Idea),IdeaS),!,IdeaS=[_|_],
-   random_member(Idea,IdeaS),!,
+   my_random_member(Idea,IdeaS),!,
    do_agent_call_plan_command(Who,Idea).
 
 
@@ -70,21 +73,23 @@ do_agent_call_plan_command(A,C):-
 
 idea(Who,IdeaS):- findall(Idea,(get_world_agent_plan(current,Who,Idea),dmsg(get_world_agent_plan(current,Who,Idea))),IdeaS),(IdeaS==[]->dmsg(noidea(idea(Who)));true).
 
-moo:decl_action(npc_timer(int),"sets how often to let NPCs run").
-moo:decl_action(tock,"Makes All NPCs do something brilliant").
-moo:decl_action(tick(agent),"Makes some agent do something brilliant").
-moo:decl_action(idea(optional(agent,self)),"Makes some agent (or self) think of something brilliant").
-moo:decl_action(tick,"Makes *your* agent do something brilliant").
-moo:decl_action(prolog(prolog),"Call prolog toploop").
+moo:action_info(npc_timer(int),"sets how often to let NPCs run").
+moo:action_info(tock,"Makes All NPCs do something brilliant").
+moo:action_info(tick(agent),"Makes some agent do something brilliant").
+moo:action_info(idea(optional(agent,self)),"Makes some agent (or self) think of something brilliant").
+moo:action_info(tick,"Makes *your* agent do something brilliant").
+moo:action_info(prolog(prolog),"Call prolog toploop").
 
-moo:agent_text_command(Agent,[prolog,X],Agent,prologCall(X)).
-moo:agent_text_command(Agent,[prolog],Agent,prologCall(prolog)).
+moo:agent_text_command(Agent,[prolog,X],Agent,prologCall(X)):-ignore(X=someCode).
+moo:agent_text_command(Agent,[prolog],Agent,prologCall(user:prolog_repl)).
+moo:agent_text_command(Agent,[tlocals],Agent,prologCall(user:tlocals)).
 
 warnOnError(X):-catch(X,E,dmsg(error(E:X))).
 
-moo:agent_call_command(Agent,prologCall(C)) :- agent_call_safely(Agent,C).
-moo:agent_call_command(Agent,prolog(C)) :- agent_call_safely(Agent,C).
+moo:agent_call_command(Agent,prologCall(C)) :-  must(nonvar(C)), agent_call_safely(Agent,C).
+moo:agent_call_command(Agent,prolog(C)) :- must(nonvar(C)),agent_call_safely(Agent,C).
 
+:-export(agent_call_safely/2).
 agent_call_safely(_Agnt,C):- any_to_callable(C,X,Vars), !, gensym(result_count_,RC),flag(RC,_,0),agent_call_safely(RC,X,Vars),flag(RC,CC,CC),fmt(result_count(CC)).
 agent_call_safely(RC,X,[]) :- !, '@'(notrace((warnOnError(doall(((X,flag(RC,CC,CC+1),fmt(cmdresult(X,true)))))))),user).
 agent_call_safely(RC,X,Vars) :-  '@'(notrace((warnOnError(doall(((X,flag(RC,CC,CC+1),fmt(cmdresult(X,Vars)))))))),user).
@@ -92,13 +97,14 @@ agent_call_safely(RC,X,Vars) :-  '@'(notrace((warnOnError(doall(((X,flag(RC,CC,C
 atom_to_term_safe(A,T,O):-catch(atom_to_term(A,T,O),_,fail),T\==end_of_file.
 any_to_callable(S,X,Vs):-string(C),!,string_to_atom(S,C),atom_to_term_safe(C,X,Vs).
 any_to_callable(C,X,Vs):-atom(C),!,atom_to_term_safe(C,X,Vs).
-any_to_callable(C,X,Vs):-expand_goal(C,X),term_variables((C,X),Vs),!.
+any_to_callable(C,X,Vs):- (expand_goal(C,X)),term_variables((C,X),Vs),!.
+% any_to_callable(C,X,Vs):-force_expand(expand_goal(C,X)),term_variables((C,X),Vs),!.
 
 moo:agent_call_command(_Agent,npc_timer(Time)):-retractall(npc_tick_tock_time(_)),asserta(npc_tick_tock_time(Time)).
 moo:agent_call_command(Who,tick) :-  debugOnError(tick(Who)).
-moo:agent_call_command(_Agent,idea(Who)) :-  catch(idea(Who,_),E,(dmsg(idea(E, Who)),debug,ggtrace,trace,idea(Who,_))).
+moo:agent_call_command(_Agent,idea(Who)) :-  catch(idea(Who,_),E,(dmsg(idea(E, Who)),ggtrace,idea(Who,_))).
 moo:agent_call_command(_Agent,tock) :- npc_tick.
 moo:agent_call_command(_Agent,tick(Other)) :- in_thread_and_join(tick(Other)).
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 

@@ -9,55 +9,70 @@
 % This file defines the basic take (pick up) predicate
 %
 */
+% :- module(user). 
 :- module(take, []).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- moo:register_module_type(command).
+
+moo:actiontype(take(item)).
 
 % Take something
 % Successfully picking something up
 moo:agent_call_command(Agent,take(SObj)) :-
-	atloc(Agent,LOC),
-	atloc(Obj,LOC),
-        object_match(SObj,Obj),
-	props(Obj,weight(1)),
-	worth(Agent,take,Obj),
+	(once((localityOfObject(Agent,LOC),
+                       localityOfObject(Obj,LOC),nonvar(Obj),
+                       not(possess(Agent,Obj)),
+
+                       object_match(SObj,Obj)))),
+	nop((ignore(props(Obj,weight<2)),
+	ignore(worth(Agent,take,Obj)))),
 	permanence_take(take,Agent,Obj),
-	moo:update_charge(Agent,take).
+	call_update_charge(Agent,take).
 
 %Nothing to pick up
 moo:agent_call_command(Agent,take(_)) :-
-	moo:update_charge(Agent,take),
-	add(failure(Agent,take)).
+	call_update_charge(Agent,take),
+	(add_cmdfailure(Agent,take)).
 
 % Is the obect going to stick around after taken, either as is
 % or in the agent's possession.
 permanence_take(take,Agent,Obj) :-
 	atloc(Agent,LOC),
-	check_permanence(take,Agent,LOC,Obj),!,
-        term_listing(Obj).
+	check_permanence(take,Agent,LOC,Obj),!.
+        %term_listing(Obj).
 
-check_permanence(take,_,_,Obj):-
-        props(Obj,permanence(take,0)),        
+moo:check_permanence(take,_,_,Obj):-
+        props(Obj,permanence(take,Dissapears)), 
+		member(Dissapears,[0,dissapears]),
         atloc(Obj,LOC),
 	clr(atloc(Obj,LOC)).
-check_permanence(take,Agent,_,Obj) :-
-	props(Obj,permanence(take,1)),
+moo:check_permanence(take,Agent,_,Obj) :-
+	props(Obj,permanence(take,Held)),
+           member(Held,[1,held]),
         atloc(Obj,LOC),
 	ignore(clr(atloc(Obj,LOC))),
 	add(possess(Agent,Obj)),
         (req(possess(Agent,Obj)) -> true; throw(req(possess(Agent,Obj)))).
-check_permanence(take,_,_,_).
+moo:check_permanence(take,Agent,_,Source) :-
+	props(Source,permanence(take,copy(What))),
+        create_new_object([What],Obj),
+         add(possess(Agent,Obj)),
+        (req(possess(Agent,Obj)) -> true; throw(req(possess(Agent,Obj)))).
+moo:check_permanence(take,_Agent,_,Obj) :-
+        props(Obj,permanence(take,stays)),!.
+
+moo:check_permanence(take,_,_,_).
 
 % Record keeping
-moo:decl_update_charge(Agent,take) :-
-      padd(Agent,[charge(-2)]).
+moo:update_charge(Agent,take) :-
+      padd(Agent,charge(-2)).
 
 
 
 
 
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(logicmoo(vworld/moo_footer)).
 

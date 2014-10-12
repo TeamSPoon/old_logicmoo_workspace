@@ -23,11 +23,11 @@
 
 
 % yadlr alias
-file_search_path(yadlr, X) :- absolute_file_name('../tools/yadlr/pl', X).
+user:file_search_path(yadlr, X) :- getenv('LOGICMOO_HOME',MOO),atom_concat(MOO,'/src_modules/yadlr/pl', X).
 
 % aleph alias must resolve to the directory where aleph.pl exists.
 % you can download aleph from http://www.comlab.ox.ac.uk/oucl/research/areas/machlearn/Aleph/aleph.pl
-file_search_path(aleph, X) :- absolute_file_name('../tools/aleph/', X).
+user:file_search_path(aleph, X) :- getenv('LOGICMOO_HOME',MOO),atom_concat(MOO,'/src_modules/aleph/', X).
 
 
 :- use_module(yadlr(prodlr)).
@@ -36,10 +36,10 @@ file_search_path(aleph, X) :- absolute_file_name('../tools/aleph/', X).
 
 :- consult(refine).
 
-:- assert(('$aleph_sat_terms'(v,v,v,v) :- fail) ).
-:- assert(('$aleph_sat_atom'(v,v) :- fail) ).
-:- assert(('$aleph_sat_varscopy'(v,v,v):- fail) ).
-:- assert((false :- fail)).
+:- assert_if_new(('$aleph_sat_terms'(v,v,v,v) :- fail) ).
+:- assert_if_new(('$aleph_sat_atom'(v,v) :- fail) ).
+:- assert_if_new(('$aleph_sat_varscopy'(v,v,v):- fail) ).
+:- assert((nil :- fail)).
 
 aleph_settings :-
    set(nodes, 100000),
@@ -124,7 +124,7 @@ learn(Pred,Example) :- learn(Pred,Example,reduction).
 learn(Example) :- learn(target,Example).
 
 
-false :-
+nil :-
    hypothesis(Head, Body, _),
    numbervars((Head:-Body), 0, _),
    Head = target(A, B),

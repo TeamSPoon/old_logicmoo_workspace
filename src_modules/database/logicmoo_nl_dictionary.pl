@@ -173,9 +173,9 @@ dictionary(contractions,[couldnt],[could,not]).
 dictionary(contractions,[couldn,'\'',t],[could,not]).
 %dictionary(contractions,['Let',me,_],[yes]).
 %dictionary(contractions,[let,me,_],[yes]).
-dictionary(contractions,['Lets',_],[yes]).
-dictionary(contractions,['lets',_],[yes]).
-dictionary(contractions,['thats',X],[X]).
+%dictionary(contractions,['Lets',_],[yes]).
+%dictionary(contractions,['lets',_],[yes]).
+dictionary(contractions,['thats'],['that','is']).
 
 dictionary(slang,[precieved],[percieved]).
 

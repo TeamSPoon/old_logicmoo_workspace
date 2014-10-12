@@ -6,47 +6,22 @@
 	<Config
 		Name="Release"
 		OutputFile=""
-		CompilerConfigName="Latest Version">
+		CompilerConfigName="GCC-4.8.2-i686-pc-cygwin">
 		<Menu>
-			<Target
-				Name="Compile"
-				MenuCaption="&amp;Compile"
-				CaptureOutputWith="ProcessBuffer"
-				SaveOption="SaveCurrent"
-				RunFromDir="%rw">
-				<Exec/>
-			</Target>
 			<Target
 				Name="Build"
 				MenuCaption="&amp;Build"
+				SaveOption="SaveModified"
+				RunFromDir="%rw"
 				CaptureOutputWith="ProcessBuffer"
-				SaveOption="SaveWorkspaceFiles"
-				RunFromDir="%rw">
-				<Exec/>
-			</Target>
-			<Target
-				Name="Rebuild"
-				MenuCaption="&amp;Rebuild"
-				CaptureOutputWith="ProcessBuffer"
-				SaveOption="SaveWorkspaceFiles"
-				RunFromDir="%rw">
-				<Exec/>
-			</Target>
-			<Target
-				Name="Debug"
-				MenuCaption="&amp;Debug"
-				SaveOption="SaveNone"
-				RunFromDir="%rw">
-				<Exec/>
-			</Target>
-			<Target
-				Name="Execute"
-				MenuCaption="E&amp;xecute"
-				SaveOption="SaveNone"
-				RunFromDir="%rw">
-				<Exec CmdLine='"LogicMOO_MUD.exe"'/>
+				ClearProcessBuffer="1"
+				Verbose="1"
+				Beep="1">
+				<Exec CmdLine="T:\devel\logicmoo\StartMUDServer.bat build"/>
 			</Target>
 		</Menu>
+		<PreBuildCommands StopOnError="1"/>
+		<PostBuildCommands StopOnError="1"/>
 	</Config>
 	<CustomFolders>
 		<Folder
@@ -79,12 +54,35 @@
 				N="src/logicmoo_util/*.*"
 				Recurse="1"/>
 		</Folder>
+		<Folder Name="src_data/pldata">
+			<F N="src_data/pldata/el_assertions.pl.hide"/>
+			<F N="src_data/pldata/el_holds.pl.hide"/>
+			<F N="src_data/pldata/nldata_talk_db_pdat.pl"/>
+		</Folder>
 		<Folder Name="src_incoming">
 			<F
 				N="src_incoming/*.*"
 				Recurse="1"
+				Excludes="*unused.*;*.orig;*.ba*"/>
+		</Folder>
+		<Folder Name="src_incoming_next">
+			<F
+				N="src_incoming_next/*.*"
+				Recurse="1"
 				Refilter="0"
 				Excludes=""/>
+		</Folder>
+		<Folder Name="src_modules/leanCOP">
+			<F
+				N="src_modules/leanCOP/*.*"
+				Recurse="1"
+				Refilter="0"
+				Excludes=""/>
+		</Folder>
+		<Folder Name="src_modules/MaLARea/script/malecop">
+			<F
+				N="src_modules/MaLARea/script/malecop/*.*"
+				Recurse="1"/>
 		</Folder>
 	</Files>
 </Project>

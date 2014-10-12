@@ -2,12 +2,12 @@
 % This file gives a common place where world effects 
 % (such as carrying  shield or being drunk) are implemented
 %
-% Project Logicmoo: A MUD server written in Prolog
+% Project LogicMoo: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
 */
-
+% :- module(world_effects,[]).
 /*
 % This file is "included" from world.pl 
 */
@@ -19,37 +19,40 @@
 % Is the object worth anything (either scored points or charge)
 % Score any points?
 worth(Agent,Action,Obj) :-
-	props(Obj,act(Action,score(S))),
-	del(score(Agent,Y)),
-	X is Y + S,
-	add(score(Agent,X)),
+	props(Obj,act_affect(Action,score(S))),
+	add(score(Agent,+S)),
 	fail. % fail to check for charge too
 % Charge up those batteries
 worth(Agent,Action,Obj) :-
-           props(Obj,act(Action,charge(NRG))),
-	charge(Agent,Chg),
-	stm(Agent,Stm),
-	max_charge(Max),
+           props(Obj,act_affect(Action,charge(NRG))),
+	req(charge(Agent,Chg)),
+	req(stm(Agent,Stm)),
+	moo:max_charge(Agent,Max),
 	(Chg + NRG) < (((Stm * 10) -20) + Max),
-	del(charge(Agent,Y)),
-	X is Y + NRG,
-	add(charge(Agent,X)),
+	add(charge(Agent,+NRG)),
 	fail. % fail to check for healing
 % Heal
 worth(Agent,Action,Obj) :-
-           props(Obj,act(Action,heal(Hl))),
-	damage(Agent,Dam),
-	stm(Agent,Stm),
-	str(Agent,Str),
-	max_damage(Max),
+           props(Obj,act_affect(Action,heal(Hl))),
+	req((damage(Agent,Dam),
+             stm(Agent,Stm),
+             str(Agent,Str))),
+	req(max_damage(Agent,Max)),
 	(Dam + Hl) < ((((Stm * 10) -20) + ((Str * 5) - 10)) + Max),
-	del(charge(Agent,Y)),
-	X is Y + Hl,
-	add(charge(Agent,X)),
+	add(charge(Agent,+Hl)),
 	!.
 worth(_,_,_).
 
 
+% Check to see if last action was successful or not
+:-export(success/2).
+success(Agent,no) :- cmdfailure(Agent,_),!.
+success(_,yes).
+
+:-export(add_cmdfailure/2).
+add_cmdfailure(Agent,What):-add(cmdfailure(Agent,What)).
+
+hook:decl_database_hook(assert(_),cmdfailure(Agent,What)):- once(idel(cmdsuccess(Agent,What));clr(cmdsuccess(Agent,_))).
 
 % Initialize world.
 % This keeps the old databases messing with new runs.
@@ -59,56 +62,52 @@ worth(_,_,_).
 
 % Check to see if any of the objects should be placed in the world as it runs.
 
+:-export(call_update_charge/2).
+call_update_charge(Agent,What):- padd(Agent,cmdsuccess(What)), doall(must(moo:update_charge(Agent,What))),!.
 
-set_stats(Agent,[]) :-
-	add(str(Agent,2)),
-	add(height(Agent,2)),
-	add(stm(Agent,2)),
-	add(spd(Agent,2)).
+:-export(call_update_stats/2).
+call_update_stats(Agent,What):- padd(Agent,cmdsuccess(What)), doall(must(moo:update_stats(Agent,What))),!.
+
+set_stats(Agent,[]) :- set_stats(Agent,[str(2),height(2),stm(2),spd(2)]).
 
 set_stats(Agent,Traits) :-
-        clr(stat_total(Agent,0)),
-	add(stat_total(Agent,0)),
+        clr(stat_total(Agent,_)),
+        add(stat_total(Agent,0)),	
 	forall(member(Trait,Traits),
-	       ignore(catch(process_stats(Agent,Trait),_,true))),
-	       catch(check_stat_total(Agent),_,true).
+	       ignore(catch(process_stats(Agent,Trait),E,dmsg(E:process_stats(Agent,Trait))))),
+               ignore(catch(check_stat_total(Agent),E2,dmsg(E2:check_stat_total(Agent)))).
+set_stats(Agent,Traits):-dmsg(warn(failed(set_stats(Agent,Traits)))).
 
 process_stats(Agent,str(Y)) :-
 	add(str(Agent,Y)),
-	must(del(damage(Agent,Dam))),
+	must_det((damage(Agent,Dam),number(Dam))),
 	NewDam is (Dam + ((Y * 5) - 10)),
 	add(damage(Agent,NewDam)),
-	del(stat_total(Agent,T)),
-	NT is T + Y,
-	add(stat_total(Agent,NT)).
+	add(stat_total(Agent,+Y)).
 
 process_stats(Agent,height(Ht)) :-
 	add(height(Agent,Ht)),
-	del(stat_total(Agent,T)),
-	NewT is T + Ht,
-	add(stat_total(Agent,NewT)).
+	add(stat_total(Agent,+Ht)).
 
 process_stats(Agent,stm(Stm)) :-
 	add(stm(Agent,Stm)),
-	del(damage(Agent,Dam)),
+	req(damage(Agent,Dam)),
 	NewDam is (((Stm * 10) - 20) + Dam),
 	add(damage(Agent,NewDam)),
-	del(charge(Agent,NRG)),
+	req(charge(Agent,NRG)),
 	Charge is (((Stm * 10) - 20) + NRG),
 	add(charge(Agent,Charge)),
-	del(stat_total(Agent,Total)),
-	NewT is Total + Stm,
-	add(stat_total(Agent,NewT)).
+	add(stat_total(Agent,+Stm)).
 
 process_stats(Agent,spd(Spd)) :-
 	add(spd(Agent,Spd)),
-	del(stat_total(Agent,T)),
-	NewT is T + Spd,
-	add(stat_total(Agent,NewT)).
+	add(stat_total(Agent,+Spd)).
+
+process_stats(Agent,Stat) :- add(props(Agent,[Stat])).
 
 check_stat_total(Agent) :-
-	del(stat_total(Agent,Total)),
-	Total > 12,
+	req(stat_total(Agent,Total)),
+	Total > 12,!,
 	nl,
 	write('Agent '),
 	write(Agent),
