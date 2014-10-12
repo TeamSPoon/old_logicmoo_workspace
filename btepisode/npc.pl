@@ -3,7 +3,7 @@
  *
  * */
 
-:- behavior_tree.
+:- behavior_tree(npc).
 
 npc is   % define a label
   [dead, % priority execution is []
@@ -13,7 +13,8 @@ npc is   % define a label
 vacuum is [
 	   vacuum_exposure,
 	   vacuum_no_air,
-	   vacuum_consume_air
+	   vacuum_consume_air,
+	   light
        ].
 
 dead is
@@ -68,5 +69,12 @@ vacuum_consume_air is
    setting(visor, down) =>
    amount(current_air_tank) > 0 =>
    continue(decrease(current_air_tank, 1)).
+
+% dark handling needs to be in the environment
+% still not happy with this
+light is
+    env(dark) =>
+    char_say('It is dark, you cannot see').
+
 
 :- end_behavior_tree.
