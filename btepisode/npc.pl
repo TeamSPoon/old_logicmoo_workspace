@@ -7,18 +7,18 @@
 
 npc is   % define a label
   [dead, % priority execution is []
-   vacuum
+   vacuum,
+   light
   ].
 
 vacuum is [
 	   vacuum_exposure,
 	   vacuum_no_air,
-	   vacuum_consume_air,
-	   light
+	   vacuum_consume_air
        ].
 
 dead is
-   body(dead) >> 30 =>  % continuous
+   body(dead) >> 30 turns =>  % continuous
      [[   % actions in parallel
        ! godlike_drop_all,
        ! godlike_remove_all,
@@ -39,11 +39,11 @@ vacuum_exposure is [
 
 blood_boil is
   [
-      body(blood_boiling) =>
+      body(blood_boiling) >> 3 frames =>
       [[
       ! char_say('blackness mercifully frees you from the agony.. you are dead'),
       die
-	   ]],
+	   ]] ;
       [[
           ! char_say('Your blood is boiling from your eyes and mouth, you are rapidly losing consciousness'),
 	  setonce body(blood_boiling)
@@ -56,7 +56,7 @@ vacuum_no_air is
 % you can die in a suit without being in vacuum
    wearing(space_suit) =>
    setting(visor, down) =>
-   amount(current_air_tank) == 0 >> 3 =>
+   amount(current_air_tank) == 0 >> 3 turns =>
       die ;
       continue(char_say('YOU CAN\'T BREATH!')).  % same as fail, but implies 'do more stuff'
 

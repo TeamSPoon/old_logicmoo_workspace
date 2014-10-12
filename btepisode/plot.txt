@@ -20,11 +20,24 @@ We do not require assistance.
 screen. The bridge
 of the Mendeleev appears damaged. 
 
-The Mendeleev is damaged. The ship is partially depressurized, and the space suits are all in the depressurized section, so 
+The Mendeleev is damaged. The ship is partially depressurized, and the space suits are all in the depressurized section, so the crew of the mendeleev 
 
 
 Suits -
 characters are wearing a uniform. 'Suits' go over the uniform. They can be worn and taken off.
+
+if the char is in a vacuum and is not wearing a suit or their visor is up they get 'your blood is boiling' message for one turn, then die.
+
+when the visor is down the char is breathing from their air tank, whose pressure goes down 1 each turn. if the pressure reaches zero the character will get 'you cant breath' messages for next 3 turns, then die
+
+There is a current tank. If the char has only one tank it's current, if not, then whichever was current last frame is current.
+
+
+When worn, these verbs are added:
+check air (or just 'air') - reports number of turns of air left
+visor up
+visor down
+change tank - if the char has more than one tank in their inventory, the fullest one is exchanged for the current one. 
 
 Objects -
 
