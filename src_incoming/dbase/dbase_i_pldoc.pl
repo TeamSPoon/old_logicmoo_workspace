@@ -72,7 +72,7 @@ show_term_listing(H):- not(not((snumbervars(H),writeq(H),write('.'),nl))),!.
 show_all(Call):-doall((show_call(Call))).
 
 alt_calls(call).
-alt_calls(mpred_call).
+alt_calls(call_mpred).
 alt_calls(is_asserted).
 alt_calls(dbase_t).
 alt_calls(req).
@@ -90,7 +90,7 @@ sreq(Call):-
  with_assertions(readOnlyDatabases,
                 (
            (is_callable(Call)-> findallCall(Call,call,CallL,CallLL) ; (CallL=[];CallLL=[])),
-                 findallCall(Call,mpred_call,MCallL,MCallLL),
+                 findallCall(Call,call_mpred,MCallL,MCallLL),
                  findallCall(Call,dbase_t,DCallL,DCallLL),
                  findallCall(Call,is_asserted,ACallL,ACallLL),
                  findallCall(Call,req,RCallL,RCallLL),
@@ -99,7 +99,7 @@ sreq(Call):-
    flatten([CallLL,MCallLL,DCallLL,ACallLL,RCallLL,ICallLL],WITHFUNCTOR),
    list_to_set(ALL,SET),
                  showDif(SET,call,CallL,WITHFUNCTOR),
-                 showDif(SET,mpred_call,MCallL,WITHFUNCTOR),
+                 showDif(SET,call_mpred,MCallL,WITHFUNCTOR),
                  showDif(SET,dbase_t,DCallL,WITHFUNCTOR),
                  showDif(SET,is_asserted,ACallL,WITHFUNCTOR),
                  showDif(SET,req,RCallL,WITHFUNCTOR),

@@ -88,6 +88,12 @@
 				Refilter="0"
 				Excludes=""/>
 		</Folder>
+		<Folder Name="src_modules/swish">
+			<F
+				N="src_modules/swish/*.*"
+				Recurse="1"
+				Excludes="./.git"/>
+		</Folder>
 		<Folder Name="src_modules/yadlr">
 			<F
 				N="src_modules/yadlr/*.*"

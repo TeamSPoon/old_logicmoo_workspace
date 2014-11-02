@@ -3768,6 +3768,7 @@ xmlExitTags.
 % ===========================================================
 % Insert
 % ===========================================================
+
 parse_cyc_soap(Options):-memberchk(submit=assert,Options),!,
         getCycOption(opt_ctx_assert='BaseKB',Ctx),
         getCycOption(opt_theory='doom:DataMt',Context),
