@@ -1,0 +1,45 @@
+% DEFINITION OF AXIOMS IN STRIPS NOTATION
+
+% stack(X,Y) means to put X onto Y (when holding X and Y is clear)
+addlist(stack(X,Y),[on(X,Y),handempty]) :- dif(X,Y).
+deletelist(stack(X,Y),[holding(X),clear(Y)]) :- dif(Y,table).
+deletelist(stack(X,table),[holding(X)]).
+preconditions(stack(X,Y),[holding(X),clear(Y)]).
+
+% pickup(X,Y) means pick up X from Y (when X is clear and hand is empty)
+addlist(pickup(X,Y),[clear(Y),holding(X)]) :- dif(table,Y), dif(X,Y).
+addlist(pickup(X,table),[holding(X)]) :- dif(X,table).
+deletelist(pickup(X,Y),[on(X,Y),handempty]).
+preconditions(pickup(X,Y),[on(X,Y),clear(X),handempty]).
+
+% INITIAL STATE
+%
+%    a
+%    b   f
+%    c   d   e
+%-------------------
+
+holds(clear(table),init).
+holds(on(a,b),init).
+holds(on(b,c),init).
+holds(on(c,table),init).
+holds(handempty,init).
+holds(clear(a),init).
+holds(on(d,table),init).
+holds(on(f,d),init).
+holds(clear(f),init).
+holds(clear(e),init).
+holds(on(e,table),init).
+
+% Example queries
+% solve([holds(on(a,f),S)],S).
+% solve([holds(on(b,f),S)],S).
+% solve([holds(on(c,d),S)],S).
+% solve([holds(on(b,f),S),holds(on(f,a),S)],S). % "sussman's anomoly"
+% solve([holds(on(a,d),S),holds(on(f,b),S)],S). % "block swapping"
+
+% solve([on(a,f)],P), seq(P,S).
+% solve([on(b,f)],P), seq(P,S).
+% solve([on(c,d)],P), seq(P,S).
+% solve([on(b,f),on(f,a)],P), seq(P,S). % "sussman's anomoly"
+% solve([on(a,d),on(f,b)],P), seq(P,S). % "block swapping"

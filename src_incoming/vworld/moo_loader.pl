@@ -102,8 +102,8 @@ load_game_name_stream(_Name,Stream):- repeat,read_one_term(Stream,Term),myDebugO
 
 myDebugOnError(Term):-catch(once((call(Term))),E,(dmsg(start_myDebugOnError(E=Term)),trace,rtrace(call(Term)),dmsg(stop_myDebugOnError(E=Term)),trace)).
 
-read_one_term(Term):- style_check(-atom), catch(once(( read_term(Term,[double_quotes(string)]))),E,(Term=error(E),dmsg(read_one_term(Term)))).
-read_one_term(Stream,Term):- style_check(-atom), catch(once(( read_term(Stream,Term,[double_quotes(string)]))),E,(Term=error(E),dmsg(read_one_term(Term)))).
+read_one_term(Term):- catch(once(( read_term(Term,[double_quotes(string)]))),E,(Term=error(E),dmsg(read_one_term(Term)))).
+read_one_term(Stream,Term):- catch(once(( read_term(Stream,Term,[double_quotes(string)]))),E,(Term=error(E),dmsg(read_one_term(Term)))).
 
 rescan_mpred_stubs:- doall((mpred_prop(F,prologHybrid),mpred_arity(F,A),A>0,warnOnError(declare_dbase_local_dynamic(moo,F,A)))).
 
@@ -154,7 +154,7 @@ rescandb:- call(finish_processing_world).
 
 :- style_check(-singleton).
 :- style_check(-discontiguous).
-:- style_check(-atom).
+% :- style_check(-atom).
 
 % gload:- load_game(savedb),!.
 gload:- load_game(logicmoo('rooms/startrek.all.plmoo')).
