@@ -1,0 +1,10 @@
+/* Generated file
+   Keep track of installed config files
+*/
+
+file('debug.pl','/devel/logicmoo/src_modules/ClioPatria/config-available',1415550399).
+file('config.pl','/devel/logicmoo/src_modules/ClioPatria/config-available',1415550399).
+file('store.pl','/devel/logicmoo/src_modules/ClioPatria/config-available',1415550399).
+file('network.pl','/devel/logicmoo/src_modules/ClioPatria/config-available',1415550399).
+file('zlib.pl','/devel/logicmoo/src_modules/ClioPatria/config-available',1415550399).
+file('pengines.pl','/devel/logicmoo/src_modules/ClioPatria/config-available',1415550399).
