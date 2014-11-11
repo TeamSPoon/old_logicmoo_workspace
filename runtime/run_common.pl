@@ -48,7 +48,7 @@ within_user(Call):- '@'(Call,'user').
 % :- user_use_module('logicmoo_util/logicmoo_util_all.pl').
 % And adds the local directories to file search path of logicmoo(..)
 % ======================================================
-:- within_user(consult('logicmoo_util/logicmoo_util_all')).
+:- within_user(consult('../src_lib/logicmoo_util/logicmoo_util_all')).
 
 % one more case of not clear what's the good way to do this.
 % Add your own path to weblog for now
