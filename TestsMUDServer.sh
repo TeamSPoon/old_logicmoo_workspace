@@ -30,7 +30,7 @@ if "%1"=="build" (
 IF "%SWIPLWIN%"=="true" (
     cd .
 ) else (
-    cd src
+    cd runtime
 )
 
 @rem start mud script 

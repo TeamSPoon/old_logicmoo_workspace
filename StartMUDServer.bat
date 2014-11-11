@@ -1,7 +1,7 @@
 @rem start mud script 
 :startMUD
 
-start /WAIT src/run_debug.pl
+start /WAIT runtime/run_debug.pl
 
 CHOICE  /T 2 /C YN /CS /D Y /M  "RESTART MUD"
 
