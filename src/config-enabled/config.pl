@@ -1,5 +1,1 @@
-/* Linked config file */
-:- ensure_loaded(cliopatria('config-available/config.pl')).
-% :-
-% consult('../../../prolog/cliopatria/cliopatria/config-available/config.pl').
-
+../../src_modules/ClioPatria/config-available/config.pl

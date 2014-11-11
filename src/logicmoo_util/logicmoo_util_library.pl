@@ -29,6 +29,8 @@
          wsubst/4,
          remove_dupes/2,
          list_to_set_safe/2,
+         get_functor/2,
+         get_functor/3,
          functor_h/2,
          functor_h/3,
          functor_safe/3,
@@ -297,6 +299,8 @@ remove_dupes([I|In],Out,Shown):-member(I,Shown),!,remove_dupes(In,Out,Shown).
 remove_dupes([I|In],[I|Out],Shown):-remove_dupes(In,Out,[I|Shown]).
 
 functor_h(Obj,F):-functor_h(Obj,F,_).
+get_functor(Obj,F):-functor_h(Obj,F,_).
+get_functor(Obj,F,A):-functor_h(Obj,F,A).
 
 functor_h(Obj,F,_):-var(Obj),trace_or_throw(functor_h(Obj,F)).
 functor_h(Obj,F,A):-var(Obj),!,(number(A)->functor(Obj,F,A);((current_predicate(F/A);throw(var_functor_h(Obj,F,A))))).

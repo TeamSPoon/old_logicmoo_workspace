@@ -43,6 +43,7 @@ never_type(subft).
 never_type(must).
 never_type(mpred_prop).
 never_type(ft_info).
+never_type(C):- compound(C),functor(C,F,1),isa_asserted(F,type).
 never_type(F):- mpred_arity(F,A),!, A > 1.
 
 :-op(0,fx,((decl_mpred_hybrid))).

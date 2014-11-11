@@ -1,2 +1,1 @@
-/* Linked config file */
-:- consult(cliopatria('config-available/debug.pl')).
+../../src_modules/ClioPatria/config-available/debug.pl

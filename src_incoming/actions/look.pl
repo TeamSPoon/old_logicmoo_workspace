@@ -186,6 +186,11 @@ check_for_blocks(Agent) :-
 	add(visually_blocked(Agent,Blocked_Percepts)).
 check_for_blocks(_).
 
+singleValued(height_on_obj(spatialthing,int)).
+singleValued(size(spatialthing,term)).
+singleValued(shape(spatialthing,term)).
+% singleValued(texture(spatialthing,term)).
+
 % High enough to see over obstacles??
 % Check to see how tall the agent is and if they are standing on an item
 height_on_obj(Agent,Ht) :-

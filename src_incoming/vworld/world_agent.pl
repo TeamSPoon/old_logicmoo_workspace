@@ -100,9 +100,13 @@ foc_current_player(P):- get_session_id(O),generate_new_player(P), !,
   retractall((thlocal:session_agent(O,P))),
   asserta(thlocal:session_agent(O,P)),assert_isa(P,human_player),must_det(create_agent(P)).
 
-generate_new_player(P) :- must((gensym(player,N),P=explorer(N),assert_isa(P,explorer),assert_isa(P,player),assert_isa(P,agent))).
+% generate_new_player(P):- req(agent(P)),!.
+generate_new_player(P):- must((gensym(player,N),P=explorer(N),assert_isa(P,explorer),assert_isa(P,player),assert_isa(P,agent))).
 
-
+:-export(become_player/1).
+become_player(NewName):- get_session_id(O),thlocal:session_agent(O,_),asserta(thlocal:session_agent(O,NewName)).
+:-export(become_player/2).
+become_player(_Old,NewName):-become_player(NewName).
 
 % Lists all the agents in the run. Except for other monsters.
 list_agents(Agents) :- agent_list(Agents), !.

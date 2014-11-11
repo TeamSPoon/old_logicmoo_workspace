@@ -164,7 +164,7 @@ grab_argsIsa(F,Types):- mpred_prop(F,argsIsaInList(Types)).
 grab_argsIsa(F,Types):- is_asserted(argsIsaInList(F,Types)).
 grab_argsIsa2(F,Types):- fail,deducedSimply(mpred_prop(F,argsIsaInList(Types))).
 
-
+argIsa_call_1(Var,2,term):-type(Var),trace_or_throw( argIsa_call_1(Var,2,term)),fail.
 argIsa_call_1(Prop,N1,Type):- is_2nd_order_holds(Prop),dmsg(todo(define(argIsa_call(Prop,N1,'Second_Order_TYPE')))),dumpST,dtrace,
    Type=argIsaFn(Prop,N1).
 argIsa_call_1(F,_,term(prolog)):-member(F/_,
@@ -375,9 +375,10 @@ correctType(_O,Obj,argIsaFn(Prop,N),AA):-must_equals(Obj,AA),
          show_call(deduce_argN(Prop,N,Obj,OType,argIsaFn(Prop,N))))),!.
 correctType(_O,A,term,AA):- must_equals(A,AA).
 correctType(_O,A,text,AA):- must_equals(A,AA).
-correctType(_O,A,mpred,AA):- any_to_atom(A,AA).
-correctType(_O,A,fpred,AA):- any_to_atom(A,AA).
-correctType(_O,A,pred,AA):- any_to_atom(A,AA).
+correctType(_O,A,mpred,AA):- any_to_relation(A,AA).
+correctType(_O,A,fpred,AA):- any_to_relation(A,AA).
+correctType(_O,A,pred,AA):- any_to_relation(A,AA).
+correctType(_O,A,relation,AA):- any_to_relation(A,AA).
 correctType(_O,A,formatted,AA):- dtrace, must_equals(A,AA).
 correctType(_O,A,atom,AA):- any_to_atom(A,AA).
 correctType(change(_,_),A,type,AA):- atom(A),decl_type(A),must_equals(A,AA).
@@ -419,6 +420,8 @@ correctType(Op,Args,Types,NewArgs):-compound(Args), compound(Types),
    Types=..[F|TypesL],
    NewArgs=..[F|NewArgsL],
    correctAnyType(Op,ArgsL,TypesL,NewArgsL).
+
+
 
 
 
@@ -480,7 +483,8 @@ any_to_dir_ns(S,D):-string(S),string_to_atom(S,A),any_to_dir_ns(A,D),!.
 any_to_dir_ns(D,O):-atom(D),sub_atom(D, 0, 1, _, S),toLowercase(S,L),p2c_dir2(L,O),!.
 any_to_dir_ns(D,D):-pathBetween(_,D,_),!.
 
-
+any_to_relation(A,F):-atomic(A),!,any_to_atom(A,F).
+any_to_relation(A,F):-functor_h(A,F).
 
 roll_dice(Rolls,_,Bonus,Result):- Rolls < 0, !, Result is Bonus.
 roll_dice(Rolls,Sided,Bonus,Result):- LessRolls is Rolls-1, roll_dice(LessRolls,Sided, Bonus + random(Sided) +1, Result).

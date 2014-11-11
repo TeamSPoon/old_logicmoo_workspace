@@ -26,11 +26,13 @@ mpred_arity(mpred_prop,2).
 mpred_arity(mpred_arity,2).
 mpred_arity(never_type,1).
 
+:-export(is_stable/0).
+is_stable:-fail.
 
 :-export(is_release/0).
-is_release :- true. 
+is_release :- fail,1 is random(3).
 :-export(not_is_release/0).
-not_is_release :- fail. % 0 is random(3).
+not_is_release :- true. % 1 is random(3).
 simple_code :- fail.
 save_in_dbase_t:-true.
 not_simple_code :- \+ simple_code.

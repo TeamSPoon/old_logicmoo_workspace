@@ -54,10 +54,9 @@ within_user(Call):- '@'(Call,'user').
 % Add your own path to weblog for now
 user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog').
 user:file_search_path(weblog, 'C:/Users/Administrator/AppData/Roaming/SWI-Prolog/pack/weblog').
-
-user:file_search_path(weblog, '/usr/local/lib/swipl-7.1.11/pack/weblog/prolog'):-current_prolog_flag(unix,true).
-user:file_search_path(cliopatria, '/devel/ClioPatria'). %  current_prolog_flag(unix,true).
-%user:file_search_path(cliopatria, 't:/devel/ClioPatria'):- not( current_prolog_flag(unix,true)).
+user:file_search_path(weblog, '/usr/local/lib/swipl-7.1.26/pack/weblog/prolog'):-current_prolog_flag(unix,true).
+user:file_search_path(cliopatria, '/devel/logicmoo/src_modules/ClioPatria'):- current_prolog_flag(unix,true).
+user:file_search_path(cliopatria, 't:/devel/logicmoo/src_modules/ClioPatria'):- not( current_prolog_flag(unix,true)).
 
 :- user_use_module(library(settings)).
 
@@ -94,14 +93,19 @@ hard_work:-
    ((
  %  use_module('t:/devel/cliopatria/rdfql/sparql_runtime.pl'),
    ensure_loaded(logicmoo(launchcliopatria)),
-   ensure_loaded(logicmoo(testwebconsole))))),!.
+   ensure_loaded(logicmoo(testwebconsole)),
+   ensure_loaded(logicmoo(swish/logicmoo_run_swish))
+   ))),!.
+
+
 
 slow_work:- with_assertions( moo:prevent_transform_moo_preds , within_user(at_start(hard_work))).
 
 thread_work:- thread_property(X, status(running)),X=loading_code,!.
 thread_work:- thread_create(slow_work,_,[alias(loading_code)]).
 
-start_servers :- startup_mod:if_version_greater(70111,thread_work).
+% start_servers :- startup_mod:if_version_greater(70111,thread_work).
+start_servers :- startup_mod:if_version_greater(70111,slow_work).
 
 
 % [Required] load and start mud
@@ -109,7 +113,8 @@ start_servers :- startup_mod:if_version_greater(70111,thread_work).
 
 startup_mod:run_setup_now:-
    within_user((
-      load_game_files
+      load_game_files,
+      doall(atloc(_,_))
    % TO UNDO register_timer_thread(npc_ticker,90,npc_tick)
    )).
 

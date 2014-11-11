@@ -8,6 +8,7 @@
 :-abolish(system:halt,0).
 system:halt:- format('the halting problem is now solved!').
 
+:-ensure_loaded(launchcliopatria).
 :-include(run_common).
 
 :- set_no_debug,set_prolog_flag(report_error,false).
@@ -17,6 +18,7 @@ system:halt:- format('the halting problem is now solved!').
 
 % [Optionaly] re-define load_default_game
 :- declare_load_game(logicmoo('rooms/startrek.all.plmoo')).
+load_default_game:- load_game(logicmoo('rooms/startrek.all.plmoo')).
 
 % [Manditory] This loads the game and intializes
 :- at_start(nodebugx(run_setup)).

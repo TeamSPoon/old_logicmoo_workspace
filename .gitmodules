@@ -4,3 +4,6 @@
 [submodule "src_modules/hMUD"]
 	path = src_modules/hMUD
 	url = https://github.com/TeamSPoon/hmud.git
+[submodule "src_modules/ClioPatria"]
+	path = src_modules/ClioPatria
+	url = https://github.com/TeamSPoon/ClioPatria.git

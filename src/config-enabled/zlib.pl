@@ -1,2 +1,1 @@
-/* Linked config file */
-:- consult(cliopatria('config-available/zlib.pl')).
+../../src_modules/ClioPatria/config-available/zlib.pl

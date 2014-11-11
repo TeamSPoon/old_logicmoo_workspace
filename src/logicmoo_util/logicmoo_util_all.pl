@@ -1,4 +1,4 @@
-/** <not module> Logicmoo Path Setups
+/** <module> Logicmoo Path Setups
 */
 :-module(logicmoo_util_all,[if_flag_true/2]).
 

@@ -22,6 +22,10 @@ moo:action_info(rename(string),"Rename your player").
 moo:agent_text_command(Agent,[login,NewName],Agent,rename(NewName)).
 moo:agent_call_command(Agent,rename(NewName)):- padd(Agent,named(NewName)).
 
+% become
+moo:agent_call_command(Agent,become(NewName)):- become_player(Agent,NewName).
+
+
 % logout
 moo:agent_text_command(Agent,[Quit],Agent,prologCall(assert(thlocal:wants_logout(Agent)))):- lorq(Quit).
 

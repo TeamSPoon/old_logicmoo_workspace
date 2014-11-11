@@ -1,4 +1,4 @@
-%!/usr/bin/swipl
+#!/usr/local/bin/swipl 
 
 :- initialization cp_server.
 
@@ -34,7 +34,9 @@ add_relative_search_path(Alias, Abs) :-
 add_relative_search_path(Alias, Rel) :-
 	assertz(user:file_search_path(Alias, Rel)).
 
-:- use_module(cliopatria_binding).
+% :- use_module(cliopatria_binding).
+file_search_path(cliopatria, '/devel/logicmoo/src_modules/ClioPatria').
+:- add_relative_search_path(cliopatria, '/devel/logicmoo/src_modules/ClioPatria').
 
 % Make loading files silent. Comment if you want verbose loading.
 
@@ -67,7 +69,7 @@ add_relative_search_path(Alias, Rel) :-
 
 :- load_conf_d([ 'config-enabled' ], []).
 
-:- ensure_loaded(logicmoo(dbase/dbase_rdf_entailment)).
+% :- ensure_loaded(logicmoo(dbase/dbase_rdf_entailment)).
 
 
 % Get back normal verbosity of the toplevel.

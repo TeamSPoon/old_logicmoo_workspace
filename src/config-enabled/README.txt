@@ -5,17 +5,17 @@ It  can  be  filled  with  Prolog    source-files  that  configure  your
 application for your specific needs. ClioPatria contains several example
 config files, which are located in the directory:
 
-    c:/docs/prolog/cliopatria/cliopatria/config-available
+    /devel/logicmoo/src_modules/ClioPatria/config-available
 
 For example, to enhance the system setup   for development, you may wish
 to do:
 
     ==
-    ln -s c:/docs/prolog/cliopatria/cliopatria/config-available/debug.pl
+    ln -s /devel/logicmoo/src_modules/ClioPatria/config-available/debug.pl
     ==
 
 This application may  provide   additional  application-specific example
 configuration files.
 
-@see	c:/docs/prolog/cliopatria/cliopatria/config-available/README.txt
+@see	/devel/logicmoo/src_modules/ClioPatria/config-available/README.txt
 

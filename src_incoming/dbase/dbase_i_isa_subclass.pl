@@ -61,7 +61,7 @@ decl_type_safe(T):- ignore((atom(T),not(never_type(T)),not(number(T)),decl_type(
 assert_subclass(O,T):-assert_subclass_safe(O,T).
 
 :-export(assert_subclass_safe/2).
-assert_subclass_safe(O,T):- ignore((nonvar(O),decl_type_safe(O))), ignore((nonvar(T),decl_type_safe(T),nonvar(O),not(formattype(O)),not(formattype(T)),add(subclass(O,T)))).
+assert_subclass_safe(O,T):- ignore((nonvar(O),decl_type_safe(O),nonvar(T),decl_type_safe(T),nonvar(O),not(formattype(O)),not(formattype(T)),add(subclass(O,T)))).
 
 :-export(assert_isa_safe/2).
 assert_isa_safe(O,T):- ignore((nonvar(O),nonvar(T),decl_type_safe(T),assert_isa(O,T))).
@@ -101,6 +101,7 @@ assert_isa_lc(I,type):- decl_type(I),!.
 assert_isa_lc(I,formattype):- define_ft(I),!.
 assert_isa_lc(I,_):- not(mpred_prop(I,_)),not(type(I)),show_call(assert_if_new(i_countable(I))),fail.
 assert_isa_lc(I,T):- is_release,!, hooked_asserta(isa(I,T)).
+assert_isa_lc(I,T):- not_is_release, must_det((hooked_asserta(isa(I,T)),(isa_backchaing(I,T)))).
 assert_isa_lc(I,T):- must_det((hooked_asserta(isa(I,T)),logOnFailureIgnore(isa_backchaing(I,T)))).
 
 is_counted_for_parse(I):-i_countable(I),not(excluded(I)),!.
@@ -177,10 +178,11 @@ isa_backchaing_v_nv(_,var):-!.
 isa_backchaing_v_nv(A,T):-no_repeats([A],(transitive_subclass_or_same(AT,T),isa_asserted(A,AT))).
 
 :-export(isa_backchaing_0/2).
+isa_backchaing_0(A,T):- T==var,!,var(A).
 isa_backchaing_0(A,T):-  var(A),nonvar(T),!,isa_backchaing_v_nv(A,T).
-isa_backchaing_0(A,T):-  var(A),!,var(T),!,isa_asserted(A,AT),transitive_subclass_or_same(AT,T).
-isa_backchaing_0(A,T):-  nonvar(T),isa_backchaing_nv_nv(A,T),!.
-isa_backchaing_0(A,T):-  build_isa_inst_list_cache(A,_,T,CALL),CALL.
+isa_backchaing_0(A,T):-  var(T),!,setof(TT,AT^(isa_asserted(A,AT),transitive_subclass_or_same(AT,TT)),List),!,member(T,List).
+isa_backchaing_0(A,T):-  nonvar(A),isa_backchaing_nv_nv(A,T),!.
+isa_backchaing_0(A,T):-  transitive_subclass_or_same(AT,T),isa_asserted(A,AT).
 
 % ==========================
 % taxonomicPair(isa,subclass)
@@ -189,11 +191,10 @@ isa_backchaing_0(A,T):-  build_isa_inst_list_cache(A,_,T,CALL),CALL.
 % A->TL = (isa_asserted_0(A,AT),transitive_subclass_or_same(AT,TL))
 build_isa_inst_list_cache(A,Isa,B,(!,dbase_t(cache_I_I,Isa,A,B))):- Isa=isa, nonvar(A),once(dbase_t(cache_I_I,Isa,A,_)),!.
 build_isa_inst_list_cache(A,Isa,B,(!,dbase_t(cache_I_I,Isa,A,B))):- Isa=isa, nonvar(A),
-      forall(((isa_asserted_0(A,AT),transitive_subclass_or_same(AT,T))),
-      assertz_if_new(dbase_t(cache_I_I,Isa,A,T))).
+      forall(((isa_asserted_0(A,AT),transitive_subclass_or_same(AT,T))),assertz_if_new(dbase_t(cache_I_I,Isa,A,T))).
       
 
-% A->TL = transitive_subclass(T,TL)..
+% A->TL = transitive_subclass(T,TL).
 build_genls_inst_list_cache(A,Subclass,B,dbase_t(cache_I_I,Subclass,A,B)):- Subclass=subclass, nonvar(A),once(dbase_t(cache_I_I,Subclass,A,_)),!.
 build_genls_inst_list_cache(A,Subclass,B,dbase_t(cache_I_I,Subclass,A,B)):- Subclass=subclass, nonvar(A),forall(transitive_subclass(A,T),assertz_if_new(dbase_t(cache_I_I,Subclass,A,T))).
 
@@ -208,9 +209,10 @@ not_ft(T):-transitive_subclass_or_same(T,spatialthing).
 
 :-export(isa_asserted/2).
 isa_asserted(A,T):-no_repeats(isa_asserted_nr(A,T)).
-isa_asserted_nr(A,T):- nonvar(A),build_isa_inst_list_cache(A,_,T,CALL),CALL.
+isa_asserted_nr(A,T):- nonvar(A),fail,build_isa_inst_list_cache(A,_,T,CALL),CALL.
 isa_asserted_nr(A,T):- stack_check,fact_loop_checked(isa(A,T),isa_asserted_0(A,T)).
 
+isa_asserted_0(A,T):- T==var,!,var(A).
 isa_asserted_0(I,T):- ((thlocal:useOnlyExternalDBs,!);thglobal:use_cyc_database),(kbp_t([isa,I,T]);kbp_t([T,I])).
 isa_asserted_0(I,T):-clause(dbase_t(T,I),true).
 isa_asserted_0(I,T):-clause(isa(I,T),true).
@@ -392,6 +394,7 @@ is_known_trew(disjointWith(A,B)):-disjointWithT(A,B).
 % :-dynamic(is_known_false/1).
 is_known_false(C):-has_free_args(C),!,fail.
 is_known_false(F):-is_known_trew(F),!,fail.
+is_known_false(F):-is_known_false0(F),!.
 
 :-dynamic_multifile_exported(is_known_false0/1).
 is_known_false0(isa(regiontype,formattype)).
@@ -399,7 +402,7 @@ is_known_false0(isa(formattype,formattype)).
 is_known_false0(isa(X,spatialthing)):- type(X);formattype(X);mpred(X).
 is_known_false0(isa(completeExtentAsserted,createableType)).
 is_known_false0(isa(X,Y)):-!,not_mud_isa(X,Y).
-is_known_false0(subclass(Type,_)):-arg(_,vv(type,relation,spatialthing,formattype),Type).
+is_known_false0(subclass(Type,_)):-arg(_,vv(type,relation,formattype),Type).
 
 :-dynamic_multifile_exported(not_mud_isa/2).
 not_mud_isa(agent,formattype).

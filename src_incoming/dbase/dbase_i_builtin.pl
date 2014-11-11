@@ -82,6 +82,9 @@ type(typeDeclarer).
 
 :-add((expand_args(eachOf,subclass(eachOf(multiValued,ordered,negationByFailure,argsIsaInList,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),mpred)))).
 
+:-add((expand_args(eachOf,argIsa(eachOf(mpred,multiValued,ordered,negationByFailure,argsIsaInList,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),1,mpred)))).
+:-add((expand_args(eachOf,argIsa(eachOf(mpred,multiValued,ordered,negationByFailure,argsIsaInList,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),2,list(prop))))).
+
 :-add((expand_args(eachOf,isa(eachOf(multiValued,ordered,negationByFailure,argsIsaInList,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),typeDeclarer)))).
 
 :-doall((argsIsaProps(F),decl_type(F),add(subclass(F,relation)))).
@@ -247,6 +250,11 @@ multiValued(act_affect(term,term,term)).
 multiValued(memory(agent,term)).
 argsIsaInList(wearing(agent,wearable)).
 
+:-decl_mpred(act_affect/3).
+
+:-decl_prolog(member/2).
+
+
 nameStrings(apath(Region,Dir),Text):- pathName(Region,Dir,Text).
 description(apath(Region,Dir),Text):- pathName(Region,Dir,Text).
 
@@ -300,6 +308,7 @@ ask_module(nearby(obj,obj),world).
 % db_prop_prolog(world,same(id,id)).
 
 
+
 argsIsaInList(somethingIsa(term,list(type))).
 argsIsaInList(somethingDescription(term,list(string))).
 argsIsaInList(objects(type,list(id))).
@@ -308,6 +317,8 @@ argsIsaInList(sorts(type,list(type))).
 
 argsIsaInList(default_sv(singleValued,int,term)).
 
+argsIsaInList(member(term,term)).
+
 % live another day to fight (meaning repl_to_string/1 for now is in prolog)
 % singleValued(repl_writer(agent,term),default_sv(2,look:default_repl_writer)).
 % singleValued(repl_to_string(agent,term),[singleValued,default_sv(2,look:default_repl_obj_to_string)]).
@@ -315,11 +326,11 @@ argsIsaInList(default_sv(singleValued,int,term)).
 %multiValued(label_type(string,type),[singleValued]).
 
 
-/*
+
 listValued(look:get_feet(agent,list(spatialthing)),[]).
 listValued(look:get_near(agent,list(spatialthing)),[ask_module(look)]).
-*/
-listValued(get_precepts(agent,list(spatialthing)),[ask_module(look)]).
+listValued(get_percepts(agent,list(spatialthing)),[ask_module(look)]).
+
 argsIsaInList(mud_test(term,prolog)).
 
 multiValued(assert_with_pred(multiValued,term)).
@@ -425,6 +436,12 @@ singleValued(needs_look(agent,boolean),default_sv(2,false)).
 
 default_type_props(agent,needs_look(false)).
 
+type(var).
+type(string).
+formattype(var).
+formattype(string).
+:-decl_prolog(var/1).
+:-decl_prolog(string/1).
 
 ft_info(action(prolog),formatted).
 ft_info(apath(region,dir),formatted).
@@ -524,7 +541,7 @@ equivRule(isa(Whom,npc_player),and(isa(Whom,player),naf(isa(Whom,human_player)))
 
 listValued(directions(term,list(term))).
 
-multiValued(ask_module(multiValued,atom)).
+multiValued(ask_module(relation,atom)).
 
 argsIsaInList(agent_call_command(agent,term(verb))).
 

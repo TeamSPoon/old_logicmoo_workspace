@@ -180,7 +180,97 @@ bad_idea:-fail.
 :- module_transparent(static_predicate/1).
 static_predicate(FA):-once(predicate_property(FA,_)),not(predicate_property(FA,dynamic)).
 */
-filter_repeats:-fail.
+
+% ===================================================================
+% Safely number vars
+% ===================================================================
+
+numbervars_impl(Term,Functor,Start,End):- numbervars(Term,Start,End,[attvar(bind),functor_name(Functor),singletons(true)]).
+
+:-export(snumbervars/3).
+snumbervars(Term,Functor,End):- atom(Functor),!,numbervars_impl(Term,Functor,0,End).
+snumbervars(Term,Start,End):- integer(Start),!,numbervars_impl(Term,'$VAR',Start,End).
+:-export(snumbervars/4).
+snumbervars(Term,Start,End,_):-snumbervars(Term,Start,End).
+:-export(snumbervars/1).
+snumbervars(Term):-numbervars(Term,0,_End).
+
+% ===================================================================
+% Loop checking
+% ===================================================================
+
+:- thread_local tlbugger:inside_loop_check/1.
+:- module_transparent(tlbugger:inside_loop_check/1).
+
+:- thread_local tlbugger:inside_loop_check_local/2.
+:- module_transparent(tlbugger:inside_loop_check_local/2).
+
+make_key(CC,KeyA):- notrace(ground(CC)->KeyA=CC ;(copy_term(CC,Key,_),snumbervars(Key,0,_))),!,KeyA=Key. % ,term_to_atom(Key,KeyA).
+
+is_loop_checked(B):-  make_key(B,BC),!,tlbugger:inside_loop_check(BC).
+is_module_loop_checked(Module, B):- (var(B)->true;make_key(B,BC)),!,tlbugger:inside_loop_check_local(Module,BC).
+
+no_loop_check_unsafe(B):- with_no_assertions(tlbugger:inside_loop_check(_),B).
+
+no_loop_check(B):- no_loop_check(B,trace_or_throw(loop_to_no_loop_check(B))).
+no_loop_check(B, TODO):-  with_no_assertions(tlbugger:inside_loop_check(_),loop_check_local(B,TODO)).
+
+no_loop_check_module( Module, B, TODO):-  with_no_assertions(tlbugger:inside_loop_check_local(Module,_),loop_check_local(B,TODO)).
+
+loop_check(B):- loop_check(B,fail).
+loop_check(B, TODO):- make_key(B,BC),!, loop_check_term(B,BC,TODO).
+
+loop_check_local(B):- loop_check_local(B,trace_or_throw(syntax_loop_check_local(B))).
+loop_check_local(B,TODO):- loop_check_module(current,B,TODO).
+
+% loop_check_local(B):- loop_check_local(B,trace_or_throw(syntax_loop_check_local(B))).
+loop_check_module(Module,B):-loop_check_module(Module,B,fail).
+loop_check_module(Module,B,TODO):- make_key(B,BC), LC = tlbugger:inside_loop_check_local(Module,BC),
+   % term_to_atom(B,BC),!, 
+    ( \+(LC) ->
+         setup_call_cleanup(asserta(LC),B,retract(LC));
+         call(TODO) ).
+
+loop_check_term(B,BC,TODO):-  ( \+(tlbugger:inside_loop_check(BC)) -> setup_call_cleanup(asserta(tlbugger:inside_loop_check(BC)),B, retract((tlbugger:inside_loop_check(BC)))) ;call(TODO) ).
+
+
+% ===================================================================
+% Bugger Term Expansions
+% ===================================================================
+
+% bugger_debug=off turns off just debugging about the debugger
+% opt_debug=off turns off all the rest of debugging
+bdmsg(_):-catch((bugger_flag(bugger_debug=off)),_,true),!.
+bdmsg(_):-!.
+bdmsg(D):-(format(user_error,'dmsg: ~q~n',[D])).
+
+bugger_t_expansion(T,T):-not(compound(T)),!.
+bugger_t_expansion(T,AA):- T=..[F,A],unwrappabe(F),bdmsg(bugger_term_expansion(T)),bugger_t_expansion(A,AA),!.
+bugger_t_expansion([F0|ARGS0],[F1|ARGS1]):-bugger_t_expansion(F0,F1),bugger_t_expansion(ARGS0,ARGS1).
+bugger_t_expansion(T,TT):- T=..[F|ARGS0],bugger_t_expansion(ARGS0,ARGS1), TT=..[F|ARGS1].
+
+unwrappabe(F):-member(F,[traceok,notrace,hotrace]).
+%unwrappabe(F):-member(F,['debugOnError',debugOnError0]),!,fail.
+%unwrappabe(F):-member(FF,['OnError','OnFailure','LeastOne','Ignore','must']),atom_concat(_,FF,F),!.
+
+bugger_goal_expansion(T,_):- bdmsg(bugger_goal_expansion(T)),fail.
+
+bugger_expand_goal(T,_):- bdmsg(bugger_expand_goal(T)),fail.
+
+bugger_expand_term(T,_):- bdmsg(bugger_expand_term(T)),fail.
+
+% bugger_term_expansion(_,_):-!,fail.
+bugger_term_expansion(T,T3):- compound(T), once(bugger_t_expansion(T,T2)),T\==T2,!,catch(expand_term(T2,T3),_,fail).
+
+% user:     expand_goal(G,G2):- compound(G),bugger_expand_goal(G,G2),!.
+
+
+% user:goal_expansion(G,G2):- compound(G),bugger_goal_expansion(G,G2).
+
+% user:expand_term(G,G2):- compound(G),bugger_expand_term(G,G2),!.
+
+:-thread_local in_bugger_expansion/0.
+user:term_expansion((H:-G),(H:-G2)):-loop_check(bugger_term_expansion(G,G2)).
 
 % ===================================================================
 % Substitution based on ==
@@ -497,6 +587,7 @@ tlocal_show(M,F,A,P,_ON,TF):-
 
 :- export(tlocals/0).
 :- module_transparent(tlocals/0).
+tlocals:- !.
 tlocals:- 
    tlocals(false),
    tlocals(all).
@@ -607,12 +698,6 @@ user_use_module(What):- within_module(use_module(What),'user').
 :- within_module(use_module(logicmoo_util_library), 'user').
 
 
-:- thread_local tlbugger:inside_loop_check/1.
-:- module_transparent(tlbugger:inside_loop_check/1).
-
-:- thread_local tlbugger:inside_loop_check_local/2.
-:- module_transparent(tlbugger:inside_loop_check_local/2).
-
 
 
 :- module_transparent(must_det_l/1).
@@ -635,17 +720,6 @@ cannot_table_call(Call):- with_assertions(tlbugger:cannot_table,Call).
 
 :-use_module(logicmoo_util_coroutining_was).
 
-% ===================================================
-
-numbervars_impl(Term,Functor,Start,End):- numbervars(Term,Start,End,[attvar(bind),functor_name(Functor),singletons(true)]).
-
-:-export(snumbervars/3).
-snumbervars(Term,Functor,End):- atom(Functor),!,numbervars_impl(Term,Functor,0,End).
-snumbervars(Term,Start,End):- integer(Start),!,numbervars_impl(Term,'$VAR',Start,End).
-:-export(snumbervars/4).
-snumbervars(Term,Start,End,_):-snumbervars(Term,Start,End).
-:-export(snumbervars/1).
-snumbervars(Term):-numbervars(Term,0,_End).
 
 % ===================================================
 
@@ -696,20 +770,14 @@ must_not_repeat(C):-call(C).
 % X = 2.
 % ===================================================
 
-memberchk_eq(X, [Y|Ys]) :-
-  (   X == Y
-    ->  true
-     ;   memberchk_eq(X, Ys)
-   ).
+
+memberchk_same(X, [Y|Ys]) :- (   X =@= Y ->  (var(X) -> X==Y ; true) ;   memberchk_same(X, Ys) ).
 
 :- export(no_repeats/1).
 :- meta_predicate no_repeats(0).
-:- export(no_repeatsU/1).
-:- meta_predicate no_repeatsU(0).
 % no_repeats(Call):- tlbugger:attributedVars,!,no_repeats_av(Call).
 
-no_repeats(Call):- hotrace((ground(Call) -> ((traceok(Call),!)) ; (CONS = [_], traceok(Call), notrace(( \+ memberchk_eq(Call,CONS) , nb_setarg(2, CONS, [Call])))))).
-no_repeatsU(Call):- hotrace((ground(Call) -> ((traceok(Call),!)) ; (CONS = [_], traceok(Call), notrace(( \+ member(Call,CONS) , nb_setarg(2, CONS, [Call])))))).
+no_repeats(Call):- no_repeats(Call,Call).
 
 % ===================================================
 % 
@@ -727,8 +795,11 @@ no_repeatsU(Call):- hotrace((ground(Call) -> ((traceok(Call),!)) ; (CONS = [_], 
 :- meta_predicate no_repeats(+,0).
 % no_repeats(Vs,Call):- tlbugger:attributedVars,!,no_repeats_av(Vs,Call).
 
-no_repeats(Vs,Call):- ground(Vs),!,Call,!.
-no_repeats(Vs,Call):- CONS=[_], call(Call),notrace((\+ memberchk_eq(Vs,CONS) , nb_setarg(2, CONS, [Vs]))).
+no_repeats(Vs,Call):- hotrace((ground(Vs) -> ((traceok(Call),!)) ;  no_repeats0(Vs,Call))).
+
+:- export(no_repeats0/2).
+:- meta_predicate no_repeats0(+,0).
+no_repeats0(Vs,Call):- CONS = [_], traceok(Call), notrace(( \+ memberchk_same(Vs,CONS), copy_term(Vs,CVs), CONS=[_|T], nb_setarg(2, CONS, [CVs|T]))).
 
 % for dont-care vars
 :- export(no_repeats_dc/2).
@@ -737,7 +808,7 @@ no_repeats_dc(Vs,Call):- term_variables(Call,CV),term_variables(Vs,VsL),subtract
 
 subtract_eq([], _, []) :- !.
 subtract_eq([A|C], B, D) :-
-        memberchk_eq(A, B), !,
+        memberchk_same(A, B), !,
         subtract_eq(C, B, D).
 subtract_eq([A|B], C, [A|D]) :-
         subtract_eq(B, C, D).
@@ -807,12 +878,14 @@ succeeds_n_times(Goal, Times) :-
 %
 % attributed variable verson of getting filtered bindings
 % ===================================================
+filter_repeats:-fail.
 
 :-export(no_repeats_av/1).
 :-meta_predicate(no_repeats_av(0)).
 no_repeats_av(Call):-  term_variables(Call,VarList), flag(oddeven,X,X+1),
   ((VarList=[] ; 1 is X mod 3) -> Call ; 
    ((1 is X mod 2 ->  no_repeats_av_prox(VarList,Call); (CONS = [_],  call(Call), newval_or_fail(CONS,VarList))))).
+
 
 
 :-export(no_repeats_av/2).
@@ -896,33 +969,6 @@ filter_repeats(AVar,Call):-
           )),del_attr(AVar,was)).  % 10  = clean up for Line 2 needed?
 
 % =========================================================================
-
-is_loop_checked(B):-  make_key(B,BC),!,tlbugger:inside_loop_check(BC).
-is_module_loop_checked(Module, B):- (var(B)->true;make_key(B,BC)),!,tlbugger:inside_loop_check_local(Module,BC).
-
-no_loop_check_unsafe(B):- with_no_assertions(tlbugger:inside_loop_check(_),B).
-
-no_loop_check(B):- no_loop_check(B,trace_or_throw(loop_to_no_loop_check(B))).
-no_loop_check(B, TODO):-  with_no_assertions(tlbugger:inside_loop_check(_),loop_check_local(B,TODO)).
-
-no_loop_check_module( Module, B, TODO):-  with_no_assertions(tlbugger:inside_loop_check_local(Module,_),loop_check_local(B,TODO)).
-
-loop_check(B):- loop_check(B,fail).
-loop_check(B, TODO):- make_key(B,BC),!, loop_check_term(B,BC,TODO).
-
-loop_check_local(B):- loop_check_local(B,trace_or_throw(syntax_loop_check_local(B))).
-loop_check_local(B,TODO):- loop_check_module(current,B,TODO).
-
-% loop_check_local(B):- loop_check_local(B,trace_or_throw(syntax_loop_check_local(B))).
-loop_check_module(Module,B):-loop_check_module(Module,B,fail).
-loop_check_module(Module,B,TODO):- make_key(B,BC), LC = tlbugger:inside_loop_check_local(Module,BC),
-   % term_to_atom(B,BC),!, 
-    ( \+(LC) ->
-         setup_call_cleanup(asserta(LC),B,retract(LC));
-         call(TODO) ).
-
-loop_check_term(B,BC,TODO):-  ( \+(tlbugger:inside_loop_check(BC)) -> setup_call_cleanup(asserta(tlbugger:inside_loop_check(BC)),B, retract((tlbugger:inside_loop_check(BC)))) ;call(TODO) ).
-
 
 :- thread_local(tlbugger:wastracing/0).
 
@@ -1640,7 +1686,7 @@ fmt_ansi(Call):-ansicall([reset,bold,hfg(white),bg(black)],Call).
 fmt_portray_clause(X):- unnumbervars(X,Y),!,snumbervars(Y), portray_clause(Y).
 fmt_or_pp(portray((X:-Y))):-!,fmt_portray_clause((X:-Y)),!.
 fmt_or_pp(portray(X)):-!,functor(X,F,A),fmt_portray_clause((pp(F,A):-X)),!.
-fmt_or_pp(X):-'format'('~q~n',[X]).
+fmt_or_pp(X):-format('~q~n',[X]).
 
 dfmt(X):- with_output_to_stream(user_error,fmt(X)).
 dfmt(X,Y):- with_output_to_stream(user_error,fmt(X,Y)).
@@ -1804,6 +1850,9 @@ ansi_control_conv(Level,Ctrl):- ansi_term:level_attrs(Level,Ansi),Level\=Ansi,!,
 ansi_control_conv(Color,Ctrl):- ansi_term:ansi_color(Color,_),!,ansi_control_conv(fg(Color),Ctrl).
 ansi_control_conv(Ctrl,CtrlO):-flatten([Ctrl],CtrlO),!.
 
+is_tty(Out):- is_stream(Out),stream_property(Out,tty(true)).
+
+ansicall(Out,_,Call):- \+ is_tty(Out),!,Call.
 ansicall(Out,CtrlIn,Call):- once(ansi_control_conv(CtrlIn,Ctrl)),  CtrlIn\=Ctrl,!,ansicall(Out,Ctrl,Call).
 ansicall(Out,Ctrl,Call):-
    retractall(last_used_color(_)),asserta(last_used_color(Ctrl)),ansicall0(Out,Ctrl,Call),!.
@@ -1909,7 +1958,7 @@ contrasting_color(_,default).
 sgr_on_code(Ctrl,OnCode):- ansi_term:sgr_code(Ctrl,OnCode),!.
 sgr_on_code(blink, 6).
 sgr_on_code(-Ctrl,OffCode):-  nonvar(Ctrl), sgr_off_code(Ctrl,OffCode),!.
-sgr_on_code(Foo,7):-format(user_error,'~MISSING: n~q~n',[sgr_on_code(Foo,7)]),!.
+sgr_on_code(Foo,7):- format(user_error,'~MISSING: n~q~n',[sgr_on_code(Foo,7)]),!.
 
 sgr_off_code(Ctrl,OnCode):-ansi_term:off_code(Ctrl,OnCode),!.
 sgr_off_code(- Ctrl,OnCode):- nonvar(Ctrl), sgr_on_code(Ctrl,OnCode),!.
@@ -2291,7 +2340,6 @@ call_no_cuts_0(C):-call(C).
 :- dynamic(call_tabled_list/2).
 
 :- meta_predicate_transparent(make_key(?,-)).
-make_key(CC,KeyA):- notrace(ground(CC)->KeyA=CC ;(copy_term(CC,Key,_),snumbervars(Key,0,_))),!,KeyA=Key. % ,term_to_atom(Key,KeyA).
 
 expire_tabled_list(all):-!,retractall(call_tabled_list(_,_)).
 expire_tabled_list(_):-!,retractall(call_tabled_list(_,_)).
@@ -2350,16 +2398,6 @@ asserta_if_ground(_).
 :-moo_hide_show_childs(bugger,must,1).
 :-moo_hide_show_childs(bugger,must,2).
 :-moo_hide_show_childs(bugger,must_flag,3).
-
-
-% bugger_debug=off turns off just debugging about the debugger
-% opt_debug=off turns off all the rest of debugging
-bdmsg(_):-bugger_flag(bugger_debug=off),!.
-bdmsg(_):-!.
-bdmsg(D):-once(dmsg(D)).
-
-bugger_term_expansion(_,_):-!,fail.
-bugger_term_expansion(T,T3):- compound(T), once(bugger_t_expansion(T,T2)),T\==T2,!,catchv(expand_term(T2,T3),_,fail).
 
 % though maybe dumptrace
 default_dumptrace(trace).
@@ -2420,32 +2458,7 @@ ftrace(Goal):- restore_trace((
    visible(+fail),visible(+exception),
    leash(-all),leash(+exception),trace,Goal)).
 
-bugger_t_expansion(T,T):-not(compound(T)),!.
-bugger_t_expansion(T,AA):- T=..[F,A],unwrappabe(F),bdmsg(bugger_term_expansion(T)),bugger_t_expansion(A,AA),!.
-bugger_t_expansion([F0|ARGS0],[F1|ARGS1]):-bugger_t_expansion(F0,F1),bugger_t_expansion(ARGS0,ARGS1).
-bugger_t_expansion(T,TT):- T=..[F|ARGS0],bugger_t_expansion(ARGS0,ARGS1), TT=..[F|ARGS1].
 
-unwrappabe(F):-member(F,['debugOnError',debugOnError0]),!,fail.
-unwrappabe(F):-member(FF,['OnError','OnFailure','LeastOne','Ignore','must']),atom_concat(_,FF,F),!.
-
-
-
-bugger_goal_expansion(T,_):- bdmsg(bugger_goal_expansion(T)),fail.
-
-bugger_expand_goal(T,_):- bdmsg(bugger_expand_goal(T)),fail.
-
-bugger_expand_term(T,_):- bdmsg(bugger_expand_term(T)),fail.
-
-
-
-% user:     expand_goal(G,G2):- compound(G),bugger_expand_goal(G,G2),!.
-
-
-% user:goal_expansion(G,G2):- compound(G),bugger_goal_expansion(G,G2).
-
-% user:expand_term(G,G2):- compound(G),bugger_expand_term(G,G2),!.
-
-% user:term_expansion((H:-G),(H:-G2)):- bugger_term_expansion(G,G2).
 
 module_predicate(ModuleName,F,A):-current_predicate(ModuleName:F/A),functor(P,F,A),
    not((( predicate_property(ModuleName:P,imported_from(IM)),IM\==ModuleName ))).

@@ -152,6 +152,7 @@ call_mpred_0(C):- debugOnError(C),!.  % just atoms
 % call_mpred_1(F,G):-loop_check(call_mpred(F,G),trace_or_throw(call_mpred(F,G))).
 
 call_mpred(_,C):- into_mpred_form(C,MP),MP\=@=C,!,call_mpred(MP).
+call_mpred(_,dbase_t([H|T])):- !,dbase_t([H|T]).
 call_mpred(dbase_t,C):- trace_or_throw(not_into_mpred_form(C)),!.
 call_mpred(F,C):- mpred_prop(F,prologOnly),!,must_det(is_callable(C)),!,debugOnError(C).
 

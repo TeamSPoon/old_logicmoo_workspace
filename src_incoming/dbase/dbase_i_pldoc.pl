@@ -123,3 +123,5 @@ showCounts([H|L],OTHER):- occurrences_of_term(H,OTHER,N),write_count(H,N),showCo
 
 write_count(H,N):- writeq(H:N),write(', ').
 
+
+

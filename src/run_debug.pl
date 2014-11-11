@@ -14,6 +14,7 @@ was_run_dbg_pl:-is_startup_file('run_debug.pl').
 % run_tests includes run_common 
 :-include(run_tests).
 
+
 % [Optionaly] re-define load_default_game
 % load_default_game:- load_game(logicmoo('rooms/startrek.all.plmoo')).
 
@@ -75,7 +76,7 @@ debug_talk:- debug_repl_wo_cyc(parser_talk,t3).
 
 % [Manditory] This loads the game and initializes so test can be ran
 :- if_flag_true(was_run_dbg_pl, at_start(run_setup)).
-
+:- ensure_plmoo_loaded(logicmoo('rooms/startrek.all.plmoo')).
 :- finish_processing_world.
 
 % [Optional] Interactively debug E2C
@@ -102,10 +103,7 @@ moo:mud_test_local :-kellerStorage:kellerStorageTestSuite.
 
 % :-curt80.
 
-% the real tests now (once)
-% moo:mud_test_local :- if_flag_true(was_run_dbg_pl,at_start(must_det(run_mud_tests))).
 
-% :- if_flag_true(was_run_dbg_pl, doall(now_run_local_tests_dbg)).
 
 % more tests even
 moo:mud_test_local :-do_player_action("look").
@@ -115,6 +113,10 @@ moo:must_test("tests to see if poorly canonicalized code (unrestricted quantific
    forall(atloc(O,L),dmsg(atloc(O,L)))).
 
 
+% the real tests now (once)
+moo:mud_test_local :- if_flag_true(was_run_dbg_pl,at_start(must_det(run_mud_tests))).
+
+ % :- if_flag_true(was_run_dbg_pl, doall(now_run_local_tests_dbg)).
 
 
 % [Optionaly] Allows testing/debug of the chat80 system (withouyt loading the servers)
@@ -143,8 +145,12 @@ cmdresult(statistics,true)
 */
 :-forall(current_prolog_flag(N,V),dmsg(N=V)).
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
-% :-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,who)).
-% :-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,look)).
+:-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,who)).
+:-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,look)).
+
+% :- kill_term_expansion.
+:- prolog.
+
 % :-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,chat80)).
 :- if_flag_true(was_run_dbg_pl, at_start(run)).
 

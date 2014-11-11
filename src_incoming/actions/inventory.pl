@@ -16,6 +16,8 @@
 moo:action_info(inventory(optional(agent,self)), "Examine an inventory").
 moo:agent_call_command(Agent,inventory(Who)):- show_kb_preds(Agent,inventory(Who,value)).
 
+listValued(inventory(agent,list(obj))).
+
 % Get only the Inv (inventory)
 inventory(Agent,Percepts) :-  inventory0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts).
 inventory0(Agent, Inv) :-

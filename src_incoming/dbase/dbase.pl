@@ -508,7 +508,7 @@ props(Obj,PropSpecs):- req(props(Obj,PropSpecs)).
 iprops(Obj,PropSpecs):- ireq(props(Obj,PropSpecs)).
 % -  add_fast(Assertion)
 % add_fast(C0):- must_det((add_fast_unchecked(C0), xtreme_debug(once(ireq(C0);(with_all_dmsg((debug(blackboard),show_call(add_fast_unchecked(C0)),rtrace(add_fast_unchecked(C0)),dtrace(ireq(C0))))))))),!.
-add_fast(C0):- must_det((add_fast_unchecked(C0), xtreme_debug(ireq(C0)->true;dmsg(warn(failed_ireq(C0)))))),!.
+add_fast(C0):- must_det((add_fast_unchecked(C0), nop(xtreme_debug(ireq(C0)->true;dmsg(warn(failed_ireq(C0))))))),!.
 
 :-export(add_fast_unchecked/1).
 add_fast_unchecked(C0):-must_det(db_op(change(assert,add), C0)).

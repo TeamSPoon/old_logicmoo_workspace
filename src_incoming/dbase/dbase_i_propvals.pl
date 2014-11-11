@@ -154,8 +154,13 @@ checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type):- not(thlocal:deduceAr
 checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type):- deduce_argN(Prop,N,Obj,OType,Type),fail.
 checkNoArgViolationOrDeduceInstead(Prop,N,Obj,_,_):- argIsa_call(Prop,N,Type),findall(OT,isa(Obj,OT),OType),reallyCheckArgViolation(Prop,N,Obj,OType,Type).
 
+openSubClass(spatialthing).
+openSubClass(obj).
+openSubClass(region).
+
 reallyCheckArgViolation(Prop,N,_Obj,_OType,argIsaFn(Prop,N)):-!.
 reallyCheckArgViolation(_,_,_,List,Type):-memberchk(Type,List),!.
+reallyCheckArgViolation(_Prop,_N,_Obj,[OType|_],OpenSubClass):- openSubClass(OpenSubClass), atom(OType),show_call(assert_subclass_safe(OType,OpenSubClass)),!.
 reallyCheckArgViolation(Prop,N,Obj,OType,Type):- violatesType(Obj,Type),trace_or_throw(violatesType_maybe_cache(Prop,N,Obj,OType\=Type)).
 
 
@@ -291,7 +296,7 @@ add_missing_instance_defaults_lc(P):-
    once(Missing=[];show_call(padd(P,Missing))).
 
 :-export(gather_props_for/3).
-gather_props_for(Op,Obj,Props):-findall(Prop,(length(REST,L),L<9,call_expanded_for(Op,dbase_t([P,Obj|REST])),Prop=..[P|REST]),Props).
+gather_props_for(_Op,Obj,Props):-setof(Prop,(between(0,9,L),length(REST,L),(dbase_t([P,Obj|REST])),Prop=..[P|REST]),Props).
 
 :-export(get_inst_default_props/3).
 get_inst_default_props(I,PropListL,Missing):-

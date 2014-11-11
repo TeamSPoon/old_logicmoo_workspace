@@ -10,8 +10,8 @@
 
 :- moo:register_module_type(command).
 
-moo:action_info(as(agent,command)), "as <agent> <command>").
-moo:agent_call_command(Agent,as(OtherAgent,Command)):- call_agent_command(OtherAgent,Command).
+moo:action_info('as'(agent,command), "as <agent> <command>").
+moo:agent_call_command(_Agent,'as'(OtherAgent,Command)):- call_agent_command(OtherAgent,Command).
 
 :- include(logicmoo(vworld/moo_footer)).
 
