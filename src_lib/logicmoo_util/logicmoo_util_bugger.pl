@@ -1284,11 +1284,16 @@ beenCaught(Call):- fail, predicate_property(Call,number_of_clauses(_Count)), cla
 beenCaught(Call):- catchv(once(Call),E,(dmsg(caugth(Call,E)),beenCaught(Call))),!.
 beenCaught(Call):- traceAll,dmsg(tracing(Call)),debug,trace,Call.
 
+:-meta_predicate_transparent(with_no_term_expansions(0)).
+with_no_term_expansions(Call):-
+  with_no_assertions(user:term_expansion(_,_),
+    with_no_assertions(user:goal_expansion(_,_),Call)).
+
 kill_term_expansion:-
-   abolish(term_expansion,2),
-   abolish(goal_expansion,2),
-   dynamic(term_expansion/2),
-   dynamic(goal_expansion/2).
+   abolish(user:term_expansion,2),
+   abolish(user:goal_expansion,2),
+   dynamic(user:term_expansion/2),
+   dynamic(user:goal_expansion/2).
 
 local_predicate(_,_/0):-!,fail.
 local_predicate(_,_/N):-N>7,!,fail.
@@ -1527,10 +1532,14 @@ with_no_assertions(THead,Call):-
    copy_term(H,  WithA), !, setup_call_cleanup(M:asserta(WithA),Call,must_det(M:retract(WithA))).
 
 to_thread_head((H:-B),TL,(HO:-B),(HH:-B)):-!,to_thread_head(H,TL,HO,HH),!.
-to_thread_head(thglobal:Head,thglobal,thglobal:Head,Head):- slow_sanity((predicate_property(thglobal:Head,(dynamic)),not(predicate_property(thglobal:Head,(thread_local))))).
-to_thread_head(TL:Head,TL,TL:Head,Head):-!, slow_sanity(( predicate_property(TL:Head,(dynamic)),must_det(predicate_property(TL:Head,(thread_local))))).
-to_thread_head(Head,thlocal,thlocal:Head,Head):-!, slow_sanity(( predicate_property(thlocal:Head,(dynamic)),must_det(predicate_property(thlocal:Head,(thread_local))))).
-to_thread_head(Head,tlbugger,tlbugger:Head,Head):- slow_sanity(( predicate_property(tlbugger:Head,(dynamic)),predicate_property(tlbugger:Head,(thread_local)))).
+to_thread_head(thglobal:Head,thglobal,thglobal:Head,Head):- !.
+to_thread_head(user:Head,user,user:Head,Head):- !.
+to_thread_head(TL:Head,TL,TL:Head,Head):-!, check_thread_local(TL:Head).
+to_thread_head(Head,thlocal,thlocal:Head,Head):-!,check_thread_local(thlocal:Head).
+to_thread_head(Head,tlbugger,tlbugger:Head,Head):- check_thread_local(tlbugger:Head).
+
+check_thread_local(user:_):-!.
+check_thread_local(TL:Head):-slow_sanity(( predicate_property(TL:Head,(dynamic)),must_det(predicate_property(TL:Head,(thread_local))))).
 
 :-thread_local(tlbugger:dmsg_hidden/1).
 :-meta_predicate_transparent(with_all_dmsg(0)).

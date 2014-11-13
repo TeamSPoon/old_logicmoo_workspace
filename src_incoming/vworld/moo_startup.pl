@@ -137,8 +137,8 @@ make_qlfs:-
 :- user_use_module(logicmoo(pldata/transform_dump)).
 % :- catch(user_use_module(logicmoo(pldata/withvars_988)),_,true).
 download_and_install_el:-
-  shell('wget -N http://www.logicmoo.org/devel/logicmoo/src_data/pldata/el_assertions.zip',_),
-  shell('unzip -u -d ../src_data/pldata/ el_assertions.zip'),
+  shell('wget -N http://logicmoo.org/devel/LogicmooDeveloperFramework/TEMP~/www.logicmoo.org/downloads/datafiles/PlDataBinary.zip',_),
+  shell('unzip -u -d ../src_data/pldata/ PlDataBinary.zip'),
   catch(user_use_module(logicmoo(pldata/el_assertions)),E,fmt('Cant use el_assertions',E)).
 
 :- catch(user_use_module(logicmoo(pldata/el_assertions)),_,download_and_install_el).

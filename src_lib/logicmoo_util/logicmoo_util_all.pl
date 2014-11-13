@@ -48,8 +48,8 @@ local_directory_search('../../src_natlang_data').
 local_directory_search('~logicmoo-mud/cynd/startrek'). % home dir CynD world
 
 :- current_prolog_flag(windows,true)->
-   setenv('PATH_INDIGOLOG','t:/devel/logicmoo/src_modules/indigolog');
-   setenv('PATH_INDIGOLOG','/devel/logicmoo/src_modules/indigolog').
+   setenv('PATH_INDIGOLOG','../../indigolog');
+   setenv('PATH_INDIGOLOG','../../indigolog').
 
 my_absolute_file_name(F,A):-catch(expand_file_name(F,[A]),_,fail),F\=A,!.
 my_absolute_file_name(F,A):-catch(absolute_file_name(F,A),_,fail),!.

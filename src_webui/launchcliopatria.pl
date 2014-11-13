@@ -1,5 +1,7 @@
 #!/usr/local/bin/swipl 
 
+:- throw('dont call lauchclio!').
+
 :- initialization cp_server.
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -35,8 +37,8 @@ add_relative_search_path(Alias, Rel) :-
 	assertz(user:file_search_path(Alias, Rel)).
 
 % :- use_module(cliopatria_binding).
-file_search_path(cliopatria, '/devel/logicmoo/src_modules/ClioPatria').
-:- add_relative_search_path(cliopatria, '/devel/logicmoo/src_modules/ClioPatria').
+file_search_path(cliopatria, '../../ClioPatria').
+:- add_relative_search_path(cliopatria, '../../ClioPatria').
 
 % Make loading files silent. Comment if you want verbose loading.
 

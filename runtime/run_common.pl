@@ -55,8 +55,8 @@ within_user(Call):- '@'(Call,'user').
 user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog').
 user:file_search_path(weblog, 'C:/Users/Administrator/AppData/Roaming/SWI-Prolog/pack/weblog').
 user:file_search_path(weblog, '/usr/local/lib/swipl-7.1.26/pack/weblog/prolog'):-current_prolog_flag(unix,true).
-user:file_search_path(cliopatria, '/devel/logicmoo/src_modules/ClioPatria'):- current_prolog_flag(unix,true).
-user:file_search_path(cliopatria, 't:/devel/logicmoo/src_modules/ClioPatria'):- not( current_prolog_flag(unix,true)).
+user:file_search_path(cliopatria, '../../ClioPatria'):- current_prolog_flag(unix,true).
+user:file_search_path(swish, '../../swish'):- current_prolog_flag(unix,true).
 
 :- user_use_module(library(settings)).
 
@@ -89,13 +89,14 @@ start_boxer:-
 % We don't start cliopatria we here. We have to manually start
 %  with  ?- start_servers.
 hard_work:-
-   with_assertions(op(200,fy,'@'),
+   with_no_term_expansions(with_assertions(op(200,fy,'@'),
    ((
  %  use_module('t:/devel/cliopatria/rdfql/sparql_runtime.pl'),
-   ensure_loaded(logicmoo(launchcliopatria)),
+  % ensure_loaded(logicmoo(launchcliopatria)),
    ensure_loaded(logicmoo(testwebconsole)),
-   ensure_loaded(logicmoo(swish/logicmoo_run_swish))
-   ))),!.
+   kill_term_expansion,
+   ensure_loaded(swish(logicmoo_run_swish))
+   )))),!.
 
 
 

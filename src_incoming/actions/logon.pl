@@ -23,6 +23,7 @@ moo:agent_text_command(Agent,[login,NewName],Agent,rename(NewName)).
 moo:agent_call_command(Agent,rename(NewName)):- padd(Agent,named(NewName)).
 
 % become
+moo:action_info(become(agent),"Assume the role of an agent").
 moo:agent_call_command(Agent,become(NewName)):- become_player(Agent,NewName).
 
 

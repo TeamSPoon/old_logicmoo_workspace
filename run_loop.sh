@@ -1,6 +1,6 @@
 #!/bin/bash
 export OLDPWD="`pwd`"
-export NEWPWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/src && pwd )"
+export NEWPWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/runtime && pwd )"
 #export SWIPL=/usr/local/lib/swipl-7.1.11/bin/x86_64-linux/swipl
 export RUNFILE="run.pl"
 if [ $# -eq 0 ] 
