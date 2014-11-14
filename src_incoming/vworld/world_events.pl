@@ -43,5 +43,6 @@ get_agent_stream(Whom,Input,Output):- thglobal:agent_message_stream(Whom,_,Input
 get_agent_stream(Whom,_Input,_Output):-ignore(retract(thglobal:agent_message_stream(Whom,_,_,_))),!,fail.
 
 :-export(deliverable_location_events/3).
+:-decl_mpred_prolog(deliverable_location_events(agent,region,term)).
 
 deliverable_location_events(Agent,Loc,tick(Agent,Loc)):-fail.

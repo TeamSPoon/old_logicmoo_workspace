@@ -169,6 +169,7 @@ near_vectors([[nw,here],[n,here],[ne,here],
 	[w,here],[d,u],[e,here],
 	[sw,here],[s,here],[se,here]]).
 
+:-dynamic(visually_blocked/2).
 :-decl_mpred_prolog(look:visually_blocked(agent,list)).
 
 :-listing(visually_blocked).

@@ -34,6 +34,8 @@ grid_dist(L1,L2,Dist):- to_3d(L1,L13D),to_3d(L2,L23D),dist(L13D,L23D,Dist),!.
 
 dist(_,_,5).
 
+:-decl_mpred_prolog(pathBetween_call(region,dir,region)).
+
 % pathBetween_call(From,DirS,To):-string(DirS),!,atom_string(Dir,DirS),!,any_to_dir(Dir,Dir2),pathBetween(From,Dir2,To),same(Dir,Dir2).
 pathBetween_call_0(From,Dir,To):-any_to_dir(Dir,Dir2),asserted_mpred_clause(pathBetween(From,Dir2,To)),same(Dir,Dir2).
 pathBetween_call(From,Dir,To):-pathBetween_call_0(From,DirS,To), same(Dir,DirS).

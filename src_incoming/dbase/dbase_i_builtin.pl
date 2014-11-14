@@ -249,10 +249,11 @@ multiValued(keyword(term,string)).
 multiValued(act_affect(term,term,term)).
 multiValued(memory(agent,term)).
 argsIsaInList(wearing(agent,wearable)).
+argsIsaInList(success(agent,term)).
 
 :-decl_mpred(act_affect/3).
 
-:-decl_prolog(member/2).
+:-decl_mpred_prolog(member/2).
 
 
 nameStrings(apath(Region,Dir),Text):- pathName(Region,Dir,Text).
@@ -440,8 +441,8 @@ type(var).
 type(string).
 formattype(var).
 formattype(string).
-:-decl_prolog(var/1).
-:-decl_prolog(string/1).
+:-decl_mpred_prolog(var/1).
+:-decl_mpred_prolog(string/1).
 
 ft_info(action(prolog),formatted).
 ft_info(apath(region,dir),formatted).
