@@ -59,6 +59,7 @@ locationToRegion(Obj,RegionIn):-locationToRegion_0(Obj,Region),!,RegionIn=Region
 locationToRegion_0(Obj,Obj):-var(Obj),dmsg(warn(var_locationToRegion(Obj,Obj))),!.
 locationToRegion_0(xyz(Room,_,_,_),Region2):-nonvar(Room),!,locationToRegion_0(Room,Region2).
 locationToRegion_0(Obj,Obj):-nonvar(Obj),isa(Obj,region),!. % localityOfObject(Obj,Room).
+locationToRegion_0(Obj,Obj):-nonvar(Obj),isa(Obj,spatialthing),!. % localityOfObject(Obj,Room).
 locationToRegion_0(Obj,Obj):-dmsg(warn(locationToRegion(Obj,Obj))),!.
 
 loc_to_xy(LOC,X,Y,xyz(Room,X,Y,1)):- locationToRegion(LOC,Room),!.
@@ -180,7 +181,7 @@ ensure_in_world(What):-must_det(put_in_world(What)).
 :- dynamic_multifile_exported hook:decl_database_hook/2.
 :- dynamic_multifile_exported hook:deduce_facts/2.
 :- dynamic_multifile_exported hook:create_random_fact/1.
-:- dynamic_multifile_exported hook:create_random_instance/3.
+:- dynamic_multifile_exported hook:hooked_random_instance/3.
 :- dynamic_multifile_exported hook:fact_always_true/1.
 :- dynamic_multifile_exported hook:fact_maybe_deduced/1.
 :- dynamic_multifile_exported hook:fact_is_false/2.
@@ -207,8 +208,8 @@ hook:create_random_fact(atloc(Obj,LOC)) :- nonvar(Obj),asserted_or_deduced(local
 hook:create_random_fact(localityOfObject(Obj,Region)) :- nonvar(Obj),not(is_asserted(localityOfObject(Obj,_))),asserted_or_deduced(localityOfObject(Obj,Region)).
 
 %  suggest random values
-hook:create_random_instance(dir,Dir,Test) :- my_random_member(Dir,[n,s,e,w,ne,nw,se,sw]),Test,!.
-hook:create_random_instance(int,3,Test):-call(Test),dmsg(create_random(int,3,Test)),dtrace,!,fail.
+hook:hooked_random_instance(dir,Dir,Test) :- my_random_member(Dir,[n,s,e,w,ne,nw,se,sw]),Test,!.
+hook:hooked_random_instance(int,3,Test):-call(Test),dmsg(random_instance(int,3,Test)),dtrace,!,fail.
 
 %  give required forward deductions
 hook:deduce_facts(atloc(Obj,LOC),localityOfObject(Obj,Region)):- nonvar(LOC), locationToRegion(LOC,Region).
@@ -219,7 +220,7 @@ hook:deduce_facts(localityOfObject(Obj,_Region),atloc(Obj,LOC)):- nonvar(Obj), p
 
 
 random_xyz(LOC):-
-   must_det(create_random(region,Region,true)),
+   must_det(random_instance(region,Region,true)),
    in_grid_rnd(Region,LOC),!.
 
 random_xyz(xyz('Area1000',1,1,1)):-  trace_or_throw(game_not_loaded).
@@ -373,17 +374,21 @@ check_for_fall(_,_,_).
 
 % Reverses the direction returned by number_to_direction
 % Used for fleeing
-reverse_dir(d,u).
-reverse_dir(u,d).
-reverse_dir(n,s).
-reverse_dir(s,n).
-reverse_dir(e,w).
-reverse_dir(w,e).
-reverse_dir(nw,se).
-reverse_dir(ne,sw).
-reverse_dir(sw,ne).
-reverse_dir(se,nw).
+reverse_dir(W,R):-string(W),atom_string(A,W),!,reverse_dir0(A,RA),atom_string(RA,R),!.
+reverse_dir(A,R):-reverse_dir0(A,R),!.
 reverse_dir(Was,reverseOf(Was)):-nonvar(Was).
+
+reverse_dir0(d,u).
+reverse_dir0(u,d).
+reverse_dir0(n,s).
+reverse_dir0(s,n).
+reverse_dir0(e,w).
+reverse_dir0(w,e).
+reverse_dir0(nw,se).
+reverse_dir0(ne,sw).
+reverse_dir0(sw,ne).
+reverse_dir0(se,nw).
+
 
 % Yet another hash table to covert numbers into directions (or the reverse).
 num_near(1,nw,here).

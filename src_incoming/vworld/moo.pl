@@ -248,7 +248,7 @@ moo:  ?- make.
 % :- meta_predicate moo:xcall_f(1,?).
 % :- meta_predicate moo:hooked_asserta(^).
 % :- meta_predicate moo:xcall_t(3,?,?,?).
-% :- meta_predicate moo:create_random(*,*,0).
+% :- meta_predicate moo:random_instance(*,*,0).
 % :- meta_predicate moo:xcall_t(6,?,?,?,?,?,?).
 % :- meta_predicate moo:db_op_loop(*,*,0).
 % :- meta_predicate moo:punless(0,0).

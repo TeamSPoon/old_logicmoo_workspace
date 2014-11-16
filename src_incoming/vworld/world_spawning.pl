@@ -69,7 +69,7 @@ createStub_rete(F,A):- dynamic(F/A),!. %%,functor(P,F,A),asserta((P:-callStub_re
       cls/0,  
       %create_instance/3,  
       frinst/4,  
-      list/1,  
+      listm/1,  
       mea/1,  
       %prop_memb/2,  
       spawn_objects/1,  
@@ -114,7 +114,7 @@ welcome  :-
 	write('The => prompt accepts four commands:'),nl,nl,
 	write('   load.       - prompts for name of rules file'),nl,
 	write('                 enclose in single quotes'),nl,
-	write('   list.       - lists stuff'),nl,
+	write('   listm.       - lists stuff'),nl,
 	write('   go.         -  starts the inference'),nl,
 	write('   exit.       - does what you"d expect'),nl,nl,
         load,ignore(lst).
@@ -143,8 +143,8 @@ do(go) :-!,
 	T is 10 * (T2 - T1),
 	write(time-T),nl,!.
 do(load) :- load, !.
-do(list) :- lst, !.       % lists all of working storage
-do(list(X)) :- lst(X), !. % lists all which match the pattern
+do(listm) :- lst, !.       % lists all of working storage
+do(listm(X)) :- lst(X), !. % lists all which match the pattern
 do(_) :- write('invalid command'),nl.
 
 % loads the rules (Prolog terms) into the Prolog database
@@ -246,7 +246,7 @@ build_keys([r(Inst,A,B,C)|T],[Key-r(Inst,A,B,C)|TR]) :-
 	reverse(X,Key),
 	build_keys(T,TR).
 
-% build a list of just the times of the various matched attributes
+% build a listm of just the times of the various matched attributes
 % for use in rule selection
 
 build_chlist([],[]).
@@ -268,7 +268,7 @@ mea_filter(Max,[r([A/T|Z],B,C,D)|X],Temp,ML) :-
 	T > Max,
 	!, mea_filter(T,X,[r([A/T|Z],B,C,D)],ML).
 
-% recursively go through the LHS list, matching conditions against
+% recursively go through the LHS listm, matching conditions against
 % working storage
 
 match([],[]).
@@ -319,7 +319,7 @@ test(X = Y) :- X is Y,!.
 test(is_on(X,Y)) :- is_on(X,Y),!.
 test(call(X)) :- call(X).
 
-% recursively execute each of the actions in the RHS list
+% recursively execute each of the actions in the RHS listm
 
 process([],_) :- !.
 process([Action|Rest],LHS) :-
@@ -328,7 +328,7 @@ process([Action|Rest],LHS) :-
 process([Action|Rest],LHS) :-
 	local_error(201,[Action,fails]).
 
-% if its retract, use the reference numbers stored in the Lrefs list,
+% if its retract, use the reference numbers stored in the Lrefs listm,
 % otherwise just take the action
 
 take(retract(N),LHS) :-
@@ -356,7 +356,7 @@ take(read(X)) :- read(X),!.
 take(prompt(X,Y)) :- nl,write(X),read(Y),!.
 take(cls) :- cls, !.
 take(is_on(X,Y)) :- is_on(X,Y), !.
-take(list(X)) :- lst(X), !.
+take(listm(X)) :- lst(X), !.
 take(call(X)) :- call(X).
 
 % logic for retraction
@@ -376,7 +376,7 @@ retrall([Prem|Rest]) :-
 retrall([_|Rest]) :-		% must have been a test
 	retrall(Rest).
 
-% list all of the terms in working storage
+% listm all of the terms in working storage
 
 lst :-
 	fact(X,_),
@@ -441,7 +441,7 @@ prep_req(Slot-X,req(C,N,Slot,val,X)).
 facet_list([val,def,calc,add,del,edit]).
 
 
-% retrieve a list of slot values
+% retrieve a listm of slot values
 
 get_frame(Class, ReqList) :-
 	frame(Class, SlotList),
@@ -464,14 +464,14 @@ slot_vals(C,N,[Req|Rest],SlotList) :-
 	find_slot(req(C,N,S,F,V),SlotList), 
 	!, slot_vals(C,N,Rest,SlotList).
 slot_vals(C,N, Req, SlotList) :-
-	not(list(Req)),
+	not(listm(Req)),
 	prep_req(Req,req(C,N,S,F,V)),
 	find_slot(req(C,N,S,F,V), SlotList).
 
 find_slot(req(C,N,S,F,V), SlotList) :-
 	nonvar(V), !,
 	find_slot(req(C,N,S,F,Val), SlotList), !,
-	(Val = V; list(Val),is_on(V,Val)).
+	(Val = V; listm(Val),is_on(V,Val)).
 find_slot(req(C,N,S,F,V), SlotList) :-
 	is_on(S-FacetList, SlotList), !,
 	facet_val(req(C,N,S,F,V),FacetList).
@@ -497,7 +497,7 @@ facet_val(req(C,N,S,val,V),FacetList) :-
 facet_val(req(C,N,S,val,V),FacetList) :-
 	is_on(def V,FacetList), !.
 
-% add a list of slot values
+% add a listm of slot values
 
 add_frame(Class, UList) :-
 	old_slots(Class,SlotList),
@@ -554,8 +554,8 @@ add_facet(req(C,N,S,F,V),FacetList,[FNew|FL2]) :-
 
 add_newval(X,Val,Val) :- var(X), !.
 add_newval(OldList,ValList,NewList) :-
-	list(OldList),
-	list(ValList),
+	listm(OldList),
+	listm(ValList),
 	append(ValList,OldList,NewList), !.
 add_newval([H|T],Val,[Val,H|T]).
 add_newval(_,Val,Val).
@@ -567,7 +567,7 @@ check_add_demons(req(C,N,S,F,V),FacetList) :-
 check_add_demons(_,_).
 
 
-% ws_delete a list of slot values
+% ws_delete a listm of slot values
 
 del_frame(Class) :-
 	retract(frame(Class,_)).
@@ -754,7 +754,7 @@ read_walls :-
 	read(DoorLength),
 	assert_ws(door-D with [length-DoorLength]),
 	update_ws(door-D with [position-wall/DoorWall]),
-	write('Which walls have outlets? (a list)'),
+	write('Which walls have outlets? (a listm)'),
 	read(PlugWalls),
 	process_plugs(PlugWalls).
 
@@ -880,8 +880,8 @@ frame(recommend, []).
 
 % calculate the available space if needed.  The available space is
 % computed from the length of the item minus the sum of the lengths of
-% the items it is holding.  The held items are in the holding list.
-% The items in the list are identified only by their unique names.
+% the items it is holding.  The held items are in the holding listm.
+% The items in the listm are identified only by their unique names.
 % This is used by walls and tables.
 
 space_calc(C,N,space-S) :-
@@ -906,7 +906,7 @@ tv_support(tv,N,place_on-table) :-
 tv_support(tv,N,place_on-floor) :-
 	uptf(tv,N,[place_on-floor]).
 
-% Whenever a piece is placed in position, update the holding list of the
+% Whenever a piece is placed in position, update the holding listm of the
 % item which holds it (table or wall) and the available space.  If something
 % is placed in front of something else, then do nothing.
 

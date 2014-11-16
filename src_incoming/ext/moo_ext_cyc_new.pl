@@ -287,7 +287,7 @@ loadLispFile(Filename):-
 
 loadLispStream(Stream,Callback):-
    repeat,
-   %%%readUntil(10,Stream,Get),
+   % %readUntil(10,Stream,Get),
    lisp_read(Stream,_String,Get),
    doSexpLine(Callback,Get),
    at_end_of_stream(Stream).
@@ -407,7 +407,7 @@ cycSync:-!.%%d3Info.
 cycSync(_:end_fo_file):-!.
 cycSync(U):-unusedCycL(U),!.
 cycSync(Out):-cycCache(Out),!,ignore(retract(cycCacheToDo(Out))).
-cycSync(Out):-Out= MT : Assert,!,catch((myCycAssert(MT : Assert),ignore(assertIfNew(cycCache(Out))),ignore(retract(cycCacheToDo(Out)))),E,debugFmt('%%%%%%%%%%%%% ~q',[E])),!.
+cycSync(Out):-Out= MT : Assert,!,catch((myCycAssert(MT : Assert),ignore(assertIfNew(cycCache(Out))),ignore(retract(cycCacheToDo(Out)))),E,debugFmt('% % % % % % % ~q',[E])),!.
 cycSync(Out):-mtForCycL(Out,Mt),!,cycSync(Mt:Out).
 
 % ===================================================================
@@ -604,21 +604,21 @@ getCycConnection3(SocketId,OutStream,InStream):-
       ignore(once(isCycOption(cycServer,Server))),
       getCycConnection(Server,SocketId,OutStream,InStream).
 
-%% Reuse an Available connection
+%  Reuse an Available connection
 getCycConnection(Server,SocketId,OutStream,InStream):- fail,
       thread_self(Thread),
       ignore((var(Server),throw(no_server(getCycConnection(Server,SocketId,OutStream,InStream))))),
       once(nonvar(SocketId);nonvar(OutStream);nonvar(InStream)),
       once(cyc:cycConnectionAvalable(Thread,Server,SocketId,OutStream,InStream);cyc:cycConnectionUsed(Thread,Server,SocketId,OutStream,InStream)),!.
 
-%% Reuse an Available connection
+%  Reuse an Available connection
 getCycConnection(Server,SocketId,OutStream,InStream):-
       thread_self(Thread),
       retract(cyc:cycConnectionAvalable(Thread,Server,SocketId,OutStream,InStream)),
       ignore(system:retractall(cyc:cycConnectionUsed(Thread,Server,SocketId,OutStream,InStream))),
       assertz(cyc:cycConnectionUsed(Thread,Server,SocketId,OutStream,InStream)),!.
 
-%% Or Create a new Available connection
+%  Or Create a new Available connection
 getCycConnection(Server,SocketId,OutStream,InStream):-
       tcp_socket(SocketId),
       tcp_connect(SocketId,Server),
@@ -910,7 +910,7 @@ allowWhiteSpaces --> endOfLine,!.
 allowWhiteSpaces --> oneSpace,!,allowWhiteSpaces.
 allowWhiteSpaces --> [].
 
-oneSpace --> [X],{ X<33 }.%%%, !, code_type(X,space),! }.
+oneSpace --> [X],{ X<33 }.% %, !, code_type(X,space),! }.
 
 spaces0 --> oneSpace,!,spaces0.
 spaces0 --> [].
@@ -938,9 +938,9 @@ symbol0(S) --> symbol1(SC),{atom_concat('',SC,S)}.
 % no upcase
 symbol1(S) --> "|",{!}, charsUpTo(S,"|").
 symbol1(S) --> symbolChars(S), { upcase_atom(S,S)}.
-%% symbol1('#$'(S)) --> symbolChars(S).
+% symbol1('#$'(S)) --> symbolChars(S).
 symbol1(S) --> symbolChars(S).
-%% symbol1(U) --> symbolChars(S), { upcase_atom(S,U)}.
+% symbol1(U) --> symbolChars(S), { upcase_atom(S,U)}.
 
 char0(char(S))-->"#\\",char1(S).
 char0(reader_error(char,C))-->"#\\",[C].
@@ -968,7 +968,7 @@ dcgBothC(DCG1,DCG2,S,R) :- append(L,R,S),phrase(DCG1,L,[]),once(phrase(DCG2,L,[]
 dcgNoConsumeStartsC(DCG,SE,SE):-phrase(DCG,SE,_).
 
 
-escapedChar(C)-->[92,C]. %%,{trace}.
+escapedChar(C)-->[92,C]. % ,{trace}.
 
 meetsCharConstrait(C,[]):-! /*,trace*/,  fail.
 meetsCharConstrait(C,List):- member(LType,List),(LType==C ;( code_type(C,Type), LType=Type)),!.
@@ -1019,7 +1019,7 @@ readCycLTermChars(InStream,Response):-
 
 readCycLTermChars(InStream,Response,ResponseType):-
    debugOnFailure(readCycLTermChars(InStream,[],[sexp],Response,ResponseType)),!.
-   %%(validLisp(Response)-> (!) ;(readMoreChars(Chars))).
+   % (validLisp(Response)-> (!) ;(readMoreChars(Chars))).
 
 subType(_Type,_ExpectedType).
 
@@ -1187,7 +1187,7 @@ readCycLTermCharsUntil(Char,InStream,Trim,atom):-!,
    streamClear(InStream).
 
 
-streamClear(InStream) :- !. %% trace,!.
+streamClear(InStream) :- !. %  trace,!.
 % needs better solution!  .01 seconds works but .001 seconds don't :(  meaning even .01 might in some circumstances be unreliable
 streamClear(InStream) :- once(catch(wait_for_input([InStream], Inputs, 0.01),E,(trace,debugFmt(E)))),Inputs=[],!.
 %streamClear(InStream) :-get_code(InStream, Was),((Was == -1) -> (true);(debugFmt('FoundMore ~c ~q ~n',[Was,Was]),streamClear(InStream))),!.
@@ -2108,7 +2108,7 @@ readCycL(Stream,CHARS)  :-
 		flag('bracket_depth',_,0),
 		retractall(reading_in_comment),
 		retractall(reading_in_string),!,
-		readCycLChars_p0(Stream,CHARS),!. %%,trim(CHARS,Trim).
+		readCycLChars_p0(Stream,CHARS),!. % ,trim(CHARS,Trim).
 
 readCycLChars_p0(Stream,[]):- really_at_end_of_stream(Stream),!.
 readCycLChars_p0(Stream,[Char|Chars]):-
@@ -2199,8 +2199,8 @@ getSurfaceFromChars(Chars,TERM,VARS):-trim(Chars,CharsClean),catch(
          (once(getSurfaceFromCleanChars(CharsClean,TERMO,VARS)),TERM=TERMO),E,(TERM=[error,E],!,fail)).
 
 getSurfaceFromCleanChars([],[end_of_file],_):-!.
-getSurfaceFromCleanChars([41|_],[end_of_file],_):-!. %% ")"
-getSurfaceFromCleanChars([59|Comment],[file_comment,Atom],VARS):-atom_codes(Atom,Comment),!. %% ";"
+getSurfaceFromCleanChars([41|_],[end_of_file],_):-!. %  ")"
+getSurfaceFromCleanChars([59|Comment],[file_comment,Atom],VARS):-atom_codes(Atom,Comment),!. %  ";"
 getSurfaceFromCleanChars(Chars,WFFOut,VARSOut):- 
                once(getWordTokens(Chars,WFFClean)),
                once(getSurfaceFromToks(WFFClean,WFFOut,VARSOut)),
@@ -2440,7 +2440,7 @@ get_token(A,List,Token,Rest)  :-
   type_codes(Type,Lchars,Token),!.
 
 
-%% get_chars_until(In,Out,Rest,UntilChar).
+%  get_chars_until(In,Out,Rest,UntilChar).
 get_chars_until([UNTIL|Rest],[UNTIL],Rest,UNTIL):-!.
 get_chars_until([92,UNTIL|List],Lchars,Rest,UNTIL):-
    get_chars_until(List,[UNTIL|Lchars],Rest,UNTIL).
@@ -2513,7 +2513,7 @@ valid_char(K,C,C1)  :-  K = 0,!, C \= C1; K = 1, valid(C).
 %bracket(quote,39,39).  % single quotes
 bracket(quote,34,34).  % double quotes
 %bracket(list,91,93).  % square brackets []
-%bracket(quote,37,37).  % Literal Percent %%
+%bracket(quote,37,37).  % Literal Percent % 
 %bracket(quote,35,35).  % Literal Percent ##
 
 quote_found(0,B,B)  :-  member(B,[34]),!.
@@ -2822,7 +2822,7 @@ if_prolog(_,_):-!.  % Dont run SWI Specificd or others
 
 
 % :-use_module(cyc_threads).
-%% :-ensure_loaded(system_dependant).
+%  :-ensure_loaded(system_dependant).
 
 :-dynamic_transparent(isKeepAlive/1).
 
@@ -3084,7 +3084,7 @@ acceptCFaslClient(ServerSocket):-
 		tcp_accept(AcceptFd, ClientSocket, ip(A4,A3,A2,A1)),!,
                 getPrettyDateTime(DateTime),
                 sformat(Name,'Dispatcher for CFASL ~w.~w.~w.~w  started ~w ',[A4,A3,A2,A1,DateTime]),
-                servantProcessCreate(killable,Name,serviceCfaslClient(ClientSocket),_,[global(128000),local(12800),trail(12800),detatched(true)]),!. %%
+                servantProcessCreate(killable,Name,serviceCfaslClient(ClientSocket),_,[global(128000),local(12800),trail(12800),detatched(true)]),!. % 
 serviceCfaslClient(ClientSocket):-
 	tcp_open_socket(ClientSocket, In, Out),!,
         setCycOption('$socket_in',In),
@@ -4711,9 +4711,9 @@ valueToCheckMark(Value,'OFF',' ').
 :-set_prolog_flag(double_quotes,string).
 
 
-%% ======================================
-%% lisp_reade_term(Lisp)
-%% ======================================
+%  ======================================
+%  lisp_reade_term(Lisp)
+%  ======================================
 % :-set_prolog_flag(double_quotes,codes).
 
 

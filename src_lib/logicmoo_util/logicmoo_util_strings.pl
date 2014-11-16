@@ -372,8 +372,9 @@ vars_to_ucase_0([N=V|Vars],List):-
    ignore(N=V),
    vars_to_ucase_0(Vars,List).
 
-atomSplit(In,List):- fail,hotrace(( ground(In),
- any_to_string(In,String),atom_string(Atom,String),splt_words(Atom,List,Vars),vars_to_ucase(Vars,List))),!.
+atomSplit(In,List):- hotrace(( ground(In),
+ any_to_string(In,String),atom_string(Atom,String),
+    splt_words(Atom,List,Vars),vars_to_ucase(Vars,List))),!.
 
 atomSplit(Atom,WordsO):-atomSplitEasy(Atom,WordsO),!.
 

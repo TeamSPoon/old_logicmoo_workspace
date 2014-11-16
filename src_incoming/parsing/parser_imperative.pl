@@ -7,18 +7,7 @@
 %
 */
 
-:- module(parser_imperative, [
-                   parse_agent_text_command/5,            
-                   parse_agent_text_command_0/5,            
-                   parseIsa//2,
-                   parseIsa0//2,
-                   parseForIsa//2,
-                   objects_match/3,
-                   object_match/2,
-                   object_string/2,
-                   get_term_specifier_text/2,
-                   parseForTypes//2]).
-
+:- module(parser_imperative, []).
 
 :-export((
                    parse_agent_text_command/5,            
@@ -65,6 +54,16 @@ moo:type_action_info(human_player,parse(prolog,list(term)),"Development test to 
 
 moo:agent_call_command(_Gent,parse(Type,StringM)):-
    parse_for(Type,StringM,_Term,_LeftOver).
+
+% ===========================================================
+% CMDPARSE command
+% ===========================================================
+moo:type_action_info(human_player,cmdparse(list(term)),"Development test to parse some Text for a human.  Usage: cmdparse take the blue backpack").
+
+moo:agent_call_command(_Gent,cmdparse(StringM)):- parse_for(command,StringM,Term,LeftOver),fmt([Term,LeftOver]).
+
+% mud_test("cmdparse test",...)
+  
 
 % ===========================================================
 % parsetemps command
@@ -203,6 +202,7 @@ object_match(S,Obj):-
    str_contains_all(Atoms,LString).
 
 
+dmsg_parserm(D):-dmsg(D),!.
 dmsg_parserm(D):-ignore((debugging(parser),dmsg(D))).
 dmsg_parserm(F,A):-ignore((debugging(parser),dmsg(F,A))).
 
@@ -214,6 +214,7 @@ dmsg_parserm(F,A):-ignore((debugging(parser),dmsg(F,A))).
 :-nodebug(parser).
 
 parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL):-
+  dmsg(parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL)),
   parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL),
    dmsg_parserm(succeed_parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL)),!.
 
@@ -230,6 +231,9 @@ parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL):-
  debug,visible(+all),leash(+all), dtrace,
  parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL),!.
 
+parse_agent_text_command(Agent,IVERB,ARGS,Agent,GOAL):- 
+  ground(IVERB), string_to_atom(IVERB,VERB),GOAL=..[VERB|ARGS],!.
+
 % try directly parsing first
 parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL):- 
    call_no_cuts(moo:agent_text_command(Agent,[SVERB|ARGS],NewAgent,GOAL)),nonvar(NewAgent),nonvar(GOAL),!.   
@@ -239,13 +243,8 @@ parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL):-
    call_no_cuts(moo:agent_text_command(Agent,[VERB|ARGS],NewAgent,GOAL)),ground(GOAL),nonvar(VERB),
    verb_matches(SVERB,VERB).
 
-% parses a verb phrase and retuns one interpretation (action)
 parse_agent_text_command_0(Agent,SVERB,ARGS,Agent,GOAL):-
-   parse_vp_real(Agent,SVERB,ARGS,GOALANDLEFTOVERS),
-   dmsg_parserm(parserm("GOALANDLEFTOVERS"=GOALANDLEFTOVERS)),
-   GOALANDLEFTOVERS \= [],
-   must(chooseBestGoal(GOALANDLEFTOVERS,GOAL)),
-   dmsg_parserm(parserm("chooseBestGoal"=GOAL)).
+   parse_agent_text_command_1(Agent,SVERB,ARGS,Agent,GOAL).
 
 parse_agent_text_command_0(Agent,IVERB,ARGS,NewAgent,GOAL):-
    verb_alias_to_verb(IVERB,SVERB), IVERB\=SVERB,!,
@@ -253,9 +252,18 @@ parse_agent_text_command_0(Agent,IVERB,ARGS,NewAgent,GOAL):-
 
 parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,prologCall(call_mpred(PROLOGTERM))):- compound(PROLOGTERM),functor(PROLOGTERM,F,_),mpred_prop(F,_),!.
 parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,prologCall(req(PROLOGTERM))):- compound(PROLOGTERM),is_callable(PROLOGTERM),!.
+
+:-export(parse_agent_text_command_1/5).
+% parses a verb phrase and retuns one interpretation (action)
+parse_agent_text_command_1(Agent,SVERB,ARGS,Agent,GOAL):-
+   parse_vp_real(Agent,SVERB,ARGS,GOALANDLEFTOVERS),
+   dmsg_parserm(parserm("GOALANDLEFTOVERS"=GOALANDLEFTOVERS)),
+   GOALANDLEFTOVERS \= [],
+   must(chooseBestGoal(GOALANDLEFTOVERS,GOAL)),
+   dmsg_parserm(parserm("chooseBestGoal"=GOAL)).
+
          
 
-parse_agent_text_command_0(Agent,IVERB,ARGS,Agent,GOAL):- ground(IVERB), string_to_atom(IVERB,VERB),GOAL=..[VERB|ARGS],!.
 
 moo:verb_alias('l','look').
 moo:verb_alias('lo','look').
@@ -285,7 +293,7 @@ get_vp_templates(_Agent,SVERB,_ARGS,TEMPLATES):-
    
 % parses a verb phrase and retuns multiple interps
 parse_vp_real(Agent,SVERB,ARGS,Sorted):-
-   get_vp_templates(Agent,SVERB,ARGS,TEMPLATES),
+   get_vp_templates(Agent,SVERB,ARGS,TEMPLATES),   
    dmsg_parserm(("TEMPLATES"= ([SVERB|ARGS] = TEMPLATES))),
    TEMPLATES \= [],
    findall(LeftOver-GOAL,
@@ -380,12 +388,12 @@ test(food_is_a_droppable, [ true(
 %:- end_tests(test_bad_verb).
 
 
-parseForIsa(actor,A,B,C) :- parseForIsa(agent,A,B,C).
-parseForIsa(optional(Type,_Who), Term, C, D) :- nonvar(Type),parseForIsa(Type, Term, C, D).
-parseForIsa(optional(_Type,Who), Who, D, D):-!. %,nonvar(Who).
+% parseForIsa(Var, _B, _C, _D):-var(Var),!,fail. % trace_or_throw(var_parseForIsa(Var, B, C, D)).
+parseForIsa(Var, B, C, D):-var(Var),!,trace_or_throw(var_parseForIsa(Var, B, C, D)).
+parseForIsa(actor,A,B,C) :-!, parseForIsa(agent,A,B,C).
+parseForIsa(optional(Type,_Default), Term, C, D) :- nonvar(Type),parseForIsa(Type, Term, C, D).
+parseForIsa(optional(_Type,Default), Default, D, D):-!.
 
-parseForIsa(Var, _B, _C, _D):-var(Var),!,fail. % trace_or_throw(var_parseForIsa(Var, B, C, D)).
-% parseForIsa(Var, B, C, D):-var(Var),!,trace_or_throw(var_parseForIsa(Var, B, C, D)).
 parseForIsa(not(Type), Term, C, D) :-  dcgAnd(dcgNot(parseIsa(Type)), theText(Term), C, D).
 parseForIsa(FT, B, C, D):-to_word_list(C,O),O\=C,!,parseForIsa(FT, B, O, D).
 

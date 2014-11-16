@@ -120,7 +120,7 @@ argIsa_call_0(color,2,color_value).
 argIsa_call_0(ft_info,1,formattype).
 argIsa_call_0(ft_info,2,term).
 argIsa_call_0(localityOfObject,1,obj).
-argIsa_call_0(localityOfObject,2,region).
+argIsa_call_0(localityOfObject,2,spatialthing).
 argIsa_call_0(isa,1,term).
 argIsa_call_0(isa,2,type).
 argIsa_call_0(memory,2,term).

@@ -13,7 +13,7 @@
 */
 
 :- dynamic_multifile_exported hook:create_random_fact/1.
-:- dynamic_multifile_exported hook:create_random_instance/3.
+:- dynamic_multifile_exported hook:hooked_random_instance/3.
 :- dynamic_multifile_exported hook:fact_is_false/2.
 :- dynamic_multifile_exported((thlocal:noDefaultValues/1)).
 :- dynamic_multifile_exported((thlocal:noRandomValues/1)).
@@ -89,7 +89,7 @@ create_someval(Prop,Obj,Value):- into_mpred_form(dbase_t(Prop,Obj,Value),Fact),a
 create_someval(Prop,Obj,Value):- into_mpred_form(dbase_t(Prop,Obj,Value),Fact),not(test_tl(thlocal:noRandomValues,Fact)),hook:create_random_fact(Fact),!.
 create_someval(Prop,Obj,_):- Fact=.. [Prop,Obj,_],test_tl(thlocal:noDefaultValues,Fact),!,fail.
 create_someval(Prop,Obj,Value):- fallback_value(Prop,Obj,DValue),!,Value=DValue.
-create_someval(Pred,_Arg1,Value):- must_det_l([moo:mpred_arity(Pred,Last),argIsa_call(Pred,Last,Type),create_random(Type,Value,nonvar(Value))]).
+create_someval(Pred,_Arg1,Value):- must_det_l([moo:mpred_arity(Pred,Last),argIsa_call(Pred,Last,Type),random_instance(Type,Value,nonvar(Value))]).
 
 asserted_or_deduced(Fact):- is_asserted(Fact),!.
 asserted_or_deduced(Fact):- hook:fact_always_true(Fact),must_det(is_fact_consistent(Fact)),!,add(Fact).
@@ -98,17 +98,17 @@ asserted_or_deduced(Fact):- hook:fact_maybe_deduced(Fact),is_fact_consistent(Fac
 asserted_or_deduced(Fact):- deducedSimply(Fact),is_fact_consistent(Fact),add(Fact).
 
 :-export(my_random_member/2).
-my_random_member(LOC,LOCS):- length(LOCS,Len),Len>0, X is random(Len),nth0(X,LOCS,LOC).
-randomize_list(LOCS,[LOC|LOCS]):- length(LOCS,Len),Len>0, X is random(Len),nth0(X,LOCS,LOC).
+my_random_member(LOC,LOCS):- must_det((length(LOCS,Len),Len>0)),random_permutation(LOCS,LOCS2),!,member(LOC,LOCS2).
 
-:-export(create_random/3).
-create_random(Type,Value,Test):- copy_term(create_random(Type,Value,Test),create_random(RType,RValue,RTest)),
-   hook:create_random_instance(RType,RValue,RTest),
-   checkAnyType(query(_,_),RValue,Type,Value),must_det(Test).
-create_random(Type,Value,Test):- atom(Type),atom_concat('random_',Type,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),Fact,Test,!.
-create_random(Type,Value,Test):- compound(Type),functor_h(Type,F),isa(F,_),atom_concat('random_',F,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),Fact,Test,!.
-create_random(Type,Value,Test):- findall(V,(isa_backchaing(V,Type)),Possibles),Possibles\=[],randomize_list(Possibles,Randomized),!,member(Value,Randomized),Test,!.
-create_random(Type,Value,Test):- trace_or_throw(failed(create_random(Type,Value,Test))).
+:-export(random_instance/3).
+random_instance(Type,Value,Test):- copy_term(ri(Type,Value,Test),ri(RType,RValue,RTest)),
+   hook:hooked_random_instance(RType,RValue,RTest),
+   checkAnyType(query(_,_),RValue,Type,Value),
+   must_det(Test),!.
+random_instance(Type,Value,Test):- atom(Type),atom_concat('random_',Type,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),call(Fact),Test,!.
+random_instance(Type,Value,Test):- compound(Type),functor_h(Type,F),isa(F,_),atom_concat('random_',F,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),Fact,Test,!.
+random_instance(Type,Value,Test):- findall(V,isa(V,Type),Possibles),Possibles\=[],must_det((my_random_member(Value,Possibles),Test)),!.
+random_instance(Type,Value,Test):- trace_or_throw(failed(random_instance(Type,Value,Test))).
 
 save_fallback(Fact):-not(ground(Fact)),trace_or_throw(var_save_fallback(Fact)).
 save_fallback(Fact):-is_fact_consistent(Fact),add(Fact).
@@ -118,11 +118,13 @@ save_fallback(Obj,Prop,Value):-is_fact_consistent(dbase_t(Prop,Obj,Value)),padd(
 maybe_cache(Prop,Obj,Value,What):-not(not(maybe_cache_0(Prop,Obj,Value,What))).
 
 :-export(checkNoArgViolation/1).
+% checkNoArgViolation(_).
+checkNoArgViolation(_):- (bad_idea),!.
+checkNoArgViolation(Fact):-get_prop_args(Fact,Prop,ARGS),checkNoArgViolation_p_args(Prop,ARGS),!.
 checkNoArgViolation(_).
-checkNoArgViolation(_):- not(bad_idea),!.
-checkNoArgViolation(Fact):-Fact=..[dbase_t,Prop|ObjValue],!,checkNoArgViolation_p_args(Prop,ObjValue),!.
-checkNoArgViolation(Fact):-Fact=..[Prop|ObjValue],!,checkNoArgViolation_p_args(Prop,ObjValue),!.
-checkNoArgViolation(_).
+
+get_prop_args(Fact,Prop,ARGS):-Fact=..[dbase_t,Prop|ARGS],!.
+get_prop_args(Fact,Prop,ARGS):-Fact=..[Prop|ARGS],!.
 
 dont_check_args(Fact):-functor(Fact,F,A),dont_check_args(F,A).
 dont_check_args(isa,2).
@@ -145,13 +147,21 @@ checkNoArgViolation(Prop,__,Value):-checkNoArgViolationOrDeduceInstead(Prop,2,Va
 checkNoArgViolation(Prop,Obj,__):-checkNoArgViolationOrDeduceInstead(Prop,1,Obj),fail.
 checkNoArgViolation(_,_,_):-!.
 
-checkNoArgViolationOrDeduceInstead(Prop,N,Obj):-argIsa_call(Prop,N,Type),not(unverifiableType(Type)),findall(OT,isa(Obj,OT),OType),checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type).
+
+checkNoArgViolationOrDeduceInstead(Prop,N,Obj):-argIsa_call(Prop,N,Type),
+   not(unverifiableType(Type)),
+   findall(OT,isa(Obj,OT),OType),
+   checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type).
 
 
+subft_or_subclass_or_same(C,C):-!.
+subft_or_subclass_or_same(S,C):-subclass(S,C),!.
+subft_or_subclass_or_same(S,C):-subft(S,C),!.
 checkNoArgViolationOrDeduceInstead(_Prop,_,Obj,_OType,_Type):-var(Obj),!.
-checkNoArgViolationOrDeduceInstead(Prop,N,[Obj],OType,Type):-!,checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type).
+checkNoArgViolationOrDeduceInstead(_Prop,_N,_Obj,[H|T],Type):-nonvar(T),!,member(E,[H|T]),subft_or_subclass_or_same(E,Type),!.
+checkNoArgViolationOrDeduceInstead(Prop,N,[H|T],OType,Type):-!,forall(member(Obj,[H|T]),checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type)).
 checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type):- not(thlocal:deduceArgTypes(Prop)),!,reallyCheckArgViolation(Prop,N,Obj,OType,Type).
-checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type):- deduce_argN(Prop,N,Obj,OType,Type),fail.
+checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type):- must_det(deduce_argN(Prop,N,Obj,OType,Type)),fail.
 checkNoArgViolationOrDeduceInstead(Prop,N,Obj,_,_):- argIsa_call(Prop,N,Type),findall(OT,isa(Obj,OT),OType),reallyCheckArgViolation(Prop,N,Obj,OType,Type).
 
 openSubClass(spatialthing).
@@ -162,7 +172,7 @@ reallyCheckArgViolation(Prop,N,_Obj,_OType,argIsaFn(Prop,N)):-!.
 reallyCheckArgViolation(_,_,_,List,Type):-memberchk(Type,List),!.
 reallyCheckArgViolation(_Prop,_N,_Obj,[OType|_],OpenSubClass):- openSubClass(OpenSubClass), atom(OType),show_call(assert_subclass_safe(OType,OpenSubClass)),!.
 reallyCheckArgViolation(Prop,N,Obj,OType,Type):- violatesType(Obj,Type),trace_or_throw(violatesType_maybe_cache(Prop,N,Obj,OType\=Type)).
-
+reallyCheckArgViolation(_,_,_,_,_).
 
 assert_argIsa(Prop,N,Type):-show_call(add(argIsa(Prop,N,Type))).
 
@@ -170,8 +180,11 @@ assert_subclass_on_argIsa(Prop,N,argIsaFn(Prop,N)):-!.
 assert_subclass_on_argIsa(Prop,N,_OType):-argIsa_call(Prop,N,PropType),PropType=argIsaFn(Prop,N),!. % , assert_argIsa(Prop,N,OType).
 assert_subclass_on_argIsa(Prop,N,OType):-argIsa_call(Prop,N,PropType),assert_subclass_safe(OType,PropType).
 
+guessed_mpred_arity(F,A):-mpred_arity(F,AA),!,A=AA.
+guessed_mpred_arity(_,2).
 
-suggestedType(Prop,N,_,argIsaFn(Prop, N),FinalType):- mpred_arity(Prop,N), atom_concat(Prop,'_value',FinalType),!,decl_type(FinalType).
+suggestedType(Prop,N,_,argIsaFn(Prop, N),FinalType):- guessed_mpred_arity(Prop,N), atom_concat(Prop,'_value',FinalType),!,must((decl_type(FinalType),assert_isa(FinalType,discoverableType))).
+suggestedType(Prop,N,_,_,FinalType):- guessed_mpred_arity(Prop,N),atom_concat(Prop,'_value',FinalType),!,must((decl_type(FinalType),assert_isa(FinalType,discoverableType))).
 suggestedType( _ ,_,_ ,FinalType,FinalType):-atom(FinalType),type(FinalType),not(formattype(FinalType)),!.
 suggestedType( _ ,_,Possibles,_ ,FinalType):- member(FinalType,[mpred,type,formattype,text,region,agent,item,obj,spatialthing]),member(FinalType,Possibles),!.
 
@@ -190,6 +203,7 @@ maybe_cache_0(Prop,Obj,Value,What):- padd(Obj,Prop,Value),
 unverifiableType(term).
 unverifiableType(voprop).
 unverifiableType(id).
+unverifiableType(dice).
 unverifiableType(mpred).
 unverifiableType(text).
 unverifiableType(fpred).
@@ -198,6 +212,7 @@ unverifiableType(string).
 unverifiableType(formattype).
 unverifiableType(type).
 unverifiableType(term(_)).
+unverifiableType(mpred(_)).
 unverifiableType(list(_)).
 
 violatesType(Value,Type):-var(Value),!,Type=var.
@@ -258,7 +273,7 @@ defaultTypeValue(Fact,_,_):- thlocal:noRandomValues(Fact),!,fail.
 defaultTypeValue(_,Type,_):- thlocal:noRandomValues(Type),!,fail.
 defaultTypeValue(_Info,dir,"n").
 defaultTypeValue(_Info,int,0).
-defaultTypeValue(Fact,Type,Out):- create_random(Type,ROut,nonvar(ROut)),dmsg(defaultArgValue(create_random(Fact,Type,ROut=Out))),!,Out=ROut.
+defaultTypeValue(Fact,Type,Out):- random_instance(Type,ROut,nonvar(ROut)),dmsg(defaultArgValue(random_instance(Fact,Type,ROut=Out))),!,Out=ROut.
 
 
 :-export(get_instance_default_props/2).

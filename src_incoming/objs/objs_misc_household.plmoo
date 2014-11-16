@@ -92,68 +92,74 @@ doorBetween(R1,R2):-pathBetween(R1,_,R2).
 
 doorsConnect(Thing,Noun2):- doorBetween(Thing,Noun2); doorBetween(Noun2,Thing).
 
-:-onLoad(doall((no_repeats(moo:doorsConnect(R1,R2)),once((split_name_type(R2,_,Isa),
-	any_to_string(Isa,Str),any_to_dir(Str,Dir),show_call(add(pathBetween(R1,Dir,R2)))))))).
+addPathBetweens:- doall((no_repeats(moo:doorsConnect(R1,R2)),must_det(ensure_some_pathBetween(R1,R2)))).
+
+ensure_some_pathBetween(R1,R2):- pathBetween(R1,_Dir,R2),!.
+ensure_some_pathBetween(R1,R2):- random_instance(dir,Dir,atom_length(Dir,1)),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
+   add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)),!.
+ensure_some_pathBetween(R1,R2):- split_name_type(R2,_,Isa), any_to_string(Isa,Str), any_to_dir(Str,Dir),show_call(add(pathBetween(R1,Dir,R2))).
+
+:-onLoad(addPathBetweens).
 
 % ==================================================
 % Where Things are Located
 % ==================================================
 :-assertOnLoad(corpius('me')).
 
-:-dynamic(loc/2).
-:-multifile(loc/2).
+:-dynamic(localityOfObject/2).
+:-multifile(localityOfObject/2).
 
 subclass(region,region).
 
-:-decl_mpred(loc(obj,spatialthing),alias(localityOfObject)).
+:-decl_mpred(localityOfObject(obj,spatialthing)).
 
-:-decl_mpred_hybrid(localityOfObject(obj,spatialthing)).
+:-decl_mpred_hybrid(localityOfObject(kappa(Self,subclass(Self,obj)),kappa(Self2,subclass(Self2,spatialthing)))).
 :-op(600,fx,onSpawn).
 
 % onSpawn(_).
 	
 
-:-onSpawn loc(desk, office).
-:-onSpawn loc(apple(color([red])), kitchen).
-:-onSpawn loc(apple(color([green])), kitchen).
-:-onSpawn loc(flashlight, desk).
-:-onSpawn loc(washing_machine, cellar).
-:-onSpawn loc(nani, washing_machine).
-:-onSpawn loc(broccoli, kitchen).
-:-onSpawn loc(crackers, kitchen).
-:-onSpawn loc(computer, office).
-:-onSpawn loc(envelope, desk).
-:-onSpawn loc(stamp, envelope).
-:-onSpawn loc(key, envelope).
-:-onSpawn loc(bed, bed_room).
-:-onSpawn loc(stand_table, bed_room).
-:-onSpawn loc(pajamas, stand_table).
-:-onSpawn loc(shirt, closet).
-:-onSpawn loc(pillow, bed).
-:-onSpawn loc(blanket, bed).                                                              
-:-onSpawn loc(table, kitchen).
-:-onSpawn loc(coat, closet).
-:-onSpawn loc(pants, closet).
-:-onSpawn loc(light_switch, bed_room).
-:-onSpawn loc(ball, back_yard).
-:-onSpawn loc(sofa, living_room).
-:-onSpawn loc(easy_chair, living_room).
-:-onSpawn loc(coffee_table, living_room).
-:-onSpawn loc(coffee_cup, kitchen).
-:-onSpawn loc(coffee, coffee_cup).
-:-onSpawn loc(book(color([green])), coffee_table).
-:-onSpawn loc(book(color([pink])), coffee_table).
-:-onSpawn loc(bookcase, living_room).
-:-onSpawn loc(dresser, bed_room).
-:-onSpawn loc(top_drawer, dresser).
-:-onSpawn loc(middle_drawer, dresser).
-:-onSpawn loc(bottom_drawer, dresser). 
-:-onSpawn loc(houseplant, planter).
-:-onSpawn loc(planter, gueridon). 
-:-onSpawn loc(gueridon, living_room).
-:-onSpawn loc(garden_plant, back_yard).
-:-onSpawn loc(me, kitchen).
-:-onSpawn loc(candle,kitchen).
+:-onSpawn localityOfObject(desk, office).
+:-onSpawn localityOfObject(apple(color([red])), kitchen).
+:-onSpawn localityOfObject(apple(color([green])), kitchen).
+:-onSpawn localityOfObject(flashlight, desk).
+:-onSpawn localityOfObject(washing_machine, cellar).
+:-onSpawn localityOfObject(nani, washing_machine).
+:-onSpawn localityOfObject(broccoli, kitchen).
+:-onSpawn localityOfObject(crackers, kitchen).
+:-onSpawn localityOfObject(computer, office).
+:-onSpawn localityOfObject(envelope, desk).
+:-onSpawn localityOfObject(stamp, envelope).
+:-onSpawn localityOfObject(key, envelope).
+:-onSpawn localityOfObject(bed, bed_room).
+:-onSpawn localityOfObject(stand_table, bed_room).
+:-onSpawn localityOfObject(pajamas, stand_table).
+:-onSpawn localityOfObject(shirt, closet).
+:-onSpawn localityOfObject(pillow, bed).
+:-onSpawn localityOfObject(blanket, bed).                                                              
+:-onSpawn localityOfObject(table, kitchen).
+:-onSpawn localityOfObject(coat, closet).
+:-onSpawn localityOfObject(pants, closet).
+:-onSpawn localityOfObject(light_switch, bed_room).
+:-onSpawn localityOfObject(ball, back_yard).
+:-onSpawn localityOfObject(sofa, living_room).
+:-onSpawn localityOfObject(easy_chair, living_room).
+:-onSpawn localityOfObject(coffee_table, living_room).
+:-onSpawn localityOfObject(coffee_cup, kitchen).
+:-onSpawn localityOfObject(coffee, coffee_cup).
+:-onSpawn localityOfObject(book(color([green])), coffee_table).
+:-onSpawn localityOfObject(book(color([pink])), coffee_table).
+:-onSpawn localityOfObject(bookcase, living_room).
+:-onSpawn localityOfObject(dresser, bed_room).
+:-onSpawn localityOfObject(top_drawer, dresser).
+:-onSpawn localityOfObject(middle_drawer, dresser).
+:-onSpawn localityOfObject(bottom_drawer, dresser). 
+:-onSpawn localityOfObject(houseplant, planter).
+:-onSpawn localityOfObject(planter, gueridon). 
+:-onSpawn localityOfObject(gueridon, living_room).
+:-onSpawn localityOfObject(garden_plant, back_yard).
+:-onSpawn localityOfObject(me, kitchen).
+:-onSpawn localityOfObject(candle,kitchen).
 
 
 /*
@@ -163,10 +169,10 @@ subclass(region,region).
 (WAS FOR ANOTHER SYSTEM)
 
 locaton_s(item_template(RealObj,D1,D2,Weight),Place):-
-	loc(RealObj,Place),item_template(RealObj,D1,D2),
+	localityOfObject(RealObj,Place),item_template(RealObj,D1,D2),
 	member(weight(Weight),D2),!.
 locaton_s(item_template(RealObj,D1,D2,0),Place):-
-	loc(RealObj,Place), item_template(RealObj,D1,D2).	
+	localityOfObject(RealObj,Place), item_template(RealObj,D1,D2).	
 
 */
 

@@ -21,7 +21,7 @@
 :- dynamic_multifile_exported hook:decl_database_hook/2.
 :- dynamic_multifile_exported hook:deduce_facts/2.
 :- dynamic_multifile_exported hook:create_random_fact/1.
-:- dynamic_multifile_exported hook:create_random_instance/3.
+:- dynamic_multifile_exported hook:hooked_random_instance/3.
 :- dynamic_multifile_exported hook:fact_maybe_deduced/1.
 
 :- dynamic_multifile_exported moo:term_anglify/2.

@@ -202,7 +202,7 @@ build_genls_inst_list_cache(A,Subclass,B,dbase_t(cache_I_I,Subclass,A,B)):- Subc
 
 
 isa_backchaing_nv_nv(A,argsIsaInList):-!,compound(A).
-isa_backchaing_nv_nv(I,T):-compound(I),functor(I,F,_),isa_backchaing(F,T).
+isa_backchaing_nv_nv(I,T):-compound(I),functor(I,F,_),isa_backchaing(F,T),!.
 isa_backchaing_nv_nv(I,T):-atom(T),!,catch(call(T,I),_,fail).
 
 not_ft(T):-transitive_subclass_or_same(T,spatialthing).

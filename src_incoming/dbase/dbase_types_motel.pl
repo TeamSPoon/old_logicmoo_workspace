@@ -117,7 +117,7 @@ c2p(CNF,CLF,HP) :- translate(CNF,CLF), clausesToNHProlog(CLF,HP).
 
 prolog_engine(swi).
 
-%:- user_use_module('../../src/logicmoo_util/logicmoo_util_all.pl').
+:- user_use_module('../../src_lib/logicmoo_util/logicmoo_util_all.pl').
 /*
 assert_if_new(X):-catch(X,_,fail),!.
 assert_if_new(X):-assertz(X).
@@ -4883,8 +4883,7 @@ showEnvironment(EnvName) :-
 showModalAxioms(Name) :-
 	modalAxioms(Name,user,K,C,MOp,A),
 	(nonvar(A) ; (A = C)),
-	write('        '), write('     modalAxioms('), write(K), write(','),
-	write(MOp), write(','), write(A), write(')'), nl,
+	write('        '), write('     modalAxioms('), write(K), write(','), write(MOp), write(','), write(A), write(')'), nl,
 	fail.
 showModalAxioms(_) :-
 	!.
@@ -4925,8 +4924,8 @@ showDefrole(_Name) :-
 	!.
 showDefprimrole(Name) :-
 	roleSubsets(Name,user,MS,CN,CT,Ax),
-	write(Ax), write(':    defprimrole('), write(MS), write(','),
-	write(CN), write(','), write(CT), write(')'), nl,
+        writeq(Ax:defprimrole(MS,CN,CT)),nl,
+	% write(Ax), write(':    defprimrole('), write(MS), write(','), write(CN), write(','), write(CT), write(')'), nl,
 	fail.
 showDefprimrole(_Name) :-
 	!.
@@ -5554,7 +5553,7 @@ copyEnvironment(Name2) :-
 copyEnvironment(Name1,Name2) :-
 	environment(Name1,Env1,Comment),
 	makeEnvironment(Name2,Comment),
-	% !! This environment mustn't be initializes because
+	% !! This environment mustn't be initialize_motels because
 	% the clauses asserted usually during initialization
 	% will also be copied from environment Name1.
 	environment(Name2,Env2,_),
@@ -6953,15 +6952,15 @@ initFuncdep :-
 
 /***********************************************************************
  *
- * initialize, initialise
+ * initialize_motel, initialise
  *
- *	Similar to initialize in
+ *	Similar to initialize_motel in
  *	~hustadt/pop/motel/motel-0.0.6/userInterface.pl
  */
 
 % For those of us who prefer the alternative spelling
 initialise :-
-	initialize.
+	initialize_motel.
 
 /***********************************************************************
  *
@@ -13062,7 +13061,7 @@ testAllMotelExamples(64) :-
 	print('Test complete'), nl, nl,
 	!.
 testAllMotelExamples(N) :-
-	initialize,
+	initialize_motel,
 	print('Example '), print(N), nl, example(N),
 	once(testMotelExample(N)),
 	M is N + 1,
@@ -13099,7 +13098,7 @@ testMotelExample(12) :-
 testMotelExample(13) :-
 	tryGoal(subsumes([],c1,c2)).
 testMotelExample(14) :-
-%	initialize, print('Example 14'), nl, example(14),
+%	initialize_motel, print('Example 14'), nl, example(14),
 %	tryGoal(subsumes([],c2,c1)),
 	!.
 testMotelExample(15) :-
@@ -13536,12 +13535,13 @@ unfoldSetToConcept(setOfFn([E1|L1]),or(L2)) :-
 
 /***********************************************************************
  *
- * initialize
+ * initialize_motel
  * cleans TBox, ABox, hierarchies, ...
  *
  */
-
-initialize :-
+:-dynamic(initialize_motel/0).
+initialize_motel :-
+        asserta((initialize_motel:-!)),
 	retractCompiledPredicates(_),
 	retractall(_,in/9),
 	retractall(_,kb_in/10),
@@ -14522,7 +14522,7 @@ completeParameter([P1,P2,P3,P4],P1,P2,P3,P4) :-
 :- write('MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.').
 :- nl, nl.
 */
-:- initialize.
+:- initialize_motel.
 
 end_of_file.
 

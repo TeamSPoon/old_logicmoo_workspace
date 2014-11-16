@@ -192,7 +192,7 @@ do_db_op_hooks:- loop_check_local(rescan_dbase_ops,true).
 
 :-export(rescan_slow_kb_ops/0).
 
-rescan_slow_kb_ops:-!.
+% rescan_slow_kb_ops:-!.
 rescan_slow_kb_ops:- loop_check(forall(retract(do_slow_kb_op_later(Slow)),must_det(Slow)),true).
 
 :-export(rescan_dbase_ops/0).
@@ -351,12 +351,12 @@ logical_functor(X):-atom(X),member(X,[',',';']).
 :- decl_mpred_prolog(stat_total/2).
 
 :- decl_mpred_hybrid((
-armorLevel/2,
-mudLevelOf/2,
-mudToHitArmorClass0/2,
-mudBareHandDamage/2,
-chargeCapacity/2,
-chargeRemaining/2,
+      armorLevel/2,
+      mudLevelOf/2,
+      mudToHitArmorClass0/2,
+      mudBareHandDamage/2,
+      chargeCapacity/2,
+      chargeRemaining/2,
      type/1, agent/1, item/1, region/1,
      verbOverride/3,named/2, determinerString/2, keyword/2 ,descriptionHere/2, 
 
@@ -404,7 +404,7 @@ chargeRemaining/2,
 %:- meta_predicate db_forall(?,?,?,0).
 
 
-% :- ensure_loaded('dbase_types_motel').
+:- ensure_loaded('dbase_types_motel').
 
 % :- user_use_module(dbase_rules_pttp).
 
@@ -1162,6 +1162,7 @@ onSpawn_f_args(Funct,List):-
   with_assertions(deduceArgTypes(Funct),
    (convertSpawnArgs(Funct,1,List,NewList),
      Later =.. [dbase_t,Funct|NewList],
+     add(Later),
    call_after_game_load(with_assertions(deduceArgTypes(Funct), add(Later))))),!.
 
 convertSpawnArgs(_,_,[],[]).

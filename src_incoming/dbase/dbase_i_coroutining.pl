@@ -17,7 +17,7 @@
 */
 
 
-:- use_module(library(lists)).
+% :- use_module(library(lists)).
 
 
 % mdif(A,B):- tlbugger:attributedVars,!,dif(A,B).

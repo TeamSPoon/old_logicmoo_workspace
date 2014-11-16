@@ -389,7 +389,7 @@ singleValued(facing(obj,dir(n))).
 singleValued(facing(obj,dir)).
 singleValued(height(obj,int)).
 singleValued(objid(obj,id)).
-singleValued(localityOfObject(obj,region)).
+singleValued(localityOfObject(obj,spatialthing)).
 singleValued(last_command(agent,command)).
 singleValued(location_center(region,xyz(region,int,int,int))).
 singleValued(movedist(agent,int(1))).
@@ -444,6 +444,8 @@ formattype(string).
 :-decl_mpred_prolog(var/1).
 :-decl_mpred_prolog(string/1).
 
+:-decl_mpred_hybrid(color/2).
+
 ft_info(action(prolog),formatted).
 ft_info(apath(region,dir),formatted).
 ft_info(atom,atom(self)).
@@ -481,9 +483,10 @@ formattype(voprop).
 %  subft(number,term).
 % subft(number,term).
 subft(percent,number).
+subft(number,percent).
 subft(atom,term).
 subft(dice,int).
-subft(dice,int).  
+subft(int,dice).  
 subft(dir,string).
 subft(id,term).
 subft(voprop,term).
@@ -514,6 +517,14 @@ multiValued(nameStrings(term,string)).
 multiValued(determinerString(term,string)).
 multiValued(descriptionHere(term,string)).
 
+argsIsaInList(size(spatialthing,size_value)).
+argsIsaInList(texture(spatialthing,texture_value)).
+
+subclass(discoverableType,type).
+
+discoverableType(texture_value).
+discoverableType(size_value).
+
 :-decl_mpred_hybrid(kwLabel,2).
 
 multiValued(description(term,string)).
@@ -536,7 +547,6 @@ expand_args(eachOf,subclass(eachOf('PortableObject','ProtectiveAttire','Somethin
 expand_args(eachOf,subclass(eachOf('ProtectiveAttire','SomethingToWear'),wearable)).
 expand_args(eachOf,subclass(eachOf('ControlDevice'),chargable)).
 expand_args(eachOf,subclass(eachOf(posture),command)).
-
 
 equivRule(isa(Whom,npc_player),and(isa(Whom,player),naf(isa(Whom,human_player)))).
 

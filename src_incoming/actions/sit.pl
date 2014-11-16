@@ -13,6 +13,9 @@
 
 :-decl_mpred(moo:posture/1).
 
+:-decl_mpred(moo:stance(agent,posture)).
+
+
 subclass(command,action).
 
 moo:posture(sit).

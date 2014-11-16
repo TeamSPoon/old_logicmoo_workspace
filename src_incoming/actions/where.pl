@@ -13,7 +13,7 @@
 */
 
 % :- module(user). 
-:- module(where, []).
+:- module(where_cmd, []).
 
 :- include(logicmoo(vworld/moo_header)).
 

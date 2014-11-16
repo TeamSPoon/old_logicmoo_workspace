@@ -37,6 +37,7 @@
             dir_offset/5,
             number_to_dir/3,
             list_agents/1,
+            
             agent_list/1,
             check_for_fall/3,
             list_object_dir_sensed/4,
