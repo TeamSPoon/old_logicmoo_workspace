@@ -20,12 +20,12 @@
 :- moo:register_module_type(command).
 
 % teleport
-moo:action_info(teleport(optional(obj,self),optional(region,random(region))),"teleport [obj] to somewhere").
+moo:action_info(teleport(optional(and([obj,not(region)]),self),optionalStr("to"),optional(region,random(region))),"teleport [obj] [to] [somewhere]").
 
-moo:verb_alias("tp","teleport").
+moo:verb_alias(tp,teleport).
 
 %targeted
-moo:agent_call_command(_Agent,teleport(Other,Where)):-
+moo:agent_call_command(_Agent,teleport(Other,_TO,Where)):-
    moo:coerce(Other,obj,Target),
    moo:coerce(Where,region,Location),
    clr(localityOfObject(Target,_)),

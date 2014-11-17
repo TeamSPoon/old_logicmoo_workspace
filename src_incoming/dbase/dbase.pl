@@ -468,8 +468,13 @@ verify_sanity(P):- dmsg('$ERROR_incomplete_SANITY'(P)),!.
 % ================================================
 % db_reop/2  RE-CURSED and CHECKED 
 % ================================================
-db_reop(query(_HLDS,Must),Call) :- !,preq(Must,Call).
-db_reop(OP,DATA):-no_loop_check(db_reop0(OP,DATA)).
+expands_on(EachOf,Term):-subst(Term,EachOf,foooz,Term2),!,Term2\=Term,not((do_expand_args(EachOf,Term,O),O = Term)).
+if_expands_on(EachOf,Term,Call):- expands_on(EachOf,Term),subst(Call,Term,O,OCall),!, forall(do_expand_args(EachOf,Term,O),OCall).
+
+db_reop(Op,Term):- expands_on(eachOf,Term), !,forall(do_expand_args(eachOf,Term,O),db_reop_l(Op,O)).
+db_reop(Op,Term):-db_reop_l(Op,Term).
+db_reop_l(query(_HLDS,Must),Call) :- !,preq(Must,Call).
+db_reop_l(OP,DATA):-no_loop_check(db_reop0(OP,DATA)).
 db_reop0(change(assert,_),Call) :- !,add_fast(Call).
 db_reop0(change(retract,one),Call) :- !,del(Call).
 db_reop0(change(retract,all),Call) :- !,clr(Call).
@@ -624,6 +629,7 @@ record_on_thread(Dbase_change,O):- thread_self(ID),thlocal:dbase_capture(ID,Dbas
 % db_op/2
 % ================================================
 
+db_op(Op,Term):- expands_on(eachOf,Term),!,forall(do_expand_args(eachOf,Term,O),db_op(Op,O)).
 % db_op(query(HLDS,Must),createableType(SubType)):- !, call_expanded_for(Must,is_creatable_type(SubType)).
 db_op(change(_,_),props(_Obj,Props)):- Props ==[], !.
 db_op(query(_,Must),NC):- not(compound(NC)),!,call_expanded_for(Must,NC).
@@ -637,6 +643,9 @@ db_op(Op,Term):- loop_check_local(db_op0(Op,Term),trace_or_throw(loop_check(db_o
 % db_op0/2  SIMPLISTIC REWRITE (this is not the PRECANONICALIZER)
 % ================================================
 :-moo_hide_childs(db_op0/2).
+
+db_op0(query(HLDS,Must),Term):- expands_on(eachOf,Term), !, forall(do_expand_args(eachOf,Term,O),no_loop_check(db_reop(query(HLDS,Must),O))).
+db_op0(Op,Term):- expands_on(eachOf,Term), !,forall(do_expand_args(eachOf,Term,O),db_op0(Op,O)).
 
 db_op0(Op,G):- when_debugging(blackboard,dmsg(db_op0(Op,G))),fail.
 db_op0(query(_HLDS,Must),isa(I,Type)):- !,call_expanded_for(Must,isa_backchaing(I,Type)).
@@ -683,8 +692,6 @@ db_op0(Op,props(Obj,PropVal)):- PropVal=..[OP,Pred|Val],comparitiveOp(OP),not(co
 db_op0(Op,props(Obj,PropVal)):- PropVal=..[Prop|Val],not(infix_op(Prop,_)),!,db_reop(Op,[dbase_t,Prop,Obj|Val]).
 db_op0(Op,props(Obj,PropVal)):- PropVal=..[Prop|Val],!,trace_or_throw(dtrace),db_reop(Op,[dbase_t,Prop,Obj|Val]).
 
-db_op0(query(HLDS,Must),expand_args(Exp,Term)):- !, forall(do_expand_args(Exp,Term,O),no_loop_check(db_reop(query(HLDS,Must),O))).
-db_op0(Op,expand_args(Exp,Term)):- !,forall(do_expand_args(Exp,Term,O),db_reop(Op,O)).
 db_op0(Op,somethingIsa(A,List)):- !,forall_member(E,List,must(db_reop(Op, isa(A,E)))).
 db_op0(Op,somethingDescription(A,List)):- !,forall_member(E,List, must(db_reop(Op, description(A,E)))).
 db_op0(Op,objects(Type,List)):- !,forall_member(I,List,must(db_reop(Op,isa(I,Type)))).
@@ -1011,8 +1018,6 @@ cycAssert(A,B):-trace_or_throw(cycAssert(A,B)).
 
 :- ensure_loaded(dbase_i_cyc).
 
-:- decl_mpred_hybrid(expand_args,2). 
-
 :- decl_mpred(objid,2).
 
 % flags
@@ -1051,6 +1056,7 @@ add_later(Fact):- call_after_game_load(add(Fact)).
 :-moo_hide_childs(add/1).
 add(A):- A==end_of_file,!.
 add(A):- not(compound(A)),!,trace_or_throw(not_compound(add(A))),!.
+add(Term):- expands_on(eachOf,Term), !,forall(do_expand_args(eachOf,Term,O),add(O)),!.
 add(Call):- loop_check(thlocal:add_thread_override(Call)),!.
 add(Call):- add_from_macropred(Call),!.
 add(M:HB):-atom(M),!, must_det(add(HB)),!.
@@ -1066,6 +1072,7 @@ end_prolog_source:- must_det(retract(thlocal:in_prolog_source_code)).
 :-export(add_from_macropred/1).
 add_from_macropred(C):- loop_check(add_from_macropred_lc(C),((dmsg(loopING_add_from_macropred(C)),dtrace,add_fast(C)))).
 add_from_macropred_lc(A):-A==end_of_file,!.
+add_from_macropred_lc(Term):- expands_on(eachOf,Term), !,forall(do_expand_args(eachOf,Term,O),add_from_macropred_lc(O)).
 add_from_macropred_lc(A):- not(compound(A)),!,trace_or_throw(not_compound(add_from_macropred_lc(A))).
 add_from_macropred_lc(':-'(A)):- predicate_property(A,_),!,must(logOnFailure(A)),!.
 add_from_macropred_lc(':-'(ensure_loaded(A))):- add(':-'(load_data_file(A))),!.

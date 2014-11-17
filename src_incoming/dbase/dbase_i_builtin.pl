@@ -46,7 +46,7 @@ mpred_prop(subft/2, prologHybrid).
 mpred_prop(ft_info/2,prologHybrid).
 % mpred_prop(subft/2, prologOnly).
 % mpred_prop(ft_info/2,prologOnly).
-expand_args(eachOf,subclass(eachOf(region,agent,gossup),channel)).
+subclass(eachOf(region,agent,gossup),channel).
 
 
 channel(gossup).
@@ -80,12 +80,12 @@ type(singleValued).
 type(createableType).
 type(typeDeclarer).
 
-:-add((expand_args(eachOf,subclass(eachOf(multiValued,ordered,negationByFailure,argsIsaInList,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),mpred)))).
+:-add((subclass(eachOf(multiValued,ordered,negationByFailure,argsIsaInList,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),mpred))).
 
-:-add((expand_args(eachOf,argIsa(eachOf(mpred,multiValued,ordered,negationByFailure,argsIsaInList,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),1,mpred)))).
-:-add((expand_args(eachOf,argIsa(eachOf(mpred,multiValued,ordered,negationByFailure,argsIsaInList,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),2,list(prop))))).
+:-add((argIsa(eachOf(mpred,multiValued,ordered,negationByFailure,argsIsaInList,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),1,mpred))).
+:-add((argIsa(eachOf(mpred,multiValued,ordered,negationByFailure,argsIsaInList,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),2,list(prop)))).
 
-:-add((expand_args(eachOf,isa(eachOf(multiValued,ordered,negationByFailure,argsIsaInList,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),typeDeclarer)))).
+:-add((isa(eachOf(multiValued,ordered,negationByFailure,argsIsaInList,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),typeDeclarer))).
 
 :-doall((argsIsaProps(F),decl_type(F),add(subclass(F,relation)))).
 :-doall((argsIsaProps(F),decl_type(F),add(isa(F,typeDeclarer)))).
@@ -543,10 +543,10 @@ subclass(human_player,player).
 subclass(npc_player,player).
 subclass('MaleAnimal',player).
 subclass('FemaleAnimal',player).
-expand_args(eachOf,subclass(eachOf('PortableObject','ProtectiveAttire','SomethingToWear'),possessable)).
-expand_args(eachOf,subclass(eachOf('ProtectiveAttire','SomethingToWear'),wearable)).
-expand_args(eachOf,subclass(eachOf('ControlDevice'),chargable)).
-expand_args(eachOf,subclass(eachOf(posture),command)).
+subclass(eachOf('PortableObject','ProtectiveAttire','SomethingToWear'),possessable).
+subclass(eachOf('ProtectiveAttire','SomethingToWear'),wearable).
+subclass('ControlDevice',chargable).
+subclass(posture,command).
 
 equivRule(isa(Whom,npc_player),and(isa(Whom,player),naf(isa(Whom,human_player)))).
 

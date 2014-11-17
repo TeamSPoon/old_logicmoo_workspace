@@ -4889,36 +4889,31 @@ showModalAxioms(_) :-
 	!.
 showAssertConcept(Name) :-
 	clause(conceptElement(Name,MS,_,user,A,C,Ax),_),
-	write(Ax), write(':     assert_ind('), write(MS), write(','),
-	write(A), write(','), write(C), write(')'), nl,
+	write(Ax), write(':     assert_ind('), write(MS), write(','),  write(A), write(','), write(C), write(')'), nl,
 	fail.
 showAssertConcept(_) :-
 	!.
 showAssertRole(Name) :-
 	clause(roleElement(Name,MS,_,user,A,B,R,Ax),_),
-	write(Ax), write(':     assert_ind('), write(MS), write(','),
-	write(A), write(','), write(B), write(','), write(R), write(')'), nl,
+	write(Ax), write(':     assert_ind('), write(MS), write(','), write(A), write(','), write(B), write(','), write(R), write(')'), nl,
 	fail.
 showAssertRole(_) :-
 	!.
 showDefconcept(Name) :-
 	conceptEqualSets(Name,user,MS,CN,CT,Ax),
-	write(Ax), write(':     defconcept('), write(MS), write(','),
-	write(CN), write(','), write(CT), write(')'), nl,
+	write(Ax), write(':     defconcept('), write(MS), write(','), write(CN), write(','), write(CT), write(')'), nl,
 	fail.
 showDefconcept(_Name) :-
 	!.
 showDefprimconcept(Name) :-
 	conceptSubsets(Name,user,MS,CN,CT,Ax),
-	write(Ax), write(': defprimconcept('), write(MS), write(','),
-	write(CN), write(','), write(CT), write(')'), nl,
+	write(Ax), write(': defprimconcept('), write(MS), write(','), write(CN), write(','), write(CT), write(')'), nl,
 	fail.
 showDefprimconcept(_Name) :-
 	!.
 showDefrole(Name) :-
 	roleEqualSets(Name,user,MS,CN,CT,Ax),
-	write(Ax), write(':        defrole('), write(MS), write(','),
-	write(CN), write(','), write(CT), write(')'), nl,
+	write(Ax), write(':        defrole('), write(MS), write(','),  write(CN), write(','), write(CT), write(')'), nl,
 	fail.
 showDefrole(_Name) :-
 	!.
@@ -4931,8 +4926,7 @@ showDefprimrole(_Name) :-
 	!.
 showDefclosed(Name) :-
 	closed(Name,MS,X,Y,R),
-	write('axiom   '), write(':     defclosed('), write(MS), write(','),
-	write(X), write(','), write(Y), write(','), write(R), write(')'),
+	write('axiom   '), write(':     defclosed('), write(MS), write(','), write(X), write(','), write(Y), write(','), write(R), write(')'),
 	nl,
 	fail.
 showDefclosed(_Name) :-

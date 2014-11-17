@@ -8,7 +8,7 @@ moo:mud_test(test_movedist,
  (
   foc_current_player(P),
    test_name("teleport to main enginering"),
-   do_player_action('tp Area1000'),
+   do_player_action('tp self to Area1000'),
   test_name("now we are really somewhere"),
    test_true(req(atloc(P,_Somewhere))),
   test_name("in main engineering?"),

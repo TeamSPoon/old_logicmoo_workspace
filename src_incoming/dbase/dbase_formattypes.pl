@@ -172,8 +172,7 @@ argIsa_call_1(F,_,term(prolog)):-member(F/_,
                                 argIsa/3,
                                 assert_with_pred/2,
                                  negate_wrapper0/2,
-                                registered_module_type/2,
-                                expand_args/2,
+                                registered_module_type/2,       
                                 hybrid_rule/2,
                                 formatted_resultIsa/2,
                                 bracket/3]).
@@ -300,7 +299,7 @@ list_to_callform(ARGS,Functor,CALL):-CALL=..[Functor|ARGS].
 correctArgsIsa0(Op,[PRED|ARGS],RESULT):-!,correctArgsIsa00(Op,[PRED|ARGS],RESULT).
 correctArgsIsa0(Op,A,RESULTC):-A=..[PRED|ARGS],!,correctArgsIsa00(Op,[PRED|ARGS],RESULT), list_to_callform(RESULT,dbase_t,RESULTC).
 
-correctArgsIsa00(_ ,[Prop|Args],AA):-var(Prop),!,AA=[Prop|Args].
+correctArgsIsa00(_ ,[Prop|Args],AA):-stack_check(1000), var(Prop),!,AA=[Prop|Args].
 correctArgsIsa00(Op,[KP,Prop|Args],AA):-is_holds_true(KP),!,correctArgsIsa00(Op,[Prop|Args],AA).
 correctArgsIsa00(Op,[KP,Prop|Args],[KP|AArgs]):-logical_functor(KP),!,correctAnyType(Op,[Prop|Args],list(askable),AArgs).
 correctArgsIsa00(Op,[KP,Prop|Args],[KP|AA]):-is_holds_false(KP),!,correctArgsIsa00(Op,[KP,Prop|Args],AA).

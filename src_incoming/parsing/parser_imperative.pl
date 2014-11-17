@@ -391,8 +391,12 @@ test(food_is_a_droppable, [ true(
 % parseForIsa(Var, _B, _C, _D):-var(Var),!,fail. % trace_or_throw(var_parseForIsa(Var, B, C, D)).
 parseForIsa(Var, B, C, D):-var(Var),!,trace_or_throw(var_parseForIsa(Var, B, C, D)).
 parseForIsa(actor,A,B,C) :-!, parseForIsa(agent,A,B,C).
-parseForIsa(optional(Type,_Default), Term, C, D) :- nonvar(Type),parseForIsa(Type, Term, C, D).
-parseForIsa(optional(_Type,Default), DefaultV, D, D):- to_arg_value(Default,DefaultV) !.
+
+parseForIsa(optional(_,Term),TermV) --> {to_arg_value(Term,TermV)},[TermT],{samef(TermV,TermT),!}.
+parseForIsa(optional(Type, _Default), Term, C, D) :- nonvar(Type),parseForIsa(Type, Term, C, D).
+parseForIsa(optional(_Type,Default), DefaultV, D, D):- !, to_arg_value(Default,DefaultV).
+parseForIsa(optionalStr(Str),Str) --> [Atom],{samef(Atom,Str),!}.
+parseForIsa(optionalStr(Str),Str) --> [].
 
 
 parseForIsa(not(Type), Term, C, D) :-  dcgAnd(dcgNot(parseIsa(Type)), theText(Term), C, D).
@@ -429,8 +433,12 @@ parseFmt(string,String)--> theString(String).
 parseFmt(or([L|_]),Term) --> parseForIsa(L,Term).
 parseFmt(or([_|List]),Term) --> parseForIsa(or(List),Term).
 
-parseFmt(optional(Type,_),Term) --> parseForIsa(Type,Term).
-parseFmt(optional(_,Term),TermV) --> {to_arg_value(Term,TermV)},[].
+
+parseFmt(optional(_,Term),TermV) --> {to_arg_value(Term,TermV)},[TermT],{samef(TermV,TermT),!}.
+parseFmt(optional(Type, _Default), Term, C, D) :- nonvar(Type),parseForIsa(Type, Term, C, D).
+parseFmt(optional(_Type,Default), DefaultV, D, D):- !, to_arg_value(Default,DefaultV).
+parseFmt(optionalStr(Str),Str) --> [Atom],{samef(Atom,Str),!}.
+parseFmt(optionalStr(Str),Str) --> [].
 
 parseFmt(list(Type),[Term|List]) --> parseForIsa(Type,Term),parseForIsa(list(Type),List).
 parseFmt(list(_Type),[]) --> [].
@@ -444,6 +452,7 @@ parseFmt(and([L|List]),Term1) --> dcgAnd(parseForIsa(L,Term1),parseForIsa(and(Li
 parseFmt(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{specifiedItemType(String,Type,Term)}.
 
 specifiedItemType([String],Type,StringO):-nonvar(String),!,specifiedItemType(String,Type,StringO).
+specifiedItemType(String,not(Type),StringO):-nonvar(Type),!,not(specifiedItemType(String,Type,StringO)).
 specifiedItemType(A,T,AA):- nonvar(T), formattype(T),!, checkAnyType(assert(_),A,T,AAA),!,AA=AAA.
 specifiedItemType(String,Type,Inst) :- get_term_specifier_text(Inst,Type),equals_icase(Inst,String),!.
 specifiedItemType(String,Type,Inst):- instances_of_type(Inst,Type),object_match(String,Inst),!.

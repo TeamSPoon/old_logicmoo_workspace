@@ -15,7 +15,7 @@
 moo:argsIsaInList(action_verb_useable(verb,term(mpred),type,term(mpred))).
 
 
-expand_args(eachOf,subclass(eachOf('PortableObject','ProtectiveAttire',stowable),wieldable)).
+subclass(eachOf('PortableObject','ProtectiveAttire',stowable),wieldable).
 subclass('FluidReservoir',drinkable).
 subclass('Weapon',wieldable).
 subclass('ControlDevice',usable).
