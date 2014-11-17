@@ -20,38 +20,19 @@
 :- moo:register_module_type(command).
 
 % teleport
-moo:agent_text_command(Agent,[tp],Agent,teleport).
-moo:agent_text_command(Agent,[tp,Other,Where],Agent,teleport_to(Other,Where)).
-moo:agent_text_command(Agent,[tp,Where],Agent,teleport_to(self,Where)).
+moo:action_info(teleport(optional(obj,self),optional(region,random(region))),"teleport [obj] to somewhere").
 
-moo:action_info(teleport,"randomly teleport somewhere").
-moo:action_info(teleport(item,region),"teleport the item somewhere").
-
-%random
-moo:agent_call_command(Agent,teleport):-
-   props(Agent,charge>10),
-   clr(atloc(Agent,_)),
-   clr(localityOfObject(Agent,_)),
-   put_in_world(Agent).
+moo:verb_alias("tp","teleport").
 
 %targeted
-moo:agent_call_command(_Agent,teleport_to(Other,Where)):-
-   moo:coerce(Other,agent,Target),
+moo:agent_call_command(_Agent,teleport(Other,Where)):-
+   moo:coerce(Other,obj,Target),
    moo:coerce(Where,region,Location),
    clr(localityOfObject(Target,_)),
    clr(atloc(Target,_)),
    to_3d(Location,Where3D),
    add(atloc(Target,Where3D)).
 
-
-%targeted
-moo:agent_call_command(Agent,tp(Where)):-
-   moo:coerce(Agent,agent,Target),
-   moo:coerce(Where,region,Location),
-   clr(localityOfObject(Target,_)),
-   clr(atloc(Target,_)),
-   to_3d(Location,Where3D),
-   add(atloc(Target,Where3D)).
 
 :- include(logicmoo(vworld/moo_footer)).
 

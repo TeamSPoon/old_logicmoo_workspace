@@ -392,7 +392,8 @@ test(food_is_a_droppable, [ true(
 parseForIsa(Var, B, C, D):-var(Var),!,trace_or_throw(var_parseForIsa(Var, B, C, D)).
 parseForIsa(actor,A,B,C) :-!, parseForIsa(agent,A,B,C).
 parseForIsa(optional(Type,_Default), Term, C, D) :- nonvar(Type),parseForIsa(Type, Term, C, D).
-parseForIsa(optional(_Type,Default), Default, D, D):-!.
+parseForIsa(optional(_Type,Default), DefaultV, D, D):- to_arg_value(Default,DefaultV) !.
+
 
 parseForIsa(not(Type), Term, C, D) :-  dcgAnd(dcgNot(parseIsa(Type)), theText(Term), C, D).
 parseForIsa(FT, B, C, D):-to_word_list(C,O),O\=C,!,parseForIsa(FT, B, O, D).
@@ -420,13 +421,16 @@ parseFmtOrIsa(vp,Goal,Left,Right):-!,one_must(parseFmt_vp1(self,Goal,Left,Right)
 parseFmt_vp1(Agent, do(NewAgent,Goal),[SVERB|ARGS],[]):- parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,Goal),!.
 parseFmt_vp2(Agent,GOAL,[SVERB|ARGS],UNPARSED):- parse_vp_real(Agent,SVERB,ARGS,TRANSLATIONS),!,member(UNPARSED-GOAL,TRANSLATIONS).
 
+to_arg_value(random(Type),Term):- random_instance(Type,Term,true),!.
+to_arg_value(Term,Term):-!.
+
 parseFmt(_, _, [AT|_], _):- var(AT),!,fail.
 parseFmt(string,String)--> theString(String).
 parseFmt(or([L|_]),Term) --> parseForIsa(L,Term).
 parseFmt(or([_|List]),Term) --> parseForIsa(or(List),Term).
 
 parseFmt(optional(Type,_),Term) --> parseForIsa(Type,Term).
-parseFmt(optional(_,Term),Term) --> [].
+parseFmt(optional(_,Term),TermV) --> {to_arg_value(Term,TermV)},[].
 
 parseFmt(list(Type),[Term|List]) --> parseForIsa(Type,Term),parseForIsa(list(Type),List).
 parseFmt(list(_Type),[]) --> [].
