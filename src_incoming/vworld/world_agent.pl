@@ -99,10 +99,14 @@ current_agent(PIn):-get_session_id(O),thlocal:session_agent(O,P),!,P=PIn.
 current_agent_or_var(P):- once(current_agent(PIn)),P=PIn,!.
 current_agent_or_var(_).
 
+
+get_agent_session(P,O):-thlocal:session_agent(O,P).
+
 foc_current_player(P):- current_agent(P),nonvar(P),!.
+foc_current_player(P):- nonvar(P),agent(P),become_player(P),!.
 foc_current_player(P):- get_session_id(O),
   random_instance(agent,P,not((thlocal:session_agent(_,P)))),!,
-  retractall((thlocal:session_agent(O,_))),
+  retractall((thlocal:session_agent(O,_))),  
   asserta(thlocal:session_agent(O,P)),assert_isa(P,human_player),must_det(create_agent(P)).
 foc_current_player(P):- get_session_id(O),generate_new_player(P), !,
   retractall((thlocal:session_agent(O,P))),
@@ -111,8 +115,11 @@ foc_current_player(P):- get_session_id(O),generate_new_player(P), !,
 % generate_new_player(P):- req(agent(P)),!.
 generate_new_player(P):- must((gensym(player,N),P=explorer(N),assert_isa(P,explorer),assert_isa(P,player),assert_isa(P,agent))).
 
+detatch_player(P):- thlocal:session_agent(_,P),!,trace_or_throw(detatch_player(P)).
+detatch_player(_).
+
 :-export(become_player/1).
-become_player(NewName):- get_session_id(O),retractall(thlocal:session_agent(O,_)),asserta(thlocal:session_agent(O,NewName)).
+become_player(NewName):- get_session_id(O),retractall(thlocal:session_agent(O,_)),detatch_player(NewName),asserta(thlocal:session_agent(O,NewName)),ensure_player_stream_local(NewName).
 :-export(become_player/2).
 become_player(_Old,NewName):-become_player(NewName).
 

@@ -21,7 +21,7 @@
 :- include(logicmoo(vworld/moo_header)).
 % :- moo:begin_transform_moo_preds.
 :- dynamic(npc_tick_tock_time/1).
-npc_tick_tock_time(300).
+npc_tick_tock_time(60).
 
 npc_tick_tock:-
    npc_tick_tock_time(Time),sleep(Time),
@@ -29,12 +29,12 @@ npc_tick_tock:-
 
 npc_tick:-
    join_npcs_long_running,   
-   forall(npc_controller(What,Who),in_thread_and_join(debugOnError(tick_controller(What,Who)))).
+   forall(npc_controller(What,Who),ignore(in_thread_and_join(debugOnError(tick_controller(What,Who))))).
 
 join_npcs_long_running.
 
 % skip manually controled agents
-npc_controller(simple_world_agent_plan,Who):- isa(Who,activeAgent),not(thglobal:agent_message_stream(Who,_,_,_)).
+npc_controller(simple_world_agent_plan,Who):- isa(Who,agent),not(thglobal:agent_message_stream(Who,_,_,_)).
 
 tick_controller(simple_world_agent_plan,Who):- tick(Who).
 

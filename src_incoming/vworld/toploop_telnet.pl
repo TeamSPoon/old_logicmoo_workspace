@@ -18,9 +18,10 @@
                   telnet_repl_writer/4,
                   telnet_repl_obj_to_string/3,
                   start_mud_telnet/1,
-                  read_and_do_telnet/1,
-                  run_player_telnet/1,
+                  read_and_do_telnet/0,
+                  run_player_telnet/0,
                   login_and_run/0,
+                  ensure_player_stream_local/1,
                   login_and_run_nodebug/0]).
 
 :- decl_thlocal wants_logout/1.
@@ -57,11 +58,15 @@ login_and_run:-
    % current_input(In),current_output(Out),
    %setup_streams(In, Out),   
    %threads,
-   foc_current_player(P),
+   player_connect_menu,
    % do_player_action(P,'who'),
    % call_agent_command(P,'look'),
-   run_player_telnet(P).
+   run_player_telnet.
 
+player_connect_menu:-
+   foc_current_player(WantsPlayer),
+   connect_player(WantsPlayer,P),
+   foc_current_player(P).
 
 connect_player(Wants,Gets):-
    foc_current_player(Wants),
@@ -70,34 +75,44 @@ connect_player(Wants,Gets):-
      current_agent(Gets))).
 
 
-run_player_telnet(WantsPlayer):-
-   connect_player(WantsPlayer,P),
+run_player_telnet:-   
    set_tty_control,
+   foc_current_player(P),
    fmt('~n~n~nHello ~w! Welcome to the MUD!~n',[P]),
    colormsg([blink,fg(red)],"this is blinking red!"),
-   call_cleanup((   
-   with_assertions(repl_writer(P,telnet_repl_writer),
-      with_assertions(repl_to_string(P,telnet_repl_obj_to_string),
+   call_cleanup(
      % runs the Telnet REPL
-     run_player_local(P))),  
-    fmt('~n~nGoodbye ~w! ~n',[P])),
-     retractall(thlocal:session_agent(_,P))).
+     (set_player_telnet_options,
+     run_player_local),  
+     goodbye_player).
 
+
+set_player_telnet_options:-
+     foc_current_player(P),
+     add(repl_writer(P,telnet_repl_writer)),
+     add(repl_to_string(P,telnet_repl_obj_to_string)).
+
+goodbye_player:- 
+     foc_current_player(P3),
+     fmt('~n~nGoodbye ~w! ~n',[P3]),
+     retractall(thlocal:session_agent(_,P3)).
 
 run_player_local(Wants) :-
     connect_player(Wants,P),
-     thread_self(Id),
-      set_prolog_flag(gui_tracer, false),
-      foc_current_player(P),
-      get_session_id(O),
-      retractall(thlocal:wants_logout(P)),
-      must(thlocal:repl_writer(P,_)),!,
+    foc_current_player(P),
+    run_player_local.
+
+reset_wants_logout:- get_session_id(O),retractall(thlocal:wants_logout(O)).
+
+run_player_local :-
+    reset_wants_logout,
+    foc_current_player(P),get_session_id(O),thread_self(Id),
     with_no_assertions(thglobal:use_cyc_database,
      with_no_assertions(thlocal:useOnlyExternalDBs, 
       with_assertions(thlocal:session_agent(O,P),
        ((repeat,
-        once(read_and_do_telnet(P)), 
-      retract(thlocal:wants_logout(P)),
+         once(read_and_do_telnet), 
+      retract(thlocal:wants_logout(O)),
         retractall(thglobal:agent_message_stream(P,Id,_,_))))))).
 
 
@@ -131,7 +146,9 @@ set_player_stream(P,Id,In,Out):-
    
 
 
-read_and_do_telnet(P):-
+read_and_do_telnet:-
+   set_prolog_flag(gui_tracer, false),
+   foc_current_player(P),
    ensure_player_stream_local(P),
          must(ignore(look_brief(P))),!,         
            sformat(S,'~w> ',[P]),prompt_read_telnet(S,List),
@@ -140,9 +157,9 @@ read_and_do_telnet(P):-
 
 :-export(prompt_read/2).
 prompt_read_telnet(Prompt,Atom):-
-     foc_current_player(P),
+      get_session_id(O),
       prompt_read(Prompt,IAtom),
-      (IAtom==end_of_file -> (assert(thlocal:wants_logout(P)),Atom='quit') ; IAtom=Atom),!.
+      (IAtom==end_of_file -> (assert(thlocal:wants_logout(O)),Atom='quit') ; IAtom=Atom),!.
 
 :-export(prompt_read/2).
 prompt_read(Prompt,Atom):-        
