@@ -20,6 +20,8 @@
 :- include(logicmoo(vworld/moo_header)).
 :- moo:register_module_type(planning).
 
+:-decl_type(monster).
+
 moo:world_agent_plan(_World,Agent,Act):-
    isa(Agent,monster),
    monster_idea(Agent,Act).

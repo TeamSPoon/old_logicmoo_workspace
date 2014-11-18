@@ -21,6 +21,9 @@
 :- include(logicmoo(vworld/moo_header)).
 :- moo:register_module_type(planning).
 
+:-decl_type(predator).
+moo:type(predator).
+
 moo:world_agent_plan(_World,Agent,Act):-
    isa(Agent,predator),
    predator_idea(Agent,Act).

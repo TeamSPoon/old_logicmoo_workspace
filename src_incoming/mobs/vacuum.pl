@@ -17,6 +17,9 @@
 
 % Possible agent actions.
 
+:-decl_type(vacuum).
+moo:type(vacuum).
+
 moo:world_agent_plan(_World,Agent,Act):-
    isa(Agent,vacuum),
    vacuum_idea(Agent,Act).

@@ -443,8 +443,14 @@ formattype(var).
 formattype(string).
 :-decl_mpred_prolog(var/1).
 :-decl_mpred_prolog(string/1).
+:-decl_mpred_prolog(number/1).
+:-decl_mpred_prolog(integer/1).
 
 :-decl_mpred_hybrid(color/2).
+:-decl_mpred_hybrid(material/2).
+:-decl_mpred_hybrid(texture/2).
+:-decl_mpred_hybrid(size/2).
+:-decl_mpred_hybrid(shape/2).
 
 ft_info(action(prolog),formatted).
 ft_info(apath(region,dir),formatted).
@@ -547,6 +553,7 @@ subclass(eachOf('PortableObject','ProtectiveAttire','SomethingToWear'),possessab
 subclass(eachOf('ProtectiveAttire','SomethingToWear'),wearable).
 subclass('ControlDevice',chargable).
 subclass(posture,command).
+
 
 equivRule(isa(Whom,npc_player),and(isa(Whom,player),naf(isa(Whom,human_player)))).
 

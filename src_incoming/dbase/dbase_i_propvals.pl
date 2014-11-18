@@ -259,11 +259,11 @@ defaultArgValue(Fact,F,A,OLD):- stack_check, mpred_prop(F,default_sv(A,OLD)),!,d
 defaultArgValue(facing(_,_),_,2,"n"):-!.
 defaultArgValue(change(_,_),_,2,200):-!.
 defaultArgValue(damage(_,_),_,2,500):-!.
-defaultArgValue(shape(Like,V1),shape,2,Like,[V1],_):- isa(Like,Type),V1 = like(shape,Type).
 defaultArgValue(Fact,F,A,Value):- Fact=..[F,P|Args],is_fact_consistent(Fact),defaultArgValue(Fact,F,A,P,Args,Value).
 
 defaultArgValue(Fact,F,A,P,_Args,Value):-var(P),!,argIsa_call(F,A,Type),defaultTypeValue(Fact,Type,Value),!,dmsg(defaultArgValue(using_defaultTypeValue1(Fact,Type,Value))).
 defaultArgValue(_Call,F,2,P,[Arg],Arg):-create_someval(F,P,Arg),!. 
+defaultArgValue(shape(Like,V1),shape,2,Like,[V1],_):- isa(Like,Type),V1 = like(shape,Type).
 defaultArgValue(Fact,F,LastPlus1,I,_Args,Value):- get_instance_default_props(I,PropList),Last is LastPlus1 - 1,
       functor(Prop,F,Last),member(Prop,PropList),arg(Last,Prop,Value),!,dmsg(defaultArgValue(defaultArgValue_get_type_props(Fact))).
 

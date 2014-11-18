@@ -47,12 +47,12 @@ term_is_ft(Term,Type):- var(Type),var(Term),!,member(Type,[var,prolog]).
 term_is_ft(Term,Type):- var(Term),!,member(Type,[var,term,prolog]).
 term_is_ft(Term,Type):- nonvar(Term),var(Type),!,formattype_guessable(Type),term_is_ft(Term,Type).
 term_is_ft(Term,Type):- must_det(formattype(Type)),
-   once(trans_subft_info(Type,How)),
+   once(trans_subft_info(Type,How)),   
    correctFormatType(query(_HLDS,_OldV),Term,How,NewTerm),!,
    sameArgTypes(NewTerm,Term).
 
 ft_info_how(FT,formatted(FT)):-moo:ft_info(FT,formatted).
-ft_info_how(FT,Info):-moo:ft_info(FT,Info),Info\=formatted.
+ft_info_how(FT,self_call(Info)):-moo:ft_info(FT,Info),Info\=formatted.
 
 trans_subft_info(FT,Info):-ft_info_how(FT,Info).
 trans_subft_info(FT,Info):-trans_subft(Sub,FT),ft_info_how(Sub,Info),!.
@@ -395,6 +395,8 @@ correctType(Op,[A|AA],list(T),[L|LIST]):-!, correctType(Op,A,T,L), correctType(O
 correctType(Op,A,list(T),[OT]):-!,correctAnyType(Op,A,T,OT).
 correctType(_O,A,same(T),AA):-must_equals(T,AA),must_equals(A,AA).
 correctType(Op,A,oneOf(List),AA):-!,member(Type,List),correctType(Op,A,Type,AA).
+
+correctType(_O,A,self_call(Call),AA):-subst(Call,self,A,NewCall),!,NewCall,must_equals(A,AA).
 
 correctType(_O,[],formatted([]),[]):-!.
 correctType(Op,[H|T],formatted([H2|T2]),[H3|T3]):-

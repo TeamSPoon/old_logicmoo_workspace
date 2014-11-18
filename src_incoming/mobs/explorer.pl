@@ -20,6 +20,7 @@
 :- include(logicmoo(vworld/moo_header)).
 :- moo:register_module_type(planning).
 
+:-decl_type(explorer).
 
 vette_idea(Agent,Act,Act):-var(Act),!,dmsg(vette_idea(Agent,Act)).
 vette_idea(_,sit,sit):-!.

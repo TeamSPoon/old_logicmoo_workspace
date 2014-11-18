@@ -19,6 +19,9 @@
 :- moo:register_module_type(planning).
 :- moo:register_module_type(command).
 
+:-decl_type(prey).
+moo:type(prey).
+
 % Predicates asserted during run.
 % :- dynamic memory/2. 
 %:- dynamic agent_list/1.

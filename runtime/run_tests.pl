@@ -52,19 +52,19 @@ was_runs_tests_pl:-is_startup_file('run_tests.pl').
 
 moo:mud_test_local:-
    test_name("tests to see if we have: player1"),
-   test_true(must_det((foc_current_player(Agent),dmsg(foc_current_player(Agent))))).
+   test_true(show_call(foc_current_player(_Agent))).
 
 moo:mud_test_local:-
    test_name("tests to see if we have: atloc"),
-   test_true((foc_current_player(Agent),must_det((atloc(Agent,Where),dmsg(atloc(Agent,Where)))))).
+   test_true((foc_current_player(Agent),show_call(atloc(Agent,_Where)))).
 
 moo:mud_test_local:- 
-   test_name("tests to see if we have: atloc"),
-   test_true((foc_current_player(Agent),must_det((atloc(Agent,Where),dmsg(atloc(Agent,Where)))))).
+   test_name("tests to see if we have: localityOfObject"),
+   test_true((foc_current_player(Agent),show_call(localityOfObject(Agent,_Where)))).
 
 moo:mud_test_local:- 
    test_name("tests to see if our clothing doesnt: atloc"),
-   test_false(not(atloc('ArtifactCol1003-Gold-Uniform775',_X))).
+   test_false(atloc('ArtifactCol1003-Gold-Uniform775',_X)).
     
 moo:mud_test_local:- 
    foc_current_player(Agent),
@@ -75,10 +75,6 @@ moo:mud_test_local:-
    test_name("tests to see if we have: singleValued on movedist"),
    must(add(movedist(explorer(player1),3))),
    test_true(must((findall(X,movedist(explorer(player1),X),L),length(L,1)))).
-
-moo:mud_test_local:-
-   test_name("tests to see if we have: localityOfObject"),
-   test_true((foc_current_player(Agent),must_det((localityOfObject(Agent,Where))),dmsg(localityOfObject(Agent,Where)))).
 
 moo:mud_test_local:- 
       test_name("nudity test"), 
@@ -93,7 +89,7 @@ moo:mud_test_local:-
 
 moo:mud_test_local:-
    test_name("tests to see if 'food' can be an item"),
-      test_true(parseIsa0(item, _G537410, [food], [])).
+      test_true(parseIsa0(item, _, [food], [])).
 
 moo:mud_test_local:-call_mpred(show_room_grid('Area1000')).
 
@@ -125,7 +121,7 @@ hook:hooked_check_consistent(Obj,20):-must(object_string(_,Obj,0-5,String)),dmsg
 % ---------------------------------------------------------------------------------------------
 
 
-moo:mud_test("local sanity tests", doall(moo:mud_test_local)).
+% moo:mud_test("local sanity tests", doall(moo:mud_test_local)).
 
 
 :- moo_hide_childs(dbase:record_on_thread/2).

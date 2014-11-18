@@ -343,14 +343,12 @@ phrase_parseForTypes(TYPEARGS,GOODARGS,ARGS,LeftOver):-
     phrase_parseForTypes_l(TYPEARGS,GOODARGS,ARGSL,LeftOver).
 
 phrase_parseForTypes_l(TYPEARGS,GOODARGS,ARGSL,LeftOver):-
-    ccatch(phrase(parseForTypes(TYPEARGS,GOODARGS),ARGSL,LeftOver),_,fail),!.    
+    catchv(phrase(parseForTypes(TYPEARGS,GOODARGS),ARGSL,LeftOver),_,fail),!.    
 phrase_parseForTypes_l(TypesIn,Out,In,[]):- length(TypesIn,L),between(1,4,L),length(In,L),must(Out=In),!,dmsg(fake_phrase_parseForTypes_l(foreach_isa(In,TypesIn))).
 phrase_parseForTypes_l(TYPEARGS,GOODARGS,ARGSL,LeftOver):-
     debugOnError(phrase(parseForTypes(TYPEARGS,GOODARGS),ARGSL,LeftOver)).    
 
 parseForTypes([], [], A, A).
-parseForTypes([TYPE], [B], C, []) :-
-        parseIsa(TYPE, B, C, []),!.
 parseForTypes([TYPE|TYPES], [B|E], C, G) :-
         parseIsa(TYPE, B, C, F),
         parseForTypes(TYPES, E, F, G).
@@ -392,11 +390,7 @@ test(food_is_a_droppable, [ true(
 parseForIsa(Var, B, C, D):-var(Var),!,trace_or_throw(var_parseForIsa(Var, B, C, D)).
 parseForIsa(actor,A,B,C) :-!, parseForIsa(agent,A,B,C).
 
-parseForIsa(optional(_,Term),TermV) --> {to_arg_value(Term,TermV)},[TermT],{samef(TermV,TermT),!}.
-parseForIsa(optional(Type, _Default), Term, C, D) :- nonvar(Type),parseForIsa(Type, Term, C, D).
-parseForIsa(optional(_Type,Default), DefaultV, D, D):- !, to_arg_value(Default,DefaultV).
-parseForIsa(optionalStr(Str),Str) --> [Atom],{samef(Atom,Str),!}.
-parseForIsa(optionalStr(Str),Str) --> [].
+parseForIsa(I,O) --> parseForOptional(I,O).
 
 
 parseForIsa(not(Type), Term, C, D) :-  dcgAnd(dcgNot(parseIsa(Type)), theText(Term), C, D).
@@ -425,8 +419,15 @@ parseFmtOrIsa(vp,Goal,Left,Right):-!,one_must(parseFmt_vp1(self,Goal,Left,Right)
 parseFmt_vp1(Agent, do(NewAgent,Goal),[SVERB|ARGS],[]):- parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,Goal),!.
 parseFmt_vp2(Agent,GOAL,[SVERB|ARGS],UNPARSED):- parse_vp_real(Agent,SVERB,ARGS,TRANSLATIONS),!,member(UNPARSED-GOAL,TRANSLATIONS).
 
-to_arg_value(random(Type),Term):- random_instance(Type,Term,true),!.
-to_arg_value(Term,Term):-!.
+to_arg_value(random(Type),Term):- !, random_instance(Type,Term,true),atom(Term),!.
+to_arg_value(Term,Term):-atom(Term),!.
+
+parseForOptional(optional(_,Term),TermV) --> {to_arg_value(Term,TermV)}, [TermT], {samef(TermV,TermT)}.
+parseForOptional(optional(Type, _), Term, C, D) :- nonvar(Type),parseForIsa(Type, Term, C, D).
+parseForOptional(optional(_Type,Default), DefaultV, D, D):- to_arg_value(Default,DefaultV).
+parseForOptional(optionalStr(Str),Str) --> [Atom],{samef(Atom,Str),!}.
+parseForOptional(optionalStr(Str),Str) --> [].
+
 
 parseFmt(_, _, [AT|_], _):- var(AT),!,fail.
 parseFmt(string,String)--> theString(String).
@@ -434,13 +435,9 @@ parseFmt(or([L|_]),Term) --> parseForIsa(L,Term).
 parseFmt(or([_|List]),Term) --> parseForIsa(or(List),Term).
 
 
-parseFmt(optional(_,Term),TermV) --> {to_arg_value(Term,TermV)},[TermT],{samef(TermV,TermT),!}.
-parseFmt(optional(Type, _Default), Term, C, D) :- nonvar(Type),parseForIsa(Type, Term, C, D).
-parseFmt(optional(_Type,Default), DefaultV, D, D):- !, to_arg_value(Default,DefaultV).
-parseFmt(optionalStr(Str),Str) --> [Atom],{samef(Atom,Str),!}.
-parseFmt(optionalStr(Str),Str) --> [].
+parseFmt(I,O) --> parseForOptional(I,O).
 
-parseFmt(list(Type),[Term|List]) --> parseForIsa(Type,Term),parseForIsa(list(Type),List).
+parseFmt(list(Type),[Term|List]) --> parseForIsa(Type,Term),parseFmt(list(Type),List).
 parseFmt(list(_Type),[]) --> [].
 
 parseFmt(countBetween(_Type,_,High),[]) --> {High==0,!}, [].

@@ -60,8 +60,8 @@ write_string_if_contains(Must,E):-ignore((with_output_to(string(Str),fmt(E)),str
 
 moo:term_specifier_text(Text,verb):- get_type_action_templates(A),nonvar(A),functor_safe(A,Text,_).
 
-moo:agent_text_command(Agent,[Who],Agent,Cmd):- nonvar(Who), get_type_action_templates(Syntax),Syntax=..[Who,optional(_,Default)],Cmd=..[Who,Default].
-moo:agent_text_command(Agent,[Who,Type],Agent,Cmd):- get_type_action_templates(Syntax),nonvar(Who),Syntax=..[Who,optional(Type,_)],Cmd=..[Who,Type].
+%moo:agent_text_command(Agent,[Who],Agent,Cmd):- nonvar(Who), get_type_action_templates(Syntax),Syntax=..[Who,optional(_,Default)],Cmd=..[Who,Default].
+%moo:agent_text_command(Agent,[Who,Type],Agent,Cmd):- get_type_action_templates(Syntax),nonvar(Who),Syntax=..[Who,optional(Type,_)],Cmd=..[Who,Type].
 
 :- include(logicmoo(vworld/moo_footer)).
 
