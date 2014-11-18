@@ -419,8 +419,8 @@ parseFmtOrIsa(vp,Goal,Left,Right):-!,one_must(parseFmt_vp1(self,Goal,Left,Right)
 parseFmt_vp1(Agent, do(NewAgent,Goal),[SVERB|ARGS],[]):- parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,Goal),!.
 parseFmt_vp2(Agent,GOAL,[SVERB|ARGS],UNPARSED):- parse_vp_real(Agent,SVERB,ARGS,TRANSLATIONS),!,member(UNPARSED-GOAL,TRANSLATIONS).
 
-to_arg_value(random(Type),Term):- !, random_instance(Type,Term,true),atom(Term),!.
-to_arg_value(Term,Term):-atom(Term),!.
+to_arg_value(random(Type),Term):- nonvar(Type),!, random_instance(Type,Term,true),atom(Term).
+to_arg_value(Term,Term).
 
 parseForOptional(optional(_,Term),TermV) --> {to_arg_value(Term,TermV)}, [TermT], {samef(TermV,TermT)}.
 parseForOptional(optional(Type, _), Term, C, D) :- nonvar(Type),parseForIsa(Type, Term, C, D).
