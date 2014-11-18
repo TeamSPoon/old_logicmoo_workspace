@@ -105,7 +105,7 @@ get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
   call((
 	looking(Agent),
 	charge(Agent,Vit),
-        damage(Agent,Dam),
+        health(Agent,Dam),
 	success(Agent,Suc),
 	score(Agent,Scr),
 	inventory(Agent,Inv),

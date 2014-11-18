@@ -94,12 +94,12 @@ squish_behind(_,_).
 % both the agents take damage. 
 % The pusher takes damage as normal (for pushing something
 % unpushable), the pushy takes damage below
-crashbang(Obj) :- padd(Obj,[damage(-5)]).
+crashbang(Obj) :- padd(Obj,[health(-5)]).
 
 % Record keeping
 moo:update_charge(Agent,push) :- padd(Agent,[charge(-6)]).
-moo:update_stats(Agent,strain) :- padd(Agent,[damage(-2)]).
-moo:update_stats(Agent,hernia) :- padd(Agent,[damage(-4),cmdfailure(hernia)]).
+moo:update_stats(Agent,strain) :- padd(Agent,[health(-2)]).
+moo:update_stats(Agent,hernia) :- padd(Agent,[health(-4),cmdfailure(hernia)]).
 
 :- include(logicmoo(vworld/moo_footer)).
 

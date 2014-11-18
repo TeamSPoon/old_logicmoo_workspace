@@ -34,10 +34,10 @@ worth(Agent,Action,Obj) :-
 % Heal
 worth(Agent,Action,Obj) :-
            props(Obj,act_affect(Action,heal(Hl))),
-	req((damage(Agent,Dam),
+	req((health(Agent,Dam),
              stm(Agent,Stm),
              str(Agent,Str))),
-	req(max_damage(Agent,Max)),
+	req(max_health(Agent,Max)),
 	(Dam + Hl) < ((((Stm * 10) -20) + ((Str * 5) - 10)) + Max),
 	add(charge(Agent,+Hl)),
 	!.
@@ -80,9 +80,9 @@ set_stats(Agent,Traits):-dmsg(warn(failed(set_stats(Agent,Traits)))).
 
 process_stats(Agent,str(Y)) :-
 	add(str(Agent,Y)),
-	must_det((damage(Agent,Dam),number(Dam))),
+	must_det((health(Agent,Dam),number(Dam))),
 	NewDam is (Dam + ((Y * 5) - 10)),
-	add(damage(Agent,NewDam)),
+	add(health(Agent,NewDam)),
 	add(stat_total(Agent,+Y)).
 
 process_stats(Agent,height(Ht)) :-
@@ -91,9 +91,9 @@ process_stats(Agent,height(Ht)) :-
 
 process_stats(Agent,stm(Stm)) :-
 	add(stm(Agent,Stm)),
-	req(damage(Agent,Dam)),
+	req(health(Agent,Dam)),
 	NewDam is (((Stm * 10) - 20) + Dam),
-	add(damage(Agent,NewDam)),
+	add(health(Agent,NewDam)),
 	req(charge(Agent,NRG)),
 	Charge is (((Stm * 10) - 20) + NRG),
 	add(charge(Agent,Charge)),

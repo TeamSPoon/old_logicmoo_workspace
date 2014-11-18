@@ -238,9 +238,13 @@ loop_check_term(B,BC,TODO):-  ( \+(tlbugger:inside_loop_check(BC)) -> setup_call
 % Bugger Term Expansions
 % ===================================================================
 
+hide_all_debug:-isDebugOption(opt_debug=off),!
+hide_all_debug:-bugger_flag(opt_debug=off),!.
+hide_all_debug:-bugger_flag(opt_debug=false),!.
+
 % bugger_debug=off turns off just debugging about the debugger
 % opt_debug=off turns off all the rest of debugging
-bdmsg(_):-catch((bugger_flag(bugger_debug=off)),_,true),!.
+bdmsg(_):-catch(hide_all_debug,_,true),!.
 bdmsg(_):-!.
 bdmsg(D):-(format(user_error,'dmsg: ~q~n',[D])).
 
@@ -1751,7 +1755,7 @@ dmsg(V):- notrace(once(dmsg0(V))).
 :-'$hide'(dmsg/1).
 
 dmsg0(V):- tlbugger:is_with_dmsg(FP),!,FP=..FPL,append(FPL,[V],VVL),VV=..VVL,once(dmsg0(VV)).
-dmsg0(_):- bugger_flag(opt_debug=off),!.
+dmsg0(_):- hide_all_debug,!.
 dmsg0(V):- var(V),!,dmsg0(dmsg_var(V)).
 dmsg0(V):- (doall((once(dmsg1(V)),hook:dmsg_hook(V)))),!.
 /*
@@ -1798,7 +1802,7 @@ dmsg(C,T):-!, (( fmt('<font size=+1 color=~w>',[C]), fmt(T), fmt('</font>',[])))
 
 dmsg(L,F,A):-loggerReFmt(L,LR),loggerFmtReal(LR,F,A).
 
-%dmsg(C,T):- isDebugOption(opt_debug=off),!.
+%dmsg(C,T):- hide_all_debug,!.
 vdmsg(L,F):-loggerReFmt(L,LR),loggerFmtReal(LR,F,[]).
 
 
@@ -2067,7 +2071,7 @@ stack_check_else(BreakIfOver,Call):- stack_depth(Level) ,  ( Level < BreakIfOver
 % dumpstack_arguments.
 dumpST:-notrace(dumpST(5000)).
 
-dumpST(_):-bugger_flag(opt_debug=off),!.
+dumpST(_):-hide_all_debug,!.
 dumpST(Opts):- prolog_current_frame(Frame),dumpST(Frame,Opts).
 
 dumpST(Frame,MaxDepth):-integer(MaxDepth),!,dumpST(Frame,[max_depth(MaxDepth),numbervars(safe),show([level,goal,clause])]).

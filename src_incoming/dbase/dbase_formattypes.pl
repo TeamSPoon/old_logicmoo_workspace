@@ -130,8 +130,8 @@ argIsa_call_0(predicates,1,list(term)).
 argIsa_call_0(resultIsa,2,type).
 argIsa_call_0(type_max_charge,1,type).
 argIsa_call_0(type_max_charge,2,int).
-argIsa_call_0(type_max_damage,1,type).
-argIsa_call_0(type_max_damage,2,int).
+argIsa_call_0(type_max_health,1,type).
+argIsa_call_0(type_max_health,2,int).
 argIsa_call_0(ask_module,1,mpred).
 argIsa_call_0(ask_module,2,atom).
 argIsa_call_0(agent_text_command,term).

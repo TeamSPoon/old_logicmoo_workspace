@@ -4,6 +4,8 @@
 
 :- module(mobs_conf,[]).
 
+:- ensure_loaded(affordance/simbots).
+
 end_of_file.
 
 :- user_use_module(logicmoo('mobs/monster.pl')).

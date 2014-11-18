@@ -216,13 +216,13 @@ moo:createableType(agent).
 moo:subclass(actor,agent).
 moo:subclass(explorer,agent).
 
-:-dynamic_multifile_exported(moo:max_damage/2).
+:-dynamic_multifile_exported(moo:max_health/2).
 :-dynamic_multifile_exported(moo:max_charge/2).
 :-dynamic_multifile_exported(moo:type_max_charge/2).
-%:-dynamic_multifile_exported(moo:type_max_damage/2).
+%:-dynamic_multifile_exported(moo:type_max_health/2).
 
 moo:max_charge(T,NRG):- fallback, moo:type_max_charge(AgentType,NRG),isa(T,AgentType).
-%moo:max_damage(T,Dam):- moo:type_max_damage(AgentType,Dam),isa(T,AgentType).
+%moo:max_health(T,Dam):- moo:type_max_health(AgentType,Dam),isa(T,AgentType).
 
 punless(Cond,Action):- once((call(Cond);call(Action))).
 
@@ -235,9 +235,9 @@ create_instance_0(T,agent,List):-
    % punless(possess(P,_),rez_to_inventory(P,food,_Food)),
    rez_to_inventory(P,food,_Food),
    %reset_values(P),   
-   padd(P, [ max_damage(500),
+   padd(P, [ max_health(500),
                        max_charge(200),
-                       damage(500),
+                       health(500),
                        charge(200),
                        agent_turnnum(0),
                        score(1)]),   
@@ -256,7 +256,7 @@ reset_value(I,To,From):- prop(I,From,FromV), padd(I,To,FromV),!.
    is_term_ft(V,Type),
 
 moo:valueReset(score,0).
-moo:valueReset(damage,max_damage).
+moo:valueReset(health,max_health).
 moo:valueReset(charge,max_charge).
 
 */
@@ -303,9 +303,9 @@ moo:default_type_props(obj,opaqueness(100)).
 moo:default_type_props(item,listPrice(0)).
 moo:default_type_props(agent,last_command(stand)).
 moo:default_type_props(agent,[
-                       max_damage(500),
+                       max_health(500),
                        max_charge(200),
-                       damage(500),
+                       health(500),
                        charge(200),
                        facing("n"),
                        agent_turnnum(0),

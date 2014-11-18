@@ -258,7 +258,7 @@ no_fallback(P,2):-not(mpred_prop(P,singleValued)).
 defaultArgValue(Fact,F,A,OLD):- stack_check, mpred_prop(F,default_sv(A,OLD)),!,dmsg(defaultArgValue(fallback_value(Fact,F,default_sv(A,OLD)))).
 defaultArgValue(facing(_,_),_,2,"n"):-!.
 defaultArgValue(change(_,_),_,2,200):-!.
-defaultArgValue(damage(_,_),_,2,500):-!.
+defaultArgValue(health(_,_),_,2,500):-!.
 defaultArgValue(Fact,F,A,Value):- Fact=..[F,P|Args],is_fact_consistent(Fact),defaultArgValue(Fact,F,A,P,Args,Value).
 
 defaultArgValue(Fact,F,A,P,_Args,Value):-var(P),!,argIsa_call(F,A,Type),defaultTypeValue(Fact,Type,Value),!,dmsg(defaultArgValue(using_defaultTypeValue1(Fact,Type,Value))).

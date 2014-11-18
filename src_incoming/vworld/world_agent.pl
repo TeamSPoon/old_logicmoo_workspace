@@ -29,7 +29,7 @@ must_ac(G):- show_call(must(G)).
 % call_agent_command/2 -->  call_agent_action/2
 % =====================================================================================================================
 % execute a prolog command including prolog/0
-call_agent_command(Agent,Var):-var(Var),trace_or_throw(call_agent_command(Agent,Var)).
+call_agent_command(Agent,Var):-var(Var),trace_or_throw(var_call_agent_command(Agent,Var)).
 
 call_agent_command(Agent,Text):-string(Text),atom_string(Atom,Text),!,call_agent_command(Agent,Atom).
 
@@ -145,7 +145,7 @@ agent_into_corpse(Agent) :-
 display_stats(Agents) :-
 	forall(member(Agent,Agents),
 	          (charge(Agent,Chg),
-		  damage(Agent,Dam),
+		  health(Agent,Dam),
 		  score(Agent,Scr),
 		  findall(Obj,possess(Agent,Obj),Inv),
 		  write('Agent = '), write(Agent), nl,

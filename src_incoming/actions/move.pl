@@ -95,9 +95,9 @@ move_command_1(Agent,Dir) :-
 
 moo:update_charge(Agent,move) :- padd(Agent,charge,-4).
 
-moo:update_stats(Agent,collide) :- padd(Agent,damage,-5),(add_cmdfailure(Agent,collide)).
+moo:update_stats(Agent,collide) :- padd(Agent,health,-5),(add_cmdfailure(Agent,collide)).
 
-moo:update_stats(Agent,fall) :- padd(Agent,damage,-10).
+moo:update_stats(Agent,fall) :- padd(Agent,health,-10).
 
 % cheating but to test
 

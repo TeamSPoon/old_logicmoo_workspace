@@ -2,7 +2,7 @@
 :- module(stats, []).
 /** <module> A command to  ...
 % charge(Agent,Chg) = charge (amount of charge agent has)
-% damage(Agent,Dam) = damage
+% health(Agent,Dam) = damage
 % success(Agent,Suc) = checks success of last action (actually checks the cmdfailure predicate)
 % score(Agent,Scr) = score
 % to do this.
@@ -15,17 +15,16 @@
 % ====================================================
 % show the stats system
 % ====================================================
-moo:action_info(stats(optional(term,self)), "Examine MUD stats of something").
-moo:agent_call_command(Agent,stats(SWhat)):- 
-   term_listing(SWhat),
-   doall((parse_for(optional(agent,self),SWhat,What,_LeftOver),
+moo:action_info(stats(optional(obj,self)), "Examine MUD stats of something").
+moo:agent_call_command(Agent,stats(What)):-    
    show_kb_preds(Agent,[
          charge(What,value),
          str(What,value),
          stm(What,value), % stamina
          score(What,value),
-         damage(What,value),
-         height(What,value)]))),!.
+         health(What,value),
+         height(What,value)]))),!,
+   term_listing(What),!.
 
 
 moo:action_info(list(term),"grep for a term").

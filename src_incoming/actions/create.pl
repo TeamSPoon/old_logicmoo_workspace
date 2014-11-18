@@ -2,7 +2,7 @@
 :- module(create, []).
 /** <module> A command to  ...
 % charge(Agent,Chg) = charge (amount of charge agent has)
-% damage(Agent,Dam) = damage
+% health(Agent,Dam) = damage
 % cmdsuccess(Agent,Suc) = checks success of last action (actually checks the cmdfailure predicate)
 % score(Agent,Scr) = score
 % to do this.

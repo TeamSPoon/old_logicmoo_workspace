@@ -53,7 +53,7 @@ channel(gossup).
 
 createableType('TemporallyExistingThing').
 
-:-dynamic moo:type_max_damage/2. 
+:-dynamic moo:type_max_health/2. 
 
 multiValued(contains(container,obj)).
 multiValued(grid(region,int,int,obj)).
@@ -270,8 +270,8 @@ argsIsaInList(verbOverride(term,action,action),[prologHybrid]).
 
 singleValued(type_max_charge(type,int)).
 singleValued(max_charge(term,int)).
-singleValued(type_max_damage(type,int)).
-singleValued(max_damage(term,int)).
+singleValued(type_max_health(type,int)).
+singleValued(max_health(term,int)).
 
 channel(A):-region(A).
 channel(A):-agent(A).
@@ -291,7 +291,7 @@ subclass(wearable,item).
 
 :-decl_mpred_hybrid(pathBetween,3).
 :-decl_mpred_hybrid(atloc,2).
-:-decl_mpred_hybrid(damage,2).
+:-decl_mpred_hybrid(health,2).
 
 
 :- assert_if_new(mpred_prop(localityOfObject,call_tabled)).
@@ -383,7 +383,7 @@ singleValued(charge(obj,int(500))).
 singleValued(charge(obj,int),[default_sv(2,500)]).
 singleValued(chargeCapacity(chargable,int)).
 singleValued(chargeRemaining(chargable,int)).
-singleValued(damage(obj,int)).
+singleValued(health(obj,int)).
 singleValued(defence(obj,int)).
 singleValued(facing(obj,dir(n))).
 singleValued(facing(obj,dir)).
@@ -563,7 +563,7 @@ multiValued(ask_module(relation,atom)).
 
 argsIsaInList(agent_call_command(agent,term(verb))).
 
-type_max_damage(obj,500).
+type_max_health(obj,500).
 type_max_charge(obj,130).
 
 default_type_props(item,charge(140)).

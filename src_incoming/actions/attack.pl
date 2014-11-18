@@ -77,23 +77,23 @@ destroy_object(LOC,What) :-
 
 % Does damage to other agent
 damage_foe(Agent,What,hit) :-
-	del(damage(What,OldDam)),
+	del(health(What,OldDam)),
 	str(Agent,Str),
 	check_for_defence(What,Def),
 	BaseAtk is Str * 2,
 	check_for_weapon(Agent,Wpn),
 	Atk is (Wpn + BaseAtk),
 	NewDam is (OldDam - (Atk - Def)),
-	add(damage(What,NewDam)).
+	add(health(What,NewDam)).
 
 % Record keeping
 moo:update_charge(Agent,attack) :- upprop(Agent,charge(-5)).
-moo:update_stats(Agent,bash) :-  upprop(Agent,damage(-2)),
+moo:update_stats(Agent,bash) :-  upprop(Agent,health(-2)),
 	(add_cmdfailure(Agent,bash)).
 moo:update_stats(Agent,wiff) :- 
-	del(damage(Agent,Old)),
+	del(health(Agent,Old)),
 	New is Old - 1,
-	add(damage(Agent,New)),
+	add(health(Agent,New)),
 	(add_cmdfailure(Agent,bash)).
 
 

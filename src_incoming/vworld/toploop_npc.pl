@@ -10,6 +10,7 @@
           move_or_sit_memory_idea/3,
           npc_tick/0,
           join_npcs_long_running/0,npc_tick_tock/0,npc_tick_tock_time/1,
+          tick/1,
           npc_controller/2,   
           warnOnError/1,
           get_world_agent_plan/3,
@@ -53,7 +54,9 @@ move_or_sit_memory_idea(Agent,sit,_) :-
 	random_permutation(Old,New),
 	add(memory(Agent,directions(New))).
 
+
 tick(Who):-
+   ignore(current_agent(Who)),
    findall(Idea,get_world_agent_plan(current,Who,Idea),IdeaS),!,IdeaS=[_|_],
    my_random_member(Idea,IdeaS),!,
    do_agent_call_plan_command(Who,Idea).
@@ -62,9 +65,9 @@ tick(Who):-
  
 get_world_agent_plan(W,Who,Idea):- agent(Who), moo:world_agent_plan(W,Who,Idea).
 
-do_agent_call_plan_command(A,C):-agent_doing(A,C),!.
+do_agent_call_plan_command(A,C):- agent_current_action(A,C),!.
 do_agent_call_plan_command(A,C):-   
-   with_assertions(agent_doing(A,C),
+   with_assertions(agent_current_action(A,C),
     (( call_agent_command(A,C),agent_done(A,C)))).
 
 

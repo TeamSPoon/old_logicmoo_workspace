@@ -36,7 +36,7 @@ moo:world_agent_plan(_World,Agent,ActV):-
 
 % Possible agent actions.
 explorer_idea(Agent,eat(Elixer)) :-
-	damage(Agent,Damage),
+	health(Agent,Damage),
 	Damage < 15,
    inventory(Agent,List),
    obj_memb(Elixer,List),
@@ -52,22 +52,18 @@ explorer_idea(Agent,eat(food)) :-
 explorer_idea(Agent,take(Good)) :-
 	get_feet(Agent,What),
         obj_memb(Good,What),
-	isa_any(Good,[gold,elixer]).  
+	isa_any(Good,[gold,elixer,treasure]).  
 
-explorer_idea(Agent,take(food)) :-
+explorer_idea(Agent,take(Good)) :-
 	get_feet(Agent,What),
         obj_memb(Good,What),
-	isa_any(Good,[food]).
+	isa_any(Good,[food,usefull,item]).
 
-explorer_idea(Agent,move(Dir)) :-
+explorer_idea(Agent,move(1,Dir)) :-
 	get_percepts(Agent,List),
-	list_object_dir_sensed(_,List,food,Dir).
+	list_object_dir_sensed(_,List,treasure,Dir).
 
-explorer_idea(Agent,move(Dir)) :-
-	get_percepts(Agent,List),
-	list_object_dir_sensed(_,List,gold,Dir).
-
-explorer_idea(Agent,move(Dir)) :-
+explorer_idea(Agent,move(3,Dir)) :-
 	get_percepts(Agent,List),
 	list_object_dir_sensed(_,List,monster,OppDir),
 	reverse_dir(OppDir,Dir),
@@ -75,7 +71,15 @@ explorer_idea(Agent,move(Dir)) :-
         nth1(N,List,What),
 	What == [].
 
-explorer_idea(Agent,move(Dir)) :-
+explorer_idea(Agent,move(1,Dir)) :-
+	get_percepts(Agent,List),
+	list_object_dir_sensed(_,List,usefull,Dir).
+
+explorer_idea(Agent,move(1,Dir)) :-
+	get_percepts(Agent,List),
+	list_object_dir_sensed(_,List,agent,Dir).
+
+explorer_idea(Agent,move(5,Dir)) :-
 	memory(Agent,directions([Dir|_])),
 	num_near(Num,Dir,here),
 	get_near(Agent,List),
@@ -86,7 +90,7 @@ explorer_idea(Agent,attack(Dir)) :-
 	get_near(Agent,List),
 	list_object_dir_near(List,monster(_),Dir).
 
-explorer_idea(Agent,sit) :-
+explorer_idea(Agent,look) :-
         req(memory(Agent,directions(Old))),
 	del(memory(Agent,directions(Old))),
 	random_permutation(Old,New),

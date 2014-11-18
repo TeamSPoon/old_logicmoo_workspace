@@ -61,14 +61,14 @@ moo:update_charge(Agent,climb) :-
 	add(charge(Agent,New)).
 
 moo:update_stats(Agent,trip) :- 
-        del(damage(Agent,Old)),
+        del(health(Agent,Old)),
 	New is Old - 3,
-	add(damage(Agent,New)).
+	add(health(Agent,New)).
 
 moo:update_stats(Agent,pulled) :- 
-        del(damage(Agent,Old)),
+        del(health(Agent,Old)),
 	New is Old - 2,
-	add(damage(Agent,New)),
+	add(health(Agent,New)),
 	(add_cmdfailure(Agent,pulled)).
 
 
