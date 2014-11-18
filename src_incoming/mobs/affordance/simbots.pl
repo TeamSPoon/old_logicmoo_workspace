@@ -13,6 +13,21 @@
 % See the the seemingly white (not dirrectly usable) in some usefull way
 moo:defined_affordance([objType= "Passable",actionVerb= "TravelThru"]).
 
+
+moo:defined_affordance([objType= "Television",
+stringMatch= "TV",
+actionVerb= "Observe",
+textName= "Watch TV",
+maximumDistance= 4,
+'Social'= 3 * -2, % this form means the AI player thinks observing a TV will satisfy their social needs by 3% .. yet instead, it reduces by 2%
+'Hunger'= 1 * -1, 
+'Bladder'= 0 * 0,
+'Hygiene'= 0 * 0,
+'Room'= 1 * 0,
+'Fun'= 2 * 1,
+'GenerallySadToHappy'= 2 * 1,
+'Energy'= 1 * -1]).
+
 moo:defined_affordance([objType= "Door",
 stringMatch= " * doorway",
 stringMatch= "gate",
@@ -145,20 +160,6 @@ slSit= true,
 slAnim= anim_SMOKE_IDLE,
 'Comfort'= 20 * 20,
 'Energy'= 10 * 20]).
-
-moo:defined_affordance([objType= "Television",
-stringMatch= "TV",
-actionVerb= "Observe",
-textName= "Watch TV",
-maximumDistance= 4,
-'Hunger'= 1 * -1,
-'Bladder'= 0 * 0,
-'Hygiene'= 0 * 0,
-'Room'= 1 * 0,
-'Social'= 2 * -1,
-'Fun'= 2 * 1,
-'GenerallySadToHappy'= 2 * 1,
-'Energy'= 1 * -1]).
 
 moo:defined_affordance([objType= "Radio",
 actionVerb= "Observe",
