@@ -42,6 +42,7 @@ moo:defined_affordance([objType= "Ladder",
 stringMatch= "ladder",
 superType= "Passable"]).
 
+% looks like a very bad idea but not (this is mainly for testing the system)
 moo:defined_affordance([objType= furnature,actionVerb= "BumpIntoBarrier",
 'Social'= -300 * 0,
 'Hygiene'= -300 * 0,
@@ -52,16 +53,16 @@ moo:defined_affordance([objType= furnature,actionVerb= "BumpIntoBarrier",
 % yet every minute you are alive, god wishes to punish you
 moo:defined_affordance([objType= self,actionVerb= "LiveAtLeastAMinute",
    maximumDistance= 2000,
-   'Energy'= 100 * -1,
-   'UnBored'= 100 * -100,
-   'Hunger'= 100 * -1,
-   'Bladder'= 100 * -1,
-   'Hygiene'= 100 * 0,
-   'Room'= 100 * -1,
-   'Social'= 100 * -1,
-   'Fun'= 100 * -1,
-   'GenerallySadToHappy'= 100 * -1,
-   'Comfort'= 100 * -1 ]).
+   'Energy'= 0 * -1,
+   'UnBored'= 0 * -0,
+   'Hunger'= 0 * -1,
+   'Bladder'= 0 * -1,
+   'Hygiene'= 0 * -1,
+   'Room'= 0 * -1,
+   'Social'= 0 * -1,
+   'Fun'= 0 * -1,
+   'GenerallySadToHappy'= 0 * -1,
+   'Comfort'= 0 * -1 ]).
 
 moo:defined_affordance([objType= "Shower",
 actionVerb= "Clean_Body_Using",
