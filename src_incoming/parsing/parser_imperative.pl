@@ -115,7 +115,7 @@ objects_match_for_agent(Agent,Text,Match,ObjList):- objects_for_agent(Agent,or([
 
 text_means(Agent,Text,Agent):- equals_icase(Text,"self"),!.
 text_means(Agent,Text,Loc):- equals_icase(Text,"here"),where_atloc(Agent,Loc).
-text_means(Agent,Text,Loc):- equals_icase(Text,"region"),where_atloc(Agent,Loc).
+text_means(Agent,Text,Region):- equals_icase(Text,"region"),where_atloc(Agent,Loc),locationToRegion(Loc,Region).
 text_means(_Agent,_Text,_Value):-fail.
 
 relates(Agent,Relation,Obj):-loop_check(relates_lc(Agent,Relation,Obj),fail).
@@ -192,14 +192,16 @@ object_print_details(Print,Agent,O,DescSpecs,Skipped):-
        forall(isa(O,S),object_print_details(Print,Agent,S,DescSpecs,[O|Skipped])))))).
 
 
-match_object(String,Obj):-non_empty(String),non_empty(Obj), isaOrSame(Obj,String).
+match_object(String,Obj):-must((non_empty(String),non_empty(Obj))),atom_string(Type,String),isaOrSame(Obj,Type).
 match_object(S,Obj):- 
    current_agent_or_var(P),
    must((once((object_string(P,Obj,0-5,String))),nonvar(String),
    non_empty(String))),!,
-   string_ci(String,LString),!,
-   atoms_of(S,Atoms),
-   str_contains_all(Atoms,LString).
+   string_ci(String,LString),
+   atoms_of(S,Atoms),must(Atoms\=[]),
+   to_word_list(LString,WList),!,
+   trace,
+   forall(member(A,Atoms),member_ci(A,WList)).
 
 
 dmsg_parserm(D):-dmsg(D),!.
@@ -419,6 +421,11 @@ parseIsa(optional(Type, _), Term, C, D) :- nonvar(Type),parseIsa(Type, Term, C, 
 parseIsa(optional(_Type,Default), DefaultV, D, D):- !,to_arg_value(Default,DefaultV).
 parseIsa(optionalStr(Str),Str) --> [Atom],{equals_icase(Atom,Str)}.
 parseIsa(optionalStr(Str),missing(Str)) --> {!},[].
+
+%  parser_imperative:real_parseForTypes([optional(and([obj, not(region)]),'NpcCol1000-Geordi684'),optionalStr("to"),optional(region, random(region))], [food], GOODARGS,[]).
+%  parser_imperative:real_parseForTypes([optional(and([obj, not(region)]),'NpcCol1000-Geordi684'),optionalStr("to"),optional(region, random(region))], [food,to,'Turbolift'], GOODARGS,[]).
+%  parser_imperative:real_parseForTypes([region], ['Turbolift'], GOODARGS,[]).
+
 
 parseIsa(string,String)--> theString(String).
 parseIsa(or([L|_]),Term) --> parseIsa(L,Term).

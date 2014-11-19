@@ -481,7 +481,7 @@ as_nc_str([A0,'\'',B0],AS):-as_nc_str([A0,B0],AS).
 as_nc_str([A0,Ommitable,B0],AS):- once(ommitable(Ommitable)), as_nc_str([A0,B0],AS).
 as_nc_str([Ommitable,B0],AS):- once(ommitable(Ommitable)), as_nc_str([B0],AS).
 as_nc_str([A0,B0],AS):-atom_concat(A0,B0,AO),as_nc_str(AO,AS).
-as_nc_str(A0,AS):-any_to_string(A0,AS).
+as_nc_str(A0,ASL):-any_to_string(A0,AS),string_lower(AS,ASL).
 % as_nc_str(A0,A0).
 
 ommitable(O):-empty_string(O).
