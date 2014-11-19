@@ -125,7 +125,7 @@ textName= "Dry The Clothes",
 actionVerb= "Clean"]).
 
 moo:defined_affordance([objType= "Bed",
-actionVerb= "Sleep_using",
+actionVerb= "Sleep",
 textSitName= "Sleep a few",
 slSit= true,
 slAnim= anim_SLEEP,
@@ -133,7 +133,7 @@ slAnim= anim_SLEEP,
 'Energy'= 100 * 80]).
 
 moo:defined_affordance([objType= "Mattress",
-actionVerb= "Sleep_using",
+actionVerb= "Sleep",
 textSitName= "Sleep a few",
 slSit= true,
 slAnim= anim_SLEEP,
@@ -144,7 +144,7 @@ moo:defined_affordance([objType= "Chair",
 stringMatch= " * chair",
 stringMatch= " * stool",
 stringMatch= " * recliner",
-actionVerb= "sit_using",
+actionVerb= "sit",
 textSitName= "Sit down",
 slSit= true,
 slAnim= anim_SMOKE_IDLE,
@@ -155,7 +155,7 @@ moo:defined_affordance([objType= "Couch",
 stringMatch= "Sofa",
 stringMatch= " * luvseat * ",
 stringMatch= " * loveseat * ",
-actionVerb= "sit_using",
+actionVerb= "sit",
 textSitName= "Sit down",
 slSit= true,
 slAnim= anim_SMOKE_IDLE,
@@ -353,7 +353,7 @@ slGrab= true,
 'Fun'= 1 * 1,
 'Secure_Room'= 1 * 1]).
 
-moo:defined_affordance([objType= sittable,actionVerb= "Sit_using",
+moo:defined_affordance([objType= sittable,actionVerb= "Sit",
 textName= "Sit on",
 slSit= true,
 slAnim= anim_SIT,
@@ -378,7 +378,7 @@ moo:defined_affordance([objType= takeable,actionVerb= "Take",
 textName= "Take it",
 'AcceptsParent'= "Avatar"]).
 
-moo:defined_affordance([objType= layable,actionVerb= "Sleep_using",
+moo:defined_affordance([objType= layable,actionVerb= "Sleep",
    textName= "Lay on",
    slSit= true,
    slAnim= anim_SLEEP,
@@ -398,9 +398,9 @@ moo:defined_affordance([alsoType= visible,actionVerb= "Observe",
    'Fun'= 2 * 1,
    'Energy'= 0 * -1]).
 
-moo:defined_affordance([objType= sittable,actionVerb= "Excersize_using",
+moo:defined_affordance([objType= sittable,actionVerb= "Excersize",
 textName= "Excersize",
-slAnim= anim_usingETWO_PUNCH,
+slAnim= animETWO_PUNCH,
 'Fun'= 10 * 10,
 'Hygiene'= -10 * -10]).
 
@@ -544,10 +544,10 @@ verb_for_type(operate, washing_machine).
 verb_for_type(clean, washing_machine).
 verb_for_type(operate, clothes_dryer).
 verb_for_type(clean, clothes_dryer).
-verb_for_type(sleep_using, bed).
-verb_for_type(sleep_using, mattress).
-verb_for_type(sit_using, chair).
-verb_for_type(sit_using, couch).
+verb_for_type(sleep, bed).
+verb_for_type(sleep, mattress).
+verb_for_type(sit, chair).
+verb_for_type(sit, couch).
 verb_for_type(observe, radio).
 verb_for_type(observe, mirror).
 verb_for_type(potty, toilet).
@@ -577,14 +577,14 @@ verb_for_type(argue, agent).
 verb_for_type(attack, agent).
 verb_for_type(kiss, agent).
 verb_for_type(touch, touchable).
-verb_for_type(sit_using, sittable).
+verb_for_type(sit, sittable).
 verb_for_type(put_x_on, hassurface).
 verb_for_type(eat, consumable).
 verb_for_type(take, takeable).
-verb_for_type(sleep_using, layable).
+verb_for_type(sleep, layable).
 verb_for_type(clean, visible).
 verb_for_type(observe, visible).
-verb_for_type(excersize_using, sittable).
+verb_for_type(excersize, sittable).
 verb_for_type(tickle, agent).
 verb_for_type(search, container).
 verb_for_type(think_about, visible).

@@ -13,8 +13,7 @@
                    parse_agent_text_command/5,            
                    parse_agent_text_command_0/5,            
                    parseIsa//2,
-                   parseIsa0//2,
-                   parseForIsa//2,
+                   real_parseForTypes//2,
                    objects_match/3,
                    match_object/2,
                    object_string/2,
@@ -343,30 +342,23 @@ moo:term_specifier_text(Text,Subclass):-
    same_arg(text,TextVar,Text))). % dmsg(todo(term_specifier_text(Text,Subclass))),transitive_subclass(Subclass,spatialthing).
 
 phrase_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver):- once(to_word_list(ARGS,ARGSL)),ARGS \=@= ARGSL,!,phrase_parseForTypes(TYPEARGS,ARGSL,GOODARGS,LeftOver).
-phrase_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver):- catchv(phrase_parseForTypes_real(TYPEARGS,ARGS,GOODARGS,LeftOver),_,fail),!.    
+phrase_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver):- catchv(real_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver),_,fail),!.    
 phrase_parseForTypes(TYPEARGS,In,Out,[]):- length(TYPEARGS,L),between(1,4,L),length(In,L),must(Out=In),!,dmsg(fake_phrase_parseForTypes_l(foreach_isa(In,TYPEARGS))).
-phrase_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver):- debugOnError(phrase_parseForTypes_real(TYPEARGS,ARGS,GOODARGS,LeftOver)).    
+phrase_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver):- debugOnError(real_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver)).    
 
-phrase_parseForTypes_real(TYPEARGS,ARGS,GOODARGS,LeftOver):- (LeftOver=[];LeftOver=[_|_] ), phrase(parseForTypes(TYPEARGS,GOODARGS),ARGS,LeftOver).
+real_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver):-mmake, (LeftOver=[];LeftOver=[_|_] ), parseForTypes(TYPEARGS,GOODARGS,ARGS,LeftOver).
 
 parseForTypes([], [], A, A).
 parseForTypes([TYPE|TYPES], [B|E], C, G) :-
-        parseIsa(TYPE, B, C, F),
+        parseIsa_Call(TYPE, B, C, F),
         parseForTypes(TYPES, E, F, G).
 
+
+parseIsa_Call(FT, BO, CIn, D):- to_word_list(CIn,C), list_tail(C,D),parseIsa(FT, B, C, D),to_arg_value(B,BO).
+
+
 % this parseIsa(T)-->parseIsa(T,_).
-parseIsa(A, B, C) :-
-        parseIsa(A, _, B, C).
-
-% this parseIsa(not(T),Term) --> dcgAnd(dcgNot(parseIsa(T)),theText(Term)).
-parseIsa(_T, _, [AT|_], _):- var(AT),!,fail.
-
-parseIsa(FT, B, C, D):- var(FT),trace_or_throw(var_parseIsa(FT, B, C, D)).
-
-parseIsa(FT, B, C, D):- to_word_list(C,O),O\=C,!,parseIsa(FT, B, O, D).
-parseIsa(FT, B, C, D):-  dbase:call_tabled(parseIsa0(FT, B, C, D)).
-
-parseIsa0(FT, BO, C, D):- list_tail(C,D),parseForIsa(FT, B, C, D),to_arg_value(B,BO).
+parseIsa(A, B, C) :- parseIsa(A, _, B, C).
 
 is_parsable_type(T):-formattype(T).
 is_parsable_type(T):-type(T).
@@ -386,44 +378,10 @@ test(food_is_a_droppable, [ true(
 
 %:- end_tests(test_bad_verb).
 
-
-% parseForIsa(Var, _B, _C, _D):-var(Var),!,fail. % trace_or_throw(var_parseForIsa(Var, B, C, D)).
-parseForIsa(Var, B, C, D):-var(Var),!,trace_or_throw(var_parseForIsa(Var, B, C, D)).
-parseForIsa(actor,A,B,C) :-!, parseForIsa(agent,A,B,C).
-
-parseForIsa(I,O) --> parseForOptional(I,O).
-
-
-parseForIsa(not(Type), Term, C, D) :-  dcgAnd(dcgNot(parseIsa(Type)), theText(Term), C, D).
-parseForIsa(FT, B, C, D):-to_word_list(C,O),O\=C,!,parseForIsa(FT, B, O, D).
-
-parseForIsa(FT, B, [AT|C], D) :- nonvar(AT),member_ci(AT,["at","the","a","an"]),!,parseForIsa(FT, B, C, D).
-%parseForIsa(FT, B, C, D) :- query_trans_sub(FT,Sub), parseFmtOrIsa(Sub, B, C, D),!.
-%parseForIsa(FT, B, C, D) :- query_trans_sub(Sub,FT), parseFmtOrIsa(Sub, B, C, D),!.
-parseForIsa(FT, B, C, D) :- parseFmtOrIsa(FT, B, C, D),!.
-
-%query_trans_sub(Sub,Super):-query_trans_subft(Sub,Super).
-%query_trans_sub(Sub,Super):-transitive_subclass(Sub,Super).
-
 query_trans_subft(FT,Sub):-moo:subft(FT,Sub).
 query_trans_subft(FT,Sub):-moo:subft(FT,A),moo:subft(A,Sub).
 query_trans_subft(FT,Sub):-moo:subft(FT,A),moo:subft(A,B),moo:subft(B,Sub).
 
-/*
-
-some tests
-
- phrase_parseForTypes([optional(agent, random(agent))], ['Crush'], A, B).
-
-  phrase_parseForTypes([optional(agent, random(agent))], ['Crush'], A, B).
-*/
-
-
-parseFmtOrIsa(Var, _B, _C, _D):-var(Var),!,fail. % trace_or_throw(var_parseForIsa(Var, B, C, D)).
-% parseFmtOrIsa(Var, B, C, D):-var(Var),!,trace_or_throw(var_parseForIsa(Var, B, C, D)).
-parseFmtOrIsa(Sub, B, C, D):- parseFmt(Sub, B, C, D).
-
-parseFmtOrIsa(vp,Goal,Left,Right):-!,one_must(parseFmt_vp1(self,Goal,Left,Right),parseFmt_vp2(self,Goal,Left,Right)).
 
 parseFmt_vp1(Agent, do(NewAgent,Goal),[SVERB|ARGS],[]):- parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,Goal),!.
 parseFmt_vp2(Agent,GOAL,[SVERB|ARGS],UNPARSED):- parse_vp_real(Agent,SVERB,ARGS,TRANSLATIONS),!,member(UNPARSED-GOAL,TRANSLATIONS).
@@ -432,40 +390,62 @@ to_arg_value(random(Type),Term):- nonvar(Type),!, random_instance(Type,Term,true
 to_arg_value(call(Call),TermO):-nonvar(Call),subst(Call,value,Term,NewCall),!,must(req(NewCall)),to_arg_value(Term,TermO).
 to_arg_value(Term,Term).
 
-parseForOptional(call(Call),TermV) --> {subst(Call,value,TermV,NewCall)},[TermT], {trace,req(NewCall),match_object(TermT,TermV)}.
-parseForOptional(optional(_,Term),TermV) --> {to_arg_value(Term,TermV)}, [TermT], {samef(TermV,TermT)}.
-parseForOptional(optional(Type, _), Term, C, D) :- nonvar(Type),parseForIsa(Type, Term, C, D).
-parseForOptional(optional(_Type,Default), DefaultV, D, D):- to_arg_value(Default,DefaultV).
-parseForOptional(optionalStr(Str),Str) --> [Atom],{samef(Atom,Str),!}.
-parseForOptional(optionalStr(Str),Str) --> [].
+/*
+
+some tests
+
+ phrase_parseForTypes([optional(agent, random(agent))], ['Crush'], A, B).
+
+  phrase_parseForTypes([optional(agent, random(agent))], ['Crush'], A, B).
+
+ parser_imperative:real_parseForTypes([optional(and([obj, not(region)]), 'NpcCol1000-Geordi684'), optionalStr("to"), optional(region, random(region))], [food, 'Turb'], GOODARGS,[]).
+
+*/
+
+parseIsa(_T, _, [AT|_], _):- var(AT),!,fail.
+parseIsa(FT, B, C, D):- var(FT),trace_or_throw(var_parseIsa(FT, B, C, D)).
+parseIsa(actor,A,B,C) :-!, parseIsa(agent,A,B,C).
+
+% this parseIsa(not(T),Term) --> dcgAnd(dcgNot(parseIsa(T)),theText(Term)).
+parseIsa(not(Type), Term, C, D) :-  dcgAnd(dcgNot(parseIsa(Type)), theText(Term), C, D).
+
+parseIsa(FT, B, [AT|C], D) :- nonvar(AT),member_ci(AT,["at","the","a","an"]),parseIsa(FT, B, C, D).
+
+parseIsa(vp,Goal,Left,Right):-!,one_must(parseFmt_vp1(self,Goal,Left,Right),parseFmt_vp2(self,Goal,Left,Right)).
+
+parseIsa(call(Call),TermV) --> {subst(Call,value,TermV,NewCall)},[TermT], {trace,req(NewCall),match_object(TermT,TermV)}.
+parseIsa(optional(_,Term),TermV) --> {to_arg_value(Term,TermV)}, [TermT], {samef(TermV,TermT)}.
+parseIsa(optional(Type, _), Term, C, D) :- nonvar(Type),parseIsa(Type, Term, C, D).
+parseIsa(optional(_Type,Default), DefaultV, D, D):- !,to_arg_value(Default,DefaultV).
+parseIsa(optionalStr(Str),Str) --> [Atom],{equals_icase(Atom,Str)}.
+parseIsa(optionalStr(Str),missing(Str)) --> {!},[].
+
+parseIsa(string,String)--> theString(String).
+parseIsa(or([L|_]),Term) --> parseIsa(L,Term).
+parseIsa(or([_|List]),Term) --> {!},parseIsa(or(List),Term).
 
 
-parseFmt(_, _, [AT|_], _):- var(AT),!,fail.
-parseFmt(string,String)--> theString(String).
-parseFmt(or([L|_]),Term) --> parseForIsa(L,Term).
-parseFmt(or([_|List]),Term) --> parseForIsa(or(List),Term).
+parseIsa(list(Type),[Term|List]) --> parseIsa(Type,Term),parseIsa(list(Type),List).
+parseIsa(list(_Type),[]) --> {!},[].
 
+parseIsa(countBetween(_Type,_,High),[]) --> {High==0,!}, [].
+parseIsa(countBetween(Type,Low,High),[Term|List]) --> parseIsa(Type,Term),{!,Low2 is Low -1,High2 is High -1 },
+   parseIsa(countBetween(Type,Low2,High2),List).
+parseIsa(countBetween(_Type,Low,_),[]) --> {!, Low < 1}, [].
 
-parseFmt(I,O) --> parseForOptional(I,O).
+% parseIsa(and([L|List]),Term1) --> dcgAnd(parseIsa(L,Term1),parseIsa(and(List),Term2)),{ignore(Term1==Term2),!}.
+parseIsa(and([L|List]),Term) --> dcgAnd(parseIsa(L,Term),parseIsa(and(List),Term)).
+parseIsa(and([L]),Term1) --> {!},parseIsa(L,Term1).
 
-parseFmt(list(Type),[Term|List]) --> parseForIsa(Type,Term),parseFmt(list(Type),List).
-parseFmt(list(_Type),[]) --> [].
+parseIsa(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{specifiedItemType(String,Type,Term)}.
 
-parseFmt(countBetween(_Type,_,High),[]) --> {High==0,!}, [].
-parseFmt(countBetween(Type,Low,High),[Term|List]) --> parseForIsa(Type,Term),{!,Low2 is Low -1,High2 is High -1 },
-   parseForIsa(countBetween(Type,Low2,High2),List).
-parseFmt(countBetween(_Type,Low,_),[]) --> {!, Low < 1}, [].
-
-parseFmt(and([L|List]),Term1) --> dcgAnd(parseForIsa(L,Term1),parseForIsa(and(List),Term2)),{ignore(Term1==Term2),!}.
-parseFmt(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{specifiedItemType(String,Type,Term)}.
-
-specifiedItemType([String],Type,StringO):-nonvar(String),!,specifiedItemType(String,Type,StringO).
-specifiedItemType(String,not(Type),StringO):-nonvar(Type),!,not(specifiedItemType(String,Type,StringO)).
-specifiedItemType(A,T,AA):- nonvar(T), formattype(T),!, checkAnyType(assert(_),A,T,AAA),!,AA=AAA.
-specifiedItemType(String,Type,Inst) :- get_term_specifier_text(Inst,Type),equals_icase(Inst,String),!.
-specifiedItemType(String,Type,Inst):- instances_of_type(Inst,Type),match_object(String,Inst),!.
+specifiedItemType(String,Type,Inst):-(var(String);var(Type)),trace_or_throw(var_specifiedItemType(String,Type,Inst)).
+specifiedItemType([String],Type,Inst):-!,specifiedItemType(String,Type,Inst).
+specifiedItemType(String,not(Type),Inst):-!,not(specifiedItemType(String,Type,Inst)).
+specifiedItemType(String,Type,Inst):- type(Type),not(formattype(Type)),instances_of_type(Inst,Type),match_object(String,Inst),!.
+specifiedItemType(String,Type,Inst):- get_term_specifier_text(Inst,Type),equals_icase(Inst,String),!.
+specifiedItemType(String,Type,Inst):- formattype(Type),checkAnyType(assert(parse),String,Type,AAA),Inst=AAA.
 specifiedItemType(String,Type,Longest) :- findall(Inst, (get_term_specifier_text(Inst,Type),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
-specifiedItemType(A,T,AA):- checkAnyType(assert(parse),A,T,AAA),AA=AAA.
 
 checkAnyType(Op,A,Type,AA):- var(A),correctAnyType(Op,A,Type,AA),must_det(var(AA)),must_det(A==AA),!.
 checkAnyType(Op,A,Type,AA):- correctAnyType(Op,A,Type,AA),nonvar(AA),!.
