@@ -200,7 +200,6 @@ match_object(S,Obj):-
    string_ci(String,LString),
    atoms_of(S,Atoms),must(Atoms\=[]),
    to_word_list(LString,WList),!,
-   trace,
    forall(member(A,Atoms),member_ci(A,WList)).
 
 
@@ -348,15 +347,15 @@ phrase_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver):- catchv(real_parseForType
 phrase_parseForTypes(TYPEARGS,In,Out,[]):- length(TYPEARGS,L),between(1,4,L),length(In,L),must(Out=In),!,dmsg(fake_phrase_parseForTypes_l(foreach_isa(In,TYPEARGS))).
 phrase_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver):- debugOnError(real_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver)).    
 
-real_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver):-mmake, (LeftOver=[];LeftOver=[_|_] ), parseForTypes(TYPEARGS,GOODARGS,ARGS,LeftOver).
+real_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver):-mmake, (LeftOver=[];LeftOver=[_|_] ), phrase(parseForTypes(TYPEARGS,GOODARGS),ARGS,LeftOver).
 
 parseForTypes([], [], A, A).
 parseForTypes([TYPE|TYPES], [B|E], C, G) :-
-        parseIsa_Call(TYPE, B, C, F),
-        parseForTypes(TYPES, E, F, G).
+        no_repeats(parseIsa_Call(TYPE, B, C, F)),
+        parseForTypes(TYPES, E, F, G),!.
 
 
-parseIsa_Call(FT, BO, CIn, D):- to_word_list(CIn,C), list_tail(C,D),parseIsa(FT, B, C, D),to_arg_value(B,BO).
+parseIsa_Call(FT, BO, CIn, D):- list_tail(CIn,D), to_word_list(CIn,C), parseIsa(FT, B, C, D),to_arg_value(B,BO).
 
 
 % this parseIsa(T)-->parseIsa(T,_).
@@ -400,7 +399,10 @@ some tests
 
   phrase_parseForTypes([optional(agent, random(agent))], ['Crush'], A, B).
 
- parser_imperative:real_parseForTypes([optional(and([obj, not(region)]), 'NpcCol1000-Geordi684'), optionalStr("to"), optional(region, random(region))], [food, 'Turb'], GOODARGS,[]).
+parser_imperative:real_parseForTypes([optional(and([obj, not(region)]), 'NpcCol1000-Geordi684'), optionalStr("to"), optional(region, random(region))], [food, 'Turbolift'], GOODARGS,[]).
+parser_imperative:real_parseForTypes([optional(and([obj, not(region)]), 'NpcCol1000-Geordi684')], [food], GOODARGS,[]).
+parser_imperative:real_parseForTypes([optional(region, random(region))], ['Turbolift'], GOODARGS,[]).
+
 
 */
 
@@ -449,7 +451,7 @@ parseIsa(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{specifiedItem
 specifiedItemType(String,Type,Inst):-(var(String);var(Type)),trace_or_throw(var_specifiedItemType(String,Type,Inst)).
 specifiedItemType([String],Type,Inst):-!,specifiedItemType(String,Type,Inst).
 specifiedItemType(String,not(Type),Inst):-!,not(specifiedItemType(String,Type,Inst)).
-specifiedItemType(String,Type,Inst):- type(Type),not(formattype(Type)),instances_of_type(Inst,Type),match_object(String,Inst),!.
+specifiedItemType(String,Type,Inst):- type(Type),not(formattype(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
 specifiedItemType(String,Type,Inst):- get_term_specifier_text(Inst,Type),equals_icase(Inst,String),!.
 specifiedItemType(String,Type,Inst):- formattype(Type),checkAnyType(assert(parse),String,Type,AAA),Inst=AAA.
 specifiedItemType(String,Type,Longest) :- findall(Inst, (get_term_specifier_text(Inst,Type),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.

@@ -148,12 +148,13 @@ cmdresult(statistics,true)
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
 :-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,who)).
 :-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,look)).
+:-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,prolog)).
 
 % :- kill_term_expansion.
 % :- slow_work.
 % :- prolog.
 % :- now_run_local_tests_dbg.
-:- prolog.
+% :- prolog.
 
 % :-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,chat80)).
 :- if_flag_true(was_run_dbg_pl, at_start(run)).
