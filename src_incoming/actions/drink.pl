@@ -19,7 +19,7 @@ moo:action_info(drink(drinkable),"Drink a Drinkable Item").
 % if it is, process it's worth, then destroy it
 moo:agent_call_command(Agent,drink(SObj)) :-
 	possess(Agent,Obj),
-        object_match(SObj,Obj),
+        match_object(SObj,Obj),
 	do_act_affect(Agent,drink,Obj),
 	del(possess(Agent,Obj)),
 	call_update_charge(Agent,eat).

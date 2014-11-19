@@ -29,7 +29,7 @@ moo:agent_text_command(Agent,[where,BE,X],Agent,where(X)):-memberchk(BE,[is,are,
 moo:action_info(where(obj),"Tells where something is").
 moo:agent_call_command(_Agent,where(SObj)) :-
     forall(
-     (atloc(Obj,LOC), object_match(SObj,Obj)),
+     (atloc(Obj,LOC), match_object(SObj,Obj)),
         fmt(cmdresult(where,atloc(Obj,LOC)))).
 
 

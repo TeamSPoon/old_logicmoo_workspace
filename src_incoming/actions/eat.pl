@@ -30,7 +30,7 @@ moo:action_info(eat(eatable),"nourish oneself").
 % if it is, process it's worth, then destroy it
 moo:agent_call_command(Agent,eat(SObj)) :-
 	possess(Agent,Obj),
-        object_match(SObj,Obj),
+        match_object(SObj,Obj),
 	do_act_affect(Agent,eat,Obj),
 	del(possess(Agent,Obj)),
 	call_update_charge(Agent,eat).

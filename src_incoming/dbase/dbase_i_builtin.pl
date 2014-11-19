@@ -193,8 +193,8 @@ resultIsa(apath,areaPath).
 
 
 subclass(areaPath,door).
-subclass(door,furnature).
-subclass(furnature,partof).
+subclass(door,furniture).
+subclass(furniture,partof).
 
 % subclass(dir,value).
 

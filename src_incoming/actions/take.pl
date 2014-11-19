@@ -25,7 +25,7 @@ moo:agent_call_command(Agent,take(SObj)) :-
                        localityOfObject(Obj,LOC),nonvar(Obj),
                        not(possess(Agent,Obj)),
 
-                       object_match(SObj,Obj)))),
+                       match_object(SObj,Obj)))),
 	nop((ignore(props(Obj,weight<2)),
 	ignore(do_act_affect(Agent,take,Obj)))),
 	permanence_take(take,Agent,Obj),

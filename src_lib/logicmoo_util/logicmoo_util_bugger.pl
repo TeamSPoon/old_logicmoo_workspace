@@ -238,7 +238,6 @@ loop_check_term(B,BC,TODO):-  ( \+(tlbugger:inside_loop_check(BC)) -> setup_call
 % Bugger Term Expansions
 % ===================================================================
 
-hide_all_debug:-isDebugOption(opt_debug=off),!
 hide_all_debug:-bugger_flag(opt_debug=off),!.
 hide_all_debug:-bugger_flag(opt_debug=false),!.
 
@@ -1718,7 +1717,7 @@ with_output_to_stream(Stream,Goal):-
 :-meta_predicate_transparent(time_call(:)).
 time_call(Call):-
   statistics(runtime,[MSecStart,_]),   
-  ignore(show_call(Call)),
+  ignore(show_call_failure(Call)),
   statistics(runtime,[MSecEnd,_]),
    MSec is (MSecEnd-MSecStart),
    Time is MSec/1000,

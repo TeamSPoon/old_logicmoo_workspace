@@ -170,11 +170,11 @@ openSubClass(region).
 
 reallyCheckArgViolation(Prop,N,_Obj,_OType,argIsaFn(Prop,N)):-!.
 reallyCheckArgViolation(_,_,_,List,Type):-memberchk(Type,List),!.
-reallyCheckArgViolation(_Prop,_N,_Obj,[OType|_],OpenSubClass):- openSubClass(OpenSubClass), atom(OType),show_call(assert_subclass_safe(OType,OpenSubClass)),!.
+reallyCheckArgViolation(_Prop,_N,_Obj,[OType|_],OpenSubClass):- openSubClass(OpenSubClass), atom(OType),show_call_failure(assert_subclass_safe(OType,OpenSubClass)),!.
 reallyCheckArgViolation(Prop,N,Obj,OType,Type):- violatesType(Obj,Type),trace_or_throw(violatesType_maybe_cache(Prop,N,Obj,OType\=Type)).
 reallyCheckArgViolation(_,_,_,_,_).
 
-assert_argIsa(Prop,N,Type):-show_call(add(argIsa(Prop,N,Type))).
+assert_argIsa(Prop,N,Type):-show_call_failure(add(argIsa(Prop,N,Type))).
 
 assert_subclass_on_argIsa(Prop,N,argIsaFn(Prop,N)):-!.
 assert_subclass_on_argIsa(Prop,N,_OType):-argIsa_call(Prop,N,PropType),PropType=argIsaFn(Prop,N),!. % , assert_argIsa(Prop,N,OType).

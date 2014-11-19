@@ -42,7 +42,7 @@ stringMatch= "ladder",
 superType= "Passable"]).
 
 % looks like a very bad idea but not (this is mainly for testing the system)
-moo:defined_affordance([objType= furnature,actionVerb= "BumpIntoBarrier",
+moo:defined_affordance([objType= furniture,actionVerb= "BumpIntoBarrier",
 'NonLoneliness_Social'= -300 * 0,
 'Hygiene'= -300 * 0,
 'Comfort'= -300 * 0,
@@ -487,7 +487,7 @@ moo:agent_call_command(Agent,textcmd(A,B)):-sformat(CMD,'~w ~w',[A,B]),!,do_play
 moo:agent_call_command(Agent,textcmd(A,B,C)):-sformat(CMD,'~w ~w ~w',[A,B,C]),!,do_player_action(Agent,CMD).
 
 
-:-forall(moo:defined_affordance(Attrs),show_call(do_define_affordance(Attrs))).
+:-forall(moo:defined_affordance(Attrs),must(do_define_affordance(Attrs))).
 :-listing(verb_desc).
 :-listing(verb_affordance).
 :-listing(verb_for_type).
@@ -504,20 +504,21 @@ subclass(mattress,layable).
 subclass(layable,sittable).
 subclass(bed,mattress).
 subclass(crib,layable).
-verb_alias(observe,use).
-verb_alias(operate,use).
-verb_alias(bath_using,use).
-subclass(clothes_dryer,furnature).
-subclass(washing_machine,furnature).
-subclass(shower,furnature).
-subclass(sittable,furnature).
-subclass(chair,furnature).
-subclass(bed,furnature).
-subclass(sink,furnature).
-subclass(toilet,furnature).
-subclass(bathtub,furnature).
-subclass(furnature,useable).
-subclass(furnature,obj).
+
+subclass(clothes_dryer,furniture).
+subclass(washing_machine,furniture).
+subclass(shower,furniture).
+subclass(sittable,furniture).
+subclass(chair,furniture).
+subclass(bed,furniture).
+subclass(sink,furniture).
+subclass(toilet,furniture).
+subclass(bathtub,furniture).
+subclass(furniture,useable).
+subclass(furniture,obj).
+
+moo:verb_alias(observe,use).
+moo:verb_alias(operate,use).
 
 /*
 
@@ -526,70 +527,67 @@ Yields
 
 
 
+:- dynamic verb_for_type/2.
 
-verb_for_type(argue, agent).
-verb_for_type(attack, agent).
-verb_for_type(bath_using, bath).
-verb_for_type(bath_using, shower).
-verb_for_type(bath_using, sink).
-verb_for_type(bumpintobarrier, furnature).
-verb_for_type(clean, bath).
-verb_for_type(clean, clothes_dryer).
-verb_for_type(clean, shower).
-verb_for_type(clean, sink).
-verb_for_type(clean, toilet).
-verb_for_type(clean, visible).
-verb_for_type(clean, washing_machine).
-verb_for_type(dance, danceball).
-verb_for_type(eat, consumable).
-verb_for_type(eat, eatable).
-verb_for_type(excersize_using, sittable).
-verb_for_type(excersize_using, treadmill).
-verb_for_type(kiss, agent).
-verb_for_type(liveatleastaminute, self).
-
-verb_for_type(observe, art).
-verb_for_type(observe, mirror).
-verb_for_type(observe, radio).
-verb_for_type(observe, readable).
+verb_for_type(travelthru, passable).
 verb_for_type(observe, television).
-verb_for_type(observe, visible).
-
-verb_for_type(operate, clothes_dryer).
-verb_for_type(operate, microwave).
-verb_for_type(operate, stove).
+verb_for_type(bumpintobarrier, furniture).
+verb_for_type(liveatleastaminute, self).
+verb_for_type(operate, shower).
+verb_for_type(clean, shower).
+verb_for_type(operate, bathtub).
+verb_for_type(clean, bathtub).
+verb_for_type(operate, sink).
+verb_for_type(clean, sink).
+verb_for_type(dance, danceball).
 verb_for_type(operate, washing_machine).
-
-verb_for_type(play_using, agent).
-verb_for_type(play_using, computer).
-verb_for_type(play_using, dance).
-verb_for_type(play_using, pooltable).
-
-verb_for_type(potty, toilet).
-verb_for_type(put_x_in, container).
-verb_for_type(put_x_in, trash_container).
-verb_for_type(put_x_on, bookcase).
-verb_for_type(put_x_on, counter).
-verb_for_type(put_x_on, desk).
-verb_for_type(put_x_on, hassurface).
-verb_for_type(put_x_on, shelf).
-verb_for_type(put_x_on, table).
-verb_for_type(search, container).
-verb_for_type(search, refrigerator).
-verb_for_type(sit_using, chair).
-verb_for_type(sit_using, couch).
-verb_for_type(sit_using, sittable).
+verb_for_type(clean, washing_machine).
+verb_for_type(operate, clothes_dryer).
+verb_for_type(clean, clothes_dryer).
 verb_for_type(sleep_using, bed).
 verb_for_type(sleep_using, mattress).
-verb_for_type(sleep_using, sittable).
-verb_for_type(switch, fixedlamp).
-verb_for_type(take, eatable).
+verb_for_type(sit_using, chair).
+verb_for_type(sit_using, couch).
+verb_for_type(observe, radio).
+verb_for_type(observe, mirror).
+verb_for_type(potty, toilet).
+verb_for_type(clean, toilet).
+verb_for_type(search, fridge).
+verb_for_type(operate, stove).
+verb_for_type(operate, microwave).
+verb_for_type(operate, treadmill).
+verb_for_type(operate, fixedlamp).
+verb_for_type(operate, pooltable).
+verb_for_type(put_x_on, shelf).
+verb_for_type(put_x_on, desk).
+verb_for_type(put_x_on, counter).
+verb_for_type(put_x_in, container).
+verb_for_type(put_x_on, table).
+verb_for_type(put_x_in, trash_container).
+verb_for_type(put_x_on, bookcase).
+verb_for_type(observe, readable).
 verb_for_type(take, readable).
-verb_for_type(take, takeable).
+verb_for_type(eat, eatable).
+verb_for_type(take, eatable).
+verb_for_type(observe, art).
+verb_for_type(operate, dance_floor).
+verb_for_type(operate, computer).
 verb_for_type(talk, agent).
-verb_for_type(think_about, visible).
+verb_for_type(argue, agent).
+verb_for_type(attack, agent).
+verb_for_type(kiss, agent).
 verb_for_type(touch, touchable).
-verb_for_type(travelthru, passable).
+verb_for_type(sit_using, sittable).
+verb_for_type(put_x_on, hassurface).
+verb_for_type(eat, consumable).
+verb_for_type(take, takeable).
+verb_for_type(sleep_using, layable).
+verb_for_type(clean, visible).
+verb_for_type(observe, visible).
+verb_for_type(excersize_using, sittable).
+verb_for_type(tickle, agent).
+verb_for_type(search, container).
+verb_for_type(think_about, visible).
 
 
 

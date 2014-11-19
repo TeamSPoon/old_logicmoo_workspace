@@ -67,8 +67,8 @@ hook:call_agent_action(Agent,CMDI):-
       call(Wrapper, call_agent_action_lc(Agent,CMD)))).
 
 :-export(where_atloc/2).
-where_atloc(Agent,Where):-atloc(Agent,Where),!.
 where_atloc(Agent,Where):-localityOfObject(Agent,Where),!.
+where_atloc(Agent,Where):-atloc(Agent,Where),!.
 where_atloc(_Agent,'OffStage'):-!.
 
 call_agent_action_lc(Agent,CMD):-
@@ -119,6 +119,7 @@ detatch_player(P):- thlocal:session_agent(_,P),!,trace_or_throw(detatch_player(P
 detatch_player(_).
 
 :-export(become_player/1).
+become_player(NewName):- once(current_agent(Was)),Was=NewName,!.
 become_player(NewName):- get_session_id(O),retractall(thlocal:session_agent(O,_)),detatch_player(NewName),asserta(thlocal:session_agent(O,NewName)),ensure_player_stream_local(NewName).
 :-export(become_player/2).
 become_player(_Old,NewName):-become_player(NewName).

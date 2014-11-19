@@ -78,7 +78,7 @@ is_creatable_type(Type):- atom(Type),call(is_asserted(isa(Type,createableType)))
 
 hook:decl_database_hook(assert(_A_or_Z),isa(W,createableType)):-decl_type_safe(W),call_after_game_load(forall(isa(I,W),create_instance(I,W))).
 hook:decl_database_hook(assert(_A_or_Z),isa(W,type)):-atom(W),atomic_list_concat(List,'_',W),!,length(List,2),!,
-   append(FirstPart,[Last],List),atom_length(Last,AL),AL>3,not(member(flagged,FirstPart)),atomic_list_concat(FirstPart,'_',_NewCol),show_call(assert_subclass_safe(W,Last)).
+   append(FirstPart,[Last],List),atom_length(Last,AL),AL>3,not(member(flagged,FirstPart)),atomic_list_concat(FirstPart,'_',_NewCol),show_call_failure(assert_subclass_safe(W,Last)).
 
 % ================================================
 % assert_isa/2

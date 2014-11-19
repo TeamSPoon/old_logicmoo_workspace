@@ -16,7 +16,7 @@
                    parseIsa0//2,
                    parseForIsa//2,
                    objects_match/3,
-                   object_match/2,
+                   match_object/2,
                    object_string/2,
                    get_term_specifier_text/2,
                    parseForTypes//2)).
@@ -112,10 +112,11 @@ desc_len(S0,Region):- term_to_atom(S0,S),
 :-export(objects_match_for_agent/3).
 objects_match_for_agent(Agent,Text,ObjList):- objects_match_for_agent(Agent,Text,[possess(Agent,value),same(atloc),same(localityOfObject),agent,item,region],ObjList).  
 :-export(objects_match_for_agent/4).
-objects_match_for_agent(Agent,Text,Match,ObjList):- objects_for_agent(Agent,or([text_means(Agent,Text,value),and([or(Match),object_match(Text,value)])]),ObjList).  
+objects_match_for_agent(Agent,Text,Match,ObjList):- objects_for_agent(Agent,or([text_means(Agent,Text,value),and([or(Match),match_object(Text,value)])]),ObjList).  
 
 text_means(Agent,Text,Agent):- equals_icase(Text,"self"),!.
 text_means(Agent,Text,Loc):- equals_icase(Text,"here"),where_atloc(Agent,Loc).
+text_means(Agent,Text,Loc):- equals_icase(Text,"region"),where_atloc(Agent,Loc).
 text_means(_Agent,_Text,_Value):-fail.
 
 relates(Agent,Relation,Obj):-loop_check(relates_lc(Agent,Relation,Obj),fail).
@@ -147,7 +148,7 @@ objects_for_agent(Agent,and([Possible|Relations]),MatchList):-!,
 objects_for_agent(Agent,Relation,MatchList):- findall(Obj, relates(Agent,Relation,Obj), MatchListL),list_to_set(MatchListL,MatchList),!.
 
 
-objects_match(Text,Possibles,MatchList):- findall(Obj,(member(Obj,Possibles),object_match(Text,Obj)), MatchList).
+objects_match(Text,Possibles,MatchList):- findall(Obj,(member(Obj,Possibles),match_object(Text,Obj)), MatchList).
 
 
 object_string(O,String):-object_string(_,O,1-4,String),!.
@@ -192,8 +193,8 @@ object_print_details(Print,Agent,O,DescSpecs,Skipped):-
        forall(isa(O,S),object_print_details(Print,Agent,S,DescSpecs,[O|Skipped])))))).
 
 
-object_match(String,Obj):-non_empty(String),non_empty(Obj), isaOrSame(Obj,String).
-object_match(S,Obj):- 
+match_object(String,Obj):-non_empty(String),non_empty(Obj), isaOrSame(Obj,String).
+match_object(S,Obj):- 
    current_agent_or_var(P),
    must((once((object_string(P,Obj,0-5,String))),nonvar(String),
    non_empty(String))),!,
@@ -276,6 +277,8 @@ moo:verb_alias('where is','where').
 verb_alias_to_verb(IVERB,SVERB):- moo:verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.
 verb_alias_to_verb(IVERB,SVERB):-specifiedItemType(IVERB,verb,SVERB), IVERB \= SVERB.
 
+subst_parser_vars(Agent,TYPEARGS,TYPEARGS_R):- subst(TYPEARGS,self,Agent,S1),where_atloc(Agent,Here),subst(S1,here,Here,TYPEARGS_R).
+
 % verb_matches("go",VERB):-!,VERB=go.
 verb_matches(SVERB,VERB):-samef(VERB,SVERB).
 
@@ -294,13 +297,14 @@ get_vp_templates(_Agent,SVERB,_ARGS,TEMPLATES):-
 % parses a verb phrase and retuns multiple interps
 parse_vp_real(Agent,SVERB,ARGS,Sorted):-
    get_vp_templates(Agent,SVERB,ARGS,TEMPLATES),   
-   dmsg_parserm(("TEMPLATES"= ([SVERB|ARGS] = TEMPLATES))),
+   dmsg_parserm(("TEMPLATES"= (orig([SVERB|ARGS]) = TEMPLATES))),
    TEMPLATES \= [],
    findall(LeftOver-GOAL,
      (( 
       member([VERB|TYPEARGS],TEMPLATES),
-      dmsg_parserm(("parseForTypes"=phrase_parseForTypes(TYPEARGS,GOODARGS,ARGS,LeftOver))),
-      phrase_parseForTypes(TYPEARGS,GOODARGS,ARGS,LeftOver),
+      subst_parser_vars(Agent,TYPEARGS,TYPEARGS_R),
+      dmsg_parserm(("parseForTypes"=phrase_parseForTypes(TYPEARGS_R,ARGS,GOODARGS,LeftOver))),      
+      phrase_parseForTypes(TYPEARGS_R,ARGS,GOODARGS,LeftOver),
       GOAL=..[VERB|GOODARGS])),
       GOALANDLEFTOVERS_FA),
    sort(GOALANDLEFTOVERS_FA,GOALANDLEFTOVERS),
@@ -338,15 +342,12 @@ moo:term_specifier_text(Text,Subclass):-
    req(keyword(X,TextVar)),   
    same_arg(text,TextVar,Text))). % dmsg(todo(term_specifier_text(Text,Subclass))),transitive_subclass(Subclass,spatialthing).
 
-phrase_parseForTypes(TYPEARGS,GOODARGS,ARGS,LeftOver):-
-   to_word_list(ARGS,ARGSL),!,
-    phrase_parseForTypes_l(TYPEARGS,GOODARGS,ARGSL,LeftOver).
+phrase_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver):- once(to_word_list(ARGS,ARGSL)),ARGS \=@= ARGSL,!,phrase_parseForTypes(TYPEARGS,ARGSL,GOODARGS,LeftOver).
+phrase_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver):- catchv(phrase_parseForTypes_real(TYPEARGS,ARGS,GOODARGS,LeftOver),_,fail),!.    
+phrase_parseForTypes(TYPEARGS,In,Out,[]):- length(TYPEARGS,L),between(1,4,L),length(In,L),must(Out=In),!,dmsg(fake_phrase_parseForTypes_l(foreach_isa(In,TYPEARGS))).
+phrase_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver):- debugOnError(phrase_parseForTypes_real(TYPEARGS,ARGS,GOODARGS,LeftOver)).    
 
-phrase_parseForTypes_l(TYPEARGS,GOODARGS,ARGSL,LeftOver):-
-    catchv(phrase(parseForTypes(TYPEARGS,GOODARGS),ARGSL,LeftOver),_,fail),!.    
-phrase_parseForTypes_l(TypesIn,Out,In,[]):- length(TypesIn,L),between(1,4,L),length(In,L),must(Out=In),!,dmsg(fake_phrase_parseForTypes_l(foreach_isa(In,TypesIn))).
-phrase_parseForTypes_l(TYPEARGS,GOODARGS,ARGSL,LeftOver):-
-    debugOnError(phrase(parseForTypes(TYPEARGS,GOODARGS),ARGSL,LeftOver)).    
+phrase_parseForTypes_real(TYPEARGS,ARGS,GOODARGS,LeftOver):- (LeftOver=[];LeftOver=[_|_] ), phrase(parseForTypes(TYPEARGS,GOODARGS),ARGS,LeftOver).
 
 parseForTypes([], [], A, A).
 parseForTypes([TYPE|TYPES], [B|E], C, G) :-
@@ -365,7 +366,7 @@ parseIsa(FT, B, C, D):- var(FT),trace_or_throw(var_parseIsa(FT, B, C, D)).
 parseIsa(FT, B, C, D):- to_word_list(C,O),O\=C,!,parseIsa(FT, B, O, D).
 parseIsa(FT, B, C, D):-  dbase:call_tabled(parseIsa0(FT, B, C, D)).
 
-parseIsa0(FT, B, C, D):- list_tail(C,D),parseForIsa(FT, B, C, D).
+parseIsa0(FT, BO, C, D):- list_tail(C,D),parseForIsa(FT, B, C, D),to_arg_value(B,BO).
 
 is_parsable_type(T):-formattype(T).
 is_parsable_type(T):-type(T).
@@ -397,17 +398,25 @@ parseForIsa(not(Type), Term, C, D) :-  dcgAnd(dcgNot(parseIsa(Type)), theText(Te
 parseForIsa(FT, B, C, D):-to_word_list(C,O),O\=C,!,parseForIsa(FT, B, O, D).
 
 parseForIsa(FT, B, [AT|C], D) :- nonvar(AT),member_ci(AT,["at","the","a","an"]),!,parseForIsa(FT, B, C, D).
-parseForIsa(FT, B, C, D) :- query_trans_sub(FT,Sub), parseFmtOrIsa(Sub, B, C, D),!.
-parseForIsa(FT, B, C, D) :- query_trans_sub(Sub,FT), parseFmtOrIsa(Sub, B, C, D),!.
+%parseForIsa(FT, B, C, D) :- query_trans_sub(FT,Sub), parseFmtOrIsa(Sub, B, C, D),!.
+%parseForIsa(FT, B, C, D) :- query_trans_sub(Sub,FT), parseFmtOrIsa(Sub, B, C, D),!.
 parseForIsa(FT, B, C, D) :- parseFmtOrIsa(FT, B, C, D),!.
 
-query_trans_sub(Sub,Super):-query_trans_subft(Sub,Super).
-query_trans_sub(Sub,Super):-transitive_subclass(Sub,Super).
+%query_trans_sub(Sub,Super):-query_trans_subft(Sub,Super).
+%query_trans_sub(Sub,Super):-transitive_subclass(Sub,Super).
 
 query_trans_subft(FT,Sub):-moo:subft(FT,Sub).
 query_trans_subft(FT,Sub):-moo:subft(FT,A),moo:subft(A,Sub).
 query_trans_subft(FT,Sub):-moo:subft(FT,A),moo:subft(A,B),moo:subft(B,Sub).
 
+/*
+
+some tests
+
+ phrase_parseForTypes([optional(agent, random(agent))], ['Crush'], A, B).
+
+  phrase_parseForTypes([optional(agent, random(agent))], ['Crush'], A, B).
+*/
 
 
 parseFmtOrIsa(Var, _B, _C, _D):-var(Var),!,fail. % trace_or_throw(var_parseForIsa(Var, B, C, D)).
@@ -419,9 +428,11 @@ parseFmtOrIsa(vp,Goal,Left,Right):-!,one_must(parseFmt_vp1(self,Goal,Left,Right)
 parseFmt_vp1(Agent, do(NewAgent,Goal),[SVERB|ARGS],[]):- parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,Goal),!.
 parseFmt_vp2(Agent,GOAL,[SVERB|ARGS],UNPARSED):- parse_vp_real(Agent,SVERB,ARGS,TRANSLATIONS),!,member(UNPARSED-GOAL,TRANSLATIONS).
 
-to_arg_value(random(Type),Term):- nonvar(Type),!, random_instance(Type,Term,true),atom(Term).
+to_arg_value(random(Type),Term):- nonvar(Type),!, random_instance(Type,Term,true).
+to_arg_value(call(Call),TermO):-nonvar(Call),subst(Call,value,Term,NewCall),!,must(req(NewCall)),to_arg_value(Term,TermO).
 to_arg_value(Term,Term).
 
+parseForOptional(call(Call),TermV) --> {subst(Call,value,TermV,NewCall)},[TermT], {trace,req(NewCall),match_object(TermT,TermV)}.
 parseForOptional(optional(_,Term),TermV) --> {to_arg_value(Term,TermV)}, [TermT], {samef(TermV,TermT)}.
 parseForOptional(optional(Type, _), Term, C, D) :- nonvar(Type),parseForIsa(Type, Term, C, D).
 parseForOptional(optional(_Type,Default), DefaultV, D, D):- to_arg_value(Default,DefaultV).
@@ -452,7 +463,7 @@ specifiedItemType([String],Type,StringO):-nonvar(String),!,specifiedItemType(Str
 specifiedItemType(String,not(Type),StringO):-nonvar(Type),!,not(specifiedItemType(String,Type,StringO)).
 specifiedItemType(A,T,AA):- nonvar(T), formattype(T),!, checkAnyType(assert(_),A,T,AAA),!,AA=AAA.
 specifiedItemType(String,Type,Inst) :- get_term_specifier_text(Inst,Type),equals_icase(Inst,String),!.
-specifiedItemType(String,Type,Inst):- instances_of_type(Inst,Type),object_match(String,Inst),!.
+specifiedItemType(String,Type,Inst):- instances_of_type(Inst,Type),match_object(String,Inst),!.
 specifiedItemType(String,Type,Longest) :- findall(Inst, (get_term_specifier_text(Inst,Type),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
 specifiedItemType(A,T,AA):- checkAnyType(assert(parse),A,T,AAA),AA=AAA.
 
@@ -460,6 +471,7 @@ checkAnyType(Op,A,Type,AA):- var(A),correctAnyType(Op,A,Type,AA),must_det(var(AA
 checkAnyType(Op,A,Type,AA):- correctAnyType(Op,A,Type,AA),nonvar(AA),!.
 
 instances_of_type(Inst,Type):- no_repeats(isa(Inst,Type)).
+
 % instances_of_type(Inst,Type):- atom(Type), Term =..[Type,Inst], logOnError(req(Term)).
 % longest_string(?Order, @Term1, @Term2)
 longest_string(Order,TStr1,TStr2):-
