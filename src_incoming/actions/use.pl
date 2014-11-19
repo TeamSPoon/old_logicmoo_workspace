@@ -40,7 +40,7 @@ moo:agent_call_command(Agent,SENT) :-
         prop(Agent,STOWED,Obj),
 	isa(Obj,USABLE),
 	props(Obj, weight =< 1),
-	worth(Agent,USE,Obj),
+	do_act_affect(Agent,USE,Obj),
 	do_permanence(USE,Agent,Obj),
 	call_update_charge(Agent,USE).
 %Nothing to use

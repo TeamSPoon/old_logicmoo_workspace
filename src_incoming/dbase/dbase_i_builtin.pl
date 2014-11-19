@@ -193,7 +193,8 @@ resultIsa(apath,areaPath).
 
 
 subclass(areaPath,door).
-subclass(door,item).
+subclass(door,furnature).
+subclass(furnature,partof).
 
 % subclass(dir,value).
 
@@ -260,6 +261,7 @@ nameStrings(apath(Region,Dir),Text):- pathName(Region,Dir,Text).
 description(apath(Region,Dir),Text):- pathName(Region,Dir,Text).
 
 subclass(agent,obj).
+subclass(item,obj).
 subclass(item,obj).
 
 % single valued

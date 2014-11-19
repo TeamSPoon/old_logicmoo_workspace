@@ -22,7 +22,8 @@
 
 :- moo:register_module_type(command).
 
-moo:action_info(eat(item),"nourish oneself").
+subclass(food,eatable).
+moo:action_info(eat(eatable),"nourish oneself").
 
 % Eat something held
 % Check to make sure it's in the agents possession... 
@@ -30,7 +31,7 @@ moo:action_info(eat(item),"nourish oneself").
 moo:agent_call_command(Agent,eat(SObj)) :-
 	possess(Agent,Obj),
         object_match(SObj,Obj),
-	worth(Agent,eat,Obj),
+	do_act_affect(Agent,eat,Obj),
 	del(possess(Agent,Obj)),
 	call_update_charge(Agent,eat).
 

@@ -144,7 +144,7 @@ true.
 cmdresult(statistics,true)
 
 */
-:-forall(current_prolog_flag(N,V),dmsg(N=V)).
+% :-forall(current_prolog_flag(N,V),dmsg(N=V)).
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
 :-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,who)).
 :-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,look)).

@@ -21,6 +21,7 @@ subclass(command,action).
 moo:posture(sit).
 moo:posture(stand).
 moo:posture(lay).
+moo:posture(sleep).
 moo:posture(kneel).
 
 moo:type(posture).
@@ -29,12 +30,20 @@ moo_posture(P):-isa(P,posture).
 
 :-decl_mpred(singleValued(stance(agent,posture))).
 
-moo:agent_text_command(Agent,[Sit],Agent,Sit):- moo_posture(Sit).
-moo:action_info(Posture,text("sets and agent's stance to ",Posture)):-moo_posture(Posture).
+moo:action_info(Posture,text("sets and agent's stance to ",Posture)):-moo_posture(PostureV),Posture=..[PostureV,optional(furnature,floor)].
 
 % Sit and do nothing.
-moo:agent_call_command(Agent,Sit):- nonvar(Sit),moo_posture(Sit),
-        fmt('agent ~w is now ~wing ',[Agent,Sit]),
+moo:agent_call_command(Agent,Verb):- nonvar(Verb), functor(Verb,Sit,1),moo_posture(Sit),arg(Verb,1,Where),moo:agent_call_command(Agent,onto(Where,Sit)).
+
+moo:agent_call_command(Agent,onto(Where,Sit)):-
+        fmt('agent ~w is now ~wing on ~w',[Agent,Sit,Where]),
+        padd(Agent,stance(Sit)),
+        padd(Agent,localityOfObject(Where)),
+	call_update_charge(Agent,Sit).
+
+% Sit and do nothing.
+moo:agent_call_command(Agent,Verb):- nonvar(Sit),functor_h(Verb,Sit),moo_posture(Sit),
+        fmt('agent ~w is now ~wing ',[Agent,Verb]),
         padd(Agent,stance(Sit)),
 	call_update_charge(Agent,Sit).
 

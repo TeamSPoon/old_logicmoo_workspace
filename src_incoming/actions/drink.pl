@@ -20,7 +20,7 @@ moo:action_info(drink(drinkable),"Drink a Drinkable Item").
 moo:agent_call_command(Agent,drink(SObj)) :-
 	possess(Agent,Obj),
         object_match(SObj,Obj),
-	worth(Agent,drink,Obj),
+	do_act_affect(Agent,drink,Obj),
 	del(possess(Agent,Obj)),
 	call_update_charge(Agent,eat).
 

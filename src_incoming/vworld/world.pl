@@ -59,7 +59,7 @@
          locationToRegion/2,
          init_location_grid/2,
          
-         worth/3,
+         do_act_affect/3,
          spread/0,
          growth/0,
          isaOrSame/2,

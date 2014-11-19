@@ -23,7 +23,7 @@ moo:agent_call_command(Agent,stats(What)):-
          stm(What,value), % stamina
          score(What,value),
          health(What,value),
-         height(What,value)]))),!,
+         height(What,value)]),!,
    term_listing(What),!.
 
 

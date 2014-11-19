@@ -54,13 +54,14 @@ mud_dictionary([anthurium,crystallinum],[anthurium_crystallinum]).
 :-decl_mpred(region(id),type).
 
 :-onSpawn region(kitchen).
-:-onSpawn region(office).
 :-onSpawn region(hall).
+:-onSpawn region(cellar).
+:-onSpawn region(office_room).
 :-onSpawn region(living_room).
 :-onSpawn region(dining_room).
-:-onSpawn region(cellar).
 :-onSpawn region(bed_room).
-:-onSpawn region(closet).
+:-onSpawn region(bath_room).
+:-onSpawn region(closet_room).
 :-onSpawn region(back_yard).
 
 
@@ -70,14 +71,14 @@ mud_dictionary([anthurium,crystallinum],[anthurium_crystallinum]).
 
 :-decl_mpred_hybrid(doorBetween(region,region),symmetric).
 
-:-onSpawn doorBetween(office, hall).
-:-onSpawn doorBetween(kitchen, office).
-:-onSpawn doorBetween(hall, dining_room).
-:-onSpawn doorBetween(living_room, hall).
+:-onSpawn doorBetween(living_room,office_room).
+:-onSpawn doorBetween(hall,dining_room).
+:-onSpawn doorBetween(hall,bed_room).
+:-onSpawn doorBetween(hall,living_room).
+:-onSpawn doorBetween(hall,bath_room).
 :-onSpawn doorBetween(kitchen, cellar).
 :-onSpawn doorBetween(dining_room, kitchen).
-:-onSpawn doorBetween(hall,bed_room).
-:-onSpawn doorBetween(bed_room, closet).
+:-onSpawn doorBetween(bed_room, closet_room).
 :-onSpawn doorBetween(kitchen, back_yard).
 
 :-onSpawn doorBetween(kitchen, 'Area1000').
@@ -104,7 +105,6 @@ ensure_some_pathBetween(R1,R2):- split_name_type(R2,_,Isa), any_to_string(Isa,St
 % ==================================================
 % Where Things are Located
 % ==================================================
-:-assertOnLoad(corpius('me')).
 
 :-dynamic(localityOfObject/2).
 :-multifile(localityOfObject/2).
@@ -119,7 +119,7 @@ subclass(region,region).
 % onSpawn(_).
 	
 
-:-onSpawn localityOfObject(desk, office).
+:-onSpawn localityOfObject(desk, office_room).
 :-onSpawn localityOfObject(apple(color(red)), kitchen).
 :-onSpawn localityOfObject(apple(color(green)), kitchen).
 :-onSpawn localityOfObject(flashlight, desk).
@@ -127,19 +127,19 @@ subclass(region,region).
 :-onSpawn localityOfObject(nani, washing_machine).
 :-onSpawn localityOfObject(broccoli, kitchen).
 :-onSpawn localityOfObject(crackers, kitchen).
-:-onSpawn localityOfObject(computer, office).
+:-onSpawn localityOfObject(computer, desk).
 :-onSpawn localityOfObject(envelope, desk).
 :-onSpawn localityOfObject(stamp, envelope).
 :-onSpawn localityOfObject(key, envelope).
 :-onSpawn localityOfObject(bed, bed_room).
 :-onSpawn localityOfObject(stand_table, bed_room).
 :-onSpawn localityOfObject(pajamas, stand_table).
-:-onSpawn localityOfObject(shirt, closet).
+:-onSpawn localityOfObject(shirt, closet_room).
 :-onSpawn localityOfObject(pillow, bed).
 :-onSpawn localityOfObject(blanket, bed).                                                              
 :-onSpawn localityOfObject(table, kitchen).
-:-onSpawn localityOfObject(coat, closet).
-:-onSpawn localityOfObject(pants, closet).
+:-onSpawn localityOfObject(coat, closet_room).
+:-onSpawn localityOfObject(pants, closet_room).
 :-onSpawn localityOfObject(light_switch, bed_room).
 :-onSpawn localityOfObject(ball, back_yard).
 :-onSpawn localityOfObject(sofa, living_room).
@@ -158,9 +158,96 @@ subclass(region,region).
 :-onSpawn localityOfObject(planter, gueridon). 
 :-onSpawn localityOfObject(gueridon, living_room).
 :-onSpawn localityOfObject(garden_plant, back_yard).
-:-onSpawn localityOfObject(me, kitchen).
 :-onSpawn localityOfObject(candle,kitchen).
+:-onSpawn localityOfObject(bathtub,bath_room).
+:-onSpawn localityOfObject(shower,bath_room).
+:-onSpawn localityOfObject(toilet,bath_room).
+:-onSpawn localityOfObject(treadmill,hall).
+:-onSpawn localityOfObject(sink,bath_room).
+:-onSpawn localityOfObject(kitchen_sink,kitchen_counter).
+:-onSpawn localityOfObject(fridge,kitchen).
+:-onSpawn localityOfObject(stove,kitchen).
+:-onSpawn localityOfObject(kitchen_counter,kitchen).
 
+
+subclass(candle,portable_device).
+subclass(flashlight, portable_device).
+subclass(desk, office_room_furnature).
+subclass(apple, food).
+subclass(nani, art).
+subclass(nani, washable).
+subclass(clothing, washable).
+subclass(nani, portable).
+subclass(broccoli, food).
+subclass(crackers, food).
+subclass(envelope, office_item).
+subclass(stamp, office_item).
+subclass(key, office_item).
+subclass(ball, throwable).
+
+subclass(pajamas, clothing).
+subclass(shirt, clothing).
+subclass(coat, clothing).
+subclass(pants, clothing).
+subclass(clothing, foldable).
+subclass(clothing, wearable).
+
+subclass(coffee_cup, liquid_container).
+subclass(coffee_cup, drinkable).
+subclass(coffee_cup, throwable).
+subclass(coffee, liquid).
+subclass(book, readable).
+
+subclass(pillow, bedding).
+subclass(blanket, bedding).                                                              
+subclass(bedding, foldable).
+subclass(foldable, portable).
+subclass(throwable, portable).
+subclass(portable_device,portable).
+subclass(device,useable).
+subclass(wearable, portable).
+subclass(portable,takeable).
+subclass(food,takeable).
+subclass(partof,not_takable).
+
+subclass(light_switch, wall_furnature).
+subclass(computer, office_furnature).
+subclass(partof_furnature,partof).
+
+subclass(bed, bed_room_furnature).
+subclass(stand_table, bed_room_furnature).
+subclass(dresser, bed_room_furnature).
+
+subclass(washing_machine, device_furnature).
+subclass(table, furnature).
+subclass(table, hassurface).
+subclass(sofa, living_room_furnature).
+subclass(easy_chair, living_room_furnature).
+subclass(coffee_table, living_room_furnature).
+subclass(bookcase, wall_furnature).
+subclass(drawer, container).
+subclass(drawer, openable).
+subclass(drawer, closeable).
+subclass(drawer, partof_furnature).
+subclass(top_drawer, partof_furnature).
+subclass(middle_drawer, partof_furnature).
+subclass(bottom_drawer, partof_furnature). 
+subclass(houseplant, partof).
+subclass(planter, container). 
+subclass(gueridon, living_room_furnature).
+subclass(garden_plant, outdoor_furnature).
+subclass(spatialthing,visible).
+subclass(nani,teddybear).
+subclass(teddybear,treasure).
+
+subclass(bathtub,bath_room_furnature).
+subclass(shower,bath_room_furnature).
+subclass(toilet,bath_room_furnature).
+subclass(sink,bath_room_furnature).
+subclass(kitchen_sink,kitchen_furnature).
+subclass(fridge,kitchen_furnature).
+subclass(stove,kitchen_furnature).
+subclass(kitchen_counter,kitchen_furnature).
 
 /*
 :-dynamic(loc_s/2).
@@ -208,7 +295,7 @@ locaton_s(item_template(RealObj,D1,D2,0),Place):-
 :-setTemplate item_template(stamp,[color(polychromatic),size(eachOf(tiny,thin)),shape(square),material(paper),texture(eachOf(smooth,sticky))]).
 :-setTemplate item_template(coat,[color(black),size(eachOf(medium,fits)),shape(like(shape,torso)),material(eachOf(wool,cotton,rayon)),texture(coarse)]).
 :-setTemplate item_template(pants,[color(black),size(eachOf(medium,fits)),shape(like(shape,ass)),material(denim),texture(coarse)]).
-:-setTemplate item_template(nani,[color(brown),color(white),size(medium),shape(like(shape,teddy_bear)),material(plush),texture(eachOf(fuzzy,soft))]).
+:-setTemplate item_template(nani,[color(brown),color(white),size(medium),shape(like(shape,teddybear)),material(plush),texture(eachOf(fuzzy,soft))]).
 :-setTemplate item_template(light_switch,[color(cream),size(small),shape(rectangular),material(plastic),texture(smooth)]).
 % :- onSpan((etrace)).
 :-setTemplate item_template(ball,[color(red),size(medium),shape(spherical),material(rubber),texture(bumpy)]).
@@ -230,7 +317,7 @@ locaton_s(item_template(RealObj,D1,D2,0),Place):-
 
 
 
-:-setTemplate item_template(teddy_bear,[color(natural),shape(unique)]).
+:-setTemplate item_template(teddybear,[color(natural),shape(unique)]).
 :-setTemplate item_template(torso,[color(like(color,skin)),shape(unique)]).
 :-setTemplate item_template(skin,[color(unique),shape(unique)]).
 

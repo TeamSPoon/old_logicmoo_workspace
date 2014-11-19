@@ -27,7 +27,7 @@ moo:agent_call_command(Agent,take(SObj)) :-
 
                        object_match(SObj,Obj)))),
 	nop((ignore(props(Obj,weight<2)),
-	ignore(worth(Agent,take,Obj)))),
+	ignore(do_act_affect(Agent,take,Obj)))),
 	permanence_take(take,Agent,Obj),
 	call_update_charge(Agent,take).
 

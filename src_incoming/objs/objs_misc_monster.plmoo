@@ -233,7 +233,7 @@ moo:label_type(Label,Type):- moo:label_type_props(Label,Type,_).
 
 moo:type_max_charge(agent,120).
 
-default_type_props(agent,[max_damage(500)]).
+default_type_props(agent,[max_health(500)]).
 
 
 % :-end_module_type(dynamic).
@@ -254,7 +254,7 @@ moo:label_type_props(hw,high_wall,[height(3),weight(4)]).
 moo:label_type_props(hb,high_box,[height(3),weight(3)]).
  moo:label_type_props(gd,gold,[height(1),weight(1),permanence(take,dissapears),act_affect(take,score(+10))]).
  moo:label_type_props(fd,food,[height(1),weight(1),permanence(take,held),act_affect(eat,charge(+80))]).
-moo:label_type_props(el,elixer,[height(1),weight(1),permanence(take,held),act_affect(eat,damage(-10))]).
+moo:label_type_props(el,elixer,[height(1),weight(1),permanence(take,held),act_affect(eat,health(+80))]).
 moo:label_type_props(ed,edge,[height(10),weight(4)]).
  moo:label_type_props(dt,dirt,[height(1),weight(1),permanence(take,dissapears),act_affect(take,score(+1)),spawn_rate(5)]).
 moo:label_type_props(dr,door,[height(3),weight(2)]).
