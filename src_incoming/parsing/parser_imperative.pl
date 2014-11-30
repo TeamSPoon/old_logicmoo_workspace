@@ -379,7 +379,7 @@ parseForTypes([TYPE|TYPES], [B|E], C, G) :-
         parseForTypes(TYPES, E, F, G),!.
 
 
-parseIsa_Call(FT, BO, CIn, D):- list_tail(CIn,D), to_word_list(CIn,C), parseIsa(FT, B, C, D),to_arg_value(B,BO).
+parseIsa_Call(FT, BO, CIn, D):- list_tail(CIn,D), to_word_list(CIn,C),!, parseIsa(FT, B, C, D),to_arg_value(B,BO).
 
 
 % this parseIsa(T)-->parseIsa(T,_).
@@ -435,7 +435,7 @@ parseIsa(FT, B, C, D):- var(FT),trace_or_throw(var_parseIsa(FT, B, C, D)).
 parseIsa(Str,A,B,C) :-string(Str),!, parseIsa(exact(Str),A,B,C).
 
 % this parseIsa(not(T),Term) --> dcgAnd(dcgNot(parseIsa(T)),theText(Term)).
-parseIsa(not(Type), Term, C, D) :-  dcgAnd(dcgNot(parseIsa(Type)), theText(Term), C, D).
+parseIsa(not(Type), Term, C, D) :- !, dcgAnd(dcgNot(parseIsa(Type)), theText(Term), C, D).
 
 parseIsa(vp,Goal,Left,Right):-!,one_must(parseFmt_vp1(self,Goal,Left,Right),parseFmt_vp2(self,Goal,Left,Right)).
 
@@ -446,7 +446,7 @@ parseIsa(optionalStr(Str),missing(Str)) --> {!},[].
 parseIsa(optionalStr(_Str),_) --> {!,fail}.
 parseIsa(optional(_,Term),TermV) --> {to_arg_value(Term,TermV)}, [TermT], {samef(TermV,TermT)}.
 parseIsa(optional(Type, _), Term, C, D) :- nonvar(Type),parseIsa(Type, Term, C, D).
-parseIsa(optional(_Type,Default), DefaultV, D, D):- !,to_arg_value(Default,DefaultV).
+parseIsa(optional(_Type,Default), DefaultV, D, D2):- !,D=D2,to_arg_value(Default,DefaultV).
 
 %  parser_imperative:phrase_parseForTypes_9([optional(and([obj, not(region)]),'NpcCol1000-Geordi684'),optionalStr("to"),optional(region, random(region))], [food], GOODARGS,[]).
 %  parser_imperative:phrase_parseForTypes_9([optional(and([obj, not(region)]),'NpcCol1000-Geordi684'),optionalStr("to"),optional(region, random(region))], [food,to,'Turbolift'], GOODARGS,[]).
@@ -457,8 +457,7 @@ parseIsa(string,String)--> {!}, theString(String).
 parseIsa(FT, B, [AT|C], D) :- nonvar(AT),member_ci(AT,["the","a","an"]),parseIsa(FT, B, C, D).
 
 
-parseIsa(or([L|_]),Term) --> parseIsa(L,Term).
-parseIsa(or([_|List]),Term) --> {!},parseIsa(or(List),Term).
+parseIsa(or(List),Term) --> {!,member(E,List)},parseIsa(E,Term).
 
 
 parseIsa(list(Type),[Term|List]) --> parseIsa(Type,Term),parseIsa(list(Type),List).
@@ -470,10 +469,9 @@ parseIsa(countBetween(Type,Low,High),[Term|List]) --> parseIsa(Type,Term),{!,Low
 parseIsa(countBetween(_Type,Low,_),[]) --> {!, Low < 1}, [].
 
 % parseIsa(and([L|List]),Term1) --> dcgAnd(parseIsa(L,Term1),parseIsa(and(List),Term2)),{ignore(Term1==Term2),!}.
-parseIsa(and([L|List]),Term) --> dcgAnd(parseIsa(L,Term),parseIsa(and(List),Term)).
 parseIsa(and([L]),Term1) --> {!},parseIsa(L,Term1).
+parseIsa(and([L|List]),Term) --> {!},dcgAnd(parseIsa(L,Term),parseIsa(and(List),Term)).
 
-parseIsa(FT, B, [AT|C], D) :- nonvar(AT),member_ci(AT,["the","a","an"]),parseIsa(FT, B, C, D).
 parseIsa(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{specifiedItemType(String,Type,Term)}.
 
 specifiedItemType(String,Type,Inst):- (var(String);var(Type)),trace_or_throw(var_specifiedItemType(String,Type,Inst)).
