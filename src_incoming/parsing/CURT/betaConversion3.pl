@@ -8,7 +8,7 @@
  
 *************************************************************************/
 
-:- module(betaConversion3,[betaConvertTestSuite/0,
+:-swi_module(betaConversion3,[betaConvertTestSuite/0,
 			  betaConvert/2]).
 
 :- ensure_loaded(comsemOperators).

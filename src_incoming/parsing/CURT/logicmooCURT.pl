@@ -1,7 +1,7 @@
 
-:- module(logicmooCURT,[]).
+:-swi_module(logicmooCURT,[]).
 
-:-export('^'/2).
+:-swi_export('^'/2).
 :-meta_predicate('^'(+,0)).
 '^'(_X,Call):-call(Call).
 

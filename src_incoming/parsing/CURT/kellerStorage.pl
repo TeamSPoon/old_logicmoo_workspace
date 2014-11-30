@@ -21,7 +21,7 @@
 
 *************************************************************************/
 
-:- module(kellerStorage,[infix/0,
+:-swi_module(kellerStorage,[infix/0,
                          prefix/0,
                          info/0,
                          kellerStorage/0,

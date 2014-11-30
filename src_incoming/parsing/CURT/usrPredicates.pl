@@ -7,7 +7,7 @@
  
 *************************************************************************/
 
-:- module(usrPredicates,[mergeUSR/2,
+:-swi_module(usrPredicates,[mergeUSR/2,
 			 betaConvertUSR/2,
 			 alphaConvertUSR/2]).
 

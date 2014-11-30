@@ -3,7 +3,7 @@
 % after eliminating disjunction
 % Aleksandar Dimitrov
 
-:- module(or,[disjunk/2]).
+:-swi_module(or,[disjunk/2]).
 
 term(Sym,Args,Term) :-
 	(

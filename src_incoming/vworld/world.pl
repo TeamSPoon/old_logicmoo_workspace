@@ -1,7 +1,7 @@
 /** <module> 
 % Common place to reduce redundancy World utility prediates
 %
-% Project Logicmoo: A MUD server written in Prolog
+% Logicmoo Project PrologMUD: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
@@ -13,8 +13,8 @@
 %
 */
 
-%:- module(world, [
-:-export((
+%:-swi_module(world, [
+:-swi_export((
         call_agent_command/2,
        % call_agent_action/2,
             %mud_isa/2,
@@ -69,7 +69,7 @@
 
 :-discontiguous create_instance_0/3.
 
-:-export((
+:-swi_export((
           create_instance/2,
           create_instance/3,
           create_instance_0/3,
@@ -118,9 +118,9 @@ metaclass(itemtype).
 
 % argsIsaInList(typeGenls(type,metaclass)).
 
-% hook:decl_database_hook(assert(_),typeGenls(_,MC)):-assert_isa(MC,metaclass).
+% decl_database_hook(assert(_),typeGenls(_,MC)):-assert_isa(MC,metaclass).
 
-% hook:deduce_facts(typeGenls(T,MC),hook:deduce_facts(subclass(S,T),isa(S,MC))).
+% deduce_facts(typeGenls(T,MC),deduce_facts(subclass(S,T),isa(S,MC))).
 
 typeGenls(region,regiontype).
 typeGenls(agent,agenttype).
@@ -129,17 +129,17 @@ typeGenls(item,itemtype).
 subclass(sillyitem,item).
 
 /*
-moo:isa(region,regiontype).
-moo:isa(agent,agenttype).
-moo:isa(item,itemtype).
+isa(region,regiontype).
+isa(agent,agenttype).
+isa(item,itemtype).
 */
 
-%moo:subclass(SubType,formattype):-isa(SubType,formattype).
+%subclass(SubType,formattype):-isa(SubType,formattype).
 
 cached(G):-ccatch(G,_,fail).
 
 
-:-export(create_meta/4).
+:-swi_export(create_meta/4).
 % if SuggestedName was 'food666' it'd like the SuggestedClass to be 'food' and the stystem name will remain 'food666'
 % if SuggestedName was 'food' it'd like the SuggestedClass to be 'food' and the stystem name will become a gensym like 'food1'
 create_meta(SuggestedName,SuggestedClass,BaseClass,SystemName):-
@@ -152,31 +152,31 @@ create_meta(SuggestedName,SuggestedClass,BaseClass,SystemName):-
    assert_isa_safe(SystemName,SuggestedClass).
 
 
-moo:subclass('Area',region).
-moo:nonCreatableType(int).
-moo:nonCreatableType(term).
-moo:nonCreatableType(type).
+subclass('Area',region).
+nonCreatableType(int).
+nonCreatableType(term).
+nonCreatableType(type).
 
-moo:subclass(wearable,item).
-moo:subclass(knife,item).
-moo:subclass(food,item).
-
-
-moo:createableType(FT):- nonvar(FT),formattype(FT),!,fail.
-moo:createableType(FT):- nonvar(FT),nonCreatableType(FT),!,fail.
-moo:createableType(item). %  type, formattype, 
-moo:createableType(SubType):-member(SubType,[agent,item,region]).
-moo:createableType(S):- is_asserted(createableType(T)), transitive_subclass(S,T).
-
-moo:createableSubclassType(S,T):- moo:createableType(T),is_asserted(subclass(S,T)).
-moo:createableSubclassType(T,'TemporallyExistingThing'):- moo:createableType(T).
+subclass(wearable,item).
+subclass(knife,item).
+subclass(food,item).
 
 
-moo:isa(int,formattype).
-moo:isa(dir,type).
-% moo:isa(dir,valuetype).
-moo:isa(number,formattype).
-moo:isa(string,formattype).
+createableType(FT):- nonvar(FT),formattype(FT),!,fail.
+createableType(FT):- nonvar(FT),nonCreatableType(FT),!,fail.
+createableType(item). %  type, formattype, 
+createableType(SubType):-member(SubType,[agent,item,region]).
+createableType(S):- is_asserted(createableType(T)), transitive_subclass(S,T).
+
+createableSubclassType(S,T):- createableType(T),is_asserted(subclass(S,T)).
+createableSubclassType(T,'TemporallyExistingThing'):- createableType(T).
+
+
+isa(int,formattype).
+isa(dir,type).
+% isa(dir,valuetype).
+isa(number,formattype).
+isa(string,formattype).
 
 
 create_agent(P):-create_agent(P,[]).
@@ -184,11 +184,11 @@ create_agent(P,List):-must_det(create_instance(P,agent,List)).
 
 % decl_type(Spec):-create_instance(Spec,type,[]).
 
-:-export(create_instance/1).
+:-swi_export(create_instance/1).
 create_instance(P):- must_det((isa(P,What),createableType(What))),must_det(create_instance(P,What,[])).
-:-export(create_instance/2).
+:-swi_export(create_instance/2).
 create_instance(P,What):-create_instance(P,What,[]).
-:-export(create_instance/3).
+:-swi_export(create_instance/3).
 create_instance(What,Type,Props):- loop_check_local(time_call(create_instance_now(What,Type,Props)),dmsg(already_create_instance(What,Type,Props))).
 
 create_instance_now(What,Type,Props):-
@@ -203,7 +203,7 @@ create_instance_now(What,Type,Props):-
 
 :-discontiguous create_instance_0/3.
 
-:- export(is_creating_now/1).
+:- swi_export(is_creating_now/1).
 :- dynamic(is_creating_now/1).
 
 create_instance_0(What,Type,List):- (var(What);var(Type);var(List)),trace_or_throw((var_create_instance_0(What,Type,List))).
@@ -212,17 +212,17 @@ create_instance_0(I,_,_):-asserta_if_new(is_creating_now(I)),fail.
 create_instance_0(What,FormatType,List):- FormatType\==type, formattype(FormatType),!,trace_or_throw(formattype(FormatType,create_instance(What,FormatType,List))).
 create_instance_0(SubType,type,List):-decl_type(SubType),padd(SubType,List).
 
-moo:createableType(agent).
-moo:subclass(actor,agent).
-moo:subclass(explorer,agent).
+createableType(agent).
+subclass(actor,agent).
+subclass(explorer,agent).
 
-:-dynamic_multifile_exported(moo:max_health/2).
-:-dynamic_multifile_exported(moo:max_charge/2).
-:-dynamic_multifile_exported(moo:type_max_charge/2).
-%:-dynamic_multifile_exported(moo:type_max_health/2).
+:-dynamic_multifile_exported(max_health/2).
+:-dynamic_multifile_exported(max_charge/2).
+:-dynamic_multifile_exported(type_max_charge/2).
+%:-dynamic_multifile_exported(type_max_health/2).
 
-moo:max_charge(T,NRG):- fallback, moo:type_max_charge(AgentType,NRG),isa(T,AgentType).
-%moo:max_health(T,Dam):- moo:type_max_health(AgentType,Dam),isa(T,AgentType).
+max_charge(T,NRG):- fallback, type_max_charge(AgentType,NRG),isa(T,AgentType).
+%max_health(T,Dam):- type_max_health(AgentType,Dam),isa(T,AgentType).
 
 punless(Cond,Action):- once((call(Cond);call(Action))).
 
@@ -246,7 +246,7 @@ create_instance_0(T,agent,List):-
    add_missing_instance_defaults(P)]).
    
 /*
-reset_values(I):- forall(moo:valueReset(To,From),reset_value(I,To,From)).
+reset_values(I):- forall(valueReset(To,From),reset_value(I,To,From)).
 
 reset_value(I,To,From):- prop(I,From,FromV), padd(I,To,FromV),!.
 reset_value(I,To,From):- prop(I,From,FromV), padd(I,To,FromV),!.
@@ -255,19 +255,19 @@ reset_value(I,To,From):- prop(I,From,FromV), padd(I,To,FromV),!.
    argIsa(P,SVArgNum,Type),
    is_term_ft(V,Type),
 
-moo:valueReset(score,0).
-moo:valueReset(health,max_health).
-moo:valueReset(charge,max_charge).
+valueReset(score,0).
+valueReset(health,max_health).
+valueReset(charge,max_charge).
 
 */
 
-moo:createableType(region).
+createableType(region).
 
 create_instance_0(T, item, List):-
-   isa(T,What),What\=item, moo:createableType(What),!,create_instance_0(T, What, List).
+   isa(T,What),What\=item, createableType(What),!,create_instance_0(T, What, List).
 
 create_instance_0(T,Type,List):-
-  moo:createableSubclassType(Type,MetaType),
+  createableSubclassType(Type,MetaType),
   must_det_l([
    create_meta(T,Type,MetaType,P),
    padd(P,List),
@@ -291,18 +291,18 @@ leash(+call),trace,
 
 create_instance_0(What,Type,Props):- leash(+call),trace,dtrace,trace_or_throw(dmsg(assumed_To_HAVE_creted_isnance(What,Type,Props))),!.
 
-%moo:createableType(type).
+%createableType(type).
 
 
 
 :-decl_mpred_hybrid(kwLabel(term,term)).
 :-decl_mpred_hybrid(opaqueness(term,percent)).
-moo:default_type_props(region,opaqueness(1)).
-moo:default_type_props(obj,opaqueness(100)).
+default_type_props(region,opaqueness(1)).
+default_type_props(obj,opaqueness(100)).
 :-decl_mpred_hybrid(listPrice(item,number)).
-moo:default_type_props(item,listPrice(0)).
-moo:default_type_props(agent,last_command(stand)).
-moo:default_type_props(agent,[
+default_type_props(item,listPrice(0)).
+default_type_props(agent,last_command(stand)).
+default_type_props(agent,[
                        max_health(500),
                        max_charge(200),
                        health(500),

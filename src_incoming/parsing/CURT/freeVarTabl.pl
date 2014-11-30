@@ -21,7 +21,7 @@
 
 *************************************************************************/
 
-:- module(freeVarTabl,[info/0,
+:-swi_module(freeVarTabl,[info/0,
                        infix/0,
                        prefix/0,
                        tprove/1,

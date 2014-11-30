@@ -15,10 +15,10 @@
 
 
 % Declare the module name and the exported (public) predicates.
-:- module(explorer,[]).
+:-swi_module(explorer,[]).
 
 :- include(logicmoo(vworld/moo_header)).
-:- moo:register_module_type(planning).
+:- register_module_type(planning).
 
 :-decl_type(explorer).
 
@@ -26,9 +26,9 @@ vette_idea(Agent,Act,Act):-var(Act),!,dmsg(vette_idea(Agent,Act)).
 vette_idea(_,sit,sit):-!.
 vette_idea(Agent,Act,Act):-dmsg(vette_idea(Agent,Act)).
 
-moo:label_type_props('Px',explorer,[]).
+label_type_props('Px',explorer,[]).
 
-moo:world_agent_plan(_World,Agent,ActV):-
+world_agent_plan(_World,Agent,ActV):-
    agent(Agent),
   % isa(Agent,explorer),
    explorer_idea(Agent,Act),

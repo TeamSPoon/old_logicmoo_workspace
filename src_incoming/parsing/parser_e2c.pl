@@ -9,7 +9,7 @@
 % Revised At:   $Date: 2002/06/06 15:43:15 $
 % ===================================================================
 
-:- module(parser_e2c,[
+:-swi_module(parser_e2c,[
          e2c/1,
          e2c/2
          % idGen/1
@@ -17,9 +17,9 @@
 
 
 % ==============================================================================
-:- dynamic_multifile_exported hook:kbp_t_list_prehook/2.
+:- dynamic_multifile_exported kbp_t_list_prehook/2.
 
-:-export(reorderClause/2).
+:-swi_export(reorderClause/2).
 :-meta_predicate(reorderClause(?,?)).
 
 :- dynamic_multifile_exported thglobal:use_cyc_database/0.
@@ -29,7 +29,7 @@
 :- meta_predicate do_dcg(?,?,?,?,?).
 :- meta_predicate isPOS(?,?,?,?,?).
 
-:- moo:register_module_type(utility).
+:- register_module_type(utility).
 
 :-thread_local thlocal:allowTT/0.
 :-thread_local thlocal:omitCycWordForms/0.
@@ -41,9 +41,9 @@
 
 % idGen(X):-flag(idGen,X,X+1).
 
-:- moo:begin_transform_moo_preds.
+:- begin_transform_moo_preds.
 
-% :- retractall(moo:prevent_transform_moo_preds).
+% :- retractall(prevent_transform_moo_preds).
 
 % Semantic Interpretation
 /* from Bratko chapter 17 page 455.
@@ -207,8 +207,8 @@ get_pl_type(C,compound(F,A)):-functor(C,F,A).
 
 */
 :-dynamic(e2c_result/1).
-:-export(e2c_result/1).
-:-export((dm1/0,dm2/0,dm3/0)).
+:-swi_export(e2c_result/1).
+:-swi_export((dm1/0,dm2/0,dm3/0)).
 
 dm1:-
   mmake,
@@ -314,7 +314,7 @@ posMeans(String,POS,Form,CycL):-
       posMeans(String,POS,Form,CycL).
 
 
-:-export(cache_the_posms/0).
+:-swi_export(cache_the_posms/0).
 cache_the_posms:-!.
 cache_the_posms:- noreorder,
  with_assertions(thglobal:use_cyc_database,
@@ -923,7 +923,7 @@ contains_obliqe(Formula):-flatten(Formula,Flat),member(':OBLIQUE-OBJECT',Flat).
 :- op(100,fx,('`')).
 
 	 
-:-export((fdelete/3)).
+:-swi_export((fdelete/3)).
 
 % ===============================================================================================
 	             	 	
@@ -1305,7 +1305,7 @@ wordageToKif(_Symbol,Words,_Quest,posList(POSList,Words)):-get_pos_list(Words,PO
 % wordageToKif
 % =================================================================
 
-:-export(notPrefixOrSuffix/1).
+:-swi_export(notPrefixOrSuffix/1).
 notPrefixOrSuffix(CycWord):- not(cyckb_t(isa, CycWord, 'LexicalPrefix')),not(cyckb_t(isa, CycWord, 'LexicalSuffix')).
 is_cycWord_chk(CycWord):- cyckb_t(isa,CycWord,'EnglishWord'),!.
 
@@ -1342,7 +1342,7 @@ is_wordage_prop(String,Prop):-is_wordage_cache(String, wordage(_,Props)),!,membe
 is_wordage_prop(String,Prop):-is_wordage_cache(String,Props),!,member(Prop,Props).
 
 :-dynamic(is_wordage_cache/2).
-:-export(is_wordage_cache/2).
+:-swi_export(is_wordage_cache/2).
 get_wordage([of, the],_Props):-!,fail.
 
 get_wordage(A,Props):-atom(A),!,get_wordage([A],Props).
@@ -1496,7 +1496,7 @@ properNames(['Geordi',
 'Klingon',
 'Ferengi']).
 
-:-export(list_wordage/0).
+:-swi_export(list_wordage/0).
 
 list_wordage:- listing(is_wordage_cache),retractall(is_wordage_cache(_,_)).
 
@@ -1885,7 +1885,7 @@ proper_object(CycL) --> pos_cycl(Noun,CycL), { goodStart(noun_phrase,Noun) } .
 poStr(CycL,String):- stringArg(String, poStr0(CycL,String)).
 poStr0(CycL,String):- strings_match,
       'genlPreds'(FirstName,nameString),
-       moo:cyckb_t(FirstName,CycL,String).
+       cyckb_t(FirstName,CycL,String).
 
 poStr0(CycL,String):- strings_match,
       'initialismString'(CycL,String);
@@ -2489,8 +2489,8 @@ atom_junct2([W|S],[W|Words]):-atom_junct2(S,Words).
 :- module_predicates_are_exported(parser_e2c).
 :- module_meta_predicates_are_transparent(parser_e2c).
 
-:-  moo:end_transform_moo_preds.
-% :-module(parser_e2c).
+:-  end_transform_moo_preds.
+% :-swi_module(parser_e2c).
 
 %:- debug, make:list_undefined. 
  % speechPartPreds_transitive(X,Y).
@@ -3587,7 +3587,7 @@ cycPred('genlMt').
 % =======================================================
 % sentence(CycL, [every,man,that,paints,likes,monet],[]) 
 % =======================================================
-:-export((sentence//1)).
+:-swi_export((sentence//1)).
 
 sentence(CycL) --> theVariable(sent).
 sentence(CycL) --> declaritive_sentence(CycL).

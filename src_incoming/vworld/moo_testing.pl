@@ -1,12 +1,12 @@
 /** <module> 
 % A MUD testing API is defined here
 %
-% Project Logicmoo: A MUD server written in Prolog
+% Logicmoo Project PrologMUD: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
 */
-:- module(moo_testing,
+:-swi_module(moo_testing,
 	[run_mud_tests/0,
         run_mud_test/2,
         test_name/1,
@@ -28,20 +28,20 @@
 
 
 :- include(logicmoo(vworld/moo_header)).
-:- moo:register_module_type(utility).
+:- register_module_type(utility).
 
 % do some sanity testing (expects the startrek world is loaded)
 run_mud_tests:-
-  forall(moo:mud_test(Name,Test),run_mud_test(Name,Test)).
+  forall(mud_test(Name,Test),run_mud_test(Name,Test)).
 
-moo:action_info(tests,"run run_mud_tests/:").
+action_info(tests,"run run_mud_tests/:").
 
-moo:agent_call_command(_Agent,tests) :- scan_updates, run_mud_tests.
+agent_call_command(_Agent,tests) :- scan_updates, run_mud_tests.
 
 
-moo:action_info(test(term),"run tests containing term").
+action_info(test(term),"run tests containing term").
 
-moo:agent_call_command(Agent,test(Obj)):-foc_current_player(Agent),run_mud_test(Obj).
+agent_call_command(Agent,test(Obj)):-foc_current_player(Agent),run_mud_test(Obj).
 
 
 test_name(String):-fmt(start_moo_test(named(String))),asserta(was_test_name(String)).

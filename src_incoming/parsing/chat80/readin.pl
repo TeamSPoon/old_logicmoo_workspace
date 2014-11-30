@@ -24,7 +24,7 @@ end_of_file.
 /* Read a sentence */
 
 
-:-export(read_sent/1).
+:-swi_export(read_sent/1).
 read_sent(P):-initread(L),words(P,L,[]),!,to_nl.
 
 initread([K1,K2|U]):-get(K1),get0(K2),readrest(K2,U).

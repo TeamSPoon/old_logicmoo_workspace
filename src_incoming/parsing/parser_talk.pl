@@ -1,5 +1,5 @@
 
-:- module(parser_talk,[]).
+:-swi_module(parser_talk,[]).
 
 :- op(500,xfy,&).
 :- op(50,xfx,+).
@@ -25,23 +25,23 @@ must_test_talkpl("what did alfred give to bertrand").
 must_test_talkpl("alfred gave a book to bertrand").
 must_test_talkpl("who did alfred give a book to").
 
-:-export(t3/0).
+:-swi_export(t3/0).
 t3:- forall(must_test_talkpl(Sent),talkpl(Sent)).
 
 m :- talkpl.
 
 :- asserta(thlocal:into_form_code).
 
-:-export(talkpl/0).
+:-swi_export(talkpl/0).
 talkpl :- with_assertions(tracing80,
              with_no_assertions(thglobal:use_cyc_database,
                   with_assertions(thlocal:usePlTalk, (told, repeat, prompt_read('TALKPL> ',U),  
                             to_word_list(U,WL),(WL==[bye];WL==[end,'_',of,'_',file];talkpl(WL)))))).
 
-:-export(talkpl/1).
+:-swi_export(talkpl/1).
 talkpl(Sentence):- to_word_list(Sentence,Words),!,dmsg(sent_in_talkpl(Words)),talkpl(Words,Reply),  print_reply(Reply).
 
-:-export(talkpl/2).
+:-swi_export(talkpl/2).
 talkpl(Sentence,Reply) :-
    show_call(talkpl_parse(Sentence,LF,Type)),
    show_call(talkpl_clausify(LF,Clause,FreeVars)),!,

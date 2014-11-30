@@ -21,7 +21,7 @@
 
 *************************************************************************/
 
-:- module(backgroundKnowledge,[backgroundKnowledge/2]).
+:-swi_module(backgroundKnowledge,[backgroundKnowledge/2]).
 
 :- use_module(comsemPredicates,[memberList/2,
 				basicFormula/1,

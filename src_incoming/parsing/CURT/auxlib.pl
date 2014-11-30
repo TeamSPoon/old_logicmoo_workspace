@@ -7,7 +7,7 @@
  
 *************************************************************************/
 
-:- module(auxlib, [myformat/2]).
+:-swi_module(auxlib, [myformat/2]).
 
 myformat(Format, Args):-
 	\+ \+ (numbervars(Args, 0, _),

@@ -7,7 +7,7 @@
  
 *************************************************************************/
 
-:- module(drs2fol,[drs2fol/2]).
+:-swi_module(drs2fol,[drs2fol/2]).
 
 :- ensure_loaded(comsemOperators).
 

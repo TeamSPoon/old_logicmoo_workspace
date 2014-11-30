@@ -1,18 +1,18 @@
 /** <module> 
 % Game loading Utils
 %
-% Project Logicmoo: A MUD server written in Prolog
+% Logicmoo Project PrologMUD: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
 */
-:- module(moo_loader, []).
+:-swi_module(moo_loader, []).
 
 :-dynamic(registered_game_file/1).
-:-export(declare_load_game/1).
+:-swi_export(declare_load_game/1).
 declare_load_game(File):-asserta_if_new(registered_game_file(File)).
 
-:-export(load_game_files/0).
+:-swi_export(load_game_files/0).
 load_game_files :- forall(registered_game_file(File),load_game(File)).
 
 :-dynamic thglobal:current_world/1.
@@ -118,12 +118,12 @@ rescan_mpred_stubs:- doall((mpred_prop(F,prologHybrid),mpred_arity(F,A),A>0,warn
 :-meta_predicate_transparent(rescan_all/0).
 :-meta_predicate_transparent(doall_and_fail(0)).
 
-finish_processing_world:- loop_check_local(with_assertions(thlocal:do_slow_kb_op_now,doall(finish_processing_game)),true).
+finish_processing_world :- loop_check_local(with_assertions(thlocal:do_slow_kb_op_now,doall(finish_processing_game)),true).
 
 doall_and_fail(Call):- time_call(once(doall(Call))),fail.
 
 
-:-export(etrace/0).
+:-swi_export(etrace/0).
 etrace:-leash(-all),leash(+exception),trace.
 
 % rescan_all:- etrace,fail.
@@ -173,16 +173,16 @@ rsavedb:-
 
 :-meta_predicate_transparent(make_db_listing/0).
 make_db_listing:-
- % moo:dbase_mod(DBM),
+ % dbase_mod(DBM),
 %   listing(dbase_t),
  %  listing(dbase_f),
-     listing(hook:_),
+     listing(_),
      listing(user:_),  
      listing(dbase:_),
      listing(dyn:_),
      listing(moo_loader:_),
-     listing(world:_),
-     listing(moo:_),!.
+     listing(world :_),
+     listing(_),!.
 
 /*
 "Lieutenant",

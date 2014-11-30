@@ -21,7 +21,7 @@
 
 *************************************************************************/
 
-:- module(callInference,[infix/0,
+:-swi_module(callInference,[infix/0,
                          prefix/0,
                          callTP/3,
                          callMB/4,

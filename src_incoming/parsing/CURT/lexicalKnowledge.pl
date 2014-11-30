@@ -21,7 +21,7 @@
 
 *************************************************************************/
 
-:- module(lexicalKnowledge,[lexicalKnowledge/3]).
+:-swi_module(lexicalKnowledge,[lexicalKnowledge/3]).
 
 /*========================================================================
    Axioms for Lexical Knowledge: Nouns

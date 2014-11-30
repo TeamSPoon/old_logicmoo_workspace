@@ -10,19 +10,19 @@
 % files are formatted.
 %
 */
-% :- module(user). 
-:- module(push, []).
+% :-swi_module(user). 
+:-swi_module(push, []).
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(command).
+:- register_module_type(command).
 
-moo:actiontype(push(dir)).
+actiontype(push(dir)).
 
 % Push a box
 % Nothing to push... agent moves and takes a little damage.
 %Plus it still costs the same charge as if the agent did push something
-moo:agent_call_command(Agent,push(Dir)) :-	
+agent_call_command(Agent,push(Dir)) :-	
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	atloc(What,XXYY),
@@ -33,7 +33,7 @@ moo:agent_call_command(Agent,push(Dir)) :-
 
 % Pushing what cannot be pushed
 % Some damage and loss of charge (same as normal push)
-moo:agent_call_command(Agent,push(Dir)) :-	
+agent_call_command(Agent,push(Dir)) :-	
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	atloc(What,XXYY),
@@ -42,7 +42,7 @@ moo:agent_call_command(Agent,push(Dir)) :-
 	call_update_charge(Agent,push).
 
 % A successful PUSH
-moo:agent_call_command(Agent,push(Dir)) :-	
+agent_call_command(Agent,push(Dir)) :-	
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	atloc(What,XXYY),
@@ -97,9 +97,9 @@ squish_behind(_,_).
 crashbang(Obj) :- padd(Obj,[health(-5)]).
 
 % Record keeping
-moo:update_charge(Agent,push) :- padd(Agent,[charge(-6)]).
-moo:update_stats(Agent,strain) :- padd(Agent,[health(-2)]).
-moo:update_stats(Agent,hernia) :- padd(Agent,[health(-4),cmdfailure(hernia)]).
+update_charge(Agent,push) :- padd(Agent,[charge(-6)]).
+update_stats(Agent,strain) :- padd(Agent,[health(-2)]).
+update_stats(Agent,hernia) :- padd(Agent,[health(-4),cmdfailure(hernia)]).
 
 :- include(logicmoo(vworld/moo_footer)).
 

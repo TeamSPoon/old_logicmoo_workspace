@@ -7,7 +7,7 @@
  
 *************************************************************************/
 
-:- module(montague,[montague/0,montague/2,montagueTestSuite/0]).
+:-swi_module(montague,[montague/0,montague/2,montagueTestSuite/0]).
 
 :- use_module(readLine,[readLine/1]).
 

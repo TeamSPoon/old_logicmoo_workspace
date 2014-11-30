@@ -5,7 +5,7 @@
 %
 % *******Object definitions*******
 %.
-% Use the moo:label_type_props(label,typecode,[property1,property2,etc.]]).
+% Use the label_type_props(label,typecode,[property1,property2,etc.]]).
 % label is whats used to refer to the object in the running world
 % typecode is whats used to refer to the object for initialization (see world.pl)
 % ===============================================================================================
@@ -27,7 +27,7 @@
 
 :-decl_mpred_hybrid(mud_dictionary(text,text)).
 
-moo:parser_equiv_text(A,B):-mud_dictionary(A,B).
+parser_equiv_text(A,B):-mud_dictionary(A,B).
 
 mud_dictionary([dining,region],['dining_room']).
 mud_dictionary([washing,machine],['washing_machine']).
@@ -93,7 +93,7 @@ doorBetween(R1,R2):-pathBetween(R1,_,R2).
 
 doorsConnect(Thing,Noun2):- doorBetween(Thing,Noun2); doorBetween(Noun2,Thing).
 
-addPathBetweens:- doall((no_repeats(moo:doorsConnect(R1,R2)),must_det(ensure_some_pathBetween(R1,R2)))).
+addPathBetweens:- doall((no_repeats(doorsConnect(R1,R2)),must_det(ensure_some_pathBetween(R1,R2)))).
 
 ensure_some_pathBetween(R1,R2):- pathBetween(R1,_Dir,R2),!.
 ensure_some_pathBetween(R1,R2):- random_instance(dir,Dir,atom_length(Dir,1)),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
@@ -106,12 +106,12 @@ ensure_some_pathBetween(R1,R2):- split_name_type(R2,_,Isa), any_to_string(Isa,St
 % Where Things are Located
 % ==================================================
 
-:-dynamic(localityOfObject/2).
-:-multifile(localityOfObject/2).
+%:-dynamic(localityOfObject/2).
+%:-multifile(localityOfObject/2).
 
 subclass(region,region).
 
-:-decl_mpred(localityOfObject(obj,spatialthing)).
+:-decl_mpred_hybrid(localityOfObject(obj,spatialthing)).
 
 :-decl_mpred_hybrid(localityOfObject(kappa(Self,subclass(Self,obj)),kappa(Self2,subclass(Self2,spatialthing)))).
 :-op(600,fx,onSpawn).
@@ -208,6 +208,7 @@ subclass(device,useable).
 subclass(wearable, portable).
 subclass(portable,takeable).
 subclass(food,takeable).
+subclass(takeable,obj).
 subclass(partof,not_takable).
 
 subclass(light_switch, wall_furnature).

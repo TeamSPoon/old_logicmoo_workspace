@@ -23,11 +23,11 @@
 :- dynamic_multifile_exported mpred_prop/2.
 :- dynamic_multifile_exported never_type/1.
 
-hook:decl_database_hook(assert(_),Fact):- ignore((compound(Fact),Fact=..[F,Arg1|PROPS],argsIsaProps(F),decl_mpred(Arg1,[F|PROPS]))).
-hook:decl_database_hook(assert(_),isa(F,P)):- argsIsaProps(P),decl_mpred(F,P).
-hook:decl_database_hook(assert(_),mpred_prop(F,stubType(Stub))):-mpred_arity(F,A),declare_dbase_stub(F,A,Stub).
-% this causes too many bugs hook:decl_database_hook(assert(_),mpred_prop(F,arity(A))):- ignore((A==1,atom(F),not(never_type(F)),not(mpred_prop(F,prologOnly)),decl_type(F))).
-hook:decl_database_hook(assert(_),mpred_prop(F,P)):- decl_mpred(F,P).
+decl_database_hook(assert(_),Fact):- ignore((compound(Fact),Fact=..[F,Arg1|PROPS],argsIsaProps(F),decl_mpred(Arg1,[F|PROPS]))).
+decl_database_hook(assert(_),isa(F,P)):- argsIsaProps(P),decl_mpred(F,P).
+decl_database_hook(assert(_),mpred_prop(F,stubType(Stub))):-mpred_arity(F,A),declare_dbase_stub(F,A,Stub).
+% this causes too many bugs decl_database_hook(assert(_),mpred_prop(F,arity(A))):- ignore((A==1,atom(F),not(never_type(F)),not(mpred_prop(F,prologOnly)),decl_type(F))).
+decl_database_hook(assert(_),mpred_prop(F,P)):- decl_mpred(F,P).
 
 mpred_arity(argsIsaInList,1).
 mpred_arity(mpred_prop,2).
@@ -47,17 +47,17 @@ never_type(C):- compound(C),functor(C,F,1),isa_asserted(F,type).
 never_type(F):- mpred_arity(F,A),!, A > 1.
 
 :-op(0,fx,((decl_mpred_hybrid))).
-:-export((decl_mpred_hybrid)/1).
-:-export((decl_mpred_hybrid)/2).
-:-export((decl_mpred_hybrid)/3).
-:-export((decl_mpred_hybrid)/4).
+:-swi_export((decl_mpred_hybrid)/1).
+:-swi_export((decl_mpred_hybrid)/2).
+:-swi_export((decl_mpred_hybrid)/3).
+:-swi_export((decl_mpred_hybrid)/4).
 
 
 scan_missing_stubs(F):-
    ignore((forall(mpred_missing_stubs(F,Stub),(mpred_arity(F,A),show_call(declare_dbase_stub(F,A,Stub)))))).
 
 decl_mpred_pi(PI):-ignore((ground(PI),compound(PI),decl_mpred(PI))).
-:-export(decl_mpred_mfa/3).
+:-swi_export(decl_mpred_mfa/3).
 decl_mpred_mfa(_,M:F,A):-atom(M),!,decl_mpred_mfa(M,F,A).
 decl_mpred_mfa(M,FF,A):-var(M),!,context_module(M),!,decl_mpred_mfa(M,FF,A).
 decl_mpred_mfa(M,FF,A):-
@@ -70,7 +70,7 @@ decl_mpred_mfa(M,FF,A):-
      must_det(nonvar(M)),
     '@'((
      (static_predicate(M,F,A)->true; M:dynamic(F/A)), 
-     M:export(F/A),
+     M:swi_export(F/A),
      M:multifile(M:F/A)),M),
      scan_missing_stubs(F) ]).
 
@@ -118,7 +118,7 @@ ensure_clause(HEAD,F,_A,BODY):- assertz((HEAD:-BODY)),
    nop(((compile_predicates([HEAD])),must_det(static_predicate(HEAD)))).
 
 
-:-export(argsIsaProps/1).
+:-swi_export(argsIsaProps/1).
 argsIsaProps(Prop):- 
 	arg(_,v(argsIsaInList,multiValued,singleValued,assertionMacroHead,prologBuiltin,nonGroundOK,prologOnly,
 		ordered,negationByFailure,formatted,prologHybrid,mpred,listValued),Prop).
@@ -138,9 +138,9 @@ mpred_prop(mpred_arity,prologOnly).
 mpred_prop(never_type,prologOnly).
 mpred_prop(subft, completeExtentAsserted).
 mpred_prop(ft_info, completeExtentAsserted).
-mpred_prop(G,assert_with_pred(add)):- atom(G),moo:assertionMacroHead(G).
-mpred_prop(G,query_with_pred(ireq)):- atom(G),moo:assertionMacroHead(G).
-mpred_prop(G,retract_with_pred(del)):- atom(G),moo:assertionMacroHead(G).
+mpred_prop(G,assert_with_pred(add)):- atom(G),assertionMacroHead(G).
+mpred_prop(G,query_with_pred(ireq)):- atom(G),assertionMacroHead(G).
+mpred_prop(G,retract_with_pred(del)):- atom(G),assertionMacroHead(G).
 
 
 :-dynamic_multifile_exported(dbase_t/2).
@@ -172,18 +172,18 @@ cannot_override(F,A,prologBuiltin(F,A)):-mpred_prop(F,prologBuiltin).
 cannot_override(F,A,prologOnly(F,A)):-mpred_prop(F,prologOnly).
 cannot_override(F,A,Why):-functor_safe(P,F,A),cannot_override(P,F,A,Why).
 
-cannot_override(P,F,A,static_predicate(P)):-static_predicate(moo,F,A).
+cannot_override(P,F,A,static_predicate(P)):-static_predicate(user,F,A).
 cannot_override(P,_,_,predicate_property(P,foreign)):-predicate_property(P,foreign),!.
 cannot_override(P,_,_,predicate_property(P,builtin)):-predicate_property(P,builtin),!.
 cannot_override(P,_,_,predicate_property(P,imported_from(system))):-predicate_property(P,imported_from(system)).
 
 
-:-export(declare_dbase_local_dynamic/1).
+:-swi_export(declare_dbase_local_dynamic/1).
 declare_dbase_local_dynamic(F):- must_det(mpred_arity(F,A)),declare_dbase_stub(F,A,prologHybrid).
-:-export(declare_dbase_local_dynamic/2).
+:-swi_export(declare_dbase_local_dynamic/2).
 declare_dbase_local_dynamic(F,A):- dbase_mod(M), M:declare_dbase_local_dynamic(M,F,A).
 
-:-export(declare_dbase_local_dynamic/3).
+:-swi_export(declare_dbase_local_dynamic/3).
 declare_dbase_local_dynamic(M,F,0):- trace_or_throw(illegal_argument_declare_dbase_local_dynamic(M,F,0)).
 declare_dbase_local_dynamic(M,F,A):- cannot_override(F,A,Why),!,dmsg(todo(cannot_override(F,A,Why))),nop(listing(M:F/A)).
 declare_dbase_local_dynamic(M,F,A):- must(declare_dbase_local_dynamic_really(M,F,A)).
@@ -192,14 +192,14 @@ decl_mpred_fa_hooks(F,A,multifile):- multifile(F/A).
 decl_mpred_fa_hooks(F,A,thread_local):- thread_local(F/A).
 decl_mpred_fa_hooks(F,A,dyn):- dynamic(F/A).
 decl_mpred_fa_hooks(F,A,stubType(dyn)):- !,decl_mpred_fa_hooks(F,A,dyn).
-decl_mpred_fa_hooks(F,A,stubType(Stub)):-  functor(P,F,A), not(static_predicate(moo,F,A)), assert_if_new((P:-env_op(Stub,call,P))),assert(mpred_prop(F,hasStub(Stub))),!. % compile_predicates([F/A]).
-hook:decl_database_hook(assert(_),mpred_prop(F,ENV)):- ((assert_if_new(env_pretype(ENV)),mpred_arity(F,A), doall(decl_mpred_fa_hooks(F,A,ENV)))).
+decl_mpred_fa_hooks(F,A,stubType(Stub)):-  functor(P,F,A), not(static_predicate(user,F,A)), assert_if_new((P:-env_op(Stub,call,P))),assert(mpred_prop(F,hasStub(Stub))),!. % compile_predicates([F/A]).
+decl_database_hook(assert(_),mpred_prop(F,ENV)):- ((assert_if_new(env_pretype(ENV)),mpred_arity(F,A), doall(decl_mpred_fa_hooks(F,A,ENV)))).
 
 add_hybrid_rules(M:HEAD,BODY):-atom(M),!,add_hybrid_rules(HEAD,BODY).
 add_hybrid_rules(HEAD,true):-!,hooked_assertz(HEAD).
-add_hybrid_rules(HEAD,BODY):- show_call(hooked_assertz(moo:hybrid_rule(HEAD,BODY))).
+add_hybrid_rules(HEAD,BODY):- show_call(hooked_assertz(hybrid_rule(HEAD,BODY))).
 
-mpred_stub(body_req, F,A,HEAD, (!, hook:body_req(F,A,HEAD,HEAD_T) ) ):- functor(HEAD,F,A),HEAD=..[F|ARGS],HEAD_T=..[dbase_t,F|ARGS].
+mpred_stub(body_req, F,A,HEAD, (!, body_req(F,A,HEAD,HEAD_T) ) ):- functor(HEAD,F,A),HEAD=..[F|ARGS],HEAD_T=..[dbase_t,F|ARGS].
 
 declare_dbase_local_dynamic_really(M,F,A):- functor(HEAD,F,A),mpred_stub(body_req, F,A,HEAD,BODY),M:is_asserted_clause(HEAD,BODY),!.
 declare_dbase_local_dynamic_really(M,F,A):- mpred_prop(F,prologOnly),!,trace_or_throw(declare_dbase_local_dynamic_really(M,F,A)).
@@ -215,7 +215,7 @@ declare_dbase_local_dynamic_really(M,F,A):-
 hybrid_rule_term_expansion(file,':-'(_),_):-!,fail.
 hybrid_rule_term_expansion(file,HEAD,_):-not(compound(HEAD)),!,fail.
 hybrid_rule_term_expansion(file,(HEAD:-true),':-'(add(HEAD))):-functor_h(HEAD,F),mpred_prop(F,prologHybrid),add(HEAD),!.
-hybrid_rule_term_expansion(file,(HEAD:-NEWBODY),moo:hybrid_rule(HEAD,NEWBODY)):-functor_h(HEAD,F),mpred_prop(F,prologHybrid),!.
+hybrid_rule_term_expansion(file,(HEAD:-NEWBODY),hybrid_rule(HEAD,NEWBODY)):-functor_h(HEAD,F),mpred_prop(F,prologHybrid),!.
 
 hybrid_rule_term_expansion((I:-_),_):-!,once((compound(I),functor(I,F,A),asserta_if_new(mpred_prolog_arity(F,A)))),!,fail.
 hybrid_rule_term_expansion(I,_):- once((compound(I),functor(I,F,A),asserta_if_new(mpred_prolog_arity(F,A)))),!,fail.
@@ -231,7 +231,7 @@ declare_dbase_local_dynamic_plus_2(F,A2):- once(( AMinus2 is A2 -2, declare_dbas
 declare_dbase_local_dynamic_plus_2(F,A2):- cannot_override(F,A2,Why),!,dmsg(cannot_override_plus_2(F,A2,Why)).
 
 declare_dbase_local_dynamic_plus_2(F,A2):- 
-   export(F/A2),
+   swi_export(F/A2),
    functor(HEAD,F,A2),
    HEAD=..[F|ARGS],
    append(ARGSMinus2,[_,_],ARGS),
@@ -244,9 +244,9 @@ declare_dbase_local_dynamic_plus_2(F,A2):-
 
  
 
-user_export(_):- dbase_mod(user),!.
-user_export(Prop/Arity):- 
-   dbase_mod(M), '@'( M:export(Prop/Arity) , M).
+user_swi_export(_):- dbase_mod(user),!.
+user_swi_export(Prop/Arity):- 
+   dbase_mod(M), '@'( M:swi_export(Prop/Arity) , M).
 
 % ============================================
 % DBASE to Cyc Predicate Mapping
@@ -297,7 +297,7 @@ make_functorskel(F,N,fskel(F,DBASE,Call,I,NList,MtVars,Call2)):-typical_mtvars(M
 % decl_mpred/N
 %
 % ============================================
-:-export(registerCycPredPlus2/1).
+:-swi_export(registerCycPredPlus2/1).
 
 
 registerCycPredPlus2_3(_CM,M,PI,F/A2):-
@@ -337,7 +337,7 @@ assert_arity_lc(F,A):-
     hooked_asserta(mpred_prop(F,arity(A))),!.
        
 
-:-export(rescan_missing_stubs/0).
+:-swi_export(rescan_missing_stubs/0).
 rescan_missing_stubs:-loop_check_local(time_call(rescan_missing_stubs_lc),true).
 rescan_missing_stubs_lc:- once(thglobal:use_cyc_database), once(with_assertions(thlocal:useOnlyExternalDBs,forall((kb_t(arity(F,A)),A>1,good_pred_relation_name(F,A),not(mpred_arity(F,A))),with_no_dmsg(decl_mpred_mfa,decl_mpred_hybrid(F,A))))),fail.
 rescan_missing_stubs_lc:- hotrace((doall((mpred_missing_stubs(F,Stub),mpred_arity(F,A),declare_dbase_stub(F,A,Stub))))).
@@ -358,10 +358,10 @@ first_mpred_props(argsIsaInList(_)).
 mpred_prop_ordered(Pred,Prop):-first_mpred_props(Prop),mpred_prop(Pred,Prop),not(mpred_prop(Pred,prologOnly)).
 mpred_prop_ordered(Pred,Prop):-mpred_prop(Pred,Prop),not(first_mpred_props(Prop)),not(mpred_prop(Pred,prologOnly)).
 
-:-export(rescan_mpred_props/0).
+:-swi_export(rescan_mpred_props/0).
 
 rescan_mpred_props:- loop_check(rescan_mpred_props_lc,true).
-rescan_mpred_props_lc:-rescan_duplicated_facts(moo,mpred_prop(_,_)),fail.
+rescan_mpred_props_lc:-rescan_duplicated_facts(user,mpred_prop(_,_)),fail.
 rescan_mpred_props_lc:-time(forall(mpred_prop_ordered(Pred,Prop),hooked_asserta(mpred_prop(Pred,Prop)))),fail.
 rescan_mpred_props_lc:-rescan_missing_stubs.
 rescan_mpred_props_lc.
@@ -417,20 +417,20 @@ decl_mpred_1(_CM,M,PI,F/A):-
 
 :-op(0,fx,decl_mpred_prolog).
 
-:-export(decl_mpred_prolog/1).
+:-swi_export(decl_mpred_prolog/1).
 decl_mpred_prolog(P):- with_pi(P,decl_mpred_prolog).
 
-:-export(decl_mpred_prolog/3).
+:-swi_export(decl_mpred_prolog/3).
 decl_mpred_prolog(M,PI,F/A):- 
  decl_mpred_prolog(_,M,PI,F/A).
 
-:-export(decl_mpred_prolog/4).
+:-swi_export(decl_mpred_prolog/4).
 decl_mpred_prolog(CM,M,PI,F/A):-
       dynamic_multifile_exported(CM,M,PI,F/A),
       debugOnError(assert_if_new(mpred_prop(F,prologOnly))),
       debugOnError(assert_if_new(mpred_arity(F,A))),
       assert_arity(F,A),
-      export(F/A),
+      swi_export(F/A),
       % retractall(mpred_prop(F,_)),   
       decl_mpred(F,prologOnly),   
       decl_mpred(F,prologBuiltin),
@@ -450,10 +450,10 @@ decl_mpred_prolog(CM,M,PI,F/A):-
 % :- dynamic_multifile_exported((decl_mpred/1)).
 
 
-functor_check_univ(M:G1,F,List):-atom(M),member(M,[dbase,moo]),!,functor_check_univ(G1,F,List),!.
+functor_check_univ(M:G1,F,List):-atom(M),member(M,[dbase,user]),!,functor_check_univ(G1,F,List),!.
 functor_check_univ(G1,F,List):-must_det(compound(G1)),must_det(G1 \= _:_),must_det(G1 \= _/_),G1=..[F|List],!.
 
-:-export(glean_pred_props_maybe/1).
+:-swi_export(glean_pred_props_maybe/1).
 glean_pred_props_maybe(_:G):-!,compound(G),glean_pred_props_maybe(G).
 glean_pred_props_maybe(G):-compound(G),G=..[F,Arg1|RGS],argsIsaProps(F),!,add_mpred_prop_gleaned(Arg1,[F|RGS]),!.
 

@@ -21,7 +21,7 @@
 
 *************************************************************************/
 
-:- module(comsemPredicates,
+:-swi_module(comsemPredicates,
           [appendLists/3,
 	   basicFormula/1,
            compose/3,

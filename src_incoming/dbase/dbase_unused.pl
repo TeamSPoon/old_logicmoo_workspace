@@ -22,7 +22,7 @@ end_of_file.
 % Dec 13, 2035
 % Douglas Miles
 */
-:- module(dbase,[add/1,
+:-swi_module(dbase,[add/1,
 force_expand_goal/2,
 force_expand_head/2,
 argIsa_call/4,
@@ -176,7 +176,7 @@ Z = noprofile ;
 */
 
 :- meta_predicate(call_after_game_load(-)).
-call_after_game_load(Code):- call_after_next(moo:not_loading_game_file,Code).
+call_after_game_load(Code):- call_after_next(not_loading_game_file,Code).
 
 
 :- decl_mpred(act_affect/3,extentKnown).
@@ -218,10 +218,10 @@ call_after_game_load(Code):- call_after_next(moo:not_loading_game_file,Code).
       str/2,
       wearing/2)).
 
-:- moo:dbase_mod(DBASE), dynamic(DBASE:inside_clause_expansion/1).
+:- dbase_mod(DBASE), dynamic(DBASE:inside_clause_expansion/1).
 
 
-:- moo:dbase_mod(DBASE), 
+:- dbase_mod(DBASE), 
           DBASE:(dynamic((
           dbase_t/1,
           dbase_t/2,
@@ -254,8 +254,8 @@ call_after_game_load(Code):- call_after_next(moo:not_loading_game_file,Code).
           dbase_f/6,
           dbase_f/7))).
 
-:- moo:dbase_mod(DBASE), 
-          DBASE:(export((
+:- dbase_mod(DBASE), 
+          DBASE:(swi_export((
           dbase_t/1,
           dbase_t/2,
           dbase_t/3,
@@ -287,7 +287,7 @@ call_after_game_load(Code):- call_after_next(moo:not_loading_game_file,Code).
           dbase_f/6,
           dbase_f/7))).
 
-:- moo:dbase_mod(DBASE), 
+:- dbase_mod(DBASE), 
           DBASE:(multifile((
           dbase_t/1,
           dbase_t/2,
@@ -320,7 +320,7 @@ call_after_game_load(Code):- call_after_next(moo:not_loading_game_file,Code).
           dbase_f/6,
           dbase_f/7))).
 
-:- moo:dbase_mod(DBASE), 
+:- dbase_mod(DBASE), 
           DBASE:(discontiguous((
           dbase_t/1,
           dbase_t/2,
@@ -370,7 +370,7 @@ call_after_game_load(Code):- call_after_next(moo:not_loading_game_file,Code).
 
 :- dynamic db_prop_prolog/2.
 
-% :- context_module(M),asserta(moo:dbase_mod(M)),dmsg(assert_if_new(moo:dbase_mod(M))).
+% :- context_module(M),asserta(dbase_mod(M)),dmsg(assert_if_new(dbase_mod(M))).
 
 :- dynamic_multifile_exported dbase_t/1.
 :- dynamic_multifile_exported dbase_t/2.
@@ -687,7 +687,7 @@ arityMatches(A,OTHER):- number(OTHER),!,A=OTHER.
 isCycPredArity_ignoreable(P,A):- hotrace(ignore(isCycPredArity(P,A))).
 
 isCycPredArity_Check(P,A):- isCycPredArity(P,A),!.
-% isCycPredArity_Check(P,A):- moo:mpred_arity(P,A),!. % get_mpred_prop(P,AA,_),!,integer(AA),A=AA.
+% isCycPredArity_Check(P,A):- mpred_arity(P,A),!. % get_mpred_prop(P,AA,_),!,integer(AA),A=AA.
 
 isCycPredArity(P,A):- hotrace(loop_check_throw(isCycPredArity_lc(P,A))).
 isCycPredArity_lc(_:P,A):- nonvar(P),!,isCycPredArity(P,A).
@@ -715,12 +715,12 @@ isCycPredArity1(P,A):- xcall_t(((holds_t(arityMin,P,A),not(holds_t(arityMax,P, _
 :- style_check(+singleton).
 
 
-scan_arities:- forall(holds_t(arity,F,A),moo:decl_mpred(F,A)).
+scan_arities:- forall(holds_t(arity,F,A),decl_mpred(F,A)).
 
 % logicmoo('vworld/dbase') compiled into dbase 11.97 sec, 2,140,309 clauses
 %:- include(logicmoo('pldata/trans_header')).
 
-process_mworld:- !. %forall(dynamicCyc2(C),moo:registerCycPredPlus2(C)).
+process_mworld :- !. %forall(dynamicCyc2(C),registerCycPredPlus2(C)).
 
 % logicmoo('pldata/mworld0.pldata') compiled into world 61.18 sec, 483,738 clauses
 
@@ -750,10 +750,10 @@ remove_undef_search:- ((
  assert((check:list_undefined(A):- not(thread_self(main)),!, ignore(A=[]))),
  assert((check:list_undefined(A):- ignore(A=[]),real_list_undefined(A))))).
 
-user_export(_):- moo:dbase_mod(user),!.
-user_export(_M:Prop/Arity):- !,user_export(Prop/Arity).
-user_export(Prop/Arity):- 
-   moo:dbase_mod(M), '@'( ((export(Prop/Arity),dynamic(Prop/Arity))) , M).
+user_swi_export(_):- dbase_mod(user),!.
+user_swi_export(_M:Prop/Arity):- !,user_swi_export(Prop/Arity).
+user_swi_export(Prop/Arity):- 
+   dbase_mod(M), '@'( ((swi_export(Prop/Arity),dynamic(Prop/Arity))) , M).
 
 
 :- meta_predicate hooked_asserta(^), hooked_assertz(^), hooked_retract(^), hooked_retractall(^).
@@ -767,7 +767,7 @@ user_export(Prop/Arity):-
 
 :-decl_dynamic_prolog(move:movedist/2).
 
-% :- moo:register_module_type(utility).
+% :- register_module_type(utility).
 
 % oncely later will throw an error if there where choice points left over by call
 oncely(:-(Call)):-!,Call,!.
@@ -818,7 +818,7 @@ world_clear(Named):- dmsg('Clearing world database: ~q.',[Named]).
 
 
 
-:-export(glean_pred_props_maybe/1).
+:-swi_export(glean_pred_props_maybe/1).
 glean_pred_props_maybe(_:G):-!,compound(G),glean_pred_props_maybe(G).
 glean_pred_props_maybe(G):-compound(G),functor(G,F,_),argsIsaProps(F),G=..[F,Arg1|RGS],!,add_mpred_prop_gleaned(Arg1,[F|RGS]),!.
 
@@ -837,22 +837,22 @@ split_name_type(C,P,C):- atom(C),dmsg(atom(C)),trace,gensym(C,P),!.
 split_name_type(C,P,C):- string(C),trace,gensym(C,P),!.
 
 
-hook:decl_database_hook(assert(_),ft_info(FT,_)):- define_ft(FT).
-% hook:decl_database_hook(assert(_),subft(FT,OFT)):- formattype(OFT),define_ft(FT).
+decl_database_hook(assert(_),ft_info(FT,_)):- define_ft(FT).
+% decl_database_hook(assert(_),subft(FT,OFT)):- formattype(OFT),define_ft(FT).
 
 formattype(formattype).
 formattype(S):-ground(S),!,is_ft0(S),!.
 formattype(S):-dtrace,dbase_t(isa,S,formattype).
 
 /*
-is_ft0(S):-  moo:ft_info(S,_).
+is_ft0(S):-  ft_info(S,_).
 is_ft0(S):-  dbase_t(subft,S,_).
 is_ft0(S):-  dbase_t(subclass,S,formattype).
 */
 is_ft0(S):- clause( dbase_t(isa,S,formattype),true).
 
 
-:- export((
+:- swi_export((
           samef/2,
           same/2,
           term_is_ft/2,
@@ -932,9 +932,9 @@ db_tell_isa(I,T):- must_det(hooked_asserta(isa(I,T))),must(is_asserted(isa(I,T))
 % ================================================
 % db_tell_isa HOOKS
 % ================================================
-hook:decl_database_hook(assert(_),isa(I,T)):- doall(db_tell_isa_hooked(I,T)).
-hook:decl_database_hook(assert(_),dbase_t(T,I)):- doall(db_tell_isa_hooked(I,T)).
-% hook:decl_database_hook(retract(_),isa(I,T)):-doall(db_retract_isa_hooked(I,T)).
+decl_database_hook(assert(_),isa(I,T)):- doall(db_tell_isa_hooked(I,T)).
+decl_database_hook(assert(_),dbase_t(T,I)):- doall(db_tell_isa_hooked(I,T)).
+% decl_database_hook(retract(_),isa(I,T)):-doall(db_retract_isa_hooked(I,T)).
 
 db_tell_isa_hooked(I,T):- not(ground(db_tell_isa(I,T))),!, trace_or_throw(not(ground(db_tell_isa(I,T)))).
 
@@ -960,7 +960,7 @@ clauses_of(F,H,B):-current_predicate(F/A),functor(H,F,A),clause(H,B).
 
 dbase_clauses(H,B):-clauses_of(dbase_t,H,B).
 
-hook:decl_database_hook(assert(_),isa(I,T)):- doall(db_tell_isa_hooked_after(I,T)).
+decl_database_hook(assert(_),isa(I,T)):- doall(db_tell_isa_hooked_after(I,T)).
 
 db_tell_isa_hooked_after(I,T):- is_creatable_type(T),!, db_tell_isa_hooked_creation(I,T).
 db_tell_isa_hooked_after(I,T):- extentKnown(ST),impliedSubClass(T,ST),db_op_int(tell(asap),isa(I,ST)).
@@ -974,9 +974,9 @@ extentKnown(F):-get_isa_asserted(F,extentKnown).
 impliedSubClass(T,ST):-stack_check(300),req(subclass(T,ST)).
 
 % one of 4 special types
-db_tell_isa_hooked_creation(I,T):- is_creatable_type(T),!,call_after_game_load((world:create_instance(I,T,[]))).
+db_tell_isa_hooked_creation(I,T):- is_creatable_type(T),!,call_after_game_load((create_instance(I,T,[]))).
 % sublass of 4 special types
-db_tell_isa_hooked_creation(I,T):- doall((is_creatable_type(ST),impliedSubClass(T,ST),call_after_game_load((world:create_instance(I,ST,[isa(T)]))))).
+db_tell_isa_hooked_creation(I,T):- doall((is_creatable_type(ST),impliedSubClass(T,ST),call_after_game_load((create_instance(I,ST,[isa(T)]))))).
 
 
 
@@ -1008,7 +1008,7 @@ db_rewrite(_Op,Term,NewTerm):-equivRule_call(Term,NewTerm).
 db_rewrite(_Op,Term,NewTerm):-forwardRule_call(Term,NewTerm).
 
 
-%% hook:dmsg_hook(db_op(query(HLDS,call),dbase:holds_t(ft_info,type,'$VAR'(_)))):-dtrace.
+%% dmsg_hook(db_op(query(HLDS,call),dbase:holds_t(ft_info,type,'$VAR'(_)))):-dtrace.
 
 call_must(query,Call):- !,call(Call).
 call_must(query(Must,_),Call):- !,call_must(Must,Call).
@@ -1026,7 +1026,7 @@ add_from_file(B,_):- contains_singletons(B),grtrace,dmsg(todo(add_from_file_cont
 add_from_file(B,B):- db_op(tell(_OldV),B),!.
 
 % do_db_op_hooks:-!.
-do_db_op_hooks:- ignore((hotrace(((do_all_of(dbase_module_loaded)),call_after(moo:not_loading_game_file, true))))).
+do_db_op_hooks:- ignore((hotrace(((do_all_of(dbase_module_loaded)),call_after(not_loading_game_file, true))))).
 
 db_op_int(query(HLDS,Must),Term):- !,do_db_op_hooks, db_op(query(HLDS,Must),Term).
 db_op_int(Op,Term):- do_db_op_hooks,db_op(Op,Term),do_db_op_hooks.
@@ -1234,7 +1234,7 @@ call_expanded_for(Must,LC):- into_mpred_form_nubervars(LC,TERM),
 
 
 call_expanded_for(_Dbase_t,subclass(S,C)):-!,clause(dbase_t(subclass,S,C),true).
-call_expanded_for(_Dbase_t,ft_info(S,C)):-!,clause(moo:ft_info(S,C),true).
+call_expanded_for(_Dbase_t,ft_info(S,C)):-!,clause(ft_info(S,C),true).
 %call_expanded_for(_Dbase_t,subclass(_,formattype)):-!,dtrace,fail.
 call_expanded_for(_Dbase_t,isa(S,C)):-!,get_isa_backchaing(S,C).
 
@@ -1376,17 +1376,17 @@ show_cgoal(G):- % dmsg(show_cgoal(G)),
 % MOTEL HOOKS
 % ================================================
 
-hook:decl_database_hook(assert(_),subclass(Sub,Sup)):- motel:defprimconcept(Sub,Sup).
+decl_database_hook(assert(_),subclass(Sub,Sup)):- motel:defprimconcept(Sub,Sup).
 
-hook:decl_database_hook(assert(_), subft(I,T)):- (atomic(I)->define_ft(I);true) ,  (atomic(T)->define_ft(T);true).
-hook:decl_database_hook(assert(_),subclass(I,T)):- (atomic(I)->define_type(I);true) ,  (atomic(T)->define_type(T);true).
+decl_database_hook(assert(_), subft(I,T)):- (atomic(I)->define_ft(I);true) ,  (atomic(T)->define_ft(T);true).
+decl_database_hook(assert(_),subclass(I,T)):- (atomic(I)->define_type(I);true) ,  (atomic(T)->define_type(T);true).
 
 % ================================================
 % DBASE_T HOOKS
 % ================================================
-hook:decl_database_hook(assert(_),C):-  holds_form(C,dbase_t,DBASE), asserta_if_new(DBASE).
-hook:decl_database_hook(assert(_),C):-  holds_form(C,dbase_f,DBASE_F), retractall(DBASE_F).
-hook:decl_database_hook(retract(_),C):-  holds_form(C,dbase_t,DBASE), retractall(DBASE).
+decl_database_hook(assert(_),C):-  holds_form(C,dbase_t,DBASE), asserta_if_new(DBASE).
+decl_database_hook(assert(_),C):-  holds_form(C,dbase_f,DBASE_F), retractall(DBASE_F).
+decl_database_hook(retract(_),C):-  holds_form(C,dbase_t,DBASE), retractall(DBASE).
 
 
 % facing(I,C):- is_asserted(facing(I,C)).
@@ -1449,7 +1449,7 @@ valuedOrThrow1(_F,_A,_Obj,ARGS):- last(ARGS,unknown),!.
 valuedOrThrow1(F,A,Obj,ARGS):- trace_or_throw(is_single_valuedOrFail(F,A,Obj,ARGS)).
 
 
-findall_type_default_props(Inst,Type,TraitsO):- findall(Props,moo:default_type_props(Inst,Type,Props),Traits),flatten(Traits,TraitsM),!,subst(TraitsM,self,Inst,TraitsO).
+findall_type_default_props(Inst,Type,TraitsO):- findall(Props,default_type_props(Inst,Type,Props),Traits),flatten(Traits,TraitsM),!,subst(TraitsM,self,Inst,TraitsO).
 
 
 replace_nth([],_N,_OldVar,_NewVar,[]):- !,trace_or_throw(missed_the_boat).
@@ -1475,7 +1475,7 @@ insert_into([Carry|ARGS],After,Insert,[Carry|NEWARGS]):-
    After1 is After - 1,
    insert_into(ARGS,After1,Insert,NEWARGS).
 
-moo:default_type_props(_,food,[height(0)]).
+default_type_props(_,food,[height(0)]).
 
 is_mpred_prolog(F,_A):- get_mpred_prop(F,ask_module(_)), 
    not(mpred_prop(F,query(_))),!.
@@ -1529,7 +1529,7 @@ asserta_if_ground(_).
 
 
 :- include(logicmoo(vworld/moo_loader)).
-:- export((          
+:- swi_export((          
           finish_processing_game/0, 
           correctType/4,
           gload/0,
@@ -1557,16 +1557,16 @@ load_game(Name,File):-
 
 load_game_file(Name,File):- 
  absolute_file_name(File,Path),
-  with_assertions(moo:loading_game_file(Name,File),
+  with_assertions(loading_game_file(Name,File),
    setup_call_cleanup(see(Path),
-    (load_game_stream(Name),asserta_new(moo:loaded_game_file(Name,File))),
+    (load_game_stream(Name),asserta_new(loaded_game_file(Name,File))),
     seen)).
 
 load_game_file(Name,File):- 
  absolute_file_name(File,Path),
-  with_assertions(moo:loading_game_file(Name,File),
+  with_assertions(loading_game_file(Name,File),
    setup_call_cleanup(open(Path,read,Stream),
-    (load_game_stream(Name,Stream),asserta_new(moo:loaded_game_file(Name,File))),
+    (load_game_stream(Name,Stream),asserta_new(loaded_game_file(Name,File))),
     close(Stream))).
    
 load_game_stream(_Name):- style_check(-atom),repeat,catch( read_term(Term,[double_quotes(string)]),E,Term=error(E)),game_assert(Term),Term == end_of_file,!.
@@ -1579,10 +1579,10 @@ game_assert(Term):- must_det(add(Term)).
 
 finish_processing_game:- loop_check(doall(finish_processing_game0),true),!.
 
-finish_processing_game0:- moo:loading_game_file(N,F),!,trace_or_throw(moo:loading_game_file(N,F)).
-finish_processing_game0:- do_all_of(moo:not_loading_game_file).
+finish_processing_game0:- loading_game_file(N,F),!,trace_or_throw(loading_game_file(N,F)).
+finish_processing_game0:- do_all_of(not_loading_game_file).
 finish_processing_game0:- rescan_dbase_t.
-finish_processing_game0:- call_after(moo:not_loading_game_file, savedb).
+finish_processing_game0:- call_after(not_loading_game_file, savedb).
 
 rescan_dbase_t:- loop_check(rescan_dbase_t_once,true).
 rescan_dbase_t_once:-doall((between(3,7,L),length(Args,L),Dbase_t=..[dbase_t|Args],once(rescan_dbase_t_once(Dbase_t)),fail)).
@@ -1599,16 +1599,16 @@ savedb:-
    tell('/tmp/lm/savedb'),make_db_listing,told),E,dmsg(savedb(E))).
 
 make_db_listing:-
- % moo:dbase_mod(DBM),
+ % dbase_mod(DBM),
 %   listing(dbase_t),
  %  listing(dbase_f),
    listing(dbase:_),
- listing(moo:_),
+ listing(_),
  listing( tbox:_).
 
 /*
 is_ft_except(S,List):- 
-   moo:ft_info(S,_);
+   ft_info(S,_);
    not((member(S,List), 
       ((get_subft(S,S2) ,
         is_ft_except(S2,[S|List]) ;
@@ -1634,8 +1634,8 @@ p2c_dir2('n','North-Directly').
 :- end_transform_moo_preds.
 
 :- begin_transform_moo_preds.
-hook:decl_database_hook(assert(_),C):- expire_tabled_list(C).
-hook:decl_database_hook(retract(_),C):- expire_tabled_list(C).
+decl_database_hook(assert(_),C):- expire_tabled_list(C).
+decl_database_hook(retract(_),C):- expire_tabled_list(C).
 :- end_transform_moo_preds.
 
 
@@ -1645,7 +1645,7 @@ do_pttp_tests:-do_pttp_test(_ALL).
 do_pttp_tests:-pttp_assert(test123).
 do_pttp_tests:-pttp_query(test123).
 % do_pttp_tests:-prolog.
-:-export(do_pttp_tests/0).
+:-swi_export(do_pttp_tests/0).
 
 
 
@@ -1702,36 +1702,36 @@ dbase_t(term_anglify_args, _, A, C, B, singleValued, G) :-
         add_arg_parts_of_speech(A, 1, B, D),
         verb_after_arg(A, C, E),
         insert_into(D, E, verbFn(A), F),
-        world:fully_expand(F, G), !.
+        fully_expand(F, G), !.
 dbase_t(createableType, A) :-
-    world:
+    
     (   dbase:holds_t(formattype, A), !,
         fail
     ).
 dbase_t(formattype, A) :-
-        world:dbase:holds_t(subclass, A, formattype).
+        dbase:holds_t(subclass, A, formattype).
 dbase_t(inRegion, apath(A, B), A) :-
         is_asserted(pathBetween(A, B, _)).
 dbase_t(inRegion, A, C) :-
         req(dbase:holds_t(atloc, A, B)),
-        world:locationToRegion(B, C).
+        locationToRegion(B, C).
 dbase_t(inRegion, A, B) :-
         is_asserted(inRegion(A, B)).
 dbase_t(subclass, A, formattype) :-
-        world:isa(A, formattype).
+        isa(A, formattype).
 dbase_t(createableSubclassType, B, A) :-
-    world:
+    
     (   dbase:holds_t(createableType, A),
         dbase:holds_t(subclass, B, A)
     ).
 dbase_t(createableSubclassType, A, A) :-
-    world:
+    
     (   nonvar(A),
         dbase:holds_t(createableType, A)
     ).
 dbase_t(isa, A, B) :-
-        world:loop_check(req(dbase:holds_t(isa, A, B)), is_asserted(isa(A, B))).
-dbase_t(moo:label_type, A, B) :-
+        loop_check(req(dbase:holds_t(isa, A, B)), is_asserted(isa(A, B))).
+dbase_t(label_type, A, B) :-
         objects:dbase:holds_t(label_type_props, A, B, _).
 
 

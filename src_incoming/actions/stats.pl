@@ -1,5 +1,5 @@
-% :- module(user). 
-:- module(stats, []).
+% :-swi_module(user). 
+:-swi_module(stats, []).
 /** <module> A command to  ...
 % charge(Agent,Chg) = charge (amount of charge agent has)
 % health(Agent,Dam) = damage
@@ -10,13 +10,13 @@
 */
 :- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(command).
+:- register_module_type(command).
 
 % ====================================================
 % show the stats system
 % ====================================================
-moo:action_info(stats(optional(obj,self)), "Examine MUD stats of something").
-moo:agent_call_command(Agent,stats(What)):-    
+action_info(stats(optional(obj,self)), "Examine MUD stats of something").
+agent_call_command(Agent,stats(What)):-    
    show_kb_preds(Agent,[
          charge(What,value),
          str(What,value),
@@ -27,7 +27,7 @@ moo:agent_call_command(Agent,stats(What)):-
    term_listing(What),!.
 
 
-moo:action_info(list(term),"grep for a term").
+action_info(list(term),"grep for a term").
 
 
 
@@ -60,8 +60,8 @@ endurance, and sustained positioning and motion.
 your ability to command your own destiny.
 */
 
-moo:action_info(list(optional(term,self)), "Examine MUD listing of something").
-moo:agent_call_command(_Gent,list(Obj)):- term_listing(Obj).
+action_info(list(optional(term,self)), "Examine MUD listing of something").
+agent_call_command(_Gent,list(Obj)):- term_listing(Obj).
 
 :- include(logicmoo(vworld/moo_footer)).
 

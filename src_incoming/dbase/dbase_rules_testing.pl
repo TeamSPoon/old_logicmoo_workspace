@@ -1,10 +1,13 @@
 :- discontiguous(pttp_test/2).
 
+:-dynamic(pttp_test_took/3).
 
 do_pttp_test(TestName):- forall(pttp_test(TestName,Data),
                                 catch((ignore(((                                 
                                  dmsg(do_pttp_test(TestName)),
-                                 eraseall(int_query,_),                                 
+                                 eraseall(int_query,_),         
+                                 eraseall(int_not_firstOrder,_),
+                                 eraseall(int_firstOrder,_),
                                  /*
                                  eraseall(int_not_firstOrder,_),
                                  eraseall(not_firstOrder,_),
@@ -75,74 +78,6 @@ pttp_assert(X) :-
 	timed_call(dpttp2(Y),'Prolog compilation'),
 	!.
 */
-
-
-
-
-
-pttp_test(logicmoo_example1,
-	((
-          motherOf(joe,sue),
-          (motherOf(X,Y) => female(Y)),
-          (sonOf(Y,X) => (motherOf(X,Y);fatherOf(X,Y))),          
-          (query:-female(Y))
-	))).
-
-
-logicmoo_example1_holds:-do_pttp_test(logicmoo_example1_holds).
-
-pttp_test(logicmoo_example1_holds,
-	((
-          firstOrder(motherOf,joe,sue),
-          (firstOrder(motherOf,X,Y) => firstOrder(female,Y)),
-          (firstOrder(sonOf,Y,X) => (firstOrder(motherOf,X,Y);firstOrder(fatherOf,X,Y))),          
-          (query:-firstOrder(female,Y))
-	))).
-
-
-logicmoo_example2:-do_pttp_test(logicmoo_example2).
-
-%  int_kbholds(sonOf,gun,phil,A,B,C,C,D,E,F):-D=[G,[1,F,A,B]|H],E=[G|H].
-%  int_not_kbholds(female,gun,A,B,C,C,D,E,F):-D=[G,[-2,F,A,B]|H],E=[G|H].
-%  int_query(A,B,C,D,E,F,G):- (E=[H,[3,query,A,B]|I],J=[H|I]),firstOrder(K,phil,gun,A,B,C,D,J,F).
-%  firstOrder(A,B,C,D,E,F,G,H,I):-J=firstOrder(A,B,C), (identical_member(J,D)->fail; (identical_member(J,E),!;unifiable_member(J,E)),G=F,H=[K,[red,J,D,E]|L],I=[K|L];int_kbholds(A,B,C,D,E,F,G,H,I,J)).
-%  not_kbholds(A,B,C,D,E,F,G,H):-I=firstOrder(A,B), (identical_member(I,D)->fail; (identical_member(I,C),!;unifiable_member(I,C)),F=E,G=[J,[redn,I,C,D]|K],H=[J|K];int_not_kbholds(A,B,C,D,E,F,G,H,I)).
-pttp_test(logicmoo_example2,
-	((
-          firstOrder(sonOf,gun,phil),
-          not(firstOrder(female,gun)),
-          (query:-firstOrder(What,phil,gun))
-          % What = fatherOf
-	))).
-
-
-logicmoo_example3:-do_pttp_test(logicmoo_example3).
-
-pttp_test(logicmoo_example3_will_fail,
-	((
-          (secondOrder(genls,SubClass,SuperClass) & firstOrder(SubClass,Instance) => firstOrder(SuperClass,Instance)),
-          (secondOrder(genlPreds,P1,P2) & firstOrder(P1,A) => firstOrder(P2,A)),
-          (secondOrder(genlPreds,P1,P2) & firstOrder(P1,A,B) => firstOrder(P2,A,B)),
-          (secondOrder(genlPreds,P1,P2) & firstOrder(P1,A,B,C) => firstOrder(P2,A,B,C)),
-          % (secondOrder(genlPreds,P1,P2) & firstOrder(P1,A,B,C,D) => firstOrder(P2,A,B,C,D)),
-          (secondOrder(genlInverse,P1,P2) & firstOrder(P1,A,B) => firstOrder(P2,B,A)),
-
-            (firstOrder(P2,A,B,C,D):-secondOrder(genlPreds,P1,P2) , firstOrder(P1,A,B,C,D) ),
-           (~firstOrder(P,B,A) :- secondOrder(irreflexive,P) & firstOrder(P,A,B)),
-           % (secondOrder(irreflexive,P) & firstOrder(P,A,B) => ~ firstOrder(P,B,A)),
-
-           (~ secondOrder(P,A,B)<=> ~firstOrder(P,A,B)),
-           secondOrder(genlInverse,parentOf,sonOf),
-         %  secondOrder(arg1Isa,genlInverse
-           secondOrder(genlPreds,motherOf,parentOf),
-           
-           secondOrder(irreflexive,sonOf),           
-
-          (query:- not(firstOrder(sonOf,gun,phil)))
-          % Expected true
-	))).
-
-          % (all X:( all Y : (motherOf(X,Y)) => (bellyButton(X) , older(X,Y) , female(Y)) )),
 
 
 % pttp_test(_,_):-!,fail.
@@ -353,9 +288,8 @@ pttp_test(chang_lee_example9,
 %%%   this is problem LCL024-1 in TPTP
 %%% SOURCE
 
-pttp_test(_,_):-!,fail.
-
-
+% pttp_test(_,_):-!,fail.
+/*
 pttp_test(overbeek_example4,	
 	((
 		p(e(X,e(e(Y,e(Z,X)),e(Z,Y)))),
@@ -367,7 +301,7 @@ pttp_test(overbeek_example4,
 % overbeek_example4 :- prove(query,100,0,2).	% cost 30 proof
 %%% ***
 
-
+*/
 
 chang_lee_example2x :-
         nl,
@@ -661,8 +595,113 @@ overbeek_example4 :-
 		(query :- p(e(e(e(a,e(b,c)),c),e(b,a))))
 	)),
 	fail.
-overbeek_example4 :-
-	prove(query,100,0,2).	% cost 30 proof
+overbeek_example4 :- prove(query,100,0,2).	% cost 30 proof
 %%% ***
 
+
+
+
+
+pttp_test(logicmoo_example1,
+	((
+          motherOf(joe,sue),
+          (motherOf(X,Y) => female(Y)),
+          (sonOf(Y,X) => (motherOf(X,Y);fatherOf(X,Y))),          
+          (query:-female(Y))
+	))).
+
+
+logicmoo_example1_holds:-do_pttp_test(logicmoo_example1_holds).
+
+pttp_test(logicmoo_example1_holds,
+	((
+          firstOrder(motherOf,joe,sue),
+          (firstOrder(motherOf,X,Y) => firstOrder(female,Y)),
+          (firstOrder(sonOf,Y,X) => (firstOrder(motherOf,X,Y);firstOrder(fatherOf,X,Y))),          
+          (query:-firstOrder(female,Y))
+	))).
+
+
+logicmoo_example2:-do_pttp_test(logicmoo_example2).
+
+%  int_kbholds(sonOf,gun,phil,A,B,C,C,D,E,F):-D=[G,[1,F,A,B]|H],E=[G|H].
+%  int_not_kbholds(female,gun,A,B,C,C,D,E,F):-D=[G,[-2,F,A,B]|H],E=[G|H].
+%  int_query(A,B,C,D,E,F,G):- (E=[H,[3,query,A,B]|I],J=[H|I]),firstOrder(K,phil,gun,A,B,C,D,J,F).
+%  firstOrder(A,B,C,D,E,F,G,H,I):-J=firstOrder(A,B,C), (identical_member(J,D)->fail; (identical_member(J,E),!;unifiable_member(J,E)),G=F,H=[K,[red,J,D,E]|L],I=[K|L];int_kbholds(A,B,C,D,E,F,G,H,I,J)).
+%  not_kbholds(A,B,C,D,E,F,G,H):-I=firstOrder(A,B), (identical_member(I,D)->fail; (identical_member(I,C),!;unifiable_member(I,C)),F=E,G=[J,[redn,I,C,D]|K],H=[J|K];int_not_kbholds(A,B,C,D,E,F,G,H,I)).
+pttp_test(logicmoo_example2,
+	((          
+          (firstOrder(motherOf,X,Y) => firstOrder(female,Y)),
+          (firstOrder(sonOf,Y,X) => (firstOrder(motherOf,X,Y);firstOrder(fatherOf,X,Y))),    
+           firstOrder(sonOf,gun,phil),
+          not(firstOrder(female,gun)),
+          (query:-firstOrder(What,phil,gun))
+          % What = fatherOf
+	))).
+
+pttp_test(logicmoo_example22,
+	((          
+          (motherOf(X,Y) => female(Y)),
+          (sonOf(Y,X) => (firstOrder(motherOf,X,Y);firstOrder(fatherOf,X,Y))),    
+           firstOrder(sonOf,gun,phil),
+          not(firstOrder(female,gun)),
+          (query:-firstOrder(What,phil,gun))
+          % What = fatherOf
+	))).
+
+
+% int_not_firstOrder(female, gun,E,F,A,B,C,G,D) :- test_and_decrement_search_cost(A, 0, B), C=[H, [-4, D, E, F]|I], G=[H|I].
+% int_firstOrder(Pred,Arg1,Arg2,E,F,A,B,C,G,D) :- call_prop_val2(Pred,Arg1,Arg2), test_and_decrement_search_cost(A, 0, B), C=[H, [3, D, E, F]|I], G=[H|I].
+
+
+logicmoo_example3:-do_pttp_test(logicmoo_example3_will_fail).
+
+pttp_test(logicmoo_example3,
+	((
+          ((firstOrder(genls,SubClass,SuperClass), firstOrder(SubClass,Instance)) => firstOrder(SuperClass,Instance)),
+          ((firstOrder(genlPreds,P1,P2) , firstOrder(P1,A)) => firstOrder(P2,A)),
+          ((firstOrder(genlPreds,P1,P2) , firstOrder(P1,A,B)) => firstOrder(P2,A,B)),
+          ((firstOrder(genlPreds,P1,P2) , firstOrder(P1,A,B,C)) => firstOrder(P2,A,B,C)),
+          ((firstOrder(genlPreds,P1,P2) , firstOrder(P1,A,B,C,D)) => firstOrder(P2,A,B,C,D)),
+          ((firstOrder(genlInverse,P1,P2), firstOrder(P1,A,B)) => firstOrder(P2,B,A)),
+          ((firstOrder(irreflexive,P) ,  firstOrder(P,A,B)) => ~ firstOrder(P,B,A)),
+          firstOrder(genlInverse,parentOf,sonOf),
+          firstOrder(genlPreds,motherOf,parentOf),
+          firstOrder(irreflexive,sonOf),         
+          firstOrder(parentOf, son_1, father_1),
+          (query:- not(firstOrder(sonOf, son_1, father_1)))
+          % Expected true
+	))).
+
+pttp_test(logicmoo_example32,
+	((
+          ((secondOrder(genls,SubClass,SuperClass) & firstOrder(SubClass,Instance)) => firstOrder(SuperClass,Instance)),
+          ((isa(I,C) <=> firstOrder(C,I))),
+          ((firstOrder(disjointWith,P1,P2) & firstOrder(P1,A)) => ~firstOrder(P2,A)),
+          ((secondOrder(genlPreds,P1,P2) & firstOrder(P1,A)) => firstOrder(P2,A)),
+          ((secondOrder(genlPreds,P1,P2) & firstOrder(P1,A,B)) => firstOrder(P2,A,B)),
+          ((secondOrder(genlPreds,P1,P2) & firstOrder(P1,A,B,C)) => firstOrder(P2,A,B,C)),
+          ((secondOrder(genlPreds,P1,P2) & firstOrder(P1,A,B,C,D)) => firstOrder(P2,A,B,C,D)),
+          ((secondOrder(genlInverse,P1,P2) & firstOrder(P1,A,B)) => firstOrder(P2,B,A)),
+          ((secondOrder(negationPreds,P1,P2) & firstOrder(P1,A,B)) => ~firstOrder(P2,A,B)),
+          ((secondOrder(negationInverse,P1,P2) & firstOrder(P1,A,B)) => ~firstOrder(P2,B,A)),
+          ((secondOrder(transitive,P) & firstOrder(P,A,B) & firstOrder(P,B,C)) => firstOrder(P,A,C)),
+          ((firstOrder(reflexive,P) => firstOrder(P,A,A))),
+          ((firstOrder(symmetric,P) &  firstOrder(P,A,B)) => firstOrder(P,B,A)),
+          ((firstOrder(irreflexive,P) &  firstOrder(P,A,B)) => ~ firstOrder(P,B,A)),
+          ((firstOrder(irreflexive,P2) & secondOrder(genlInverse,P2,P1)) => firstOrder(irreflexive,P1)),
+          ((firstOrder(irreflexive,P2) & secondOrder(genlPreds,P1,P2)) => firstOrder(irreflexive,P1)),
+          secondOrder(genlInverse,parentOf,sonOf),
+          secondOrder(genlPreds,motherOf,parentOf),
+          secondOrder(genlPreds,fatherOf,parentOf),
+          isa(parentOf,irreflexive),
+          firstOrder(fatherOf, son_1, father_1),
+          firstOrder(motherOf, son_1, mother_1),
+          (query:- not(firstOrder(sonOf, son_1, father_1)))
+          % Expected true
+	))).
+
+
+          
+ % (all X:( all Y : (motherOf(X,Y)) => (bellyButton(X) , older(X,Y) , female(Y)) ))
 

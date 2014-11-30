@@ -7,7 +7,7 @@
  
 **********************************************************************/
 
-:- module(bindingDRT,[potentialAntecedent/3,
+:-swi_module(bindingDRT,[potentialAntecedent/3,
 		      properBinding/3]).
 
 :- use_module(comsemOperators),

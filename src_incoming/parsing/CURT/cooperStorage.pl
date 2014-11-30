@@ -21,7 +21,7 @@
 
 *************************************************************************/
 
-:- module(cooperStorage,[info/0,
+:-swi_module(cooperStorage,[info/0,
                          infix/0,
                          prefix/0,             
                          cooperStorage/0,

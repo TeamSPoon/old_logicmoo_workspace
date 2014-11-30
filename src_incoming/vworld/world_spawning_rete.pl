@@ -2,7 +2,7 @@
 %  laying out new objects in the mud based on some frame rules (using RETE method)
 %
 %
-% Project Logicmoo: A MUD server written in Prolog
+% Logicmoo Project PrologMUD: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
@@ -11,7 +11,7 @@
 end_of_file.
 
 
-moo:on_world_load :- retractall(spawn_objects(_)).
+on_world_load :- retractall(spawn_objects(_)).
 
 growth :-
 	findall(([Obj,Chance]),

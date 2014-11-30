@@ -7,7 +7,7 @@
  
 *************************************************************************/
 
-:- module(modelCheckerTestSuiteDRT,[test/4]).
+:-swi_module(modelCheckerTestSuiteDRT,[test/4]).
 
 :- ensure_loaded(comsemOperators).
 

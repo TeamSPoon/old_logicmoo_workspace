@@ -18,12 +18,12 @@
 % padd(Obj,height(ObjHt))  == add(p(height,Obj,ObjHt)) == add(p(height,Obj,ObjHt)) == add(height(Obj,ObjHt))
 */
 
-% :- module(user). 
-:- module(look, [ get_percepts/2,  get_near/2, get_feet/2, height_on_obj/2, can_sense/5 , call_look/2]).
+% :-swi_module(user). 
+:-swi_module(look, [ get_percepts/2,  get_near/2, get_feet/2, height_on_obj/2, can_sense/5 , call_look/2]).
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(command).
+:- register_module_type(command).
 
 :- dynamic blocks/1.
 
@@ -32,37 +32,42 @@
 % can_sense(Agent,Sense,InList,CanDetect,CantDetect).
 can_sense(_Agent,visual,InList,InList,[]).
 
-moo:action_info(examine(item), "view details of item (see also @list)").
-moo:agent_call_command(_Gent,examine(SObj)):- term_listing(SObj).
+action_info(examine(item), "view details of item (see also @list)").
+agent_call_command(_Gent,examine(SObj)):- term_listing(SObj).
 
 visibleTo(Agent,Agent).
+visibleTo(Agent,Obj):-possess(Agent,Obj).
+visibleTo(Agent,Obj):-same_regions(Agent,Obj).
 
-moo:action_info(look, "generalized look in region").
-moo:action_info(look(dir), "Look in a direction").
-moo:action_info(look(visible), "Look at a speficific item").
-moo:action_info(look_at(optional(call(visibleTo(self,value)),call(visibleTo(self,value)))), "Look at a speficific item").
+term_specifier_text(Prep,prepstr_spatial):-member(Prep,[in,on,north_of,inside,onto,ontop]).
+term_specifier_text(Prep,prepstr_spatial):-term_specifier_text(Prep,prepstr_dir_of).
+term_specifier_text([Dir,of],prepstr_dir_of):-term_specifier_text(Dir,dir).
 
-moo:agent_call_command(Agent,look):- !,must(look_as(Agent)).
-moo:agent_call_command(Agent,look(here)):- look_as(Agent),!.
-moo:agent_call_command(Agent,look(Dir)):- get_term_specifier_text(Dir,dir),!,
+action_info(look, "generalized look in region").
+action_info(look(optionalStr("in"),optionalStr("here")), "generalized look in region").
+action_info(look(prepstr_dir_of,optionalStr("self")), "Look in a direction (TODO: look north of self)").
+action_info(look(optional(prepstr_spatial,"at"),obj),"look [in|at|on|under|at] somewhere").
+%action_info(look(obj), "Look at a speficific item").
+%action_info(look_at(optional(call(visibleTo(self,value)),call(visibleTo(self,value)))), "Look at a speficific item").
+
+agent_call_command(Agent,look):- look_as(Agent),!.
+agent_call_command(Agent,look("here")):- look_as(Agent),!.
+agent_call_command(Agent,look(_,"here")):- look_as(Agent),!.
+agent_call_command(Agent,look(Dir,"self")):- get_term_specifier_text(Dir,dir),!,
    view_dirs(Agent,[[Dir,here],[Dir,Dir],[Dir,Dir,adjacent]],Percepts),
-   forall_member(P,Percepts,hook:call_agent_action(Agent,examine(P))).
-
-moo:agent_call_command(Agent,look(SObj)):-
+   forall_member(P,Percepts,call_agent_action(Agent,examine(P))).
+agent_call_command(Agent,look(_Dir,SObj)):-
    objects_match_for_agent(Agent,SObj,obj,Percepts),
-   forall_member(P,Percepts,hook:call_agent_action(Agent,examine(P))).
+   forall_member(P,Percepts,call_agent_action(Agent,examine(P))).
 
-moo:agent_call_command(Agent,look_at(P)):-
-   moo:agent_call_command(Agent,examine(P)).
-
-:-export(look_as/1).
+:-swi_export(look_as/1).
 look_as(Agent):-
    get_session_id(O),
    with_assertions(thlocal:session_agent(O,Agent),
         ((atloc(Agent,LOC),call_look(Agent,LOC)))).
 
 
-:-export(call_look/2).
+:-swi_export(call_look/2).
 call_look(Agent,LOC):-  mmake, call(call_look_proc,Agent,LOC).
 
 :-decl_mpred_prolog(call_look_proc/3).
@@ -93,7 +98,7 @@ call_look_proc(Agent,LOC):-
          height_on_obj(Agent,value),
          listof(possess(Agent,value)),
          inventory(Agent,value),         
-         success=world:success(Agent,value)
+         success=success(Agent,value)
        ]).
 
 
@@ -118,7 +123,7 @@ get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
 
 % Get only the Percepts
 
-% :-decl_mpred(get_percepts(agent,list(spatialthing)),[ask_module(look)]).
+% :-decl_mpred(get_percepts(agent,list(spatialthing)),[ask_module(user)]).
 get_percepts(Agent,Percepts) :- get_percepts0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts).
 get_percepts0(Agent,Percepts) :-
   call((
@@ -130,7 +135,7 @@ get_percepts0(Agent,Percepts) :-
 	!.
 
 % Look at locations immediately around argent
-% :-decl_mpred(look:get_near(agent,list(spatialthing)),[ask_module(look)]).
+% :-decl_mpred(get_near(agent,list(spatialthing)),[ask_module(user)]).
 get_near(Agent,PerceptsO):- get_near0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
    
 get_near0(Agent,Percepts) :-
@@ -140,7 +145,7 @@ get_near0(Agent,Percepts) :-
 	view_dirs(Agent,Dirs,Percepts))),!.
 
 % Look only at location agent is currently in.
-% :-decl_mpred(look:get_feet(agent,list(spatialthing)),[ask_module(look)]).
+% :-decl_mpred(get_feet(agent,list(spatialthing)),[ask_module(user)]).
 get_feet(Agent,PerceptsO) :-  get_feet0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
 
 get_feet0(Agent,Percepts):-
@@ -174,7 +179,7 @@ near_vectors([[nw,here],[n,here],[ne,here],
 	[sw,here],[s,here],[se,here]]).
 
 :-dynamic(visually_blocked/2).
-:-decl_mpred_prolog(look:visually_blocked(agent,list)).
+:-decl_mpred_prolog(visually_blocked(agent,list)).
 
 :-listing(visually_blocked).
 

@@ -10,7 +10,7 @@
 %
 % Declare the module name and the exported (public) predicates.
 */
-:- module(monster,[]).
+:-swi_module(monster,[]).
 
 % Predicates asserted during run.
 % :- dynamic memory/2. 
@@ -18,11 +18,11 @@
 
 % Possible agent actions.
 :- include(logicmoo(vworld/moo_header)).
-:- moo:register_module_type(planning).
+:- register_module_type(planning).
 
 :-decl_type(monster).
 
-moo:world_agent_plan(_World,Agent,Act):-
+world_agent_plan(_World,Agent,Act):-
    isa(Agent,monster),
    monster_idea(Agent,Act).
    
@@ -52,7 +52,7 @@ monster_idea(Agent,move(Dir)) :-
 
 monster_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[corpse]).
 
-moo:default_inst_props(Instance,monster,[description(fmt("Very screy looking monster named ~w",[Instance])),wearsClothing(tough_hide),possess(tough_hide)]).
+default_inst_props(Instance,monster,[description(fmt("Very screy looking monster named ~w",[Instance])),wearsClothing(tough_hide),possess(tough_hide)]).
 
 :- include(logicmoo(vworld/moo_footer)).
 

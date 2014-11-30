@@ -4,7 +4,7 @@
     Public domain code.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-% :-module(lispprolog,[]).
+% :-swi_module(lispprolog,[]).
 :- style_check(-singleton).
 :- style_check(-discontiguous).
 % :- style_check(-atom).

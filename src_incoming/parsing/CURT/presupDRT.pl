@@ -7,7 +7,7 @@
 
 **********************************************************************/
 
-:- module(presupDRT,[presupDRT/0,
+:-swi_module(presupDRT,[presupDRT/0,
 		     presupDRT/2,
 		     presupDRT/3,
 		     presupDRTTestSuite/0]).

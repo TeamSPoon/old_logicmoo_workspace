@@ -1,19 +1,19 @@
 /* <module>
 % Imperitive Sentence Parser (using DCG)
 %
-% Project Logicmoo: A MUD server written in Prolog
+% Logicmoo Project PrologMUD: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
 */
 
-:- module(parser_imperative, []).
+:-swi_module(parser_imperative, []).
 
-:-export((
+:-swi_export((
                    parse_agent_text_command/5,            
                    parse_agent_text_command_0/5,            
                    parseIsa//2,
-                   real_parseForTypes//2,
+                   phrase_parseForTypes_9//2,
                    objects_match/3,
                    match_object/2,
                    object_string/2,
@@ -24,42 +24,42 @@
 
 :- register_module_type(utility).
 
-hook:decl_database_hook(assert(_),C):- expire_tabled_list(C).
-hook:decl_database_hook(retract(_),C):- expire_tabled_list(C).
+decl_database_hook(assert(_),C):- expire_tabled_list(C).
+decl_database_hook(retract(_),C):- expire_tabled_list(C).
 
 % =====================================================================================================================
 % get_agent_text_command/4
 % =====================================================================================================================
-:-export(get_agent_text_command/4).
+:-swi_export(get_agent_text_command/4).
 
 get_agent_text_command(Agent,VERBOrListIn,AgentR,CMD):-
    debugOnError(loop_check(get_agent_text_command_0(Agent,VERBOrListIn,AgentR,CMD),fail)).
 
 get_agent_text_command_0(Agent,ListIn,AgentR,CMD):- 
    (is_list(ListIn) -> UseList=ListIn ; UseList=[ListIn]),
-       call_no_cuts(moo:agent_text_command(Agent,UseList,AgentR,CMD)).
+       call_no_cuts(agent_text_command(Agent,UseList,AgentR,CMD)).
 
 % ===========================================================
 % DEBUG/NODEBUG command
 % ===========================================================
-moo:type_action_info(human_player,debug(term),"Development Usage: debug  the blue backpack").
+type_action_info(human_player,debug(term),"Development Usage: debug  the blue backpack").
 
-moo:agent_call_command(Agent,debug(Term)):- agent_call_safely(Agent,debug(Term)).
+agent_call_command(Agent,debug(Term)):- agent_call_safely(Agent,debug(Term)).
 
 % ===========================================================
 % PARSE command
 % ===========================================================
-moo:type_action_info(human_player,parse(prolog,list(term)),"Development test to parse some Text for a human.  Usage: parse 'item' the blue backpack").
+type_action_info(human_player,parse(prolog,list(term)),"Development test to parse some Text for a human.  Usage: parse 'item' the blue backpack").
 
-moo:agent_call_command(_Gent,parse(Type,StringM)):-
+agent_call_command(_Gent,parse(Type,StringM)):-
    parse_for(Type,StringM,_Term,_LeftOver).
 
 % ===========================================================
 % CMDPARSE command
 % ===========================================================
-moo:type_action_info(human_player,cmdparse(list(term)),"Development test to parse some Text for a human.  Usage: cmdparse take the blue backpack").
+type_action_info(human_player,cmdparse(list(term)),"Development test to parse some Text for a human.  Usage: cmdparse take the blue backpack").
 
-moo:agent_call_command(_Gent,cmdparse(StringM)):- parse_for(command,StringM,Term,LeftOver),fmt([Term,LeftOver]).
+agent_call_command(_Gent,cmdparse(StringM)):- parse_for(command,StringM,Term,LeftOver),fmt([Term,LeftOver]).
 
 % mud_test("cmdparse test",...)
   
@@ -67,11 +67,11 @@ moo:agent_call_command(_Gent,cmdparse(StringM)):- parse_for(command,StringM,Term
 % ===========================================================
 % parsetemps command
 % ===========================================================
-moo:type_action_info(human_player,parsetemps(list(term)),"Development test to see what verb phrase heads are found. (uses get_vp_templates/4)  Usage: parsetemps who").
+type_action_info(human_player,parsetemps(list(term)),"Development test to see what verb phrase heads are found. (uses get_vp_templates/4)  Usage: parsetemps who").
 
-moo:agent_text_command(Agent,[parsetemps|List],Agent,parsetemps(List)).
+agent_text_command(Agent,[parsetemps|List],Agent,parsetemps(List)).
 
-moo:agent_call_command(Agent,parsetemps(StringM)):-
+agent_call_command(Agent,parsetemps(StringM)):-
   to_word_list(StringM,[SVERB|ARGS]),
   get_vp_templates(Agent,SVERB,ARGS,TEMPLATES),fmt(templates=TEMPLATES),
   ignore((
@@ -88,7 +88,7 @@ parse_for(Type,StringM, Term):-parse_for(Type,StringM, Term, []).
 list_tail(_,[]).
 list_tail(String,LeftOver):-ground(String),to_word_list(String,List),length(List,L),!,between(1,L,X),length(LeftOver,X).
 
-:-export(parse_for/4).
+:-swi_export(parse_for/4).
 parse_for(Type,StringM,Term,LeftOver):-
    to_word_list(StringM,String),  
    list_tail(String,LeftOver),
@@ -108,9 +108,9 @@ desc_len(S0,Region):- term_to_atom(S0,S),
    atomic_list_concat_catch(Words,' ',S),length(Words,Ws),atomic_list_concat_catch(Sents,'.',S),length(Sents,Ss),Region is Ss+Ws,!.
 
 
-:-export(objects_match_for_agent/3).
+:-swi_export(objects_match_for_agent/3).
 objects_match_for_agent(Agent,Text,ObjList):- objects_match_for_agent(Agent,Text,[possess(Agent,value),same(atloc),same(localityOfObject),agent,item,region],ObjList).  
-:-export(objects_match_for_agent/4).
+:-swi_export(objects_match_for_agent/4).
 objects_match_for_agent(Agent,Text,Match,ObjList):- objects_for_agent(Agent,or([text_means(Agent,Text,value),and([or(Match),match_object(Text,value)])]),ObjList).  
 
 text_means(Agent,Text,Agent):- equals_icase(Text,"self"),!.
@@ -153,7 +153,7 @@ objects_match(Text,Possibles,MatchList):- findall(Obj,(member(Obj,Possibles),mat
 object_string(O,String):-object_string(_,O,1-4,String),!.
 object_string_0_5(O,String):-object_string(_,O,0-5,String),!.
 
-:-export(object_string/4).
+:-swi_export(object_string/4).
 :-dynamic object_string_fmt/3.
 object_string(_,O,DescSpecs,String):- object_string_fmt(O,DescSpecs,String),!.
 object_string(Agent,O,DescSpecs,String):- String = [O], 
@@ -179,7 +179,7 @@ save_fmt_a(O,E):-member(E,[obj,value,the,is,spatialthing,prologHybrid,prologOnly
 
 object_name_is_descriptive(O):- (isa(O,type);isa(O,mpred);isa(O,typeDeclarer);isa(O,valuetype),isa(O,name_is_descriptive)).
 
-:-export(object_print_details/5).
+:-swi_export(object_print_details/5).
 object_print_details(Print,Agent,O,DescSpecs,Skipped):-
    member(O,Skipped) -> true ;
   (
@@ -191,15 +191,16 @@ object_print_details(Print,Agent,O,DescSpecs,Skipped):-
        forall(is_asserted(descriptionHere(O,KW)),ignore((meets_desc_spec(KW,DescSpecs)->call(Print,' ~w ',[KW])))),
        forall(isa(O,S),object_print_details(Print,Agent,S,DescSpecs,[O|Skipped])))))).
 
+must_make_object_string_list(P,Obj,WList):- call_tabled_can(must_make_object_string_list_cached(P,Obj,WList)).
+must_make_object_string_list_cached(P,Obj,WList):-
+  must((object_string(P,Obj,0-5,String),nonvar(String),non_empty(String),string_ci(String,LString),to_word_list(LString,WList))).
+
+
 
 match_object(String,Obj):-must((non_empty(String),non_empty(Obj))),atom_string(Type,String),isaOrSame(Obj,Type).
-match_object(S,Obj):- 
-   current_agent_or_var(P),
-   must((once((object_string(P,Obj,0-5,String))),nonvar(String),
-   non_empty(String))),!,
-   string_ci(String,LString),
+match_object(S,Obj):-   
    atoms_of(S,Atoms),must(Atoms\=[]),
-   to_word_list(LString,WList),!,
+   current_agent_or_var(P),must_make_object_string_list(P,Obj,WList),!,
    forall(member(A,Atoms),member_ci(A,WList)).
 
 
@@ -237,11 +238,11 @@ parse_agent_text_command(Agent,IVERB,ARGS,Agent,GOAL):-
 
 % try directly parsing first
 parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL):- 
-   call_no_cuts(moo:agent_text_command(Agent,[SVERB|ARGS],NewAgent,GOAL)),nonvar(NewAgent),nonvar(GOAL),!.   
+   call_no_cuts(agent_text_command(Agent,[SVERB|ARGS],NewAgent,GOAL)),nonvar(NewAgent),nonvar(GOAL),!.   
 
 % try indirectly parsing
 parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL):- 
-   call_no_cuts(moo:agent_text_command(Agent,[VERB|ARGS],NewAgent,GOAL)),ground(GOAL),nonvar(VERB),
+   call_no_cuts(agent_text_command(Agent,[VERB|ARGS],NewAgent,GOAL)),ground(GOAL),nonvar(VERB),
    verb_matches(SVERB,VERB).
 
 parse_agent_text_command_0(Agent,SVERB,ARGS,Agent,GOAL):-
@@ -254,7 +255,7 @@ parse_agent_text_command_0(Agent,IVERB,ARGS,NewAgent,GOAL):-
 parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,prologCall(call_mpred(PROLOGTERM))):- compound(PROLOGTERM),functor(PROLOGTERM,F,_),mpred_prop(F,_),!.
 parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,prologCall(req(PROLOGTERM))):- compound(PROLOGTERM),is_callable(PROLOGTERM),!.
 
-:-export(parse_agent_text_command_1/5).
+:-swi_export(parse_agent_text_command_1/5).
 % parses a verb phrase and retuns one interpretation (action)
 parse_agent_text_command_1(Agent,SVERB,ARGS,Agent,GOAL):-
    parse_vp_real(Agent,SVERB,ARGS,GOALANDLEFTOVERS),
@@ -266,15 +267,15 @@ parse_agent_text_command_1(Agent,SVERB,ARGS,Agent,GOAL):-
          
 
 
-moo:verb_alias('l','look').
-moo:verb_alias('lo','look').
-moo:verb_alias('s','move s').
-moo:verb_alias('go','go').
-moo:verb_alias('where is','where').
+verb_alias('l','look').
+verb_alias('lo','look').
+verb_alias('s','move s').
+verb_alias('go','go').
+verb_alias('where is','where').
 
 % pos_word_formula('infinitive',Verb,Formula):- 'infinitive'(TheWord, Verb, _, _G183), 'verbSemTrans'(TheWord, 0, 'TransitiveNPCompFrame', Formula, _, _).
 
-verb_alias_to_verb(IVERB,SVERB):- moo:verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.
+verb_alias_to_verb(IVERB,SVERB):- verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.
 verb_alias_to_verb(IVERB,SVERB):-specifiedItemType(IVERB,verb,SVERB), IVERB \= SVERB.
 
 subst_parser_vars(Agent,TYPEARGS,TYPEARGS_R):- subst(TYPEARGS,self,Agent,S1),where_atloc(Agent,Here),subst(S1,here,Here,TYPEARGS_R).
@@ -287,7 +288,7 @@ get_vp_templates(_Agent,SVERB,_ARGS,TEMPLATES):-
     ((
       get_type_action_templates(TEMPL),
      %isa(Agent,What),
-     %moo:action_info(What,TEMPL,_),
+     %action_info(What,TEMPL,_),
      TEMPL=..[VERB|TYPEARGS],
      verb_matches(SVERB,VERB))),
      TEMPLATES_FA),
@@ -303,8 +304,9 @@ parse_vp_real(Agent,SVERB,ARGS,Sorted):-
      (( 
       member([VERB|TYPEARGS],TEMPLATES),
       subst_parser_vars(Agent,TYPEARGS,TYPEARGS_R),
-      dmsg_parserm(("parseForTypes"=phrase_parseForTypes(TYPEARGS_R,ARGS,GOODARGS,LeftOver))),      
-      phrase_parseForTypes(TYPEARGS_R,ARGS,GOODARGS,LeftOver),
+      subst_parser_vars(Agent,ARGS,ARGS_R),
+      dmsg_parserm(("parseForTypes"=phrase_parseForTypes(TYPEARGS_R,ARGS_R,GOODARGS,LeftOver))),      
+      phrase_parseForTypes(TYPEARGS_R,ARGS_R,GOODARGS,LeftOver),
       GOAL=..[VERB|GOODARGS])),
       GOALANDLEFTOVERS_FA),
    sort(GOALANDLEFTOVERS_FA,GOALANDLEFTOVERS),
@@ -333,21 +335,43 @@ bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
 
 :-style_check(+singleton).
 
-moo:term_specifier_text(Dir,dir):-member(Dir,[n,s,e,w,ne,nw,se,sw,u,d]).
+term_specifier_text(Dir,dir):-member(Dir,[n,s,e,w,ne,nw,se,sw,u,d]).
 
-moo:term_specifier_text(Text,Subclass):- 
+term_specifier_text(Text,Subclass):- 
    not(memberchk(Subclass,[dir,'TemporallyExistingThing'])),
    once((isa_asserted(X,Subclass),
    arg_to_var(text,Text,TextVar),
    req(keyword(X,TextVar)),   
    same_arg(text,TextVar,Text))). % dmsg(todo(term_specifier_text(Text,Subclass))),transitive_subclass(Subclass,spatialthing).
 
-phrase_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver):- once(to_word_list(ARGS,ARGSL)),ARGS \=@= ARGSL,!,phrase_parseForTypes(TYPEARGS,ARGSL,GOODARGS,LeftOver).
-phrase_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver):- catchv(real_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver),_,fail),!.    
-phrase_parseForTypes(TYPEARGS,In,Out,[]):- length(TYPEARGS,L),between(1,4,L),length(In,L),must(Out=In),!,dmsg(fake_phrase_parseForTypes_l(foreach_isa(In,TYPEARGS))).
-phrase_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver):- debugOnError(real_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver)).    
 
-real_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver):-mmake, (LeftOver=[];LeftOver=[_|_] ), phrase(parseForTypes(TYPEARGS,GOODARGS),ARGS,LeftOver).
+phrase_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver):-length(TYPEARGS,N),length(GOODARGS,N),!,
+  to_word_list(ARGS,ARGSL),!,phrase_parseForTypes_0(TYPEARGS,ARGSL,GOODARGS,LeftOver).
+
+string_append(A,[B1,B2],C,ABC):-append(A,[B1,B2|C],ABC).
+string_append(A,[B],C,ABC):-append(A,[B|C],ABC).
+
+
+
+optional_strings_opt.
+
+% optimization for optional strings
+phrase_parseForTypes_0(TYPEARGS,ARGS,GOODARGS,LeftOver):- optional_strings_opt,
+      (string_append(T1,[optionalStr(Str)],T2,TYPEARGS),
+      (StrT =[_] /*;StrT=[_,_]*/),
+      string_append(A1,StrT,A2,ARGS),
+      equals_icase(Str,StrT)),!,
+      (phrase_parseForTypes_1(T1,A1,G1,[]),
+         phrase_parseForTypes_9(T2,A2,G2,LeftOver),      
+         string_append(G1,[Str],G2,GOODARGS)).
+      
+phrase_parseForTypes_0(TYPEARGS,ARGS,GOODARGS,LeftOver):-phrase_parseForTypes_1(TYPEARGS,ARGS,GOODARGS,LeftOver).
+
+phrase_parseForTypes_1(TYPEARGS,ARGS,GOODARGS,LeftOver):- catchv(phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver),_,fail),!.    
+phrase_parseForTypes_1(TYPEARGS,In,Out,[]):- length(TYPEARGS,L),between(1,4,L),length(In,L),must(Out=In),!,dmsg(fake_phrase_parseForTypes_l(foreach_isa(In,TYPEARGS))).
+phrase_parseForTypes_1(TYPEARGS,ARGS,GOODARGS,LeftOver):- debugOnError(phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver)).    
+
+phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver):-mmake, (LeftOver=[];LeftOver=[_|_] ), phrase(parseForTypes(TYPEARGS,GOODARGS),ARGS,LeftOver).
 
 parseForTypes([], [], A, A).
 parseForTypes([TYPE|TYPES], [B|E], C, G) :-
@@ -379,9 +403,9 @@ test(food_is_a_droppable, [ true(
 
 %:- end_tests(test_bad_verb).
 
-query_trans_subft(FT,Sub):-moo:subft(FT,Sub).
-query_trans_subft(FT,Sub):-moo:subft(FT,A),moo:subft(A,Sub).
-query_trans_subft(FT,Sub):-moo:subft(FT,A),moo:subft(A,B),moo:subft(B,Sub).
+query_trans_subft(FT,Sub):-subft(FT,Sub).
+query_trans_subft(FT,Sub):-subft(FT,A),subft(A,Sub).
+query_trans_subft(FT,Sub):-subft(FT,A),subft(A,B),subft(B,Sub).
 
 
 parseFmt_vp1(Agent, do(NewAgent,Goal),[SVERB|ARGS],[]):- parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,Goal),!.
@@ -399,37 +423,40 @@ some tests
 
   phrase_parseForTypes([optional(agent, random(agent))], ['Crush'], A, B).
 
-parser_imperative:real_parseForTypes([optional(and([obj, not(region)]), 'NpcCol1000-Geordi684'), optionalStr("to"), optional(region, random(region))], [food, 'Turbolift'], GOODARGS,[]).
-parser_imperative:real_parseForTypes([optional(and([obj, not(region)]), 'NpcCol1000-Geordi684')], [food], GOODARGS,[]).
-parser_imperative:real_parseForTypes([optional(region, random(region))], ['Turbolift'], GOODARGS,[]).
+parser_imperative:phrase_parseForTypes_9([optional(and([obj, not(region)]), 'NpcCol1000-Geordi684'), optionalStr("to"), optional(region, random(region))], [food, 'Turbolift'], GOODARGS,[]).
+parser_imperative:phrase_parseForTypes_9([optional(and([obj, not(region)]), 'NpcCol1000-Geordi684')], [food], GOODARGS,[]).
+parser_imperative:phrase_parseForTypes_9([optional(region, random(region))], ['Turbolift'], GOODARGS,[]).
 
 
 */
 
 parseIsa(_T, _, [AT|_], _):- var(AT),!,fail.
 parseIsa(FT, B, C, D):- var(FT),trace_or_throw(var_parseIsa(FT, B, C, D)).
-parseIsa(actor,A,B,C) :-!, parseIsa(agent,A,B,C).
+parseIsa(Str,A,B,C) :-string(Str),!, parseIsa(exact(Str),A,B,C).
 
 % this parseIsa(not(T),Term) --> dcgAnd(dcgNot(parseIsa(T)),theText(Term)).
 parseIsa(not(Type), Term, C, D) :-  dcgAnd(dcgNot(parseIsa(Type)), theText(Term), C, D).
 
-parseIsa(FT, B, [AT|C], D) :- nonvar(AT),member_ci(AT,["at","the","a","an"]),parseIsa(FT, B, C, D).
-
 parseIsa(vp,Goal,Left,Right):-!,one_must(parseFmt_vp1(self,Goal,Left,Right),parseFmt_vp2(self,Goal,Left,Right)).
 
-parseIsa(call(Call),TermV) --> {subst(Call,value,TermV,NewCall)},[TermT], {trace,req(NewCall),match_object(TermT,TermV)}.
+parseIsa(call(Call),TermV) --> {!,subst(Call,value,TermV,NewCall)},[TermT], {trace,req(NewCall),match_object(TermT,TermV)}.
+parseIsa(exact(Str),Str) --> {!,[Atom],{equals_icase(Atom,Str),!}.
+parseIsa(optionalStr(Str),Str) --> {not(optional_strings_opt)},[Atom],{equals_icase(Atom,Str),!}.
+parseIsa(optionalStr(Str),missing(Str)) --> {!},[].
+parseIsa(optionalStr(_Str),_) --> {!,fail}.
 parseIsa(optional(_,Term),TermV) --> {to_arg_value(Term,TermV)}, [TermT], {samef(TermV,TermT)}.
 parseIsa(optional(Type, _), Term, C, D) :- nonvar(Type),parseIsa(Type, Term, C, D).
 parseIsa(optional(_Type,Default), DefaultV, D, D):- !,to_arg_value(Default,DefaultV).
-parseIsa(optionalStr(Str),Str) --> [Atom],{equals_icase(Atom,Str)}.
-parseIsa(optionalStr(Str),missing(Str)) --> {!},[].
 
-%  parser_imperative:real_parseForTypes([optional(and([obj, not(region)]),'NpcCol1000-Geordi684'),optionalStr("to"),optional(region, random(region))], [food], GOODARGS,[]).
-%  parser_imperative:real_parseForTypes([optional(and([obj, not(region)]),'NpcCol1000-Geordi684'),optionalStr("to"),optional(region, random(region))], [food,to,'Turbolift'], GOODARGS,[]).
-%  parser_imperative:real_parseForTypes([region], ['Turbolift'], GOODARGS,[]).
+%  parser_imperative:phrase_parseForTypes_9([optional(and([obj, not(region)]),'NpcCol1000-Geordi684'),optionalStr("to"),optional(region, random(region))], [food], GOODARGS,[]).
+%  parser_imperative:phrase_parseForTypes_9([optional(and([obj, not(region)]),'NpcCol1000-Geordi684'),optionalStr("to"),optional(region, random(region))], [food,to,'Turbolift'], GOODARGS,[]).
+%  parser_imperative:phrase_parseForTypes_9([region], ['Turbolift'], GOODARGS,[]).
 
 
-parseIsa(string,String)--> theString(String).
+parseIsa(string,String)--> {!}, theString(String).
+parseIsa(FT, B, [AT|C], D) :- nonvar(AT),member_ci(AT,["the","a","an"]),parseIsa(FT, B, C, D).
+
+
 parseIsa(or([L|_]),Term) --> parseIsa(L,Term).
 parseIsa(or([_|List]),Term) --> {!},parseIsa(or(List),Term).
 
@@ -446,18 +473,16 @@ parseIsa(countBetween(_Type,Low,_),[]) --> {!, Low < 1}, [].
 parseIsa(and([L|List]),Term) --> dcgAnd(parseIsa(L,Term),parseIsa(and(List),Term)).
 parseIsa(and([L]),Term1) --> {!},parseIsa(L,Term1).
 
+parseIsa(FT, B, [AT|C], D) :- nonvar(AT),member_ci(AT,["the","a","an"]),parseIsa(FT, B, C, D).
 parseIsa(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{specifiedItemType(String,Type,Term)}.
 
-specifiedItemType(String,Type,Inst):-(var(String);var(Type)),trace_or_throw(var_specifiedItemType(String,Type,Inst)).
+specifiedItemType(String,Type,Inst):- (var(String);var(Type)),trace_or_throw(var_specifiedItemType(String,Type,Inst)).
 specifiedItemType([String],Type,Inst):-!,specifiedItemType(String,Type,Inst).
 specifiedItemType(String,not(Type),Inst):-!,not(specifiedItemType(String,Type,Inst)).
-specifiedItemType(String,Type,Inst):- type(Type),not(formattype(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
-specifiedItemType(String,Type,Inst):- get_term_specifier_text(Inst,Type),equals_icase(Inst,String),!.
+specifiedItemType(String,Type,Inst):- not(formattype(Type)),must(type(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
+specifiedItemType(String,Type,Inst2):- get_term_specifier_text(Inst,Type),equals_icase(Inst,String),!,must(Inst=Inst2).
 specifiedItemType(String,Type,Inst):- formattype(Type),checkAnyType(assert(parse),String,Type,AAA),Inst=AAA.
 specifiedItemType(String,Type,Longest) :- findall(Inst, (get_term_specifier_text(Inst,Type),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
-
-checkAnyType(Op,A,Type,AA):- var(A),correctAnyType(Op,A,Type,AA),must_det(var(AA)),must_det(A==AA),!.
-checkAnyType(Op,A,Type,AA):- correctAnyType(Op,A,Type,AA),nonvar(AA),!.
 
 instances_of_type(Inst,Type):- no_repeats(isa(Inst,Type)).
 
@@ -468,7 +493,7 @@ longest_string(Order,TStr1,TStr2):-
    text_to_string(TStr2,Str2),string_length(Str2,L2),
    compare(Order,L2-Str2,L1-Str1).
 
-get_term_specifier_text(Text,Type):- call_no_cuts(moo:term_specifier_text(Text,Type)).
+get_term_specifier_text(Text,Type):- must((var(Text),nonvar(Type))), call_tabled_can(no_repeats(call_no_cuts(term_specifier_text(Text,Type)))).
 
 :- include(logicmoo('vworld/moo_footer.pl')).
 

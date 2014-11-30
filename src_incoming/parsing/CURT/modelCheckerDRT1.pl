@@ -7,7 +7,7 @@
  
 *************************************************************************/
 
-:- module(modelCheckerDRT1,[evaluate/0,
+:-swi_module(modelCheckerDRT1,[evaluate/0,
 			    evaluate/2,
 			    evaluate/3,
 			    satisfyDrs/4]).

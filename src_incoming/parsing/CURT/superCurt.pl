@@ -7,7 +7,7 @@
  
 *************************************************************************/
 
-:- module(curt,[curt/0,curtUpdate/3]).
+:-swi_module(curt,[curt/0,curtUpdate/3]).
 
 :- ensure_loaded(comsemOperators).
 

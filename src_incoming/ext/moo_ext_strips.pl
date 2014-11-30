@@ -1,4 +1,4 @@
-:- module(domain_chr,[dom_chr/2]).
+:-swi_module(domain_chr,[dom_chr/2]).
 :- use_module(library(chr)).
 
 :- chr_constraint dom_chr(?int,+list(int)).

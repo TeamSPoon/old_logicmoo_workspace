@@ -41,7 +41,7 @@ nnf_pre_clean(Type,[A|B],[AA|BB],Vars):-!,
 
 nnf_pre_clean(_Type,C,CC,Vars):-
    C=..[A|B],
-   logical_functor(A),!,
+   logical_functor_pttp(A),!,
    nnf_pre_clean_functor(A,AA,Vars1),!,
    nnf_pre_clean(sent,B,BB,Vars2),
    append(Vars1,Vars2,Vars),
@@ -78,9 +78,15 @@ nnf_post_clean(C,CC,Vars):-
    nnf_post_clean(B,BB,Vars),
    CC=..[AA|BB],!.
 
-:-export(logical_functor/1).
+:-export(logical_functor_pttp/1).
 
-logical_functor(X):-atom(X),nnf_pre_clean_functor(A,B,_),(X==A;X==B),!.
+logical_functor_pttp(X):-not(atom(X)),!,fail.
+logical_functor_pttp(X):-nnf_pre_clean_functor(A,B,_),(X==A;X==B),!.
+logical_functor_pttp(&).
+logical_functor_pttp(~).
+logical_functor_pttp(<=>).
+logical_functor_pttp(=>).
+logical_functor_pttp(v).
 
 nnf_pre_clean_functor(and,(,),[]).
 nnf_pre_clean_functor(or,(;),[]).
@@ -89,6 +95,7 @@ nnf_pre_clean_functor(~,(-),[]).
 nnf_pre_clean_functor(not,(-),[]).
 nnf_pre_clean_functor(implies,(=>),[]).
 nnf_pre_clean_functor(imp,(=>),[]).
+nnf_pre_clean_functor(equiv,(<=>),[]).
 %nnf_pre_clean_functor(->,(=>),[]).
 nnf_pre_clean_functor(entailed_from,(:-),[]).
 nnf_pre_clean_functor(implied_by,(:-),[]).

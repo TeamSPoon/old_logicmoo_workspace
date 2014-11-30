@@ -7,7 +7,7 @@
 
 *************************************************************************/
 
-:- module(matchDRT,[matchDrs/4]).
+:-swi_module(matchDRT,[matchDrs/4]).
 
 :- use_module(comsemPredicates,[memberList/2,compose/3]),
    use_module(semOntology,[consistent/2]).

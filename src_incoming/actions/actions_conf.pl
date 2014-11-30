@@ -1,5 +1,5 @@
-% :- module(user). 
-:- module(actions_conf, []).
+% :-swi_module(user). 
+:-swi_module(actions_conf, []).
 
 end_of_file.
 

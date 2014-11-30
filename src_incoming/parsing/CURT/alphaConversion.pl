@@ -21,7 +21,7 @@
 
 *************************************************************************/
 
-:- module(alphaConversion,[alphaConvert/2,
+:-swi_module(alphaConversion,[alphaConvert/2,
                            alphabeticVariants/2]).
 
 :- use_module(comsemPredicates,[compose/3,

@@ -21,7 +21,7 @@
 
 *************************************************************************/
 
-:- module(elimEquivReadings,[elimEquivReadings/2]).
+:-swi_module(elimEquivReadings,[elimEquivReadings/2]).
 
 :- use_module(callInference,[callTP/3]).
 

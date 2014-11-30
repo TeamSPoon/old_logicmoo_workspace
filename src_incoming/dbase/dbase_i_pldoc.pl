@@ -1,6 +1,6 @@
 
 
-:-export((term_listing/1)).
+:-swi_export((term_listing/1)).
 term_listing([]):-!.
 term_listing(Match):-
    ignore((catch(listing(Match),_,fail))),
@@ -16,7 +16,7 @@ synth_clause_for(H,B):- cur_predicate(H,_),synth_clause_db(H,B).
 synth_clause_db(H,info(Props)):- once(pred_info(H,Props)).
 synth_clause_db(H,B):- predicate_property(M:H,number_of_clauses(_)),!,clause(M:H,B).
 
-:-export((use_term_listing/3)).
+:-swi_export((use_term_listing/3)).
 use_term_listing(noinfo,_,info(_)):-!,fail. 
 use_term_listing(HO,H,B):- atom(HO),!, use_term_listing_2(exact,HO,H,B).
 use_term_listing([],_,_):-!.

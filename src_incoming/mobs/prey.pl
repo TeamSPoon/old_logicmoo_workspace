@@ -13,20 +13,20 @@
 */
 
 % Declare the module name and the exported (public) predicates.
-:- module(prey,[]).
+:-swi_module(prey,[]).
 
 :- include(logicmoo(vworld/moo_header)).
-:- moo:register_module_type(planning).
-:- moo:register_module_type(command).
+:- register_module_type(planning).
+:- register_module_type(command).
 
 :-decl_type(prey).
-moo:type(prey).
+type(prey).
 
 % Predicates asserted during run.
 % :- dynamic memory/2. 
 %:- dynamic agent_list/1.
 
-moo:world_agent_plan(_World,Self,Act):-
+world_agent_plan(_World,Self,Act):-
    isa(Self,prey),
    prey_idea(Self,Act).
    
@@ -60,9 +60,9 @@ prey_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[nut]).
 % spawn new prey
 % maybe(N) == N chance of each agent spawning a new agent each turn
 
-moo:actiontype(spawn(type)).
+actiontype(spawn(type)).
 
-moo:agent_call_command(_Agent,spawn(prey)):-spawn.
+agent_call_command(_Agent,spawn(prey)):-spawn.
 
 spawn :-
 	maybe(10),

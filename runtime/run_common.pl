@@ -8,6 +8,16 @@
 % :- make.
 :- portray_text(true).
 
+:- (
+      (current_prolog_flag(readline, true))
+     ->
+      expand_file_name("~/.pl-history", [File|_]),
+      (exists_file(File) -> rl_read_history(File); true),
+      at_halt(rl_write_history(File))
+     ;
+      true
+     ).
+
 :-module(user).
 
 :- multifile( entailment:rdf /3 ).
@@ -22,10 +32,10 @@ create_module(M):-context_module(CM),module(M),asserta(M:this_is_a_module(M)),wr
 :-create_module(moo).
 
 
-:-module_transparent moo:parser_chat80_module/1.
-:-multifile moo:parser_chat80_module/1.
-:-export((moo:parser_chat80_module/1)).
-moo:parser_chat80_module(moo).
+:-module_transparent parser_chat80_module/1.
+:-multifile parser_chat80_module/1.
+:-export((parser_chat80_module/1)).
+parser_chat80_module(moo).
 
 
 :-export(prolog_repl/0).
@@ -100,7 +110,7 @@ hard_work:-
 
 
 
-slow_work:- with_assertions( moo:prevent_transform_moo_preds , within_user(at_start(hard_work))).
+slow_work:- with_assertions( prevent_transform_moo_preds , within_user(at_start(hard_work))).
 
 thread_work:- thread_property(X, status(running)),X=loading_code,!.
 thread_work:- thread_create(slow_work,_,[alias(loading_code)]).

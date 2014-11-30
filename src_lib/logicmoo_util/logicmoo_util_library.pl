@@ -103,8 +103,8 @@ makeArgIndexes(_NEW,_F).
 asserta_new(_Ctx,NEW):-ignore(retractall(NEW)),asserta(NEW).
 writeqnl(_Ctx,NEW):- fmt('~q.~n',[NEW]),!.
 
-eraseall(M:F,A):-!,forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(clause_safe(M:C,_,X),erase(X))).
-eraseall(F,A):-forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(clause_safe(M:C,_,X),erase(X))).
+eraseall(M:F,A):-!,forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(clause(M:C,_,X),erase(X))).
+eraseall(F,A):-forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(clause(M:C,_,X),erase(X))).
 
 asserta_new(NEW):-ignore(retractall(NEW)),asserta(NEW).
 assertz_new(NEW):-ignore(retractall(NEW)),assertz(NEW).
@@ -131,13 +131,15 @@ clause_asserted(H,B):- predicate_property(H,number_of_clauses(N)),N>0,copy_term(
 :-module_transparent clause_safe/2.
 :-export(clause_safe/2).
 
+:-export(clause_safe_m3/3).
+
 clause_safe(M:H,B):-!,debugOnError(clause(M:H,B)).
 clause_safe(H,B):-!,debugOnError(clause(H,B)).
 
-clause_safe(M:H,B):-!,clause_safe(M,H,B).
-clause_safe(H,B):-!,clause_safe(_,H,B).
-clause_safe(M,string(S),B):- trace_or_throw(clause_safe(M,string(S),B)).
-clause_safe(M,H,B):-  (nonvar(H)->true;(current_predicate(M:F/A),functor(H,F,A))),predicate_property(M:H,number_of_clauses(_)),clause(H,B).
+clause_safe(M:H,B):-!,clause_safe_m3(M,H,B).
+clause_safe(H,B):-!,clause_safe_m3(_,H,B).
+%clause_safe(M,string(S),B):- trace_or_throw(clause_safe(M,string(S),B)).
+clause_safe_m3(M,H,B):-  (nonvar(H)->true;(trace,current_predicate(M:F/A),functor(H,F,A))),predicate_property(M:H,number_of_clauses(_)),clause(H,B).
 
 as_clause( ((H :- B)),H,B):-!.
 as_clause( H,  H,  true).
@@ -275,7 +277,7 @@ get_module_of_4(_P,F,A,M):- current_predicate(M0:F0/A0),F0=F,A0=A,!,M=M0.
 get_module_of_4(P,F,A,M):-trace_or_throw((get_module_of_4(P,F,A,M))).
 
 /*
-get_module_of_4(_P,F,A,M):- current_predicate(F0/A0),F0=F,A0=A,!,moo:dbase_mod(M).
+get_module_of_4(_P,F,A,M):- current_predicate(F0/A0),F0=F,A0=A,!,dbase_mod(M).
 get_module_of_4(_P,F,A,_M):-trace, isCycPredArity(F,A),!,fail.
 get_module_of_4(P,F,A,M):- trace, debugCall(get_module_of_4(P,F,A,M)).
 */

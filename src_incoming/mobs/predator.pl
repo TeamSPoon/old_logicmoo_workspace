@@ -12,19 +12,19 @@
 */
 
 % Declare the module name and the exported (public) predicates.
-:- module(predator,[]).
+:-swi_module(predator,[]).
 
 % Predicates asserted during run.
 % :- dynamic memory/2.
 
 % Possible agent actions.
 :- include(logicmoo(vworld/moo_header)).
-:- moo:register_module_type(planning).
+:- register_module_type(planning).
 
 :-decl_type(predator).
-moo:type(predator).
+type(predator).
 
-moo:world_agent_plan(_World,Agent,Act):-
+world_agent_plan(_World,Agent,Act):-
    isa(Agent,predator),
    predator_idea(Agent,Act).
 

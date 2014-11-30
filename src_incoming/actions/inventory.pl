@@ -1,5 +1,5 @@
-% :- module(user). 
-:- module(inventory, [inventory/2,inventory1/2]).
+% :-swi_module(user). 
+:-swi_module(inventory, [inventory/2,inventory1/2]).
 /** <module> A command to  ...
 % Douglas Miles 2014
 % inventory(Agt,Inv) = inventory (anything the agent has taken
@@ -13,8 +13,8 @@
 % ====================================================
 % the entire inventory system
 % ====================================================
-moo:action_info(inventory(optional(agent,self)), "Examine an inventory").
-moo:agent_call_command(Agent,inventory(Who)):- show_kb_preds(Agent,inventory(Who,value)).
+action_info(inventory(optional(agent,self)), "Examine an inventory").
+agent_call_command(Agent,inventory(Who)):- show_kb_preds(Agent,inventory(Who,value)).
 
 listValued(inventory(agent,list(obj))).
 

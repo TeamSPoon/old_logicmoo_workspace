@@ -19,17 +19,17 @@
 :-dynamic(isCycUnavailable_known/1).
 :-dynamic(isCycAvailable_known/0).
 
-:-export(isCycAvailable/0).
+:-swi_export(isCycAvailable/0).
 isCycAvailable:-isCycUnavailable_known(_),!,fail.
 isCycAvailable:-isCycAvailable_known,!.
 isCycAvailable:-checkCycAvailablity,isCycAvailable.
 
-:-export(isCycUnavailable/0).
+:-swi_export(isCycUnavailable/0).
 isCycUnavailable:-isCycUnavailable_known(_),!.
 isCycUnavailable:-isCycAvailable_known,!,fail.
 isCycUnavailable:-checkCycAvailablity,isCycUnavailable.
 
-:-export(checkCycAvailablity/0).
+:-swi_export(checkCycAvailablity/0).
 checkCycAvailablity:- (isCycAvailable_known;isCycUnavailable_known(_)),!.
 checkCycAvailablity:- ccatch((ignore((invokeSubL("(+ 1 1)",R))),(R==2->assert_if_new(isCycAvailable_known);assert_if_new(isCycUnavailable_known(R)))),E,assert_if_new(isCycUnavailable_known(E))),!.
 
@@ -49,7 +49,7 @@ stringToWord([S|L],W):-!,textCached([S|L],[lex,W|_]).
 stringToWord(S,W):-textCached([S],[lex,W|_]).
 */
      
-:-export(list_to_term/2).
+:-swi_export(list_to_term/2).
 %list_to_term(X,Y):- balanceBinding(X,Y).
 list_to_term(X,Y):-nonvar(X),var(Y),!,list_to_terms_lr(X,Y).
 list_to_term(X,Y):-list_to_terms_rl(X,Y).
@@ -70,7 +70,7 @@ list_to_conjs_lr([],true):-!.
 list_to_conjs_lr([T],T):-!.
 list_to_conjs_lr([H|T],(H,TT)):-!,list_to_conjs_lr(T,TT).
    
-:-export(balanceBinding/2).
+:-swi_export(balanceBinding/2).
 balanceBinding(Binding,Binding):- (var(Binding);number(Binding)),!.
 balanceBinding(string(B),string(B)):-!.
 balanceBinding(Binding,BindingP):-atom(Binding),atom_concat('#$',BindingP,Binding),!.
@@ -129,7 +129,7 @@ finishCycConnection(SocketId,OutStream,InStream):-
       ignore(system:retractall(cycConnectionUsed(SocketId,OutStream,InStream))),
       asserta(cycConnection(SocketId,OutStream,InStream)),!.
 
-:-export(cycStats/0).
+:-swi_export(cycStats/0).
 cycStats:- % will add more 
    listing(cycConnection),
    listing(cycConnectionUsed).
@@ -202,11 +202,11 @@ readSubL(InStream,[G,E,T,Space|Response]):-
 % ===================================================================
 % Lowlevel readCycLTermChars
 % ===================================================================
-:-export(readCycLTermChars/2).
+:-swi_export(readCycLTermChars/2).
 readCycLTermChars(InStream,Response):-
    must_det(readCycLTermChars(InStream,Response,_)).
    
-:-export(readCycLTermChars/3).
+:-swi_export(readCycLTermChars/3).
 readCycLTermChars(InStream,[Start|Response],Type):-
    peek_code(InStream,Start),
    readCycLTermCharsUntil(Start,InStream,Response,Type),
@@ -495,7 +495,7 @@ ensureMt(Const):-
 defaultMt('PrologDataMt').
 
 
-addPrologKB:- defaultMt(Mt),!,ensureMt(Mt),cycAssert(moo:'genlMt'(Mt,'InferencePSC'),'BaseKB'). % Puts the defaultMt/1 into Cyc 
+addPrologKB:- defaultMt(Mt),!,ensureMt(Mt),cycAssert('genlMt'(Mt,'InferencePSC'),'BaseKB'). % Puts the defaultMt/1 into Cyc 
 
 % :- at_start((isCycUnavailable -> true ; addPrologKB)).
 
@@ -611,7 +611,7 @@ testOpenCyc:-halt.
 % ===================================================================
 % ===================================================================
 
-:-export(isSlot/1).
+:-swi_export(isSlot/1).
 isSlot(Var):-var(Var).
 isSlot('$VAR'(Var)):-number(Var).
 
@@ -694,7 +694,7 @@ Vars = [=(CITIZEN,_h2866)|_h3347]
 
 */
 
-:-export(getSurfaceFromChars/3).
+:-swi_export(getSurfaceFromChars/3).
 getSurfaceFromChars([],[EOF],_):- end_of_file == EOF, !.
 getSurfaceFromChars([41],[EOF],_):- end_of_file == EOF, !.
 
@@ -985,7 +985,7 @@ valid(C)  :-   (65 =< C, C =< 90);    % A - Z
 % ===================================================================
 
 %%lowerCasePred(CycLPred)
-:-export(lowerCasePred/1).
+:-swi_export(lowerCasePred/1).
 lowerCasePred(Pred):-atom(Pred),atom_codes(Pred,[_,_,C|_]),char_type(C,lower).
 
 

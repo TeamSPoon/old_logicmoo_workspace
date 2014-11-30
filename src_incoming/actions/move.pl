@@ -10,8 +10,8 @@
 %
 */
 
-% :- module(user). 
-:- module(move, []).
+% :-swi_module(user). 
+:-swi_module(move, []).
 
 :- include(logicmoo(vworld/moo_header)).
 
@@ -20,12 +20,12 @@
 % :- begin_transform_moo_preds.
 
 
-moo:agent_text_command(Agent,[DirSS],Agent,move(DirS)):- nonvar(DirSS),catch(((get_term_specifier_text(Dir,dir), any_to_atom(DirSS,DirS),catch((atom_concat(Dir,N,DirS),(atom_number(N,_))),_,fail))),_,fail).
-moo:agent_text_command(Agent,[DirSS],Agent,move(Dir)):- get_term_specifier_text(Dir,dir),catch((any_to_atom(DirSS,DirA),any_to_atom(Dir,DirA)),_,fail),!.
+agent_text_command(Agent,[DirSS],Agent,move(DirS)):- nonvar(DirSS),catch(((get_term_specifier_text(Dir,dir), any_to_atom(DirSS,DirS),catch((atom_concat(Dir,N,DirS),(atom_number(N,_))),_,fail))),_,fail).
+agent_text_command(Agent,[DirSS],Agent,move(Dir)):- get_term_specifier_text(Dir,dir),catch((any_to_atom(DirSS,DirA),any_to_atom(Dir,DirA)),_,fail),!.
 
-moo:agent_call_command(Agnt,Cmd):- compound(Cmd),functor(Cmd,move,_),!,must(move_command(Agnt,Cmd)).
+agent_call_command(Agnt,Cmd):- compound(Cmd),functor(Cmd,move,_),!,must(move_command(Agnt,Cmd)).
 
-moo:action_info(move(dir),"Move in a direction").
+action_info(move(dir),"Move in a direction").
 
 % dir###
 move_command(Agent,move(DirSS)) :- catch((string_to_atom(DirSS,DirS),
@@ -93,16 +93,16 @@ move_command_1(Agent,Dir) :-
 
 %Record keeping
 
-moo:update_charge(Agent,move) :- padd(Agent,charge,-4).
+update_charge(Agent,move) :- padd(Agent,charge,-4).
 
-moo:update_stats(Agent,collide) :- padd(Agent,health,-5),(add_cmdfailure(Agent,collide)).
+update_stats(Agent,collide) :- padd(Agent,health,-5),(add_cmdfailure(Agent,collide)).
 
-moo:update_stats(Agent,fall) :- padd(Agent,health,-10).
+update_stats(Agent,fall) :- padd(Agent,health,-10).
 
 % cheating but to test
 
-moo:actiontype(go(dir)).
-moo:agent_call_command(Agent,go(Dir)) :-
+actiontype(go(dir)).
+agent_call_command(Agent,go(Dir)) :-
 	atloc(Agent,LOC),
         in_world_move(LOC,Agent,Dir),
 	call_update_charge(Agent,move).

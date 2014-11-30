@@ -7,22 +7,22 @@
 %
 %
 */
-% :- module(world_text,[]).
+% :-swi_module(world_text,[]).
 %      default_repl_obj_to_string/3,default_repl_writer/4,show_kb_via_pred/3,show_kb_preds/2,show_kb_preds/3,success/2
 :- include(logicmoo(vworld/moo_header)).
 
-:-export(fully_expand/2).
+:-swi_export(fully_expand/2).
 
-:- moo:begin_prolog_source.
+:- begin_prolog_source.
 
-:- moo:begin_transform_moo_preds.
+:- begin_transform_moo_preds.
 
 
 % ===========================================
 % generatePhrase_local(+Term,-English).
 % Generate english version of a message
 % ===========================================
-:-export(generatePhrase_local/2).
+:-swi_export(generatePhrase_local/2).
 
 bugger:term_to_message_string(T,T):-var(T),!.
 bugger:term_to_message_string(T,T):-!.
@@ -36,11 +36,11 @@ is_leave_alone(exact_message).
 is_leave_alone(todo).
 is_leave_alone((error)).
 is_leave_alone(parserm).
-% is_leave_alone(F):- moo:is_db_prop(F,_,_),!,fail.
+% is_leave_alone(F):- is_db_prop(F,_,_),!,fail.
 is_leave_alone(A):-failOnError((sub_atom(A,_,1,0,S),atom_number(S,_))),!.
 
-moo:term_anglify(A,B):-local_term_anglify(A,B).
-moo:term_anglify_np_last(Obj,T,String):- local_term_anglify_np_last(Obj,T,String).
+term_anglify(A,B):-local_term_anglify(A,B).
+term_anglify_np_last(Obj,T,String):- local_term_anglify_np_last(Obj,T,String).
 
 generatePhrase_local(Term,String):- debugOnError(( fully_expand(Term,EnglishM),!,
           % fmt('FR0=~q~n',[fully_expand(Term,EnglishM)]),
@@ -181,7 +181,7 @@ local_term_anglify(fN(Obj,T),String):- anglify_noun_known(Obj,T,String),!.
 % %enter_term_anglify(Obj,Obj):-!.
 
 
-moo:term_anglify_np(Obj,Hint,String):-local_term_anglify_np(Obj,Hint,String).
+term_anglify_np(Obj,Hint,String):-local_term_anglify_np(Obj,Hint,String).
 
 local_term_anglify_np(Obj,String):-isa(Obj,Isa),local_term_anglify_np(Obj,Isa,String),!.
 local_term_anglify_np(Obj,String):-local_term_anglify_np(Obj,term,String).
@@ -211,7 +211,7 @@ anglify_noun_known(Obj,_Hint,StringO):- findall(String,holds_t(nameStrings,Obj,S
 %nameStrings(X,Y,_,_)
 
 
-:-  moo:end_transform_moo_preds.
+:-  end_transform_moo_preds.
 
 
 end_of_file.

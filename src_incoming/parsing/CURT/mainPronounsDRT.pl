@@ -7,7 +7,7 @@ description: Pronoun Resolution
 
 **********************************************************************/
 
-:- module(mainPronounsDRT,[parse/0,resolveDrs/1]).
+:-swi_module(mainPronounsDRT,[parse/0,resolveDrs/1]).
 
 :- use_module(readLine,[readLine/1]),
    use_module(comsemOperators),

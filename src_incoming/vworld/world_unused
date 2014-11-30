@@ -89,7 +89,7 @@ show_world:-
    show_room_grid(_).
 
 act(Agent,Decision) :-
-	moo:agent_call_command(Agent,Decision),
+	agent_call_command(Agent,Decision),
 	!.
 /*
 act(Agent,Decision) :-
@@ -115,7 +115,7 @@ dec_turns :-
 deliberate(Agent,Decision,Time) :-
 	add(thinking(Agent)),
 	ticks(StartClock),
-	once(moo:world_agent_plan(_World,Agent,Decision)),
+	once(world_agent_plan(_World,Agent,Decision)),
 	ticks(StopClock),
 	del(thinking(_)),
 	Diff is StopClock - StartClock,
@@ -293,7 +293,7 @@ nth_member(N,X,[_|T]) :-
 
 :- register_module_type(utility).
 
-moo:agent_call_command(_,_):-fail.
+agent_call_command(_,_):-fail.
 
 actr:agent_action(Actor,Action) :-var(Action),!,
         look_to_conso;e(Actor),

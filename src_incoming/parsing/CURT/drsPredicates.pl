@@ -7,7 +7,7 @@
  
 *************************************************************************/
 
-:- module(drsPredicates,[mergeDrs/2,
+:-swi_module(drsPredicates,[mergeDrs/2,
 			 betaConvertDrs/2,
 			 alphaConvertDrs/2,
 			 superSubDrs/3]).

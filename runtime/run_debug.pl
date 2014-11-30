@@ -3,6 +3,9 @@
 
 */
 
+swi_module(M,E):-dmsg(swi_module(M,E)).
+swi_export(E):-dmsg(swi_export(E)).
+
 % Was this our startup file?
 was_run_dbg_pl:-is_startup_file('run_debug.pl').
 
@@ -55,7 +58,7 @@ debug_repl_m(Module,CallFirst):-
             module(CM)).
 
 % [Required] Defines debug80
-debug80:- moo:parser_chat80_module(M),debug_repl_wo_cyc(M,M:t1).
+debug80:- parser_chat80_module(M),debug_repl_wo_cyc(M,M:t1).
 
 % [Optionaly] Allows testing/debug of the chat80 system (withouyt loading the servers)
 % :- parser_chat80:t1.
@@ -69,7 +72,7 @@ debug_talk:- debug_repl_wo_cyc(parser_talk,t3).
 
 
 % [Optional] This loads boxer
-% :- at_start(with_assertions(moo:prevent_transform_moo_preds,within_user(ignore(catch(start_boxer,_,true))))).
+% :- at_start(with_assertions(prevent_transform_moo_preds,within_user(ignore(catch(start_boxer,_,true))))).
 
 % [Optional] Testing PTTP
 % :-is_startup_file('run_debug.pl')->doall(do_pttp_test(_));true.
@@ -84,15 +87,15 @@ debug_talk:- debug_repl_wo_cyc(parser_talk,t3).
 % :- debug_e2c.
 
 % the local tests each reload (once)
-now_run_local_tests_dbg :- doall(moo:mud_test_local).
+now_run_local_tests_dbg :- doall(mud_test_local).
 
 :-must_det(show_call((atloc('NpcCol1012-Ensign728',X),nonvar(X)))).
 
 % nasty way i debug the parser
-moo:mud_test_local :- do_player_action('who').
+mud_test_local :- do_player_action('who').
 % :-repeat, trace, do_player_action('who'),fail.
 
-% moo:mud_test_local :-do_player_action("scansrc").
+% mud_test_local :-do_player_action("scansrc").
 
 % :-trace.
 
@@ -100,22 +103,22 @@ moo:mud_test_local :- do_player_action('who').
 % [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
 % :- register_timer_thread(npc_ticker,30,npc_tick).
 
-moo:mud_test_local :-kellerStorage:kellerStorageTestSuite.
+mud_test_local :-kellerStorage:kellerStorageTestSuite.
 
 % :-curt80.
 
 
 
 % more tests even
-moo:mud_test_local :-do_player_action("look").
-moo:mud_test_local :-forall(localityOfObject(O,L),dmsg(localityOfObject(O,L))).
+mud_test_local :-do_player_action("look").
+mud_test_local :-forall(localityOfObject(O,L),dmsg(localityOfObject(O,L))).
 
-moo:must_test("tests to see if poorly canonicalized code (unrestricted quantification) will not be -too- inneffienct",
+must_test("tests to see if poorly canonicalized code (unrestricted quantification) will not be -too- inneffienct",
    forall(atloc(O,L),dmsg(atloc(O,L)))).
 
 
 % the real tests now (once)
-moo:mud_test_local :- if_flag_true(was_run_dbg_pl,at_start(must_det(run_mud_tests))).
+mud_test_local :- if_flag_true(was_run_dbg_pl,at_start(must_det(run_mud_tests))).
 
  % :- if_flag_true(was_run_dbg_pl, doall(now_run_local_tests_dbg)).
 

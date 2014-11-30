@@ -428,7 +428,7 @@ predOfCycL(CX,Y):-functor(CX,Y,_).
 % :-dynamic_transparent(mtForPred/2).
 
 getMtForPred(X,Y):-mtForPred(X,Y),!.
-getMtForPred(moo:genlMt,'BaseKB').
+getMtForPred(genlMt,'BaseKB').
 getMtForPred(CycL,Mt):-nonvar(CycL),functor(CycL,Pred,_),isRegisterCycPred(Mt,Pred,_),!.
 getMtForPred(CycL,Mt):-defaultAssertMt(Mt).
 
@@ -1892,10 +1892,10 @@ killConstant(Const):-
 
 ensureMt(Mt):-
    makeConstant(Mt),
-   cycAssert(moo:'isa'(Mt,'Microtheory'),'BaseKB').
+   cycAssert('isa'(Mt,'Microtheory'),'BaseKB').
 
 ensureGenlMt(Sub,Super):-ensureMt(Sub),ensureMt(Super),
-   cycAssert(moo:'genlMt'(Sub,Super),'BaseKB').
+   cycAssert('genlMt'(Sub,Super),'BaseKB').
 
 % ============================================
 % Get An English Paraphrase
@@ -2662,7 +2662,7 @@ weak_nd_subst2( X, Sk, L, L ).
 
     
 /*
-:-module(system_dependant,
+:-swi_module(system_dependant,
       [getCputime/1,
       safe_numbervars/1,
       unnumbervars/2,
@@ -2808,7 +2808,7 @@ if_prolog(_,_):-!.  % Dont run SWI Specificd or others
 %  Http, Native or Soap and replies accordingly
 % ===========================================================
 /*
-:-module(cyc_httpd,[
+:-swi_module(cyc_httpd,[
    createCycServer/1,
    xmlPrologServer/1,
    read_line_with_nl/3,
@@ -3706,7 +3706,7 @@ ifInteractive(X):-X.
 % ===========================================================
 
 			    
-%:-module(cyc_soap,[]).
+%:-swi_module(cyc_soap,[]).
 
 % :-include('cyc_header.pl').
 
@@ -4123,7 +4123,7 @@ write_e(C):-put_code(C),!.
 % ===================================================================
 
 			  /*      				   
-:-module(cyc_generation,
+:-swi_module(cyc_generation,
 	 [ 
 	 debugFmt/1,
 	 debugFmt/2,
@@ -4208,7 +4208,7 @@ dumpstack_argument(N,Frame):-!,write('\n').
 write_response_begin:-!.
 write_response_end:-!.
 /*
-:-export((	 logOnFailureIgnore/1,
+:-swi_export((	 logOnFailureIgnore/1,
 	 sendNote/1,
 	 sendNote/4,
 	 writeFailureLog/2)).
@@ -4316,7 +4316,7 @@ writeFailureLog(E,X):-
 		writeFmt('\n;; error:  ~q ~q\n',[E,X]),!,flush_output. %,writeFmtFlushed([E,X]).
 
 /*
-:-export((	 debugOnFailure/2,
+:-swi_export((	 debugOnFailure/2,
 	 debugOnFailure/1,
          debugOnError/1)).
 
@@ -4503,7 +4503,7 @@ Where <cr> indicates a carriage return or some other suitable delimiter.
 % thread_join(Id,_)
 
 /*
-:-module(cyc_threads,
+:-swi_module(cyc_threads,
       [ 
       	 servantProcessCreate/1,
 	 servantProcessCreate/3,

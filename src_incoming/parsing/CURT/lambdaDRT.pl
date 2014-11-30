@@ -7,7 +7,7 @@
  
 *************************************************************************/
 
-:- module(lambdaDRT,[lambdaDRT/0,lambdaDRT/2,lambdaDRTTestSuite/0]).
+:-swi_module(lambdaDRT,[lambdaDRT/0,lambdaDRT/2,lambdaDRTTestSuite/0]).
 
 :- use_module(readLine,[readLine/1]).
 

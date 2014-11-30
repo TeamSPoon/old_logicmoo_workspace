@@ -1,10 +1,10 @@
-
+:-module(mootel,[]).
 
 
 /** <module> 
 % Still working on (and testing) but will provide the type inference for Logicmoo Later
 %
-% Project Logicmoo: A MUD server written in Prolog
+% Logicmoo Project PrologMUD: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
@@ -59,27 +59,40 @@ c2p(implies(predSplit(R1,R2,R3) , subrelation(R2,R3)),X,Y).
 
 c2p(CNF,CLF,HP) :- translate(CNF,CLF), clausesToNHProlog(CLF,HP).
 
+/**********************************************************************
+ *
+ * @(#) dynamicDef.pl 1.16@(#)
+ *
+ */
+:- use_module('../../src_lib/logicmoo_util/logicmoo_util_all.pl').
+:-op(900,fy,'~').
 
- :- meta_predicate doFileGoal(0).
- :- meta_predicate doClashTest(0).
- :- meta_predicate compare_op(*,2,?,?).
- :- meta_predicate printTime(0,*).
- :- meta_predicate unexpand_role(*,*,0,*).
+% !! Remember: Any changes to the following list should be carefully
+%              reflected in     clearEnvironment
+%                       and     saveEnvironment.
+
+% The following predicates belong to the translated terminologial 
+% axioms.
+
  :- meta_predicate printTime(0).
- :- meta_predicate setofOrNil(?,^,-).
- :- meta_predicate mapGoal(0,*,*).
- :- meta_predicate tryGoal(0).
- :- meta_predicate try(0).
  :- meta_predicate callList(0).
+ :- meta_predicate ifOption(*,*,0).
+ :- meta_predicate try(0).
  :- meta_predicate bagofOrNil(?,^,-).
  :- meta_predicate doboth(0,0).
+    :- meta_predicate tryGoal(0).
+    :- meta_predicate tryGoalF(0).
+ :- meta_predicate doClashTest(0).
+ :- meta_predicate printTime(0,*).
+ :- meta_predicate doFileGoal(0).
+ :- meta_predicate unexpand_role(*,*,0,*).
+ :- meta_predicate setofOrNil(?,^,-).
  :- meta_predicate performQuery(*,0,0).
- :- meta_predicate must_asserta(^).
- :- meta_predicate ifOption(*,*,0).
+ :- meta_predicate mapGoal(0,*,*).
 
- callStub(P,F,A):- predicate_property(P,number_of_clauses(N)),(N==1 -> (trace,fail); (functor(PP,F,A),trace,retractall((PP:-callStub(PP,F,A))),fail)).
+  callStub(P,F,A):- dtrace, predicate_property(P,number_of_clauses(N)),(N==1 -> (trace,fail); (functor(PP,F,A),trace,retractall((PP:-callStub(PP,F,A))),fail)).
 
- createStub(F/A):- functor(P,F,A),asserta((P:-callStub(P,F,A))).
+ createStub(F/A):- functor(P,F,A),asserta_if_new((P:-callStub(P,F,A))).
 
 :- forall(member(F/A,[
            assertMA/3, 
@@ -102,126 +115,61 @@ c2p(CNF,CLF,HP) :- translate(CNF,CLF), clausesToNHProlog(CLF,HP).
            roleAll/9,
            roleEqualSets/5, 
            roleSubsets/5, 
-           roleTripel/6,
+           roleTripel/6,          
            sb_assert_Attributes/5, 
            sub/5,
            succ/5
            ]),createStub(F/A)).
 
-/**********************************************************************
- *
- * @(#) dynamicDef.pl 1.16@(#)
- *
- */
-% :- visible(+all), leash(-exit),leash(-fail),leash(-call),leash(-redo).
+motel_mpred(FA):-dynamic(FA),multifile(FA).
 
-prolog_engine(swi).
-
-:- user_use_module('../../src_lib/logicmoo_util/logicmoo_util_all.pl').
-/*
-assert_if_new(X):-catch(X,_,fail),!.
-assert_if_new(X):-assertz(X).
-
-fmt(X,Y):-'format'(X,Y).
-fmt(X,Y,Z):-'format'(X,Y,Z).
-*/
-
-% !! Remember: Any changes to the following list should be carefully
-%              reflected in     clearEnvironment
-%                       and     saveEnvironment.
-
-% The following predicates belong to the translated terminologial 
-% axioms.
-:- multifile(in/9).
-:- dynamic(in/9).
-:- multifile(kb_in/10).
-:- dynamic(kb_in/10).
-:- multifile(eq/9).
-:- dynamic(eq/9).
-:- multifile(constraint/8).
-:- dynamic(constraint/8).
-:- multifile(rel/5).
-:- dynamic(rel/5).
+:- motel_mpred(in/9).
+:- motel_mpred(kb_in/10).
+:- motel_mpred(eq/9).
+:- motel_mpred(constraint/8).
+:- motel_mpred(rel/5).
 % The following predicates are used for additional informations about
 % the terminology and the world description.
-:- multifile(axiom/3).
-:- dynamic(axiom/3).
-:- multifile(closed/5).
-:- dynamic(closed/5).
-:- multifile(compiledPredicate/2).
-:- dynamic(compiledPredicate/2).
-:- multifile(conceptElement/7).
-:- dynamic(conceptElement/7).
-:- multifile(conceptEqualSets/6).
-:- dynamic(conceptEqualSets/6).
-:- multifile(conceptHierarchy/3).
-:- dynamic(conceptHierarchy/3).
-:- multifile(conceptName/4).
-:- dynamic(conceptName/4).
-:- multifile(conceptSubsets/6).
-:- dynamic(conceptSubsets/6).
-:- multifile(environment/3).
-:- dynamic(environment/3).
-:- multifile(given_change/4).
-:- dynamic(given_change/4).
-:- multifile(given_inflLink/4).
-:- dynamic(given_inflLink/4).
-:- multifile(modalAxioms/6).
-:- dynamic(modalAxioms/6).
-:- multifile(roleAttributes/5).
-:- dynamic(roleAttributes/5).
-:- multifile(roleDefault/4).
-:- dynamic(roleDefault/4).
-:- multifile(roleDefNr/4).
-:- dynamic(roleDefNr/4).
-:- multifile(roleDomain/4).
-:- dynamic(roleDomain/4).
-:- multifile(roleElement/8).
-:- dynamic(roleElement/8).
-:- multifile(roleEqualSets/6).
-:- dynamic(roleEqualSets/6).
-:- multifile(roleHierarchy/3).
-:- dynamic(roleHierarchy/3).
-:- multifile(roleName/4).
-:- dynamic(roleName/4).
-:- multifile(roleNr/5).
-:- dynamic(roleNr/5).
-:- multifile(roleRange/4).
-:- dynamic(roleRange/4).
-:- multifile(roleSubsets/6).
-:- dynamic(roleSubsets/6).
-:- multifile(sub/4).
-:- dynamic(sub/4).
-:- multifile(succ/4).
-:- dynamic(succ/4).
+:- motel_mpred(axiom/3).
+:- motel_mpred(closed/5).
+:- motel_mpred(compiledPredicate/2).
+:- motel_mpred(conceptElement/7).
+:- motel_mpred(conceptEqualSets/6).
+:- motel_mpred(conceptHierarchy/3).
+:- motel_mpred(conceptName/4).
+:- motel_mpred(conceptSubsets/6).
+:- motel_mpred(environment/3).
+:- motel_mpred(given_change/4).
+:- motel_mpred(given_inflLink/4).
+:- motel_mpred(modalAxioms/6).
+:- motel_mpred(roleAttributes/5).
+:- motel_mpred(roleDefault/4).
+:- motel_mpred(roleDefNr/4).
+:- motel_mpred(roleDomain/4).
+:- motel_mpred(roleElement/8).
+:- motel_mpred(roleEqualSets/6).
+:- motel_mpred(roleHierarchy/3).
+:- motel_mpred(roleName/4).
+:- motel_mpred(roleNr/5).
+:- motel_mpred(roleRange/4).
+:- motel_mpred(roleSubsets/6).
+:- motel_mpred(sub/4).
+:- motel_mpred(succ/4).
 % The following predicates are used during computations only.
-:- multifile(abductiveDerivation/3).
-:- dynamic(abductiveDerivation/3).
-:- multifile(consistencyDerivation/3).
-:- dynamic(consistencyDerivation/3).
-:- multifile(hypothesis/1).
-:- dynamic(hypothesis/1).
-:- multifile(inconsistencyCheck/3).
-:- dynamic(inconsistencyCheck/3).
-:- multifile(kb_option/2).
-:- dynamic(kb_option/2).
-:- multifile(nsub/4).
-:- dynamic(nsub/4).
-:- multifile(nsub3/2).
-:- dynamic(nsub3/2).
-:- multifile(sub3/2).
-:- dynamic(sub3/2).
-:- multifile(succ3/2).
-:- dynamic(succ3/2).
-:- multifile(counter_value/2).
-:- dynamic(counter_value/2).
+:- motel_mpred(abductiveDerivation/3).
+:- motel_mpred(consistencyDerivation/3).
+:- motel_mpred(hypothesis/1).
+:- motel_mpred(inconsistencyCheck/3).
+:- motel_mpred(option/2).
+:- motel_mpred(nsub/4).
+:- motel_mpred(nsub3/2).
+:- motel_mpred(sub3/2).
+:- motel_mpred(succ3/2).
+:- motel_mpred(value/2).
 % Predicates which are no longer needed
-%:- multifile(falsum/2).
-%:- dynamic(falsum/2).
-%:- multifile(numb/1).
-%:- dynamic(numb/1).
+%:- motel_mpred(falsum/2).
+%:- motel_mpred(numb/1).
 :- op(1200,xfx,<-).
-:- op(500,fx,(~)).
 /**********************************************************************
  *
  * @(#) sets.pl 1.1@(#)
@@ -232,8 +180,8 @@ fmt(X,Y,Z):-'format'(X,Y,Z).
 %   is true when Set is a list, and Element occurs in it.  It may be used
 %   to test for an element or to enumerate all the elements by backtracking.
 %   Indeed, it may be used to generate the Set!
-/*
-member(X, [X|_]    ).
+
+/*member(X, [X|_]    ).
 member(X, [_,X|_]  ).
 member(X, [_,_,X|_]).
 member(X, [_,_,_|L]) :-
@@ -267,7 +215,7 @@ memberchk1(X, [_,_,_|L]) :-
 %   nonmember(+Element, +Set)
 %   means that Element does not occur in Set.  It does not make sense
 %   to instantiate Element in any way, as there are infinitely many
-%   terms which do not occur in any given setOfFn.  Nor can we generate
+%   terms which do not occur in any given set.  Nor can we generate
 %   Set; there are infinitely many sets not containing a given Element.
 %   Read it as "the given Element does not occur in the given list Set".
 %   This code was suggested by Bruce Hakami; seven versions of this
@@ -306,7 +254,7 @@ intersection([_|Elements], Set, Intersection) :-
 %   intersection(+ListOfSets, ?Intersection)
 %   is true when Intersection is the intersection of all the sets in
 %   ListOfSets.  The order of elements in Intersection is taken from
-%   the first setOfFn in ListOfSets.  This has been turned inside out to
+%   the first set in ListOfSets.  This has been turned inside out to
 %   minimise the storage turnover.
 
 intersection([Set|Sets], Intersection) :-
@@ -366,7 +314,7 @@ union([Set1,Set2|Sets],Union) :-
 %   is true when List and Set are lists, and Set has the same elements
 %   as List in the same order, except that it contains no duplicates.
 %   The two are thus equal considered as sets.  If you really want to
-%   convert a list to a setOfFn, list_to_ord_set is faster, but this way
+%   convert a list to a set, list_to_ord_set is faster, but this way
 %   preserves as much of the original ordering as possible.
 %   If List contains several copies of an element X, only the LAST
 %   copy of X is retained.  If you want to convert a List to a Set,
@@ -483,36 +431,36 @@ permutation([X|Xs], Ys1, [_|Zs]) :-
 /**********************************************************************
  *
  * setCounter(+Counter,+Value)
- * creates a new counter Counter with counter_value Value.
+ * creates a new counter Counter with value Value.
  *
  */
 
 setCounter(Counter,N) :-
-        asserta(counter_value(Counter,N)),
+        asserta(value(Counter,N)),
         !.
 
 /**********************************************************************
  *
  * addCounter(+Counter,+Value)
- * adds Value to the current counter_value of counter Counter.
+ * adds Value to the current value of counter Counter.
  *
  */
  
 addCounter(Counter,N) :-
-        retract(counter_value(Counter,M)),
+        retract(value(Counter,M)),
         Sum is N + M,
-        asserta(counter_value(Counter,Sum)),
+        asserta(value(Counter,Sum)),
         !.
 
 /**********************************************************************
  *
  * getCounter(+Counter,-Value)
- * retrieves the current counter_value Value of counter Counter.
+ * retrieves the current value Value of counter Counter.
  *
  */
 
 getCounter(Counter,N) :-
-        counter_value(Counter,N),
+        value(Counter,N),
         !.
 
 /**********************************************************************
@@ -547,11 +495,11 @@ printTime(G,T0) :-
 	call(G),
 	getRuntime(T1),
 	T is T1 - T0,
-   'format'('Total runtime ~3d sec for ~q. ~n', [T,G]).
-printTime(G,T0) :-
+	'format'('Total runtime ~3d sec.~n', [T]).
+printTime(_,T0) :-
 	getRuntime(T1),
 	T is T1 - T0,
-   'format'('Total runtime ~3d sec for ~q. ~n', [T,G]),
+	'format'('Total runtime ~3d sec.~n', [T]),
 	!,
 	fail.
 
@@ -576,9 +524,9 @@ simple_term(X) :-
  * LIBRARY HANDLING
  *
  */
-/*
+
 loadLibraries(sicstus) :-
-	assertz((gensym(Prefix, V) :-
+	assertz_if_new((gensym(Prefix, V) :-
 	var(V),
 	atomic(Prefix),
 	(   retract(gensym_counter(Prefix, M))
@@ -591,24 +539,24 @@ loadLibraries(sicstus) :-
 	append(P1,N1,V1),
 	name(V,V1),
 	!)),
-	assertz((getTwoRandomNumbers(RT,CT) :-
+	assertz_if_new((getTwoRandomNumbers(RT,CT) :-
 	statistics(runtime,[RT,CT]))),
-	assertz((getRuntime(RT) :-
+	assertz_if_new((getRuntime(RT) :-
 	statistics(runtime,[RT|_]))),
-	assertz((append([],L2,L2))),
-	assertz((append([A1|L1],L2,[A1|L3]) :-
+	assertz_if_new((append([],L2,L2))),
+	assertz_if_new((append([A1|L1],L2,[A1|L3]) :-
 	append(L1,L2,L3))),
-	assertz((not(Goal) :- call(\+ Goal))),
-	assertz((once(Goal) :- Goal, !)),
-	assertz((ask(A1) :- deduce(A1))),
-	assertz((ask(A1,A2) :- deduce(A1,A2))),
-	assertz((ask(A1,A2,A3) :- deduce(A1,A2,A3))),
-	assertz((ask(A1,A2,A3,A4) :- deduce(A1,A2,A3,A4))),
-	assertz((map(A1,A2,A3) :- hop_map(A1,A2,A3))),
-	assertz((map(A1,A2,A3,A4) :- hop_map(A1,A2,A3,A4))),
+	assertz_if_new((not(Goal) :- call(\+ Goal))),
+	assertz_if_new((once(Goal) :- Goal, !)),
+	assertz_if_new((ask(A1) :- deduce(A1))),
+	assertz_if_new((ask(A1,A2) :- deduce(A1,A2))),
+	assertz_if_new((ask(A1,A2,A3) :- deduce(A1,A2,A3))),
+	assertz_if_new((ask(A1,A2,A3,A4) :- deduce(A1,A2,A3,A4))),
+	assertz_if_new((map(A1,A2,A3) :- hop_map(A1,A2,A3))),
+	assertz_if_new((map(A1,A2,A3,A4) :- hop_map(A1,A2,A3,A4))),
 	!.
 loadLibraries(eclipse) :-
-	assertz((gensym(Prefix, V) :-
+	assertz_if_new((gensym(Prefix, V) :-
 	var(V),
 	atomic(Prefix),
 	(   retract(gensym_counter(Prefix, M))
@@ -621,45 +569,42 @@ loadLibraries(eclipse) :-
 	append(P1,N1,V1),
 	name(V,V1),
 	!)),
-	assertz((getTwoRandomNumbers(RT,CT) :-
+	assertz_if_new((getTwoRandomNumbers(RT,CT) :-
 	statistics(runtime,[RT,CT]))),
-	assertz((getRuntime(RT) :-
+	assertz_if_new((getRuntime(RT) :-
 	statistics(runtime,[RT|_]))),
-	assertz((append([],L2,L2))),
-	assertz((append([A1|L1],L2,[A1|L3]) :-
+	assertz_if_new((append([],L2,L2))),
+	assertz_if_new((append([A1|L1],L2,[A1|L3]) :-
 	append(L1,L2,L3))),
-	assertz((ask(A1) :- deduce(A1))),
-	assertz((ask(A1,A2) :- deduce(A1,A2))),
-	assertz((ask(A1,A2,A3) :- deduce(A1,A2,A3))),
-	assertz((ask(A1,A2,A3,A4) :- deduce(A1,A2,A3,A4))),
-	assertz((map(A1,A2,A3) :- hop_map(A1,A2,A3))),
-	assertz((map(A1,A2,A3,A4) :- hop_map(A1,A2,A3,A4))),
+	assertz_if_new((ask(A1) :- deduce(A1))),
+	assertz_if_new((ask(A1,A2) :- deduce(A1,A2))),
+	assertz_if_new((ask(A1,A2,A3) :- deduce(A1,A2,A3))),
+	assertz_if_new((ask(A1,A2,A3,A4) :- deduce(A1,A2,A3,A4))),
+	assertz_if_new((map(A1,A2,A3) :- hop_map(A1,A2,A3))),
+	assertz_if_new((map(A1,A2,A3,A4) :- hop_map(A1,A2,A3,A4))),
 	!.
-        */
 loadLibraries(swiprolog) :-
-	assertz((ask(A1) :- deduce(A1))),
-	assertz((ask(A1,A2) :- deduce(A1,A2))),
-	assertz((ask(A1,A2,A3) :- deduce(A1,A2,A3))),
-	assertz((ask(A1,A2,A3,A4) :- deduce(A1,A2,A3,A4))),
-	assertz((map(A1,A2,A3) :- hop_map(A1,A2,A3))),
-	assertz((map(A1,A2,A3,A4) :- hop_map(A1,A2,A3,A4))),
-	assertz((portray(not(F)) :- display(not(F)))),
-	assertz((getTwoRandomNumbers(RT,CT) :-
+	assertz_if_new((ask(A1) :- deduce(A1))),
+	assertz_if_new((ask(A1,A2) :- deduce(A1,A2))),
+	assertz_if_new((ask(A1,A2,A3) :- deduce(A1,A2,A3))),
+	assertz_if_new((ask(A1,A2,A3,A4) :- deduce(A1,A2,A3,A4))),
+	assertz_if_new((map(A1,A2,A3) :- hop_map(A1,A2,A3))),
+	assertz_if_new((map(A1,A2,A3,A4) :- hop_map(A1,A2,A3,A4))),
+	assertz_if_new((portray(not(F)) :- display(not(F)))),
+	assertz_if_new((getTwoRandomNumbers(RT,CT) :-
 	statistics(cputime,RT1), RT is (ceil(RT1 * 100000)) mod 100000, statistics(atoms,CT))),
-	assertz((getRuntime(RT) :-
+	assertz_if_new((getRuntime(RT) :-
 	statistics(cputime,RT1), RT is ceil(RT1 * 1000))),
-       % index(kb_in(1,0,0,0,1,1,0,0,0,0)),
-%	index(eq(1,0,0,1,1,0,0,0,0)),
+	%index(kb_in(1,0,0,0,1,1,0,0,0,0)),
+	%index(eq(1,0,0,1,1,0,0,0,0)),
 	%index(constraint(1,0,0,1,0,0,0,0)),
-	%assertz((retractall(Head) :- retract(Head), fail)),
-	%assertz((retractall(Head) :- retract((Head :- _Body)), fail)),
-	%assertz((retractall(_))),
+	assertz_if_new((retractall1(Head) :- retract(Head), fail)),
+	assertz_if_new((retractall1(Head) :- retract((Head :- _Body)), fail)),
+	assertz_if_new((retractall1(_))),
 	!.
-
-        /*
 loadLibraries(poplog) :-
 	op(600,xfy,':'),
-	assertz((gensym(Prefix, V) :-
+	assertz_if_new((gensym(Prefix, V) :-
 	var(V),
 	atomic(Prefix),
 	(   retract(gensym_counter(Prefix, M))
@@ -672,20 +617,20 @@ loadLibraries(poplog) :-
 	append(P1,N1,V1),
 	name(V,V1),
 	!)),
-	assertz((append([],L2,L2))),
-	assertz((append([A1|L1],L2,[A1|L3]) :-
+	assertz_if_new((append([],L2,L2))),
+	assertz_if_new((append([A1|L1],L2,[A1|L3]) :-
 	append(L1,L2,L3))),
-	assertz((ask(A1) :- deduce(A1))),
-	assertz((ask(A1,A2) :- deduce(A1,A2))),
-	assertz((ask(A1,A2,A3) :- deduce(A1,A2,A3))),
-	assertz((ask(A1,A2,A3,A4) :- deduce(A1,A2,A3,A4))),
-	assertz((map(A1,A2,A3) :- hop_map(A1,A2,A3))),
-	assertz((map(A1,A2,A3,A4) :- hop_map(A1,A2,A3,A4))),
-	assertz((once(Goal) :- Goal, !)),
-	assertz((saveMOTEL(F) :- save_program(F))),
+	assertz_if_new((ask(A1) :- deduce(A1))),
+	assertz_if_new((ask(A1,A2) :- deduce(A1,A2))),
+	assertz_if_new((ask(A1,A2,A3) :- deduce(A1,A2,A3))),
+	assertz_if_new((ask(A1,A2,A3,A4) :- deduce(A1,A2,A3,A4))),
+	assertz_if_new((map(A1,A2,A3) :- hop_map(A1,A2,A3))),
+	assertz_if_new((map(A1,A2,A3,A4) :- hop_map(A1,A2,A3,A4))),
+	assertz_if_new((once(Goal) :- Goal, !)),
+	assertz_if_new((saveMOTEL(F) :- save_program(F))),
 	!.
 loadLibraries(quintus) :-
-	assertz((gensym(Prefix, V) :-
+	assertz_if_new((gensym(Prefix, V) :-
 	var(V),
 	atomic(Prefix),
 	(   retract(gensym_counter(Prefix, M))
@@ -698,19 +643,19 @@ loadLibraries(quintus) :-
 	append(P1,N1,V1),
 	name(V,V1),
 	!)),
-	assertz((getTwoRandomNumbers(RT,CT) :-
+	assertz_if_new((getTwoRandomNumbers(RT,CT) :-
 	statistics(runtime,[RT,CT]))),
-	assertz((getRuntime(RT) :-
+	assertz_if_new((getRuntime(RT) :-
 	statistics(runtime,[RT|_]))),
-	assertz((not(Goal) :- call(\+ Goal))),
-	assertz((once(Goal) :- Goal, !)),
-	assertz((ask(A1) :- deduce(A1))),
-	assertz((ask(A1,A2,A3,A4) :- deduce(A1,A2,A3,A4))),
-	assertz((ask(A1,A2) :- deduce(A1,A2))),
-	assertz((ask(A1,A2,A3) :- deduce(A1,A2,A3))),
-	assertz((map(A1,A2,A3) :- hop_map(A1,A2,A3))),
-	assertz((map(A1,A2,A3,A4) :- hop_map(A1,A2,A3,A4))),
-	assertz((saveMOTEL(F) :- save_program(F))),
+	assertz_if_new((not(Goal) :- call(\+ Goal))),
+	assertz_if_new((once(Goal) :- Goal, !)),
+	assertz_if_new((ask(A1) :- deduce(A1))),
+	assertz_if_new((ask(A1,A2,A3,A4) :- deduce(A1,A2,A3,A4))),
+	assertz_if_new((ask(A1,A2) :- deduce(A1,A2))),
+	assertz_if_new((ask(A1,A2,A3) :- deduce(A1,A2,A3))),
+	assertz_if_new((map(A1,A2,A3) :- hop_map(A1,A2,A3))),
+	assertz_if_new((map(A1,A2,A3,A4) :- hop_map(A1,A2,A3,A4))),
+	assertz_if_new((saveMOTEL(F) :- save_program(F))),
 	!.
 loadLibraries(macprolog) :-
 	op(600,xfy,':'),
@@ -737,15 +682,13 @@ getLibraries :-
 	asserta(currentProlog(eclipse)),
 	set_flag(variable_names,off),
 	loadLibraries(eclipse).
-*/
 getLibraries :-
 	current_op(_X,_Y,?),
-   style_check(-singleton),
+	style_check(-singleton),
 	!,
 	asserta(currentProlog(swiprolog)),
 	style_check(-discontiguous),
 	loadLibraries(swiprolog).
-/*
 getLibraries :-
 	setof((X,Y),prolog_flag(X,Y),L),
 	member((single_var,_Z),L),
@@ -773,7 +716,7 @@ getLibraries :-
 	asserta(currentProlog(poplog)),
 	version('MOTEL-0.4 Tue Aug 04 15:00:00 MET 1992'),
 	loadLibraries(poplog).
-*/
+
 /**********************************************************************
  *
  * OPTIONS
@@ -783,33 +726,33 @@ getLibraries :-
 /***********************************************************************
  *
  * setOption(+Option,+Set)
- * setOfFn kb_option Option to counter_value Set.
+ * set option Option to value Set.
  *
  */
 
 setOption(Option,Set) :-
-	retractall(kb_option(Option,_)),
-	asserta(kb_option(Option,Set)),
+	retractall1(option(Option,_)),
+	asserta(option(Option,Set)),
 	!.
 
 /**********************************************************************
  *
  * ifOption(+Option,+Set,+Goal)
- * executes Goal if the current counter_value of Option is Set otherwise
+ * executes Goal if the current value of Option is Set otherwise
  * the predicate suceeds.
  *
  */
 
 ifOption(Option,Set,Goal) :-
-	kb_option(Option,Set),
+	option(Option,Set),
 	call(Goal),
 	!.
 ifOption(_,_,_) :-
 	!.
 
-retractall(Env,Pred/Arity) :-
+retractall1(Env,Pred/Arity) :-
 	constructHead(Env,Pred/Arity,Head),
-	retractall(Head), 
+	retractall1(Head), 
 	!.
 
 :- getLibraries.
@@ -826,7 +769,7 @@ retractall(Env,Pred/Arity) :-
 
 % MOTEL is free software; you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
-% the Free Software Foundation; either version 1, or (at your kb_option)
+% the Free Software Foundation; either version 1, or (at your option)
 % any later version.
 
 % MOTEL is distributed in the hope that it will be useful,
@@ -1220,7 +1163,7 @@ generateClashGoal(CS1,Goal) :-
 		
 clashCS(CL) :-
 	retract(clashTest(possible)),
-	assertz(clashTest(impossible)),
+	assertz_if_new(clashTest(impossible)),
 	generateClashGoal(CL,Goal),
 	!,
 	doClashTest(Goal).
@@ -1241,7 +1184,7 @@ doClashTest(InHead1) :-
 	print(InHead1), nl,
 	nl,
 	retract(clashTest(impossible)),
-	assertz(clashTest(possible)),
+	assertz_if_new(clashTest(possible)),
 	!.
 doClashTest(Goal) :-
 	% the clash goal has failed, so there is no clash
@@ -1249,7 +1192,7 @@ doClashTest(Goal) :-
 	print(HYP), nl,
 	nl,
 	retract(clashTest(impossible)),
-	assertz(clashTest(possible)),
+	assertz_if_new(clashTest(possible)),
 	!,
 	fail.
 
@@ -1420,7 +1363,7 @@ subsumes(EnvName,MS,N1,N2) :-
 subsumes(concepts,Env,MS,C,D) :-
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	constructMLHead(Env,_RN1,W1,D,aaa,_HYPS,noAb,_CALLS,abox,InHeadD),
-	asserta((InHeadD :- call(G1))),
+	asserta_new((InHeadD :- call(G1))),
  	getQuery(Env,W1,C,aaa,Exp,InHeadC),
 %	convertToGoal(Env,_RN2,MS,C,aaa,[or([]),rl([]),fl(_DML1)],noAb,[],
 %		      _PT2,InHeadC),
@@ -1436,7 +1379,7 @@ subsumes(roles,Env,MS,R,S) :-
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	gensym(skolem,SF),
 	constructEqHead(Env,_RN1,W1,bbb,SF,S,aaa,_HYPS,noAb,_CALLS,abox,InHeadS),
-	asserta((InHeadS :- call(G1))),
+	asserta_new((InHeadS :- call(G1))),
 	constructEqHead(Env,_RN2,W1,bbb,_FF,R,aaa,[or([]),rl([]),fl(_DML1)],
 			noAb,[],_PT2,InHeadR),
 	call((G1, InHeadR)),
@@ -1617,11 +1560,11 @@ classify(roles,Env,MS,NewRole) :-
 classify(concepts,Env,MS,NewConcept) :-
 	retract(conceptHierarchy(Env,MS,OldTree)),
 	classify(concepts,Env,MS,NewConcept,OldTree,NewTree),
-	assertz(conceptHierarchy(Env,MS,NewTree)).
+	assertz_if_new(conceptHierarchy(Env,MS,NewTree)).
 classify(roles,Env,MS,NewRole) :-
 	retract(roleHierarchy(Env,MS,OldTree)),
 	classify(roles,Env,MS,NewRole,OldTree,NewTree),
-	assertz(roleHierarchy(Env,MS,NewTree)).
+	assertz_if_new(roleHierarchy(Env,MS,NewTree)).
 
 classify(Type,Env,MS,NewConcept,OldTree,NewTree) :-
 	testForSubsumption(Type,Env,MS,NewConcept,OldTree,NewTree,_Judgement),
@@ -1811,7 +1754,7 @@ cont5a(X,Y) :-
 	succ3(Y,Z),
 	cont5a(X,Z),!.
 
-assert2(G) :- not(G),assert(G),!.
+assert2(G) :- not(G),assertz_if_new(G),!.
 assert2(G) :-!.
 
 retract2(G) :- retract(G),!.
@@ -1952,6 +1895,9 @@ printArgs(Depth,[N1|NL]) :-
  *
  */
 
+:-dynamic(conceptName1/3).
+:-dynamic(roleName1/3).
+
 init_new_daten :- 
 	currentEnvironment(Env),
 	init_new_daten(Env).
@@ -1960,16 +1906,16 @@ init_new_daten(Env) :-
         init_succ(_),
 	init_sub(_),
 	init_nsub(_),
-	assert(conceptName1(Env,_,top)),
-	assert(roleName1(Env,_,top)),
-       	assertz(succ(concepts,Env,_,top,bot)),
-	assertz(sub(concepts,Env,_,top,_)),
-	assertz(nsub(concepts,Env,_,X,X)),	
-	assertz(succ(roles,Env,_,top,bot)),
-	assertz(sub(roles,Env,_,top,_)),
-	assertz(nsub(roles,Env,_,X,X)),
-	assertz(sub(roles,Env,_,_,bot)),
-	assertz(sub(concepts,Env,_,_,bot)).
+	assertz_if_new(conceptName1(Env,_,top)),
+	assertz_if_new(roleName1(Env,_,top)),
+       	assertz_if_new(succ(concepts,Env,_,top,bot)),
+	assertz_if_new(sub(concepts,Env,_,top,_)),
+	assertz_if_new(nsub(concepts,Env,_,X,X)),	
+	assertz_if_new(succ(roles,Env,_,top,bot)),
+	assertz_if_new(sub(roles,Env,_,top,_)),
+	assertz_if_new(nsub(roles,Env,_,X,X)),
+	assertz_if_new(sub(roles,Env,_,_,bot)),
+	assertz_if_new(sub(concepts,Env,_,_,bot)).
 
 init_new_daten1 :-
 	currentEnvironment(Env),
@@ -1978,12 +1924,12 @@ init_new_daten1 :-
 init_new_daten1(Env) :-
 	conceptName(Env,MS,W1,NewConcept),
 	not(name(NewConcept,[99,111,110,99,101,112,116|_])),
-	assert1(conceptName1(Env,MS,W1,NewConcept)),
+	assert1(conceptName1(Env,MS, /*W1,*/ NewConcept)),
 	fail.
 init_new_daten1(Env) :-
 	roleName(Env,MS,W1,NewRole),
 	not(name(NewRole,[114,111,108,101|_])),
-	assert1(roleName1(Env,MS,W1,NewRole)),
+	assert1(roleName1(Env,MS,/*W1,*/NewRole)),
 	fail.
 init_new_daten1(Env).
 
@@ -1993,14 +1939,14 @@ init_succ(MS) :-
 	!.
 init_succ(MS).
 init_succ(Env,MS) :- 
-	retractall(succ(_,Env,MS,_,_)),
+	retractall1(succ(_,Env,MS,_,_)),
 	!.
 init_sub(MS) :-
 	currentEnvironment(Env),
 	init_sub(Env,MS).
 init_sub(MS).
 init_sub(Env,MS) :- 
-	retractall(sub(_,Env,MS,_,_)),
+	retractall1(sub(_,Env,MS,_,_)),
 	!.
 
 init_nsub(MS) :-
@@ -2008,7 +1954,7 @@ init_nsub(MS) :-
 	init_nsub(Env,MS).
 init_nsub(MS).
 init_nsub(Env,MS) :-
-	retractall(nsub(_,Env,MS,_,_)),
+	retractall1(nsub(_,Env,MS,_,_)),
 	!.
 
 /********************************************************************/
@@ -2107,10 +2053,10 @@ testa(Env,MS) :-
 	initStat,
 	testb(Env,MS),
 	buildOrdering(Env,MS,CTree,RTree),
-	retractall(conceptHierarchy(Env,MS,_)),
-	retractall(roleHierarchy(Env,MS,_)),
-	assert(conceptHierarchy(Env,MS,CTree)),
-	assert(roleHierarchy(Env,MS,RTree)),
+	retractall1(conceptHierarchy(Env,MS,_)),
+	retractall1(roleHierarchy(Env,MS,_)),
+	assertz_if_new(conceptHierarchy(Env,MS,CTree)),
+	assertz_if_new(roleHierarchy(Env,MS,RTree)),
 	ifOption(testOutput,yes,printStat),
 %	ifOption(testOutput,yes,show_dag(MS)),
 	!.	
@@ -2938,7 +2884,7 @@ union1(X,Y,Z) :-
 	!.
 assert1(G) :- 
 	not(G),
-	assert(G),
+	assertz_if_new(G),
 	!.
 assert1(G) :-
 	!.
@@ -3137,8 +3083,8 @@ compileEnvironment(FileName,EnvName) :-
 	write((:- dynamic(roleAttributes/5))), write('.'), nl,
 %	write((:- dynamic(given_inflLink/4))), write('.'), nl,
 %	write((:- dynamic(given_change/4))), write('.'), nl,
-	write((:- dynamic(counter_value/2))), write('.'), nl,
-	write((:- dynamic(kb_option/2))), write('.'), nl,
+	write((:- dynamic(value/2))), write('.'), nl,
+	write((:- dynamic(option/2))), write('.'), nl,
 %	write((:- dynamic(environment/3))), write('.'), nl,
 %	write((:- dynamic(conceptHierarchy/3))), write('.'), nl,
 %	write((:- dynamic(roleHierarchy/3))), write('.'), nl,
@@ -3146,7 +3092,7 @@ compileEnvironment(FileName,EnvName) :-
 %	write((:- dynamic(rel/5))), write('.'), nl,
 	write((:- dynamic(compiledPredicate/2))), write('.'), nl,
 	writeq((:- asserta(environment(EnvName,Env,Comment)))), write('.'), nl,
-	writeq((:- retractall(currentEnvironment(_)))), write('.'), nl,
+	writeq((:- retractall1(currentEnvironment(_)))), write('.'), nl,
 	writeq((:- asserta(currentEnvironment(Env)))), write('.'), nl,
 	writeCompiledPredicateFactsToFile(Env,CPList),
 	expand_term((in(Env,Name,modal(MS),CN,CON,hyp(HYP),
@@ -3195,7 +3141,7 @@ compileEnvironment(FileName,EnvName) :-
 	!,
 	fail.
 
-treatClause(EOF) :- end_of_file == EOF,
+treatClause('end_of_file') :-
 	!.
 treatClause((:-dynamic Pred/Arity)) :-
 %	write((:-dynamic Pred/Arity)), write('.'), nl,
@@ -3219,18 +3165,18 @@ writeCompiledPredicateFactsToFile(Env,[Pred/Arity|List]) :-
 
 assertConnectionClauses(Env) :-
 	expand_term(constraint(Env,X2,X3,X4,X5,X6,X7,X8),CompConAtom),
-	assertz((constraint(Env,X2,X3,X4,X5,X6,X7,X8) :-
+	assertz_if_new((constraint(Env,X2,X3,X4,X5,X6,X7,X8) :-
 		 CompConAtom)),
 	expand_term(eq(Env,X2,X3,X4,X5,X6,X7,X8,X9),CompEqAtom),
-	assertz((eq(Env,X2,X3,X4,X5,X6,X7,X8,X9) :-
+	assertz_if_new((eq(Env,X2,X3,X4,X5,X6,X7,X8,X9) :-
 		 CompEqAtom)),
 	expand_term(in(Env,X2,X3,X4,X5,X6,X7,X8,X9),CompInAtom),
-	assertz((in(Env,X2,X3,X4,X5,X6,X7,X8,X9) :-
+	assertz_if_new((in(Env,X2,X3,X4,X5,X6,X7,X8,X9) :-
 		 CompInAtom)),
-%	assertz((kb_in(Env,X2,X3,X4,X5,X6,X7,X8,X9,X10) :-
+%	assertz_if_new((kb_in(Env,X2,X3,X4,X5,X6,X7,X8,X9,X10) :-
 %		 comp_kb_in(Env,X2,X3,X4,X5,X6,X7,X8,X9,X10))),
 	expand_term(rel(Env,X2,X3,X4,X5),CompRelAtom),
-	assertz((rel(Env,X2,X3,X4,X5) :-
+	assertz_if_new((rel(Env,X2,X3,X4,X5) :-
 		 CompRelAtom)),
 	!.
 
@@ -3270,32 +3216,32 @@ termExpansion(on,env(Id),
 	% Assert the term_expansion rules needed to translate the
 	% interpreted clauses into compiled clauses.
 	abolish(term_expansion/2),
-	assertz((term_expansion((Head :- Body),(Head1 :- Body1)) :-
+	assertz_if_new((term_expansion((Head :- Body),(Head1 :- Body1)) :-
 	term_expansion(Head,Head1),
 	term_expansion(Body,Body1))),
-	assertz((term_expansion((L, Body), (L1,Body1)) :-
+	assertz_if_new((term_expansion((L, Body), (L1,Body1)) :-
 	term_expansion(L,L1),
 	term_expansion(Body,Body1))),
-	assertz((term_expansion((L; Body), (L1,Body1)) :-
+	assertz_if_new((term_expansion((L; Body), (L1,Body1)) :-
 	term_expansion(L,L1),
 	term_expansion(Body,Body1))),
-	assertz((term_expansion(\+Atom,\+Atom1) :-
+	assertz_if_new((term_expansion(\+Atom,\+Atom1) :-
 	term_expansion(Atom,Atom1))),
-	assertz((term_expansion(constraint(X1,X2,X3,X4,X5,X6,X7,X8),
+	assertz_if_new((term_expansion(constraint(X1,X2,X3,X4,X5,X6,X7,X8),
 				CompConAtom))),
-	assertz((term_expansion(eq(X1,X2,X3,X4,X5,X6,X7,X8,X9),
+	assertz_if_new((term_expansion(eq(X1,X2,X3,X4,X5,X6,X7,X8,X9),
 				CompEqAtom))),
-	assertz((term_expansion(in(X1,X2,X3,X4,X5,X6,X7,X8,X9),
+	assertz_if_new((term_expansion(in(X1,X2,X3,X4,X5,X6,X7,X8,X9),
 				CompInAtom))),
-	assertz((term_expansion(kb_in(X1,X2,X3,X4,X5,X6,X7,X8,X9,X10),
+	assertz_if_new((term_expansion(kb_in(X1,X2,X3,X4,X5,X6,X7,X8,X9,X10),
 				CompKb_inAtom))),
-	assertz((term_expansion(rel(X1,X2,X3,X4,X5),
+	assertz_if_new((term_expansion(rel(X1,X2,X3,X4,X5),
 				CompRelAtom))),
-	assertz((term_expansion(once(Body1),once(Body2)) :-
+	assertz_if_new((term_expansion(once(Body1),once(Body2)) :-
 		term_expansion(Body1,Body2))),
-	assertz((term_expansion(call(Body1),call(Body2)) :-
+	assertz_if_new((term_expansion(call(Body1),call(Body2)) :-
 		 term_expansion(Body1,Body2))),
-	assertz(term_expansion(X,X)),
+	assertz_if_new(term_expansion(X,X)),
 	!.
 termExpansion(off,_) :-
 	abolish(term_expansion/2),
@@ -3352,7 +3298,7 @@ normalizeNot(not(and([C1])),C2) :-
 	negate(C1,C2).
 normalizeNot(not(and([])),'bot') :-
 	!.
-normalizeNot(not(setOfFn(L)),not(setOfFn(L))) :-
+normalizeNot(not(set(L)),not(set(L))) :-
 	!.
 normalizeNot(not(or([C1,C2|L1])),and(L3)) :-
 	!,
@@ -3388,7 +3334,7 @@ normalizeNot(not(dc(O,P)),bc(O,P)) :-
 	!.
 normalizeNot(not(not(C1)),C3) :-
 	normalizeNot(C1,C3).
-normalizeNot(not(setOfFn([])),top) :- !.
+normalizeNot(not(set([])),top) :- !.
 normalizeNot(C1,C1).
 
 /***********************************************************************
@@ -3424,7 +3370,7 @@ flatten(or(L1),or(L2)) :-
 	!,
 	hop_map(flatten,L1,L3),
 	flattenOr([],L3,L2).
-flatten(setOfFn(L1),setOfFn(L1)) :-
+flatten(set(L1),set(L1)) :-
 	!.
 flatten(all(R1,C1),all(R2,C2)) :-
 	flatten(R1,R2),
@@ -4341,8 +4287,8 @@ constructMLMark(in(_,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(_),_),LoopCheck) 
  * which is added to the call stack. If AX1 is `no' then the MLMark is
  * not added to the call stack at all.
  * S1 is used in the construction of InHead. If S1 is a variable, any 
- * rule can be used to prove the call. If S1 is `user' then only user
- * provided rules may be used. If S1 is system' then only system provided
+ * rule can be used to prove the call. If S1 is user' then only user
+ * provided rules may be used. If S1 is `system' then only system provided
  * rules may be used.
  *
  */
@@ -4845,7 +4791,7 @@ makeEnvironment(Name,Comment) :-
 	name(Runtime,RTChars),
 	name(EnvIdentifier,[FirstChar|RTChars]),
 	asserta(environment(Name,env(EnvIdentifier),Comment)),
-	retractall(currentEnvironment(_)),
+	retractall1(currentEnvironment(_)),
 	asserta(currentEnvironment(env(EnvIdentifier))),
 	!.
 
@@ -4883,50 +4829,57 @@ showEnvironment(EnvName) :-
 showModalAxioms(Name) :-
 	modalAxioms(Name,user,K,C,MOp,A),
 	(nonvar(A) ; (A = C)),
-	write('        '), write('     modalAxioms('), write(K), write(','), write(MOp), write(','), write(A), write(')'), nl,
+	write('        '), write('     modalAxioms('), write(K), write(','),
+	write(MOp), write(','), write(A), write(')'), nl,
 	fail.
 showModalAxioms(_) :-
 	!.
 showAssertConcept(Name) :-
 	clause(conceptElement(Name,MS,_,user,A,C,Ax),_),
-	write(Ax), write(':     assert_ind('), write(MS), write(','),  write(A), write(','), write(C), write(')'), nl,
+	write(Ax), write(':     assert_ind('), write(MS), write(','),
+	write(A), write(','), write(C), write(')'), nl,
 	fail.
 showAssertConcept(_) :-
 	!.
 showAssertRole(Name) :-
 	clause(roleElement(Name,MS,_,user,A,B,R,Ax),_),
-	write(Ax), write(':     assert_ind('), write(MS), write(','), write(A), write(','), write(B), write(','), write(R), write(')'), nl,
+	write(Ax), write(':     assert_ind('), write(MS), write(','),
+	write(A), write(','), write(B), write(','), write(R), write(')'), nl,
 	fail.
 showAssertRole(_) :-
 	!.
 showDefconcept(Name) :-
 	conceptEqualSets(Name,user,MS,CN,CT,Ax),
-	write(Ax), write(':     defconcept('), write(MS), write(','), write(CN), write(','), write(CT), write(')'), nl,
+	write(Ax), write(':     defconcept('), write(MS), write(','),
+	write(CN), write(','), write(CT), write(')'), nl,
 	fail.
 showDefconcept(_Name) :-
 	!.
 showDefprimconcept(Name) :-
 	conceptSubsets(Name,user,MS,CN,CT,Ax),
-	write(Ax), write(': defprimconcept('), write(MS), write(','), write(CN), write(','), write(CT), write(')'), nl,
+	write(Ax), write(': defprimconcept('), write(MS), write(','),
+	write(CN), write(','), write(CT), write(')'), nl,
 	fail.
 showDefprimconcept(_Name) :-
 	!.
 showDefrole(Name) :-
 	roleEqualSets(Name,user,MS,CN,CT,Ax),
-	write(Ax), write(':        defrole('), write(MS), write(','),  write(CN), write(','), write(CT), write(')'), nl,
+	write(Ax), write(':        defrole('), write(MS), write(','),
+	write(CN), write(','), write(CT), write(')'), nl,
 	fail.
 showDefrole(_Name) :-
 	!.
 showDefprimrole(Name) :-
 	roleSubsets(Name,user,MS,CN,CT,Ax),
-        writeq(Ax:defprimrole(MS,CN,CT)),nl,
-	% write(Ax), write(':    defprimrole('), write(MS), write(','), write(CN), write(','), write(CT), write(')'), nl,
+	write(Ax), write(':    defprimrole('), write(MS), write(','),
+	write(CN), write(','), write(CT), write(')'), nl,
 	fail.
 showDefprimrole(_Name) :-
 	!.
 showDefclosed(Name) :-
 	closed(Name,MS,X,Y,R),
-	write('axiom   '), write(':     defclosed('), write(MS), write(','), write(X), write(','), write(Y), write(','), write(R), write(')'),
+	write('axiom   '), write(':     defclosed('), write(MS), write(','),
+	write(X), write(','), write(Y), write(','), write(R), write(')'),
 	nl,
 	fail.
 showDefclosed(_Name) :-
@@ -4947,7 +4900,7 @@ removeEnvironment :-
 
 removeEnvironment(Name) :-
 	clearEnvironment(Name),
-	retractall(environment(Name,_,_)),
+	retractall1(environment(Name,_,_)),
 	retract(currentEnvironment(Name)),
 	asserta(currentEnvironment(env(e0))),
 	!.
@@ -4969,44 +4922,44 @@ clearEnvironment :-
 clearEnvironment(EnvName) :-
 	environment(EnvName,Env,_),
 	retractCompiledPredicates(Env),
-	retractall(Env,in/9),
-	retractall(Env,kb_in/10),
-	retractall(Env,eq/9),
-	retractall(Env,constraint/8),
-	retractall(Env,rel/5),
-	retractall(Env,closed/5),
-	retractall(Env,compiledPredicate/2),
-	retractall(Env,conceptElement/7),
-	retractall(Env,conceptEqualSets/6),
-	retractall(Env,conceptHierarchy/3),
-	retractall(Env,conceptName/4),
-	retractall(Env,conceptSubsets/6),
-	retractall(Env,environment/3),
-	retractall(Env,given_change/4),
-	retractall(Env,given_inflLink/4),
-	retractall(Env,modalAxioms/6),
-	retractall(Env,roleAttributes/5),
-	retractall(Env,roleDefault/4),
-	retractall(Env,roleDefNr/4),
-	retractall(Env,roleDomain/4),
-	retractall(Env,roleElement/8),
-	retractall(Env,roleEqualSets/6),
-	retractall(Env,roleHierarchy/3),
-	retractall(Env,roleName/4),
-	retractall(Env,roleNr/5),
-	retractall(Env,roleRange/4),
-	retractall(Env,roleSubsets/6),
-	retractall(Env,sub/4),
-	retractall(Env,succ/4),
-	retractall(Env,abductiveDerivation/3),
-	retractall(Env,consistencyDerivation/3),
-	retractall(Env,hypothesis/1),
-	retractall(Env,inconsistencyCheck/3),
-	retractall(Env,kb_option/2),
-	retractall(Env,nsub/4),
-	retractall(Env,nsub3/2),
-	retractall(Env,sub3/2),
-	retractall(Env,succ3/2),
+	retractall1(Env,in/9),
+	retractall1(Env,kb_in/10),
+	retractall1(Env,eq/9),
+	retractall1(Env,constraint/8),
+	retractall1(Env,rel/5),
+	retractall1(Env,closed/5),
+	retractall1(Env,compiledPredicate/2),
+	retractall1(Env,conceptElement/7),
+	retractall1(Env,conceptEqualSets/6),
+	retractall1(Env,conceptHierarchy/3),
+	retractall1(Env,conceptName/4),
+	retractall1(Env,conceptSubsets/6),
+	retractall1(Env,environment/3),
+	retractall1(Env,given_change/4),
+	retractall1(Env,given_inflLink/4),
+	retractall1(Env,modalAxioms/6),
+	retractall1(Env,roleAttributes/5),
+	retractall1(Env,roleDefault/4),
+	retractall1(Env,roleDefNr/4),
+	retractall1(Env,roleDomain/4),
+	retractall1(Env,roleElement/8),
+	retractall1(Env,roleEqualSets/6),
+	retractall1(Env,roleHierarchy/3),
+	retractall1(Env,roleName/4),
+	retractall1(Env,roleNr/5),
+	retractall1(Env,roleRange/4),
+	retractall1(Env,roleSubsets/6),
+	retractall1(Env,sub/4),
+	retractall1(Env,succ/4),
+	retractall1(Env,abductiveDerivation/3),
+	retractall1(Env,consistencyDerivation/3),
+	retractall1(Env,hypothesis/1),
+	retractall1(Env,inconsistencyCheck/3),
+	retractall1(Env,option/2),
+	retractall1(Env,nsub/4),
+	retractall1(Env,nsub3/2),
+	retractall1(Env,sub3/2),
+	retractall1(Env,succ3/2),
 	!.
 
 /**********************************************************************
@@ -5042,7 +4995,7 @@ initEnvironment :-
 initEnvironment(EnvName) :-
 	clearEnvironment(EnvName),
 	environment(EnvName,Env,_),
-	assert(theory(Env,
+	assertz_if_new(theory(Env,
 	[
         (in([],P,pair(X,Y)) <- equal(X,Z), in([],P,pair(Z,Y))),
 	(in([],P,pair(X,Y)) <- equal(Y,Z), in([],P,pair(X,Z))),
@@ -5095,12 +5048,12 @@ initEnvironment(EnvName) :-
 	% Meta Reasoning
 %	metaReasoning,
 	% Assert concept hierarchy
-	assertz(conceptHierarchy(Env,[],node(['top'],[]))),
-	assertz(conceptName(Env,[],[],'top')),
-	assertz(conceptName(Env,[],[],'bot')),
+	assertz_if_new(conceptHierarchy(Env,[],node(['top'],[]))),
+	assertz_if_new(conceptName(Env,[],[],'top')),
+	assertz_if_new(conceptName(Env,[],[],'bot')),
 	% Assert role hierarchy
-	assertz(roleHierarchy(Env,[],node(['top'],[]))),
-	assertz(roleName(Env,[],[],'top')),
+	assertz_if_new(roleHierarchy(Env,[],node(['top'],[]))),
+	assertz_if_new(roleName(Env,[],[],'top')),
 	initFuncdep,
 	!.
 
@@ -5118,36 +5071,36 @@ initEnvironment(EnvName) :-
  */
 
 assertInRules(Env) :-
-	assertz((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
+	assertz_if_new((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
 		 ifOption(traceOutput,yes,(length(CALL,Depth), 'format'('trying ~d  in(~w,~w)~n',[Depth,CN,CON]))),
 	kb_in(Env,pr(5),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT),
 		 ifOption(traceOutput,yes,(length(CALL,Depth), 'format'('succeeded ~d  in(~w,~w)~n',[Depth,CN,CON]))))),
 % There are no kb_in clauses with priority 4 at the moment (07.10.92)
-%	assertz((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
+%	assertz_if_new((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
 %	kb_in(Env,pr(4),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT))),
-	assertz((in(Env,Name,modal(MS),CN,CON,hyp([or(H1),rl(H2),fl(H3)]),ab(noAb),call(CALL),PT) :-
+	assertz_if_new((in(Env,Name,modal(MS),CN,CON,hyp([or(H1),rl(H2),fl(H3)]),ab(noAb),call(CALL),PT) :-
 		 clashInHyp(H2), !, fail)),
-	assertz((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
+	assertz_if_new((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
 		 (CN \== top, CN \== bot, CN \== not(top), CN \== not(bot),
 	kb_in(Env,pr(3),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT)))),
 % There are no kb_in clauses with priority 2 at the moment (07.10.92)
-%	assertz((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
+%	assertz_if_new((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
 %	kb_in(Env,pr(2),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT))),
-	assertz((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
+	assertz_if_new((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
 		 (CN \== top,CN \== bot, CN \== not(top), CN \== not(bot),
 	kb_in(Env,pr(1),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT)))),
 % Experimental code (07.10.92 uh)
 % It might be useful to have global information about the failure of
-% derivations. With the code below such a failure is used to assert to
+% derivations. With the code below such a failure is used to assertz_if_new to
 % hypothesis that the negation of the goal is true.
-%	assertz((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
+%	assertz_if_new((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
 %		 (nonvar(CON), nonvar(CN), 
 %		  \+ hypothesis(in(Env,modal(MS),CN,CON,ab(D),PT)),
 %		  getNegatedConcept(CN,C1),
-%		  assertz(hypothesis(in(Env,modal(MS),C1,CON,ab(D),assume))),
+%		  assertz_if_new(hypothesis(in(Env,modal(MS),C1,CON,ab(D),assume))),
 %		  fail))),
 % There are no kb_in clauses with priority 0 at the moment (07.10.92)
-%	assertz((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
+%	assertz_if_new((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
 %	kb_in(Env,pr(0),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT))),
 	!.
 
@@ -5156,11 +5109,11 @@ assertEqRule(Env,1) :-
 	gensym(rule,RN1),
 	constructEqHead(Env,rn(AN1,RN1,user,lInR),W1,app((F:R),X),F,R,X,HYPS,AB,CALLS,PT3,EqHead1),
 	constructMLCall(Env,rn(AX,_RN4,_S4,_O4),bodyMC(W1),headMC(W1),normal(R),X,HYPS,AB,CALLS,PT3,InHead2),
-	assertz((EqHead1 :- cCS(CALLS,true),  simple_term(X))),
+	assertz_if_new((EqHead1 :- cCS(CALLS,true),  simple_term(X))),
 %       The following would be correct
-%	assertz((EqHead1 :- cCS(CALLS,true),  InHead2)),
+%	assertz_if_new((EqHead1 :- cCS(CALLS,true),  InHead2)),
 %       old code (uh 20.08.92)
-%	assertz((eq(Env,rn(AN1,RN1,user,lInR),modal(MS),X,X,hyp(HYPS),
+%	assertz_if_new((eq(Env,rn(AN1,RN1,user,lInR),modal(MS),X,X,hyp(HYPS),
 %                   ab(_AB),call(CALLS),proved(eq(MS,X,X,hyp(HYPS),
 %                   basedOn(true)))) :- 
 %                (cCS(CALLS,true)))),
@@ -5171,13 +5124,13 @@ assertEqRule(Env,2) :-
 	gensym(rule,RN3),
 	constructMLHead(Env,rn(AN3,RN3,user,lInR),_MS,_,Role1,
 			_HYPS,_D,_CALLS,tbox,InHeadR),
-	assertz((InHeadR)),
+	assertz_if_new((InHeadR)),
 	!.
 assertEqRule(Env,3) :-
 	gensym(axiom,AN20),
 	gensym(rule,RN20),
 	constructEqHead(Env,rn(AN20,RN20,user,lInR),_W1,_Y,_F,top,_X,_HYPS,_D,_CALLS,tbox,EqHead20),
-	assertz(EqHead20),
+	assertz_if_new(EqHead20),
 	!.
 assertEqRule(Env,4) :-
 	gensym(axiom,AN21),
@@ -5185,7 +5138,7 @@ assertEqRule(Env,4) :-
 	HYPS = [or(H1),rl(H2),fl(H3)],
 	constructEqHead(Env,rn(AN21,RN21,user,lInR),W1,Y,F,R,X,HYPS,D,_CALLS,tbox,EqHead20),
 	constructEqMark(rn(_AN21,_RN21,_,_),W1,Y,F,R,X,_HYPS2,D,_CALLS2,EqMark20),
-	assertz((EqHead20 :- append(H1,H2,H), member(EqMark20,H))),
+	assertz_if_new((EqHead20 :- append(H1,H2,H), member(EqMark20,H))),
 	!.
 
 
@@ -5196,7 +5149,7 @@ assertInRule(Env,1) :-
 	gensym(rule,RN2),
 	constructKBHead(Env,pr(5),rn(AN2,RN2,user,lInR),_W1,'top',_X,
 			_HYPS,_D,_CALLS,tbox,InHead),
-	assertz(InHead),
+	assertz_if_new(InHead),
 	!.
 assertInRule(Env,2) :-
 	% For all X: X in not(bot) 
@@ -5210,13 +5163,13 @@ assertInRule(Env,2) :-
 	% is subsumed by assertInRule(Env,4).
 	% For all X: X in not(bot) if X in top.
 	% is subsumed by assertInRule(Env,2), i.e. the rule we will
-	% assert now.
+	% assertz_if_new now.
 	% Priority 5 (high priority)
 	gensym(axiom,AN4),
 	gensym(rule,RN4),
 	constructKBHead(Env,pr(5),rn(AN4,RN4,user,lInR),_W1,not(bot),X,
 	                _HYPS,_D,_CALLS,tbox,InHead1),
-	assertz(InHead1),
+	assertz_if_new(InHead1),
 	!.
 assertInRule(Env,3) :-
 	% For all X: X in C if (X in C) is a hypothesis
@@ -5227,9 +5180,9 @@ assertInRule(Env,3) :-
 	constructInHead(Env,rn(_AN5,_RN5,_S5,_O5),MS,C,X,_HYPS,_D1,_CALLS1,_,InHead1),
 	constructKBHead(Env,pr(5),rn(AN4,RN4,system,lInR),MS,C,X,
 	                HYPS,_D,_CALLS2,usingHyp(InHead1),InHead2),
-	assertz((InHead2 :- append(H1,H2,H), member(InHead1,H))),
+	assertz_if_new((InHead2 :- append(H1,H2,H), member(InHead1,H))),
 	constructMLMark(InHead1,Mark1),
-	assertz((InHead2 :- (append(H1,H2,H), member(Mark1,H)) ; memberDML(Mark1,H3))),
+	assertz_if_new((InHead2 :- (append(H1,H2,H), member(Mark1,H)) ; memberDML(Mark1,H3))),
 	!.
 assertInRule(Env,4) :-
 	% For all X: X in not(top) => X in C 
@@ -5242,7 +5195,7 @@ assertInRule(Env,4) :-
 	constructMLCall(Env,rn(AN7,_RN7,_S7,_O7),bodyMC(MS),headMC(MS),
                         not('top'),X,HYPS,D,CALLS,PT3,L3),
  	constructMLMark(InHead3,Mark3),
-	assertz((InHead3 :- cCS(CALLS,Mark3), L3)),
+	assertz_if_new((InHead3 :- cCS(CALLS,Mark3), L3)),
 	!.
 
 assertInRule(Env,1,AN10) :- 
@@ -5255,7 +5208,7 @@ assertInRule(Env,1,AN10) :-
 	constructMLMark(InHead,Mark),
 	convertInAntecedent(Env,rn(AN10,system,lInR),bodyMC(W),headMC(W),
 			    atmost(0,R),X,HYPS,AB,CALLS,PT,Body),
-	asserta((InHead :- (nonvar(C), (cCS(CALLS,Mark), once((EqLiteral, Body)))))),
+	asserta_new((InHead :- (nonvar(C), (cCS(CALLS,Mark), once((EqLiteral, Body)))))),
 	!.
 assertInRule(Env,2,AxiomName) :-
 	% Assert x in all(r,'bot') => x in atmost(0,r)
@@ -5268,7 +5221,7 @@ assertInRule(Env,2,AxiomName) :-
 	convertInConsequence(Env,pr(1),RN1,_MS,W1,
 			     atmost(0,R),X,HYPS,AB,CALLS,PT1,InHead1),
 	constructConMark(InHead1,Mark1),
-	asserta((InHead1 :- (nonvar(R),(cCS(CALLS,Mark1), once(Body))))),
+	asserta_new((InHead1 :- (nonvar(R),(cCS(CALLS,Mark1), once(Body))))),
 	!.
 assertInRule(Env,3,AxiomName) :-
 	% Assert x in some(R,top) => x in atleast(1,R)
@@ -5281,7 +5234,7 @@ assertInRule(Env,3,AxiomName) :-
 	convertInConsequence(Env,pr(1),RN1,_MS,W1,
 			     atleast(1,R),X,HYPS,AB,CALLS,PT1,InHead1),
 	constructConMark(InHead1,Mark1),
-	asserta((InHead1 :- (nonvar(R), cCS(CALLS,Mark1), once(Body)))),
+	asserta_new((InHead1 :- (nonvar(R), cCS(CALLS,Mark1), once(Body)))),
 	!.
 assertInRule(Env,4,AxiomName) :-
 	% Assert x in atleast(1,R) => x in some(R,top)
@@ -5294,7 +5247,7 @@ assertInRule(Env,4,AxiomName) :-
 	convertInAntecedent(Env,rn(AxiomName,system,lInR),
 	                    bodyMC(W1),headMC(W1),
 			    atleast(1,R),X,HYPS,AB,CALLS,PT1,Body),
-	asserta((InHead1 :- (cCS(CALLS,Mark1), once((EqLiteral, Body))))),
+	asserta_new((InHead1 :- (cCS(CALLS,Mark1), once((EqLiteral, Body))))),
 	!.
 assertInRule(Env,5,AN6) :-
 	% For all X: X in C => X in not(not(C))
@@ -5305,7 +5258,7 @@ assertInRule(Env,5,AN6) :-
 	constructMLCall(Env,rn(AN6,_RN9,_S9,_O9),bodyMC(MS),headMC(MS),C,X,
 	                HYPS,D,CALLS,PT4,Antecedent4),
 	constructMLMark(Consequence3,AxiomHead3),
-	assertz((Consequence3 :- cCS(CALLS,AxiomHead3), Antecedent4)),
+	assertz_if_new((Consequence3 :- cCS(CALLS,AxiomHead3), Antecedent4)),
 	!.
 assertInRule(Env,6,AN6) :-
 	% For all X: X in not(not(C)) => X in C 
@@ -5316,49 +5269,49 @@ assertInRule(Env,6,AN6) :-
 	constructMLCall(Env,rn(AN6,_RN7,_S7,_O7),bodyMC(MS),headMC(MS),
 			not(not(C)),X,HYPS,D,CALLS,PT3,Antecedent3),
 	constructMLMark(Consequence4,AxiomHead4),
-	assertz((Consequence4 :- cCS(CALLS,AxiomHead4), Antecedent3)),
+	assertz_if_new((Consequence4 :- cCS(CALLS,AxiomHead4), Antecedent3)),
 	!.
 assertInRule(Env,7,AN7) :-
-	% For all X: X in setOfFn(S2) and subset(S2,S1) => X in S1
+	% For all X: X in set(S2) and subset(S2,S1) => X in S1
 	% Priority 1 (low priority)
 	gensym(rule,RN8),
-	constructKBHead(Env,pr(1),rn(AN7,RN8,system,lInR),MS,setOfFn(S1),X,
+	constructKBHead(Env,pr(1),rn(AN7,RN8,system,lInR),MS,set(S1),X,
 	                HYPS,D,CALLS,PT2,Consequence1),
 	constructMLCall(Env,rn(AN7,_RN2,_S2,_O2),bodyMC(MS),headMC(MS),
-			setOfFn(S2),X,HYPS,D,CALLS,PT2,Antecedent2),
+			set(S2),X,HYPS,D,CALLS,PT2,Antecedent2),
 	L1 = subset(S2,S1),
 	constructMLMark(Consequence1,AxiomHead1),
-	assertz((Consequence1 :- cCS(CALLS,AxiomHead1), (Antecedent2, L1))),
+	assertz_if_new((Consequence1 :- cCS(CALLS,AxiomHead1), (Antecedent2, L1))),
 	!.
 assertInRule(Env,8,AN7) :-
-	% For all X: X in setOfFn(S2) and X in setOfFn(S3) and 
+	% For all X: X in set(S2) and X in set(S3) and 
 	%            intersection(S2,S3,S1) => X in S1
 	% Priority 1 (low priority)
 	gensym(rule,RN8),
-	constructKBHead(Env,pr(1),rn(AN7,RN8,system,lInR),MS,setOfFn(S1),X,
+	constructKBHead(Env,pr(1),rn(AN7,RN8,system,lInR),MS,set(S1),X,
 	                HYPS,D,CALLS,and([PT2,PT3]),Consequence1),
 	constructMLCall(Env,rn(AN7,_RN2,_S2,_O2),bodyMC(MS),headMC(MS),
-			setOfFn(S2),X,HYPS,D,CALLS,PT2,Antecedent2),
+			set(S2),X,HYPS,D,CALLS,PT2,Antecedent2),
 	constructMLCall(Env,rn(AN7,_RN3,_S3,_O3),bodyMC(MS),headMC(MS),
-			setOfFn(S3),X,HYPS,D,CALLS,PT3,Antecedent3),
+			set(S3),X,HYPS,D,CALLS,PT3,Antecedent3),
 	L1 = intersection([S2,S3],S1),
 	constructMLMark(Consequence1,AxiomHead1),
-	assertz((Consequence1 :- cCS(CALLS,AxiomHead1), (Antecedent3, (Antecedent2, L1)))),
+	assertz_if_new((Consequence1 :- cCS(CALLS,AxiomHead1), (Antecedent3, (Antecedent2, L1)))),
 	!.
 assertInRule(Env,9,AN7) :-
-	% For all X: X in setOfFn(S2) and X in setOfFn(S3) and 
+	% For all X: X in set(S2) and X in set(S3) and 
 	%            intersection(S2,S3,S1) => X in S1
 	% Priority 1 (low priority)
 	gensym(rule,RN8),
-	constructKBHead(Env,pr(1),rn(AN7,RN8,system,lInR),MS,not(setOfFn(S1)),X,
+	constructKBHead(Env,pr(1),rn(AN7,RN8,system,lInR),MS,not(set(S1)),X,
 	                HYPS,D,CALLS,and([PT2,PT3]),Consequence1),
 	constructMLCall(Env,rn(AN7,_RN2,_S2,_O2),bodyMC(MS),headMC(MS),
-			setOfFn(S2),X,HYPS,D,CALLS,PT2,Antecedent2),
+			set(S2),X,HYPS,D,CALLS,PT2,Antecedent2),
 	constructMLCall(Env,rn(AN7,_RN3,_S3,_O3),bodyMC(MS),headMC(MS),
-			setOfFn(S3),X,HYPS,D,CALLS,PT3,Antecedent3),
+			set(S3),X,HYPS,D,CALLS,PT3,Antecedent3),
 	L1 = subtract(S2,S3,S1),
 	constructMLMark(Consequence1,AxiomHead1),
-	assertz((Consequence1 :- cCS(CALLS,AxiomHead1), (Antecedent3, (Antecedent2, L1)))),
+	assertz_if_new((Consequence1 :- cCS(CALLS,AxiomHead1), (Antecedent3, (Antecedent2, L1)))),
 	!.
 
 
@@ -5369,7 +5322,7 @@ assertAbductionRule(Env,1) :-
 	constructInHead(Env,rn(_AN2,_RN2,_S2,_O2),MS,C,X,
 	                _HYPS1,_D,_CALLS1,_,InHead1),
 	constructMLHead(Env,rn(AN1,RN1,system,lInR),MS,C,X,_HYPS2,D1,_CALLS2,usingAbHyp(in(MS,C,X)),InHead2),
-	assertz((InHead2 :- memberDML(InHead1,D1))),
+	assertz_if_new((InHead2 :- memberDML(InHead1,D1))),
 	!.
 assertAbductionRule(Env,2) :-
 	% Proof by abduction
@@ -5381,7 +5334,7 @@ assertAbductionRule(Env,2) :-
 	L1 = normalizeNot(C1,C),
 	L2 = not(memberDML(InHead2,D1)),
 	L3 = addDefaultML(InHead2,D1),
-	assertz((InHead1 :- L1, L2, L3)),
+	assertz_if_new((InHead1 :- L1, L2, L3)),
 	!.
 
 
@@ -5395,7 +5348,7 @@ assertAbductionRule(Env,2) :-
 
 switchToEnvironment(Name) :-
 	environment(Name,Env,_),
-	retractall(currentEnvironment(_)),
+	retractall1(currentEnvironment(_)),
 	asserta(currentEnvironment(Env)),
 	!.
 
@@ -5516,7 +5469,7 @@ loadEnvironment(FileName,EnvName) :-
 	see(FileName),
 	read(environment(_EnvName2,Env,C)),
 	(removeEnvironment(EnvName) ; true),
-	assertz(environment(EnvName,Env,C)),
+	assertz_if_new(environment(EnvName,Env,C)),
 	repeat,
 	read(Clause),
 	assertClause(Clause),
@@ -5527,10 +5480,10 @@ loadEnvironment(_FileName,_EnvName) :-
 	!, 
 	fail.
 
-assertClause(EOF) :- end_of_file == EOF,
+assertClause('end_of_file') :-
 	!.
 assertClause(Clause) :-
-	assertz(Clause),
+	assertz_if_new(Clause),
 	fail.
 
 /**********************************************************************
@@ -5547,7 +5500,7 @@ copyEnvironment(Name2) :-
 copyEnvironment(Name1,Name2) :-
 	environment(Name1,Env1,Comment),
 	makeEnvironment(Name2,Comment),
-	% !! This environment mustn't be initialize_motels because
+	% !! This environment mustn't be initializes because
 	% the clauses asserted usually during initialization
 	% will also be copied from environment Name1.
 	environment(Name2,Env2,_),
@@ -5582,27 +5535,27 @@ copyEnvironment(Name1,Name2) :-
 	copyAll(Env1,Env2,roleSubsets/6),
 %	copyAll(Env1,Env2,sub/4),
 %	copyAll(Env1,Env2,succ/4),
-%	copyAll(Env1,Env2,kb_option/2),
+%	copyAll(Env1,Env2,option/2),
 %	copyAll(Env1,Env2,nsub/4),
 	term_expansion(copy,off,Env1,Env2),
 	!.
 
 term_expansion(copy,on,Env1,Env2) :-
 	abolish(term_expansion/2),
-	assertz((term_expansion((Head :- Body),(Head1 :- Body1)) :-
+	assertz_if_new((term_expansion((Head :- Body),(Head1 :- Body1)) :-
 	term_expansion(Head,Head1),
 	term_expansion(Body,Body1))),
-	assertz((term_expansion((L, Body), (L1,Body1)) :-
+	assertz_if_new((term_expansion((L, Body), (L1,Body1)) :-
 	term_expansion(L,L1),
 	term_expansion(Body,Body1))),
-	assertz((term_expansion((L; Body), (L1,Body1)) :-
+	assertz_if_new((term_expansion((L; Body), (L1,Body1)) :-
 	term_expansion(L,L1),
 	term_expansion(Body,Body1))),
-	assertz((term_expansion(\+Atom,\+Atom1) :-
+	assertz_if_new((term_expansion(\+Atom,\+Atom1) :-
 	term_expansion(Atom,Atom1))),
-	assertz((term_expansion(once(Body1),once(Body2)) :-
+	assertz_if_new((term_expansion(once(Body1),once(Body2)) :-
 		term_expansion(Body1,Body2))),
-	assertz((term_expansion(call(Body1),call(Body2)) :-
+	assertz_if_new((term_expansion(call(Body1),call(Body2)) :-
 		 term_expansion(Body1,Body2))),
 	assertTermExpansionClause(in/9,Env1,Env2),
 	assertTermExpansionClause(kb_in/10,Env1,Env2),
@@ -5633,11 +5586,11 @@ term_expansion(copy,on,Env1,Env2) :-
 	assertTermExpansionClause(roleSubsets/6,Env1,Env2),
 	assertTermExpansionClause(sub/4,Env1,Env2),
 	assertTermExpansionClause(succ/4,Env1,Env2),
-	assertz((term_expansion(succ(X1,Env1,X3,X4),
+	assertz_if_new((term_expansion(succ(X1,Env1,X3,X4),
 				succ(X1,Env2,X3,X4)))),
-	assertz((term_expansion(sub(X1,Env1,X3,X4),
+	assertz_if_new((term_expansion(sub(X1,Env1,X3,X4),
 				sub(X1,Env2,X3,X4)))),
-	assertz(term_expansion(X,X)),
+	assertz_if_new(term_expansion(X,X)),
 	!.
 term_expansion(copy,off,_Env1,_Env2) :-
 	abolish(term_expansion/2),
@@ -5648,7 +5601,7 @@ assertTermExpansionClause(Pred/Arity,Env1,Env2) :-
 	constructArguments(Env,Arity,[],[Env1|Arguments]),
 	Head1 =.. [Pred|[Env1|Arguments]],
 	Head2 =.. [Pred|[Env2|Arguments]],
-	assertz((term_expansion(Head1,Head2))),
+	assertz_if_new((term_expansion(Head1,Head2))),
 	!.
 
 expandTerm(A,B) :-
@@ -5659,7 +5612,7 @@ copyall(Env1,_Env2,Pred,Args) :-
 	Head1 =.. [Pred,Env1|Args],
 	clause(Head1,Body1),
 	expandTerm((Head1,Body1),(Head2,Body2)),
-	assertz((Head2 :- Body2)),
+	assertz_if_new((Head2 :- Body2)),
 	fail.
 copyall(_,_,_,_) :- !.
 
@@ -5667,7 +5620,7 @@ copyAll(Env1,_Env2,Pred/Arity) :-
 	constructHead(Env1,Pred/Arity,Head1),
 	clause(Head1,Body1),
 	expandTerm((Head1,Body1),(Head2,Body2)),
-	assertz((Head2 :- Body2)),
+	assertz_if_new((Head2 :- Body2)),
 	fail.
 copyAll(_,_,_) :- !.
 
@@ -5702,7 +5655,7 @@ example(1) :-
 	assert_ind(tom,male).
 %%% Example  2:
 %%% KRIS-Example
-% setof(C,ask(elementOf(mary,C)),L)
+% setof(C,ask(isa(mary,C)),L)
 % gives L = ['top',grandparent,parent,parent_with_sons_only,
 %            parent_with_two_children,person] 
 % in Total runtime 12.167 sec. (05.06.92)
@@ -5776,7 +5729,7 @@ example(7) :-
 	defconcept(c1,atleast(3,r)),
 	defconcept(c2,and([all(and([r,p]),a),all(and([r,q]),not(a)),atleast(2,and([r,p])),atleast(2,and([r,q]))])).
 %%% Example  8;
-% ask(elementOf(tom,heterosexual))
+% ask(isa(tom,heterosexual))
 % succeeds in Total runtime 0.033 sec. (05.06.92)
 example(8) :-
 	makeEnvironment('ex8','Disjunction of complementary concepts'),
@@ -5786,7 +5739,7 @@ example(8) :-
 	defconcept(heterosexual,or([male,female])).
 %%% Example  9:
 % Variation of the KRIS-Example
-% ask(elementOf(chris,male))
+% ask(isa(chris,male))
 % succeeds in Total runtime 0.000 sec. (05.06.92)
 example(9) :-
 	makeEnvironment('ex9','Variation of the KRIS example'),
@@ -5807,7 +5760,7 @@ example(9) :-
 	assert_ind(mary,tom,child),
 	assert_ind(mary,chris,child).
 %%% Example 10:
-% ask(elementOf(tom,c2)) 
+% ask(isa(tom,c2)) 
 % succeeds in Total runtime 0.017 sec. (05.06.92)
 example(10) :-
 	makeEnvironment('ex10','Inverse Role'),
@@ -5877,7 +5830,7 @@ example(17) :-
 	defconcept(c1,some(and([child,friend]),doctor)),
 	defconcept(c2,and([some(child,doctor),some(friend,doctor)])).
 %%% Example 18:
-% ask(elementOf(mary,c4))
+% ask(isa(mary,c4))
 % succeeds in Total runtime 0.117 sec. (05.06.92)
 example(18) :-
 	makeEnvironment('ex18','Number restrictions'),
@@ -5892,7 +5845,7 @@ example(18) :-
 	assert_ind(mary,tom,child),
 	assert_ind(mary,c3).
 %%% Example 19
-% ask(elementOf(amy,female))
+% ask(isa(amy,female))
 % succeeds in Total runtime 0.067 sec. (06.06.92)
 example(19) :-
 	makeEnvironment('ex19','Number restrictions'),
@@ -5923,7 +5876,7 @@ example(20) :-
 	assert_ind(mary,jane,child),
 	assert_ind(mary,c5).
 %%% Example 21
-% ask(elementOf(betty,female))
+% ask(isa(betty,female))
 example(21) :-
 	makeEnvironment('ex21','Number restrictions'),
 	initEnvironment,
@@ -5942,7 +5895,7 @@ example(21) :-
 	assert_ind(david,chris,teacher),
 	assert_ind(david,peter,teacher).
 %%% Example 22
-% ask(elementOf(amy,female))
+% ask(isa(amy,female))
 % should succeeds
 % but fails in the current implementation
 example(22) :-
@@ -5964,7 +5917,7 @@ example(22) :-
 %%% Example 23
 % is a variant of example 23 with user provided names for the 
 % restricted roles.
-% ask(elementOf(amy,female))
+% ask(isa(amy,female))
 % should succeeds
 % but fails in the current implementation
 example(23) :-
@@ -5984,7 +5937,7 @@ example(23) :-
 	assert_ind(sue,betty,teacher),
 	assert_ind(sue,chris,teacher).
 %%% Example 24
-% ask(elementOf(audi,c3))
+% ask(isa(audi,c3))
 % succeeds in Total runtime 1.634 sec. (24.06.92)
 example(24) :-
 	makeEnvironment('ex24','Modal operators'),
@@ -5996,7 +5949,7 @@ example(24) :-
 	defconcept([b(believe,a1)],c3,b(believe,a1,c1)),
 	assert_ind(audi,c1).
 %%% Example 25
-% not(ask(elementOf(audi,c3)))
+% not(ask(isa(audi,c3)))
 % succeeds in Total runtime 0.033 sec. (24.06.92)
 example(25) :-
 	makeEnvironment('ex25','Modal operators'),
@@ -6026,7 +5979,7 @@ example(27) :-
 	defconcept(c1,not(some(r,'top'))),
 	defconcept(c2,all(r,c5)).
 %%% Example 28
-% ask(ex28,[b(believe,john)],elementOf(audi,auto),P)
+% ask(ex28,[b(believe,john)],isa(audi,auto),P)
 % succeeds
 example(28) :-
 	makeEnvironment('ex28','Modal operators'),
@@ -6037,7 +5990,7 @@ example(28) :-
 	assert_ind([b(believe,all)],audi,auto).
 %%% Example 29
 % is a variant of example 23 with a more restricted definition of c1
-% ask(elementOf(amy,female))
+% ask(isa(amy,female))
 % should succeeds
 % but fails in the current implementation
 example(29) :-
@@ -6073,7 +6026,7 @@ example(30) :-
 	assert_ind(sue,chris,teacher).
 %%% Example 31
 % First test example for defclosed
-% ask(elementOf(tom,onlyMaleChildren))
+% ask(isa(tom,onlyMaleChildren))
 % succeeds
 example(31) :-
 	makeEnvironment('ex31','defclosed'),
@@ -6088,16 +6041,16 @@ example(31) :-
 	defclosed(tom,_Y,child).
 %%% Example 32
 % First test example for abduction
-% abduce(elementOf(robin,male),H,E)
-% abduce(elementOf(robin,female),H,E)
+% abduce(isa(robin,male),H,E)
+% abduce(isa(robin,female),H,E)
 example(32) :-
 	makeEnvironment('ex32','abduction'),
 	initEnvironment,
 	defconcept(male,not(female)).
 %%% Example 33
 % Second test example for abduction
-% abduce(elementOf(nixon,dove),H,E)
-% abduce(elementOf(nixon,hawk),H,E)
+% abduce(isa(nixon,dove),H,E)
+% abduce(isa(nixon,hawk),H,E)
 % gives unexpected results!!!
 example(33) :-
 	makeEnvironment('ex33','abduction'),
@@ -6122,7 +6075,7 @@ example(34) :-
 	assert_ind(john,bird).
 %%% Example 35
 % This is a consistent specification of the penguin - bird problem.
-% abduce(ex35,[],elementOf(john,fly),H,E).
+% abduce(ex35,[],isa(john,fly),H,E).
 % succeeds with
 % H = [in(env(e1),rn(_7982,_7983,_7984,_7985),modal([]),normalBird,john,
 %         hyp(_7989),ab(_7991),call(_7993),
@@ -6135,7 +6088,7 @@ example(34) :-
 %                           proved(in([],normalBird,john),hyp(_7532),
 %                           basedOn(_7548))))))])))
 % and
-% abduce(ex35,[],elementOf(tweety,fly),H,E).
+% abduce(ex35,[],isa(tweety,fly),H,E).
 % fails
 example(35) :-
 	makeEnvironment('ex35',abduction),
@@ -6146,7 +6099,7 @@ example(35) :-
 	assert_ind(john,bird).
 %%% Example 36
 % Variant of example 33 giving the expected results:
-% abduce(ex36,[],elementOf(nixon,dove),H,E).
+% abduce(ex36,[],isa(nixon,dove),H,E).
 % succeeds with
 % H = [in(env(e4),rn(_8077,_8078,_8079,_8080),modal([]),
 %         normalQuaker,nixon,hyp(_8084),ab(_8086),call(_8088),
@@ -6159,7 +6112,7 @@ example(35) :-
 %                   call(_7631),proved(in([],normalQuaker,nixon),
 %                   hyp(_7627),basedOn(_7643))))))]))) 
 % and
-% abduce(ex36,[],elementOf(nixon,hawk),H,E).
+% abduce(ex36,[],isa(nixon,hawk),H,E).
 % succeeds with
 % H = [in(env(e4),rn(_8077,_8078,_8079,_8080),modal([]),
 %         normalRepublican,nixon, hyp(_8084),ab(_8086),call(_8088),
@@ -6186,7 +6139,7 @@ example(37) :-
 	defprimconcept(sprinkler_was_on,grass_is_wet),
 	defprimconcept(grass_is_wet,shoes_are_wet).
 %%% Example 38
-% ask(elementOf(ideaste,c2))
+% ask(isa(ideaste,c2))
 % should succeed
 example(38) :-
 	makeEnvironment('ex38','disjunctive_information'),
@@ -6200,7 +6153,7 @@ example(38) :-
 	defconcept(c1,and([fatherMurderer,some(hasChild,not(fatherMurderer))])),
 	defconcept(c2,some(hasChild,c1)).
 %%% Example 39
-% ask(elementOf(lucky,female))
+% ask(isa(lucky,female))
 % succeeds
 example(39) :-
 	makeEnvironment('ex39','negation_as_failure'),
@@ -6210,12 +6163,12 @@ example(39) :-
 	defprimconcept(and([some(parentOf,top),naf(not(female))]),female),
 	assert_ind(mary,lucky,childOf).
 %%% Example 40
-% ask(elementOf(peter,richPerson))
+% ask(isa(peter,richPerson))
 % succeeds.
 % After
 % assert_ind(peter,poorPerson)
 % the query
-% ask(elementOf(peter,richPerson))
+% ask(isa(peter,richPerson))
 % fails
 example(40) :-
 	makeEnvironment('ex40','negation_as_failure'),
@@ -6224,12 +6177,12 @@ example(40) :-
 	defconcept(poorPerson,not(richPerson)),
 	assert_ind(peter,doctor).
 %%% Example 41
-% ask(elementOf(tom,richPerson))
+% ask(isa(tom,richPerson))
 % succeeds.
 % After 
 % assert_ind(tom,poorPerson)
 % the query
-% ask(elementOf(tom,richPerson))
+% ask(isa(tom,richPerson))
 % fails
 example(41) :-
 	makeEnvironment('ex41','negation_as_failure'),
@@ -6241,12 +6194,12 @@ example(41) :-
 	assert_ind(chris,doctor),
 	assert_ind(chris,tom,childOf).
 %%% Example 42
-% ask(elementOf(audi,fourWheels))
+% ask(isa(audi,fourWheels))
 % succeeds.
 % After
 % assert_ind(audi,fiveWheels)
 % the query
-% ask(elementOf(audi,fourWheels))
+% ask(isa(audi,fourWheels))
 % fails
 example(42) :-
 	makeEnvironment('ex42','negation_as_failure'),
@@ -6259,53 +6212,53 @@ example(42) :-
 example(43) :-
 	makeEnvironment('ex43','concrete_domains'),
 	initEnvironment,
-	defconcept(colors,setOfFn([b,y,r])),
-	defconcept(blueOrYellow,setOfFn([b,y])),
-	defconcept(red,setOfFn([r])),
-	defconcept(blue,setOfFn([b])),
-	defconcept(yellow,setOfFn([y])),
-	defconcept(redOrYellow,setOfFn([r,y])),
-	defconcept(blueOrRed,setOfFn([b,r])),
-	defconcept(yellowOrBlue,setOfFn([y,b])).
+	defconcept(colors,set([b,y,r])),
+	defconcept(blueOrYellow,set([b,y])),
+	defconcept(red,set([r])),
+	defconcept(blue,set([b])),
+	defconcept(yellow,set([y])),
+	defconcept(redOrYellow,set([r,y])),
+	defconcept(blueOrRed,set([b,r])),
+	defconcept(yellowOrBlue,set([y,b])).
 %%% Example 44
 % subsumes(c2,c1)
 % should succeed
 example(44) :-
 	makeEnvironment('ex44','concrete_domains'),
 	initEnvironment,
-	defconcept(c1,setOfFn([a,b])),
-	defconcept(c2,setOfFn([a,b,c])).
+	defconcept(c1,set([a,b])),
+	defconcept(c2,set([a,b,c])).
 %%% Example 45
 example(45) :-
 	makeEnvironment('ex45','concrete_domains'),
 	initEnvironment,
-	defconcept(c1,setOfFn([a,b,c])),
-	defconcept(c2,setOfFn([a,b])),
+	defconcept(c1,set([a,b,c])),
+	defconcept(c2,set([a,b])),
 	defconcept(nc2,not(c2)).
 %%% Example 46
 % An insufficient specification of 
 % The bmw is either yellow, blue, or red but not yellow. 
-% ask(elementOf(bmw,c3))
+% ask(isa(bmw,c3))
 % fails
 example(46) :-
 	makeEnvironment('ex46','concrete_domains'),
 	initEnvironment,
-	defconcept(c1,some(hasCol,setOfFn([yellow,blue,red]))),
-	defconcept(c2,some(hasCol,not(setOfFn([yellow])))),
-	defconcept(c3,some(hasCol,setOfFn([blue,red]))),
+	defconcept(c1,some(hasCol,set([yellow,blue,red]))),
+	defconcept(c2,some(hasCol,not(set([yellow])))),
+	defconcept(c3,some(hasCol,set([blue,red]))),
 	assert_ind(bmw,c1),
 	assert_ind(bmw,c2).
 %%% Example 47
 % A correct specification of
 % The bmw is either yellow, blue, or red but not yellow. 
-% ask(elementOf(bmw,c3))
+% ask(isa(bmw,c3))
 % succeeds
 example(47) :-
 	makeEnvironment('ex47','concrete_domains'),
 	initEnvironment,
-	defconcept(c1,and([some(hasCol,setOfFn([yellow,blue,red])),all(hasCol,setOfFn([yellow,blue,red]))])),
-	defconcept(c2,some(hasCol,not(setOfFn([yellow])))),
-	defconcept(c3,some(hasCol,setOfFn([blue,red]))),
+	defconcept(c1,and([some(hasCol,set([yellow,blue,red])),all(hasCol,set([yellow,blue,red]))])),
+	defconcept(c2,some(hasCol,not(set([yellow])))),
+	defconcept(c3,some(hasCol,set([blue,red]))),
 	assert_ind(bmw,c1),
 	assert_ind(bmw,c2).
 example(48) :-
@@ -6313,35 +6266,35 @@ example(48) :-
 	initEnvironment,
 	defconcept(oneSpouse,and([atleast(1,spouse),atmost(1,spouse)])),
 	assert_ind(m1,oneSpouse),
-	defprimconcept(some(inverse(spouse),setOfFn([m1])),setOfFn([g0,g1,g2])),
+	defprimconcept(some(inverse(spouse),set([m1])),set([g0,g1,g2])),
 	assert_ind(g0,oneSpouse),
-	defprimconcept(some(inverse(spouse),setOfFn([g0])),setOfFn([m1,g1,g2])),
+	defprimconcept(some(inverse(spouse),set([g0])),set([m1,g1,g2])),
 	assert_ind(g1,oneSpouse),
-	defprimconcept(some(inverse(spouse),setOfFn([g1])),setOfFn([m1,g0,g2])),
+	defprimconcept(some(inverse(spouse),set([g1])),set([m1,g0,g2])),
 	assert_ind(g2,oneSpouse),
-	defprimconcept(some(inverse(spouse),setOfFn([g2])),setOfFn([m1,g0,g1])),
+	defprimconcept(some(inverse(spouse),set([g2])),set([m1,g0,g1])),
 	defconcept(zeroSH,and([atleast(0,sh),atmost(0,sh)])),
 	defconcept(oneSH,and([atleast(1,sh),atmost(1,sh)])),
 	defconcept(twoSH,and([atleast(2,sh),atmost(2,sh)])),
 	assert_ind(g0,zeroSH),
 	assert_ind(g1,oneSH),
 	assert_ind(g2,twoSH),
-	defprimconcept(and([some(inverse(sh),setOfFn([m1])),setOfFn([m1])]),bot),
-	defprimconcept(and([some(inverse(sh),setOfFn([g0])),setOfFn([g0])]),bot),
-	defprimconcept(and([some(inverse(sh),setOfFn([g1])),setOfFn([g1])]),bot),
-	defprimconcept(and([some(inverse(sh),setOfFn([g2])),setOfFn([g2])]),bot),
-	defprimconcept(and([some(inverse(spouse),setOfFn([m1])),some(inverse(sh),setOfFn([m1]))]),bot),
-	defprimconcept(and([some(inverse(spouse),setOfFn([g0])),some(inverse(sh),setOfFn([g0]))]),bot),
-	defprimconcept(and([some(inverse(spouse),setOfFn([g1])),some(inverse(sh),setOfFn([g1]))]),bot),
-	defprimconcept(and([some(inverse(spouse),setOfFn([g2])),some(inverse(sh),setOfFn([g2]))]),bot),
-%	defconcept(some(sh,setOfFn([m1])),some(inverse(sh),setOfFn([m1]))),
-%	defconcept(some(sh,setOfFn([g0])),some(inverse(sh),setOfFn([g0]))),
-%	defconcept(some(sh,setOfFn([g1])),some(inverse(sh),setOfFn([g1]))),
-%	defconcept(some(sh,setOfFn([g2])),some(inverse(sh),setOfFn([g2]))).
+	defprimconcept(and([some(inverse(sh),set([m1])),set([m1])]),bot),
+	defprimconcept(and([some(inverse(sh),set([g0])),set([g0])]),bot),
+	defprimconcept(and([some(inverse(sh),set([g1])),set([g1])]),bot),
+	defprimconcept(and([some(inverse(sh),set([g2])),set([g2])]),bot),
+	defprimconcept(and([some(inverse(spouse),set([m1])),some(inverse(sh),set([m1]))]),bot),
+	defprimconcept(and([some(inverse(spouse),set([g0])),some(inverse(sh),set([g0]))]),bot),
+	defprimconcept(and([some(inverse(spouse),set([g1])),some(inverse(sh),set([g1]))]),bot),
+	defprimconcept(and([some(inverse(spouse),set([g2])),some(inverse(sh),set([g2]))]),bot),
+%	defconcept(some(sh,set([m1])),some(inverse(sh),set([m1]))),
+%	defconcept(some(sh,set([g0])),some(inverse(sh),set([g0]))),
+%	defconcept(some(sh,set([g1])),some(inverse(sh),set([g1]))),
+%	defconcept(some(sh,set([g2])),some(inverse(sh),set([g2]))).
 	defrole(sh,inverse(sh)),
 	defrole(spouse,inverse(spouse)).
 %%% Example 49
-% ask(elementOf(p,c4))
+% ask(isa(p,c4))
 % should fail
 example(49) :-
 	makeEnvironment('ex49','defaults'),
@@ -6471,10 +6424,10 @@ example(60) :-
 	defprimconcept([b(believe,peter)],doctor,richPerson),
 	assert_ind([b(believe,peter)],tom,doctor).
 %%% Example 61
-% deduce(elementOf(tweety,fly))
-% deduce(elementOf(tweety,nest))
-% deduce(elementOf(tweety,not(emu)))
-% deduce(elementOf(tweety,not(cuckoo)))
+% deduce(isa(tweety,fly))
+% deduce(isa(tweety,nest))
+% deduce(isa(tweety,not(emu)))
+% deduce(isa(tweety,not(cuckoo)))
 % succeed
 example(61) :-
 	makeEnvironment('ex61','Defaults and the lottery paradox'),
@@ -6485,16 +6438,16 @@ example(61) :-
 	defprimconcept(cuckoo,not(nest)),
 	assert_ind(tweety,bird).
 %%% Example 62
-% deduce(elementOf(tweety,bird))
-% deduce(elementOf(tweety,fly))
-% deduce(elementOf(tweety,nest))
+% deduce(isa(tweety,bird))
+% deduce(isa(tweety,fly))
+% deduce(isa(tweety,nest))
 % consistent([])
 % succeed
-% deduce(elementOf(tweety,not(emu)))
-% deduce(elementOf(tweety,emu))
-% deduce(elementOf(tweety,not(cuckoo)))
-% deduce(elementOf(tweety,cuckoo))
-% deduce(elementOf(tweety,not(bird)))
+% deduce(isa(tweety,not(emu)))
+% deduce(isa(tweety,emu))
+% deduce(isa(tweety,not(cuckoo)))
+% deduce(isa(tweety,cuckoo))
+% deduce(isa(tweety,not(bird)))
 % fail
 example(62) :-
 	makeEnvironment('ex62','Defaults and the lottery paradox'),
@@ -6506,12 +6459,12 @@ example(62) :-
 	defconcept(bird,or([emu,cuckoo])),
 	assert_ind(tweety,bird).
 %%% Example 63
-% deduce(elementOf(tweety,bird))
-% deduce(elementOf(tweety,fly))
-% deduce(elementOf(tweety,nest))
-% deduce(elementOf(tweety,sparrow))
-% deduce(elementOf(tweety,not(emu)))
-% deduce(elementOf(tweety,not(cuckoo)))
+% deduce(isa(tweety,bird))
+% deduce(isa(tweety,fly))
+% deduce(isa(tweety,nest))
+% deduce(isa(tweety,sparrow))
+% deduce(isa(tweety,not(emu)))
+% deduce(isa(tweety,not(cuckoo)))
 % consistent([])
 % succeed
 example(63) :-
@@ -6524,12 +6477,12 @@ example(63) :-
 	defconcept(bird,or([sparrow,emu,cuckoo])),
 	assert_ind(tweety,bird).
 %%% Example 64
-% deduce(elementOf(peter,leftHandUsable))
-% deduce(elementOf(peter,rightHandUsable))
-% deduce(elementOf(peter,oneHandUsable))
+% deduce(isa(peter,leftHandUsable))
+% deduce(isa(peter,rightHandUsable))
+% deduce(isa(peter,oneHandUsable))
 % succeed
-% deduce(elementOf(peter,bothHandsUsable))
-% deduce(elementOf(peter,not(bothHandsUsable))
+% deduce(isa(peter,bothHandsUsable))
+% deduce(isa(peter,not(bothHandsUsable))
 % fail
 example(64) :-
 	makeEnvironment('ex64','Defaults and the lottery paradox'),
@@ -6541,7 +6494,7 @@ example(64) :-
 	defconcept(bothHandsUsable,and([leftHandUsable,rightHandUsable])),
 	assert_ind(peter,oneHandBroken).
 %%% Example 65
-% deduce(elementOf(peter,leftHandUsable))
+% deduce(isa(peter,leftHandUsable))
 % can prove leftHandUsable by default because
 % cannot prove leftHandBroken because
 % can prove oneHandBroken but
@@ -6553,11 +6506,11 @@ example(64) :-
 % can prove leftHandUsable by default because
 % cannot prove leftHandBroken because the loop check prevents
 %                                     the application of any axiom
-% deduce(elementOf(peter,rightHandUsable))
-% deduce(elementOf(peter,not(bothHandsUsable))
+% deduce(isa(peter,rightHandUsable))
+% deduce(isa(peter,not(bothHandsUsable))
 % succeed
-% deduce(elementOf(peter,bothHandsUsable))
-% deduce(elementOf(peter,oneHandUsable))
+% deduce(isa(peter,bothHandsUsable))
+% deduce(isa(peter,oneHandUsable))
 % cannot prove oneHandUsable becauce
 % (cannot prove leftHandUsable because
 %  can prove leftHandBroken because
@@ -6571,7 +6524,7 @@ example(64) :-
 %                                       the application of any axiom))
 % and it is also not possible possible to prove rightHandUsable
 % for similar reasons
-% deduce(elementOf(peter,not(oneHandUsable)))
+% deduce(isa(peter,not(oneHandUsable)))
 % fail
 example(65) :-
 	makeEnvironment('ex65','Defaults and the lottery paradox'),
@@ -6585,13 +6538,13 @@ example(65) :-
 	defprimconcept(rightHandBroken,not(rightHandUsable)),
 	assert_ind(peter,oneHandBroken).
 %%% Example 66
-% deduce(elementOf(peter,leftHandUsable))
-% deduce(elementOf(peter,rightHandUsable))
-% deduce(elementOf(peter,oneHandUsable))
-% deduce(elementOf(peter,not(bothHandsUsable))
+% deduce(isa(peter,leftHandUsable))
+% deduce(isa(peter,rightHandUsable))
+% deduce(isa(peter,oneHandUsable))
+% deduce(isa(peter,not(bothHandsUsable))
 % succeed
-% deduce(elementOf(peter,bothHandsUsable))
-% deduce(elementOf(peter,not(oneHandUsable)))
+% deduce(isa(peter,bothHandsUsable))
+% deduce(isa(peter,not(oneHandUsable)))
 % fail
 example(66) :-
 	makeEnvironment('ex66','Defaults and the lottery paradox'),
@@ -6630,13 +6583,13 @@ example(68) :-
         assert_ind(peter,oneHandBroken),
         assert_ind(peter,not(bothHandsBroken)).
 %%% Example 69
-% deduce(elementOf(tweety,bird))
+% deduce(isa(tweety,bird))
 % succeeds
-% deduce(elementOf(tweety,not(bird)))
-% deduce(elementOf(tweety,fly))
-% deduce(elementOf(tweety,not(fly)))
-% deduce(elementOf(tweety,nest))
-% deduce(elementOf(tweety,not(nest)))
+% deduce(isa(tweety,not(bird)))
+% deduce(isa(tweety,fly))
+% deduce(isa(tweety,not(fly)))
+% deduce(isa(tweety,nest))
+% deduce(isa(tweety,not(nest)))
 % fail
 example(69) :-
 	makeEnvironment('ex69','Defaults and the lottery paradox'),
@@ -6648,11 +6601,11 @@ example(69) :-
 	defconcept(bird,or([emu,cuckoo])),
 	assert_ind(tweety,bird).
 %%% Example 70
-% deduce(elementOf(a,clearTop))
-% deduce(elementOf(a,not(clearTop)))
+% deduce(isa(a,clearTop))
+% deduce(isa(a,not(clearTop)))
 % fail
-% deduce(elementOf(b,clearTop))
-% deduce(elementOf(b,clearTop))
+% deduce(isa(b,clearTop))
+% deduce(isa(b,clearTop))
 % succeed
 example(70) :-
 	makeEnvironment('ex70','Defaults and existential quantification'),
@@ -6709,13 +6662,13 @@ example(72) :-
 	assert_ind([b(believe,pv),b(want,pk)],polo,auto).
         % Demo:
         %
-        % setof(C,ask([b(believe,pk)],elementOf(polo,C)),L).
+        % setof(C,ask([b(believe,pk)],isa(polo,C)),L).
         % L = [auto,langsam,top,vw,not(bot)]
         % Zun"achst erbt hier der pk vom b(believe,all), den Glauben, da\3
         % polo ein vw und damit ein auto ist. Vom b(believe,sporttyp) erbt 
         % er, da\3 vw's langsam sind, womit auch der polo langsam ist.
         % 
-        % setof(C,ask([b(believe,pk)],elementOf(manta,C)),L)
+        % setof(C,ask([b(believe,pk)],isa(manta,C)),L)
         % L = [auto,opel,top,not(bot)]
         % Da es sich bei dem manta um einen opel handelt, wird zun"achst
         % nicht angenommen, da\3 der manta langsam ist.
@@ -6727,12 +6680,12 @@ example(72) :-
         % Dies f"uhrt bei der Wiederholung der letzten Anfrage zu folgendem
         % Ergebnis:
         %
-        % setof(C,ask([b(believe,pk)],elementOf(manta,C)),L)
+        % setof(C,ask([b(believe,pk)],isa(manta,C)),L)
         % L = [auto,hatKat,langsam,opel,top,not(bot)]
         %
         % Wir k"onnen neben der Deduktion auf Abduktion verwenden:
         %
-        % abduce([b(want,pk)],H,elementOf(polo,wunsch_auto),E).
+        % abduce([b(want,pk)],H,isa(polo,wunsch_auto),E).
         % E = proved(in(app(_A:m(want,pk),[]),wunsch_auto,polo),
         %     basedOn(and([proved(in(app(_A:m(want,pk),[]),auto,polo),
         %     basedOn(abox)),
@@ -6749,23 +6702,23 @@ example(72) :-
         %
         % Dadurch "andern sich die Anfrageergebnisse wie folgt:
         %
-        % setof(C,ask([b(believe,pk)],elementOf(polo,C)),L).
+        % setof(C,ask([b(believe,pk)],isa(polo,C)),L).
         % L = [auto,top,vw,not(bot),not(langsam)]
         %
-        % Der polo gehort nun zu den nicht langsamen Autos, da umwelttypen
+        % Der polo geh"ort nun zu den nicht langsamen Autos, da umwelttypen
         % genau dies glauben.
         % 
-        % setof(C,ask([b(believe,pk)],elementOf(manta,C)),L).
+        % setof(C,ask([b(believe,pk)],isa(manta,C)),L).
         % L = [auto,hatKat,opel,top,not(bot)]
         % 
         % Der Manta hat zwar immernoch einen Katalysator, ist aber trotzdem
         % nicht langsam, da umwelttypen nicht glauben, da\3 Katalysatoren ein
         % Auto langsam machen.
         %
-        % Wir k"onnen auch in diesem Fall fragen, unter welchen Umst"anden
+        % Wir k""onnen auch in diesem Fall fragen, unter welchen Umst"anden
         % pk den polo f"ur sein Wunschauto halten w"urde:
         %
-        % abduce([b(want,pk)],H,elementOf(polo,wunsch_auto),E).
+        % abduce([b(want,pk)],H,isa(polo,wunsch_auto),E).
         % E = proved(in(app(_A:m(want,pk),[]),wunsch_auto,polo),
         %     basedOn(and([proved(in(app(_A:m(want,pk),[]),auto,polo),
         %     basedOn(abox)),
@@ -6940,8 +6893,8 @@ default_changes([Change|Changes],[WeightedChange|WeightedChanges]) :-
  */
 
 initFuncdep :-
-	assertz((given_inflLink(_,_,_,_) :- !, fail)),
-	assertz((given_change(_,_,_,_) :- !, fail)).
+	assertz_if_new((given_inflLink(_,_,_,_) :- !, fail)),
+	assertz_if_new((given_change(_,_,_,_) :- !, fail)).
 	
 
 /***********************************************************************
@@ -7127,7 +7080,7 @@ def(EnvName,MS,infl(X,Y,W)) :-
 	wellDefined_InflWeight(W),
 	not(given_inflLink(Env,World,app(_,_,X),Y)),
 	gensym(sk,F),
-	asserta(given_inflLink(Env,World,app(F,W,X),Y)).
+	asserta_new(given_inflLink(Env,World,app(F,W,X),Y)).
 
 def(EnvName,MS,change(X,W)) :-
 	get_Env_World(EnvName,MS,Env,World),
@@ -7135,7 +7088,7 @@ def(EnvName,MS,change(X,W)) :-
 	assertNames(Env,World,X,role),
 	wellDefined_ChangeWeight(W),
 	not(given_change(Env,World,X,_)),
-	asserta(given_change(Env,World,X,W)).
+	asserta_new(given_change(Env,World,X,W)).
 
 def(EnvName,MS,posInfl(X,Y)) :-
 	def(EnvName,MS,infl(X,Y,1.0)).
@@ -7299,7 +7252,7 @@ get_Env_World(EnvName,MS,Env,World) :-
 % Author:       Ullrich Hustadt
 % Address:      Max-Planck-Institut for Computer Science
 %               Im Stadtwald
-%               6600 Saarbrucken
+%               6600 Saarbr""ucken
 %               Germany
 % Email:        Ullrich.Hustadt@mpi-sb.mpg.de
 % Copyright:    (C) 1993 Ullrich Hustadt
@@ -7444,7 +7397,7 @@ skolem(exists(X,P),P2,Vars) :-
 	skolem(P,P1,Vars),
 	gensym(f,F),
 	Sk =.. [F|Vars],
-	fol_subst(P1,P2,X,Sk).
+	subst4(P1,P2,X,Sk).
 skolem(and(L),and(L1),Vars) :-
 	!,
 	map(skolem,[Vars],L,L1).
@@ -7455,7 +7408,7 @@ skolem(P,P,_).
 
 
 %----------------------------------------------------------------------
-% fol_subst(+F1,-F2,+X,+Sk)
+% subst4(+F1,-F2,+X,+Sk)
 % Parameter: F1     First-order formula
 %            F2     First-order formula
 %            X      Variable that will be substituted
@@ -7464,41 +7417,41 @@ skolem(P,P,_).
 % 
 % Author: Ullrich Hustadt
 
-fol_subst(T1,T2,X,Sk) :-
+subst4(T1,T2,X,Sk) :-
 	(atomic(T1) ; var(T1)),
 	T1 == X,
 	!,
 	T2 = Sk.
-fol_subst(T1,T2,X,_Sk) :-
+subst4(T1,T2,X,_Sk) :-
 	(atomic(T1) ; var(T1)),
 	not(T1 == X),
 	!,
 	T2 = T1.
-fol_subst(forall(Y,P),forall(Y,P),X,_Sk) :-
+subst4(forall(Y,P),forall(Y,P),X,_Sk) :-
 	X == Y,
 	!.
-fol_subst(forall(Y,P),forall(Y,P1),X,Sk) :-
+subst4(forall(Y,P),forall(Y,P1),X,Sk) :-
 	!,
-	fol_subst(P,P1,X,Sk).
-fol_subst(exists(Y,P),exists(Y,P),X,_Sk) :-
+	subst4(P,P1,X,Sk).
+subst4(exists(Y,P),exists(Y,P),X,_Sk) :-
 	X == Y,
 	!.
-fol_subst(exists(Y,P),exists(Y,P1),X,Sk) :-
+subst4(exists(Y,P),exists(Y,P1),X,Sk) :-
 	!,
-	fol_subst(P,P1,X,Sk).
-fol_subst(and(L),and(L1),X,Sk) :-
+	subst4(P,P1,X,Sk).
+subst4(and(L),and(L1),X,Sk) :-
 	!,
-	map(fol_subst,[X,Sk],L,L1).
-fol_subst(or(L),or(L1),X,Sk) :-
+	map(subst4,[X,Sk],L,L1).
+subst4(or(L),or(L1),X,Sk) :-
 	!,
-	map(fol_subst,[X,Sk],L,L1).
-fol_subst(not(P),not(P1),X,Sk) :-
+	map(subst4,[X,Sk],L,L1).
+subst4(not(P),not(P1),X,Sk) :-
 	!,
-	fol_subst(P,P1,X,Sk).
-fol_subst(T1,T2,X,Sk) :-
+	subst4(P,P1,X,Sk).
+subst4(T1,T2,X,Sk) :-
 	!,
 	T1 =.. [F|Args],
-	map(fol_subst,[X,Sk],Args,Args1),
+	map(subst4,[X,Sk],Args,Args1),
 	T2 =.. [F|Args1].
 
 %----------------------------------------------------------------------
@@ -8141,7 +8094,7 @@ noChange(Env,World,Y) :-
 
 wellDefined_attribute(Env,World,X) :-
 	atom(X),
-	roleName(Env,_,World,X),
+	roleName(Env,_MS,World,X),
 	!.
 
 /***********************************************************************
@@ -8329,7 +8282,7 @@ weightOf_SimultChange(Ws,W) :-
  *	Given a list of values (Values) and a predicate name for
  *	checking whether each of the values is well-defined this clause
  *	computes the arithmetical mean (Mean) over Values.
- *	Provided Mean is given the first counter_value may be a variable.
+ *	Provided Mean is given the first value may be a variable.
  */
 
 arithm_Mean([],0.0,IsWellDefName) :-
@@ -8354,7 +8307,7 @@ arithm_Mean(Values,Mean,IsWellDefName) :-
  *	Given a list of values (Values) and a predicate name 
  *	(IsWellDefName) for checking whether each of the values is 
  *	well-defined this clause computes the sum (Sum) of the values.
- *	Provided Sum is given the first counter_value may be a variable.
+ *	Provided Sum is given the first value may be a variable.
  */
 
 sum([Value|Values],Sum,IsWellDefName) :-
@@ -8420,7 +8373,7 @@ product(Factor1,Factor2,Product,IsWellDefName) :-
  *
  * max(+Value1,+Value2,+-Max)
  *
- *	returns the bigger counter_value of Value1 and Value2 in Max.
+ *	returns the bigger value of Value1 and Value2 in Max.
  */
 
 motel_max([Max],Max,_) :-
@@ -8449,7 +8402,7 @@ lub(Value1,Value2,Value2).
  *
  * min(+Value1,+Value2,+-Min)
  *
- *	returns the smaller counter_value of Value1 and Value2 in Min.
+ *	returns the smaller value of Value1 and Value2 in Min.
  */
 
 motel_min([Min],Min,_) :-
@@ -8522,8 +8475,8 @@ defprimconcept(EnvName,MS,Left) :-
 	environment(EnvName,Env,_),
 	(MS = [] ; MS = [_|_]),
 	atomic(Left),
-	assertz(conceptSubsets(Env,user,MS,Left,'top',noAxiom)),
-	assertz(axiom(Env,MS,defprimconcept(MS,Left,'top'))),
+	assertz_if_new(conceptSubsets(Env,user,MS,Left,'top',noAxiom)),
+	assertz_if_new(axiom(Env,MS,defprimconcept(MS,Left,'top'))),
 	assertNames(Env,MS,Left,concept),
 	!.
 
@@ -8566,10 +8519,10 @@ defprimconcept(EnvName,MS,L,R) :-
 	cnf(R,Right),
 	assertNames(Env,MS,Left,concept),
 	assertNames(Env,MS,Right,concept),
-	assertz(axiom(Env,MS,defprimconcept(MS,L,R))),
+	assertz_if_new(axiom(Env,MS,defprimconcept(MS,L,R))),
 	unfold(Env,[(user,concept,Left,Right)],[(_Origin,_,L1,_,R1)|DL]),
 	gensym(axiom,AxiomName1),
-	assertz(conceptSubsets(Env,user,MS,Left,Right,AxiomName1)),
+	assertz_if_new(conceptSubsets(Env,user,MS,Left,Right,AxiomName1)),
 	typeOfDefinition(Env,MS,L1,Origin),
 	assertConceptLInR(Env,rn(AxiomName1,Origin,lInR),MS,L1,R1),
 	defList(Env,MS,DL,_),
@@ -8581,16 +8534,16 @@ defprimconcept(EnvName,MS,L,R) :-
 
 
 notClauseL(Env,MS,Left,Right) :-
-	% assertz that Left is included in Right
+	% assertz_if_new that Left is included in Right
 	unfold(Env,[(user,concept,Left,Right)],[(_O,_,Concept1,C3,Concept2)|DL2]),
 	defPositiveList(Env,MS,DL2),
 	gensym(axiom,AxiomName2),
 	typeOfDefinition(Env,MS,Concept1,O),
-	assertz(conceptSubsets(Env,user,MS,Concept1,C3,AxiomName2)),
+	assertz_if_new(conceptSubsets(Env,user,MS,Concept1,C3,AxiomName2)),
 	assertConceptLInR(Env,rn(AxiomName2,O,lInR),MS,Concept1,Concept2).
 /* 
 notClauseL(Env,MS,Left,Right) :-
-	% assertz that Left is included in Right
+	% assertz_if_new that Left is included in Right
 	atomic(Left),
 	!,
 	unfold(Env,[(user,concept,Left,Right)],[(_O,_,Concept1,C3,Concept2)|DL2]),
@@ -8598,7 +8551,7 @@ notClauseL(Env,MS,Left,Right) :-
 	gensym(axiom,AxiomName2),
 	typeOfDefinition(Env,MS,Concept1,O),
 	assertConceptLInR(Env,rn(AxiomName2,O,lInR),MS,Concept1,Concept2),
-	assertz(conceptSubsets(Env,user,MS,Concept1,C3,AxiomName2)).
+	assertz_if_new(conceptSubsets(Env,user,MS,Concept1,C3,AxiomName2)).
 notClauseL(Env,MS,Left,Right) :-
 	atomic(Right),
 	!,
@@ -8607,7 +8560,7 @@ notClauseL(Env,MS,Left,Right) :-
 	defPositiveList(Env,MS,DL2),
 	gensym(axiom,AxiomName2),
 	assertConceptLInR(Env,rn(AxiomName2,system,lInR)MS,Concept1,Right),
-	assertz(conceptSubsets(Env,system,MS,Concept1,Concept2,AxiomName2)).
+	assertz_if_new(conceptSubsets(Env,system,MS,Concept1,Concept2,AxiomName2)).
 notClauseL(Env,MS,Left,Right) :-
 	!,
 	gensym(concept,Concept1),
@@ -8616,7 +8569,7 @@ notClauseL(Env,MS,Left,Right) :-
 	defPositiveList(Env,MS,DL2),
 	gensym(axiom,AxiomName2),
 	assertConceptLInR(Env,rn(AxiomName,system,lInR),MS,Concept1,Concept2),
-	assertz(conceptSubsets(Env,system,MS,Concept1,Concept2,AxiomName2)).
+	assertz_if_new(conceptSubsets(Env,system,MS,Concept1,Concept2,AxiomName2)).
 */
 
 notClausesLR(Env,MS,Left,Right,DL2) :-
@@ -8668,14 +8621,14 @@ defconcept(EnvName,MS,CT1,CT2) :-
 	cnf(CT2,ConceptTerm2),
 	assertNames(Env,MS,ConceptTerm1,concept),
 	assertNames(Env,MS,ConceptTerm2,concept),
-	assertz(axiom(Env,MS,defconcept(MS,CT1,CT2))),
+	assertz_if_new(axiom(Env,MS,defconcept(MS,CT1,CT2))),
 	unfold(Env,[(user,concept,ConceptTerm1,ConceptTerm2)],DL),
 	defList(Env,MS,DL,_).
 
 defPositiveList(_,_,[]) :- !.
 defPositiveList(Env,MS,[(Origin,concept,ConceptName,CTO,ConceptTerm)|DL]) :-
 	gensym(axiom,AxiomName),
-	assertz(conceptEqualSets(Env,Origin,MS,ConceptName,CTO,AxiomName)),
+	assertz_if_new(conceptEqualSets(Env,Origin,MS,ConceptName,CTO,AxiomName)),
 	assertConceptRInL(Env,rn(AxiomName,Origin,rInL),MS,ConceptName,ConceptTerm),
 	assertConceptLInR(Env,rn(AxiomName,Origin,lInR),MS,ConceptName,ConceptTerm),
 	defPositiveList(Env,MS,DL).
@@ -8689,7 +8642,7 @@ defList(_,_,[],[]) :- !.
 defList(Env,MS,[(Origin,concept,ConceptName,CTO,ConceptTerm)|DL],
         NeededDL3) :-
 	gensym(axiom,AxiomName),
-	assertz(conceptEqualSets(Env,Origin,MS,ConceptName,CTO,AxiomName)),
+	assertz_if_new(conceptEqualSets(Env,Origin,MS,ConceptName,CTO,AxiomName)),
 	assertConceptRInL(Env,rn(AxiomName,Origin,rInL),MS,ConceptName,ConceptTerm),
 	assertConceptLInR(Env,rn(AxiomName,Origin,lInR),MS,ConceptName,ConceptTerm),
 	negate(ConceptTerm,NotRight1),
@@ -8701,7 +8654,7 @@ defList(Env,MS,[(Origin,concept,ConceptName,CTO,ConceptTerm)|DL],
 	append(NeededDL1,NeededDL2,NeededDL3).
 defList(Env,MS,[(Origin,role,RN,RTO,RT)|RDL],NeededDL) :-
 	gensym(axiom,AxiomName),
-	assertz(roleEqualSets(Env,Origin,MS,RN,RTO,AxiomName)),
+	assertz_if_new(roleEqualSets(Env,Origin,MS,RN,RTO,AxiomName)),
 	assertRoleLInR(Env,MS,RN,RT,AxiomName),
 	assertRoleRInL(Env,MS,RN,RT,AxiomName),
 	defList(Env,MS,RDL,NeededDL).
@@ -8752,10 +8705,10 @@ assert_ind(EnvName,MS,X,C) :-
 	gensym(rule,RuleName),
 	ruleName(AxiomName,RuleName,user,lInR,RN1),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	asserta((conceptElement(Env,MS,W1,user,X,C,AxiomName) :- call(G1))),
-	assertz(axiom(Env,MS,assert_ind(MS,X,C))),
+	asserta_new((conceptElement(Env,MS,W1,user,X,C,AxiomName) :- call(G1))),
+	assertz_if_new(axiom(Env,MS,assert_ind(MS,X,C))),
 	constructMLHead(Env,RN1,W1,C,X,_HYPS,_D,_CALLS,abox,InHead),
-	asserta((InHead :- call(G1))),
+	asserta_new((InHead :- call(G1))),
 	assertNames(Env,MS,C,concept).
 
 /***********************************************************************
@@ -8793,17 +8746,17 @@ assert_ind(EnvName,MS,X,Y,R) :-
 	atomic(Y),
 	atomic(R),
 	Role1 =.. [R,X,Y],
-	asserta(Role1),
+	asserta_new(Role1),
 %	Role2 =.. [R,X,Y],
 	gensymbol(skolem,[X,Y],SF),
 	gensym(axiom,AX),
 	gensym(rule,RN),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	constructEqHead(Env,rn(AX,RN,user,lInR),W1,Y,SF,R,X,_,_D,CALLS,abox,EqLiteral),
-	asserta((EqLiteral :- (cCS(CALLS,true), call(G1)))),
+	asserta_new((EqLiteral :- (cCS(CALLS,true), call(G1)))),
 	assertNames(Env,MS,R,role),
-	assertz(axiom(Env,MS,assert_ind(MS,X,Y,R))),
-	asserta((roleElement(Env,MS,W1,user,X,Y,R,AX) :- call(G1))).
+	assertz_if_new(axiom(Env,MS,assert_ind(MS,X,Y,R))),
+	asserta_new((roleElement(Env,MS,W1,user,X,Y,R,AX) :- call(G1))).
 
 
 /***********************************************************************
@@ -8818,14 +8771,14 @@ defprimrole(Role) :-
 	currentEnvironment(Env),
 	!,
 	assertNames(Env,[],Role,role),
-	asserta(roleSubsets(Env,user,[],Role,'top',noAxiom)).
+	asserta_new(roleSubsets(Env,user,[],Role,'top',noAxiom)).
 
 defprimrole(EnvName,Role) :-
 	environment(EnvName,Env,_),
 	!,
 	assertNames(Env,[],Role,role),
-	asserta(axiom(Env,[],defprimrole([],Role,'top'))),
-	asserta(roleSubsets(Env,user,[],Role,'top',noAxiom)).
+	asserta_new(axiom(Env,[],defprimrole([],Role,'top'))),
+	asserta_new(roleSubsets(Env,user,[],Role,'top',noAxiom)).
 
 /***********************************************************************
  *
@@ -8842,8 +8795,8 @@ defprimrole(MS,Role) :-
 	!,
 	currentEnvironment(Env),
 	assertNames(Env,MS,Role,role),
-	asserta(axiom(Env,MS,defprimrole(MS,Role,'top'))),
-	asserta(roleSubsets(Env,user,MS,Role,'top',noAxiom)).
+	asserta_new(axiom(Env,MS,defprimrole(MS,Role,'top'))),
+	asserta_new(roleSubsets(Env,user,MS,Role,'top',noAxiom)).
 
 defprimrole(R1,R2) :-
 	getCurrentEnvironment(EnvName),
@@ -8890,8 +8843,8 @@ defprimrole(EnvName,MS,RN,Role) :-
 	assertNames(Env,MS,Role,role),
 	unfold(Env,[(user,role,RN,Role)],[(user,role,RN,_,RT)|RDL]),
 	gensym(axiom,AxiomName),
-	asserta(axiom(Env,MS,defprimrole(MS,RN,Role))),
-	asserta(roleSubsets(Env,user,MS,RN,Role,AxiomName)),
+	asserta_new(axiom(Env,MS,defprimrole(MS,RN,Role))),
+	asserta_new(roleSubsets(Env,user,MS,RN,Role,AxiomName)),
 	assertRoleLInR(Env,MS,RN,RT,AxiomName),
 	defList(Env,MS,RDL,_).
 
@@ -8936,7 +8889,7 @@ defrole(EnvName,MS,RN,Role) :-
 	unfold(Env,[(user,role,RN,Role)],RDL),
 	assertNames(Env,MS,RN,role),
 	assertNames(Env,MS,Role,role),
-	asserta(axiom(Env,MS,defrole(MS,RN,Role))),
+	asserta_new(axiom(Env,MS,defrole(MS,RN,Role))),
 	defList(Env,MS,RDL,_).
 
 /**********************************************************************
@@ -9002,7 +8955,7 @@ defclosed(MS,X,Y,R) :-
 
 defclosed(EnvName,MS,X,Y,R) :-
 	environment(EnvName,Env,_),
-	assertz(closed(Env,MS,X,Y,R)),
+	assertz_if_new(closed(Env,MS,X,Y,R)),
 	!.
 
 /***********************************************************************
@@ -9036,20 +8989,20 @@ assertName((role,CN1),alreadyAsserted,Env,MS,W1,G1) :-
 	clause(roleName(Env,MS,_,CN1),_),
 	!.
 assertName((concept,CN1),newAsserted,Env,MS,W1,G1) :-
-% Otherwise we assert the concept name
+% Otherwise we assertz_if_new the concept name
 % Remember: The fact that the concept name is not already asserted with
 % identical modal sequence does not mean that we are not already able to 
 % deduce that the concept name is present in the modal context corresponding
 % to the modal sequence.
-	assertz((conceptName(Env,MS,W1,CN1) :- G1)),
+	assertz_if_new((conceptName(Env,MS,W1,CN1) :- G1)),
 	!.
 assertName((role,CN1),newAsserted,Env,MS,W1,G1) :-
-% Otherwise we assert the role name
+% Otherwise we assertz_if_new the role name
 % Remember: The fact that the role name is not already asserted with
 % identical modal sequence does not mean that we are not already able to 
 % deduce that the role name is present in the modal context corresponding
 % to the modal sequence.
-	assertz((roleName(Env,MS,W1,CN1) :- G1)),
+	assertz_if_new((roleName(Env,MS,W1,CN1) :- G1)),
 	!.
 	
 /***********************************************************************
@@ -9104,7 +9057,7 @@ namesInTerm(dc(_O,D,C),L,Type) :-
 	namesInTerm(D,L1,Type),
 	namesInTerm(C,L2,Type),
 	append(L1,L2,L).
-namesInTerm(setOfFn(_L),[],_Type) :-
+namesInTerm(set(_L),[],_Type) :-
 	!.
 namesInTerm(L,[(Type,L)],Type) :-
 	atomic(L),
@@ -9467,9 +9420,9 @@ clauseToSequent(cl([],TL),HL1,[]) :-
 clauseToSequent(cl(HL,TL),HL,TL) :-
 	!.
 
-negateLiterals(~L,L) :-
+negateLiterals(~ L,L) :-
 	!.
-negateLiterals(L,~L) :-
+negateLiterals(L,~ L) :-
 	!.
 
 literalsToLOP(antecedent,[H1,H2|HL],(H1,HL2)) :-
@@ -9631,16 +9584,16 @@ genclass(_,_,A,A,some,true) :-
 
 assertMA(A1,rel(Env,every,m(MOp,A1),X,Y), WG, G) :-
 	var(A1),
-	asserta((rel(Env,every,m(MOp,A1),X,Y) :- (WG, G))),
+	asserta_new((rel(Env,every,m(MOp,A1),X,Y) :- (WG, G))),
 	!.
 assertMA(all,rel(Env,all,m(MOp,A),X,Y), _WG, G) :-
-	asserta((rel(Env,all,m(MOp,A),X,Y) :- G)),
+	asserta_new((rel(Env,all,m(MOp,A),X,Y) :- G)),
 	!.
 assertMA(A,rel(Env,some,m(MOp,A),X,Y), WG, G) :-
-	asserta((rel(Env,some,m(MOp,A),X,Y) :- (WG, G))),
+	asserta_new((rel(Env,some,m(MOp,A),X,Y) :- (WG, G))),
 	!.
 assertMA(concept(_),rel(Env,D,m(MOp,A),X,Y), WG, G) :-
-	asserta((rel(Env,D,m(MOp,A),X,Y) :- (WG, G))),
+	asserta_new((rel(Env,D,m(MOp,A),X,Y) :- (WG, G))),
 	!.
 
 
@@ -9664,20 +9617,20 @@ modalAxioms(EnvName,MS,k,MOp,A1) :-
 	environment(EnvName,Env,_),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	genclass(Env,[W1,G1],A1,A,C,Goal),
-	retractall(rel(Env,C,m(MOp,A),_,_)),
-	retractall(modalAxioms(Env,MS,user,_,A1,MOp,A)),
+	retractall1(rel(Env,C,m(MOp,A),_,_)),
+	retractall1(modalAxioms(Env,MS,user,_,A1,MOp,A)),
 	assertMA(A1,
                  rel(Env,C,m(MOp,A),U,app(_FF:m(MOp,A),U)), 
 		 (not(not(world(Env,m(MOp,A),U,V)))), 
 		 (normal(Env,U), Goal)),
-	asserta(modalAxioms(Env,MS,user,k,A1,MOp,A)),
+	asserta_new(modalAxioms(Env,MS,user,k,A1,MOp,A)),
 	!.
 modalAxioms(EnvName,MS,kd45,MOp,A1) :-
 	environment(EnvName,Env,_),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	genclass(Env,[W1,G1],A1,A,C,Goal),
-	retractall(rel(Env,C,m(MOp,A),_,_)),
-	retractall(modalAxioms(Env,MS,user,_,A1,MOp,A)),
+	retractall1(rel(Env,C,m(MOp,A),_,_)),
+	retractall1(modalAxioms(Env,MS,user,_,A1,MOp,A)),
 	assertMA(A1,
 	         rel(Env,C,m(MOp,A),U,app(_FF:m(MOp,A),V)), 
 		 (not(not(world(Env,m(MOp,A),U,V)))), 
@@ -9686,7 +9639,7 @@ modalAxioms(EnvName,MS,kd45,MOp,A1) :-
 %                 rel(Env,C,m(MOp,A),U,app(_FF:m(MOp,A),U)), 
 %		 (not(not(world(Env,m(MOp,A),U,V)))), 
 %		 (normal(Env,U), Goal)),
-	asserta(modalAxioms(Env,MS,user,kd45,A1,MOp,A)),
+	asserta_new(modalAxioms(Env,MS,user,kd45,A1,MOp,A)),
 	!.
 modalAxioms(EnvName,MS,kd4e,MOp,A) :-
 	modalAxioms(EnvName,kd45,MOp,A).
@@ -9694,8 +9647,8 @@ modalAxioms(EnvName,MS,kd5,MOp,A1) :-
 	environment(EnvName,Env,_),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	genclass(Env,[W1,G1],A1,A,C,Goal),
-	retractall(rel(Env,C,m(MOp,A),_,_)),
-	retractall(modalAxioms(Env,MS,user,_,A1,MOp,A)),
+	retractall1(rel(Env,C,m(MOp,A),_,_)),
+	retractall1(modalAxioms(Env,MS,user,_,A1,MOp,A)),
 	assertMA(A1,
 	         rel(Env,C,m(MOp,A),app(_F1:m(MOp,A),U),app(_F2:m(MOp,A),V)), 
 		 ((world(Env,m(MOp,A),U,V), not(U == []))), 
@@ -9704,27 +9657,27 @@ modalAxioms(EnvName,MS,kd5,MOp,A1) :-
 	         rel(Env,C,m(MOp,A),U,app(_F2:m(MOp,A),U)), 
 		 true, 
 		 Goal),
-	asserta(modalAxioms(Env,MS,user,kd5,A1,MOp,A)),
+	asserta_new(modalAxioms(Env,MS,user,kd5,A1,MOp,A)),
 	!.
 modalAxioms(EnvName,MS,kd4,MOp,A1) :-
 	environment(EnvName,Env,_),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	genclass(Env,[W1,G1],A1,A,C,Goal),
-	retractall(rel(Env,C,m(MOp,A),_,_)),
-	retractall(modalAxioms(Env,MS,user,_,A1,MOp,A)),
+	retractall1(rel(Env,C,m(MOp,A),_,_)),
+	retractall1(modalAxioms(Env,MS,user,_,A1,MOp,A)),
 	assertMA(A1,rel(Env,C,m(MOp,A),U,app(_F1:m(MOp,A),U)), Goal),
 	assertMA(A1,rel(Env,C,m(MOp,A),U,app(_F1:m(MOp,A),V)), (world(Env,m(MOp,A),U,V), (rel(Env,_,m(MOp,A),U,V), Goal))),
-	asserta(modalAxioms(Env,MS,user,k4,A1,MOp,A)),
+	asserta_new(modalAxioms(Env,MS,user,k4,A1,MOp,A)),
 	!.
 modalAxioms(EnvName,MS,kt,MOp,A1) :-
 	environment(EnvName,Env,_),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	genclass(Env,[W1,G1],A1,A,C,Goal),
-	retractall(rel(Env,C,m(MOp,A),_,_)),
-	retractall(modalAxioms(Env,MS,user,_,A1,MOp,A)),
+	retractall1(rel(Env,C,m(MOp,A),_,_)),
+	retractall1(modalAxioms(Env,MS,user,_,A1,MOp,A)),
 	assertMA(A1,rel(Env,C,m(MOp,A),U,app(_F1:m(MOp,A),U)), Goal),
 	assertMA(A1,rel(Env,C,m(MOp,A),U,U), Goal),
-	asserta(modalAxioms(Env,MS,user,kt,A1,MOp,A)),
+	asserta_new(modalAxioms(Env,MS,user,kt,A1,MOp,A)),
 	!.
 
 /**********************************************************************
@@ -9996,16 +9949,16 @@ undefconcept(EnvName,MS,CN,CT) :-
 	environment(EnvName,Env,_),
 	
 	conceptEqualSets(Env,_user,MS,CN,CT,AX),
-	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-%	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-%	retractall(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall1(in(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+%	retractall1(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+%	retractall1(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
  	retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
  	retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
  	retractall_all(query(Env,MS,CN,_CT,_PT,_)),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,_),_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall1(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall1(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall1(constraint(Env,rn(AX,_,_,_),_,_,_,_,_)),
+	retractall1(constraint(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
 	change_classifier(EnvName,MS,CN,CT),
 	retract(conceptEqualSets(Env,_user,MS,CN,CT,AX)),
 	!.
@@ -10013,18 +9966,18 @@ undefconcept(EnvName,MS,CN,CT) :-
 undefConcept(Env,MS,CN) :-
 	conceptEqualSets(Env,user,_,CN,_,Ax),
 	
-	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-%	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
-%	retractall(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
+	retractall1(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+%	retractall1(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
+%	retractall1(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
  	retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
  	retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
    	retract_all(query(Env,MS,CN,_CT,_PT,_)),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,_),_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall1(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall1(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall1(constraint(Env,rn(AX,_,_,_),_,_,_,_,_)),
+	retractall1(constraint(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
 	change_classifier(EnvName,MS,CN,CT),
-	retractall(conceptEqualSets(Env,user,MS,CN,_CT,Ax)),
+	retractall1(conceptEqualSets(Env,user,MS,CN,_CT,Ax)),
 	fail,
 	!.
 undefConcept(_Env,_MS,_CN) :-
@@ -10033,24 +9986,24 @@ undefConcept(_Env,_MS,_CN) :-
 retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)) :-
 	clause(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_)),_),
 	member(rn(AX,_,_,_),[Name]),	
-	retractall(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
+	retractall1(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
 	fail.
 retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)).
 
 retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)) :-
 	clause(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_)),_),
 	member(rn(AX,_,_,_),[Name]),	
-	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
+	retractall1(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
 	fail.
 retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)) :-
-	retractall(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall(in(_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)).
+	retractall1(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall1(in(_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)).
 
 retract_all(query(Env,MS,CN,_CT,_PT,_PT1)) :-
 	query(Env,MS,CN1,CT,PT,PT1),
 	collect(PT,Liste),
 	member(CN,Liste),
-	retractall(query(Env,MS,CN1,CT,PT,PT1)),
+	retractall1(query(Env,MS,CN1,CT,PT,PT1)),
 	fail.
 retract_all(query(Env,MS,CN,_CT,_PT,_PT1)).
 
@@ -10092,35 +10045,35 @@ undefrole(EnvName,MS,RN,RT) :-
 	environment(EnvName,Env,_),
 
 	roleEqualSets(Env,_user,MS,RN,RT,AX),
-	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall1(in(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
 
-%	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-%	retractall(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+%	retractall1(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+%	retractall1(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
  	retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
  	retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
  	retract_all(query(Env,MS,CN,_CT,_PT,_)),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,_),_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall1(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall1(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall1(constraint(Env,rn(AX,_,_,_),_,_,_,_,_)),
+	retractall1(constraint(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
 	change_classifier(EnvName,MS,RN,RT),
 	retract(roleEqualSets(Env,_user,MS,RN,RT,AX)),
 	!.
 undefRole(Env,MS,RN) :-
 	roleEqualSets(Env,user,MS,RN,_,Ax),
 
-	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
-%	retractall(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
+	retractall1(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall1(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
+%	retractall1(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
 % 	retract_all(query(Env,MS,RN,_RT,_PT,_)),
  	retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
  	retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,_),_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall1(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall1(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall1(constraint(Env,rn(AX,_,_,_),_,_,_,_,_)),
+	retractall1(constraint(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
 	change_classifier(EnvName,MS,RN,_),
-	retractall(roleEqualSets(Env,user,MS,RN,_RT,Ax)),
+	retractall1(roleEqualSets(Env,user,MS,RN,_RT,Ax)),
 	fail,
 	!.
 undefRole(_Env,_MS,_RN) :-
@@ -10154,16 +10107,16 @@ undefprimconcept(EnvName,MS,CN,CT) :-
 	environment(EnvName,Env,_),
 
 	conceptSubsets(Env,_user,MS,CN,CT,AX),
-	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-%	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-%	retractall(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall1(in(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+%	retractall1(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+%	retractall1(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
  	retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
  	retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
  	retract_all(query(Env,MS,CN,_CT,_PT,_)),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,lInR),_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,lInR),_,_,_,_,_,_)),
+	retractall1(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall1(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall1(constraint(Env,rn(AX,_,_,lInR),_,_,_,_,_)),
+	retractall1(constraint(Env,rn(AX,_,_,lInR),_,_,_,_,_,_)),
 	change_classifier(EnvName,MS,CN,CT),
 	retract(conceptSubsets(Env,_user,MS,CN,CT,AX)),
 	!.
@@ -10205,34 +10158,34 @@ undefprimrole(EnvName,MS,RN,RT) :-
 	environment(EnvName,Env,_),
 
 	roleSubsets(Env,_user,MS,RN,RT,AX),
-	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-%	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-%	retractall(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall1(in(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+%	retractall1(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+%	retractall1(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
  	retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
  	retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
  	retract_all(query(Env,MS,RN,_RT,_PT,_)),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,lInR),_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,lInR),_,_,_,_,_,_)),
+	retractall1(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall1(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall1(constraint(Env,rn(AX,_,_,lInR),_,_,_,_,_)),
+	retractall1(constraint(Env,rn(AX,_,_,lInR),_,_,_,_,_,_)),
 	change_classifier(EnvName,MS,RN,RT),
 	retract(roleSubsets(Env,_user,MS,RN,RT,AX)),
 	!.
 undefprimRole(Env,MS,RN) :-
 	roleSubsets(Env,user,MS,RN,_,Ax),
 
-	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
-	retractall(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
+	retractall1(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall1(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
+	retractall1(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
  	retract_all(query(Env,MS,RN,_RT,_PT,_)),
  	retract_all(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
  	retract_all(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-	retractall(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,_),_,_,_,_,_)),
-	retractall(constraint(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall1(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall1(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall1(constraint(Env,rn(AX,_,_,_),_,_,_,_,_)),
+	retractall1(constraint(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
 	change_classifier(EnvName,MS,RN,_),
-	retractall(roleSubsets(Env,user,MS,RN,_RT,Ax)),
+	retractall1(roleSubsets(Env,user,MS,RN,_RT,Ax)),
 	fail,
 	!.
 
@@ -10266,10 +10219,10 @@ delete_ind(EnvName,MS,X,C) :-
  	 retract((InHead :- call(G1)))))),
 	not(not((retract((conceptElement(Env,_,W1,_,X,C,_) :- call(user:G1))) ;
 	 retract((conceptElement(Env,_,W1,_,X,C,_) :- call(G1)))))),
-	 retractall((InHead :- call(user:G1))),
-	 retractall((InHead :- call(G1))),
-	 retractall((conceptElement(Env,_,W1,_,X,C,_) :- call(user:G1))),
-	 retractall((conceptElement(Env,_,W1,_,X,C,_) :- call(G1))).
+	 retractall1((InHead :- call(user:G1))),
+	 retractall1((InHead :- call(G1))),
+	 retractall1((conceptElement(Env,_,W1,_,X,C,_) :- call(user:G1))),
+	 retractall1((conceptElement(Env,_,W1,_,X,C,_) :- call(G1))).
 delete_ind(P1,X,Y,R) :-
 	completeParameter([(X,Y,R)],EnvName,MS,_,_),
 	delete_ind(EnvName,MS,X,Y,R).
@@ -10286,10 +10239,10 @@ delete_ind(EnvName,MS,X,Y,R) :-
 	 retract((EqLiteral :- (cCS(CALLS,true), call(G1))))))),
 	not(not((retract((roleElement(Env,_,W1,X,Y,R,_) :- call(user:G1))) ;
 	 retract((roleElement(Env,_,W1,X,Y,R,_) :- call(G1)))))),
-	retractall((EqLiteral :- (cCS(CALLS,true), call(user:G1)))),
-	retractall((EqLiteral :- (cCS(CALLS,true), call(G1)))),
-	retractall((roleElement(Env,_,W1,X,Y,R,_) :- call(user:G1))),
-	retractall((roleElement(Env,_,W1,X,Y,R,_) :- call(G1))).
+	retractall1((EqLiteral :- (cCS(CALLS,true), call(user:G1)))),
+	retractall1((EqLiteral :- (cCS(CALLS,true), call(G1)))),
+	retractall1((roleElement(Env,_,W1,X,Y,R,_) :- call(user:G1))),
+	retractall1((roleElement(Env,_,W1,X,Y,R,_) :- call(G1))).
 
 	
 /***
@@ -10366,12 +10319,12 @@ delete_hierarchy(Type,Env,MS,CR) :-
 	assert_succ(Type,Env,MS,PC,SC),
 	fail.
 delete_hierarchy(Type,Env,MS,CR) :-
-	retractall(succ(Type,Env,MS,CR,_)),
-	retractall(succ(Type,Env,MS,_,CR)),
-	retractall(sub(Type,Env,MS,CR,_)),
-	retractall(sub(Type,Env,MS,_,CR)),
-	retractall(nsub(Type,Env,MS,CR,_)),
-	retractall(nsub(Type,Env,MS,_,CR)),
+	retractall1(succ(Type,Env,MS,CR,_)),
+	retractall1(succ(Type,Env,MS,_,CR)),
+	retractall1(sub(Type,Env,MS,CR,_)),
+	retractall1(sub(Type,Env,MS,_,CR)),
+	retractall1(nsub(Type,Env,MS,CR,_)),
+	retractall1(nsub(Type,Env,MS,_,CR)),
 	!.
 	
 /*****************************************************************************
@@ -10606,10 +10559,10 @@ make_primconcept(EnvName,MS,CName1,restrict_inh(RTerm1, restricts(RTerm2 ,
 %	defprimconcept(EnvName,MS,and([some(inverse(RName1),top),
 %				       naf(not(CNameDef))]),CNameDef),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	assertz((roleDomain(Env,W1,RName1,CNameDom) :- G1)),
-	assertz((roleRange(Env,W1,RName1,CName2) :- G1)),
-	assertz((roleDefault(Env,W1,RName1,CNameDef) :- G1)),
-	assertz((roleTripel(Env,W1,RName1,CNameDom,CName2,CNameDef))).
+	assertz_if_new((roleDomain(Env,W1,RName1,CNameDom) :- G1)),
+	assertz_if_new((roleRange(Env,W1,RName1,CName2) :- G1)),
+	assertz_if_new((roleDefault(Env,W1,RName1,CNameDef) :- G1)),
+	assertz_if_new((roleTripel(Env,W1,RName1,CNameDom,CName2,CNameDef))).
    
 /*----------------------------------------------------------------------------
  * make_primconcept(EnvName,MS,CName1, nr(RName1,MinNr,MaxNr,DefNr))
@@ -10632,9 +10585,9 @@ make_primconcept(EnvName,MS,CName1 , nr(RTerm1, MinNr,MaxNr,DefNr)):-
 %	defconcept(EnvName,MS,CNameDef, and([atleast(DefNr,RName1),atmost(DefNr,RName1)])),
 %	defprimconcept(EnvName,MS,and([some(inverse(RName1)),naf(not(CNameDef))]),CNameDef),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	assertz((roleNr(Env,W1,RName1,MinNr,MaxNr) :- G1)),
-	assertz((roleDefNr(Env,W1,RName1,DefNr) :- G1)),
-	assertz((roleAll(Env,W1,Rname1,CNameDomT,CName2T,CNameDefT,MinNr,MaxNr,DefNr))).
+	assertz_if_new((roleNr(Env,W1,RName1,MinNr,MaxNr) :- G1)),
+	assertz_if_new((roleDefNr(Env,W1,RName1,DefNr) :- G1)),
+	assertz_if_new((roleAll(Env,W1,Rname1,CNameDomT,CName2T,CNameDefT,MinNr,MaxNr,DefNr))).
 
 
 
@@ -10763,10 +10716,10 @@ make_defconcept(EnvName,MS,CName1,'restr-inh'(RName1, restricts(RName2 ,
 %	defprimconcept(EnvName,MS,and([some(inverse(RName1),top),
 %				       naf(not(CNameDef))]),CNameDef),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	assertz((roleDomain(Env,MS,RName1,CNameDom) :- G1)),
-	assertz((roleRange(Env,MS,RName1,CName2) :- G1)),
-	assertz((roleDefault(Env,MS,RName1,CNameDef) :- G1)),
-	assertz((roleTripel(Env,MS,RName1,CNameDom,CName2,CNameDef))).
+	assertz_if_new((roleDomain(Env,MS,RName1,CNameDom) :- G1)),
+	assertz_if_new((roleRange(Env,MS,RName1,CName2) :- G1)),
+	assertz_if_new((roleDefault(Env,MS,RName1,CNameDef) :- G1)),
+	assertz_if_new((roleTripel(Env,MS,RName1,CNameDom,CName2,CNameDef))).
     
 /*----------------------------------------------------------------------------
  * make_defconcept(EnvName,MS,CName1, nr(RName1,MinNr,MaxNr,DefNr),CNameDom)
@@ -10787,9 +10740,9 @@ make_defconcept(EnvName,MS,CName1 , nr(RTerm, MinNr,MaxNr,DefNr),CNameDom):-
 %	defconcept(EnvName,MS,CNameDef, and([atleast(DefNr,RName1),atmost(DefNr,RName1)])),
 %	defprimconcept(EnvName,MS,and([some(inverse(RName1)),naf(not(CNameDef))]),CNameDef),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	assertz((roleNr(Env,W1,RName1,MinNr,MaxNr) :- G1)),
-	assertz((roleDefNr(Env,W1,RName1,DefNr) :- G1)),
-	assertz((roleAll(Env,W1,RName1,CNameDomT,CNameT,CNameDefT,MinNr,MaxNr,DefNr) :- G1)).
+	assertz_if_new((roleNr(Env,W1,RName1,MinNr,MaxNr) :- G1)),
+	assertz_if_new((roleDefNr(Env,W1,RName1,DefNr) :- G1)),
+	assertz_if_new((roleAll(Env,W1,RName1,CNameDomT,CNameT,CNameDefT,MinNr,MaxNr,DefNr) :- G1)).
 
 make_defconcept(EnvName,MS,CName1 , necres(RTerm, nec),CNameDom):-
 	!,
@@ -10798,14 +10751,14 @@ make_defconcept(EnvName,MS,CName1 , necres(RTerm, nec),CNameDom):-
 	gensym(concept,CNameDom),
 	defconcept(EnvName,MS,CNameDom,atleast(1,RName1)),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	assertz((roleDomain(Env,W1,RName1,CNameDom) :- G1)),
+	assertz_if_new((roleDomain(Env,W1,RName1,CNameDom) :- G1)),
 	!.
 make_defconcept(EnvName,MS,CName1 , necres(RTerm, _),CNameDom):-
 	!,
 	environment(EnvName,Env,_),
 	expand_role(EnvName,MS,RTerm,RName1,_,_,_),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	assertz((roleDomain(Env,W1,RName1,CNameDom) :- G1)),
+	assertz_if_new((roleDomain(Env,W1,RName1,CNameDom) :- G1)),
 	!.
 
 
@@ -10900,7 +10853,7 @@ sb_defconcept(EnvName,MS,C1,supers(L),[]) :-
 /*---------------------------------------------------------------------------
  * sb_primelemrole(RName1,domain-range(CName1,CName2,CNameDef))
  * definiert eine neue generelle Rolle RName1 mit CName1 als domain, CName2 
- * als range und CNameDef als "default counter_value restriction" in modal context [].
+ * als range und CNameDef als "default value restriction" in modal context [].
  *------------------------------------------*/
 
 
@@ -10911,7 +10864,7 @@ sb_primelemrole(RName1, 'domain-range'(CName1,CName2,CNameDef)):-
 /*---------------------------------------------------------------------------
  * sb_primelemrole(X,RName1,domain-range(CName1,CName2,CNameDef))
  * definiert eine neue generelle Rolle RName1 mit CName1 als domain, CName2 
- * als range und CNameDef als "default counter_value restriction" in modal context []
+ * als range und CNameDef als "default value restriction" in modal context []
  * und X=environment bzw. in modal context X=MS und current environment.
  *------------------------------------------*/
 
@@ -10927,7 +10880,7 @@ sb_primelemrole(X,RName1, 'domain-range'(CName1,CName2,CNameDef)):-
 /*---------------------------------------------------------------------------
  * sb_primelemrole(EnvName,MS,RName1,domain-range(CName1,CName2,CNameDef))
  * definiert eine neue generelle Rolle RName1 mit CName1 als domain, CName2 
- * als range und CNameDef als "default counter_value restriction" in modal context MS 
+ * als range und CNameDef als "default value restriction" in modal context MS 
  * und environment EnvName.
  *------------------------------------------*/
 
@@ -10937,10 +10890,10 @@ sb_primelemrole(EnvName,MS,RName1, 'domain-range'(CName1,CName2,CNameDef)):-
 	defprimconcept(EnvName,MS,some(inverse(RName1),top),CName2),
 %	defprimconcept(ENvName,MS,and([CName2,naf(not(CNameDef))]),CNameDef),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	assertz((roleDomain(Env,W1,RName1,CName1) :- G1)),
-	assertz((roleRange(Env,W1,RName1,CName2) :- G1)),
-	assertz((roleDefault(Env,W1,RName1,CNameDef) :- G1)),
-	assertz((roleTripel(Env,W1,RName1,CName1,CName2,CNameDef) :- G1)),
+	assertz_if_new((roleDomain(Env,W1,RName1,CName1) :- G1)),
+	assertz_if_new((roleRange(Env,W1,RName1,CName2) :- G1)),
+	assertz_if_new((roleDefault(Env,W1,RName1,CNameDef) :- G1)),
+	assertz_if_new((roleTripel(Env,W1,RName1,CName1,CName2,CNameDef) :- G1)),
 	!.
 
 /*----------------------------------------------------------------------------
@@ -10986,8 +10939,8 @@ sb_defelemrole(EnvName,MS,RName1, restricts(RName2, range(CName1,CNameDef))):-
 %	defprimconcept(EnvName,MS,and([some(inverse(RName1),top),
 %                                      naf(not(CNameDef))]),CNameDef),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	assertz((roleRange(Env,MS,RName1,CName1) :- G1)),
-	assertz((roleDefault(Env,MS,RName1,CNameDef) :- G1)),
+	assertz_if_new((roleRange(Env,MS,RName1,CName1) :- G1)),
+	assertz_if_new((roleDefault(Env,MS,RName1,CNameDef) :- G1)),
 	!.
 
 
@@ -11040,8 +10993,8 @@ make_irole(EnvName,MS,ICName1,irole(RName,iname(IRName),
 %			  		    atmost(MaxNr,RName),
 %					    some(inverse(RName),top)]))),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	assertz((roleNr(Env,W1,IRName,MinNr,MaxNr) :- G1)),
-	assertz((roleDefNr(Env,W1,IRName,DefNr) :- G1)).
+	assertz_if_new((roleNr(Env,W1,IRName,MinNr,MaxNr) :- G1)),
+	assertz_if_new((roleDefNr(Env,W1,IRName,DefNr) :- G1)).
                            
 
 
@@ -11300,7 +11253,7 @@ sb_ask(M,Q) :-
 
 
  sb_ask(EnvName,MS,(isa(ICName,CName))) :- 
-	ask(EnvName,MS,elementOf(ICName,CName),_).
+	ask(EnvName,MS,isa(ICName,CName),_).
 
 
 sb_ask(EnvName,MS,(attributes(CN,Attribute,Value))) :-
@@ -11470,14 +11423,14 @@ sb_attributes(A1,A2,CN,AList) :-
 	!,
 	sb_assert_attributes(concept,A1,A2,CN,AList).
 sb_attributes(EnvName,CN,RN,AList) :-
-	sb_assert_attributes(role,EnvName,[],[CN,RN],AList).
+	sb_assert_Attributes(role,EnvName,[],[CN,RN],AList).
 sb_attributes(EnvName,MS,CN,RN,AList) :-	
 	sb_assert_attributes(role,EnvName,MS,[CN,RN],AList).
 
 sb_assert_attributes(Type,EnvName,MS,Spec,[]) :-
 	!.
 sb_assert_attributes(Type,EnvName,MS,Spec,[Pair|AList]) :-
-	assertz(attribute(Type,EnvName,MS,Spec,Pair)),
+	assertz_if_new(attribute(Type,EnvName,MS,Spec,Pair)),
 	sb_assert_attributes(Type,EnvName,MS,Spec,AList).
 
 /*------------------------------------------------------------------------------
@@ -11931,7 +11884,7 @@ sb_undefelem(EnvName,MS,ICName1,[X|T]):-
 
 /**********************************************************************
  *
- * sb_fact(EnvName,MS,elementOf(X,C),P)
+ * sb_fact(EnvName,MS,isa(X,C),P)
  *
  */
 
@@ -11946,7 +11899,7 @@ sb_fact(P1,P2,P3) :-
 	sb_fact(EnvName,MS,Query,Proof).
 
 sb_fact(EnvName,MS,isa(X,C),Exp) :-
-	retractall(hypothesis(_)),
+	retractall1(hypothesis(_)),
  	environment(EnvName,Env,_),
  	convertMS(negative,Env,[[],true],MS,[],[W1,G1],_),
  	getNegatedConcept(C,C1),
@@ -11964,7 +11917,7 @@ sb_fact(EnvName,MS,(attributes(CN,Attribute,Value)),proved(fact,basedOn(tbox))) 
 sb_fact(EnvName,MS,(attributes(CN,RN,Attribute,Value)),proved(fact,basedOn(tbox))) :-
 	attribute(role,EnvName,MS,[CN,RN],[Attribute,Value]).
 sb_fact(EnvName,MS,irole(R,X,Y),Exp) :-
-	retractall(hypothesis(_)),
+	retractall1(hypothesis(_)),
 	environment(EnvName,Env,_),
 	convertMS(negative,Env,[[],true],MS,[],[W1,G1],_),
 	getFactQuery(Env,W1,Y,R,X,Exp,Goal),
@@ -12067,31 +12020,31 @@ assertConceptLInR(Env,rn(AxiomName,O2,Orientation2),MS,CN1,and([CN2|CTs])) :-
 	ruleName(AxiomName,RuleName,O2,Orientation2,RN2),
 	convertInConsequence(Env,pr(3),RN2,MS,W1,CN2,X,HYPS,AB,CALLS,PT1,InHead2),
 	constructMLMark(InHead2,Mark2),
-%	asserta((InHead2 :- (cCS(CALLS,Mark2), (call(G1), once(Body))))),
-	asserta((InHead2 :- (cCS(CALLS,Mark2), (call(G1), Body)))),
+%	asserta_new((InHead2 :- (cCS(CALLS,Mark2), (call(G1), once(Body))))),
+	asserta_new((InHead2 :- (cCS(CALLS,Mark2), (call(G1), Body)))),
 	assertConceptLInR(Env,rn(AxiomName,O2,Orientation2),MS,CN1,and(CTs)),
 	!.
-assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,setOfFn(Set1)) :-
+assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,set(Set1)) :-
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	gensym(rule,RuleName),
 	ruleName(AxiomName,RuleName,O,Orientation,RN1),
-	convertInConsequence(Env,pr(3),RN1,MS,W1,setOfFn(Set1),X,HYPS,AB,CALLS,PT1,InHead1),
+	convertInConsequence(Env,pr(3),RN1,MS,W1,set(Set1),X,HYPS,AB,CALLS,PT1,InHead1),
 	constructMLMark(InHead1,Mark1),
 	convertInAntecedent(Env,rn(AxiomName,_AnySource1,Orientation),
 			    bodyMC(W1),headMC(W1),
 	                    CN,X,HYPS,AB,CALLS,PT1,Body),
-	asserta((InHead1 :- (cCS(CALLS,Mark1), (call(G1), once(Body))))),
+	asserta_new((InHead1 :- (cCS(CALLS,Mark1), (call(G1), once(Body))))),
 	!.
-assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,not(setOfFn(Set1))) :-
+assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,not(set(Set1))) :-
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	gensym(rule,RuleName),
 	ruleName(AxiomName,RuleName,O,Orientation,RN1),
-	convertInConsequence(Env,pr(3),RN1,MS,W1,not(setOfFn(Set1)),X,HYPS,AB,CALLS,PT1,InHead1),
+	convertInConsequence(Env,pr(3),RN1,MS,W1,not(set(Set1)),X,HYPS,AB,CALLS,PT1,InHead1),
 	constructMLMark(InHead1,Mark1),
 	convertInAntecedent(Env,rn(AxiomName,_AnySource1,Orientation),
 			    bodyMC(W1),headMC(W1),
 	                    CN,X,HYPS,AB,CALLS,PT1,Body),
-	asserta((InHead1 :- (cCS(CALLS,Mark1), (call(G1), once(Body))))),
+	asserta_new((InHead1 :- (cCS(CALLS,Mark1), (call(G1), once(Body))))),
 	!.
 assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,not(D)) :-
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
@@ -12102,7 +12055,7 @@ assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,not(D)) :-
 	convertInAntecedent(Env,rn(AxiomName,_AnySource1,Orientation),
 			    bodyMC(W1),headMC(W1),
 	                    CN,X,HYPS,AB,CALLS,PT1,Body),
-	asserta((InHead1 :- (cCS(CALLS,Mark1), (call(G1), once(Body))))),
+	asserta_new((InHead1 :- (cCS(CALLS,Mark1), (call(G1), once(Body))))),
 	!.
 assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,naf(D)) :-
 	% in the consequence not and naf have the same meaning
@@ -12114,7 +12067,7 @@ assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,naf(D)) :-
 	convertInAntecedent(Env,rn(AxiomName,_AnySource1,Orientation),
 			    bodyMC(W1),headMC(W1),
 	                    CN,X,HYPS,AB,CALLS,PT1,Body),
-	asserta((InHead1 :- (cCS(CALLS,Mark1), (call(G1), once(Body))))),
+	asserta_new((InHead1 :- (cCS(CALLS,Mark1), (call(G1), once(Body))))),
 	!.
 assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,all(R,D)) :-
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
@@ -12125,7 +12078,7 @@ assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,all(R,D)) :-
 	constructMLMark(InHead1,Mark1),
 	convertInAntecedent(Env,rn(AxiomName,_AnySource1,Orientation),
                             bodyMC(W1),headMC(W1),CN,X,HYPS,AB,CALLS,PT1,Body),
-	asserta((InHead1 :- (cCS(CALLS,Mark1), (call(G1), (EqLiteral, Body))))),
+	asserta_new((InHead1 :- (cCS(CALLS,Mark1), (call(G1), (EqLiteral, Body))))),
 	!.
 assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,some(R,D)) :-
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
@@ -12136,13 +12089,13 @@ assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,some(R,D)) :-
 	constructMLMark(InHead1,Mark1),
 	convertInAntecedent(Env,rn(AxiomName,_AnySource1,Orientation),
 	                    bodyMC(W1),headMC(W1),CN,X,HYPS,AB,CALLS,PT1,Body),
-	asserta((InHead1 :- (cCS(CALLS,Mark1), (call(G1), (EqLiteral, Body))))),
+	asserta_new((InHead1 :- (cCS(CALLS,Mark1), (call(G1), (EqLiteral, Body))))),
 	gensym(rule,RuleName2),
 	ruleName(AxiomName,RuleName2,system,Orientation,RN2),
 	convertInConsequence(Env,pr(3),RN2,MS,W1,normal(R),X,
 			     HYPS,AB,CALLS,PT2,InHead2),
 	constructMLMark(InHead2,Mark2),
-	asserta((InHead2 :- cCS(CALLS,Mark2), (call(G1), Body))),
+	asserta_new((InHead2 :- cCS(CALLS,Mark2), (call(G1), Body))),
 	!.
 assertConceptLInR(Env,rn(AxiomName,_S,Orientation),MS,CN,atleast(N,R)) :-
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
@@ -12154,7 +12107,7 @@ assertConceptLInR(Env,rn(AxiomName,_S,Orientation),MS,CN,atleast(N,R)) :-
 	convertInConsequence(Env,pr(3),RN1,MS,W1,atleast(N,R),X,
 			     HYPS,AB,CALLS,PT1,InHead1),
 	constructConMark(InHead1,Mark1),
-	asserta((InHead1 :- (cCS(CALLS,Mark1), (call(G1), once(Body))))),
+	asserta_new((InHead1 :- (cCS(CALLS,Mark1), (call(G1), once(Body))))),
 	!.
 assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,atmost(N,R)) :-
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
@@ -12166,7 +12119,7 @@ assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,atmost(N,R)) :-
 	convertInConsequence(Env,pr(3),RN1,MS,W1,atmost(N,R),X,
 			     HYPS,AB,CALLS,PT1,InHead1),
 	constructConMark(InHead1,Mark1),
-	asserta((InHead1 :- (cCS(CALLS,Mark1), once((call(G1), Body))))),
+	asserta_new((InHead1 :- (cCS(CALLS,Mark1), once((call(G1), Body))))),
 	!.
 assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,b(MOp,P1,D)) :-
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
@@ -12178,7 +12131,7 @@ assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,b(MOp,P1,D)) :-
 	                    bodyMC(W1),headMC(W2),CN,X,HYPS,AB,CALLS,PT1,Body),
 	constructMLHead(Env,RN1,W2,D,X,HYPS,AB,CALLS,and([C1,PT1]),InHead1),
 	constructMLMark(InHead1,Mark1),
-	asserta((InHead1 :- (cCS(CALLS,Mark1), (call(G1), (C1, Body))))),
+	asserta_new((InHead1 :- (cCS(CALLS,Mark1), (call(G1), (C1, Body))))),
 	!.
 assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,bc(MOp,C,D)) :-
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
@@ -12192,7 +12145,7 @@ assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,bc(MOp,C,D)) :-
 			    bodyMC(W1),headMC(W2),C,P,HYPS,AB,CALLS,PT2,Body2),
 	constructMLHead(Env,RN1,W2,D,X,HYPS,AB,CALLS,and([C1,PT1,PT2]),InHead1),
 	constructMLMark(InHead1,Mark1),
-	asserta((InHead1 :- (cCS(CALLS,Mark1), (call(G1), (C1, (Body1, Body2)))))),
+	asserta_new((InHead1 :- (cCS(CALLS,Mark1), (call(G1), (C1, (Body1, Body2)))))),
 	!.
 assertConceptLInR(Env,rn(AxiomName,_S1,Orientation),MS,CN,d(MOp,P1,D)) :-
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],WVL),
@@ -12208,7 +12161,7 @@ assertConceptLInR(Env,rn(AxiomName,_S1,Orientation),MS,CN,d(MOp,P1,D)) :-
 	constructMLHead(Env,RN1,W2,D,X,HYPS,AB,CALLS,
 			PT1,InHead1),
 	constructMLMark(InHead1,Mark1),
-	asserta((InHead1 :- (cCS(CALLS,Mark1), (call(G1), Body)))),
+	asserta_new((InHead1 :- (cCS(CALLS,Mark1), (call(G1), Body)))),
 	!.
 assertConceptLInR(Env,rn(AxiomName,_S1,Orientation),MS,CN,dc(MOp,C,D)) :-
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],WVL),
@@ -12226,7 +12179,7 @@ assertConceptLInR(Env,rn(AxiomName,_S1,Orientation),MS,CN,dc(MOp,C,D)) :-
 	constructMLHead(Env,RN1,W2,D,X,HYPS,AB,CALLS,
 			and([PT1,PT2]),InHead1),
 	constructMLMark(InHead1,Mark1),
-	asserta((InHead1 :- (cCS(CALLS,Mark1), (call(G1), (Body1, Body2))))),
+	asserta_new((InHead1 :- (cCS(CALLS,Mark1), (call(G1), (Body1, Body2))))),
 	!.
 assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,ConceptTerm) :-
 	assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,and([ConceptTerm])).
@@ -12252,7 +12205,7 @@ assertOrConceptLInR(Env,rn(AxiomName,O,Orientation),
 	ruleName(AxiomName,RuleName,S1,Orientation,RN1),
 	constructMLHead(Env,RN1,W1,CT1,X,HYPS,AB,CALLS,and(PTL),InHead1),
 	constructMLMark(InHead1,Mark1),
-	asserta((InHead1 :- (cCS(CALLS,Mark1), once((call(G1), Body))))),
+	asserta_new((InHead1 :- (cCS(CALLS,Mark1), once((call(G1), Body))))),
 	append(First,[INCT1],L2),
 	append(FPTL,[PT1],FPTL2),
 	!,
@@ -12333,14 +12286,14 @@ convertInAntecedent(Env,rn(AX,S1,_O),MC1,MC2,D,X,HYPS,AB,CALLS,PT1,InHead) :-
 	!,
 	constructMLCall(Env,rn(AX,_RN1,S1,_O1),MC1,MC2,
 	                D,X,HYPS,AB,CALLS,PT1,InHead).
-convertInAntecedent(Env,rn(AX,Source,_O),MC1,MC2,setOfFn(S1),X,HYPS,AB,CALLS,PT1,Body) :-
+convertInAntecedent(Env,rn(AX,Source,_O),MC1,MC2,set(S1),X,HYPS,AB,CALLS,PT1,Body) :-
 	constructMLCall(Env,rn(AX,_RN1,Source,_O1),MC1,MC2,
-	                setOfFn(S1),X,HYPS,AB,CALLS,PT1,InHead1),
+	                set(S1),X,HYPS,AB,CALLS,PT1,InHead1),
 	Body = ((nonvar(S1), (nongeneric(X), member(X,S1))) ; InHead1),
 	!.
-convertInAntecedent(Env,rn(AX,Source,_O),MC1,MC2,not(setOfFn(S1)),X,HYPS,AB,CALLS,PT1,Body) :-
+convertInAntecedent(Env,rn(AX,Source,_O),MC1,MC2,not(set(S1)),X,HYPS,AB,CALLS,PT1,Body) :-
 	constructMLCall(Env,rn(AX,_RN1,Source,_O1),MC1,MC2,
-	                not(setOfFn(S1)),X,HYPS,AB,CALLS,PT1,InHead1),
+	                not(set(S1)),X,HYPS,AB,CALLS,PT1,InHead1),
 	Body = ((nonvar(S1), (atomic(X), (nongeneric(X), not(member(X,S1)))) ; InHead1)),
 	!.
 convertInAntecedent(Env,Name,MC1,MC2,and(L),X,HYPS,AB,CALLS,and(PTL),Body) :-
@@ -12370,7 +12323,7 @@ convertInAntecedent(Env,rn(AX,S1,_O1),bodyMC(MS1),MC2,
 			HYPS,AB,_CALLS,_,DefaultMLTerm),
 	constructMLMark(DefaultMLTerm,DefaultTerm),
 	L1 = addDefaultML(DefaultTerm,H3),
-%	L1 = asserta(hypothesis(in(Env,modal(MS1),not(D),X,hyp(HYPS),ab(AB),PT1))),
+%	L1 = asserta_new(hypothesis(in(Env,modal(MS1),not(D),X,hyp(HYPS),ab(AB),PT1))),
 	constructMLMark(BodyD,MarkD),
 	Body = (member(MarkD,HYPS) ; (nongeneric(X), (not(BodyD), nongeneric(X), L1))),
 	!.
@@ -12389,7 +12342,7 @@ convertInAntecedent(Env,rn(AX,S1,_O1),bodyMC(MS1),MC2,
 			HYPS,AB,_CALLS,_,DefaultMLTerm),
 	constructMLMark(DefaultMLTerm,DefaultTerm),
 	L1 = addDefaultML(DefaultTerm,H3),
-%	L1 = asserta(hypothesis(in(Env,modal(MS1),D1,X,hyp(HYPS),ab(AB),PT1))),
+%	L1 = asserta_new(hypothesis(in(Env,modal(MS1),D1,X,hyp(HYPS),ab(AB),PT1))),
 	Body = (nongeneric(X), (not(BodyD), nongeneric(X), L1)),
 	!.
 convertInAntecedent(Env,rn(AX,S1,_O1),MC1,MC2,
@@ -12540,10 +12493,10 @@ convertInConsequence(Env,Pr,rn(AX,RN,_S,O),MS,W1,naf(D),X,
 	constructKBHead(Env,Pr,rn(AX,RN,S2,O),W1,not(D),X,
 			HYPS,AB,CALLS,PT1,InHead),
 	!.
-convertInConsequence(Env,Pr,rn(AX,RN,_S,O),MS,W1,setOfFn(Set1),X,
+convertInConsequence(Env,Pr,rn(AX,RN,_S,O),MS,W1,set(Set1),X,
                      HYPS,AB,CALLS,PT1,InHead) :-
 	typeOfDefinition(Env,MS,D,S2),
-	constructKBHead(Env,Pr,rn(AX,RN,S2,O),W1,setOfFn(Set1),X,
+	constructKBHead(Env,Pr,rn(AX,RN,S2,O),W1,set(Set1),X,
 			HYPS,AB,CALLS,PT1,InHead),
 	!.
 %convertInConsequence(Env,rn(AX,RN,_S,O),MS,W1,b(MOp,P,D),X,
@@ -12634,21 +12587,21 @@ assertRoleLInR(Env,MS,R1,inverse(R2),AN) :-
 	gensym(rule,RN),
 	ruleName(AN,RN,user,lInR,Name),
 	constructEqHead(Env,Name,W1,X,inverse(F),R2,app((F:R1),X),HYPS,AB,CALLS,true,EqLiteral1), 
-%	asserta((EqLiteral1 :- G1)),
+%	asserta_new((EqLiteral1 :- G1)),
 	constructEqHead(Env,Name,W1,X,F,R2,app((inverse(F):R1),X),HYPS,AB,CALLS,true,EqLiteral2), 
-%	asserta((EqLiteral2 :- G1)),
+%	asserta_new((EqLiteral2 :- G1)),
 	gensym(rule,RN3),
 	constructEqHead(Env,rn(AN,RN3,user,rInL),W1,X,inverse(F),inverse(R2),
 			Y,HYPS,AB,CALLS,PT1,EqLiteral3),
 	constructEqCall(Env,rn(AN,RN3,_S3,_O3),bodyMC(W1),headMC(W1),X,F,R1,Y,
 	                HYPS,AB,CALLS,PT1,EqLiteral4),
-%	asserta((EqLiteral3 :- cCS(CALLS,true), (call(G1), EqLiteral4))),
+%	asserta_new((EqLiteral3 :- cCS(CALLS,true), (call(G1), EqLiteral4))),
 	gensym(rule,RN4),
 	constructEqHead(Env,rn(AN,RN4,user,rInL),W1,Y,inverse(F1),R2,X,HYPS,AB,CALLS,
 			PT2,EqLiteral5),
 	constructEqCall(Env,rn(AN,RN4,_S3,_O3),bodyMC(W1),headMC(W1),
 			X,F1,R1,Y,HYPS,AB,CALLS,PT2,EqLiteral6),
-	asserta((EqLiteral5 :- cCS(CALLS,true), (call(G1), EqLiteral6))),
+	asserta_new((EqLiteral5 :- cCS(CALLS,true), (call(G1), EqLiteral6))),
 	true.
 assertRoleLInR(Env,MS,R1,and(RL),AN) :-
 	!,
@@ -12669,7 +12622,7 @@ assertRoleLInR(Env,MS,R1,R2,AN) :-
 	constructEqHead(Env,Name1,W1,Y,SF1,R2,X,HYPS,AB,CALLS,PT1,EqLiteral2),
 	constructEqMark(rn(AN,RN1,_S2,_O2),W1,Y,SF1,R2,X,HYPS,AB,CALLS,EqMark2),
 	constructEqCall(Env,rn(AN,RN1,_S3,_O3),bodyMC(W1),headMC(W1),Y,_FF,R1,X,HYPS,AB,CALLS,PT1,EqLiteral1),
-	asserta((EqLiteral2 :- (cCS(CALLS,EqMark2), (call(G1), EqLiteral1)))),
+	asserta_new((EqLiteral2 :- (cCS(CALLS,EqMark2), (call(G1), EqLiteral1)))),
 	gensymbol(skolem,[X,Y],SF2),
 	gensym(rule,RN2),
 	constructConHead(Env,rn(AN,RN2,user,lInR),W1,SF2,R2,X,'>=',N,
@@ -12677,7 +12630,7 @@ assertRoleLInR(Env,MS,R1,R2,AN) :-
 	constructConMark(C2,Mark2),
 	constructSolveConMark(rn(AN,RN2,_S4,_O4),W1,_FF3,R1,X,'>=',N,HYPS,AB,CALLS,Mark1),
 	C1 = solveConstraint(Env,W1,(card,app((_FF:R1),X),'>=',N),_,hyp(HYPS),ab(AB),call([Mark1|CALLS]),PT1),
-	asserta((C2 :- (cCS(CALLS,Mark2), (call(G1), C1)))),
+	asserta_new((C2 :- (cCS(CALLS,Mark2), (call(G1), C1)))),
 	gensym(rule,RN5),
 	gensym(skolem,SF3),
 	constructConHead(Env,rn(AN,RN5,user,lInR),W1,SF3,R1,X,'=<',N,
@@ -12685,7 +12638,7 @@ assertRoleLInR(Env,MS,R1,R2,AN) :-
 	constructConMark(C4,Mark4),
 	constructSolveConMark(rn(AN,RN5,_S6,_O6),W1,_FF4,R2,X,'=<',N,HYPS,AB,CALLS,Mark5),
 	C5 = solveConstraint(Env,MS,(card,app((_FF2:R2),X),'=<',N),_,hyp(HYPS),ab(AB),call([Mark5|CALLS]),PT1),
-	asserta((C4 :- (cCS(CALLS,Mark4), (call(G1), C5)))).
+	asserta_new((C4 :- (cCS(CALLS,Mark4), (call(G1), C5)))).
 	
 /**********************************************************************
  *
@@ -12704,7 +12657,7 @@ assertRoleLInRRestr1(Env,MS,R1,restr(R2,C),AN) :-
 	constructMLMark(InHead,InMark),
 	constructEqCall(Env,rn(AN,RN1,_S2,_O2),bodyMC(W1),headMC(W1),
 	                Y,F,R1,X,HYPS,AB,[InMark|CALLS],PT1,EqLiteral11),
-	asserta((InHead :- (cCS(CALLS,InMark), (call(G1), (EqLiteral11, ground(Y,true)))))),
+	asserta_new((InHead :- (cCS(CALLS,InMark), (call(G1), (EqLiteral11, ground(Y,true)))))),
 	gensym(skolem,SF),
 	gensym(rule,RN2),
 	typeOfDefinition(Env,MS,C,S2),
@@ -12713,7 +12666,7 @@ assertRoleLInRRestr1(Env,MS,R1,restr(R2,C),AN) :-
 	constructEqMark(rn(AN,RN2,_S3,_O3),W1,Y,SF,R2,X,HYPS,AB,CALLS,EqMark2),
 	constructEqCall(Env,rn(AN,RN2,_S4,_O4),bodyMC(W1),headMC(W1),
                         Y,F,R1,X,HYPS,AB,[EqMark2|CALLS],PT2,EqLiteral21),
-	asserta((EqLiteral2 :- (cCS(CALLS,EqMark2), (call(G1), EqLiteral21)))),
+	asserta_new((EqLiteral2 :- (cCS(CALLS,EqMark2), (call(G1), EqLiteral21)))),
 	!.
 
 
@@ -12727,7 +12680,7 @@ assertRoleLInRRestr3(Env,MS,R1,restr(R2,C),AN) :-
 	constructSolveConMark(rn(AN,_RN2,_S2,_O2),
                          W1,_FF1,R1,X,'>=',N,HYPS,AB,CALLS,Mark2),
 	C2 = solveConstraint(Env,W1,(card,app((F:R1),X),'>=',N),_,hyp(HYPS),ab(AB),call([Mark2|CALLS]),PT2),
-	asserta((C1 :- (cCS(CALLS,Mark1), (call(G1), C2)))),
+	asserta_new((C1 :- (cCS(CALLS,Mark1), (call(G1), C2)))),
 	gensym(rule,RN3),
 	constructConHead(Env,rn(AN,RN3,S1,lInR),W1,G,R1,X,'=<',N,
                          HYPS,AB,CALLS,PT4,C3),
@@ -12735,7 +12688,7 @@ assertRoleLInRRestr3(Env,MS,R1,restr(R2,C),AN) :-
 	constructSolveConMark(rn(AN,RN3,_S4,_O4),
                          W1,_FF3,R2,X,'=<',N,HYPS,AB,CALLS,Mark4),
 	C4 = solveConstraint(Env,W1,(card,app((F:R2),X),'=<',N),_,hyp(HYPS),ab(AB),call([Mark4|CALLS]),PT4),
-	asserta((C3 :- (cCS(CALLS,Mark3), (call(G1), C4)))).
+	asserta_new((C3 :- (cCS(CALLS,Mark3), (call(G1), C4)))).
 
 
 /**********************************************************************
@@ -12758,7 +12711,7 @@ assertRoleLInRRestr4(Env,MS,R1,restr(R2,_C),R3,restr(R2,_CNF),AN1) :-
 	C2 = solveConstraint(Env,W1,(card,app((FF1:R2),X),'=<',N2),_,hyp(HYPS),ab(AB),call([Mark2|CALLS]),PT2),
 	constructSolveConMark(rn(AN1,RN,_S3,_O3),W1,FF2,R3,X,'>=',N3,HYPS,AB,CALLS,Mark3),
 	C3 = solveConstraint(Env,W1,(card,app((FF2:R3),X),'>=',N3),_,hyp(HYPS),ab(AB),call([Mark3|CALLS]),PT3),
-	asserta((C1 :- (cCS(CALLS,Mark1), (call(G1), (C2, (C3, (M is N2 - N3, comparison('=<',M,N1)))))))),
+	asserta_new((C1 :- (cCS(CALLS,Mark1), (call(G1), (C2, (C3, (M is N2 - N3, comparison('=<',M,N1)))))))),
 	!.
 
 
@@ -12781,7 +12734,7 @@ assertAndRoleLInR(Env,MS,R1,and([R2|RL]),AN) :-
 	constructEqMark(rn(AN,RN,_S1,_O1),W1,Y,SF,R2,X,HYPS,AB,CALLS,EqMark2),
 	constructEqCall(Env,rn(AN,RN,_S2,_O2),bodyMC(W1),headMC(W1),Y,_F,R1,X,
 	                HYPS,AB,[EqMark2|CALLS],PT1,EqLiteral1),
-	asserta((EqLiteral2 :- (cCS(CALLS,EqMark2), (call(G1), EqLiteral1)))),
+	asserta_new((EqLiteral2 :- (cCS(CALLS,EqMark2), (call(G1), EqLiteral1)))),
 	assertAndRoleLInR(Env,MS,R1,and(RL),AN).
 
 /***********************************************************************
@@ -12801,7 +12754,7 @@ assertAndConstraintLInR(Env,MS,R1,and([R2|RL]),AN) :-
 	constructSolveConMark(rn(AN,RN,_S1,_O1),W1,_FF2,R2,X,Rel,N,HYPS,AB,CALLS,Mark2),	
 	gensymbol(skolem,[X],SF),
 	C2 = solveConstraint(Env,W1,(card,app((SF:R2),X),Rel,N),_,hyp(HYPS),ab(AB),call([Mark2|CALLS]),PT2),
-	asserta((C1 :- cCS(CALLS,Mark1), (call(G1), C2))),
+	asserta_new((C1 :- cCS(CALLS,Mark1), (call(G1), C2))),
 	assertAndConstraintLInR(Env,MS,R1,and(RL),AN).
 
 /***********************************************************************
@@ -12821,7 +12774,7 @@ assertAndConstraintRInL(Env,MS,R1,and([R2|RL]),AN) :-
 	constructSolveConMark(rn(AN,RN,_S1,_O1),W1,_FF1,R1,X,'>=',N,HYPS,AB,CALLS,Mark2),
 	gensymbol(skolem,[X],SF),
 	C2 = solveConstraint(Env,W1,(card,app((SF:R1),X),'>=',N),_,hyp(HYPS),ab(AB),call([Mark2|CALLS]),PT2),
-	asserta((C1 :- cCS(CALLS,Mark1), (call(G1), C2))),
+	asserta_new((C1 :- cCS(CALLS,Mark1), (call(G1), C2))),
 	assertAndConstraintRInL(Env,MS,R1,and(RL),AN).
 
 
@@ -12838,24 +12791,24 @@ assertRoleRInL(Env,MS,R1,inverse(R2),_AN) :-
 	constructEqHead(Env,rn(AN,RN1,user,rInL),W1,X,F,R1,
                         app((inverse(F):R2),X),HYPS,AB,CALLS,
 			true,EqLiteral1),
-%	asserta((EqLiteral1 :- call(G1))),
+%	asserta_new((EqLiteral1 :- call(G1))),
 	gensym(rule,RN2),
 	constructEqHead(Env,rn(AN,RN2,user,rInL),
                         W1,X,inverse(F),R1,app((F:R2),X),HYPS,AB,CALLS,
 			true,EqLiteral2),
-%	asserta((EqLiteral2 :- call(G1))),
+%	asserta_new((EqLiteral2 :- call(G1))),
 	gensym(rule,RN3),
 	constructEqHead(Env,rn(AN,RN3,user,rInL),W1,Y,inverse(F),inverse(R2),
 			X,HYPS,AB,CALLS,PT1,EqLiteral3),
 	constructEqCall(Env,rn(AN,RN3,_S3,_O3),bodyMC(W1),headMC(W1),X,F,R1,Y,
 	                HYPS,AB,CALLS,PT1,EqLiteral4),
-%	asserta((EqLiteral3 :- cCS(CALLS,true), (call(G1), EqLiteral4))),
+%	asserta_new((EqLiteral3 :- cCS(CALLS,true), (call(G1), EqLiteral4))),
 	gensym(rule,RN4),
 	constructEqHead(Env,rn(AN,RN4,user,rInL),W1,Y,inverse(F1),R1,X,HYPS,AB,CALLS,
 			PT2,EqLiteral5),
 	constructEqCall(Env,rn(AN,RN4,_S3,_O3),bodyMC(W1),headMC(W1),
 			X,F1,R2,Y,HYPS,AB,CALLS,PT2,EqLiteral6),
-	asserta((EqLiteral5 :- cCS(CALLS,true), (call(G1), EqLiteral6))).
+	asserta_new((EqLiteral5 :- cCS(CALLS,true), (call(G1), EqLiteral6))).
 assertRoleRInL(Env,MS,R1,restr(R2,C), AN) :-
 	!,
 	assertRoleRInLRestr1(Env,MS,R1,restr(R2,C),AN),
@@ -12872,7 +12825,7 @@ assertRoleRInL(Env,MS,R1,and(RL),AN) :-
 	constructEqHead(Env,rn(AN,RN1,user,rInL),
                         W1,Y,SF,R1,X,HYPS,AB,CALLS,and([PTL]),EqLiteral1),
 	constructEqMark(rn(AN,RN1,_S2,_O2),W1,Y,SF,R1,X,HYPS,AB,CALLS,EqMark1),
-	asserta((EqLiteral1 :- (cCS(CALLS,EqMark1), (call(G1), Body)))),
+	asserta_new((EqLiteral1 :- (cCS(CALLS,EqMark1), (call(G1), Body)))),
 	assertAndConstraintRInL(Env,MS,R1,and(RL),AN).
 assertRoleRInL(Env,MS,R1,R2,AN) :-
 	!,
@@ -12884,14 +12837,14 @@ assertRoleRInL(Env,MS,R1,R2,AN) :-
 	constructEqMark(rn(AN,RN1,_S2,_O2),W1,X,SF,R1,Y,HYPS,AB,CALLS,EqMark1),
 	constructEqCall(Env,rn(AN,RN1,_S3,_O3),bodyMC(W1),headMC(W1),X,_F,R2,Y,
 	                HYPS,AB,CALLS,PT1,EqLiteral2),
-	asserta((EqLiteral1 :- (cCS(CALLS,EqMark1), (call(G1), EqLiteral2)))),
+	asserta_new((EqLiteral1 :- (cCS(CALLS,EqMark1), (call(G1), EqLiteral2)))),
 	gensym(rule,RN2),
 	constructConHead(Env,rn(AN,RN2,user,rInL),W1,_FF5,R1,X,'>=',N,
 	                 HYPS,AB,CALLS,PT1,C2),
 	constructConMark(C2,Mark2),
 	constructSolveConMark(rn(AN,RN2,_S4,_O4),W1,_FF3,R2,X,'>=',N,HYPS,AB,CALLS,Mark1),
 	C1 = solveConstraint(Env,W1,(card,app((_FF:R2),X),'>=',N),_,hyp(HYPS),ab(AB),call([Mark1|CALLS]),PT1),
-	asserta((C2 :- (cCS(CALLS,Mark2), (call(G1), C1)))),
+	asserta_new((C2 :- (cCS(CALLS,Mark2), (call(G1), C1)))),
 	gensym(rule,RN5),
 	gensym(skolem,SF3),
 	constructConHead(Env,rn(AN,RN5,user,rInL),W1,SF3,R2,X,'=<',N,
@@ -12899,7 +12852,7 @@ assertRoleRInL(Env,MS,R1,R2,AN) :-
 	constructConMark(C4,Mark4),
 	constructSolveConMark(rn(AN,RN5,_S6,_O6),W1,_FF4,R1,X,'=<',N,HYPS,AB,CALLS,Mark5),
 	C5 = solveConstraint(Env,W1,(card,app((_FF2:R1),X),'=<',N),_,hyp(HYPS),ab(AB),call([Mark5|CALLS]),PT5),
-	asserta((C4 :- (cCS(CALLS,Mark4), (call(G1), C5)))).
+	asserta_new((C4 :- (cCS(CALLS,Mark4), (call(G1), C5)))).
 
 /**********************************************************************
  *
@@ -12953,7 +12906,7 @@ assertRoleRInLRestr1(Env,MS,R1,restr(R2,C),AN) :-
                         bodyMC(W1),headMC(W1),Y,_FF,R2,X,HYPS,AB,CALLS,PTEq2,EqLiteral2),
 	constructMLCall(Env,rn(AN,RN,_S3,_O3),
                         bodyMC(W1),headMC(W1),C,Y,HYPS,AB,CALLS,PTIn,InHead),
-	asserta((EqLiteral1 :- (cCS(CALLS,EqMark1), (call(G1), (EqLiteral2, (ground(Y,true), once(InHead))))))).
+	asserta_new((EqLiteral1 :- (cCS(CALLS,EqMark1), (call(G1), (EqLiteral2, (ground(Y,true), once(InHead))))))).
 
 
 assertRoleRInLRestr2(Env,MS,R1,restr(R2,_C),R3,restr(R2,_CNF),AN) :-
@@ -12966,7 +12919,7 @@ assertRoleRInLRestr2(Env,MS,R1,restr(R2,_C),R3,restr(R2,_CNF),AN) :-
 	D2 = solveConstraint(Env,W1,(card,app((_FF3:R2),X),'>=',N2),_,hyp(HYPS),ab(AB),call([Mark2|CALLS]),PT2),
 	constructSolveConMark(rn(AN,RN,_S3,_O3),W1,_FF4,R3,X,'=<',_N3,HYPS,AB,CALLS,Mark3),
 	D3 = solveConstraint(Env,W1,(card,app((_FF5:R3),X),'=<',N3),_,hyp(HYPS),ab(AB),call([Mark3|CALLS]),PT3),
-	asserta((D1 :- (cCS(CALLS,Mark1), (call(G1), (D2, (D3, (M is N2 - N3, comparison('>=',M,N1)))))))),
+	asserta_new((D1 :- (cCS(CALLS,Mark1), (call(G1), (D2, (D3, (M is N2 - N3, comparison('>=',M,N1)))))))),
 	!.
 	
 	
@@ -12991,7 +12944,7 @@ assertRoleRInLRestr3(Env,MS,R1,restr(R2,C),AN) :-
                         Y,_FF,R2,X,HYPS,AB,CALLS,PT1,EqLiteral2),
 % Removed this rule for test purposes
 % uh 03.10.92
-%	asserta((InHead :- (cCS(CALLS,Mark), (call(G1), (EqLiteral2, (ground(Y,true), (D1, (not(member((Y,_),L1)), N1 = M1)))))))),
+%	asserta_new((InHead :- (cCS(CALLS,Mark), (call(G1), (EqLiteral2, (ground(Y,true), (D1, (not(member((Y,_),L1)), N1 = M1)))))))),
 	!.
 
 assertRoleRInLRestr4(Env,MS,R1,restr(R2,_C),R3,restr(R2,_CNF),AN) :-
@@ -13008,7 +12961,7 @@ assertRoleRInLRestr4(Env,MS,R1,restr(R2,_C),R3,restr(R2,_CNF),AN) :-
 	                 HYPS,AB,CALLS,Mark3),
 	D3 = solveConstraint(Env,W1,(card,app((_FF5:R3),X),Rel,N3),_,
 	                     hyp(HYPS),ab(AB),call([Mark3|CALLS]),PT3),
-	asserta((D2 :- (cCS(CALLS,Mark2), (call(G1), (D1, (D3, (M is N1 + N3, comparison(Rel,M,N2)))))))),
+	asserta_new((D2 :- (cCS(CALLS,Mark2), (call(G1), (D1, (D3, (M is N1 + N3, comparison(Rel,M,N2)))))))),
 	!.
 	
 
@@ -13054,36 +13007,44 @@ testMotel(N) :-
 testAllMotelExamples(64) :-
 	print('Test complete'), nl, nl,
 	!.
-testAllMotelExamples(N) :-
-	initialize_motel,
-	print('Example '), print(N), nl, example(N),
-	once(testMotelExample(N)),
+testAllMotelExamples(N) :- 
+	test_motel(N),
 	M is N + 1,
 	testAllMotelExamples(M).
 
+test_motel(N):-
+	initialize_motel,
+	print('Example '), print(N), nl,
+        flag(current_example,_,N),
+        example(N),
+	once(testMotelExample(N)),!.
+
+go_goal_for_example:-!.
+go_goal_for_example :- print('No goal for this example'), nl.
+
 testMotelExample(1) :-	
-	print('No goal for this example'), nl.
+	go_goal_for_example.
 testMotelExample(2) :-
-	printTime(setof(C,E^deduce(ex2,[],elementOf(mary,C),E),L1)), print(L1), nl,
-	printTime(setof(D,F^deduce(ex2,[],elementOf(tom,D),F),L2)), print(L2), nl.
+	printTime(setof(C,E^deduce(ex2,[],isa(mary,C),E),L1)), print(L1), nl,
+	printTime(setof(D,F^deduce(ex2,[],isa(tom,D),F),L2)), print(L2), nl.
 testMotelExample(3) :-
 	tryGoal(inconsistent(ex3)).
 testMotelExample(4) :-
-	print('No goal for this example'), nl.
+	go_goal_for_example.
 testMotelExample(5) :-
 	tryGoal(not(subsumes([],c1,c2))),
-	tryGoal(subsumes([],c2,c1)).
+	tryGoalF(subsumes([],c2,c1)).
 testMotelExample(6) :-
 	tryGoal(not(subsumes([],c1,c2))),
-	tryGoal(subsumes([],c2,c1)).
+	tryGoalF(subsumes([],c2,c1)).
 testMotelExample(7) :-
-	print('No goal for this example'), nl.
+	go_goal_for_example.
 testMotelExample(8) :-
-	tryGoal(deduce(elementOf(tom,heterosexual))).
+	tryGoal(deduce(isa(tom,heterosexual))).
 testMotelExample(9) :-
-	tryGoal(deduce(elementOf(chris,male))).
+	tryGoal(deduce(isa(chris,male))).
 testMotelExample(10) :-
-	tryGoal(deduce(elementOf(tom,c2))).
+	tryGoal(deduce(isa(tom,c2))).
 testMotelExample(11) :-
 	tryGoal(inconsistent(ex11)).
 testMotelExample(12) :-
@@ -13098,100 +13059,100 @@ testMotelExample(14) :-
 testMotelExample(15) :-
 	tryGoal(subsumes([],c2,c1)).
 testMotelExample(16) :-
-	tryGoal(subsumes([],c2,c1)).
+	tryGoalF(subsumes([],c2,c1)).
 testMotelExample(17) :-
-	tryGoal(subsumes([],c2,c1)).
+	tryGoalF(subsumes([],c2,c1)).
 testMotelExample(18) :-
-	tryGoal(deduce(elementOf(mary,c4))).
+	tryGoal(deduce(isa(mary,c4))).
 testMotelExample(19) :-
-	tryGoal(deduce(elementOf(amy,female))).
+	tryGoalF(deduce(isa(amy,female))).
 testMotelExample(20) :-
 	tryGoal(inconsistent(ex20)).
 testMotelExample(21) :-
-	print('No goal for this example'), nl,
-% 	deduce(elementOf(betty,female)),
+	go_goal_for_example,
+% 	deduce(isa(betty,female)),
 	!.
 testMotelExample(22) :-
-% 	deduce(elementOf(amy,female)),
-	print('No goal for this example'), nl.
+% 	deduce(isa(amy,female)),
+	go_goal_for_example.
 testMotelExample(23) :-
-% 	deduce(elementOf(amy,female))
-	print('No goal for this example'), nl.
+% 	deduce(isa(amy,female))
+	go_goal_for_example.
 testMotelExample(24) :-
-	tryGoal(deduce(elementOf(audi,c3))).
+	tryGoal(deduce(isa(audi,c3))).
 testMotelExample(25) :-
-	tryGoal(not(deduce(elementOf(audi,c3)))).
+	tryGoal(not(deduce(isa(audi,c3)))).
 testMotelExample(26) :-
 	tryGoal(not(subsumes([],c1,c2))),
-	tryGoal(subsumes([],c2,c1)).
+	tryGoalF(subsumes([],c2,c1)).
 testMotelExample(27) :-
 	tryGoal(not(subsumes([],c1,c2))),
-	tryGoal(subsumes([],c2,c1)).
+	tryGoalF(subsumes([],c2,c1)).
 testMotelExample(28) :-
-	tryGoal(deduce(ex29,[b(believe,john)],elementOf(audi,auto),_P)).
+	tryGoalF(deduce(ex29,[b(believe,john)],isa(audi,auto),_P)).
 testMotelExample(29) :-
-	print('No goal for this example'), nl.
+	go_goal_for_example.
 testMotelExample(30) :-
-	print('No goal for this example'), nl.
+	go_goal_for_example.
 testMotelExample(31) :-
-	tryGoal(deduce(elementOf(tom,onlyMaleChildren))).
+	tryGoal(deduce(isa(tom,onlyMaleChildren))).
 testMotelExample(32) :-
-	tryGoal(abduce(_H1,elementOf(robin,male),_E1)),
-	tryGoal(abduce(_H2,elementOf(robin,female),_E2)).
+	tryGoal(abduce(_H1,isa(robin,male),_E1)),
+	tryGoal(abduce(_H2,isa(robin,female),_E2)).
 testMotelExample(33) :-
-	tryGoal(abduce(_H3,elementOf(nixon,dove),_E3)),
-	tryGoal(abduce(_H4,elementOf(nixon,hawk),_E4)).
+	tryGoal(abduce(_H3,isa(nixon,dove),_E3)),
+	tryGoal(abduce(_H4,isa(nixon,hawk),_E4)).
 testMotelExample(34) :-
 	tryGoal(inconsistent(ex34)).
 testMotelExample(35) :-
-	tryGoal(abduce(ex35,[],_H5,elementOf(john,fly),_E5)),
-	tryGoal(not(abduce(ex35,[],_H8,elementOf(tweety,fly),_E8))).
+	tryGoal(abduce(ex35,[],_H5,isa(john,fly),_E5)),
+	tryGoal(not(abduce(ex35,[],_H8,isa(tweety,fly),_E8))).
 testMotelExample(36) :-
-	tryGoal(abduce(ex36,[],_H6,elementOf(nixon,dove),_E6)),
-	tryGoal(abduce(ex36,[],_H7,elementOf(nixon,hawk),_E7)).
+	tryGoal(abduce(ex36,[],_H6,isa(nixon,dove),_E6)),
+	tryGoal(abduce(ex36,[],_H7,isa(nixon,hawk),_E7)).
 testMotelExample(37) :-
-	print('No goal for this example'), nl.
+	go_goal_for_example.
 testMotelExample(38) :-
-	tryGoal(deduce(elementOf(ideaste,c2))).
+	tryGoal(deduce(isa(ideaste,c2))).
 testMotelExample(39) :-
-	tryGoal(deduce(elementOf(lucky,female))),
+	tryGoal(deduce(isa(lucky,female))),
 	tryGoal(assert_ind(lucky,male)),
-	tryGoal(not(deduce(elementOf(lucky,female)))),
+	tryGoalF(not(deduce(isa(lucky,female)))),
 	tryGoal(consistent([])).
 testMotelExample(40) :-
-	tryGoal(deduce(elementOf(peter,richPerson))),
+	tryGoal(deduce(isa(peter,richPerson))),
 	tryGoal(assert_ind(peter,poorPerson)),
-	tryGoal(not(deduce(elementOf(peter,richPerson)))),
+	tryGoalF(not(deduce(isa(peter,richPerson)))),
 	tryGoal(consistent([])),
 	tryGoal(not(subsumes(richPerson,doctor))).
 testMotelExample(41) :-
-	tryGoal(deduce(elementOf(tom,richPerson))),
+	tryGoal(deduce(isa(tom,richPerson))),
 	tryGoal(assert_ind(tom,poorPerson)),
-	tryGoal(not(deduce(elementOf(tom,richPerson)))),
+	tryGoalF(not(deduce(isa(tom,richPerson)))),
 	tryGoal(consistent([])).
 testMotelExample(42) :-
-	tryGoal(deduce(elementOf(audi,fourWheels))),
+	tryGoal(deduce(isa(audi,fourWheels))),
 	tryGoal(assert_ind(audi,fiveWheels)),
-	tryGoal(not(deduce(elementOf(audi,fourWheels)))),
+	tryGoalF(not(deduce(isa(audi,fourWheels)))),
 	tryGoal(consistent([])).
 testMotelExample(43) :-
-	tryGoal(deduce(elementOf(r,red))),
-	tryGoal(deduce(elementOf(r,redOrYellow))),
-	tryGoal(deduce(elementOf(r,colors))).
+	tryGoal(deduce(isa(r,red))),
+	tryGoal(deduce(isa(r,redOrYellow))),
+	tryGoal(deduce(isa(r,colors))).
 testMotelExample(44) :-
-	tryGoal(subsumes(c2,c12)).
+	tryGoalF(subsumes(c2,c12)).
 testMotelExample(45) :-
-	print('No goal for this example'), nl.
+	go_goal_for_example.
 testMotelExample(46) :-
-	print('No goal for this example'), nl.
+	go_goal_for_example.
 testMotelExample(47) :-
-	tryGoal(deduce(elementOf(bmw,c3))).
+	tryGoalF(deduce(isa(bmw,c3))).
 testMotelExample(48) :-
-	print('No goal for this example'), nl.
+	go_goal_for_example.
 testMotelExample(49) :-
-	tryGoal(not(deduce(elementOf(p,c4)))).
+	tryGoal(not(deduce(isa(p,c4)))).
 testMotelExample(50) :-
-	tryGoal(deduce(elementOf(peter,c0))).
+	tryGoal(deduce(isa(peter,c0))).
 
 testMotelExample(51) :-
 	tryGoal(deduce(posInfl(a,d))),
@@ -13224,17 +13185,17 @@ testMotelExample(52) :-
 	tryGoal(bagof((X3,W3),(deduce(leastInfl(X3,hasMaxSpeed)),abduce(change(X3,W3),change(hasMaxSpeed,1.0))),X3W3s)),
 	tryGoal(verifySolution(X3W3s,[(hasCatConverter,-1.0)])).
 testMotelExample(53) :-
-	print('No goal for this example'), nl.
+	go_goal_for_example.
 testMotelExample(54) :-
-	print('No goal for this example'), nl.
+	go_goal_for_example.
 testMotelExample(55) :-
-	print('No goal for this example'), nl.
+	go_goal_for_example.
 testMotelExample(56) :-
-	print('No goal for this example'), nl.
+	go_goal_for_example.
 testMotelExample(57) :-
-	print('No goal for this example'), nl.
+	go_goal_for_example.
 testMotelExample(58) :-
-	print('No goal for this example'), nl.
+	go_goal_for_example.
 testMotelExample(59) :-
 	tryGoal(sb_ask(isa(harry,parent))),
 	tryGoal(sb_ask(isa(harry,person))),
@@ -13243,38 +13204,44 @@ testMotelExample(59) :-
 	printTime(setof((X,Y),sb_ask(roleNr('marys-child',X,Y)),L3)), print(L3), nl,
 	printTime(setof(X,sb_ask(roleDefNr('marys-child',X)),L4)), print(L4), nl.
 testMotelExample(60) :-
-	tryGoal(deduce(ex60,[b(believe,peter)],elementOf(tom,richPerson),E)),
+	tryGoal(deduce(ex60,[b(believe,peter)],isa(tom,richPerson),E)),
 	tryGoal(assert_ind([b(believe,peter)],tom,not(richPerson))),
 	tryGoal(inconsistent([b(believe,peter)])).
 testMotelExample(61) :-
-	tryGoal(deduce(elementOf(X,fly))),
-	tryGoal(deduce(elementOf(X,nest))),
-	tryGoal(deduce(elementOf(X,not(emu)))),
-	tryGoal(deduce(elementOf(X,not(cuckoo)))),
+	tryGoal(deduce(isa(tweety,fly))),
+	tryGoal(deduce(isa(tweety,nest))),
+	tryGoal(deduce(isa(tweety,not(emu)))),
+	tryGoal(deduce(isa(tweety,not(cuckoo)))),
 	tryGoal(consistent([])).
 testMotelExample(62) :-
-	tryGoal(deduce(elementOf(tweety,fly))),
-	tryGoal(deduce(elementOf(tweety,nest))),
-	tryGoal(not(deduce(elementOf(tweety,not(emu))))),
-	tryGoal(not(deduce(elementOf(tweety,not(cuckoo))))),
-	tryGoal(not(deduce(elementOf(tweety,emu)))),
-	tryGoal(not(deduce(elementOf(tweety,cuckoo)))),
+	tryGoal(deduce(isa(tweety,fly))),
+	tryGoal(deduce(isa(tweety,nest))),
+	tryGoal(not(deduce(isa(tweety,not(emu))))),
+	tryGoal(not(deduce(isa(tweety,not(cuckoo))))),
+	tryGoal(not(deduce(isa(tweety,emu)))),
+	tryGoal(not(deduce(isa(tweety,cuckoo)))),
 	tryGoal(consistent([])).
 testMotelExample(63) :-
-	tryGoal(deduce(elementOf(tweety,fly))),
-	tryGoal(deduce(elementOf(tweety,nest))),
-	tryGoal(deduce(elementOf(tweety,not(emu)))),
-	tryGoal(deduce(elementOf(tweety,not(cuckoo)))),
-	tryGoal(deduce(elementOf(tweety,sparrow))),
+	tryGoal(deduce(isa(tweety,fly))),
+	tryGoal(deduce(isa(tweety,nest))),
+	tryGoal(deduce(isa(tweety,not(emu)))),
+	tryGoal(deduce(isa(tweety,not(cuckoo)))),
+	tryGoal(deduce(isa(tweety,sparrow))),
 	tryGoal(consistent([])).
 
+testMotelExample(N):- print('No goal for this example':N), nl.
 
 tryGoal(G) :-
 	call(G),
-	!,
-	print('Goal '), print(G), print(' succeeded'), nl.
+	!. %print('Goal '), print(G), print(' succeeded'), nl.
 tryGoal(G) :-
 	print('Goal '), print(G), print(' failed'), nl.
+
+tryGoalF(G) :-
+	call(G),
+	!,
+	print('Goal '), print(G), print(' failed_Not'), nl.
+tryGoalF(G) :- !. % print('Goal '), print(G), print(' succeeded_Not'), nl.
 
 /***********************************************************************
  *
@@ -13397,9 +13364,9 @@ unfold(Env,[(Origin,Type,A,and(L1))|L2],[(NewOrigin,Type,A1,and(L1),and(L3))|L5]
 	unfoldList(Env,Type,L1,L3,CL3),
 	append(L4,CL3,L5),
 	!.
-unfold(Env,[(Origin,Type,A,setOfFn(L1))|L2],[(NewOrigin,Type,A1,setOfFn(L1),C)|L4]) :-
+unfold(Env,[(Origin,Type,A,set(L1))|L2],[(NewOrigin,Type,A1,set(L1),C)|L4]) :-
 	unfold(Env,L2,DL1),
-	unfoldSetToConcept(setOfFn(L1),C),
+	unfoldSetToConcept(set(L1),C),
 	unfold(Env,Origin,left,Type,A,DL1,NewOrigin,A1,L4),
 	!.
 unfold(Env,[(Origin,concept,A,or(L1))|L2],[(NewOrigin,concept,A1,or(L1),or(L3))|L5]) :-
@@ -13494,29 +13461,29 @@ atomicConcept(not(CT)) :-
 atomicConcept(not(CT)) :-
 	atomic(CT),
 	!.
-atomicConcept(setOfFn([E1])) :-
+atomicConcept(set([E1])) :-
 	!.
-%atomicConcept(not(setOfFn([E1]))) :-
+%atomicConcept(not(set([E1]))) :-
 %	!.
 	
 /**********************************************************************
  *
  * unfoldElementToSet(+Set,-CT)
- * for a given setOfFn Set the concept term CT consisting of a disjunktion 
- * of all singleton setOfFn contained in Set is computed.
+ * for a given set Set the concept term CT consisting of a disjunktion 
+ * of all singleton set contained in Set is computed.
  *
  * 130892   UH   (c)  
  * 140892   UH   Documented
  *
  */
 
-unfoldElementToSet(E1,setOfFn([E1])).
+unfoldElementToSet(E1,set([E1])).
 
-unfoldSetToConcept(setOfFn([]),bot) :-
+unfoldSetToConcept(set([]),bot) :-
 	!.
-unfoldSetToConcept(setOfFn([E1]),setOfFn([E1])) :-
+unfoldSetToConcept(set([E1]),set([E1])) :-
 	!.
-unfoldSetToConcept(setOfFn([E1|L1]),or(L2)) :-
+unfoldSetToConcept(set([E1|L1]),or(L2)) :-
 	hop_map(unfoldElementToSet,[E1|L1],L2),
 	!.
 
@@ -13533,59 +13500,58 @@ unfoldSetToConcept(setOfFn([E1|L1]),or(L2)) :-
  * cleans TBox, ABox, hierarchies, ...
  *
  */
-:-dynamic(initialize_motel/0).
+
 initialize_motel :-
-        asserta((initialize_motel:-!)),
 	retractCompiledPredicates(_),
-	retractall(_,in/9),
-	retractall(_,kb_in/10),
-	retractall(_,eq/9),
-	retractall(_,constraint/8),
-	retractall(_,rel/5),
-	retractall(_,closed/5),
-	retractall(_,compiledPredicate/2),
-	retractall(_,conceptElement/7),
-	retractall(_,conceptEqualSets/6),
-	retractall(_,conceptHierarchy/3),
-	retractall(_,conceptName/4),
-	retractall(_,conceptSubsets/6),
-	retractall(_,environment/3),
-	retractall(_,given_change/4),
-	retractall(_,given_inflLink/4),
-	retractall(_,modalAxioms/6),
-	retractall(_,roleAttributes/5),
-	retractall(_,roleDefault/4),
-	retractall(_,roleDefNr/4),
-	retractall(_,roleDomain/4),
-	retractall(_,roleElement/8),
-	retractall(_,roleEqualSets/6),
-	retractall(_,roleHierarchy/3),
-	retractall(_,roleName/4),
-	retractall(_,roleNr/4),
-	retractall(_,roleRange/4),
-	retractall(_,roleSubsets/6),
-	retractall(_,sub/4),
-	retractall(_,succ/4),
-	retractall(_,abductiveDerivation/3),
-	retractall(_,consistencyDerivation/3),
-	retractall(_,hypothesis/1),
-	retractall(_,inconsistencyCheck/3),
-	retractall(_,kb_option/2),
-	retractall(_,nsub/4),
-	retractall(_,nsub3/2),
-	retractall(_,sub3/2),
-	retractall(_,succ3/2),
-	retractall(_,counter_value/2),
-	retractall(_,query/6),
-	asserta(environment(initial,env(e0),'Initial Environment')),
-	asserta(currentEnvironment(env(e0))),
+	retractall1(_,in/9),
+	retractall1(_,kb_in/10),
+	retractall1(_,eq/9),
+	retractall1(_,constraint/8),
+	retractall1(_,rel/5),
+	retractall1(_,closed/5),
+	retractall1(_,compiledPredicate/2),
+	retractall1(_,conceptElement/7),
+	retractall1(_,conceptEqualSets/6),
+	retractall1(_,conceptHierarchy/3),
+	retractall1(_,conceptName/4),
+	retractall1(_,conceptSubsets/6),
+	retractall1(_,environment/3),
+	retractall1(_,given_change/4),
+	retractall1(_,given_inflLink/4),
+	retractall1(_,modalAxioms/6),
+	retractall1(_,roleAttributes/5),
+	retractall1(_,roleDefault/4),
+	retractall1(_,roleDefNr/4),
+	retractall1(_,roleDomain/4),
+	retractall1(_,roleElement/8),
+	retractall1(_,roleEqualSets/6),
+	retractall1(_,roleHierarchy/3),
+	retractall1(_,roleName/4),
+	retractall1(_,roleNr/4),
+	retractall1(_,roleRange/4),
+	retractall1(_,roleSubsets/6),
+	retractall1(_,sub/4),
+	retractall1(_,succ/4),
+	retractall1(_,abductiveDerivation/3),
+	retractall1(_,consistencyDerivation/3),
+	retractall1(_,hypothesis/1),
+	retractall1(_,inconsistencyCheck/3),
+	retractall1(_,option/2),
+	retractall1(_,nsub/4),
+	retractall1(_,nsub3/2),
+	retractall1(_,sub3/2),
+	retractall1(_,succ3/2),
+	retractall1(_,value/2),
+	retractall1(_,query/6),
+	asserta_new(environment(initial,env(e0),'Initial Environment')),
+	asserta_new(currentEnvironment(env(e0))),
 	initEnvironment(initial),
 	!.
 
 retractRoles(Env) :-
  	clause(roleName(Env,_MS,_,RN),_),
  	Head =.. [RN,_,_],
- 	retractall(Head),
+ 	retractall1(Head),
 	fail.
 retractRoles(_).
 
@@ -13618,7 +13584,7 @@ loadKB(FileName,EnvName) :-
 	!.
 
 
-doFileGoal(EOF) :- end_of_file == EOF,
+doFileGoal('end_of_file') :-
 	seen,
 	!.
 doFileGoal(Goal) :-
@@ -13647,7 +13613,7 @@ getKB(EnvName,Set08) :-
                    [MS2,W1,G1,A2,C2,Ax2]^(clause(conceptElement(Name,MS2,W1,user,A2,C2,Ax2),G1),
                    Clause2 = assert_ind(MS2,A2,C2)),Set2),
 	bagofOrNil(Clause3,
-                   [MS3,W1,G1,A3,B3,R3,Ax3]^(clause(roleElement(Name,MS3,W1,user,A3,B3,R3,Ax3),G1), % dmiles added ",G1" here
+                   [MS3,W1,G1,A3,B3,R3,Ax3]^(clause(roleElement(Name,MS3,W1,user,A3,B3,R3,Ax3),G1),
 	           Clause3 = assert_ind(MS3,A3,B3,R3)),Set3),
 	bagofOrNil(Clause4,
                    [MS4,CN4,CT4,Ax4]^(conceptEqualSets(Name,user,MS4,CN4,CT4,Ax4),
@@ -13705,17 +13671,17 @@ saveKB(EnvName,FileName) :-
 	transformAndWrite(modalAxioms(Env,user,A71,_A72,A73,A74),
                           modalAxioms(Env,A71,A73,A74)),
 	transformAndWrite(roleAttributes(Env,A71,B71,C71),
-			  (environment(EnvName,NewEnv,_), assert(roleAttributes(NewEnv,A71,B71,C71)))),
+			  (environment(EnvName,NewEnv,_), assertz_if_new(roleAttributes(NewEnv,A71,B71,C71)))),
 	transformAndWrite(roleDefault(Env,A81,B81,C81),
-			  (environment(EnvName,NewEnv,_), assert(roleDefault(NewEnv,A81,B81,C81)))),
+			  (environment(EnvName,NewEnv,_), assertz_if_new(roleDefault(NewEnv,A81,B81,C81)))),
 	transformAndWrite(roleDefNr(Env,A91,B91,C91),
-			  (environment(EnvName,NewEnv,_), assert(roleDefNr(NewEnv,A91,B91,C91)))),
+			  (environment(EnvName,NewEnv,_), assertz_if_new(roleDefNr(NewEnv,A91,B91,C91)))),
 	transformAndWrite(roleDomain(Env,A82,B82,C82),
-			  (environment(EnvName,NewEnv,_), assert(roleDomain(NewEnv,A82,B82,C82)))),
+			  (environment(EnvName,NewEnv,_), assertz_if_new(roleDomain(NewEnv,A82,B82,C82)))),
 	transformAndWrite(roleNr(Env,A83,B83,C83),
-			  (environment(EnvName,NewEnv,_), assert(roleNr(NewEnv,A83,B83,C83)))),
+			  (environment(EnvName,NewEnv,_), assertz_if_new(roleNr(NewEnv,A83,B83,C83)))),
 	transformAndWrite(roleRange(Env,A84,B84,C84),
-			  (environment(EnvName,NewEnv,_), assert(roleRange(NewEnv,A84,B84,C84)))),
+			  (environment(EnvName,NewEnv,_), assertz_if_new(roleRange(NewEnv,A84,B84,C84)))),
         told,
         !.
 saveKB(_,_) :-
@@ -13747,20 +13713,20 @@ deduce(P1,P2,P3) :-
 	completeParameter([P1,P2,P3],EnvName,MS,Query,Proof),
 	deduce(EnvName,MS,Query,Proof).
 
-deduce(EnvName,MS,elementOf(X,C),Exp) :-
-	kb_option(useSetheo,yes),
+deduce(EnvName,MS,isa(X,C),Exp) :-
+	option(useSetheo,yes),
 	!,
-	deduceSetheo(EnvName,MS,elementOf(X,C),Exp).
-deduce(EnvName,MS,elementOf(X,C),Exp) :-
-	deduceMOTEL(EnvName,MS,elementOf(X,C),Exp).
+	deduceSetheo(EnvName,MS,isa(X,C),Exp).
+deduce(EnvName,MS,isa(X,C),Exp) :-
+	deduceMOTEL(EnvName,MS,isa(X,C),Exp).
 
-deduceMOTEL(EnvName,MS,elementOf(X,C),Exp) :-
-	retractall(hypothesis(_)),
+deduceMOTEL(EnvName,MS,isa(X,C),Exp) :-
+	retractall1(hypothesis(_)),
  	environment(EnvName,Env,_),
  	convertMS(negative,Env,[[],true],MS,[],[W1,G1],_),
 	clause(query(Env,W1,C,X,Exp,Goal),_).
-deduceMOTEL(EnvName,MS,elementOf(X,C),Exp) :-
-	retractall(hypothesis(_)),
+deduceMOTEL(EnvName,MS,isa(X,C),Exp) :-
+	retractall1(hypothesis(_)),
  	environment(EnvName,Env,_),
  	convertMS(negative,Env,[[],true],MS,[],[W1,G1],_),
  	getNegatedConcept(C,C1),
@@ -13772,7 +13738,7 @@ deduceMOTEL(EnvName,MS,elementOf(X,C),Exp) :-
 % 	anlegen einer clausel die in undefconcept wieder geloescht wird...
  	setQuery(Env,W1,C,X,Exp,Goal).
 deduceMOTEL(EnvName,MS,roleFiller(X,R,L,N),Exp) :-
-	retractall(hypothesis(_)),
+	retractall1(hypothesis(_)),
 	environment(EnvName,Env,_),
 	convertMS(negative,Env,[[],true],MS,[],[W1,G1],_),
 	call(G1),
@@ -13781,7 +13747,7 @@ deduceMOTEL(EnvName,MS,roleFiller(X,R,L,N),Exp) :-
 	nonvar(X),
 	length(L,N).
 
-deduceSetheo(EnvName,MS,elementOf(X,C),Exp) :-
+deduceSetheo(EnvName,MS,isa(X,C),Exp) :-
  	environment(EnvName,Env,_),
  	convertMS(negative,Env,[[],true],MS,[],[W1,G1],_),
 	getQuery(Env,MS,C,X,GL),
@@ -13800,7 +13766,7 @@ deduceSetheo(EnvName,MS,elementOf(X,C),Exp) :-
 
 
 setQuery(Env,W1,C,X,Exp,Goal) :-
-	assert(query(Env,W1,C,X,Exp,Goal)),
+	assertz_if_new(query(Env,W1,C,X,Exp,Goal)),
 	!.
 setQuery(Env,W1,C,X,Exp,Goal) :-
 	!.
@@ -13996,10 +13962,10 @@ getQuery(Env,W1,C0,X,Exp,Goal) :-
  *
  *	Succeeds if Consequent follows under the hypothesis Hypothesis.
  */
-abduce(Hyps,elementOf(X,Y)) :-
+abduce(Hyps,isa(X,Y)) :-
 	!,
 	getCurrentEnvironment(EnvName),
-	abduce(EnvName,[],Hyps,elementOf(X,Y),_).
+	abduce(EnvName,[],Hyps,isa(X,Y),_).
 abduce(Hypothesis,Consequent) :-
         getCurrentEnvironment(EnvName),
 	abduce(EnvName,[],Hypothesis,Consequent,[]).
@@ -14011,21 +13977,21 @@ abduce(Hypothesis,Consequent) :-
  *	Succeeds if Consequent follows under the hypothesis Hypothesis.
  */
 
-abduce(EnvName,Hypothesis,elementOf(X,C)) :-
+abduce(EnvName,Hypothesis,isa(X,C)) :-
 	nonvar(EnvName),
 	environment(EnvName,_,_),
 	!,
-	abduce(EnvName,[],elementOf(X,C),_Exp).
-abduce(MS,Hypothesis,elementOf(X,C)) :-
+	abduce(EnvName,[],isa(X,C),_Exp).
+abduce(MS,Hypothesis,isa(X,C)) :-
 	nonvar(MS),
 	(MS = [] ; MS = [_|_]),
         getCurrentEnvironment(EnvName),
 	!,
-	abduce(EnvName,MS,Hypothesis,elementOf(X,C),_Exp).
-abduce(Hypothesis,elementOf(X,C),Exp) :-
+	abduce(EnvName,MS,Hypothesis,isa(X,C),_Exp).
+abduce(Hypothesis,isa(X,C),Exp) :-
 	getCurrentEnvironment(EnvName),
 	!,
-	abduce(EnvName,[],Hypothesis,elementOf(X,C),Exp).
+	abduce(EnvName,[],Hypothesis,isa(X,C),Exp).
 abduce(EnvName,Hypothesis,Consequent) :-
         environment(EnvName,_,_),
 	!,
@@ -14037,22 +14003,22 @@ abduce(MS,Hypothesis,Consequent) :-
 	!,
 	abduce(EnvName,MS,Hypothesis,Consequent,[]).
 
-abduce(EnvName,Hyps,elementOf(X,Y),Exp) :-
+abduce(EnvName,Hyps,isa(X,Y),Exp) :-
 	nonvar(EnvName),
 	environment(EnvName,_,_),
 	!,
-	abduce(EnvName,[],Hyps,elementOf(X,Y),Exp).
-abduce(MS,Hyps,elementOf(X,Y),Exp) :-
+	abduce(EnvName,[],Hyps,isa(X,Y),Exp).
+abduce(MS,Hyps,isa(X,Y),Exp) :-
 	nonvar(MS),
 	(MS = [] ; MS = [_|_]),
 	getCurrentEnvironment(EnvName),
 	!,
-	abduce(EnvName,MS,Hyps,elementOf(X,Y),Exp).
-abduce(EnvName,MS,Hyps,elementOf(X,Y)) :-
+	abduce(EnvName,MS,Hyps,isa(X,Y),Exp).
+abduce(EnvName,MS,Hyps,isa(X,Y)) :-
 	!,
-	abduce(EnvName,MS,Hyps,elementOf(X,Y),_Exp).
+	abduce(EnvName,MS,Hyps,isa(X,Y),_Exp).
 
-abduce(EnvName,MS,Hyps,elementOf(X,C),Exp) :-
+abduce(EnvName,MS,Hyps,isa(X,C),Exp) :-
 	environment(EnvName,Env,_),
 	convertMS(negative,Env,[[],true],MS,[],[W1,G1],_),
 	constructMLCall(Env,rn(no,_RN1,user,_O1),bodyMC(W1),headMC(_),
@@ -14358,14 +14324,14 @@ metaReasoning :-
 	constructMLHead(Env,rn(ti,ti,system,lInR),W1,not(C),X,
 			_HYPS,_D,_CALLS,inconsistency,InHead2),
 	Lit11 = not(inconsistencyCheck(_,_,_)),
-	Lit13 = asserta(InHead2),
-	Lit14 = asserta(inconsistencyCheck(MS,C,X)),
+	Lit13 = asserta_new(InHead2),
+	Lit14 = asserta_new(inconsistencyCheck(MS,C,X)),
 	Lit15 = tryInconsistency(MS,C,X,InHead2),
-	assertz((InHead1 :- atomic(C), atomic(X), Lit11, Lit13, Lit14, Lit15)),
-	Lit23 = asserta(InHead1),
-	Lit24 = asserta(inconsistencyCheck(MS,C,X)),
+	assertz_if_new((InHead1 :- atomic(C), atomic(X), Lit11, Lit13, Lit14, Lit15)),
+	Lit23 = asserta_new(InHead1),
+	Lit24 = asserta_new(inconsistencyCheck(MS,C,X)),
 	Lit25 = tryInconsistency(MS,C,X,InHead1),
-	assertz((InHead2 :- atomic(C), atomic(X), Lit11, Lit23, Lit24, Lit25)).
+	assertz_if_new((InHead2 :- atomic(C), atomic(X), Lit11, Lit23, Lit24, Lit25)).
 
 
 tryInconsistency(MS,C,X,InHead) :-
@@ -14407,7 +14373,7 @@ realizeArgs(EnvName,MS,X,[C|AL],CL3) :-
 realizeNode(EnvName,MS,X,_CL,[C0|CL0],[C0|CL0]) :-
 	!.
 realizeNode(EnvName,MS,X,[C|CL],[],CL1) :-
-	deduce(EnvName,MS,elementOf(X,C),_),
+	deduce(EnvName,MS,isa(X,C),_),
 	!,
 	CL1 = [C|CL].
 realizeNode(_,_,_,_,_,[]) :-
@@ -14433,7 +14399,7 @@ askNode(_EnvName,_MS,_esX,CL,[C0|CL0],CL1) :-
 	!,
 	append([C0|CL0],CL,CL1).
 askNode(EnvName,MS,X,[C|CL],[],CL1) :-
-	deduce(EnvName,MS,elementOf(X,C),_),
+	deduce(EnvName,MS,isa(X,C),_),
 	!,
 	CL1 = [C|CL].
 askNode(_,_,_,_,_,[]) :-
@@ -14520,9 +14486,28 @@ completeParameter([P1,P2,P3,P4],P1,P2,P3,P4) :-
 
 end_of_file.
 
+
+
+
+happy(A, B) :- member(C, B), C == happy(A), !, fail.
+happy(A, B) :- memberchk(not_Happy(A), B).
+happy(A, _) :- hasChild(A, B), hasChild(B, C), hasChild(B, D), pos_Clever(C), pos_Pretty(D).
+
+not_Clever(A, B) :- member(C, B), C == not_Clever(A), !, fail.
+not_Clever(A, B) :- memberchk(pos_Clever(A), B).
+not_Clever(A, B) :- F = [not_Clever(A)|B], hasChild(C, A), hasChild(D, C), hasChild(C, E), pos_Pretty(E), not_Happy(D, F).
+
+not_Pretty(A, B) :- member(C, B), C == not_Pretty(A), !, fail.
+not_Pretty(A, B) :- memberchk(pos_Pretty(A), B).
+not_Pretty(A, B) :- F = [not_Pretty(A)|B], hasChild(C, A), hasChild(D, C), hasChild(C, E), pos_Clever(E), not_Happy(D, F).
+
+not_Happy(A, B) :- memberchk(happy(A), B).
+pos_Clever(lisa). pos_Pretty(lisa). hasChild(kate, bob). hasChild(bob, lisa).
+
+
 % succ(A,_B,C,D,E):-succ(A,C,D,E).
 
-:-dynamic(in_motel_kb/1).
+:-motel_mpred(in_motel_kb/1).
 
 contains_instance(T):-atom(T),atom_concat(_,N,T),atom_number(N,_),!.
 contains_instance(T2) :- compound(T),
@@ -14532,7 +14517,7 @@ contains_instance(T2) :- compound(T),
 
 
 motel_term_expansion(_,H,B,true):- contains_instance(H:B),!.
-motel_term_expansion(_KB,H,B,true):- predicate_property(H,dynamic),assertz(H:-B),!.
+motel_term_expansion(_KB,H,B,true):- predicate_property(H,motel_mpred),assertz_if_new(H:-B),!.
 motel_term_expansion(_KB,H,B,true):- predicate_property(H,built_in),call(H),!.
 motel_term_expansion(_KB,H,B,true):- call(H).
 
@@ -14551,7 +14536,7 @@ motel_at_all_term_expansion(H,':-'(nopS(Out))):- in_motel_kb(KB),!, motel_term_e
 user:term_expansion(A,B):- fail, motel_at_all_term_expansion(A,B).
 
 
-:-asserta(in_motel_kb(fssKB)).
+:-asserta_if_new(in_motel_kb(fssKB)).
 
 'sb_defenv'('fssKB','What means fss?').
 'sb_initenv'('fssKB').
@@ -15274,155 +15259,155 @@ defrole(fssKB,[],agent,restr(subject,human)).
 defrole(fssKB,[],location_enter,restr(location,canvas)).
 defrole(fssKB,[],has_property_haben,restr(has_property,thing)).
 defrole(fssKB,[],quantity,restr(det,cardinal)).
-assert(roleDefault(env(t4259),[],truth_mod,bot)).
-assert(roleDefault(env(t4259),[],det,bot)).
-assert(roleDefault(env(t4259),[],deictic_mod,bot)).
-assert(roleDefault(env(t4259),[],named,bot)).
-assert(roleDefault(env(t4259),[],subject,bot)).
-assert(roleDefault(env(t4259),[],purpose,bot)).
-assert(roleDefault(env(t4259),[],time,bot)).
-assert(roleDefault(env(t4259),[],illoc,bot)).
-assert(roleDefault(env(t4259),[],cause,bot)).
-assert(roleDefault(env(t4259),[],result,bot)).
-assert(roleDefault(env(t4259),[],location,bot)).
-assert(roleDefault(env(t4259),[],time_state,bot)).
-assert(roleDefault(env(t4259),[],volition,bot)).
-assert(roleDefault(env(t4259),[],origin_mod,bot)).
-assert(roleDefault(env(t4259),[],agent,thing)).
-assert(roleDefault(env(t4259),[],location_wohn,bot)).
-assert(roleDefault(env(t4259),[],colour_mod,bot)).
-assert(roleDefault(env(t4259),[],relative_mod,bot)).
-assert(roleDefault(env(t4259),[],material_mod,bot)).
-assert(roleDefault(env(t4259),[],weight_mod,bot)).
-assert(roleDefault(env(t4259),[],agent,human)).
-assert(roleDefault(env(t4259),[],instrument,bot)).
-assert(roleDefault(env(t4259),[],concerned,bot)).
-assert(roleDefault(env(t4259),[],destination,bot)).
-assert(roleDefault(env(t4259),[],source,bot)).
-assert(roleDefault(env(t4259),[],means,touchable_object)).
-assert(roleDefault(env(t4259),[],result,thing)).
-assert(roleDefault(env(t4259),[],concerned,thing)).
-assert(roleDefault(env(t4259),[],location_enter,canvas)).
-assert(roleDefault(env(t4259),[],beneficative,bot)).
-assert(roleDefault(env(t4259),[],has_property,bot)).
-assert(roleDefault(env(t4259),[],measure,bot)).
-assert(roleDefault(env(t4259),[],measure,abstract_thing)).
-assert(roleDefault(env(t4259),[],has_property_haben,bot)).
-assert(roleDefault(env(t4259),[],quantity,cardinal)).
-assert(roleDefault(env(t4259),[],physis_mod,bot)).
-assert(roleDefault(env(t4259),[],volition,bot)).
-assert(roleDefault(env(t4259),[],worth_mod,bot)).
-assert(roleDefNr(env(t4259),[],truth_mod,1)).
-assert(roleDefNr(env(t4259),[],det,1)).
-assert(roleDefNr(env(t4259),[],deictic_mod,1)).
-assert(roleDefNr(env(t4259),[],named,1)).
-assert(roleDefNr(env(t4259),[],subject,1)).
-assert(roleDefNr(env(t4259),[],purpose,1)).
-assert(roleDefNr(env(t4259),[],time,1)).
-assert(roleDefNr(env(t4259),[],illoc,1)).
-assert(roleDefNr(env(t4259),[],cause,1)).
-assert(roleDefNr(env(t4259),[],result,1)).
-assert(roleDefNr(env(t4259),[],location,1)).
-assert(roleDefNr(env(t4259),[],volition,1)).
-assert(roleDefNr(env(t4259),[],origin_mod,1)).
-assert(roleDefNr(env(t4259),[],colour_mod,1)).
-assert(roleDefNr(env(t4259),[],relative_mod,1)).
-assert(roleDefNr(env(t4259),[],material_mod,1)).
-assert(roleDefNr(env(t4259),[],weight_mod,1)).
-assert(roleDefNr(env(t4259),[],instrument,1)).
-assert(roleDefNr(env(t4259),[],concerned,1)).
-assert(roleDefNr(env(t4259),[],destination,1)).
-assert(roleDefNr(env(t4259),[],source,1)).
-assert(roleDefNr(env(t4259),[],beneficative,1)).
-assert(roleDefNr(env(t4259),[],measure,1)).
-assert(roleDefNr(env(t4259),[],physis_mod,1)).
-assert(roleDefNr(env(t4259),[],volition,1)).
-assert(roleDefNr(env(t4259),[],worth_mod,1)).
-assert(roleDomain(env(t4259),[],truth_mod,abstract_thing)).
-assert(roleDomain(env(t4259),[],det,thing)).
-assert(roleDomain(env(t4259),[],deictic_mod,thing)).
-assert(roleDomain(env(t4259),[],named,thing)).
-assert(roleDomain(env(t4259),[],subject,predicate)).
-assert(roleDomain(env(t4259),[],purpose,predicate)).
-assert(roleDomain(env(t4259),[],time,predicate)).
-assert(roleDomain(env(t4259),[],illoc,predicate)).
-assert(roleDomain(env(t4259),[],cause,predicate)).
-assert(roleDomain(env(t4259),[],result,predicate)).
-assert(roleDomain(env(t4259),[],location,predicate)).
-assert(roleDomain(env(t4259),[],subject,concept90)).
-assert(roleDomain(env(t4259),[],time_state,concept93)).
-assert(roleDomain(env(t4259),[],volition,human)).
-assert(roleDomain(env(t4259),[],origin_mod,geographical_object)).
-assert(roleDomain(env(t4259),[],agent,concept111)).
-assert(roleDomain(env(t4259),[],location_wohn,concept113)).
-assert(roleDomain(env(t4259),[],colour_mod,concrete_thing)).
-assert(roleDomain(env(t4259),[],relative_mod,individual)).
-assert(roleDomain(env(t4259),[],material_mod,inanimate)).
-assert(roleDomain(env(t4259),[],weight_mod,touchable_object)).
-assert(roleDomain(env(t4259),[],agent,concept147)).
-assert(roleDomain(env(t4259),[],instrument,action)).
-assert(roleDomain(env(t4259),[],concerned,action)).
-assert(roleDomain(env(t4259),[],destination,motion)).
-assert(roleDomain(env(t4259),[],source,motion)).
-assert(roleDomain(env(t4259),[],means,motion_by_means)).
-assert(roleDomain(env(t4259),[],means,concept180)).
-assert(roleDomain(env(t4259),[],concerned,concept186)).
-assert(roleDomain(env(t4259),[],result,productive)).
-assert(roleDomain(env(t4259),[],result,concept190)).
-assert(roleDomain(env(t4259),[],concerned,write)).
-assert(roleDomain(env(t4259),[],concerned,concept194)).
-assert(roleDomain(env(t4259),[],location_enter,concept197)).
-assert(roleDomain(env(t4259),[],beneficative,transaction)).
-assert(roleDomain(env(t4259),[],concerned,concept209)).
-assert(roleDomain(env(t4259),[],concerned,concept212)).
-assert(roleDomain(env(t4259),[],has_property,property)).
-assert(roleDomain(env(t4259),[],measure,value_property)).
-assert(roleDomain(env(t4259),[],measure,cost)).
-assert(roleDomain(env(t4259),[],measure,concept226)).
-assert(roleDomain(env(t4259),[],has_property_haben,concept230)).
-assert(roleDomain(env(t4259),[],quantity,concept232)).
-assert(roleDomain(env(t4259),[],quantity,concept234)).
-assert(roleDomain(env(t4259),[],physis_mod,animate)).
-assert(roleDomain(env(t4259),[],volition,animal)).
-assert(roleDomain(env(t4259),[],worth_mod,vehicle)).
-assert(roleRange(env(t4259),[],truth_mod,truth_value)).
-assert(roleRange(env(t4259),[],det,determiner)).
-assert(roleRange(env(t4259),[],deictic_mod,pointing)).
-assert(roleRange(env(t4259),[],named,name)).
-assert(roleRange(env(t4259),[],subject,thing)).
-assert(roleRange(env(t4259),[],purpose,predicate)).
-assert(roleRange(env(t4259),[],time,time)).
-assert(roleRange(env(t4259),[],illoc,speech_act)).
-assert(roleRange(env(t4259),[],cause,predicate)).
-assert(roleRange(env(t4259),[],result,thing)).
-assert(roleRange(env(t4259),[],location,thing)).
-assert(roleRange(env(t4259),[],time_state,period)).
-assert(roleRange(env(t4259),[],volition,volitional_sq)).
-assert(roleRange(env(t4259),[],origin_mod,origin)).
-assert(roleRange(env(t4259),[],agent,human)).
-assert(roleRange(env(t4259),[],location_wohn,geographical_object)).
-assert(roleRange(env(t4259),[],colour_mod,colour)).
-assert(roleRange(env(t4259),[],relative_mod,relation)).
-assert(roleRange(env(t4259),[],material_mod,material)).
-assert(roleRange(env(t4259),[],weight_mod,weight)).
-assert(roleRange(env(t4259),[],agent,human)).
-assert(roleRange(env(t4259),[],instrument,touchable_object)).
-assert(roleRange(env(t4259),[],concerned,thing)).
-assert(roleRange(env(t4259),[],destination,geographical_object)).
-assert(roleRange(env(t4259),[],source,geographical_object)).
-assert(roleRange(env(t4259),[],means,touchable_object)).
-assert(roleRange(env(t4259),[],result,thing)).
-assert(roleRange(env(t4259),[],concerned,thing)).
-assert(roleRange(env(t4259),[],location_enter,canvas)).
-assert(roleRange(env(t4259),[],beneficative,human)).
-assert(roleRange(env(t4259),[],has_property,property_filler)).
-assert(roleRange(env(t4259),[],measure,abstract_thing)).
-assert(roleRange(env(t4259),[],measure,abstract_thing)).
-assert(roleRange(env(t4259),[],has_property_haben,thing)).
-assert(roleRange(env(t4259),[],quantity,cardinal)).
-assert(roleRange(env(t4259),[],physis_mod,physical_sq)).
-assert(roleRange(env(t4259),[],volition,volitional_sq)).
-assert(roleRange(env(t4259),[],worth_mod,worth)).
+assert_if_new(roleDefault(env(t4259),[],truth_mod,bot)).
+assert_if_new(roleDefault(env(t4259),[],det,bot)).
+assert_if_new(roleDefault(env(t4259),[],deictic_mod,bot)).
+assert_if_new(roleDefault(env(t4259),[],named,bot)).
+assert_if_new(roleDefault(env(t4259),[],subject,bot)).
+assert_if_new(roleDefault(env(t4259),[],purpose,bot)).
+assert_if_new(roleDefault(env(t4259),[],time,bot)).
+assert_if_new(roleDefault(env(t4259),[],illoc,bot)).
+assert_if_new(roleDefault(env(t4259),[],cause,bot)).
+assert_if_new(roleDefault(env(t4259),[],result,bot)).
+assert_if_new(roleDefault(env(t4259),[],location,bot)).
+assert_if_new(roleDefault(env(t4259),[],time_state,bot)).
+assert_if_new(roleDefault(env(t4259),[],volition,bot)).
+assert_if_new(roleDefault(env(t4259),[],origin_mod,bot)).
+assert_if_new(roleDefault(env(t4259),[],agent,thing)).
+assert_if_new(roleDefault(env(t4259),[],location_wohn,bot)).
+assert_if_new(roleDefault(env(t4259),[],colour_mod,bot)).
+assert_if_new(roleDefault(env(t4259),[],relative_mod,bot)).
+assert_if_new(roleDefault(env(t4259),[],material_mod,bot)).
+assert_if_new(roleDefault(env(t4259),[],weight_mod,bot)).
+assert_if_new(roleDefault(env(t4259),[],agent,human)).
+assert_if_new(roleDefault(env(t4259),[],instrument,bot)).
+assert_if_new(roleDefault(env(t4259),[],concerned,bot)).
+assert_if_new(roleDefault(env(t4259),[],destination,bot)).
+assert_if_new(roleDefault(env(t4259),[],source,bot)).
+assert_if_new(roleDefault(env(t4259),[],means,touchable_object)).
+assert_if_new(roleDefault(env(t4259),[],result,thing)).
+assert_if_new(roleDefault(env(t4259),[],concerned,thing)).
+assert_if_new(roleDefault(env(t4259),[],location_enter,canvas)).
+assert_if_new(roleDefault(env(t4259),[],beneficative,bot)).
+assert_if_new(roleDefault(env(t4259),[],has_property,bot)).
+assert_if_new(roleDefault(env(t4259),[],measure,bot)).
+assert_if_new(roleDefault(env(t4259),[],measure,abstract_thing)).
+assert_if_new(roleDefault(env(t4259),[],has_property_haben,bot)).
+assert_if_new(roleDefault(env(t4259),[],quantity,cardinal)).
+assert_if_new(roleDefault(env(t4259),[],physis_mod,bot)).
+assert_if_new(roleDefault(env(t4259),[],volition,bot)).
+assert_if_new(roleDefault(env(t4259),[],worth_mod,bot)).
+assert_if_new(roleDefNr(env(t4259),[],truth_mod,1)).
+assert_if_new(roleDefNr(env(t4259),[],det,1)).
+assert_if_new(roleDefNr(env(t4259),[],deictic_mod,1)).
+assert_if_new(roleDefNr(env(t4259),[],named,1)).
+assert_if_new(roleDefNr(env(t4259),[],subject,1)).
+assert_if_new(roleDefNr(env(t4259),[],purpose,1)).
+assert_if_new(roleDefNr(env(t4259),[],time,1)).
+assert_if_new(roleDefNr(env(t4259),[],illoc,1)).
+assert_if_new(roleDefNr(env(t4259),[],cause,1)).
+assert_if_new(roleDefNr(env(t4259),[],result,1)).
+assert_if_new(roleDefNr(env(t4259),[],location,1)).
+assert_if_new(roleDefNr(env(t4259),[],volition,1)).
+assert_if_new(roleDefNr(env(t4259),[],origin_mod,1)).
+assert_if_new(roleDefNr(env(t4259),[],colour_mod,1)).
+assert_if_new(roleDefNr(env(t4259),[],relative_mod,1)).
+assert_if_new(roleDefNr(env(t4259),[],material_mod,1)).
+assert_if_new(roleDefNr(env(t4259),[],weight_mod,1)).
+assert_if_new(roleDefNr(env(t4259),[],instrument,1)).
+assert_if_new(roleDefNr(env(t4259),[],concerned,1)).
+assert_if_new(roleDefNr(env(t4259),[],destination,1)).
+assert_if_new(roleDefNr(env(t4259),[],source,1)).
+assert_if_new(roleDefNr(env(t4259),[],beneficative,1)).
+assert_if_new(roleDefNr(env(t4259),[],measure,1)).
+assert_if_new(roleDefNr(env(t4259),[],physis_mod,1)).
+assert_if_new(roleDefNr(env(t4259),[],volition,1)).
+assert_if_new(roleDefNr(env(t4259),[],worth_mod,1)).
+assert_if_new(roleDomain(env(t4259),[],truth_mod,abstract_thing)).
+assert_if_new(roleDomain(env(t4259),[],det,thing)).
+assert_if_new(roleDomain(env(t4259),[],deictic_mod,thing)).
+assert_if_new(roleDomain(env(t4259),[],named,thing)).
+assert_if_new(roleDomain(env(t4259),[],subject,predicate)).
+assert_if_new(roleDomain(env(t4259),[],purpose,predicate)).
+assert_if_new(roleDomain(env(t4259),[],time,predicate)).
+assert_if_new(roleDomain(env(t4259),[],illoc,predicate)).
+assert_if_new(roleDomain(env(t4259),[],cause,predicate)).
+assert_if_new(roleDomain(env(t4259),[],result,predicate)).
+assert_if_new(roleDomain(env(t4259),[],location,predicate)).
+assert_if_new(roleDomain(env(t4259),[],subject,concept90)).
+assert_if_new(roleDomain(env(t4259),[],time_state,concept93)).
+assert_if_new(roleDomain(env(t4259),[],volition,human)).
+assert_if_new(roleDomain(env(t4259),[],origin_mod,geographical_object)).
+assert_if_new(roleDomain(env(t4259),[],agent,concept111)).
+assert_if_new(roleDomain(env(t4259),[],location_wohn,concept113)).
+assert_if_new(roleDomain(env(t4259),[],colour_mod,concrete_thing)).
+assert_if_new(roleDomain(env(t4259),[],relative_mod,individual)).
+assert_if_new(roleDomain(env(t4259),[],material_mod,inanimate)).
+assert_if_new(roleDomain(env(t4259),[],weight_mod,touchable_object)).
+assert_if_new(roleDomain(env(t4259),[],agent,concept147)).
+assert_if_new(roleDomain(env(t4259),[],instrument,action)).
+assert_if_new(roleDomain(env(t4259),[],concerned,action)).
+assert_if_new(roleDomain(env(t4259),[],destination,motion)).
+assert_if_new(roleDomain(env(t4259),[],source,motion)).
+assert_if_new(roleDomain(env(t4259),[],means,motion_by_means)).
+assert_if_new(roleDomain(env(t4259),[],means,concept180)).
+assert_if_new(roleDomain(env(t4259),[],concerned,concept186)).
+assert_if_new(roleDomain(env(t4259),[],result,productive)).
+assert_if_new(roleDomain(env(t4259),[],result,concept190)).
+assert_if_new(roleDomain(env(t4259),[],concerned,write)).
+assert_if_new(roleDomain(env(t4259),[],concerned,concept194)).
+assert_if_new(roleDomain(env(t4259),[],location_enter,concept197)).
+assert_if_new(roleDomain(env(t4259),[],beneficative,transaction)).
+assert_if_new(roleDomain(env(t4259),[],concerned,concept209)).
+assert_if_new(roleDomain(env(t4259),[],concerned,concept212)).
+assert_if_new(roleDomain(env(t4259),[],has_property,property)).
+assert_if_new(roleDomain(env(t4259),[],measure,value_property)).
+assert_if_new(roleDomain(env(t4259),[],measure,cost)).
+assert_if_new(roleDomain(env(t4259),[],measure,concept226)).
+assert_if_new(roleDomain(env(t4259),[],has_property_haben,concept230)).
+assert_if_new(roleDomain(env(t4259),[],quantity,concept232)).
+assert_if_new(roleDomain(env(t4259),[],quantity,concept234)).
+assert_if_new(roleDomain(env(t4259),[],physis_mod,animate)).
+assert_if_new(roleDomain(env(t4259),[],volition,animal)).
+assert_if_new(roleDomain(env(t4259),[],worth_mod,vehicle)).
+assert_if_new(roleRange(env(t4259),[],truth_mod,truth_value)).
+assert_if_new(roleRange(env(t4259),[],det,determiner)).
+assert_if_new(roleRange(env(t4259),[],deictic_mod,pointing)).
+assert_if_new(roleRange(env(t4259),[],named,name)).
+assert_if_new(roleRange(env(t4259),[],subject,thing)).
+assert_if_new(roleRange(env(t4259),[],purpose,predicate)).
+assert_if_new(roleRange(env(t4259),[],time,time)).
+assert_if_new(roleRange(env(t4259),[],illoc,speech_act)).
+assert_if_new(roleRange(env(t4259),[],cause,predicate)).
+assert_if_new(roleRange(env(t4259),[],result,thing)).
+assert_if_new(roleRange(env(t4259),[],location,thing)).
+assert_if_new(roleRange(env(t4259),[],time_state,period)).
+assert_if_new(roleRange(env(t4259),[],volition,volitional_sq)).
+assert_if_new(roleRange(env(t4259),[],origin_mod,origin)).
+assert_if_new(roleRange(env(t4259),[],agent,human)).
+assert_if_new(roleRange(env(t4259),[],location_wohn,geographical_object)).
+assert_if_new(roleRange(env(t4259),[],colour_mod,colour)).
+assert_if_new(roleRange(env(t4259),[],relative_mod,relation)).
+assert_if_new(roleRange(env(t4259),[],material_mod,material)).
+assert_if_new(roleRange(env(t4259),[],weight_mod,weight)).
+assert_if_new(roleRange(env(t4259),[],agent,human)).
+assert_if_new(roleRange(env(t4259),[],instrument,touchable_object)).
+assert_if_new(roleRange(env(t4259),[],concerned,thing)).
+assert_if_new(roleRange(env(t4259),[],destination,geographical_object)).
+assert_if_new(roleRange(env(t4259),[],source,geographical_object)).
+assert_if_new(roleRange(env(t4259),[],means,touchable_object)).
+assert_if_new(roleRange(env(t4259),[],result,thing)).
+assert_if_new(roleRange(env(t4259),[],concerned,thing)).
+assert_if_new(roleRange(env(t4259),[],location_enter,canvas)).
+assert_if_new(roleRange(env(t4259),[],beneficative,human)).
+assert_if_new(roleRange(env(t4259),[],has_property,property_filler)).
+assert_if_new(roleRange(env(t4259),[],measure,abstract_thing)).
+assert_if_new(roleRange(env(t4259),[],measure,abstract_thing)).
+assert_if_new(roleRange(env(t4259),[],has_property_haben,thing)).
+assert_if_new(roleRange(env(t4259),[],quantity,cardinal)).
+assert_if_new(roleRange(env(t4259),[],physis_mod,physical_sq)).
+assert_if_new(roleRange(env(t4259),[],volition,volitional_sq)).
+assert_if_new(roleRange(env(t4259),[],worth_mod,worth)).
 
 :-retract(in_motel_kb(fssKB)).
 

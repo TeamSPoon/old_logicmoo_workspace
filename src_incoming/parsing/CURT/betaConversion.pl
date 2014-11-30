@@ -21,7 +21,7 @@
 
 *************************************************************************/
 
-:- module(betaConversion,[info/0,
+:-swi_module(betaConversion,[info/0,
                           infix/0,
                           prefix/0, 
                           betaConvertTestSuite/0,

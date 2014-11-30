@@ -21,7 +21,7 @@
 
 *************************************************************************/
 
-:- module(situationalKnowledge,[situationalKnowledge/1]).
+:-swi_module(situationalKnowledge,[situationalKnowledge/1]).
 
 :- dynamic situationalKnowledge/1.
 

@@ -53,7 +53,7 @@ channel(gossup).
 
 createableType('TemporallyExistingThing').
 
-:-dynamic moo:type_max_health/2. 
+:-dynamic type_max_health/2. 
 
 multiValued(contains(container,obj)).
 multiValued(grid(region,int,int,obj)).
@@ -91,9 +91,9 @@ type(typeDeclarer).
 :-doall((argsIsaProps(F),decl_type(F),add(isa(F,typeDeclarer)))).
 
 :-decl_mpred_prolog(repl_writer(agent,term)).
-%:-decl_mpred_hybrid(repl_writer(agent,term),[singleValued,default_sv(2,look:default_repl_writer)]).
+%:-decl_mpred_hybrid(repl_writer(agent,term),[singleValued,default_sv(2,default_repl_writer)]).
 :-decl_mpred_prolog(repl_to_string(agent,term)).
-%:-decl_mpred_hybrid(repl_to_string(agent,term),[singleValued,default_sv(2,look:default_repl_obj_to_string)]).
+%:-decl_mpred_hybrid(repl_to_string(agent,term),[singleValued,default_sv(2,default_repl_obj_to_string)]).
 
 %mpred(ArgTypes,PropTypes):-decl_mpred_prop(ArgTypes,PropTypes).
 % somethingIsa('NpcCol1012-Ensign732',['NpcCol1012',actor,'MaleAnimal']).
@@ -121,7 +121,7 @@ term_anglify_last(Head,English):-compound(Head),
 term_anglify(Head,EnglishO):- compound(Head), 
    Head=..[F|ARGS],mpred_prop(F,Info),
    member(Info,[singleValued,multi(_)]),   
-   term_anglify_args(Head,F,1,ARGS,Info,English),world:fully_expand(English,EnglishO),!.
+   term_anglify_args(Head,F,1,ARGS,Info,English),fully_expand(English,EnglishO),!.
 
 
 term_anglify_args(Head,F,A,ARGS,multi(Which),English):- !,replace_nth(ARGS,Which,_OldVar,NewVar,NEWARGS),!,
@@ -133,12 +133,12 @@ term_anglify_args(Head,F,A,ARGS,multi(Which),English):- !,replace_nth(ARGS,Which
 
 term_expansion((term_anglify_args(_Head,F,A,ARGS0,singleValued,English):- add_arg_parts_of_speech(F,1,ARGS0,ARGS),verb_after_arg(F,A,After),
 insert_into(ARGS,After,verbFn(F),NEWARGS),
-world:fully_expand(NEWARGS,English),X),O).
+fully_expand(NEWARGS,English),X),O).
 
 */
 term_anglify_args(_Head,F,A,ARGS0,singleValued,English):- add_arg_parts_of_speech(F,1,ARGS0,ARGS),verb_after_arg(F,A,After),
 insert_into(ARGS,After,verbFn(F),NEWARGS),
-world:fully_expand(NEWARGS,English),!.
+fully_expand(NEWARGS,English),!.
 
 unCamelCase(S,String):-any_to_string(S,Str),S\=Str,!,unCamelCase(Str,String),!.
 unCamelCase("",""):-!.
@@ -226,9 +226,9 @@ assertionMacroHead(sorts(type,list(type))).
 %mpred(ArgTypes,[singleValued]):-singleValued(ArgTypes).
 %mpred(CallSig,[external(M)]):-prologBuiltin(M:CallSig).
 
-prologBuiltin(world:nearby(obj,obj)).
-%prologBuiltin(world:isa(obj,type)).
-%prologBuiltin(world:same(id,id)).
+prologBuiltin(nearby(obj,obj)).
+%prologBuiltin(isa(obj,type)).
+%prologBuiltin(same(id,id)).
 
 
 % multiValued
@@ -254,7 +254,7 @@ argsIsaInList(success(agent,term)).
 
 :-decl_mpred(act_affect/3).
 
-:-decl_mpred_prolog(member/2).
+% :-decl_mpred_prolog(member/2).
 
 
 nameStrings(apath(Region,Dir),Text):- pathName(Region,Dir,Text).
@@ -305,8 +305,8 @@ multiValued(equivRule(term,term),nonGroundOK,prologOnly).
 equivRule(multiValued(CallSig,[assert_with_pred(hooked_asserta),retract_with_pred(hooked_retract),query_with_pred(call)]),prologBuiltin(CallSig)).
 
 
-ask_module(nearby(obj,obj),world).
-%  ask_module(isa(obj,type),world).
+ask_module(nearby(obj,obj),user).
+%  ask_module(isa(obj,type),user).
 % db_prop_prolog(world,isa(obj,type)).
 % db_prop_prolog(world,same(id,id)).
 
@@ -323,16 +323,20 @@ argsIsaInList(default_sv(singleValued,int,term)).
 argsIsaInList(member(term,term)).
 
 % live another day to fight (meaning repl_to_string/1 for now is in prolog)
-% singleValued(repl_writer(agent,term),default_sv(2,look:default_repl_writer)).
-% singleValued(repl_to_string(agent,term),[singleValued,default_sv(2,look:default_repl_obj_to_string)]).
+% singleValued(repl_writer(agent,term),default_sv(2,default_repl_writer)).
+% singleValued(repl_to_string(agent,term),[singleValued,default_sv(2,default_repl_obj_to_string)]).
 
 %multiValued(label_type(string,type),[singleValued]).
 
 
 
-listValued(look:get_feet(agent,list(spatialthing)),[]).
-listValued(look:get_near(agent,list(spatialthing)),[ask_module(look)]).
-listValued(get_percepts(agent,list(spatialthing)),[ask_module(look)]).
+listValued(get_feet(agent,list(spatialthing)),[]).
+listValued(get_near(agent,list(spatialthing)),[ask_module(user)]).
+listValued(get_percepts(agent,list(spatialthing)),[ask_module(user)]).
+
+subclass(fpred,pred).
+subclass(mpred,pred).
+subclass(pred,relation).
 
 argsIsaInList(mud_test(term,prolog)).
 
@@ -391,7 +395,7 @@ singleValued(facing(obj,dir(n))).
 singleValued(facing(obj,dir)).
 singleValued(height(obj,int)).
 singleValued(objid(obj,id)).
-singleValued(localityOfObject(obj,spatialthing)).
+argsIsaInList(localityOfObject(obj,spatialthing)).
 singleValued(last_command(agent,command)).
 singleValued(location_center(region,xyz(region,int,int,int))).
 singleValued(movedist(agent,int(1))).
@@ -443,10 +447,12 @@ type(var).
 type(string).
 formattype(var).
 formattype(string).
+/*
 :-decl_mpred_prolog(var/1).
 :-decl_mpred_prolog(string/1).
 :-decl_mpred_prolog(number/1).
 :-decl_mpred_prolog(integer/1).
+*/
 
 :-decl_mpred_hybrid(color/2).
 :-decl_mpred_hybrid(material/2).

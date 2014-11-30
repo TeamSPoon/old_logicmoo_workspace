@@ -7,7 +7,7 @@
 
 **********************************************************************/
 
-:- module(resolvePresupScore,[projectDrs/2,accommodate/2]).
+:-swi_module(resolvePresupScore,[projectDrs/2,accommodate/2]).
 
 :- ensure_loaded(comsemOperators).
 

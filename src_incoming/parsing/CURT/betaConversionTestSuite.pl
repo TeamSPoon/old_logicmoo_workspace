@@ -21,7 +21,7 @@
 
 *************************************************************************/
 
-:- module(betaConversionTestSuite,[expression/2]).
+:-swi_module(betaConversionTestSuite,[expression/2]).
 
 
 /*========================================================================

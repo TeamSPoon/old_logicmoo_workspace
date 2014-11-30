@@ -7,7 +7,7 @@
 */
 
 % Declare the module name and the exported (public) predicates.
-:- module(vacuum,[]).
+:-swi_module(vacuum,[]).
 
 % Predicates asserted during run.
 % :- dynamic memory/2.
@@ -18,9 +18,9 @@
 % Possible agent actions.
 
 :-decl_type(vacuum).
-moo:type(vacuum).
+type(vacuum).
 
-moo:world_agent_plan(_World,Agent,Act):-
+world_agent_plan(_World,Agent,Act):-
    isa(Agent,vacuum),
    vacuum_idea(Agent,Act).
 

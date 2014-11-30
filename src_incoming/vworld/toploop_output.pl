@@ -1,38 +1,38 @@
 /** <module>  
 %  Database pretty outputing controls 
 %
-% Project Logicmoo: A MUD server written in Prolog
+% Logicmoo Project PrologMUD: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
 */
 
-:- module(toploop_output, []).
+:-swi_module(toploop_output, []).
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(utility).
+:- register_module_type(utility).
 
 % live another day to fight (meaning repl_to_string/1 for now is in prolog)
 % local_decl_db_prop(repl_writer(agent,term),[singleValued,default_sv(2,default_repl_writer)]).
 % local_decl_db_prop(repl_to_string(agent,term),[singleValued,default_sv(2,default_repl_obj_to_string)]).
 
-:-export(default_repl_writer/4).
+:-swi_export(default_repl_writer/4).
 default_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=o),fmt('~q=D(~w)~q.~n',[N,TypeO,V]).
-:-export(default_repl_obj_to_string/3).
+:-swi_export(default_repl_obj_to_string/3).
 default_repl_obj_to_string(O,Type,toStringD(TypeO,O)):-copy_term(Type,TypeO),ignore(TypeO=o).
 
 
 canUseEnglish:-true.
 
-:-export(show_kb_preds/3).
+:-swi_export(show_kb_preds/3).
 
-:-export(show_kb_preds/2).
+:-swi_export(show_kb_preds/2).
 show_kb_preds(Agent,List):- mmake,
       ignore(atloc(Agent,LOC)),
       show_kb_preds(Agent,LOC,List).
 
-:-export(show_kb_preds/3).
+:-swi_export(show_kb_preds/3).
 show_kb_preds(Agent,LOC,List):-
       ignore(atloc(Agent,LOC)),
        locationToRegion(LOC,Region),
@@ -43,7 +43,7 @@ show_kb_preds(Agent,LOC,List):-
 
 
 
-:-export(show_kb_via_pred/3).
+:-swi_export(show_kb_via_pred/3).
 show_kb_via_pred(_,_,[]).
 show_kb_via_pred(WPred,ToSTR,[L|List]):-!,
    show_kb_via_pred(WPred,ToSTR,L),
@@ -53,7 +53,7 @@ show_kb_via_pred(WPred,ToSTR,L):-!,
 
 
 
-:-export(show_kb_via_pred_0/3).
+:-swi_export(show_kb_via_pred_0/3).
 
 show_kb_via_pred_0(WPred,ToSTR,listof(Call)):- contains_var(Call,value),subst(Call,value,P,PCall),subst(Call,value,PS,PSCall),!,
                                                show_kb_via_pred_0(WPred,ToSTR,forEach(findall(P,PCall,PS),fmt(PSCall))).

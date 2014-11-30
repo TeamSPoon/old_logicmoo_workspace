@@ -23,7 +23,7 @@
 % mdif(A,B):- tlbugger:attributedVars,!,dif(A,B).
 mdif(_,_).
 
-:-export((samef/2,same/2)).
+:-swi_export((samef/2,same/2)).
 same(X,Y):- samef(X,Y),!.
 same(X,Y):- compound(X),arg(1,X,Y),!.
 same(X,Y):- compound(Y),arg(1,Y,X),!.
@@ -33,10 +33,10 @@ samef(X,Y):- X=Y,!.
 samef(X,Y):- hotrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci(XF,YF)))).
 
 
-:-export(arg_to_var/3).
+:-swi_export(arg_to_var/3).
 arg_to_var(_Type,_String,_Var).
 
-:-export(same_arg/3).
+:-swi_export(same_arg/3).
 
 same_arg(_How,X,Y):-var(X),var(Y),!,X=Y.
 same_arg(equals,X,Y):-!,equals_call(X,Y).
@@ -243,28 +243,28 @@ when_goals(call(Conj)) -->
 when_conj_goals((A,B)) --> !,
 	when_conj_goals(A),
 	when_conj_goals(B).
-when_conj_goals(moo:G) -->
+when_conj_goals(G) -->
 	when_goal(G).
 
 when_goal(trigger_nonvar(X, G)) -->
 	(   { disj_goal(G, Disj, DG) }
 	->  disj_or(Disj, DG)
-	;   { G = moo:varcall:trigger(C, Goal) }
+	;   { G = varcall:trigger(C, Goal) }
 	->  [ when_met((nonvar(X),C), Goal) ]
 	;   [ when_met(nonvar(X),G) ]
 	).
 when_goal(trigger_ground(X, G)) -->
 	(   { disj_goal(G, Disj, DG) }
 	->  disj_or(Disj, DG)
-	;   { G = moo:varcall:trigger(C, Goal) }
+	;   { G = varcall:trigger(C, Goal) }
 	->  [ when_met((ground(X),C), Goal) ]
 	;   [ when_met(ground(X),G) ]
 	).
 when_goal(wake_det(_)) -->
 	[].
 
-disj_goal(moo:check_disj(X, _, _), [], -) :- X == (-).
-disj_goal(moo:check_disj(-, Or, DG), Or, DG).
+disj_goal(check_disj(X, _, _), [], -) :- X == (-).
+disj_goal(check_disj(-, Or, DG), Or, DG).
 
 disj_or([], _) --> [].
 disj_or(List, DG) -->
@@ -278,9 +278,9 @@ or_list([H|T], (H;OT)) :-
 
 
 
-% :- module(domain, [ domain/2  ]). % Var, ?Domain
+% :-swi_module(domain, [ domain/2  ]). % Var, ?Domain
 :- use_module(library(ordsets)).
-:-export(domain/2).
+:-swi_export(domain/2).
 domain(X, Dom) :-
       var(Dom), !,
       get_attr(X, domain, Dom).
@@ -289,13 +289,13 @@ domain(X, List) :-
       put_attr(Y, domain, Domain),
       X = Y.
 
-:-export(extend_domain/2).
+:-swi_export(extend_domain/2).
 extend_domain(X, DomL):- init_dom(X, Dom2), ord_union(Dom2, DomL, NewDomain),put_attr( X, domain, NewDomain ).
 
-:-export(extend_dom/2).
+:-swi_export(extend_dom/2).
 extend_dom(X, DomE):-  init_dom(X, Dom2),ord_add_element(Dom2, DomE, NewDomain),put_attr( X, domain, NewDomain ).
 
-:-export(init_dom/2).
+:-swi_export(init_dom/2).
 init_dom(X,Dom):-get_attr(X, domain, Dom),!.
 init_dom(X,Dom):-Dom =[_], put_attr(X, domain, Dom),!.
 
@@ -325,7 +325,7 @@ domain:attribute_goals(X) -->
 
 
 
-:-export(isac/2).
+:-swi_export(isac/2).
 isac(X, Dom) :-
       var(Dom), !,
       get_attr(X, isac, Dom).

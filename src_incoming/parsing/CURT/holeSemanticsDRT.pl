@@ -7,7 +7,7 @@
  
 *************************************************************************/
 
-:- module(holeSemanticsDRT,[holeSemanticsDRT/0,
+:-swi_module(holeSemanticsDRT,[holeSemanticsDRT/0,
 			    holeSemanticsDRT/2,
 			    holeSemanticsDRTTestSuite/0]).
 

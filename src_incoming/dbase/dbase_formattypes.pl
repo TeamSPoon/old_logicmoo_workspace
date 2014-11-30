@@ -2,14 +2,14 @@
 /** <module> 
 % This is mainly used by the moo_loader but also needed everywhere
 %
-% Project Logicmoo: A MUD server written in Prolog
+% Logicmoo Project PrologMUD: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
 */
 % =======================================================
 /*
-:- module(dbase_formattypes, [
+:-swi_module(dbase_formattypes, [
           any_to_dir_ns/2,
           any_to_number/2,
           any_to_value/2,
@@ -25,7 +25,7 @@
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
-:-export(split_name_type/3).
+:-swi_export(split_name_type/3).
 :- '$hide'(split_name_type/3).
 split_name_type(Suggest,InstName,Type):- must_det(split_name_type_0(Suggest,NewInstName,NewType)),!,must((NewInstName=InstName,NewType=Type)).
 split_name_type_0(S,P,C):- string(S),!,atom_string(A,S),split_name_type_0(A,P,C).
@@ -35,13 +35,13 @@ split_name_type_0(T,T,C):- notrace(atomic_list_concat_safe([C,'-',_],T)).
 split_name_type_0(T,T,C):- atom(T),atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),ccatch(number_codes(_,Digits),_,fail),atom_codes(C,Type).
 split_name_type_0(C,P,C):- atom(C),gensym(C,P).
 
-:-dynamic(moo:formattype/1).
-:-export(moo:formattype/1).
+:-dynamic(formattype/1).
+:-swi_export(formattype/1).
 
-% moo:formattype(S):-   is_asserted(moo:ft_info(S,_)).
-% moo:formattype(S):-   is_asserted(moo:subft(S,_)).
+% formattype(S):-   is_asserted(ft_info(S,_)).
+% formattype(S):-   is_asserted(subft(S,_)).
 
-formattype_guessable(S):- moo:ft_info(S,_).
+formattype_guessable(S):- ft_info(S,_).
 
 term_is_ft(Term,Type):- var(Type),var(Term),!,member(Type,[var,prolog]).
 term_is_ft(Term,Type):- var(Term),!,member(Type,[var,term,prolog]).
@@ -51,15 +51,15 @@ term_is_ft(Term,Type):- must_det(formattype(Type)),
    correctFormatType(query(_HLDS,_OldV),Term,How,NewTerm),!,
    sameArgTypes(NewTerm,Term).
 
-ft_info_how(FT,formatted(FT)):-moo:ft_info(FT,formatted).
-ft_info_how(FT,self_call(Info)):-moo:ft_info(FT,Info),Info\=formatted.
+ft_info_how(FT,formatted(FT)):-ft_info(FT,formatted).
+ft_info_how(FT,self_call(Info)):-ft_info(FT,Info),Info\=formatted.
 
 trans_subft_info(FT,Info):-ft_info_how(FT,Info).
 trans_subft_info(FT,Info):-trans_subft(Sub,FT),ft_info_how(Sub,Info),!.
 trans_subft_info(FT,Info):-trans_subft(FT,Sub),ft_info_how(Sub,Info),!.
-trans_subft(FT,Sub):-moo:subft(FT,Sub).
-trans_subft(FT,Sub):-moo:subft(FT,A),moo:subft(A,Sub).
-trans_subft(FT,Sub):-moo:subft(FT,A),moo:subft(A,B),moo:subft(B,Sub).
+trans_subft(FT,Sub):-subft(FT,Sub).
+trans_subft(FT,Sub):-subft(FT,A),subft(A,Sub).
+trans_subft(FT,Sub):-subft(FT,A),subft(A,B),subft(B,Sub).
 
 sameArgTypes(A,C):-same(A,C);(pl_arg_type(C,CT),pl_arg_type(A,AT),!,typesOverlap(AT,CT)).
 typesOverlap(AT,AT).
@@ -79,8 +79,8 @@ pl_arg_type(Arg,Type):-
 mpred_arity_pred(P):- nonvar(P),arg(_,a(arity,arityMax,arityMin),P).
 mpred_arity_pred(mpred_arity).
 
-as_one_of(Types,Type):-nonvar(Type),moo:type(Type),!,member(Type,Types).
-as_one_of([Type],TypeO):-!,moo:same_arg(same_or(subclass),Type,TypeO).
+as_one_of(Types,Type):-nonvar(Type),type(Type),!,member(Type,Types).
+as_one_of([Type],TypeO):-!,same_arg(same_or(subclass),Type,TypeO).
 as_one_of(Types,oneOf(Types)).
 
 
@@ -96,7 +96,7 @@ argIsa_call_nt(_O,F,N,Type):-argIsa_call_nt(F,N,Type).
 
 argIsa(F,N,Isa):-argIsa_call(F,N,Isa).
 
-:-export(argIsa_call/3).
+:-swi_export(argIsa_call/3).
 argIsa_call(F,N,Type):- argIsa_call_0(F,N,Type),!.
 argIsa_call(F,N,Type):- argIsa_asserted(F,N,Type),!.
 argIsa_call(F,N,Type):- argIsa_call_1(F,N,Type),!.
@@ -140,7 +140,7 @@ argIsa_call_0(F,N,Type):-between(1,2,N),argIsa_call_3(F,Type).
 argIsa_call_0(class_template,N,Type):- (N=1 -> Type=type;Type=list(voprop)).
 argIsa_call_0(Arity,N,T):-mpred_arity_pred(Arity),!,arg(N,vv(mpred,int,type),T).
 argIsa_call_0(F,2,string):-member(F,[descriptionHere,nameStrings,keyword]).
-argIsa_call_0(F,N,Type):-moo:typeDeclarer(F),!,(N=1 -> Type=F ; Type=term(voprop)).
+argIsa_call_0(F,N,Type):-typeDeclarer(F),!,(N=1 -> Type=F ; Type=term(voprop)).
 
 argIsa_call_3(WP,mpred(arity(2))):-member(WP,[retract_with_pred,assert_with_pred,query_with_pred,genlPreds,genlInverse]).
 argIsa_call_3(disjointWith,type).
@@ -180,7 +180,7 @@ argIsa_call_1(Prop,N1,Type):- dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),m
 argIsa_call_1(_,_,term).
 argIsa_call_1(facing,_,term).
 
-:-export(db_quf/4).
+:-swi_export(db_quf/4).
 db_quf(Op,M:C,Pretest,Template):-var(C),!,throw(var(db_quf(Op,M:C,Pretest,Template))).
 db_quf(Op,_:C,Pretest,Template):-nonvar(C),!,db_quf(Op,C,Pretest,Template).
 db_quf(Op,','(C,D),','(C2,D2),','(C3,D3)):-!,db_quf(Op,C,C2,C3),db_quf(Op,D,D2,D3).
@@ -198,11 +198,11 @@ translate_args(Op,Prop,A,OBJ,N1,[ARG|S],[NEW|ARGS],GIN,GOALS):-
    N2 is N1 +1,
    translate_args(Op,Prop,A,OBJ,N2,S,ARGS,GMID,GOALS).
 
-:-export(infix_op/2).
+:-swi_export(infix_op/2).
 infix_op(OP,_):-comparitiveOp(OP).
 infix_op(OP,_):-additiveOp(OP).
 
-:-export(comparitiveOp/1).
+:-swi_export(comparitiveOp/1).
 comparitiveOp((\=)).
 comparitiveOp((\==)).
 comparitiveOp((=)).
@@ -213,7 +213,7 @@ comparitiveOp((>)).
 comparitiveOp((=<)).
 comparitiveOp((>=)).
 
-:-export(additiveOp/1).
+:-swi_export(additiveOp/1).
 additiveOp((is)).
 additiveOp((*)).
 additiveOp(+).
@@ -260,7 +260,7 @@ compare_op(Type,F,OLD,VAL):-nop(Type),show_call((call(F,OLD,VAL))),!.
 % start of database
 % These will all be deleted at start of run
 
-:-export(inverse_args/2).
+:-swi_export(inverse_args/2).
 inverse_args([AR,GS],[GS,AR]):-!.
 inverse_args([AR,G,S],[S,G,AR]):-!.
 inverse_args([A,R,G,S],[S,R,G,A]):-!.
@@ -271,15 +271,15 @@ inverse_args([P,A,R,G,S],[S,A,R,G,P]):-!.
 % =======================================================
 
 
-moo:decl_coerce(A,Type,AA):- correctAnyType(change(_,_),A,Type,AA).
+decl_coerce(A,Type,AA):- correctAnyType(change(_,_),A,Type,AA).
 
-:-export(same_vars/2).
+:-swi_export(same_vars/2).
 same_vars(T1,T2):-term_variables(T1,V1),term_variables(T2,V2),!,V1==V2.
 
-:-export(correctArgsIsa/2).
+:-swi_export(correctArgsIsa/2).
 correctArgsIsa(In,Out):- correctArgsIsa(query(must,dbase_t),In,Out),!.
 
-:-export(correctArgsIsa/3).
+:-swi_export(correctArgsIsa/3).
 correctArgsIsa(_,A,A):- bad_idea,!.
 % correctArgsIsa(_,A,A):- is_release,!.
 correctArgsIsa(_,NC,NC):-not(compound(NC)),!.
@@ -289,7 +289,7 @@ correctArgsIsa(_Op,G,G):- functor(G,F,A),arg(_,vv(subclass/_,isa/_,':-'/_
 correctArgsIsa(Op,A,AA):- correctArgsIsa0(Op,A,AA),nonvar(AA),!.
 correctArgsIsa(Op,A,AA):- grtrace,correctArgsIsa0(Op,A,AA).
 
-:-export(correctArgsIsa/4).
+:-swi_export(correctArgsIsa/4).
 correctArgsIsa(Op,A,Type,AA):- trace_or_throw(warn(not(correctArgsIsa(Op,A,Type,AA)))).
 
 
@@ -314,7 +314,7 @@ discoverAndCorrectArgsIsa(Op,Prop,N1,[A|Args],Out):-
    discoverAndCorrectArgsIsa(Op,Prop,N2,Args,AArgs),
     Out = [AA|AArgs].
 
-:-export(correctAnyType/4).
+:-swi_export(correctAnyType/4).
 
 % correctAnyType(_,A,_,A):-is_release.
 
@@ -327,20 +327,20 @@ correctAnyType(Op,A,Type,A):- dtrace,dmsg(warn(not(correctAnyType(Op,A,Type)))).
 
 %  @set movedist 4
 
-:-export(correctFormatType/4).
+:-swi_export(correctFormatType/4).
 correctFormatType(Op,A,Type,AA):- var(A),correctType(Op,A,Type,AA),must_det(var(AA)),must_det(A==AA),!.
 correctFormatType(Op,A,Type,AA):- var(Type),trace_or_throw(correctFormatType(Op,A,Type,AA)).
 correctFormatType(Op,A,Type,AA):- correctType(Op,A,Type,AA),nonvar(AA),!.
 correctFormatType(Op,A,Type,AA):- grtrace,correctType(Op,A,Type,AA).
 correctFormatType(Op,A,Type,A):- dmsg(todo(not(correctFormatType(Op,A,Type)))).
 
-:-export(checkAnyType/4).
+:-swi_export(checkAnyType/4).
 
 checkAnyType(Op,A,Type,AA):- var(A),correctType(Op,A,Type,AA),must_det(var(AA)),must_det(A==AA),!.
 checkAnyType(Op,A,Type,AA):- correctType(Op,A,Type,AA),nonvar(AA),!.
 
 :-thread_local thlocal:can_coerce/1.
-correctType_gripe(Op,A,Fmt,AA):- moo:formattype(Fmt),!,trace_or_throw(correctType(is_ft_correctFormatType(Op,A,Fmt,AA))).
+correctType_gripe(Op,A,Fmt,AA):- formattype(Fmt),!,trace_or_throw(correctType(is_ft_correctFormatType(Op,A,Fmt,AA))).
 correctType_gripe(Op,A,Type,AA):- fail,atom(Type),must_equals(A,AA),
       dmsg(todo(isa_assert_type(Type))),
       % decl_type(Type),
@@ -374,9 +374,11 @@ correctType(_O,Obj,argIsaFn(Prop,N),AA):-must_equals(Obj,AA),
          show_call(deduce_argN(Prop,N,Obj,OType,argIsaFn(Prop,N))))),!.
 correctType(_O,A,term,AA):- must_equals(A,AA).
 correctType(_O,A,text,AA):- must_equals(A,AA).
+
 correctType(_O,A,mpred,AA):- any_to_relation(A,AA).
 correctType(_O,A,fpred,AA):- any_to_relation(A,AA).
 correctType(_O,A,pred,AA):- any_to_relation(A,AA).
+
 correctType(_O,A,relation,AA):- any_to_relation(A,AA).
 correctType(_O,A,formatted,AA):- dtrace, must_equals(A,AA).
 correctType(_O,A,atom,AA):- any_to_atom(A,AA).
@@ -426,8 +428,8 @@ correctType(Op,Args,Types,NewArgs):-compound(Args), compound(Types),
 
 
 
-correctType(Op,A,Fmt,AA):- moo:ft_info(Fmt,formatted),!,correctFormatType(Op,A,formatted(Fmt),AA).
-correctType(_O,A,Fmt,A):- moo:ft_info(Fmt,Code),!,subst(Code,self,A,Call),with_assertions(thlocal:no_arg_type_error_checking,show_call_failure(req(Call))).   
+correctType(Op,A,Fmt,AA):- ft_info(Fmt,formatted),!,correctFormatType(Op,A,formatted(Fmt),AA).
+correctType(_O,A,Fmt,A):- ft_info(Fmt,Code),!,subst(Code,self,A,Call),with_assertions(thlocal:no_arg_type_error_checking,show_call_failure(req(Call))).   
 correctType(Op,A,Super,AA):- formattype(Super),req(subft(Sub,Super)),Sub\=Super,correctType(Op,A,Sub,AA).
 
 correctType(Op,Arg,Props,NewArg):- compound(Props),
@@ -436,7 +438,7 @@ correctType(Op,Arg,Props,NewArg):- compound(Props),
    correctArgsIsa(Op,C,CC),
    CC=..[F,NewArg|_].
 
-correctType(_O,A,Type,AA):-not(formattype(Type)),moo:type(Type),isa(A,Type),!,must_equals(A,AA).
+correctType(_O,A,Type,AA):-not(formattype(Type)),type(Type),isa(A,Type),!,must_equals(A,AA).
 
 
 
@@ -447,20 +449,20 @@ must_equals(A,AA):-must_det(A=AA).
   
 :- style_check(+singleton).
 
-:-export(any_to_value/2).
+:-swi_export(any_to_value/2).
 any_to_value(Var,Var):-var(Var),!.
 any_to_value(V,Term):-atom(V),!,atom_to_value(V,Term).
 any_to_value(A,V):-any_to_number(A,V).
 any_to_value(A,A).
 
 
-:-export(any_to_number/2).
+:-swi_export(any_to_number/2).
 any_to_number(N,N):- number(N),!.
 any_to_number(dice(A,B,C),N):- ground(A),roll_dice(A,B,C,N),!.
 any_to_number(A,N):-atom(A),atom_to_value(A,V),A\=V,any_to_number(V,N).
 any_to_number(A,N):- ccatch(number_string(N,A),_,fail).
 
-:-export(atom_to_value/2).
+:-swi_export(atom_to_value/2).
 atom_to_value(V,Term):-not(atom(V)),!,any_to_value(V,Term).
 % 56
 atom_to_value(V,Term):- ccatch((read_term_from_atom(V,Term,[variable_names([])])),_,fail),!.
@@ -468,10 +470,10 @@ atom_to_value(V,Term):- ccatch((read_term_from_atom(V,Term,[variable_names([])])
 atom_to_value(V,dice(T1,T2,+T3)):- atomic_list_concat_safe([D1,'d',D2,'+',D3],V), atom_to_value(D1,T1),atom_to_value(D2,T2),atom_to_value(D3,T3),!.
 atom_to_value(V,dice(T1,T2,-T3)):- atomic_list_concat_safe([D1,'d',D2,'-',D3],V), atom_to_value(D1,T1),atom_to_value(D2,T2),atom_to_value(D3,T3),!.
 
-:-export(is_any_dir/1).
+:-swi_export(is_any_dir/1).
 is_any_dir(Dir):-var(Dir),!,fail.
 is_any_dir(Dir):-any_to_dir_ns(Dir,_).
-:-export(any_to_dir/2).
+:-swi_export(any_to_dir/2).
 
 any_to_dir(D,D):-var(D),!.
 any_to_dir(A,S):-any_to_dir_ns(A,D),any_to_string(D,S),!.
@@ -509,7 +511,7 @@ learnArgIsaInst(_,_,_).
 
 
 
-hook:deduce_facts(Fact,isa(Arg,Type)):- slow_kb_op(deduce_argIsa_facts(Fact,Arg,Type)).
+deduce_facts(Fact,isa(Arg,Type)):- slow_kb_op(deduce_argIsa_facts(Fact,Arg,Type)).
 
 call_argIsa_ForAssert(F,N,Type):-argIsa_call(F,N,Type),atom(Type),!,not(nonusefull_deduction_type(Type)),type(Type).
 

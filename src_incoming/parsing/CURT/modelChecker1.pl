@@ -21,7 +21,7 @@
 
 *************************************************************************/
 
-:- module(modelChecker1,[modelCheckerTestSuite/0,
+:-swi_module(modelChecker1,[modelCheckerTestSuite/0,
                          info/0,
                          infix/0,
                          prefix/0,

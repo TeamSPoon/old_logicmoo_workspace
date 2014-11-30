@@ -21,7 +21,7 @@
 
 *************************************************************************/
 
-:- module(propTableau,[info/0,
+:-swi_module(propTableau,[info/0,
                        infix/0,
                        prefix/0,
                        tprove/1,

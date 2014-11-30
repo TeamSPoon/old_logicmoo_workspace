@@ -21,7 +21,7 @@
 
 *************************************************************************/
 
-:- module(logicmooTestSuite,[discourse/2]).
+:-swi_module(logicmooTestSuite,[discourse/2]).
 
 
 /*========================================================================
@@ -178,7 +178,7 @@ discourse([mia,walks,mia,smokes],1).
 /*========================================================================
    Sentences
 -========================================================================*/
-:- export(sentence/2).
+:- swi_export(sentence/2).
 
 
 sentence([a,man,walks],1).
@@ -271,6 +271,6 @@ sentence([vincent,eats,a,big,kahuna,burger],1).
 
 sentence([either,vincent,eats,a,big,kahuna,burger,or,jules,smokes],1).
 
-:- module(presupTestSuite,[discourse/2]).
+:-swi_module(presupTestSuite,[discourse/2]).
 
 

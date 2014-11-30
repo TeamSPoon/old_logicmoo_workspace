@@ -7,7 +7,7 @@
  
 *************************************************************************/
 
-:- module(acceptabilityConstraints,[consistent/2,
+:-swi_module(acceptabilityConstraints,[consistent/2,
 				    informative/2,
 				    localConsistent/1,
 				    localInformative/1,

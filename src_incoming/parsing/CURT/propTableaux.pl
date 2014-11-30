@@ -7,7 +7,7 @@
  
 *************************************************************************/
 
-:- module(propTableaux,[tprove/1,
+:-swi_module(propTableaux,[tprove/1,
 		        tproveTestSuite/0]).
 
 :- ensure_loaded(comsemOperators).

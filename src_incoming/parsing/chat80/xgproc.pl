@@ -27,10 +27,10 @@ new_pred(M,P,F,A) :-
    recordz('xg.pred',P,_).
 
 :-thread_local tlxgproc:do_xg_process_te/0.
-:-export(xg_process_te_clone/5).
+:-swi_export(xg_process_te_clone/5).
 xg_process_te_clone(L,R,_Mode,P,Q):- expandlhs(L,S0,S,H0,H,P), expandrhs(R,S0,S,H0,H,Q).  %new_pred(P),usurping(Mode,P),!.
 
-:-export(xg_process_te_clone/3).
+:-swi_export(xg_process_te_clone/3).
 xg_process_te_clone((H ... T --> R),Mode,((P :- Q))) :- !, xg_process_te_clone((H ... T),R,Mode,P,Q).
 xg_process_te_clone((L --> R),Mode,((P :- Q))) :- !,xg_process_te_clone(L,R,Mode,P,Q).
 

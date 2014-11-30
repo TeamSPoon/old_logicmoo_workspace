@@ -2,7 +2,7 @@
 % This module is the CircleMUD configurator
 */
 
-:- module(mobs_conf,[]).
+:-swi_module(mobs_conf,[]).
 
 :- ensure_loaded(affordance/simbots).
 

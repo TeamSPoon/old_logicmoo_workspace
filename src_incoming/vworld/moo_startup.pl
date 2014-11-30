@@ -6,7 +6,7 @@
 % July 10,1996
 % John Eikenberry
 %
-% Project Logicmoo: A MUD server written in Prolog
+% Logicmoo Project PrologMUD: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
@@ -17,13 +17,14 @@
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
-:-export(include_moo_files/1).
-include_moo_files(Mask):- expand_file_name(Mask,X),
-     forall(member(E,X),user_use_module(E)).
+/*
+:-swi_export(include_moo_files/1).
+include_moo_files(Mask):- expand_file_name(Mask,X), forall(member(E,X),user_ensure_loaded(E)).
+*/
 
 in_user_startup(Call):- '@'(user:Call,user).
 
-:- '@'(use_module(logicmoo('vworld/moo.pl')),'user').
+:- '@'(ensure_loaded(logicmoo('vworld/moo.pl')),'user').
 
 % standard header used in all files that all modules are loaded (therefore useful for when(?) the day comes that modules *can*only*see their explicitly imported modules)
 %:- prolog_flag(unknown,error,fail). % Not sure if this is needed for Quintus
@@ -47,13 +48,13 @@ in_user_startup(Call):- '@'(user:Call,user).
 
 
 % logicmoo vworld mud server
-%:- user_use_module(logicmoo(vworld/world)).
-:- user_use_module(logicmoo(vworld/toploop_npc)).
-:- user_use_module(logicmoo(vworld/toploop_telnet)).
+%:- user_ensure_loaded(logicmoo(vworld/world)).
+:- user_ensure_loaded(logicmoo(vworld/toploop_npc)).
+:- user_ensure_loaded(logicmoo(vworld/toploop_telnet)).
 :- user_ensure_loaded(logicmoo(vworld/toploop_output)).
 
 
-:- user_use_module(logicmoo(vworld/moo_testing)).
+:- user_ensure_loaded(logicmoo(vworld/moo_testing)).
 
 /*
 
@@ -123,30 +124,30 @@ make_qlfs:-
 
 */
 
-% :- user_use_module(logicmoo(pldata/tiny_kb)).
-:- user_use_module(logicmoo(pldata/nldata_freq_pdat)).
-:- user_use_module(logicmoo(pldata/nldata_BRN_WSJ_LEXICON)).
-:- user_use_module(logicmoo(pldata/nldata_colloc_pdat)).
-:- user_use_module(logicmoo(pldata/nldata_cycl_pos0)).
-:- user_use_module(logicmoo(pldata/nldata_dictionary_some01)).
+% :- user_ensure_loaded(logicmoo(pldata/tiny_kb)).
+:- user_ensure_loaded(logicmoo(pldata/nldata_freq_pdat)).
+:- user_ensure_loaded(logicmoo(pldata/nldata_BRN_WSJ_LEXICON)).
+:- user_ensure_loaded(logicmoo(pldata/nldata_colloc_pdat)).
+:- user_ensure_loaded(logicmoo(pldata/nldata_cycl_pos0)).
+:- user_ensure_loaded(logicmoo(pldata/nldata_dictionary_some01)).
 :- load_files([logicmoo(pldata/nldata_talk_db_pdat)],[expand(true),if(changed),qcompile(auto)]).
 
-% :- user_use_module(logicmoo(pldata/tt0_00022_cycl)).
-% :- user_use_module(logicmoo(pldata/hl_holds)).
-% :- user_use_module(logicmoo(pldata/mworld0)).
-:- user_use_module(logicmoo(pldata/transform_dump)).
-% :- catch(user_use_module(logicmoo(pldata/withvars_988)),_,true).
+% :- user_ensure_loaded(logicmoo(pldata/tt0_00022_cycl)).
+% :- user_ensure_loaded(logicmoo(pldata/hl_holds)).
+% :- user_ensure_loaded(logicmoo(pldata/mworld0)).
+:- user_ensure_loaded(logicmoo(pldata/transform_dump)).
+% :- catch(user_ensure_loaded(logicmoo(pldata/withvars_988)),_,true).
 download_and_install_el:-
   shell('wget -N http://logicmoo.org/devel/LogicmooDeveloperFramework/TEMP~/www.logicmoo.org/downloads/datafiles/PlDataBinary.zip',_),
   shell('unzip -u -d ../src_data/pldata/ PlDataBinary.zip'),
-  catch(user_use_module(logicmoo(pldata/el_assertions)),E,fmt('Cant use el_assertions',E)).
+  catch(user_ensure_loaded(logicmoo(pldata/el_assertions)),E,fmt('Cant use el_assertions',E)).
 
-:- catch(user_use_module(logicmoo(pldata/el_assertions)),_,download_and_install_el).
+:- catch(user_ensure_loaded(logicmoo(pldata/el_assertions)),_,download_and_install_el).
 
 :- asserta(loaded_external_kbs),show_call(kbp_to_dbase_t).
 
 
-% :- user_use_module(logicmoo(dbase/dbase_formattypes)).
+% :- user_ensure_loaded(logicmoo(dbase/dbase_formattypes)).
 :- user_ensure_loaded(logicmoo(parsing/parser_imperative)).
 /*
 :- user_ensure_loaded(logicmoo(parsing/parser_talk)). 
@@ -158,7 +159,7 @@ download_and_install_el:-
 %:- user_ensure_loaded(logicmoo(dbase/dbase_ext_lisp)).
 %:- user_ensure_loaded(logicmoo(dbase/dbase_ext_chr)).
 
-:- user_use_module(logicmoo('vworld/moo_loader.pl')).
+:- user_ensure_loaded(logicmoo('vworld/moo_loader.pl')).
 
 :- load_data_file(logicmoo('dbase/dbase_i_builtin.pl')).
 
@@ -169,47 +170,47 @@ download_and_install_el:-
 % Load the map file (*.map.pl) appropriate for the world being used.
 :- in_user_startup(ensure_plmoo_loaded(logicmoo('rooms/vacuum.map.plmoo'))).
 % NPC planners
-:- user_use_module(logicmoo('mobs/monster.pl')).
+:- user_ensure_loaded(logicmoo('mobs/monster.pl')).
 
-:- user_use_module(logicmoo('actions/look.pl')).
+:- user_ensure_loaded(logicmoo('actions/look.pl')).
 
-% :-module(user).
+% :-swi_module(user).
 %:-prolog.
 % end_of_file.
 
 /*
-:- user_use_module(logicmoo('mobs/predator.pl')).
-:- user_use_module(logicmoo('mobs/explorer.pl')).
-:- user_use_module(logicmoo('mobs/prey.pl')).
-:- user_use_module(logicmoo('mobs/mobs_conf.pl')).
-:- user_use_module(logicmoo('mobs/vacuum.pl')).
+:- user_ensure_loaded(logicmoo('mobs/predator.pl')).
+:- user_ensure_loaded(logicmoo('mobs/explorer.pl')).
+:- user_ensure_loaded(logicmoo('mobs/prey.pl')).
+:- user_ensure_loaded(logicmoo('mobs/mobs_conf.pl')).
+:- user_ensure_loaded(logicmoo('mobs/vacuum.pl')).
 */
 :- include_moo_files('../src_incoming/mobs/?*.pl').
 
 
 % Action/Commands implementation
 /*
-:- user_use_module(logicmoo('actions/drink.pl')).
-:- user_use_module(logicmoo('actions/actions_db.pl')).
-:- user_use_module(logicmoo('actions/attack.pl')).
-:- user_use_module(logicmoo('actions/inventory.pl')).
-:- user_use_module(logicmoo('actions/push.pl')).
-:- user_use_module(logicmoo('actions/where.pl')).
-:- user_use_module(logicmoo('actions/climb.pl')).
-:- user_use_module(logicmoo('actions/move.pl')).
-:- user_use_module(logicmoo('actions/any.pl')).
-:- user_use_module(logicmoo('actions/drop.pl')).
-:- user_use_module(logicmoo('actions/help.pl')).
-:- user_use_module(logicmoo('actions/logon.pl')).
-:- user_use_module(logicmoo('actions/get_set.pl')).
-:- user_use_module(logicmoo('actions/sit.pl')).
-:- user_use_module(logicmoo('actions/actions_conf.pl')).
-:- user_use_module(logicmoo('actions/take.pl')).
-:- user_use_module(logicmoo('actions/chat.pl')).
-:- user_use_module(logicmoo('actions/use.pl')).
-:- user_use_module(logicmoo('actions/stats.pl')).
-:- user_use_module(logicmoo('actions/eat.pl')).
-:- user_use_module(logicmoo('actions/teleport.pl')).
+:- user_ensure_loaded(logicmoo('actions/drink.pl')).
+:- user_ensure_loaded(logicmoo('actions/actions_db.pl')).
+:- user_ensure_loaded(logicmoo('actions/attack.pl')).
+:- user_ensure_loaded(logicmoo('actions/inventory.pl')).
+:- user_ensure_loaded(logicmoo('actions/push.pl')).
+:- user_ensure_loaded(logicmoo('actions/where.pl')).
+:- user_ensure_loaded(logicmoo('actions/climb.pl')).
+:- user_ensure_loaded(logicmoo('actions/move.pl')).
+:- user_ensure_loaded(logicmoo('actions/any.pl')).
+:- user_ensure_loaded(logicmoo('actions/drop.pl')).
+:- user_ensure_loaded(logicmoo('actions/help.pl')).
+:- user_ensure_loaded(logicmoo('actions/logon.pl')).
+:- user_ensure_loaded(logicmoo('actions/get_set.pl')).
+:- user_ensure_loaded(logicmoo('actions/sit.pl')).
+:- user_ensure_loaded(logicmoo('actions/actions_conf.pl')).
+:- user_ensure_loaded(logicmoo('actions/take.pl')).
+:- user_ensure_loaded(logicmoo('actions/chat.pl')).
+:- user_ensure_loaded(logicmoo('actions/use.pl')).
+:- user_ensure_loaded(logicmoo('actions/stats.pl')).
+:- user_ensure_loaded(logicmoo('actions/eat.pl')).
+:- user_ensure_loaded(logicmoo('actions/teleport.pl')).
 */
 :- include_moo_files('../src_incoming/actions/?*.pl').
 
@@ -232,16 +233,16 @@ download_and_install_el:-
 :-create_agent(explorer(2),[]).
 */
 
-:- moo:begin_transform_moo_preds.
+:- begin_transform_moo_preds.
 
-moo:agent_text_command(Agent,[run,Term], Agent,prologCall(Term)):- ignore(Term=someCode).
+agent_text_command(Agent,[run,Term], Agent,prologCall(Term)):- ignore(Term=someCode).
 
 % [Optionaly] Start the telent server
 :-at_start(toploop_telnet:start_mud_telnet(4000)).
 
 
 % standard header used in all files that all modules are loaded (therefore useful for when(?) the day comes that modules *can*only*see their explicitly imported modules)
-% :- user_use_module(logicmoo(vworld/moo_header)).
+% :- user_ensure_loaded(logicmoo(vworld/moo_header)).
 
 % These contain the definition of the object types.
 

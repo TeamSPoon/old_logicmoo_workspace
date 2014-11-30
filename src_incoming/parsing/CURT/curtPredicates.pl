@@ -21,7 +21,7 @@
 
 *************************************************************************/
 
-:- module(curtPredicates,[curtHelp/0,
+:-swi_module(curtPredicates,[curtHelp/0,
                           curtOutput/1,
                           updateReadings/1,
                           updateModels/1,

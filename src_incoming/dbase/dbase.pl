@@ -11,8 +11,8 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-:- dynamic_multifile_exported hook:fact_is_false/2.
-:- dynamic_multifile_exported hook:kbp_t_list_prehook/2.
+:- dynamic_multifile_exported fact_is_false/2.
+:- dynamic_multifile_exported kbp_t_list_prehook/2.
 
 :- op(1120,fx,decl_mpred_prolog).
 :- op(1150,fx,decl_mpred_hybrid).
@@ -26,7 +26,7 @@ ztrace:-dmsg(ztrace),trace_or_throw(dtrace).
 when_debugging(What,Call):-debugging(What),!,Call.
 when_debugging(_,_).
 
-:-export(listprolog/0).
+:-swi_export(listprolog/0).
 listprolog:-listing(mpred_prop(_,prologOnly)).
 
 
@@ -63,54 +63,6 @@ shrink_clause( HB,HB).
 :- decl_thlocal thlocal:usePlTalk/0.
 :- decl_thlocal thlocal:useAltPOS/0.
 
-:- dynamic_multifile_exported(thlocal:tracing80/0).
-:- dynamic_multifile_exported(thlocal:usePlTalk/0).
-
-:- dynamic_multifile_exported hybrid_rule/2.
-
-:- dynamic_multifile_exported loaded_external_kbs/0.
-
-
-% ========================================
-% decl_mpred_hybrid database
-% ========================================
-
-:- dynamic_multifile_exported action_info/2.
-:- dynamic_multifile_exported action_rules/4.
-:- dynamic_multifile_exported agent_call_command/2.
-:- dynamic_multifile_exported agent_text_command/4.
-:- dynamic_multifile_exported check_permanence/4.
-:- dynamic_multifile_exported decl_mud_test/2.
-:- dynamic_multifile_exported default_type_props/2.
-:- dynamic_multifile_exported default_inst_props/3.
-:- dynamic_multifile_exported label_type/2.
-:- dynamic_multifile_exported label_type_props/3.
-:- dynamic_multifile_exported mud_test/2.
-:- dynamic_multifile_exported mud_test/1.
-:- dynamic_multifile_exported mud_test/0.
-:- dynamic_multifile_exported mud_test_local/2.
-:- dynamic_multifile_exported mud_test_local/1.
-:- dynamic_multifile_exported mud_test_local/0.
-:- dynamic_multifile_exported now_unused/1.
-:- dynamic_multifile_exported term_specifier_text/2.
-:- dynamic_multifile_exported type_action_info/3.
-:- dynamic_multifile_exported update_charge/2.
-:- dynamic_multifile_exported update_stats/2.
-:- dynamic_multifile_exported use_usable/4.
-:- dynamic_multifile_exported movedist/2.
-:- dynamic_multifile_exported verb_alias/2.
-:- dynamic_multifile_exported world_agent_plan/3.
-:- dynamic_multifile_exported contains/2.
-:- dynamic_multifile_exported longitude/2.
-:- dynamic_multifile_exported latitude/2.
-:- dynamic_multifile_exported region/1.
-:- dynamic_multifile_exported((actiontype/1,action_info/2,action_rules/4,type_action_info/3,term_specifier_text/2,action_verb_useable/4)).
-:- dynamic_multifile_exported((decl_coerce)/3).
-:- dynamic_multifile_exported((term_anglify/2,term_anglify_last/2, term_anglify_np/3,term_anglify_np_last/3)).
-:- dynamic_multifile_exported((update_charge/2,update_stats/2)).
-:- dynamic_multifile_exported(ft_info/2).
-
-:- dynamic_multifile_exported thglobal:use_cyc_database/0.
 
 % TODO uncomment the next line without breaking it all!
 % thglobal:use_cyc_database.
@@ -136,7 +88,7 @@ shrink_clause( HB,HB).
 :- decl_mpred_hybrid str/2. 
 :- decl_mpred_hybrid subclass/2.
 :- decl_mpred_hybrid type_grid/3.
-:- decl_mpred_hybrid(moo:subft/2).
+:- decl_mpred_hybrid(subft/2).
 :- decl_mpred_hybrid(singleValued/1).
 :- discontiguous(singleValued/1).
 
@@ -150,17 +102,17 @@ shrink_clause( HB,HB).
 % A tiny bit of TMS
 % ================================================
 
-hook:decl_database_hook(assert(_),Fact):- check_was_known_false(Fact).
+decl_database_hook(assert(_),Fact):- check_was_known_false(Fact).
 
 was_known_false(Fact):-is_known_false(Fact),retractall((is_known_false(_):-true)),dmsg(trace_or_throw(error+was_known_false(Fact))).
 
 check_was_known_false(Fact):- ignore(((is_known_false(Fact),was_known_false(Fact)))).
 
-hook:decl_database_hook(assert(_A_or_Z),label_type_props(Lbl,T,Props)):- hooked_asserta(default_type_props(T,[kwLabel(Lbl)|Props])).
+decl_database_hook(assert(_A_or_Z),label_type_props(Lbl,T,Props)):- hooked_asserta(default_type_props(T,[kwLabel(Lbl)|Props])).
 
-hook:decl_database_hook(assert(_A_or_Z),default_type_props(T,_)):- decl_type_safe(T).
+decl_database_hook(assert(_A_or_Z),default_type_props(T,_)):- decl_type_safe(T).
 
-hook:decl_database_hook(assert(_A_or_Z),mpred_prop(F,_)):- must_det(atom(F)).
+decl_database_hook(assert(_A_or_Z),mpred_prop(F,_)):- must_det(atom(F)).
 
 
 % ================================================
@@ -169,19 +121,19 @@ hook:decl_database_hook(assert(_A_or_Z),mpred_prop(F,_)):- must_det(atom(F)).
 
 :-dynamic_multifile_exported((thglobal:loading_game_file/2, thglobal:loaded_game_file/2)).
 
-moo:after_game_load:- not(thglobal:loading_game_file(_,_)),thglobal:loaded_game_file(_,_),!.
+after_game_load:- not(thglobal:loading_game_file(_,_)),thglobal:loaded_game_file(_,_),!.
 
 % when all previous tasks have completed
-moo:after_game_load_pass2:- not(thglobal:will_call_after(moo:after_game_load,_)).
+after_game_load_pass2:- not(thglobal:will_call_after(after_game_load,_)).
 :- meta_predicate(call_after_game_load(0)).
-% call_after_game_load(Code):- moo:after_game_load,!, call_after_next(moo:after_game_load_pass2,Code).
-call_after_game_load(Code):- call_after_next(moo:after_game_load,Code).
+% call_after_game_load(Code):- after_game_load,!, call_after_next(after_game_load_pass2,Code).
+call_after_game_load(Code):- call_after_next(after_game_load,Code).
 
-:-export(rescan_game_loaded/0).
-rescan_game_loaded:- ignore((moo:after_game_load, loop_check(call_after(moo:after_game_load, true ),true))).
+:-swi_export(rescan_game_loaded/0).
+rescan_game_loaded:- ignore((after_game_load, loop_check(call_after(after_game_load, true ),true))).
 
-:-export(rescan_game_loaded/0).
-rescan_game_loaded_pass2:- ignore((moo:after_game_load, loop_check(call_after(moo:after_game_load_pass2,  dmsg(rescan_game_loaded_pass2_comlpete)),true))).
+:-swi_export(rescan_game_loaded/0).
+rescan_game_loaded_pass2:- ignore((after_game_load, loop_check(call_after(after_game_load_pass2,  dmsg(rescan_game_loaded_pass2_comlpete)),true))).
 
 % ================================================
 % Agenda system - standard database
@@ -190,12 +142,12 @@ rescan_game_loaded_pass2:- ignore((moo:after_game_load, loop_check(call_after(mo
 % do_db_op_hooks:-!.
 do_db_op_hooks:- loop_check_local(rescan_dbase_ops,true).
 
-:-export(rescan_slow_kb_ops/0).
+:-swi_export(rescan_slow_kb_ops/0).
 
 % rescan_slow_kb_ops:-!.
 rescan_slow_kb_ops:- loop_check(forall(retract(do_slow_kb_op_later(Slow)),must_det(Slow)),true).
 
-:-export(rescan_dbase_ops/0).
+:-swi_export(rescan_dbase_ops/0).
 rescan_dbase_ops:- test_tl(skip_db_op_hooks),!.
 rescan_dbase_ops:- rescan_module_ready.
 
@@ -249,16 +201,16 @@ coerce(What,_Type,NewThing):-NewThing = What.
 
 :-op(1150,fx,export).
 
-:- '@'(use_module(logicmoo(vworld/moo)),'user').
+:- '@'(ensure_loaded(logicmoo(vworld/moo)),'user').
 % :- '@'(use_module(dbase_formattypes),'user').
 
 :-ensure_loaded(dbase_formattypes).
 
-%:- trace, (dynamic_multifile_exported  moo:obj/1). 
+%:- trace, (dynamic_multifile_exported  obj/1). 
 %:- trace, (dynamic_multifile_exported  obj/1). 
 
 
-:- export(( 
+:- swi_export(( 
    (add)/1, 
    clr/1,
    db_op/2,
@@ -274,13 +226,13 @@ coerce(What,_Type,NewThing):-NewThing = What.
    agent/1, agent_done/2, charge/2,health/2, atloc/2, failure/2, grid/4, isa/2, item/1, 
   memory/2,  pathName/3, possess/2,  region/1, score/2, stm/2,   facing/2,
    % type/1,
-   localityOfObject/2,
+   % localityOfObject/2,
    
   thinking/1,   wearing/2, 
   %str/2,
   facing/2, height/2, act_term/2, nameStrings/2, description/2, pathBetween/3, agent_turnnum/2.
 
-:- must(dbase_mod(moo)).
+:- must(dbase_mod(user)).
 
 :- dbase_mod(M),dynamic_multifile_exported((
           % M:dbase_t/1,
@@ -310,7 +262,7 @@ coerce(What,_Type,NewThing):-NewThing = What.
 
 % :-dynamic((weight/2)).
 % :-dynamic(subclass/2).
-:-export(subclass/2).
+:-swi_export(subclass/2).
 
 :- dynamic_multifile_exported mtForPred/2.
 
@@ -384,8 +336,8 @@ logical_functor(X):-atom(X),member(X,[',',';']).
       str/2,
       wearing/2)).
 
-:-multifile localityOfObject/2.
 /*
+:-multifile localityOfObject/2.
 
 :- context_module(M),
    asserta(dbase_mod(M)),
@@ -396,7 +348,7 @@ logical_functor(X):-atom(X),member(X,[',',';']).
 %:- multifile argsIsaInList/2.
 
 %:- meta_predicate man:with_assertions(:,0).
-%:- meta_predicate world:intersect(?,0,?,0,0,-).
+%:- meta_predicate intersect(?,0,?,0,0,-).
 
 % -  :- meta_predicate del(0),clr(0),add(0),add0(0),req(0), db_op(0,0,0).
 
@@ -410,8 +362,8 @@ logical_functor(X):-atom(X),member(X,[',',';']).
 
 :- register_module_type(utility).
 
-moo:actiontype(list(term)).
-moo:agent_call_command(_Gent,list(Obj)):- term_listing(Obj).
+actiontype(list(term)).
+agent_call_command(_Gent,list(Obj)):- term_listing(Obj).
 
 
 :-declare_dbase_local_dynamic(atloc,2).
@@ -457,14 +409,14 @@ verify_sanity(P):- dmsg('$ERROR_incomplete_SANITY'(P)),!.
 %:- meta_predicate db_op_exact(?,?,?,0).
 
 :- decl_mpred_prolog(movedist/2).
-:- export(movedist/2).
+:- swi_export(movedist/2).
 :- dynamic(movedist/2).
-:- decl_mpred(movedist/2,[argsIsaInList(movedist(agent,int)),singleValued,ask_module(move),query(call),default_sv(2,1)]).
+:- decl_mpred(movedist/2,[argsIsaInList(movedist(agent,int)),singleValued,ask_module(user),query(call),default_sv(2,1)]).
 
 % movedist(X,Y):-callStub_moo(holds_t,movedist(X,Y)).
 
 
-% :- moo:register_module_type(utility).
+% :- register_module_type(utility).
 % ================================================
 % db_reop/2  RE-CURSED and CHECKED 
 % ================================================
@@ -515,7 +467,7 @@ iprops(Obj,PropSpecs):- ireq(props(Obj,PropSpecs)).
 % add_fast(C0):- must_det((add_fast_unchecked(C0), xtreme_debug(once(ireq(C0);(with_all_dmsg((debug(blackboard),show_call(add_fast_unchecked(C0)),rtrace(add_fast_unchecked(C0)),dtrace(ireq(C0))))))))),!.
 add_fast(C0):- must_det((add_fast_unchecked(C0), nop(xtreme_debug(ireq(C0)->true;dmsg(warn(failed_ireq(C0))))))),!.
 
-:-export(add_fast_unchecked/1).
+:-swi_export(add_fast_unchecked/1).
 add_fast_unchecked(C0):-must_det(db_op(change(assert,add), C0)).
 
 % -  upprop(Obj,PropSpecs) update the properties
@@ -536,11 +488,11 @@ kb_update(New,OldV):- db_op_int(change(assert,OldV),New).
 
 :-decl_thlocal((record_on_thread/2)).
 
-hook:decl_database_hook(assert(_),ft_info(FT,_)):- define_ft(FT).
-hook:decl_database_hook(assert(_),subft(FT,OFT)):- define_ft(OFT),define_ft(FT).
-% hook:decl_database_hook(assert(_),subclass(FT,OFT)):- formattype(OFT),dmsg(warning(subclass_of_define_ft(FT))).
+decl_database_hook(assert(_),ft_info(FT,_)):- define_ft(FT).
+decl_database_hook(assert(_),subft(FT,OFT)):- define_ft(OFT),define_ft(FT).
+% decl_database_hook(assert(_),subclass(FT,OFT)):- formattype(OFT),dmsg(warning(subclass_of_define_ft(FT))).
 
-hook:dmsg_hook(transform_holds(dbase_t,_What,props(createableType,[isa(isa),isa]))):-trace_or_throw(dtrace).
+dmsg_hook(transform_holds(dbase_t,_What,props(createableType,[isa(isa),isa]))):-trace_or_throw(dtrace).
 
 % expand_goal_correct_argIsa(A,A):-simple_code,!.
 expand_goal_correct_argIsa(A,B):- expand_goal(A,B).
@@ -558,7 +510,7 @@ db_op_simpler_wlc(Op,Wild,Simpler):- !,call(call,db_op_simpler(Op,Wild,Simpler))
 db_op_sentence(_Op,Prop,ARGS,C0):- atom(Prop),!, C0=..[Prop|ARGS].
 db_op_sentence(_Op,Prop,ARGS,C0):- C0=..[dbase_t,Prop|ARGS].
 
-hook:decl_database_hook(AR,C):-smart_decl_database(AR,C).
+decl_database_hook(AR,C):-smart_decl_database(AR,C).
 
 smart_decl_database(AR,svo(S,V,O)):- !,dbase2pred2svo(DBASE,PRED,svo(S,V,O)),!,smart_db_op(AR,DBASE,PRED,svo(S,V,O)).
 smart_decl_database(AR,DBASE):- functor_catch(DBASE,dbase_t,_),!,dbase2pred2svo(DBASE,PRED,SVO),!,smart_db_op(AR,DBASE,PRED,SVO).
@@ -598,12 +550,12 @@ good_for_chaining(_Op,Term):-not(contains_singletons(Term)).
 db_rewrite(_Op,Term,NewTerm):-equivRule_call(Term,NewTerm).
 db_rewrite(_Op,Term,NewTerm):-forwardRule_call(Term,NewTerm).
 
-:-export(simply_functors/3).
+:-swi_export(simply_functors/3).
 simply_functors(Db_pred,query(HLDS,Must),Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=@=Simpler,!,call(Db_pred,query(HLDS,Must),Simpler).
 simply_functors(Db_pred,Op,Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=@=Simpler,!,call(Db_pred,Op,Simpler).
 
 
-% -  hook:dmsg_hook(db_op(query(HLDS,call),moo:holds_t(ft_info,type,'$VAR'(_)))):-trace_or_throw(dtrace).
+% -  dmsg_hook(db_op(query(HLDS,call),holds_t(ft_info,type,'$VAR'(_)))):-trace_or_throw(dtrace).
 
 % ================================================
 % db_op_int/2
@@ -617,10 +569,10 @@ db_op_int(Op,Term):- do_db_op_hooks,db_op(Op,Term),do_db_op_hooks.
 
 univ_left(Comp,[M:P|List]):- nonvar(M),univ_left0(M, Comp, [P|List]),!.
 univ_left(Comp,[H,M:P|List]):- nonvar(M),univ_left0(M,Comp,[H,P|List]),!.
-univ_left(Comp,[P|List]):-moo:dbase_mod(DBASE), univ_left0(DBASE,Comp,[P|List]),!.
+univ_left(Comp,[P|List]):-dbase_mod(DBASE), univ_left0(DBASE,Comp,[P|List]),!.
 univ_left0(M,M:Comp,List):- Comp=..List,!.
 
-hook:decl_database_hook(AR,C):- record_on_thread(dbase_change,changing(AR,C)).
+decl_database_hook(AR,C):- record_on_thread(dbase_change,changing(AR,C)).
 
 record_on_thread(Dbase_change,O):- thread_self(ID),thlocal:dbase_capture(ID,Dbase_change),!,Z=..[Dbase_change,ID,O],assertz(Z).
 
@@ -791,7 +743,7 @@ db_op_exact(Op,C):- trace_or_throw(unhandled(db_op_exact(Op,C))).
       
 
 
-:-export((dbase_t/1,dbase_t/2)).
+:-swi_export((dbase_t/1,dbase_t/2)).
 :- dynamic_multifile_exported((
          % dbase_t/1,
          % dbase_t/2,
@@ -843,7 +795,7 @@ never_dbase_mpred(mpred_arity).
 
 
 % assert_with to change(CA1,CB2) mutlivalue pred
-:-export((db_assert_mv/4)).
+:-swi_export((db_assert_mv/4)).
 db_assert_mv(_Must,end_of_file,_,_):-!.
 % db_assert_mv(_Must,C,_F,_A):- hooked_assertz(C),!.
 db_assert_mv(Must,C,F,A):- test_tl(thlocal:adding_from_srcfile), dmsg(db_assert_mv(Must,C,F,A)), hooked_assertz(C).
@@ -851,21 +803,21 @@ db_assert_mv(Must,C,F,A):- dmsg(db_assert_mv(Must,C,F,A)), must_det(mpred_prop(F
 
 
 % assert_with to change(CA1,CB2) singlevalue pred
-:-export((db_assert_sv/4)).
+:-swi_export((db_assert_sv/4)).
 %db_assert_sv(_Must,C,F,A):- throw_if_true_else_fail(contains_singletons(C),db_assert_sv(C,F,A)).
 db_assert_sv(Must,C,F,A):- ignore(( loop_check(db_assert_sv_lc(Must,C,F,A),true))).
 
-:-export((db_assert_sv_lc/4)).
+:-swi_export((db_assert_sv_lc/4)).
 db_assert_sv_lc(Must,C,F,A):- arg(A,C,UPDATE),db_assert_sv_now(Must,C,F,A,UPDATE),!.
 
-:-export(db_assert_sv_now/5).
+:-swi_export(db_assert_sv_now/5).
 db_assert_sv_now(Must,C,F,A, UPDATE):- has_free_args(db_assert_sv_now(Must,C,F,A, UPDATE)),!,trace_or_throw(var_db_assert_sv_now(Must,C,F,A, UPDATE)).
 db_assert_sv_now(Must,C,F,A, UPDATE):- number(UPDATE),UPDATE<0, !,db_assert_sv_update(Must,C,F,A,UPDATE).
 db_assert_sv_now(Must,C,F,A,+UPDATE):-!, db_assert_sv_update(Must,C,F,A,+UPDATE).
 db_assert_sv_now(Must,C,F,A,-UPDATE):-!, db_assert_sv_update(Must,C,F,A,-UPDATE).
 db_assert_sv_now(Must,C,F,A, REPLACE):- db_assert_sv_replace(Must,C,F,A, REPLACE).
 
-:-export(db_assert_sv_update/5).
+:-swi_export(db_assert_sv_update/5).
 db_assert_sv_update(Must,C,F,A,UPDATE):-
    replace_arg(C,A,OLD,COLD),
    % prefer updated values to come from instances but will settle with anything legal
@@ -873,7 +825,7 @@ db_assert_sv_update(Must,C,F,A,UPDATE):-
    update_value(OLD,UPDATE,NEW),!,
    db_assert_sv_replace(Must,C,F,A,NEW),!.
 
-:-export(db_assert_sv_replace/5).
+:-swi_export(db_assert_sv_replace/5).
 
 :-style_check(-singleton).
 % db_assert_sv_replace_noisey_so_disabled
@@ -996,7 +948,7 @@ insert_into([Carry|ARGS],After,Insert,[Carry|NEWARGS]):-
    After1 is After - 1,
    insert_into(ARGS,After1,Insert,NEWARGS).
 
-moo:term_specifier_text(Text,pred):- mpred_prop(Text,arity(_)).
+term_specifier_text(Text,pred):- mpred_prop(Text,arity(_)).
 
 :- multifile(mudToHitArmorClass0 / 2).
 
@@ -1004,11 +956,10 @@ moo:term_specifier_text(Text,pred):- mpred_prop(Text,arity(_)).
 
 :- user_use_module(dbase_rules_pttp).
 
-
 /*
-:-export(makeConstant/1).
+:-swi_export(makeConstant/1).
 makeConstant(X):-trace_or_throw(makeConstant(X)).
-:-export(cycAssert/2).
+:-swi_export(cycAssert/2).
 cycAssert(A,B):-trace_or_throw(cycAssert(A,B)).
 */
 
@@ -1033,27 +984,27 @@ cycAssert(A,B):-trace_or_throw(cycAssert(A,B)).
 
 
 
-:-export(forall_setof/2).
+:-swi_export(forall_setof/2).
 forall_setof(ForEach,Call):-
    findall(ForEach,ForEach,ForEachAll),
    list_to_set(ForEachAll,Set),!,
    ignore(forall(member(ForEach,Set),Call)).
 
-:-dynamic_multifile_exported((moo:was_imported_kb_content/2)).
+:-dynamic_multifile_exported((was_imported_kb_content/2)).
 
-:-decl_mpred_prolog(moo:was_imported_kb_content/2).
+:-decl_mpred_prolog(was_imported_kb_content/2).
 
 is_clause_moo_special((Head :- Body)):-!, is_clause_moo_special(Head,Body).
 is_clause_moo_special(C):- is_clause_moo_special(C,true).
 
-:-export(add_later/1).
+:-swi_export(add_later/1).
 add_later(Fact):- call_after_game_load(add(Fact)).
 
 :-decl_thlocal add_thread_override/1.
 % thlocal:add_thread_override(A):-add_from_macropred(A),!.
 
-:-export((add/1)).
-:-moo_hide_childs(add/1).
+:-swi_export(((add)/1)).
+:-moo_hide_childs((add)/1).
 add(A):- A==end_of_file,!.
 add(A):- not(compound(A)),!,trace_or_throw(not_compound(add(A))),!.
 add(Term):- expands_on(eachOf,Term), !,forall(do_expand_args(eachOf,Term,O),add(O)),!.
@@ -1064,12 +1015,12 @@ add(type(A)):- must_det(decl_type(A)),!.
 add(A):-must(add_fast(A)),!.
 add(A):-trace_or_throw(fmt('add is skipping ~q.',[A])).
 
-:-export(begin_prolog_source/0).
-:-export(end_prolog_source/0).
+:-swi_export(begin_prolog_source/0).
+:-swi_export(end_prolog_source/0).
 begin_prolog_source:- must_det(asserta(thlocal:in_prolog_source_code)).
 end_prolog_source:- must_det(retract(thlocal:in_prolog_source_code)).
 
-:-export(add_from_macropred/1).
+:-swi_export(add_from_macropred/1).
 add_from_macropred(C):- loop_check(add_from_macropred_lc(C),((dmsg(loopING_add_from_macropred(C)),dtrace,add_fast(C)))).
 add_from_macropred_lc(A):-A==end_of_file,!.
 add_from_macropred_lc(Term):- expands_on(eachOf,Term), !,forall(do_expand_args(eachOf,Term,O),add_from_macropred_lc(O)).
@@ -1100,7 +1051,7 @@ add_from_macropred_lc(d(s)):-dumpST, trace_or_throw(dtrace).
 */
 add_from_macropred_lc(M:HB):-atom(M),!,add_from_macropred_lc(HB).
 
-:-export((assertz_local_game_clause/1)).
+:-swi_export((assertz_local_game_clause/1)).
 assertz_local_game_clause(Before):- expand_term(Before,Replaced),Before \=@= Replaced,!, assertz_local_game_clause(Replaced).
 assertz_local_game_clause((':-'(Body))):-!,must_det(show_call(Body)),!.
 assertz_local_game_clause((Head :- Body)):- !,assertz_local_game_clause(Head,Body),!.
@@ -1115,8 +1066,8 @@ assertz_local_game_clause(Head,Body):- get_mpred_type(Head,Type),!,must_det(asse
 assertz_local_game_clause(callable(prologOnly),Head,Body):- must_det(assertz_if_new_clause(Head,Body)),dmsg(used_clause_as_prologOnly(Head,Body)).
 assertz_local_game_clause(callable(static),Head,Body):- must_det(assertz_if_new_clause(Head,Body)),trace_or_throw(eRROR_maybe_used_clause_as_prologOnly(Head,Body)).
 assertz_local_game_clause(_,Head,true):- !,with_assertions(thlocal:adding_from_srcfile,add(Head)),!.
-assertz_local_game_clause(callable(prologHybrid),Head,Body):-!, assertz_if_new_clause(moo:hybrid_rule(Head,Body),true),dmsg(used_clause_as_hybridRule(Head,Body)),
-   decl_mpred_hybrid(F/A),!,declare_dbase_local_dynamic_really(moo,F,A).
+assertz_local_game_clause(callable(prologHybrid),Head,Body):-!, assertz_if_new_clause(hybrid_rule(Head,Body),true),dmsg(used_clause_as_hybridRule(Head,Body)),
+   decl_mpred_hybrid(F/A),!,declare_dbase_local_dynamic_really(user,F,A).
 assertz_local_game_clause(Type,Head,BodyIn):- once(make_body_clause(Head,BodyIn,Body)),must_det(assertz_if_new_clause(Head,Body)),dmsg(used_clause_as_unknown(Type,Head,Body)).
 assertz_local_game_clause(Type,Head,Body):- must_det(assertz_if_new_clause(Head,Body)),dmsg(used_clause_as(Type,Head,Body)).
 
@@ -1150,7 +1101,7 @@ special_wrapper_functor(loop_check_clauses).
 
 make_body_clause(_Head,Body,Body):-atomic(Body),!.
 make_body_clause(_Head,Body,Body):-special_wrapper_body(Body),!.
-make_body_clause(Head,Body,moo:call_mpred_body(Head,Body)).
+make_body_clause(Head,Body,call_mpred_body(Head,Body)).
 
 
 assertOnLoad(X):-add_later(X).
@@ -1159,7 +1110,7 @@ setTemplate(X):-add(X).
 
 englishServerInterface(SomeEnglish):-dmsg(todo(englishServerInterface(SomeEnglish))).
 
-:-export(onLoad/1).
+:-swi_export(onLoad/1).
 onLoad(C):-call_after_game_load(C).
 
 onSpawn(ClassFact):- ClassFact=..[Funct,InstA],createByNameMangle(InstA,Inst,Type2),assert_isa(Type2,createableType),assert_isa(Inst,Funct),assert_isa(Inst,Type2),!.
@@ -1222,26 +1173,26 @@ special_head(_,F):-mpred_prop(F,prologOnly),!,fail.
 special_head(_,F):-mpred_prop(F,prologHybrid).
 special_head(_,F):-mpred_prop(F,hasStub(_)).
 
-:-export(thlocal:in_dynamic_reader/1).
+:-swi_export(thlocal:in_dynamic_reader/1).
 
-:-export(begin_dynamic_reader/0).
-begin_dynamic_reader:-  dynamic_multifile_exported((moo:was_imported_kb_content/2)),
+:-swi_export(begin_dynamic_reader/0).
+begin_dynamic_reader:-  dynamic_multifile_exported((was_imported_kb_content/2)),
   !. %  must_det(( prolog_load_context(file,Source),asserta(thlocal:in_dynamic_reader(Source)))).
-:-export(end_dynamic_reader/0).
+:-swi_export(end_dynamic_reader/0).
 end_dynamic_reader:-  
   !. % must_det(( prolog_load_context(file,Source),retract(thlocal:in_dynamic_reader(Source)))).
 
-:-export(inside_dynamic_reader/0).
+:-swi_export(inside_dynamic_reader/0).
 inside_dynamic_reader :- prolog_load_context(file,Source),test_tl(thlocal:in_dynamic_reader(Source)),!.
 inside_dynamic_reader :- prolog_load_context(source,Source),test_tl(thlocal:in_dynamic_reader(Source)),!.
 
-user:term_expansion(CL,moo:was_imported_kb_content(inside_dynamic_reader,CL)):-not(thlocal:into_form_code), not((functor_h(CL,F),F=was_imported_kb_content)),
+user:term_expansion(CL,was_imported_kb_content(inside_dynamic_reader,CL)):-not(thlocal:into_form_code), not((functor_h(CL,F),F=was_imported_kb_content)),
  % ==== why we assert
    not(is_clause_moo_special(CL)),inside_dynamic_reader,
 % ==== do it
    dmsg(assertz_inside_dynamic_reader(CL)),ignore(is_compiling_sourcecode),with_assertions(thlocal:adding_from_srcfile,must_det(add(CL))),!.
 
-user:term_expansion(CL,moo:was_imported_kb_content(is_clause_moo_special,CL)):-not(thlocal:into_form_code), not((functor_h(CL,F),F=was_imported_kb_content)),
+user:term_expansion(CL,was_imported_kb_content(is_clause_moo_special,CL)):-not(thlocal:into_form_code), not((functor_h(CL,F),F=was_imported_kb_content)),
 % ==== why we assert
    is_clause_moo_special(CL),  not(inside_dynamic_reader), 
 % ==== do it

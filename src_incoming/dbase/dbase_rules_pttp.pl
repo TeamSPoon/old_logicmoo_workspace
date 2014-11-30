@@ -1,3 +1,4 @@
+
 :-module(dbase_rules_pttp,[ nnf/2, pttp1/2,
       op(400,fy,-),    % negation
       op(500,xfy,&),   % conjunction
@@ -13,6 +14,10 @@
        pttp_test/2,
        do_pttp_test/1
         ]).
+
+:-dynamic(moo:mpred_prop/2).
+:-multifile(moo:mpred_prop/2).
+:- use_module('../../src_lib/logicmoo_util/logicmoo_util_all.pl').
 
 :- style_check(+discontiguous).
 :- style_check(-singleton).
@@ -685,7 +690,7 @@ body_for_head_literal(Head,Wff,Body) :-
 
 is_functor_like_search(Search):-atom(Search),arg(_,vv(search,prove),Search).
 
-is_functor_like_firstOrder(Search):-atom(Search),arg(_,vv(firstOrder,prove),Search).
+is_functor_like_firstOrder(Search):-atom(Search),arg(_,vv(firstOrder,secondOrder,prove),Search).
 
 predicates(Wff,[]):-not(compound(Wff)),!.
 predicates([Lw],L):- predicates(Lw,L),!.
@@ -722,7 +727,7 @@ predicates(Wff,L) :-
 
 predicates(Wff,L) :- functor(Wff,F,A), predicates(Wff,F,A,L).
 
-skipped_functor(F):- fail,is_2nd_order_holds(F).
+skipped_functor(F):- fail,is_2nd_order_holds_pttp(F).
 
 predicates(Wff,F,___,L):- logical_functor(F), Wff=..[_|ARGS], predicates(ARGS,L).
 predicates(Wff,F,A,  L):- builtin(F,A), Wff=..[_|ARGS], predicates(ARGS,L).
@@ -974,9 +979,13 @@ correct_lit0(Body,Body):-not(compound(Body)),!.
 correct_lit0(BodyIn,Body):- var(BodyIn),trace_or_throw(correct_lit(BodyIn,Body)).
 correct_lit0(BodyIn,Body):- functor(BodyIn,F,A),BodyIn=..[F|List],correct_lit(BodyIn,F,A,List,Body).
 
+is_holds_false_pttp(Prop):-member(Prop,[not,nholds,holds_f,dbase_f,aint,assertion_f,asserted_dbase_f,retraction,not_secondOrder,not_firstOrder]).
+is_holds_true_pttp(Prop):-arg(_,vvv(holds,holds_t,dbase_t,asserted_dbase_t,assertion_t,assertion,secondOrder,firstOrder),Prop).
+is_2nd_order_holds_pttp(Prop):- is_holds_true_pttp(Prop) ; is_holds_false_pttp(Prop).
+
 correct_lit(BodyIn,F,_,_,Body):- atom_concat('not_',_,F),!,negated_literal(BodyIn,Neg),!,correct_lit(Neg,NegBody),negated_literal(NegBody,Body).
-correct_lit(BodyIn,F,A,L,Body):- is_holds_false(F),trace_or_throw(correct_lit(BodyIn,F,A,L,Body)).
-correct_lit(BodyIn,F,_,[L|IST],Body):- is_holds_true(F),correct_true(L,IST,Body).
+correct_lit(BodyIn,F,A,L,Body):- is_holds_false_pttp(F),trace_or_throw(correct_lit(BodyIn,F,A,L,Body)).
+correct_lit(BodyIn,F,_,[L|IST],Body):- is_holds_true_pttp(F),correct_true(L,IST,Body).
 correct_lit(BodyIn,F,_,[L|IST],Body):- correct_true(F,[L|IST],Body).
 
 do_not_wrap(F):-not(atom(F)),!,fail.
@@ -1396,7 +1405,7 @@ builtin(unify,_).
 builtin(identical_member,_).
 builtin(unifiable_member,_).
 builtin(F,_):- atom_concat(_,'_int',F),!.
-builtin(F,_):-moo:mpred_prop(F,as_is(_)),!. %,fail.
+builtin(F,_):- moo:mpred_prop(F,as_is(_)),!. %,fail.
 %builtin(F,A):-functor(P,F,A),predicate_property(P,_).
 %%% ***
 

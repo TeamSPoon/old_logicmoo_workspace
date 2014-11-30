@@ -4,14 +4,14 @@
 %
 % This allows control of any cha5racter from any otgher character
 
-:- module(as_agent, []).
+:-swi_module(as_agent, []).
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(command).
+:- register_module_type(command).
 
-moo:action_info('as'(agent,command), "as <agent> <command>").
-moo:agent_call_command(_Agent,'as'(OtherAgent,Command)):- call_agent_command(OtherAgent,Command).
+action_info('as'(agent,command), "as <agent> <command>").
+agent_call_command(_Agent,'as'(OtherAgent,Command)):- call_agent_command(OtherAgent,Command).
 
 :- include(logicmoo(vworld/moo_footer)).
 

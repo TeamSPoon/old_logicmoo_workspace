@@ -21,7 +21,7 @@
 
 *************************************************************************/
 
-:- module(fol2tptp,[fol2tptp/2]).
+:-swi_module(fol2tptp,[fol2tptp/2]).
 
 :- use_module(comsemPredicates,[basicFormula/1]).
 

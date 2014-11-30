@@ -21,7 +21,7 @@
 
 *************************************************************************/
 
-:- module(holeSemantics,[info/0,
+:-swi_module(holeSemantics,[info/0,
                          prefix/0,
                          infix/0,
                          holeSemantics/0,

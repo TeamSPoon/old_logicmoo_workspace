@@ -7,7 +7,7 @@
  
 *************************************************************************/
 
-:- module(drsTools,[exDRS/2,
+:-swi_module(drsTools,[exDRS/2,
 		    checkDRS/1,
 		    ppDRS/1]).
 

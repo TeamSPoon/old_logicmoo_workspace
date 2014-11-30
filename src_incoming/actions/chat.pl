@@ -4,19 +4,19 @@
 %
 */
 
-% :- module(user). 
-:- module(chat, [socialVerb/1,socialCommand/3,chat_to_callcmd/4]).
+% :-swi_module(user). 
+:-swi_module(chat, [socialVerb/1,socialCommand/3,chat_to_callcmd/4]).
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
 :- register_module_type(command).
 
-moo:action_info(Say,text("invokes",Does)):-socialCommand(Say,_SocialVerb,Does).
+action_info(Say,text("invokes",Does)):-socialCommand(Say,_SocialVerb,Does).
 
 socialCommand(Say,SocialVerb,chat(optional(verb,SocialVerb),optional(channel,here),string)):-socialVerb(SocialVerb), Say =.. [SocialVerb,optional(channel,here),string].
 socialVerb(SocialVerb):-member(SocialVerb,[say,whisper,emote,tell,ask,shout,gossup]).
 
-moo:agent_text_command(Agent,[Say|What],Agent,CMD):-agent_text_command_chat(Agent,[Say|What],Agent,CMD).
+agent_text_command(Agent,[Say|What],Agent,CMD):-agent_text_command_chat(Agent,[Say|What],Agent,CMD).
 
 agent_text_command_chat(Agent,[Say|What],Agent,CMD):- nonvar(Say),nonvar(What),!,
       socialVerb(Say),

@@ -7,7 +7,7 @@
 
 *************************************************************************/
 
-:- module(semOntology,[generateOntology/1,
+:-swi_module(semOntology,[generateOntology/1,
 		       generateOntology/2,
 		       consistent/2]).
 

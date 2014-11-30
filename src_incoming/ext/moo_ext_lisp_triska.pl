@@ -4,7 +4,7 @@
     Public domain code.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-% :-module(moo_ext_lisp_triska,[]).
+% :-swi_module(moo_ext_lisp_triska,[]).
 :- style_check(-singleton).
 :- style_check(-discontiguous).
 % :- style_check(-atom).

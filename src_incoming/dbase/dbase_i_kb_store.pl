@@ -28,9 +28,9 @@
 % dbase_mod/1
 % ========================================
 
-:- export dbase_mod/1.
+:- swi_export(dbase_mod/1).
 :- dynamic dbase_mod/1.
-dbase_mod(moo).
+dbase_mod(user).
 
 
 % ========================================
@@ -47,25 +47,25 @@ dbase_mod(moo).
           M:dbase_t/6,
           M:dbase_t/7)).
 
-:-export(is_svo_functor/1).
+:-swi_export(is_svo_functor/1).
 is_svo_functor(Prop):- notrace((atom(Prop),arg(_,svo(svo,prop,valueOf,rdf),Prop))).
 
-:-export(hilog_functor/1).
+:-swi_export(hilog_functor/1).
 hilog_functor(dbase_t).
 
-:-export(is_holds_true_not_hilog/1).
+:-swi_export(is_holds_true_not_hilog/1).
 is_holds_true_not_hilog(HOLDS):-is_holds_true(HOLDS),\+ hilog_functor(HOLDS).
 
-:-export(is_holds_true/1).
+:-swi_export(is_holds_true/1).
 is_holds_true(Prop):- notrace((atom(Prop),is_holds_true0(Prop))),!.
 
 % k,p,..
 is_holds_true0(Prop):-arg(_,vvv(holds,holds_t,dbase_t,asserted_dbase_t,assertion_t,assertion,secondOrder,firstOrder),Prop).
 
-:-export(is_2nd_order_holds/1).
+:-swi_export(is_2nd_order_holds/1).
 is_2nd_order_holds(Prop):- is_holds_true(Prop) ; is_holds_false(Prop).
 
-:-export(is_holds_false/1).
+:-swi_export(is_holds_false/1).
 is_holds_false(Prop):-notrace((atom(Prop),is_holds_false0(Prop))).
 
 is_holds_false0(Prop):-member(Prop,[not,nholds,holds_f,dbase_f,aint,assertion_f,asserted_dbase_f,retraction,not_secondOrder,not_firstOrder]).
@@ -88,7 +88,7 @@ non_assertable(WW,notAssertable(Why)):- compound(WW),functor_catch(WW,F,_),mpred
 % ========================================
 
 :-'$hide'(expanded_different/2).
-:-export(expanded_different/2).
+:-swi_export(expanded_different/2).
 
 expanded_different(G0,G1):-call(expanded_different_ic(G0,G1)).
 
@@ -102,7 +102,7 @@ expanded_different_1(G0,G1):- (var(G0);var(G1)),!,trace_or_throw(expanded_differ
 expanded_different_1(G0,G1):- G0 \= G1,!.
 
 
-:-export(into_hilog_form/2).
+:-swi_export(into_hilog_form/2).
 into_hilog_form(G0,G1):-call(into_hilog_form_ic(G0,G1)).
 
 into_hilog_form_ic(M:X,O):- atom(M),!,into_hilog_form_ic(X,O).
@@ -123,20 +123,20 @@ into_hilog_form(_X,F,A,Call):-Call=..[dbase_t,F|A].
 list_to_dbase_t([P|List],DBASE_T):-P==dbase_t -> DBASE_T=..[P|List] ; DBASE_T=..[dbase_t,P|List].
 
 
-hook:into_assertable_form_trans_hook(G,Dbase):- functor_catch(G,F,A),hook:into_assertable_form_trans_hook(G,F,A,Dbase).
-hook:into_assertable_form_trans_hook(G,F,_,(G)):- mpred_prop(F,prologBuiltin),!.
-hook:into_assertable_form_trans_hook(G,F,_,(G)):- mpred_prop(F,prologOnly),!.
-hook:into_assertable_form_trans_hook(G,F,_,(G)):- mpred_prop(F,as_is(_)),!.
-hook:into_assertable_form_trans_hook(G,F,_,Dbase):-mpred_prop(F,prologHybrid),!,into_hilog_form(G,Dbase).
-hook:into_assertable_form_trans_hook(G,F,_,Dbase):-mpred_prop(F,is_dbase_t),!,into_hilog_form(G,Dbase).
-hook:into_assertable_form_trans_hook(G,F,_,was_asserted_gaf(G)):- mpred_prop(F,was_asserted_gaf),!.
+into_assertable_form_trans_hook(G,Dbase):- functor_catch(G,F,A),into_assertable_form_trans_hook(G,F,A,Dbase).
+into_assertable_form_trans_hook(G,F,_,(G)):- mpred_prop(F,prologBuiltin),!.
+into_assertable_form_trans_hook(G,F,_,(G)):- mpred_prop(F,prologOnly),!.
+into_assertable_form_trans_hook(G,F,_,(G)):- mpred_prop(F,as_is(_)),!.
+into_assertable_form_trans_hook(G,F,_,Dbase):-mpred_prop(F,prologHybrid),!,into_hilog_form(G,Dbase).
+into_assertable_form_trans_hook(G,F,_,Dbase):-mpred_prop(F,is_dbase_t),!,into_hilog_form(G,Dbase).
+into_assertable_form_trans_hook(G,F,_,was_asserted_gaf(G)):- mpred_prop(F,was_asserted_gaf),!.
 
 :-dynamic_multifile_exported(into_assertable_form/2).
 into_assertable_form(M:H,G):-atom(M),!,into_assertable_form(H,G).
 % into_assertable_form(B,A):- save_in_dbase_t,!,into_hilog_form(B,A),!.
 into_assertable_form(G0,G1):-call(into_assertable_form_ic(G0,G1)).
 
-into_assertable_form_ic(H,G):- call_no_cuts((hook:into_assertable_form_trans_hook(H,G))),expanded_different(H,G),!.
+into_assertable_form_ic(H,G):- call_no_cuts((into_assertable_form_trans_hook(H,G))),expanded_different(H,G),!.
 % into_assertable_form_ic(H,GO):-expand_term( (H :- true) , C ), reduce_clause(C,G),expanded_different(H,G),!,into_assertable_form(G,GO),!.
 into_assertable_form_ic(X,O):- functor_catch(X,F,A),into_assertable_form_via_mpred(X,F,A,O),!.
 into_assertable_form_ic(X,O):- into_assertable_form(dbase_t,X,O),!.
@@ -200,14 +200,14 @@ props_into_mpred_form(PROPS,MPRED):- trace_or_throw(unk_props_into_mpred_form(PR
 
 acceptable_xform(From,To):- From \=@= To,  (To = isa(I,C) -> was_isa(From,I,C); true).
 
-:-export(was_isa/3).
+:-swi_export(was_isa/3).
 was_isa(dbase_t(C,I),I,C):- maybe_typep(C/1),not(prolog_side_effects(C/1)).
 was_isa(isa(I,C),I,C).
 was_isa(dbase_t(isa,I,C),I,C).
 was_isa(M:X,I,C):-atom(M),!,was_isa(M:X,I,C).
 was_isa(X,I,C):-compound(X),functor(X,C,1),!,arg(1,X,I),maybe_typep(C/1),not(prolog_side_effects(C/1)).
 
-:-export(prolog_side_effects/1).
+:-swi_export(prolog_side_effects/1).
 prolog_side_effects(G):-var(G),!,fail.
 prolog_side_effects(F/A):- ((integer(A);current_predicate(F/A)),functor(G,F,A)), prolog_side_effects(G).
 prolog_side_effects(G):-functor_h(G,F),mpred_prop(F,sideEffect),!.
@@ -218,7 +218,7 @@ prolog_side_effects(G):-mpred_prop(G,mped_type(callable(prologOnly))),!.
 prolog_side_effects(P):-atom(P),!,prolog_side_effects(P/_).
 
 
-:-export(maybe_typep/1).
+:-swi_export(maybe_typep/1).
 maybe_typep(F/A):- ((integer(A);current_predicate(F/A)),functor(G,F,A)), maybe_typep(G),!.
 maybe_typep(G):-prolog_side_effects(G),!,fail.
 maybe_typep(G):-functor_h(G,F),(mpred_prop(F,type);typeDeclarer(F)),!. %  ;type(F);formattype(F)
@@ -264,8 +264,8 @@ transform_holds_3(_,[P,A|ARGS],DBASE):- atom(P),!,DBASE=..[P,A|ARGS].
 transform_holds_3(_,[P,A|ARGS],DBASE):- !, nonvar(P),dumpST,trace_or_throw(dtrace), DBASE=..[P,A|ARGS].
 transform_holds_3(Op,DBASE_T,OUT):- DBASE_T=..[P,A|ARGS],!,transform_holds_3(Op,[P,A|ARGS],OUT).
 
-% Warning: moo:argIsa_ft/3, which is referenced by
-% Warning:        /devel/logicmoo/src_incoming/dbase/dbase.pl:423:56: 1-st clause of moo:transform_functor_holds/5
+% Warning: argIsa_ft/3, which is referenced by
+% Warning:        /devel/logicmoo/src_incoming/dbase/dbase.pl:423:56: 1-st clause of transform_functor_holds/5
 
 
 holds_args([H|LIST],LISTO):- !, is_holds_true(H),!,LIST=LISTO.
@@ -275,19 +275,19 @@ holds_args(HOLDS,LIST):- compound(HOLDS),HOLDS=..[H|LIST],is_holds_true(H),!.
 % ========================================
 % assert/retract hooks
 % ========================================
-:- dynamic_multifile_exported hook:decl_database_hook/2.
+:- dynamic_multifile_exported decl_database_hook/2.
 % hooks are declared as
-%        hook:decl_database_hook(assert(A_or_Z),Fact):- ...
-%        hook:decl_database_hook(retract(One_or_All),Fact):- ...
+%        decl_database_hook(assert(A_or_Z),Fact):- ...
+%        decl_database_hook(retract(One_or_All),Fact):- ...
 
 
 run_database_hooks(change(A,B),Hook):- Change=..[A,B],!,run_database_hooks(Change,Hook).
 run_database_hooks(Type,M:Hook):-atom(M),!,run_database_hooks(Type,Hook).
 run_database_hooks(Type,HookIn):- into_mpred_form(HookIn,Hook),loop_check_local(run_database_hooks_1(Type,Hook),dmsg(looped_run_database_hooks(Type,Hook))).
 
-run_database_hooks_1(Type,M:Hook):-atom(M),!,moo:run_database_hooks_1(Type,Hook).
+run_database_hooks_1(Type,M:Hook):-atom(M),!,run_database_hooks_1(Type,Hook).
 run_database_hooks_1(Type,Hook):- loop_check(run_database_hooks_2(Type,Hook),true).
-run_database_hooks_2(Type,Hook):- copy_term(Hook,HCopy),doall(call_no_cuts(hook:decl_database_hook(Type,HCopy))).
+run_database_hooks_2(Type,Hook):- copy_term(Hook,HCopy),doall(call_no_cuts(decl_database_hook(Type,HCopy))).
 
 
 
@@ -356,21 +356,21 @@ is_asserted_mpred(G):-fact_loop_checked(G,asserted_mpred_clause(G)).
 
 :-dynamic(was_asserted_gaf/1).
 :-dynamic_multifile_exported(was_asserted_gaf/1).
-:-export(asserted_mpred_clause/1).
+:-swi_export(asserted_mpred_clause/1).
 asserted_mpred_clause(naf(C)):-nonvar(C),!,not(is_asserted(C)).
 asserted_mpred_clause(C):- (functor(C,dbase_t,_);functor(C,holds_t,_)),!,trace_or_throw(use_code(is_asserted(C))).
 asserted_mpred_clause(C):-was_asserted_gaf(C).
 asserted_mpred_clause(C):-dbase_t(C).
 asserted_mpred_clause(C):-clause_asserted(C).
-asserted_mpred_clause(C):-hook:fact_always_true(C).
+asserted_mpred_clause(C):-fact_always_true(C).
 asserted_mpred_clause(H):-not(ground(H)),predicate_property(H,number_of_clauses(_)),clause(H,true).
 % asserted_mpred_clause(C):- asserted_mpred_clause_hardwork(C).
 
-asserted_mpred_clause_hardwork(C):-clause_asserted(C,moo:call_mpred_body(C,Call)),   
+asserted_mpred_clause_hardwork(C):-clause_asserted(C,call_mpred_body(C,Call)),   
                     must_det(ground(Call)), 
-                    moo:call_mpred_body(C,Call).
+                    call_mpred_body(C,Call).
 asserted_mpred_clause_hardwork(C):- has_free_args(C),!,fail.
-asserted_mpred_clause_hardwork(C):- hook:deduce_facts(Body, C),req(Body),must_det(ground(Body)),!.
+asserted_mpred_clause_hardwork(C):- deduce_facts(Body, C),req(Body),must_det(ground(Body)),!.
 
 % ============================================
 % Prolog is_asserted_clause/2
@@ -399,7 +399,7 @@ call_after_next(When,C):- ignore((When,!,do_all_of(When))),assert_next(When,C).
 
 do_all_of_when(When):- ignore((more_to_do(When),When,do_all_of(When))).
 
-:-export(do_all_of/1).
+:-swi_export(do_all_of/1).
 do_all_of(When):- ignore(loop_check_local(do_all_of_lc(When),true)),!.
 do_all_of_lc(When):- not(thglobal:will_call_after(When,_)),!.
 do_all_of_lc(When):-  repeat,do_stuff_of_lc(When), not(more_to_do(When)).
@@ -420,7 +420,7 @@ ensure_predicate_reachable(M,C):-once((predicate_property(C,imported_from(Other)
                                        context_module(CM),
                                        dmsg(wrong_import_module(M,Other:C,from(CM))),
                                        ignore(delete_import_module(CM,Other)),
-                                       '@'((M:dynamic(C),M:export(C)),M),user:import(M:C))),fail.
+                                       '@'((M:dynamic(C),M:swi_export(C)),M),user:import(M:C))),fail.
 ensure_predicate_reachable(_,_).
 
 
@@ -445,11 +445,11 @@ into_assertable_form(H,G):-expand_term( (H :- true) , C ), reduce_clause(C,G).
 
 % only place ever should actual game dbase be changed from
 
-:-export(into_mpred_aform/3).
+:-swi_export(into_mpred_aform/3).
 into_mpred_aform(C,CP,CA):-into_mpred_form(C,CP),into_assertable_form(C,CA),!.
 
 :- meta_predicate hooked_asserta(^), hooked_assertz(^), hooked_retract(^), hooked_retractall(^).
-:-export((hooked_asserta/1,hooked_assertz/1)).
+:-swi_export((hooked_asserta/1,hooked_assertz/1)).
 hooked_asserta(C):- into_mpred_aform(C,CP,CA),hooked_asserta(CP,CA).
 hooked_assertz(C):- into_mpred_aform(C,CP,CA),hooked_assertz(CP,CA).
 hooked_retract(C):- into_mpred_aform(C,CP,CA),hooked_retract(CP,CA).
@@ -533,14 +533,14 @@ database_real(P,C):-
 % ========================================
 % Rescan for consistency
 % ========================================
-:- export((rescan_dbase_facts/0, rescan_duplicated_facts/0, rerun_database_hooks/0 , gather_fact_heads/2)).
+:-swi_export((rescan_dbase_facts/0, rescan_duplicated_facts/0, rerun_database_hooks/0 , gather_fact_heads/2)).
 
 rescan_dbase_facts:-!.
 rescan_dbase_facts:-  loop_check_local(rescan_dbase_facts_local).
 
 rescan_dbase_facts_local:-with_no_assertions(thglobal:use_cyc_database,(must_det(rescan_duplicated_facts),must_det(rerun_database_hooks))).
 
-rescan_duplicated_facts:- !, notrace( forall(member(M,[moo,world,hook]), forall((predicate_property(M:H,dynamic),mpred_arity(F,A),functor(H,F,A)), rescan_duplicated_facts(M,H)))).
+rescan_duplicated_facts:- !, notrace( forall(member(M,[moo,user,world,hook]), forall((predicate_property(M:H,dynamic),mpred_arity(F,A),functor(H,F,A)), rescan_duplicated_facts(M,H)))).
 rescan_duplicated_facts(_M,_H):-!.
 rescan_duplicated_facts(M,H):-!,rescan_duplicated_facts(M,H,true).
 rescan_duplicated_facts(M,H):-findall(H,(clause_safe(M:H,B),B==true),CL1), once((list_to_set(CL1,CL2),reduce_fact_heads(M,H,CL1,CL2))).

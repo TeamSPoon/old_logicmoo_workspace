@@ -21,7 +21,7 @@
 
 *************************************************************************/
 
-:- module(worldKnowledge,[worldKnowledge/3]).
+:-swi_module(worldKnowledge,[worldKnowledge/3]).
 
 /*========================================================================
    Axioms for World Knowledge

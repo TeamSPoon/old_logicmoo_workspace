@@ -8,7 +8,7 @@
  
 *************************************************************************/
 
-:- module(alphaConversion2,[alphaConvert/2,
+:-swi_module(alphaConversion2,[alphaConvert/2,
                            alphabeticVariants/2]).
 
 :- use_module(comsemPredicates,[compose/3,

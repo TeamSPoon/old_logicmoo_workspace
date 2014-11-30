@@ -2,7 +2,7 @@
 % Aleksandar Dimitrov
 % based on Helpful Curt
 
-:- module(curt,[curt/0,curtUpdate/3,infix/0,prefix/0]).
+:-swi_module(curt,[curt/0,curtUpdate/3,infix/0,prefix/0]).
 
 :- use_module(callInference,[callTP/3,
                              callTPandMB/6]).
@@ -253,12 +253,12 @@ beAdvertent((Index,world(_,_,Background)),knowledge(X,que(_,alt,Q))) :-
 		\+ check(and(and(Background,BK2),not(BG)),'yes/ interrogative: informativity',_)
 		, !
 		, backgroundKnowledge(BG,BK)
-		, check(and(BG,BK),'preparing world: consistency', model(D2,F2))
+		, check(and(BG,BK),'preparing world : consistency', model(D2,F2))
 		, World = (X,Index,world(D2,F2,BG))
 	;
 		\+ check(and(and(Background,BK2),BG),'/no interrogative: informativity',_)
 		, backgroundKnowledge(NBG,BK)
-		, check(and(NBG,BK),'preparing world: consistency', model(D2,F2))
+		, check(and(NBG,BK),'preparing world : consistency', model(D2,F2))
 		, World = (X,Index,world(D2,F2,NBG))
 	)
 	, addEpistemic(World)
@@ -274,7 +274,7 @@ beAdvertent((Index,world(D,F,Background)),knowledge(X,que(Y,Domain,Body))) :-
 		Q = Answer
 	)
 	, backgroundKnowledge(Q,BK)
-	, check(and(Q,BK),'preparing world: consistency', model(D2,F2))
+	, check(and(Q,BK),'preparing world : consistency', model(D2,F2))
 	, World = (X, Index,world(D2,F2,Q))
 	, addEpistemic(World)
 	.
@@ -290,7 +290,7 @@ beAdvertent((Index,world(_,_,Background)),knowledge(X,P)) :-
 	, backgroundKnowledge(and(Q,Background),BK2)
 	, \+ check(and(and(Background,BK2),not(Q)),'embedded proposition: informativity',_)
 	, backgroundKnowledge(Q,BK)
-	, check(and(Q,BK),'preparing world: consistency', model(D2,F2))
+	, check(and(Q,BK),'preparing world : consistency', model(D2,F2))
 	, World = (X,Index,world(D2,F2,Q))
 	, addEpistemic(World)
 	.

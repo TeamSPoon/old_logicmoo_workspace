@@ -9,11 +9,11 @@
 % Revised At:   $Date: 2002/06/06 15:43:15 $
 % ===================================================================
 
-:- module(parser_CURT,[
+:-swi_module(parser_CURT,[
          ]).
 
 % ==============================================================================
-% :- reexport('CURT/curtPPDRT').
+% :- reswi_export('CURT/curtPPDRT').
 :- ['CURT/advertentCurt'].
 
 
@@ -21,10 +21,10 @@
 % ===========================================================
 % CURT80 command
 % ===========================================================
-moo:type_action_info(human_player,curt80(list(term)),"Development test CURT Text for a human.  Usage: CURT80 Cant i see the blue backpack?").
+type_action_info(human_player,curt80(list(term)),"Development test CURT Text for a human.  Usage: CURT80 Cant i see the blue backpack?").
 
-moo:agent_call_command(_Gent,curt80([])):- curt80.
-moo:agent_call_command(_Gent,curt80(StringM)):- curt80(StringM).  
+agent_call_command(_Gent,curt80([])):- curt80.
+agent_call_command(_Gent,curt80(StringM)):- curt80(StringM).  
 
 
 % ===========================================================

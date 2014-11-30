@@ -7,7 +7,7 @@
 % Dec 13, 2035
 %
 */
-% :- module(world_effects,[]).
+% :-swi_module(world_effects,[]).
 /*
 % This file is "included" from world.pl 
 */
@@ -27,7 +27,7 @@ do_act_affect(Agent,Action,Obj) :-
            props(Obj,act_affect(Action,charge(NRG))),
 	req(charge(Agent,Chg)),
 	req(stm(Agent,Stm)),
-	moo:max_charge(Agent,Max),
+	max_charge(Agent,Max),
 	(Chg + NRG) < (((Stm * 10) -20) + Max),
 	add(charge(Agent,+NRG)),
 	fail. % fail to check for healing
@@ -45,14 +45,14 @@ do_act_affect(_,_,_).
 
 
 % Check to see if last action was successful or not
-:-export(success/2).
+:-swi_export(success/2).
 success(Agent,no) :- cmdfailure(Agent,_),!.
 success(_,yes).
 
-:-export(add_cmdfailure/2).
+:-swi_export(add_cmdfailure/2).
 add_cmdfailure(Agent,What):-add(cmdfailure(Agent,What)).
 
-hook:decl_database_hook(assert(_),cmdfailure(Agent,What)):- once(idel(cmdsuccess(Agent,What));clr(cmdsuccess(Agent,_))).
+decl_database_hook(assert(_),cmdfailure(Agent,What)):- once(idel(cmdsuccess(Agent,What));clr(cmdsuccess(Agent,_))).
 
 % Initialize world.
 % This keeps the old databases messing with new runs.
@@ -62,11 +62,11 @@ hook:decl_database_hook(assert(_),cmdfailure(Agent,What)):- once(idel(cmdsuccess
 
 % Check to see if any of the objects should be placed in the world as it runs.
 
-:-export(call_update_charge/2).
-call_update_charge(Agent,What):- padd(Agent,cmdsuccess(What)), doall(must(moo:update_charge(Agent,What))),!.
+:-swi_export(call_update_charge/2).
+call_update_charge(Agent,What):- padd(Agent,cmdsuccess(What)), doall(must(update_charge(Agent,What))),!.
 
-:-export(call_update_stats/2).
-call_update_stats(Agent,What):- padd(Agent,cmdsuccess(What)), doall(must(moo:update_stats(Agent,What))),!.
+:-swi_export(call_update_stats/2).
+call_update_stats(Agent,What):- padd(Agent,cmdsuccess(What)), doall(must(update_stats(Agent,What))),!.
 
 set_stats(Agent,[]) :- set_stats(Agent,[str(2),height(2),stm(2),spd(2)]).
 

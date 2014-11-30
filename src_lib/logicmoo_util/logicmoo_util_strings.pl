@@ -135,7 +135,7 @@ list_replace(List,Char,Replace,NewList):-
 	append(NewLeft,NewRight,NewList),!.
 list_replace(List,_Char,_Replace,List):-!.
 
-term_to_string(I,IS):- ccatch(string_to_atom(IS,I),_,fail),!.
+term_to_string(I,IS):- catchv(string_to_atom(IS,I),_,fail),!.
 term_to_string(I,IS):- term_to_atom(I,A),string_to_atom(IS,A),!.
 
 % ===========================================================
@@ -326,8 +326,8 @@ any_to_string0(Atom,String):-string(Atom),Atom=String,!.
 any_to_string0(Atom,String):-atom(Atom),atom_string(Atom,String),!.
 any_to_string0([Atom],String):-atom(Atom),atom_string(Atom,String),!.
 any_to_string0(A,""):-nonvar(A),member(A,[[],'',""]),!.
-any_to_string0(List,String):-ccatch(text_to_string(List,String),_,fail),!.
-any_to_string0(List,String):-is_list(List), (ccatch(atomics_to_string(List, ' ', String),_,fail);((list_to_atomics_list0(List,AList),ccatch(atomics_to_string(AList, ' ', String),_,fail)))),!.
+any_to_string0(List,String):-catchv(text_to_string(List,String),_,fail),!.
+any_to_string0(List,String):-is_list(List), (catchv(atomics_to_string(List, ' ', String),_,fail);((list_to_atomics_list0(List,AList),catchv(atomics_to_string(AList, ' ', String),_,fail)))),!.
 any_to_string0(List,String):-sformat(String,'~q',[List]).
 
 list_to_atomics_list0(Var,A):-var(Var),!,any_to_string(Var,A),!.
@@ -337,13 +337,13 @@ list_to_atomics_list0([E|EnglishF],[A|EnglishA]):-
 list_to_atomics_list0([],[]):-!.
 
 :-export(atomic_list_concat_catch/3).
-atomic_list_concat_catch(List,Sep,Atom):-ccatch(atomic_list_concat(List,Sep,Atom),E,(dumpST,dmsg(E:atomic_list_concat(List,Sep,Atom)),!,fail)).
+atomic_list_concat_catch(List,Sep,Atom):-catchv(atomic_list_concat(List,Sep,Atom),E,(dumpST,dmsg(E:atomic_list_concat(List,Sep,Atom)),!,fail)).
 
 
-catch_read_term_from_atom(Sub,Term,NewOnes):-ccatch(read_term_from_atom(Sub,Term,[module(user),variable_names(NewOnes)]),_,fail),Term\==end_of_file.
+catch_read_term_from_atom(Sub,Term,NewOnes):-catchv(read_term_from_atom(Sub,Term,[module(user),variable_names(NewOnes)]),_,fail),Term\==end_of_file.
 
-splt_words(Atom,Terms,Var):- ccatch((hotrace(once(splt_words_0(Atom,Terms,Var)))),_,fail),!.
-splt_words(Atom,Words1,[]):- ccatch(atomic_list_concat(Words1,' ',Atom),_,fail),!.
+splt_words(Atom,Terms,Var):- catchv((hotrace(once(splt_words_0(Atom,Terms,Var)))),_,fail),!.
+splt_words(Atom,Words1,[]):- catchv(atomic_list_concat(Words1,' ',Atom),_,fail),!.
 splt_words_0('',[],[]):-!.
 splt_words_0(Atom,[Term|List],Vars):- atom_length(Atom,To),between(0,To,X), 
       sub_atom(Atom,0,Len,X,Sub),Len>0,
@@ -451,8 +451,8 @@ remove_predupes([L|ListI], ListO):- (member_ci(L,ListI) -> remove_predupes(ListI
 member_ci(L,[List|I]):-!,member(LL2,[List|I]),string_equal_ci(LL2,L).
 member_ci(W,WL):-to_word_list(WL,ListI),member(LL2,ListI),string_equal_ci(LL2,W).
 
-string_ci(A,LIC):-var(A),!,A=LIC.
-string_ci(A,LIC):-hotrace((any_to_string(A,S),non_empty(A),text_to_string(S,SS),string_lower(SS,SL),atomics_to_string(SLIC,"_",SL),atomics_to_string(SLIC," ",LIC))),!.
+string_ci(A,LIC):-hotrace((must(nonvar(A)),non_empty(A),any_to_string(A,S),!,text_to_string(S,SS),string_lower(SS,SL),atomics_to_string(SLIC,"_",SL),
+   atomics_to_string(SLIC," ",LIC))),!.
 
 :-export(append_ci/3).
 append_ci(A1,A2,A3):-to_word_list(A1,L1),to_word_list(A2,L2),to_word_list(A3,L3),!, append_ci0(L1,L2,L3),!.

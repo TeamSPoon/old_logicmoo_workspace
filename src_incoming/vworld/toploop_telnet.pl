@@ -2,13 +2,13 @@
 % Initial Telnet/Text console 
 % ALL telnet client business logic is here (removed from everywhere else!)
 %
-% Project Logicmoo: A MUD server written in Prolog
+% Logicmoo Project PrologMUD: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
 */
 
-:- module(toploop_telnet, [                  
+:-swi_module(toploop_telnet, [                  
                   do_player_action/1,
                   connect_player/2,
                   look_brief/1,
@@ -32,7 +32,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(utility).
+:- register_module_type(utility).
 
 :-  use_module(library(threadutil)).
 
@@ -51,22 +51,23 @@ service_client_call(Call, Slave, In, Out, Host, Peer, Options):-
    call(Call).
   
 login_and_run_nodebug:- 
- set_no_debug,
-   notrace((set_tty_control, login_and_run)).
+ ignore(set_no_debug),
+ set_tty_control, 
+ notrace(login_and_run).
 
 login_and_run:-
    % current_input(In),current_output(Out),
    %setup_streams(In, Out),   
    %threads,
    player_connect_menu,
-   % do_player_action(P,'who'),
-   % call_agent_command(P,'look'),
+   % do_player_action(P,'who'),   
    run_player_telnet.
 
 player_connect_menu:-
    foc_current_player(WantsPlayer),
    connect_player(WantsPlayer,P),
-   foc_current_player(P).
+   foc_current_player(P),
+   call_agent_command(P,'look'),!.
 
 connect_player(Wants,Gets):-
    foc_current_player(Wants),
@@ -76,8 +77,9 @@ connect_player(Wants,Gets):-
 
 
 run_player_telnet:-   
-   set_tty_control,
-   foc_current_player(P),
+   set_tty_control,!,
+   fmt('~n~n~nHello run_player_telnet!~n',[]),
+   must(foc_current_player(P)),
    fmt('~n~n~nHello ~w! Welcome to the MUD!~n',[P]),
    colormsg([blink,fg(red)],"this is blinking red!"),
    call_cleanup(
@@ -146,8 +148,7 @@ set_player_stream(P,Id,In,Out):-
    
 
 
-read_and_do_telnet:-
-   set_prolog_flag(gui_tracer, false),
+read_and_do_telnet:-   
    foc_current_player(P),
    ensure_player_stream_local(P),
          must(ignore(look_brief(P))),!,         
@@ -155,13 +156,13 @@ read_and_do_telnet:-
             must(once(do_player_action(List))),!.
 
 
-:-export(prompt_read/2).
+:-swi_export(prompt_read/2).
 prompt_read_telnet(Prompt,Atom):-
       get_session_id(O),
       prompt_read(Prompt,IAtom),
       (IAtom==end_of_file -> (assert(thlocal:wants_logout(O)),Atom='quit') ; IAtom=Atom),!.
 
-:-export(prompt_read/2).
+:-swi_export(prompt_read/2).
 prompt_read(Prompt,Atom):-        
         ansi_format([reset,hfg(white),bold],'~w',[Prompt]),flush_output,        
         repeat,read_code_list_or_next_command(Atom),!.
@@ -187,15 +188,15 @@ code_list_to_next_command([],'look').
 code_list_to_next_command([91|REST],TERM):- catchv((atom_codes(A,[91|REST]),atom_to_term(A,TERM,[])),_,fail),!.
 code_list_to_next_command(NewCodes,Atom):-atom_codes(Atom,NewCodes),!.
 
-:-export(scan_updates/0).
+:-swi_export(scan_src_updates/0).
 
 tick_tock:-
-           scan_updates,!,fmt('tick tock',[]),sleep(0.1),!.
+           scan_src_updates,!,fmt('tick tock',[]),sleep(0.1),!.
 
-scan_updates:- !.
-scan_updates:- ignore((thread_self(main),ignore((catch(make,E,dmsg(E)))))).
+scan_src_updates:- !.
+scan_src_updates:- ignore((thread_self(main),ignore((catch(make,E,dmsg(E)))))).
 
-hook:decl_database_hook(Type,C):- current_agent(Agent),interesting_to_player(Type,Agent,C).
+decl_database_hook(Type,C):- current_agent(Agent),interesting_to_player(Type,Agent,C).
 
 interesting_to_player(Type,Agent,C):- contains_var(C,Agent),dmsg(agent_database_hook(Type,C)),!.
 interesting_to_player(Type,Agent,C):-is_asserted(localityOfObject(Agent,Region)),contains_var(C,Region),dmsg(region_database_hook(Type,C)),!.
@@ -205,10 +206,10 @@ interesting_to_player(Type,Agent,C):-is_asserted(localityOfObject(Agent,Region))
 % USES PACKRAT PARSER 
 % ===========================================================
 
-:-export(do_player_action/1).
+:-swi_export(do_player_action/1).
 do_player_action(VA):- debug, foc_current_player(Agent),!, do_player_action(Agent,VA),!.
 
-:-export(do_player_action/2).
+:-swi_export(do_player_action/2).
 do_player_action(Agent,CMD):-var(CMD),!,fmt('unknown_var_command(~q,~q).',[Agent,CMD]).
 do_player_action(_,EOF):- end_of_file == EOF, !, tick_tock.
 do_player_action(_,''):-!, tick_tock.
@@ -251,7 +252,7 @@ write_pretty(Percepts) :-
 write_pretty_aux(Rest,Rest,5).
 write_pretty_aux([[]|Tail],Return,Column) :-
 	Ctemp is Column + 1,
-	moo:label_type(Obj,0),
+	label_type(Obj,0),
 	write(Obj), write(' '),
 	write_pretty_aux(Tail,Return,Ctemp).
 write_pretty_aux([[dark]|Tail],Return,Column) :-
@@ -260,7 +261,7 @@ write_pretty_aux([[dark]|Tail],Return,Column) :-
 	write_pretty_aux(Tail,Return,Ctemp).
 write_pretty_aux([[Head]|Tail], Return, Column) :-
 	Ctemp is Column + 1,
-	moo:label_type(Map,Head),
+	label_type(Map,Head),
 	write(Map), write(' '),
 	write_pretty_aux(Tail, Return, Ctemp).
 write_pretty_aux([[Agent]|Tail],Return,Column) :-
@@ -281,7 +282,7 @@ show_room_grid(Room) :- ignore(show_room_grid_new(Room)),!.
 % ===================================================================
 % show_room_grid_new(Room)
 % ===================================================================
-:-export(show_room_grid_new/1).
+:-swi_export(show_room_grid_new/1).
 show_room_grid_new(Room):-
    grid_size(Room,Xs,Ys,_Zs),
    Ys1 is Ys+1,Xs1 is Xs+1,
@@ -305,7 +306,7 @@ show_room_grid_single(_Room,_LOC,_OutsideTest):- write('--'), !.
 
 inst_label(Obj,SLabe2):-term_to_atom(Obj,SLabel),sub_atom(SLabel,1,2,_,SLabe2),!.
 inst_label(Obj,SLabe2):-term_to_atom(Obj,SLabel),sub_atom(SLabel,0,2,_,SLabe2),!.
-inst_label(Obj,Label):- moo:label_type(Label,Obj),!.
+inst_label(Obj,Label):- label_type(Label,Obj),!.
 inst_label(Obj,Label):-  iprops(Obj,nameStrings(Val)),Val\=Obj,inst_label(Val,Label),!.
 inst_label(Obj,Label):-  iprops(Obj,named(Val)),Val\=Obj,!,inst_label(Val,Label),!.
 inst_label(Obj,Label):-  iprops(Obj,isa(Val)),Val\=Obj,inst_label(Val,Label),!.
@@ -347,7 +348,7 @@ show_room_grid(Room,Y,X,N) :-
         loc_to_xy(Room,X,Y,LOC),
 	asserted_atloc(Obj,LOC),
         prop(Obj,isa,Class),
-	moo:label_type(Label,Class),
+	label_type(Label,Class),
 	write(Label), write(' '),
 	XX is X + 1,
 	!,
@@ -365,7 +366,7 @@ show_room_grid(Room,Y,X,N) :-
 % Used to display the labels of the grid locations. (the key to the map).
 % Used at end of run.
 display_grid_labels :-
-	findall([Label,Name],moo:label_type(Label,Name),List),
+	findall([Label,Name],label_type(Label,Name),List),
 	forall(prop_memb([Label,Name],List),
 	           (write(Label), write('='), write(Name), write(' '))),
 		   nl.

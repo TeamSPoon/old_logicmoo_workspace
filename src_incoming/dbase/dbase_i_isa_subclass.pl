@@ -12,7 +12,7 @@
 % Douglas Miles
 */
 
-:- dynamic_multifile_exported hook:fact_always_true/1.
+:- dynamic_multifile_exported fact_always_true/1.
 
 % nart_to_atomic(L,L):-!,atom(L).
 nart_to_atomic(L,L).
@@ -53,20 +53,20 @@ define_ft_0(Spec):- hooked_asserta(isa(Spec,formattype)),asserta_if_new(dbase_t(
 
 %type(Spec):- is_asserted(isa(Spec,type)).
 
-:-export(decl_type_safe/1).
+:-swi_export(decl_type_safe/1).
 decl_type_safe(T):- compound(T),!.
 decl_type_safe(T):- ignore((atom(T),not(never_type(T)),not(number(T)),decl_type(T))).
 
-:-export(assert_subclass/2).
+:-swi_export(assert_subclass/2).
 assert_subclass(O,T):-assert_subclass_safe(O,T).
 
-:-export(assert_subclass_safe/2).
+:-swi_export(assert_subclass_safe/2).
 assert_subclass_safe(O,T):- ignore((nonvar(O),decl_type_safe(O),nonvar(T),decl_type_safe(T),nonvar(O),not(formattype(O)),not(formattype(T)),add(subclass(O,T)))).
 
-:-export(assert_isa_safe/2).
+:-swi_export(assert_isa_safe/2).
 assert_isa_safe(O,T):- ignore((nonvar(O),nonvar(T),decl_type_safe(T),assert_isa(O,T))).
 
-hook:decl_database_hook(assert(_A_or_Z),subclass(S,C)):-decl_type_safe(S),decl_type_safe(C).
+decl_database_hook(assert(_A_or_Z),subclass(S,C)):-decl_type_safe(S),decl_type_safe(C).
 
 :- decl_type(type).
 :- decl_type(completeExtentAsserted).
@@ -76,14 +76,14 @@ hook:decl_database_hook(assert(_A_or_Z),subclass(S,C)):-decl_type_safe(S),decl_t
 is_creatable_type(Type):- arg(_,vv(agent,item,region,concept),Type).
 is_creatable_type(Type):- atom(Type),call(is_asserted(isa(Type,createableType))).
 
-hook:decl_database_hook(assert(_A_or_Z),isa(W,createableType)):-decl_type_safe(W),call_after_game_load(forall(isa(I,W),create_instance(I,W))).
-hook:decl_database_hook(assert(_A_or_Z),isa(W,type)):-atom(W),atomic_list_concat(List,'_',W),!,length(List,2),!,
+decl_database_hook(assert(_A_or_Z),isa(W,createableType)):-decl_type_safe(W),call_after_game_load(forall(isa(I,W),create_instance(I,W))).
+decl_database_hook(assert(_A_or_Z),isa(W,type)):-atom(W),atomic_list_concat(List,'_',W),!,length(List,2),!,
    append(FirstPart,[Last],List),atom_length(Last,AL),AL>3,not(member(flagged,FirstPart)),atomic_list_concat(FirstPart,'_',_NewCol),show_call_failure(assert_subclass_safe(W,Last)).
 
 % ================================================
 % assert_isa/2
 % ================================================
-:-export assert_isa/2.
+:-swi_export(assert_isa/2).
 :-dynamic_multifile_exported i_countable/1.
 
 assert_isa(I,T):- not(ground(I:T)),trace_or_throw(not(ground(assert_isa(I,T)))).
@@ -91,7 +91,7 @@ assert_isa(_,term):-!.
 assert_isa(_,term(_)):-!.
 assert_isa(I,T):- loop_check(assert_isa_lc(I,T),true).
 
-:-export assert_isa_lc/2.
+:-swi_export(assert_isa_lc/2).
 % skip formatter types
 assert_isa_lc(_I,T):- member(T,[string,action,dir,apath]),!.
 assert_isa_lc(I,T):- hotrace(formattype(T)),(compound(I)->true;dmsg(once(dont_assert_is_ft(I,T)))).
@@ -119,14 +119,14 @@ insttype_for_parse(I):-findall(C,(instance_for_parse(I),isa(I,C)),List),list_to_
 % ================================================
 % assert_isa HOOKS
 % ================================================
-hook:decl_database_hook(_,subclass(_,_)):-retractall(dbase_t(_,isa,_,_)),retractall(dbase_t(_,subclass,_,_)).
-hook:decl_database_hook(assert(_),DATA):-into_mpred_form(DATA,O),!,O=isa(I,T),hotrace(doall(assert_isa_hooked(I,T))).
-% hook:decl_database_hook(retract(_),isa(I,T)):-doall(db_retract_isa_hooked(I,T)).
+decl_database_hook(_,subclass(_,_)):-retractall(dbase_t(_,isa,_,_)),retractall(dbase_t(_,subclass,_,_)).
+decl_database_hook(assert(_),DATA):-into_mpred_form(DATA,O),!,O=isa(I,T),hotrace(doall(assert_isa_hooked(I,T))).
+% decl_database_hook(retract(_),isa(I,T)):-doall(db_retract_isa_hooked(I,T)).
 
 assert_isa_hooked(A,_):-retractall(dbase_t(cache_I_L,isa,A,_)),fail.
 assert_isa_hooked(F,T):-argsIsaProps(T),decl_mpred(F,T),fail.
 assert_isa_hooked(I,T):- not(ground(assert_isa(I,T))),!, trace_or_throw(not(ground(assert_isa(I,T)))).
-assert_isa_hooked(I,T):- asserta_if_new(moo:dbase_t(T,I)),fail.
+assert_isa_hooked(I,T):- asserta_if_new(dbase_t(T,I)),fail.
 
 assert_isa_hooked(T,type):-!,decl_type(T),!.
 assert_isa_hooked(T,formattype):-!,define_ft(T),!.
@@ -142,7 +142,7 @@ assert_isa_hooked(food5,'Weapon'):-trace_or_throw(assert_isa(food5,'Weapon')).
 % assert_isa_hooked(I,T):-dmsg((told(assert_isa(I,T)))).
 
 
-hook:decl_database_hook(assert(_),isa(I,T)):- doall(assert_isa_hooked_after(I,T)).
+decl_database_hook(assert(_),isa(I,T)):- doall(assert_isa_hooked_after(I,T)).
 
 assert_isa_hooked_after(F,T):-argsIsaProps(T),!,decl_mpred(F,T).
 assert_isa_hooked_after(_,type):-!.
@@ -160,11 +160,11 @@ completeExtentAsserted(F):- is_asserted(isa(F,completeExtentAsserted)).
 
 
 % one of 4 special types
-assert_isa_hooked_creation(I,T):- is_creatable_type(T),!,call_after_game_load((world:create_instance(I,T,[]))).
+assert_isa_hooked_creation(I,T):- is_creatable_type(T),!,call_after_game_load((create_instance(I,T,[]))).
 % sublass of 4 special types
-assert_isa_hooked_creation(I,T):- doall((is_creatable_type(ST),impliedSubClass(T,ST),call_after_game_load((world:create_instance(I,ST,[isa(T)]))))).
+assert_isa_hooked_creation(I,T):- doall((is_creatable_type(ST),impliedSubClass(T,ST),call_after_game_load((create_instance(I,ST,[isa(T)]))))).
 
-:-export transitive_subclass_tst/2.
+:-swi_export( transitive_subclass_tst/2).
 transitive_subclass_tst(_,_):-!,fail.
 
 
@@ -177,7 +177,7 @@ isa_backchaing_v_nv(A,term):-nonvar(A),!.
 isa_backchaing_v_nv(_,var):-!.
 isa_backchaing_v_nv(A,T):-no_repeats([A],(transitive_subclass_or_same(AT,T),isa_asserted(A,AT))).
 
-:-export(isa_backchaing_0/2).
+:-swi_export(isa_backchaing_0/2).
 isa_backchaing_0(A,T):- T==var,!,var(A).
 isa_backchaing_0(A,T):-  var(A),nonvar(T),!,isa_backchaing_v_nv(A,T).
 isa_backchaing_0(A,T):-  var(T),!,setof(TT,AT^(isa_asserted(A,AT),transitive_subclass_or_same(AT,TT)),List),!,member(T,List).
@@ -207,7 +207,7 @@ isa_backchaing_nv_nv(I,T):-atom(T),!,catch(call(T,I),_,fail).
 
 not_ft(T):-transitive_subclass_or_same(T,spatialthing).
 
-:-export(isa_asserted/2).
+:-swi_export(isa_asserted/2).
 isa_asserted(A,T):-no_repeats(isa_asserted_nr(A,T)).
 isa_asserted_nr(A,T):- nonvar(A),fail,build_isa_inst_list_cache(A,_,T,CALL),CALL.
 isa_asserted_nr(A,T):- stack_check,fact_loop_checked(isa(A,T),isa_asserted_0(A,T)).
@@ -220,7 +220,7 @@ isa_asserted_0(I,T):-string(I),!,member(T,[string,text]).
 isa_asserted_0(I,T):-integer(I),!,member(T,[int,number,value]).
 isa_asserted_0(I,T):-number(I),!,member(T,[number,float,value]).
 isa_asserted_0(I,T):-atom(I),isa_w_inst_atom(I,T).
-isa_asserted_0(I,T):-hook:fact_always_true(isa(I,T)).
+isa_asserted_0(I,T):-fact_always_true(isa(I,T)).
 isa_asserted_0(I,T):-mpred_prop(I,T),T\=mped_type(_).
 isa_asserted_0(_,T):-var(T),!,fail.
 isa_asserted_0(I,formattype):-!,isa_w_type_atom(I,formattype).
@@ -290,11 +290,11 @@ mpred_prop(mpred_prop,prologOnly).
 
 
 
-:- export(impliedSubClass/2).
+:- swi_export(impliedSubClass/2).
 impliedSubClass(T,ST):-ground(T:ST),is_known_false(subclass(T,ST)),!,fail.
 impliedSubClass(T,ST):-predicate_property(transitive_subclass(T,ST),_),!,call_tabled(transitive_subclass(T,ST)).
 
-:- export(asserted_subclass/2).
+:- swi_export(asserted_subclass/2).
 asserted_subclass(I,T):- ((thlocal:useOnlyExternalDBs,!);thglobal:use_cyc_database),(kbp_t([genls,I,T])).
 asserted_subclass(T,ST):-dbase_t(subclass,T,ST).
 
@@ -305,7 +305,7 @@ into_single_class('&'(A,Var),VV):-var(Var),!,into_single_class(A,VV).
 into_single_class('&'(A,B),VV):-!, into_single_class((B),VV);into_single_class((A),VV).
 into_single_class(A,A).
 
-:- export((transitive_subclass/2)).
+:- swi_export((transitive_subclass/2)).
 transitive_subclass(_,T):-T==formattype,!,fail.
 transitive_subclass(A,_):-A==formattype,!,fail.
 transitive_subclass(A,T):- bad_idea,!, into_single_class(A,AA), into_single_class(T,TT), fact_loop_checked(subclass(A,T),transitive_P_l_r(dbase_t,subclass,AA,TT)).
@@ -424,7 +424,7 @@ not_mud_isa(X,type):-never_type(X).
 
 :-dynamic_multifile_exported(disjointWith/2).
 
-:-export(has_free_args/1).
+:-swi_export(has_free_args/1).
 has_free_args(C):- not(ground(C)), compound(C),not(not(arg(_,C,var))),!.
 
 % is_known_false(subclass(A,B)):-disjointWith(A,B).

@@ -21,7 +21,7 @@
 
 *************************************************************************/
 
-:- module(lambda,[info/0,
+:-swi_module(lambda,[info/0,
                   infix/0,
                   prefix/0,
                   lambda/0,

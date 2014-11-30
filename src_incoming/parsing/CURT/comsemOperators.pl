@@ -7,7 +7,7 @@
  
 *************************************************************************/
 
-:- module(comsemOperators,[
+:-swi_module(comsemOperators,[
 
 op(950,yfx,@),         % application
 op(900,yfx,'<>'),      % bin impl

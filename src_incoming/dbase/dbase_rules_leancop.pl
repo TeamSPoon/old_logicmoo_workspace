@@ -1,7 +1,7 @@
 
 end_of_file.
 
-:-module(dbase_rules_leancop,[
+:- module(dbase_rules_leancop,[
       op(400,fy,-),    % negation
       op(500,xfy,&),   % conjunction
       op(600,xfy,v),   % disjunction
@@ -15,6 +15,8 @@ end_of_file.
         ]).
 
 :- dynamic(axiom_path/1).
+
+getenv_or(N,V,O):-getenv(N,V)->true;V=O.
 
 user:file_search_path(tptp, EnvPath) :- getenv('TPTP',EnvPath),atom(EnvPath).
 user:file_search_path(tptp, EnvPath) :- getenv('LOGICMOO_HOME',MOO),atom(MOO),atom_concat(MOO,'../TPTP', EnvPath).

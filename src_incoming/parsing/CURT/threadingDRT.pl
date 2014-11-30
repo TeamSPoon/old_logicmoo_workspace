@@ -7,7 +7,7 @@
  
 *************************************************************************/
 
-:- module(threadingDRT,[threadingDRT/0,
+:-swi_module(threadingDRT,[threadingDRT/0,
 			threadingDRT/2,
 			threadingDRTTestSuite/0]).
 

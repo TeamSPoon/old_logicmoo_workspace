@@ -1,4 +1,4 @@
-:- module(intensionalExampleModels,[example/2]).
+:-swi_module(intensionalExampleModels,[example/2]).
 
 
 /*========================================================================

@@ -502,16 +502,17 @@ has_gui_debug :- getenv('DISPLAY',NV),NV\==''.
 
 set_no_debug:- 
    retractall(ifCanTrace),
-   retractall(ifWontTrace),asserta(ifWontTrace),
-   notrace, nodebug,
+   retractall(ifWontTrace),
+   asserta(ifWontTrace),   
    set_prolog_flag(report_error,false),   
    set_prolog_flag(debug_on_error,false),
    set_prolog_flag(debug, false),   
    set_prolog_flag(query_debug_settings, debug(false, false)),
-   catch(noguitracer,_,true),
+   ignore((catch(noguitracer,_,true))),
    set_prolog_flag(gui_tracer, false),
    leash(-all),
-   visible(-cut_call),!.
+   visible(-cut_call),!,
+   notrace, nodebug,!.
 
 
 
@@ -579,7 +580,7 @@ shrink_clause(P,Body,Prop):- (Body==true-> Prop=P ; (Prop= (P:-Body))).
 tlocal_show(M,F,A,P,_ON,TF):-
    copy_term(P,PL),
    must_det((predicate_property(M:P,number_of_clauses(_)) -> findall(Prop,(clause(M:PL,Body),shrink_clause(PL,Body,Prop)),Props1);Props1=[no_clause_Access])),
-   findall(' ++'(Prop),call(mpred_prop,F,Prop),Props2),
+   findall(' ++'(Prop),call(moo:mpred_prop,F,Prop),Props2),
    findall(' -'(yes(Prop)),(predicate_property(M:P,Prop),not(member(Prop,[number_of_rules(0),number_of_clauses(0),/*thread_local,*/volatile,dynamic,visible,interpreted]))),Props3),
    findall(' -'(not(Prop)),(member(Prop,[number_of_clauses(_),thread_local,volatile,dynamic,visible,exported,interpreted]),not(predicate_property(M:P,Prop))),Props4),   
    flatten([[Props1],[Props2],[Props3],[Props4],[TF/A]],PropsR),
@@ -2442,7 +2443,7 @@ dtrace(G):-write(dtrace(G)),nl,has_auto_trace(C),!,C.
 dtrace(G):-repeat,debug,dumptrace(G),!.
 
 dumptrace(_):-tracing,!,leash(+call).
-dumptrace(G):- not(ifCanTrace),!,notrace((fmt((not(ifCanTrace(G)))))),!,snumbervars(G),!.
+dumptrace(G):- not(ifCanTrace),!,notrace((fmt((not(ifCanTrace(G)))))),!,snumbervars(G),!,notrace(dumpST).
 dumptrace(G):- notrace((fmt(in_dumptrace(G)),leash(+exception),get_single_char(C))),dumptrace(G,C).
 dumptrace(_,0'g):-notrace(dumpST),!,fail.
 dumptrace(G,0'l):-notrace((ggtrace,!,G)).

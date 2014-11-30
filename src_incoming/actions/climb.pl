@@ -9,23 +9,23 @@
 % Dec 13, 2035
 % Douglas Miles
 */
-% :- module(user). 
-:- module(climb, []).
+% :-swi_module(user). 
+:-swi_module(climb, []).
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(command).
+:- register_module_type(command).
 
 can_move_into(_LOC,XXYY):-var(XXYY),!,fail.
 can_move_into(_LOC,XXYY):-not(atloc(_,XXYY)),!.
 can_move_into(_LOC,XXYY):-ground(XXYY).
 
-moo:actiontype(climb(dir)).
+actiontype(climb(dir)).
 
 % Climb
 % If there is nothing there to climb, move to location
 % plus take some damage and loose charge 
-moo:agent_call_command(Agent,climb(Dir)) :-	
+agent_call_command(Agent,climb(Dir)) :-	
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	can_move_into(LOC,XXYY),
@@ -33,13 +33,13 @@ moo:agent_call_command(Agent,climb(Dir)) :-
 	call_update_stats(Agent,trip),
 	call_update_charge(Agent,climb).
 % Object is too high to climb, or it is another agent. 
-moo:agent_call_command(Agent,climb(Dir)) :-
+agent_call_command(Agent,climb(Dir)) :-
 	
 	\+ climbable(Agent,Dir),
 	call_update_stats(Agent,pulled),
 	call_update_charge(Agent,climb).
 % Successful climb
-moo:agent_call_command(Agent,climb(Dir)) :-	
+agent_call_command(Agent,climb(Dir)) :-	
 	in_world_move(_,Agent,Dir),
 	call_update_charge(Agent,climb).
 
@@ -55,17 +55,17 @@ climbable(Agent,Dir) :-
 	ObjHt > 1.
 
 %Record keeping
-moo:update_charge(Agent,climb) :-
+update_charge(Agent,climb) :-
 	del(charge(Agent,Old)),
 	New is Old - 5,
 	add(charge(Agent,New)).
 
-moo:update_stats(Agent,trip) :- 
+update_stats(Agent,trip) :- 
         del(health(Agent,Old)),
 	New is Old - 3,
 	add(health(Agent,New)).
 
-moo:update_stats(Agent,pulled) :- 
+update_stats(Agent,pulled) :- 
         del(health(Agent,Old)),
 	New is Old - 2,
 	add(health(Agent,New)),

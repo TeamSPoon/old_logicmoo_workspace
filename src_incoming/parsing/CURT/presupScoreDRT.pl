@@ -8,7 +8,7 @@
 **********************************************************************/
 
 
-:- module(presupScoreDRT,[presupScoreDRT/0,
+:-swi_module(presupScoreDRT,[presupScoreDRT/0,
 			  presupScoreDRT/2,
 			  presupScoreDRT/3,
 			  presupScoreDRTTestSuite/0]).

@@ -11,7 +11,7 @@
      Module Declaration
 =====================================================================*/
 
-:- module(printDrs,[printDrs/1]).
+:-swi_module(printDrs,[printDrs/1]).
 
 :- ensure_loaded(comsemOperators).
 

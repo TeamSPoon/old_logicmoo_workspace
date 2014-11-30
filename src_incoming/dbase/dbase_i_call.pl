@@ -99,7 +99,7 @@ call_one(not(Op1),Flags,Call,Vars):-  not(call_collect(Op1,Flags,Call,Vars)).
 call_one(v(Vars),_Flags,_Call,Vars):-!.
 % succeed call
 call_one(c(Call),_Flags,Call,_Vars):-!.
-% hook:deduce_facts
+% deduce_facts
 call_one(deducedSimply,_Flags,Call,_Vars):-!, deducedSimply(Call).
 % is_asserted
 call_one(asserted,_Flags,Call,_Vars):-!, is_asserted(Call).
@@ -110,15 +110,15 @@ call_one(Other,_Flags,Call,_Vars):- call(Other,Call).
 
 
 
-deducedSimply(Call):- clause(hook:deduce_facts(Fact,Call),Body),not(is_asserted(Call)),nonvar(Fact),Body,dmsg((deducedSimply2(Call):-Fact)),!,show_call((is_asserted(Fact),ground(Call))).
+deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),not(is_asserted(Call)),nonvar(Fact),Body,dmsg((deducedSimply2(Call):-Fact)),!,show_call((is_asserted(Fact),ground(Call))).
 
-% deducedSimply(Call):- clause(hook:deduce_facts(Fact,Call),Body),nonvar(Fact),Body,ground(Call),dmsg((deducedSimply1(Call):-Fact)),show_call((is_asserted(Fact),ground(Call))).
+% deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),nonvar(Fact),Body,ground(Call),dmsg((deducedSimply1(Call):-Fact)),show_call((is_asserted(Fact),ground(Call))).
 
 
 % ================================================
 % call_expanded_for/2
 % ================================================
-:-export((call_expanded_for/2)).
+:-swi_export((call_expanded_for/2)).
 
 call_expanded_for(req,Call):- !,call_mpred(Call).
 call_expanded_for(must,Call):- !,must(call_mpred(Call)).
@@ -130,8 +130,8 @@ call_expanded_for(_Req,Call):- !,call_mpred(Call).
 :-meta_predicate_transparent(is_callable(0)).
 is_callable(C):-predicate_property(C,_),!.
 
-:-export(call_mpred/1).
-:-export(call_mpred/2).
+:-swi_export(call_mpred/1).
+:-swi_export(call_mpred/2).
 
 check_mcall_ok(_):-!.
 check_mcall_ok(C):-functor(C,F,_),not(mpred_prop(F,_)),!,ignore(check_was_known_false(C)),!.
@@ -188,7 +188,7 @@ call_only_backchain_0(F,C):- loop_check(C,call_only_backchain_lc(F,C)).
 
 call_only_backchain_lc(F,C):- mpred_prop(F,query_with_pred(P)),PC=..[P,C],!,req(PC).
 call_only_backchain_lc(F,C):- mpred_prop(F,prologOnly),!,predicate_property(C,number_of_rules(N)),N>0,!,clause(C,Body),body_no_backchains(C,Body).
-call_only_backchain_lc(_,C):- moo:hybrid_rule(C,BODY),call_mpred_body(C,BODY).
+call_only_backchain_lc(_,C):- hybrid_rule(C,BODY),call_mpred_body(C,BODY).
 % TODO call_only_backchain_lc(_,_,_,dbase_t(F,Obj,LValue)):-  choose_val(F,Obj,LValue).
 
 
@@ -197,7 +197,7 @@ body_no_backchains(_,true):-!.
 body_no_backchains(_,B):- body_no_backchains_match(B),!,B.
 body_no_backchains(H,B):- call_mpred_body(H,B).
 
-body_no_backchains_match((!,hook:body_req(_, _, _, _))).
+body_no_backchains_match((!,body_req(_, _, _, _))).
 
 :-decl_mpred_prolog(naf/1).
 
@@ -350,7 +350,7 @@ xcall_t(P,A1):- call(P,A1).
 xcall_t(P):- call(P).
 
 % todo hook into loaded files!
-:- export(assertion_t/1).
+:- swi_export(assertion_t/1).
 
 % assertion_t(Call):- thlocal:useOnlyExternalDBs,!,thglobal:use_cyc_database,with_no_assertions(thlocal:useOnlyExternalDBs,kb_t(Call)).
 assertion_t(Call):- thglobal:use_cyc_database,!,with_assertions(thlocal:useOnlyExternalDBs,kb_t(Call)).

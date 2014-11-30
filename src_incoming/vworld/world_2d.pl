@@ -1,25 +1,25 @@
 /** <module> 
 % This module defines the way we lay out 2-D grids into room
 %
-% Project Logicmoo: A MUD server written in Prolog
+% Logicmoo Project PrologMUD: A MUD server written in Prolog
 % Maintainer: Douglas Miles
-% Dec 13, 2035
+% Dec 13,2035
 %
 */
-% :- module(world_2d,[]).
+% :-swi_module(world_2d,[]).
 
-:- export(((
+:- swi_export(((
          check_for_fall/3,
          dir_offset/5,
          doorLocation/5,
          grid_size/4,
          in_grid/2,
          in_grid_rnd/2,
-         in_world_move/3, 
+         in_world_move/3,
          is_3d/1,
          loc_to_xy/4,
          move_dir_target/3,
-         number_to_dir/3,  
+         number_to_dir/3, 
          reverse_dir/2,
          round_loc/8,
          round_loc_target/8,
@@ -38,45 +38,38 @@ dist(_,_,5).
 
 % pathBetween_call(From,DirS,To):-string(DirS),!,atom_string(Dir,DirS),!,any_to_dir(Dir,Dir2),pathBetween(From,Dir2,To),same(Dir,Dir2).
 pathBetween_call_0(From,Dir,To):-any_to_dir(Dir,Dir2),asserted_mpred_clause(pathBetween(From,Dir2,To)),same(Dir,Dir2).
-pathBetween_call(From,Dir,To):-pathBetween_call_0(From,DirS,To), same(Dir,DirS).
+pathBetween_call(From,Dir,To):-pathBetween_call_0(From,DirS,To),same(Dir,DirS).
    
 % 5x5 rooms are average
-%% to_3d(L1,L13D):-compound(L1)->L13D=L1; room_center(L1,X,Y,Z), L13D = xyz(L1,X,Y,Z).
+%% to_3d(L1,L13D):-compound(L1)->L13D=L1; room_center(L1,X,Y,Z),L13D = xyz(L1,X,Y,Z).
 to_3d(xyz(L1,X,Y,Z),xyz(L1,X,Y,Z)):- nonvar(L1),!.
 to_3d(L1,xyz(L1,X,Y,Z)):-room_center(L1,X,Y,Z),!.
 
 
 center_xyz(MaxX,MidX):- MidX is MaxX div 2 + MaxX mod 2.
 
-room_center(Room,X,Y,Z):-
-      grid_size(Room,MaxX,MaxY,MaxZ),
+room_center(Region,X,Y,Z):-
+      grid_size(Region,MaxX,MaxY,MaxZ),
       center_xyz(MaxX,X),
       center_xyz(MaxY,Y),
       center_xyz(MaxZ,Z),!,
-      dmsg(todo("get room size and calc center ",Room)).
+      dmsg(todo("get room size and calc center ",Region)).
 
-locationToRegion(Obj,RegionIn):-locationToRegion_0(Obj,Region),!,RegionIn=Region.
-locationToRegion_0(Obj,Obj):-var(Obj),dmsg(warn(var_locationToRegion(Obj,Obj))),!.
-locationToRegion_0(xyz(Room,_,_,_),Region2):-nonvar(Room),!,locationToRegion_0(Room,Region2).
-locationToRegion_0(Obj,Obj):-nonvar(Obj),isa(Obj,region),!. % localityOfObject(Obj,Room).
-locationToRegion_0(Obj,Obj):-nonvar(Obj),isa(Obj,spatialthing),!. % localityOfObject(Obj,Room).
-locationToRegion_0(Obj,Obj):-dmsg(warn(locationToRegion(Obj,Obj))),!.
-
-loc_to_xy(LOC,X,Y,xyz(Room,X,Y,1)):- locationToRegion(LOC,Room),!.
-loc_to_xy(Room,X,Y,xyz(Room,X,Y,1)).
+loc_to_xy(LOC,X,Y,xyz(Region,X,Y,1)):- locationToRegion(LOC,Region),!.
+loc_to_xy(Region,X,Y,xyz(Region,X,Y,1)).
 
 is_3d(LOC):- compound(LOC).
 
 % Quintus random(1,MaxX,X) and random(1,MaxY,Y)
-grid_size(Room,MaxX,MaxY,MaxZ):- fail,
+grid_size(Region,MaxX,MaxY,MaxZ):- fail,
     tbox:type_grid(What,1,L),
-   isa(Room,What),!,
+   isa(Region,What),!,
    maxZ(MaxZ),
 	length(L,MaxX),
-	findall(1, tbox:type_grid(What,_,_),LL),
+	findall(1,tbox:type_grid(What,_,_),LL),
 	length(LL,MaxY),!.
 
-grid_size(_Room,MaxX,MaxY,MaxZ):- MaxX = 5 , MaxY = 5 , maxZ(MaxZ) ,!.
+grid_size(_Room,MaxX,MaxY,MaxZ):- MaxX = 5 ,MaxY = 5 ,maxZ(MaxZ) ,!.
 
 maxZ(2).
 
@@ -84,10 +77,10 @@ in_grid(LocName,Var):-var(Var),!,in_grid_rnd(LocName,Var).
 in_grid(LocName,Var):-in_grid_no_rnd(LocName,Var).
 
 in_grid_no_rnd(LocName,xyz(LocName,X,Y,Z)) :-
-   grid_size(LocName,MaxX,MaxY, MaxZ),!,between(1,MaxX,X),between(1,MaxY,Y),between(1,MaxZ,Z).
+   grid_size(LocName,MaxX,MaxY,MaxZ),!,between(1,MaxX,X),between(1,MaxY,Y),between(1,MaxZ,Z).
 
 in_grid_rnd(LocName,xyz(LocName,X,Y,1)) :-
-   grid_size(LocName,MaxX,MaxY, _MaxZ),!,
+   grid_size(LocName,MaxX,MaxY,_MaxZ),!,
    repeat,
 	X is (1 + random(MaxX-2)),
 	Y is (1 + random(MaxY-2)).	
@@ -117,7 +110,7 @@ init3(LocName,LocType,xyz(LocName,_,Y,1),[]) :-
 	init2(LocName,LocType,X,1).
 
 init3(LocName,LocType,xyz(LocName,X,Y,1),[O|T]) :-
-	moo:label_type(O,Type),
+	label_type(O,Type),
            rez_loc_object(xyz(LocName,X,Y,1),Type),
 	K is X + 1,
 	init3(LocName,LocType,xyz(LocName,K,Y,1),T).
@@ -126,39 +119,84 @@ init3(LocName,LocType,xyz(LocName,X,Y,1),[O|T]) :-
 % rez_loc_object(_,0):-!.
 rez_loc_object(XY,Type):-
            gensym(Type,Name2),
-           Name = xyN(XY,Name2),           
+           Name = xyN(XY,Name2),          
            assert_isa(Name,Type),
            add(atloc(Name,XY)),!,
            add_missing_instance_defaults(Name).
 
 nearby(X,Y):-atloc(X,L1),atloc(Y,L2),locs_near(L1,L2).
 
-:-export(locs_near/2).
+locationToRegion(Obj,RegionIn):-locationToRegion_0(Obj,Region),must((nonvar(Region),isa(Region,region))),!,RegionIn=Region.
+locationToRegion_0(Obj,Obj):-var(Obj),dmsg(warn(var_locationToRegion(Obj,Obj))),!.
+locationToRegion_0(xyz(Region,_,_,_),Region2):-nonvar(Region),!,locationToRegion_0(Region,Region2).
+locationToRegion_0(Obj,Obj):-nonvar(Obj),isa(Obj,region),!.
+locationToRegion_0(Obj,Region):-nonvar(Obj),must(localityOfObject(Obj,Location)),!,locationToRegion_0(Location,Region).
+locationToRegion_0(Obj,Obj):-dmsg(warn(locationToRegion(Obj,Obj))),!.
+
+:-swi_export(locs_near/2).
 locs_near(L1,L2):- var(L1),nonvar(L2),!,locs_near(L2,L1).
 locs_near(L1,L2):- nonvar(L1),nonvar(L2),L2=xyz(_,_,_,_),locationToRegion(L1,R),!,call_tabled(locs_near_i(R,L2)).
 locs_near(L1,L2):- nonvar(L1),nonvar(L2),locationToRegion(L1,R1),locationToRegion(L2,R2),!,region_near(R1,R2).
 locs_near(L1,L2):-region_near(R1,R2),in_grid_no_rnd(R1,L1),in_grid_no_rnd(R2,L2).
 
 % :- decl_not_mpred(locs_near_i,2).
-:-export(locs_near_i/2).
+:-swi_export(locs_near_i/2).
 locs_near_i(L1,L2):- locationToRegion(L1,R),in_grid_no_rnd(R,L2).
 locs_near_i(L1,L2):- locationToRegion(L1,R),pathBetween_call(R,_,R2),in_grid_no_rnd(R2,L2).
 
 region_near(R1,R2):-pathBetween_call(R1,_,R2).
 region_near(R1,R1).
 
-% 345345  moo:default_inst_props(OfAgent,agent,[facing(F),atloc(L)]):-  dfsdfd ignore((nonvar(OfAgent),create_someval(facing,OfAgent,F),create_someval(atloc,OfAgent,L))).
+% 345345  default_inst_props(OfAgent,agent,[facing(F),atloc(L)]):-  dfsdfd ignore((nonvar(OfAgent),create_someval(facing,OfAgent,F),create_someval(atloc,OfAgent,L))).
 
-moo:transitive_other(atloc,1,Obj,What):-inside_of(Obj,What).
+transitive_other(atloc,1,Obj,What):-inside_of(Obj,What).
+% transitive_other(localityOfObject,1,Obj,What):-inside_of(Obj,What).
 
 :-decl_mpred_hybrid(inside_of/2).
-:-export(inside_of/2).
-inside_of(Obj,What):-is_asserted(stowed(What,Obj)).
-inside_of(Obj,What):-is_asserted(wearsClothing(What,Obj)).
-inside_of(Obj,What):-is_asserted(contains(What,Obj)).
+:-swi_export(inside_of/2).
+inside_of(Inner,Outer):-is_asserted(stowed(Outer,Inner)).
+inside_of(Inner,Outer):-is_asserted(contains(Outer,Inner)).
 
+
+
+
+moves_with(Obj1,Obj2):-nonvar(Obj2),!,moves_with(Obj2,Where),localityOfObject(Where,Obj1).
+moves_with(Obj1,Obj2):-moves_with_sym(Obj1,Obj2).
+moves_with(Obj1,Obj2):-moves_with_sym(Obj2,Obj1).
+moves_with_sym(Obj1,Obj2):-localityOfObject(Where,Obj1),moves_with(Obj2,Where).
+
+on_surface(Clothes,Agent):-loop_check(wearsClothing(Agent,Clothes),fail).
+
+same_regions(Agent,Obj):-inRegion(Agent,Where1),inRegion(Obj,Where2),Where1=Where2.
+
+inRegion(Agent,Region):- loop_check(( (is_asserted(atloc(Agent,Where));localityOfObject(Agent,Where)), locationToRegion(Where,Region)),fail).
+
+localityOfObject(Inner,Container):-inside_of(Inner,Container).
+localityOfObject(Above,HasSurface):-on_surface(Above,HasSurface).
+localityOfObject(Obj,Region):-inRegion(Obj,Region).
+
+
+/*
+localityOfObject(Clothes,Agent):-has_parts(Agent,Clothes).
+has_parts(Outer,Inner):-is_asserted(inside_of(Inner,Outer)).
+has_parts(Agent,Clothes):-wearsClothing(Agent,Clothes).
+
+has_parts(body,eachOf(head,neck,upper_torso,lower_torso,pelvis,arms,legs)).
+has_parts(head,eachOf(face,hair)).
+has_parts(face,eachOf(eyes,nose,mouth)).
+has_parts([upper_torso,arms,left_arm,left_hand,left_digits]).
+has_parts([upper_torso,arms,right_arm,right_hand,right_digits]).
+has_parts([pelvis,legs,left_leg,left_foot,left_toes]).
+has_parts([pelvis,legs,right_leg,right_foot,right_toes]).
+
+
+
+
+*/
+
+
+genlPreds(wearsClothing,possess).
 genlInverse(inside_of,possess).
-genlInverse(wearsClothing,inside_of).
 genlInverse(contains,inside_of).
 genlInverse(stowed,inside_of).
 
@@ -168,8 +206,9 @@ genlInverse(stowed,inside_of).
 put_in_world(self):-!.
 put_in_world(Agent):-loop_check(put_in_world_lc(Agent),true),!.
 
+put_in_world_lc(Obj):-isa_asserted(Obj,region),!.
 put_in_world_lc(Obj):-is_asserted(atloc(Obj,_)),!.
-put_in_world_lc(Obj):-inside_of(Obj,What),ensure_in_world(What),!.
+put_in_world_lc(Obj):-localityOfObject(Obj,What),!,ensure_in_world(What),!.
 put_in_world_lc(Obj):-with_fallbacksg(with_fallbacks(put_in_world_lc_gen(Obj))),!.
 
 put_in_world_lc_gen(Obj):-choose_for(facing,Obj,_),!,must_det((choose_for(atloc,Obj,LOC),nonvar(LOC))).
@@ -178,42 +217,43 @@ put_in_world_lc_gen(Obj):-choose_for(facing,Obj,_),!,must_det((choose_for(atloc,
 ensure_in_world(What):-must_det(put_in_world(What)).
 
 
-:- dynamic_multifile_exported hook:decl_database_hook/2.
-:- dynamic_multifile_exported hook:deduce_facts/2.
-:- dynamic_multifile_exported hook:create_random_fact/1.
-:- dynamic_multifile_exported hook:hooked_random_instance/3.
-:- dynamic_multifile_exported hook:fact_always_true/1.
-:- dynamic_multifile_exported hook:fact_maybe_deduced/1.
-:- dynamic_multifile_exported hook:fact_is_false/2.
+:- dynamic_multifile_exported decl_database_hook/2.
+:- dynamic_multifile_exported deduce_facts/2.
+:- dynamic_multifile_exported create_random_fact/1.
+:- dynamic_multifile_exported hooked_random_instance/3.
+:- dynamic_multifile_exported fact_always_true/1.
+:- dynamic_multifile_exported fact_maybe_deduced/1.
+:- dynamic_multifile_exported fact_is_false/2.
 
 :-decl_mpred_hybrid(inside_of(obj,obj)).
 
 % facts that cant be true
 
-hook:fact_is_false(atloc(Obj,_LOC),inside_of(Obj,What)) :- nonvar(Obj),is_asserted(inside_of(Obj,What)),not(isa(What,region)).
-hook:fact_is_false(atloc(Obj,LOC),inside_of(Obj,What)) :- nonvar(Obj),(inside_of(Obj,What)),not(atloc(What,LOC)).
-hook:fact_is_false(localityOfObject(Obj,_LOC),inside_of(Obj,What)) :- nonvar(Obj),(inside_of(Obj,What)),!.
+% fact_is_false(atloc(Obj,_LOC),isa(Obj,region)).
+fact_is_false(atloc(Obj,_LOC),inside_of(Obj,What)) :- nonvar(Obj),is_asserted(inside_of(Obj,What)),not(isa(What,region)).
+fact_is_false(atloc(Obj,LOC),inside_of(Obj,What)) :- nonvar(Obj),(inside_of(Obj,What)),not(atloc(What,LOC)).
+fact_is_false(localityOfObject(Obj,_LOC),inside_of(Obj,What)) :- nonvar(Obj),(inside_of(Obj,What)),!.
 
 % facts that must be true 
 %  suggest a deducable fact that is always defiantely true but not maybe asserted
-hook:fact_always_true(localityOfObject(apath(Region,Dir),Region)):-is_asserted(pathBetween(Region,Dir,_)).
-hook:fact_always_true(localityOfObject(Obj,Region)):- is_asserted(atloc(Obj,LOC)),locationToRegion(LOC,Region),!.
+fact_always_true(localityOfObject(apath(Region,Dir),Region)):-is_asserted(pathBetween(Region,Dir,_)).
+fact_always_true(localityOfObject(Obj,Region)):- is_asserted(atloc(Obj,LOC)),locationToRegion(LOC,Region),!.
 
 %  suggest a deducable fact that is probably true but not already asserted
-hook:fact_maybe_deduced(localityOfObject(Obj,Region)):- is_asserted(atloc(Obj,LOC)),locationToRegion(LOC,Region),!.
-hook:fact_maybe_deduced(localityOfObject(apath(Region,Dir),Region)):-is_asserted(pathBetween(Region,Dir,_)).
+fact_maybe_deduced(localityOfObject(Obj,Region)):- is_asserted(atloc(Obj,LOC)),locationToRegion(LOC,Region),!.
+fact_maybe_deduced(localityOfObject(apath(Region,Dir),Region)):-is_asserted(pathBetween(Region,Dir,_)).
 
 %  suggest a random fact that is probably is not already true
-hook:create_random_fact(atloc(Obj,LOC)) :- nonvar(Obj),asserted_or_deduced(localityOfObject(Obj,Region)),!,((in_grid(Region,LOC),unoccupied(Obj,LOC),is_fact_consistent(atloc(Obj,LOC)))).
-hook:create_random_fact(localityOfObject(Obj,Region)) :- nonvar(Obj),not(is_asserted(localityOfObject(Obj,_))),asserted_or_deduced(localityOfObject(Obj,Region)).
+create_random_fact(atloc(Obj,LOC)) :- nonvar(Obj),asserted_or_deduced(localityOfObject(Obj,Region)),!,((in_grid(Region,LOC),unoccupied(Obj,LOC),is_fact_consistent(atloc(Obj,LOC)))).
+create_random_fact(localityOfObject(Obj,Region)) :- nonvar(Obj),not(is_asserted(localityOfObject(Obj,_))),asserted_or_deduced(localityOfObject(Obj,Region)).
 
 %  suggest random values
-hook:hooked_random_instance(dir,Dir,Test) :- my_random_member(Dir,[n,s,e,w,ne,nw,se,sw]),Test,!.
-hook:hooked_random_instance(int,3,Test):-call(Test),dmsg(random_instance(int,3,Test)),dtrace,!,fail.
+hooked_random_instance(dir,Dir,Test) :- my_random_member(Dir,[n,s,e,w,ne,nw,se,sw]),Test,!.
+hooked_random_instance(int,3,Test):-call(Test),dmsg(random_instance(int,3,Test)),dtrace,!,fail.
 
 %  give required forward deductions
-hook:deduce_facts(atloc(Obj,LOC),localityOfObject(Obj,Region)):- nonvar(LOC), locationToRegion(LOC,Region).
-hook:deduce_facts(localityOfObject(Obj,_Region),atloc(Obj,LOC)):- nonvar(Obj), put_in_world(Obj),must_det(atloc(Obj,LOC)).
+deduce_facts(atloc(Obj,LOC),localityOfObject(Obj,Region)):- nonvar(LOC),locationToRegion(LOC,Region).
+deduce_facts(localityOfObject(Obj,_Region),atloc(Obj,LOC)):- nonvar(Obj),put_in_world(Obj),must_det(atloc(Obj,LOC)).
 
 
 % random_region(LOC):- findall(O,isa(O,region),LOCS),my_random_member(LOC,LOCS).
@@ -241,7 +281,7 @@ is_occupied(Loc,What):- locationToRegion(Loc,Region),localityOfObject(What,Regio
 calc_xyz(Region1,Dir,force(X1,Y1,Z1),X2,Y2,Z2):-
    to_3d(Region1,xyz(_,X,Y,Z)),
    get_dir_offset(Dir,1,OX,OY,OZ),
-   X2 is X+ (OX*X1), Y2 is Y+OY*Y1, Z2 is Z+OZ*Z1.
+   X2 is X+ (OX*X1),Y2 is Y+OY*Y1,Z2 is Z+OZ*Z1.
 
 move_dir_target(RegionXYZ,Dir,XXYY):-
    move_dir_target(RegionXYZ,Dir,1,XXYY).
@@ -300,9 +340,11 @@ get_dir_offset(Dir,F,OX,OY,OZ):- any_to_atom(Dir,DirA),
 get_dir_offset(Dir,F,OX,OY,OZ):- any_to_string(Dir,DirS),
   dir_offset(DirS,F,OX,OY,OZ),!.
 
-:-export(dir_offset/5).
+:-swi_export(dir_offset/5).
 
 % :-decl_mpred_hybrid(dir_offset(term,int,int,int,int)).
+
+
 dir_offset(u,F,0,0,F).
 dir_offset(d,F,0,0,-F).
 dir_offset(n,F,0,-F,0).
@@ -315,25 +357,44 @@ dir_offset(se,F,F,F,0).
 dir_offset(nw,F,-F,-F,0).
 dir_offset(here,_,0,0,0).
 
-hook:decl_database_hook(retract(_),atloc(Agent,_)):-padd(Agent,needs_look(true)).
+% MergedNess -1,0,1 = contacting_at,inside,outside_near_on
+with_offset(detatched,F,X,Y,Z):-dir_offset(here,F,X,Y,Z).
+with_offset(absolute_with,F,X,Y,Z):-dir_offset(u,F,X,Y,Z).
+with_offset(relative_from,F,X,Y,Z):-dir_offset(d,F,X,Y,Z).
+with_offset(surrounding,F,X,Y,Z):-dir_offset(n,F,X,Y,Z).
+with_offset(inside_of,F,X,Y,Z):-dir_offset(s,F,X,Y,Z).
+with_offset(on,F,X,Y,Z):-dir_offset(e,F,X,Y,Z).
+with_offset(partof,F,X,Y,Z):-dir_offset(w,F,X,Y,Z).
+
+facing_offset(at,F,X,Y,Z):-dir_offset(here,F,X,Y,Z).
+facing_offset(above,F,X,Y,Z):-dir_offset(u,F,X,Y,Z).
+facing_offset(below,F,X,Y,Z):-dir_offset(d,F,X,Y,Z).
+facing_offset(left,F,X,Y,Z):-dir_offset(w,F,X,Y,Z).
+facing_offset(right,F,X,Y,Z):-dir_offset(e,F,X,Y,Z).
+facing_offset(behind,F,X,Y,Z):-dir_offset(s,F,X,Y,Z).
+facing_offset(front,F,X,Y,Z):-dir_offset(n,F,X,Y,Z).
+
+
+
+decl_database_hook(retract(_),atloc(Agent,_)):-padd(Agent,needs_look(true)).
 
 % dir_mult(X,Y,Z,X1,Y1,Z1,X2,Y2,Z2):- X2 is X * X1,Y2 is Y * Y1,Z2 is Z * Z1.
 
 
-% Used in move.pl, push.pl and climb.pl
+% Used in move.pl,push.pl and climb.pl
 % Move agent (usually). Used to relocate agent's location.
 in_world_move(LOC,Agent,DirS) :-
         string_to_atom(DirS,Dir),
         ignore(is_asserted(atloc(Agent,LOC))),
-        must_det((with_assertions(thlocal:noDefaultValues(atloc),in_world_move0(LOC,Agent,Dir)),        
+        must_det((with_assertions(thlocal:noDefaultValues(atloc),in_world_move0(LOC,Agent,Dir)),       
          is_asserted(atloc(Agent,LOC2)),
          LOC2 \== LOC)),!.
 
-can_world_move(LOC,_Agent,Dir) :- check_behind_for_ground(LOC), move_dir_target(LOC,Dir,_).
+can_world_move(LOC,_Agent,Dir) :- check_behind_for_ground(LOC),move_dir_target(LOC,Dir,_).
 
 in_world_move0(LOC,Agent,Dir) :-
       any_to_string(Dir,DirS),
-        padd(Agent,facing(DirS)),   
+        padd(Agent,facing(DirS)),  
         check_behind_for_ground(LOC),
 	move_dir_target(LOC,Dir,XXYY),!,
    must_det_l([
@@ -343,9 +404,9 @@ in_world_move0(LOC,Agent,Dir) :-
         ((add(atloc(Agent,XXYY)),
         is_asserted(atloc(Agent,LOC2)),
          LOC2 \== LOC)),
-   ifThen(( Region1\==Region2) , raise_location_event(LOC,notice(reciever,leave(Agent,Region1,to(Dir))))),
+   ifThen(( Region1\==Region2) ,raise_location_event(LOC,notice(reciever,leave(Agent,Region1,to(Dir))))),
         reverse_dir(Dir,Rev),
-   ifThen(( Region1\==Region2) , raise_location_event(XXYY,notice(reciever,enter(Agent,Region2,from(Rev))))),!,
+   ifThen(( Region1\==Region2) ,raise_location_event(XXYY,notice(reciever,enter(Agent,Region2,from(Rev))))),!,
 	check_for_fall(LOC,XXYY,Agent)]).
 
 check_behind_for_ground(LOC):-nonvar(LOC).
@@ -432,7 +493,7 @@ number_to_dir(25,se,se).
 
 
 % Scans through list of perceptions (as returned by look_percepts(Agent,L) or look_all(NearAgt,_,_,_,L,_))
-% for an object, returns the direction in which the object lies.
+% for an object,returns the direction in which the object lies.
 list_object_dir_sensed(_,List,Type,Dir) :-
 	!,
 	scan_lists_aux(List,Type,1,N),

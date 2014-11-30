@@ -1,4 +1,4 @@
-:- module(dbase_rdf_entailment,
+:-swi_module(dbase_rdf_entailment,
 	  []).
 
 end_of_file.

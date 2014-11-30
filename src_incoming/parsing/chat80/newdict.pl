@@ -42,9 +42,9 @@
 
 
 :- dynamic_multifile_exported((contains0/2,country/8,city/3,borders/2,in_continent/2)).
-:- dynamic_multifile_exported moo:contains/2.
+:- dynamic_multifile_exported contains/2.
 
-:- dynamic_multifile_exported hook:fact_always_true/1.
+:- dynamic_multifile_exported fact_always_true/1.
 
 :- style_check(+discontiguous).
 :- style_check(-discontiguous).
@@ -415,7 +415,7 @@ clause_head_arg1_wrong(Call,Word,LFType):- must(nonvar(LFType)),
 call_if_required(_PreMaybe).
 
 
-:-export(kill_talk_db_bad_verbs/0).
+:-swi_export(kill_talk_db_bad_verbs/0).
 kill_talk_db_bad_verbs:-!.
 kill_talk_db_bad_verbs:-doall(((
          talk_db(noun1,Sky,Skies),
@@ -678,8 +678,8 @@ typeAssignableTo(Type,SomeType):-transitive_subclass(Type,SomeType).
 typeAssignableTo(_Type,SomeType):-formattype(SomeType).
 
 
-%hook:fact_always_true(isa(Type,type)):- clause(subject_LF(thing,Type,feature&_,_X,_),true).
-%hook:fact_always_true(isa(Type,type)):- clause(subject_LF(restriction,Type,feature&_,_X,_),true).
+%fact_always_true(isa(Type,type)):- clause(subject_LF(thing,Type,feature&_,_X,_),true).
+%fact_always_true(isa(Type,type)):- clause(subject_LF(restriction,Type,feature&_,_X,_),true).
 
 
 type_allowed(feature&TYPEMASK,Type):-nonvar(TYPEMASK),!,type_allowed(TYPEMASK,Type),!.
@@ -694,7 +694,7 @@ type_allowed0(TypeM&_,Type):- Type==TypeM,!.
 % =================================================================
 % Having Referant Proper nouns
 % =================================================================
-:-export(name_template_db/2).
+:-swi_export(name_template_db/2).
 name_db([black,sea],black_sea).
 name_db([upper,volta],upper_volta).
 name_db([Name],Name) :-
@@ -1218,7 +1218,7 @@ toDCPred(Type,Pred,In,Out):-compound(Type),!,functor(Type,F,A),A2 is A + 2,curre
 toDCPred(Type,Pred,In,Out):-atom(F),current_dcg_predicate(F/A2),A is A2 - 2,once((length(Args,A),Type=..[F|Args],append(Args,[In,Out],Dargs))),Pred=..[F|Dargs].
 
 probeDCG(Left,Content,Right,Type):-length_between(0,1,Left),length_between(0,1,Right),append(Left,Content,Fisrt),append(Fisrt,Right,In),toDCPred(Type,Pred,In,[]),Pred.
-:-export(ph/2).
+:-swi_export(ph/2).
 ph(Type,Content):-show_call(probeDCG(_,Content,_,Type)).
 
 length_between(S,E,Left):-between(S,E,X),length(Left,X).
@@ -1287,7 +1287,7 @@ must_test_801([which, are, the, largest, african, countries, ?], [ parse(whq(fea
 answers([sudan])],[time(0.0)]).
 
 
-:-export((t1/0,t12/0,t13/0)).
+:-swi_export((t1/0,t12/0,t13/0)).
 t1:- with_no_assertions(thglobal:use_cyc_database,with_assertions(thlocal:tracing80, forall(must_test_801(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
 t12:- with_no_assertions(thglobal:use_cyc_database,with_assertions(thlocal:tracing80, forall(must_test_802(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).
 t13:- with_no_assertions(thglobal:use_cyc_database,with_assertions(thlocal:tracing80, forall(must_test_803(U,R,O),once(ignore(must_det(process_run_diff(report,U,R,O))))))).

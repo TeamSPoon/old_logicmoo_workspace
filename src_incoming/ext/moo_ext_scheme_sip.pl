@@ -104,7 +104,7 @@
                           tail(X) ==> force(cdr(X)).
 
 */
-:-module(moo_ext_scheme_sip,[proccessInSip/1,eval/1]).
+:-swi_module(moo_ext_scheme_sip,[proccessInSip/1,eval/1]).
 :-ensure_loaded(moo_ext_lisp_triska).
 
 %% SIPC - Scheme In Prolog with Continuation Semantics

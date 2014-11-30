@@ -48,7 +48,7 @@ decl_mpred_env(kb(KB),_):- assert_if_new(env_kb(KB)),fail.
 decl_mpred_env(stubType(dyn),Pred):-!, decl_mpred_env(dyn,Pred).
 decl_mpred_env(Prop,Pred):- functor_h(Pred,F,A),decl_mpred_env(Prop,Pred,F,A).
 
-decl_mpred_env(Prop,Pred,F,A):- !,export(F/A),dynamic(F/A),multifile(F/A), decl_mpred(Pred,Prop),!.
+decl_mpred_env(Prop,Pred,F,A):- !,swi_export(F/A),dynamic(F/A),multifile(F/A), decl_mpred(Pred,Prop),!.
 
 env_learn_pred(_,_):-nb_getval(disabled_env_learn_pred,true),!.
 env_learn_pred(ENV,P):-decl_mpred_env(ENV,P).
@@ -432,7 +432,7 @@ inside_queue(Q,E) :-
         b_getval(Q, fast_slow(H-T, I-U)),(   nonvar(H) , member(E,H)  ;   nonvar(I) , member(E,H)).
 
 
-:-export(on_call_decl_hyhtn/0).
+:-swi_export(on_call_decl_hyhtn/0).
 on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(domcache)],(temp_assertIndivConds/1)). % Used for grounding operators
 on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(domcache)],(is_of_primitive_sort/2, is_of_sort/2)).
 on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(domcache)],(methodC/7, opParent/6,operatorC/5,gOperator/3)).

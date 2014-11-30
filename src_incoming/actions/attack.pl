@@ -10,19 +10,19 @@
 %
 */
 
-% :- module(user). 
-:- module(attack, []).
+% :-swi_module(user). 
+:-swi_module(attack, []).
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(command).
+:- register_module_type(command).
 
 % attack joe ->translates-> attack nw
-moo:actiontype(attack(dir)).
+actiontype(attack(dir)).
 
 % Attack
 % Successful Attack
-moo:agent_call_command(Agent,attack(Dir)) :-	
+agent_call_command(Agent,attack(Dir)) :-	
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	atloc(What,XXYY),
@@ -30,7 +30,7 @@ moo:agent_call_command(Agent,attack(Dir)) :-
 	call_update_charge(Agent,attack).
 
 % Destroy small objects (food, etc.)
-moo:agent_call_command(Agent,attack(Dir)) :-	
+agent_call_command(Agent,attack(Dir)) :-	
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	atloc(What,XXYY),	
@@ -39,7 +39,7 @@ moo:agent_call_command(Agent,attack(Dir)) :-
 	call_update_charge(Agent,attack).
 
 % Hit a big object... causes damage to agent attacking
-moo:agent_call_command(Agent,attack(Dir)) :-	
+agent_call_command(Agent,attack(Dir)) :-	
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	atloc(What,XXYY),	
@@ -49,7 +49,7 @@ moo:agent_call_command(Agent,attack(Dir)) :-
 	call_update_charge(Agent,attack).
 
 % Hit nothing (empty space)... causes a little damage
-moo:agent_call_command(Agent,attack(Dir)) :-	
+agent_call_command(Agent,attack(Dir)) :-	
 	atloc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	not(atloc(_,XXYY)),
@@ -87,10 +87,10 @@ damage_foe(Agent,What,hit) :-
 	add(health(What,NewDam)).
 
 % Record keeping
-moo:update_charge(Agent,attack) :- upprop(Agent,charge(-5)).
-moo:update_stats(Agent,bash) :-  upprop(Agent,health(-2)),
+update_charge(Agent,attack) :- upprop(Agent,charge(-5)).
+update_stats(Agent,bash) :-  upprop(Agent,health(-2)),
 	(add_cmdfailure(Agent,bash)).
-moo:update_stats(Agent,wiff) :- 
+update_stats(Agent,wiff) :- 
 	del(health(Agent,Old)),
 	New is Old - 1,
 	add(health(Agent,New)),

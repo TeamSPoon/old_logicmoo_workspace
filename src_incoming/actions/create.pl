@@ -1,5 +1,5 @@
-% :- module(user). 
-:- module(create, []).
+% :-swi_module(user). 
+:-swi_module(create, []).
 /** <module> A command to  ...
 % charge(Agent,Chg) = charge (amount of charge agent has)
 % health(Agent,Dam) = damage
@@ -10,7 +10,7 @@
 */
 :- include(logicmoo(vworld/moo_header)).
 
-:- moo:register_module_type(command).
+:- register_module_type(command).
 
 
 
@@ -18,7 +18,7 @@
 % item rez (to stowed inventory)
 % ====================================================
 
-:-export(rez_to_inventory/3).
+:-swi_export(rez_to_inventory/3).
 rez_to_inventory(Agent,NameOrType,NewName):-   
    create_meta(NameOrType,Clz,item,NewName),
    padd(Agent,stowed(NewName)),
@@ -27,20 +27,20 @@ rez_to_inventory(Agent,NameOrType,NewName):-
    add_missing_instance_defaults(NewName).
 
 
-moo:action_info(rez(term),"Rezes a new 'item' of some NameOrType into stowed inventory").
-moo:agent_call_command(Agent,rez(NameOrType)):- nonvar(NameOrType),rez_to_inventory(Agent,NameOrType,_NewName).
+action_info(rez(term),"Rezes a new 'item' of some NameOrType into stowed inventory").
+agent_call_command(Agent,rez(NameOrType)):- nonvar(NameOrType),rez_to_inventory(Agent,NameOrType,_NewName).
 
 % ====================================================
 % object/type creation
 % ====================================================
-moo:action_info(create(list(term)), "Rezes a new 'spatialthing' or creates a new 'type' of some NameOrType and if it's an 'item' it will put in stowed inventory").
+action_info(create(list(term)), "Rezes a new 'spatialthing' or creates a new 'type' of some NameOrType and if it's an 'item' it will put in stowed inventory").
 
-moo:agent_call_command(Agent,create(SWhat)):- with_all_dmsg(must_det(create_new_object(Agent,SWhat))).
+agent_call_command(Agent,create(SWhat)):- with_all_dmsg(must_det(create_new_object(Agent,SWhat))).
 
 :-decl_mpred_prolog(authorWas(term,term)).
 :-decl_mpred_prolog(current_pronoun(agent,string,term)).
 
-:-export(create_new_object/2).
+:-swi_export(create_new_object/2).
 
 create_new_object(Agent,[type,NameOfType|DefaultParams]):-!,create_new_type(Agent,[NameOfType|DefaultParams]).
 
@@ -55,7 +55,7 @@ create_new_object(Agent,[NameOrType|Params]):-
    must((isa(NewName,item),padd(Agent,stowed(NewName)))),
    add_missing_instance_defaults(NewName).
 
-:-export(create_new_type/2).
+:-swi_export(create_new_type/2).
 create_new_type(Agent,[NewName|DefaultParams]):-
    decl_type(NewName),
    padd(NewName,authorWas(create_new_type(Agent,[NewName|DefaultParams]))),

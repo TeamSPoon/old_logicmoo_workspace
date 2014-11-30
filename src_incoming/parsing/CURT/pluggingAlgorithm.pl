@@ -25,7 +25,7 @@
      Module Declaration
 ========================================================================*/
 
-:- module(pluggingAlgorithm,[plugUSR/2]).
+:-swi_module(pluggingAlgorithm,[plugUSR/2]).
 
 :- use_module(comsemPredicates,[compose/3,
                                 memberList/2,

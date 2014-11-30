@@ -7,7 +7,7 @@
 
 **********************************************************************/
 
-:- module(acDRT,[consistentDRT/0,
+:-swi_module(acDRT,[consistentDRT/0,
 		 informativeDRT/0,
 		 localDRT/0]).
 

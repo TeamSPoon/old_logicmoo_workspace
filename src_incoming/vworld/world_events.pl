@@ -1,12 +1,12 @@
 /** <module> File used to implement in_world_events
 % like Talking, Appearing, falling rocks..
 %
-% Project Logicmoo: A MUD server written in Prolog
+% Logicmoo Project PrologMUD: A MUD server written in Prolog
 % Maintainer: Douglas Miles
 % Dec 13, 2035
 %
 */
-% :- module(world_events,[]).
+% :-swi_module(world_events,[]).
 
 /*
 % This file is "included" from world.pl 
@@ -25,7 +25,7 @@ atlocNear(Whom,Where):-findall(Whom+Where,atlocNear0(Whom,Where),List),list_to_s
 atlocNear0(Whom,Where):-locs_near(Where,LOC),is_asserted(atloc(Whom,LOC)).
 
 raise_location_event(Where,Event):- forall(atlocNear(Whom,Where),ignore(show_event_to(Whom,Event))).
-:-export(raise_location_event/2).
+:-swi_export(raise_location_event/2).
 
 
 show_event_to(Whom,Event):-subst(Event,reciever,you,NewEventM),subst(NewEventM,Whom,you,NewEvent),direct_to_agent(Whom,NewEvent),!.
@@ -38,11 +38,11 @@ direct_to_agent(_Whom,_NewEvent):-!.
 direct_to_agent(Whom,NewEvent):- dmsg(could_not(direct_to_agent(Whom,NewEvent))).
 
 
-%%:-export(direct_to_agent/2).
+%%:-swi_export(direct_to_agent/2).
 get_agent_stream(Whom,Input,Output):- thglobal:agent_message_stream(Whom,_,Input,Output),is_stream(Input),is_stream(Output),!.
 get_agent_stream(Whom,_Input,_Output):-ignore(retract(thglobal:agent_message_stream(Whom,_,_,_))),!,fail.
 
-:-export(deliverable_location_events/3).
+:-swi_export(deliverable_location_events/3).
 :-decl_mpred_prolog(deliverable_location_events(agent,region,term)).
 
 deliverable_location_events(Agent,Loc,tick(Agent,Loc)):-fail.

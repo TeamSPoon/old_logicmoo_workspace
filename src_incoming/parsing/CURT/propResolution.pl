@@ -21,7 +21,7 @@
 
 *************************************************************************/
 
-:- module(propResolution,[info/0,
+:-swi_module(propResolution,[info/0,
                           infix/0,
                           prefix/0, 
                           rprove/1,
