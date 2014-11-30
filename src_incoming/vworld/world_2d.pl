@@ -76,8 +76,9 @@ maxZ(2).
 in_grid(LocName,Var):-var(Var),!,in_grid_rnd(LocName,Var).
 in_grid(LocName,Var):-in_grid_no_rnd(LocName,Var).
 
-in_grid_no_rnd(LocName,xyz(LocName,X,Y,Z)) :-
+in_grid_no_rnd(LocName,xyz(LocName,X,Y,Z)) :- !,
    grid_size(LocName,MaxX,MaxY,MaxZ),!,between(1,MaxX,X),between(1,MaxY,Y),between(1,MaxZ,Z).
+in_grid_no_rnd(LocName,LocName).
 
 in_grid_rnd(LocName,xyz(LocName,X,Y,1)) :-
    grid_size(LocName,MaxX,MaxY,_MaxZ),!,
@@ -137,7 +138,7 @@ locationToRegion_0(Obj,Obj):-dmsg(warn(locationToRegion(Obj,Obj))),!.
 locs_near(L1,L2):- var(L1),nonvar(L2),!,locs_near(L2,L1).
 locs_near(L1,L2):- nonvar(L1),nonvar(L2),L2=xyz(_,_,_,_),locationToRegion(L1,R),!,call_tabled(locs_near_i(R,L2)).
 locs_near(L1,L2):- nonvar(L1),nonvar(L2),locationToRegion(L1,R1),locationToRegion(L2,R2),!,region_near(R1,R2).
-locs_near(L1,L2):-region_near(R1,R2),in_grid_no_rnd(R1,L1),in_grid_no_rnd(R2,L2).
+locs_near(L1,L2):- must((hotrace(region_near(R1,R2)),in_grid_no_rnd(R1,L1),in_grid_no_rnd(R2,L2))).
 
 % :- decl_not_mpred(locs_near_i,2).
 :-swi_export(locs_near_i/2).
