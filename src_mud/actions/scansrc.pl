@@ -59,8 +59,8 @@ scansrc :-
   reload_library_index,
   %remove_undef_search,
   update_changed_files,
-  include_moo_files_not_included('../src_incoming/*/?*.pl'),
-   
+  include_moo_files_not_included('../src_mud/*/?*.pl'),
+  include_moo_files_not_included('../src_game/*/?*.pl'),   
    % autoload,
    % include_moo_files_not_included('../src_incoming/*/*/?*.pl'),
    % make,

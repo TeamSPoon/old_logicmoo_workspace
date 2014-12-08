@@ -86,7 +86,7 @@ t2:- with_assertions(tracing80,with_no_assertions(thlocal:old_text,with_no_asser
 t2_process_run_diff(report,U,R,O):- copy_term80(U,UU),
    process_run_diff(report,U,R,O),!,nop( with_assertions(thlocal:usePlTalk,process_run_diff(report,UU,[],[]))),!.
 
-:- ensure_loaded(logicmoo('src_data/pldata/clex_lexicon')).
+:- ensure_loaded(logicmoo('src_assets/pldata/clex_lexicon')).
 
 % ===========================================================
 % CHAT80 command

@@ -90,7 +90,7 @@
 :- include(logicmoo('vworld/world_events.pl')).
 :- include(logicmoo('vworld/world_spawning.pl')).
 
-
+:-export(isaOrSame/2).
 isaOrSame(A,B):-A==B,!.
 isaOrSame(A,B):-isa(A,B).
 

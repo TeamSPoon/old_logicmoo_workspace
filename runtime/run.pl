@@ -4,6 +4,7 @@
 */
 
 swi_module(M,E):-dmsg(swi_module(M,E)).
+swi_export(_):-!.
 swi_export(E):-dmsg(swi_export(E)).
 
 % Was this our startup file?
@@ -12,7 +13,7 @@ was_run_dbg_pl:-is_startup_file('run.pl').
 % :- catch(guitracer,_,true).
 :- set_prolog_flag(verbose_load,true).
 
-% :- ensure_loaded('../../swish//logicmoo_run_swish').
+% :- ensure_loaded('../../swish/logicmoo_run_swish').
 :- debug.
 
 % run_tests includes run_common 

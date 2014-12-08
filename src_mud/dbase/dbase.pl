@@ -356,7 +356,7 @@ logical_functor(X):-atom(X),member(X,[',',';']).
 %:- meta_predicate db_forall(?,?,?,0).
 
 
-:- ensure_loaded('dbase_types_motel').
+:- xperimental->ensure_loaded(logicmoo('dbase/dbase_types_motel'));true.
 
 % :- user_use_module(dbase_rules_pttp).
 
@@ -954,7 +954,7 @@ term_specifier_text(Text,pred):- mpred_prop(Text,arity(_)).
 
 :- dynamic_safe(mudToHitArmorClass0 / 2).
 
-:- user_use_module(dbase_rules_pttp).
+:- user_use_module(logicmoo(dbase/dbase_rules_pttp)).
 
 /*
 :-swi_export(makeConstant/1).

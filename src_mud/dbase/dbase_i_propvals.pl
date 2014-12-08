@@ -117,7 +117,7 @@ save_fallback(Fact):-is_fact_consistent(Fact),add(Fact).
 
 save_fallback(Obj,Prop,Value):-not(ground(padd(Obj,Prop,Value))),trace_or_throw(var_save_fallback(Obj,Prop,Value)).
 save_fallback(Obj,Prop,Value):-is_fact_consistent(dbase_t(Prop,Obj,Value)),padd(Obj,Prop,Value).
-maybe_cache(Prop,Obj,Value,What):-!.
+maybe_cache(_Prop,_Obj,_Value,_What):-!.
 maybe_cache(Prop,Obj,Value,What):-not(not(maybe_cache_0(Prop,Obj,Value,What))).
 
 :-swi_export(checkNoArgViolation/1).

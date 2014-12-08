@@ -15,9 +15,9 @@
        do_pttp_test/1
         ]).
 
-:-dynamic(moo:mpred_prop/2).
-:-multifile(moo:mpred_prop/2).
-:- use_module('../../src_lib/logicmoo_util/logicmoo_util_all.pl').
+:-dynamic(user:mpred_prop/2).
+:-multifile(user:mpred_prop/2).
+:- use_module('../../../src_lib/logicmoo_util/logicmoo_util_all.pl').
 
 :- style_check(+discontiguous).
 :- style_check(-singleton).
@@ -1405,7 +1405,7 @@ builtin(unify,_).
 builtin(identical_member,_).
 builtin(unifiable_member,_).
 builtin(F,_):- atom_concat(_,'_int',F),!.
-builtin(F,_):- moo:mpred_prop(F,as_is(_)),!. %,fail.
+builtin(F,_):- user:mpred_prop(F,as_is(_)),!. %,fail.
 %builtin(F,A):-functor(P,F,A),predicate_property(P,_).
 %%% ***
 

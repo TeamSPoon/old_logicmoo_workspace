@@ -264,8 +264,6 @@ parse_agent_text_command_1(Agent,SVERB,ARGS,Agent,GOAL):-
    must(chooseBestGoal(GOALANDLEFTOVERS,GOAL)),
    dmsg_parserm(parserm("chooseBestGoal"=GOAL)).
 
-         
-
 
 verb_alias('l','look').
 verb_alias('lo','look').
@@ -371,7 +369,7 @@ phrase_parseForTypes_1(TYPEARGS,ARGS,GOODARGS,LeftOver):- catchv(phrase_parseFor
 phrase_parseForTypes_1(TYPEARGS,In,Out,[]):- length(TYPEARGS,L),between(1,4,L),length(In,L),must(Out=In),!,dmsg(fake_phrase_parseForTypes_l(foreach_isa(In,TYPEARGS))).
 phrase_parseForTypes_1(TYPEARGS,ARGS,GOODARGS,LeftOver):- debugOnError(phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver)).    
 
-phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver):-mmake, (LeftOver=[];LeftOver=[_|_] ), phrase(parseForTypes(TYPEARGS,GOODARGS),ARGS,LeftOver).
+phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver):- (LeftOver=[];LeftOver=[_|_] ), phrase(parseForTypes(TYPEARGS,GOODARGS),ARGS,LeftOver).
 
 parseForTypes([], [], A, A).
 parseForTypes([TYPE|TYPES], [B|E], C, G) :-
@@ -440,7 +438,7 @@ parseIsa(not(Type), Term, C, D) :- !, dcgAnd(dcgNot(parseIsa(Type)), theText(Ter
 parseIsa(vp,Goal,Left,Right):-!,one_must(parseFmt_vp1(self,Goal,Left,Right),parseFmt_vp2(self,Goal,Left,Right)).
 
 parseIsa(call(Call),TermV) --> {!,subst(Call,value,TermV,NewCall)},[TermT], {trace,req(NewCall),match_object(TermT,TermV)}.
-parseIsa(exact(Str),Str) --> {!,[Atom],{equals_icase(Atom,Str),!}.
+parseIsa(exact(Str),Str) --> {!},[Atom],{equals_icase(Atom,Str),!}.
 parseIsa(optionalStr(Str),Str) --> {not(optional_strings_opt)},[Atom],{equals_icase(Atom,Str),!}.
 parseIsa(optionalStr(Str),missing(Str)) --> {!},[].
 parseIsa(optionalStr(_Str),_) --> {!,fail}.

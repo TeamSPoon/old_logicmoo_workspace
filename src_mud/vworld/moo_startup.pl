@@ -139,10 +139,10 @@ make_qlfs:-
 % :- catch(user_ensure_loaded(logicmoo(pldata/withvars_988)),_,true).
 download_and_install_el:-
   shell('wget -N http://logicmoo.org/devel/LogicmooDeveloperFramework/TEMP~/www.logicmoo.org/downloads/datafiles/PlDataBinary.zip',_),
-  shell('unzip -u -d ../src_data/pldata/ PlDataBinary.zip'),
+  shell('unzip -u -d ../src_assets/pldata/ PlDataBinary.zip'),
   catch(user_ensure_loaded(logicmoo(pldata/el_assertions)),E,fmt('Cant use el_assertions',E)).
 
-:- catch(user_ensure_loaded(logicmoo(pldata/el_assertions)),_,download_and_install_el).
+:- xperimental_big_data->catch(user_ensure_loaded(logicmoo(pldata/el_assertions)),_,download_and_install_el);true.
 
 :- asserta(loaded_external_kbs),show_call(kbp_to_dbase_t).
 
@@ -169,51 +169,22 @@ download_and_install_el:-
 
 % Load the map file (*.map.pl) appropriate for the world being used.
 :- in_user_startup(ensure_plmoo_loaded(logicmoo('rooms/vacuum.map.plmoo'))).
+
 % NPC planners
-:- user_ensure_loaded(logicmoo('mobs/monster.pl')).
-
-:- user_ensure_loaded(logicmoo('actions/look.pl')).
-
-% :-swi_module(user).
-%:-prolog.
-% end_of_file.
-
-/*
-:- user_ensure_loaded(logicmoo('mobs/predator.pl')).
-:- user_ensure_loaded(logicmoo('mobs/explorer.pl')).
-:- user_ensure_loaded(logicmoo('mobs/prey.pl')).
-:- user_ensure_loaded(logicmoo('mobs/mobs_conf.pl')).
-:- user_ensure_loaded(logicmoo('mobs/vacuum.pl')).
-*/
-:- include_moo_files('../src_incoming/mobs/?*.pl').
+:- include_moo_files('../src_mud/mobs/?*.pl').
+:- include_moo_files('../src_assets/mobs/?*.pl').
+:- xperimental->include_moo_files('../xperimental/src_incoming/mobs/?*.pl');true.
 
 
 % Action/Commands implementation
-/*
-:- user_ensure_loaded(logicmoo('actions/drink.pl')).
-:- user_ensure_loaded(logicmoo('actions/actions_db.pl')).
-:- user_ensure_loaded(logicmoo('actions/attack.pl')).
-:- user_ensure_loaded(logicmoo('actions/inventory.pl')).
-:- user_ensure_loaded(logicmoo('actions/push.pl')).
-:- user_ensure_loaded(logicmoo('actions/where.pl')).
-:- user_ensure_loaded(logicmoo('actions/climb.pl')).
-:- user_ensure_loaded(logicmoo('actions/move.pl')).
-:- user_ensure_loaded(logicmoo('actions/any.pl')).
-:- user_ensure_loaded(logicmoo('actions/drop.pl')).
-:- user_ensure_loaded(logicmoo('actions/help.pl')).
-:- user_ensure_loaded(logicmoo('actions/logon.pl')).
-:- user_ensure_loaded(logicmoo('actions/get_set.pl')).
-:- user_ensure_loaded(logicmoo('actions/sit.pl')).
-:- user_ensure_loaded(logicmoo('actions/actions_conf.pl')).
-:- user_ensure_loaded(logicmoo('actions/take.pl')).
-:- user_ensure_loaded(logicmoo('actions/chat.pl')).
-:- user_ensure_loaded(logicmoo('actions/use.pl')).
-:- user_ensure_loaded(logicmoo('actions/stats.pl')).
-:- user_ensure_loaded(logicmoo('actions/eat.pl')).
-:- user_ensure_loaded(logicmoo('actions/teleport.pl')).
-*/
-:- include_moo_files('../src_incoming/actions/?*.pl').
+:- include_moo_files('../src_mud/actions/?*.pl').
+:- include_moo_files('../src_assets/actions/?*.pl').
+:- xperimental->include_moo_files('../xperimental/src_incoming/actions/?*.pl');true.
 
+% New Objects
+:- include_moo_files('../src_mud/objs/?*.pl').
+:- include_moo_files('../src_assets/objs/?*.pl').
+:- xperimental->include_moo_files('../xperimental/src_incoming/actions/?*.pl');true.
 
 
 % Define the agents traits, both for your agent and the world inhabitants. 

@@ -34,18 +34,17 @@ join_path33(A,B,C):-exists_directory(B)->B=C;directory_file_path(A,B,C).
 
 % Add the locations that the MUD source files will be picked up by the system
 %local_directory_search('../..').
+%local_directory_search('~logicmoo-mud/cynd/startrek'). % home dir CynD world
 local_directory_search('.'). 
 local_directory_search('../runtime'). 
 local_directory_search('..'). 
-local_directory_search('../../src_game').  % for non uploadables
-local_directory_search('../../src_incoming').  % for user uploads
-local_directory_search('../../src').  % for user uploads
-local_directory_search('../../src_modules').  % for big modules
-local_directory_search('../../src_data'). 
-local_directory_search('../../src_webui'). 
-local_directory_search('../../src_lib'). 
-local_directory_search('../../src_natlang_data').  
-local_directory_search('~logicmoo-mud/cynd/startrek'). % home dir CynD world
+local_directory_search('../../src_game'). % for user overrides and uploads
+local_directory_search('../../src_assets').  % for non uploadables (downloadables)
+local_directory_search('../../src_mud').  % for vetted src of the MUD
+local_directory_search('../../src_modules'). % for big modules
+local_directory_search('../../src_webui').  % for web UI modules
+local_directory_search('../../src_lib'). % shared_library preds
+local_directory_search('../../xperimental/src_incoming').  % areeba underlay
 
 :- current_prolog_flag(windows,true)->
    setenv('PATH_INDIGOLOG','../../indigolog');

@@ -32,6 +32,8 @@ mpred_arity(never_type,1).
 :-swi_export(is_stable/0).
 is_stable:-fail.
 
+xperimental:-fail.
+xperimental_big_data:-fail.
 :-swi_export(is_release/0).
 is_release :- fail,1 is random(3).
 :-swi_export(not_is_release/0).
