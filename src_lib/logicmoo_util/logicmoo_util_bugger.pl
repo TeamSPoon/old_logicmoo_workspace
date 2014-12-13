@@ -171,6 +171,27 @@ for obvious reasons.
       export_all_preds/0,
      export_all_preds/1 ]).
 
+:- dynamic(double_quotes_was/1).
+:- multifile(double_quotes_was/1).
+:- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was(WAS)).
+:- retract(double_quotes_was(WAS)),set_prolog_flag(double_quotes,WAS).
+:- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was(WAS)).
+
+define_if_missing(M:F/A,List):-current_predicate(M:F/A)->true;((forall(member(C,List),M:assertz(C)),export(M:F/A))).
+
+new_a2s(List, Separator, String):-catch(new_a2s0(List, Separator, String),_,((trace,new_a2s0(List, Separator, String)))).
+new_a2s0(List, Separator, String):- debug,
+ (atomic(String) -> (string_to_atom(String,Atom),concat_atom(List, Separator, Atom));
+     (concat_atom(List, Separator, Atom),string_to_atom(String,Atom))).
+
+define_if_missing(system:atomics_to_string/3, [
+  ( system:atomics_to_string(List, Separator, String):- new_a2s(List, Separator, String) ) ]).
+
+define_if_missing(system:atomics_to_string/2, [
+  ( system:atomics_to_string(List, String):- new_a2s(List, '', String) ) ]).
+
+
+
 :-export(bad_idea/0).
 bad_idea:-fail.
 
@@ -1779,7 +1800,7 @@ into_comments(S,AC,O):-atomics_to_string(Lines,'\n',S),!,atom_concat('\n',AC,Sep
 
 dmsg3(Msg):- 
          sformat(Str,Msg,[],[]),
-         atomics_to_string(Lines,'\n',Str),
+         string_to_atom(AStr,Str),concat_atom(Lines,'\n',AStr),
          mesg_color(Msg,Ctrl),!,
          with_output_to_stream(user_error,  
                      forall(member(E,Lines), dmsg5(Ctrl,E))).
@@ -2551,3 +2572,5 @@ user:prolog_exception_hook(A,B,C,D):-once(copy_term(A,AA)),catchv(( once(bugger_
 
 %:-module(bugger).
 %:-prolog.
+
+:-retract(double_quotes_was(WAS)),set_prolog_flag(double_quotes,WAS).

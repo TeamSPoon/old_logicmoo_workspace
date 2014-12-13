@@ -12,7 +12,7 @@ was_run_dbg_pl:-is_startup_file('run_debug.pl').
 % :- catch(guitracer,_,true).
 :- set_prolog_flag(verbose_load,true).
 
-% :- ensure_loaded('../../swish//logicmoo_run_swish').
+% :- ensure_loaded('../../swish/logicmoo_run_swish').
 :- debug.
 
 % run_tests includes run_common 

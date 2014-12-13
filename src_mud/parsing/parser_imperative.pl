@@ -340,7 +340,7 @@ term_specifier_text(Text,Subclass):-
    once((isa_asserted(X,Subclass),
    arg_to_var(text,Text,TextVar),
    req(keyword(X,TextVar)),   
-   same_arg(text,TextVar,Text))). % dmsg(todo(term_specifier_text(Text,Subclass))),transitive_subclass(Subclass,spatialthing).
+   same_arg(text,TextVar,Text))). % dmsg(todo(term_specifier_text(Text,Subclass))),subclass_backchaing(Subclass,spatialthing).
 
 
 phrase_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver):-length(TYPEARGS,N),length(GOODARGS,N),!,
@@ -350,6 +350,16 @@ string_append(A,[B1,B2],C,ABC):-append(A,[B1,B2|C],ABC).
 string_append(A,[B],C,ABC):-append(A,[B|C],ABC).
 
 
+is_counted_for_parse(I):-i_countable(I),not(excluded_in_parse(I)),!.
+
+excluded_in_parse(apath(_, _)).
+excluded_in_parse(I):-type(I).
+excluded_in_parse(I):-formattype(I).
+excluded_in_parse(I):-mpred_prop(_,argsIsaInList(I)).
+excluded_in_parse(apath(_ = _)).
+
+instance_for_parse(I):-is_counted_for_parse(I).
+insttype_for_parse(I):-findall(C,(instance_for_parse(I),isa(I,C)),List),list_to_set(List,Set),member(I,Set).
 
 optional_strings_opt.
 

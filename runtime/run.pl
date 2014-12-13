@@ -13,12 +13,15 @@ was_run_dbg_pl:-is_startup_file('run.pl').
 % :- catch(guitracer,_,true).
 :- set_prolog_flag(verbose_load,true).
 
-% :- ensure_loaded('../../swish/logicmoo_run_swish').
+%:- ensure_loaded('../../swish/logicmoo_run_swish').
 :- debug.
 
 % run_tests includes run_common 
 :-include(run_tests).
 
+%:- ensure_loaded('../xperimental/src_incoming/dbase/dbase_rosprolog').
+
+:-prolog.
 
 % [Optionaly] re-define load_default_game
 % load_default_game:- load_game(logicmoo('rooms/startrek.all.plmoo')).
@@ -27,7 +30,8 @@ was_run_dbg_pl:-is_startup_file('run.pl').
 % starts in forground
 %:- at_start(slow_work).
 % starts in thread (the the above was commented out)
-%:- at_start(start_servers).
+% :- at_start(start_servers).
+% :- thread_work.
 % commented out except on run
 
 
@@ -162,7 +166,6 @@ cmdresult(statistics,true)
 
 % :-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,chat80)).
 :- if_flag_true(was_run_dbg_pl, at_start(run)).
-
 
 % So scripted versions don't just exit
 %:- if_flag_true(was_run_dbg_pl,at_start(prolog)).

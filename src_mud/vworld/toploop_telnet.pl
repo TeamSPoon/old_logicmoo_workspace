@@ -92,7 +92,8 @@ run_player_telnet:-
 set_player_telnet_options:-
      foc_current_player(P),
      add(repl_writer(P,telnet_repl_writer)),
-     add(repl_to_string(P,telnet_repl_obj_to_string)).
+     add(repl_to_string(P,telnet_repl_obj_to_string)),
+     set_bugger_flag(opt_debug,off).
 
 goodbye_player:- 
      foc_current_player(P3),

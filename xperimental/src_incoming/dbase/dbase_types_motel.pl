@@ -1,8 +1,8 @@
-:-module(mootel,[]).
+:-module(mootel,[subclass_motel/2,isa_asserted_motel/2,isa_backchaing_motel/2,assert_subclass_motel/2,assert_disjoint_motel/2,assert_isa_motel/2]).
 
 
 /** <module> 
-% Still working on (and testing) but will provide the type inference for Logicmoo Later
+% Still working on (and testing) but will provide the isa/genls inference for Logicmoo Later
 %
 % Logicmoo Project PrologMUD: A MUD server written in Prolog
 % Maintainer: Douglas Miles
@@ -10,14 +10,32 @@
 %
 */
 
+
+subclass_motel(X,Y):- no_repeats(ask(isa(the(X),Y))).
+isa_asserted_motel(X,Y):- no_repeats(ask(isa(X,Y))),X \= the(_).
+isa_backchaing_motel(X,Y):- no_repeats(ask(isa(X,Y))),X \= the(_).
+assert_subclass_motel(X,Y):- defconcept(X,Y),!.
+assert_disjoint_motel(X,Y):- defconcept(X,not(Y)),!.
+assert_isa_motel(X,Y):- assert_ind(X,Y),!.
+
+
+
+fort(the(A)):-atomic(A).
+fort(A):-atomic(A).
+
+top_or_bot(top).
+top_or_bot(bot).
+db_hook(assertz_if_new,(conceptName(Env,MS,W1,CN1):-G)):-assertz_if_new(conceptName(Env,MS,W1,CN1):-G),(top_or_bot(CN1)->true;must(assert_ind_no_names(Env,MS,the(CN1),CN1))),!.
+db_hook(assertz_if_new,conceptName(Env,MS,W1,CN1)):-assertz_if_new(conceptName(Env,MS,W1,CN1)),(top_or_bot(CN1)->true;must(assert_ind_no_names(Env,MS,the(CN1),CN1))),!.
+db_hook(assertz_if_new,X):-assertz_if_new(X),!.
+
 /*
 
-nt: notice(explorer(player1),do(explorer(player1),prolog)). 
  1 ?- translate(implies(and(isa(X,C),genls(C,SC)),isa(X,SC)),X).
-X = [cl([isa(X, SC)], [and(isa(X, C), genls(C, SC))])].
+ X = [cl([isa(X, SC)], [and(isa(X, C), genls(C, SC))])].
 
 
-- translate(exists(Z,implies(and([isa(X,C),genls(C,SC)]),isa(X,SC),knows(X,Z))),F).
+3 ?- translate(exists(Z,implies(and([isa(X,C),genls(C,SC)]),isa(X,SC),knows(X,Z))),F).
 F = [cl([implies(and([isa(X, C), genls(C, SC)]), isa(X, SC), knows(X, f1))], [])].
 
 4 ?- translate(exists(Z,implies(and([isa(X,C),genls(C,SC)]),and([isa(X,SC),knows(X,Z)]))),F).
@@ -26,11 +44,9 @@ F = [cl([isa(X, SC)], [isa(X, C), genls(C, SC)]), cl([knows(X, f2)], [isa(X, C),
 5 ?- translate(exists(Z,implies(and([isa(X,C),allHasPred(C,Pred)]),holds(Pred,X,Z))),F).
 F = [cl([holds(Pred, X, f3)], [isa(X, C), allHasPred(C, Pred)])].
 
-6 ?- 
 
 
-
-c2p(implies(and([disjoint(C, E), domain(A, B, C), domain(D, B, E)]), disjointRelation(A, D)),X,Y).
+?- c2p(implies(and([disjoint(C, E), domain(A, B, C), domain(D, B, E)]), disjointRelation(A, D)),X,Y).
 
 c2p(implies(and([  subrelation(R1, R2), holds(R1, A, B)]), holds(R1, A, B)),X,Y).
 
@@ -64,7 +80,7 @@ c2p(CNF,CLF,HP) :- translate(CNF,CLF), clausesToNHProlog(CLF,HP).
  * @(#) dynamicDef.pl 1.16@(#)
  *
  */
-:- use_module('../../src_lib/logicmoo_util/logicmoo_util_all.pl').
+:- use_module('../../../src_lib/logicmoo_util/logicmoo_util_all.pl').
 :-op(900,fy,'~').
 
 % !! Remember: Any changes to the following list should be carefully
@@ -90,7 +106,7 @@ c2p(CNF,CLF,HP) :- translate(CNF,CLF), clausesToNHProlog(CLF,HP).
  :- meta_predicate performQuery(*,0,0).
  :- meta_predicate mapGoal(0,*,*).
 
-  callStub(P,F,A):- dtrace, predicate_property(P,number_of_clauses(N)),(N==1 -> (trace,fail); (functor(PP,F,A),trace,retractall((PP:-callStub(PP,F,A))),fail)).
+ callStub(P,F,A):- predicate_property(P,number_of_clauses(N)),(N==1 -> (dmsg( callStub(P,F,A)), fail); (functor(PP,F,A),retractall((PP:-callStub(PP,F,A))),fail)).
 
  createStub(F/A):- functor(P,F,A),asserta_if_new((P:-callStub(P,F,A))).
 
@@ -492,16 +508,9 @@ printTime(G) :-
 	printTime(G,T0).
 
 printTime(G,T0) :-
-	call(G),
-	getRuntime(T1),
-	T is T1 - T0,
-	'format'('Total runtime ~3d sec.~n', [T]).
-printTime(_,T0) :-
-	getRuntime(T1),
-	T is T1 - T0,
-	'format'('Total runtime ~3d sec.~n', [T]),
-	!,
-	fail.
+     call(G) *->
+	(getRuntime(T1),T is T1 - T0, 'format'('Succeeds ?- ~q.~nTotal runtime ~3d sec.~n', [G,T]));
+        ((getRuntime(T1),T is T1 - T0, 'format'('Fails ?- ~q.~nTotal runtime ~3d sec.~n', [G,T]), !,fail)).
 
 /**********************************************************************
  *
@@ -516,7 +525,7 @@ simple_term(X) :-
 	var(X),
 	!.
 simple_term(X) :-
-	atomic(X),
+	fort(X),
 	!.
 
 /**********************************************************************
@@ -526,9 +535,9 @@ simple_term(X) :-
  */
 
 loadLibraries(sicstus) :-
-	assertz_if_new((gensym(Prefix, V) :-
+	db_hook(assertz_if_new,(gensym(Prefix, V) :-
 	var(V),
-	atomic(Prefix),
+	fort(Prefix),
 	(   retract(gensym_counter(Prefix, M))
 	;   M = 0
 	),
@@ -539,26 +548,26 @@ loadLibraries(sicstus) :-
 	append(P1,N1,V1),
 	name(V,V1),
 	!)),
-	assertz_if_new((getTwoRandomNumbers(RT,CT) :-
+	db_hook(assertz_if_new,(getTwoRandomNumbers(RT,CT) :-
 	statistics(runtime,[RT,CT]))),
-	assertz_if_new((getRuntime(RT) :-
+	db_hook(assertz_if_new,(getRuntime(RT) :-
 	statistics(runtime,[RT|_]))),
-	assertz_if_new((append([],L2,L2))),
-	assertz_if_new((append([A1|L1],L2,[A1|L3]) :-
+	db_hook(assertz_if_new,(append([],L2,L2))),
+	db_hook(assertz_if_new,(append([A1|L1],L2,[A1|L3]) :-
 	append(L1,L2,L3))),
-	assertz_if_new((not(Goal) :- call(\+ Goal))),
-	assertz_if_new((once(Goal) :- Goal, !)),
-	assertz_if_new((ask(A1) :- deduce(A1))),
-	assertz_if_new((ask(A1,A2) :- deduce(A1,A2))),
-	assertz_if_new((ask(A1,A2,A3) :- deduce(A1,A2,A3))),
-	assertz_if_new((ask(A1,A2,A3,A4) :- deduce(A1,A2,A3,A4))),
-	assertz_if_new((map(A1,A2,A3) :- hop_map(A1,A2,A3))),
-	assertz_if_new((map(A1,A2,A3,A4) :- hop_map(A1,A2,A3,A4))),
+	db_hook(assertz_if_new,(not(Goal) :- call(\+ Goal))),
+	db_hook(assertz_if_new,(once(Goal) :- Goal, !)),
+	db_hook(assertz_if_new,(ask(A1) :- deduce(A1))),
+	db_hook(assertz_if_new,(ask(A1,A2) :- deduce(A1,A2))),
+	db_hook(assertz_if_new,(ask(A1,A2,A3) :- deduce(A1,A2,A3))),
+	db_hook(assertz_if_new,(ask(A1,A2,A3,A4) :- deduce(A1,A2,A3,A4))),
+	db_hook(assertz_if_new,(map(A1,A2,A3) :- hop_map(A1,A2,A3))),
+	db_hook(assertz_if_new,(map(A1,A2,A3,A4) :- hop_map(A1,A2,A3,A4))),
 	!.
 loadLibraries(eclipse) :-
-	assertz_if_new((gensym(Prefix, V) :-
+	db_hook(assertz_if_new,(gensym(Prefix, V) :-
 	var(V),
-	atomic(Prefix),
+	fort(Prefix),
 	(   retract(gensym_counter(Prefix, M))
 	;   M = 0
 	),
@@ -569,44 +578,44 @@ loadLibraries(eclipse) :-
 	append(P1,N1,V1),
 	name(V,V1),
 	!)),
-	assertz_if_new((getTwoRandomNumbers(RT,CT) :-
+	db_hook(assertz_if_new,(getTwoRandomNumbers(RT,CT) :-
 	statistics(runtime,[RT,CT]))),
-	assertz_if_new((getRuntime(RT) :-
+	db_hook(assertz_if_new,(getRuntime(RT) :-
 	statistics(runtime,[RT|_]))),
-	assertz_if_new((append([],L2,L2))),
-	assertz_if_new((append([A1|L1],L2,[A1|L3]) :-
+	db_hook(assertz_if_new,(append([],L2,L2))),
+	db_hook(assertz_if_new,(append([A1|L1],L2,[A1|L3]) :-
 	append(L1,L2,L3))),
-	assertz_if_new((ask(A1) :- deduce(A1))),
-	assertz_if_new((ask(A1,A2) :- deduce(A1,A2))),
-	assertz_if_new((ask(A1,A2,A3) :- deduce(A1,A2,A3))),
-	assertz_if_new((ask(A1,A2,A3,A4) :- deduce(A1,A2,A3,A4))),
-	assertz_if_new((map(A1,A2,A3) :- hop_map(A1,A2,A3))),
-	assertz_if_new((map(A1,A2,A3,A4) :- hop_map(A1,A2,A3,A4))),
+	db_hook(assertz_if_new,(ask(A1) :- deduce(A1))),
+	db_hook(assertz_if_new,(ask(A1,A2) :- deduce(A1,A2))),
+	db_hook(assertz_if_new,(ask(A1,A2,A3) :- deduce(A1,A2,A3))),
+	db_hook(assertz_if_new,(ask(A1,A2,A3,A4) :- deduce(A1,A2,A3,A4))),
+	db_hook(assertz_if_new,(map(A1,A2,A3) :- hop_map(A1,A2,A3))),
+	db_hook(assertz_if_new,(map(A1,A2,A3,A4) :- hop_map(A1,A2,A3,A4))),
 	!.
 loadLibraries(swiprolog) :-
-	assertz_if_new((ask(A1) :- deduce(A1))),
-	assertz_if_new((ask(A1,A2) :- deduce(A1,A2))),
-	assertz_if_new((ask(A1,A2,A3) :- deduce(A1,A2,A3))),
-	assertz_if_new((ask(A1,A2,A3,A4) :- deduce(A1,A2,A3,A4))),
-	assertz_if_new((map(A1,A2,A3) :- hop_map(A1,A2,A3))),
-	assertz_if_new((map(A1,A2,A3,A4) :- hop_map(A1,A2,A3,A4))),
-	assertz_if_new((portray(not(F)) :- display(not(F)))),
-	assertz_if_new((getTwoRandomNumbers(RT,CT) :-
+	db_hook(assertz_if_new,(ask(A1) :- deduce(A1))),
+	db_hook(assertz_if_new,(ask(A1,A2) :- deduce(A1,A2))),
+	db_hook(assertz_if_new,(ask(A1,A2,A3) :- deduce(A1,A2,A3))),
+	db_hook(assertz_if_new,(ask(A1,A2,A3,A4) :- deduce(A1,A2,A3,A4))),
+	db_hook(assertz_if_new,(map(A1,A2,A3) :- hop_map(A1,A2,A3))),
+	db_hook(assertz_if_new,(map(A1,A2,A3,A4) :- hop_map(A1,A2,A3,A4))),
+	db_hook(assertz_if_new,(portray(not(F)) :- display(not(F)))),
+	db_hook(assertz_if_new,(getTwoRandomNumbers(RT,CT) :-
 	statistics(cputime,RT1), RT is (ceil(RT1 * 100000)) mod 100000, statistics(atoms,CT))),
-	assertz_if_new((getRuntime(RT) :-
+	db_hook(assertz_if_new,(getRuntime(RT) :-
 	statistics(cputime,RT1), RT is ceil(RT1 * 1000))),
 	%index(kb_in(1,0,0,0,1,1,0,0,0,0)),
 	%index(eq(1,0,0,1,1,0,0,0,0)),
 	%index(constraint(1,0,0,1,0,0,0,0)),
-	assertz_if_new((retractall1(Head) :- retract(Head), fail)),
-	assertz_if_new((retractall1(Head) :- retract((Head :- _Body)), fail)),
-	assertz_if_new((retractall1(_))),
+	db_hook(assertz_if_new,(retractall1(Head) :- retract(Head), fail)),
+	db_hook(assertz_if_new,(retractall1(Head) :- retract((Head :- _Body)), fail)),
+	db_hook(assertz_if_new,(retractall1(_))),
 	!.
 loadLibraries(poplog) :-
 	op(600,xfy,':'),
-	assertz_if_new((gensym(Prefix, V) :-
+	db_hook(assertz_if_new,(gensym(Prefix, V) :-
 	var(V),
-	atomic(Prefix),
+	fort(Prefix),
 	(   retract(gensym_counter(Prefix, M))
 	;   M = 0
 	),
@@ -617,22 +626,22 @@ loadLibraries(poplog) :-
 	append(P1,N1,V1),
 	name(V,V1),
 	!)),
-	assertz_if_new((append([],L2,L2))),
-	assertz_if_new((append([A1|L1],L2,[A1|L3]) :-
+	db_hook(assertz_if_new,(append([],L2,L2))),
+	db_hook(assertz_if_new,(append([A1|L1],L2,[A1|L3]) :-
 	append(L1,L2,L3))),
-	assertz_if_new((ask(A1) :- deduce(A1))),
-	assertz_if_new((ask(A1,A2) :- deduce(A1,A2))),
-	assertz_if_new((ask(A1,A2,A3) :- deduce(A1,A2,A3))),
-	assertz_if_new((ask(A1,A2,A3,A4) :- deduce(A1,A2,A3,A4))),
-	assertz_if_new((map(A1,A2,A3) :- hop_map(A1,A2,A3))),
-	assertz_if_new((map(A1,A2,A3,A4) :- hop_map(A1,A2,A3,A4))),
-	assertz_if_new((once(Goal) :- Goal, !)),
-	assertz_if_new((saveMOTEL(F) :- save_program(F))),
+	db_hook(assertz_if_new,(ask(A1) :- deduce(A1))),
+	db_hook(assertz_if_new,(ask(A1,A2) :- deduce(A1,A2))),
+	db_hook(assertz_if_new,(ask(A1,A2,A3) :- deduce(A1,A2,A3))),
+	db_hook(assertz_if_new,(ask(A1,A2,A3,A4) :- deduce(A1,A2,A3,A4))),
+	db_hook(assertz_if_new,(map(A1,A2,A3) :- hop_map(A1,A2,A3))),
+	db_hook(assertz_if_new,(map(A1,A2,A3,A4) :- hop_map(A1,A2,A3,A4))),
+	db_hook(assertz_if_new,(once(Goal) :- Goal, !)),
+	db_hook(assertz_if_new,(saveMOTEL(F) :- save_program(F))),
 	!.
 loadLibraries(quintus) :-
-	assertz_if_new((gensym(Prefix, V) :-
+	db_hook(assertz_if_new,(gensym(Prefix, V) :-
 	var(V),
-	atomic(Prefix),
+	fort(Prefix),
 	(   retract(gensym_counter(Prefix, M))
 	;   M = 0
 	),
@@ -643,19 +652,19 @@ loadLibraries(quintus) :-
 	append(P1,N1,V1),
 	name(V,V1),
 	!)),
-	assertz_if_new((getTwoRandomNumbers(RT,CT) :-
+	db_hook(assertz_if_new,(getTwoRandomNumbers(RT,CT) :-
 	statistics(runtime,[RT,CT]))),
-	assertz_if_new((getRuntime(RT) :-
+	db_hook(assertz_if_new,(getRuntime(RT) :-
 	statistics(runtime,[RT|_]))),
-	assertz_if_new((not(Goal) :- call(\+ Goal))),
-	assertz_if_new((once(Goal) :- Goal, !)),
-	assertz_if_new((ask(A1) :- deduce(A1))),
-	assertz_if_new((ask(A1,A2,A3,A4) :- deduce(A1,A2,A3,A4))),
-	assertz_if_new((ask(A1,A2) :- deduce(A1,A2))),
-	assertz_if_new((ask(A1,A2,A3) :- deduce(A1,A2,A3))),
-	assertz_if_new((map(A1,A2,A3) :- hop_map(A1,A2,A3))),
-	assertz_if_new((map(A1,A2,A3,A4) :- hop_map(A1,A2,A3,A4))),
-	assertz_if_new((saveMOTEL(F) :- save_program(F))),
+	db_hook(assertz_if_new,(not(Goal) :- call(\+ Goal))),
+	db_hook(assertz_if_new,(once(Goal) :- Goal, !)),
+	db_hook(assertz_if_new,(ask(A1) :- deduce(A1))),
+	db_hook(assertz_if_new,(ask(A1,A2,A3,A4) :- deduce(A1,A2,A3,A4))),
+	db_hook(assertz_if_new,(ask(A1,A2) :- deduce(A1,A2))),
+	db_hook(assertz_if_new,(ask(A1,A2,A3) :- deduce(A1,A2,A3))),
+	db_hook(assertz_if_new,(map(A1,A2,A3) :- hop_map(A1,A2,A3))),
+	db_hook(assertz_if_new,(map(A1,A2,A3,A4) :- hop_map(A1,A2,A3,A4))),
+	db_hook(assertz_if_new,(saveMOTEL(F) :- save_program(F))),
 	!.
 loadLibraries(macprolog) :-
 	op(600,xfy,':'),
@@ -1163,7 +1172,7 @@ generateClashGoal(CS1,Goal) :-
 		
 clashCS(CL) :-
 	retract(clashTest(possible)),
-	assertz_if_new(clashTest(impossible)),
+	db_hook(assertz_if_new,clashTest(impossible)),
 	generateClashGoal(CL,Goal),
 	!,
 	doClashTest(Goal).
@@ -1174,7 +1183,7 @@ clashCS(_CL) :-
 doClashTest(InHead1) :-
 	call(InHead1),
 	InHead1 = in(Env,_,modal(W1),C1,X,hyp(HYP),ab(_),call(_CALL),_),
-	atomic(X),
+	fort(X),
 	normalizeNot(not(C1),C2),
 	constructMLHead(Env,rn(_AX2,_RN2,_S2,_O2),W1,C2,X,HYP,noAb,[],_,InHead2),
 	call(InHead2),
@@ -1184,7 +1193,7 @@ doClashTest(InHead1) :-
 	print(InHead1), nl,
 	nl,
 	retract(clashTest(impossible)),
-	assertz_if_new(clashTest(possible)),
+	db_hook(assertz_if_new,clashTest(possible)),
 	!.
 doClashTest(Goal) :-
 	% the clash goal has failed, so there is no clash
@@ -1192,7 +1201,7 @@ doClashTest(Goal) :-
 	print(HYP), nl,
 	nl,
 	retract(clashTest(impossible)),
-	assertz_if_new(clashTest(possible)),
+	db_hook(assertz_if_new,clashTest(possible)),
 	!,
 	fail.
 
@@ -1237,7 +1246,7 @@ doClashTest(Goal) :-
 %    [eq(rn(_,_,_,_),modal(MS),Y,app(_F:R,X),hyp(_HYPS))|CL],RF1,RF2) :-
 % 	nonvar(Y),
 % 	nonvar(X),
-% 	atomic(Y),
+% 	fort(Y),
 % 	not(member((X,Y),RF1)),
 % 	!,
 % 	getAllRoleFillersInCS(MS,R,CL,[(X,Y)|RF1],RF2).
@@ -1256,7 +1265,7 @@ clashInHyp(CL) :-
 	!.
 clashInHyp(CL) :-
 	member(in(_N2,modal(MS2),A,X,hyp(_HYPS2),ab(_D2)),CL),
-	atomic(A),
+	fort(A),
 	member(in(_N1,modal(MS1),not(A),X,hyp(_HYPS1),ab(_D1)),CL),
 	not(not(MS1 = MS2)),
 	!.
@@ -1288,7 +1297,7 @@ clashInHyp(CL) :-
 %    [eq(rn(_,_,_,_),modal(MS),Y,app(_F:R,X),hyp(_HYPS))|CL],RF1,RF2) :-
 % 	nonvar(Y),
 % 	nonvar(X),
-% 	atomic(Y),
+% 	fort(Y),
 % 	not(member((X,Y),RF1)),
 % 	!,
 % 	getAllRoleFillersInCS(MS,R,CL,[(X,Y)|RF1],RF2).
@@ -1477,12 +1486,12 @@ classify(EnvName,MS) :-
 
 classify(EnvName,NewConcept) :-
 	environment(EnvName,Env,_),
-	atomic(NewConcept),
+	fort(NewConcept),
 	clause(conceptName(Env,_MS1,_W2,NewConcept),_), % _MS1 might be [] ?
 	classify(concepts,[],NewConcept).
 classify(EnvName,NewRole) :-
 	environment(EnvName,Env,_),
-	atomic(NewRole),
+	fort(NewRole),
 	clause(roleName(Env,_MS1,_W1,NewRole),_), % _MS1 might be [] ?
 	classify(roles,[],NewRole).
 
@@ -1560,11 +1569,11 @@ classify(roles,Env,MS,NewRole) :-
 classify(concepts,Env,MS,NewConcept) :-
 	retract(conceptHierarchy(Env,MS,OldTree)),
 	classify(concepts,Env,MS,NewConcept,OldTree,NewTree),
-	assertz_if_new(conceptHierarchy(Env,MS,NewTree)).
+	db_hook(assertz_if_new,conceptHierarchy(Env,MS,NewTree)).
 classify(roles,Env,MS,NewRole) :-
 	retract(roleHierarchy(Env,MS,OldTree)),
 	classify(roles,Env,MS,NewRole,OldTree,NewTree),
-	assertz_if_new(roleHierarchy(Env,MS,NewTree)).
+	db_hook(assertz_if_new,roleHierarchy(Env,MS,NewTree)).
 
 classify(Type,Env,MS,NewConcept,OldTree,NewTree) :-
 	testForSubsumption(Type,Env,MS,NewConcept,OldTree,NewTree,_Judgement),
@@ -1754,7 +1763,7 @@ cont5a(X,Y) :-
 	succ3(Y,Z),
 	cont5a(X,Z),!.
 
-assert2(G) :- not(G),assertz_if_new(G),!.
+assert2(G) :- not(G),db_hook(assertz_if_new,G),!.
 assert2(G) :-!.
 
 retract2(G) :- retract(G),!.
@@ -1888,7 +1897,6 @@ printArgs(Depth,[N1|NL]) :-
 
 
 
-
 /**********************************************************************
  *
  * @(#) classifier2.pl 1.35@(#)
@@ -1906,16 +1914,16 @@ init_new_daten(Env) :-
         init_succ(_),
 	init_sub(_),
 	init_nsub(_),
-	assertz_if_new(conceptName1(Env,_,top)),
-	assertz_if_new(roleName1(Env,_,top)),
-       	assertz_if_new(succ(concepts,Env,_,top,bot)),
-	assertz_if_new(sub(concepts,Env,_,top,_)),
-	assertz_if_new(nsub(concepts,Env,_,X,X)),	
-	assertz_if_new(succ(roles,Env,_,top,bot)),
-	assertz_if_new(sub(roles,Env,_,top,_)),
-	assertz_if_new(nsub(roles,Env,_,X,X)),
-	assertz_if_new(sub(roles,Env,_,_,bot)),
-	assertz_if_new(sub(concepts,Env,_,_,bot)).
+	db_hook(assertz_if_new,conceptName1(Env,_,top)),
+	db_hook(assertz_if_new,roleName1(Env,_,top)),
+       	db_hook(assertz_if_new,succ(concepts,Env,_,top,bot)),
+	db_hook(assertz_if_new,sub(concepts,Env,_,top,_)),
+	db_hook(assertz_if_new,nsub(concepts,Env,_,X,X)),	
+	db_hook(assertz_if_new,succ(roles,Env,_,top,bot)),
+	db_hook(assertz_if_new,sub(roles,Env,_,top,_)),
+	db_hook(assertz_if_new,nsub(roles,Env,_,X,X)),
+	db_hook(assertz_if_new,sub(roles,Env,_,_,bot)),
+	db_hook(assertz_if_new,sub(concepts,Env,_,_,bot)).
 
 init_new_daten1 :-
 	currentEnvironment(Env),
@@ -2055,8 +2063,8 @@ testa(Env,MS) :-
 	buildOrdering(Env,MS,CTree,RTree),
 	retractall1(conceptHierarchy(Env,MS,_)),
 	retractall1(roleHierarchy(Env,MS,_)),
-	assertz_if_new(conceptHierarchy(Env,MS,CTree)),
-	assertz_if_new(roleHierarchy(Env,MS,RTree)),
+	db_hook(assertz_if_new,conceptHierarchy(Env,MS,CTree)),
+	db_hook(assertz_if_new,roleHierarchy(Env,MS,RTree)),
 	ifOption(testOutput,yes,printStat),
 %	ifOption(testOutput,yes,show_dag(MS)),
 	!.	
@@ -2884,7 +2892,7 @@ union1(X,Y,Z) :-
 	!.
 assert1(G) :- 
 	not(G),
-	assertz_if_new(G),
+	db_hook(assertz_if_new,G),
 	!.
 assert1(G) :-
 	!.
@@ -3165,18 +3173,18 @@ writeCompiledPredicateFactsToFile(Env,[Pred/Arity|List]) :-
 
 assertConnectionClauses(Env) :-
 	expand_term(constraint(Env,X2,X3,X4,X5,X6,X7,X8),CompConAtom),
-	assertz_if_new((constraint(Env,X2,X3,X4,X5,X6,X7,X8) :-
+	db_hook(assertz_if_new,(constraint(Env,X2,X3,X4,X5,X6,X7,X8) :-
 		 CompConAtom)),
 	expand_term(eq(Env,X2,X3,X4,X5,X6,X7,X8,X9),CompEqAtom),
-	assertz_if_new((eq(Env,X2,X3,X4,X5,X6,X7,X8,X9) :-
+	db_hook(assertz_if_new,(eq(Env,X2,X3,X4,X5,X6,X7,X8,X9) :-
 		 CompEqAtom)),
 	expand_term(in(Env,X2,X3,X4,X5,X6,X7,X8,X9),CompInAtom),
-	assertz_if_new((in(Env,X2,X3,X4,X5,X6,X7,X8,X9) :-
+	db_hook(assertz_if_new,(in(Env,X2,X3,X4,X5,X6,X7,X8,X9) :-
 		 CompInAtom)),
-%	assertz_if_new((kb_in(Env,X2,X3,X4,X5,X6,X7,X8,X9,X10) :-
+%	db_hook(assertz_if_new,(kb_in(Env,X2,X3,X4,X5,X6,X7,X8,X9,X10) :-
 %		 comp_kb_in(Env,X2,X3,X4,X5,X6,X7,X8,X9,X10))),
 	expand_term(rel(Env,X2,X3,X4,X5),CompRelAtom),
-	assertz_if_new((rel(Env,X2,X3,X4,X5) :-
+	db_hook(assertz_if_new,(rel(Env,X2,X3,X4,X5) :-
 		 CompRelAtom)),
 	!.
 
@@ -3216,32 +3224,32 @@ termExpansion(on,env(Id),
 	% Assert the term_expansion rules needed to translate the
 	% interpreted clauses into compiled clauses.
 	abolish(term_expansion/2),
-	assertz_if_new((term_expansion((Head :- Body),(Head1 :- Body1)) :-
+	db_hook(assertz_if_new,(term_expansion((Head :- Body),(Head1 :- Body1)) :-
 	term_expansion(Head,Head1),
 	term_expansion(Body,Body1))),
-	assertz_if_new((term_expansion((L, Body), (L1,Body1)) :-
+	db_hook(assertz_if_new,(term_expansion((L, Body), (L1,Body1)) :-
 	term_expansion(L,L1),
 	term_expansion(Body,Body1))),
-	assertz_if_new((term_expansion((L; Body), (L1,Body1)) :-
+	db_hook(assertz_if_new,(term_expansion((L; Body), (L1,Body1)) :-
 	term_expansion(L,L1),
 	term_expansion(Body,Body1))),
-	assertz_if_new((term_expansion(\+Atom,\+Atom1) :-
+	db_hook(assertz_if_new,(term_expansion(\+Atom,\+Atom1) :-
 	term_expansion(Atom,Atom1))),
-	assertz_if_new((term_expansion(constraint(X1,X2,X3,X4,X5,X6,X7,X8),
+	db_hook(assertz_if_new,(term_expansion(constraint(X1,X2,X3,X4,X5,X6,X7,X8),
 				CompConAtom))),
-	assertz_if_new((term_expansion(eq(X1,X2,X3,X4,X5,X6,X7,X8,X9),
+	db_hook(assertz_if_new,(term_expansion(eq(X1,X2,X3,X4,X5,X6,X7,X8,X9),
 				CompEqAtom))),
-	assertz_if_new((term_expansion(in(X1,X2,X3,X4,X5,X6,X7,X8,X9),
+	db_hook(assertz_if_new,(term_expansion(in(X1,X2,X3,X4,X5,X6,X7,X8,X9),
 				CompInAtom))),
-	assertz_if_new((term_expansion(kb_in(X1,X2,X3,X4,X5,X6,X7,X8,X9,X10),
+	db_hook(assertz_if_new,(term_expansion(kb_in(X1,X2,X3,X4,X5,X6,X7,X8,X9,X10),
 				CompKb_inAtom))),
-	assertz_if_new((term_expansion(rel(X1,X2,X3,X4,X5),
+	db_hook(assertz_if_new,(term_expansion(rel(X1,X2,X3,X4,X5),
 				CompRelAtom))),
-	assertz_if_new((term_expansion(once(Body1),once(Body2)) :-
+	db_hook(assertz_if_new,(term_expansion(once(Body1),once(Body2)) :-
 		term_expansion(Body1,Body2))),
-	assertz_if_new((term_expansion(call(Body1),call(Body2)) :-
+	db_hook(assertz_if_new,(term_expansion(call(Body1),call(Body2)) :-
 		 term_expansion(Body1,Body2))),
-	assertz_if_new(term_expansion(X,X)),
+	db_hook(assertz_if_new,term_expansion(X,X)),
 	!.
 termExpansion(off,_) :-
 	abolish(term_expansion/2),
@@ -3290,6 +3298,8 @@ invert(R,inverse(R)) :- !.
  *
  */
 
+normalizeNot(X,X):-var(X),!.
+normalizeNot(not(X),not(X)):-var(X),!.
 normalizeNot(not(and([C1,C2|L1])),or(L3)) :-
 	!,
 	hop_map(negate,[C1,C2|L1],L2),
@@ -3967,7 +3977,7 @@ inProofTerm(MS,D,X,HYPS,PT1,PT) :-
 
 eqProofTerm(MS,Y,_FF,R,X,HYPS,PT1,PT) :-
 	nonvar(R),
-	atomic(R),
+	fort(R),
 	!,
 	Rel =.. [R,MS,X,Y],
 	PT = proved(Rel,basedOn(PT1)),
@@ -3989,7 +3999,7 @@ makeTerm(Term,Term) :-
 	var(Term),
 	!.
 makeTerm(Term,Term) :-
-	atomic(Term),
+	fort(Term),
 	!.
 makeTerm([Functor|ArgList],Term) :-
 	hop_map(makeTerm,ArgListTerms,ArgList),
@@ -3997,7 +4007,7 @@ makeTerm([Functor|ArgList],Term) :-
 makeTerm(Term,Term).
 
 %element(X) :-
-%	atomic(X),
+%	fort(X),
 %	!.
 %element(X) :-
 %	var(X),
@@ -4014,7 +4024,7 @@ eqGenerator(Env,AX,RN,S,O,MS,X,Y,HYPS,D,CALLS,PT) :-
 	eq(Env,rn(AX,RN,S,O),modal(MS),X,Y,hyp(HYPS),ab(D),call(CALLS),PT),
 	nonvar(X),
 	nonvar(Y),
-	atomic(X).
+	fort(X).
 
 gensymbol(Symbol,_L,NewSymbol) :-
 	gensym(Symbol,NewSymbol),
@@ -4042,14 +4052,14 @@ typeOfDefinition(Env,MS,C,user) :-
 	getConceptName(Env,MS,C),
 	!.
 typeOfDefinition(_,_,C,system) :-
-	atomic(C),
+	fort(C),
 	name(C,[99,111,110,99,101,112,116|_]),
 	!.
 typeOfDefinition(Env,MS,R,user) :-
 	getRoleName(Env,MS,R),
 	!.
 typeOfDefinition(_,_,R,system) :-
-	atomic(R),
+	fort(R),
 	name(R,[114,111,108,101|_]),
 	!.
 typeOfDefinition(Env,MS,not(C),Type) :-
@@ -4222,7 +4232,7 @@ getInExplanation(in(_,_,modal(_MS),_CN,_CON,hyp(_HYP),ab(_),call(_CALL),
  */
 
 constructEqHead(Env,Name,MS,Y,F,R,X,HYPS,D,CALLS,PT1,L) :-
-	eqProofTerm(MS,Y,F,R,X,HYPS,PT1,PT),
+	must(eqProofTerm(MS,Y,F,R,X,HYPS,PT1,PT)),
 	L = eq(Env,Name,modal(MS),Y,app((F:R),X),hyp(HYPS),ab(D),call(CALLS),PT),
 	!.
 
@@ -4955,7 +4965,7 @@ clearEnvironment(EnvName) :-
 	retractall1(Env,consistencyDerivation/3),
 	retractall1(Env,hypothesis/1),
 	retractall1(Env,inconsistencyCheck/3),
-	retractall1(Env,option/2),
+	% retractall1(Env,option/2),
 	retractall1(Env,nsub/4),
 	retractall1(Env,nsub3/2),
 	retractall1(Env,sub3/2),
@@ -4989,13 +4999,13 @@ retractCompiledPredicates(_) :-
 
 initEnvironment :- 
 	getCurrentEnvironment(EnvName),
-	initEnvironment(EnvName),
+	must(initEnvironment(EnvName)),
 	!.
 
 initEnvironment(EnvName) :-
-	clearEnvironment(EnvName),
-	environment(EnvName,Env,_),
-	assertz_if_new(theory(Env,
+	notrace(clearEnvironment(EnvName)),
+	must(environment(EnvName,Env,_)),        
+	db_hook(assertz_if_new,theory(Env,
 	[
         (in([],P,pair(X,Y)) <- equal(X,Z), in([],P,pair(Z,Y))),
 	(in([],P,pair(X,Y)) <- equal(Y,Z), in([],P,pair(X,Z))),
@@ -5003,9 +5013,9 @@ initEnvironment(EnvName) :-
 	(equal(X,Y) <- equal(Y,X)),
 	(equal(X,X) <- true),
 	(in(MS,top,X) <- true)])),
-	assertInRules(Env),
+	must(assertInRules(Env)),
 	% Assert equality axioms
-	assertEqRule(Env,1),
+        assertEqRule(Env,1),
 	% Assert 'top' role
 %	assertEqRule(Env,2),
 	assertEqRule(Env,3),
@@ -5048,12 +5058,12 @@ initEnvironment(EnvName) :-
 	% Meta Reasoning
 %	metaReasoning,
 	% Assert concept hierarchy
-	assertz_if_new(conceptHierarchy(Env,[],node(['top'],[]))),
-	assertz_if_new(conceptName(Env,[],[],'top')),
-	assertz_if_new(conceptName(Env,[],[],'bot')),
+	db_hook(assertz_if_new,conceptHierarchy(Env,[],node(['top'],[]))),
+	db_hook(assertz_if_new,conceptName(Env,[],[],'top')),
+	db_hook(assertz_if_new,conceptName(Env,[],[],'bot')),
 	% Assert role hierarchy
-	assertz_if_new(roleHierarchy(Env,[],node(['top'],[]))),
-	assertz_if_new(roleName(Env,[],[],'top')),
+	db_hook(assertz_if_new,roleHierarchy(Env,[],node(['top'],[]))),
+	db_hook(assertz_if_new,roleName(Env,[],[],'top')),
 	initFuncdep,
 	!.
 
@@ -5071,36 +5081,36 @@ initEnvironment(EnvName) :-
  */
 
 assertInRules(Env) :-
-	assertz_if_new((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
+	db_hook(assertz_if_new,(in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
 		 ifOption(traceOutput,yes,(length(CALL,Depth), 'format'('trying ~d  in(~w,~w)~n',[Depth,CN,CON]))),
 	kb_in(Env,pr(5),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT),
 		 ifOption(traceOutput,yes,(length(CALL,Depth), 'format'('succeeded ~d  in(~w,~w)~n',[Depth,CN,CON]))))),
 % There are no kb_in clauses with priority 4 at the moment (07.10.92)
-%	assertz_if_new((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
+%	db_hook(assertz_if_new,(in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
 %	kb_in(Env,pr(4),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT))),
-	assertz_if_new((in(Env,Name,modal(MS),CN,CON,hyp([or(H1),rl(H2),fl(H3)]),ab(noAb),call(CALL),PT) :-
+	db_hook(assertz_if_new,(in(Env,Name,modal(MS),CN,CON,hyp([or(H1),rl(H2),fl(H3)]),ab(noAb),call(CALL),PT) :-
 		 clashInHyp(H2), !, fail)),
-	assertz_if_new((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
+	db_hook(assertz_if_new,(in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
 		 (CN \== top, CN \== bot, CN \== not(top), CN \== not(bot),
 	kb_in(Env,pr(3),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT)))),
 % There are no kb_in clauses with priority 2 at the moment (07.10.92)
-%	assertz_if_new((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
+%	db_hook(assertz_if_new,(in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
 %	kb_in(Env,pr(2),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT))),
-	assertz_if_new((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
+	db_hook(assertz_if_new,(in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
 		 (CN \== top,CN \== bot, CN \== not(top), CN \== not(bot),
 	kb_in(Env,pr(1),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT)))),
 % Experimental code (07.10.92 uh)
 % It might be useful to have global information about the failure of
 % derivations. With the code below such a failure is used to assertz_if_new to
 % hypothesis that the negation of the goal is true.
-%	assertz_if_new((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
+%	db_hook(assertz_if_new,(in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
 %		 (nonvar(CON), nonvar(CN), 
 %		  \+ hypothesis(in(Env,modal(MS),CN,CON,ab(D),PT)),
 %		  getNegatedConcept(CN,C1),
-%		  assertz_if_new(hypothesis(in(Env,modal(MS),C1,CON,ab(D),assume))),
+%		  db_hook(assertz_if_new,hypothesis(in(Env,modal(MS),C1,CON,ab(D),assume))),
 %		  fail))),
 % There are no kb_in clauses with priority 0 at the moment (07.10.92)
-%	assertz_if_new((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
+%	db_hook(assertz_if_new,(in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
 %	kb_in(Env,pr(0),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT))),
 	!.
 
@@ -5109,11 +5119,12 @@ assertEqRule(Env,1) :-
 	gensym(rule,RN1),
 	constructEqHead(Env,rn(AN1,RN1,user,lInR),W1,app((F:R),X),F,R,X,HYPS,AB,CALLS,PT3,EqHead1),
 	constructMLCall(Env,rn(AX,_RN4,_S4,_O4),bodyMC(W1),headMC(W1),normal(R),X,HYPS,AB,CALLS,PT3,InHead2),
-	assertz_if_new((EqHead1 :- cCS(CALLS,true),  simple_term(X))),
+	db_hook(assertz_if_new,(EqHead1 :- cCS(CALLS,true),  simple_term(X))),
+        dmsg(db_hook(assertz_if_new,(EqHead1 :- cCS(CALLS,true),  simple_term(X)))),
 %       The following would be correct
-%	assertz_if_new((EqHead1 :- cCS(CALLS,true),  InHead2)),
+%	db_hook(assertz_if_new,(EqHead1 :- cCS(CALLS,true),  InHead2)),
 %       old code (uh 20.08.92)
-%	assertz_if_new((eq(Env,rn(AN1,RN1,user,lInR),modal(MS),X,X,hyp(HYPS),
+%	db_hook(assertz_if_new,(eq(Env,rn(AN1,RN1,user,lInR),modal(MS),X,X,hyp(HYPS),
 %                   ab(_AB),call(CALLS),proved(eq(MS,X,X,hyp(HYPS),
 %                   basedOn(true)))) :- 
 %                (cCS(CALLS,true)))),
@@ -5124,13 +5135,13 @@ assertEqRule(Env,2) :-
 	gensym(rule,RN3),
 	constructMLHead(Env,rn(AN3,RN3,user,lInR),_MS,_,Role1,
 			_HYPS,_D,_CALLS,tbox,InHeadR),
-	assertz_if_new((InHeadR)),
+	db_hook(assertz_if_new,(InHeadR)),
 	!.
 assertEqRule(Env,3) :-
 	gensym(axiom,AN20),
 	gensym(rule,RN20),
 	constructEqHead(Env,rn(AN20,RN20,user,lInR),_W1,_Y,_F,top,_X,_HYPS,_D,_CALLS,tbox,EqHead20),
-	assertz_if_new(EqHead20),
+	db_hook(assertz_if_new,EqHead20),
 	!.
 assertEqRule(Env,4) :-
 	gensym(axiom,AN21),
@@ -5138,7 +5149,7 @@ assertEqRule(Env,4) :-
 	HYPS = [or(H1),rl(H2),fl(H3)],
 	constructEqHead(Env,rn(AN21,RN21,user,lInR),W1,Y,F,R,X,HYPS,D,_CALLS,tbox,EqHead20),
 	constructEqMark(rn(_AN21,_RN21,_,_),W1,Y,F,R,X,_HYPS2,D,_CALLS2,EqMark20),
-	assertz_if_new((EqHead20 :- append(H1,H2,H), member(EqMark20,H))),
+	db_hook(assertz_if_new,(EqHead20 :- append(H1,H2,H), member(EqMark20,H))),
 	!.
 
 
@@ -5149,7 +5160,7 @@ assertInRule(Env,1) :-
 	gensym(rule,RN2),
 	constructKBHead(Env,pr(5),rn(AN2,RN2,user,lInR),_W1,'top',_X,
 			_HYPS,_D,_CALLS,tbox,InHead),
-	assertz_if_new(InHead),
+	db_hook(assertz_if_new,InHead),
 	!.
 assertInRule(Env,2) :-
 	% For all X: X in not(bot) 
@@ -5169,7 +5180,7 @@ assertInRule(Env,2) :-
 	gensym(rule,RN4),
 	constructKBHead(Env,pr(5),rn(AN4,RN4,user,lInR),_W1,not(bot),X,
 	                _HYPS,_D,_CALLS,tbox,InHead1),
-	assertz_if_new(InHead1),
+	db_hook(assertz_if_new,InHead1),
 	!.
 assertInRule(Env,3) :-
 	% For all X: X in C if (X in C) is a hypothesis
@@ -5180,9 +5191,9 @@ assertInRule(Env,3) :-
 	constructInHead(Env,rn(_AN5,_RN5,_S5,_O5),MS,C,X,_HYPS,_D1,_CALLS1,_,InHead1),
 	constructKBHead(Env,pr(5),rn(AN4,RN4,system,lInR),MS,C,X,
 	                HYPS,_D,_CALLS2,usingHyp(InHead1),InHead2),
-	assertz_if_new((InHead2 :- append(H1,H2,H), member(InHead1,H))),
+	db_hook(assertz_if_new,(InHead2 :- append(H1,H2,H), member(InHead1,H))),
 	constructMLMark(InHead1,Mark1),
-	assertz_if_new((InHead2 :- (append(H1,H2,H), member(Mark1,H)) ; memberDML(Mark1,H3))),
+	db_hook(assertz_if_new,(InHead2 :- (append(H1,H2,H), member(Mark1,H)) ; memberDML(Mark1,H3))),
 	!.
 assertInRule(Env,4) :-
 	% For all X: X in not(top) => X in C 
@@ -5195,7 +5206,7 @@ assertInRule(Env,4) :-
 	constructMLCall(Env,rn(AN7,_RN7,_S7,_O7),bodyMC(MS),headMC(MS),
                         not('top'),X,HYPS,D,CALLS,PT3,L3),
  	constructMLMark(InHead3,Mark3),
-	assertz_if_new((InHead3 :- cCS(CALLS,Mark3), L3)),
+	db_hook(assertz_if_new,(InHead3 :- cCS(CALLS,Mark3), L3)),
 	!.
 
 assertInRule(Env,1,AN10) :- 
@@ -5258,7 +5269,7 @@ assertInRule(Env,5,AN6) :-
 	constructMLCall(Env,rn(AN6,_RN9,_S9,_O9),bodyMC(MS),headMC(MS),C,X,
 	                HYPS,D,CALLS,PT4,Antecedent4),
 	constructMLMark(Consequence3,AxiomHead3),
-	assertz_if_new((Consequence3 :- cCS(CALLS,AxiomHead3), Antecedent4)),
+	db_hook(assertz_if_new,(Consequence3 :- cCS(CALLS,AxiomHead3), Antecedent4)),
 	!.
 assertInRule(Env,6,AN6) :-
 	% For all X: X in not(not(C)) => X in C 
@@ -5269,7 +5280,7 @@ assertInRule(Env,6,AN6) :-
 	constructMLCall(Env,rn(AN6,_RN7,_S7,_O7),bodyMC(MS),headMC(MS),
 			not(not(C)),X,HYPS,D,CALLS,PT3,Antecedent3),
 	constructMLMark(Consequence4,AxiomHead4),
-	assertz_if_new((Consequence4 :- cCS(CALLS,AxiomHead4), Antecedent3)),
+	db_hook(assertz_if_new,(Consequence4 :- cCS(CALLS,AxiomHead4), Antecedent3)),
 	!.
 assertInRule(Env,7,AN7) :-
 	% For all X: X in set(S2) and subset(S2,S1) => X in S1
@@ -5281,7 +5292,7 @@ assertInRule(Env,7,AN7) :-
 			set(S2),X,HYPS,D,CALLS,PT2,Antecedent2),
 	L1 = subset(S2,S1),
 	constructMLMark(Consequence1,AxiomHead1),
-	assertz_if_new((Consequence1 :- cCS(CALLS,AxiomHead1), (Antecedent2, L1))),
+	db_hook(assertz_if_new,(Consequence1 :- cCS(CALLS,AxiomHead1), (Antecedent2, L1))),
 	!.
 assertInRule(Env,8,AN7) :-
 	% For all X: X in set(S2) and X in set(S3) and 
@@ -5296,7 +5307,7 @@ assertInRule(Env,8,AN7) :-
 			set(S3),X,HYPS,D,CALLS,PT3,Antecedent3),
 	L1 = intersection([S2,S3],S1),
 	constructMLMark(Consequence1,AxiomHead1),
-	assertz_if_new((Consequence1 :- cCS(CALLS,AxiomHead1), (Antecedent3, (Antecedent2, L1)))),
+	db_hook(assertz_if_new,(Consequence1 :- cCS(CALLS,AxiomHead1), (Antecedent3, (Antecedent2, L1)))),
 	!.
 assertInRule(Env,9,AN7) :-
 	% For all X: X in set(S2) and X in set(S3) and 
@@ -5311,7 +5322,7 @@ assertInRule(Env,9,AN7) :-
 			set(S3),X,HYPS,D,CALLS,PT3,Antecedent3),
 	L1 = subtract(S2,S3,S1),
 	constructMLMark(Consequence1,AxiomHead1),
-	assertz_if_new((Consequence1 :- cCS(CALLS,AxiomHead1), (Antecedent3, (Antecedent2, L1)))),
+	db_hook(assertz_if_new,(Consequence1 :- cCS(CALLS,AxiomHead1), (Antecedent3, (Antecedent2, L1)))),
 	!.
 
 
@@ -5322,7 +5333,7 @@ assertAbductionRule(Env,1) :-
 	constructInHead(Env,rn(_AN2,_RN2,_S2,_O2),MS,C,X,
 	                _HYPS1,_D,_CALLS1,_,InHead1),
 	constructMLHead(Env,rn(AN1,RN1,system,lInR),MS,C,X,_HYPS2,D1,_CALLS2,usingAbHyp(in(MS,C,X)),InHead2),
-	assertz_if_new((InHead2 :- memberDML(InHead1,D1))),
+	db_hook(assertz_if_new,(InHead2 :- memberDML(InHead1,D1))),
 	!.
 assertAbductionRule(Env,2) :-
 	% Proof by abduction
@@ -5334,7 +5345,7 @@ assertAbductionRule(Env,2) :-
 	L1 = normalizeNot(C1,C),
 	L2 = not(memberDML(InHead2,D1)),
 	L3 = addDefaultML(InHead2,D1),
-	assertz_if_new((InHead1 :- L1, L2, L3)),
+	trace,db_hook(assertz_if_new,(InHead1 :- L1, L2, L3)),
 	!.
 
 
@@ -5469,7 +5480,7 @@ loadEnvironment(FileName,EnvName) :-
 	see(FileName),
 	read(environment(_EnvName2,Env,C)),
 	(removeEnvironment(EnvName) ; true),
-	assertz_if_new(environment(EnvName,Env,C)),
+	db_hook(assertz_if_new,environment(EnvName,Env,C)),
 	repeat,
 	read(Clause),
 	assertClause(Clause),
@@ -5483,7 +5494,7 @@ loadEnvironment(_FileName,_EnvName) :-
 assertClause('end_of_file') :-
 	!.
 assertClause(Clause) :-
-	assertz_if_new(Clause),
+	db_hook(assertz_if_new,Clause),
 	fail.
 
 /**********************************************************************
@@ -5542,20 +5553,20 @@ copyEnvironment(Name1,Name2) :-
 
 term_expansion(copy,on,Env1,Env2) :-
 	abolish(term_expansion/2),
-	assertz_if_new((term_expansion((Head :- Body),(Head1 :- Body1)) :-
+	db_hook(assertz_if_new,(term_expansion((Head :- Body),(Head1 :- Body1)) :-
 	term_expansion(Head,Head1),
 	term_expansion(Body,Body1))),
-	assertz_if_new((term_expansion((L, Body), (L1,Body1)) :-
+	db_hook(assertz_if_new,(term_expansion((L, Body), (L1,Body1)) :-
 	term_expansion(L,L1),
 	term_expansion(Body,Body1))),
-	assertz_if_new((term_expansion((L; Body), (L1,Body1)) :-
+	db_hook(assertz_if_new,(term_expansion((L; Body), (L1,Body1)) :-
 	term_expansion(L,L1),
 	term_expansion(Body,Body1))),
-	assertz_if_new((term_expansion(\+Atom,\+Atom1) :-
+	db_hook(assertz_if_new,(term_expansion(\+Atom,\+Atom1) :-
 	term_expansion(Atom,Atom1))),
-	assertz_if_new((term_expansion(once(Body1),once(Body2)) :-
+	db_hook(assertz_if_new,(term_expansion(once(Body1),once(Body2)) :-
 		term_expansion(Body1,Body2))),
-	assertz_if_new((term_expansion(call(Body1),call(Body2)) :-
+	db_hook(assertz_if_new,(term_expansion(call(Body1),call(Body2)) :-
 		 term_expansion(Body1,Body2))),
 	assertTermExpansionClause(in/9,Env1,Env2),
 	assertTermExpansionClause(kb_in/10,Env1,Env2),
@@ -5586,11 +5597,11 @@ term_expansion(copy,on,Env1,Env2) :-
 	assertTermExpansionClause(roleSubsets/6,Env1,Env2),
 	assertTermExpansionClause(sub/4,Env1,Env2),
 	assertTermExpansionClause(succ/4,Env1,Env2),
-	assertz_if_new((term_expansion(succ(X1,Env1,X3,X4),
+	db_hook(assertz_if_new,(term_expansion(succ(X1,Env1,X3,X4),
 				succ(X1,Env2,X3,X4)))),
-	assertz_if_new((term_expansion(sub(X1,Env1,X3,X4),
+	db_hook(assertz_if_new,(term_expansion(sub(X1,Env1,X3,X4),
 				sub(X1,Env2,X3,X4)))),
-	assertz_if_new(term_expansion(X,X)),
+	db_hook(assertz_if_new,term_expansion(X,X)),
 	!.
 term_expansion(copy,off,_Env1,_Env2) :-
 	abolish(term_expansion/2),
@@ -5601,7 +5612,7 @@ assertTermExpansionClause(Pred/Arity,Env1,Env2) :-
 	constructArguments(Env,Arity,[],[Env1|Arguments]),
 	Head1 =.. [Pred|[Env1|Arguments]],
 	Head2 =.. [Pred|[Env2|Arguments]],
-	assertz_if_new((term_expansion(Head1,Head2))),
+	db_hook(assertz_if_new,(term_expansion(Head1,Head2))),
 	!.
 
 expandTerm(A,B) :-
@@ -5612,7 +5623,7 @@ copyall(Env1,_Env2,Pred,Args) :-
 	Head1 =.. [Pred,Env1|Args],
 	clause(Head1,Body1),
 	expandTerm((Head1,Body1),(Head2,Body2)),
-	assertz_if_new((Head2 :- Body2)),
+	db_hook(assertz_if_new,(Head2 :- Body2)),
 	fail.
 copyall(_,_,_,_) :- !.
 
@@ -5620,7 +5631,7 @@ copyAll(Env1,_Env2,Pred/Arity) :-
 	constructHead(Env1,Pred/Arity,Head1),
 	clause(Head1,Body1),
 	expandTerm((Head1,Body1),(Head2,Body2)),
-	assertz_if_new((Head2 :- Body2)),
+	db_hook(assertz_if_new,(Head2 :- Body2)),
 	fail.
 copyAll(_,_,_) :- !.
 
@@ -5915,7 +5926,7 @@ example(22) :-
 	assert_ind(sue,betty,teacher),
 	assert_ind(sue,chris,teacher).
 %%% Example 23
-% is a variant of example 23 with user provided names for the 
+% is a variant of example 22 with user provided names for the 
 % restricted roles.
 % ask(isa(amy,female))
 % should succeeds
@@ -6893,8 +6904,8 @@ default_changes([Change|Changes],[WeightedChange|WeightedChanges]) :-
  */
 
 initFuncdep :-
-	assertz_if_new((given_inflLink(_,_,_,_) :- !, fail)),
-	assertz_if_new((given_change(_,_,_,_) :- !, fail)).
+	db_hook(assertz_if_new,(given_inflLink(_,_,_,_) :- !, fail)),
+	db_hook(assertz_if_new,(given_change(_,_,_,_) :- !, fail)).
 	
 
 /***********************************************************************
@@ -7073,9 +7084,9 @@ showNoChange(_).
 
 def(EnvName,MS,infl(X,Y,W)) :-
 	get_Env_World(EnvName,MS,Env,World),
-	atomic(X),
+	fort(X),
 	assertNames(Env,World,X,role),
-	atomic(Y),
+	fort(Y),
 	assertNames(Env,World,Y,role),
 	wellDefined_InflWeight(W),
 	not(given_inflLink(Env,World,app(_,_,X),Y)),
@@ -7084,7 +7095,7 @@ def(EnvName,MS,infl(X,Y,W)) :-
 
 def(EnvName,MS,change(X,W)) :-
 	get_Env_World(EnvName,MS,Env,World),
-	atomic(X),
+	fort(X),
 	assertNames(Env,World,X,role),
 	wellDefined_ChangeWeight(W),
 	not(given_change(Env,World,X,_)),
@@ -7418,12 +7429,12 @@ skolem(P,P,_).
 % Author: Ullrich Hustadt
 
 subst4(T1,T2,X,Sk) :-
-	(atomic(T1) ; var(T1)),
+	(fort(T1) ; var(T1)),
 	T1 == X,
 	!,
 	T2 = Sk.
 subst4(T1,T2,X,_Sk) :-
-	(atomic(T1) ; var(T1)),
+	(fort(T1) ; var(T1)),
 	not(T1 == X),
 	!,
 	T2 = T1.
@@ -7573,7 +7584,7 @@ hop_map(Pred,[H1|T1],[H2|T2]) :-
  */
 
 hop_map(_Pred,_Args,[],[]) :- !.
-hop_map(Pred,Args,[H1|T1],[H2|T2]) :-
+hop_map(Pred,Args,[H1|T1],[H2|T2]) :- is_list(T1),
 	Clause =.. [Pred|[H1,H2|Args]],
 	call(Clause),
 	hop_map(Pred,Args,T1,T2).
@@ -8474,9 +8485,9 @@ defprimconcept(Left,Right) :-
 defprimconcept(EnvName,MS,Left) :-
 	environment(EnvName,Env,_),
 	(MS = [] ; MS = [_|_]),
-	atomic(Left),
-	assertz_if_new(conceptSubsets(Env,user,MS,Left,'top',noAxiom)),
-	assertz_if_new(axiom(Env,MS,defprimconcept(MS,Left,'top'))),
+	fort(Left),
+	db_hook(assertz_if_new,conceptSubsets(Env,user,MS,Left,'top',noAxiom)),
+	db_hook(assertz_if_new,axiom(Env,MS,defprimconcept(MS,Left,'top'))),
 	assertNames(Env,MS,Left,concept),
 	!.
 
@@ -8519,10 +8530,10 @@ defprimconcept(EnvName,MS,L,R) :-
 	cnf(R,Right),
 	assertNames(Env,MS,Left,concept),
 	assertNames(Env,MS,Right,concept),
-	assertz_if_new(axiom(Env,MS,defprimconcept(MS,L,R))),
+	db_hook(assertz_if_new,axiom(Env,MS,defprimconcept(MS,L,R))),
 	unfold(Env,[(user,concept,Left,Right)],[(_Origin,_,L1,_,R1)|DL]),
 	gensym(axiom,AxiomName1),
-	assertz_if_new(conceptSubsets(Env,user,MS,Left,Right,AxiomName1)),
+	db_hook(assertz_if_new,conceptSubsets(Env,user,MS,Left,Right,AxiomName1)),
 	typeOfDefinition(Env,MS,L1,Origin),
 	assertConceptLInR(Env,rn(AxiomName1,Origin,lInR),MS,L1,R1),
 	defList(Env,MS,DL,_),
@@ -8539,28 +8550,28 @@ notClauseL(Env,MS,Left,Right) :-
 	defPositiveList(Env,MS,DL2),
 	gensym(axiom,AxiomName2),
 	typeOfDefinition(Env,MS,Concept1,O),
-	assertz_if_new(conceptSubsets(Env,user,MS,Concept1,C3,AxiomName2)),
+	db_hook(assertz_if_new,conceptSubsets(Env,user,MS,Concept1,C3,AxiomName2)),
 	assertConceptLInR(Env,rn(AxiomName2,O,lInR),MS,Concept1,Concept2).
 /* 
 notClauseL(Env,MS,Left,Right) :-
 	% assertz_if_new that Left is included in Right
-	atomic(Left),
+	fort(Left),
 	!,
 	unfold(Env,[(user,concept,Left,Right)],[(_O,_,Concept1,C3,Concept2)|DL2]),
 	defPositiveList(Env,MS,DL2),
 	gensym(axiom,AxiomName2),
 	typeOfDefinition(Env,MS,Concept1,O),
 	assertConceptLInR(Env,rn(AxiomName2,O,lInR),MS,Concept1,Concept2),
-	assertz_if_new(conceptSubsets(Env,user,MS,Concept1,C3,AxiomName2)).
+	db_hook(assertz_if_new,conceptSubsets(Env,user,MS,Concept1,C3,AxiomName2)).
 notClauseL(Env,MS,Left,Right) :-
-	atomic(Right),
+	fort(Right),
 	!,
 	gensym(concept,Concept1),
 	unfold(Env,[(system,concept,Concept1,Left)],DL2),
 	defPositiveList(Env,MS,DL2),
 	gensym(axiom,AxiomName2),
 	assertConceptLInR(Env,rn(AxiomName2,system,lInR)MS,Concept1,Right),
-	assertz_if_new(conceptSubsets(Env,system,MS,Concept1,Concept2,AxiomName2)).
+	db_hook(assertz_if_new,conceptSubsets(Env,system,MS,Concept1,Concept2,AxiomName2)).
 notClauseL(Env,MS,Left,Right) :-
 	!,
 	gensym(concept,Concept1),
@@ -8569,7 +8580,7 @@ notClauseL(Env,MS,Left,Right) :-
 	defPositiveList(Env,MS,DL2),
 	gensym(axiom,AxiomName2),
 	assertConceptLInR(Env,rn(AxiomName,system,lInR),MS,Concept1,Concept2),
-	assertz_if_new(conceptSubsets(Env,system,MS,Concept1,Concept2,AxiomName2)).
+	db_hook(assertz_if_new,conceptSubsets(Env,system,MS,Concept1,Concept2,AxiomName2)).
 */
 
 notClausesLR(Env,MS,Left,Right,DL2) :-
@@ -8621,14 +8632,14 @@ defconcept(EnvName,MS,CT1,CT2) :-
 	cnf(CT2,ConceptTerm2),
 	assertNames(Env,MS,ConceptTerm1,concept),
 	assertNames(Env,MS,ConceptTerm2,concept),
-	assertz_if_new(axiom(Env,MS,defconcept(MS,CT1,CT2))),
+	db_hook(assertz_if_new,axiom(Env,MS,defconcept(MS,CT1,CT2))),
 	unfold(Env,[(user,concept,ConceptTerm1,ConceptTerm2)],DL),
 	defList(Env,MS,DL,_).
 
 defPositiveList(_,_,[]) :- !.
 defPositiveList(Env,MS,[(Origin,concept,ConceptName,CTO,ConceptTerm)|DL]) :-
 	gensym(axiom,AxiomName),
-	assertz_if_new(conceptEqualSets(Env,Origin,MS,ConceptName,CTO,AxiomName)),
+	db_hook(assertz_if_new,conceptEqualSets(Env,Origin,MS,ConceptName,CTO,AxiomName)),
 	assertConceptRInL(Env,rn(AxiomName,Origin,rInL),MS,ConceptName,ConceptTerm),
 	assertConceptLInR(Env,rn(AxiomName,Origin,lInR),MS,ConceptName,ConceptTerm),
 	defPositiveList(Env,MS,DL).
@@ -8642,7 +8653,7 @@ defList(_,_,[],[]) :- !.
 defList(Env,MS,[(Origin,concept,ConceptName,CTO,ConceptTerm)|DL],
         NeededDL3) :-
 	gensym(axiom,AxiomName),
-	assertz_if_new(conceptEqualSets(Env,Origin,MS,ConceptName,CTO,AxiomName)),
+	db_hook(assertz_if_new,conceptEqualSets(Env,Origin,MS,ConceptName,CTO,AxiomName)),
 	assertConceptRInL(Env,rn(AxiomName,Origin,rInL),MS,ConceptName,ConceptTerm),
 	assertConceptLInR(Env,rn(AxiomName,Origin,lInR),MS,ConceptName,ConceptTerm),
 	negate(ConceptTerm,NotRight1),
@@ -8654,7 +8665,7 @@ defList(Env,MS,[(Origin,concept,ConceptName,CTO,ConceptTerm)|DL],
 	append(NeededDL1,NeededDL2,NeededDL3).
 defList(Env,MS,[(Origin,role,RN,RTO,RT)|RDL],NeededDL) :-
 	gensym(axiom,AxiomName),
-	assertz_if_new(roleEqualSets(Env,Origin,MS,RN,RTO,AxiomName)),
+	db_hook(assertz_if_new,roleEqualSets(Env,Origin,MS,RN,RTO,AxiomName)),
 	assertRoleLInR(Env,MS,RN,RT,AxiomName),
 	assertRoleRInL(Env,MS,RN,RT,AxiomName),
 	defList(Env,MS,RDL,NeededDL).
@@ -8695,21 +8706,37 @@ assert_ind(X,Y,R) :-
 	getCurrentEnvironment(EnvName),
 	assert_ind(EnvName,X,Y,R).
 
-assert_ind(EnvName,MS,X,C) :-
-	environment(EnvName,Env,_),
-	nonvar(MS),
-	(MS = [] ; MS = [_|_]),
+assert_ind(EnvName,MS,X,C) :-	
+	nonvar(MS),	
+        environment(EnvName,Env,_),
+        (MS = [] ; MS = [_|_]),
 	!,
-	atomic(X),
+	fort(X),
 	gensym(axiom,AxiomName),
 	gensym(rule,RuleName),
 	ruleName(AxiomName,RuleName,user,lInR,RN1),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	asserta_new((conceptElement(Env,MS,W1,user,X,C,AxiomName) :- call(G1))),
-	assertz_if_new(axiom(Env,MS,assert_ind(MS,X,C))),
+	db_hook(assertz_if_new,axiom(Env,MS,assert_ind(MS,X,C))),
 	constructMLHead(Env,RN1,W1,C,X,_HYPS,_D,_CALLS,abox,InHead),
 	asserta_new((InHead :- call(G1))),
-	assertNames(Env,MS,C,concept).
+	assertNames(Env,MS,C,concept),!.
+
+assert_ind_no_names(Env,MS,X,C) :-
+	must(environment(EnvName,Env,_)),
+	nonvar(MS),
+	(MS = [] ; MS = [_|_]),
+	!,
+	fort(X),
+	gensym(axiom,AxiomName),
+	gensym(rule,RuleName),
+	ruleName(AxiomName,RuleName,user,lInR,RN1),
+	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
+	asserta_new((conceptElement(Env,MS,W1,user,X,C,AxiomName) :- call(G1))),
+	db_hook(assertz_if_new,axiom(Env,MS,assert_ind(MS,X,C))),
+	constructMLHead(Env,RN1,W1,C,X,_HYPS,_D,_CALLS,abox,InHead),
+	asserta_new((InHead :- call(G1))).
+
 
 /***********************************************************************
  *
@@ -8724,10 +8751,11 @@ assert_ind(EnvName,MS,X,C) :-
  */
 
 assert_ind(EnvName,X,Y,R) :-
-	environment(EnvName,_,_),
+	must(not(environment(_,EnvName,_))),
+        environment(EnvName,_,_),
 	!,
-	atomic(X),
-	atomic(Y),
+	fort(X),
+	fort(Y),
 	!,
 	assert_ind(EnvName,[],X,Y,R).
 assert_ind(MS,X,Y,R) :-
@@ -8735,16 +8763,16 @@ assert_ind(MS,X,Y,R) :-
 	!,
 	getCurrentEnvironment(EnvName),
 	!,
-	atomic(X),
-	atomic(Y),
+	fort(X),
+	fort(Y),
 	!,
 	assert_ind(EnvName,MS,X,Y,R).
 
 assert_ind(EnvName,MS,X,Y,R) :-
-	environment(EnvName,Env,_),
-	atomic(X),
-	atomic(Y),
-	atomic(R),
+	must(environment(EnvName,Env,_)),
+	fort(X),
+	fort(Y),
+	fort(R),
 	Role1 =.. [R,X,Y],
 	asserta_new(Role1),
 %	Role2 =.. [R,X,Y],
@@ -8755,8 +8783,8 @@ assert_ind(EnvName,MS,X,Y,R) :-
 	constructEqHead(Env,rn(AX,RN,user,lInR),W1,Y,SF,R,X,_,_D,CALLS,abox,EqLiteral),
 	asserta_new((EqLiteral :- (cCS(CALLS,true), call(G1)))),
 	assertNames(Env,MS,R,role),
-	assertz_if_new(axiom(Env,MS,assert_ind(MS,X,Y,R))),
-	asserta_new((roleElement(Env,MS,W1,user,X,Y,R,AX) :- call(G1))).
+	db_hook(assertz_if_new,axiom(Env,MS,assert_ind(MS,X,Y,R))),
+	asserta_new((roleElement(Env,MS,W1,user,X,Y,R,AX) :- call(G1))),!.
 
 
 /***********************************************************************
@@ -8814,14 +8842,14 @@ defprimrole(R1,R2) :-
 
 defprimrole(EnvName,RN,Role) :-
 	environment(EnvName,_,_),
-	atomic(RN),
+	fort(RN),
 	!,
 	defprimrole(EnvName,[],RN,Role).
 defprimrole(MS,RN,Role) :-
 	nonvar(MS),
 	(MS = [] ; MS = [_|_]),
 	getCurrentEnvironment(EnvName),
-	atomic(RN),
+	fort(RN),
 	!,
 	defprimrole(EnvName,MS,RN,Role).
 
@@ -8838,7 +8866,7 @@ defprimrole(MS,RN,Role) :-
 
 defprimrole(EnvName,MS,RN,Role) :-
 	environment(EnvName,Env,_),
-	atomic(RN),
+	fort(RN),
 	assertNames(Env,MS,RN,role),
 	assertNames(Env,MS,Role,role),
 	unfold(Env,[(user,role,RN,Role)],[(user,role,RN,_,RT)|RDL]),
@@ -8885,7 +8913,7 @@ defrole(EnvName,RN,Role) :-
 
 defrole(EnvName,MS,RN,Role) :-
 	environment(EnvName,Env,_),
-	atomic(RN),
+	fort(RN),
 	unfold(Env,[(user,role,RN,Role)],RDL),
 	assertNames(Env,MS,RN,role),
 	assertNames(Env,MS,Role,role),
@@ -8955,7 +8983,7 @@ defclosed(MS,X,Y,R) :-
 
 defclosed(EnvName,MS,X,Y,R) :-
 	environment(EnvName,Env,_),
-	assertz_if_new(closed(Env,MS,X,Y,R)),
+	db_hook(assertz_if_new,closed(Env,MS,X,Y,R)),
 	!.
 
 /***********************************************************************
@@ -8994,7 +9022,7 @@ assertName((concept,CN1),newAsserted,Env,MS,W1,G1) :-
 % identical modal sequence does not mean that we are not already able to 
 % deduce that the concept name is present in the modal context corresponding
 % to the modal sequence.
-	assertz_if_new((conceptName(Env,MS,W1,CN1) :- G1)),
+	db_hook(assertz_if_new,(conceptName(Env,MS,W1,CN1) :- G1)),
 	!.
 assertName((role,CN1),newAsserted,Env,MS,W1,G1) :-
 % Otherwise we assertz_if_new the role name
@@ -9002,7 +9030,7 @@ assertName((role,CN1),newAsserted,Env,MS,W1,G1) :-
 % identical modal sequence does not mean that we are not already able to 
 % deduce that the role name is present in the modal context corresponding
 % to the modal sequence.
-	assertz_if_new((roleName(Env,MS,W1,CN1) :- G1)),
+	db_hook(assertz_if_new,(roleName(Env,MS,W1,CN1) :- G1)),
 	!.
 	
 /***********************************************************************
@@ -9060,7 +9088,7 @@ namesInTerm(dc(_O,D,C),L,Type) :-
 namesInTerm(set(_L),[],_Type) :-
 	!.
 namesInTerm(L,[(Type,L)],Type) :-
-	atomic(L),
+	fort(L),
 	!.
 
 
@@ -9196,7 +9224,7 @@ malcToFOL(Trans,U,[X],dc(O,C1,C2),
 	malcToFOL(Trans,U,[A],C1,F1),
 	malcToFOL(Trans,V,[X],C2,F2).
 malcToFOL(Trans,U,[X],A,F) :-
-	atomic(A),
+	fort(A),
 	F =.. [in,U,A,X].
 malcToFOL(Trans,U,[X,Y],inverse(R),F) :-
 	malcToFOL(Trans,U,[Y,X],R,F).
@@ -9216,15 +9244,15 @@ malcToFOL(Trans,U,[X,Y],restr(R,C),
 	malcToFOL(Trans,U,[X,Y],R,F1),
 	malcToFOL(Trans,U,[Y],C,F2).
 malcToFOL(relational,U,[X,Y],P,F) :-
-	atomic(P),
+	fort(P),
 	F =.. [in,U,P,pair(X,Y)].
 malcToFOL(functional,U,[X,Y],P,equal(Y,app(fun(F,P),X))) :-
-	atomic(P),
-	atomic(X),
+	fort(P),
+	fort(X),
 	gensym(f,F),
 	!.
 malcToFOL(functional,U,[X,Y],P,equal(Y,app(fun(F,P),X))) :-
-	atomic(P),
+	fort(P),
 	var(X),
 	!.
 	
@@ -10212,7 +10240,7 @@ delete_ind(EnvName,MS,X,C) :-
 	nonvar(MS),
 	(MS = [] ; MS = [_|_]),
 	!,
-	atomic(X),
+	fort(X),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	constructMLHead(Env,rn(_,_,user,lInR),W1,C,X,_HYPS,_D,_CALLS,abox,InHead),
 	not(not((retract((InHead :- call(user:G1))) ;
@@ -10228,9 +10256,9 @@ delete_ind(P1,X,Y,R) :-
 	delete_ind(EnvName,MS,X,Y,R).
 delete_ind(EnvName,MS,X,Y,R) :-
 	environment(EnvName,Env,_),
-	atomic(X),
-	atomic(Y),
-	atomic(R),
+	fort(X),
+	fort(Y),
+	fort(R),
 	Role1 =.. [R,X,Y],
 	retract(Role1),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
@@ -10559,10 +10587,10 @@ make_primconcept(EnvName,MS,CName1,restrict_inh(RTerm1, restricts(RTerm2 ,
 %	defprimconcept(EnvName,MS,and([some(inverse(RName1),top),
 %				       naf(not(CNameDef))]),CNameDef),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	assertz_if_new((roleDomain(Env,W1,RName1,CNameDom) :- G1)),
-	assertz_if_new((roleRange(Env,W1,RName1,CName2) :- G1)),
-	assertz_if_new((roleDefault(Env,W1,RName1,CNameDef) :- G1)),
-	assertz_if_new((roleTripel(Env,W1,RName1,CNameDom,CName2,CNameDef))).
+	db_hook(assertz_if_new,(roleDomain(Env,W1,RName1,CNameDom) :- G1)),
+	db_hook(assertz_if_new,(roleRange(Env,W1,RName1,CName2) :- G1)),
+	db_hook(assertz_if_new,(roleDefault(Env,W1,RName1,CNameDef) :- G1)),
+	db_hook(assertz_if_new,(roleTripel(Env,W1,RName1,CNameDom,CName2,CNameDef))).
    
 /*----------------------------------------------------------------------------
  * make_primconcept(EnvName,MS,CName1, nr(RName1,MinNr,MaxNr,DefNr))
@@ -10585,9 +10613,9 @@ make_primconcept(EnvName,MS,CName1 , nr(RTerm1, MinNr,MaxNr,DefNr)):-
 %	defconcept(EnvName,MS,CNameDef, and([atleast(DefNr,RName1),atmost(DefNr,RName1)])),
 %	defprimconcept(EnvName,MS,and([some(inverse(RName1)),naf(not(CNameDef))]),CNameDef),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	assertz_if_new((roleNr(Env,W1,RName1,MinNr,MaxNr) :- G1)),
-	assertz_if_new((roleDefNr(Env,W1,RName1,DefNr) :- G1)),
-	assertz_if_new((roleAll(Env,W1,Rname1,CNameDomT,CName2T,CNameDefT,MinNr,MaxNr,DefNr))).
+	db_hook(assertz_if_new,(roleNr(Env,W1,RName1,MinNr,MaxNr) :- G1)),
+	db_hook(assertz_if_new,(roleDefNr(Env,W1,RName1,DefNr) :- G1)),
+	db_hook(assertz_if_new,(roleAll(Env,W1,Rname1,CNameDomT,CName2T,CNameDefT,MinNr,MaxNr,DefNr))).
 
 
 
@@ -10716,10 +10744,10 @@ make_defconcept(EnvName,MS,CName1,'restr-inh'(RName1, restricts(RName2 ,
 %	defprimconcept(EnvName,MS,and([some(inverse(RName1),top),
 %				       naf(not(CNameDef))]),CNameDef),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	assertz_if_new((roleDomain(Env,MS,RName1,CNameDom) :- G1)),
-	assertz_if_new((roleRange(Env,MS,RName1,CName2) :- G1)),
-	assertz_if_new((roleDefault(Env,MS,RName1,CNameDef) :- G1)),
-	assertz_if_new((roleTripel(Env,MS,RName1,CNameDom,CName2,CNameDef))).
+	db_hook(assertz_if_new,(roleDomain(Env,MS,RName1,CNameDom) :- G1)),
+	db_hook(assertz_if_new,(roleRange(Env,MS,RName1,CName2) :- G1)),
+	db_hook(assertz_if_new,(roleDefault(Env,MS,RName1,CNameDef) :- G1)),
+	db_hook(assertz_if_new,(roleTripel(Env,MS,RName1,CNameDom,CName2,CNameDef))).
     
 /*----------------------------------------------------------------------------
  * make_defconcept(EnvName,MS,CName1, nr(RName1,MinNr,MaxNr,DefNr),CNameDom)
@@ -10740,9 +10768,9 @@ make_defconcept(EnvName,MS,CName1 , nr(RTerm, MinNr,MaxNr,DefNr),CNameDom):-
 %	defconcept(EnvName,MS,CNameDef, and([atleast(DefNr,RName1),atmost(DefNr,RName1)])),
 %	defprimconcept(EnvName,MS,and([some(inverse(RName1)),naf(not(CNameDef))]),CNameDef),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	assertz_if_new((roleNr(Env,W1,RName1,MinNr,MaxNr) :- G1)),
-	assertz_if_new((roleDefNr(Env,W1,RName1,DefNr) :- G1)),
-	assertz_if_new((roleAll(Env,W1,RName1,CNameDomT,CNameT,CNameDefT,MinNr,MaxNr,DefNr) :- G1)).
+	db_hook(assertz_if_new,(roleNr(Env,W1,RName1,MinNr,MaxNr) :- G1)),
+	db_hook(assertz_if_new,(roleDefNr(Env,W1,RName1,DefNr) :- G1)),
+	db_hook(assertz_if_new,(roleAll(Env,W1,RName1,CNameDomT,CNameT,CNameDefT,MinNr,MaxNr,DefNr) :- G1)).
 
 make_defconcept(EnvName,MS,CName1 , necres(RTerm, nec),CNameDom):-
 	!,
@@ -10751,19 +10779,19 @@ make_defconcept(EnvName,MS,CName1 , necres(RTerm, nec),CNameDom):-
 	gensym(concept,CNameDom),
 	defconcept(EnvName,MS,CNameDom,atleast(1,RName1)),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	assertz_if_new((roleDomain(Env,W1,RName1,CNameDom) :- G1)),
+	db_hook(assertz_if_new,(roleDomain(Env,W1,RName1,CNameDom) :- G1)),
 	!.
 make_defconcept(EnvName,MS,CName1 , necres(RTerm, _),CNameDom):-
 	!,
 	environment(EnvName,Env,_),
 	expand_role(EnvName,MS,RTerm,RName1,_,_,_),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	assertz_if_new((roleDomain(Env,W1,RName1,CNameDom) :- G1)),
+	db_hook(assertz_if_new,(roleDomain(Env,W1,RName1,CNameDom) :- G1)),
 	!.
 
 
 expand_role(_,_,RTerm,RTerm,_,_,_) :-
-	atomic(RTerm),
+	fort(RTerm),
 	!.
 expand_role(EnvName,MS1,RTerm,RName1,CName1,CName2,CNameDef) :-
 	RTerm = sb_primelemrole(EnvName,MS2,RName1, 'domain-range'(CName1,CName2,CNameDef)),
@@ -10798,6 +10826,12 @@ elem(I,[H|T],X):- Hilf is I-1,
  * [supers(Liste von concepts) , restr-inh(...) , nr(...)], es werden dann jeweils die
  * entsprechenden Hilfskonstruktoren mit dem einzelnen Listenelement als aktueller Parameter 
  * aktiviert bzw. aufgerufen und zwar in current environment und [] als modal context.
+
+ The 2-digit constructor sb_defconcept (CName1, SpecListe) takes as arguments a
+  * CName1 and a list of up now introduced "uhrten Pr" adikaten as:
+  * [Supers (list of concepts), restr-inh (...), no (...)], it is then in each case the
+  * Hilfskonstruktoren corresponding to the individual list item as the current parameter
+  * Activated or invoked specifically in current environment and [] as a modal context.
  *-----------------------------------------*/
 
 sb_defconcept(C1,SpecList):- 
@@ -10890,10 +10924,10 @@ sb_primelemrole(EnvName,MS,RName1, 'domain-range'(CName1,CName2,CNameDef)):-
 	defprimconcept(EnvName,MS,some(inverse(RName1),top),CName2),
 %	defprimconcept(ENvName,MS,and([CName2,naf(not(CNameDef))]),CNameDef),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	assertz_if_new((roleDomain(Env,W1,RName1,CName1) :- G1)),
-	assertz_if_new((roleRange(Env,W1,RName1,CName2) :- G1)),
-	assertz_if_new((roleDefault(Env,W1,RName1,CNameDef) :- G1)),
-	assertz_if_new((roleTripel(Env,W1,RName1,CName1,CName2,CNameDef) :- G1)),
+	db_hook(assertz_if_new,(roleDomain(Env,W1,RName1,CName1) :- G1)),
+	db_hook(assertz_if_new,(roleRange(Env,W1,RName1,CName2) :- G1)),
+	db_hook(assertz_if_new,(roleDefault(Env,W1,RName1,CNameDef) :- G1)),
+	db_hook(assertz_if_new,(roleTripel(Env,W1,RName1,CName1,CName2,CNameDef) :- G1)),
 	!.
 
 /*----------------------------------------------------------------------------
@@ -10939,8 +10973,8 @@ sb_defelemrole(EnvName,MS,RName1, restricts(RName2, range(CName1,CNameDef))):-
 %	defprimconcept(EnvName,MS,and([some(inverse(RName1),top),
 %                                      naf(not(CNameDef))]),CNameDef),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	assertz_if_new((roleRange(Env,MS,RName1,CName1) :- G1)),
-	assertz_if_new((roleDefault(Env,MS,RName1,CNameDef) :- G1)),
+	db_hook(assertz_if_new,(roleRange(Env,MS,RName1,CName1) :- G1)),
+	db_hook(assertz_if_new,(roleDefault(Env,MS,RName1,CNameDef) :- G1)),
 	!.
 
 
@@ -10993,8 +11027,8 @@ make_irole(EnvName,MS,ICName1,irole(RName,iname(IRName),
 %			  		    atmost(MaxNr,RName),
 %					    some(inverse(RName),top)]))),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	assertz_if_new((roleNr(Env,W1,IRName,MinNr,MaxNr) :- G1)),
-	assertz_if_new((roleDefNr(Env,W1,IRName,DefNr) :- G1)).
+	db_hook(assertz_if_new,(roleNr(Env,W1,IRName,MinNr,MaxNr) :- G1)),
+	db_hook(assertz_if_new,(roleDefNr(Env,W1,IRName,DefNr) :- G1)).
                            
 
 
@@ -11430,7 +11464,7 @@ sb_attributes(EnvName,MS,CN,RN,AList) :-
 sb_assert_attributes(Type,EnvName,MS,Spec,[]) :-
 	!.
 sb_assert_attributes(Type,EnvName,MS,Spec,[Pair|AList]) :-
-	assertz_if_new(attribute(Type,EnvName,MS,Spec,Pair)),
+	db_hook(assertz_if_new,attribute(Type,EnvName,MS,Spec,Pair)),
 	sb_assert_attributes(Type,EnvName,MS,Spec,AList).
 
 /*------------------------------------------------------------------------------
@@ -11627,7 +11661,7 @@ unmake_defconcept(EnvName,MS,CName1 , necres(RTerm, _),CNameDom):-
 
 
 unexpand_role(_,_,RTerm,RTerm) :-
-	 atomic(RTerm),
+	 fort(RTerm),
 	 !.
 
 unexpand_role(EnvName,MS,RTerm,R1) :-
@@ -11888,6 +11922,10 @@ sb_undefelem(EnvName,MS,ICName1,[X|T]):-
  *
  */
 
+sb_fact_proof(P1,Proof) :-
+	completeParameter([P1],EnvName,MS,Query,Proof),
+	sb_fact(EnvName,MS,Query,Proof).
+
 sb_fact(P1) :-
 	completeParameter([P1],EnvName,MS,Query,Proof),
 	sb_fact(EnvName,MS,Query,Proof).
@@ -11905,7 +11943,7 @@ sb_fact(EnvName,MS,isa(X,C),Exp) :-
  	getNegatedConcept(C,C1),
  	getFactQuery(Env,W1,C,X,Exp,Goal),
  	call((call(G1), Goal)),
- 	atomic(X),
+ 	fort(X),
 	allowedAnswerConcept(Env,C).
 sb_fact(EnvName,MS,(role(RName,CNameDom,CNameRan)),proved(fact,basedOn(tbox))) :-
 	environment(EnvName,Env,_),
@@ -11925,14 +11963,14 @@ sb_fact(EnvName,MS,irole(R,X,Y),Exp) :-
 	call(Goal).
 	
 getFactQuery(Env,W1,C0,X,Exp,Goal) :-
-	constructMLHead(Env,_RN1,W1,C0,CON,A1,X,Pc,_CALLS,_D,Exp,Gd,Od,L1,L2,Anc1,Anc2,Y,PT,InHead),
-%	constructMLHead(Env,_RN1,W1,C0,X,_HYPS,_D,_CALLS,PT,InHead),
+% %	constructMLHead(Env,_RN1,W1,C0,CON,A1,X,Pc,_CALLS,_D,Exp,Gd,Od,L1,L2,Anc1,Anc2,Y,PT,InHead),
+	constructMLHead(Env,_RN1,W1,C0,X,_HYPS,_D,_CALLS,PT,InHead),
 	getExplanation(InHead,Exp),
 	Goal = (clause(InHead,Body), ((PT == abox), call(Body))),
 	!.
 getFactQuery(Env,W1,Y,R,X,PT,Goal) :-
-	constructEqHead(Env,_RN1,W1,Y,CON,A1,X,Pc,_CALLS,_D,Exp,Gd,Od,L1,L2,Anc1,Anc2,Y,PT,EqHead),
-%	constructEqHead(Env,_RN1,W1,Y,_F,R,X,_HYPS,_D,_CALLS,PT,EqHead),
+% %	constructEqHead(Env,_RN1,W1,Y,CON,A1,X,Pc,_CALLS,_D,Exp,Gd,Od,L1,L2,Anc1,Anc2,Y,PT,EqHead),
+	constructEqHead(Env,_RN1,W1,Y,_F,R,X,_HYPS,_D,_CALLS,PT,EqHead),
 	Goal = (clause(EqHead,Body), ((PT == abox), call(Body))),
 	!.
 
@@ -12282,7 +12320,7 @@ convertOrList(Env,Name,bodyMC(W1),MC2,[CTerm|CTermList],X,
  */
 
 convertInAntecedent(Env,rn(AX,S1,_O),MC1,MC2,D,X,HYPS,AB,CALLS,PT1,InHead) :-
-	(var(D) ; atomic(D)),
+	(var(D) ; fort(D)),
 	!,
 	constructMLCall(Env,rn(AX,_RN1,S1,_O1),MC1,MC2,
 	                D,X,HYPS,AB,CALLS,PT1,InHead).
@@ -12294,7 +12332,7 @@ convertInAntecedent(Env,rn(AX,Source,_O),MC1,MC2,set(S1),X,HYPS,AB,CALLS,PT1,Bod
 convertInAntecedent(Env,rn(AX,Source,_O),MC1,MC2,not(set(S1)),X,HYPS,AB,CALLS,PT1,Body) :-
 	constructMLCall(Env,rn(AX,_RN1,Source,_O1),MC1,MC2,
 	                not(set(S1)),X,HYPS,AB,CALLS,PT1,InHead1),
-	Body = ((nonvar(S1), (atomic(X), (nongeneric(X), not(member(X,S1)))) ; InHead1)),
+	Body = ((nonvar(S1), (fort(X), (nongeneric(X), not(member(X,S1)))) ; InHead1)),
 	!.
 convertInAntecedent(Env,Name,MC1,MC2,and(L),X,HYPS,AB,CALLS,and(PTL),Body) :-
 	convertAndList(Env,Name,MC1,MC2,L,X,HYPS,AB,CALLS,Body,PTL),
@@ -12312,7 +12350,7 @@ convertInAntecedent(Env,rn(AX,S1,_O1),bodyMC(MS1),MC2,
 	            naf(D),X,HYPS,AB,CALLS,PT1,Body) :-
 	% in the antecedent `x in naf(D) is provable' means 
 	% `x in D is not provable'
-	atomic(D),
+	fort(D),
 	!,
 	HYPS = [or(H1),rl(H2),fl(H3)],
 	NewHYPS = [or(H1),rl([]),fl(H3)],
@@ -12448,7 +12486,7 @@ convertInAntecedentList(Env,Name,MC1,MC2,[NCT|NCTs],X,
  */
 
 convertInConsequence(Env,Pr,rn(AX,RN,_S,O),MS,W1,D,X,HYPS,AB,CALLS,PT1,InHead) :-
-	(var(D) ; atomic(D)),
+	(var(D) ; fort(D)),
 	!,
 	typeOfDefinition(Env,MS,D,S2),
 	constructKBHead(Env,Pr,rn(AX,RN,S2,O),W1,D,X,HYPS,AB,CALLS,PT1,InHead).
@@ -12558,7 +12596,7 @@ ground(T,Result) :-
 	!,
 	Result = false.
 ground(T,Result) :-
-	atomic(T),
+	fort(T),
 	!,
 	Result = true.
 ground(T,Result) :-
@@ -13022,23 +13060,17 @@ test_motel(N):-
 go_goal_for_example:-!.
 go_goal_for_example :- print('No goal for this example'), nl.
 
-testMotelExample(1) :-	
-	go_goal_for_example.
 testMotelExample(2) :-
 	printTime(setof(C,E^deduce(ex2,[],isa(mary,C),E),L1)), print(L1), nl,
 	printTime(setof(D,F^deduce(ex2,[],isa(tom,D),F),L2)), print(L2), nl.
 testMotelExample(3) :-
 	tryGoal(inconsistent(ex3)).
-testMotelExample(4) :-
-	go_goal_for_example.
 testMotelExample(5) :-
 	tryGoal(not(subsumes([],c1,c2))),
 	tryGoalF(subsumes([],c2,c1)).
 testMotelExample(6) :-
 	tryGoal(not(subsumes([],c1,c2))),
 	tryGoalF(subsumes([],c2,c1)).
-testMotelExample(7) :-
-	go_goal_for_example.
 testMotelExample(8) :-
 	tryGoal(deduce(isa(tom,heterosexual))).
 testMotelExample(9) :-
@@ -13090,10 +13122,6 @@ testMotelExample(27) :-
 	tryGoalF(subsumes([],c2,c1)).
 testMotelExample(28) :-
 	tryGoalF(deduce(ex29,[b(believe,john)],isa(audi,auto),_P)).
-testMotelExample(29) :-
-	go_goal_for_example.
-testMotelExample(30) :-
-	go_goal_for_example.
 testMotelExample(31) :-
 	tryGoal(deduce(isa(tom,onlyMaleChildren))).
 testMotelExample(32) :-
@@ -13141,14 +13169,8 @@ testMotelExample(43) :-
 	tryGoal(deduce(isa(r,colors))).
 testMotelExample(44) :-
 	tryGoalF(subsumes(c2,c12)).
-testMotelExample(45) :-
-	go_goal_for_example.
-testMotelExample(46) :-
-	go_goal_for_example.
 testMotelExample(47) :-
 	tryGoalF(deduce(isa(bmw,c3))).
-testMotelExample(48) :-
-	go_goal_for_example.
 testMotelExample(49) :-
 	tryGoal(not(deduce(isa(p,c4)))).
 testMotelExample(50) :-
@@ -13184,18 +13206,6 @@ testMotelExample(52) :-
 	tryGoal(verifySolution(X2s,[hasFuelConsumption,hasListPrice,hasOverallCost,hasPrice,hasWeight,hasCubicCapacity])),
 	tryGoal(bagof((X3,W3),(deduce(leastInfl(X3,hasMaxSpeed)),abduce(change(X3,W3),change(hasMaxSpeed,1.0))),X3W3s)),
 	tryGoal(verifySolution(X3W3s,[(hasCatConverter,-1.0)])).
-testMotelExample(53) :-
-	go_goal_for_example.
-testMotelExample(54) :-
-	go_goal_for_example.
-testMotelExample(55) :-
-	go_goal_for_example.
-testMotelExample(56) :-
-	go_goal_for_example.
-testMotelExample(57) :-
-	go_goal_for_example.
-testMotelExample(58) :-
-	go_goal_for_example.
 testMotelExample(59) :-
 	tryGoal(sb_ask(isa(harry,parent))),
 	tryGoal(sb_ask(isa(harry,person))),
@@ -13438,10 +13448,10 @@ unfoldList(Env,Type,[CT1|CTL1],[CN|CNL2],DL1) :-
 /**********************************************************************
  *
  * atomicConcept(+CT) 
- * succeeds if the concept term CT can be regarded as a atomic concept
+ * succeeds if the concept term CT can be regarded as a fort concept
  * for our translation. In the current implementation variables, 
  * identifiers, singleton sets, and their negation are regarded as 
- * atomic.
+ * fort.
  *
  * 130892   UH   (c)
  * 140892   UH   Added clauses for sets and negation of variables
@@ -13453,13 +13463,13 @@ atomicConcept(CT) :-
 	var(CT),
 	!.
 atomicConcept(CT) :-
-	atomic(CT),
+	fort(CT),
 	!.
 atomicConcept(not(CT)) :-
 	var(CT),
 	!.
 atomicConcept(not(CT)) :-
-	atomic(CT),
+	fort(CT),
 	!.
 atomicConcept(set([E1])) :-
 	!.
@@ -13671,17 +13681,17 @@ saveKB(EnvName,FileName) :-
 	transformAndWrite(modalAxioms(Env,user,A71,_A72,A73,A74),
                           modalAxioms(Env,A71,A73,A74)),
 	transformAndWrite(roleAttributes(Env,A71,B71,C71),
-			  (environment(EnvName,NewEnv,_), assertz_if_new(roleAttributes(NewEnv,A71,B71,C71)))),
+			  (environment(EnvName,NewEnv,_), db_hook(assertz_if_new,roleAttributes(NewEnv,A71,B71,C71)))),
 	transformAndWrite(roleDefault(Env,A81,B81,C81),
-			  (environment(EnvName,NewEnv,_), assertz_if_new(roleDefault(NewEnv,A81,B81,C81)))),
+			  (environment(EnvName,NewEnv,_), db_hook(assertz_if_new,roleDefault(NewEnv,A81,B81,C81)))),
 	transformAndWrite(roleDefNr(Env,A91,B91,C91),
-			  (environment(EnvName,NewEnv,_), assertz_if_new(roleDefNr(NewEnv,A91,B91,C91)))),
+			  (environment(EnvName,NewEnv,_), db_hook(assertz_if_new,roleDefNr(NewEnv,A91,B91,C91)))),
 	transformAndWrite(roleDomain(Env,A82,B82,C82),
-			  (environment(EnvName,NewEnv,_), assertz_if_new(roleDomain(NewEnv,A82,B82,C82)))),
+			  (environment(EnvName,NewEnv,_), db_hook(assertz_if_new,roleDomain(NewEnv,A82,B82,C82)))),
 	transformAndWrite(roleNr(Env,A83,B83,C83),
-			  (environment(EnvName,NewEnv,_), assertz_if_new(roleNr(NewEnv,A83,B83,C83)))),
+			  (environment(EnvName,NewEnv,_), db_hook(assertz_if_new,roleNr(NewEnv,A83,B83,C83)))),
 	transformAndWrite(roleRange(Env,A84,B84,C84),
-			  (environment(EnvName,NewEnv,_), assertz_if_new(roleRange(NewEnv,A84,B84,C84)))),
+			  (environment(EnvName,NewEnv,_), db_hook(assertz_if_new,roleRange(NewEnv,A84,B84,C84)))),
         told,
         !.
 saveKB(_,_) :-
@@ -13766,7 +13776,7 @@ deduceSetheo(EnvName,MS,isa(X,C),Exp) :-
 
 
 setQuery(Env,W1,C,X,Exp,Goal) :-
-	assertz_if_new(query(Env,W1,C,X,Exp,Goal)),
+	db_hook(assertz_if_new,query(Env,W1,C,X,Exp,Goal)),
 	!.
 setQuery(Env,W1,C,X,Exp,Goal) :-
 	!.
@@ -13850,11 +13860,11 @@ getQuery(Env,W1,C0,X,Exp,Goal) :-
 performQuery(X,G1,Goal) :-
 	nonvar(X),
 	!,
- 	once((call((call(G1), Goal)), atomic(X))).
+ 	once((call((call(G1), Goal)), fort(X))).
 performQuery(X,G1,Goal) :-
 	!,
  	call((call(G1), Goal)), 
-	atomic(X).
+	fort(X).
 
 /***********************************************************************
  *
@@ -14025,7 +14035,7 @@ abduce(EnvName,MS,Hyps,isa(X,C),Exp) :-
 			C,X,[or([]),rl([]),fl(_DML1)],D,[],_Exp1,InHead),
 	call((call(G1), InHead)),
 	getConstraint(InHead,X),
-	atomic(X),
+	fort(X),
 	allowedAnswerConcept(Env,C),
 	getAbductionHyps(D,GL),
 	once((doConsistencyCheck([],GL),doMinimalityCheck([],GL))),
@@ -14225,24 +14235,24 @@ abduce(EnvName,MS,Hypothesis,Consequents,[]) :-
  */
 
 allowedAnswerConcept(Env,C) :-
-	atomic(C),
+	fort(C),
 	!,
 	clause(conceptName(Env,_,_,C),_),
 	!.
 % allowedAnswerConcept(Env,C) :-
-%	atomic(C),
+%	fort(C),
 %	conceptEqualSets(Env,user,_,C,_,_),
 %	!.
 % allowedAnswerConcept(Env,C) :-
-%	atomic(C),
+%	fort(C),
 %	conceptEqualSets(Env,user,_,_,C,_),
 %	!.
 %allowedAnswerConcept(Env,C) :-
-%	atomic(C),
+%	fort(C),
 %	conceptSubsets(Env,user,_,C,_,_),
 %	!.
 %allowedAnswerConcept(Env,C) :-
-%	atomic(C),
+%	fort(C),
 %	conceptSubsets(Env,user,_,_,C,_).
 allowedAnswerConcept(Env,C) :-
 	nonvar(C),
@@ -14259,7 +14269,7 @@ allowedAnswerConcept(_,not(normat(_))) :-
 	!,
 	fail.
 allowedAnswerConcept(Env,C) :-
-	not(atomic(C)),
+	not(fort(C)),
 	!.
 
 /***********************************************************************
@@ -14288,7 +14298,7 @@ inconsistent(EnvName,MS) :-
 	constructMLHead(Env,rn(_AX1,_RN1,user,_O1),W1,C,X,[or([]),rl([]),fl(_DML1)],noAb,[],_,InHead1),
 	call((call(G1), InHead1)),
 	getConstraint(InHead1,X),
-	atomic(X),
+	fort(X),
 	constructMLHead(Env,rn(_AX2,_RN2,_S2,_O2),W1,not(C),X,[or([]),rl([]),fl(_DML1)],noAb,[],_,InHead2),
 	call((call(G1), InHead2)).
 
@@ -14327,11 +14337,11 @@ metaReasoning :-
 	Lit13 = asserta_new(InHead2),
 	Lit14 = asserta_new(inconsistencyCheck(MS,C,X)),
 	Lit15 = tryInconsistency(MS,C,X,InHead2),
-	assertz_if_new((InHead1 :- atomic(C), atomic(X), Lit11, Lit13, Lit14, Lit15)),
+	db_hook(assertz_if_new,(InHead1 :- fort(C), fort(X), Lit11, Lit13, Lit14, Lit15)),
 	Lit23 = asserta_new(InHead1),
 	Lit24 = asserta_new(inconsistencyCheck(MS,C,X)),
 	Lit25 = tryInconsistency(MS,C,X,InHead1),
-	assertz_if_new((InHead2 :- atomic(C), atomic(X), Lit11, Lit23, Lit24, Lit25)).
+	db_hook(assertz_if_new,(InHead2 :- fort(C), fort(X), Lit11, Lit23, Lit24, Lit25)).
 
 
 tryInconsistency(MS,C,X,InHead) :-
@@ -14421,7 +14431,7 @@ completeParameter([P1,P2],P1,_MS,P2,_Proof) :-
 	!.
 completeParameter([P1,P2],P1,_MS,P2,_Proof) :-
 	nonvar(P1),
-	atomic(P1),
+	fort(P1),
 	P1 \== [],
 	!.
 completeParameter([P1,P2],EnvName,P1,P2,_Proof) :-
@@ -14439,7 +14449,7 @@ completeParameter([P1,P2,P3],P1,P2,P3,_Proof) :-
 	!.
 completeParameter([P1,P2,P3],P1,P2,P3,_Proof) :-
 	nonvar(P1),
-	atomic(P1),
+	fort(P1),
 	P1 \== [],
 	var(P2),
 	!.
@@ -14454,7 +14464,7 @@ completeParameter([P1,P2,P3],P1,P2,P3,_Proof) :-
 	!.
 completeParameter([P1,P2,P3],P1,[],P2,P3) :-
 	nonvar(P1),
-	atomic(P1),
+	fort(P1),
 	P1 \== [],
 	!.
 completeParameter([P1,P2,P3],P1,[],P2,P3) :-
@@ -14482,30 +14492,13 @@ completeParameter([P1,P2,P3,P4],P1,P2,P3,P4) :-
 :- write('MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.').
 :- nl, nl.
 */
-:- initialize_motel.
+:- setOption(traceOutput,yes),initialize_motel.
+
+:-module(mootel).
 
 end_of_file.
 
 
-
-
-happy(A, B) :- member(C, B), C == happy(A), !, fail.
-happy(A, B) :- memberchk(not_Happy(A), B).
-happy(A, _) :- hasChild(A, B), hasChild(B, C), hasChild(B, D), pos_Clever(C), pos_Pretty(D).
-
-not_Clever(A, B) :- member(C, B), C == not_Clever(A), !, fail.
-not_Clever(A, B) :- memberchk(pos_Clever(A), B).
-not_Clever(A, B) :- F = [not_Clever(A)|B], hasChild(C, A), hasChild(D, C), hasChild(C, E), pos_Pretty(E), not_Happy(D, F).
-
-not_Pretty(A, B) :- member(C, B), C == not_Pretty(A), !, fail.
-not_Pretty(A, B) :- memberchk(pos_Pretty(A), B).
-not_Pretty(A, B) :- F = [not_Pretty(A)|B], hasChild(C, A), hasChild(D, C), hasChild(C, E), pos_Clever(E), not_Happy(D, F).
-
-not_Happy(A, B) :- memberchk(happy(A), B).
-pos_Clever(lisa). pos_Pretty(lisa). hasChild(kate, bob). hasChild(bob, lisa).
-
-
-% succ(A,_B,C,D,E):-succ(A,C,D,E).
 
 :-motel_mpred(in_motel_kb/1).
 
@@ -14517,9 +14510,9 @@ contains_instance(T2) :- compound(T),
 
 
 motel_term_expansion(_,H,B,true):- contains_instance(H:B),!.
-motel_term_expansion(_KB,H,B,true):- predicate_property(H,motel_mpred),assertz_if_new(H:-B),!.
+motel_term_expansion(_KB,H,B,true):- predicate_property(H,dynamic),db_hook(assertz_if_new,H:-B),!.
 motel_term_expansion(_KB,H,B,true):- predicate_property(H,built_in),call(H),!.
-motel_term_expansion(_KB,H,B,true):- call(H).
+motel_term_expansion(_KB,H,B,true):- dmsg(call(H)),call(H).
 
 nopS(_).
 
@@ -14530,10 +14523,10 @@ user:term_expansion(H,':-'(nopS(Out))):- in_motel_kb(KB),!, motel_term_expansion
 */
 
 motel_at_all_term_expansion((:-CALL),(:-CALL)):-!,expand_goal(CALL1,CALL2),CALL1\=@=CALL2.
-motel_at_all_term_expansion((H:-B),':-'(nopS(Out))):- in_motel_kb(KB),!, motel_term_expansion(KB,H,B,Out).
-motel_at_all_term_expansion(H,':-'(nopS(Out))):- in_motel_kb(KB),!, motel_term_expansion(KB,H,true,Out).
+motel_at_all_term_expansion((H:-B),':-'(nopS(Out))):- in_motel_kb(KB),!, must(motel_term_expansion(KB,H,B,Out)).
+motel_at_all_term_expansion(H,':-'(nopS(Out))):- in_motel_kb(KB),!, must(motel_term_expansion(KB,H,true,Out)).
 
-user:term_expansion(A,B):- fail, motel_at_all_term_expansion(A,B).
+user:term_expansion(A,B):- motel_at_all_term_expansion(A,B).
 
 
 :-asserta_if_new(in_motel_kb(fssKB)).

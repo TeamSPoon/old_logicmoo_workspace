@@ -54,6 +54,15 @@
          make_list/3,
          multi_transparent/1]).
 
+
+% this is a backwards compatablity block for SWI-Prolog 6.6.6
+:- dynamic(double_quotes_was/1).
+:- multifile(double_quotes_was/1).
+:- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was(WAS)).
+:- retract(double_quotes_was(WAS)),set_prolog_flag(double_quotes,WAS).
+:- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was(WAS)).
+:- set_prolog_flag(double_quotes,string).
+
 :- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)), 'user').
 
 % :-user_use_module(logicmoo(logicmoo_util/logicmoo_util_strings)).
@@ -494,3 +503,8 @@ identical_member(X,[_|L]) :-
 
 
 contains_singletons(Term):- not(ground(Term)),not(not((term_variables(Term,Vs),numbervars(Term,0,_,[attvar(bind),singletons(true)]),member('$VAR'('_'),Vs)))).
+
+
+% this is a backwards compatablity block for SWI-Prolog 6.6.6
+:- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was(WAS)).
+

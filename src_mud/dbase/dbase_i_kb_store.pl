@@ -341,6 +341,11 @@ is_asserted(dbase_t,_,C):-C=..[_,nart(List)|IST],!,nart_to_atomic(List,L),atom(L
 %  %  is_asserted(Holds,_,C):-is_holds_true(Holds), C=..[_,L|IST],atom(L),!,CC=..[L|IST],is_asserted_mpred(CC).
 is_asserted(_,_,G):-is_asserted_mpred(G).
 
+
+% nart_to_atomic(L,L):-!,atom(L).
+nart_to_atomic(L,L).
+
+
 :-dynamic_multifile_exported(is_asserted_mpred/1).
 
 is_asserted_lc_isa(isa,2,isa(I,C)):-!,is_asserted_mpred_clause_isa(I,C).

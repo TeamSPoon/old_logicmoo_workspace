@@ -674,7 +674,7 @@ deepestType(TYPE&Next,Type):-var(Next),!,Type=TYPE.
 deepestType(_&LIST,Type):-!,deepestType(LIST,Type).
 deepestType(TYPE,Type):-Type=TYPE.
 
-typeAssignableTo(Type,SomeType):-transitive_subclass(Type,SomeType).
+typeAssignableTo(Type,SomeType):-subclass_backchaing(Type,SomeType).
 typeAssignableTo(_Type,SomeType):-formattype(SomeType).
 
 

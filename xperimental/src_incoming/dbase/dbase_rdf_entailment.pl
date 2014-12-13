@@ -24,7 +24,7 @@ This entailment module does MUD-DB entailment.
 :- use_module(library('semweb/rdfs')).
 % :- rdf_attach_library((.)).
 
-:- rdf_meta
+:-op(1150, fx, (rdf_meta)).   :- rdf_meta
 	dbase_rdf_entailment:rdf(o,o,o),
 	dbase_rdf_entailment:individual_of(r,r).
 

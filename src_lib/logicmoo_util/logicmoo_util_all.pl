@@ -2,6 +2,14 @@
 */
 :-module(logicmoo_util_all,[if_flag_true/2]).
 
+% this is a backwards compatablity block for SWI-Prolog 6.6.6
+:- dynamic(double_quotes_was/1).
+:- multifile(double_quotes_was/1).
+:- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was(WAS)).
+:- retract(double_quotes_was(WAS)),set_prolog_flag(double_quotes,WAS).
+:- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was(WAS)).
+:- set_prolog_flag(double_quotes,string).
+
 :- meta_predicate if_flag_true(0,0).
 :- multifile user:file_search_path/2.
 :- dynamic   user:file_search_path/2.
@@ -90,5 +98,11 @@ show_file_search_path:-'format'('% ~q.~n',[forall(user:file_search_path(_,_))]),
 % :-show_file_search_path.
 
 % :- list_undefined.
+
 :- logicmoo_util_dcg:do_dcg_util_tests.
+
+
+% this is a backwards compatablity block for SWI-Prolog 6.6.6
+:- retract(double_quotes_was(WAS)),set_prolog_flag(double_quotes,WAS).
+
 

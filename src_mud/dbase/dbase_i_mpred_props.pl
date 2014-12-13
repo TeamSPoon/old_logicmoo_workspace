@@ -23,6 +23,12 @@
 :- dynamic_multifile_exported mpred_prop/2.
 :- dynamic_multifile_exported never_type/1.
 
+
+
+mpred_prop(dbase_t,prologOnly).
+mpred_prop(mpred_prop,prologOnly).
+
+
 decl_database_hook(assert(_),Fact):- ignore((compound(Fact),Fact=..[F,Arg1|PROPS],argsIsaProps(F),decl_mpred(Arg1,[F|PROPS]))).
 decl_database_hook(assert(_),isa(F,P)):- argsIsaProps(P),decl_mpred(F,P).
 decl_database_hook(assert(_),mpred_prop(F,stubType(Stub))):-mpred_arity(F,A),declare_dbase_stub(F,A,Stub).
@@ -132,7 +138,6 @@ mpred_prop(F,Prop):- mpred_arity(F,A),functor(P,F,A),predicate_property(P,Prop).
 mpred_prop(F,type):- type(F).
 mpred_prop(H,PP):- nonvar(H),functor_h(H,F), H \=@= F, !,mpred_prop(F,PP).
 mpred_prop(F,PP):- dbase_t(PP,F).
-mpred_prop(F,mped_type(Type)):-nonvar(F),once(get_mpred_type(F,Type)).
 mpred_prop(mpred_prop,prologOnly).
 mpred_prop(mpred_arity,prologOnly).
 mpred_prop(never_type,prologOnly).
@@ -141,6 +146,7 @@ mpred_prop(ft_info, completeExtentAsserted).
 mpred_prop(G,assert_with_pred(add)):- atom(G),assertionMacroHead(G).
 mpred_prop(G,query_with_pred(ireq)):- atom(G),assertionMacroHead(G).
 mpred_prop(G,retract_with_pred(del)):- atom(G),assertionMacroHead(G).
+mpred_prop(F,mped_type(Type)):-nonvar(F),once(get_mpred_type(F,Type)).
 
 
 :-dynamic_multifile_exported(dbase_t/2).

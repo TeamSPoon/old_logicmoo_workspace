@@ -66,6 +66,12 @@
 :- meta_predicate decl_dcgTest(?,?).
 :- meta_predicate decl_dcgTest(?,?,?).
 
+% this is a backwards compatablity block for SWI-Prolog 6.6.6
+:- dynamic(double_quotes_was/1).
+:- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was(WAS)).
+:- retract(double_quotes_was(WAS)),set_prolog_flag(double_quotes,WAS).
+:- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was(WAS)).
+:- set_prolog_flag(double_quotes,string).
 
 isVarOrVAR(V):-var(V),!.
 isVarOrVAR('$VAR'(_)).
@@ -111,17 +117,19 @@ theText([S|Text]) --> [S|Text].
 decl_dcgTest("this is a string",theString("this is a string")).
 theString(String) --> theString(String, " ").
 
+atomic_to_string(S,S):-string(S),!.
 atomic_to_string(S,Str):-sformat(Str,'~w',[S]).
 
 atomics_to_string_str(L,S,A):-catch(atomics_to_string(L,S,A),_,fail).
 atomics_to_string_str(L,S,A):-atomics_to_string_str0(L,S,A).
 
 atomics_to_string_str0([],_Sep,""):-!.
-atomics_to_string_str0([S],_Sep,String):-!,atomic_to_string(S,String).
+atomics_to_string_str0([S],_Sep,String):-atom(S),!,string_to_atom(String,S).
+atomics_to_string_str0([S],_Sep,S):-string(S),!.
 atomics_to_string_str0([S|Text],Sep,String):-
    atomic_to_string(S,StrL),
-   atomics_to_string_str0(Text,Sep,StrR),!,
-   atomics_to_string([StrL,StrR],Sep,String).
+   atomics_to_string_str0(Text,Sep,StrR),!,   
+   new_a2s([StrL,StrR],Sep,String).
 
 % theString(String,Sep) --> [S|Text], {atomic_list_concat_catch([S|Text],Sep,String),!}.
 theString(String,Sep) --> [S|Text], {atomics_to_string_str([S|Text],Sep,String),!}.
@@ -303,6 +311,10 @@ dumpList(_,AB):-dmsg(dumpList(AB)),!.
 dumpList(_,[]):-!.
 %dumpList(Ctx,[A|B]):-!,fmt(Ctx,A),dumpList(Ctx,B),!.
 %dumpList(Ctx,B):-fmt(Ctx,dumpList(B)).
+
+% this is a backwards compatablity block for SWI-Prolog 6.6.6
+:- retract(double_quotes_was(WAS)),set_prolog_flag(double_quotes,WAS).
+
 
 end_of_file.
 

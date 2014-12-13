@@ -13,7 +13,7 @@
 */
 :- dynamic_multifile_exported fact_is_false/2.
 :- dynamic_multifile_exported kbp_t_list_prehook/2.
-
+:- dynamic_multifile_exported get_mpred_type/2.
 :- op(1120,fx,decl_mpred_prolog).
 :- op(1150,fx,decl_mpred_hybrid).
 
@@ -582,7 +582,6 @@ record_on_thread(Dbase_change,O):- thread_self(ID),thlocal:dbase_capture(ID,Dbas
 % ================================================
 
 db_op(Op,Term):- expands_on(eachOf,Term),!,forall(do_expand_args(eachOf,Term,O),db_op(Op,O)).
-% db_op(query(HLDS,Must),createableType(SubType)):- !, call_expanded_for(Must,is_creatable_type(SubType)).
 db_op(change(_,_),props(_Obj,Props)):- Props ==[], !.
 db_op(query(_,Must),NC):- not(compound(NC)),!,call_expanded_for(Must,NC).
 db_op(query(Dbase_t, Req), must(Call)):-!, must(db_op(query(Dbase_t, Req), Call)).
