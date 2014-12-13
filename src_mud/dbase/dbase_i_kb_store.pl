@@ -363,11 +363,11 @@ is_asserted_mpred(G):-fact_loop_checked(G,asserted_mpred_clause(G)).
 :-dynamic_multifile_exported(was_asserted_gaf/1).
 :-swi_export(asserted_mpred_clause/1).
 asserted_mpred_clause(naf(C)):-nonvar(C),!,not(is_asserted(C)).
+asserted_mpred_clause(C):-fact_always_true(C),!.
 asserted_mpred_clause(C):- (functor(C,dbase_t,_);functor(C,holds_t,_)),!,trace_or_throw(use_code(is_asserted(C))).
 asserted_mpred_clause(C):-was_asserted_gaf(C).
 asserted_mpred_clause(C):-dbase_t(C).
 asserted_mpred_clause(C):-clause_asserted(C).
-asserted_mpred_clause(C):-fact_always_true(C).
 asserted_mpred_clause(H):-not(ground(H)),predicate_property(H,number_of_clauses(_)),clause(H,true).
 % asserted_mpred_clause(C):- asserted_mpred_clause_hardwork(C).
 

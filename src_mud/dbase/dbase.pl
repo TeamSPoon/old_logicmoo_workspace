@@ -11,6 +11,8 @@
 % Dec 13, 2035
 % Douglas Miles
 */
+:- use_module(library(semweb/turtle)).
+
 :- dynamic_multifile_exported fact_is_false/2.
 :- dynamic_multifile_exported kbp_t_list_prehook/2.
 :- dynamic_multifile_exported get_mpred_type/2.

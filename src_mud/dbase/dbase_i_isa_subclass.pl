@@ -14,10 +14,6 @@
 
 :- dynamic_multifile_exported fact_always_true/1.
 
-% nart_to_atomic(L,L):-!,atom(L).
-nart_to_atomic(L,L).
-
-
 decl_type(Spec):- never_type(Spec),!,trace_or_throw(never_type(Spec)).
 decl_type(M:F):-!, '@'(decl_type(F), M).
 decl_type([]):-!.
@@ -77,8 +73,8 @@ is_creatable_type(Type):- arg(_,vv(agent,item,region,concept),Type).
 is_creatable_type(Type):- atom(Type),call(is_asserted(isa(Type,createableType))).
 
 decl_database_hook(assert(_A_or_Z),isa(W,createableType)):-decl_type_safe(W),call_after_game_load(forall(isa(I,W),create_instance(I,W))).
-decl_database_hook(assert(_A_or_Z),isa(W,type)):-atom(W),atomic_list_concat(List,'_',W),!,length(List,2),!,
-   append(FirstPart,[Last],List),atom_length(Last,AL),AL>3,not(member(flagged,FirstPart)),atomic_list_concat(FirstPart,'_',_NewCol),show_call_failure(assert_subclass_safe(W,Last)).
+decl_database_hook(assert(_A_or_Z),isa(W,type)):-atom(W),atomic_list_concat(List,'_',W),!,length(List,2),!, append(FirstPart,[Last],List),atom_length(Last,AL),AL>3,not(member(flagged,FirstPart)),atomic_list_concat(FirstPart,'_',_NewCol),show_call_failure(assert_subclass_safe(W,Last)).
+
 
 % ================================================
 % assert_isa/2
@@ -103,17 +99,6 @@ assert_isa_lc(I,_):- not(mpred_prop(I,_)),not(type(I)),show_call(assert_if_new(i
 assert_isa_lc(I,T):- is_release,!, hooked_asserta(isa(I,T)).
 assert_isa_lc(I,T):- not_is_release, must_det((hooked_asserta(isa(I,T)),(isa_backchaing(I,T)))).
 assert_isa_lc(I,T):- must_det((hooked_asserta(isa(I,T)),logOnFailureIgnore(isa_backchaing(I,T)))).
-
-is_counted_for_parse(I):-i_countable(I),not(excluded(I)),!.
-excluded(apath(_, _)).
-excluded(I):-type(I).
-excluded(I):-formattype(I).
-excluded(I):-mpred_prop(_,argsIsaInList(I)).
-excluded(I):-type(I).
-excluded(apath(_ = _)).
-
-instance_for_parse(I):-is_counted_for_parse(I).
-insttype_for_parse(I):-findall(C,(instance_for_parse(I),isa(I,C)),List),list_to_set(List,Set),member(I,Set).
 
 
 % ================================================

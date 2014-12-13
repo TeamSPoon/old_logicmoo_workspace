@@ -19,9 +19,9 @@ was_run_dbg_pl:-is_startup_file('run.pl').
 % run_tests includes run_common 
 :-include(run_tests).
 
-%:- ensure_loaded('../xperimental/src_incoming/dbase/dbase_rosprolog').
-
-:-prolog.
+:- ensure_loaded('../xperimental/src_incoming/dbase/dbase_rdf_store').
+:- prolog.
+:- ensure_loaded('../xperimental/src_incoming/dbase/dbase_rosprolog').
 
 % [Optionaly] re-define load_default_game
 % load_default_game:- load_game(logicmoo('rooms/startrek.all.plmoo')).
@@ -168,7 +168,7 @@ cmdresult(statistics,true)
 :- if_flag_true(was_run_dbg_pl, at_start(run)).
 
 % So scripted versions don't just exit
-%:- if_flag_true(was_run_dbg_pl,at_start(prolog)).
+:- if_flag_true(was_run_dbg_pl,at_start(prolog)).
 
 %:- kill_term_expansion.
 %:- prolog.
@@ -225,5 +225,5 @@ Proof end.
 
 
 
-*/
+
 

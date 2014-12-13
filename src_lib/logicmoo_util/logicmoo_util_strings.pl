@@ -69,11 +69,11 @@
 
 
 % this is a backwards compatablity block for SWI-Prolog 6.6.6
-:- multifile(double_quotes_was/1).
-:- dynamic(double_quotes_was/1).
-:- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was(WAS)).
-:- retract(double_quotes_was(WAS)),set_prolog_flag(double_quotes,WAS).
-:- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was(WAS)).
+:- multifile(double_quotes_was_strings/1).
+:- dynamic(double_quotes_was_strings/1).
+:- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was_strings(WAS)).
+:- retract(double_quotes_was_strings(WAS)),set_prolog_flag(double_quotes,WAS).
+:- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was_strings(WAS)).
 :- set_prolog_flag(double_quotes,string).
 
 :-import(bugger:must/1).
@@ -605,5 +605,5 @@ longest_string(Order,TStr1,TStr2):-
    compare(Order,L2-Str2,L1-Str1).
 
 % this is a backwards compatablity block for SWI-Prolog 6.6.6
-:- retract(double_quotes_was(WAS)),set_prolog_flag(double_quotes,WAS).
+:- retract(double_quotes_was_strings(WAS)),set_prolog_flag(double_quotes,WAS).
 

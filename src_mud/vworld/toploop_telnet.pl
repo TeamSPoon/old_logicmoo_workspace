@@ -41,11 +41,15 @@
 % ===========================================================
 start_mud_telnet(Port):- telnet_server(Port, [allow(_ALL),call_pred(login_and_run_nodebug)]),!.
 
+:- dynamic(main_thread_error_stream/1).
+
 :-  ignore((thread_self(main),(quintus:current_stream(2, write, Err),asserta(main_thread_error_stream(Err))))).
 
+get_main_thread_error_stream(ES):-main_thread_error_stream(ES),!.
+get_main_thread_error_stream(user_error).
 
 service_client_call(Call, Slave, In, Out, Host, Peer, Options):-
-   main_thread_error_stream(Err),
+   get_main_thread_error_stream(Err),
    thread_self(Id),
    'format'(Err,'~n~n~q~n~n',[service_client_call(Call, Id, Slave, In, Out, Host, Peer, Options)]),
    call(Call).
@@ -120,7 +124,7 @@ run_player_local :-
 
 
 set_console_attached:-
-  thread_self(Id),current_input(In),current_output(Out), (thread_self(main)->main_thread_error_stream(Err); Err=Out),
+  thread_self(Id),current_input(In),current_output(Out), (thread_self(main)->get_main_thread_error_stream(Err); Err=Out),
   (thread_util:has_console(Id,In, Out,Err)->true;((retractall(thread_util:has_console(Id,_,_,_)),asserta(thread_util:has_console(Id,In,Out,Err))))).
 
 

@@ -127,9 +127,11 @@ concat_env(Var,Val):-
 
 :- show_call(user:file_search_path(knowrob,_Where)).
 
-% :-prolog.
+:-prolog.
 :- init_ros_package(knowrob_common).
 :- init_ros_package(knowrob_actions).
 :- init_ros_package(ias_knowledge_base).
 :- init_ros_package(comp_semantic_map).
 :- forall(ros_package(B),init_ros_package(B)).
+
+

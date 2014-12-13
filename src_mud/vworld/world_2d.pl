@@ -130,7 +130,7 @@ nearby(X,Y):-atloc(X,L1),atloc(Y,L2),locs_near(L1,L2).
 locationToRegion(Obj,RegionIn):-locationToRegion_0(Obj,Region),must((nonvar(Region),isa(Region,region))),!,RegionIn=Region.
 locationToRegion_0(Obj,Obj):-var(Obj),dmsg(warn(var_locationToRegion(Obj,Obj))),!.
 locationToRegion_0(xyz(Region,_,_,_),Region2):-nonvar(Region),!,locationToRegion_0(Region,Region2).
-locationToRegion_0(Obj,Obj):-nonvar(Obj),isa(Obj,region),!.
+locationToRegion_0(Obj,Obj):-nonvar(Obj),!,isa(Obj,region),!.
 locationToRegion_0(Obj,Region):-nonvar(Obj),must(localityOfObject(Obj,Location)),!,locationToRegion_0(Location,Region).
 locationToRegion_0(Obj,Obj):-dmsg(warn(locationToRegion(Obj,Obj))),!.
 
