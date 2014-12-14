@@ -80,7 +80,7 @@ call_look_proc(Agent,LOC):-
          %  why does this this work on Prolog REPL?
          %   with_output_to(string(Str),show_room_grid('Area1000'))
          %  but yet this doent?
-         show_room_grid = once(with_output_to(string(value),show_room_grid(region))),
+       %   show_room_grid = once(with_output_to(string(value),show_room_grid(region))),
          % for now workarround is 
          call(show_room_grid(region)),
          atloc(Agent,value),

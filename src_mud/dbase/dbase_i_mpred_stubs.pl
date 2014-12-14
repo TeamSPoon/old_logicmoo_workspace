@@ -33,6 +33,7 @@ body_req(F,A,HEAD,HEAD_T):- hook_body_req(F,A,HEAD,HEAD_T).
 hook_body_req(F,A,HEAD,HEAD_T):- mpred_prop(F,prologOnly),!,dmsg(warn(hook_body_req(F,A,HEAD,HEAD_T))),fail.
 hook_body_req(_,_,isa(I,C),_):- !, body_req_isa(I,C).
 hook_body_req(_,_,_,dbase_t(C,I)):- !, body_req_isa(I,C).
+hook_body_req(_,_,_,isa_t(C,I)):- !, body_req_isa(I,C).
 hook_body_req(_,_,_ ,HEAD_T):- thlocal:useOnlyExternalDBs,!, body_call_cyckb(HEAD_T).
 % loop checking is not usefull (why the cut was added)
 hook_body_req(F,A,HEAD,HEAD_T):- !, no_repeats(body_req_normal(F,A,HEAD,HEAD_T)).

@@ -40,7 +40,7 @@ dbase_mod(user).
 
 :- dbase_mod(M),dynamic_multifile_exported((
           M:dbase_t/1,
-          M:dbase_t/2,
+          % M:dbase_t/2,
           M:dbase_t/3,
           M:dbase_t/4,
           M:dbase_t/5,
@@ -51,7 +51,7 @@ dbase_mod(user).
 is_svo_functor(Prop):- notrace((atom(Prop),arg(_,svo(svo,prop,valueOf,rdf),Prop))).
 
 :-swi_export(hilog_functor/1).
-hilog_functor(dbase_t).
+hilog_functor(dbase_ttttt).
 
 :-swi_export(is_holds_true_not_hilog/1).
 is_holds_true_not_hilog(HOLDS):-is_holds_true(HOLDS),\+ hilog_functor(HOLDS).
@@ -110,7 +110,7 @@ into_hilog_form_ic(X,O):- is_list(X),list_to_dbase_t(X,D),into_hilog_form_ic(D,O
 into_hilog_form_ic(X,O):- X=..[F|A],into_hilog_form(X,F,A,O).
 
 % TODO finish negations
-into_hilog_form(X,_,_,dbase_t(C,I)):-was_isa(X,I,C),!.
+into_hilog_form(X,_,_,isa_t(C,I)):-was_isa(X,I,C),!.
 into_hilog_form(X,F,_A,X):- mpred_prop(F,as_is(_Why)),!.
 into_hilog_form(X,F,_A,X):- mpred_prop(F,prologCall),!.
 into_hilog_form(X,dbase_t,_A,X).
@@ -202,9 +202,11 @@ acceptable_xform(From,To):- From \=@= To,  (To = isa(I,C) -> was_isa(From,I,C); 
 
 :-swi_export(was_isa/3).
 was_isa(dbase_t(C,I),I,C):- maybe_typep(C/1),not(prolog_side_effects(C/1)).
+was_isa(dbase_t(C,I),I,C).
 was_isa(isa(I,C),I,C).
+was_isa(isa_t(C,I),I,C).
 was_isa(dbase_t(isa,I,C),I,C).
-was_isa(M:X,I,C):-atom(M),!,was_isa(M:X,I,C).
+was_isa(M:X,I,C):-atom(M),!,was_isa(X,I,C).
 was_isa(X,I,C):-compound(X),functor(X,C,1),!,arg(1,X,I),maybe_typep(C/1),not(prolog_side_effects(C/1)).
 
 :-swi_export(prolog_side_effects/1).
@@ -331,6 +333,7 @@ is_asserted(C):-compound(C),functor(C,F,A),!,is_asserted(F,A,C).
 is_asserted(F,G):-must_det(functor(G,F,A)),is_asserted(F,A,G).
 
 :-dynamic_multifile_exported(is_asserted/3).
+is_asserted(once,1,once(G)):-!,is_asserted(G),!.
 is_asserted(M:F,A,C):- atom(M),!,is_asserted(F,A,C).
 is_asserted(F,A,M:C):- atom(M),!,is_asserted(F,A,C).
 %  %  is_asserted(dbase_t,1,dbase_t(C)):-!,dbase_t(C).
@@ -349,7 +352,7 @@ nart_to_atomic(L,L).
 :-dynamic_multifile_exported(is_asserted_mpred/1).
 
 is_asserted_lc_isa(isa,2,isa(I,C)):-!,is_asserted_mpred_clause_isa(I,C).
-is_asserted_lc_isa(dbase_t,2,dbase_t(C,I)):-!,is_asserted_mpred_clause_isa(I,C).
+is_asserted_lc_isa(isa_t,2,isa_t(C,I)):-!,is_asserted_mpred_clause_isa(I,C).
 is_asserted_lc_isa(C,1,G):-arg(1,G,I),!,is_asserted_mpred_clause_isa(I,C).
 
 is_asserted_mpred_clause_isa(I,C):-isa_asserted(C,I).
@@ -363,6 +366,7 @@ is_asserted_mpred(G):-fact_loop_checked(G,asserted_mpred_clause(G)).
 :-dynamic_multifile_exported(was_asserted_gaf/1).
 :-swi_export(asserted_mpred_clause/1).
 asserted_mpred_clause(naf(C)):-nonvar(C),!,not(is_asserted(C)).
+asserted_mpred_clause(is_asserted(C)):-nonvar(C),!,is_asserted(C).
 asserted_mpred_clause(C):-fact_always_true(C),!.
 asserted_mpred_clause(C):- (functor(C,dbase_t,_);functor(C,holds_t,_)),!,trace_or_throw(use_code(is_asserted(C))).
 asserted_mpred_clause(C):-was_asserted_gaf(C).
@@ -528,6 +532,10 @@ retractall_cloc(M,C):-ensure_predicate_reachable(M,C),fail.
 %retractall_cloc(M,C):-not(clause_asserted(M:C)),!.
 retractall_cloc(M,C):-database_real(retractall,M:C).
 
+
+database_real(assertz,G):- was_isa(G,I,C),isa_t(C,I),!.
+database_real(assertz,G):- was_isa(G,I,C),!,show_call(asserta(isa_t(C,I))).
+database_real(asserta,G):- was_isa(G,I,C),!,asserta_if_new(isa_t(C,I)).
 database_real(P,C):- 
     copy_term(C,CC),
       ignore((once((into_assertable_form(CC,DB), functor_h(C,CF),functor_h(DB,DBF))),DBF \== CF, 

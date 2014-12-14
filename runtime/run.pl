@@ -18,7 +18,7 @@ was_run_dbg_pl:-is_startup_file('run.pl').
 
 :- ensure_loaded('../xperimental/src_incoming/dbase/dbase_rosprolog').
 :- ensure_loaded('../xperimental/src_incoming/dbase/dbase_rdf_store').
-:- prolog.
+% :- prolog.
 
 
 % run_tests includes run_common 
