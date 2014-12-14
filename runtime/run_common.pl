@@ -43,7 +43,7 @@ prolog_repl:- nl,fmt("Press Ctrl-D to start the mud!"),nl,catch(tlocals,E,dmsg(t
 
 :- set_prolog_flag(gui,false).
 :- set_prolog_flag(history,1000).
-:- set_prolog_flag(history,1000).
+
 
 :-export(within_user/1).
 :-export(is_startup_file/1).
@@ -103,8 +103,8 @@ hard_work:-
    ((
  %  use_module('t:/devel/cliopatria/rdfql/sparql_runtime.pl'),
   % ensure_loaded(logicmoo(launchcliopatria)),
-   ensure_loaded(logicmoo(testwebconsole)),
-   kill_term_expansion,
+  % ensure_loaded(logicmoo(testwebconsole)),
+  % kill_term_expansion,
    ensure_loaded(swish(logicmoo_run_swish))
    )))),!.
 

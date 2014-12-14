@@ -13,13 +13,12 @@ was_run_dbg_pl:-is_startup_file('run.pl').
 % :- catch(guitracer,_,true).
 :- set_prolog_flag(verbose_load,true).
 
-%:- ensure_loaded('../../swish/logicmoo_run_swish').
+:- ensure_loaded('../../swish/logicmoo_run_swish').
 :- debug.
 
 :- ensure_loaded('../xperimental/src_incoming/dbase/dbase_rosprolog').
 :- ensure_loaded('../xperimental/src_incoming/dbase/dbase_rdf_store').
 % :- prolog.
-
 
 % run_tests includes run_common 
 :- include(run_tests).
@@ -29,7 +28,7 @@ was_run_dbg_pl:-is_startup_file('run.pl').
 
 % [Optionaly] load and start sparql server
 % starts in forground
-%:- at_start(slow_work).
+% :- at_start((slow_work,threads)).
 % starts in thread (the the above was commented out)
 % :- at_start(start_servers).
 %:- thread_work.
@@ -55,7 +54,7 @@ debug_repl_wo_cyc(Module,CallFirst):- !,
                 prolog_repl)))).
 
 %  bug.. swi does not maintain context_module(CM) outside
-%  of the current caller (so we have no idea what the real context module is!?!
+%  of the current caller (so we have no idea what the real context module is!?! )
 debug_repl_m(Module,CallFirst):- 
         context_module(CM),
           call_cleanup(
@@ -84,6 +83,13 @@ debug_talk:- debug_repl_wo_cyc(parser_talk,t3).
 % :-is_startup_file('run.pl')->doall(do_pttp_test(_));true.
 
 
+% onLoad(Code):- call_after_next(after_game_load,Code).
+:- onLoad(forall(disjointWith0(A,B),rdf_assert_hook(disjointWith(A,B)))).
+:- onLoad(forall(is_known_trew(B),rdf_assert_hook(B))).
+:- onLoad(forall(dbase_t(P,S,O),rdf_assert_hook(rdf(S,P,O)))).
+:- onLoad(forall(po(P,O),rdf_assert_hook(subclass(P,O)))).
+
+
 % [Manditory] This loads the game and initializes so test can be ran
 :- if_flag_true(was_run_dbg_pl, at_start(run_setup)).
 :- ensure_plmoo_loaded(logicmoo('rooms/startrek.all.plmoo')).
@@ -94,8 +100,6 @@ debug_talk:- debug_repl_wo_cyc(parser_talk,t3).
 
 % the local tests each reload (once)
 now_run_local_tests_dbg :- doall(mud_test_local).
-
-:-must_det(show_call((atloc('NpcCol1012-Ensign728',X),nonvar(X)))).
 
 % nasty way i debug the parser
 mud_test_local :- do_player_action('who').
@@ -153,6 +157,9 @@ true.
 cmdresult(statistics,true)
 
 */
+
+:- must_det(show_call((atloc('NpcCol1012-Ensign728',X),nonvar(X)))).
+
 % :-forall(current_prolog_flag(N,V),dmsg(N=V)).
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
 :-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,who)).

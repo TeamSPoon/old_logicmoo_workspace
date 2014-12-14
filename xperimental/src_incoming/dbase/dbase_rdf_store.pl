@@ -1,4 +1,4 @@
-:-module(dbase_rdf_store, [dbase_rdf/3]).
+:-module(dbase_rdf_store, [dbase_rdf/3,po/2,rdf_object/1,rdf_assert_hook/1]).
 
 /** <module> MUD STORE
 
@@ -121,6 +121,26 @@ rdf(S,P,O):- show_call(dbase_rdf(S,P,O)).
    
 current_g(knowrob).
 
+rdf_object(NS:C):-!,ground(rdf_object(NS:C)).
+rdf_object(C):-atomic(C).
+
+:- rdf_register_prefix(mud,'file:///opt/LogicmooDeveloperFramework/PrologMUD/xperimental/knowrob_addons/comp_missingobj/owl/comp_missingobj.owl#').
+:- rdf_register_prefix(mudh,'file:///opt/LogicmooDeveloperFramework/PrologMUD/xperimental/knowrob_addons/comp_missingobj/owl/comp_missingobj.owl').
+
+rdf_assert_x(S,P,O):- rdf_assert_x(S,P,O,'file:///opt/LogicmooDeveloperFramework/PrologMUD/xperimental/knowrob_addons/comp_missingobj/owl/comp_missingobj.owl#').
+
+user:decl_database_hook(assert(_A_or_Z),G):-rdf_assert_hook(G),!.
+
+rdf_assert_hook(subclass(C,P)):-!,rdf_object(C),rdf_object(P),rdf_assert_x(C,rdfs:subClassOf,P).
+rdf_assert_hook(description(C,P)):-!,rdf_object(C),rdf_object(P),rdf_assert_x(C,rdfs:comment,P).
+rdf_assert_hook(isa(Prop,mpred)):- functor(Prop,P,_),!,rdf_object(P),rdf_assert_x(P,rdf:type,owl:'Property').
+rdf_assert_hook(isa(Prop,singleValued)):- functor(Prop,P,_),!,rdf_object(P),rdf_assert_x(P,rdf:type,owl:'FunctionalProperty').
+rdf_assert_hook(arity(W,2)):-!,rdf_object(W),rdf_assert_x(W,rdf:type,owl:'Property').
+rdf_assert_hook(isa(W,type)):-!,rdf_object(W),rdf_assert_x(W,rdf:type,owl:'Class').
+rdf_assert_hook(isa(C,P)):-!,rdf_object(C),rdf_object(P),P\=type,rdf_assert_x(C,rdf:type,P).
+rdf_assert_hook(rdf(S,P,O)):-!,rdf_object(S),rdf_object(O),rdf_assert_x(S,P,O).
+rdf_assert_hook(PSO):-PSO=..[P,S,O],rdf_object(S),rdf_object(O),rdf_assert_x(S,P,O).
+
 dbase_rdf(S,P,O):-
   current_g(G),
   maplist(rdf_to_cname(G),[S,P,O],[Sc,Pc,Oc]),
@@ -132,11 +152,19 @@ rdf_to_node_ignore(G,A,B):-rdf_to_node(G,A,BB),ignore(B=BB).
 
 :- rdf_register_prefix(logicmoo, 'http://onto.ui.sav.sk/agents.owl#').
 
+po(type,owl:'Class').
+po(food,knowrob:'Food').
+po(item,knowrob:'HumanScaleObject').
+po(spatialthing,knowrob:'SpatialThing').
+po(region,knowrob:'FixedStructure').
+po(agent,knowrob:'Agent-Generic').
 
-o_to_p(O,type):-O==owl:'Class',!.
+
+
+o_to_p(O,T):-po(T,C),O==C,!.
 o_to_p(O,O).
 
-p_to_o(P,owl:'Class'):-P==type,!.
+p_to_o(P,C):-po(T,C),P==T,!.
 p_to_o(O,O).
 
 dbase_t_rdf(Sc,rdf:type,CC):- /*o_to_p(CC,Oc),*/hasInstance(Oc,Sc),p_to_o(Oc,CC).
@@ -145,7 +173,8 @@ dbase_t_rdf(Sc,Pc,Oc):-dbase_t(Pc,Sc,Oc).
 :-export(rdf_assert_x/4).
 rdf_assert_x(S,P,O,G):-Q=rdf_x(S,P,O,G),not(ground(Q)),!,Q.
 rdf_assert_x(S,P,O,G):-
-  must((rdf_to_graph(G,Gx))),rdf_to_node(Gx,S,Sx),rdf_to_node(Gx,P,Px),rdf_to_node(Gx,O,Ox),rdf_assert(Sx,Px,Ox,Gx).
+  must((rdf_to_graph(G,Gx))),rdf_to_node(Gx,S,Sx),rdf_to_node(Gx,P,Px),rdf_to_node(Gx,O,Ox),
+   show_call(rdf_assert(Sx,Px,Ox,Gx)).
 
 :-export(rdf_x/4).
 rdf_x(S,P,O,G):-
@@ -284,3 +313,4 @@ dbase_rdf_has_type(Resource, Class) :-
 	cliopatria:entailment/2.
 
 cliopatria:entailment(dbase_rdf, dbase_rdf_store).
+

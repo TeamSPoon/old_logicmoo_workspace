@@ -357,6 +357,12 @@ type_isa(Type,formattype):-formattype(Type),!. % text
 is_known_true(C):-has_free_args(C),!,trace_or_throw(has_free_args(is_known_trew,C)).
 is_known_true(F):-is_known_false0(F),!,fail.
 is_known_true(isa(X,spatialthing)):- is_asserted(isa(X,_)),is_known_false0(isa(X,type)),is_known_false0(isa(X,formattype)),is_known_false0(isa(X,mpred)).
+is_known_true(subclass(X,X)).
+is_known_true(isa(_,id)).
+is_known_true(isa(apath(_,_),areaPath)).
+is_known_true(isa(apath(_,_),apath)).
+is_known_true(isa(_,term)).
+
 
 is_known_trew(isa(container,completeExtentAsserted)).
 % is_known_trew(isa(formattype,metaclass)).
@@ -393,11 +399,6 @@ is_known_trew(subclass(F,mpred)):-argsIsaProps(F).
 is_known_trew(subclass(F,fpred)):-argsIsaProps(F).
 is_known_trew(subclass(F,relation)):-argsIsaProps(F).
 is_known_trew(disjointWith(A,B)):-disjointWithT(A,B).
-is_known_trew(subclass(X,X)).
-is_known_trew(isa(_,id)).
-is_known_trew(isa(apath(_,_),areaPath)).
-is_known_trew(isa(apath(_,_),apath)).
-is_known_trew(isa(_,term)).
 
 
 
