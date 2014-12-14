@@ -226,7 +226,7 @@ relax_term(P,P,Ai,Ac,Bi,Bc):- when_met(pred(nonvar,Ac),when_met(pred(nonvar,Bc),
 % ================================================================================
 
 
-dbase_t(C,I):- trace_or_throw(dbase_t(C,I)),fail,loop_check_term(isa_backchaing(I,C),isa_t(C,I),fail).
+dbase_t(C,I):- trace_or_throw(dbase_t(C,I)),fail,loop_check_term(isa_backchaing(I,C),hasInstance(C,I),fail).
 
 %dbase_t([P|LIST]):- !,dbase_plist_t(P,LIST).
 %dbase_t(naf(CALL)):-!,not(dbase_t(CALL)).
@@ -236,7 +236,7 @@ dbase_plist_t(P,[]):-!,dbase_t(P).
 dbase_plist_t(P,LIST):-var(P),!,CALL=..[dbase_t,P|LIST],debugOnError((CALL)).
 dbase_plist_t(dbase_t,LIST):-!, CALL=..[dbase_t|LIST],call(CALL),debugOnError((CALL)).
 dbase_plist_t(mpred_prop,[C,I]):-!,ground(I:C),mpred_prop(C,I).
-dbase_plist_t(isa,[I,C]):-!,isa_t(C,I).
+dbase_plist_t(isa,[I,C]):-!,hasInstance(C,I).
 dbase_plist_t(P,_):-never_dbase_mpred(P),!,fail.
 dbase_plist_t(P,[L|IST]):-is_holds_true(P),!,dbase_plist_t(L,IST).
 dbase_plist_t(P,LIST):-is_holds_false(P),!,dbase_f(LIST).
@@ -325,7 +325,7 @@ call_which_t(dac(_,a,_,_),P,A1,A2):- assertion_t([P,A1,A2]).
 call_which_t(dac(_,_,c,_),P,A1,A2):- callable_tf(P,2),xcall_t(P,A1,A2).
 call_which_t(dac(_,_,_,holds_t),P,A1,A2):- holds_t(P,A1,A2).
 
-call_which_t(dac(d,_,_,_),P,A1):- isa_t(P,A1).
+call_which_t(dac(d,_,_,_),P,A1):- hasInstance(P,A1).
 call_which_t(dac(_,a,_,_),P,A1):- assertion_t([P,A1]).
 call_which_t(dac(_,_,c,_),P,A1):- callable_tf(P,1),xcall_t(P,A1).
 call_which_t(dac(_,_,_,holds_t),P,A1):- holds_t(P,A1).

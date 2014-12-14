@@ -1,4 +1,4 @@
-:-swi_module(dbase_rdf_store, [rdf_assert_x/4,rdf_x/4]).
+:-module(dbase_rdf_store, [dbase_rdf/3]).
 
 /** <module> MUD STORE
 
@@ -10,8 +10,8 @@ semantic web sub language of RDF.
 
 This entailment module does MUD-DB entailment.
 
+@tbd	Check the completeness
 */
-
 
 :- use_module(library(semweb/rdf_db)).
 :- use_module(library(semweb/rdf_persistency)).
@@ -73,16 +73,17 @@ rdf_to_lit(U,literal(type(xsd:double, S))):-number(U),!,atom_string(U,S).
 rdf_to_lit(U,literal(type(xsd:string, U))):-string(U),!.
 
 
-rdf_from_node(_,Var,V):-var(Var),!,copy_term(Var,V).
-rdf_from_node(_,P:S,P:S):-!.
-rdf_from_node(_,Sx,S):-is_url(Sx),prolog_to_cname(Sx,S0),!,must(S=S0).
-rdf_from_node(_,Sx,S):-prolog_to_cname(Sx,S0),!,must(S=S0).
-rdf_from_node(G,Sx,S):-rdfs_list_to_prolog_list(Sx,LL),!,maplist(rdf_from_node(G),LL,S).
-rdf_from_node(_,literal(type('http://www.w3.org/2001/XMLSchema#string', Atom)),String):-string_to_atom(String,Atom),!.
-rdf_from_node(_,Sx,S):-compound(Sx),!,must(rdf_literal_value_safe(Sx,S)).
-rdf_from_node(_,Sx,node(S)):-atom(Sx),atom_concat('__bnode',S,Sx),!.
-rdf_from_node(G,Sx,NS:SI):-atom(Sx),rdf_graph_ns(G,NS),!,must(SI=Sx).
-rdf_from_node(_,Ss,Sx):-copy_term(Ss,Sx).
+rdf_to_cname(_,Var,V):-var(Var),!,copy_term(Var,V).
+rdf_to_cname(_,P:S,P:S):-!.
+rdf_to_cname(_,Sx,S):-is_url(Sx),prolog_to_cname(Sx,S0),!,must(S=S0).
+rdf_to_cname(_,Sx,S):-prolog_to_cname(Sx,S0),!,must(S=S0).
+rdf_to_cname(G,Sx,S):-rdfs_list_to_prolog_list(Sx,LL),!,maplist(rdf_to_cname(G),LL,S).
+rdf_to_cname(_,literal(type('http://www.w3.org/2001/XMLSchema#string', Atom)),String):-string_to_atom(String,Atom),!.
+rdf_to_cname(_,literal(type(_, Atom)),String):-atom_to_term(Atom,String),!.
+rdf_to_cname(_,Sx,S):-compound(Sx),!,must(rdf_literal_value_safe(Sx,S)).
+rdf_to_cname(_,Sx,node(S)):-atom(Sx),atom_concat('__bnode',S,Sx),!.
+rdf_to_cname(G,Sx,NS:SI):-atom(Sx),rdf_graph_ns(G,NS),!,must(SI=Sx).
+rdf_to_cname(_,Ss,Sx):-copy_term(Ss,Sx).
 
 rdf_literal_value_safe(Sx,S):-rdf_literal_value(Sx,S),!.
 
@@ -102,26 +103,12 @@ rdf_to_graph(G,G):- atom(G),atomic_list_concat(['source://',G,'#'],S),
 
 rdf_from_graph(G,G).
 
-rdf_assert_x(S,P,O,G):-Q=rdf_x(S,P,O,G),not(ground(Q)),!,Q.
-rdf_assert_x(S,P,O,G):-
-  must((rdf_to_graph(G,Gx))),rdf_to_node(Gx,S,Sx),rdf_to_node(Gx,P,Px),rdf_to_node(Gx,O,Ox),rdf_assert(Sx,Px,Ox,Gx).
-
-rdf_from_node_io(G,o,S,Sx):-!,rdf_from_node(G,S,Sx),!.
+rdf_from_node_io(G,o,S,Sx):-!,rdf_to_cname(G,S,Sx),!.
 rdf_from_node_io(_,i,S,Sx):-ground(S),!,ignore(S=Sx).
-rdf_from_node_io(G,i,S,Sx):-rdf_from_node(G,S,Sx),!.
+rdf_from_node_io(G,i,S,Sx):-rdf_to_cname(G,S,Sx),!.
 
 rdf_to_node_io(_,S,Sx,o):-var(S),!,must(copy_term(S,Sx)).
 rdf_to_node_io(G,S,Sx,i):-rdf_to_node(G,S,Sx).
-
-
-
-rdf_x(S,P,O,G):-
-  notrace((once((rdf_to_node_io(user,G,Gx,Gio),rdf_to_node_io(Gx,S,Sx,Sio),rdf_to_node_io(Gx,P,Px,Pio),rdf_to_node_io(Gx,O,Ox,Oio))))),
-                (nonvar(P)->NeverP=[];NeverP=[rdf:rest,rdf:first,rdf:type]),
-                rdf(Sx,Px,Ox,Gx),
-                rdf_from_node_io(G,Pio,Px,P),
-                enforce_never_p(G,P,NeverP),
-                once((rdf_from_graph(Gx,G),rdf_from_node_io(G,Sio,Sx,S),rdf_from_node_io(G,Oio,Ox,O))).
 
 bs:- rdf_process_turtle('bootstrap.ttl',onLoadTTL,[prefixes(X)]),forall(member(NS-Prefix,X),rdf_register_prefix(NS,Prefix)).
 
@@ -129,23 +116,47 @@ enforce_never_p(_,_,[]):-!.
 enforce_never_p(_,P,List):-member(L,List),rdf_equal(P,L),!,fail.
 enforce_never_p(_,_,_).
 
-from_a(S0,P0,O0,S,P,O):-from_a(S0,S),from_a(P0,P),from_a(O0,O).
 
-from_a(P:_,_):-atom(P),!.
-from_a(_,_):-!.
-
-to_a(S0,P0,O0,S,P,O):-to_a(S0,S),to_a(P0,P),to_a(O0,O).
-
-to_a(P:A,O1):-atom(P),rdf_current_prefix(P,PP),!,atom_concat(PP,A,O2),!,O1=O2.
-to_a(O,O1):-O=O1.
-
-rdf(S0,P0,O0):- fail,
-   from_a(S0,P0,O0,S,P,O),
-   dbase_rdf(S,P,O),
-   to_a(S0,P0,O0,S,P,O).
+rdf(S,P,O):- show_call(dbase_rdf(S,P,O)).
    
+current_g(knowrob).
+
+dbase_rdf(S,P,O):-
+  current_g(G),
+  maplist(rdf_to_cname(G),[S,P,O],[Sc,Pc,Oc]),
+  dbase_t_rdf(Sc,Pc,Oc),
+  maplist(rdf_to_node_ignore(G),[Sc,Pc,Oc],[S,P,O]).
+
+rdf_to_node_ignore(G,S,Sxx):-atom(S),prolog_to_cname(S,Sx),!,rdf_to_node(G,Sx,Sxx).
+rdf_to_node_ignore(G,A,B):-rdf_to_node(G,A,BB),ignore(B=BB).
 
 :- rdf_register_prefix(logicmoo, 'http://onto.ui.sav.sk/agents.owl#').
+
+
+o_to_p(O,type):-O==owl:'Class',!.
+o_to_p(O,O).
+
+p_to_o(P,owl:'Class'):-P==type,!.
+p_to_o(O,O).
+
+dbase_t_rdf(Sc,rdf:type,CC):- /*o_to_p(CC,Oc),*/hasInstance(Oc,Sc),p_to_o(Oc,CC).
+dbase_t_rdf(Sc,Pc,Oc):-dbase_t(Pc,Sc,Oc).
+
+:-export(rdf_assert_x/4).
+rdf_assert_x(S,P,O,G):-Q=rdf_x(S,P,O,G),not(ground(Q)),!,Q.
+rdf_assert_x(S,P,O,G):-
+  must((rdf_to_graph(G,Gx))),rdf_to_node(Gx,S,Sx),rdf_to_node(Gx,P,Px),rdf_to_node(Gx,O,Ox),rdf_assert(Sx,Px,Ox,Gx).
+
+:-export(rdf_x/4).
+rdf_x(S,P,O,G):-
+  notrace((once((rdf_to_node_io(user,G,Gx,_Gio),rdf_to_node_io(Gx,S,Sx,Sio),rdf_to_node_io(Gx,P,Px,Pio),rdf_to_node_io(Gx,O,Ox,Oio))))),
+                (nonvar(P)->NeverP=[];NeverP=[rdf:rest,rdf:first,rdf:type]),
+                rdf(Sx,Px,Ox,Gx),
+                rdf_from_node_io(G,Pio,Px,P),
+                enforce_never_p(G,P,NeverP),
+                once((rdf_from_graph(Gx,G),rdf_from_node_io(G,Sio,Sx,S),rdf_from_node_io(G,Oio,Ox,O))).
+
+
 
 % http://localhost:3020/cliopatria/browse/list_triples?graph=file:///t:/devel/cliopatria/rdf/base/rdfs.rdfs
 % http://localhost:3020/cliopatria/browse/list_triples_with_object?r=http://www.w3.org/1999/02/22-rdf-syntax-ns%23Property
@@ -169,7 +180,10 @@ dbase_rdf('http://www.w3.org/1999/02/22-rdf-syntax-ns#object','http://www.w3.org
 dbase_rdf('http://www.w3.org/1999/02/22-rdf-syntax-ns#object','http://www.w3.org/2000/01/rdf-schema#isDefinedBy','http://www.w3.org/1999/02/22-rdf-syntax-ns#').
 dbase_rdf('http://www.w3.org/1999/02/22-rdf-syntax-ns#object','http://www.w3.org/2000/01/rdf-schema#label',literal(lang(en,object))).
 
-dbase_rdf(S, P, O):-rdf_db:rdf(S, P, O).
+
+dbase_rdf(S, P, O):-!, rdf_db:rdf(S, P, O).
+
+dbase_rdf(S, P, O):-dmsg(dbase_rdf(S, P, O)),!,fail.
 
 dbase_rdf(literal(L), _, _) :-		% should move to compiler
 	nonvar(L), !, fail.
@@ -202,19 +216,14 @@ dbase_rdf(S, rdfs:subPropertyOf, O) :- !,
 	;   individual_of(S, rdf:'Property'),
 	    rdfs_subproperty_of(S, O)
 	).
-dbase_rdf(S, serql:directSubClassOf, O) :- !,
-	rdf_has(S, rdfs:subClassOf, O).
-dbase_rdf(S, serql:directType, O) :- !,
-	rdf_has(S, rdf:type, O).
-dbase_rdf(S, serql:directSubPropertyOf, O) :- !,
-	rdf_has(S, rdfs:subPropertyOf, O).
-dbase_rdf(S, P, O) :-
-	rdf_has(S, P, O).
+dbase_rdf(S, serql:directSubClassOf, O) :- !, rdf_has(S, rdfs:subClassOf, O).
+dbase_rdf(S, serql:directType, O) :- !, rdf_has(S, rdf:type, O).
+dbase_rdf(S, serql:directSubPropertyOf, O) :- !, rdf_has(S, rdfs:subPropertyOf, O).
+dbase_rdf(S, P, O) :- rdf_has(S, P, O).
 
 
 %%	individual_of(?Resource, ?Class)
-individual_of(Resource, Class):-
-   dbase_individual_of(Resource, Class).
+individual_of(Resource, Class):- dbase_individual_of(Resource, Class).
 
 
 dbase_individual_of(Resource, Class) :-

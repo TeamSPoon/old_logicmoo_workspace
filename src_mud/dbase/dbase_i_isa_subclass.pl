@@ -25,14 +25,14 @@ decl_type((A,L)):-!,decl_type(A),decl_type(L).
 decl_type(Spec):- compound(Spec),must_det(define_compound_as_type(Spec)).
 decl_type(Spec):- decl_mpred(Spec,1),declare_dbase_local_dynamic(Spec,1), decl_type_unsafe(Spec).
 
-decl_type_unsafe(Spec):- isa_t(type,Spec),!.
-decl_type_unsafe(Spec):- hooked_asserta(isa(Spec,type)),asserta_if_new(isa_t(type,Spec)).
+decl_type_unsafe(Spec):- hasInstance(type,Spec),!.
+decl_type_unsafe(Spec):- hooked_asserta(isa(Spec,type)),asserta_if_new(hasInstance(type,Spec)).
 
 :- decl_mpred_hybrid(typeDeclarer/1).
 
-define_compound_as_type(Spec):- isa_t(F,Spec),dmsg(once(define_compound_as_type(Spec,F))).
+define_compound_as_type(Spec):- hasInstance(F,Spec),dmsg(once(define_compound_as_type(Spec,F))).
 define_compound_as_type(Spec):- add(resultIsa(Spec,type)).
-define_compound_as_type(Spec):- assertz_if_new(isa_t(formattype,Spec)),dmsg(once(define_compound_as_type(Spec,formattype))).
+define_compound_as_type(Spec):- assertz_if_new(hasInstance(formattype,Spec)),dmsg(once(define_compound_as_type(Spec,formattype))).
 define_compound_as_type(Spec):- compound(Spec),trace_or_throw(never_compound_define_type(Spec)).
 
 :-forall(argsIsaProps(F),decl_type(F)).
@@ -43,9 +43,9 @@ define_ft(M:F):- !, '@'(define_ft(F), M).
 define_ft(Spec):- compound(Spec),functor(Spec,F,_),!,define_ft_0(F),define_ft_0(Spec).
 define_ft(Spec):- define_ft_0(Spec).
 
-define_ft_0(Spec):- isa_t(formattype,Spec),!.
-define_ft_0(Spec):- isa_t(type,Spec),dmsg(once(maybe_converting_plain_type_to_formattype(Spec))),fail.
-define_ft_0(Spec):- hooked_asserta(isa(Spec,formattype)),asserta_if_new(isa_t(formattype,Spec)).
+define_ft_0(Spec):- hasInstance(formattype,Spec),!.
+define_ft_0(Spec):- hasInstance(type,Spec),dmsg(once(maybe_converting_plain_type_to_formattype(Spec))),fail.
+define_ft_0(Spec):- hooked_asserta(isa(Spec,formattype)),asserta_if_new(hasInstance(formattype,Spec)).
 
 %type(Spec):- is_asserted(isa(Spec,type)).
 
@@ -111,7 +111,7 @@ decl_database_hook(assert(_),DATA):-into_mpred_form(DATA,O),!,O=isa(I,T),hotrace
 assert_isa_hooked(A,_):-retractall(dbase_t(cache_I_L,isa,A,_)),fail.
 assert_isa_hooked(F,T):-argsIsaProps(T),decl_mpred(F,T),fail.
 assert_isa_hooked(I,T):- not(ground(assert_isa(I,T))),!, trace_or_throw(not(ground(assert_isa(I,T)))).
-assert_isa_hooked(I,T):- asserta_if_new(isa_t(T,I)),fail.
+assert_isa_hooked(I,T):- asserta_if_new(hasInstance(T,I)),fail.
 
 assert_isa_hooked(T,type):-!,decl_type(T),!.
 assert_isa_hooked(T,formattype):-!,define_ft(T),!.
@@ -229,7 +229,7 @@ isa_asserted_0(I,T):-atom(I),isa_w_inst_atom(I,T).
 isa_asserted_0(I,T):-fact_always_true(isa(I,T)).
 
 isa_asserted_0(I,T):- ((thlocal:useOnlyExternalDBs,!);thglobal:use_cyc_database),(kbp_t([isa,I,T]);kbp_t([T,I])).
-isa_asserted_0(I,T):-clause(isa_t(T,I),true).
+isa_asserted_0(I,T):-clause(hasInstance(T,I),true).
 isa_asserted_0(I,T):-clause(isa(I,T),true).
 
 isa_asserted_0(I,T):-T\=mped_type(_),mpred_prop(I,T).
@@ -287,7 +287,7 @@ type(typeDeclarer).
 % type(argsIsaInList).
 % TODO decide if OK
 type(ArgsIsa):-argsIsaProps(ArgsIsa).
-type(F):-isa_t(typeDeclarer,F).
+type(F):-hasInstance(typeDeclarer,F).
 type(formattype).
 type(actiontype).
 type(region).
@@ -367,10 +367,6 @@ is_known_trew(subclass(region,channel)).
 is_known_trew(subclass(agent,channel)).
 is_known_trew(isa(agent,createableType)).
 is_known_trew(isa(region,createableType)).
-is_known_trew(isa(_,id)).
-is_known_trew(isa(apath(_,_),areaPath)).
-is_known_trew(isa(apath(_,_),apath)).
-is_known_trew(isa(_,term)).
 is_known_trew(isa(singleValued, completeExtentAsserted)).
 is_known_trew(isa(createableType,completeExtentAsserted)).
 is_known_trew(isa(formattype,completeExtentAsserted)).
@@ -381,7 +377,6 @@ is_known_trew(isa(completeExtentAsserted, type)).
 is_known_trew(subclass(completeExtentAsserted, extentDecidable)).
 is_known_trew(subclass(singleValued, extentDecidable)).
 is_known_trew(subclass('MaleAnimal',agent)).
-is_known_trew(subclass(X,X)).
 is_known_trew(subclass(formattype,type)).
 is_known_trew(isa(type,nonCreatableType)).
 is_known_trew(isa(item,createableType)).
@@ -392,10 +387,19 @@ is_known_trew(isa('TemporallyExistingThing', 'createableType')).
 is_known_trew(isa(term,nonCreatableType)).
 is_known_trew(subclass(argsIsaInList,relation)).
 is_known_trew(subclass(fpred,relation)).
+
+
 is_known_trew(subclass(F,mpred)):-argsIsaProps(F).
 is_known_trew(subclass(F,fpred)):-argsIsaProps(F).
 is_known_trew(subclass(F,relation)):-argsIsaProps(F).
 is_known_trew(disjointWith(A,B)):-disjointWithT(A,B).
+is_known_trew(subclass(X,X)).
+is_known_trew(isa(_,id)).
+is_known_trew(isa(apath(_,_),areaPath)).
+is_known_trew(isa(apath(_,_),apath)).
+is_known_trew(isa(_,term)).
+
+
 
 
 :-dynamic_multifile_exported(is_known_false/1).
@@ -424,7 +428,7 @@ not_mud_isa(formattype,formattype).
 not_mud_isa(subft,type).
 not_mud_isa('TemporallyExistingThing', 'TemporallyExistingThing').
 not_mud_isa(createableType,'TemporallyExistingThing').
-not_mud_isa(Type,formattype):- \+ (isa_t(formattype, Type)).
+not_mud_isa(Type,formattype):- \+ (hasInstance(formattype, Type)).
 not_mud_isa(Type, assertionMacroHead):- \+ (mpred_prop(Type, assertionMacroHead)).
 not_mud_isa(Type, completeExtentAsserted):- \+ (mpred_prop(Type, completeExtentAsserted)).
 not_mud_isa(X,type):-never_type(X).
@@ -452,6 +456,6 @@ disjointWith(A,B):-disjointWithT(A,B).
 disjointWith(A,B):-disjointWithT(AS,BS),transitive_subclass_or_same(A,AS),transitive_subclass_or_same(B,BS).
 disjointWith(A,B):- once((type_isa(A,AT),type_isa(B,BT))),AT \= BT.
 
-:- assert_if_new(isa_t(formattype,string)).
-:- assert_if_new(isa_t(type,container)).
+:- assert_if_new(hasInstance(formattype,string)).
+:- assert_if_new(hasInstance(type,container)).
 

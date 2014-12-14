@@ -32,7 +32,7 @@ was_run_dbg_pl:-is_startup_file('run.pl').
 %:- at_start(slow_work).
 % starts in thread (the the above was commented out)
 % :- at_start(start_servers).
-% :- thread_work.
+%:- thread_work.
 % commented out except on run
 
 

@@ -133,11 +133,11 @@ mpred_arity(Prop,1):-argsIsaProps(Prop).
 mpred_arity(F,A):- current_predicate(F/A).
 mpred_prop(H,PP):-compound(H),predicate_property(H,PP).
 mpred_prop(F,PP):-mpred_arity(F,A),functor(H,F,A),predicate_property(H,PP).
-mpred_prop(P,Prop):- argsIsaProps(Prop),isa_t(Prop, P).
+mpred_prop(P,Prop):- argsIsaProps(Prop),hasInstance(Prop, P).
 mpred_prop(F,Prop):- mpred_arity(F,A),functor(P,F,A),predicate_property(P,Prop).
 mpred_prop(F,type):- type(F).
 mpred_prop(H,PP):- nonvar(H),functor_h(H,F), H \=@= F, !,mpred_prop(F,PP).
-mpred_prop(F,PP):- isa_t(PP,F).
+mpred_prop(F,PP):- hasInstance(PP,F).
 mpred_prop(mpred_prop,prologOnly).
 mpred_prop(mpred_arity,prologOnly).
 mpred_prop(never_type,prologOnly).
@@ -149,11 +149,11 @@ mpred_prop(G,retract_with_pred(del)):- atom(G),assertionMacroHead(G).
 mpred_prop(F,mped_type(Type)):-nonvar(F),once(get_mpred_type(F,Type)).
 
 
-:-dynamic_multifile_exported(isa_t/2).
-% isa_t(type,Prop):-mpred_arity(Prop,1).
+:-dynamic_multifile_exported(hasInstance/2).
+% hasInstance(type,Prop):-mpred_arity(Prop,1).
 
 :-forall(argsIsaProps(F),dynamic(F/1)).
-:-forall(argsIsaProps(F),asserta_if_new(isa_t(typeDeclarer,F))).
+:-forall(argsIsaProps(F),asserta_if_new(hasInstance(typeDeclarer,F))).
 
 
 % pass 2
@@ -273,7 +273,7 @@ dbase2pred2svo(DBASE,PRED,svo(A,F,RGS)):-nonvar(F),must(mpred_arity(F,N)),make_f
 typical_mtvars([_,_]).
 
 % arity 1 person
-make_functorskel(Person,1,fskel(Person,isa_t(Person,A),Call,A,[],MtVars,Call2)):-typical_mtvars(MtVars),Call=..[Person,A],Call2=..[Person,A|MtVars]. 
+make_functorskel(Person,1,fskel(Person,hasInstance(Person,A),Call,A,[],MtVars,Call2)):-typical_mtvars(MtVars),Call=..[Person,A],Call2=..[Person,A|MtVars]. 
 % arity 2 likes
 make_functorskel(Likes,2,fskel(Likes,dbase_t(Likes,A,B),Call,A,B,MtVars,Call2)):- typical_mtvars(MtVars),Call=..[Likes,A,B],Call2=..[Likes,A,B|MtVars]. 
 % arity 3 between
@@ -377,7 +377,7 @@ rescan_mpred_props_lc.
 
 decl_mpred((A,B)):-decl_mpred(A),decl_mpred(B).
 decl_mpred(M):-loop_check_local(with_pi(M,decl_mpred_1),true).
-decl_mpred_1(_,F,F/0):-!,assert_if_new(isa_t(mpred,F)).
+decl_mpred_1(_,F,F/0):-!,assert_if_new(hasInstance(mpred,F)).
 decl_mpred_1(M,PI,F/A):-
    decl_mpred(F,A),
    ignore((ground(PI),compound(PI),decl_mpred(F,argsIsaInList(PI)))),
@@ -387,7 +387,7 @@ decl_mpred_1(M,PI,F/A):-
 decl_mpred(C,More):- ignore(loop_check(decl_mpred_0(C,More),true)).
 
 decl_mpred_0(C,More):- (var(C);var(More)), trace_or_throw(var_decl_mpred(C,More)).
-decl_mpred_0(F,mpred):-!,assert_if_new(isa_t(mpred,F)).
+decl_mpred_0(F,mpred):-!,assert_if_new(hasInstance(mpred,F)).
 decl_mpred_0(_,[]):-!.
 decl_mpred_0(M:FA,More):-atom(M),!,decl_mpred_0(FA,[ask_module(M)|More]).
 decl_mpred_0(F/A,More):-atom(F),!,decl_mpred_1(F,arity(A)),decl_mpred(F,More),!.

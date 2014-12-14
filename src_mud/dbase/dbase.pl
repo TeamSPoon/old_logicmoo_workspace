@@ -744,7 +744,7 @@ db_op_exact(Op,C):- trace_or_throw(unhandled(db_op_exact(Op,C))).
       
 
 
-:-swi_export((dbase_t/1,isa_t/2)).
+:-swi_export((dbase_t/1,hasInstance/2)).
 :- dynamic_multifile_exported((
          % dbase_t/1,
          % dbase_t/2,

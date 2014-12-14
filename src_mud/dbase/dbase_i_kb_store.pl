@@ -110,7 +110,7 @@ into_hilog_form_ic(X,O):- is_list(X),list_to_dbase_t(X,D),into_hilog_form_ic(D,O
 into_hilog_form_ic(X,O):- X=..[F|A],into_hilog_form(X,F,A,O).
 
 % TODO finish negations
-into_hilog_form(X,_,_,isa_t(C,I)):-was_isa(X,I,C),!.
+into_hilog_form(X,_,_,hasInstance(C,I)):-was_isa(X,I,C),!.
 into_hilog_form(X,F,_A,X):- mpred_prop(F,as_is(_Why)),!.
 into_hilog_form(X,F,_A,X):- mpred_prop(F,prologCall),!.
 into_hilog_form(X,dbase_t,_A,X).
@@ -204,7 +204,7 @@ acceptable_xform(From,To):- From \=@= To,  (To = isa(I,C) -> was_isa(From,I,C); 
 was_isa(dbase_t(C,I),I,C):- maybe_typep(C/1),not(prolog_side_effects(C/1)).
 was_isa(dbase_t(C,I),I,C).
 was_isa(isa(I,C),I,C).
-was_isa(isa_t(C,I),I,C).
+was_isa(hasInstance(C,I),I,C).
 was_isa(dbase_t(isa,I,C),I,C).
 was_isa(M:X,I,C):-atom(M),!,was_isa(X,I,C).
 was_isa(X,I,C):-compound(X),functor(X,C,1),!,arg(1,X,I),maybe_typep(C/1),not(prolog_side_effects(C/1)).
@@ -352,7 +352,7 @@ nart_to_atomic(L,L).
 :-dynamic_multifile_exported(is_asserted_mpred/1).
 
 is_asserted_lc_isa(isa,2,isa(I,C)):-!,is_asserted_mpred_clause_isa(I,C).
-is_asserted_lc_isa(isa_t,2,isa_t(C,I)):-!,is_asserted_mpred_clause_isa(I,C).
+is_asserted_lc_isa(hasInstance,2,hasInstance(C,I)):-!,is_asserted_mpred_clause_isa(I,C).
 is_asserted_lc_isa(C,1,G):-arg(1,G,I),!,is_asserted_mpred_clause_isa(I,C).
 
 is_asserted_mpred_clause_isa(I,C):-isa_asserted(C,I).
@@ -533,9 +533,9 @@ retractall_cloc(M,C):-ensure_predicate_reachable(M,C),fail.
 retractall_cloc(M,C):-database_real(retractall,M:C).
 
 
-database_real(assertz,G):- was_isa(G,I,C),isa_t(C,I),!.
-database_real(assertz,G):- was_isa(G,I,C),!,show_call(asserta(isa_t(C,I))).
-database_real(asserta,G):- was_isa(G,I,C),!,asserta_if_new(isa_t(C,I)).
+database_real(assertz,G):- was_isa(G,I,C),hasInstance(C,I),!.
+database_real(assertz,G):- was_isa(G,I,C),!,show_call(asserta(hasInstance(C,I))).
+database_real(asserta,G):- was_isa(G,I,C),!,asserta_if_new(hasInstance(C,I)).
 database_real(P,C):- 
     copy_term(C,CC),
       ignore((once((into_assertable_form(CC,DB), functor_h(C,CF),functor_h(DB,DBF))),DBF \== CF, 

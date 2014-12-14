@@ -46,7 +46,7 @@ deduce_facts(mpred_prop(F,argsIsaInList(ArgTs)),argsIsaInList(ArgTs)):-mpred_ari
 deduce_facts(argsIsaInList(ArgTs),argIsa(F,A,Type)):-ztrace,functor(ArgTs,F,_),arg(A,ArgTs,Type).
 deduce_facts(mpred_prop(F,argsIsaInList(ArgTs)),argIsa(F,A,Type)):-arg(A,ArgTs,Type).
 
-deduce_facts(argIsa(F,_A,Type),[isa(Type,type),isa(F,relation)]):-atom(Type),not(isa_t(formattype,Type)).
+deduce_facts(argIsa(F,_A,Type),[isa(Type,type),isa(F,relation)]):-atom(Type),not(hasInstance(formattype,Type)).
 
 %deduce_facts(B,A):- is_asserted(equivRule(B,A)),not(contains_singletons(A)).
 %deduce_facts(B,A):- is_asserted(equivRule(A,B)),not(contains_singletons(A)).
