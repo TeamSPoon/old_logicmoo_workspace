@@ -33,7 +33,7 @@ user:file_search_path(knowrob,Where):- dbase_rosprolog(Here),file_directory_name
 % :-asserta((library_directory(Where):-ros_library_directory(Where))).
 user:library_directory(Where):-ros_library_directory(Where).
 
-ros_library_directory(WhereF2):-user:file_search_path(knowrob,W),!,once((atom_concat(W,'/*/prolog/',O),
+ros_library_directory(WhereF2):-user:file_search_path(knowrob,W),once((atom_concat(W,'/*/prolog/',O),
   expand_file_name(O,ListE))),member(Where,ListE),normalize_path(Where,WhereF2).
 
 normalize_path(Where,WhereF2):- absolute_file_name(Where,WhereF),prolog_to_os_filename(WhereF,WhereF1),prolog_to_os_filename(WhereF2,WhereF1),!.
@@ -127,11 +127,13 @@ concat_env(Var,Val):-
 
 :- show_call(user:file_search_path(knowrob,_Where)).
 
-:-prolog.
 :- init_ros_package(knowrob_common).
+% :- init_ros_package(prolog_perception).
 :- init_ros_package(knowrob_actions).
 :- init_ros_package(ias_knowledge_base).
+:- init_ros_package(comp_missingobj).
 :- init_ros_package(comp_semantic_map).
-:- forall(ros_package(B),init_ros_package(B)).
+:- init_ros_package(semweb).
+%:- forall(ros_package(B),init_ros_package(B)).
 
 

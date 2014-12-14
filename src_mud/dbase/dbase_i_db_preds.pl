@@ -16,6 +16,10 @@
 % Douglas Miles
 */
 
+:- registerCycPredPlus2([genlPreds/4,genlInverse/4,localityOfObject/4]).
+
+end_of_file.
+
 :- decl_mpred((
 'abbreviationString-PN'/2, 
 'countryName-LongForm'/2, 

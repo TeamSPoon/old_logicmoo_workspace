@@ -16,12 +16,13 @@ was_run_dbg_pl:-is_startup_file('run.pl').
 %:- ensure_loaded('../../swish/logicmoo_run_swish').
 :- debug.
 
-% run_tests includes run_common 
-:-include(run_tests).
-
+:- ensure_loaded('../xperimental/src_incoming/dbase/dbase_rosprolog').
 :- ensure_loaded('../xperimental/src_incoming/dbase/dbase_rdf_store').
 :- prolog.
-:- ensure_loaded('../xperimental/src_incoming/dbase/dbase_rosprolog').
+
+
+% run_tests includes run_common 
+:- include(run_tests).
 
 % [Optionaly] re-define load_default_game
 % load_default_game:- load_game(logicmoo('rooms/startrek.all.plmoo')).
