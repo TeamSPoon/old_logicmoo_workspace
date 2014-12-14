@@ -1,0 +1,27 @@
+# modelName=urn:ftd:cogchar.org:2012:runtime#lifter_sheet_22
+# modelSize=4974
+
+
+
+
+@prefix ccrt:    <urn:ftd:cogchar.org:2012:runtime#> .
+@prefix cs:      <http://www.cogchar.org/schema/scene#> .
+@prefix lc:      <http://www.cogchar.org/lift/config#> .
+@prefix lci:     <http://www.cogchar.org/lift/config/instance#> .
+@prefix liftcmd:  <http://www.cogchar.org/lift/config/command#> .
+@prefix liftconfig:  <http://www.cogchar.org/lift/config/configroot#> .
+@prefix liftqa:  <http://www.cogchar.org/lift/question_and_answer#> .
+@prefix liftquery:  <http://www.cogchar.org/lift/action/query#> .
+@prefix liftreg:  <http://www.cogchar.org/lift/action/registration#> .
+@prefix liftsessionvar:  <http://www.cogchar.org/lift/config/sessionVariable#> .
+@prefix liftvar:  <http://www.cogchar.org/lift/config/variable#> .
+@prefix path:    <http://www.cogchar.org/schema/path/definition#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix scenetrig:  <http://www.cogchar.org/schema/scene/trigger#> .
+@prefix thinganim:  <http://www.cogchar.org/schema/thinganim/definition#> .
+
+liftconfig:_M1L1P2
+      rdf:type ccrt:liftconfig ;
+      lc:template (liftvar:a liftvar:b liftvar:c liftvar:d) .
+
+
