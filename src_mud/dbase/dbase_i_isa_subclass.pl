@@ -313,31 +313,27 @@ into_single_class('&'(A,Var),VV):-var(Var),!,into_single_class(A,VV).
 into_single_class('&'(A,B),VV):-!, into_single_class((B),VV);into_single_class((A),VV).
 into_single_class(A,A).
 
+:- swi_export((transitive_subclass_or_same/2)).
+transitive_subclass_or_same(A,A).
+transitive_subclass_or_same(A,B):-transitive_subclass(A,B).
+
 :- swi_export((transitive_subclass/2)).
 transitive_subclass(_,T):-T==formattype,!,fail.
 transitive_subclass(A,_):-A==formattype,!,fail.
 transitive_subclass(A,T):- bad_idea,!, into_single_class(A,AA), into_single_class(T,TT), fact_loop_checked(subclass(A,T),transitive_P_l_r(dbase_t,subclass,AA,TT)).
 transitive_subclass(I,T):- stack_check,((thlocal:useOnlyExternalDBs,!);thglobal:use_cyc_database),
    fact_loop_checked(subclass(I,T),transitive_P_l_r(cyckb_t,genls,I,T)).
-transitive_subclass(A,T):- fact_loop_checked(subclass(A,T),transitive_P_l_r(dbase_t,subclass,A,T)).
+transitive_subclass(A,T):- fact_loop_checked(subclass(A,T),transitive_P(dbase_t,subclass,A,T)).
 
-      
-transitive_subclass_or_same(A,A).
-% transitive_subclass_or_same(A,AA):-compound(A),into_single_class(A,AA).
-transitive_subclass_or_same(A,B):-nonvar(A),!,build_genls_inst_list_cache(A,subclass,B,Call),Call.
-transitive_subclass_or_same(A,B):-transitive_subclass(A,B).
+transitive_P(DB,P,L,R):-call(DB,P,L,R).
+transitive_P(DB,P,L,R):-var(L),!,transitive_P_r_l(DB,P,L,R).
+transitive_P(DB,P,L,R):-transitive_P_l_r(DB,P,L,R).
 
-transitive_P_l_r(DB,P,FT,Sub):-call(DB,P,FT,Sub).
-transitive_P_l_r(DB,P,FT,Sub):-var(FT),!,transitive_P_r_l(DB,P,FT,Sub).
-transitive_P_l_r(DB,P,FT,Sub):-call(DB,P,FT,A),call(DB,P,A,Sub).
-transitive_P_l_r(DB,P,FT,Sub):-call(DB,P,FT,A),call(DB,P,A,B),call(DB,P,B,Sub).
-transitive_P_l_r(_,_P,_FT,Sub):-var(Sub),!,fail.
-transitive_P_l_r(DB,P,FT,Sub):-call(DB,P,FT,A),call(DB,P,A,B),call(DB,P,B,C),call(DB,P,C,Sub).
+transitive_P_l_r(DB,P,L,R):-call(DB,P,L,A1),(call(DB,P,A1,R);call(DB,P,A1,A2),call(DB,P,A2,R)).
+transitive_P_l_r(DB,P,L,R):-nonvar(R),call(DB,P,L,A1),call(DB,P,A1,A2),call(DB,P,A2,A3),call(DB,P,A3,R).
 
-transitive_P_r_l(DB,P,FT,Sub):-call(DB,P,A,Sub),call(DB,P,FT,A).
-transitive_P_r_l(DB,P,FT,Sub):-call(DB,P,B,Sub),call(DB,P,A,B),call(DB,P,FT,A).
-transitive_P_r_l(_,_P,_FT,Sub):-var(Sub),!,fail.
-transitive_P_r_l(DB,P,FT,Sub):-call(DB,P,C,Sub),call(DB,P,B,C),call(DB,P,A,B),call(DB,P,FT,A).
+transitive_P_r_l(DB,P,L,R):-call(DB,P,A1,R),(call(DB,P,L,A1);call(DB,P,A2,A1),call(DB,P,L,A2)).
+transitive_P_r_l(DB,P,L,R):-nonvar(L),call(DB,P,A3,R),call(DB,P,A2,A3),call(DB,P,A1,A2),call(DB,P,L,A1).
 
 
 

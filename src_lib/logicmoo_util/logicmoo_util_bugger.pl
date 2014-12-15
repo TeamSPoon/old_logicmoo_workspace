@@ -521,6 +521,8 @@ has_gui_debug :- getenv('DISPLAY',NV),NV\==''.
 
 :-export(set_no_debug/0).
 
+
+
 set_no_debug:- 
    retractall(ifCanTrace),
    retractall(ifWontTrace),
@@ -1100,6 +1102,7 @@ moo_hide_show_childs(M,F,A,_MPred):-
 
 :-thread_local(ifCanTrace/0).
 % thread locals should defaults to false: ifCanTrace.
+ifCanTrace.
 
 isConsole :- telling(user).
 isConsole :- current_output(X),!,stream_property(X,alias(user_output)).
@@ -1568,7 +1571,14 @@ check_thread_local(TL:Head):-slow_sanity(( predicate_property(TL:Head,(dynamic))
 
 :-thread_local(tlbugger:dmsg_hidden/1).
 :-meta_predicate_transparent(with_all_dmsg(0)).
-with_all_dmsg(Call):-with_no_assertions(tlbugger:dmsg_hidden(_),Call).
+
+with_all_dmsg(Call):-
+  bugger_flag(opt_debug=WAS),
+   setup_call_cleanup(
+     set_prolog_flag(opt_debug,true),
+      with_no_assertions(tlbugger:dmsg_hidden(_),Call),
+      set_prolog_flag(opt_debug,WAS)).
+
 :-meta_predicate_transparent(with_no_dmsg(0)).
 with_no_dmsg(Call):-with_assertions(tlbugger:dmsg_hidden(_),Call).
 with_no_dmsg(Shown,Call):-with_assertions(tlbugger:dmsg_hidden(Shown),Call).
@@ -2458,6 +2468,8 @@ show_and_do(C):-dmsg(C),!,traceok(C).
 dtrace:-dtrace(trace).
 
 
+% esa Michele Murer 360-750-7500 ext_135
+
 %dtrace:- skipWrapper,!,dmsg(dtrace_skipWrapper).
 dtrace(G):-tracing,!,write(dtrace(G)),nl,notrace,leash(+call),dtrace(G).
 dtrace(G):-write(dtrace(G)),nl,has_auto_trace(C),!,C.
@@ -2465,9 +2477,9 @@ dtrace(G):-repeat,debug,dumptrace(G),!.
 
 dumptrace(_):-tracing,!,leash(+call).
 dumptrace(G):- not(ifCanTrace),!,notrace((fmt((not(ifCanTrace(G)))))),!,snumbervars(G),!,notrace(dumpST).
-dumptrace(G):- notrace((fmt(in_dumptrace(G)),leash(+exception),get_single_char(C))),dumptrace(G,C).
+dumptrace(G):- fmt(in_dumptrace(G)),leash(+exception),show_call(get_single_char(C)),with_all_dmsg(dumptrace(G,C)).
 dumptrace(_,0'g):-notrace(dumpST),!,fail.
-dumptrace(G,0'l):-notrace((ggtrace,!,G)).
+dumptrace(G,0'l):-notrace(ggtrace),!,G.
 dumptrace(_,0'b):-debug,prolog,!,fail.
 dumptrace(_,0'a):-abort.
 dumptrace(_,0'e):-halt(1).
@@ -2478,7 +2490,7 @@ dumptrace(_,0't):-visible(+all),leash(+all),trace,!.
 dumptrace(G,0't):-show_and_do(grtrace(G)).
 dumptrace(_,10):-dumptrace_ret,!.
 dumptrace(_,13):-dumptrace_ret,!.
-dumptrace(_,C):-dmsg(unused_keypress(C)),!,fail.
+dumptrace(_,C):-fmt(unused_keypress(C)),!,fail.
 
 dumptrace_ret:-leash(+all),visible(+all),visible(+unify),trace.
 

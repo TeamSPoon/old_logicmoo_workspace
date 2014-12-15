@@ -237,7 +237,7 @@ subclass(houseplant, partof).
 subclass(planter, container). 
 subclass(gueridon, living_room_furnature).
 subclass(garden_plant, outdoor_furnature).
-subclass(spatialthing,visible).
+subclass(spatialthing,lookable).
 subclass(nani,teddybear).
 subclass(teddybear,treasure).
 

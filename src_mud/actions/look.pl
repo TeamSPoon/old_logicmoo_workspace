@@ -85,7 +85,7 @@ call_look_proc(Agent,LOC):-
          call(show_room_grid(region)),
          atloc(Agent,value),
          nameStrings(region,value),
-         forEach(descriptionHere(region,Value),fmt(region_desc(Value))),
+         forEach(description(region,Value),fmt(region_desc(Value))),
          events=deliverable_location_events(Agent,LOC,value),
          path(D) = pathBetween_call(region,D,value),
          pathName(D) = pathName(region,D,value),

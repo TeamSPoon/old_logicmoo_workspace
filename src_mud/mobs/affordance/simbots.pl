@@ -385,13 +385,13 @@ defined_affordance([objType= layable,actionVerb= "Sleep",
    'Comfort'= 5 * 5,
    'Energy'= 20 * 20]).
 
-defined_affordance([alsoType= visible,actionVerb= "Clean",
+defined_affordance([alsoType= lookable,actionVerb= "Clean",
    textName= "Clean",
    slAnim= anim_FINGER_WAG,
    'Fun'= -2 * 2,
    'Energy'= 0 * -1]).
 
-defined_affordance([alsoType= visible,actionVerb= "Observe",
+defined_affordance([alsoType= lookable,actionVerb= "Observe",
    textName= "Observe",
    maximumDistance= 5,
    slAnim= anim_CLAP,
@@ -407,7 +407,7 @@ slAnim= animETWO_PUNCH,
 defined_affordance([objType= agent,actionVerb= "tickle",
 textName= "Play with",
 slAnim= anim_SHOOT_BOW_L,
-alsoType= visible,
+alsoType= lookable,
 'Energy'= -10 * -10,
 'Fun'= 20 * 10]).
 
@@ -419,14 +419,14 @@ slAnim= anim_DRINK,
 
 defined_affordance([objType= agent,actionVerb= "Argue",
 textName= "Argue",
-alsoType= visible,
+alsoType= lookable,
 slAnim= anim_ONETWO_PUNCH,
 'Energy'= -11 * -20]).
 
 defined_affordance([objType= agent,actionVerb= "Talk",
 textName= "Talk to",
 maximumDistance= 3,
-alsoType= visible,
+alsoType= lookable,
 slAnim= anim_TALK,
 'NonLoneliness_Social'= 11 * 20]).
 
@@ -441,7 +441,7 @@ slAnim= anim_BLOW_KISS,
 'NonLoneliness_Social'= 11 * 20,
 'Fun'= 21 * 20]).
 
-defined_affordance([objType= visible,actionVerb= "Think_About",
+defined_affordance([objType= lookable,actionVerb= "Think_About",
 textName= "Think about",
 slAnim= anim_SHRUG,
 'Fun'= 1 * 2]).
@@ -586,12 +586,12 @@ verb_for_type(put_x_on, hassurface).
 verb_for_type(eat, consumable).
 verb_for_type(take, takeable).
 verb_for_type(sleep, layable).
-verb_for_type(clean, visible).
-verb_for_type(observe, visible).
+verb_for_type(clean, lookable).
+verb_for_type(observe, lookable).
 verb_for_type(excersize, sittable).
 verb_for_type(tickle, agent).
 verb_for_type(search, container).
-verb_for_type(think_about, visible).
+verb_for_type(think_about, lookable).
 
 
 

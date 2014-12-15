@@ -274,7 +274,7 @@ verb_alias('where is','where').
 % pos_word_formula('infinitive',Verb,Formula):- 'infinitive'(TheWord, Verb, _, _G183), 'verbSemTrans'(TheWord, 0, 'TransitiveNPCompFrame', Formula, _, _).
 
 verb_alias_to_verb(IVERB,SVERB):- verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.
-verb_alias_to_verb(IVERB,SVERB):-specifiedItemType(IVERB,verb,SVERB), IVERB \= SVERB.
+verb_alias_to_verb(IVERB,SVERB):- specifiedItemType(IVERB,verb,SVERB), IVERB \= SVERB.
 
 subst_parser_vars(Agent,TYPEARGS,TYPEARGS_R):- subst(TYPEARGS,self,Agent,S1),where_atloc(Agent,Here),subst(S1,here,Here,TYPEARGS_R).
 
@@ -485,10 +485,10 @@ parseIsa(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{specifiedItem
 specifiedItemType(String,Type,Inst):- (var(String);var(Type)),trace_or_throw(var_specifiedItemType(String,Type,Inst)).
 specifiedItemType([String],Type,Inst):-!,specifiedItemType(String,Type,Inst).
 specifiedItemType(String,not(Type),Inst):-!,not(specifiedItemType(String,Type,Inst)).
-specifiedItemType(String,Type,Inst):- not(formattype(Type)),must(type(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
 specifiedItemType(String,Type,Inst2):- get_term_specifier_text(Inst,Type),equals_icase(Inst,String),!,must(Inst=Inst2).
 specifiedItemType(String,Type,Inst):- formattype(Type),checkAnyType(assert(parse),String,Type,AAA),Inst=AAA.
 specifiedItemType(String,Type,Longest) :- findall(Inst, (get_term_specifier_text(Inst,Type),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
+specifiedItemType(String,Type,Inst):- not(formattype(Type)),must(type(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
 
 instances_of_type(Inst,Type):- no_repeats(isa(Inst,Type)).
 

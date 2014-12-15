@@ -129,7 +129,7 @@ look(agent(Agent),theme(Theme)) :- % -->
 look(agent(Agent),theme(Theme)) :- % -->
 %   <preconds>
 	notk(here(Theme)),
-	k(visible(Theme)),
+	k(lookable(Theme)),
 %	</preconds>
 %	<effects>
 	add(describe(Theme)).

@@ -67,10 +67,10 @@ call_agent_action(Agent,CMDI):-
       call(Wrapper, call_agent_action_lc(Agent,CMD)))).
 
 :-swi_export(where_atloc/2).
-where_atloc(Agent,Where):-localityOfObject(Agent,Where).
 where_atloc(Agent,Where):-atloc(Agent,Where).
+where_atloc(Agent,Where):-localityOfObject(Agent,Where).
 where_atloc(Agent,Where):-atloc(Agent,Loc),!,locationToRegion(Loc,Where).
-where_atloc(_Agent,'OffStage'):-!.
+where_atloc(Agent,'OffStage'):-nonvar(Agent).
 
 call_agent_action_lc(Agent,CMD):-
    % start event
