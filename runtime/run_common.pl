@@ -65,8 +65,8 @@ within_user(Call):- '@'(Call,'user').
 user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog').
 user:file_search_path(weblog, 'C:/Users/Administrator/AppData/Roaming/SWI-Prolog/pack/weblog').
 user:file_search_path(weblog, '/usr/lib/swi-prolog/pack/weblog/prolog'):-current_prolog_flag(unix,true).
-user:file_search_path(cliopatria, '../external/ClioPatria'). % :- current_prolog_flag(unix,true).
-user:file_search_path(swish, '../external/swish'):- current_prolog_flag(unix,true).
+user:file_search_path(cliopatria, '../externals/ClioPatria'). % :- current_prolog_flag(unix,true).
+user:file_search_path(swish, '../externals/swish'):- current_prolog_flag(unix,true).
 
 :- user_use_module(library(settings)).
 
@@ -124,8 +124,7 @@ start_servers :- startup_mod:if_version_greater(70111,slow_work).
 
 startup_mod:run_setup_now:-
    within_user((
-      load_game_files,
-      doall(atloc(_,_))
+      load_game_files      
    % TO UNDO register_timer_thread(npc_ticker,90,npc_tick)
    )).
 

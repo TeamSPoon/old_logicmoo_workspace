@@ -102,7 +102,7 @@ call_look_proc(Agent,LOC):-
        ]).
 
 
-looking(Agent):- get_session_id(O), thlocal:session_agent(O,Agent),!.
+looking(Agent):- current_agent(Agent),!.
 looking(Agent):- agent(Agent). % ,thinking(Agent).
 
 % ********** TOP LEVEL PREDICATE: this is the predicate agents use to look

@@ -6,7 +6,7 @@
 
 % [Optionaly 1st run] tell where ClioPatria is located and restart
 
-:-set_setting(cliopatria_binding:path, '../../ClioPatria'), save_settings('moo_settings.db').
+:-set_setting(cliopatria_binding:path, '../externals/ClioPatria'), save_settings('moo_settings.db').
 */
 
 :- use_module(library(settings)).
@@ -24,7 +24,7 @@
 http:location(cliopatria, root(cliopatria), [priority(100)]).
 
 
-:- setting(path, atom, '../../ClioPatria', 'Path to root of cliopatria install').
+:- setting(path, atom, '../externals/ClioPatria', 'Path to root of cliopatria install').
 
 % :- load_settings('moo_settings.db').
 

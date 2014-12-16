@@ -1,0 +1,368 @@
+/** <module> 
+% This file contains the definitions for the objects in a household
+% To create a new world, simply change the object definitions as
+% described below (or in manual)
+%
+% *******Object definitions*******
+%.
+% Use the label_type_props(label,typecode,[property1,property2,etc.]]).
+% label is whats used to refer to the object in the running world
+% typecode is whats used to refer to the object for initialization (see world.pl)
+% ===============================================================================================
+%    by Mea_culpa
+% ===============================================================================================
+*/
+
+:- style_check(-singleton).
+:- style_check(-discontiguous).
+:- style_check(-atom).
+
+% assertOnLoad(X):-game_assert(X).
+
+% ==================================================
+% Mud Dictionary
+% ==================================================
+
+:-dynamic(mud_dictionary/2).
+
+:-decl_mpred_hybrid(mud_dictionary(text,text)).
+
+parser_equiv_text(A,B):-mud_dictionary(A,B).
+
+mud_dictionary([dining,region],['dining_room']).
+mud_dictionary([washing,machine],['washing_machine']).
+mud_dictionary([my,body],['self']).
+mud_dictionary([back,yard],['back_yard']).
+mud_dictionary([stand,table],['stand_table']).
+mud_dictionary([light,switch],[light_switch]).
+mud_dictionary([living,region],['living_room']).
+mud_dictionary([easy,chair],[easy_chair]).
+mud_dictionary([coffee,table],[coffee_table]).
+mud_dictionary([coffee,cup],[coffee_cup]).
+mud_dictionary([top,drawer],[top_drawer]).
+mud_dictionary([middle,drawer],[middle_drawer]).
+mud_dictionary([bottom,drawer],[bottom_drawer]).
+mud_dictionary([anthurium,crystallinum],[anthurium_crystallinum]).
+
+
+
+:- onSpawn(agent(player)).
+
+% ==================================================
+% Rooms
+% ==================================================
+
+:-op(600,fx,onSpawn).
+
+:-decl_mpred(region(id),type).
+
+:-onSpawn region(kitchen).
+:-onSpawn region(hall).
+:-onSpawn region(cellar).
+:-onSpawn region(office_room).
+:-onSpawn region(living_room).
+:-onSpawn region(dining_room).
+:-onSpawn region(bed_room).
+:-onSpawn region(bath_room).
+:-onSpawn region(closet_room).
+:-onSpawn region(back_yard).
+
+
+% ==================================================
+% Doors
+% ==================================================
+
+:-decl_mpred_hybrid(doorBetween(region,region),symmetric).
+
+:-onSpawn doorBetween(living_room,office_room).
+:-onSpawn doorBetween(hall,dining_room).
+:-onSpawn doorBetween(hall,bed_room).
+:-onSpawn doorBetween(hall,living_room).
+:-onSpawn doorBetween(hall,bath_room).
+:-onSpawn doorBetween(kitchen, cellar).
+:-onSpawn doorBetween(dining_room, kitchen).
+:-onSpawn doorBetween(bed_room, closet_room).
+:-onSpawn doorBetween(kitchen, back_yard).
+
+:-onSpawn doorBetween(kitchen, 'Area1000').
+
+:-onSpawn pathBetween('Area1000',"s",'kitchen').
+:-onSpawn pathBetween('kitchen',nospawn("n"),'Area1000').
+
+:-export(doorsConnect/2).
+:-decl_mpred_hybrid(doorsConnect(region,region)).
+
+doorBetween(R1,R2):-pathBetween(R1,_,R2).
+
+doorsConnect(Thing,Noun2):- doorBetween(Thing,Noun2); doorBetween(Noun2,Thing).
+
+addPathBetweens:- doall((no_repeats(doorsConnect(R1,R2)),must_det(ensure_some_pathBetween(R1,R2)))).
+
+ensure_some_pathBetween(R1,R2):- pathBetween(R1,_Dir,R2),!.
+ensure_some_pathBetween(R1,R2):- random_instance(dir,Dir,atom_length(Dir,1)),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
+   add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)),!.
+ensure_some_pathBetween(R1,R2):- split_name_type(R2,_,Isa), any_to_string(Isa,Str), any_to_dir(Str,Dir),show_call(add(pathBetween(R1,Dir,R2))).
+
+:-onLoad(addPathBetweens).
+
+% ==================================================
+% Where Things are Located
+% ==================================================
+
+%:-dynamic(localityOfObject/2).
+%:-multifile(localityOfObject/2).
+
+subclass(region,region).
+
+:-decl_mpred_hybrid(localityOfObject(obj,spatialthing)).
+
+:-decl_mpred_hybrid(localityOfObject(kappa(Self,subclass(Self,obj)),kappa(Self2,subclass(Self2,spatialthing)))).
+:-op(600,fx,onSpawn).
+
+% onSpawn(_).
+	
+
+:-onSpawn localityOfObject(desk, office_room).
+:-onSpawn localityOfObject(apple(color(red)), kitchen).
+:-onSpawn localityOfObject(apple(color(green)), kitchen).
+:-onSpawn localityOfObject(flashlight, desk).
+:-onSpawn localityOfObject(washing_machine, cellar).
+:-onSpawn localityOfObject(nani, washing_machine).
+:-onSpawn localityOfObject(broccoli, kitchen).
+:-onSpawn localityOfObject(crackers, kitchen).
+:-onSpawn localityOfObject(computer, desk).
+:-onSpawn localityOfObject(envelope, desk).
+:-onSpawn localityOfObject(stamp, envelope).
+:-onSpawn localityOfObject(key, envelope).
+:-onSpawn localityOfObject(bed, bed_room).
+:-onSpawn localityOfObject(stand_table, bed_room).
+:-onSpawn localityOfObject(pajamas, stand_table).
+:-onSpawn localityOfObject(shirt, closet_room).
+:-onSpawn localityOfObject(pillow, bed).
+:-onSpawn localityOfObject(blanket, bed).                                                              
+:-onSpawn localityOfObject(table, kitchen).
+:-onSpawn localityOfObject(coat, closet_room).
+:-onSpawn localityOfObject(pants, closet_room).
+:-onSpawn localityOfObject(light_switch, bed_room).
+:-onSpawn localityOfObject(ball, back_yard).
+:-onSpawn localityOfObject(sofa, living_room).
+:-onSpawn localityOfObject(easy_chair, living_room).
+:-onSpawn localityOfObject(coffee_table, living_room).
+:-onSpawn localityOfObject(coffee_cup, kitchen).
+:-onSpawn localityOfObject(coffee, coffee_cup).
+:-onSpawn localityOfObject(book(color(green)), coffee_table).
+:-onSpawn localityOfObject(book(color(pink)), coffee_table).
+:-onSpawn localityOfObject(bookcase, living_room).
+:-onSpawn localityOfObject(dresser, bed_room).
+:-onSpawn localityOfObject(top_drawer, dresser).
+:-onSpawn localityOfObject(middle_drawer, dresser).
+:-onSpawn localityOfObject(bottom_drawer, dresser). 
+:-onSpawn localityOfObject(houseplant, planter).
+:-onSpawn localityOfObject(planter, gueridon). 
+:-onSpawn localityOfObject(gueridon, living_room).
+:-onSpawn localityOfObject(garden_plant, back_yard).
+:-onSpawn localityOfObject(candle,kitchen).
+:-onSpawn localityOfObject(bathtub,bath_room).
+:-onSpawn localityOfObject(shower,bath_room).
+:-onSpawn localityOfObject(toilet,bath_room).
+:-onSpawn localityOfObject(treadmill,hall).
+:-onSpawn localityOfObject(sink,bath_room).
+:-onSpawn localityOfObject(kitchen_sink,kitchen_counter).
+:-onSpawn localityOfObject(fridge,kitchen).
+:-onSpawn localityOfObject(stove,kitchen).
+:-onSpawn localityOfObject(kitchen_counter,kitchen).
+
+
+subclass(candle,portable_device).
+subclass(flashlight, portable_device).
+subclass(desk, office_room_furnature).
+subclass(apple, food).
+subclass(nani, art).
+subclass(nani, washable).
+subclass(clothing, washable).
+subclass(nani, portable).
+subclass(broccoli, food).
+subclass(crackers, food).
+subclass(envelope, office_item).
+subclass(stamp, office_item).
+subclass(key, office_item).
+subclass(ball, throwable).
+
+subclass(pajamas, clothing).
+subclass(shirt, clothing).
+subclass(coat, clothing).
+subclass(pants, clothing).
+subclass(clothing, foldable).
+subclass(clothing, wearable).
+
+subclass(coffee_cup, liquid_container).
+subclass(coffee_cup, drinkable).
+subclass(coffee_cup, throwable).
+subclass(coffee, liquid).
+subclass(book, readable).
+
+subclass(pillow, bedding).
+subclass(blanket, bedding).                                                              
+subclass(bedding, foldable).
+subclass(foldable, portable).
+subclass(throwable, portable).
+subclass(portable_device,portable).
+subclass(device,useable).
+subclass(wearable, portable).
+subclass(portable,takeable).
+subclass(food,takeable).
+subclass(takeable,obj).
+subclass(partof,not_takable).
+
+subclass(light_switch, wall_furnature).
+subclass(computer, office_furnature).
+subclass(partof_furnature,partof).
+
+subclass(bed, bed_room_furnature).
+subclass(stand_table, bed_room_furnature).
+subclass(dresser, bed_room_furnature).
+
+subclass(washing_machine, device_furnature).
+subclass(table, furnature).
+subclass(table, hassurface).
+subclass(sofa, living_room_furnature).
+subclass(easy_chair, living_room_furnature).
+subclass(coffee_table, living_room_furnature).
+subclass(bookcase, wall_furnature).
+subclass(drawer, container).
+subclass(drawer, openable).
+subclass(drawer, closeable).
+subclass(drawer, partof_furnature).
+subclass(top_drawer, partof_furnature).
+subclass(middle_drawer, partof_furnature).
+subclass(bottom_drawer, partof_furnature). 
+subclass(houseplant, partof).
+subclass(planter, container). 
+subclass(gueridon, living_room_furnature).
+subclass(garden_plant, outdoor_furnature).
+subclass(spatialthing,lookable).
+subclass(nani,teddybear).
+subclass(teddybear,treasure).
+
+subclass(bathtub,bath_room_furnature).
+subclass(shower,bath_room_furnature).
+subclass(toilet,bath_room_furnature).
+subclass(sink,bath_room_furnature).
+subclass(kitchen_sink,kitchen_furnature).
+subclass(fridge,kitchen_furnature).
+subclass(stove,kitchen_furnature).
+subclass(kitchen_counter,kitchen_furnature).
+
+/*
+:-dynamic(loc_s/2).
+
+
+(WAS FOR ANOTHER SYSTEM)
+
+locaton_s(item_template(RealObj,D1,D2,Weight),Place):-
+	localityOfObject(RealObj,Place),item_template(RealObj,D1,D2),
+	member(weight(Weight),D2),!.
+locaton_s(item_template(RealObj,D1,D2,0),Place):-
+	localityOfObject(RealObj,Place), item_template(RealObj,D1,D2).	
+
+*/
+
+
+:-export(setTemplate/1).
+
+
+% ==================================================
+% item_template Descriptions
+% ==================================================
+
+% :-dynamic(item_template/3).
+:-op(600,fx,setTemplate).
+
+
+:-setTemplate item_template(candle,[color(blue),size(small),shape(triangular),material(wax),texture(sticky)]).
+:-setTemplate item_template(red_apple,[color(red),size(small),shape(round),isa(fruit),texture(smooth)]).
+:-setTemplate item_template(green_apple,[color(eachOf(green,pastel)),size(small),shape(round),isa(fruit),texture(smooth)]).
+:-setTemplate item_template(table,[color(eachOf(blue,white)),size(large),shape(oval),material(wood),texture(eachOf(bumpy,irregular)),weight(50)]).
+:-setTemplate item_template(pillow,[color(white),size(medium),shape(rectangular),material(eachOf(cotton,flannel)),texture(eachOf(fluffy,soft))]).
+:-setTemplate item_template(blanket,[color(eachOf(green,dark)),size(eachOf(large,bulky)),shape(rectangular),material(rayon),texture(eachOf(plush,soft))]).                                                              
+:-setTemplate item_template(stand_table,[color(eachOf(black,shiney)),size(medium),shape(eachOf(cubular,rectangular)),material(wood),texture(smooth),weight(25)]).
+:-setTemplate item_template(pajams,[color(eachOf(blue,pastel)),size(eachOf(medium,fits)),shape(unique),material(eachOf(cotton,rayon)),texture(soft)]).
+:-setTemplate item_template(shirt,[color(black),size(eachOf(medium,fits)),shape(like(shape,torso)),material(cotton),texture(eachOf(soft,threadbare))]).
+:-setTemplate item_template(flashlight,[color(yellow),size(eachOf(medium,small)),shape(cylindrical),material(plastic),texture(ribbed)]).
+:-setTemplate item_template(key,[color(silver),size(eachOf(small,tiny)),shape(unique),material(metal),texture(eachOf(ridged,bumpy))]).
+:-setTemplate item_template(envelope,[color(white),size(small),shape(rectangular),material(paper),texture(smooth)]).
+:-setTemplate item_template(desk,[color(eachOf(brown,shiney)),size(large),shape(eachOf(cubular,rectangular)),texture(eachOf(smooth,ridged)),weight(175)]).
+:-setTemplate item_template(washing_machine,[color(white),size(large),shape(eachOf(cubular,square)),material(metal),texture(smooth),weight(125)]).
+:-setTemplate item_template(broccoli,[color(green),size(small),shape(like(shape,tree)),isa(vegetable),texture(eachOf(porous,bumpy))]).                                                                    
+:-setTemplate item_template(crackers,[color(tan),isa(bread),shape(eachOf(circular,flat)),size(small),texture(eachOf(dry,coarse))]).
+:-setTemplate item_template(computer,[color(grey),material(plastic),shape(eachOf(cubular,rectangular)),size(medium),texture(smooth)]).
+:-setTemplate item_template(stamp,[color(polychromatic),size(eachOf(tiny,thin)),shape(square),material(paper),texture(eachOf(smooth,sticky))]).
+:-setTemplate item_template(coat,[color(black),size(eachOf(medium,fits)),shape(like(shape,torso)),material(eachOf(wool,cotton,rayon)),texture(coarse)]).
+:-setTemplate item_template(pants,[color(black),size(eachOf(medium,fits)),shape(like(shape,ass)),material(denim),texture(coarse)]).
+:-setTemplate item_template(nani,[color(brown),color(white),size(medium),shape(like(shape,teddybear)),material(plush),texture(eachOf(fuzzy,soft))]).
+:-setTemplate item_template(light_switch,[color(cream),size(small),shape(rectangular),material(plastic),texture(smooth)]).
+% :- onSpan((etrace)).
+:-setTemplate item_template(ball,[color(red),size(medium),shape(spherical),material(rubber),texture(bumpy)]).
+:-setTemplate item_template(coffee,[color(eachOf(black,brown)),size(small),shape(fluid),material(liquid),texture(wet)]).
+:-setTemplate item_template(coffee_cup,[color(black),color(brown),size(small),shape(cuplike),material(glass),texture(smooth)]).
+:-setTemplate item_template(sofa,[color(eachOf(blue,dark)),size(eachOf(large,wide,long)),shape(polyhedral),material(eachOf(poplin,wood)),texture(ribbed),weight(125)]).
+:-setTemplate item_template(easy_chair,[color(blue),size(eachOf(large,narrow)),shape(polyhedral),material(eachOf(poplin,wood)),texture(ribbed),weight(75)]).
+:-setTemplate item_template(coffee_table,[color(eachOf(brown,shiney)),size(medium),shape(circular),material(wood),texture(smooth),weight(35)]).
+:-setTemplate item_template(book_type_a,[color(green),color(white),color(black),size(small),shape(eachOf(cubular,rectangular)),material(paper),texture(smooth)]).
+:-setTemplate item_template(book_type_b,[color(pink),color(white),color(black),size(small),shape(eachOf(cubular,rectangular)),material(paper),texture(smooth)]).
+:-setTemplate item_template(bookcase,[color(eachOf(brown,dark,shiney)),size(large),shape(eachOf(square,concave_polyhedron)),material(wood),texture(smooth),weight(60)]).
+:-setTemplate item_template(dresser,[color(eachOf(brown,shiney)),size(large),shape(eachOf(rectangular,polyhedral)),material(wood),texture(smooth),weight(45)]).
+:-setTemplate item_template(top_drawer,[color(eachOf(brown,shiney)),size(medium),shape(eachOf(rectangular,concave_polyhedron)),material(wood),texture(smooth)]). 
+:-setTemplate item_template(middle_drawer,[color(eachOf(brown,shiney)),size(medium),shape(eachOf(rectangular,concave_polyhedron)),material(wood),texture(smooth)]).
+:-setTemplate item_template(bottom_drawer,[color(eachOf(brown,shiney)),size(medium),shape(eachOf(rectangular,concave_polyhedron)),material(wood),texture(smooth)]).
+:-setTemplate item_template(planter,[color(eachOf(pastel,blue)),size(medium),shape(eachOf(cylindrical,trapezohedron)),material(clay),texture(abrasive),weight(15)]).
+:-setTemplate item_template(houseplant,[color(green),size(medium),shape(anthurium_crystallinum),material(plant_tissue),texture(smooth)]).
+:-setTemplate item_template(gueridon,[color(eachOf(brown,shiney)),size(medium),shape(circular),material(wood),texture(smooth),weight(25)]).		 
+
+
+
+:-setTemplate item_template(teddybear,[color(natural),shape(unique)]).
+:-setTemplate item_template(torso,[color(like(color,skin)),shape(unique)]).
+:-setTemplate item_template(skin,[color(unique),shape(unique)]).
+
+/****************************
+
+
+REST IS UNUSED 
+
+(WAS FOR ANOTHER SYSTEM)
+
+:-dynamic(property/2).
+:-dynamic(subpart/2).  
+
+property(Obj,Words):-
+	((Obj =..[Type,Spec] ; (Obj=Type,Spec=[]))),!,
+	get_property(Type,Spec,Pro),
+	transform_property(Pro,Property),
+	Property=..Words.
+
+
+transform_property(Pro,Property):-
+	  Pro=..[Type,like(Other)],
+	  Property=..[Type,_],!,
+	  property(Other,Property).
+transform_property(Property,Property).
+
+	  
+
+functor_member(Property,[]):-!,fail.
+functor_member(Property,Specification):-
+	functor(Property,S,_),!,
+	member(Super,Specification),
+	functor(Super,S,_).
+
+get_property(Type,Specification,Property):-
+	member(Property,Specification).
+get_property(Type,Specification,Property):-
+	item_template(Type,D1,D2), % was object/3
+	append(D1,D2,DD),
+	member(Property,DD),
+	not(functor_member(Property,Specification)).
+
+
+*************/

@@ -120,7 +120,7 @@ make_qlfs:-
 
 % done in 'user' to avoid reloading when we reload dbase
 
-:- include_moo_files('../src_data/pldata/?*.pl').
+:- include_moo_files('../src_asserts/pldata/?*.pl').
 
 */
 
@@ -164,27 +164,21 @@ download_and_install_el:-
 :- load_data_file(logicmoo('dbase/dbase_i_builtin.pl')).
 
 
-% These contain the definition of the object types.
-:- in_user_startup(ensure_plmoo_loaded(logicmoo('objs/objs_misc_monster.plmoo'))). 
-
-% Load the map file (*.map.pl) appropriate for the world being used.
-:- in_user_startup(ensure_plmoo_loaded(logicmoo('rooms/vacuum.map.plmoo'))).
-
 % NPC planners
 :- include_moo_files('../src_mud/mobs/?*.pl').
 :- include_moo_files('../src_assets/mobs/?*.pl').
-:- xperimental->include_moo_files('../xperimental/src_incoming/mobs/?*.pl');true.
+:- xperimental->include_moo_files('../external/XperiMental/src_incoming/mobs/?*.pl');true.
 
 
 % Action/Commands implementation
 :- include_moo_files('../src_mud/actions/?*.pl').
 :- include_moo_files('../src_assets/actions/?*.pl').
-:- xperimental->include_moo_files('../xperimental/src_incoming/actions/?*.pl');true.
+:- xperimental->include_moo_files('../external/XperiMental/src_incoming/actions/?*.pl');true.
 
 % New Objects
 :- include_moo_files('../src_mud/objs/?*.pl').
 :- include_moo_files('../src_assets/objs/?*.pl').
-:- xperimental->include_moo_files('../xperimental/src_incoming/actions/?*.pl');true.
+:- xperimental->include_moo_files('../external/XperiMental/src_incoming/actions/?*.pl');true.
 
 
 % Define the agents traits, both for your agent and the world inhabitants. 
@@ -216,23 +210,14 @@ agent_text_command(Agent,[run,Term], Agent,prologCall(Term)):- ignore(Term=someC
 % :- user_ensure_loaded(logicmoo(vworld/moo_header)).
 
 % These contain the definition of the object types.
+% Load the map file appropriate for the world being used.
+% Load the mud files appropriate for the mobs being used.
+:- forall(filematch(logicmoo('*/?*.plmoo'), X),dmsg(X)).
+:- ensure_plmoo_loaded(logicmoo('*/?*.plmoo')).
+:- forall(filematch(logicmoo('*/*/?*.plmoo'), X),dmsg(X)).
+:- ensure_plmoo_loaded(logicmoo('*/*/?*.plmoo')).
 
-:- ensure_plmoo_loaded(logicmoo('objs/objs_misc_household.plmoo')).
-
-:- ensure_plmoo_loaded(logicmoo('objs/objs_misc_monster.plmoo')).
-
-% Load the map file (*.map.pl) appropriate for the world being used.
-:- ensure_plmoo_loaded(logicmoo('rooms/maze.map.plmoo')).
-:- ensure_plmoo_loaded(logicmoo('rooms/predator.map.plmoo')).
-:- ensure_plmoo_loaded(logicmoo('rooms/vacuum.map.plmoo')).
-
-% :- ensure_plmoo_loaded(logicmoo('rooms/*.plmoo')).
-
-% Load the map file (*.map.pl) appropriate for the mobs being used.
-%:- forall(files_matching(logicmoo('mobs/?*.plmoo'), X),dmsg(X)).
-%:- ensure_plmoo_loaded(logicmoo('mobs/?*.plmoo')).
-%:- ensure_plmoo_loaded(logicmoo('mobs/*/?*.plmoo')).
-
+:- forall(filematch('../*/*/basic*.plmoo', X),(dmsg(ensure_plmoo_loaded(X)),ensure_plmoo_loaded(X))).
 
 % puts world into running state
 % :- must(old_setup).

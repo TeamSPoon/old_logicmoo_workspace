@@ -103,14 +103,15 @@ asserted_or_deduced(Fact):- deducedSimply(Fact),is_fact_consistent(Fact),add(Fac
 my_random_member(LOC,LOCS):- must_det((length(LOCS,Len),Len>0)),random_permutation(LOCS,LOCS2),!,member(LOC,LOCS2).
 
 :-swi_export(random_instance/3).
-random_instance(Type,Value,Test):- copy_term(ri(Type,Value,Test),ri(RType,RValue,RTest)),
+random_instance_no_throw(Type,Value,Test):- copy_term(ri(Type,Value,Test),ri(RType,RValue,RTest)),
    hooked_random_instance(RType,RValue,RTest),
    checkAnyType(query(_,_),RValue,Type,Value),
    must_det(Test),!.
-random_instance(Type,Value,Test):- atom(Type),atom_concat('random_',Type,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),call(Fact),Test,!.
-random_instance(Type,Value,Test):- compound(Type),functor_h(Type,F),isa(F,_),atom_concat('random_',F,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),Fact,Test,!.
-random_instance(Type,Value,Test):- findall(V,isa(V,Type),Possibles),Possibles\=[],must_det((my_random_member(Value,Possibles),Test)),!.
-random_instance(Type,Value,Test):- trace_or_throw(failed(random_instance(Type,Value,Test))).
+random_instance_no_throw(Type,Value,Test):- atom(Type),atom_concat('random_',Type,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),call(Fact),Test,!.
+random_instance_no_throw(Type,Value,Test):- compound(Type),functor_h(Type,F),isa(F,_),atom_concat('random_',F,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),Fact,Test,!.
+random_instance_no_throw(Type,Value,Test):- findall(V,isa(V,Type),Possibles),Possibles\=[],must_det((my_random_member(Value,Possibles),Test)),!.
+
+random_instance(Type,Value,Test):- must(random_instance_no_throw(Type,Value,Test)).
 
 save_fallback(Fact):-not(ground(Fact)),trace_or_throw(var_save_fallback(Fact)).
 save_fallback(Fact):-is_fact_consistent(Fact),add(Fact).

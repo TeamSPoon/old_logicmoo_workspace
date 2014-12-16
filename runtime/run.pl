@@ -88,7 +88,13 @@ debug_talk:- debug_repl_wo_cyc(parser_talk,t3).
 
 % [Manditory] This loads the game and initializes so test can be ran
 :- if_flag_true(was_run_dbg_pl, at_start(run_setup)).
-:- ensure_plmoo_loaded(logicmoo('rooms/startrek.all.plmoo')).
+
+% :- ensure_plmoo_loaded(examples(game('rooms/startrek.all.plmoo'))).
+:- forall(filematch(logicmoo('*/?*.plmoo'), X),dmsg(X)).
+:- ensure_plmoo_loaded(logicmoo('*/?*.plmoo')).
+:- forall(filematch(logicmoo('*/*/?*.plmoo'), X),dmsg(X)).
+:- ensure_plmoo_loaded(logicmoo('*/*/?*.plmoo')).
+
 :- finish_processing_world.
 
 % [Optional] Interactively debug E2C
@@ -131,42 +137,16 @@ mud_test_local :- if_flag_true(was_run_dbg_pl,at_start(must_det(run_mud_tests)))
 
 % [Optionaly] Allows testing/debug of the chat80 system (withouyt loading the servers)
 % :- debug80.
-/*
 
-explorer(player1)> prolog statistics
-notice(you,begin(you,prologCall(statistics)))
-statistics.
-188.523 seconds cpu time for 282,024,744 inferences
-1,004,265 atoms, 14,959 functors, 11,578 predicates, 176 modules, 268,104,937 VM-codes
 
-                       Limit    Allocated       In use
-Local  stack :137,438,953,472      126,976       41,032 Bytes
-Global stack :137,438,953,472  805,302,256  669,634,856 Bytes
-Trail  stack :137,438,953,472      129,016        2,448 Bytes
-
-1 garbage collections gained 41,528 bytes in 0.000 seconds.
-2 atom garbage collections gained 19,741 atoms in 1.360 seconds.
-Stack shifts: 4 local, 22 global, 20 trail in 0.038 seconds.
-2 threads, 0 finished threads used 0.000 seconds.
-true.
-
-cmdresult(statistics,true)
-
-*/
-
-:- must_det(show_call((atloc('NpcCol1012-Ensign728',X),nonvar(X)))).
 
 % :-forall(current_prolog_flag(N,V),dmsg(N=V)).
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
+
 :-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,who)).
 :-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,look)).
 :-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,prolog)).
 
-% :- kill_term_expansion.
-% :- slow_work.
-% :- prolog.
-% :- now_run_local_tests_dbg.
-% :- prolog.
 
 % :-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,chat80)).
 :- if_flag_true(was_run_dbg_pl, at_start(run)).

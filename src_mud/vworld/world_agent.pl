@@ -95,33 +95,35 @@ get_session_id(ID):-thread_self(ID).
 
 :-swi_export(current_agent/1).
 :-decl_mpred_prolog(current_agent/1).
-current_agent(PIn):-get_session_id(O),thlocal:session_agent(O,P),!,P=PIn.
+current_agent(PIn):- get_session_id(O),get_agent_session(P,O),!,P=PIn.
 
 current_agent_or_var(P):- once(current_agent(PIn)),P=PIn,!.
 current_agent_or_var(_).
 
 
-get_agent_session(P,O):-thlocal:session_agent(O,P).
+get_agent_session(P,O):- (thlocal:session_agent(O,P);thglobal:global_session_agent(O,P)).
 
 foc_current_player(P):- current_agent(P),nonvar(P),!.
 foc_current_player(P):- nonvar(P),agent(P),become_player(P),!.
-foc_current_player(P):- get_session_id(O),
-  random_instance(agent,P,not((thlocal:session_agent(_,P)))),!,
-  retractall((thlocal:session_agent(O,_))),  
-  asserta(thlocal:session_agent(O,P)),assert_isa(P,human_player),must_det(create_agent(P)).
-foc_current_player(P):- get_session_id(O),generate_new_player(P), !,
-  retractall((thlocal:session_agent(O,P))),
-  asserta(thlocal:session_agent(O,P)),assert_isa(P,human_player),must_det(create_agent(P)).
+foc_current_player(P):- 
+  prolog_must_l([    
+             get_session_id(O),
+             once(get_dettached_npc(P);generate_new_player(P)),
+               retractall(thglobal:global_session_agent(O,P)),
+              asserta(thglobal:global_session_agent(O,P)),assert_isa(P,human_player),must_det(create_agent(P))]),!.
+
+
+get_dettached_npc(P):-random_instance_no_throw(agent,P,true),not(isa(P,human_player)),!.
 
 % generate_new_player(P):- req(agent(P)),!.
-generate_new_player(P):- must((gensym(player,N),P=explorer(N),assert_isa(P,explorer),assert_isa(P,player),assert_isa(P,agent))).
+generate_new_player(P):- prolog_must_l([gensym(player,N),not(is_asserted(isa(N,agent))),P=explorer(N),assert_isa(P,explorer),assert_isa(P,player),assert_isa(P,agent)]),!.
 
-detatch_player(P):- thlocal:session_agent(_,P),!,trace_or_throw(detatch_player(P)).
+detatch_player(P):- thglobal:global_session_agent(_,P),!,trace_or_throw(detatch_player(P)).
 detatch_player(_).
 
 :-swi_export(become_player/1).
 become_player(NewName):- once(current_agent(Was)),Was=NewName,!.
-become_player(NewName):- get_session_id(O),retractall(thlocal:session_agent(O,_)),detatch_player(NewName),asserta(thlocal:session_agent(O,NewName)),ensure_player_stream_local(NewName).
+become_player(NewName):- get_session_id(O),retractall(thglobal:global_session_agent(O,_)),detatch_player(NewName),asserta(thglobal:global_session_agent(O,NewName)),ensure_player_stream_local(NewName).
 :-swi_export(become_player/2).
 become_player(_Old,NewName):-become_player(NewName).
 

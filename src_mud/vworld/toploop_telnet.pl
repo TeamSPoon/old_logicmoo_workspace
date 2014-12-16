@@ -55,42 +55,42 @@ service_client_call(Call, Slave, In, Out, Host, Peer, Options):-
    call(Call).
   
 login_and_run_nodebug:- 
- ignore(set_no_debug),
- set_tty_control, 
- notrace(login_and_run).
+ must(set_no_debug), (notrace(login_and_run)->true;login_and_run).
 
 login_and_run:-
    % current_input(In),current_output(Out),
    %setup_streams(In, Out),   
    %threads,
-   player_connect_menu,
+   must(player_connect_menu),
    % do_player_action(P,'who'),   
-   run_player_telnet.
+   must(run_player_telnet).
 
 player_connect_menu:-
-   foc_current_player(WantsPlayer),
+   prolog_must_l([foc_current_player(WantsPlayer),
    connect_player(WantsPlayer,P),
    foc_current_player(P),
-   call_agent_command(P,'look'),!.
+   call_agent_command(P,'look')]),!.
 
 connect_player(Wants,Gets):-
+ prolog_must_l([
    foc_current_player(Wants),
    % sets some IO functions
    once((ensure_player_stream_local(Wants),
-     current_agent(Gets))).
+     current_agent(Gets)))]).
 
 
 run_player_telnet:-   
-   set_tty_control,!,
+   must(set_tty_control),!,
    fmt('~n~n~nHello run_player_telnet!~n',[]),
    must(foc_current_player(P)),
+   assert_isa(P,human_player),
    fmt('~n~n~nHello ~w! Welcome to the MUD!~n',[P]),
-   colormsg([blink,fg(red)],"this is blinking red!"),
+   must((colormsg([blink,fg(red)],"this is blinking red!"))),
    call_cleanup(
      % runs the Telnet REPL
-     (set_player_telnet_options,
-     run_player_local),  
-     goodbye_player).
+     (must(set_player_telnet_options),
+     must(run_player_local)),  
+     must(goodbye_player)).
 
 
 set_player_telnet_options:-
@@ -102,7 +102,7 @@ set_player_telnet_options:-
 goodbye_player:- 
      foc_current_player(P3),
      fmt('~n~nGoodbye ~w! ~n',[P3]),
-     retractall(thlocal:session_agent(_,P3)).
+     retractall(thglobal:global_session_agent(_,P3)).
 
 run_player_local(Wants) :-
     connect_player(Wants,P),
@@ -129,7 +129,7 @@ set_console_attached:-
 
 
 set_tty_control:- 
-  logOnFailure(( 
+  ignore((logOnFailure(( 
    colormsg(red,"this is red!"),
    set_console_attached,
    set_prolog_flag(color_term,true),
@@ -137,7 +137,7 @@ set_tty_control:-
    set_stream(user_error, tty(true)),
    set_stream(user_input, tty(true)),
    set_prolog_flag(tty_control, true),
-   colormsg(green,"this is green!"))).
+   colormsg(green,"this is green!"))))),!.
 
 
 ensure_player_stream_local(P):-  

@@ -56,7 +56,6 @@ shrink_clause( HB,HB).
 :- decl_thlocal noRandomValues/1.
 :- decl_thlocal repl_to_string/2.
 :- decl_thlocal repl_writer/2.
-:- decl_thlocal session_agent/2.
 :- decl_thlocal thlocal:useOnlyExternalDBs/0.
 :- decl_thlocal with_callMPred/1.
 :- decl_thlocal skip_db_op_hooks/0.
@@ -65,6 +64,9 @@ shrink_clause( HB,HB).
 :- decl_thlocal thlocal:usePlTalk/0.
 :- decl_thlocal thlocal:useAltPOS/0.
 
+:- decl_thlocal thlocal:session_agent/2.
+
+:- dynamic thglobal:global_session_agent/2.
 
 % TODO uncomment the next line without breaking it all!
 % thglobal:use_cyc_database.

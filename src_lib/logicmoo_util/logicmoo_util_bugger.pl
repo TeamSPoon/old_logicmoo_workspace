@@ -1573,7 +1573,7 @@ check_thread_local(TL:Head):-slow_sanity(( predicate_property(TL:Head,(dynamic))
 :-meta_predicate_transparent(with_all_dmsg(0)).
 
 with_all_dmsg(Call):-
-  bugger_flag(opt_debug=WAS),
+  (bugger_flag(opt_debug=WAS);WAS=on),
    setup_call_cleanup(
      set_prolog_flag(opt_debug,true),
       with_no_assertions(tlbugger:dmsg_hidden(_),Call),
