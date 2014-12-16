@@ -21,4 +21,4 @@ sleep 1;
 cd $NEWPWD
 swipl -L32G -G32G -T132G -f $RUNFILE
 cd $OLDPWD
-exit $?
+echo exit $?

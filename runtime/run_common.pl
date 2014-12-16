@@ -64,9 +64,9 @@ within_user(Call):- '@'(Call,'user').
 % Add your own path to weblog for now
 user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog').
 user:file_search_path(weblog, 'C:/Users/Administrator/AppData/Roaming/SWI-Prolog/pack/weblog').
-user:file_search_path(weblog, '/usr/local/lib/swipl-7.1.26/pack/weblog/prolog'):-current_prolog_flag(unix,true).
-user:file_search_path(cliopatria, '../../ClioPatria'). % :- current_prolog_flag(unix,true).
-user:file_search_path(swish, '../../swish'):- current_prolog_flag(unix,true).
+user:file_search_path(weblog, '/usr/lib/swi-prolog/pack/weblog/prolog'):-current_prolog_flag(unix,true).
+user:file_search_path(cliopatria, '../external/ClioPatria'). % :- current_prolog_flag(unix,true).
+user:file_search_path(swish, '../external/swish'):- current_prolog_flag(unix,true).
 
 :- user_use_module(library(settings)).
 

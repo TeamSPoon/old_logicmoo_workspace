@@ -204,9 +204,9 @@ coerce(What,_Type,NewThing):-NewThing = What.
 :-op(1150,fx,export).
 
 :- '@'(ensure_loaded(logicmoo(vworld/moo)),'user').
-% :- '@'(use_module(dbase_formattypes),'user').
+:- '@'(ensure_loaded(dbase_i_formattypes),'user').
 
-:-ensure_loaded(dbase_formattypes).
+% :-ensure_loaded(dbase_i_formattypes).
 
 %:- trace, (dynamic_multifile_exported  obj/1). 
 %:- trace, (dynamic_multifile_exported  obj/1). 
@@ -963,7 +963,7 @@ makeConstant(X):-trace_or_throw(makeConstant(X)).
 cycAssert(A,B):-trace_or_throw(cycAssert(A,B)).
 */
 
-:- ensure_loaded(dbase_c_term_expansion).
+:- ensure_loaded(dbase_i_term_expansion).
 
 :- ensure_loaded(dbase_i_db_preds).
 
@@ -1223,7 +1223,7 @@ agent_text_command(_Agent,_Text,_AgentTarget,_Cmd):-fail.
 
 
 
-:-ensure_loaded(logicmoo(planner/dbase_i_hyhtn)).
+:-ensure_loaded(logicmoo(mobs/planner/dbase_i_hyhtn)).
 
 % ================================================
 % MPRED_PROP System
