@@ -179,16 +179,16 @@ for obvious reasons.
 
 define_if_missing(M:F/A,List):-current_predicate(M:F/A)->true;((forall(member(C,List),M:assertz(C)),export(M:F/A))).
 
-new_a2s(List, Separator, String):-catch(new_a2s0(List, Separator, String),_,((trace,new_a2s0(List, Separator, String)))).
-new_a2s0(List, Separator, String):- debug,
- (atomic(String) -> (string_to_atom(String,Atom),concat_atom(List, Separator, Atom));
-     (concat_atom(List, Separator, Atom),string_to_atom(String,Atom))).
-
 define_if_missing(system:atomics_to_string/3, [
   ( system:atomics_to_string(List, Separator, String):- new_a2s(List, Separator, String) ) ]).
 
 define_if_missing(system:atomics_to_string/2, [
   ( system:atomics_to_string(List, String):- new_a2s(List, '', String) ) ]).
+
+new_a2s(List, Separator, String):-catch(new_a2s0(List, Separator, String),_,((trace,new_a2s0(List, Separator, String)))).
+new_a2s0(List, Separator, String):- debug,
+ (atomic(String) -> (string_to_atom(String,Atom),concat_atom(List, Separator, Atom));
+     (concat_atom(List, Separator, Atom),string_to_atom(String,Atom))).
 
 
 

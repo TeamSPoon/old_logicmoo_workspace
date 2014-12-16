@@ -88,7 +88,7 @@
 :- include(logicmoo('vworld/world_text.pl')).
 :- include(logicmoo('vworld/world_effects.pl')).
 :- include(logicmoo('vworld/world_events.pl')).
-:- include(logicmoo('vworld/world_spawning.pl')).
+:- if_file_exists(include(logicmoo('vworld/world_spawning.pl'))).
 
 :-export(isaOrSame/2).
 isaOrSame(A,B):-A==B,!.
@@ -275,7 +275,7 @@ create_instance_0(T,Type,List):-
 
 create_instance_0(T,MetaType,List):-  
   must_det_l([
-   create_meta(T,Type,MetaType,P),
+   create_meta(T,_Type,MetaType,P),
    padd(P,List),
    add_missing_instance_defaults(P)]). 
 
@@ -284,7 +284,7 @@ create_instance_0(T,MetaType,List):-
  dmsg(create_instance_0(T,MetaType,List)),
 leash(+call),trace,
   must_det_l([
-   create_meta(T,Type,MetaType,P),
+   create_meta(T,_Type,MetaType,P),
    padd(P,List),
    put_in_world(P),   
    add_missing_instance_defaults(P)]). 

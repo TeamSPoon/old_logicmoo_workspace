@@ -7,17 +7,20 @@ swi_module(M,E):-dmsg(swi_module(M,E)).
 swi_export(_):-!.
 swi_export(E):-dmsg(swi_export(E)).
 
+:- '@'(consult('../src_lib/logicmoo_util/logicmoo_util_all'),user).
+
 % Was this our startup file?
 was_run_dbg_pl:-is_startup_file('run.pl').
 
 % :- catch(guitracer,_,true).
 :- set_prolog_flag(verbose_load,true).
 
-:- ensure_loaded('../../swish/logicmoo_run_swish').
+
+:- if_file_exists(ensure_loaded('../../swish/logicmoo_run_swish')).
 :- debug.
 
-:- ensure_loaded('../xperimental/src_incoming/dbase/dbase_rosprolog').
-:- ensure_loaded('../xperimental/src_incoming/dbase/dbase_rdf_store').
+:- if_file_exists(ensure_loaded('../xperimental/src_incoming/dbase/dbase_rosprolog')).
+:- if_file_exists(ensure_loaded('../xperimental/src_incoming/dbase/dbase_rdf_store')).
 % :- prolog.
 
 % run_tests includes run_common 
@@ -81,13 +84,6 @@ debug_talk:- debug_repl_wo_cyc(parser_talk,t3).
 
 % [Optional] Testing PTTP
 % :-is_startup_file('run.pl')->doall(do_pttp_test(_));true.
-
-
-% onLoad(Code):- call_after_next(after_game_load,Code).
-:- onLoad(forall(disjointWith0(A,B),rdf_assert_hook(disjointWith(A,B)))).
-:- onLoad(forall(is_known_trew(B),rdf_assert_hook(B))).
-:- onLoad(forall(dbase_t(P,S,O),rdf_assert_hook(rdf(S,P,O)))).
-:- onLoad(forall(po(P,O),rdf_assert_hook(subclass(P,O)))).
 
 
 % [Manditory] This loads the game and initializes so test can be ran
