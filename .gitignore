@@ -1,7 +1,5 @@
 .DS_Store
 applet
-externals/
-games/
 *~
 *.qlf
 *.zip
