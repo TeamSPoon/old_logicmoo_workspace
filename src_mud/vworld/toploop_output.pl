@@ -18,9 +18,10 @@
 % local_decl_db_prop(repl_to_string(agent,term),[singleValued,default_sv(2,default_repl_obj_to_string)]).
 
 :-swi_export(default_repl_writer/4).
-default_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=o),fmt('~q=D(~w)~q.~n',[N,TypeO,V]).
+default_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=o),  ( TypeO == o -> fmt('~q= ~q.~n',[N,V]) ; fmt('~q=D(~w) ~q.~n',[N,TypeO,V])).
 :-swi_export(default_repl_obj_to_string/3).
-default_repl_obj_to_string(O,Type,toStringD(TypeO,O)):-copy_term(Type,TypeO),ignore(TypeO=o).
+default_repl_obj_to_string(O,Type,Out):- copy_term(Type,TypeO), ignore((TypeO = o )), ( TypeO == o -> Out=O ; Out = stringD(TypeO,O)).
+
 
 
 canUseEnglish:-true.
