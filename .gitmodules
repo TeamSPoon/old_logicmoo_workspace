@@ -1,6 +1,0 @@
-[submodule "src_extern/ClioPatria"]
-	path = src_extern/ClioPatria
-	url = git@github.com:TeamSPoon/ClioPatria
-[submodule "src_extern/hMUD"]
-	path = src_extern/hMUD
-	url = git@github.com:TeamSPoon/hMUD
