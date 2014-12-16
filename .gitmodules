@@ -1,0 +1,6 @@
+[submodule "hMUD"]
+	path = hMUD
+	url = git@github.com:TeamSPoon/hMUD
+[submodule "ClioPatria"]
+	path = ClioPatria
+	url = git@github.com:TeamSPoon/ClioPatria
