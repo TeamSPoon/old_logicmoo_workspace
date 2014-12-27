@@ -23,8 +23,6 @@
 % Mud Dictionary
 % ==================================================
 
-:-dynamic(mud_dictionary/2).
-
 :-decl_mpred_hybrid(mud_dictionary(text,text)).
 
 parser_equiv_text(A,B):-mud_dictionary(A,B).
