@@ -127,6 +127,7 @@ rez_loc_object(XY,Type):-
 
 nearby(X,Y):-atloc(X,L1),atloc(Y,L2),locs_near(L1,L2).
 
+locationToRegion(Obj,RegionIn):-var(Obj),!,dmsg(warn(var_locationToRegion(Obj,RegionIn))),isa(RegionIn,region).
 locationToRegion(Obj,RegionIn):-locationToRegion_0(Obj,Region),must((nonvar(Region),isa(Region,region))),!,RegionIn=Region.
 locationToRegion_0(Obj,Obj):-var(Obj),dmsg(warn(var_locationToRegion(Obj,Obj))),!.
 locationToRegion_0(xyz(Region,_,_,_),Region2):-nonvar(Region),!,locationToRegion_0(Region,Region2).
@@ -170,7 +171,8 @@ on_surface(Clothes,Agent):-loop_check(wearsClothing(Agent,Clothes),fail).
 
 same_regions(Agent,Obj):-inRegion(Agent,Where1),inRegion(Obj,Where2),Where1=Where2.
 
-inRegion(Agent,Region):- loop_check(( (is_asserted(atloc(Agent,Where));localityOfObject(Agent,Where)), locationToRegion(Where,Region)),fail).
+inRegion(Agent,Region):- nonvar(Agent),!, loop_check(( (is_asserted(atloc(Agent,Where));localityOfObject(Agent,Where)), locationToRegion(Where,Region)),fail).
+%inRegion(Agent,Region):- nonvar(Region),!, loop_check(( (is_asserted(atloc(Agent,Where));localityOfObject(Agent,Where)), locationToRegion(Where,Region)),fail).
 
 localityOfObject(Inner,Container):-inside_of(Inner,Container).
 localityOfObject(Above,HasSurface):-on_surface(Above,HasSurface).
@@ -195,13 +197,12 @@ has_parts([pelvis,legs,right_leg,right_foot,right_toes]).
 
 */
 
-
 genlPreds(wearsClothing,possess).
-genlInverse(inside_of,possess).
+genlPreds(stowed,possess).
+genlPreds(possess,contains).
 genlInverse(contains,inside_of).
-genlInverse(stowed,inside_of).
-
-% mud_test(stowed_is_possessing):- 
+%genlInverse(inside_of,possess).
+%genlInverse(stowed,inside_of).
 
 
 put_in_world(self):-!.

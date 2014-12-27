@@ -5,24 +5,6 @@
 
 end_of_file.
 
-swi_module(M,E):-dmsg(swi_module(M,E)).
-swi_export(E):-dmsg(swi_export(E)).
-
-% Was this our startup file?
-was_run_dbg_pl:-is_startup_file('run_debug.pl').
-
-% :- catch(guitracer,_,true).
-:- set_prolog_flag(verbose_load,true).
-
-% :- ensure_loaded('../../swish/logicmoo_run_swish').
-:- debug.
-
-% run_tests includes run_common 
-:-include(run_tests).
-
-
-% [Optionaly] re-define load_default_game
-% load_default_game:- load_game(logicmoo('rooms/startrek.all.plmoo')).
 
 % [Optionaly] load and start sparql server
 % starts in forground
@@ -30,7 +12,6 @@ was_run_dbg_pl:-is_startup_file('run_debug.pl').
 % starts in thread (the the above was commented out)
 %:- at_start(start_servers).
 % commented out except on run
-
 
 debug_repl_w_cyc(Module,CallFirst):- !,         
           with_assertions(thlocal:useOnlyExternalDBs,
@@ -84,19 +65,9 @@ debug_talk:- debug_repl_wo_cyc(parser_talk,t3).
 % :- debug_e2c.
 
 
-% [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
-% :- register_timer_thread(npc_ticker,30,npc_tick).
-
-mud_test_local :-kellerStorage:kellerStorageTestSuite.
+mud_test_local :- current_predicate(kellerStorage:kellerStorageTestSuite/0) -> kellerStorage:kellerStorageTestSuite ; true.
 
 % :-curt80.
-
-% more tests even
-mud_test_local :-do_player_action("look").
-mud_test_local :-forall(localityOfObject(O,L),dmsg(localityOfObject(O,L))).
-
-must_test("tests to see if poorly canonicalized code (unrestricted quantification) will not be -too- inneffienct",
-   forall(atloc(O,L),dmsg(atloc(O,L)))).
 
 
 % the real tests now (once)

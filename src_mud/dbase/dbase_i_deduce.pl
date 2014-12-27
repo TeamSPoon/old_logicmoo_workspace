@@ -15,9 +15,36 @@
 % Dec 13, 2035
 % Douglas Miles
 */
+
+% ========================================================================================
+% DEDUCE RETRACTIONS
+% ========================================================================================
+
+:-export((alt_forms/2)).
+alt_forms(P,NP):-into_mpred_form(P,CP),P\=@=CP,!,alt_forms(CP,NP).
+alt_forms(P,NP):- no_repeats(( alt_forms0(P,NP), NP\=@=P)).
+
+alt_forms0(P,NP):-alt_forms1(P,M),alt_forms1(M,N),alt_forms1(N,NP).
+alt_forms0(P,NP):-alt_forms1(P,M),alt_forms1(M,NP).
+alt_forms0(P,NP):-alt_forms1(P,NP).
+
+
+alt_forms1(atloc(P,L),localityOfObject(P,R)):-nonvar(P),nonvar(L),once(locationToRegion(L,R)),nonvar(R).
+alt_forms1(localityOfObject(P,_),atloc(P,L)):-nonvar(P),ignore(atloc(P,L)),nonvar(L).
+alt_forms1(P,NP):-P=..[F,A,B|R],alt_forms2(F,A,B,R,NP). 
+
+alt_forms2(F,A,B,R,NP):-dbase_t(genlInverse,F,FF),NP=..[FF,B,A|R].
+alt_forms2(F,A,B,R,NP):-dbase_t(genlInverse,FF,F),NP=..[FF,B,A|R].
+alt_forms2(F,A,B,R,NP):-dbase_t(genlPreds,F,FF),NP=..[FF,A,B|R].
+alt_forms2(F,A,B,R,NP):-dbase_t(genlPreds,FF,F),NP=..[FF,A,B|R].
+
+decl_database_hook(retract(Kind),P):- forall(alt_forms(P,NP),ignore(hooked_op(retract(Kind),NP))).
+
+
 % ========================================================================================
 % DEDUCE FACTS
 % ========================================================================================
+
 
 decl_database_hook(Type,Fact):- predicate_property(add_deduction(_,_),_),run_deduce_facts_from(Type,Fact).
 

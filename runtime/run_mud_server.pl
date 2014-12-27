@@ -28,7 +28,7 @@ swi_export(E):-dmsg(swi_export(E)).
 :- if_file_exists(ensure_loaded('../externals/swish/logicmoo_run_swish')).
 
 % [Optionaly] register/run Cliopatria sparql server (remote RDF browsing)
-% :- if_startup_script(ensure_loaded(run_clio)).
+:- if_startup_script(ensure_loaded(run_clio)).
 
 % [Optionaly] register/run KnowRob robot services (we use it for the ontology mainly)
 :- with_no_term_expansions(if_file_exists(ensure_loaded('../externals/MUD_KnowRob/knowrob_addons/knowrob_mud/prolog/init'))).
@@ -44,8 +44,18 @@ swi_export(E):-dmsg(swi_export(E)).
 
 
 % [Manditory] load_default_game
-:- add_game_dir('../games/src_game_unknown',prolog_repl).       
-	  
+% this is what happens when the world is not found
+:- add_game_dir('../games/src_game_unknown',prolog_repl).     
+
+% the following 4 worlds are in version control in examples
+% :- add_game_dir('../games/src_game_nani',prolog_repl).       
+% :- add_game_dir('../games/src_game_sims',prolog_repl).       
+% :- add_game_dir('../games/src_game_startrek',prolog_repl).       
+% :- add_game_dir('../games/src_game_wumpus',prolog_repl).       
+
+% [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
+:- register_timer_thread(npc_ticker,30,npc_tick).
+
 % [Manditory] This loads the game and initializes so test can be ran
 :- if_startup_script( at_start(finish_processing_world)).
 

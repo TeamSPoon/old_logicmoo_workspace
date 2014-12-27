@@ -134,7 +134,7 @@ rescan_all:- doall_and_fail(rescan_slow_kb_ops).
 rescan_all:- doall_and_fail(rescan_mpred_props).
 rescan_all.
 
-ensure_at_least_one_region:- (isa(_,region)->true;create_instance(oneRegion,region)),!.
+ensure_at_least_one_region:- (isa(_,region)->true;create_instance(oneRegion1,region)),!.
 
 :-meta_predicate_transparent(finish_processing_game/0).
 finish_processing_game:- dmsg(begin_finish_processing_game),fail.

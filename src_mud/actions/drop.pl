@@ -18,9 +18,13 @@
 actiontype(drop(item)).
 
 % Drop something
-agent_call_command(Agent,drop(SObj)) :- 
-	possess(Agent,Obj),match_object(SObj,Obj),
-	possess(Agent,Obj),trace,del(possess(Agent,Obj)),atloc(Agent,LOC),add(atloc(Obj,LOC)),
+agent_call_command(Agent,drop(SObj)) :-
+	possess(Agent,Obj),
+        match_object(SObj,Obj),
+        del(possess(Agent,Obj)),
+        must(not((possess(Agent,Obj)))),
+        atloc(Agent,LOC),
+        add(atloc(Obj,LOC)),
 	must(call_update_charge(Agent,drop)).
 
 %Nothing to drop

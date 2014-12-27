@@ -265,12 +265,14 @@ bdmsg(D):-(format(user_error,'dmsg: ~q~n',[D])).
 
 bugger_t_expansion(T,T):-not(compound(T)),!.
 bugger_t_expansion([F0|ARGS0],[F1|ARGS1]):-bugger_t_expansion(F0,F1),bugger_t_expansion(ARGS0,ARGS1).
-bugger_t_expansion(T,AA):-compound_name_arguments(T,F,[A]),unwrappabe(F),bdmsg(bugger_term_expansion(T)),bugger_t_expansion(A,AA),!.
+bugger_t_expansion(T,AA):-compound_name_arguments(T,F,[A]),unwrap_for_debug(F),bdmsg(bugger_term_expansion(T)),bugger_t_expansion(A,AA),!.
 bugger_t_expansion(T,TT):-compound_name_arguments(T,F,ARGS0),bugger_t_expansion(ARGS0,ARGS1), TT=..[F|ARGS1].
 
-unwrappabe(F):-member(F,[traceok,notrace,hotrace]).
-%unwrappabe(F):-member(F,['debugOnError',debugOnError0]),!,fail.
-%unwrappabe(F):-member(FF,['OnError','OnFailure','LeastOne','Ignore','must']),atom_concat(_,FF,F),!.
+:-dynamic(unwrap_for_debug/1).
+% unwrap_for_debug(F):-member(F,[notrace,hotrace]).
+unwrap_for_debug(F):-member(F,[traceok]).
+%unwrap_for_debug(F):-member(F,['debugOnError',debugOnError0]),!,fail.
+%unwrap_for_debug(F):-member(FF,['OnError','OnFailure','LeastOne','Ignore','must']),atom_concat(_,FF,F),!.
 
 bugger_goal_expansion(T,_):- bdmsg(bugger_goal_expansion(T)),fail.
 

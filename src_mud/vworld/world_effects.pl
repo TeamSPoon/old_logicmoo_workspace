@@ -18,13 +18,15 @@
 % Used by eat.pl and take.pl
 % Is the object worth anything (either scored points or charge)
 % Score any points?
+
+
 do_act_affect(Agent,Action,Obj) :-
 	props(Obj,act_affect(Action,score(S))),
 	add(score(Agent,+S)),
 	fail. % fail to check for charge too
 % Charge up those batteries
 do_act_affect(Agent,Action,Obj) :-
-           props(Obj,act_affect(Action,charge(NRG))),
+          props(Obj,act_affect(Action,charge(NRG))),
 	req(charge(Agent,Chg)),
 	req(stm(Agent,Stm)),
 	max_charge(Agent,Max),
@@ -46,7 +48,7 @@ do_act_affect(_,_,_).
 
 % Check to see if last action was successful or not
 :-swi_export(success/2).
-success(Agent,no) :- cmdfailure(Agent,_)-> YN=no ; YN=yes.
+success(Agent,YN) :- cmdfailure(Agent,_)-> YN=no ; YN=yes.
 
 :-swi_export(add_cmdfailure/2).
 add_cmdfailure(Agent,What):-add(cmdfailure(Agent,What)).

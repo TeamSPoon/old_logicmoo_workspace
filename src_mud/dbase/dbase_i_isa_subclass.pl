@@ -235,7 +235,7 @@ isa_asserted_0(I,T):- hasInstance(T,I).   %isa_asserted_0(I,T):-clause(hasInstan
 isa_asserted_0(I,T):-nonvar(T),isa_asserted_1(I,T).
 
 isa_asserted_1(I,T):-T\=mped_type(_),mpred_prop(I,T).
-isa_asserted_1(I,'&'(T1 , T2)):-nonvar(T1),var(T2),!,dif:dif(T1,T2),isa_backchaing(I,T1),subclass_backchaing(T1,T2),isa_backchaing(I,T2).
+isa_asserted_1(I,'&'(T1 , T2)):-nonvar(T1),var(T2),!,dif:dif(T1,T2),isa_backchaing(I,T1),impliedSubClass(T1,T2),isa_backchaing(I,T2).
 isa_asserted_1(I,'&'(T1 , T2)):-nonvar(T1),!,dif:dif(T1,T2),isa_backchaing(I,T1),isa_backchaing(I,T2).
 isa_asserted_1(I,(T1 ; T2)):-nonvar(T1),!,dif:dif(T1,T2),isa_backchaing(I,T1),isa_backchaing(I,T2).
 isa_asserted_1(I,formattype):-!,isa_w_type_atom(I,formattype).
@@ -315,7 +315,8 @@ into_single_class('&'(A,B),VV):-!, into_single_class((B),VV);into_single_class((
 into_single_class(A,A).
 
 :- swi_export((transitive_subclass_or_same/2)).
-transitive_subclass_or_same(A,A).
+transitive_subclass_or_same(A,B):-var(A),!,A=B.
+transitive_subclass_or_same(A,A):-nonvar(A),!.
 transitive_subclass_or_same(A,B):-transitive_subclass(A,B).
 
 :- swi_export((transitive_subclass/2)).

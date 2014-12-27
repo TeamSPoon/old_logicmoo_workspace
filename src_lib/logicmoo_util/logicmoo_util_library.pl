@@ -246,7 +246,7 @@ univ_safe(P,L):- must_det(is_list(L)),debugOnError((P=..L)).
 
 % Usage: subst(+Fml,+X,+Sk,?FmlSk)
 
-subst(A,B,C,D):-  ccatch(hotrace(nd_subst(A,B,C,D)),E,(dumpST,dmsg(E:nd_subst(A,B,C,D)),fail)),!.
+subst(A,B,C,D):-  notrace((ccatch(notrace(nd_subst(A,B,C,D)),E,(dumpST,dmsg(E:nd_subst(A,B,C,D)),fail)))),!.
 subst(A,_B,_C,A).
 
 nd_subst(  Var, VarS,SUB,SUB ) :- Var==VarS,!.

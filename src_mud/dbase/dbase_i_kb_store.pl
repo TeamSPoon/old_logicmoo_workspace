@@ -457,6 +457,14 @@ into_assertable_form(H,G):-expand_term( (H :- true) , C ), reduce_clause(C,G).
 :-swi_export(into_mpred_aform/3).
 into_mpred_aform(C,CP,CA):-into_mpred_form(C,CP),into_assertable_form(C,CA),!.
 
+hooked_op(U,C):-loop_check_term(hooked_op0(U,C),U,true).
+
+hooked_op0(retract(all),C):-!, hooked_retractall(C).
+hooked_op0(retract(_One),C):-!, hooked_retract(C).
+hooked_op0(assert(a),C):-!, hooked_asserta(C).
+hooked_op0(assert(z),C):-!, hooked_assertz(C).
+hooked_op0(U,C):-trace_or_throw(hooked_op(U,C)).
+
 :- meta_predicate hooked_asserta(^), hooked_assertz(^), hooked_retract(^), hooked_retractall(^).
 :-swi_export((hooked_asserta/1,hooked_assertz/1)).
 hooked_asserta(C):- into_mpred_aform(C,CP,CA),hooked_asserta(CP,CA).

@@ -31,9 +31,10 @@ action_info(eat(eatable),"nourish oneself").
 agent_call_command(Agent,eat(SObj)) :-
 	possess(Agent,Obj),
         match_object(SObj,Obj),
-	do_act_affect(Agent,eat,Obj),
+	must((do_act_affect(Agent,eat,Obj))),
 	del(possess(Agent,Obj)),
-	call_update_charge(Agent,eat).
+        must(not(possess(Agent,Obj))),
+	must((call_update_charge(Agent,eat))).
 
 update_charge(Agent,eat) :-
 	del(charge(Agent,Old)),

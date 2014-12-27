@@ -165,7 +165,7 @@ createableType(FT):- nonvar(FT),formattype(FT),!,fail.
 createableType(FT):- nonvar(FT),nonCreatableType(FT),!,fail.
 createableType(item). %  col, formattype, 
 createableType(SubType):-member(SubType,[agent,item,region]).
-createableType(S):- is_asserted(createableType(T)), subclass_backchaing(S,T).
+createableType(S):- is_asserted(createableType(T)), impliedSubClass(S,T).
 
 createableSubclassType(S,T):- createableType(T),is_asserted(subclass(S,T)).
 createableSubclassType(T,'TemporallyExistingThing'):- createableType(T).

@@ -30,7 +30,9 @@ get_type_action_help_0(What,TEMPL,Help):- call_no_cuts(type_action_info(What,TEM
 get_type_action_help_0(_What,TEMPL,Help):- call_no_cuts(action_info(TEMPL,Help)).
 get_type_action_help_0(_What,TEMPL,S):-    call_no_cuts(actiontype(TEMPL)),sformat(S,'Prolog looks like: ~q',[TEMPL]).
 get_type_action_help_0(isaFn(A),TEMPL,text(Text,'does: ',do(A2,TEMPL))):- between(1,5,L),length(Text,L),get_agent_text_command(A,Text,A2,Goal),(nonvar(Goal)->TEMPL=Goal;TEMPL=Text).
-get_type_action_help_0(What,Syntax,text([makes,happen,List])):- call_no_cuts(action_rules(Agent,Verb,[Obj|Objs],List)),atom(Verb),safe_univ(Syntax,[Verb,Obj|Objs]), once(member(isa(Obj,Type),List);Type=term),ignore(Agent=an(What)),ignore(What=agent).
+get_type_action_help_0(What,Syntax,text([makes,happen,List])):- call_no_cuts(action_rules(Agent,Verb,[Obj|Objs],List)),atom(Verb),safe_univ(Syntax,[Verb,Obj|Objs]), 
+                     % once(member(isa(Obj,_Type),List);_Type=term),
+                      ignore(Agent=an(What)),ignore(What=agent).
 
 
 action_info_db(TEMPL,S):- (PRED=agent_call_command(_,TEMPL);PRED=agent_text_command(_,_,_,TEMPL)) ,

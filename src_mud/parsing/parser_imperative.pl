@@ -195,14 +195,17 @@ must_make_object_string_list(P,Obj,WList):- call_tabled_can(must_make_object_str
 must_make_object_string_list_cached(P,Obj,WList):-
   must((object_string(P,Obj,0-5,String),nonvar(String),non_empty(String),string_ci(String,LString),to_word_list(LString,WList))).
 
-same_ci(A,B):-must((non_empty(A),non_empty(B))),any_to_string(A,StringA),any_to_string(B,StringB),!,string_ci(StringA,StringB),!.
+same_ci(A,B):-notrace((must((non_empty(A),non_empty(B))),any_to_string(A,StringA),any_to_string(B,StringB),!,string_ci(StringA,StringB))),!.
 
-match_object(A,Obj):-same_ci(A,Obj),!.
-match_object(A,Obj):-isa(Obj,Type),same_ci(A,Type),!.
-match_object(S,Obj):-   
-   atoms_of(S,Atoms),must(Atoms\=[]),
+match_object(S,Obj):- atoms_of(S,Atoms),!,must(Atoms\=[]),match_object_0(Atoms,Obj).
+
+match_object_0([S],Obj):-nonvar(S),match_object_1(S,Obj),!.
+match_object_0(Atoms,Obj):-
    current_agent_or_var(P),must_make_object_string_list(P,Obj,WList),!,
    forall(member(A,Atoms),member_ci(A,WList)).
+
+match_object_1(A,Obj):-same_ci(A,Obj),!.
+match_object_1(A,Obj):-isa(Obj,Type),same_ci(A,Type),!.
 
 
 dmsg_parserm(D):-dmsg(D),!.
@@ -341,7 +344,7 @@ term_specifier_text(Text,Subclass):-
    once((isa_asserted(X,Subclass),
    arg_to_var(text,Text,TextVar),
    req(keyword(X,TextVar)),   
-   same_arg(text,TextVar,Text))). % dmsg(todo(term_specifier_text(Text,Subclass))),subclass_backchaing(Subclass,spatialthing).
+   same_arg(text,TextVar,Text))). % dmsg(todo(term_specifier_text(Text,Subclass))),impliedSubClass(Subclass,spatialthing).
 
 
 phrase_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver):-length(TYPEARGS,N),length(GOODARGS,N),!,

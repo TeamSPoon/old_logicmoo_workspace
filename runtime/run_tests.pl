@@ -93,6 +93,11 @@ mud_test_local:-
 
 mud_test_local:-call_mpred(show_room_grid('Area1000')).
 
+
+% more tests even
+mud_test_local :-do_player_action("look").
+mud_test_local :-forall(localityOfObject(O,L),dmsg(localityOfObject(O,L))).
+
 % ---------------------------------------------------------------------------------------------
 mud_test_local:-
   test_name("Tests our types to populate bad_instance/2 at level 5"),
