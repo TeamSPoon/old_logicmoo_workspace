@@ -3,6 +3,11 @@
 
 */
 
+:- multifile
+	prolog:message/3.
+
+prolog:message(git(update_versions),A,A):-!.
+
 :- use_module(library(settings)).
 % :- use_module(library(check)).
 % :- make.

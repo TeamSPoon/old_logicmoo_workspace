@@ -1,5 +1,3 @@
-[Global]
-CurrentProject=PrologMUD.vpj
 [ProjectDates]
-PrologMUD.vpj=20141226201706146
-externals\PrologMUD_ext.vpj=20141226191635794
+PrologMUD.vpj=
+externals\PrologMUD_ext.vpj=20141227024518610
