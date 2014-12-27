@@ -1,0 +1,53 @@
+/** <module> a_nani_household
+% This file contains the definitions for the room in a household
+% To create a new world, simply change the room definitions as
+% described below (or in manual)
+%
+
+use this file with...
+
+:- declare_load_game('../games/src_game_nani/a_nani_household.plmoo').
+
+*/
+
+:- style_check(-singleton).
+:- style_check(-discontiguous).
+:- style_check(-atom).
+
+:- op(600,fx,onSpawn).
+
+% ==================================================
+% Rooms
+% ==================================================
+
+/* technically the following are not needed due the pathBetween/2s below */
+:-onSpawn region(kitchen).
+:-onSpawn region(hall).
+:-onSpawn region(cellar).
+:-onSpawn region(office_room).
+:-onSpawn region(living_room).
+:-onSpawn region(dining_room).
+:-onSpawn region(bed_room).
+:-onSpawn region(bath_room).
+:-onSpawn region(closet_room).
+:-onSpawn region(back_yard).
+
+
+% ==================================================
+% Doors
+% ==================================================
+
+:-decl_mpred_hybrid(pathBetween(region,region),symmetric).
+
+:-onSpawn pathBetween(living_room,office_room).
+:-onSpawn pathBetween(hall,dining_room).
+:-onSpawn pathBetween(hall,bed_room).
+:-onSpawn pathBetween(hall,living_room).
+:-onSpawn pathBetween(hall,bath_room).
+:-onSpawn pathBetween(kitchen, cellar).
+:-onSpawn pathBetween(dining_room, kitchen).
+:-onSpawn pathBetween(bed_room, closet_room).
+:-onSpawn pathBetween(kitchen, back_yard).
+
+
+
