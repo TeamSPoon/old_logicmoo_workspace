@@ -1,7 +1,10 @@
 .DS_Store
 applet
-examples/*/
 *~
+runtime/*.log
+runtime/cache/*
+runtime/store/*
+.svn/
 *.qlf
 *.zip
 *.rar
