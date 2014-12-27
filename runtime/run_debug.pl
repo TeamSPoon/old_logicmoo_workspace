@@ -3,6 +3,8 @@
 
 */
 
+end_of_file.
+
 swi_module(M,E):-dmsg(swi_module(M,E)).
 swi_export(E):-dmsg(swi_export(E)).
 
@@ -78,26 +80,8 @@ debug_talk:- debug_repl_wo_cyc(parser_talk,t3).
 % :-is_startup_file('run_debug.pl')->doall(do_pttp_test(_));true.
 
 
-% [Manditory] This loads the game and initializes so test can be ran
-:- if_flag_true(was_run_dbg_pl, at_start(run_setup)).
-:- ensure_plmoo_loaded(logicmoo('rooms/startrek.all.plmoo')).
-:- finish_processing_world.
-
 % [Optional] Interactively debug E2C
 % :- debug_e2c.
-
-% the local tests each reload (once)
-now_run_local_tests_dbg :- doall(mud_test_local).
-
-:-must_det(show_call((atloc('NpcCol1012-Ensign728',X),nonvar(X)))).
-
-% nasty way i debug the parser
-mud_test_local :- do_player_action('who').
-% :-repeat, trace, do_player_action('who'),fail.
-
-% mud_test_local :-do_player_action("scansrc").
-
-% :-trace.
 
 
 % [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
@@ -106,8 +90,6 @@ mud_test_local :- do_player_action('who').
 mud_test_local :-kellerStorage:kellerStorageTestSuite.
 
 % :-curt80.
-
-
 
 % more tests even
 mud_test_local :-do_player_action("look").
@@ -147,11 +129,6 @@ true.
 cmdresult(statistics,true)
 
 */
-% :-forall(current_prolog_flag(N,V),dmsg(N=V)).
-% [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
-:-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,who)).
-:-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,look)).
-:-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,prolog)).
 
 % :- kill_term_expansion.
 % :- slow_work.

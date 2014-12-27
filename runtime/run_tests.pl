@@ -140,6 +140,27 @@ now_run_local_tests:- doall(mud_test_local).
 :- if_flag_true(was_runs_tests_pl, halt).
 
 
+
+% the local tests each reload (once)
+now_run_local_tests_dbg :- doall(mud_test_local).
+
+% nasty way i debug the parser
+% :-repeat, trace, do_player_action('who'),fail.
+mud_test_local :- do_player_action('who').
+
+% mud_test_local :-do_player_action("scansrc").
+
+% more tests even
+mud_test_local :-do_player_action("look").
+mud_test_local :-forall(localityOfObject(O,L),dmsg(localityOfObject(O,L))).
+
+must_test("tests to see if poorly canonicalized code (unrestricted quantification) will not be -too- inneffienct",
+   forall(atloc(O,L),fmt(atloc(O,L)))).
+
+% the real tests now (once)
+mud_test_local :- at_start(must_det(run_mud_tests)).
+
+
 end_of_file.
 
 

@@ -118,13 +118,16 @@ thread_work:- thread_create(slow_work,_,[alias(loading_code)]).
 % start_servers :- startup_mod:if_version_greater(70111,thread_work).
 start_servers :- startup_mod:if_version_greater(70111,slow_work).
 
+enqueue_player_command(C):-enqueue_player_command(_,C).
+enqueue_player_command(P,C):-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,C)).
+
 
 % [Required] load and start mud
 :- within_user(ensure_loaded(logicmoo(vworld/moo_startup))).
 
 startup_mod:run_setup_now:-
    within_user((
-      load_game_files      
+      finish_processing_world      
    % TO UNDO register_timer_thread(npc_ticker,90,npc_tick)
    )).
 
