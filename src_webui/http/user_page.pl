@@ -34,24 +34,31 @@ http:location(mud, root(mud), []).
 :- multifile user:file_search_path/2.
 :- dynamic   user:file_search_path/2.
 
-% These should remain. They are static assets served by the core
-% server (eg. the javascript to make the page go, the fallback css, etc)
-user:file_search_path(js, './http/web/js').
-user:file_search_path(css, './http/web/css').
-user:file_search_path(icons, './http/web/icons').
+% these are static assets that belong to a specific MUD Game
+user:file_search_path(js, O) :- expand_file_search_path(game('web/js'),O).
+user:file_search_path(css, O):- expand_file_search_path(game('web/css'),O).
+user:file_search_path(icons, O):- expand_file_search_path(game('web/icons'),O).
+user:file_search_path(mud_code, O):- expand_file_search_path(game('web/prolog'),O).
 
 % Someday these will be set up per-MUD
-% these are static assets that belong to a specific MUD
+% these are static assets that belong to a specific MUD Server
 user:file_search_path(js, '../src_assets/web/js').
 user:file_search_path(css, '../src_assets/web/css').
 user:file_search_path(icons, '../src_assets/web/icons').
 user:file_search_path(mud_code, '../src_assets/web/prolog').
 
+% These should remain. They are static assets served by the core
+% server (eg. the javascript to make the page go, the fallback css, etc)
+user:file_search_path(js, '../src_webui/http/web/js').
+user:file_search_path(css, '../src_webui/http/web/css').
+user:file_search_path(icons, '../src_webui/http/web/icons').
+
+
 %
 %  SECURITY - potential security hole.
 %
-:- use_module(mud_code(mud_specific), [style/1]).
-:- use_module(logicmoo(model/substance)).
+:- if_file_exists(use_module(mud_code(mud_specific), [style/1])).
+:- if_file_exists(use_module(logicmoo(model/substance))).
 
 % The game page where players spend most of their time
 :- http_handler(mud(.), mud_page, [id(mud), priority(10)]).

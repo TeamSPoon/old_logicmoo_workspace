@@ -53,7 +53,7 @@ swi_export(E):-dmsg(swi_export(E)).
 
 :-enqueue_player_command(who).
 :-enqueue_player_command(look).
-:-enqueue_player_command(prolog).
+% :-enqueue_player_command(prolog).
 
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
 :- if_startup_script(at_start(run)).

@@ -46,8 +46,7 @@ do_act_affect(_,_,_).
 
 % Check to see if last action was successful or not
 :-swi_export(success/2).
-success(Agent,no) :- cmdfailure(Agent,_),!.
-success(_,yes).
+success(Agent,no) :- cmdfailure(Agent,_)-> YN=no ; YN=yes.
 
 :-swi_export(add_cmdfailure/2).
 add_cmdfailure(Agent,What):-add(cmdfailure(Agent,What)).
