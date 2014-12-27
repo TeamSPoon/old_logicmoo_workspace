@@ -17,7 +17,7 @@
 				ClearProcessBuffer="1"
 				Verbose="1"
 				Beep="1">
-				<Exec CmdLine=".\StartMUDServer.bat build"/>
+				<Exec CmdLine="StartMUDServer.bat build"/>
 			</Target>
 		</Menu>
 		<PreBuildCommands StopOnError="1"/>
@@ -26,18 +26,24 @@
 	<CustomFolders>
 	</CustomFolders>
 	<Files AutoFolders="DirectoryView">
-		<Folder Name="./">
+		<Folder Name="games">
 			<F
-				N="./*.*"
+				N="games/*.*"
 				Recurse="1"
-				Excludes="*~/;.git/;.svn/;externals/"/>
+				Refilter="1"
+				Excludes=".git/"/>
 		</Folder>
-		<Folder Name="./src_mud">
+		<Folder Name="runtime">
 			<F
-				N="./src_mud/*.*"
+				N="runtime/*.*"
 				Recurse="1"
-				Refilter="0"
-				Excludes=""/>
+				Refilter="1"
+				Excludes="cache/;store/"/>
 		</Folder>
+		<F
+			N="*.*"
+			Recurse="1"
+			Refilter="1"
+			Excludes="externals/;*.*~;.git/"/>
 	</Files>
 </Project>
