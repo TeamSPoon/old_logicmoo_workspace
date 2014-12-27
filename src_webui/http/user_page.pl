@@ -2,6 +2,8 @@
 /** <module> The web page the user interacts with
 
 */
+:- multifile(style/1).
+:- dynamic(style/1).
 
 :- use_module(library(http/thread_httpd)).
 :- use_module(library(http/http_dispatch)).
@@ -13,7 +15,7 @@
 :- use_module(library(option)).
 :- use_module(library(http/http_session)).
 :- use_module(library(http/http_wrapper)).
-:- use_module(weblog(html_form/ajaxify)).
+:- if_file_exists(use_module(weblog(html_form/ajaxify))).
 
 wire_in_weblog :-
   assertz(user:file_search_path(css, weblog('static/css'))),

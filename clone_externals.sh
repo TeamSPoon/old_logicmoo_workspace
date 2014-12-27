@@ -14,6 +14,7 @@ fi
 git clone $GITRC https://github.com/TeamSPoon/MUD_Examples games/
 git clone $GITRC https://github.com/TeamSPoon/hMUD $MUDPACK/hMUD
 sudo ln -s `pwd`/$MUDPACK/hMUD /var/www/html/hmud
+sudo adduser --gecos "PrologMUD User" --disabled-login --disabled-password prologmud
 
 # very usefull for seeing what is going on
 git clone $GITRC https://github.com/TeamSPoon/ClioPatria $MUDPACK/ClioPatria

@@ -19,6 +19,6 @@ echo `pwd`
 echo "Hit CTRL+C ${BASH_SOURCE[0]} $RUNFILE ";
 sleep 1;
 cd $NEWPWD
-swipl -L32G -G32G -T32G -f $RUNFILE
+sudo su -c "swipl -L32G -G32G -T32G -f ${RUNFILE}" prologmud
 cd $OLDPWD
 echo exit $?
