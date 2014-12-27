@@ -1251,6 +1251,8 @@ objects(dir,["n","s","e","w","u","d"]).
 
 
 
+:- onLoad(must_det(show_call((atloc('NpcCol1012-Ensign728',X),nonvar(X))))).
+
 
 end_of_file.
 

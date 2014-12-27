@@ -169,7 +169,7 @@ subclass(region,region).
 :-onSpawn localityOfObject(stove,kitchen).
 :-onSpawn localityOfObject(kitchen_counter,kitchen).
 
-
+subclass(monster,agent).
 subclass(candle,portable_device).
 subclass(flashlight, portable_device).
 subclass(desk, office_room_furnature).
@@ -219,6 +219,8 @@ subclass(bed, bed_room_furnature).
 subclass(stand_table, bed_room_furnature).
 subclass(dresser, bed_room_furnature).
 
+isa(explorer(player1),agent).
+
 subclass(washing_machine, device_furnature).
 subclass(table, furnature).
 subclass(table, hassurface).
@@ -237,7 +239,7 @@ subclass(houseplant, partof).
 subclass(planter, container). 
 subclass(gueridon, living_room_furnature).
 subclass(garden_plant, outdoor_furnature).
-subclass(spatialthing,visible).
+subclass(spatialthing,lookable).
 subclass(nani,teddybear).
 subclass(teddybear,treasure).
 
