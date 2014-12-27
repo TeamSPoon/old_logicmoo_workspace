@@ -88,7 +88,7 @@
 :- include(logicmoo('vworld/world_text.pl')).
 :- include(logicmoo('vworld/world_effects.pl')).
 :- include(logicmoo('vworld/world_events.pl')).
-:- if_file_exists(include(logicmoo('vworld/world_spawning.pl'))).
+:- if_file_exists(ensure_loaded(logicmoo('vworld/world_spawning.pl'))).
 
 :-export(isaOrSame/2).
 isaOrSame(A,B):-A==B,!.
@@ -103,7 +103,7 @@ prop_memb(E,L):-flatten([E],EE),flatten([L],LL),!,intersect(A,EE,B,LL,isaOrSame(
 exisitingThing(O):-item(O).
 exisitingThing(O):-agent(O).
 exisitingThing(O):-region(O).
-anyInst(O):-type(O).
+anyInst(O):-col(O).
 anyInst(O):-exisitingThing(O).
 
 /*
@@ -111,27 +111,27 @@ anyInst(O):-exisitingThing(O).
 :-decl_type(metaclass).
 
 metaclass(formattype).
-metaclass(regiontype).
-metaclass(agenttype).
-metaclass(itemtype).
+metaclass(regioncol).
+metaclass(agentcol).
+metaclass(itemcol).
 % isa(metaclass,metaclass).
 
-% argsIsaInList(typeGenls(type,metaclass)).
+% argsIsaInList(typeGenls(col,metaclass)).
 
 % decl_database_hook(assert(_),typeGenls(_,MC)):-assert_isa(MC,metaclass).
 
 % deduce_facts(typeGenls(T,MC),deduce_facts(subclass(S,T),isa(S,MC))).
 
-typeGenls(region,regiontype).
-typeGenls(agent,agenttype).
-typeGenls(item,itemtype).
+typeGenls(region,regioncol).
+typeGenls(agent,agentcol).
+typeGenls(item,itemcol).
 */
 subclass(sillyitem,item).
 
 /*
-isa(region,regiontype).
-isa(agent,agenttype).
-isa(item,itemtype).
+isa(region,regioncol).
+isa(agent,agentcol).
+isa(item,itemcol).
 */
 
 %subclass(SubType,formattype):-isa(SubType,formattype).
@@ -152,28 +152,26 @@ create_meta(SuggestedName,SuggestedClass,BaseClass,SystemName):-
    assert_isa_safe(SystemName,SuggestedClass).
 
 
-subclass('Area',region).
 nonCreatableType(int).
 nonCreatableType(term).
-nonCreatableType(type).
 
 subclass(wearable,item).
+subclass(lookable,item).
 subclass(knife,item).
 subclass(food,item).
 
 
 createableType(FT):- nonvar(FT),formattype(FT),!,fail.
 createableType(FT):- nonvar(FT),nonCreatableType(FT),!,fail.
-createableType(item). %  type, formattype, 
+createableType(item). %  col, formattype, 
 createableType(SubType):-member(SubType,[agent,item,region]).
 createableType(S):- is_asserted(createableType(T)), subclass_backchaing(S,T).
 
 createableSubclassType(S,T):- createableType(T),is_asserted(subclass(S,T)).
 createableSubclassType(T,'TemporallyExistingThing'):- createableType(T).
 
-
 isa(int,formattype).
-isa(dir,type).
+isa(dir,col).
 % isa(dir,valuetype).
 isa(number,formattype).
 isa(string,formattype).
@@ -182,12 +180,12 @@ isa(string,formattype).
 create_agent(P):-create_agent(P,[]).
 create_agent(P,List):-must_det(create_instance(P,agent,List)).
 
-% decl_type(Spec):-create_instance(Spec,type,[]).
+% decl_type(Spec):-create_instance(Spec,col,[]).
 
 :-swi_export(create_instance/1).
 create_instance(P):- must_det((isa(P,What),createableType(What))),must_det(create_instance(P,What,[])).
 :-swi_export(create_instance/2).
-create_instance(P,What):-create_instance(P,What,[]).
+create_instance(Name,Type):-create_instance(Name,Type,[]).
 :-swi_export(create_instance/3).
 create_instance(What,Type,Props):- loop_check_local(time_call(create_instance_now(What,Type,Props)),dmsg(already_create_instance(What,Type,Props))).
 
@@ -209,8 +207,8 @@ create_instance_now(What,Type,Props):-
 create_instance_0(What,Type,List):- (var(What);var(Type);var(List)),trace_or_throw((var_create_instance_0(What,Type,List))).
 create_instance_0(I,_,_):-is_creating_now(I),!.
 create_instance_0(I,_,_):-asserta_if_new(is_creating_now(I)),fail.
-create_instance_0(What,FormatType,List):- FormatType\==type, formattype(FormatType),!,trace_or_throw(formattype(FormatType,create_instance(What,FormatType,List))).
-create_instance_0(SubType,type,List):-decl_type(SubType),padd(SubType,List).
+create_instance_0(What,FormatType,List):- FormatType\==col, formattype(FormatType),!,trace_or_throw(formattype(FormatType,create_instance(What,FormatType,List))).
+create_instance_0(SubType,col,List):-decl_type(SubType),padd(SubType,List).
 
 createableType(agent).
 subclass(actor,agent).
@@ -291,7 +289,7 @@ leash(+call),trace,
 
 create_instance_0(What,Type,Props):- leash(+call),trace,dtrace,trace_or_throw(dmsg(assumed_To_HAVE_creted_isnance(What,Type,Props))),!.
 
-%createableType(type).
+%createableType(col).
 
 
 

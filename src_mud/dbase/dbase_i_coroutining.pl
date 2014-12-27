@@ -40,7 +40,7 @@ arg_to_var(_Type,_String,_Var).
 
 same_arg(_How,X,Y):-var(X),var(Y),!,X=Y.
 same_arg(equals,X,Y):-!,equals_call(X,Y).
-same_arg(type(_Type),X,Y):-!, unify_with_occurs_check(X,Y).
+same_arg(col(_Type),X,Y):-!, unify_with_occurs_check(X,Y).
 
 same_arg(text,X,Y):-!, string_equal_ci(X,Y).
 
@@ -334,13 +334,13 @@ isac(X, List) :-
       put_attr(Y, isac, Domain),
       X = Y.
 
-col_size(C,S):-isa(C,completeExtentKnown),!,setof(E,isa(E,C),L),length(L,S).
-col_size(C,1000000):-isa(C,formattype),!.
-col_size(_,1000).
+type_size(C,S):-isa(C,completeExtentKnown),!,setof(E,isa(E,C),L),length(L,S).
+type_size(C,1000000):-isa(C,formattype),!.
+type_size(_,1000).
 
-comp_col(Comp,Col1,Col2):-col_size(Col1,S1),col_size(Col2,S2),compare(Comp,S1,S2).
+comp_type(Comp,Col1,Col2):-type_size(Col1,S1),type_size(Col2,S2),compare(Comp,S1,S2).
 
-inst_isac(X, List):- predsort(comp_col,List,SList),isac_gen(X,SList).
+inst_isac(X, List):- predsort(comp_type,List,SList),isac_gen(X,SList).
 
 % An attributed variable with attribute value Domain has been
 % assigned the value Y

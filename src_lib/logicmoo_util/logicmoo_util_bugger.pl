@@ -22,7 +22,7 @@
          module_predicates_are_exported/1,
          module_predicates_are_exported/0,
          all_module_predicates_are_transparent/1,
-         tlbugger:inside_loop_check/1,
+         
          is_loop_checked/1,
          is_module_loop_checked/2,
          snumbervars/1,
@@ -219,41 +219,36 @@ snumbervars(Term):-numbervars(Term,0,_End).
 % ===================================================================
 % Loop checking
 % ===================================================================
+:- thread_local ilc/1.
+:- dynamic(ilc/1).
 
-:- thread_local tlbugger:inside_loop_check/1.
-:- module_transparent(tlbugger:inside_loop_check/1).
+:- thread_local ilc_local/2.
+:- dynamic(ilc_local/2).
 
-:- thread_local tlbugger:inside_loop_check_local/2.
-:- module_transparent(tlbugger:inside_loop_check_local/2).
+make_key(CC,Key):- notrace(ground(CC)->Key=CC ; (copy_term(CC,Key,_),numbervars(Key,0,_))).
 
-make_key(CC,KeyA):- notrace(ground(CC)->KeyA=CC ;(copy_term(CC,Key,_),snumbervars(Key,0,_))),!,KeyA=Key. % ,term_to_atom(Key,KeyA).
+is_loop_checked(Call):-  make_key(Call,Key),!,ilc(Key).
+is_module_loop_checked(Module, Call):- (var(Call)->true;make_key(Call,Key)),!,ilc_local(Module,Key).
 
-is_loop_checked(B):-  make_key(B,BC),!,tlbugger:inside_loop_check(BC).
-is_module_loop_checked(Module, B):- (var(B)->true;make_key(B,BC)),!,tlbugger:inside_loop_check_local(Module,BC).
+no_loop_check_unsafe(Call):- with_no_assertions(ilc(_),Call).
 
-no_loop_check_unsafe(B):- with_no_assertions(tlbugger:inside_loop_check(_),B).
+no_loop_check(Call):- no_loop_check(Call,trace_or_throw(loop_to_no_loop_check(Call))).
+no_loop_check(Call, TODO):-  with_no_assertions(ilc(_),loop_check_local(Call,TODO)).
 
-no_loop_check(B):- no_loop_check(B,trace_or_throw(loop_to_no_loop_check(B))).
-no_loop_check(B, TODO):-  with_no_assertions(tlbugger:inside_loop_check(_),loop_check_local(B,TODO)).
+no_loop_check_module( Module, Call, TODO):-  with_no_assertions(ilc_local(Module,_),loop_check_local(Call,TODO)).
 
-no_loop_check_module( Module, B, TODO):-  with_no_assertions(tlbugger:inside_loop_check_local(Module,_),loop_check_local(B,TODO)).
+loop_check(Call):- loop_check(Call,fail).
+loop_check(Call, TODO):- make_key(Call,Key),!, loop_check_term(Call,Key,TODO).
 
-loop_check(B):- loop_check(B,fail).
-loop_check(B, TODO):- make_key(B,BC),!, loop_check_term(B,BC,TODO).
+loop_check_local(Call):- loop_check_local(Call,trace_or_throw(syntax_loop_check_local(Call))).
+loop_check_local(Call,TODO):- loop_check_module(current,Call,TODO).
 
-loop_check_local(B):- loop_check_local(B,trace_or_throw(syntax_loop_check_local(B))).
-loop_check_local(B,TODO):- loop_check_module(current,B,TODO).
+% loop_check_local(Call):- loop_check_local(Call,trace_or_throw(syntax_loop_check_local(Call))).
+loop_check_module(Module,Call):-loop_check_module(Module,Call,fail).
+loop_check_module(Module,Call,TODO):- make_key(Call,Key), LC = ilc_local(Module,Key),  ( \+(LC) -> ((asserta(LC,REF),setup_call_cleanup(true,Call,notrace(erase(REF))))); call(TODO) ).
 
-% loop_check_local(B):- loop_check_local(B,trace_or_throw(syntax_loop_check_local(B))).
-loop_check_module(Module,B):-loop_check_module(Module,B,fail).
-loop_check_module(Module,B,TODO):- make_key(B,BC), LC = tlbugger:inside_loop_check_local(Module,BC),
-   % term_to_atom(B,BC),!, 
-    ( \+(LC) ->
-         setup_call_cleanup(asserta(LC),B,retract(LC));
-         call(TODO) ).
-
-loop_check_term(B,BC,TODO):-  ( \+(tlbugger:inside_loop_check(BC)) -> setup_call_cleanup(asserta(tlbugger:inside_loop_check(BC)),B, retract((tlbugger:inside_loop_check(BC)))) ;call(TODO) ).
-
+loop_check_term(Call,Key,TODO):- TT = ilc(Key),
+   ( \+(TT) -> (asserta(TT,REF),setup_call_cleanup(true, Call, notrace(erase(REF)))) ; call(TODO) ).
 
 % ===================================================================
 % Bugger Term Expansions
@@ -269,9 +264,9 @@ bdmsg(_):-!.
 bdmsg(D):-(format(user_error,'dmsg: ~q~n',[D])).
 
 bugger_t_expansion(T,T):-not(compound(T)),!.
-bugger_t_expansion(T,AA):- T=..[F,A],unwrappabe(F),bdmsg(bugger_term_expansion(T)),bugger_t_expansion(A,AA),!.
 bugger_t_expansion([F0|ARGS0],[F1|ARGS1]):-bugger_t_expansion(F0,F1),bugger_t_expansion(ARGS0,ARGS1).
-bugger_t_expansion(T,TT):- T=..[F|ARGS0],bugger_t_expansion(ARGS0,ARGS1), TT=..[F|ARGS1].
+bugger_t_expansion(T,AA):-compound_name_arguments(T,F,[A]),unwrappabe(F),bdmsg(bugger_term_expansion(T)),bugger_t_expansion(A,AA),!.
+bugger_t_expansion(T,TT):-compound_name_arguments(T,F,ARGS0),bugger_t_expansion(ARGS0,ARGS1), TT=..[F|ARGS1].
 
 unwrappabe(F):-member(F,[traceok,notrace,hotrace]).
 %unwrappabe(F):-member(F,['debugOnError',debugOnError0]),!,fail.
@@ -292,9 +287,6 @@ bugger_term_expansion(T,T3):- compound(T), once(bugger_t_expansion(T,T2)),T\==T2
 % user:goal_expansion(G,G2):- compound(G),bugger_goal_expansion(G,G2).
 
 % user:expand_term(G,G2):- compound(G),bugger_expand_term(G,G2),!.
-
-:-thread_local in_bugger_expansion/0.
-user:term_expansion((H:-G),(H:-G2)):-loop_check(bugger_term_expansion(G,G2)).
 
 % ===================================================================
 % Substitution based on ==
@@ -471,14 +463,76 @@ def_meta_predicate(F,S,E):- trace_or_throw(def_meta_predicate(F,S,E)).
 :- meta_predicate_transparent((loop_check(0,0))).
 :- meta_predicate_transparent((loop_check(0))).
 
+:-export(mstatistics/0).
+mstatistics:-
+  garbage_collect,
+  garbage_collect_atoms,
+  statistics,
+  statistics(stack,Om),O is Om/1000000,
+  statistics(clauses,C),
+  statistics(memory,[Tm,_]),T is Tm/1000000,
+  statistics(atoms,[A,Mm,0]),AM is Mm/1000000,
+  OdC is O/C,
+  OdA is (A/1000)*39,
+  PerAtom is (Mm/A),
+  b_i(L,NA),
+  save_atoms,
+  fmt((stack/clauses/mem/new + O/C/T-Tm/NA = c(OdC)/a(OdA-AM-PerAtom))),!,
+  (NA<1000->fmt(L);true).
+
+current_atom_or_blob(X,atom):-current_atom(X).
+current_atom_or_blob(X,blob(T)):-current_blob(X,T).
+current_atom_or_blob(X,functor(Y)):-current_functor(X,Y).
+current_atom_or_blob(X,key):-current_key(X).
+current_atom_or_blob(X,flag):-current_key(X).
+
+blob_info(A,atom,blob(A,text)).
+blob_info(A,blob(text),blob(A,text)).
+blob_info(A,functor(Y),functor(A,Y)).
+blob_info(A,key,key(A,Y)):-findall(V,recorded(A,V),Y).
+blob_info(A,flag,flag(A,Y)):-flag(A,Y,Y).
+blob_info(A,blob(clause),blob(A,T,Y,H,B)):-T=clause, findall(V,clause_property(A,V),Y),(clause(H,B,A)->true;H=dead).
+blob_info(A,blob(record),blob(A,T,Y)):-T=record,with_output_to(string(Y),print_record_properties(A, current_output)).
+% blob_info(A,blob(T),blob(A,T,Y)):-with_output_to(string(Y),prolog_term_view:emit_term(A, [])).
+blob_info(A,blob(T),blob(A,T)).
+
+:-export(saved_current_atom/2).
+:-dynamic(saved_current_atom/2).
+:-export(new_atoms/2).
+new_atoms(X,Type):-current_atom_or_blob(X,Type),not(saved_current_atom(X,Type)).
+:-export(save_atoms/0).
+save_atoms:-forall(new_atoms(X,Type),assert(saved_current_atom(X,Type))).
+:-export(b_i/2).
+b_i(L,NA):-findall(W,(new_atoms(X,Type),once(blob_info(X,Type,W))),LL),list_to_set(LL,L),length(L,NA).
+print_record_properties(Record, Out) :-
+	format(Out, 'Record reference ~w~n', [Record]),
+	(   recorded(Key, Value, Record)
+	->  format(Out, ' Key:   ~p~n', [Key]),
+	    format(Out, ' Value: ~p~n', [Value])
+	;   format(Out, ' <erased>~n', [])
+	).
+
+print_clause_properties(Ref, Out) :-
+	format(Out, 'Clause reference ~w~n', [Ref]),
+	(   clause(Head, Body, Ref)
+	->  nl(Out),
+	    portray_clause(Out, (Head:-Body))
+	;   format(Out, '\t<erased>~n', [])
+	).
+
+
+
+
+thread_local_leaks:-!.
 
 :- export(((decl_thlocal)/1)).
-:- meta_predicate(( decl_thlocal(+),  decl_thlocal(+,+,+,+))).
+:- meta_predicate(( decl_thlocal(:),  decl_thlocal(+,+,+,+))).
 decl_thlocal(M:P):-!,with_pi(M:P,(decl_thlocal)).
 decl_thlocal(P):-with_pi(thlocal:P,(decl_thlocal)).
 
 decl_thlocal(CM,M,PI,F/A):-
    (var(PI)->functor(PI,F,A);true),
+   % (thread_local_leaks->dynamic(M:F/A);thread_local(M:F/A)),
    thread_local(M:F/A),
    % make_transparent(CM,M,PI,F/A),
    dynamic_multifile_exported(CM, M,PI,F/A).
@@ -518,11 +572,10 @@ trace_or(E):- trace,E.
 
 has_gui_debug :- getenv('DISPLAY',NV),NV\==''.
 
+:-export(ifWontTrace/0).
+:-decl_thlocal(ifWontTrace/0).
 
 :-export(set_no_debug/0).
-
-
-
 set_no_debug:- 
    retractall(ifCanTrace),
    retractall(ifWontTrace),
@@ -566,8 +619,10 @@ trace_or_throw(E):- trace_or(throw(E)).
 :-multifile evil_term/3.
 :-dynamic evil_term/3.
 
-:- thread_local has_auto_trace/1.
+:- decl_thlocal(has_auto_trace/1).
 
+:-decl_thlocal in_bugger_expansion/0.
+user:term_expansion((H:-G),(H:-G2)):-loop_check(bugger_term_expansion(G,G2)).
 
 :- meta_predicate_transparent(tlocal/2).
 tlocal(M,ON):- forall(current_predicate(M:F/A), tlocal(M,F,A,ON)).
@@ -739,8 +794,8 @@ user_use_module(What):- within_module(use_module(What),'user').
 %:- meta_predicate_transparent((loop_check_fail(0))).
 
 
-:-thread_local tlbugger:can_table/0.
-:-thread_local tlbugger:cannot_table/0.
+:-decl_thlocal tlbugger:can_table/0.
+:-decl_thlocal tlbugger:cannot_table/0.
 % thread locals should defaults to false: tlbugger:can_table.
 
 cannot_table_call(Call):- with_assertions(tlbugger:cannot_table,Call).
@@ -776,7 +831,7 @@ call_skipping_n_clauses(N,H):-
 
 % ===================================================================
 
-:-thread_local tlbugger:attributedVars.
+:-decl_thlocal tlbugger:attributedVars.
 
 % tlbugger:attributedVars.
 
@@ -997,7 +1052,7 @@ filter_repeats(AVar,Call):-
 
 % =========================================================================
 
-:- thread_local(tlbugger:wastracing/0).
+:- decl_thlocal(tlbugger:wastracing/0).
 
 % =========================================================================
 % cli_notrace(+Call) is nondet.
@@ -1008,7 +1063,7 @@ traceok(X):- tlbugger:wastracing -> call_cleanup((trace,call(X)),notrace) ; call
 
 % =========================================================================
 
-:- thread_local(tlbugger:skip_bugger/0).
+:- decl_thlocal(tlbugger:skip_bugger/0).
 
 % false = use this wrapper, true = code is good and avoid using this wrapper
 skipWrapper:-tlbugger:skip_bugger.
@@ -1100,15 +1155,14 @@ moo_hide_show_childs(M,F,A,_MPred):-
 % can/will Tracer.
 % ==========================================================
 
-:-thread_local(ifCanTrace/0).
+:-decl_thlocal(ifCanTrace/0).
 % thread locals should defaults to false: ifCanTrace.
 ifCanTrace.
 
 isConsole :- telling(user).
 isConsole :- current_output(X),!,stream_property(X,alias(user_output)).
 
-:-export(ifWontTrace/0).
-:-thread_local(ifWontTrace/0).
+
 willTrace:-ifWontTrace,!,fail.
 willTrace:-not(isConsole),!,fail.
 willTrace:-ifCanTrace.
@@ -1456,8 +1510,6 @@ must_each0([]):-!.
 must_each0([E|List]):-E,must_each0(List).
 
 :-moo_hide_show_childs(one_must/2).
-% now using gensym counter instead of findall (since findall can make tracing difficult)
-
 one_must(C1,C2,C3):-one_must(C1,one_must(C2,C3)).
 one_must(Call,OnFail):- ( Call *->  true ;    OnFail ).
 
@@ -1489,7 +1541,7 @@ must_det_l([]):-!.
 must_det_l([C|List]):-!,must_det(C),!,must_det_l(List).
 must_det_l(C):- !,must_det(C).
 
-:-thread_local tlbugger:skip_use_slow_sanity/0.
+:-decl_thlocal tlbugger:skip_use_slow_sanity/0.
 % thread locals should defaults to false tlbugger:skip_use_slow_sanity.
 
 slow_sanity(C):-  must(C),!. %  (tlbugger:skip_use_slow_sanity ; must_det(C)),!.
@@ -1517,6 +1569,9 @@ dynamic_if_missing(F/A):-dynamic([F/A]).
 
 pp_listing(Pred):- functor(Pred,File,A),functor(FA,File,A),listing(File),nl,findall(NV,predicate_property(FA,NV),LIST),writeq(LIST),nl,!.
 
+%:-module_transparent(wac(+,:,0,:)).
+% wac(M,AssertA,Call,RetractA):-!,setup_call_cleanup(M:asserta(AssertA),Call,must_det(M:retract(RetractA))).
+%wac(M,AssertA,Call):- M:asserta(AssertA,REF),setup_call_cleanup(true,Call,notrace(erase(REF))).
 
 :- meta_predicate_transparent(with_assertions(+,0)).
 with_assertions( [],Call):- !,Call.
@@ -1535,14 +1590,25 @@ with_assertions(op(N,XFY,OP),Call):-!,
 
 % with_assertions(THead,Call):- functor(THead,F,_),b_setval(F,THead).
 
+/*
 with_assertions(THead,Call):- ground(THead),!,
  must_det(to_thread_head(THead,M,_Head,WithA)),
    ( M:WithA -> Call ; setup_call_cleanup(M:asserta(WithA),Call,must_det(M:retract(WithA)))).
+*/
+
+
+with_assertions(THead,Call):- 
+ to_thread_head(THead,M,_Head,HAssert),
+    M:asserta(HAssert,Ref),
+     setup_call_cleanup(true,Call,notrace(erase(Ref))).
+
+/*
 
 with_assertions(THead,Call):- !,
  must_det(to_thread_head(THead,M,_Head,H)),
    copy_term(H,  WithA), !,
    setup_call_cleanup(M:asserta(WithA),Call,must_det(M:retract(WithA))).
+
 
 with_assertions(THead,Call):- 
  must_det(to_thread_head(THead,M,_Head,H)),
@@ -1554,22 +1620,35 @@ with_assertions(M,WithA,Call):- M:WithA,!,Call.
 with_assertions(M,WithA,Call):-
    setup_call_cleanup(M:asserta(WithA),Call,must_det(M:retract(WithA))).
 
+*/
+
 :-meta_predicate_transparent(with_no_assertions(+,0)).
 with_no_assertions(THead,Call):-
- must_det(to_thread_head((THead:-!,fail),M,_Head,H)),
-   copy_term(H,  WithA), !, setup_call_cleanup(M:asserta(WithA),Call,must_det(M:retract(WithA))).
+ must_det(to_thread_head((THead:- (!,fail)),M,_HEAD,H)),
+   copy_term(H,  WithA), !,
+    (M:asserta(WithA,REF),setup_call_cleanup(true,Call,notrace(erase(REF)))).
 
-to_thread_head((H:-B),TL,(HO:-B),(HH:-B)):-!,to_thread_head(H,TL,HO,HH),!.
+/*
+old version
+:-meta_predicate_transparent(with_no_assertions(+,0)).
+with_no_assertions(THead,Call):-
+ must_det(to_thread_head((THead:- (!,fail)),M,Head,H)),
+   copy_term(H,  WithA), !, setup_call_cleanup(M:asserta(WithA,REF),Call,must_det(M:retract(Head))).
+*/
+
+to_thread_head((H:-B),TL,HO,(HH:-B)):-!,to_thread_head(H,TL,HO,HH),!.
 to_thread_head(thglobal:Head,thglobal,thglobal:Head,Head):- !.
 to_thread_head(user:Head,user,user:Head,Head):- !.
 to_thread_head(TL:Head,TL,TL:Head,Head):-!, check_thread_local(TL:Head).
 to_thread_head(Head,thlocal,thlocal:Head,Head):-!,check_thread_local(thlocal:Head).
 to_thread_head(Head,tlbugger,tlbugger:Head,Head):- check_thread_local(tlbugger:Head).
 
+check_thread_local(thlocal:_):-!.
+check_thread_local(_):-!.
 check_thread_local(user:_):-!.
 check_thread_local(TL:Head):-slow_sanity(( predicate_property(TL:Head,(dynamic)),must_det(predicate_property(TL:Head,(thread_local))))).
 
-:-thread_local(tlbugger:dmsg_hidden/1).
+:-decl_thlocal(tlbugger:dmsg_hidden/1).
 :-meta_predicate_transparent(with_all_dmsg(0)).
 
 with_all_dmsg(Call):-
@@ -1716,7 +1795,7 @@ tst_fmt:- make,
  doall((
         ansi_term:ansi_color(FC, _),
         member(FG,[hfg(FC),fg(FC)]),
-        % ansi_term:ansi_color(BC, _),
+        % ansi_term:ansi_color(Key, _),
         member(BG,[hbg(default),bg(default)]),
         member(R,List),
         % random_member(R1,List),
@@ -1761,7 +1840,7 @@ logger_property(todo,once,true).
 
 :-debug(todo).
 
-:- thread_local tlbugger:is_with_dmsg/1.
+:- decl_thlocal tlbugger:is_with_dmsg/1.
 
 with_dmsg(Functor,Goal):-
    with_assertions(tlbugger:is_with_dmsg(Functor),Goal).
@@ -1997,7 +2076,7 @@ contrasting_color(black,white).
 contrasting_color(default,default).
 contrasting_color(_,default).
 
-:-thread_local(ansi_prop/2).
+:-decl_thlocal(ansi_prop/2).
 
 sgr_on_code(Ctrl,OnCode):- ansi_term:sgr_code(Ctrl,OnCode),!.
 sgr_on_code(blink, 6).
@@ -2102,7 +2181,7 @@ stack_check_else(BreakIfOver,Call):- stack_depth(Level) ,  ( Level < BreakIfOver
 % dumpstack_arguments.
 dumpST:-notrace(dumpST(5000)).
 
-dumpST(_):-hide_all_debug,!.
+% dumpST(_):-hide_all_debug,!.
 dumpST(Opts):- prolog_current_frame(Frame),dumpST(Frame,Opts).
 
 dumpST(Frame,MaxDepth):-integer(MaxDepth),!,dumpST(Frame,[max_depth(MaxDepth),numbervars(safe),show([level,goal,clause])]).
@@ -2566,14 +2645,16 @@ quiet_all_module_predicates_are_transparent(ModuleName):-
 % bugger_prolog_exception_hook(error(syntax_error(operator_expected),_),_,_,_).
 bugger_prolog_exception_hook(Info,_,_,_):- bugger_error_info(Info),!, dumpST,dmsg(prolog_exception_hook(Info)), dtrace.
 
+bugger_error_info(C):-contains_var(type_error,C).
 bugger_error_info(C):-contains_var(instantiation_error,C).
-bugger_error_info(C):-contains_var(existence_error(procedure,s/0),C).
+bugger_error_info(C):-contains_var(existence_error(procedure,_/_),C).
 
 
 % have to load this module here so we dont take ownership of prolog_exception_hook/4.
 :- user_use_module(library(prolog_stack)).
 
-user:prolog_exception_hook(A,B,C,D):-once(copy_term(A,AA)),catchv(( once(bugger_prolog_exception_hook(AA,B,C,D))),_,fail),fail.
+user:prolog_exception_hook(A,B,C,D):- fail,
+   once(copy_term(A,AA)),catchv(( once(bugger_prolog_exception_hook(AA,B,C,D))),_,fail),fail.
 
 :-'$syspreds':'$hide'('$syspreds':leash/1).
 :-'$syspreds':'$hide'(leash/1).

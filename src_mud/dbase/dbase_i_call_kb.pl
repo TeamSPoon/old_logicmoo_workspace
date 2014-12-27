@@ -141,7 +141,7 @@ cyckb_t_via_implies(CONSEQ):- fail, loop_check(cyckb_t_implies(ANTE,CONSEQ)), lo
 cyckb_t_call(ANTE):- nop(cyckb_t_call(ANTE)),!,fail.
 cyckb_t_implies(ANTE,CONSEQ):- nop(cyckb_t_implies(ANTE,CONSEQ)),!,fail.
 
-:-thread_local thlocal:useDbase_t/0.
+:-decl_thlocal thlocal:useDbase_t/0.
 
 kbp_t_list_prehook(PLIST,PLIST).
 

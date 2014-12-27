@@ -18,7 +18,7 @@
 % Possible agent actions.
 
 :-decl_type(vacuum).
-type(vacuum).
+col(vacuum).
 
 world_agent_plan(_World,Agent,Act):-
    isa(Agent,vacuum),

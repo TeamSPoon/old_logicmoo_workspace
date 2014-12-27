@@ -8,8 +8,8 @@
 
 :- register_module_type(command).
 
-isa(human_player,agenttype).
-subclass(agenttype,type).
+isa(human_player,agentcol).
+subclass(agentcol,col).
 
 % type_action_info(human_player,help, "shows this help").
 type_action_info(human_player,help(optional(string,"")), "shows this help").

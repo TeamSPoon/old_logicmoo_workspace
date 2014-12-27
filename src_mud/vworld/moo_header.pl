@@ -80,7 +80,7 @@ end_of_file.
 
 :- dynamic_multifile_exported ft_info/2.
 :- dynamic_multifile_exported subft/2.
-:- dynamic_multifile_exported type/1.
+:- dynamic_multifile_exported col/1.
 
 
 %  very very first import

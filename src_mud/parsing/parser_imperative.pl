@@ -98,13 +98,13 @@ parse_for(Type,StringM,Term,LeftOver):-
       fmt('Success! parse \'~q\' "~q" = ~q   (leftover=~q) . ~n',[Type,String,Term,LeftOver]);
       fmt('No Success.~n',[])).
 
-meets_desc_spec(T,_L):- term_to_atom(T,S0),string_to_atom(S0,A),atomic_list_concat_catch([_,_|_],'mudBareHandDa',A),!,fail.
+meets_desc_spec(T,_L):- show_call(term_to_atom(T,S0)),string_to_atom(S0,A),atomic_list_concat_catch([_,_|_],'mudBareHandDa',A),!,fail.
 meets_desc_spec(_,[]):-!.
 meets_desc_spec(S,[DS|SL]):-!,meets_desc_spec(S,DS),meets_desc_spec(S,SL),!.
 meets_desc_spec(S,From-To):-!, desc_len(S,Len),!, between(From,To,Len).
 meets_desc_spec(_,_).
 
-desc_len(S0,Region):- term_to_atom(S0,S),
+desc_len(S0,Region):- show_call(term_to_atom(S0,S)),
    atomic_list_concat_catch(Words,' ',S),length(Words,Ws),atomic_list_concat_catch(Sents,'.',S),length(Sents,Ss),Region is Ss+Ws,!.
 
 
@@ -120,7 +120,7 @@ text_means(_Agent,_Text,_Value):-fail.
 
 relates(Agent,Relation,Obj):-loop_check(relates_lc(Agent,Relation,Obj),fail).
 relates_lc(Agent,Relation,Obj):-text_means(Agent,Relation,Obj),!.
-relates_lc(_    ,Relation,Obj):- atom(Relation),type(Relation),!,isa(Obj,Relation).
+relates_lc(_    ,Relation,Obj):- atom(Relation),col(Relation),!,isa(Obj,Relation).
 relates_lc(_    ,Relation,Obj):-contains_var(Relation,value),subst(Relation,value,Obj,Call),!,req(Call).
 relates_lc(Agent,same(Relation),Obj):- !, relates(Agent,Relation,Value),relates(Obj,Relation,Value).
 relates_lc(Agent,Relation,Obj):- atom(Relation),!, prop(Agent,Relation,Obj).
@@ -157,7 +157,7 @@ object_string_0_5(O,String):-object_string(_,O,0-5,String),!.
 :-dynamic object_string_fmt/3.
 object_string(_,O,DescSpecs,String):- object_string_fmt(O,DescSpecs,String),!.
 object_string(Agent,O,DescSpecs,String):- String = [O], 
-   object_print_details(save_fmt(String),Agent,O,DescSpecs,[type,item,agent,channel]),
+   object_print_details(save_fmt(String),Agent,O,DescSpecs,[col,item,agent,channel]),
    asserta(object_string_fmt(O,DescSpecs,String)),!.
 
 save_fmt(OS,' ~w ',[A]):-!,save_fmt_e(OS,A),!.
@@ -177,7 +177,7 @@ save_fmt_a(O,E):-atom_contains(E,'-'),!,must((to_word_list(E,WL),save_fmt_e(O,WL
 save_fmt_a(O,E):-member(E,[obj,value,the,is,spatialthing,prologHybrid,prologOnly,relation,mpred,'',[]]),O\== E,!.
 
 
-object_name_is_descriptive(O):- (isa(O,type);isa(O,mpred);isa(O,typeDeclarer);isa(O,valuetype),isa(O,name_is_descriptive)).
+object_name_is_descriptive(O):- (isa(O,col);isa(O,mpred);isa(O,colDeclarer);isa(O,valuetype),isa(O,name_is_descriptive)).
 
 :-swi_export(object_print_details/5).
 object_print_details(Print,Agent,O,DescSpecs,Skipped):-
@@ -195,9 +195,10 @@ must_make_object_string_list(P,Obj,WList):- call_tabled_can(must_make_object_str
 must_make_object_string_list_cached(P,Obj,WList):-
   must((object_string(P,Obj,0-5,String),nonvar(String),non_empty(String),string_ci(String,LString),to_word_list(LString,WList))).
 
+same_ci(A,B):-must((non_empty(A),non_empty(B))),any_to_string(A,StringA),any_to_string(B,StringB),!,string_ci(StringA,StringB),!.
 
-
-match_object(String,Obj):-must((non_empty(String),non_empty(Obj))),atom_string(Type,String),isaOrSame(Obj,Type).
+match_object(A,Obj):-same_ci(A,Obj),!.
+match_object(A,Obj):-isa(Obj,Type),same_ci(A,Type),!.
 match_object(S,Obj):-   
    atoms_of(S,Atoms),must(Atoms\=[]),
    current_agent_or_var(P),must_make_object_string_list(P,Obj,WList),!,
@@ -353,7 +354,7 @@ string_append(A,[B],C,ABC):-append(A,[B|C],ABC).
 is_counted_for_parse(I):-i_countable(I),not(excluded_in_parse(I)),!.
 
 excluded_in_parse(apath(_, _)).
-excluded_in_parse(I):-type(I).
+excluded_in_parse(I):-col(I).
 excluded_in_parse(I):-formattype(I).
 excluded_in_parse(I):-mpred_prop(_,argsIsaInList(I)).
 excluded_in_parse(apath(_ = _)).
@@ -394,7 +395,7 @@ parseIsa_Call(FT, BO, CIn, D):- list_tail(CIn,D), to_word_list(CIn,C),!, parseIs
 parseIsa(A, B, C) :- parseIsa(A, _, B, C).
 
 is_parsable_type(T):-formattype(T).
-is_parsable_type(T):-type(T).
+is_parsable_type(T):-col(T).
 is_parsable_type(vp).
 
 
@@ -488,7 +489,7 @@ specifiedItemType(String,not(Type),Inst):-!,not(specifiedItemType(String,Type,In
 specifiedItemType(String,Type,Inst2):- get_term_specifier_text(Inst,Type),equals_icase(Inst,String),!,must(Inst=Inst2).
 specifiedItemType(String,Type,Inst):- formattype(Type),checkAnyType(assert(parse),String,Type,AAA),Inst=AAA.
 specifiedItemType(String,Type,Longest) :- findall(Inst, (get_term_specifier_text(Inst,Type),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
-specifiedItemType(String,Type,Inst):- not(formattype(Type)),must(type(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
+specifiedItemType(String,Type,Inst):- not(formattype(Type)),must(col(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
 
 instances_of_type(Inst,Type):- no_repeats(isa(Inst,Type)).
 

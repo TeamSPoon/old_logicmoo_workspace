@@ -124,18 +124,21 @@ make_qlfs:-
 
 */
 
+user_ensure_nl_loaded(_):-!.
+user_ensure_nl_loaded(F):-load_files([F],[expand(true),if(changed),qcompile(auto)]).
+
 % :- user_ensure_loaded(logicmoo(pldata/tiny_kb)).
-:- user_ensure_loaded(logicmoo(pldata/nldata_freq_pdat)).
-:- user_ensure_loaded(logicmoo(pldata/nldata_BRN_WSJ_LEXICON)).
-:- user_ensure_loaded(logicmoo(pldata/nldata_colloc_pdat)).
-:- user_ensure_loaded(logicmoo(pldata/nldata_cycl_pos0)).
-:- user_ensure_loaded(logicmoo(pldata/nldata_dictionary_some01)).
-:- load_files([logicmoo(pldata/nldata_talk_db_pdat)],[expand(true),if(changed),qcompile(auto)]).
+:- user_ensure_nl_loaded(logicmoo(pldata/nldata_freq_pdat)).
+:- user_ensure_nl_loaded(logicmoo(pldata/nldata_BRN_WSJ_LEXICON)).
+:- user_ensure_nl_loaded(logicmoo(pldata/nldata_colloc_pdat)).
+:- user_ensure_nl_loaded(logicmoo(pldata/nldata_cycl_pos0)).
+:- user_ensure_nl_loaded(logicmoo(pldata/nldata_dictionary_some01)).
+:- user_ensure_nl_loaded(logicmoo(pldata/nldata_talk_db_pdat)).
 
 % :- user_ensure_loaded(logicmoo(pldata/tt0_00022_cycl)).
 % :- user_ensure_loaded(logicmoo(pldata/hl_holds)).
 % :- user_ensure_loaded(logicmoo(pldata/mworld0)).
-:- user_ensure_loaded(logicmoo(pldata/transform_dump)).
+:- user_ensure_nl_loaded(logicmoo(pldata/transform_dump)).
 % :- catch(user_ensure_loaded(logicmoo(pldata/withvars_988)),_,true).
 download_and_install_el:-
   shell('wget -N http://logicmoo.org/devel/LogicmooDeveloperFramework/TEMP~/www.logicmoo.org/downloads/datafiles/PlDataBinary.zip',_),
@@ -147,7 +150,6 @@ download_and_install_el:-
 :- asserta(loaded_external_kbs),show_call(kbp_to_dbase_t).
 
 
-% :- user_ensure_loaded(logicmoo(dbase/dbase_formattypes)).
 :- user_ensure_loaded(logicmoo(parsing/parser_imperative)).
 /*
 :- user_ensure_loaded(logicmoo(parsing/parser_talk)). 
@@ -209,7 +211,7 @@ agent_text_command(Agent,[run,Term], Agent,prologCall(Term)):- ignore(Term=someC
 % standard header used in all files that all modules are loaded (therefore useful for when(?) the day comes that modules *can*only*see their explicitly imported modules)
 % :- user_ensure_loaded(logicmoo(vworld/moo_header)).
 
-% These contain the definition of the object types.
+% These contain the definition of the object cols.
 % Load the map file appropriate for the world being used.
 % Load the mud files appropriate for the mobs being used.
 :- forall(filematch(logicmoo('*/?*.plmoo'), X),dmsg(X)).
@@ -279,7 +281,7 @@ lundef :- A = [],
   ?- mc_format('Hello ~w', [world]).
   ?- mc_html(p(['Hello ', b(world)])).
   ?- mc_ask([age(Age)], [p('How old are you'), input([name(age)])]).
-  Age = 24.				% type 24 <enter>
+  Age = 24.				% col 24 <enter>
   ==
 
 */

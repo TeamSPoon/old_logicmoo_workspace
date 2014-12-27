@@ -31,9 +31,9 @@ action_info(rez(term),"Rezes a new 'item' of some NameOrType into stowed invento
 agent_call_command(Agent,rez(NameOrType)):- nonvar(NameOrType),rez_to_inventory(Agent,NameOrType,_NewName).
 
 % ====================================================
-% object/type creation
+% object/col creation
 % ====================================================
-action_info(create(list(term)), "Rezes a new 'spatialthing' or creates a new 'type' of some NameOrType and if it's an 'item' it will put in stowed inventory").
+action_info(create(list(term)), "Rezes a new 'spatialthing' or creates a new 'col' of some NameOrType and if it's an 'item' it will put in stowed inventory").
 
 agent_call_command(Agent,create(SWhat)):- with_all_dmsg(must_det(create_new_object(Agent,SWhat))).
 
@@ -42,7 +42,7 @@ agent_call_command(Agent,create(SWhat)):- with_all_dmsg(must_det(create_new_obje
 
 :-swi_export(create_new_object/2).
 
-create_new_object(Agent,[type,NameOfType|DefaultParams]):-!,create_new_type(Agent,[NameOfType|DefaultParams]).
+create_new_object(Agent,[col,NameOfType|DefaultParams]):-!,create_new_type(Agent,[NameOfType|DefaultParams]).
 
 create_new_object(Agent,[NameOrType|Params]):-
    create_meta(NameOrType,NewType,spatialthing,NewName),

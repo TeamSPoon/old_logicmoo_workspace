@@ -54,9 +54,9 @@ verb_alias(logoff,logout).
 action_info(dmsg(optional(boolean,show)),"set the dmsg flag to on/off").
 agent_call_command(_Agent,dmsg(show)):- listing(tlbugger:dmsg_hidden(_)),current_prolog_flag(opt_debug,ON_OFF),fmt(current_prolog_flag(opt_debug,ON_OFF)).
 agent_call_command(_Agent,dmsg(FLAG)):- to_on_off(FLAG,on,off,ON_OFF),!,set_bugger_flag(opt_debug,ON_OFF),fmt(current_prolog_flag(opt_debug,ON_OFF)).
-action_info(show(optional(prolog,show)),"show messages of type").
+action_info(show(optional(prolog,show)),"show messages of col").
 agent_call_command(_Agent,show(A)):-bugger:dmsg_show(A).
-action_info(hide(optional(prolog,show)),"hide messages of type").
+action_info(hide(optional(prolog,show)),"hide messages of col").
 agent_call_command(_Agent,hide(A)):-bugger:dmsg_hide(A).
 
 % debug

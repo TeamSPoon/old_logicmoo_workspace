@@ -22,7 +22,7 @@
 :- register_module_type(planning).
 
 :-decl_type(predator).
-type(predator).
+col(predator).
 
 world_agent_plan(_World,Agent,Act):-
    isa(Agent,predator),

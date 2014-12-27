@@ -29,7 +29,7 @@ Positions:
 8   STANDING   The monster is standing.
 
 
-Attack types:
+Attack cols:
 
      0    hit/hits
      1    sting/stings
@@ -153,7 +153,7 @@ The following choices are available:
 
 Mob Types:
 
-The following mobtypes are currently implemented:
+The following mobcols are currently implemented:
 
  1) Unknown                
  2) Undead                

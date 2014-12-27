@@ -28,7 +28,7 @@ force_expand_goal(A, B) :- force_expand(expand_goal(A, B)).
 
 :-multifile(user:goal_expansion/2).
 
-:-thread_local inside_clause_expansion/1.
+:-decl_thlocal inside_clause_expansion/1.
    
 set_list_len(List,A,NewList):-length(List,LL),A=LL,!,NewList=List.
 set_list_len(List,A,NewList):-length(List,LL),A>LL,length(NewList,A),append(List,_,NewList),!.
@@ -53,7 +53,7 @@ isCycPredArity_Check(F,A):-get_mpred_prop(F,cycPred(A)).
 
 using_holds_db(F,A,_,_):- never_use_holds_db(F,A,_),!,fail.
 using_holds_db(F,A2,A,m2(F,A2,isCycPredArity_Check)):- integer(A2), A is A2-2, A>0, isCycPredArity_Check(F,A),!.
-using_holds_db(F,A,A,type(F/A)):- integer(A), type(F),!, must(A>0).
+using_holds_db(F,A,A,col(F/A)):- integer(A), col(F),!, must(A>0).
 using_holds_db(F,A,A,isCycPredArity_Check):- isCycPredArity_Check(F,A).
 using_holds_db(F,A,A,W):-integer(A),!,fail,trace_or_throw(wont(using_holds_db(F,A,A,W))).
 
@@ -80,7 +80,7 @@ negate_wrapper0(firstOrder,not_firstOrder).
 negate_wrapper0(asserted_dbase_t,asserted_dbase_f).
 negate_wrapper0(Dbase_t,Dbase_f):- atom_concat(Dbase,'_t',Dbase_t),atom_concat(Dbase,'_f',Dbase_f).
 
-:-thread_local hga_wrapper/3.
+:-decl_thlocal hga_wrapper/3.
 hga_wrapper(dbase_t,holds_t,dbase_t).
 
 get_goal_wrappers(if_use_holds_db, Holds_t , N):- hga_wrapper(_,Holds_t,_),!,negate_wrapper(Holds_t,N),!.

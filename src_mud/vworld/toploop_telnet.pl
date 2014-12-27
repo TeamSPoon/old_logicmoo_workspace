@@ -24,7 +24,8 @@
                   ensure_player_stream_local/1,
                   login_and_run_nodebug/0]).
 
-:- decl_thlocal wants_logout/1.
+:- multifile thlocal:wants_logout/1.
+:- decl_thlocal thlocal:wants_logout/1.
 
 :- dynamic thglobal:agent_message_stream/4, telnet_fmt_shown/3, thglobal:player_command_stack/2.
 
@@ -117,10 +118,10 @@ run_player_local :-
     with_no_assertions(thglobal:use_cyc_database,
      with_no_assertions(thlocal:useOnlyExternalDBs, 
       with_assertions(thlocal:session_agent(O,P),
-       ((repeat,
-         once(read_and_do_telnet), 
-      retract(thlocal:wants_logout(O)),
-        retractall(thglobal:agent_message_stream(P,Id,_,_))))))).
+        ((repeat,
+          once(read_and_do_telnet),
+          retract(thlocal:wants_logout(O)),
+        retractall(thglobal:agent_message_stream(P,Id,_,_))))))),!.
 
 
 set_console_attached:-
@@ -153,7 +154,8 @@ set_player_stream(P,Id,In,Out):-
    
 
 
-read_and_do_telnet:-   
+read_and_do_telnet:-
+  repeat,
    foc_current_player(P),
    ensure_player_stream_local(P),
          must(ignore(look_brief(P))),!,         
@@ -309,8 +311,8 @@ show_room_grid_single(_Room,LOC,_OutsideTest):- asserted_atloc(Obj,LOC),inst_lab
 show_room_grid_single(_Room,LOC,_OutsideTest):- asserted_atloc(_Obj,LOC),write('..'), !.
 show_room_grid_single(_Room,_LOC,_OutsideTest):- write('--'), !.
 
-inst_label(Obj,SLabe2):-term_to_atom(Obj,SLabel),sub_atom(SLabel,1,2,_,SLabe2),!.
-inst_label(Obj,SLabe2):-term_to_atom(Obj,SLabel),sub_atom(SLabel,0,2,_,SLabe2),!.
+inst_label(Obj,SLabe2):-show_call(term_to_atom(Obj,SLabel)),sub_atom(SLabel,1,2,_,SLabe2),!.
+inst_label(Obj,SLabe2):-show_call(term_to_atom(Obj,SLabel)),sub_atom(SLabel,0,2,_,SLabe2),!.
 inst_label(Obj,Label):- label_type(Label,Obj),!.
 inst_label(Obj,Label):-  iprops(Obj,nameStrings(Val)),Val\=Obj,inst_label(Val,Label),!.
 inst_label(Obj,Label):-  iprops(Obj,named(Val)),Val\=Obj,!,inst_label(Val,Label),!.

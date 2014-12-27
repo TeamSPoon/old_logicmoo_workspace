@@ -12,7 +12,7 @@
 
 :- register_module_type(command).
 
-argsIsaInList(action_verb_useable(verb,term(mpred),type,term(mpred))).
+argsIsaInList(action_verb_useable(verb,term(mpred),col,term(mpred))).
 
 
 subclass(eachOf('PortableObject','ProtectiveAttire',stowable),wieldable).

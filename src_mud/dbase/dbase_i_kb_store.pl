@@ -223,7 +223,7 @@ prolog_side_effects(P):-atom(P),!,prolog_side_effects(P/_).
 :-swi_export(maybe_typep/1).
 maybe_typep(F/A):- ((integer(A);current_predicate(F/A)),functor(G,F,A)), maybe_typep(G),!.
 maybe_typep(G):-prolog_side_effects(G),!,fail.
-maybe_typep(G):-functor_h(G,F),(mpred_prop(F,type);typeDeclarer(F)),!. %  ;type(F);formattype(F)
+maybe_typep(G):-functor_h(G,F),(mpred_prop(F,col);colDeclarer(F)),!. %  ;col(F);formattype(F)
 maybe_typep(F):-atom(F),!,maybe_typep(F/_).
 
 
@@ -252,7 +252,7 @@ transform_holds_3(_,[P|ARGS],[P|ARGS]):- not(atom(P)),!,dmsg(transform_holds_3),
 transform_holds_3(HLDS,[HOLDS,P,A|ARGS],OUT):- is_holds_true(HOLDS),!,transform_holds_3(HLDS,[P,A|ARGS],OUT).
 transform_holds_3(HLDS,[HOLDS,P,A|ARGS],OUT):- HLDS==HOLDS, !, transform_holds_3(HLDS,[P,A|ARGS],OUT).
 transform_holds_3(_,HOLDS,isa(I,C)):- was_isa(HOLDS,I,C),!.
-transform_holds_3(_,[Type,Inst],isa(Inst,Type)):-must_det(not(type(Type))).
+transform_holds_3(_,[Type,Inst],isa(Inst,Type)):-must_det(not(col(Type))).
 transform_holds_3(_,HOLDS,isa(I,C)):- holds_args(HOLDS,[ISA,I,C]),ISA==isa,!.
 
 transform_holds_3(Op,[Logical|ARGS],OUT):- 
@@ -261,7 +261,7 @@ transform_holds_3(Op,[Logical|ARGS],OUT):-
          OUT=..[Logical|LARGS].
 
 transform_holds_3(_,[props,Obj,Props],props(Obj,Props)).
-transform_holds_3(_,[Type,Inst|PROPS],props(Inst,[isa(Type)|PROPS])):- nonvar(Inst), not(Type=props), cached_isa(Type,typeDeclarer),must_det(not(never_type(Type))),!.
+transform_holds_3(_,[Type,Inst|PROPS],props(Inst,[isa(Type)|PROPS])):- nonvar(Inst), not(Type=props), cached_isa(Type,colDeclarer),must_det(not(never_type(Type))),!.
 transform_holds_3(_,[P,A|ARGS],DBASE):- atom(P),!,DBASE=..[P,A|ARGS].
 transform_holds_3(_,[P,A|ARGS],DBASE):- !, nonvar(P),dumpST,trace_or_throw(dtrace), DBASE=..[P,A|ARGS].
 transform_holds_3(Op,DBASE_T,OUT):- DBASE_T=..[P,A|ARGS],!,transform_holds_3(Op,[P,A|ARGS],OUT).
@@ -532,10 +532,8 @@ retractall_cloc(M,C):-ensure_predicate_reachable(M,C),fail.
 %retractall_cloc(M,C):-not(clause_asserted(M:C)),!.
 retractall_cloc(M,C):-database_real(retractall,M:C).
 
-
-database_real(assertz,G):- was_isa(G,I,C),hasInstance(C,I),!.
-database_real(assertz,G):- was_isa(G,I,C),!,show_call(asserta(hasInstance(C,I))).
-database_real(asserta,G):- was_isa(G,I,C),!,asserta_if_new(hasInstance(C,I)).
+database_real(assertz,G):- was_isa(G,I,C),assert_hasInstance(C,I),!.
+database_real(asserta,G):- was_isa(G,I,C),!,assert_hasInstance(C,I).
 database_real(P,C):- 
     copy_term(C,CC),
       ignore((once((into_assertable_form(CC,DB), functor_h(C,CF),functor_h(DB,DBF))),DBF \== CF, 

@@ -64,8 +64,14 @@
 :- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was(WAS)).
 :- set_prolog_flag(double_quotes,string).
 
-:- meta_predicate(if_file_exists(1)).
-if_file_exists(Call):-arg(1,Call,File),expand_file_search_path(File,X), (exists_file(X)->Call;dmsg(not_installing(Call,X))),!.
+:- meta_predicate(if_file_exists(:)).
+if_file_exists(M:Call):- arg(1,Call,File),(filematch(File,_)-> must((filematch(File,X),exists_file(X),call(M:Call)));fmt(not_installing(M,Call))),!.
+
+:-export(filematch/2).
+:-export(filematch/3).
+filematch(Mask,File1):-filematch('./',Mask,File1).
+filematch(RelativeTo,Mask,File1):-absolute_file_name(Mask,File1,[expand(true),extensions(['',plmoo,pl,'pl.in']),file_errors(fail),solutions(all),relative_to(RelativeTo),access(read)]).
+
 
 :- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)), 'user').
 

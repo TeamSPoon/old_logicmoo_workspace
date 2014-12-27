@@ -14,8 +14,8 @@
 planner_failure(Why,Info):-dmsg(error,Why-Info),banner_party(error,'FAILURE_PLANNER'),print_message(error,'FAILURE_PLANNER'(Why,Info)),!. %sleep(2).
 
 :- discontiguous(post_header_hook/0).
-:- thread_local((canDoTermExp/0)).
-:-thread_local thlocal:doing/1.
+:- decl_thlocal((canDoTermExp/0)).
+:-decl_thlocal thlocal:doing/1.
 :-retractall(canDoTermExp).
 :-dynamic(env_kb/1).
 
@@ -270,16 +270,16 @@ post_header:- dmsg(post_header),fail, forall(clause(post_header_hook,G),G).
 
 :- discontiguous(header_tests/0).
 
-run_tests(Call) :- 
+run_tests_hyhtn(Call) :- 
   statistics_runtime(InTime),  
-  with_assertions(doing(run_tests(Call)),
+  with_assertions(doing(run_tests_hyhtn(Call)),
    call_cleanup(Call, 
   ((
  statistics_runtime(OutTime),
   Time is OutTime - InTime,
   banner_party(informational,runtests(Call) = time(Time)))))).
 
-run_header_tests :- run_tests(forall(clause(header_tests,G),run_tests(G))).
+run_header_tests :- run_tests_hyhtn(forall(clause(header_tests,G),run_tests_hyhtn(G))).
 
 
 
@@ -2808,7 +2808,7 @@ enumOps.
 
 % *********************************************************************
 % findVarsAndTypes - collect a list of all variables and their
-%                    types as they occur in an operator
+%                    cols as they occur in an operator
 %                    also collect the list of "ne" constraints
 %                    that apply to variables
 %                    [<Type>,<Variable>|<Rest>]
@@ -2823,7 +2823,7 @@ findVarsAndTypes(operator(_,Pre,Nec,Cond),Vars,NEs) :-
 	append_dcut(PreNEs,NecNEs,NEs),
 	!.
 
-% collect all Vars and types in a changes clause
+% collect all Vars and cols in a changes clause
 %vtEffects(+EffectsClause,-VarsTypes,-NEClauses).
 
 vtEffects([],[],[]).
@@ -2835,7 +2835,7 @@ vtEffects([sc(Type,Obj1,Preds)|Rest],VT,NEs) :-
 	append_dcut(Obj1VT,RestVT,VT),
 	append_dcut(NEs1,RestNEs,NEs).
 
-% collect all Vars and types in a Prevail clause
+% collect all Vars and cols in a Prevail clause
 %vtPrevail(+PrevailClause,-VarsTypes,-NEClauses).
 
 vtPrevail([],[],[]).
@@ -2875,8 +2875,8 @@ vtPLst([is_of_sort(_,_)|Preds],Res,NEs) :-
 	vtPLst(Preds,Res,NEs).
 
 % here is the hard bit, Create a dummy literal - instantiate it with
-% the OCL predicate list to find the types then
-% match up the type with the original literal variables.
+% the OCL predicate list to find the cols then
+% match up the col with the original literal variables.
 
 vtPLst([Pred|Preds],Res,NEs) :-
 	functor(Pred,Name,Arity),
@@ -2900,7 +2900,7 @@ createVarList(N,[X|Rest]) :-
 	Next is N - 1,
 	createVarList(Next,Rest).
 
-% merge the list of variables and the list of types
+% merge the list of variables and the list of cols
 % pair(+TypeList,+VarList,-varTypeList).
 
 pair([],[],[]).
@@ -3413,9 +3413,9 @@ with_no_assertions(THead,Call):-
 
 to_thread_head((H:-B),TL,(HO:-B),(HH:-B)):-!,to_thread_head(H,TL,HO,HH),!.
 to_thread_head(thglobal:Head,thglobal,thglobal:Head,Head):- slow_sanity((predicate_property(thglobal:Head,(dynamic)),not(predicate_property(thglobal:Head,(thread_local))))).
-to_thread_head(TL:Head,TL,TL:Head,Head):-!, slow_sanity(( predicate_property(TL:Head,(dynamic)),must(predicate_property(TL:Head,(thread_local))))).
-to_thread_head(Head,thlocal,thlocal:Head,Head):-!, slow_sanity(( predicate_property(thlocal:Head,(dynamic)),must(predicate_property(thlocal:Head,(thread_local))))).
-to_thread_head(Head,tlbugger,tlbugger:Head,Head):- slow_sanity(( predicate_property(tlbugger:Head,(dynamic)),predicate_property(tlbugger:Head,(thread_local)))).
+to_thread_head(TL:Head,TL,TL:Head,Head):-!, slow_sanity(( predicate_property(TL:Head,(dynamic)),nop(must(predicate_property(TL:Head,(thread_local)))))).
+to_thread_head(Head,thlocal,thlocal:Head,Head):-!, slow_sanity(( predicate_property(thlocal:Head,(dynamic)),nop(must(predicate_property(thlocal:Head,(thread_local)))))).
+to_thread_head(Head,tlbugger,tlbugger:Head,Head):- slow_sanity(( predicate_property(tlbugger:Head,(dynamic)),nop(predicate_property(tlbugger:Head,(thread_local))))).
 
 slow_sanity(X):-must(X).
 
@@ -3438,9 +3438,10 @@ term_alias(neq,dif).*/
 term_alias(startOcl,start).
 term_alias(startOCL,start).
 
+/*
 :- use_module(library(pce)).
 :- use_module(library(gui_tracer)).
-
+*/
 
 :- thread_local tlbugger:inside_loop_check/1.
 :- module_transparent(tlbugger:inside_loop_check/1).
@@ -3534,7 +3535,7 @@ eraseall(Key) :-
 dmsg(Term):-dmsg(debug,Term).
 dmsg(Color,Term):-   tell(user),fresh_line, sformat(S,Term,[],[]),print_message_lines(user_output,kind(Color),[S-[]]),fresh_line,told,!.
 /*
-dmsg(Color,Term):- current_prolog_flag(tty_control, true),!,  tell(user),fresh_line,to_petty_color(Color,Type),
+dmsg(Color,Term):- current_prolog_flag(tty_control, true),!,  tell(user),fresh_line,to_petty_typeor(Color,Type),
    call_cleanup(((sformat(S,Term,[],[]),print_message(Type,if_tty([S-[]])))),told).
 */
 
@@ -3549,7 +3550,7 @@ to_petty_clause(V,('VARIABLE':-V)):-var(V),!.
 to_petty_clause((H:-B),(H:-B)):-!.
 to_petty_clause((':-'(B)),(':-'(B))):-!.
 to_petty_clause(((B)),(':-'(B))):-!.
-to_petty_color(X,X).
+to_petty_typeor(X,X).
 
 nop(_P).
 doall(G):-ignore((G,fail)).

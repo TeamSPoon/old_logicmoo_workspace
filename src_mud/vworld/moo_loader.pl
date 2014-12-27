@@ -10,10 +10,10 @@
 
 :-dynamic(registered_game_file/1).
 :-swi_export(declare_load_game/1).
-declare_load_game(File):-asserta_if_new(registered_game_file(File)).
+declare_load_game(File):-show_call(asserta_if_new(registered_game_file(File))).
 
 :-swi_export(load_game_files/0).
-load_game_files :- forall(registered_game_file(File),load_game(File)).
+load_game_files :- forall(registered_game_file(File),ensure_plmoo_loaded(File)).
 
 :-dynamic thglobal:current_world/1.
 thglobal:current_world(current).
@@ -33,11 +33,6 @@ load_game(World,File):-
       retractall(loaded_file_world_time(_,_,_)),
       time_call(ensure_plmoo_loaded(File)),!,
       time_call(finish_processing_world))).
-
-:-meta_predicate_transparent(filematch/2).
-:-meta_predicate_transparent filematch/3.
-filematch(Mask,File1):-filematch('./',Mask,File1).
-filematch(RelativeTo,Mask,File1):-absolute_file_name(Mask,File1,[expand(true),access(read),extensions(['',plmoo,pl]),file_errors(fail),solutions(all),relative_to(RelativeTo)]).
 
 /*
 
@@ -97,8 +92,11 @@ load_data_file(FileIn):-
    setup_call_cleanup(see(File),(load_game_name_stream(World),asserta_new(thglobal:loaded_game_file(World,File)),!), seen)),
   dmsg(load_data_file_complete(File)),!.
    
-load_game_name_stream(_Name):- repeat,read_one_term(Term),myDebugOnError(add(Term)),Term == end_of_file,!.
-load_game_name_stream(_Name,Stream):- repeat,read_one_term(Stream,Term),myDebugOnError(add(Term)),Term == end_of_file,!.
+load_game_name_stream(_Name):- repeat,read_one_term(Term),myDebugOnError(add_term(Term)),Term == end_of_file,!.
+load_game_name_stream(_Name,Stream):- repeat,read_one_term(Stream,Term),myDebugOnError(add_term(Term)),Term == end_of_file,!.
+
+add_term(':-'(dynamic(F/A))):-mpred_arity(F,A),!.
+add_term(A):-add(A).
 
 myDebugOnError(Term):-catch(once((call(Term))),E,(dmsg(start_myDebugOnError(E=Term)),trace,rtrace(call(Term)),dmsg(stop_myDebugOnError(E=Term)),trace)).
 
@@ -118,7 +116,7 @@ rescan_mpred_stubs:- doall((mpred_prop(F,prologHybrid),mpred_arity(F,A),A>0,warn
 :-meta_predicate_transparent(rescan_all/0).
 :-meta_predicate_transparent(doall_and_fail(0)).
 
-finish_processing_world :- loop_check_local(with_assertions(thlocal:do_slow_kb_op_now,doall(finish_processing_game)),true).
+finish_processing_world :- load_game_files, loop_check_local(with_assertions(thlocal:do_slow_kb_op_now,doall(finish_processing_game)),true).
 
 doall_and_fail(Call):- time_call(once(doall(Call))),fail.
 
@@ -126,15 +124,14 @@ doall_and_fail(Call):- time_call(once(doall(Call))),fail.
 :-swi_export(etrace/0).
 etrace:-leash(-all),leash(+exception),trace.
 
-% rescan_all:- etrace,fail.
+
+:-meta_predicate_transparent(rescan_all/0).
 rescan_all:- doall_and_fail(rescan_game_loaded).
 rescan_all:- doall_and_fail(rescan_dbase_ops).
 rescan_all:- doall_and_fail(rescan_dbase_facts).
 rescan_all:- doall_and_fail(rescan_default_props).
 rescan_all:- doall_and_fail(rescan_slow_kb_ops).
 rescan_all:- doall_and_fail(rescan_mpred_props).
-
-:-meta_predicate_transparent(rescan_all/0).
 rescan_all.
 
 :-meta_predicate_transparent(finish_processing_game/0).

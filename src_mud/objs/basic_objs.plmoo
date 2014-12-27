@@ -5,9 +5,9 @@
 %
 % *******Object definitions*******
 %.
-% Use the label_type_props(label,typecode,[property1,property2,etc.]]).
+% Use the label_type_props(label,colcode,[property1,property2,etc.]]).
 % label is whats used to refer to the object in the running world
-% typecode is whats used to refer to the object for initialization (see world.pl)
+% colcode is whats used to refer to the object for initialization (see world.pl)
 % ===============================================================================================
 %    by Mea_culpa
 % ===============================================================================================
@@ -54,7 +54,7 @@ mud_dictionary([anthurium,crystallinum],[anthurium_crystallinum]).
 
 :-op(600,fx,onSpawn).
 
-:-decl_mpred(region(id),type).
+:-decl_mpred(region(id),col).
 
 :-onSpawn region(kitchen).
 :-onSpawn region(hall).
@@ -84,10 +84,10 @@ mud_dictionary([anthurium,crystallinum],[anthurium_crystallinum]).
 :-onSpawn doorBetween(bed_room, closet_room).
 :-onSpawn doorBetween(kitchen, back_yard).
 
-:-onSpawn doorBetween(kitchen, 'Area1000').
+%:-onSpawn doorBetween(kitchen, 'Area1000').
 
-:-onSpawn pathBetween('Area1000',"s",'kitchen').
-:-onSpawn pathBetween('kitchen',nospawn("n"),'Area1000').
+%:-onSpawn pathBetween('Area1000',"s",'kitchen').
+%:-onSpawn pathBetween('kitchen',nospawn("n"),'Area1000').
 
 :-export(doorsConnect/2).
 :-decl_mpred_hybrid(doorsConnect(region,region)).

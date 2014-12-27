@@ -24,7 +24,7 @@ posture(lay).
 posture(sleep).
 posture(kneel).
 
-type(posture).
+col(posture).
 
 moo_posture(P):-isa(P,posture).
 

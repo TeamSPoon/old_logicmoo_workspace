@@ -1,213 +1,67 @@
-%!swipl -f
-/** <module> An Implementation a MUD server in SWI-Prolog
+#!/usr/local/bin/swipl 
 
-*/
+:- initialization cp_server.
 
-swi_module(M,E):-dmsg(swi_module(M,E)).
-swi_export(_):-!.
-swi_export(E):-dmsg(swi_export(E)).
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+This file provides a skeleton startup file.  It can be localized by running
 
-:- '@'(consult('../src_lib/logicmoo_util/logicmoo_util_all'),user).
+    % ./configure			(Unix)
+    % Double-clicking win-config.exe	(Windows)
 
-% Was this our startup file?
-was_run_dbg_pl:-is_startup_file('run.pl').
+After  that,  the  system  may  be  customized  by  copying  or  linking
+customization  files  from  config-available    to  config-enabled.  See
+config-enabled/README.txt for details.
 
-% :- catch(guitracer,_,true).
-:- set_prolog_flag(verbose_load,true).
+To run the system, do one of the following:
 
+    * Running for development
+      Run ./run.pl (Unix) or open run.pl by double clicking it (Windows)
 
-:- if_file_exists(ensure_loaded('../../swish/logicmoo_run_swish')).
-:- debug.
+    * Running as Unix daemon (service)
+      See daemon.pl
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-:- if_file_exists(ensure_loaded('../xperimental/src_incoming/dbase/dbase_rosprolog')).
-:- if_file_exists(ensure_loaded('../xperimental/src_incoming/dbase/dbase_rdf_store')).
-% :- prolog.
+% Setup search path for cliopatria. We add  both a relative and absolute
+% path. The absolute path allow us to  start in any directory, while the
+% relative one ensures that the system remains working when installed on
+% a device that may be mounted on a different location.
 
-% run_tests includes run_common 
-:- include(run_tests).
+add_relative_search_path(Alias, Abs) :-
+	is_absolute_file_name(Abs), !,
+	prolog_load_context(file, Here),
+	relative_file_name(Abs, Here, Rel),
+	assertz(user:file_search_path(Alias, Rel)).
+add_relative_search_path(Alias, Rel) :-
+	assertz(user:file_search_path(Alias, Rel)).
 
-% [Optionaly] re-define load_default_game
-% load_default_game:- load_game(logicmoo('rooms/startrek.all.plmoo')).
+file_search_path(cliopatria, '/devel/LogicmooDeveloperFramework/PrologMUD/externals/ClioPatria').
+:- add_relative_search_path(cliopatria, '/devel/LogicmooDeveloperFramework/PrologMUD/externals/ClioPatria').
 
-% [Optionaly] load and start sparql server
-% starts in forground
-% :- at_start((slow_work,threads)).
-% starts in thread (the the above was commented out)
-% :- at_start(start_servers).
-%:- thread_work.
-% commented out except on run
+% Make loading files silent. Comment if you want verbose loading.
 
+:- current_prolog_flag(verbose, Verbose),
+   asserta(saved_verbose(Verbose)),
+   set_prolog_flag(verbose, silent).
 
-debug_repl_w_cyc(Module,CallFirst):- !,         
-          with_assertions(thlocal:useOnlyExternalDBs,
-            with_assertions(thglobal:use_cyc_database,
-               ((decl_type(person),          
-                ensure_plmoo_loaded(logicmoo('rooms/startrek.all.plmoo')),
-                module(Module),
-                show_call(CallFirst), 
-                prolog_repl)))).
 
-debug_repl_wo_cyc(Module,CallFirst):- !,         
-          with_no_assertions(thlocal:useOnlyExternalDBs,
-            with_assertions(thglobal:use_cyc_database,
-               ((decl_type(person),          
-                ensure_plmoo_loaded(logicmoo('rooms/startrek.all.plmoo')),
-                module(Module),
-                show_call(CallFirst), 
-                prolog_repl)))).
+		 /*******************************
+		 *	      LOAD CODE		*
+		 *******************************/
 
-%  bug.. swi does not maintain context_module(CM) outside
-%  of the current caller (so we have no idea what the real context module is!?! )
-debug_repl_m(Module,CallFirst):- 
-        context_module(CM),
-          call_cleanup(
-            (module(Module),
-              debug_repl_wo_cyc(Module,CallFirst)),
-            module(CM)).
+% Use the ClioPatria help system.  May   be  commented to disable online
+% help on the source-code.
 
-% [Required] Defines debug80
-debug80:- parser_chat80_module(M),debug_repl_wo_cyc(M,M:t1).
+:- use_module(cliopatria('applications/help/load')).
 
-% [Optionaly] Allows testing/debug of the chat80 system (withouyt loading the servers)
-% :- parser_chat80:t1.
+% Load ClioPatria itself.  Better keep this line.
 
-% [Required] Defines debug_e2c
-debug_e2c:- debug_repl_wo_cyc(parser_e2c,cache_the_posms).
+:- use_module(cliopatria(cliopatria)).
 
+% Get back normal verbosity of the toplevel.
 
-% [Required] Defines debug_talk
-debug_talk:- debug_repl_wo_cyc(parser_talk,t3).
-
-
-% [Optional] This loads boxer
-% :- at_start(with_assertions(prevent_transform_moo_preds,within_user(ignore(catch(start_boxer,_,true))))).
-
-% [Optional] Testing PTTP
-% :-is_startup_file('run.pl')->doall(do_pttp_test(_));true.
-
-
-% [Manditory] This loads the game and initializes so test can be ran
-:- if_flag_true(was_run_dbg_pl, at_start(run_setup)).
-
-% :- ensure_plmoo_loaded(examples(game('rooms/startrek.all.plmoo'))).
-:- forall(filematch(logicmoo('*/?*.plmoo'), X),dmsg(X)).
-:- ensure_plmoo_loaded(logicmoo('*/?*.plmoo')).
-:- forall(filematch(logicmoo('*/*/?*.plmoo'), X),dmsg(X)).
-:- ensure_plmoo_loaded(logicmoo('*/*/?*.plmoo')).
-
-:- finish_processing_world.
-
-% [Optional] Interactively debug E2C
-% :- debug_e2c.
-
-% the local tests each reload (once)
-now_run_local_tests_dbg :- doall(mud_test_local).
-
-% nasty way i debug the parser
-mud_test_local :- do_player_action('who').
-% :-repeat, trace, do_player_action('who'),fail.
-
-% mud_test_local :-do_player_action("scansrc").
-
-% :-trace.
-
-
-% [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
-% :- register_timer_thread(npc_ticker,30,npc_tick).
-
-mud_test_local :-kellerStorage:kellerStorageTestSuite.
-
-% :-curt80.
-
-
-
-% more tests even
-mud_test_local :-do_player_action("look").
-mud_test_local :-forall(localityOfObject(O,L),dmsg(localityOfObject(O,L))).
-
-must_test("tests to see if poorly canonicalized code (unrestricted quantification) will not be -too- inneffienct",
-   forall(atloc(O,L),dmsg(atloc(O,L)))).
-
-
-% the real tests now (once)
-mud_test_local :- if_flag_true(was_run_dbg_pl,at_start(must_det(run_mud_tests))).
-
- % :- if_flag_true(was_run_dbg_pl, doall(now_run_local_tests_dbg)).
-
-
-% [Optionaly] Allows testing/debug of the chat80 system (withouyt loading the servers)
-% :- debug80.
-
-
-
-% :-forall(current_prolog_flag(N,V),dmsg(N=V)).
-% [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
-
-:-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,who)).
-:-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,look)).
-:-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,prolog)).
-
-
-% :-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,chat80)).
-:- if_flag_true(was_run_dbg_pl, at_start(run)).
-
-% So scripted versions don't just exit
-:- if_flag_true(was_run_dbg_pl,at_start(prolog)).
-
-%:- kill_term_expansion.
-%:- prolog.
-
-% :-proccess_command_line.
-
-/*
-
-PTTP input formulas:
-  1  firstOrder(motherOf,joe,sue).
-  2  not_firstOrder(motherOf,_,A);firstOrder(female,A).
-  3  not_firstOrder(sonOf,B,A);firstOrder(motherOf,A,B);firstOrder(fatherOf,A,B).
-  4  query:-firstOrder(female,_).
-PTTP to Prolog translation time: 0.0028555670000001143 seconds
-
-Prolog compilation time: 0.0004133299999997675 seconds
-2.
-Proof time: 4.34149999994915e-5 seconds
-Proof:
-length = 2, depth = 1
-Goal#  Wff#  Wff Instance
------  ----  ------------
-  [0]    4   query :- [1].
-  [1]    2      firstOrder(female,sue) :- [2].
-  [2]    1         firstOrder(motherOf,joe,sue).
-Proof end.
-%                    succceeded(prove_timed(logicmoo_example1,query))
-%                do_pttp_test(logicmoo_example1_holds)
-
-PTTP input formulas:
-  1  firstOrder(motherOf,joe,sue).
-  2  not_firstOrder(motherOf,_,A);firstOrder(female,A).
-  3  not_firstOrder(sonOf,B,A);firstOrder(motherOf,A,B);firstOrder(fatherOf,A,B).
-  4  query:-firstOrder(female,_).
-PTTP to Prolog translation time: 0.0024834679999994336 seconds
-
-Prolog compilation time: 0.00039567500000003974 seconds
-2.
-Proof time: 3.7734999999372576e-5 seconds
-Proof:
-length = 2, depth = 1
-Goal#  Wff#  Wff Instance
------  ----  ------------
-  [0]    4   query :- [1].
-  [1]    2      firstOrder(female,sue) :- [2].
-  [2]    1         firstOrder(motherOf,joe,sue).
-Proof end.
-%                    succceeded(prove_timed(logicmoo_example1_holds,query))
-%                do_pttp_test(logicmoo_example2)
-
-
-*/
-
-
-
-
+:- (   retract(saved_verbose(Verbose))
+   ->  set_prolog_flag(verbose, Verbose)
+   ;   true
+   ).
 
 

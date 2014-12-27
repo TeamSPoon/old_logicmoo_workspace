@@ -125,6 +125,7 @@ decl_database_hook(assert(_A_or_Z),mpred_prop(F,_)):- must_det(atom(F)).
 
 :-dynamic_multifile_exported((thglobal:loading_game_file/2, thglobal:loaded_game_file/2)).
 
+:-export(after_game_load/0).
 after_game_load:- not(thglobal:loading_game_file(_,_)),thglobal:loaded_game_file(_,_),!.
 
 % when all previous tasks have completed
@@ -155,7 +156,7 @@ rescan_slow_kb_ops:- loop_check(forall(retract(do_slow_kb_op_later(Slow)),must_d
 rescan_dbase_ops:- test_tl(skip_db_op_hooks),!.
 rescan_dbase_ops:- rescan_module_ready.
 
-:-thread_local thlocal:in_rescan_module_ready/0.
+:-decl_thlocal thlocal:in_rescan_module_ready/0.
 rescan_module_ready:- thlocal:in_rescan_module_ready,!.
 rescan_module_ready:- with_assertions(thlocal:in_rescan_module_ready,loop_check_local(do_all_of(dbase_module_ready),true)).
 
@@ -191,11 +192,11 @@ coerce(What,_Type,NewThing):-NewThing = What.
 :- meta_predicate tick_every(*,*,0).
 :- meta_predicate register_timer_thread(*,*,0).
 
-:- decl_mpred_hybrid((nonCreatableType/1, type/1, subclass/2, argsIsaInList/1 ,createableType/1, createableSubclassType/2)).
+:- decl_mpred_hybrid((nonCreatableType/1, col/1, subclass/2, argsIsaInList/1 ,createableType/1, createableSubclassType/2)).
 
 /*
-:- decl_mpred_hybrid((createableSubclassType(type,type))).
-:- decl_mpred_hybrid((createableType(type))).
+:- decl_mpred_hybrid((createableSubclassType(col,col))).
+:- decl_mpred_hybrid((createableType(col))).
 :- decl_mpred_hybrid type_grid/3.
 */
 :- decl_mpred_hybrid(((formatted/1,
@@ -229,7 +230,7 @@ coerce(What,_Type,NewThing):-NewThing = What.
 :- dynamic_multifile_exported 
    agent/1, agent_done/2, charge/2,health/2, atloc/2, failure/2, grid/4, isa/2, item/1, 
   memory/2,  pathName/3, possess/2,  region/1, score/2, stm/2,   facing/2,
-   % type/1,
+   % col/1,
    % localityOfObject/2,
    
   thinking/1,   wearing/2, 
@@ -271,7 +272,7 @@ coerce(What,_Type,NewThing):-NewThing = What.
 :- dynamic_multifile_exported mtForPred/2.
 
 :- decl_mpred_hybrid((
-     type/1, agent/1, item/1, region/1,
+     col/1, agent/1, item/1, region/1,
      verbOverride/3,named/2, determinerString/2, keyword/2 ,descriptionHere/2, 
      mudToHitArmorClass0/2,
 
@@ -313,7 +314,7 @@ logical_functor(X):-atom(X),member(X,[',',';']).
       mudBareHandDamage/2,
       chargeCapacity/2,
       chargeRemaining/2,
-     type/1, agent/1, item/1, region/1,
+     col/1, agent/1, item/1, region/1,
      verbOverride/3,named/2, determinerString/2, keyword/2 ,descriptionHere/2, 
 
       thinking/1,
@@ -501,7 +502,7 @@ dmsg_hook(transform_holds(dbase_t,_What,props(createableType,[isa(isa),isa]))):-
 expand_goal_correct_argIsa(A,B):- expand_goal(A,B).
 
 % db_op_simpler(query(HLDS,_),MODULE:C0,req(call,MODULE:C0)):- atom(MODULE), nonvar(C0),not(not(predicate_property(C0,_PP))),!. % , functor_catch(C0,F,A), dmsg(todo(unmodulize(F/A))), %trace_or_throw(module_form(MODULE:C0)), %   db_op(Op,C0).
-db_op_simpler(_,TypeTerm,props(Inst,[isa(Type)|PROPS])):- TypeTerm=..[Type,Inst|PROPS],nonvar(Inst),typeDeclarer(Type),!.
+db_op_simpler(_,TypeTerm,props(Inst,[isa(Type)|PROPS])):- TypeTerm=..[Type,Inst|PROPS],nonvar(Inst),colDeclarer(Type),!.
 
 
 
@@ -558,7 +559,7 @@ simply_functors(Db_pred,query(HLDS,Must),Wild):- once(into_mpred_form(Wild,Simpl
 simply_functors(Db_pred,Op,Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=@=Simpler,!,call(Db_pred,Op,Simpler).
 
 
-% -  dmsg_hook(db_op(query(HLDS,call),holds_t(ft_info,type,'$VAR'(_)))):-trace_or_throw(dtrace).
+% -  dmsg_hook(db_op(query(HLDS,call),holds_t(ft_info,col,'$VAR'(_)))):-trace_or_throw(dtrace).
 
 % ================================================
 % db_op_int/2
@@ -688,7 +689,7 @@ db_op0(Op,C0):- C0=..[Prop|ARGS],db_op_unit(Op,C0,Prop,ARGS).
 % db_op_unit/3
 % ================================================
 
-db_op_unit(Op,_C0,Prop,ARGS):- type_error_checking,!, cached_isa(Prop,type),trace_or_throw(db_op_unit(Op,type(Prop),ARGS)).
+db_op_unit(Op,_C0,Prop,ARGS):- type_error_checking,!, cached_isa(Prop,col),trace_or_throw(db_op_unit(Op,col(Prop),ARGS)).
 
 db_op_unit(Op,C0,isa,ARGS):- type_error_checking,!, trace_or_throw(db_op_unit(Op,isa(C0),ARGS)).
 
@@ -743,7 +744,7 @@ db_op_exact(Op,C):- trace_or_throw(unhandled(db_op_exact(Op,C))).
 
 
       
-
+:- with_no_term_expansions(if_file_exists(user_ensure_loaded(logicmoo(dbase/dbase_i_rdf_store)))).
 
 :-swi_export((dbase_t/1,hasInstance/2)).
 :- dynamic_multifile_exported((
@@ -977,7 +978,7 @@ cycAssert(A,B):-trace_or_throw(cycAssert(A,B)).
 :-decl_mpred(agent(id),[flag]).
 :-decl_mpred(item(id),[flag]).
 :-decl_mpred(region(id),[flag]).
-:-decl_mpred(type(id),[flag]).
+:-decl_mpred(col(id),[flag]).
 :-decl_mpred(thinking(agent),[flag]).
 :-decl_mpred(deleted(id),[flag]).
 
@@ -1013,7 +1014,7 @@ add(Term):- expands_on(eachOf,Term), !,forall(do_expand_args(eachOf,Term,O),add(
 add(Call):- loop_check(thlocal:add_thread_override(Call)),!.
 add(Call):- add_from_macropred(Call),!.
 add(M:HB):-atom(M),!, must_det(add(HB)),!.
-add(type(A)):- must_det(decl_type(A)),!.
+add(col(A)):- must_det(decl_type(A)),!.
 add(A):-must(add_fast(A)),!.
 add(A):-trace_or_throw(fmt('add is skipping ~q.',[A])).
 
@@ -1036,7 +1037,7 @@ add_from_macropred_lc(RDF):- RDF=..[SVO,S,V,O],is_svo_functor(SVO),!,must_det(ad
 add_from_macropred_lc(A):- into_mpred_form(A,F), A \=@=F,!,add_from_macropred(F). 
 add_from_macropred_lc(ClassTemplate):- compound(ClassTemplate), ClassTemplate=..[item_template,Type|Props],
    assert_isa(Type,createableType),
-   assert_isa(Type,type),
+   assert_isa(Type,col),
    add(subclass(Type,item)),   
    flatten(Props,AllProps),!,
    show_call(add(default_type_props(Type,AllProps))).
@@ -1085,7 +1086,7 @@ get_mpred_type(Head,F,A,Type):-must(mpred_arity(F,A)),functor(Head,F,A),get_mpre
 
 get_mpred_type4(P,F,A,T):-get_mpred_type5(P,F,A,T),!.
 
-get_mpred_type5(_,F,_,callable(Type)):-member(Type,[prologOnly,prologHybrid,type]),mpred_prop(F,Type).
+get_mpred_type5(_,F,_,callable(Type)):-member(Type,[prologOnly,prologHybrid,col]),mpred_prop(F,Type).
 get_mpred_type5(P,_,_,W):-compound(P),!,pp_has(P,W).
 get_mpred_type5(_,F,A,W):-atom(F),current_predicate(F/A),functor(P,F,A),!,pp_has(P,W).
 get_mpred_type5(F,_,A,W):-atom(F),current_predicate(F/A),functor(P,F,A),!,pp_has(P,W).
@@ -1143,12 +1144,14 @@ spawnOneSpawnArg(Funct,N,A,O):-
   assert_isa(TypeA,createableType).
 
 
-createByNameMangle(InstA,InstA,Type):-compound(InstA),InstA=..[Type|Props],assert_isa(InstA,Type),with_assertions(deduceArgTypes(_),padd(InstA,Props)).
-createByNameMangle(InstA,Inst,Type):- compound(InstA),!,functor_catch(InstA,Type,A),must(A==1),assert_isa(InstA,Type),InstA=Inst.
-createByNameMangle(InstA,_,_Type):- not(atom(InstA)),!,trace_or_throw(todo(not_atom_createByNameMangle(InstA))).
-createByNameMangle(Suggest,InstA,Type):- once(split_name_type(Suggest,InstA,Type)),Suggest==InstA,assert_isa(InstA,Type).
-createByNameMangle(Type,InstA,Type):- atom_concat(Type,'777',InstA),must_det(assert_isa(InstA,Type)), call_after_game_load(create_instance(InstA)).
-createByNameMangle(InstA,IDA,InstA):- gensym(InstA,IDA), englishServerInterface([create,InstA,IDA]).
+createByNameMangle(InstA,IDA,InstAO):-must(createByNameMangle0(InstA,IDA,InstAO)),!.
+
+createByNameMangle0(InstA,InstA,Type):-compound(InstA),InstA=..[Type|Props],assert_isa(InstA,Type),with_assertions(deduceArgTypes(_),padd(InstA,Props)).
+createByNameMangle0(InstA,Inst,Type):- compound(InstA),!,functor_catch(InstA,Type,A),must(A==1),assert_isa(InstA,Type),InstA=Inst.
+createByNameMangle0(InstA,_,_Type):- not(atom(InstA)),!,trace_or_throw(todo(not_atom_createByNameMangle(InstA))).
+createByNameMangle0(Suggest,InstA,Type):- once(split_name_type(Suggest,InstA,Type)),Suggest==InstA,assert_isa(InstA,Type).
+createByNameMangle0(Type,InstA,Type):- atom_concat(Type,'777',InstA),must_det(assert_isa(InstA,Type)), call_after_game_load(create_instance(InstA)).
+createByNameMangle0(InstA,IDA,InstA):- gensym(InstA,IDA), englishServerInterface([create,InstA,IDA]).
 
 wfAssert(X):-add(X). %  add_later(X).
 
@@ -1225,7 +1228,7 @@ agent_text_command(_Agent,_Text,_AgentTarget,_Cmd):-fail.
 
 
 
-:-ensure_loaded(logicmoo(mobs/planner/dbase_i_hyhtn)).
+:- with_no_term_expansions(if_file_exists(user_ensure_loaded(logicmoo(mobs/planner/dbase_i_hyhtn)))).
 
 % ================================================
 % MPRED_PROP System

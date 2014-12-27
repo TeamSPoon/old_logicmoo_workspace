@@ -24,77 +24,77 @@ oncely(Call):-once(Call).
 
 
 % ================================================
-% call_collect/2,4
+% call_typelect/2,4
 % ================================================
-call_collect(Ops,Call):-call_collect(Ops,Ops,Call,Call).
+call_typelect(Ops,Call):-call_typelect(Ops,Ops,Call,Call).
 
-call_collect(Ops,Flags,Call,Vars):-ground(Call),not(member(ground,Flags)),!,call_collect(Ops,[ground|Flags],Call,Vars).
-call_collect(Ops,Flags,Call,Vars):-is_callable(Call),not(member(defined,Flags)),!,call_collect(Ops,[defined|Flags],Call,Vars).
-call_collect(Ops,Flags,Call,Vars):-call_collect_op(Ops,Flags,Call,Vars,[],Results),!,member(Vars,Results).
+call_typelect(Ops,Flags,Call,Vars):-ground(Call),not(member(ground,Flags)),!,call_typelect(Ops,[ground|Flags],Call,Vars).
+call_typelect(Ops,Flags,Call,Vars):-is_callable(Call),not(member(defined,Flags)),!,call_typelect(Ops,[defined|Flags],Call,Vars).
+call_typelect(Ops,Flags,Call,Vars):-call_typelect_op(Ops,Flags,Call,Vars,[],Results),!,member(Vars,Results).
 
 % complete
-call_collect_op([],_Flags,_Call,_,Results,Results):-!.
+call_typelect_op([],_Flags,_Call,_,Results,Results):-!.
 
 % early complete
-call_collect_op(_,Flags,_Call,_Vars,ResultsIn,ResultsOut):- member(firstValue,Flags),length(ResultsIn,L),L>0, member(Minus,[-(_),?(_)]), not(member(Minus,Flags)),!,
+call_typelect_op(_,Flags,_Call,_Vars,ResultsIn,ResultsOut):- member(firstValue,Flags),length(ResultsIn,L),L>0, member(Minus,[-(_),?(_)]), not(member(Minus,Flags)),!,
    must_det(ResultsIn=ResultsOut),!.
 
 % push flag
-call_collect_op([flag(+Flag)|Op2],FlagsIn,Call,Vars,ResultsIn,ResultsOut):- !,
+call_typelect_op([flag(+Flag)|Op2],FlagsIn,Call,Vars,ResultsIn,ResultsOut):- !,
    ord_union(FlagsIn,[Flag],NewFlags),
-   call_collect_op(Op2,NewFlags,Call,Vars,ResultsIn,ResultsOut).
+   call_typelect_op(Op2,NewFlags,Call,Vars,ResultsIn,ResultsOut).
 
 % remove flag
-call_collect_op([flag(-Flag)|Op2],FlagsIn,Call,Vars,ResultsIn,ResultsOut):- !,
+call_typelect_op([flag(-Flag)|Op2],FlagsIn,Call,Vars,ResultsIn,ResultsOut):- !,
    ord_subtract(FlagsIn,[Flag],NewFlags),
-   call_collect_op(Op2,NewFlags,Call,Vars,ResultsIn,ResultsOut).
+   call_typelect_op(Op2,NewFlags,Call,Vars,ResultsIn,ResultsOut).
 
 % replace flags
-call_collect_op([flags(NewFlags)|Op2],_OldFlags,Call,Vars,ResultsIn,ResultsOut):- !,
-   call_collect_op(Op2,NewFlags,Call,Vars,ResultsIn,ResultsOut).
+call_typelect_op([flags(NewFlags)|Op2],_OldFlags,Call,Vars,ResultsIn,ResultsOut):- !,
+   call_typelect_op(Op2,NewFlags,Call,Vars,ResultsIn,ResultsOut).
 
 % sequential opers
-call_collect_op([Op1|Op2],Flags,Call,Vars,ResultsIn,ResultsOut):- !,
-   call_collect_op(Op1,[doing(Op,Call)|Flags],Call,Vars,ResultsIn,ResultsMid),   
-   call_collect_op(Op2,[done(Op,Call)|Flags],Call,Vars,ResultsMid,ResultsOut).
+call_typelect_op([Op1|Op2],Flags,Call,Vars,ResultsIn,ResultsOut):- !,
+   call_typelect_op(Op1,[doing(Op,Call)|Flags],Call,Vars,ResultsIn,ResultsMid),   
+   call_typelect_op(Op2,[done(Op,Call)|Flags],Call,Vars,ResultsMid,ResultsOut).
 
 % with_assertions
-call_collect_op(with_assertions(Assertions,Op2),Flags,Call,Vars,ResultsIn,ResultsOut):- !,
-   with_assertions(Assertions, call_collect_op(Op2,Flags,Call,Vars,ResultsIn,ResultsOut)).
+call_typelect_op(with_assertions(Assertions,Op2),Flags,Call,Vars,ResultsIn,ResultsOut):- !,
+   with_assertions(Assertions, call_typelect_op(Op2,Flags,Call,Vars,ResultsIn,ResultsOut)).
 
 % with_assertions
-call_collect_op(with_no_assertions(Assertions,Op2),Flags,Call,Vars,ResultsIn,ResultsOut):- !,
-   with_no_assertions(Assertions, call_collect_op(Op2,Flags,Call,Vars,ResultsIn,ResultsOut)).
+call_typelect_op(with_no_assertions(Assertions,Op2),Flags,Call,Vars,ResultsIn,ResultsOut):- !,
+   with_no_assertions(Assertions, call_typelect_op(Op2,Flags,Call,Vars,ResultsIn,ResultsOut)).
 
 % add to set
-call_collect_op(+Op,Flags,Call,Vars,ResultsIn,ResultsOut):- !,
+call_typelect_op(+Op,Flags,Call,Vars,ResultsIn,ResultsOut):- !,
    findall_nodupes(Vars,call_one(Op,Flags,Call,Vars),ResultsN), 
    ord_union(ResultsIn,ResultsN,ResultsOut).
 
 % remove from set
-call_collect_op(-Op,Flags,Call,Vars,ResultsIn,ResultsOut):- !,
+call_typelect_op(-Op,Flags,Call,Vars,ResultsIn,ResultsOut):- !,
    findall_nodupes(Vars,(member(Vars,ResultsIn),not(call_one(Op,Flags,Call,Vars))),ResultsOut).
 
 % retain only
-call_collect_op('?'(Op),Flags,Call,Vars,ResultsIn,ResultsOut):- !,
+call_typelect_op('?'(Op),Flags,Call,Vars,ResultsIn,ResultsOut):- !,
    findall_nodupes(Vars,(member(Vars,ResultsIn),call_one(Op,Flags,Call,Vars)),ResultsOut).
 
 % unknown option
-call_collect_op(Op,Flags,Call,Vars,ResultsIn,ResultsOut):- 
-   dmsg(error_call_collect(Op,Flags,Call,Vars,ResultsIn,ResultsOut)),
+call_typelect_op(Op,Flags,Call,Vars,ResultsIn,ResultsOut):- 
+   dmsg(error_call_typelect(Op,Flags,Call,Vars,ResultsIn,ResultsOut)),
      ResultsIn=ResultsOut.
 
 % ================================================
 % call_one/4
 % ================================================
 % and
-call_one((Op1,Op2),Flags,Call,Vars):-  call_collect(Op1,Flags,Call,Vars), call_collect(Op2,Flags,Call,Vars).
+call_one((Op1,Op2),Flags,Call,Vars):-  call_typelect(Op1,Flags,Call,Vars), call_typelect(Op2,Flags,Call,Vars).
 % or
-call_one((Op1;Op2),Flags,Call,Vars):- call_collect(Op1,Flags,Call,Vars), call_collect(Op2,Flags,Call,Vars).
+call_one((Op1;Op2),Flags,Call,Vars):- call_typelect(Op1,Flags,Call,Vars), call_typelect(Op2,Flags,Call,Vars).
 % basic call
 call_one(call,_Flags,Call,_Vars):- call(Call).
 % not
-call_one(not(Op1),Flags,Call,Vars):-  not(call_collect(Op1,Flags,Call,Vars)).
+call_one(not(Op1),Flags,Call,Vars):-  not(call_typelect(Op1,Flags,Call,Vars)).
 % succeed vars
 call_one(v(Vars),_Flags,_Call,Vars):-!.
 % succeed call

@@ -16,7 +16,7 @@
         last_test_name/1,
         test_call/1]).
 
-:- thread_local was_test_name/1.
+:- decl_thlocal was_test_name/1.
 
 :- meta_predicate_transparent test_call(+).
 :- meta_predicate_transparent run_mud_test(+,+).

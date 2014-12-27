@@ -49,7 +49,7 @@ never_type(subft).
 never_type(must).
 never_type(mpred_prop).
 never_type(ft_info).
-never_type(C):- compound(C),functor(C,F,1),isa_asserted(F,type).
+never_type(C):- compound(C),functor(C,F,1),isa_asserted(F,col).
 never_type(F):- mpred_arity(F,A),!, A > 1.
 
 :-op(0,fx,((decl_mpred_hybrid))).
@@ -76,23 +76,23 @@ decl_mpred_mfa(M,FF,A):-
      must_det(nonvar(M)),
     '@'((
      (static_predicate(M,F,A)->true; M:dynamic(F/A)), 
-     M:swi_export(F/A),
+     M:export(F/A),
      M:multifile(M:F/A)),M),
      scan_missing_stubs(F) ]).
 
-decl_mpred_stubtype(F,StubType):-decl_mpred(F,stubType(StubType)),decl_mpred(F,StubType).
+decl_mpred_stubcol(F,StubType):-decl_mpred(F,stubType(StubType)),decl_mpred(F,StubType).
 
 decl_mpred_hybrid(M):- with_pi(M,decl_mpred_hybrid).
 decl_mpred_hybrid(F,A):-
      decl_mpred(F,A),
      decl_mpred_pi(F),
-     decl_mpred_stubtype(F,prologHybrid),
+     decl_mpred_stubcol(F,prologHybrid),
      functor_h(F,FF,_),
      must_det((mpred_arity(FF,AR),decl_mpred_mfa(_,F,AR))).
 decl_mpred_hybrid(M,PI,F/A):-
      decl_mpred(F,A),  
      decl_mpred_pi(PI),       
-     decl_mpred_stubtype(F,prologHybrid),
+     decl_mpred_stubcol(F,prologHybrid),
      decl_mpred_mfa(M,F,A).
 
 decl_mpred_hybrid(_CM,M,PI,F/A):-
@@ -135,7 +135,7 @@ mpred_prop(H,PP):-compound(H),predicate_property(H,PP).
 mpred_prop(F,PP):-mpred_arity(F,A),functor(H,F,A),predicate_property(H,PP).
 mpred_prop(P,Prop):- argsIsaProps(Prop),hasInstance(Prop, P).
 mpred_prop(F,Prop):- mpred_arity(F,A),functor(P,F,A),predicate_property(P,Prop).
-mpred_prop(F,type):- type(F).
+mpred_prop(F,col):- col(F).
 mpred_prop(H,PP):- nonvar(H),functor_h(H,F), H \=@= F, !,mpred_prop(F,PP).
 mpred_prop(F,PP):- hasInstance(PP,F).
 mpred_prop(mpred_prop,prologOnly).
@@ -150,10 +150,10 @@ mpred_prop(F,mped_type(Type)):-nonvar(F),once(get_mpred_type(F,Type)).
 
 
 :-dynamic_multifile_exported(hasInstance/2).
-% hasInstance(type,Prop):-mpred_arity(Prop,1).
+% hasInstance(col,Prop):-mpred_arity(Prop,1).
 
 :-forall(argsIsaProps(F),dynamic(F/1)).
-:-forall(argsIsaProps(F),asserta_if_new(hasInstance(typeDeclarer,F))).
+:-forall(argsIsaProps(F),assert_hasInstance(colDeclarer,F)).
 
 
 % pass 2
@@ -195,11 +195,11 @@ declare_dbase_local_dynamic(M,F,A):- cannot_override(F,A,Why),!,dmsg(todo(cannot
 declare_dbase_local_dynamic(M,F,A):- must(declare_dbase_local_dynamic_really(M,F,A)).
 
 decl_mpred_fa_hooks(F,A,multifile):- multifile(F/A).
-decl_mpred_fa_hooks(F,A,thread_local):- thread_local(F/A).
+decl_mpred_fa_hooks(F,A,thread_local):- decl_thlocal(F/A).
 decl_mpred_fa_hooks(F,A,dyn):- dynamic(F/A).
 decl_mpred_fa_hooks(F,A,stubType(dyn)):- !,decl_mpred_fa_hooks(F,A,dyn).
 decl_mpred_fa_hooks(F,A,stubType(Stub)):-  functor(P,F,A), not(static_predicate(user,F,A)), assert_if_new((P:-env_op(Stub,call,P))),assert(mpred_prop(F,hasStub(Stub))),!. % compile_predicates([F/A]).
-decl_database_hook(assert(_),mpred_prop(F,ENV)):- ((assert_if_new(env_pretype(ENV)),mpred_arity(F,A), doall(decl_mpred_fa_hooks(F,A,ENV)))).
+decl_database_hook(assert(_),mpred_prop(F,ENV)):- ((assert_if_new(env_precol(ENV)),mpred_arity(F,A), doall(decl_mpred_fa_hooks(F,A,ENV)))).
 
 add_hybrid_rules(M:HEAD,BODY):-atom(M),!,add_hybrid_rules(HEAD,BODY).
 add_hybrid_rules(HEAD,true):-!,hooked_assertz(HEAD).
@@ -228,7 +228,8 @@ hybrid_rule_term_expansion(I,_):- once((compound(I),functor(I,F,A),asserta_if_ne
 
 user:term_expansion(I,O):-not(thlocal:into_form_code),functor_h(I,F),mpred_prop(F,prologHybrid),hybrid_rule_term_expansion(file,I,O).
 
-declare_dbase_local_dynamic_plus_minus_2(F,AMinus2):-   
+
+declare_dbase_local_dynamic_plus_minus_2(F,AMinus2):-
    decl_mpred(F,arity(AMinus2)),
    declare_dbase_local(F,AMinus2).
    
@@ -377,7 +378,7 @@ rescan_mpred_props_lc.
 
 decl_mpred((A,B)):-decl_mpred(A),decl_mpred(B).
 decl_mpred(M):-loop_check_local(with_pi(M,decl_mpred_1),true).
-decl_mpred_1(_,F,F/0):-!,assert_if_new(hasInstance(mpred,F)).
+decl_mpred_1(_,F,F/0):-!,assert_hasInstance(mpred,F).
 decl_mpred_1(M,PI,F/A):-
    decl_mpred(F,A),
    ignore((ground(PI),compound(PI),decl_mpred(F,argsIsaInList(PI)))),
@@ -387,11 +388,11 @@ decl_mpred_1(M,PI,F/A):-
 decl_mpred(C,More):- ignore(loop_check(decl_mpred_0(C,More),true)).
 
 decl_mpred_0(C,More):- (var(C);var(More)), trace_or_throw(var_decl_mpred(C,More)).
-decl_mpred_0(F,mpred):-!,assert_if_new(hasInstance(mpred,F)).
+decl_mpred_0(F,mpred):-!, assert_hasInstance(mpred,F).
 decl_mpred_0(_,[]):-!.
 decl_mpred_0(M:FA,More):-atom(M),!,decl_mpred_0(FA,[ask_module(M)|More]).
 decl_mpred_0(F/A,More):-atom(F),!,decl_mpred_1(F,arity(A)),decl_mpred(F,More),!.
-decl_mpred_0(C,More):-string(C),!,dmsg( trace_or_throw(var_decl_mpred(C,More))).
+decl_mpred_0(C,More):-string(C),!,dmsg(trace_or_throw(var_string_decl_mpred(C,More))).
 decl_mpred_0(C,More):-compound(C),C=..[F,Arg1|PROPS],argsIsaProps(F),!,ground(Arg1),decl_mpred(Arg1,[F,PROPS,More]).
 decl_mpred_0(C,More):-compound(C),!,functor(C,F,A),decl_mpred_1(F,arity(A)),decl_mpred_0(F,More),!,ignore((ground(C),decl_mpred(F,argsIsaInList(C)))),!.
 decl_mpred_0(F,A):-number(A),!,decl_mpred_1(F,arity(A)),!.

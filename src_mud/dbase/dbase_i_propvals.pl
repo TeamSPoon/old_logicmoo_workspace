@@ -46,7 +46,7 @@ generate_candidate_arg_values0(Prop,N,R):- cached_isa(Prop,completeExtentAsserte
 generate_candidate_arg_values0(Prop,N,Obj):- once((argIsa_asserted(Prop,N,Type),type_has_instances(Type))),!,cached_isa(Obj,Type).
 generate_candidate_arg_values0(Prop,N,R):- arg(N,vv(Obj,Value),R),!,is_asserted(dbase_t(Prop,Obj,Value)).
 
-type_has_instances(Type):-  atom(Type),Type\=term,Type\=type,not_ft(Type),isa(_,Type),!.
+type_has_instances(Type):-  atom(Type),Type\=term,Type\=col,not_ft(Type),isa(_,Type),!.
 
 choose_right(Prop,Obj,Value):- thlocal:useOnlyExternalDBs,!, body_call_cyckb(dbase_t(Prop,Obj,Value)).
 choose_right(Prop,Obj,Value):- nonvar(Obj),!,choose_for(Prop,Obj,RValue),RValue=Value.
@@ -144,7 +144,7 @@ checkNoArgViolation_p_args(Prop,[Obj,Value]):-!,checkNoArgViolation(Prop,Obj,Val
 checkNoArgViolation_p_args(Prop,[Obj,Value|_More]):-checkNoArgViolation(Prop,Obj,Value).
 checkNoArgViolation_p_args(_,_).
 
-:-thread_local deduceArgTypes/1.
+:-decl_thlocal deduceArgTypes/1.
 
 checkNoArgViolation(isa,_,_):-!.
 checkNoArgViolation(Prop,__,Value):-checkNoArgViolationOrDeduceInstead(Prop,2,Value),fail.
@@ -189,11 +189,11 @@ guessed_mpred_arity(_,2).
 
 suggestedType(Prop,N,_,argIsaFn(Prop, N),FinalType):- guessed_mpred_arity(Prop,N), atom_concat(Prop,'_value',FinalType),!,must((decl_type(FinalType),assert_isa(FinalType,discoverableType))).
 suggestedType(Prop,N,_,_,FinalType):- guessed_mpred_arity(Prop,N),atom_concat(Prop,'_value',FinalType),!,must((decl_type(FinalType),assert_isa(FinalType,discoverableType))).
-suggestedType( _ ,_,_ ,FinalType,FinalType):-atom(FinalType),type(FinalType),not(formattype(FinalType)),!.
-suggestedType( _ ,_,Possibles,_ ,FinalType):- member(FinalType,[mpred,type,formattype,text,region,agent,item,obj,spatialthing]),member(FinalType,Possibles),!.
+suggestedType( _ ,_,_ ,FinalType,FinalType):-atom(FinalType),col(FinalType),not(formattype(FinalType)),!.
+suggestedType( _ ,_,Possibles,_ ,FinalType):- member(FinalType,[mpred,col,formattype,text,region,agent,item,obj,spatialthing]),member(FinalType,Possibles),!.
 
 deduce_argN(Prop,N,_,ObjectTypes,Type):- suggestedType(Prop,N,ObjectTypes,Type,FinalType),FinalType\=Type,assert_argIsa(Prop,N,FinalType).
-deduce_argN(_ ,_ ,Obj,[],Type):- type(Type), assert_isa(Obj,Type),!.
+deduce_argN(_ ,_ ,Obj,[],Type):- col(Type), assert_isa(Obj,Type),!.
 deduce_argN(Prop,N,_,[OType|_],_Type):-assert_subclass_on_argIsa(Prop,N,OType),!.
 
 maybe_cache_0(Prop,Obj,Value,_What):- checkNoArgViolation(Prop,Obj,Value), is_asserted(dbase_t(Prop,Obj,Value)),!.
@@ -214,14 +214,14 @@ unverifiableType(fpred).
 unverifiableType(dir).
 unverifiableType(string).
 unverifiableType(formattype).
-unverifiableType(type).
+unverifiableType(col).
 unverifiableType(term(_)).
 unverifiableType(mpred(_)).
 unverifiableType(list(_)).
 
 violatesType(Value,Type):-var(Value),!,Type=var.
 violatesType(_,Type):- unverifiableType(Type),!,fail.
-% violatesType(_,type):-!,fail.
+% violatesType(_,col):-!,fail.
 violatesType(Value,int):-number(Value),!,fail.
 violatesType(Value,Type):-atom(Type),isa_backchaing(Value,Type),!,fail.
 violatesType(Value,string):-string(Value),!,fail.

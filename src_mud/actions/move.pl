@@ -21,7 +21,7 @@
 
 
 agent_text_command(Agent,[DirSS],Agent,move(DirS)):- nonvar(DirSS),catch(((get_term_specifier_text(Dir,dir), any_to_atom(DirSS,DirS),catch((atom_concat(Dir,N,DirS),(atom_number(N,_))),_,fail))),_,fail).
-agent_text_command(Agent,[DirSS],Agent,move(Dir)):- get_term_specifier_text(Dir,dir),catch((any_to_atom(DirSS,DirA),any_to_atom(Dir,DirA)),_,fail),!.
+agent_text_command(Agent,[DirSS],Agent,move(Dir)):- get_term_specifier_text(Dir,dir),catch((any_to_string(DirSS,DirA),any_to_string(Dir,DirA)),_,fail),!.
 
 agent_call_command(Agnt,Cmd):- compound(Cmd),functor(Cmd,move,_),!,must(move_command(Agnt,Cmd)).
 

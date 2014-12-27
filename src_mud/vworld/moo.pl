@@ -1,5 +1,5 @@
 /** <module> 
-% This module defines the module types that we use:
+% This module defines the module cols that we use:
 % utility,planner,parser,action,database,effects,spawning_loading,connection
 % It is the basic module system of the Logicmoo MUD
 %
@@ -16,11 +16,27 @@
          op(1120,fx,swi_export),
          register_timer_thread/3]).
 
+
+/*
+:- '@'(ensure_loaded('../src_lib/logicmoo_util/logicmoo_util_all'),user).
+:- ensure_loaded(logicmoo('dbase/dbase_i_rdf_store.pl')).
+*/
+
+:-dynamic(hasInstance_dyn/2).
+
+hasInstance(T,I):- !, hasInstance_dyn(T,I).
+hasInstance(T,I):- rdf_x(I,rdf:type,T).
+
+assert_hasInstance(T,I):- !,assert_if_new(hasInstance_dyn(T,I)),!.
+assert_hasInstance(T,I):- rdf_assert_x(I,rdf:type,T).
+
+
 :-dynamic_multifile_exported loading_module_h/1.
 :-dynamic_multifile_exported(mpred_prop/2).
 :-dynamic_multifile_exported(mpred_arity/2).
 :-dynamic_multifile_exported(never_type/1).
 % :-dynamic_multifile_exported(localityOfObject/2).
+
 mpred_prop(member,prologOnly).
 mpred_prop(mpred_prop,prologOnly).
 mpred_prop(mpred_arity,prologOnly).
@@ -173,9 +189,9 @@ current_context_module(Ctx):-context_module(Ctx).
 % begin/end_transform_moo_preds
 % ========================================
 
-:-thread_local is_compiling_clause/0.
+:-decl_thlocal is_compiling_clause/0.
 is_compiling:-is_compiling_clause;compiling.
-:-thread_local ended_transform_moo_preds/0, always_expand_on_thread/1, prevent_transform_moo_preds/0, may_moo_term_expand/1, always_transform_heads/0.
+:-decl_thlocal ended_transform_moo_preds/0, always_expand_on_thread/1, prevent_transform_moo_preds/0, may_moo_term_expand/1, always_transform_heads/0.
 :-module_transparent begin_transform_moo_preds/0, end_transform_moo_preds/0.
 :-swi_export(((begin_transform_moo_preds/0,end_transform_moo_preds/0))).
 begin_transform_moo_preds:- retractall(ended_transform_moo_preds),context_module(CM),asserta(may_moo_term_expand(CM)).

@@ -32,7 +32,7 @@ possess(Agent,Poss):-inventory1(Agent,Poss).
 test_exists(O):- item(O).
 test_exists(O):- agent(O).
 test_exists(O):- region(O).
-test_anyInst(O):- type(O).
+test_anyInst(O):- col(O).
 test_anyInst(O):- test_exists(O).
 
 % helps for testings

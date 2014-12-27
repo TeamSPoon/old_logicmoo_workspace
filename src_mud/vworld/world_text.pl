@@ -155,7 +155,7 @@ local_term_anglify(HOLDS,[A,verbFn(Pred)|MORE]):-HOLDS=..[H,Pred,A|MORE],is_hold
 local_term_anglify(HOLDS,English):-HOLDS=..[H,Pred,A|MORE],is_holds_false(H),atom(Pred),HOLDS2=..[Pred,A|MORE],!,local_term_anglify(not(HOLDS2),English).
 local_term_anglify(HOLDS,[false,that,A,verbFn(Pred)|MORE]):-HOLDS=..[H,Pred,A|MORE],is_holds_false(H),!.
 local_term_anglify(not(HOLDS),[false,that,English]):-!,local_term_anglify(HOLDS,English).
-local_term_anglify(notFound(FNum,F,Type),[no,FNum,TypeC,'-s',for,FC]):-copy_term(notFound(F,Type),notFound(FC,TypeC)),ignore(TypeC='type'),ignore(FC='whatever').
+local_term_anglify(notFound(FNum,F,Type),[no,FNum,TypeC,'-s',for,FC]):-copy_term(notFound(F,Type),notFound(FC,TypeC)),ignore(TypeC='col'),ignore(FC='whatever').
 local_term_anglify(NPO,String):-NPO=..[NP,Obj],is_phrase_type(NP),!,enter_term_anglify(fN(Obj,NP),String).
 
 local_term_anglify(fN(Obj,argIsaFn(_PathName,_NumTwo)),String):- enter_term_anglify(Obj,String),!.

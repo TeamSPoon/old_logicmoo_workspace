@@ -24,6 +24,7 @@ default_repl_obj_to_string(O,Type,Out):- copy_term(Type,TypeO), ignore((TypeO = 
 
 
 
+
 canUseEnglish:-true.
 
 :-swi_export(show_kb_preds/3).

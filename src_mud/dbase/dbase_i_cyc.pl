@@ -183,7 +183,7 @@ printSubL(OutStream,Send):-
 	       atom(Send) -> formatCyc(OutStream,'~w~n',[Send]);
 	       compound(Send) ->
       	       (toCycApiExpression(Send,[],STerm),formatCyc(OutStream,'~w~n',[STerm]));
-%	       throw(cyc_error('SubL message type not supported',Send)),
+%	       throw(cyc_error('SubL message col not supported',Send)),
 	       	       formatCyc(OutStream,'~w~n',[Send])),!.
 
 
@@ -281,7 +281,7 @@ toCycVar(Var,[VV|_],NameQ):-nonvar(VV),VV=..[_,Name,VarRef],
    Var==VarRef,!,sformat(NameQ,'?~w',[Name]).
 toCycVar(Var,[_|Rest],Name):-nonvar(Rest),toCycVar(Var,Rest,Name).
 toCycVar(VAR,_,VarName):-
-      term_to_atom(VAR,AVAR),
+      rtrace(term_to_atom(VAR,AVAR)),
       atom_codes(AVAR,[95|CODES]),!,
       catch(sformat(VarName,'?HYP-~s',[CODES]),_,VarName='?HYP-VAR').
 
@@ -882,7 +882,7 @@ cyclVarNums_list(LIST,[A|RGS],[V|ARARGS],VARLIST):-
             append(VARS1,VARS2,VARLIST).
 
 
-unnumbervars_a2t(X,Y):-term_to_atom(X,A),atom_to_term(A,Y,_).
+unnumbervars_a2t(X,Y):- show_call(term_to_atom(X,A)),atom_to_term(A,Y,_).
 
 open_list(V,V):-var(V).
 open_list(A,B):-append(A,_,B).

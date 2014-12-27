@@ -19,6 +19,6 @@ echo `pwd`
 echo "Hit CTRL+C ${BASH_SOURCE[0]} $RUNFILE ";
 sleep 1;
 cd $NEWPWD
-swipl -L32G -G32G -T132G -f $RUNFILE
+swipl -L32G -G32G -T32G -f $RUNFILE
 cd $OLDPWD
 echo exit $?

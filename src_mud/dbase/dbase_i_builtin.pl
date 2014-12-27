@@ -26,11 +26,11 @@
 % =================================================================================================
 % BEGIN world English
 % =================================================================================================
-type('TemporallyExistingThing').
-type(activeAgent).
+col('TemporallyExistingThing').
+col(activeAgent).
 
-type(channel).
-type(completeExtentAsserted).
+col(channel).
+col(completeExtentAsserted).
 
 argsIsaInList(ft_info(formattype,term)).
 argsIsaInList(subft(formattype,formattype)).
@@ -59,36 +59,36 @@ multiValued(contains(container,obj)).
 multiValued(grid(region,int,int,obj)).
 multiValued(possess(agent,spatialthing)).
 genlPreds(possess,wearsClothing).
-multiValued(subclass(type,type)).
-multiValued(isa(term,type)).
-argsIsaInList(somethingIsa(term,list(type))).
+multiValued(subclass(col,col)).
+multiValued(isa(term,col)).
+argsIsaInList(somethingIsa(term,list(col))).
 argsIsaInList(somethingDescription(term,list(string))).
 
 :- decl_mpred_hybrid(assert_with_pred,2).
 :- begin_transform_moo_preds.
 
-subclass(createableType,type).
+subclass(createableType,col).
 
 % :- (do_term_expansions->true;throw(not_term_expansions)).
 
 :-dynamic(monster/1).
 
-%createableType(type).
-type(item).
-type(multiValued).
-type(singleValued).
-type(createableType).
-type(typeDeclarer).
+%createableType(col).
+col(item).
+col(multiValued).
+col(singleValued).
+col(createableType).
+col(colDeclarer).
 
 :-add((subclass(eachOf(multiValued,ordered,negationByFailure,argsIsaInList,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),mpred))).
 
 :-add((argIsa(eachOf(mpred,multiValued,ordered,negationByFailure,argsIsaInList,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),1,mpred))).
 :-add((argIsa(eachOf(mpred,multiValued,ordered,negationByFailure,argsIsaInList,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),2,list(prop)))).
 
-:-add((isa(eachOf(multiValued,ordered,negationByFailure,argsIsaInList,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),typeDeclarer))).
+:-add((isa(eachOf(multiValued,ordered,negationByFailure,argsIsaInList,prologHybrid,prologBuiltin,prologOnly,nonGroundOK,assertionMacroHead,listValued,singleValued),colDeclarer))).
 
 :-doall((argsIsaProps(F),decl_type(F),add(subclass(F,relation)))).
-:-doall((argsIsaProps(F),decl_type(F),add(isa(F,typeDeclarer)))).
+:-doall((argsIsaProps(F),decl_type(F),add(isa(F,colDeclarer)))).
 
 :-decl_mpred_prolog(repl_writer(agent,term)).
 %:-decl_mpred_hybrid(repl_writer(agent,term),[singleValued,default_sv(2,default_repl_writer)]).
@@ -159,14 +159,14 @@ term_anglify(term_anglify(Term,Text),[prolog(Term),is,converted,to,english,using
 
 multiValued(verb_alias(string,string)).
 
-prologHybrid(label_type_props(string,type,list(term(property)))).
+prologHybrid(label_type_props(string,col,list(term(property)))).
 
-prologHybrid(type_grid(type,int,term)).
+prologHybrid(type_grid(col,int,term)).
 
 multiValued(action_rules(agent,verb,term(obj),term(list(term(property))))).
 
 
-type(actiontype).
+col(actiontype).
 
 singleValued(atloc(obj,xyz(region,int,int,int))).
 
@@ -182,10 +182,10 @@ argsIsaInList(forwardRule(term,term)).
 % 
 
 
-argsIsaInList(resultIsa(fpred,type)).
+argsIsaInList(resultIsa(fpred,col)).
 
 
-argsIsaInList(formatted_resultIsa(formattype,type)).
+argsIsaInList(formatted_resultIsa(formattype,col)).
 
 formatted_resultIsa(apath(region,dir),areaPath).
 formatted_resultIsa(dice(int,int,int),int).
@@ -202,7 +202,7 @@ subclass(furniture,partof).
 :-decl_mpred_hybrid(agent(id),[flag]).
 :-decl_mpred_hybrid(item(id),[flag]).
 :-decl_mpred_hybrid(region(id),[flag]).
-:-decl_mpred_hybrid(type(id),[flag]).
+:-decl_mpred_hybrid(col(id),[flag]).
 :-decl_mpred_hybrid(thinking(agent),[flag]).
 :-decl_mpred_hybrid(deleted(id),[flag]).
 
@@ -213,21 +213,21 @@ subclass(furniture,partof).
 % dbase_t = a dbase_t/N
 % pttp = pttp _int compiled
 % cyc = 
-% type =
+% col =
 
 % multivalued
 %mpred(G,[multi(AT)|LIST]):-multiValued(G,AT,LIST).
 
-assertionMacroHead(somethingIsa(term,list(type))).
+assertionMacroHead(somethingIsa(term,list(col))).
 assertionMacroHead(somethingDescription(term,list(string))).
-assertionMacroHead(objects(type,list(id))).
-assertionMacroHead(sorts(type,list(type))).
+assertionMacroHead(objects(col,list(id))).
+assertionMacroHead(sorts(col,list(col))).
 
 %mpred(ArgTypes,[singleValued]):-singleValued(ArgTypes).
 %mpred(CallSig,[external(M)]):-prologBuiltin(M:CallSig).
 
 prologBuiltin(nearby(obj,obj)).
-%prologBuiltin(isa(obj,type)).
+%prologBuiltin(isa(obj,col)).
 %prologBuiltin(same(id,id)).
 
 
@@ -270,9 +270,9 @@ argsIsaInList(verbOverride(term,action,action),[prologHybrid]).
 
 :-dynamic(spawn_rate/2).
 
-singleValued(type_max_charge(type,int)).
+singleValued(type_max_charge(col,int)).
 singleValued(max_charge(term,int)).
-singleValued(type_max_health(type,int)).
+singleValued(type_max_health(col,int)).
 singleValued(max_health(term,int)).
 
 channel(A):-region(A).
@@ -306,17 +306,17 @@ equivRule(multiValued(CallSig,[assert_with_pred(hooked_asserta),retract_with_pre
 
 
 ask_module(nearby(obj,obj),user).
-%  ask_module(isa(obj,type),user).
-% db_prop_prolog(world,isa(obj,type)).
+%  ask_module(isa(obj,col),user).
+% db_prop_prolog(world,isa(obj,col)).
 % db_prop_prolog(world,same(id,id)).
 
 
 
-argsIsaInList(somethingIsa(term,list(type))).
+argsIsaInList(somethingIsa(term,list(col))).
 argsIsaInList(somethingDescription(term,list(string))).
-argsIsaInList(objects(type,list(id))).
+argsIsaInList(objects(col,list(id))).
 argsIsaInList(predicates(list(functor))).
-argsIsaInList(sorts(type,list(type))).
+argsIsaInList(sorts(col,list(col))).
 
 argsIsaInList(default_sv(singleValued,int,term)).
 
@@ -326,7 +326,7 @@ argsIsaInList(member(term,term)).
 % singleValued(repl_writer(agent,term),default_sv(2,default_repl_writer)).
 % singleValued(repl_to_string(agent,term),[singleValued,default_sv(2,default_repl_obj_to_string)]).
 
-%multiValued(label_type(string,type),[singleValued]).
+%multiValued(label_type(string,col),[singleValued]).
 
 
 
@@ -346,10 +346,10 @@ multiValued(ask_predicate(multiValued,term)).
 
 isa(text,formattype).
 
-argsIsaInList(type_action_info(agenttype,actiontype,text)).
+argsIsaInList(type_action_info(agentcol,actiontype,text)).
 argsIsaInList(action_info(actiontype,text)).
 argsIsaInList(actiontype(term)).
-argsIsaInList(argIsa(relation,int,type)).
+argsIsaInList(argIsa(relation,int,col)).
 argsIsaInList(argFormat(relation,int,formattype)).
 
 argsIsaInList(agent_text_command(agent,text,agent,goal)).
@@ -358,7 +358,8 @@ multiValued(description(term,text),[assert_with_pred(add_description),retract_wi
 
 
 
-type(item).
+col(item).
+col(verb).
 
 
 equivRule(nameStrings(apath(Region,Dir),Text),pathName(Region,Dir,Text)).
@@ -366,7 +367,7 @@ equivRule(description(apath(Region,Dir),Text),pathName(Region,Dir,Text)).
 
 % dbase_t(action_info,What,text("command is: ",What)):- holds_t(actiontype,What).
 
-
+:-decl_mpred_hybrid(stowed(agent,item)).
 
 
 % formattype(FormatType):-subclass(FormatType,formattype).
@@ -414,7 +415,7 @@ singleValued(spd(agent,int)).
 singleValued(stat_total(agent,int)).
 singleValued(stm(agent,int)).
 singleValued(str(agent,int)).
-singleValued(type_grid(regiontype,int,list(term))).
+singleValued(type_grid(regioncol,int,list(term))).
 singleValued(weight(obj,int)).
 
 singleValued(height(spatialthing,int)).
@@ -422,8 +423,8 @@ singleValued(height(spatialthing,int)).
 multiValued(comment(term,string)).
 multiValued(pathBetween(region,dir,region)).
 
-prologOnly(default_type_props(type,voprop)).
-prologOnly(default_inst_props(id,type,voprop)).
+prologOnly(default_type_props(col,voprop)).
+prologOnly(default_inst_props(id,col,voprop)).
 
 
 default_type_props(food,[height(0)]).
@@ -443,8 +444,8 @@ singleValued(needs_look(agent,boolean),default_sv(2,false)).
 
 default_type_props(agent,needs_look(false)).
 
-type(var).
-type(string).
+col(var).
+col(string).
 formattype(var).
 formattype(string).
 /*
@@ -468,13 +469,13 @@ ft_info(dice(int,int,int),formatted).
 % ft_info(dir,is_any_dir(self)).
 % ft_info(formattype,formatted).
 ft_info(id,nonvar(self)).
-ft_info(list(type),formatted).
+ft_info(list(col),formatted).
 ft_info(number,number(self)).
 ft_info(prolog,true).
 ft_info(rest,true).
 ft_info(string,string(self)).
 ft_info(term,nonvar(self)).
-% ft_info(type,type(self)).
+% ft_info(col,col(self)).
 ft_info(var,var(self)).
 ft_info(xyz(region,int,int,int),formatted).
 
@@ -504,7 +505,6 @@ subft(int,dice).
 subft(dir,string).
 subft(id,term).
 subft(voprop,term).
-subft(int,integer).
 subft(integer,number).
 subft(string,term).
 subft(string,text).
@@ -518,7 +518,7 @@ subft(var,prolog).
 negationByFailure(agent(id)).
 negationByFailure(item(id)).
 negationByFailure(region(id)).
-negationByFailure(type(id)).
+negationByFailure(col(id)).
 
 negationByFailure(thinking(agent)).
 negationByFailure(deleted(id)).
@@ -534,7 +534,7 @@ multiValued(descriptionHere(term,string)).
 argsIsaInList(size(spatialthing,size_value)).
 argsIsaInList(texture(spatialthing,texture_value)).
 
-subclass(discoverableType,type).
+subclass(discoverableType,col).
 
 discoverableType(texture_value).
 discoverableType(size_value).
@@ -549,8 +549,8 @@ multiValued(memory(agent,term)).
 multiValued(wearsClothing(agent,wearable)).
 multiValued(grid(region,int,int,obj)).
 multiValued(possess(agent,item)).
-multiValued(subclass(type,type)).
-multiValued(isa(term,type)).
+multiValued(subclass(col,col)).
+multiValued(isa(term,col)).
 
 subclass(player,agent).
 subclass(human_player,player).
