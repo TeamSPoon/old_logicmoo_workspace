@@ -10,7 +10,7 @@
 
 :-dynamic(registered_game_file/1).
 :-swi_export(declare_load_game/1).
-declare_load_game(File):-show_call(asserta_if_new(registered_game_file(File))).
+declare_load_game(Spec):- forall(filematch(Spec,File),show_call(asserta_if_new(registered_game_file(File)))).
 
 :-swi_export(load_game_files/0).
 load_game_files :- forall(registered_game_file(File),ensure_plmoo_loaded(File)).
@@ -140,6 +140,7 @@ ensure_at_least_one_region:- (isa(_,region)->true;create_instance(oneRegion1,reg
 finish_processing_game:- dmsg(begin_finish_processing_game),fail.
 finish_processing_game:- doall_and_fail(rescan_all).
 finish_processing_game:- doall_and_fail(ensure_at_least_one_region).
+finish_processing_game:- doall_and_fail(call_OnEachLoad).
 finish_processing_game:- dmsg(saving_finish_processing_game),fail.
 finish_processing_game:- savedb,fail.
 finish_processing_game:- dmsg(end_finish_processing_game),fail.

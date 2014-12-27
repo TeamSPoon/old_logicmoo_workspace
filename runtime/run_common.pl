@@ -27,10 +27,15 @@ prolog:message(git(update_versions),A,A):-!.
 
 :- multifile( entailment:rdf /3 ).
 
+% [Optionaly] Solve the Halting problem
+:-redefine_system_predicate(system:halt).
+:-abolish(system:halt,0).
+system:halt:- format('the halting problem is now solved!').
+
 
 add_game_dir(GAMEDIR,Else):- add_to_search_path_first(game, GAMEDIR),now_try_game_dir(Else).
 
-now_try_game_dir(Else):-  expand_file_search_path(game('.'), GAMEDIR) -> 
+now_try_game_dir(Else):-  filematch(game('.'), GAMEDIR) -> 
   ((exists_directory(GAMEDIR) -> 
     with_all_dmsg(( forall(enumerate_files(game('**/*.pl'),X),user_ensure_loaded(X)),
       forall(enumerate_files(game('**/*.plmoo'),X),declare_load_game(X)))); (fmt(missing(GAMEDIR)),Else)));  (fmt(no_game_dir),Else).

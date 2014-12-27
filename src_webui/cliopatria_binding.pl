@@ -1,6 +1,6 @@
 :- module(cliopatria_binding, []).
 
-:- throw('dont call cliopatria_binding!').
+:- throw('dont call cliopatria_binding!').
 
 /** <module> Separate module so setting ends up in right place
 

@@ -29,8 +29,8 @@ alt_forms0(P,NP):-alt_forms1(P,M),alt_forms1(M,NP).
 alt_forms0(P,NP):-alt_forms1(P,NP).
 
 
-alt_forms1(atloc(P,L),localityOfObject(P,R)):-nonvar(P),nonvar(L),once(locationToRegion(L,R)),nonvar(R).
-alt_forms1(localityOfObject(P,_),atloc(P,L)):-nonvar(P),ignore(atloc(P,L)),nonvar(L).
+alt_forms1(atloc(P,L),localityOfObject(P,R)):-ground(atloc(P,L)),once(locationToRegion(L,R)),nonvar(R).
+alt_forms1(localityOfObject(P,R),atloc(P,L)):-ground(localityOfObject(P,R)),is_asserted(atloc(P,L)),nonvar(L),once(locationToRegion(L,R)).
 alt_forms1(P,NP):-P=..[F,A,B|R],alt_forms2(F,A,B,R,NP). 
 
 alt_forms2(F,A,B,R,NP):-dbase_t(genlInverse,F,FF),NP=..[FF,B,A|R].

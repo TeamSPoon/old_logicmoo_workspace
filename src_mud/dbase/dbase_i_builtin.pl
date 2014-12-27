@@ -48,6 +48,9 @@ mpred_prop(ft_info/2,prologHybrid).
 % mpred_prop(ft_info/2,prologOnly).
 subclass(eachOf(region,agent,gossup),channel).
 
+:-decl_mpred_hybrid(mud_dictionary(text,text)).
+
+:-decl_mpred(region(id),type).
 
 channel(gossup).
 
@@ -428,6 +431,7 @@ prologOnly(default_inst_props(id,col,voprop)).
 
 
 default_type_props(food,[height(0)]).
+default_type_props(agent,[movedist(1)]).
 
 default_type_props(spatialthing,height(0)).
 

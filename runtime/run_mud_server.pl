@@ -3,20 +3,14 @@
 
 */
 
-% [Manditory] Load the Logicmioo utils
-:- '@'(ensure_loaded('../src_lib/logicmoo_util/logicmoo_util_all'),user).
-
 % [Optionaly] Set the Prolog optimize/debug flags
 :- set_prolog_flag(gc,true),set_prolog_flag(debug,false),set_prolog_flag(last_call_optimisation,true),set_prolog_flag(optimise,true).
 :- set_prolog_flag(verbose_load,true).
 :- use_module(library(gui_tracer)).
 :- set_prolog_flag(gui_tracer, false).
 
-
-% [Optionaly] Solve the Halting problem
-:-redefine_system_predicate(system:halt).
-:-abolish(system:halt,0).
-system:halt:- format('the halting problem is now solved!').
+% [Manditory] Load the Logicmioo utils
+:- '@'(ensure_loaded('../src_lib/logicmoo_util/logicmoo_util_all'),user).
 
 % [Manditory] define how we interact with the module system
 swi_module(M,E):-dmsg(swi_module(M,E)).
@@ -45,16 +39,18 @@ swi_export(E):-dmsg(swi_export(E)).
 
 % [Manditory] load_default_game
 % this is what happens when the world is not found
-:- add_game_dir('../games/src_game_unknown',prolog_repl).     
+% :- add_game_dir('../games/src_game_unknown',prolog_repl).     
+
+:- onSpawn(pathBetween(living_room,office_room)).
+
+% :- declare_load_game('../games/src_game_nani/a_nani_household.plmoo').
 
 % the following 4 worlds are in version control in examples
+% :- add_game_dir('../games/src_game_wumpus',prolog_repl).       
 % :- add_game_dir('../games/src_game_nani',prolog_repl).       
 % :- add_game_dir('../games/src_game_sims',prolog_repl).       
 % :- add_game_dir('../games/src_game_startrek',prolog_repl).       
-% :- add_game_dir('../games/src_game_wumpus',prolog_repl).       
 
-% [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
-:- register_timer_thread(npc_ticker,30,npc_tick).
 
 % [Manditory] This loads the game and initializes so test can be ran
 :- if_startup_script( at_start(finish_processing_world)).
@@ -65,9 +61,12 @@ swi_export(E):-dmsg(swi_export(E)).
 :-enqueue_player_command(look).
 % :-enqueue_player_command(prolog).
 
+% [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
+:- register_timer_thread(npc_ticker,30,npc_tick).
+
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
 :- if_startup_script(at_start(run)).
 
 % So scripted versions don't just exit
 :- if_startup_script(at_start(prolog)).
-
+   

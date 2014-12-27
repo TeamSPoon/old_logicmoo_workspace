@@ -137,7 +137,7 @@ call_after_game_load(Code):- call_after_next(after_game_load,Code).
 :-swi_export(rescan_game_loaded/0).
 rescan_game_loaded:- ignore((after_game_load, loop_check(call_after(after_game_load, true ),true))).
 
-:-swi_export(rescan_game_loaded/0).
+:-swi_export(rescan_game_loaded_pass2/0).
 rescan_game_loaded_pass2:- ignore((after_game_load, loop_check(call_after(after_game_load_pass2,  dmsg(rescan_game_loaded_pass2_comlpete)),true))).
 
 % ================================================
@@ -1113,8 +1113,13 @@ setTemplate(X):-add(X).
 
 englishServerInterface(SomeEnglish):-dmsg(todo(englishServerInterface(SomeEnglish))).
 
+:-dynamic(call_OnEachLoad/1).
 :-swi_export(onLoad/1).
 onLoad(C):-call_after_game_load(C).
+:-swi_export(onEachLoad/1).
+onEachLoad(C):-assert_if_new(call_OnEachLoad(C)).
+
+call_OnEachLoad:-forall(call_OnEachLoad(C),doall(C)).
 
 onSpawn(ClassFact):- ClassFact=..[Funct,InstA],createByNameMangle(InstA,Inst,Type2),assert_isa(Type2,createableType),assert_isa(Inst,Funct),assert_isa(Inst,Type2),!.
 onSpawn(ClassFact):- ClassFact=..[Funct|InstADeclB],must_det(onSpawn_f_args(Funct,InstADeclB)).
