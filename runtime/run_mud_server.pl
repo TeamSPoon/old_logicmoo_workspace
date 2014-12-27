@@ -27,9 +27,8 @@ swi_export(E):-dmsg(swi_export(E)).
 % [Optionaly] register swish server (remote file editing)
 :- if_file_exists(ensure_loaded('../externals/swish/logicmoo_run_swish')).
 
-% [Optionaly] load and start Cliopatria sparql server
-% [Optionaly] register/run Cliopatria server (remote RDF browsing)
-:- if_startup_script(ensure_loaded(run_clio)).
+% [Optionaly] register/run Cliopatria sparql server (remote RDF browsing)
+% :- if_startup_script(ensure_loaded(run_clio)).
 
 % [Optionaly] register/run KnowRob robot services (we use it for the ontology mainly)
 :- with_no_term_expansions(if_file_exists(ensure_loaded('../externals/MUD_KnowRob/knowrob_addons/knowrob_mud/prolog/init'))).
@@ -43,14 +42,12 @@ swi_export(E):-dmsg(swi_export(E)).
 :- forall(retract(prolog_debug:debugging(http(X), true, O)),show_call(asserta(prolog_debug:debugging(http(X), false, O)))).
 :- forall(retract(prolog_debug:debugging((X), true, O)),show_call(asserta(prolog_debug:debugging((X), false, O)))).
 
-% [Manditory] load_default_game
-:- add_to_search_path(game, '../games/src_game_startrek').
-:- with_all_dmsg(( forall(enumerate_files(game('**/*.pl'),X),user_ensure_loaded(X)),
-      forall(enumerate_files(game('**/*.plmoo'),X),declare_load_game(X)))).
 
+% [Manditory] load_default_game
+:- add_game_dir('../games/src_game_unknown',prolog_repl).       
+	  
 % [Manditory] This loads the game and initializes so test can be ran
 :- if_startup_script( at_start(finish_processing_world)).
-
 
 % :- if_startup_script( doall(now_run_local_tests_dbg)).
 

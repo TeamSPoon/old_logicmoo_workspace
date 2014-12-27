@@ -26,18 +26,18 @@
 	<CustomFolders>
 	</CustomFolders>
 	<Files AutoFolders="DirectoryView">
-		<Folder Name=".">
-			<Folder Name="src_mud">
-				<F
-					N="./src_mud/*.*"
-					Recurse="1"
-					Refilter="0"
-					Excludes=""/>
-			</Folder>
+		<Folder Name="./">
 			<F
 				N="./*.*"
 				Recurse="1"
 				Excludes="*~/;.git/;.svn/;externals/"/>
+		</Folder>
+		<Folder Name="./src_mud">
+			<F
+				N="./src_mud/*.*"
+				Recurse="1"
+				Refilter="0"
+				Excludes=""/>
 		</Folder>
 	</Files>
 </Project>

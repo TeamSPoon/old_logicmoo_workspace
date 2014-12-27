@@ -23,6 +23,14 @@
 :- multifile( entailment:rdf /3 ).
 
 
+add_game_dir(GAMEDIR,Else):- add_to_search_path_first(game, GAMEDIR),now_try_game_dir(Else).
+
+now_try_game_dir(Else):-  expand_file_search_path(game('.'), GAMEDIR) -> 
+  ((exists_directory(GAMEDIR) -> 
+    with_all_dmsg(( forall(enumerate_files(game('**/*.pl'),X),user_ensure_loaded(X)),
+      forall(enumerate_files(game('**/*.plmoo'),X),declare_load_game(X)))); (fmt(missing(GAMEDIR)),Else)));  (fmt(no_game_dir),Else).
+
+
 :-context_module(CM),assert(startup_mod:loading_from_cm(CM)).
 create_module(M):-context_module(CM),module(M),asserta(M:this_is_a_module(M)),writeq(switching_back_to_module(CM)),module(CM).
 :-create_module(user).

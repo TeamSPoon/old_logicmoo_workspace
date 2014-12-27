@@ -378,6 +378,6 @@ onLoad(Code):- call_after_next(after_game_load,Code).
 :- onLoad(forall(is_known_trew(B),rdf_assert_hook(B))).
 :- onLoad(forall(dbase_t(P,S,O),rdf_assert_hook(svo(S,P,O)))).
 :- onLoad(forall(po(P,O),rdf_assert_hook(subclass(P,O)))).
-:- onLoad(hard_work).
+% :- onLoad(hard_work).
 
 
