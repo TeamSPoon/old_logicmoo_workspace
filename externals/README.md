@@ -1,4 +1,4 @@
-EXTERNAL PACKAGES for Logicmoo Base Prolog MUD
+EXTERNAL PACKAGES
 =========
 Initial starter Docs https://github.com/TeamSPoon/PrologMUD/wiki
 
