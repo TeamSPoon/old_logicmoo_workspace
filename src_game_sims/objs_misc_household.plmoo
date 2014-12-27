@@ -69,19 +69,19 @@ mud_dictionary([anthurium,crystallinum],[anthurium_crystallinum]).
 % Doors
 % ==================================================
 
-:-decl_mpred_hybrid(doorBetween(region,region),symmetric).
+:-decl_mpred_hybrid(pathBetween(region,region),symmetric).
 
-:-onSpawn doorBetween(living_room,office_room).
-:-onSpawn doorBetween(hall,dining_room).
-:-onSpawn doorBetween(hall,bed_room).
-:-onSpawn doorBetween(hall,living_room).
-:-onSpawn doorBetween(hall,bath_room).
-:-onSpawn doorBetween(kitchen, cellar).
-:-onSpawn doorBetween(dining_room, kitchen).
-:-onSpawn doorBetween(bed_room, closet_room).
-:-onSpawn doorBetween(kitchen, back_yard).
+:-onSpawn pathBetween(living_room,office_room).
+:-onSpawn pathBetween(hall,dining_room).
+:-onSpawn pathBetween(hall,bed_room).
+:-onSpawn pathBetween(hall,living_room).
+:-onSpawn pathBetween(hall,bath_room).
+:-onSpawn pathBetween(kitchen, cellar).
+:-onSpawn pathBetween(dining_room, kitchen).
+:-onSpawn pathBetween(bed_room, closet_room).
+:-onSpawn pathBetween(kitchen, back_yard).
 
-:-onSpawn doorBetween(kitchen, 'Area1000').
+:-onSpawn pathBetween(kitchen, 'Area1000').
 
 :-onSpawn pathBetween('Area1000',"s",'kitchen').
 :-onSpawn pathBetween('kitchen',nospawn("n"),'Area1000').
@@ -89,9 +89,9 @@ mud_dictionary([anthurium,crystallinum],[anthurium_crystallinum]).
 :-export(doorsConnect/2).
 :-decl_mpred_hybrid(doorsConnect(region,region)).
 
-doorBetween(R1,R2):-pathBetween(R1,_,R2).
+pathBetween(R1,R2):-pathBetween(R1,_,R2).
 
-doorsConnect(Thing,Noun2):- doorBetween(Thing,Noun2); doorBetween(Noun2,Thing).
+doorsConnect(Thing,Noun2):- pathBetween(Thing,Noun2); pathBetween(Noun2,Thing).
 
 addPathBetweens:- doall((no_repeats(doorsConnect(R1,R2)),must_det(ensure_some_pathBetween(R1,R2)))).
 
