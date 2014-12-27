@@ -8,6 +8,7 @@ runtime/store/*
 *.qlf
 *.zip
 *.rar
+*.vtg
 application.linux32
 application.linux64
 application.windows32
