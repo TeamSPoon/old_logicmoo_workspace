@@ -184,7 +184,7 @@ subclass(bedding, foldable).
 subclass(foldable, portable).
 subclass(throwable, portable).
 subclass(portable_device,portable).
-subclass(device,useable).
+subclass(physicalDevice,useable).
 subclass(wearable, portable).
 subclass(portable,takeable).
 subclass(food,takeable).
