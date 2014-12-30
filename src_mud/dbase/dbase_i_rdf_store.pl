@@ -18,23 +18,95 @@ This entailment module does MUD-DB entailment.
 :- use_module(library(nb_set)).
 :- use_module(library(semweb/rdfs)).
 :- use_module(library(semweb/turtle)).
+:- use_module(library(semweb/rdf_edit)).
+:- use_module(library(url)).
+:- use_module(library(http/http_open)).
+:- use_module(library(http/http_ssl_plugin)).
+
+ssl_verify(_SSL, _ProblemCert, _AllCerts, _FirstCert, _Error) :- !.
+        
+
+
+%% n3_parse(+URL)
+%
+% Parse an OWL file and load it into the local RDF database.
+% 
+% Resolves owl:imports and supports both the common URL formats
+% (file paths, file:// or http://) and the package:// URLs used
+% in ROS to reference files with respect to the surrounding ROS
+% package.
+%
+% @param URL Local or global file path or URL of the forms file://, http:// or package://
+%
+:-export(n3_parse/1).
+
+graph_src(URL,Source):-rdf_current_prefix(Source,URL),!.
+graph_src(URL,Source):-atom_concat(URL,'#',URIH),rdf_current_prefix(Source,URIH),!.
+graph_src(URL,URL).
+
+n3_parse(URL) :- graph_src(URL,Source),n3_parse(URL,[graph(Source),base_uri(URL),register_namespaces(true)]).
+n3_parse(URL,Options) :-
+  n3_parse_1(URL,[URL],Options).
+  
+
+n3_parse_1(URL,Imported,Options) :- catchv(n3_parse_2(URL,Imported,Options),E,dmsg(E:n3_parse_1(URL,Imported,Options))).
+:-export(owl_file_loaded/1).
+
+n3_parse_2(URL,Imported,Options) :-
+
+  ((sub_string(URL,0,4,_,'http'), !,
+    http_open(URL,RDF_Stream,[ cert_verify_hook(ssl_verify)
+				]),
+    rdf_load(RDF_Stream,[blank_nodes(noshare)|Options]),
+    close(RDF_Stream)),
+    assert(owl_file_loaded(URL))
+    ;
+   (sub_string(URL,0,7,_,'package'), !,
+
+    % retrieve part after package://
+    sub_atom(URL, 10, _, 0, Path),
+    atomic_list_concat(PathList, '/', Path),
+
+    % determine package name and resolve path
+    selectchk(Pkg, PathList, LocalPath),
+    rospack_package_path(Pkg, PkgPath),
+
+    % build global path and load OWL file
+    atomic_list_concat([PkgPath|LocalPath], '/',  GlobalPath),
+
+    rdf_load(GlobalPath,[blank_nodes(noshare)|Options]),
+    assert(owl_file_loaded(URL))
+    ) ; (
+    rdf_load(URL,[blank_nodes(noshare)|Options])),
+    assert(owl_file_loaded(URL))
+  ),
+  (   rdf_db:rdf(_,'http://www.w3.org/2002/07/owl#imports',Import_URL),
+      not( owl_file_loaded(Import_URL)),!,
+      n3_parse_1(Import_URL,[Import_URL|Imported],Options)
+    ; true).
+
+:- n3_parse('http://omeo.googlecode.com/svn/trunk/build/ro-subset.owl').
+:- n3_parse('http://knowrob.org/kb/roboearth.owl').
+:- n3_parse('http://ias.cs.tum.edu/kb/knowrob.owl').
+:- n3_parse('http://raw.github.com/knowrob/knowrob/master/knowrob_omics/rdf/locations.rdf').
+:- n3_parse('http://raw.github.com/knowrob/knowrob/master/knowrob_omics/rdf/roboearth.rdf').
+
+
 % :- rdf_attach_library((.)).
 :-  with_no_term_expansions(use_module(cliopatria(cliopatria))).
 
 
-% :- rdf_register_prefix(mudh,'http://ias.cs.tum.edu/kb/knowrob.owl',[force(true)]).
-:- rdf_register_prefix(mud, "http://ias.cs.tum.edu/kb/knowrob.owl#",[force(true)]).
 
 /*[rdf_register_prefix/2,rdf_register_prefix/3,rdf_current_ns/2,rdf/4,rdf_assert/4,
                                       rdf_current_prefix/2,rdf_global_object/2,rdf_resource/1,rdf_current_predicate/1,
                                       rdf_has/3,rdf_graph_property/2,rdf_equal/2,rdf_literal_value/2,rdf_reachable/3,rdf_set_graph/2,rdf_subject/1]).
                                       */
 :- rdf_register_prefix(agents_owl, 'http://onto.ui.sav.sk/agents.owl#',[force(true)]).
-:- rdf_register_prefix(mud,'http://ias.cs.tum.edu/kb/knowrob.owl#',[force(true)]).
 :- rdf_register_prefix(skos, 'http://www.w3.org/2004/02/skos/core#',[force(true)]).
 :- rdf_register_prefix(skosxl,  'http://www.w3.org/2008/05/skos-xl#',[force(true)]).
-:- rdf_register_prefix(knowrob_objects, "http://ias.cs.tum.edu/kb/knowrob_objects.owl#",[force(true)]).
-:- rdf_register_prefix(knowrob, "http://ias.cs.tum.edu/kb/knowrob.owl#",[force(true)]).
+:- rdf_register_prefix(knowrob_objects, 'http://ias.cs.tum.edu/kb/knowrob_objects.owl#',[force(true)]).
+:- rdf_register_prefix(knowrob, 'http://ias.cs.tum.edu/kb/knowrob.owl#',[force(true)]).
+:- rdf_register_prefix(mud,'http://www.prologmoo.com/onto/mud.owl#',[force(true)]).
 
 :- public(rdf/3).
 rdf(S,P,O):- show_call(dbase_rdf(S,P,O)).
@@ -74,23 +146,38 @@ prolog_to_qname('http://www.w3.org/1999/02/22-rdf-syntax-ns#type',rdf:type).
 prolog_to_qname('http://www.w3.org/1999/02/22-rdf-syntax-ns#',rdf:'<>').
 prolog_to_qname(URL,Px:Rest):-concat_atom([NS,Rest],'#',URL),atom_concat(NS,'#',NSH),rdf_current_prefix(Px,NSH),!.
 
-rdf_to_url(From,To):-rdf_to_url(mud,From,To),must(ground(From)).
+
+:- dynamic(rdf_alias/2).
+cache_rdf_alias(M:_R:From,To):-!,cache_rdf_alias(M:From,To).
+cache_rdf_alias(From,To):-rdf_alias(From,To),!.
+cache_rdf_alias(From,To):-fmt(url_alias(From,To)),asserta(rdf_alias(From,To)),!.
+list_rdf_alias:-listing(rdf_alias).
+
+
+rdf_to_url(From,To):-must(ground(From)),rdf_alias(mud:From,To),!.
+rdf_to_url(From,To):-must(ground(From)),rdf_to_url(mud,From,To),must(ground(To)),cache_rdf_alias(mud:From,To),!.
+
 rdf_to_url(_,Var,V):-var(Var),!,must(copy_term(Var,V)).
-rdf_to_url(G,Var,V):-not(ground(Var)),trace_or_throw(nonground(rdf_to_url(G,Var,V))).
-rdf_to_url(G,Var,V):-not(ground(G)),trace_or_throw(nonground(rdf_to_url(G,Var,V))).
-rdf_to_url(G,_:U/_, UO):-atom(U),!,must(rdf_to_url(G,U,UO)).
-rdf_to_url(G,U/_, UO):-atom(U),!,must(rdf_to_url(G,U,UO)).
-rdf_to_url(G,[H|T],List):-must(nonvar(G)),!, maplist(rdf_to_url(G),[H|T],HT),!,rdfs_assert_list(HT, List, G).
-rdf_to_url(G,NS:S,Sxx):-atom(S),once(prolog_to_qname(S,Sx)),Sx\=NS:S,rdf_to_url(G,Sx,Sxx).
-rdf_to_url(_,NS:R,URL):-must(ground(NS:R)),must(rdf_global_object(NS:R,URL)),!.
-rdf_to_url(_,U,U):-atom(U),is_url(U),!.
-rdf_to_url(G,S,Sxx):-atom(S),prolog_to_qname(S,Sx),Sx\=S,!,rdf_to_url(G,Sx,Sxx).
-rdf_to_url(_,U,O):-rdf_to_lit(U,M),must(rdf_global_object(M,O)),!.
-rdf_to_url(_,node(S),Sx):-atom_concat('__bnode',S,Sx),!.
-rdf_to_url(G,S,URL):-atom(S),rdf_graph_ns(G,NS),rdf_global_object(NS:S,URL),!.
-rdf_to_url(_,S,Sx):-catchv((rdf_global_object(S,Sx),not(compound(Sx))),_,fail),!.
-rdf_to_url(G,C,List):-compound(C),C=..[H|T],must(nonvar(G)),!,must(( maplist(rdf_to_url(G),[H|T],HT),!,rdfs_assert_list(HT, List, G))).
+%rdf_to_url(G,G:From,To):-!,rdf_to_url(G,From,To).
+%rdf_to_url(_,G:From,To):-!,rdf_to_url(G,From,To).
+rdf_to_url(G,From,To):-rdf_alias(G:From,To),!.
+rdf_to_url(G,From,To):-rdf_to_url0(G,From,To),!,cache_rdf_alias(G:From,To),!.
 rdf_to_url(_,Sx,Sx).
+
+rdf_to_url0(G,Var,V):-not(ground(Var)),trace_or_throw(nonground(rdf_to_url(G,Var,V))).
+rdf_to_url0(G,Var,V):-not(ground(G)),trace_or_throw(nonground(rdf_to_url(G,Var,V))).
+rdf_to_url0(G,_:U/_, UO):-atom(U),!,must(rdf_to_url(G,U,UO)).
+rdf_to_url0(G,U/_, UO):-atom(U),!,must(rdf_to_url(G,U,UO)).
+rdf_to_url0(G,[H|T],List):-must(nonvar(G)),!, maplist(rdf_to_url(G),[H|T],HT),!,rdfs_assert_list(HT, List, G).
+rdf_to_url0(G,NS:S,Sxx):-atom(S),once(prolog_to_qname(S,Sx)),Sx\=NS:S,rdf_to_url(G,Sx,Sxx).
+rdf_to_url0(_,NS:R,URL):-must(ground(NS:R)),must(rdf_global_object(NS:R,URL)),!.
+rdf_to_url0(_,U,U):-atom(U),is_url(U),!.
+rdf_to_url0(G,S,Sxx):-atom(S),prolog_to_qname(S,Sx),Sx\=S,!,rdf_to_url(G,Sx,Sxx).
+rdf_to_url0(_,U,O):-rdf_to_lit(U,M),must(rdf_global_object(M,O)),!.
+rdf_to_url0(_,node(S),Sx):-atom_concat('__bnode',S,Sx),!.
+rdf_to_url0(G,S,URL):-atom(S),rdf_graph_ns(G,NS),rdf_global_object(NS:S,URL),!.
+rdf_to_url0(_,S,Sx):-catchv((rdf_global_object(S,Sx),not(compound(Sx))),_,fail),!.
+rdf_to_url0(G,C,List):-compound(C),C=..[H|T],must(nonvar(G)),!,must(( maplist(rdf_to_url(G),[H|T],HT),!,rdfs_assert_list(HT, List, G))).
 
 
 rdf_to_lit(U,literal(type(xsd:integer, S))):-integer(U),!,atom_string(U,S).
@@ -104,7 +191,9 @@ rdf_to_qname(_,Sx,S):-is_url(Sx),prolog_to_qname(Sx,S0),!,must(S=S0).
 rdf_to_qname(_,Sx,S):-prolog_to_qname(Sx,S0),!,must(S=S0).
 rdf_to_qname(G,Sx,S):-rdfs_list_to_prolog_list(Sx,LL),!,maplist(rdf_to_qname(G),LL,S).
 rdf_to_qname(_,literal(type('http://www.w3.org/2001/XMLSchema#string', Atom)),String):-string_to_atom(String,Atom),!.
-rdf_to_qname(_,literal(type(_, Atom)),String):-atom_to_term(Atom,String),!.
+rdf_to_qname(_,literal(type(_, Atom)),Term):-catch(term_to_atom(Term,Atom),_,fail),!.
+rdf_to_qname(_,literal(type(_, String)),Term):-catch(term_string(Term,String),_,fail),!.
+rdf_to_qname(_,literal(Sx),S):-!,must(rdf_literal_value_safe(literal(Sx),S)).
 rdf_to_qname(_,Sx,S):-compound(Sx),!,must(rdf_literal_value_safe(Sx,S)).
 rdf_to_qname(_,Sx,node(S)):-atom(Sx),atom_concat('__bnode',S,Sx),!.
 rdf_to_qname(G,Sx,NS:SI):-atom(Sx),rdf_graph_ns(G,NS),!,must(SI=Sx).
@@ -203,6 +292,7 @@ po(region,knowrob:'FixedStructure').
 po(agent,knowrob:'Agent-Generic').
 po(int,xsd:integer).
 po(string,xsd:string).
+po(F,G:A):-rdf_alias(mud:F,G:A).
 
 
 
@@ -216,7 +306,7 @@ dbase_t_rdf(Sc,rdf:type,CC):- /*o_to_p(CC,Oc),*/clause(hasInstance(Oc,Sc),true),
 dbase_t_rdf(Sc,Pc,Oc):-dbase_t(Pc,Sc,Oc).
 
 :-export(rdf_assert_x/3).
-rdf_assert_x(S,P,O):- rdf_assert_x(S,P,O,'http://ias.cs.tum.edu/kb/knowrob.owl'). % 'http://ias.cs.tum.edu/kb/knowrob.owl#'
+rdf_assert_x(S,P,O):- rdf_assert_x(S,P,O,mud).
 :-export(rdf_assert_x/4).
 % rdf_assert_x(S,P,O,G):-Q=rdf_x(S,P,O,G),not(ground(Q)),!,Q.
 rdf_assert_x(S,P,O,G):-
@@ -226,7 +316,7 @@ rdf_assert_x(S,P,O,G):-
 
 
 :-export(rdf_x/3).
-rdf_x(S,P,O):- rdf_x(S,P,O,'http://ias.cs.tum.edu/kb/knowrob.owl').
+rdf_x(S,P,O):- rdf_x(S,P,O,mud).
 :-export(rdf_x/4).
 rdf_x(S,P,O,G):-
   notrace(once((rdf_to_url_io(user,G,Gx,_Gio),rdf_to_url_io(Gx,S,Sx,Sio),rdf_to_url_io(Gx,P,Px,Pio),rdf_to_url_io(Gx,O,Ox,Oio)))),
@@ -372,13 +462,17 @@ dbase_rdf_has_type(Resource, Class) :-
 cliopatria:entailment(dbase_rdf, dbase_rdf_store).
 
 
-:- after_game_load -> throw(after_game_load) ; true.
-onLoad(Code):- call_after_next(after_game_load,Code).
-:- onLoad(forall(disjointWith0(A,B),rdf_assert_hook(disjointWith(A,B)))).
-:- onLoad(forall(is_known_trew(B),rdf_assert_hook(B))).
-:- onLoad(forall(dbase_t(P,S,O),rdf_assert_hook(svo(S,P,O)))).
-:- onLoad(forall(po(P,O),rdf_assert_hook(subclass(P,O)))).
-:- onLoad(forall(hasInstance(C,I),rdf_assert_hook(isa(I,C)))).
-% :- onLoad(hard_work).
+:-export(sync_rdf/0).
 
+sync_rdf:-
+   forall(disjointWith0(A,B),rdf_assert_hook(disjointWith(A,B))),
+   forall(is_known_trew(B),rdf_assert_hook(B)),
+   forall(dbase_t(P,S,O),rdf_assert_hook(svo(S,P,O))),
+   forall(po(P,O),rdf_assert_hook(subclass(P,O))),
+   forall(hasInstance(C,I),rdf_assert_hook(isa(I,C))).
+
+:-sync_rdf.
+
+:- multifile(user:call_OnEachLoad/1).
+:- asserta_if_new(user:call_OnEachLoad(sync_rdf)).
 

@@ -742,10 +742,6 @@ db_op_exact(change(assert,Must),C):- trace_or_throw(dtrace),functor_catch(C,F,A)
 db_op_exact(Op,C):- trace_or_throw(unhandled(db_op_exact(Op,C))).
 
 
-
-      
-:- with_no_term_expansions(if_file_exists(user_ensure_loaded(logicmoo(dbase/dbase_i_rdf_store)))).
-
 :-swi_export((dbase_t/1,hasInstance/2)).
 :- dynamic_multifile_exported((
          % dbase_t/1,
@@ -1113,11 +1109,14 @@ setTemplate(X):-add(X).
 
 englishServerInterface(SomeEnglish):-dmsg(todo(englishServerInterface(SomeEnglish))).
 
-:-dynamic(call_OnEachLoad/1).
+:-multifile(user:call_OnEachLoad/1).
+:-export(user:call_OnEachLoad/1).
+:-dynamic(user:call_OnEachLoad/1).
+
 :-swi_export(onLoad/1).
 onLoad(C):-call_after_game_load(C).
-:-swi_export(onEachLoad/1).
-onEachLoad(C):-assert_if_new(call_OnEachLoad(C)).
+:-swi_export(user:onEachLoad/1).
+onEachLoad(C):-assert_if_new(user:call_OnEachLoad(C)).
 
 call_OnEachLoad:-forall(call_OnEachLoad(C),doall(C)).
 
@@ -1168,6 +1167,9 @@ argIsa_call_or_undressed(F,N,Obj,fN(Obj,Type)):- argIsa_call_0(F,N,Type),!.
 argIsa_call_or_undressed(_F,_N,Obj,Obj).
 
 verb_after_arg(_,_,1).
+
+
+:- with_no_term_expansions(if_file_exists(user_ensure_loaded(logicmoo(dbase/dbase_i_rdf_store)))).
 
 :- style_check(+discontiguous).
 :- style_check(-discontiguous).

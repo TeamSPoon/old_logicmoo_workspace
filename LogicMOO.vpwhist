@@ -1,8 +1,8 @@
 [Global]
 CurrentProject=PrologMUD.vpj
 [ProjectDates]
-PrologMUD.vpj=20141227095138418
-externals\PrologMUD_ext.vpj=20141227044157694
+PrologMUD.vpj=20141227124652282
+externals\PrologMUD_ext.vpj=20141228123609793
 [TreeExpansion2]
 - PrologMUD.vpj
   - src_mud

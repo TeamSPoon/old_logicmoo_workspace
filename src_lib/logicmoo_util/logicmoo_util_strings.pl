@@ -121,29 +121,31 @@ any_to_atom(A,A):-atom(A),!.
 any_to_atom(T,A):-sformat(S,'~w',[T]),atom_string(A,S).
 
 any_to_string_or_var(StringO,String):- (var(StringO);var(String)),!,String=StringO.
-any_to_string_or_var(StringO,String):- any_to_string(StringO,StringOS),any_to_string(String,StringOS).
+any_to_string_or_var(StringO,String):- any_to_string(StringO,StringOS1),any_to_string(String,StringOS2),!,StringOS1=StringOS2.
 
-atomic_list_concat_safe(List,StringO):- ground(List),atomics_to_string(List,String),any_to_string_or_var(StringO,String).
-atomic_list_concat_safe(O,""):- O=[],!.
+atomic_list_concat_safe(List,StringO):- ground(List),!,atomics_to_string(List,String),any_to_string_or_var(StringO,String).
+atomic_list_concat_safe(List,V):- (V=='';V==""),!,List=[].
 atomic_list_concat_safe([Atom,A2|Bonus],V):-atomic(Atom),atomic(A2),string_concat(Atom,A2,A3),!,atomic_list_concat_safe([A3|Bonus],V).
 atomic_list_concat_safe([Atom|Bonus],V):-atomic(Atom),atomic(V),string_concat(Atom,NV,V),!,atomic_list_concat_safe(Bonus,NV).
 atomic_list_concat_safe([D1,Atom|Bonus],V):-var(D1),atomic(Atom),sub_string(V, NBefore, _Len, _NumAfter, Atom),
       sub_string(V, 0, NBefore, _, D1), atomic_list_concat_safe([D1,Atom|Bonus],V).
 atomic_list_concat_safe([V],V):-!.
 
-
-atomic_list_concat_safe(List,Sep,StringO):- ground(List:Sep),atomics_to_string(List,Sep,String),any_to_string_or_var(StringO,String).
-atomic_list_concat_safe(O,_,""):- O=[],!.
-atomic_list_concat_safe([Atom,A2|Bonus],Sep,V):-atomic(Atom),atomic(A2),atomic_list_concat_safe([Atom,Sep,A2],A3),!,atomic_list_concat_safe([A3|Bonus],Sep,V).
+atomic_list_concat_safe(List,Sep,StringO):- (Sep==[];Sep=='';Sep==""),!,atomic_list_concat_safe(List,StringO).
+atomic_list_concat_safe(List,Sep,StringO):- ground(List:Sep),!,atomics_to_string(List,Sep,String),any_to_string_or_var(StringO,String).
+atomic_list_concat_safe(List,_,V):- (V=='';V==""),!,List=[].
+atomic_list_concat_safe([Atom,A2|Bonus],Sep,V):-atomic(Atom),atomic(A2),atomic_list_concat_safe([Atom,Sep,A2],A3),atomic_list_concat_safe([A3|Bonus],Sep,V),!.
 atomic_list_concat_safe([Atom|Bonus],Sep,V):-atomic(Atom),atomic(V),atomic_list_concat_safe([Atom,Sep,NV],V),!,atomic_list_concat_safe(Bonus,NV).
 atomic_list_concat_safe([D1,PostAtom|Bonus],Sep,V):-var(D1),atomic(Atom),atomic(Sep),string_concat(Sep,PostAtom,Atom),
   % We calc D1
   sub_string(V, NBefore, _Len, NumAfter, Atom),sub_string(V, 0, NBefore, _, D1O),
-  sub_string(V,_,NumAfter,0,NewV),atomic_list_concat_safe(Bonus,Sep,NewV),!,any_to_string_or_var(D1,D1O).
+  sub_string(V,_,NumAfter,0,NewV),atomic_list_concat_safe(Bonus,Sep,NewV),!,
+  any_to_string_or_var(D1,D1O).
 atomic_list_concat_safe([D1|Bonus],AtomSep,V):-var(D1),atomic(AtomSep),
   % We calc D1
   sub_string(V, NBefore, _Len, NumAfter, AtomSep),sub_string(V, 0, NBefore, _, D1O),!,
-  sub_string(V,_,NumAfter,0,NewV),atomic_list_concat_safe(Bonus,AtomSep,NewV),!,any_to_string_or_var(D1,D1O).
+  sub_string(V,_,NumAfter,0,NewV),atomic_list_concat_safe(Bonus,AtomSep,NewV),!,
+  any_to_string_or_var(D1,D1O).
 atomic_list_concat_safe([V],_Sep,V):-!.
 
 
@@ -155,7 +157,7 @@ convert_to_string(I,ISO):-
 		string_to_list(IS,LIST),!,
 		list_replace(LIST,92,[92,92],LISTM),
 		list_replace(LISTM,34,[92,34],LISTO),!,
-		string_to_atom_safe(ISO,LISTO),!.
+		text_to_string(LISTO,ISO). % string_to_atom_safe(ISO,LISTO),!.
 
 list_replace(List,Char,Replace,NewList):-
 	append(Left,[Char|Right],List),
@@ -168,6 +170,50 @@ term_to_string(IS,I):- catchv(term_string(IS,I),_,fail),!.
 term_to_string(I,IS):- catchv(string_to_atom(IS,I),_,fail),!.
 term_to_string(I,IS):- grtrace(term_to_atom(I,A)),string_to_atom(IS,A),!.
 
+:-multifile(user:package_path/2).
+
+:- use_module(library(url)).
+:- use_module(library(http/http_open)).
+:- use_module(library(http/http_ssl_plugin)).
+
+file_to_stream_ssl_verify(_SSL, _ProblemCert, _AllCerts, _FirstCert, _Error) :- !.
+:-export(text_to_stream/2).
+text_to_stream(Text,Stream):-text_to_string(Text,String),string_codes(String,Codes),open_codes_stream(Codes,Stream).
+:-export(file_to_stream/2).
+file_to_stream((StreamIn),Stream):-is_stream(StreamIn),!,copy_stream(StreamIn,Stream).
+file_to_stream(stream(StreamIn),Stream):-copy_stream(StreamIn,Stream).
+file_to_stream('$socket'(Sock),Stream):-tcp_open_socket('$socket'(Sock),StreamIn),copy_stream(StreamIn,Stream).
+file_to_stream(term(Text),Stream):-term_to_string(Text,String),string_codes(String,Codes),open_codes_stream(Codes,Stream).
+file_to_stream(text(Text),Stream):-text_to_stream(Text,Stream).
+file_to_stream(codes(Text),Stream):-text_to_stream(Text,Stream).
+file_to_stream(chars(Text),Stream):-text_to_stream(Text,Stream).
+file_to_stream(atom(Text),Stream):-text_to_stream(Text,Stream).
+file_to_stream(string(Text),Stream):-text_to_stream(Text,Stream).
+file_to_stream(file(Spec),Stream):-file_to_stream(Spec,Stream).
+file_to_stream(exfile(File),Stream):-!,read_file_to_codes(File,Codes,[expand(true)]),open_codes_stream(Codes,Stream).
+file_to_stream(match(Spec),Stream):-!,filematch(Spec,File),exists_file(File),!,file_to_stream(exfile(File),Stream).
+file_to_stream(package(Pkg,LocalPath),Stream) :-!,
+   user:package_path(Pkg,PkgPath),
+   % build global path
+   atomic_list_concat([PkgPath|LocalPath], '/',  GlobalPath),file_to_stream(GlobalPath,Stream).
+file_to_stream(Spec,Stream):-compound(Spec),!,file_to_stream(match(Spec),Stream).
+file_to_stream(URL,Stream):-atom_contains(URL,":/"),sub_string(URL,0,4,_,'http'), !, http_open(URL,HTTP_Stream,[ cert_verify_hook(file_to_stream_ssl_verify)]),copy_stream(HTTP_Stream,Stream),!.
+file_to_stream(URL,Stream):-atom_concat('file://', File, URL),!,file_to_stream(File,Stream).
+file_to_stream(URL,Stream):-atom_concat('file:', File, URL),!,file_to_stream(File,Stream).
+file_to_stream(URL,Stream):-atomic_list_concat_safe(['package://',Pkg,'/', Path], URL),file_to_stream(package(Pkg,Path),Stream).
+file_to_stream(URL,Stream):-atomic_list_concat_safe([Pkg,'://',Path],URL),file_to_stream(package(Pkg,Path),Stream).
+file_to_stream(Spec,Stream):-file_to_stream(match(Spec),Stream).
+
+user:package_path(Pkg,PkgPath):-expand_file_search_path(pack(Pkg),PkgPathN),exists_directory(PkgPathN),normalize_path(PkgPathN,PkgPath).
+user:package_path(Pkg,PkgPath):-atom(Pkg),T=..[Pkg,'.'],expand_file_search_path(T,PkgPathN),exists_directory(PkgPathN),normalize_path(PkgPathN,PkgPath).
+
+:-export(copy_stream/2).
+copy_stream(HTTP_Stream,Stream):-read_stream_to_codes(HTTP_Stream,Codes),catch(close(HTTP_Stream),_,true),open_codes_stream(Codes,Stream).
+
+:-export(atomic_concat/3).
+atomic_concat(A,B,C,Out):-atomic_list_concat_safe([A,B,C],Out).
+
+% :-atomic_list_concat_safe([A,'/',C],'','foo/bar/baz').
 % ===========================================================
 % CASE CHANGE
 % ===========================================================
@@ -213,7 +259,7 @@ toPropercase(Left,VAR):-nonvar(VAR),!,toPropercase(Left,New),!,VAR=New.
 toPropercase([],[]):-!.
 toPropercase([CX|Y],[D3|YY]):- must_det(toPropercase(CX,D3)),must_det(toPropercase(Y,YY)).
 toPropercase(MiXed,UPPER):-compound(MiXed),MiXed=..MList,toPropercase(MList,UList),!,UPPER=..UList.
-toPropercase(D3,D3):-not(atom(D3)),!.
+toPropercase(D3,D3):-not(atomic(D3)),!.
 toPropercase('',''):-!.
 toPropercase(A,U):-atom_length(A,1),toUppercase(A,U),!.
 toPropercase('_','_'):-!.

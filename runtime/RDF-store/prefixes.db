@@ -18,3 +18,5 @@ prefix(graphviz, 'http://www.graphviz.org/').
 prefix(cpack, 'http://cliopatria.swi-prolog.org/schema/cpack#').
 prefix(dctypes, 'http://purl.org/dc/dcmitype/').
 prefix(dcam, 'http://purl.org/dc/dcam/').
+prefix(mud, 'http://ias.cs.tum.edu/kb/knowrob.owl#').
+

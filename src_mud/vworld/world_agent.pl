@@ -116,7 +116,9 @@ foc_current_player(P):-
 get_dettached_npc(P):-random_instance_no_throw(agent,P,true),not(isa(P,human_player)),!.
 
 % generate_new_player(P):- req(agent(P)),!.
-generate_new_player(P):- prolog_must_l([gensym(player,N),not((isa_asserted(N,agent))),P=explorer(N),assert_isa(P,explorer),assert_isa(P,player),assert_isa(P,agent)]),!.
+generate_new_player(P):- prolog_must_l([gensym(player,N),not((isa_asserted(N,agent))),P=explorer(N),ensure_new_player(P)]),!.
+
+ensure_new_player(P):- prolog_must_l([assert_isa(P,explorer),assert_isa(P,player),assert_isa(P,agent)]),!.
 
 detatch_player(P):- thglobal:global_session_agent(_,P),!,trace_or_throw(detatch_player(P)).
 detatch_player(_).

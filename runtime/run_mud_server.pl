@@ -11,6 +11,7 @@
 
 % [Manditory] Load the Logicmioo utils
 :- '@'(ensure_loaded('../src_lib/logicmoo_util/logicmoo_util_all'),user).
+:- set_prolog_flag(gc,true),set_prolog_flag(debug,false),set_prolog_flag(last_call_optimisation,true),set_prolog_flag(optimise,true).
 
 % [Manditory] define how we interact with the module system
 swi_module(M,E):-dmsg(swi_module(M,E)).
@@ -25,7 +26,7 @@ swi_export(E):-dmsg(swi_export(E)).
 :- if_startup_script(ensure_loaded(run_clio)).
 
 % [Optionaly] register/run KnowRob robot services (we use it for the ontology mainly)
-:- with_no_term_expansions(if_file_exists(ensure_loaded('../externals/MUD_KnowRob/knowrob_addons/knowrob_mud/prolog/init'))).
+:- with_no_term_expansions(if_file_exists(ensure_loaded('../externals/MUD_KnowRob/knowrob_addons/knowrob_mud/prolog/init.pl'))).
 
 % [Manditory] run_tests (includes run_common)
 :- include(run_tests).
@@ -36,6 +37,8 @@ swi_export(E):-dmsg(swi_export(E)).
 :- forall(retract(prolog_debug:debugging(http(X), true, O)),show_call(asserta(prolog_debug:debugging(http(X), false, O)))).
 :- forall(retract(prolog_debug:debugging((X), true, O)),show_call(asserta(prolog_debug:debugging((X), false, O)))).
 
+:- with_no_term_expansions(if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop.pl'))).
+:- current_predicate(egg_go/0)->egg_go;true.
 
 % [Manditory] load_default_game
 % this is what happens when the world is not found
@@ -43,7 +46,8 @@ swi_export(E):-dmsg(swi_export(E)).
 
 :- onSpawn(pathBetween(living_room,office_room)).
 
-% :- declare_load_game('../games/src_game_nani/a_nani_household.plmoo').
+:- declare_load_game('../games/src_game_nani/a_nani_household.plmoo').
+:- declare_load_game('../games/src_game_nani/objs_misc_household.plmoo').
 
 % the following 4 worlds are in version control in examples
 % :- add_game_dir('../games/src_game_wumpus',prolog_repl).       

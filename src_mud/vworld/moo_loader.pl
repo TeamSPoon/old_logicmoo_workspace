@@ -299,7 +299,6 @@ fast_add(C):- correctArgsIsa(change(assert,add),C,CC),!, add(CC),!.
 show_load_call(C):- 
    logOnFailure(debugOnError(show_call(C))).
 
-
 :- include(logicmoo('vworld/moo_footer.pl')).
 
 

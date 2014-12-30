@@ -24,7 +24,7 @@ To run the system, do one of the following:
 % Setup search path for cliopatria. We add  both a relative and absolute
 % path. The absolute path allow us to  start in any directory, while the
 % relative one ensures that the system remains working when installed on
-% a device that may be mounted on a different location.
+% a physicalDevice that may be mounted on a different location.
 
 add_relative_search_path(Alias, Abs) :-
 	is_absolute_file_name(Abs), !,

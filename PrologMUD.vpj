@@ -40,6 +40,13 @@
 				Refilter="1"
 				Excludes="cache/;store/"/>
 		</Folder>
+		<Folder Name="src_lib">
+			<F
+				N="src_lib/*.*"
+				Recurse="1"
+				Refilter="0"
+				Excludes="cache/;store/"/>
+		</Folder>
 		<F
 			N="*.*"
 			Recurse="1"

@@ -3423,6 +3423,7 @@ slow_sanity(X):-must(X).
 %se/cond == se. state == ss. trans == sc. dif == ne.  operator == operator
 term_expansion_hyhtn(In,Out):-nonvar(In),term_expansion_alias(In,Out).
 
+:-export(term_expansion_alias/2).
 term_expansion_alias(In,Out):-term_expansion_alias([],In,Out).
 term_expansion_alias(Not,In,Out):-term_alias(I,O),not(member(I,Not)),subst_eq(In,I,O,M), In\=@=M,!, term_expansion_alias([I|Not],M,Out).
 term_expansion_alias(_Not,InOut,InOut).

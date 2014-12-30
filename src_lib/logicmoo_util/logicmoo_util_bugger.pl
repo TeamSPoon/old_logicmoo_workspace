@@ -655,7 +655,9 @@ tlocal_2(M,P,ON,TF):-
 
 :- meta_predicate_transparent(shrink_clause/3).
 shrink_clause(P,Body,Prop):- (Body==true-> Prop=P ; (Prop= (P:-Body))).
-   
+
+:-dynamic(moo:mpred_prop/2).
+:-multifile(moo:mpred_prop/2).
 :- meta_predicate_transparent(tlocal_show/6).
 tlocal_show(M,F,A,P,_ON,TF):-
    copy_term(P,PL),
