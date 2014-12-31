@@ -1,7 +1,8 @@
 
 :- module(dbase_i_pldoc,
 	  [ 		% +Source, +OutStream, +Options
-          source_to_text/3,
+          source_to_txt/3,
+          source_to_txt/1,
           s_to_html/3
 	  ]).
 
@@ -187,19 +188,24 @@ transform_term(Term,State,nohtml(State,Term)).
 :- use_module(library(prolog_xref)).
 
 :- meta_predicate
-	s_to_html(+, +, :).
+	s_to_html(+, +, ^).
 
 :- meta_predicate
-	source_to_txt(+, +, :).
+	source_to_txt(+, +, ^).
 
-source_to_text(S,Out,Opts):- 
+:- meta_predicate 
+       source_to_txt(+).
+
+source_to_txt(S):- source_to_txt(S,stream(current_output),[]).
+
+source_to_txt(S,Out,Opts):- 
   asserta(nohtml),
   debug(htmlsrc),
    setup_call_cleanup(
      true,
      s_to_html(S,Out,[header(false)|Opts]),
      retract(nohtml)).
-  
+
 
 :-thread_local nohtml/0.
 
@@ -370,7 +376,7 @@ html_fragment_new(H, In, Out, State0, State1, Options):-
    html_fragment(H, In, Out, State0, State1, Options)).
 
 class_from_frag(H,A):-arg(3,H,A),!.
-class_from_frag(H,noClass):-!.
+class_from_frag(_,noClass):-!.
 
 html_fragment(fragment(Start, End, structured_comment, []),
 	      In, Out, State0, [], Options) :-
