@@ -198,12 +198,12 @@ transform_term(Term,State,nohtml(State,Term)).
 
 source_to_txt(S):- source_to_txt(S,stream(current_output),[]).
 
-source_to_txt(S,Out,Opts):- 
+source_to_txt(S,Out,M:Opts):- 
   asserta(nohtml),
   debug(htmlsrc),
    setup_call_cleanup(
      true,
-     s_to_html(S,Out,[header(false)|Opts]),
+     s_to_html(S,Out,M:[header(false)|Opts]),
      retract(nohtml)).
 
 
