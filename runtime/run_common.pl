@@ -57,7 +57,7 @@ parser_chat80_module(moo).
 
 
 :-export(prolog_repl/0).
-prolog_repl:- nl,fmt("Press Ctrl-D to start the mud!"),nl,catch(tlocals,E,dmsg(tlocals==E)),prolog.
+prolog_repl:- with_all_dmsg((nl,fmt("Press Ctrl-D to start the mud!"),nl,catch(tlocals,E,dmsg(tlocals==E)),prolog)).
 
 :- set_prolog_flag(gui,false).
 :- set_prolog_flag(history,1000).
