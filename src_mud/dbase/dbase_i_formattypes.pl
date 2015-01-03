@@ -29,8 +29,17 @@
 :-decl_type(tFormattype).
 :-decl_type(tValuetype).
 
+capAtom(Type):-name(Type,[S|_]),char_type(S,upper).
 
-:-swi_export(split_name_type/3).
+:-export(typename_to_iname/3).
+typename_to_iname(I,OType,IType):-atom_concat(mud,Type,OType),capAtom(Type),typename_to_iname(I,Type,IType),!.
+typename_to_iname(I,OType,IType):-atom_concat(vt,Type,OType),capAtom(Type),typename_to_iname(I,Type,IType),!.
+typename_to_iname(I,OType,IType):-atom_concat(t,Type,OType),capAtom(Type),typename_to_iname(I,Type,IType),!.
+typename_to_iname(I,OType,IType):-atom_concat(v,Type,OType),capAtom(Type),typename_to_iname(I,Type,IType),!.
+typename_to_iname(I,Type,IType):-atom_concat(I,Type,IType).
+
+
+:-export(split_name_type/3).
 :- '$hide'(split_name_type/3).
 split_name_type(Suggest,InstName,Type):- must_det(split_name_type_0(Suggest,NewInstName,NewType)),!,must((NewInstName=InstName,NewType=Type)),!.
 split_name_type_0(S,P,C):- string(S),!,atom_string(A,S),split_name_type_0(A,P,C),!.
@@ -38,7 +47,7 @@ split_name_type_0(FT,FT,tFormattype):-tFormattype(FT),dmsg(trace_or_throw(tForma
 split_name_type_0(T,T,C):- compound(T),functor(T,C,_),!.
 split_name_type_0(T,T,C):- notrace((once(atomic_list_concat_safe([CO,'-'|_],T)),atom_string(C,CO))).
 split_name_type_0(T,T,C):- atom(T),atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),ccatch(number_codes(_,Digits),_,fail),atom_codes(C,Type),!.
-split_name_type_0(C,P,C):- var(P),atom(C),gensym(C,P),!.
+split_name_type_0(C,P,C):- var(P),atom(C),typename_to_iname(i,C,I),gensym(I,P),!.
 
 % formattype(S):-   is_asserted(ft_info(S,_)).
 % formattype(S):-   is_asserted(subft(S,_)).
@@ -114,9 +123,9 @@ argIsa_call_0(argIsa,1,tRelation).
 argIsa_call_0(argIsa,2,ftInt).
 argIsa_call_0(argIsa,3,tCol).
 argIsa_call_0(comment,2,string).
-argIsa_call_0(directions,2,ftList(ftDir)).
+argIsa_call_0(directions,2,ftList(vtDirection)).
 argIsa_call_0(mudFacing,1,tObj).
-argIsa_call_0(mudFacing,2,ftDir).
+argIsa_call_0(mudFacing,2,vtDirection).
 argIsa_call_0(mudColor,1,tObj).
 argIsa_call_0(mudColor,2,color_value).
 argIsa_call_0(mudFtInfo,1,tFormattype).
@@ -366,7 +375,7 @@ correctType(Op,A,'&'(Type1,Type2),AAA):-!,correctType(Op,A,Type1,AA),correctType
 
 correctType(Op,+A,Type,+AA):-nonvar(A),!,correctType(Op,A,Type,AA).
 correctType(Op,-A,Type,-AA):-nonvar(A),!,correctType(Op,A,Type,AA).
-correctType(_O,A,ftDir,AA):- any_to_dir(A,AA).
+correctType(_O,A,vtDirection,AA):- any_to_dir(A,AA).
 correctType(Op,A,integer,AA):-!,correctType(Op,A,ftInt,AA).
 correctType(Op,A,askable,AA):-!,correctArgsIsa(Op,A,AA).
 
@@ -397,7 +406,7 @@ correctType(_O,A,Type,AA):- compound(Type),contains_var(Type,self),predicate_pro
    subst(Call1,value,AA,Call2),!,
       show_call(Call2),ignore(AA=A).
 
-correctType(query(HLDS,Must),A,ftXyz(Region, ftInt, ftInt, ftInt),ftXyz(AA, _, _, _)):-atom(A),correctAnyType(query(HLDS,Must),A,Region,AA).
+correctType(query(HLDS,Must),A,xyzFn(Region, ftInt, ftInt, ftInt),xyzFn(AA, _, _, _)):-atom(A),correctAnyType(query(HLDS,Must),A,Region,AA).
 correctType(_Op,A,ftList(_),AA):- A == [],!,A=AA.
 correctType(Op,[A|AA],ftList(T),[L|LIST]):-!, correctType(Op,A,T,L), correctType(Op,AA,ftList(T),LIST).
 correctType(Op,A,ftList(T),[OT]):-!,correctAnyType(Op,A,T,OT).
@@ -476,21 +485,7 @@ atom_to_value(V,Term):- ccatch((read_term_from_atom(V,Term,[variable_names([])])
 atom_to_value(V,ftDice(T1,T2,+T3)):- atomic_list_concat_safe([D1,'d',D2,'+',D3],V), atom_to_value(D1,T1),atom_to_value(D2,T2),atom_to_value(D3,T3),!.
 atom_to_value(V,ftDice(T1,T2,-T3)):- atomic_list_concat_safe([D1,'d',D2,'-',D3],V), atom_to_value(D1,T1),atom_to_value(D2,T2),atom_to_value(D3,T3),!.
 
-:-swi_export(is_any_dir/1).
-is_any_dir(Dir):-var(Dir),!,fail.
-is_any_dir(Dir):-any_to_dir_ns(Dir,_).
-:-swi_export(any_to_dir/2).
 
-any_to_dir(D,D):-var(D),!.
-any_to_dir(A,S):-any_to_dir_ns(A,D),any_to_string(D,S),!.
-any_to_dir(S,S):-string(S),!.
-
-any_to_dir_ns(D,D):-var(D),!.
-any_to_dir_ns(D,D):-dir_offset(D,_,_,_,_),!.
-any_to_dir_ns(A,D):-p2c_dir2(D,A),!.
-any_to_dir_ns(S,D):-string(S),string_to_atom(S,A),any_to_dir_ns(A,D),!.
-any_to_dir_ns(D,O):-atom(D),sub_atom(D, 0, 1, _, S),toLowercase(S,L),p2c_dir2(L,O),!.
-any_to_dir_ns(D,D):-pathBetween(_,D,_),!.
 
 any_to_relation(A,F):-atomic(A),!,any_to_atom(A,F).
 any_to_relation(A,F):-functor_h(A,F).
@@ -498,13 +493,6 @@ any_to_relation(A,F):-functor_h(A,F).
 roll_dice(Rolls,_,Bonus,Result):- Rolls < 0, !, Result is Bonus.
 roll_dice(Rolls,Sided,Bonus,Result):- LessRolls is Rolls-1, roll_dice(LessRolls,Sided, Bonus + random(Sided) +1, Result).
 
-
-p2c_dir2('s','South-Directly').
-p2c_dir2('w','West-Directly').
-p2c_dir2('u','Up-Directly').
-p2c_dir2('d','Down-Directly').
-p2c_dir2('e','East-Directly').
-p2c_dir2('n','North-Directly').
 
 
 learnArgIsa(P,N,_):-argIsa_asserted(P,N,_),!.
@@ -523,7 +511,7 @@ call_argIsa_ForAssert(F,N,Type):-argIsa_call(F,N,Type),atom(Type),!,not(nonusefu
 
 nonusefull_deduction_type(ftTerm).
 nonusefull_deduction_type(ftVoprop).
-nonusefull_deduction_type(ftDir).
+nonusefull_deduction_type(vtDirection).
 nonusefull_deduction_type(Type):-createableType(Type),!,fail.
 nonusefull_deduction_type(tObj).
 nonusefull_deduction_type(Type):-is_asserted(tFormattype(Type)).

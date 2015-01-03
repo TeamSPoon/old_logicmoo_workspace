@@ -138,7 +138,6 @@ isa(item,itemcol).
 
 cached(G):-ccatch(G,_,fail).
 
-
 :-swi_export(create_meta/4).
 % if SuggestedName was 'food666' it'd like the SuggestedClass to be 'food' and the stystem name will remain 'food666'
 % if SuggestedName was 'food' it'd like the SuggestedClass to be 'food' and the stystem name will become a gensym like 'food1'
@@ -171,7 +170,7 @@ createableSubclassType(S,T):- createableType(T),is_asserted(mudSubclass(S,T)).
 createableSubclassType(T,'TemporallyExistingThing'):- createableType(T).
 
 mudIsa(ftInt,tFormattype).
-mudIsa(ftDir,tValuetype).
+mudIsa(vtDirection,tValuetype).
 mudIsa(number,tFormattype).
 mudIsa(string,tFormattype).
 

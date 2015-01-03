@@ -252,8 +252,8 @@ rdf_assert_ignored(G):-  not(ground(G)).
 
 cyc_to_rdf(mpred_prop(P,PST),svo(F,StubType,S)):- PST=..[StubType,S],rdf_object(S),rdf_to_pred(P,F).
 cyc_to_rdf(argIsa(P,1,D),domain(P,D)).
-cyc_to_rdf(mudIsa(ftApath(A,Dir),T),mudIsa([ftApath,A,Dir],T)).
-cyc_to_rdf(pathName(A,Dir,String),mudNamed([ftApath,A,Dir],String)).
+cyc_to_rdf(mudIsa(apathFn(A,Dir),T),mudIsa([apathFn,A,Dir],T)).
+cyc_to_rdf(pathName(A,Dir,String),mudNamed([apathFn,A,Dir],String)).
 cyc_to_rdf(default_sv(PAB, 2, V),type_default(A,[P,self,V])):-PAB=[P,A,_].
 cyc_to_rdf(argIsa(P,2,D),range(P,D)):-mpred_arity(P,2).
 

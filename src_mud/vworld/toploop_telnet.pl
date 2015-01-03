@@ -305,7 +305,7 @@ door_label(R,Dir,'  '):- pathBetween_call(R,Dir,SP),atomic(SP).
 
 asserted_atloc(O,L):-is_asserted(mudAtLoc(O,L)).
 
-show_room_grid_single(Room, ftXyz(Room,X,Y,Z),OutsideTest):- call(OutsideTest), doorLocation(Room,X,Y,Z,Dir),door_label(Room,Dir,Label),write(Label),!.
+show_room_grid_single(Room, xyzFn(Room,X,Y,Z),OutsideTest):- call(OutsideTest), doorLocation(Room,X,Y,Z,Dir),door_label(Room,Dir,Label),write(Label),!.
 show_room_grid_single(_Room,_LOC,OutsideTest):- call(OutsideTest),!,write('[]'),!.
 show_room_grid_single(_Room,LOC,_OutsideTest):- asserted_atloc(Obj,LOC),inst_label(Obj,Label), write(Label), !.
 show_room_grid_single(_Room,LOC,_OutsideTest):- asserted_atloc(_Obj,LOC),write('..'), !.

@@ -18,7 +18,7 @@
 :- register_module_type(tCommand).
 
 % attack joe ->translates-> attack nw
-tActionType(actAttack(ftDir)).
+tActionType(actAttack(vtDirection)).
 
 % Attack
 % Successful Attack

@@ -34,7 +34,7 @@ grid_dist(L1,L2,Dist):- to_3d(L1,L13D),to_3d(L2,L23D),dist(L13D,L23D,Dist),!.
 
 dist(_,_,5).
 
-:-decl_mpred_prolog(pathBetween_call(tRegion,ftDir,tRegion)).
+:-decl_mpred_prolog(pathBetween_call(tRegion,vtDirection,tRegion)).
 
 % pathBetween_call(From,DirS,To):-string(DirS),!,atom_string(Dir,DirS),!,any_to_dir(Dir,Dir2),pathBetween(From,Dir2,To),same(Dir,Dir2).
 pathBetween_call_0(From,Dir,To):-any_to_dir(Dir,Dir2),asserted_mpred_clause(pathBetween(From,Dir2,To)),same(Dir,Dir2).
@@ -42,8 +42,8 @@ pathBetween_call(From,Dir,To):-pathBetween_call_0(From,DirS,To),same(Dir,DirS).
    
 % 5x5 rooms are average
 %% to_3d(L1,L13D):-compound(L1)->L13D=L1; room_center(L1,X,Y,Z),L13D = xyz(L1,X,Y,Z).
-to_3d(ftXyz(L1,X,Y,Z),ftXyz(L1,X,Y,Z)):- nonvar(L1),!.
-to_3d(L1,ftXyz(L1,X,Y,Z)):-room_center(L1,X,Y,Z),!.
+to_3d(xyzFn(L1,X,Y,Z),xyzFn(L1,X,Y,Z)):- nonvar(L1),!.
+to_3d(L1,xyzFn(L1,X,Y,Z)):-room_center(L1,X,Y,Z),!.
 
 
 center_xyz(MaxX,MidX):- MidX is MaxX div 2 + MaxX mod 2.
@@ -55,8 +55,8 @@ room_center(Region,X,Y,Z):-
       center_xyz(MaxZ,Z),!,
       dmsg(todo("get room size and calc center ",Region)).
 
-loc_to_xy(LOC,X,Y,ftXyz(Region,X,Y,1)):- locationToRegion(LOC,Region),!.
-loc_to_xy(Region,X,Y,ftXyz(Region,X,Y,1)).
+loc_to_xy(LOC,X,Y,xyzFn(Region,X,Y,1)):- locationToRegion(LOC,Region),!.
+loc_to_xy(Region,X,Y,xyzFn(Region,X,Y,1)).
 
 is_3d(LOC):- compound(LOC).
 
@@ -76,18 +76,18 @@ maxZ(2).
 in_grid(LocName,Var):-var(Var),!,in_grid_rnd(LocName,Var).
 in_grid(LocName,Var):-in_grid_no_rnd(LocName,Var).
 
-in_grid_no_rnd(LocName,ftXyz(LocName,X,Y,Z)) :- !,
+in_grid_no_rnd(LocName,xyzFn(LocName,X,Y,Z)) :- !,
    grid_size(LocName,MaxX,MaxY,MaxZ),!,between(1,MaxX,X),between(1,MaxY,Y),between(1,MaxZ,Z).
 in_grid_no_rnd(LocName,LocName).
 
-in_grid_rnd(LocName,ftXyz(LocName,X,Y,1)) :-
+in_grid_rnd(LocName,xyzFn(LocName,X,Y,1)) :-
    grid_size(LocName,MaxX,MaxY,_MaxZ),!,
    repeat,
 	X is (1 + random(MaxX-2)),
 	Y is (1 + random(MaxY-2)).	
 
 % for now not useing grids
-in_grid_rnd(LocName,ftXyz(LocName,1,1,1)).
+in_grid_rnd(LocName,xyzFn(LocName,1,1,1)).
 
 
 init_location_grid(LocName):-
@@ -102,19 +102,19 @@ init_location_grid(LocName,LocType):-
 init2(LocName,LocType,Y,1) :-
 	mudGrid(LocName,1,Y,L),
 	!,
-	init3(LocName,LocType,ftXyz(LocName,1,Y,_),L).
+	init3(LocName,LocType,xyzFn(LocName,1,Y,_),L).
 init2(_LocName,_LocType,_,_).
 
-init3(LocName,LocType,ftXyz(LocName,_,Y,1),[]) :-
+init3(LocName,LocType,xyzFn(LocName,_,Y,1),[]) :-
 	!,
 	X is Y + 1,
 	init2(LocName,LocType,X,1).
 
-init3(LocName,LocType,ftXyz(LocName,X,Y,1),[O|T]) :-
+init3(LocName,LocType,xyzFn(LocName,X,Y,1),[O|T]) :-
 	label_type(O,Type),
-           rez_loc_object(ftXyz(LocName,X,Y,1),Type),
+           rez_loc_object(xyzFn(LocName,X,Y,1),Type),
 	K is X + 1,
-	init3(LocName,LocType,ftXyz(LocName,K,Y,1),T).
+	init3(LocName,LocType,xyzFn(LocName,K,Y,1),T).
 
 
 % rez_loc_object(_,0):-!.
@@ -130,14 +130,14 @@ nearby(X,Y):-mudAtLoc(X,L1),mudAtLoc(Y,L2),locs_near(L1,L2).
 locationToRegion(Obj,RegionIn):-var(Obj),!,dmsg(warn(var_locationToRegion(Obj,RegionIn))),mudIsa(RegionIn,tRegion).
 locationToRegion(Obj,RegionIn):-locationToRegion_0(Obj,Region),must((nonvar(Region),mudIsa(Region,tRegion))),!,RegionIn=Region.
 locationToRegion_0(Obj,Obj):-var(Obj),dmsg(warn(var_locationToRegion(Obj,Obj))),!.
-locationToRegion_0(ftXyz(Region,_,_,_),Region2):-nonvar(Region),!,locationToRegion_0(Region,Region2).
+locationToRegion_0(xyzFn(Region,_,_,_),Region2):-nonvar(Region),!,locationToRegion_0(Region,Region2).
 locationToRegion_0(Obj,Obj):-nonvar(Obj),!,mudIsa(Obj,tRegion),!.
 locationToRegion_0(Obj,Region):-nonvar(Obj),must(localityOfObject(Obj,Location)),!,locationToRegion_0(Location,Region).
 locationToRegion_0(Obj,Obj):-dmsg(warn(locationToRegion(Obj,Obj))),!.
 
 :-swi_export(locs_near/2).
 locs_near(L1,L2):- var(L1),nonvar(L2),!,locs_near(L2,L1).
-locs_near(L1,L2):- nonvar(L1),nonvar(L2),L2=ftXyz(_,_,_,_),locationToRegion(L1,R),!,call_tabled(locs_near_i(R,L2)).
+locs_near(L1,L2):- nonvar(L1),nonvar(L2),L2=xyzFn(_,_,_,_),locationToRegion(L1,R),!,call_tabled(locs_near_i(R,L2)).
 locs_near(L1,L2):- nonvar(L1),nonvar(L2),locationToRegion(L1,R1),locationToRegion(L2,R2),!,region_near(R1,R2).
 locs_near(L1,L2):- must((hotrace(region_near(R1,R2)),in_grid_no_rnd(R1,L1),in_grid_no_rnd(R2,L2))).
 
@@ -238,19 +238,19 @@ fact_is_false(localityOfObject(Obj,_LOC),mudInsideOf(Obj,What)) :- nonvar(Obj),(
 
 % facts that must be true 
 %  suggest a deducable fact that is always defiantely true but not maybe asserted
-fact_always_true(localityOfObject(ftApath(Region,Dir),Region)):-is_asserted(pathBetween(Region,Dir,_)).
+fact_always_true(localityOfObject(apathFn(Region,Dir),Region)):-is_asserted(pathBetween(Region,Dir,_)).
 fact_always_true(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,LOC)),locationToRegion(LOC,Region),!.
 
 %  suggest a deducable fact that is probably true but not already asserted
 fact_maybe_deduced(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,LOC)),locationToRegion(LOC,Region),!.
-fact_maybe_deduced(localityOfObject(ftApath(Region,Dir),Region)):-is_asserted(pathBetween(Region,Dir,_)).
+fact_maybe_deduced(localityOfObject(apathFn(Region,Dir),Region)):-is_asserted(pathBetween(Region,Dir,_)).
 
 %  suggest a random fact that is probably is not already true
 create_random_fact(mudAtLoc(Obj,LOC)) :- nonvar(Obj),asserted_or_deduced(localityOfObject(Obj,Region)),!,((in_grid(Region,LOC),unoccupied(Obj,LOC),is_fact_consistent(mudAtLoc(Obj,LOC)))).
 create_random_fact(localityOfObject(Obj,Region)) :- nonvar(Obj),not(is_asserted(localityOfObject(Obj,_))),asserted_or_deduced(localityOfObject(Obj,Region)).
 
 %  suggest random values
-hooked_random_instance(ftDir,Dir,Test) :- my_random_member(Dir,[n,s,e,w,ne,nw,se,sw]),Test,!.
+hooked_random_instance(vtDirection,Dir,Test) :- my_random_member(Dir,[vNorth,vSouth,vEast,vWest,vNE,vNW,vSE,vSW]),Test,!.
 hooked_random_instance(ftInt,3,Test):-call(Test),dmsg(random_instance(ftInt,3,Test)),dtrace,!,fail.
 
 %  give required forward deductions
@@ -261,11 +261,11 @@ deduce_facts(localityOfObject(Obj,_Region),mudAtLoc(Obj,LOC)):- nonvar(Obj),put_
 % random_region(LOC):- findall(O,isa(O,region),LOCS),my_random_member(LOC,LOCS).
 
 
-random_ftXyz(LOC):-
+random_xyzFn(LOC):-
    must_det(random_instance(tRegion,Region,true)),
    in_grid_rnd(Region,LOC),!.
 
-random_ftXyz(ftXyz('Area1000',1,1,1)):-  trace_or_throw(game_not_loaded).
+random_xyzFn(xyzFn('Area1000',1,1,1)):-  trace_or_throw(game_not_loaded).
 
 unoccupied(_,Loc):- not(is_asserted(mudAtLoc(_,Loc))),!.
 unoccupied(_,_):-!.
@@ -281,7 +281,7 @@ is_occupied(Loc,What):- locationToRegion(Loc,Region),localityOfObject(What,Regio
 % Transforms location based on cardinal direction given
 
 calc_xyz(Region1,Dir,force(X1,Y1,Z1),X2,Y2,Z2):-
-   to_3d(Region1,ftXyz(_,X,Y,Z)),
+   to_3d(Region1,xyzFn(_,X,Y,Z)),
    get_dir_offset(Dir,1,OX,OY,OZ),
    X2 is X+ (OX*X1),Y2 is Y+OY*Y1,Z2 is Z+OZ*Z1.
 
@@ -294,7 +294,7 @@ move_dir_target(RegionXYZ,DirS,Force,XXYY):-
    once(((calc_xyz(RegionXYZ,Dir,force(Force,Force,Force),X,Y,Z)),
    (locationToRegion(RegionXYZ,Region1)),
    (round_loc_target(Region1,X,Y,Z,Region2,X2,Y2,Z2)),
-   XXYY = ftXyz(Region2,X2,Y2,Z2),
+   XXYY = xyzFn(Region2,X2,Y2,Z2),
    must_det(ground(XXYY)))),
    check_ahead_for_ground(XXYY),!.
 
@@ -303,7 +303,7 @@ move_dir_target(RegionXYZ,Dir,_Force,XXYY):-
    locationToRegion(RegionXYZ,Region1),
    pathBetween_call(Region1,DirS,Region2),
    in_grid_rnd(Region2,XXYY),
-   XXYY = ftXyz(Region2,_X2,_Y2,_Z2),
+   XXYY = xyzFn(Region2,_X2,_Y2,_Z2),
    must_det(ground(XXYY)),
    check_ahead_for_ground(XXYY),!.
 
@@ -323,15 +323,15 @@ round_loc_dir(Region1,X,Y,Z,Dir,Region2,X2,Y2,Z2):-
    any_to_dir(Dir,DirLong),
    pathBetween_call(Region1,DirLong,Region2),!,
    grid_size(Region1,X1,Y1,Z1),
-   calc_xyz(ftXyz(Region2,X,Y,Z),Dir,force(-X1,-Y1,-Z1),X2,Y2,Z2),!.
+   calc_xyz(xyzFn(Region2,X,Y,Z),Dir,force(-X1,-Y1,-Z1),X2,Y2,Z2),!.
 
 round_loc_dir(Region1,X,Y,Z,_Dir,Region2,X2,Y2,Z2):-Region2=Region1,X2=X,Y2=Y,Z2=Z.
 
 compute_dir(Region1,X,Y,Z,Dir):-
   grid_size(Region1,MaxX,MaxY,MaxZ),
-   ((X<1 -> EW=w ; X > MaxX -> EW=e ; EW= ''),
-   (Y<1 -> NS=n ; Y > MaxY -> NS=s ; NS= ''),
-   (Z<1 -> UD=d ; Z > MaxZ -> UD=u ; UD= '')),
+   ((X<1 -> EW=vWest ; X > MaxX -> EW=vEast ; EW= ''),
+   (Y<1 -> NS=vNorth ; Y > MaxY -> NS=vSouth ; NS= ''),
+   (Z<1 -> UD=vDown ; Z > MaxZ -> UD=vUp ; UD= '')),
    atomic_list_concat_catch([NS,EW,UD],'',Dir),!.
 
 
@@ -342,39 +342,60 @@ get_dir_offset(Dir,F,OX,OY,OZ):- any_to_atom(Dir,DirA),
 get_dir_offset(Dir,F,OX,OY,OZ):- any_to_string(Dir,DirS),
   dir_offset(DirS,F,OX,OY,OZ),!.
 
+
+
+p2c_dir2('s','vSouth').
+p2c_dir2('w','vWest').
+p2c_dir2('u','vUp').
+p2c_dir2('d','vDown').
+p2c_dir2('e','vEast').
+p2c_dir2('n','vNorth').
+
+:-swi_export(is_any_dir/1).
+is_any_dir(Dir):-var(Dir),!,fail.
+is_any_dir(Dir):-any_to_dir(Dir,_).
+:-swi_export(any_to_dir/2).
+
+any_to_dir(D,D):-var(D),!.
+any_to_dir(S,D):-string(S),string_to_atom(S,A),any_to_dir(A,D),!.
+any_to_dir(D,D):-dir_offset(D,_,_,_,_),!.
+any_to_dir(A,D):-p2c_dir2(D,A),!.
+any_to_dir(D,O):-atom(D),sub_atom(D, 0, 1, _, S),toLowercase(S,L),p2c_dir2(L,O),!.
+any_to_dir(D,D):-pathBetween(_,D,_),!.
+
 :-swi_export(dir_offset/5).
 
 % :-decl_mpred_hybrid(dir_offset(term,int,int,int,int)).
 
 
-dir_offset(u,F,0,0,F).
-dir_offset(d,F,0,0,-F).
-dir_offset(n,F,0,-F,0).
-dir_offset(s,F,0,F,0).
-dir_offset(e,F,F,0,0).
-dir_offset(w,F,-F,0,0).
-dir_offset(ne,F,F,-F,0).
-dir_offset(sw,F,-F,-F,0).
-dir_offset(se,F,F,F,0).
-dir_offset(nw,F,-F,-F,0).
-dir_offset(here,_,0,0,0).
+dir_offset(vUp,F,0,0,F).
+dir_offset(vDown,F,0,0,-F).
+dir_offset(vNorth,F,0,-F,0).
+dir_offset(vSouth,F,0,F,0).
+dir_offset(vEast,F,F,0,0).
+dir_offset(vWest,F,-F,0,0).
+dir_offset(vNE,F,F,-F,0).
+dir_offset(vSW,F,-F,-F,0).
+dir_offset(vSE,F,F,F,0).
+dir_offset(vNW,F,-F,-F,0).
+dir_offset(vHere,_,0,0,0).
 
 % MergedNess -1,0,1 = contacting_at,inside,outside_near_on
-with_offset(detatched,F,X,Y,Z):-dir_offset(here,F,X,Y,Z).
-with_offset(absolute_with,F,X,Y,Z):-dir_offset(u,F,X,Y,Z).
-with_offset(relative_from,F,X,Y,Z):-dir_offset(d,F,X,Y,Z).
-with_offset(surrounding,F,X,Y,Z):-dir_offset(n,F,X,Y,Z).
-with_offset(mudInsideOf,F,X,Y,Z):-dir_offset(s,F,X,Y,Z).
-with_offset(on,F,X,Y,Z):-dir_offset(e,F,X,Y,Z).
-with_offset(tPartof,F,X,Y,Z):-dir_offset(w,F,X,Y,Z).
+with_offset(detatched,F,X,Y,Z):-dir_offset(vHere,F,X,Y,Z).
+with_offset(absolute_with,F,X,Y,Z):-dir_offset(vUp,F,X,Y,Z).
+with_offset(relative_from,F,X,Y,Z):-dir_offset(vDown,F,X,Y,Z).
+with_offset(surrounding,F,X,Y,Z):-dir_offset(vNorth,F,X,Y,Z).
+with_offset(mudInsideOf,F,X,Y,Z):-dir_offset(vSouth,F,X,Y,Z).
+with_offset(on,F,X,Y,Z):-dir_offset(vEast,F,X,Y,Z).
+with_offset(tPartof,F,X,Y,Z):-dir_offset(vWest,F,X,Y,Z).
 
-facing_offset(at,F,X,Y,Z):-dir_offset(here,F,X,Y,Z).
-facing_offset(above,F,X,Y,Z):-dir_offset(u,F,X,Y,Z).
-facing_offset(below,F,X,Y,Z):-dir_offset(d,F,X,Y,Z).
-facing_offset(left,F,X,Y,Z):-dir_offset(w,F,X,Y,Z).
-facing_offset(right,F,X,Y,Z):-dir_offset(e,F,X,Y,Z).
-facing_offset(behind,F,X,Y,Z):-dir_offset(s,F,X,Y,Z).
-facing_offset(front,F,X,Y,Z):-dir_offset(n,F,X,Y,Z).
+facing_offset(at,F,X,Y,Z):-dir_offset(vHere,F,X,Y,Z).
+facing_offset(above,F,X,Y,Z):-dir_offset(vUp,F,X,Y,Z).
+facing_offset(below,F,X,Y,Z):-dir_offset(vDown,F,X,Y,Z).
+facing_offset(left,F,X,Y,Z):-dir_offset(vWest,F,X,Y,Z).
+facing_offset(right,F,X,Y,Z):-dir_offset(vEast,F,X,Y,Z).
+facing_offset(behind,F,X,Y,Z):-dir_offset(vSouth,F,X,Y,Z).
+facing_offset(front,F,X,Y,Z):-dir_offset(vNorth,F,X,Y,Z).
 
 
 
@@ -384,7 +405,7 @@ decl_database_hook(retract(_),mudAtLoc(Agent,_)):-padd(Agent,mudNeedsLook(true))
 
 
 % Used in move.pl,push.pl and climb.pl
-% Move agent (usually). Used to relocate agent's location.
+% Move agent (usually). Used to relocate agent'vSouth location.
 in_world_move(LOC,Agent,DirS) :-
         string_to_atom(DirS,Dir),
         ignore(is_asserted(mudAtLoc(Agent,LOC))),
@@ -395,7 +416,7 @@ in_world_move(LOC,Agent,DirS) :-
 can_world_move(LOC,_Agent,Dir) :- check_behind_for_ground(LOC),move_dir_target(LOC,Dir,_).
 
 in_world_move0(LOC,Agent,Dir) :-
-      any_to_string(Dir,DirS),
+      any_to_dir(Dir,DirS),
         padd(Agent,mudFacing(DirS)),  
         check_behind_for_ground(LOC),
 	move_dir_target(LOC,Dir,XXYY),!,
@@ -413,7 +434,7 @@ in_world_move0(LOC,Agent,Dir) :-
 
 check_behind_for_ground(LOC):-nonvar(LOC).
 check_ahead_for_ground(XXYY):-nonvar(XXYY),
-   to_3d(XXYY,ftXyz(L1,X,Y,Z)),
+   to_3d(XXYY,xyzFn(L1,X,Y,Z)),
    grid_size(L1,MX,MY,MZ),
    inside_grid(L1,X,Y,Z,MX,MY,MZ).
 
@@ -441,57 +462,57 @@ reverse_dir(W,R):-string(W),atom_string(A,W),!,reverse_dir0(A,RA),atom_string(RA
 reverse_dir(A,R):-reverse_dir0(A,R),!.
 reverse_dir(Was,reverseOf(Was)):-nonvar(Was).
 
-reverse_dir0(d,u).
-reverse_dir0(u,d).
-reverse_dir0(n,s).
-reverse_dir0(s,n).
-reverse_dir0(e,w).
-reverse_dir0(w,e).
-reverse_dir0(nw,se).
-reverse_dir0(ne,sw).
-reverse_dir0(sw,ne).
-reverse_dir0(se,nw).
+reverse_dir0(vDown,vUp).
+reverse_dir0(vUp,vDown).
+reverse_dir0(vNorth,vSouth).
+reverse_dir0(vSouth,vNorth).
+reverse_dir0(vEast,vWest).
+reverse_dir0(vWest,vEast).
+reverse_dir0(vNW,vSE).
+reverse_dir0(vNE,vSW).
+reverse_dir0(vSW,vNE).
+reverse_dir0(vSE,vNW).
 
 
 % Yet another hash table to covert numbers into directions (or the reverse).
-num_near(1,nw,here).
-num_near(2,n,here).
-num_near(3,ne,here).
-num_near(4,w,here).
-num_near(6,e,here).
-num_near(7,sw,here).
-num_near(8,s,here).
-num_near(9,se,here).
+num_near(1,vNW,vHere).
+num_near(2,vNorth,vHere).
+num_near(3,vNE,vHere).
+num_near(4,vWest,vHere).
+num_near(6,vEast,vHere).
+num_near(7,vSW,vHere).
+num_near(8,vSouth,vHere).
+num_near(9,vSE,vHere).
 
-num_near(0,d,here).
-num_near(5,u,here).
+num_near(0,vDown,vHere).
+num_near(5,vUp,vHere).
 
 % Translates numbers returned from scan_lists_aux/3 (the number of the location)
 % into thier relative directions.
-number_to_dir(1,nw,nw).
-number_to_dir(2,n,nw).
-number_to_dir(3,n,n).
-number_to_dir(4,n,ne).
-number_to_dir(5,ne,ne).
-number_to_dir(6,w,nw).
-number_to_dir(7,nw,here).
-number_to_dir(8,n,here).
-number_to_dir(9,ne,here).
-number_to_dir(10,e,ne).
-number_to_dir(11,w,w).
-number_to_dir(12,w,here).
-number_to_dir(14,e,here).
-number_to_dir(15,e,e).
-number_to_dir(16,w,sw).
-number_to_dir(17,sw,here).
-number_to_dir(18,s,here).
-number_to_dir(19,se,here).
-number_to_dir(20,e,se).
-number_to_dir(21,sw,sw).
-number_to_dir(22,s,sw).
-number_to_dir(23,s,s).
-number_to_dir(24,s,se).
-number_to_dir(25,se,se).
+number_to_dir(1,vNW,vNW).
+number_to_dir(2,vNorth,vNW).
+number_to_dir(3,vNorth,vNorth).
+number_to_dir(4,vNorth,vNE).
+number_to_dir(5,vNE,vNE).
+number_to_dir(6,vWest,vNW).
+number_to_dir(7,vNW,vHere).
+number_to_dir(8,vNorth,vHere).
+number_to_dir(9,vNE,vHere).
+number_to_dir(10,vEast,vNE).
+number_to_dir(11,vWest,vWest).
+number_to_dir(12,vWest,vHere).
+number_to_dir(14,vEast,vHere).
+number_to_dir(15,vEast,vEast).
+number_to_dir(16,vWest,vSW).
+number_to_dir(17,vSW,vHere).
+number_to_dir(18,vSouth,vHere).
+number_to_dir(19,vSE,vHere).
+number_to_dir(20,vEast,vSE).
+number_to_dir(21,vSW,vSW).
+number_to_dir(22,vSouth,vSW).
+number_to_dir(23,vSouth,vSouth).
+number_to_dir(24,vSouth,vSE).
+number_to_dir(25,vSE,vSE).
 
 
 % Scans through list of perceptions (as returned by look_percepts(Agent,L) or look_all(NearAgt,_,_,_,L,_))
@@ -517,20 +538,20 @@ scan_lists_aux([_|Rest],Type,M,N) :-
 	scan_lists_aux(Rest,Type,Mtemp,N).
 
 
-doorLocation(_Room,3,0,_Z,n).
-doorLocation(_Room,2,0,_Z,n).
-doorLocation(_Room,4,0,_Z,n).
-doorLocation(_Room,3,6,_Z,s).
-doorLocation(_Room,2,6,_Z,s).
-doorLocation(_Room,4,6,_Z,s).
-doorLocation(_Room,0,2,_Z,w).
-doorLocation(_Room,0,3,_Z,w).
-doorLocation(_Room,0,4,_Z,w).
-doorLocation(_Room,6,2,_Z,e).
-doorLocation(_Room,6,3,_Z,e).
-doorLocation(_Room,6,4,_Z,e).
-doorLocation(_Room,6,0,_Z,ne).
-doorLocation(_Room,6,6,_Z,se).
-doorLocation(_Room,0,0,_Z,nw).
-doorLocation(_Room,6,0,_Z,sw).
+doorLocation(_Room,3,0,_Z,vNorth).
+doorLocation(_Room,2,0,_Z,vNorth).
+doorLocation(_Room,4,0,_Z,vNorth).
+doorLocation(_Room,3,6,_Z,vSouth).
+doorLocation(_Room,2,6,_Z,vSouth).
+doorLocation(_Room,4,6,_Z,vSouth).
+doorLocation(_Room,0,2,_Z,vWest).
+doorLocation(_Room,0,3,_Z,vWest).
+doorLocation(_Room,0,4,_Z,vWest).
+doorLocation(_Room,6,2,_Z,vEast).
+doorLocation(_Room,6,3,_Z,vEast).
+doorLocation(_Room,6,4,_Z,vEast).
+doorLocation(_Room,6,0,_Z,vNE).
+doorLocation(_Room,6,6,_Z,vSE).
+doorLocation(_Room,0,0,_Z,vNW).
+doorLocation(_Room,6,0,_Z,vSW).
 doorLocation(_Room,_X,_Y,_Z,_Dir):-!,fail.

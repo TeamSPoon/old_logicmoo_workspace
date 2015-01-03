@@ -17,7 +17,7 @@
                    objects_match/3,
                    match_object/2,
                    object_string/2,
-                   get_term_specifier_text/2,
+                   specifiedItem/3,
                    parseForTypes//2)).
 
 :- include(logicmoo('vworld/moo_header.pl')).
@@ -278,7 +278,7 @@ verb_alias('where is',actWhere).
 % pos_word_formula('infinitive',Verb,Formula):- 'infinitive'(TheWord, Verb, _, _G183), 'verbSemTrans'(TheWord, 0, 'TransitiveNPCompFrame', Formula, _, _).
 
 verb_alias_to_verb(IVERB,SVERB):- verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.
-verb_alias_to_verb(IVERB,SVERB):- specifiedItemType(IVERB,tVerb,SVERB), IVERB \= SVERB.
+verb_alias_to_verb(IVERB,SVERB):- specifiedItem(IVERB,tVerb,SVERB), IVERB \= SVERB.
 
 subst_parser_vars(Agent,TYPEARGS,TYPEARGS_R):- subst(TYPEARGS,self,Agent,S1),where_atloc(Agent,Here),subst(S1,here,Here,TYPEARGS_R).
 
@@ -337,10 +337,17 @@ bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
 
 :-style_check(+singleton).
 
-term_specifier_text(Dir,ftDir):-member(Dir,[n,s,e,w,ne,nw,se,sw,u,d]).
+:-export(name_text/2).
+name_text(Name,Text):-string(Name),Name=Text.
+name_text(Name,Text):-typename_to_iname('',Name,TextN),!,atom_string(TextN,TextU),toLowercase(TextU,Text).
+name_text(Name,Text):-atom_string(Name,Text).
 
-term_specifier_text(Text,Subclass):- 
-   not(memberchk(Subclass,[ftDir,'TemporallyExistingThing'])),
+term_specifier_text(TextS,vtDirection,Dir):-
+  member(Dir-Text,[vNorth-"n",vSouth-"s",vEast-"e",vWest-"w",vNE-"ne",vNW-"nw",vSE-"se",vSW-"sw",vUp-"u",vDown-"d"]),
+  (name_text(Dir,TextS);TextS=Text).
+
+term_specifier_text(Text,Subclass,X):- 
+   not(memberchk(Subclass,[vtDirection,'TemporallyExistingThing'])),
    once((isa_asserted(X,Subclass),
    arg_to_var(ftText,Text,TextVar),
    req(mudKeyword(X,TextVar)),   
@@ -356,11 +363,11 @@ string_append(A,[B],C,ABC):-append(A,[B|C],ABC).
 
 is_counted_for_parse(I):-i_countable(I),not(excluded_in_parse(I)),!.
 
-excluded_in_parse(ftApath(_, _)).
+excluded_in_parse(apathFn(_, _)).
 excluded_in_parse(I):-tCol(I).
 excluded_in_parse(I):-tFormattype(I).
 excluded_in_parse(I):-mpred_prop(_,argsIsaInList(I)).
-excluded_in_parse(ftApath(_ = _)).
+excluded_in_parse(apathFn(_ = _)).
 
 instance_for_parse(I):-is_counted_for_parse(I).
 insttype_for_parse(I):-findall(C,(instance_for_parse(I),mudIsa(I,C)),List),list_to_set(List,Set),member(I,Set).
@@ -410,7 +417,7 @@ actTest(test_bad_verb, [ true(
 
 
 actTest(food_is_a_droppable, [ true(
-       parse_agent_text_command(tExplorer(player1),actDrop,[tFood],_D2,_E2))]).
+       parse_agent_text_command(iPlayer1,actDrop,[food],_D2,_E2))]).
 
 
 %:- end_tests(test_bad_verb).
@@ -484,15 +491,15 @@ parseIsa(countBetween(_Type,Low,_),[]) --> {!, Low < 1}, [].
 parseIsa(and([L]),Term1) --> {!},parseIsa(L,Term1).
 parseIsa(and([L|List]),Term) --> {!},dcgAnd(parseIsa(L,Term),parseIsa(and(List),Term)).
 
-parseIsa(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{specifiedItemType(String,Type,Term)}.
+parseIsa(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{specifiedItem(String,Type,Term)}.
 
-specifiedItemType(String,Type,Inst):- (var(String);var(Type)),trace_or_throw(var_specifiedItemType(String,Type,Inst)).
-specifiedItemType([String],Type,Inst):-!,specifiedItemType(String,Type,Inst).
-specifiedItemType(String,not(Type),Inst):-!,not(specifiedItemType(String,Type,Inst)).
-specifiedItemType(String,Type,Inst2):- get_term_specifier_text(Inst,Type),equals_icase(Inst,String),!,must(Inst=Inst2).
-specifiedItemType(String,Type,Inst):- tFormattype(Type),checkAnyType(assert(actParse),String,Type,AAA),Inst=AAA.
-specifiedItemType(String,Type,Longest) :- findall(Inst, (get_term_specifier_text(Inst,Type),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
-specifiedItemType(String,Type,Inst):- not(tFormattype(Type)),must(tCol(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
+specifiedItem(String,Type,Inst):- var(Type),trace_or_throw(var_specifiedItemType(String,Type,Inst)).
+specifiedItem(String,not(Type),Inst):-!,not(specifiedItem(String,Type,Inst)).
+specifiedItem([String],Type,Inst):- nonvar(String),!,specifiedItem(String,Type,Inst).
+specifiedItem(String,Type,Inst):- tFormattype(Type),checkAnyType(assert(actParse),String,Type,AAA),Inst=AAA.
+specifiedItem(Text,Type,Inst):- call_tabled_can(no_repeats(call_no_cuts(term_specifier_text(Text,Type,Inst)))).
+%specifiedItem(String,Type,Longest) :- findall(Inst, (specifiedItem(Inst,Type,Inst),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
+specifiedItem(String,Type,Inst):- not(tFormattype(Type)),must(tCol(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
 
 instances_of_type(Inst,Type):- no_repeats(mudIsa(Inst,Type)).
 
@@ -503,6 +510,5 @@ longest_string(Order,TStr1,TStr2):-
    text_to_string(TStr2,Str2),string_length(Str2,L2),
    compare(Order,L2-Str2,L1-Str1).
 
-get_term_specifier_text(Text,Type):- must((var(Text),nonvar(Type))), call_tabled_can(no_repeats(call_no_cuts(term_specifier_text(Text,Type)))).
 
 :- include(logicmoo('vworld/moo_footer.pl')).

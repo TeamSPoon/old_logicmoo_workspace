@@ -17,7 +17,7 @@
 
 :- register_module_type(tCommand).
 
-tActionType(actPush(ftDir)).
+tActionType(actPush(vtDirection)).
 
 % Push a box
 % Nothing to push... agent moves and takes a little damage.

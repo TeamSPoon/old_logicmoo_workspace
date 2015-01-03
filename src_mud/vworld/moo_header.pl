@@ -55,7 +55,7 @@
 :- dynamic_multifile_exported mud_test_local/1.
 :- dynamic_multifile_exported mud_test_local/0.
 :- dynamic_multifile_exported now_unused/1.
-:- dynamic_multifile_exported term_specifier_text/2.
+:- dynamic_multifile_exported term_specifier_text/3.
 :- dynamic_multifile_exported type_action_info/3.
 :- dynamic_multifile_exported update_charge/2.
 :- dynamic_multifile_exported update_stats/2.
@@ -67,7 +67,7 @@
 :- dynamic_multifile_exported longitude/2.
 :- dynamic_multifile_exported latitude/2.
 :- dynamic_multifile_exported tRegion/1.
-:- dynamic_multifile_exported((tActionType/1,action_info/2,action_rules/4,type_action_info/3,term_specifier_text/2,action_verb_useable/4)).
+:- dynamic_multifile_exported((tActionType/1,action_info/2,action_rules/4,type_action_info/3,term_specifier_text/3,action_verb_useable/4)).
 :- dynamic_multifile_exported((decl_coerce)/3).
 :- dynamic_multifile_exported((mudTermAnglify/2,term_anglify_last/2, term_anglify_np/3,term_anglify_np_last/3)).
 :- dynamic_multifile_exported((update_charge/2,update_stats/2)).

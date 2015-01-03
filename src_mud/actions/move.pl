@@ -20,12 +20,12 @@
 % :- begin_transform_moo_preds.
 
 
-agent_text_command(Agent,[DirSS],Agent,actMove(DirS)):- nonvar(DirSS),catch(((get_term_specifier_text(Dir,ftDir), any_to_atom(DirSS,DirS),catch((atom_concat(Dir,N,DirS),(atom_number(N,_))),_,fail))),_,fail).
-agent_text_command(Agent,[DirSS],Agent,actMove(Dir)):- get_term_specifier_text(Dir,ftDir),catch((any_to_string(DirSS,DirA),any_to_string(Dir,DirA)),_,fail),!.
+agent_text_command(Agent,[DirSS],Agent,actMove(Inst,N)):- nonvar(DirSS),catch(((specifiedItem(Dir,vtDirection,Inst), any_to_atom(DirSS,DirS),catch((atom_concat(Dir,N,DirS),(atom_number(N,_))),_,fail))),_,fail).
+agent_text_command(Agent,[DirS],Agent,actMove(Dir,1)):- specifiedItem(DirS,vtDirection,Dir).
 
 agent_call_command(Agnt,Cmd):- compound(Cmd),functor(Cmd,actMove,_),!,must(move_command(Agnt,Cmd)).
 
-action_info(actMove(ftDir),"Move in a direction").
+action_info(actMove(vtDirection),"Move in a direction").
 
 % dir###
 move_command(Agent,actMove(DirSS)) :- catch((string_to_atom(DirSS,DirS),
@@ -35,7 +35,11 @@ move_command(Agent,actMove(DirSS)) :- catch((string_to_atom(DirSS,DirS),
 move_command(Agent,actMove(Dir)) :-
 	    get_move_dist(Agent,Dist),
             move_command(Agent,Dir,Dist).
- 
+
+% dir
+move_command(Agent,actMove(Dir,Dist)) :-
+            move_command(Agent,Dir,Dist).
+
 get_move_dist(Agent,Dist):-req(movedist(Agent,Dist)),!.
 get_move_dist(_Gent,1).
 
@@ -101,7 +105,7 @@ update_stats(Agent,fall) :- padd(Agent,mudHealth,-10).
 
 % cheating but to test
 
-tActionType(go(ftDir)).
+tActionType(go(vtDirection)).
 agent_call_command(Agent,go(Dir)) :-
 	mudAtLoc(Agent,LOC),
         in_world_move(LOC,Agent,Dir),

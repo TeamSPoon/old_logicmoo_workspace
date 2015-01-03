@@ -116,7 +116,7 @@ foc_current_player(P):-
 get_dettached_npc(P):-random_instance_no_throw(tAgentGeneric,P,true),not(mudIsa(P,tHumanPlayer)),!.
 
 % generate_new_player(P):- req(agent(P)),!.
-generate_new_player(P):- prolog_must_l([gensym(tPlayer,N),not((isa_asserted(N,tAgentGeneric))),P=tExplorer(N),ensure_new_player(P)]),!.
+generate_new_player(P):- prolog_must_l([gensym(iPlayer,N),not((isa_asserted(N,tAgentGeneric))),P=N,ensure_new_player(P)]),!.
 
 ensure_new_player(P):- prolog_must_l([assert_isa(P,tExplorer),assert_isa(P,tPlayer),assert_isa(P,tAgentGeneric)]),!.
 

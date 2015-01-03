@@ -80,7 +80,7 @@ deduce_facts(argIsa(F,_A,Type),[mudIsa(Type,tCol),mudIsa(F,tRelation)]):-atom(Ty
 deduce_facts(Term,NewTerm):- hotrace(good_for_chaining(Op,Term)), db_rewrite(Op,Term,NewTerm),not(contains_singletons(NewTerm)).
 
 
-fix_argIsa(F,N,ftDir(Val),ftDir):-add(mpred_prop(F,default_sv(N,Val))),!.
+fix_argIsa(F,N,vtDirection(Val),vtDirection):-add(mpred_prop(F,default_sv(N,Val))),!.
 fix_argIsa(F,N,ftInt(Val),ftInt):-add(mpred_prop(F,default_sv(N,Val))),!.
 fix_argIsa(_,_,ftList(Type),ftList(Type)):-!.
 fix_argIsa(_,_,tFormatted(Type),tFormatted(Type)):-!.

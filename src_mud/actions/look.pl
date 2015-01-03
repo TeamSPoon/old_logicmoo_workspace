@@ -39,9 +39,9 @@ visibleTo(Agent,Agent).
 visibleTo(Agent,Obj):-mudPossess(Agent,Obj).
 visibleTo(Agent,Obj):-same_regions(Agent,Obj).
 
-term_specifier_text(Prep,prepstr_spatial):-member(Prep,[in,on,north_of,inside,actOnto,ontop]).
-term_specifier_text(Prep,prepstr_spatial):-term_specifier_text(Prep,prepstr_dir_of).
-term_specifier_text([Dir,of],prepstr_dir_of):-term_specifier_text(Dir,ftDir).
+term_specifier_text(Prep,prepstr_spatial,Str):-member(Prep,[in,on,north_of,inside,onto,ontop]),name_text(Prep,Str).
+term_specifier_text(Prep,prepstr_spatial,Inst):-term_specifier_text(Prep,prepstr_dir_of,Inst).
+term_specifier_text([SDir,of],prepstr_dir_of,ofFn(Dir)):-term_specifier_text(SDir,vtDirection,Dir).
 
 action_info(actLook, "generalized look in region").
 action_info(actLook(optionalStr("in"),optionalStr("here")), "generalized look in region").
@@ -53,7 +53,7 @@ action_info(actLook(optional(prepstr_spatial,"at"),tObj),"look [in|at|on|under|a
 agent_call_command(Agent,actLook):- look_as(Agent),!.
 agent_call_command(Agent,actLook("here")):- look_as(Agent),!.
 agent_call_command(Agent,actLook(_,"here")):- look_as(Agent),!.
-agent_call_command(Agent,actLook(Dir,"self")):- get_term_specifier_text(Dir,ftDir),!,
+agent_call_command(Agent,actLook(Dir,"self")):- specifiedItem(Dir,vtDirection),!,
    view_dirs(Agent,[[Dir,here],[Dir,Dir],[Dir,Dir,adjacent]],Percepts),
    forall_member(P,Percepts,call_agent_action(Agent,actExamine(P))).
 agent_call_command(Agent,actLook(_Dir,SObj)):-
@@ -87,7 +87,7 @@ call_look_proc(Agent,LOC):-
          nameStrings(tRegion,value),
          forEach(mudDescription(tRegion,Value),fmt(mudDescription(Value))),
          events=deliverable_location_events(Agent,LOC,value),
-         path(D) = pathBetween_call(tRegion,D,value),
+         path(D) = pathBetween(tRegion,D,value),
          pathName(D) = pathName(tRegion,D,value),
          value = is_asserted(localityOfObject(value,tRegion)),       
          mudFacing(Agent,value),

@@ -211,7 +211,7 @@ unverifiableType(ftDice).
 unverifiableType(tMpred).
 unverifiableType(ftText).
 unverifiableType(tFpred).
-unverifiableType(ftDir).
+unverifiableType(vtDirection).
 unverifiableType(string).
 unverifiableType(tFormattype).
 unverifiableType(tCol).
@@ -276,7 +276,7 @@ defaultArgValue(Fact,F,A,_P,_Args,Value):-argIsa_call(F,A,Type),is_fact_consiste
 
 defaultTypeValue(Fact,_,_):- thlocal:noRandomValues(Fact),!,fail.
 defaultTypeValue(_,Type,_):- thlocal:noRandomValues(Type),!,fail.
-defaultTypeValue(_Info,ftDir,"n").
+defaultTypeValue(_Info,vtDirection,"n").
 defaultTypeValue(_Info,ftInt,0).
 defaultTypeValue(Fact,Type,Out):- random_instance(Type,ROut,nonvar(ROut)),dmsg(defaultArgValue(random_instance(Fact,Type,ROut=Out))),!,Out=ROut.
 
@@ -305,7 +305,7 @@ each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(default_inst_props(I
 each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(default_type_props(Type,TProps)),subst(TProps,self,Inst,Prop),flatten([Prop],Props).
 each_default_inst_type_props(_,Type,[kwLabel(Lbl)|Props]):-call_no_cuts(mudLabelTypeProps(Lbl,Type,Props)).
 
-default_inst_props(ftApath(Region,_Dir),areaPath,[localityOfObject(Region)]).
+default_inst_props(apathFn(Region,_Dir),areaPath,[localityOfObject(Region)]).
 
 
 :-swi_export((add_missing_instance_defaults/1)).

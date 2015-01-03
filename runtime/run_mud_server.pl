@@ -67,7 +67,7 @@ swi_export(E):-dmsg(swi_export(E)).
 
 % [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
 :- register_timer_thread(npc_ticker,30,npc_tick).
-:- prolog_repl.
+
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
 :- if_startup_script(at_start(run)).
 

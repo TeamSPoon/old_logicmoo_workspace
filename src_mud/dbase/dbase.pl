@@ -947,7 +947,7 @@ insert_into([Carry|ARGS],After,Insert,[Carry|NEWARGS]):-
    After1 is After - 1,
    insert_into(ARGS,After1,Insert,NEWARGS).
 
-term_specifier_text(Text,tPred):- mpred_prop(Text,arity(_)).
+term_specifier_text(Text,tPred,Pred):- mpred_prop(Pred,arity(_)),name_text(Pred,Text).
 
 :- multifile(mudToHitArmorClass0 / 2).
 
@@ -1154,7 +1154,7 @@ createByNameMangle0(InstA,InstA,Type):-compound(InstA),InstA=..[Type|Props],asse
 createByNameMangle0(InstA,Inst,Type):- compound(InstA),!,functor_catch(InstA,Type,A),must(A==1),assert_isa(InstA,Type),InstA=Inst.
 createByNameMangle0(InstA,_,_Type):- not(atom(InstA)),!,trace_or_throw(todo(not_atom_createByNameMangle(InstA))).
 createByNameMangle0(Suggest,InstA,Type):- once(split_name_type(Suggest,InstA,Type)),Suggest==InstA,assert_isa(InstA,Type).
-createByNameMangle0(Type,InstA,Type):- atom_concat(Type,'777',InstA),must_det(assert_isa(InstA,Type)), call_after_game_load(create_instance(InstA)).
+createByNameMangle0(OType,InstA,Type):- typename_to_iname(i,OType,Type),atom_concat(Type,'7',InstA),must_det(assert_isa(InstA,Type)), call_after_game_load(create_instance(InstA)).
 createByNameMangle0(InstA,IDA,InstA):- gensym(InstA,IDA), englishServerInterface([actCreate,InstA,IDA]).
 
 wfAssert(X):-add(X). %  add_later(X).

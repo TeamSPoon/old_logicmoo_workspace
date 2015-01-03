@@ -20,7 +20,7 @@ can_move_into(_LOC,XXYY):-var(XXYY),!,fail.
 can_move_into(_LOC,XXYY):-not(mudAtLoc(_,XXYY)),!.
 can_move_into(_LOC,XXYY):-ground(XXYY).
 
-tActionType(actClimb(ftDir)).
+tActionType(actClimb(vtDirection)).
 
 % Climb
 % If there is nothing there to climb, move to location

@@ -171,7 +171,7 @@ multiValued(action_rules(tAgentGeneric,tVerb,ftTerm(tObj),ftTerm(ftList(ftTerm(p
 
 tCol(tActionType).
 
-singleValued(mudAtLoc(tObj,ftXyz(tRegion,ftInt,ftInt,ftInt))).
+singleValued(mudAtLoc(tObj,xyzFn(tRegion,ftInt,ftInt,ftInt))).
 
 % =================================================================================================
 % BEGIN world database
@@ -190,9 +190,9 @@ argsIsaInList(resultIsa(tFpred,tCol)).
 
 argsIsaInList(formatted_resultIsa(tFormattype,tCol)).
 
-formatted_resultIsa(ftApath(tRegion,ftDir),areaPath).
+formatted_resultIsa(apathFn(tRegion,vtDirection),areaPath).
 formatted_resultIsa(ftDice(ftInt,ftInt,ftInt),ftInt).
-resultIsa(ftApath,areaPath).
+resultIsa(apathFn,areaPath).
 
 
 mudSubclass(areaPath,tDoor).
@@ -237,7 +237,7 @@ prologBuiltin(nearby(tObj,tObj)).
 % multiValued
 %multiValued(G,AT,[ordered|LIST]):-multiValued(G,LIST),functor_catch(G,_,AT).
 
-multiValued(pathBetween(tRegion,ftDir,tRegion)).
+multiValued(pathBetween(tRegion,vtDirection,tRegion)).
 multiValued(mudNamed(ftTerm,ftTerm),[]).
 
 :-must_det(argIsa_call(genlPreds,2,_Type)).
@@ -260,15 +260,15 @@ argsIsaInList(success(tAgentGeneric,ftTerm)).
 % :-decl_mpred_prolog(member/2).
 
 
-nameStrings(ftApath(Region,Dir),Text):- pathName(Region,Dir,Text).
-mudDescription(ftApath(Region,Dir),Text):- pathName(Region,Dir,Text).
+nameStrings(apathFn(Region,Dir),Text):- pathName(Region,Dir,Text).
+mudDescription(apathFn(Region,Dir),Text):- pathName(Region,Dir,Text).
 
 mudSubclass(tAgentGeneric,tObj).
 mudSubclass(tItem,tObj).
 mudSubclass(tItem,tObj).
 
 % single valued
-argsIsaInList(pathName(tRegion,ftDir,string)).
+argsIsaInList(pathName(tRegion,vtDirection,string)).
 argsIsaInList(verbOverride(ftTerm,ftAction,ftAction),[prologHybrid]).
 
 :-dynamic(spawn_rate/2).
@@ -365,8 +365,8 @@ tCol(tItem).
 tCol(tVerb).
 
 
-equivRule(nameStrings(ftApath(Region,Dir),Text),pathName(Region,Dir,Text)).
-equivRule(mudDescription(ftApath(Region,Dir),Text),pathName(Region,Dir,Text)).
+equivRule(nameStrings(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
+equivRule(mudDescription(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
 
 % dbase_t(action_info,What,text("command is: ",What)):- holds_t(action_type,What).
 
@@ -375,14 +375,12 @@ equivRule(mudDescription(ftApath(Region,Dir),Text),pathName(Region,Dir,Text)).
 
 % formattype(FormatType):-subclass(FormatType,formattype).
 
-term_specifier_text(Text,tPred):- mpred_prop(Text,arity(_)).
-
 % single valued
 mudSubclass(tAgentGeneric,tObj).
 mudSubclass(tItem,tObj).
 
 
-multiValued(pathName(tRegion,ftDir,string)).
+multiValued(pathName(tRegion,vtDirection,string)).
 multiValued(verbOverride(ftTerm,ftAction,ftAction)).
 
 singleValued(mudAgentTurnnum(tAgentGeneric,ftInt(0))).
@@ -395,13 +393,13 @@ singleValued(chargeCapacity(tChargable,ftInt)).
 singleValued(chargeRemaining(tChargable,ftInt)).
 singleValued(mudHealth(tObj,ftInt)).
 singleValued(defence(tObj,ftInt)).
-singleValued(mudFacing(tObj,ftDir(vNorth))).
-singleValued(mudFacing(tObj,ftDir)).
+singleValued(mudFacing(tObj,vtDirection(vNorth))).
+singleValued(mudFacing(tObj,vtDirection)).
 singleValued(mudHeight(tObj,ftInt)).
 singleValued(objid(tObj,id)).
 argsIsaInList(localityOfObject(tObj,tSpatialthing)).
 singleValued(mudLastCommand(tAgentGeneric,tCommand)).
-singleValued(location_center(tRegion,ftXyz(tRegion,ftInt,ftInt,ftInt))).
+singleValued(location_center(tRegion,xyzFn(tRegion,ftInt,ftInt,ftInt))).
 singleValued(movedist(tAgentGeneric,ftInt(1))).
 singleValued(movedist(tAgentGeneric,number)).
 singleValued(mudBareHandDamage(tAgentGeneric,ftDice)).
@@ -424,7 +422,7 @@ singleValued(mudWeight(tObj,ftInt)).
 singleValued(mudHeight(tSpatialthing,ftInt)).
 
 multiValued(comment(ftTerm,string)).
-multiValued(pathBetween(tRegion,ftDir,tRegion)).
+multiValued(pathBetween(tRegion,vtDirection,tRegion)).
 
 prologOnly(default_type_props(tCol,ftVoprop)).
 prologOnly(default_inst_props(id,tCol,ftVoprop)).
@@ -466,7 +464,7 @@ tFormattype(string).
 :-decl_mpred_hybrid(mudShape/2).
 
 mudFtInfo(ftAction(prolog),tFormatted).
-mudFtInfo(ftApath(tRegion,ftDir),tFormatted).
+mudFtInfo(apathFn(tRegion,vtDirection),tFormatted).
 mudFtInfo(atom,atom(self)).
 mudFtInfo(ftBoolean,member(self,[true,false])).
 mudFtInfo(ftDice(ftInt,ftInt,ftInt),tFormatted).
@@ -481,7 +479,7 @@ mudFtInfo(string,string(self)).
 mudFtInfo(ftTerm,nonvar(self)).
 % ft_info(col,col(self)).
 mudFtInfo(var,var(self)).
-mudFtInfo(ftXyz(tRegion,ftInt,ftInt,ftInt),tFormatted).
+mudFtInfo(xyzFn(tRegion,ftInt,ftInt,ftInt),tFormatted).
 
 mudSubclass(tAgentGeneric,tSpatialthing).
 mudSubclass(areaPath,tDoor).
@@ -497,9 +495,9 @@ mudSubclass(tUseable,tItem).
 mudSubclass(tWearable,tItem).
 
 disjointWith(tObj,tRegion).
-mudIsa(ftDir,tValuetype).
+mudIsa(vtDirection,tValuetype).
 
-mudSubclass(ftDir,tTypevalue).
+mudSubclass(vtDirection,tTypevalue).
 
 
 tFormattype(ftVoprop).
@@ -510,7 +508,6 @@ mudSubft(number,ftPercent).
 mudSubft(atom,ftTerm).
 mudSubft(ftDice,ftInt).
 mudSubft(ftInt,ftDice).  
-mudSubft(ftDir,string).
 
 mudSubft(id,ftTerm).
 mudSubft(ftVoprop,ftTerm).

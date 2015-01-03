@@ -60,7 +60,7 @@ agent_call_command(_Agent,actHelp(Str)) :-commands_list(ListS),forall(member(E,L
 write_string_if_contains("",E):-!,fmt(E).
 write_string_if_contains(Must,E):-ignore((with_output_to(string(Str),fmt(E)),str_contains_all([Must],Str),fmt(Str))).
 
-term_specifier_text(Text,tVerb):- get_type_action_templates(A),nonvar(A),functor_safe(A,Text,_).
+term_specifier_text(Text,tVerb,Inst):- get_type_action_templates(A),nonvar(A),functor_safe(A,Inst,_),name_text(Inst,Text).
 
 %agent_text_command(Agent,[Who],Agent,Cmd):- nonvar(Who), get_type_action_templates(Syntax),Syntax=..[Who,optional(_,Default)],Cmd=..[Who,Default].
 %agent_text_command(Agent,[Who,Type],Agent,Cmd):- get_type_action_templates(Syntax),nonvar(Who),Syntax=..[Who,optional(Type,_)],Cmd=..[Who,Type].

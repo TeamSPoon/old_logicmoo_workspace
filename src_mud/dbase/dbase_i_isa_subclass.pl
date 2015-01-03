@@ -89,7 +89,7 @@ assert_isa(I,T):- loop_check(assert_isa_lc(I,T),true).
 
 :-swi_export(assert_isa_lc/2).
 % skip formatter cols
-assert_isa_lc(_I,T):- member(T,[string,ftAction,ftDir,ftApath]),!.
+assert_isa_lc(_I,T):- member(T,[string,ftAction,vtDirection,apathFn]),!.
 assert_isa_lc(I,T):- hotrace(tFormattype(T)),(compound(I)->true;dmsg(once(dont_assert_is_ft(I,T)))).
 assert_isa_lc(I,T):- cannot_table_call(isa_asserted(I,T)),!.
 assert_isa_lc(_,T):- once(decl_type(T)),fail.
@@ -136,7 +136,7 @@ assert_isa_hooked_after(I,T):- is_creatable_type(T),!,assert_isa_hooked_creation
 assert_isa_hooked_after(I,T):- not(completeExtentAsserted(T)),impliedSubClass(T,ST),completeExtentAsserted(ST),assert_isa(I,ST).
 %assert_isa_hooked_after(I,T):- assert_isa_hooked_creation(I,T).
 
-completeExtentAsserted(Ext):- arg(_,vv(tCol,ftDir,tFormattype,string),Ext).
+completeExtentAsserted(Ext):- arg(_,vv(tCol,vtDirection,tFormattype,string),Ext).
 completeExtentAsserted(F):- is_creatable_type(F).
 completeExtentAsserted(F):- argsIsaProps(F).
 completeExtentAsserted(F):- (isa_asserted(F,completeExtentAsserted)).
@@ -205,9 +205,9 @@ isa_asserted(I,T):-isa_asserted_ft(I,T).
 
 type_isa(Type,createableType):-arg(_,vv(tAgentGeneric,tItem,tObj,tRegion),Type),!.
 type_isa(ArgIsa,mpredcol):-argsIsaProps(ArgIsa),!.
-type_isa(Type,tValuetype):-arg(_,vv(ftDir),Type),!.
+type_isa(Type,tValuetype):-arg(_,vv(vtDirection),Type),!.
 type_isa(string,tFormattype):-!.
-type_isa(Type,objecttype):-arg(_,vv(concept,tChannel,place,ftDir,tRegion),Type),!.
+type_isa(Type,objecttype):-arg(_,vv(concept,tChannel,place,vtDirection,tRegion),Type),!.
 type_isa(Type,tFormattype):-tFormattype(Type),!. % text
 
 
@@ -275,9 +275,9 @@ cached_isa(I,T):-hotrace(isa_backchaing(I,T)).
 :- dynamic_multifile_exported never_type/1.
 :- dynamic_multifile_exported decl_type/1.
 
-never_type(tExplorer(player2)).
+never_type(iPlayer2).
 
-tCol(ftDir).
+tCol(vtDirection).
 tCol(tCol).
 tCol(tMpred).
 tCol(tFpred).
@@ -345,8 +345,8 @@ is_known_true(F):-is_known_false0(F),!,fail.
 is_known_true(mudIsa(X,tSpatialthing)):- (isa_asserted(X,_)),is_known_false0(mudIsa(X,tCol)),is_known_false0(mudIsa(X,tFormattype)),is_known_false0(mudIsa(X,tMpred)).
 is_known_true(mudSubclass(X,X)).
 is_known_true(mudIsa(_,id)).
-is_known_true(mudIsa(ftApath(_,_),areaPath)).
-is_known_true(mudIsa(ftApath(_,_),ftApath)).
+is_known_true(mudIsa(apathFn(_,_),areaPath)).
+is_known_true(mudIsa(apathFn(_,_),apathFn)).
 is_known_true(mudIsa(_,ftTerm)).
 
 
