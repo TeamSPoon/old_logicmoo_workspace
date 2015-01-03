@@ -1,4 +1,6 @@
 
+end_of_file.
+
 :- ensure_loaded('../src_lib/logicmoo_util/logicmoo_util_all').
 
 :- multifile

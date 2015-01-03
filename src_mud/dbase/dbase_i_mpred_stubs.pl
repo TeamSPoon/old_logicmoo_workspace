@@ -1,7 +1,3 @@
-
-
-
-
 % =====================================
 % = body_req
 % =====================================
@@ -27,11 +23,11 @@ body_req_isa(I,C):-isa_backchaing(I,C).
 
 body_call_cyckb(HEAD_T):-el_holds_DISABLED_KB, HEAD_T =.. [dbase_t|PLIST], thglobal:use_cyc_database,!, no_repeats(kbp_t(PLIST)).
 
-body_req(F,A,HEAD,HEAD_T):- hotrace(hook_body_req(F,A,HEAD,HEAD_T)).
+body_req(F,A,HEAD,HEAD_T):- (hook_body_req(F,A,HEAD,HEAD_T)).
 
 :-swi_export(body_req_normal/4).
 hook_body_req(F,A,HEAD,HEAD_T):- mpred_prop(F,prologOnly),!,dmsg(warn(hook_body_req(F,A,HEAD,HEAD_T))),fail.
-hook_body_req(_,_,isa(I,C),_):- !, body_req_isa(I,C).
+hook_body_req(_,_,mudIsa(I,C),_):- !, body_req_isa(I,C).
 hook_body_req(_,_,_,dbase_t(C,I)):- !, body_req_isa(I,C).
 hook_body_req(_,_,_,hasInstance(C,I)):- !, body_req_isa(I,C).
 hook_body_req(_,_,_ ,HEAD_T):- thlocal:useOnlyExternalDBs,!, body_call_cyckb(HEAD_T).
@@ -96,5 +92,3 @@ foo_b(b3):-!.
 
 
 %:-rescan_mpred_props.
-
-

@@ -6,24 +6,24 @@
 %
 % It will destroy something, even if it is not food... talk about a garbage disposal. 
 % :-swi_module(user). 
-:-swi_module(drink, []).
+:-swi_module(actDrink, []).
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- register_module_type(tCommand).
 
-action_info(drink(drinkable),"Drink a Drinkable Item").
+action_info(actDrink(tDrinkable),"Drink a Drinkable Item").
 
 % Eat something held
 % Check to make sure it's in the agents possession... 
 % if it is, process it's worth, then destroy it
-agent_call_command(Agent,drink(SObj)) :-
-	possess(Agent,Obj),
+agent_call_command(Agent,actDrink(SObj)) :-
+	mudPossess(Agent,Obj),
         match_object(SObj,Obj),
-	do_act_affect(Agent,drink,Obj),
-	del(possess(Agent,Obj)),
-	call_update_charge(Agent,eat).
+	do_act_affect(Agent,actDrink,Obj),
+	del(mudPossess(Agent,Obj)),
+	call_update_charge(Agent,actEat).
 
-update_charge(Agent,drink) :- add(charge(Agent,-1)).
+update_charge(Agent,actDrink) :- add(mudCharge(Agent,-1)).
 
 :- include(logicmoo(vworld/moo_footer)).

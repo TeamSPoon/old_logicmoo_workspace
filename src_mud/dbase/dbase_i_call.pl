@@ -236,7 +236,7 @@ dbase_plist_t(P,[]):-!,dbase_t(P).
 dbase_plist_t(P,LIST):-var(P),!,CALL=..[dbase_t,P|LIST],debugOnError((CALL)).
 dbase_plist_t(dbase_t,LIST):-!, CALL=..[dbase_t|LIST],call(CALL),debugOnError((CALL)).
 dbase_plist_t(mpred_prop,[C,I]):-!,ground(I:C),mpred_prop(C,I).
-dbase_plist_t(isa,[I,C]):-!,hasInstance(C,I).
+dbase_plist_t(mudIsa,[I,C]):-!,hasInstance(C,I).
 dbase_plist_t(P,_):-never_dbase_mpred(P),!,fail.
 dbase_plist_t(P,[L|IST]):-is_holds_true(P),!,dbase_plist_t(L,IST).
 dbase_plist_t(P,LIST):-is_holds_false(P),!,dbase_f(LIST).
@@ -443,7 +443,3 @@ assertion_f([P|LIST]):- 'TINYKB-ASSERTION'(':FALSE-MON',_,_UniversalVocabularyMt
 % ================================================================================
 % end holds_f 
 % ================================================================================
-
-
-
-

@@ -16,9 +16,11 @@ reset -w
 echo -ne '\033]50;ClearScrollback\a'
 echo -en "\ec\e[3J"
 echo `pwd`
+sudo su -c "killall -9 swipl" prologmud
 echo "Hit CTRL+C ${BASH_SOURCE[0]} $RUNFILE ";
 sleep 1;
 cd $NEWPWD
 sudo su -c "swipl -L32G -G32G -T32G -f ${RUNFILE}" prologmud
+sudo su -c "killall -9 swipl" prologmud
 cd $OLDPWD
 echo exit $?

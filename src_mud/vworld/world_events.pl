@@ -22,7 +22,7 @@ atlocNear(Whom,Where):-nonvar(Where),!,findall(Whom,atlocNear0(Whom,Where),List)
 atlocNear(Whom,Where):-nonvar(Whom),!,findall(Where,atlocNear0(Whom,Where),List),list_to_set(List,Set),!,member(Where,Set).
 atlocNear(Whom,Where):-findall(Whom+Where,atlocNear0(Whom,Where),List),list_to_set(List,Set),!,member(Whom+Where,Set).
 
-atlocNear0(Whom,Where):-locs_near(Where,LOC),is_asserted(atloc(Whom,LOC)).
+atlocNear0(Whom,Where):-locs_near(Where,LOC),is_asserted(mudAtLoc(Whom,LOC)).
 
 raise_location_event(Where,Event):- forall(atlocNear(Whom,Where),ignore(show_event_to(Whom,Event))).
 :-swi_export(raise_location_event/2).
@@ -43,6 +43,6 @@ get_agent_stream(Whom,Input,Output):- thglobal:agent_message_stream(Whom,_,Input
 get_agent_stream(Whom,_Input,_Output):-ignore(retract(thglobal:agent_message_stream(Whom,_,_,_))),!,fail.
 
 :-swi_export(deliverable_location_events/3).
-:-decl_mpred_prolog(deliverable_location_events(agent,region,term)).
+:-decl_mpred_prolog(deliverable_location_events(tAgentGeneric,tRegion,ftTerm)).
 
-deliverable_location_events(Agent,Loc,tick(Agent,Loc)):-fail.
+deliverable_location_events(Agent,Loc,actTick(Agent,Loc)):-fail.

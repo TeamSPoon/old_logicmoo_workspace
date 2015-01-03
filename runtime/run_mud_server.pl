@@ -20,13 +20,13 @@ swi_export(E):-dmsg(swi_export(E)).
 
 
 % [Optionaly] register swish server (remote file editing)
-:- if_file_exists(ensure_loaded('../externals/swish/logicmoo_run_swish')).
+% :- if_file_exists(ensure_loaded('../externals/swish/logicmoo_run_swish')).
 
 % [Optionaly] register/run Cliopatria sparql server (remote RDF browsing)
-:- if_startup_script(ensure_loaded(run_clio)).
+% :- if_startup_script(ensure_loaded(run_clio)).
 
 % [Optionaly] register/run KnowRob robot services (we use it for the ontology mainly)
-:- with_no_term_expansions(if_file_exists(ensure_loaded('../externals/MUD_KnowRob/knowrob_addons/knowrob_mud/prolog/init.pl'))).
+% :- with_no_term_expansions(if_file_exists(ensure_loaded('../externals/MUD_KnowRob/knowrob_addons/knowrob_mud/prolog/init.pl'))).
 
 % [Manditory] run_tests (includes run_common)
 :- include(run_tests).
@@ -44,10 +44,10 @@ swi_export(E):-dmsg(swi_export(E)).
 % this is what happens when the world is not found
 % :- add_game_dir('../games/src_game_unknown',prolog_repl).     
 
-:- onSpawn(pathBetween(living_room,office_room)).
+:- onSpawn(pathBetween(tLivingRoom,tOfficeRoom)).
 
-:- declare_load_game('../games/src_game_nani/a_nani_household.plmoo').
-:- declare_load_game('../games/src_game_nani/objs_misc_household.plmoo').
+%:- declare_load_game('../games/src_game_nani/a_nani_household.plmoo').
+%:- declare_load_game('../games/src_game_nani/objs_misc_household.plmoo').
 
 % the following 4 worlds are in version control in examples
 % :- add_game_dir('../games/src_game_wumpus',prolog_repl).       
@@ -61,13 +61,13 @@ swi_export(E):-dmsg(swi_export(E)).
 
 % :- if_startup_script( doall(now_run_local_tests_dbg)).
 
-:-enqueue_player_command(who).
-:-enqueue_player_command(look).
+:-enqueue_player_command(actWho).
+:-enqueue_player_command(actLook).
 % :-enqueue_player_command(prolog).
 
 % [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
 :- register_timer_thread(npc_ticker,30,npc_tick).
-
+:- prolog_repl.
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
 :- if_startup_script(at_start(run)).
 

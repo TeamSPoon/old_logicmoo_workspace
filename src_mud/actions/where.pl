@@ -1,4 +1,3 @@
-
 % Dec 13, 2035
 % Douglas Miles
 %
@@ -17,38 +16,36 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- register_module_type(tCommand).
 
 
-subclass(agent,obj).
-subclass(item,obj).
+mudSubclass(tAgentGeneric,tObj).
+mudSubclass(tItem,tObj).
 
 
 % where 
-agent_text_command(Agent,[where,BE,X],Agent,where(X)):-memberchk(BE,[is,are,be,were]).
-action_info(where(obj),"Tells where something is").
-agent_call_command(_Agent,where(SObj)) :-
+agent_text_command(Agent,[actWhere,BE,X],Agent,actWhere(X)):-memberchk(BE,[is,are,be,were]).
+action_info(actWhere(tObj),"Tells where something is").
+agent_call_command(_Agent,actWhere(SObj)) :-
     forall(
-     (atloc(Obj,LOC), match_object(SObj,Obj)),
-        fmt(cmdresult(where,atloc(Obj,LOC)))).
+     (mudAtLoc(Obj,LOC), match_object(SObj,Obj)),
+        fmt(cmdresult(actWhere,mudAtLoc(Obj,LOC)))).
 
 
-action_info(who(optional(agent,world)),"Lists who is online (where they are at least)").
+action_info(actWho(optional(tAgentGeneric,world)),"Lists who is online (where they are at least)").
 
-agent_call_command(_Gent,who(W)) :- mud_cmd_who(W).
+agent_call_command(_Gent,actWho(W)) :- mud_cmd_who(W).
 
 mud_cmd_who(world):-!,mud_cmd_who_1(_).
 mud_cmd_who(Who):- mud_cmd_who_1(Who).
 
 get_inRegion(Agnt,Where):- inRegion(Agnt,Where),!.
-get_inRegion(Agnt,Where):- atloc(Agnt,Where),!.
+get_inRegion(Agnt,Where):- mudAtLoc(Agnt,Where),!.
 get_inRegion(Agnt,Where):- localityOfObject(Agnt,Where),!.
 
 mud_cmd_who_1(Who):-
-     forall(agent(Who),
+     forall(tAgentGeneric(Who),
       once((get_inRegion(Who,Where),
-            fmt(cmdresult(who(Who),localityOfObject(Who,Where)))))).
+            fmt(cmdresult(actWho(Who),localityOfObject(Who,Where)))))).
 
 :- include(logicmoo(vworld/moo_footer)).
-
-

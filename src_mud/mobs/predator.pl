@@ -12,7 +12,7 @@
 */
 
 % Declare the module name and the exported (public) predicates.
-:-swi_module(predator,[]).
+:-swi_module(tPredator,[]).
 
 % Predicates asserted during run.
 % :- dynamic memory/2.
@@ -21,37 +21,37 @@
 :- include(logicmoo(vworld/moo_header)).
 :- register_module_type(planning).
 
-:-decl_type(predator).
-col(predator).
+:-decl_type(tPredator).
+tCol(tPredator).
 
 world_agent_plan(_World,Agent,Act):-
-   isa(Agent,predator),
+   mudIsa(Agent,tPredator),
    predator_idea(Agent,Act).
 
-predator_idea(Agent,eat(Corpse)) :-
-	charge(Agent,Charge),
+predator_idea(Agent,actEat(Corpse)) :-
+	mudCharge(Agent,Charge),
 	Charge < 100,
-	inventory(Agent, List),                
+	actInventory(Agent, List),                
 	obj_memb(Corpse,List),
-        isa(Corpse,corpse).
-predator_idea(Agent,take(What)) :-
+        mudIsa(Corpse,corpse).
+predator_idea(Agent,actTake(What)) :-
 	get_feet(Agent,What),
-	isa(What,corpse).
-predator_idea(Agent,move(Dir)) :-
+	mudIsa(What,corpse).
+predator_idea(Agent,actMove(Dir)) :-
 	get_percepts(Agent,List),
 	list_object_dir_sensed(_,List,corpse(_),Dir).
-predator_idea(Agent,attack(Dir)) :-
+predator_idea(Agent,actAttack(Dir)) :-
 	get_near(Agent,List),
-	list_object_dir_near(List,prey(_),Dir).
+	list_object_dir_near(List,tPrey(_),Dir).
 
 % find something near and itnersting and go to it.. or find a dirrection and go that way.. or sit 
 
-predator_idea(Agent,move(Dir)) :-
+predator_idea(Agent,actMove(Dir)) :-
 	get_percepts(Agent,List),
-	list_object_dir_sensed(_,List,prey(_),Dir).
+	list_object_dir_sensed(_,List,tPrey(_),Dir).
 
 predator_idea(Agent,Act) :- 
-      move_or_sit_memory_idea(Agent,Act,[nut]).
+      move_or_sit_memory_idea(Agent,Act,[tNut]).
 
 
 :- include(logicmoo(vworld/moo_footer)).

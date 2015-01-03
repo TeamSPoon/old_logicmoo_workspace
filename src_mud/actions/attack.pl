@@ -11,93 +11,91 @@
 */
 
 % :-swi_module(user). 
-:-swi_module(attack, []).
+:-swi_module(actAttack, []).
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- register_module_type(tCommand).
 
 % attack joe ->translates-> attack nw
-action_type(attack(dir)).
+tActionType(actAttack(ftDir)).
 
 % Attack
 % Successful Attack
-agent_call_command(Agent,attack(Dir)) :-	
-	atloc(Agent,LOC),
+agent_call_command(Agent,actAttack(Dir)) :-	
+	mudAtLoc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
-	atloc(What,XXYY),
+	mudAtLoc(What,XXYY),
 	damage_foe(Agent,What,hit),
-	call_update_charge(Agent,attack).
+	call_update_charge(Agent,actAttack).
 
 % Destroy small objects (food, etc.)
-agent_call_command(Agent,attack(Dir)) :-	
-	atloc(Agent,LOC),
+agent_call_command(Agent,actAttack(Dir)) :-	
+	mudAtLoc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
-	atloc(What,XXYY),	
-	props(What,weight(1)),
+	mudAtLoc(What,XXYY),	
+	props(What,mudWeight(1)),
 	destroy_object(XXYY,What),
-	call_update_charge(Agent,attack).
+	call_update_charge(Agent,actAttack).
 
 % Hit a big object... causes damage to agent attacking
-agent_call_command(Agent,attack(Dir)) :-	
-	atloc(Agent,LOC),
+agent_call_command(Agent,actAttack(Dir)) :-	
+	mudAtLoc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
-	atloc(What,XXYY),	
+	mudAtLoc(What,XXYY),	
 	What \== 0,
-	props(What,weight(_)),
+	props(What,mudWeight(_)),
 	call_update_stats(Agent,bash),
-	call_update_charge(Agent,attack).
+	call_update_charge(Agent,actAttack).
 
 % Hit nothing (empty space)... causes a little damage
-agent_call_command(Agent,attack(Dir)) :-	
-	atloc(Agent,LOC),
+agent_call_command(Agent,actAttack(Dir)) :-	
+	mudAtLoc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
-	not(atloc(_,XXYY)),
+	not(mudAtLoc(_,XXYY)),
 	call_update_stats(Agent,wiff),
-	call_update_charge(Agent,attack).
+	call_update_charge(Agent,actAttack).
 
 % Check to see if agent being attacked is carrying an 
 % object which provides defence
 check_for_defence(Agent,Def) :-
-	findall(Poss,possess(Agent,Poss),Inv),
+	findall(Poss,mudPossess(Agent,Poss),Inv),
 	member(Obj,Inv),
 	props(Obj,act_affect(_,defence(Def))).
 check_for_defence(_,0).
 
 % Check to see if attacking agent has a weapon
 check_for_weapon(Agent,Wpn) :-
-	findall(Poss,possess(Agent,Poss),Inv),
+	findall(Poss,mudPossess(Agent,Poss),Inv),
         member(Obj,Inv),
-        props(Obj,act_affect(_,attack(Wpn))).
+        props(Obj,act_affect(_,actAttack(Wpn))).
 
 check_for_weapon(_,0).
 
 destroy_object(LOC,What) :-
-	del(atloc(What,LOC)).
+	del(mudAtLoc(What,LOC)).
 
 % Does damage to other agent
 damage_foe(Agent,What,hit) :-
-	del(health(What,OldDam)),
-	str(Agent,Str),
+	del(mudHealth(What,OldDam)),
+	mudStr(Agent,Str),
 	check_for_defence(What,Def),
 	BaseAtk is Str * 2,
 	check_for_weapon(Agent,Wpn),
 	Atk is (Wpn + BaseAtk),
 	NewDam is (OldDam - (Atk - Def)),
-	add(health(What,NewDam)).
+	add(mudHealth(What,NewDam)).
 
 % Record keeping
-update_charge(Agent,attack) :- upprop(Agent,charge(-5)).
-update_stats(Agent,bash) :-  upprop(Agent,health(-2)),
+update_charge(Agent,actAttack) :- upprop(Agent,mudCharge(-5)).
+update_stats(Agent,bash) :-  upprop(Agent,mudHealth(-2)),
 	(add_cmdfailure(Agent,bash)).
 update_stats(Agent,wiff) :- 
-	del(health(Agent,Old)),
+	del(mudHealth(Agent,Old)),
 	New is Old - 1,
-	add(health(Agent,New)),
+	add(mudHealth(Agent,New)),
 	(add_cmdfailure(Agent,bash)).
 
 
 
 :- include(logicmoo(vworld/moo_footer)).
-
-

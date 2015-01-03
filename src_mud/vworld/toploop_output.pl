@@ -31,16 +31,16 @@ canUseEnglish:-true.
 
 :-swi_export(show_kb_preds/2).
 show_kb_preds(Agent,List):- mmake,
-      ignore(atloc(Agent,LOC)),
+      ignore(mudAtLoc(Agent,LOC)),
       show_kb_preds(Agent,LOC,List).
 
 :-swi_export(show_kb_preds/3).
 show_kb_preds(Agent,LOC,List):-
-      ignore(atloc(Agent,LOC)),
+      ignore(mudAtLoc(Agent,LOC)),
        locationToRegion(LOC,Region),
          once((thlocal:repl_writer(Agent,WPred);WPred=default_repl_writer)),
          once((thlocal:repl_to_string(Agent,ToSTR);ToSTR=default_repl_obj_to_string)),
-        subst(List,region,Region,ListR),
+        subst(List,tRegion,Region,ListR),
         must(show_kb_via_pred(WPred,ToSTR,ListR)),!.
 
 
@@ -111,7 +111,7 @@ merge_list_on_p(WPred,ToSTR,_SayIt,Type,listof(_GCall),_NewValue,SayItList):-
         (findall(KV,(member(KV,SayItList),arg(1,KV,K)),VS),
           fmt_holds_tcall(WPred,ToSTR,K,Type,VS))).
 
-merge_list_on_p(WPred,ToSTR, _SayIt ,Type,_GCall,_NewValue,SayItList):- fmt_holds_tcall(WPred,ToSTR,text,Type,SayItList).
+merge_list_on_p(WPred,ToSTR, _SayIt ,Type,_GCall,_NewValue,SayItList):- fmt_holds_tcall(WPred,ToSTR,ftText,Type,SayItList).
 
 
 % merge_list_on_p(WPred,ToSTR, SayIt ,Type,GCall,NewValue,SayItList):- forall(member(KV,SayItList),fmt_holds_tcall_pred_trans(WPred,ToSTR,SayIt,Type,KV)).
@@ -152,7 +152,7 @@ show_kb_via_pred_3(WPred,ToSTR,output,Type,GCall,NewValue):-!,
 show_kb_via_pred_3(WPred,ToSTR,F,Type,GCall,NewValue):- canUseEnglish,!,
   % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
       findall(NewValue,(ccatch(req(GCall),Error, NewValue=Error), 
-             fmt_holds_tcall(WPred,ToSTR,text,Type,GCall)),Count),!,
+             fmt_holds_tcall(WPred,ToSTR,ftText,Type,GCall)),Count),!,
       (Count==[] ->
         (fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(f4,F,Type))); true),!.
 
@@ -177,4 +177,3 @@ fmt_holds_tcall_pred_trans(WPred,ToSTR,N,Type,V0):-must((debugOnError(call(ToSTR
 
 
 :- include(logicmoo(vworld/moo_footer)).
-

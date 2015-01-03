@@ -53,7 +53,7 @@ isCycPredArity_Check(F,A):-get_mpred_prop(F,cycPred(A)).
 
 using_holds_db(F,A,_,_):- never_use_holds_db(F,A,_),!,fail.
 using_holds_db(F,A2,A,m2(F,A2,isCycPredArity_Check)):- integer(A2), A is A2-2, A>0, isCycPredArity_Check(F,A),!.
-using_holds_db(F,A,A,col(F/A)):- integer(A), col(F),!, must(A>0).
+using_holds_db(F,A,A,tCol(F/A)):- integer(A), tCol(F),!, must(A>0).
 using_holds_db(F,A,A,isCycPredArity_Check):- isCycPredArity_Check(F,A).
 using_holds_db(F,A,A,W):-integer(A),!,fail,trace_or_throw(wont(using_holds_db(F,A,A,W))).
 
@@ -243,7 +243,3 @@ do_holds_form([F|List],HOLDS - _NHOLDS,G2):-
    holds_form(G1,HOLDS,G2).
 
 do_holds_form([F|List],HOLDS - _NHOLDS,G2):- G2=..[HOLDS,F|List].
-
-
-
-

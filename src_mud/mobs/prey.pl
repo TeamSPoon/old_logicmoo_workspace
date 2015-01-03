@@ -13,25 +13,25 @@
 */
 
 % Declare the module name and the exported (public) predicates.
-:-swi_module(prey,[]).
+:-swi_module(tPrey,[]).
 
 :- include(logicmoo(vworld/moo_header)).
 :- register_module_type(planning).
-:- register_module_type(command).
+:- register_module_type(tCommand).
 
-:-decl_type(prey).
-col(prey).
+:-decl_type(tPrey).
+tCol(tPrey).
 
 % Predicates asserted during run.
 % :- dynamic memory/2. 
 %:- dynamic agent_list/1.
 
 world_agent_plan(_World,Self,Act):-
-   isa(Self,prey),
+   mudIsa(Self,tPrey),
    prey_idea(Self,Act).
    
 % Possible agent actions.
-prey_idea(Self,move(Dir)) :-
+prey_idea(Self,actMove(Dir)) :-
 	get_percepts(Self,List),
 	list_agents(Agents),
 	obj_memb(NearAgnt,Agents),
@@ -40,31 +40,31 @@ prey_idea(Self,move(Dir)) :-
 	number_to_dir(Num,Dir,here),
 	nth1(Num,List,What),
 	What == [].
-prey_idea(Self,take(nut)) :-
+prey_idea(Self,actTake(tNut)) :-
 	get_feet(Self,What),
-	member(nut,What).
-prey_idea(Self,eat(nut)) :-
-	charge(Self,Charge),
+	member(tNut,What).
+prey_idea(Self,actEat(tNut)) :-
+	mudCharge(Self,Charge),
 	Charge < 120,
-	possess(Self,nut).
-prey_idea(Self,move(Dir)) :-
+	mudPossess(Self,tNut).
+prey_idea(Self,actMove(Dir)) :-
 	get_percepts(Self,List),
-	list_object_dir_sensed(_,List,nut,Dir).
+	list_object_dir_sensed(_,List,tNut,Dir).
 prey_idea(_Agent,_) :-
-	spawn.
+	actSpawn.
 
-prey_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[nut]).
+prey_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[tNut]).
 
 
 
 % spawn new prey
 % maybe(N) == N chance of each agent spawning a new agent each turn
 
-action_type(spawn(col)).
+tActionType(actSpawn(tCol)).
 
-agent_call_command(_Agent,spawn(prey)):-spawn.
+agent_call_command(_Agent,actSpawn(tPrey)):-actSpawn.
 
-spawn :-
+actSpawn :-
 	maybe(10),
 	spawn_prey(1),
 	!,
@@ -78,18 +78,18 @@ spawn :-
 spawn_prey(10) :-
 	!.
 spawn_prey(N) :-
-       Prey = prey(N),
-       assert_isa(Prey,prey),
+       Prey = tPrey(N),
+       assert_isa(Prey,tPrey),
        get_instance_default_props(Prey,Traits),
-	\+ agent_turnnum(Prey,_),
+	\+ mudAgentTurnnum(Prey,_),
          req(max_charge(Prey,NRG)),
          req(max_health(Prey,Dam)),
-         clr(charge(Prey,_)),
-         clr(health(Prey,_)),
-         add(charge(Prey,NRG)),
-         add(health(Prey,Dam)),
-         add(agent_turnnum(Prey,1)),
-         clr(possess(Prey,_)),
+         clr(mudCharge(Prey,_)),
+         clr(mudHealth(Prey,_)),
+         add(mudCharge(Prey,NRG)),
+         add(mudHealth(Prey,Dam)),
+         add(mudAgentTurnnum(Prey,1)),
+         clr(mudPossess(Prey,_)),
 	set_stats(Prey,Traits),
 	put_in_world(Prey),
         add_missing_instance_defaults(Prey),
@@ -100,5 +100,3 @@ spawn_prey(N) :-
 
 
 :- include(logicmoo(vworld/moo_footer)).
-
-

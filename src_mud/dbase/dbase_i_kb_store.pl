@@ -169,14 +169,14 @@ into_mpred_form_lc(G,O):- functor(G,F,A),G=..[F,P|ARGS],!,into_mpred_form(G,F,P,
 
 into_mpred_form(_,F,_,1,[C],O):-alt_calls(F),!,into_mpred_form(C,O),!.
 into_mpred_form(_,':-',C,1,_,':-'(C)):-!.
-into_mpred_form(C,isa,_,2,_,C):-!.
+into_mpred_form(C,mudIsa,_,2,_,C):-!.
 % into_mpred_form(H,_,_,_,_,GO):- call(once((expand_term( (H :- true) , C ), reduce_clause(C,G)))),expanded_different(H,G),!,into_mpred_form(G,GO),!.
 into_mpred_form(_,not,C,1,_,not(O)):-into_mpred_form(C,O),!.
 into_mpred_form(G,F,_,_,_,G):-mpred_prop(F,prologBuiltin),!.
 into_mpred_form(G,F,_,1,_,G):-mpred_prop(F,mped_type(callable(prologOnly))),!.
 into_mpred_form(G,_,_,1,_,G):-predicate_property(G,number_of_rules(N)),N >0, !.
 into_mpred_form(G,F,C,1,_,O):-predicate_property(G,builtin),!,into_mpred_form(C,OO),O=..[F,OO].
-into_mpred_form(C,_,_,_,_,isa(I,T)):-was_isa(C,I,T),!.
+into_mpred_form(C,_,_,_,_,mudIsa(I,T)):-was_isa(C,I,T),!.
 into_mpred_form(_X,dbase_t,P,_N,A,O):-!,(atom(P)->O=..[P|A];O=..[dbase_t,P|A]).
 into_mpred_form(_X,H,P,_N,A,O):-is_holds_true(H),(atom(P)->O=..[P|A];O=..[dbase_t,P|A]).
 into_mpred_form(_X,H,P,_N,A,O):-is_holds_false(H),(atom(P)->(G=..[P|A],O=not(G));O=..[holds_f,P|A]).
@@ -198,14 +198,14 @@ props_into_mpred_form(props(Obj,PropVal),MPRED):- PropVal=..[Prop|Val],not(infix
 props_into_mpred_form(props(Obj,PropVal),MPRED):- PropVal=..[Prop|Val],!,trace_or_throw(dtrace),into_mpred_form([dbase_t,Prop,Obj|Val],MPRED).
 props_into_mpred_form(PROPS,MPRED):- trace_or_throw(unk_props_into_mpred_form(PROPS,MPRED)).
 
-acceptable_xform(From,To):- From \=@= To,  (To = isa(I,C) -> was_isa(From,I,C); true).
+acceptable_xform(From,To):- From \=@= To,  (To = mudIsa(I,C) -> was_isa(From,I,C); true).
 
 :-swi_export(was_isa/3).
 was_isa(dbase_t(C,I),I,C):- maybe_typep(C/1),not(prolog_side_effects(C/1)).
 was_isa(dbase_t(C,I),I,C).
-was_isa(isa(I,C),I,C).
+was_isa(mudIsa(I,C),I,C).
 was_isa(hasInstance(C,I),I,C).
-was_isa(dbase_t(isa,I,C),I,C).
+was_isa(dbase_t(mudIsa,I,C),I,C).
 was_isa(M:X,I,C):-atom(M),!,was_isa(X,I,C).
 was_isa(X,I,C):-compound(X),functor(X,C,1),!,arg(1,X,I),maybe_typep(C/1),not(prolog_side_effects(C/1)).
 
@@ -223,7 +223,7 @@ prolog_side_effects(P):-atom(P),!,prolog_side_effects(P/_).
 :-swi_export(maybe_typep/1).
 maybe_typep(F/A):- ((integer(A);current_predicate(F/A)),functor(G,F,A)), maybe_typep(G),!.
 maybe_typep(G):-prolog_side_effects(G),!,fail.
-maybe_typep(G):-functor_h(G,F),(mpred_prop(F,col);colDeclarer(F)),!. %  ;col(F);formattype(F)
+maybe_typep(G):-functor_h(G,F),(mpred_prop(F,tCol);colDeclarer(F)),!. %  ;col(F);formattype(F)
 maybe_typep(F):-atom(F),!,maybe_typep(F/_).
 
 
@@ -235,7 +235,7 @@ foreach_arg([ArgIn1|ARGS],ArgN1,ArgIn,ArgN,ArgOut,Call1,[ArgOut1|ARGSO]):-
       ArgN2 is ArgN + 1,
       foreach_arg(ARGS,ArgN2,ArgIn,ArgN,ArgOut,Call,ARGSO).
 
-transform_functor_holds(_,F,ArgInOut,N,ArgInOut):- once(argIsa_ft(F,N,FT)),FT=term,!.
+transform_functor_holds(_,F,ArgInOut,N,ArgInOut):- once(argIsa_ft(F,N,FT)),FT=ftTerm,!.
 transform_functor_holds(Op,_,ArgIn,_,ArgOut):- transform_holds(Op,ArgIn,ArgOut),!.
 
 
@@ -251,9 +251,9 @@ transform_holds_3(Op,[SVOFunctor,Obj,Prop|ARGS],OUT):- is_svo_functor(SVOFunctor
 transform_holds_3(_,[P|ARGS],[P|ARGS]):- not(atom(P)),!,dmsg(transform_holds_3),trace_or_throw(dtrace).
 transform_holds_3(HLDS,[HOLDS,P,A|ARGS],OUT):- is_holds_true(HOLDS),!,transform_holds_3(HLDS,[P,A|ARGS],OUT).
 transform_holds_3(HLDS,[HOLDS,P,A|ARGS],OUT):- HLDS==HOLDS, !, transform_holds_3(HLDS,[P,A|ARGS],OUT).
-transform_holds_3(_,HOLDS,isa(I,C)):- was_isa(HOLDS,I,C),!.
-transform_holds_3(_,[Type,Inst],isa(Inst,Type)):-must_det(not(col(Type))).
-transform_holds_3(_,HOLDS,isa(I,C)):- holds_args(HOLDS,[ISA,I,C]),ISA==isa,!.
+transform_holds_3(_,HOLDS,mudIsa(I,C)):- was_isa(HOLDS,I,C),!.
+transform_holds_3(_,[Type,Inst],mudIsa(Inst,Type)):-must_det(not(tCol(Type))).
+transform_holds_3(_,HOLDS,mudIsa(I,C)):- holds_args(HOLDS,[ISA,I,C]),ISA==mudIsa,!.
 
 transform_holds_3(Op,[Logical|ARGS],OUT):- 
          call(call,logical_functor(Logical)),!,must(not(is_svo_functor(Logical))),
@@ -261,7 +261,7 @@ transform_holds_3(Op,[Logical|ARGS],OUT):-
          OUT=..[Logical|LARGS].
 
 transform_holds_3(_,[props,Obj,Props],props(Obj,Props)).
-transform_holds_3(_,[Type,Inst|PROPS],props(Inst,[isa(Type)|PROPS])):- nonvar(Inst), not(Type=props), cached_isa(Type,colDeclarer),must_det(not(never_type(Type))),!.
+transform_holds_3(_,[Type,Inst|PROPS],props(Inst,[mudIsa(Type)|PROPS])):- nonvar(Inst), not(Type=props), cached_isa(Type,colDeclarer),must_det(not(never_type(Type))),!.
 transform_holds_3(_,[P,A|ARGS],DBASE):- atom(P),!,DBASE=..[P,A|ARGS].
 transform_holds_3(_,[P,A|ARGS],DBASE):- !, nonvar(P),dumpST,trace_or_throw(dtrace), DBASE=..[P,A|ARGS].
 transform_holds_3(Op,DBASE_T,OUT):- DBASE_T=..[P,A|ARGS],!,transform_holds_3(Op,[P,A|ARGS],OUT).
@@ -313,8 +313,8 @@ really_can_table_fact(Fact,TF):-really_can_table,functor(Fact,F,_),can_table_fun
 can_table_functor(F,AsTrueOrFalse):-cannot_table_functor(F,AsTrueOrFalse),!,fail.
 can_table_functor(_,_).
 
-cannot_table_functor(atloc,_).
-cannot_table_functor(isa,false).
+cannot_table_functor(mudAtLoc,_).
+cannot_table_functor(mudIsa,false).
 
 :-meta_predicate_transparent(fact_loop_checked(+,0)).
 fact_loop_checked(Fact,Call):- no_repeats(fact_checked(Fact,loop_check(Call,is_asserted(Fact)))).
@@ -351,7 +351,7 @@ nart_to_atomic(L,L).
 
 :-dynamic_multifile_exported(is_asserted_mpred/1).
 
-is_asserted_lc_isa(isa,2,isa(I,C)):-!,is_asserted_mpred_clause_isa(I,C).
+is_asserted_lc_isa(mudIsa,2,mudIsa(I,C)):-!,is_asserted_mpred_clause_isa(I,C).
 is_asserted_lc_isa(hasInstance,2,hasInstance(C,I)):-!,is_asserted_mpred_clause_isa(I,C).
 is_asserted_lc_isa(C,1,G):-arg(1,G,I),!,is_asserted_mpred_clause_isa(I,C).
 
@@ -567,8 +567,8 @@ rescan_duplicated_facts(M,H,BB):-notrace(doall((gather_fact_heads(M,H),BB=true,o
                                                                      list_to_set(CL1,CL2),once(reduce_fact_heads(M,H,CL1,CL2))))))).
 rerun_database_hooks:-!.
 rerun_database_hooks:-time_call(doall((gather_fact_heads(_M,H),forall(is_asserted(H),run_database_hooks(assert(z),H))))),fail.
-rerun_database_hooks:-time_call(doall((is_asserted(subclass(I,C)),run_database_hooks(assert(z),subclass(I,C))))),fail.
-rerun_database_hooks:-time_call(doall((isa_asserted(I,C),run_database_hooks(assert(z),isa(I,C))))),fail.
+rerun_database_hooks:-time_call(doall((is_asserted(mudSubclass(I,C)),run_database_hooks(assert(z),mudSubclass(I,C))))),fail.
+rerun_database_hooks:-time_call(doall((isa_asserted(I,C),run_database_hooks(assert(z),mudIsa(I,C))))),fail.
 
 reduce_fact_heads(_M,_H,CL1,CL1):-!. % no change
 reduce_fact_heads(M,H,CL1,CL2):- 
@@ -583,5 +583,3 @@ reduce_fact_heads(M,H,CL1,CL2):-
 gather_fact_heads(M,H):- (nonvar(M)->true; member(M,[dbase,moo,world,user,hook])), current_predicate(M:F/A), mpred_arity(F,A),
   once((once((A>0,atom(F),F\=(:),var(H), debugOnError(functor_catch(H,F,A)))),compound(H),predicate_property(M:H,number_of_clauses(_)),
   not((arg(_,vv(system,bugger,logicmoo_util_dcg,user),M);predicate_property(M:H,imported_from(_)))))).
-
-

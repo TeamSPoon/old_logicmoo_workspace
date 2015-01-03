@@ -22,6 +22,7 @@ do
 	echo -en "\ec\e[3J"
 	echo "Hit CTRL+C ${BASH_SOURCE[0]} ";
         echo ". ./debug_once.sh ${RUNFILE} ";
+        sudo su -c "killall -9 swipl" prologmud
         sleep 4;
         cd $NEWPWD
         . ./debug_once.sh $RUNFILE

@@ -10,7 +10,7 @@
           move_or_sit_memory_idea/3,
           npc_tick/0,
           join_npcs_long_running/0,npc_tick_tock/0,npc_tick_tock_time/1,
-          tick/1,
+          actTick/1,
           npc_controller/2,   
           warnOnError/1,
           get_world_agent_plan/3,
@@ -35,27 +35,27 @@ npc_tick:-
 join_npcs_long_running.
 
 % skip manually controled agents
-npc_controller(simple_world_agent_plan,Who):- isa(Who,agent),not(thglobal:agent_message_stream(Who,_,_,_)).
+npc_controller(simple_world_agent_plan,Who):- mudIsa(Who,tAgentGeneric),not(thglobal:agent_message_stream(Who,_,_,_)).
 
-tick_controller(simple_world_agent_plan,Who):- tick(Who).
+tick_controller(simple_world_agent_plan,Who):- actTick(Who).
 
 %:-ggtrace.
 
-move_or_sit_memory_idea(Agent,move(Dir),[Outlet]) :-
-	memory(Agent,directions([Dir|_])),
+move_or_sit_memory_idea(Agent,actMove(Dir),[Outlet]) :-
+	mudMemory(Agent,directions([Dir|_])),
 	num_near(Num,Dir,here),
 	get_near(Agent,List),
 	nth1(Num,List,What),
 	(What == [];
 	What == [Outlet]).
-move_or_sit_memory_idea(Agent,sit,_) :-
-        req(memory(Agent,directions(Old))),
-	del(memory(Agent,directions(Old))),
+move_or_sit_memory_idea(Agent,actSit,_) :-
+        req(mudMemory(Agent,directions(Old))),
+	del(mudMemory(Agent,directions(Old))),
 	random_permutation(Old,New),
-	add(memory(Agent,directions(New))).
+	add(mudMemory(Agent,directions(New))).
 
 
-tick(Who):-
+actTick(Who):-
    ignore(current_agent(Who)),
    findall(Idea,get_world_agent_plan(current,Who,Idea),IdeaS),!,IdeaS=[_|_],
    my_random_member(Idea,IdeaS),!,
@@ -63,7 +63,7 @@ tick(Who):-
 
 
  
-get_world_agent_plan(W,Who,Idea):- agent(Who), world_agent_plan(W,Who,Idea).
+get_world_agent_plan(W,Who,Idea):- tAgentGeneric(Who), world_agent_plan(W,Who,Idea).
 
 do_agent_call_plan_command(A,C):- agent_current_action(A,C),!.
 do_agent_call_plan_command(A,C):-   
@@ -74,13 +74,14 @@ do_agent_call_plan_command(A,C):-
 
 :- debug .
 
-idea(Who,IdeaS):- findall(Idea,(get_world_agent_plan(current,Who,Idea),dmsg(get_world_agent_plan(current,Who,Idea))),IdeaS),(IdeaS==[]->dmsg(noidea(idea(Who)));true).
 
-action_info(npc_timer(int),"sets how often to let NPCs run").
-action_info(tock,"Makes All NPCs do something brilliant").
-action_info(tick(agent),"Makes some agent do something brilliant").
-action_info(idea(optional(agent,self)),"Makes some agent (or self) think of something brilliant").
-action_info(tick,"Makes *your* agent do something brilliant").
+actIdea(Who,IdeaS):- findall(Idea,(get_world_agent_plan(current,Who,Idea),dmsg(get_world_agent_plan(current,Who,Idea))),IdeaS),(IdeaS==[]->dmsg(noidea(actIdea(Who)));true).
+
+action_info(actNpcTimer(ftInt),"sets how often to let NPCs run").
+action_info(actTock,"Makes All NPCs do something brilliant").
+action_info(actTick(tAgentGeneric),"Makes some agent do something brilliant").
+action_info(actIdea(optional(tAgentGeneric,self)),"Makes some agent (or self) think of something brilliant").
+action_info(actTick,"Makes *your* agent do something brilliant").
 action_info(prolog(prolog),"Call prolog toploop").
 
 agent_text_command(Agent,[prolog,X],Agent,prologCall(X)):-ignore(X=someCode).
@@ -103,11 +104,10 @@ any_to_callable(C,X,Vs):-atom(C),!,atom_to_term_safe(C,X,Vs).
 any_to_callable(C,X,Vs):- (expand_goal(C,X)),term_variables((C,X),Vs),!.
 % any_to_callable(C,X,Vs):-force_expand(expand_goal(C,X)),term_variables((C,X),Vs),!.
 
-agent_call_command(_Agent,npc_timer(Time)):-retractall(npc_tick_tock_time(_)),asserta(npc_tick_tock_time(Time)).
-agent_call_command(Who,tick) :-  debugOnError(tick(Who)).
-agent_call_command(_Agent,idea(Who)) :-  catch(idea(Who,_),E,(dmsg(idea(E, Who)),ggtrace,idea(Who,_))).
-agent_call_command(_Agent,tock) :- npc_tick.
-agent_call_command(_Agent,tick(Other)) :- in_thread_and_join(tick(Other)).
+agent_call_command(_Agent,actNpcTimer(Time)):-retractall(npc_tick_tock_time(_)),asserta(npc_tick_tock_time(Time)).
+agent_call_command(Who,actTick) :-  debugOnError(actTick(Who)).
+agent_call_command(_Agent,actIdea(Who)) :-  catch(actIdea(Who,_),E,(dmsg(actIdea(E, Who)),ggtrace,actIdea(Who,_))).
+agent_call_command(_Agent,actTock) :- npc_tick.
+agent_call_command(_Agent,actTick(Other)) :- in_thread_and_join(actTick(Other)).
 
 :- include(logicmoo(vworld/moo_footer)).
-

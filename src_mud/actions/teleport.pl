@@ -13,27 +13,25 @@
 % Douglas Miles
 */
 % :-swi_module(user). 
-:-swi_module(teleport, []).
+:-swi_module(actTeleport, []).
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- register_module_type(tCommand).
 
 % teleport
-action_info(teleport(optional(and([obj,not(region)]),self),optionalStr("to"),optional(region,random(region))),"teleport [obj] [to] [somewhere]").
+action_info(actTeleport(optional(and([tObj,not(tRegion)]),self),optionalStr("to"),optional(tRegion,random(tRegion))),"teleport [obj] [to] [somewhere]").
 
-verb_alias(tp,teleport).
+verb_alias(tp,actTeleport).
 
 %targeted
-agent_call_command(_Agent,teleport(Other,_TO,Where)):-
-   coerce(Other,obj,Target),
-   coerce(Where,region,Location),
+agent_call_command(_Agent,actTeleport(Other,_TO,Where)):-
+   coerce(Other,tObj,Target),
+   coerce(Where,tRegion,Location),
    clr(localityOfObject(Target,_)),
-   clr(atloc(Target,_)),
+   clr(mudAtLoc(Target,_)),
    to_3d(Location,Where3D),
-   add(atloc(Target,Where3D)).
+   add(mudAtLoc(Target,Where3D)).
 
 
 :- include(logicmoo(vworld/moo_footer)).
-
-

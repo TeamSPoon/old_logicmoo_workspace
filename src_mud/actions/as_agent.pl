@@ -8,11 +8,9 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- register_module_type(tCommand).
 
-action_info('as'(agent,command), "as <agent> <command>").
+action_info('as'(tAgentGeneric,tCommand), "as <agent> <command>").
 agent_call_command(_Agent,'as'(OtherAgent,Command)):- call_agent_command(OtherAgent,Command).
 
 :- include(logicmoo(vworld/moo_footer)).
-
-

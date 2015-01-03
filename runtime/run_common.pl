@@ -116,6 +116,7 @@ start_boxer:-
 
 % We don't start cliopatria we here. We have to manually start
 %  with  ?- start_servers.
+hard_work:-!.
 hard_work:-
    with_no_term_expansions(with_assertions(op(200,fy,'@'),
    ((

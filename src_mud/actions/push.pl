@@ -11,49 +11,49 @@
 %
 */
 % :-swi_module(user). 
-:-swi_module(push, []).
+:-swi_module(actPush, []).
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- register_module_type(tCommand).
 
-action_type(push(dir)).
+tActionType(actPush(ftDir)).
 
 % Push a box
 % Nothing to push... agent moves and takes a little damage.
 %Plus it still costs the same charge as if the agent did push something
-agent_call_command(Agent,push(Dir)) :-	
-	atloc(Agent,LOC),
+agent_call_command(Agent,actPush(Dir)) :-	
+	mudAtLoc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
-	atloc(What,XXYY),
+	mudAtLoc(What,XXYY),
 	integer(What),
 	in_world_move(_,Agent,Dir),
 	call_update_stats(Agent,strain),
-	call_update_charge(Agent,push).
+	call_update_charge(Agent,actPush).
 
 % Pushing what cannot be pushed
 % Some damage and loss of charge (same as normal push)
-agent_call_command(Agent,push(Dir)) :-	
-	atloc(Agent,LOC),
+agent_call_command(Agent,actPush(Dir)) :-	
+	mudAtLoc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
-	atloc(What,XXYY),
+	mudAtLoc(What,XXYY),
 	\+ pushable(Agent,What,XXYY,Dir),
 	call_update_stats(Agent,hernia),
-	call_update_charge(Agent,push).
+	call_update_charge(Agent,actPush).
 
 % A successful PUSH
-agent_call_command(Agent,push(Dir)) :-	
-	atloc(Agent,LOC),
+agent_call_command(Agent,actPush(Dir)) :-	
+	mudAtLoc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
-	atloc(What,XXYY),
+	mudAtLoc(What,XXYY),
 	move_object(XXYY,What,Dir),
 	in_world_move(_,Agent,Dir),
-	call_update_charge(Agent,push).
+	call_update_charge(Agent,actPush).
 
 % Can the Object be pushed?
 pushable(Agent,Obj,LOC,Dir) :-
-	str(Agent,Str),
-	props(Obj,weight(Wt)),
+	mudStr(Agent,Str),
+	props(Obj,mudWeight(Wt)),
 	Wt \== 4,
 	Wt =< Str,
 	\+ anything_behind(LOC,Dir).
@@ -61,8 +61,8 @@ pushable(Agent,Obj,LOC,Dir) :-
 % An agent can push another if the agents strenght is greater that or equal to
 % their opponents strength.
 pushable(Agent,Obj,LOC,Dir) :-
-	str(Agent,Str),
-	str(Obj,OppStr),
+	mudStr(Agent,Str),
+	mudStr(Obj,OppStr),
 	Str >= OppStr,
 	(\+ anything_behind(LOC,Dir);
 	crashbang(Obj)).
@@ -70,8 +70,8 @@ pushable(Agent,Obj,LOC,Dir) :-
 % Is the location behind the pushed item/agent empty (or near empty).
 anything_behind(LOC,Dir) :-
 	move_dir_target(LOC,Dir,XXYY),
-	atloc(What,XXYY),
-	props(What,[weight > 1,permanence(or(Pm,0))]),
+	mudAtLoc(What,XXYY),
+	props(What,[mudWeight > 1,mudPermanence(or(Pm,0))]),
 	Pm < 2.
 
 % Move the object.
@@ -83,24 +83,22 @@ move_object(LOC,Obj,Dir) :-
 % Squish small objects behind what is being pushed.
 squish_behind(LOC,Obj) :-
         XY = LOC,
-	atloc(What,XY),
-	props(What,weight(1)),
-	props(Obj,weight(N)),
+	mudAtLoc(What,XY),
+	props(What,mudWeight(1)),
+	props(Obj,mudWeight(N)),
 	N > 1,
-	del(atloc(What,XY)).
+	del(mudAtLoc(What,XY)).
 squish_behind(_,_).
 
 % When one agent pushes another into a wall (or anything big), 
 % both the agents take damage. 
 % The pusher takes damage as normal (for pushing something
 % unpushable), the pushy takes damage below
-crashbang(Obj) :- padd(Obj,[health(-5)]).
+crashbang(Obj) :- padd(Obj,[mudHealth(-5)]).
 
 % Record keeping
-update_charge(Agent,push) :- padd(Agent,[charge(-6)]).
-update_stats(Agent,strain) :- padd(Agent,[health(-2)]).
-update_stats(Agent,hernia) :- padd(Agent,[health(-4),cmdfailure(hernia)]).
+update_charge(Agent,actPush) :- padd(Agent,[mudCharge(-6)]).
+update_stats(Agent,strain) :- padd(Agent,[mudHealth(-2)]).
+update_stats(Agent,hernia) :- padd(Agent,[mudHealth(-4),mudCmdfailure(hernia)]).
 
 :- include(logicmoo(vworld/moo_footer)).
-
-

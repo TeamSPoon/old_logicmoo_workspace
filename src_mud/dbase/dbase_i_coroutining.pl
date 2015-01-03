@@ -40,15 +40,15 @@ arg_to_var(_Type,_String,_Var).
 
 same_arg(_How,X,Y):-var(X),var(Y),!,X=Y.
 same_arg(equals,X,Y):-!,equals_call(X,Y).
-same_arg(col(_Type),X,Y):-!, unify_with_occurs_check(X,Y).
+same_arg(tCol(_Type),X,Y):-!, unify_with_occurs_check(X,Y).
 
-same_arg(text,X,Y):-!, string_equal_ci(X,Y).
+same_arg(ftText,X,Y):-!, string_equal_ci(X,Y).
 
 same_arg(same_or(equals),X,Y):- same_arg(equals,X,Y).
-same_arg(same_or(subclass),X,Y):- same_arg(equals,X,Y).
-same_arg(same_or(subclass),Sub,Sup):- holds_t(subclass,Sub,Sup),!.
-same_arg(same_or(isa),X,Y):- same_arg(equals,X,Y).
-same_arg(same_or(isa),I,Sup):- !, holds_t(Sup,I),!.
+same_arg(same_or(mudSubclass),X,Y):- same_arg(equals,X,Y).
+same_arg(same_or(mudSubclass),Sub,Sup):- holds_t(mudSubclass,Sub,Sup),!.
+same_arg(same_or(mudIsa),X,Y):- same_arg(equals,X,Y).
+same_arg(same_or(mudIsa),I,Sup):- !, holds_t(Sup,I),!.
 
 same_arg(same_or(_Pred),X,Y):- same_arg(equals,X,Y).
 same_arg(same_or(Pred),I,Sup):- holds_t(Pred,I,Sup),!.
@@ -132,7 +132,7 @@ varcall:trigger(ground(X),Goal) :-
 	trigger_ground(X,Goal).
 varcall:trigger(?=(X,Y),Goal) :- 
 	trigger_determined(X,Y,Goal).
-varcall:trigger(pred(X,Pred),Goal) :- 
+varcall:trigger(tPred(X,Pred),Goal) :- 
 	trigger_pred(X,Pred,Goal).
 varcall:trigger((G1,G2),Goal) :- 
 	trigger_conj(G1,G2,Goal).
@@ -334,8 +334,8 @@ isac(X, List) :-
       put_attr(Y, isac, Domain),
       X = Y.
 
-type_size(C,S):-isa(C,completeExtentKnown),!,setof(E,isa(E,C),L),length(L,S).
-type_size(C,1000000):-isa(C,formattype),!.
+type_size(C,S):-mudIsa(C,completeExtentKnown),!,setof(E,mudIsa(E,C),L),length(L,S).
+type_size(C,1000000):-mudIsa(C,tFormattype),!.
 type_size(_,1000).
 
 comp_type(Comp,Col1,Col2):-type_size(Col1,S1),type_size(Col2,S2),compare(Comp,S1,S2).
@@ -360,7 +360,7 @@ isac:attr_unify_hook(Domain, Y):-
 isac_chk(E,Cs):-once(isac_gen(E,Cs)).
 
 isac_gen(_, []).
-isac_gen(Y, [H|List]):-isa(Y,H),!,isac_gen(Y, List).
+isac_gen(Y, [H|List]):-mudIsa(Y,H),!,isac_gen(Y, List).
 
 
 
@@ -368,4 +368,3 @@ isac_gen(Y, [H|List]):-isa(Y,H),!,isac_gen(Y, List).
 isac:attribute_goals(X) -->
       { get_attr(X, isac, List) },
       [isac(X, List)].
-  

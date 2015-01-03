@@ -70,7 +70,7 @@ player_connect_menu:-
    prolog_must_l([foc_current_player(WantsPlayer),
    connect_player(WantsPlayer,P),
    foc_current_player(P),
-   call_agent_command(P,'look')]),!.
+   call_agent_command(P,actLook)]),!.
 
 connect_player(Wants,Gets):-
  prolog_must_l([
@@ -84,7 +84,7 @@ run_player_telnet:-
    must(set_tty_control),!,
    fmt('~n~n~nHello run_player_telnet!~n',[]),
    must(foc_current_player(P)),
-   assert_isa(P,human_player),
+   assert_isa(P,tHumanPlayer),
    fmt('~n~n~nHello ~w! Welcome to the MUD!~n',[P]),
    must((colormsg([blink,fg(red)],"this is blinking red!"))),
    call_cleanup(
@@ -191,7 +191,7 @@ read_code_list_or_next_command(In,Atom):-
 code_list_to_next_command(end_of_file,end_of_file).
 code_list_to_next_command(NewCodes,Atom):-append(Left,[EOL],NewCodes),EOL<33,!,code_list_to_next_command(Left,Atom).
 code_list_to_next_command([EOL|NewCodes],Atom):-EOL<33,!,code_list_to_next_command(NewCodes,Atom).
-code_list_to_next_command([],'look').
+code_list_to_next_command([],actLook).
 code_list_to_next_command([91|REST],TERM):- catchv((atom_codes(A,[91|REST]),atom_to_term(A,TERM,[])),_,fail),!.
 code_list_to_next_command(NewCodes,Atom):-atom_codes(Atom,NewCodes),!.
 
@@ -227,14 +227,14 @@ do_player_action(Agent,CMD):-fmt('skipping_unknown_player_action(~q,~q).~n',[Age
 % ===========================================================
 % DEFAULT TELNET "LOOK"
 % ===========================================================
-look_brief(Agent):- prop(Agent,last_command,X),nonvar(X),functor(X,look,_),!.
-look_brief(Agent):- not(prop(Agent,needs_look,true)),!.
-look_brief(Agent):- must(prop(Agent,needs_look,true)),look_as(Agent).
+look_brief(Agent):- prop(Agent,mudLastCommand,X),nonvar(X),functor(X,actLook,_),!.
+look_brief(Agent):- not(prop(Agent,mudNeedsLook,true)),!.
+look_brief(Agent):- must(prop(Agent,mudNeedsLook,true)),look_as(Agent).
 
-telnet_repl_writer(_TL,call,term,Goal):-!,ignore(debugOnError(Goal)).
-telnet_repl_writer( TL,text,Type,[V]):-telnet_repl_writer(TL,text,Type,V).
-telnet_repl_writer( TL,text,Type,V):- is_list(V),merge_elements(V,L),V\=@=L,!,telnet_repl_writer( TL,text,Type,L).
-telnet_repl_writer(_TL,text,Type,V):-copy_term(Type,TypeO),ignore(TypeO=t),fmt('text(~q).~n',[V]).
+telnet_repl_writer(_TL,call,ftTerm,Goal):-!,ignore(debugOnError(Goal)).
+telnet_repl_writer( TL,ftText,Type,[V]):-telnet_repl_writer(TL,ftText,Type,V).
+telnet_repl_writer( TL,ftText,Type,V):- is_list(V),merge_elements(V,L),V\=@=L,!,telnet_repl_writer( TL,ftText,Type,L).
+telnet_repl_writer(_TL,ftText,Type,V):-copy_term(Type,TypeO),ignore(TypeO=t),fmt('text(~q).~n',[V]).
 telnet_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=t),fmt('~q=(~w)~q.~n',[N,TypeO,V]).
 
 telnet_repl_obj_to_string(O,_TypeHint,O):-!.
@@ -262,7 +262,7 @@ write_pretty_aux([[]|Tail],Return,Column) :-
 	label_type(Obj,0),
 	write(Obj), write(' '),
 	write_pretty_aux(Tail,Return,Ctemp).
-write_pretty_aux([[dark]|Tail],Return,Column) :-
+write_pretty_aux([[vDark]|Tail],Return,Column) :-
 	Ctemp is Column + 1,
 	write('dk '),
 	write_pretty_aux(Tail,Return,Ctemp).
@@ -273,7 +273,7 @@ write_pretty_aux([[Head]|Tail], Return, Column) :-
 	write_pretty_aux(Tail, Return, Ctemp).
 write_pretty_aux([[Agent]|Tail],Return,Column) :-
 	Ctemp is Column + 1,
-	isa(Agent,agent),
+	mudIsa(Agent,tAgentGeneric),
 	write('Ag'), write(' '),
 	write_pretty_aux(Tail,Return,Ctemp).
 write_pretty_aux([[_|_]|Tail],Return,Column) :-
@@ -303,9 +303,9 @@ show_room_grid_new(_):-nl.
 
 door_label(R,Dir,'  '):- pathBetween_call(R,Dir,SP),atomic(SP).
 
-asserted_atloc(O,L):-is_asserted(atloc(O,L)).
+asserted_atloc(O,L):-is_asserted(mudAtLoc(O,L)).
 
-show_room_grid_single(Room, xyz(Room,X,Y,Z),OutsideTest):- call(OutsideTest), doorLocation(Room,X,Y,Z,Dir),door_label(Room,Dir,Label),write(Label),!.
+show_room_grid_single(Room, ftXyz(Room,X,Y,Z),OutsideTest):- call(OutsideTest), doorLocation(Room,X,Y,Z,Dir),door_label(Room,Dir,Label),write(Label),!.
 show_room_grid_single(_Room,_LOC,OutsideTest):- call(OutsideTest),!,write('[]'),!.
 show_room_grid_single(_Room,LOC,_OutsideTest):- asserted_atloc(Obj,LOC),inst_label(Obj,Label), write(Label), !.
 show_room_grid_single(_Room,LOC,_OutsideTest):- asserted_atloc(_Obj,LOC),write('..'), !.
@@ -315,8 +315,8 @@ inst_label(Obj,SLabe2):-show_call(term_to_atom(Obj,SLabel)),sub_atom(SLabel,1,2,
 inst_label(Obj,SLabe2):-show_call(term_to_atom(Obj,SLabel)),sub_atom(SLabel,0,2,_,SLabe2),!.
 inst_label(Obj,Label):- label_type(Label,Obj),!.
 inst_label(Obj,Label):-  iprops(Obj,nameStrings(Val)),Val\=Obj,inst_label(Val,Label),!.
-inst_label(Obj,Label):-  iprops(Obj,named(Val)),Val\=Obj,!,inst_label(Val,Label),!.
-inst_label(Obj,Label):-  iprops(Obj,isa(Val)),Val\=Obj,inst_label(Val,Label),!.
+inst_label(Obj,Label):-  iprops(Obj,mudNamed(Val)),Val\=Obj,!,inst_label(Val,Label),!.
+inst_label(Obj,Label):-  iprops(Obj,mudIsa(Val)),Val\=Obj,inst_label(Val,Label),!.
 inst_label(_Obj,'&&').
 
 % ===================================================================
@@ -324,14 +324,14 @@ inst_label(_Obj,'&&').
 % ===================================================================
 % Display world
 show_room_grid_old(Room) :-  
-	grid(Room,1,G,_),
+	mudGrid(Room,1,G,_),
 	length(G,N),
 	M is N + 1,
 	show_room_grid(Room,1,1,M).
 
 show_room_grid(Room,Old,N,N) :-
 	New is Old + 1,
-	\+ grid(Room,New,N,_),
+	\+ mudGrid(Room,New,N,_),
 	nl,
 	!.
 
@@ -343,7 +343,7 @@ show_room_grid(Room,Old,N,N) :-
 show_room_grid(Room,Y,X,N) :-
       loc_to_xy(Room,X,Y,LOC),
 	asserted_atloc(Obj,LOC),
-        props(Obj,isa(agent)),
+        props(Obj,mudIsa(tAgentGeneric)),
 	list_agents(Agents),
 	obj_memb(Agent,Agents),
 	asserted_atloc(Agent,LOC),
@@ -354,7 +354,7 @@ show_room_grid(Room,Y,X,N) :-
 show_room_grid(Room,Y,X,N) :-
         loc_to_xy(Room,X,Y,LOC),
 	asserted_atloc(Obj,LOC),
-        prop(Obj,isa,Class),
+        prop(Obj,mudIsa,Class),
 	label_type(Label,Class),
 	write(Label), write(' '),
 	XX is X + 1,
@@ -363,7 +363,7 @@ show_room_grid(Room,Y,X,N) :-
 show_room_grid(Room,Y,X,N) :-
       loc_to_xy(Room,X,Y,LOC),
 	asserted_atloc(Agent,LOC),
-	isa(Agent,agent),
+	mudIsa(Agent,tAgentGeneric),
 	write('Ag'), write(' '),
 	XX is X + 1,
 	!,
@@ -445,7 +445,7 @@ server_loop(ServerSocket, Options) :-
                       alias(Alias)
                      % detached(true)
 		  ]),
-	      error(permission_error(create, thread, Alias/ThreadID), _),
+	      error(permission_error(actCreate, thread, Alias/ThreadID), _),
 	      fail), !,
 	server_loop(ServerSocket, Options).
 
@@ -509,4 +509,3 @@ call_pred(Call, Options) :-
 
 
 :- include(logicmoo(vworld/moo_footer)).
-

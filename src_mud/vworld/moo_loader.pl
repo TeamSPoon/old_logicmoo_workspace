@@ -134,7 +134,7 @@ rescan_all:- doall_and_fail(rescan_slow_kb_ops).
 rescan_all:- doall_and_fail(rescan_mpred_props).
 rescan_all.
 
-ensure_at_least_one_region:- (isa(_,region)->true;create_instance(oneRegion1,region)),!.
+ensure_at_least_one_region:- (mudIsa(_,tRegion)->true;create_instance(oneRegion1,tRegion)),!.
 
 :-meta_predicate_transparent(finish_processing_game/0).
 finish_processing_game:- dmsg(begin_finish_processing_game),fail.
@@ -231,18 +231,18 @@ detWithSpace(WithSpace,String):-ddeterminer1(String),atom_concat(String,' ',With
 determinerRemoved(S0,Det,S):- fail,detWithSpace(WithSpace,String),string_concat(WithSpace,S,S0),string_lower(String,Det).
 
 :-meta_predicate_transparent(query_description/1).
-query_description(description(I,S)):-  is_asserted(description(I,S)).
-query_description(dbase_t(description,I,S)):- is_asserted(description(I,S));is_asserted(keyword(I,S)).
+query_description(mudDescription(I,S)):-  is_asserted(mudDescription(I,S)).
+query_description(dbase_t(mudDescription,I,S)):- is_asserted(mudDescription(I,S));is_asserted(mudKeyword(I,S)).
 
 
 :-meta_predicate_transparent(remove_description/1).
-remove_description(description(I,S)):- dmsg(trace_or_throw(remove_description(description(I,S)))).
+remove_description(mudDescription(I,S)):- dmsg(trace_or_throw(remove_description(mudDescription(I,S)))).
 
 :-meta_predicate_transparent(add_description/1).
-add_description(description(I,S)):-add_description(I,S).
+add_description(mudDescription(I,S)):-add_description(I,S).
 
 :-meta_predicate_transparent(add_description/2).
-add_description(A,S0):-hooked_asserta(description(A,S0)),fail.
+add_description(A,S0):-hooked_asserta(mudDescription(A,S0)),fail.
 add_description(A,S0):-string_concat('#$PunchingSomething ',S,S0),!,add_description(A,S).
 % add_description(A,S0):-determinerRemoved(S0,String,S),!,add_description(A,S),add(determinerString(A,String)).
 add_description(A,S0):-
@@ -266,7 +266,7 @@ add_description(A,_S,_S0,1,_,[Word]):-add_description_word(A,Word),!.
 add_description(A,S,S0,Ws,Sents,['#$PunchingSomething',B|C]):-add_description(A,S,S0,Ws,Sents,[B|C]).
 add_description(A,S,S0,Ws,Sents,[Det,B|C]):-ddeterminer(Det,L),add_description(A,S,S0,Ws,Sents,[B|C]),hooked_asserta(determinerString(A,L)).
 add_description(A,S,S0,Ws,_Sents,_Words):-Ws>3,is_here_String(S),text_to_string(S0,String),!,hooked_asserta(descriptionHere(A,String)).
-add_description(A,_S,S0,_Ws,_Sents,_Words):- text_to_string(S0,String),hooked_asserta(description(A,String)).
+add_description(A,_S,S0,_Ws,_Sents,_Words):- text_to_string(S0,String),hooked_asserta(mudDescription(A,String)).
 
 is_here_String(S):- atomic_list_concat_safe([_,is,_,here,_],S).
 is_here_String(S):- atomic_list_concat_safe([_,here],S).
@@ -282,9 +282,9 @@ ddeterminer0(the).
 ddeterminer(L,L):-ddeterminer0(L).
 ddeterminer(U,L):-string_lower(U,L),U\=L,!,ddeterminer0(L).
 
-add_description_word(A,Word):- string_upper(Word,Word),string_lower(Word,Flag),string_to_atom(Flag,Atom),atom_concat(flagged_,Atom,FAtom),fast_add((isa(A,FAtom))).
-add_description_word(A,Word):- string_lower(Word,Word),fast_add((keyword(A,Word))).
-add_description_word(A,Word):- string_lower(Word,Lower),fast_add((keyword(A,Lower))).
+add_description_word(A,Word):- string_upper(Word,Word),string_lower(Word,Flag),string_to_atom(Flag,Atom),atom_concat(flagged_,Atom,FAtom),fast_add((mudIsa(A,FAtom))).
+add_description_word(A,Word):- string_lower(Word,Word),fast_add((mudKeyword(A,Word))).
+add_description_word(A,Word):- string_lower(Word,Lower),fast_add((mudKeyword(A,Lower))).
 
 
 add_description_kv(A,K,V):- atom_concat('#$PunchingSomething ',Key,K),!,add_description_kv(A,Key,V).
@@ -300,5 +300,3 @@ show_load_call(C):-
    logOnFailure(debugOnError(show_call(C))).
 
 :- include(logicmoo('vworld/moo_footer.pl')).
-
-

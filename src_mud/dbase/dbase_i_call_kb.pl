@@ -1,5 +1,3 @@
-
-
 :-swi_module(dbase_i_call_kb,[]).
 
 
@@ -48,7 +46,7 @@ into_plist(Call,PLIST):-Call=..PLIST. % finally the fallthrue
 
 kb_t(AH,_,PLIST):-var(AH),!,kbp_t(PLIST).
 kb_t(dbase_t,PLIST,_):- !,kbp_t(PLIST).  % dbase_t is our versuion of '$holds' or call/N
-kb_t(subclass,PLIST,_):- !,kbp_t([genls|PLIST]). % rewrite hack for SUMO callers
+kb_t(mudSubclass,PLIST,_):- !,kbp_t([genls|PLIST]). % rewrite hack for SUMO callers
 kb_t(AH,PLIST,_):- is_holds_true(AH),!,kb_t(PLIST). % is_holds_true/1 is temp disabled for speed
 kb_t(AH,PLIST,_):- is_holds_false(AH),!,kb_f(PLIST). % is_holds_false(not).
 kb_t(_,_,PLIST):- kbp_t(PLIST).
@@ -124,7 +122,7 @@ cyckb_t(PLIST):- not(el_holds_DISABLED_KB), apply(cyckb_t,PLIST).
 
 :-swi_export(noGenlPreds/1).
 noGenlPreds(coGenlPreds).
-noGenlPreds(isa).
+noGenlPreds(mudIsa).
 noGenlPreds(genls).
 noGenlPreds(X):-not(atom(X)),!.
 noGenlPreds(_).
@@ -264,6 +262,3 @@ write_assertions:-
 
 
 print_sentence(Proof):- fix_sentence(Proof,New),!,ignore((Proof\=New,!,must_det(retract(Proof)),assert(assert_next(New)))),!.
-
-
-

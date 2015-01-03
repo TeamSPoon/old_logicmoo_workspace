@@ -15,88 +15,86 @@
 
 
 % Declare the module name and the exported (public) predicates.
-:-swi_module(explorer,[]).
+:-swi_module(tExplorer,[]).
 
 :- include(logicmoo(vworld/moo_header)).
 :- register_module_type(planning).
 
-:-decl_type(explorer).
+:-decl_type(tExplorer).
 
 vette_idea(Agent,Act,Act):-var(Act),!,dmsg(vette_idea(Agent,Act)).
-vette_idea(_,sit,sit):-!.
+vette_idea(_,actSit,actSit):-!.
 vette_idea(Agent,Act,Act):-dmsg(vette_idea(Agent,Act)).
 
-label_type_props('Px',explorer,[]).
+mudLabelTypeProps('Px',tExplorer,[]).
 
 world_agent_plan(_World,Agent,ActV):-
-   agent(Agent),
+   tAgentGeneric(Agent),
   % isa(Agent,explorer),
    explorer_idea(Agent,Act),
    vette_idea(Agent,Act,ActV).
 
 % Possible agent actions.
-explorer_idea(Agent,eat(Elixer)) :-
-	health(Agent,Damage),
+explorer_idea(Agent,actEat(Elixer)) :-
+	mudHealth(Agent,Damage),
 	Damage < 15,
-   inventory(Agent,List),
+   actInventory(Agent,List),
    obj_memb(Elixer,List),
-   isa(Elixer,elixer).
+   mudIsa(Elixer,tElixer).
 
-explorer_idea(Agent,eat(food)) :-
-	charge(Agent,Charge),
+explorer_idea(Agent,actEat(tFood)) :-
+	mudCharge(Agent,Charge),
 	Charge < 150,
-   inventory(Agent,List),
+   actInventory(Agent,List),
    obj_memb(Food,List),
-   isa(Food,food).
+   mudIsa(Food,tFood).
 
-explorer_idea(Agent,take(Good)) :-
+explorer_idea(Agent,actTake(Good)) :-
 	get_feet(Agent,What),
         obj_memb(Good,What),
-	isa_any(Good,[gold,elixer,treasure]).  
+	isa_any(Good,[tGold,tElixer,tTreasure]).  
 
-explorer_idea(Agent,take(Good)) :-
+explorer_idea(Agent,actTake(Good)) :-
 	get_feet(Agent,What),
         obj_memb(Good,What),
-	isa_any(Good,[food,usefull,item]).
+	isa_any(Good,[tFood,usefull,tItem]).
 
-explorer_idea(Agent,move(1,Dir)) :-
+explorer_idea(Agent,actMove(1,Dir)) :-
 	get_percepts(Agent,List),
-	list_object_dir_sensed(_,List,treasure,Dir).
+	list_object_dir_sensed(_,List,tTreasure,Dir).
 
-explorer_idea(Agent,move(3,Dir)) :-
+explorer_idea(Agent,actMove(3,Dir)) :-
 	get_percepts(Agent,List),
-	list_object_dir_sensed(_,List,monster,OppDir),
+	list_object_dir_sensed(_,List,tMonster,OppDir),
 	reverse_dir(OppDir,Dir),
 	number_to_dir(N,Dir,here),
         nth1(N,List,What),
 	What == [].
 
-explorer_idea(Agent,move(1,Dir)) :-
+explorer_idea(Agent,actMove(1,Dir)) :-
 	get_percepts(Agent,List),
 	list_object_dir_sensed(_,List,usefull,Dir).
 
-explorer_idea(Agent,move(1,Dir)) :-
+explorer_idea(Agent,actMove(1,Dir)) :-
 	get_percepts(Agent,List),
-	list_object_dir_sensed(_,List,agent,Dir).
+	list_object_dir_sensed(_,List,tAgentGeneric,Dir).
 
-explorer_idea(Agent,move(5,Dir)) :-
-	memory(Agent,directions([Dir|_])),
+explorer_idea(Agent,actMove(5,Dir)) :-
+	mudMemory(Agent,directions([Dir|_])),
 	num_near(Num,Dir,here),
 	get_near(Agent,List),
 	nth1(Num,List,What),
 	What == [].
 
-explorer_idea(Agent,attack(Dir)) :-
+explorer_idea(Agent,actAttack(Dir)) :-
 	get_near(Agent,List),
-	list_object_dir_near(List,monster(_),Dir).
+	list_object_dir_near(List,tMonster(_),Dir).
 
-explorer_idea(Agent,look) :-
-        req(memory(Agent,directions(Old))),
-	del(memory(Agent,directions(Old))),
+explorer_idea(Agent,actLook) :-
+        req(mudMemory(Agent,directions(Old))),
+	del(mudMemory(Agent,directions(Old))),
 	random_permutation(Old,New),
-	add(memory(Agent,directions(New))).
+	add(mudMemory(Agent,directions(New))).
 
 
 :- include(logicmoo(vworld/moo_footer)).
-
-

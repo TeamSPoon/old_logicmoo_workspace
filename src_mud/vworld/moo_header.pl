@@ -24,7 +24,7 @@
 :- dynamic_multifile_exported hooked_random_instance/3.
 :- dynamic_multifile_exported fact_maybe_deduced/1.
 
-:- dynamic_multifile_exported term_anglify/2.
+:- dynamic_multifile_exported mudTermAnglify/2.
 
 :- dynamic_multifile_exported(thlocal:tracing80/0).
 :- dynamic_multifile_exported(thlocal:usePlTalk/0).
@@ -47,7 +47,7 @@
 :- dynamic_multifile_exported default_type_props/2.
 :- dynamic_multifile_exported default_inst_props/3.
 :- dynamic_multifile_exported label_type/2.
-:- dynamic_multifile_exported label_type_props/3.
+:- dynamic_multifile_exported mudLabelTypeProps/3.
 :- dynamic_multifile_exported mud_test/2.
 :- dynamic_multifile_exported mud_test/1.
 :- dynamic_multifile_exported mud_test/0.
@@ -63,37 +63,14 @@
 :- dynamic_multifile_exported movedist/2.
 :- dynamic_multifile_exported verb_alias/2.
 :- dynamic_multifile_exported world_agent_plan/3.
-:- dynamic_multifile_exported contains/2.
+:- dynamic_multifile_exported mudContains/2.
 :- dynamic_multifile_exported longitude/2.
 :- dynamic_multifile_exported latitude/2.
-:- dynamic_multifile_exported region/1.
-:- dynamic_multifile_exported((action_type/1,action_info/2,action_rules/4,type_action_info/3,term_specifier_text/2,action_verb_useable/4)).
+:- dynamic_multifile_exported tRegion/1.
+:- dynamic_multifile_exported((tActionType/1,action_info/2,action_rules/4,type_action_info/3,term_specifier_text/2,action_verb_useable/4)).
 :- dynamic_multifile_exported((decl_coerce)/3).
-:- dynamic_multifile_exported((term_anglify/2,term_anglify_last/2, term_anglify_np/3,term_anglify_np_last/3)).
+:- dynamic_multifile_exported((mudTermAnglify/2,term_anglify_last/2, term_anglify_np/3,term_anglify_np_last/3)).
 :- dynamic_multifile_exported((update_charge/2,update_stats/2)).
-:- dynamic_multifile_exported(ft_info/2).
+:- dynamic_multifile_exported(mudFtInfo/2).
 
 :- dynamic_multifile_exported thglobal:use_cyc_database/0.
-
-end_of_file.
-
-
-:- dynamic_multifile_exported ft_info/2.
-:- dynamic_multifile_exported subft/2.
-:- dynamic_multifile_exported col/1.
-
-
-%  very very first import
-:- within_user(ensure_loaded(logicmoo('vworld/moo.pl'))).
-
-% :-context_module(Ctx),writeq(context_module(Ctx)),nl.
-:-context_module(Ctx),asserta(context_module_h(Ctx)).
-
-% These three are for use with Quintus
-%:- prolog_flag(unknown,error,fail). % Not sure if this is needed for Quintus
-:- within_user(ensure_loaded(library(random))).
-%:- within_user(ensure_loaded(library(date))).
-% This one is for use with SWI
-:- within_user(ensure_loaded(library(quintus))).
-
-

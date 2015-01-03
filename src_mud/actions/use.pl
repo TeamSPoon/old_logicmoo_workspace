@@ -6,25 +6,25 @@
 %
 
 % :-swi_module(user). 
-:-swi_module(use, []).
+:-swi_module(actUse, []).
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- register_module_type(tCommand).
 
-argsIsaInList(action_verb_useable(verb,term(mpred),col,term(mpred))).
+argsIsaInList(action_verb_useable(tVerb,ftTerm(tMpred),tCol,ftTerm(tMpred))).
 
 
-subclass(eachOf('PortableObject','ProtectiveAttire',stowable),wieldable).
-subclass('FluidReservoir',drinkable).
-subclass('Weapon',wieldable).
-subclass('ControlDevice',usable).
+mudSubclass(eachOf('PortableObject','ProtectiveAttire',tStowable),tWieldable).
+mudSubclass('FluidReservoir',tDrinkable).
+mudSubclass('Weapon',tWieldable).
+mudSubclass('ControlDevice',tUsable).
 
-action_verb_useable(wear,wearsClothing,wearable,stowed).
-action_verb_useable(wield,wielding,wieldable,stowed).
-action_verb_useable(use,using,usable,stowed).
-action_verb_useable(drink,drinking,drinkable,holding).
-action_verb_useable(stow,stowed,stowable,holding).
+action_verb_useable(actWear,wearsClothing,tWearable,mudStowed).
+action_verb_useable(actWield,wielding,tWieldable,mudStowed).
+action_verb_useable(actUse,using,tUsable,mudStowed).
+action_verb_useable(actDrink,drinking,tDrinkable,holding).
+action_verb_useable(actStow,mudStowed,tStowable,holding).
 
 action_info(Syntax,String):-action_verb_useable(Stow,Stowed,Stowable,Holding),Syntax=..[Stow,Stowable],
    sformat(String,'~w a ~w that you are/have ~w so it will be ~w.',[Stow,Stowable,Holding,Stowed]).
@@ -36,10 +36,10 @@ get_use_verbs(USE,USING,USABLE,STOWED):-action_verb_useable(USE,USING,USABLE,STO
 agent_call_command(Agent,SENT) :-
   get_use_verbs(USE,_USING,USABLE,STOWED),
     SENT=..[USE,Obj],
-	possess(Agent,Obj),
+	mudPossess(Agent,Obj),
         prop(Agent,STOWED,Obj),
-	isa(Obj,USABLE),
-	props(Obj, weight =< 1),
+	mudIsa(Obj,USABLE),
+	props(Obj, mudWeight =< 1),
 	do_act_affect(Agent,USE,Obj),
 	do_permanence(USE,Agent,Obj),
 	call_update_charge(Agent,USE).
@@ -54,26 +54,26 @@ agent_call_command(Agent,SENT) :-
 % or in the agent's possession.
 do_permanence(USE,Agent,Obj) :-
   get_use_verbs(USE,_USING,_USABLE,_STOWED),
-	atloc(Obj,LOC),
+	mudAtLoc(Obj,LOC),
 	check_permanence(USE,Agent,LOC,Obj).
 
 check_permanence(USE,_Agent,LOC,Obj) :-
      get_use_verbs(USE,_USING,_USABLE,_STOWED),
-	props(Obj,permanence(USE,Dissapears)),
+	props(Obj,mudPermanence(USE,Dissapears)),
 	member(Dissapears,[dissapears,0]),
-	del(atloc(Obj,LOC)).
+	del(mudAtLoc(Obj,LOC)).
 check_permanence(USE,Agent,LOC,Obj) :-
     get_use_verbs(USE,USING,_USABLE,_STOWED),
-        props(Obj,permanence(USE,Held)),
+        props(Obj,mudPermanence(USE,Held)),
         member(Held,[1,held]),
-	del(atloc(Obj,LOC)),
+	del(mudAtLoc(Obj,LOC)),
 	padd(Agent,USING,Obj).
 check_permanence(USE,_,_,_):-get_use_verbs(USE,_USING,_USABLE,_STOWED),!.
 
 % Record keeping
 update_charge(Agent,USE) :-
     get_use_verbs(USE,_USING,_USABLE,_STOWED),
-      padd(Agent,[charge(-2)]).
+      padd(Agent,[mudCharge(-2)]).
 
 
 
@@ -81,4 +81,3 @@ update_charge(Agent,USE) :-
 
 
 :- include(logicmoo(vworld/moo_footer)).
-

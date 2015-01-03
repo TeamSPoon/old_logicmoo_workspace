@@ -13,13 +13,13 @@
 % ===============================================================================================
 */
 
-:-decl_mpred_hybrid(pathBetween(region,dir,region)).
-:-decl_mpred_hybrid(pathBetween(region,region),symmetric).
+:-decl_mpred_hybrid(pathBetween(tRegion,ftDir,tRegion)).
+:-decl_mpred_hybrid(pathBetween(tRegion,tRegion),symmetric).
 pathBetween(R1,R2):-pathBetween(R1,Dir,R2),nop(Dir).
 
 :-decl_mpred_prolog(ensure_some_pathBetween/2).
 ensure_some_pathBetween(R1,R2):- pathBetween(R1,_Dir,R2),!.
-ensure_some_pathBetween(R1,R2):- random_instance(dir,Dir,atom_length(Dir,1)),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
+ensure_some_pathBetween(R1,R2):- random_instance(ftDir,Dir,atom_length(Dir,1)),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
    add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)),!.
 ensure_some_pathBetween(R1,R2):- split_name_type(R2,_,Isa), any_to_string(Isa,Str), any_to_dir(Str,Dir),show_call(add(pathBetween(R1,Dir,R2))).
 
@@ -33,134 +33,133 @@ addPathBetweens:- forall(no_repeats(is_asserted(pathBetween(R1,R2))),must_det((e
 % Classes of things
 % ==================================================
 
-subclass(candle,portable_device).
-subclass(flashlight, portable_device).
-subclass(desk, office_room_furnature).
-subclass(apple, food).
-subclass(nani, art).
-subclass(nani, washable).
-subclass(clothing, washable).
-subclass(nani, portable).
-subclass(broccoli, food).
-subclass(food,eatable).
-subclass(crackers, food).
-subclass(envelope, office_item).
-subclass(stamp, office_item).
-subclass(key, office_item).
-subclass(ball, throwable).
+mudSubclass(tCandle,tPortableDevice).
+mudSubclass(tFlashlight, tPortableDevice).
+mudSubclass(tDesk, tOfficeRoomFurnature).
+mudSubclass(tApple, tFood).
+mudSubclass(tNani, tArt).
+mudSubclass(tNani, tWashable).
+mudSubclass(tClothing, tWashable).
+mudSubclass(tNani, tPortable).
+mudSubclass(tBroccoli, tFood).
+mudSubclass(tFood,tEatable).
+mudSubclass(tCrackers, tFood).
+mudSubclass(tEnvelope, tOfficeItem).
+mudSubclass(tStamp, tOfficeItem).
+mudSubclass(tKey, tOfficeItem).
+mudSubclass(tBall, tThrowable).
 
-subclass(pajamas, clothing).
-subclass(shirt, clothing).
-subclass(coat, clothing).
-subclass(pants, clothing).
-subclass(clothing, foldable).
-subclass(clothing, wearable).
+mudSubclass(tPajamas, tClothing).
+mudSubclass(tShirt, tClothing).
+mudSubclass(tCoat, tClothing).
+mudSubclass(tPants, tClothing).
+mudSubclass(tClothing, tFoldable).
+mudSubclass(tClothing, tWearable).
 
-subclass(coffee_cup, liquid_container).
-subclass(coffee_cup, drinkable).
-subclass(coffee_cup, throwable).
-subclass(coffee, liquid).
-subclass(book, readable).
+mudSubclass(tCoffeeCup, tLiquidContainer).
+mudSubclass(tCoffeeCup, tDrinkable).
+mudSubclass(tCoffeeCup, tThrowable).
+mudSubclass(tCoffee, tLiquid).
+mudSubclass(tBook, tReadable).
 
-subclass(pillow, bedding).
-subclass(blanket, bedding).                                                              
-subclass(bedding, foldable).
-subclass(foldable, portable).
-subclass(throwable, portable).
-subclass(portable_device,portable).
-subclass(portable_device,physicalDevice).
-subclass(physicalDevice,useable).
-subclass(wearable, portable).
-subclass(portable,takeable).
-subclass(food,takeable).
-subclass(takeable,obj).
-subclass(partof,not_takable).
+mudSubclass(tPillow, tBedding).
+mudSubclass(tBlanket, tBedding).                                                              
+mudSubclass(tBedding, tFoldable).
+mudSubclass(tFoldable, tPortable).
+mudSubclass(tThrowable, tPortable).
+mudSubclass(tPortableDevice,tPortable).
+mudSubclass(tPortableDevice,physicalDevice).
+mudSubclass(physicalDevice,tUseable).
+mudSubclass(tWearable, tPortable).
+mudSubclass(tPortable,tTakeable).
+mudSubclass(tFood,tTakeable).
+mudSubclass(tTakeable,tObj).
+mudSubclass(tPartof,tNotTakable).
 
-subclass(light_switch, wall_furnature).
-subclass(computer, office_furnature).
-subclass(partof_furnature,partof).
+mudSubclass(tLightSwitch, tWallFurnature).
+mudSubclass(tComputer, tOfficeFurnature).
+mudSubclass(tPartofFurnature,tPartof).
 
-subclass(bed, bed_room_furnature).
-subclass(stand_table, bed_room_furnature).
-subclass(dresser, bed_room_furnature).
+mudSubclass(tBed, tBedRoomFurnature).
+mudSubclass(tStandTable, tBedRoomFurnature).
+mudSubclass(tDresser, tBedRoomFurnature).
 
-subclass(washing_machine, device_furnature).
-subclass(table, furnature).
-subclass(table, hassurface).
-subclass(sofa, living_room_furnature).
-subclass(easy_chair, living_room_furnature).
-subclass(coffee_table, living_room_furnature).
-subclass(bookcase, wall_furnature).
-subclass(drawer, container).
-subclass(drawer, openable).
-subclass(drawer, closeable).
-subclass(drawer, partof_furnature).
-subclass(top_drawer, partof_furnature).
-subclass(middle_drawer, partof_furnature).
-subclass(bottom_drawer, partof_furnature). 
-subclass(houseplant, partof).
-subclass(planter, container). 
-subclass(gueridon, living_room_furnature).
-subclass(garden_plant, outdoor_furnature).
-subclass(spatialthing,lookable).
-subclass(nani,teddybear).
-subclass(teddybear,treasure).
+mudSubclass(tWashingMachine, tDeviceFurnature).
+mudSubclass(tTable, tFurnature).
+mudSubclass(tTable, tHassurface).
+mudSubclass(tSofa, tLivingRoomFurnature).
+mudSubclass(tEasyChair, tLivingRoomFurnature).
+mudSubclass(tCoffeeTable, tLivingRoomFurnature).
+mudSubclass(tBookcase, tWallFurnature).
+mudSubclass(tDrawer, tContainer).
+mudSubclass(tDrawer, tOpenable).
+mudSubclass(tDrawer, tCloseable).
+mudSubclass(tDrawer, tPartofFurnature).
+mudSubclass(tTopDrawer, tPartofFurnature).
+mudSubclass(tMiddleDrawer, tPartofFurnature).
+mudSubclass(tBottomDrawer, tPartofFurnature). 
+mudSubclass(tHouseplant, tPartof).
+mudSubclass(tPlanter, tContainer). 
+mudSubclass(tGueridon, tLivingRoomFurnature).
+mudSubclass(tGardenPlant, tOutdoorFurnature).
+mudSubclass(tSpatialthing,tLookable).
+mudSubclass(tNani,tTeddybear).
+mudSubclass(tTeddybear,tTreasure).
 
-subclass(bathtub,bath_room_furnature).
-subclass(shower,bath_room_furnature).
-subclass(toilet,bath_room_furnature).
-subclass(sink,bath_room_furnature).
-subclass(kitchen_sink,kitchen_furnature).
-subclass(fridge,kitchen_furnature).
-subclass(stove,kitchen_furnature).
-subclass(kitchen_counter,kitchen_furnature).
+mudSubclass(tBathtub,tBathRoomFurnature).
+mudSubclass(tShower,tBathRoomFurnature).
+mudSubclass(tToilet,tBathRoomFurnature).
+mudSubclass(tSink,tBathRoomFurnature).
+mudSubclass(tKitchenSink,tKitchenFurnature).
+mudSubclass(tFridge,tKitchenFurnature).
+mudSubclass(tStove,tKitchenFurnature).
+mudSubclass(tKitchenCounter,tKitchenFurnature).
 
 
 % ==================================================
 % default_type_props Descriptions
 % ==================================================
 
-default_type_props(candle,[color(blue),size(small),shape(triangular),material(wax),texture(sticky)]).
-default_type_props(red_apple,[color(red),size(small),shape(round),isa(fruit),texture(smooth)]).
-default_type_props(green_apple,[color(eachOf(green,pastel)),size(small),shape(round),isa(fruit),texture(smooth)]).
-default_type_props(table,[color(eachOf(blue,white)),size(large),shape(oval),material(wood),texture(eachOf(bumpy,irregular)),weight(50)]).
-default_type_props(pillow,[color(white),size(medium),shape(rectangular),material(eachOf(cotton,flannel)),texture(eachOf(fluffy,soft))]).
-default_type_props(blanket,[color(eachOf(green,dark)),size(eachOf(large,bulky)),shape(rectangular),material(rayon),texture(eachOf(plush,soft))]).                                                              
-default_type_props(stand_table,[color(eachOf(black,shiney)),size(medium),shape(eachOf(cubular,rectangular)),material(wood),texture(smooth),weight(25)]).
-default_type_props(pajams,[color(eachOf(blue,pastel)),size(eachOf(medium,fits)),shape(unique),material(eachOf(cotton,rayon)),texture(soft)]).
-default_type_props(shirt,[color(black),size(eachOf(medium,fits)),shape(like(shape,torso)),material(cotton),texture(eachOf(soft,threadbare))]).
-default_type_props(flashlight,[color(yellow),size(eachOf(medium,small)),shape(cylindrical),material(plastic),texture(ribbed)]).
-default_type_props(key,[color(silver),size(eachOf(small,tiny)),shape(unique),material(metal),texture(eachOf(ridged,bumpy))]).
-default_type_props(envelope,[color(white),size(small),shape(rectangular),material(paper),texture(smooth)]).
-default_type_props(desk,[color(eachOf(brown,shiney)),size(large),shape(eachOf(cubular,rectangular)),texture(eachOf(smooth,ridged)),weight(175)]).
-default_type_props(washing_machine,[color(white),size(large),shape(eachOf(cubular,square)),material(metal),texture(smooth),weight(125)]).
-default_type_props(broccoli,[color(green),size(small),shape(like(shape,tree)),isa(vegetable),texture(eachOf(porous,bumpy))]).                                                                    
-default_type_props(crackers,[color(tan),isa(bread),shape(eachOf(circular,flat)),size(small),texture(eachOf(dry,coarse))]).
-default_type_props(computer,[color(grey),material(plastic),shape(eachOf(cubular,rectangular)),size(medium),texture(smooth)]).
-default_type_props(stamp,[color(polychromatic),size(eachOf(tiny,thin)),shape(square),material(paper),texture(eachOf(smooth,sticky))]).
-default_type_props(coat,[color(black),size(eachOf(medium,fits)),shape(like(shape,torso)),material(eachOf(wool,cotton,rayon)),texture(coarse)]).
-default_type_props(pants,[color(black),size(eachOf(medium,fits)),shape(like(shape,ass)),material(denim),texture(coarse)]).
-default_type_props(nani,[color(brown),color(white),size(medium),shape(like(shape,teddybear)),material(plush),texture(eachOf(fuzzy,soft))]).
-default_type_props(light_switch,[color(cream),size(small),shape(rectangular),material(plastic),texture(smooth)]).
+default_type_props(tCandle,[mudColor(vBlue),mudSize(vSmall),mudShape(vTriangular),mudMaterial(vWax),mudTexture(vSticky)]).
+default_type_props(tRedApple,[mudColor(vRed),mudSize(vSmall),mudShape(round),mudIsa(fruit),mudTexture(vSmooth)]).
+default_type_props(tGreenApple,[mudColor(eachOf(vGreen,vPastel)),mudSize(vSmall),mudShape(round),mudIsa(fruit),mudTexture(vSmooth)]).
+default_type_props(tTable,[mudColor(eachOf(vBlue,vWhite)),mudSize(vLarge),mudShape(vOval),mudMaterial(vWood),mudTexture(eachOf(vBumpy,vIrregular)),mudWeight(50)]).
+default_type_props(tPillow,[mudColor(vWhite),mudSize(vMedium),mudShape(vRectangular),mudMaterial(eachOf(vCotton,vFlannel)),mudTexture(eachOf(vFluffy,vSoft))]).
+default_type_props(tBlanket,[mudColor(eachOf(vGreen,vDark)),mudSize(eachOf(vLarge,bulky)),mudShape(vRectangular),mudMaterial(vRayon),mudTexture(eachOf(vPlush,vSoft))]).                                                              
+default_type_props(tStandTable,[mudColor(eachOf(vBlack,vShiney)),mudSize(vMedium),mudShape(eachOf(vCubular,vRectangular)),mudMaterial(vWood),mudTexture(vSmooth),mudWeight(25)]).
+default_type_props(tPajams,[mudColor(eachOf(vBlue,vPastel)),mudSize(eachOf(vMedium,fits)),mudShape(vUnique),mudMaterial(eachOf(vCotton,vRayon)),mudTexture(vSoft)]).
+default_type_props(tShirt,[mudColor(vBlack),mudSize(eachOf(vMedium,fits)),mudShape(like(mudShape,tTorso)),mudMaterial(vCotton),mudTexture(eachOf(vSoft,vThreadbare))]).
+default_type_props(tFlashlight,[mudColor(vYellow),mudSize(eachOf(vMedium,vSmall)),mudShape(vCylindrical),mudMaterial(vPlastic),mudTexture(vRibbed)]).
+default_type_props(tKey,[mudColor(vSilver),mudSize(eachOf(vSmall,vTiny)),mudShape(vUnique),mudMaterial(vMetal),mudTexture(eachOf(vRidged,vBumpy))]).
+default_type_props(tEnvelope,[mudColor(vWhite),mudSize(vSmall),mudShape(vRectangular),mudMaterial(vPaper),mudTexture(vSmooth)]).
+default_type_props(tDesk,[mudColor(eachOf(vBrown,vShiney)),mudSize(vLarge),mudShape(eachOf(vCubular,vRectangular)),mudTexture(eachOf(vSmooth,vRidged)),mudWeight(175)]).
+default_type_props(tWashingMachine,[mudColor(vWhite),mudSize(vLarge),mudShape(eachOf(vCubular,vSquare)),mudMaterial(vMetal),mudTexture(vSmooth),mudWeight(125)]).
+default_type_props(tBroccoli,[mudColor(vGreen),mudSize(vSmall),mudShape(like(mudShape,tTree)),mudIsa(vegetable),mudTexture(eachOf(vPorous,vBumpy))]).                                                                    
+default_type_props(tCrackers,[mudColor(vTan),mudIsa(bread),mudShape(eachOf(vCircular,flat)),mudSize(vSmall),mudTexture(eachOf(vDry,vCoarse))]).
+default_type_props(tComputer,[mudColor(vGrey),mudMaterial(vPlastic),mudShape(eachOf(vCubular,vRectangular)),mudSize(vMedium),mudTexture(vSmooth)]).
+default_type_props(tStamp,[mudColor(vPolychromatic),mudSize(eachOf(vTiny,thin)),mudShape(vSquare),mudMaterial(vPaper),mudTexture(eachOf(vSmooth,vSticky))]).
+default_type_props(tCoat,[mudColor(vBlack),mudSize(eachOf(vMedium,fits)),mudShape(like(mudShape,tTorso)),mudMaterial(eachOf(vWool,vCotton,vRayon)),mudTexture(vCoarse)]).
+default_type_props(tPants,[mudColor(vBlack),mudSize(eachOf(vMedium,fits)),mudShape(like(mudShape,ass)),mudMaterial(vDenim),mudTexture(vCoarse)]).
+default_type_props(tNani,[mudColor(vBrown),mudColor(vWhite),mudSize(vMedium),mudShape(like(mudShape,tTeddybear)),mudMaterial(vPlush),mudTexture(eachOf(vFuzzy,vSoft))]).
+default_type_props(tLightSwitch,[mudColor(vCream),mudSize(vSmall),mudShape(vRectangular),mudMaterial(vPlastic),mudTexture(vSmooth)]).
 
-default_type_props(ball,[color(red),size(medium),shape(spherical),material(rubber),texture(bumpy)]).
-default_type_props(coffee,[color(eachOf(black,brown)),size(small),shape(fluid),material(liquid),texture(wet)]).
-default_type_props(coffee_cup,[color(black),color(brown),size(small),shape(cuplike),material(glass),texture(smooth)]).
-default_type_props(sofa,[color(eachOf(blue,dark)),size(eachOf(large,wide,long)),shape(polyhedral),material(eachOf(poplin,wood)),texture(ribbed),weight(125)]).
-default_type_props(easy_chair,[color(blue),size(eachOf(large,narrow)),shape(polyhedral),material(eachOf(poplin,wood)),texture(ribbed),weight(75)]).
-default_type_props(coffee_table,[color(eachOf(brown,shiney)),size(medium),shape(circular),material(wood),texture(smooth),weight(35)]).
-default_type_props(book_type_a,[color(green),color(white),color(black),size(small),shape(eachOf(cubular,rectangular)),material(paper),texture(smooth)]).
-default_type_props(book_type_b,[color(pink),color(white),color(black),size(small),shape(eachOf(cubular,rectangular)),material(paper),texture(smooth)]).
-default_type_props(bookcase,[color(eachOf(brown,dark,shiney)),size(large),shape(eachOf(square,concave_polyhedron)),material(wood),texture(smooth),weight(60)]).
-default_type_props(dresser,[color(eachOf(brown,shiney)),size(large),shape(eachOf(rectangular,polyhedral)),material(wood),texture(smooth),weight(45)]).
-default_type_props(top_drawer,[color(eachOf(brown,shiney)),size(medium),shape(eachOf(rectangular,concave_polyhedron)),material(wood),texture(smooth)]). 
-default_type_props(middle_drawer,[color(eachOf(brown,shiney)),size(medium),shape(eachOf(rectangular,concave_polyhedron)),material(wood),texture(smooth)]).
-default_type_props(bottom_drawer,[color(eachOf(brown,shiney)),size(medium),shape(eachOf(rectangular,concave_polyhedron)),material(wood),texture(smooth)]).
-default_type_props(planter,[color(eachOf(pastel,blue)),size(medium),shape(eachOf(cylindrical,trapezohedron)),material(clay),texture(abrasive),weight(15)]).
-default_type_props(houseplant,[color(green),size(medium),shape(anthurium_crystallinum),material(plant_tissue),texture(smooth)]).
-default_type_props(gueridon,[color(eachOf(brown,shiney)),size(medium),shape(circular),material(wood),texture(smooth),weight(25)]).		 
+default_type_props(tBall,[mudColor(vRed),mudSize(vMedium),mudShape(vSpherical),mudMaterial(vRubber),mudTexture(vBumpy)]).
+default_type_props(tCoffee,[mudColor(eachOf(vBlack,vBrown)),mudSize(vSmall),mudShape(vFluid),mudMaterial(tLiquid),mudTexture(vWet)]).
+default_type_props(tCoffeeCup,[mudColor(vBlack),mudColor(vBrown),mudSize(vSmall),mudShape(vCuplike),mudMaterial(vGlass),mudTexture(vSmooth)]).
+default_type_props(tSofa,[mudColor(eachOf(vBlue,vDark)),mudSize(eachOf(vLarge,wide,long)),mudShape(vPolyhedral),mudMaterial(eachOf(vPoplin,vWood)),mudTexture(vRibbed),mudWeight(125)]).
+default_type_props(tEasyChair,[mudColor(vBlue),mudSize(eachOf(vLarge,narrow)),mudShape(vPolyhedral),mudMaterial(eachOf(vPoplin,vWood)),mudTexture(vRibbed),mudWeight(75)]).
+default_type_props(tCoffeeTable,[mudColor(eachOf(vBrown,vShiney)),mudSize(vMedium),mudShape(vCircular),mudMaterial(vWood),mudTexture(vSmooth),mudWeight(35)]).
+default_type_props(tBookTypeA,[mudColor(vGreen),mudColor(vWhite),mudColor(vBlack),mudSize(vSmall),mudShape(eachOf(vCubular,vRectangular)),mudMaterial(vPaper),mudTexture(vSmooth)]).
+default_type_props(tBookTypeB,[mudColor(vPink),mudColor(vWhite),mudColor(vBlack),mudSize(vSmall),mudShape(eachOf(vCubular,vRectangular)),mudMaterial(vPaper),mudTexture(vSmooth)]).
+default_type_props(tBookcase,[mudColor(eachOf(vBrown,vDark,vShiney)),mudSize(vLarge),mudShape(eachOf(vSquare,concave_polyhedron)),mudMaterial(vWood),mudTexture(vSmooth),mudWeight(60)]).
+default_type_props(tDresser,[mudColor(eachOf(vBrown,vShiney)),mudSize(vLarge),mudShape(eachOf(vRectangular,vPolyhedral)),mudMaterial(vWood),mudTexture(vSmooth),mudWeight(45)]).
+default_type_props(tTopDrawer,[mudColor(eachOf(vBrown,vShiney)),mudSize(vMedium),mudShape(eachOf(vRectangular,concave_polyhedron)),mudMaterial(vWood),mudTexture(vSmooth)]). 
+default_type_props(tMiddleDrawer,[mudColor(eachOf(vBrown,vShiney)),mudSize(vMedium),mudShape(eachOf(vRectangular,concave_polyhedron)),mudMaterial(vWood),mudTexture(vSmooth)]).
+default_type_props(tBottomDrawer,[mudColor(eachOf(vBrown,vShiney)),mudSize(vMedium),mudShape(eachOf(vRectangular,concave_polyhedron)),mudMaterial(vWood),mudTexture(vSmooth)]).
+default_type_props(tPlanter,[mudColor(eachOf(vPastel,vBlue)),mudSize(vMedium),mudShape(eachOf(vCylindrical,trapezohedron)),mudMaterial(vClay),mudTexture(vAbrasive),mudWeight(15)]).
+default_type_props(tHouseplant,[mudColor(vGreen),mudSize(vMedium),mudShape(vAnthuriumCrystallinum),mudMaterial(vPlantTissue),mudTexture(vSmooth)]).
+default_type_props(tGueridon,[mudColor(eachOf(vBrown,vShiney)),mudSize(vMedium),mudShape(vCircular),mudMaterial(vWood),mudTexture(vSmooth),mudWeight(25)]).		 
 
-default_type_props(teddybear,[color(natural),shape(unique)]).
-default_type_props(torso,[color(like(color,skin)),shape(unique)]).
-default_type_props(skin,[color(unique),shape(unique)]).
-
+default_type_props(tTeddybear,[mudColor(natural),mudShape(vUnique)]).
+default_type_props(tTorso,[mudColor(like(mudColor,tSkin)),mudShape(vUnique)]).
+default_type_props(tSkin,[mudColor(vUnique),mudShape(vUnique)]).

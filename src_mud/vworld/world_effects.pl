@@ -21,39 +21,39 @@
 
 
 do_act_affect(Agent,Action,Obj) :-
-	props(Obj,act_affect(Action,score(S))),
-	add(score(Agent,+S)),
+	props(Obj,act_affect(Action,mudScore(S))),
+	add(mudScore(Agent,+S)),
 	fail. % fail to check for charge too
 % Charge up those batteries
 do_act_affect(Agent,Action,Obj) :-
-          props(Obj,act_affect(Action,charge(NRG))),
-	req(charge(Agent,Chg)),
-	req(stm(Agent,Stm)),
+          props(Obj,act_affect(Action,mudCharge(NRG))),
+	req(mudCharge(Agent,Chg)),
+	req(mudStm(Agent,Stm)),
 	max_charge(Agent,Max),
 	(Chg + NRG) < (((Stm * 10) -20) + Max),
-	add(charge(Agent,+NRG)),
+	add(mudCharge(Agent,+NRG)),
 	fail. % fail to check for healing
 % Heal
 do_act_affect(Agent,Action,Obj) :-
            props(Obj,act_affect(Action,heal(Hl))),
-	req((health(Agent,Dam),
-             stm(Agent,Stm),
-             str(Agent,Str))),
+	req((mudHealth(Agent,Dam),
+             mudStm(Agent,Stm),
+             mudStr(Agent,Str))),
 	req(max_health(Agent,Max)),
 	(Dam + Hl) < ((((Stm * 10) -20) + ((Str * 5) - 10)) + Max),
-	add(charge(Agent,+Hl)),
+	add(mudCharge(Agent,+Hl)),
 	!.
 do_act_affect(_,_,_).
 
 
 % Check to see if last action was successful or not
 :-swi_export(success/2).
-success(Agent,YN) :- cmdfailure(Agent,_)-> YN=no ; YN=yes.
+success(Agent,YN) :- mudCmdfailure(Agent,_)-> YN=no ; YN=yes.
 
 :-swi_export(add_cmdfailure/2).
-add_cmdfailure(Agent,What):-add(cmdfailure(Agent,What)).
+add_cmdfailure(Agent,What):-add(mudCmdfailure(Agent,What)).
 
-decl_database_hook(assert(_),cmdfailure(Agent,What)):- once(idel(cmdsuccess(Agent,What));clr(cmdsuccess(Agent,_))).
+decl_database_hook(assert(_),mudCmdfailure(Agent,What)):- once(idel(cmdsuccess(Agent,What));clr(cmdsuccess(Agent,_))).
 
 % Initialize world.
 % This keeps the old databases messing with new runs.
@@ -69,7 +69,7 @@ call_update_charge(Agent,What):- padd(Agent,cmdsuccess(What)), doall(must(update
 :-swi_export(call_update_stats/2).
 call_update_stats(Agent,What):- padd(Agent,cmdsuccess(What)), doall(must(update_stats(Agent,What))),!.
 
-set_stats(Agent,[]) :- set_stats(Agent,[str(2),height(2),stm(2),spd(2)]).
+set_stats(Agent,[]) :- set_stats(Agent,[mudStr(2),mudHeight(2),mudStm(2),mudSpd(2)]).
 
 set_stats(Agent,Traits) :-
         clr(stat_total(Agent,_)),
@@ -79,29 +79,29 @@ set_stats(Agent,Traits) :-
                ignore(catch(check_stat_total(Agent),E2,dmsg(E2:check_stat_total(Agent)))).
 set_stats(Agent,Traits):-dmsg(warn(failed(set_stats(Agent,Traits)))).
 
-process_stats(Agent,str(Y)) :-
-	add(str(Agent,Y)),
-	must_det((health(Agent,Dam),number(Dam))),
+process_stats(Agent,mudStr(Y)) :-
+	add(mudStr(Agent,Y)),
+	must_det((mudHealth(Agent,Dam),number(Dam))),
 	NewDam is (Dam + ((Y * 5) - 10)),
-	add(health(Agent,NewDam)),
+	add(mudHealth(Agent,NewDam)),
 	add(stat_total(Agent,+Y)).
 
-process_stats(Agent,height(Ht)) :-
-	add(height(Agent,Ht)),
+process_stats(Agent,mudHeight(Ht)) :-
+	add(mudHeight(Agent,Ht)),
 	add(stat_total(Agent,+Ht)).
 
-process_stats(Agent,stm(Stm)) :-
-	add(stm(Agent,Stm)),
-	req(health(Agent,Dam)),
+process_stats(Agent,mudStm(Stm)) :-
+	add(mudStm(Agent,Stm)),
+	req(mudHealth(Agent,Dam)),
 	NewDam is (((Stm * 10) - 20) + Dam),
-	add(health(Agent,NewDam)),
-	req(charge(Agent,NRG)),
+	add(mudHealth(Agent,NewDam)),
+	req(mudCharge(Agent,NRG)),
 	Charge is (((Stm * 10) - 20) + NRG),
-	add(charge(Agent,Charge)),
+	add(mudCharge(Agent,Charge)),
 	add(stat_total(Agent,+Stm)).
 
-process_stats(Agent,spd(Spd)) :-
-	add(spd(Agent,Spd)),
+process_stats(Agent,mudSpd(Spd)) :-
+	add(mudSpd(Agent,Spd)),
 	add(stat_total(Agent,+Spd)).
 
 process_stats(Agent,Stat) :- add(props(Agent,[Stat])).
@@ -118,5 +118,3 @@ check_stat_total(Agent) :-
 	nl,
 	abort.
 check_stat_total(_).
-
-

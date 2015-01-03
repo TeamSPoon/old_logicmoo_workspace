@@ -29,8 +29,8 @@ alt_forms0(P,NP):-alt_forms1(P,M),alt_forms1(M,NP).
 alt_forms0(P,NP):-alt_forms1(P,NP).
 
 
-alt_forms1(atloc(P,L),localityOfObject(P,R)):-ground(atloc(P,L)),once(locationToRegion(L,R)),nonvar(R).
-alt_forms1(localityOfObject(P,R),atloc(P,L)):-ground(localityOfObject(P,R)),is_asserted(atloc(P,L)),nonvar(L),once(locationToRegion(L,R)).
+alt_forms1(mudAtLoc(P,L),localityOfObject(P,R)):-ground(mudAtLoc(P,L)),once(locationToRegion(L,R)),nonvar(R).
+alt_forms1(localityOfObject(P,R),mudAtLoc(P,L)):-ground(localityOfObject(P,R)),is_asserted(mudAtLoc(P,L)),nonvar(L),once(locationToRegion(L,R)).
 alt_forms1(P,NP):-P=..[F,A,B|R],alt_forms2(F,A,B,R,NP). 
 
 alt_forms2(F,A,B,R,NP):-dbase_t(genlInverse,F,FF),NP=..[FF,B,A|R].
@@ -56,11 +56,11 @@ run_deduce_facts_from(Type,Fact):-loop_check_local(run_deduce_facts_from_lc(Type
 run_deduce_facts_from_lc(Type,Fact):-doall((call_no_cuts(deduce_facts(Fact,Deduction)),add_deduction(Type,Deduction,Fact))).
 
 
-decl_database_hook(assert(_),atloc(R,W)):- isa(R,region),trace_or_throw(atloc(R,W)).
+decl_database_hook(assert(_),mudAtLoc(R,W)):- mudIsa(R,tRegion),trace_or_throw(mudAtLoc(R,W)).
 
 
-deduce_facts(localityOfObject(_,Region),isa(Region,spatialthing)).
-deduce_facts(localityOfObject(Obj,_),isa(Obj,obj)).
+deduce_facts(localityOfObject(_,Region),mudIsa(Region,tSpatialthing)).
+deduce_facts(localityOfObject(Obj,_),mudIsa(Obj,tObj)).
 
 deduce_facts(Fact,mpred_prop(AF,[argsIsaInList(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],argsIsaProps(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,
                 ArgTs=..[AF|ARGS],!,must_det(ground(ARGS)).
@@ -73,17 +73,17 @@ deduce_facts(mpred_prop(F,argsIsaInList(ArgTs)),argsIsaInList(ArgTs)):-mpred_ari
 deduce_facts(argsIsaInList(ArgTs),argIsa(F,A,Type)):-ztrace,functor(ArgTs,F,_),arg(A,ArgTs,Type).
 deduce_facts(mpred_prop(F,argsIsaInList(ArgTs)),argIsa(F,A,Type)):-arg(A,ArgTs,Type).
 
-deduce_facts(argIsa(F,_A,Type),[isa(Type,col),isa(F,relation)]):-atom(Type),not(hasInstance(formattype,Type)).
+deduce_facts(argIsa(F,_A,Type),[mudIsa(Type,tCol),mudIsa(F,tRelation)]):-atom(Type),not(hasInstance(tFormattype,Type)).
 
 %deduce_facts(B,A):- is_asserted(equivRule(B,A)),not(contains_singletons(A)).
 %deduce_facts(B,A):- is_asserted(equivRule(A,B)),not(contains_singletons(A)).
 deduce_facts(Term,NewTerm):- hotrace(good_for_chaining(Op,Term)), db_rewrite(Op,Term,NewTerm),not(contains_singletons(NewTerm)).
 
 
-fix_argIsa(F,N,dir(Val),dir):-add(mpred_prop(F,default_sv(N,Val))),!.
-fix_argIsa(F,N,int(Val),int):-add(mpred_prop(F,default_sv(N,Val))),!.
-fix_argIsa(_,_,list(Type),list(Type)):-!.
-fix_argIsa(_,_,formatted(Type),formatted(Type)):-!.
+fix_argIsa(F,N,ftDir(Val),ftDir):-add(mpred_prop(F,default_sv(N,Val))),!.
+fix_argIsa(F,N,ftInt(Val),ftInt):-add(mpred_prop(F,default_sv(N,Val))),!.
+fix_argIsa(_,_,ftList(Type),ftList(Type)):-!.
+fix_argIsa(_,_,tFormatted(Type),tFormatted(Type)):-!.
 fix_argIsa(_,_,Arg,Arg).
 fix_argIsa(F,N,Type,F):-compound(Type),Type=..[F,Val],isa_backchaing(Val,F),decl_mpred(F,default_sv(N,Val)),!.
 
@@ -99,7 +99,7 @@ decl_database_hook(assert(_),argsIsaInList(ArgTs)):-
 
 :-swi_export(add_deduction/3).
 quiet_fact(Fact):-functor(Fact,F,A),quiet_fact(F,A).
-quiet_fact(isa,_).
+quiet_fact(mudIsa,_).
 quiet_fact(argIsa,_).
 quiet_fact(mpred_prop,_).
 
@@ -111,7 +111,7 @@ add_deduction_lc(Type,Fact,_How):-quiet_fact(Fact),!,do_deduction_type(Type,Fact
 add_deduction_lc(Type,Fact,How):-dmsg(add_deduction(Type,Fact,'_________from________',How)),do_deduction_type(Type,Fact),!.
 
 do_deduction_type(assert(_),Fact):-add(Fact).
-do_deduction_type(retract(_),Fact):-functor(Fact,F,A),(F=isa;F=mpred_prop;A=1),!.
+do_deduction_type(retract(_),Fact):-functor(Fact,F,A),(F=mudIsa;F=mpred_prop;A=1),!.
 do_deduction_type(retract(_),Fact):-clr(Fact).
 
 /*
@@ -123,5 +123,3 @@ a :- \++ b. % a if b is not provable
 a :- not b. % a if b fails
 a :- b -> c;d. % a if (if b then c else d)
 */
-
-

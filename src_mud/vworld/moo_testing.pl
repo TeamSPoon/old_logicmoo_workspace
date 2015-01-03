@@ -34,17 +34,17 @@
 run_mud_tests:-
   forall(mud_test(Name,Test),run_mud_test(Name,Test)).
 
-action_info(tests,"run run_mud_tests/:").
+action_info(actTests,"run run_mud_tests/:").
 
-agent_call_command(_Agent,tests) :- scan_updates, run_mud_tests.
-
-
-action_info(test(term),"run tests containing term").
-
-agent_call_command(Agent,test(Obj)):-foc_current_player(Agent),run_mud_test(Obj).
+agent_call_command(_Agent,actTests) :- scan_updates, run_mud_tests.
 
 
-test_name(String):-fmt(start_moo_test(named(String))),asserta(was_test_name(String)).
+action_info(actTest(ftTerm),"run tests containing term").
+
+agent_call_command(Agent,actTest(Obj)):-foc_current_player(Agent),run_mud_test(Obj).
+
+
+test_name(String):-fmt(start_moo_test(mudNamed(String))),asserta(was_test_name(String)).
 last_test_name(String):- was_test_name(String),!.
 last_test_name(unknown).
 
@@ -52,8 +52,8 @@ test_result(Result):-test_result(Result,true).
 
 test_result(Result,SomeGoal):- last_test_name(String),fmt(Result:test_mini_result(Result:String,SomeGoal)).
 
-from_here(_:SomeGoal):-!,functor(SomeGoal,F,_),atom_concat('test',_,F).
-from_here(SomeGoal):-!,functor(SomeGoal,F,_),atom_concat('test',_,F).
+from_here(_:SomeGoal):-!,functor(SomeGoal,F,_),atom_concat(actTest,_,F).
+from_here(SomeGoal):-!,functor(SomeGoal,F,_),atom_concat(actTest,_,F).
 
 test_call(X):- var(X),!, throw(var(test_call(X))).
 test_call(meta_callable(String,test_name(String))):-!,string(String).
@@ -84,9 +84,8 @@ run_mud_test_clause(M:mud_test(Name,Test),B):- forall(B,M:run_mud_test(Name,Test
 
 run_mud_test(Name,Test):-
    fmt(begin_mud_test(Name)),
-   once(ccatch((test_call(Test),fmt(completed_mud_test(Name))),E,fmt(error_mud_test(E, Name)));fmt(tests(incomplet_mud_test(Name)))).
+   once(ccatch((test_call(Test),fmt(completed_mud_test(Name))),E,fmt(error_mud_test(E, Name)));fmt(actTests(incomplet_mud_test(Name)))).
 
 :- module_predicates_are_exported.
 
 :- module_meta_predicates_are_transparent(moo_testing).
-

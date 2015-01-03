@@ -16,31 +16,29 @@
 */
 
 % :-swi_module(user). 
-:-swi_module(eat, []).
+:-swi_module(actEat, []).
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- register_module_type(tCommand).
 
-subclass(food,eatable).
-action_info(eat(eatable),"nourish oneself").
+mudSubclass(tFood,tEatable).
+action_info(actEat(tEatable),"nourish oneself").
 
 % Eat something held
 % Check to make sure it's in the agents possession... 
 % if it is, process it's worth, then destroy it
-agent_call_command(Agent,eat(SObj)) :-
-	possess(Agent,Obj),
+agent_call_command(Agent,actEat(SObj)) :-
+	mudPossess(Agent,Obj),
         match_object(SObj,Obj),
-	must((do_act_affect(Agent,eat,Obj))),
-	del(possess(Agent,Obj)),
-        must(not(possess(Agent,Obj))),
-	must((call_update_charge(Agent,eat))).
+	must((do_act_affect(Agent,actEat,Obj))),
+	del(mudPossess(Agent,Obj)),
+        must(not(mudPossess(Agent,Obj))),
+	must((call_update_charge(Agent,actEat))).
 
-update_charge(Agent,eat) :-
-	del(charge(Agent,Old)),
+update_charge(Agent,actEat) :-
+	del(mudCharge(Agent,Old)),
 	New is Old - 1,
-	add(charge(Agent,New)).
+	add(mudCharge(Agent,New)).
 
 :- include(logicmoo(vworld/moo_footer)).
-
-

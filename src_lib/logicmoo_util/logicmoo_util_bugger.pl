@@ -2176,6 +2176,7 @@ loggerFmtReal(S,F,A):-
 :-moo_hide_childs(stack_check/2).
 stack_depth(Level):-notrace((prolog_current_frame(Frame),prolog_frame_attribute(Frame,level,Level))).
 
+stack_check:-!.
 stack_check:-stack_check(3000).
 stack_check(BreakIfOver):- stack_check_else(BreakIfOver, trace_or_throw(stack_check(BreakIfOver))).
 stack_check(BreakIfOver,Error):- stack_check_else(BreakIfOver, trace_or_throw(stack_check(BreakIfOver,Error))).

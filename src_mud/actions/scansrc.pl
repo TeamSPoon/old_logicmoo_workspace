@@ -7,11 +7,11 @@
 %
 */
 %
-:-swi_module(scansrc, []).
+:-swi_module(actScansrc, []).
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- register_module_type(tCommand).
 
 :- swi_export(found_undef/3).
 found_undef(_,_,_).
@@ -49,11 +49,11 @@ remove_undef_search:- ((
  assert((check:list_undefined(A):- ignore(A=[]),scansrc_list_undefined(A))))).
 
 
-action_info(scansrc,"Scan for sourcecode modifed on filesystem and TeamSPoon. NOTE: only new files with this mask (src_incoming/*/?*.pl) are picked up on").
-agent_call_command(Agent,scansrc):-  once('@'(agent_call_safely(Agent,scansrc),'user')).
+action_info(actScansrc,"Scan for sourcecode modifed on filesystem and TeamSPoon. NOTE: only new files with this mask (src_incoming/*/?*.pl) are picked up on").
+agent_call_command(Agent,actScansrc):-  once('@'(agent_call_safely(Agent,actScansrc),'user')).
 
-:-swi_export(scansrc/0).
-scansrc :- 
+:-swi_export(actScansrc/0).
+actScansrc :- 
  ensure_loaded(library(make)),
  debugOnError((
   reload_library_index,

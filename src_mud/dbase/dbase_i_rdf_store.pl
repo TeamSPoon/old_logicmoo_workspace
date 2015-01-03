@@ -1,3 +1,5 @@
+end_of_file.
+
 :-module(dbase_rdf_store, [dbase_rdf/3,po/2,rdf_object/1,rdf_assert_hook/1 ]).
 
 /** <module> MUD STORE
@@ -132,17 +134,17 @@ rdf_current_resource(NS:Atom):-rdf_global_object(NS:Atom,URL),!,rdf_current_reso
 rdf_current_resource(O):-(rdf_resource(O);rdf_current_predicate(O)). % aalready included rdf_subject(O).
 
 prolog_to_qname(A,_):-not(atom(A)),!,fail.
-prolog_to_qname(a,rdf:type).
-prolog_to_qname(int,xsd:integer).
+prolog_to_qname(a,rdf:tType).
+prolog_to_qname(ftInt,xsd:integer).
 
-prolog_to_qname(Atom,knowrob:Proper):-atom(Atom),current_predicate(isa/2),isa(Atom,col),toPropercase(Atom,Proper),rdf_current_resource(knowrob:Proper),!.
+prolog_to_qname(Atom,knowrob:Proper):-atom(Atom),current_predicate(mudIsa/2),mudIsa(Atom,tCol),toPropercase(Atom,Proper),rdf_current_resource(knowrob:Proper),!.
 prolog_to_qname([],rdf:nil).
 prolog_to_qname(P,O):-po(P,C),P\=C,!,(prolog_to_qname(O,C);O=C).
 prolog_to_qname(Atom,NS:Atom):-rdf_current_prefix(NS,_),rdf_global_object(NS:Atom,URL),rdf_current_resource(URL).
 prolog_to_qname(URL,_):-not(is_url(URL)),!,fail.
 prolog_to_qname(URL,NS:Atom):-rdf_global_object(NS:Atom,URL).
 prolog_to_qname('http://www.w3.org/1999/02/22-rdf-syntax-ns#first',rdf:first).
-prolog_to_qname('http://www.w3.org/1999/02/22-rdf-syntax-ns#type',rdf:type).
+prolog_to_qname('http://www.w3.org/1999/02/22-rdf-syntax-ns#type',rdf:tType).
 prolog_to_qname('http://www.w3.org/1999/02/22-rdf-syntax-ns#',rdf:'<>').
 prolog_to_qname(URL,Px:Rest):-concat_atom([NS,Rest],'#',URL),atom_concat(NS,'#',NSH),rdf_current_prefix(Px,NSH),!.
 
@@ -180,9 +182,9 @@ rdf_to_url0(_,S,Sx):-catchv((rdf_global_object(S,Sx),not(compound(Sx))),_,fail),
 rdf_to_url0(G,C,List):-compound(C),C=..[H|T],must(nonvar(G)),!,must(( maplist(rdf_to_url(G),[H|T],HT),!,rdfs_assert_list(HT, List, G))).
 
 
-rdf_to_lit(U,literal(type(xsd:integer, S))):-integer(U),!,atom_string(U,S).
-rdf_to_lit(U,literal(type(xsd:double, S))):-number(U),!,atom_string(U,S).
-rdf_to_lit(U,literal(type(xsd:string, U))):-string(U),!.
+rdf_to_lit(U,literal(tType(xsd:integer, S))):-integer(U),!,atom_string(U,S).
+rdf_to_lit(U,literal(tType(xsd:double, S))):-number(U),!,atom_string(U,S).
+rdf_to_lit(U,literal(tType(xsd:string, U))):-string(U),!.
 
 rdf_to_qname(_,Var,V):-var(Var),!,copy_term(Var,V).
 rdf_to_qname(_,O,P):-p_to_o(O,P),!.
@@ -190,9 +192,9 @@ rdf_to_qname(_,P:S,P:S):-!.
 rdf_to_qname(_,Sx,S):-is_url(Sx),prolog_to_qname(Sx,S0),!,must(S=S0).
 rdf_to_qname(_,Sx,S):-prolog_to_qname(Sx,S0),!,must(S=S0).
 rdf_to_qname(G,Sx,S):-rdfs_list_to_prolog_list(Sx,LL),!,maplist(rdf_to_qname(G),LL,S).
-rdf_to_qname(_,literal(type('http://www.w3.org/2001/XMLSchema#string', Atom)),String):-string_to_atom(String,Atom),!.
-rdf_to_qname(_,literal(type(_, Atom)),Term):-catch(term_to_atom(Term,Atom),_,fail),!.
-rdf_to_qname(_,literal(type(_, String)),Term):-catch(term_string(Term,String),_,fail),!.
+rdf_to_qname(_,literal(tType('http://www.w3.org/2001/XMLSchema#string', Atom)),String):-string_to_atom(String,Atom),!.
+rdf_to_qname(_,literal(tType(_, Atom)),Term):-catch(term_to_atom(Term,Atom),_,fail),!.
+rdf_to_qname(_,literal(tType(_, String)),Term):-catch(term_string(Term,String),_,fail),!.
 rdf_to_qname(_,literal(Sx),S):-!,must(rdf_literal_value_safe(literal(Sx),S)).
 rdf_to_qname(_,Sx,S):-compound(Sx),!,must(rdf_literal_value_safe(Sx,S)).
 rdf_to_qname(_,Sx,node(S)):-atom(Sx),atom_concat('__bnode',S,Sx),!.
@@ -244,14 +246,14 @@ rdf_object(O):-ground(O).
 
 rdf_assert_ignored(mpred_prop(_,arity(1))).
 rdf_assert_ignored(mpred_prop(_,argsIsaInList(_))).
-rdf_assert_ignored(G):-functor(G,F,_),member(F,[hybrid_rule,term_anglify,equivRule]).
+rdf_assert_ignored(G):-functor(G,F,_),member(F,[hybrid_rule,mudTermAnglify,equivRule]).
 rdf_assert_ignored(G):-functor(G,_,1).
 rdf_assert_ignored(G):-  not(ground(G)). 
 
 cyc_to_rdf(mpred_prop(P,PST),svo(F,StubType,S)):- PST=..[StubType,S],rdf_object(S),rdf_to_pred(P,F).
 cyc_to_rdf(argIsa(P,1,D),domain(P,D)).
-cyc_to_rdf(isa(apath(A,Dir),T),isa([apath,A,Dir],T)).
-cyc_to_rdf(pathName(A,Dir,String),named([apath,A,Dir],String)).
+cyc_to_rdf(mudIsa(ftApath(A,Dir),T),mudIsa([ftApath,A,Dir],T)).
+cyc_to_rdf(pathName(A,Dir,String),mudNamed([ftApath,A,Dir],String)).
 cyc_to_rdf(default_sv(PAB, 2, V),type_default(A,[P,self,V])):-PAB=[P,A,_].
 cyc_to_rdf(argIsa(P,2,D),range(P,D)):-mpred_arity(P,2).
 
@@ -261,16 +263,16 @@ rdf_assert_hook(PSO):-rdf_assert_hook0(PSO),!.
 rdf_assert_hook(PSO):-dmsg(once(skipped(rdf_assert_hook(PSO)))).
 
 
-rdf_assert_hook0(label_type_props(A,Food,Props)):-atom_string(A,S),!,must((rdf_assert_hook(default_type_props(Food,[label(S)|Props])))).
+rdf_assert_hook0(mudLabelTypeProps(A,Food,Props)):-atom_string(A,S),!,must((rdf_assert_hook(default_type_props(Food,[label(S)|Props])))).
 rdf_assert_hook0(default_type_props(Food,Props)):-is_list(Props),!,forall(member(P,Props),must(rdf_assert_hook(default_type_props(Food,P)))).
 rdf_assert_hook0(default_type_props(Food,Prop)):-Prop=..[P|ARGS],must(rdf_assert_hook(type_default(Food,[P,self|ARGS]))).
-rdf_assert_hook0(subclass(C,P)):-!,rdf_object(C),rdf_object(P),rdf_assert_x(C,rdfs:subClassOf,P).
-rdf_assert_hook0(description(C,P)):-!,rdf_object(C),rdf_object(P),rdf_assert_x(C,rdfs:comment,P).
-rdf_assert_hook0(isa(Prop,mpred)):- rdf_to_pred(Prop,P),!,rdf_object(P),rdf_assert_x(P,rdf:type,owl:'Property').
-rdf_assert_hook0(isa(Prop,singleValued)):- functor(Prop,P,_),!,rdf_object(P),rdf_assert_x(P,rdf:type,owl:'FunctionalProperty').
-rdf_assert_hook0(arity(W1,N)):-rdf_to_pred(W1,W),N>1,rdf_assert_x(W,rdf:type,owl:'Property').
-rdf_assert_hook0(isa(W,col)):-!,rdf_object(W),rdf_assert_x(W,rdf:type,owl:'Class').
-rdf_assert_hook0(isa(C,P)):-!,rdf_object(C),rdf_object(P),P\=col,rdf_assert_x(C,rdf:type,P).
+rdf_assert_hook0(mudSubclass(C,P)):-!,rdf_object(C),rdf_object(P),rdf_assert_x(C,rdfs:subClassOf,P).
+rdf_assert_hook0(mudDescription(C,P)):-!,rdf_object(C),rdf_object(P),rdf_assert_x(C,rdfs:comment,P).
+rdf_assert_hook0(mudIsa(Prop,tMpred)):- rdf_to_pred(Prop,P),!,rdf_object(P),rdf_assert_x(P,rdf:tType,owl:'Property').
+rdf_assert_hook0(mudIsa(Prop,singleValued)):- functor(Prop,P,_),!,rdf_object(P),rdf_assert_x(P,rdf:tType,owl:'FunctionalProperty').
+rdf_assert_hook0(arity(W1,N)):-rdf_to_pred(W1,W),N>1,rdf_assert_x(W,rdf:tType,owl:'Property').
+rdf_assert_hook0(mudIsa(W,tCol)):-!,rdf_object(W),rdf_assert_x(W,rdf:tType,owl:'Class').
+rdf_assert_hook0(mudIsa(C,P)):-!,rdf_object(C),rdf_object(P),P\=tCol,rdf_assert_x(C,rdf:tType,P).
 rdf_assert_hook0(svo(S,P,O)):-!,must(rdf_assert_x(S,P,O)).
 rdf_assert_hook0(PSO):-PSO=..[P,S,O],!,rdf_assert_x(S,P,O).
 rdf_assert_hook0(PSO):-PSO=..[P,S|O],!,rdf_assert_x(S,P,O).
@@ -282,15 +284,15 @@ rdf_to_url_ignore(G,S,Sxx):-atom(S),prolog_to_qname(S,Sx),!,rdf_to_url(G,Sx,Sxx)
 rdf_to_url_ignore(G,A,B):-rdf_to_url(G,A,BB),ignore(B=BB).
 
 po(mud:O,OO):-nonvar(O),!,po(O,OO).
-po(food,knowrob:'Food').
+po(tFood,knowrob:'Food').
 po(mpred_arity,arity).
-po(col,owl:'Class').
-po(item,knowrob:'HumanScaleObject').
-po(spatialthing,knowrob:'SpatialThing').
-po(subclass,rdfs:subClassOf).
-po(region,knowrob:'FixedStructure').
-po(agent,knowrob:'Agent-Generic').
-po(int,xsd:integer).
+po(tCol,owl:'Class').
+po(tItem,knowrob:'HumanScaleObject').
+po(tSpatialthing,knowrob:'SpatialThing').
+po(mudSubclass,rdfs:subClassOf).
+po(tRegion,knowrob:'FixedStructure').
+po(tAgentGeneric,knowrob:'Agent-Generic').
+po(ftInt,xsd:integer).
 po(string,xsd:string).
 po(F,G:A):-rdf_alias(mud:F,G:A).
 
@@ -302,7 +304,7 @@ o_to_p(O,O).
 p_to_o(P,C):-po(T,C),P==T,!.
 p_to_o(O,O).
 
-dbase_t_rdf(Sc,rdf:type,CC):- /*o_to_p(CC,Oc),*/clause(hasInstance(Oc,Sc),true),p_to_o(Oc,CC).
+dbase_t_rdf(Sc,rdf:tType,CC):- /*o_to_p(CC,Oc),*/clause(hasInstance(Oc,Sc),true),p_to_o(Oc,CC).
 dbase_t_rdf(Sc,Pc,Oc):-dbase_t(Pc,Sc,Oc).
 
 :-export(rdf_assert_x/3).
@@ -320,7 +322,7 @@ rdf_x(S,P,O):- rdf_x(S,P,O,mud).
 :-export(rdf_x/4).
 rdf_x(S,P,O,G):-
   notrace(once((rdf_to_url_io(user,G,Gx,_Gio),rdf_to_url_io(Gx,S,Sx,Sio),rdf_to_url_io(Gx,P,Px,Pio),rdf_to_url_io(Gx,O,Ox,Oio)))),
-                notrace(((nonvar(P)->NeverP=[];NeverP=[rdf:rest,rdf:first,rdf:type]))),
+                notrace(((nonvar(P)->NeverP=[];NeverP=[rdf:ftRest,rdf:first,rdf:tType]))),
                 rdf_db:rdf(Sx,Px,Ox,Gx),
                 rdf_to_prolog_io(G,Pio,Px,P),
                 enforce_never_p(G,P,NeverP),
@@ -339,9 +341,9 @@ dbase_rdf(S,P,O):-
 % http://localhost:3020/servlets/loadLibraryOntology?resultFormat=html&ontology=rdfs
 % http://localhost:3020/servlets/loadLibraryOntology?resultFormat=html&ontology=owl
 
-dbase_rdf(skosxl:prefLabel,   rdf:type, owl:'ObjectProperty').
-dbase_rdf(skosxl:altLabel,    rdf:type, owl:'ObjectProperty').
-dbase_rdf(skosxl:hiddenLabel, rdf:type, owl:'ObjectProperty').
+dbase_rdf(skosxl:prefLabel,   rdf:tType, owl:'ObjectProperty').
+dbase_rdf(skosxl:altLabel,    rdf:tType, owl:'ObjectProperty').
+dbase_rdf(skosxl:hiddenLabel, rdf:tType, owl:'ObjectProperty').
 
 dbase_rdf('http://www.w3.org/2000/01/rdf-schema#ContainerMembershipProperty','http://www.w3.org/2000/01/rdf-schema#subClassOf','http://www.w3.org/1999/02/22-rdf-syntax-ns#Property').
 dbase_rdf('http://www.w3.org/2002/07/owl#someValuesFrom','http://www.w3.org/1999/02/22-rdf-syntax-ns#type','http://www.w3.org/1999/02/22-rdf-syntax-ns#Property').
@@ -368,12 +370,12 @@ dbase_rdf(_, literal(L), _) :-		% idem
 dbase_rdf(S, P, O) :-
 	var(P), !,
 	(   rdf_db:rdf(S,P,O)
-	;   rdf_db:rdf(P, rdf:type, rdf:'Property'),
+	;   rdf_db:rdf(P, rdf:tType, rdf:'Property'),
 	    rdf_db:rdf(S, P, O),
 	    \+ rdf_db:rdf(S,P,O)
 	).
 dbase_rdf(S, P, C) :-
-	rdf_reachable(rdf:type, rdfs:subPropertyOf, P), !,
+	rdf_reachable(rdf:tType, rdfs:subPropertyOf, P), !,
 	individual_of(S, C).
 dbase_rdf(S, P, O) :-					% transitive predicates
 	rdf_reachable(rdfs:subClassOf, rdfs:subPropertyOf, P), !,
@@ -393,7 +395,7 @@ dbase_rdf(S, rdfs:subPropertyOf, O) :- !,
 	    rdfs_subproperty_of(S, O)
 	).
 dbase_rdf(S, serql:directSubClassOf, O) :- !, rdf_has(S, rdfs:subClassOf, O).
-dbase_rdf(S, serql:directType, O) :- !, rdf_has(S, rdf:type, O).
+dbase_rdf(S, serql:directType, O) :- !, rdf_has(S, rdf:tType, O).
 dbase_rdf(S, serql:directSubPropertyOf, O) :- !, rdf_has(S, rdfs:subPropertyOf, O).
 dbase_rdf(S, P, O) :- rdf_has(S, P, O).
 
@@ -431,7 +433,7 @@ dbase_individual_of(Resource, Class) :-
 dbase_rdf_has_type(Resource, Class) :-
 	empty_nb_set(Set),
 	(   atom(Resource)
-	->  (   rdf_has(Resource, rdf:type, Class)
+	->  (   rdf_has(Resource, rdf:tType, Class)
 	    ;	rdf_db:rdf(Resource, P, _),
 		rdf_has(P, rdfs:domain, Class)
 	    ;	rdf_db:rdf(_, P, Resource),
@@ -440,7 +442,7 @@ dbase_rdf_has_type(Resource, Class) :-
 	    add_nb_set(Class, Set, New),
 	    New == true
 	;   atom(Class)
-	->  (	rdf_has(Resource, rdf:type, Class)
+	->  (	rdf_has(Resource, rdf:tType, Class)
 	    ;	rdf_has(P, rdfs:domain, Class),
 		rdf_has(Resource, P, _)
 	    ;	rdf_has(P, rdfs:range, Class),
@@ -468,11 +470,10 @@ sync_rdf:-
    forall(disjointWith0(A,B),rdf_assert_hook(disjointWith(A,B))),
    forall(is_known_trew(B),rdf_assert_hook(B)),
    forall(dbase_t(P,S,O),rdf_assert_hook(svo(S,P,O))),
-   forall(po(P,O),rdf_assert_hook(subclass(P,O))),
-   forall(hasInstance(C,I),rdf_assert_hook(isa(I,C))).
+   forall(po(P,O),rdf_assert_hook(mudSubclass(P,O))),
+   forall(hasInstance(C,I),rdf_assert_hook(mudIsa(I,C))).
 
-:-sync_rdf.
+:- sync_rdf.
 
 :- multifile(user:call_OnEachLoad/1).
 :- asserta_if_new(user:call_OnEachLoad(sync_rdf)).
-

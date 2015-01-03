@@ -19,7 +19,7 @@
 parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):- 
    catch(( parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD),
          nonvar(CMD),must(nonvar(NewAgent))),'$aborted',true),
-         ignore((CMD=tick)),ignore((NewAgent=Agent)).
+         ignore((CMD=actTick)),ignore((NewAgent=Agent)).
 
 parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):- 
    debugging(parser), trace, parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD).
@@ -67,9 +67,9 @@ call_agent_action(Agent,CMDI):-
       call(Wrapper, call_agent_action_lc(Agent,CMD)))).
 
 :-swi_export(where_atloc/2).
-where_atloc(Agent,Where):-atloc(Agent,Where).
+where_atloc(Agent,Where):-mudAtLoc(Agent,Where).
 where_atloc(Agent,Where):-localityOfObject(Agent,Where).
-where_atloc(Agent,Where):-atloc(Agent,Loc),!,locationToRegion(Loc,Where).
+where_atloc(Agent,Where):-mudAtLoc(Agent,Loc),!,locationToRegion(Loc,Where).
 where_atloc(Agent,'OffStage'):-nonvar(Agent).
 
 call_agent_action_lc(Agent,CMD):-
@@ -82,7 +82,7 @@ call_agent_action_lc(Agent,CMD):-
 send_command_completed_message(Agent,Where,Done,CMD):-
      ignore((must_det_l([flush_output,renumbervars(CMD,SCMD),Message =..[Done,Agent,SCMD],
                 raise_location_event(Where,notice(reciever,Message)),
-                padd(Agent,last_command(SCMD)),flush_output]))),!.
+                padd(Agent,mudLastCommand(SCMD)),flush_output]))),!.
 
 
 % complete event
@@ -104,21 +104,21 @@ current_agent_or_var(_).
 get_agent_session(P,O):- (thlocal:session_agent(O,P);thglobal:global_session_agent(O,P)).
 
 foc_current_player(P):- current_agent(P),nonvar(P),!.
-foc_current_player(P):- nonvar(P),agent(P),become_player(P),!.
+foc_current_player(P):- nonvar(P),tAgentGeneric(P),become_player(P),!.
 foc_current_player(P):- 
   prolog_must_l([    
              get_session_id(O),
              once(get_dettached_npc(P);generate_new_player(P)),
                retractall(thglobal:global_session_agent(O,P)),
-              asserta(thglobal:global_session_agent(O,P)),assert_isa(P,human_player),must_det(create_agent(P))]),!.
+              asserta(thglobal:global_session_agent(O,P)),assert_isa(P,tHumanPlayer),must_det(create_agent(P))]),!.
 
 
-get_dettached_npc(P):-random_instance_no_throw(agent,P,true),not(isa(P,human_player)),!.
+get_dettached_npc(P):-random_instance_no_throw(tAgentGeneric,P,true),not(mudIsa(P,tHumanPlayer)),!.
 
 % generate_new_player(P):- req(agent(P)),!.
-generate_new_player(P):- prolog_must_l([gensym(player,N),not((isa_asserted(N,agent))),P=explorer(N),ensure_new_player(P)]),!.
+generate_new_player(P):- prolog_must_l([gensym(tPlayer,N),not((isa_asserted(N,tAgentGeneric))),P=tExplorer(N),ensure_new_player(P)]),!.
 
-ensure_new_player(P):- prolog_must_l([assert_isa(P,explorer),assert_isa(P,player),assert_isa(P,agent)]),!.
+ensure_new_player(P):- prolog_must_l([assert_isa(P,tExplorer),assert_isa(P,tPlayer),assert_isa(P,tAgentGeneric)]),!.
 
 detatch_player(P):- thglobal:global_session_agent(_,P),!,trace_or_throw(detatch_player(P)).
 detatch_player(_).
@@ -132,7 +132,7 @@ become_player(_Old,NewName):-become_player(NewName).
 % Lists all the agents in the run. Except for other monsters.
 list_agents(Agents) :- agent_list(Agents), !.
 list_agents(Agents) :- % build cache
-	findall(NearAgent,req(agent(NearAgent)),Agents),
+	findall(NearAgent,req(tAgentGeneric(NearAgent)),Agents),
 	assert(agent_list(Agents)),!.
 
 :-swi_export((agent_into_corpse/1, display_stats/1)).
@@ -140,23 +140,22 @@ list_agents(Agents) :- % build cache
 % When an agent dies, it turns into a corpse.
 % corpse is defined as an object in the *.objects.pl files
 agent_into_corpse(Agent) :-
-	del(atloc(Agent,LOC)),
-	clr(str(Agent,_)),
-	clr(height(Agent,_)),
-	clr(stm(Agent,_)),
-	clr(spd(Agent,_)),
-	add(atloc(corpse(Agent),LOC)).
+	del(mudAtLoc(Agent,LOC)),
+	clr(mudStr(Agent,_)),
+	clr(mudHeight(Agent,_)),
+	clr(mudStm(Agent,_)),
+	clr(mudSpd(Agent,_)),
+	add(mudAtLoc(corpse(Agent),LOC)).
 
 % Displays all the agents stats. Used at end of a run.
 display_stats(Agents) :-
 	forall(member(Agent,Agents),
-	          (charge(Agent,Chg),
-		  health(Agent,Dam),
-		  score(Agent,Scr),
-		  findall(Obj,possess(Agent,Obj),Inv),
+	          (mudCharge(Agent,Chg),
+		  mudHealth(Agent,Dam),
+		  mudScore(Agent,Scr),
+		  findall(Obj,mudPossess(Agent,Obj),Inv),
 		  write('Agent = '), write(Agent), nl,
 		  write('Charge = '), write(Chg), write('  '),
 		  write('Dam= ' ), write(Dam), write('  '),
 		  write('Score = '), write(Scr), nl,
 		  write('Inventory = '), write(Inv), nl)).
-

@@ -17,4 +17,3 @@
 % :- loading_module_h(CM), (context_module(CM) -> retract(loading_module_h(CM)) ; true).
 % :- context_module(CM),(registered_module_type(utility,CM))->module_predicates_are_exported(CM);module_predicates_are_exported(CM).
 % :- retract(loading_module_h(_)).
-

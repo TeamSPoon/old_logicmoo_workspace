@@ -17,27 +17,25 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(command).
+:- register_module_type(tCommand).
 
 % put
-action_info(put(throwable,prepstr_spatial,hasobjs),"put [obj] [onto|inside] [somewhere]").
+action_info(put(tThrowable,prepstr_spatial,tHasobjs),"put [obj] [onto|inside] [somewhere]").
 
 verb_alias(set,put).
 verb_alias(place,put).
-verb_alias(hide,put).
+verb_alias(actHide,put).
 verb_alias(display,put).
-verb_alias(stow,put).
+verb_alias(actStow,put).
 
 %targeted
 agent_call_command(_Agent,put(Other,_Prep,Where)):-
-   coerce(Other,obj,Target),
-   coerce(Where,hasobjs,Location),
+   coerce(Other,tObj,Target),
+   coerce(Where,tHasobjs,Location),
    clr(localityOfObject(Target,_)),
-   clr(atloc(Target,_)),
+   clr(mudAtLoc(Target,_)),
    to_3d(Location,Where3D),
-   add(atloc(Where3D,Location)).
+   add(mudAtLoc(Where3D,Location)).
 
 
 :- include(logicmoo(vworld/moo_footer)).
-
-

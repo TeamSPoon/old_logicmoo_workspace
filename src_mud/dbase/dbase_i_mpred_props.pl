@@ -30,7 +30,7 @@ mpred_prop(mpred_prop,prologOnly).
 
 
 decl_database_hook(assert(_),Fact):- ignore((compound(Fact),Fact=..[F,Arg1|PROPS],argsIsaProps(F),decl_mpred(Arg1,[F|PROPS]))).
-decl_database_hook(assert(_),isa(F,P)):- argsIsaProps(P),decl_mpred(F,P).
+decl_database_hook(assert(_),mudIsa(F,P)):- argsIsaProps(P),decl_mpred(F,P).
 decl_database_hook(assert(_),mpred_prop(F,stubType(Stub))):-mpred_arity(F,A),declare_dbase_stub(F,A,Stub).
 % this causes too many bugs decl_database_hook(assert(_),mpred_prop(F,arity(A))):- ignore((A==1,atom(F),not(never_type(F)),not(mpred_prop(F,prologOnly)),decl_type(F))).
 decl_database_hook(assert(_),mpred_prop(F,P)):- decl_mpred(F,P).
@@ -40,16 +40,16 @@ mpred_arity(mpred_prop,2).
 mpred_arity(mpred_arity,2).
 mpred_arity(never_type,1).
 mpred_arity(singleValued,1).
-mpred_arity(term_anglify,2).
+mpred_arity(mudTermAnglify,2).
 mpred_arity(equivRule,2).
 
 never_type(Var):-var(Var),!,trace_or_throw(var_never_type(Var)).
 never_type('Area1000').
-never_type(subft).
+never_type(mudSubft).
 never_type(must).
 never_type(mpred_prop).
-never_type(ft_info).
-never_type(C):- compound(C),functor(C,F,1),isa_asserted(F,col).
+never_type(mudFtInfo).
+never_type(C):- compound(C),functor(C,F,1),isa_asserted(F,tCol).
 never_type(F):- mpred_arity(F,A),!, A > 1.
 
 :-op(0,fx,((decl_mpred_hybrid))).
@@ -127,7 +127,7 @@ ensure_clause(HEAD,F,_A,BODY):- assertz((HEAD:-BODY)),
 :-swi_export(argsIsaProps/1).
 argsIsaProps(Prop):- 
 	arg(_,v(argsIsaInList,multiValued,singleValued,assertionMacroHead,prologBuiltin,nonGroundOK,prologOnly,
-		ordered,negationByFailure,formatted,prologHybrid,mpred,listValued),Prop).
+		tOrdered,negationByFailure,tFormatted,prologHybrid,tMpred,listValued),Prop).
 
 mpred_arity(Prop,1):-argsIsaProps(Prop).
 mpred_arity(F,A):- current_predicate(F/A).
@@ -135,15 +135,15 @@ mpred_prop(H,PP):-compound(H),predicate_property(H,PP).
 mpred_prop(F,PP):-mpred_arity(F,A),functor(H,F,A),predicate_property(H,PP).
 mpred_prop(P,Prop):- argsIsaProps(Prop),hasInstance(Prop, P).
 mpred_prop(F,Prop):- mpred_arity(F,A),functor(P,F,A),predicate_property(P,Prop).
-mpred_prop(F,col):- col(F).
+mpred_prop(F,tCol):- tCol(F).
 mpred_prop(H,PP):- nonvar(H),functor_h(H,F), H \=@= F, !,mpred_prop(F,PP).
 mpred_prop(F,PP):- hasInstance(PP,F).
 mpred_prop(mpred_prop,prologOnly).
 mpred_prop(mpred_arity,prologOnly).
 mpred_prop(never_type,prologOnly).
-mpred_prop(subft, completeExtentAsserted).
-mpred_prop(ft_info, completeExtentAsserted).
-mpred_prop(G,assert_with_pred(add)):- atom(G),assertionMacroHead(G).
+mpred_prop(mudSubft, completeExtentAsserted).
+mpred_prop(mudFtInfo, completeExtentAsserted).
+mpred_prop(G,mudAssertWithPred(add)):- atom(G),assertionMacroHead(G).
 mpred_prop(G,query_with_pred(ireq)):- atom(G),assertionMacroHead(G).
 mpred_prop(G,retract_with_pred(del)):- atom(G),assertionMacroHead(G).
 mpred_prop(F,mped_type(Type)):-nonvar(F),once(get_mpred_type(F,Type)).
@@ -378,7 +378,7 @@ rescan_mpred_props_lc.
 
 decl_mpred((A,B)):-decl_mpred(A),decl_mpred(B).
 decl_mpred(M):-loop_check_local(with_pi(M,decl_mpred_1),true).
-decl_mpred_1(_,F,F/0):-!,assert_hasInstance(mpred,F).
+decl_mpred_1(_,F,F/0):-!,assert_hasInstance(tMpred,F).
 decl_mpred_1(M,PI,F/A):-
    decl_mpred(F,A),
    ignore((ground(PI),compound(PI),decl_mpred(F,argsIsaInList(PI)))),
@@ -388,7 +388,7 @@ decl_mpred_1(M,PI,F/A):-
 decl_mpred(C,More):- ignore(loop_check(decl_mpred_0(C,More),true)).
 
 decl_mpred_0(C,More):- (var(C);var(More)), trace_or_throw(var_decl_mpred(C,More)).
-decl_mpred_0(F,mpred):-!, assert_hasInstance(mpred,F).
+decl_mpred_0(F,tMpred):-!, assert_hasInstance(tMpred,F).
 decl_mpred_0(_,[]):-!.
 decl_mpred_0(M:FA,More):-atom(M),!,decl_mpred_0(FA,[ask_module(M)|More]).
 decl_mpred_0(F/A,More):-atom(F),!,decl_mpred_1(F,arity(A)),decl_mpred(F,More),!.
@@ -470,5 +470,3 @@ add_mpred_prop_gleaned_4(Arg1,_F,[ARG|_],FRGS):-nonvar(ARG),!,decl_mpred(Arg1,[a
 add_mpred_prop_gleaned_4(Arg1,_F,_,FRGS):-decl_mpred(Arg1,FRGS).
 
 user:term_expansion(G,_):- not(thlocal:into_form_code),notrace((once(glean_pred_props_maybe(G)),fail)).
-
-

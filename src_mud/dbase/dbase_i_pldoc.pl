@@ -1,4 +1,3 @@
-
 :- module(dbase_i_pldoc,
 	  [ 		% +Source, +OutStream, +Options
           source_to_txt/3,
@@ -42,11 +41,11 @@ use_term_listing(M:HO,H,B):-!,use_term_listing(module(M),H,B),!,use_term_listing
 use_term_listing(F/A,H,_):-atom(F),functor(H,F,A),!.
 use_term_listing(h(P),H,_):-!,use_term_listing(P,H,666666).
 use_term_listing(b(P),_,B):-!,use_term_listing(P,666666,B).
-use_term_listing(HO,H,B):- string(HO),!, use_term_listing_2(contains,HO,H,B).
-use_term_listing(contains(HO),H,B):-!, use_term_listing_2(contains,HO,H,B).
+use_term_listing(HO,H,B):- string(HO),!, use_term_listing_2(mudContains,HO,H,B).
+use_term_listing(mudContains(HO),H,B):-!, use_term_listing_2(mudContains,HO,H,B).
 use_term_listing(HO,H,B):- !,use_term_listing_2(exact,HO,H,B).
 
-use_term_listing_2(contains,HO,H,B):- any_to_string(HO,HS),!, with_output_to(string(H1B1),write_canonical((H:-B))), (sub_atom_icasechk(HS,_,H1B1);sub_atom_icasechk(H1B1,_,HS)),!.
+use_term_listing_2(mudContains,HO,H,B):- any_to_string(HO,HS),!, with_output_to(string(H1B1),write_canonical((H:-B))), (sub_atom_icasechk(HS,_,H1B1);sub_atom_icasechk(H1B1,_,HS)),!.
 use_term_listing_2(exact,HO,H,B):- contains_var(HO,(H:-B)).
 
 use_term_listing(HO,(H:-B)):-!, synth_clause_db(H,B), use_term_listing(HO,H,B).
@@ -136,43 +135,49 @@ write_count(H,N):- writeq(H:N),write(', ').
 :-source_to_txt('../src_mud/actions/take.pl').
 
 */
-to_tclass(F,F):- current_predicate(_:F/A),functor(P,F,A),predicate_property(P,built_in).
+:-export(to_tclass/2).
+to_tclass(F,F):- current_predicate(_:F/A),functor(P,F,A),(predicate_property(P,built_in);predicate_property(P, nodebug );predicate_property(P, meta_predicate(P) )).
 to_tclass(F,F):-atom_string(F,S),string_lower(S,L),S\=L,!.
-to_tclass(agent,tAgentGeneric).
-to_tclass(item,tItem).
-to_tclass(atloc,propAtLoc).
-to_tclass(possess,propPossess).
-to_tclass(charge,propCharge).
-to_tclass(drop,actDrop).
-to_tclass(Prop,New):- formattype(Prop),ensure_starts_with_prefix(Prop,ft,New),!.
-to_tclass(Prop,New):- mpred_arity(Prop,1),mpred_arity(Prop,col),ensure_starts_with_prefix(Prop,t,New),!.
-to_tclass(Prop,New):- mpred_prop(Prop,prologHybrid),mpred_arity(Prop,M),M>1,mpred_prop(Prop,argsIsaInList(_)),ensure_starts_with_prefix(Prop,prop,New),!.
+to_tclass(tAgentGeneric,tAgentGeneric).
+to_tclass(tItem,tItem).
+to_tclass(mudAtLoc,mudAtLoc).
+to_tclass(mudPossess,mudPossess).
+to_tclass(mudCharge,mudCharge).
+to_tclass(actDrop,actDrop).
+to_tclass(actJump,actJump).
+
+to_tclass(Prop,New):- tFormattype(Prop),ensure_starts_with_prefix(Prop,ft,New),!.
+to_tclass(Prop,New):- tValuetype(Prop),ensure_starts_with_prefix(Prop,vt,New),!.
+
+to_tclass(Prop,New):- mpred_arity(Prop,1),mpred_arity(Prop,tCol),ensure_starts_with_prefix(Prop,t,New),!.
+to_tclass(Prop,New):- mpred_prop(Prop,prologHybrid),mpred_arity(Prop,M),M>1,mpred_prop(Prop,argsIsaInList(_)),ensure_starts_with_prefix(Prop,mud,New),!.
+to_tclass(Prop,New):- (dbase_t(Prop,_,_);dbase_t(Prop,_,_,_);dbase_t(Prop,_,_,_,_)),ensure_starts_with_prefix(Prop,mud,New),!.
 to_tclass(Prop,New):- is_actverb(Prop),ensure_starts_with_prefix(Prop,act,New),!.
-% to_tclass(Prop,New):- isa(Prop,col),ensure_starts_with_prefix(Prop,t,New),!.
+to_tclass(Prop,New):- mudIsa(Prop,tCol),ensure_starts_with_prefix(Prop,t,New),!.
+to_tclass(Prop,New):- (dbase_t(_,_,Prop);dbase_t(_,_,Prop,_);dbase_t(_,_,_,Prop)),ensure_starts_with_prefix(Prop,v,New),!.
 % to_tclass(Prop,actDrop).
 
-is_actverb(X):-type_action_info(_,PX,_),functor(PX,X,_),!.
-is_actverb(X):-action_info(PX,_),functor(PX,X,_),!.
-is_actverb(X):-action_type(PX),functor(PX,X,_),!.
-is_actverb(X):-posture(PX),functor(PX,X,_),!.
+is_actverb(X):-type_action_info(_,PX,_),functor(PX,X,_).
+is_actverb(X):-action_info(PX,_),functor(PX,X,_).
+is_actverb(X):-tActionType(PX),functor(PX,X,_).
+is_actverb(X):-tPosture(PX),functor(PX,X,_).
 is_actverb(X):-verb_alias(_,X).
 
-ensure_starts_with_prefix(A,Prefix,A):- atom_concat(Prefix,Rest,A),toCamelcase(Rest,CC),toPropercase(CC,PC),!,Rest==PC.
+:-export(ensure_starts_with_prefix/3).
+ensure_starts_with_prefix(A,Prefix,A):- atom_concat(Prefix,Rest,A),toCamelcase(Rest,CC),toPropercase(CC,PC),Rest==PC,!.
 ensure_starts_with_prefix(A,Prefix,B):- toCamelcase(A,CC),toPropercase(CC,PC),!,atom_concat(Prefix,PC,B),!.
  
 
 
 %mpred_prop(Prop,prologHybrid).
 
-transform_term(TermIn,TermOut):-nohtml,get_frag_class(State),transform_term(TermIn,State,TermOut).
+transform_term(TermIn,TermOut):-nohtml,transform_term0(TermIn,TermOut).
 
-transform_term(Term,_,Term):- var(Term),!.
-transform_term(Term,_,TermOut):- atom(Term),atom_length(Term,L),L>2,to_tclass(Term,TermOut),!.
-transform_term(Term,_,Term):-!.
-transform_term(Term,Same,Term):- member(Same,[nofile,functor,int,control,neck,var]),!.
-transform_term(Term,Atom,TermO):-atom(Atom),!,TermO=..[Atom,Term].
-%transform_term(Term,_,Term):-!.
-transform_term(Term,State,nohtml(State,Term)).
+transform_term0(Term,Term):- var(Term),!.
+transform_term0(Term,TermOut):- atom(Term),atom_length(Term,L),L>2,to_tclass(Term,TermOut),!.
+transform_term0([H|T],[HO|TO]):-!,transform_term0(H,HO),transform_term0(T,TO).
+transform_term0(Term,TermO):-compound(Term),Term=..List,maplist(transform_term0,List,ListO),TermO=..ListO.
+transform_term0(Term,Term):-!.
 
 
 
@@ -251,10 +256,10 @@ cross-reference based technology as used by PceEmacs.
 */
 
 :- predicate_options(s_to_html/3, 3,
-		     [ format_comments(boolean),
-		       header(boolean),
-		       skin(callable),
-		       stylesheets(list),
+		     [ format_comments(ftBoolean),
+		       header(ftBoolean),
+		       tSkin(callable),
+		       stylesheets(ftList),
 		       title(atom)
 		     ]).
 
@@ -325,7 +330,7 @@ open_source(Id, Stream) :-
 open_source(File, Stream) :-
 	open(File, read, Stream).
 
-is_meta(skin).
+is_meta(tSkin).
 
 %%	print_html_head(+Out:stream, +Options) is det.
 %
@@ -375,7 +380,7 @@ print_html_footer(Out, Options) :-
 	skin_hook(Out, footer, Options).
 
 skin_hook(Out, Where, Options) :-
-	option(skin(Skin), Options),
+	option(tSkin(Skin), Options),
 	call(Skin, Where, Out), !.
 skin_hook(_, _, _).
 
@@ -660,7 +665,8 @@ read_to(In, End, Codes) :-
 %
 %	Write codes that have been read starting at Line.
 
-write_codes(A,B,C):-transform_codes(A,AA),write_codes1(AA,B,C).
+write_codes(A,B,C):-catch((transform_codes(A,AA),write_codes1(AA,B,C)),E,(dmsg(E:A),fail)).
+write_codes(A,B,C):-write_codes1(A,B,C).
 
 write_codes1([], _, _).
 write_codes1([H|T], L0, Out) :-
@@ -767,9 +773,19 @@ css_class(Term, Class) :-
 element(_,_,_).				% term expanded
 
 
-cp_src(F):-atom_concat('/mnt/mint-oldsys/devel/PrologMUD/',B,F),atom_concat('/mnt/mint-oldsys/devel/PrologMUD/temp~/',B,NF),
+cp_src(F):-atom_concat('/mnt/mint-oldsys/devel/PrologMUD/',B,F),atom_concat('/devel/LogicmooDeveloperFramework/temp~/',B,NF),
+  dmsg(telling(NF)),
    tell(NF),source_to_txt(F),told.
 
 :-export(psaveall/0).
-psaveall:- mmake, forall(enumerate_files('../src_mud/**/*.pl*',F),cp_src(F)),!, forall(enumerate_files('../games/**/*.pl*',F),cp_src(F)).
-
+psaveall:- mmake, forall(enumerate_files('../src_mud/**/*.pl*',F),cp_src(F)).
+:-export(psaveall1/0).
+psaveall1:- mmake, forall(enumerate_files('../src_mud/**/buil*.pl*',F),cp_src(F)).
+:-export(psaveall2/0).
+psaveall2:- forall(enumerate_files('../games/*nan*/*.pl*',F),cp_src(F)).
+:-export(psaveall3/0).
+psaveall3:- forall(enumerate_files('../games/*start*/*.pl*',F),cp_src(F)).
+:-export(psaveall4/0).
+psaveall4:- forall(enumerate_files('../games/*wump*/*.pl*',F),cp_src(F)).
+:-export(psaveall5/0).
+psaveall5:- forall(enumerate_files('../games/*e_sim*/*.pl*',F),cp_src(F)).
