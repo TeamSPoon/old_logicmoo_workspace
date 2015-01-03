@@ -34,17 +34,17 @@ type_grid('SpaceInAHOC',5, [--,--,--,--,--]).
 
 predicates([
 % dynamic startrek
-  nameStrings(term,string),
-  pathName(region,dir,string),
-  localityOfObject(agent,'BPVLocation'),
-  stowed(agent,'ProtectiveAttire'),
-  stowed(agent,'Weapon'),
-  stowed(agent,'PortableObject'),
-  wearsClothing(agent,'ProtectiveAttire'),
-  wearsClothing(agent,'PortableObject'),
+  nameStrings(ftTerm,string),
+  pathName(tRegion,ftDir,string),
+  localityOfObject(tAgentGeneric,'BPVLocation'),
+  mudStowed(tAgentGeneric,'ProtectiveAttire'),
+  mudStowed(tAgentGeneric,'Weapon'),
+  mudStowed(tAgentGeneric,'PortableObject'),
+  wearsClothing(tAgentGeneric,'ProtectiveAttire'),
+  wearsClothing(tAgentGeneric,'PortableObject'),
 
 % static startrek
-  pathBetween('BPVLocation',dir,'BPVLocation'),
+  pathBetween('BPVLocation',ftDir,'BPVLocation'),
   agentRoute(areaPath,'BPVLocation','BPVLocation') ]).
 
 /* Prediate:  agent/1 
@@ -54,27 +54,27 @@ line_count(55).
 number_of_clauses(1).
 Pattern: agent(_G1281). 
  */
-agent('NpcCol1000-Geordi684').
-agent(vacuum(1)).
-agent(explorer(player1)).
-agent('NpcCol1002-Worf720').
-agent('NpcCol1003-Dr-Crusher677').
-agent('NpcCol1004-Troi712').
-agent('NpcCol1005-Riker707').
-agent('NpcCol1006-Picard701').
-agent('NpcCol1007-Guinan689').
-agent('NpcCol1008-OBrien696').
-agent('NpcCol1009-Wesley716').
-agent('NpcCol1010-Livingston726').
-agent('NpcCol1011-Spot727').
-agent('NpcCol1012-Ensign732').
-agent('NpcCol1012-Ensign728').
-agent('NpcCol1012-Ensign736').
-agent('NpcCol1012-Ensign740').
-agent('NpcCol1012-Ensign744').
-agent('NpcCol1012-Ensign748').
-agent('NpcCol1012-Ensign752').
-agent('NpcCol1013-Alexander671').
+tAgentGeneric('NpcCol1000-Geordi684').
+tAgentGeneric(tVacuum(1)).
+tAgentGeneric(tExplorer(player1)).
+tAgentGeneric('NpcCol1002-Worf720').
+tAgentGeneric('NpcCol1003-Dr-Crusher677').
+tAgentGeneric('NpcCol1004-Troi712').
+tAgentGeneric('NpcCol1005-Riker707').
+tAgentGeneric('NpcCol1006-Picard701').
+tAgentGeneric('NpcCol1007-Guinan689').
+tAgentGeneric('NpcCol1008-OBrien696').
+tAgentGeneric('NpcCol1009-Wesley716').
+tAgentGeneric('NpcCol1010-Livingston726').
+tAgentGeneric('NpcCol1011-Spot727').
+tAgentGeneric('NpcCol1012-Ensign732').
+tAgentGeneric('NpcCol1012-Ensign728').
+tAgentGeneric('NpcCol1012-Ensign736').
+tAgentGeneric('NpcCol1012-Ensign740').
+tAgentGeneric('NpcCol1012-Ensign744').
+tAgentGeneric('NpcCol1012-Ensign748').
+tAgentGeneric('NpcCol1012-Ensign752').
+tAgentGeneric('NpcCol1013-Alexander671').
 
  /* found 21 for agent(_G1281). */ 
 
@@ -86,12 +86,12 @@ number_of_clauses(1).
 Pattern: wearsClothing(_G1304,_G1305). 
  */
 somethingIsa('ArtifactCol1005-Boots673',['ArtifactCol1005','ProtectiveAttire','PortableObject','SomethingToWear']).
-wearsClothing(vacuum(1),'ArtifactCol1005-Boots673').
-wearsClothing(vacuum(1),'ArtifactCol1006-Comm-Badge674').
-wearsClothing(vacuum(1),'ArtifactCol1003-Gold-Uniform675').
-wearsClothing(explorer(player1),'ArtifactCol1005-Boots773').
-wearsClothing(explorer(player1),'ArtifactCol1006-Comm-Badge774').
-wearsClothing(explorer(player1),'ArtifactCol1003-Gold-Uniform775').
+wearsClothing(tVacuum(1),'ArtifactCol1005-Boots673').
+wearsClothing(tVacuum(1),'ArtifactCol1006-Comm-Badge674').
+wearsClothing(tVacuum(1),'ArtifactCol1003-Gold-Uniform675').
+wearsClothing(tExplorer(player1),'ArtifactCol1005-Boots773').
+wearsClothing(tExplorer(player1),'ArtifactCol1006-Comm-Badge774').
+wearsClothing(tExplorer(player1),'ArtifactCol1003-Gold-Uniform775').
 wearsClothing('NpcCol1003-Dr-Crusher677','ArtifactCol1005-Boots678').
 wearsClothing('NpcCol1003-Dr-Crusher677','ArtifactCol1006-Comm-Badge679').
 wearsClothing('NpcCol1003-Dr-Crusher677','ArtifactCol1004-Blue-Uniform680').
@@ -149,22 +149,22 @@ line_count(57).
 number_of_clauses(1).
 Pattern: stowed(_G1328,_G1329). 
  */
-stowed(vacuum(1),'ArtifactCol1000-Phaser676').
-stowed(explorer(player1),'ArtifactCol1000-Phaser776').
-stowed('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder681').
-stowed('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder682').
-stowed('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder683').
-stowed('NpcCol1007-Guinan689','ArtifactCol1020-Tea690').
-stowed('NpcCol1007-Guinan689','ArtifactCol1021-Synthehol691').
-stowed('NpcCol1007-Guinan689','ArtifactCol1022-Ferengi-Ale692').
-stowed('NpcCol1007-Guinan689','ArtifactCol1023-Romulan-Whisky693').
-stowed('NpcCol1007-Guinan689','ArtifactCol1024-Lemonade-Prune-Juice694').
-stowed('NpcCol1007-Guinan689','ArtifactCol1025-Vulcan-Beer695').
-stowed('NpcCol1008-OBrien696','ArtifactCol1000-Phaser700').
-stowed('NpcCol1006-Picard701','ArtifactCol1001-5-Phaser-Rifle705').
-stowed('NpcCol1006-Picard701','ArtifactCol1011-5-Picards-Flute706').
-stowed('NpcCol1005-Riker707','ArtifactCol1012-Trombone711').
-stowed('NpcCol1002-Worf720','ArtifactCol1000-Phaser724').
+mudStowed(tVacuum(1),'ArtifactCol1000-Phaser676').
+mudStowed(tExplorer(player1),'ArtifactCol1000-Phaser776').
+mudStowed('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder681').
+mudStowed('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder682').
+mudStowed('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder683').
+mudStowed('NpcCol1007-Guinan689','ArtifactCol1020-Tea690').
+mudStowed('NpcCol1007-Guinan689','ArtifactCol1021-Synthehol691').
+mudStowed('NpcCol1007-Guinan689','ArtifactCol1022-Ferengi-Ale692').
+mudStowed('NpcCol1007-Guinan689','ArtifactCol1023-Romulan-Whisky693').
+mudStowed('NpcCol1007-Guinan689','ArtifactCol1024-Lemonade-Prune-Juice694').
+mudStowed('NpcCol1007-Guinan689','ArtifactCol1025-Vulcan-Beer695').
+mudStowed('NpcCol1008-OBrien696','ArtifactCol1000-Phaser700').
+mudStowed('NpcCol1006-Picard701','ArtifactCol1001-5-Phaser-Rifle705').
+mudStowed('NpcCol1006-Picard701','ArtifactCol1011-5-Picards-Flute706').
+mudStowed('NpcCol1005-Riker707','ArtifactCol1012-Trombone711').
+mudStowed('NpcCol1002-Worf720','ArtifactCol1000-Phaser724').
 
  /* found 16 for stowed(_G1328,_G1329). */ 
 
@@ -175,81 +175,81 @@ line_count(56).
 number_of_clauses(1).
 Pattern: item(_G1352). 
  */
-item('ArtifactCol1000-Phaser676').
-item('ArtifactCol1000-Phaser776').
-item('ArtifactCol1000-Phaser700').
-item('ArtifactCol1000-Phaser724').
-item('ArtifactCol1001-5-Phaser-Rifle705').
-item('ArtifactCol1002-Red-Uniform704').
-item('ArtifactCol1002-Red-Uniform710').
-item('ArtifactCol1002-Red-Uniform719').
-item('ArtifactCol1002-Red-Uniform739').
-item('ArtifactCol1002-Red-Uniform743').
-item('ArtifactCol1003-Gold-Uniform675').
-item('ArtifactCol1003-Gold-Uniform775').
-item('ArtifactCol1003-Gold-Uniform687').
-item('ArtifactCol1003-Gold-Uniform699').
-item('ArtifactCol1003-Gold-Uniform723').
-item('ArtifactCol1003-Gold-Uniform731').
-item('ArtifactCol1003-Gold-Uniform735').
-item('ArtifactCol1004-Blue-Uniform680').
-item('ArtifactCol1004-Blue-Uniform715').
-item('ArtifactCol1004-Blue-Uniform747').
-item('ArtifactCol1004-Blue-Uniform751').
-item('ArtifactCol1004-Blue-Uniform755').
-item('ArtifactCol1005-Boots673').
-item('ArtifactCol1005-Boots773').
-item('ArtifactCol1005-Boots678').
-item('ArtifactCol1005-Boots685').
-item('ArtifactCol1005-Boots697').
-item('ArtifactCol1005-Boots702').
-item('ArtifactCol1005-Boots708').
-item('ArtifactCol1005-Boots713').
-item('ArtifactCol1005-Boots717').
-item('ArtifactCol1005-Boots721').
-item('ArtifactCol1005-Boots729').
-item('ArtifactCol1005-Boots733').
-item('ArtifactCol1005-Boots737').
-item('ArtifactCol1005-Boots741').
-item('ArtifactCol1005-Boots745').
-item('ArtifactCol1005-Boots749').
-item('ArtifactCol1005-Boots753').
-item('ArtifactCol1006-Comm-Badge674').
-item('ArtifactCol1006-Comm-Badge774').
-item('ArtifactCol1006-Comm-Badge679').
-item('ArtifactCol1006-Comm-Badge686').
-item('ArtifactCol1006-Comm-Badge698').
-item('ArtifactCol1006-Comm-Badge703').
-item('ArtifactCol1006-Comm-Badge709').
-item('ArtifactCol1006-Comm-Badge714').
-item('ArtifactCol1006-Comm-Badge718').
-item('ArtifactCol1006-Comm-Badge722').
-item('ArtifactCol1006-Comm-Badge730').
-item('ArtifactCol1006-Comm-Badge734').
-item('ArtifactCol1006-Comm-Badge738').
-item('ArtifactCol1006-Comm-Badge742').
-item('ArtifactCol1006-Comm-Badge746').
-item('ArtifactCol1006-Comm-Badge750').
-item('ArtifactCol1006-Comm-Badge754').
-item('ArtifactCol1007-Sash725').
-item('ArtifactCol1008-VISOR688').
-item('ArtifactCol1009-Medical-Tricorder681').
-item('ArtifactCol1009-Medical-Tricorder682').
-item('ArtifactCol1009-Medical-Tricorder683').
-item('ArtifactCol1009-Tricorder759').
-item('ArtifactCol1009-Tricorder760').
-item('ArtifactCol1009-Tricorder761').
-item('ArtifactCol1010-Dilithium-Crystal756').
-item('ArtifactCol1010-Dilithium-Crystal757').
-item('ArtifactCol1010-Dilithium-Crystal758').
-item('ArtifactCol1011-5-Picards-Flute706').
-item('ArtifactCol1012-Trombone711').
-item('ArtifactCol1020-Tea690').
-item('ArtifactCol1021-Synthehol691').
-item('ArtifactCol1022-Ferengi-Ale692').
-item('ArtifactCol1023-Romulan-Whisky693').
-item('ArtifactCol1024-Lemonade-Prune-Juice694').
-item('ArtifactCol1025-Vulcan-Beer695').
+tItem('ArtifactCol1000-Phaser676').
+tItem('ArtifactCol1000-Phaser776').
+tItem('ArtifactCol1000-Phaser700').
+tItem('ArtifactCol1000-Phaser724').
+tItem('ArtifactCol1001-5-Phaser-Rifle705').
+tItem('ArtifactCol1002-Red-Uniform704').
+tItem('ArtifactCol1002-Red-Uniform710').
+tItem('ArtifactCol1002-Red-Uniform719').
+tItem('ArtifactCol1002-Red-Uniform739').
+tItem('ArtifactCol1002-Red-Uniform743').
+tItem('ArtifactCol1003-Gold-Uniform675').
+tItem('ArtifactCol1003-Gold-Uniform775').
+tItem('ArtifactCol1003-Gold-Uniform687').
+tItem('ArtifactCol1003-Gold-Uniform699').
+tItem('ArtifactCol1003-Gold-Uniform723').
+tItem('ArtifactCol1003-Gold-Uniform731').
+tItem('ArtifactCol1003-Gold-Uniform735').
+tItem('ArtifactCol1004-Blue-Uniform680').
+tItem('ArtifactCol1004-Blue-Uniform715').
+tItem('ArtifactCol1004-Blue-Uniform747').
+tItem('ArtifactCol1004-Blue-Uniform751').
+tItem('ArtifactCol1004-Blue-Uniform755').
+tItem('ArtifactCol1005-Boots673').
+tItem('ArtifactCol1005-Boots773').
+tItem('ArtifactCol1005-Boots678').
+tItem('ArtifactCol1005-Boots685').
+tItem('ArtifactCol1005-Boots697').
+tItem('ArtifactCol1005-Boots702').
+tItem('ArtifactCol1005-Boots708').
+tItem('ArtifactCol1005-Boots713').
+tItem('ArtifactCol1005-Boots717').
+tItem('ArtifactCol1005-Boots721').
+tItem('ArtifactCol1005-Boots729').
+tItem('ArtifactCol1005-Boots733').
+tItem('ArtifactCol1005-Boots737').
+tItem('ArtifactCol1005-Boots741').
+tItem('ArtifactCol1005-Boots745').
+tItem('ArtifactCol1005-Boots749').
+tItem('ArtifactCol1005-Boots753').
+tItem('ArtifactCol1006-Comm-Badge674').
+tItem('ArtifactCol1006-Comm-Badge774').
+tItem('ArtifactCol1006-Comm-Badge679').
+tItem('ArtifactCol1006-Comm-Badge686').
+tItem('ArtifactCol1006-Comm-Badge698').
+tItem('ArtifactCol1006-Comm-Badge703').
+tItem('ArtifactCol1006-Comm-Badge709').
+tItem('ArtifactCol1006-Comm-Badge714').
+tItem('ArtifactCol1006-Comm-Badge718').
+tItem('ArtifactCol1006-Comm-Badge722').
+tItem('ArtifactCol1006-Comm-Badge730').
+tItem('ArtifactCol1006-Comm-Badge734').
+tItem('ArtifactCol1006-Comm-Badge738').
+tItem('ArtifactCol1006-Comm-Badge742').
+tItem('ArtifactCol1006-Comm-Badge746').
+tItem('ArtifactCol1006-Comm-Badge750').
+tItem('ArtifactCol1006-Comm-Badge754').
+tItem('ArtifactCol1007-Sash725').
+tItem('ArtifactCol1008-VISOR688').
+tItem('ArtifactCol1009-Medical-Tricorder681').
+tItem('ArtifactCol1009-Medical-Tricorder682').
+tItem('ArtifactCol1009-Medical-Tricorder683').
+tItem('ArtifactCol1009-Tricorder759').
+tItem('ArtifactCol1009-Tricorder760').
+tItem('ArtifactCol1009-Tricorder761').
+tItem('ArtifactCol1010-Dilithium-Crystal756').
+tItem('ArtifactCol1010-Dilithium-Crystal757').
+tItem('ArtifactCol1010-Dilithium-Crystal758').
+tItem('ArtifactCol1011-5-Picards-Flute706').
+tItem('ArtifactCol1012-Trombone711').
+tItem('ArtifactCol1020-Tea690').
+tItem('ArtifactCol1021-Synthehol691').
+tItem('ArtifactCol1022-Ferengi-Ale692').
+tItem('ArtifactCol1023-Romulan-Whisky693').
+tItem('ArtifactCol1024-Lemonade-Prune-Juice694').
+tItem('ArtifactCol1025-Vulcan-Beer695').
 
  /* found 75 for item(_G1352). */ 
 
@@ -268,8 +268,8 @@ localityOfObject('Area1016-Object669','Area1016').
 localityOfObject('Area1024-Object670','Area1024').
 */
 localityOfObject('NpcCol1013-Alexander671','Area1025').
-localityOfObject(vacuum(1),'Area1010').
-localityOfObject(explorer(player1),'Area1000').
+localityOfObject(tVacuum(1),'Area1010').
+localityOfObject(tExplorer(player1),'Area1000').
 localityOfObject('NpcCol1003-Dr-Crusher677','Area1015').
 localityOfObject('NpcCol1000-Geordi684','Area1000').
 localityOfObject('NpcCol1007-Guinan689','Area1021').
@@ -304,49 +304,49 @@ line_count(30).
 number_of_clauses(1).
 Pattern: region(_G1399). 
  */
-region('Area1000').
-region('Area1002').
-region('Area1001').
-region('Area1005').
-region('Area1003').
-region('Area1004').
-region('Area1008').
-region('Area1006').
-region('Area1042').
-region('Area1007').
-region('Area1010').
-region('Area1009').
-region('Area1011').
-region('Area1013').
-region('Area1032').
-region('Area1012').
-region('Area1016').
-region('Area1014').
-region('Area1015').
-region('Area1019').
-region('Area1017').
-region('Area1018').
-region('Area1021').
-region('Area1020').
-region('Area1022').
-region('Area1024').
-region('Area1039').
-region('Area1023').
-region('Area1027').
-region('Area1025').
-region('Area1026').
-region('Area1030').
-region('Area1028').
-region('Area1029').
-region('Area1031').
-region('Area1033').
-region('Area1034').
-region('Area1036').
-region('Area1035').
-region('Area1038').
-region('Area1037').
-region('Area1040').
-region('Area1041').
+tRegion('Area1000').
+tRegion('Area1002').
+tRegion('Area1001').
+tRegion('Area1005').
+tRegion('Area1003').
+tRegion('Area1004').
+tRegion('Area1008').
+tRegion('Area1006').
+tRegion('Area1042').
+tRegion('Area1007').
+tRegion('Area1010').
+tRegion('Area1009').
+tRegion('Area1011').
+tRegion('Area1013').
+tRegion('Area1032').
+tRegion('Area1012').
+tRegion('Area1016').
+tRegion('Area1014').
+tRegion('Area1015').
+tRegion('Area1019').
+tRegion('Area1017').
+tRegion('Area1018').
+tRegion('Area1021').
+tRegion('Area1020').
+tRegion('Area1022').
+tRegion('Area1024').
+tRegion('Area1039').
+tRegion('Area1023').
+tRegion('Area1027').
+tRegion('Area1025').
+tRegion('Area1026').
+tRegion('Area1030').
+tRegion('Area1028').
+tRegion('Area1029').
+tRegion('Area1031').
+tRegion('Area1033').
+tRegion('Area1034').
+tRegion('Area1036').
+tRegion('Area1035').
+tRegion('Area1038').
+tRegion('Area1037').
+tRegion('Area1040').
+tRegion('Area1041').
 
  /* found 45 for region(_G1399). */ 
 
@@ -357,27 +357,27 @@ line_count(50).
 number_of_clauses(1).
 Pattern: somethingIsa(_G1422,_G1423). 
  */
-somethingIsa('NpcCol1000-Geordi684',['NpcCol1000',agent,'MaleAnimal']).
-somethingIsa(vacuum(1),['NpcCol1001',agent,'MaleAnimal']).
+somethingIsa('NpcCol1000-Geordi684',['NpcCol1000',tAgentGeneric,'MaleAnimal']).
+somethingIsa(tVacuum(1),['NpcCol1001',tAgentGeneric,'MaleAnimal']).
 % somethingIsa(explorer(player1),[['OSimClassFn',string("player_osimmarine_mp")],agent,'MaleAnimal']).
-somethingIsa('NpcCol1002-Worf720',['NpcCol1002',agent,'MaleAnimal']).
-somethingIsa('NpcCol1003-Dr-Crusher677',['NpcCol1003',agent,'FemaleAnimal']).
-somethingIsa('NpcCol1004-Troi712',['NpcCol1004',agent,'FemaleAnimal']).
-somethingIsa('NpcCol1005-Riker707',['NpcCol1005',agent,'MaleAnimal']).
-somethingIsa('NpcCol1006-Picard701',['NpcCol1006',agent,'MaleAnimal']).
-somethingIsa('NpcCol1007-Guinan689',['NpcCol1007',agent,'FemaleAnimal']).
-somethingIsa('NpcCol1008-OBrien696',['NpcCol1008',agent,'MaleAnimal']).
-somethingIsa('NpcCol1009-Wesley716',['NpcCol1009',agent,'MaleAnimal']).
-somethingIsa('NpcCol1010-Livingston726',['NpcCol1010',agent,'MaleAnimal']).
-somethingIsa('NpcCol1011-Spot727',['NpcCol1011',agent,'MaleAnimal']).
-somethingIsa('NpcCol1012-Ensign728',['NpcCol1012',agent,'MaleAnimal']).
-somethingIsa('NpcCol1012-Ensign732',['NpcCol1012',agent,'MaleAnimal']).
-somethingIsa('NpcCol1012-Ensign736',['NpcCol1012',agent,'MaleAnimal']).
-somethingIsa('NpcCol1012-Ensign740',['NpcCol1012',agent,'MaleAnimal']).
-somethingIsa('NpcCol1012-Ensign744',['NpcCol1012',agent,'MaleAnimal']).
-somethingIsa('NpcCol1012-Ensign748',['NpcCol1012',agent,'MaleAnimal']).
-somethingIsa('NpcCol1012-Ensign752',['NpcCol1012',agent,'MaleAnimal']).
-somethingIsa('NpcCol1013-Alexander671',['NpcCol1013',agent,'MaleAnimal']).
+somethingIsa('NpcCol1002-Worf720',['NpcCol1002',tAgentGeneric,'MaleAnimal']).
+somethingIsa('NpcCol1003-Dr-Crusher677',['NpcCol1003',tAgentGeneric,'FemaleAnimal']).
+somethingIsa('NpcCol1004-Troi712',['NpcCol1004',tAgentGeneric,'FemaleAnimal']).
+somethingIsa('NpcCol1005-Riker707',['NpcCol1005',tAgentGeneric,'MaleAnimal']).
+somethingIsa('NpcCol1006-Picard701',['NpcCol1006',tAgentGeneric,'MaleAnimal']).
+somethingIsa('NpcCol1007-Guinan689',['NpcCol1007',tAgentGeneric,'FemaleAnimal']).
+somethingIsa('NpcCol1008-OBrien696',['NpcCol1008',tAgentGeneric,'MaleAnimal']).
+somethingIsa('NpcCol1009-Wesley716',['NpcCol1009',tAgentGeneric,'MaleAnimal']).
+somethingIsa('NpcCol1010-Livingston726',['NpcCol1010',tAgentGeneric,'MaleAnimal']).
+somethingIsa('NpcCol1011-Spot727',['NpcCol1011',tAgentGeneric,'MaleAnimal']).
+somethingIsa('NpcCol1012-Ensign728',['NpcCol1012',tAgentGeneric,'MaleAnimal']).
+somethingIsa('NpcCol1012-Ensign732',['NpcCol1012',tAgentGeneric,'MaleAnimal']).
+somethingIsa('NpcCol1012-Ensign736',['NpcCol1012',tAgentGeneric,'MaleAnimal']).
+somethingIsa('NpcCol1012-Ensign740',['NpcCol1012',tAgentGeneric,'MaleAnimal']).
+somethingIsa('NpcCol1012-Ensign744',['NpcCol1012',tAgentGeneric,'MaleAnimal']).
+somethingIsa('NpcCol1012-Ensign748',['NpcCol1012',tAgentGeneric,'MaleAnimal']).
+somethingIsa('NpcCol1012-Ensign752',['NpcCol1012',tAgentGeneric,'MaleAnimal']).
+somethingIsa('NpcCol1013-Alexander671',['NpcCol1013',tAgentGeneric,'MaleAnimal']).
 somethingIsa('ArtifactCol1000-Phaser676',['ArtifactCol1000','Handgun','Weapon','LightingDevice','PortableObject','Device-SingleUser','SomethingToWear']).
 somethingIsa('ArtifactCol1000-Phaser776',['ArtifactCol1000','Handgun','Weapon','LightingDevice','PortableObject','Device-SingleUser','SomethingToWear']).
 somethingIsa('ArtifactCol1000-Phaser700',['ArtifactCol1000','Handgun','Weapon','LightingDevice','PortableObject','Device-SingleUser','SomethingToWear']).
@@ -496,9 +496,9 @@ somethingIsa('Area1038',['BPVLocation','Indoors-IsolatedFromOutside','SpaceInAHO
 somethingIsa('Area1037',['BPVLocation','Indoors-IsolatedFromOutside','SpaceInAHOC']).
 somethingIsa('Area1040',['BPVLocation','FreeSpaceContent']).
 somethingIsa('Area1041',['BPVLocation','FreeSpaceContent']).
-somethingIsa('ShipMap123',[item]).
+somethingIsa('ShipMap123',[tItem]).
 localityOfObject('ShipMap123','Area1000').
-verbOverride('ShipMap123',examine(this),
+verbOverride('ShipMap123',actExamine(this),
   prologCall(fmt("
 STARSHIP ENTERPRISE
 
@@ -594,15 +594,15 @@ nameStrings('Area1040',"Outer Space").
 nameStrings('Area1041',"Outer Space").
 nameStrings('Area1042',"Transporter Beam").
 nameStrings('NpcCol1013-Alexander671',"Alexander").
-nameStrings(vacuum(1),"Data").
-nameStrings(vacuum(1),"CycLBot").
-nameStrings(vacuum(1),"CycBot").
-nameStrings(vacuum(1),"CycBot1").
+nameStrings(tVacuum(1),"Data").
+nameStrings(tVacuum(1),"CycLBot").
+nameStrings(tVacuum(1),"CycBot").
+nameStrings(tVacuum(1),"CycBot1").
 nameStrings('ArtifactCol1005-Boots673',"Boots").
 nameStrings('ArtifactCol1006-Comm-Badge674',"Comm Badge").
 nameStrings('ArtifactCol1003-Gold-Uniform675',"Gold Uniform").
 nameStrings('ArtifactCol1000-Phaser676',"Phaser").
-nameStrings(explorer(player1),"Player").
+nameStrings(tExplorer(player1),"Player").
 nameStrings('ArtifactCol1005-Boots773',"Boots").
 nameStrings('ArtifactCol1006-Comm-Badge774',"Comm Badge").
 nameStrings('ArtifactCol1003-Gold-Uniform775',"Gold Uniform").
@@ -693,8 +693,8 @@ nameStrings('ArtifactCol1009-Tricorder759',"Tricorder").
 nameStrings('ArtifactCol1009-Tricorder760',"Tricorder").
 nameStrings('ArtifactCol1009-Tricorder761',"Tricorder").
 nameStrings('NpcCol1013-Alexander671',"alexander rozhenko").
-nameStrings(vacuum(1),"Data").
-nameStrings(explorer(player1),"Player").
+nameStrings(tVacuum(1),"Data").
+nameStrings(tExplorer(player1),"Player").
 nameStrings('NpcCol1003-Dr-Crusher677',"Doctor Crusher").
 nameStrings('NpcCol1000-Geordi684',"Geordi LaForge").
 nameStrings('NpcCol1007-Guinan689',"Guinan").
@@ -799,8 +799,8 @@ number_of_clauses(1).
 Pattern: somethingDescription(_G1470,_G1471). 
  */
 somethingDescription('NpcCol1000-Geordi684',["Lieutenant","Commander","Geordi","LaForge","Geordi LaForge","Lieutenant Commander Geordi LaForge is standing here","Geordi is the Chief Engineer of the Enterprise","He's blind, so he wears a special VISOR that lets him see things","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 3","mudMaxHitPoints: 12d12+3200","#$PunchingSomething mudBareHandDamage: 9d9+42","Geordi","Geordi LaForge","Lieutenant Commander Geordi LaForge is standing here","Geordi is the Chief Engineer of the Enterprise","He's blind, so he wears a special VISOR that lets him see things"]).
-somethingDescription(vacuum(1),["Lieutenant","Commander","Data","Android","Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He stowed super-human strength, and is extremely tough","ACT_NICE_THIEF","AWARE","NOBACKSTAB","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOSUMMON","NOSLEEP","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 1","mudMaxHitPoints: 18d18+4000","#$PunchingSomething mudBareHandDamage: 10d10+75","Data","CycLBot","CycBot","CycBot1","Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He stowed super-human strength, and is extremely tough"]).
-somethingDescription(explorer(player1),["Lieutenant","Commander","Human","Player",
+somethingDescription(tVacuum(1),["Lieutenant","Commander","Data","Android","Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He stowed super-human strength, and is extremely tough","ACT_NICE_THIEF","AWARE","NOBACKSTAB","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOSUMMON","NOSLEEP","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 1","mudMaxHitPoints: 18d18+4000","#$PunchingSomething mudBareHandDamage: 10d10+75","Data","CycLBot","CycBot","CycBot1","Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He stowed super-human strength, and is extremely tough"]).
+somethingDescription(tExplorer(player1),["Lieutenant","Commander","Human","Player",
             "Explorer Player",
             "ACT_NICE_THIEF","AWARE","NOBACKSTAB","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOSUMMON",
             "NOSLEEP","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 1","mudMaxHitPoints: 18d18+4000",
@@ -1241,554 +1241,14 @@ objects('FluidReservoir',['ArtifactCol1020-Tea690','ArtifactCol1021-Synthehol691
 objects('BPVLocation',['Area1000','Area1001','Area1002','Area1003','Area1004','Area1005','Area1006','Area1007','Area1008','Area1009','Area1010','Area1011','Area1012','Area1013','Area1014','Area1015','Area1016','Area1017','Area1018','Area1019','Area1020','Area1021','Area1022','Area1023','Area1024','Area1025','Area1026','Area1027','Area1028','Area1029','Area1030','Area1031','Area1032','Area1033','Area1034','Area1035','Area1036','Area1037','Area1038','Area1039','Area1040','Area1041','Area1042'
 % ,'Area4075'
 ]).
-objects(agent,['NpcCol1000-Geordi684','NpcCol1002-Worf720','NpcCol1003-Dr-Crusher677','NpcCol1004-Troi712','NpcCol1005-Riker707','NpcCol1006-Picard701','NpcCol1007-Guinan689','NpcCol1008-OBrien696','NpcCol1009-Wesley716','NpcCol1010-Livingston726','NpcCol1011-Spot727','NpcCol1012-Ensign728','NpcCol1012-Ensign732','NpcCol1012-Ensign736','NpcCol1012-Ensign740','NpcCol1012-Ensign744','NpcCol1012-Ensign748','NpcCol1012-Ensign752','NpcCol1013-Alexander671',vacuum(1),explorer(player1)]).
+objects(tAgentGeneric,['NpcCol1000-Geordi684','NpcCol1002-Worf720','NpcCol1003-Dr-Crusher677','NpcCol1004-Troi712','NpcCol1005-Riker707','NpcCol1006-Picard701','NpcCol1007-Guinan689','NpcCol1008-OBrien696','NpcCol1009-Wesley716','NpcCol1010-Livingston726','NpcCol1011-Spot727','NpcCol1012-Ensign728','NpcCol1012-Ensign732','NpcCol1012-Ensign736','NpcCol1012-Ensign740','NpcCol1012-Ensign744','NpcCol1012-Ensign748','NpcCol1012-Ensign752','NpcCol1013-Alexander671',tVacuum(1),tExplorer(player1)]).
 
 %%objects(areaPath,List):-findall(apath(A,B),pathBetween(A,B,C),List).
-objects(areaPath,[apath('Area1000',"n"),apath('Area1001',"e"),apath('Area1002',"n"),apath('Area1002',"e"),apath('Area1002',"s"),apath('Area1002',"w"),apath('Area1003',"w"),apath('Area1004',"e"),apath('Area1005',"n"),apath('Area1005',"e"),apath('Area1005',"s"),apath('Area1005',"w"),apath('Area1006',"n"),apath('Area1006',"w"),apath('Area1007',"e"),apath('Area1008',"n"),apath('Area1008',"e"),apath('Area1008',"s"),apath('Area1008',"w"),apath('Area1009',"w"),apath('Area1010',"s"),apath('Area1010',"u"),apath('Area1011',"n"),apath('Area1011',"u"),apath('Area1011',"d"),apath('Area1012',"e"),apath('Area1013',"n"),apath('Area1013',"e"),apath('Area1013',"s"),apath('Area1013',"w"),apath('Area1014',"w"),apath('Area1015',"e"),apath('Area1016',"n"),apath('Area1016',"e"),apath('Area1016',"s"),apath('Area1016',"w"),apath('Area1017',"w"),apath('Area1018',"e"),apath('Area1019',"n"),apath('Area1019',"e"),apath('Area1019',"s"),apath('Area1019',"w"),apath('Area1020',"w"),apath('Area1021',"s"),apath('Area1022',"n"),apath('Area1022',"s"),apath('Area1023',"e"),apath('Area1024',"n"),apath('Area1024',"e"),apath('Area1024',"s"),apath('Area1024',"w"),apath('Area1025',"w"),apath('Area1026',"e"),apath('Area1027',"n"),apath('Area1027',"e"),apath('Area1027',"s"),apath('Area1027',"w"),apath('Area1028',"w"),apath('Area1029',"e"),apath('Area1030',"n"),apath('Area1030',"e"),apath('Area1030',"s"),apath('Area1030',"w"),apath('Area1031',"w"),apath('Area1032',"s"),apath('Area1032',"u"),apath('Area1032',"d"),apath('Area1033',"u"),apath('Area1033',"d"),apath('Area1034',"u"),apath('Area1034',"d"),apath('Area1035',"e"),apath('Area1036',"n"),apath('Area1036',"e"),apath('Area1036',"d"),apath('Area1037',"w"),apath('Area1038',"s"),apath('Area1038',"w"),apath('Area1039',"n"),apath('Area1039',"u"),apath('Area1040',"u"),apath('Area1040',"d"),apath('Area1041',"u"),apath('Area1041',"d"),apath('Area1042',"n"),apath('Area1042',"s")]).
+objects(areaPath,[ftApath('Area1000',"n"),ftApath('Area1001',"e"),ftApath('Area1002',"n"),ftApath('Area1002',"e"),ftApath('Area1002',"s"),ftApath('Area1002',"w"),ftApath('Area1003',"w"),ftApath('Area1004',"e"),ftApath('Area1005',"n"),ftApath('Area1005',"e"),ftApath('Area1005',"s"),ftApath('Area1005',"w"),ftApath('Area1006',"n"),ftApath('Area1006',"w"),ftApath('Area1007',"e"),ftApath('Area1008',"n"),ftApath('Area1008',"e"),ftApath('Area1008',"s"),ftApath('Area1008',"w"),ftApath('Area1009',"w"),ftApath('Area1010',"s"),ftApath('Area1010',"u"),ftApath('Area1011',"n"),ftApath('Area1011',"u"),ftApath('Area1011',"d"),ftApath('Area1012',"e"),ftApath('Area1013',"n"),ftApath('Area1013',"e"),ftApath('Area1013',"s"),ftApath('Area1013',"w"),ftApath('Area1014',"w"),ftApath('Area1015',"e"),ftApath('Area1016',"n"),ftApath('Area1016',"e"),ftApath('Area1016',"s"),ftApath('Area1016',"w"),ftApath('Area1017',"w"),ftApath('Area1018',"e"),ftApath('Area1019',"n"),ftApath('Area1019',"e"),ftApath('Area1019',"s"),ftApath('Area1019',"w"),ftApath('Area1020',"w"),ftApath('Area1021',"s"),ftApath('Area1022',"n"),ftApath('Area1022',"s"),ftApath('Area1023',"e"),ftApath('Area1024',"n"),ftApath('Area1024',"e"),ftApath('Area1024',"s"),ftApath('Area1024',"w"),ftApath('Area1025',"w"),ftApath('Area1026',"e"),ftApath('Area1027',"n"),ftApath('Area1027',"e"),ftApath('Area1027',"s"),ftApath('Area1027',"w"),ftApath('Area1028',"w"),ftApath('Area1029',"e"),ftApath('Area1030',"n"),ftApath('Area1030',"e"),ftApath('Area1030',"s"),ftApath('Area1030',"w"),ftApath('Area1031',"w"),ftApath('Area1032',"s"),ftApath('Area1032',"u"),ftApath('Area1032',"d"),ftApath('Area1033',"u"),ftApath('Area1033',"d"),ftApath('Area1034',"u"),ftApath('Area1034',"d"),ftApath('Area1035',"e"),ftApath('Area1036',"n"),ftApath('Area1036',"e"),ftApath('Area1036',"d"),ftApath('Area1037',"w"),ftApath('Area1038',"s"),ftApath('Area1038',"w"),ftApath('Area1039',"n"),ftApath('Area1039',"u"),ftApath('Area1040',"u"),ftApath('Area1040',"d"),ftApath('Area1041',"u"),ftApath('Area1041',"d"),ftApath('Area1042',"n"),ftApath('Area1042',"s")]).
 
-objects(dir,["n","s","e","w","u","d"]).
+objects(ftDir,["n","s","e","w","u","d"]).
 /*********************** predcate defns ***********************************/
 
 
 
-:- onLoad(must_det(show_call((atloc('NpcCol1012-Ensign728',X),nonvar(X))))).
-
-
-end_of_file.
-
-/*********************** invariants ****************************************/
-
-% LHS vars univ. quantified over primitive sorts
-% RHS free vars are existentially quantified
-/*
-
-implied_invariant([loaded(P,V)], [at(V,L),at(P,L)]).
-
-inconsistent_constraint([certified(P), not_insured(P)]).
-
-%%atomic_invariants([]):-!.%%,fail.
-atomic_invariants([
-      pathBetween('Area1000',"n",'Area1002'),
-      pathBetween('Area1001',"e",'Area1002'),
-      pathBetween('Area1002',"n",'Area1005'),
-      pathBetween('Area1002',"e",'Area1003'),
-      pathBetween('Area1002',"s",'Area1000'),
-      pathBetween('Area1002',"w",'Area1001'),
-      pathBetween('Area1003',"w",'Area1002'),
-      pathBetween('Area1004',"e",'Area1005'),
-      pathBetween('Area1005',"n",'Area1008'),
-      pathBetween('Area1005',"e",'Area1006'),
-      pathBetween('Area1005',"s",'Area1002'),
-      pathBetween('Area1005',"w",'Area1004'),
-      pathBetween('Area1006',"n",'Area1042'),
-      pathBetween('Area1006',"w",'Area1005'),
-      pathBetween('Area1007',"e",'Area1008'),
-      pathBetween('Area1008',"n",'Area1010'),
-      pathBetween('Area1008',"e",'Area1009'),
-      pathBetween('Area1008',"s",'Area1005'),
-      pathBetween('Area1008',"w",'Area1007'),
-      pathBetween('Area1009',"w",'Area1008'),
-      pathBetween('Area1010',"s",'Area1008'),
-      pathBetween('Area1010',"u",'Area1011'),
-      pathBetween('Area1011',"n",'Area1013'),
-      pathBetween('Area1011',"u",'Area1032'),
-      pathBetween('Area1011',"d",'Area1010'),
-      pathBetween('Area1012',"e",'Area1013'),
-      pathBetween('Area1013',"n",'Area1016'),
-      pathBetween('Area1013',"e",'Area1014'),
-      pathBetween('Area1013',"s",'Area1011'),
-      pathBetween('Area1013',"w",'Area1012'),
-      pathBetween('Area1014',"w",'Area1013'),
-      pathBetween('Area1015',"e",'Area1016'),
-      pathBetween('Area1016',"n",'Area1019'),
-      pathBetween('Area1016',"e",'Area1017'),
-      pathBetween('Area1016',"s",'Area1013'),
-      pathBetween('Area1016',"w",'Area1015'),
-      pathBetween('Area1017',"w",'Area1016'),
-      pathBetween('Area1018',"e",'Area1019'),
-      pathBetween('Area1019',"n",'Area1021'),
-      pathBetween('Area1019',"e",'Area1020'),
-      pathBetween('Area1019',"s",'Area1016'),
-      pathBetween('Area1019',"w",'Area1018'),
-      pathBetween('Area1020',"w",'Area1019'),
-      pathBetween('Area1021',"s",'Area1019'),
-      pathBetween('Area1022',"n",'Area1024'),
-      pathBetween('Area1022',"s",'Area1039'),
-      pathBetween('Area1023',"e",'Area1024'),
-      pathBetween('Area1024',"n",'Area1027'),
-      pathBetween('Area1024',"e",'Area1025'),
-      pathBetween('Area1024',"s",'Area1022'),
-      pathBetween('Area1024',"w",'Area1023'),
-      pathBetween('Area1025',"w",'Area1024'),
-      pathBetween('Area1026',"e",'Area1027'),
-      pathBetween('Area1027',"n",'Area1030'),
-      pathBetween('Area1027',"e",'Area1028'),
-      pathBetween('Area1027',"s",'Area1024'),
-      pathBetween('Area1027',"w",'Area1026'),
-      pathBetween('Area1028',"w",'Area1027'),
-      pathBetween('Area1029',"e",'Area1030'),
-      pathBetween('Area1030',"n",'Area1032'),
-      pathBetween('Area1030',"e",'Area1031'),
-      pathBetween('Area1030',"s",'Area1027'),
-      pathBetween('Area1030',"w",'Area1029'),
-      pathBetween('Area1031',"w",'Area1030'),
-      pathBetween('Area1032',"s",'Area1030'),
-      pathBetween('Area1032',"u",'Area1033'),
-      pathBetween('Area1032',"d",'Area1011'),
-      pathBetween('Area1033',"u",'Area1034'),
-      pathBetween('Area1033',"d",'Area1032'),
-      pathBetween('Area1034',"u",'Area1036'),
-      pathBetween('Area1034',"d",'Area1033'),
-      pathBetween('Area1035',"e",'Area1038'),
-      pathBetween('Area1036',"n",'Area1038'),
-      pathBetween('Area1036',"e",'Area1037'),
-      pathBetween('Area1036',"d",'Area1034'),
-      pathBetween('Area1037',"w",'Area1036'),
-      pathBetween('Area1038',"s",'Area1036'),
-      pathBetween('Area1038',"w",'Area1035'),
-      pathBetween('Area1039',"n",'Area1022'),
-      pathBetween('Area1039',"u",'Area1040'),
-      pathBetween('Area1040',"u",'Area1041'),
-      pathBetween('Area1040',"d",'Area1039'),
-      pathBetween('Area1041',"u",'Area1041'),
-      pathBetween('Area1041',"d",'Area1040'),
-      % pathBetween('Area1042',"n",'Area4075'),
-      pathBetween('Area1042',"s",'Area1006'),
-
-     %% printAll(pathBetween(X,Y,Z),agentRoute(apath(X,Y),X,Z)).
-      agentRoute(apath('Area1000',"n"),'Area1000','Area1002'),
-      agentRoute(apath('Area1001',"e"),'Area1001','Area1002'),
-      agentRoute(apath('Area1002',"n"),'Area1002','Area1005'),
-      agentRoute(apath('Area1002',"e"),'Area1002','Area1003'),
-      agentRoute(apath('Area1002',"s"),'Area1002','Area1000'),
-      agentRoute(apath('Area1002',"w"),'Area1002','Area1001'),
-      agentRoute(apath('Area1003',"w"),'Area1003','Area1002'),
-      agentRoute(apath('Area1004',"e"),'Area1004','Area1005'),
-      agentRoute(apath('Area1005',"n"),'Area1005','Area1008'),
-      agentRoute(apath('Area1005',"e"),'Area1005','Area1006'),
-      agentRoute(apath('Area1005',"s"),'Area1005','Area1002'),
-      agentRoute(apath('Area1005',"w"),'Area1005','Area1004'),
-      agentRoute(apath('Area1006',"n"),'Area1006','Area1042'),
-      agentRoute(apath('Area1006',"w"),'Area1006','Area1005'),
-      agentRoute(apath('Area1007',"e"),'Area1007','Area1008'),
-      agentRoute(apath('Area1008',"n"),'Area1008','Area1010'),
-      agentRoute(apath('Area1008',"e"),'Area1008','Area1009'),
-      agentRoute(apath('Area1008',"s"),'Area1008','Area1005'),
-      agentRoute(apath('Area1008',"w"),'Area1008','Area1007'),
-      agentRoute(apath('Area1009',"w"),'Area1009','Area1008'),
-      agentRoute(apath('Area1010',"s"),'Area1010','Area1008'),
-      agentRoute(apath('Area1010',"u"),'Area1010','Area1011'),
-      agentRoute(apath('Area1011',"n"),'Area1011','Area1013'),
-      agentRoute(apath('Area1011',"u"),'Area1011','Area1032'),
-      agentRoute(apath('Area1011',"d"),'Area1011','Area1010'),
-      agentRoute(apath('Area1012',"e"),'Area1012','Area1013'),
-      agentRoute(apath('Area1013',"n"),'Area1013','Area1016'),
-      agentRoute(apath('Area1013',"e"),'Area1013','Area1014'),
-      agentRoute(apath('Area1013',"s"),'Area1013','Area1011'),
-      agentRoute(apath('Area1013',"w"),'Area1013','Area1012'),
-      agentRoute(apath('Area1014',"w"),'Area1014','Area1013'),
-      agentRoute(apath('Area1015',"e"),'Area1015','Area1016'),
-      agentRoute(apath('Area1016',"n"),'Area1016','Area1019'),
-      agentRoute(apath('Area1016',"e"),'Area1016','Area1017'),
-      agentRoute(apath('Area1016',"s"),'Area1016','Area1013'),
-      agentRoute(apath('Area1016',"w"),'Area1016','Area1015'),
-      agentRoute(apath('Area1017',"w"),'Area1017','Area1016'),
-      agentRoute(apath('Area1018',"e"),'Area1018','Area1019'),
-      agentRoute(apath('Area1019',"n"),'Area1019','Area1021'),
-      agentRoute(apath('Area1019',"e"),'Area1019','Area1020'),
-      agentRoute(apath('Area1019',"s"),'Area1019','Area1016'),
-      agentRoute(apath('Area1019',"w"),'Area1019','Area1018'),
-      agentRoute(apath('Area1020',"w"),'Area1020','Area1019'),
-      agentRoute(apath('Area1021',"s"),'Area1021','Area1019'),
-      agentRoute(apath('Area1022',"n"),'Area1022','Area1024'),
-      agentRoute(apath('Area1022',"s"),'Area1022','Area1039'),
-      agentRoute(apath('Area1023',"e"),'Area1023','Area1024'),
-      agentRoute(apath('Area1024',"n"),'Area1024','Area1027'),
-      agentRoute(apath('Area1024',"e"),'Area1024','Area1025'),
-      agentRoute(apath('Area1024',"s"),'Area1024','Area1022'),
-      agentRoute(apath('Area1024',"w"),'Area1024','Area1023'),
-      agentRoute(apath('Area1025',"w"),'Area1025','Area1024'),
-      agentRoute(apath('Area1026',"e"),'Area1026','Area1027'),
-      agentRoute(apath('Area1027',"n"),'Area1027','Area1030'),
-      agentRoute(apath('Area1027',"e"),'Area1027','Area1028'),
-      agentRoute(apath('Area1027',"s"),'Area1027','Area1024'),
-      agentRoute(apath('Area1027',"w"),'Area1027','Area1026'),
-      agentRoute(apath('Area1028',"w"),'Area1028','Area1027'),
-      agentRoute(apath('Area1029',"e"),'Area1029','Area1030'),
-      agentRoute(apath('Area1030',"n"),'Area1030','Area1032'),
-      agentRoute(apath('Area1030',"e"),'Area1030','Area1031'),
-      agentRoute(apath('Area1030',"s"),'Area1030','Area1027'),
-      agentRoute(apath('Area1030',"w"),'Area1030','Area1029'),
-      agentRoute(apath('Area1031',"w"),'Area1031','Area1030'),
-      agentRoute(apath('Area1032',"s"),'Area1032','Area1030'),
-      agentRoute(apath('Area1032',"u"),'Area1032','Area1033'),
-      agentRoute(apath('Area1032',"d"),'Area1032','Area1011'),
-      agentRoute(apath('Area1033',"u"),'Area1033','Area1034'),
-      agentRoute(apath('Area1033',"d"),'Area1033','Area1032'),
-      agentRoute(apath('Area1034',"u"),'Area1034','Area1036'),
-      agentRoute(apath('Area1034',"d"),'Area1034','Area1033'),
-      agentRoute(apath('Area1035',"e"),'Area1035','Area1038'),
-      agentRoute(apath('Area1036',"n"),'Area1036','Area1038'),
-      agentRoute(apath('Area1036',"e"),'Area1036','Area1037'),
-      agentRoute(apath('Area1036',"d"),'Area1036','Area1034'),
-      agentRoute(apath('Area1037',"w"),'Area1037','Area1036'),
-      agentRoute(apath('Area1038',"s"),'Area1038','Area1036'),
-      agentRoute(apath('Area1038',"w"),'Area1038','Area1035'),
-      agentRoute(apath('Area1039',"n"),'Area1039','Area1022'),
-      agentRoute(apath('Area1039',"u"),'Area1039','Area1040'),
-      agentRoute(apath('Area1040',"u"),'Area1040','Area1041'),
-      agentRoute(apath('Area1040',"d"),'Area1040','Area1039'),
-      agentRoute(apath('Area1041',"u"),'Area1041','Area1041'),
-      agentRoute(apath('Area1041',"d"),'Area1041','Area1040'),
-      % agentRoute(apath('Area1042',"n"),'Area1042','Area4075'),
-      agentRoute(apath('Area1042',"s"),'Area1042','Area1006')
-
-     ]).
-*/
-
-/*********************** ss classes ****************************
-
-substate_classes(physical_obj, P,
-       [
-        [at(P,L)]
-       ]).
-
-substate_classes(agent, P,
-       [
-        [localityOfObject(P,L)]
-       ]).
-
-substate_classes(railv, V,
-       [
-        [unattached(V)] , [attached(V,V1)]
-       ]).
-substate_classes(vehicle, T,
-       [
-        [moveable(T),available(T)], 
-        [moveable(T),busy(T)] 
-       ]).
-
-substate_classes(package, P,
-       [
-        [uncertified(P)],
-        [waiting(P),certified(P)],
-        [loaded(P,V),certified(P)],
-        [delivered(P)]
-      ]) .
-
-************/
-/*********************** operators *****
-
-% method(name,precons,transitions,statics,temps,decomposition)
-% operator(name,prevail,transitions,cond_transitions)
-
-
-method(
- % 1. name
-      transport(P,O,D),
- % 2. dynamic constraints
-      [ ],
- % 3. list of necessary substate changes
-      [ sc(package, P, [at(P,O), is_of_sort(P,package)] => 
-                       [at(P,D), delivered(P)]) ],
- % 4. static constraints
-      [ ne(O,D),in_region(O,R),in_region(D,R)
-       % list of static predicates that must be instantiated to
-       % be true. Static preds may also appear in 2. and 3. if
-       % its clearer that way 
-       ],
-
- % 5.  temporal  constraints
-       % list of static predicates before(N1,N2)
-      [before(1,2),before(2,3)],
- % 6. decomposition
-      [ achieve( ss(package, P,[waiting(P),certified(P)]) ), carry_direct(P,O,D), deliver(P,D)]
- ).
-
-method(
-      transport(P,O,D),
-      [ ],
-      [ sc(package, P, [at(P,O), is_of_sort(P,package)] =>
-                       [at(P,D), delivered(P)]) ],
-      [ ne(O,D),ne(R1,R2),is_of_sort(AV,aircraft),
-        in_region(O,R1),in_region(D,R2),
-        serves_region(A1,R1),serves_region(A2,R2)
-       ],
-      [before(1,2),before(2,3),before(3,4),before(4,5)],
-      [ achieve( ss(package, P,[waiting(P),certified(P)]) ), 
-        carry_direct(P,O,A1), carry_via_ap(A1,A2,P), 
-        carry_direct(P,A2,D), deliver(P,D)]
- ).
-
-method(
-   carry_via_ap(O,D,P),
-  [ ],
-  [ sc(package, P, [at(P,O),waiting(P),certified(P)] =>
-                       [at(P,D),waiting(P),certified(P)]) ],
-      [ ne(O,D), 
-%                ne(O,O1), is_of_sort(O1,airport),
-        is_of_sort(O,airport), is_of_sort(D,airport),
-        is_of_sort(P,package), is_of_sort(V,aircraft)],
- [before(1,3), before(2,3),before(3,4), before(4,5)],
-  [
-%       fly(V,O1,O),
-       commission(V),
-       achieve(ss(aircraft,V,[at(V,O)])),
-       load_package(P,V,O),
-       fly(V,O,D),
-       unload_package(P,V,D)
-       ]
-).
-
-% carry in one city
-method(  
-  carry_direct(P,O,D),
- [ ],
-  [ sc(package, P, [at(P,O),waiting(P),certified(P)] => 
-                       [at(P,D),waiting(P),certified(P)]) ],
- [is_of_sort(P,package),
-       is_of_sort(V,truck),
-       in_city(O,CY),
-       in_city(D,CY)
-       ],
- [before(1,2), before(2,3), before(3,4),before(4,5)
-       ],
- [   %  achieve(ss(truck,V,[moveable(V), busy(V)])),
-       commission(V),
-       achieve(ss(truck,V,[at(V,O)])),
-       load_package(P,V,O),
-       move(V,O,D,local_roads),
-       unload_package(P,V,D)
-       ]
-).
-
-% carry between two cities by traincar
-method(
-  carry_direct(P,O,D),
- [ ],
-  [ sc(package, P, [at(P,O),waiting(P),certified(P)] => 
-                       [at(P,D),waiting(P),certified(P)]) ],
- [is_of_sort(P,package),
-       is_of_sort(V,traincar),
-       is_of_sort(Train,train),
-       connects(R,O,D),
-       rv_compatible(R,traincar),
-       route_available(R)
-       ],
- [before(1,2), before(2,3), before(3,4),before(4,5),
-       before(5,6),before(6,7),before(7,8) ],
- [     commission(V),
-       achieve(ss(train,Train,[at(Train,O),attached(Train,V)])),
-       load_package(P,V,O),
-       pull_traincar(Train,V,O,D,R),
-       detach_traincar(Train,V,D),
-       unload_package(P,V,D)
-       ]
-).
-
-% carry between two cities by truck
-method(
-  carry_direct(P,O,D),
- [ ],
-  [ sc(package, P, [at(P,O),waiting(P),certified(P)] => 
-                       [at(P,D),waiting(P),certified(P)]) ],
- [is_of_sort(P,package),
-       is_of_sort(V,truck),
-       in_city(O,CY),
-       in_city(D,CY1),
-       ne(CY,CY1),
-       connects(R,CY,CY1),
-       is_of_sort(R,road_route),
-       route_available(R)
-       ],
- [before(1,2), before(2,3), before(3,4),before(4,5) ],
- [   %  achieve(ss(truck,V,[moveable(V), busy(V)])),
-       commission(V),
-       achieve(ss(truck,V,[at(V,O)])),
-       load_package(P,V,O),
-       move(V,O,D,R),
-       unload_package(P,V,D)
-       ]
-).
-
-method(
-  move_traincar(V, O, L, R2),
- [ ],
-         [sc(traincar,V,[at(V,O) ]
-            =>[at(V,L)] )],
- [is_of_sort(V,traincar),
-       connects(R2,O,L),
-       is_of_sort(R2,rail_route),
-       is_of_sort(Train,train) ],
- [before(1,2), before(2,3), before(3,4),before(4,5) ],
- [   achieve(ss(train,Train,[at(Train,O)])),
-          attach_traincar(Train,V,O),
-          pull_traincar(Train,V,O,L,R2),
-          detach_traincar(Train,V,L) ]
-).
-***********************************/
-/* getting 
- operator( pay_fees(P),
-      [],
-      [sc(package,P,[uncertified(P)]
-      =>[waiting(P),certified(P)])],
-      [ ]).
-
-operator(fly(A,D1,D2),
-      [ ],
-      [sc(aircraft,A,[at(A,D1)]
-            =>[at(A,D2)] )],
-         [sc(package,X,[loaded(X,A),certified(X),at(X,D1)]
-            => [loaded(X,A),certified(X),at(X,D2)])  ]
-).
-
-
-%move truck
-operator( move(V, O, L, R), 
-        [ ],
-         [sc(truck,V,[at(V,O),
-             is_of_sort(R,road_route),
-             moveable(V),
-             in_city(O,City),
-             in_city(L,City1),
-             ne(City,City1),
-             connects(R,City,City1)]
-            =>[at(V,L)] )],
-         [sc(package,X,[loaded(X,V),certified(X),at(X,O)] 
-            => [loaded(X,V),certified(X),at(X,L)])  ]
-).
-
-%move truck inside city
-operator( move(V, O, L, local_roads), 
-         [],
-         [sc(truck,V,[at(V,O),
-             moveable(V),
-             in_city(O,City),
-             in_city(L,City)]
-            =>[at(V,L)]  )],
-         [ sc(package,X,[loaded(X,V),certified(X),at(X,O)] 
-            =>[loaded(X,V),certified(X),at(X,L)])   ]
-).
-
-%move traincar
-operator( pull_traincar(Train,V1, O, L, Rt), 
-         [  ],
-         [ sc(train,Train,[at(Train,O),
-             attached(Train,V1),
-             moveable(Train),
-             connects(Rt,O,L),
-             is_of_sort(Rt,rail_route)]
-            =>[at(Train,L),attached(Train,V1)] ),
-           sc(traincar,V1,[at(V1,O),attached(V1,Train)]
-            =>[at(V1,L),attached(V1,Train)]) ],
-         [sc(package,P,[loaded(P,V1),certified(P),at(P,O)]
-            =>[loaded(P,V1),certified(P),at(P,L)]) ]
-).
-
-operator( move_train(V, O, L, Rt),
-         [ ],
-          [sc(train,V,[at(V,O),unattached(V),
-             moveable(V),available(V),
-             connects(Rt,O,L),
-             is_of_sort(Rt,rail_route)]
-            =>[at(V,L),unattached(V),moveable(V),available(V)] )],
-       [ ]
-).
-
-operator(attach_traincar(Train,V,O),
-     [  ],
-     [sc(train, Train, [at(Train,O),moveable(Train),available(Train),unattached(Train)]
-        =>[at(Train,O),attached(Train,V),moveable(Train),busy(Train)] ),
-     sc(traincar, V, [at(V,O),unattached(V)]
-        =>[at(V,O),attached(V,Train)] ) ],
-     [ ]
-).
-
-operator(detach_traincar(Train,V,O),
-     [ ],
-     [sc(train, Train, [attached(Train,V),moveable(Train),busy(Train)]
-        =>[unattached(Train),moveable(Train),available(Train)] ),
-     sc(traincar, V, [attached(V,Train)]
-        =>[unattached(V)] ) ],
-     [ ]
-).
-
-operator(commission(V),
-      [ ],
-      [sc(vehicle, V,[moveable(V),available(V)] =>[moveable(V), busy(V)])],
-      [ ]).
-
-         
-
-operator( load_package(P,V,L),
-   [ss(vehicle,V, [at(V,L),moveable(V),busy(V)])],
-   [sc(package, P, [at(P,L),waiting(P),certified(P)]=>
-      [at(P,L),loaded(P,V),certified(P)])],
-   []
-).
-
-operator( unload_package(P,V,L),
- [],
- [sc(package, P, [at(P,L),loaded(P,V),certified(P)]=>[at(P,L),waiting(P),certified(P)]
-),
- sc(vehicle,V, [at(V,L), moveable(V), busy(V)] => [at(V,L),moveable(V),available(V)])
-],
- []
- ).
-
-
-operator( deliver(P,L),
-        [],
-        [sc(package, P, [at(P,L),waiting(P),certified(P)]=>
-          [at(P,L),delivered(P)] )],
-        []
-).
-
-docs ready */
-
-
-% TESTS
-
-actorStartState(agent,X,[localityOfObject(X,Y)|List]):-agent(X),localityOfObject(X,Y),findall(stowed(X,P),stowed(X,P),List1),findall(wearsClothing(X,P),wearsClothing(X,P),List2),flatten([List1,List2],List).
-initialStart([ 
-
-/*
-localityOfObject('Area1005-Object666','Area1005').
-localityOfObject('Area1008-Object667','Area1008').
-localityOfObject('Area1013-Object668','Area1013').
-localityOfObject('Area1016-Object669','Area1016').
-localityOfObject('Area1024-Object670','Area1024').
-localityOfObject('ArtifactCol1010-Dilithium-Crystal756','Area1000').
-localityOfObject('ArtifactCol1010-Dilithium-Crystal757','Area1000').
-localityOfObject('ArtifactCol1010-Dilithium-Crystal758','Area1000').
-localityOfObject('ArtifactCol1009-Tricorder759','Area1015').
-localityOfObject('ArtifactCol1009-Tricorder760','Area1015').
-localityOfObject('ArtifactCol1009-Tricorder761','Area1015').
-*/
-%% printAll(actorStartState(agent,X,List),ss(agent,X,List)).
-   ss(agent,'NpcCol1000-Geordi684',[localityOfObject('NpcCol1000-Geordi684','Area1000'),wearsClothing('NpcCol1000-Geordi684','ArtifactCol1005-Boots685'),wearsClothing('NpcCol1000-Geordi684','ArtifactCol1006-Comm-Badge686'),wearsClothing('NpcCol1000-Geordi684','ArtifactCol1003-Gold-Uniform687'),wearsClothing('NpcCol1000-Geordi684','ArtifactCol1008-VISOR688')]),
-   ss(agent,vacuum(1),[localityOfObject(vacuum(1),'Area1010'),stowed(vacuum(1),'ArtifactCol1000-Phaser676'),wearsClothing(vacuum(1),'ArtifactCol1005-Boots673'),wearsClothing(vacuum(1),'ArtifactCol1006-Comm-Badge674'),wearsClothing(vacuum(1),'ArtifactCol1003-Gold-Uniform675')]),
-   ss(agent,explorer(player1),[localityOfObject(explorer(player1),'Area1000'),stowed(explorer(player1),'ArtifactCol1000-Phaser776'),wearsClothing(explorer(player1),'ArtifactCol1005-Boots773'),wearsClothing(explorer(player1),'ArtifactCol1006-Comm-Badge774'),wearsClothing(explorer(player1),'ArtifactCol1003-Gold-Uniform775')]),
-   ss(agent,'NpcCol1002-Worf720',[localityOfObject('NpcCol1002-Worf720','Area1025'),stowed('NpcCol1002-Worf720','ArtifactCol1000-Phaser724'),wearsClothing('NpcCol1002-Worf720','ArtifactCol1005-Boots721'),wearsClothing('NpcCol1002-Worf720','ArtifactCol1006-Comm-Badge722'),wearsClothing('NpcCol1002-Worf720','ArtifactCol1003-Gold-Uniform723'),wearsClothing('NpcCol1002-Worf720','ArtifactCol1007-Sash725')]),
-   ss(agent,'NpcCol1003-Dr-Crusher677',[localityOfObject('NpcCol1003-Dr-Crusher677','Area1015'),stowed('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder681'),stowed('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder682'),stowed('NpcCol1003-Dr-Crusher677','ArtifactCol1009-Medical-Tricorder683'),wearsClothing('NpcCol1003-Dr-Crusher677','ArtifactCol1005-Boots678'),wearsClothing('NpcCol1003-Dr-Crusher677','ArtifactCol1006-Comm-Badge679'),wearsClothing('NpcCol1003-Dr-Crusher677','ArtifactCol1004-Blue-Uniform680')]),
-   ss(agent,'NpcCol1004-Troi712',[localityOfObject('NpcCol1004-Troi712','Area1007'),wearsClothing('NpcCol1004-Troi712','ArtifactCol1005-Boots713'),wearsClothing('NpcCol1004-Troi712','ArtifactCol1006-Comm-Badge714'),wearsClothing('NpcCol1004-Troi712','ArtifactCol1004-Blue-Uniform715')]),
-   ss(agent,'NpcCol1005-Riker707',[localityOfObject('NpcCol1005-Riker707','Area1036'),stowed('NpcCol1005-Riker707','ArtifactCol1012-Trombone711'),wearsClothing('NpcCol1005-Riker707','ArtifactCol1005-Boots708'),wearsClothing('NpcCol1005-Riker707','ArtifactCol1006-Comm-Badge709'),wearsClothing('NpcCol1005-Riker707','ArtifactCol1002-Red-Uniform710')]),
-   ss(agent,'NpcCol1006-Picard701',[localityOfObject('NpcCol1006-Picard701','Area1035'),stowed('NpcCol1006-Picard701','ArtifactCol1001-5-Phaser-Rifle705'),stowed('NpcCol1006-Picard701','ArtifactCol1011-5-Picards-Flute706'),wearsClothing('NpcCol1006-Picard701','ArtifactCol1005-Boots702'),wearsClothing('NpcCol1006-Picard701','ArtifactCol1006-Comm-Badge703'),wearsClothing('NpcCol1006-Picard701','ArtifactCol1002-Red-Uniform704')]),
-   ss(agent,'NpcCol1007-Guinan689',[localityOfObject('NpcCol1007-Guinan689','Area1021'),stowed('NpcCol1007-Guinan689','ArtifactCol1020-Tea690'),stowed('NpcCol1007-Guinan689','ArtifactCol1021-Synthehol691'),stowed('NpcCol1007-Guinan689','ArtifactCol1022-Ferengi-Ale692'),stowed('NpcCol1007-Guinan689','ArtifactCol1023-Romulan-Whisky693'),stowed('NpcCol1007-Guinan689','ArtifactCol1024-Lemonade-Prune-Juice694'),stowed('NpcCol1007-Guinan689','ArtifactCol1025-Vulcan-Beer695')]),
-   ss(agent,'NpcCol1008-OBrien696',[localityOfObject('NpcCol1008-OBrien696','Area1006'),stowed('NpcCol1008-OBrien696','ArtifactCol1000-Phaser700'),wearsClothing('NpcCol1008-OBrien696','ArtifactCol1005-Boots697'),wearsClothing('NpcCol1008-OBrien696','ArtifactCol1006-Comm-Badge698'),wearsClothing('NpcCol1008-OBrien696','ArtifactCol1003-Gold-Uniform699')]),
-   ss(agent,'NpcCol1009-Wesley716',[localityOfObject('NpcCol1009-Wesley716','Area1016'),wearsClothing('NpcCol1009-Wesley716','ArtifactCol1005-Boots717'),wearsClothing('NpcCol1009-Wesley716','ArtifactCol1006-Comm-Badge718'),wearsClothing('NpcCol1009-Wesley716','ArtifactCol1002-Red-Uniform719')]),
-   ss(agent,'NpcCol1010-Livingston726',[localityOfObject('NpcCol1010-Livingston726','Area1035')]),
-   ss(agent,'NpcCol1011-Spot727',[localityOfObject('NpcCol1011-Spot727','Area1003')]),
-   ss(agent,'NpcCol1012-Ensign728',[localityOfObject('NpcCol1012-Ensign728','Area1000'),wearsClothing('NpcCol1012-Ensign728','ArtifactCol1005-Boots729'),wearsClothing('NpcCol1012-Ensign728','ArtifactCol1006-Comm-Badge730'),wearsClothing('NpcCol1012-Ensign728','ArtifactCol1003-Gold-Uniform731')]),
-   ss(agent,'NpcCol1012-Ensign732',[localityOfObject('NpcCol1012-Ensign732','Area1004'),wearsClothing('NpcCol1012-Ensign732','ArtifactCol1005-Boots733'),wearsClothing('NpcCol1012-Ensign732','ArtifactCol1006-Comm-Badge734'),wearsClothing('NpcCol1012-Ensign732','ArtifactCol1003-Gold-Uniform735')]),
-   ss(agent,'NpcCol1012-Ensign736',[localityOfObject('NpcCol1012-Ensign736','Area1011'),wearsClothing('NpcCol1012-Ensign736','ArtifactCol1005-Boots737'),wearsClothing('NpcCol1012-Ensign736','ArtifactCol1006-Comm-Badge738'),wearsClothing('NpcCol1012-Ensign736','ArtifactCol1002-Red-Uniform739')]),
-   ss(agent,'NpcCol1012-Ensign740',[localityOfObject('NpcCol1012-Ensign740','Area1020'),wearsClothing('NpcCol1012-Ensign740','ArtifactCol1005-Boots741'),wearsClothing('NpcCol1012-Ensign740','ArtifactCol1006-Comm-Badge742'),wearsClothing('NpcCol1012-Ensign740','ArtifactCol1002-Red-Uniform743')]),
-   ss(agent,'NpcCol1012-Ensign744',[localityOfObject('NpcCol1012-Ensign744','Area1024'),wearsClothing('NpcCol1012-Ensign744','ArtifactCol1005-Boots745'),wearsClothing('NpcCol1012-Ensign744','ArtifactCol1006-Comm-Badge746'),wearsClothing('NpcCol1012-Ensign744','ArtifactCol1004-Blue-Uniform747')]),
-   ss(agent,'NpcCol1012-Ensign748',[localityOfObject('NpcCol1012-Ensign748','Area1022'),wearsClothing('NpcCol1012-Ensign748','ArtifactCol1005-Boots749'),wearsClothing('NpcCol1012-Ensign748','ArtifactCol1006-Comm-Badge750'),wearsClothing('NpcCol1012-Ensign748','ArtifactCol1004-Blue-Uniform751')]),
-   ss(agent,'NpcCol1012-Ensign752',[localityOfObject('NpcCol1012-Ensign752','Area1036'),wearsClothing('NpcCol1012-Ensign752','ArtifactCol1005-Boots753'),wearsClothing('NpcCol1012-Ensign752','ArtifactCol1006-Comm-Badge754'),wearsClothing('NpcCol1012-Ensign752','ArtifactCol1004-Blue-Uniform755')]),
-   ss(agent,'NpcCol1013-Alexander671',[localityOfObject('NpcCol1013-Alexander671','Area1025')])
-   ]).
-
-
-% 
-
+:- onLoad(must_det(show_call((mudAtLoc('NpcCol1012-Ensign728',X),nonvar(X))))).

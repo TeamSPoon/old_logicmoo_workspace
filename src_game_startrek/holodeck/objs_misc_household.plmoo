@@ -23,7 +23,7 @@
 % Mud Dictionary
 % ==================================================
 
-mud_dictionary([my,body],['self']).
+mudMudDictionary([my,body],['self']).
 
 % ==================================================
 % Rooms
@@ -31,43 +31,43 @@ mud_dictionary([my,body],['self']).
 
 :-op(600,fx,onSpawn).
 
-:-decl_mpred(region(id),type).
+:-decl_mpred(tRegion(id),tType).
 
-:-onSpawn region(kitchen).
-:-onSpawn region(hall).
-:-onSpawn region(cellar).
-:-onSpawn region(office_room).
-:-onSpawn region(living_room).
-:-onSpawn region(dining_room).
-:-onSpawn region(bed_room).
-:-onSpawn region(bath_room).
-:-onSpawn region(closet_room).
-:-onSpawn region(back_yard).
+:-onSpawn tRegion(tKitchen).
+:-onSpawn tRegion(tHall).
+:-onSpawn tRegion(tCellar).
+:-onSpawn tRegion(tOfficeRoom).
+:-onSpawn tRegion(tLivingRoom).
+:-onSpawn tRegion(tDiningRoom).
+:-onSpawn tRegion(tBedRoom).
+:-onSpawn tRegion(tBathRoom).
+:-onSpawn tRegion(tClosetRoom).
+:-onSpawn tRegion(tBackYard).
 
 
 % ==================================================
 % Doors
 % ==================================================
 
-:-decl_mpred_hybrid(pathBetween(region,region),symmetric).
+:-decl_mpred_hybrid(pathBetween(tRegion,tRegion),symmetric).
 
-:-onSpawn pathBetween(living_room,office_room).
-:-onSpawn pathBetween(hall,dining_room).
-:-onSpawn pathBetween(hall,bed_room).
-:-onSpawn pathBetween(hall,living_room).
-:-onSpawn pathBetween(hall,bath_room).
-:-onSpawn pathBetween(kitchen, cellar).
-:-onSpawn pathBetween(dining_room, kitchen).
-:-onSpawn pathBetween(bed_room, closet_room).
-:-onSpawn pathBetween(kitchen, back_yard).
+:-onSpawn pathBetween(tLivingRoom,tOfficeRoom).
+:-onSpawn pathBetween(tHall,tDiningRoom).
+:-onSpawn pathBetween(tHall,tBedRoom).
+:-onSpawn pathBetween(tHall,tLivingRoom).
+:-onSpawn pathBetween(tHall,tBathRoom).
+:-onSpawn pathBetween(tKitchen, tCellar).
+:-onSpawn pathBetween(tDiningRoom, tKitchen).
+:-onSpawn pathBetween(tBedRoom, tClosetRoom).
+:-onSpawn pathBetween(tKitchen, tBackYard).
 
-:-onSpawn pathBetween(kitchen, 'Area1000').
+:-onSpawn pathBetween(tKitchen, 'Area1000').
 
-:-onSpawn pathBetween('Area1000',"s",'kitchen').
-:-onSpawn pathBetween('kitchen',nospawn("n"),'Area1000').
+:-onSpawn pathBetween('Area1000',"s",tKitchen).
+:-onSpawn pathBetween(tKitchen,nospawn("n"),'Area1000').
 
 :-export(doorsConnect/2).
-:-decl_mpred_hybrid(doorsConnect(region,region)).
+:-decl_mpred_hybrid(doorsConnect(tRegion,tRegion)).
 
 pathBetween(R1,R2):-pathBetween(R1,_,R2).
 
@@ -76,7 +76,7 @@ doorsConnect(Thing,Noun2):- pathBetween(Thing,Noun2); pathBetween(Noun2,Thing).
 addPathBetweens:- doall((no_repeats(doorsConnect(R1,R2)),must_det(ensure_some_pathBetween(R1,R2)))).
 
 ensure_some_pathBetween(R1,R2):- pathBetween(R1,_Dir,R2),!.
-ensure_some_pathBetween(R1,R2):- random_instance(dir,Dir,atom_length(Dir,1)),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
+ensure_some_pathBetween(R1,R2):- random_instance(ftDir,Dir,atom_length(Dir,1)),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
    add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)),!.
 ensure_some_pathBetween(R1,R2):- split_name_type(R2,_,Isa), any_to_string(Isa,Str), any_to_dir(Str,Dir),show_call(add(pathBetween(R1,Dir,R2))).
 
@@ -89,148 +89,148 @@ ensure_some_pathBetween(R1,R2):- split_name_type(R2,_,Isa), any_to_string(Isa,St
 %:-dynamic(localityOfObject/2).
 %:-multifile(localityOfObject/2).
 
-subclass(region,region).
+mudSubclass(tRegion,tRegion).
 
-:-decl_mpred_hybrid(localityOfObject(obj,spatialthing)).
+:-decl_mpred_hybrid(localityOfObject(tObj,tSpatialthing)).
 
-:-decl_mpred_hybrid(localityOfObject(kappa(Self,subclass(Self,obj)),kappa(Self2,subclass(Self2,spatialthing)))).
+:-decl_mpred_hybrid(localityOfObject(kappa(Self,mudSubclass(Self,tObj)),kappa(Self2,mudSubclass(Self2,tSpatialthing)))).
 :-op(600,fx,onSpawn).
 
 % onSpawn(_).
 	
 
-:-onSpawn localityOfObject(desk, office_room).
-:-onSpawn localityOfObject(apple(color(red)), kitchen).
-:-onSpawn localityOfObject(apple(color(green)), kitchen).
-:-onSpawn localityOfObject(flashlight, desk).
-:-onSpawn localityOfObject(washing_machine, cellar).
-:-onSpawn localityOfObject(nani, washing_machine).
-:-onSpawn localityOfObject(broccoli, kitchen).
-:-onSpawn localityOfObject(crackers, kitchen).
-:-onSpawn localityOfObject(computer, desk).
-:-onSpawn localityOfObject(envelope, desk).
-:-onSpawn localityOfObject(stamp, envelope).
-:-onSpawn localityOfObject(key, envelope).
-:-onSpawn localityOfObject(bed, bed_room).
-:-onSpawn localityOfObject(stand_table, bed_room).
-:-onSpawn localityOfObject(pajamas, stand_table).
-:-onSpawn localityOfObject(shirt, closet_room).
-:-onSpawn localityOfObject(pillow, bed).
-:-onSpawn localityOfObject(blanket, bed).                                                              
-:-onSpawn localityOfObject(table, kitchen).
-:-onSpawn localityOfObject(coat, closet_room).
-:-onSpawn localityOfObject(pants, closet_room).
-:-onSpawn localityOfObject(light_switch, bed_room).
-:-onSpawn localityOfObject(ball, back_yard).
-:-onSpawn localityOfObject(sofa, living_room).
-:-onSpawn localityOfObject(easy_chair, living_room).
-:-onSpawn localityOfObject(coffee_table, living_room).
-:-onSpawn localityOfObject(coffee_cup, kitchen).
-:-onSpawn localityOfObject(coffee, coffee_cup).
-:-onSpawn localityOfObject(book(color(green)), coffee_table).
-:-onSpawn localityOfObject(book(color(pink)), coffee_table).
-:-onSpawn localityOfObject(bookcase, living_room).
-:-onSpawn localityOfObject(dresser, bed_room).
-:-onSpawn localityOfObject(top_drawer, dresser).
-:-onSpawn localityOfObject(middle_drawer, dresser).
-:-onSpawn localityOfObject(bottom_drawer, dresser). 
-:-onSpawn localityOfObject(houseplant, planter).
-:-onSpawn localityOfObject(planter, gueridon). 
-:-onSpawn localityOfObject(gueridon, living_room).
-:-onSpawn localityOfObject(garden_plant, back_yard).
-:-onSpawn localityOfObject(candle,kitchen).
-:-onSpawn localityOfObject(bathtub,bath_room).
-:-onSpawn localityOfObject(shower,bath_room).
-:-onSpawn localityOfObject(toilet,bath_room).
-:-onSpawn localityOfObject(treadmill,hall).
-:-onSpawn localityOfObject(sink,bath_room).
-:-onSpawn localityOfObject(kitchen_sink,kitchen_counter).
-:-onSpawn localityOfObject(fridge,kitchen).
-:-onSpawn localityOfObject(stove,kitchen).
-:-onSpawn localityOfObject(kitchen_counter,kitchen).
+:-onSpawn localityOfObject(tDesk, tOfficeRoom).
+:-onSpawn localityOfObject(tApple(mudColor(vRed)), tKitchen).
+:-onSpawn localityOfObject(tApple(mudColor(vGreen)), tKitchen).
+:-onSpawn localityOfObject(tFlashlight, tDesk).
+:-onSpawn localityOfObject(tWashingMachine, tCellar).
+:-onSpawn localityOfObject(tNani, tWashingMachine).
+:-onSpawn localityOfObject(tBroccoli, tKitchen).
+:-onSpawn localityOfObject(tCrackers, tKitchen).
+:-onSpawn localityOfObject(tComputer, tDesk).
+:-onSpawn localityOfObject(tEnvelope, tDesk).
+:-onSpawn localityOfObject(tStamp, tEnvelope).
+:-onSpawn localityOfObject(tKey, tEnvelope).
+:-onSpawn localityOfObject(tBed, tBedRoom).
+:-onSpawn localityOfObject(tStandTable, tBedRoom).
+:-onSpawn localityOfObject(tPajamas, tStandTable).
+:-onSpawn localityOfObject(tShirt, tClosetRoom).
+:-onSpawn localityOfObject(tPillow, tBed).
+:-onSpawn localityOfObject(tBlanket, tBed).                                                              
+:-onSpawn localityOfObject(tTable, tKitchen).
+:-onSpawn localityOfObject(tCoat, tClosetRoom).
+:-onSpawn localityOfObject(tPants, tClosetRoom).
+:-onSpawn localityOfObject(tLightSwitch, tBedRoom).
+:-onSpawn localityOfObject(tBall, tBackYard).
+:-onSpawn localityOfObject(tSofa, tLivingRoom).
+:-onSpawn localityOfObject(tEasyChair, tLivingRoom).
+:-onSpawn localityOfObject(tCoffeeTable, tLivingRoom).
+:-onSpawn localityOfObject(tCoffeeCup, tKitchen).
+:-onSpawn localityOfObject(tCoffee, tCoffeeCup).
+:-onSpawn localityOfObject(tBook(mudColor(vGreen)), tCoffeeTable).
+:-onSpawn localityOfObject(tBook(mudColor(vPink)), tCoffeeTable).
+:-onSpawn localityOfObject(tBookcase, tLivingRoom).
+:-onSpawn localityOfObject(tDresser, tBedRoom).
+:-onSpawn localityOfObject(tTopDrawer, tDresser).
+:-onSpawn localityOfObject(tMiddleDrawer, tDresser).
+:-onSpawn localityOfObject(tBottomDrawer, tDresser). 
+:-onSpawn localityOfObject(tHouseplant, tPlanter).
+:-onSpawn localityOfObject(tPlanter, tGueridon). 
+:-onSpawn localityOfObject(tGueridon, tLivingRoom).
+:-onSpawn localityOfObject(tGardenPlant, tBackYard).
+:-onSpawn localityOfObject(tCandle,tKitchen).
+:-onSpawn localityOfObject(tBathtub,tBathRoom).
+:-onSpawn localityOfObject(tShower,tBathRoom).
+:-onSpawn localityOfObject(tToilet,tBathRoom).
+:-onSpawn localityOfObject(tTreadmill,tHall).
+:-onSpawn localityOfObject(tSink,tBathRoom).
+:-onSpawn localityOfObject(tKitchenSink,tKitchenCounter).
+:-onSpawn localityOfObject(tFridge,tKitchen).
+:-onSpawn localityOfObject(tStove,tKitchen).
+:-onSpawn localityOfObject(tKitchenCounter,tKitchen).
 
-subclass(monster,agent).
-subclass(candle,portable_device).
-subclass(flashlight, portable_device).
-subclass(desk, office_room_furnature).
-subclass(apple, food).
-subclass(nani, art).
-subclass(nani, washable).
-subclass(clothing, washable).
-subclass(nani, portable).
-subclass(broccoli, food).
-subclass(crackers, food).
-subclass(envelope, office_item).
-subclass(stamp, office_item).
-subclass(key, office_item).
-subclass(ball, throwable).
+mudSubclass(tMonster,tAgentGeneric).
+mudSubclass(tCandle,tPortableDevice).
+mudSubclass(tFlashlight, tPortableDevice).
+mudSubclass(tDesk, tOfficeRoomFurnature).
+mudSubclass(tApple, tFood).
+mudSubclass(tNani, tArt).
+mudSubclass(tNani, tWashable).
+mudSubclass(tClothing, tWashable).
+mudSubclass(tNani, tPortable).
+mudSubclass(tBroccoli, tFood).
+mudSubclass(tCrackers, tFood).
+mudSubclass(tEnvelope, tOfficeItem).
+mudSubclass(tStamp, tOfficeItem).
+mudSubclass(tKey, tOfficeItem).
+mudSubclass(tBall, tThrowable).
 
-subclass(pajamas, clothing).
-subclass(shirt, clothing).
-subclass(coat, clothing).
-subclass(pants, clothing).
-subclass(clothing, foldable).
-subclass(clothing, wearable).
+mudSubclass(tPajamas, tClothing).
+mudSubclass(tShirt, tClothing).
+mudSubclass(tCoat, tClothing).
+mudSubclass(tPants, tClothing).
+mudSubclass(tClothing, tFoldable).
+mudSubclass(tClothing, tWearable).
 
-subclass(coffee_cup, liquid_container).
-subclass(coffee_cup, drinkable).
-subclass(coffee_cup, throwable).
-subclass(coffee, liquid).
-subclass(book, readable).
+mudSubclass(tCoffeeCup, tLiquidContainer).
+mudSubclass(tCoffeeCup, tDrinkable).
+mudSubclass(tCoffeeCup, tThrowable).
+mudSubclass(tCoffee, tLiquid).
+mudSubclass(tBook, tReadable).
 
-subclass(pillow, bedding).
-subclass(blanket, bedding).                                                              
-subclass(bedding, foldable).
-subclass(foldable, portable).
-subclass(throwable, portable).
-subclass(portable_device,portable).
-subclass(physicalDevice,useable).
-subclass(wearable, portable).
-subclass(portable,takeable).
-subclass(food,takeable).
-subclass(takeable,obj).
-subclass(partof,not_takable).
+mudSubclass(tPillow, tBedding).
+mudSubclass(tBlanket, tBedding).                                                              
+mudSubclass(tBedding, tFoldable).
+mudSubclass(tFoldable, tPortable).
+mudSubclass(tThrowable, tPortable).
+mudSubclass(tPortableDevice,tPortable).
+mudSubclass(physicalDevice,tUseable).
+mudSubclass(tWearable, tPortable).
+mudSubclass(tPortable,tTakeable).
+mudSubclass(tFood,tTakeable).
+mudSubclass(tTakeable,tObj).
+mudSubclass(tPartof,tNotTakable).
 
-subclass(light_switch, wall_furnature).
-subclass(computer, office_furnature).
-subclass(partof_furnature,partof).
+mudSubclass(tLightSwitch, tWallFurnature).
+mudSubclass(tComputer, tOfficeFurnature).
+mudSubclass(tPartofFurnature,tPartof).
 
-subclass(bed, bed_room_furnature).
-subclass(stand_table, bed_room_furnature).
-subclass(dresser, bed_room_furnature).
+mudSubclass(tBed, tBedRoomFurnature).
+mudSubclass(tStandTable, tBedRoomFurnature).
+mudSubclass(tDresser, tBedRoomFurnature).
 
-isa(explorer(player1),agent).
+mudIsa(tExplorer(player1),tAgentGeneric).
 
-subclass(washing_machine, device_furnature).
-subclass(table, furnature).
-subclass(table, hassurface).
-subclass(sofa, living_room_furnature).
-subclass(easy_chair, living_room_furnature).
-subclass(coffee_table, living_room_furnature).
-subclass(bookcase, wall_furnature).
-subclass(drawer, container).
-subclass(drawer, openable).
-subclass(drawer, closeable).
-subclass(drawer, partof_furnature).
-subclass(top_drawer, partof_furnature).
-subclass(middle_drawer, partof_furnature).
-subclass(bottom_drawer, partof_furnature). 
-subclass(houseplant, partof).
-subclass(planter, container). 
-subclass(gueridon, living_room_furnature).
-subclass(garden_plant, outdoor_furnature).
-subclass(spatialthing,lookable).
-subclass(nani,teddybear).
-subclass(teddybear,treasure).
+mudSubclass(tWashingMachine, tDeviceFurnature).
+mudSubclass(tTable, tFurnature).
+mudSubclass(tTable, tHassurface).
+mudSubclass(tSofa, tLivingRoomFurnature).
+mudSubclass(tEasyChair, tLivingRoomFurnature).
+mudSubclass(tCoffeeTable, tLivingRoomFurnature).
+mudSubclass(tBookcase, tWallFurnature).
+mudSubclass(tDrawer, tContainer).
+mudSubclass(tDrawer, tOpenable).
+mudSubclass(tDrawer, tCloseable).
+mudSubclass(tDrawer, tPartofFurnature).
+mudSubclass(tTopDrawer, tPartofFurnature).
+mudSubclass(tMiddleDrawer, tPartofFurnature).
+mudSubclass(tBottomDrawer, tPartofFurnature). 
+mudSubclass(tHouseplant, tPartof).
+mudSubclass(tPlanter, tContainer). 
+mudSubclass(tGueridon, tLivingRoomFurnature).
+mudSubclass(tGardenPlant, tOutdoorFurnature).
+mudSubclass(tSpatialthing,tLookable).
+mudSubclass(tNani,tTeddybear).
+mudSubclass(tTeddybear,tTreasure).
 
-subclass(bathtub,bath_room_furnature).
-subclass(shower,bath_room_furnature).
-subclass(toilet,bath_room_furnature).
-subclass(sink,bath_room_furnature).
-subclass(kitchen_sink,kitchen_furnature).
-subclass(fridge,kitchen_furnature).
-subclass(stove,kitchen_furnature).
-subclass(kitchen_counter,kitchen_furnature).
+mudSubclass(tBathtub,tBathRoomFurnature).
+mudSubclass(tShower,tBathRoomFurnature).
+mudSubclass(tToilet,tBathRoomFurnature).
+mudSubclass(tSink,tBathRoomFurnature).
+mudSubclass(tKitchenSink,tKitchenFurnature).
+mudSubclass(tFridge,tKitchenFurnature).
+mudSubclass(tStove,tKitchenFurnature).
+mudSubclass(tKitchenCounter,tKitchenFurnature).
 
 /*
 :-dynamic(loc_s/2).
@@ -258,90 +258,22 @@ locaton_s(item_template(RealObj,D1,D2,0),Place):-
 :-op(600,fx,setTemplate).
 
 
-:-setTemplate item_template(candle,[color(blue),size(small),shape(triangular),material(wax),texture(sticky)]).
-:-setTemplate item_template(red_apple,[color(red),size(small),shape(round),isa(fruit),texture(smooth)]).
-:-setTemplate item_template(green_apple,[color(eachOf(green,pastel)),size(small),shape(round),isa(fruit),texture(smooth)]).
-:-setTemplate item_template(table,[color(eachOf(blue,white)),size(large),shape(oval),material(wood),texture(eachOf(bumpy,irregular)),weight(50)]).
-:-setTemplate item_template(pillow,[color(white),size(medium),shape(rectangular),material(eachOf(cotton,flannel)),texture(eachOf(fluffy,soft))]).
-:-setTemplate item_template(blanket,[color(eachOf(green,dark)),size(eachOf(large,bulky)),shape(rectangular),material(rayon),texture(eachOf(plush,soft))]).                                                              
-:-setTemplate item_template(stand_table,[color(eachOf(black,shiney)),size(medium),shape(eachOf(cubular,rectangular)),material(wood),texture(smooth),weight(25)]).
-:-setTemplate item_template(pajams,[color(eachOf(blue,pastel)),size(eachOf(medium,fits)),shape(unique),material(eachOf(cotton,rayon)),texture(soft)]).
-:-setTemplate item_template(shirt,[color(black),size(eachOf(medium,fits)),shape(like(shape,torso)),material(cotton),texture(eachOf(soft,threadbare))]).
-:-setTemplate item_template(flashlight,[color(yellow),size(eachOf(medium,small)),shape(cylindrical),material(plastic),texture(ribbed)]).
-:-setTemplate item_template(key,[color(silver),size(eachOf(small,tiny)),shape(unique),material(metal),texture(eachOf(ridged,bumpy))]).
-:-setTemplate item_template(envelope,[color(white),size(small),shape(rectangular),material(paper),texture(smooth)]).
-:-setTemplate item_template(desk,[color(eachOf(brown,shiney)),size(large),shape(eachOf(cubular,rectangular)),texture(eachOf(smooth,ridged)),weight(175)]).
-:-setTemplate item_template(washing_machine,[color(white),size(large),shape(eachOf(cubular,square)),material(metal),texture(smooth),weight(125)]).
-:-setTemplate item_template(broccoli,[color(green),size(small),shape(like(shape,tree)),isa(vegetable),texture(eachOf(porous,bumpy))]).                                                                    
-:-setTemplate item_template(crackers,[color(tan),isa(bread),shape(eachOf(circular,flat)),size(small),texture(eachOf(dry,coarse))]).
-:-setTemplate item_template(computer,[color(grey),material(plastic),shape(eachOf(cubular,rectangular)),size(medium),texture(smooth)]).
-:-setTemplate item_template(stamp,[color(polychromatic),size(eachOf(tiny,thin)),shape(square),material(paper),texture(eachOf(smooth,sticky))]).
-:-setTemplate item_template(coat,[color(black),size(eachOf(medium,fits)),shape(like(shape,torso)),material(eachOf(wool,cotton,rayon)),texture(coarse)]).
-:-setTemplate item_template(pants,[color(black),size(eachOf(medium,fits)),shape(like(shape,ass)),material(denim),texture(coarse)]).
-:-setTemplate item_template(nani,[color(brown),color(white),size(medium),shape(like(shape,teddybear)),material(plush),texture(eachOf(fuzzy,soft))]).
-:-setTemplate item_template(light_switch,[color(cream),size(small),shape(rectangular),material(plastic),texture(smooth)]).
-% :- onSpan((etrace)).
-:-setTemplate item_template(ball,[color(red),size(medium),shape(spherical),material(rubber),texture(bumpy)]).
-:-setTemplate item_template(coffee,[color(eachOf(black,brown)),size(small),shape(fluid),material(liquid),texture(wet)]).
-:-setTemplate item_template(coffee_cup,[color(black),color(brown),size(small),shape(cuplike),material(glass),texture(smooth)]).
-:-setTemplate item_template(sofa,[color(eachOf(blue,dark)),size(eachOf(large,wide,long)),shape(polyhedral),material(eachOf(poplin,wood)),texture(ribbed),weight(125)]).
-:-setTemplate item_template(easy_chair,[color(blue),size(eachOf(large,narrow)),shape(polyhedral),material(eachOf(poplin,wood)),texture(ribbed),weight(75)]).
-:-setTemplate item_template(coffee_table,[color(eachOf(brown,shiney)),size(medium),shape(circular),material(wood),texture(smooth),weight(35)]).
-:-setTemplate item_template(book_type_a,[color(green),color(white),color(black),size(small),shape(eachOf(cubular,rectangular)),material(paper),texture(smooth)]).
-:-setTemplate item_template(book_type_b,[color(pink),color(white),color(black),size(small),shape(eachOf(cubular,rectangular)),material(paper),texture(smooth)]).
-:-setTemplate item_template(bookcase,[color(eachOf(brown,dark,shiney)),size(large),shape(eachOf(square,concave_polyhedron)),material(wood),texture(smooth),weight(60)]).
-:-setTemplate item_template(dresser,[color(eachOf(brown,shiney)),size(large),shape(eachOf(rectangular,polyhedral)),material(wood),texture(smooth),weight(45)]).
-:-setTemplate item_template(top_drawer,[color(eachOf(brown,shiney)),size(medium),shape(eachOf(rectangular,concave_polyhedron)),material(wood),texture(smooth)]). 
-:-setTemplate item_template(middle_drawer,[color(eachOf(brown,shiney)),size(medium),shape(eachOf(rectangular,concave_polyhedron)),material(wood),texture(smooth)]).
-:-setTemplate item_template(bottom_drawer,[color(eachOf(brown,shiney)),size(medium),shape(eachOf(rectangular,concave_polyhedron)),material(wood),texture(smooth)]).
-:-setTemplate item_template(planter,[color(eachOf(pastel,blue)),size(medium),shape(eachOf(cylindrical,trapezohedron)),material(clay),texture(abrasive),weight(15)]).
-:-setTemplate item_template(houseplant,[color(green),size(medium),shape(anthurium_crystallinum),material(plant_tissue),texture(smooth)]).
-:-setTemplate item_template(gueridon,[color(eachOf(brown,shiney)),size(medium),shape(circular),material(wood),texture(smooth),weight(25)]).		 
-
-
-
-:-setTemplate item_template(teddybear,[color(natural),shape(unique)]).
-:-setTemplate item_template(torso,[color(like(color,skin)),shape(unique)]).
-:-setTemplate item_template(skin,[color(unique),shape(unique)]).
-
-/****************************
-
-
-REST IS UNUSED 
-
-(WAS FOR ANOTHER SYSTEM)
-
-:-dynamic(property/2).
-:-dynamic(subpart/2).  
-
-property(Obj,Words):-
-	((Obj =..[Type,Spec] ; (Obj=Type,Spec=[]))),!,
-	get_property(Type,Spec,Pro),
-	transform_property(Pro,Property),
-	Property=..Words.
-
-
-transform_property(Pro,Property):-
-	  Pro=..[Type,like(Other)],
-	  Property=..[Type,_],!,
-	  property(Other,Property).
-transform_property(Property,Property).
-
-	  
-
-functor_member(Property,[]):-!,fail.
-functor_member(Property,Specification):-
-	functor(Property,S,_),!,
-	member(Super,Specification),
-	functor(Super,S,_).
-
-get_property(Type,Specification,Property):-
-	member(Property,Specification).
-get_property(Type,Specification,Property):-
-	item_template(Type,D1,D2), % was object/3
-	append(D1,D2,DD),
-	member(Property,DD),
-	not(functor_member(Property,Specification)).
-
-
-*************/
+:-setTemplate item_template(tCandle,[mudColor(vBlue),mudSize(vSmall),mudShape(vTriangular),mudMaterial(vWax),mudTexture(vSticky)]).
+:-setTemplate item_template(tRedApple,[mudColor(vRed),mudSize(vSmall),mudShape(round),mudIsa(fruit),mudTexture(vSmooth)]).
+:-setTemplate item_template(tGreenApple,[mudColor(eachOf(vGreen,vPastel)),mudSize(vSmall),mudShape(round),mudIsa(fruit),mudTexture(vSmooth)]).
+:-setTemplate item_template(tTable,[mudColor(eachOf(vBlue,vWhite)),mudSize(vLarge),mudShape(vOval),mudMaterial(vWood),mudTexture(eachOf(vBumpy,vIrregular)),mudWeight(50)]).
+:-setTemplate item_template(tPillow,[mudColor(vWhite),mudSize(vMedium),mudShape(vRectangular),mudMaterial(eachOf(vCotton,vFlannel)),mudTexture(eachOf(vFluffy,vSoft))]).
+:-setTemplate item_template(tBlanket,[mudColor(eachOf(vGreen,vDark)),mudSize(eachOf(vLarge,bulky)),mudShape(vRectangular),mudMaterial(vRayon),mudTexture(eachOf(vPlush,vSoft))]).                                                              
+:-setTemplate item_template(tStandTable,[mudColor(eachOf(vBlack,vShiney)),mudSize(vMedium),mudShape(eachOf(vCubular,vRectangular)),mudMaterial(vWood),mudTexture(vSmooth),mudWeight(25)]).
+:-setTemplate item_template(tPajams,[mudColor(eachOf(vBlue,vPastel)),mudSize(eachOf(vMedium,fits)),mudShape(vUnique),mudMaterial(eachOf(vCotton,vRayon)),mudTexture(vSoft)]).
+:-setTemplate item_template(tShirt,[mudColor(vBlack),mudSize(eachOf(vMedium,fits)),mudShape(like(mudShape,tTorso)),mudMaterial(vCotton),mudTexture(eachOf(vSoft,vThreadbare))]).
+:-setTemplate item_template(tFlashlight,[mudColor(vYellow),mudSize(eachOf(vMedium,vSmall)),mudShape(vCylindrical),mudMaterial(vPlastic),mudTexture(vRibbed)]).
+:-setTemplate item_template(tKey,[mudColor(vSilver),mudSize(eachOf(vSmall,vTiny)),mudShape(vUnique),mudMaterial(vMetal),mudTexture(eachOf(vRidged,vBumpy))]).
+:-setTemplate item_template(tEnvelope,[mudColor(vWhite),mudSize(vSmall),mudShape(vRectangular),mudMaterial(vPaper),mudTexture(vSmooth)]).
+:-setTemplate item_template(tDesk,[mudColor(eachOf(vBrown,vShiney)),mudSize(vLarge),mudShape(eachOf(vCubular,vRectangular)),mudTexture(eachOf(vSmooth,vRidged)),mudWeight(175)]).
+:-setTemplate item_template(tWashingMachine,[mudColor(vWhite),mudSize(vLarge),mudShape(eachOf(vCubular,vSquare)),mudMaterial(vMetal),mudTexture(vSmooth),mudWeight(125)]).
+:-setTemplate item_template(tBroccoli,[mudColor(vGreen),mudSize(vSmall),mudShape(like(mudShape,tTree)),mudIsa(vegetable),mudTexture(eachOf(vPorous,vBumpy))]).                                                                    
+:-setTemplate item_template(tCrackers,[mudColor(vTan),mudIsa(bread),mudShape(eachOf(vCircular,flat)),mudSize(vSmall),mudTexture(eachOf(vDry,vCoarse))]).
+:-setTemplate item_template(tComputer,[mudColor(vGrey),mudMaterial(vPlastic),mudShape(eachOf(vCubular,vRectangular)),mudSize(vMedium),mudTexture(vSmooth)]).
+:-setTemplate item_template(tStamp,[mudColor(vPolychromatic),mudSize(eachOf(vTiny,thin)),mudShape(vSquare),mudMaterial(vPaper),mudTexture(eachOf(vSmooth,vSticky))]).
+:-setTemplate item_

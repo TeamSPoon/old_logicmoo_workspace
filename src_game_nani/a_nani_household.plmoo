@@ -21,33 +21,30 @@ use this file with...
 % ==================================================
 
 /* technically the following are not needed due the pathBetween/2s below */
-:-onSpawn region(kitchen).
-:-onSpawn region(hall).
-:-onSpawn region(cellar).
-:-onSpawn region(office_room).
-:-onSpawn region(living_room).
-:-onSpawn region(dining_room).
-:-onSpawn region(bed_room).
-:-onSpawn region(bath_room).
-:-onSpawn region(closet_room).
-:-onSpawn region(back_yard).
+:-onSpawn tRegion(tKitchen).
+:-onSpawn tRegion(tHall).
+:-onSpawn tRegion(tCellar).
+:-onSpawn tRegion(tOfficeRoom).
+:-onSpawn tRegion(tLivingRoom).
+:-onSpawn tRegion(tDiningRoom).
+:-onSpawn tRegion(tBedRoom).
+:-onSpawn tRegion(tBathRoom).
+:-onSpawn tRegion(tClosetRoom).
+:-onSpawn tRegion(tBackYard).
 
 
 % ==================================================
 % Doors
 % ==================================================
 
-:-decl_mpred_hybrid(pathBetween(region,region),symmetric).
+:-decl_mpred_hybrid(pathBetween(tRegion,tRegion),symmetric).
 
-:-onSpawn pathBetween(living_room,office_room).
-:-onSpawn pathBetween(hall,dining_room).
-:-onSpawn pathBetween(hall,bed_room).
-:-onSpawn pathBetween(hall,living_room).
-:-onSpawn pathBetween(hall,bath_room).
-:-onSpawn pathBetween(kitchen, cellar).
-:-onSpawn pathBetween(dining_room, kitchen).
-:-onSpawn pathBetween(bed_room, closet_room).
-:-onSpawn pathBetween(kitchen, back_yard).
-
-
-
+:-onSpawn pathBetween(tLivingRoom,tOfficeRoom).
+:-onSpawn pathBetween(tHall,tDiningRoom).
+:-onSpawn pathBetween(tHall,tBedRoom).
+:-onSpawn pathBetween(tHall,tLivingRoom).
+:-onSpawn pathBetween(tHall,tBathRoom).
+:-onSpawn pathBetween(tKitchen, tCellar).
+:-onSpawn pathBetween(tDiningRoom, tKitchen).
+:-onSpawn pathBetween(tBedRoom, tClosetRoom).
+:-onSpawn pathBetween(tKitchen, tBackYard).

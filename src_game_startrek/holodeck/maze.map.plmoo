@@ -18,33 +18,31 @@
 
 
 grid_key(ed='edge of world').
-grid_key(wl=wall).
-grid_key(lg=ledge).
-grid_key(dr=door).
-grid_key(gd=gold).
-grid_key(fd=food).
-grid_key(pt=pit).
+grid_key(wl=tWall).
+grid_key(lg=tLedge).
+grid_key(dr=tDoor).
+grid_key(gd=tGold).
+grid_key(fd=tFood).
+grid_key(pt=tPit).
 grid_key(el='elixer of health').
 
-type_grid(maze,1, [ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed]).
-type_grid(maze,2, [ed,--,--,--,wl,fd,--,fd,--,fd,--,fd,--,fd,--,--,fd,wl,gd,ed]).
-type_grid(maze,3, [ed,--,wl,--,wl,fd,--,--,--,--,--,--,--,--,--,wl,--,wl,--,ed]).
-type_grid(maze,4, [ed,--,wl,--,wl,fd,--,--,--,--,--,--,--,wl,--,wl,--,wl,--,ed]).
-type_grid(maze,5, [ed,--,wl,--,wl,wl,wl,--,wl,wl,wl,wl,--,wl,--,wl,--,wl,--,ed]).
-type_grid(maze,6, [ed,el,wl,--,--,--,--,--,--,--,--,--,--,wl,--,wl,--,wl,--,ed]).
-type_grid(maze,7, [ed,gd,wl,wl,wl,wl,wl,--,wl,wl,wl,--,wl,wl,--,--,--,--,--,ed]).
-type_grid(maze,8, [ed,wl,wl,--,--,--,--,--,--,--,--,--,--,wl,wl,wl,--,wl,--,ed]).
-type_grid(maze,9, [ed,--,--,--,wl,wl,wl,wl,wl,wl,wl,--,--,--,--,--,--,wl,--,ed]).
-type_grid(maze,10,[ed,--,wl,--,wl,--,--,--,--,gd,wl,--,wl,--,wl,--,--,wl,--,ed]).
-type_grid(maze,11,[ed,--,wl,--,wl,--,wl,--,wl,fd,wl,--,wl,fd,wl,--,--,wl,--,ed]).
-type_grid(maze,12,[ed,--,--,--,--,--,wl,--,wl,fd,wl,--,wl,wl,wl,--,--,wl,--,ed]).
-type_grid(maze,13,[ed,--,wl,--,wl,--,wl,--,wl,--,--,--,--,--,--,--,--,wl,--,ed]).
-type_grid(maze,14,[ed,fd,wl,--,wl,wl,wl,--,wl,wl,wl,wl,wl,wl,wl,wl,--,wl,--,ed]).
-type_grid(maze,15,[ed,--,wl,--,--,wl,--,--,--,--,--,--,--,--,pt,wl,--,--,--,ed]).
-type_grid(maze,16,[ed,fd,wl,fd,--,wl,--,wl,wl,wl,wl,wl,wl,--,wl,wl,wl,--,fd,ed]).
-type_grid(maze,17,[ed,--,wl,fd,--,--,--,--,--,--,--,--,--,--,--,--,wl,--,fd,ed]).
-type_grid(maze,18,[ed,fd,wl,wl,wl,wl,wl,wl,wl,--,wl,--,wl,wl,wl,--,wl,--,fd,ed]).
-type_grid(maze,19,[ed,pt,fd,--,fd,--,fd,--,fd,--,wl,--,--,--,--,--,--,--,fd,ed]).
-type_grid(maze,20,[ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed]).
-
-
+mudTypeGrid(maze,1, [ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed]).
+mudTypeGrid(maze,2, [ed,--,--,--,wl,fd,--,fd,--,fd,--,fd,--,fd,--,--,fd,wl,gd,ed]).
+mudTypeGrid(maze,3, [ed,--,wl,--,wl,fd,--,--,--,--,--,--,--,--,--,wl,--,wl,--,ed]).
+mudTypeGrid(maze,4, [ed,--,wl,--,wl,fd,--,--,--,--,--,--,--,wl,--,wl,--,wl,--,ed]).
+mudTypeGrid(maze,5, [ed,--,wl,--,wl,wl,wl,--,wl,wl,wl,wl,--,wl,--,wl,--,wl,--,ed]).
+mudTypeGrid(maze,6, [ed,el,wl,--,--,--,--,--,--,--,--,--,--,wl,--,wl,--,wl,--,ed]).
+mudTypeGrid(maze,7, [ed,gd,wl,wl,wl,wl,wl,--,wl,wl,wl,--,wl,wl,--,--,--,--,--,ed]).
+mudTypeGrid(maze,8, [ed,wl,wl,--,--,--,--,--,--,--,--,--,--,wl,wl,wl,--,wl,--,ed]).
+mudTypeGrid(maze,9, [ed,--,--,--,wl,wl,wl,wl,wl,wl,wl,--,--,--,--,--,--,wl,--,ed]).
+mudTypeGrid(maze,10,[ed,--,wl,--,wl,--,--,--,--,gd,wl,--,wl,--,wl,--,--,wl,--,ed]).
+mudTypeGrid(maze,11,[ed,--,wl,--,wl,--,wl,--,wl,fd,wl,--,wl,fd,wl,--,--,wl,--,ed]).
+mudTypeGrid(maze,12,[ed,--,--,--,--,--,wl,--,wl,fd,wl,--,wl,wl,wl,--,--,wl,--,ed]).
+mudTypeGrid(maze,13,[ed,--,wl,--,wl,--,wl,--,wl,--,--,--,--,--,--,--,--,wl,--,ed]).
+mudTypeGrid(maze,14,[ed,fd,wl,--,wl,wl,wl,--,wl,wl,wl,wl,wl,wl,wl,wl,--,wl,--,ed]).
+mudTypeGrid(maze,15,[ed,--,wl,--,--,wl,--,--,--,--,--,--,--,--,pt,wl,--,--,--,ed]).
+mudTypeGrid(maze,16,[ed,fd,wl,fd,--,wl,--,wl,wl,wl,wl,wl,wl,--,wl,wl,wl,--,fd,ed]).
+mudTypeGrid(maze,17,[ed,--,wl,fd,--,--,--,--,--,--,--,--,--,--,--,--,wl,--,fd,ed]).
+mudTypeGrid(maze,18,[ed,fd,wl,wl,wl,wl,wl,wl,wl,--,wl,--,wl,wl,wl,--,wl,--,fd,ed]).
+mudTypeGrid(maze,19,[ed,pt,fd,--,fd,--,fd,--,fd,--,wl,--,--,--,--,--,--,--,fd,ed]).
+mudTypeGrid(maze,20,[ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed]).
