@@ -366,7 +366,7 @@ logical_functor(X):-atom(X),member(X,[',',';']).
 
 :- register_module_type(utility).
 
-actiontype(list(term)).
+action_type(list(term)).
 agent_call_command(_Gent,list(Obj)):- term_listing(Obj).
 
 

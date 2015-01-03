@@ -16,7 +16,7 @@
 
 :- register_module_type(command).
 
-actiontype(take(item)).
+action_type(take(item)).
 
 :-decl_mpred(possess,notAssertible).
 

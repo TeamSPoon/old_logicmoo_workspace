@@ -99,6 +99,15 @@ string_lower(M,U):-toLowercase(M,U).
 
 camelSplitters(V):-member(V,[' ','-','_',':','mt','doom','Mt','Doom']).
 
+
+concat_atom_safe(I,O):-concat_atom_safe(I,'',O).
+
+concat_atom_safe(A,B,C):-!,atomic_list_concat_safe(A,B,C).
+
+concat_atom_safe([],_,O):-nonvar(O),!,O==''.
+concat_atom_safe(L,_,''):-nonvar(L),!,L==[].
+concat_atom_safe(A,B,C):-concat_atom(A,B,C).
+
 %================================================================
 % Atom / String functions
 %================================================================
@@ -255,26 +264,32 @@ toLowercase(MiXed,CASED):-compound(MiXed),MiXed=..MList,toLowercase(MList,UList)
 toLowercase(A,A).
 
 toPropercase(VAR,VAR):-var(VAR),!.
+toPropercase(Left,VARA):-atom(Left),text_to_string(Left,Str),!,toPropercase(Str,VAR),string_to_atom(VAR,VARA).
 toPropercase(Left,VAR):-nonvar(VAR),!,toPropercase(Left,New),!,VAR=New.
 toPropercase([],[]):-!.
+toPropercase('',''):-!.
 toPropercase([CX|Y],[D3|YY]):- must_det(toPropercase(CX,D3)),must_det(toPropercase(Y,YY)).
 toPropercase(MiXed,UPPER):-compound(MiXed),MiXed=..MList,toPropercase(MList,UList),!,UPPER=..UList.
 toPropercase(D3,D3):-not(atomic(D3)),!.
-toPropercase('',''):-!.
 toPropercase(A,U):-atom_length(A,1),toUppercase(A,U),!.
 toPropercase('_','_'):-!.
 toPropercase('_','-'):-!.
-toPropercase(D3,DD3):- camelSplitters(V),concat_atom([L,I|ST],V,D3),L \='',I \='',toPropercase([L,I|ST],LIST2),toPropercase(V,VV),concat_atom(LIST2,VV,DD3),!.
+
+toPropercase(D3,DD3):- camelSplitters(V),concat_atom_safe([L,I|ST],V,D3),L \='',I \='',toPropercase([L,I|ST],LIST2),toPropercase(V,VV),concat_atom_safe(LIST2,VV,DD3),!.
 toPropercase(CX,Y):- name(CX,[S|SS]),char_type(S,to_lower(NA)),name(NA,[N]),name(Y,[N|SS]),!.
 toPropercase(A,A).
 
 
 toCamelcase(VAR,VAR):-var(VAR),!.
 toCamelcase([],[]):-!.
+toCamelcase('',''):-!.
+toCamelcase('_',''):-!.
+toCamelcase('-',''):-!.
 toCamelcase([CX|Y],[D3|YY]):-!,toCamelcase(CX,D3),toCamelcase(Y,YY).
-toCamelcase(D3,DD3):-atom(D3),camelSplitters(V),concat_atom([L,I|ST],V,D3),toCamelcase([L,I|ST],LIST2),toCamelcase(V,VV),concat_atom(LIST2,VV,DD3).
-toCamelcase(CX,Y):-atom(CX),name(CX,[S|SS]),char_type(S,to_upper(NA)),name(NA,[N]),name(Y,[N|SS]),!.
 toCamelcase(MiXed,UPPER):-compound(MiXed),MiXed=..MList,toCamelcase(MList,UList),!,UPPER=..UList.
+toCamelcase(Left,VARA):-atom(Left),text_to_string(Left,Str),!,toCamelcase(Str,VAR),string_to_atom(VAR,VARA).
+toCamelcase(D3,DD3):-atomic(D3),camelSplitters(V),concat_atom_safe([L,I|ST],V,D3),toPropercase([I|ST],LIST2),toCamelcase(V,VV),concat_atom_safe([L|LIST2],VV,DD3).
+toCamelcase(CX,Y):-atomic(CX),name(CX,[S|SS]),char_type(S,to_upper(NA)),name(NA,[N]),name(Y,[N|SS]),!.
 toCamelcase(A,A).
 
       
@@ -284,10 +299,10 @@ toCamelcase(A,A).
 
 quoteAtomString([34|T],Out):-name(Out,[34|T]),!.
 quoteAtomString([H|T],Out):-!,append([34,H|T],[34],Quote),name(Out,Quote).
-quoteAtomString(QU,QU):-concat_atom(['"'|_],QU),!.
-quoteAtomString(UQ,QU):-concat_atom(['"',UQ,'"'],QU),!.
+quoteAtomString(QU,QU):-concat_atom_safe(['"'|_],QU),!.
+quoteAtomString(UQ,QU):-concat_atom_safe(['"',UQ,'"'],QU),!.
 
-unquoteAtom(Atom,New):-concat_atom(LIST,'"',Atom),concat_atom(LIST,'',New),!.
+unquoteAtom(Atom,New):-concat_atom_safe(LIST,'"',Atom),concat_atom_safe(LIST,'',New),!.
 
 % ===========================================================
 % string/chars/codes
@@ -348,7 +363,7 @@ stringToList(X,Y):-atom(X),atom_codes(X,Codes),!,stringToList(Codes,Y),!.
 stringToList(X,Y):-string(X),string_to_atom(X,M),!,stringToList(M,Y).
 stringToList(X,Y):-string(X),!,string_to_list(X,Y).
 stringToList(X,Y):-is_string(X),!,string_to_list(X,Y).
-stringToList([X|XX],Y):-concat_atom([X|XX],' ',XXX),!,string_to_list(XXX,Y).
+stringToList([X|XX],Y):-concat_atom_safe([X|XX],' ',XXX),!,string_to_list(XXX,Y).
 %prologPredToCyc(Predicate):-arity(PredicateHead)
 
 stringToCodelist(S,CL):-stringToCodelist2(S,SL),!,escapeString(SL,CS),!,stringToList(CL,CS),!.

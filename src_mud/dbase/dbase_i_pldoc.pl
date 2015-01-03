@@ -131,14 +131,47 @@ showCounts([H|L],OTHER):- occurrences_of_term(H,OTHER,N),write_count(H,N),showCo
 
 write_count(H,N):- writeq(H:N),write(', ').
 
+/*
+
+:-source_to_txt('../src_mud/actions/take.pl').
+
+*/
+to_tclass(F,F):- current_predicate(_:F/A),functor(P,F,A),predicate_property(P,built_in).
+to_tclass(F,F):-atom_string(F,S),string_lower(S,L),S\=L,!.
+to_tclass(agent,tAgentGeneric).
+to_tclass(item,tItem).
+to_tclass(atloc,propAtLoc).
+to_tclass(possess,propPossess).
+to_tclass(charge,propCharge).
+to_tclass(drop,actDrop).
+to_tclass(Prop,New):- formattype(Prop),ensure_starts_with_prefix(Prop,ft,New),!.
+to_tclass(Prop,New):- mpred_arity(Prop,1),mpred_arity(Prop,col),ensure_starts_with_prefix(Prop,t,New),!.
+to_tclass(Prop,New):- mpred_prop(Prop,prologHybrid),mpred_arity(Prop,M),M>1,mpred_prop(Prop,argsIsaInList(_)),ensure_starts_with_prefix(Prop,prop,New),!.
+to_tclass(Prop,New):- is_actverb(Prop),ensure_starts_with_prefix(Prop,act,New),!.
+% to_tclass(Prop,New):- isa(Prop,col),ensure_starts_with_prefix(Prop,t,New),!.
+% to_tclass(Prop,actDrop).
+
+is_actverb(X):-type_action_info(_,PX,_),functor(PX,X,_),!.
+is_actverb(X):-action_info(PX,_),functor(PX,X,_),!.
+is_actverb(X):-action_type(PX),functor(PX,X,_),!.
+is_actverb(X):-posture(PX),functor(PX,X,_),!.
+is_actverb(X):-verb_alias(_,X).
+
+ensure_starts_with_prefix(A,Prefix,A):- atom_concat(Prefix,Rest,A),toCamelcase(Rest,CC),toPropercase(CC,PC),!,Rest==PC.
+ensure_starts_with_prefix(A,Prefix,B):- toCamelcase(A,CC),toPropercase(CC,PC),!,atom_concat(Prefix,PC,B),!.
+ 
 
 
+%mpred_prop(Prop,prologHybrid).
 
 transform_term(TermIn,TermOut):-nohtml,get_frag_class(State),transform_term(TermIn,State,TermOut).
 
-transform_term(Term,Same,Term):- member(Same,[nofile,functor,int]),!.
-transform_term(Term,Atom,TermO):-atom(Atom),!,TermO=..[Atom,Term].
+transform_term(Term,_,Term):- var(Term),!.
+transform_term(Term,_,TermOut):- atom(Term),atom_length(Term,L),L>2,to_tclass(Term,TermOut),!.
 transform_term(Term,_,Term):-!.
+transform_term(Term,Same,Term):- member(Same,[nofile,functor,int,control,neck,var]),!.
+transform_term(Term,Atom,TermO):-atom(Atom),!,TermO=..[Atom,Term].
+%transform_term(Term,_,Term):-!.
 transform_term(Term,State,nohtml(State,Term)).
 
 
@@ -188,22 +221,21 @@ transform_term(Term,State,nohtml(State,Term)).
 :- use_module(library(prolog_xref)).
 
 :- meta_predicate
-	s_to_html(+, +, ^).
+	s_to_html(+, +, +).
 
 :- meta_predicate
-	source_to_txt(+, +, ^).
+	source_to_txt(+, +, +).
 
 :- meta_predicate 
        source_to_txt(+).
 
 source_to_txt(S):- source_to_txt(S,stream(current_output),[]).
 
-source_to_txt(S,Out,M:Opts):- 
+source_to_txt(S,Out,Opts):- 
   asserta(nohtml),
-  debug(htmlsrc),
    setup_call_cleanup(
      true,
-     s_to_html(S,Out,M:[header(false)|Opts]),
+     s_to_html(S,Out,[header(false),format_comments(false)|Opts]),
      retract(nohtml)).
 
 
@@ -375,7 +407,9 @@ html_fragment_new(H, In, Out, State0, State1, Options):-
   with_assertions(thlocal:frag_class(Class),
    html_fragment(H, In, Out, State0, State1, Options)).
 
-class_from_frag(H,A):-arg(3,H,A),!.
+class_from_frag(H,H):-atom(H),!.
+class_from_frag(fragment(_, _,H,_),A):-class_from_frag(H,A),!.
+class_from_frag(H,A):-compound(H),functor(H,A,_),!.
 class_from_frag(_,noClass):-!.
 
 html_fragment(fragment(Start, End, structured_comment, []),
@@ -460,7 +494,7 @@ end_fragment(_, _, [nop|State], State) :- !.
 end_fragment(Out, In, [span(class(directive))|State], State) :- !,
 	copy_full_stop(In, Out),
 	noformat(Out, '</span>', []),
-	(   peek_code(In, 10),
+	(   (peek_code(In, 10),format(Out,'\n',[])),
 	    \+ nonl
 	->  assert(nonl)
 	;   true
@@ -551,7 +585,8 @@ copy_full_stop(In, Out) :-
 	get_code(In, C0),
 	copy_full_stop(C0, In, Out).
 
-copy_full_stop(0'., _, Out) :- !,
+copy_full_stop(0'.,
+  _, Out) :- !,
 	put_code(Out, 0'.).
 copy_full_stop(C, In, Out) :-
 	put_code(Out, C),
@@ -731,4 +766,10 @@ css_class(Term, Class) :-
 
 element(_,_,_).				% term expanded
 
+
+cp_src(F):-atom_concat('/mnt/mint-oldsys/devel/PrologMUD/',B,F),atom_concat('/mnt/mint-oldsys/devel/PrologMUD/temp~/',B,NF),
+   tell(NF),source_to_txt(F),told.
+
+:-export(psaveall/0).
+psaveall:- mmake, forall(enumerate_files('../src_mud/**/*.pl*',F),cp_src(F)),!, forall(enumerate_files('../games/**/*.pl*',F),cp_src(F)).
 

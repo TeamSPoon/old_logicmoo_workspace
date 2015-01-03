@@ -17,7 +17,7 @@
 
 :- register_module_type(command).
 
-actiontype(push(dir)).
+action_type(push(dir)).
 
 % Push a box
 % Nothing to push... agent moves and takes a little damage.

@@ -3,5 +3,6 @@
 	<Projects>
 		<Project File="PrologMUD.vpj"/>
 		<Project File="externals/PrologMUD_ext.vpj"/>
+		<Project File="tempFiles.vpj"/>
 	</Projects>
 </Workspace>

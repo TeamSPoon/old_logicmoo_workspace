@@ -135,8 +135,8 @@ term_anglify_args(Head,F,A,ARGS,multi(Which),English):- !,replace_nth(ARGS,Which
 /*
 
 term_expansion((term_anglify_args(_Head,F,A,ARGS0,singleValued,English):- add_arg_parts_of_speech(F,1,ARGS0,ARGS),verb_after_arg(F,A,After),
-insert_into(ARGS,After,verbFn(F),NEWARGS),
-fully_expand(NEWARGS,English),X),O).
+   insert_into(ARGS,After,verbFn(F),NEWARGS),
+   fully_expand(NEWARGS,English),X),O).
 
 */
 term_anglify_args(_Head,F,A,ARGS0,singleValued,English):- add_arg_parts_of_speech(F,1,ARGS0,ARGS),verb_after_arg(F,A,After),
@@ -169,7 +169,7 @@ prologHybrid(type_grid(col,int,term)).
 multiValued(action_rules(agent,verb,term(obj),term(list(term(property))))).
 
 
-col(actiontype).
+col(action_type).
 
 singleValued(atloc(obj,xyz(region,int,int,int))).
 
@@ -349,9 +349,9 @@ multiValued(ask_predicate(multiValued,term)).
 
 isa(text,formattype).
 
-argsIsaInList(type_action_info(agentcol,actiontype,text)).
-argsIsaInList(action_info(actiontype,text)).
-argsIsaInList(actiontype(term)).
+argsIsaInList(type_action_info(agentcol,action_type,text)).
+argsIsaInList(action_info(action_type,text)).
+argsIsaInList(action_type(term)).
 argsIsaInList(argIsa(relation,int,col)).
 argsIsaInList(argFormat(relation,int,formattype)).
 
@@ -368,7 +368,7 @@ col(verb).
 equivRule(nameStrings(apath(Region,Dir),Text),pathName(Region,Dir,Text)).
 equivRule(description(apath(Region,Dir),Text),pathName(Region,Dir,Text)).
 
-% dbase_t(action_info,What,text("command is: ",What)):- holds_t(actiontype,What).
+% dbase_t(action_info,What,text("command is: ",What)):- holds_t(action_type,What).
 
 :-decl_mpred_hybrid(stowed(agent,item)).
 

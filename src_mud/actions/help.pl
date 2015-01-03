@@ -14,7 +14,7 @@ subclass(agentcol,col).
 % type_action_info(human_player,help, "shows this help").
 type_action_info(human_player,help(optional(string,"")), "shows this help").
 
-action_info(What,text("command is: ",What)):- actiontype(What).
+action_info(What,text("command is: ",What)):- action_type(What).
 
 
 :-swi_export(get_type_action_help_commands_list/3).
@@ -28,7 +28,7 @@ good_template(Templ):- \+ contains_singletons(Templ).
 
 get_type_action_help_0(What,TEMPL,Help):- call_no_cuts(type_action_info(What,TEMPL,Help)).
 get_type_action_help_0(_What,TEMPL,Help):- call_no_cuts(action_info(TEMPL,Help)).
-get_type_action_help_0(_What,TEMPL,S):-    call_no_cuts(actiontype(TEMPL)),sformat(S,'Prolog looks like: ~q',[TEMPL]).
+get_type_action_help_0(_What,TEMPL,S):-    call_no_cuts(action_type(TEMPL)),sformat(S,'Prolog looks like: ~q',[TEMPL]).
 get_type_action_help_0(isaFn(A),TEMPL,text(Text,'does: ',do(A2,TEMPL))):- between(1,5,L),length(Text,L),get_agent_text_command(A,Text,A2,Goal),(nonvar(Goal)->TEMPL=Goal;TEMPL=Text).
 get_type_action_help_0(What,Syntax,text([makes,happen,List])):- call_no_cuts(action_rules(Agent,Verb,[Obj|Objs],List)),atom(Verb),safe_univ(Syntax,[Verb,Obj|Objs]), 
                      % once(member(isa(Obj,_Type),List);_Type=term),

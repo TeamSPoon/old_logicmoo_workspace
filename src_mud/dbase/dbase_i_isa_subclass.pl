@@ -290,7 +290,7 @@ col(colDeclarer).
 col(ArgsIsa):-argsIsaProps(ArgsIsa).
 col(F):-hasInstance(colDeclarer,F).
 col(formattype).
-col(actiontype).
+col(action_type).
 col(region).
 col(container).
 

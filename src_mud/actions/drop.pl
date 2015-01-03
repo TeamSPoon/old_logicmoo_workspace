@@ -15,7 +15,7 @@
 
 :- register_module_type(command).
 
-actiontype(drop(item)).
+action_type(drop(item)).
 
 % Drop something
 agent_call_command(Agent,drop(SObj)) :-

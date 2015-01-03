@@ -18,7 +18,7 @@
 :- register_module_type(command).
 
 % attack joe ->translates-> attack nw
-actiontype(attack(dir)).
+action_type(attack(dir)).
 
 % Attack
 % Successful Attack

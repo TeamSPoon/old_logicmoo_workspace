@@ -4,14 +4,14 @@
 */
 
 % [Optionaly] Set the Prolog optimize/debug flags
-:- set_prolog_flag(gc,true),set_prolog_flag(debug,false),set_prolog_flag(last_call_optimisation,true),set_prolog_flag(optimise,true).
 :- set_prolog_flag(verbose_load,true).
 :- use_module(library(gui_tracer)).
 :- set_prolog_flag(gui_tracer, false).
 
 % [Manditory] Load the Logicmioo utils
 :- '@'(ensure_loaded('../src_lib/logicmoo_util/logicmoo_util_all'),user).
-:- set_prolog_flag(gc,true),set_prolog_flag(debug,false),set_prolog_flag(last_call_optimisation,true),set_prolog_flag(optimise,true).
+% :- set_prolog_flag(gc,true),set_prolog_flag(last_call_optimisation,true),set_prolog_flag(optimise,true).
+% :- set_prolog_flag(debug,false),
 
 % [Manditory] define how we interact with the module system
 swi_module(M,E):-dmsg(swi_module(M,E)).

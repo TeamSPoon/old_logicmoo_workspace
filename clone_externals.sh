@@ -13,7 +13,9 @@ fi
 # must have at least
 git clone $GITRC https://github.com/TeamSPoon/MUD_Examples games/
 git clone $GITRC https://github.com/TeamSPoon/hMUD $MUDPACK/hMUD
-sudo ln -s `pwd`/$MUDPACK/hMUD /var/www/html/hmud
+if [ ! -d /var/www/html/hmud/ ]; then
+ sudo ln -s `pwd`/$MUDPACK/hMUD /var/www/html/hmud/
+fi
 sudo adduser --gecos "PrologMUD User" --disabled-login --disabled-password prologmud
 
 # very usefull for seeing what is going on

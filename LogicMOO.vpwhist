@@ -1,8 +1,11 @@
+[ActiveConfig]
+tempFiles.vpj=Release
 [Global]
-CurrentProject=PrologMUD.vpj
+CurrentProject=tempFiles.vpj
 [ProjectDates]
-PrologMUD.vpj=20141227124652282
+PrologMUD.vpj=20150102185535180
 externals\PrologMUD_ext.vpj=20141228123609793
+tempFiles.vpj=20141231002747733
 [TreeExpansion2]
 - PrologMUD.vpj
   - src_mud

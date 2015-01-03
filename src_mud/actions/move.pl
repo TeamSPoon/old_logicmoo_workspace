@@ -101,7 +101,7 @@ update_stats(Agent,fall) :- padd(Agent,health,-10).
 
 % cheating but to test
 
-actiontype(go(dir)).
+action_type(go(dir)).
 agent_call_command(Agent,go(Dir)) :-
 	atloc(Agent,LOC),
         in_world_move(LOC,Agent,Dir),
