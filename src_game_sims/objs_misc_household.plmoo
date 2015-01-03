@@ -96,7 +96,7 @@ doorsConnect(Thing,Noun2):- pathBetween(Thing,Noun2); pathBetween(Noun2,Thing).
 addPathBetweens:- doall((no_repeats(doorsConnect(R1,R2)),must_det(ensure_some_pathBetween(R1,R2)))).
 
 ensure_some_pathBetween(R1,R2):- pathBetween(R1,_Dir,R2),!.
-ensure_some_pathBetween(R1,R2):- random_instance(ftDir,Dir,atom_length(Dir,1)),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
+ensure_some_pathBetween(R1,R2):- random_instance(vtDirection,Dir,atom_length(Dir,1)),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
    add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)),!.
 ensure_some_pathBetween(R1,R2):- split_name_type(R2,_,Isa), any_to_string(Isa,Str), any_to_dir(Str,Dir),show_call(add(pathBetween(R1,Dir,R2))).
 
