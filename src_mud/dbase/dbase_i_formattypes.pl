@@ -32,8 +32,9 @@
 toUpperCamelcase(Type,TypeUC):-toCamelcase(Type,TypeC),toPropercase(TypeC,TypeUC),!.
 % TODO OPTIMISE
 :-export(typename_to_iname/3).
-typename_to_iname(I,OType,IType):-type_prefix(Prefix,_),atom_concat(Prefix,Type,OType),capitalized(Type),!,typename_to_iname(I,Type,IType).
-typename_to_iname(I,Type,IType):-toUpperCamelcase(Type,UType),atom_concat(I,UType,IType).
+typename_to_iname(I,OType,IType):-typename_to_iname0(I,OType,IOType),!,IOType=IType.
+typename_to_iname0(I,OType,IType):-type_prefix(Prefix,_),atom_concat(Prefix,Type,OType),capitalized(Type),!,typename_to_iname0(I,Type,IType).
+typename_to_iname0(I,Type,IType):-toUpperCamelcase(Type,UType),atom_concat(I,UType,IType).
 
 
 :-export(split_name_type/3).
@@ -52,7 +53,7 @@ split_name_type_0(C,P,C):- var(P),atom(C),typename_to_iname(i,C,I),gensym(I,P),!
 
 formattype_guessable(S):- mudFtInfo(S,_).
 
-term_is_ft(Term,Type):- var(Type),var(Term),!,member(Type,[ftVar,ftCallable]).
+term_is_ft(Term,Type):- var(Type),var(Term),!,member(Type,[ftVar,ftProlog]).
 term_is_ft(Term,Type):- var(Term),!,member(Type,[ftVar,ftTerm,ftCallable]).
 term_is_ft(Term,Type):- nonvar(Term),var(Type),!,formattype_guessable(Type),term_is_ft(Term,Type).
 term_is_ft(Term,Type):- must_det(ttFormatType(Type)),

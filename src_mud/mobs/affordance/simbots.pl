@@ -526,6 +526,13 @@ mudSubclass(tFurniture,tObj).
 verb_alias("observe",actUse).
 verb_alias("operate",actUse).
 
+
+user:action_info(ACT, DESC):-no_repeats(action_info_simbots(ACT, DESC)).
+
+action_info_simbots(ACT, DESC):-verb_desc(V,O,DESC),ACT=..[V,O].
+action_info_simbots(ACT,text([verb_for_type,V, O])):-verb_affordance(V, O,_,_,_),ACT=..[V,O].
+action_info_simbots(ACT,text([verb_for_type,V, O])):-verb_for_type(V, O),ACT=..[V,O].
+
 /*
 
 

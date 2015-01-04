@@ -39,12 +39,6 @@ get_agent_text_command_0(Agent,ListIn,AgentR,CMD):-
    (is_list(ListIn) -> UseList=ListIn ; UseList=[ListIn]),
        call_no_cuts(agent_text_command(Agent,UseList,AgentR,CMD)).
 
-% ===========================================================
-% DEBUG/NODEBUG command
-% ===========================================================
-type_action_info(tHumanPlayer,debug(ftTerm),"Development Usage: debug  the blue backpack").
-
-agent_call_command(Agent,debug(Term)):- agent_call_safely(Agent,debug(Term)).
 
 % ===========================================================
 % PARSE command
@@ -396,7 +390,7 @@ phrase_parseForTypes_1(TYPEARGS,ARGS,GOODARGS,LeftOver):- catchv(phrase_parseFor
 phrase_parseForTypes_1(TYPEARGS,In,Out,[]):- length(TYPEARGS,L),between(1,4,L),length(In,L),must(Out=In),!,fmt(fake_phrase_parseForTypes_l(foreach_isa(In,TYPEARGS))),fail.
 phrase_parseForTypes_1(TYPEARGS,ARGS,GOODARGS,LeftOver):- debugOnError(phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver)).    
 
-phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver):- (LeftOver=[];LeftOver=[_|_] ), phrase(parseForTypes(TYPEARGS,GOODARGS),ARGS,LeftOver).
+phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver):- (LeftOver=[];LeftOver=_ /*[_|_]*/), phrase(parseForTypes(TYPEARGS,GOODARGS),ARGS,LeftOver).
 
 parseForTypes([], [], A, A).
 parseForTypes([TYPE|TYPES], [B|E], C, G) :-

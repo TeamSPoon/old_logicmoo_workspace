@@ -196,15 +196,8 @@ not_ft(T):-transitive_subclass_or_same(T,tSpatialthing).
 % ============================================
 % isa_asserted/1
 % ============================================
-
-isa_asserted(I,T):-no_repeats(isa_asserted_new(I,T)).
-isa_asserted_new(I,T):-isa_asserted_motel(I,T).
-isa_asserted_new(I,T):-type_isa(I,T).
-isa_asserted_new(I,T):-nonvar(T),type_prefix(_Prefix,T),atom(I),!,isa_from_morphology(I,T).
-isa_asserted_new(I,T):-isa_asserted_ft(I,T).
-isa_asserted_new(I,T):-nonvar(T),append_term(T,I,HEAD),hybrid_rule(HEAD,BODY),call_mpred_body(HEAD,BODY).
-isa_asserted_new(I,T):-type_deduced(I,T).
-isa_asserted_new(I,T):-isa_from_morphology(I,T).
+isa_asserted(I,T):-no_repeats(isa_asserted_nr(I,T)).
+isa_asserted_motel(I,T):-no_repeats(isa_asserted_nr(I,T)).
 
 :-dynamic_multifile_exported(type_isa/2).
 
@@ -236,9 +229,10 @@ type_prefix(t,ttObjectType).
 type_prefix(v,ftValue).
 type_prefix(i,ftID).
 
+callOr(Pred,I,T):-(call(Pred,I);call(Pred,T)),!.
 
-
-type_deduced(I,T):-dbase_t(P,_,I),not(number(I)),(argIsa_known(P,2,AT)->T=AT;typename_to_iname(vt,P,T)).
+type_deduced(I,T):-atom(T),typename_to_iname(mud,T,P),!,dbase_t(P,_,I).
+type_deduced(I,T):-nonvar(I),not(number(I)),dbase_t(P,_,I),(argIsa_known(P,2,AT)->T=AT;typename_to_iname(vt,P,T)).
 
 
 isa_asserted_ft(I,T):- T==ftVar,!,var(I).
@@ -253,12 +247,16 @@ isa_asserted_ft(I,T):-atomic(I),!,member(T,[ftAtom,ftID]).
 isa_asserted_ft(_,ftCompound).
 isa_asserted_ft(I,T):-compound(I),functor(I,T,_),ttFormatType(T).
 
-isa_asserted_motel(I,T):-no_repeats(isa_asserted_nr(I,T)).
-
 % isa_asserted_nr(I,T):- nonvar(I),fail,build_isa_inst_list_cache(I,_,T,CALL),CALL.
 isa_asserted_nr(I,T):- stack_check,fact_loop_checked(mudIsa(I,T),isa_asserted_0(I,T)).
 
-isa_asserted_0(I,T):-atom(I),isa_w_inst_atom(I,T).
+isa_asserted_0(I,T):-type_deduced(I,T).
+isa_asserted_0(I,T):-isa_from_morphology(I,T).
+isa_asserted_0(I,T):-type_isa(I,T).
+isa_asserted_0(I,T):-nonvar(T),type_prefix(_Prefix,T),atom(I),!,isa_from_morphology(I,T).
+isa_asserted_0(I,T):-nonvar(T),append_term(T,I,HEAD),hybrid_rule(HEAD,BODY),call_mpred_body(HEAD,BODY).
+isa_asserted_0(I,T):-isa_asserted_ft(I,T).
+
 isa_asserted_0(I,T):-fact_always_true(mudIsa(I,T)).
 
 isa_asserted_0(I,T):- ((thlocal:useOnlyExternalDBs,!);thglobal:use_cyc_database),(kbp_t([mudIsa,I,T]);kbp_t([T,I])).
@@ -270,18 +268,11 @@ isa_asserted_1(I,T):-T\=mped_type(_),mpred_prop(I,T).
 isa_asserted_1(I,'&'(T1 , T2)):-nonvar(T1),var(T2),!,dif:dif(T1,T2),isa_backchaing(I,T1),impliedSubClass(T1,T2),isa_backchaing(I,T2).
 isa_asserted_1(I,'&'(T1 , T2)):-nonvar(T1),!,dif:dif(T1,T2),isa_backchaing(I,T1),isa_backchaing(I,T2).
 isa_asserted_1(I,(T1 ; T2)):-nonvar(T1),!,dif:dif(T1,T2),isa_backchaing(I,T1),isa_backchaing(I,T2).
-isa_asserted_1(I,ttFormatType):-!,isa_w_type_atom(I,ttFormatType).
 isa_asserted_1(I,tCol):-!,isa_w_type_atom(I,tCol).
 isa_asserted_1(I,T):-atom(T),isa_w_type_atom(I,T).
-isa_asserted_1(I,T):-nonvar(I),isa_asserted(T,ttFormatType),!,term_is_ft(I,T).
+isa_asserted_1(I,T):-nonvar(I),ttFormatType(T),term_is_ft(I,T).
 % isa_asserted_1(I,T):- compound(I),functor(I,F,_),!,isa_backchaing_1(F,T).
 
-%isa_w_inst_atom(O,T):- atomic_list_concat_catch([T,_|_],'-',O),!.
-%isa_w_inst_atom(O,T):- atom_concat(T,Int,O),catch(atom_number(Int,_),_,fail),!.
-isa_w_inst_atom(_,T):- T==atom. 
-
-isa_w_type_atom(I,ttFormatType):- clause(mudFtInfo(I,_),true).
-isa_w_type_atom(I,ttFormatType):-!, clause(mudSubft(I,_),true).
 isa_w_type_atom(I,T):- argsIsaProps(T),!,mpred_prop(I,T).
 isa_w_type_atom(I,T):- clause(mpred_prop(I,T),true).
 isa_w_type_atom(I,T):- G=..[T,I],once_if_ground(isa_atom_call(T,G),_).
@@ -479,3 +470,7 @@ disjointWith(A,B):- once((type_isa(A,AT),type_isa(B,BT))),AT \= BT.
 
 :- assert_hasInstance(ttFormatType,string).
 :- assert_hasInstance(tCol,tContainer).
+
+ttFormatType(I):- clause(mudFtInfo(I,_),true).
+ttFormatType(I):- clause(mudSubft(I,_),true).
+
