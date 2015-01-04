@@ -139,8 +139,8 @@ isa(item,itemcol).
 cached(G):-ccatch(G,_,fail).
 
 :-swi_export(create_meta/4).
-% if SuggestedName was 'food666' it'd isLike the SuggestedClass to be 'food' and the stystem name will remain 'food666'
-% if SuggestedName was 'food' it'd isLike the SuggestedClass to be 'food' and the stystem name will become a gensym isLike 'food1'
+% if SuggestedName was 'food666' it'd like the SuggestedClass to be 'food' and the stystem name will remain 'food666'
+% if SuggestedName was 'food' it'd like the SuggestedClass to be 'food' and the stystem name will become a gensym like 'food1'
 create_meta(SuggestedName,SuggestedClass,BaseClass,SystemName):-
    must_det(split_name_type(SuggestedName,SystemName,NewSuggestedClass)),
    ignore(SuggestedClass=NewSuggestedClass),   

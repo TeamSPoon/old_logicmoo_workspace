@@ -41,7 +41,7 @@ defined_affordance([objType= "Ladder",
 stringMatch= "ladder",
 superType= "Passable"]).
 
-% looks isLike a very bad idea but not (this is mainly for testing the system)
+% looks like a very bad idea but not (this is mainly for testing the system)
 defined_affordance([objType= tFurniture,actionVerb= "BumpIntoBarrier",
 'NonLoneliness_Social'= -300 * 0,
 'Hygiene'= -300 * 0,
