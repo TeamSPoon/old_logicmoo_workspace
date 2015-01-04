@@ -130,7 +130,7 @@ mudSubclass(tDresser, tBedRoomFurnature).
 
 mudSubclass(tWashingMachine, tDeviceFurnature).
 mudSubclass(tTable, tFurnature).
-mudSubclass(tTable, tHassurface).
+mudSubclass(tTable, tHasSurface).
 mudSubclass(tSofa, tLivingRoomFurnature).
 mudSubclass(tEasyChair, tLivingRoomFurnature).
 mudSubclass(tCoffeeTable, tLivingRoomFurnature).
@@ -191,7 +191,7 @@ default_type_props(tBall,[mudColor(vRed),mudSize(vMedium),mudShape(vSpherical),m
 default_type_props(tCoffee,[mudColor(isEach(vBlack,vBrown)),mudSize(vSmall),mudShape(vFluid),mudMaterial(tLiquid),mudTexture(vWet)]).
 default_type_props(tCoffeeCup,[mudColor(vBlack),mudColor(vBrown),mudSize(vSmall),mudShape(vCuplike),mudMaterial(vGlass),mudTexture(vSmooth)]).
 default_type_props(tSofa,[mudColor(isEach(vBlue,vDark)),mudSize(isEach(vLarge,vWide,vLong)),mudShape(vPolyhedral),mudMaterial(isEach(vPoplin,vWood)),mudTexture(vRibbed),mudWeight(125)]).
-default_type_props(tEasyChair,[mudColor(vBlue),mudSize(isEach(vLarge,narrow)),mudShape(vPolyhedral),mudMaterial(isEach(vPoplin,vWood)),mudTexture(vRibbed),mudWeight(75)]).
+default_type_props(tEasyChair,[mudColor(vBlue),mudSize(isEach(vLarge,vNarrow)),mudShape(vPolyhedral),mudMaterial(isEach(vPoplin,vWood)),mudTexture(vRibbed),mudWeight(75)]).
 default_type_props(tCoffeeTable,[mudColor(isEach(vBrown,vShiney)),mudSize(vMedium),mudShape(vCircular),mudMaterial(vWood),mudTexture(vSmooth),mudWeight(35)]).
 default_type_props(tBookTypeA,[mudColor(vGreen),mudColor(vWhite),mudColor(vBlack),mudSize(vSmall),mudShape(isEach(vCubular,vRectangular)),mudMaterial(vPaper),mudTexture(vSmooth)]).
 default_type_props(tPinkBook,[mudColor(vPink),mudColor(vWhite),mudColor(vBlack),mudSize(vSmall),mudShape(isEach(vCubular,vRectangular)),mudMaterial(vPaper),mudTexture(vSmooth)]).
