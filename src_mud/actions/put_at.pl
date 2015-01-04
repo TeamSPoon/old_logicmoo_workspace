@@ -17,7 +17,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(tCommand).
+:- register_module_type(mtCommand).
 
 % actPut
 action_info(actPut(tThrowable,prepstr_spatial,tHasobjs),"actPut [obj] [onto|inside] [somewhere]").

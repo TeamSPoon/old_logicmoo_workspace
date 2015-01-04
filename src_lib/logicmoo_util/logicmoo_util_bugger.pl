@@ -431,19 +431,6 @@ fill_args([Arg|More],With):-!,ignore(With=Arg),fill_args(More,With).
 fill_args([],_).
 fill_args(PI,With):-PI=..[_|ARGS],fill_args(ARGS,With).
 
-% use ccatch/3 to replace catch/3 works around SWI specific issues arround using $abort/0 and block/3
-% (catchv/3 allows you to have these exceptions bubble up past your catch block handlers)
-:- meta_predicate((catchv(0, ?, 0))).
-:- meta_predicate((ccatch(0, ?, 0))).
-:- export((ccatch/3,catchv/3)).
-bubbled_ex(block(_,_)).
-bubbled_ex('$aborted').
-bubbled_ex_check(E):- (\+ bubbled_ex(E)),!.
-bubbled_ex_check(E):-throw(E).
-ccatch(Goal,E,Recovery):- nonvar(E),!,catch(Goal,E,Recovery). % normal mode (the user knows what they want)
-ccatch(Goal,E,Recovery):- catch(Goal,E,(bubbled_ex_check(E),Recovery)). % prevents promiscous mode
-catchv(Goal,E,Recovery):- catch(Goal,E,(bubbled_ex_check(E),Recovery)). % prevents promiscous mode
-
 :- meta_predicate_transparent(meta_predicate_transparent(0)).
 
 
@@ -1145,7 +1132,7 @@ moo_hide_childs_0(N,MPred):-
 
 moo_hide_show_childs(M,F,A):-functor(MPred,F,A),moo_hide_show_childs(M,F,A,MPred).
 
-moo_hide_childs(M,F,A):-functor(MPred,F,A),moo_hide_childs(M,F,A,1,1).
+moo_hide_childs(M,F,A):-moo_trace_hidechilds(M,F,A,1,1).
 
 moo_hide_show_childs(M,_,_, MPred):- not(predicate_property(_:MPred,imported_from(M))).
 moo_hide_show_childs(M,F,A,_MPred):- moo_trace_hidechilds(M,F,A,0,0).
@@ -2517,7 +2504,7 @@ asserta_if_ground(_).
 % =====================================================================================================================
 :- module_notrace(bugger).
 % =====================================================================================================================
-:- module_notrace(logicmoo_util_strings).
+%:- module_notrace(logicmoo_util_strings).
 % =====================================================================================================================
 
 :-source_location(File,_Line),module_property(M,file(File)),!,forall(current_predicate(M:F/A),moo_hide_show_childs(M,F,A)).

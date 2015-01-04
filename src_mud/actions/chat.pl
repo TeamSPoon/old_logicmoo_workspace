@@ -9,11 +9,11 @@
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
-:- register_module_type(tCommand).
+:- register_module_type(mtCommand).
 
 action_info(Say,ftText("invokes",Does)):-socialCommand(Say,_SocialVerb,Does).
 
-socialCommand(Say,SocialVerb,chat(optional(tVerb,SocialVerb),optional(tChannel,vHere),string)):-vtSocialVerb(SocialVerb), Say =.. [SocialVerb,optional(tChannel,vHere),string].
+socialCommand(Say,SocialVerb,chat(isOptional(vtVerb,SocialVerb),isOptional(tChannel,vHere),ftString)):-vtSocialVerb(SocialVerb), Say =.. [SocialVerb,isOptional(tChannel,vHere),ftString].
 vtSocialVerb(SocialVerb):-member(SocialVerb,[actSay,actWhisper,actEmote,actTell,actAsk,actShout,actGossup]).
 
 agent_text_command(Agent,[Say|What],Agent,CMD):-agent_text_command_chat(Agent,[Say|What],Agent,CMD).
@@ -33,7 +33,7 @@ chat_to_callcmd(Agent,Say,What,CMD):-append(Text,[to,Whom],What),!,chat_command_
 % say some text
 chat_to_callcmd(Agent,Say,What,CMD):-mudAtLoc(Agent,Where),chat_command_parse_2(Agent,Say,Where,What,CMD).
 
-chat_command_parse_2(Agent,Say,Where,What,prologCall(do_social(Agent,Say,Where,What))).
+chat_command_parse_2(Agent,Say,Where,What,actProlog(do_social(Agent,Say,Where,What))).
 
 do_social(Agent,Say,Whom,Text):-
    mudAtLoc(Agent,Where),

@@ -10,15 +10,15 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(tCommand).
+:- register_module_type(mtCommand).
 
-argsIsaInList(action_verb_useable(tVerb,ftTerm(tMpred),tCol,ftTerm(tMpred))).
+argsIsaInList(action_verb_useable(vtVerb,ftTerm(tPred),tCol,ftTerm(tPred))).
 
 
-mudSubclass(eachOf('PortableObject','ProtectiveAttire',tStowable),tWieldable).
+mudSubclass(isEach('PortableObject','ProtectiveAttire',tStowable),tWieldable).
 mudSubclass('FluidReservoir',tDrinkable).
-mudSubclass('Weapon',tWieldable).
-mudSubclass('ControlDevice',tUsable).
+mudSubclass(tWeapon,tWieldable).
+mudSubclass(tContolDevice,tUsable).
 
 action_verb_useable(actWear,wearsClothing,tWearable,mudStowed).
 action_verb_useable(actWield,wielding,tWieldable,mudStowed).

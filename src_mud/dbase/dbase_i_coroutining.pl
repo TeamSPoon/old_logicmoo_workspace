@@ -335,7 +335,7 @@ isac(X, List) :-
       X = Y.
 
 type_size(C,S):-mudIsa(C,completeExtentKnown),!,setof(E,mudIsa(E,C),L),length(L,S).
-type_size(C,1000000):-mudIsa(C,tFormattype),!.
+type_size(C,1000000):-mudIsa(C,ttFormatType),!.
 type_size(_,1000).
 
 comp_type(Comp,Col1,Col2):-type_size(Col1,S1),type_size(Col2,S2),compare(Comp,S1,S2).

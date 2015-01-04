@@ -139,8 +139,8 @@ isa(item,itemcol).
 cached(G):-ccatch(G,_,fail).
 
 :-swi_export(create_meta/4).
-% if SuggestedName was 'food666' it'd like the SuggestedClass to be 'food' and the stystem name will remain 'food666'
-% if SuggestedName was 'food' it'd like the SuggestedClass to be 'food' and the stystem name will become a gensym like 'food1'
+% if SuggestedName was 'food666' it'd isLike the SuggestedClass to be 'food' and the stystem name will remain 'food666'
+% if SuggestedName was 'food' it'd isLike the SuggestedClass to be 'food' and the stystem name will become a gensym isLike 'food1'
 create_meta(SuggestedName,SuggestedClass,BaseClass,SystemName):-
    must_det(split_name_type(SuggestedName,SystemName,NewSuggestedClass)),
    ignore(SuggestedClass=NewSuggestedClass),   
@@ -151,8 +151,8 @@ create_meta(SuggestedName,SuggestedClass,BaseClass,SystemName):-
    assert_isa_safe(SystemName,SuggestedClass).
 
 
-nonCreatableType(ftInt).
-nonCreatableType(ftTerm).
+ttNotCreatableType(ftInt).
+ttNotCreatableType(ftTerm).
 
 mudSubclass(tWearable,tItem).
 mudSubclass(tLookable,tItem).
@@ -160,19 +160,19 @@ mudSubclass(tKnife,tItem).
 mudSubclass(tFood,tItem).
 
 
-createableType(FT):- nonvar(FT),tFormattype(FT),!,fail.
-createableType(FT):- nonvar(FT),nonCreatableType(FT),!,fail.
-createableType(tItem). %  col, formattype, 
-createableType(SubType):-member(SubType,[tAgentGeneric,tItem,tRegion]).
-createableType(S):- is_asserted(createableType(T)), impliedSubClass(S,T).
+ttCreateable(FT):- nonvar(FT),ttFormatType(FT),!,fail.
+ttCreateable(FT):- nonvar(FT),ttNotCreatableType(FT),!,fail.
+ttCreateable(tItem). %  col, formattype, 
+ttCreateable(SubType):-member(SubType,[tAgentGeneric,tItem,tRegion]).
+ttCreateable(S):- is_asserted(ttCreateable(T)), impliedSubClass(S,T).
 
-createableSubclassType(S,T):- createableType(T),is_asserted(mudSubclass(S,T)).
-createableSubclassType(T,'TemporallyExistingThing'):- createableType(T).
+createableSubclassType(S,T):- ttCreateable(T),is_asserted(mudSubclass(S,T)).
+createableSubclassType(T,'TemporallyExistingThing'):- ttCreateable(T).
 
-mudIsa(ftInt,tFormattype).
-mudIsa(vtDirection,tValuetype).
-mudIsa(number,tFormattype).
-mudIsa(string,tFormattype).
+mudIsa(ftInt,ttFormatType).
+mudIsa(vtDirection,ttValueType).
+mudIsa(ftNumber,ttFormatType).
+mudIsa(ftString,ttFormatType).
 
 
 create_agent(P):-create_agent(P,[]).
@@ -181,13 +181,15 @@ create_agent(P,List):-must_det(create_instance(P,tAgentGeneric,List)).
 % decl_type(Spec):-create_instance(Spec,col,[]).
 
 :-swi_export(create_instance/1).
-create_instance(P):- must_det((mudIsa(P,What),createableType(What))),must_det(create_instance(P,What,[])).
+create_instance(P):- must_det((mudIsa(P,What),ttCreateable(What))),must_det(create_instance(P,What,[])).
 :-swi_export(create_instance/2).
 create_instance(Name,Type):-create_instance(Name,Type,[]).
 :-swi_export(create_instance/3).
-create_instance(What,Type,Props):- loop_check_local(time_call(create_instance_now(What,Type,Props)),dmsg(already_create_instance(What,Type,Props))).
+create_instance(What,Type,Props):- 
+  loop_check_local(time_call(create_instance_now(What,Type,Props)),dmsg(already_create_instance(What,Type,Props))).
 
 create_instance_now(What,Type,Props):-
+  must((var(Type);atom_concat('t',_,Type ))),!,
  with_assertions(thlocal:skip_db_op_hooks,
   with_assertions(thlocal:deduceArgTypes(_),
   with_no_assertions(thlocal:useOnlyExternalDBs,
@@ -205,10 +207,10 @@ create_instance_now(What,Type,Props):-
 create_instance_0(What,Type,List):- (var(What);var(Type);var(List)),trace_or_throw((var_create_instance_0(What,Type,List))).
 create_instance_0(I,_,_):-is_creating_now(I),!.
 create_instance_0(I,_,_):-asserta_if_new(is_creating_now(I)),fail.
-create_instance_0(What,FormatType,List):- FormatType\==tCol, tFormattype(FormatType),!,trace_or_throw(tFormattype(FormatType,create_instance(What,FormatType,List))).
+create_instance_0(What,FormatType,List):- FormatType\==tCol, ttFormatType(FormatType),!,trace_or_throw(ttFormatType(FormatType,create_instance(What,FormatType,List))).
 create_instance_0(SubType,tCol,List):-decl_type(SubType),padd(SubType,List).
 
-createableType(tAgentGeneric).
+ttCreateable(tAgentGeneric).
 mudSubclass(tActor,tAgentGeneric).
 mudSubclass(tExplorer,tAgentGeneric).
 
@@ -228,7 +230,7 @@ create_instance_0(T,tAgentGeneric,List):-
    create_meta(T,_,tAgentGeneric,P),
    mreq(mudIsa(P,tAgentGeneric)),
    padd(P,List),   
-   % punless(possess(P,_),rez_to_inventory(P,food,_Food)),
+   % punless(mudPossess(P,_),rez_to_inventory(P,food,_Food)),
    rez_to_inventory(P,tFood,_Food),
    %reset_values(P),   
    padd(P, [ max_health(500),
@@ -247,7 +249,7 @@ reset_values(I):- forall(valueReset(To,From),reset_value(I,To,From)).
 reset_value(I,To,From):- prop(I,From,FromV), padd(I,To,FromV),!.
 reset_value(I,To,From):- prop(I,From,FromV), padd(I,To,FromV),!.
    
-   (contains_var(V,value),get_value(P,V,Result)) -> subst(V,P,self)
+   (contains_var(V,value),get_value(P,V,Result)) -> subst(V,P,isSelf)
    argIsa(P,SVArgNum,Type),
    is_term_ft(V,Type),
 
@@ -257,10 +259,10 @@ valueReset(charge,max_charge).
 
 */
 
-createableType(tRegion).
+ttCreateable(tRegion).
 
 create_instance_0(T, tItem, List):-
-   mudIsa(T,What),What\=tItem, createableType(What),!,create_instance_0(T, What, List).
+   mudIsa(T,What),What\=tItem, ttCreateable(What),!,create_instance_0(T, What, List).
 
 create_instance_0(T,Type,List):-
   createableSubclassType(Type,MetaType),
@@ -287,7 +289,7 @@ leash(+call),trace,
 
 create_instance_0(What,Type,Props):- leash(+call),trace,dtrace,trace_or_throw(dmsg(assumed_To_HAVE_creted_isnance(What,Type,Props))),!.
 
-%createableType(col).
+%ttCreateable(col).
 
 
 
@@ -295,15 +297,16 @@ create_instance_0(What,Type,Props):- leash(+call),trace,dtrace,trace_or_throw(dm
 :-decl_mpred_hybrid(mudOpaqueness(ftTerm,ftPercent)).
 default_type_props(tRegion,mudOpaqueness(1)).
 default_type_props(tObj,mudOpaqueness(100)).
-:-decl_mpred_hybrid(listPrice(tItem,number)).
-default_type_props(tItem,listPrice(0)).
+:-decl_mpred_hybrid(mudListPrice(tItem,number)).
+default_type_props(tItem,mudListPrice(0)).
 default_type_props(tAgentGeneric,mudLastCommand(actStand)).
 default_type_props(tAgentGeneric,[
                        max_health(500),
                        max_charge(200),
                        mudHealth(500),
                        mudCharge(200),
-                       mudFacing("n"),
+                       % mudFacing(vNorth), % later on Test that "n" will work on assertions
+                       mudFacing(isRandom(vtBasicDir)), % later on Test that "n" will work on assertions
                        mudAgentTurnnum(0),
                        mudScore(1),
                        mudMemory(directions([n,s,e,w,ne,nw,se,sw,u,d]))]).
@@ -311,8 +314,8 @@ default_type_props(tAgentGeneric,[
 
 
 
-% already convered possess(Who,Thing):-genlInverse(W,possess),into_mpred_form(dbase_t(W,Thing,Who),Call),call_mpred(Call).
-% already convered possess(Who,Thing):-genlPreds(possess,W),into_mpred_form(dbase_t(W,Who,Thing),Call),call_mpred(Call).
+% already convered mudPossess(Who,Thing):-genlInverse(W,mudPossess),into_mpred_form(dbase_t(W,Thing,Who),Call),call_mpred(Call).
+% already convered mudPossess(Who,Thing):-genlPreds(mudPossess,W),into_mpred_form(dbase_t(W,Who,Thing),Call),call_mpred(Call).
 
 
 :- include(logicmoo(vworld/moo_footer)).

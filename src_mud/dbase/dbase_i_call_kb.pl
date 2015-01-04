@@ -6,7 +6,7 @@
 kb_f(X):-assertion_f(X).
 
 /*
-get_props(TRUTH,VARS,missing,VARSP):-!,get_props(TRUTH,VARS,notmissing,[_|VARSP]),!.
+get_props(TRUTH,VARS,isMissing,VARSP):-!,get_props(TRUTH,VARS,notmissing,[_|VARSP]),!.
 get_props(':TRUE-DEF',VARS,MT,[amt(MT)|VARSP]):-get_varsp(VARS,VARSP),!.
 get_props(':FALSE-DEF',VARS,MT,[amt(MT),truth(':FALSE')|VARSP]):-get_varsp(VARS,VARSP),!.
 get_props(':TRUE-MON',VARS,MT,[amt(MT),str(':MONOTONIC')|VARSP]):-get_varsp(VARS,VARSP),!.

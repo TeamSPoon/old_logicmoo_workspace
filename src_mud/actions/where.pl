@@ -16,15 +16,12 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(tCommand).
-
-
-mudSubclass(tAgentGeneric,tObj).
-mudSubclass(tItem,tObj).
+:- register_module_type(mtCommand).
 
 
 % where 
-agent_text_command(Agent,[actWhere,BE,X],Agent,actWhere(X)):-memberchk(BE,[is,are,be,were]).
+agent_text_command(Agent,["where",BE,X],Agent,actWhere(X)):-memberchk(BE,[is,are,be,were]).
+agent_text_command(Agent,["where_is",X],Agent,actWhere(X)).
 action_info(actWhere(tObj),"Tells where something is").
 agent_call_command(_Agent,actWhere(SObj)) :-
     forall(
@@ -32,11 +29,11 @@ agent_call_command(_Agent,actWhere(SObj)) :-
         fmt(cmdresult(actWhere,mudAtLoc(Obj,LOC)))).
 
 
-action_info(actWho(optional(tAgentGeneric,world)),"Lists who is online (where they are at least)").
+action_info(actWho(isOptional(tAgentGeneric,isMissing)),"Lists who is online (where they are at least)").
 
 agent_call_command(_Gent,actWho(W)) :- mud_cmd_who(W).
 
-mud_cmd_who(world):-!,mud_cmd_who_1(_).
+mud_cmd_who(isMissing):-!,mud_cmd_who_1(_).
 mud_cmd_who(Who):- mud_cmd_who_1(Who).
 
 get_inRegion(Agnt,Where):- inRegion(Agnt,Where),!.

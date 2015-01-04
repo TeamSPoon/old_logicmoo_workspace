@@ -11,7 +11,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(tCommand).
+:- register_module_type(mtCommand).
 
 :- swi_export(found_undef/3).
 found_undef(_,_,_).

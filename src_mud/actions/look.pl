@@ -8,9 +8,9 @@
 /** <module>
 % This file defines the basic look action
 % Agents will use the predicate:
-% get_percepts(Agent,Percepts) = list of lists of objects in agents location plus 2 locations in each direction
-% get_near(Agent,Percepts) = list of lists of objects in agents atloc plus 1 atloc in each dir
-% get_feet(Agent,Percepts) = list of objects in agents location
+% mudGetPrecepts(Agent,Percepts) = list of lists of objects in agents location plus 2 locations in each direction
+% mudNearReach(Agent,Percepts) = list of lists of objects in agents atloc plus 1 atloc in each dir
+% mudNearFeet(Agent,Percepts) = list of objects in agents location
 %
 
 %
@@ -19,11 +19,11 @@
 */
 
 % :-swi_module(user). 
-:-swi_module(actLook, [ get_percepts/2,  get_near/2, get_feet/2, height_on_obj/2, can_sense/5 , call_look/2]).
+:-swi_module(actLook, [ mudGetPrecepts/2,  mudNearReach/2, mudNearFeet/2, height_on_obj/2, can_sense/5 , call_look/2]).
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(tCommand).
+:- register_module_type(mtCommand).
 
 :- dynamic blocks/1.
 
@@ -44,17 +44,17 @@ term_specifier_text(Prep,prepstr_spatial,Inst):-term_specifier_text(Prep,prepstr
 term_specifier_text([SDir,of],prepstr_dir_of,ofFn(Dir)):-term_specifier_text(SDir,vtDirection,Dir).
 
 action_info(actLook, "generalized look in region").
-action_info(actLook(optionalStr("in"),optionalStr("here")), "generalized look in region").
-action_info(actLook(prepstr_dir_of,optionalStr("self")), "Look in a direction (TODO: look north of self)").
-action_info(actLook(optional(prepstr_spatial,"at"),tObj),"look [in|at|on|under|at] somewhere").
+action_info(actLook(isOptionalStr("in"),isOptionalStr("here")), "generalized look in region").
+action_info(actLook(prepstr_dir_of,isOptionalStr("self")), "Look in a direction (TODO: look north of isAgentSelf)").
+action_info(actLook(isOptional(prepstr_spatial,"at"),tObj),"look [in|at|on|under|at] somewhere").
 %action_info(look(obj), "Look at a speficific item").
-%action_info(look_at(optional(call(visibleTo(self,value)),call(visibleTo(self,value)))), "Look at a speficific item").
+%action_info(look_at(isOptional(call(visibleTo(isAgentSelf,value)),call(visibleTo(isAgentSelf,value)))), "Look at a speficific item").
 
 agent_call_command(Agent,actLook):- look_as(Agent),!.
 agent_call_command(Agent,actLook("here")):- look_as(Agent),!.
 agent_call_command(Agent,actLook(_,"here")):- look_as(Agent),!.
 agent_call_command(Agent,actLook(Dir,"self")):- specifiedItem(Dir,vtDirection),!,
-   view_dirs(Agent,[[Dir,here],[Dir,Dir],[Dir,Dir,adjacent]],Percepts),
+   view_dirs(Agent,[[Dir,vHere],[Dir,Dir],[Dir,Dir,vAdjacent]],Percepts),
    forall_member(P,Percepts,call_agent_action(Agent,actExamine(P))).
 agent_call_command(Agent,actLook(_Dir,SObj)):-
    objects_match_for_agent(Agent,SObj,tObj,Percepts),
@@ -89,12 +89,12 @@ call_look_proc(Agent,LOC):-
          events=deliverable_location_events(Agent,LOC,value),
          path(D) = pathBetween(tRegion,D,value),
          pathName(D) = pathName(tRegion,D,value),
-         value = is_asserted(localityOfObject(value,tRegion)),       
+         value = localityOfObject(value,tRegion),
          mudFacing(Agent,value),
-         get_feet(Agent,value),
-         get_near(Agent,value),
-         get_percepts(Agent,value),         
-         movedist(Agent,value),
+         mudNearFeet(Agent,value),
+         mudNearReach(Agent,value),
+         mudGetPrecepts(Agent,value),         
+         mudMoveDist(Agent,value),
          height_on_obj(Agent,value),
          listof(mudPossess(Agent,value)),
          actInventory(Agent,value),         
@@ -103,7 +103,7 @@ call_look_proc(Agent,LOC):-
 
 
 looking(Agent):- current_agent(Agent),!.
-looking(Agent):- tAgentGeneric(Agent). % ,thinking(Agent).
+looking(Agent):- tAgentGeneric(Agent),not(tDeleted(Agent)).
 
 % ********** TOP LEVEL PREDICATE: this is the predicate agents use to look
 % Look, reports everything not blocked up to two locations away
@@ -118,14 +118,14 @@ get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
 	success(Agent,Suc),
 	mudScore(Agent,Scr),
 	actInventory(Agent,Inv),
-	get_percepts(Agent,Percepts))),!.
+	mudGetPrecepts(Agent,Percepts))),!.
 
 
 % Get only the Percepts
 
-% :-decl_mpred(get_percepts(agent,list(spatialthing)),[ask_module(user)]).
-get_percepts(Agent,Percepts) :- get_percepts0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts).
-get_percepts0(Agent,Percepts) :-
+% :-decl_mpred(mudGetPrecepts(agent,list(spatialthing)),[ask_module(user)]).
+mudGetPrecepts(Agent,Percepts) :- mudGetPrecepts0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts).
+mudGetPrecepts0(Agent,Percepts) :-
   call((
 	looking(Agent),
 	view_vectors(Dirs),
@@ -135,8 +135,8 @@ get_percepts0(Agent,Percepts) :-
 	!.
 
 % Look at locations immediately around argent
-% :-decl_mpred(get_near(agent,list(spatialthing)),[ask_module(user)]).
-get_near(Agent,PerceptsO):- get_near0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
+% :-decl_mpred(mudNearReach(agent,list(spatialthing)),[ask_module(user)]).
+mudNearReach(Agent,PerceptsO):- get_near0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
    
 get_near0(Agent,Percepts) :-
   call((
@@ -145,8 +145,8 @@ get_near0(Agent,Percepts) :-
 	view_dirs(Agent,Dirs,Percepts))),!.
 
 % Look only at location agent is currently in.
-% :-decl_mpred(get_feet(agent,list(spatialthing)),[ask_module(user)]).
-get_feet(Agent,PerceptsO) :-  get_feet0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
+% :-decl_mpred(mudNearFeet(agent,list(spatialthing)),[ask_module(user)]).
+mudNearFeet(Agent,PerceptsO) :-  get_feet0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
 
 get_feet0(Agent,Percepts):-
   call((
@@ -159,27 +159,27 @@ get_feet0(Agent,Percepts):-
 
 
 
-%View list starting at vac's position and moving out in a clockwise spiral
-%old_view_list([[e,w],[n,here],[ne,here],[e,here],[se,here],[s,here],[sw,here],
-%	   [w,here],[nw,here],[n,n],[n,ne],[ne,ne],[e,ne],[e,e],[e,se],
-%	   [se,se],[s,se],[s,s],[s,sw],[sw,sw],[w,sw],[w,w],[w,nw],
-%	   [nw,nw],[n,nw]]).
+%View list starting at vac'vSouth position and moving out in a clockwise spiral
+%old_view_list([[vEast,vWest],[vNorth,vHere],[vNE,vHere],[vEast,vHere],[vSE,vHere],[vSouth,vHere],[vSW,vHere],
+%	   [vWest,vHere],[vNW,vHere],[vNorth,vNorth],[vNorth,vNE],[vNE,vNE],[vEast,vNE],[vEast,vEast],[vEast,vSE],
+%	   [vSE,vSE],[vSouth,vSE],[vSouth,vSouth],[vSouth,vSW],[vSW,vSW],[vWest,vSW],[vWest,vWest],[vWest,vNW],
+%	   [vNW,vNW],[vNorth,vNW]]).
 
-%grid of view, upper left (nw) to lower right (se)
+%grid of view, upper left (vNW) to lower right (vSE)
 %This is the order the agents will receive their Percepts returned from get_all(Agent,) in
-view_vectors([[nw,nw],[n,nw],[n,n],[n,ne],[ne,ne],
-	    [w,nw],[nw,here],[n,here],[ne,here],[e,ne],
-	    [w,w],[w,here],[d,u],[e,here],[e,e],
-	    [w,sw],[sw,here],[s,here],[se,here],[e,se],
-	    [sw,sw],[s,sw],[s,s],[s,se],[se,se]]).
+view_vectors([[vNW,vNW],[vNorth,vNW],[vNorth,vNorth],[vNorth,vNE],[vNE,vNE],
+	    [vWest,vNW],[vNW,vHere],[vNorth,vHere],[vNE,vHere],[vEast,vNE],
+	    [vWest,vWest],[vWest,vHere],[vDown,vUp],[vEast,vHere],[vEast,vEast],
+	    [vWest,vSW],[vSW,vHere],[vSouth,vHere],[vSE,vHere],[vEast,vSE],
+	    [vSW,vSW],[vSouth,vSW],[vSouth,vSouth],[vSouth,vSE],[vSE,vSE]]).
 
 % A view list of only the locations immediately surrounding the agent.
-near_vectors([[nw,here],[n,here],[ne,here],
-	[w,here],[d,u],[e,here],
-	[sw,here],[s,here],[se,here]]).
+near_vectors([[vNW,vHere],[vNorth,vHere],[vNE,vHere],
+	[vWest,vHere],[vDown,vUp],[vEast,vHere],
+	[vSW,vHere],[vSouth,vHere],[vSE,vHere]]).
 
 :-dynamic(visually_blocked/2).
-:-decl_mpred_prolog(visually_blocked(tAgentGeneric,ftList)).
+:-decl_mpred_prolog(visually_blocked(tAgentGeneric,ftListFn(vtDirection))).
 
 :-listing(visually_blocked).
 
@@ -189,8 +189,8 @@ near_vectors([[nw,here],[n,here],[ne,here],
 check_for_blocks(Agent) :-
 	height_on_obj(Agent,Ht),
 	clr(visually_blocked(Agent,_)),
-	Dirs = [[n,here],[s,here],[e,here],[w,here],
-	[ne,here],[nw,here],[se,here],[sw,here]],
+	Dirs = [[vNorth,vHere],[vSouth,vHere],[vEast,vHere],[vWest,vHere],
+	[vNE,vHere],[vNW,vHere],[vSE,vHere],[vSW,vHere]],
 	view_dirs(Agent,Dirs,Percepts),
 	blocked_percepts(Ht,Dirs,Percepts,[],Blocked_Percepts),
 	add(visually_blocked(Agent,Blocked_Percepts)).
@@ -227,11 +227,11 @@ blocked_percepts(AgHt,[_|Drest],[_|Prest],Blocked_sofar,Blocked_Percepts) :-
 	!,
 	blocked_percepts(AgHt,Drest,Prest,Blocked_sofar,Blocked_Percepts).
 
-% Blocks view for inbetween locations (eg.[n,here] would block [n,n],[n,ne],[n,nw]).
-block_coverage(n,n,[[n,n],[n,ne],[n,nw]]).
-block_coverage(s,s,[[s,s],[s,se],[s,sw]]).
-block_coverage(w,w,[[w,w],[w,nw],[w,sw]]).
-block_coverage(e,e,[[e,e],[e,ne],[e,se]]).
+% Blocks view for inbetween locations (eg.[vNorth,vHere] would block [vNorth,vNorth],[vNorth,vNE],[vNorth,vNW]).
+block_coverage(vNorth,vNorth,[[vNorth,vNorth],[vNorth,vNE],[vNorth,vNW]]).
+block_coverage(vSouth,vSouth,[[vSouth,vSouth],[vSouth,vSE],[vSouth,vSW]]).
+block_coverage(vWest,vWest,[[vWest,vWest],[vWest,vNW],[vWest,vSW]]).
+block_coverage(vEast,vEast,[[vEast,vEast],[vEast,vNE],[vEast,vSE]]).
 block_coverage(D1,D2,[[D1,D2]]).
 
 % These three predicates modifies Percepts so that blocked locations return 'dark'
@@ -263,7 +263,7 @@ view_dirs(Agent,[[D1|D2]|Rest],Percepts) :-
 % The look loop (look at one location)
 get_mdir(_Gent,[],LOC,What) :-
 	report(LOC,What).
-get_mdir(_Gent,[here],LOC,What) :-
+get_mdir(_Gent,[vHere],LOC,What) :-
 	report(LOC,What).
 get_mdir(Agent,[Dir|D],LOC,What) :-
 	move_dir_target(LOC,Dir,XXYY),
@@ -272,7 +272,7 @@ get_mdir(Agent,[Dir|D],LOC,What) :-
 % The look loop (look at one location)
 get_mdir_u(_Gent,[],LOC,What) :-
 	report(LOC,What).
-get_mdir_u(_Gent,[here],LOC,What) :-
+get_mdir_u(_Gent,[vHere],LOC,What) :-
 	report(LOC,What).
 get_mdir_u(Agent,[Dir|D],LOC,What) :-
 	move_dir_target(LOC,Dir,XXYY),
@@ -284,7 +284,7 @@ get_mdir_u(Agent,[_|D],LOC,What) :-
 report(LOC,List) :-
 	findall(Z,mudAtLoc(Z,LOC),List).
 
-% Converts the objects seen... basically to weed out the 0's the empty locations report
+% Converts the objects seen... basically to weed out the 0'vSouth the empty locations report
 mask([],What,What).
 mask([K|Tail],SoFar,What) :-
 	(K)=nil,

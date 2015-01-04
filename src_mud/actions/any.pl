@@ -20,7 +20,7 @@ action_requires_states(_Agent,List,Preconds):-findall(A,(member(A,List),\+ funct
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(tCommand).
+:- register_module_type(mtCommand).
 action_rules(_,_,_,_):-fail.
 
 action_rules(Agent,actUse,[Obj],[mudPossess(Agent,Obj),mudIsa(Obj,tUseable),mudStowed(Agent,Obj)->using(Agent,Obj)]).

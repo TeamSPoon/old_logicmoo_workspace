@@ -10,12 +10,12 @@
 */
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(tCommand).
+:- register_module_type(mtCommand).
 
 
 
 % ====================================================
-% item rez (to stowed inventory)
+% item rez (to mudStowed inventory)
 % ====================================================
 
 :-swi_export(rez_to_inventory/3).
@@ -27,18 +27,18 @@ rez_to_inventory(Agent,NameOrType,NewName):-
    add_missing_instance_defaults(NewName).
 
 
-action_info(actRez(or([tCol,ftTerm])),"Rezes a new 'item' of some NameOrType into stowed inventory").
+action_info(actRez(isOneOf([tCol,ftTerm])),"Rezes a new 'item' of some NameOrType into mudStowed inventory").
 agent_call_command(Agent,actRez(NameOrType)):- nonvar(NameOrType),rez_to_inventory(Agent,NameOrType,_NewName).
 
 % ====================================================
 % object/col creation
 % ====================================================
-action_info(actCreate(ftList(ftTerm)), "Rezes a new 'spatialthing' or creates a new 'col' of some NameOrType and if it's an 'item' it will put in stowed inventory").
+action_info(actCreate(ftListFn(ftTerm)), "Rezes a new 'spatialthing' or creates a new 'col' of some NameOrType and if it's an 'item' it will put in mudStowed inventory").
 
 agent_call_command(Agent,actCreate(SWhat)):- with_all_dmsg(must_det(create_new_object(Agent,SWhat))).
 
 :-decl_mpred_prolog(authorWas(ftTerm,ftTerm)).
-:-decl_mpred_prolog(current_pronoun(tAgentGeneric,string,ftTerm)).
+:-decl_mpred_prolog(current_pronoun(tAgentGeneric,ftString,ftTerm)).
 
 :-swi_export(create_new_object/2).
 

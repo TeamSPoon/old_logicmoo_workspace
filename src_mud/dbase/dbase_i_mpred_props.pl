@@ -127,7 +127,7 @@ ensure_clause(HEAD,F,_A,BODY):- assertz((HEAD:-BODY)),
 :-swi_export(argsIsaProps/1).
 argsIsaProps(Prop):- 
 	arg(_,v(argsIsaInList,multiValued,singleValued,assertionMacroHead,prologBuiltin,nonGroundOK,prologOnly,
-		tOrdered,negationByFailure,tFormatted,prologHybrid,tMpred,listValued),Prop).
+		tOrdered,negationByFailure,tFormatted,prologHybrid,tPred,listValued),Prop).
 
 mpred_arity(Prop,1):-argsIsaProps(Prop).
 mpred_arity(F,A):- current_predicate(F/A).
@@ -144,8 +144,8 @@ mpred_prop(never_type,prologOnly).
 mpred_prop(mudSubft, completeExtentAsserted).
 mpred_prop(mudFtInfo, completeExtentAsserted).
 mpred_prop(G,mudAssertWithPred(add)):- atom(G),assertionMacroHead(G).
-mpred_prop(G,query_with_pred(ireq)):- atom(G),assertionMacroHead(G).
-mpred_prop(G,retract_with_pred(del)):- atom(G),assertionMacroHead(G).
+mpred_prop(G,mudQueryWithPred(ireq)):- atom(G),assertionMacroHead(G).
+mpred_prop(G,mudRetractWithPred(del)):- atom(G),assertionMacroHead(G).
 mpred_prop(F,mped_type(Type)):-nonvar(F),once(get_mpred_type(F,Type)).
 
 
@@ -378,7 +378,7 @@ rescan_mpred_props_lc.
 
 decl_mpred((A,B)):-decl_mpred(A),decl_mpred(B).
 decl_mpred(M):-loop_check_local(with_pi(M,decl_mpred_1),true).
-decl_mpred_1(_,F,F/0):-!,assert_hasInstance(tMpred,F).
+decl_mpred_1(_,F,F/0):-!,assert_hasInstance(tPred,F).
 decl_mpred_1(M,PI,F/A):-
    decl_mpred(F,A),
    ignore((ground(PI),compound(PI),decl_mpred(F,argsIsaInList(PI)))),
@@ -388,7 +388,7 @@ decl_mpred_1(M,PI,F/A):-
 decl_mpred(C,More):- ignore(loop_check(decl_mpred_0(C,More),true)).
 
 decl_mpred_0(C,More):- (var(C);var(More)), trace_or_throw(var_decl_mpred(C,More)).
-decl_mpred_0(F,tMpred):-!, assert_hasInstance(tMpred,F).
+decl_mpred_0(F,tPred):-!, assert_hasInstance(tPred,F).
 decl_mpred_0(_,[]):-!.
 decl_mpred_0(M:FA,More):-atom(M),!,decl_mpred_0(FA,[ask_module(M)|More]).
 decl_mpred_0(F/A,More):-atom(F),!,decl_mpred_1(F,arity(A)),decl_mpred(F,More),!.
@@ -452,7 +452,7 @@ decl_mpred_prolog(CM,M,PI,F/A):-
 
 
 
-% :- decl_mpred((nameStrings/2,grid_key/1,on_world_load/0,label_type/2,createableType/2)).
+% :- decl_mpred((nameStrings/2,grid_key/1,on_world_load/0,label_type/2,ttCreateable/2)).
 % :- decl_mpred posture/1.
 % :- dynamic_multifile_exported((decl_mpred/1)).
 

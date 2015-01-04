@@ -254,7 +254,7 @@ cyc_to_rdf(mpred_prop(P,PST),svo(F,StubType,S)):- PST=..[StubType,S],rdf_object(
 cyc_to_rdf(argIsa(P,1,D),domain(P,D)).
 cyc_to_rdf(mudIsa(apathFn(A,Dir),T),mudIsa([apathFn,A,Dir],T)).
 cyc_to_rdf(pathName(A,Dir,String),mudNamed([apathFn,A,Dir],String)).
-cyc_to_rdf(default_sv(PAB, 2, V),type_default(A,[P,self,V])):-PAB=[P,A,_].
+cyc_to_rdf(predSingleValueDefault(PAB, 2, V),type_default(A,[P,isSelf,V])):-PAB=[P,A,_].
 cyc_to_rdf(argIsa(P,2,D),range(P,D)):-mpred_arity(P,2).
 
 rdf_assert_hook(CYC):-once(cyc_to_rdf(CYC,RDF)),CYC\=RDF,must(call(rdf_assert_hook(RDF))).
@@ -265,10 +265,10 @@ rdf_assert_hook(PSO):-dmsg(once(skipped(rdf_assert_hook(PSO)))).
 
 rdf_assert_hook0(mudLabelTypeProps(A,Food,Props)):-atom_string(A,S),!,must((rdf_assert_hook(default_type_props(Food,[label(S)|Props])))).
 rdf_assert_hook0(default_type_props(Food,Props)):-is_list(Props),!,forall(member(P,Props),must(rdf_assert_hook(default_type_props(Food,P)))).
-rdf_assert_hook0(default_type_props(Food,Prop)):-Prop=..[P|ARGS],must(rdf_assert_hook(type_default(Food,[P,self|ARGS]))).
+rdf_assert_hook0(default_type_props(Food,Prop)):-Prop=..[P|ARGS],must(rdf_assert_hook(type_default(Food,[P,isSelf|ARGS]))).
 rdf_assert_hook0(mudSubclass(C,P)):-!,rdf_object(C),rdf_object(P),rdf_assert_x(C,rdfs:subClassOf,P).
 rdf_assert_hook0(mudDescription(C,P)):-!,rdf_object(C),rdf_object(P),rdf_assert_x(C,rdfs:comment,P).
-rdf_assert_hook0(mudIsa(Prop,tMpred)):- rdf_to_pred(Prop,P),!,rdf_object(P),rdf_assert_x(P,rdf:tType,owl:'Property').
+rdf_assert_hook0(mudIsa(Prop,tPred)):- rdf_to_pred(Prop,P),!,rdf_object(P),rdf_assert_x(P,rdf:tType,owl:'Property').
 rdf_assert_hook0(mudIsa(Prop,singleValued)):- functor(Prop,P,_),!,rdf_object(P),rdf_assert_x(P,rdf:tType,owl:'FunctionalProperty').
 rdf_assert_hook0(arity(W1,N)):-rdf_to_pred(W1,W),N>1,rdf_assert_x(W,rdf:tType,owl:'Property').
 rdf_assert_hook0(mudIsa(W,tCol)):-!,rdf_object(W),rdf_assert_x(W,rdf:tType,owl:'Class').
@@ -294,6 +294,7 @@ po(tRegion,knowrob:'FixedStructure').
 po(tAgentGeneric,knowrob:'Agent-Generic').
 po(ftInt,xsd:integer).
 po(string,xsd:string).
+po(ftString,xsd:string).
 po(F,G:A):-rdf_alias(mud:F,G:A).
 
 

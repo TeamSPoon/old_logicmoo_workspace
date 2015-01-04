@@ -9,28 +9,25 @@
 */
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(tCommand).
+:- register_module_type(mtCommand).
 
-:-decl_mpred(tPosture/1).
+:-decl_mpred(vtPosture/1).
 
-:-decl_mpred(stance(tAgentGeneric,tPosture)).
+:-decl_mpred(stance(tAgentGeneric,vtPosture)).
 
+vtPosture(actSit).
+vtPosture(actStand).
+vtPosture(actLay).
+vtPosture(actSleep).
+vtPosture(actKneel).
 
-mudSubclass(tCommand,ftAction).
+tCol(vtPosture).
 
-tPosture(actSit).
-tPosture(actStand).
-tPosture(actLay).
-tPosture(sleep).
-tPosture(actKneel).
+moo_posture(P):-mudIsa(P,vtPosture).
 
-tCol(tPosture).
+:-decl_mpred(singleValued(stance(tAgentGeneric,vtPosture))).
 
-moo_posture(P):-mudIsa(P,tPosture).
-
-:-decl_mpred(singleValued(stance(tAgentGeneric,tPosture))).
-
-action_info(Posture,ftText("sets and agent's stance to ",Posture)):-moo_posture(PostureV),Posture=..[PostureV,optional(tFurniture,here)].
+action_info(Posture,ftText("sets and agent's stance to ",Posture)):-moo_posture(PostureV),Posture=..[PostureV,isOptional(tFurniture,here)].
 
 % Sit and do nothing.
 agent_call_command(Agent,Verb):- compound(Verb), functor(Verb,Sit,1),moo_posture(Sit),arg(1,Verb,Where),agent_call_command(Agent,actOnto(Where,Sit)).

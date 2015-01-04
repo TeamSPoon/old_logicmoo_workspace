@@ -27,17 +27,17 @@ world_agent_plan(_World,Agent,Act):-
 vacuum_idea(Agent,actTake(tOutlet)) :-
 	mudCharge(Agent,Charge),
 	Charge < 490,
-	get_feet(Agent,What),
+	mudNearFeet(Agent,What),
 	member(tOutlet,What).
 vacuum_idea(Agent,actTake(tDirt)) :-
-	get_feet(Agent,What),
+	mudNearFeet(Agent,What),
 	member(tDirt,What).
 vacuum_idea(Agent,actMove(Dir)) :-
 	mudCharge(Agent,Charge),
 	Charge < 200,
-	get_percepts(Agent,List),
+	mudGetPrecepts(Agent,List),
 	list_object_dir_sensed(_,List,tOutlet,Dir),
-	number_to_dir(N,Dir,here),
+	number_to_dir(N,Dir,vHere),
 	nth1(N,List,What),
 	(What == [];
 	    What == [tDirt];
@@ -45,24 +45,24 @@ vacuum_idea(Agent,actMove(Dir)) :-
 vacuum_idea(Agent,actClimb(Dir)) :-
 	mudCharge(Agent,Charge),
 	Charge < 200,
-	get_percepts(Agent,List),
+	mudGetPrecepts(Agent,List),
 	list_object_dir_sensed(_,List,tOutlet,Dir),
-	number_to_dir(N,Dir,here),
+	number_to_dir(N,Dir,vHere),
 	nth1(N,List,What),
 	(What == [tLowBox];
 	    What == [tLowWall]).
 vacuum_idea(Agent,actMove(Dir)) :-
-	get_percepts(Agent,List),
+	mudGetPrecepts(Agent,List),
 	list_object_dir_sensed(_,List,tDirt,Dir),
-	number_to_dir(N,Dir,here),
+	number_to_dir(N,Dir,vHere),
 	nth1(N,List,What),
 	(What == [];
 	What == [tDirt];
 	What == [tOutlet]).
 vacuum_idea(Agent,actClimb(Dir)) :-
-	get_percepts(Agent,List),
+	mudGetPrecepts(Agent,List),
 	list_object_dir_sensed(_,List,tDirt,Dir),
-	number_to_dir(N,Dir,here),
+	number_to_dir(N,Dir,vHere),
 	nth1(N,List,What),
 	(What == [tLowBox];
 	    What == [tLowWall]).

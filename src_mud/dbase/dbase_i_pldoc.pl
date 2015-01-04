@@ -75,9 +75,10 @@ show_term_listing(H):- not(not((snumbervars(H),writeq(H),write('.'),nl))),!.
 
 
 
-
+:-export(show_all/1).
 show_all(Call):-doall((show_call(Call))).
 
+:-export(alt_calls/1).
 alt_calls(call).
 alt_calls(call_mpred).
 alt_calls(is_asserted).
@@ -122,7 +123,7 @@ showDif(SET,Named,LIST,_WITHFUNCTOR):-
       showListWithCounts(ULIST,LIST),nl.
 
 showListWithCounts(ULIST,[]):- fmt(ulist=ULIST).
-showListWithCounts([],ALL):- fmt(missing=ALL).
+showListWithCounts([],ALL):- fmt(isMissing=ALL).
 showListWithCounts(ULIST,LIST):-ULIST=LIST,fmt(same=ULIST).
 showListWithCounts(ULIST,LIST):-showCounts(ULIST,LIST).
 showCounts([],_).
@@ -146,8 +147,8 @@ to_tclass(mudCharge,mudCharge).
 to_tclass(actDrop,actDrop).
 to_tclass(actJump,actJump).
 
-to_tclass(Prop,New):- tFormattype(Prop),ensure_starts_with_prefix(Prop,ft,New),!.
-to_tclass(Prop,New):- tValuetype(Prop),ensure_starts_with_prefix(Prop,vt,New),!.
+to_tclass(Prop,New):- ttFormatType(Prop),ensure_starts_with_prefix(Prop,ft,New),!.
+to_tclass(Prop,New):- ttValueType(Prop),ensure_starts_with_prefix(Prop,vt,New),!.
 
 to_tclass(Prop,New):- mpred_arity(Prop,1),mpred_arity(Prop,tCol),ensure_starts_with_prefix(Prop,t,New),!.
 to_tclass(Prop,New):- mpred_prop(Prop,prologHybrid),mpred_arity(Prop,M),M>1,mpred_prop(Prop,argsIsaInList(_)),ensure_starts_with_prefix(Prop,mud,New),!.
@@ -160,7 +161,7 @@ to_tclass(Prop,New):- (dbase_t(_,_,Prop);dbase_t(_,_,Prop,_);dbase_t(_,_,_,Prop)
 is_actverb(X):-type_action_info(_,PX,_),functor(PX,X,_).
 is_actverb(X):-action_info(PX,_),functor(PX,X,_).
 is_actverb(X):-tActionType(PX),functor(PX,X,_).
-is_actverb(X):-tPosture(PX),functor(PX,X,_).
+is_actverb(X):-vtPosture(PX),functor(PX,X,_).
 is_actverb(X):-verb_alias(_,X).
 
 :-export(ensure_starts_with_prefix/3).
@@ -256,10 +257,10 @@ cross-reference based technology as used by PceEmacs.
 */
 
 :- predicate_options(s_to_html/3, 3,
-		     [ format_comments(ftBoolean),
-		       header(ftBoolean),
+		     [ format_comments(boolean),
+		       header(boolean),
 		       tSkin(callable),
-		       stylesheets(ftList),
+		       stylesheets(list),
 		       title(atom)
 		     ]).
 

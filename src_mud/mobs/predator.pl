@@ -33,21 +33,21 @@ predator_idea(Agent,actEat(Corpse)) :-
 	Charge < 100,
 	actInventory(Agent, List),                
 	obj_memb(Corpse,List),
-        mudIsa(Corpse,corpse).
+        mudIsa(Corpse,tCorpse).
 predator_idea(Agent,actTake(What)) :-
-	get_feet(Agent,What),
-	mudIsa(What,corpse).
+	mudNearFeet(Agent,What),
+	mudIsa(What,tCorpse).
 predator_idea(Agent,actMove(Dir)) :-
-	get_percepts(Agent,List),
-	list_object_dir_sensed(_,List,corpse(_),Dir).
+	mudGetPrecepts(Agent,List),
+	list_object_dir_sensed(_,List,iCorpseFn(_),Dir).
 predator_idea(Agent,actAttack(Dir)) :-
-	get_near(Agent,List),
+	mudNearReach(Agent,List),
 	list_object_dir_near(List,tPrey(_),Dir).
 
 % find something near and itnersting and go to it.. or find a dirrection and go that way.. or sit 
 
 predator_idea(Agent,actMove(Dir)) :-
-	get_percepts(Agent,List),
+	mudGetPrecepts(Agent,List),
 	list_object_dir_sensed(_,List,tPrey(_),Dir).
 
 predator_idea(Agent,Act) :- 

@@ -292,7 +292,54 @@ toCamelcase(D3,DD3):-atomic(D3),camelSplitters(V),concat_atom_safe([L,I|ST],V,D3
 toCamelcase(CX,Y):-atomic(CX),name(CX,[S|SS]),char_type(S,to_upper(NA)),name(NA,[N]),name(Y,[N|SS]),!.
 toCamelcase(A,A).
 
-      
+% ===========================================================
+% CHECK CASE
+% ===========================================================
+:-export(capitalized/1).
+
+capitalized(Type):-string_codes(Type,[S|_]),char_type(S,upper),must(char_type(S,alpha)).
+
+% ===========================================================
+% BREAKING ON CASE CHANGE
+% ===========================================================
+:-export(to_case_breaks/2).
+to_case_breaks(Text,New):-string_codes(Text,[C|Codes]), char_type_this(C,WillBe),!,to_case_breaks(Codes,WillBe,[C],WillBe,New).
+
+char_type_this(C,Lower):-ctype_switcher(Lower),char_type(C,Lower),!.
+
+ctype_switcher(lower).
+ctype_switcher(upper).
+ctype_switcher(digit).
+ctype_switcher(punct).
+
+breaked_codes(S,C):-catchv(number_codes(S,C),_,string_codes(S,C)->true;(atom_codes(S,C)->true;string_equal_ci(S,C))).
+
+ctype_continue(upper,lower).
+ctype_continue(X,X):-ctype_switcher(X).
+
+ctype_switch(upper,upper).
+ctype_switch(T1,T2):-ctype_switcher(T1),ctype_switcher(T2),T1\=T2.
+
+% to_case_breaks(+Codes,+SoFarC,+Lower,List)
+to_case_breaks([      ],_WillBe,   [],_,     []):-!.
+to_case_breaks([       ],WillBe,SoFar,_NewType,[t(Left,WillBe)]):-breaked_codes(Left,SoFar),!.
+to_case_breaks([C|Codes],WillBe,SoFar,Upper,New):- ctype_continue(Upper,Lower), char_type(C,Lower),append(SoFar,[C],SoFarC),!,to_case_breaks(Codes,WillBe,SoFarC,Lower,New).
+to_case_breaks(C___Codes,WillBe,SoFar,Upper,OUT):- is_list(OUT),OUT=[t(Left,WillBe),t(New,RType)],!,to_first_break_w(C___Codes,SoFar,Upper,Left,New,RType).
+to_case_breaks([C|Codes],WillBe,SoFar,Upper,[t(Left,WillBe)|New]):- ctype_switch(Upper,Digit), char_type(C,Digit),!, breaked_codes(Left,SoFar), to_case_breaks(Codes,Digit,[C],Digit,New),!.
+to_case_breaks([C|Codes],WillBe,SoFar,Upper,New):- append(SoFar,[C],SoFarC),to_case_breaks(Codes,WillBe,SoFarC,Upper,New).
+
+:-export(to_first_break/2).
+to_first_break(Text,Left):-to_first_break(Text,_LeftType,Left,_Right,_NextType).
+:-export(to_first_break/5).
+to_first_break(Text,LType,Left,Right,RType):-string_codes(Text,[C|Codes]), char_type_this(C,LType),!,to_first_break_w(Codes,[C],LType,Left,Right,RType).
+to_first_break(Text,LType,Left,Right,RType):-string_codes(Text,[C|Codes]), !,to_first_break_w(Codes,[C],LType,Left,Right,RType).
+
+to_first_break_w([],       []   ,empty,'',[],empty):-!.
+to_first_break_w([],       SoFar,_Some,Left,[],empty):-breaked_codes(Left,SoFar),!.
+to_first_break_w([C|Codes],SoFar,Upper,Left,Rest,RType):- ctype_continue(Upper,Lower), char_type(C,Lower),append(SoFar,[C],SoFarC),!,to_first_break_w(Codes,SoFarC,Lower,Left,Rest,RType).
+to_first_break_w([C|Codes],SoFar,Lower,Left,Rest,Upper):- ctype_switch(Lower,Upper), char_type(C,Upper), breaked_codes(Left,SoFar),!,breaked_codes(Rest,[C|Codes]).
+to_first_break_w([C|Codes],SoFar,Lower,Left,Rest,RType):- append(SoFar,[C],SoFarC),to_first_break_w(Codes,SoFarC,Lower,Left,Rest,RType).
+
 % ===========================================================
 % Quote-Unquote
 % ===========================================================

@@ -1,34 +1,10 @@
 [ActiveConfig]
-tempFiles.vpj=Release
+PrologMUD_base.vpj=Release
 [Global]
 CurrentProject=PrologMUD.vpj
 [ProjectDates]
-PrologMUD.vpj=20150103001514018
-externals\PrologMUD_ext.vpj=20141228123609793
+PrologMUD.vpj=20150103232932736
+externals\PrologMUD_ext.vpj=20150103232712863
+PrologMUD_nonext.vpj=20150103232602643
 tempFiles.vpj=20150102210343664
-[TreeExpansion2]
-- PrologMUD.vpj
-  - src_mud
-    + actions
-    + dbase
-    + mobs
-      + affordance
-      + planner
-    + objs
-    + parsing
-    + vworld
-+ externals\PrologMUD_ext.vpj
-scroll:0
-[State]
-SCREEN: 1920 1080 198 143 1440 699 0 0 M 0 0 0 0 1469 633
-CWD: ..\..\PrologMUD
-FILEHIST: 9
-\opt\LogicmooDeveloperFramework\PrologMUD\externals\XperiMental\knowrob_addons\knowrob_roslog_launch\prolog\init.pl
-externals\XperiMental\knowrob_addons\knowrob_mud\prolog\init.pl
-clone_externals.sh
-src_mud\vworld\moo_startup.pl
-src_lib\logicmoo_util\logicmoo_util_all.pl
-runtime\run.pl
-\opt\LogicmooDeveloperFramework\PrologMUD\externals\MUD_KnowRob\knowrob_addons\knowrob_mud\README.md
-\opt\LogicmooDeveloperFramework\PrologMUD\externals\MUD_KnowRob\knowrob_addons\knowrob_mud\package.xml
-externals\MUD_KnowRob\robokind\milo\milo-lesson\app\MiloVolumeExampleConfig.ttl
+PrologMUD_base.vpj=20150103232704879

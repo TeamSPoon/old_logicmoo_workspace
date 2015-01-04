@@ -10,7 +10,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(tCommand).
+:- register_module_type(mtCommand).
 
 action_info(actDrink(tDrinkable),"Drink a Drinkable Item").
 

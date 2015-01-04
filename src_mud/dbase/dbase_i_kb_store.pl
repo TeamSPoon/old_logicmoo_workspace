@@ -112,7 +112,7 @@ into_hilog_form_ic(X,O):- X=..[F|A],into_hilog_form(X,F,A,O).
 % TODO finish negations
 into_hilog_form(X,_,_,hasInstance(C,I)):-was_isa(X,I,C),!.
 into_hilog_form(X,F,_A,X):- mpred_prop(F,as_is(_Why)),!.
-into_hilog_form(X,F,_A,X):- mpred_prop(F,prologCall),!.
+into_hilog_form(X,F,_A,X):- mpred_prop(F,actProlog),!.
 into_hilog_form(X,dbase_t,_A,X).
 into_hilog_form(X,mpred_arity,_A,X).
 into_hilog_form(X,mpred_prop,_A,X).
@@ -238,7 +238,6 @@ foreach_arg([ArgIn1|ARGS],ArgN1,ArgIn,ArgN,ArgOut,Call1,[ArgOut1|ARGSO]):-
 transform_functor_holds(_,F,ArgInOut,N,ArgInOut):- once(argIsa_ft(F,N,FT)),FT=ftTerm,!.
 transform_functor_holds(Op,_,ArgIn,_,ArgOut):- transform_holds(Op,ArgIn,ArgOut),!.
 
-
 transform_holds(H,In,Out):- once(transform_holds_3(H,In,Out)),!,ignore((In\=Out,fail,dmsg(transform_holds(H,In,Out)))).
 
 transform_holds_3(_,A,A):-not(compound(A)),!.
@@ -261,7 +260,7 @@ transform_holds_3(Op,[Logical|ARGS],OUT):-
          OUT=..[Logical|LARGS].
 
 transform_holds_3(_,[props,Obj,Props],props(Obj,Props)).
-transform_holds_3(_,[Type,Inst|PROPS],props(Inst,[mudIsa(Type)|PROPS])):- nonvar(Inst), not(Type=props), cached_isa(Type,colDeclarer),must_det(not(never_type(Type))),!.
+transform_holds_3(_,[Type,Inst|PROPS],props(Inst,[mudIsa(Type)|PROPS])):- nonvar(Inst), not(Type=props), hasInstance(colDeclarer,Type),must_det(not(never_type(Type))),!.
 transform_holds_3(_,[P,A|ARGS],DBASE):- atom(P),!,DBASE=..[P,A|ARGS].
 transform_holds_3(_,[P,A|ARGS],DBASE):- !, nonvar(P),dumpST,trace_or_throw(dtrace), DBASE=..[P,A|ARGS].
 transform_holds_3(Op,DBASE_T,OUT):- DBASE_T=..[P,A|ARGS],!,transform_holds_3(Op,[P,A|ARGS],OUT).
@@ -441,7 +440,7 @@ nonground_throw_or_fail(C):- not_is_release,not(ground(C)),!,( (test_tl(thlocal:
 
 
 into_assertable_form_trans(G,was_asserted_gaf(G)):- functor_catch(G,F,_),mpred_prop(F,was_asserted_gaf),!.
-into_assertable_form_trans(G,was_asserted_gaf(G)):- functor_catch(G,F,_),mpred_prop(F,query_with_pred(was_asserted_gaf)),!.
+into_assertable_form_trans(G,was_asserted_gaf(G)):- functor_catch(G,F,_),mpred_prop(F,mudQueryWithPred(was_asserted_gaf)),!.
 
 /*
 into_assertable_form(M:H,G):-atom(M),!,into_assertable_form(H,G).

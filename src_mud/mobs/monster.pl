@@ -1,5 +1,5 @@
 /** <module> 
-% This is optional (simple) monster to prowl the maze world.
+% This is isOptional (simple) monster to prowl the maze world.
 %
 % monster.pl
 % July 11, 1996
@@ -30,27 +30,27 @@ monster_idea(Agent,actEat(Food)) :-
 	mudCharge(Agent,Charge),
 	Charge < 100,
         mudPossess(Agent, Food),
-        isa_any(Food,[tFood,corpse]).
+        isa_any(Food,[tFood,tCorpse]).
 monster_idea(Agent,actTake(Food)) :-
-	get_feet(Agent,What),
-	isa_any(Food,[tFood,corpse]),
+	mudNearFeet(Agent,What),
+	isa_any(Food,[tFood,tCorpse]),
 	obj_memb(Food,What).
-monster_idea(Agent,actMove(Dir)) :-
-	get_percepts(Agent,List),
-	isa_any(Food,[tFood,corpse]),
+monster_idea(Agent,actMove(1,Dir)) :-
+	mudGetPrecepts(Agent,List),
+	isa_any(Food,[tFood,tCorpse]),
 	list_object_dir_sensed(_,List,Food,Dir).
 monster_idea(Agent,actAttack(Dir)) :-
-	get_near(Agent,List),
+	mudNearReach(Agent,List),
 	list_agents(Agents),
 	isa_any(NearAgt,Agents),
 	list_object_dir_near(List,NearAgt,Dir).
-monster_idea(Agent,actMove(Dir)) :-
-	get_percepts(Agent,List),
+monster_idea(Agent,actMove(1,Dir)) :-
+	mudGetPrecepts(Agent,List),
 	list_agents(Agents),
 	isa_any(NearAgt,Agents),
 	list_object_dir_sensed(_,List,NearAgt,Dir).
 
-monster_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[corpse]).
+monster_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[tCorpse]).
 
 default_inst_props(Instance,tMonster,[mudDescription(fmt("Very screy looking monster named ~w",[Instance])),wearsClothing(tToughHide),mudPossess(tToughHide)]).
 

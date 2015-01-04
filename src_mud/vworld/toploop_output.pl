@@ -14,8 +14,8 @@
 :- register_module_type(utility).
 
 % live another day to fight (meaning repl_to_string/1 for now is in prolog)
-% local_decl_db_prop(repl_writer(agent,term),[singleValued,default_sv(2,default_repl_writer)]).
-% local_decl_db_prop(repl_to_string(agent,term),[singleValued,default_sv(2,default_repl_obj_to_string)]).
+% local_decl_db_prop(repl_writer(agent,term),[singleValued,predSingleValueDefault(2,default_repl_writer)]).
+% local_decl_db_prop(repl_to_string(agent,term),[singleValued,predSingleValueDefault(2,default_repl_obj_to_string)]).
 
 :-swi_export(default_repl_writer/4).
 default_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=o),  ( TypeO == o -> fmt('~q= ~q.~n',[N,V]) ; fmt('~q=D(~w) ~q.~n',[N,TypeO,V])).

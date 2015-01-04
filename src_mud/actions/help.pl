@@ -6,13 +6,13 @@
 */
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(tCommand).
+:- register_module_type(mtCommand).
 
 mudIsa(tHumanPlayer,tAgentcol).
 mudSubclass(tAgentcol,tCol).
 
 % type_action_info(human_player,help, "shows this help").
-type_action_info(tHumanPlayer,actHelp(optional(string,"")), "shows this help").
+type_action_info(tHumanPlayer,actHelp(isOptional(ftString,"")), "shows this help").
 
 action_info(What,ftText("command is: ",What)):- tActionType(What).
 
@@ -62,9 +62,9 @@ agent_call_command(_Agent,actHelp(Str)) :-commands_list(ListS),forall(member(E,L
 write_string_if_contains("",E):-!,fmt(E).
 write_string_if_contains(Must,E):-ignore((with_output_to(string(Str),fmt(E)),str_contains_all([Must],Str),fmt(Str))).
 
-term_specifier_text(Text,tVerb,Inst):- get_type_action_templates(A),nonvar(A),functor_safe(A,Inst,_),name_text(Inst,Text).
+term_specifier_text(Text,vtVerb,Inst):- get_type_action_templates(A),nonvar(A),functor_safe(A,Inst,_),name_text(Inst,Text).
 
-%agent_text_command(Agent,[Who],Agent,Cmd):- nonvar(Who), get_type_action_templates(Syntax),Syntax=..[Who,optional(_,Default)],Cmd=..[Who,Default].
-%agent_text_command(Agent,[Who,Type],Agent,Cmd):- get_type_action_templates(Syntax),nonvar(Who),Syntax=..[Who,optional(Type,_)],Cmd=..[Who,Type].
+%agent_text_command(Agent,[Who],Agent,Cmd):- nonvar(Who), get_type_action_templates(Syntax),Syntax=..[Who,isOptional(_,Default)],Cmd=..[Who,Default].
+%agent_text_command(Agent,[Who,Type],Agent,Cmd):- get_type_action_templates(Syntax),nonvar(Who),Syntax=..[Who,isOptional(Type,_)],Cmd=..[Who,Type].
 
 :- include(logicmoo(vworld/moo_footer)).

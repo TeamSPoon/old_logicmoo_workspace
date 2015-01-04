@@ -15,18 +15,19 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(tCommand).
+:- register_module_type(mtCommand).
 
 % :- begin_transform_moo_preds.
 
 
-agent_text_command(Agent,[DirSS],Agent,actMove(Inst,N)):- nonvar(DirSS),catch(((specifiedItem(Dir,vtDirection,Inst), any_to_atom(DirSS,DirS),catch((atom_concat(Dir,N,DirS),(atom_number(N,_))),_,fail))),_,fail).
-agent_text_command(Agent,[DirS],Agent,actMove(Dir,1)):- specifiedItem(DirS,vtDirection,Dir).
+agent_text_command(Agent,[DirSS],Agent,OUT):-nonvar(DirSS), to_case_breaks(DirSS,[t(DirS,_),t(Dist,digit)]),show_call(specifiedItem(DirS,vtDirection,Dir)),OUT=actMove(Dist,Dir).
+agent_text_command(Agent,[DirSS],Agent,OUT):-nonvar(DirSS), show_call(specifiedItem(DirSS,vtDirection,Dir)),OUT=actMove(Dir).
 
 agent_call_command(Agnt,Cmd):- compound(Cmd),functor(Cmd,actMove,_),!,must(move_command(Agnt,Cmd)).
 
-action_info(actMove(vtDirection),"Move in a direction").
+action_info(actMove(isOptional(ftNumber,1),vtDirection),"Move [n=1] distance in direction").
 
+/*
 % dir###
 move_command(Agent,actMove(DirSS)) :- catch((string_to_atom(DirSS,DirS),
 	    atom_concat(Dir,N,DirS),atom_number(N,Dist)),_,fail),!,
@@ -35,12 +36,13 @@ move_command(Agent,actMove(DirSS)) :- catch((string_to_atom(DirSS,DirS),
 move_command(Agent,actMove(Dir)) :-
 	    get_move_dist(Agent,Dist),
             move_command(Agent,Dir,Dist).
-
+*/
+move_command(Agent,actMove(Dir)):-!,move_command(Agent,actMove(1,Dir)).
 % dir
-move_command(Agent,actMove(Dir,Dist)) :-
+move_command(Agent,actMove(Dist,Dir)) :-
             move_command(Agent,Dir,Dist).
 
-get_move_dist(Agent,Dist):-req(movedist(Agent,Dist)),!.
+get_move_dist(Agent,Dist):-req(mudMoveDist(Agent,Dist)),!.
 get_move_dist(_Gent,1).
 
 % Move thy agent

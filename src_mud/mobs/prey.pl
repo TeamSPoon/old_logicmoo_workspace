@@ -17,7 +17,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 :- register_module_type(planning).
-:- register_module_type(tCommand).
+:- register_module_type(mtCommand).
 
 :-decl_type(tPrey).
 tCol(tPrey).
@@ -32,23 +32,23 @@ world_agent_plan(_World,Self,Act):-
    
 % Possible agent actions.
 prey_idea(Self,actMove(Dir)) :-
-	get_percepts(Self,List),
+	mudGetPrecepts(Self,List),
 	list_agents(Agents),
 	obj_memb(NearAgnt,Agents),
 	list_object_dir_sensed(_,List,NearAgnt,OppDir),
 	reverse_dir(OppDir,Dir),
-	number_to_dir(Num,Dir,here),
+	number_to_dir(Num,Dir,vHere),
 	nth1(Num,List,What),
 	What == [].
 prey_idea(Self,actTake(tNut)) :-
-	get_feet(Self,What),
+	mudNearFeet(Self,What),
 	member(tNut,What).
 prey_idea(Self,actEat(tNut)) :-
 	mudCharge(Self,Charge),
 	Charge < 120,
 	mudPossess(Self,tNut).
 prey_idea(Self,actMove(Dir)) :-
-	get_percepts(Self,List),
+	mudGetPrecepts(Self,List),
 	list_object_dir_sensed(_,List,tNut,Dir).
 prey_idea(_Agent,_) :-
 	actSpawn.

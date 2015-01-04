@@ -59,7 +59,7 @@ call_agent_command(A,CMD):- must_ac(call_agent_action(A,CMD)),!.
 % All Actions must be called from here!
 call_agent_action(Agent,CMDI):-var(CMDI),trace_or_throw(call_agent_action(Agent,CMDI)).
 call_agent_action(Agent,CMDI):-
-   subst(CMDI,self,Agent,CMD),
+   subst(CMDI,isAgentSelf,Agent,CMD),
    thread_self(TS),
    (TS=main -> Wrapper = call ; Wrapper = notrace),
    with_assertions(thlocal:session_agent(TS,Agent),
@@ -137,7 +137,7 @@ list_agents(Agents) :- % build cache
 
 :-swi_export((agent_into_corpse/1, display_stats/1)).
 
-% When an agent dies, it turns into a corpse.
+% When an agent dies, it turns into a tCorpse.
 % corpse is defined as an object in the *.objects.pl files
 agent_into_corpse(Agent) :-
 	del(mudAtLoc(Agent,LOC)),
@@ -145,7 +145,9 @@ agent_into_corpse(Agent) :-
 	clr(mudHeight(Agent,_)),
 	clr(mudStm(Agent,_)),
 	clr(mudSpd(Agent,_)),
-	add(mudAtLoc(corpse(Agent),LOC)).
+        Newthing = iCorpseFn(Agent),
+        assert_isa(Newthing,tCorpse),
+	add(mudAtLoc(Newthing,LOC)).
 
 % Displays all the agents stats. Used at end of a run.
 display_stats(Agents) :-

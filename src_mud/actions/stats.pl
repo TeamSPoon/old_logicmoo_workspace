@@ -10,12 +10,12 @@
 */
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(tCommand).
+:- register_module_type(mtCommand).
 
 % ====================================================
 % show the stats system
 % ====================================================
-action_info(actStats(optional(tObj,self)), "Examine MUD stats of something").
+action_info(actStats(isOptional(tObj,isAgentSelf)), "Examine MUD stats of something").
 agent_call_command(Agent,actStats(What)):-    
    show_kb_preds(Agent,[
          mudCharge(What,value),
@@ -56,11 +56,11 @@ manipulation.
 morph to the best of its physical ability, including
 the fundamental utilization of the morph�s strength,
 endurance, and sustained positioning and motion.
-� Willpower (WIL) is your skill for self-control,
+� Willpower (WIL) is your skill for isAgentSelf-control,
 your ability to command your own destiny.
 */
 
-action_info(actList(optional(ftTerm,self)), "Examine MUD listing of something").
+action_info(actList(isOptional(ftTerm,isAgentSelf)), "Examine MUD listing of something").
 agent_call_command(_Gent,actList(Obj)):- term_listing(Obj).
 
 :- include(logicmoo(vworld/moo_footer)).

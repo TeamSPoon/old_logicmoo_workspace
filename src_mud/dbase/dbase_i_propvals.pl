@@ -187,10 +187,10 @@ assert_subclass_on_argIsa(Prop,N,OType):-argIsa_call(Prop,N,PropType),assert_sub
 guessed_mpred_arity(F,A):-mpred_arity(F,AA),!,A=AA.
 guessed_mpred_arity(_,2).
 
-suggestedType(Prop,N,_,argIsaFn(Prop, N),FinalType):- guessed_mpred_arity(Prop,N), atom_concat(Prop,'_value',FinalType),!,must((decl_type(FinalType),assert_isa(FinalType,discoverableType))).
-suggestedType(Prop,N,_,_,FinalType):- guessed_mpred_arity(Prop,N),atom_concat(Prop,'_value',FinalType),!,must((decl_type(FinalType),assert_isa(FinalType,discoverableType))).
-suggestedType( _ ,_,_ ,FinalType,FinalType):-atom(FinalType),tCol(FinalType),not(tFormattype(FinalType)),!.
-suggestedType( _ ,_,Possibles,_ ,FinalType):- member(FinalType,[tMpred,tCol,tFormattype,ftText,tRegion,tAgentGeneric,tItem,tObj,tSpatialthing]),member(FinalType,Possibles),!.
+suggestedType(Prop,N,_,argIsaFn(Prop, N),FinalType):- guessed_mpred_arity(Prop,N),typename_to_iname('vt',Prop,FinalType),!,must((decl_type(FinalType),assert_isa(FinalType,discoverableType))).
+suggestedType(Prop,N,_,_,FinalType):- guessed_mpred_arity(Prop,N),typename_to_iname('vt',Prop,FinalType),!,must((decl_type(FinalType),assert_isa(FinalType,discoverableType))).
+suggestedType( _ ,_,_ ,FinalType,FinalType):-atom(FinalType),tCol(FinalType),not(ttFormatType(FinalType)),!.
+suggestedType( _ ,_,Possibles,_ ,FinalType):- member(FinalType,[tPred,tCol,ttFormatType,ftText,tRegion,tAgentGeneric,tItem,tObj,tSpatialthing]),member(FinalType,Possibles),!.
 
 deduce_argN(Prop,N,_,ObjectTypes,Type):- suggestedType(Prop,N,ObjectTypes,Type,FinalType),FinalType\=Type,assert_argIsa(Prop,N,FinalType).
 deduce_argN(_ ,_ ,Obj,[],Type):- tCol(Type), assert_isa(Obj,Type),!.
@@ -206,18 +206,18 @@ maybe_cache_0(Prop,Obj,Value,What):- padd(Obj,Prop,Value),
 
 unverifiableType(ftTerm).
 unverifiableType(ftVoprop).
-unverifiableType(id).
+unverifiableType(ftID).
 unverifiableType(ftDice).
-unverifiableType(tMpred).
+unverifiableType(tPred).
 unverifiableType(ftText).
-unverifiableType(tFpred).
+unverifiableType(tFunction).
 unverifiableType(vtDirection).
 unverifiableType(string).
-unverifiableType(tFormattype).
+unverifiableType(ttFormatType).
 unverifiableType(tCol).
 unverifiableType(ftTerm(_)).
-unverifiableType(tMpred(_)).
-unverifiableType(ftList(_)).
+unverifiableType(tPred(_)).
+unverifiableType(ftListFn(_)).
 
 violatesType(Value,Type):-var(Value),!,Type=var.
 violatesType(_,Type):- unverifiableType(Type),!,fail.
@@ -259,7 +259,7 @@ no_fallback(mudSubclass,2).
 no_fallback(P,2):-not(mpred_prop(P,singleValued)).
 
 :-swi_export(defaultArgValue/4).
-defaultArgValue(Fact,F,A,OLD):- stack_check, mpred_prop(F,default_sv(A,OLD)),!,dmsg(defaultArgValue(fallback_value(Fact,F,default_sv(A,OLD)))).
+defaultArgValue(Fact,F,A,OLD):- stack_check, mpred_prop(F,predSingleValueDefault(A,OLD)),!,dmsg(defaultArgValue(fallback_value(Fact,F,predSingleValueDefault(A,OLD)))).
 defaultArgValue(mudFacing(_,_),_,2,"n"):-!.
 defaultArgValue(change(_,_),_,2,200):-!.
 defaultArgValue(mudHealth(_,_),_,2,500):-!.
@@ -288,9 +288,9 @@ get_instance_default_props(Inst,TraitsO):- must_det(nonvar(Inst)),!,
 
 :-swi_export((get_type_default_props/2)).
 
-get_type_default_props(Type,TraitsO):- nonvar(Type),!, Inst = self,
+get_type_default_props(Type,TraitsO):- nonvar(Type),!, Inst = isSelf,
    findall(Props,((type_w_default_props(DefType),transitive_subclass_or_same(Type,DefType),each_default_inst_type_props(Inst,DefType,Props))),Traits),flatten_set(Traits,TraitsO),!.
-get_type_default_props(DefType,TraitsO):- type_w_default_props(DefType), Inst = self,
+get_type_default_props(DefType,TraitsO):- type_w_default_props(DefType), Inst = isSelf,
    findall(Props,((each_default_inst_type_props(Inst,DefType,Props))),Traits),flatten_set(Traits,TraitsO),!.
 
 
@@ -301,8 +301,8 @@ type_w_defaults_asserted(Type):- is_asserted(default_inst_props(_,Type,_)),nonva
 type_w_defaults_asserted(Type):- is_asserted(default_type_props(Type,_)),nonvar(Type).
 type_w_defaults_asserted(Type):- is_asserted(mudLabelTypeProps(_,Type,_)),nonvar(Type).
 
-each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(default_inst_props(Inst,Type,TProps)),subst(TProps,self,Inst,Prop),flatten([Prop],Props).
-each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(default_type_props(Type,TProps)),subst(TProps,self,Inst,Prop),flatten([Prop],Props).
+each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(default_inst_props(Inst,Type,TProps)),subst(TProps,isSelf,Inst,Prop),flatten([Prop],Props).
+each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(default_type_props(Type,TProps)),subst(TProps,isSelf,Inst,Prop),flatten([Prop],Props).
 each_default_inst_type_props(_,Type,[kwLabel(Lbl)|Props]):-call_no_cuts(mudLabelTypeProps(Lbl,Type,Props)).
 
 default_inst_props(apathFn(Region,_Dir),areaPath,[localityOfObject(Region)]).

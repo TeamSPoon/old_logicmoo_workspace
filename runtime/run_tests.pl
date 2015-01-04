@@ -14,14 +14,14 @@ mud_test(test_movedist,
   test_name("in main engineering?"),
    test_true(req(localityOfObject(P,'Area1000'))),
    test_name("set the move dist to 5 meters"),
-   do_player_action('@set movedist 5'),
+   do_player_action('@set mudMoveDist 5'),
    test_name("going 5 meters"),
    % gets use out of othre NPC path
    do_player_action('move e'),
    do_player_action('move n'),
    test_name("must be now be in corridor"),
    test_true(req(localityOfObject(P,'Area1002'))),
-   do_player_action('@set movedist 1'),
+   do_player_action('@set mudMoveDist 1'),
    call_n_times(5, do_player_action('s')),
    do_player_action('move s'),
    test_name("must be now be back in engineering"),
@@ -72,9 +72,9 @@ mud_test_local:-
    test_true(correctArgsIsa(charge(Agent,_),_)).
 
 mud_test_local:- 
-   test_name("tests to see if we have: singleValued on movedist"),
-   must(add(movedist(explorer(player1),3))),
-   test_true(must((findall(X,movedist(explorer(player1),X),L),length(L,1)))).
+   test_name("tests to see if we have: singleValued on mudMoveDist"),
+   must(add(mudMoveDist(explorer(player1),3))),
+   test_true(must((findall(X,mudMoveDist(explorer(player1),X),L),length(L,1)))).
 
 mud_test_local:- 
       test_name("nudity test"), 

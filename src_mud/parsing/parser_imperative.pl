@@ -49,7 +49,7 @@ agent_call_command(Agent,debug(Term)):- agent_call_safely(Agent,debug(Term)).
 % ===========================================================
 % PARSE command
 % ===========================================================
-type_action_info(tHumanPlayer,actParse(ftProlog,ftList(ftTerm)),"Development test to parse some Text for a human.  Usage: parse 'item' the blue backpack").
+type_action_info(tHumanPlayer,actParse(ftProlog,ftListFn(ftTerm)),"Development test to parse some Text for a human.  Usage: parse 'item' the blue backpack").
 
 agent_call_command(_Gent,actParse(Type,StringM)):-
    parse_for(Type,StringM,_Term,_LeftOver).
@@ -57,21 +57,21 @@ agent_call_command(_Gent,actParse(Type,StringM)):-
 % ===========================================================
 % CMDPARSE command
 % ===========================================================
-type_action_info(tHumanPlayer,actCmdparse(ftList(ftTerm)),"Development test to parse some Text for a human.  Usage: cmdparse take the blue backpack").
+type_action_info(tHumanPlayer,actCmdparse(ftListFn(ftTerm)),"Development test to parse some Text for a human.  Usage: cmdparse take the blue backpack").
 
-agent_call_command(_Gent,actCmdparse(StringM)):- parse_for(tCommand,StringM,Term,LeftOver),fmt([Term,LeftOver]).
+agent_call_command(_Gent,actCmdparse(StringM)):- parse_for(ftAction,StringM,Term,LeftOver),fmt(parse_for(StringM)=>[Term,LeftOver]).
 
 % mud_test("cmdparse test",...)
   
 
 % ===========================================================
-% parsetemps command
+% parsetempl command
 % ===========================================================
-type_action_info(tHumanPlayer,actParsetemps(ftList(ftTerm)),"Development test to see what verb phrase heads are found. (uses get_vp_templates/4)  Usage: parsetemps who").
+type_action_info(tHumanPlayer,actParsetempl(ftListFn(ftTerm)),"Development test to see what verb phrase heads are found. (uses get_vp_templates/4)  Usage: parsetempl who").
 
-agent_text_command(Agent,[actParsetemps|List],Agent,actParsetemps(List)).
+agent_text_command(Agent,[actParsetempl|List],Agent,actParsetempl(List)).
 
-agent_call_command(Agent,actParsetemps(StringM)):-
+agent_call_command(Agent,actParsetempl(StringM)):-
   to_word_list(StringM,[SVERB|ARGS]),
   get_vp_templates(Agent,SVERB,ARGS,TEMPLATES),fmt(templates=TEMPLATES),
   ignore((
@@ -109,9 +109,9 @@ desc_len(S0,Region):- call(term_to_atom(S0,S)),
 
 
 :-swi_export(objects_match_for_agent/3).
-objects_match_for_agent(Agent,Text,ObjList):- objects_match_for_agent(Agent,Text,[mudPossess(Agent,value),same(mudAtLoc),same(localityOfObject),tAgentGeneric,tItem,tRegion],ObjList).  
+objects_match_for_agent(Agent,Text,ObjList):- objects_match_for_agent(Agent,Text,[mudPossess(Agent,value),isSame(mudAtLoc),isSame(localityOfObject),tAgentGeneric,tItem,tRegion],ObjList).  
 :-swi_export(objects_match_for_agent/4).
-objects_match_for_agent(Agent,Text,Match,ObjList):- objects_for_agent(Agent,or([text_means(Agent,Text,value),and([or(Match),match_object(Text,value)])]),ObjList).  
+objects_match_for_agent(Agent,Text,Match,ObjList):- objects_for_agent(Agent,isOneOf([text_means(Agent,Text,value),isAnd([isOneOf(Match),match_object(Text,value)])]),ObjList).  
 
 text_means(Agent,Text,Agent):- equals_icase(Text,"self"),!.
 text_means(Agent,Text,Loc):- equals_icase(Text,"here"),where_atloc(Agent,Loc).
@@ -122,17 +122,17 @@ relates(Agent,Relation,Obj):-loop_check(relates_lc(Agent,Relation,Obj),fail).
 relates_lc(Agent,Relation,Obj):-text_means(Agent,Relation,Obj),!.
 relates_lc(_    ,Relation,Obj):- atom(Relation),tCol(Relation),!,mudIsa(Obj,Relation).
 relates_lc(_    ,Relation,Obj):-contains_var(Relation,value),subst(Relation,value,Obj,Call),!,req(Call).
-relates_lc(Agent,same(Relation),Obj):- !, relates(Agent,Relation,Value),relates(Obj,Relation,Value).
+relates_lc(Agent,isSame(Relation),Obj):- !, relates(Agent,Relation,Value),relates(Obj,Relation,Value).
 relates_lc(Agent,Relation,Obj):- atom(Relation),!, prop(Agent,Relation,Obj).
 relates_lc(_    ,Relation,Obj):-contains_var(Relation,Obj),!,req(Relation).
 relates_lc(Agent,Relation,Obj):-contains_var(Relation,Agent),append_term(Relation,Obj,Call),!,req(Call).
 relates_lc(Agent,Relation,Obj):-objects_for_agent(Agent,Relation,MatchList),MatchList\=[],!,member(MatchList,Obj).
 
 
-objects_for_agent(_Agent,and([]),[]):-!.
-objects_for_agent(_Agent,or([]),[]):-!.
+objects_for_agent(_Agent,isAnd([]),[]):-!.
+objects_for_agent(_Agent,isOneOf([]),[]):-!.
 
-objects_for_agent(Agent,or([Possible|Relations]),MatchList):-!,
+objects_for_agent(Agent,isOneOf([Possible|Relations]),MatchList):-!,
    objects_for_agent(Agent,Possible,L1),
    objects_for_agent(Agent,Relations,L2),
    append(L1,L2,MatchListL),!,
@@ -140,7 +140,7 @@ objects_for_agent(Agent,or([Possible|Relations]),MatchList):-!,
 
 objects_for_agent(Agent,members(List,Relations),MatchList):-!, findall(Obj,(member(Obj,List),relates(Agent,Relations,Obj)),MatchListL),list_to_set(MatchListL,MatchList),!.
 
-objects_for_agent(Agent,and([Possible|Relations]),MatchList):-!,
+objects_for_agent(Agent,isAnd([Possible|Relations]),MatchList):-!,
    objects_for_agent(Agent,Possible,L1),
    objects_for_agent(Agent,members(L1,Relations),MatchListL),
    list_to_set(MatchListL,MatchList),!.
@@ -175,10 +175,10 @@ save_fmt_e(O,E):- member(E,O) -> true ; (O=[_|CDR],nb_setarg(2,O,[E|CDR])).
 
 save_fmt_a(_,A):-atom_length(A,L),L =< 1,!.
 save_fmt_a(O,E):-atom_contains(E,'-'),!,must((to_word_list(E,WL),save_fmt_e(O,WL))),!.
-save_fmt_a(O,E):-member(E,[tObj,value,the,is,tSpatialthing,prologHybrid,prologOnly,tRelation,tMpred,'',[]]),O\== E,!.
+save_fmt_a(O,E):-member(E,[tObj,value,the,is,tSpatialthing,prologHybrid,prologOnly,tRelation,tPred,'',[]]),O\== E,!.
 
 
-object_name_is_descriptive(O):- (mudIsa(O,tCol);mudIsa(O,tMpred);mudIsa(O,colDeclarer);mudIsa(O,tValuetype),mudIsa(O,name_is_descriptive)).
+object_name_is_descriptive(O):- (mudIsa(O,tCol);mudIsa(O,tPred);hasInstance(colDeclarer,O);mudIsa(O,ttValueType),mudIsa(O,name_is_descriptive)).
 
 :-swi_export(object_print_details/5).
 object_print_details(Print,Agent,O,DescSpecs,Skipped):-
@@ -199,7 +199,7 @@ must_make_object_string_list_cached(P,Obj,WList):-
 
 same_ci(A,B):-notrace((must((non_empty(A),non_empty(B))),any_to_string(A,StringA),any_to_string(B,StringB),!,string_ci(StringA,StringB))),!.
 
-match_object(S,Obj):- atoms_of(S,Atoms),!,must(Atoms\=[]),match_object_0(Atoms,Obj).
+match_object(S,Obj):- must(((atoms_of(S,Atoms),!,Atoms\=[]))),match_object_0(Atoms,Obj).
 
 match_object_0([S],Obj):-nonvar(S),match_object_1(S,Obj),!.
 match_object_0(Atoms,Obj):-
@@ -231,7 +231,7 @@ parse_agent_text_command(Agent,VERB,[PT2|ARGS],NewAgent,GOAL):-
    parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL),!,
    dmsg_parserm(special_succeed_parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL)),!.
 
-parse_agent_text_command(Agent,PROLOGTERM,[],Agent,prologCall(PROLOGTERM)):- must(nonvar(PROLOGTERM)),predicate_property(PROLOGTERM,_),!.
+parse_agent_text_command(Agent,PROLOGTERM,[],Agent,actProlog(PROLOGTERM)):- must(nonvar(PROLOGTERM)),predicate_property(PROLOGTERM,_),!.
 
 parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL):-
  dmsg(failed_parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL)),
@@ -258,8 +258,8 @@ parse_agent_text_command_0(Agent,IVERB,ARGS,NewAgent,GOAL):-
    verb_alias_to_verb(IVERB,SVERB), IVERB\=SVERB,!,
    parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL).
 
-parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,prologCall(call_mpred(PROLOGTERM))):- compound(PROLOGTERM),functor(PROLOGTERM,F,_),mpred_prop(F,_),!.
-parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,prologCall(req(PROLOGTERM))):- compound(PROLOGTERM),is_callable(PROLOGTERM),!.
+parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,actProlog(call_mpred(PROLOGTERM))):- compound(PROLOGTERM),functor(PROLOGTERM,F,_),mpred_prop(F,_),!.
+parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,actProlog(req(PROLOGTERM))):- compound(PROLOGTERM),is_callable(PROLOGTERM),!.
 
 :-swi_export(parse_agent_text_command_1/5).
 % parses a verb phrase and retuns one interpretation (action)
@@ -273,16 +273,16 @@ parse_agent_text_command_1(Agent,SVERB,ARGS,Agent,GOAL):-
 
 verb_alias('l',actLook).
 verb_alias('lo',actLook).
-verb_alias('s',actMove(s)).
-verb_alias('go','go').
+verb_alias('s',actMove(vSouth)).
+% verb_alias('go','go').
 verb_alias('where is',actWhere).
 
 % pos_word_formula('infinitive',Verb,Formula):- 'infinitive'(TheWord, Verb, _, _G183), 'verbSemTrans'(TheWord, 0, 'TransitiveNPCompFrame', Formula, _, _).
 
 verb_alias_to_verb(IVERB,SVERB):- verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.
-verb_alias_to_verb(IVERB,SVERB):- specifiedItem(IVERB,tVerb,SVERB), IVERB \= SVERB.
+verb_alias_to_verb(IVERB,SVERB):- specifiedItem(IVERB,vtVerb,SVERB), IVERB \= SVERB.
 
-subst_parser_vars(Agent,TYPEARGS,TYPEARGS_R):- subst(TYPEARGS,self,Agent,S1),where_atloc(Agent,Here),subst(S1,here,Here,TYPEARGS_R).
+subst_parser_vars(Agent,TYPEARGS,TYPEARGS_R):- subst(TYPEARGS,isAgentSelf,Agent,S1),where_atloc(Agent,Here),subst(S1,here,Here,TYPEARGS_R).
 
 % verb_matches("go",VERB):-!,VERB=go.
 verb_matches(SVERB,VERB):-samef(VERB,SVERB).
@@ -346,7 +346,7 @@ name_text(Name,Text):-string(Name),Name=Text.
 name_text(Name,Text):-atomic(Name),typename_to_iname('',Name,TextN),!,atom_string(TextN,TextU),toLowercase(TextU,Text).
 name_text(Name,Text):-atomic(Name),atom_string(Name,Text).
 name_text(Name,Text):-dbase_t(mudKeyword,Name,Text).
-name_text(Name,Text):-argIsa(N,2,string),not(is_asserted(argIsa(N,1,string))),dbase_t(N,Name,Text).
+name_text(Name,Text):-argIsa(N,2,ftString),not(is_asserted(argIsa(N,1,ftString))),dbase_t(N,Name,Text).
 
 term_specifier_text(TextS,vtDirection,Dir):-
   member(Dir-Text,[vNorth-"n",vSouth-"s",vEast-"e",vWest-"w",vNE-"ne",vNW-"nw",vSE-"se",vSW-"sw",vUp-"u",vDown-"d"]),
@@ -371,7 +371,7 @@ is_counted_for_parse(I):-i_countable(I),not(excluded_in_parse(I)),!.
 
 excluded_in_parse(apathFn(_, _)).
 excluded_in_parse(I):-tCol(I).
-excluded_in_parse(I):-tFormattype(I).
+excluded_in_parse(I):-ttFormatType(I).
 excluded_in_parse(I):-mpred_prop(_,argsIsaInList(I)).
 excluded_in_parse(apathFn(_ = _)).
 
@@ -380,9 +380,9 @@ insttype_for_parse(I):-findall(C,(instance_for_parse(I),mudIsa(I,C)),List),list_
 
 optional_strings_opt.
 
-% optimization for optional strings
+% optimization for isOptional strings
 phrase_parseForTypes_0(TYPEARGS,ARGS,GOODARGS,LeftOver):- optional_strings_opt,
-      (string_append(T1,[optionalStr(Str)],T2,TYPEARGS),
+      (string_append(T1,[isOptionalStr(Str)],T2,TYPEARGS),
       (StrT =[_] /*;StrT=[_,_]*/),
       string_append(A1,StrT,A2,ARGS),
       equals_icase(Str,StrT)),!,
@@ -410,7 +410,7 @@ parseIsa_Call(FT, BO, CIn, D):- list_tail(CIn,D), to_word_list(CIn,C),!, parseIs
 % this parseIsa(T)-->parseIsa(T,_).
 parseIsa(A, B, C) :- parseIsa(A, _, B, C).
 
-is_parsable_type(T):-tFormattype(T).
+is_parsable_type(T):-ttFormatType(T).
 is_parsable_type(T):-tCol(T).
 is_parsable_type(vp).
 
@@ -418,7 +418,7 @@ is_parsable_type(vp).
 %:- begin_tests(test_bad_verb).
 
 actTest(test_bad_verb, [ true(
-       not(phrase(parseIsa(tVerb,ff),[ff],[]))
+       not(phrase(parseIsa(vtVerb,ff),[ff],[]))
        )] ).
 
 
@@ -436,7 +436,7 @@ query_trans_subft(FT,Sub):-mudSubft(FT,A),mudSubft(A,B),mudSubft(B,Sub).
 parseFmt_vp1(Agent, do(NewAgent,Goal),[SVERB|ARGS],[]):- parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,Goal),!.
 parseFmt_vp2(Agent,GOAL,[SVERB|ARGS],UNPARSED):- parse_vp_real(Agent,SVERB,ARGS,TRANSLATIONS),!,member(UNPARSED-GOAL,TRANSLATIONS).
 
-to_arg_value(random(Type),Term):- nonvar(Type),!, random_instance(Type,Term,true).
+to_arg_value(isRandom(Type),Term):- nonvar(Type),!, random_instance(Type,Term,true).
 to_arg_value(call(Call),TermO):-nonvar(Call),subst(Call,value,Term,NewCall),!,must(req(NewCall)),to_arg_value(Term,TermO).
 to_arg_value(Term,Term).
 
@@ -444,13 +444,13 @@ to_arg_value(Term,Term).
 
 some tests
 
- phrase_parseForTypes([optional(agent, random(agent))], ['Crush'], A, B).
+ phrase_parseForTypes([isOptional(agent, isRandom(agent))], ['Crush'], A, B).
 
-  phrase_parseForTypes([optional(agent, random(agent))], ['Crush'], A, B).
+  phrase_parseForTypes([isOptional(agent, isRandom(agent))], ['Crush'], A, B).
 
-parser_imperative:phrase_parseForTypes_9([optional(and([obj, not(region)]), 'NpcCol1000-Geordi684'), optionalStr("to"), optional(region, random(region))], [food, 'Turbolift'], GOODARGS,[]).
-parser_imperative:phrase_parseForTypes_9([optional(and([obj, not(region)]), 'NpcCol1000-Geordi684')], [food], GOODARGS,[]).
-parser_imperative:phrase_parseForTypes_9([optional(region, random(region))], ['Turbolift'], GOODARGS,[]).
+parser_imperative:phrase_parseForTypes_9([isOptional(isAnd([obj, isNot(region)]), 'NpcCol1000-Geordi684'), isOptionalStr("to"), isOptional(region, isRandom(region))], [food, 'Turbolift'], GOODARGS,[]).
+parser_imperative:phrase_parseForTypes_9([isOptional(isAnd([obj, isNot(region)]), 'NpcCol1000-Geordi684')], [food], GOODARGS,[]).
+parser_imperative:phrase_parseForTypes_9([isOptional(region, isRandom(region))], ['Turbolift'], GOODARGS,[]).
 
 
 */
@@ -462,52 +462,52 @@ parseIsa(Str,A,B,C) :-string(Str),!, parseIsa(exactStr(Str),A,B,C).
 % this parseIsa(not(T),Term) --> dcgAnd(dcgNot(parseIsa(T)),theText(Term)).
 parseIsa(not(Type), Term, C, D) :- !, dcgAnd(dcgNot(parseIsa(Type)), theText(Term), C, D).
 
-parseIsa(vp,Goal,Left,Right):-!,one_must(parseFmt_vp1(self,Goal,Left,Right),parseFmt_vp2(self,Goal,Left,Right)).
+parseIsa(vp,Goal,Left,Right):-!,one_must(parseFmt_vp1(isAgentSelf,Goal,Left,Right),parseFmt_vp2(isAgentSelf,Goal,Left,Right)).
 
 parseIsa(call(Call),TermV) --> {!,subst(Call,value,TermV,NewCall)},[TermT], {trace,req(NewCall),match_object(TermT,TermV)}.
 parseIsa(exactStr(Str),Str) --> {!},[Atom],{equals_icase(Atom,Str),!}.
-parseIsa(optionalStr(Str),Str) --> {not(optional_strings_opt)},[Atom],{equals_icase(Atom,Str),!}.
-parseIsa(optionalStr(Str),missing(Str)) --> {!},[].
-parseIsa(optionalStr(_Str),_) --> {!,fail}.
-parseIsa(optional(_,Term),TermV) --> {to_arg_value(Term,TermV)}, [TermT], {samef(TermV,TermT)}.
-parseIsa(optional(Type, _), Term, C, D) :- nonvar(Type),parseIsa(Type, Term, C, D).
-parseIsa(optional(_Type,Default), DefaultV, D, D2):- !,D=D2,to_arg_value(Default,DefaultV).
+parseIsa(isOptionalStr(Str),Str) --> {not(optional_strings_opt)},[Atom],{equals_icase(Atom,Str),!}.
+parseIsa(isOptionalStr(Str),isMissing(Str)) --> {!},[].
+parseIsa(isOptionalStr(_Str),_) --> {!,fail}.
+parseIsa(isOptional(_,Term),TermV) --> {to_arg_value(Term,TermV)}, [TermT], {samef(TermV,TermT)}.
+parseIsa(isOptional(Type, _), Term, C, D) :- nonvar(Type),parseIsa(Type, Term, C, D).
+parseIsa(isOptional(_Type,Default), DefaultV, D, D2):- !,D=D2,to_arg_value(Default,DefaultV).
 
-%  parser_imperative:phrase_parseForTypes_9([optional(and([obj, not(region)]),'NpcCol1000-Geordi684'),optionalStr("to"),optional(region, random(region))], [food], GOODARGS,[]).
-%  parser_imperative:phrase_parseForTypes_9([optional(and([obj, not(region)]),'NpcCol1000-Geordi684'),optionalStr("to"),optional(region, random(region))], [food,to,'Turbolift'], GOODARGS,[]).
+%  parser_imperative:phrase_parseForTypes_9([isOptional(isAnd([obj, isNot(region)]),'NpcCol1000-Geordi684'),isOptionalStr("to"),isOptional(region, isRandom(region))], [food], GOODARGS,[]).
+%  parser_imperative:phrase_parseForTypes_9([isOptional(isAnd([obj, isNot(region)]),'NpcCol1000-Geordi684'),isOptionalStr("to"),isOptional(region, isRandom(region))], [food,to,'Turbolift'], GOODARGS,[]).
 %  parser_imperative:phrase_parseForTypes_9([region], ['Turbolift'], GOODARGS,[]).
 
 
-parseIsa(string,String)--> {!}, theString(String).
+parseIsa(ftString,String)--> {!}, theString(String).
 parseIsa(FT, B, [AT|C], D) :- nonvar(AT),member_ci(AT,["the","a","an"]),parseIsa(FT, B, C, D).
 
 
-parseIsa(or(List),Term) --> {!,member(E,List)},parseIsa(E,Term).
+parseIsa(isOneOf(List),Term) --> {!,member(E,List)},parseIsa(E,Term).
 
 
-parseIsa(ftList(Type),[Term|List]) --> parseIsa(Type,Term),parseIsa(ftList(Type),List).
-parseIsa(ftList(_Type),[]) --> {!},[].
+parseIsa(ftListFn(Type),[Term|List]) --> parseIsa(Type,Term),parseIsa(ftListFn(Type),List).
+parseIsa(ftListFn(_Type),[]) --> {!},[].
 
 parseIsa(countBetween(_Type,_,High),[]) --> {High==0,!}, [].
 parseIsa(countBetween(Type,Low,High),[Term|List]) --> parseIsa(Type,Term),{!,Low2 is Low -1,High2 is High -1 },
    parseIsa(countBetween(Type,Low2,High2),List).
 parseIsa(countBetween(_Type,Low,_),[]) --> {!, Low < 1}, [].
 
-% parseIsa(and([L|List]),Term1) --> dcgAnd(parseIsa(L,Term1),parseIsa(and(List),Term2)),{ignore(Term1==Term2),!}.
-parseIsa(and([L]),Term1) --> {!},parseIsa(L,Term1).
-parseIsa(and([L|List]),Term) --> {!},dcgAnd(parseIsa(L,Term),parseIsa(and(List),Term)).
+% parseIsa(isAnd([L|List]),Term1) --> dcgAnd(parseIsa(L,Term1),parseIsa(isAnd(List),Term2)),{ignore(Term1==Term2),!}.
+parseIsa(isAnd([L]),Term1) --> {!},parseIsa(L,Term1).
+parseIsa(isAnd([L|List]),Term) --> {!},dcgAnd(parseIsa(L,Term),parseIsa(isAnd(List),Term)).
 
 parseIsa(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{specifiedItem(String,Type,Term)}.
 
 specifiedItem(String,Type,Inst):- var(Type),trace_or_throw(var_specifiedItemType(String,Type,Inst)).
-specifiedItem(String,not(Type),Inst):-!,not(specifiedItem(String,Type,Inst)).
+specifiedItem(String,isNot(Type),Inst):-!,not(specifiedItem(String,Type,Inst)).
 specifiedItem([String],Type,Inst):- nonvar(String),!,specifiedItem(String,Type,Inst).
-specifiedItem(String,Type,Inst):- tFormattype(Type),checkAnyType(assert(actParse),String,Type,AAA),Inst=AAA.
+specifiedItem(String,Type,Inst):- ttFormatType(Type),checkAnyType(assert(actParse),String,Type,AAA),Inst=AAA.
 specifiedItem(Text,Type,Inst):- call_tabled_can(no_repeats(call_no_cuts(term_specifier_text(Text,Type,Inst)))).
 %specifiedItem(String,Type,Longest) :- findall(Inst, (specifiedItem(Inst,Type,Inst),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
-specifiedItem(String,_Type,Inst):- nonvar(Inst),match_object(String,Inst).
-specifiedItem(String,Type,Inst):- not(tFormattype(Type)),must(tCol(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
-specifiedItem(String,Type,Inst):- nonvar(String),not(string(String)),!,text_to_string(String,StringS),!,specifiedItem(StringS,Type,Inst).
+specifiedItem(String,Type,Inst):- var(String),!,instances_of_type(Inst,Type),name_text(Inst,String).
+specifiedItem(String,Type,Inst):- not(ttFormatType(Type)),must(tCol(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
+specifiedItem(String,Type,Inst):- not(string(String)),!,text_to_string(String,StringS),!,specifiedItem(StringS,Type,Inst).
 
 instances_of_type(Inst,Type):- no_repeats(instances_of_type_0(Inst,Type)).
 instances_of_type_0(Inst,Type):- mudIsa(Inst,Type).

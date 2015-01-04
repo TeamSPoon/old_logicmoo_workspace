@@ -152,7 +152,7 @@ region_near(R1,R1).
 % 345345  default_inst_props(OfAgent,agent,[facing(F),atloc(L)]):-  dfsdfd ignore((nonvar(OfAgent),create_someval(facing,OfAgent,F),create_someval(atloc,OfAgent,L))).
 
 transitive_other(mudAtLoc,1,Obj,What):-mudInsideOf(Obj,What).
-% transitive_other(localityOfObject,1,Obj,What):-inside_of(Obj,What).
+% transitive_other(localityOfObject,1,Obj,What):-mudInsideOf(Obj,What).
 
 :-decl_mpred_hybrid(mudInsideOf/2).
 :-swi_export(mudInsideOf/2).
@@ -181,12 +181,12 @@ localityOfObject(Obj,Region):-inRegion(Obj,Region).
 
 /*
 localityOfObject(Clothes,Agent):-has_parts(Agent,Clothes).
-has_parts(Outer,Inner):-is_asserted(inside_of(Inner,Outer)).
+has_parts(Outer,Inner):-is_asserted(mudInsideOf(Inner,Outer)).
 has_parts(Agent,Clothes):-wearsClothing(Agent,Clothes).
 
-has_parts(body,eachOf(head,neck,upper_torso,lower_torso,pelvis,arms,legs)).
-has_parts(head,eachOf(face,hair)).
-has_parts(face,eachOf(eyes,nose,mouth)).
+has_parts(body,isEach(head,neck,upper_torso,lower_torso,pelvis,arms,legs)).
+has_parts(head,isEach(face,hair)).
+has_parts(face,isEach(eyes,nose,mouth)).
 has_parts([upper_torso,arms,left_arm,left_hand,left_digits]).
 has_parts([upper_torso,arms,right_arm,right_hand,right_digits]).
 has_parts([pelvis,legs,left_leg,left_foot,left_toes]).
@@ -201,11 +201,11 @@ genlPreds(wearsClothing,mudPossess).
 genlPreds(mudStowed,mudPossess).
 genlPreds(mudPossess,mudContains).
 genlInverse(mudContains,mudInsideOf).
-%genlInverse(inside_of,possess).
-%genlInverse(stowed,inside_of).
+%genlInverse(mudInsideOf,mudPossess).
+%genlInverse(mudStowed,mudInsideOf).
 
 
-put_in_world(self):-!.
+put_in_world(isSelf):-!.
 put_in_world(Agent):-loop_check(put_in_world_lc(Agent),true),!.
 
 put_in_world_lc(Obj):-isa_asserted(Obj,tRegion),!.
@@ -375,7 +375,7 @@ dir_offset(vSouth,F,0,F,0).
 dir_offset(vEast,F,F,0,0).
 dir_offset(vWest,F,-F,0,0).
 dir_offset(vNE,F,F,-F,0).
-dir_offset(vSW,F,-F,-F,0).
+dir_offset(vSW,F,-F,F,0).
 dir_offset(vSE,F,F,F,0).
 dir_offset(vNW,F,-F,-F,0).
 dir_offset(vHere,_,0,0,0).
@@ -475,17 +475,17 @@ reverse_dir0(vSE,vNW).
 
 
 % Yet another hash table to covert numbers into directions (or the reverse).
-num_near(1,vNW,vHere).
-num_near(2,vNorth,vHere).
-num_near(3,vNE,vHere).
-num_near(4,vWest,vHere).
-num_near(6,vEast,vHere).
-num_near(7,vSW,vHere).
-num_near(8,vSouth,vHere).
-num_near(9,vSE,vHere).
+num_near_reverse(1,vNW,vHere).
+num_near_reverse(2,vNorth,vHere).
+num_near_reverse(3,vNE,vHere).
+num_near_reverse(4,vWest,vHere).
+num_near_reverse(6,vEast,vHere).
+num_near_reverse(7,vSW,vHere).
+num_near_reverse(8,vSouth,vHere).
+num_near_reverse(9,vSE,vHere).
 
-num_near(0,vDown,vHere).
-num_near(5,vUp,vHere).
+num_near_reverse(0,vDown,vHere).
+num_near_reverse(5,vUp,vHere).
 
 % Translates numbers returned from scan_lists_aux/3 (the number of the location)
 % into thier relative directions.
@@ -526,7 +526,7 @@ list_object_dir_sensed(_,List,Type,Dir) :-
 list_object_dir_near(List,Type,Dir) :-
 	!,
 	scan_lists_aux(List,Type,1,N),
-	num_near(N,Dir,_).
+	num_near_reverse(N,Dir,_).
 
 scan_lists_aux([Loc|_],Type,N,N) :-
 	member(Obj,Loc),
@@ -553,5 +553,5 @@ doorLocation(_Room,6,4,_Z,vEast).
 doorLocation(_Room,6,0,_Z,vNE).
 doorLocation(_Room,6,6,_Z,vSE).
 doorLocation(_Room,0,0,_Z,vNW).
-doorLocation(_Room,6,0,_Z,vSW).
+doorLocation(_Room,0,6,_Z,vSW).
 doorLocation(_Room,_X,_Y,_Z,_Dir):-!,fail.

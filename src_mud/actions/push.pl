@@ -15,7 +15,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(tCommand).
+:- register_module_type(mtCommand).
 
 tActionType(actPush(vtDirection)).
 

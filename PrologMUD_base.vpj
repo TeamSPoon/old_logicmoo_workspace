@@ -26,19 +26,24 @@
 	<CustomFolders>
 	</CustomFolders>
 	<Files AutoFolders="DirectoryView">
-		<Folder Name="games">
+		<Folder Name="runtime">
 			<F
-				N="games/*.*"
+				N="runtime/*.*"
+				Recurse="1"
+				Refilter="1"
+				Excludes="cache/;store/"/>
+		</Folder>
+		<Folder Name="src_lib">
+			<F
+				N="src_lib/*.*"
 				Recurse="1"
 				Refilter="0"
-				Excludes=".git/"/>
+				Excludes="cache/;store/"/>
 		</Folder>
-		<Folder Name="src_mud">
-			<F
-				N="src_mud/*.*"
-				Recurse="1"
-				Refilter="0"
-				Excludes="*.*~;*~/"/>
-		</Folder>
+		<F
+			N="*.*"
+			Recurse="0"
+			Refilter="1"
+			Excludes="externals/;*.*~;.git/"/>
 	</Files>
 </Project>

@@ -41,10 +41,10 @@ tick_controller(simple_world_agent_plan,Who):- actTick(Who).
 
 %:-ggtrace.
 
-move_or_sit_memory_idea(Agent,actMove(Dir),[Outlet]) :-
+move_or_sit_memory_idea(Agent,actMove(Dir),[Outlet]) :- 
 	mudMemory(Agent,directions([Dir|_])),
-	num_near(Num,Dir,here),
-	get_near(Agent,List),
+	number_to_dir(Num,Dir,vHere),
+	mudNearReach(Agent,List),
 	nth1(Num,List,What),
 	(What == [];
 	What == [Outlet]).
@@ -80,18 +80,17 @@ actIdea(Who,IdeaS):- findall(Idea,(get_world_agent_plan(current,Who,Idea),dmsg(g
 action_info(actNpcTimer(ftInt),"sets how often to let NPCs run").
 action_info(actTock,"Makes All NPCs do something brilliant").
 action_info(actTick(tAgentGeneric),"Makes some agent do something brilliant").
-action_info(actIdea(optional(tAgentGeneric,self)),"Makes some agent (or self) think of something brilliant").
+action_info(actIdea(isOptional(tAgentGeneric,isAgentSelf)),"Makes some agent (or self) think of something brilliant").
 action_info(actTick,"Makes *your* agent do something brilliant").
-action_info(prolog(prolog),"Call prolog toploop").
+action_info(actProlog(tCallable),"Call a tCallable").
 
-agent_text_command(Agent,[prolog,X],Agent,prologCall(X)):-ignore(X=someCode).
-agent_text_command(Agent,[prolog],Agent,prologCall(user:prolog_repl)).
-agent_text_command(Agent,[tlocals],Agent,prologCall(user:tlocals)).
+agent_text_command(Agent,["prolog",X],Agent,actProlog(X)):-ignore(X=someCode).
+agent_text_command(Agent,["prolog"],Agent,actProlog(user:prolog_repl)).
+agent_text_command(Agent,["tlocals"],Agent,actProlog(user:tlocals)).
 
 warnOnError(X):-catch(X,E,dmsg(error(E:X))).
 
-agent_call_command(Agent,prologCall(C)) :-  must(nonvar(C)), agent_call_safely(Agent,C).
-agent_call_command(Agent,prolog(C)) :- must(nonvar(C)),agent_call_safely(Agent,C).
+agent_call_command(Agent,actProlog(C)) :- must(nonvar(C)),agent_call_safely(Agent,C).
 
 :-swi_export(agent_call_safely/2).
 agent_call_safely(_Agnt,C):- any_to_callable(C,X,Vars), !, gensym(result_count_,RC),flag(RC,_,0),agent_call_safely(RC,X,Vars),flag(RC,CC,CC),fmt(result_count(CC)).

@@ -202,7 +202,7 @@ download_and_install_el:-
 
 :- begin_transform_moo_preds.
 
-agent_text_command(Agent,[run,Term], Agent,prologCall(Term)):- ignore(Term=someCode).
+agent_text_command(Agent,["run",Term], Agent,actProlog(Term)):- ignore(Term=someCode).
 
 % [Optionaly] Start the telent server
 :-at_start(toploop_telnet:start_mud_telnet(4000)).

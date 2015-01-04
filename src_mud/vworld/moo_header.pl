@@ -60,7 +60,7 @@
 :- dynamic_multifile_exported update_charge/2.
 :- dynamic_multifile_exported update_stats/2.
 :- dynamic_multifile_exported use_usable/4.
-:- dynamic_multifile_exported movedist/2.
+:- dynamic_multifile_exported mudMoveDist/2.
 :- dynamic_multifile_exported verb_alias/2.
 :- dynamic_multifile_exported world_agent_plan/3.
 :- dynamic_multifile_exported mudContains/2.
