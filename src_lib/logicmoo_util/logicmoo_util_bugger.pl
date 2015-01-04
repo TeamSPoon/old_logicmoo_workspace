@@ -1145,15 +1145,16 @@ moo_hide_childs_0(N,MPred):-
 
 moo_hide_show_childs(M,F,A):-functor(MPred,F,A),moo_hide_show_childs(M,F,A,MPred).
 
-moo_hide_show_childs(M,_,_,MPred):-
-   not(predicate_property(_:MPred,imported_from(M))).
+moo_hide_childs(M,F,A):-functor(MPred,F,A),moo_hide_childs(M,F,A,1,1).
 
-moo_hide_show_childs(M,F,A,_MPred):-
- % dmsg(moo_hide_show_childs(M,F,A,MPred)),
- '$set_predicate_attribute'(M:F/A, trace, 0),
+moo_hide_show_childs(M,_,_, MPred):- not(predicate_property(_:MPred,imported_from(M))).
+moo_hide_show_childs(M,F,A,_MPred):- moo_trace_hidechilds(M,F,A,0,0).
+
+
+moo_trace_hidechilds(M,F,A,Trace,HideChilds):-
+ '$set_predicate_attribute'(M:F/A, trace, Trace),
  '$set_predicate_attribute'(M:F/A, noprofile, 1),
- '$set_predicate_attribute'(M:F/A, hide_childs, 0),!.
-
+ '$set_predicate_attribute'(M:F/A, hide_childs, HideChilds),!.
 
 % ==========================================================
 % can/will Tracer.
@@ -2526,6 +2527,8 @@ asserta_if_ground(_).
 :-moo_hide_show_childs(bugger,must,1).
 :-moo_hide_show_childs(bugger,must,2).
 :-moo_hide_show_childs(bugger,must_flag,3).
+:-moo_hide_show_childs(bugger,traceok,1).
+:-moo_hide_show_childs(bugger,hotrace,1).
 
 % though maybe dumptrace
 default_dumptrace(trace).

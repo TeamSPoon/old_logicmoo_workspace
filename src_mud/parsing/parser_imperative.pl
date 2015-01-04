@@ -49,7 +49,7 @@ agent_call_command(Agent,debug(Term)):- agent_call_safely(Agent,debug(Term)).
 % ===========================================================
 % PARSE command
 % ===========================================================
-type_action_info(tHumanPlayer,actParse(prolog,ftList(ftTerm)),"Development test to parse some Text for a human.  Usage: parse 'item' the blue backpack").
+type_action_info(tHumanPlayer,actParse(ftProlog,ftList(ftTerm)),"Development test to parse some Text for a human.  Usage: parse 'item' the blue backpack").
 
 agent_call_command(_Gent,actParse(Type,StringM)):-
    parse_for(Type,StringM,_Term,_LeftOver).
@@ -98,13 +98,13 @@ parse_for(Type,StringM,Term,LeftOver):-
       fmt('Success! parse \'~q\' "~q" = ~q   (leftover=~q) . ~n',[Type,String,Term,LeftOver]);
       fmt('No Success.~n',[])).
 
-meets_desc_spec(T,_L):- show_call(term_to_atom(T,S0)),string_to_atom(S0,A),atomic_list_concat_catch([_,_|_],'mudBareHandDa',A),!,fail.
+meets_desc_spec(T,_L):- term_to_atom(T,S0),string_to_atom(S0,A),atomic_list_concat_catch([_,_|_],'mudBareHandDa',A),!,fail.
 meets_desc_spec(_,[]):-!.
 meets_desc_spec(S,[DS|SL]):-!,meets_desc_spec(S,DS),meets_desc_spec(S,SL),!.
 meets_desc_spec(S,From-To):-!, desc_len(S,Len),!, between(From,To,Len).
 meets_desc_spec(_,_).
 
-desc_len(S0,Region):- show_call(term_to_atom(S0,S)),
+desc_len(S0,Region):- call(term_to_atom(S0,S)),
    atomic_list_concat_catch(Words,' ',S),length(Words,Ws),atomic_list_concat_catch(Sents,'.',S),length(Sents,Ss),Region is Ss+Ws,!.
 
 
@@ -155,6 +155,7 @@ object_string_0_5(O,String):-object_string(_,O,0-5,String),!.
 
 :-swi_export(object_string/4).
 :-dynamic object_string_fmt/3.
+:-retractall(object_string_fmt(_,_,_)).
 object_string(_,O,DescSpecs,String):- object_string_fmt(O,DescSpecs,String),!.
 object_string(Agent,O,DescSpecs,String):- String = [O], 
    object_print_details(save_fmt(String),Agent,O,DescSpecs,[tCol,tItem,tAgentGeneric,tChannel]),
@@ -184,6 +185,7 @@ object_print_details(Print,Agent,O,DescSpecs,Skipped):-
    member(O,Skipped) -> true ;
   (
    ignore((atom(O),to_word_list(O,WL),call(Print,' ~w ',[WL]))),
+   forall(name_text(O,KW),ignore((meets_desc_spec(KW,DescSpecs)->call(Print,' ~w ',[KW])))),
    forall(is_asserted(mudKeyword(O,KW)),ignore((meets_desc_spec(KW,DescSpecs)->call(Print,' ~w ',[KW])))),
    forall(is_asserted(nameStrings(O,KW)),call(Print,' ~w ',[KW])),
    (object_name_is_descriptive(O) -> true ; 
@@ -284,6 +286,7 @@ subst_parser_vars(Agent,TYPEARGS,TYPEARGS_R):- subst(TYPEARGS,self,Agent,S1),whe
 
 % verb_matches("go",VERB):-!,VERB=go.
 verb_matches(SVERB,VERB):-samef(VERB,SVERB).
+verb_matches(SVERB,VERB):-name_text(VERB,SVERB).
 
 get_vp_templates(_Agent,SVERB,_ARGS,TEMPLATES):-
    findall([VERB|TYPEARGS],
@@ -338,9 +341,12 @@ bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
 :-style_check(+singleton).
 
 :-export(name_text/2).
+name_text(Name,Text):-nonvar(Name),nonvar(Text),!,name_text(Name,TextS),equals_icase(Text,TextS).
 name_text(Name,Text):-string(Name),Name=Text.
-name_text(Name,Text):-typename_to_iname('',Name,TextN),!,atom_string(TextN,TextU),toLowercase(TextU,Text).
-name_text(Name,Text):-atom_string(Name,Text).
+name_text(Name,Text):-atomic(Name),typename_to_iname('',Name,TextN),!,atom_string(TextN,TextU),toLowercase(TextU,Text).
+name_text(Name,Text):-atomic(Name),atom_string(Name,Text).
+name_text(Name,Text):-dbase_t(mudKeyword,Name,Text).
+name_text(Name,Text):-argIsa(N,2,string),not(is_asserted(argIsa(N,1,string))),dbase_t(N,Name,Text).
 
 term_specifier_text(TextS,vtDirection,Dir):-
   member(Dir-Text,[vNorth-"n",vSouth-"s",vEast-"e",vWest-"w",vNE-"ne",vNW-"nw",vSE-"se",vSW-"sw",vUp-"u",vDown-"d"]),
@@ -387,7 +393,7 @@ phrase_parseForTypes_0(TYPEARGS,ARGS,GOODARGS,LeftOver):- optional_strings_opt,
 phrase_parseForTypes_0(TYPEARGS,ARGS,GOODARGS,LeftOver):-phrase_parseForTypes_1(TYPEARGS,ARGS,GOODARGS,LeftOver).
 
 phrase_parseForTypes_1(TYPEARGS,ARGS,GOODARGS,LeftOver):- catchv(phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver),_,fail),!.    
-phrase_parseForTypes_1(TYPEARGS,In,Out,[]):- length(TYPEARGS,L),between(1,4,L),length(In,L),must(Out=In),!,dmsg(fake_phrase_parseForTypes_l(foreach_isa(In,TYPEARGS))).
+phrase_parseForTypes_1(TYPEARGS,In,Out,[]):- length(TYPEARGS,L),between(1,4,L),length(In,L),must(Out=In),!,fmt(fake_phrase_parseForTypes_l(foreach_isa(In,TYPEARGS))),fail.
 phrase_parseForTypes_1(TYPEARGS,ARGS,GOODARGS,LeftOver):- debugOnError(phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver)).    
 
 phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver):- (LeftOver=[];LeftOver=[_|_] ), phrase(parseForTypes(TYPEARGS,GOODARGS),ARGS,LeftOver).
@@ -451,7 +457,7 @@ parser_imperative:phrase_parseForTypes_9([optional(region, random(region))], ['T
 
 parseIsa(_T, _, [AT|_], _):- var(AT),!,fail.
 parseIsa(FT, B, C, D):- var(FT),trace_or_throw(var_parseIsa(FT, B, C, D)).
-parseIsa(Str,A,B,C) :-string(Str),!, parseIsa(exact(Str),A,B,C).
+parseIsa(Str,A,B,C) :-string(Str),!, parseIsa(exactStr(Str),A,B,C).
 
 % this parseIsa(not(T),Term) --> dcgAnd(dcgNot(parseIsa(T)),theText(Term)).
 parseIsa(not(Type), Term, C, D) :- !, dcgAnd(dcgNot(parseIsa(Type)), theText(Term), C, D).
@@ -459,7 +465,7 @@ parseIsa(not(Type), Term, C, D) :- !, dcgAnd(dcgNot(parseIsa(Type)), theText(Ter
 parseIsa(vp,Goal,Left,Right):-!,one_must(parseFmt_vp1(self,Goal,Left,Right),parseFmt_vp2(self,Goal,Left,Right)).
 
 parseIsa(call(Call),TermV) --> {!,subst(Call,value,TermV,NewCall)},[TermT], {trace,req(NewCall),match_object(TermT,TermV)}.
-parseIsa(exact(Str),Str) --> {!},[Atom],{equals_icase(Atom,Str),!}.
+parseIsa(exactStr(Str),Str) --> {!},[Atom],{equals_icase(Atom,Str),!}.
 parseIsa(optionalStr(Str),Str) --> {not(optional_strings_opt)},[Atom],{equals_icase(Atom,Str),!}.
 parseIsa(optionalStr(Str),missing(Str)) --> {!},[].
 parseIsa(optionalStr(_Str),_) --> {!,fail}.
@@ -499,9 +505,13 @@ specifiedItem([String],Type,Inst):- nonvar(String),!,specifiedItem(String,Type,I
 specifiedItem(String,Type,Inst):- tFormattype(Type),checkAnyType(assert(actParse),String,Type,AAA),Inst=AAA.
 specifiedItem(Text,Type,Inst):- call_tabled_can(no_repeats(call_no_cuts(term_specifier_text(Text,Type,Inst)))).
 %specifiedItem(String,Type,Longest) :- findall(Inst, (specifiedItem(Inst,Type,Inst),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
+specifiedItem(String,_Type,Inst):- nonvar(Inst),match_object(String,Inst).
 specifiedItem(String,Type,Inst):- not(tFormattype(Type)),must(tCol(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
+specifiedItem(String,Type,Inst):- nonvar(String),not(string(String)),!,text_to_string(String,StringS),!,specifiedItem(StringS,Type,Inst).
 
-instances_of_type(Inst,Type):- no_repeats(mudIsa(Inst,Type)).
+instances_of_type(Inst,Type):- no_repeats(instances_of_type_0(Inst,Type)).
+instances_of_type_0(Inst,Type):- mudIsa(Inst,Type).
+% should never need this but .. instances_of_type_0(Inst,Type):- mudSubclass(SubType,Type),mudIsa(Inst,SubType).
 
 % instances_of_type(Inst,Type):- atom(Type), Term =..[Type,Inst], logOnError(req(Term)).
 % longest_string(?Order, @Term1, @Term2)

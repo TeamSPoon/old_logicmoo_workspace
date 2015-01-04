@@ -46,8 +46,8 @@ swi_export(E):-dmsg(swi_export(E)).
 
 :- onSpawn(pathBetween(tLivingRoom,tOfficeRoom)).
 
-%:- declare_load_game('../games/src_game_nani/a_nani_household.plmoo').
-%:- declare_load_game('../games/src_game_nani/objs_misc_household.plmoo').
+:- declare_load_game('../games/src_game_nani/a_nani_household.plmoo').
+:- declare_load_game('../games/src_game_nani/objs_misc_household.plmoo').
 
 % the following 4 worlds are in version control in examples
 % :- add_game_dir('../games/src_game_wumpus',prolog_repl).       

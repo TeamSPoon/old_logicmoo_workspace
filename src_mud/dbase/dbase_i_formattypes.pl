@@ -31,10 +31,16 @@
 
 capAtom(Type):-name(Type,[S|_]),char_type(S,upper).
 
+% TODO OPTIMISE
 :-export(typename_to_iname/3).
+typename_to_iname(I,OType,IType):-atom_concat(act,Type,OType),capAtom(Type),typename_to_iname(I,Type,IType),!.
+typename_to_iname(I,OType,IType):-atom_concat(cmd,Type,OType),capAtom(Type),typename_to_iname(I,Type,IType),!.
 typename_to_iname(I,OType,IType):-atom_concat(mud,Type,OType),capAtom(Type),typename_to_iname(I,Type,IType),!.
+typename_to_iname(I,OType,IType):-atom_concat(prop,Type,OType),capAtom(Type),typename_to_iname(I,Type,IType),!.
 typename_to_iname(I,OType,IType):-atom_concat(vt,Type,OType),capAtom(Type),typename_to_iname(I,Type,IType),!.
+typename_to_iname(I,OType,IType):-atom_concat(ft,Type,OType),capAtom(Type),typename_to_iname(I,Type,IType),!.
 typename_to_iname(I,OType,IType):-atom_concat(t,Type,OType),capAtom(Type),typename_to_iname(I,Type,IType),!.
+typename_to_iname(I,OType,IType):-atom_concat(i,Type,OType),capAtom(Type),typename_to_iname(I,Type,IType),!.
 typename_to_iname(I,OType,IType):-atom_concat(v,Type,OType),capAtom(Type),typename_to_iname(I,Type,IType),!.
 typename_to_iname(I,Type,IType):-atom_concat(I,Type,IType).
 
@@ -42,11 +48,12 @@ typename_to_iname(I,Type,IType):-atom_concat(I,Type,IType).
 :-export(split_name_type/3).
 :- '$hide'(split_name_type/3).
 split_name_type(Suggest,InstName,Type):- must_det(split_name_type_0(Suggest,NewInstName,NewType)),!,must((NewInstName=InstName,NewType=Type)),!.
+
 split_name_type_0(S,P,C):- string(S),!,atom_string(A,S),split_name_type_0(A,P,C),!.
 split_name_type_0(FT,FT,tFormattype):-tFormattype(FT),dmsg(trace_or_throw(tFormattype(FT))),fail.
 split_name_type_0(T,T,C):- compound(T),functor(T,C,_),!.
 split_name_type_0(T,T,C):- notrace((once(atomic_list_concat_safe([CO,'-'|_],T)),atom_string(C,CO))).
-split_name_type_0(T,T,C):- atom(T),atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),ccatch(number_codes(_,Digits),_,fail),atom_codes(C,Type),!.
+split_name_type_0(T,T,C):- notrace((atom(T),atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),ccatch(number_codes(_,Digits),_,fail),atom_codes(CC,Type),!,typename_to_iname(t,CC,C))).
 split_name_type_0(C,P,C):- var(P),atom(C),typename_to_iname(i,C,I),gensym(I,P),!.
 
 % formattype(S):-   is_asserted(ft_info(S,_)).

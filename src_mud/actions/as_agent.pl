@@ -10,7 +10,7 @@
 
 :- register_module_type(tCommand).
 
-action_info('as'(tAgentGeneric,tCommand), "as <agent> <command>").
-agent_call_command(_Agent,'as'(OtherAgent,Command)):- call_agent_command(OtherAgent,Command).
+action_info('actAs'(tAgentGeneric,tCommand), "actAs <agent> <command>").
+agent_call_command(_Agent,'actAs'(OtherAgent,Command)):- call_agent_command(OtherAgent,Command).
 
 :- include(logicmoo(vworld/moo_footer)).

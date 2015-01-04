@@ -694,6 +694,8 @@ longest_string(Order,TStr1,TStr2):-
    text_to_string(TStr2,Str2),string_length(Str2,L2),
    compare(Order,L2-Str2,L1-Str1).
 
+:- module_property(logicmoo_util_strings, exports(List)),forall(member(F/A,List),moo_hide_childs(logicmoo_util_strings:F/A)).
+
 % this is a backwards compatablity block for SWI-Prolog 6.6.6
 :- retract(double_quotes_was_strings(WAS)),set_prolog_flag(double_quotes,WAS).
 

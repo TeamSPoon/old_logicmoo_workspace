@@ -17,11 +17,31 @@
 :-decl_mpred_hybrid(pathBetween(tRegion,tRegion),symmetric).
 pathBetween(R1,R2):-pathBetween(R1,Dir,R2),nop(Dir).
 
+:-decl_type(vtBasicDir).
+vtBasicDir(vNorth).
+vtBasicDir(vEast).
+vtBasicDir(vSouth).
+vtBasicDir(vWest).
+
+:-decl_type(vtBasicDirPlusUpDown).
+vtBasicDirPlusUpDown(X):-vtBasicDir(X).
+vtBasicDirPlusUpDown(vUp).
+vtBasicDirPlusUpDown(vDown).
+
+
 :-decl_mpred_prolog(ensure_some_pathBetween/2).
-ensure_some_pathBetween(R1,R2):- pathBetween(R1,_Dir,R2),!.
-ensure_some_pathBetween(R1,R2):- random_instance(vtDirection,Dir,true),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
-   add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)),!.
-ensure_some_pathBetween(R1,R2):- split_name_type(R2,_,Isa), any_to_string(Isa,Str), any_to_dir(Str,Dir),show_call(add(pathBetween(R1,Dir,R2))).
+ensure_some_pathBetween(R1,R2):- pathBetween(R1,_,R2),!.
+ensure_some_pathBetween(R1,R2):- pathBetween(R2,_,R1),!.
+ensure_some_pathBetween(R1,R2):- 
+   random_instance(vtBasicDir,Dir,true),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
+   must((add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)))),!.
+ensure_some_pathBetween(R1,R2):- 
+   random_instance(vtBasicDirPlusUpDown,Dir,true),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
+   must((add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)))),!.
+ensure_some_pathBetween(R1,R2):- 
+   random_instance(vtDirection,Dir,true),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
+   must((add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)))),!.
+
 
 addPathBetweens:- forall(no_repeats(is_asserted(pathBetween(R1,R2))),must_det((ensure_some_pathBetween(R1,R2),ensure_some_pathBetween(R2,R1)))).
 

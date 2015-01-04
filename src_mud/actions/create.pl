@@ -27,7 +27,7 @@ rez_to_inventory(Agent,NameOrType,NewName):-
    add_missing_instance_defaults(NewName).
 
 
-action_info(actRez(ftTerm),"Rezes a new 'item' of some NameOrType into stowed inventory").
+action_info(actRez(or([tCol,ftTerm])),"Rezes a new 'item' of some NameOrType into stowed inventory").
 agent_call_command(Agent,actRez(NameOrType)):- nonvar(NameOrType),rez_to_inventory(Agent,NameOrType,_NewName).
 
 % ====================================================

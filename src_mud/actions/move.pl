@@ -105,8 +105,8 @@ update_stats(Agent,fall) :- padd(Agent,mudHealth,-10).
 
 % cheating but to test
 
-tActionType(go(vtDirection)).
-agent_call_command(Agent,go(Dir)) :-
+tActionType(actGo(vtDirection)).
+agent_call_command(Agent,actGo(Dir)) :-
 	mudAtLoc(Agent,LOC),
         in_world_move(LOC,Agent,Dir),
 	call_update_charge(Agent,actMove).

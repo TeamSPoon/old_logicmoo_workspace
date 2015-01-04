@@ -98,6 +98,7 @@ safe_univ0([L|List],[L|List]):- var(List),atomic(Call),!,grtrace,Call =.. [L|Lis
 safe_univ0(Call,[L|List]):- ccatch(Call =.. [L|List],E,(dumpST,'format'('~q~n',[E=safe_univ(Call,List)]))),warn_bad_functor(L).
 
 :-export(append_term/3).
+append_term(T,I,HEAD):-atom(T),HEAD=..[T,I],!.
 append_term(Call,E,CallE):- Call=..List, append(List,[E],ListE), CallE=..ListE.
 
 % =================================================================================

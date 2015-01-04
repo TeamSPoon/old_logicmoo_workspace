@@ -1,5 +1,5 @@
 /** <module>
-% put.pl
+% actPut.pl
 %
 % This file defines how an agent puts 
 %
@@ -13,23 +13,23 @@
 % Douglas Miles
 */
 % :-swi_module(user). 
-:-swi_module(put, []).
+:-swi_module(actPut, []).
 
 :- include(logicmoo(vworld/moo_header)).
 
 :- register_module_type(tCommand).
 
-% put
-action_info(put(tThrowable,prepstr_spatial,tHasobjs),"put [obj] [onto|inside] [somewhere]").
+% actPut
+action_info(actPut(tThrowable,prepstr_spatial,tHasobjs),"actPut [obj] [onto|inside] [somewhere]").
 
-verb_alias(set,put).
-verb_alias(place,put).
-verb_alias(actHide,put).
-verb_alias(display,put).
-verb_alias(actStow,put).
+verb_alias(set,actPut).
+verb_alias(place,actPut).
+verb_alias(actHide,actPut).
+verb_alias(display,actPut).
+verb_alias(actStow,actPut).
 
 %targeted
-agent_call_command(_Agent,put(Other,_Prep,Where)):-
+agent_call_command(_Agent,actPut(Other,_Prep,Where)):-
    coerce(Other,tObj,Target),
    coerce(Where,tHasobjs,Location),
    clr(localityOfObject(Target,_)),

@@ -168,7 +168,6 @@ isa_backchaing_0(I,T):-  var(I),nonvar(T),!,isa_backchaing_v_nv(I,T).
 isa_backchaing_0(I,T):-  var(T),!,setof(TT,AT^(isa_asserted(I,AT),transitive_subclass_or_same(AT,TT)),List),!,member(T,List).
 isa_backchaing_0(I,T):-  nonvar(I),isa_backchaing_nv_nv(I,T),!.
 isa_backchaing_0(I,T):-  transitive_subclass_or_same(AT,T),isa_asserted(I,AT).
-
 % ==========================
 % taxonomicPair(isa,subclass)
 % ==========================
@@ -200,6 +199,7 @@ not_ft(T):-transitive_subclass_or_same(T,tSpatialthing).
 isa_asserted(I,T):-isa_asserted_motel(I,T).
 isa_asserted(I,T):-type_isa(I,T).
 isa_asserted(I,T):-isa_asserted_ft(I,T).
+isa_asserted(I,T):-nonvar(T),append_term(T,I,HEAD),hybrid_rule(HEAD,BODY),call_mpred_body(HEAD,BODY).
 
 :-dynamic_multifile_exported(type_isa/2).
 
@@ -314,8 +314,8 @@ into_single_class('&'(A,B),VV):-!, into_single_class((B),VV);into_single_class((
 into_single_class(A,A).
 
 :- swi_export((transitive_subclass_or_same/2)).
-transitive_subclass_or_same(A,B):-var(A),!,A=B.
-transitive_subclass_or_same(A,A):-nonvar(A),!.
+transitive_subclass_or_same(A,B):- (var(A),var(B)),!,A=B.
+transitive_subclass_or_same(A,A):-nonvar(A).
 transitive_subclass_or_same(A,B):-transitive_subclass(A,B).
 
 :- swi_export((transitive_subclass/2)).
@@ -324,6 +324,7 @@ transitive_subclass(A,_):-A==tFormattype,!,fail.
 transitive_subclass(A,T):- fail, bad_idea,!, into_single_class(A,AA), into_single_class(T,TT), fact_loop_checked(mudSubclass(A,T),transitive_P_l_r(dbase_t,mudSubclass,AA,TT)).
 transitive_subclass(I,T):- fail,stack_check,((thlocal:useOnlyExternalDBs,!);thglobal:use_cyc_database),
    fact_loop_checked(mudSubclass(I,T),transitive_P_l_r(cyckb_t,genls,I,T)).
+% transitive_subclass(A,T):- mudSubclass(A,T).
 transitive_subclass(A,T):- fact_loop_checked(mudSubclass(A,T),transitive_P(dbase_t,mudSubclass,A,T)).
 
 transitive_P(DB,P,L,R):-call(DB,P,L,R).

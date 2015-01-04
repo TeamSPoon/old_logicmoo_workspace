@@ -27,7 +27,7 @@ agent_call_command(Agent,actStats(What)):-
    term_listing(What),!.
 
 
-action_info(ftList(ftTerm),"grep for a term").
+action_info(actList(ftTerm),"grep for a term").
 
 
 
@@ -60,7 +60,7 @@ endurance, and sustained positioning and motion.
 your ability to command your own destiny.
 */
 
-action_info(ftList(optional(ftTerm,self)), "Examine MUD listing of something").
-agent_call_command(_Gent,ftList(Obj)):- term_listing(Obj).
+action_info(actList(optional(ftTerm,self)), "Examine MUD listing of something").
+agent_call_command(_Gent,actList(Obj)):- term_listing(Obj).
 
 :- include(logicmoo(vworld/moo_footer)).

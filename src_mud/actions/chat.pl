@@ -5,7 +5,7 @@
 */
 
 % :-swi_module(user). 
-:-swi_module(chat, [socialVerb/1,socialCommand/3,chat_to_callcmd/4]).
+:-swi_module(chat, [vtSocialVerb/1,socialCommand/3,chat_to_callcmd/4]).
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
@@ -13,13 +13,13 @@
 
 action_info(Say,ftText("invokes",Does)):-socialCommand(Say,_SocialVerb,Does).
 
-socialCommand(Say,SocialVerb,chat(optional(tVerb,SocialVerb),optional(tChannel,here),string)):-socialVerb(SocialVerb), Say =.. [SocialVerb,optional(tChannel,here),string].
-socialVerb(SocialVerb):-member(SocialVerb,[actSay,actWhisper,actEmote,tell,actAsk,actShout,actGossup]).
+socialCommand(Say,SocialVerb,chat(optional(tVerb,SocialVerb),optional(tChannel,vHere),string)):-vtSocialVerb(SocialVerb), Say =.. [SocialVerb,optional(tChannel,vHere),string].
+vtSocialVerb(SocialVerb):-member(SocialVerb,[actSay,actWhisper,actEmote,actTell,actAsk,actShout,actGossup]).
 
 agent_text_command(Agent,[Say|What],Agent,CMD):-agent_text_command_chat(Agent,[Say|What],Agent,CMD).
 
 agent_text_command_chat(Agent,[Say|What],Agent,CMD):- nonvar(Say),nonvar(What),!,
-      socialVerb(Say),
+      vtSocialVerb(Say),
       once(((chat_to_callcmd(Agent,Say,What,CMD),nonvar(CMD)))).
 
 % ask joe about some text
