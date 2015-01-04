@@ -62,16 +62,16 @@ decl_database_hook(assert(_),mudAtLoc(R,W)):- mudIsa(R,tRegion),trace_or_throw(m
 deduce_facts(localityOfObject(_,Region),mudIsa(Region,tSpatialthing)).
 deduce_facts(localityOfObject(Obj,_),mudIsa(Obj,tObj)).
 
-deduce_facts(Fact,mpred_prop(AF,[argsIsaInList(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],argsIsaProps(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,
+deduce_facts(Fact,mpred_prop(AF,[predArgTypes(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],argsIsaProps(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,
                 ArgTs=..[AF|ARGS],!,must_det(ground(ARGS)).
 
 
-deduce_facts(argsIsaInList(ArgTs),mpred_prop(F,argsIsaInList(ArgTs))):-mpred_arity(F,A),functor(ArgTs,F,A).
-deduce_facts(mpred_prop(F,argsIsaInList(ArgTs)),argsIsaInList(ArgTs)):-mpred_arity(F,A),functor(ArgTs,F,A).
+deduce_facts(predArgTypes(ArgTs),mpred_prop(F,predArgTypes(ArgTs))):-mpred_arity(F,A),functor(ArgTs,F,A).
+deduce_facts(mpred_prop(F,predArgTypes(ArgTs)),predArgTypes(ArgTs)):-mpred_arity(F,A),functor(ArgTs,F,A).
 
 
-deduce_facts(argsIsaInList(ArgTs),argIsa(F,A,Type)):-ztrace,functor(ArgTs,F,_),arg(A,ArgTs,Type).
-deduce_facts(mpred_prop(F,argsIsaInList(ArgTs)),argIsa(F,A,Type)):-arg(A,ArgTs,Type).
+deduce_facts(predArgTypes(ArgTs),argIsa(F,A,Type)):-ztrace,functor(ArgTs,F,_),arg(A,ArgTs,Type).
+deduce_facts(mpred_prop(F,predArgTypes(ArgTs)),argIsa(F,A,Type)):-arg(A,ArgTs,Type).
 
 deduce_facts(argIsa(F,_A,Type),[mudIsa(Type,tCol),mudIsa(F,tRelation)]):-atom(Type),not(hasInstance(ttFormatType,Type)).
 
@@ -80,22 +80,22 @@ deduce_facts(argIsa(F,_A,Type),[mudIsa(Type,tCol),mudIsa(F,tRelation)]):-atom(Ty
 deduce_facts(Term,NewTerm):- hotrace(good_for_chaining(Op,Term)), db_rewrite(Op,Term,NewTerm),not(contains_singletons(NewTerm)).
 
 
-fix_argIsa(F,N,vtDirection(Val),vtDirection):-add(mpred_prop(F,predSingleValueDefault(N,Val))),!.
-fix_argIsa(F,N,ftInt(Val),ftInt):-add(mpred_prop(F,predSingleValueDefault(N,Val))),!.
+fix_argIsa(F,N,vtDirection(Val),vtDirection):-add(mpred_prop(F,argSingleValueDefault(N,Val))),!.
+fix_argIsa(F,N,ftInt(Val),ftInt):-add(mpred_prop(F,argSingleValueDefault(N,Val))),!.
 fix_argIsa(_,_,ftListFn(Type),ftListFn(Type)):-!.
-fix_argIsa(_,_,tFormatted(Type),tFormatted(Type)):-!.
+fix_argIsa(_,_,vFormatted(Type),vFormatted(Type)):-!.
 fix_argIsa(_,_,Arg,Arg).
-fix_argIsa(F,N,Type,F):-compound(Type),Type=..[F,Val],isa_backchaing(Val,F),decl_mpred(F,predSingleValueDefault(N,Val)),!.
+fix_argIsa(F,N,Type,F):-compound(Type),Type=..[F,Val],isa_backchaing(Val,F),decl_mpred(F,argSingleValueDefault(N,Val)),!.
 
 fix_argsIsas(_,_,[],[]):-!.
 fix_argsIsas(F,N,[Arg|TList],[G|List]):-
    fix_argIsa(F,N,Arg,G),!, N1 is N + 1,fix_argsIsas(F,N1,TList,List),!.
 
-decl_database_hook(assert(_),argsIsaInList(ArgTs)):-
+decl_database_hook(assert(_),predArgTypes(ArgTs)):-
    ArgTs=..[F|ArgTList],
    fix_argsIsas(F,1,ArgTList,GList),
    Good=..[F|GList],
-   Good\=ArgTs,!,del(mpred_prop(F,argsIsaInList(ArgTs))),decl_mpred(F,argsIsaInList(Good)).
+   Good\=ArgTs,!,del(mpred_prop(F,predArgTypes(ArgTs))),decl_mpred(F,predArgTypes(Good)).
 
 :-swi_export(add_deduction/3).
 quiet_fact(Fact):-functor(Fact,F,A),quiet_fact(F,A).

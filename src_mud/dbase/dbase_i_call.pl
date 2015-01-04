@@ -181,15 +181,15 @@ call_only_backchain_checked(F,C):-call_only_backchain(F,C),check_mcall_ok(C).
 
 
 
-% call_only_backchain(F,C):- mpred_prop(F,ask_module(M2)),context_module(M),M\=M2,!,dmsg(calling_in_other_module(M:call_only_backchain(M2:C))),'@'(M:call_only_backchain(M2:C),M).
+% call_only_backchain(F,C):- mpred_prop(F,predModule(M2)),context_module(M),M\=M2,!,dmsg(calling_in_other_module(M:call_only_backchain(M2:C))),'@'(M:call_only_backchain(M2:C),M).
 
 call_only_backchain(F,C):-  no_repeats(call_only_backchain_0(F,C)).
 
 call_only_backchain_0(F,C):- loop_check(C,call_only_backchain_lc(F,C)).
 
-call_only_backchain_lc(F,C):- mpred_prop(F,mudQueryWithPred(P)),PC=..[P,C],!,req(PC).
+call_only_backchain_lc(F,C):- mpred_prop(F,predProxyQuery(P)),PC=..[P,C],!,req(PC).
 call_only_backchain_lc(F,C):- mpred_prop(F,prologOnly),!,predicate_property(C,number_of_rules(N)),N>0,!,clause(C,Body),body_no_backchains(C,Body).
-call_only_backchain_lc(_,C):- hybrid_rule(C,BODY),call_mpred_body(C,BODY).
+call_only_backchain_lc(_,C):- predHybridRule(C,BODY),call_mpred_body(C,BODY).
 % TODO call_only_backchain_lc(_,_,_,dbase_t(F,Obj,LValue)):-  choose_val(F,Obj,LValue).
 
 
@@ -280,7 +280,7 @@ holds_relaxed_0_t(dac(_,a,_,_),P,A1,A2):- assertion_t([P,A1,A2]).
 holds_relaxed_0_t(dac(d,_,_,_),P,A1,A2):- dbase_t(P,A1,A2).
 holds_relaxed_0_t(dac(_,_,_,h),P,A1,A2):- call_which_t(DBS,P,A1,A2).
 holds_relaxed_0_t(DBS,P,A1,A2):- call_mt_t(DBS,P,A1,A2,_,_).
-holds_relaxed_0_t(_DBS,P,A1,A2):- ground((P,A1)), TEMPL=..[P,T1,_],dbase_t(predSingleValueDefault,TEMPL,2,A2),req(isa(A1,T1)),!.
+holds_relaxed_0_t(_DBS,P,A1,A2):- ground((P,A1)), TEMPL=..[P,T1,_],dbase_t(argSingleValueDefault,TEMPL,2,A2),req(isa(A1,T1)),!.
 */
 
 holds_t([AH,P|LIST]):- is_holds_true(AH),!,holds_plist_t(P,LIST).

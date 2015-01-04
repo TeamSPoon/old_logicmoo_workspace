@@ -244,9 +244,9 @@ rdf_object(O):-ground(O).
 
 % user:decl_database_hook(assert(_A_or_Z),G):-rdf_assert_hook(G),!.
 
-rdf_assert_ignored(mpred_prop(_,arity(1))).
-rdf_assert_ignored(mpred_prop(_,argsIsaInList(_))).
-rdf_assert_ignored(G):-functor(G,F,_),member(F,[hybrid_rule,mudTermAnglify,equivRule]).
+rdf_assert_ignored(mpred_prop(_,predArity(1))).
+rdf_assert_ignored(mpred_prop(_,predArgTypes(_))).
+rdf_assert_ignored(G):-functor(G,F,_),member(F,[predHybridRule,mudTermAnglify,equivRule]).
 rdf_assert_ignored(G):-functor(G,_,1).
 rdf_assert_ignored(G):-  not(ground(G)). 
 
@@ -254,7 +254,7 @@ cyc_to_rdf(mpred_prop(P,PST),svo(F,StubType,S)):- PST=..[StubType,S],rdf_object(
 cyc_to_rdf(argIsa(P,1,D),domain(P,D)).
 cyc_to_rdf(mudIsa(apathFn(A,Dir),T),mudIsa([apathFn,A,Dir],T)).
 cyc_to_rdf(pathName(A,Dir,String),mudNamed([apathFn,A,Dir],String)).
-cyc_to_rdf(predSingleValueDefault(PAB, 2, V),type_default(A,[P,isSelf,V])):-PAB=[P,A,_].
+cyc_to_rdf(argSingleValueDefault(PAB, 2, V),type_default(A,[P,isSelf,V])):-PAB=[P,A,_].
 cyc_to_rdf(argIsa(P,2,D),range(P,D)):-mpred_arity(P,2).
 
 rdf_assert_hook(CYC):-once(cyc_to_rdf(CYC,RDF)),CYC\=RDF,must(call(rdf_assert_hook(RDF))).
@@ -269,8 +269,8 @@ rdf_assert_hook0(default_type_props(Food,Prop)):-Prop=..[P|ARGS],must(rdf_assert
 rdf_assert_hook0(mudSubclass(C,P)):-!,rdf_object(C),rdf_object(P),rdf_assert_x(C,rdfs:subClassOf,P).
 rdf_assert_hook0(mudDescription(C,P)):-!,rdf_object(C),rdf_object(P),rdf_assert_x(C,rdfs:comment,P).
 rdf_assert_hook0(mudIsa(Prop,tPred)):- rdf_to_pred(Prop,P),!,rdf_object(P),rdf_assert_x(P,rdf:tType,owl:'Property').
-rdf_assert_hook0(mudIsa(Prop,singleValued)):- functor(Prop,P,_),!,rdf_object(P),rdf_assert_x(P,rdf:tType,owl:'FunctionalProperty').
-rdf_assert_hook0(arity(W1,N)):-rdf_to_pred(W1,W),N>1,rdf_assert_x(W,rdf:tType,owl:'Property').
+rdf_assert_hook0(mudIsa(Prop,prologSingleValued)):- functor(Prop,P,_),!,rdf_object(P),rdf_assert_x(P,rdf:tType,owl:'FunctionalProperty').
+rdf_assert_hook0(predArity(W1,N)):-rdf_to_pred(W1,W),N>1,rdf_assert_x(W,rdf:tType,owl:'Property').
 rdf_assert_hook0(mudIsa(W,tCol)):-!,rdf_object(W),rdf_assert_x(W,rdf:tType,owl:'Class').
 rdf_assert_hook0(mudIsa(C,P)):-!,rdf_object(C),rdf_object(P),P\=tCol,rdf_assert_x(C,rdf:tType,P).
 rdf_assert_hook0(svo(S,P,O)):-!,must(rdf_assert_x(S,P,O)).
@@ -285,7 +285,7 @@ rdf_to_url_ignore(G,A,B):-rdf_to_url(G,A,BB),ignore(B=BB).
 
 po(mud:O,OO):-nonvar(O),!,po(O,OO).
 po(tFood,knowrob:'Food').
-po(mpred_arity,arity).
+po(mpred_arity,predArity).
 po(tCol,owl:'Class').
 po(tItem,knowrob:'HumanScaleObject').
 po(tSpatialthing,knowrob:'SpatialThing').

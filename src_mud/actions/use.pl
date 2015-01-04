@@ -12,7 +12,7 @@
 
 :- register_module_type(mtCommand).
 
-argsIsaInList(action_verb_useable(vtVerb,ftTerm(tPred),tCol,ftTerm(tPred))).
+predArgTypes(action_verb_useable(vtVerb,ftTerm(tPred),tCol,ftTerm(tPred))).
 
 
 mudSubclass(isEach('PortableObject','ProtectiveAttire',tStowable),tWieldable).
@@ -60,12 +60,12 @@ do_permanence(USE,Agent,Obj) :-
 check_permanence(USE,_Agent,LOC,Obj) :-
      get_use_verbs(USE,_USING,_USABLE,_STOWED),
 	props(Obj,mudPermanence(USE,Dissapears)),
-	member(Dissapears,[dissapears,0]),
+	member(Dissapears,[vTakenDeletes,0]),
 	del(mudAtLoc(Obj,LOC)).
 check_permanence(USE,Agent,LOC,Obj) :-
     get_use_verbs(USE,USING,_USABLE,_STOWED),
         props(Obj,mudPermanence(USE,Held)),
-        member(Held,[1,held]),
+        member(Held,[1,vTakenHolds]),
 	del(mudAtLoc(Obj,LOC)),
 	padd(Agent,USING,Obj).
 check_permanence(USE,_,_,_):-get_use_verbs(USE,_USING,_USABLE,_STOWED),!.

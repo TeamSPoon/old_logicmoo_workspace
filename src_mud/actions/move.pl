@@ -20,8 +20,8 @@
 % :- begin_transform_moo_preds.
 
 
-agent_text_command(Agent,[DirSS],Agent,OUT):-nonvar(DirSS), to_case_breaks(DirSS,[t(DirS,_),t(Dist,digit)]),show_call(specifiedItem(DirS,vtDirection,Dir)),OUT=actMove(Dist,Dir).
-agent_text_command(Agent,[DirSS],Agent,OUT):-nonvar(DirSS), show_call(specifiedItem(DirSS,vtDirection,Dir)),OUT=actMove(Dir).
+agent_text_command(Agent,[DirSS],Agent,OUT):-nonvar(DirSS), to_case_breaks(DirSS,[t(DirS,_),t(Dist,digit)]),show_call(coerce(DirS,vtDirection,Dir)),OUT=actMove(Dist,Dir).
+agent_text_command(Agent,[DirSS],Agent,OUT):-nonvar(DirSS), show_call(coerce(DirSS,vtDirection,Dir)),OUT=actMove(Dir).
 
 agent_call_command(Agnt,Cmd):- compound(Cmd),functor(Cmd,actMove,_),!,must(move_command(Agnt,Cmd)).
 
@@ -107,7 +107,7 @@ update_stats(Agent,fall) :- padd(Agent,mudHealth,-10).
 
 % cheating but to test
 
-tActionType(actGo(vtDirection)).
+vtActionTemplate(actGo(vtDirection)).
 agent_call_command(Agent,actGo(Dir)) :-
 	mudAtLoc(Agent,LOC),
         in_world_move(LOC,Agent,Dir),

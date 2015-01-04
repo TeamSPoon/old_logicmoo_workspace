@@ -61,8 +61,8 @@ term_is_ft(Term,Type):- must_det(ttFormatType(Type)),
    correctFormatType(query(_HLDS,_OldV),Term,How,NewTerm),!,
    sameArgTypes(NewTerm,Term).
 
-ft_info_how(FT,tFormatted(FT)):-mudFtInfo(FT,tFormatted).
-ft_info_how(FT,self_call(Info)):-mudFtInfo(FT,Info),Info\=tFormatted.
+ft_info_how(FT,vFormatted(FT)):-mudFtInfo(FT,vFormatted).
+ft_info_how(FT,self_call(Info)):-mudFtInfo(FT,Info),Info\=vFormatted.
 
 trans_subft_info(FT,Info):-ft_info_how(FT,Info).
 trans_subft_info(FT,Info):-trans_subft(Sub,FT),ft_info_how(Sub,Info),!.
@@ -95,7 +95,7 @@ pl_arg_type(Arg,Type):-
          Arg = Type.
 
 
-mpred_arity_pred(P):- nonvar(P),arg(_,a(arity,arityMax,arityMin),P).
+mpred_arity_pred(P):- nonvar(P),arg(_,a(arity,predArity,arityMax,arityMin),P).
 mpred_arity_pred(mpred_arity).
 
 as_one_of(Types,Type):-nonvar(Type),tCol(Type),!,member(Type,Types).
@@ -159,8 +159,8 @@ argIsa_call_0(type_max_charge,1,tCol).
 argIsa_call_0(type_max_charge,2,ftInt).
 argIsa_call_0(type_max_health,1,tCol).
 argIsa_call_0(type_max_health,2,ftInt).
-argIsa_call_0(ask_module,1,tPred).
-argIsa_call_0(ask_module,2,ftAtom).
+argIsa_call_0(predModule,1,tPred).
+argIsa_call_0(predModule,2,ftAtom).
 % argIsa_call_0(agent_text_command,_,ftTerm).
 argIsa_call_0(equivRule,_,ftTerm).
 argIsa_call_0(F,N,Type):-between(1,2,N),argIsa_call_3(F,Type).
@@ -169,11 +169,11 @@ argIsa_call_0(Arity,N,T):-mpred_arity_pred(Arity),!,arg(N,vv(tPred,ftInt,tCol),T
 argIsa_call_0(F,2,ftString):-member(F,[descriptionHere,nameftStrings,mudKeyword]).
 argIsa_call_0(F,N,Type):-hasInstance(colDeclarer,F),!,(N=1 -> Type=F ; Type=ftTerm(ftVoprop)).
 
-argIsa_call_3(WP,tPred(arity(2))):-member(WP,[mudRetractWithPred,mudAssertWithPred,mudQueryWithPred,genlPreds,genlInverse]).
+argIsa_call_3(WP,tPred(predArity(2))):-member(WP,[predProxyRetract,predProxyAssert,predProxyQuery,genlPreds,genlInverse]).
 argIsa_call_3(disjointWith,tCol).
 argIsa_call_3(mudTermAnglify,ftTerm).
 argIsa_call_3(mudFacing,ftTerm).
-argIsa_call_3(tFormatted,ftTerm).
+argIsa_call_3(vFormatted,ftTerm).
 argIsa_call_3(mudSubclass,tCol).
 argIsa_call_3(mudSubft,ttFormatType).
 
@@ -186,10 +186,10 @@ argIsa_asserted(F,N,Type):- grab_argsIsa(F,Types),arg(N,Types,Type),nonvar(Type)
 argIsa_asserted(F,N,Type):- grab_argsIsa2(F,Types),arg(N,Types,Type),nonvar(Type),!.
 
 grab_argsIsa(resultIsa,resultIsa(tFunction,tCol)).
-% grab_argsIsa(F,Types):- call_typelect([flag(+firstValue),+debugOnError,+deducedSimply],mpred_prop(F,argsIsaInList(Types))).
-grab_argsIsa(F,Types):- mpred_prop(F,argsIsaInList(Types)).
-grab_argsIsa(F,Types):- is_asserted(argsIsaInList(F,Types)).
-grab_argsIsa2(F,Types):- fail,deducedSimply(mpred_prop(F,argsIsaInList(Types))).
+% grab_argsIsa(F,Types):- call_typelect([flag(+firstValue),+debugOnError,+deducedSimply],mpred_prop(F,predArgTypes(Types))).
+grab_argsIsa(F,Types):- mpred_prop(F,predArgTypes(Types)).
+grab_argsIsa(F,Types):- is_asserted(predArgTypes(F,Types)).
+grab_argsIsa2(F,Types):- fail,deducedSimply(mpred_prop(F,predArgTypes(Types))).
 
 argIsa_call_1(Var,2,ftTerm):-tCol(Var),trace_or_throw( argIsa_call_1(Var,2,ftTerm)),fail.
 argIsa_call_1(Prop,N1,Type):- is_2nd_order_holds(Prop),dmsg(todo(define(argIsa_call(Prop,N1,'Second_Order_TYPE')))),dumpST,dtrace,
@@ -197,10 +197,10 @@ argIsa_call_1(Prop,N1,Type):- is_2nd_order_holds(Prop),dmsg(todo(define(argIsa_c
 argIsa_call_1(F,_,ftTerm(ftCallable)):-member(F/_,
                                 [
                                 argIsa/3,
-                                mudAssertWithPred/2,
+                                predProxyAssert/2,
                                  negate_wrapper0/2,
                                 registered_module_type/2,       
-                                hybrid_rule/2,
+                                predHybridRule/2,
                                 formatted_resultIsa/2,
                                 bracket/3]).
 
@@ -298,8 +298,6 @@ inverse_args([P,A,R,G,S],[S,A,R,G,P]):-!.
 % correctArgsIsa/3
 % =======================================================
 
-
-decl_coerce(A,Type,AA):- correctAnyType(change(_,_),A,Type,AA).
 
 :-swi_export(same_vars/2).
 same_vars(T1,T2):-term_variables(T1,V1),term_variables(T2,V2),!,V1==V2.
@@ -413,7 +411,7 @@ correctType(_O,A,tFunction,AA):- any_to_relation(A,AA).
 correctType(_O,A,tPred,AA):- any_to_relation(A,AA).
 
 correctType(_O,A,tRelation,AA):- any_to_relation(A,AA).
-correctType(_O,A,tFormatted,AA):- dtrace, must_equals(A,AA).
+correctType(_O,A,vFormatted,AA):- dtrace, must_equals(A,AA).
 correctType(_O,A,ftAtom,AA):- any_to_atom(A,AA).
 correctType(change(_,_),A,tCol,AA):- atom(A),decl_type(A),must_equals(A,AA).
 correctType(_O,A,vtVerb,AA):- must_equals(A,AA).
@@ -433,12 +431,12 @@ correctType(Op,A,isOneOf(List),AA):-!,member(Type,List),correctType(Op,A,Type,AA
 
 correctType(_O,A,self_call(Call),AA):-subst(Call,isSelf,A,NewCall),!,NewCall,must_equals(A,AA).
 
-correctType(_O,[],tFormatted([]),[]):-!.
-correctType(Op,[H|T],tFormatted([H2|T2]),[H3|T3]):-
+correctType(_O,[],vFormatted([]),[]):-!.
+correctType(Op,[H|T],vFormatted([H2|T2]),[H3|T3]):-
    correctType(Op,H,H2,H3),
-   correctType(Op,T,tFormatted(T2),T3).
+   correctType(Op,T,vFormatted(T2),T3).
 
-correctType(Op,Args,tFormatted(Types),NewArgs):- compound(Args),compound(Types),
+correctType(Op,Args,vFormatted(Types),NewArgs):- compound(Args),compound(Types),
    functor(Args,F,N),functor(Types,F,N),functor(NewArgs,F,N),
    Args=..[F|ArgsL],
    Types=..[F|TypesL],
@@ -461,7 +459,7 @@ correctType(Op,Args,Types,NewArgs):-compound(Args), compound(Types),
 
 
 
-correctType(Op,A,Fmt,AA):- mudFtInfo(Fmt,tFormatted),!,correctFormatType(Op,A,tFormatted(Fmt),AA).
+correctType(Op,A,Fmt,AA):- mudFtInfo(Fmt,vFormatted),!,correctFormatType(Op,A,vFormatted(Fmt),AA).
 correctType(_O,A,Fmt,A):- mudFtInfo(Fmt,Code),!,subst(Code,isSelf,A,Call),with_assertions(thlocal:no_arg_type_error_checking,show_call_failure(req(Call))).   
 correctType(Op,A,Super,AA):- ttFormatType(Super),req(mudSubft(Sub,Super)),Sub\=Super,correctType(Op,A,Sub,AA).
 

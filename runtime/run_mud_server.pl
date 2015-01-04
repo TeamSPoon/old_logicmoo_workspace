@@ -62,8 +62,8 @@ swi_export(E):-dmsg(swi_export(E)).
 % :- if_startup_script( doall(now_run_local_tests_dbg)).
 
 :-enqueue_player_command(actWho).
-:-enqueue_player_command(actLook).
-:-enqueue_player_command(actProlog).
+:-enqueue_player_command('look').
+:-enqueue_player_command("prolog").
 
 % [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
 :- register_timer_thread(npc_ticker,30,npc_tick).

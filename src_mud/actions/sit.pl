@@ -25,7 +25,7 @@ tCol(vtPosture).
 
 moo_posture(P):-mudIsa(P,vtPosture).
 
-:-decl_mpred(singleValued(stance(tAgentGeneric,vtPosture))).
+:-decl_mpred(prologSingleValued(stance(tAgentGeneric,vtPosture))).
 
 action_info(Posture,ftText("sets and agent's stance to ",Posture)):-moo_posture(PostureV),Posture=..[PostureV,isOptional(tFurniture,here)].
 

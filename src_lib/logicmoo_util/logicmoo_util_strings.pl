@@ -143,7 +143,7 @@ atomic_list_concat_safe([V],V):-!.
 atomic_list_concat_safe(List,Sep,StringO):- (Sep==[];Sep=='';Sep==""),!,atomic_list_concat_safe(List,StringO).
 atomic_list_concat_safe(List,Sep,StringO):- ground(List:Sep),!,atomics_to_string(List,Sep,String),any_to_string_or_var(StringO,String).
 atomic_list_concat_safe(List,_,V):- (V=='';V==""),!,List=[].
-atomic_list_concat_safe(List,Sep,StringO):-ground(StringO),ground(Sep),not(atom_contains(StringO,Sep)),!,List=[D10],any_to_string_or_var(StringO,D1O).
+atomic_list_concat_safe(List,Sep,StringO):-ground(StringO),ground(Sep),not(atom_contains(StringO,Sep)),!,List=[D1O],any_to_string_or_var(StringO,D1O).
 atomic_list_concat_safe([Atom,A2|Bonus],Sep,V):-atomic(Atom),atomic(A2),atomic_list_concat_safe([Atom,Sep,A2],A3),atomic_list_concat_safe([A3|Bonus],Sep,V),!.
 atomic_list_concat_safe([Atom|Bonus],Sep,V):-atomic(Atom),atomic(V),atomic_list_concat_safe([Atom,Sep,NV],V),!,atomic_list_concat_safe(Bonus,NV).
 atomic_list_concat_safe([D1,PostAtom|Bonus],Sep,V):-var(D1),atomic(Atom),atomic(Sep),string_concat(Sep,PostAtom,Atom),

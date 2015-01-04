@@ -50,7 +50,7 @@ type_has_instances(Type):-  atom(Type),Type\=ftTerm,Type\=tCol,not_ft(Type),mudI
 
 choose_right(Prop,Obj,Value):- thlocal:useOnlyExternalDBs,!, body_call_cyckb(dbase_t(Prop,Obj,Value)).
 choose_right(Prop,Obj,Value):- nonvar(Obj),!,choose_for(Prop,Obj,RValue),RValue=Value.
-choose_right(Prop,Obj,Value):- cached_isa(Prop,completeExtentAsserted),not(cached_isa(Prop,singleValued)),!,is_asserted(dbase_t(Prop,Obj,Value)).
+choose_right(Prop,Obj,Value):- cached_isa(Prop,completeExtentAsserted),not(cached_isa(Prop,prologSingleValued)),!,is_asserted(dbase_t(Prop,Obj,Value)).
 choose_right(Prop,Obj,Value):- findall(Obj,generate_candidate_arg_values(Prop,1,Obj),Objs),Objs\=[],!,member(Obj,Objs),nonvar(Obj),choose_for(Prop,Obj,Value).
 choose_right(Prop,Obj,Value):- dmsg(var_choose_right(Prop,Obj,Value)),!,dtrace,is_asserted(dbase_t(Prop,Obj,Value)).
 choose_right(Prop,Obj,Value):- choose_for(Prop,Obj,RValue),RValue=Value.
@@ -60,7 +60,7 @@ choose_right(Prop,Obj,Value):- choose_for(Prop,Obj,RValue),RValue=Value.
 choose_for(mudAtLoc,Obj,_):-nonvar(Obj),isa_asserted(Obj,tRegion),!,fail.
 choose_for(Prop,Obj,Value):- var(Obj),trace_or_throw(var_choose_for(Prop,Obj,Value)).
 choose_for(Prop,Obj,Value):- not(is_fact_consistent(dbase_t(Prop,Obj,Value))),!,fail.
-choose_for(Prop,Obj,Value):- mpred_prop(Prop,singleValued),!,choose_one(Prop,Obj,Value),!.
+choose_for(Prop,Obj,Value):- mpred_prop(Prop,prologSingleValued),!,choose_one(Prop,Obj,Value),!.
 choose_for(Prop,Obj,Value):- nonvar(Value),!,choose_each(Prop,Obj,RValue),!,RValue=Value.
 choose_for(Prop,Obj,Value):- no_repeats(choose_each(Prop,Obj,Value)).
 
@@ -212,7 +212,7 @@ unverifiableType(tPred).
 unverifiableType(ftText).
 unverifiableType(tFunction).
 unverifiableType(vtDirection).
-unverifiableType(string).
+unverifiableType(ftString).
 unverifiableType(ttFormatType).
 unverifiableType(tCol).
 unverifiableType(ftTerm(_)).
@@ -224,7 +224,7 @@ violatesType(_,Type):- unverifiableType(Type),!,fail.
 % violatesType(_,col):-!,fail.
 violatesType(Value,ftInt):-number(Value),!,fail.
 violatesType(Value,Type):-atom(Type),isa_backchaing(Value,Type),!,fail.
-violatesType(Value,string):-string(Value),!,fail.
+violatesType(Value,ftString):-string(Value),!,fail.
 %violatesType(apath(_,_),Type):-!,(Type\=areaPath,Type\=obj).
 violatesType(Value,Type):- compound(Type),!,not(term_is_ft(Value,Type)),!.
 violatesType(Value,Type):- once((isa_backchaing(Value,_))), no_loop_check(not(isa_backchaing(Value,Type))).
@@ -256,12 +256,12 @@ fallback_value(Prop,Obj,Value):-Fact=..[Prop,Obj,Value],
 :-dmsg_hide(defaultArgValue).
 
 no_fallback(mudSubclass,2).
-no_fallback(P,2):-not(mpred_prop(P,singleValued)).
+no_fallback(P,2):-not(mpred_prop(P,prologSingleValued)).
 
 :-swi_export(defaultArgValue/4).
-defaultArgValue(Fact,F,A,OLD):- stack_check, mpred_prop(F,predSingleValueDefault(A,OLD)),!,dmsg(defaultArgValue(fallback_value(Fact,F,predSingleValueDefault(A,OLD)))).
-defaultArgValue(mudFacing(_,_),_,2,"n"):-!.
-defaultArgValue(change(_,_),_,2,200):-!.
+defaultArgValue(Fact,F,A,OLD):- stack_check, mpred_prop(F,argSingleValueDefault(A,OLD)),!,dmsg(defaultArgValue(fallback_value(Fact,F,argSingleValueDefault(A,OLD)))).
+defaultArgValue(mudFacing(_,_),_,2,vNorth):-!.
+defaultArgValue(mudCharge(_,_),_,2,200):-!.
 defaultArgValue(mudHealth(_,_),_,2,500):-!.
 defaultArgValue(Fact,F,A,Value):- Fact=..[F,P|Args],is_fact_consistent(Fact),defaultArgValue(Fact,F,A,P,Args,Value).
 

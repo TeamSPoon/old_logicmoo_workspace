@@ -14,7 +14,7 @@
 mudIsa(vOn,vtOnOff).
 mudIsa(vOff,vtOnOff).
 
-user:term_specifier_text(Text,vtOnOff,ON_OFF):-text_to_string(Text,FLAG),to_on_off(FLAG,vOn,vOff,ON_OFF).
+user:hook_coerce(Text,vtOnOff,ON_OFF):-text_to_string(Text,FLAG),to_on_off(FLAG,vOn,vOff,ON_OFF).
 
 t_f("vOn","vOff").
 t_f("t","f").

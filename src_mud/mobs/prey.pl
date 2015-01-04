@@ -60,7 +60,7 @@ prey_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[tNut]).
 % spawn new prey
 % maybe(N) == N chance of each agent spawning a new agent each turn
 
-tActionType(actSpawn(tCol)).
+vtActionTemplate(actSpawn(tCol)).
 
 agent_call_command(_Agent,actSpawn(tPrey)):-actSpawn.
 

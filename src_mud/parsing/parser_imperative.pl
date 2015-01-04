@@ -17,7 +17,7 @@
                    objects_match/3,
                    match_object/2,
                    object_string/2,
-                   specifiedItem/3,
+                   coerce/3,
                    parseForTypes//2)).
 
 :- include(logicmoo('vworld/moo_header.pl')).
@@ -163,7 +163,7 @@ save_fmt(OS,Fmt,[A|KW]):-sformat(Str,Fmt,[A|KW]),to_word_list(Str,WL),save_fmt_e
 save_fmt_e(O,A):-atom(A),save_fmt_a(O,A),!.
 save_fmt_e(O,[E|L]):-!,save_fmt_e(O,E),!,save_fmt_e(O,L),!.
 save_fmt_e(O,mudIsa(A)):-!,must(save_fmt_e(O,A)).
-save_fmt_e(_,E):-compound(E),!. % cycPred(_),mped_type(_),cycPlus2(_),hasStub(_),def_module(_),stubType(_),arity(_),mped_type(_)
+save_fmt_e(_,E):-compound(E),!. % cycPred(_),mped_type(_),cycPlus2(_),hasStub(_),def_module(_),predStubType(_),arity(_),mped_type(_)
 save_fmt_e(O,E):- string(E),!,must((to_word_list(E,WL),save_fmt_e(O,WL))),!.
 save_fmt_e(O,E):- member(E,O) -> true ; (O=[_|CDR],nb_setarg(2,O,[E|CDR])).
 
@@ -274,7 +274,7 @@ verb_alias('where is',actWhere).
 % pos_word_formula('infinitive',Verb,Formula):- 'infinitive'(TheWord, Verb, _, _G183), 'verbSemTrans'(TheWord, 0, 'TransitiveNPCompFrame', Formula, _, _).
 
 verb_alias_to_verb(IVERB,SVERB):- verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.
-verb_alias_to_verb(IVERB,SVERB):- specifiedItem(IVERB,vtVerb,SVERB), IVERB \= SVERB.
+verb_alias_to_verb(IVERB,SVERB):- coerce(IVERB,vtVerb,SVERB), IVERB \= SVERB.
 
 subst_parser_vars(Agent,TYPEARGS,TYPEARGS_R):- subst(TYPEARGS,isAgentSelf,Agent,S1),where_atloc(Agent,Here),subst(S1,here,Here,TYPEARGS_R).
 
@@ -342,16 +342,16 @@ name_text(Name,Text):-atomic(Name),atom_string(Name,Text).
 name_text(Name,Text):-dbase_t(mudKeyword,Name,Text).
 name_text(Name,Text):-argIsa(N,2,ftString),not(is_asserted(argIsa(N,1,ftString))),dbase_t(N,Name,Text).
 
-term_specifier_text(TextS,vtDirection,Dir):-
+hook_coerce(TextS,vtDirection,Dir):-
   member(Dir-Text,[vNorth-"n",vSouth-"s",vEast-"e",vWest-"w",vNE-"ne",vNW-"nw",vSE-"se",vSW-"sw",vUp-"u",vDown-"d"]),
   (name_text(Dir,TextS);TextS=Text).
 
-term_specifier_text(Text,Subclass,X):- 
+hook_coerce(Text,Subclass,X):- 
    not(memberchk(Subclass,[vtDirection,'TemporallyExistingThing'])),
    once((isa_asserted(X,Subclass),
    arg_to_var(ftText,Text,TextVar),
    req(mudKeyword(X,TextVar)),   
-   same_arg(ftText,TextVar,Text))). % dmsg(todo(term_specifier_text(Text,Subclass))),impliedSubClass(Subclass,spatialthing).
+   same_arg(ftText,TextVar,Text))). % dmsg(todo(hook_coerce(Text,Subclass))),impliedSubClass(Subclass,spatialthing).
 
 
 phrase_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver):-length(TYPEARGS,N),length(GOODARGS,N),!,
@@ -366,7 +366,7 @@ is_counted_for_parse(I):-i_countable(I),not(excluded_in_parse(I)),!.
 excluded_in_parse(apathFn(_, _)).
 excluded_in_parse(I):-tCol(I).
 excluded_in_parse(I):-ttFormatType(I).
-excluded_in_parse(I):-mpred_prop(_,argsIsaInList(I)).
+excluded_in_parse(I):-mpred_prop(_,predArgTypes(I)).
 excluded_in_parse(apathFn(_ = _)).
 
 instance_for_parse(I):-is_counted_for_parse(I).
@@ -491,17 +491,20 @@ parseIsa(countBetween(_Type,Low,_),[]) --> {!, Low < 1}, [].
 parseIsa(isAnd([L]),Term1) --> {!},parseIsa(L,Term1).
 parseIsa(isAnd([L|List]),Term) --> {!},dcgAnd(parseIsa(L,Term),parseIsa(isAnd(List),Term)).
 
-parseIsa(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{specifiedItem(String,Type,Term)}.
+parseIsa(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{coerce(String,Type,Term)}.
 
-specifiedItem(String,Type,Inst):- var(Type),trace_or_throw(var_specifiedItemType(String,Type,Inst)).
-specifiedItem(String,isNot(Type),Inst):-!,not(specifiedItem(String,Type,Inst)).
-specifiedItem([String],Type,Inst):- nonvar(String),!,specifiedItem(String,Type,Inst).
-specifiedItem(String,Type,Inst):- ttFormatType(Type),checkAnyType(assert(actParse),String,Type,AAA),Inst=AAA.
-specifiedItem(Text,Type,Inst):- call_tabled_can(no_repeats(call_no_cuts(term_specifier_text(Text,Type,Inst)))).
-%specifiedItem(String,Type,Longest) :- findall(Inst, (specifiedItem(Inst,Type,Inst),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
-specifiedItem(String,Type,Inst):- var(String),!,instances_of_type(Inst,Type),name_text(Inst,String).
-specifiedItem(String,Type,Inst):- not(ttFormatType(Type)),must(tCol(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
-specifiedItem(String,Type,Inst):- not(string(String)),!,text_to_string(String,StringS),!,specifiedItem(StringS,Type,Inst).
+
+
+coerce(String,Type,Inst):- var(Type),trace_or_throw(var_specifiedItemType(String,Type,Inst)).
+coerce(String,isNot(Type),Inst):-!,not(coerce(String,Type,Inst)).
+coerce([String],Type,Inst):- nonvar(String),!,coerce(String,Type,Inst).
+coerce(String,Type,Inst):- ttFormatType(Type),checkAnyType(assert(actParse),String,Type,AAA),Inst=AAA.
+coerce(Text,Type,Inst):- call_tabled_can(no_repeats(call_no_cuts(hook_coerce(Text,Type,Inst)))).
+%coerce(String,Type,Longest) :- findall(Inst, (hook_coerce(Inst,Type,Inst),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
+coerce(String,Type,Inst):- var(String),!,instances_of_type(Inst,Type),name_text(Inst,String).
+coerce(String,Type,Inst):- not(ttFormatType(Type)),must(tCol(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
+coerce(String,Type,Inst):- not(string(String)),!,text_to_string(String,StringS),!,coerce(StringS,Type,Inst).
+% coerce(A,Type,AA):- correctAnyType(change(_,_),A,Type,AA).
 
 instances_of_type(Inst,Type):- no_repeats(instances_of_type_0(Inst,Type)).
 instances_of_type_0(Inst,Type):- mudIsa(Inst,Type).

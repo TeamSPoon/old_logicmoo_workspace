@@ -142,7 +142,7 @@ local_term_anglify([Var],[tCallable([Var])]):- var(Var),!.
 local_term_anglify(np(P),English):- local_term_anglify_np(P,English).
 local_term_anglify(noun_phrase(P),English):- local_term_anglify_np(P,English).
 
-local_term_anglify(notice(Who,What),[np(Who),notices,What]).
+local_term_anglify(actNotice(Who,What),[np(Who),notices,What]).
 local_term_anglify(fN(Region,tRegion),[(String)]):- nameStrings(Region,String),!.
 
 local_term_anglify(fN(Region,tRegion),[nameString1(String)]):- holds_t(nameStrings,Region,String),!.

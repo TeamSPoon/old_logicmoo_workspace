@@ -11,10 +11,10 @@
  */
 
 % See the the seemingly white (not dirrectly usable) in some tUsefull way
-defined_affordance([objType= "Passable",actionVerb= "TravelThru"]).
+defined_affordance([subjType= "Passable",actionVerb= "TravelThru"]).
 
 
-defined_affordance([objType= "Television",
+defined_affordance([subjType= "Television",
 stringMatch= "TV",
 actionVerb= "Observe",
 maximumDistance= 4,
@@ -27,22 +27,22 @@ maximumDistance= 4,
 'Sad_To_Happy'= 2 * 1,
 'Energy'= 1 * -1]).
 
-defined_affordance([objType= "Door",
+defined_affordance([subjType= "Door",
 stringMatch= " * doorway",
 stringMatch= "gate",
 stringMatch= "Curtain",
 superType= "Passable"]).
 
-defined_affordance([objType= "Floor",
+defined_affordance([subjType= "Floor",
 stringMatch= "floor",
 superType= "Passable"]).
 
-defined_affordance([objType= "Ladder",
+defined_affordance([subjType= "Ladder",
 stringMatch= "ladder",
 superType= "Passable"]).
 
 % looks like a very bad idea but not (this is mainly for testing the system)
-defined_affordance([objType= tFurniture,actionVerb= "BumpIntoBarrier",
+defined_affordance([subjType= tFurniture,actionVerb= "BumpIntoBarrier",
 'NonLoneliness_Social'= -300 * 0,
 'Hygiene'= -300 * 0,
 'Comfort'= -300 * 0,
@@ -50,7 +50,7 @@ defined_affordance([objType= tFurniture,actionVerb= "BumpIntoBarrier",
 'Fun'= -300 * 0]).
 
 % yet every minute you are alive, God wishes to punish you
-defined_affordance([objType= isAgentSelf,actionVerb= "LiveAtLeastAMinute",
+defined_affordance([subjType= isAgentSelf,actionVerb= "LiveAtLeastAMinute",
    maximumDistance= 2000,
    'Energy'= 0 * -1,
    'NonHunger'= 0 * -1,
@@ -62,7 +62,7 @@ defined_affordance([objType= isAgentSelf,actionVerb= "LiveAtLeastAMinute",
    'Sad_To_Happy'= 0 * -1,
    'Comfort'= 0 * -1 ]).
 
-defined_affordance([objType= "Shower",
+defined_affordance([subjType= "Shower",
 actionVerb= "Operate",
 slAnim= anim_AFRAID,
 textName= "wash self with X",
@@ -71,10 +71,10 @@ textName= "take a shower",
 'Hygiene'= 30 * 30,
 actionVerb= "Clean"]).
 
-defined_affordance([objType= "Bathtub",
+defined_affordance([subjType= "Bathtub",
 stringMatch= "bath",
 stringMatch= "bathtub",
-dontMatch= "Plastic Tub",
+slExceptFor= "PlasticTub",
 actionVerb= "Operate",
 textName= "wash self with X",
 textName= "Take a Bath",
@@ -83,32 +83,32 @@ slSit= true,
 'Hygiene'= 100 * 100,
 actionVerb= "Clean"]).
 
-defined_affordance([objType= "Sink",
+defined_affordance([subjType= "Sink",
 actionVerb= "Operate",
 textName= "Wash Hands",
 'Comfort'= 0 * 0,
 'Hygiene'= 10 * 10,
 actionVerb= "Clean"]).
 
-defined_affordance([objType= "BigThing",require(mudSize > 8)]).
+% defined_affordance([subjType= "BigThing",require(mudSize > 8)]).
 
 % defined_affordance([actionVerb= "Attach_To_Self",textName= "Attach it",slAnim= anim_RPS_PAPER,'Comfort'= 20 * 20,'LispScript'= "(progn (TheBot.Attach_To_Self Target))"]).
 
-defined_affordance([objType= "DanceBall",
+defined_affordance([subjType= "DanceBall",
 actionVerb= "Dance",
 textName= "Dance! Dance!",
-is_To_uchDefined= true,
+slTouch= true,
 slAnim= anim_DANCE,
 'NonLoneliness_Social'= 10 * 10,
 'Fun'= 10 * 10,
 'Hygiene'= -10 * -10]).
 
-defined_affordance([objType= "PoseBall",
+defined_affordance([subjType= "PoseBall",
 stringMatch= " * pose",
 stringMatch= " * Pose",
-is_To_uchDefined= true]).
+slTouch= true]).
 
-defined_affordance([objType= tWashingMachine,
+defined_affordance([subjType= tWashingMachine,
 stringMatch= "Washing Machine",
 actionVerb= "actOperate",
 textName= "Wash The Clothes",
@@ -116,7 +116,7 @@ textName= "Wash The Clothes",
 'Hygiene'= 10 * 10,
 actionVerb= "Clean"]).
 
-defined_affordance([objType= tClothesDryer,
+defined_affordance([subjType= tClothesDryer,
 stringMatch= "Dryer",
 actionVerb= "actOperate",
 textName= "Dry The Clothes",
@@ -124,7 +124,7 @@ textName= "Dry The Clothes",
 'Hygiene'= 10 * 10,
 actionVerb= "Clean"]).
 
-defined_affordance([objType= "Bed",
+defined_affordance([subjType= "Bed",
 actionVerb= "Sleep",
 textSitName= "Sleep a few",
 slSit= true,
@@ -132,7 +132,7 @@ slAnim= anim_SLEEP,
 'Comfort'= 10 * 30,
 'Energy'= 100 * 80]).
 
-defined_affordance([objType= "Mattress",
+defined_affordance([subjType= "Mattress",
 actionVerb= "Sleep",
 textSitName= "Sleep a few",
 slSit= true,
@@ -140,7 +140,7 @@ slAnim= anim_SLEEP,
 'Comfort'= 10 * 30,
 'Energy'= 100 * 80]).
 
-defined_affordance([objType= "Chair",
+defined_affordance([subjType= "Chair",
 stringMatch= " * chair",
 stringMatch= " * stool",
 stringMatch= " * recliner",
@@ -151,7 +151,7 @@ slAnim= anim_SMOKE_IDLE,
 'Comfort'= 15 * 10,
 'Energy'= 10 * 20]).
 
-defined_affordance([objType= "Couch",
+defined_affordance([subjType= "Couch",
 stringMatch= "Sofa",
 stringMatch= " * luvseat * ",
 stringMatch= " * loveseat * ",
@@ -162,7 +162,7 @@ slAnim= anim_SMOKE_IDLE,
 'Comfort'= 20 * 20,
 'Energy'= 10 * 20]).
 
-defined_affordance([objType= "Radio",
+defined_affordance([subjType= "Radio",
 actionVerb= "Observe",
 textName= "Listen to Radio",
 maximumDistance= 4,
@@ -171,7 +171,7 @@ maximumDistance= 4,
 'Sad_To_Happy'= 10 * 10,
 'Energy'= 1 * -1]).
 
-defined_affordance([objType= "Mirror",
+defined_affordance([subjType= "Mirror",
 actionVerb= "Observe",
 textName= "Pop your zits",
 maximumDistance= 2,
@@ -180,7 +180,7 @@ maximumDistance= 2,
 'Sad_To_Happy'= 10 * -1,
 'Energy'= 1 * -1]).
 
-defined_affordance([objType= "Toilet",
+defined_affordance([subjType= "Toilet",
 actionVerb= "Potty",
 textSitName= "Go potty",
 slSit= true,
@@ -192,7 +192,7 @@ slAnim= anim_POINT_YOU,
 'Hygiene'= 1 * 4,
 'Fun'= 5 * 4]).
 
-defined_affordance([objType= "Refrigerator",
+defined_affordance([subjType= "Refrigerator",
 stringMatch= " * Fridge * ",
 stringMatch= " * Frige * ",
 stringMatch= " * icebox",
@@ -201,26 +201,26 @@ textName= "Raid the fridge",
 slAnim= anim_DRINK,
 slGrab= true]).
 
-defined_affordance([objType= "Stove",
+defined_affordance([subjType= "Stove",
 stringMatch= "Oven",
 stringMatch= " * kitchen range",
 actionVerb= "actOperate",
 slAnim= anim_DRINK,
 slGrab= true]).
 
-defined_affordance([objType= "Microwave",
+defined_affordance([subjType= "Microwave",
 actionVerb= "actOperate",
 textName= "see what was forgotten in the microwave",
 slAnim= anim_DRINK,
 slGrab= true]).
 
-defined_affordance([objType= "Treadmill",
+defined_affordance([subjType= "Treadmill",
    actionVerb= "Operate",
    textName= "Excersize with X",
    textName= "Tread the mill",
    slSit= true]).
 
-defined_affordance([objType= "FixedLamp",
+defined_affordance([subjType= "FixedLamp",
    stringMatch= " * floorlamp",
    stringMatch= "lamp",
    stringMatch= "lantern",
@@ -230,63 +230,63 @@ defined_affordance([objType= "FixedLamp",
    textName= "flip the switch",
    slAnim= anim_AIM_BAZOOKA_R]).
 
-defined_affordance([objType= "Pooltable",
+defined_affordance([subjType= "Pooltable",
 stringMatch= " * pool table * ",
 actionVerb= "Operate",
 textName= "Play pool",
 slAnim= anim_AIM_BAZOOKA_R]).
 
-defined_affordance([objType= "Barrier",
+defined_affordance([subjType= "Barrier",
 stringMatch= " * Wall * ",
 stringMatch= " * Fence * ",
 stringMatch= " * Pillar * ",
 stringMatch= " * Roof * ",
 stringMatch= " * Beam * "]).
 
-defined_affordance([objType= "Shelf",
+defined_affordance([subjType= "Shelf",
 stringMatch= " * cupboard",
 stringMatch= " * Cabinet",
 stringMatch= " * cabinate",
 stringMatch= " * FoodStore",
-actionVerb= "Put_X_On"]).
+actionVerb(2)="Put_X_On"]).
 
-defined_affordance([objType= "Desk",
+defined_affordance([subjType= "Desk",
 stringMatch= " * Lab Bench",
 stringMatch= " * workbench",
 stringMatch= " * officedesk",
-actionVerb= "Put_X_On"]).
+actionVerb(2)="Put_X_On"]).
 
-defined_affordance([objType= "Counter",stringMatch= "Bar",actionVerb= "Put_X_On"]).
+defined_affordance([subjType= "Counter",stringMatch= "Bar",actionVerb(2)="Put_X_On"]).
 
-defined_affordance([objType= "Container",stringMatch= "Plastic",actionVerb= "Put_X_In"]).
+defined_affordance([subjType= "Container",stringMatch= "Plastic",actionVerb(2)="Put_X_In"]).
 
-defined_affordance([objType= "Table",
+defined_affordance([subjType= "Table",
 stringMatch= " * Coffee Table",
 acceptsChild= tReadable,
 acceptsChild= tEatable,
-actionVerb= "Put_X_On"]).
+actionVerb(2)="Put_X_On"]).
 
-defined_affordance([objType= "Trash_Container",
+defined_affordance([subjType= "Trash_Container",
    stringMatch= "garbage * c",
    stringMatch= "trash * c",
    stringMatch= "trash * bin",
    stringMatch= "waste",
    stringMatch= "recycle * bin",
    acceptsChild= "Take",
-   actionVerb= "Put_X_In"]).
+   actionVerb(2)="Put_X_In",acceptsChild= takeable]).
 
-defined_affordance([objType= "Bookcase",
+defined_affordance([subjType= "Bookcase",
 stringMatch= " * Bookcase",
 stringMatch= " * Bookshelf",
 stringMatch= " * Bookshelve",
 acceptsChild= tReadable,
-actionVerb= "Put_X_On",
-textName= "Browse books",
+actionVerb(2)="Put_X_On",
+textName= "Organize books",
 slAnim= anim_YES,
 'Fun'= 10 * 10,
 'Secure_Room'= 20 * 20]).
 
-defined_affordance([objType= tReadable,
+defined_affordance([subjType= tReadable,
 stringMatch= "Book",
 stringMatch= "Magazine",
 actionVerb= "Observe",
@@ -298,15 +298,15 @@ slAnim= anim_LAUGH_SHORT,
 actionVerb= "Take",
 textName= "Take the materials"]).
 
-defined_affordance([objType= tEatable,
-'AcceptsParent'= "Avatar",
+defined_affordance([subjType= tEatable,
+'slAcceptsParent'= "Avatar",
 actionVerb= "Eat",
 textName= "Eat the food",
 slAnim= anim_DRINK,
 actionVerb= "Take",
 textName= "Take the food"]).
 
-defined_affordance([objType= "Art",
+defined_affordance([subjType= "Art",
 stringMatch= "Art  * ",
 actionVerb= "Observe",
 textName= "Apreciate the Art",
@@ -314,12 +314,12 @@ slAnim= anim_YES_HAPPY,
 'Fun'= 10 * 10,
 'Secure_Room'= 20 * 20]).
 
-defined_affordance([objType= "Dance_floor",
+defined_affordance([subjType= "Dance_floor",
 actionVerb= "Operate",
 textName= "Dance! Dance!",
 slAnim= anim_DANCE2]).
 
-defined_affordance([objType= "Computer",
+defined_affordance([subjType= "Computer",
 stringMatch= "keyboard",
 stringMatch= "keypad",
 stringMatch= "workstation",
@@ -328,7 +328,7 @@ actionVerb= "Operate",
 textName= "Look busy doing something!",
 slAnim= anim_TYPE]).
 
-defined_affordance([objType= tAgentGeneric,
+defined_affordance([subjType= tAgentGeneric,
 actionVerb= "Talk",
 'NonLoneliness_Social'= 10 * 15,
 'Fun'= 1 * 1,
@@ -347,13 +347,13 @@ actionVerb= "Kiss",
 'Sad_To_Happy'= 10 * 10,
 'Fun'= 10 * 10]).
 
-defined_affordance([objType= touchable,actionVerb= "Touch",
+defined_affordance([subjType= touchable,actionVerb= "Touch",
 textName= "Touch",
 slGrab= true,
 'Fun'= 1 * 1,
 'Secure_Room'= 1 * 1]).
 
-defined_affordance([objType= tSittable,actionVerb= "Sit",
+defined_affordance([subjType= tSittable,actionVerb= "Sit",
 textName= "Sit on",
 slSit= true,
 slAnim= anim_SIT,
@@ -361,24 +361,24 @@ slAnim= anim_SIT,
 'Fun'= 1 * 1,
 'Secure_Room'= 1 * 1]).
 
-defined_affordance([objType= tHasSurface,actionVerb= "Put_X_On",
+defined_affordance([subjType= tHasSurface,actionVerb(2)="Put_X_On",
 textName= "This is a Put_X_On placeholder",
 slAnim= anim_FINGER_WAG,
 'Fun'= -2 * 2,
 'Energy'= 0 * -1]).
 
 
-defined_affordance([objType= tConsumable,actionVerb= "Eat",
+defined_affordance([subjType= tConsumable,actionVerb= "Eat",
 textName= "Eat it",
-isDestroyedOnUse= true,
+slDestroyedOnUse= true,
 'NonHunger'= 100 * 100,
 'Hygiene'= 0 * -10]).
 
-defined_affordance([objType= tTakeable,actionVerb= "Take", 
+defined_affordance([subjType= tTakeable,actionVerb= "Take", 
 textName= "Take it",
-'AcceptsParent'= "Avatar"]).
+'slAcceptsParent'= "Avatar"]).
 
-defined_affordance([objType= tLayable,actionVerb= "Sleep",
+defined_affordance([subjType= tLayable,actionVerb= "Sleep",
    textName= "Lay on",
    slSit= true,
    slAnim= anim_SLEEP,
@@ -398,71 +398,88 @@ defined_affordance([alsoType= tLookable,actionVerb= "Observe",
    'Fun'= 2 * 1,
    'Energy'= 0 * -1]).
 
-defined_affordance([objType= tSittable,actionVerb= "Excersize",
+defined_affordance([subjType= tSittable,actionVerb= "Excersize",
 textName= "Excersize",
 slAnim= animETWO_PUNCH,
 'Fun'= 10 * 10,
 'Hygiene'= -10 * -10]).
 
-defined_affordance([objType= tAgentGeneric,actionVerb= "Tickle",
+defined_affordance([subjType= tAgentGeneric,actionVerb= "Tickle",
 textName= "Play with",
 slAnim= anim_SHOOT_BOW_L,
 alsoType= tLookable,
 'Energy'= -10 * -10,
 'Fun'= 20 * 10]).
 
-defined_affordance([objType= tContainer,actionVerb= "Search",
+defined_affordance([subjType= tContainer,actionVerb= "Search",
 textName= "Eat_from",
 slAnim= anim_DRINK,
 'Hygiene'= 0 * -5,
 'NonHunger'= 40 * 20]).
 
-defined_affordance([objType= tAgentGeneric,actionVerb= "Argue",
+defined_affordance([subjType= tAgentGeneric,actionVerb= "Argue",
 textName= "Argue",
 alsoType= tLookable,
 slAnim= anim_ONETWO_PUNCH,
 'Energy'= -11 * -20]).
 
-defined_affordance([objType= tAgentGeneric,actionVerb= "Talk",
+defined_affordance([subjType= tAgentGeneric,actionVerb= "Talk",
 textName= "Talk to",
 maximumDistance= 3,
 alsoType= tLookable,
 slAnim= anim_TALK,
 'NonLoneliness_Social'= 11 * 20]).
 
-defined_affordance([objType= tAgentGeneric,actionVerb= "Attack",
+defined_affordance([subjType= tAgentGeneric,actionVerb= "Attack",
 textName= "Beat up",
 slAnim= anim_SWORD_STRIKE,
 'Energy'= -11 * -20]).
 
-defined_affordance([objType= tAgentGeneric,actionVerb= "Kiss",
+defined_affordance([subjType= tAgentGeneric,actionVerb= "Kiss",
 textName= "Kiss",
 slAnim= anim_BLOW_KISS,
 'NonLoneliness_Social'= 11 * 20,
 'Fun'= 21 * 20]).
 
-defined_affordance([objType= tLookable,actionVerb= "Think_About",
+defined_affordance([subjType= tLookable,actionVerb= "Think_About",
 textName= "Think about",
 slAnim= anim_SHRUG,
 'Fun'= 1 * 2]).
 
-:-retractall(verb_desc(_,_,_)).
-:-retractall(verb_for_type(_,_)).
+recreate(F/A):-dynamic(F/A),functor(P,F,A),retractall(P),!.
+:-recreate(verb_desc/3).
+:-recreate(verb_for_type/2).
+:-recreate(verb_affordance_2/2).
+:-recreate(can_hold_type/2).
+:-recreate(verb_affordance/5).
+
 
 to_personal(mudCharge,mudCharge).
 to_personal(Pred,APred):-atom_concat('',Pred,APred).
 
-do_define_affordance(LIST):-(member(objType= SType,LIST);member(alsoType= SType,LIST)),typename_to_iname('t',SType,Type),!,do_define_type_affordance(Type,LIST).
+do_define_affordance(LIST):-(member(subjType= SType,LIST);member(alsoType= SType,LIST)),typename_to_iname('t',SType,Type),!,
+  decl_type(Type),do_define_type_affordance(Type,LIST).
 
 do_define_type_affordance1(Type,_= Type):-!.
+do_define_type_affordance1(Type,subjType= String):- add(nameStrings(Type,String)).
+
+
+do_define_type_affordance1(Type,alsoType= TWhat):-typename_to_iname(t,TWhat,ParentType),add(mudSuperclass(Type,ParentType)).
+do_define_type_affordance1(Type,superType= TWhat):-typename_to_iname(t,TWhat,ParentType),add(mudSuperclass(Type,ParentType)).
 do_define_type_affordance1(Type,actionVerb= SVerb):-typename_to_iname(act,SVerb,Verb),nb_setval(actionVerb,Verb),!,assert_if_new(verb_for_type(Verb,Type)).
+do_define_type_affordance1(Type,actionVerb(2)= SVerb):-typename_to_iname(act,SVerb,Verb),nb_setval(actionVerb,Verb),
+  (nb_current(acceptsChild,ChildType)->true;ChildType=tTakeable),
+  assert_if_new(verb_affordance_2(Verb,Type,ChildType)).
+do_define_type_affordance1(Type,acceptsChild= TWhat):-typename_to_iname(t,TWhat,ChildType),
+  nb_setval(acceptsChild,ChildType),!,assert_if_new(can_hold_type(Type,ChildType)),
+ (nb_current(actionVerb,Verb)->assert_if_new(verb_affordance_2(Verb,Type,ChildType));dmsg(warn(verb_affordance_3_no_verb(error(vVerb),Type,ChildType)))),!.
 do_define_type_affordance1(Type,SPred= Wants * Gets):-typename_to_iname(mud,SPred,Pred),nb_getval(actionVerb,Verb),to_personal(Pred,APred),assert_if_new(verb_affordance(Verb,Type,APred,Wants,Gets)).
-do_define_type_affordance1(Type,maximumDistance= String):-nb_getval(actionVerb,Verb),assert_if_new(maximumDistance(Verb,Type,String)).
+do_define_type_affordance1(Type,maximumDistance= String):-nb_getval(actionVerb,Verb),add(maximumDistance(Verb,Type,String)).
 do_define_type_affordance1(Type,textSitName= String):-do_define_type_affordance1(Type,textName= String).
 do_define_type_affordance1(Type,textName= String):-nb_getval(actionVerb,Verb),assert_if_new(verb_desc(Verb,Type,String)).
 do_define_type_affordance1(Type,stringMatch= String):-assert_if_new(type_desc(Type,String)).
 do_define_type_affordance1(_,Skipped=_):-atom_concat('sl',_,Skipped).
-do_define_type_affordance1(Type,Skipped):-dmsg(skipped(do_define_type_affordance1(Type,Skipped))).
+do_define_type_affordance1(Type,Skipped):-dmsg(error(skipped(do_define_type_affordance1(Type,Skipped)))).
 
 do_define_type_affordance(_,[]).
 do_define_type_affordance(Type,[H|LIST]):-do_define_type_affordance1(Type,H),!,do_define_type_affordance(Type,LIST),!.
@@ -481,6 +498,46 @@ simian_idea(Agent,Act):-
 % verb_affordance(Verb,Type,APred,Wants,Gets)
 choose_best(_Agent,CMDS,Act):-random_permutation(CMDS,[Act|_]).
 
+show_call_fmt(Call):-show_call_failure(Call),fmt(Call).
+call_clause_last(CLREAL,Goal):-user:call_clause_last_1(CLREAL,Goal),!.
+call_clause_last_1(CLREAL,Goal):-functor(CLREAL,F,A),functor(Goal,GF,GA),functor(CGoal,GF,GA),
+    functor(CLCOPY2,F,A),functor(CLCOPY3,F,A),functor(CLCOPY4,F,A),functor(CLCOPY5,F,A),functor(CLCOPY6,F,A),
+    FB = (_,_,_,call_clause_last(CLCOPY2,CGoal)),
+     must((
+      clause(CLCOPY2,FB,Ref),
+       nth_clause(CLCOPY3,NTH,Ref),
+       predicate_property(CLCOPY4,number_of_clauses(NC)),NTHNext is NTH+1)),!,
+     ((((between(NTHNext,NC,NthCL),nth_clause(CLCOPY5,NthCL,NewRef),
+       show_call_failure(clause(CLCOPY6,BODY,NewRef)),CLCOPY6=CLREAL,call(BODY)))*->true;Goal)).
+  
+% this is doing a trick to make sure it gets called very last
+agent_call_command(Agent,ACT) :- nonvar(ACT),!,true,call_clause_last(agent_call_command(Agent,ACT),agent_call_command_simbots_real(Agent,ACT)).
+
+% args_match_types(ARGS,Type).
+%args_match_types([],_):-!,fail.
+args_match_types([Obj],Type):-!,mudIsa(Obj,Type).
+args_match_types(Obj,Type):-!,mudIsa(Obj,Type).
+
+
+agent_call_command_simbots_real(Agent,ACT):- nonvar(ACT),
+   ignore(affordance_side_effects(Agent,ACT,Template)),
+   ignore(affordance_message(Agent,ACT,Template)),
+   fmt(agent_call_command_simbots_real(Agent,ACT,Template)),!.
+
+
+affordance_side_effects(Agent,ACT,Template):- ACT=..[ActVerb|ARGS],
+      verb_affordance(ActVerb,Types,_,_,_),args_match_types(ARGS,Types),!,must(Template=..[ActVerb,Types]),
+      findall(dbase_t(Trait,Agent,Real), verb_affordance(ActVerb,Types,Trait,_Think,Real),NewAdds),
+      forall(member(Add,NewAdds),add(Add)).
+
+affordance_message(Agent,ACT,Template):- ACT=..[ActVerb|ARGS],
+      verb_desc_or_else(ActVerb,Types,Mesg),args_match_types(ARGS,Types),!,must(Template=..[ActVerb,Types]),
+      fmt(affordance_message(Agent,ACT,verb_affordance(ActVerb,Types,Mesg))),!.
+      
+verb_desc_or_else(ActVerb,Types,Mesg):-verb_desc(ActVerb,Types,Mesg).
+verb_desc_or_else(ActVerb,Types,verb_desc(ActVerb,Types)):-nonvar(ActVerb),nonvar(Types),not(verb_desc(ActVerb,Types,_)).
+
+agent_call_command(Agent,ACT):- fmt(agent_call_command_simbots_real_3(Agent,ACT)),fail.
 
 action_info(actTextcmd(ftString),"reinterps a term as text").
 agent_call_command(Agent,actTextcmd(A)):-sformat(CMD,'~w',[A]),!,do_player_action(Agent,CMD).
@@ -488,16 +545,11 @@ agent_call_command(Agent,actTextcmd(A,B)):-sformat(CMD,'~w ~w',[A,B]),!,do_playe
 agent_call_command(Agent,actTextcmd(A,B,C)):-sformat(CMD,'~w ~w ~w',[A,B,C]),!,do_player_action(Agent,CMD).
 
 
-:-forall(defined_affordance(Attrs),must(do_define_affordance(Attrs))).
-:-listing(verb_desc).
-:-listing(verb_affordance).
-:-listing(verb_for_type).
-
-mudSubclass(tShelf,tHassurface).
-mudSubclass(tCounter,tHassurface).
+mudSubclass(tShelf,tHasSurface).
+mudSubclass(tCounter,tHasSurface).
 mudSubclass(tEatable,tConsumable).
-mudSubclass(tBar,tHassurface).
-mudSubclass(tSittable,tHassurface).
+mudSubclass(tBar,tHasSurface).
+mudSubclass(tSittable,tHasSurface).
 mudSubclass(tSofa,tCouch).
 mudSubclass(tCouch,tSittable).
 mudSubclass(tChair,tSittable).
@@ -505,9 +557,9 @@ mudSubclass(tMattress,tLayable).
 mudSubclass(tLayable,tSittable).
 mudSubclass(tBed,tMattress).
 mudSubclass(tCrib,tLayable).
-mudSubclass(tHassurface, tContainer).
-mudSubclass(tHassurface, tHasobjs).
-mudSubclass(tContainer, tHasobjs).
+mudSubclass(tHasSurface, tContainer).
+mudSubclass(tHasSurface, tHasObjects).
+mudSubclass(tContainer, tHasObjects).
 
 
 
@@ -533,12 +585,19 @@ action_info_simbots(ACT, DESC):-verb_desc(V,O,DESC),ACT=..[V,O].
 action_info_simbots(ACT,text([verb_for_type,V, O])):-verb_affordance(V, O,_,_,_),ACT=..[V,O].
 action_info_simbots(ACT,text([verb_for_type,V, O])):-verb_for_type(V, O),ACT=..[V,O].
 
+:-forall(defined_affordance(Attrs),must(do_define_affordance(Attrs))).
+:-listing(verb_desc/3).
+:-listing(verb_for_type/2).
+:-listing(verb_affordance_2/2).
+:-listing(can_hold_type/2).
+:-listing(verb_affordance/5).
+
+
 /*
 
 
 Yields
 
-:- dynamic verb_desc/3.
 :- dynamic verb_desc/3.
 
 verb_desc(actOperate, tShower, "wash self with X").

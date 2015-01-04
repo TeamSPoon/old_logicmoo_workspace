@@ -16,7 +16,7 @@
 action_info(actInventory(isOptional(tAgentGeneric,isAgentSelf)), "Examine an inventory").
 agent_call_command(Agent,actInventory(Who)):- show_kb_preds(Agent,actInventory(Who,value)).
 
-listValued(actInventory(tAgentGeneric,ftListFn(tObj))).
+prologListValued(actInventory(tAgentGeneric,ftListFn(tObj))).
 
 % Get only the Inv (inventory)
 actInventory(Agent,Percepts) :-  inventory0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts).

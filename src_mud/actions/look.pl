@@ -39,21 +39,21 @@ visibleTo(Agent,Agent).
 visibleTo(Agent,Obj):-mudPossess(Agent,Obj).
 visibleTo(Agent,Obj):-same_regions(Agent,Obj).
 
-term_specifier_text(Prep,prepstr_spatial,Str):-member(Prep,[in,on,north_of,inside,onto,ontop]),name_text(Prep,Str).
-term_specifier_text(Prep,prepstr_spatial,Inst):-term_specifier_text(Prep,prepstr_dir_of,Inst).
-term_specifier_text([SDir,of],prepstr_dir_of,ofFn(Dir)):-term_specifier_text(SDir,vtDirection,Dir).
+hook_coerce(Prep,txtPrepSpatial,Str):-member(Prep,[in,on,north_of,inside,onto,ontop]),name_text(Prep,Str).
+hook_coerce(Prep,txtPrepSpatial,Inst):-hook_coerce(Prep,txtPrepOf,Inst).
+hook_coerce([SDir,of],txtPrepOf,vDirFn(Dir)):-hook_coerce(SDir,vtDirection,Dir).
 
 action_info(actLook, "generalized look in region").
 action_info(actLook(isOptionalStr("in"),isOptionalStr("here")), "generalized look in region").
-action_info(actLook(prepstr_dir_of,isOptionalStr("self")), "Look in a direction (TODO: look north of isAgentSelf)").
-action_info(actLook(isOptional(prepstr_spatial,"at"),tObj),"look [in|at|on|under|at] somewhere").
+action_info(actLook(txtPrepOf,isOptionalStr("self")), "Look in a direction (TODO: look north of isAgentSelf)").
+action_info(actLook(isOptional(txtPrepSpatial,"at"),tObj),"look [in|at|on|under|at] somewhere").
 %action_info(look(obj), "Look at a speficific item").
 %action_info(look_at(isOptional(call(visibleTo(isAgentSelf,value)),call(visibleTo(isAgentSelf,value)))), "Look at a speficific item").
 
 agent_call_command(Agent,actLook):- look_as(Agent),!.
 agent_call_command(Agent,actLook("here")):- look_as(Agent),!.
 agent_call_command(Agent,actLook(_,"here")):- look_as(Agent),!.
-agent_call_command(Agent,actLook(Dir,"self")):- specifiedItem(Dir,vtDirection),!,
+agent_call_command(Agent,actLook(DirS,"self")):- coerce(DirS,vtDirection,Dir),!,
    view_dirs(Agent,[[Dir,vHere],[Dir,Dir],[Dir,Dir,vAdjacent]],Percepts),
    forall_member(P,Percepts,call_agent_action(Agent,actExamine(P))).
 agent_call_command(Agent,actLook(_Dir,SObj)):-
@@ -71,25 +71,28 @@ look_as(Agent):-
 call_look(Agent,LOC):-  mmake, call(call_look_proc,Agent,LOC).
 
 :-decl_mpred_prolog(call_look_proc/3).
+% call_look_proc(Agent,LOC):- with_assertions(mpred_prop(nameStrings,prologListValued),call_look_proc_0(Agent,LOC)).
 call_look_proc(Agent,LOC):-
    clr(props(Agent,mudNeedsLook(true))),
    add(props(Agent,mudNeedsLook(false))),    
     toploop_output:show_kb_preds(Agent,LOC,
          [
+         location= (value=LOC),
       % TODO make this work
          %  why does this this work on Prolog REPL?
          %   with_output_to(string(Str),show_room_grid('Area1000'))
          %  but yet this doent?
        %   show_room_grid = once(with_output_to(string(value),show_room_grid(region))),
          % for now workarround is 
-         call(show_room_grid(tRegion)),
+         call(show_room_grid(isRegionSelf)),
          mudAtLoc(Agent,value),
-         nameStrings(tRegion,value),
-         forEach(mudDescription(tRegion,Value),fmt(mudDescription(Value))),
+         nameStringsList(isRegionSelf,value),
+         forEach(mudDescription(isRegionSelf,Value),fmt(mudDescription(Value))),
          events=deliverable_location_events(Agent,LOC,value),
-         path(D) = pathBetween(tRegion,D,value),
-         pathName(D) = pathName(tRegion,D,value),
-         value = localityOfObject(value,tRegion),
+         path(D) = pathBetween(isRegionSelf,D,value),
+         pathName(D) = pathName(isRegionSelf,D,value),
+         % value = localityOfObject(value,isRegionSelf),
+         localityOfObject(value,isRegionSelf),
          mudFacing(Agent,value),
          mudNearFeet(Agent,value),
          mudNearReach(Agent,value),
@@ -101,6 +104,7 @@ call_look_proc(Agent,LOC):-
          success=success(Agent,value)
        ]).
 
+nameStringsList(Region,ValueList):-findall(Value,nameStrings(Region,Value),ValueList).
 
 looking(Agent):- current_agent(Agent),!.
 looking(Agent):- tAgentGeneric(Agent),not(tDeleted(Agent)).
@@ -123,7 +127,7 @@ get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
 
 % Get only the Percepts
 
-% :-decl_mpred(mudGetPrecepts(agent,list(spatialthing)),[ask_module(user)]).
+% :-decl_mpred(mudGetPrecepts(agent,list(spatialthing)),[predModule(user)]).
 mudGetPrecepts(Agent,Percepts) :- mudGetPrecepts0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts).
 mudGetPrecepts0(Agent,Percepts) :-
   call((
@@ -135,7 +139,7 @@ mudGetPrecepts0(Agent,Percepts) :-
 	!.
 
 % Look at locations immediately around argent
-% :-decl_mpred(mudNearReach(agent,list(spatialthing)),[ask_module(user)]).
+% :-decl_mpred(mudNearReach(agent,list(spatialthing)),[predModule(user)]).
 mudNearReach(Agent,PerceptsO):- get_near0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
    
 get_near0(Agent,Percepts) :-
@@ -145,7 +149,7 @@ get_near0(Agent,Percepts) :-
 	view_dirs(Agent,Dirs,Percepts))),!.
 
 % Look only at location agent is currently in.
-% :-decl_mpred(mudNearFeet(agent,list(spatialthing)),[ask_module(user)]).
+% :-decl_mpred(mudNearFeet(agent,list(spatialthing)),[predModule(user)]).
 mudNearFeet(Agent,PerceptsO) :-  get_feet0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
 
 get_feet0(Agent,Percepts):-
@@ -196,10 +200,10 @@ check_for_blocks(Agent) :-
 	add(visually_blocked(Agent,Blocked_Percepts)).
 check_for_blocks(_).
 
-singleValued(height_on_obj(tSpatialthing,ftInt)).
-singleValued(mudSize(tSpatialthing,ftTerm)).
-singleValued(mudShape(tSpatialthing,ftTerm)).
-% singleValued(texture(spatialthing,term)).
+prologSingleValued(height_on_obj(tSpatialthing,ftInt)).
+prologSingleValued(mudSize(tSpatialthing,ftTerm)).
+prologSingleValued(mudShape(tSpatialthing,ftTerm)).
+% prologSingleValued(texture(spatialthing,term)).
 
 % High enough to see over obstacles??
 % Check to see how tall the agent is and if they are standing on an item

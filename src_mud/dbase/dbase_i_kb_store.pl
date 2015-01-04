@@ -242,7 +242,7 @@ transform_holds(H,In,Out):- once(transform_holds_3(H,In,Out)),!,ignore((In\=Out,
 
 transform_holds_3(_,A,A):-not(compound(A)),!.
 transform_holds_3(_,props(Obj,Props),props(Obj,Props)):-!.
-transform_holds_3(_,A,A):-functor_catch(A,F,N), predicate_property(A,_),mpred_prop(F,arity(N)),!.
+transform_holds_3(_,A,A):-functor_catch(A,F,N), predicate_property(A,_),mpred_prop(F,predArity(N)),!.
 transform_holds_3(HLDS,M:Term,OUT):-atom(M),!,transform_holds_3(HLDS,Term,OUT).
 transform_holds_3(HLDS,[P,A|ARGS],DBASE):- var(P),!,DBASE=..[HLDS,P,A|ARGS].
 transform_holds_3(HLDS, ['[|]'|ARGS],DBASE):- trace_or_throw(list_transform_holds_3(HLDS,['[|]'|ARGS],DBASE)).
@@ -440,7 +440,7 @@ nonground_throw_or_fail(C):- not_is_release,not(ground(C)),!,( (test_tl(thlocal:
 
 
 into_assertable_form_trans(G,was_asserted_gaf(G)):- functor_catch(G,F,_),mpred_prop(F,was_asserted_gaf),!.
-into_assertable_form_trans(G,was_asserted_gaf(G)):- functor_catch(G,F,_),mpred_prop(F,mudQueryWithPred(was_asserted_gaf)),!.
+into_assertable_form_trans(G,was_asserted_gaf(G)):- functor_catch(G,F,_),mpred_prop(F,predProxyQuery(was_asserted_gaf)),!.
 
 /*
 into_assertable_form(M:H,G):-atom(M),!,into_assertable_form(H,G).

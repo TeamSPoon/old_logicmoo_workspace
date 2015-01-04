@@ -14,8 +14,8 @@
 :- register_module_type(utility).
 
 % live another day to fight (meaning repl_to_string/1 for now is in prolog)
-% local_decl_db_prop(repl_writer(agent,term),[singleValued,predSingleValueDefault(2,default_repl_writer)]).
-% local_decl_db_prop(repl_to_string(agent,term),[singleValued,predSingleValueDefault(2,default_repl_obj_to_string)]).
+% local_decl_db_prop(repl_writer(agent,term),[prologSingleValued,argSingleValueDefault(2,default_repl_writer)]).
+% local_decl_db_prop(repl_to_string(agent,term),[prologSingleValued,argSingleValueDefault(2,default_repl_obj_to_string)]).
 
 :-swi_export(default_repl_writer/4).
 default_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=o),  ( TypeO == o -> fmt('~q= ~q.~n',[N,V]) ; fmt('~q=D(~w) ~q.~n',[N,TypeO,V])).
@@ -40,7 +40,8 @@ show_kb_preds(Agent,LOC,List):-
        locationToRegion(LOC,Region),
          once((thlocal:repl_writer(Agent,WPred);WPred=default_repl_writer)),
          once((thlocal:repl_to_string(Agent,ToSTR);ToSTR=default_repl_obj_to_string)),
-        subst(List,tRegion,Region,ListR),
+        subst(List,isRegionSelf,Region,ListRR),
+        subst(ListRR,isAgentSelf,Agent,ListR),
         must(show_kb_via_pred(WPred,ToSTR,ListR)),!.
 
 
@@ -68,8 +69,8 @@ show_kb_via_pred_0(WPred,ToSTR,F = Call):- !,show_kb_via_pred_format_call(WPred,
 show_kb_via_pred_0(WPred,ToSTR,forEach(Call,Show)):-!, show_kb_via_pred_format_call(WPred,ToSTR, Show, forEach(Call)).
 show_kb_via_pred_0(WPred,ToSTR,fmt(Show)):- !, show_kb_via_pred_format_call(WPred,ToSTR, Show ,true).
 show_kb_via_pred_0(WPred,ToSTR,call(Call)):- !,  with_output_to(string(Value),req(Call)),
-      fmt(Value),
-      show_kb_via_pred_0(WPred,ToSTR,fmt(Value)).
+      fmt(Value),!.
+      % show_kb_via_pred_0(WPred,ToSTR,fmt(Value)).
 
 show_kb_via_pred_0(WPred,ToSTR,once(Call)):- !,show_kb_via_pred_format_call(WPred,ToSTR,Call,once(Call)).
 show_kb_via_pred_0(WPred,ToSTR,all(Call)):- !,functor(Call,F,_), show_kb_via_pred_1(WPred,ToSTR,F,all(Call)).
@@ -94,8 +95,13 @@ show_kb_via_pred_fmt(WPred,ToSTR,SayIt,Type,listof(GCall)):-!,findall(SayIt,ccat
 show_kb_via_pred_fmt(WPred,ToSTR,SayIt,Type,GCall):-!,findall(SayIt,ccatch(req(GCall),Error,(dmsg(error(SayIt=Error:GCall)),fail)),Count),
     merge_list_on_p(WPred,ToSTR,SayIt,Type,GCall,_NewValue,Count).
 
+
+merge_list_on_p(WPred,ToSTR,SayIt,Type,GCall,_NewValue,[]):-
+  fmt_holds_tcall(WPred,ToSTR,SayIt,Type,[noVal]).
+
 merge_list_on_p(WPred,ToSTR,SayIt,Type,GCall,_NewValue,[]):-
   fmt_holds_tcall(WPred,ToSTR,SayIt,Type,notFound(f1SayIt,SayIt,Type,GCall)).
+
 
 merge_list_on_p(WPred,ToSTR,SayIt,Type,_GCall,_NewValue,SayItList):-  SayIt = ( _ = _ ),!,
   findall(K,(member(KV,SayItList),arg(1,KV,K)),Keys),

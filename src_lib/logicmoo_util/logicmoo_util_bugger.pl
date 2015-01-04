@@ -1630,8 +1630,9 @@ with_no_assertions(THead,Call):-
 
 to_thread_head((H:-B),TL,HO,(HH:-B)):-!,to_thread_head(H,TL,HO,HH),!.
 to_thread_head(thglobal:Head,thglobal,thglobal:Head,Head):- !.
-to_thread_head(user:Head,user,user:Head,Head):- !.
 to_thread_head(TL:Head,TL,TL:Head,Head):-!, check_thread_local(TL:Head).
+% to_thread_head(Head,Module,Module:Head,Head):-Head \= (_:_), predicate_module(Head,Module),!.
+to_thread_head(user:Head,user,user:Head,Head):- !.
 to_thread_head(Head,thlocal,thlocal:Head,Head):-!,check_thread_local(thlocal:Head).
 to_thread_head(Head,tlbugger,tlbugger:Head,Head):- check_thread_local(tlbugger:Head).
 

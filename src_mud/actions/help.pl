@@ -14,7 +14,7 @@ mudSubclass(tAgentcol,tCol).
 % type_action_info(human_player,help, "shows this help").
 type_action_info(tHumanPlayer,actHelp(isOptional(ftString,"")), "shows this help").
 
-action_info(What,ftText("command is: ",What)):- tActionType(What).
+action_info(What,ftText("command is: ",What)):- vtActionTemplate(What).
 
 
 :-swi_export(get_type_action_help_commands_list/3).
@@ -23,14 +23,14 @@ get_type_action_help_commands_list(A,B,C):-no_repeats(get_type_action_help_0(A,B
 :-swi_export(get_type_action_templates/1).
 get_type_action_templates(Templ):- no_repeats((get_type_action_help_0(_,Templ,_),good_template(Templ))).
 
-tActionType(Templ):-get_type_action_templates(Templ).
+vtActionTemplate(Templ):-get_type_action_templates(Templ).
 
 :-swi_export(good_template/1).
 good_template(Templ):- \+ contains_singletons(Templ).
 
 get_type_action_help_0(What,TEMPL,Help):- call_no_cuts(type_action_info(What,TEMPL,Help)).
 get_type_action_help_0(_What,TEMPL,Help):- call_no_cuts(action_info(TEMPL,Help)).
-get_type_action_help_0(_What,TEMPL,S):-    call_no_cuts(tActionType(TEMPL)),sformat(S,'Prolog looks like: ~q',[TEMPL]).
+get_type_action_help_0(_What,TEMPL,S):-    call_no_cuts(vtActionTemplate(TEMPL)),sformat(S,'Prolog looks like: ~q',[TEMPL]).
 get_type_action_help_0(isaFn(A),TEMPL,ftText(Text,'does: ',do(A2,TEMPL))):- between(1,5,L),length(Text,L),get_agent_text_command(A,Text,A2,Goal),(nonvar(Goal)->TEMPL=Goal;TEMPL=Text).
 get_type_action_help_0(What,Syntax,ftText([makes,happen,List])):- call_no_cuts(action_rules(Agent,Verb,[Obj|Objs],List)),atom(Verb),safe_univ(Syntax,[Verb,Obj|Objs]), 
                      % once(member(isa(Obj,_Type),List);_Type=term),
@@ -62,7 +62,7 @@ agent_call_command(_Agent,actHelp(Str)) :-commands_list(ListS),forall(member(E,L
 write_string_if_contains("",E):-!,fmt(E).
 write_string_if_contains(Must,E):-ignore((with_output_to(string(Str),fmt(E)),str_contains_all([Must],Str),fmt(Str))).
 
-term_specifier_text(Text,vtVerb,Inst):- get_type_action_templates(A),nonvar(A),functor_safe(A,Inst,_),name_text(Inst,Text).
+hook_coerce(Text,vtVerb,Inst):- get_type_action_templates(A),nonvar(A),functor_safe(A,Inst,_),name_text(Inst,Text).
 
 %agent_text_command(Agent,[Who],Agent,Cmd):- nonvar(Who), get_type_action_templates(Syntax),Syntax=..[Who,isOptional(_,Default)],Cmd=..[Who,Default].
 %agent_text_command(Agent,[Who,Type],Agent,Cmd):- get_type_action_templates(Syntax),nonvar(Who),Syntax=..[Who,isOptional(Type,_)],Cmd=..[Who,Type].

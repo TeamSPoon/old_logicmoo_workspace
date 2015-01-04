@@ -427,9 +427,9 @@ in_world_move0(LOC,Agent,Dir) :-
         ((add(mudAtLoc(Agent,XXYY)),
         is_asserted(mudAtLoc(Agent,LOC2)),
          LOC2 \== LOC)),
-   ifThen(( Region1\==Region2) ,raise_location_event(LOC,notice(reciever,leave(Agent,Region1,to(Dir))))),
+   ifThen(( Region1\==Region2) ,raise_location_event(LOC,actNotice(reciever,actLeave(Agent,Region1,to(Dir))))),
         reverse_dir(Dir,Rev),
-   ifThen(( Region1\==Region2) ,raise_location_event(XXYY,notice(reciever,enter(Agent,Region2,from(Rev))))),!,
+   ifThen(( Region1\==Region2) ,raise_location_event(XXYY,actNotice(reciever,actEnter(Agent,Region2,from(Rev))))),!,
 	check_for_fall(LOC,XXYY,Agent)]).
 
 check_behind_for_ground(LOC):-nonvar(LOC).

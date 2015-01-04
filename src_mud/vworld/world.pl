@@ -116,7 +116,7 @@ metaclass(agentcol).
 metaclass(itemcol).
 % isa(metaclass,metaclass).
 
-% argsIsaInList(typeGenls(col,metaclass)).
+% predArgTypes(typeGenls(col,metaclass)).
 
 % decl_database_hook(assert(_),typeGenls(_,MC)):-assert_isa(MC,metaclass).
 

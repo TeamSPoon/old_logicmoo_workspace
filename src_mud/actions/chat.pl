@@ -38,7 +38,7 @@ chat_command_parse_2(Agent,Say,Where,What,actProlog(do_social(Agent,Say,Where,Wh
 do_social(Agent,Say,Whom,Text):-
    mudAtLoc(Agent,Where),
    asInvoked(Cmd,[Say,Agent,Whom,Text]),
-   raise_location_event(Where,notice(reciever,Cmd)).
+   raise_location_event(Where,actNotice(reciever,Cmd)).
 
 :- module_predicates_are_exported.
 

@@ -15,7 +15,7 @@
 
 :- register_module_type(mtCommand).
 
-tActionType(actDrop(tItem)).
+vtActionTemplate(actDrop(tItem)).
 
 % Drop something
 agent_call_command(Agent,actDrop(SObj)) :-

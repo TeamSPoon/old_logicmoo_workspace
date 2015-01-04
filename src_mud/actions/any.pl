@@ -24,7 +24,7 @@ action_requires_states(_Agent,List,Preconds):-findall(A,(member(A,List),\+ funct
 action_rules(_,_,_,_):-fail.
 
 action_rules(Agent,actUse,[Obj],[mudPossess(Agent,Obj),mudIsa(Obj,tUseable),mudStowed(Agent,Obj)->using(Agent,Obj)]).
-action_rules(Agent,actStow,[Obj],[mudPossess(Agent,Obj),mudIsa(Obj,tStowable),genlPreds(Using,'controls'),[Using,Agent,Obj]]->[mudStowed,Agent,Obj]).
+action_rules(Agent,actStow,[Obj],[mudPossess(Agent,Obj),mudIsa(Obj,tStowable),genlPreds(Using,'mudControls'),[Using,Agent,Obj]]->[mudStowed,Agent,Obj]).
 
 % Use something
 agent_call_command(Agent,ACT) :-

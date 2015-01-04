@@ -93,8 +93,8 @@ shrink_clause( HB,HB).
 :- decl_mpred_hybrid mudSubclass/2.
 :- decl_mpred_hybrid mudTypeGrid/3.
 :- decl_mpred_hybrid(mudSubft/2).
-:- decl_mpred_hybrid(singleValued/1).
-:- discontiguous(singleValued/1).
+:- decl_mpred_hybrid(prologSingleValued/1).
+:- discontiguous(prologSingleValued/1).
 
 :-ensure_loaded(dbase_i_deduce).
 
@@ -175,16 +175,10 @@ enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_last(X,Y),Body),L
 enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_np_last(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
 
 
+:-dynamic_multifile_exported(coerce/4).
 
-:- dynamic_multifile_exported(decl_coerce/3).
-
-
-decl_coerce(_,_,_):-fail.
-
-:-dynamic_multifile_exported(coerce/3).
-
-coerce(What,Type,NewThing):-decl_coerce(What,Type,NewThing),!.
-coerce(What,_Type,NewThing):-NewThing = What.
+coerce(What,Type,NewThing,_Else):-coerce(What,Type,NewThing),!.
+coerce(_ ,_,     NewThing,Else):- NewThing = Else.
 
 
 
@@ -192,14 +186,14 @@ coerce(What,_Type,NewThing):-NewThing = What.
 :- meta_predicate tick_every(*,*,0).
 :- meta_predicate register_timer_thread(*,*,0).
 
-:- decl_mpred_hybrid((ttNotCreatableType/1, tCol/1, mudSubclass/2, argsIsaInList/1 ,ttCreateable/1, createableSubclassType/2)).
+:- decl_mpred_hybrid((ttNotCreatableType/1, tCol/1, mudSubclass/2, predArgTypes/1 ,ttCreateable/1, createableSubclassType/2)).
 
 /*
 :- decl_mpred_hybrid((createableSubclassType(col,col))).
 :- decl_mpred_hybrid((ttCreateable(col))).
 :- decl_mpred_hybrid type_grid/3.
 */
-:- decl_mpred_hybrid(((tFormatted/1,
+:- decl_mpred_hybrid(((vFormatted/1,
                        mudContains/2))).
 
 
@@ -351,7 +345,7 @@ logical_functor(X):-atom(X),member(X,[',',';']).
 
 */
 
-%:- multifile argsIsaInList/2.
+%:- multifile predArgTypes/2.
 
 %:- meta_predicate man:with_assertions(:,0).
 %:- meta_predicate intersect(?,0,?,0,0,-).
@@ -367,15 +361,15 @@ logical_functor(X):-atom(X),member(X,[',',';']).
 
 :- register_module_type(utility).
 
-agent_call_command(_Gent,ftListFn(Obj)):- term_listing(Obj).
+agent_call_command(_Gent,actGrep(Obj)):- term_listing(Obj).
 
 
 :-declare_dbase_local_dynamic(mudAtLoc,2).
 
 :-ensure_loaded(dbase_i_pldoc).
 :-ensure_loaded(dbase_i_coroutining).
-%:-discontiguous(singleValued/2).
-%:-discontiguous(multiValued/1).
+%:-discontiguous(prologSingleValued/2).
+%:-discontiguous(prologMultiValued/1).
 % =================================================================================================
 % world database
 % =================================================================================================
@@ -415,7 +409,7 @@ verify_sanity(P):- dmsg('$ERROR_incomplete_SANITY'(P)),!.
 :- decl_mpred_prolog(mudMoveDist/2).
 :- swi_export(mudMoveDist/2).
 :- dynamic(mudMoveDist/2).
-:- decl_mpred(mudMoveDist/2,[argsIsaInList(mudMoveDist(tAgentGeneric,ftInt)),singleValued,ask_module(user),query(call),predSingleValueDefault(2,1)]).
+:- decl_mpred(mudMoveDist/2,[predArgTypes(mudMoveDist(tAgentGeneric,ftInt)),prologSingleValued,predModule(user),query(call),argSingleValueDefault(2,1)]).
 
 % mudMoveDist(X,Y):-callStub_moo(holds_t,mudMoveDist(X,Y)).
 
@@ -664,7 +658,7 @@ db_op0(Op,nameStrings(A,S0)):- nonvar(S0),determinerRemoved(S0,String,S),!,db_re
 db_op0(Op,props(Obj,nameStrings(Str))):-!,db_reop(Op,nameStrings(Obj,Str)).
 db_op0(query(HLDS,Must),mudIsa(Term,Var)):- !,call_expanded_for(query(HLDS,Must),call(call,isa_backchaing(Term,Var))).
 db_op0(Op,mudIsa(A,SubType)):- dbase_t(createableSubclassType,SubType,Type),!,db_reop(Op,mudIsa(A,Type)),db_reop(Op,mudIsa(A,SubType)).
-db_op0(query(HLDS,Must),argIsa(P,N,T)):- call_expanded_for(query(HLDS,Must),(get_mpred_prop(P,argsIsaInList(ArgsIsa)),arg(N,ArgsIsa,T),must(nonvar(T)))).
+db_op0(query(HLDS,Must),argIsa(P,N,T)):- call_expanded_for(query(HLDS,Must),(get_mpred_prop(P,predArgTypes(ArgsIsa)),arg(N,ArgsIsa,T),must(nonvar(T)))).
 
 db_op0(change(_,_),Term):- glean_pred_props_maybe(Term),fail.
 
@@ -676,7 +670,7 @@ db_op0(Op,Wild):- transform_holds(dbase_t,Wild,Simpler),acceptable_xform(  Wild 
 % db_op0(Op,Term):- call(call,good_for_chaining(Op,Term)), db_rewrite(Op,Term,NewTerm),not(contains_singletons(NewTerm)),db_reop(Op,NewTerm).
 % db_op0(Op,Wild):- dsfdf db_op_simpler_wlc(Op,Wild,Simpler),!,db_reop(Op,Simpler).
 
-db_op0(change(DIR,_),argsIsaInList(Term)):- must(DIR==assert),!,show_call(decl_mpred(Term)),!.
+db_op0(change(DIR,_),predArgTypes(Term)):- must(DIR==assert),!,show_call(decl_mpred(Term)),!.
 
 db_op0(change(DIR,_),mudIsa(T,Type)):- must(DIR==assert),!,assert_isa(T,Type),!.
 
@@ -697,16 +691,16 @@ db_op_unit(Op,C0,mudIsa,ARGS):- type_error_checking,!, trace_or_throw(db_op_unit
 db_op_unit(Op,C0,Prop,_ARGS):- get_mpred_prop(Prop,use_db_op(Other)),!,call(Other,Op,C0).
 
 % assert_with_pred/1
-db_op_unit(change(assert,A),C0,Prop,_RGS):- get_mpred_prop(Prop,mudAssertWithPred(How)),!, must(nonvar(How)), once(ignore((call(How,C0), run_database_hooks(assert(A),C0)))).
+db_op_unit(change(assert,A),C0,Prop,_RGS):- get_mpred_prop(Prop,predProxyAssert(How)),!, must(nonvar(How)), once(ignore((call(How,C0), run_database_hooks(assert(A),C0)))).
 
-% mudRetractWithPred/1
-db_op_unit(change(retract,A),C0,Prop,_RGS):- get_mpred_prop(Prop,mudRetractWithPred(How)),!, must(nonvar(How)), once(ignore((call(How,C0), run_database_hooks(retract(A),C0)))).
+% predProxyRetract/1
+db_op_unit(change(retract,A),C0,Prop,_RGS):- get_mpred_prop(Prop,predProxyRetract(How)),!, must(nonvar(How)), once(ignore((call(How,C0), run_database_hooks(retract(A),C0)))).
 
 
 % db_op_unit(query(HLDS,Must),_C0,Prop,ARGS):- bad_idea, get_mpred_prop(Prop,extentAsserted),!,call_expanded_for(query(HLDS,Must),dbase_t_p2(Prop,ARGS)).
 
-% mudQueryWithPred/1
-db_op_unit(query(Must,HLDS),C0,Prop,_RGS):- get_mpred_prop(Prop,mudQueryWithPred(How)),!, call_expanded_for(query(Must,HLDS),call(How,C0)).
+% predProxyQuery/1
+db_op_unit(query(Must,HLDS),C0,Prop,_RGS):- get_mpred_prop(Prop,predProxyQuery(How)),!, call_expanded_for(query(Must,HLDS),call(How,C0)).
 
 
 % plain prop
@@ -736,8 +730,8 @@ db_op_exact(Op,G):- when_debugging(blackboard,dmsg(db_op_exact(Op,G))),fail.
 db_op_exact(change(retract,all),C):- !, db_quf(change(retract,all),C,U,Template),!, when_debugging(retract,dtrace), doall((call_mpred_fast(U),hooked_retractall(Template))).
 db_op_exact(change(retract,A),C):- must(db_quf(change(retract,A),C,U,Template)),!,  when_debugging(retract,dtrace), call_mpred_fast(U),!,hooked_retract(Template).
 db_op_exact(change(Assert,OldV),W):- non_assertable(W,Why),trace_or_throw(todo(db_op(change(Assert,OldV), non_assertable(Why,W)))).
-db_op_exact(change(assert,Must),C0):- db_quf(change(assert,Must),C0,U,C),!,must(call_mpred_fast(U)),functor_catch(C,F,A),( get_mpred_prop(F,singleValued) -> must(db_assert_sv(Must,C,F,A)) ; must(db_assert_mv(Must,C,F,A))).
-db_op_exact(change(assert,Must),C):- trace_or_throw(dtrace),functor_catch(C,F,A), must_det((get_mpred_prop(F,singleValued) -> must_det(db_assert_sv(assert(Must),C,F,A)) ; must(db_assert_mv(assert(Must),C,F,A)))).
+db_op_exact(change(assert,Must),C0):- db_quf(change(assert,Must),C0,U,C),!,must(call_mpred_fast(U)),functor_catch(C,F,A),( get_mpred_prop(F,prologSingleValued) -> must(db_assert_sv(Must,C,F,A)) ; must(db_assert_mv(Must,C,F,A))).
+db_op_exact(change(assert,Must),C):- trace_or_throw(dtrace),functor_catch(C,F,A), must_det((get_mpred_prop(F,prologSingleValued) -> must_det(db_assert_sv(assert(Must),C,F,A)) ; must(db_assert_mv(assert(Must),C,F,A)))).
 %db_op_exact(Must, Term):- !,call_expanded_for(Must,Term).
 db_op_exact(Op,C):- trace_or_throw(unhandled(db_op_exact(Op,C))).
 
@@ -798,7 +792,7 @@ never_dbase_mpred(mpred_arity).
 db_assert_mv(_Must,end_of_file,_,_):-!.
 % db_assert_mv(_Must,C,_F,_A):- hooked_assertz(C),!.
 db_assert_mv(Must,C,F,A):- test_tl(thlocal:adding_from_srcfile), dmsg(db_assert_mv(Must,C,F,A)), hooked_assertz(C).
-db_assert_mv(Must,C,F,A):- dmsg(db_assert_mv(Must,C,F,A)), must_det(mpred_prop(F,tOrdered) -> hooked_assertz(C) ; hooked_asserta(C)).
+db_assert_mv(Must,C,F,A):- dmsg(db_assert_mv(Must,C,F,A)), must_det(mpred_prop(F,prologOrdered) -> hooked_assertz(C) ; hooked_asserta(C)).
 
 
 % assert_with to change(CA1,CB2) singlevalue pred
@@ -947,7 +941,7 @@ insert_into([Carry|ARGS],After,Insert,[Carry|NEWARGS]):-
    After1 is After - 1,
    insert_into(ARGS,After1,Insert,NEWARGS).
 
-term_specifier_text(Text,tPred,Pred):- mpred_prop(Pred,arity(_)),name_text(Pred,Text).
+hook_coerce(Text,tPred,Pred):- mpred_prop(Pred,predArity(_)),name_text(Pred,Text).
 
 :- multifile(mudToHitArmorClass0 / 2).
 
@@ -1065,7 +1059,7 @@ assertz_local_game_clause(Head,Body):- get_mpred_type(Head,Type),!,must_det(asse
 assertz_local_game_clause(callable(prologOnly),Head,Body):- must_det(assertz_if_new_clause(Head,Body)),dmsg(used_clause_as_prologOnly(Head,Body)).
 assertz_local_game_clause(callable(static),Head,Body):- must_det(assertz_if_new_clause(Head,Body)),trace_or_throw(eRROR_maybe_used_clause_as_prologOnly(Head,Body)).
 assertz_local_game_clause(_,Head,true):- !,with_assertions(thlocal:adding_from_srcfile,add(Head)),!.
-assertz_local_game_clause(callable(prologHybrid),Head,Body):-!, assertz_if_new_clause(hybrid_rule(Head,Body),true),dmsg(used_clause_as_hybridRule(Head,Body)),
+assertz_local_game_clause(callable(prologHybrid),Head,Body):-!, assertz_if_new_clause(predHybridRule(Head,Body),true),dmsg(used_clause_as_hybridRule(Head,Body)),
    decl_mpred_hybrid(F/A),!,declare_dbase_local_dynamic_really(user,F,A).
 assertz_local_game_clause(Type,Head,BodyIn):- once(make_body_clause(Head,BodyIn,Body)),must_det(assertz_if_new_clause(Head,Body)),dmsg(used_clause_as_unknown(Type,Head,Body)).
 assertz_local_game_clause(Type,Head,Body):- must_det(assertz_if_new_clause(Head,Body)),dmsg(used_clause_as(Type,Head,Body)).
@@ -1174,8 +1168,8 @@ verb_after_arg(_,_,1).
 :- style_check(+discontiguous).
 :- style_check(-discontiguous).
 
-:- decl_mpred(predSingleValueDefault, 3).
-:- decl_mpred(ask_module, 2).
+:- decl_mpred(argSingleValueDefault, 3).
+:- decl_mpred(predModule, 2).
 
 is_clause_moo_special(M:H,B):-atomic(M),!,is_clause_moo_special(H,B).
 is_clause_moo_special(H,_B):-compound(H),functor_catch(H,F,_),not(get_mpred_prop(F,prologBuiltin)),!,special_head(H,F),!.

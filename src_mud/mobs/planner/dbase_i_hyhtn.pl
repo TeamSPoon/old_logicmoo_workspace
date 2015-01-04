@@ -31,7 +31,7 @@ in_dyn_pred(_DB,Call):- functor(Call,F,A), mpred_arity(F,A), predicate_property(
 
 env_mpred(Prop,F,A):- mpred_prop(F,Prop),ignore(mpred_arity(F,A)).
 
-get_mpred_stubType(F,A,StubIn):- env_mpred(stubType(Stub),F,A),!,must(StubIn=Stub).
+get_mpred_stubType(F,A,StubIn):- env_mpred(predStubType(Stub),F,A),!,must(StubIn=Stub).
 get_mpred_stubType(F,A,dyn):-env_mpred(dyn,F,A).
 
 :-assert_if_new(env_kb(l)).
@@ -45,7 +45,7 @@ decl_mpred_env(Props,(H,T)):-!,decl_mpred_env(Props,H),decl_mpred_env(Props,T).
 decl_mpred_env([H|T],Pred):-!,decl_mpred_env(H,Pred),decl_mpred_env(T,Pred).
 decl_mpred_env((H,T),Pred):-!,decl_mpred_env(H,Pred),decl_mpred_env(T,Pred).
 decl_mpred_env(kb(KB),_):- assert_if_new(env_kb(KB)),fail.
-decl_mpred_env(stubType(dyn),Pred):-!, decl_mpred_env(dyn,Pred).
+decl_mpred_env(predStubType(dyn),Pred):-!, decl_mpred_env(dyn,Pred).
 decl_mpred_env(Prop,Pred):- functor_h(Pred,F,A),decl_mpred_env(Prop,Pred,F,A).
 
 decl_mpred_env(Prop,Pred,F,A):- !,swi_export(F/A),dynamic(F/A),multifile(F/A), decl_mpred(Pred,Prop),!.
@@ -104,7 +104,7 @@ env_op2(with_pred(Pred),OP,P):-!, call(Pred,OP,P).
 % env_op2(ENV,OP,P):- dmsg(env_op2(ENV,OP,P)),fail.
 env_op2(ENV,OP,P):- lg_op2(ENV,OP,OP2),!,call(OP2,P).
 env_op2(ENV,OP,P):- trace,simplest(ENV),!,call(OP,P).
-env_op2(stubType(ENV),OP,P):-!,env_op(ENV,OP,P).
+env_op2(predStubType(ENV),OP,P):-!,env_op(ENV,OP,P).
 % !,env_op2(in_dyn(DB),OP,P).
 env_op2(_,OP,P):-!,env_op2(in_dyn(db),OP,P).
 env_op2(_,_,_):-trace,fail.
@@ -433,30 +433,30 @@ inside_queue(Q,E) :-
 
 
 :-swi_export(on_call_decl_hyhtn/0).
-on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(domcache)],(temp_assertIndivConds/1)). % Used for grounding operators
-on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(domcache)],(is_of_primitive_sort/2, is_of_sort/2)).
-on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(domcache)],(methodC/7, opParent/6,operatorC/5,gOperator/3)).
-on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(domcache)],(objectsC/2,objectsD/2,atomic_invariantsC/1)).% Used only dynamic objects
-on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(domcache)],(objectsOfSort/2)).      % Used to store all objects of a sort
+on_call_decl_hyhtn :- decl_mpred_env([predStubType(dyn),kb(domcache)],(temp_assertIndivConds/1)). % Used for grounding operators
+on_call_decl_hyhtn :- decl_mpred_env([predStubType(dyn),kb(domcache)],(is_of_primitive_sort/2, is_of_sort/2)).
+on_call_decl_hyhtn :- decl_mpred_env([predStubType(dyn),kb(domcache)],(methodC/7, opParent/6,operatorC/5,gOperator/3)).
+on_call_decl_hyhtn :- decl_mpred_env([predStubType(dyn),kb(domcache)],(objectsC/2,objectsD/2,atomic_invariantsC/1)).% Used only dynamic objects
+on_call_decl_hyhtn :- decl_mpred_env([predStubType(dyn),kb(domcache)],(objectsOfSort/2)).      % Used to store all objects of a sort
 
-on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(domcache) /*stubType(with_pred(bb_op(_)))*/],(related_op/2, gsubstate_classes/3, gsstates/3)).  
+on_call_decl_hyhtn :- decl_mpred_env([predStubType(dyn),kb(domcache) /*predStubType(with_pred(bb_op(_)))*/],(related_op/2, gsubstate_classes/3, gsstates/3)).  
 
-on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(nodecache) /*stubType(with_pred(bb_op(_)))*/],(op_score/2)). 
-on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(nodecache)/*stubType(rec_db)*/],(node/5,final_node/1)).
-on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(nodecache)],(tp_goal/3,closed_node/6,solved_node/2, goal_related_search/1)). 
-on_call_decl_hyhtn :- decl_mpred_env([stubType(rec_db),kb(nodecache)],(goal_related/3)).
-on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(nodecache)],(current_num/2)).
-on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(nodecache)],(tn/6)). % Used to store full expanded steps
-on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(nodecache)],(tp_node/6)).
-% on_call_decl_hyhtn :- decl_mpred_env([stubType(dyn),kb(nodecache)],(tp_node_cached/6)).
-% on_call_decl_hyhtn :- decl_mpred_env([stubType(with_pred(gvar_list(tnodeSORTED))),kb(nodecache)],tp_node/6).
+on_call_decl_hyhtn :- decl_mpred_env([predStubType(dyn),kb(nodecache) /*predStubType(with_pred(bb_op(_)))*/],(op_score/2)). 
+on_call_decl_hyhtn :- decl_mpred_env([predStubType(dyn),kb(nodecache)/*predStubType(rec_db)*/],(node/5,final_node/1)).
+on_call_decl_hyhtn :- decl_mpred_env([predStubType(dyn),kb(nodecache)],(tp_goal/3,closed_node/6,solved_node/2, goal_related_search/1)). 
+on_call_decl_hyhtn :- decl_mpred_env([predStubType(rec_db),kb(nodecache)],(goal_related/3)).
+on_call_decl_hyhtn :- decl_mpred_env([predStubType(dyn),kb(nodecache)],(current_num/2)).
+on_call_decl_hyhtn :- decl_mpred_env([predStubType(dyn),kb(nodecache)],(tn/6)). % Used to store full expanded steps
+on_call_decl_hyhtn :- decl_mpred_env([predStubType(dyn),kb(nodecache)],(tp_node/6)).
+% on_call_decl_hyhtn :- decl_mpred_env([predStubType(dyn),kb(nodecache)],(tp_node_cached/6)).
+% on_call_decl_hyhtn :- decl_mpred_env([predStubType(with_pred(gvar_list(tnodeSORTED))),kb(nodecache)],tp_node/6).
 
 % Tasks
-on_call_decl_hyhtn :- decl_mpred_env([kb(domtasks),stubType(dyn)], ( htn_task/3, planner_task/3, planner_task_slow/3 )).
+on_call_decl_hyhtn :- decl_mpred_env([kb(domtasks),predStubType(dyn)], ( htn_task/3, planner_task/3, planner_task_slow/3 )).
 
 % Contents of a OCLh Domain
 on_call_decl_hyhtn :- 
- decl_mpred_env([kb(domfile),stubType(dyn)],[
+ decl_mpred_env([kb(domfile),predStubType(dyn)],[
   domain_name/1,
   sorts/2,
   substate_classes/3,

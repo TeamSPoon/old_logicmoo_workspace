@@ -16,7 +16,7 @@
 
 :- register_module_type(mtCommand).
 
-tActionType(actTake(tItem)).
+vtActionTemplate(actTake(tItem)).
 
 :-decl_mpred(mudPossess,notAssertible).
 
@@ -54,21 +54,21 @@ remove_object_loc(Obj):-
 
 do_permanence_change(actTake,_,_,Obj):-
         props(Obj,mudPermanence(actTake,Dissapears)), 
-		member(Dissapears,[0,dissapears]),
+		member(Dissapears,[0,vTakenDeletes]),
         remove_object_loc(Obj).
 do_permanence_change(actTake,Agent,_,Obj) :-
 	props(Obj,mudPermanence(actTake,Held)),
-           member(Held,[1,held]),
+           member(Held,[1,vTakenHolds]),
         remove_object_loc(Obj),
 	add(mudStowed(Agent,Obj)),
         must_posses(Agent,Obj).
 do_permanence_change(actTake,Agent,_,Source) :-
-	props(Source,mudPermanence(actTake,copy(What))),
+	props(Source,mudPermanence(actTake,vTakenCopyFn(What))),
         create_new_object([What],Obj),
         add(mudStowed(Agent,Obj)),
         must_posses(Agent,Obj).
 do_permanence_change(actTake,_Agent,_,Obj) :-
-        props(Obj,mudPermanence(actTake,stays)),!.
+        props(Obj,mudPermanence(actTake,vTakenStays)),!.
 do_permanence_change(actTake,Agent,_,Obj) :-
         remove_object_loc(Obj),
 	add(mudStowed(Agent,Obj)),

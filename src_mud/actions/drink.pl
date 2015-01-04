@@ -14,7 +14,7 @@
 
 action_info(actDrink(tDrinkable),"Drink a Drinkable Item").
 
-% Eat something held
+% Drink something held
 % Check to make sure it's in the agents possession... 
 % if it is, process it's worth, then destroy it
 agent_call_command(Agent,actDrink(Obj)) :-

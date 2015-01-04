@@ -75,13 +75,13 @@ where_atloc(Agent,'OffStage'):-nonvar(Agent).
 call_agent_action_lc(Agent,CMD):-
    % start event
  ignore((must_det_l([where_atloc(Agent,Where),
-   raise_location_event(Where,notice(reciever,begin(Agent,CMD))),   
+   raise_location_event(Where,actNotice(reciever,begin(Agent,CMD))),   
    catch(call_agent_where_action_lc(Agent,Where,CMD),E,(fmt('call_agent_action/2 Error ~q ',[E])))]))),!.
 
 :-swi_export(send_command_completed_message/4).
 send_command_completed_message(Agent,Where,Done,CMD):-
      ignore((must_det_l([flush_output,renumbervars(CMD,SCMD),Message =..[Done,Agent,SCMD],
-                raise_location_event(Where,notice(reciever,Message)),
+                raise_location_event(Where,actNotice(reciever,Message)),
                 padd(Agent,mudLastCommand(SCMD)),flush_output]))),!.
 
 
