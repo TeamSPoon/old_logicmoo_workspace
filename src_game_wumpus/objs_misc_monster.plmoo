@@ -238,7 +238,7 @@ default_type_props(tAgentGeneric,[max_health(500)]).
 
 % :-end_module_type(dynamic).
 
-default_type_props(self,Type,[mudNamed(self),kwLabel(Lbl)|SP]):-  mudLabelTypeProps(Lbl,Type,SomeProps),nonvar(Type),flatten(SomeProps,SP).
+default_type_props(isSelf,Type,[mudNamed(isSelf),kwLabel(Lbl)|SP]):-  mudLabelTypeProps(Lbl,Type,SomeProps),nonvar(Type),flatten(SomeProps,SP).
 
 % Vacuum World example objects........
 mudLabelTypeProps(wl,tWall,[mudHeight(3),mudWeight(4)]).
@@ -264,7 +264,7 @@ mudLabelTypeProps(dr,tDoor,[mudHeight(3),mudWeight(2)]).
 mudLabelTypeProps(--,var,[]).
 
 % What an agent turns into upon death.
-% Must be named corpse (or edit abent_to_corpse/1 in lib.pl.
+% Must be named iCorpseFn (or edit agent_to_corpse/1 in lib.pl.
  mudLabelTypeProps(cp,tCorpsea,[mudHeight(1),mudWeight(1),mudPermanence(actTake,held),act_affect(actEat,mudCharge(+80)),act_affect(actTake,mudScore(+10))]).
  mudLabelTypeProps(cp,tCorpseb,[mudHeight(1),mudWeight(1),mudPermanence(actTake,held),act_affect(actEat,mudCharge(+120))]).
 mudLabelTypeProps(da,tCorpsec,[mudHeight(2),mudWeight(2)]).

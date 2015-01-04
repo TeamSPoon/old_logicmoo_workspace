@@ -238,7 +238,7 @@ default_type_props(agent,[max_health(500)]).
 
 % :-end_module_type(dynamic).
 
-default_type_props(self,Type,[named(self),kwLabel(Lbl)|SP]):-  label_type_props(Lbl,Type,SomeProps),nonvar(Type),flatten(SomeProps,SP).
+default_type_props(isSelf,Type,[named(isSelf),kwLabel(Lbl)|SP]):-  label_type_props(Lbl,Type,SomeProps),nonvar(Type),flatten(SomeProps,SP).
 
 % Vacuum World example objects........
 label_type_props(wl,wall,[height(3),weight(4)]).
@@ -264,7 +264,7 @@ label_type_props(dr,door,[height(3),weight(2)]).
 label_type_props(--,var,[]).
 
 % What an agent turns into upon death.
-% Must be named corpse (or edit abent_to_corpse/1 in lib.pl.
+% Must be named corpse (or edit agent_to_corpse/1 in lib.pl.
  label_type_props(cp,corpsea,[height(1),weight(1),permanence(take,held),act_affect(eat,charge(+80)),act_affect(take,score(+10))]).
  label_type_props(cp,corpseb,[height(1),weight(1),permanence(take,held),act_affect(eat,charge(+120))]).
 label_type_props(da,corpsec,[height(2),weight(2)]).

@@ -7,7 +7,7 @@ A single number, with the following meaning:
                     that cannot be opened or closed with the ``open'' and ``close''
                     commands.  The latter is useful for secret doors, trap doors,
                     or other doors that are opened and closed by something other
-                    than the normal commands, like a special procedure or script
+                    than the normal commands, isLike a special procedure or script
                     assigned to the room or an object in the room.
 
 1) Closeable door - Normal doors that can be opened, closed, locked, unlocked,

@@ -26,7 +26,7 @@ type_grid('SpaceInAHOC',5, [,,,,]).
 % center of room is 3,3,1 (rooms ranges are (15,15,13))
 
 % : style_check(singleton).
-:set_prolog_flag(double_quotes,string).
+:set_prolog_flag(double_quotes,ftString).
 :style_check(atom).
 
 %%:['../hyhtn/translog4.pl'].
@@ -34,11 +34,11 @@ type_grid('SpaceInAHOC',5, [,,,,]).
 
 predicates([
 % dynamic startrek
-  nameStrings(ftTerm,string),
-  pathName(tRegion,vtDirection,string),
+  nameStrings(ftTerm,ftString),
+  pathName(tRegion,vtDirection,ftString),
   localityOfObject(tAgentGeneric,'BPVLocation'),
   mudStowed(tAgentGeneric,'ProtectiveAttire'),
-  mudStowed(tAgentGeneric,'Weapon'),
+  mudStowed(tAgentGeneric,tWeapon),
   mudStowed(tAgentGeneric,'PortableObject'),
   wearsClothing(tAgentGeneric,'ProtectiveAttire'),
   wearsClothing(tAgentGeneric,'PortableObject'),
@@ -142,12 +142,12 @@ wearsClothing('iEnsign752','Item4BlueUniform755').
 
  /* found 53 for wearsClothing(_G1304,_G1305). */ 
 
-/* Prediate:  stowed/2 
+/* Prediate:  mudStowed/2 
 interpreted.
 file('c:/development/opensim4opencog/bin/cynd/startrek/mudreader.pl').
 line_count(57).
 number_of_clauses(1).
-Pattern: stowed(_G1328,_G1329). 
+Pattern: mudStowed(_G1328,_G1329). 
  */
 mudStowed(iCommanderData,'iPhaser676').
 mudStowed(iExplorer1,'iPhaser776').
@@ -166,7 +166,7 @@ mudStowed('NPC6Picard701','iPicardsFlute').
 mudStowed('NPC5Riker707','Item12Trombone711').
 mudStowed('NPC2Worf720','iPhaser724').
 
- /* found 16 for stowed(_G1328,_G1329). */ 
+ /* found 16 for mudStowed(_G1328,_G1329). */ 
 
 /* Prediate:  item/1 
 interpreted.
@@ -359,7 +359,7 @@ Pattern: somethingIsa(_G1422,_G1423).
  */
 somethingIsa('NPC0Geordi684',['NPC0',tAgentGeneric,'MaleAnimal']).
 somethingIsa(iCommanderData,['NPC1',tAgentGeneric,'MaleAnimal']).
-% somethingIsa(explorer(player1),[['OSimClassFn',string("player_osimmarine_mp")],agent,'MaleAnimal']).
+% somethingIsa(iPlayer1,[['OSimClassFn',ftString("player_osimmarine_mp")],agent,'MaleAnimal']).
 somethingIsa('NPC2Worf720',['NPC2',tAgentGeneric,'MaleAnimal']).
 somethingIsa('NPC3DrCrusher677',['NPC3',tAgentGeneric,'FemaleAnimal']).
 somethingIsa('NPC4Troi712',['NPC4',tAgentGeneric,'FemaleAnimal']).
@@ -378,11 +378,11 @@ somethingIsa('iEnsign744',['tEnsign',tAgentGeneric,'MaleAnimal']).
 somethingIsa('iEnsign748',['tEnsign',tAgentGeneric,'MaleAnimal']).
 somethingIsa('iEnsign752',['tEnsign',tAgentGeneric,'MaleAnimal']).
 somethingIsa('NPC1013Alexander671',['NPC1013',tAgentGeneric,'MaleAnimal']).
-somethingIsa('iPhaser676',['tPhaser','Handgun','Weapon','LightingDevice','PortableObject','DeviceSingleUser','SomethingToWear']).
-somethingIsa('iPhaser776',['tPhaser','Handgun','Weapon','LightingDevice','PortableObject','DeviceSingleUser','SomethingToWear']).
-somethingIsa('iPhaser700',['tPhaser','Handgun','Weapon','LightingDevice','PortableObject','DeviceSingleUser','SomethingToWear']).
-somethingIsa('iPhaser724',['tPhaser','Handgun','Weapon','LightingDevice','PortableObject','DeviceSingleUser','SomethingToWear']).
-somethingIsa('Item15PhaserRifle705',['Item1','Weapon','LightingDevice','PortableObject','DeviceSingleUser','SomethingToWear']).
+somethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','SomethingToWear']).
+somethingIsa('iPhaser776',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','SomethingToWear']).
+somethingIsa('iPhaser700',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','SomethingToWear']).
+somethingIsa('iPhaser724',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','SomethingToWear']).
+somethingIsa('Item15PhaserRifle705',['Item1',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','SomethingToWear']).
 somethingIsa('Item2RedUniform704',['Item2','ProtectiveAttire','PortableObject','SomethingToWear']).
 somethingIsa('Item2RedUniform710',['Item2','ProtectiveAttire','PortableObject','SomethingToWear']).
 somethingIsa('Item2RedUniform719',['Item2','ProtectiveAttire','PortableObject','SomethingToWear']).
@@ -436,12 +436,12 @@ somethingIsa('iComBadge750',['tComBadge','ProtectiveAttire','PortableObject','Ne
 somethingIsa('iComBadge754',['tComBadge','ProtectiveAttire','PortableObject','Necklace']).
 somethingIsa('Item7Sash725',['Item7','ProtectiveAttire','PortableObject','SomethingToWear']).
 somethingIsa('Item8VISOR688',['Item8','ProtectiveAttire','PortableObject']).
-somethingIsa('Item9MedicalTricorder681',['Item9','RodShapedObject','ControlDevice','HandTool','PortableObject']).
-somethingIsa('Item9MedicalTricorder682',['Item9','RodShapedObject','ControlDevice','HandTool','PortableObject']).
-somethingIsa('Item9MedicalTricorder683',['Item9','RodShapedObject','ControlDevice','HandTool','PortableObject']).
-somethingIsa('Item9Tricorder759',['Item9','RodShapedObject','ControlDevice','HandTool','PortableObject']).
-somethingIsa('Item9Tricorder760',['Item9','RodShapedObject','ControlDevice','HandTool','PortableObject']).
-somethingIsa('Item9Tricorder761',['Item9','RodShapedObject','ControlDevice','HandTool','PortableObject']).
+somethingIsa('Item9MedicalTricorder681',['Item9','RodShapedObject',tContolDevice,'HandTool','PortableObject']).
+somethingIsa('Item9MedicalTricorder682',['Item9','RodShapedObject',tContolDevice,'HandTool','PortableObject']).
+somethingIsa('Item9MedicalTricorder683',['Item9','RodShapedObject',tContolDevice,'HandTool','PortableObject']).
+somethingIsa('Item9Tricorder759',['Item9','RodShapedObject',tContolDevice,'HandTool','PortableObject']).
+somethingIsa('Item9Tricorder760',['Item9','RodShapedObject',tContolDevice,'HandTool','PortableObject']).
+somethingIsa('Item9Tricorder761',['Item9','RodShapedObject',tContolDevice,'HandTool','PortableObject']).
 somethingIsa('Item10DilithiumCrystal756',['Item10','LightingDevice','PortableObject','HandTool']).
 somethingIsa('Item10DilithiumCrystal757',['Item10','LightingDevice','PortableObject','HandTool']).
 somethingIsa('Item10DilithiumCrystal758',['Item10','LightingDevice','PortableObject','HandTool']).
@@ -499,7 +499,7 @@ somethingIsa('iArea1041',['BPVLocation','FreeSpaceContent']).
 somethingIsa('ShipMap123',[tItem]).
 localityOfObject('ShipMap123','iArea1000').
 verbOverride('ShipMap123',actExamine(this),
-  prologCall(fmt("
+  actProlog(fmt("
 STARSHIP ENTERPRISE
 
              Turbolift               |                Ten Forward
@@ -799,7 +799,7 @@ number_of_clauses(1).
 Pattern: somethingDescription(_G1470,_G1471). 
  */
 somethingDescription('NPC0Geordi684',["Lieutenant","Commander","Geordi","LaForge","Geordi LaForge","Lieutenant Commander Geordi LaForge is standing here","Geordi is the Chief Engineer of the Enterprise","He's blind, so he wears a special VISOR that lets him see things","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 3","mudMaxHitPoints: 12d12+3200","#$PunchingSomething mudBareHandDamage: 9d9+42","Geordi","Geordi LaForge","Lieutenant Commander Geordi LaForge is standing here","Geordi is the Chief Engineer of the Enterprise","He's blind, so he wears a special VISOR that lets him see things"]).
-somethingDescription(iCommanderData,["Lieutenant","Commander","Data","Android","Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He stowed superhuman strength, and is extremely tough","ACT_NICE_THIEF","AWARE","NOBACKSTAB","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOSUMMON","NOSLEEP","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 1","mudMaxHitPoints: 18d18+4000","#$PunchingSomething mudBareHandDamage: 10d10+75","Data","CycLBot","CycBot","CycBot1","Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He stowed superhuman strength, and is extremely tough"]).
+somethingDescription(iCommanderData,["Lieutenant","Commander","Data","Android","Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He mudStowed superhuman strength, and is extremely tough","ACT_NICE_THIEF","AWARE","NOBACKSTAB","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOSUMMON","NOSLEEP","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 1","mudMaxHitPoints: 18d18+4000","#$PunchingSomething mudBareHandDamage: 10d10+75","Data","CycLBot","CycBot","CycBot1","Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He mudStowed superhuman strength, and is extremely tough"]).
 somethingDescription(iExplorer1,["Lieutenant","Commander","Human","Player",
             "Explorer Player",
             "ACT_NICE_THIEF","AWARE","NOBACKSTAB","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOSUMMON",
@@ -930,7 +930,7 @@ somethingDescription('iArea1004',["The Brig","You're in the dimly lit Brig","Thi
 ***************************************************
 ']).
 somethingDescription('iArea1008',["A Corridor","You find yourself in the middle of a well lit corridor on the Enterprise","It isn't very wide, and the light beige walls have been rounded, making the corridor an oval shape","You see the holodeck's control panel beside the holodeck door, and it has some information on it"]).
-somethingDescription('iArea1006',["Transporter Room","You're in the Enterprise transporter room","A computer terminal is sitting near the southern wall, where the transporter chief can control the transporters","Eight round transport pads have been arranged in a circle, on a raised platform against the northern wall"]).
+somethingDescription('iArea1006',["Transporter Room","You're in the Enterprise transporter room","A computer terminal is sitting near the southern wall, where the transporter chief can control the transporters","Eight vRound transport pads have been arranged in a circle, on a raised platform against the northern wall"]).
 somethingDescription('iArea1042',["Transporter Beam","You find yourself in a transporter beam","All you can see is blue flashing light","It feels as though your body is racing around at high speeds","As you try to look down at your body, you realize that there's nothing there!"]).
 somethingDescription('iArea1007',["School","You step through the doors and find yourself in a large school room","Various tables and chairs are set up all around the room, and many paintings and drawings have been attached to the walls","Several computer consoles with a children's interface on them can be seen on the tables"]).
 somethingDescription('iArea1010',["Turbolift","You're in the turbolift","The turbolift walls have been rounded off, making it in the shape of a tube","Several vertical rows of lights make this place very well lit","From here, you can access the other decks on the Enterprise"]).
@@ -983,7 +983,7 @@ somethingDescription('iArea1015',["Sick Bay","You're in the middle of the Enterp
 somethingDescription('iArea1019',["A Corridor","You find yourself in the middle of a well lit corridor on the Enterprise","It isn't very wide, and the light beige walls have been rounded, making the corridor an oval shape"]).
 somethingDescription('iArea1017',["Holodeck 4 Entrance  A Narrow Alley","You emerge into a dark narrow alley","Tall dark brick buildings block your way north and south","You can see that the windows on the buildings are fairly high, and some have been boarded up","The smell from the rotting food and garbage mixing with the foul water on the ground is unbearable","You can hear the sounds of a bustling marketpace to the east","The archway leading out of the holodeck is west"]).
 somethingDescription('iArea1018',["Crusher's Quarters","You're in Doctor Crusher's quarters","Several different paintings are attached to the walls, and you also notice a few sculptures","A neatly made bed is located by the northern wall, in between two large windows looking out into space"]).
-somethingDescription('iArea1021',["Ten Forward","You're now in Ten Forward, the entertainment room of the Enterprise","The entire northern wall is covered with windows looking out into space, while two large wooden doors with the Starfleet insignia stamped on them face south","Many round metal tables are scattered around the room, surrounded by metal chairs","A long bar spans almost the entire length of the southern part of the room, and about two dozen bar stools are sitting in front of it","It's very noisy in here, due to all the talking and laughing"]).
+somethingDescription('iArea1021',["Ten Forward","You're now in Ten Forward, the entertainment room of the Enterprise","The entire northern wall is covered with windows looking out into space, while two large wooden doors with the Starfleet insignia stamped on them face south","Many vRound metal tables are scattered around the room, surrounded by metal chairs","A long bar spans almost the entire length of the southern part of the room, and about two dozen bar stools are sitting in front of it","It's very noisy in here, due to all the talking and laughing"]).
 somethingDescription('iArea1020',["Enterprise Security","You're standing in the dimly lit Enterprise Security","Weapons lockers cover all of the walls, except along the northern wall, where a large glass window protects dozens of different phasors, blaster rifles, and other high tech weapons","Three long tables surrounded by chairs stretch across the room"]).
 somethingDescription('iArea1022',["Shuttle Bay","You're in the main shuttle bay of the Enterprise","It's quite a large room, with a very high ceiling and a lot of floor space","You can see three different shuttle crafts sitting here, waiting to be flown","A large grey door leads into space"]).
 somethingDescription('iArea1024',["A Corridor","You find yourself in the middle of a well lit corridor on the Enterprise","It isn't very wide, and the light beige walls have been rounded, making the corridor an oval shape","You notice a tiny computer panel embedded into the wall"]).
@@ -1227,15 +1227,15 @@ sorts(primitive_sorts, [
         train, traincar, truck, road_route, rail_route, region,agent]).
 
 sorts(physical_obj, [vehicle, package,'PortableObject',agent]).
-sorts('PortableObject',['SomethingToWear','Weapon','ControlDevice','ProtectiveAttire','FluidReservoir']).
+sorts('PortableObject',['SomethingToWear',tWeapon,tContolDevice,'ProtectiveAttire','FluidReservoir']).
 sorts(actorNPC, [agent]).
 */
 
 
-% objects(SW,List):member(SW,['Weapon','ControlDevice','ProtectiveAttire','FluidReservoir','BPVLocation','PortableObject','SomethingToWear',agent,'SomethingToWear']),findall(O,somethingIsa0(O,SW),ULIST),sort(ULIST,List).
+% objects(SW,List):member(SW,[tWeapon,tContolDevice,'ProtectiveAttire','FluidReservoir','BPVLocation','PortableObject','SomethingToWear',agent,'SomethingToWear']),findall(O,somethingIsa0(O,SW),ULIST),sort(ULIST,List).
 %SLOW 
-objects('Weapon',['iPhaser676','iPhaser700','iPhaser724','iPhaser776','Item15PhaserRifle705']).
-objects('ControlDevice',['Item9MedicalTricorder681','Item9MedicalTricorder682','Item9MedicalTricorder683','Item9Tricorder759','Item9Tricorder760','Item9Tricorder761']).
+objects(tWeapon,['iPhaser676','iPhaser700','iPhaser724','iPhaser776','Item15PhaserRifle705']).
+objects(tContolDevice,['Item9MedicalTricorder681','Item9MedicalTricorder682','Item9MedicalTricorder683','Item9Tricorder759','Item9Tricorder760','Item9Tricorder761']).
 objects('ProtectiveAttire',['Item2RedUniform704','Item2RedUniform710','Item2RedUniform719','Item2RedUniform739','Item2RedUniform743','itGoldUniform675','itGoldUniform687','itGoldUniform699','itGoldUniform723','itGoldUniform731','itGoldUniform735','itGoldUniform775','Item4BlueUniform680','Item4BlueUniform715','Item4BlueUniform747','Item4BlueUniform751','Item4BlueUniform755','iBoots673','iBoots678','iBoots685','iBoots697','iBoots702','iBoots708','iBoots713','iBoots717','iBoots721','iBoots729','iBoots733','iBoots737','iBoots741','iBoots745','iBoots749','iBoots753','iBoots773','iComBadge674','iComBadge679','iComBadge686','iComBadge698','iComBadge703','iComBadge709','iComBadge714','iComBadge718','iComBadge722','iComBadge730','iComBadge734','iComBadge738','iComBadge742','iComBadge746','iComBadge750','iComBadge754','iComBadge774','Item7Sash725','Item8VISOR688']).
 objects('FluidReservoir',['Item20Tea690','Item21Synthehol691','Item22FerengiAle692','Item23RomulanWhisky693','Item24LemonadePruneJuice694','Item25VulcanBeer695']).
 objects('BPVLocation',['iArea1000','iArea1001','iArea1002','iArea1003','iArea1004','iArea1005','iArea1006','iArea1007','iArea1008','iArea1009','iArea1010','iArea1011','iArea1012','iArea1013','iArea1014','iArea1015','iArea1016','iArea1017','iArea1018','iArea1019','iArea1020','iArea1021','iArea1022','iArea1023','iArea1024','iArea1025','iArea1026','iArea1027','iArea1028','iArea1029','iArea1030','iArea1031','iArea1032','iArea1033','iArea1034','iArea1035','iArea1036','iArea1037','iArea1038','iArea1039','iArea1040','iArea1041','iArea1042'
@@ -1748,7 +1748,7 @@ docs ready */
 
 % TESTS
 
-actorStartState(agent,X,[localityOfObject(X,Y)|List]):agent(X),localityOfObject(X,Y),findall(stowed(X,P),stowed(X,P),List1),findall(wearsClothing(X,P),wearsClothing(X,P),List2),flatten([List1,List2],List).
+actorStartState(agent,X,[localityOfObject(X,Y)|List]):agent(X),localityOfObject(X,Y),findall(mudStowed(X,P),mudStowed(X,P),List1),findall(wearsClothing(X,P),wearsClothing(X,P),List2),flatten([List1,List2],List).
 initialStart([ 
 
 /*
@@ -1766,15 +1766,15 @@ localityOfObject('Item9Tricorder761','iArea1015').
 */
 %% printAll(actorStartState(agent,X,List),ss(agent,X,List)).
    ss(agent,'NPC0Geordi684',[localityOfObject('NPC0Geordi684','iArea1000'),wearsClothing('NPC0Geordi684','iBoots685'),wearsClothing('NPC0Geordi684','iComBadge686'),wearsClothing('NPC0Geordi684','itGoldUniform687'),wearsClothing('NPC0Geordi684','Item8VISOR688')]),
-   ss(agent,vacuum(1),[localityOfObject(vacuum(1),'iArea1010'),stowed(vacuum(1),'iPhaser676'),wearsClothing(vacuum(1),'iBoots673'),wearsClothing(vacuum(1),'iComBadge674'),wearsClothing(vacuum(1),'itGoldUniform675')]),
-   ss(agent,explorer(player1),[localityOfObject(explorer(player1),'iArea1000'),stowed(explorer(player1),'iPhaser776'),wearsClothing(explorer(player1),'iBoots773'),wearsClothing(explorer(player1),'iComBadge774'),wearsClothing(explorer(player1),'itGoldUniform775')]),
-   ss(agent,'NPC2Worf720',[localityOfObject('NPC2Worf720','iArea1025'),stowed('NPC2Worf720','iPhaser724'),wearsClothing('NPC2Worf720','iBoots721'),wearsClothing('NPC2Worf720','iComBadge722'),wearsClothing('NPC2Worf720','itGoldUniform723'),wearsClothing('NPC2Worf720','Item7Sash725')]),
-   ss(agent,'NPC3DrCrusher677',[localityOfObject('NPC3DrCrusher677','iArea1015'),stowed('NPC3DrCrusher677','Item9MedicalTricorder681'),stowed('NPC3DrCrusher677','Item9MedicalTricorder682'),stowed('NPC3DrCrusher677','Item9MedicalTricorder683'),wearsClothing('NPC3DrCrusher677','iBoots678'),wearsClothing('NPC3DrCrusher677','iComBadge679'),wearsClothing('NPC3DrCrusher677','Item4BlueUniform680')]),
+   ss(agent,vacuum(1),[localityOfObject(vacuum(1),'iArea1010'),mudStowed(vacuum(1),'iPhaser676'),wearsClothing(vacuum(1),'iBoots673'),wearsClothing(vacuum(1),'iComBadge674'),wearsClothing(vacuum(1),'itGoldUniform675')]),
+   ss(agent,iPlayer1,[localityOfObject(iPlayer1,'iArea1000'),mudStowed(iPlayer1,'iPhaser776'),wearsClothing(iPlayer1,'iBoots773'),wearsClothing(iPlayer1,'iComBadge774'),wearsClothing(iPlayer1,'itGoldUniform775')]),
+   ss(agent,'NPC2Worf720',[localityOfObject('NPC2Worf720','iArea1025'),mudStowed('NPC2Worf720','iPhaser724'),wearsClothing('NPC2Worf720','iBoots721'),wearsClothing('NPC2Worf720','iComBadge722'),wearsClothing('NPC2Worf720','itGoldUniform723'),wearsClothing('NPC2Worf720','Item7Sash725')]),
+   ss(agent,'NPC3DrCrusher677',[localityOfObject('NPC3DrCrusher677','iArea1015'),mudStowed('NPC3DrCrusher677','Item9MedicalTricorder681'),mudStowed('NPC3DrCrusher677','Item9MedicalTricorder682'),mudStowed('NPC3DrCrusher677','Item9MedicalTricorder683'),wearsClothing('NPC3DrCrusher677','iBoots678'),wearsClothing('NPC3DrCrusher677','iComBadge679'),wearsClothing('NPC3DrCrusher677','Item4BlueUniform680')]),
    ss(agent,'NPC4Troi712',[localityOfObject('NPC4Troi712','iArea1007'),wearsClothing('NPC4Troi712','iBoots713'),wearsClothing('NPC4Troi712','iComBadge714'),wearsClothing('NPC4Troi712','Item4BlueUniform715')]),
-   ss(agent,'NPC5Riker707',[localityOfObject('NPC5Riker707','iArea1036'),stowed('NPC5Riker707','Item12Trombone711'),wearsClothing('NPC5Riker707','iBoots708'),wearsClothing('NPC5Riker707','iComBadge709'),wearsClothing('NPC5Riker707','Item2RedUniform710')]),
-   ss(agent,'NPC6Picard701',[localityOfObject('NPC6Picard701','iArea1035'),stowed('NPC6Picard701','Item15PhaserRifle705'),stowed('NPC6Picard701','iPicardsFlute'),wearsClothing('NPC6Picard701','iBoots702'),wearsClothing('NPC6Picard701','iComBadge703'),wearsClothing('NPC6Picard701','Item2RedUniform704')]),
-   ss(agent,'NPC7Guinan689',[localityOfObject('NPC7Guinan689','iArea1021'),stowed('NPC7Guinan689','Item20Tea690'),stowed('NPC7Guinan689','Item21Synthehol691'),stowed('NPC7Guinan689','Item22FerengiAle692'),stowed('NPC7Guinan689','Item23RomulanWhisky693'),stowed('NPC7Guinan689','Item24LemonadePruneJuice694'),stowed('NPC7Guinan689','Item25VulcanBeer695')]),
-   ss(agent,'NPC8OBrien696',[localityOfObject('NPC8OBrien696','iArea1006'),stowed('NPC8OBrien696','iPhaser700'),wearsClothing('NPC8OBrien696','iBoots697'),wearsClothing('NPC8OBrien696','iComBadge698'),wearsClothing('NPC8OBrien696','itGoldUniform699')]),
+   ss(agent,'NPC5Riker707',[localityOfObject('NPC5Riker707','iArea1036'),mudStowed('NPC5Riker707','Item12Trombone711'),wearsClothing('NPC5Riker707','iBoots708'),wearsClothing('NPC5Riker707','iComBadge709'),wearsClothing('NPC5Riker707','Item2RedUniform710')]),
+   ss(agent,'NPC6Picard701',[localityOfObject('NPC6Picard701','iArea1035'),mudStowed('NPC6Picard701','Item15PhaserRifle705'),mudStowed('NPC6Picard701','iPicardsFlute'),wearsClothing('NPC6Picard701','iBoots702'),wearsClothing('NPC6Picard701','iComBadge703'),wearsClothing('NPC6Picard701','Item2RedUniform704')]),
+   ss(agent,'NPC7Guinan689',[localityOfObject('NPC7Guinan689','iArea1021'),mudStowed('NPC7Guinan689','Item20Tea690'),mudStowed('NPC7Guinan689','Item21Synthehol691'),mudStowed('NPC7Guinan689','Item22FerengiAle692'),mudStowed('NPC7Guinan689','Item23RomulanWhisky693'),mudStowed('NPC7Guinan689','Item24LemonadePruneJuice694'),mudStowed('NPC7Guinan689','Item25VulcanBeer695')]),
+   ss(agent,'NPC8OBrien696',[localityOfObject('NPC8OBrien696','iArea1006'),mudStowed('NPC8OBrien696','iPhaser700'),wearsClothing('NPC8OBrien696','iBoots697'),wearsClothing('NPC8OBrien696','iComBadge698'),wearsClothing('NPC8OBrien696','itGoldUniform699')]),
    ss(agent,'NPC9Wesley716',[localityOfObject('NPC9Wesley716','iArea1016'),wearsClothing('NPC9Wesley716','iBoots717'),wearsClothing('NPC9Wesley716','iComBadge718'),wearsClothing('NPC9Wesley716','Item2RedUniform719')]),
    ss(agent,'NPC1010Livingston726',[localityOfObject('NPC1010Livingston726','iArea1035')]),
    ss(agent,'NPC1011Spot727',[localityOfObject('NPC1011Spot727','iArea1003')]),

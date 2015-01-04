@@ -50,44 +50,44 @@ federation_idea(Agent,eat(food)) :-
    isa(Food,food).
 
 federation_idea(Agent,take(Good)) :-
-	get_feet(Agent,What),
+	mudNearFeet(Agent,What),
         obj_memb(Good,What),
 	isa_any(Good,[gold,elixer,treasure]).  
 
 federation_idea(Agent,take(Good)) :-
-	get_feet(Agent,What),
+	mudNearFeet(Agent,What),
         obj_memb(Good,What),
-	isa_any(Good,[food,usefull,item]).
+	isa_any(Good,[food,tUsefull,item]).
 
 federation_idea(Agent,move(1,Dir)) :-
-	get_percepts(Agent,List),
+	mudGetPrecepts(Agent,List),
 	list_object_dir_sensed(_,List,treasure,Dir).
 
 federation_idea(Agent,move(3,Dir)) :-
-	get_percepts(Agent,List),
+	mudGetPrecepts(Agent,List),
 	list_object_dir_sensed(_,List,monster,OppDir),
 	reverse_dir(OppDir,Dir),
-	number_to_dir(N,Dir,here),
+	number_to_dir(N,Dir,vHere),
         nth1(N,List,What),
 	What == [].
 
 federation_idea(Agent,move(1,Dir)) :-
-	get_percepts(Agent,List),
-	list_object_dir_sensed(_,List,usefull,Dir).
+	mudGetPrecepts(Agent,List),
+	list_object_dir_sensed(_,List,tUsefull,Dir).
 
 federation_idea(Agent,move(1,Dir)) :-
-	get_percepts(Agent,List),
+	mudGetPrecepts(Agent,List),
 	list_object_dir_sensed(_,List,agent,Dir).
 
 federation_idea(Agent,move(5,Dir)) :-
 	memory(Agent,directions([Dir|_])),
-	num_near(Num,Dir,here),
-	get_near(Agent,List),
+	number_to_dir(Num,Dir,vHere),
+	mudNearReach(Agent,List),
 	nth1(Num,List,What),
 	What == [].
 
 federation_idea(Agent,attack(Dir)) :-
-	get_near(Agent,List),
+	mudNearReach(Agent,List),
 	list_object_dir_near(List,monster(_),Dir).
 
 federation_idea(Agent,look) :-
