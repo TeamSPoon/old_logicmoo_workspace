@@ -15,17 +15,6 @@
 :- register_module_type(tCommand).
 :- multifile thlocal:wants_logout/1.
 
-t_f(t,f).
-t_f(true,false).
-t_f(on,off).
-t_f(1,0).
-t_f(actShow,actHide).
-t_f(yes,no).
-t_f(y,n).
-
-to_on_off(FLAG,ON,OFF,ON_OFF):- t_f(_,FLAG) -> ON_OFF=OFF; ON_OFF=ON.
-
-
 % rename
 action_info(actRename(string),"Rename your player").
 agent_call_command(Agent,actRename(Other)):- padd(Agent,mudNamed(Other)).
@@ -50,16 +39,5 @@ verb_alias(quit,actLogout).
 % logoff
 verb_alias(logoff,actLogout).
 
-% dmsg/show/hide
-action_info(dmsg(optional(ftBoolean,actShow)),"set the dmsg flag to on/off").
-agent_call_command(_Agent,dmsg(actShow)):- listing(tlbugger:dmsg_hidden(_)),current_prolog_flag(opt_debug,ON_OFF),fmt(current_prolog_flag(opt_debug,ON_OFF)).
-agent_call_command(_Agent,dmsg(FLAG)):- to_on_off(FLAG,on,off,ON_OFF),!,set_bugger_flag(opt_debug,ON_OFF),fmt(current_prolog_flag(opt_debug,ON_OFF)).
-action_info(actShow(optional(prolog,actShow)),"show messages of col").
-agent_call_command(_Agent,actShow(A)):-bugger:dmsg_show(A).
-action_info(actHide(optional(prolog,actShow)),"hide messages of col").
-agent_call_command(_Agent,actHide(A)):-bugger:dmsg_hide(A).
-
-% debug
-verb_alias(debug,dmsg).
 
 :- include(logicmoo(vworld/moo_footer)).
