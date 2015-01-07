@@ -15,25 +15,33 @@
 
 
 % ====================================================
-% item rez (to mudStowed inventory)
+% item rez (to mudStowing inventory)
 % ====================================================
 
 :-swi_export(rez_to_inventory/3).
-rez_to_inventory(Agent,NameOrType,NewName):-   
-   create_meta(NameOrType,Clz,tItem,NewName),
-   padd(Agent,mudStowed(NewName)),
-   add(mudIsa(NewName,Clz)),
-   padd(NewName,authorWas(rez_to_inventory(Agent,NameOrType,NewName))),
-   add_missing_instance_defaults(NewName).
+rez_to_inventory(Agent,NameOrType,NewObj):-   
+  must_det_l([
+   create_meta(NameOrType,Clz,tItem,NewObj),
+   padd(Agent,mudStowing(NewObj)),
+   add(mudIsa(NewObj,Clz)),
+   padd(NewObj,authorWas(rez_to_inventory(Agent,NameOrType,NewObj))),
+   add_missing_instance_defaults(NewObj),
+   mudStowing(Agent,NewObj),
+   ireq(dbase_t(mudStowing,Agent,NewObj)),
+   mudPossess(Agent,NewObj),
+   ireq(dbase_t(mudPossess,Agent,NewObj)),
+   mudPossess(Agent,NewObj)]).
 
 
-action_info(actRez(isOneOf([tCol,ftTerm])),"Rezes a new 'item' of some NameOrType into mudStowed inventory").
-agent_call_command(Agent,actRez(NameOrType)):- nonvar(NameOrType),rez_to_inventory(Agent,NameOrType,_NewName).
+action_info(actRez(isOneOf([tCol,ftTerm])),"Rezes a new 'item' of some NameOrType into mudStowing inventory").
+agent_call_command(Agent,actRez(NameOrType)):- nonvar(NameOrType),
+        must(rez_to_inventory(Agent,NameOrType,NewObj)),
+        fmt([rezed,NameOrType,NewObj]).
 
 % ====================================================
 % object/col creation
 % ====================================================
-action_info(actCreate(ftListFn(ftTerm)), "Rezes a new 'spatialthing' or creates a new 'col' of some NameOrType and if it's an 'item' it will put in mudStowed inventory").
+action_info(actCreate(ftListFn(ftTerm)), "Rezes a new 'tSpatialThing' or creates a new 'col' of some NameOrType and if it's an 'item' it will put in mudStowing inventory").
 
 agent_call_command(Agent,actCreate(SWhat)):- with_all_dmsg(must_det(create_new_object(Agent,SWhat))).
 
@@ -45,23 +53,23 @@ agent_call_command(Agent,actCreate(SWhat)):- with_all_dmsg(must_det(create_new_o
 create_new_object(Agent,[tCol,NameOfType|DefaultParams]):-!,create_new_type(Agent,[NameOfType|DefaultParams]).
 
 create_new_object(Agent,[NameOrType|Params]):-
-   create_meta(NameOrType,NewType,tSpatialthing,NewName),
-   assert_isa(NewName,NewType),
+   create_meta(NameOrType,NewType,tSpatialThing,NewObj),
+   assert_isa(NewObj,NewType),
    add(mudSubclass(NewType,tItem)),
-   padd(NewName,authorWas(create_new_object(Agent,[NameOrType|Params]))),
-   padd(Agent,current_pronoun("it",NewName)),   
-   getPropInfo(Agent,NewName,Params,2,PropList),!,
-   padd(NewName,PropList),
-   must((mudIsa(NewName,tItem),padd(Agent,mudStowed(NewName)))),
-   add_missing_instance_defaults(NewName).
+   padd(NewObj,authorWas(create_new_object(Agent,[NameOrType|Params]))),
+   padd(Agent,current_pronoun("it",NewObj)),   
+   getPropInfo(Agent,NewObj,Params,2,PropList),!,
+   padd(NewObj,PropList),
+   must((mudIsa(NewObj,tItem),padd(Agent,mudStowing(NewObj)))),
+   add_missing_instance_defaults(NewObj).
 
 :-swi_export(create_new_type/2).
-create_new_type(Agent,[NewName|DefaultParams]):-
-   decl_type(NewName),
-   padd(NewName,authorWas(create_new_type(Agent,[NewName|DefaultParams]))),
-   padd(Agent,current_pronoun("it",NewName)),
-   getPropInfo(Agent,NewName,DefaultParams,2,PropList),!,
-   add(default_type_props(NewName,PropList)).
+create_new_type(Agent,[NewObj|DefaultParams]):-
+   decl_type(NewObj),
+   padd(NewObj,authorWas(create_new_type(Agent,[NewObj|DefaultParams]))),
+   padd(Agent,current_pronoun("it",NewObj)),
+   getPropInfo(Agent,NewObj,DefaultParams,2,PropList),!,
+   add(default_type_props(NewObj,PropList)).
 
 
 getPropInfo(_Agent,_NewName,PropsIn,N,[comment(ftText(need,to,actParse,PropsIn,N))]).

@@ -1,6 +1,4 @@
-
-end_of_file.
-
+:- multifile(user:semweb_startup).
 :- ensure_loaded('../src_lib/logicmoo_util/logicmoo_util_all').
 
 :- multifile
@@ -8,7 +6,7 @@ end_of_file.
 
 prolog:message(git(update_versions),A,A):-!.
 
-:- if_file_exists(ensure_loaded('../externals/swish/logicmoo_run_swish')).
+:- if_file_exists(ensure_loaded('../externals/swish/logicmoo_run_swish.pl')).
 
 :- add_to_search_path_first(cliopatria, '../externals/ClioPatria').
 :- add_to_search_path_first(user, '../externals/ClioPatria/user').
@@ -120,6 +118,7 @@ pre_http_location(pldoc, root('help/source'), [priority(10)]).
 cliopatria_redir(Request):- with_all_dmsg((member(request_uri(URI),Request),fix_clio_atom(URI,NEWURI),http_redirect(moved,NEWURI,Request))).
 fix_clio_atom(I,O):-atom(I),atom_concat('/cliopatria',O,I).
 fix_clio_atom(IO,IO).
+
 :- http_handler(root('cliopatria'),cliopatria_redir, [priority(100),prefix] ).
 
 /*
@@ -127,21 +126,22 @@ http_open:location(A, B) :-
         member(C, A),
         phrase(atom_field(location, B), C), !.
 */
-:- cp_server:attach_account_info.
+user:semweb_startup:- cp_server:attach_account_info.
 
 :- asserta((user:file_search_path(A,B):-pre_file_search_path(A,B))).
 
 
-:- listing(pre_http_location/3).
-:- listing(location/3).
-:- (http_server(http_dispatch, [ port(3020), workers(16) ]),
-  debug(http_request(_)),debug(cm(_)),debug(swish(_)),debug(storage)).
+user:semweb_startup :- debug(http_request(_)),debug(cm(_)),debug(swish(_)),debug(storage).
+user:semweb_startup :- listing(pre_http_location/3).
+user:semweb_startup :- listing(location/3).
+user:semweb_startup :- ensure_webserver.
+
+ensure_webserver :- thread_property(_,alias('httpd@3020_1')),!.
+ensure_webserver :- http_server(http_dispatch,[ port(3020), workers(16) ]).
+  
 
 %prolog:message(git(update_versions))  --> [ 'Updating GIT version stamps in the background.' ])).
 % :-must(prolog:retract((message(git(update_versions,_,_):-_)))).
 
-
-
-% :- prolog.
 
 

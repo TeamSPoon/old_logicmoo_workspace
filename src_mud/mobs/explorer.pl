@@ -38,14 +38,14 @@ world_agent_plan(_World,Agent,ActV):-
 explorer_idea(Agent,actEat(Elixer)) :-
 	mudHealth(Agent,Damage),
 	Damage < 15,
-   actInventory(Agent,List),
+   mudPossess(Agent,List),
    obj_memb(Elixer,List),
    mudIsa(Elixer,tElixer).
 
 explorer_idea(Agent,actEat(tFood)) :-
 	mudCharge(Agent,Charge),
 	Charge < 150,
-   actInventory(Agent,List),
+   mudPossess(Agent,List),
    obj_memb(Food,List),
    mudIsa(Food,tFood).
 

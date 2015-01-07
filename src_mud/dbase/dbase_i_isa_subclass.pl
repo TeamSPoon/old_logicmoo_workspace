@@ -189,7 +189,7 @@ isa_backchaing_nv_nv(A,predArgTypes):-!,compound(A).
 isa_backchaing_nv_nv(I,T):-compound(I),functor(I,F,_),isa_backchaing(F,T),!.
 isa_backchaing_nv_nv(I,T):-atom(T),!,catch(call(T,I),_,fail).
 
-not_ft(T):-transitive_subclass_or_same(T,tSpatialthing).
+not_ft(T):-transitive_subclass_or_same(T,tSpatialThing).
 
 
 
@@ -208,11 +208,17 @@ type_isa(Type,ttFormatType):-ttFormatType(Type),!. % text
 %  from name
 
 
+atom_prefix_other(Inst,Prefix,Other):-atom_type_prefix_other(Inst,_,Prefix,Other).
+atom_type_prefix_other(Inst,Type,Prefix,Other):-type_prefix(Prefix,Type),current_atom(Inst),atom_concat(Prefix,Other,Inst),capitalized(Other).
+atom_type_prefix_other(Inst,Type,Suffix,Other):-type_suffix(Suffix,Type),current_atom(Inst),atom_concat(Other,Suffix,Inst),!.
+
+
 isa_from_morphology(Inst,Type):-type_prefix(Prefix,Type),current_atom(Inst),atom_concat(Prefix,Other,Inst),capitalized(Other).
 isa_from_morphology(Inst,Type):-type_suffix(Suffix,Type),current_atom(Inst),atom_concat(_,Suffix,Inst),!.
 
 type_suffix('Fn',ftFunctional).
 type_suffix('Type',ttTypeType).
+
 
 
 type_prefix(is,ftSyntaxOperator).
@@ -372,7 +378,7 @@ transitive_P_r_l(DB,P,L,R):-nonvar(L),call(DB,P,A3,R),call(DB,P,A2,A3),call(DB,P
 
 is_known_true(C):-has_free_args(C),!,trace_or_throw(has_free_args(is_known_trew,C)).
 is_known_true(F):-is_known_false0(F),!,fail.
-is_known_true(mudIsa(X,tSpatialthing)):- (isa_asserted(X,_)),is_known_false0(mudIsa(X,tCol)),is_known_false0(mudIsa(X,ttFormatType)),is_known_false0(mudIsa(X,tPred)).
+is_known_true(mudIsa(X,tSpatialThing)):- (isa_asserted(X,_)),is_known_false0(mudIsa(X,tCol)),is_known_false0(mudIsa(X,ttFormatType)),is_known_false0(mudIsa(X,tPred)).
 is_known_true(mudSubclass(X,X)).
 is_known_true(mudIsa(_,ftID)).
 is_known_true(mudIsa(apathFn(_,_),areaPath)).
@@ -405,7 +411,7 @@ is_known_trew(mudIsa(tItem,ttCreateable)).
 is_known_trew(mudSubclass(tItem,ttCreateable)).
 is_known_trew(mudIsa(ttFormatType,ttNotCreatableType)).
 is_known_trew(mudSubclass(ttFormatType,ttNotCreatableType)).
-is_known_trew(mudIsa('TemporallyExistingThing', 'ttCreateable')).
+is_known_trew(mudIsa(tTemporallyExistingThing, 'ttCreateable')).
 is_known_trew(mudIsa(ftTerm,ttNotCreatableType)).
 is_known_trew(mudSubclass(predArgTypes,tRelation)).
 is_known_trew(mudSubclass(tFunction,tRelation)).
@@ -428,7 +434,7 @@ is_known_false(F):-is_known_false0(F),!.
 :-dynamic_multifile_exported(is_known_false0/1).
 is_known_false0(mudIsa(regioncol,ttFormatType)).
 is_known_false0(mudIsa(ttFormatType,ttFormatType)).
-is_known_false0(mudIsa(X,tSpatialthing)):- tCol(X);ttFormatType(X);tPred(X).
+is_known_false0(mudIsa(X,tSpatialThing)):- tCol(X);ttFormatType(X);tPred(X).
 is_known_false0(mudIsa(completeExtentAsserted,ttCreateable)).
 is_known_false0(mudIsa(X,Y)):-!,not_mud_isa(X,Y).
 is_known_false0(mudSubclass(Type,_)):-arg(_,vv(tCol,tRelation,ttFormatType),Type).
@@ -443,8 +449,8 @@ not_mud_isa(prologMacroHead, ttFormatType).
 not_mud_isa(tObj, ttFormatType).
 not_mud_isa(ttFormatType,ttFormatType).
 not_mud_isa(mudSubft,tCol).
-not_mud_isa('TemporallyExistingThing', 'TemporallyExistingThing').
-not_mud_isa(ttCreateable,'TemporallyExistingThing').
+not_mud_isa(tTemporallyExistingThing, tTemporallyExistingThing).
+not_mud_isa(ttCreateable,tTemporallyExistingThing).
 not_mud_isa(Type,ttFormatType):- \+ (hasInstance(ttFormatType, Type)).
 not_mud_isa(Type, prologMacroHead):- \+ (mpred_prop(Type, prologMacroHead)).
 not_mud_isa(Type, completeExtentAsserted):- \+ (mpred_prop(Type, completeExtentAsserted)).

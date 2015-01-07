@@ -1,33 +1,87 @@
 % :-swi_module(user). 
-:-swi_module(actInventory, [actInventory/2,inventory1/2]).
+:-swi_module(actInventory, [mudPossess/2,inventory1/2]).
 /** <module> A command to  ...
 % Douglas Miles 2014
-% inventory(Agt,Inv) = inventory (anything the agent has taken
+% inventory(Agt,Inv) = inventory (anything the agent has taken)
 */
 :- include(logicmoo(vworld/moo_header)).
 
 :- register_module_type(mtCommand).
 
-:-debug.
 
 % ====================================================
 % the entire inventory system
 % ====================================================
-action_info(actInventory(isOptional(tAgentGeneric,isAgentSelf)), "Examine an inventory").
-agent_call_command(Agent,actInventory(Who)):- show_kb_preds(Agent,actInventory(Who,value)).
+:- decl_type(tNearestReachableItem).
+tNearestReachableItem(Obj):-
+  current_agent_or_var(Agent),
+  nearest_reachable_object(Agent,Obj).
 
-prologListValued(actInventory(tAgentGeneric,ftListFn(tObj))).
+:- decl_type(tFarthestReachableItem).
+tFarthestReachableItem(Obj):-
+  current_agent_or_var(Agent),
+  nearest_reachable_object(Agent,Obj).
+
+nearest_reachable_object(Agent,Obj):-
+  with_no_modifications((findall(Obj,farthest_reachable_object(Agent,Obj),List),reverse(List,Reverse),!,member(Obj,Reverse))).
+
+farthest_reachable_object(Agent,Obj):-with_no_modifications((farthest_reachable_object0(Agent,Obj))).
+farthest_reachable_object0(Agent,Obj):-
+  test_exists(Obj),
+  dif(Agent,Obj),
+  localityOfObject(Agent,LOC),
+  localityOfObject(Obj,LOC).
+farthest_reachable_object0(Agent,Obj):-
+  test_exists(Obj),
+  dif(Agent,Obj),
+  mudAtLoc(Agent,LOC),
+  mudAtLoc(Obj,LOC).
+farthest_reachable_object0(Agent,Obj):-
+  test_exists(Obj),
+  dif(Agent,Obj),
+  localityOfObject(Obj,Agent).
+farthest_reachable_object0(Agent,Obj):-
+  test_exists(Obj),
+  mudPossess(Agent,Obj).
+  
+
+detatch_object(Obj):-  
+  (mudPossess(Agent,Obj)->clr(mudPossess(Agent,Obj));true),
+  (with_no_modifications(mudAtLoc(Obj,LOC))-> clr(mudAtLoc(Obj,LOC));true),
+  (with_no_modifications(localityOfObject(Obj,R))-> clr(localityOfObject(Obj,R));true).
+
+action_info(actInventory(isOptional(tAgentGeneric,isSelfAgent)), "Examine an inventory").
+
+agent_call_command(Agent,actInventory(Who)):- show_inventory(Agent,Who).
+
+show_inventory(Agent,Who):-
+        show_kb_preds(Agent,[                                                  
+                        listof(mudInventory(Who, value)),
+                        listof(mudContains(Who,value)),                 
+                        listof(mudPossess(Who,value)),
+                        listof(mudStowing(Who,value)),
+                        listof(mudContains(Who,value)),
+                        listof(mudWielding(Who,value)),
+                        listof(wearsClothing(Who,value))]).
+
+
 
 % Get only the Inv (inventory)
-actInventory(Agent,Percepts) :-  inventory0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts).
-inventory0(Agent, Inv) :-
-	findall(Poss,inventory1(Agent,Poss),Inv).
+mudInventory(Agent, Inv) :-
+	findall(Obj,inventory1(Agent,Obj),Inv).
 
-inventory1(Agent,Poss):-mudInsideOf(Poss,Agent).
-
-:-decl_mpred_hybrid(mudPossess(tAgentGeneric,tObj)).
-
-mudPossess(Agent,Poss):-inventory1(Agent,Poss).
+inventory1(Who,CALL):- 
+         findall(prop(Obj,PRED),
+                  (member(dbase_t(PRED,A,B), [
+                        dbase_t(mudPossess,Who,Obj),
+                        dbase_t(mudStowing,Who,Obj),
+                        dbase_t(mudContains,Who,Obj),
+                        dbase_t(mudWielding,Who,Obj),
+                        dbase_t(wearsClothing,Who,Obj)]),
+                     ireq(dbase_t(PRED,A,B))),
+                  RESULTS),
+         setof(Obj,member(prop(Obj,PRED),RESULTS),OBJLIST),
+         (member(Obj,OBJLIST),member(CALL,[mudAtLoc(Obj,LOC),localityOfObject(Obj,LOC)]),ireq(CALL)).
 
 test_exists(O):- tItem(O).
 test_exists(O):- tAgentGeneric(O).

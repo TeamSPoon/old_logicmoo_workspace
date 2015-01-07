@@ -312,6 +312,7 @@ ctype_switcher(lower).
 ctype_switcher(upper).
 ctype_switcher(digit).
 ctype_switcher(punct).
+ctype_switcher(white).
 
 breaked_codes(S,C):-catchv(number_codes(S,C),_,string_codes(S,C)->true;(atom_codes(S,C)->true;string_equal_ci(S,C))).
 
@@ -321,12 +322,16 @@ ctype_continue(X,X):-ctype_switcher(X).
 ctype_switch(upper,upper).
 ctype_switch(T1,T2):-ctype_switcher(T1),ctype_switcher(T2),T1\=T2.
 
+
+hide_char_type(white).
+hide_char_type(punct).
+
 % to_case_breaks(+Codes,+SoFarC,+Lower,List)
 to_case_breaks([      ],_WillBe,   [],_,     []):-!.
 to_case_breaks([       ],WillBe,SoFar,_NewType,[t(Left,WillBe)]):-breaked_codes(Left,SoFar),!.
 to_case_breaks([C|Codes],WillBe,SoFar,Upper,New):- ctype_continue(Upper,Lower), char_type(C,Lower),append(SoFar,[C],SoFarC),!,to_case_breaks(Codes,WillBe,SoFarC,Lower,New).
 to_case_breaks(C___Codes,WillBe,SoFar,Upper,OUT):- is_list(OUT),OUT=[t(Left,WillBe),t(New,RType)],!,to_first_break_w(C___Codes,SoFar,Upper,Left,New,RType).
-to_case_breaks([C|Codes],WillBe,SoFar,Upper,[t(Left,WillBe)|New]):- ctype_switch(Upper,Digit), char_type(C,Digit),!, breaked_codes(Left,SoFar), to_case_breaks(Codes,Digit,[C],Digit,New),!.
+to_case_breaks([C|Codes],WillBe,SoFar,Upper,OUT):- ctype_switch(Upper,Digit), char_type(C,Digit),!, breaked_codes(Left,SoFar), to_case_breaks(Codes,Digit,[C],Digit,New),!,(hide_char_type(WillBe)->OUT=New;OUT=[t(Left,WillBe)|New]).
 to_case_breaks([C|Codes],WillBe,SoFar,Upper,New):- append(SoFar,[C],SoFarC),to_case_breaks(Codes,WillBe,SoFarC,Upper,New).
 
 :-export(to_first_break/2).

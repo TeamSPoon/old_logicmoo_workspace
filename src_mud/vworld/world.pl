@@ -167,7 +167,7 @@ ttCreateable(SubType):-member(SubType,[tAgentGeneric,tItem,tRegion]).
 ttCreateable(S):- is_asserted(ttCreateable(T)), impliedSubClass(S,T).
 
 createableSubclassType(S,T):- ttCreateable(T),is_asserted(mudSubclass(S,T)).
-createableSubclassType(T,'TemporallyExistingThing'):- ttCreateable(T).
+createableSubclassType(T,tTemporallyExistingThing):- ttCreateable(T).
 
 mudIsa(ftInt,ttFormatType).
 mudIsa(vtDirection,ttValueType).

@@ -201,9 +201,10 @@ props_into_mpred_form(PROPS,MPRED):- trace_or_throw(unk_props_into_mpred_form(PR
 acceptable_xform(From,To):- From \=@= To,  (To = mudIsa(I,C) -> was_isa(From,I,C); true).
 
 :-swi_export(was_isa/3).
-was_isa(dbase_t(C,I),I,C):- maybe_typep(C/1),not(prolog_side_effects(C/1)).
+was_isa(dbase_t(C,I),I,C):- nonvar(C),maybe_typep(C/1),not(prolog_side_effects(C/1)).
 was_isa(dbase_t(C,I),I,C).
 was_isa(mudIsa(I,C),I,C).
+was_isa(isa(I,C),I,C).
 was_isa(hasInstance(C,I),I,C).
 was_isa(dbase_t(mudIsa,I,C),I,C).
 was_isa(M:X,I,C):-atom(M),!,was_isa(X,I,C).
@@ -281,6 +282,7 @@ holds_args(HOLDS,LIST):- compound(HOLDS),HOLDS=..[H|LIST],is_holds_true(H),!.
 %        decl_database_hook(assert(A_or_Z),Fact):- ...
 %        decl_database_hook(retract(One_or_All),Fact):- ...
 
+run_database_hooks(Type,Hook):- thlocal:noDBaseHOOKS(_),dmsg(noDBaseHOOKS(Type,Hook)),!.
 
 run_database_hooks(change(A,B),Hook):- Change=..[A,B],!,run_database_hooks(Change,Hook).
 run_database_hooks(Type,M:Hook):-atom(M),!,run_database_hooks(Type,Hook).
@@ -539,14 +541,25 @@ retractall_cloc(M,C):-ensure_predicate_reachable(M,C),fail.
 %retractall_cloc(M,C):-not(clause_asserted(M:C)),!.
 retractall_cloc(M,C):-database_real(retractall,M:C).
 
+
+database_real(P,G):- thlocal:noDBaseMODs(_),!,dmsg(noDBaseMODs(P,G)).
+
 database_real(assertz,G):- was_isa(G,I,C),assert_hasInstance(C,I),!.
 database_real(asserta,G):- was_isa(G,I,C),!,assert_hasInstance(C,I).
-database_real(P,C):- 
-    copy_term(C,CC),
-      ignore((once((into_assertable_form(CC,DB), functor_h(C,CF),functor_h(DB,DBF))),DBF \== CF, 
-        dmsg(warn_into_assertable_form(P,C,DB)),show_call_failure(debugOnError(call(P,DB))))),
-      show_call_failure(debugOnError(call(P,C))).
+database_real(P,C):-database_real0(P,C).
 
+database_real0(asserta,C):-!,database_real0(asserta_new,C).
+database_real0(assertz,C):-!,database_real0(assertz_if_new,C).
+database_real0(assert,C):-!,database_real0(assert_if_new,C).
+database_real0(P,C):- 
+    copy_term(C,CC),
+     dmsg(database_real(P,C)),
+      ignore((once((into_assertable_form(CC,DB), functor_h(C,CF),functor_h(DB,DBF))),DBF \== CF, 
+        dmsg(warn_into_assertable_form(P,C,DB)),show_call_failure(debugOnError(call_wdmsg(P,DB))))),
+      show_call_failure(debugOnError(call_wdmsg(P,C))).
+
+call_wdmsg(P,DB):- thlocal:noDBaseMODs(_),!,dmsg(error(noDBaseMODs(P,DB))).
+call_wdmsg(P,DB):- append_term(P,DB,CALL),dmsg(call_wdmsg(CALL)),call(CALL).
 
 % ========================================
 % Rescan for consistency

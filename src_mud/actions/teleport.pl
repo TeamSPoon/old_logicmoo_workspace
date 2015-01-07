@@ -20,7 +20,7 @@
 :- register_module_type(mtCommand).
 
 % teleport
-action_info(actTeleport(isOptional(isAnd([tObj,isNot(tRegion)]),isAgentSelf),isOptionalStr("to"),isOptional(tRegion,isRandom(tRegion))),"teleport [obj] [to] [somewhere]").
+action_info(actTeleport(isOptional(isAnd([tObj,isNot(tRegion)]),isSelfAgent),isOptionalStr("to"),isOptional(tRegion,isRandom(tRegion))),"teleport [obj] [to] [somewhere]").
 
 verb_alias(tp,actTeleport).
 

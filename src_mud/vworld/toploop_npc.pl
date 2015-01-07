@@ -80,7 +80,7 @@ actIdea(Who,IdeaS):- findall(Idea,(get_world_agent_plan(current,Who,Idea),dmsg(g
 action_info(actNpcTimer(ftInt),"sets how often to let NPCs run").
 action_info(actTock,"Makes All NPCs do something brilliant").
 action_info(actTick(tAgentGeneric),"Makes some agent do something brilliant").
-action_info(actIdea(isOptional(tAgentGeneric,isAgentSelf)),"Makes some agent (or self) think of something brilliant").
+action_info(actIdea(isOptional(tAgentGeneric,isSelfAgent)),"Makes some agent (or self) think of something brilliant").
 action_info(actTick,"Makes *your* agent do something brilliant").
 action_info(actProlog(tCallable),"Call a tCallable").
 
@@ -90,7 +90,7 @@ agent_text_command(Agent,["tlocals"],Agent,actProlog(user:tlocals)).
 
 warnOnError(X):-catch(X,E,dmsg(error(E:X))).
 
-agent_call_command(Agent,actProlog(C)) :- must(nonvar(C)),agent_call_safely(Agent,C).
+agent_call_command(Agent,actProlog(C)) :- true,must(nonvar(C)),agent_call_safely(Agent,C).
 
 :-swi_export(agent_call_safely/2).
 agent_call_safely(_Agnt,C):- any_to_callable(C,X,Vars), !, gensym(result_count_,RC),flag(RC,_,0),agent_call_safely(RC,X,Vars),flag(RC,CC,CC),fmt(result_count(CC)).

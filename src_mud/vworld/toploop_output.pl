@@ -40,8 +40,8 @@ show_kb_preds(Agent,LOC,List):-
        locationToRegion(LOC,Region),
          once((thlocal:repl_writer(Agent,WPred);WPred=default_repl_writer)),
          once((thlocal:repl_to_string(Agent,ToSTR);ToSTR=default_repl_obj_to_string)),
-        subst(List,isRegionSelf,Region,ListRR),
-        subst(ListRR,isAgentSelf,Agent,ListR),
+        subst(List,isSelfRegion,Region,ListRR),
+        subst(ListRR,isSelfAgent,Agent,ListR),
         must(show_kb_via_pred(WPred,ToSTR,ListR)),!.
 
 
@@ -68,7 +68,7 @@ show_kb_via_pred_0(WPred,ToSTR,F = Call):- contains_var(Call,value), !,show_kb_v
 show_kb_via_pred_0(WPred,ToSTR,F = Call):- !,show_kb_via_pred_format_call(WPred,ToSTR, F = Call ,Call).
 show_kb_via_pred_0(WPred,ToSTR,forEach(Call,Show)):-!, show_kb_via_pred_format_call(WPred,ToSTR, Show, forEach(Call)).
 show_kb_via_pred_0(WPred,ToSTR,fmt(Show)):- !, show_kb_via_pred_format_call(WPred,ToSTR, Show ,true).
-show_kb_via_pred_0(WPred,ToSTR,call(Call)):- !,  with_output_to(string(Value),req(Call)),
+show_kb_via_pred_0(_WPred,_STR,call(Call)):- !,  with_output_to(string(Value),req(Call)),
       fmt(Value),!.
       % show_kb_via_pred_0(WPred,ToSTR,fmt(Value)).
 
@@ -96,7 +96,7 @@ show_kb_via_pred_fmt(WPred,ToSTR,SayIt,Type,GCall):-!,findall(SayIt,ccatch(req(G
     merge_list_on_p(WPred,ToSTR,SayIt,Type,GCall,_NewValue,Count).
 
 
-merge_list_on_p(WPred,ToSTR,SayIt,Type,GCall,_NewValue,[]):-
+merge_list_on_p(WPred,ToSTR,SayIt,Type,_GCall,_NewValue,[]):-
   fmt_holds_tcall(WPred,ToSTR,SayIt,Type,[noVal]).
 
 merge_list_on_p(WPred,ToSTR,SayIt,Type,GCall,_NewValue,[]):-

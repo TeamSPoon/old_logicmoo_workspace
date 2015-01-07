@@ -59,7 +59,7 @@ call_agent_command(A,CMD):- must_ac(call_agent_action(A,CMD)),!.
 % All Actions must be called from here!
 call_agent_action(Agent,CMDI):-var(CMDI),trace_or_throw(call_agent_action(Agent,CMDI)).
 call_agent_action(Agent,CMDI):-
-   subst(CMDI,isAgentSelf,Agent,CMD),
+   subst(CMDI,isSelfAgent,Agent,CMD),
    thread_self(TS),
    (TS=main -> Wrapper = call ; Wrapper = notrace),
    with_assertions(thlocal:session_agent(TS,Agent),
@@ -72,6 +72,7 @@ where_atloc(Agent,Where):-localityOfObject(Agent,Where).
 where_atloc(Agent,Where):-mudAtLoc(Agent,Loc),!,locationToRegion(Loc,Where).
 where_atloc(Agent,'OffStage'):-nonvar(Agent).
 
+% call_agent_action_lc(Agent,CMD):- with_no_fallbacksg(with_no_fallbacks(call_agent_action_lc0(Agent,CMD))).
 call_agent_action_lc(Agent,CMD):-
    % start event
  ignore((must_det_l([where_atloc(Agent,Where),

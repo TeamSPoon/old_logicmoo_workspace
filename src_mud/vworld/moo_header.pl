@@ -33,6 +33,14 @@
 
 :- dynamic_multifile_exported loaded_external_kbs/0.
 
+:- dynamic_multifile_exported create_random_fact/1.
+:- dynamic_multifile_exported hooked_random_instance/3.
+:- dynamic_multifile_exported fact_is_false/2.
+:- dynamic_multifile_exported((thlocal:noDefaultValues/1)).
+:- dynamic_multifile_exported((thlocal:noDBaseMODs/1)).
+:- dynamic_multifile_exported((thlocal:noDBaseHOOKS/1)).
+:- dynamic_multifile_exported((thlocal:noRandomValues/1)).
+:- dynamic_multifile_exported((thlocal:insideIREQ/1)).
 
 % ========================================
 % decl_mpred_hybrid database

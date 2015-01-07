@@ -156,7 +156,7 @@ transitive_other(mudAtLoc,1,Obj,What):-mudInsideOf(Obj,What).
 
 :-decl_mpred_hybrid(mudInsideOf/2).
 :-swi_export(mudInsideOf/2).
-mudInsideOf(Inner,Outer):-is_asserted(mudStowed(Outer,Inner)).
+mudInsideOf(Inner,Outer):-is_asserted(mudStowing(Outer,Inner)).
 mudInsideOf(Inner,Outer):-is_asserted(mudContains(Outer,Inner)).
 
 
@@ -196,13 +196,6 @@ has_parts([pelvis,legs,right_leg,right_foot,right_toes]).
 
 
 */
-
-genlPreds(wearsClothing,mudPossess).
-genlPreds(mudStowed,mudPossess).
-genlPreds(mudPossess,mudContains).
-genlInverse(mudContains,mudInsideOf).
-%genlInverse(mudInsideOf,mudPossess).
-%genlInverse(mudStowed,mudInsideOf).
 
 
 put_in_world(isSelf):-!.

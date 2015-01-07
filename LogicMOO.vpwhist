@@ -1,10 +1,393 @@
 [ActiveConfig]
 PrologMUD_base.vpj=Release
 [Global]
-CurrentProject=PrologMUD.vpj
+CurrentProject=PrologMUD_base.vpj
 [ProjectDates]
-PrologMUD.vpj=20150103232932736
-externals\PrologMUD_ext.vpj=20150103232712863
-PrologMUD_nonext.vpj=20150103232602643
-tempFiles.vpj=20150102210343664
-PrologMUD_base.vpj=20150103232704879
+PrologMUD.vpj=20150105225229828
+PrologMUD_base.vpj=20150106175546839
+externals\PrologMUD_ext.vpj=20150105131252020
+[TreeExpansion2]
++ PrologMUD.vpj
+- PrologMUD_base.vpj
+  - externals
+    + ClioPatria
+      + client
+        + Java
+      + rdf
+        + base
+        + cpack
+        + tool
+      + test
+        + Tests
+          + sparql
+            + ARQ
+              + Algebra
+              + Ask
+              + Basic
+              + BasicPatterns
+              + BlankNodes
+              + Construct
+              + Describe
+              + Distinct
+              + Examples
+              + Expr
+              + Expr1
+              + Expr2
+              + ExprBuiltIns
+              + ExprDatatypes
+              + ExprEquals
+              + ExprRegex
+              + Extensions
+              + Function
+              + General
+              + OpenWorld
+              + Optional
+              + OrderBy
+              + Planning
+              + PropertyFunctions
+              + Select
+              + Serialization
+              + SolutionSeq
+              + Sort
+              + Syntax
+                + Syntax-ARQ
+                + Syntax-SPARQL
+                + Syntax-SPARQL2
+                + Syntax-SPARQL3
+              + TypePromotion
+              + Union
+              + Unsaid
+              + ValueTesting
+            + test-suite-archive
+              + data-r2
+                + algebra
+                + ask
+                + basic
+                + bnode-coreference
+                + boolean-effective-value
+                + bound
+                + cast
+                + construct
+                + dataset
+                + distinct
+                + expr-builtin
+                + expr-equals
+                + expr-ops
+                + graph
+                + i18n
+                + open-world
+                + optional
+                + optional-filter
+                + reduced
+                + regex
+                + solution-seq
+                + sort
+                + syntax-sparql1
+                + syntax-sparql2
+                + syntax-sparql3
+                + syntax-sparql4
+                + syntax-sparql5
+                + triple-match
+                + type-promotion
+          + sparql-1.1
+            + 2009
+              + sparql
+                + docs
+                  + tests
+                    + data-sparql11
+                      + add
+                      + aggregates
+                      + basic-update
+                      + bind
+                      + bindings
+                      + clear
+                      + construct
+                      + copy
+                      + csv-tsv-res
+                      + delete
+                      + delete-data
+                      + delete-insert
+                      + delete-where
+                      + drop
+                      + entailment
+                      + exists
+                      + functions
+                      + grouping
+                      + json-res
+                      + move
+                      + negation
+                      + project-expression
+                      + property-path
+                      + protocol
+                      + service
+                      + service-description
+                      + subquery
+                      + syntax-fed
+                      + syntax-query
+                      + syntax-update-1
+                      + syntax-update-2
+                      + update-silent
+    + MUD_ircbot
+      + prolog
+    + MUD_KnowRob
+      + knowrob_logicmoo
+        + euler
+          + 02swap
+            + classes
+              + euler
+            + deployment
+          + autoload
+          + compare
+          + prolog
+    + MUD_ScriptEngines
+      + ext
+        + r6rs-plt-redex-model
+    - swipl-library
+      + bin
+        + amd64
+      - boot
+      + customize
+      + demo
+      + doc
+        + Manual
+      + include
+        + sicstus
+        + Yap
+      + lib
+        + amd64
+      + library
+        + chr
+        + clp
+          + clpq
+          + clpqr
+          + clpr
+        + cql
+        + dcg
+        + dialect
+          + ciao
+            + engine
+            + regtypes
+          + eclipse
+          + hprolog
+          + iso
+          + sicstus
+          + swi
+          + yap
+        + DTD
+        + http
+          + web
+            + css
+            + icons
+            + js
+        + pldoc
+        + pldoc - Copy
+        + semweb
+        + tipc
+        + unicode
+      + pack
+        + db_facts
+          + doc
+          + examples
+          + prolog
+        + Downloads
+        + list_util
+          + prolog
+          + t
+        + mavis
+          + prolog
+          + t
+        + prosqlite
+          + c
+          + doc
+          + examples
+          + lib
+            + amd64
+            + i386-win32
+            + x64-win64
+          + prolog
+        + quickcheck
+          + prolog
+          + t
+        + swicli
+          + bin
+          + c
+            + Example4SWICLI
+              + obj
+                + Debug
+                + Release
+              + Properties
+            + SWICFFITests
+              + obj
+                + Debug
+                + Release
+              + Properties
+            + Swicli.Library
+              + mindtouch.reflection
+                + Properties
+              + obj
+                + Debug
+                + Release
+              + Properties
+            + SWICLITestDLL
+              + obj
+                + Debug
+                + Release
+              + Properties
+            + swicli
+          + cffi-tests
+          + doc
+            + api_files
+          + lib
+            + amd64
+            + i386-linux
+            + i386-win32
+            + x64-win64
+            + x86_64-linux
+          + prolog
+      + pack-disabled
+        + weblog\.git
+          + hooks
+          + info
+          + logs
+            + refs
+              + heads
+              + remotes
+                + origin
+          + objects
+            + pack
+          + refs
+            + heads
+            + remotes
+              + origin
+        + weblog
+          + demo
+          + docs
+          + prolog
+            + assetsources
+            + debug_page
+            + formatting
+            + html_form
+            + identity
+              + login_prototype
+                + docs
+              + stormpath
+            + info
+              + books
+                + google
+              + buttons
+              + geocoding
+                + google
+              + geohashing
+              + html
+              + maps
+                + google
+                + leaflet
+              + numbers
+              + stock
+                + crox
+              + weather
+                + geonames
+            + keys
+            + nav
+            + resources
+            + static
+              + css
+              + icons
+              + js
+            + support
+            + widgets
+              + agents
+      + xpce
+        + appl-help
+        + bitmaps
+          + 16x16
+          + 32x32
+          + patterns
+        + man
+          + faq
+          + reference
+            + class
+        + pl
+        + prolog
+          + boot
+          + contrib
+            + rubik
+          + demo
+          + lib
+            + compatibility
+            + dialog
+              + bitmaps
+            + doc
+              + icons
+            + draw
+            + emacs
+            + english
+            + http
+            + man
+            + math
+            + plot
+            + swi
+            + trace
+              + icons
+                + 16x16
+            + xref
+  + games
+    + src_game_nani
+      + web
+        + css
+        + icons
+        + js
+        + prolog
+        + snd
+    + src_game_sims
+      + web
+        + css
+        + icons
+        + js
+        + prolog
+        + snd
+    + src_game_startrek
+      + holodeck
+      + mobs
+      + web
+        + css
+        + icons
+        + js
+        + prolog
+        + snd
+    + src_game_wumpus
+  + runtime
+    + config-enabled
+    + RDF-store
+  + src_lib
+    + logicmoo_util
+  + src_mud
+    + actions
+    + dbase
+    + mobs
+      + affordance
+      + planner
+    + objs
+    + parsing
+    + vworld
++ externals\PrologMUD_ext.vpj
+scroll:0
+[State]
+SCREEN: 1920 1080 198 143 1440 699 0 0 M 0 0 0 0 1469 553
+CWD: ..\PrologMUD
+BUFFER: BN="externals\swipl-library\boot\syspred.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.6171 CL=33 LE=0 CX=32 CY=10 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1293 377 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\swipl-library\boot\syspred.pl"
+VIEW: LN=.7914 CL=1 LE=0 CX=0 CY=13 WI=248 BI=17 HT=0 HN=0 HF=0 HC=4
+FILEHIST: 9
+externals\XperiMental\knowrob_addons\knowrob_mud\prolog\init.pl
+clone_externals.sh
+src_mud\vworld\moo_startup.pl
+src_lib\logicmoo_util\logicmoo_util_all.pl
+runtime\run.pl
+\opt\LogicmooDeveloperFramework\PrologMUD\externals\MUD_KnowRob\knowrob_addons\knowrob_mud\README.md
+\opt\LogicmooDeveloperFramework\PrologMUD\externals\MUD_KnowRob\knowrob_addons\knowrob_mud\package.xml
+externals\MUD_KnowRob\robokind\milo\milo-lesson\app\MiloVolumeExampleConfig.ttl
+externals\swipl-library\boot\syspred.pl

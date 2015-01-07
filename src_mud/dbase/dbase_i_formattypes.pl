@@ -53,9 +53,9 @@ split_name_type_0(C,P,C):- var(P),atom(C),typename_to_iname(i,C,I),gensym(I,P),!
 
 formattype_guessable(S):- mudFtInfo(S,_).
 
-term_is_ft(Term,Type):- var(Type),var(Term),!,member(Type,[ftVar,ftProlog]).
-term_is_ft(Term,Type):- var(Term),!,member(Type,[ftVar,ftTerm,ftCallable]).
-term_is_ft(Term,Type):- nonvar(Term),var(Type),!,formattype_guessable(Type),term_is_ft(Term,Type).
+term_is_ft(Term,Type):- var(Term),!,member(Type,[ftVar,ftProlog]).
+term_is_ft(Term,Type):- var(Type),!,formattype_guessable(Type),term_is_ft(Term,Type).
+term_is_ft(_ANY,ftVar):- !,fail.
 term_is_ft(Term,Type):- must_det(ttFormatType(Type)),
    once(trans_subft_info(Type,How)),   
    correctFormatType(query(_HLDS,_OldV),Term,How,NewTerm),!,
@@ -147,7 +147,7 @@ argIsa_call_0(mudColor,2,vtColor).
 argIsa_call_0(mudFtInfo,1,ttFormatType).
 argIsa_call_0(mudFtInfo,2,ftTerm).
 argIsa_call_0(localityOfObject,1,tObj).
-argIsa_call_0(localityOfObject,2,tSpatialthing).
+argIsa_call_0(localityOfObject,2,tSpatialThing).
 argIsa_call_0(mudIsa,1,ftTerm).
 argIsa_call_0(mudIsa,2,tCol).
 argIsa_call_0(mudMemory,2,ftTerm).

@@ -17,7 +17,7 @@ defined_affordance([subjType= "Passable",actionVerb= "TravelThru"]).
 defined_affordance([subjType= "Television",
 stringMatch= "TV",
 actionVerb= "Observe",
-maximumDistance= 4,
+mudActionMaxDistance= 4,
 'NonLoneliness_Social'= 3 * -2, % this form means the AI player thinks observing a TV will satisfy their NonLoneliness_Social needs by 3% .. yet instead, it reduces by 2%
 'NonHunger'= 1 * -1, 
 'BladderEmpty'= 0 * 0,
@@ -50,8 +50,8 @@ defined_affordance([subjType= tFurniture,actionVerb= "BumpIntoBarrier",
 'Fun'= -300 * 0]).
 
 % yet every minute you are alive, God wishes to punish you
-defined_affordance([subjType= isAgentSelf,actionVerb= "LiveAtLeastAMinute",
-   maximumDistance= 2000,
+defined_affordance([subjType= isSelfAgent,actionVerb= "LiveAtLeastAMinute",
+   mudActionMaxDistance= 2000,
    'Energy'= 0 * -1,
    'NonHunger'= 0 * -1,
    'BladderEmpty'= 0 * -1,
@@ -165,7 +165,7 @@ slAnim= anim_SMOKE_IDLE,
 defined_affordance([subjType= "Radio",
 actionVerb= "Observe",
 textName= "Listen to Radio",
-maximumDistance= 4,
+mudActionMaxDistance= 4,
 'Secure_Room'= 1 * 0,
 'Fun'= 10 * 10,
 'Sad_To_Happy'= 10 * 10,
@@ -174,7 +174,7 @@ maximumDistance= 4,
 defined_affordance([subjType= "Mirror",
 actionVerb= "Observe",
 textName= "Pop your zits",
-maximumDistance= 2,
+mudActionMaxDistance= 2,
 'Secure_Room'= 1 * 0,
 'Fun'= 10 * 10,
 'Sad_To_Happy'= 10 * -1,
@@ -393,7 +393,7 @@ defined_affordance([alsoType= tLookable,actionVerb= "Clean",
 
 defined_affordance([alsoType= tLookable,actionVerb= "Observe",
    textName= "Observe",
-   maximumDistance= 5,
+   mudActionMaxDistance= 5,
    slAnim= anim_CLAP,
    'Fun'= 2 * 1,
    'Energy'= 0 * -1]).
@@ -425,7 +425,7 @@ slAnim= anim_ONETWO_PUNCH,
 
 defined_affordance([subjType= tAgentGeneric,actionVerb= "Talk",
 textName= "Talk to",
-maximumDistance= 3,
+mudActionMaxDistance= 3,
 alsoType= tLookable,
 slAnim= anim_TALK,
 'NonLoneliness_Social'= 11 * 20]).
@@ -453,6 +453,7 @@ recreate(F/A):-dynamic(F/A),functor(P,F,A),retractall(P),!.
 :-recreate(can_hold_type/2).
 :-recreate(verb_affordance/5).
 
+:- decl_mpred_hybrid(mudActionMaxDistance(vtActionType,ttObjectType,ftInt)).
 
 to_personal(mudCharge,mudCharge).
 to_personal(Pred,APred):-atom_concat('',Pred,APred).
@@ -464,8 +465,8 @@ do_define_type_affordance1(Type,_= Type):-!.
 do_define_type_affordance1(Type,subjType= String):- add(nameStrings(Type,String)).
 
 
-do_define_type_affordance1(Type,alsoType= TWhat):-typename_to_iname(t,TWhat,ParentType),add(mudSuperclass(Type,ParentType)).
-do_define_type_affordance1(Type,superType= TWhat):-typename_to_iname(t,TWhat,ParentType),add(mudSuperclass(Type,ParentType)).
+do_define_type_affordance1(Type,alsoType= TWhat):-typename_to_iname(t,TWhat,ParentType),add(mudSubclass(Type,ParentType)).
+do_define_type_affordance1(Type,superType= TWhat):-typename_to_iname(t,TWhat,ParentType),add(mudSubclass(Type,ParentType)).
 do_define_type_affordance1(Type,actionVerb= SVerb):-typename_to_iname(act,SVerb,Verb),nb_setval(actionVerb,Verb),!,assert_if_new(verb_for_type(Verb,Type)).
 do_define_type_affordance1(Type,actionVerb(2)= SVerb):-typename_to_iname(act,SVerb,Verb),nb_setval(actionVerb,Verb),
   (nb_current(acceptsChild,ChildType)->true;ChildType=tTakeable),
@@ -474,7 +475,7 @@ do_define_type_affordance1(Type,acceptsChild= TWhat):-typename_to_iname(t,TWhat,
   nb_setval(acceptsChild,ChildType),!,assert_if_new(can_hold_type(Type,ChildType)),
  (nb_current(actionVerb,Verb)->assert_if_new(verb_affordance_2(Verb,Type,ChildType));dmsg(warn(verb_affordance_3_no_verb(error(vVerb),Type,ChildType)))),!.
 do_define_type_affordance1(Type,SPred= Wants * Gets):-typename_to_iname(mud,SPred,Pred),nb_getval(actionVerb,Verb),to_personal(Pred,APred),assert_if_new(verb_affordance(Verb,Type,APred,Wants,Gets)).
-do_define_type_affordance1(Type,maximumDistance= String):-nb_getval(actionVerb,Verb),add(maximumDistance(Verb,Type,String)).
+do_define_type_affordance1(Type,mudActionMaxDistance= Distance):-nb_getval(actionVerb,Verb),add(mudActionMaxDistance(Verb,Type,Distance)).
 do_define_type_affordance1(Type,textSitName= String):-do_define_type_affordance1(Type,textName= String).
 do_define_type_affordance1(Type,textName= String):-nb_getval(actionVerb,Verb),assert_if_new(verb_desc(Verb,Type,String)).
 do_define_type_affordance1(Type,stringMatch= String):-assert_if_new(type_desc(Type,String)).
@@ -499,19 +500,20 @@ simian_idea(Agent,Act):-
 choose_best(_Agent,CMDS,Act):-random_permutation(CMDS,[Act|_]).
 
 show_call_fmt(Call):-show_call_failure(Call),fmt(Call).
-call_clause_last(CLREAL,Goal):-user:call_clause_last_1(CLREAL,Goal),!.
-call_clause_last_1(CLREAL,Goal):-functor(CLREAL,F,A),functor(Goal,GF,GA),functor(CGoal,GF,GA),
+call_clause_last(CLREAL,Goal):-functor(CLREAL,F,A),functor(Goal,GF,GA),functor(CGoal,GF,GA),
     functor(CLCOPY2,F,A),functor(CLCOPY3,F,A),functor(CLCOPY4,F,A),functor(CLCOPY5,F,A),functor(CLCOPY6,F,A),
-    FB = (_,_,_,call_clause_last(CLCOPY2,CGoal)),
-     must((
+    FB = (call(_),!,call_clause_last(_,WF)),
+     must_det_l([
       clause(CLCOPY2,FB,Ref),
+      CGoal = WF,
        nth_clause(CLCOPY3,NTH,Ref),
-       predicate_property(CLCOPY4,number_of_clauses(NC)),NTHNext is NTH+1)),!,
-     ((((between(NTHNext,NC,NthCL),nth_clause(CLCOPY5,NthCL,NewRef),
-       show_call_failure(clause(CLCOPY6,BODY,NewRef)),CLCOPY6=CLREAL,call(BODY)))*->true;Goal)).
+       predicate_property(CLCOPY4,number_of_clauses(NC)),NTHNext is NTH+1]),!,
+     EACH = ((between(NTHNext,NC,NthCL),nth_clause(CLCOPY5,NthCL,NewRef),show_call_failure(clause(CLCOPY6,BODY,NewRef)),CLCOPY6=CLREAL,call(BODY))),
+     !,
+     (call(EACH) -> ! ; ignore(show_call_failure(Goal))),!.
   
 % this is doing a trick to make sure it gets called very last
-agent_call_command(Agent,ACT) :- nonvar(ACT),!,true,call_clause_last(agent_call_command(Agent,ACT),agent_call_command_simbots_real(Agent,ACT)).
+agent_call_command(Agent,Templ) :- call((nonvar(Templ),simbots_templates(Templ))),!,call_clause_last(agent_call_command(Agent,Templ),agent_call_command_simbots_real(Agent,Templ)).
 
 % args_match_types(ARGS,Type).
 %args_match_types([],_):-!,fail.
@@ -519,25 +521,25 @@ args_match_types([Obj],Type):-!,mudIsa(Obj,Type).
 args_match_types(Obj,Type):-!,mudIsa(Obj,Type).
 
 
-agent_call_command_simbots_real(Agent,ACT):- nonvar(ACT),
-   ignore(affordance_side_effects(Agent,ACT,Template)),
-   ignore(affordance_message(Agent,ACT,Template)),
-   fmt(agent_call_command_simbots_real(Agent,ACT,Template)),!.
+agent_call_command_simbots_real(Agent,Templ):- must(simbots_templates(Templ)),nonvar(Templ),
+   ignore(affordance_side_effects(Agent,Templ,Template)),
+   ignore(affordance_message(Agent,Templ,Template)),
+   fmt(agent_call_command_simbots_real(Agent,Templ,Template)),!.
 
 
-affordance_side_effects(Agent,ACT,Template):- ACT=..[ActVerb|ARGS],
+affordance_side_effects(Agent,Templ,Template):- Templ=..[ActVerb|ARGS],
       verb_affordance(ActVerb,Types,_,_,_),args_match_types(ARGS,Types),!,must(Template=..[ActVerb,Types]),
       findall(dbase_t(Trait,Agent,Real), verb_affordance(ActVerb,Types,Trait,_Think,Real),NewAdds),
       forall(member(Add,NewAdds),add(Add)).
 
-affordance_message(Agent,ACT,Template):- ACT=..[ActVerb|ARGS],
+affordance_message(Agent,Templ,Template):- Templ=..[ActVerb|ARGS],
       verb_desc_or_else(ActVerb,Types,Mesg),args_match_types(ARGS,Types),!,must(Template=..[ActVerb,Types]),
-      fmt(affordance_message(Agent,ACT,verb_affordance(ActVerb,Types,Mesg))),!.
+      fmt(affordance_message(Agent,Templ,verb_affordance(ActVerb,Types,Mesg))),!.
       
 verb_desc_or_else(ActVerb,Types,Mesg):-verb_desc(ActVerb,Types,Mesg).
 verb_desc_or_else(ActVerb,Types,verb_desc(ActVerb,Types)):-nonvar(ActVerb),nonvar(Types),not(verb_desc(ActVerb,Types,_)).
 
-agent_call_command(Agent,ACT):- fmt(agent_call_command_simbots_real_3(Agent,ACT)),fail.
+agent_call_command(Agent,Templ):- simbots_templates(Templ), (fmt(agent_call_command_simbots_real_3(Agent,Templ)),fail).
 
 action_info(actTextcmd(ftString),"reinterps a term as text").
 agent_call_command(Agent,actTextcmd(A)):-sformat(CMD,'~w',[A]),!,do_player_action(Agent,CMD).
@@ -579,11 +581,15 @@ verb_alias("observe",actUse).
 verb_alias("operate",actUse).
 
 
-user:action_info(ACT, DESC):-no_repeats(action_info_simbots(ACT, DESC)).
+action_info(Templ,DESC):-verb_desc(V,O,DESC),Templ=..[V,O].
+action_info(Templ,text([verb_for_type,V,O,DOC])):- no_repeats([V,O],verb_affordance(V,O,_,_,_)),Templ=..[V,O], 
+                  findall(pir(P,I,R),((verb_affordance(V, O,P,I,R))),DOC).
 
-action_info_simbots(ACT, DESC):-verb_desc(V,O,DESC),ACT=..[V,O].
-action_info_simbots(ACT,text([verb_for_type,V, O])):-verb_affordance(V, O,_,_,_),ACT=..[V,O].
-action_info_simbots(ACT,text([verb_for_type,V, O])):-verb_for_type(V, O),ACT=..[V,O].
+vtActionTemplate(Templ):-simbots_templates(Templ).
+simbots_templates(Templ):-no_repeats(simbots_templates0(Templ)).
+simbots_templates0(Templ):-verb_for_type(V, O),Templ=..[V,O].
+simbots_templates0(Templ):-verb_desc(V,O,_),Templ=..[V,O].
+simbots_templates0(Templ):-verb_affordance(V,O,_,_,_),Templ=..[V,O].
 
 :-forall(defined_affordance(Attrs),must(do_define_affordance(Attrs))).
 :-listing(verb_desc/3).

@@ -27,8 +27,12 @@
 hasInstance(T,I):- !, hasInstance_dyn(T,I).
 hasInstance(T,I):- rdf_x(I,rdf:tType,T).
 
-assert_hasInstance(T,I):- !,assert_if_new(hasInstance_dyn(T,I)),!.
+assert_hasInstance(T,I):- !, assert_hasInstance_real(T,I).
+assert_hasInstance(T,I):- loop_check(hooked_asserta(mudIsa(I,T)),assert_hasInstance_real(T,I)).
 assert_hasInstance(T,I):- rdf_assert_x(I,rdf:tType,T).
+
+assert_hasInstance_real(T,I):- hasInstance_dyn(T,I),!.
+assert_hasInstance_real(T,I):- !,dmsg(assert_isa(I,T)),assert_if_new(hasInstance_dyn(T,I)),!.
 
 
 :-dynamic_multifile_exported loading_module_h/1.

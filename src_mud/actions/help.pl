@@ -14,36 +14,58 @@ mudSubclass(tAgentcol,tCol).
 % type_action_info(human_player,help, "shows this help").
 type_action_info(tHumanPlayer,actHelp(isOptional(ftString,"")), "shows this help").
 
-action_info(What,ftText("command is: ",What)):- vtActionTemplate(What).
+% action_info(TEMPL,S):- vtActionTemplate(TEMPL),to_param_doc(TEMPL,S).
+
 
 
 :-swi_export(get_type_action_help_commands_list/3).
 get_type_action_help_commands_list(A,B,C):-no_repeats(get_type_action_help_0(A,B,C)).
 
-:-swi_export(get_type_action_templates/1).
-get_type_action_templates(Templ):- no_repeats((get_type_action_help_0(_,Templ,_),good_template(Templ))).
+:-swi_export(get_all_templates/1).
+get_all_templates(Templ):-no_repeats(get_all_templates0(Templ)).
+get_all_templates0(Templ):-get_good_templates(Templ).
+get_all_templates0(Templ):-get_bad_templates(Templ),not(get_good_templates(Templ)).
+get_good_templates(Templ):- no_repeats((get_type_action_help_1(_,Templ,_),good_template(Templ))).
+get_bad_templates(Templ):- no_repeats((get_type_action_help_1(_,Templ,_),not(good_template(Templ)))).
 
-vtActionTemplate(Templ):-get_type_action_templates(Templ).
+
+vtActionTemplate(Templ):- loop_check(get_all_templates(Templ),fail).
 
 :-swi_export(good_template/1).
 good_template(Templ):- \+ contains_singletons(Templ).
 
+
+to_param_doc(TEMPL,S):-sformat(S,'Prolog looks like: ~q',[TEMPL]).
+
+
+
 get_type_action_help_0(What,TEMPL,Help):- call_no_cuts(type_action_info(What,TEMPL,Help)).
 get_type_action_help_0(_What,TEMPL,Help):- call_no_cuts(action_info(TEMPL,Help)).
-get_type_action_help_0(_What,TEMPL,S):-    call_no_cuts(vtActionTemplate(TEMPL)),sformat(S,'Prolog looks like: ~q',[TEMPL]).
 get_type_action_help_0(isaFn(A),TEMPL,ftText(Text,'does: ',do(A2,TEMPL))):- between(1,5,L),length(Text,L),get_agent_text_command(A,Text,A2,Goal),(nonvar(Goal)->TEMPL=Goal;TEMPL=Text).
 get_type_action_help_0(What,Syntax,ftText([makes,happen,List])):- call_no_cuts(action_rules(Agent,Verb,[Obj|Objs],List)),atom(Verb),safe_univ(Syntax,[Verb,Obj|Objs]), 
                      % once(member(isa(Obj,_Type),List);_Type=term),
                       ignore(Agent=an(What)),ignore(What=tAgentGeneric).
 
+get_type_action_help_1(What,TEMPL,S):- get_type_action_help_0(What,TEMPL,S).
+get_type_action_help_1(_What,TEMPL,S):- call_no_cuts(vtActionTemplate(TEMPL)),to_param_doc(TEMPL,S).
 
-action_info_db(TEMPL,S):- (PRED=agent_call_command(_,TEMPL);PRED=agent_text_command(_,_,_,TEMPL)) ,
-   predicate_property(user:PRED,multifile),clause(PRED,_BODY,REF),nonvar(TEMPL),clause_property(REF,file(S)).
 
-action_info(TEMPL,ftText(file,S,mudContains,TEMPL)):-action_info_db(TEMPL,S),not(clause_asserted(action_info(TEMPL,_Help),true)).
+first_pl((BODY,_),PL):-!,
+ first_pl(BODY,PL).
+first_pl(PL,PL).
 
-commands_list(ListS):-findall(action_info(B,C,A),(get_type_action_help_commands_list(A,B,C),
- numbervars(action_info(A,B,C),0,_,[attvar(bind),singletons(true)])),List),
+action_info_db(TEMPL,INFO,WAS):- (PRED=agent_call_command(_,WAS);PRED=agent_text_command(_,_,_,WAS)) ,
+   clause(PRED,BODY,REF),clause_property(REF,file(S)),
+   (nonvar(WAS)->true;once(( ignore((nop(S=S),first_pl(BODY,PL),ignore(catch(notrace(PL),_,true)))),nonvar(WAS)))),
+   
+    (TEMPL=@=WAS -> ((clause_property(REF,line_count(LC)),INFO=line(LC:S))) ;  (not(not(TEMPL=WAS)) -> INFO=file(S) ; fail)).
+ 
+action_info(TEMPL,ftText(S,contains,WAS)):-action_info_db(TEMPL,S,WAS),not(clause_asserted(action_info(TEMPL,_Help),true)).
+
+
+commands_list(ListS):- findall(Templ,get_all_templates(Templ),List),predsort(alpha_shorter_1,List,ListS).
+commands_list_old(ListS):-
+ findall(action_info(B,C,A),(get_type_action_help_commands_list(A,B,C), numbervars(action_info(A,B,C),0,_,[attvar(bind),singletons(true)])),List),
    predsort(alpha_shorter,List,ListS).
 
 alpha_shorter(OrderO, P1,P2):-arg(1,P1,O1),arg(1,P2,O2),!,alpha_shorter_1(OrderO, O1,O2),!.
@@ -54,17 +76,29 @@ alpha_shorter_1(OrderO, P1,P2):-functor_h(P1,F1,A1),functor_h(P2,F2,A2),compare(
   (compare(OrderA,A1,A2), (OrderA \== '=' -> OrderO=OrderA ; compare(OrderO,P1,P2)))).
 
 
+get_template_docu(TEMPL,DOC):-no_repeats((get_type_action_help_0(_,TEMPL,DOC)*->true;get_type_action_help_1(_What,TEMPL,DOC))).
+get_template_docu_all(TEMPL,DOC):-no_repeats(get_type_action_help_1(_What,TEMPL,DOC)).
+
+show_templ_doc(TEMPL):-findall(DOC,get_template_docu(TEMPL,DOC),DOCL),nvfmt(TEMPL=DOCL).
+show_templ_doc_all(TEMPL):-findall(DOC,get_template_docu_all(TEMPL,DOC),DOCL),nvfmt(TEMPL=DOCL).
+
+nvfmt([XX]):-!,nvfmt(XX).
+nvfmt(XX=[YY]):-!,nvfmt(XX=YY).
+nvfmt(XX):-copy_term(XX,X),numbervars(X,0,_,[attvar(bind),singletons(true)]),fmt(X).
+
 % Help - A command to tell an agent all the possible commands
-show_help:- commands_list(ListS),forall(member(E,ListS),fmt(E)).
+show_help:- commands_list(ListS),forall(member(E,ListS),show_templ_doc(E)).
 agent_call_command(_Agent,actHelp) :- show_help.
-agent_call_command(_Agent,actHelp(Str)) :-commands_list(ListS),forall(member(E,ListS),write_string_if_contains(Str,E)).
+agent_call_command(_Agent,actHelp(Str)) :-show_help(Str).
 
-write_string_if_contains("",E):-!,fmt(E).
-write_string_if_contains(Must,E):-ignore((with_output_to(string(Str),fmt(E)),str_contains_all([Must],Str),fmt(Str))).
+show_help(Str):-commands_list(ListS),forall(member(E,ListS),write_string_if_contains(Str,E)).
 
-hook_coerce(Text,vtVerb,Inst):- get_type_action_templates(A),nonvar(A),functor_safe(A,Inst,_),name_text(Inst,Text).
+write_string_if_contains("",E):-!,show_templ_doc(E),!.
+write_string_if_contains(Must,E):-ignore((with_output_to(string(Str),show_templ_doc_all(E)),str_contains_all([Must],Str),fmt(Str))).
 
-%agent_text_command(Agent,[Who],Agent,Cmd):- nonvar(Who), get_type_action_templates(Syntax),Syntax=..[Who,isOptional(_,Default)],Cmd=..[Who,Default].
-%agent_text_command(Agent,[Who,Type],Agent,Cmd):- get_type_action_templates(Syntax),nonvar(Who),Syntax=..[Who,isOptional(Type,_)],Cmd=..[Who,Type].
+hook_coerce(Text,vtVerb,Inst):- get_all_templates(A),nonvar(A),functor_safe(A,Inst,_),name_text(Inst,Text).
+
+%agent_text_command(Agent,[Who],Agent,Cmd):- nonvar(Who), get_all_templates(Syntax),Syntax=..[Who,isOptional(_,Default)],Cmd=..[Who,Default].
+%agent_text_command(Agent,[Who,Type],Agent,Cmd):- get_all_templates(Syntax),nonvar(Who),Syntax=..[Who,isOptional(Type,_)],Cmd=..[Who,Type].
 
 :- include(logicmoo(vworld/moo_footer)).

@@ -1,7 +1,7 @@
 /** <module> Logicmoo Path Setups
 */
 :-module(logicmoo_util_all,[if_flag_true/2,add_to_search_path/2,add_to_search_path_first/2,prolog_file_dir/2,if_startup_script/1,if_startup_script/0]).
-
+:- set_prolog_flag(generate_debug_info, true).
 :-export(prolog_file_dir/1).
 prolog_file_dir(Here):- prolog_load_context(file, HereF),file_directory_name(HereF,Here).
 prolog_file_dir(Here):- working_directory(Here,Here).

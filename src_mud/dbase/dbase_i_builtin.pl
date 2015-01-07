@@ -26,7 +26,7 @@
 % =================================================================================================
 % BEGIN world English
 % =================================================================================================
-tCol('TemporallyExistingThing').
+tCol(tTemporallyExistingThing).
 tCol(activeAgent).
 
 tCol(tChannel).
@@ -54,14 +54,13 @@ mudSubclass(isEach(tRegion,tAgentGeneric,actGossup),tChannel).
 
 tChannel(actGossup).
 
-ttCreateable('TemporallyExistingThing').
+ttCreateable(tTemporallyExistingThing).
 
 :-dynamic type_max_health/2. 
 
-prologMultiValued(mudContains(tContainer,tObj)).
 prologMultiValued(mudGrid(tRegion,ftInt,ftInt,tObj)).
-prologMultiValued(mudPossess(tAgentGeneric,tSpatialthing)).
-genlPreds(mudPossess,wearsClothing).
+
+
 prologMultiValued(mudSubclass(tCol,tCol)).
 prologMultiValued(mudIsa(ftTerm,tCol)).
 predArgTypes(somethingIsa(ftTerm,ftListFn(tCol))).
@@ -278,10 +277,10 @@ prologSingleValued(max_health(ftTerm,ftInt)).
 tChannel(A):-tRegion(A).
 tChannel(A):-tAgentGeneric(A).
 
-mudSubclass(tAgentGeneric,tSpatialthing).
-mudSubclass(tRegion,tSpatialthing).
-mudSubclass(tObj,tSpatialthing).
-mudSubclass(tItem,tSpatialthing).
+mudSubclass(tAgentGeneric,tSpatialThing).
+mudSubclass(tRegion,tSpatialThing).
+mudSubclass(tObj,tSpatialThing).
+mudSubclass(tItem,tSpatialThing).
 
 mudSubclass(tDrinkable,tItem).
 mudSubclass(tPossessable,tItem).
@@ -330,9 +329,9 @@ predArgTypes(member(ftTerm,ftTerm)).
 
 
 
-prologListValued(mudNearFeet(tAgentGeneric,ftListFn(tSpatialthing)),[]).
-prologListValued(mudNearReach(tAgentGeneric,ftListFn(tSpatialthing)),[predModule(user)]).
-prologListValued(mudGetPrecepts(tAgentGeneric,ftListFn(tSpatialthing)),[predModule(user)]).
+prologListValued(mudNearFeet(tAgentGeneric,ftListFn(tSpatialThing)),[]).
+prologListValued(mudNearReach(tAgentGeneric,ftListFn(tSpatialThing)),[predModule(user)]).
+prologListValued(mudGetPrecepts(tAgentGeneric,ftListFn(tSpatialThing)),[predModule(user)]).
 
 mudSubclass(tFunction,tRelation).
 mudSubclass(tPred,tRelation).
@@ -366,7 +365,7 @@ equivRule(mudDescription(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
 
 % dbase_t(action_info,What,text("command is: ",What)):- holds_t(action_type,What).
 
-:-decl_mpred_hybrid(mudStowed(tAgentGeneric,tItem)).
+:-decl_mpred_hybrid(mudStowing(tAgentGeneric,tItem)).
 
 
 % formattype(FormatType):-subclass(FormatType,formattype).
@@ -393,7 +392,7 @@ prologSingleValued(mudFacing(tObj,vtDirection(vNorth))).
 prologSingleValued(mudFacing(tObj,vtDirection)).
 prologSingleValued(mudHeight(tObj,ftInt)).
 prologSingleValued(mudID(tObj,ftID)).
-predArgTypes(localityOfObject(tObj,tSpatialthing)).
+predArgTypes(localityOfObject(tObj,tSpatialThing)).
 prologSingleValued(mudLastCommand(tAgentGeneric,tCommand)).
 prologSingleValued(location_center(tRegion,xyzFn(tRegion,ftInt,ftInt,ftInt))).
 prologSingleValued(mudMoveDist(tAgentGeneric,ftInt(1))).
@@ -415,7 +414,7 @@ prologSingleValued(mudStr(tAgentGeneric,ftInt)).
 prologSingleValued(mudTypeGrid(regioncol,ftInt,ftListFn(ftTerm))).
 prologSingleValued(mudWeight(tObj,ftInt)).
 
-prologSingleValued(mudHeight(tSpatialthing,ftInt)).
+prologSingleValued(mudHeight(tSpatialThing,ftInt)).
 
 prologMultiValued(comment(ftTerm,ftString)).
 prologMultiValued(pathBetween(tRegion,vtDirection,tRegion)).
@@ -427,7 +426,7 @@ prologOnly(default_inst_props(ftID,tCol,ftVoprop)).
 default_type_props(tFood,[mudHeight(0)]).
 default_type_props(tAgentGeneric,[mudMoveDist(1)]).
 
-default_type_props(tSpatialthing,mudHeight(0)).
+default_type_props(tSpatialThing,mudHeight(0)).
 
 
 
@@ -475,16 +474,16 @@ mudFtInfo(ftString,prologCall(string(isSelf))).
 mudFtInfo(ftTerm,prologCall(nonvar(isSelf))).
 mudFtInfo(ftVar,prologCall(var(isSelf))).
 
-mudSubclass(tAgentGeneric,tSpatialthing).
+mudSubclass(tAgentGeneric,tSpatialThing).
 mudSubclass(areaPath,tDoor).
 mudSubclass(tChargeable,tItem).
 mudSubclass(tDoor,tItem).
 mudSubclass(tDrinkable,tItem).
 mudSubclass(tEatable,tItem).
-mudSubclass(tItem,tSpatialthing).
-mudSubclass(tObj,tSpatialthing).
+mudSubclass(tItem,tSpatialThing).
+mudSubclass(tObj,tSpatialThing).
 mudSubclass(tPossessable,tItem).
-mudSubclass(tRegion,tSpatialthing).
+mudSubclass(tRegion,tSpatialThing).
 mudSubclass(tUseable,tItem).
 mudSubclass(tWearable,tItem).
 
@@ -532,8 +531,8 @@ prologMultiValued(nameStrings(ftTerm,ftString)).
 prologMultiValued(determinerString(ftTerm,ftString)).
 prologMultiValued(descriptionHere(ftTerm,ftString)).
 
-predArgTypes(mudSize(tSpatialthing,size_value)).
-predArgTypes(mudTexture(tSpatialthing,vTextureValue)).
+predArgTypes(mudSize(tSpatialThing,size_value)).
+predArgTypes(mudTexture(tSpatialThing,vTextureValue)).
 
 mudSubclass(discoverableType,tCol).
 
@@ -547,9 +546,7 @@ prologMultiValued(mudKeyword(ftTerm,ftString)).
 prologMultiValued(kwLabel(ftTerm,ftString)).
 prologMultiValued(act_affect(tItem,vtVerb,ftTerm(ftVoprop))).
 prologMultiValued(mudMemory(tAgentGeneric,ftTerm)).
-prologMultiValued(wearsClothing(tAgentGeneric,tWearable)).
 prologMultiValued(mudGrid(tRegion,ftInt,ftInt,tObj)).
-prologMultiValued(mudPossess(tAgentGeneric,tItem)).
 prologMultiValued(mudSubclass(tCol,tCol)).
 prologMultiValued(mudIsa(ftTerm,tCol)).
 

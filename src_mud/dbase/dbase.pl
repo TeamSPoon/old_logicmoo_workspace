@@ -435,35 +435,37 @@ db_reop0(OP,Call) :- dmsg(warn(db_reop(OP,Call))),db_op0(OP,Call).
 del(C0):- ireq(C0),!,idel(C0),!.
 del(C0):- mreq(C0),!,mdel(C0),!.
 
-idel(C0):- db_op_int(change(retract,one),C0), verify_sanity(ireq(C0)->(dmsg(warn(incomplete_I_DEL(C0))),fail);true),!.
+idel(C0):- dmsg(idel(C0)),db_op_int(change(retract,one),C0), verify_sanity(ireq(C0)->(dmsg(warn(incomplete_I_DEL(C0))),fail);true),!.
 idel(C0):- dmsg(warn(failed(idel(C0)))),!,fail.
 
-mdel(C0):- db_op_int(change(retract,one),C0), verify_sanity(mreq(C0)->(dmsg(warn(incomplete_M_DEL(C0))),fail);true),!.
+mdel(C0):- dmsg(mdel(C0)),db_op_int(change(retract,one),C0), verify_sanity(mreq(C0)->(dmsg(warn(incomplete_M_DEL(C0))),fail);true),!.
 mdel(C0):- dmsg(warn(failed(mdel(C0)))),!,fail.
 
 % -  clr(Retractall)
-clr(C0):- db_op_int(change(retract,all),C0),verify_sanity(ireq(C0)->(dmsg(warn(incomplete_CLR(C0))));true).
+clr(C0):- dmsg(clr(C0)),db_op_int(change(retract,all),C0),verify_sanity(ireq(C0)->(dmsg(warn(incomplete_CLR(C0))));true).
 
 % -  preq(Query) = query with P note
 preq(P,C0):- db_op_int(query(dbase_t,P),C0).
 
 % -  req(Query) = Normal query
-req(C0):- preq(req,C0).
+req(C0):- dmsg(req(C0)), preq(req,C0).
 
 % -  mreq(Query) = Forced Full query
-mreq(C0):- rescan_module_ready,no_loop_check(with_assertions([-insideIREQ(_),-thlocal:noDefaultValues(_),-thlocal:noRandomValues(_)],preq(must,C0))).
+mreq(C0):- dmsg(mreq(C0)), rescan_module_ready,no_loop_check(with_assertions([-insideIREQ(_),-thlocal:noDefaultValues(_),-thlocal:noRandomValues(_)],preq(must,C0))).
 
 
 % -  ireq(Query) = Normal query (May not use second order logic) (must be asserted on isntance) (used mainly by 2nd order logic to avoid looping)
-ireq(C0):- rescan_module_ready,no_loop_check(with_assertions([+insideIREQ(_), +thlocal:noDefaultValues(_),+thlocal:noRandomValues(_)],preq(ireq,C0))).
+ireq(C0):- dmsg(ireq(C0)), rescan_module_ready,no_loop_check(with_assertions([+insideIREQ(_), +thlocal:noDefaultValues(_),+thlocal:noRandomValues(_)],preq(ireq,C0))).
 
+:-dmsg_hide(req).
+:-dmsg_hide(ireq).
 
 % -  props(Obj,QueryPropSpecs)
 props(Obj,PropSpecs):- req(props(Obj,PropSpecs)).
 iprops(Obj,PropSpecs):- ireq(props(Obj,PropSpecs)).
 % -  add_fast(Assertion)
 % add_fast(C0):- must_det((add_fast_unchecked(C0), xtreme_debug(once(ireq(C0);(with_all_dmsg((debug(blackboard),show_call(add_fast_unchecked(C0)),rtrace(add_fast_unchecked(C0)),dtrace(ireq(C0))))))))),!.
-add_fast(C0):- must_det((add_fast_unchecked(C0), nop(xtreme_debug(ireq(C0)->true;dmsg(warn(failed_ireq(C0))))))),!.
+add_fast(C0):- dmsg(add_fast(C0)),must_det((add_fast_unchecked(C0), nop(xtreme_debug(ireq(C0)->true;dmsg(warn(failed_ireq(C0))))))),!.
 
 :-swi_export(add_fast_unchecked/1).
 add_fast_unchecked(C0):-must_det(db_op(change(assert,add), C0)).
@@ -710,10 +712,10 @@ db_op_unit(Op,_C0,Prop,ARGS):- once((db_op_sentence(Op,Prop,ARGS,Unit),same_vars
 db_op_unit(Op,C0,_Prop,_ARGS):- test_tl(thlocal:insideIREQ,C0),!,must_det(query(_Must,_HLDS)=Op),fail.
 
 % genlInverse/2
-db_op_unit(Op,_C0,Prop,ARGS):- dbase_t(genlInverse,Prop,Other), inverse_args(ARGS,Inverse), db_op_sentence(Op,Other,Inverse,Unit1), db_op_exact(Op,Unit1).
+%db_op_unit(Op,_C0,Prop,ARGS):- dbase_t(genlInverse,Prop,Other), inverse_args(ARGS,Inverse), db_op_sentence(Op,Other,Inverse,Unit1), db_op_exact(Op,Unit1).
 
 % genlPreds/2
-db_op_unit(Op,_C0,Prop,ARGS):- dbase_t(genlPreds,Prop,Other),  db_op_sentence(Op,Other,ARGS,Unit1), db_op_exact(Op,Unit1).
+%db_op_unit(Op,_C0,Prop,ARGS):- dbase_t(genlPreds,Prop,Other),  db_op_sentence(Op,Other,ARGS,Unit1), db_op_exact(Op,Unit1).
 
 db_op_loop(Op,Unit,Result):- is_loop_checked(db_op0(Op,Unit)),!,call(Result).
 db_op_loop(Op,Unit,_Result):- db_reop(Op,Unit).
@@ -784,8 +786,8 @@ never_dbase_mpred(mpred_arity).
 
 :-dmsg_hide(db_op_exact).
 :-dmsg_hide(add).
-:-dmsg_hide(assert_isa).
 
+:-dmsg_hide(into_mpred_form).
 
 % assert_with to change(CA1,CB2) mutlivalue pred
 :-swi_export((db_assert_mv/4)).

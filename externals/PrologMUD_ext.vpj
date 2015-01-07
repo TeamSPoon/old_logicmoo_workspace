@@ -1563,6 +1563,12 @@
 				<F N="MUD_DeepParsing/prolog/parser_talk.pl"/>
 			</Folder>
 		</Folder>
+		<Folder Name="MUD_ircbot">
+			<Folder Name="prolog">
+				<F N="MUD_ircbot/prolog/eggdrop.pl"/>
+				<F N="MUD_ircbot/prolog/tn_eggdrop.pl"/>
+			</Folder>
+		</Folder>
 		<Folder Name="MUD_KnowRob">
 			<Folder Name="iai_maps/.git">
 				<Folder Name="info">

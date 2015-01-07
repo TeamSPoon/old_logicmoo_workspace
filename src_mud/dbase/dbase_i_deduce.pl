@@ -21,24 +21,23 @@
 % ========================================================================================
 
 :-export((alt_forms/2)).
-alt_forms(P,NP):-into_mpred_form(P,CP),P\=@=CP,!,alt_forms(CP,NP).
-alt_forms(P,NP):- no_repeats(( alt_forms0(P,NP), NP\=@=P)).
+alt_forms(AR,P,NP):-into_mpred_form(P,CP),P\=@=CP,!,alt_forms(AR,CP,NP).
+alt_forms(AR,P,NP):- no_repeats(( alt_forms0(AR,P,NP), NP\=@=P)).
 
-alt_forms0(P,NP):-alt_forms1(P,M),alt_forms1(M,N),alt_forms1(N,NP).
-alt_forms0(P,NP):-alt_forms1(P,M),alt_forms1(M,NP).
-alt_forms0(P,NP):-alt_forms1(P,NP).
+alt_forms0(AR,P,NP):-alt_forms1(AR,P,M),alt_forms1(AR,M,N),alt_forms1(AR,N,NP).
+alt_forms0(AR,P,NP):-alt_forms1(AR,P,M),alt_forms1(AR,M,NP).
+alt_forms0(AR,P,NP):-alt_forms1(AR,P,NP).
 
+alt_forms1(AR,mudAtLoc(P,L),localityOfObject(P,R)):-ground(mudAtLoc(P,L)),once(locationToRegion(L,R)),nonvar(R).
+alt_forms1(AR,localityOfObject(P,R),mudAtLoc(P,L)):-ground(localityOfObject(P,R)),is_asserted(mudAtLoc(P,L)),nonvar(L),once(locationToRegion(L,R)).
+alt_forms1(AR,P,NP):-P=..[F,A,B|R],alt_forms2(AR,F,A,B,R,NP). 
 
-alt_forms1(mudAtLoc(P,L),localityOfObject(P,R)):-ground(mudAtLoc(P,L)),once(locationToRegion(L,R)),nonvar(R).
-alt_forms1(localityOfObject(P,R),mudAtLoc(P,L)):-ground(localityOfObject(P,R)),is_asserted(mudAtLoc(P,L)),nonvar(L),once(locationToRegion(L,R)).
-alt_forms1(P,NP):-P=..[F,A,B|R],alt_forms2(F,A,B,R,NP). 
+%alt_forms2(r,F,A,B,R,NP):-dbase_t(genlInverse,F,FF),NP=..[FF,B,A|R].
+%alt_forms2(r,F,A,B,R,NP):-dbase_t(genlInverse,FF,F),NP=..[FF,B,A|R].
+% alt_forms2(r,F,A,B,R,NP):-dbase_t(genlPreds,F,FF),NP=..[FF,A,B|R].
+alt_forms2(r,F,A,B,R,NP):-dbase_t(genlPreds,FF,F),NP=..[FF,A,B|R].
 
-alt_forms2(F,A,B,R,NP):-dbase_t(genlInverse,F,FF),NP=..[FF,B,A|R].
-alt_forms2(F,A,B,R,NP):-dbase_t(genlInverse,FF,F),NP=..[FF,B,A|R].
-alt_forms2(F,A,B,R,NP):-dbase_t(genlPreds,F,FF),NP=..[FF,A,B|R].
-alt_forms2(F,A,B,R,NP):-dbase_t(genlPreds,FF,F),NP=..[FF,A,B|R].
-
-decl_database_hook(retract(Kind),P):- forall(alt_forms(P,NP),ignore(hooked_op(retract(Kind),NP))).
+decl_database_hook(retract(Kind),P):- forall(alt_forms(r,P,NP),ignore(hooked_op(retract(Kind),NP))).
 
 
 % ========================================================================================
@@ -59,7 +58,7 @@ run_deduce_facts_from_lc(Type,Fact):-doall((call_no_cuts(deduce_facts(Fact,Deduc
 decl_database_hook(assert(_),mudAtLoc(R,W)):- mudIsa(R,tRegion),trace_or_throw(mudAtLoc(R,W)).
 
 
-deduce_facts(localityOfObject(_,Region),mudIsa(Region,tSpatialthing)).
+deduce_facts(localityOfObject(_,Region),mudIsa(Region,tSpatialThing)).
 deduce_facts(localityOfObject(Obj,_),mudIsa(Obj,tObj)).
 
 deduce_facts(Fact,mpred_prop(AF,[predArgTypes(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],argsIsaProps(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,

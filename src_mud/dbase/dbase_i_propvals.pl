@@ -12,24 +12,27 @@
 % Douglas Miles
 */
 
-:- dynamic_multifile_exported create_random_fact/1.
-:- dynamic_multifile_exported hooked_random_instance/3.
-:- dynamic_multifile_exported fact_is_false/2.
-:- dynamic_multifile_exported((thlocal:noDefaultValues/1)).
-:- dynamic_multifile_exported((thlocal:noRandomValues/1)).
-:- dynamic_multifile_exported((thlocal:insideIREQ/1)).
+:- include(logicmoo('vworld/moo_header.pl')).
+
+:-meta_predicate_transparent(with_no_modifications(0)).
+with_no_modifications(CALL):-!,CALL.
+with_no_modifications(CALL):-with_assertions(thlocal:noDBaseMODs(_),CALL).
+
+:-meta_predicate_transparent(with_no_db_hooks(0)).
+with_no_db_hooks(CALL):-!,CALL.
+with_no_db_hooks(CALL):-with_assertions(thlocal:noDBaseHOOKS(_),CALL).
 
 :-meta_predicate_transparent(with_fallbacks(0)).
-with_fallbacks(Fact):-with_no_assertions(thlocal:noDefaultValues(_),Fact).
+with_fallbacks(CALL):-with_no_assertions(thlocal:noDefaultValues(_),CALL).
 
 :-meta_predicate_transparent(with_fallbacksg(0)).
-with_fallbacksg(Fact):-with_no_assertions(thlocal:noRandomValues(_),Fact).
+with_fallbacksg(CALL):-with_no_assertions(thlocal:noRandomValues(_),CALL).
 
 :-meta_predicate_transparent(with_no_fallbacksg(0)).
-with_no_fallbacksg(Fact):-with_assertions(thlocal:noRandomValues(_),Fact).
+with_no_fallbacksg(CALL):-with_assertions(thlocal:noRandomValues(_),CALL).
 
 :-meta_predicate_transparent(with_no_fallbacks(0)).
-with_no_fallbacks(Fact):-with_assertions(thlocal:noDefaultValues(_),Fact).
+with_no_fallbacks(CALL):-with_assertions(thlocal:noDefaultValues(_),CALL).
 
 :-meta_predicate_transparent(fallback/0).
 fallback:- not(thlocal:insideIREQ(_)).
@@ -82,8 +85,8 @@ choose_asserted(Prop,Obj,Value):- nonvar(Obj),transitive_other(Prop,1,Obj,What),
 choose_asserted_mid_order(Prop,Obj,Value):-loop_check(choose_asserted_mid_order_all(Prop,Obj,Value),fail).
 choose_asserted_mid_order_all(Prop,Obj,Value):- call_mpred(dbase_t(Prop,Obj,Value)).
 choose_asserted_mid_order_all(Prop,Obj,_Value):- atom(Prop), Fact=.. [Prop,Obj,_],thlocal:insideIREQ(Fact),!,fail.
-choose_asserted_mid_order_all(Prop,Obj,Value):- is_asserted(genlPreds(Prop,Other)),choose_asserted(Other,Obj,Value).
-choose_asserted_mid_order_all(Prop,Obj,Value):- is_asserted(genlInverse(Prop,Other)),choose_val(Other,Value,Obj).
+choose_asserted_mid_order_all(Prop,Obj,Value):- is_asserted(genlPreds(Other,Prop)),choose_asserted(Other,Obj,Value).
+% choose_asserted_mid_order_all(Prop,Obj,Value):- is_asserted(genlInverse(Prop,Other)),choose_val(Other,Value,Obj).
 
 :-swi_export(create_someval/3).
 create_someval(Prop,Obj,Value):- ground(Prop-Obj-Value),!,dmsg(error_create_someval(Prop,Obj,Value)).
@@ -168,7 +171,7 @@ checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type):- not(thlocal:deduceAr
 checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type):- must_det(deduce_argN(Prop,N,Obj,OType,Type)),fail.
 checkNoArgViolationOrDeduceInstead(Prop,N,Obj,_,_):- argIsa_call(Prop,N,Type),findall(OT,mudIsa(Obj,OT),OType),reallyCheckArgViolation(Prop,N,Obj,OType,Type).
 
-openSubClass(tSpatialthing).
+openSubClass(tSpatialThing).
 openSubClass(tObj).
 openSubClass(tRegion).
 
@@ -190,7 +193,7 @@ guessed_mpred_arity(_,2).
 suggestedType(Prop,N,_,argIsaFn(Prop, N),FinalType):- guessed_mpred_arity(Prop,N),typename_to_iname('vt',Prop,FinalType),!,must((decl_type(FinalType),assert_isa(FinalType,discoverableType))).
 suggestedType(Prop,N,_,_,FinalType):- guessed_mpred_arity(Prop,N),typename_to_iname('vt',Prop,FinalType),!,must((decl_type(FinalType),assert_isa(FinalType,discoverableType))).
 suggestedType( _ ,_,_ ,FinalType,FinalType):-atom(FinalType),tCol(FinalType),not(ttFormatType(FinalType)),!.
-suggestedType( _ ,_,Possibles,_ ,FinalType):- member(FinalType,[tPred,tCol,ttFormatType,ftText,tRegion,tAgentGeneric,tItem,tObj,tSpatialthing]),member(FinalType,Possibles),!.
+suggestedType( _ ,_,Possibles,_ ,FinalType):- member(FinalType,[tPred,tCol,ttFormatType,ftText,tRegion,tAgentGeneric,tItem,tObj,tSpatialThing]),member(FinalType,Possibles),!.
 
 deduce_argN(Prop,N,_,ObjectTypes,Type):- suggestedType(Prop,N,ObjectTypes,Type,FinalType),FinalType\=Type,assert_argIsa(Prop,N,FinalType).
 deduce_argN(_ ,_ ,Obj,[],Type):- tCol(Type), assert_isa(Obj,Type),!.
@@ -253,7 +256,7 @@ fallback_value(Prop,Obj,Value):-Fact=..[Prop,Obj,Value],
    checkNoArgViolation(Prop,Obj,ValueR),is_fact_consistent(Fact),
    Value=ValueR.
 
-:-dmsg_hide(defaultArgValue).
+%:-dmsg_hide(defaultArgValue).
 
 no_fallback(mudSubclass,2).
 no_fallback(P,2):-not(mpred_prop(P,prologSingleValued)).

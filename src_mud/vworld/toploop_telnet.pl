@@ -79,8 +79,10 @@ connect_player(Wants,Gets):-
    once((ensure_player_stream_local(Wants),
      current_agent(Gets)))]).
 
+run_player_telnet:- 
+      with_assertions(set_prolog_flag(opt_debug,filter),run_player_telnet_0).
 
-run_player_telnet:-   
+run_player_telnet_0:-    
    must(set_tty_control),!,
    fmt('~n~n~nHello run_player_telnet!~n',[]),
    must(foc_current_player(P)),
@@ -98,7 +100,7 @@ set_player_telnet_options:-
      foc_current_player(P),
      add(repl_writer(P,telnet_repl_writer)),
      add(repl_to_string(P,telnet_repl_obj_to_string)),
-     set_bugger_flag(opt_debug,off).
+     set_bugger_flag(opt_debug,false).
 
 goodbye_player:- 
      foc_current_player(P3),

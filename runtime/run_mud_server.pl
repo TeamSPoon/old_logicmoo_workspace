@@ -1,32 +1,48 @@
-%!swipl -f
-/** <module> An Implementation a MUD server in SWI-Prolog
+#!/usr/local/bin/swipl -L8G -G8G -T8G -f
+/** <module> MUD server startup script in SWI-Prolog
 
 */
 
-% [Optionaly] Set the Prolog optimize/debug flags
-:- set_prolog_flag(verbose_load,true).
-:- use_module(library(gui_tracer)).
-:- set_prolog_flag(gui_tracer, false).
+:- set_prolog_flag(generate_debug_info, true).
+:- exists_directory(runtime)->cd(runtime);(exists_directory('../runtime')->cd('../runtime');true).
 
 % [Manditory] Load the Logicmioo utils
 :- '@'(ensure_loaded('../src_lib/logicmoo_util/logicmoo_util_all'),user).
-% :- set_prolog_flag(gc,true),set_prolog_flag(last_call_optimisation,true),set_prolog_flag(optimise,true).
-% :- set_prolog_flag(debug,false),
+
+bugger:action_verb_useable(actWearUnused,wearsClothing,tWearable,mudPossess).
 
 % [Manditory] define how we interact with the module system
 swi_module(M,E):-dmsg(swi_module(M,E)).
 swi_export(_):-!.
 swi_export(E):-dmsg(swi_export(E)).
 
+% [Optionaly] Set the Prolog optimize/debug flags
+:- set_prolog_flag(verbose_load,true).
+:- use_module(library(gui_tracer)).
+:- set_prolog_flag(gui_tracer, false).
+:- set_prolog_flag(answer_write_options, [quoted(true), portray(true), max_depth(1000), spacing(next_argument)]).
+set_mem_opt(TF):- set_prolog_flag(gc,TF),set_prolog_flag(last_call_optimisation,TF),set_prolog_flag(optimise,TF).
+:- set_prolog_flag(debug,false).
+:- set_mem_opt(true).
+
+:- multifile(user:semweb_startup).
+:- export(do_semweb_startup/0).
+do_semweb_startup:-forall(clause(user:semweb_startup,Body),must(show_call(Body))).
 
 % [Optionaly] register swish server (remote file editing)
-% :- if_file_exists(ensure_loaded('../externals/swish/logicmoo_run_swish')).
+:- if_file_exists(ensure_loaded('../externals/swish/logicmoo_run_swish')).
 
 % [Optionaly] register/run Cliopatria sparql server (remote RDF browsing)
-% :- if_startup_script(ensure_loaded(run_clio)).
+:- if_startup_script(ensure_loaded('run_clio')).
 
 % [Optionaly] register/run KnowRob robot services (we use it for the ontology mainly)
-% :- with_no_term_expansions(if_file_exists(ensure_loaded('../externals/MUD_KnowRob/knowrob_addons/knowrob_mud/prolog/init.pl'))).
+user:semweb_startup :- with_no_term_expansions(if_file_exists(ensure_loaded('../externals/MUD_KnowRob/knowrob_addons/knowrob_mud/prolog/init.pl'))).
+
+% [Optionaly] register/run MILO robot services (we use it for the ontology mainly)
+user:semweb_startup :- register_ros_package(milo).
+
+% [Optionaly] register/run EulerSharp robot services (we use it for the ontology mainly)
+user:semweb_startup :- register_ros_package(euler).
 
 % [Manditory] run_tests (includes run_common)
 :- include(run_tests).
@@ -34,11 +50,13 @@ swi_export(E):-dmsg(swi_export(E)).
 % :- include(run_common).
 
 % [Optionaly] remove debug noises
-:- forall(retract(prolog_debug:debugging(http(X), true, O)),show_call(asserta(prolog_debug:debugging(http(X), false, O)))).
-:- forall(retract(prolog_debug:debugging((X), true, O)),show_call(asserta(prolog_debug:debugging((X), false, O)))).
+user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),show_call(asserta(prolog_debug:debugging(http(X), false, O)))).
+% user:semweb_startup:- forall(retract(prolog_debug:debugging((X), true, O)),show_call(asserta(prolog_debug:debugging((X), false, O)))).
 
 :- with_no_term_expansions(if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop.pl'))).
 :- current_predicate(egg_go/0)->egg_go;true.
+
+% :- do_semweb_startup.
 
 % [Manditory] load_default_game
 % this is what happens when the world is not found
@@ -62,8 +80,20 @@ swi_export(E):-dmsg(swi_export(E)).
 % :- if_startup_script( doall(now_run_local_tests_dbg)).
 
 :-enqueue_player_command(actWho).
+
+:-enqueue_player_command("rez crackers").
+:-enqueue_player_command("drop crackers").
 :-enqueue_player_command('look').
-:-enqueue_player_command("prolog").
+:-enqueue_player_command("take crackers").
+:-enqueue_player_command("eat crackers").
+:-enqueue_player_command('look').
+:-enqueue_player_command("rez pants").
+:-enqueue_player_command("wear pants").
+:-enqueue_player_command("tp to closet").
+:-enqueue_player_command("take shirt").
+:-enqueue_player_command("inventory").
+
+
 
 % [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
 :- register_timer_thread(npc_ticker,30,npc_tick).

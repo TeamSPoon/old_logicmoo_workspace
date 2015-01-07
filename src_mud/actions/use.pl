@@ -6,77 +6,142 @@
 %
 
 % :-swi_module(user). 
-:-swi_module(actUse, []).
+:-swi_module(moduleUse, [do_act_use/3]).
 
 :- include(logicmoo(vworld/moo_header)).
 
 :- register_module_type(mtCommand).
 
-predArgTypes(action_verb_useable(vtVerb,ftTerm(tPred),tCol,ftTerm(tPred))).
-
+predArgTypes(action_verb_useable(vtVerb,tCol,ftTerm(tPred),ftTerm(tPred),ftTerm(tPred))).
 
 mudSubclass(isEach('PortableObject','ProtectiveAttire',tStowable),tWieldable).
 mudSubclass('FluidReservoir',tDrinkable).
 mudSubclass(tWeapon,tWieldable).
 mudSubclass(tContolDevice,tUsable).
+mudSubclass(tUsable,tWieldable).
+mudSubclass(tStowable,tPortable).
 
-action_verb_useable(actWear,wearsClothing,tWearable,mudStowed).
-action_verb_useable(actWield,wielding,tWieldable,mudStowed).
-action_verb_useable(actUse,using,tUsable,mudStowed).
-action_verb_useable(actDrink,drinking,tDrinkable,holding).
-action_verb_useable(actStow,mudStowed,tStowable,holding).
 
-action_info(Syntax,String):-action_verb_useable(Stow,Stowed,Stowable,Holding),Syntax=..[Stow,Stowable],
-   sformat(String,'~w a ~w that you are/have ~w so it will be ~w.',[Stow,Stowable,Holding,Stowed]).
+:-decl_mpred_hybrid(mudWielding/2).
+:-decl_mpred_hybrid(mudStowing/2).
 
-get_use_verbs(USE,USING,USABLE,STOWED):-action_verb_useable(USE,USING,USABLE,STOWED).
+mudPossess(A,O):-mudStowing(A,O).
+mudPossess(A,O):-mudWielding(A,O).
+mudPossess(A,O):-wearsClothing(A,O).
 
-% Use something
-% Successfully picking something up
-agent_call_command(Agent,SENT) :-
-  get_use_verbs(USE,_USING,USABLE,STOWED),
-    SENT=..[USE,Obj],
-	mudPossess(Agent,Obj),
-        prop(Agent,STOWED,Obj),
-	mudIsa(Obj,USABLE),
-	props(Obj, mudWeight =< 1),
-	do_act_affect(Agent,USE,Obj),
-	do_permanence(USE,Agent,Obj),
-	call_update_charge(Agent,USE).
-%Nothing to use
-agent_call_command(Agent,SENT) :-
-  get_use_verbs(USE,_USING,_USABLE,_STOWED),
-    SENT=..[USE,_Obj],
-	call_update_charge(Agent,USE),
-	(add_cmdfailure(Agent,USE)).
+prologMultiValued(wearsClothing(tAgentGeneric,tWearable)).
+prologMultiValued(mudWielding(tAgentGeneric,tWieldable)).
+prologMultiValued(mudStowing(tAgentGeneric,tStowable)).
+prologMultiValued(mudContains(tContainer,tObj)).
+genlPreds(wearsClothing,mudPossess).
+genlPreds(mudWielding,mudPossess).
+genlPreds(mudStowing,mudPossess).
+genlPreds(mudPossess,mudContains).
+genlInverse(mudContains,mudInsideOf).
+%genlInverse(mudStowing,mudInsideOf).
+%genlInverse(mudInsideOf,mudPossess).
 
-% Is the obect going to stick around after usen, either as is
-% or in the agent's possession.
-do_permanence(USE,Agent,Obj) :-
-  get_use_verbs(USE,_USING,_USABLE,_STOWED),
-	mudAtLoc(Obj,LOC),
-	check_permanence(USE,Agent,LOC,Obj).
+% action_verb_useable(Actionn,RequiredArg,AddedProp,PrecondProp,RemovedProp).
+action_verb_useable(actWear,tWearable,wearsClothing,mudPossess,mudStowing).
+action_verb_useable(actWield,tWieldable,mudWielding,mudPossess,mudStowing).
+action_verb_useable(actStow,tStowable,mudStowing,mudPossess,mudWielding).
+% action_verb_useable(actUse,mudUsing,tUsable,mudPossess,mudPossess).
 
-check_permanence(USE,_Agent,LOC,Obj) :-
-     get_use_verbs(USE,_USING,_USABLE,_STOWED),
-	props(Obj,mudPermanence(USE,Dissapears)),
-	member(Dissapears,[vTakenDeletes,0]),
-	del(mudAtLoc(Obj,LOC)).
-check_permanence(USE,Agent,LOC,Obj) :-
-    get_use_verbs(USE,USING,_USABLE,_STOWED),
-        props(Obj,mudPermanence(USE,Held)),
-        member(Held,[1,vTakenHolds]),
-	del(mudAtLoc(Obj,LOC)),
-	padd(Agent,USING,Obj).
-check_permanence(USE,_,_,_):-get_use_verbs(USE,_USING,_USABLE,_STOWED),!.
+
+action_info(Syntax,String):-
+ action_verb_useable(ActUse,Wieldable,NowWielding,Possessing,Unstowed),
+   Syntax=..[ActUse,Wieldable],
+   sformat(String,'~w a ~w that you ~w so it will be ~w and not be ~w.',[ActUse,Wieldable,Possessing,NowWielding,Unstowed]).
+
+use_action_templates(Syntax):-no_repeats([Syntax],(
+  action_verb_useable(ActUse,Wieldable,_NowWielding,_Possessing,_Unstowed),Syntax=..[ActUse,Wieldable])).
+
+vtActionTemplate(Templ):-use_action_templates(Templ).
+
+agent_call_command(Agent,Syntax) :- 
+    call((action_verb_useable(ActUse,_Wieldable,_NowWielding,_Possessing,_Unstowed),Syntax=..[ActUse,Obj])),
+    agent_call_command_use(Agent,ActUse,Obj),!.
+
+ 
+% Successfully use something
+agent_call_command_use(Agent,ActUse,Obj) :- 
+  must_det_l([
+	once((nearest_reachable_object(Agent,Obj))),
+	nop((ignore(props(Obj,mudWeight<2)),
+	ignore(do_act_affect(Agent,ActUse,Obj)))),
+	do_act_use(ActUse,Agent,Obj),
+	call_update_charge(Agent,ActUse)]).
+
+% Unsuccessfully use something
+agent_call_command_use(Agent,ActUse,_Obj) :- 
+	call_update_charge(Agent,ActUse),
+	add_cmdfailure(Agent,ActUse).
+
+get_use_perminance(Obj,ActUse,TakeableType):-
+ ignore(props(Obj,mudPermanence(ActUse,TakeableType))), 
+ ignore(TakeableType=vTakenMoves).
+
+do_act_use(ActUse,Agent,Obj) :-
+   must_det_l([  
+        get_use_perminance(Obj,ActUse,TakeableType),
+	do_change_use(ActUse,Agent,Obj,TakeableType)]),!.
+
+
+get_add_remove_use(ActUse,Agent,NowWielding,Obj,Unstowed):-     
+ must_det_l([
+     action_verb_useable(ActUse,Wieldable,NowWielding,Possessing,Unstowed),
+      show_call_failure(mudIsa(Obj,Wieldable)),
+  %   show_call_failure(ireq(dbase_t(Unstowed,Agent,Obj))),
+  %   show_call_failure(not(ireq(dbase_t(NowWielding,Agent,Obj)))),
+     show_call_failure(ireq(dbase_t(Possessing,Agent,Obj)))]).
+
+% Is the obect going to stick around after use-ing, either as is or in the agent's possession.
+do_change_use(ActUse,Agent,Obj,vTakenDeletes):-
+        get_add_remove_use(ActUse,Agent,NowWielding,Obj,Unstowed),
+        detatch_object(Obj),
+        clr(dbase_t(Unstowed,Agent,Obj)),
+        add(dbase_t(NowWielding,Agent,Obj)),    
+        must_post_use(ActUse,Agent,Obj),
+        detatch_object(Obj).
+do_change_use(ActUse,Agent,_Source,vTakenCopyFn(What)) :-
+        get_add_remove_use(ActUse,Agent,NowWielding,Obj,Unstowed),
+        create_new_object([What],Obj),
+        detatch_object(Obj),
+        clr(dbase_t(Unstowed,Agent,Obj)),
+        add(dbase_t(NowWielding,Agent,Obj)),        
+        must_post_use(ActUse,Agent,Obj).
+do_change_use(ActUse,Agent,Obj,vTakenStays) :-        
+        get_add_remove_use(ActUse,Agent,NowWielding,Obj,Unstowed),
+        mudAtLoc(Obj,Was),
+        detatch_object(Obj),
+        clr(dbase_t(Unstowed,Agent,Obj)),
+        add(dbase_t(NowWielding,Agent,Obj)),
+        must_post_use(ActUse,Agent,Obj),
+        detatch_object(Obj),
+        add(mudAtLoc(Obj,Was)).
+% default is same as vTakenMoves
+do_change_use(ActUse,Agent,Obj,vTakenMoves) :-
+ must_det_l([
+        get_add_remove_use(ActUse,Agent,NowWielding,Obj,Unstowed),        
+        detatch_object(Obj),
+        clr(dbase_t(Unstowed,Agent,Obj)),
+	add(dbase_t(NowWielding,Agent,Obj)),
+        must_post_use(ActUse,Agent,Obj)]).
+
+must_post_use(ActUse,Agent,Obj):-
+      must_det_l([
+       get_add_remove_use(ActUse,Agent,NowWielding,Obj,Unstowed),
+       fmt([Agent,ActUse,Obj]),       
+       REQ = dbase_t(NowWielding,Agent,Obj),
+       CLR = dbase_t(Unstowed,Agent,Obj),
+       (ireq(REQ) -> true; trace_or_throw(req(REQ))),
+       (ireq(CLR) -> trace_or_throw(not(req(REQ))); true)]),!.
 
 % Record keeping
-update_charge(Agent,USE) :-
-    get_use_verbs(USE,_USING,_USABLE,_STOWED),
-      padd(Agent,[mudCharge(-2)]).
+update_charge(Agent,_ActWield) :- 
+        padd(Agent,mudCharge(-2)).
 
-
-
+:- include(logicmoo(vworld/moo_footer)).
 
 
 

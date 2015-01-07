@@ -28,6 +28,19 @@ prolog:message(git(update_versions),A,A):-!.
 :- multifile( entailment:rdf /3 ).
 
 % [Optionaly] Solve the Halting problem
+:-use_module(library(process)).
+unsafe_preds(M,F,A):-M=files_ex,current_predicate(M:F/A),member(X,[delete,copy]),atom_contains(F,X).
+unsafe_preds(M,F,A):-M=process,current_predicate(M:F/A),member(X,[kill,create]),atom_contains(F,X).
+unsafe_preds(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/A).
+
+remove_pred(_,F,A):-member(_:F/A,[_:delete_common_prefix/4]),!.
+remove_pred(M,F,A):- functor(P,F,A),
+  (current_predicate(M:F/A) -> ignore((catch(redefine_system_predicate(M:P),_,true),abolish(M:F,A)));true),
+  M:asserta((P:-throw(permission_error(M:F/A)))).
+
+:-forall(unsafe_preds(M,F,A),remove_pred(M,F,A)).
+
+% [Optionaly] Solve the Halting problem
 :-redefine_system_predicate(system:halt).
 :-abolish(system:halt,0).
 system:halt:- format('the halting problem is now solved!').

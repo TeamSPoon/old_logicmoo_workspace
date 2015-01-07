@@ -30,7 +30,7 @@ action_info(actLogin(isOptional(tAgentGeneric,isRandom(tAgentGeneric))),"(Re)Log
 agent_call_command(Agent,actLogin(Other)):- show_call(become_player(Agent,Other)).
 
 % logout
-action_info(actLogout(isOptional(tAgentGeneric,isAgentSelf)),"logs out of game (quits)").
+action_info(actLogout(isOptional(tAgentGeneric,isSelfAgent)),"logs out of game (quits)").
 agent_call_command(_Agent,actLogout(Other)):-get_agent_session(Other,O),assert(thlocal:wants_logout(O)).
 
 % quit

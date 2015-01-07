@@ -139,13 +139,7 @@ write_count(H,N):- writeq(H:N),write(', ').
 :-export(to_tclass/2).
 to_tclass(F,F):- current_predicate(_:F/A),functor(P,F,A),(predicate_property(P,built_in);predicate_property(P, nodebug );predicate_property(P, meta_predicate(P) )).
 to_tclass(F,F):-atom_string(F,S),string_lower(S,L),S\=L,!.
-to_tclass(tAgentGeneric,tAgentGeneric).
-to_tclass(tItem,tItem).
-to_tclass(mudAtLoc,mudAtLoc).
-to_tclass(mudPossess,mudPossess).
-to_tclass(mudCharge,mudCharge).
-to_tclass(actDrop,actDrop).
-to_tclass(actJump,actJump).
+
 
 to_tclass(Prop,New):- ttFormatType(Prop),ensure_starts_with_prefix(Prop,ft,New),!.
 to_tclass(Prop,New):- ttValueType(Prop),ensure_starts_with_prefix(Prop,vt,New),!.
