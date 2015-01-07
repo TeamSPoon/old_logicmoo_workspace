@@ -1,5 +1,5 @@
 /** <module> 
-% This is simple example federation for the maze world.
+% This is simple example tFederation for the maze world.
 %
 %
 % monster.pl
@@ -15,22 +15,22 @@
 
 
 % Declare the module name and the exported (public) predicates.
-:-swi_module(federation,[]).
+:-swi_module(tFederation,[]).
 
 :- include(logicmoo(vworld/moo_header)).
 :- register_module_type(planning).
 
-:-decl_type(federation).
+:-decl_type(tFederation).
 
 vette_fed_idea(Agent,Act,Act):-var(Act),!,dmsg(vette_fed_idea(Agent,Act)).
 vette_fed_idea(_,sit,sit):-!.
 vette_fed_idea(Agent,Act,Act):-dmsg(vette_fed_idea(Agent,Act)).
 
-label_type_props('Px',federation,[]).
+label_type_props('Px',tFederation,[]).
 
 world_agent_plan(_World,Agent,ActV):-
    agent(Agent),
-  % isa(Agent,federation),
+  % isa(Agent,tFederation),
    federation_idea(Agent,Act),
    vette_fed_idea(Agent,Act,ActV).
 

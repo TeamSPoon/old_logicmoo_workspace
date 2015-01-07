@@ -45,7 +45,7 @@
 %
 % # permanence(take,N) where N ranges from 0-3.
 % ---> vTakenDeletes = 0 = object deletes when taken. (like dirt)
-% ---> 1/vTakenHolds = object is held when taken, can be eaten/destroyed (see eat.pl)   (like swords)
+% ---> 1/vTakenMoves = object is held when taken, can be eaten/destroyed (see eat.pl)   (like swords)
 % ---> 2/vTakenStays = object stays where it is but something else (charge,score)   (like electricy)
 %          is usually accumulated.
 % ---> 3/vTakenCopyFn(Something) = object stays where it is but copies:  type_props(tLeaf,mudPermanence(takeAct,vTakenCopyFn(tLeaf)))
@@ -246,15 +246,15 @@ mudLabelTypeProps(tr,tTree,[mudHeight(3),mudWeight(4)]).
 mudLabelTypeProps(rk,tRock,[mudHeight(2),mudWeight(4)]).
 mudLabelTypeProps(pt,tPit,[mudHeight(-1),mudWeight(4)]).
  mudLabelTypeProps(ot,tOutlet,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenStays),act_affect(actTake,mudCharge(+50))]).
- mudLabelTypeProps(nt,tNut,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenHolds),act_affect(actEat,mudCharge(+40)),spawn_rate(10)]).
+ mudLabelTypeProps(nt,tNut,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),act_affect(actEat,mudCharge(+40)),spawn_rate(10)]).
 mudLabelTypeProps(lw,tLowWall,[mudHeight(2),mudWeight(4)]).
 mudLabelTypeProps(lg,tLedge,[mudHeight(2),mudWeight(4)]).
 mudLabelTypeProps(lb,tLowBox,[mudHeight(2),mudWeight(2)]).
 mudLabelTypeProps(hw,tHighWall,[mudHeight(3),mudWeight(4)]).
 mudLabelTypeProps(hb,tHighBox,[mudHeight(3),mudWeight(3)]).
  mudLabelTypeProps(gd,tGold,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenDeletes),act_affect(actTake,mudScore(+10))]).
- mudLabelTypeProps(fd,tFood,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenHolds),act_affect(actEat,mudCharge(+80))]).
-mudLabelTypeProps(el,tElixer,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenHolds),act_affect(actEat,mudHealth(+80))]).
+ mudLabelTypeProps(fd,tFood,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),act_affect(actEat,mudCharge(+80))]).
+mudLabelTypeProps(el,tElixer,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),act_affect(actEat,mudHealth(+80))]).
 mudLabelTypeProps(ed,tEdge,[mudHeight(10),mudWeight(4)]).
  mudLabelTypeProps(dt,tDirt,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenDeletes),act_affect(actTake,mudScore(+1)),spawn_rate(5)]).
 mudLabelTypeProps(dr,tDoor,[mudHeight(3),mudWeight(2)]).
@@ -265,8 +265,8 @@ mudLabelTypeProps(--,var,[]).
 
 % What an agent turns into upon death.
 % Must be named iCorpseFn (or edit agent_to_corpse/1 in lib.pl.
- mudLabelTypeProps(cp,tCorpsea,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenHolds),act_affect(actEat,mudCharge(+80)),act_affect(actTake,mudScore(+10))]).
- mudLabelTypeProps(cp,tCorpseb,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenHolds),act_affect(actEat,mudCharge(+120))]).
+ mudLabelTypeProps(cp,tCorpsea,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),act_affect(actEat,mudCharge(+80)),act_affect(actTake,mudScore(+10))]).
+ mudLabelTypeProps(cp,tCorpseb,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),act_affect(actEat,mudCharge(+120))]).
 mudLabelTypeProps(da,tCorpsec,[mudHeight(2),mudWeight(2)]).
 % This is used to make the monster roaming the maze a bit tougher
 % It doesn't require any of the usual traits since the monster will never 

@@ -18,8 +18,8 @@
 % Where Things are Located
 % ==================================================
 
-:-decl_mpred_hybrid(localityOfObject(tObj,tSpatialthing)).
-% which will imply ... :-decl_mpred_hybrid(localityOfObject(kappa(Self,subclass(Self,obj)),kappa(Self2,subclass(Self2,spatialthing)))).
+:-decl_mpred_hybrid(localityOfObject(tObj,tSpatialThing)).
+% which will imply ... :-decl_mpred_hybrid(localityOfObject(kappa(Self,subclass(Self,obj)),kappa(Self2,subclass(Self2,tSpatialThing)))).
 
 
 :- op(600,fx,onSpawn).
@@ -146,7 +146,7 @@ mudSubclass(tHouseplant, tPartof).
 mudSubclass(tPlanter, tContainer). 
 mudSubclass(tGueridon, tLivingRoomFurnature).
 mudSubclass(tGardenPlant, tOutdoorFurnature).
-mudSubclass(tSpatialthing,tLookable).
+mudSubclass(tSpatialThing,tLookable).
 mudSubclass(tNani,tTeddybear).
 mudSubclass(tTeddybear,tTreasure).
 

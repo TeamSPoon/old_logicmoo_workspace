@@ -37,9 +37,9 @@ predicates([
   nameStrings(ftTerm,ftString),
   pathName(tRegion,vtDirection,ftString),
   localityOfObject(tAgentGeneric,'BPVLocation'),
-  mudStowed(tAgentGeneric,'ProtectiveAttire'),
-  mudStowed(tAgentGeneric,tWeapon),
-  mudStowed(tAgentGeneric,'PortableObject'),
+  mudStowing(tAgentGeneric,'ProtectiveAttire'),
+  mudStowing(tAgentGeneric,tWeapon),
+  mudStowing(tAgentGeneric,'PortableObject'),
   wearsClothing(tAgentGeneric,'ProtectiveAttire'),
   wearsClothing(tAgentGeneric,'PortableObject'),
 
@@ -142,31 +142,31 @@ wearsClothing('iEnsign752','Item4BlueUniform755').
 
  /* found 53 for wearsClothing(_G1304,_G1305). */ 
 
-/* Prediate:  mudStowed/2 
+/* Prediate:  mudStowing/2 
 interpreted.
 file('c:/development/opensim4opencog/bin/cynd/startrek/mudreader.pl').
 line_count(57).
 number_of_clauses(1).
-Pattern: mudStowed(_G1328,_G1329). 
+Pattern: mudStowing(_G1328,_G1329). 
  */
-mudStowed(iCommanderData,'iPhaser676').
-mudStowed(iExplorer1,'iPhaser776').
-mudStowed('NPC3DrCrusher677','Item9MedicalTricorder681').
-mudStowed('NPC3DrCrusher677','Item9MedicalTricorder682').
-mudStowed('NPC3DrCrusher677','Item9MedicalTricorder683').
-mudStowed('NPC7Guinan689','Item20Tea690').
-mudStowed('NPC7Guinan689','Item21Synthehol691').
-mudStowed('NPC7Guinan689','Item22FerengiAle692').
-mudStowed('NPC7Guinan689','Item23RomulanWhisky693').
-mudStowed('NPC7Guinan689','Item24LemonadePruneJuice694').
-mudStowed('NPC7Guinan689','Item25VulcanBeer695').
-mudStowed('NPC8OBrien696','iPhaser700').
-mudStowed('NPC6Picard701','Item15PhaserRifle705').
-mudStowed('NPC6Picard701','iPicardsFlute').
-mudStowed('NPC5Riker707','Item12Trombone711').
-mudStowed('NPC2Worf720','iPhaser724').
+mudStowing(iCommanderData,'iPhaser676').
+mudStowing(iExplorer1,'iPhaser776').
+mudStowing('NPC3DrCrusher677','Item9MedicalTricorder681').
+mudStowing('NPC3DrCrusher677','Item9MedicalTricorder682').
+mudStowing('NPC3DrCrusher677','Item9MedicalTricorder683').
+mudStowing('NPC7Guinan689','Item20Tea690').
+mudStowing('NPC7Guinan689','Item21Synthehol691').
+mudStowing('NPC7Guinan689','Item22FerengiAle692').
+mudStowing('NPC7Guinan689','Item23RomulanWhisky693').
+mudStowing('NPC7Guinan689','Item24LemonadePruneJuice694').
+mudStowing('NPC7Guinan689','Item25VulcanBeer695').
+mudStowing('NPC8OBrien696','iPhaser700').
+mudStowing('NPC6Picard701','Item15PhaserRifle705').
+mudStowing('NPC6Picard701','iPicardsFlute').
+mudStowing('NPC5Riker707','Item12Trombone711').
+mudStowing('NPC2Worf720','iPhaser724').
 
- /* found 16 for mudStowed(_G1328,_G1329). */ 
+ /* found 16 for mudStowing(_G1328,_G1329). */ 
 
 /* Prediate:  item/1 
 interpreted.
@@ -799,7 +799,7 @@ number_of_clauses(1).
 Pattern: somethingDescription(_G1470,_G1471). 
  */
 somethingDescription('NPC0Geordi684',["Lieutenant","Commander","Geordi","LaForge","Geordi LaForge","Lieutenant Commander Geordi LaForge is standing here","Geordi is the Chief Engineer of the Enterprise","He's blind, so he wears a special VISOR that lets him see things","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 3","mudMaxHitPoints: 12d12+3200","#$PunchingSomething mudBareHandDamage: 9d9+42","Geordi","Geordi LaForge","Lieutenant Commander Geordi LaForge is standing here","Geordi is the Chief Engineer of the Enterprise","He's blind, so he wears a special VISOR that lets him see things"]).
-somethingDescription(iCommanderData,["Lieutenant","Commander","Data","Android","Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He mudStowed superhuman strength, and is extremely tough","ACT_NICE_THIEF","AWARE","NOBACKSTAB","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOSUMMON","NOSLEEP","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 1","mudMaxHitPoints: 18d18+4000","#$PunchingSomething mudBareHandDamage: 10d10+75","Data","CycLBot","CycBot","CycBot1","Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He mudStowed superhuman strength, and is extremely tough"]).
+somethingDescription(iCommanderData,["Lieutenant","Commander","Data","Android","Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He mudStowing superhuman strength, and is extremely tough","ACT_NICE_THIEF","AWARE","NOBACKSTAB","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOSUMMON","NOSLEEP","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 1","mudMaxHitPoints: 18d18+4000","#$PunchingSomething mudBareHandDamage: 10d10+75","Data","CycLBot","CycBot","CycBot1","Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He mudStowing superhuman strength, and is extremely tough"]).
 somethingDescription(iExplorer1,["Lieutenant","Commander","Human","Player",
             "Explorer Player",
             "ACT_NICE_THIEF","AWARE","NOBACKSTAB","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOSUMMON",
@@ -1748,7 +1748,7 @@ docs ready */
 
 % TESTS
 
-actorStartState(agent,X,[localityOfObject(X,Y)|List]):agent(X),localityOfObject(X,Y),findall(mudStowed(X,P),mudStowed(X,P),List1),findall(wearsClothing(X,P),wearsClothing(X,P),List2),flatten([List1,List2],List).
+actorStartState(agent,X,[localityOfObject(X,Y)|List]):agent(X),localityOfObject(X,Y),findall(mudStowing(X,P),mudStowing(X,P),List1),findall(wearsClothing(X,P),wearsClothing(X,P),List2),flatten([List1,List2],List).
 initialStart([ 
 
 /*
@@ -1766,15 +1766,15 @@ localityOfObject('Item9Tricorder761','iArea1015').
 */
 %% printAll(actorStartState(agent,X,List),ss(agent,X,List)).
    ss(agent,'NPC0Geordi684',[localityOfObject('NPC0Geordi684','iArea1000'),wearsClothing('NPC0Geordi684','iBoots685'),wearsClothing('NPC0Geordi684','iComBadge686'),wearsClothing('NPC0Geordi684','itGoldUniform687'),wearsClothing('NPC0Geordi684','Item8VISOR688')]),
-   ss(agent,vacuum(1),[localityOfObject(vacuum(1),'iArea1010'),mudStowed(vacuum(1),'iPhaser676'),wearsClothing(vacuum(1),'iBoots673'),wearsClothing(vacuum(1),'iComBadge674'),wearsClothing(vacuum(1),'itGoldUniform675')]),
-   ss(agent,iPlayer1,[localityOfObject(iPlayer1,'iArea1000'),mudStowed(iPlayer1,'iPhaser776'),wearsClothing(iPlayer1,'iBoots773'),wearsClothing(iPlayer1,'iComBadge774'),wearsClothing(iPlayer1,'itGoldUniform775')]),
-   ss(agent,'NPC2Worf720',[localityOfObject('NPC2Worf720','iArea1025'),mudStowed('NPC2Worf720','iPhaser724'),wearsClothing('NPC2Worf720','iBoots721'),wearsClothing('NPC2Worf720','iComBadge722'),wearsClothing('NPC2Worf720','itGoldUniform723'),wearsClothing('NPC2Worf720','Item7Sash725')]),
-   ss(agent,'NPC3DrCrusher677',[localityOfObject('NPC3DrCrusher677','iArea1015'),mudStowed('NPC3DrCrusher677','Item9MedicalTricorder681'),mudStowed('NPC3DrCrusher677','Item9MedicalTricorder682'),mudStowed('NPC3DrCrusher677','Item9MedicalTricorder683'),wearsClothing('NPC3DrCrusher677','iBoots678'),wearsClothing('NPC3DrCrusher677','iComBadge679'),wearsClothing('NPC3DrCrusher677','Item4BlueUniform680')]),
+   ss(agent,vacuum(1),[localityOfObject(vacuum(1),'iArea1010'),mudStowing(vacuum(1),'iPhaser676'),wearsClothing(vacuum(1),'iBoots673'),wearsClothing(vacuum(1),'iComBadge674'),wearsClothing(vacuum(1),'itGoldUniform675')]),
+   ss(agent,iPlayer1,[localityOfObject(iPlayer1,'iArea1000'),mudStowing(iPlayer1,'iPhaser776'),wearsClothing(iPlayer1,'iBoots773'),wearsClothing(iPlayer1,'iComBadge774'),wearsClothing(iPlayer1,'itGoldUniform775')]),
+   ss(agent,'NPC2Worf720',[localityOfObject('NPC2Worf720','iArea1025'),mudStowing('NPC2Worf720','iPhaser724'),wearsClothing('NPC2Worf720','iBoots721'),wearsClothing('NPC2Worf720','iComBadge722'),wearsClothing('NPC2Worf720','itGoldUniform723'),wearsClothing('NPC2Worf720','Item7Sash725')]),
+   ss(agent,'NPC3DrCrusher677',[localityOfObject('NPC3DrCrusher677','iArea1015'),mudStowing('NPC3DrCrusher677','Item9MedicalTricorder681'),mudStowing('NPC3DrCrusher677','Item9MedicalTricorder682'),mudStowing('NPC3DrCrusher677','Item9MedicalTricorder683'),wearsClothing('NPC3DrCrusher677','iBoots678'),wearsClothing('NPC3DrCrusher677','iComBadge679'),wearsClothing('NPC3DrCrusher677','Item4BlueUniform680')]),
    ss(agent,'NPC4Troi712',[localityOfObject('NPC4Troi712','iArea1007'),wearsClothing('NPC4Troi712','iBoots713'),wearsClothing('NPC4Troi712','iComBadge714'),wearsClothing('NPC4Troi712','Item4BlueUniform715')]),
-   ss(agent,'NPC5Riker707',[localityOfObject('NPC5Riker707','iArea1036'),mudStowed('NPC5Riker707','Item12Trombone711'),wearsClothing('NPC5Riker707','iBoots708'),wearsClothing('NPC5Riker707','iComBadge709'),wearsClothing('NPC5Riker707','Item2RedUniform710')]),
-   ss(agent,'NPC6Picard701',[localityOfObject('NPC6Picard701','iArea1035'),mudStowed('NPC6Picard701','Item15PhaserRifle705'),mudStowed('NPC6Picard701','iPicardsFlute'),wearsClothing('NPC6Picard701','iBoots702'),wearsClothing('NPC6Picard701','iComBadge703'),wearsClothing('NPC6Picard701','Item2RedUniform704')]),
-   ss(agent,'NPC7Guinan689',[localityOfObject('NPC7Guinan689','iArea1021'),mudStowed('NPC7Guinan689','Item20Tea690'),mudStowed('NPC7Guinan689','Item21Synthehol691'),mudStowed('NPC7Guinan689','Item22FerengiAle692'),mudStowed('NPC7Guinan689','Item23RomulanWhisky693'),mudStowed('NPC7Guinan689','Item24LemonadePruneJuice694'),mudStowed('NPC7Guinan689','Item25VulcanBeer695')]),
-   ss(agent,'NPC8OBrien696',[localityOfObject('NPC8OBrien696','iArea1006'),mudStowed('NPC8OBrien696','iPhaser700'),wearsClothing('NPC8OBrien696','iBoots697'),wearsClothing('NPC8OBrien696','iComBadge698'),wearsClothing('NPC8OBrien696','itGoldUniform699')]),
+   ss(agent,'NPC5Riker707',[localityOfObject('NPC5Riker707','iArea1036'),mudStowing('NPC5Riker707','Item12Trombone711'),wearsClothing('NPC5Riker707','iBoots708'),wearsClothing('NPC5Riker707','iComBadge709'),wearsClothing('NPC5Riker707','Item2RedUniform710')]),
+   ss(agent,'NPC6Picard701',[localityOfObject('NPC6Picard701','iArea1035'),mudStowing('NPC6Picard701','Item15PhaserRifle705'),mudStowing('NPC6Picard701','iPicardsFlute'),wearsClothing('NPC6Picard701','iBoots702'),wearsClothing('NPC6Picard701','iComBadge703'),wearsClothing('NPC6Picard701','Item2RedUniform704')]),
+   ss(agent,'NPC7Guinan689',[localityOfObject('NPC7Guinan689','iArea1021'),mudStowing('NPC7Guinan689','Item20Tea690'),mudStowing('NPC7Guinan689','Item21Synthehol691'),mudStowing('NPC7Guinan689','Item22FerengiAle692'),mudStowing('NPC7Guinan689','Item23RomulanWhisky693'),mudStowing('NPC7Guinan689','Item24LemonadePruneJuice694'),mudStowing('NPC7Guinan689','Item25VulcanBeer695')]),
+   ss(agent,'NPC8OBrien696',[localityOfObject('NPC8OBrien696','iArea1006'),mudStowing('NPC8OBrien696','iPhaser700'),wearsClothing('NPC8OBrien696','iBoots697'),wearsClothing('NPC8OBrien696','iComBadge698'),wearsClothing('NPC8OBrien696','itGoldUniform699')]),
    ss(agent,'NPC9Wesley716',[localityOfObject('NPC9Wesley716','iArea1016'),wearsClothing('NPC9Wesley716','iBoots717'),wearsClothing('NPC9Wesley716','iComBadge718'),wearsClothing('NPC9Wesley716','Item2RedUniform719')]),
    ss(agent,'NPC1010Livingston726',[localityOfObject('NPC1010Livingston726','iArea1035')]),
    ss(agent,'NPC1011Spot727',[localityOfObject('NPC1011Spot727','iArea1003')]),
