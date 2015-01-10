@@ -134,6 +134,7 @@ any_to_string_or_var(StringO,String):- any_to_string(StringO,StringOS1),any_to_s
 
 atomic_list_concat_safe(List,StringO):- ground(List),!,atomics_to_string(List,String),any_to_string_or_var(StringO,String).
 atomic_list_concat_safe(List,V):- (V=='';V==""),!,List=[].
+
 atomic_list_concat_safe([Atom,A2|Bonus],V):-atomic(Atom),atomic(A2),string_concat(Atom,A2,A3),!,atomic_list_concat_safe([A3|Bonus],V).
 atomic_list_concat_safe([Atom|Bonus],V):-atomic(Atom),atomic(V),string_concat(Atom,NV,V),!,atomic_list_concat_safe(Bonus,NV).
 atomic_list_concat_safe([D1,Atom|Bonus],V):-var(D1),atomic(Atom),sub_string(V, NBefore, _Len, _NumAfter, Atom),
@@ -141,6 +142,7 @@ atomic_list_concat_safe([D1,Atom|Bonus],V):-var(D1),atomic(Atom),sub_string(V, N
 atomic_list_concat_safe([V],V):-!.
 
 atomic_list_concat_safe(List,Sep,StringO):- (Sep==[];Sep=='';Sep==""),!,atomic_list_concat_safe(List,StringO).
+atomic_list_concat_safe(List,Sep,Str):-ground(Sep:Str),not(atom_contains(Str,Sep)),!,List=[Str0],any_to_string_or_var(Str,Str0).
 atomic_list_concat_safe(List,Sep,StringO):- ground(List:Sep),!,atomics_to_string(List,Sep,String),any_to_string_or_var(StringO,String).
 atomic_list_concat_safe(List,_,V):- (V=='';V==""),!,List=[].
 atomic_list_concat_safe(List,Sep,StringO):-ground(StringO),ground(Sep),not(atom_contains(StringO,Sep)),!,List=[D1O],any_to_string_or_var(StringO,D1O).
@@ -463,15 +465,17 @@ ltrim([32,32|String],Out) :- trim(String,Out),!.
 ltrim([P|X],Y):- (isWhitespace(P);not(number(P));P<33;P>128),trim(X,Y),!.
 ltrim(X,X).
 
-any_to_string(Atom,String):- once(any_to_string0(Atom,StringS)),StringS=String.
+any_to_string(Atom,String):- must_det(any_to_string0(Atom,StringS)),StringS=String.
 
-any_to_string0(Atom,String):-string(Atom),Atom=String.
+any_to_string0(Atom,String):-string(Atom),!,Atom=String.
 any_to_string0(Atom,String):-var(Atom),!,term_string(Atom,String).
-any_to_string0(Atom,String):-atom(Atom),atom_string(Atom,String).
+any_to_string0(fmt(Fmt,Args),String):-!,sformat(String,Fmt,Args).
+any_to_string0(txtFormatFn(Fmt,Args),String):-!,sformat(String,Fmt,Args).
+any_to_string0(Atom,String):-atom(Atom),!,atom_string(Atom,String).
 any_to_string0([Atom],String):-atom(Atom),atom_string(Atom,String).
-any_to_string0(A,""):-nonvar(A),member(A,[[],'',""]).
+any_to_string0(A,""):-nonvar(A),member(A,[[],'',""]),!.
 any_to_string0(List,String):-catchv(text_to_string(List,String),_,fail).
-any_to_string0(List,String):-is_list(List), (catchv(atomics_to_string(List, ' ', String),_,fail);
+any_to_string0(List,String):- fail, dtrace, is_list(List), (catchv(atomics_to_string(List, ' ', String),_,fail);
               ((list_to_atomics_list0(List,AList),catchv(atomics_to_string(AList, ' ', String),_,fail)))),!.
 any_to_string0(List,String):-sformat(String,'~q',[List]).
 

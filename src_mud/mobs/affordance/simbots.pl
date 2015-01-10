@@ -458,23 +458,23 @@ recreate(F/A):-dynamic(F/A),functor(P,F,A),retractall(P),!.
 to_personal(mudCharge,mudCharge).
 to_personal(Pred,APred):-atom_concat('',Pred,APred).
 
-do_define_affordance(LIST):-(member(subjType= SType,LIST);member(alsoType= SType,LIST)),typename_to_iname('t',SType,Type),!,
+do_define_affordance(LIST):-(member(subjType= SType,LIST);member(alsoType= SType,LIST)),i_name('t',SType,Type),!,
   decl_type(Type),do_define_type_affordance(Type,LIST).
 
 do_define_type_affordance1(Type,_= Type):-!.
 do_define_type_affordance1(Type,subjType= String):- add(nameStrings(Type,String)).
 
 
-do_define_type_affordance1(Type,alsoType= TWhat):-typename_to_iname(t,TWhat,ParentType),add(mudSubclass(Type,ParentType)).
-do_define_type_affordance1(Type,superType= TWhat):-typename_to_iname(t,TWhat,ParentType),add(mudSubclass(Type,ParentType)).
-do_define_type_affordance1(Type,actionVerb= SVerb):-typename_to_iname(act,SVerb,Verb),nb_setval(actionVerb,Verb),!,assert_if_new(verb_for_type(Verb,Type)).
-do_define_type_affordance1(Type,actionVerb(2)= SVerb):-typename_to_iname(act,SVerb,Verb),nb_setval(actionVerb,Verb),
+do_define_type_affordance1(Type,alsoType= TWhat):-i_name(t,TWhat,ParentType),add(mudSubclass(Type,ParentType)).
+do_define_type_affordance1(Type,superType= TWhat):-i_name(t,TWhat,ParentType),add(mudSubclass(Type,ParentType)).
+do_define_type_affordance1(Type,actionVerb= SVerb):-i_name(act,SVerb,Verb),nb_setval(actionVerb,Verb),!,assert_if_new(verb_for_type(Verb,Type)).
+do_define_type_affordance1(Type,actionVerb(2)= SVerb):-i_name(act,SVerb,Verb),nb_setval(actionVerb,Verb),
   (nb_current(acceptsChild,ChildType)->true;ChildType=tTakeable),
   assert_if_new(verb_affordance_2(Verb,Type,ChildType)).
-do_define_type_affordance1(Type,acceptsChild= TWhat):-typename_to_iname(t,TWhat,ChildType),
+do_define_type_affordance1(Type,acceptsChild= TWhat):-i_name(t,TWhat,ChildType),
   nb_setval(acceptsChild,ChildType),!,assert_if_new(can_hold_type(Type,ChildType)),
  (nb_current(actionVerb,Verb)->assert_if_new(verb_affordance_2(Verb,Type,ChildType));dmsg(warn(verb_affordance_3_no_verb(error(vVerb),Type,ChildType)))),!.
-do_define_type_affordance1(Type,SPred= Wants * Gets):-typename_to_iname(mud,SPred,Pred),nb_getval(actionVerb,Verb),to_personal(Pred,APred),assert_if_new(verb_affordance(Verb,Type,APred,Wants,Gets)).
+do_define_type_affordance1(Type,SPred= Wants * Gets):-i_name(mud,SPred,Pred),nb_getval(actionVerb,Verb),to_personal(Pred,APred),assert_if_new(verb_affordance(Verb,Type,APred,Wants,Gets)).
 do_define_type_affordance1(Type,mudActionMaxDistance= Distance):-nb_getval(actionVerb,Verb),add(mudActionMaxDistance(Verb,Type,Distance)).
 do_define_type_affordance1(Type,textSitName= String):-do_define_type_affordance1(Type,textName= String).
 do_define_type_affordance1(Type,textName= String):-nb_getval(actionVerb,Verb),assert_if_new(verb_desc(Verb,Type,String)).
@@ -485,13 +485,13 @@ do_define_type_affordance1(Type,Skipped):-dmsg(error(skipped(do_define_type_affo
 do_define_type_affordance(_,[]).
 do_define_type_affordance(Type,[H|LIST]):-do_define_type_affordance1(Type,H),!,do_define_type_affordance(Type,LIST),!.
 
-world_agent_plan(_World,Agent,Act):-
+user:world_agent_plan(_World,Agent,Act):-
    (mudIsa(Agent,tSimian);mudIsa(Agent,tAgentGeneric)),
    simian_idea(Agent,Act).
 
-agent_available_type(_,Visible,Visible).
-
-simian_ideas_possible(Agent,actTextcmd(Think_about,Visible)) :- verb_for_type(Think_about, Type),agent_available_type(Agent,Visible,Type).
+:-export(simian_ideas_possible/2).
+% simian_ideas_possible(Agent,actTextcmd(Think_about,Visible)) :- verb_for_type(Think_about, Type),available_instances_of_type(Agent,Visible,Type).
+simian_ideas_possible(Agent,actDo(Think_about,Visible)) :- verb_for_type(Think_about, Type),available_instances_of_type(Agent,Visible,Type).
 
 simian_idea(Agent,Act):-
    findall(Act,simian_ideas_possible(Agent,Act),CMDS),choose_best(Agent,CMDS,Act).
@@ -541,6 +541,13 @@ verb_desc_or_else(ActVerb,Types,verb_desc(ActVerb,Types)):-nonvar(ActVerb),nonva
 
 agent_call_command(Agent,Templ):- simbots_templates(Templ), (fmt(agent_call_command_simbots_real_3(Agent,Templ)),fail).
 
+action_info(actDo(vtVerb,ftListFn(ftTerm)),"reinterps a action").
+agent_call_command(Agent,actDo(A)):-CMD=..[A],agent_call_command(Agent,CMD).
+agent_call_command(Agent,actDo(A,B)):-CMD=..[A,B],agent_call_command(Agent,CMD).
+agent_call_command(Agent,actDo(A,B,C)):- CMD=..[A,B,C],agent_call_command(Agent,CMD).
+agent_call_command(Agent,actDo(A,B,C,D)):- CMD=..[A,B,C,D],agent_call_command(Agent,CMD).
+agent_call_command(Agent,actDo(A,B,C,D,E)):- CMD=..[A,B,C,D,E],agent_call_command(Agent,CMD).
+
 action_info(actTextcmd(ftString),"reinterps a term as text").
 agent_call_command(Agent,actTextcmd(A)):-sformat(CMD,'~w',[A]),!,do_player_action(Agent,CMD).
 agent_call_command(Agent,actTextcmd(A,B)):-sformat(CMD,'~w ~w',[A,B]),!,do_player_action(Agent,CMD).
@@ -560,8 +567,8 @@ mudSubclass(tLayable,tSittable).
 mudSubclass(tBed,tMattress).
 mudSubclass(tCrib,tLayable).
 mudSubclass(tHasSurface, tContainer).
-mudSubclass(tHasSurface, tHasObjects).
-mudSubclass(tContainer, tHasObjects).
+mudSubclass(tHasSurface, tPutTargetable).
+mudSubclass(tContainer, tPutTargetable).
 
 
 
@@ -573,7 +580,7 @@ mudSubclass(tChair,tFurniture).
 mudSubclass(tBed,tFurniture).
 mudSubclass(tSink,tFurniture).
 mudSubclass(tToilet,tFurniture).
-mudSubclass(tBathtub,tFurniture).
+mudSubclass(tBathTub,tFurniture).
 mudSubclass(tFurniture,tUseable).
 mudSubclass(tFurniture,tObj).
 
@@ -608,8 +615,8 @@ Yields
 
 verb_desc(actOperate, tShower, "wash self with X").
 verb_desc(actOperate, tShower, "take a shower").
-verb_desc(actOperate, tBathtub, "wash self with X").
-verb_desc(actOperate, tBathtub, "Take a Bath").
+verb_desc(actOperate, tBathTub, "wash self with X").
+verb_desc(actOperate, tBathTub, "Take a Bath").
 verb_desc(actOperate, tSink, "Wash Hands").
 verb_desc(actDance, tDanceBall, "Dance! Dance!").
 verb_desc(actOperate, tWashingMachine, "Wash The Clothes").
@@ -679,8 +686,8 @@ verb_affordance(actLiveAtLeastAMinute, tAgentSelf, mudSadToHappy, 0, -1).
 verb_affordance(actLiveAtLeastAMinute, tAgentSelf, mudComfort, 0, -1).
 verb_affordance(actOperate, tShower, mudComfort, 10, 10).
 verb_affordance(actOperate, tShower, mudHygiene, 30, 30).
-verb_affordance(actOperate, tBathtub, mudComfort, 20, 20).
-verb_affordance(actOperate, tBathtub, mudHygiene, 100, 100).
+verb_affordance(actOperate, tBathTub, mudComfort, 20, 20).
+verb_affordance(actOperate, tBathTub, mudHygiene, 100, 100).
 verb_affordance(actOperate, tSink, mudComfort, 0, 0).
 verb_affordance(actOperate, tSink, mudHygiene, 10, 10).
 verb_affordance(actDance, tDanceBall, mudNonLonelinessSocial, 10, 10).
@@ -765,8 +772,8 @@ verb_for_type(actBumpIntoBarrier, tFurniture).
 verb_for_type(actLiveAtLeastAMinute, tAgentSelf).
 verb_for_type(actOperate, tShower).
 verb_for_type(actClean, tShower).
-verb_for_type(actOperate, tBathtub).
-verb_for_type(actClean, tBathtub).
+verb_for_type(actOperate, tBathTub).
+verb_for_type(actClean, tBathTub).
 verb_for_type(actOperate, tSink).
 verb_for_type(actClean, tSink).
 verb_for_type(actDance, tDanceBall).

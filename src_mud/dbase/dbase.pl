@@ -49,11 +49,7 @@ shrink_clause( HB,HB).
 :- decl_thlocal do_slow_kb_op_now/0.
 :- decl_thlocal enable_src_loop_checking/0.
 :- decl_thlocal in_prolog_source_code/0.
-:- decl_thlocal insideIREQ/1.
 :- decl_thlocal into_form_code/0.
-:- decl_thlocal no_arg_type_error_checking/0.
-:- decl_thlocal noDefaultValues/1.
-:- decl_thlocal noRandomValues/1.
 :- decl_thlocal repl_to_string/2.
 :- decl_thlocal repl_writer/2.
 :- decl_thlocal thlocal:useOnlyExternalDBs/0.
@@ -63,6 +59,12 @@ shrink_clause( HB,HB).
 :- decl_thlocal thlocal:tracing80/0.
 :- decl_thlocal thlocal:usePlTalk/0.
 :- decl_thlocal thlocal:useAltPOS/0.
+
+:- decl_thlocal infInstanceOnly/1.
+:- decl_thlocal no_arg_type_error_checking/0.
+:- decl_thlocal infAssertedOnly/1.
+:- decl_thlocal noRandomValues/1.
+
 
 :- decl_thlocal thlocal:session_agent/2.
 
@@ -112,9 +114,9 @@ was_known_false(Fact):-is_known_false(Fact),retractall((is_known_false(_):-true)
 
 check_was_known_false(Fact):- ignore(((is_known_false(Fact),was_known_false(Fact)))).
 
-decl_database_hook(assert(_A_or_Z),mudLabelTypeProps(Lbl,T,Props)):- hooked_asserta(default_type_props(T,[kwLabel(Lbl)|Props])).
+decl_database_hook(assert(_A_or_Z),mudLabelTypeProps(Lbl,T,Props)):- hooked_asserta(typeProps(T,[mudKwLabel(Lbl)|Props])).
 
-decl_database_hook(assert(_A_or_Z),default_type_props(T,_)):- decl_type_safe(T).
+decl_database_hook(assert(_A_or_Z),typeProps(T,_)):- decl_type_safe(T).
 
 decl_database_hook(assert(_A_or_Z),mpred_prop(F,_)):- must_det(atom(F)).
 
@@ -222,7 +224,7 @@ coerce(_ ,_,     NewThing,Else):- NewThing = Else.
 
 
 :- dynamic_multifile_exported 
-   tAgentGeneric/1, agent_done/2, mudCharge/2,mudHealth/2, mudAtLoc/2, failure/2, mudGrid/4, mudIsa/2, tItem/1, 
+   tAgentGeneric/1,  mudCharge/2,mudHealth/2, mudAtLoc/2, failure/2, mudGrid/4, mudIsa/2, tItem/1, 
   mudMemory/2,  pathName/3, mudPossess/2,  tRegion/1, mudScore/2, mudStm/2,   mudFacing/2,
    % col/1,
    % localityOfObject/2,
@@ -277,7 +279,6 @@ coerce(_ ,_,     NewThing,Else):- NewThing = Else.
       act_term/2,
       mudAgentTurnnum/2,
       agent_current_action/2,
-      agent_done/2,
       mudAtLoc/2,
       mudCharge/2,
       mudHealth/2,
@@ -308,7 +309,7 @@ logical_functor(X):-atom(X),member(X,[',',';']).
       mudToHitArmorClass0/2,
       mudBareHandDamage/2,
       chargeCapacity/2,
-      chargeRemaining/2,
+      mudCharge/2,
      tCol/1, tAgentGeneric/1, tItem/1, tRegion/1,
      verbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, 
 
@@ -318,7 +319,6 @@ logical_functor(X):-atom(X),member(X,[',',';']).
       act_term/2,
       mudAgentTurnnum/2,
       agent_current_action/2,
-      agent_done/2,
       mudAtLoc/2,
       mudCharge/2,
       mudHealth/2,
@@ -451,11 +451,11 @@ preq(P,C0):- db_op_int(query(dbase_t,P),C0).
 req(C0):- dmsg(req(C0)), preq(req,C0).
 
 % -  mreq(Query) = Forced Full query
-mreq(C0):- dmsg(mreq(C0)), rescan_module_ready,no_loop_check(with_assertions([-insideIREQ(_),-thlocal:noDefaultValues(_),-thlocal:noRandomValues(_)],preq(must,C0))).
+mreq(C0):- dmsg(mreq(C0)), rescan_module_ready,no_loop_check(with_assertions([-infInstanceOnly(_),-thlocal:infAssertedOnly(_),-thlocal:noRandomValues(_)],preq(must,C0))).
 
 
 % -  ireq(Query) = Normal query (May not use second order logic) (must be asserted on isntance) (used mainly by 2nd order logic to avoid looping)
-ireq(C0):- dmsg(ireq(C0)), rescan_module_ready,no_loop_check(with_assertions([+insideIREQ(_), +thlocal:noDefaultValues(_),+thlocal:noRandomValues(_)],preq(ireq,C0))).
+ireq(C0):- dmsg(ireq(C0)), rescan_module_ready,no_loop_check(with_assertions([+infInstanceOnly(_), +thlocal:infAssertedOnly(_),+thlocal:noRandomValues(_)],preq(ireq,C0))).
 
 :-dmsg_hide(req).
 :-dmsg_hide(ireq).
@@ -498,7 +498,7 @@ dmsg_hook(transform_holds(dbase_t,_What,props(ttCreateable,[mudIsa(mudIsa),mudIs
 expand_goal_correct_argIsa(A,B):- expand_goal(A,B).
 
 % db_op_simpler(query(HLDS,_),MODULE:C0,req(call,MODULE:C0)):- atom(MODULE), nonvar(C0),not(not(predicate_property(C0,_PP))),!. % , functor_catch(C0,F,A), dmsg(todo(unmodulize(F/A))), %trace_or_throw(module_form(MODULE:C0)), %   db_op(Op,C0).
-db_op_simpler(_,TypeTerm,props(Inst,[mudIsa(Type)|PROPS])):- TypeTerm=..[Type,Inst|PROPS],nonvar(Inst),hasInstance(colDeclarer,Type),!.
+db_op_simpler(_,TypeTerm,props(Inst,[mudIsa(Type)|PROPS])):- TypeTerm=..[Type,Inst|PROPS],nonvar(Inst),hasInstance(macroDeclarer,Type),!.
 
 
 
@@ -538,12 +538,12 @@ generate_fact_arg(F,N,Arg):-argIsa_call(F,N,Type),!,isa_arg_test(Arg,Type).
 isa_arg_test(Arg,Type):-ground(Arg),!,show_call(isa_backchaing(Arg,Type)).
 isa_arg_test(Arg,Type):-isa_backchaing(Arg,Type).
 
-equivRule_call(A,B):- is_asserted(holds_t(equivRule,A,B)).
-equivRule_call(A,B):- is_asserted(holds_t(equivRule,B,A)).
+equivRule_call(A,B):- is_asserted(holds_t(ruleEquiv,A,B)).
+equivRule_call(A,B):- is_asserted(holds_t(ruleEquiv,B,A)).
 
 forwardRule_call(A,B):- is_asserted(holds_t(forwardRule,B,A)).
 
-:-dynamic_multifile_exported(equivRule/2).
+:-dynamic_multifile_exported(ruleEquiv/2).
 
 good_for_chaining(_,_):-!.
 good_for_chaining(_Op,Term):-not(contains_singletons(Term)).
@@ -643,11 +643,12 @@ db_op0(Op,props(Obj,PropVal)):- PropVal=..[OP,Pred|Val],comparitiveOp(OP),not(co
 db_op0(Op,props(Obj,PropVal)):- PropVal=..[Prop|Val],not(infix_op(Prop,_)),!,db_reop(Op,[dbase_t,Prop,Obj|Val]).
 db_op0(Op,props(Obj,PropVal)):- PropVal=..[Prop|Val],!,trace_or_throw(dtrace),db_reop(Op,[dbase_t,Prop,Obj|Val]).
 
-db_op0(Op,somethingIsa(A,List)):- !,forall_member(E,List,must(db_reop(Op, mudIsa(A,E)))).
-db_op0(Op,somethingDescription(A,List)):- !,forall_member(E,List, must(db_reop(Op, mudDescription(A,E)))).
-db_op0(Op,objects(Type,List)):- !,forall_member(I,List,must(db_reop(Op,mudIsa(I,Type)))).
-db_op0(Op,sorts(Type,List)):- !,forall_member(I,List,must(db_reop(Op, mudSubclass(I,Type)))).
-db_op0(Op,predicates(List)):- !,forall_member(T,List,must(db_reop(Op,tPred(T)))).
+db_op0(Op,macroSomethingIsa(A,List)):- !,forall_member(E,List,must(db_reop(Op, mudIsa(A,E)))).
+db_op0(Op,macroSomethingDescription(A,List)):- !,forall_member(E,List, must(db_reop(Op, mudDescription(A,E)))).
+db_op0(Op,pddlObjects(Type,List)):- !,forall_member(I,List,must(db_reop(Op,mudIsa(I,Type)))).
+db_op0(Op,pddlSorts(Type,List)):- !,forall_member(I,List,must(db_reop(Op, mudSubclass(I,Type)))).
+db_op0(Op,pddlTypes(List)):- !,forall_member(I,List,must(db_reop(Op, mudIsa(I,tCol)))).
+db_op0(Op,pddlPredicates(List)):- !,forall_member(T,List,must(db_reop(Op,tPred(T)))).
 db_op0(Op,EACH):- EACH=..[each|List],forall_member(T,List,must(db_reop(Op,T))).
 db_op0(change(assert,_),mpred_prop(F,A)):- !,must(decl_mpred(F,A)).
 
@@ -709,7 +710,7 @@ db_op_unit(query(Must,HLDS),C0,Prop,_RGS):- get_mpred_prop(Prop,predProxyQuery(H
 db_op_unit(Op,_C0,Prop,ARGS):- once((db_op_sentence(Op,Prop,ARGS,Unit),same_vars(ARGS,Unit))), db_op_exact(Op,Unit).
 
 % if is IREQ then fail
-db_op_unit(Op,C0,_Prop,_ARGS):- test_tl(thlocal:insideIREQ,C0),!,must_det(query(_Must,_HLDS)=Op),fail.
+db_op_unit(Op,C0,_Prop,_ARGS):- test_tl(thlocal:infInstanceOnly,C0),!,must_det(query(_Must,_HLDS)=Op),fail.
 
 % genlInverse/2
 %db_op_unit(Op,_C0,Prop,ARGS):- dbase_t(genlInverse,Prop,Other), inverse_args(ARGS,Inverse), db_op_sentence(Op,Other,Inverse,Unit1), db_op_exact(Op,Unit1).
@@ -974,7 +975,7 @@ cycAssert(A,B):-trace_or_throw(cycAssert(A,B)).
 :-decl_mpred(tThinking(tAgentGeneric),[flag]).
 :-decl_mpred(tDeleted(ftID),[flag]).
 
-:- decl_mpred(mudNeedsLook/2,[completeExtentAsserted]).
+:- decl_mpred(mudNeedsLook/2,[ttCompleteExtentAsserted]).
 :- decl_mpred(mudMaxHitPoints(tAgentGeneric,ftInt)).
 
 
@@ -1016,7 +1017,7 @@ begin_prolog_source:- must_det(asserta(thlocal:in_prolog_source_code)).
 end_prolog_source:- must_det(retract(thlocal:in_prolog_source_code)).
 
 :-swi_export(add_from_macropred/1).
-add_from_macropred(C):- loop_check(add_from_macropred_lc(C),((dmsg(loopING_add_from_macropred(C)),dtrace,add_fast(C)))).
+add_from_macropred(C):- loop_check(add_from_macropred_lc(C),((dmsg(loopING_add_from_macropred(C)),add_fast(C)))).
 add_from_macropred_lc(A):-A==end_of_file,!.
 add_from_macropred_lc(Term):- expands_on(isEach,Term), !,forall(do_expand_args(isEach,Term,O),add_from_macropred_lc(O)).
 add_from_macropred_lc(A):- not(compound(A)),!,trace_or_throw(not_compound(add_from_macropred_lc(A))).
@@ -1027,23 +1028,13 @@ add_from_macropred_lc(':-'(Head,true)):- !, add(Head).
 add_from_macropred_lc(':-'(Head,Body)):- must_det(assertz_local_game_clause(Head,Body)),!.
 add_from_macropred_lc(RDF):- RDF=..[SVO,S,V,O],is_svo_functor(SVO),!,must_det(add(dbase_t(V,S,O))).
 add_from_macropred_lc(A):- into_mpred_form(A,F), A \=@=F,!,add_from_macropred(F). 
-add_from_macropred_lc(ClassTemplate):- compound(ClassTemplate), ClassTemplate=..[item_template,Type|Props],
+add_from_macropred_lc(ClassTemplate):- compound(ClassTemplate), ClassTemplate=..[typeProps,Type|Props],
    assert_isa(Type,ttCreateable),
    assert_isa(Type,tCol),
    add(mudSubclass(Type,tItem)),   
    flatten(Props,AllProps),!,
-   show_call(add(default_type_props(Type,AllProps))).
-/*
-add_from_macropred_lc(somethingIsa(A,List)):-forall_member(E,List,add(isa(A,E))).
-add_from_macropred_lc(somethingDescription(A,List)):-forall_member(E,List,add(description(A,E))).
-add_from_macropred_lc(objects(Type,List)):-forall_member(I,List,add(isa(I,Type))).
-add_from_macropred_lc(sorts(Type,List)):-forall_member(I,List,add(subclass(I,Type))).
-add_from_macropred_lc(predicates(List)):-forall_member(T,List,add(mpred_prop(T))).
-add_from_macropred_lc(description(A,E)):- add_description(A,E).
-add_from_macropred_lc(nameStrings(A,S0)):- determinerRemoved(S0,String,S),!,add(nameStrings(A,S)),add(determinerString(A,String)).
-add_from_macropred_lc(Call):- fail, predicate_property(Call, number_of_rules(_)),not(predicate_property(Call, dynamic)),nop(dmsg(assert_to_static(Call))),fail.
-add_from_macropred_lc(d(s)):-dumpST, trace_or_throw(dtrace).
-*/
+   show_call(add(typeProps(Type,AllProps))).
+
 add_from_macropred_lc(M:HB):-atom(M),!,add_from_macropred_lc(HB).
 
 :-swi_export((assertz_local_game_clause/1)).
@@ -1061,7 +1052,7 @@ assertz_local_game_clause(Head,Body):- get_mpred_type(Head,Type),!,must_det(asse
 assertz_local_game_clause(callable(prologOnly),Head,Body):- must_det(assertz_if_new_clause(Head,Body)),dmsg(used_clause_as_prologOnly(Head,Body)).
 assertz_local_game_clause(callable(static),Head,Body):- must_det(assertz_if_new_clause(Head,Body)),trace_or_throw(eRROR_maybe_used_clause_as_prologOnly(Head,Body)).
 assertz_local_game_clause(_,Head,true):- !,with_assertions(thlocal:adding_from_srcfile,add(Head)),!.
-assertz_local_game_clause(callable(prologHybrid),Head,Body):-!, assertz_if_new_clause(predHybridRule(Head,Body),true),dmsg(used_clause_as_hybridRule(Head,Body)),
+assertz_local_game_clause(callable(prologHybrid),Head,Body):-!, assertz_if_new_clause(ruleHybridChain(Head,Body),true),dmsg(used_clause_as_hybridRule(Head,Body)),
    decl_mpred_hybrid(F/A),!,declare_dbase_local_dynamic_really(user,F,A).
 assertz_local_game_clause(Type,Head,BodyIn):- once(make_body_clause(Head,BodyIn,Body)),must_det(assertz_if_new_clause(Head,Body)),dmsg(used_clause_as_unknown(Type,Head,Body)).
 assertz_local_game_clause(Type,Head,Body):- must_det(assertz_if_new_clause(Head,Body)),dmsg(used_clause_as(Type,Head,Body)).
@@ -1150,7 +1141,7 @@ createByNameMangle0(InstA,InstA,Type):-compound(InstA),InstA=..[Type|Props],asse
 createByNameMangle0(InstA,Inst,Type):- compound(InstA),!,functor_catch(InstA,Type,A),must(A==1),assert_isa(InstA,Type),InstA=Inst.
 createByNameMangle0(InstA,_,_Type):- not(atom(InstA)),!,trace_or_throw(todo(not_atom_createByNameMangle(InstA))).
 createByNameMangle0(Suggest,InstA,Type):- once(split_name_type(Suggest,InstA,Type)),Suggest==InstA,assert_isa(InstA,Type).
-createByNameMangle0(OType,InstA,Type):- must(var(InstA)),typename_to_iname(t,OType,Type),atom_concat(Type,'7',InstA7),typename_to_iname(i,InstA7,InstA),must_det(assert_isa(InstA,Type)), call_after_game_load(create_instance(InstA)).
+createByNameMangle0(OType,InstA,Type):- must(var(InstA)),i_name(t,OType,Type),atom_concat(Type,'7',InstA7),i_name(i,InstA7,InstA),must_det(assert_isa(InstA,Type)), call_after_game_load(create_instance(InstA)).
 createByNameMangle0(InstA,IDA,InstA):- gensym(InstA,IDA), englishServerInterface([actCreate,InstA,IDA]).
 
 wfAssert(X):-add(X). %  add_later(X).

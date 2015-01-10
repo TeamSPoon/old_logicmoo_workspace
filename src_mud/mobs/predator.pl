@@ -24,7 +24,7 @@
 :-decl_type(tPredator).
 tCol(tPredator).
 
-world_agent_plan(_World,Agent,Act):-
+user:world_agent_plan(_World,Agent,Act):-
    mudIsa(Agent,tPredator),
    predator_idea(Agent,Act).
 
@@ -42,13 +42,13 @@ predator_idea(Agent,actMove(Dir)) :-
 	list_object_dir_sensed(_,List,iCorpseFn(_),Dir).
 predator_idea(Agent,actAttack(Dir)) :-
 	mudNearReach(Agent,List),
-	list_object_dir_near(List,tPrey(_),Dir).
+	list_object_dir_near(List,tPrey,Dir).
 
 % find something near and itnersting and go to it.. or find a dirrection and go that way.. or sit 
 
 predator_idea(Agent,actMove(Dir)) :-
 	mudGetPrecepts(Agent,List),
-	list_object_dir_sensed(_,List,tPrey(_),Dir).
+	list_object_dir_sensed(_,List,tPrey,Dir).
 
 predator_idea(Agent,Act) :- 
       move_or_sit_memory_idea(Agent,Act,[tNut]).

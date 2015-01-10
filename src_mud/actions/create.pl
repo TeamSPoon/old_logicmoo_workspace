@@ -69,7 +69,7 @@ create_new_type(Agent,[NewObj|DefaultParams]):-
    padd(NewObj,authorWas(create_new_type(Agent,[NewObj|DefaultParams]))),
    padd(Agent,current_pronoun("it",NewObj)),
    getPropInfo(Agent,NewObj,DefaultParams,2,PropList),!,
-   add(default_type_props(NewObj,PropList)).
+   add(typeProps(NewObj,PropList)).
 
 
 getPropInfo(_Agent,_NewName,PropsIn,N,[comment(ftText(need,to,actParse,PropsIn,N))]).

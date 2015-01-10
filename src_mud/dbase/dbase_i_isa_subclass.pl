@@ -28,14 +28,14 @@ decl_type(Spec):- decl_mpred(Spec,1),declare_dbase_local_dynamic(Spec,1), decl_t
 decl_type_unsafe(Spec):- hasInstance(tCol,Spec),!.
 decl_type_unsafe(Spec):- hooked_asserta(mudIsa(Spec,tCol)),assert_hasInstance(tCol,Spec).
 
-:- decl_mpred_hybrid(colDeclarer/1).
+:- decl_mpred_hybrid(macroDeclarer/1).
 
 define_compound_as_type(Spec):- hasInstance(F,Spec),dmsg(once(define_compound_as_type(Spec,F))).
 define_compound_as_type(Spec):- add(resultIsa(Spec,tCol)).
 define_compound_as_type(Spec):- (assert_hasInstance(ttFormatType,Spec)),dmsg(once(define_compound_as_type(Spec,ttFormatType))).
 define_compound_as_type(Spec):- compound(Spec),trace_or_throw(never_compound_define_type(Spec)).
 
-:-forall(argsIsaProps(F),decl_type(F)).
+:-forall(ttDeclarer(F),decl_type(F)).
 
 :-dynamic_multifile_exported(define_ft/1).
 define_ft(Spec):- never_type(Spec),!,trace_or_throw(never_ft(Spec)).
@@ -66,16 +66,23 @@ decl_database_hook(assert(_A_or_Z),mudSubclass(S,C)):-decl_type_safe(S),decl_typ
 
 :- decl_type(tCol).
 :- decl_type(ttFormatType).
-:- decl_type(completeExtentAsserted).
+:- decl_type(ttCompleteExtentAsserted).
 :- decl_type(ttCreateable).
-:- forall(argsIsaProps(Prop),(decl_type(Prop),asserta(is_known_trew(mudSubclass(Prop,tPred))))).
+:- forall(ttDeclarer(Prop),(decl_type(Prop),asserta(is_known_trew(mudSubclass(Prop,tPred))))).
+
+:- decl_thlocal(infSupertypeName).
 
 ttCreateable(Type):- arg(_,vv(tAgentGeneric,tItem,tRegion),Type).
 
 decl_database_hook(assert(_A_or_Z),mudIsa(W,ttCreateable)):-decl_type_safe(W),call_after_game_load(forall(mudIsa(I,W),create_instance(I,W))).
-decl_database_hook(assert(_A_or_Z),mudIsa(W,tCol)):-atom(W),atomic_list_concat(List,'_',W),!,length(List,2),!, append(FirstPart,[Last],List),atom_length(Last,AL),AL>3,not(member(flagged,FirstPart)),atomic_list_concat(FirstPart,'_',_NewCol),show_call_failure(assert_subclass_safe(W,Last)).
+decl_database_hook(assert(_A_or_Z),mudIsa(W,tCol)):- (test_tl(infSupertypeName);true),guess_supertypes(W).
+
+guess_supertypes(W):-atom(W),atomic_list_concat(List,'_',W),!,length(List,2),!, append(FirstPart,[Last],List),atom_length(Last,AL),AL>3,not(member(flagged,FirstPart)),atomic_list_concat(FirstPart,'_',_NewCol),show_call_failure(assert_subclass_safe(W,Last)).
+guess_supertypes(W):-atom(W),to_first_break(W,lower,tt,_,upper),!,assert_isa(W,ttTypeType),!.
+guess_supertypes(W):-atom(W),T=t,to_first_break(W,lower,T,All,upper),!,to_first_break(All,upper,_,Super,Rest),atom_length(Rest,L),!,L>2,i_name(T,Rest,Super),show_call_failure(assert_subclass_safe(W,Super)),!.
 
 
+% i_name(I,OType,IType)
 % ================================================
 % assert_isa/2
 % ================================================
@@ -109,7 +116,7 @@ decl_database_hook(assert(_),DATA):-into_mpred_form(DATA,O),!,O=mudIsa(I,T),hotr
 % decl_database_hook(retract(_),isa(I,T)):-doall(db_retract_isa_hooked(I,T)).
 
 assert_isa_hooked(A,_):-retractall(dbase_t(cache_I_L,mudIsa,A,_)),fail.
-assert_isa_hooked(F,T):-argsIsaProps(T),decl_mpred(F,T),fail.
+assert_isa_hooked(F,T):-ttDeclarer(T),decl_mpred(F,T),fail.
 assert_isa_hooked(I,T):- not(ground(assert_isa(I,T))),!, trace_or_throw(not(ground(assert_isa(I,T)))).
 assert_isa_hooked(I,T):- assert_hasInstance(T,I),fail.
 
@@ -119,7 +126,7 @@ assert_isa_hooked(Term,tPred):-!,decl_mpred(Term).
 assert_isa_hooked(Term,prologHybrid):-!,decl_mpred_hybrid(Term).
 assert_isa_hooked(Term,prologOnly):-!,decl_mpred_prolog(Term).
 assert_isa_hooked(I,_):- glean_pred_props_maybe(I),fail.
-assert_isa_hooked(I,T):- argsIsaProps(T),decl_mpred(I,T),fail.
+assert_isa_hooked(I,T):- ttDeclarer(T),decl_mpred(I,T),fail.
 assert_isa_hooked(food5,tWeapon):-trace_or_throw(assert_isa(food5,tWeapon)).
 
 % assert_isa_hooked(I,T):- motel:defconcept(I,isAnd([lexicon,T])).
@@ -129,17 +136,17 @@ assert_isa_hooked(food5,tWeapon):-trace_or_throw(assert_isa(food5,tWeapon)).
 
 decl_database_hook(assert(_),mudIsa(I,T)):- doall(assert_isa_hooked_after(I,T)).
 
-assert_isa_hooked_after(F,T):-argsIsaProps(T),!,decl_mpred(F,T).
+assert_isa_hooked_after(F,T):-ttDeclarer(T),!,decl_mpred(F,T).
 assert_isa_hooked_after(_,tCol):-!.
 assert_isa_hooked_after(_,ttFormatType):-!.
 assert_isa_hooked_after(I,T):- ttCreateable(T),!,assert_isa_hooked_creation(I,T).
-assert_isa_hooked_after(I,T):- not(completeExtentAsserted(T)),impliedSubClass(T,ST),completeExtentAsserted(ST),assert_isa(I,ST).
+assert_isa_hooked_after(I,T):- not(ttCompleteExtentAsserted(T)),impliedSubClass(T,ST),ttCompleteExtentAsserted(ST),assert_isa(I,ST).
 %assert_isa_hooked_after(I,T):- assert_isa_hooked_creation(I,T).
 
-completeExtentAsserted(Ext):- arg(_,vv(tCol,vtDirection,ttFormatType,ftString),Ext).
-completeExtentAsserted(F):- ttCreateable(F).
-completeExtentAsserted(F):- argsIsaProps(F).
-completeExtentAsserted(F):- (isa_asserted(F,completeExtentAsserted)).
+ttCompleteExtentAsserted(Ext):- arg(_,vv(tCol,vtDirection,ttFormatType,ftString),Ext).
+ttCompleteExtentAsserted(F):- ttCreateable(F).
+ttCompleteExtentAsserted(F):- ttDeclarer(F).
+ttCompleteExtentAsserted(F):- (isa_asserted(F,ttCompleteExtentAsserted)).
 
 
 
@@ -202,7 +209,7 @@ isa_asserted_motel(I,T):-no_repeats(isa_asserted_nr(I,T)).
 :-dynamic_multifile_exported(type_isa/2).
 
 type_isa(Type,ttCreateable):-arg(_,vv(tAgentGeneric,tItem,tObj,tRegion),Type),!.
-type_isa(ArgIsa,ttPredType):-argsIsaProps(ArgIsa),!.
+type_isa(ArgIsa,ttPredType):-ttDeclarer(ArgIsa),!.
 type_isa(ftString,ttFormatType):-!.
 type_isa(Type,ttFormatType):-ttFormatType(Type),!. % text
 %  from name
@@ -220,9 +227,8 @@ type_suffix('Fn',ftFunctional).
 type_suffix('Type',ttTypeType).
 
 
-
 type_prefix(is,ftSyntaxOperator).
-type_prefix(txt,ftText).
+type_prefix(txt,ftTextType).
 type_prefix(sk,ftSkolemFunction).
 type_prefix(fn,ftSkolemFunction).
 type_prefix(mud,tPred).
@@ -242,8 +248,8 @@ type_prefix(i,ftID).
 
 callOr(Pred,I,T):-(call(Pred,I);call(Pred,T)),!.
 
-type_deduced(I,T):-atom(T),typename_to_iname(mud,T,P),!,dbase_t(P,_,I).
-type_deduced(I,T):-nonvar(I),not(number(I)),dbase_t(P,_,I),(argIsa_known(P,2,AT)->T=AT;typename_to_iname(vt,P,T)).
+type_deduced(I,T):-atom(T),i_name(mud,T,P),!,dbase_t(P,_,I).
+type_deduced(I,T):-nonvar(I),not(number(I)),dbase_t(P,_,I),(argIsa_known(P,2,AT)->T=AT;i_name(vt,P,T)).
 
 
 isa_asserted_ft(I,T):- T==ftVar,!,var(I).
@@ -265,7 +271,7 @@ isa_asserted_0(I,T):-type_deduced(I,T).
 isa_asserted_0(I,T):-isa_from_morphology(I,T).
 isa_asserted_0(I,T):-type_isa(I,T).
 isa_asserted_0(I,T):-nonvar(T),type_prefix(_Prefix,T),atom(I),!,isa_from_morphology(I,T).
-isa_asserted_0(I,T):-nonvar(T),append_term(T,I,HEAD),predHybridRule(HEAD,BODY),call_mpred_body(HEAD,BODY).
+isa_asserted_0(I,T):-nonvar(T),append_term(T,I,HEAD),ruleHybridChain(HEAD,BODY),call_mpred_body(HEAD,BODY).
 isa_asserted_0(I,T):-isa_asserted_ft(I,T).
 
 isa_asserted_0(I,T):-fact_always_true(mudIsa(I,T)).
@@ -284,13 +290,13 @@ isa_asserted_1(I,T):-atom(T),isa_w_type_atom(I,T).
 isa_asserted_1(I,T):-nonvar(I),ttFormatType(T),term_is_ft(I,T).
 % isa_asserted_1(I,T):- compound(I),functor(I,F,_),!,isa_backchaing_1(F,T).
 
-isa_w_type_atom(I,T):- argsIsaProps(T),!,mpred_prop(I,T).
+isa_w_type_atom(I,T):- ttDeclarer(T),!,mpred_prop(I,T).
 isa_w_type_atom(I,T):- clause(mpred_prop(I,T),true).
 isa_w_type_atom(I,T):- G=..[T,I],once_if_ground(isa_atom_call(T,G),_).
 
 dont_call_type_arity_one(tCol).
 dont_call_type_arity_one(ttFormatType).
-dont_call_type_arity_one(tAgentcol).
+dont_call_type_arity_one(ttAgentType).
 dont_call_type_arity_one(F):-mpred_prop(F,predStubType(prologHybrid)),!.
 
 isa_atom_call(T,G):-loop_check(isa_atom_call_lc(T,G),fail).
@@ -318,11 +324,11 @@ tCol(tPred).
 tCol(tFunction).
 tCol(tRelation).
 tCol(ttCreateable).
-tCol(colDeclarer).
+tCol(macroDeclarer).
 % col(predArgTypes).
 % TODO decide if OK
-tCol(ArgsIsa):-argsIsaProps(ArgsIsa).
-tCol(F):-hasInstance(colDeclarer,F).
+tCol(ArgsIsa):-ttDeclarer(ArgsIsa).
+tCol(F):-hasInstance(macroDeclarer,F).
 tCol(ttFormatType).
 tCol(vtActionTemplate).
 tCol(tRegion).
@@ -368,9 +374,11 @@ transitive_P(DB,P,L,R):-transitive_P_l_r(DB,P,L,R).
 
 transitive_P_l_r(DB,P,L,R):-call(DB,P,L,A1),(call(DB,P,A1,R);call(DB,P,A1,A2),call(DB,P,A2,R)).
 transitive_P_l_r(DB,P,L,R):-nonvar(R),call(DB,P,L,A1),call(DB,P,A1,A2),call(DB,P,A2,A3),call(DB,P,A3,R).
+transitive_P_l_r(DB,P,L,R):-ground(L:R),call(DB,P,L,A1),call(DB,P,A1,A2),call(DB,P,A2,A3),call(DB,P,A3,A4),call(DB,P,A4,R).
 
-transitive_P_r_l(DB,P,L,R):-call(DB,P,A1,R),(call(DB,P,L,A1);call(DB,P,A2,A1),call(DB,P,L,A2)).
-transitive_P_r_l(DB,P,L,R):-nonvar(L),call(DB,P,A3,R),call(DB,P,A2,A3),call(DB,P,A1,A2),call(DB,P,L,A1).
+transitive_P_r_l(DB,P,L,R):-nonvar(R),(call(DB,P,A1,R),(call(DB,P,L,A1);call(DB,P,A2,A1),call(DB,P,L,A2))).
+transitive_P_r_l(DB,P,L,R):-nonvar(R),call(DB,P,A3,R),call(DB,P,A2,A3),call(DB,P,A1,A2),call(DB,P,L,A1).
+transitive_P_r_l(DB,P,L,R):-ground(L:R),call(DB,P,A3,R),call(DB,P,A2,A3),call(DB,P,A1,A2),call(DB,P,A0,A1),call(DB,P,L,A0).
 
 
 :-dynamic_multifile_exported(is_known_trew/1).
@@ -386,23 +394,23 @@ is_known_true(mudIsa(apathFn(_,_),apathFn)).
 is_known_true(mudIsa(_,ftTerm)).
 
 
-is_known_trew(mudIsa(tContainer,completeExtentAsserted)).
+is_known_trew(mudIsa(tContainer,ttCompleteExtentAsserted)).
 % is_known_trew(isa(formattype,metaclass)).
-is_known_trew(mudIsa(completeExtentAsserted,completeExtentAsserted)).
-is_known_trew(mudIsa(tCol,completeExtentAsserted)).
+is_known_trew(mudIsa(ttCompleteExtentAsserted,ttCompleteExtentAsserted)).
+is_known_trew(mudIsa(tCol,ttCompleteExtentAsserted)).
 is_known_trew(mudIsa(actGossup,tChannel)).
 is_known_trew(mudSubclass(tRegion,tChannel)).
 is_known_trew(mudSubclass(tAgentGeneric,tChannel)).
 is_known_trew(mudIsa(tAgentGeneric,ttCreateable)).
 is_known_trew(mudIsa(tRegion,ttCreateable)).
-is_known_trew(mudIsa(prologSingleValued, completeExtentAsserted)).
-is_known_trew(mudIsa(ttCreateable,completeExtentAsserted)).
-is_known_trew(mudIsa(ttFormatType,completeExtentAsserted)).
+is_known_trew(mudIsa(prologSingleValued, ttCompleteExtentAsserted)).
+is_known_trew(mudIsa(ttCreateable,ttCompleteExtentAsserted)).
+is_known_trew(mudIsa(ttFormatType,ttCompleteExtentAsserted)).
 is_known_trew(mudIsa(ftInt,ttNotCreatableType)).
 is_known_trew(mudIsa(tCol,tCol)).
 is_known_trew(mudIsa(prologSingleValued, tCol)).
-is_known_trew(mudIsa(completeExtentAsserted, tCol)).
-is_known_trew(mudSubclass(completeExtentAsserted, extentDecidable)).
+is_known_trew(mudIsa(ttCompleteExtentAsserted, tCol)).
+is_known_trew(mudSubclass(ttCompleteExtentAsserted, extentDecidable)).
 is_known_trew(mudSubclass(prologSingleValued, extentDecidable)).
 is_known_trew(mudSubclass('MaleAnimal',tAgentGeneric)).
 is_known_trew(mudSubclass(ttFormatType,tCol)).
@@ -417,9 +425,9 @@ is_known_trew(mudSubclass(predArgTypes,tRelation)).
 is_known_trew(mudSubclass(tFunction,tRelation)).
 
 
-is_known_trew(mudSubclass(F,tPred)):-argsIsaProps(F).
-is_known_trew(mudSubclass(F,tFunction)):-argsIsaProps(F).
-is_known_trew(mudSubclass(F,tRelation)):-argsIsaProps(F).
+is_known_trew(mudSubclass(F,tPred)):-ttDeclarer(F).
+% is_known_trew(mudSubclass(F,tFunction)):-ttDeclarer(F).
+is_known_trew(mudSubclass(F,tRelation)):-ttDeclarer(F).
 is_known_trew(disjointWith(A,B)):-disjointWithT(A,B).
 
 
@@ -435,7 +443,7 @@ is_known_false(F):-is_known_false0(F),!.
 is_known_false0(mudIsa(regioncol,ttFormatType)).
 is_known_false0(mudIsa(ttFormatType,ttFormatType)).
 is_known_false0(mudIsa(X,tSpatialThing)):- tCol(X);ttFormatType(X);tPred(X).
-is_known_false0(mudIsa(completeExtentAsserted,ttCreateable)).
+is_known_false0(mudIsa(ttCompleteExtentAsserted,ttCreateable)).
 is_known_false0(mudIsa(X,Y)):-!,not_mud_isa(X,Y).
 is_known_false0(mudSubclass(Type,_)):-arg(_,vv(tCol,tRelation,ttFormatType),Type).
 
@@ -443,7 +451,7 @@ is_known_false0(mudSubclass(Type,_)):-arg(_,vv(tCol,tRelation,ttFormatType),Type
 not_mud_isa(tAgentGeneric,ttFormatType).
 not_mud_isa(tItem,ttFormatType).
 not_mud_isa(tCol,ttFormatType).
-not_mud_isa(tObj, completeExtentAsserted).
+not_mud_isa(tObj, ttCompleteExtentAsserted).
 not_mud_isa(tObj, ttCreateable).
 not_mud_isa(prologMacroHead, ttFormatType).
 not_mud_isa(tObj, ttFormatType).
@@ -453,7 +461,7 @@ not_mud_isa(tTemporallyExistingThing, tTemporallyExistingThing).
 not_mud_isa(ttCreateable,tTemporallyExistingThing).
 not_mud_isa(Type,ttFormatType):- \+ (hasInstance(ttFormatType, Type)).
 not_mud_isa(Type, prologMacroHead):- \+ (mpred_prop(Type, prologMacroHead)).
-not_mud_isa(Type, completeExtentAsserted):- \+ (mpred_prop(Type, completeExtentAsserted)).
+not_mud_isa(Type, ttCompleteExtentAsserted):- \+ (mpred_prop(Type, ttCompleteExtentAsserted)).
 not_mud_isa(X,tCol):-never_type(X).
 
 

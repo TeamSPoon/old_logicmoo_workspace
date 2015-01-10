@@ -74,7 +74,7 @@ body_req_no_rules(_,_,HEAD, _):-     clause(HEAD,  true).
 body_req_no_rules(_,_,_  , HEAD_T):- clause(HEAD_T,true).
 body_req_no_rules(F,_,_,HEAD_T):- body_req_plus_cyc(F,_,_,HEAD_T).
 
-body_req_only_rules(_,_,HEAD, _):-  predHybridRule(HEAD,BODY),call_mpred_body(HEAD,BODY).
+body_req_only_rules(_,_,HEAD, _):-  ruleHybridChain(HEAD,BODY),call_mpred_body(HEAD,BODY).
 body_req_only_rules(_,_,_,dbase_t(F,Obj,LValue)):-  choose_val(F,Obj,LValue).
 
 body_req_plus_cyc(F,_,_,HEAD_T):-  mpred_prop(F,cycPlus2(_)),thlocal:useOnlyExternalDBs,!,with_assertions(thglobal:use_cyc_database,body_call_cyckb(HEAD_T)).

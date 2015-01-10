@@ -234,9 +234,9 @@ look_brief(Agent):- not(prop(Agent,mudNeedsLook,true)),!.
 look_brief(Agent):- must(prop(Agent,mudNeedsLook,true)),look_as(Agent).
 
 telnet_repl_writer(_TL,call,ftTerm,Goal):-!,ignore(debugOnError(Goal)).
-telnet_repl_writer( TL,ftText,Type,[V]):-telnet_repl_writer(TL,ftText,Type,V).
-telnet_repl_writer( TL,ftText,Type,V):- is_list(V),merge_elements(V,L),V\=@=L,!,telnet_repl_writer( TL,ftText,Type,L).
-telnet_repl_writer(_TL,ftText,Type,V):-copy_term(Type,TypeO),ignore(TypeO=t),fmt('text(~q).~n',[V]).
+telnet_repl_writer( TL,text,Type,[V]):-telnet_repl_writer(TL,text,Type,V).
+telnet_repl_writer( TL,text,Type,V):- is_list(V),merge_elements(V,L),V\=@=L,!,telnet_repl_writer( TL,text,Type,L).
+telnet_repl_writer(_TL,text,Type,V):-copy_term(Type,TypeO),ignore(TypeO=t),fmt('text(~q).~n',[V]).
 telnet_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=t),fmt('~q=(~w)~q.~n',[N,TypeO,V]).
 
 telnet_repl_obj_to_string(O,_TypeHint,O):-!.

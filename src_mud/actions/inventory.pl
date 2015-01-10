@@ -1,5 +1,5 @@
 % :-swi_module(user). 
-:-swi_module(actInventory, [mudPossess/2,inventory1/2]).
+:-swi_module(actInventory, [mudInventoryLocation/3,show_inventory/2]).
 /** <module> A command to  ...
 % Douglas Miles 2014
 % inventory(Agt,Inv) = inventory (anything the agent has taken)
@@ -20,7 +20,7 @@ tNearestReachableItem(Obj):-
 :- decl_type(tFarthestReachableItem).
 tFarthestReachableItem(Obj):-
   current_agent_or_var(Agent),
-  nearest_reachable_object(Agent,Obj).
+  farthest_reachable_object(Agent,Obj).
 
 nearest_reachable_object(Agent,Obj):-
   with_no_modifications((findall(Obj,farthest_reachable_object(Agent,Obj),List),reverse(List,Reverse),!,member(Obj,Reverse))).
@@ -56,21 +56,15 @@ agent_call_command(Agent,actInventory(Who)):- show_inventory(Agent,Who).
 
 show_inventory(Agent,Who):-
         show_kb_preds(Agent,[                                                  
-                        listof(mudInventory(Who, value)),
-                        listof(mudContains(Who,value)),                 
-                        listof(mudPossess(Who,value)),
-                        listof(mudStowing(Who,value)),
-                        listof(mudContains(Who,value)),
+                        % listof(mudInventoryLocation(Who, value, _)),
+                       % listof(mudContains(Who,value)),                 
+                       % listof(mudPossess(Who,value)),
+                        listof(mudStowing(Who,value)),                       
                         listof(mudWielding(Who,value)),
                         listof(wearsClothing(Who,value))]).
 
 
-
-% Get only the Inv (inventory)
-mudInventory(Agent, Inv) :-
-	findall(Obj,inventory1(Agent,Obj),Inv).
-
-inventory1(Who,CALL):- 
+mudInventoryLocation(Who,Obj,Loc):- 
          findall(prop(Obj,PRED),
                   (member(dbase_t(PRED,A,B), [
                         dbase_t(mudPossess,Who,Obj),
@@ -80,8 +74,8 @@ inventory1(Who,CALL):-
                         dbase_t(wearsClothing,Who,Obj)]),
                      ireq(dbase_t(PRED,A,B))),
                   RESULTS),
-         setof(Obj,member(prop(Obj,PRED),RESULTS),OBJLIST),
-         (member(Obj,OBJLIST),member(CALL,[mudAtLoc(Obj,LOC),localityOfObject(Obj,LOC)]),ireq(CALL)).
+         setof(Obj,member(prop(Obj,PRED),RESULTS),OBJLIST),!,
+         member(Obj,OBJLIST),once((member(PRED2,[mudAtLoc,localityOfObject]),ireq(dbase_t(PRED2,Obj,Loc)))).
 
 test_exists(O):- tItem(O).
 test_exists(O):- tAgentGeneric(O).

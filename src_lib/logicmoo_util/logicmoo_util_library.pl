@@ -21,19 +21,17 @@
          exists_directory_safe/1,
          eraseall/2,
          time_file_safe/2,
-         throw_safe/1,
+         
          maplist_safe/2,
          maplist_safe/3,
          subst/4,
          predsubst/3,
          wsubst/4,
          remove_dupes/2,
-         list_to_set_safe/2,
          get_functor/2,
          get_functor/3,
          functor_h/2,
          functor_h/3,
-         functor_safe/3,
          flatten_set/2,
          at_start/1,
          in_thread_and_join/1,
@@ -49,8 +47,7 @@
          assert_if_new/1,
          safe_univ/2,
          clause_asserted/2,
-         clause_asserted/1,
-         bad_functor/1,
+         clause_asserted/1,         
          make_list/3,
          if_file_exists/1,
          multi_transparent/1]).
@@ -73,7 +70,9 @@ filematch(Mask,File1):-filematch('./',Mask,File1).
 filematch(RelativeTo,Mask,File1):-absolute_file_name(Mask,File1,[expand(true),extensions(['',plmoo,pl,'pl.in']),file_errors(fail),solutions(all),relative_to(RelativeTo),access(read)]).
 
 
-:- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)), 'user').
+:- use_module(logicmoo_util_bugger_new).
+:- use_module(logicmoo_util_bugger_catch).
+:- '@'( use_module(logicmoo_util_bugger), 'user').
 
 % :-user_use_module(logicmoo(logicmoo_util/logicmoo_util_strings)).
 % :-user_use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)).
@@ -81,12 +80,6 @@ filematch(RelativeTo,Mask,File1):-absolute_file_name(Mask,File1,[expand(true),ex
 lastMember(_E,List):-var(List),!,fail.
 lastMember(E,[H|List]):-lastMember(E,List);E=H.
 
-:-export(functor_catch/3).
-functor_catch(P,F,A):-ccatch(functor(P,F,A),E,(dumpST,dmsg(E:functor(P,F,A)),dtrace)).
-
-bad_functor(L) :- arg(_,v('|','.',[],':','/'),L).
-
-warn_bad_functor(L):-ignore((notrace(bad_functor(L)),!,dumpST,dtrace,trace_or_throw(bad_functor(L)))).
 
 safe_univ(Call,List):-hotrace(safe_univ0(Call,List)),!.
 
@@ -168,7 +161,7 @@ as_clause( H,  H,  true).
 :- meta_predicate doall(0).
 doall(C):-ignore((C,fail)).
 
-:- user_use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)).
+:- use_module(logicmoo_util_bugger).
 
 proccess_status(_,exited(called(Det,Goal)),called(Goal2)):- Det = true,!,must_det(Goal=Goal2).
 proccess_status(ID,exited(called(Det,Goal)),called(Goal2)):- dmsg(nondet_proccess_status(ID,exited(called(Det,Goal)),called(Goal2))),!,must_det(Goal=Goal2).
@@ -246,6 +239,8 @@ univ_safe(P,L):- must_det(is_list(L)),debugOnError((P=..L)).
 % ===================================================================
 
 % Usage: subst(+Fml,+X,+Sk,?FmlSk)
+
+:-moo_hide_childs(subst/4).
 
 subst(A,B,C,D):-  notrace((ccatch(notrace(nd_subst(A,B,C,D)),E,(dumpST,dmsg(E:nd_subst(A,B,C,D)),fail)))),!.
 subst(A,_B,_C,A).
@@ -335,23 +330,6 @@ functor_h(Obj,F,0):- string(Obj),!,atom_string(F,Obj).
 functor_h(Obj,Obj,0):-not(compound(Obj)),!.
 functor_h(Obj,F,A):-functor_catch(Obj,F,A).
 
-strip_f_module(_:P,FA):-nonvar(P),!,strip_f_module(P,F),!,F=FA.
-strip_f_module(P,PA):-atom(P),!,P=PA.
-strip_f_module(P,FA):- notrace(string(P);is_list(P);atomic(P)), text_to_string(P,S),!,atom_string(F,S),!,F=FA.
-strip_f_module(P,P).
-
-functor_safe(P,F,A):-functor_safe0(P,F,A),!.
-functor_safe0(M:P,M:F,A):-var(P),atom(M),functor_catch(P,F,A),!,warn_bad_functor(F).
-functor_safe0(P,F,A):-var(P),strip_f_module(F,F0),functor_catch(P,F0,A),!,warn_bad_functor(F).
-functor_safe0(P,F,A):-compound(P),!,functor_safe_compound(P,F,A),warn_bad_functor(F).
-functor_safe0(P,F,0):- notrace(string(P);atomic(P)), text_to_string(P,S),!,atom_string(F,S),warn_bad_functor(F).
-functor_safe_compound((_,_),',',2).
-functor_safe_compound([_|_],'.',2).
-functor_safe_compound(_:P,F,A):- functor_catch(P,F,A),!.
-functor_safe_compound(P,F,A):- functor_catch(P,F,A).
-functor_safe_compound(P,F,A):- var(F),strip_f_module(P,P0),!,functor_catch(P0,F0,A),strip_f_module(F0,F),!.
-functor_safe_compound(P,F,A):- strip_f_module(P,P0),strip_f_module(F,F0),!,functor_catch(P0,F0,A).
-
 
 :- dynamic_multifile_exported((do_expand_args/3)).
 
@@ -425,9 +403,7 @@ multi_transparent(M:F/A):-!, module_transparent(M:F/A),dynamic(M:F/A),multifile(
 multi_transparent(F/A):-!,multi_transparent(user:F/A).
 multi_transparent(X):-functor_catch(X,F,A),multi_transparent(F/A),!.
 
-:- module_transparent(library_directory/1).
 
-throw_safe(Exc):-trace_or_throw(Exc).
 atom_concat_safe(L,R,A):- ((atom(A),(atom(L);atom(R))) ; ((atom(L),atom(R)))), !, atom_concat(L,R,A),!.
 exists_file_safe(File):-bugger:must(atomic(File)),exists_file(File).
 exists_directory_safe(File):-bugger:must(atomic(File)),exists_directory(File).
@@ -456,27 +432,10 @@ maplist_safe(Pred,LISTIN, LIST):-!, findall(EE, ((member(E,LISTIN),debugOnFailur
 % though this should been fine % maplist_safe(Pred,[A|B],OUT):- copy_term(Pred+A, Pred0+A0), debugOnFailureEach(once(call(Pred0,A0,AA))),  maplist_safe(Pred,B,BB), !, ignore(OUT=[AA|BB]).
 
 
-:- dynamic(buggerDir/1).
-:- abolish(buggerDir/1),prolog_load_context(directory,D),asserta(buggerDir(D)).
-:- dynamic(buggerFile/1).
-:- abolish(buggerFile/1),prolog_load_context(source,D),asserta(buggerFile(D)).
-
-
-hasLibrarySupport :- absolute_file_name(logicmoo('logicmoo_util/logicmoo_util_library.pl'),File),exists_file(File).
-
-throwNoLib:- trace,absolute_file_name('.',Here), buggerFile(BuggerFile), listing(library_directory), trace_or_throw(error(existence_error(url, BuggerFile), context(_, status(404, [BuggerFile, from( Here) ])))).
-
-addLibraryDir :- buggerDir(Here),atom_concat(Here,'/..',UpOne), absolute_file_name(UpOne,AUpOne),asserta(user:library_directory(AUpOne)).
-
-% if not has library suport, add this direcotry as a library directory
-:-not(hasLibrarySupport) -> addLibraryDir ; true .
-
-:-hasLibrarySupport->true;throwNoLib.
 
 % TODO remove this next line
-:-user_use_module(logicmoo('logicmoo_util/logicmoo_util_bugger')).
+% :-user_use_module(logicmoo_util_bugger).
 % and replace with...
-
 
 
 term_parts(A,[A]):- not(compound(A)),!.

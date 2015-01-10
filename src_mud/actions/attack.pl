@@ -61,14 +61,14 @@ agent_call_command(Agent,actAttack(Dir)) :-
 check_for_defence(Agent,Def) :-
 	findall(Poss,mudPossess(Agent,Poss),Inv),
 	member(Obj,Inv),
-	props(Obj,act_affect(_,mudArmor(Def))).
+	props(Obj,mudActAffect(_,mudArmor(Def))).
 check_for_defence(_,0).
 
 % Check to see if attacking agent has a weapon
 check_for_weapon(Agent,Wpn) :-
 	findall(Poss,mudPossess(Agent,Poss),Inv),
         member(Obj,Inv),
-        props(Obj,act_affect(_,mudAttack(Wpn))).
+        props(Obj,mudActAffect(_,mudAttack(Wpn))).
 
 check_for_weapon(_,0).
 

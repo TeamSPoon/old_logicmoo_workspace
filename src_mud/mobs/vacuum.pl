@@ -20,7 +20,7 @@
 :-decl_type(tVacuum).
 tCol(tVacuum).
 
-world_agent_plan(_World,Agent,Act):-
+user:world_agent_plan(_World,Agent,Act):-
    mudIsa(Agent,tVacuum),
    vacuum_idea(Agent,Act).
 

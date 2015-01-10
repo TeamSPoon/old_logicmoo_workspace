@@ -13,7 +13,7 @@
 */
 
 
-:-decl_mpred_hybrid(act_affect/3).
+:-decl_mpred_hybrid(mudActAffect/3).
 
 % Used by eat.pl and take.pl
 % Is the object worth anything (either scored points or charge)
@@ -21,25 +21,25 @@
 
 
 do_act_affect(Agent,Action,Obj) :-
-	props(Obj,act_affect(Action,mudScore(S))),
+	props(Obj,mudActAffect(Action,mudScore(S))),
 	add(mudScore(Agent,+S)),
 	fail. % fail to check for charge too
 % Charge up those batteries
 do_act_affect(Agent,Action,Obj) :-
-          props(Obj,act_affect(Action,mudCharge(NRG))),
+          props(Obj,mudActAffect(Action,mudCharge(NRG))),
 	req(mudCharge(Agent,Chg)),
 	req(mudStm(Agent,Stm)),
-	max_charge(Agent,Max),
+	predInstMax(mudCharge,Agent,Max),
 	(Chg + NRG) < (((Stm * 10) -20) + Max),
 	add(mudCharge(Agent,+NRG)),
 	fail. % fail to check for healing
 % Heal
 do_act_affect(Agent,Action,Obj) :-
-           props(Obj,act_affect(Action,heal(Hl))),
+           props(Obj,mudActAffect(Action,heal(Hl))),
 	req((mudHealth(Agent,Dam),
              mudStm(Agent,Stm),
              mudStr(Agent,Str))),
-	req(max_health(Agent,Max)),
+	req(predInstMax(mudHealth,Agent,Max)),
 	(Dam + Hl) < ((((Stm * 10) -20) + ((Str * 5) - 10)) + Max),
 	add(mudCharge(Agent,+Hl)),
 	!.

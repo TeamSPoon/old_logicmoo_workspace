@@ -22,7 +22,7 @@
 
 :-decl_type(tMonster).
 
-world_agent_plan(_World,Agent,Act):-
+user:world_agent_plan(_World,Agent,Act):-
    mudIsa(Agent,tMonster),
    monster_idea(Agent,Act).
    
@@ -52,6 +52,6 @@ monster_idea(Agent,actMove(1,Dir)) :-
 
 monster_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[tCorpse]).
 
-default_inst_props(Instance,tMonster,[mudDescription(fmt("Very screy looking monster named ~w",[Instance])),wearsClothing(tToughHide),mudPossess(tToughHide)]).
+default_inst_props(Instance,tMonster,[mudDescription(txtFormatFn("Very screy looking monster named ~w",[Instance])),wearsClothing(tToughHide),mudPossess(tToughHide)]).
 
 :- include(logicmoo(vworld/moo_footer)).

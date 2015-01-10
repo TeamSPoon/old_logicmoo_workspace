@@ -13,11 +13,14 @@
 
 % :-set_prolog_flag(unknown,fail).
 :- set_prolog_flag(double_quotes, atom).
-:- set_prolog_flag(double_quotes, string). 
+:- set_prolog_flag(double_quotes, string).
+:- set_prolog_flag(generate_debug_info, true).
+
 
 % these do not get defined!?
 % :-dynamic user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
 
+:- dynamic_multifile_exported user:world_agent_plan/3.
 :- dynamic_multifile_exported decl_database_hook/2.
 :- dynamic_multifile_exported deduce_facts/2.
 :- dynamic_multifile_exported create_random_fact/1.
@@ -29,18 +32,18 @@
 :- dynamic_multifile_exported(thlocal:tracing80/0).
 :- dynamic_multifile_exported(thlocal:usePlTalk/0).
 
-:- dynamic_multifile_exported predHybridRule/2.
+:- dynamic_multifile_exported ruleHybridChain/2.
 
 :- dynamic_multifile_exported loaded_external_kbs/0.
 
 :- dynamic_multifile_exported create_random_fact/1.
 :- dynamic_multifile_exported hooked_random_instance/3.
 :- dynamic_multifile_exported fact_is_false/2.
-:- dynamic_multifile_exported((thlocal:noDefaultValues/1)).
+:- dynamic_multifile_exported((thlocal:infAssertedOnly/1)).
 :- dynamic_multifile_exported((thlocal:noDBaseMODs/1)).
 :- dynamic_multifile_exported((thlocal:noDBaseHOOKS/1)).
 :- dynamic_multifile_exported((thlocal:noRandomValues/1)).
-:- dynamic_multifile_exported((thlocal:insideIREQ/1)).
+:- dynamic_multifile_exported((thlocal:infInstanceOnly/1)).
 
 % ========================================
 % decl_mpred_hybrid database
@@ -52,7 +55,7 @@
 :- dynamic_multifile_exported agent_text_command/4.
 :- dynamic_multifile_exported check_permanence/4.
 :- dynamic_multifile_exported decl_mud_test/2.
-:- dynamic_multifile_exported default_type_props/2.
+:- dynamic_multifile_exported typeProps/2.
 :- dynamic_multifile_exported default_inst_props/3.
 :- dynamic_multifile_exported label_type/2.
 :- dynamic_multifile_exported mudLabelTypeProps/3.
@@ -70,7 +73,6 @@
 :- dynamic_multifile_exported use_usable/4.
 :- dynamic_multifile_exported mudMoveDist/2.
 :- dynamic_multifile_exported verb_alias/2.
-:- dynamic_multifile_exported world_agent_plan/3.
 :- dynamic_multifile_exported mudContains/2.
 :- dynamic_multifile_exported longitude/2.
 :- dynamic_multifile_exported latitude/2.

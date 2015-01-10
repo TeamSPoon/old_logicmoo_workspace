@@ -87,10 +87,34 @@ send_command_completed_message(Agent,Where,Done,CMD):-
 
 
 % complete event
-call_agent_where_action_lc(Agent,Where,CMD):- debugOnError(agent_call_command(Agent,CMD)),send_command_completed_message(Agent,Where,done,CMD),!.
+call_agent_where_action_lc(Agent,Where,CMD):- debugOnError(agent_call_command_now(Agent,CMD)),send_command_completed_message(Agent,Where,done,CMD),!.
 % fail event
 call_agent_where_action_lc(Agent,Where,CMD):-  send_command_completed_message(Agent,Where,failed,CMD),!. 
 
+correctCommand(CMD,OUT):-compound(CMD),
+   must(current_agent(Who)),
+   CMD=..[F|ARGS],   
+   functor(CMD,F,A),
+   functor(MATCH,F,A),
+   vtActionTemplate(MATCH),compound(MATCH),MATCH=..[F|TYPES],!,
+   correctEachTypeOrFail(Who,F,query(dbase_t, must),ARGS,TYPES,NEWS),!,
+   OUT=..[F|NEWS].
+
+correctCommand(CMD,CMD).
+
+correctEachTypeOrFail(Who, F, Q,ARGS,TYPES,NEWS):- is_list(TYPES),!,maplist(correctEachTypeOrFail(Who,F,Q),ARGS,TYPES,NEWS).
+correctEachTypeOrFail(Who,_F,_Q,Arg,Type,Inst):- mudIsa(Arg,Type),!,Inst = Arg.
+correctEachTypeOrFail(Who,_F,_Q,Arg,Type,Inst):- must(coerce(Arg,Type,Inst)).
+correctEachTypeOrFail(Who,_F,_Q,Arg,Type,Inst):- acceptableArg(Arg,Type),!,Inst = Arg.
+
+acceptableArg(_Arg,_Type):-fail.
+
+agent_call_command_now(Agent,CMD):-
+  with_current_agent(Agent,
+      (must(correctCommand(CMD,NewCMD)),
+      agent_call_command(Agent,NewCMD))).
+
+% need to return http sessions as well
 get_session_id(IDIn):-current_input(ID),is_stream(ID),!,ID=IDIn.
 get_session_id(ID):-thread_self(ID).
 
@@ -98,11 +122,13 @@ get_session_id(ID):-thread_self(ID).
 :-decl_mpred_prolog(current_agent/1).
 current_agent(PIn):- get_session_id(O),get_agent_session(P,O),!,P=PIn.
 
+
 current_agent_or_var(P):- once(current_agent(PIn)),P=PIn,!.
 current_agent_or_var(_).
 
+with_current_agent(Who,Cmd):- get_session_id(ID),with_assertions(thlocal:session_agent(ID,Who),Cmd).
 
-get_agent_session(P,O):- (thlocal:session_agent(O,P);thglobal:global_session_agent(O,P)).
+get_agent_session(P,O):- once(thlocal:session_agent(O,P);thglobal:global_session_agent(O,P)).
 
 foc_current_player(P):- current_agent(P),nonvar(P),!.
 foc_current_player(P):- nonvar(P),tAgentGeneric(P),become_player(P),!.

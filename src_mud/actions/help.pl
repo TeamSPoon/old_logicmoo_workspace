@@ -8,8 +8,8 @@
 
 :- register_module_type(mtCommand).
 
-mudIsa(tHumanPlayer,tAgentcol).
-mudSubclass(tAgentcol,tCol).
+mudIsa(tHumanPlayer,ttAgentType).
+mudSubclass(ttAgentType,tCol).
 
 % type_action_info(human_player,help, "shows this help").
 type_action_info(tHumanPlayer,actHelp(isOptional(ftString,"")), "shows this help").
@@ -41,8 +41,8 @@ to_param_doc(TEMPL,S):-sformat(S,'Prolog looks like: ~q',[TEMPL]).
 
 get_type_action_help_0(What,TEMPL,Help):- call_no_cuts(type_action_info(What,TEMPL,Help)).
 get_type_action_help_0(_What,TEMPL,Help):- call_no_cuts(action_info(TEMPL,Help)).
-get_type_action_help_0(isaFn(A),TEMPL,ftText(Text,'does: ',do(A2,TEMPL))):- between(1,5,L),length(Text,L),get_agent_text_command(A,Text,A2,Goal),(nonvar(Goal)->TEMPL=Goal;TEMPL=Text).
-get_type_action_help_0(What,Syntax,ftText([makes,happen,List])):- call_no_cuts(action_rules(Agent,Verb,[Obj|Objs],List)),atom(Verb),safe_univ(Syntax,[Verb,Obj|Objs]), 
+get_type_action_help_0(isaFn(A),TEMPL,txtConcatFn(Text,'does: ',do(A2,TEMPL))):- between(1,5,L),length(Text,L),get_agent_text_command(A,Text,A2,Goal),(nonvar(Goal)->TEMPL=Goal;TEMPL=Text).
+get_type_action_help_0(What,Syntax,txtConcatFn(makes,happen,List)):- call_no_cuts(action_rules(Agent,Verb,[Obj|Objs],List)),atom(Verb),safe_univ(Syntax,[Verb,Obj|Objs]), 
                      % once(member(isa(Obj,_Type),List);_Type=term),
                       ignore(Agent=an(What)),ignore(What=tAgentGeneric).
 
@@ -60,7 +60,7 @@ action_info_db(TEMPL,INFO,WAS):- (PRED=agent_call_command(_,WAS);PRED=agent_text
    
     (TEMPL=@=WAS -> ((clause_property(REF,line_count(LC)),INFO=line(LC:S))) ;  (not(not(TEMPL=WAS)) -> INFO=file(S) ; fail)).
  
-action_info(TEMPL,ftText(S,contains,WAS)):-action_info_db(TEMPL,S,WAS),not(clause_asserted(action_info(TEMPL,_Help),true)).
+action_info(TEMPL,txtConcatFn(S,contains,WAS)):-action_info_db(TEMPL,S,WAS),not(clause_asserted(action_info(TEMPL,_Help),true)).
 
 
 commands_list(ListS):- findall(Templ,get_all_templates(Templ),List),predsort(alpha_shorter_1,List,ListS).

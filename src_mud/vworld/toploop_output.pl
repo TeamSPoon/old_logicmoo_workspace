@@ -14,8 +14,8 @@
 :- register_module_type(utility).
 
 % live another day to fight (meaning repl_to_string/1 for now is in prolog)
-% local_decl_db_prop(repl_writer(agent,term),[prologSingleValued,argSingleValueDefault(2,default_repl_writer)]).
-% local_decl_db_prop(repl_to_string(agent,term),[prologSingleValued,argSingleValueDefault(2,default_repl_obj_to_string)]).
+% local_decl_db_prop(repl_writer(tAgentGeneric,term),[prologSingleValued,argSingleValueDefault(2,default_repl_writer)]).
+% local_decl_db_prop(repl_to_string(tAgentGeneric,term),[prologSingleValued,argSingleValueDefault(2,default_repl_obj_to_string)]).
 
 :-swi_export(default_repl_writer/4).
 default_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=o),  ( TypeO == o -> fmt('~q= ~q.~n',[N,V]) ; fmt('~q=D(~w) ~q.~n',[N,TypeO,V])).
@@ -96,8 +96,9 @@ show_kb_via_pred_fmt(WPred,ToSTR,SayIt,Type,GCall):-!,findall(SayIt,ccatch(req(G
     merge_list_on_p(WPred,ToSTR,SayIt,Type,GCall,_NewValue,Count).
 
 
-merge_list_on_p(WPred,ToSTR,SayIt,Type,_GCall,_NewValue,[]):-
-  fmt_holds_tcall(WPred,ToSTR,SayIt,Type,[noVal]).
+merge_list_on_p(_WPred,_ToSTR,_SayIt,_Type,_GCall,_NewValue,[]):-
+  % fmt_holds_tcall(WPred,ToSTR,SayIt,Type,[noVal]).
+  !. % dont print anything
 
 merge_list_on_p(WPred,ToSTR,SayIt,Type,GCall,_NewValue,[]):-
   fmt_holds_tcall(WPred,ToSTR,SayIt,Type,notFound(f1SayIt,SayIt,Type,GCall)).
@@ -158,7 +159,7 @@ show_kb_via_pred_3(WPred,ToSTR,output,Type,GCall,NewValue):-!,
 show_kb_via_pred_3(WPred,ToSTR,F,Type,GCall,NewValue):- canUseEnglish,!,
   % dmsg(show_kb_via_pred_3(WPred,ToSTR,F,GCall,NewValue)),
       findall(NewValue,(ccatch(req(GCall),Error, NewValue=Error), 
-             fmt_holds_tcall(WPred,ToSTR,ftText,Type,GCall)),Count),!,
+             fmt_holds_tcall(WPred,ToSTR,text,Type,GCall)),Count),!,
       (Count==[] ->
         (fmt_holds_tcall(WPred,ToSTR,F,Type,notFound(f4,F,Type))); true),!.
 

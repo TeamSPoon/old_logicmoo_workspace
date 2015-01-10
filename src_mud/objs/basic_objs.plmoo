@@ -14,8 +14,9 @@
 */
 
 :-decl_mpred_hybrid(pathBetween(tRegion,vtDirection,tRegion)).
-:-decl_mpred_hybrid(pathBetween(tRegion,tRegion),symmetric).
-pathBetween(R1,R2):-pathBetween(R1,Dir,R2),nop(Dir).
+:-decl_mpred_hybrid(pathConnects(tRegion,tRegion),symmetric).
+pathConnects(R1,R2):-pathBetween(R1,Dir,R2),nop(Dir).
+pathConnects(R1,R2):-pathBetween(R2,Dir,R1),nop(Dir).
 
 :-decl_type(vtBasicDir).
 vtBasicDir(vNorth).
@@ -42,11 +43,12 @@ ensure_some_pathBetween(R1,R2):-
    random_instance(vtDirection,Dir,true),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
    must((add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)))),!.
 
-ensure_some_pathBetween:- forall(no_repeats(is_asserted(pathBetween(R1,R2))),show_call_failure((ensure_some_pathBetween(R1,R2),ensure_some_pathBetween(R2,R1)))).
+ensure_some_pathBetween:- forall(no_repeats(is_asserted(pathConnects(R1,R2))),show_call_failure((ensure_some_pathBetween(R1,R2),ensure_some_pathBetween(R2,R1)))).
 
 :-onEachLoad(ensure_some_pathBetween).
 
-
+:-assert_until_end_of_file(infSupertypeName).
+:-onEndOfFile(dmsg(infSupertypeName)).
 
 % ==================================================
 % Classes of things
@@ -96,11 +98,13 @@ mudSubclass(tWearable, tPortable).
 mudSubclass(tPortable,tTakeable).
 mudSubclass(tFood,tTakeable).
 mudSubclass(tTakeable,tObj).
-mudSubclass(tPartof,tNotTakable).
+mudSubclass(tPartofObj,tNotTakable).
+mudSubclass(tBodyPart,tPartofObj).
+
 
 mudSubclass(tLightSwitch, tWallFurnature).
 mudSubclass(tComputer, tOfficeFurnature).
-mudSubclass(tPartofFurnature,tPartof).
+mudSubclass(tPartofFurnature,tPartofObj).
 
 mudSubclass(tBed, tBedRoomFurnature).
 mudSubclass(tStandTable, tBedRoomFurnature).
@@ -108,9 +112,13 @@ mudSubclass(tDresser, tBedRoomFurnature).
 
 mudSubclass(tWashingMachine, tDeviceFurnature).
 mudSubclass(tTable, tFurnature).
+
+mudSubclass(tTable, tFurnatureMoveable).
+
 mudSubclass(tTable, tHasSurface).
 mudSubclass(tSofa, tLivingRoomFurnature).
 mudSubclass(tEasyChair, tLivingRoomFurnature).
+mudSubclass(tEasyChair, tSittable).
 mudSubclass(tCoffeeTable, tLivingRoomFurnature).
 mudSubclass(tBookcase, tWallFurnature).
 mudSubclass(tDrawer, tContainer).
@@ -120,7 +128,7 @@ mudSubclass(tDrawer, tPartofFurnature).
 mudSubclass(tTopDrawer, tPartofFurnature).
 mudSubclass(tMiddleDrawer, tPartofFurnature).
 mudSubclass(tBottomDrawer, tPartofFurnature). 
-mudSubclass(tHouseplant, tPartof).
+mudSubclass(tHousePlant, tPartofObj).
 mudSubclass(tPlanter, tContainer). 
 mudSubclass(tGueridon, tLivingRoomFurnature).
 mudSubclass(tGardenPlant, tOutdoorFurnature).
@@ -128,7 +136,7 @@ mudSubclass(tSpatialThing,tLookable).
 mudSubclass(tNani,tTeddybear).
 mudSubclass(tTeddybear,tTreasure).
 
-mudSubclass(tBathtub,tBathRoomFurnature).
+mudSubclass(tBathTub,tBathRoomFurnature).
 mudSubclass(tShower,tBathRoomFurnature).
 mudSubclass(tToilet,tBathRoomFurnature).
 mudSubclass(tSink,tBathRoomFurnature).
@@ -136,82 +144,89 @@ mudSubclass(tKitchenSink,tKitchenFurnature).
 mudSubclass(tFridge,tKitchenFurnature).
 mudSubclass(tStove,tKitchenFurnature).
 mudSubclass(tKitchenCounter,tKitchenFurnature).
+mudSubclass(tFurnature,tOntoable).
+
+mudSubclass(tBathRoomFurnature,tFurnature).
+mudSubclass(tKitchenFurnature,tFurnature).
+mudSubclass(tLivingRoomFurnature,tFurnature).
+mudSubclass(tOutdoorFurnature,tFurnature).
+
 
 
 % ==================================================
-% default_type_props Descriptions
+% typeProps Descriptions
 % ==================================================
 
-default_type_props(tCandle,[mudColor(vBlue),mudSize(vSmall),mudShape(vTriangular),mudMaterial(vWax),mudTexture(vSticky)]).
-default_type_props(tRedApple,[mudColor(vRed),mudSize(vSmall),mudShape(vRound),mudIsa(tFruit),mudTexture(vSmooth)]).
-default_type_props(tGreenApple,[mudColor(isEach(vGreen,vPastel)),mudSize(vSmall),mudShape(vRound),mudIsa(tFruit),mudTexture(vSmooth)]).
-default_type_props(tTable,[mudColor(isEach(vBlue,vWhite)),mudSize(vLarge),mudShape(vOval),mudMaterial(vWood),mudTexture(isEach(vBumpy,vIrregular)),mudWeight(50)]).
-default_type_props(tPillow,[mudColor(vWhite),mudSize(vMedium),mudShape(vRectangular),mudMaterial(isEach(vCotton,vFlannel)),mudTexture(isEach(vFluffy,vSoft))]).
-default_type_props(tBlanket,[mudColor(isEach(vGreen,vDark)),mudSize(isEach(vLarge,vBulky)),mudShape(vRectangular),mudMaterial(vRayon),mudTexture(isEach(vPlush,vSoft))]).                                                              
-default_type_props(tStandTable,[mudColor(isEach(vBlack,vShiney)),mudSize(vMedium),mudShape(isEach(vCubular,vRectangular)),mudMaterial(vWood),mudTexture(vSmooth),mudWeight(25)]).
-default_type_props(tPajams,[mudColor(isEach(vBlue,vPastel)),mudSize(isEach(vMedium,vFits)),mudShape(vUnique),mudMaterial(isEach(vCotton,vRayon)),mudTexture(vSoft)]).
-default_type_props(tShirt,[mudColor(vBlack),mudSize(isEach(vMedium,vFits)),mudShape(isLike(mudShape,tTorso)),mudMaterial(vCotton),mudTexture(isEach(vSoft,vThreadbare))]).
-default_type_props(tFlashlight,[mudColor(vYellow),mudSize(isEach(vMedium,vSmall)),mudShape(vCylindrical),mudMaterial(vPlastic),mudTexture(vRibbed)]).
-default_type_props(tKey,[mudColor(vSilver),mudSize(isEach(vSmall,vTiny)),mudShape(vUnique),mudMaterial(vMetal),mudTexture(isEach(vRidged,vBumpy))]).
-default_type_props(tEnvelope,[mudColor(vWhite),mudSize(vSmall),mudShape(vRectangular),mudMaterial(vPaper),mudTexture(vSmooth)]).
-default_type_props(tDesk,[mudColor(isEach(vBrown,vShiney)),mudSize(vLarge),mudShape(isEach(vCubular,vRectangular)),mudTexture(isEach(vSmooth,vRidged)),mudWeight(175)]).
-default_type_props(tWashingMachine,[mudColor(vWhite),mudSize(vLarge),mudShape(isEach(vCubular,vSquare)),mudMaterial(vMetal),mudTexture(vSmooth),mudWeight(125)]).
-default_type_props(tBroccoli,[mudColor(vGreen),mudSize(vSmall),mudShape(isLike(mudShape,tTree)),mudIsa(vegetable),mudTexture(isEach(vPorous,vBumpy))]).                                                                    
-default_type_props(tCrackers,[mudColor(vTan),mudIsa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]).
-default_type_props(tComputer,[mudColor(vGrey),mudMaterial(vPlastic),mudShape(isEach(vCubular,vRectangular)),mudSize(vMedium),mudTexture(vSmooth)]).
-default_type_props(tStamp,[mudColor(vPolychromatic),mudSize(isEach(vTiny,thin)),mudShape(vSquare),mudMaterial(vPaper),mudTexture(isEach(vSmooth,vSticky))]).
-default_type_props(tCoat,[mudColor(vBlack),mudSize(isEach(vMedium,vFits)),mudShape(isLike(mudShape,tTorso)),mudMaterial(isEach(vWool,vCotton,vRayon)),mudTexture(vCoarse)]).
-default_type_props(tPants,[mudColor(vBlack),mudSize(isEach(vMedium,vFits)),mudShape(isLike(mudShape,tAss)),mudMaterial(vDenim),mudTexture(vCoarse)]).
-default_type_props(tNani,[mudColor(vBrown),mudColor(vWhite),mudSize(vMedium),mudShape(isLike(mudShape,tTeddybear)),mudMaterial(vPlush),mudTexture(isEach(vFuzzy,vSoft))]).
-default_type_props(tLightSwitch,[mudColor(vCream),mudSize(vSmall),mudShape(vRectangular),mudMaterial(vPlastic),mudTexture(vSmooth)]).
+typeProps(tCandle,[mudColor(vBlue),mudSize(vSmall),mudShape(vTriangular),mudMaterial(vWax),mudTexture(vSticky)]).
+typeProps(tRedApple,[mudColor(vRed),mudSize(vSmall),mudShape(vRound),mudIsa(tFruit),mudTexture(vSmooth)]).
+typeProps(tGreenApple,[mudColor(isEach(vGreen,vPastel)),mudSize(vSmall),mudShape(vRound),mudIsa(tFruit),mudTexture(vSmooth)]).
+typeProps(tTable,[mudColor(isEach(vBlue,vWhite)),mudSize(vLarge),mudShape(vOval),mudMaterial(vWood),mudTexture(isEach(vBumpy,vIrregular)),mudWeight(50)]).
+typeProps(tPillow,[mudColor(vWhite),mudSize(vMedium),mudShape(vRectangular),mudMaterial(isEach(vCotton,vFlannel)),mudTexture(isEach(vFluffy,vSoft))]).
+typeProps(tBlanket,[mudColor(isEach(vGreen,vDark)),mudSize(isEach(vLarge,vBulky)),mudShape(vRectangular),mudMaterial(vRayon),mudTexture(isEach(vPlush,vSoft))]).                                                              
+typeProps(tStandTable,[mudColor(isEach(vBlack,vShiney)),mudSize(vMedium),mudShape(isEach(vCubular,vRectangular)),mudMaterial(vWood),mudTexture(vSmooth),mudWeight(25)]).
+typeProps(tPajams,[mudColor(isEach(vBlue,vPastel)),mudSize(isEach(vMedium,vFits)),mudShape(vUnique),mudMaterial(isEach(vCotton,vRayon)),mudTexture(vSoft)]).
+typeProps(tShirt,[mudColor(vBlack),mudSize(isEach(vMedium,vFits)),mudShape(isLike(mudShape,tTorso)),mudMaterial(vCotton),mudTexture(isEach(vSoft,vThreadbare))]).
+typeProps(tFlashlight,[mudColor(vYellow),mudSize(isEach(vMedium,vSmall)),mudShape(vCylindrical),mudMaterial(vPlastic),mudTexture(vRibbed)]).
+typeProps(tKey,[mudColor(vSilver),mudSize(isEach(vSmall,vTiny)),mudShape(vUnique),mudMaterial(vMetal),mudTexture(isEach(vRidged,vBumpy))]).
+typeProps(tEnvelope,[mudColor(vWhite),mudSize(vSmall),mudShape(vRectangular),mudMaterial(vPaper),mudTexture(vSmooth)]).
+typeProps(tDesk,[mudColor(isEach(vBrown,vShiney)),mudSize(vLarge),mudShape(isEach(vCubular,vRectangular)),mudTexture(isEach(vSmooth,vRidged)),mudWeight(175)]).
+typeProps(tWashingMachine,[mudColor(vWhite),mudSize(vLarge),mudShape(isEach(vCubular,vSquare)),mudMaterial(vMetal),mudTexture(vSmooth),mudWeight(125)]).
+typeProps(tBroccoli,[mudColor(vGreen),mudSize(vSmall),mudShape(isLike(mudShape,tTree)),mudIsa(tVegetable),mudTexture(isEach(vPorous,vBumpy))]).                                                                    
+typeProps(tCrackers,[mudColor(vTan),mudIsa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]).
+typeProps(tComputer,[mudColor(vGrey),mudMaterial(vPlastic),mudShape(isEach(vCubular,vRectangular)),mudSize(vMedium),mudTexture(vSmooth)]).
+typeProps(tStamp,[mudColor(vPolychromatic),mudSize(isEach(vTiny,thin)),mudShape(vSquare),mudMaterial(vPaper),mudTexture(isEach(vSmooth,vSticky))]).
+typeProps(tCoat,[mudColor(vBlack),mudSize(isEach(vMedium,vFits)),mudShape(isLike(mudShape,tTorso)),mudMaterial(isEach(vWool,vCotton,vRayon)),mudTexture(vCoarse)]).
+typeProps(tPants,[mudColor(vBlack),mudSize(isEach(vMedium,vFits)),mudShape(isLike(mudShape,tAss)),mudMaterial(vDenim),mudTexture(vCoarse)]).
+typeProps(tNani,[mudColor(vBrown),mudColor(vWhite),mudSize(vMedium),mudShape(isLike(mudShape,tTeddybear)),mudMaterial(vPlush),mudTexture(isEach(vFuzzy,vSoft))]).
+typeProps(tLightSwitch,[mudColor(vCream),mudSize(vSmall),mudShape(vRectangular),mudMaterial(vPlastic),mudTexture(vSmooth)]).
 
-default_type_props(tBall,[mudColor(vRed),mudSize(vMedium),mudShape(vSpherical),mudMaterial(vRubber),mudTexture(vBumpy)]).
-default_type_props(tCoffee,[mudColor(isEach(vBlack,vBrown)),mudSize(vSmall),mudShape(vFluid),mudMaterial(tLiquid),mudTexture(vWet)]).
-default_type_props(tCoffeeCup,[mudColor(vBlack),mudColor(vBrown),mudSize(vSmall),mudShape(vCuplike),mudMaterial(vGlass),mudTexture(vSmooth)]).
-default_type_props(tSofa,[mudColor(isEach(vBlue,vDark)),mudSize(isEach(vLarge,vWide,vLong)),mudShape(vPolyhedral),mudMaterial(isEach(vPoplin,vWood)),mudTexture(vRibbed),mudWeight(125)]).
-default_type_props(tEasyChair,[mudColor(vBlue),mudSize(isEach(vLarge,vNarrow)),mudShape(vPolyhedral),mudMaterial(isEach(vPoplin,vWood)),mudTexture(vRibbed),mudWeight(75)]).
-default_type_props(tCoffeeTable,[mudColor(isEach(vBrown,vShiney)),mudSize(vMedium),mudShape(vCircular),mudMaterial(vWood),mudTexture(vSmooth),mudWeight(35)]).
-default_type_props(tBookTypeA,[mudColor(vGreen),mudColor(vWhite),mudColor(vBlack),mudSize(vSmall),mudShape(isEach(vCubular,vRectangular)),mudMaterial(vPaper),mudTexture(vSmooth)]).
-default_type_props(tPinkBook,[mudColor(vPink),mudColor(vWhite),mudColor(vBlack),mudSize(vSmall),mudShape(isEach(vCubular,vRectangular)),mudMaterial(vPaper),mudTexture(vSmooth)]).
-default_type_props(tBookcase,[mudColor(isEach(vBrown,vDark,vShiney)),mudSize(vLarge),mudShape(isEach(vSquare,vConcavePolyhedron)),mudMaterial(vWood),mudTexture(vSmooth),mudWeight(60)]).
-default_type_props(tDresser,[mudColor(isEach(vBrown,vShiney)),mudSize(vLarge),mudShape(isEach(vRectangular,vPolyhedral)),mudMaterial(vWood),mudTexture(vSmooth),mudWeight(45)]).
-default_type_props(tTopDrawer,[mudColor(isEach(vBrown,vShiney)),mudSize(vMedium),mudShape(isEach(vRectangular,vConcavePolyhedron)),mudMaterial(vWood),mudTexture(vSmooth)]). 
-default_type_props(tMiddleDrawer,[mudColor(isEach(vBrown,vShiney)),mudSize(vMedium),mudShape(isEach(vRectangular,vConcavePolyhedron)),mudMaterial(vWood),mudTexture(vSmooth)]).
-default_type_props(tBottomDrawer,[mudColor(isEach(vBrown,vShiney)),mudSize(vMedium),mudShape(isEach(vRectangular,vConcavePolyhedron)),mudMaterial(vWood),mudTexture(vSmooth)]).
-default_type_props(tPlanter,[mudColor(isEach(vPastel,vBlue)),mudSize(vMedium),mudShape(isEach(vCylindrical,vTrapezohedron)),mudMaterial(vClay),mudTexture(vAbrasive),mudWeight(15)]).
-default_type_props(tHouseplant,[mudColor(vGreen),mudSize(vMedium),mudShape(vAnthuriumCrystallinum),mudMaterial(vPlantTissue),mudTexture(vSmooth)]).
-default_type_props(tGueridon,[mudColor(isEach(vBrown,vShiney)),mudSize(vMedium),mudShape(vCircular),mudMaterial(vWood),mudTexture(vSmooth),mudWeight(25)]).		 
+typeProps(tBall,[mudColor(vRed),mudSize(vMedium),mudShape(vSpherical),mudMaterial(vRubber),mudTexture(vBumpy)]).
+typeProps(tCoffee,[mudColor(isEach(vBlack,vBrown)),mudSize(vSmall),mudShape(vFluid),mudMaterial(tLiquid),mudTexture(vWet)]).
+typeProps(tCoffeeCup,[mudColor(vBlack),mudColor(vBrown),mudSize(vSmall),mudShape(vCuplike),mudMaterial(vGlass),mudTexture(vSmooth)]).
+typeProps(tSofa,[mudColor(isEach(vBlue,vDark)),mudSize(isEach(vLarge,vWide,vLong)),mudShape(vPolyhedral),mudMaterial(isEach(vPoplin,vWood)),mudTexture(vRibbed),mudWeight(125)]).
+typeProps(tEasyChair,[mudColor(vBlue),mudSize(isEach(vLarge,vNarrow)),mudShape(vPolyhedral),mudMaterial(isEach(vPoplin,vWood)),mudTexture(vRibbed),mudWeight(75)]).
+typeProps(tCoffeeTable,[mudColor(isEach(vBrown,vShiney)),mudSize(vMedium),mudShape(vCircular),mudMaterial(vWood),mudTexture(vSmooth),mudWeight(35)]).
+typeProps(tBookTypeA,[mudColor(vGreen),mudColor(vWhite),mudColor(vBlack),mudSize(vSmall),mudShape(isEach(vCubular,vRectangular)),mudMaterial(vPaper),mudTexture(vSmooth)]).
+typeProps(tPinkBook,[mudColor(vPink),mudColor(vWhite),mudColor(vBlack),mudSize(vSmall),mudShape(isEach(vCubular,vRectangular)),mudMaterial(vPaper),mudTexture(vSmooth)]).
+typeProps(tBookcase,[mudColor(isEach(vBrown,vDark,vShiney)),mudSize(vLarge),mudShape(isEach(vSquare,vConcavePolyhedron)),mudMaterial(vWood),mudTexture(vSmooth),mudWeight(60)]).
+typeProps(tDresser,[mudColor(isEach(vBrown,vShiney)),mudSize(vLarge),mudShape(isEach(vRectangular,vPolyhedral)),mudMaterial(vWood),mudTexture(vSmooth),mudWeight(45)]).
+typeProps(tTopDrawer,[mudColor(isEach(vBrown,vShiney)),mudSize(vMedium),mudShape(isEach(vRectangular,vConcavePolyhedron)),mudMaterial(vWood),mudTexture(vSmooth)]). 
+typeProps(tMiddleDrawer,[mudColor(isEach(vBrown,vShiney)),mudSize(vMedium),mudShape(isEach(vRectangular,vConcavePolyhedron)),mudMaterial(vWood),mudTexture(vSmooth)]).
+typeProps(tBottomDrawer,[mudColor(isEach(vBrown,vShiney)),mudSize(vMedium),mudShape(isEach(vRectangular,vConcavePolyhedron)),mudMaterial(vWood),mudTexture(vSmooth)]).
+typeProps(tPlanter,[mudColor(isEach(vPastel,vBlue)),mudSize(vMedium),mudShape(isEach(vCylindrical,vTrapezohedron)),mudMaterial(vClay),mudTexture(vAbrasive),mudWeight(15)]).
+typeProps(tHousePlant,[mudColor(vGreen),mudSize(vMedium),mudShape(vAnthuriumCrystallinum),mudMaterial(vPlantTissue),mudTexture(vSmooth)]).
+typeProps(tGueridon,[mudColor(isEach(vBrown,vShiney)),mudSize(vMedium),mudShape(vCircular),mudMaterial(vWood),mudTexture(vSmooth),mudWeight(25)]).		 
 
-default_type_props(tTeddybear,[mudColor(vNatural),mudShape(vUnique)]).
-default_type_props(tTorso,[mudColor(isLike(mudColor,tSkin)),mudShape(vUnique)]).
-default_type_props(tSkin,[mudColor(vUnique),mudShape(vUnique)]).
+typeProps(tTeddybear,[mudColor(vNatural),mudShape(vUnique)]).
+typeProps(tTorso,[mudColor(isLike(mudColor,tSkin)),mudShape(vUnique)]).
+typeProps(tSkin,[mudColor(vUnique),mudShape(vUnique)]).
 
-type_max_charge(tAgentGeneric,120).
+predTypeMax(mudCharge,tAgentGeneric,120).
 
-default_type_props(tAgentGeneric,[max_health(500)]).
+typeProps(tAgentGeneric,[predInstMax(mudHealth,500)]).
 
 
 % :-end_module_type(dynamic).
 
-default_type_props(isSelf,Type,[mudNamed(isSelf),kwLabel(Lbl)|SP]):-  mudLabelTypeProps(Lbl,Type,SomeProps),nonvar(Type),flatten(SomeProps,SP).
+typeProps(isSelf,Type,[mudNamed(isSelf),mudKwLabel(Lbl)|SP]):-  mudLabelTypeProps(Lbl,Type,SomeProps),nonvar(Type),flatten(SomeProps,SP).
 
 % Vacuum World example objects........
 mudLabelTypeProps(wl,tWall,[mudHeight(3),mudWeight(4)]).
 mudLabelTypeProps(tr,tTree,[mudHeight(3),mudWeight(4)]).
 mudLabelTypeProps(rk,tRock,[mudHeight(2),mudWeight(4)]).
 mudLabelTypeProps(pt,tPit,[mudHeight(-1),mudWeight(4)]).
- mudLabelTypeProps(ot,tOutlet,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenStays),act_affect(actTake,mudCharge(+50))]).
- mudLabelTypeProps(nt,tNut,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),act_affect(actEat,mudCharge(+40)),spawn_rate(10)]).
+ mudLabelTypeProps(ot,tOutlet,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenStays),mudActAffect(actTake,mudCharge(+50))]).
+ mudLabelTypeProps(nt,tNut,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudCharge(+40)),spawn_rate(10)]).
 mudLabelTypeProps(lw,tLowWall,[mudHeight(2),mudWeight(4)]).
 mudLabelTypeProps(lg,tLedge,[mudHeight(2),mudWeight(4)]).
 mudLabelTypeProps(lb,tLowBox,[mudHeight(2),mudWeight(2)]).
 mudLabelTypeProps(hw,tHighWall,[mudHeight(3),mudWeight(4)]).
 mudLabelTypeProps(hb,tHighBox,[mudHeight(3),mudWeight(3)]).
- mudLabelTypeProps(gd,tGold,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenDeletes),act_affect(actTake,mudScore(+10))]).
- mudLabelTypeProps(fd,tFood,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),act_affect(actEat,mudCharge(+80))]).
-mudLabelTypeProps(el,tElixer,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),act_affect(actEat,mudHealth(+80))]).
+ mudLabelTypeProps(gd,tGold,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenDeletes),mudActAffect(actTake,mudScore(+10))]).
+ mudLabelTypeProps(fd,tFood,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudCharge(+80))]).
+mudLabelTypeProps(el,tElixer,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudHealth(+80))]).
 mudLabelTypeProps(ed,tEdge,[mudHeight(10),mudWeight(4)]).
- mudLabelTypeProps(dt,tDirt,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenDeletes),act_affect(actTake,mudScore(+1)),spawn_rate(5)]).
+ mudLabelTypeProps(dt,tDirt,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenDeletes),mudActAffect(actTake,mudScore(+1)),spawn_rate(5)]).
 mudLabelTypeProps(dr,tDoor,[mudHeight(3),mudWeight(2)]).
 
 %Empty Location
@@ -220,14 +235,14 @@ mudLabelTypeProps(--,ftVar,[]).
 
 % What an agent turns into upon death.
 % Must be named iCorpseFn (or edit agent_to_corpse/1 in lib.pl.
- mudLabelTypeProps(cp,tCorpsea,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),act_affect(actEat,mudCharge(+80)),act_affect(actTake,mudScore(+10))]).
- mudLabelTypeProps(cp,tCorpseb,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),act_affect(actEat,mudCharge(+120))]).
+ mudLabelTypeProps(cp,tCorpsea,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudCharge(+80)),mudActAffect(actTake,mudScore(+10))]).
+ mudLabelTypeProps(cp,tCorpseb,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudCharge(+120))]).
 mudLabelTypeProps(da,tCorpsec,[mudHeight(2),mudWeight(2)]).
 % This is used to make the monster roaming the maze a bit tougher
 % It doesn't require any of the usual traits since the monster will never 
 % leave the monster's possession.
-mudLabelTypeProps(th,tNastyKnife,[act_affect(actWield,mudAttack(2))]).
-mudLabelTypeProps(th,tToughHide,[act_affect(actWear,mudArmor(2))]).
+mudLabelTypeProps(th,tNastyKnife,[mudActAffect(actWield,mudAttack(2))]).
+mudLabelTypeProps(th,tToughHide,[mudActAffect(actWear,mudArmor(2))]).
 
 
 % Define the maximum charge and maximum damage an agent can have

@@ -29,26 +29,27 @@ prolog:message(git(update_versions),A,A):-!.
 
 % [Optionaly] Solve the Halting problem
 :-use_module(library(process)).
+:-use_module(library(pce)).
+:- has_gui_debug -> true ; remove_pred(pce_principal,send,2).
+:- has_gui_debug -> true ; remove_pred(pce_principal,new,2).
+
+
 unsafe_preds(M,F,A):-M=files_ex,current_predicate(M:F/A),member(X,[delete,copy]),atom_contains(F,X).
 unsafe_preds(M,F,A):-M=process,current_predicate(M:F/A),member(X,[kill,create]),atom_contains(F,X).
 unsafe_preds(M,F,A):-M=system,member(F,[shell,halt]),current_predicate(M:F/A).
 
-remove_pred(_,F,A):-member(_:F/A,[_:delete_common_prefix/4]),!.
-remove_pred(M,F,A):- functor(P,F,A),
-  (current_predicate(M:F/A) -> ignore((catch(redefine_system_predicate(M:P),_,true),abolish(M:F,A)));true),
-  M:asserta((P:-throw(permission_error(M:F/A)))).
-
-:-forall(unsafe_preds(M,F,A),remove_pred(M,F,A)).
+:-forall(unsafe_preds(M,F,A),bugger:remove_pred(M,F,A)).
 
 % [Optionaly] Solve the Halting problem
 :-redefine_system_predicate(system:halt).
 :-abolish(system:halt,0).
 system:halt:- format('the halting problem is now solved!').
 
+:- dmsg('the halting problem is now solved!').
 
 add_game_dir(GAMEDIR,Else):- add_to_search_path_first(game, GAMEDIR),now_try_game_dir(Else).
 
-now_try_game_dir(Else):-  filematch(game('.'), GAMEDIR) -> 
+now_try_game_dir(Else):-  enumerate_files(game('.'), GAMEDIR) *-> 
   ((exists_directory(GAMEDIR) -> 
     with_all_dmsg(( forall(enumerate_files(game('**/*.pl'),X),user_ensure_loaded(X)),
       forall(enumerate_files(game('**/*.plmoo'),X),declare_load_game(X)))); (fmt(missing(GAMEDIR)),Else)));  (fmt(no_game_dir),Else).

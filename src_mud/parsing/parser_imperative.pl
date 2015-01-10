@@ -53,7 +53,7 @@ agent_call_command(_Gent,actParse(Type,StringM)):-
 % ===========================================================
 type_action_info(tHumanPlayer,actCmdparse(ftListFn(ftTerm)),"Development test to parse some Text for a human.  Usage: cmdparse take the blue backpack").
 
-agent_call_command(_Gent,actCmdparse(StringM)):- parse_for(ftAction,StringM,Term,LeftOver),fmt(parse_for(StringM)=>[Term,LeftOver]).
+agent_call_command(_Gent,actCmdparse(StringM)):- parse_for(ftAction,StringM,Term,LeftOver),fmt('=>'(parse_for(StringM) , [Term,LeftOver])).
 
 % mud_test("cmdparse test",...)
   
@@ -175,7 +175,7 @@ save_fmt_a(_,A):-vtSkippedPrintNames(A).
 %save_fmt_a(O,E):-atom_contains(E,'-'),!,must((to_word_list(E,WL),save_fmt_e(O,WL))),!.
 
 
-object_name_is_descriptive(O):- (mudIsa(O,tCol);mudIsa(O,tPred);hasInstance(colDeclarer,O);mudIsa(O,ttValueType),mudIsa(O,name_is_descriptive)).
+object_name_is_descriptive(O):- (mudIsa(O,tCol);mudIsa(O,tPred);hasInstance(macroDeclarer,O);mudIsa(O,ttValueType),mudIsa(O,name_is_descriptive)).
 
 :-swi_export(object_print_details/5).
 
@@ -358,7 +358,7 @@ name_text(Name,Text):-compound(Name),!,Name=..[F,A|List],!,name_text([F,A|List],
 
 name_text_atomic(Name,Text):-string(Name),Name=Text.
 name_text_atomic(Name,Text):-to_case_breaks(Name,[_|ListN]),member(t(Text,_),ListN).
-name_text_atomic(Name,Text):-typename_to_iname('',Name,TextN),atom_string(TextN,Text).
+name_text_atomic(Name,Text):-i_name('',Name,TextN),atom_string(TextN,Text).
 name_text_atomic(Name,Text):-atom_string(Name,Text).
 
 
@@ -533,6 +533,7 @@ coerce(String,Type,Inst):- not(string(String)),!,text_to_string(String,StringS),
 
 instances_of_type(Inst,Type):- no_repeats(instances_of_type_0(Inst,Type)).
 
+available_instances_of_type(Agent,Obj,Type):- must(current_agent(Agent)), current_agent_or_var(Agent), mudIsa(Obj,Type), same_regions(Agent,Obj),!.
 
 instances_of_type_0(Inst,Type):- instances_sortable(Type,HOW),!,get_sorted_instances(Inst,Type,HOW).
 % should never need this but .. instances_of_type_0(Inst,Type):- mudSubclass(SubType,Type),mudIsa(Inst,SubType).
@@ -545,10 +546,14 @@ instances_sortable0(tWearable,distance_to_current_avatar(Agent)):-current_agent_
 
 distance_to_current_avatar(Agent,ORDEROUT,L,R):-mudDistance(Agent,L,L1),mudDistance(Agent,R,R1),compare(ORDER,L1,R1),!, (ORDER == '=' -> naming_order(ORDEROUT,L,R) ; ORDEROUT=ORDER).
 
+
+mudDistance(Agent,Obj,1):-localityOfObject(Obj,Agent),!.
+mudDistance(Agent,Obj,2):-localityOfObject(Obj,Where),localityOfObject(Agent,Where),!.
+mudDistance(_Agent,_Obj,2).
+
 naming_order(_,ORDER,L,R):-compare(ORDER,L,R).
 
 get_sorted_instances(Inst,Type,HOW):-findall(Inst,mudIsa(Inst,Type),List),predsort(HOW,List,Sorted),!,member(Inst,Sorted).
-
 
 % instances_of_type(Inst,Type):- atom(Type), Term =..[Type,Inst], logOnError(req(Term)).
 % longest_string(?Order, @Term1, @Term2)

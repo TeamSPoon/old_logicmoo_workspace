@@ -26,7 +26,7 @@ tCol(tPrey).
 % :- dynamic memory/2. 
 %:- dynamic agent_list/1.
 
-world_agent_plan(_World,Self,Act):-
+user:world_agent_plan(_World,Self,Act):-
    mudIsa(Self,tPrey),
    prey_idea(Self,Act).
    
@@ -82,8 +82,8 @@ spawn_prey(N) :-
        assert_isa(Prey,tPrey),
        get_instance_default_props(Prey,Traits),
 	\+ mudAgentTurnnum(Prey,_),
-         req(max_charge(Prey,NRG)),
-         req(max_health(Prey,Dam)),
+         req(predInstMax(mudCharge,Prey,NRG)),
+         req(predInstMax(mudHealth,Prey,Dam)),
          clr(mudCharge(Prey,_)),
          clr(mudHealth(Prey,_)),
          add(mudCharge(Prey,NRG)),

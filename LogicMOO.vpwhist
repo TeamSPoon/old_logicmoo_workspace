@@ -1,9 +1,9 @@
 [ActiveConfig]
 PrologMUD_base.vpj=Release
 [Global]
-CurrentProject=PrologMUD_base.vpj
+CurrentProject=PrologMUD.vpj
 [ProjectDates]
-PrologMUD.vpj=20150105225229828
+PrologMUD.vpj=20150108202845164
 PrologMUD_base.vpj=20150106175546839
 externals\PrologMUD_ext.vpj=20150105131252020
 [TreeExpansion2]
@@ -142,7 +142,7 @@ externals\PrologMUD_ext.vpj=20150105131252020
     + MUD_ScriptEngines
       + ext
         + r6rs-plt-redex-model
-    - swipl-library
+    + swipl-library
       + bin
         + amd64
       - boot
@@ -155,7 +155,7 @@ externals\PrologMUD_ext.vpj=20150105131252020
         + Yap
       + lib
         + amd64
-      + library
+      - library
         + chr
         + clp
           + clpq
@@ -181,22 +181,22 @@ externals\PrologMUD_ext.vpj=20150105131252020
             + js
         + pldoc
         + pldoc - Copy
-        + semweb
-        + tipc
+        - semweb
+        - tipc
         + unicode
-      + pack
+      - pack
         + db_facts
           + doc
           + examples
           + prolog
-        + Downloads
-        + list_util
+        - Downloads
+        - list_util
           + prolog
-          + t
+          - t
         + mavis
           + prolog
           + t
-        + prosqlite
+        - prosqlite
           + c
           + doc
           + examples
@@ -331,8 +331,8 @@ externals\PrologMUD_ext.vpj=20150105131252020
               + icons
                 + 16x16
             + xref
-  + games
-    + src_game_nani
+  - games
+    - src_game_nani
       + web
         + css
         + icons
@@ -356,38 +356,206 @@ externals\PrologMUD_ext.vpj=20150105131252020
         + prolog
         + snd
     + src_game_wumpus
-  + runtime
+  - runtime
     + config-enabled
     + RDF-store
-  + src_lib
-    + logicmoo_util
-  + src_mud
-    + actions
-    + dbase
-    + mobs
-      + affordance
+  - src_lib
+    - logicmoo_util
+  - src_mud
+    - actions
+    - dbase
+    - mobs
+      - affordance
       + planner
     + objs
     + parsing
-    + vworld
+    - vworld
 + externals\PrologMUD_ext.vpj
-scroll:0
+scroll:69
 [State]
 SCREEN: 1920 1080 198 143 1440 699 0 0 M 0 0 0 0 1469 553
 CWD: ..\PrologMUD
 BUFFER: BN="externals\swipl-library\boot\syspred.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.8013 CL=13 LE=0 CX=12 CY=14 WI=5 BI=15 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\swipl-library\boot\dcg.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=5 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\swipl-library\library\tipc\tipc_broadcast.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\swipl-library\library\semweb\rdf_litindex.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.20331 CL=28 LE=0 CX=27 CY=16 WI=5 BI=16 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\swipl-library\library\semweb\rdf_cache.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1631 CL=19 LE=0 CX=18 CY=9 WI=5 BI=18 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\swipl-library\library\semweb\rdfs.rdfs"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=19 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\swipl-library\library\semweb\rdfa.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=20 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\swipl-library\library\prolog_metainference.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=21 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\swipl-library\library\prolog_server.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=22 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\swipl-library\library\prolog_source.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=23 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\swipl-library\library\pure_input.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=24 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\swipl-library\library\tipc\tipc_linda.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=25 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\swipl-library\pack\list_util\t\lazy_include.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=26 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\swipl-library\library\helpidx.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.78608 CL=11 LE=0 CX=10 CY=9 WI=5 BI=29 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\swipl-library\library\prolog_xref.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.34015 CL=36 LE=0 CX=35 CY=9 WI=5 BI=32 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\swipl-library\xpce\prolog\lib\swi_hooks.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.2281 CL=8 LE=0 CX=7 CY=7 WI=5 BI=31 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="src_lib\logicmoo_util\logicmoo_util_header.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=33 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="src_lib\logicmoo_util\logicmoo_util_all.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.979 CL=1 LE=0 CX=0 CY=16 WI=5 BI=36 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="src_mud\vworld\world_agent.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1408 CL=20 LE=0 CX=19 CY=27 WI=5 BI=37 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="src_lib\logicmoo_util\logicmoo_util_bugger.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.50652 CL=25 LE=0 CX=24 CY=15 WI=5 BI=27 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="runtime\run_mud_server.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.2530 CL=22 LE=0 CX=21 CY=13 WI=5 BI=34 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="src_mud\mobs\affordance\simbots.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.6171 CL=33 LE=0 CX=32 CY=10 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
+VIEW: LN=.16768 CL=48 LE=0 CX=47 CY=15 WI=5 BI=44 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="src_mud\actions\use.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=616 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.3224 CL=4 LE=0 CX=3 CY=20 WI=5 BI=41 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="src_mud\actions\inventory.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=42 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="src_mud\vworld\toploop_telnet.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.2596 CL=11 LE=0 CX=10 CY=19 WI=5 BI=35 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\swipl-library\boot\init.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.56125 CL=1 LE=0 CX=0 CY=25 WI=5 BI=28 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="\var\www\newlisp\makefile_aixLP64_utf8_xlc"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=520 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=39 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\MUD_ScriptEngines\ext\moo_ext_cyc_new.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.162325 CL=37 LE=0 CX=36 CY=16 WI=5 BI=38 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="src_mud\actions\showdebug.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1082 CL=86 LE=0 CX=85 CY=13 WI=5 BI=40 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1293 377 -1 -1 N  WF=0 WT=30 "Default Fixed Font,10,0,1"
+BUFFER: BN="src_mud\mobs\affordance\simbots.pl"
+VIEW: LN=.16768 CL=48 LE=0 CX=47 CY=15 WI=208 BI=44 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1293 377 -1 -1 N  WF=0 WT=21 "Default Fixed Font,10,0,1"
+BUFFER: BN="runtime\run_mud_server.pl"
+VIEW: LN=.2530 CL=22 LE=0 CX=21 CY=13 WI=190 BI=34 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1293 377 -1 -1 N  WF=0 WT=15 "Default Fixed Font,10,0,1"
+BUFFER: BN="src_lib\logicmoo_util\logicmoo_util_bugger.pl"
+VIEW: LN=.50652 CL=25 LE=0 CX=24 CY=15 WI=133 BI=27 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1293 377 -1 -1 N  WF=0 WT=29 "Default Fixed Font,10,0,1"
+BUFFER: BN="src_mud\actions\inventory.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=206 BI=42 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1293 377 -1 -1 N  WF=0 WT=24 "Default Fixed Font,10,0,1"
+BUFFER: BN="src_mud\vworld\toploop_telnet.pl"
+VIEW: LN=.2596 CL=7 LE=0 CX=6 CY=19 WI=197 BI=35 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1293 377 -1 -1 N  WF=0 WT=27 "Default Fixed Font,10,0,1"
+BUFFER: BN="\var\www\newlisp\makefile_aixLP64_utf8_xlc"
+VIEW: LN=.494 CL=1 LE=0 CX=0 CY=11 WI=173 BI=39 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1293 377 -1 -1 N  WF=0 WT=16 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\swipl-library\boot\init.pl"
+VIEW: LN=.56125 CL=1 LE=0 CX=0 CY=25 WI=137 BI=28 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1293 377 -1 -1 N  WF=0 WT=25 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\MUD_ScriptEngines\ext\moo_ext_cyc_new.pl"
+VIEW: LN=.162439 CL=23 LE=0 CX=22 CY=20 WI=154 BI=38 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1293 377 -1 -1 N  WF=0 WT=26 "Default Fixed Font,10,0,1"
+BUFFER: BN="src_mud\actions\showdebug.pl"
+VIEW: LN=.1189 CL=49 LE=0 CX=48 CY=15 WI=183 BI=40 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1293 377 -1 -1 N  WF=0 WT=23 "Default Fixed Font,10,0,1"
+BUFFER: BN="src_mud\vworld\world_agent.pl"
+VIEW: LN=.1408 CL=20 LE=0 CX=19 CY=27 WI=195 BI=37 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1293 377 -1 -1 N  WF=0 WT=22 "Default Fixed Font,10,0,1"
+BUFFER: BN="src_lib\logicmoo_util\logicmoo_util_all.pl"
+VIEW: LN=.979 CL=1 LE=0 CX=0 CY=16 WI=192 BI=36 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1293 377 -1 -1 N  WF=0 WT=20 "Default Fixed Font,10,0,1"
+BUFFER: BN="src_lib\logicmoo_util\logicmoo_util_header.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=188 BI=33 HT=0 HN=0 HF=0 HC=4
 WINDOW: 88 88 1293 377 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
 BUFFER: BN="externals\swipl-library\boot\syspred.pl"
-VIEW: LN=.7914 CL=1 LE=0 CX=0 CY=13 WI=248 BI=17 HT=0 HN=0 HF=0 HC=4
+VIEW: LN=.1368 CL=22 LE=0 CX=21 CY=9 WI=106 BI=15 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1293 377 -1 -1 N  WF=0 WT=17 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\swipl-library\xpce\prolog\lib\swi_hooks.pl"
+VIEW: LN=.2281 CL=8 LE=0 CX=7 CY=7 WI=147 BI=31 HT=0 HN=0 HF=0 HC=4
+WINDOW: 176 176 1293 377 -1 -1 N  WF=0 WT=19 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\swipl-library\library\prolog_xref.pl"
+VIEW: LN=.34015 CL=36 LE=0 CX=35 CY=18 WI=150 BI=32 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1293 377 -1 -1 N  WF=0 WT=18 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\swipl-library\library\helpidx.pl"
+VIEW: LN=.78608 CL=11 LE=0 CX=10 CY=9 WI=143 BI=29 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1293 377 -1 -1 N  WF=0 WT=12 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\swipl-library\library\pure_input.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=127 BI=24 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1293 377 -1 -1 N  WF=0 WT=14 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\swipl-library\pack\list_util\t\lazy_include.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=131 BI=26 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1293 377 -1 -1 N  WF=0 WT=13 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\swipl-library\library\tipc\tipc_linda.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=129 BI=25 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1293 377 -1 -1 N  WF=0 WT=11 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\swipl-library\library\prolog_source.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=125 BI=23 HT=0 HN=0 HF=0 HC=4
+WINDOW: 176 176 1293 377 -1 -1 N  WF=0 WT=10 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\swipl-library\library\prolog_server.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=123 BI=22 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1293 377 -1 -1 N  WF=0 WT=9 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\swipl-library\library\prolog_metainference.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=121 BI=21 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1293 377 -1 -1 N  WF=0 WT=8 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\swipl-library\library\semweb\rdfa.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=119 BI=20 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1293 377 -1 -1 N  WF=0 WT=7 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\swipl-library\library\semweb\rdfs.rdfs"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=117 BI=19 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1293 377 -1 -1 N  WF=0 WT=6 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\swipl-library\library\semweb\rdf_cache.pl"
+VIEW: LN=.1631 CL=19 LE=0 CX=18 CY=9 WI=115 BI=18 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1293 377 -1 -1 N  WF=0 WT=5 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\swipl-library\library\semweb\rdf_litindex.pl"
+VIEW: LN=.20331 CL=28 LE=0 CX=27 CY=16 WI=113 BI=16 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1293 377 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\swipl-library\library\tipc\tipc_broadcast.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=111 BI=17 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1293 377 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\swipl-library\boot\dcg.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=109 BI=5 HT=0 HN=0 HF=0 HC=4
+WINDOW: 176 176 1293 377 -1 -1 M  WF=0 WT=28 "Default Fixed Font,10,0,1"
+BUFFER: BN="src_mud\actions\use.pl"
+VIEW: LN=.3559 CL=9 LE=0 CX=8 CY=26 WI=204 BI=41 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
-externals\XperiMental\knowrob_addons\knowrob_mud\prolog\init.pl
-clone_externals.sh
-src_mud\vworld\moo_startup.pl
-src_lib\logicmoo_util\logicmoo_util_all.pl
-runtime\run.pl
-\opt\LogicmooDeveloperFramework\PrologMUD\externals\MUD_KnowRob\knowrob_addons\knowrob_mud\README.md
-\opt\LogicmooDeveloperFramework\PrologMUD\externals\MUD_KnowRob\knowrob_addons\knowrob_mud\package.xml
-externals\MUD_KnowRob\robokind\milo\milo-lesson\app\MiloVolumeExampleConfig.ttl
-externals\swipl-library\boot\syspred.pl
+src_mud\actions\showdebug.pl
+externals\MUD_ScriptEngines\ext\moo_ext_cyc_new.pl
+\var\www\newlisp\makefile_aixLP64_utf8_xlc
+src_mud\vworld\toploop_telnet.pl
+src_mud\actions\inventory.pl
+src_mud\actions\use.pl
+src_lib\logicmoo_util\logicmoo_util_bugger.pl
+runtime\run_mud_server.pl
+src_mud\mobs\affordance\simbots.pl

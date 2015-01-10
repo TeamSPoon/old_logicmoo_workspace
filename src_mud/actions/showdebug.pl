@@ -28,8 +28,6 @@ t_f("y","n").
 to_on_off(FLAG,ON,OFF,ON_OFF):- t_f(_,FLAG) -> ON_OFF=OFF; ON_OFF=ON.
 
 :-onEachLoad(do_gc).
-do_gc:-statistics,do_gc0,do_gc0,statistics.
-do_gc0:- current_prolog_flag(gc,GCWAS),set_prolog_flag(gc,true), garbage_collect, garbage_collect_atoms, set_prolog_flag(gc,GCWAS).
  
 show_dmsg_values:- listing(tlbugger:dmsg_match/2),current_prolog_flag(opt_debug,ON_OFF),fmt(current_prolog_flag(opt_debug,ON_OFF)),debugging.
 

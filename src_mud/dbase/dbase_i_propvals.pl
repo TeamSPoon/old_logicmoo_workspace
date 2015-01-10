@@ -23,7 +23,7 @@ with_no_db_hooks(CALL):-!,CALL.
 with_no_db_hooks(CALL):-with_assertions(thlocal:noDBaseHOOKS(_),CALL).
 
 :-meta_predicate_transparent(with_fallbacks(0)).
-with_fallbacks(CALL):-with_no_assertions(thlocal:noDefaultValues(_),CALL).
+with_fallbacks(CALL):-with_no_assertions(thlocal:infAssertedOnly(_),CALL).
 
 :-meta_predicate_transparent(with_fallbacksg(0)).
 with_fallbacksg(CALL):-with_no_assertions(thlocal:noRandomValues(_),CALL).
@@ -32,10 +32,13 @@ with_fallbacksg(CALL):-with_no_assertions(thlocal:noRandomValues(_),CALL).
 with_no_fallbacksg(CALL):-with_assertions(thlocal:noRandomValues(_),CALL).
 
 :-meta_predicate_transparent(with_no_fallbacks(0)).
-with_no_fallbacks(CALL):-with_assertions(thlocal:noDefaultValues(_),CALL).
+with_no_fallbacks(CALL):-with_assertions(thlocal:infAssertedOnly(_),CALL).
 
-:-meta_predicate_transparent(fallback/0).
-fallback:- not(thlocal:insideIREQ(_)).
+:-meta_predicate_transparent(infSecondOrder/0).
+infSecondOrder:- not(thlocal:infInstanceOnly(_)).
+:-meta_predicate_transparent(infThirdOrder/0).
+infThirdOrder :- fail, infSecondOrder, not(thlocal:noRandomValues(_)).
+
 
 :- dynamic_multifile_exported(transitive_other/4).
 
@@ -45,7 +48,7 @@ choose_val(Prop,Obj,Value):- mdif(Obj,Value),choose_right(Prop,Obj,Value).
 
 generate_candidate_arg_values(Prop,N,Obj):-call_vars_tabled(Obj,generate_candidate_arg_values0(Prop,N,Obj)).
 
-generate_candidate_arg_values0(Prop,N,R):- cached_isa(Prop,completeExtentAsserted),arg(N,vv(Obj,Value),R),!,is_asserted(dbase_t(Prop,Obj,Value)).
+generate_candidate_arg_values0(Prop,N,R):- cached_isa(Prop,ttCompleteExtentAsserted),arg(N,vv(Obj,Value),R),!,is_asserted(dbase_t(Prop,Obj,Value)).
 generate_candidate_arg_values0(Prop,N,Obj):- once((argIsa_asserted(Prop,N,Type),type_has_instances(Type))),!,cached_isa(Obj,Type).
 generate_candidate_arg_values0(Prop,N,R):- arg(N,vv(Obj,Value),R),!,is_asserted(dbase_t(Prop,Obj,Value)).
 
@@ -53,7 +56,7 @@ type_has_instances(Type):-  atom(Type),Type\=ftTerm,Type\=tCol,not_ft(Type),mudI
 
 choose_right(Prop,Obj,Value):- thlocal:useOnlyExternalDBs,!, body_call_cyckb(dbase_t(Prop,Obj,Value)).
 choose_right(Prop,Obj,Value):- nonvar(Obj),!,choose_for(Prop,Obj,RValue),RValue=Value.
-choose_right(Prop,Obj,Value):- cached_isa(Prop,completeExtentAsserted),not(cached_isa(Prop,prologSingleValued)),!,is_asserted(dbase_t(Prop,Obj,Value)).
+choose_right(Prop,Obj,Value):- cached_isa(Prop,ttCompleteExtentAsserted),not(cached_isa(Prop,prologSingleValued)),!,is_asserted(dbase_t(Prop,Obj,Value)).
 choose_right(Prop,Obj,Value):- findall(Obj,generate_candidate_arg_values(Prop,1,Obj),Objs),Objs\=[],!,member(Obj,Objs),nonvar(Obj),choose_for(Prop,Obj,Value).
 choose_right(Prop,Obj,Value):- dmsg(var_choose_right(Prop,Obj,Value)),!,dtrace,is_asserted(dbase_t(Prop,Obj,Value)).
 choose_right(Prop,Obj,Value):- choose_for(Prop,Obj,RValue),RValue=Value.
@@ -70,11 +73,11 @@ choose_for(Prop,Obj,Value):- no_repeats(choose_each(Prop,Obj,Value)).
 choose_one(mudAtLoc,Obj,_):-nonvar(Obj),isa_asserted(Obj,tRegion),!,fail.
 choose_one(Prop,Obj,Value):- choose_asserted(Prop,Obj,RValue),!,Value=RValue.
 % was choose_one(Prop,Obj,Value):- with_fallbacks(with_fallbacksg(fallback_value(Prop,Obj,RValue))),checkNoArgViolation(Prop,Obj,RValue),!,Value = RValue,maybe_save(Obj,Prop,Value).
-choose_one(Prop,Obj,_Value):- Fact=.. [Prop,Obj,_],thlocal:insideIREQ(Fact),!,fail.
+choose_one(Prop,Obj,_Value):- Fact=.. [Prop,Obj,_],thlocal:infInstanceOnly(Fact),!,fail.
 choose_one(Prop,Obj,Value):- with_fallbacks(fallback_value(Prop,Obj,RValue)),ground(choose_one(Prop,Obj,RValue)),checkNoArgViolation(Prop,Obj,RValue),!,Value = RValue,save_fallback(Obj,Prop,Value).
 choose_one(Prop,Obj,Value):- create_someval(Prop,Obj,RValue),ground(create_someval(Prop,Obj,RValue)),ground(create_someval(Prop,Obj,RValue)),checkNoArgViolation(Prop,Obj,RValue),!,Value = RValue,save_fallback(Obj,Prop,Value).
 
-choose_each(Prop,Obj,Value):- mpred_prop(Prop, completeExtentAsserted),!,choose_asserted(Prop,Obj,Value).
+choose_each(Prop,Obj,Value):- mpred_prop(Prop, ttCompleteExtentAsserted),!,choose_asserted(Prop,Obj,Value).
 choose_each(Prop,Obj,Value):- one_must(choose_asserted(Prop,Obj,Value),(fallback_value(Prop,Obj,Value),maybe_cache(Prop,Obj,Value,Obj))).
 
 % choose_asserted(Prop,Obj,Value):- dbase_t(Prop,Obj,Value). % ,must_det(is_asserted(dbase_t(Prop,Obj,Value))).
@@ -84,7 +87,7 @@ choose_asserted(Prop,Obj,Value):- nonvar(Obj),transitive_other(Prop,1,Obj,What),
 
 choose_asserted_mid_order(Prop,Obj,Value):-loop_check(choose_asserted_mid_order_all(Prop,Obj,Value),fail).
 choose_asserted_mid_order_all(Prop,Obj,Value):- call_mpred(dbase_t(Prop,Obj,Value)).
-choose_asserted_mid_order_all(Prop,Obj,_Value):- atom(Prop), Fact=.. [Prop,Obj,_],thlocal:insideIREQ(Fact),!,fail.
+choose_asserted_mid_order_all(Prop,Obj,_Value):- atom(Prop), Fact=.. [Prop,Obj,_],thlocal:infInstanceOnly(Fact),!,fail.
 choose_asserted_mid_order_all(Prop,Obj,Value):- is_asserted(genlPreds(Other,Prop)),choose_asserted(Other,Obj,Value).
 % choose_asserted_mid_order_all(Prop,Obj,Value):- is_asserted(genlInverse(Prop,Other)),choose_val(Other,Value,Obj).
 
@@ -92,13 +95,13 @@ choose_asserted_mid_order_all(Prop,Obj,Value):- is_asserted(genlPreds(Other,Prop
 create_someval(Prop,Obj,Value):- ground(Prop-Obj-Value),!,dmsg(error_create_someval(Prop,Obj,Value)).
 create_someval(Prop,Obj,Value):- into_mpred_form(dbase_t(Prop,Obj,Value),Fact),asserted_or_deduced(Fact),!.
 create_someval(Prop,Obj,Value):- into_mpred_form(dbase_t(Prop,Obj,Value),Fact),not(test_tl(thlocal:noRandomValues,Fact)),create_random_fact(Fact),!.
-create_someval(Prop,Obj,_):- Fact=.. [Prop,Obj,_],test_tl(thlocal:noDefaultValues,Fact),!,fail.
+create_someval(Prop,Obj,_):- Fact=.. [Prop,Obj,_],test_tl(thlocal:infAssertedOnly,Fact),!,fail.
 create_someval(Prop,Obj,Value):- fallback_value(Prop,Obj,DValue),!,Value=DValue.
 create_someval(Pred,_Arg1,Value):- must_det_l([mpred_arity(Pred,Last),argIsa_call(Pred,Last,Type),random_instance(Type,Value,nonvar(Value))]).
 
 asserted_or_deduced(Fact):- is_asserted(Fact),!.
 asserted_or_deduced(Fact):- fact_always_true(Fact),must_det(is_fact_consistent(Fact)),!,add(Fact).
-asserted_or_deduced(Fact):- test_tl(thlocal:noDefaultValues,Fact),!,fail.
+asserted_or_deduced(Fact):- test_tl(thlocal:infAssertedOnly,Fact),!,fail.
 asserted_or_deduced(Fact):- fact_maybe_deduced(Fact),is_fact_consistent(Fact),add(Fact).
 asserted_or_deduced(Fact):- deducedSimply(Fact),is_fact_consistent(Fact),add(Fact).
 
@@ -190,8 +193,8 @@ assert_subclass_on_argIsa(Prop,N,OType):-argIsa_call(Prop,N,PropType),assert_sub
 guessed_mpred_arity(F,A):-mpred_arity(F,AA),!,A=AA.
 guessed_mpred_arity(_,2).
 
-suggestedType(Prop,N,_,argIsaFn(Prop, N),FinalType):- guessed_mpred_arity(Prop,N),typename_to_iname('vt',Prop,FinalType),!,must((decl_type(FinalType),assert_isa(FinalType,discoverableType))).
-suggestedType(Prop,N,_,_,FinalType):- guessed_mpred_arity(Prop,N),typename_to_iname('vt',Prop,FinalType),!,must((decl_type(FinalType),assert_isa(FinalType,discoverableType))).
+suggestedType(Prop,N,_,argIsaFn(Prop, N),FinalType):- guessed_mpred_arity(Prop,N),i_name('vt',Prop,FinalType),!,must((decl_type(FinalType),assert_isa(FinalType,discoverableType))).
+suggestedType(Prop,N,_,_,FinalType):- guessed_mpred_arity(Prop,N),i_name('vt',Prop,FinalType),!,must((decl_type(FinalType),assert_isa(FinalType,discoverableType))).
 suggestedType( _ ,_,_ ,FinalType,FinalType):-atom(FinalType),tCol(FinalType),not(ttFormatType(FinalType)),!.
 suggestedType( _ ,_,Possibles,_ ,FinalType):- member(FinalType,[tPred,tCol,ttFormatType,ftText,tRegion,tAgentGeneric,tItem,tObj,tSpatialThing]),member(FinalType,Possibles),!.
 
@@ -252,7 +255,7 @@ fallback_value(Prop,Obj,Value):- is_asserted(dbase_t(Prop,Obj,Value)),!.
 fallback_value(_Prop,Obj,_Value):-var(Obj),!,fail.
 fallback_value(Prop,_Obj,_Value):-no_fallback(Prop,2),!,fail.
 fallback_value(Prop,Obj,Value):-Fact=..[Prop,Obj,Value], 
-   with_assertions(thlocal:noDefaultValues(Fact),defaultArgValue(Fact,Prop,2,ValueR)),!,
+   with_assertions(thlocal:infAssertedOnly(Fact),defaultArgValue(Fact,Prop,2,ValueR)),!,
    checkNoArgViolation(Prop,Obj,ValueR),is_fact_consistent(Fact),
    Value=ValueR.
 
@@ -289,6 +292,7 @@ defaultTypeValue(Fact,Type,Out):- random_instance(Type,ROut,nonvar(ROut)),dmsg(d
 get_instance_default_props(Inst,TraitsO):- must_det(nonvar(Inst)),!,
    findall(Props,((type_w_default_props(Type),mudIsa(Inst,Type),each_default_inst_type_props(Inst,Type,Props))),Traits),flatten_set(Traits,TraitsO),!.
 
+
 :-swi_export((get_type_default_props/2)).
 
 get_type_default_props(Type,TraitsO):- nonvar(Type),!, Inst = isSelf,
@@ -301,17 +305,18 @@ get_type_default_props(DefType,TraitsO):- type_w_default_props(DefType), Inst = 
 type_w_default_props(Type):-call_tabled_can(type_w_defaults_asserted(Type)).
 
 type_w_defaults_asserted(Type):- is_asserted(default_inst_props(_,Type,_)),nonvar(Type).
-type_w_defaults_asserted(Type):- is_asserted(default_type_props(Type,_)),nonvar(Type).
+type_w_defaults_asserted(Type):- is_asserted(typeProps(Type,_)),nonvar(Type).
 type_w_defaults_asserted(Type):- is_asserted(mudLabelTypeProps(_,Type,_)),nonvar(Type).
 
 each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(default_inst_props(Inst,Type,TProps)),subst(TProps,isSelf,Inst,Prop),flatten([Prop],Props).
-each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(default_type_props(Type,TProps)),subst(TProps,isSelf,Inst,Prop),flatten([Prop],Props).
-each_default_inst_type_props(_,Type,[kwLabel(Lbl)|Props]):-call_no_cuts(mudLabelTypeProps(Lbl,Type,Props)).
+each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(typeProps(Type,TProps)),subst(TProps,isSelf,Inst,Prop),flatten([Prop],Props).
+each_default_inst_type_props(_,Type,[mudKwLabel(Lbl)|Props]):-call_no_cuts(mudLabelTypeProps(Lbl,Type,Props)).
 
 default_inst_props(apathFn(Region,_Dir),areaPath,[localityOfObject(Region)]).
 
 
 :-swi_export((add_missing_instance_defaults/1)).
+add_missing_instance_defaults(_P):-dontAssertTypeProps,!.
 add_missing_instance_defaults(P):-
    loop_check_local(add_missing_instance_defaults_lc(P),true).
 add_missing_instance_defaults_lc(P):-
@@ -338,11 +343,13 @@ inst_missing_prop(_,MP,F):- must_det((MP=..[F|Args],get_sv_argnum(F,Args,A),repl
 
 get_sv_argnum(F,Args,ArgNum):-once(mpred_prop(F,functionalArg(ArgNum));length(Args,ArgNum)).
 
+dontAssertTypeProps:-!.
 
 :-swi_export(rescan_default_props/0).
 
 rescan_default_props:- loop_check_local(rescan_default_props_lc,true).
 % rescan_default_props_lc:- dmsg(todo(fix(rescan_default_props,"to not set atloc/2"))),!,
+rescan_default_props_lc:-dontAssertTypeProps,!.
 rescan_default_props_lc:-
    once((forall_setof(get_type_default_props(Type,PropList),
     once((dmsg(get_type_default_props(Type,PropList)),

@@ -125,7 +125,7 @@ rez_loc_object(XY,Type):-
            add(mudAtLoc(Name,XY)),!,
            add_missing_instance_defaults(Name).
 
-nearby(X,Y):-mudAtLoc(X,L1),mudAtLoc(Y,L2),locs_near(L1,L2).
+mudNearbyObjs(X,Y):-mudAtLoc(X,L1),mudAtLoc(Y,L2),mudNearbyLocs(L1,L2).
 
 locationToRegion(Obj,RegionIn):-var(Obj),!,dmsg(warn(var_locationToRegion(Obj,RegionIn))),mudIsa(RegionIn,tRegion).
 locationToRegion(Obj,RegionIn):-locationToRegion_0(Obj,Region),must((nonvar(Region),mudIsa(Region,tRegion))),!,RegionIn=Region.
@@ -135,19 +135,19 @@ locationToRegion_0(Obj,Obj):-nonvar(Obj),!,mudIsa(Obj,tRegion),!.
 locationToRegion_0(Obj,Region):-nonvar(Obj),must(localityOfObject(Obj,Location)),!,locationToRegion_0(Location,Region).
 locationToRegion_0(Obj,Obj):-dmsg(warn(locationToRegion(Obj,Obj))),!.
 
-:-swi_export(locs_near/2).
-locs_near(L1,L2):- var(L1),nonvar(L2),!,locs_near(L2,L1).
-locs_near(L1,L2):- nonvar(L1),nonvar(L2),L2=xyzFn(_,_,_,_),locationToRegion(L1,R),!,call_tabled(locs_near_i(R,L2)).
-locs_near(L1,L2):- nonvar(L1),nonvar(L2),locationToRegion(L1,R1),locationToRegion(L2,R2),!,region_near(R1,R2).
-locs_near(L1,L2):- must((hotrace(region_near(R1,R2)),in_grid_no_rnd(R1,L1),in_grid_no_rnd(R2,L2))).
+:-swi_export(mudNearbyLocs/2).
+mudNearbyLocs(L1,L2):- var(L1),nonvar(L2),!,mudNearbyLocs(L2,L1).
+mudNearbyLocs(L1,L2):- nonvar(L1),nonvar(L2),L2=xyzFn(_,_,_,_),locationToRegion(L1,R),!,call_tabled(locs_near_i(R,L2)).
+mudNearbyLocs(L1,L2):- nonvar(L1),nonvar(L2),locationToRegion(L1,R1),locationToRegion(L2,R2),!,mudNearbyRegions(R1,R2).
+mudNearbyLocs(L1,L2):- must((hotrace(mudNearbyRegions(R1,R2)),in_grid_no_rnd(R1,L1),in_grid_no_rnd(R2,L2))).
 
 % :- decl_not_mpred(locs_near_i,2).
 :-swi_export(locs_near_i/2).
 locs_near_i(L1,L2):- locationToRegion(L1,R),in_grid_no_rnd(R,L2).
 locs_near_i(L1,L2):- locationToRegion(L1,R),pathBetween_call(R,_,R2),in_grid_no_rnd(R2,L2).
 
-region_near(R1,R2):-pathBetween_call(R1,_,R2).
-region_near(R1,R1).
+mudNearbyRegions(R1,R2):-pathBetween_call(R1,_,R2).
+mudNearbyRegions(R1,R1).
 
 % 345345  default_inst_props(OfAgent,agent,[facing(F),atloc(L)]):-  dfsdfd ignore((nonvar(OfAgent),create_someval(facing,OfAgent,F),create_someval(atloc,OfAgent,L))).
 
@@ -160,42 +160,56 @@ mudInsideOf(Inner,Outer):-is_asserted(mudStowing(Outer,Inner)).
 mudInsideOf(Inner,Outer):-is_asserted(mudContains(Outer,Inner)).
 
 
-
-
 moves_with(Obj1,Obj2):-nonvar(Obj2),!,moves_with(Obj2,Where),localityOfObject(Where,Obj1).
 moves_with(Obj1,Obj2):-moves_with_sym(Obj1,Obj2).
 moves_with(Obj1,Obj2):-moves_with_sym(Obj2,Obj1).
 moves_with_sym(Obj1,Obj2):-localityOfObject(Where,Obj1),moves_with(Obj2,Where).
 
-on_surface(Clothes,Agent):-loop_check(wearsClothing(Agent,Clothes),fail).
+mudLocOnSurface(Clothes,Agent):-loop_check(wearsClothing(Agent,Clothes),fail).
 
-same_regions(Agent,Obj):-inRegion(Agent,Where1),inRegion(Obj,Where2),Where1=Where2.
+:-export(same_regions/2).
+same_regions(Agent,Obj):-must(inRegion(Agent,Where1)),dif_safe(Agent,Obj),inRegion(Obj,Where2),Where1=Where2.
 
 inRegion(Agent,Region):- nonvar(Agent),!, loop_check(( (is_asserted(mudAtLoc(Agent,Where));localityOfObject(Agent,Where)), locationToRegion(Where,Region)),fail).
 %inRegion(Agent,Region):- nonvar(Region),!, loop_check(( (is_asserted(atloc(Agent,Where));localityOfObject(Agent,Where)), locationToRegion(Where,Region)),fail).
 
 localityOfObject(Inner,Container):-mudInsideOf(Inner,Container).
-localityOfObject(Above,HasSurface):-on_surface(Above,HasSurface).
-localityOfObject(Obj,Region):-inRegion(Obj,Region).
+localityOfObject(Above,HasSurface):-mudLocOnSurface(Above,HasSurface).
+localityOfObject(Obj,Region):-loop_check(inRegion(Obj,Region),fail).
 
 
-/*
-localityOfObject(Clothes,Agent):-has_parts(Agent,Clothes).
-has_parts(Outer,Inner):-is_asserted(mudInsideOf(Inner,Outer)).
-has_parts(Agent,Clothes):-wearsClothing(Agent,Clothes).
+localityOfObject(Clothes,Agent):-mudSubPart(Agent,Clothes).
 
-has_parts(body,isEach(head,neck,upper_torso,lower_torso,pelvis,arms,legs)).
-has_parts(head,isEach(face,hair)).
-has_parts(face,isEach(eyes,nose,mouth)).
-has_parts([upper_torso,arms,left_arm,left_hand,left_digits]).
-has_parts([upper_torso,arms,right_arm,right_hand,right_digits]).
-has_parts([pelvis,legs,left_leg,left_foot,left_toes]).
-has_parts([pelvis,legs,right_leg,right_foot,right_toes]).
+mudSubPart(Outer,Inner):-is_asserted(mudInsideOf(Inner,Outer)).
+mudSubPart(Agent,Clothes):-wearsClothing(Agent,Clothes).
 
+mudSubclass(tPlayer,tHominid).
+mudSubclass(tHumanBody,tBodyPart).
 
+predInnerArgIsa(mudSubPart(tBodyPart,tBodyPart)).
 
+predRelationAllExists(mudSubPart,tHominid,tHumanBody).
+predRelationAllExists(mudSubPart,tHumanBody,tBodyPart).
+predRelationAllExists(mudSubPart,tHumanBody,isEach(tHumanHead,tHumanNeck,tHumanUpperTorso,tHumanLowerTorso,tHumanPelvis,tHumanArms,tHumanLegs)).
+predRelationAllExists(mudSubPart,tHumanHead,isEach(tHumanFace,tHumanHair)).
 
-*/
+predPredicateToFunction(Pred,SubjT,ObjT,FullNameFnO):- 
+  is_asserted(predPredicateToFunction(Pred,SubjT,ObjT,FullNameFn)) *-> FullNameFnO=FullNameFn ; 
+  (i_name('i',ObjT,Obj),i_name(Obj,Pred,ObjPred),i_name('Of',SubjT,OfSubj),concat_atom([ObjPred,OfSubj,'Fn'],FullNameFn)),simplifyFullName(FullNameFn,FullNameFnO).
+
+simplifyFullName(FullNameFn,FullNameFn).
+
+mudSubPart(Subj,Obj):- thlocal:infThirdOrder, find_instance_of(mudSubPart,Subj,Obj).
+
+find_instance_of(Pred,Subj,Obj):- predRelationAllExists(Pred,SubjT,ObjT), mudIsa(Subj,SubjT), 
+ (is_asserted(dbase_t(Pred,Subj,Obj),mudIsa(Obj,ObjT)) *-> true ; (predPredicateToFunction(Pred,SubjT,ObjT,PredFn), Obj =.. [PredFn,Subj])).
+
+% mudSubPart(face,isEach(eyes,nose,mouth)).
+% mudSubPart([upper_torso,arms,left_arm,left_hand,left_digits]).
+% mudSubPart([upper_torso,arms,right_arm,right_hand,right_digits]).
+% mudSubPart([pelvis,legs,left_leg,left_foot,left_toes]).
+% mudSubPart([pelvis,legs,right_leg,right_foot,right_toes]).
+
 
 
 put_in_world(isSelf):-!.
@@ -380,7 +394,7 @@ with_offset(relative_from,F,X,Y,Z):-dir_offset(vDown,F,X,Y,Z).
 with_offset(surrounding,F,X,Y,Z):-dir_offset(vNorth,F,X,Y,Z).
 with_offset(mudInsideOf,F,X,Y,Z):-dir_offset(vSouth,F,X,Y,Z).
 with_offset(on,F,X,Y,Z):-dir_offset(vEast,F,X,Y,Z).
-with_offset(tPartof,F,X,Y,Z):-dir_offset(vWest,F,X,Y,Z).
+with_offset(tPartofObj,F,X,Y,Z):-dir_offset(vWest,F,X,Y,Z).
 
 facing_offset(at,F,X,Y,Z):-dir_offset(vHere,F,X,Y,Z).
 facing_offset(above,F,X,Y,Z):-dir_offset(vUp,F,X,Y,Z).
@@ -402,7 +416,7 @@ decl_database_hook(retract(_),mudAtLoc(Agent,_)):-padd(Agent,mudNeedsLook(true))
 in_world_move(LOC,Agent,DirS) :-
         string_to_atom(DirS,Dir),
         ignore(is_asserted(mudAtLoc(Agent,LOC))),
-        must_det((with_assertions(thlocal:noDefaultValues(mudAtLoc),in_world_move0(LOC,Agent,Dir)),       
+        must_det((with_assertions(thlocal:infAssertedOnly(mudAtLoc),in_world_move0(LOC,Agent,Dir)),       
          is_asserted(mudAtLoc(Agent,LOC2)),
          LOC2 \== LOC)),!.
 
@@ -467,7 +481,7 @@ reverse_dir0(vSW,vNE).
 reverse_dir0(vSE,vNW).
 
 
-% Yet another hash table to covert numbers into directions (or the reverse).
+% Yet another hash table to covert numbers into aDirectionsFn (or the reverse).
 num_near_reverse(1,vNW,vHere).
 num_near_reverse(2,vNorth,vHere).
 num_near_reverse(3,vNE,vHere).
@@ -481,7 +495,7 @@ num_near_reverse(0,vDown,vHere).
 num_near_reverse(5,vUp,vHere).
 
 % Translates numbers returned from scan_lists_aux/3 (the number of the location)
-% into thier relative directions.
+% into thier relative aDirectionsFn.
 number_to_dir(1,vNW,vNW).
 number_to_dir(2,vNorth,vNW).
 number_to_dir(3,vNorth,vNorth).

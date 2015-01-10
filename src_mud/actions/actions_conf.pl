@@ -10,7 +10,7 @@ end_of_file.
      forall(member(E,X),ensure_loaded(E)).
 
 :- use_module('look.pl').   % simmudGetPrecepts(Agent,[list of internal traits],[list of percepts]).
-:- use_module('move.pl').   % move(Dir). Dir is one of 8 cardinal directions
+:- use_module('move.pl').   % move(Dir). Dir is one of 8 cardinal aDirectionsFn
 :- use_module('sit.pl').    % sit. Don't do anything.
 :- use_module('take.pl').   % take(Object). take an item in the same atloc as agent
 :- use_module('drop.pl').   % drop(Object). drop an item in agent's possession

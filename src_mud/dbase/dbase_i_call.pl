@@ -122,7 +122,7 @@ deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),not(is_asserted(Call)
 
 call_expanded_for(req,Call):- !,call_mpred(Call).
 call_expanded_for(must,Call):- !,must(call_mpred(Call)).
-call_expanded_for(assertedOnly,Call):- !,with_assertions(thlocal:insideIREQ(F),call_mpred(F,Call)).
+call_expanded_for(assertedOnly,Call):- !,with_assertions(thlocal:infInstanceOnly(F),call_mpred(F,Call)).
 call_expanded_for(once,Call):- !,once(call_mpred(Call)).
 call_expanded_for(_Req,Call):- !,call_mpred(Call).
 
@@ -189,12 +189,12 @@ call_only_backchain_0(F,C):- loop_check(C,call_only_backchain_lc(F,C)).
 
 call_only_backchain_lc(F,C):- mpred_prop(F,predProxyQuery(P)),PC=..[P,C],!,req(PC).
 call_only_backchain_lc(F,C):- mpred_prop(F,prologOnly),!,predicate_property(C,number_of_rules(N)),N>0,!,clause(C,Body),body_no_backchains(C,Body).
-call_only_backchain_lc(_,C):- predHybridRule(C,BODY),call_mpred_body(C,BODY).
+call_only_backchain_lc(_,C):- ruleHybridChain(C,BODY),call_mpred_body(C,BODY).
 % TODO call_only_backchain_lc(_,_,_,dbase_t(F,Obj,LValue)):-  choose_val(F,Obj,LValue).
 
 
 body_no_backchains(_,true):-!.
-% body_no_backchains(H,_):- test_tl(thlocal:insideIREQ,H),!,fail.
+% body_no_backchains(H,_):- test_tl(thlocal:infInstanceOnly,H),!,fail.
 body_no_backchains(_,B):- body_no_backchains_match(B),!,B.
 body_no_backchains(H,B):- call_mpred_body(H,B).
 
@@ -242,7 +242,7 @@ dbase_plist_t(P,[L|IST]):-is_holds_true(P),!,dbase_plist_t(L,IST).
 dbase_plist_t(P,LIST):-is_holds_false(P),!,dbase_f(LIST).
 dbase_plist_t(P,LIST):- CALL=..[dbase_t,P|LIST],call(CALL),debugOnError((CALL)).
 
-loop_check_mpred(Call):- !, fail,not(thlocal:insideIREQ(_)),loop_check_local(ireq(Call),fail).
+loop_check_mpred(Call):- !, fail,not(thlocal:infInstanceOnly(_)),loop_check_local(ireq(Call),fail).
 % loop_check_mpred(Call):-loop_check_local(call_mpred(dbase_t,Call),fail).
 
 dbase_t(P,A1,A2,A3,A4,A5,A6,A7):- loop_check_mpred(dbase_t(P,A1,A2,A3,A4,A5,A6,A7)).

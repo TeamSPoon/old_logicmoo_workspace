@@ -21,16 +21,16 @@
 % ========================================================================================
 
 :-export((alt_forms/2)).
-alt_forms(AR,P,NP):-into_mpred_form(P,CP),P\=@=CP,!,alt_forms(AR,CP,NP).
+alt_forms(AR,P,NP):- nonvar(P),into_mpred_form(P,CP),P\=@=CP,!,alt_forms(AR,CP,NP).
 alt_forms(AR,P,NP):- no_repeats(( alt_forms0(AR,P,NP), NP\=@=P)).
 
 alt_forms0(AR,P,NP):-alt_forms1(AR,P,M),alt_forms1(AR,M,N),alt_forms1(AR,N,NP).
 alt_forms0(AR,P,NP):-alt_forms1(AR,P,M),alt_forms1(AR,M,NP).
 alt_forms0(AR,P,NP):-alt_forms1(AR,P,NP).
 
-alt_forms1(AR,mudAtLoc(P,L),localityOfObject(P,R)):-ground(mudAtLoc(P,L)),once(locationToRegion(L,R)),nonvar(R).
-alt_forms1(AR,localityOfObject(P,R),mudAtLoc(P,L)):-ground(localityOfObject(P,R)),is_asserted(mudAtLoc(P,L)),nonvar(L),once(locationToRegion(L,R)).
-alt_forms1(AR,P,NP):-P=..[F,A,B|R],alt_forms2(AR,F,A,B,R,NP). 
+alt_forms1(none_AR,mudAtLoc(P,L),localityOfObject(P,R)):-ground(mudAtLoc(P,L)),once(locationToRegion(L,R)),nonvar(R).
+alt_forms1(none_AR,localityOfObject(P,R),mudAtLoc(P,L)):-ground(localityOfObject(P,R)),is_asserted(mudAtLoc(P,L)),nonvar(L),once(locationToRegion(L,R)).
+alt_forms1(AR,P,NP):-compound(P),P=..[F,A,B|R],alt_forms2(AR,F,A,B,R,NP). 
 
 %alt_forms2(r,F,A,B,R,NP):-dbase_t(genlInverse,F,FF),NP=..[FF,B,A|R].
 %alt_forms2(r,F,A,B,R,NP):-dbase_t(genlInverse,FF,F),NP=..[FF,B,A|R].
@@ -61,7 +61,7 @@ decl_database_hook(assert(_),mudAtLoc(R,W)):- mudIsa(R,tRegion),trace_or_throw(m
 deduce_facts(localityOfObject(_,Region),mudIsa(Region,tSpatialThing)).
 deduce_facts(localityOfObject(Obj,_),mudIsa(Obj,tObj)).
 
-deduce_facts(Fact,mpred_prop(AF,[predArgTypes(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],argsIsaProps(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,
+deduce_facts(Fact,mpred_prop(AF,[predArgTypes(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],ttDeclarer(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,
                 ArgTs=..[AF|ARGS],!,must_det(ground(ARGS)).
 
 
@@ -74,8 +74,8 @@ deduce_facts(mpred_prop(F,predArgTypes(ArgTs)),argIsa(F,A,Type)):-arg(A,ArgTs,Ty
 
 deduce_facts(argIsa(F,_A,Type),[mudIsa(Type,tCol),mudIsa(F,tRelation)]):-atom(Type),not(hasInstance(ttFormatType,Type)).
 
-%deduce_facts(B,A):- is_asserted(equivRule(B,A)),not(contains_singletons(A)).
-%deduce_facts(B,A):- is_asserted(equivRule(A,B)),not(contains_singletons(A)).
+%deduce_facts(B,A):- is_asserted(ruleEquiv(B,A)),not(contains_singletons(A)).
+%deduce_facts(B,A):- is_asserted(ruleEquiv(A,B)),not(contains_singletons(A)).
 deduce_facts(Term,NewTerm):- hotrace(good_for_chaining(Op,Term)), db_rewrite(Op,Term,NewTerm),not(contains_singletons(NewTerm)).
 
 

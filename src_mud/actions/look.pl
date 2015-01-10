@@ -129,7 +129,7 @@ get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
 
 % Get only the Percepts
 
-% :-decl_mpred(mudGetPrecepts(agent,list(tSpatialThing)),[predModule(user)]).
+% :-decl_mpred(mudGetPrecepts(tAgentGeneric,list(tSpatialThing)),[predModule(user)]).
 mudGetPrecepts(Agent,Percepts) :- mudGetPrecepts0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts).
 mudGetPrecepts0(Agent,Percepts) :-
   call((
@@ -141,7 +141,7 @@ mudGetPrecepts0(Agent,Percepts) :-
 	!.
 
 % Look at locations immediately around argent
-% :-decl_mpred(mudNearReach(agent,list(tSpatialThing)),[predModule(user)]).
+% :-decl_mpred(mudNearReach(tAgentGeneric,list(tSpatialThing)),[predModule(user)]).
 mudNearReach(Agent,PerceptsO):- get_near0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
    
 get_near0(Agent,Percepts) :-
@@ -150,8 +150,8 @@ get_near0(Agent,Percepts) :-
 	near_vectors(Dirs),
 	view_dirs(Agent,Dirs,Percepts))),!.
 
-% Look only at location agent is currently in.
-% :-decl_mpred(mudNearFeet(agent,list(tSpatialThing)),[predModule(user)]).
+% Look only at location tAgentGeneric is currently in.
+% :-decl_mpred(mudNearFeet(tAgentGeneric,list(tSpatialThing)),[predModule(user)]).
 mudNearFeet(Agent,PerceptsO) :-  get_feet0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
 
 get_feet0(Agent,Percepts):-
@@ -179,7 +179,7 @@ view_vectors([[vNW,vNW],[vNorth,vNW],[vNorth,vNorth],[vNorth,vNE],[vNE,vNE],
 	    [vWest,vSW],[vSW,vHere],[vSouth,vHere],[vSE,vHere],[vEast,vSE],
 	    [vSW,vSW],[vSouth,vSW],[vSouth,vSouth],[vSouth,vSE],[vSE,vSE]]).
 
-% A view list of only the locations immediately surrounding the agent.
+% A view list of only the locations immediately surrounding the tAgentGeneric.
 near_vectors([[vNW,vHere],[vNorth,vHere],[vNE,vHere],
 	[vWest,vHere],[vDown,vUp],[vEast,vHere],
 	[vSW,vHere],[vSouth,vHere],[vSE,vHere]]).
@@ -208,7 +208,7 @@ prologSingleValued(mudShape(tSpatialThing,ftTerm)).
 % prologSingleValued(texture(tSpatialThing,term)).
 
 % High enough to see over obstacles??
-% Check to see how tall the agent is and if they are standing on an item
+% Check to see how tall the tAgentGeneric is and if they are standing on an item
 height_on_obj(Agent,Ht) :-
 	mudAtLoc(Agent,LOC),
 	report(LOC,Objs),
@@ -257,7 +257,7 @@ dark_if_yes(yes,_,[vDark]).
 %dark_if_yes(no,[[]],[]).
 dark_if_yes(no,[P],P).
 
-% Builds the Percepts list. (everything located up to 2 locations away from agent).
+% Builds the Percepts list. (everything located up to 2 locations away from tAgentGeneric).
 view_dirs(_,[],[]).
 view_dirs(Agent,[[D1|D2]|Rest],Percepts) :-
       looking(Agent),

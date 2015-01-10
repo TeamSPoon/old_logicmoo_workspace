@@ -224,7 +224,7 @@ prolog_side_effects(P):-atom(P),!,prolog_side_effects(P/_).
 :-swi_export(maybe_typep/1).
 maybe_typep(F/A):- ((integer(A);current_predicate(F/A)),functor(G,F,A)), maybe_typep(G),!.
 maybe_typep(G):-prolog_side_effects(G),!,fail.
-maybe_typep(G):-functor_h(G,F),(mpred_prop(F,tCol);colDeclarer(F)),!. %  ;col(F);formattype(F)
+maybe_typep(G):-functor_h(G,F),(mpred_prop(F,tCol);macroDeclarer(F)),!. %  ;col(F);formattype(F)
 maybe_typep(F):-atom(F),!,maybe_typep(F/_).
 
 
@@ -261,7 +261,7 @@ transform_holds_3(Op,[Logical|ARGS],OUT):-
          OUT=..[Logical|LARGS].
 
 transform_holds_3(_,[props,Obj,Props],props(Obj,Props)).
-transform_holds_3(_,[Type,Inst|PROPS],props(Inst,[mudIsa(Type)|PROPS])):- nonvar(Inst), not(Type=props), hasInstance(colDeclarer,Type),must_det(not(never_type(Type))),!.
+transform_holds_3(_,[Type,Inst|PROPS],props(Inst,[mudIsa(Type)|PROPS])):- nonvar(Inst), not(Type=props), hasInstance(macroDeclarer,Type),must_det(not(never_type(Type))),!.
 transform_holds_3(_,[P,A|ARGS],DBASE):- atom(P),!,DBASE=..[P,A|ARGS].
 transform_holds_3(_,[P,A|ARGS],DBASE):- !, nonvar(P),dumpST,trace_or_throw(dtrace), DBASE=..[P,A|ARGS].
 transform_holds_3(Op,DBASE_T,OUT):- DBASE_T=..[P,A|ARGS],!,transform_holds_3(Op,[P,A|ARGS],OUT).

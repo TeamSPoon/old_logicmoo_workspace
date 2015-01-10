@@ -6,6 +6,21 @@
 
 prolog:message(git(update_versions),A,A):-!.
 
+:- debug(daemon).
+
+% Do not run xpce in a thread. This disables forking. The problem here
+% is that loading library(pce) starts the event dispatching thread. This
+% should be handled lazily.
+
+:- set_prolog_flag(xpce_threaded, false).
+:- set_prolog_flag(message_ide,   false). % cause xpce to trap messages
+
+% [Optionaly] Solve the Halting problem
+:-use_module(library(process)).
+:-use_module(library(pce)).
+:- has_gui_debug -> true ; remove_pred(pce_principal,send,2).
+:- has_gui_debug -> true ; remove_pred(pce_principal,new,2).
+
 :- if_file_exists(ensure_loaded('../externals/swish/logicmoo_run_swish.pl')).
 
 :- add_to_search_path_first(cliopatria, '../externals/ClioPatria').

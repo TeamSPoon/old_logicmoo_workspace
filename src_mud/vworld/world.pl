@@ -96,7 +96,7 @@ isaOrSame(A,B):-mudIsa(A,B).
 
 intersect(A,EF,B,LF,Tests,Results):-findall( A-B, ((member(A,EF),member(B,LF),once(Tests))), Results),[A-B|_]=Results.
 % is_property(P,_A),PROP=..[P|ARGS],CALL=..[P,Obj|ARGS],req(CALL).
-obj_memb(E,L):-member(E,L).
+obj_memb(E,L):-is_list(L)->member(E,L);E=L.
 isa_any(E,L):-flatten([E],EE),flatten([L],LL),!,intersect(A,EE,B,LL,isaOrSame(A,B),_Results).
 prop_memb(E,L):-flatten([E],EE),flatten([L],LL),!,intersect(A,EE,B,LL,isaOrSame(A,B),_Results).
 
@@ -123,14 +123,14 @@ metaclass(itemcol).
 % deduce_facts(typeGenls(T,MC),deduce_facts(subclass(S,T),isa(S,MC))).
 
 typeGenls(region,regioncol).
-typeGenls(agent,agentcol).
+typeGenls(tAgentGeneric,agentcol).
 typeGenls(item,itemcol).
 */
 mudSubclass(tSillyitem,tItem).
 
 /*
 isa(region,regioncol).
-isa(agent,agentcol).
+isa(tAgentGeneric,agentcol).
 isa(item,itemcol).
 */
 
@@ -194,8 +194,8 @@ create_instance_now(What,Type,Props):-
   with_assertions(thlocal:deduceArgTypes(_),
   with_no_assertions(thlocal:useOnlyExternalDBs,
    with_no_assertions(thlocal:noRandomValues(_),
-     with_no_assertions(thlocal:insideIREQ(_),   
-      with_no_assertions(thlocal:noDefaultValues(_),
+     with_no_assertions(thlocal:infInstanceOnly(_),   
+      with_no_assertions(thlocal:infAssertedOnly(_),
         with_no_assertions(thglobal:use_cyc_database, 
      ((split_name_type(What,Inst,_WhatType),assert_isa(Inst,Type), create_instance_0(What,Type,Props)))))))))).
 
@@ -214,13 +214,11 @@ ttCreateable(tAgentGeneric).
 mudSubclass(tActor,tAgentGeneric).
 mudSubclass(tExplorer,tAgentGeneric).
 
-:-dynamic_multifile_exported(max_health/2).
-:-dynamic_multifile_exported(max_charge/2).
-:-dynamic_multifile_exported(type_max_charge/2).
-%:-dynamic_multifile_exported(type_max_health/2).
+:-dynamic_multifile_exported(predTypeMax/3).
+:-dynamic_multifile_exported(predInstMax/3).
 
-max_charge(T,NRG):- fallback, type_max_charge(AgentType,NRG),mudIsa(T,AgentType).
-%max_health(T,Dam):- type_max_health(AgentType,Dam),isa(T,AgentType).
+predInstMax(mudCharge,T,NRG):- infSecondOrder, predTypeMax(mudCharge,AgentType,NRG),mudIsa(T,AgentType).
+%predInstMax(mudHealth,T,Dam):- predTypeMax(mudHealth,AgentType,Dam),isa(T,AgentType).
 
 punless(Cond,Action):- once((call(Cond);call(Action))).
 
@@ -233,8 +231,8 @@ create_instance_0(T,tAgentGeneric,List):-
    % punless(mudPossess(P,_),rez_to_inventory(P,food,_Food)),
    rez_to_inventory(P,tFood,_Food),
    %reset_values(P),   
-   padd(P, [ max_health(500),
-                       max_charge(200),
+   padd(P, [ predInstMax(mudHealth,500),
+                       predInstMax(mudCharge,200),
                        mudHealth(500),
                        mudCharge(200),
                        mudAgentTurnnum(0),
@@ -293,23 +291,23 @@ create_instance_0(What,Type,Props):- leash(+call),trace,dtrace,trace_or_throw(dm
 
 
 
-:-decl_mpred_hybrid(kwLabel(ftTerm,ftTerm)).
+:-decl_mpred_hybrid(mudKwLabel(ftTerm,ftTerm)).
 :-decl_mpred_hybrid(mudOpaqueness(ftTerm,ftPercent)).
-default_type_props(tRegion,mudOpaqueness(1)).
-default_type_props(tObj,mudOpaqueness(100)).
+typeProps(tRegion,mudOpaqueness(1)).
+typeProps(tObj,mudOpaqueness(100)).
 :-decl_mpred_hybrid(mudListPrice(tItem,number)).
-default_type_props(tItem,mudListPrice(0)).
-default_type_props(tAgentGeneric,mudLastCommand(actStand)).
-default_type_props(tAgentGeneric,[
-                       max_health(500),
-                       max_charge(200),
+typeProps(tItem,mudListPrice(0)).
+typeProps(tAgentGeneric,mudLastCommand(actStand)).
+typeProps(tAgentGeneric,[
+                       predInstMax(mudHealth,500),
+                       predInstMax(mudCharge,200),
                        mudHealth(500),
                        mudCharge(200),
                        % mudFacing(vNorth), % later on Test that "n" will work on assertions
                        mudFacing(isRandom(vtBasicDir)), % later on Test that "n" will work on assertions
                        mudAgentTurnnum(0),
                        mudScore(1),
-                       mudMemory(directions([n,s,e,w,ne,nw,se,sw,u,d]))]).
+                       mudMemory(aDirectionsFn([n,s,e,w,ne,nw,se,sw,u,d]))]).
 
 
 

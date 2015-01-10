@@ -36,6 +36,7 @@ prologMultiValued(mudContains(tContainer,tObj)).
 genlPreds(wearsClothing,mudPossess).
 genlPreds(mudWielding,mudPossess).
 genlPreds(mudStowing,mudPossess).
+genlPreds(mudKnowing,mudPossess).
 genlPreds(mudPossess,mudContains).
 genlInverse(mudContains,mudInsideOf).
 %genlInverse(mudStowing,mudInsideOf).
@@ -134,8 +135,8 @@ must_post_use(ActUse,Agent,Obj):-
        fmt([Agent,ActUse,Obj]),       
        REQ = dbase_t(NowWielding,Agent,Obj),
        CLR = dbase_t(Unstowed,Agent,Obj),
-       (ireq(REQ) -> true; trace_or_throw(req(REQ))),
-       (ireq(CLR) -> trace_or_throw(not(req(REQ))); true)]),!.
+       (ireq(REQ) -> true; trace_or_throw(ireq(REQ))),
+       (ireq(CLR) -> trace_or_throw(not(ireq(REQ))); true)]),!.
 
 % Record keeping
 update_charge(Agent,_ActWield) :- 

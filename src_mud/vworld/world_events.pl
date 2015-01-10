@@ -18,13 +18,13 @@ asInvoked(Cmd,[L|Ist]):-atom(L),not(bad_functor(L)),!, Cmd=..[L|Ist].
 asInvoked(Cmd,[L|Ist]):-!,Cmd=..[asInvoked,L|Ist].
 asInvoked(Cmd,Cmd):-!.
 
-atlocNear(Whom,Where):-nonvar(Where),!,findall(Whom,atlocNear0(Whom,Where),List),list_to_set(List,Set),!,member(Whom,Set).
-atlocNear(Whom,Where):-nonvar(Whom),!,findall(Where,atlocNear0(Whom,Where),List),list_to_set(List,Set),!,member(Where,Set).
-atlocNear(Whom,Where):-findall(Whom+Where,atlocNear0(Whom,Where),List),list_to_set(List,Set),!,member(Whom+Where,Set).
+mudObjNearLoc(Whom,Where):-nonvar(Where),!,findall(Whom,atlocNear0(Whom,Where),List),list_to_set(List,Set),!,member(Whom,Set).
+mudObjNearLoc(Whom,Where):-nonvar(Whom),!,findall(Where,atlocNear0(Whom,Where),List),list_to_set(List,Set),!,member(Where,Set).
+mudObjNearLoc(Whom,Where):-findall(Whom+Where,atlocNear0(Whom,Where),List),list_to_set(List,Set),!,member(Whom+Where,Set).
 
-atlocNear0(Whom,Where):-locs_near(Where,LOC),is_asserted(mudAtLoc(Whom,LOC)).
+atlocNear0(Whom,Where):-mudNearbyLocs(Where,LOC),is_asserted(mudAtLoc(Whom,LOC)).
 
-raise_location_event(Where,Event):- forall(atlocNear(Whom,Where),ignore(show_event_to(Whom,Event))).
+raise_location_event(Where,Event):- forall(mudObjNearLoc(Whom,Where),ignore(show_event_to(Whom,Event))).
 :-swi_export(raise_location_event/2).
 
 

@@ -26,7 +26,7 @@
 
 bugger:term_to_message_string(T,T):-var(T),!.
 bugger:term_to_message_string(T,T):-!.
-bugger:term_to_message_string(ftText(T),M):-debugOnError(generatePhrase_local(T,M)),!.
+bugger:term_to_message_string(txtConcatFn(T),M):-debugOnError(generatePhrase_local(T,M)),!.
 bugger:term_to_message_string(fmt(T),M):-debugOnError(generatePhrase_local(T,M)),!.
 bugger:term_to_message_string(C,C):-compound(C),functor(C,F,_),is_leave_alone(F),!.
 bugger:term_to_message_string((T),M):-failOnError(generatePhrase_local(T,M)),!.

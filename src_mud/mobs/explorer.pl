@@ -28,7 +28,7 @@ vette_idea(Agent,Act,Act):-dmsg(vette_idea(Agent,Act)).
 
 mudLabelTypeProps('Px',tExplorer,[]).
 
-world_agent_plan(_World,Agent,ActV):-
+user:world_agent_plan(_World,Agent,ActV):-
    tAgentGeneric(Agent),
   % isa(Agent,explorer),
    explorer_idea(Agent,Act),
@@ -80,7 +80,7 @@ explorer_idea(Agent,actMove(1,Dir)) :-
 	list_object_dir_sensed(_,List,tAgentGeneric,Dir).
 
 explorer_idea(Agent,actMove(5,Dir)) :-
-	mudMemory(Agent,directions([Dir|_])),
+	mudMemory(Agent,aDirectionsFn([Dir|_])),
 	number_to_dir(Num,Dir,vHere),
 	mudNearReach(Agent,List),
 	nth1(Num,List,What),
@@ -88,13 +88,13 @@ explorer_idea(Agent,actMove(5,Dir)) :-
 
 explorer_idea(Agent,actAttack(Dir)) :-
 	mudNearReach(Agent,List),
-	list_object_dir_near(List,tMonster(_),Dir).
+	list_object_dir_near(List,tMonster,Dir).
 
 explorer_idea(Agent,actLook) :-
-        req(mudMemory(Agent,directions(Old))),
-	del(mudMemory(Agent,directions(Old))),
+        req(mudMemory(Agent,aDirectionsFn(Old))),
+	del(mudMemory(Agent,aDirectionsFn(Old))),
 	random_permutation(Old,New),
-	add(mudMemory(Agent,directions(New))).
+	add(mudMemory(Agent,aDirectionsFn(New))).
 
 
 :- include(logicmoo(vworld/moo_footer)).
