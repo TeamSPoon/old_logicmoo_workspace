@@ -231,32 +231,32 @@ label_type(Label,Type):- mudLabelTypeProps(Label,Type,_).
 
 % :-register_module_type(dynamic).
 
-type_max_charge(tAgentGeneric,120).
+predTypeMax(mudCharge,tAgentGeneric,120).
 
-default_type_props(tAgentGeneric,[max_health(500)]).
+typeProps(tAgentGeneric,[predInstMax(mudHealth,500)]).
 
 
 % :-end_module_type(dynamic).
 
-default_type_props(isSelf,Type,[mudNamed(isSelf),kwLabel(Lbl)|SP]):-  mudLabelTypeProps(Lbl,Type,SomeProps),nonvar(Type),flatten(SomeProps,SP).
+typeProps(isSelf,Type,[mudNamed(isSelf),mudKwLabel(Lbl)|SP]):-  mudLabelTypeProps(Lbl,Type,SomeProps),nonvar(Type),flatten(SomeProps,SP).
 
 % Vacuum World example objects........
 mudLabelTypeProps(wl,tWall,[mudHeight(3),mudWeight(4)]).
 mudLabelTypeProps(tr,tTree,[mudHeight(3),mudWeight(4)]).
 mudLabelTypeProps(rk,tRock,[mudHeight(2),mudWeight(4)]).
 mudLabelTypeProps(pt,tPit,[mudHeight(-1),mudWeight(4)]).
- mudLabelTypeProps(ot,tOutlet,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenStays),act_affect(actTake,mudCharge(+50))]).
- mudLabelTypeProps(nt,tNut,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),act_affect(actEat,mudCharge(+40)),spawn_rate(10)]).
+ mudLabelTypeProps(ot,tOutlet,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenStays),mudActAffect(actTake,mudCharge(+50))]).
+ mudLabelTypeProps(nt,tNut,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudCharge(+40)),spawn_rate(10)]).
 mudLabelTypeProps(lw,tLowWall,[mudHeight(2),mudWeight(4)]).
 mudLabelTypeProps(lg,tLedge,[mudHeight(2),mudWeight(4)]).
 mudLabelTypeProps(lb,tLowBox,[mudHeight(2),mudWeight(2)]).
 mudLabelTypeProps(hw,tHighWall,[mudHeight(3),mudWeight(4)]).
 mudLabelTypeProps(hb,tHighBox,[mudHeight(3),mudWeight(3)]).
- mudLabelTypeProps(gd,tGold,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenDeletes),act_affect(actTake,mudScore(+10))]).
- mudLabelTypeProps(fd,tFood,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),act_affect(actEat,mudCharge(+80))]).
-mudLabelTypeProps(el,tElixer,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),act_affect(actEat,mudHealth(+80))]).
+ mudLabelTypeProps(gd,tGold,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenDeletes),mudActAffect(actTake,mudScore(+10))]).
+ mudLabelTypeProps(fd,tFood,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudCharge(+80))]).
+mudLabelTypeProps(el,tElixer,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudHealth(+80))]).
 mudLabelTypeProps(ed,tEdge,[mudHeight(10),mudWeight(4)]).
- mudLabelTypeProps(dt,tDirt,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenDeletes),act_affect(actTake,mudScore(+1)),spawn_rate(5)]).
+ mudLabelTypeProps(dt,tDirt,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenDeletes),mudActAffect(actTake,mudScore(+1)),spawn_rate(5)]).
 mudLabelTypeProps(dr,tDoor,[mudHeight(3),mudWeight(2)]).
 
 %Empty Location
@@ -265,14 +265,14 @@ mudLabelTypeProps(--,var,[]).
 
 % What an agent turns into upon death.
 % Must be named iCorpseFn (or edit agent_to_corpse/1 in lib.pl.
- mudLabelTypeProps(cp,tCorpsea,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),act_affect(actEat,mudCharge(+80)),act_affect(actTake,mudScore(+10))]).
- mudLabelTypeProps(cp,tCorpseb,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),act_affect(actEat,mudCharge(+120))]).
+ mudLabelTypeProps(cp,tCorpsea,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudCharge(+80)),mudActAffect(actTake,mudScore(+10))]).
+ mudLabelTypeProps(cp,tCorpseb,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudCharge(+120))]).
 mudLabelTypeProps(da,tCorpsec,[mudHeight(2),mudWeight(2)]).
 % This is used to make the monster roaming the maze a bit tougher
 % It doesn't require any of the usual traits since the monster will never 
 % leave the monster's possession.
-mudLabelTypeProps(th,tNastyKnife,[act_affect(actWield,mudAttack(2))]).
-mudLabelTypeProps(th,tToughHide,[act_affect(actWear,mudArmor(2))]).
+mudLabelTypeProps(th,tNastyKnife,[mudActAffect(actWield,mudAttack(2))]).
+mudLabelTypeProps(th,tToughHide,[mudActAffect(actWear,mudArmor(2))]).
 
 
 % Define the maximum charge and maximum damage an agent can have

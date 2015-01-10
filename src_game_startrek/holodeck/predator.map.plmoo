@@ -19,9 +19,9 @@
 
 
 grid_key(ed='edge of world').
-grid_key(tr=tree).
-grid_key( rk=rock).
-grid_key( nt=nut).
+grid_key(tr=tTree).
+grid_key( rk=tRock).
+grid_key( nt=tNnut).
 %
 
 

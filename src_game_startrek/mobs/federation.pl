@@ -1,5 +1,5 @@
 /** <module> 
-% This is simple example tFederation for the maze world.
+% This is simple example federation for the maze world.
 %
 %
 % monster.pl
@@ -15,88 +15,86 @@
 
 
 % Declare the module name and the exported (public) predicates.
-:-swi_module(tFederation,[]).
+:-swi_module(modFederation,[]).
 
 :- include(logicmoo(vworld/moo_header)).
 :- register_module_type(planning).
 
 :-decl_type(tFederation).
 
-vette_fed_idea(Agent,Act,Act):-var(Act),!,dmsg(vette_fed_idea(Agent,Act)).
-vette_fed_idea(_,sit,sit):-!.
-vette_fed_idea(Agent,Act,Act):-dmsg(vette_fed_idea(Agent,Act)).
+vette_federation_idea(Agent,Act,Act):-var(Act),!,dmsg(vette_federation_idea(Agent,Act)).
+vette_federation_idea(_,actSit,actSit):-!.
+vette_federation_idea(Agent,Act,Act):-dmsg(vette_federation_idea(Agent,Act)).
 
-label_type_props('Px',tFederation,[]).
+mudLabelTypeProps('Px',tFederation,[]).
 
-world_agent_plan(_World,Agent,ActV):-
-   agent(Agent),
-  % isa(Agent,tFederation),
+user:world_agent_plan(_World,Agent,ActV):-
+   tAgentGeneric(Agent),
+  % isa(Agent,federation),
    federation_idea(Agent,Act),
-   vette_fed_idea(Agent,Act,ActV).
+   vette_federation_idea(Agent,Act,ActV).
 
 % Possible agent actions.
-federation_idea(Agent,eat(Elixer)) :-
-	health(Agent,Damage),
+federation_idea(Agent,actEat(Elixer)) :-
+	mudHealth(Agent,Damage),
 	Damage < 15,
-   inventory(Agent,List),
+   mudPossess(Agent,List),
    obj_memb(Elixer,List),
-   isa(Elixer,elixer).
+   mudIsa(Elixer,tElixer).
 
-federation_idea(Agent,eat(food)) :-
-	charge(Agent,Charge),
+federation_idea(Agent,actEat(tFood)) :-
+	mudCharge(Agent,Charge),
 	Charge < 150,
-   inventory(Agent,List),
+   mudPossess(Agent,List),
    obj_memb(Food,List),
-   isa(Food,food).
+   mudIsa(Food,tFood).
 
-federation_idea(Agent,take(Good)) :-
+federation_idea(Agent,actTake(Good)) :-
 	mudNearFeet(Agent,What),
         obj_memb(Good,What),
-	isa_any(Good,[gold,elixer,treasure]).  
+	isa_any(Good,[tGold,tElixer,tTreasure]).  
 
-federation_idea(Agent,take(Good)) :-
+federation_idea(Agent,actTake(Good)) :-
 	mudNearFeet(Agent,What),
         obj_memb(Good,What),
-	isa_any(Good,[food,tUsefull,item]).
+	isa_any(Good,[tFood,tUsefull,tItem]).
 
-federation_idea(Agent,move(1,Dir)) :-
+federation_idea(Agent,actMove(1,Dir)) :-
 	mudGetPrecepts(Agent,List),
-	list_object_dir_sensed(_,List,treasure,Dir).
+	list_object_dir_sensed(_,List,tTreasure,Dir).
 
-federation_idea(Agent,move(3,Dir)) :-
+federation_idea(Agent,actMove(3,Dir)) :-
 	mudGetPrecepts(Agent,List),
-	list_object_dir_sensed(_,List,monster,OppDir),
+	list_object_dir_sensed(_,List,tMonster,OppDir),
 	reverse_dir(OppDir,Dir),
 	number_to_dir(N,Dir,vHere),
         nth1(N,List,What),
 	What == [].
 
-federation_idea(Agent,move(1,Dir)) :-
+federation_idea(Agent,actMove(1,Dir)) :-
 	mudGetPrecepts(Agent,List),
 	list_object_dir_sensed(_,List,tUsefull,Dir).
 
-federation_idea(Agent,move(1,Dir)) :-
+federation_idea(Agent,actMove(1,Dir)) :-
 	mudGetPrecepts(Agent,List),
-	list_object_dir_sensed(_,List,agent,Dir).
+	list_object_dir_sensed(_,List,tAgentGeneric,Dir).
 
-federation_idea(Agent,move(5,Dir)) :-
-	memory(Agent,directions([Dir|_])),
+federation_idea(Agent,actMove(5,Dir)) :-
+	mudMemory(Agent,aDirectionsFn([Dir|_])),
 	number_to_dir(Num,Dir,vHere),
 	mudNearReach(Agent,List),
 	nth1(Num,List,What),
 	What == [].
 
-federation_idea(Agent,attack(Dir)) :-
+federation_idea(Agent,actAttack(Dir)) :-
 	mudNearReach(Agent,List),
-	list_object_dir_near(List,monster(_),Dir).
+	list_object_dir_near(List,tMonster,Dir).
 
-federation_idea(Agent,look) :-
-        req(memory(Agent,directions(Old))),
-	del(memory(Agent,directions(Old))),
+federation_idea(Agent,actLook) :-
+        req(mudMemory(Agent,aDirectionsFn(Old))),
+	del(mudMemory(Agent,aDirectionsFn(Old))),
 	random_permutation(Old,New),
-	add(memory(Agent,directions(New))).
+	add(mudMemory(Agent,aDirectionsFn(New))).
 
 
 :- include(logicmoo(vworld/moo_footer)).
-
-
