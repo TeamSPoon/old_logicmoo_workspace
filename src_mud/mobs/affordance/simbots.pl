@@ -542,11 +542,11 @@ verb_desc_or_else(ActVerb,Types,verb_desc(ActVerb,Types)):-nonvar(ActVerb),nonva
 agent_call_command(Agent,Templ):- simbots_templates(Templ), (fmt(agent_call_command_simbots_real_3(Agent,Templ)),fail).
 
 action_info(actDo(vtVerb,ftListFn(ftTerm)),"reinterps a action").
-agent_call_command(Agent,actDo(A)):-CMD=..[A],agent_call_command(Agent,CMD).
-agent_call_command(Agent,actDo(A,B)):-CMD=..[A,B],agent_call_command(Agent,CMD).
-agent_call_command(Agent,actDo(A,B,C)):- CMD=..[A,B,C],agent_call_command(Agent,CMD).
-agent_call_command(Agent,actDo(A,B,C,D)):- CMD=..[A,B,C,D],agent_call_command(Agent,CMD).
-agent_call_command(Agent,actDo(A,B,C,D,E)):- CMD=..[A,B,C,D,E],agent_call_command(Agent,CMD).
+agent_call_command(Agent,actDo(A)):-CMD=..[A],!,agent_call_command(Agent,CMD).
+agent_call_command(Agent,actDo(A,B)):-CMD=..[A,B],!,agent_call_command(Agent,CMD).
+agent_call_command(Agent,actDo(A,B,C)):- CMD=..[A,B,C],!,agent_call_command(Agent,CMD).
+agent_call_command(Agent,actDo(A,B,C,D)):- CMD=..[A,B,C,D],!,agent_call_command(Agent,CMD).
+agent_call_command(Agent,actDo(A,B,C,D,E)):- CMD=..[A,B,C,D,E],!,agent_call_command(Agent,CMD).
 
 action_info(actTextcmd(ftString),"reinterps a term as text").
 agent_call_command(Agent,actTextcmd(A)):-sformat(CMD,'~w',[A]),!,do_player_action(Agent,CMD).

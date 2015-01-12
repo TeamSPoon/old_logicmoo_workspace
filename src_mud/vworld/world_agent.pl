@@ -102,12 +102,13 @@ correctCommand(CMD,OUT):-compound(CMD),
 
 correctCommand(CMD,CMD).
 
-correctEachTypeOrFail(Who, F, Q,ARGS,TYPES,NEWS):- is_list(TYPES),!,maplist(correctEachTypeOrFail(Who,F,Q),ARGS,TYPES,NEWS).
-correctEachTypeOrFail(Who,_F,_Q,Arg,Type,Inst):- mudIsa(Arg,Type),!,Inst = Arg.
-correctEachTypeOrFail(Who,_F,_Q,Arg,Type,Inst):- must(coerce(Arg,Type,Inst)).
-correctEachTypeOrFail(Who,_F,_Q,Arg,Type,Inst):- acceptableArg(Arg,Type),!,Inst = Arg.
+correctEachTypeOrFail( Who, F, Q,ARGS,TYPES,NEWS):- is_list(TYPES),!,maplist(correctEachTypeOrFail(Who,F,Q),ARGS,TYPES,NEWS).
+correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- mudIsa(Arg,Type),!,Inst = Arg.
+correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- !,acceptableArg(Arg,Type),!,Inst = Arg.
+correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- must(coerce(Arg,Type,Inst)).
 
-acceptableArg(_Arg,_Type):-fail.
+acceptableArg(Arg,Type):-dmsg(acceptableArg(Arg,Type)).
+
 
 agent_call_command_now(Agent,CMD):-
   with_current_agent(Agent,

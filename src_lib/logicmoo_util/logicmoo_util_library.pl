@@ -465,11 +465,23 @@ list_retain([],_Pred,[]):-!.
 list_retain([R|List],Pred,[R|Retained]):- call(Pred,R),!, list_retain(List,Pred,Retained).
 list_retain([_|List],Pred,Retained):- list_retain(List,Pred,Retained).
 
+:-export(identical_member/2).
 identical_member(X,[Y|_])  :-
 	X == Y,
 	!.
 identical_member(X,[_|L]) :-
 	'identical_member'(X,L).
+
+:-export(delete_eq/3).
+:-export(pred_delete/4).
+delete_eq(A,B,C):-pred_delete(==,A,B,C).
+pred_delete(_,[], _, []).
+pred_delete(Pred,[A|C], B, D) :-
+        (    call(Pred,A,B)
+        ->  pred_delete(Pred,C, B, D)
+        ;   D=[A|E],
+            pred_delete(Pred,C, B, E)
+        ).
 
 
 contains_singletons(Term):- not(ground(Term)),not(not((term_variables(Term,Vs),numbervars(Term,0,_,[attvar(bind),singletons(true)]),member('$VAR'('_'),Vs)))).

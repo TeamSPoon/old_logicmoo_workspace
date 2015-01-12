@@ -340,7 +340,10 @@ prologMultiValued(mudDescription(ftTerm,ftText),[predProxyAssert(add_description
 mudSubclass(AT,ttAgentGeneric):-mudIsa(AT,ttAgentType).
 mudIsa(AT,ttAgentType):-mudSubclass(AT,ttAgentGeneric).
 
+mudSubclass(tMonster,ttAgentGeneric).
 
+mudIsa(Inst,tHasAction):-mudIsa(Inst,Type),mudIsa(Type,ttTypeByAction).
+mudSubclass(ttObjectType,tCol).
 
 tCol(tItem).
 tCol(vtVerb).

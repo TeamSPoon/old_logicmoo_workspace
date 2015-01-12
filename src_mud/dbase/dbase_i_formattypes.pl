@@ -26,9 +26,6 @@
 :- include(logicmoo('vworld/moo_header.pl')).
 
 
-:-decl_type(ttFormatType).
-:-decl_type(ttValueType).
-
 toUpperCamelcase(Type,TypeUC):-toCamelcase(Type,TypeC),toPropercase(TypeC,TypeUC),!.
 :-export(i_name/2).
 i_name(OType,IType):-typename_to_iname0('',OType,IOType),!,IOType=IType.

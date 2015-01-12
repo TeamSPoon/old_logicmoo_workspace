@@ -117,7 +117,7 @@ pddlSomethingIsa('iPhaser7776',['tPhaser','Handgun',tWeapon,'LightingDevice','Po
 :-enqueue_player_command("take shirt").
 :-enqueue_player_command("inventory").
 */
-
+:-enqueue_player_command(prolog).
 
 % [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
 % :- register_timer_thread(npc_ticker,30,npc_tick).

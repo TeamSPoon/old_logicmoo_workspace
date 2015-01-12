@@ -33,13 +33,6 @@
 				Refilter="0"
 				Excludes=".git/"/>
 		</Folder>
-		<Folder Name="src_mud">
-			<F
-				N="src_mud/*.*"
-				Recurse="1"
-				Refilter="0"
-				Excludes="*.*~;*~/"/>
-		</Folder>
 		<Folder Name="runtime">
 			<F
 				N="runtime/*.*"
@@ -53,6 +46,13 @@
 				Recurse="1"
 				Refilter="0"
 				Excludes="cache/;store/"/>
+		</Folder>
+		<Folder Name="src_mud">
+			<F
+				N="src_mud/*.*"
+				Recurse="1"
+				Refilter="0"
+				Excludes="*.*~;*~/"/>
 		</Folder>
 	</Files>
 </Project>

@@ -462,24 +462,24 @@ moo_trace_hidechilds(M,F,A,Trace,HideChilds):-
 :- create_prolog_flag(opt_debug,filter,[type(term),keep(true)]).
 :- create_prolog_flag(dmsg_color,true,[type(boolean),keep(false)]).
 
-%:-thread_local( /*tlbugger:*/ bugger_prolog_flag/2).
-:-thread_local( /*tlbugger:*/ skipMust/0).
+%:-thread_local( tlbugger:bugger_prolog_flag/2).
+:-thread_local( tlbugger:skipMust/0).
 
-%:-multifile( /*tlbugger:*/ bugger_prolog_flag/2).
-%:-export( /*tlbugger:*/ bugger_prolog_flag/2).
+%:-multifile( tlbugger:bugger_prolog_flag/2).
+%:-export( tlbugger:bugger_prolog_flag/2).
 
 
 
-must(C):-  /*tlbugger:*/ skipMust,!,catch(C,E,(wdmsg(E:C),fail)).
+must(C):-  tlbugger:skipMust,!,catch(C,E,(wdmsg(E:C),fail)).
 must(C):- catch(C,E,(wdmsg(E:C),fail)) *-> true ; (wdmsg(failed_must(C)),dtrace(C)).
 
 /*
 current_prolog_flag(N,VV):-
-   (( /*tlbugger:*/ bugger_prolog_flag(N,V),
-   ignore(current_prolog_flag(N,VO)),!,(VO=@=V -> true; ddmsg_call(set_prolog_flag(N,VO))));(current_prolog_flag(N,V),asserta( /*tlbugger:*/ bugger_prolog_flag(N,V)))),!, V=VV.
+   (( tlbugger:bugger_prolog_flag(N,V),
+   ignore(current_prolog_flag(N,VO)),!,(VO=@=V -> true; ddmsg_call(set_prolog_flag(N,VO))));(current_prolog_flag(N,V),asserta( tlbugger:bugger_prolog_flag(N,V)))),!, V=VV.
 
 set_prolog_flag(N,V):- current_prolog_flag(N,VV),!,
-        (V==VV ->  true ; (asserta( /*tlbugger:*/ bugger_prolog_flag(N,V)),set_prolog_flag(N,V))).
+        (V==VV ->  true ; (asserta( tlbugger:bugger_prolog_flag(N,V)),set_prolog_flag(N,V))).
 */
 
 
@@ -610,10 +610,10 @@ fixnotrace(X):- tracing -> (call(X),trace) ; call(X).
 hidetrace(X):- X.
 :-moo_hide_all(hidetrace(0)).
 
-:-export( /*tlbugger:*/ use_bugger_expansion/0).
-:-dynamic( /*tlbugger:*/ use_bugger_expansion/0).
-:- retractall( /*tlbugger:*/ use_bugger_expansion).
-%:- asserta( /*tlbugger:*/ use_bugger_expansion).
+:-export( tlbugger:use_bugger_expansion/0).
+:-dynamic( tlbugger:use_bugger_expansion/0).
+:- retractall( tlbugger:use_bugger_expansion).
+%:- asserta( tlbugger:use_bugger_expansion).
 
 functor_h0(P,F,A):-var(P),!,throw(functor_h_var(P,F,A)).
 functor_h0(_:P,F,A):-nonvar(P),!,functor_h0(P,F,A).
@@ -633,7 +633,7 @@ bugger_t_expansion(CM,notrace(T),fixnotrace(TT)):-!,bugger_t_expansion(CM,(T),(T
 bugger_t_expansion(_,F/A,F/A):-!.
 bugger_t_expansion(_,M:F/A,M:F/A):-!.
 bugger_t_expansion(CM,[F0|ARGS0],[F1|ARGS1]):- !,bugger_t_expansion(CM,F0,F1),bugger_t_expansion(CM,ARGS0,ARGS1).
-% bugger_t_expansion(CM,T,AA):-  /*tlbugger:*/ use_bugger_expansion,compound_name_arguments(T,F,[A]),unwrap_for_debug(F),!,bugger_t_expansion(CM,A,AA),
+% bugger_t_expansion(CM,T,AA):-  tlbugger:use_bugger_expansion,compound_name_arguments(T,F,[A]),unwrap_for_debug(F),!,bugger_t_expansion(CM,A,AA),
 %  ddmsg(bugger_term_expansion((T->AA))),!.
 bugger_t_expansion(_,use_module(T),use_module(T)):-!.
 bugger_t_expansion(_,module(A,B),module(A,B)):-!.
@@ -660,7 +660,7 @@ current_predicate_module(OM:P,M):-!,functor_safe(P,F,A),(current_predicate(M:F/A
 current_predicate_module(P,M):-!,functor_safe(P,F,A),(current_predicate(M:F/A);current_predicate(F/A)),(nonvar(M)->true;p_predicate_property(P,imported_from(M))).
 
 :-meta_predicate(bugger_atom_change(:,0,+,+,-,-)).
-bugger_atom_change(CM,T,F,FH,FA,FF):- /*tlbugger:*/ use_bugger_expansion, bugger_atom_change0(CM,T,F,FH,FA,FF).
+bugger_atom_change(CM,T,F,FH,FA,FF):- tlbugger:use_bugger_expansion, bugger_atom_change0(CM,T,F,FH,FA,FF).
 bugger_atom_change0(_CM,T,_F,FH,FA,FF):- current_predicate_module(T,M1),atom_concat(FH,'_safe',FF),functor_safe(FFT,FF,FA),current_predicate_module(FFT,M2),differnt_modules(M1,M2).
 
 :-meta_predicate(bugger_atom_change(:,(-))).
@@ -682,7 +682,7 @@ differnt_modules(User2,User1):- User1 \== User2.
 %unwrap_for_debug(F):-member(FF,['OnError','OnFailure','LeastOne','Ignore','must']),atom_concat(_,FF,F),!.
 
 :-meta_predicate(bugger_goal_expansion(:,-)).
-bugger_goal_expansion(CM:T,TT):-  /*tlbugger:*/ use_bugger_expansion,!,bugger_goal_expansion(CM,T,TT).
+bugger_goal_expansion(CM:T,TT):-  tlbugger:use_bugger_expansion,!,bugger_goal_expansion(CM,T,TT).
 :-meta_predicate(bugger_goal_expansion(+,+,-)).
 bugger_goal_expansion(CM,T,T3):- once(bugger_t_expansion(CM,T,T2)),T\==T2,!,catch(expand_term(T2,T3),_,fail).
 
@@ -696,7 +696,7 @@ bugger_expand_term(T,_):- fail, ddmsg(bugger_expand_term(T)),fail.
 format_safe(A,B):-catch(format(A,B),E,(dumpST,dtrace(E:format(A,B)))).
 
 :-meta_predicate(bugger_term_expansion(:,-)).
-bugger_term_expansion(CM:T,TT):- compound(T),  /*tlbugger:*/ use_bugger_expansion,!,bugger_term_expansion(CM,T,TT).
+bugger_term_expansion(CM:T,TT):- compound(T),  tlbugger:use_bugger_expansion,!,bugger_term_expansion(CM,T,TT).
 :-meta_predicate(bugger_term_expansion(+,+,-)).
 bugger_term_expansion(CM,T,T3):- once(bugger_t_expansion(CM,T,T2)),T\==T2,!,nop(ddmsg(T\==T2)),catch(expand_term(T2,T3),_,fail).
 
@@ -1041,11 +1041,11 @@ user_use_module(What):- within_module(use_module(What),'user').
 %:- meta_predicate_transparent((loop_check_fail(0))).
 
 
-:-decl_thlocal  /*tlbugger:*/ can_table/0.
-:-decl_thlocal  /*tlbugger:*/ cannot_table/0.
-% thread locals should defaults to false:  /*tlbugger:*/ can_table.
+:-decl_thlocal  tlbugger:can_table/0.
+:-decl_thlocal  tlbugger:cannot_table/0.
+% thread locals should defaults to false:  tlbugger:can_table.
 
-cannot_table_call(Call):- with_assertions( /*tlbugger:*/ cannot_table,Call).
+cannot_table_call(Call):- with_assertions( tlbugger:cannot_table,Call).
 
 :-use_module(logicmoo_util_coroutining_was).
 
@@ -1078,9 +1078,9 @@ call_skipping_n_clauses(N,H):-
 
 % ===================================================================
 
-:-decl_thlocal  /*tlbugger:*/ attributedVars.
+:-decl_thlocal  tlbugger:attributedVars.
 
-%  /*tlbugger:*/ attributedVars.
+%  tlbugger:attributedVars.
 
 :-export(must_not_repeat/1).
 :-meta_predicate(must_not_repeat(0)).
@@ -1104,7 +1104,7 @@ memberchk_same(X, [Y|Ys]) :- (   X =@= Y ->  (var(X) -> X==Y ; true) ;   memberc
 
 :- export(no_repeats/1).
 :- meta_predicate no_repeats(0).
-% no_repeats(Call):-  /*tlbugger:*/ attributedVars,!,no_repeats_av(Call).
+% no_repeats(Call):-  tlbugger:attributedVars,!,no_repeats_av(Call).
 
 no_repeats(Call):- no_repeats(Call,Call).
 
@@ -1122,7 +1122,7 @@ no_repeats(Call):- no_repeats(Call,Call).
 % ===================================================
 :- export(no_repeats/2).
 :- meta_predicate no_repeats(+,0).
-% no_repeats(Vs,Call):-  /*tlbugger:*/ attributedVars,!,no_repeats_av(Vs,Call).
+% no_repeats(Vs,Call):-  tlbugger:attributedVars,!,no_repeats_av(Vs,Call).
 
 no_repeats(Vs,Call):- hotrace((ground(Vs) -> ((traceok(Call),!)) ;  no_repeats0(Vs,Call))).
 
@@ -1234,7 +1234,7 @@ no_repeats_avl(VarList,Call):-no_repeats_av_prox(VarList,Call).
 :-meta_predicate(no_repeats_avar(+,0)).
 no_repeats_avar(VarList,Call):- filter_repeats, !, filter_repeats(VarList,Call).
 no_repeats_avar(AVar,Call):- get_attr(AVar,was,VARWAS),!,work_with_attvar(AVar,Call,VARWAS,true).
-no_repeats_avar(AVar,Call):-  /*tlbugger:*/ attributedVars,!, create_varwas(AVar,VARWAS), !,work_with_attvar(AVar,Call,VARWAS,del_attr(AVar,was)).
+no_repeats_avar(AVar,Call):-  tlbugger:attributedVars,!, create_varwas(AVar,VARWAS), !,work_with_attvar(AVar,Call,VARWAS,del_attr(AVar,was)).
 no_repeats_avar(Var,Call):- no_repeats_av_prox(Var,Call).
 
 :-export(no_repeats_av_prox/2).
@@ -1299,27 +1299,27 @@ filter_repeats(AVar,Call):-
 
 % =========================================================================
 
-:- decl_thlocal( /*tlbugger:*/ wastracing/0).
-:- moo_hide_all( /*tlbugger:*/ wastracing/0).
+:- decl_thlocal( tlbugger:wastracing/0).
+:- moo_hide_all( tlbugger:wastracing/0).
 
 % =========================================================================
 % cli_notrace(+Call) is nondet.
 % use call/1 with trace turned off
-cli_notrace(X):- tracing -> with_assertions( /*tlbugger:*/ wastracing,call_cleanup((notrace,call(X)),trace)) ; call(X).
-traceok(X):-  /*tlbugger:*/ wastracing -> call_cleanup((trace,call(X)),notrace) ; call(X).
+cli_notrace(X):- tracing -> with_assertions( tlbugger:wastracing,call_cleanup((notrace,call(X)),trace)) ; call(X).
+traceok(X):-  tlbugger:wastracing -> call_cleanup((trace,call(X)),notrace) ; call(X).
 
 
 % =========================================================================
 
-:- decl_thlocal( /*tlbugger:*/ skip_bugger/0).
+:- decl_thlocal( tlbugger:skip_bugger/0).
 
 % false = use this wrapper, true = code is good and avoid using this wrapper
-skipWrapper:- /*tlbugger:*/ skip_bugger.
+skipWrapper:- tlbugger:skip_bugger.
 skipWrapper:-tracing.
 % false = hide this wrapper
 showHiddens:-true.
 
-:-moo_hide_all( /*tlbugger:*/ skip_bugger).
+:-moo_hide_all( tlbugger:skip_bugger).
 :-moo_hide_all(skipWrapper).
 
 
@@ -1383,7 +1383,7 @@ set_yes_debug:-
    notrace, debug]),!.
 
 
-:- assert_if_new( /*tlbugger:*/ use_bugger_expansion).
+:- assert_if_new( tlbugger:use_bugger_expansion).
 
 % :- set_yes_debug.
 
@@ -1529,7 +1529,7 @@ forall_member(C,C1,Call):-forall(member(C,C1),once(Call)).
 
 must_assign(From=To):-must_assign(From,To).
 must_assign(From,To):-To=From,!.
-must_assign(From,To):- /*tlbugger:*/ skipMust,!,ignore(To=From),!.
+must_assign(From,To):- tlbugger:skipMust,!,ignore(To=From),!.
 must_assign(From,To):-dmsg(From),dmsg(=),dmsg(From),dmsg(must_assign),!,trace,To=From.
 
 
@@ -1561,7 +1561,7 @@ rtraceOnError(C):-
   with_skip_bugger( C ),E,(dmsg(rtraceOnError(E=C)),dtrace,leash(+call),trace,leash(+exception),leash(+all),rtrace(with_skip_bugger( C )),dmsg(E=C),leash(+call),dtrace)).
 
 
-with_skip_bugger(C):-setup_call_cleanup(asserta( /*tlbugger:*/ skip_bugger),C,retract( /*tlbugger:*/ skip_bugger)).
+with_skip_bugger(C):-setup_call_cleanup(asserta( tlbugger:skip_bugger),C,retract( tlbugger:skip_bugger)).
 
 debugOnError(C):- skipWrapper,!,C.
 debugOnError(C):- !,debugOnError0(C).
@@ -1779,10 +1779,10 @@ must_det_l([C|List]):-!,rmust_det(C),!,must_det_l(List).
 must_det_l((C,List)):-!,rmust_det(C),!,must_det_l(List).
 must_det_l(C):- !,must_det(C).
 
-:-decl_thlocal  /*tlbugger:*/ skip_use_slow_sanity/0.
-% thread locals should defaults to false  /*tlbugger:*/ skip_use_slow_sanity.
+:-decl_thlocal  tlbugger:skip_use_slow_sanity/0.
+% thread locals should defaults to false  tlbugger:skip_use_slow_sanity.
 
-slow_sanity(C):-  must(C),!. %  ( /*tlbugger:*/ skip_use_slow_sanity ; must_det(C)),!.
+slow_sanity(C):-  must(C),!. %  ( tlbugger:skip_use_slow_sanity ; must_det(C)),!.
 must_det(C):- must(C),!.
 
 one_must_det(Call,_OnFail):-Call,!.
@@ -1882,36 +1882,36 @@ to_thread_head(TL:Head,TL,TL:Head,Head):-!, check_thread_local(TL:Head).
 % to_thread_head(Head,Module,Module:Head,Head):-Head \= (_:_), predicate_module(Head,Module),!.
 to_thread_head(user:Head,user,user:Head,Head):- !.
 to_thread_head(Head,thlocal,thlocal:Head,Head):-!,check_thread_local(thlocal:Head).
-to_thread_head(Head,tlbugger, /*tlbugger:*/ Head,Head):- check_thread_local( /*tlbugger:*/ Head).
+to_thread_head(Head,tlbugger, tlbugger:Head,Head):- check_thread_local( tlbugger:Head).
 
 check_thread_local(thlocal:_):-!.
 check_thread_local(_):-!.
 check_thread_local(user:_):-!.
 check_thread_local(TL:Head):-slow_sanity(( predicate_property(TL:Head,(dynamic)),must_det(predicate_property(TL:Head,(thread_local))))).
 
-:-decl_thlocal( /*tlbugger:*/  /*tlbugger:*/ dmsg_match/2).
+:-decl_thlocal( tlbugger: tlbugger:dmsg_match/2).
 :-meta_predicate_transparent(with_all_dmsg(0)).
 :-meta_predicate_transparent(with_all_dmsg(0)).
 
 with_all_dmsg(Call):-
      with_assertions(set_prolog_flag(opt_debug,true),
-       with_no_assertions( /*tlbugger:*/ dmsg_match(hidden,_),Call)).
+       with_no_assertions( tlbugger:dmsg_match(hidden,_),Call)).
 with_show_dmsg(TypeShown,Call):-
   with_assertions(set_prolog_flag(opt_debug,filter),
-     with_assertions( /*tlbugger:*/ dmsg_match(showing,TypeShown),Call)).
+     with_assertions( tlbugger:dmsg_match(showing,TypeShown),Call)).
 
 :-meta_predicate_transparent(with_no_dmsg(0)).
 with_no_dmsg(Call):-with_assertions(set_prolog_flag(opt_debug,false),Call).
 with_no_dmsg(TypeUnShown,Call):-with_assertions(set_prolog_flag(opt_debug,filter),
-  with_assertions( /*tlbugger:*/ dmsg_match(hidden,TypeUnShown),Call)).
+  with_assertions( tlbugger:dmsg_match(hidden,TypeUnShown),Call)).
 
 dmsg_hides_message(_):- current_prolog_flag(opt_debug,false),!.
 dmsg_hides_message(_):- current_prolog_flag(opt_debug,true),!,fail.
-dmsg_hides_message(C):-  /*tlbugger:*/ dmsg_match(HideShow,Matcher),matches_term(Matcher,C),!,HideShow=hidden.
+dmsg_hides_message(C):-  tlbugger:dmsg_match(HideShow,Matcher),matches_term(Matcher,C),!,HideShow=hidden.
 
-dmsg_hide(Term):-must(nonvar(Term)),asserta_new( /*tlbugger:*/ dmsg_match(hidden,Term)),retractall( /*tlbugger:*/ dmsg_match(showing,Term)),nodebug(Term).
-dmsg_show(Term):-asserta_new( /*tlbugger:*/ dmsg_match(showing,Term)),ignore(retractall( /*tlbugger:*/ dmsg_match(hidden,Term))),debug(Term).
-dmsg_showall(Term):-ignore(retractall( /*tlbugger:*/ dmsg_match(hidden,Term))).
+dmsg_hide(Term):-must(nonvar(Term)),asserta_new( tlbugger:dmsg_match(hidden,Term)),retractall( tlbugger:dmsg_match(showing,Term)),nodebug(Term).
+dmsg_show(Term):-asserta_new( tlbugger:dmsg_match(showing,Term)),ignore(retractall( tlbugger:dmsg_match(hidden,Term))),debug(Term).
+dmsg_showall(Term):-ignore(retractall( tlbugger:dmsg_match(hidden,Term))).
 
 % =================================================================================
 % Utils
@@ -2674,7 +2674,7 @@ traceIf(Call):-ignore((Call,trace)).
 % Unlike cnotrace/1, it allows traceing when excpetions are raised during Goal.
 %hotrace(C):- skipWrapper,!,notrace(C).
 :-moo_hide_childs(hotrace/1).
-hotrace(X):- ( tracing -> with_assertions( /*tlbugger:*/ wastracing,call_cleanup((nop(notrace),call(X)),trace)) ; call(X) ).
+hotrace(X):- ( tracing -> with_assertions( tlbugger:wastracing,call_cleanup((nop(notrace),call(X)),trace)) ; call(X) ).
 
 
 :-'$syspreds':'$hide'(hotrace/1).
@@ -2759,7 +2759,7 @@ any_term_overlap(T1,T2):- atoms_of(T1,A1),atoms_of(T2,A2),!,member(A,A1),member(
 
 :-meta_predicate_transparent(call_tabled_can(0)).
 
-call_tabled_can(Call):-with_assertions( /*tlbugger:*/ can_table,with_no_assertions( /*tlbugger:*/ cannot_table,call_tabled(Call))).
+call_tabled_can(Call):-with_assertions( tlbugger:can_table,with_no_assertions( tlbugger:cannot_table,call_tabled(Call))).
 
 call_tabled(setof(Vars,C,List)):- !,call_setof_tabled(Vars,C,List).
 call_tabled(findall(Vars,C,List)):- !,call_setof_tabled(Vars,C,List).
@@ -2776,7 +2776,7 @@ call_tabled0(Key,_,_,List):- call_tabled_list(Key,List),!.
 call_tabled0(Key,Vars,C,List):- really_can_table,!,findall_nodupes(Vars,C,List),!,asserta_if_ground(call_tabled_list(Key,List)),!.
 call_tabled0(_,Vars,C,List):- findall_nodupes(Vars,C,List),!.
 
-really_can_table:-not(test_tl( /*tlbugger:*/ cannot_table)),test_tl( /*tlbugger:*/ can_table).
+really_can_table:-not(test_tl( tlbugger:cannot_table)),test_tl( tlbugger:can_table).
 
 
 :-meta_predicate_transparent(test_tl(1,+)).

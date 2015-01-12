@@ -21,7 +21,6 @@
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
-
 ztrace:-dmsg(ztrace),trace_or_throw(dtrace).
 
 :-meta_predicate_transparent(when_debugging(+,0)).
@@ -204,6 +203,11 @@ coerce(_ ,_,     NewThing,Else):- NewThing = Else.
 
 :- '@'(ensure_loaded(logicmoo(vworld/moo)),'user').
 :- '@'(ensure_loaded(dbase_i_formattypes),'user').
+:-decl_type(ttFormatType).
+:-decl_type(ttValueType).
+
+:- '@'(if_file_exists(ensure_loaded(logicmoo(snark/snark_in_prolog))),'user').
+
 
 % :-ensure_loaded(dbase_i_formattypes).
 
@@ -649,6 +653,7 @@ db_op0(Op,pddlObjects(Type,List)):- !,forall_member(I,List,must(db_reop(Op,mudIs
 db_op0(Op,pddlSorts(Type,List)):- !,forall_member(I,List,must(db_reop(Op, mudSubclass(I,Type)))).
 db_op0(Op,pddlTypes(List)):- !,forall_member(I,List,must(db_reop(Op, mudIsa(I,tCol)))).
 db_op0(Op,pddlPredicates(List)):- !,forall_member(T,List,must(db_reop(Op,tPred(T)))).
+db_op0(Op,typeProps(Type,List)):- fail,addTypeProps_getOverlap(Type,List,Overlap),!,db_op(Op,typePropSet(Type,Overlap)).
 db_op0(Op,EACH):- EACH=..[each|List],forall_member(T,List,must(db_reop(Op,T))).
 db_op0(change(assert,_),mpred_prop(F,A)):- !,must(decl_mpred(F,A)).
 
@@ -738,6 +743,7 @@ db_op_exact(change(assert,Must),C):- trace_or_throw(dtrace),functor_catch(C,F,A)
 %db_op_exact(Must, Term):- !,call_expanded_for(Must,Term).
 db_op_exact(Op,C):- trace_or_throw(unhandled(db_op_exact(Op,C))).
 
+addTypeProps_getOverlap(_Type,List,Overlap):-!,List=Overlap.
 
 :-swi_export((dbase_t/1,hasInstance/2)).
 :- dynamic_multifile_exported((

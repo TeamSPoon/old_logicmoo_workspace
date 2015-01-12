@@ -112,7 +112,7 @@ any_to_callable(C,X,Vs):- (expand_goal(C,X)),term_variables((C,X),Vs),!.
 
 agent_call_command(_Agent,actNpcTimer(Time)):-retractall(npc_tick_tock_time(_)),asserta(npc_tick_tock_time(Time)).
 agent_call_command(Who,actTick) :-  debugOnError(command_actTick(Who)).
-agent_call_command(_Agent,actIdea(Who)) :-  must(command_actIdea(Who,Idea)),agent_call_command(Who,actSay(Idea)).
+agent_call_command(_Agent,actIdea(Who)) :-  must(command_actIdea(Who,Idea)),fmt(result_actIdea(Who,Idea)).
 agent_call_command(_Agent,actTock) :- npc_tick.
 agent_call_command(_Agent,actTick(Other)) :-agent_call_command(Other,actTick).
 

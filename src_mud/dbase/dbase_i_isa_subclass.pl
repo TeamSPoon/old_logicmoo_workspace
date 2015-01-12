@@ -77,12 +77,12 @@ ttCreateable(Type):- arg(_,vv(tAgentGeneric,tItem,tRegion),Type).
 decl_database_hook(assert(_A_or_Z),mudIsa(W,ttCreateable)):-decl_type_safe(W),call_after_game_load(forall(mudIsa(I,W),create_instance(I,W))).
 decl_database_hook(assert(_A_or_Z),mudIsa(W,tCol)):- (test_tl(infSupertypeName);true),guess_supertypes(W).
 
-guess_supertypes(W):-atom(W),atomic_list_concat(List,'_',W),!,length(List,2),!, append(FirstPart,[Last],List),atom_length(Last,AL),AL>3,not(member(flagged,FirstPart)),atomic_list_concat(FirstPart,'_',_NewCol),show_call_failure(assert_subclass_safe(W,Last)).
+guess_supertypes(W):-atom(W),atomic_list_concat(List,'_',W),length(List,S),S>2,!, append(FirstPart,[Last],List),atom_length(Last,AL),AL>3,not(member(flagged,FirstPart)),atomic_list_concat(FirstPart,'_',_NewCol),show_call_failure(assert_subclass_safe(W,Last)).
 guess_supertypes(W):-atom(W),to_first_break(W,lower,tt,_,upper),!,assert_isa(W,ttTypeType),!.
-guess_supertypes(W):-atom(W),T=t,to_first_break(W,lower,T,All,upper),!,to_first_break(All,upper,_,Super,Rest),atom_length(Rest,L),!,L>2,i_name(T,Rest,Super),show_call_failure(assert_subclass_safe(W,Super)),!.
+guess_supertypes(W):-atom(W),T=t,to_first_break(W,lower,T,All,upper),!,to_first_break(All,upper,_,Super,Rest),
+   atom_length(Rest,L),!,L>2,i_name(T,Rest,Super),show_call_failure(assert_subclass_safe(W,Super)),!.
 
 
-% i_name(I,OType,IType)
 % ================================================
 % assert_isa/2
 % ================================================
@@ -225,6 +225,7 @@ isa_from_morphology(Inst,Type):-type_suffix(Suffix,Type),current_atom(Inst),atom
 
 type_suffix('Fn',ftFunctional).
 type_suffix('Type',ttTypeType).
+type_suffix('able',ttTypeByAction).
 
 
 type_prefix(is,ftSyntaxOperator).
@@ -242,6 +243,7 @@ type_prefix(ft,ttFormatType).
 type_prefix(pred,ttPredType).
 type_prefix(tt,ttTypeType).
 type_prefix(t,ttObjectType).
+type_prefix(a,ttAnyType).
 
 type_prefix(v,ftValue).
 type_prefix(i,ftID).

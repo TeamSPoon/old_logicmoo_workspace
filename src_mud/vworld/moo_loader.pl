@@ -136,6 +136,8 @@ etrace:-leash(-all),leash(+exception),trace.
 
 current_filesource(F):-seeing(X),stream_property(X,file_name(F)).
 
+:-export(onEndOfFile/1).
+:-dynamic(onEndOfFile/2).
 onEndOfFile(Call):-current_filesource(F),asserta(onEndOfFile(F,Call)).
 
 assert_until_end_of_file(Fact):-must_det_l((thread_local(Fact),asserta(Fact),onEndOfFile(retract(Fact)))).

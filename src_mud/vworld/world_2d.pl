@@ -238,10 +238,9 @@ ensure_in_world(What):-must_det(put_in_world(What)).
 
 % facts that cant be true
 
-% fact_is_false(atloc(Obj,_LOC),isa(Obj,region)).
-fact_is_false(mudAtLoc(Obj,_LOC),mudInsideOf(Obj,What)) :- nonvar(Obj),is_asserted(mudInsideOf(Obj,What)),not(mudIsa(What,tRegion)).
-fact_is_false(mudAtLoc(Obj,LOC),mudInsideOf(Obj,What)) :- nonvar(Obj),(mudInsideOf(Obj,What)),not(mudAtLoc(What,LOC)).
-fact_is_false(localityOfObject(Obj,_LOC),mudInsideOf(Obj,What)) :- nonvar(Obj),(mudInsideOf(Obj,What)),!.
+%fact_is_false(mudAtLoc(Obj,_LOC),mudInsideOf(Obj,What)) :- nonvar(Obj),is_asserted(mudInsideOf(Obj,What)),not(mudIsa(What,tRegion)).
+%fact_is_false(mudAtLoc(Obj,LOC),mudInsideOf(Obj,What)) :- nonvar(Obj),(mudInsideOf(Obj,What)),not(mudAtLoc(What,LOC)).
+%fact_is_false(localityOfObject(Obj,_LOC),mudInsideOf(Obj,What)) :- nonvar(Obj),(mudInsideOf(Obj,What)),!.
 
 % facts that must be true 
 %  suggest a deducable fact that is always defiantely true but not maybe asserted
