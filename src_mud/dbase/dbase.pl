@@ -206,7 +206,7 @@ coerce(_ ,_,     NewThing,Else):- NewThing = Else.
 :-decl_type(ttFormatType).
 :-decl_type(ttValueType).
 
-:- '@'(if_file_exists(ensure_loaded(logicmoo(snark/snark_in_prolog))),'user').
+:- '@'(if_file_exists(ensure_loaded(logicmoo('../externals/MUD_ScriptEngines/snark/snark_in_prolog'))),'user').
 
 
 % :-ensure_loaded(dbase_i_formattypes).

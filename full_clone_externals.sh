@@ -15,16 +15,20 @@ fi
 # very fun complex stuff
 git clone $GITRC https://github.com/TeamSPoon/MUD_PDDL $MUDPACK/MUD_PDDL
 git clone $GITRC https://github.com/TeamSPoon/MUD_DeepParsing $MUDPACK/MUD_DeepParsing
+git clone $GITRC https://github.com/TeamSPoon/MUD_ScriptEngines $MUDPACK/MUD_ScriptEngines
+
 
 # even more fun complex stuff
 git clone $GITRC https://github.com/TeamSPoon/MUD_KnowRob $MUDPACK/MUD_KnowRob
 git clone $GITRC -b indigo-devel --single-branch https://github.com/TeamSPoon/knowrob_addons.git $MUDPACK/MUD_KnowRob/knowrob_addons
 git clone $GITRC -b indigo-devel --single-branch https://github.com/TeamSPoon/knowrob.git $MUDPACK/MUD_KnowRob/knowrob
 git clone $GITRC https://github.com/TeamSPoon/iai_maps.git $MUDPACK/MUD_KnowRob/iai_maps
+git clone $GITRC https://github.com/TeamSPoon/DLog $MUDPACK/MUD_DLog
 
 # up and comming (not usefull yet)
 git clone $GITRC https://github.com/TeamSPoon/MUD_WebTHEA $MUDPACK/MUD_WebTHEA
-git clone $GITRC https://github.com/TeamSPoon/MUD_ScriptEngines $MUDPACK/MUD_ScriptEngines
+
+git clone $GITRC https://github.com/TeamSPoon/MUD_DB_LeanCOR $MUDPACK/MUD_DB_LeanCOR
 
 
 # svn co http://roboticssrv.wtb.tue.nl/svn/ros/user/loyvanbeek/  $MUDPACK/loyvanbeek

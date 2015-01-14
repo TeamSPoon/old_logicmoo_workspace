@@ -3,6 +3,8 @@
 
 */
 
+:- multifile(user:mud_regression_test/0).
+
 :- set_prolog_flag(generate_debug_info, true).
 :- exists_directory(runtime)->cd(runtime);(exists_directory('../runtime')->cd('../runtime');true).
 
@@ -63,6 +65,13 @@ user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),s
 % :- add_game_dir('../games/src_game_unknown',prolog_repl).     
 
 :- onSpawn(pathConnects(tLivingRoom,tOfficeRoom)).
+
+% int_firstOrder(some_query, 666, What, C, E, A, J, D, L, B)
+:- forall(clause(user:mud_regression_test,Call),must(Call)).
+
+:- prolog_repl.
+
+:- prolog.
 
 :- declare_load_game('../games/src_game_nani/a_nani_household.plmoo').
 :- declare_load_game('../games/src_game_nani/objs_misc_household.plmoo').

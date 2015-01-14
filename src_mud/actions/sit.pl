@@ -32,7 +32,7 @@ action_info(Posture,ftText("sets and agent's stance to ",Posture)):-moo_posture(
 % Sit and do nothing.
 agent_call_command(Agent,Verb):- compound(Verb), functor(Verb,Sit,1),moo_posture(Sit),arg(1,Verb,Where),agent_call_command(Agent,actOnto(Where,Sit)).
 
-action_info(actOnto(isOptional(tFurniture,isSelfRegion),vPosture),txtConcatFn("onto tObj do ",Posture)):-moo_posture(PostureV).
+action_info(actOnto(isOptional(tFurniture,isSelfRegion),vPosture),txtConcatFn("onto tObj do ",Posture)):-moo_posture(Posture).
 
 agent_call_command(Agent,actOnto(Where,Sit)):-
         fmt('agent ~w is now ~wing on ~w',[Agent,Sit,Where]),

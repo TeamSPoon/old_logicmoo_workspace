@@ -200,7 +200,7 @@ nop(_).
 
 % functor_safe(P,F,A):- catch(compound_name_arity(P,F,A),_,functor(P,F,A)).
 
-erase_safe(Which,REF):-var(REF)-> ddmsg(var_erase_safe(Which,REF)) ; erase(REF).
+erase_safe(Which,REF):- notrace((var(REF)-> ddmsg(var_erase_safe(Which,REF)) ; erase(REF))).
 
 ib_multi_transparent33(MT):-multifile(MT),module_transparent(MT),dynamic_safe(MT).
 
@@ -560,16 +560,17 @@ loop_check_local(Call,TODO):- loop_check_module(current,Call,TODO).
 
 % loop_check_local(Call):- loop_check_local(Call,trace_or_throw(syntax_loop_check_local(Call))).
 loop_check_module(Module,Call):-loop_check_module(Module,Call,fail).
-loop_check_module(Module,Call,TODO):- make_key(Call,Key), LC = ilc_local(Module,Key),  ( \+(LC) -> (setup_call_cleanup(asserta(LC,REF),Call,erase_safe(asserta(LC,REF),REF))); call(TODO) ).
+loop_check_module(Module,Call,TODO):- make_key(Call,Key), LC = ilc_local(Module,Key),  
+ ( \+(LC) -> (setup_call_cleanup(asserta(LC,REF),Call,erase_safe(LC:loop_check_module(Module,Call,TODO),REF))); call(TODO) ).
 
 loop_check_term(Call,Key,TODO):- TT = ilc(Key),
-   ( \+(TT) -> (setup_call_cleanup(asserta(TT,REF), Call, erase_safe(loop_check_term(Call,Key,TODO),REF))) ; call(TODO) ).
+ ( \+(TT) -> (setup_call_cleanup(asserta(TT,REF), Call, erase_safe(TT:loop_check_term(Call,Key,TODO),REF))) ; call(TODO) ).
 
 % ===================================================================
 % Bugger Term Expansions
 % ===================================================================
 
-is_hiding_dmsgs:-bugger_flag(opt_debug,false),!.
+is_hiding_dmsgs:-current_prolog_flag(opt_debug,false),!.
 
 % bugger_debug=false turns off just debugging about the debugger
 % opt_debug=false turns off all the rest of debugging
@@ -1379,11 +1380,11 @@ set_yes_debug:-
    set_gui_debug(true),
    leash(+all),
    leash(+exception),
-   visible(+cut_call),!,
+   visible(+cut_call),
    notrace, debug]),!.
 
 
-:- assert_if_new( tlbugger:use_bugger_expansion).
+:- assert_if_new(tlbugger:use_bugger_expansion).
 
 % :- set_yes_debug.
 
@@ -1825,48 +1826,19 @@ with_assertions(op(N,XFY,OP),Call):-!,
 with_assertions(set_prolog_flag(N,XFY),Call):-!,
      (current_prolog_flag(N,WAS);WAS=unUSED),!,     
      (XFY==WAS -> Call ; 
-     (
-       setup_call_cleanup(set_prolog_flag(N,XFY),Call,(WAS=unUSED->true;set_prolog_flag(N,WAS))))).
+     (setup_call_cleanup(set_prolog_flag(N,XFY),Call,(WAS=unUSED->true;set_prolog_flag(N,WAS))))).
 
 with_assertions(before_after(Before,After),Call):-!,
      (Before -> setup_call_cleanup(true,Call,After);Call).
 
-% with_assertions(THead,Call):- functor_safe(THead,F,_),b_setval(F,THead).
-
-/*
-with_assertions(THead,Call):- ground(THead),!,
- must_det(to_thread_head(THead,M,_Head,WithA)),
-   ( M:WithA -> Call ; setup_call_cleanup(M:asserta(WithA),Call,must_det(M:retract(WithA)))).
-*/
-
-with_assertions(THead,Call):- to_thread_head(THead,M,_Head,HAssert), !, 
-     setup_call_cleanup(asserta(M:HAssert,REF),Call,erase_safe(asserta(M:HAssert,REF),REF)).
-
-/*
-
-with_assertions(THead,Call):- !,
- must_det(to_thread_head(THead,M,_Head,H)),
-   copy_term(H,  WithA), !,
-   setup_call_cleanup(M:asserta(WithA),Call,must_det(M:retract(WithA))).
-
-
 with_assertions(THead,Call):- 
- must_det(to_thread_head(THead,M,_Head,H)),
-   copy_term(H,  WithA), !,
-   with_assertions(M,WithA,Call).
-   
-:- meta_predicate_transparent(with_assertions(+,+,0)).
-with_assertions(M,WithA,Call):- M:WithA,!,Call.
-with_assertions(M,WithA,Call):-
-   setup_call_cleanup(M:asserta(WithA),Call,must_det(M:retract(WithA))).
-
-*/
+ (to_thread_head(THead,M,_Head,HAssert) -> true; throw(to_thread_head(THead,M,_Head,HAssert))),
+     setup_call_cleanup(M:asserta(HAssert,REF),Call,erase_safe(asserta(M:HAssert,REF),REF)).
 
 :-meta_predicate_transparent(with_no_assertions(+,0)).
-with_no_assertions(THead,Call):-
- must_det(to_thread_head((THead:- (!,fail)),M,_HEAD,H)),
-   copy_term(H, WithA), !,
-    setup_call_cleanup(M:asserta(WithA,REF),Call,erase_safe(M:asserta(WithA,REF),REF)).
+with_no_assertions(UHead,Call):- THead = (UHead:- (!,fail)),
+   (to_thread_head(THead,M,_Head,HAssert) -> true; throw(to_thread_head(THead,M,_Head,HAssert))),
+       setup_call_cleanup(M:asserta(HAssert,REF),Call,erase_safe(asserta(M:HAssert,REF),REF)).
 
 /*
 old version
@@ -1895,7 +1867,7 @@ check_thread_local(TL:Head):-slow_sanity(( predicate_property(TL:Head,(dynamic))
 
 with_all_dmsg(Call):-
      with_assertions(set_prolog_flag(opt_debug,true),
-       with_no_assertions( tlbugger:dmsg_match(hidden,_),Call)).
+       with_assertions( tlbugger:dmsg_match(show,_),Call)).
 with_show_dmsg(TypeShown,Call):-
   with_assertions(set_prolog_flag(opt_debug,filter),
      with_assertions( tlbugger:dmsg_match(showing,TypeShown),Call)).
@@ -1905,6 +1877,7 @@ with_no_dmsg(Call):-with_assertions(set_prolog_flag(opt_debug,false),Call).
 with_no_dmsg(TypeUnShown,Call):-with_assertions(set_prolog_flag(opt_debug,filter),
   with_assertions( tlbugger:dmsg_match(hidden,TypeUnShown),Call)).
 
+dmsg_hides_message(_):- !,fail.
 dmsg_hides_message(_):- current_prolog_flag(opt_debug,false),!.
 dmsg_hides_message(_):- current_prolog_flag(opt_debug,true),!,fail.
 dmsg_hides_message(C):-  tlbugger:dmsg_match(HideShow,Matcher),matches_term(Matcher,C),!,HideShow=hidden.
@@ -2109,27 +2082,22 @@ matches_term0(F/A,Term):- (var(A)->member(A,[0,1,2,3,4]);true), functor_safe(Fil
 matches_term0(Filter,Term):- sub_term(STerm,Term),nonvar(STerm),matches_term0(Filter,STerm),!.
 
 dmsginfo(V):-dmsg(info(V)).
-dmsg(V):- notrace(once(dmsg0(V))).
+dmsg(V):- notrace(dmsg0(V)).
 :-'$syspreds':'$hide'(dmsg/1).
 
 dmsg0(V):- is_with_dmsg(FP),!,FP=..FPL,append(FPL,[V],VVL),VV=..VVL,once(dmsg0(VV)).
-%DMILES 
-dmsg0(_):- is_hiding_dmsgs,!.
+%DMILES  dmsg0(_):- is_hiding_dmsgs,!.
 dmsg0(V):- var(V),!,dmsg0(dmsg_var(V)).
-dmsg0(V):- (doall((once(dmsg1(V)),hook:dmsg_hook(V)))),!.
-/*
+dmsg0(V):- once(dmsg1(V)), doall((hook:dmsg_hook(V))).
 dmsg1(trace_or_throw(V)):- dumpST(15),print_message(warning,V),fail.
 dmsg1(error(V)):- print_message(warning,V),fail.
-dmsg1(warn(V)):- dumpST(6),print_message(warning,V),fail.
-*/
+% dmsg1(warn(V)):- dumpST(6),print_message(warning,V),fail.
 dmsg1(skip_dmsg(_)):-!.
-%DMILES  
-dmsg1(C):-dmsg_hides_message(C),!.
+%DMILES  dmsg1(C):-dmsg_hides_message(C),!.
 dmsg1(ansi(Ctrl,Msg)):- ansicall(Ctrl,dmsg1(Msg)).
-dmsg1(C):-functor_safe(C,Topic,_),debugging(Topic,_True_or_False),!,logger_property(Topic,once,true),!,
+dmsg1(C):-functor_safe(C,Topic,_),debugging(Topic,_True_or_False),logger_property(Topic,once,true),!,
       (dmsg_log(Topic,_Time,C) -> true ; ((get_time(Time),asserta(dmsg_log(todo,Time,C)),!,dmsg2(C)))).
 
-dmsg1(ansi(Ctrl,Msg)):- !, ansicall(Ctrl,dmsg2(Msg)).
 dmsg1(Msg):- mesg_color(Msg,Ctrl),!,ansicall(Ctrl, dmsg2(Msg)).
 
 dmsg2(C):-not(ground(C)),copy_term(C,Stuff), snumbervars(Stuff),!,dmsg3(Stuff).
