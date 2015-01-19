@@ -66,9 +66,9 @@ ft_info_how(FT,self_call(Info)):-mudFtInfo(FT,Info),Info\=vFormatted.
 trans_subft_info(FT,Info):-ft_info_how(FT,Info).
 trans_subft_info(FT,Info):-trans_subft(Sub,FT),ft_info_how(Sub,Info),!.
 trans_subft_info(FT,Info):-trans_subft(FT,Sub),ft_info_how(Sub,Info),!.
-trans_subft(FT,Sub):-mudSubft(FT,Sub).
-trans_subft(FT,Sub):-mudSubft(FT,A),mudSubft(A,Sub).
-trans_subft(FT,Sub):-mudSubft(FT,A),mudSubft(A,B),mudSubft(B,Sub).
+trans_subft(FT,Sub):-mudSubclass(FT,Sub).
+trans_subft(FT,Sub):-mudSubclass(FT,A),mudSubclass(A,Sub).
+trans_subft(FT,Sub):-mudSubclass(FT,A),mudSubclass(A,B),mudSubclass(B,Sub).
 
 sameArgTypes(A,C):-same(A,C);(pl_arg_type(C,CT),pl_arg_type(A,AT),!,colsOverlap(AT,CT)).
 colsOverlap(AT,AT).
@@ -176,7 +176,7 @@ argIsa_call_3(mudTermAnglify,ftTerm).
 argIsa_call_3(mudFacing,ftTerm).
 argIsa_call_3(vFormatted,ftTerm).
 argIsa_call_3(mudSubclass,tCol).
-argIsa_call_3(mudSubft,ttFormatType).
+argIsa_call_3(mudSubclass,ttFormatType).
 
 % argIsa_call_0(HILOG,_,term):-hilog_functor(HILOG).
 
@@ -208,6 +208,7 @@ argIsa_call_1(F,_,ftTerm(ftCallable)):-member(F/_,
 argIsa_call_1(Prop,N1,Type):- dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),must( Type=argIsaFn(Prop,N1)).
 argIsa_call_1(_,_,ftTerm).
 argIsa_call_1(mudFacing,_,ftTerm).
+
 
 :-swi_export(db_quf/4).
 db_quf(Op,M:C,Pretest,Template):-var(C),!,throw(var(db_quf(Op,M:C,Pretest,Template))).
@@ -473,7 +474,7 @@ correctType(Op,Args,Types,NewArgs):-compound(Args), compound(Types),
 
 correctType(Op,A,Fmt,AA):- mudFtInfo(Fmt,vFormatted),!,correctFormatType(Op,A,vFormatted(Fmt),AA).
 correctType(_O,A,Fmt,A):- mudFtInfo(Fmt,Code),!,subst(Code,isSelf,A,Call),with_assertions(thlocal:no_arg_type_error_checking,show_call_failure(req(Call))).   
-correctType(Op,A,Super,AA):- ttFormatType(Super),req(mudSubft(Sub,Super)),Sub\=Super,correctType(Op,A,Sub,AA).
+correctType(Op,A,Super,AA):- ttFormatType(Super),req(mudSubclass(Sub,Super)),Sub\=Super,correctType(Op,A,Sub,AA).
 
 correctType(Op,Arg,Props,NewArg):- compound(Props),
    Props=..[F|TypesL],

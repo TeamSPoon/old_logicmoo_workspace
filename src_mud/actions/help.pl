@@ -1,5 +1,5 @@
 % :-swi_module(user). 
-:-swi_module(actHelp, [show_help/0]).
+:-swi_module(modHelp, [show_help/0]).
 /** <module> A command to tell an agent all the possible commands
 % help.pl
 % Douglas Miles 2014

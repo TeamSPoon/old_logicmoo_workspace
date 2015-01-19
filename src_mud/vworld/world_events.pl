@@ -18,6 +18,7 @@ asInvoked(Cmd,[L|Ist]):-atom(L),not(bad_functor(L)),!, Cmd=..[L|Ist].
 asInvoked(Cmd,[L|Ist]):-!,Cmd=..[asInvoked,L|Ist].
 asInvoked(Cmd,Cmd):-!.
 
+:-decl_mpred_prolog(mudObjNearLoc(tObj,tObj)).
 mudObjNearLoc(Whom,Where):-nonvar(Where),!,findall(Whom,atlocNear0(Whom,Where),List),list_to_set(List,Set),!,member(Whom,Set).
 mudObjNearLoc(Whom,Where):-nonvar(Whom),!,findall(Where,atlocNear0(Whom,Where),List),list_to_set(List,Set),!,member(Where,Set).
 mudObjNearLoc(Whom,Where):-findall(Whom+Where,atlocNear0(Whom,Where),List),list_to_set(List,Set),!,member(Whom+Where,Set).
@@ -42,7 +43,7 @@ direct_to_agent(Whom,NewEvent):- dmsg(could_not(direct_to_agent(Whom,NewEvent)))
 get_agent_stream(Whom,Input,Output):- thglobal:agent_message_stream(Whom,_,Input,Output),is_stream(Input),is_stream(Output),!.
 get_agent_stream(Whom,_Input,_Output):-ignore(retract(thglobal:agent_message_stream(Whom,_,_,_))),!,fail.
 
-:-swi_export(deliverable_location_events/3).
-:-decl_mpred_prolog(deliverable_location_events(tAgentGeneric,tRegion,ftTerm)).
+:-swi_export(mudDeliverableLocationEvents/3).
+:-decl_mpred_hybrid(mudDeliverableLocationEvents(tAgentGeneric,tRegion,ftTerm)).
 
-deliverable_location_events(Agent,Loc,actTick(Agent,Loc)):-fail.
+mudDeliverableLocationEvents(Agent,Loc,actTick(Agent,Loc)).

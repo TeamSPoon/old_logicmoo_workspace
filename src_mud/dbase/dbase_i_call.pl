@@ -146,7 +146,7 @@ call_mpred(true):-!.
 call_mpred(M:C):-atom(M),!,with_assertions(thlocal:caller_module(prolog,M),call_mpred_0(C)).
 call_mpred(C):-call_mpred_0(C).
 
-call_mpred_0(show_room_grid(W)):-!,show_room_grid(W).
+call_mpred_0(cmdShowRoomGrid(W)):-!,cmdShowRoomGrid(W).
 call_mpred_0(C):- compound(C),!,functor(C,F,_),!,call_mpred(F,C).
 call_mpred_0(C):- debugOnError(C),!.  % just atoms
 
@@ -155,6 +155,7 @@ call_mpred_0(C):- debugOnError(C),!.  % just atoms
 % call_mpred(_,Goal):-mcall(Goal).
 call_mpred(_,C):- into_mpred_form(C,MP),MP\=@=C,!,call_mpred(MP).
 call_mpred(_,dbase_t([H|T])):- !,dbase_t([H|T]).
+call_mpred(F,C):- mpred_prop(F,prologPTTP),!,debugOnError(pttp_call(C)).
 call_mpred(dbase_t,C):- trace_or_throw(not_into_mpred_form(C)),!.
 call_mpred(F,C):- mpred_prop(F,prologOnly),!,must_det(is_callable(C)),!,debugOnError(C).
 
@@ -190,6 +191,7 @@ call_only_backchain_0(F,C):- loop_check(C,call_only_backchain_lc(F,C)).
 
 call_only_backchain_lc(F,C):- mpred_prop(F,predProxyQuery(P)),PC=..[P,C],!,req(PC).
 call_only_backchain_lc(F,C):- mpred_prop(F,prologOnly),!,predicate_property(C,number_of_rules(N)),N>0,!,clause(C,Body),body_no_backchains(C,Body).
+call_only_backchain_lc(F,C):- mpred_prop(F,prologPTTP),!,pttp_call(C).
 call_only_backchain_lc(_,C):- ruleHybridChain(C,BODY),call_mpred_body(C,BODY).
 % TODO call_only_backchain_lc(_,_,_,dbase_t(F,Obj,LValue)):-  choose_val(F,Obj,LValue).
 
@@ -222,75 +224,6 @@ relax_term(P,P,Ai,Ac,Bi,Bc):- when_met(pred(nonvar,Ac),when_met(pred(nonvar,Bc),
 
 % ?- member(R,[a,b,c]),when_met(nonvar(Re), dbase:same_arg(same_or(termOfUnit),n,Re)),Re=R,write(chose(R)).
 
-% ================================================================================
-% begin holds_t
-% ================================================================================
-
-
-dbase_t(C,I):- trace_or_throw(dbase_t(C,I)),fail,loop_check_term(isa_backchaing(I,C),hasInstance(C,I),fail).
-
-%dbase_t([P|LIST]):- !,dbase_plist_t(P,LIST).
-%dbase_t(naf(CALL)):-!,not(dbase_t(CALL)).
-%dbase_t(not(CALL)):-!,dbase_f(CALL).
-dbase_t(CALL):- into_plist(CALL,[P|LIST]),dbase_plist_t(P,LIST).
-dbase_plist_t(P,[]):-!,dbase_t(P).
-dbase_plist_t(P,LIST):-var(P),!,CALL=..[dbase_t,P|LIST],debugOnError((CALL)).
-dbase_plist_t(dbase_t,LIST):-!, CALL=..[dbase_t|LIST],call(CALL),debugOnError((CALL)).
-dbase_plist_t(mpred_prop,[C,I]):-!,ground(I:C),mpred_prop(C,I).
-dbase_plist_t(mudIsa,[I,C]):-!,hasInstance(C,I).
-dbase_plist_t(P,_):-never_dbase_mpred(P),!,fail.
-dbase_plist_t(P,[L|IST]):-is_holds_true(P),!,dbase_plist_t(L,IST).
-dbase_plist_t(P,LIST):-is_holds_false(P),!,dbase_f(LIST).
-dbase_plist_t(P,LIST):- CALL=..[dbase_t,P|LIST],call(CALL),debugOnError((CALL)).
-
-loop_check_mpred(Call):- !, fail,not(thlocal:infInstanceOnly(_)),loop_check_local(ireq(Call),fail).
-% loop_check_mpred(Call):-loop_check_local(call_mpred(dbase_t,Call),fail).
-
-dbase_t(P,A1,A2,A3,A4,A5,A6,A7):- loop_check_mpred(dbase_t(P,A1,A2,A3,A4,A5,A6,A7)).
-dbase_t(P,A1,A2,A3,A4,A5,A6):- loop_check_mpred(dbase_t(P,A1,A2,A3,A4,A5,A6)).
-dbase_t(P,A1,A2,A3,A4,A5):- loop_check_mpred(dbase_t(P,A1,A2,A3,A4,A5)).
-dbase_t(P,A1,A2,A3,A4):- loop_check_mpred(dbase_t(P,A1,A2,A3,A4)).
-dbase_t(P,A1,A2,A3):- loop_check_mpred(dbase_t(P,A1,A2,A3)).
-dbase_t(P,A1,A2):- loop_check_mpred(dbase_t(P,A1,A2)).
-
-isCycPredArity_ignoreable(F,A):- ignore(mpred_prop(F,cycPred(A))),ignore(mpred_arity(F,A)).
-
-which_t(dac(d,a_notnow,c,no_fallback)).
-
-holds_t(P,A1,A2,A3,A4,A5,A6,A7):- isCycPredArity_ignoreable(P,7),which_t(DBS),(call_which_t(DBS,P,A1,A2,A3,A4,A5,A6,A7);call_mt_t(DBS,P,A1,A2,A3,A4,A5,A6,A7,_,_);assertion_t([P,A1,A2,A3,A4,A5,A6,A7])).
-holds_t(P,A1,A2,A3,A4,A5,A6):- isCycPredArity_ignoreable(P,6),which_t(DBS),(call_which_t(DBS,P,A1,A2,A3,A4,A5,A6);call_mt_t(DBS,P,A1,A2,A3,A4,A5,A6,_,_)).
-holds_t(P,A1,A2,A3,A4,A5):- isCycPredArity_ignoreable(P,5),which_t(DBS),(call_which_t(DBS,P,A1,A2,A3,A4,A5);call_mt_t(DBS,P,A1,A2,A3,A4,A5,_,_)).
-holds_t(P,A1,A2,A3,A4):- isCycPredArity_ignoreable(P,4),which_t(DBS),(call_which_t(DBS,P,A1,A2,A3,A4);call_mt_t(DBS,P,A1,A2,A3,A4,_,_)).
-holds_t(P,A1,A2,A3):- isCycPredArity_ignoreable(P,3),which_t(DBS),(call_which_t(DBS,P,A1,A2,A3);call_mt_t(DBS,P,A1,A2,A3,_,_)).
-%holds_t(P,A1,A2):- hotrace(holds_relaxed_t(P,A1,A2)).
-holds_t(P,A1,A2):- isCycPredArity_ignoreable(P,2),which_t(DBS),(call_which_t(DBS,P,A1,A2);call_mt_t(DBS,P,A1,A2,_,_)).
-holds_t(P,A1):- isCycPredArity_ignoreable(P,1),which_t(DBS),(call_which_t(DBS,P,A1);call_mt_t(DBS,P,A1,_,_)).
-
-
-% holds_relaxed_t(P,A1,A2):-var(A1),var(A2),!,dbase_t(P,A1,A2).
-holds_relaxed_t(P,A1,A2):-
-  isCycPredArity_ignoreable(P,2),which_t(DBS),
-      relax_term(P,PR,A1,R1,A2,R2),
-         holds_relaxed_0_t(DBS,PR,R1,R2).
-
-holds_relaxed_0_t(DBS,P,A1,A2):- call_which_t(DBS,P,A1,A2).
-holds_relaxed_0_t(DBS,P,A1,A2):- call_mt_t(DBS,P,A1,A2,_,_).
-
-/*
-holds_relaxed_0_t(dac(_,a,_,_),P,A1,A2):- assertion_t([P,A1,A2]).
-holds_relaxed_0_t(dac(d,_,_,_),P,A1,A2):- dbase_t(P,A1,A2).
-holds_relaxed_0_t(dac(_,_,_,h),P,A1,A2):- call_which_t(DBS,P,A1,A2).
-holds_relaxed_0_t(DBS,P,A1,A2):- call_mt_t(DBS,P,A1,A2,_,_).
-holds_relaxed_0_t(_DBS,P,A1,A2):- ground((P,A1)), TEMPL=..[P,T1,_],dbase_t(argSingleValueDefault,TEMPL,2,A2),req(isa(A1,T1)),!.
-*/
-
-holds_t([AH,P|LIST]):- is_holds_true(AH),!,holds_plist_t(P,LIST).
-holds_t([AH,P|LIST]):- is_holds_false(AH),!,holds_f_p2(P,LIST).
-holds_t([P|LIST]):- !,holds_plist_t(P,LIST).
-holds_t(not(CALL)):- !, holds_f(CALL).
-holds_t(CALL):- '=..'(CALL,PLIST),holds_t(PLIST).
-
-holds_plist_t(P,LIST):- apply(holds_t,[P|LIST]).
 
 
 call_whichlist_t(dac(d,_,_,_),CALL,_):- dbase_t(CALL).

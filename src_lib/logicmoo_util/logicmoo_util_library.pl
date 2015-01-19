@@ -206,7 +206,7 @@ nd_predsubst2( _, L, L ).
 % ===================================================================
 % Substitution based on +PRED
 % ===================================================================
-
+/*
 % Usage: subst(+Pred,+Fml,+X,+Sk,?FmlSk)
 
 pred_subst(Pred,A,B,C,D):-  ccatch(hotrace(nd_pred_subst(Pred,A,B,C,D)),E,(dumpST,dmsg(E:nd_pred_subst(Pred,A,B,C,D)),fail)),!.
@@ -228,6 +228,18 @@ nd_pred_subst2(Pred, X, Sk, [A|As], [Sk|AS] ) :- call(Pred, X , A), !, nd_pred_s
 nd_pred_subst2(Pred, X, Sk, [A|As], [A|AS]  ) :- var(A), !, nd_pred_subst2(Pred, X, Sk, As, AS).
 nd_pred_subst2(Pred, X, Sk, [A|As], [Ap|AS] ) :- nd_pred_subst(Pred, A,X,Sk,Ap ),nd_pred_subst2(Pred, X, Sk, As, AS).
 nd_pred_subst2(_, _X, _Sk, L, L ).
+
+*/
+
+% -- CODEBLOCK
+% Usage: pred_subst(+Pred,+Fml,+X,+Sk,?FmlSk)
+:-export(pred_subst/5).
+
+pred_subst( Pred, P,       X,Sk,       P1    ) :- call(Pred,P,X),!,must( Sk=P1),!.
+pred_subst(_Pred, P,       _,_ ,       P1    ) :- is_ftVar(P),!, must(P1=P),!.
+pred_subst( Pred,[P|Args], X,Sk,    [P1|ArgS]) :- !, pred_subst(Pred,P,X,Sk,P1),!, must(pred_subst( Pred, Args,X, Sk, ArgS )),!.
+pred_subst( Pred, P,       X,Sk,       P1    ) :- compound(P),!, P =..Args, pred_subst( Pred, Args,X, Sk, ArgS ),!, must(P1 =..ArgS),!.
+pred_subst(_Pred ,P,       _, _,       P     ).
 
 % dcgPredicate(M,F,A,P).
 

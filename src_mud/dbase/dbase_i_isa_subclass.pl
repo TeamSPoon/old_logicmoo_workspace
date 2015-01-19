@@ -23,7 +23,7 @@ decl_type((A,L)):-!,decl_type(A),decl_type(L).
 
 
 decl_type(Spec):- compound(Spec),must_det(define_compound_as_type(Spec)).
-decl_type(Spec):- decl_mpred(Spec,1),declare_dbase_local_dynamic(Spec,1), decl_type_unsafe(Spec).
+decl_type(Spec):- decl_mpred(Spec,1), decl_type_unsafe(Spec).
 
 decl_type_unsafe(Spec):- hasInstance(tCol,Spec),!.
 decl_type_unsafe(Spec):- hooked_asserta(mudIsa(Spec,tCol)),assert_hasInstance(tCol,Spec).
@@ -91,6 +91,7 @@ guess_supertypes(W):-atom(W),T=t,to_first_break(W,lower,T,All,upper),!,to_first_
 
 assert_isa(I,T):- not(ground(I:T)),trace_or_throw(not(ground(assert_isa(I,T)))).
 assert_isa(_,ftTerm):-!.
+assert_isa(_,prologOnly):-!.
 assert_isa(_,ftTerm(_)):-!.
 assert_isa(I,T):- loop_check(assert_isa_lc(I,T),true).
 
@@ -125,6 +126,7 @@ assert_isa_hooked(T,ttFormatType):-!,define_ft(T),!.
 assert_isa_hooked(Term,tPred):-!,decl_mpred(Term).
 assert_isa_hooked(Term,prologHybrid):-!,decl_mpred_hybrid(Term).
 assert_isa_hooked(Term,prologOnly):-!,decl_mpred_prolog(Term).
+assert_isa_hooked(Term,prologPTTP):-!,decl_mpred_hybrid(Term,prologPTTP).
 assert_isa_hooked(I,_):- glean_pred_props_maybe(I),fail.
 assert_isa_hooked(I,T):- ttDeclarer(T),decl_mpred(I,T),fail.
 assert_isa_hooked(food5,tWeapon):-trace_or_throw(assert_isa(food5,tWeapon)).
@@ -283,7 +285,7 @@ isa_asserted_0(I,T):- hasInstance(T,I).   %isa_asserted_0(I,T):-clause(hasInstan
 
 isa_asserted_0(I,T):-nonvar(T),isa_asserted_1(I,T).
 
-isa_asserted_1(I,T):-T\=mped_type(_),mpred_prop(I,T).
+isa_asserted_1(I,T):-T\=predStubType(_),mpred_prop(I,T).
 isa_asserted_1(I,'&'(T1 , T2)):-nonvar(T1),var(T2),!,dif:dif(T1,T2),isa_backchaing(I,T1),impliedSubClass(T1,T2),isa_backchaing(I,T2).
 isa_asserted_1(I,'&'(T1 , T2)):-nonvar(T1),!,dif:dif(T1,T2),isa_backchaing(I,T1),isa_backchaing(I,T2).
 isa_asserted_1(I,(T1 ; T2)):-nonvar(T1),!,dif:dif(T1,T2),isa_backchaing(I,T1),isa_backchaing(I,T2).
@@ -458,7 +460,7 @@ not_mud_isa(tObj, ttCreateable).
 not_mud_isa(prologMacroHead, ttFormatType).
 not_mud_isa(tObj, ttFormatType).
 not_mud_isa(ttFormatType,ttFormatType).
-not_mud_isa(mudSubft,tCol).
+not_mud_isa(mudSubclass,tCol).
 not_mud_isa(tTemporallyExistingThing, tTemporallyExistingThing).
 not_mud_isa(ttCreateable,tTemporallyExistingThing).
 not_mud_isa(Type,ttFormatType):- \+ (hasInstance(ttFormatType, Type)).
@@ -493,5 +495,5 @@ disjointWith(A,B):- once((type_isa(A,AT),type_isa(B,BT))),AT \= BT.
 :- assert_hasInstance(tCol,tContainer).
 
 ttFormatType(I):- clause(mudFtInfo(I,_),true).
-ttFormatType(I):- clause(mudSubft(I,_),true).
+ttFormatType(I):- clause(mudSubclass(I,_),true).
 

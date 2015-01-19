@@ -45,6 +45,12 @@
 :- dynamic_multifile_exported((thlocal:noRandomValues/1)).
 :- dynamic_multifile_exported((thlocal:infInstanceOnly/1)).
 
+:- dynamic_multifile_exported(provide_mpred_storage_impl/4).
+:- dynamic_multifile_exported(provide_mpred_storage_clauses/3).
+:- dynamic_multifile_exported(provide_mpred_read_attributes/3).
+:- dynamic_multifile_exported(provide_mpred_write_attributes/2).
+:- dynamic_multifile_exported(provide_mpred_storage_ops/3).
+
 % ========================================
 % decl_mpred_hybrid database
 % ========================================

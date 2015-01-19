@@ -91,7 +91,7 @@ mud_test_local:-
    test_name("tests to see if 'food' can be an item"),
       test_true(parseIsa0(item, _, [food], [])).
 
-mud_test_local:-call_mpred(show_room_grid('Area1000')).
+mud_test_local:-call_mpred(cmdShowRoomGrid('Area1000')).
 
 
 % more tests even

@@ -34,12 +34,12 @@ set_list_len(List,A,NewList):-length(List,LL),A=LL,!,NewList=List.
 set_list_len(List,A,NewList):-length(List,LL),A>LL,length(NewList,A),append(List,_,NewList),!.
 set_list_len(List,A,NewList):-length(NewList,A),append(NewList,_,List),!.
 
-is_mpred_prolog(F,_):-get_mpred_prop(F,prologBuiltin).
+is_mpred_prolog(F,_):-get_mpred_prop(F,prologOnly).
 
 if_mud_asserted(F,A2,_,_Why):-is_mpred_prolog(F,A2),!,fail.
 if_mud_asserted(F,A2,A,Why):-using_holds_db(F,A2,A,Why).
 
-declare_as_code(F,A):-findall(n(File,Line),source_location(File,Line),SL),ignore(inside_clause_expansion(CE)),decl_mpred(F,as_is(discoveredInCode(F/A,SL,CE))),!.
+declare_as_code(F,A):-findall(n(File,Line),source_location(File,Line),SL),ignore(inside_clause_expansion(CE)),decl_mpred(F,prologOnly),decl_mpred(F,info(discoveredInCode(F/A,SL,CE))),!.
 
 :-swi_export(if_use_holds_db/4).
 if_use_holds_db(F,A2,_,_):- is_mpred_prolog(F,A2),!,fail.

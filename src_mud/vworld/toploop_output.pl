@@ -27,22 +27,21 @@ default_repl_obj_to_string(O,Type,Out):- copy_term(Type,TypeO), ignore((TypeO = 
 
 canUseEnglish:-true.
 
-:-swi_export(show_kb_preds/3).
 
 :-swi_export(show_kb_preds/2).
 show_kb_preds(Agent,List):- mmake,
-      ignore(mudAtLoc(Agent,LOC)),
-      show_kb_preds(Agent,LOC,List).
+      show_kb_preds(Agent,_,List).
 
 :-swi_export(show_kb_preds/3).
 show_kb_preds(Agent,LOC,List):-
-      ignore(mudAtLoc(Agent,LOC)),
-       locationToRegion(LOC,Region),
+    must_det_l([       
+        ignore((once(mudAtLoc(Agent,LOC);localityOfObject(Agent,LOC)))),
+        ignore((once(locationToRegion(LOC,Region);localityOfObject(Agent,Region)))),
          once((thlocal:repl_writer(Agent,WPred);WPred=default_repl_writer)),
-         once((thlocal:repl_to_string(Agent,ToSTR);ToSTR=default_repl_obj_to_string)),
+         once((thlocal:repl_to_string(Agent,ToSTR);ToSTR=default_repl_obj_to_string)),!,
         subst(List,isSelfRegion,Region,ListRR),
         subst(ListRR,isSelfAgent,Agent,ListR),
-        must(show_kb_via_pred(WPred,ToSTR,ListR)),!.
+        show_kb_via_pred(WPred,ToSTR,ListR)]),!.
 
 
 

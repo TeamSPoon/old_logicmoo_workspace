@@ -11,7 +11,7 @@
 %
 */
 % :-swi_module(user). 
-:-swi_module(actPush, []).
+:-swi_module(modPush, []).
 
 :- include(logicmoo(vworld/moo_header)).
 

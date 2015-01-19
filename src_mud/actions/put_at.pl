@@ -13,7 +13,7 @@
 % Douglas Miles
 */
 % :-swi_module(user). 
-:-swi_module(actPut, []).
+:-swi_module(modPut, []).
 
 :- include(logicmoo(vworld/moo_header)).
 

@@ -28,6 +28,7 @@
 /*
 % This file is "included" from world.pl 
 */
+:- leash(+all).
 
 
 grid_dist(L1,L2,Dist):- to_3d(L1,L13D),to_3d(L2,L23D),dist(L13D,L23D,Dist),!.
@@ -125,6 +126,10 @@ rez_loc_object(XY,Type):-
            add(mudAtLoc(Name,XY)),!,
            add_missing_instance_defaults(Name).
 
+
+%prologOnly(mudNearbyObjs(tObj,tObj)).
+%prologOnly(mudNearbyObjs(tObj,tObj)).
+%predModule(mudNearbyObjs(tObj,tObj),user).
 mudNearbyObjs(X,Y):-mudAtLoc(X,L1),mudAtLoc(Y,L2),mudNearbyLocs(L1,L2).
 
 locationToRegion(Obj,RegionIn):-var(Obj),!,dmsg(warn(var_locationToRegion(Obj,RegionIn))),mudIsa(RegionIn,tRegion).
@@ -170,15 +175,28 @@ mudLocOnSurface(Clothes,Agent):-loop_check(wearsClothing(Agent,Clothes),fail).
 :-export(same_regions/2).
 same_regions(Agent,Obj):-must(inRegion(Agent,Where1)),dif_safe(Agent,Obj),inRegion(Obj,Where2),Where1=Where2.
 
-inRegion(Agent,Region):- nonvar(Agent),!, loop_check(( (is_asserted(mudAtLoc(Agent,Where));localityOfObject(Agent,Where)), locationToRegion(Where,Region)),fail).
+prologPTTP(inRegion(tObj,tRegion)).
+prologPTTP(localityOfObject(tObj,tSpatialthing)).
+
+:- add_mpred_universal_stub(prologPTTP,inRegion,2).
+:- add_mpred_universal_stub(prologPTTP,mudTestAgentWearing,2).
+
+inRegion(Obj,Region):-provide_mpred_storage_ops(prologPTTP,call(_),inRegion(Obj,Region)).
+
+% inRegion(Agent,Region):- nonvar(Agent),!, loop_check(( (is_asserted(mudAtLoc(Agent,Where));localityOfObject(Agent,Where)), locationToRegion(Where,Region)),fail).
 %inRegion(Agent,Region):- nonvar(Region),!, loop_check(( (is_asserted(atloc(Agent,Where));localityOfObject(Agent,Where)), locationToRegion(Where,Region)),fail).
 
 localityOfObject(Inner,Container):-mudInsideOf(Inner,Container).
 localityOfObject(Above,HasSurface):-mudLocOnSurface(Above,HasSurface).
 localityOfObject(Obj,Region):-loop_check(inRegion(Obj,Region),fail).
-
-
 localityOfObject(Clothes,Agent):-mudSubPart(Agent,Clothes).
+
+:-snark_tell(localityOfObject(Obj,Where) &  tRegion(Where) => inRegion(Obj,Where)).
+:-snark_tell(localityOfObject(A,B) &  localityOfObject(B,C) => localityOfObject(A,C)).
+
+:-listing(inRegion).
+:-listing(localityOfObject).
+:- prolog.
 
 mudSubPart(Outer,Inner):-is_asserted(mudInsideOf(Inner,Outer)).
 mudSubPart(Agent,Clothes):-wearsClothing(Agent,Clothes).
@@ -405,7 +423,7 @@ facing_offset(front,F,X,Y,Z):-dir_offset(vNorth,F,X,Y,Z).
 
 
 
-decl_database_hook(retract(_),mudAtLoc(Agent,_)):-padd(Agent,mudNeedsLook(true)).
+decl_database_hook(retract(_),mudAtLoc(Agent,_)):-padd(Agent,mudNeedsLook(vTrue)).
 
 % dir_mult(X,Y,Z,X1,Y1,Z1,X2,Y2,Z2):- X2 is X * X1,Y2 is Y * Y1,Z2 is Z * Z1.
 

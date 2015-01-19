@@ -19,7 +19,7 @@
 */
 
 % :-swi_module(user). 
-:-swi_module(actLook, [ mudGetPrecepts/2,  mudNearReach/2, mudNearFeet/2, height_on_obj/2, can_sense/5 , call_look/2]).
+:-swi_module(modLook, [ mudGetPrecepts/2,  mudNearReach/2, mudNearFeet/2, mudHeightOnObj/2, mudCanSense/5 , cmdLook/2]).
 
 :- include(logicmoo(vworld/moo_header)).
 
@@ -29,8 +29,8 @@
 
 
 
-% can_sense(Agent,Sense,InList,CanDetect,CantDetect).
-can_sense(_Agent,visual,InList,InList,[]).
+% mudCanSense(Agent,Sense,InList,CanDetect,CantDetect).
+mudCanSense(_Agent,visual,InList,InList,[]).
 
 action_info(actExamine(tItem), "view details of item (see also @list)").
 agent_call_command(_Gent,actExamine(SObj)):- term_listing(SObj).
@@ -66,32 +66,32 @@ agent_call_command(Agent,actLook(_Dir,SObj)):-
 look_as(Agent):-
    get_session_id(O),
    with_assertions(thlocal:session_agent(O,Agent),
-        ((mudAtLoc(Agent,LOC),call_look(Agent,LOC)))).
+        ((mudAtLoc(Agent,LOC),cmdLook(Agent,LOC)))).
 
 
-:-swi_export(call_look/2).
-call_look(Agent,LOC):-  mmake, call(call_look_proc,Agent,LOC).
+:-swi_export(cmdLook/2).
+cmdLook(Agent,LOC):-  mmake, call(cmdLook_proc,Agent,LOC).
 
-:-decl_mpred_prolog(call_look_proc/3).
-call_look_proc(Agent,LOC):- 
-   with_no_modifications(with_assertions(mpred_prop(nameStrings,prologListValued),call_look_proc_0(Agent,LOC))).
-call_look_proc_0(Agent,LOC):-
-   clr(props(Agent,mudNeedsLook(true))),
-   add(props(Agent,mudNeedsLook(false))),    
-    toploop_output:show_kb_preds(Agent,LOC,
+:-decl_mpred_prolog(cmdLook_proc/3).
+cmdLook_proc(Agent,LOC):- 
+   with_no_modifications(with_assertions(mpred_prop(nameStrings,prologListValued),cmdLook_proc_0(Agent,LOC))).
+cmdLook_proc_0(Agent,LOC):-
+  % implicit in next command clr(props(Agent,mudNeedsLook(_))),
+   add(props(Agent,mudNeedsLook(vFalse))),
+     show_kb_preds(Agent,LOC,
          [
          location= (value=LOC),
       % TODO make this work
          %  why does this this work on Prolog REPL?
-         %   with_output_to(string(Str),show_room_grid('Area1000'))
+         %   with_output_to(string(Str),cmdShowRoomGrid('Area1000'))
          %  but yet this doent?
-       %   show_room_grid = once(with_output_to(string(value),show_room_grid(region))),
+       %   cmdShowRoomGrid = once(with_output_to(string(value),cmdShowRoomGrid(region))),
          % for now workarround is 
-         call(show_room_grid(isSelfRegion)),
+         call(cmdShowRoomGrid(isSelfRegion)),
          mudAtLoc(Agent,value),
          nameStringsList(isSelfRegion,value),
          forEach(mudDescription(isSelfRegion,Value),fmt(mudDescription(Value))),
-         events=deliverable_location_events(Agent,LOC,value),
+         events=mudDeliverableLocationEvents(Agent,LOC,value),
          path(D) = pathBetween(isSelfRegion,D,value),
          pathName(D) = pathName(isSelfRegion,D,value),
          % value = localityOfObject(value,isSelfRegion),
@@ -101,15 +101,15 @@ call_look_proc_0(Agent,LOC):-
          mudNearReach(Agent,value),
          mudGetPrecepts(Agent,value),         
          mudMoveDist(Agent,value),
-         height_on_obj(Agent,value),
-         success=success(Agent,value)
+         mudHeightOnObj(Agent,value),
+         mudLastCmdSuccess=mudLastCmdSuccess(Agent,value)
        ]),
     show_inventory(Agent,Agent).
 
 nameStringsList(Region,ValueList):-findall(Value,nameStrings(Region,Value),ValueList).
 
-looking(Agent):- current_agent(Agent),!.
-looking(Agent):- tAgentGeneric(Agent),not(tDeleted(Agent)).
+tLooking(Agent):- current_agent(Agent),!.
+tLooking(Agent):- tAgentGeneric(Agent),not(tDeleted(Agent)).
 
 % ********** TOP LEVEL PREDICATE: this is the predicate agents use to look
 % Look, reports everything not blocked up to two locations away
@@ -118,7 +118,7 @@ looking(Agent):- tAgentGeneric(Agent),not(tDeleted(Agent)).
 % Impliment(get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv)) :-
 get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
   call((
-	looking(Agent),
+	tLooking(Agent),
 	mudCharge(Agent,Vit),
         mudHealth(Agent,Dam),
 	success(Agent,Suc),
@@ -129,11 +129,11 @@ get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
 
 % Get only the Percepts
 
-% :-decl_mpred(mudGetPrecepts(tAgentGeneric,list(tSpatialThing)),[predModule(user)]).
+:-decl_mpred(mudGetPrecepts(tAgentGeneric,list(tSpatialThing)),[predModule(user)]).
 mudGetPrecepts(Agent,Percepts) :- mudGetPrecepts0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts).
 mudGetPrecepts0(Agent,Percepts) :-
   call((
-	looking(Agent),
+	tLooking(Agent),
 	view_vectors(Dirs),
 	check_for_blocks(Agent),
 	view_dirs(Agent,Dirs,Tmp_percepts),
@@ -146,7 +146,7 @@ mudNearReach(Agent,PerceptsO):- get_near0(Agent,Percepts0),!,flatten_set(Percept
    
 get_near0(Agent,Percepts) :-
   call((
-	looking(Agent),
+	tLooking(Agent),
 	near_vectors(Dirs),
 	view_dirs(Agent,Dirs,Percepts))),!.
 
@@ -156,7 +156,7 @@ mudNearFeet(Agent,PerceptsO) :-  get_feet0(Agent,Percepts0),!,flatten_set(Percep
 
 get_feet0(Agent,Percepts):-
   call((
-	looking(Agent),
+	tLooking(Agent),
 	mudAtLoc(Agent,LOC),
         mudFacing(Agent,Facing),
         reverse_dir(Facing,Rev),
@@ -193,7 +193,7 @@ near_vectors([[vNW,vHere],[vNorth,vHere],[vNE,vHere],
 % which are blocked from view
 % check_for_blocks(_Agent) :-!.
 check_for_blocks(Agent) :-
-	height_on_obj(Agent,Ht),
+	mudHeightOnObj(Agent,Ht),
 	clr(visually_blocked(Agent,_)),
 	Dirs = [[vNorth,vHere],[vSouth,vHere],[vEast,vHere],[vWest,vHere],
 	[vNE,vHere],[vNW,vHere],[vSE,vHere],[vSW,vHere]],
@@ -202,21 +202,22 @@ check_for_blocks(Agent) :-
 	add(visually_blocked(Agent,Blocked_Percepts)).
 check_for_blocks(_).
 
-prologSingleValued(height_on_obj(tSpatialThing,ftInt)).
 prologSingleValued(mudSize(tSpatialThing,ftTerm)).
-prologSingleValued(mudShape(tSpatialThing,ftTerm)).
+prologSingleValued(mudShape(tSpatialThing,vtShape)).
+prologSingleValued(mudHeightOnObj(tSpatialThing,ftNumber)).
 % prologSingleValued(texture(tSpatialThing,term)).
 
+:-decl_mpred_hybrid(mudHeightOnObj(tSpatialThing,ftNumber)).
 % High enough to see over obstacles??
 % Check to see how tall the tAgentGeneric is and if they are standing on an item
-height_on_obj(Agent,Ht) :-
+mudHeightOnObj(Agent,Ht) :-
 	mudAtLoc(Agent,LOC),
-	report(LOC,Objs),
+	mudAtLocList(LOC,Objs),
 	member(Obj,Objs),
 	props(Obj,mudHeight(ObjHt)),
 	mudHeight(Agent,AgHt),
 	Ht = (AgHt + ObjHt) - 1,!.
-height_on_obj(Agent,Ht) :-
+mudHeightOnObj(Agent,Ht) :-
 	mudHeight(Agent,Ht),!.
 
 
@@ -260,7 +261,7 @@ dark_if_yes(no,[P],P).
 % Builds the Percepts list. (everything located up to 2 locations away from tAgentGeneric).
 view_dirs(_,[],[]).
 view_dirs(Agent,[[D1|D2]|Rest],Percepts) :-
-      looking(Agent),
+      tLooking(Agent),
 	view_dirs(Agent,Rest,Psofar),
 	mudAtLoc(Agent,LOC),
 	get_mdir_u(Agent,[D1|D2],LOC,What),
@@ -268,18 +269,18 @@ view_dirs(Agent,[[D1|D2]|Rest],Percepts) :-
 
 % The look loop (look at one location)
 get_mdir(_Gent,[],LOC,What) :-
-	report(LOC,What).
+	mudAtLocList(LOC,What).
 get_mdir(_Gent,[vHere],LOC,What) :-
-	report(LOC,What).
+	mudAtLocList(LOC,What).
 get_mdir(Agent,[Dir|D],LOC,What) :-
 	move_dir_target(LOC,Dir,XXYY),
 	get_mdir(Agent,D,XXYY,What).
 
 % The look loop (look at one location)
 get_mdir_u(_Gent,[],LOC,What) :-
-	report(LOC,What).
+	mudAtLocList(LOC,What).
 get_mdir_u(_Gent,[vHere],LOC,What) :-
-	report(LOC,What).
+	mudAtLocList(LOC,What).
 get_mdir_u(Agent,[Dir|D],LOC,What) :-
 	move_dir_target(LOC,Dir,XXYY),
 	get_mdir_u(Agent,D,XXYY,What).
@@ -287,10 +288,10 @@ get_mdir_u(Agent,[_|D],LOC,What) :-
    get_mdir_u(Agent,D,LOC,What).
 
 % Reports everything at a location.
-report(LOC,List) :-
+mudAtLocList(LOC,List) :-
 	findall(Z,mudAtLoc(Z,LOC),List).
 
-% Converts the objects seen... basically to weed out the 0'vSouth the empty locations report
+% Converts the objects seen... basically to weed out the 0'vSouth the empty locations mudAtLocList
 mask([],What,What).
 mask([K|Tail],SoFar,What) :-
 	(K)=nil,

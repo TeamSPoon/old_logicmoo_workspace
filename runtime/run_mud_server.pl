@@ -6,7 +6,7 @@
 :- multifile(user:mud_regression_test/0).
 
 :- set_prolog_flag(generate_debug_info, true).
-:- exists_directory(runtime)->cd(runtime);(exists_directory('../runtime')->cd('../runtime');true).
+:- exists_directory(runtime)->working_directory(_,runtime);(exists_directory('../runtime')->working_directory(_,'../runtime');true).
 
 % [Manditory] Load the Logicmioo utils
 :- '@'(ensure_loaded('../src_lib/logicmoo_util/logicmoo_util_all'),user).
@@ -58,7 +58,10 @@ user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),s
 :- with_no_term_expansions(if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop.pl'))).
 :- current_predicate(egg_go/0)->egg_go;true.
 
+:-multifile(pre_file_search_path/2).
+user:pre_file_search_path(_,_):-!,fail.
 % :- do_semweb_startup.
+% :- do_web_startup.
 
 % [Manditory] load_default_game
 % this is what happens when the world is not found
@@ -67,11 +70,7 @@ user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),s
 :- onSpawn(pathConnects(tLivingRoom,tOfficeRoom)).
 
 % int_firstOrder(some_query, 666, What, C, E, A, J, D, L, B)
-:- forall(clause(user:mud_regression_test,Call),must(Call)).
-
-:- prolog_repl.
-
-:- prolog.
+% :- forall(clause(user:mud_regression_test,Call),must(Call)).
 
 :- declare_load_game('../games/src_game_nani/a_nani_household.plmoo').
 :- declare_load_game('../games/src_game_nani/objs_misc_household.plmoo').

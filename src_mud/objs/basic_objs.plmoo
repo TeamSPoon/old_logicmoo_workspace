@@ -18,16 +18,6 @@
 pathConnects(R1,R2):-pathBetween(R1,Dir,R2),nop(Dir).
 pathConnects(R1,R2):-pathBetween(R2,Dir,R1),nop(Dir).
 
-:-decl_type(vtBasicDir).
-vtBasicDir(vNorth).
-vtBasicDir(vEast).
-vtBasicDir(vSouth).
-vtBasicDir(vWest).
-
-:-decl_type(vtBasicDirPlusUpDown).
-vtBasicDirPlusUpDown(X):-vtBasicDir(X).
-vtBasicDirPlusUpDown(vUp).
-vtBasicDirPlusUpDown(vDown).	
 
 
 :-decl_mpred_prolog(ensure_some_pathBetween/2).

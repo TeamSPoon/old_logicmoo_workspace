@@ -166,7 +166,7 @@ save_fmt_e(O,A):-atom(A),save_fmt_a(O,A),!.
 save_fmt_e(O,[E|L]):-!,save_fmt_e(O,E),!,save_fmt_e(O,L),!.
 save_fmt_e(O,mudIsa(A)):-!,must(save_fmt_e(O,A)).
 save_fmt_e(O,t(A,_)):-!,must(save_fmt_e(O,A)).
-save_fmt_e(_,E):-compound(E),!. % cycPred(_),mped_type(_),cycPlus2(_),hasStub(_),def_module(_),predStubType(_),arity(_),mped_type(_)
+save_fmt_e(_,E):-compound(E),!. % cycPred(_),predStubType(_),cycPlus2(_),hasStub(_),def_module(_),arity(_),
 save_fmt_e(O,E):- string(E),!,must((to_word_list(E,WL),save_fmt_e(O,WL))),!.
 save_fmt_e(O,E):- member(E,O) -> true ; (O=[_|CDR],nb_setarg(2,O,[E|CDR])).
 
@@ -195,7 +195,7 @@ object_print_details0(Print,Agent,O,DescSpecs,Skipped):-
 :-decl_type(ttTypeType).
 vtSkippedPrintNames(T):-ttFormatType(T).
 vtSkippedPrintNames(T):-mudIsa(T,ttTypeType).
-vtSkippedPrintNames(E):-member(E,[tObj,isSelf,the,is,tSpatialThing,ttNotCreatableType,ttCreateable,prologHybrid,prologOnly,tRelation,tPred,'',[]]).
+vtSkippedPrintNames(E):-member(E,[tObj,isSelf,the,is,tSpatialThing,ttNotCreatableType,ttCreateable,prologHybrid,prologPTTP,prologOnly,tRelation,tPred,'',[]]).
 
 
 must_make_object_string_list(_,Obj,WList):- object_string(Obj,WList),!.
@@ -431,20 +431,20 @@ is_parsable_type(vp).
 
 %:- begin_tests(test_bad_verb).
 
-actTest(test_bad_verb, [ true(
+mud_test(test_bad_verb, [ true(
        not(phrase(parseIsa(vtVerb,ff),[ff],[]))
        )] ).
 
 
-actTest(food_is_a_droppable, [ true(
+mud_test(food_is_a_droppable, [ true(
        parse_agent_text_command(iPlayer1,actDrop,[food],_D2,_E2))]).
 
 
 %:- end_tests(test_bad_verb).
 
-query_trans_subft(FT,Sub):-mudSubft(FT,Sub).
-query_trans_subft(FT,Sub):-mudSubft(FT,A),mudSubft(A,Sub).
-query_trans_subft(FT,Sub):-mudSubft(FT,A),mudSubft(A,B),mudSubft(B,Sub).
+query_trans_subft(FT,Sub):-mudSubclass(FT,Sub).
+query_trans_subft(FT,Sub):-mudSubclass(FT,A),mudSubclass(A,Sub).
+query_trans_subft(FT,Sub):-mudSubclass(FT,A),mudSubclass(A,B),mudSubclass(B,Sub).
 
 
 parseFmt_vp1(Agent, do(NewAgent,Goal),[SVERB|ARGS],[]):- parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,Goal),!.

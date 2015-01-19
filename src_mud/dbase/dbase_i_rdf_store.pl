@@ -395,7 +395,7 @@ user:decl_database_hook(assert(_A_or_Z),DB):-use_rdf_hooks,rdf_assert_hook(DB),!
 :-thread_local(thlocal:rdf_asserting/2).
 
 rdf_assert_ignored(DB):-thlocal:rdf_asserting(_,DB),!.
-rdf_assert_ignored(svo(_,as_is,_)).
+rdf_assert_ignored(svo(_,prologOnly,_)).
 rdf_assert_ignored(mpred_prop(_,predArity(1))).
 rdf_assert_ignored(mpred_prop(_,predArgTypes(_))).
 rdf_assert_ignored(DB):-functor(DB,F,_),member(F,[ruleHybridChain,mudTermAnglify,ruleEquiv]).

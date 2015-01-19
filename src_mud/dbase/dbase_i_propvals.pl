@@ -34,9 +34,10 @@ with_no_fallbacksg(CALL):-with_assertions(thlocal:noRandomValues(_),CALL).
 :-meta_predicate_transparent(with_no_fallbacks(0)).
 with_no_fallbacks(CALL):-with_assertions(thlocal:infAssertedOnly(_),CALL).
 
-:-meta_predicate_transparent(infSecondOrder/0).
-infSecondOrder:- not(thlocal:infInstanceOnly(_)).
-:-meta_predicate_transparent(infThirdOrder/0).
+:-thread_local(infSecondOrder/0).
+infSecondOrder :- not(thlocal:infInstanceOnly(_)).
+
+:-thread_local(infThirdOrder/0).
 infThirdOrder :- fail, infSecondOrder, not(thlocal:noRandomValues(_)).
 
 
@@ -166,7 +167,6 @@ checkNoArgViolationOrDeduceInstead(Prop,N,Obj):-argIsa_call(Prop,N,Type),
 
 subft_or_subclass_or_same(C,C):-!.
 subft_or_subclass_or_same(S,C):-mudSubclass(S,C),!.
-subft_or_subclass_or_same(S,C):-mudSubft(S,C),!.
 checkNoArgViolationOrDeduceInstead(_Prop,_,Obj,_OType,_Type):-var(Obj),!.
 checkNoArgViolationOrDeduceInstead(_Prop,_N,_Obj,[H|T],Type):-nonvar(T),!,member(E,[H|T]),subft_or_subclass_or_same(E,Type),!.
 checkNoArgViolationOrDeduceInstead(Prop,N,[H|T],OType,Type):-!,forall(member(Obj,[H|T]),checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type)).

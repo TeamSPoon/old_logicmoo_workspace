@@ -157,6 +157,7 @@ is_actverb(X):-action_info(PX,_),functor(PX,X,_).
 is_actverb(X):-vtActionTemplate(PX),functor(PX,X,_).
 is_actverb(X):-vtPosture(PX),functor(PX,X,_).
 is_actverb(X):-verb_alias(_,X).
+vtVerb(X):-is_actverb(X).
 
 :-export(ensure_starts_with_prefix/3).
 ensure_starts_with_prefix(A,Prefix,A):- atom_concat(Prefix,Rest,A),toCamelcase(Rest,CC),toPropercase(CC,PC),Rest==PC,!.

@@ -13,15 +13,7 @@ prolog:message(git(update_versions),A,A):-!.
 % :- make.
 :- portray_text(true).
 
-:- (
-      (current_prolog_flag(readline, true))
-     ->
-      expand_file_name("~/.pl-history", [File|_]),
-      (exists_file(File) -> rl_read_history(File); true),
-      at_halt(rl_write_history(File))
-     ;
-      true
-     ).
+:- ((current_prolog_flag(readline, true))->expand_file_name("~/.pl-history", [File|_]),(exists_file(File) -> rl_read_history(File); true),at_halt(rl_write_history(File));true).
 
 :-module(user).
 

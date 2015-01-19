@@ -25,7 +25,7 @@
 :- meta_predicate_transparent test_false(+).
 :- meta_predicate_transparent run_mud_test(+).
 
-:- meta_predicate_transparent run_mud_tests/0.
+% :- trace,leash(+all),meta_predicate_transparent run_mud_tests().
 
 :- include(logicmoo(vworld/moo_header)).
 :- register_module_type(utility).

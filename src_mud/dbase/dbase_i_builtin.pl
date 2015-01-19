@@ -32,16 +32,15 @@ tCol(tChannel).
 tCol(ttCompleteExtentAsserted).
 
 predArgTypes(mudFtInfo(ttFormatType,ftTerm)).
-predArgTypes(mudSubft(ttFormatType,ttFormatType)).
 
 :-decl_mpred_hybrid((genlInverse/2,genlPreds/2)).
 
 prologMultiValued(genlInverse(tPred,tPred)).
 prologMultiValued(genlPreds(tPred,tPred)).
 
-mpred_prop(mudSubft, ttCompleteExtentAsserted).
+mpred_prop(mudSubclass, ttCompleteExtentAsserted).
 mpred_prop(mudFtInfo, ttCompleteExtentAsserted).
-mpred_prop(mudSubft/2, prologHybrid).
+mpred_prop(mudSubclass/2, prologHybrid).
 mpred_prop(mudFtInfo/2,prologHybrid).
 mudSubclass(isEach(tRegion,tAgentGeneric,actGossup),tChannel).
 
@@ -76,12 +75,12 @@ tCol(prologSingleValued).
 tCol(ttCreateable).
 tCol(macroDeclarer).
 
-:-add((mudSubclass(isEach(prologMultiValued,prologOrdered,prologNegByFailure,predArgTypes,prologHybrid,prologBuiltin,prologOnly,prologMacroHead,prologListValued,prologSingleValued),tPred))).
+:-add((mudSubclass(isEach(prologMultiValued,prologOrdered,prologNegByFailure,predArgTypes,prologHybrid,prologPTTP,prologOnly,prologMacroHead,prologListValued,prologSingleValued),tPred))).
 
-:-add((argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,predArgTypes,prologHybrid,prologBuiltin,prologOnly,prologMacroHead,prologListValued,prologSingleValued),1,tPred))).
-:-add((argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,predArgTypes,prologHybrid,prologBuiltin,prologOnly,prologMacroHead,prologListValued,prologSingleValued),2,ftListFn(ftVoprop)))).
+:-add((argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,predArgTypes,prologHybrid,prologPTTP,prologOnly,prologMacroHead,prologListValued,prologSingleValued),1,tPred))).
+:-add((argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,predArgTypes,prologHybrid,prologPTTP,prologOnly,prologMacroHead,prologListValued,prologSingleValued),2,ftListFn(ftVoprop)))).
 
-:-add((mudIsa(isEach(prologMultiValued,prologOrdered,prologNegByFailure,predArgTypes,prologHybrid,prologBuiltin,prologOnly,prologMacroHead,prologListValued,prologSingleValued),macroDeclarer))).
+:-add((mudIsa(isEach(prologMultiValued,prologOrdered,prologNegByFailure,predArgTypes,prologPTTP,prologHybrid,prologOnly,prologOnly,prologMacroHead,prologListValued,prologSingleValued),macroDeclarer))).
 
 :-doall((ttDeclarer(F),decl_type(F),add(mudSubclass(F,tRelation)))).
 :-doall((ttDeclarer(F),decl_type(F),add(mudIsa(F,macroDeclarer)))).
@@ -172,11 +171,6 @@ prologSingleValued(mudAtLoc(tObj,xyzFn(tRegion,ftInt,ftInt,ftInt))).
 
 :- begin_transform_moo_preds.
 
-predArgTypes(forwardRule(ftTerm,ftTerm)).
-% forwardRule(localityOfObject(O,Region),atloc(O,LOC)):-
-
-% 
-
 
 predArgTypes(resultIsa(tFunction,tCol)).
 predArgTypes(formatted_resultIsa(ttFormatType,tCol)).
@@ -203,18 +197,24 @@ mudSubclass(tFurniture,tPartofObj).
 
 % multivalued
 %mpred(G,[predArgMulti(AT)|LIST]):-prologMultiValued(G,AT,LIST).
-
+/*
 prologMacroHead(pddlSomethingIsa(ftTerm,ftListFn(tCol))).
 prologMacroHead(macroSomethingDescription(ftTerm,ftListFn(ftString))).
 prologMacroHead(pddlObjects(tCol,ftListFn(ftID))).
 prologMacroHead(pddlSorts(tCol,ftListFn(tCol))).
 prologMacroHead(pddlPredicates(ftListFn(ftVoprop))).
 prologMacroHead(pddlTypes(ftListFn(tCol))).
+*/
+
+predArgTypes(pddlSomethingIsa(ftTerm,ftListFn(tCol))).
+predArgTypes(macroSomethingDescription(ftTerm,ftListFn(ftString))).
+predArgTypes(pddlObjects(tCol,ftListFn(ftID))).
+predArgTypes(pddlSorts(tCol,ftListFn(tCol))).
+predArgTypes(pddlPredicates(ftListFn(ftVoprop))).
+predArgTypes(pddlTypes(ftListFn(tCol))).
 
 %mpred(ArgTypes,[prologSingleValued]):-prologSingleValued(ArgTypes).
-%mpred(CallSig,[external(M)]):-prologBuiltin(M:CallSig).
-
-prologBuiltin(mudNearbyObjs(tObj,tObj)).
+%mpred(CallSig,[external(M)]):-prologOnly(M:CallSig).
 
 
 % prologMultiValued
@@ -236,7 +236,7 @@ prologMultiValued(mudKeyword(ftTerm,ftString)).
 prologMultiValued(mudActAffect(ftTerm,ftTerm,ftTerm)).
 prologMultiValued(mudMemory(tAgentGeneric,ftTerm)).
 predArgTypes(mudWearing(tAgentGeneric,tWearable)).
-predArgTypes(success(tAgentGeneric,ftTerm)).
+predArgTypes(mudLastCmdSuccess(tAgentGeneric,ftTerm)).
 
 :-decl_mpred(mudActAffect/3).
 
@@ -284,15 +284,18 @@ prologSingleValued(predInstMax(prologSingleValued,ftTerm,ftInt)).
 
 :- assert_if_new(mpred_prop(localityOfObject,call_tabled)).
 
-
+predArgTypes(forwardRule(ftTerm,ftTerm)).
+% forwardRule(localityOfObject(O,Region),atloc(O,LOC)):-
+prologMultiValued(forwardRule(ftTerm,ftTerm)).
 prologMultiValued(ruleEquiv(ftTerm,ftTerm),prologOnly).
 prologMultiValued(ruleHybridChain(ftTerm,ftTerm),prologOnly).
 
 % ftCallable code
-ruleEquiv(prologMultiValued(CallSig,[predProxyAssert(hooked_asserta),predProxyRetract(hooked_retract),predProxyQuery(call)]),prologBuiltin(CallSig)).
+% ruleEquiv(prologMultiValued(CallSig,[predProxyAssert(add),predProxyRetract(del),predProxyQuery(req)]),prologHybrid(CallSig)).
+ruleEquiv(prologMultiValued(CallSig,[predProxyAssert(hooked_asserta),predProxyRetract(hooked_retract),predProxyQuery(call)]),prologOnly(CallSig)).
+ruleEquiv(prologMultiValued(CallSig,[predProxyAssert(pttp_tell),predProxyRetract(pttp_retract),predProxyQuery(pttp_ask)]),prologPTTP(CallSig)).
 
 
-predModule(mudNearbyObjs(tObj,tObj),user).
 %  predModule(isa(obj,col),user).
 % db_prop_prolog(world,isa(obj,col)).
 % db_prop_prolog(world,same(ftID,ftID)).
@@ -318,7 +321,7 @@ prologListValued(mudGetPrecepts(tAgentGeneric,ftListFn(tSpatialThing)),[predModu
 mudSubclass(tFunction,tRelation).
 mudSubclass(tPred,tRelation).
 
-predArgTypes(mud_test(ftTerm,ftCallable)).
+prologOnly(mud_test(ftTerm,ftCallable)).
 
 prologMultiValued(predProxyAssert(prologMultiValued,ftTerm)).
 prologNegByFailure(predArgMulti(prologMultiValued,ftInt)).
@@ -327,12 +330,12 @@ prologMultiValued(predProxyQuery(prologMultiValued,ftTerm)).
 mudIsa(ftText,ttFormatType).
 
 predArgTypes(type_action_info(ttAgentType,vtActionTemplate,ftText)).
-predArgTypes(action_info(vtActionTemplate,ftText)).
-predArgTypes(vtActionTemplate(ftTerm)).
 predArgTypes(argIsa(tRelation,ftInt,tCol)).
 predArgTypes(argFormat(tRelation,ftInt,ttFormatType)).
 
-predArgTypes(agent_text_command(tAgentGeneric,ftText,tAgentGeneric,ftAction)).
+prologOnly(action_template(ftTerm)).
+prologOnly(action_info(vtActionTemplate,ftText)).
+prologOnly(agent_text_command(tAgentGeneric,ftText,tAgentGeneric,ftAction)).
 
 prologMultiValued(mudDescription(ftTerm,ftText),[predProxyAssert(add_description),predProxyRetract(remove_description),predProxyQuery(query_description)]).
 
@@ -381,7 +384,7 @@ prologSingleValued(mudFacing(tObj,vtDirection(vNorth))).
 prologSingleValued(mudFacing(tObj,vtDirection)).
 prologSingleValued(mudHeight(tObj,ftInt)).
 prologSingleValued(mudID(tObj,ftID)).
-predArgTypes(localityOfObject(tObj,tSpatialThing)).
+prologSingleValued(localityOfObject(tObj,tSpatialThing)).
 prologSingleValued(mudLastCommand(tAgentGeneric,tCommand)).
 prologSingleValued(location_center(tRegion,xyzFn(tRegion,ftInt,ftInt,ftInt))).
 prologSingleValued(mudMoveDist(tAgentGeneric,ftInt(1))).
@@ -425,10 +428,10 @@ typeProps(tSpatialThing,mudHeight(0)).
 
 prologNegByFailure(mudNeedsLook(tObj,ftBoolean)). 
 
-prologSingleValued(mudNeedsLook(tAgentGeneric,ftBoolean),argSingleValueDefault(2,false)). 
+prologSingleValued(mudNeedsLook(tAgentGeneric,ftBoolean),argSingleValueDefault(2,vFalse)). 
 
 
-typeProps(tAgentGeneric,mudNeedsLook(false)).
+typeProps(tAgentGeneric,mudNeedsLook(vFalse)).
 
 tCol(ftVar).
 tCol(ftString).
@@ -485,23 +488,21 @@ mudSubclass(vtDirection,tTypevalue).
 ttFormatType(ftVoprop).
 %  subft(ftNumber,term).
 % subft(ftNumber,term).
-mudSubft(ftPercent,ftNumber).
-mudSubft(ftNumber,ftPercent).
-mudSubft(ftAtom,ftTerm).
-mudSubft(ftDice,ftInt).
-mudSubft(ftInt,ftDice).  
+mudSubclass(ftPercent,ftNumber).
+mudSubclass(ftNumber,ftPercent).
+mudSubclass(ftAtom,ftTerm).
+mudSubclass(ftDice,ftInt).
+mudSubclass(ftInt,ftNumber).  
 
-mudSubft(ftID,ftTerm).
-mudSubft(ftVoprop,ftTerm).
-mudSubft(ftInteger,ftNumber).
-mudSubft(ftString,ftTerm).
-mudSubft(ftString,ftText).
-mudSubft(ftText,ftTerm).
-mudSubft(ftTerm,ftProlog).
-mudSubft(ftCallable,ftProlog).
-mudSubft(ftVar,ftProlog).
-
-:-debug.
+mudSubclass(ftID,ftTerm).
+mudSubclass(ftVoprop,ftTerm).
+mudSubclass(ftInteger,ftNumber).
+mudSubclass(ftString,ftTerm).
+mudSubclass(ftString,ftText).
+mudSubclass(ftText,ftTerm).
+mudSubclass(ftTerm,ftProlog).
+mudSubclass(ftCallable,ftProlog).
+mudSubclass(ftVar,ftProlog).
 
 % flags
 prologNegByFailure(tAgentGeneric(ftID)).
@@ -556,7 +557,7 @@ prologListValued(aDirectionsFn(ftTerm,ftListFn(ftTerm))).
 
 prologMultiValued(predModule(tRelation,ftAtom)).
 
-predArgTypes(agent_call_command(tAgentGeneric,ftAction)).
+prologOnly(agent_call_command(tAgentGeneric,ftAction)).
 
 predTypeMax(mudHealth,tObj,500).
 predTypeMax(mudCharge,tObj,130).

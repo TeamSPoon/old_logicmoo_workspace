@@ -8,7 +8,7 @@
 % Douglas Miles
 */
 % :-swi_module(user). 
-:-swi_module(actLogin, []).
+:-swi_module(modLogin, []).
 
 :- include(logicmoo(vworld/moo_header)).
 

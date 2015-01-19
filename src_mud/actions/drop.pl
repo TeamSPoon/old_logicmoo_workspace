@@ -9,7 +9,7 @@
 % 
 */
 % :-swi_module(user). 
-:-swi_module(actDrop, []).
+:-swi_module(modDrop, []).
 
 :- include(logicmoo(vworld/moo_header)).
 

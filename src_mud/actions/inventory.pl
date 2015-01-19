@@ -1,5 +1,5 @@
 % :-swi_module(user). 
-:-swi_module(actInventory, [mudInventoryLocation/3,show_inventory/2]).
+:-swi_module(modInventory, [mudInventoryLocation/3,show_inventory/2]).
 /** <module> A command to  ...
 % Douglas Miles 2014
 % inventory(Agt,Inv) = inventory (anything the agent has taken)

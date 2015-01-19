@@ -48,7 +48,7 @@ do_act_affect(_,_,_).
 
 % Check to see if last action was successful or not
 :-swi_export(success/2).
-success(Agent,YN) :- mudCmdfailure(Agent,_)-> YN=no ; YN=yes.
+mudLastCmdSuccess(Agent,YN) :- mudCmdfailure(Agent,_)-> YN=no ; YN=yes.
 
 :-swi_export(add_cmdfailure/2).
 add_cmdfailure(Agent,What):-add(mudCmdfailure(Agent,What)).

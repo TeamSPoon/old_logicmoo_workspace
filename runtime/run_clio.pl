@@ -6,7 +6,14 @@
 
 prolog:message(git(update_versions),A,A):-!.
 
-:- debug(daemon).
+
+% :- pack_install(blog_core,[interactive(false)]).
+load_blog_core:- use_module(library(arouter)),use_module(library(docstore)),use_module(library(bc/bc_main)),use_module(library(bc/bc_view)),
+   thread_create(bc_main('site.docstore',[port(3080)]),_,[]).
+
+:- load_blog_core.
+
+% :- debug(daemon).
 
 % Do not run xpce in a thread. This disables forking. The problem here
 % is that loading library(pce) starts the event dispatching thread. This
@@ -18,8 +25,8 @@ prolog:message(git(update_versions),A,A):-!.
 % [Optionaly] Solve the Halting problem
 :-use_module(library(process)).
 :-use_module(library(pce)).
-:- has_gui_debug -> true ; remove_pred(pce_principal,send,2).
-:- has_gui_debug -> true ; remove_pred(pce_principal,new,2).
+%:- has_gui_debug -> true ; remove_pred(pce_principal,send,2).
+%:- has_gui_debug -> true ; remove_pred(pce_principal,new,2).
 
 :- if_file_exists(ensure_loaded('../externals/swish/logicmoo_run_swish.pl')).
 

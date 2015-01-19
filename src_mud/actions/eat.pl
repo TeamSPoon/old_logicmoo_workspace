@@ -16,7 +16,7 @@
 */
 
 % :-swi_module(user). 
-:-swi_module(actEat, []).
+:-swi_module(modEat, []).
 
 :- include(logicmoo(vworld/moo_header)).
 

@@ -7,7 +7,7 @@
 %
 */
 %
-:-swi_module(actScansrc, []).
+:-swi_module(modScansrc, []).
 
 :- include(logicmoo(vworld/moo_header)).
 

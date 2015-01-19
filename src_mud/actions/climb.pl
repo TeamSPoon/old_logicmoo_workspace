@@ -10,7 +10,7 @@
 % Douglas Miles
 */
 % :-swi_module(user). 
-:-swi_module(actClimb, []).
+:-swi_module(modClimb, []).
 
 :- include(logicmoo(vworld/moo_header)).
 
@@ -49,7 +49,7 @@ climbable(Agent,Dir) :-
 	move_dir_target(LOC,Dir,XXYY),
 	mudAtLoc(Obj,XXYY),
 	props(Obj,mudHeight(ObjHt)), % If object is an agent, it will fail at this point
-	height_on_obj(Agent,AgHt),
+	mudHeightOnObj(Agent,AgHt),
 	mudAtLoc(Obj2,LOC), prop_or(Obj2,mudHeight,0,Obj2Ht),
 	ObjHt =< (AgHt + Obj2Ht),
 	ObjHt > 1.

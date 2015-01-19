@@ -3,11 +3,58 @@ PrologMUD_base.vpj=Release
 [Global]
 CurrentProject=PrologMUD.vpj
 [ProjectDates]
-PrologMUD.vpj=20150112215418695
-PrologMUD_base.vpj=20150112170159657
+PrologMUD.vpj=20150119030702522
+PrologMUD_base.vpj=20150118165844771
 externals\PrologMUD_ext.vpj=20150105131252020
 [TreeExpansion2]
-+ PrologMUD.vpj
+- PrologMUD.vpj
+  - externals
+    - MUD_ircbot
+      - prolog
+    - MUD_ScriptEngines
+      - ext
+        + r6rs-plt-redex-model
+      - snark
+        + SGB-Interface
+  + games
+    + src_game_nani
+      + web
+        + css
+        + icons
+        + js
+        + prolog
+        + snd
+    + src_game_sims
+      + web
+        + css
+        + icons
+        + js
+        + prolog
+        + snd
+    + src_game_startrek
+      + holodeck
+      + mobs
+      + web
+        + css
+        + icons
+        + js
+        + prolog
+        + snd
+    + src_game_wumpus
+  - runtime
+    + config-enabled
+    + RDF-store
+  - src_lib
+    - logicmoo_util
+  - src_mud
+    - actions
+    - dbase
+    + mobs
+      + affordance
+      + planner
+    + objs
+    + parsing
+    + vworld
 - PrologMUD_base.vpj
   - externals
     + ClioPatria
@@ -17,116 +64,54 @@ externals\PrologMUD_ext.vpj=20150105131252020
         + base
         + cpack
         + tool
-      + test
-        + Tests
-          + sparql
-            + ARQ
-              + Algebra
-              + Ask
-              + Basic
-              + BasicPatterns
-              + BlankNodes
-              + Construct
-              + Describe
-              + Distinct
-              + Examples
-              + Expr
-              + Expr1
-              + Expr2
-              + ExprBuiltIns
-              + ExprDatatypes
-              + ExprEquals
-              + ExprRegex
-              + Extensions
-              + Function
-              + General
-              + OpenWorld
-              + Optional
-              + OrderBy
-              + Planning
-              + PropertyFunctions
-              + Select
-              + Serialization
-              + SolutionSeq
-              + Sort
-              + Syntax
-                + Syntax-ARQ
-                + Syntax-SPARQL
-                + Syntax-SPARQL2
-                + Syntax-SPARQL3
-              + TypePromotion
-              + Union
-              + Unsaid
-              + ValueTesting
-            + test-suite-archive
-              + data-r2
-                + algebra
-                + ask
-                + basic
-                + bnode-coreference
-                + boolean-effective-value
-                + bound
-                + cast
-                + construct
-                + dataset
-                + distinct
-                + expr-builtin
-                + expr-equals
-                + expr-ops
-                + graph
-                + i18n
-                + open-world
-                + optional
-                + optional-filter
-                + reduced
-                + regex
-                + solution-seq
-                + sort
-                + syntax-sparql1
-                + syntax-sparql2
-                + syntax-sparql3
-                + syntax-sparql4
-                + syntax-sparql5
-                + triple-match
-                + type-promotion
-          + sparql-1.1
-            + 2009
-              + sparql
-                + docs
-                  + tests
-                    + data-sparql11
-                      + add
-                      + aggregates
-                      + basic-update
-                      + bind
-                      + bindings
-                      + clear
-                      + construct
-                      + copy
-                      + csv-tsv-res
-                      + delete
-                      + delete-data
-                      + delete-insert
-                      + delete-where
-                      + drop
-                      + entailment
-                      + exists
-                      + functions
-                      + grouping
-                      + json-res
-                      + move
-                      + negation
-                      + project-expression
-                      + property-path
-                      + protocol
-                      + service
-                      + service-description
-                      + subquery
-                      + syntax-fed
-                      + syntax-query
-                      + syntax-update-1
-                      + syntax-update-2
-                      + update-silent
+    + MUD_DB_LeanCOR
+      + tests
+        + ontologies
+          + examples
+        + scripts
+    + MUD_DeepParsing
+      + prolog
+        + chat80
+        + CURT
+    + MUD_DLog
+      + dlog-reasoner
+        + doc
+        + examples
+          + alcoholic
+          + clever
+          + happy
+          + iocaste
+          + shi
+        + lib
+        + output
+        + src
+        + test
+        + xml_reader
+      + dlog-server
+        + bin
+          + lib
+        + examples
+          + alcoholic
+          + clever
+          + happy
+          + iocaste
+          + shi
+        + src
+          + core
+          + dl_translator
+            + fol
+            + old
+            + pure
+            + shiq
+          + hash
+          + interfaces
+          + prolog_translator
+            + debug
+            + docs
+            + pyutil
+          + test
+          + unfold
+        + test
     + MUD_ircbot
       + prolog
     + MUD_KnowRob
@@ -139,12 +124,176 @@ externals\PrologMUD_ext.vpj=20150105131252020
           + autoload
           + compare
           + prolog
+    + MUD_PDDL
+      - prolog
+        - planner
+          + bkwld_pddl_parser
+          + Blocks_world
+          + domains
+            + failing_or_too_slow
+            + others
+            + sanity
+          + ipc2008-no-cybersec
+            + netben-opt
+              + crewplanning-numeric
+              + elevators-numeric
+              + elevators-strips
+              + openstacks-adl
+              + openstacks-numericadl
+              + openstacks-stripsneg
+              + pegsol-strips
+              + transport-numeric
+              + woodworking-numeric
+            + seq-opt
+              + elevators-strips
+              + openstacks-adl
+              + openstacks-strips
+              + parcprinter-strips
+              + pegsol-strips
+              + scanalyzer-strips
+              + sokoban-strips
+              + transport-strips
+              + woodworking-strips
+            + seq-sat
+              + elevators-strips
+              + openstacks-adl
+              + openstacks-strips
+              + parcprinter-strips
+              + pegsol-strips
+          + orig_pddl_parser
+            + charts
+            + docs
+            + output
+            + test
+              + blocks
+              + elevators
+              + gripper
+              + hanoi
+          + Rakiduam07
+            + continuos
+            + socket_udp
     + MUD_ScriptEngines
       + ext
         + r6rs-plt-redex-model
+      + snark
+    + OLD_logicm00
+      - src_modules
+        + aleph
+        + candc
+          + candc-svn
+            + src
+              + api
+                + ccg
+                + nlp
+                + python
+                + soap
+              + data
+                + boot
+                + boxer
+                + ccg
+                  + cats
+                + ccg2ptb
+                + italian
+                  + prolog
+                  + scripts
+                + mpi
+                + vpe
+                  + wsj
+              + html
+              + include
+                + bootstrap
+                + config
+                + extract
+                + hashtable
+                + io
+                + maxent
+                + model
+                + parser
+                + relations
+                + tagger
+                + thesaurus
+                  + measures
+                  + weights
+                + tree
+                + utils
+              + lib
+                + bootstrap
+                + config
+                + extract
+                + io
+                + maxent
+                + model
+                + parser
+                + ports
+                + relations
+                + tagger
+                + thesaurus
+                  + measures
+                  + weights
+                + tokeniser
+                + tree
+                + utils
+              + main
+              + prolog
+                + boxer
+                  + knowledge
+                  + lex
+                + lib
+                + nutcracker
+              + scripts
+                + boxer
+                  + sick
+                + ccg
+                + class
+                + memex
+              + tests
+                + ccg
+                + depbank560
+              + web
+                + static
+                  + css
+                  + js
+          + working
+        + circlemuddata
+        + database
+          + benchmarks
+          + prologTestFiles
+        - indigolog
+          + Doc
+            + source
+          + Env
+          + Eval
+          + Examples
+            + ElevatorSim-BAT\.xpce
+            + CLIMA
+            + Delivery-BAT
+            + Elevator-Vanilla
+            + ElevatorLego-BAT
+            + ElevatorSim-BAT
+            + ER1Test-BAT
+            + PMS
+            + Wumpus-FLUX
+              + WumpusApplet
+            + Wumpus-KBAT
+              + Screenshots
+              + WumpusApplet
+          + flux_WumpusApplet
+          - Interpreters
+            + flux
+          + lib
+        + MaLARea
+          + bin
+          + data
+          + doc
+          + script
+            + malecop
+        + yadlr
+          + examples
+            + iris
+            + trains
+          - pl
     + swipl-library
       + bin
-        + amd64
       - boot
       + customize
       + demo
@@ -154,14 +303,12 @@ externals\PrologMUD_ext.vpj=20150105131252020
         + sicstus
         + Yap
       + lib
-        + amd64
       - library
         + chr
         + clp
           + clpq
           + clpqr
           + clpr
-        + cql
         + dcg
         + dialect
           + ciao
@@ -180,123 +327,9 @@ externals\PrologMUD_ext.vpj=20150105131252020
             + icons
             + js
         + pldoc
-        + pldoc - Copy
         - semweb
         - tipc
         + unicode
-      - pack
-        + db_facts
-          + doc
-          + examples
-          + prolog
-        - Downloads
-        - list_util
-          + prolog
-          - t
-        + mavis
-          + prolog
-          + t
-        - prosqlite
-          + c
-          + doc
-          + examples
-          + lib
-            + amd64
-            + i386-win32
-            + x64-win64
-          + prolog
-        + quickcheck
-          + prolog
-          + t
-        + swicli
-          + bin
-          + c
-            + Example4SWICLI
-              + obj
-                + Debug
-                + Release
-              + Properties
-            + SWICFFITests
-              + obj
-                + Debug
-                + Release
-              + Properties
-            + Swicli.Library
-              + mindtouch.reflection
-                + Properties
-              + obj
-                + Debug
-                + Release
-              + Properties
-            + SWICLITestDLL
-              + obj
-                + Debug
-                + Release
-              + Properties
-            + swicli
-          + cffi-tests
-          + doc
-            + api_files
-          + lib
-            + amd64
-            + i386-linux
-            + i386-win32
-            + x64-win64
-            + x86_64-linux
-          + prolog
-      + pack-disabled
-        + weblog\.git
-          + hooks
-          + info
-          + logs
-            + refs
-              + heads
-              + remotes
-                + origin
-          + objects
-            + pack
-          + refs
-            + heads
-            + remotes
-              + origin
-        + weblog
-          + demo
-          + docs
-          + prolog
-            + assetsources
-            + debug_page
-            + formatting
-            + html_form
-            + identity
-              + login_prototype
-                + docs
-              + stormpath
-            + info
-              + books
-                + google
-              + buttons
-              + geocoding
-                + google
-              + geohashing
-              + html
-              + maps
-                + google
-                + leaflet
-              + numbers
-              + stock
-                + crox
-              + weather
-                + geonames
-            + keys
-            + nav
-            + resources
-            + static
-              + css
-              + icons
-              + js
-            + support
-            + widgets
-              + agents
       + xpce
         + appl-help
         + bitmaps
@@ -331,7 +364,7 @@ externals\PrologMUD_ext.vpj=20150105131252020
               + icons
                 + 16x16
             + xref
-  - games
+  + games
     - src_game_nani
       + web
         + css
@@ -359,10 +392,10 @@ externals\PrologMUD_ext.vpj=20150105131252020
   - runtime
     + config-enabled
     + RDF-store
-  - src_lib
+  + src_lib
     - logicmoo_util
   - src_mud
-    - actions
+    + actions
     - dbase
     - mobs
       - affordance
@@ -370,192 +403,746 @@ externals\PrologMUD_ext.vpj=20150105131252020
     + objs
     + parsing
     - vworld
-+ externals\PrologMUD_ext.vpj
-scroll:69
+- externals\PrologMUD_ext.vpj
+  + MUD_DeepParsing\.git
+    + info
+    + logs
+      + refs
+        + heads
+    + refs
+      + heads
+  + MUD_KnowRob\.git
+    + info
+    + logs
+      + refs
+        + heads
+    + refs
+      + heads
+  + ClioPatria
+    + api
+    + applications
+      + help
+    + client
+      + Java
+    + components
+    + config-available
+    + entailment
+    + lib
+      + bundles
+      + cpack
+      + http
+      + semweb
+    + rdf
+      + base
+      + cpack
+      + tool
+    + rdfql
+    + skin
+    + test
+      + Tests
+        + sparql
+          + ARQ
+            + Algebra
+            + Ask
+            + Basic
+            + BasicPatterns
+            + BlankNodes
+            + Bound
+            + Construct
+            + Dataset
+            + Describe
+            + Distinct
+            + Examples
+            + Expr
+            + Expr1
+            + Expr2
+            + ExprBuiltIns
+            + ExprDatatypes
+            + ExprEquals
+            + ExprRegex
+            + Extensions
+            + Function
+            + General
+            + OpenWorld
+            + Optional
+            + OrderBy
+            + Planning
+            + PropertyFunctions
+            + Select
+            + Serialization
+            + SolutionSeq
+            + Sort
+            + Syntax
+              + Syntax-ARQ
+              + Syntax-SPARQL
+              + Syntax-SPARQL2
+              + Syntax-SPARQL3
+            + TypePromotion
+            + Union
+            + Unsaid
+            + ValueTesting
+          + test-suite-archive
+            + data-r2
+              + algebra
+              + ask
+              + basic
+              + bnode-coreference
+              + boolean-effective-value
+              + bound
+              + cast
+              + construct
+              + dataset
+              + distinct
+              + expr-builtin
+              + expr-equals
+              + expr-ops
+              + graph
+              + i18n
+              + open-world
+              + optional
+              + optional-filter
+              + reduced
+              + regex
+              + solution-seq
+              + sort
+              + syntax-sparql1
+              + syntax-sparql2
+              + syntax-sparql3
+              + syntax-sparql4
+              + syntax-sparql5
+              + triple-match
+              + type-promotion
+        + sparql-1.1
+          + 2009
+            + sparql
+              + docs
+                + tests
+                  + data-sparql11
+                    + add
+                    + aggregates
+                    + basic-update
+                    + bind
+                    + bindings
+                    + clear
+                    + construct
+                    + copy
+                    + csv-tsv-res
+                    + delete
+                    + delete-data
+                    + delete-insert
+                    + delete-where
+                    + drop
+                    + entailment
+                    + exists
+                    + functions
+                    + grouping
+                    + json-res
+                    + move
+                    + negation
+                    + project-expression
+                    + property-path
+                    + protocol
+                    + service
+                    + service-description
+                    + subquery
+                    + syntax-fed
+                    + syntax-query
+                    + syntax-update-1
+                    + syntax-update-2
+                    + update-silent
+    + user
+    + web
+      + FlintSparqlEditor
+        + ll1
+      + help
+        + howto
+      + tutorial
+        + Parsia
+      + yasqe
+      + yasr
+        + lib
+          + DataTables
+            + examples
+              + resources
+                + syntax
+          + DataTables-1.10.0
+            + examples
+              + resources
+                + syntax
+    + Windows
+  + hMUD
+  + MUD_DeepParsing
+    + prolog
+      + chat80
+      + CURT
+  + MUD_ircbot
+    + prolog
+  + MUD_KnowRob
+    + iai_maps\.git
+      + info
+      + logs
+        + refs
+          + heads
+          + remotes
+            + origin
+      + refs
+        + heads
+        + remotes
+          + origin
+    + knowrob\.git
+      + info
+      + logs
+        + refs
+          + heads
+      + refs
+        + heads
+        + tags
+    + knowrob_addons\.git
+      + info
+      + logs
+        + refs
+          + heads
+      + refs
+        + heads
+    + iai_maps
+      + iai_semantic_maps
+        + owl
+        + prolog
+    + knowrob
+      + comp_orgprinciples
+        + owl
+        + prolog
+      + comp_spatial
+        + owl
+        + prolog
+      + comp_temporal
+        + owl
+        + prolog
+      + json_prolog
+        + gradle
+          + wrapper
+        + json_prolog
+          + src
+            + main
+              + java
+                + org
+                  + knowrob
+                    + json_prolog
+                      + client
+                      + query
+                      + solutions
+                      + test
+        + scripts
+      + knowrob_actions
+        + owl
+        + prolog
+        + src
+          + edu
+            + tum
+              + cs
+                + ias
+                  + knowrob
+      + knowrob_common
+        + gradle
+          + wrapper
+        + knowrob_common
+          + src
+            + main
+              + java
+                + org
+                  + knowrob
+                    + owl
+                      + utils
+                    + prolog
+                    + utils
+                      + ros
+        + owl
+        + prolog
+      + knowrob_map_data
+        + owl
+        + prolog
+      + knowrob_map_tools
+        + owl
+        + prolog
+      + knowrob_mongo
+        + gradle
+          + wrapper
+        + knowrob_mongo
+          + src
+            + main
+              + java
+                + org
+                  + knowrob
+                    + interfaces
+                      + mongo
+                        + types
+                    + tfmemory
+        + prolog
+      + knowrob_objects
+        + owl
+        + prolog
+      + knowrob_srdl
+        + gradle
+          + wrapper
+        + knowrob_srdl
+          + src
+            + main
+              + java
+                + org
+                  + knowrob
+                    + knowrob_srdl
+        + owl
+        + prolog
+        + scripts
+      + knowrob_vis
+        + gradle
+          + wrapper
+        + html
+          + lib
+            + ros
+              + EventEmitter2
+              + threejs
+        + knowrob_vis
+          + src
+            + main
+              + java
+                + org
+                  + knowrob
+                    + vis
+        + prolog
+      + rosprolog
+        + prolog
+          + pldoc
+        + scripts
+      + tf_prolog
+        + gradle
+          + wrapper
+        + prolog
+        + tfjava
+          + src
+            + main
+              + java
+                + tfjava
+    + knowrob_addons
+      + comp_barcoo
+        + owl
+        + prolog
+        + src
+          + edu
+            + tum
+              + cs
+                + ias
+                  + knowrob
+                    + comp_barcoo
+      + comp_ehow
+        + howtos
+        + owl
+        + prolog
+        + src
+          + instruction
+            + converter
+            + disambiguator
+            + exceptions
+            + exporter
+              + owl
+            + factory
+            + gui
+              + dialog
+              + internal
+              + tab
+              + test
+            + importer
+            + opencyc
+            + patterns
+            + postprocessor
+            + ros
+            + semanticObjects
+            + syntaxparser
+            + test
+            + transformation
+            + wordnet
+            + wrapper
+        + wordnet
+      + comp_germandeli
+        + prolog
+        + src
+          + edu
+            + tum
+              + cs
+                + ias
+                  + knowrob
+                    + comp_germandeli
+      + comp_missingobj
+        + owl
+        + prolog
+      + flowchart_vis
+        + howtos
+        + owl
+        + prolog
+        + src
+          + org
+            + knowrob
+              + vis
+                + flowchart
+      + knowrob_cad_models
+        + owl
+        + prolog
+      + knowrob_cad_parser
+        + gradle
+          + wrapper
+        + knowrob_cad_parser
+          + src
+            + main
+              + java
+                + org
+                  + knowrob
+                    + vis
+                      + model
+                        + parser
+                        + util
+                          + algorithm
+        + prolog
+      + knowrob_cram
+        + gradle
+          + wrapper
+        + knowrob_cram
+          + src
+            + main
+              + java
+                + org
+                  + knowrob
+                    + cram
+        + owl
+        + prolog
+      + knowrob_mongo
+        + src
+          + org
+            + knowrob
+              + interfaces
+                + mongo
+                  + types
+      + knowrob_motion_constraints
+        + data
+          + scenario0
+        + owl
+        + prolog
+        + src
+          + org
+            + knowrob
+              + constr
+                + util
+      + knowrob_mud
+        + owl
+        + prolog
+      + knowrob_omics
+        + prolog
+        + rdf
+      + knowrob_openprs_interface
+        + owl
+      + knowrob_roslog_launch
+        + prolog
+      + knowrob_sim
+        + owl
+        + prolog
+      + mary_tts
+        + scripts
+        + src
+          + edu
+            + tum
+              + cs
+                + ias
+                  + mary_tts
+      + mod_action_visualization
+        + prolog
+        + src
+          + edu
+            + tum
+              + cs
+                + ias
+                  + knowrob
+                    + mod_action_visualization
+      + mod_dialog
+        + src
+          + edu
+            + tum
+              + cs
+                + ias
+                  + knowrob
+                    + mod_dialog
+                      + queries
+      + mod_probcog
+        + prolog
+      + mod_self_info
+        + owl
+        + prolog
+        + src
+          + edu
+            + tum
+              + cs
+                + ias
+                  + knowrob
+                    + mod_self_info
+      + opencyc
+      + semantic_map_to_owl
+        + gradle
+          + wrapper
+        + scripts
+        + semantic_map_to_owl
+          + src
+            + main
+              + java
+                + org
+                  + knowrob
+                    + map
+    + knowrob_logicmoo
+      + euler
+        + 02swap
+          + classes
+            + euler
+        + prolog
+    + robokind
+      + milo
+        + cogchar-onto
+        + milo-lesson
+          + app
+          + dphys
+            + MiloTests
+              + less_legacy
+          + scenegen_props
+            + Module_1_SceneProperties\.svn
+              + pristine
+                + 1e
+                + 4c
+                + 63
+                + 96
+                + 9b
+                + c3
+            + Module_1_SceneProperties
+        + onto
+          + rdf_owl
+          + templates
+            + input
+          + testdata
+            + content
+            + media_ptr
+        + prolog
+        + RK_R25_Demo_OnDisk
+          + account
+          + content
+          + media_ptr
+  + MUD_PDDL
+    + prolog
+      + planner
+        + bkwld_pddl_parser
+        + Blocks_world
+        + orig_pddl_parser
+        + Rakiduam07
+          + continuos
+          + socket_udp
+  + MUD_ScriptEngines
+    + ext
+  + MUD_WebTHEA
+    + apps
+      + labelgen
+        + grammars
+      + mireot
+      + opencalais
+      + owlmacros
+      + semsim
+      + webthea_old
+    + benchmarks
+    + bin
+    + examples
+    + iso
+    + owl2java
+    + owlgres
+    + rules
+    + t
+    + testfiles
+    + util
+  + swipl-library
+    + boot
+    + demo
+    + library
+      + chr
+      + clp
+        + clpq
+        + clpqr
+        + clpr
+      + cql
+      + dcg
+      + dialect
+        + ciao
+          + engine
+          + regtypes
+        + eclipse
+        + hprolog
+        + iso
+        + sicstus
+        + swi
+      + http
+      + pldoc
+      + semweb
+      + tipc
+      + unicode
+    + pack
+      + db_facts
+        + examples
+        + prolog
+      + list_util
+        + prolog
+        + t
+      + mavis
+        + prolog
+        + t
+      + prosqlite
+        + examples
+        + prolog
+      + quickcheck
+        + prolog
+        + t
+      + swicli
+        + cffi-tests
+        + prolog
+    + pack-disabled
+      + weblog
+        + demo
+        + prolog
+          + debug_page
+          + formatting
+          + html_form
+          + identity
+            + login_prototype
+            + stormpath
+          + info
+            + books
+              + google
+            + buttons
+            + geocoding
+              + google
+            + geohashing
+            + html
+            + maps
+              + google
+              + leaflet
+            + numbers
+            + stock
+              + crox
+            + weather
+              + geonames
+          + keys
+          + nav
+          + resources
+          + support
+          + widgets
+            + agents
+    + xpce
+      + prolog
+        + boot
+        + contrib
+          + rubik
+        + demo
+        + lib
+          + compatibility
+          + dialog
+          + doc
+          + draw
+          + emacs
+          + english
+          + http
+          + man
+          + math
+          + plot
+          + swi
+          + trace
+          + xref
+  + swish
+    + examples
+    + filesystems
+    + lib
+      + render
+    + test
+    + web
+      + css
+      + js
+  + triple20
+    + Ontologies
+      + Base
+      + Demo
+    + Plugins
+    + src
+      + Keep
+scroll:10
 [State]
-SCREEN: 1920 1080 198 143 1440 699 0 0 M 0 0 0 0 1469 553
-CWD: ..\PrologMUD
-BUFFER: BN="externals\swipl-library\boot\syspred.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.8013 CL=13 LE=0 CX=12 CY=14 WI=5 BI=15 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\swipl-library\boot\dcg.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+SCREEN: 1920 1080 198 143 1440 699 0 0 M 0 0 0 0 1469 536
+CWD: externals\MUD_ScriptEngines\snark\09-43-01
+BUFFER: BN="externals\MUD_ScriptEngines\snark\debug.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
 VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=5 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\swipl-library\library\tipc\tipc_broadcast.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\swipl-library\library\semweb\rdf_litindex.pl"
+BUFFER: BN="externals\MUD_ScriptEngines\snark\dbase_rules_nnf.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.20331 CL=28 LE=0 CX=27 CY=16 WI=5 BI=16 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\swipl-library\library\semweb\rdf_cache.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.1631 CL=19 LE=0 CX=18 CY=9 WI=5 BI=18 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\swipl-library\library\semweb\rdfs.rdfs"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=19 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\swipl-library\library\semweb\rdfa.pl"
+VIEW: LN=.5555 CL=1 LE=0 CX=0 CY=58 WI=5 BI=16 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\MUD_ScriptEngines\snark\dbase_i_bootstrap_dnf.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=20 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\swipl-library\library\prolog_metainference.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=21 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\swipl-library\library\prolog_server.pl"
+VIEW: LN=.1995 CL=39 LE=0 CX=38 CY=17 WI=5 BI=22 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\MUD_ScriptEngines\snark\dbase_rules_testing.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=22 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\swipl-library\library\prolog_source.pl"
+VIEW: LN=.866 CL=67 LE=0 CX=66 CY=15 WI=5 BI=19 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\MUD_ScriptEngines\snark\dbase_rules_pttp_statics.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1796 CL=20 LE=0 CX=19 CY=2 WI=5 BI=18 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\MUD_ScriptEngines\snark\dbase_rules_pttp.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.20091 CL=17 LE=0 CX=16 CY=15 WI=5 BI=15 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\MUD_ScriptEngines\snark\snark_ailog2.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.67199 CL=12 LE=0 CX=11 CY=19 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\MUD_ScriptEngines\snark\snark_in_prolog.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.2521 CL=53 LE=0 CX=52 CY=12 WI=5 BI=21 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="\var\www\newlisp\idastar.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.538 CL=51 LE=0 CX=50 CY=14 WI=5 BI=24 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="externals\MUD_ScriptEngines\ext\moo_ext_lisp_triska.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
 VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=23 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\swipl-library\library\pure_input.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=24 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\swipl-library\library\tipc\tipc_linda.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=25 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\swipl-library\pack\list_util\t\lazy_include.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=26 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\swipl-library\library\helpidx.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.78608 CL=11 LE=0 CX=10 CY=9 WI=5 BI=29 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\swipl-library\library\prolog_xref.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.34015 CL=36 LE=0 CX=35 CY=9 WI=5 BI=32 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\swipl-library\xpce\prolog\lib\swi_hooks.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.2281 CL=8 LE=0 CX=7 CY=7 WI=5 BI=31 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="src_lib\logicmoo_util\logicmoo_util_header.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=33 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="src_lib\logicmoo_util\logicmoo_util_all.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.979 CL=1 LE=0 CX=0 CY=16 WI=5 BI=36 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="src_mud\vworld\world_agent.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.1408 CL=20 LE=0 CX=19 CY=27 WI=5 BI=37 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="src_lib\logicmoo_util\logicmoo_util_bugger.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.50652 CL=25 LE=0 CX=24 CY=15 WI=5 BI=27 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="runtime\run_mud_server.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.2530 CL=22 LE=0 CX=21 CY=13 WI=5 BI=34 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="src_mud\mobs\affordance\simbots.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.16768 CL=48 LE=0 CX=47 CY=15 WI=5 BI=44 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="src_mud\actions\use.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=616 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.3224 CL=4 LE=0 CX=3 CY=20 WI=5 BI=41 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="src_mud\actions\inventory.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=42 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="src_mud\vworld\toploop_telnet.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.2596 CL=11 LE=0 CX=10 CY=19 WI=5 BI=35 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\swipl-library\boot\init.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.56125 CL=1 LE=0 CX=0 CY=25 WI=5 BI=28 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="\var\www\newlisp\makefile_aixLP64_utf8_xlc"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=520 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=39 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_ScriptEngines\ext\moo_ext_cyc_new.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.162325 CL=37 LE=0 CX=36 CY=16 WI=5 BI=38 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="src_mud\actions\showdebug.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.1082 CL=86 LE=0 CX=85 CY=13 WI=5 BI=40 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1293 377 -1 -1 N  WF=0 WT=30 "Default Fixed Font,10,0,1"
-BUFFER: BN="src_mud\mobs\affordance\simbots.pl"
-VIEW: LN=.16768 CL=48 LE=0 CX=47 CY=15 WI=208 BI=44 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1293 377 -1 -1 N  WF=0 WT=21 "Default Fixed Font,10,0,1"
-BUFFER: BN="runtime\run_mud_server.pl"
-VIEW: LN=.2530 CL=22 LE=0 CX=21 CY=13 WI=190 BI=34 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1293 377 -1 -1 N  WF=0 WT=15 "Default Fixed Font,10,0,1"
-BUFFER: BN="src_lib\logicmoo_util\logicmoo_util_bugger.pl"
-VIEW: LN=.50652 CL=25 LE=0 CX=24 CY=15 WI=133 BI=27 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1293 377 -1 -1 N  WF=0 WT=29 "Default Fixed Font,10,0,1"
-BUFFER: BN="src_mud\actions\inventory.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=206 BI=42 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1293 377 -1 -1 N  WF=0 WT=24 "Default Fixed Font,10,0,1"
-BUFFER: BN="src_mud\vworld\toploop_telnet.pl"
-VIEW: LN=.2596 CL=7 LE=0 CX=6 CY=19 WI=197 BI=35 HT=0 HN=0 HF=0 HC=4
-WINDOW: 154 154 1293 377 -1 -1 N  WF=0 WT=27 "Default Fixed Font,10,0,1"
-BUFFER: BN="\var\www\newlisp\makefile_aixLP64_utf8_xlc"
-VIEW: LN=.494 CL=1 LE=0 CX=0 CY=11 WI=173 BI=39 HT=0 HN=0 HF=0 HC=4
-WINDOW: 110 110 1293 377 -1 -1 N  WF=0 WT=16 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\swipl-library\boot\init.pl"
-VIEW: LN=.56125 CL=1 LE=0 CX=0 CY=25 WI=137 BI=28 HT=0 HN=0 HF=0 HC=4
-WINDOW: 110 110 1293 377 -1 -1 N  WF=0 WT=25 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_ScriptEngines\ext\moo_ext_cyc_new.pl"
-VIEW: LN=.162439 CL=23 LE=0 CX=22 CY=20 WI=154 BI=38 HT=0 HN=0 HF=0 HC=4
-WINDOW: 132 132 1293 377 -1 -1 N  WF=0 WT=26 "Default Fixed Font,10,0,1"
-BUFFER: BN="src_mud\actions\showdebug.pl"
-VIEW: LN=.1189 CL=49 LE=0 CX=48 CY=15 WI=183 BI=40 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1293 377 -1 -1 N  WF=0 WT=23 "Default Fixed Font,10,0,1"
-BUFFER: BN="src_mud\vworld\world_agent.pl"
-VIEW: LN=.1408 CL=20 LE=0 CX=19 CY=27 WI=195 BI=37 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1293 377 -1 -1 N  WF=0 WT=22 "Default Fixed Font,10,0,1"
-BUFFER: BN="src_lib\logicmoo_util\logicmoo_util_all.pl"
-VIEW: LN=.979 CL=1 LE=0 CX=0 CY=16 WI=192 BI=36 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1293 377 -1 -1 N  WF=0 WT=20 "Default Fixed Font,10,0,1"
-BUFFER: BN="src_lib\logicmoo_util\logicmoo_util_header.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=188 BI=33 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1293 377 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\swipl-library\boot\syspred.pl"
-VIEW: LN=.1368 CL=22 LE=0 CX=21 CY=9 WI=106 BI=15 HT=0 HN=0 HF=0 HC=4
-WINDOW: 132 132 1293 377 -1 -1 N  WF=0 WT=17 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\swipl-library\xpce\prolog\lib\swi_hooks.pl"
-VIEW: LN=.2281 CL=8 LE=0 CX=7 CY=7 WI=147 BI=31 HT=0 HN=0 HF=0 HC=4
-WINDOW: 176 176 1293 377 -1 -1 N  WF=0 WT=19 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\swipl-library\library\prolog_xref.pl"
-VIEW: LN=.34015 CL=36 LE=0 CX=35 CY=18 WI=150 BI=32 HT=0 HN=0 HF=0 HC=4
-WINDOW: 154 154 1293 377 -1 -1 N  WF=0 WT=18 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\swipl-library\library\helpidx.pl"
-VIEW: LN=.78608 CL=11 LE=0 CX=10 CY=9 WI=143 BI=29 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1293 377 -1 -1 N  WF=0 WT=12 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\swipl-library\library\pure_input.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=127 BI=24 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1293 377 -1 -1 N  WF=0 WT=14 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\swipl-library\pack\list_util\t\lazy_include.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=131 BI=26 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1293 377 -1 -1 N  WF=0 WT=13 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\swipl-library\library\tipc\tipc_linda.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=129 BI=25 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1293 377 -1 -1 N  WF=0 WT=11 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\swipl-library\library\prolog_source.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=125 BI=23 HT=0 HN=0 HF=0 HC=4
-WINDOW: 176 176 1293 377 -1 -1 N  WF=0 WT=10 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\swipl-library\library\prolog_server.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=123 BI=22 HT=0 HN=0 HF=0 HC=4
-WINDOW: 154 154 1293 377 -1 -1 N  WF=0 WT=9 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\swipl-library\library\prolog_metainference.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=121 BI=21 HT=0 HN=0 HF=0 HC=4
-WINDOW: 132 132 1293 377 -1 -1 N  WF=0 WT=8 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\swipl-library\library\semweb\rdfa.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=119 BI=20 HT=0 HN=0 HF=0 HC=4
-WINDOW: 110 110 1293 377 -1 -1 N  WF=0 WT=7 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\swipl-library\library\semweb\rdfs.rdfs"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=117 BI=19 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1293 377 -1 -1 N  WF=0 WT=6 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\swipl-library\library\semweb\rdf_cache.pl"
-VIEW: LN=.1631 CL=19 LE=0 CX=18 CY=9 WI=115 BI=18 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1293 377 -1 -1 N  WF=0 WT=5 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\swipl-library\library\semweb\rdf_litindex.pl"
-VIEW: LN=.20331 CL=28 LE=0 CX=27 CY=16 WI=113 BI=16 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1293 377 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\swipl-library\library\tipc\tipc_broadcast.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=111 BI=17 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1293 377 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\swipl-library\boot\dcg.pl"
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=109 BI=5 HT=0 HN=0 HF=0 HC=4
-WINDOW: 176 176 1293 377 -1 -1 M  WF=0 WT=28 "Default Fixed Font,10,0,1"
-BUFFER: BN="src_mud\actions\use.pl"
-VIEW: LN=.3559 CL=9 LE=0 CX=8 CY=26 WI=204 BI=41 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1293 360 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\MUD_ScriptEngines\snark\dbase_rules_pttp_statics.pl"
+VIEW: LN=.1796 CL=20 LE=0 CX=19 CY=2 WI=172 BI=18 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1293 360 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\MUD_ScriptEngines\snark\dbase_rules_testing.pl"
+VIEW: LN=.866 CL=67 LE=0 CX=66 CY=15 WI=171 BI=19 HT=0 HN=0 HF=0 HC=4
+WINDOW: 176 176 1293 360 -1 -1 N  WF=0 WT=9 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\MUD_ScriptEngines\snark\snark_in_prolog.pl"
+VIEW: LN=.33161 CL=22 LE=0 CX=21 CY=15 WI=182 BI=21 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1293 360 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\MUD_ScriptEngines\snark\dbase_rules_nnf.pl"
+VIEW: LN=.5555 CL=1 LE=0 CX=0 CY=18 WI=174 BI=16 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1293 360 -1 -1 N  WF=0 WT=11 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\MUD_ScriptEngines\snark\dbase_i_bootstrap_dnf.pl"
+VIEW: LN=.1995 CL=39 LE=0 CX=38 CY=17 WI=186 BI=22 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1293 360 -1 -1 N  WF=0 WT=6 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\MUD_ScriptEngines\snark\snark_ailog2.pl"
+VIEW: LN=.67199 CL=12 LE=0 CX=11 CY=19 WI=178 BI=17 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1293 360 -1 -1 N  WF=0 WT=7 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\MUD_ScriptEngines\ext\moo_ext_lisp_triska.pl"
+VIEW: LN=.641 CL=1 LE=0 CX=0 CY=14 WI=180 BI=23 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1293 360 -1 -1 N  WF=0 WT=10 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\MUD_ScriptEngines\snark\debug.pl"
+VIEW: LN=.1466 CL=42 LE=0 CX=41 CY=30 WI=184 BI=5 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1293 360 -1 -1 N  WF=0 WT=8 "Default Fixed Font,10,0,1"
+BUFFER: BN="\var\www\newlisp\idastar.pl"
+VIEW: LN=.538 CL=51 LE=0 CX=50 CY=14 WI=166 BI=24 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1293 360 -1 -1 M  WF=0 WT=5 "Default Fixed Font,10,0,1"
+BUFFER: BN="externals\MUD_ScriptEngines\snark\dbase_rules_pttp.pl"
+VIEW: LN=.20091 CL=17 LE=0 CX=16 CY=15 WI=176 BI=15 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
-src_mud\actions\showdebug.pl
-externals\MUD_ScriptEngines\ext\moo_ext_cyc_new.pl
-\var\www\newlisp\makefile_aixLP64_utf8_xlc
-src_mud\vworld\toploop_telnet.pl
-src_mud\actions\inventory.pl
-src_mud\actions\use.pl
-src_lib\logicmoo_util\logicmoo_util_bugger.pl
-runtime\run_mud_server.pl
-src_mud\mobs\affordance\simbots.pl
+externals\MUD_ScriptEngines\snark\dbase_rules_nnf.pl
+externals\MUD_ScriptEngines\snark\13-52-47\dbase_rules_nnf.pl
+externals\MUD_ScriptEngines\snark\snark_in_prolog.pl
+externals\MUD_ScriptEngines\snark\09-43-01\dbase_rules_pttp_statics.pl
+externals\MUD_ScriptEngines\snark\09-43-01\dbase_rules_pttp.pl
+externals\MUD_ScriptEngines\snark\09-43-01\dbase_rules_testing.pl
+externals\MUD_ScriptEngines\snark\dbase_rules_testing.pl
+externals\MUD_ScriptEngines\snark\dbase_rules_pttp_statics.pl
+externals\MUD_ScriptEngines\snark\dbase_rules_pttp.pl

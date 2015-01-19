@@ -290,6 +290,17 @@ create_instance_0(What,Type,Props):- leash(+call),trace,dtrace,trace_or_throw(dm
 %ttCreateable(col).
 
 
+:-decl_type(vtBasicDir).
+vtBasicDir(vNorth).
+vtBasicDir(vEast).
+vtBasicDir(vSouth).
+vtBasicDir(vWest).
+
+:-decl_type(vtBasicDirPlusUpDown).
+vtBasicDirPlusUpDown(X):-vtBasicDir(X).
+vtBasicDirPlusUpDown(vUp).
+vtBasicDirPlusUpDown(vDown).	
+
 
 :-decl_mpred_hybrid(mudKwLabel(ftTerm,ftTerm)).
 :-decl_mpred_hybrid(mudOpaqueness(ftTerm,ftPercent)).

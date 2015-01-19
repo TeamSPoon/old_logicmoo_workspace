@@ -40,6 +40,8 @@ alt_forms2(r,F,A,B,R,NP):-dbase_t(genlPreds,FF,F),NP=..[FF,A,B|R].
 decl_database_hook(retract(Kind),P):- forall(alt_forms(r,P,NP),ignore(hooked_op(retract(Kind),NP))).
 
 
+
+
 % ========================================================================================
 % DEDUCE FACTS
 % ========================================================================================

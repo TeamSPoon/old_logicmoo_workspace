@@ -116,14 +116,16 @@ read_one_term(Stream,Term):- catch(once(( read_term(Stream,Term,[double_quotes(s
 rescan_mpred_stubs:- doall((mpred_prop(F,prologHybrid),mpred_arity(F,A),A>0,warnOnError(declare_dbase_local_dynamic(moo,F,A)))).
 
 
-:-meta_predicate_transparent(finish_processing_world/0).
+%:-meta_predicate_transparent(finish_processing_world).
 %:-meta_predicate(finish_processing_world).
-:-dynamic(finish_processing_world/0).
-:-module_transparent(finish_processing_world/0).
 
-:-meta_predicate_transparent(finish_processing_world/0).
-:-meta_predicate_transparent(finish_processing_game/0).
-:-meta_predicate_transparent(rescan_all/0).
+%:- dynamic(finish_processing_world/0).
+
+% :-module_transparent(finish_processing_world()).
+
+% :-meta_predicate_transparent(finish_processing_world).
+% :-meta_predicate_transparent(finish_processing_game()).
+%:-meta_predicate_transparent(rescan_all/0).
 :-meta_predicate_transparent(doall_and_fail(0)).
 
 finish_processing_world :- load_game_files, loop_check_local(with_assertions(thlocal:do_slow_kb_op_now,doall(finish_processing_game)),true).
@@ -142,7 +144,7 @@ onEndOfFile(Call):-current_filesource(F),asserta(onEndOfFile(F,Call)).
 
 assert_until_end_of_file(Fact):-must_det_l((thread_local(Fact),asserta(Fact),onEndOfFile(retract(Fact)))).
 
-:-meta_predicate_transparent(rescan_all/0).
+%:-meta_predicate_transparent(rescan_all/0).
 rescan_all:- doall_and_fail(rescan_game_loaded).
 rescan_all:- doall_and_fail(rescan_dbase_ops).
 rescan_all:- doall_and_fail(rescan_dbase_facts).
@@ -153,7 +155,7 @@ rescan_all.
 
 ensure_at_least_one_region:- (mudIsa(_,tRegion)->true;create_instance(oneRegion1,tRegion)),!.
 
-:-meta_predicate_transparent(finish_processing_game/0).
+% :-meta_predicate_transparent(finish_processing_game).
 finish_processing_game:- dmsginfo(begin_finish_processing_game),fail.
 finish_processing_game:- doall_and_fail(rescan_all).
 finish_processing_game:- doall_and_fail(ensure_at_least_one_region).
@@ -164,7 +166,7 @@ finish_processing_game:- dmsginfo(end_finish_processing_game),fail.
 finish_processing_game.
 
 
-:-meta_predicate_transparent(rescandb/0).
+%:-meta_predicate_transparent(rescandb/0).
 % rescandb:- forall(thglobal:current_world(World),(findall(File,thglobal:loaded_file_world_time(File,World,_),Files),forall(member(File,Files),ensure_plmoo_loaded_each(File)),call(finish_processing_world))).
 rescandb:- call(finish_processing_world).
 
@@ -177,10 +179,10 @@ rescandb:- call(finish_processing_world).
 % gload:- load_game(savedb),!.
 gload:- load_game(logicmoo('rooms/startrek.all.plmoo')).
 
-:-meta_predicate_transparent(savedb/0).
+%:-meta_predicate_transparent(savedb/0).
 savedb:-!.
 savedb:- debugOnError(rsavedb),!.
-:-meta_predicate_transparent(rsavedb/0).
+%:-meta_predicate_transparent(rsavedb/0).
 rsavedb:-
  debugOnError(rescan_dbase_facts),
  catch((   
@@ -189,7 +191,7 @@ rsavedb:-
    tell('/tmp/lm/savedb'),make_db_listing,told),E,dmsginfo(savedb(E))),!.
 
 
-:-meta_predicate_transparent(make_db_listing/0).
+%:-meta_predicate_transparent(make_db_listing/0).
 make_db_listing:-
  % dbase_mod(DBM),
 %   listing(dbase_t),

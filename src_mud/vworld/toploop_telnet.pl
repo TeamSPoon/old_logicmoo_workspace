@@ -12,7 +12,7 @@
                   do_player_action/1,
                   connect_player/2,
                   look_brief/1,
-                  show_room_grid/1,
+                  cmdShowRoomGrid/1,
                   inst_label/2,
                   display_grid_labels/0,
                   telnet_repl_writer/4,
@@ -230,8 +230,8 @@ do_player_action(Agent,CMD):-fmt('skipping_unknown_player_action(~q,~q).~n',[Age
 % DEFAULT TELNET "LOOK"
 % ===========================================================
 look_brief(Agent):- prop(Agent,mudLastCommand,X),nonvar(X),functor(X,actLook,_),!.
-look_brief(Agent):- not(prop(Agent,mudNeedsLook,true)),!.
-look_brief(Agent):- must(prop(Agent,mudNeedsLook,true)),look_as(Agent).
+look_brief(Agent):- not(prop(Agent,mudNeedsLook,vTrue)),!.
+look_brief(Agent):- must(prop(Agent,mudNeedsLook,vTrue)),look_as(Agent).
 
 telnet_repl_writer(_TL,call,ftTerm,Goal):-!,ignore(debugOnError(Goal)).
 telnet_repl_writer( TL,text,Type,[V]):-telnet_repl_writer(TL,text,Type,V).
@@ -285,8 +285,9 @@ write_pretty_aux([[_|_]|Tail],Return,Column) :-
 
 
 
-show_room_grid(Room) :- ignore(show_room_grid_new(Room)),!.
-% show_room_grid(Room) :-show_room_grid_old(Room),!.
+
+cmdShowRoomGrid(Room) :- ignore(show_room_grid_new(Room)),!.
+% cmdShowRoomGrid(Room) :-show_room_grid_old(Room),!.
 
 % ===================================================================
 % show_room_grid_new(Room)
@@ -329,20 +330,20 @@ show_room_grid_old(Room) :-
 	mudGrid(Room,1,G,_),
 	length(G,N),
 	M is N + 1,
-	show_room_grid(Room,1,1,M).
+	cmdShowRoomGrid(Room,1,1,M).
 
-show_room_grid(Room,Old,N,N) :-
+cmdShowRoomGrid(Room,Old,N,N) :-
 	New is Old + 1,
 	\+ mudGrid(Room,New,N,_),
 	nl,
 	!.
 
-show_room_grid(Room,Old,N,N) :-
+cmdShowRoomGrid(Room,Old,N,N) :-
 	New is Old + 1,
 	nl,
 	!,
-	show_room_grid(Room,New,1,N).
-show_room_grid(Room,Y,X,N) :-
+	cmdShowRoomGrid(Room,New,1,N).
+cmdShowRoomGrid(Room,Y,X,N) :-
       loc_to_xy(Room,X,Y,LOC),
 	asserted_atloc(Obj,LOC),
         props(Obj,mudIsa(tAgentGeneric)),
@@ -352,8 +353,8 @@ show_room_grid(Room,Y,X,N) :-
 	write('Region1+'), write(' '),
 	XX is X + 1,
 	!,
-	show_room_grid(Room,Y,XX,N).
-show_room_grid(Room,Y,X,N) :-
+	cmdShowRoomGrid(Room,Y,XX,N).
+cmdShowRoomGrid(Room,Y,X,N) :-
         loc_to_xy(Room,X,Y,LOC),
 	asserted_atloc(Obj,LOC),
         prop(Obj,mudIsa,Class),
@@ -361,15 +362,15 @@ show_room_grid(Room,Y,X,N) :-
 	write(Label), write(' '),
 	XX is X + 1,
 	!,
-	show_room_grid(Room,Y,XX,N).
-show_room_grid(Room,Y,X,N) :-
+	cmdShowRoomGrid(Room,Y,XX,N).
+cmdShowRoomGrid(Room,Y,X,N) :-
       loc_to_xy(Room,X,Y,LOC),
 	asserted_atloc(Agent,LOC),
 	mudIsa(Agent,tAgentGeneric),
 	write('Ag'), write(' '),
 	XX is X + 1,
 	!,
-	show_room_grid(Room,Y,XX,N).
+	cmdShowRoomGrid(Room,Y,XX,N).
 
 
 % Used to display the labels of the grid locations. (the key to the map).
