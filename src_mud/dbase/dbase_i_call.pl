@@ -14,7 +14,6 @@
 
 :-meta_predicate_transparent(call_mpred(0)).
 :-meta_predicate_transparent(call_mpred(+,+)).
-:-decl_mpred_prolog(call_mpred/1).
 
 % oncely later will throw an error if there where choice points left over by call
 oncely(:-(Call)):-!,Call,!.
@@ -156,8 +155,8 @@ call_mpred_0(C):- debugOnError(C),!.  % just atoms
 call_mpred(_,C):- into_mpred_form(C,MP),MP\=@=C,!,call_mpred(MP).
 call_mpred(_,dbase_t([H|T])):- !,dbase_t([H|T]).
 call_mpred(F,C):- mpred_prop(F,prologPTTP),!,debugOnError(pttp_call(C)).
-call_mpred(dbase_t,C):- trace_or_throw(not_into_mpred_form(C)),!.
 call_mpred(F,C):- mpred_prop(F,prologOnly),!,must_det(is_callable(C)),!,debugOnError(C).
+call_mpred(dbase_t,C):- trace_or_throw(not_into_mpred_form(C)),!.
 
 % lazy hooking up of new preds
 call_mpred(F,C):- not(is_callable(C)),!,functor(C,F,A),dmsg(todo(non_existent(F/A,C))),!,A>1,
@@ -202,8 +201,6 @@ body_no_backchains(_,B):- body_no_backchains_match(B),!,B.
 body_no_backchains(H,B):- call_mpred_body(H,B).
 
 body_no_backchains_match((!,body_req(_, _, _, _))).
-
-:-decl_mpred_prolog(naf/1).
 
 naf(Goal):-not(req(Goal)).
 

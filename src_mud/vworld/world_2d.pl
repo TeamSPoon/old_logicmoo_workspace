@@ -175,28 +175,36 @@ mudLocOnSurface(Clothes,Agent):-loop_check(wearsClothing(Agent,Clothes),fail).
 :-export(same_regions/2).
 same_regions(Agent,Obj):-must(inRegion(Agent,Where1)),dif_safe(Agent,Obj),inRegion(Obj,Where2),Where1=Where2.
 
-prologPTTP(inRegion(tObj,tRegion)).
-prologPTTP(localityOfObject(tObj,tSpatialthing)).
+%:-decl_mpred(prologPTTP(inRegion(tObj,tRegion))).
+%prologPTTP(localityOfObject(tObj,tSpatialthing)).
 
-:- add_mpred_universal_stub(prologPTTP,inRegion,2).
-:- add_mpred_universal_stub(prologPTTP,mudTestAgentWearing,2).
-
-inRegion(Obj,Region):-provide_mpred_storage_ops(prologPTTP,call(_),inRegion(Obj,Region)).
+%:- add_storage_stub(prologPTTP,inRegion/2).
+%:- add_storage_stub(prologPTTP,mudTestAgentWearing/2).
 
 % inRegion(Agent,Region):- nonvar(Agent),!, loop_check(( (is_asserted(mudAtLoc(Agent,Where));localityOfObject(Agent,Where)), locationToRegion(Where,Region)),fail).
 %inRegion(Agent,Region):- nonvar(Region),!, loop_check(( (is_asserted(atloc(Agent,Where));localityOfObject(Agent,Where)), locationToRegion(Where,Region)),fail).
 
+/*
+:- must(show_call(get_mpred_storage_provider(assert(_),inRegion,O))).
+:- must(show_call(get_mpred_storage_provider(assert(_),inRegion/2,O))).
+:- must(show_call(get_mpred_storage_provider(assert(_),inRegion(_,_),O))).
+*/
+
+inRegion(Obj,Where):- localityOfObject(Obj,Where), tRegion(Where).
+
+% :-snark_tell(localityOfObject(A,B) &  localityOfObject(B,C) => localityOfObject(A,C)).
+
+
+%localityOfObject(fo_T__T_T_T_TTTT_________TT__To,fo_T__T_T_T_TTTT_________TT__To_R).
+
 localityOfObject(Inner,Container):-mudInsideOf(Inner,Container).
 localityOfObject(Above,HasSurface):-mudLocOnSurface(Above,HasSurface).
-localityOfObject(Obj,Region):-loop_check(inRegion(Obj,Region),fail).
 localityOfObject(Clothes,Agent):-mudSubPart(Agent,Clothes).
+localityOfObject(Inner,Outer):-in_pttp,localityOfObject(Inner,Container),localityOfObject(Container,Outer).
+localityOfObject(Obj,Region):-loop_check(inRegion(Obj,Region),fail).
 
-:-snark_tell(localityOfObject(Obj,Where) &  tRegion(Where) => inRegion(Obj,Where)).
-:-snark_tell(localityOfObject(A,B) &  localityOfObject(B,C) => localityOfObject(A,C)).
-
-:-listing(inRegion).
-:-listing(localityOfObject).
-:- prolog.
+:- listing(inRegion).
+:- listing(localityOfObject).
 
 mudSubPart(Outer,Inner):-is_asserted(mudInsideOf(Inner,Outer)).
 mudSubPart(Agent,Clothes):-wearsClothing(Agent,Clothes).

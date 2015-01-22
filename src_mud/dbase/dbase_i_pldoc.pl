@@ -8,13 +8,13 @@
 :-export((term_listing/1)).
 term_listing([]):-!.
 term_listing(Match):-
-   ignore((catch(listing(Match),_,fail))),
+   '@'((ignore((catch(listing(Match),E,wdmsg(E)))),
    doall((
-      synth_clause_for(H,B),
-      once(ok_pred(H)),
-      once(use_term_listing(Match,H,B)),
-      show_term_listing(H,B),
-      fail)).
+      dbase_i_pldoc:synth_clause_for(H,B),
+      once(dbase_i_pldoc:ok_pred(H)),
+      once(dbase_i_pldoc:use_term_listing(Match,H,B)),
+      dbase_i_pldoc:show_term_listing(H,B),
+      fail))),'user').
 
 synth_clause_for(H,B):- cur_predicate(H,_),synth_clause_db(H,B).
 
@@ -65,7 +65,7 @@ bad_pred(P):-not(predicate_property(P,number_of_clauses(_))).
 bad_pred(P):-predicate_property(P,imported_from(_)),predicate_property(P,static).
 bad_pred(P):-predicate_property(P,foreign).
 
-pred_info(H,Props):- findall(PP,mpred_prop(H,PP),Props).
+pred_info(H,Props):- get_functor(H,F), findall(PP,mpred_prop(F,PP),Props).
 
 
 show_term_listing(H,true):- !, show_term_listing(H).
@@ -92,7 +92,7 @@ showall(Call):- doall(show_call(Call)).
 findallCall(Args,Functor,ICallL,ICallLL):-  findall(Args,call(Functor,Args),ICallL),findall(Functor:C,member(C,ICallL),ICallLL).
 
 sreq(Call):-
- into_mpred_form(Call,MCall),functor_h(MCall,MF), findall(P,pred_info(MF,P),Props),dmsg(props=Props),
+ into_mpred_form(Call,MCall),get_functor(MCall,MF),findall(P,pred_info(MF,P),Props),dmsg(props=Props),
    dmsg(call=Call),dmsg(call=MCall),
  % some calls remember deduced fasts and we need to prevent that
  with_assertions(readOnlyDatabases,
@@ -146,7 +146,7 @@ to_tclass(Prop,New):- ttValueType(Prop),ensure_starts_with_prefix(Prop,vt,New),!
 
 to_tclass(Prop,New):- mpred_arity(Prop,1),mpred_arity(Prop,tCol),ensure_starts_with_prefix(Prop,t,New),!.
 to_tclass(Prop,New):- mpred_prop(Prop,prologHybrid),mpred_arity(Prop,M),M>1,mpred_prop(Prop,predArgTypes(_)),ensure_starts_with_prefix(Prop,mud,New),!.
-to_tclass(Prop,New):- (dbase_t(Prop,_,_);dbase_t(Prop,_,_,_);dbase_t(Prop,_,_,_,_)),ensure_starts_with_prefix(Prop,mud,New),!.
+to_tclass(Prop,New):- (call(dbase_t,Prop,_,_);dbase_t(Prop,_,_,_);dbase_t(Prop,_,_,_,_)),ensure_starts_with_prefix(Prop,mud,New),!.
 to_tclass(Prop,New):- is_actverb(Prop),ensure_starts_with_prefix(Prop,act,New),!.
 to_tclass(Prop,New):- mudIsa(Prop,tCol),ensure_starts_with_prefix(Prop,t,New),!.
 to_tclass(Prop,New):- (dbase_t(_,_,Prop);dbase_t(_,_,Prop,_);dbase_t(_,_,_,Prop)),ensure_starts_with_prefix(Prop,v,New),!.

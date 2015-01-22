@@ -38,11 +38,17 @@ nv1000(S):-numbervars(S,100,_,[singletons(true),attvar(bind)]).
 kb_t(Call):- into_plist(Call,PLIST),[AH|LIST]=PLIST,!, kb_t(AH,LIST,PLIST).
 
 :-swi_export(into_plist/2).
-into_plist(PLIST,PLIST):- var(PLIST),!,between(2,12,X),length(PLIST,X).
-into_plist([P|LIST],[P|LIST]):-var(P),!.
-into_plist([dbase_t|PLIST],PLIST).  % dbase_t is our versuion of '$holds' or call/N
-into_plist(plist(P,LIST),[P|LIST]).
-into_plist(Call,PLIST):-Call=..PLIST. % finally the fallthrue
+into_plist(In,Out):-into_plist_arities(2,12,In,Out).
+
+:-swi_export(into_plist/4).
+into_plist_arities(Min,Max,PLIST,PLISTO):- var(PLIST),!,between(Min,Max,X),length(PLIST,X),PLISTO=PLIST.
+into_plist_arities(_,_,[P|LIST],[P|LIST]):-var(P),!.
+into_plist_arities(_,_,[dbase_t|PLIST],PLIST):-!.  % dbase_t is our versuion of '$holds' or call/N
+into_plist_arities(_,_,plist(P,LIST),[P|LIST]):-!.
+into_plist_arities(_,_,Call,PLIST):-Call=..PLIST. % finally the fallthrue
+
+
+
 
 kb_t(AH,_,PLIST):-var(AH),!,kbp_t(PLIST).
 kb_t(dbase_t,PLIST,_):- !,kbp_t(PLIST).  % dbase_t is our versuion of '$holds' or call/N

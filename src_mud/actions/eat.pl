@@ -28,11 +28,10 @@ action_info(actEat(tEatable),"nourish oneself").
 % Eat something held
 % Check to make sure it's in the agents possession... 
 % if it is, process it's worth, then destroy it
-agent_call_command(Agent,actEat(SObj)) :-
+agent_call_command(Agent,actEat(Obj)) :-
 	mudPossess(Agent,Obj),
-        match_object(SObj,Obj),
 	must((do_act_affect(Agent,actEat,Obj))),
-	del(mudPossess(Agent,Obj)),
+	must((clr(mudPossess(Agent,Obj)))),
         must(not(mudPossess(Agent,Obj))),
 	must((call_update_charge(Agent,actEat))).
 

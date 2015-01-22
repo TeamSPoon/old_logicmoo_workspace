@@ -15,7 +15,8 @@
 
 :- dynamic_multifile_exported fact_is_false/2.
 :- dynamic_multifile_exported kbp_t_list_prehook/2.
-:- dynamic_multifile_exported get_mpred_storage_type/2.
+:- dynamic_multifile_exported get_mpred_storage_provider/3.
+:- dynamic_multifile_exported get_mpred_storage_provider/4.
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
@@ -88,15 +89,16 @@ shrink_clause( HB,HB).
 :- op(1120,fx,decl_mpred_prolog).
 :- op(1150,fx,decl_mpred_hybrid).
 
-:- decl_mpred_prolog agent_call_command/2.
-:- decl_mpred_hybrid mudLastCommand/2.
-:- decl_mpred_hybrid mudNamed/2, mudSpd/2.
-:- decl_mpred_hybrid mudStr/2. 
-:- decl_mpred_hybrid mudSubclass/2.
-:- decl_mpred_hybrid mudTypeGrid/3.
-:- decl_mpred_hybrid(mudSubclass/2).
-:- decl_mpred_hybrid(prologSingleValued/1).
-:- discontiguous(prologSingleValued/1).
+
+toUpperCamelcase(Type,TypeUC):-toCamelcase(Type,TypeC),toPropercase(TypeC,TypeUC),!.
+:-export(i_name/2).
+i_name(OType,IType):-typename_to_iname0('',OType,IOType),!,IOType=IType.
+:-export(i_name/3).
+i_name(I,OType,IType):-typename_to_iname0(I,OType,IOType),!,IOType=IType.
+
+typename_to_iname0(I,OType,IType):-type_prefix(Prefix,_),atom_concat(Prefix,Type,OType),capitalized(Type),!,typename_to_iname0(I,Type,IType).
+typename_to_iname0(I,Type,IType):-nonvar(Type),toUpperCamelcase(Type,UType),atom_concat(I,UType,IType).
+
 
 :-ensure_loaded(dbase_i_deduce).
 
@@ -110,7 +112,7 @@ shrink_clause( HB,HB).
 
 decl_database_hook(assert(_),Fact):- check_was_known_false(Fact).
 
-was_known_false(Fact):-is_known_false(Fact),retractall((is_known_false(_):-true)),dmsg(trace_or_throw(error+was_known_false(Fact))).
+was_known_false(Fact):-is_known_false(Fact),doall(retract((is_known_false(_):-true))),trace_or_throw(error+was_known_false(Fact)).
 
 check_was_known_false(Fact):- ignore(((is_known_false(Fact),was_known_false(Fact)))).
 
@@ -188,16 +190,6 @@ coerce(_ ,_,     NewThing,Else):- NewThing = Else.
 :- meta_predicate tick_every(*,*,0).
 :- meta_predicate register_timer_thread(*,*,0).
 
-:- decl_mpred_hybrid((ttNotCreatableType/1, tCol/1, mudSubclass/2, predArgTypes/1 ,ttCreateable/1, createableSubclassType/2)).
-
-/*
-:- decl_mpred_hybrid((createableSubclassType(col,col))).
-:- decl_mpred_hybrid((ttCreateable(col))).
-:- decl_mpred_hybrid type_grid/3.
-*/
-:- decl_mpred_hybrid(((vFormatted/1,
-                       mudContains/2))).
-
 
 
 :-op(1150,fx,export).
@@ -207,7 +199,7 @@ coerce(_ ,_,     NewThing,Else):- NewThing = Else.
 :-decl_type(ttFormatType).
 :-decl_type(ttValueType).
 
-:- '@'(if_file_exists(user_ensure_loaded(logicmoo('../externals/MUD_ScriptEngines/snark/snark_in_prolog'))),'user').
+
 
 % :- if_file_exists(user_ensure_loaded(logicmoo(../externalsdbase/dbase_rules_pttp))).
 
@@ -249,83 +241,11 @@ coerce(_ ,_,     NewThing,Else):- NewThing = Else.
 
 :- dynamic_multifile_exported mtForPred/2.
 
-:- decl_mpred_hybrid((
-     tCol/1, tAgentGeneric/1, tItem/1, tRegion/1,
-     verbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, 
-     mudToHitArmorClass0/2,
-
-      tThinking/1,
-      tDeleted/1,
- mudWeight/2,
- mudPermanence/3,
-      act_term/2,
-      mudAgentTurnnum/2,
-      
-      mudAtLoc/2,
-      mudCharge/2,
-      mudHealth/2,
-      mudDescription/2,
-      mudFacing/2,
-      mudCmdfailure/2,
-      mudSpd/2,
-      mudGrid/4,
-      mudHeight/2,
-      mudMemory/2,
-      
-      mudIsa/2,
-      pathName/3, 
-      mudPossess/2,
-      mudScore/2,
-      mudStm/2,      
-      mudStr/2,
-      wearsClothing/2)).
 
 logical_functor(X):-atom(X),member(X,[',',';']).
 
 :- dynamic stat_total/2.
-:- decl_mpred_prolog(stat_total/2).
 
-:- decl_mpred_hybrid((
-      armorLevel/2,
-      mudLevelOf/2,
-      mudToHitArmorClass0/2,
-      mudBareHandDamage/2,
-      chargeCapacity/2,
-      mudCharge/2,
-     tCol/1, tAgentGeneric/1, tItem/1, tRegion/1,
-     verbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, 
-
-      tThinking/1,
- mudWeight/2,
- mudPermanence/3,
-      act_term/2,
-      mudAgentTurnnum/2,
-      
-      mudAtLoc/2,
-      mudCharge/2,
-      mudHealth/2,
-      mudDescription/2,
-      mudFacing/2,
-      failure/2,
-      mudGrid/4,
-      mudHeight/2,
-      mudMemory/2,
-      mudIsa/2,
-      pathName/3, 
-      mudPossess/2,
-      mudScore/2,
-      mudStm/2,      
-      mudStr/2,
-      mudWearing/2)).
-
-/*
-:-multifile localityOfObject/2.
-
-:- context_module(M),
-   asserta(dbase_mod(M)),
-   dmsg(assert_if_new(dbase_mod(M))).
-
-*/
 
 %:- multifile predArgTypes/2.
 
@@ -345,8 +265,6 @@ logical_functor(X):-atom(X),member(X,[',',';']).
 
 agent_call_command(_Gent,actGrep(Obj)):- term_listing(Obj).
 
-
-:-declare_dbase_local_dynamic(mudAtLoc,2).
 
 :-ensure_loaded(dbase_i_pldoc).
 :-ensure_loaded(dbase_i_coroutining).
@@ -382,12 +300,8 @@ verify_sanity(P):- dmsg('$ERROR_incomplete_SANITY'(P)),!.
 % Found new meta-predicates in iteration 1 (0.281 sec)
 %:- meta_predicate db_op_exact(?,?,?,0).
 
-:- decl_mpred_prolog(mudMoveDist/2).
 :- swi_export(mudMoveDist/2).
 :- dynamic(mudMoveDist/2).
-:- decl_mpred(mudMoveDist/2,[predArgTypes(mudMoveDist(tAgentGeneric,ftInt)),prologSingleValued,predModule(user),query(call),argSingleValueDefault(2,1)]).
-
-% mudMoveDist(X,Y):-callStub_moo(holds_t,mudMoveDist(X,Y)).
 
 
 % :- register_module_type(utility).
@@ -397,8 +311,11 @@ verify_sanity(P):- dmsg('$ERROR_incomplete_SANITY'(P)),!.
 expands_on(EachOf,Term):-subst(Term,EachOf,foooz,Term2),!,Term2\=Term,not((do_expand_args(EachOf,Term,O),O = Term)).
 if_expands_on(EachOf,Term,Call):- expands_on(EachOf,Term),subst(Call,Term,O,OCall),!, forall(do_expand_args(EachOf,Term,O),OCall).
 
+db_reop(WhatNot,Call) :- into_mpred_form(Call,NewCall),NewCall\=@=Call,!,db_reop(WhatNot,NewCall).
+
 db_reop(Op,Term):- expands_on(isEach,Term), !,forall(do_expand_args(isEach,Term,O),db_reop_l(Op,O)).
 db_reop(Op,Term):-db_reop_l(Op,Term).
+
 db_reop_l(query(_HLDS,Must),Call) :- !,preq(Must,Call).
 db_reop_l(OP,DATA):-no_loop_check(db_reop0(OP,DATA)).
 db_reop0(change(assert,_),Call) :- !,add_fast(Call).
@@ -440,15 +357,18 @@ ireq(C0):- dmsg(ireq(C0)), rescan_module_ready,no_loop_check(with_assertions([+i
 props(Obj,PropSpecs):- req(props(Obj,PropSpecs)).
 iprops(Obj,PropSpecs):- ireq(props(Obj,PropSpecs)).
 % -  add_fast(Assertion)
-% add_fast(C0):- must_det((add_fast_unchecked(C0), xtreme_debug(once(ireq(C0);(with_all_dmsg((debug(blackboard),show_call(add_fast_unchecked(C0)),rtrace(add_fast_unchecked(C0)),dtrace(ireq(C0))))))))),!.
-add_fast(C0):- dmsg(add_fast(C0)),must_det((add_fast_unchecked(C0), nop(xtreme_debug(ireq(C0)->true;dmsg(warn(failed_ireq(C0))))))),!.
+% add_fast(CO):- must_det((add_fast_unchecked(CO), xtreme_debug(once(ireq(CO);(with_all_dmsg((debug(blackboard),show_call(add_fast_unchecked(CO)),rtrace(add_fast_unchecked(CO)),dtrace(ireq(CO))))))))),!.
+add_fast(CO:-BODY):- dmsg(add_fast(CO:-BODY)),must_det((add_fast_unchecked((CO:-BODY)))),!.
+add_fast(CO):- dmsg(add_fast(CO)),must_det((add_fast_unchecked(CO), nop(xtreme_debug(ireq(CO)->true;dmsg(warn(failed_ireq(CO))))))),!.
 
 :-swi_export(add_fast_unchecked/1).
-add_fast_unchecked(C0):-must_det(db_op(change(assert,add), C0)).
+add_fast_unchecked((CO:-BODY)):-BODY==true,!,add_fast_unchecked(CO).
+add_fast_unchecked((CO:-BODY)):-!,must_det(assertz_clause(CO,BODY)).
+add_fast_unchecked(CO):-must_det(db_op(change(assert,add), CO)).
 
 % -  upprop(Obj,PropSpecs) update the properties
 upprop(Obj,PropSpecs):- upprop(props(Obj,PropSpecs)).
-upprop(C0):- add(C0).
+upprop(CO):- add(CO).
 % -  padd(Obj,Prop,Value)
 padd(Obj,PropSpecs):- add(props(Obj,PropSpecs)).
 % -  padd(Obj,Prop,Value)
@@ -890,18 +810,6 @@ cycAssert(A,B):-trace_or_throw(cycAssert(A,B)).
 
 :- ensure_loaded(dbase_i_cyc).
 
-:- decl_mpred(objid,2).
-
-% flags
-:-decl_mpred(tAgentGeneric(ftID),[flag]).
-:-decl_mpred(tItem(ftID),[flag]).
-:-decl_mpred(tRegion(ftID),[flag]).
-:-decl_mpred(tCol(ftID),[flag]).
-:-decl_mpred(tThinking(tAgentGeneric),[flag]).
-:-decl_mpred(tDeleted(ftID),[flag]).
-
-:- decl_mpred(mudNeedsLook/2,[ttCompleteExtentAsserted]).
-:- decl_mpred(mudMaxHitPoints(tAgentGeneric,ftInt)).
 
 
 :-swi_export(forall_setof/2).
@@ -911,8 +819,6 @@ forall_setof(ForEach,Call):-
    ignore(forall(member(ForEach,Set),Call)).
 
 :-dynamic_multifile_exported((was_imported_kb_content/2)).
-
-:-decl_mpred_prolog(was_imported_kb_content/2).
 
 :-swi_export(add_later/1).
 add_later(Fact):- call_after_game_load(add(Fact)).
@@ -924,6 +830,7 @@ add_later(Fact):- call_after_game_load(add(Fact)).
 :-moo_hide_childs((add)/1).
 add(A):- A==end_of_file,!.
 add(A):- not(compound(A)),!,trace_or_throw(not_compound(add(A))),!.
+add(Call) :- into_mpred_form(Call,NewCall),NewCall\=@=Call,!,add(NewCall).
 add(Term):- expands_on(isEach,Term), !,forall(do_expand_args(isEach,Term,O),add(O)),!.
 add(Call):- loop_check(thlocal:add_thread_override(Call)),!.
 add(Call):- add_from_macropred(Call),!.
@@ -1013,7 +920,8 @@ createByNameMangle0(InstA,InstA,Type):-compound(InstA),InstA=..[Type|Props],asse
 createByNameMangle0(InstA,Inst,Type):- compound(InstA),!,functor_catch(InstA,Type,A),must(A==1),assert_isa(InstA,Type),InstA=Inst.
 createByNameMangle0(InstA,_,_Type):- not(atom(InstA)),!,trace_or_throw(todo(not_atom_createByNameMangle(InstA))).
 createByNameMangle0(Suggest,InstA,Type):- once(split_name_type(Suggest,InstA,Type)),Suggest==InstA,assert_isa(InstA,Type).
-createByNameMangle0(OType,InstA,Type):- must(var(InstA)),i_name(t,OType,Type),atom_concat(Type,'7',InstA7),i_name(i,InstA7,InstA),must_det(assert_isa(InstA,Type)), call_after_game_load(create_instance(InstA)).
+createByNameMangle0(OType,InstA,Type):- must(var(InstA)),i_name(t,OType,Type),atom_concat(Type,'7',InstA7),i_name(i,InstA7,InstA),must_det(assert_isa(InstA,Type)), 
+ call_after_game_load(create_instance(InstA,Type)).
 createByNameMangle0(InstA,IDA,InstA):- gensym(InstA,IDA), englishServerInterface([actCreate,InstA,IDA]).
 
 wfAssert(X):-add(X). %  add_later(X).
@@ -1046,17 +954,22 @@ end_dynamic_reader:-
 inside_dynamic_reader :- prolog_load_context(file,Source),test_tl(thlocal:in_dynamic_reader(Source)),!.
 inside_dynamic_reader :- prolog_load_context(source,Source),test_tl(thlocal:in_dynamic_reader(Source)),!.
 
-user:term_expansion(CL,was_imported_kb_content(inside_dynamic_reader,CL)):-not(thlocal:into_form_code), not((functor_h(CL,F),F=was_imported_kb_content)),
+user:term_expansion(CL,EXP):-
+ not(thlocal:adding_from_srcfile),
+ not(thlocal:into_form_code), not((get_functor(CL,F),F=was_imported_kb_content)),
  % ==== why we assert
    not(requires_storage(CL)),inside_dynamic_reader,
 % ==== do it
-   dmsg(assertz_inside_dynamic_reader(CL)),ignore(is_compiling_sourcecode),with_assertions(thlocal:adding_from_srcfile,must_det(add(CL))),!.
+   dmsg(assertz_inside_dynamic_reader(CL)),ignore(is_compiling_sourcecode),with_assertions(thlocal:adding_from_srcfile,must_det(add(CL))),!,
+   must(EXP=was_imported_kb_content(inside_dynamic_reader,CL)).
 
-user:term_expansion(CL,was_imported_kb_content(requires_storage,CL)):-not(thlocal:into_form_code), not((functor_h(CL,F),F=was_imported_kb_content)),
+user:term_expansion(CL,EXP):-not(thlocal:into_form_code),not(thlocal:adding_from_srcfile),
+   not((get_functor(CL,F),F=was_imported_kb_content)),
 % ==== why we assert
    requires_storage(CL),  not(inside_dynamic_reader), 
 % ==== do it
-   dmsg(addingGaf(CL)),ignore(is_compiling_sourcecode),with_assertions(thlocal:adding_from_srcfile,must_det(add(CL))),!.
+   dmsg(addingGaf(CL)),ignore(is_compiling_sourcecode),with_assertions(thlocal:adding_from_srcfile,must_det(add(CL))),!,
+   must(EXP=was_imported_kb_content(requires_storage,CL)).
 
 user:term_expansion((H:-B),Out):- fail,test_tl(enable_src_loop_checking),
    with_assertions(thlocal:adding_from_srcfile,
@@ -1075,12 +988,13 @@ agent_text_command(_Agent,_Text,_AgentTarget,_Cmd):-fail.
            agent_text_command/4,         
 */
 
-:- ensure_loaded(logicmoo(vworld/world)).
+
+
+:- with_no_term_expansions(if_file_exists(user_ensure_loaded(logicmoo(mobs/planner/dbase_i_hyhtn)))).
+
+
 :-'$hide'(rescan_dbase_ops/0).
 :-'$hide'(do_db_op_hooks/0).
 %:- rescan_missing_stubs.
 %:- rescan_mpred_props.
-
-
-:- with_no_term_expansions(if_file_exists(user_ensure_loaded(logicmoo(mobs/planner/dbase_i_hyhtn)))).
 

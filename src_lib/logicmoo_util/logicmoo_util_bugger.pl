@@ -172,6 +172,17 @@ for obvious reasons.
 
 :- set_prolog_flag(generate_debug_info, true).
 
+:- meta_predicate(one_must(:,:)).
+one_must(Call,OnFail):- ( Call *->  true ;    OnFail ).
+
+% -- CODEBLOCK
+:-export(must/1).
+:-meta_predicate(must(:)).
+must(Call):-(repeat, (catch(Call,E,(wdmsg(must_ex(E:Call)),debug,rtrace(Call),dtrace(Call))) *-> true ; (ignore(ftrace(Call)),leash(+all),repeat,wdmsg(must_failed(Call)),dtrace(Call))),!).
+
+:- meta_predicate(motrace(:)).
+motrace(O):-one_must(notrace(must(O)),(trace,O)).
+
 :- use_module(logicmoo_util_bugger_catch).
 throw_safe(Exc):-trace_or_throw(Exc).
 
@@ -228,7 +239,6 @@ moo_show_childs(X):- with_preds(X,_M,F,A,_PI,'$hide'(F/A)).
 moo_show_childs(M,F,A):-functor_safe(MPred,F,A),moo_show_childs(M,F,A,MPred).
 moo_show_childs(M,_,_, MPred):- not(predicate_property(_:MPred,imported_from(M))).
 moo_show_childs(M,F,A,_MPred):- moo_trace_hidechilds(M,F,A,0,0).
-
 
 
 
@@ -333,7 +343,7 @@ nd_dbgsubst2( _X, _Sk, L, L ).
 
 make_transparent(_CM,M,_PI,F/0):-!, compound_name_arity(C,F,0), M:meta_predicate(C).
 make_transparent(_CM,M,PI,F/A):-
-   notrace(((var(PI)->functor_safe(PI,F,A);true),
+   motrace(((var(PI)->functor_safe(PI,F,A);true),
    M:module_transparent(F/A),
    fill_args(PI,('?')),!,
    dbgsubst(PI, (0),(0),PI1),
@@ -382,7 +392,7 @@ fill_args(PI,With):-compound_name_arguments(PI,_,ARGS),fill_args(ARGS,With).
 :- export(def_meta_predicate/3).
 :- meta_predicate_transparent((def_meta_predicate(0,+,+))).
 
-def_meta_predicate(M:F,S,E):-!,doall(((between(S,E,N),make_list('?',N,List),compound_name_arguments(CALL,F,List),'@'(meta_predicate_transparent(CALL),M)))).
+def_meta_predicate(M:F,S,E):-!,M:doall(((between(S,E,N),make_list('?',N,List),compound_name_arguments(CALL,F,List),'@'(meta_predicate_transparent(CALL),M)))).
 def_meta_predicate(F,S,E):- trace_or_throw(def_meta_predicate(F,S,E)).
 
 
@@ -474,10 +484,6 @@ moo_trace_hidechilds(M,F,A,Trace,HideChilds):-
 %must(C):- catch(C,E,(wdmsg(E:C),fail)) *-> true ; (wdmsg(failed_must(C)),dtrace(C)).
 
 
-% -- CODEBLOCK
-:-export(must/1).
-:-meta_predicate(must(0)).
-must(Call):-(repeat, (catch(Call,E,(dmsg(E:Call),debug,fail)) *-> true ; (ignore(ftrace(Call)),leash(+all),repeat,wdmsg(failed(Call)),trace,Call)),!).
 
 
 /*
@@ -528,15 +534,23 @@ static_predicate(FA):-once(predicate_property(FA,_)),not(predicate_property(FA,d
 % Safely number vars
 % ===================================================================
 
-numbervars_impl(Term,Functor,Start,End):- numbervars(Term,Start,End,[attvar(bind),functor_name(Functor),singletons(true)]).
+numbervars_impl(Term,Start,List):- integer(Start),!,numbervars_impl(Term,'$VAR',Start,List).
+numbervars_impl(Term,Functor,Start):- integer(Start),atom(Functor),!,numbervars_impl(Term,Functor,Start,_End).
+numbervars_impl(Term,Functor,List):- is_list(List),atom(Functor),!,!,must(( numbervars(Term,0,_End,[functor_name(Functor)|List]))).
+
+numbervars_impl(Term,Start,End,List):-number(Start),is_list(List),!,must(( numbervars(Term,Start,End,List) )).
+numbervars_impl(Term,Functor,Start,List):- must(number(Start)),is_list(List),!,must(( numbervars(Term,Start,_End,[functor_name(Functor)|List]))).
+numbervars_impl(Term,Functor,Start,End):- must((must(var(End);number(End)),numbervars(Term,Start,End,[attvar(bind),functor_name(Functor),singletons(true)]))).
+
+numbervars_impl(Term,Functor,Start,End,List):-must(( must(var(End);number(End)),numbervars(Term,Start,End,[functor_name(Functor)|List]))).
+
 
 :-export(snumbervars/3).
-snumbervars(Term,Functor,End):- atom(Functor),!,numbervars_impl(Term,Functor,0,End).
 snumbervars(Term,Start,End):- integer(Start),!,numbervars_impl(Term,'$VAR',Start,End).
 :-export(snumbervars/4).
-snumbervars(Term,Start,End,_):-snumbervars(Term,Start,End).
+snumbervars(Term,Functor,Start,List):-numbervars_impl(Term,Functor,Start,List).
 :-export(snumbervars/1).
-snumbervars(Term):-numbervars(Term,0,_End).
+snumbervars(Term):-numbervars_impl(Term,0,_).
 
 % ===================================================================
 % Loop checking
@@ -552,9 +566,12 @@ make_key(CC,Key):- notrace(ground(CC)->Key=CC ; (copy_term(CC,Key,_),numbervars(
 is_loop_checked(Call):-  make_key(Call,Key),!,ilc(Key).
 is_module_loop_checked(Module, Call):- (var(Call)->true;make_key(Call,Key)),!,ilc_local(Module,Key).
 
-no_loop_check_unsafe(Call):- with_no_assertions(ilc(_),Call).
+no_loop_check_unsafe(Call):- % make_key(Call,Key),
+   with_assertions([-ilc(_),-ilc_local(_,_)],loop_check(Call,fail)).
 
-no_loop_check(Call):- no_loop_check(Call,trace_or_throw(loop_to_no_loop_check(Call))).
+% WAS no_loop_check(Call):- no_loop_check(Call,trace_or_throw(loop_to_no_loop_check(Call))).
+no_loop_check(Call):- make_key(Call,Key), with_no_assertions([ilc(_),ilc(Key)],Call).
+
 no_loop_check(Call, TODO):-  with_no_assertions(ilc(_),loop_check_local(Call,TODO)).
 
 no_loop_check_module( Module, Call, TODO):-  with_no_assertions(ilc_local(Module,_),loop_check_local(Call,TODO)).
@@ -1756,7 +1773,6 @@ must_each0([E|List]):-E,must_each0(List).
 
 :-moo_show_childs(one_must/2).
 one_must(C1,C2,C3):-one_must(C1,one_must(C2,C3)).
-one_must(Call,OnFail):- ( Call *->  true ;    OnFail ).
 
 is_deterministic(once(V)):-var(V),trace_or_throw(is_deterministic(var_once(V))).
 is_deterministic(M:G):-atom(M),!,is_deterministic(G).
@@ -2200,7 +2216,7 @@ colormsg(d,Msg):- mesg_color(Msg,Ctrl),!,colormsg(Ctrl,Msg).
 colormsg(Ctrl,Msg):- fresh_line,ansicall(Ctrl,fmt0(Msg)),fresh_line.
 
 :-export(ansicall/2).
-ansicall(Ctrl,Call):- current_output(Out), ansicall(Out,Ctrl,Call).
+ansicall(Ctrl,Call):- notrace((current_output(Out), ansicall(Out,Ctrl,Call))).
 
 ansi_control_conv([],[]):-!.
 ansi_control_conv([H|T],HT):-!,ansi_control_conv(H,HH),!,ansi_control_conv(T,TT),!,flatten([HH,TT],HT),!.
@@ -2522,23 +2538,26 @@ sendNote(To,From,Subj,Message,Vars):-
 % safe_numbervars/1 (just simpler safe_numbervars.. will use a rand9ome start point so if a partially numbered getPrologVars wont get dup getPrologVars)
 % Each prolog has a specific way it could unnumber the result of a safe_numbervars
 % ========================================================================================
-
-safe_numbervars(E,EE):-duplicate_term(E,EE),safe_numbervars(EE),get_gtime(G),snumbervars(EE,'$VAR',G,[attvar(bind)]),
-   term_variables(EE,AttVars),forall(member(V,AttVars),(copy_term(V,VC,Gs),V='$VAR'(VC=Gs))).
+% 7676767
+safe_numbervars(E,EE):-duplicate_term(E,EE),
+  get_gtime(G),numbervars(EE,G,End,[attvar(skip),functor_name('$VAR'),singletons(true)]),
+  term_variables(EE,AttVars),
+  numbervars(EE,End,_,[attvar(bind),functor_name('$VAR'),singletons(true)]),
+  forall(member(V,AttVars),(copy_term(V,VC,Gs),V='$VAR'(VC=Gs))).
    
 
 get_gtime(G):- get_time(T),convert_time(T,_A,_B,_C,_D,_E,_F,G).
 
-safe_numbervars(X):-get_gtime(G),snumbervars(X,G,_).
+safe_numbervars(EE):-get_gtime(G),numbervars(EE,G,_End,[attvar(bind),functor_name('$VAR'),singletons(true)]).
 
-safe_numbervars(Copy,X,Z):-snumbervars(Copy,X,Z,[attvar(bind)]).
-safe_numbervars(Copy,_,X,Z):-snumbervars(Copy,X,Z,[attvar(bind)]).
+%safe_numbervars(Copy,X,Z):-numbervars(Copy,X,Z,[attvar(bind)]).
+%safe_numbervars(Copy,_,X,Z):-numbervars(Copy,X,Z,[attvar(bind)]).
 
 unnumbervars(X,Y):-with_output_to(atom(A),write_term(X,[numbervars(true),quoted(true)])),atom_to_term(A,Y,_),!.
 
-renumbervars(X,X):-ground(X),!.
-renumbervars(X,Z):-unnumbervars(X,Y),safe_numbervars(Y,Z).
-renumbervars(Y,Z):-safe_numbervars(Y,Z).
+% renumbervars(X,X):-ground(X),!.
+renumbervars(X,Z):-unnumbervars(X,Y),safe_numbervars(Y,Z),!.
+renumbervars(Y,Z):-safe_numbervars(Y,Z),!.
 
 withFormatter(Lang,From,Vars,SForm):-formatter_hook(Lang,From,Vars,SForm),!.
 withFormatter(_Lang,From,_Vars,SForm):-sformat(SForm,'~w',[From]).
@@ -2847,7 +2866,7 @@ dumptrace_ret:-leash(+all),visible(+all),visible(+unify),trace.
 restore_trace(Goal):-  tracing, notrace,!,'$leash'(Old, Old),'$visible'(OldV, OldV),call_cleanup(Goal,(('$leash'(_, Old),'$visible'(_, OldV),trace),trace)).
 restore_trace(Goal):-  '$leash'(Old, Old),'$visible'(OldV, OldV),call_cleanup(Goal,((notrace,'$leash'(_, Old),'$visible'(_, OldV)))).
 
-rtrace(Goal):- do_gc, restore_trace((notrace((visible(+all),visible(+unify),visible(+exception),leash(-all),leash(+exception))),trace,Goal)).
+rtrace(Goal):- do_gc, restore_trace((notrace((visible(+all),visible(+unify),visible(+exception),leash(-all),leash(+exception))),(trace,Goal))).
 
 ftrace(Goal):- restore_trace((
    visible(-all),visible(+unify),

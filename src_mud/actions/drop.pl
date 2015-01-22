@@ -15,13 +15,12 @@
 
 :- register_module_type(mtCommand).
 
-vtActionTemplate(actDrop(tItem)).
+vtActionTemplate(actDrop(tDropable)).
 
 % Drop something
-agent_call_command(Agent,actDrop(SObj)) :-
-	mudPossess(Agent,Obj),
-        match_object(SObj,Obj),
-        del(mudPossess(Agent,Obj)),
+agent_call_command(Agent,actDrop(Obj)) :-
+	mudPossess(Agent,Obj),        
+        clr(mudPossess(Agent,Obj)),
         must(not((mudPossess(Agent,Obj)))),
         mudAtLoc(Agent,LOC),
         add(mudAtLoc(Obj,LOC)),

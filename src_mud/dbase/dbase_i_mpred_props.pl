@@ -25,9 +25,10 @@
 
 mpred_prop(dbase_t,prologOnly).
 mpred_prop(mpred_prop,prologOnly).
+mpred_prop(prologMultiValued, tCol).
 
-decl_database_hook(assert(_),Fact):- ignore((compound(Fact),Fact=..[F,Arg1|PROPS],ttDeclarer(F),decl_mpred(Arg1,[F|PROPS]))).
-decl_database_hook(assert(_),mudIsa(F,P)):- ttDeclarer(P),decl_mpred(F,P).
+decl_database_hook(assert(_),Fact):- ignore((compound(Fact),Fact=..[F,Arg1|PROPS],is_pred_declarer(F),decl_mpred(Arg1,[F|PROPS]))).
+decl_database_hook(assert(_),mudIsa(F,P)):- is_pred_declarer(P),decl_mpred(F,P).
 % this causes too many bugs decl_database_hook(assert(_),mpred_prop(F,predArity(A))):- ignore((A==1,atom(F),not(never_type(F)),not(mpred_prop(F,prologOnly)),decl_type(F))).
 decl_database_hook(assert(_),mpred_prop(F,P)):- decl_mpred(F,P).
 
@@ -53,7 +54,7 @@ decl_mpred_pi(PI):-ignore((ground(PI),compound(PI),decl_mpred(PI))).
 decl_mpred_mfa(_,M:F,A):-atom(M),!,decl_mpred_mfa(M,F,A).
 decl_mpred_mfa(M,FF,A):-var(M),!,context_module(M),!,decl_mpred_mfa(M,FF,A).
 decl_mpred_mfa(M,FF,A):-
-   functor_h(FF,F,_),
+   get_functor(FF,F,_),
    must_det_l([
      ignore((var(M),context_module(M),dmsg(decl_mpred_mfa(M,F,A)))),
      ignore((nonvar(M),asserta_if_new(mpred_prop(F,def_module(M))))),
@@ -66,7 +67,7 @@ decl_mpred_mfa(M,FF,A):-
      scan_missing_stubs(F) ]).
 
 
-declare_dbase_local_dynamic_plus_minus_2(F,AMinus2):-
+ensure_universal_stub_plus_minus_2(F,AMinus2):-
    decl_mpred(F,predArity(AMinus2)),
    decl_mpred_mfa(user,F,AMinus2).
    
@@ -88,38 +89,37 @@ registerCycPredPlus2(P):-!,with_pi(P,registerCycPredPlus2_3).
 % ========================================
 % mpred_props database
 % ========================================
-:-swi_export(ttDeclarer/1).
-ttDeclarer(Prop):- 
-	arg(_,v(predArgTypes,vFormatted,tPred,
+:-swi_export(is_pred_declarer/1).
+is_pred_declarer(Prop):- 
+	arg(_,v(predArgTypes,vFormatted,predIsFlag,tPred,
                 prologMultiValued,prologSingleValued,prologMacroHead,prologOnly,
 		prologOrdered,prologNegByFailure,prologPTTP,prologHybrid,prologListValued),Prop).
 
-mpred_arity(Prop,1):-ttDeclarer(Prop).
+mpred_arity(Prop,1):-is_pred_declarer(Prop).
 mpred_arity(F,A):- current_predicate(F/A).
 mpred_prop(H,PP):-compound(H),predicate_property(H,PP).
 mpred_prop(F,PP):-mpred_arity(F,A),functor(H,F,A),predicate_property(H,PP).
-mpred_prop(P,Prop):- ttDeclarer(Prop),hasInstance(Prop, P).
+mpred_prop(P,Prop):- is_pred_declarer(Prop),hasInstance(Prop, P).
 mpred_prop(F,Prop):- mpred_arity(F,A),functor(P,F,A),predicate_property(P,Prop).
-mpred_prop(F,tCol):- tCol(F).
-mpred_prop(H,PP):- nonvar(H),functor_h(H,F), H \=@= F, !,mpred_prop(F,PP).
+%mpred_prop(F,tCol):- current_predicate(tCol/1),tCol(F).
+mpred_prop(H,PP):- nonvar(H),get_functor(H,F), H \=@= F, !,mpred_prop(F,PP).
 mpred_prop(F,PP):- hasInstance(PP,F).
 mpred_prop(mpred_prop,prologOnly).
 mpred_prop(mpred_arity,prologOnly).
 mpred_prop(never_type,prologOnly).
 mpred_prop(mudSubclass, ttCompleteExtentAsserted).
 mpred_prop(mudFtInfo, ttCompleteExtentAsserted).
+mpred_prop(F,predStubType(Type)):-mpred_prop(F,hasStub(Type)).
 /*
 mpred_prop(G,predProxyAssert(add)):- atom(G),prologMacroHead(G).
 mpred_prop(G,predProxyQuery(ireq)):- atom(G),prologMacroHead(G).
 mpred_prop(G,predProxyRetract(del)):- atom(G),prologMacroHead(G).
-mpred_prop(F,predStubType(Type)):-mpred_prop(F,hasStub(Type)).
 */
 
 :-dynamic_multifile_exported(hasInstance/2).
-% hasInstance(col,Prop):-mpred_arity(Prop,1).
 
-:-forall(ttDeclarer(F),dynamic(F/1)).
-:-forall(ttDeclarer(F),assert_hasInstance(macroDeclarer,F)).
+:-forall(is_pred_declarer(F),dynamic(F/1)).
+:-forall(is_pred_declarer(F),assert_hasInstance(macroDeclarer,F)).
 
 get_mpred_prop(F,_A,P):-get_mpred_prop(F,P).
 get_mpred_prop(F,P):- mpred_prop(F,P).
@@ -138,7 +138,7 @@ assert_arity(F,A):-asserta(mpred_arity(F,A)),!.
 assert_arity(F,A):-dmsg(failed_assert_arity(F,A)).
 
 assert_arity_lc(F,A):-
-  % A2 is A+2,declare_dbase_local_dynamic_plus_2(F,A2),
+  % A2 is A+2,ensure_universal_stub_plus_2(F,A2),
   retractall(mpred_prop(F,predArity(_))),
   retractall(mpred_arity(F,_)),
    must_det(good_pred_relation_name(F,A)),
@@ -182,7 +182,7 @@ decl_mpred_0(_,[]):-!.
 decl_mpred_0(M:FA,More):-atom(M),!,decl_mpred_0(FA,[predModule(M)|More]).
 decl_mpred_0(F/A,More):-atom(F),!,decl_mpred_1(F,predArity(A)),decl_mpred(F,More),!.
 decl_mpred_0(C,More):-string(C),!,dmsg(trace_or_throw(var_string_decl_mpred(C,More))).
-decl_mpred_0(C,More):-compound(C),C=..[F,Arg1|PROPS],ttDeclarer(F),!,ground(Arg1),decl_mpred(Arg1,[F,PROPS,More]).
+decl_mpred_0(C,More):-compound(C),C=..[F,Arg1|PROPS],is_pred_declarer(F),!,ground(Arg1),decl_mpred(Arg1,[F,PROPS,More]).
 decl_mpred_0(C,More):-compound(C),!,functor(C,F,A),decl_mpred_1(F,predArity(A)),decl_mpred_0(F,More),!,ignore((ground(C),decl_mpred(F,predArgTypes(C)))),!.
 decl_mpred_0(F,A):-number(A),!,decl_mpred_1(F,predArity(A)),!.
 decl_mpred_0(F,[Prop|Types]):-!,decl_mpred_0(F,Prop),!,decl_mpred_0(F,Types),!.
@@ -193,8 +193,8 @@ decl_mpred_1(F,predArgTypes(FARGS)):- functor(FARGS,_,A),decl_mpred(F,A),fail.
 decl_mpred_1(_,predArgTypes(FARGS)):- functor(FARGS,_,A),arg(A,FARGS,Arg),var(Arg),!.
 decl_mpred_1(F,predArity(A)):- assert_arity(F,A),fail.
 
-decl_mpred_1(F,prologHybrid):- declare_dbase_local_dynamic(F).
-decl_mpred_1(F,cycPlus2(A)):- declare_dbase_local_dynamic_plus_2(F,A).
+decl_mpred_1(F,prologHybrid):- ensure_universal_stub(F).
+decl_mpred_1(F,cycPlus2(A)):- ensure_universal_stub_plus_2(F,A).
 
 decl_mpred_1(F,Prop):-mpred_prop(F,Prop),!.
 decl_mpred_1(F,Prop):-hooked_asserta(mpred_prop(F,Prop)),fail.
@@ -212,7 +212,7 @@ functor_check_univ(G1,F,List):-must_det(compound(G1)),must_det(G1 \= _:_),must_d
 
 :-swi_export(glean_pred_props_maybe/1).
 glean_pred_props_maybe(_:G):-!,compound(G),glean_pred_props_maybe(G).
-glean_pred_props_maybe(G):-compound(G),G=..[F,Arg1|RGS],ttDeclarer(F),!,add_mpred_prop_gleaned(Arg1,[F|RGS]),!.
+glean_pred_props_maybe(G):-compound(G),G=..[F,Arg1|RGS],is_pred_declarer(F),!,add_mpred_prop_gleaned(Arg1,[F|RGS]),!.
 
 add_mpred_prop_gleaned(M:Arg1,FRGS):-atom(M),!,add_mpred_prop_gleaned(Arg1,FRGS).
 add_mpred_prop_gleaned(Arg1,FRGS):-functor_check_univ(Arg1,F,ARGSISA),add_mpred_prop_gleaned_4(Arg1,F,ARGSISA,FRGS).

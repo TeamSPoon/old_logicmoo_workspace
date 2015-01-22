@@ -11,6 +11,20 @@
 % [Manditory] Load the Logicmioo utils
 :- '@'(ensure_loaded('../src_lib/logicmoo_util/logicmoo_util_all'),user).
 
+:- '@'(if_file_exists(user_ensure_loaded(logicmoo('../externals/MUD_ScriptEngines/snark/snark_in_prolog'))),'user').
+/*
+else
+
+% -- CODEBLOCK
+:-export(is_ftVar/1).
+user:is_ftVar(V):-var(V),!.
+user:is_ftVar('$VAR'(_)).
+:-export(not_ftVar/1).
+not_ftVar(V):-not(is_ftVar(V)).
+   
+
+*/
+
 % bugger:action_verb_useable(actWearUnused,wearsClothing,tWearable,mudPossess).
 
 % [Manditory] define how we interact with the module system

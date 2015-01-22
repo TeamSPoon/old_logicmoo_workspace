@@ -31,7 +31,7 @@ user:world_agent_plan(_World,Agent,Act):-
 predator_idea(Agent,actEat(Corpse)) :-
 	mudCharge(Agent,Charge),
 	Charge < 100,
-	actInventory(Agent, List),                
+	mudPossess(Agent, List),                
 	obj_memb(Corpse,List),
         mudIsa(Corpse,tCorpse).
 predator_idea(Agent,actTake(What)) :-

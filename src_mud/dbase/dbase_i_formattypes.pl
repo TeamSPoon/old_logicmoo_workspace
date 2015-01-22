@@ -24,16 +24,7 @@
 */
 
 :- include(logicmoo('vworld/moo_header.pl')).
-
-
-toUpperCamelcase(Type,TypeUC):-toCamelcase(Type,TypeC),toPropercase(TypeC,TypeUC),!.
-:-export(i_name/2).
-i_name(OType,IType):-typename_to_iname0('',OType,IOType),!,IOType=IType.
-:-export(i_name/3).
-i_name(I,OType,IType):-typename_to_iname0(I,OType,IOType),!,IOType=IType.
-
-typename_to_iname0(I,OType,IType):-type_prefix(Prefix,_),atom_concat(Prefix,Type,OType),capitalized(Type),!,typename_to_iname0(I,Type,IType).
-typename_to_iname0(I,Type,IType):-nonvar(Type),toUpperCamelcase(Type,UType),atom_concat(I,UType,IType).
+:- dynamic_multifile_exported correctArgsIsa/3.
 
 
 :-export(split_name_type/3).
@@ -55,7 +46,8 @@ formattype_guessable(S):- mudFtInfo(S,_).
 term_is_ft(Term,Type):- var(Term),!,member(Type,[ftVar,ftProlog]).
 term_is_ft(Term,Type):- var(Type),!,formattype_guessable(Type),term_is_ft(Term,Type).
 term_is_ft(_ANY,ftVar):- !,fail.
-term_is_ft(Term,Type):- must_det(ttFormatType(Type)),
+term_is_ft(Term,Type):- ttFormatType(Type),
+   must_det(ttFormatType(Type)),
    once(trans_subft_info(Type,How)),   
    correctFormatType(query(_HLDS,_OldV),Term,How,NewTerm),!,
    sameArgTypes(NewTerm,Term).
@@ -109,12 +101,10 @@ argIsa_call(Op,F,N,Type):-hotrace((loop_check((argIsa_call_nt(Op,F,N,Type),!),Ty
 
 argIsa_call_nt(_O,F,N,Type):-argIsa_call_nt(F,N,Type).
 
-:-decl_mpred_hybrid(argIsa/3).
-
 
 argIsa(F,N,Isa):-argIsa_call(F,N,Isa).
 
-:-swi_export(argIsa_call/3).
+:-export(argIsa_call/3).
 argIsa_call(F,N,Type):- argIsa_known(F,N,Type),!.
 argIsa_call(F,N,Type):- argIsa_call_1(F,N,Type),!.
 
@@ -176,7 +166,7 @@ argIsa_call_3(mudTermAnglify,ftTerm).
 argIsa_call_3(mudFacing,ftTerm).
 argIsa_call_3(vFormatted,ftTerm).
 argIsa_call_3(mudSubclass,tCol).
-argIsa_call_3(mudSubclass,ttFormatType).
+% argIsa_call_3(mudSubclass,ttFormatType).
 
 % argIsa_call_0(HILOG,_,term):-hilog_functor(HILOG).
 
@@ -210,9 +200,11 @@ argIsa_call_1(_,_,ftTerm).
 argIsa_call_1(mudFacing,_,ftTerm).
 
 
-:-swi_export(db_quf/4).
+:-export(db_quf/4).
 db_quf(Op,M:C,Pretest,Template):-var(C),!,throw(var(db_quf(Op,M:C,Pretest,Template))).
 db_quf(Op,_:C,Pretest,Template):-nonvar(C),!,db_quf(Op,C,Pretest,Template).
+
+db_quf(Op,':-'(C,D),':-'(C2,D2),':-'(C3,D3)):-!,db_quf(Op,C,C2,C3),db_quf(Op,D,D2,D3).
 db_quf(Op,','(C,D),','(C2,D2),','(C3,D3)):-!,db_quf(Op,C,C2,C3),db_quf(Op,D,D2,D3).
 db_quf(Op,C,Pretest,Template):- C=..[Holds,OBJ|ARGS],is_holds_true(Holds),atom(OBJ),!,C1=..[OBJ|ARGS],db_quf(Op,C1,Pretest,Template).
 db_quf(_Op,C,true,C):- C=..[Holds,OBJ|_],is_holds_true(Holds),var(OBJ),!.
@@ -228,11 +220,11 @@ translate_args(Op,Prop,A,OBJ,N1,[ARG|S],[NEW|ARGS],GIN,GOALS):-
    N2 is N1 +1,
    translate_args(Op,Prop,A,OBJ,N2,S,ARGS,GMID,GOALS).
 
-:-swi_export(infix_op/2).
+:-export(infix_op/2).
 infix_op(OP,_):-comparitiveOp(OP).
 infix_op(OP,_):-additiveOp(OP).
 
-:-swi_export(comparitiveOp/1).
+:-export(comparitiveOp/1).
 comparitiveOp((\=)).
 comparitiveOp((\==)).
 comparitiveOp((=)).
@@ -243,7 +235,7 @@ comparitiveOp((>)).
 comparitiveOp((=<)).
 comparitiveOp((>=)).
 
-:-swi_export(additiveOp/1).
+:-export(additiveOp/1).
 additiveOp((is)).
 additiveOp((*)).
 additiveOp(+).
@@ -290,7 +282,7 @@ compare_op(Type,F,OLD,VAL):-nop(Type),show_call((call(F,OLD,VAL))),!.
 % start of database
 % These will all be deleted at start of run
 
-:-swi_export(inverse_args/2).
+:-export(inverse_args/2).
 inverse_args([AR,GS],[GS,AR]):-!.
 inverse_args([AR,G,S],[S,G,AR]):-!.
 inverse_args([A,R,G,S],[S,R,G,A]):-!.
@@ -301,13 +293,13 @@ inverse_args([P,A,R,G,S],[S,A,R,G,P]):-!.
 % =======================================================
 
 
-:-swi_export(same_vars/2).
+:-export(same_vars/2).
 same_vars(T1,T2):-term_variables(T1,V1),term_variables(T2,V2),!,V1==V2.
 
-:-swi_export(correctArgsIsa/2).
+:-export(correctArgsIsa/2).
 correctArgsIsa(In,Out):- correctArgsIsa(query(must,dbase_t),In,Out),!.
 
-:-swi_export(correctArgsIsa/3).
+:-export(correctArgsIsa/3).
 correctArgsIsa(_,A,A):- bad_idea,!.
 % correctArgsIsa(_,A,A):- is_release,!.
 correctArgsIsa(_,NC,NC):-not(compound(NC)),!.
@@ -320,7 +312,7 @@ correctArgsIsa(change(assert, add),A,AA):-true, ground(A),!,must(A=AA).
 correctArgsIsa(Op,A,AA):- correctArgsIsa0(Op,A,AA),nonvar(AA),!.
 correctArgsIsa(Op,A,AA):- grtrace,correctArgsIsa0(Op,A,AA).
 
-:-swi_export(correctArgsIsa/4).
+:-export(correctArgsIsa/4).
 correctArgsIsa(Op,A,Type,AA):- trace_or_throw(warn(not(correctArgsIsa(Op,A,Type,AA)))).
 
 need_to_be_fast.
@@ -346,7 +338,7 @@ discoverAndCorrectArgsIsa(Op,Prop,N1,[A|Args],Out):-
    discoverAndCorrectArgsIsa(Op,Prop,N2,Args,AArgs),
     Out = [AA|AArgs].
 
-:-swi_export(correctAnyType/4).
+:-export(correctAnyType/4).
 
 % correctAnyType(_,A,_,A):-is_release.
 
@@ -361,14 +353,14 @@ correctAnyType(Op,A,Type,A):- dtrace,dmsg(warn(not(correctAnyType(Op,A,Type)))).
 
 %  @set mudMoveDist 4
 
-:-swi_export(correctFormatType/4).
+:-export(correctFormatType/4).
 correctFormatType(Op,A,Type,AA):- var(A),correctType(Op,A,Type,AA),must_det(var(AA)),must_det(A==AA),!.
 correctFormatType(Op,A,Type,AA):- var(Type),trace_or_throw(correctFormatType(Op,A,Type,AA)).
 correctFormatType(Op,A,Type,AA):- correctType(Op,A,Type,AA),nonvar(AA),!.
 correctFormatType(Op,A,Type,AA):- grtrace,correctType(Op,A,Type,AA).
 correctFormatType(Op,A,Type,A):- dmsg(todo(not(correctFormatType(Op,A,Type)))).
 
-:-swi_export(checkAnyType/4).
+:-export(checkAnyType/4).
 
 checkAnyType(Op,A,Type,AA):- var(A),correctType(Op,A,Type,AA),must_det(var(AA)),must_det(A==AA),!.
 checkAnyType(Op,A,Type,AA):- correctType(Op,A,Type,AA),nonvar(AA),!.
@@ -493,20 +485,20 @@ must_equals(A,AA):-must_det(A=AA).
   
 :- style_check(+singleton).
 
-:-swi_export(any_to_value/2).
+:-export(any_to_value/2).
 any_to_value(Var,Var):-var(Var),!.
 any_to_value(V,Term):-atom(V),!,atom_to_value(V,Term).
 any_to_value(A,V):-any_to_number(A,V).
 any_to_value(A,A).
 
 
-:-swi_export(any_to_number/2).
+:-export(any_to_number/2).
 any_to_number(N,N):- number(N),!.
 any_to_number(ftDice(A,B,C),N):- ground(A),roll_dice(A,B,C,N),!.
 any_to_number(A,N):-atom(A),atom_to_value(A,V),A\=V,any_to_number(V,N).
 any_to_number(A,N):- catchv(number_string(N,A),_,fail).
 
-:-swi_export(atom_to_value/2).
+:-export(atom_to_value/2).
 atom_to_value(V,Term):-not(atom(V)),!,any_to_value(V,Term).
 % 56
 atom_to_value(V,Term):- catchv((read_term_from_atom(V,Term,[variable_names([])])),_,fail),!.

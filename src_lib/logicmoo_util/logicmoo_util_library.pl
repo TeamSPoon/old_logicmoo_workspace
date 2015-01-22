@@ -98,6 +98,20 @@ append_term(Call,E,CallE):- Call=..List, append(List,[E],ListE), CallE=..ListE.
 % Utils
 % =================================================================================
 
+
+:-export(each_subterm/2).
+each_subterm(B, A):- (compound(B), arg(_, B, C), each_subterm(C, A));A=B.
+
+:-export(each_subterm/3).
+each_subterm(A,Pred,B):- call( Pred,A,B).
+each_subterm(A,Pred,O):- 
+   compound(A),
+   once(  A=[H|T] ;  A=..[H|T] ),
+   (each_subterm(H,Pred,O);
+     each_subterm(T,Pred,O)).
+
+
+
 :-dynamic(argNumsTracked/3).
 :-dynamic(argNFound/3).
 % :-index(argNFound(1,1,1)).
@@ -113,23 +127,20 @@ makeArgIndexes(_NEW,_F).
 % peekAttributes/2,pushAttributes/2,pushCateElement/2.
 :- module_transparent asserta_new(:),asserta_if_new(:),assertz_new(:),assertz_if_new(:),assert_if_new(:),assertz_if_new_clause(:),assertz_if_new_clause(:,:),clause_asserted(0,0),clause_asserted(0),eraseall(-,-).
 % :- meta_predicate asserta_new(:),asserta_if_new(:),assertz_new(:),assertz_if_new(:),assert_if_new(:),assertz_if_new_clause(:),assertz_if_new_clause(:,:),clause_asserted(0,0),clause_asserted(0),eraseall(-,-).
-asserta_new(_Ctx,NEW):-ignore(retractall(NEW)),asserta(NEW).
+asserta_new(_Ctx,NEW):-ignore((retract(NEW),fail)),asserta(NEW).
 writeqnl(_Ctx,NEW):- fmt('~q.~n',[NEW]),!.
 
 eraseall(M:F,A):-!,forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(clause(M:C,_,X),erase(X))).
 eraseall(F,A):-forall((current_predicate(M:F/A),functor_catch(C,F,A)),forall(clause(M:C,_,X),erase(X))).
 
-asserta_new(NEW):-ignore(retractall(NEW)),asserta(NEW).
-assertz_new(NEW):-ignore(retractall(NEW)),assertz(NEW).
+asserta_new(NEW):-ignore((retract(NEW),fail)),asserta(NEW).
+assertz_new(NEW):-ignore((retract(NEW),fail)),assertz(NEW).
 
-assert_if_new(N):-clause_asserted(N),!.
-assert_if_new(N):-assert(N),!.
+assert_if_new(N):-clause_asserted(N)->true;asserta(N).
 
-assertz_if_new(N):-clause_asserted(N),!.
-assertz_if_new(N):-assertz(N),!.
+assertz_if_new(N):-clause_asserted(N)->true;assertz(N).
 
-asserta_if_new(N):-clause_asserted(N),!.
-asserta_if_new(N):-asserta(N),!.
+asserta_if_new(N):-clause_asserted(N)->true;asserta(N).
 
 assertz_if_new_clause(C):- as_clause(C,H,B),assertz_if_new_clause(H,B).
 
@@ -158,8 +169,8 @@ as_clause( ((H :- B)),H,B):-!.
 as_clause( H,  H,  true).
 
 
-:- meta_predicate doall(0).
-doall(C):-ignore((C,fail)).
+:- meta_predicate doall(:).
+doall(M:C):-M:ignore((C,fail)).
 
 :- use_module(logicmoo_util_bugger).
 
@@ -327,18 +338,18 @@ remove_dupes([],[],_):-!.
 remove_dupes([I|In],Out,Shown):-member(I,Shown),!,remove_dupes(In,Out,Shown).
 remove_dupes([I|In],[I|Out],Shown):-remove_dupes(In,Out,[I|Shown]).
 
-functor_h(Obj,F):-functor_h(Obj,F,_).
-get_functor(Obj,F):-functor_h(Obj,F,_).
-get_functor(Obj,F,A):-functor_h(Obj,F,A).
+functor_h(Obj,F):-notrace(functor_h(Obj,F,_)).
+get_functor(Obj,F):-notrace(functor_h(Obj,F,_)).
+get_functor(Obj,F,A):-notrace(functor_h(Obj,F,A)).
 
-functor_h(Obj,F,_):-var(Obj),trace_or_throw(functor_h(Obj,F)).
+functor_h(Obj,F,A):-var(Obj),trace_or_throw(var_functor_h(Obj,F,A)).
 functor_h(Obj,F,A):-var(Obj),!,(number(A)->functor(Obj,F,A);((current_predicate(F/A);throw(var_functor_h(Obj,F,A))))).
 functor_h(F/A,F,A):-number(A),!,( atom(F) ->  true ; current_predicate(F/A)).
 functor_h(':'(_,Obj),F,A):-nonvar(Obj),!,functor_h(Obj,F,A).
 functor_h(M:_,F,A):- atom(M),!, ( M=F -> current_predicate(F/A) ; current_predicate(M:F/A)).
 functor_h(':-'(Obj),F,A):-!,functor_h(Obj,F,A).
 functor_h(':-'(Obj,_),F,A):-!,functor_h(Obj,F,A).
-functor_h(Obj,F,0):- string(Obj),!,atom_string(F,Obj).
+functor_h(Obj,F,0):- string(Obj),!,must_det(atom_string(F,Obj)).
 functor_h(Obj,Obj,0):-not(compound(Obj)),!.
 functor_h(Obj,F,A):-functor_catch(Obj,F,A).
 
@@ -363,13 +374,14 @@ do_expand_args_l(Exp,[A|RGS],[E|ARGS]):- do_expand_args(Exp,A,E),do_expand_args_
 % :- moo_hide_childs(functor_safe/2).
 % :- moo_hide_childs(functor_safe/3).
 
-:- meta_predicate at_start(0).
 
+:- meta_predicate call_n_times(+,0).
 call_n_times(0,_Goal):-!.
 call_n_times(1,Goal):-!,Goal.
 call_n_times(N,Goal):-doall((between(2,N,_),once(Goal))),Goal.
 
 
+:- meta_predicate at_start(0).
 :-dynamic(at_started/1).
 at_start(Goal):-
 	copy_term(Goal,Named),
@@ -424,6 +436,8 @@ concat_atom_safe(List,Sep,Atom):-atom(Atom),!,concat_atom(ListM,Sep,Atom),!,List
 concat_atom_safe(List,Sep,Atom):- concat_atom(List,Sep,Atom),!.
 upcase_atom_safe(A,B):-atom(A),upcase_atom(A,B),!.
 time_file_safe(F,INNER_XML):-exists_file_safe(F),time_file(F,INNER_XML).
+
+:-export(list_to_set_safe/2).
 list_to_set_safe(A,A):-(var(A);atomic(A)),!.
 list_to_set_safe([A|AA],BB):- (not(not(lastMember(A,AA))) -> list_to_set_safe(AA,BB) ; (list_to_set_safe(AA,NB),BB=[A|NB])),!.
 

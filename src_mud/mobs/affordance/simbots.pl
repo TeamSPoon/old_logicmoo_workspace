@@ -453,6 +453,8 @@ recreate(F/A):-dynamic(F/A),functor(P,F,A),retractall(P),!.
 :-recreate(can_hold_type/2).
 :-recreate(verb_affordance/5).
 
+:- decl_mpred_hybrid(argIsa/3).
+:- decl_mpred_hybrid(mudSubclass/2).
 :- decl_mpred_hybrid(mudActionMaxDistance(vtActionType,ttObjectType,ftInt)).
 
 to_personal(mudCharge,mudCharge).

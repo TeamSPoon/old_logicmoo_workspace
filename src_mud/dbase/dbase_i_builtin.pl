@@ -26,6 +26,14 @@
 % =================================================================================================
 % BEGIN world English
 % =================================================================================================
+
+:- decl_mpred_prolog(naf/1).
+:- decl_mpred_prolog(call_mpred/1).
+:- decl_mpred_hybrid(macroDeclarer/1).
+
+:- decl_mpred_hybrid(predTypeMax/3).
+:- decl_mpred_hybrid(argIsa/3).
+
 tCol(tTemporallyExistingThing).
 
 tCol(tChannel).
@@ -42,13 +50,139 @@ mpred_prop(mudSubclass, ttCompleteExtentAsserted).
 mpred_prop(mudFtInfo, ttCompleteExtentAsserted).
 mpred_prop(mudSubclass/2, prologHybrid).
 mpred_prop(mudFtInfo/2,prologHybrid).
-mudSubclass(isEach(tRegion,tAgentGeneric,actGossup),tChannel).
+mudSubclass(isEach(tRegion,tAgentGeneric),tChannel).
+
+:-decl_mpred_prolog(forwardRule/2).
 
 :-decl_mpred_hybrid(mudTextSame(ftText,ftText)).
 
+:- decl_mpred_prolog(stat_total/2).
+:- decl_mpred_prolog(createableSubclassType/2).
+:- decl_mpred_prolog(mudMoveDist/2).
+:- decl_mpred_prolog(was_imported_kb_content/2).
+:- must(decl_mpred_prolog(agent_call_command/2)).
+
+:-ensure_universal_stub(mudAtLoc,2).
+
+
+:- decl_mpred_hybrid((
+     tCol/1, tAgentGeneric/1, tItem/1, tRegion/1,
+     verbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, 
+     mudToHitArmorClass0/2,
+
+      tThinking/1,
+      tDeleted/1,
+ mudWeight/2,
+ mudPermanence/3,
+      act_term/2,
+      mudAgentTurnnum/2,
+      
+      mudAtLoc/2,
+      mudCharge/2,
+      mudHealth/2,
+      mudDescription/2,
+      mudFacing/2,
+      mudCmdfailure/2,
+      mudSpd/2,
+      mudGrid/4,
+      mudHeight/2,
+      mudMemory/2,
+      
+      mudIsa/2,
+      pathName/3, 
+      mudPossess/2,
+      mudScore/2,
+      mudStm/2,      
+      mudStr/2,
+      wearsClothing/2)).
+
+:- decl_mpred_hybrid((
+      armorLevel/2,
+      mudLevelOf/2,
+      mudToHitArmorClass0/2,
+      mudBareHandDamage/2,
+      chargeCapacity/2,
+      mudCharge/2,
+     tCol/1, tAgentGeneric/1, tItem/1, tRegion/1,
+     verbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, 
+
+      tThinking/1,
+ mudWeight/2,
+ mudPermanence/3,
+      act_term/2,
+      mudAgentTurnnum/2,
+      
+      mudAtLoc/2,
+      mudCharge/2,
+      mudHealth/2,
+      mudDescription/2,
+      mudFacing/2,
+      failure/2,
+      mudGrid/4,
+      mudHeight/2,
+      mudMemory/2,
+      mudIsa/2,
+      pathName/3, 
+      mudPossess/2,
+      mudScore/2,
+      mudStm/2,      
+      mudStr/2,
+      mudWearing/2)).
+
+/*
+:-multifile localityOfObject/2.
+
+:- context_module(M),
+   asserta(dbase_mod(M)),
+   dmsg(assert_if_new(dbase_mod(M))).
+
+*/
+
+:- decl_mpred_hybrid((ttNotCreatableType/1, tCol/1, mudSubclass/2, predArgTypes/1 ,ttCreateable/1)).
+
+
+:- decl_mpred_hybrid(((vFormatted/1,
+                       mudContains/2))).
+
+
+:- decl_mpred_hybrid mudLastCommand/2.
+:- decl_mpred_hybrid mudNamed/2, mudSpd/2.
+:- decl_mpred_hybrid mudStr/2. 
+:- decl_mpred_hybrid mudSubclass/2.
+:- decl_mpred_hybrid mudTypeGrid/3.
+:- decl_mpred_hybrid(mudSubclass/2).
+:- decl_mpred_hybrid(prologSingleValued/1).
+:- discontiguous(prologSingleValued/1).
+:- decl_mpred_hybrid(argSingleValueDefault, 3).
+
+:- decl_mpred_hybrid(predModule, 2).
+:- decl_mpred_hybrid(predProxyAssert, 2).
+:- decl_mpred_hybrid(predProxyRetract, 2).
+:- decl_mpred_hybrid(predProxyQuery, 2).
+:- decl_mpred_hybrid(argSingleValueDefault, 3).
+
+:- decl_mpred(mudMoveDist/2,[predArgTypes(mudMoveDist(tAgentGeneric,ftInt)),prologSingleValued,predModule(user),query(call),argSingleValueDefault(2,1)]).
+
+% mudMoveDist(X,Y):-callStub_moo(holds_t,mudMoveDist(X,Y)).
+
+
+:- decl_mpred(objid,2).
+
+% flags
+:-decl_mpred(tAgentGeneric(ftID),[predIsFlag]).
+:-decl_mpred(tItem(ftID),[predIsFlag]).
+:-decl_mpred(tRegion(ftID),[predIsFlag]).
+:-decl_mpred(tCol(ftID),[predIsFlag]).
+:-decl_mpred(tThinking(tAgentGeneric),[predIsFlag]).
+:-decl_mpred(tDeleted(ftID),[predIsFlag]).
+
+:- decl_mpred(mudNeedsLook/2,[ttCompleteExtentAsserted]).
+:- decl_mpred(mudMaxHitPoints(tAgentGeneric,ftInt)).
+
+
 :-decl_mpred(tRegion(ftID),tCol).
 
-tChannel(actGossup).
+tChannel(iGossupChannel).
 
 ttCreateable(tTemporallyExistingThing).
 
@@ -59,6 +193,8 @@ prologMultiValued(mudGrid(tRegion,ftInt,ftInt,tObj)).
 prologMultiValued(mudSubclass(tCol,tCol)).
 prologMultiValued(mudIsa(ftTerm,tCol)).
 
+
+prologMultiValued(mudPossess(tObj,tObj)).
 
 :- decl_mpred_hybrid(predProxyAssert,2).
 :- begin_transform_moo_preds.
@@ -82,8 +218,7 @@ tCol(macroDeclarer).
 
 :-add((mudIsa(isEach(prologMultiValued,prologOrdered,prologNegByFailure,predArgTypes,prologPTTP,prologHybrid,prologOnly,prologOnly,prologMacroHead,prologListValued,prologSingleValued),macroDeclarer))).
 
-:-doall((ttDeclarer(F),decl_type(F),add(mudSubclass(F,tRelation)))).
-:-doall((ttDeclarer(F),decl_type(F),add(mudIsa(F,macroDeclarer)))).
+:-doall((is_pred_declarer(F),decl_type(F),add(mudIsa(F,macroDeclarer)),add(mudSubclass(F,tRelation)))).
 
 :-decl_mpred_prolog(repl_writer(tAgentGeneric,ftTerm)).
 %:-decl_mpred_hybrid(repl_writer(tAgentGeneric,term),[prologSingleValued,argSingleValueDefault(2,default_repl_writer)]).
@@ -226,6 +361,8 @@ prologMultiValued(mudNamed(ftTerm,ftTerm),[]).
 :-must_det(argIsa_call(genlPreds,2,_Type)).
 % genlPreds(tPred,tPred).
 
+ 
+prologHybrid(mudKnowing(tAgentGeneric,ftTerm)).
 prologMultiValued(cmdsuccess(tAgentGeneric,ftAction)).
 prologMultiValued(mudCmdfailure(tAgentGeneric,ftAction)).
 prologMultiValued(nameStrings(ftTerm,ftString)).
@@ -384,7 +521,7 @@ prologSingleValued(mudFacing(tObj,vtDirection(vNorth))).
 prologSingleValued(mudFacing(tObj,vtDirection)).
 prologSingleValued(mudHeight(tObj,ftInt)).
 prologSingleValued(mudID(tObj,ftID)).
-prologSingleValued(localityOfObject(tObj,tSpatialThing)).
+predArgTypes(localityOfObject(tObj,tSpatialThing)).
 prologSingleValued(mudLastCommand(tAgentGeneric,tCommand)).
 prologSingleValued(location_center(tRegion,xyzFn(tRegion,ftInt,ftInt,ftInt))).
 prologSingleValued(mudMoveDist(tAgentGeneric,ftInt(1))).
@@ -421,6 +558,16 @@ typeProps(tAgentGeneric,[mudMoveDist(1)]).
 typeProps(tSpatialThing,mudHeight(0)).
 
 
+:-decl_type(vtBasicDir).
+vtBasicDir(vNorth).
+vtBasicDir(vEast).
+vtBasicDir(vSouth).
+vtBasicDir(vWest).
+
+:-decl_type(vtBasicDirPlusUpDown).
+vtBasicDirPlusUpDown(X):-vtBasicDir(X).
+vtBasicDirPlusUpDown(vUp).
+vtBasicDirPlusUpDown(vDown).
 
 % :- must((argIsa_call_0(comment,2,W), W\=term)).
 
@@ -530,6 +677,7 @@ discoverableType(vtTexture).
 discoverableType(vtSize).
 
 :-decl_mpred_hybrid(mudKwLabel,2).
+:-decl_mpred_hybrid(argIsa/3).
 
 prologMultiValued(mudDescription(ftTerm,ftString)).
 prologMultiValued(mudKeyword(ftTerm,ftString)).

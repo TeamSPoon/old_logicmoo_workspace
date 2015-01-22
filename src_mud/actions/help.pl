@@ -22,7 +22,7 @@ type_action_info(tHumanPlayer,actHelp(isOptional(ftString,"")), "shows this help
 get_type_action_help_commands_list(A,B,C):-no_repeats(get_type_action_help_0(A,B,C)).
 
 :-swi_export(get_all_templates/1).
-get_all_templates(Templ):-no_repeats(get_all_templates0(Templ)).
+get_all_templates(Templ):- call_tabled_can(no_repeats(get_all_templates0(Templ))).
 get_all_templates0(Templ):-get_good_templates(Templ).
 get_all_templates0(Templ):-get_bad_templates(Templ),not(get_good_templates(Templ)).
 get_good_templates(Templ):- no_repeats((get_type_action_help_1(_,Templ,_),good_template(Templ))).

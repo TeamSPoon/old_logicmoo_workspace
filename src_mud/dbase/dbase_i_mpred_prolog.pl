@@ -1,7 +1,26 @@
+/** <module> dbase_i_mpred_dbase_t
+% Provides a prolog dabase in these predicates...
+%
+%  dbase_t/N
+%  hybridRule/2
+%  
+%
+% Logicmoo Project PrologMUD: A MUD server written in Prolog
+% Maintainer: Douglas Miles
+% Dec 13, 2035
+%
+*/
+
+:- include(logicmoo('vworld/moo_header.pl')).
+
 
 provide_mpred_write_attributes(F,A,multifile):- multifile(F/A).
 provide_mpred_write_attributes(F,A,thread_local):- decl_thlocal(F/A).
 provide_mpred_write_attributes(F,A,dynamic):- dynamic(F/A).
+
+
+provide_mpred_currently(_OP,Head,prologOnly,declared(_)):- get_functor(Head,F),mpred_prop(F,prologOnly).
+provide_mpred_currently(_OP,Head,prologOnly, Will):- get_functor(Head,F,A), current_predicate(F/A) -> Will= will(_) ; Will = wont(_).
 
 
 provide_mpred_storage_clauses(prolog,H,B):-predicate_property(H,number_of_clauses(_)),clause(H,B).
@@ -14,8 +33,17 @@ provide_mpred_write_attributes(F,external(Module)):- dmsg(decl_mpred(F,external(
 
 
 % HOOK
-provide_mpred_storage_impl(prologOnly,M,F,A) :- declare_dbase_local_dynamic(M,F,A).
-
+provide_mpred_setup(OP,Head,StubType,OUT):-  StubType = prologOnly, 
+  must_det_l(( get_pifunctor(Head,PHead,F,A),   
+   doall((clause(PHead,use_provided_mpred_storage_op(call(_),PHead,_),Ref),erase(Ref))),
+   show_call(provide_clauses_list(PHead,HBLIST)),
+   user:abolish(F,A),dynamic_multifile_exported(user:F/A),
+   asserta_if_new(mpred_prop(F,hasStub(StubType))),         
+   asserta_if_new(mpred_prop(F,StubType)), 
+   forall(member(HB,HBLIST),must(add(HB))),!,   
+   doall(retract((user:PHead:-use_provided_mpred_storage_op(call(_),PHead,_)))),
+   must_same_clauses(PHead,HBLIST))),
+   must(OUT=defined(provide_mpred_setup(OP,StubType))).
 
 :-op(0,fx,decl_mpred_prolog).
 
@@ -64,28 +92,54 @@ provide_mpred_read_attributes(P,_,_,predicate_property(P,foreign)):-predicate_pr
 provide_mpred_read_attributes(P,_,_,predicate_property(P,builtin)):-predicate_property(P,builtin),!.
 provide_mpred_read_attributes(P,_,_,predicate_property(P,imported_from(system))):-predicate_property(P,imported_from(system)).
 
+%retract_all((H:-B)) :-!, forall(clause(H,B,Ref),erase(Ref)).
+retract_all(HB) :- ignore((retract(HB),fail)).
 
 
-get_mpred_storage_type(Head,Type):-functor_h(Head,F,A),!,get_mpred_storage_type(Head,F,A,Type).
-get_mpred_storage_type(F,A,Type):-functor(P,F,A),get_mpred_storage_type(P,F,A,Type).
+is_static_pred(Head:-_):-!,predicate_property(Head,_),not(predicate_property(Head,dynamic)).
+is_static_pred(Head):-predicate_property(Head,_),not(predicate_property(Head,dynamic)).
 
-get_mpred_storage_type(Head,F,A,Type):-atom(Head),mpred_arity(Head,A),!,dmsg(get_mpred_storage_type(Head,F,A,Type)),get_mpred_storage_type(Head,A,Type).
-get_mpred_storage_type(Head,_,_,Type):-compound(Head),!,functor_h(Head,F,A),get_mpred_type4(Head,F,A,Type).
-get_mpred_storage_type(_,F,A,Type):-atom(F),number(A),!,functor(Head,F,A),get_mpred_type4(Head,F,A,Type).
-get_mpred_storage_type(Head,F,A,Type):-must(mpred_arity(F,A)),functor(Head,F,A),get_mpred_type4(Head,F,A,Type).
+% get_mpred_storage_provider(assert(a), mpred_prop(agent_call_command, info((decl_mpred_prolog user:agent_call_command/2))),S,W)
 
-get_mpred_type4(P,F,A,T):-get_mpred_type5(P,F,A,T),!.
+provide_mpred_storage_op(clause_asserted,Head,prologOnly,CALL):- CALL = clause_asserted(Head).
 
-get_mpred_type5(_,F,_,(Type)):-tPredStubImpl(Type),mpred_prop(F,Type).
-get_mpred_type5(_,F,_,(Type)):-member(Type,[tCol]),mpred_prop(F,Type).
-get_mpred_type5(P,_,_,W):-compound(P),!,pp_has(P,W).
-get_mpred_type5(_,F,A,W):-atom(F),current_predicate(F/A),functor(P,F,A),!,pp_has(P,W).
-get_mpred_type5(F,_,A,W):-atom(F),current_predicate(F/A),functor(P,F,A),!,pp_has(P,W).
-get_mpred_type5(_P,_F,_A,funknown):-!. % dmsg(warn_pp(not(predicate_property(P,F,A)))).
+provide_mpred_storage_op(assert(How),Head,prologOnly,CALL):-   
+   get_functor(Head,F,A),
+   functor(PF,F,A),
+   (predicate_property(PF,_)->true;show_call((dynamic(F/A),multifile(F/A),export(F/A)))),
+   (is_static_pred(PF)-> 
+     (listing(F/A),dmsg(want_to_assert(How,decl_mpred_hybrid(F,A,Head))),decl_mpred_hybrid(F/A),CALL=add(Head)); 
+      (transitive(how_to_op,assert(How),OP),CALL = call_wdmsg(OP,Head))),!.   
+   
 
-pp_has(P,callable(dynamic)):-predicate_property(P,dynamic),!.
-pp_has(P,callable(static)):-predicate_property(P,dynamic),!.
-pp_has(_,unknown).
+
+provide_mpred_storage_op(assert(How),Head,prologOnly,CALL):-   
+   get_functor(Head,F,A),
+   functor(PF,F,A),
+   (predicate_property(PF,_)->true;show_call((dynamic(F/A),multifile(F/A),export(F/A)))),
+   (is_static_pred(PF)-> (listing(F/A),trace_or_throw(want_to_assert(How,Head))); true),   
+   transitive(how_to_op,assert(How),OP),
+   CALL = call_wdmsg(OP,Head).
+
+provide_mpred_storage_op(How,Head,prologOnly,CALL):- 
+ transitive(how_to_op,How,OP),
+ wdmsg(provide_mpred_storage_op(How,Head,prologOnly,defined(OP))),
+ CALL = call_wdmsg(OP,Head).
+
+transitive(X,A,B):- (call(X,A,R) -> ( R\=@=A -> transitive(X,R,B) ; B=R); B=A).
+
+
+how_to_op(assert(a),asserta_new).
+how_to_op(assert(z),assertz_if_new).
+how_to_op(retract(one),retract).
+how_to_op(retract(all),retract_all).
+how_to_op(assert(z),assertz_if_new).
+how_to_op(asserta,asserta_new).
+how_to_op(assertz,assertz_if_new).
+how_to_op(call(_),call).
+how_to_op(assert,assert_if_new).
+how_to_op(HowOP,HowOP).
+
 
 :- op(1120,fx,decl_mpred_prolog).
   

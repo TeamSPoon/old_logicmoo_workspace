@@ -295,6 +295,11 @@ toCamelcase(D3,DD3):-atomic(D3),camelSplitters(V),atom_contains(D3,V),concat_ato
 toCamelcase(CX,Y):-atomic(CX),name(CX,[S|SS]),char_type(S,to_upper(NA)),name(NA,[N]),name(Y,[N|SS]),!.
 toCamelcase(A,A).
 
+unCamelCase(S,String):-any_to_string(S,Str),S\=Str,!,unCamelCase(Str,String),!.
+unCamelCase("",""):-!.
+unCamelCase(S,String):-sub_string(S,0,1,_,Char),sub_string(S,1,_,0,Rest),unCamelCase(Rest,RestString),string_lower(Char,NewChar),
+(Char\=NewChar->atomics_to_string(['_',NewChar,RestString],String);atomics_to_string([Char,RestString],String)),!.
+
 % ===========================================================
 % CHECK CASE
 % ===========================================================

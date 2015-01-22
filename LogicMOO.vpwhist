@@ -3,7 +3,7 @@ PrologMUD_base.vpj=Release
 [Global]
 CurrentProject=PrologMUD.vpj
 [ProjectDates]
-PrologMUD.vpj=20150119030702522
+PrologMUD.vpj=20150122044152548
 PrologMUD_base.vpj=20150118165844771
 externals\PrologMUD_ext.vpj=20150105131252020
 [TreeExpansion2]
@@ -15,7 +15,6 @@ externals\PrologMUD_ext.vpj=20150105131252020
       - ext
         + r6rs-plt-redex-model
       - snark
-        + SGB-Interface
   + games
     + src_game_nani
       + web
@@ -54,7 +53,7 @@ externals\PrologMUD_ext.vpj=20150105131252020
       + planner
     + objs
     + parsing
-    + vworld
+    - vworld
 - PrologMUD_base.vpj
   - externals
     + ClioPatria
@@ -73,7 +72,7 @@ externals\PrologMUD_ext.vpj=20150105131252020
       + prolog
         + chat80
         + CURT
-    + MUD_DLog
+    - MUD_DLog
       + dlog-reasoner
         + doc
         + examples
@@ -87,7 +86,7 @@ externals\PrologMUD_ext.vpj=20150105131252020
         + src
         + test
         + xml_reader
-      + dlog-server
+      - dlog-server
         + bin
           + lib
         + examples
@@ -96,13 +95,13 @@ externals\PrologMUD_ext.vpj=20150105131252020
           + happy
           + iocaste
           + shi
-        + src
-          + core
-          + dl_translator
+        - src
+          - core
+          - dl_translator
             + fol
             + old
             + pure
-            + shiq
+            - shiq
           + hash
           + interfaces
           + prolog_translator
@@ -172,12 +171,12 @@ externals\PrologMUD_ext.vpj=20150105131252020
           + Rakiduam07
             + continuos
             + socket_udp
-    + MUD_ScriptEngines
-      + ext
+    - MUD_ScriptEngines
+      - ext
         + r6rs-plt-redex-model
       + snark
-    + OLD_logicm00
-      - src_modules
+    - OLD_logicm00
+      + src_modules
         + aleph
         + candc
           + candc-svn
@@ -392,7 +391,7 @@ externals\PrologMUD_ext.vpj=20150105131252020
   - runtime
     + config-enabled
     + RDF-store
-  + src_lib
+  - src_lib
     - logicmoo_util
   - src_mud
     + actions
@@ -400,7 +399,7 @@ externals\PrologMUD_ext.vpj=20150105131252020
     - mobs
       - affordance
       + planner
-    + objs
+    - objs
     + parsing
     - vworld
 - externals\PrologMUD_ext.vpj
@@ -1072,77 +1071,17 @@ externals\PrologMUD_ext.vpj=20150105131252020
     + Plugins
     + src
       + Keep
-scroll:10
+scroll:84
 [State]
 SCREEN: 1920 1080 198 143 1440 699 0 0 M 0 0 0 0 1469 536
-CWD: externals\MUD_ScriptEngines\snark\09-43-01
-BUFFER: BN="externals\MUD_ScriptEngines\snark\debug.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=5 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_ScriptEngines\snark\dbase_rules_nnf.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.5555 CL=1 LE=0 CX=0 CY=58 WI=5 BI=16 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_ScriptEngines\snark\dbase_i_bootstrap_dnf.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.1995 CL=39 LE=0 CX=38 CY=17 WI=5 BI=22 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_ScriptEngines\snark\dbase_rules_testing.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.866 CL=67 LE=0 CX=66 CY=15 WI=5 BI=19 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_ScriptEngines\snark\dbase_rules_pttp_statics.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.1796 CL=20 LE=0 CX=19 CY=2 WI=5 BI=18 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_ScriptEngines\snark\dbase_rules_pttp.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.20091 CL=17 LE=0 CX=16 CY=15 WI=5 BI=15 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_ScriptEngines\snark\snark_ailog2.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.67199 CL=12 LE=0 CX=11 CY=19 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_ScriptEngines\snark\snark_in_prolog.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.2521 CL=53 LE=0 CX=52 CY=12 WI=5 BI=21 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="\var\www\newlisp\idastar.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.538 CL=51 LE=0 CX=50 CY=14 WI=5 BI=24 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="externals\MUD_ScriptEngines\ext\moo_ext_lisp_triska.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=23 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1293 360 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_ScriptEngines\snark\dbase_rules_pttp_statics.pl"
-VIEW: LN=.1796 CL=20 LE=0 CX=19 CY=2 WI=172 BI=18 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1293 360 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_ScriptEngines\snark\dbase_rules_testing.pl"
-VIEW: LN=.866 CL=67 LE=0 CX=66 CY=15 WI=171 BI=19 HT=0 HN=0 HF=0 HC=4
-WINDOW: 176 176 1293 360 -1 -1 N  WF=0 WT=9 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_ScriptEngines\snark\snark_in_prolog.pl"
-VIEW: LN=.33161 CL=22 LE=0 CX=21 CY=15 WI=182 BI=21 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1293 360 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_ScriptEngines\snark\dbase_rules_nnf.pl"
-VIEW: LN=.5555 CL=1 LE=0 CX=0 CY=18 WI=174 BI=16 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1293 360 -1 -1 N  WF=0 WT=11 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_ScriptEngines\snark\dbase_i_bootstrap_dnf.pl"
-VIEW: LN=.1995 CL=39 LE=0 CX=38 CY=17 WI=186 BI=22 HT=0 HN=0 HF=0 HC=4
-WINDOW: 110 110 1293 360 -1 -1 N  WF=0 WT=6 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_ScriptEngines\snark\snark_ailog2.pl"
-VIEW: LN=.67199 CL=12 LE=0 CX=11 CY=19 WI=178 BI=17 HT=0 HN=0 HF=0 HC=4
-WINDOW: 132 132 1293 360 -1 -1 N  WF=0 WT=7 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_ScriptEngines\ext\moo_ext_lisp_triska.pl"
-VIEW: LN=.641 CL=1 LE=0 CX=0 CY=14 WI=180 BI=23 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1293 360 -1 -1 N  WF=0 WT=10 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_ScriptEngines\snark\debug.pl"
-VIEW: LN=.1466 CL=42 LE=0 CX=41 CY=30 WI=184 BI=5 HT=0 HN=0 HF=0 HC=4
-WINDOW: 154 154 1293 360 -1 -1 N  WF=0 WT=8 "Default Fixed Font,10,0,1"
-BUFFER: BN="\var\www\newlisp\idastar.pl"
-VIEW: LN=.538 CL=51 LE=0 CX=50 CY=14 WI=166 BI=24 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1293 360 -1 -1 M  WF=0 WT=5 "Default Fixed Font,10,0,1"
-BUFFER: BN="externals\MUD_ScriptEngines\snark\dbase_rules_pttp.pl"
-VIEW: LN=.20091 CL=17 LE=0 CX=16 CY=15 WI=176 BI=15 HT=0 HN=0 HF=0 HC=4
+CWD: src_mud\dbase
 FILEHIST: 9
-externals\MUD_ScriptEngines\snark\dbase_rules_nnf.pl
-externals\MUD_ScriptEngines\snark\13-52-47\dbase_rules_nnf.pl
-externals\MUD_ScriptEngines\snark\snark_in_prolog.pl
-externals\MUD_ScriptEngines\snark\09-43-01\dbase_rules_pttp_statics.pl
-externals\MUD_ScriptEngines\snark\09-43-01\dbase_rules_pttp.pl
-externals\MUD_ScriptEngines\snark\09-43-01\dbase_rules_testing.pl
-externals\MUD_ScriptEngines\snark\dbase_rules_testing.pl
-externals\MUD_ScriptEngines\snark\dbase_rules_pttp_statics.pl
-externals\MUD_ScriptEngines\snark\dbase_rules_pttp.pl
+src_mud\dbase_new\dbase_i_mpred_dbase_t.pl
+src_mud\dbase_new\dbase_i_kb_store.pl
+src_mud\dbase\dbase.pl
+src_mud\dbase\dbase_i_mpred_props.pl
+src_mud\dbase\dbase_i_kb_store.pl
+src_mud\dbase\dbase_i_mpred_prolog.pl
+src_mud\dbase\dbase_i_mpred_dbase_t.pl
+src_mud\dbase_new\dbase_i_mpred_stubs.pl
+src_mud\dbase\dbase_i_mpred_stubs.pl

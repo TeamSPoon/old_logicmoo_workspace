@@ -24,6 +24,8 @@
 
 :-dynamic(hasInstance_dyn/2).
 
+hasInstance_dyn(tCol, tChannel).
+
 hasInstance(T,I):- !, hasInstance_dyn(T,I).
 hasInstance(T,I):- rdf_x(I,rdf:type,T).
 
@@ -45,6 +47,7 @@ mpred_prop(member,prologOnly).
 mpred_prop(mpred_prop,prologOnly).
 mpred_prop(mpred_arity,prologOnly).
 mpred_prop(never_type,prologOnly).
+mpred_prop(dbase_t, prologHybrid).
 mpred_arity(mpred_prop,2).
 mpred_arity(mpred_arity,2).
 mpred_arity(never_type,1).

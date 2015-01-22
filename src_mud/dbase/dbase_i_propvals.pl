@@ -115,7 +115,7 @@ random_instance_no_throw(Type,Value,Test):- copy_term(ri(Type,Value,Test),ri(RTy
    checkAnyType(query(_,_),RValue,Type,Value),
    must_det(Test),!.
 random_instance_no_throw(Type,Value,Test):- atom(Type),atom_concat('random_',Type,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),call(Fact),Test,!.
-random_instance_no_throw(Type,Value,Test):- compound(Type),functor_h(Type,F),mudIsa(F,_),atom_concat('random_',F,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),Fact,Test,!.
+random_instance_no_throw(Type,Value,Test):- compound(Type),get_functor(Type,F),mudIsa(F,_),atom_concat('random_',F,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),Fact,Test,!.
 random_instance_no_throw(Type,Value,Test):- findall(V,mudIsa(V,Type),Possibles),Possibles\=[],must_det((my_random_member(Value,Possibles),Test)),!.
 
 random_instance(Type,Value,Test):- must(random_instance_no_throw(Type,Value,Test)).
@@ -158,6 +158,7 @@ checkNoArgViolation(Prop,__,Value):-checkNoArgViolationOrDeduceInstead(Prop,2,Va
 checkNoArgViolation(Prop,Obj,__):-checkNoArgViolationOrDeduceInstead(Prop,1,Obj),fail.
 checkNoArgViolation(_,_,_):-!.
 
+:-decl_mpred_prolog(unverifiableType/1).
 
 checkNoArgViolationOrDeduceInstead(Prop,N,Obj):-argIsa_call(Prop,N,Type),
    not(unverifiableType(Type)),
@@ -232,7 +233,7 @@ violatesType(Value,ftInt):-number(Value),!,fail.
 violatesType(Value,Type):-atom(Type),isa_backchaing(Value,Type),!,fail.
 violatesType(Value,ftString):-string(Value),!,fail.
 %violatesType(apath(_,_),Type):-!,(Type\=areaPath,Type\=obj).
-violatesType(Value,Type):- compound(Type),!,not(term_is_ft(Value,Type)),!.
+violatesType(Value,Type):- compound(Type),!,ttFormatType(Type),not(term_is_ft(Value,Type)),!.
 violatesType(Value,Type):- once((isa_backchaing(Value,_))), no_loop_check(not(isa_backchaing(Value,Type))).
 
 decl_database_hook(Type,Changer):- retract(on_change_once(Type,Changer,Fact)),Fact.

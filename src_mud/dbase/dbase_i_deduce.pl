@@ -21,6 +21,7 @@
 % ========================================================================================
 
 :-export((alt_forms/2)).
+alt_forms(AR,M:P,NP):- atom(M),!,alt_forms(AR,P,NP).
 alt_forms(AR,P,NP):- nonvar(P),into_mpred_form(P,CP),P\=@=CP,!,alt_forms(AR,CP,NP).
 alt_forms(AR,P,NP):- no_repeats(( alt_forms0(AR,P,NP), NP\=@=P)).
 
@@ -63,7 +64,7 @@ decl_database_hook(assert(_),mudAtLoc(R,W)):- mudIsa(R,tRegion),trace_or_throw(m
 deduce_facts(localityOfObject(_,Region),mudIsa(Region,tSpatialThing)).
 deduce_facts(localityOfObject(Obj,_),mudIsa(Obj,tObj)).
 
-deduce_facts(Fact,mpred_prop(AF,[predArgTypes(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],ttDeclarer(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,
+deduce_facts(Fact,mpred_prop(AF,[predArgTypes(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],is_pred_declarer(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,
                 ArgTs=..[AF|ARGS],!,must_det(ground(ARGS)).
 
 

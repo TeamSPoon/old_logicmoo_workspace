@@ -22,7 +22,7 @@
 % where 
 agent_text_command(Agent,["where",BE,X],Agent,actWhere(X)):-memberchk(BE,[is,are,be,were]).
 agent_text_command(Agent,["where_is",X],Agent,actWhere(X)).
-action_info(actWhere(tObj),"Tells where something is").
+action_info(actWhere(ftTerm),"Tells where something is").
 agent_call_command(_Agent,actWhere(SObj)) :-
     forall(
      (mudAtLoc(Obj,LOC), match_object(SObj,Obj)),

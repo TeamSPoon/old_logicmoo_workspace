@@ -1,3 +1,15 @@
+/** <module> dbase_i_mpred_dbase_t
+% Provides a prolog dabase in these predicates...
+%
+%  dbase_t/N
+%  hybridRule/2
+%  
+%
+% Logicmoo Project PrologMUD: A MUD server written in Prolog
+% Maintainer: Douglas Miles
+% Dec 13, 2035
+%
+*/
 
 :-module(dbase_rdf_store, [dbase_rdf/3,atom_to_qname/2,rdf_object/1,rdf_assert_hook/1,expire_rdf_caches/0 ]).
 

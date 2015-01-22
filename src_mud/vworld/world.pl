@@ -82,9 +82,7 @@
 :- include(logicmoo('vworld/moo_header.pl')).
 :- register_module_type(utility).
 
-
 :- include(logicmoo('vworld/world_2d.pl')).
-:- include(logicmoo('vworld/world_agent.pl')).
 :- include(logicmoo('vworld/world_text.pl')).
 :- include(logicmoo('vworld/world_effects.pl')).
 :- include(logicmoo('vworld/world_events.pl')).
@@ -151,6 +149,8 @@ create_meta(SuggestedName,SuggestedClass,BaseClass,SystemName):-
    assert_isa_safe(SystemName,SuggestedClass).
 
 
+:-decl_type(ttNotCreatableType).
+
 ttNotCreatableType(ftInt).
 ttNotCreatableType(ftTerm).
 
@@ -166,8 +166,8 @@ ttCreateable(tItem). %  col, formattype,
 ttCreateable(SubType):-member(SubType,[tAgentGeneric,tItem,tRegion]).
 ttCreateable(S):- is_asserted(ttCreateable(T)), impliedSubClass(S,T).
 
-createableSubclassType(S,T):- ttCreateable(T),is_asserted(mudSubclass(S,T)).
-createableSubclassType(T,tTemporallyExistingThing):- ttCreateable(T).
+createableSubclassType(S,T):-call_mpred(  ttCreateable(T)),is_asserted(mudSubclass(S,T)).
+createableSubclassType(T,tTemporallyExistingThing):-call_mpred( ttCreateable(T)).
 
 mudIsa(ftInt,ttFormatType).
 mudIsa(vtDirection,ttValueType).
@@ -182,8 +182,9 @@ create_agent(P,List):-must_det(create_instance(P,tAgentGeneric,List)).
 
 :-swi_export(create_instance/1).
 create_instance(P):- must_det((mudIsa(P,What),ttCreateable(What))),must_det(create_instance(P,What,[])).
-:-swi_export(create_instance/2).
+:-export(create_instance/2).
 create_instance(Name,Type):-create_instance(Name,Type,[]).
+user:create_instance(Name,Type):-create_instance(Name,Type,[]).
 :-swi_export(create_instance/3).
 create_instance(What,Type,Props):- 
   loop_check_local(time_call(create_instance_now(What,Type,Props)),dmsg(already_create_instance(What,Type,Props))).
@@ -290,23 +291,11 @@ create_instance_0(What,Type,Props):- leash(+call),trace,dtrace,trace_or_throw(dm
 %ttCreateable(col).
 
 
-:-decl_type(vtBasicDir).
-vtBasicDir(vNorth).
-vtBasicDir(vEast).
-vtBasicDir(vSouth).
-vtBasicDir(vWest).
-
-:-decl_type(vtBasicDirPlusUpDown).
-vtBasicDirPlusUpDown(X):-vtBasicDir(X).
-vtBasicDirPlusUpDown(vUp).
-vtBasicDirPlusUpDown(vDown).	
-
-
 :-decl_mpred_hybrid(mudKwLabel(ftTerm,ftTerm)).
 :-decl_mpred_hybrid(mudOpaqueness(ftTerm,ftPercent)).
 typeProps(tRegion,mudOpaqueness(1)).
 typeProps(tObj,mudOpaqueness(100)).
-:-decl_mpred_hybrid(mudListPrice(tItem,number)).
+:-decl_mpred_hybrid(mudListPrice(tItem,ftNumber)).
 typeProps(tItem,mudListPrice(0)).
 typeProps(tAgentGeneric,mudLastCommand(actStand)).
 typeProps(tAgentGeneric,[

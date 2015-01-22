@@ -47,6 +47,9 @@ in_user_startup(Call):- '@'(user:Call,user).
          use_module(logicmoo(vworld/moo))),'user').
 
 
+:- user_ensure_loaded(logicmoo('vworld/moo_loader.pl')).
+:- load_data_file(logicmoo('dbase/dbase_i_builtin.pl')).
+
 % logicmoo vworld mud server
 %:- user_ensure_loaded(logicmoo(vworld/world)).
 :- user_ensure_loaded(logicmoo(vworld/toploop_npc)).
@@ -123,7 +126,7 @@ make_qlfs:-
 :- include_moo_files('../src_asserts/pldata/?*.pl').
 
 */
-
+:- dynamic_multifile_exported(user_ensure_nl_loaded/1).
 user_ensure_nl_loaded(_):-!.
 user_ensure_nl_loaded(F):-load_files([F],[expand(true),if(changed),qcompile(auto)]).
 
@@ -149,8 +152,12 @@ download_and_install_el:-
 
 :- asserta(loaded_external_kbs),show_call(kbp_to_dbase_t).
 
+:- user_ensure_loaded(logicmoo('vworld/world_agent.pl')).
 
 :- user_ensure_loaded(logicmoo(parsing/parser_imperative)).
+
+:- user_ensure_loaded(logicmoo('vworld/world.pl')).
+
 /*
 :- user_ensure_loaded(logicmoo(parsing/parser_talk)). 
 :- user_ensure_loaded(logicmoo(parsing/parser_e2c)). 
@@ -161,9 +168,7 @@ download_and_install_el:-
 %:- user_ensure_loaded(logicmoo(dbase/dbase_ext_lisp)).
 %:- user_ensure_loaded(logicmoo(dbase/dbase_ext_chr)).
 
-:- user_ensure_loaded(logicmoo('vworld/moo_loader.pl')).
 
-:- load_data_file(logicmoo('dbase/dbase_i_builtin.pl')).
 
 
 % NPC planners
