@@ -84,10 +84,10 @@ isQVar(Cvar):-atom(Cvar),atom_concat('?',_,Cvar).
    decl_dcgTest_startsWith/2,
    decl_dcgTest_startsWith/3.
 
-:- '@'((use_module(logicmoo(logicmoo_util/logicmoo_util_library)),
-        use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)),        
+:- '@'((ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_library)),
+        ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_bugger)),        
+%        ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_strings)),
          use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)),
-         use_module(logicmoo(logicmoo_util/logicmoo_util_strings)),
          use_module(logicmoo(logicmoo_util/logicmoo_util_terms))),'user').
 
 decl_dcgTest(X,Y):- nonvar(Y),!,do_dcgTest(X,Y,true).
@@ -285,12 +285,12 @@ logicmoo_util_dcg:do_dcg_util_tests:-
    forall(decl_dcgTest_startsWith(List,Phrase,Call),'@'((do_dcgTest_startsWith(List,Phrase,Call)),logicmoo_util_dcg)).
 
 
-do_dcgTest(Input,DCG,Call):- to_word_list(Input,List),OTEST=do_dcgTest(Input,DCG,Call),copy_term(DCG:OTEST,CDCG:TEST),
+do_dcgTest(Input,DCG,Call):- logicmoo_util_strings:to_word_list(Input,List),OTEST=do_dcgTest(Input,DCG,Call),copy_term(DCG:OTEST,CDCG:TEST),
    once((phrase(DCG,List,Slack),Call,(Slack==[]->dmsg(passed(CDCG,TEST,OTEST));dmsg(warn(Slack,OTEST))))).
 do_dcgTest(Input,DCG,Call):- dmsg(failed(DCG, do_dcgTest(Input,DCG,Call))).
 
 
-do_dcgTest_startsWith(Input,DCG,Call):- to_word_list(Input,List),OTEST=do_dcgTest(Input,DCG,Call),copy_term(DCG:OTEST,CDCG:TEST),
+do_dcgTest_startsWith(Input,DCG,Call):- logicmoo_util_strings:to_word_list(Input,List),OTEST=do_dcgTest(Input,DCG,Call),copy_term(DCG:OTEST,CDCG:TEST),
    once((phrase(DCG,List,Slack),Call,(Slack==[]->dmsg(warn(CDCG,TEST,OTEST));dmsg(passed(CDCG,TEST,OTEST))))).
 do_dcgTest_startsWith(Input,DCG,Call):- dmsg(failed(DCG, do_dcgTest_startsWith(Input,DCG,Call))).
 

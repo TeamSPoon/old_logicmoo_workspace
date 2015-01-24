@@ -12,6 +12,8 @@
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
+:-asserta_if_new(use_pttp).
+
 :- dynamic_multifile_exported correctArgsIsa/3.
 
 tPredStubImpl(prologOnly).
@@ -51,7 +53,7 @@ has_storage_stub(StubType,Head):-
       get_pifunctor(Head,PHead,F),mpred_prop(F,hasStub(StubType)),must(tPredStubImpl(StubType)),
       predicate_property(PHead,number_of_rules(1)),
       predicate_property(PHead,number_of_clauses(1)),!,
-      clause(PHead,use_provided_mpred_storage_op(call(_),PHead,_)).
+      user:clause(PHead,use_provided_mpred_storage_op(call(_),PHead,_)).
       
 
 
@@ -74,13 +76,13 @@ add_storage_stub(StubType,Head):- has_storage_stub(StubType,Head),!.
 add_storage_stub(StubType,Head):-get_pifunctor(Head,PHead,F,A),!,add_storage_stub(StubType,Head,PHead,F,A).
 add_storage_stub(StubType,Head,PHead,F,0):- dmsg(zero_add_storage_stub(StubType,Head,PHead,F,0)),!.
 add_storage_stub(StubType,Head,PHead,F,_):-
-  must_det_l((          
+ user: must_det_l((          
      OP = call(conjecture),
      must(tPredStubImpl(StubType)),
          provide_clauses_list(Head,HBLIST),
          retractall(mpred_prop(F,hasStub(_))),
          forall(tPredStubImpl(Impl),(retractall(mpred_prop(F,Impl)),retractall(mpred_prop(F,predStubType(Impl))))),
-         asserta_if_new(mpred_prop(F,hasStub(StubType))),       
+         user:asserta_if_new(mpred_prop(F,hasStub(StubType))),       
          asserta_if_new(mpred_prop(F,StubType)),         
          asserta_if_new(mpred_prop(F,predStubType(StubType))), 
          one_must(show_call_failure(call_no_cuts(provide_mpred_setup(OP,PHead,StubType,Result))),
@@ -106,13 +108,12 @@ add_storage_op(OP,Head,StubType):-
          asserta_if_new(provide_mpred_currently(OP,Head,StubType,Result)))).
 
 
-add_mpred_universal_call_stub(StubType,Head):- get_pifunctor(Head,PHead,F),must(change_pred_to_dynamic(PHead)),
-    asserta_if_new((PHead:-use_provided_mpred_storage_op(call(conjecture),PHead,StubType))),
-    asserta_if_new(mpred_prop(F,hasStub(StubType))),!.
+add_stub_now(PHead,StubType,OP):- predicate_property(PHead,number_of_clauses(NC)),NC>0,!,asserta_if_new(PHead:-use_provided_mpred_storage_op(OP,PHead,StubType)).
+add_stub_now(PHead,StubType,OP):- asserta_if_new(PHead:-use_provided_mpred_storage_op(OP,PHead,StubType)).
 
-
-:-export(use_provided_mpred_storage_ops/3).    
-use_provided_mpred_storage_op(OP,Head,StubType):- get_provided_mpred_storage_op(OP,Head,StubType,CALL),!,
+:-export(use_provided_mpred_storage_op/3).    
+use_provided_mpred_storage_op(OP,Head,StubType):-
+  must(get_provided_mpred_storage_op(OP,Head,StubType,CALL)),!,
   debugOnError(user:call(CALL)).
 
 :-export(use_provided_mpred_storage_op/4).
@@ -242,12 +243,12 @@ requires_storage(C):- requires_storage(C,true).
 requires_storage(M:H,B):-atomic(M),!,requires_storage(H,B).
 requires_storage(H,_):-get_pifunctor(H,F),!,special_head(H,F),!.
 
-special_wrapper_functor(call_mpred_body).
-special_wrapper_functor(body_req).
-special_wrapper_functor(provide_mpred_storage_op).
-special_wrapper_functor(use_provided_mpred_storage_ops).
-%special_wrapper_functor(loop_check).
-%special_wrapper_functor(loop_check_term).
+special_wrapper_functor(call_mpred_body,direct_to_prolog).
+special_wrapper_functor(body_req,direct_to_prolog).
+special_wrapper_functor(provide_mpred_storage_op,direct_to_prolog).
+special_wrapper_functor(use_provided_mpred_storage_op,direct_to_prolog).
+special_wrapper_functor(loop_check,meta).
+special_wrapper_functor(loop_check_term,meta).
 %special_wrapper_functor(pttp_req).
 %special_wrapper_functor(loop_check_clauses).
 
@@ -265,7 +266,7 @@ special_head(_,F):-mpred_prop(F,prologHybrid),!.
 
 
 
-special_wrapper_body(W):-get_body_functor(W,F,_),!,special_wrapper_functor(F).
+special_wrapper_body(W,Why):-get_body_functor(W,F,_),!,special_wrapper_functor(F,Why).
 
 get_body_functor(Var,_,call):-var(Var),!.
 get_body_functor((M:BDY),BF,A):-atom(M),!,get_body_functor(BDY,BF,A).

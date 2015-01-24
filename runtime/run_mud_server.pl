@@ -59,6 +59,9 @@ user:semweb_startup :- register_ros_package(milo).
 % [Optionaly] register/run EulerSharp robot services (we use it for the ontology mainly)
 user:semweb_startup :- register_ros_package(euler).
 
+:- with_no_term_expansions(if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop.pl'))).
+:- current_predicate(egg_go/0)->egg_go;true.
+
 % [Manditory] run_tests (includes run_common)
 :- include(run_tests).
 % OR
@@ -69,8 +72,6 @@ user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),s
 % user:semweb_startup:- forall(retract(prolog_debug:debugging((X), true, O)),show_call(asserta(prolog_debug:debugging((X), false, O)))).
 
 
-:- with_no_term_expansions(if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop.pl'))).
-:- current_predicate(egg_go/0)->egg_go;true.
 
 :-multifile(pre_file_search_path/2).
 user:pre_file_search_path(_,_):-!,fail.

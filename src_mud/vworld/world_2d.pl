@@ -200,11 +200,9 @@ inRegion(Obj,Where):- localityOfObject(Obj,Where), tRegion(Where).
 localityOfObject(Inner,Container):-mudInsideOf(Inner,Container).
 localityOfObject(Above,HasSurface):-mudLocOnSurface(Above,HasSurface).
 localityOfObject(Clothes,Agent):-mudSubPart(Agent,Clothes).
-localityOfObject(Inner,Outer):-in_pttp,localityOfObject(Inner,Container),localityOfObject(Container,Outer).
+localityOfObject(Inner,Outer):-use_pttp,localityOfObject(Inner,Container),localityOfObject(Container,Outer).
 localityOfObject(Obj,Region):-loop_check(inRegion(Obj,Region),fail).
 
-:- listing(inRegion).
-:- listing(localityOfObject).
 
 mudSubPart(Outer,Inner):-is_asserted(mudInsideOf(Inner,Outer)).
 mudSubPart(Agent,Clothes):-wearsClothing(Agent,Clothes).

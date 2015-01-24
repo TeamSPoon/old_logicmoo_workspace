@@ -20,7 +20,7 @@ action_info(actDrink(tDrinkable),"Drink a Drinkable Item").
 agent_call_command(Agent,actDrink(Obj)) :-
 	mudPossess(Agent,Obj),
 	do_act_affect(Agent,actDrink,Obj),
-	del(mudPossess(Agent,Obj)),
+	clr(mudPossess(Agent,Obj)),
 	call_update_charge(Agent,actDrink).
 
 update_charge(Agent,actDrink) :- add(mudCharge(Agent,-1)).

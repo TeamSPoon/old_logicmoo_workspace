@@ -23,8 +23,7 @@ provide_mpred_currently(_OP,Head,prologOnly,declared(_)):- get_functor(Head,F),m
 provide_mpred_currently(_OP,Head,prologOnly, Will):- get_functor(Head,F,A), current_predicate(F/A) -> Will= will(_) ; Will = wont(_).
 
 
-provide_mpred_storage_clauses(prolog,H,B):-predicate_property(H,number_of_clauses(_)),clause(H,B).
-
+provide_mpred_storage_clauses(prolog,H,B):-predicate_property(H,number_of_clauses(_)),user:clause(H,B).
 
 
 
@@ -34,14 +33,16 @@ provide_mpred_write_attributes(F,external(Module)):- dmsg(decl_mpred(F,external(
 
 % HOOK
 provide_mpred_setup(OP,Head,StubType,OUT):-  StubType = prologOnly, 
-  must_det_l(( get_pifunctor(Head,PHead,F,A),   
-   doall((clause(PHead,use_provided_mpred_storage_op(call(_),PHead,_),Ref),erase(Ref))),
+  user:must_det_l(( 
+   get_pifunctor(Head,PHead,F,A),   
+   doall((user:clause(PHead,use_provided_mpred_storage_op(call(_),PHead,_),Ref),erase(Ref))),
    show_call(provide_clauses_list(PHead,HBLIST)),
-   user:abolish(F,A),dynamic_multifile_exported(user:F/A),
+   (predicate_property(PHead,thread_local)->retract_all(PHead:-_);user:abolish(F,A)),
+   dynamic_multifile_exported(user:F/A),
    asserta_if_new(mpred_prop(F,hasStub(StubType))),         
    asserta_if_new(mpred_prop(F,StubType)), 
    forall(member(HB,HBLIST),must(add(HB))),!,   
-   doall(retract((user:PHead:-use_provided_mpred_storage_op(call(_),PHead,_)))),
+   doall(retract((PHead:-use_provided_mpred_storage_op(call(_),PHead,_)))),
    must_same_clauses(PHead,HBLIST))),
    must(OUT=defined(provide_mpred_setup(OP,StubType))).
 
@@ -55,18 +56,20 @@ decl_mpred_prolog(M,PI,F/A):-
  decl_mpred_prolog(_,M,PI,F/A).
 
 :-swi_export(decl_mpred_prolog/4).
-decl_mpred_prolog(CM,M,PI,F/A):-
+decl_mpred_prolog(CM,M,PI,FA):- loop_check(must(decl_mpred_prolog_lc(CM,M,PI,FA)),true).
+
+decl_mpred_prolog_lc(CM,M,PI,F/A):-
       dynamic_multifile_exported(CM,M,PI,F/A),
-      debugOnError(assert_if_new(mpred_prop(F,prologOnly))),
-      debugOnError(assert_if_new(mpred_arity(F,A))),
+      assert_if_new(mpred_prop(F,prologOnly)),
+      assert_if_new(mpred_arity(F,A)),
       assert_arity(F,A),
-      swi_export(F/A),
-      % retractall(mpred_prop(F,_)),   
-      decl_mpred(F,prologOnly),   
-      decl_mpred(F,info(decl_mpred_prolog(M:F/A))),
-      decl_mpred(F,predModule(M)),
       module_transparent(F/A),
+      export(F/A),
+      decl_mpred(F,info(decl_mpred_prolog(M:F/A))),
+      decl_mpred(F,predModule(M)),      
       ignore((ground(PI),decl_mpred(PI))),
+      forall(mpred_op(OP),must((provide_mpred_setup(OP,PI,prologOnly,OUT),dmsg(PI=OUT)))),
+      decl_mpred(F/A,prologOnly),   
       decl_mpred(F,A).
 
 

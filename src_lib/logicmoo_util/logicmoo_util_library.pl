@@ -12,7 +12,7 @@
          upcase_atom_safe/2,
          get_module_of/2,
          call_n_times/2,
-         concat_atom_safe/3,
+         % concat_atom_safe/3,
          makeArgIndexes/1,
          contains_singletons/1,
          doall/1,
@@ -54,11 +54,11 @@
 
 
 % this is a backwards compatablity block for SWI-Prolog 6.6.6
-:- dynamic(double_quotes_was/1).
-:- multifile(double_quotes_was/1).
-:- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was(WAS)).
-:- retract(double_quotes_was(WAS)),set_prolog_flag(double_quotes,WAS).
-:- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was(WAS)).
+:- dynamic(double_quotes_was_lib/1).
+:- multifile(double_quotes_was_lib/1).
+:- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was_lib(WAS)).
+:- retract(double_quotes_was_lib(WAS)),set_prolog_flag(double_quotes,WAS).
+:- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was_lib(WAS)).
 :- set_prolog_flag(double_quotes,string).
 
 :- meta_predicate(if_file_exists(:)).
@@ -70,15 +70,15 @@ filematch(Mask,File1):-filematch('./',Mask,File1).
 filematch(RelativeTo,Mask,File1):-absolute_file_name(Mask,File1,[expand(true),extensions(['',plmoo,pl,'pl.in']),file_errors(fail),solutions(all),relative_to(RelativeTo),access(read)]).
 
 
-:- use_module(logicmoo_util_bugger_new).
-:- use_module(logicmoo_util_bugger_catch).
-:- '@'( use_module(logicmoo_util_bugger), 'user').
+:- ensure_loaded(logicmoo_util_bugger_new).
+:- ensure_loaded(logicmoo_util_bugger_catch).
+:- '@'( ensure_loaded(logicmoo_util_bugger), 'user').
 
 % :-user_use_module(logicmoo(logicmoo_util/logicmoo_util_strings)).
 % :-user_use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)).
 
-lastMember(_E,List):-var(List),!,fail.
-lastMember(E,[H|List]):-lastMember(E,List);E=H.
+lastMember2(_E,List):-var(List),!,fail.
+lastMember2(E,[H|List]):-lastMember2(E,List);E=H.
 
 
 safe_univ(Call,List):-hotrace(safe_univ0(Call,List)),!.
@@ -125,8 +125,10 @@ makeArgIndexes(_NEW,_F).
 
 
 % peekAttributes/2,pushAttributes/2,pushCateElement/2.
-:- module_transparent asserta_new(:),asserta_if_new(:),assertz_new(:),assertz_if_new(:),assert_if_new(:),assertz_if_new_clause(:),assertz_if_new_clause(:,:),clause_asserted(0,0),clause_asserted(0),eraseall(-,-).
-% :- meta_predicate asserta_new(:),asserta_if_new(:),assertz_new(:),assertz_if_new(:),assert_if_new(:),assertz_if_new_clause(:),assertz_if_new_clause(:,:),clause_asserted(0,0),clause_asserted(0),eraseall(-,-).
+:- module_transparent((asserta_new/1,asserta_if_new/1,assertz_new/1,assertz_if_new/1,assert_if_new/1,assertz_if_new_clause/1,assertz_if_new_clause/2,clause_asserted/2,as_clause/2,clause_asserted/1,eraseall/2)).
+:- meta_predicate asserta_new(:),asserta_if_new(:),assertz_new(:),assertz_if_new(:),assert_if_new(:),assertz_if_new_clause(:),assertz_if_new_clause(:,:).
+:- meta_predicate clause_asserted(-,-),as_clause(-,-),clause_asserted(-),eraseall(-,-).
+
 asserta_new(_Ctx,NEW):-ignore((retract(NEW),fail)),asserta(NEW).
 writeqnl(_Ctx,NEW):- fmt('~q.~n',[NEW]),!.
 
@@ -147,9 +149,21 @@ assertz_if_new_clause(C):- as_clause(C,H,B),assertz_if_new_clause(H,B).
 assertz_if_new_clause(H,B):-clause_asserted(H,B),!.
 assertz_if_new_clause(H,B):-assertz((H:-B)).
 
-clause_asserted(C):- as_clause(C,H,B),!,clause_asserted(H,B).
+as_clause( M:((H :- B)),M:H,B):-!.
+as_clause( ((H :- B)),H,B):-!.
+as_clause( H,  H,  true).
 
-clause_asserted(H,B):- predicate_property(H,number_of_clauses(N)),N>0,copy_term(H:B,HH:BB),!, clause(HH, BB, Ref),clause(Head, Body, Ref),H=@=Head,Body=@=B,!.
+clause_asserted(C):- as_clause(C,H,B),!,clause_asserted(H,B).
+% clause_asserted(H,B):- predicate_property(H,number_of_clauses(N)),N>0, \+ \+ ((numbervars(H:B),clause(H,B))).
+clause_asserted(H,B):- predicate_property(H,number_of_clauses(N)),N>0,copy_term(H:B,HH:BB),!, clause(HH, BB, Ref),must(clause(Head, Body, Ref)),
+  same_body(B,Body), same_heads(H,Head).
+
+same_body(B,Body):-same_heads(B,Body).
+
+same_heads(H,Head):-H=@=Head,!.
+same_heads(M1:H,M2:Head):-H=@=Head,!,dtrace(dmsg(warn(same_heads(M1:H,M2:Head)))).
+same_heads(H,M2:Head):-H=@=Head,!,dtrace(dmsg(warn(same_heads(_M1:H,M2:Head)))).
+same_heads(M1:H,Head):-H=@=Head,!,dtrace(dmsg(warn(same_heads(M1:H,_M2:Head)))).
 
 :-meta_predicate clause_safe(:, ?).
 :-module_transparent clause_safe/2.
@@ -165,14 +179,13 @@ clause_safe(H,B):-!,clause_safe_m3(_,H,B).
 %clause_safe(M,string(S),B):- trace_or_throw(clause_safe(M,string(S),B)).
 clause_safe_m3(M,H,B):-  (nonvar(H)->true;(trace,current_predicate(M:F/A),functor(H,F,A))),predicate_property(M:H,number_of_clauses(_)),clause(H,B).
 
-as_clause( ((H :- B)),H,B):-!.
-as_clause( H,  H,  true).
 
 
 :- meta_predicate doall(:).
-doall(M:C):-M:ignore((C,fail)).
+doall(M:C):-!, M:ignore(M:(C,fail)).
+doall(C):-ignore((C,fail)).
 
-:- use_module(logicmoo_util_bugger).
+% :- ensure_loaded(logicmoo_util_bugger).
 
 proccess_status(_,exited(called(Det,Goal)),called(Goal2)):- Det = true,!,must_det(Goal=Goal2).
 proccess_status(ID,exited(called(Det,Goal)),called(Goal2)):- dmsg(nondet_proccess_status(ID,exited(called(Det,Goal)),called(Goal2))),!,must_det(Goal=Goal2).
@@ -431,15 +444,17 @@ multi_transparent(X):-functor_catch(X,F,A),multi_transparent(F/A),!.
 atom_concat_safe(L,R,A):- ((atom(A),(atom(L);atom(R))) ; ((atom(L),atom(R)))), !, atom_concat(L,R,A),!.
 exists_file_safe(File):-bugger:must(atomic(File)),exists_file(File).
 exists_directory_safe(File):-bugger:must(atomic(File)),exists_directory(File).
+/*
 concat_atom_safe(List,Sep,[Atom]):-atom(Atom),!,concat_atom(List,Sep,Atom),!.
 concat_atom_safe(List,Sep,Atom):-atom(Atom),!,concat_atom(ListM,Sep,Atom),!,List = ListM.
 concat_atom_safe(List,Sep,Atom):- concat_atom(List,Sep,Atom),!.
+*/
 upcase_atom_safe(A,B):-atom(A),upcase_atom(A,B),!.
 time_file_safe(F,INNER_XML):-exists_file_safe(F),time_file(F,INNER_XML).
 
 :-export(list_to_set_safe/2).
 list_to_set_safe(A,A):-(var(A);atomic(A)),!.
-list_to_set_safe([A|AA],BB):- (not(not(lastMember(A,AA))) -> list_to_set_safe(AA,BB) ; (list_to_set_safe(AA,NB),BB=[A|NB])),!.
+list_to_set_safe([A|AA],BB):- (not(not(lastMember2(A,AA))) -> list_to_set_safe(AA,BB) ; (list_to_set_safe(AA,NB),BB=[A|NB])),!.
 
 
 %================================================================
@@ -460,7 +475,7 @@ maplist_safe(Pred,LISTIN, LIST):-!, findall(EE, ((member(E,LISTIN),debugOnFailur
 
 
 % TODO remove this next line
-% :-user_use_module(logicmoo_util_bugger).
+% :-ensure_loaded(logicmoo_util_bugger).
 % and replace with...
 
 
@@ -514,5 +529,8 @@ contains_singletons(Term):- not(ground(Term)),not(not((term_variables(Term,Vs),n
 
 
 % this is a backwards compatablity block for SWI-Prolog 6.6.6
-:- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was(WAS)).
+:- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was_lib(WAS)).
+
+:- module_predicates_are_exported(logicmoo_util_library).
+:- all_module_predicates_are_transparent(logicmoo_util_library).
 

@@ -100,11 +100,13 @@ typename_to_iname0(I,OType,IType):-type_prefix(Prefix,_),atom_concat(Prefix,Type
 typename_to_iname0(I,Type,IType):-nonvar(Type),toUpperCamelcase(Type,UType),atom_concat(I,UType,IType).
 
 
-:-ensure_loaded(dbase_i_deduce).
-
-% :-ensure_loaded(dbase_ext_was).
+% ================================================
+% A tiny bit of TMS
+% ================================================
 
 :-ensure_loaded(dbase_i_isa_subclass).
+
+:-ensure_loaded(dbase_i_deduce).
 
 % ================================================
 % A tiny bit of TMS

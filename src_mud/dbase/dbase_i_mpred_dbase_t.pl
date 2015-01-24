@@ -166,17 +166,21 @@ holds_plist_t(P,LIST):- apply(holds_t,[P|LIST]).
 
 
 decl_mpred_hybrid(M):- with_pi(M,decl_mpred_hybrid).
-decl_mpred_hybrid(F,A):-
-     decl_mpred(F,A),
-     decl_mpred_pi(F),
-     functor_h(F,FF,_),
-     must_det((mpred_arity(FF,AR),decl_mpred_mfa(_,F,AR),
-     decl_mpred_stubcol(F,A,prologHybrid))).
 
-decl_mpred_hybrid(M,PI,F/A):-
-     decl_mpred(F,A),  
-     decl_mpred_pi(PI),       
+decl_mpred_hybrid(F,A):- integer(A),!,decl_mpred_hybrid(F/A).
+decl_mpred_hybrid(F,Other):- 
+     decl_mpred(F,Other),
+     decl_mpred_hybrid(F).
+
+:-export(decl_mpred_hybrid/3).
+decl_mpred_hybrid(M, F, A):- atom(F),integer(A),!,functor(PI,F,A),decl_mpred_hybrid(M,PI,F/A).
+decl_mpred_hybrid(M,PI,FA):- loop_check(must(decl_mpred_hybrid_lc(M,PI,FA)),true).
+
+
+decl_mpred_hybrid_lc(M,PI,F/A):-
+     must(M=user),
      decl_mpred_mfa(M,F,A),
+     decl_mpred_pi(PI),
      decl_mpred_stubcol(F,A,prologHybrid).
 
 decl_mpred_hybrid(_CM,M,PI,F/A):-
@@ -195,16 +199,16 @@ ensure_universal_stub_plus_2(F,A2):- once(( AMinus2 is A2 -2, ensure_universal_s
 %ensure_universal_stub_plus_2(F,A2):- cannot_override(F,A2,Why),!,dmsg(cannot_override_plus_2(F,A2,Why)).
 
 ensure_universal_stub_plus_2(F,A2):- 
-   swi_export(F/A2),
+   export(F/A2),
    functor(HEAD,F,A2),
    HEAD=..[F|ARGS],
    append(ARGSMinus2,[_,_],ARGS),
    HEADMinus2=..[F|ARGSMinus2],
-   % AMinus2 is A2 -2,
+   AMinus2 is A2 -2,
    assert_if_new(HEAD:-HEADMinus2),!,
   % compile_predicates([HEAD]),
    dbase_mod(M),
-   decl_mpred_hybrid(M,F,A2).
+   decl_mpred_hybrid(M,F,AMinus2).
 
 
 
@@ -242,34 +246,54 @@ is_tCol(F):- mpred_prop(F,tCol);hasInstance(tCol,F);hasInstance(F,_).
 is_proc(V):-is_ftVar(V),!,fail.
 is_proc(F):- functor(P,F,1),predicate_property(P,_),must(not(mpred_prop(F,tCol))).
 
+is_call_op(call(_)):-!.
+is_call_op(call).
 
+mpred_op(assert(_)).
+mpred_op(retract(_)).
+mpred_op(call(_)).
+
+
+
+
+% ISA DECL
+provide_mpred_currently(call(conjecture),mudIsa(I,C),prologHybrid):-!.
+provide_mpred_currently(_OP, X, prologHybrid, declared(_)):-was_isa(X,_,_),!.
+
+
+% ALL CALLS
+provide_mpred_storage_op(OP,X,prologHybrid, CALL):- is_call_op(OP),!,provide_mpred_call_op(OP,X,prologHybrid, CALL).
 
 % ISA HOOK
-provide_mpred_currently(_OP, X, prologHybrid, declared(_)):-was_isa(X,_,_),!.
-provide_mpred_storage_op(assert(_),X,prologHybrid, CALL):- was_isa(X,I,C),!,dmsg(isa_assert(X,I,C)),!, CALL=isa_assert(I,C).
-provide_mpred_storage_op(call,X,prologHybrid, CALL):- was_isa(X,I,C),!, CALL=no_loop_check_unsafe(isa_backchaing(I,C)).
+provide_mpred_storage_op(assert(_),X,prologHybrid, CALL):-  was_isa(X,I,C),!,dmsg(isa_assert(X,I,C)),!, CALL=isa_assert(I,C).
 
 % RULE HOOK   
-provide_mpred_storage_op(OP,(Head:-Body),prologHybrid,CALL):-
+provide_mpred_storage_op(OP,(Head:-Body),_ANY,CALL):-
  transitive(how_to_op,OP,OP2),
-  special_wrapper_body(Body),!,
-  CALL = user:(call(OP2,(Head:-Body))),
-  wdmsg(special_wrapper_body(OP2,Head,Body)).
+  special_wrapper_body(Body,direct_to_prolog),!,
+  wdmsg(direct_to_prolog(OP2,Head,Body)),
+  CALL = user:(call(OP2,(Head:-Body))).  
 
-% RULE HOOK   
-provide_mpred_storage_op(OP,(Head:-Body),prologHybrid,CALL):-
+% OLD RULE HOOK   
+provide_mpred_storage_op(OP,(Head:-Body),prologHybrid,CALL):- \+ use_pttp,
  transitive(how_to_op,OP,OP2),
-  CALL = user:(call(OP2,ruleHybridChain(Head,Body))),
+  CALL = (call(OP2,ruleHybridChain(Head,Body))),
   wdmsg(saved_clause_in_hybridRule(OP2,Head,Body)).
+
+% PTTP RULE HOOK   
+provide_mpred_storage_op(OP,(Head:-Body),prologHybrid,CALL):- use_pttp,!,
+  transitive(how_to_op,OP,OP2),
+  CALL = (((call(OP2,ruleHybridChain(Head,Body)),dbase_t_tell_snark(OP2,(Head:-Body))))),!.
+
+% SNARK RULE HOOK   
+provide_mpred_storage_op(OP,RULE,prologHybrid,CALL):- use_pttp,is_rule(RULE),!,
+  transitive(how_to_op,OP,OP2),
+  CALL = dbase_t_tell_snark(OP2,RULE),!.
+
 
 % REOP HOOK
 provide_mpred_storage_op(OP1,HeadBody,prologHybrid,CALL):- 
   transitive(how_to_op,OP1,OP2), OP1\==OP2, provide_mpred_storage_op(OP2,HeadBody,prologHybrid,CALL).
-
-% FACT CALL HOOK
-provide_mpred_storage_op(call,FACT,prologHybrid,CALL):-!,
- into_assertable_form(dbase_t,FACT,DB),   
-     CALL= call_fact_db(FACT,DB),!.
 
 % FACT DB HOOK
 provide_mpred_storage_op(OP,HeadBody,prologHybrid,CALL):-
@@ -277,31 +301,70 @@ provide_mpred_storage_op(OP,HeadBody,prologHybrid,CALL):-
     into_assertable_form(dbase_t,HeadBody,DB),   
      CALL=loop_check(call(OP2,DB),fail),!.
 
-call_fact_db( HEAD,DB):-no_repeats(HEAD,loop_check(call(call,DB),loop_check(call_rule_db(HEAD,DB),call(call,DB)))).
-call_fact_db( HEAD,DB):-loop_check(call_rule_db(HEAD,DB)).
-call_fact_db(_FACT,dbase_t(P1,A,B)):-dbase_t(genlPreds,P2,P1),call(P2,A,B).
-call_rule_db( HEAD,_DB):- ruleHybridChain(HEAD,BODY),call_mpred_body(HEAD,BODY).
-
 % THROW HOOK
 provide_mpred_storage_op(OP1,HeadBody,prologHybrid,CALL):- trace_or_throw(provide_mpred_storage_op(OP1,HeadBody,prologHybrid,CALL)).
 
 % SETUP HOOK
 provide_mpred_setup(OP,Head,StubType,OUT):-  StubType = prologHybrid, 
-  must_det_l(( get_pifunctor(Head,PHead,F,A),  
+  user:must_det_l(( get_pifunctor(Head,PHead,F,A),  
    show_call(provide_clauses_list(PHead,HBLIST)),
    user:abolish(F,A),dynamic_multifile_exported(user:F/A),
-   asserta_if_new(mpred_prop(F,hasStub(StubType))),         
+   call((asserta_if_new(mpred_prop(F,hasStub(StubType))))), 
    asserta_if_new(mpred_prop(F,StubType)), 
    forall(member(HB,HBLIST),must(add(HB))),!,   
-   asserta_if_new(user:(PHead:-use_provided_mpred_storage_op(call(conjecture),PHead,StubType))),
+   add_stub_now(PHead,StubType,call(conjecture)),
    must_same_clauses(PHead,HBLIST))),
    must(OUT=defined(provide_mpred_setup(OP,StubType))).
+
+
+% :- forall(current_predicate(M:F/A),catch(module_transparent(M:F/A),_,true)).
+
+
+dbase_t_tell_snark(OP2,RULE):-
+   with_assertions(thlocal:current_pttp_db_oper(mud_call_op(OP2)),(show_call(call((must(snark_tell(RULE))))))).
+
+mud_call_op(OP2,OPRAND):- show_call(call(OP2,OPRAND)).
+
+
+% ISA CALL
+provide_mpred_call_op(_,X,prologHybrid, CALL):- was_isa(X,I,C),!, CALL=no_loop_check_unsafe(isa_backchaing(I,C)).
+
+% FACT CALL HOOK
+provide_mpred_call_op(_,FACT,prologHybrid,CALL):-!,
+     CALL= call_for_literal(FACT),!.
+
+
+cwdl(CALL,DEEP7):- call_with_depth_limit(CALL,DEEP7,Result),
+   ( Result == depth_limit_exceeded -> (!,fail) ; true).
+
+call_for_literal_ideep_lc(HEAD):- must(into_assertable_form(dbase_t,HEAD,DB)),!, call_for_literal_db(HEAD,DB).
+
+call_for_literal_db(HEAD,DB):-no_repeats(HEAD,loop_check(call(call,DB),loop_check(call_rule_db(HEAD,DB),call(call,DB)))).
+call_for_literal_db(HEAD,DB):-loop_check(call_rule_db(HEAD,DB)).
+call_for_literal_db( _,dbase_t(P1,A,B)):-dbase_t(genlPreds,P2,P1),call(dbase_t,P2,A,B).
+
+:- dynamic(use_ideep/0).
+:- retractall(use_pttp).
+% :- asserta_if_new(use_pttp).
+
+call_for_literal(HEAD):- use_pttp,!,trace,snark_ask(HEAD).
+call_for_literal(HEAD):- use_ideep, CALL = call_for_literal_ideep_lc(HEAD),!,loop_check_term(cwdl(CALL,7),HEAD,(trace,CALL)).
+call_for_literal(HEAD):- must(into_assertable_form(dbase_t,HEAD,DB)),!,call_for_literal_db(HEAD,DB).
+
+call_rule_db(HEAD,_DB):- use_pttp,!,snark_ask(HEAD).
+call_rule_db(HEAD,_DB):- ruleHybridChain(HEAD,BODY),call_mpred_body(HEAD,BODY).
+
+call_mpred_body(_,true):-!.
+call_mpred_body(HEAD,and(A,B)):- !,call_mpred_body(HEAD,A),!,call_mpred_body(HEAD,B).
+call_mpred_body(HEAD,BODY):- no_repeats(loop_check_term(call_mpred_body_lc(HEAD,BODY),body_of(HEAD),(dmsg(failure(call_mpred_body_lc(HEAD,BODY))),!,fail))).
+
+call_mpred_body_lc(_HEAD,BODY):- debugOnError(BODY).
 
 
 % =====================================
 % = body_req
 % =====================================
-:-swi_export(last_arg_ground/1).
+:-export(last_arg_ground/1).
 last_arg_ground(HEAD):-compound(HEAD),functor(HEAD,F,A),last_arg_ground(F, A, HEAD),!.
 last_arg_ground(mud_test,_,_).
 last_arg_ground(_,A,_):-A>2,!.
@@ -310,11 +373,13 @@ last_arg_ground(_,A,HEAD):-arg(A,HEAD,Arg),!,ground(Arg).
 % call_body_req(HEAD):- functor(HEAD,F,A),HEAD_T=..[F|ARGS],HEAD_T=..[dbase_t,F|ARGS],hook_body_req(HEAD,HEAD_T).
 
 provide_mpred_storage_clauses(dbase_t,H,true):-is_list(H),!,length(H,A),A>2,dbase_t(H).
-provide_mpred_storage_clauses(dbase_t,H,true):-compound(H),!,functor(H,_,A),A>1,dbase_t(H).
+provide_mpred_storage_clauses(dbase_t,H,true):-compound(H),!,current_predicate(into_plist_arities/4),functor(H,_,A),A>1,dbase_t(H).
 
 % ========================================================================================
 % BODY StubType
 % ========================================================================================
+
+
 
 body_req_isa(I,C):-isa_backchaing(I,C).
 
@@ -322,7 +387,7 @@ body_call_cyckb(HEAD_T):-el_holds_DISABLED_KB, HEAD_T =.. [dbase_t|PLIST], thglo
 
 body_req(HEAD,HEAD_T):- (hook_body_req(HEAD,HEAD_T)).
 
-:-swi_export(body_req_normal/4).
+:-export(body_req_normal/4).
 %hook_body_req(HEAD,HEAD_T):- mpred_prop(F,prologPTTP),!,dmsg(warn(hook_body_req(HEAD,HEAD_T))),fail.
 %hook_body_req(HEAD,HEAD_T):- mpred_prop(F,prologOnly),!,dmsg(warn(hook_body_req(HEAD,HEAD_T))),fail.
 hook_body_req(_,_,mudIsa(I,C),_):- !, body_req_isa(I,C).
@@ -333,11 +398,11 @@ hook_body_req(_,_,_ ,HEAD_T):- thlocal:useOnlyExternalDBs,!, body_call_cyckb(HEA
 hook_body_req(HEAD,HEAD_T):-  no_repeats(body_req_normal(HEAD,HEAD_T)).
 
 
-:-swi_export(body_req_normal/4).
+:-export(body_req_normal/4).
 body_req_normal(HEAD,HEAD_T):- not(ground(HEAD)),!,no_repeats(HEAD_T,body_req_1(HEAD,HEAD_T)).
 body_req_normal(HEAD,HEAD_T):- body_req_1(HEAD,HEAD_T),!. 
 
-:-swi_export(body_req_1/4).
+:-export(body_req_1/4).
 body_req_1(HEAD,HEAD_T):- mpred_prop(F,call_tabled),!, call_tabled(body_req_2(HEAD,HEAD_T)).
 body_req_1(HEAD,HEAD_T):- body_req_2(HEAD,HEAD_T).
 
@@ -355,12 +420,6 @@ body_req_only_rules(HEAD, _):-  ruleHybridChain(HEAD,BODY),call_mpred_body(HEAD,
 body_req_only_rules(_,_,_,dbase_t(F,Obj,LValue)):-  choose_val(F,Obj,LValue).
 
 body_req_plus_cyc(F,_,_,HEAD_T):-  mpred_prop(F,cycPlus2(_)),thlocal:useOnlyExternalDBs,!,with_assertions(thglobal:use_cyc_database,body_call_cyckb(HEAD_T)).
-
-call_mpred_body(_,true):-!.
-call_mpred_body(HEAD,and(A,B)):- !,call_mpred_body(HEAD,A),!,call_mpred_body(HEAD,B).
-call_mpred_body(HEAD,BODY):- no_repeats(loop_check(call_mpred_body_lc(HEAD,BODY))).
-
-call_mpred_body_lc(_HEAD,BODY):- debugOnError(BODY).
  
 foo_b(b1).
 foo_b(b2):-!.

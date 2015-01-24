@@ -145,12 +145,12 @@ user:file_search_path(logicmoo,Dir):-
 locally_to_dir(Locally,Dir):-logicmoo_runtime_dir(RunDir), join_path33(RunDir,Locally,Directory),my_absolute_file_name(Directory,Dir),exists_directory(Dir),!.
 locally_to_dir(Directory,Dir):-my_absolute_file_name(Directory,Dir),exists_directory(Dir),!.
 
-:- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_bugger_new)), 'user').
-:- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_bugger_catch)), 'user').
-:- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)), 'user').
+:- '@'( ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_bugger_new)), 'user').
+:- '@'( ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_bugger_catch)), 'user').
+:- '@'( ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_bugger)), 'user').
+:- '@'( ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_strings)), 'user').
 :- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_library)), 'user').
 :- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)), 'user').
-:- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_strings)), 'user').
 :- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_terms)), 'user').
 :- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_dcg)), 'user').
 :- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_library)), 'user').

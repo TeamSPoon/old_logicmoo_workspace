@@ -63,8 +63,7 @@ decl_mpred_mfa(M,FF,A):-
     '@'((
      (static_predicate(M,F,A)->true; M:dynamic(F/A)), 
      M:export(F/A),
-     M:multifile(M:F/A)),M),
-     scan_missing_stubs(F) ]).
+     M:multifile(M:F/A)),M) ]).
 
 
 ensure_universal_stub_plus_minus_2(F,AMinus2):-
@@ -84,7 +83,7 @@ registerCycPredPlus2_3(M,_PI,F/A2):-
   decl_mpred(F,cycPlus2(A2)),decl_mpred(F,cycPred(A)).
 
 
-registerCycPredPlus2(P):-!,with_pi(P,registerCycPredPlus2_3).
+registerCycPredPlus2(P):-!,user:with_pi(P,registerCycPredPlus2_3).
 
 % ========================================
 % mpred_props database

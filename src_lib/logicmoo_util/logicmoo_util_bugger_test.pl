@@ -12,7 +12,7 @@
 :- module(logicmoo_util_bugger_test,[test1a/0,test1b/0,test_foo_test/1]).
 %:- use_module(logicmoo_util_bugger_new).
 %:- use_module(logicmoo_util_bugger_catch).
-%:- use_module(logicmoo_util_bugger).
+%:- ensure_loaded(logicmoo_util_bugger).
 :- use_module(logicmoo_util_all).
 
 %:- assert_if_new(tlbugger:use_bugger_expansion).

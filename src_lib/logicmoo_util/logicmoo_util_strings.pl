@@ -7,7 +7,7 @@
 % Revision:  $Revision: 1.7 $
 % Revised At:   $Date: 2002/07/11 21:57:28 $
 % ===================================================================
-:-module(logicmoo_util_strings,[
+logicmoo_util_strings:-module(logicmoo_util_strings,[
             atoms_of/2,
             to_word_list/2,
             equals_icase/2,
@@ -77,7 +77,7 @@
 :- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was_strings(WAS)).
 :- set_prolog_flag(double_quotes,string).
 
-:-import(bugger:must/1).
+% :-import(bugger:must/1).
 
 string_to_atom_safe(ISO,LISTO):-LISTO==[],!,string_to_atom(ISO,'').
 string_to_atom_safe(ISO,LISTO):-string_to_atom(ISO,LISTO).
@@ -89,7 +89,7 @@ string_upper(M,U):-toUppercase(M,U).
 string_lower(M,U):-toLowercase(M,U).
 */
 
-:- use_module(logicmoo_util_bugger).
+% :- ensure_loaded(logicmoo_util_bugger).
 :- meta_predicate map_tree_to_list(2,?,*).
 
 
@@ -443,8 +443,8 @@ stringToCodelist2(Term,Codes):-sformat(Codes,'~q',[Term]),true.
 %===================================================================
 % Removes Leading and Trailing whitespaces and non ANSI charsets.
 %====================================================================
-:-assert(show_this_hide(trim,2)).
-:-current_prolog_flag(double_quotes,X),asserta(double_quotes(X)).
+:-assert(bugger:show_this_hide(trim,2)).
+:-current_prolog_flag(double_quotes,X),asserta(double_quotes_string_was(X)).
 :-set_prolog_flag(double_quotes,codes).
 
 trim(S,Y):-flatten(S,S2),trim2(S2,Y).
@@ -459,7 +459,7 @@ trim2(S,Y):-
 addSpaceBeforeSym([H|T],[H,32|T]):-member(H,"?.!"),!.
 addSpaceBeforeSym(H,H).
 
-:-retract(double_quotes(X)),set_prolog_flag(double_quotes,X).
+:-retract(double_quotes_string_was(X)),set_prolog_flag(double_quotes,X).
 :-set_prolog_flag(double_quotes,string).
 
 ltrim([],[]):-!.
@@ -760,4 +760,7 @@ longest_string(Order,TStr1,TStr2):-
 
 % this is a backwards compatablity block for SWI-Prolog 6.6.6
 :- retract(double_quotes_was_strings(WAS)),set_prolog_flag(double_quotes,WAS).
+
+:- module_predicates_are_exported(logicmoo_util_strings).
+:- all_module_predicates_are_transparent(logicmoo_util_strings).
 

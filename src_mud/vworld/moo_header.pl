@@ -16,6 +16,7 @@
 :- set_prolog_flag(double_quotes, string).
 :- set_prolog_flag(generate_debug_info, true).
 
+:- thread_local(thlocal:current_pttp_db_oper/1).
 
 % these do not get defined!?
 % :-dynamic user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
@@ -33,6 +34,7 @@
 :- dynamic_multifile_exported(thlocal:usePlTalk/0).
 
 :- dynamic_multifile_exported(ruleHybridChain/2).
+:- dynamic_multifile_exported(ruleEquiv/2).
 
 :- dynamic_multifile_exported loaded_external_kbs/0.
 
@@ -56,7 +58,9 @@
 :- dynamic_multifile_exported(forwardRule/2).
 
 
-:- thread_local in_pttp/0.
+%:- thread_local use_pttp/0.
+:- dynamic(use_pttp/0).
+
 
 % ========================================
 % decl_mpred_hybrid database

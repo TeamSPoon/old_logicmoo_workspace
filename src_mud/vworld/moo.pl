@@ -71,7 +71,7 @@ type_error_checking:-false.
 :- set_prolog_flag(double_quotes, atom).
 :- set_prolog_flag(double_quotes, string).
 
-:- '@'((use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)),
+:- '@'((ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_bugger)),
          use_module(logicmoo(logicmoo_util/logicmoo_util_library)),
          use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)),
          use_module(logicmoo(logicmoo_util/logicmoo_util_strings)),

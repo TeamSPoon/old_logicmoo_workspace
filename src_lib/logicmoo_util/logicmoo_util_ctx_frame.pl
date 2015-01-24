@@ -27,8 +27,8 @@
 % you could quickly reset the top of an index.
 
 :-module(ctx_frame,[
-         lastMember/2,
-         lastMember/3,
+         lastMemberCtx/2,
+         lastMemberCtx/3,
          pushCtxFrame/3,
          getCtxValue/3,
          makeLocalContext/2,
@@ -37,8 +37,7 @@
 
 
 :-use_module(logicmoo(logicmoo_util/logicmoo_util_library)).
-:-use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)).
-:-use_module(logicmoo(logicmoo_util/logicmoo_util_library)).
+% :-ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_bugger)).
 
 currentContext(Name,X):-hotrace(makeLocalContext(Name,X)),!.
 
@@ -68,7 +67,7 @@ bestSetterFn(v(_,Setter,_),_OuterSetter,Setter):-!.
 bestSetterFn(_Value,OuterSetter,OuterSetter).
 
 getCtxValue(Name,Ctx,Value):-checkCtx(Ctx), hotrace(( get_ctx_holder(Ctx,Holder),get_o_value(Name,Holder,HValue,_Setter),!, unwrapValue(HValue,Value))),!.
-getCtxValue(Name,CtxI,Value):-checkCtx(CtxI),lastMember(Ctx,CtxI),hotrace(( get_ctx_holder(Ctx,Holder),get_o_value(Name,Holder,HValue,_Setter),!, unwrapValue(HValue,Value))),!.
+getCtxValue(Name,CtxI,Value):-checkCtx(CtxI),lastMemberCtx(Ctx,CtxI),hotrace(( get_ctx_holder(Ctx,Holder),get_o_value(Name,Holder,HValue,_Setter),!, unwrapValue(HValue,Value))),!.
 
 setCtxValue(Name,Ctx,Value):-checkCtx(Ctx),get_ctx_holder(Ctx,Holder),get_o_value(Name,Holder,HValue,Setter),unwrapValue(HValue,CurrentValue),!,(CurrentValue=Value;call(Setter,Value)),!.
 setCtxValue(Name,Ctx,Value):-checkCtx(Ctx),addCtxValue1(Name,Ctx,Value),!.
@@ -154,10 +153,10 @@ get_n_value(Name,Pred,Dash,2,Value,nb_setarg(2,Pred)):-arg(1,Pred,Name),member(D
 %%get_n_value(Name,Pred,_,_,Value,Setter):- !, arg(_,Pred,Try2),get_o_value0(Name,Try2,Value,Setter).
 
 
-lastMember(_E,List):-var(List),!,fail.
-lastMember(E,[H|List]):-lastMember(E,List);E=H.
+lastMemberCtx(_E,List):-var(List),!,fail.
+lastMemberCtx(E,[H|List]):-lastMemberCtx(E,List);E=H.
 
-lastMember(E,List,Rest):-lastMember(E,List),!,delete_safe(List,E,Rest),!.
+lastMemberCtx(E,List,Rest):-lastMemberCtx(E,List),!,delete_safe(List,E,Rest),!.
 
 delete_safe(List,_E,Rest):-var(List),!,Rest=List.
 delete_safe(List,E,Rest):-is_list(List),!,delete(List,E,Rest).
@@ -165,14 +164,14 @@ delete_safe([H|List],E,Rest):- H==E,!,delete_safe(List,E,Rest).
 delete_safe([H|List],E,[H|Rest]):-delete_safe(List,E,Rest).
 
 
-getKeyValue(FullList,N=V):-lastMember(N=V,FullList),!.
+getKeyValue(FullList,N=V):-lastMemberCtx(N=V,FullList),!.
 %%addKeyValue(FullList,N=V):-nonvar(N),!,append(_Closed,[N=V|_],FullList),!.
 addKeyValue(FullList,NV):- must((not(ground(FullList)),nonvar(NV))),append(_Closed,[NV|_],FullList),!.
 
 
-lastMember2(E,List):-to_open_list(_,Closed,_Open,List),reverse(Closed,Rev),member(E,Rev).
+% lastMember2(E,List):-to_open_list(_,Closed,_Open,List),reverse(Closed,Rev),member(E,Rev).
 
-%lastMember(End,List) :- append(_,[End|_],List).
+%lastMemberCtx(End,List) :- append(_,[End|_],List).
 
 bugger:evil_term(_Ctx,Before,After):-hideIfNeeded(Before,After),!.
 
