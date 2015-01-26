@@ -7,7 +7,7 @@
 % Revision:  $Revision: 1.7 $
 % Revised At:   $Date: 2002/07/11 21:57:28 $
 % ===================================================================
-:-module(logicmoo_util_library,
+logicmoo_util_library:-module(logicmoo_util_library,
         [dynamic_transparent/1,
          upcase_atom_safe/2,
          get_module_of/2,
@@ -61,7 +61,7 @@
 :- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was_lib(WAS)).
 :- set_prolog_flag(double_quotes,string).
 
-:- meta_predicate(if_file_exists(:)).
+:- meta_predicate(if_file_exists(0)).
 if_file_exists(M:Call):- arg(1,Call,File),(filematch(File,_)-> must((filematch(File,X),exists_file(X),call(M:Call)));fmt(not_installing(M,Call))),!.
 
 :-export(filematch/2).
@@ -126,7 +126,7 @@ makeArgIndexes(_NEW,_F).
 
 % peekAttributes/2,pushAttributes/2,pushCateElement/2.
 :- module_transparent((asserta_new/1,asserta_if_new/1,assertz_new/1,assertz_if_new/1,assert_if_new/1,assertz_if_new_clause/1,assertz_if_new_clause/2,clause_asserted/2,as_clause/2,clause_asserted/1,eraseall/2)).
-:- meta_predicate asserta_new(:),asserta_if_new(:),assertz_new(:),assertz_if_new(:),assert_if_new(:),assertz_if_new_clause(:),assertz_if_new_clause(:,:).
+:- meta_predicate asserta_new(0),asserta_if_new(0),assertz_new(0),assertz_if_new(0),assert_if_new(0),assertz_if_new_clause(0),assertz_if_new_clause(0,0).
 :- meta_predicate clause_asserted(-,-),as_clause(-,-),clause_asserted(-),eraseall(-,-).
 
 asserta_new(_Ctx,NEW):-ignore((retract(NEW),fail)),asserta(NEW).
@@ -155,17 +155,18 @@ as_clause( H,  H,  true).
 
 clause_asserted(C):- as_clause(C,H,B),!,clause_asserted(H,B).
 % clause_asserted(H,B):- predicate_property(H,number_of_clauses(N)),N>0, \+ \+ ((numbervars(H:B),clause(H,B))).
+clause_asserted(_:H,B):-clause_asserted(H,B).
 clause_asserted(H,B):- predicate_property(H,number_of_clauses(N)),N>0,copy_term(H:B,HH:BB),!, clause(HH, BB, Ref),must(clause(Head, Body, Ref)),
   same_body(B,Body), same_heads(H,Head).
 
 same_body(B,Body):-same_heads(B,Body).
 
 same_heads(H,Head):-H=@=Head,!.
-same_heads(M1:H,M2:Head):-H=@=Head,!,dtrace(dmsg(warn(same_heads(M1:H,M2:Head)))).
-same_heads(H,M2:Head):-H=@=Head,!,dtrace(dmsg(warn(same_heads(_M1:H,M2:Head)))).
-same_heads(M1:H,Head):-H=@=Head,!,dtrace(dmsg(warn(same_heads(M1:H,_M2:Head)))).
+same_heads(M1:H,M2:Head):-H=@=Head,!,call(dmsg(warn(same_heads(M1:H,M2:Head)))).
+same_heads(H,M2:Head):-H=@=Head,!,call(dmsg(warn(same_heads(_M1:H,M2:Head)))).
+same_heads(M1:H,Head):-H=@=Head,!,call(dmsg(warn(same_heads(M1:H,_M2:Head)))).
 
-:-meta_predicate clause_safe(:, ?).
+:-meta_predicate clause_safe(?, ?).
 :-module_transparent clause_safe/2.
 :-export(clause_safe/2).
 
@@ -181,7 +182,7 @@ clause_safe_m3(M,H,B):-  (nonvar(H)->true;(trace,current_predicate(M:F/A),functo
 
 
 
-:- meta_predicate doall(:).
+:- meta_predicate doall(0).
 doall(M:C):-!, M:ignore(M:(C,fail)).
 doall(C):-ignore((C,fail)).
 

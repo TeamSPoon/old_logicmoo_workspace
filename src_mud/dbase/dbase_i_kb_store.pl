@@ -115,7 +115,7 @@ into_assertable_form_trans_hook(G,F,_,(G)):- mpred_prop(F,prologPTTP),!.
 into_assertable_form_trans_hook(G,F,_,(G)):- mpred_prop(F,prologOnly),!.
 into_assertable_form_trans_hook(G,F,_,Dbase):-mpred_prop(F,prologHybrid),!,into_hilog_form(G,Dbase).
 into_assertable_form_trans_hook(G,F,_,Dbase):-mpred_prop(F,is_dbase_t),!,into_hilog_form(G,Dbase).
-into_assertable_form_trans_hook(G,F,_,was_asserted_gaf(G)):- mpred_prop(F,was_asserted_gaf),!.
+
 
 :-dynamic_multifile_exported(into_assertable_form/2).
 into_assertable_form(M:H,G):-atom(M),!,into_assertable_form(H,G).
@@ -195,9 +195,27 @@ props_into_mpred_form(PROPS,MPRED):- trace_or_throw(unk_props_into_mpred_form(PR
 acceptable_xform(From,To):- From \=@= To,  (To = mudIsa(I,C) -> was_isa(From,I,C); true).
 
 
+cant_be_col(':-').
+cant_be_col('include').
+cant_be_col('onSpawn').
+cant_be_col('ensure_loaded').
+cant_be_col(C):-mpred_prop(C,prologOnly),!.
+cant_be_col('declare_load_game').
+cant_be_col('user_ensure_loaded').
+cant_be_col(C):-user:hasInstance_dyn(tCol,C),!,fail.
+cant_be_col(_).
+/*
+cant_be_col('meta_predicate').
+cant_be_col(C):-functor(G,C,1),predicate_property(G,built_in),!.
+cant_be_col(C):-current_predicate(C/1),!.
+cant_be_col(C):-prolog_side_effects(C/1),!.
+cant_be_col(C):-dmsg(cant_be_col(C)),!,asserta_if_new(mpred_prop(C,prologOnly)).
+*/
+
 :-swi_export(was_isa/3).
 was_isa(V,_,_):-call(is_ftVar(V)),!,fail.
-was_isa(X,I,C):-once(was_isa0(X,I,C)),(is_ftVar(C)->true;(not(mpred_prop(C,prologOnly)))).
+was_isa(X,I,C):-nonvar(X),!,once(was_isa0(X,I,C)),!.
+
 was_isa0(mudIsa(I,C),I,C).
 was_isa0(is_typef(_),_,_):-!,fail.
 was_isa0(notrace(_),_,_):-!,fail.
@@ -223,14 +241,16 @@ prolog_side_effects(G):-get_functor(G,F),mpred_prop(F,sideEffect),!.
 prolog_side_effects(G):-predicate_property(G,number_of_rules(N)),N >0,clause(G,(B,_)),compound(B),!.
 prolog_side_effects(G):-predicate_property(G,exported),!.
 prolog_side_effects(G):-functor_h(G,F),mpred_prop(F,prologOnly),!.
-prolog_side_effects(G):-mpred_prop(G,predStubType((prologOnly))),!.
+prolog_side_effects(G):-mpred_prop(G,predStubType(prologOnly)),!.
 prolog_side_effects(P):-atom(P),!,prolog_side_effects(P/_).
 
 
 :-swi_export(maybe_typep/1).
 is_typep(G):- get_functor(G,F),is_typef(F).
 
-is_typef(F):- (hasInstance(macroDeclarer,F);hasInstance(F,_);hasInstance(tCol,F);clause(mpred_prop(F,tCol),true)),!.
+is_typef(C):-var(C),!,fail.
+is_typef(prologSingleValued).
+is_typef(F):- (hasInstance_dyn(macroDeclarer,F);hasInstance_dyn(tCol,F);clause(mpred_prop(F,tCol),true)),!.
 is_typef(F):- atom(F),isa_from_morphology(F,TT),!,atom_concat(_,'Type',TT).
 
 maybe_typep(G):- is_typep(G),!.
@@ -269,7 +289,11 @@ transform_holds_3(Op,[Logical|ARGS],OUT):-
          OUT=..[Logical|LARGS].
 
 transform_holds_3(_,[props,Obj,Props],props(Obj,Props)).
-transform_holds_3(_,[Type,Inst|PROPS],props(Inst,[mudIsa(Type)|PROPS])):- nonvar(Inst), not(Type=props), hasInstance(macroDeclarer,Type),must_det(not(never_type(Type))),!.
+transform_holds_3(_,[Type,Inst|PROPS],props(Inst,[mudIsa(Type)|PROPS])):- 
+                  nonvar(Inst), not(Type=props), hasInstance_dyn(tCol,Type), must_det(not(never_type(Type))),!.
+transform_holds_3(_,[Type,Inst|PROPS],props(Inst,[mudIsa(Type)|PROPS])):- 
+                  nonvar(Inst), not(Type=props), hasInstance_dyn(macroDeclarer,Type), must_det(not(never_type(Type))),!.
+
 transform_holds_3(_,[P,A|ARGS],DBASE):- atom(P),!,DBASE=..[P,A|ARGS].
 transform_holds_3(_,[P,A|ARGS],DBASE):- !, nonvar(P),dumpST,trace_or_throw(dtrace), DBASE=..[P,A|ARGS].
 transform_holds_3(Op,DBASE_T,OUT):- DBASE_T=..[P,A|ARGS],!,transform_holds_3(Op,[P,A|ARGS],OUT).
@@ -343,11 +367,10 @@ is_asserted(F,G):-must_det(functor(G,F,A)),is_asserted(F,A,G).
 is_asserted(once,1,once(G)):-!,is_asserted(G),!.
 is_asserted(M:F,A,C):- atom(M),!,is_asserted(F,A,C).
 is_asserted(F,A,M:C):- atom(M),!,is_asserted(F,A,C).
-%  %  is_asserted(dbase_t,1,dbase_t(C)):-!,dbase_t(C).
-%  %  is_asserted(F,A,G):- is_asserted_lc_isa(F,A,G).
-% is_asserted(_,_,G):-was_isa(G,I,C),!,isa_asserted(I,C).
+is_asserted(dbase_t,1,dbase_t(C)):-!,dbase_t(C).
+is_asserted(_,_,G):-was_isa(G,I,C),!,loop_check(isa_asserted(I,C)).
+is_asserted(dbase_t,_,C):-C=..[_,NA|IST],nonvar(NA),NA=nart(List),!,nart_to_atomic(List,L),atom(L),CC=..[L|IST],is_asserted_mpred(CC).
 is_asserted(dbase_t,_,C):-C=..[_,L|IST],atom(L),!,CC=..[L|IST],is_asserted_mpred(CC).
-is_asserted(dbase_t,_,C):-C=..[_,nart(List)|IST],!,nart_to_atomic(List,L),atom(L),CC=..[L|IST],is_asserted_mpred(CC).
 %  %  is_asserted(Holds,_,C):-is_holds_true(Holds), C=..[_,L|IST],atom(L),!,CC=..[L|IST],is_asserted_mpred(CC).
 is_asserted(_,_,G):-is_asserted_mpred(G).
 
@@ -358,13 +381,6 @@ nart_to_atomic(L,L).
 
 :-dynamic_multifile_exported(is_asserted_mpred/1).
 
-is_asserted_lc_isa(mudIsa,2,mudIsa(I,C)):-!,is_asserted_mpred_clause_isa(I,C).
-is_asserted_lc_isa(hasInstance,2,hasInstance(C,I)):-!,is_asserted_mpred_clause_isa(I,C).
-is_asserted_lc_isa(C,1,G):-arg(1,G,I),!,is_asserted_mpred_clause_isa(I,C).
-
-is_asserted_mpred_clause_isa(I,C):-isa_asserted(C,I).
-
-
 is_asserted_mpred(G):-var(G),!,trace_or_throw(var_is_asserted_mpred(G)).
 is_asserted_mpred(mpred_prop(F,P)):-!,mpred_prop(F,P).
 is_asserted_mpred(G):-fact_loop_checked(G,asserted_mpred_clause(G)).
@@ -373,7 +389,7 @@ is_asserted_mpred(G):-fact_loop_checked(G,asserted_mpred_clause(G)).
 :-dynamic_multifile_exported(was_asserted_gaf/1).
 :-swi_export(asserted_mpred_clause/1).
 asserted_mpred_clause(naf(C)):-nonvar(C),!,not(is_asserted(C)).
-asserted_mpred_clause(is_asserted(C)):-nonvar(C),!,asserted_mpred_clause(C).
+asserted_mpred_clause(is_asserted(C)):-nonvar(C),!,is_asserted(C).
 asserted_mpred_clause(C):-fact_always_true(C),!.
 asserted_mpred_clause(C):- (functor(C,dbase_t,_);functor(C,holds_t,_)),!,trace_or_throw(use_code(is_asserted(C))).
 asserted_mpred_clause(C):-was_asserted_gaf(C).

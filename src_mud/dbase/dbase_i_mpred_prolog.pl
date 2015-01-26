@@ -23,7 +23,7 @@ provide_mpred_currently(_OP,Head,prologOnly,declared(_)):- get_functor(Head,F),m
 provide_mpred_currently(_OP,Head,prologOnly, Will):- get_functor(Head,F,A), current_predicate(F/A) -> Will= will(_) ; Will = wont(_).
 
 
-provide_mpred_storage_clauses(prolog,H,B):-predicate_property(H,number_of_clauses(_)),user:clause(H,B).
+provide_mpred_storage_clauses(prolog,H,B):-predicate_property(H,number_of_clauses(_)),clause(H,B).
 
 
 
@@ -33,16 +33,16 @@ provide_mpred_write_attributes(F,external(Module)):- dmsg(decl_mpred(F,external(
 
 % HOOK
 provide_mpred_setup(OP,Head,StubType,OUT):-  StubType = prologOnly, 
-  user:must_det_l(( 
+  must_det_l(( 
    get_pifunctor(Head,PHead,F,A),   
-   doall((user:clause(PHead,use_provided_mpred_storage_op(call(_),PHead,_),Ref),erase(Ref))),
+   doall((clause(PHead,call_provided_mpred_storage_op(call(_),PHead,_),Ref),erase(Ref))),
    show_call(provide_clauses_list(PHead,HBLIST)),
-   (predicate_property(PHead,thread_local)->retract_all(PHead:-_);user:abolish(F,A)),
-   dynamic_multifile_exported(user:F/A),
+   (predicate_property(PHead,thread_local)->retract_all(PHead:-_);abolish(F,A)),
+   dynamic_multifile_exported(F/A),
    asserta_if_new(mpred_prop(F,hasStub(StubType))),         
    asserta_if_new(mpred_prop(F,StubType)), 
    forall(member(HB,HBLIST),must(add(HB))),!,   
-   doall(retract((PHead:-use_provided_mpred_storage_op(call(_),PHead,_)))),
+   doall(retract((PHead:-call_provided_mpred_storage_op(call(_),PHead,_)))),
    must_same_clauses(PHead,HBLIST))),
    must(OUT=defined(provide_mpred_setup(OP,StubType))).
 
@@ -102,7 +102,7 @@ retract_all(HB) :- ignore((retract(HB),fail)).
 is_static_pred(Head:-_):-!,predicate_property(Head,_),not(predicate_property(Head,dynamic)).
 is_static_pred(Head):-predicate_property(Head,_),not(predicate_property(Head,dynamic)).
 
-% get_mpred_storage_provider(assert(a), mpred_prop(agent_call_command, info((decl_mpred_prolog user:agent_call_command/2))),S,W)
+% get_mpred_storage_provider(assert(a), mpred_prop(agent_call_command, info((decl_mpred_prolog agent_call_command/2))),S,W)
 
 provide_mpred_storage_op(clause_asserted,Head,prologOnly,CALL):- CALL = clause_asserted(Head).
 
@@ -112,8 +112,7 @@ provide_mpred_storage_op(assert(How),Head,prologOnly,CALL):-
    (predicate_property(PF,_)->true;show_call((dynamic(F/A),multifile(F/A),export(F/A)))),
    (is_static_pred(PF)-> 
      (listing(F/A),dmsg(want_to_assert(How,decl_mpred_hybrid(F,A,Head))),decl_mpred_hybrid(F/A),CALL=add(Head)); 
-      (transitive(how_to_op,assert(How),OP),CALL = call_wdmsg(OP,Head))),!.   
-   
+      (transitive(how_to_op,assert(How),OP),CALL = call_wdmsg(OP,Head))),!.      
 
 
 provide_mpred_storage_op(assert(How),Head,prologOnly,CALL):-   
@@ -122,6 +121,14 @@ provide_mpred_storage_op(assert(How),Head,prologOnly,CALL):-
    (predicate_property(PF,_)->true;show_call((dynamic(F/A),multifile(F/A),export(F/A)))),
    (is_static_pred(PF)-> (listing(F/A),trace_or_throw(want_to_assert(How,Head))); true),   
    transitive(how_to_op,assert(How),OP),
+   CALL = call_wdmsg(OP,Head).
+
+provide_mpred_storage_op(retract(How),Head,prologOnly,CALL):-   
+   get_functor(Head,F,A),
+   functor(PF,F,A),
+   (predicate_property(PF,_)->true;show_call((dynamic(F/A),multifile(F/A),export(F/A)))),
+   (is_static_pred(PF)-> (listing(F/A),trace_or_throw(want_to_retract(How,Head))); true),   
+   transitive(how_to_op,retract(How),OP),
    CALL = call_wdmsg(OP,Head).
 
 provide_mpred_storage_op(How,Head,prologOnly,CALL):- 

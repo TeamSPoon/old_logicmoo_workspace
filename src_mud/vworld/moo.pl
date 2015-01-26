@@ -16,25 +16,33 @@
          op(1120,fx,swi_export),
          register_timer_thread/3]).
 
-
+:-multifile(user:mudIsa/2).
+:-dynamic(user:mudIsa/2).
 /*
 :- '@'(ensure_loaded('../src_lib/logicmoo_util/logicmoo_util_all'),user).
 :- ensure_loaded(logicmoo('dbase/dbase_i_rdf_store.pl')).
 */
 
-:-dynamic(hasInstance_dyn/2).
 
-hasInstance_dyn(tCol, tChannel).
+:-multifile(user:hasInstance_dyn/2).
+:-dynamic(user:hasInstance_dyn/2).
 
-hasInstance(T,I):- !, hasInstance_dyn(T,I).
+mudIsa_motel(tCol,tCol).
+mudIsa_motel(I,T):-no_repeats_av(deduce_M(mudIsa(I,T))),I\=tCol,I\==isTDisjoint(tBOT),I\==tTOP,T\==isTDisjoint(tBOT),T\==tTOP.
+
+user:hasInstance_dyn(tCol, tChannel).
+
+hasInstance(T,I):- not(current_predicate(deduce_M/1)),!,user:hasInstance_dyn(T,I).
+hasInstance(T,I):- !, (mudIsa_motel(I,T) *-> true ; (((atom(I),must(not(user:hasInstance_dyn(T,I)))),fail))).
 hasInstance(T,I):- rdf_x(I,rdf:type,T).
 
 assert_hasInstance(T,I):- !, assert_hasInstance_real(T,I).
 assert_hasInstance(T,I):- loop_check(hooked_asserta(mudIsa(I,T)),assert_hasInstance_real(T,I)).
 assert_hasInstance(T,I):- rdf_assert_x(I,rdf:type,T).
 
-assert_hasInstance_real(T,I):- hasInstance_dyn(T,I),!.
-assert_hasInstance_real(T,I):- !,dmsg(assert_isa(I,T)),assert_if_new(hasInstance_dyn(T,I)),!.
+assert_hasInstance_real(T,I):- user:hasInstance_dyn(T,I),!.
+assert_hasInstance_real(T,I):- not(current_predicate(assert_ind/2)),!,assert_if_new(user:hasInstance_dyn(T,I)),!.
+assert_hasInstance_real(T,I):- assert_if_new(user:hasInstance_dyn(T,I)),!,(atom(I)->must(assert_ind(I,T));true),!.
 
 
 :-dynamic_multifile_exported loading_module_h/1.
@@ -72,9 +80,9 @@ type_error_checking:-false.
 :- set_prolog_flag(double_quotes, string).
 
 :- '@'((ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_bugger)),
-         use_module(logicmoo(logicmoo_util/logicmoo_util_library)),
+         ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_library)),
          use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)),
-         use_module(logicmoo(logicmoo_util/logicmoo_util_strings)),
+         ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_strings)),
          use_module(logicmoo(logicmoo_util/logicmoo_util_terms)),
          use_module(logicmoo(logicmoo_util/logicmoo_util_dcg))),'user').
 

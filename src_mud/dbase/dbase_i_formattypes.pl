@@ -182,7 +182,7 @@ grab_argsIsa(F,Types):- mpred_prop(F,predArgTypes(Types)).
 grab_argsIsa(F,Types):- is_asserted(predArgTypes(F,Types)).
 grab_argsIsa2(F,Types):- fail,deducedSimply(mpred_prop(F,predArgTypes(Types))).
 
-argIsa_call_1(Var,2,ftTerm):-tCol(Var),trace_or_throw( argIsa_call_1(Var,2,ftTerm)),fail.
+argIsa_call_1(Var,2,ftTerm):-not(must(not(tCol(Var)))),dmsg(trace_or_throw( argIsa_call_1(Var,2,ftTerm))),fail.
 argIsa_call_1(Prop,N1,Type):- is_2nd_order_holds(Prop),dmsg(todo(define(argIsa_call(Prop,N1,'Second_Order_TYPE')))),dumpST,dtrace,
    Type=argIsaFn(Prop,N1).
 argIsa_call_1(F,_,ftTerm(ftCallable)):-member(F/_,

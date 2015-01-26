@@ -630,6 +630,7 @@ moo_trace_hidechilds(M,F,A,Trace,HideChilds):-
 
 %:-thread_local( tlbugger:bugger_prolog_flag/2).
 :-thread_local( tlbugger:skipMust/0).
+:-thread_local( tlbugger:old_no_repeats/0).
 
 %:-multifile( tlbugger:bugger_prolog_flag/2).
 %:-export( tlbugger:bugger_prolog_flag/2).
@@ -696,7 +697,7 @@ numbervars_impl(Term,Functor,List):- is_list(List),atom(Functor),!,!,must(( numb
 
 numbervars_impl(Term,Start,End,List):-number(Start),is_list(List),!,must(( numbervars(Term,Start,End,List) )).
 numbervars_impl(Term,Functor,Start,List):- must(number(Start)),is_list(List),!,must(( numbervars(Term,Start,_End,[functor_name(Functor)|List]))).
-numbervars_impl(Term,Functor,Start,End):- must((must(var(End);number(End)),numbervars(Term,Start,End,[attvar(bind),functor_name(Functor),singletons(true)]))).
+numbervars_impl(Term,Functor,Start,End):- must((must(var(End);number(End)),numbervars(Term,Start,End,[attvar(skip),functor_name(Functor),singletons(true)]))).
 
 numbervars_impl(Term,Functor,Start,End,List):-must(( must(var(End);number(End)),numbervars(Term,Start,End,[functor_name(Functor)|List]))).
 
@@ -1093,7 +1094,7 @@ tlocal_show(M,F,A,P,_ON,TF):-
    findall(' -'(yes(Prop)),(predicate_property(M:P,Prop),not(member(Prop,[number_of_rules(0),number_of_clauses(0),/*thread_local,*/volatile,dynamic,visible,interpreted]))),Props3),
    findall(' -'(not(Prop)),(member(Prop,[number_of_clauses(_),thread_local,volatile,dynamic,visible,exported,interpreted]),not(predicate_property(M:P,Prop))),Props4),   
    flatten([[Props1],[Props2],[Props3],[Props4],[TF/A]],PropsR),
-   numbervars(PropsR,0,_,[singletons(true),attvars(skip)]),
+   numbervars(PropsR,0,_,[singletons(true),attvar(skip)]),
    reverse(PropsR,Props),
    fmt(Props),!.
 
@@ -1208,7 +1209,7 @@ user_ensure_loaded(What):- !, '@'(ensure_loaded(What),'user').
 % user_use_module(library(What)):- !, use_module(library(What)).
 user_use_module(What):- '@'(use_module(What),'user').
 
-% :- '@'(use_module(logicmoo_util_library), 'user').
+% :- '@'(ensure_loaded(logicmoo_util_library), 'user').
 
 
 
@@ -1272,7 +1273,6 @@ must_not_repeat(C):-call(C).
 % ===================================================
 % 
 % no_repeats(:Call) 
-%  (uses newval_or_fail/2)
 %
 % Like call/1 but ony succeeds only unique variabes
 % 
@@ -1285,16 +1285,32 @@ must_not_repeat(C):-call(C).
 
 memberchk_same(X, [Y|Ys]) :- (   X =@= Y ->  (var(X) -> X==Y ; true) ;   memberchk_same(X, Ys) ).
 
+
+no_repeats_av:-tlbugger:attributedVars.
+
 :- export(no_repeats/1).
 :- meta_predicate no_repeats(0).
-% no_repeats(Call):-  tlbugger:attributedVars,!,no_repeats_av(Call).
 
-no_repeats(Call):- no_repeats(Call,Call).
+no_repeats(Call):- tlbugger:old_no_repeats,!, no_repeats_old(Call).
+no_repeats(Call):- no_repeats_av,no_repeats_av(Call).
+no_repeats(Call):- no_repeats_old(Call).
+
+
+:- export(no_repeats/2).
+:- meta_predicate no_repeats(+,0).
+no_repeats(Vs,Call):- tlbugger:old_no_repeats,!,no_repeats_old(Vs,Call).
+no_repeats(Vs,Call):- no_repeats_av,!,no_repeats_av(Vs,Call).
+no_repeats(Vs,Call):- no_repeats_old(Vs,Call).
+
+/*
+no_repeats_dif(Vs,Call):- dif(Vs,_), get_attr(Vs,dif,vardif(CONS,_)),!,
+  Call,copy_term_nat(Vs,C),nb_setarg(2, CONS, [_-C|CONS]).
+
+*/
 
 % ===================================================
 % 
-% no_repeats(+Vars,:Call) 
-%  (uses newval_or_fail/2)
+% no_repeats_old([+Vars,]:Call) 
 % 
 % Like call/1 but ony succeeds on unique free variabes
 % 
@@ -1303,15 +1319,14 @@ no_repeats(Call):- no_repeats(Call,Call).
 % X = 1, Y = 4 ;
 % X = 2, Y = 1.
 % ===================================================
-:- export(no_repeats/2).
-:- meta_predicate no_repeats(+,0).
-% no_repeats(Vs,Call):-  tlbugger:attributedVars,!,no_repeats_av(Vs,Call).
+:- export(no_repeats_old/1).
+:- meta_predicate no_repeats_old(0).
+no_repeats_old(Call):- no_repeats_old(Call,Call).
 
-no_repeats(Vs,Call):- hotrace((ground(Vs) -> ((traceok(Call),!)) ;  no_repeats0(Vs,Call))).
+:- export(no_repeats_old/2).
+:- meta_predicate no_repeats_old(+,0).
+no_repeats_old(Vs,Call):- CONS = [_], traceok(Call), notrace(( \+ memberchk_same(Vs,CONS), copy_term(Vs,CVs), CONS=[_|T], nb_setarg(2, CONS, [CVs|T]))).
 
-:- export(no_repeats0/2).
-:- meta_predicate no_repeats0(+,0).
-no_repeats0(Vs,Call):- CONS = [_], traceok(Call), notrace(( \+ memberchk_same(Vs,CONS), copy_term(Vs,CVs), CONS=[_|T], nb_setarg(2, CONS, [CVs|T]))).
 
 % for dont-care vars
 :- export(no_repeats_dc/2).
@@ -1325,46 +1340,6 @@ subtract_eq([A|C], B, D) :-
 subtract_eq([A|B], C, [A|D]) :-
         subtract_eq(B, C, D).
 
-
-:-export(newval_or_fail/2).
-:-meta_predicate(newval_or_fail(+,+)).
-newval_or_fail(CONS,VAL):- CONS = [CAR|CDR], VAL \== CAR,  ( CDR==[] ->  nb_setarg(2, CONS, [VAL]) ; newval_or_fail(CDR,VAL)). 
-
-% ==========================================================
-%    is newval_or_fail/2  - a little term db to track if we've seen a term or not
-% 
-% written out for understanding  
-% 
-% newval_or_fail(cons(Vars,_),Vars):-!,fail.
-% newval_or_fail(CONS,Vars):- CONS = '.'(_,[]), !,nb_setarg(2, CONS, '.'(Vars,[])).
-% newval_or_fail(CONS,Vars):- CONS = '.'(Var,_),var(Var), !,nb_setarg(1, CONS, Vars).   % should we even bother to look here?
-% newval_or_fail(cons(_,Nxt),Vars):- newval_or_fail_2(Nxt,Vars).
-%
-% (combined into one rule for immplementing)
-% ==========================================================
-:- export(newval_or_fail/2).
-:- meta_predicate newval_or_fail(?,?).
-% What may I do to simplify or speed up the below fo combine to the caller?
-%  i skip checking the car each time
-% what can be done to speed up?
-%  perhapes starting ourt with an array? vv(_,_,_,_,_).
-% and grow with a.. vv(_,_,_,_,vv(_,_,_,_,vv(_,_,_,_,_))) ? 
-
-
-
-
-:- meta_predicate
-        succeeds_n_times(0, -).
-
-succeeds_n_times(Goal, Times) :-
-        Counter = counter(0),
-        (   Goal,
-            arg(1, Counter, N0),
-            N is N0 + 1,
-            nb_setarg(1, Counter, N),
-            fail
-        ;   arg(1, Counter, Times)
-        ).
 
 % ===================================================
 %
@@ -1381,8 +1356,6 @@ succeeds_n_times(Goal, Times) :-
 %     does that mess with anything in code that we are calling?
 %  Could some peice of code been required to see some binding to make a side effect come about?
 %  
-%  (uses newval_or_fail/2)
-%
 % logicmoo_mud:  ?- no_repeats_av(member(X,[3,1,1,1,3,2])).
 % X = 3 ;
 % X = 1 ;
@@ -1390,95 +1363,45 @@ succeeds_n_times(Goal, Times) :-
 %
 % attributed variable verson of getting filtered bindings
 % ===================================================
-filter_repeats:-fail.
-
 :-export(no_repeats_av/1).
 :-meta_predicate(no_repeats_av(0)).
-no_repeats_av(Call):-  term_variables(Call,VarList), flag(oddeven,X,X+1),
-  ((VarList=[] ; 1 is X mod 3) -> Call ; 
-   ((1 is X mod 2 ->  no_repeats_av_prox(VarList,Call); (CONS = [_],  call(Call), newval_or_fail(CONS,VarList))))).
-
-
-
 :-export(no_repeats_av/2).
 :-meta_predicate(no_repeats_av(+,0)).
+:-export(no_repeats_av_l/2).
+:-meta_predicate(no_repeats_av_l(+,0)).
 
-no_repeats_av(Var,Call):- var(Var),!,no_repeats_avar(Var,Call).
-no_repeats_av(VarList,Call):- no_repeats_avl(VarList,Call).
-
-
-:-export(no_repeats_avl/2).
-:-meta_predicate(no_repeats_avl(+,0)).
-no_repeats_avl([],Call):-!,Call,!.
-no_repeats_avl([Var],Call):- !,no_repeats_avar(Var,Call).
-no_repeats_avl(VarList,Call):-no_repeats_av_prox(VarList,Call).
-
-:-export(no_repeats_avar/2).
-:-meta_predicate(no_repeats_avar(+,0)).
-no_repeats_avar(VarList,Call):- filter_repeats, !, filter_repeats(VarList,Call).
-no_repeats_avar(AVar,Call):- get_attr(AVar,was,VARWAS),!,work_with_attvar(AVar,Call,VARWAS,true).
-no_repeats_avar(AVar,Call):-  tlbugger:attributedVars,!, create_varwas(AVar,VARWAS), !,work_with_attvar(AVar,Call,VARWAS,del_attr(AVar,was)).
-no_repeats_avar(Var,Call):- no_repeats_av_prox(Var,Call).
-
-:-export(no_repeats_av_prox/2).
-:-meta_predicate(no_repeats_av_prox(+,0)).
-no_repeats_av_prox(VarList,Call):- filter_repeats,!, filter_repeats(VarList,Call).
-no_repeats_av_prox(VarList,Call):- create_varwas(AVar,VARWAS), !,VarList=AVar, !,work_with_attvar(AVar,Call,VARWAS,del_attr(AVar,was)).
-
-:-export(create_varwas/2).
-:-meta_predicate(create_varwas(+,+)).
-create_varwas(AVar,VARWAS):- was(AVar,_Comquatz),get_attr(AVar,was,VARWAS),!.
-
-:-export(work_with_attvar/4).
-:-meta_predicate(work_with_attvar(+,0,+,0)).
-work_with_attvar(AVar,Call,VARWAS,ExitHook):- VARWAS = varwas(CONS,[]),  call_cleanup((  ( call(Call), newval_or_fail_attrib_varwas_cons(VARWAS, CONS, (was(-)-AVar)))),ExitHook).
+no_repeats_av(Call):-term_variables(Call,Vs),!,no_repeats_av_l(Vs,Call).
+   
+no_repeats_av(AVar,Call):- var(AVar),!,
+      setup_call_cleanup(
+       (was(AVar,iNEVER), get_attr(AVar,was,varwas(CONS,_))),
+        (Call,copy_term_nat(AVar,C),nb_setarg(2, CONS, [_-C|CONS])),
+        del_attr(AVar,was)).
+no_repeats_av(List,Call):- is_list(List),!,no_repeats_av_l(List,Call).
+no_repeats_av(Term,Call):-term_variables(Term,List),!,no_repeats_av_l(List,Call).
 
 
-:-export(newval_or_fail_attrib_varwas_cons/3).
-:-meta_predicate(newval_or_fail_attrib_varwas_cons(+,+,+)).
-newval_or_fail_attrib_varwas_cons(VARWAS,CONS,VAL):- CONS = [CAR|CDR], VAL \== CAR,  ( CDR==[] ->  ((arg(1, VARWAS, FIRSTCONS),nb_setarg(1, VARWAS, [VAL|FIRSTCONS]))) ; newval_or_fail_attrib_varwas_cons(VARWAS,CDR,VAL)). 
+no_repeats_av_l([],Call):-!,Call,!.
+no_repeats_av_l([AVar],Call):-!,
+   no_repeats_av(AVar,Call).
+no_repeats_av_l([AVar|List],Call):-
+   no_repeats_av(AVar,no_repeats_av_l(List,Call)).
 
 
 
-:-export(filter_repeats/2).
-:-meta_predicate(filter_repeats(+,0)).
-filter_repeats(AVar,Call):- 
-      % 1 =  make globals storage compounds
-      LVAL= lastResult(_),
-      LATTR = lastWasHolderState([]),
+% =========================================================================
+:- meta_predicate succeeds_n_times(0, -).
+% =========================================================================
 
-      % 2a = create intial varwas 
-      was(AVar,_),
-
-      % 2b = refernce it
-      get_attr(AVar,was,WASHOLDER),
-
-      % 3 = WASHOLDER now looks like "varwas([_G190299-comquatz], [])"
-      %  store it's arg1  into lastDifHolderState
-      arg(1,WASHOLDER,SAVE), nb_setarg(1,LATTR,SAVE),
-     
-       % would a cut go here? 
-      !,
-      call_cleanup((( 
-        
-          % 4 = get the last saved attributes and set them from line 3 or 8
-          arg(1,LATTR,LAST_WASHOLDER_STATE),  nb_setarg(1, WASHOLDER, LAST_WASHOLDER_STATE),
-         
-          % 5 = get the last result and add it to the was (saved from line 7)
-          arg(1,LVAL,LR), was(AVar,LR),
-
-          % 6 = call 
-          call(Call), 
-
-          % 7 = save our new val
-          nb_setarg(1,LVAL,AVar),
-
-          % 8 = save the new washolder state into lastWasHolderState
-          arg(1,WASHOLDER, NEW_WASHOLDER_STATE), nb_setarg(1,LATTR, NEW_WASHOLDER_STATE)
-
-          % 9 = REDO TO Line 4
-
-          )),del_attr(AVar,was)).  % 10  = clean up for Line 2 needed?
+succeeds_n_times(Goal, Times) :-
+        Counter = counter(0),
+        (   Goal,
+            arg(1, Counter, N0),
+            N is N0 + 1,
+            nb_setarg(1, Counter, N),
+            fail
+        ;   arg(1, Counter, Times)
+        ).
 
 % =========================================================================
 
@@ -1620,7 +1543,7 @@ hideTrace:-
   !,hideRest,!.
   %%findall(File-F/A,(functor_source_file(M,P,F,A,File),M==user),List),sort(List,Sort),dmsg(Sort),!.
 
-hideRest:- fail, logicmoo_util_library:buggerDir(BuggerDir),
+hideRest:- fail, buggerDir(BuggerDir),
    functor_source_file(M,_P,F,A,File),atom_concat(BuggerDir,_,File),hideTraceMFA(M,F,A,-all),
    fail.
 hideRest:- functor_source_file(system,_P,F,A,_File),hideTraceMFA(system,F,A,-all), fail.
@@ -2710,16 +2633,16 @@ sendNote(To,From,Subj,Message,Vars):-
 safe_numbervars(E,EE):-duplicate_term(E,EE),
   get_gtime(G),numbervars(EE,G,End,[attvar(skip),functor_name('$VAR'),singletons(true)]),
   term_variables(EE,AttVars),
-  numbervars(EE,End,_,[attvar(bind),functor_name('$VAR'),singletons(true)]),
+  numbervars(EE,End,_,[attvar(skip),functor_name('$VAR'),singletons(true)]),
   forall(member(V,AttVars),(copy_term(V,VC,Gs),V='$VAR'(VC=Gs))).
    
 
 get_gtime(G):- get_time(T),convert_time(T,_A,_B,_C,_D,_E,_F,G).
 
-safe_numbervars(EE):-get_gtime(G),numbervars(EE,G,_End,[attvar(bind),functor_name('$VAR'),singletons(true)]).
+safe_numbervars(EE):-get_gtime(G),numbervars(EE,G,_End,[attvar(skip),functor_name('$VAR'),singletons(true)]).
 
-%safe_numbervars(Copy,X,Z):-numbervars(Copy,X,Z,[attvar(bind)]).
-%safe_numbervars(Copy,_,X,Z):-numbervars(Copy,X,Z,[attvar(bind)]).
+%safe_numbervars(Copy,X,Z):-numbervars(Copy,X,Z,[attvar(skip)]).
+%safe_numbervars(Copy,_,X,Z):-numbervars(Copy,X,Z,[attvar(skip)]).
 
 unnumbervars(X,Y):-with_output_to(atom(A),write_term(X,[numbervars(true),quoted(true)])),atom_to_term(A,Y,_),!.
 
@@ -3054,6 +2977,7 @@ module_predicate(ModuleName,F,A):-current_predicate(ModuleName:F/A),functor_safe
 
 module_predicates_are_exported:- context_module(CM),module_predicates_are_exported(CM).
 
+module_predicates_are_exported(_):-!.
 module_predicates_are_exported(user):-!,context_module(CM),module_predicates_are_exported0(CM).
 module_predicates_are_exported(Ctx):-module_predicates_are_exported0(Ctx).
 
@@ -3075,6 +2999,7 @@ arg_is_transparent(0).
 arg_is_transparent(Arg):- number(Arg).
 
 % make meta_predicate_transparent's module_transparent
+module_meta_predicates_are_transparent(_):-!.
 module_meta_predicates_are_transparent(ModuleName):-
     forall((module_predicate(ModuleName,F,A),functor_safe(P,F,A)), 
       ignore(((predicate_property(ModuleName:P,(meta_predicate( P ))),
@@ -3083,6 +3008,7 @@ module_meta_predicates_are_transparent(ModuleName):-
                    (module_transparent(ModuleName:F/A)))))).
 
 :-export(all_module_predicates_are_transparent/1).
+all_module_predicates_are_transparent(_):-!.
 all_module_predicates_are_transparent(ModuleName):-
     forall((module_predicate(ModuleName,F,A),functor_safe(P,F,A)), 
       ignore((
@@ -3090,6 +3016,7 @@ all_module_predicates_are_transparent(ModuleName):-
                    ( dmsg(todo(module_transparent(ModuleName:F/A)))),
                    (module_transparent(ModuleName:F/A))))).
 
+quiet_all_module_predicates_are_transparent(_):-!.
 quiet_all_module_predicates_are_transparent(ModuleName):-
     forall((module_predicate(ModuleName,F,A),functor_safe(P,F,A)), 
       ignore((

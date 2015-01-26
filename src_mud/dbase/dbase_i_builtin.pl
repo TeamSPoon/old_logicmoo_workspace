@@ -184,7 +184,7 @@ mudSubclass(isEach(tRegion,tAgentGeneric),tChannel).
 
 tChannel(iGossupChannel).
 
-ttCreateable(tTemporallyExistingThing).
+% ttCreateable(tTemporallyExistingThing).
 
 
 prologMultiValued(mudGrid(tRegion,ftInt,ftInt,tObj)).
@@ -235,56 +235,6 @@ tCol(macroDeclarer).
 % :- style_check(-discontiguous).
 :- debug.
 
-:- begin_prolog_source.
-
-:- decl_mpred_hybrid(mudTermAnglify/2).
-:- decl_mpred_prolog(term_anglify_args/6).
-:- decl_mpred_prolog(term_anglify_last/2).
-
-term_anglify_last(Head,English):-compound(Head),
-   functor(Head,F,A),A>1,
-   not(ends_with_icase(F,"Fn")),not(starts_with_icase(F,"SKF-")),
-   atom_codes(F,[C|_]),code_type(C,lower),
-   Head=..[F|ARGS],
-   term_anglify_args(Head,F,A,ARGS,prologSingleValued,English).
-
-mudTermAnglify(Head,EnglishO):- compound(Head), 
-   Head=..[F|ARGS],mpred_prop(F,Info),
-   member(Info,[prologSingleValued,predArgMulti(_)]),   
-   term_anglify_args(Head,F,1,ARGS,Info,English),fully_expand(English,EnglishO),!.
-
-
-term_anglify_args(Head,F,A,ARGS,predArgMulti(Which),English):- !,replace_nth(ARGS,Which,_OldVar,NewVar,NEWARGS),!,
-   NewHead=..[F|NEWARGS], findall(NewVar,req(NewHead),ListNewVar),list_to_set_safe(ListNewVar,SetNewVar),NewVar=ftListFn(SetNewVar),
-   term_anglify_args(Head,F,A,NewHead,prologSingleValued,English).
-
-
-/*
-
-term_expansion((term_anglify_args(_Head,F,A,ARGS0,prologSingleValued,English):- add_arg_parts_of_speech(F,1,ARGS0,ARGS),verb_after_arg(F,A,After),
-   insert_into(ARGS,After,verbFn(F),NEWARGS),
-   fully_expand(NEWARGS,English),X),O).
-
-*/
-term_anglify_args(_Head,F,A,ARGS0,prologSingleValued,English):- add_arg_parts_of_speech(F,1,ARGS0,ARGS),verb_after_arg(F,A,After),
-insert_into(ARGS,After,verbFn(F),NEWARGS),
-fully_expand(NEWARGS,English),!.
-
-unCamelCase(S,String):-any_to_string(S,Str),S\=Str,!,unCamelCase(Str,String),!.
-unCamelCase("",""):-!.
-unCamelCase(S,String):-sub_string(S,0,1,_,Char),sub_string(S,1,_,0,Rest),unCamelCase(Rest,RestString),string_lower(Char,NewChar),
-(Char\=NewChar->atomics_to_string(['_',NewChar,RestString],String);atomics_to_string([Char,RestString],String)),!.
-
-mudTermAnglify(verbFn(mudIsa),[is,a]):-!.
-mudTermAnglify(verbFn(F),[is|UL]):-not(string_lower(F,F)),unCamelCase(F,U),atomics_to_string(UL,"_",U).
-mudTermAnglify(verbFn(F),[is,F]):-atom_concat(_,'ing',F).
-mudTermAnglify(verbFn(F),[F,is]).
-% term_anglify(ftCallable(Term),String):-term_to_atom(Term,Atom),any_to_string(Atom,String).
-mudTermAnglify(determinerString(Obj,Text),[np(Obj),is,uses,ftString(Text),as,a,determiner]).
-mudTermAnglify(nameStrings(Obj,Text),[np(Obj),is,refered,to,as,ftString(Text)]).
-mudTermAnglify(mudTermAnglify(Term,Text),[ftCallable(Term),is,converted,to,english,using,ftCallable(Text)]).
-
-:- end_prolog_source.
 
 
 prologMultiValued(verb_alias(ftString,ftString)).

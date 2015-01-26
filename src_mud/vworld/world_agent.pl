@@ -12,7 +12,7 @@
 
 /*
 % This file is "included" from world.pl 
-:-swi_module(modr, [ call_agent_command/2,  call_agent_action/2 ]).
+:-swi_module(modr, [ call_agent_command_0/2,  call_agent_action/2 ]).
 */
 
 :-swi_export(parse_agent_text_command_checked/5).
@@ -25,36 +25,41 @@ parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):-
    debugging(parser), trace, parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD).
 
 must_ac(G):- show_call(must(G)).
+
+
 % =====================================================================================================================
-% call_agent_command/2 -->  call_agent_action/2
+% call_agent_command_0/2 -->  call_agent_action/2
 % =====================================================================================================================
+
+call_agent_command(A,C):-with_assertions(tlbugger:old_no_repeats, call_agent_command_0(A,C)).
+
 % execute a prolog command including prolog/0
-call_agent_command(Agent,Var):-var(Var),trace_or_throw(var_call_agent_command(Agent,Var)).
+call_agent_command_0(Agent,Var):-var(Var),trace_or_throw(var_call_agent_command(Agent,Var)).
 
-call_agent_command(Agent,Text):-string(Text),atom_string(Atom,Text),!,call_agent_command(Agent,Atom).
+call_agent_command_0(Agent,Text):-string(Text),atom_string(Atom,Text),!,call_agent_command_0(Agent,Atom).
 
-call_agent_command(Agent,[VERB|ARGS]):-
+call_agent_command_0(Agent,[VERB|ARGS]):-
       debugOnError(parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD)),
       must_ac(call_agent_action(NewAgent,CMD)),!.
 
 % lists
-call_agent_command(A,Atom):-atom(Atom),atomSplit(Atom,List),must(is_list(List)),!,call_agent_command(A,List).
+call_agent_command_0(A,Atom):-atom(Atom),atomSplit(Atom,List),must(is_list(List)),!,call_agent_command_0(A,List).
 
 % prolog command
-call_agent_command(_Gent,Atom):- atom(Atom), catch((
+call_agent_command_0(_Gent,Atom):- atom(Atom), catch((
    (once((read_term_from_atom(Atom,OneCmd,[variables(VARS)]),
       predicate_property(OneCmd,_),
       fmt('doing command ~q~n',[OneCmd]))),!, doall((OneCmd,fmt('Yes: ~w',[VARS]))))),E,(dmsg(E),fail)).
 
 % remove period at end
-call_agent_command(A,PeriodAtEnd):-append(New,[(.)],PeriodAtEnd),!,call_agent_command(A,New).
+call_agent_command_0(A,PeriodAtEnd):-append(New,[(.)],PeriodAtEnd),!,call_agent_command_0(A,New).
 
 % concat the '@'
-call_agent_command(Ag,[A,B|REST]):- atom(A),atom(B),A=='@',atom_concat(A,B,C),!,call_agent_command(Ag,[C|REST]).
+call_agent_command_0(Ag,[A,B|REST]):- atom(A),atom(B),A=='@',atom_concat(A,B,C),!,call_agent_command_0(Ag,[C|REST]).
 
-call_agent_command(A,[L,I|IST]):- atom(L), CMD =.. [L,I|IST],!, must_ac(call_agent_action(A,CMD)).
+call_agent_command_0(A,[L,I|IST]):- atom(L), CMD =.. [L,I|IST],!, must_ac(call_agent_action(A,CMD)).
 
-call_agent_command(A,CMD):- must_ac(call_agent_action(A,CMD)),!.
+call_agent_command_0(A,CMD):- must_ac(call_agent_action(A,CMD)),!.
 
 % All Actions must be called from here!
 call_agent_action(Agent,CMDI):-var(CMDI),trace_or_throw(call_agent_action(Agent,CMDI)).

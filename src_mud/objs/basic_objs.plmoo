@@ -61,7 +61,18 @@ mudSubclass(tCrackers, tFood).
 mudSubclass(tEnvelope, tOfficeItem).
 mudSubclass(tStamp, tOfficeItem).
 mudSubclass(tKey, tOfficeItem).
-mudSubclass(tBall, tThrowable).
+
+mudSubclass(tOfficeItem, tItem).
+mudSubclass(tFood, tItem).
+mudSubclass(tClothing, tItem).
+
+mudSubclass(tItem, tPortable).
+mudSubclass( tPortable, tDropable).
+
+mudSubclass( tPortable, tThrowable).
+mudSubclass( tPortable, tTakeable).
+
+mudSubclass(tPortableDevice,tPortable).
 
 mudSubclass(tPajamas, tClothing).
 mudSubclass(tShirt, tClothing).

@@ -39,7 +39,58 @@ is_leave_alone(parserm).
 % is_leave_alone(F):- is_db_prop(F,_,_),!,fail.
 is_leave_alone(A):-failOnError((sub_atom(A,_,1,0,S),atom_number(S,_))),!.
 
+
+
 mudTermAnglify(A,B):-local_term_anglify(A,B).
+:- decl_mpred_prolog(mudTermAnglify/2).
+:- decl_mpred_prolog(term_anglify_args/6).
+:- decl_mpred_prolog(term_anglify_last/2).
+
+term_anglify_last(Head,English):-compound(Head),
+   functor(Head,F,A),A>1,
+   not(ends_with_icase(F,"Fn")),not(starts_with_icase(F,"SKF-")),
+   atom_codes(F,[C|_]),code_type(C,lower),
+   Head=..[F|ARGS],
+   term_anglify_args(Head,F,A,ARGS,prologSingleValued,English).
+
+mudTermAnglify(Head,EnglishO):- compound(Head), 
+   Head=..[F|ARGS],mpred_prop(F,Info),
+   member(Info,[prologSingleValued,predArgMulti(_)]),   
+   term_anglify_args(Head,F,1,ARGS,Info,English),fully_expand(English,EnglishO),!.
+
+
+term_anglify_args(Head,F,A,ARGS,predArgMulti(Which),English):- !,replace_nth(ARGS,Which,_OldVar,NewVar,NEWARGS),!,
+   NewHead=..[F|NEWARGS], findall(NewVar,req(NewHead),ListNewVar),list_to_set_safe(ListNewVar,SetNewVar),NewVar=ftListFn(SetNewVar),
+   term_anglify_args(Head,F,A,NewHead,prologSingleValued,English).
+
+
+/*
+
+term_expansion((term_anglify_args(_Head,F,A,ARGS0,prologSingleValued,English):- add_arg_parts_of_speech(F,1,ARGS0,ARGS),verb_after_arg(F,A,After),
+   insert_into(ARGS,After,verbFn(F),NEWARGS),
+   fully_expand(NEWARGS,English),X),O).
+
+*/
+term_anglify_args(_Head,F,A,ARGS0,prologSingleValued,English):- add_arg_parts_of_speech(F,1,ARGS0,ARGS),verb_after_arg(F,A,After),
+               insert_into(ARGS,After,verbFn(F),NEWARGS),
+               fully_expand(NEWARGS,English),!.
+
+/*
+unCamelCase(S,String):-any_to_string(S,Str),S\=Str,!,unCamelCase(Str,String),!.
+unCamelCase("",""):-!.
+unCamelCase(S,String):-sub_string(S,0,1,_,Char),sub_string(S,1,_,0,Rest),unCamelCase(Rest,RestString),string_lower(Char,NewChar),
+(Char\=NewChar->atomics_to_string(['_',NewChar,RestString],String);atomics_to_string([Char,RestString],String)),!.
+*/
+
+mudTermAnglify(verbFn(mudIsa),[is,a]):-!.
+mudTermAnglify(verbFn(F),[is|UL]):-not(string_lower(F,F)),unCamelCase(F,U),atomics_to_string(UL,"_",U).
+mudTermAnglify(verbFn(F),[is,F]):-atom_concat(_,'ing',F).
+mudTermAnglify(verbFn(F),[F,is]).
+% term_anglify(ftCallable(Term),String):-term_to_atom(Term,Atom),any_to_string(Atom,String).
+mudTermAnglify(determinerString(Obj,Text),[np(Obj),is,uses,ftString(Text),as,a,determiner]).
+mudTermAnglify(nameStrings(Obj,Text),[np(Obj),is,refered,to,as,ftString(Text)]).
+mudTermAnglify(mudTermAnglify(Term,Text),[ftCallable(Term),is,converted,to,english,using,ftCallable(Text)]).
+
 term_anglify_np_last(Obj,T,String):- local_term_anglify_np_last(Obj,T,String).
 
 generatePhrase_local(Term,String):- debugOnError(( fully_expand(Term,EnglishM),!,
@@ -73,6 +124,7 @@ fix_grammar_0([Carry|EnglishG],[Carry|English]):-
 join_for_string(English,EnglishS):-failOnError(( flatten([English],EnglishF),list_to_atomics_list(EnglishF,EnglishA),atomics_to_string(EnglishA," ",EnglishS))),!.
 join_for_string(English,English).
 
+/*
 list_to_atomics_list(L,AL):-list_to_atomics_list0(L,AL),forall(member(E,AL),must(atomic(E))).
 
 list_to_atomics_list0(Var,A):-var(Var),!,any_to_string(Var,A),!.
@@ -80,6 +132,7 @@ list_to_atomics_list0([E|EnglishF],[A|EnglishA]):-
    any_to_string(E,A),
    list_to_atomics_list0(EnglishF,EnglishA),!.
 list_to_atomics_list0([],[]):-!.
+*/
 
 
 fully_expand(I,OOF):-copy_term(I,C),flatten([C],FC),fully_expand_0(FC,O),flatten([O],OF),fully_expand_0(OF,OOF).
@@ -136,6 +189,7 @@ local_term_anglify_first(T,TA):-enter_term_anglify(T,TA).
 
 flatten_append(First,Last,Out):-flatten([First],FirstF),flatten([Last],LastF),append(FirstF,LastF,Out),!.
 
+:-decl_mpred_prolog(local_term_anglify/2).
 local_term_anglify(Var,[tCallable(Var)]):- var(Var),!.
 local_term_anglify([Var],[tCallable([Var])]):- var(Var),!.
 

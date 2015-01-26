@@ -50,17 +50,15 @@
 
 :- module(was,[was/2]).
 :- use_module(library(lists)).
-:- set_prolog_flag(generate_debug_info, true).
+:- set_prolog_flag(generate_debug_info, false).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 was:was(X,Y) :-
-	was_c_c(X,Y,_).
+	notrace(was_c_c(X,Y,_)).
 
-/*
-was:attr_portray_hook(varwas(L,U),_Var) :-
-  length(L,LL),length(L,U),ignore
-	write(wazzzs([LL-UU])).
-*/
+
+% was:attr_portray_hook(varwas(L,U),_Var) :- length(L,LL),length(U,UU),write(wazzzs([LL-UU])).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % types of attributes?
 % 	varwas: X is a variable

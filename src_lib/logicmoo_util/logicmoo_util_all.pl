@@ -149,11 +149,10 @@ locally_to_dir(Directory,Dir):-my_absolute_file_name(Directory,Dir),exists_direc
 :- '@'( ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_bugger_catch)), 'user').
 :- '@'( ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_bugger)), 'user').
 :- '@'( ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_strings)), 'user').
-:- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_library)), 'user').
+:- '@'( ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_library)), 'user').
 :- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)), 'user').
 :- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_terms)), 'user').
 :- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_dcg)), 'user').
-:- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_library)), 'user').
 :- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_coroutining_was)), 'user').
 :- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_coroutining_iz)), 'user').
 

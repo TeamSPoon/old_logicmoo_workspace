@@ -69,7 +69,7 @@ command_actTick(Who):-
 
 
  
-get_world_agent_plan(W,Who,Idea):-with_current_agent(Who,call_no_cuts(user:world_agent_plan(W,Who,Idea))).
+get_world_agent_plan(W,Who,Idea):-with_current_agent(Who,call_no_cuts(world_agent_plan(W,Who,Idea))).
 
 do_agent_call_plan_command(A,C):- agent_current_action(A,CC),dmsg(too_busy(CC,agent_call_plan_command(A,C))),!.
 do_agent_call_plan_command(A,C):-   
@@ -93,7 +93,7 @@ action_info(actProlog(tCallable),"Call a tCallable").
 
 agent_text_command(Agent,["prolog",X],Agent,actProlog(X)):-ignore(X=someCode).
 agent_text_command(Agent,["prolog"],Agent,actProlog(user:prolog_repl)).
-agent_text_command(Agent,["tlocals"],Agent,actProlog(user:tlocals)).
+agent_text_command(Agent,["tlocals"],Agent,actProlog(tlocals)).
 
 warnOnError(X):-catch(X,E,dmsg(error(E:X))).
 

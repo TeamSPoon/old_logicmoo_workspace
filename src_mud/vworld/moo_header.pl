@@ -21,7 +21,7 @@
 % these do not get defined!?
 % :-dynamic user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
 
-:- dynamic_multifile_exported user:world_agent_plan/3.
+:- dynamic_multifile_exported world_agent_plan/3.
 :- dynamic_multifile_exported decl_database_hook/2.
 :- dynamic_multifile_exported deduce_facts/2.
 :- dynamic_multifile_exported create_random_fact/1.

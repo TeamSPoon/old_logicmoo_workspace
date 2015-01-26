@@ -22,7 +22,7 @@
 include_moo_files(Mask):- expand_file_name(Mask,X), forall(member(E,X),user_ensure_loaded(E)).
 */
 
-in_user_startup(Call):- '@'(user:Call,user).
+in_user_startup(Call):- '@'(Call,user).
 
 :- '@'(ensure_loaded(logicmoo('vworld/moo.pl')),'user').
 
@@ -39,9 +39,9 @@ in_user_startup(Call):- '@'(user:Call,user).
 :- set_prolog_flag(double_quotes, string).
 
 :- '@'((ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_bugger)),
-         use_module(logicmoo(logicmoo_util/logicmoo_util_library)),
+         ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_library)),
          use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)),
-         use_module(logicmoo(logicmoo_util/logicmoo_util_strings)),
+         ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_strings)),
          use_module(logicmoo(logicmoo_util/logicmoo_util_terms)),
          use_module(logicmoo(logicmoo_util/logicmoo_util_dcg)),
          use_module(logicmoo(vworld/moo))),'user').

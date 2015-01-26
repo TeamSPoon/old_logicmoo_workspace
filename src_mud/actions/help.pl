@@ -19,14 +19,14 @@ type_action_info(tHumanPlayer,actHelp(isOptional(ftString,"")), "shows this help
 
 
 :-swi_export(get_type_action_help_commands_list/3).
-get_type_action_help_commands_list(A,B,C):-no_repeats(get_type_action_help_0(A,B,C)).
+get_type_action_help_commands_list(A,B,C):-no_repeats_old(get_type_action_help_0(A,B,C)).
 
 :-swi_export(get_all_templates/1).
-get_all_templates(Templ):- call_tabled_can(no_repeats(get_all_templates0(Templ))).
+get_all_templates(Templ):- call_tabled_can(no_repeats_old(get_all_templates0(Templ))).
 get_all_templates0(Templ):-get_good_templates(Templ).
 get_all_templates0(Templ):-get_bad_templates(Templ),not(get_good_templates(Templ)).
-get_good_templates(Templ):- no_repeats((get_type_action_help_1(_,Templ,_),good_template(Templ))).
-get_bad_templates(Templ):- no_repeats((get_type_action_help_1(_,Templ,_),not(good_template(Templ)))).
+get_good_templates(Templ):- no_repeats_old((get_type_action_help_1(_,Templ,_),good_template(Templ))).
+get_bad_templates(Templ):- no_repeats_old((get_type_action_help_1(_,Templ,_),not(good_template(Templ)))).
 
 
 vtActionTemplate(Templ):- loop_check(get_all_templates(Templ),fail).
@@ -47,7 +47,7 @@ get_type_action_help_0(What,Syntax,txtConcatFn(makes,happen,List)):- call_no_cut
                       ignore(Agent=an(What)),ignore(What=tAgentGeneric).
 
 get_type_action_help_1(What,TEMPL,S):- get_type_action_help_0(What,TEMPL,S).
-get_type_action_help_1(_What,TEMPL,S):- call_no_cuts(vtActionTemplate(TEMPL)),to_param_doc(TEMPL,S).
+get_type_action_help_1(_What,TEMPL,S):- call_no_cuts(mudIsa(TEMPL,vtActionTemplate)),to_param_doc(TEMPL,S).
 
 
 first_pl((BODY,_),PL):-!,
@@ -76,8 +76,8 @@ alpha_shorter_1(OrderO, P1,P2):-functor_h(P1,F1,A1),functor_h(P2,F2,A2),compare(
   (compare(OrderA,A1,A2), (OrderA \== '=' -> OrderO=OrderA ; compare(OrderO,P1,P2)))).
 
 
-get_template_docu(TEMPL,DOC):-no_repeats((get_type_action_help_0(_,TEMPL,DOC)*->true;get_type_action_help_1(_What,TEMPL,DOC))).
-get_template_docu_all(TEMPL,DOC):-no_repeats(get_type_action_help_1(_What,TEMPL,DOC)).
+get_template_docu(TEMPL,DOC):-no_repeats_old((get_type_action_help_0(_,TEMPL,DOC)*->true;get_type_action_help_1(_What,TEMPL,DOC))).
+get_template_docu_all(TEMPL,DOC):-no_repeats_old(get_type_action_help_1(_What,TEMPL,DOC)).
 
 show_templ_doc(TEMPL):-findall(DOC,get_template_docu(TEMPL,DOC),DOCL),nvfmt(TEMPL=DOCL).
 show_templ_doc_all(TEMPL):-findall(DOC,get_template_docu_all(TEMPL,DOC),DOCL),nvfmt(TEMPL=DOCL).

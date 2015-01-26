@@ -53,7 +53,7 @@ mudLastCmdSuccess(Agent,YN) :- mudCmdfailure(Agent,_)-> YN=no ; YN=yes.
 :-swi_export(add_cmdfailure/2).
 add_cmdfailure(Agent,What):-add(mudCmdfailure(Agent,What)).
 
-decl_database_hook(assert(_),mudCmdfailure(Agent,What)):- once(idel(cmdsuccess(Agent,What));clr(cmdsuccess(Agent,_))).
+decl_database_hook(assert(_),mudCmdfailure(Agent,What)):- /*once(idel(cmdsuccess(Agent,What));*/clr(cmdsuccess(Agent,_)).
 
 % Initialize world.
 % This keeps the old databases messing with new runs.

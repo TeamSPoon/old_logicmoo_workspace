@@ -4,6 +4,10 @@
 */
 
 :- multifile(user:mud_regression_test/0).
+:- multifile(user:mudIsa/2).
+:- dynamic(user:mudIsa/2).
+:-import(user:mudIsa/2).
+'$toplevel':mudIsa(X,Y):-user:mudIsa(X,Y).
 
 :- set_prolog_flag(generate_debug_info, true).
 :- exists_directory(runtime)->working_directory(_,runtime);(exists_directory('../runtime')->working_directory(_,'../runtime');true).
@@ -74,7 +78,7 @@ user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),s
 
 
 :-multifile(pre_file_search_path/2).
-user:pre_file_search_path(_,_):-!,fail.
+% user:pre_file_search_path(_,_):-!,fail.
 % :- do_semweb_startup.
 % :- do_web_startup.
 
@@ -122,6 +126,8 @@ pddlSomethingIsa('iPhaser7776',['tPhaser','Handgun',tWeapon,'LightingDevice','Po
 
 
 % [Manditory] This loads the game and initializes so test can be ran
+
+
 :- if_startup_script( at_start(finish_processing_world)).
 
 % :- if_startup_script( doall(now_run_local_tests_dbg)).
@@ -140,6 +146,7 @@ pddlSomethingIsa('iPhaser7776',['tPhaser','Handgun',tWeapon,'LightingDevice','Po
 :-enqueue_player_command("take shirt").
 :-enqueue_player_command("inventory").
 */
+
 :-enqueue_player_command(prolog).
 
 % [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)

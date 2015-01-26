@@ -414,7 +414,7 @@ phrase_parseForTypes_9(TYPEARGS,ARGS,GOODARGS,LeftOver):- (LeftOver=[];LeftOver=
 
 parseForTypes([], [], A, A).
 parseForTypes([TYPE|TYPES], [B|E], C, G) :-
-        no_repeats(parseIsa_Call(TYPE, B, C, F)),
+        no_repeats_old(parseIsa_Call(TYPE, B, C, F)),
         parseForTypes(TYPES, E, F, G),!.
 
 
@@ -524,14 +524,14 @@ coerce(String,Type,Inst):- var(Type),trace_or_throw(var_specifiedItemType(String
 coerce(String,isNot(Type),Inst):-!,not(coerce(String,Type,Inst)).
 coerce([String],Type,Inst):- nonvar(String),!,coerce(String,Type,Inst).
 coerce(String,Type,Inst):- ttFormatType(Type),checkAnyType(assert(actParse),String,Type,AAA),Inst=AAA.
-coerce(Text,Type,Inst):- call_tabled_can(no_repeats(call_no_cuts(hook_coerce(Text,Type,Inst)))).
+coerce(Text,Type,Inst):- call_tabled_can(no_repeats_old(call_no_cuts(hook_coerce(Text,Type,Inst)))).
 %coerce(String,Type,Longest) :- findall(Inst, (hook_coerce(Inst,Type,Inst),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
 coerce(String,Type,Inst):- var(String),!,instances_of_type(Inst,Type),name_text(Inst,String).
 coerce(String,Type,Inst):- not(ttFormatType(Type)),must(tCol(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
 coerce(String,Type,Inst):- not(string(String)),!,text_to_string(String,StringS),!,coerce(StringS,Type,Inst).
 % coerce(A,Type,AA):- correctAnyType(change(_,_),A,Type,AA).
 
-instances_of_type(Inst,Type):- no_repeats(instances_of_type_0(Inst,Type)).
+instances_of_type(Inst,Type):- no_repeats_old(instances_of_type_0(Inst,Type)).
 
 available_instances_of_type(Agent,Obj,Type):- must(current_agent(Agent)), current_agent_or_var(Agent), mudIsa(Obj,Type), same_regions(Agent,Obj),!.
 
@@ -567,9 +567,9 @@ longest_string(Order,TStr1,TStr2):-
 
 end_of_file.
 
-text_isa(I,T):-no_repeats(hook_text_isa(I,T)).
+text_isa(I,T):-no_repeats_old(hook_text_isa(I,T)).
 
-hook_text_isa(Text,Whatnot):- no_repeats(tCol(Whatnot)),mudIsa(Inst,Whatnot),not(tCol(Inst)),once(name_text(Inst,Text)).
+hook_text_isa(Text,Whatnot):- no_repeats_old(tCol(Whatnot)),mudIsa(Inst,Whatnot),not(tCol(Inst)),once(name_text(Inst,Text)).
 hook_text_isa(Text,txtVerb):- get_all_templates(A),nonvar(A),functor_safe(A,Inst,_),name_text(Inst,Text).
 
 

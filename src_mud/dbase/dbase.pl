@@ -114,7 +114,7 @@ typename_to_iname0(I,Type,IType):-nonvar(Type),toUpperCamelcase(Type,UType),atom
 
 decl_database_hook(assert(_),Fact):- check_was_known_false(Fact).
 
-was_known_false(Fact):-is_known_false(Fact),doall(retract((is_known_false(_):-true))),trace_or_throw(error+was_known_false(Fact)).
+was_known_false(Fact):-is_known_false(Fact),doall(retract((is_known_false(_):-true))),dmsg(trace_or_throw(error+was_known_false(Fact))).
 
 check_was_known_false(Fact):- ignore(((is_known_false(Fact),was_known_false(Fact)))).
 
@@ -622,9 +622,6 @@ db_op_exact(Op,C):- trace_or_throw(unhandled(db_op_exact(Op,C))).
 
 addTypeProps_getOverlap(_Type,List,Overlap):-!,List=Overlap.
 
-never_dbase_mpred(mpred_prop).
-never_dbase_mpred(mpred_arity).
-
 
 % ================================================
 % db_assert_[mv|sv]/3
@@ -729,6 +726,7 @@ hooked_asserta_confirmed(CNEW,A,NEW):-dmsg(unconfirmed(hooked_asserta_confirmed(
 
 :-ensure_loaded(dbase_i_propvals).
 :-ensure_loaded(dbase_i_call).
+:-ensure_loaded(dbase_i_call_kb).
 
 :-moo_hide_childs(replace_arg/4).
 replace_arg(C,A,OLD,CC):- 

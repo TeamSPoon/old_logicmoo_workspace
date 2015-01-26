@@ -22,8 +22,8 @@
 rez_to_inventory(Agent,NameOrType,NewObj):-   
   must_det_l([
    create_meta(NameOrType,Clz,tItem,NewObj),
-   padd(Agent,mudStowing(NewObj)),
    add(mudIsa(NewObj,Clz)),
+   padd(Agent,mudStowing(NewObj)),
    padd(NewObj,authorWas(rez_to_inventory(Agent,NameOrType,NewObj))),
    add_missing_instance_defaults(NewObj),
    mudStowing(Agent,NewObj),

@@ -78,6 +78,19 @@
           dbase_f/7)).
 
 
+:-swi_export(into_plist/2).
+into_plist(In,Out):-into_plist_arities(2,12,In,Out).
+
+:-export(into_plist_arities/4).
+into_plist_arities(Min,Max,PLIST,PLISTO):- var(PLIST),!,between(Min,Max,X),length(PLIST,X),PLISTO=PLIST.
+into_plist_arities(_,_,[P|LIST],[P|LIST]):-var(P),!.
+into_plist_arities(_,_,[dbase_t|PLIST],PLIST):-!.  % dbase_t is our versuion of '$holds' or call/N
+into_plist_arities(_,_,plist(P,LIST),[P|LIST]):-!.
+into_plist_arities(_,_,Call,PLIST):-Call=..PLIST. % finally the fallthrue
+
+
+never_dbase_mpred(mpred_prop).
+never_dbase_mpred(mpred_arity).
 
 
 % ================================================================================
@@ -222,7 +235,7 @@ hybrid_rule_term_expansion(file,(HEAD:-NEWBODY),ruleHybridChain(HEAD,NEWBODY)):-
 hybrid_rule_term_expansion((I:-_),_):-!,once((compound(I),functor(I,F,A),asserta_if_new(mpred_prolog_arity(F,A)))),!,fail.
 hybrid_rule_term_expansion(I,_):- once((compound(I),functor(I,F,A),asserta_if_new(mpred_prolog_arity(F,A)))),!,fail.
 
-user:term_expansion(I,O):-not(thlocal:into_form_code),get_functor(I,F),mpred_prop(F,prologHybrid),hybrid_rule_term_expansion(file,I,O).
+term_expansion(I,O):-not(thlocal:into_form_code),get_functor(I,F),mpred_prop(F,prologHybrid),hybrid_rule_term_expansion(file,I,O).
  */  
 :- op(1150,fx,decl_mpred_hybrid).
 
@@ -249,6 +262,8 @@ is_proc(F):- functor(P,F,1),predicate_property(P,_),must(not(mpred_prop(F,tCol))
 is_call_op(call(_)):-!.
 is_call_op(call).
 
+non_call_op(OP):-mpred_op(OP),not(is_call_op(OP)).
+
 mpred_op(assert(_)).
 mpred_op(retract(_)).
 mpred_op(call(_)).
@@ -272,13 +287,13 @@ provide_mpred_storage_op(OP,(Head:-Body),_ANY,CALL):-
  transitive(how_to_op,OP,OP2),
   special_wrapper_body(Body,direct_to_prolog),!,
   wdmsg(direct_to_prolog(OP2,Head,Body)),
-  CALL = user:(call(OP2,(Head:-Body))).  
+  CALL = (call(OP2,(Head:-Body))).  
 
 % OLD RULE HOOK   
 provide_mpred_storage_op(OP,(Head:-Body),prologHybrid,CALL):- \+ use_pttp,
  transitive(how_to_op,OP,OP2),
   CALL = (call(OP2,ruleHybridChain(Head,Body))),
-  wdmsg(saved_clause_in_hybridRule(OP2,Head,Body)).
+  wdmsg(saved_clause_in_hybridRule(OP2,Head,Body)),!.
 
 % PTTP RULE HOOK   
 provide_mpred_storage_op(OP,(Head:-Body),prologHybrid,CALL):- use_pttp,!,
@@ -306,9 +321,9 @@ provide_mpred_storage_op(OP1,HeadBody,prologHybrid,CALL):- trace_or_throw(provid
 
 % SETUP HOOK
 provide_mpred_setup(OP,Head,StubType,OUT):-  StubType = prologHybrid, 
-  user:must_det_l(( get_pifunctor(Head,PHead,F,A),  
+  must_det_l(( get_pifunctor(Head,PHead,F,A),  
    show_call(provide_clauses_list(PHead,HBLIST)),
-   user:abolish(F,A),dynamic_multifile_exported(user:F/A),
+   abolish(F,A),dynamic_multifile_exported(F/A),
    call((asserta_if_new(mpred_prop(F,hasStub(StubType))))), 
    asserta_if_new(mpred_prop(F,StubType)), 
    forall(member(HB,HBLIST),must(add(HB))),!,   
@@ -325,7 +340,6 @@ dbase_t_tell_snark(OP2,RULE):-
 
 mud_call_op(OP2,OPRAND):- show_call(call(OP2,OPRAND)).
 
-
 % ISA CALL
 provide_mpred_call_op(_,X,prologHybrid, CALL):- was_isa(X,I,C),!, CALL=no_loop_check_unsafe(isa_backchaing(I,C)).
 
@@ -339,16 +353,26 @@ cwdl(CALL,DEEP7):- call_with_depth_limit(CALL,DEEP7,Result),
 
 call_for_literal_ideep_lc(HEAD):- must(into_assertable_form(dbase_t,HEAD,DB)),!, call_for_literal_db(HEAD,DB).
 
-call_for_literal_db(HEAD,DB):-no_repeats(HEAD,loop_check(call(call,DB),loop_check(call_rule_db(HEAD,DB),call(call,DB)))).
-call_for_literal_db(HEAD,DB):-loop_check(call_rule_db(HEAD,DB)).
-call_for_literal_db( _,dbase_t(P1,A,B)):-dbase_t(genlPreds,P2,P1),call(dbase_t,P2,A,B).
+constrain_args(HEAD):-HEAD=..[P|ARGS],constrain_args(P,ARGS).
+
+constrain_args(_P,[AR,GS]):-!,dif(AR,GS).
+constrain_args(_,[_P,AR,GS]):-!,dif(AR,GS).
+constrain_args(A,B):-constrain_args_pttp(A,B).
+
+call_for_literal_db(HEAD,DB):-HEAD=..[P|ARGS],constrain_args(P,ARGS),call_for_literal_db0(HEAD,DB),constrain_args(P,ARGS).
+
+call_for_literal_db0(HEAD,DB):-no_repeats_av(HEAD,call_for_literal_db00(HEAD,DB)).
+
+call_for_literal_db00(HEAD,DB):-loop_check(is_asserted(HEAD),loop_check(is_asserted(DB),(DB))).
+call_for_literal_db00(HEAD,DB):-loop_check(call_rule_db(HEAD,DB),DB).
+call_for_literal_db00( _,dbase_t(P1,A,B)):- not(use_pttp),dif(P1,P2),loop_check_term(genlPreds(P2,P1),gp(P1),fail),call(dbase_t,P2,A,B).
 
 :- dynamic(use_ideep/0).
 :- retractall(use_pttp).
-% :- asserta_if_new(use_pttp).
+%:- asserta_if_new(use_pttp).
 
-call_for_literal(HEAD):- use_pttp,!,trace,snark_ask(HEAD).
-call_for_literal(HEAD):- use_ideep, CALL = call_for_literal_ideep_lc(HEAD),!,loop_check_term(cwdl(CALL,7),HEAD,(trace,CALL)).
+call_for_literal(HEAD):- use_pttp,!,snark_ask(HEAD).
+call_for_literal(HEAD):- use_ideep, CALL = call_for_literal_ideep_lc(HEAD),!,loop_check_term(cwdl(CALL,7),HEAD,(CALL)).
 call_for_literal(HEAD):- must(into_assertable_form(dbase_t,HEAD,DB)),!,call_for_literal_db(HEAD,DB).
 
 call_rule_db(HEAD,_DB):- use_pttp,!,snark_ask(HEAD).
@@ -356,7 +380,8 @@ call_rule_db(HEAD,_DB):- ruleHybridChain(HEAD,BODY),call_mpred_body(HEAD,BODY).
 
 call_mpred_body(_,true):-!.
 call_mpred_body(HEAD,and(A,B)):- !,call_mpred_body(HEAD,A),!,call_mpred_body(HEAD,B).
-call_mpred_body(HEAD,BODY):- no_repeats(loop_check_term(call_mpred_body_lc(HEAD,BODY),body_of(HEAD),(dmsg(failure(call_mpred_body_lc(HEAD,BODY))),!,fail))).
+call_mpred_body(HEAD,(A,B)):- !,call_mpred_body(HEAD,A),call_mpred_body(HEAD,B).
+call_mpred_body(HEAD,BODY):- no_repeats(loop_check_term(call_mpred_body_lc(HEAD,BODY),body_of(HEAD),(nop(failure(call_mpred_body_lc(HEAD,BODY))),!,fail))).
 
 call_mpred_body_lc(_HEAD,BODY):- debugOnError(BODY).
 
