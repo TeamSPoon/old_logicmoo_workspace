@@ -54,6 +54,7 @@
 					<F N="externals/MUD_ScriptEngines/snark/dbase_i_bootstrap_dnf.pl"/>
 					<F N="externals/MUD_ScriptEngines/snark/dbase_rules_nnf.pl"/>
 					<F N="externals/MUD_ScriptEngines/snark/dbase_rules_pttp.pl"/>
+					<F N="externals/MUD_ScriptEngines/snark/dbase_rules_pttp_precompiled.pl"/>
 					<F N="externals/MUD_ScriptEngines/snark/dbase_rules_pttp_statics.pl"/>
 					<F N="externals/MUD_ScriptEngines/snark/dbase_rules_testing.pl"/>
 					<F N="externals/MUD_ScriptEngines/snark/snark_ailog2.pl"/>
@@ -75,6 +76,27 @@
 				N="runtime/*.*"
 				Recurse="1"
 				Refilter="1"
+				Excludes="cache/;store/"/>
+		</Folder>
+		<Folder Name="src">
+			<F
+				N="src/*.*"
+				Recurse="1"
+				Refilter="0"
+				Excludes="cache/;store/"/>
+		</Folder>
+		<Folder Name="src_game">
+			<F
+				N="src_game/*.*"
+				Recurse="1"
+				Refilter="0"
+				Excludes="cache/;store/"/>
+		</Folder>
+		<Folder Name="src_incoming">
+			<F
+				N="src_incoming/*.*"
+				Recurse="1"
+				Refilter="0"
 				Excludes="cache/;store/"/>
 		</Folder>
 		<Folder Name="src_lib">

@@ -64,8 +64,8 @@ logicmoo_util_library:-module(logicmoo_util_library,
 :- meta_predicate(if_file_exists(0)).
 if_file_exists(M:Call):- arg(1,Call,File),(filematch(File,_)-> must((filematch(File,X),exists_file(X),call(M:Call)));fmt(not_installing(M,Call))),!.
 
-:-export(filematch/2).
-:-export(filematch/3).
+:- export(filematch/2).
+:- export(filematch/3).
 filematch(Mask,File1):-filematch('./',Mask,File1).
 filematch(RelativeTo,Mask,File1):-absolute_file_name(Mask,File1,[expand(true),extensions(['',plmoo,pl,'pl.in']),file_errors(fail),solutions(all),relative_to(RelativeTo),access(read)]).
 
@@ -86,11 +86,11 @@ safe_univ(Call,List):-hotrace(safe_univ0(Call,List)),!.
 safe_univ0(M:Call,[N:L|List]):- nonvar(M),nonvar(N),!,safe_univ0(Call,[L|List]).
 safe_univ0(Call,[M:L|List]):- nonvar(M),!,safe_univ(Call,[L|List]).
 safe_univ0(M:Call,[L|List]):- nonvar(M),!,safe_univ(Call,[L|List]).
-safe_univ0(Call,[L|List]):- not(is_list(Call)), Call =..[L|List],!,warn_bad_functor(L).
+safe_univ0(Call,[L|List]):- not(is_list(Call)),must(atom(L);compound(Call)), Call =..[L|List],!,warn_bad_functor(L).
 safe_univ0([L|List],[L|List]):- var(List),atomic(Call),!,grtrace,Call =.. [L|List],warn_bad_functor(L).
-safe_univ0(Call,[L|List]):- ccatch(Call =.. [L|List],E,(dumpST,'format'('~q~n',[E=safe_univ(Call,List)]))),warn_bad_functor(L).
+safe_univ0(Call,[L|List]):- must(atom(L);compound(Call)),ccatch(Call =.. [L|List],E,(dumpST,'format'('~q~n',[E=safe_univ(Call,List)]))),warn_bad_functor(L).
 
-:-export(append_term/3).
+:- export(append_term/3).
 append_term(T,I,HEAD):-atom(T),HEAD=..[T,I],!.
 append_term(Call,E,CallE):- Call=..List, append(List,[E],ListE), CallE=..ListE.
 
@@ -99,10 +99,10 @@ append_term(Call,E,CallE):- Call=..List, append(List,[E],ListE), CallE=..ListE.
 % =================================================================================
 
 
-:-export(each_subterm/2).
+:- export(each_subterm/2).
 each_subterm(B, A):- (compound(B), arg(_, B, C), each_subterm(C, A));A=B.
 
-:-export(each_subterm/3).
+:- export(each_subterm/3).
 each_subterm(A,Pred,B):- call( Pred,A,B).
 each_subterm(A,Pred,O):- 
    compound(A),
@@ -122,6 +122,8 @@ makeArgIndexes(CateSig,F):- argNumsTracked(F,Atom,Number),arg(Number,CateSig,Arg
      assert_if_new(argNFound(F,Atom,Arg)),fail.
 makeArgIndexes(_NEW,_F).
 
+flatten_dedupe(Percepts0,Percepts):-
+   flatten([Percepts0],Percepts1),remove_dupes(Percepts1,Percepts).
 
 
 % peekAttributes/2,pushAttributes/2,pushCateElement/2.
@@ -163,14 +165,14 @@ same_body(B,Body):-same_heads(B,Body).
 
 same_heads(H,Head):-H=@=Head,!.
 same_heads(M1:H,M2:Head):-H=@=Head,!,call(dmsg(warn(same_heads(M1:H,M2:Head)))).
-same_heads(H,M2:Head):-H=@=Head,!,call(dmsg(warn(same_heads(_M1:H,M2:Head)))).
-same_heads(M1:H,Head):-H=@=Head,!,call(dmsg(warn(same_heads(M1:H,_M2:Head)))).
+same_heads(H,M2:Head):-H=@=Head,!,nop(dmsg(warn(same_heads(_M1:H,M2:Head)))).
+same_heads(M1:H,Head):-H=@=Head,!,nop(dmsg(warn(same_heads(M1:H,_M2:Head)))).
 
 :-meta_predicate clause_safe(?, ?).
 :-module_transparent clause_safe/2.
-:-export(clause_safe/2).
+:- export(clause_safe/2).
 
-:-export(clause_safe_m3/3).
+:- export(clause_safe_m3/3).
 
 clause_safe(M:H,B):-!,debugOnError(clause(M:H,B)).
 clause_safe(H,B):-!,debugOnError(clause(H,B)).
@@ -258,7 +260,7 @@ nd_pred_subst2(_, _X, _Sk, L, L ).
 
 % -- CODEBLOCK
 % Usage: pred_subst(+Pred,+Fml,+X,+Sk,?FmlSk)
-:-export(pred_subst/5).
+:- export(pred_subst/5).
 
 pred_subst( Pred, P,       X,Sk,       P1    ) :- call(Pred,P,X),!,must( Sk=P1),!.
 pred_subst(_Pred, P,       _,_ ,       P1    ) :- is_ftVar(P),!, must(P1=P),!.
@@ -342,7 +344,7 @@ get_module_of(P,M):-predicate_property(_:P,imported_from(M)),!.
 get_module_of(MM:_,M):-!,MM=M.
 get_module_of(P,M):-functor_catch(P,F,A),get_module_of_4(P,F,A,M).
 
-:-export(flatten_set/2).
+:- export(flatten_set/2).
 flatten_set(L,S):-flatten([L],F),list_to_set(F,S),!.
 %flatten_set(Percepts0,Percepts):- flatten([Percepts0],Percepts1),remove_dupes(Percepts1,Percepts).
 
@@ -453,7 +455,7 @@ concat_atom_safe(List,Sep,Atom):- concat_atom(List,Sep,Atom),!.
 upcase_atom_safe(A,B):-atom(A),upcase_atom(A,B),!.
 time_file_safe(F,INNER_XML):-exists_file_safe(F),time_file(F,INNER_XML).
 
-:-export(list_to_set_safe/2).
+:- export(list_to_set_safe/2).
 list_to_set_safe(A,A):-(var(A);atomic(A)),!.
 list_to_set_safe([A|AA],BB):- (not(not(lastMember2(A,AA))) -> list_to_set_safe(AA,BB) ; (list_to_set_safe(AA,NB),BB=[A|NB])),!.
 
@@ -507,15 +509,15 @@ list_retain([],_Pred,[]):-!.
 list_retain([R|List],Pred,[R|Retained]):- call(Pred,R),!, list_retain(List,Pred,Retained).
 list_retain([_|List],Pred,Retained):- list_retain(List,Pred,Retained).
 
-:-export(identical_member/2).
+:- export(identical_member/2).
 identical_member(X,[Y|_])  :-
 	X == Y,
 	!.
 identical_member(X,[_|L]) :-
 	'identical_member'(X,L).
 
-:-export(delete_eq/3).
-:-export(pred_delete/4).
+:- export(delete_eq/3).
+:- export(pred_delete/4).
 delete_eq(A,B,C):-pred_delete(==,A,B,C).
 pred_delete(_,[], _, []).
 pred_delete(Pred,[A|C], B, D) :-

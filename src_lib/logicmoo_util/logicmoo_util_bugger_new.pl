@@ -4,7 +4,7 @@
 
 
 :-multifile(system:goal_expansion/2).
-:-export(system:goal_expansion/2).
+:- export(system:goal_expansion/2).
 :-multifile(tlbugger:bugger_prolog_flag/2).
 :-multifile(mpred_arity/2).
 :-meta_predicate(lmdmsg_call(0)).
@@ -25,20 +25,20 @@ lmdmsg_call(D):- ( (lmdmsg(lmdmsg_call(D)),call(D),lmdmsg(lmdmsg_exit(D))) *-> t
 
 :-use_module(library(apply)).
 :-meta_predicate pcall(:).
-:-export(pcall/1).
+:- export(pcall/1).
 :-meta_predicate(out_mcall(:)).
-:-export(out_mcall/1).
+:- export(out_mcall/1).
 :-meta_predicate(in_mcall(:)).
-:-export(in_mcall/1).
+:- export(in_mcall/1).
 :-meta_predicate(mcall(:)).
-:-export(mcall/1).
+:- export(mcall/1).
 :-meta_predicate(mcall(?,?)).
-:-export(mcall/2).
+:- export(mcall/2).
 :-meta_predicate(mcall_expansion(:,?)).
 
 mcall(Goal):- menv(Env),mcall(Goal, Env).
 
-:-export(mcall/2).
+:- export(mcall/2).
 % mcall(M:Goal,Env):-atomic(M),M=zxz,!,mcall(Goal,Env).
 mcall(V, _):- var(V), !, throw(error(instantiation_error, _)).
 mcall(true, _Env):-!, true.
@@ -60,7 +60,7 @@ do_meta_arg(_Env,(-),Goal,Goal).
 do_meta_arg(_Env,(?),Goal,Goal).
 do_meta_arg(Env, _,Goal,mcall(Goal,Env)).
 
-:-export(mcall2/2).
+:- export(mcall2/2).
 mcall2(M:Goal,Env):-!,mcall3(M,Goal,Env).
 mcall2(Goal,Env):-mcall3(user,Goal,Env).
 

@@ -3,16 +3,16 @@ PrologMUD_base.vpj=Release
 [Global]
 CurrentProject=PrologMUD.vpj
 [ProjectDates]
-PrologMUD.vpj=20150122044152548
+PrologMUD.vpj=20150131180738869
 PrologMUD_base.vpj=20150118165844771
-externals\PrologMUD_ext.vpj=20150105131252020
+externals\PrologMUD_ext.vpj=20150128041104409
 [TreeExpansion2]
 - PrologMUD.vpj
   - externals
-    - MUD_ircbot
-      - prolog
+    + MUD_ircbot
+      + prolog
     - MUD_ScriptEngines
-      - ext
+      + ext
         + r6rs-plt-redex-model
       - snark
   + games
@@ -40,22 +40,54 @@ externals\PrologMUD_ext.vpj=20150105131252020
         + prolog
         + snd
     + src_game_wumpus
-  - runtime
+  + runtime
     + config-enabled
     + RDF-store
-  - src_lib
-    - logicmoo_util
-  - src_mud
-    - actions
-    - dbase
+  - src
+    + assetsources
+    + config-enabled
+    + http
+      + web
+        + css
+        + icons
+        + js
+    + logicmoo_util_OLD
+    + model
+    + mudconsole
+    + RDF-store
+  + src_game
+    + actions
+    + dbase
     + mobs
       + affordance
       + planner
     + objs
     + parsing
+    + vworld
+  + src_incoming
+    + actions
+    + dbase
+      + leancop21
+      + motel
+    + mobs
+      + affordance
+    + objs
+    + rooms
+    + vworld
+  + src_lib
+    - logicmoo_util
+  - src_mud
+    - actions
+    - dbase
+      + leancop21
+      + motel
+    + mobs
+      + affordance
+    + objs
+    + rooms
     - vworld
 - PrologMUD_base.vpj
-  - externals
+  + externals
     + ClioPatria
       + client
         + Java
@@ -72,7 +104,7 @@ externals\PrologMUD_ext.vpj=20150105131252020
       + prolog
         + chat80
         + CURT
-    - MUD_DLog
+    + MUD_DLog
       + dlog-reasoner
         + doc
         + examples
@@ -86,7 +118,7 @@ externals\PrologMUD_ext.vpj=20150105131252020
         + src
         + test
         + xml_reader
-      - dlog-server
+      + dlog-server
         + bin
           + lib
         + examples
@@ -95,13 +127,13 @@ externals\PrologMUD_ext.vpj=20150105131252020
           + happy
           + iocaste
           + shi
-        - src
-          - core
-          - dl_translator
+        + src
+          + core
+          + dl_translator
             + fol
             + old
             + pure
-            - shiq
+            + shiq
           + hash
           + interfaces
           + prolog_translator
@@ -124,8 +156,8 @@ externals\PrologMUD_ext.vpj=20150105131252020
           + compare
           + prolog
     + MUD_PDDL
-      - prolog
-        - planner
+      + prolog
+        + planner
           + bkwld_pddl_parser
           + Blocks_world
           + domains
@@ -171,11 +203,11 @@ externals\PrologMUD_ext.vpj=20150105131252020
           + Rakiduam07
             + continuos
             + socket_udp
-    - MUD_ScriptEngines
-      - ext
+    + MUD_ScriptEngines
+      + ext
         + r6rs-plt-redex-model
       + snark
-    - OLD_logicm00
+    + OLD_logicm00
       + src_modules
         + aleph
         + candc
@@ -257,7 +289,7 @@ externals\PrologMUD_ext.vpj=20150105131252020
         + database
           + benchmarks
           + prologTestFiles
-        - indigolog
+        + indigolog
           + Doc
             + source
           + Env
@@ -277,7 +309,7 @@ externals\PrologMUD_ext.vpj=20150105131252020
               + Screenshots
               + WumpusApplet
           + flux_WumpusApplet
-          - Interpreters
+          + Interpreters
             + flux
           + lib
         + MaLARea
@@ -290,10 +322,10 @@ externals\PrologMUD_ext.vpj=20150105131252020
           + examples
             + iris
             + trains
-          - pl
+          + pl
     + swipl-library
       + bin
-      - boot
+      + boot
       + customize
       + demo
       + doc
@@ -302,7 +334,7 @@ externals\PrologMUD_ext.vpj=20150105131252020
         + sicstus
         + Yap
       + lib
-      - library
+      + library
         + chr
         + clp
           + clpq
@@ -326,8 +358,8 @@ externals\PrologMUD_ext.vpj=20150105131252020
             + icons
             + js
         + pldoc
-        - semweb
-        - tipc
+        + semweb
+        + tipc
         + unicode
       + xpce
         + appl-help
@@ -364,7 +396,7 @@ externals\PrologMUD_ext.vpj=20150105131252020
                 + 16x16
             + xref
   + games
-    - src_game_nani
+    + src_game_nani
       + web
         + css
         + icons
@@ -388,19 +420,20 @@ externals\PrologMUD_ext.vpj=20150105131252020
         + prolog
         + snd
     + src_game_wumpus
-  - runtime
+  + runtime
     + config-enabled
     + RDF-store
   - src_lib
     - logicmoo_util
   - src_mud
-    + actions
+    - actions
     - dbase
-    - mobs
-      - affordance
-      + planner
-    - objs
-    + parsing
+      + leancop21
+      + motel
+    + mobs
+      + affordance
+    + objs
+    + rooms
     - vworld
 - externals\PrologMUD_ext.vpj
   + MUD_DeepParsing\.git
@@ -984,57 +1017,6 @@ externals\PrologMUD_ext.vpj=20150105131252020
       + semweb
       + tipc
       + unicode
-    + pack
-      + db_facts
-        + examples
-        + prolog
-      + list_util
-        + prolog
-        + t
-      + mavis
-        + prolog
-        + t
-      + prosqlite
-        + examples
-        + prolog
-      + quickcheck
-        + prolog
-        + t
-      + swicli
-        + cffi-tests
-        + prolog
-    + pack-disabled
-      + weblog
-        + demo
-        + prolog
-          + debug_page
-          + formatting
-          + html_form
-          + identity
-            + login_prototype
-            + stormpath
-          + info
-            + books
-              + google
-            + buttons
-            + geocoding
-              + google
-            + geohashing
-            + html
-            + maps
-              + google
-              + leaflet
-            + numbers
-            + stock
-              + crox
-            + weather
-              + geonames
-          + keys
-          + nav
-          + resources
-          + support
-          + widgets
-            + agents
     + xpce
       + prolog
         + boot
@@ -1071,17 +1053,17 @@ externals\PrologMUD_ext.vpj=20150105131252020
     + Plugins
     + src
       + Keep
-scroll:84
+scroll:201
 [State]
-SCREEN: 1920 1080 198 143 1440 699 0 0 M 0 0 0 0 1469 536
-CWD: src_mud\dbase
+SCREEN: 1920 1080 480 174 1440 699 0 0 M 0 0 0 0 1469 536
+CWD: src_mud
 FILEHIST: 9
-src_mud\dbase_new\dbase_i_mpred_dbase_t.pl
-src_mud\dbase_new\dbase_i_kb_store.pl
+src_mud\vworld\parser_imperative.pl.bak
+src_mud\dbase\dbase_formattypes.pl
+src_mud\dbase\dbase_i_builtin.pl
+src_mud\vworld\toploop_telnet.pl
+src_game\dbase\dbase_i_formattypes.pl
+externals\MUD_ScriptEngines\snark\snark_in_prolog.pl
+src_game\dbase\dbase.pl
+src_incoming\dbase\dbase.pl
 src_mud\dbase\dbase.pl
-src_mud\dbase\dbase_i_mpred_props.pl
-src_mud\dbase\dbase_i_kb_store.pl
-src_mud\dbase\dbase_i_mpred_prolog.pl
-src_mud\dbase\dbase_i_mpred_dbase_t.pl
-src_mud\dbase_new\dbase_i_mpred_stubs.pl
-src_mud\dbase\dbase_i_mpred_stubs.pl

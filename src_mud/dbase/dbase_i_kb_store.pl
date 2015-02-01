@@ -356,7 +356,6 @@ fact_loop_checked(Fact,Call):- no_repeats(fact_checked(Fact,loop_check(Call,is_a
 
 had_module(M:X,X):-atom(M).
 
-
 :-dynamic_multifile_exported(is_asserted/1).
 is_asserted(M:C):- atom(M),!,is_asserted(C).
 is_asserted(C):-compound(C),functor(C,F,A),!,is_asserted(F,A,C). 
@@ -383,27 +382,7 @@ nart_to_atomic(L,L).
 
 is_asserted_mpred(G):-var(G),!,trace_or_throw(var_is_asserted_mpred(G)).
 is_asserted_mpred(mpred_prop(F,P)):-!,mpred_prop(F,P).
-is_asserted_mpred(G):-fact_loop_checked(G,asserted_mpred_clause(G)).
-
-:-dynamic(was_asserted_gaf/1).
-:-dynamic_multifile_exported(was_asserted_gaf/1).
-:-swi_export(asserted_mpred_clause/1).
-asserted_mpred_clause(naf(C)):-nonvar(C),!,not(is_asserted(C)).
-asserted_mpred_clause(is_asserted(C)):-nonvar(C),!,is_asserted(C).
-asserted_mpred_clause(C):-fact_always_true(C),!.
-asserted_mpred_clause(C):- (functor(C,dbase_t,_);functor(C,holds_t,_)),!,trace_or_throw(use_code(is_asserted(C))).
-asserted_mpred_clause(C):-was_asserted_gaf(C).
-asserted_mpred_clause(C):-clause_stored(C).
-asserted_mpred_clause(C):-functor(C,_,A),A>1,dbase_t(C).
-asserted_mpred_clause(H):-not(ground(H)),predicate_property(H,number_of_clauses(_)),clause(H,true).
-% asserted_mpred_clause(C):- asserted_mpred_clause_hardwork(C).
-
-asserted_mpred_clause_hardwork(C):-
-   clause_asserted(C,call_mpred_body(C,Call)),   
-                    must_det(ground(Call)), 
-                    call_mpred_body(C,Call).
-asserted_mpred_clause_hardwork(C):- has_free_args(C),!,fail.
-asserted_mpred_clause_hardwork(C):- deduce_facts(Body, C),req(Body),must_det(ground(Body)),!.
+is_asserted_mpred(G):-fact_loop_checked(G,(dbase_t(G);fact_always_true(G))).
 
 % ============================================
 % Prolog is_asserted_clause/2

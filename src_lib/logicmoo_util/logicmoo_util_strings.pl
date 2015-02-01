@@ -80,11 +80,11 @@ logicmoo_util_strings:-module(logicmoo_util_strings,[
 % :-import(bugger:must/1).
 
 string_to_atom_safe(ISO,LISTO):-LISTO==[],!,string_to_atom(ISO,'').
-string_to_atom_safe(ISO,LISTO):-string_to_atom(ISO,LISTO).
+string_to_atom_safe(ISO,LISTO):- string_to_atom(ISO,LISTO).
 
 /*
 string_chars(S,C):-atom_chars(S,C).
-text_to_string(T,S):-string_to_atom(S,T).
+text_to_string(T,S):- string_to_atom(S,T).
 string_upper(M,U):-toUppercase(M,U).
 string_lower(M,U):-toLowercase(M,U).
 */
@@ -163,7 +163,7 @@ atomic_list_concat_safe([V],_Sep,V):-!.
 
 
 
-% convert any term to 'atom' string
+% convert any ftTerm to 'atom' string
 convert_to_string(I,ISO):-
                 term_to_string(I,IS),!,
 		string_to_list(IS,LIST),!,
@@ -189,13 +189,13 @@ term_to_string(I,IS):- grtrace(term_to_atom(I,A)),string_to_atom(IS,A),!.
 :- use_module(library(http/http_ssl_plugin)).
 
 file_to_stream_ssl_verify(_SSL, _ProblemCert, _AllCerts, _FirstCert, _Error) :- !.
-:-export(text_to_stream/2).
+:- export(text_to_stream/2).
 text_to_stream(Text,Stream):-text_to_string(Text,String),string_codes(String,Codes),open_codes_stream(Codes,Stream).
-:-export(file_to_stream/2).
+:- export(file_to_stream/2).
 file_to_stream((StreamIn),Stream):-is_stream(StreamIn),!,copy_stream(StreamIn,Stream).
 file_to_stream(stream(StreamIn),Stream):-copy_stream(StreamIn,Stream).
 file_to_stream('$socket'(Sock),Stream):-tcp_open_socket('$socket'(Sock),StreamIn),copy_stream(StreamIn,Stream).
-file_to_stream(term(Text),Stream):-term_to_string(Text,String),string_codes(String,Codes),open_codes_stream(Codes,Stream).
+file_to_stream(ftTerm(Text),Stream):-term_to_string(Text,String),string_codes(String,Codes),open_codes_stream(Codes,Stream).
 file_to_stream(text(Text),Stream):-text_to_stream(Text,Stream).
 file_to_stream(codes(Text),Stream):-text_to_stream(Text,Stream).
 file_to_stream(chars(Text),Stream):-text_to_stream(Text,Stream).
@@ -219,10 +219,10 @@ file_to_stream(Spec,Stream):-file_to_stream(match(Spec),Stream).
 user:package_path(Pkg,PkgPath):-expand_file_search_path(pack(Pkg),PkgPathN),exists_directory(PkgPathN),normalize_path(PkgPathN,PkgPath).
 user:package_path(Pkg,PkgPath):-atom(Pkg),T=..[Pkg,'.'],expand_file_search_path(T,PkgPathN),exists_directory(PkgPathN),normalize_path(PkgPathN,PkgPath).
 
-:-export(copy_stream/2).
+:- export(copy_stream/2).
 copy_stream(HTTP_Stream,Stream):-read_stream_to_codes(HTTP_Stream,Codes),catch(close(HTTP_Stream),_,true),open_codes_stream(Codes,Stream).
 
-:-export(atomic_concat/3).
+:- export(atomic_concat/3).
 atomic_concat(A,B,C,Out):-atomic_list_concat_safe([A,B,C],Out).
 
 % :-atomic_list_concat_safe([A,'/',C],'','foo/bar/baz').
@@ -237,7 +237,7 @@ noCaseChange(MiXed,MiXed):-atom(MiXed),atom_concat('#$',_,MiXed),!.
 noCaseChange(c(VAR),c(VAR)):-!.
 
 toUppercase(MiXed,MiXed):-noCaseChange(MiXed),!.
-toUppercase(V,V2):-string(V),!,atom_codes(V,VC),toUppercase(VC,CVC),string_to_atom(V2,CVC),!.
+toUppercase(V,V2):- string(V),!,atom_codes(V,VC),toUppercase(VC,CVC),string_to_atom(V2,CVC),!.
 toUppercase(95,45):-!.
 toUppercase(I,O):-integer(I),!,to_upper(I,O).
 toUppercase([A|L],[AO|LO]):-
@@ -252,7 +252,7 @@ toUppercase(MiXed,CASED):-compound(MiXed),MiXed=..MList,toUppercase(MList,UList)
 toUppercase(A,A).
 
 toLowercase(MiXed,MiXed):-noCaseChange(MiXed),!.
-toLowercase(V,V2):-string(V),!,atom_codes(V,VC),toLowercase(VC,CVC),string_to_atom(V2,CVC),!.
+toLowercase(V,V2):- string(V),!,atom_codes(V,VC),toLowercase(VC,CVC),string_to_atom(V2,CVC),!.
 toLowercase(95,45):-!.
 toLowercase(I,O):-integer(I),!,to_lower(I,O).
 toLowercase([A|L],[AO|LO]):-
@@ -303,15 +303,15 @@ unCamelCase(S,String):-sub_string(S,0,1,_,Char),sub_string(S,1,_,0,Rest),unCamel
 % ===========================================================
 % CHECK CASE
 % ===========================================================
-:-export(capitalized/1).
+:- export(capitalized/1).
 
-capitalized(Type):-string_codes(Type,[S|_]),char_type(S,upper),must(char_type(S,alpha)).
+capitalized(Type):- string_codes(Type,[S|_]),char_type(S,upper),must(char_type(S,alpha)).
 
 % ===========================================================
 % BREAKING ON CASE CHANGE
 % ===========================================================
-:-export(to_case_breaks/2).
-to_case_breaks(Text,New):-string_codes(Text,[C|Codes]), char_type_this(C,WillBe),!,to_case_breaks(Codes,WillBe,[C],WillBe,New).
+:- export(to_case_breaks/2).
+to_case_breaks(Text,New):- string_codes(Text,[C|Codes]), char_type_this(C,WillBe),!,to_case_breaks(Codes,WillBe,[C],WillBe,New).
 
 char_type_this(C,Lower):-ctype_switcher(Lower),char_type(C,Lower),!.
 
@@ -341,11 +341,11 @@ to_case_breaks(C___Codes,WillBe,SoFar,Upper,OUT):- is_list(OUT),OUT=[t(Left,Will
 to_case_breaks([C|Codes],WillBe,SoFar,Upper,OUT):- ctype_switch(Upper,Digit), char_type(C,Digit),!, breaked_codes(Left,SoFar), to_case_breaks(Codes,Digit,[C],Digit,New),!,(hide_char_type(WillBe)->OUT=New;OUT=[t(Left,WillBe)|New]).
 to_case_breaks([C|Codes],WillBe,SoFar,Upper,New):- append(SoFar,[C],SoFarC),to_case_breaks(Codes,WillBe,SoFarC,Upper,New).
 
-:-export(to_first_break/2).
+:- export(to_first_break/2).
 to_first_break(Text,Left):-to_first_break(Text,_LeftType,Left,_Right,_NextType).
-:-export(to_first_break/5).
-to_first_break(Text,LType,Left,Right,RType):-string_codes(Text,[C|Codes]), char_type_this(C,LType),!,to_first_break_w(Codes,[C],LType,Left,Right,RType).
-to_first_break(Text,LType,Left,Right,RType):-string_codes(Text,[C|Codes]), !,to_first_break_w(Codes,[C],LType,Left,Right,RType).
+:- export(to_first_break/5).
+to_first_break(Text,LType,Left,Right,RType):- string_codes(Text,[C|Codes]), char_type_this(C,LType),!,to_first_break_w(Codes,[C],LType,Left,Right,RType).
+to_first_break(Text,LType,Left,Right,RType):- string_codes(Text,[C|Codes]), !,to_first_break_w(Codes,[C],LType,Left,Right,RType).
 
 to_first_break_w([],       []   ,empty,'',[],empty):-!.
 to_first_break_w([],       SoFar,_Some,Left,[],empty):-breaked_codes(Left,SoFar),!.
@@ -378,7 +378,7 @@ is_string(X):-atom(X),!,atom_length(X,L),L>1,atom_concat('"',_,X),atom_concat(_,
 is_string(X):-var(X),!,fail.
 is_string(string(_)):-!.
 is_string("").
-is_string(X):-string(X),!.
+is_string(X):- string(X),!.
 is_string(L):-is_charlist(L),!.
 is_string(L):-is_codelist(L),!.
 
@@ -420,13 +420,13 @@ stringToList(X,Y):-var(X),!,string_to_list(X,Y).
 stringToList([],[]).
 stringToList("",[]).
 stringToList(X,Y):-atom(X),atom_codes(X,Codes),!,stringToList(Codes,Y),!.
-stringToList(X,Y):-string(X),string_to_atom(X,M),!,stringToList(M,Y).
-stringToList(X,Y):-string(X),!,string_to_list(X,Y).
+stringToList(X,Y):- string(X),string_to_atom(X,M),!,stringToList(M,Y).
+stringToList(X,Y):- string(X),!,string_to_list(X,Y).
 stringToList(X,Y):-is_string(X),!,string_to_list(X,Y).
 stringToList([X|XX],Y):-concat_atom_safe([X|XX],' ',XXX),!,string_to_list(XXX,Y).
 %prologPredToCyc(Predicate):-arity(PredicateHead)
 
-stringToCodelist(S,CL):-stringToCodelist2(S,SL),!,escapeString(SL,CS),!,stringToList(CL,CS),!.
+stringToCodelist(S,CL):- stringToCodelist2(S,SL),!,escapeString(SL,CS),!,stringToList(CL,CS),!.
 
 stringToCodelist2(string(S),Codes):-!,stringToCodelist2(S,Codes).
 stringToCodelist2([],[]):-!.
@@ -434,7 +434,7 @@ stringToCodelist2([[]],[]):-!.
 stringToCodelist2([''],[]):-!.
 stringToCodelist2([X|T],[X|T]):-is_codelist([X|T]),!.
 stringToCodelist2([X|T],Codes):-atom(X),is_charlist([X|T]),!,stringToList([X|T],Codes),!.
-stringToCodelist2(String,Codes):-string(String),!,string_to_atom(String,Atom),atom_codes(Atom,Codes),!.
+stringToCodelist2(String,Codes):- string(String),!,string_to_atom(String,Atom),atom_codes(Atom,Codes),!.
 stringToCodelist2(Atom,Codes):-atom(Atom),atom_codes(Atom,Codes),!.
 stringToCodelist2(A,Codes):- to_string_hook(A,_,L),atom_codes(L,Codes),!.
 stringToCodelist2(Term,Codes):-sformat(Codes,'~q',[Term]),true.
@@ -472,7 +472,7 @@ ltrim(X,X).
 
 any_to_string(Atom,String):- must_det(any_to_string0(Atom,StringS)),StringS=String.
 
-any_to_string0(Atom,String):-string(Atom),!,Atom=String.
+any_to_string0(Atom,String):- string(Atom),!,Atom=String.
 any_to_string0(Atom,String):-var(Atom),!,term_string(Atom,String).
 any_to_string0(fmt(Fmt,Args),String):-!,sformat(String,Fmt,Args).
 any_to_string0(txtFormatFn(Fmt,Args),String):-!,sformat(String,Fmt,Args).
@@ -490,14 +490,14 @@ list_to_atomics_list0([E|EnglishF],[A|EnglishA]):-
    list_to_atomics_list0(EnglishF,EnglishA),!.
 list_to_atomics_list0([],[]):-!.
 
-:-export(atomic_list_concat_catch/3).
+:- export(atomic_list_concat_catch/3).
 atomic_list_concat_catch(List,Sep,Atom):-catchv(atomic_list_concat_safe(List,Sep,Atom),E,(dumpST,dmsg(E:atomic_list_concat_safe(List,Sep,Atom)),!,fail)).
 
 
 catch_read_term_from_atom(Sub,Term,NewOnes):-
   catchv(read_term_from_atom(Sub,Term,[module(user),variable_names(NewOnes)]),_,fail),Term\==end_of_file.
 
-:-export(splt_words/3).
+:- export(splt_words/3).
 splt_words(Atom,Terms,Var):- catchv((hotrace(once(splt_words_0(Atom,Terms,Var)))),_,fail),!.
 splt_words(Atom,Words1,[]):- catchv(atomic_list_concat_safe(Words1,' ',Atom),_,fail),!.
 
@@ -537,7 +537,7 @@ atomSplit(In,List):- hotrace(( ground(In),
 
 atomSplit(Atom,WordsO):-atomSplitEasy(Atom,WordsO),!.
 
-:-export(atomSplitEasy/2).
+:- export(atomSplitEasy/2).
 atomSplitEasy(Atom,WordsO):- 
    hotrace((atomSplit(Atom,WordsO,[' ','\t','\n','\v','\f','\r',' ','!','"','#','$','%','&','\'',
     '(',')','*','+',',','-','.','/',':',';','<',
@@ -590,16 +590,16 @@ both_empty(A,B):-empty_string(A),!,empty_string(B),nop(dmsg(both_empty(A,B))).
 either_empty(A,B):- (empty_string(B);empty_string(A)),!,nop(dmsg(either_empty(A,B))).
 
 equals_icase(A,B):-either_empty(A,B),!,fail.
-equals_icase(A,B):-string_ci(A,U),string_ci(B,U).
+equals_icase(A,B):- string_ci(A,U),string_ci(B,U).
 starts_with_icase(A,B):-either_empty(A,B),!,fail.
-starts_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),non_empty(UB),atom_concat(UB,_,UA).
+starts_with_icase(A,B):- string_ci(A,UA),string_ci(B,UB),non_empty(UB),atom_concat(UB,_,UA).
 starts_with_icase(A,B):-both_empty(A,B),dmsg(warn(equals_icase(A,B))).
 either_starts_with_icase(A,B):-either_empty(A,B),!,fail.
-either_starts_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),non_empty(UA),non_empty(UB),(atom_concat(UB,_,UA);atom_concat(UA,_,UB)).
+either_starts_with_icase(A,B):- string_ci(A,UA),string_ci(B,UB),non_empty(UA),non_empty(UB),(atom_concat(UB,_,UA);atom_concat(UA,_,UB)).
 starts_or_ends_with_icase(A,B):-either_empty(A,B),!,fail.
-starts_or_ends_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),non_empty(UA),non_empty(UB),(atom_concat(UB,_,UA);atom_concat(_,UA,UB)).
+starts_or_ends_with_icase(A,B):- string_ci(A,UA),string_ci(B,UB),non_empty(UA),non_empty(UB),(atom_concat(UB,_,UA);atom_concat(_,UA,UB)).
 ends_with_icase(A,B):-either_empty(A,B),!,fail.
-ends_with_icase(A,B):-string_ci(A,UA),string_ci(B,UB),non_empty(UB),atom_concat(_,UB,UA).
+ends_with_icase(A,B):- string_ci(A,UA),string_ci(B,UB),non_empty(UB),atom_concat(_,UB,UA).
 
 string_dedupe(StringI,StringO):- to_word_list(StringI,Words),remove_predupes(Words,StringO).
 
@@ -613,10 +613,10 @@ member_ci(W,WL):-to_word_list(WL,ListI),member(LL2,ListI),string_equal_ci(LL2,W)
 string_ci(A,LIC):-hotrace((must(nonvar(A)),non_empty(A),any_to_string(A,S),!,text_to_string(S,SS),string_lower(SS,SL),atomics_to_string(SLIC,"_",SL),
    atomics_to_string(SLIC," ",LIC))),!.
 
-:-export(append_ci/3).
+:- export(append_ci/3).
 append_ci(A1,A2,A3):-to_word_list(A1,L1),to_word_list(A2,L2),to_word_list(A3,L3),!, append_ci0(L1,L2,L3),!.
 
-append_ci0([],L1,L2):-string_equal_ci(L1,L2),!.
+append_ci0([],L1,L2):- string_equal_ci(L1,L2),!.
 append_ci0(L,L2,R):-divide_list(L,H1,L1),divide_list(R,H2,L3),string_equal_ci(H1,H2),!,append_ci0(L1,L2,L3).
 
 divide_list(L,L0,LT):-is_list(L),!,length(L,X),X1 is X-1,between(1,X1,RS),length(LT,RS),append(L0,LT,L).
@@ -626,7 +626,7 @@ string_equal_ci(L0,L1):- to_word_list(L0,WL0),to_word_list(L1,WL1),!,string_equa
 
 string_equal_ci0([],_):-!,fail.
 string_equal_ci0(_,[]):-!,fail.
-string_equal_ci0(L0,R0):-string_equal_ci1(L0,R0),!.
+string_equal_ci0(L0,R0):- string_equal_ci1(L0,R0),!.
 string_equal_ci0(L,R):-divide_list(L,L0,LT),divide_list(R,R0,RT),string_equal_ci1(L0,R0),!,string_equal_ci0(LT,RT).
 
 string_equal_ci1(A0,A0):-!.
@@ -644,7 +644,7 @@ as_nc_str(A0,ASL):-any_to_string(A0,AS),string_lower(AS,ASL).
 % as_nc_str(A0,A0).
 
 ommitable(O):-empty_string(O).
-ommitable(O):-string_to_atom(O,A),atom_length(A,L),!,L<2.
+ommitable(O):- string_to_atom(O,A),atom_length(A,L),!,L<2.
 
 atom_subst(A,F,R,K):-replace_in_string(F,R,A,K),!.
 
@@ -714,7 +714,7 @@ to_word_list_0([A],[A]):-number(A),!.
 to_word_list_0([],[]):-!.
 to_word_list_0("",[]):-!.
 to_word_list_0('',[]):-!.
-%to_word_list_0(A,WList):-string(A),Final=" (period) ",replace_periods(A,Final,S),not(A=S),!,to_word_list_0(S,WList).
+%to_word_list_0(A,WList):- string(A),Final=" (period) ",replace_periods(A,Final,S),not(A=S),!,to_word_list_0(S,WList).
 to_word_list_0([A,B|C],[A,B|C]):-atomic(A),atomic(B),!.
 % to_word_list_0(A,WL):-not(string(A)),!,text_to_string(A,S),to_word_list_1(S,WL),!.
 to_word_list_0(A,S):-any_to_string(A,AS),to_word_list_1(AS,S),!.

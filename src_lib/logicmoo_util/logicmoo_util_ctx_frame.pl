@@ -22,7 +22,7 @@
 
 % well i played with a couple few differnt environment impls.. they have their pros cons.. one impl.. 
 % that was unique is that an array of "binding pairs" live in an arraylist.. to be "in" an environment 
-% it meant that you held an "index" into the arry list that as you went backwards you'd find your bindings.. each symbol had a java int field "lastBindingIndex" 
+% it meant that you held an "index" into the arry list that as you went backwards you'd find your bindings.. each symbol had a java ftInt field "lastBindingIndex" 
 % .. that was a "hint" to where you could fastforward the backwards search .. end named binding context also had a "index" to when you leave a named block.. 
 % you could quickly reset the top of an index.
 

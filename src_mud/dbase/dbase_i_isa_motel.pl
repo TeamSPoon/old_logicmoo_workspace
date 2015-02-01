@@ -1,8 +1,10 @@
+
+end_of_file.
 %:-module(mootel,[]).
 
 
 /** <module> 
-% Still working on (andM testing) but will provide the type inference for Logicmoo Later
+% Still working on (and testing) but will provide the type inference for Logicmoo Later
 %
 % Logicmoo Project PrologMUD: A MUD server written in Prolog
 % Maintainer: Douglas Miles
@@ -13,51 +15,51 @@
 /*
 
 nt: notice(explorer(player1),do(explorer(player1),prolog)). 
- 1 ?- translate(implies(andM(mudIsa(X,C),genls(C,SC)),mudIsa(X,SC)),X).
+ 1 ?- tranlate_M(impliesM(andM(mudIsa(X,C),genls(C,SC)),mudIsa(X,SC)),X).
 X = [cl([mudIsa(X, SC)], [andM(mudIsa(X, C), genls(C, SC))])].
 
 
-- translate(exists(Z,implies(andM([mudIsa(X,C),genls(C,SC)]),mudIsa(X,SC),knows(X,Z))),F).
-F = [cl([implies(andM([mudIsa(X, C), genls(C, SC)]), mudIsa(X, SC), knows(X, f1))], [])].
+- tranlate_M(existsM(Z,impliesM(andM([mudIsa(X,C),genls(C,SC)]),mudIsa(X,SC),knows(X,Z))),F).
+F = [cl([impliesM(andM([mudIsa(X, C), genls(C, SC)]), mudIsa(X, SC), knows(X, f1))], [])].
 
-4 ?- translate(exists(Z,implies(andM([mudIsa(X,C),genls(C,SC)]),andM([mudIsa(X,SC),knows(X,Z)]))),F).
+4 ?- tranlate_M(existsM(Z,impliesM(andM([mudIsa(X,C),genls(C,SC)]),andM([mudIsa(X,SC),knows(X,Z)]))),F).
 F = [cl([mudIsa(X, SC)], [mudIsa(X, C), genls(C, SC)]), cl([knows(X, f2)], [mudIsa(X, C), genls(C, SC)])].
 
-5 ?- translate(exists(Z,implies(andM([mudIsa(X,C),allHasPred(C,Pred)]),holds(Pred,X,Z))),F).
+5 ?- tranlate_M(existsM(Z,impliesM(andM([mudIsa(X,C),allHasPred(C,Pred)]),holds(Pred,X,Z))),F).
 F = [cl([holds(Pred, X, f3)], [mudIsa(X, C), allHasPred(C, Pred)])].
 
 6 ?- 
 
 
 
-c2p(implies(andM([disjoint(C, E), domain(A, B, C), domain(D, B, E)]), disjointRelation(A, D)),X,Y).
+c2p(impliesM(andM([disjoint(C, E), domain(A, B, C), domain(D, B, E)]), disjointRelation(A, D)),X,Y).
 
-c2p(implies(andM([  subrelation(R1, R2), holds(R1, A, B)]), holds(R1, A, B)),X,Y).
+c2p(impliesM(andM([  subrelation(R1, R2), holds(R1, A, B)]), holds(R1, A, B)),X,Y).
 
-c2p(implies(andM([  negInverse(R1, R2), -(holds(R1, A, B))]), holds(R1, B, A)),X,Y).
+c2p(impliesM(andM([  negInverse(R1, R2), -(holds(R1, A, B))]), holds(R1, B, A)),X,Y).
 
-c2p(implies(andM([ subrelation(A, B), domain(A, C, E), domain(B, C, D)  ]), subclass(E, D)),X,Y).
+c2p(impliesM(andM([ subrelation(A, B), domain(A, C, E), domain(B, C, D)  ]), subclass(E, D)),X,Y).
 
-c2p(implies(andM([predSplit(R1,R2,R3), orM([  holds(R1, A, B), holds(R2, A, B) ])]), holds(R3, A, B) ),X,Y).
-
-
-c2p(implies(andM([predSplit(R1,R2,R3), -(holds(R1, A, B)), holds(R3, A, B)]), holds(R2, A, B)) ,X,Y).
+c2p(impliesM(andM([predSplit(R1,R2,R3), orM([  holds(R1, A, B), holds(R2, A, B) ])]), holds(R3, A, B) ),X,Y).
 
 
-c2p(implies(andM([predSplit(R1,R2,R3), holds(R1, A, B)]), -(holds(R2, A, B))) ,X,Y).
+c2p(impliesM(andM([predSplit(R1,R2,R3), -(holds(R1, A, B)), holds(R3, A, B)]), holds(R2, A, B)) ,X,Y).
+
+
+c2p(impliesM(andM([predSplit(R1,R2,R3), holds(R1, A, B)]), -(holds(R2, A, B))) ,X,Y).
 X = [cl([], [predSplit(R1, R2, R3), holds(R1, A, B), holds(R2, A, B)])],
 Y = [ (true:-predSplit(R1, R2, R3), holds(R1, A, B), holds(R2, A, B))] .
 
 
 
-c2p(implies(predSplit(R1,R2,R3) , subrelation(R1,R3)),X,Y).
+c2p(impliesM(predSplit(R1,R2,R3) , subrelation(R1,R3)),X,Y).
 
-c2p(implies(predSplit(R1,R2,R3) , subrelation(R2,R3)),X,Y).
+c2p(impliesM(predSplit(R1,R2,R3) , subrelation(R2,R3)),X,Y).
 
 
 */
 
-c2p(CNF,CLF,HP) :- translate(CNF,CLF), clausesToNHProlog(CLF,HP).
+c2p(CNF,CLF,HP) :- tranlate_M(CNF,CLF), clausesToNHProlog(CLF,HP).
 
 /**********************************************************************
  *
@@ -69,26 +71,26 @@ c2p(CNF,CLF,HP) :- translate(CNF,CLF), clausesToNHProlog(CLF,HP).
 
 % !! Remember: Any changes to the following list should be carefully
 %              reflected in     clearEnvironment
-%                       andM     saveEnvironment.
+%                       and     saveEnvironment.
 
 % The following predicates belong to the translated terminologial 
 % axioms.
 
- :- meta_predicate printTime(0).
- :- meta_predicate callList(0).
- :- meta_predicate ifOption(*,*,0).
- :- meta_predicate try(0).
- :- meta_predicate bagofOrNil(?,^,-).
- :- meta_predicate doboth(0,0).
-    :- meta_predicate tryGoal(0).
-    :- meta_predicate tryGoalF(0).
- :- meta_predicate doClashTest(0).
- :- meta_predicate printTime(0,*).
- :- meta_predicate doFileGoal(0).
- :- meta_predicate unexpand_role(*,*,0,*).
- :- meta_predicate setofOrNil(?,^,-).
- :- meta_predicate performQuery(*,0,0).
- :- meta_predicate mapGoal(0,*,*).
+:- meta_predicate printTime(0).
+:- meta_predicate callList(0).
+:- meta_predicate ifOption(*,*,0).
+:- meta_predicate try(0).
+:- meta_predicate bagofOrNil(?,^,-).
+:- meta_predicate doboth(0,0).
+:- meta_predicate tryGoal(0).
+:- meta_predicate tryGoalF(0).
+:- meta_predicate doClashTest(0).
+:- meta_predicate printTime(0,*).
+:- meta_predicate doFileGoal(0).
+:- meta_predicate unexpand_role(*,*,0,*).
+:- meta_predicate setofOrNil(?,^,-).
+:- meta_predicate performQuery(*,0,0).
+:- meta_predicate mapGoal(0,*,*).
 
   callStub(P,F,A):-trace, predicate_property(P,number_of_clauses(N)),(N==1 -> (trace,fail); (functor(PP,F,A),trace,retractall((PP:-callStub(PP,F,A))),fail)).
 
@@ -110,9 +112,9 @@ c2p(CNF,CLF,HP) :- translate(CNF,CLF), clausesToNHProlog(CLF,HP).
            cont1a/5, 
            convertInConsequence/10, 
            default_change/3, 
-           eq/19, 
+           eq_M/19, 
            noDouble/2, 
-           nsub/5, 
+           nsub_M/5, 
            prolog_flag/3, 
            retractall_all/1, 
            roleAll/9,
@@ -120,21 +122,29 @@ c2p(CNF,CLF,HP) :- translate(CNF,CLF), clausesToNHProlog(CLF,HP).
            roleSubsets/5, 
            roleTripel/6,          
            sb_assert_Attributes/5, 
-           sub/5,
-           succ/5
+           sub_M/5,
+           succ_M/5
            ]),createStub(F/A)).
 
 motel_mpred(FA):-dynamic(FA),multifile(FA).
 
-:- motel_mpred(in/9).
-:- motel_mpred(kb_in/10).
-:- motel_mpred(eq/9).
-:- motel_mpred(constraint/8).
-:- motel_mpred(rel/5).
+isFORT(Atom):-atom(Atom).
+isFORTIC(isTDisjoint(_)):-!,fail.
+isFORTIC(C):-compound(C),C=..[F|ARGS],isNART(F,ARGS).
+isFORTIC(Atom):-atomic(Atom).
+
+isNART(F,_):-atom_concat(_,'Fn',F).
+isNART(F,_):-atom_concat('ft',_,F).
+
+:- motel_mpred(in_M/9).
+:- motel_mpred(kb_in_M/10).
+:- motel_mpred(eq_M/9).
+:- motel_mpred(constraint_M/8).
+:- motel_mpred(rel_M/5).
 % The following predicates are used for additional informations about
-% the terminology andM the world description.
+% the terminology and the world description.
 :- motel_mpred(axiom/3).
-:- motel_mpred(closed/5).
+:- motel_mpred(closed_M/5).
 :- motel_mpred(compiledPredicate/2).
 :- motel_mpred(conceptElement/7).
 :- motel_mpred(conceptEqualSets/6).
@@ -156,19 +166,19 @@ motel_mpred(FA):-dynamic(FA),multifile(FA).
 :- motel_mpred(roleNr/5).
 :- motel_mpred(roleRange/4).
 :- motel_mpred(roleSubsets/6).
-:- motel_mpred(sub/4).
-:- motel_mpred(succ/4).
+:- motel_mpred(sub_M/4).
+:- motel_mpred(succ_M/4).
 % The following predicates are used during computations only.
 :- motel_mpred(abductiveDerivation/3).
 :- motel_mpred(consistencyDerivation/3).
-:- motel_mpred(hypothesis/1).
+:- motel_mpred(hypothesis_M/1).
 :- motel_mpred(inconsistencyCheck/3).
 :- motel_mpred(option_M/2).
-:- motel_mpred(nsub/4).
+:- motel_mpred(nsub_M/4).
 :- motel_mpred(nsub3/2).
 :- motel_mpred(sub3/2).
 :- motel_mpred(succ3/2).
-:- motel_mpred(value/2).
+:- motel_mpred(value_M/2).
 % Predicates which are no longer needed
 %:- motel_mpred(falsum/2).
 %:- motel_mpred(numb/1).
@@ -180,8 +190,8 @@ motel_mpred(FA):-dynamic(FA),multifile(FA).
  */
 
 %   member(?Element, ?Set)
-%   is true when Set is a list, andM Element occurs in it.  It may be used
-%   to test for an element orM to enumerate allM the elements by backtracking.
+%   is true when Set is a list, and Element occurs in it.  It may be used
+%   to test for an element or to enumerate all the elements by backtracking.
 %   Indeed, it may be used to generate the Set!
 
 /*member(X, [X|_]    ).
@@ -222,7 +232,7 @@ memberchk1(X, [_,_,_|L]) :-
 %   Set; there are infinitely many sets not containing a given Element.
 %   Read it as "the given Element does not occur in the given list Set".
 %   This code was suggested by Bruce Hakami; seven versions of this
-%   operation were benchmarked andM this found to be the fastest.
+%   operation were benchmarked and this found to be the fastest.
 %   The old code was for DEC-10 Prolog, which did not compile (\+)/1.
 
 nonmember(Element, Set) :-
@@ -231,15 +241,15 @@ nonmember(Element, Set) :-
 	not(member(Element, Set)).
 
 %   intersection_m(+Set1, +Set2, ?Intersection)
-%   is true when allM three arguments are lists representing sets,
-%   andM Intersection contains every element of Set1 which is also
+%   is true when all three arguments are lists representing sets,
+%   and Intersection contains every element of Set1 which is also
 %   an element of Set2, the order of elements in Intersection
 %   being the same as in Set1.  That is, Intersection represents
-%   the intersection_m of the sets represented by Set1 andM Set2.
+%   the intersection of the sets represented by Set1 and Set2.
 %   If Set2 is a partial list, Intersection will be empty, which
 %   is not, of course, correct.  If Set1 is a partial list, this
-%   predicate will run away on backtracking.  Set1 andM Set2 should
-%   both be proper lists, but this is not checked.  Duplicates in
+%   predicate will run away on backtracking.  Set1 and Set2 should
+%   both be proper lists, but this is not checked.  Duplicates in_M
 %   Set1 may survive in Intersection.  It is worthy of note that
 %   if Set1 is an ordset, Intersection is an ordset, despite Set2.
 
@@ -255,9 +265,9 @@ intersection_m([_|Elements], Set, Intersection) :-
 
 
 %   intersection_m(+ListOfSets, ?Intersection)
-%   is true when Intersection is the intersection_m of allM the sets in
+%   is true when Intersection is the intersection of all the sets in
 %   ListOfSets.  The order of elements in Intersection is taken from
-%   the first setM in ListOfSets.  This has been turned inside out to
+%   the first set in ListOfSets.  This has been turned inside out to
 %   minimise the storage turnover.
 
 intersection_m([Set|Sets], Intersection) :-
@@ -291,9 +301,9 @@ subtract_m([Element|Elements], Set, [Element|Difference]) :-
 	subtract_m(Elements, Set, Difference).
 
 %   union_m(+Set1, +Set2, ?Union)
-%   is true when subtract_m(Set1,Set2,Diff) andM append(Diff,Set2,Union),
-%   that is, when Union is the elements of Set1 that do not occur in
-%   Set2, followed by allM the elements of Set2.
+%   is true when subtract_m(Set1,Set2,Diff) and append(Diff,Set2,Union),
+%   that is, when Union is the elements of Set1 that do not occur in_M
+%   Set2, followed by all the elements of Set2.
 
 union_m([], Union, Union).
 union_m([Element|Elements], Set, Union) :-
@@ -304,7 +314,7 @@ union_m([Element|Elements], Set, [Element|Union]) :-
 	union_m(Elements, Set, Union).
 
 %   union_m(+ListOfSets, ?Union)
-%   is true when Union is the union_m of allM sets in ListOfSets.
+%   is true when Union is the union of all sets in ListOfSets.
 
 union_m([],[]).
 union_m([Set1],Set1).
@@ -314,7 +324,7 @@ union_m([Set1,Set2|Sets],Union) :-
 
 
 %   list_to_set_m(+List, ?Set)
-%   is true when List andM Set are lists, andM Set has the same elements
+%   is true when List and Set are lists, and Set has the same elements
 %   as List in the same order, except that it contains no duplicates.
 %   The two are thus equal considered as sets.  If you really want to
 %   convert a list to a setM, list_to_ord_set is faster, but this way
@@ -334,10 +344,10 @@ list_to_set_m([Head|Tail], [Head|Set]) :-
 
 
 %   deleteInList(+List, +Kill, ?Residue)
-%   is true when List is a list, in which Kill may orM may not occur, and
-%   Residue is a copy of List with allM elements equal to Kill deleted.
+%   is true when List is a list, in which Kill may or may not occur, and
+%   Residue is a copy of List with all elements equal to Kill deleted.
 %   To extract a single copy of Kill, use select(Kill, List, Residue).
-%   If List is not proper, deleteInList/3 will FAIL.  Kill andM the elements of
+%   If List is not proper, deleteInList/3 will FAIL.  Kill and the elements of
 %   List should be sufficiently instantiated for \= to be sound.
 
 deleteInList(-, _, _) :- !, fail.		% reject partial lists
@@ -362,16 +372,16 @@ equalset(S1,S2) :-
 
 %----------------------------------------------------------------------	
 %   Module : lists
-%   Authors: Bob Welham, Lawrence Byrd, andM Richard A. O'Keefe
+%   Authors: Bob Welham, Lawrence Byrd, and Richard A. O'Keefe
 %   Updated: 10/25/90
 %   Defines: list processing utilities
 %   SeeAlso: library(fatten_m)
 
-%   Adapted from shared code written by the same authors; allM changes
+%   Adapted from shared code written by the same authors; all changes
 %   Copyright (C) 1987, Quintus Computer Systems, Inc.  All rights reserved.
 
 %   perm(+List, ?Perm)
-%   is true when List andM Perm are permutations of each other.  The main
+%   is true when List and Perm are permutations of each other.  The main
 %   use of perm/2 is to generate permutations.  You should not use this
 %   predicate in new programs; use permutation_m/2 instead.  List must be
 %   a proper list.  Perm may be partly instantiated.
@@ -387,12 +397,12 @@ insert_m([H|T], X, [H|L]) :-
 	insert_m(T, X, L).
 
 %   permutation_m(?List, ?Perm)
-%   is true when List andM Perm are permuations of each other.
+%   is true when List and Perm are permuations of each other.
 %   Unlike perm/2, it will work even when List is isTDisjoint a proper list.
 %   It even acts in a marginally sensible way when Perm isn't proper
 %   either, but it will still backtrack forever.
 %   Be careful: this is quite efficient, but the number of permutations of an
-%   N-element list is N!, andM even for a 7-element list that is 5040.
+%   N-element list is N!, and even for a 7-element list that is 5040.
 
 permutation_m(List, Perm) :-
 	permutation_m(List, Perm, Perm).
@@ -434,36 +444,36 @@ permutation_m([X|Xs], Ys1, [_|Zs]) :-
 /**********************************************************************
  *
  * setCounter(+Counter,+Value)
- * creates a new counter Counter with value Value.
+ * creates a new counter Counter with value_M Value.
  *
  */
 
 setCounter(Counter,N) :-
-        asserta(value(Counter,N)),
+        asserta(value_M(Counter,N)),
         !.
 
 /**********************************************************************
  *
  * addCounter(+Counter,+Value)
- * adds Value to the current value of counter Counter.
+ * adds Value to the current value_M of counter Counter.
  *
  */
  
 addCounter(Counter,N) :-
-        retract(value(Counter,M)),
+        retract(value_M(Counter,M)),
         Sum is N + M,
-        asserta(value(Counter,Sum)),
+        asserta(value_M(Counter,Sum)),
         !.
 
 /**********************************************************************
  *
  * getCounter(+Counter,-Value)
- * retrieves the current value Value of counter Counter.
+ * retrieves the current value_M Value of counter Counter.
  *
  */
 
 getCounter(Counter,N) :-
-        value(Counter,N),
+        value_M(Counter,N),
         !.
 
 /**********************************************************************
@@ -479,8 +489,8 @@ writes([H|T]) :- put(H), writes(T).
 /***********************************************************************
  *
  * printTime(+G)
- * execute goal G andM report the runtime the execution needed.
- * Only available for SICStus Prolog andM Quintus Prolog.
+ * execute goal G and report the runtime the execution needed.
+ * Only available for SICStus Prolog and Quintus Prolog.
  *
  */
 
@@ -510,16 +520,16 @@ printTime(_,T0) :-
  *
  * simple_term(X) 
  * it contrast to the usage in the Quintus Prolog user manual we
- * call a term `simple` if it is either an atom orM a variable.
+ * call a term `simple` if it is either an isFORT or a variable.
  * This predicate succeeds iff X is a simple term in this sense.
  *
  */
 
 simple_term(X) :-
-	var(X),
+	is_ftVar(X),
 	!.
 simple_term(X) :-
-	atomic(X),
+	isFORTIC(X),
 	!.
 
 /**********************************************************************
@@ -530,8 +540,8 @@ simple_term(X) :-
 
 loadLibraries(sicstus) :-
 	assertz_if_new((gensym(Prefix, V) :-
-	var(V),
-	atomic(Prefix),
+	is_ftVar(V),
+	isFORTIC(Prefix),
 	(   retract(gensym_counter(Prefix, M))
 	;   M = 0
 	),
@@ -560,8 +570,8 @@ loadLibraries(sicstus) :-
 	!.
 loadLibraries(eclipse) :-
 	assertz_if_new((gensym(Prefix, V) :-
-	var(V),
-	atomic(Prefix),
+	is_ftVar(V),
+	isFORTIC(Prefix),
 	(   retract(gensym_counter(Prefix, M))
 	;   M = 0
 	),
@@ -598,9 +608,9 @@ loadLibraries(swiprolog) :-
 	statistics(cputime,RT1), RT is (ceil(RT1 * 100000)) mod 100000, statistics(atoms,CT))),
 	assertz_if_new((getRuntime(RT) :-
 	statistics(cputime,RT1), RT is ceil(RT1 * 1000))),
-	%index(kb_in(1,0,0,0,1,1,0,0,0,0)),
-	%index(eq(1,0,0,1,1,0,0,0,0)),
-	%index(constraint(1,0,0,1,0,0,0,0)),
+	%index(kb_in_M(1,0,0,0,1,1,0,0,0,0)),
+	%index(eq_M(1,0,0,1,1,0,0,0,0)),
+	%index(constraint_M(1,0,0,1,0,0,0,0)),
 	assertz_if_new((retractall1_M(Head) :- retract(Head), fail)),
 	assertz_if_new((retractall1_M(Head) :- retract((Head :- _Body)), fail)),
 	assertz_if_new((retractall1_M(_))),
@@ -608,8 +618,8 @@ loadLibraries(swiprolog) :-
 loadLibraries(poplog) :-
 	op(600,xfy,':'),
 	assertz_if_new((gensym(Prefix, V) :-
-	var(V),
-	atomic(Prefix),
+	is_ftVar(V),
+	isFORTIC(Prefix),
 	(   retract(gensym_counter(Prefix, M))
 	;   M = 0
 	),
@@ -634,8 +644,8 @@ loadLibraries(poplog) :-
 	!.
 loadLibraries(quintus) :-
 	assertz_if_new((gensym(Prefix, V) :-
-	var(V),
-	atomic(Prefix),
+	is_ftVar(V),
+	isFORTIC(Prefix),
 	(   retract(gensym_counter(Prefix, M))
 	;   M = 0
 	),
@@ -729,7 +739,7 @@ getLibraries :-
 /***********************************************************************
  *
  * setOption(+Option,+Set)
- * setM option_M Option to value Set.
+ * set option Option to value_M Set.
  *
  */
 
@@ -741,7 +751,7 @@ setOption(Option,Set) :-
 /**********************************************************************
  *
  * ifOption(+Option,+Set,+Goal)
- * executes Goal if the current value of Option is Set otherwise
+ * executes Goal if the current value_M of Option is Set otherwise
  * the predicate suceeds.
  *
  */
@@ -770,14 +780,14 @@ retractall1_M(Env,Pred/Arity) :-
 
 % This file is part of the MOTEL distribution.
 
-% MOTEL is free software; you can redistribute it andM/orM modify
+% MOTEL is free software; you can redistribute it andM/or modify
 % it under the terms of the GNU General Public License as published by
-% the Free Software Foundation; either version 1, orM (at your option_M)
+% the Free Software Foundation; either version 1, or (at your option_M)
 % any later version.
 
 % MOTEL is distributed in the hope that it will be useful,
 % but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY orM FITNESS FOR A PARTICULAR PURPOSE.  See the
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 % GNU General Public License for more details.
 /**********************************************************************
  *
@@ -786,36 +796,36 @@ retractall1_M(Env,Pred/Arity) :-
  */
 
 getAbductionHyps(L,[]) :-
-	var(L),
+	is_ftVar(L),
 	!.
 getAbductionHyps([],[]) :-
 	!.
-getAbductionHyps([in(Env,RN,modal(MS),C,X,A1,A2,A3,A4)|L1],
-	[in(Env,RN,modal(MS),C,X,A1,A2,A3,A4)|L2]) :-
+getAbductionHyps([in_M(Env,RN,modal(MS),C,X,A1,A2,A3,A4)|L1],
+	[in_M(Env,RN,modal(MS),C,X,A1,A2,A3,A4)|L2]) :-
 	!,
 	getAbductionHyps(L1,L2).
 
-doMinimalityCheck(GL1,[in(Env,RN,modal(MS),C,X,_A1,_A2,_A3,_A4)|GL2]) :-
+doMinimalityCheck(GL1,[in_M(Env,RN,modal(MS),C,X,_A1,_A2,_A3,_A4)|GL2]) :-
 	append(GL1,GL2,GL),
 	HYPS = [orM(GL),rl([]),fl(H3)],
 	constructMLCall(Env,rn(_AX3,_RN3,_S3,_O3),bodyMC(MS),headMC(MS),
 	                C,X,HYPS,[],CALLS,_PT35,Goal),
 	not(Goal),
-	doMinimalityCheck([in(Env,RN,modal(MS),C,X,_A1,_A2,_A3,_A4)|GL1],
+	doMinimalityCheck([in_M(Env,RN,modal(MS),C,X,_A1,_A2,_A3,_A4)|GL1],
 	                   GL2),
 	!.
 doMinimalityCheck(_GL1,[]) :-
 	!.
 	
 
-doConsistencyCheck(GL1,[in(Env,RN,modal(MS),C,X,_A1,_A2,_A3,_A4)|GL2]) :-
+doConsistencyCheck(GL1,[in_M(Env,RN,modal(MS),C,X,_A1,_A2,_A3,_A4)|GL2]) :-
 	append(GL1,GL2,GL),
 	HYPS = [orM(GL),rl([]),fl(H3)],
 	normalizeNot(isTDisjoint(C),C1),
 	constructMLCall(Env,rn(_AX3,_RN3,_S3,_O3),bodyMC(MS),headMC(MS),
 	                C1,X,HYPS,[],CALLS,_PT35,Goal),
 	not(Goal),
-	doConsistencyCheck([in(Env,RN,modal(MS),C,X,_A1,_A2,_A3,_A4)|GL1],
+	doConsistencyCheck([in_M(Env,RN,modal(MS),C,X,_A1,_A2,_A3,_A4)|GL1],
 	                   GL2),
 	!.
 doConsistencyCheck(_GL1,[]) :-
@@ -834,9 +844,9 @@ doConsistencyCheck(_GL1,[]) :-
  * THE CALL STACK 
  * is a list of elements of the following form:
  * - true 
- * - in(rn(AX,RN,_,_),modal(MS),C,X,hyp(HYPS))
- * - eq(rn(AX,RN,_,_),modal(MS),X,Y,hyp(HYPS))
- * - constraint(rn(AX,RN,_,_),MS,(card,app(_F:R,X),Rel,N),hyp(HYPS))
+ * - in_M(rn(AX,RN,_,_),modal(MS),C,X,hyp(HYPS))
+ * - eq_M(rn(AX,RN,_,_),modal(MS),X,Y,hyp(HYPS))
+ * - constraint_M(rn(AX,RN,_,_),MS,(card,app(_F:R,X),Rel,N),hyp(HYPS))
  *
  */
 
@@ -844,7 +854,7 @@ doConsistencyCheck(_GL1,[]) :-
  * 
  * cCS(+CallStack,Call)
  * succeeds if the tTOP call on CallStack is not already contained
- * elsewhere in CallStack andM Call is not already contained in CallStack.
+ * elsewhere in CallStack and Call is not already contained in CallStack.
  * This predicate is used to prevent nontermination.
  *
  */
@@ -875,108 +885,108 @@ testEqualHypotheses(H1,H2) :-
 %	equalset(H1,H2),
 	!.
 
-% To prove in(C,X) it is isTDisjoint allowed to use another in-clause generated 
+% To prove in_M(C,X) it is not allowed to use another in-clause generated 
 % from the same axiom
-sameAxiom(AX,_RN1,MS1,in(C1,X1),HYPS1,D1,
-          in(rn(AX,_RN2,_,_),modal(MS2),C2,X2,hyp(HYPS2),ab(D2))) :- 
+sameAxiom(AX,_RN1,MS1,in_M(C1,X1),HYPS1,D1,
+          in_M(rn(AX,_RN2,_,_),modal(MS2),C2,X2,hyp(HYPS2),ab(D2))) :- 
 	not(not(X1 = X2)),
 	not(not(C1 = C2)),
 	testEqualAbductiveHypotheses(D1,D2),
 	testEqualHypotheses(HYPS1,HYPS2),
 	equalWorlds(MS1,MS2), !.
-sameAxiom(AX,_RN1,MS1,in(_C,X1),HYPS1,_D1,
-          eq(rn(AX,_RN2,_,_),modal(MS2),X2,_,hyp(HYPS2))) :- 
-	nonvar(X1),
-	nonvar(X2),
+sameAxiom(AX,_RN1,MS1,in_M(_C,X1),HYPS1,_D1,
+          eq_M(rn(AX,_RN2,_,_),modal(MS2),X2,_,hyp(HYPS2))) :- 
+	not_ftVar(X1),
+	not_ftVar(X2),
 	not(not(X1 = X2)),
 	testEqualHypotheses(HYPS1,HYPS2),
 	equalWorlds(MS1,MS2), !.
-sameAxiom(AX,_RN1,MS1,in(_C,X1),HYPS1,_D1,
-          eq(rn(AX,_RN2,_,_),modal(MS2),_,X2,hyp(HYPS2))) :- 
+sameAxiom(AX,_RN1,MS1,in_M(_C,X1),HYPS1,_D1,
+          eq_M(rn(AX,_RN2,_,_),modal(MS2),_,X2,hyp(HYPS2))) :- 
 	not(not(X1 = X2)),
 	testEqualHypotheses(HYPS1,HYPS2),
 	equalWorlds(MS1,MS2), !.
-% To prove in(C,X) it is isTDisjoint allowed to use a constraint-clause generated 
+% To prove in_M(C,X) it is isTDisjoint allowed to use a constraint_M-clause generated 
 % from the same axiom
-sameAxiom(AX,_RN1,MS1,in(_C,X1),HYPS1,_D1,
-          constraint(rn(AX,_RN2,_,_),MS2,(card,app(_,X2),_Rel,_N),hyp(HYPS2))) :- 
+sameAxiom(AX,_RN1,MS1,in_M(_C,X1),HYPS1,_D1,
+          constraint_M(rn(AX,_RN2,_,_),MS2,(card,app(_,X2),_Rel,_N),hyp(HYPS2))) :- 
 	not(not(X1 = X2)),
 	testEqualHypotheses(HYPS1,HYPS2),
 	equalWorlds(MS1,MS2), !.
-sameAxiom(AX,_RN1,MS1,in(_C,X1),HYPS1,_D1,
+sameAxiom(AX,_RN1,MS1,in_M(_C,X1),HYPS1,_D1,
           solveConstraint(rn(AX,_RN2,_,_),MS2,(card,app(_,X2),_Rel,_N),hyp(HYPS2))) :- 
 	not(not(X1 = X2)),
 	testEqualHypotheses(HYPS1,HYPS2),
 	equalWorlds(MS1,MS2), !.
-sameAxiom(AX,_RN1,MS1,eq(X1,_Y),HYPS1,_D1,
-          in(rn(AX,_RN2,_,_),modal(MS2),_C,X2,hyp(HYPS2),ab(_D2))) :- 
-	nonvar(X1),
-	nonvar(X2),
+sameAxiom(AX,_RN1,MS1,eq_M(X1,_Y),HYPS1,_D1,
+          in_M(rn(AX,_RN2,_,_),modal(MS2),_C,X2,hyp(HYPS2),ab(_D2))) :- 
+	not_ftVar(X1),
+	not_ftVar(X2),
 	not(not(X1 = X2)),
 	testEqualHypotheses(HYPS1,HYPS2),
 	equalWorlds(MS1,MS2), !.
-sameAxiom(AX,_RN1,MS1,eq(_X,Y1),HYPS1,_D1,
-          in(rn(AX,_RN2,_,_),modal(MS2),_C,Y2,hyp(HYPS2),ab(_D2))) :- 
+sameAxiom(AX,_RN1,MS1,eq_M(_X,Y1),HYPS1,_D1,
+          in_M(rn(AX,_RN2,_,_),modal(MS2),_C,Y2,hyp(HYPS2),ab(_D2))) :- 
 	not(not(Y1 = Y2)),
 	testEqualHypotheses(HYPS1,HYPS2),
 	equalWorlds(MS1,MS2), !.
-sameAxiom(AX,_RN1,MS1,eq(X1,Y1),HYPS1,_D1,
-          eq(rn(AX,_RN2,_,_),modal(MS2),X2,Y2,hyp(HYPS2))) :- 
+sameAxiom(AX,_RN1,MS1,eq_M(X1,Y1),HYPS1,_D1,
+          eq_M(rn(AX,_RN2,_,_),modal(MS2),X2,Y2,hyp(HYPS2))) :- 
 	not(not(X1 = X2)),
 	not(not(Y1 = Y2)),
 	testEqualHypotheses(HYPS1,HYPS2),
 	equalWorlds(MS1,MS2), !.
-sameAxiom(AX,_RN1,MS1,eq(X1,app(_Y1)),HYPS1,_D1,
-          constraint(rn(AX,_RN2,_,_),MS2,(card,app(_,X2),_Rel,_N),hyp(HYPS2))) :-   
+sameAxiom(AX,_RN1,MS1,eq_M(X1,app(_Y1)),HYPS1,_D1,
+          constraint_M(rn(AX,_RN2,_,_),MS2,(card,app(_,X2),_Rel,_N),hyp(HYPS2))) :-   
 	not(not(X1 = X2)),
 	testEqualHypotheses(HYPS1,HYPS2),
 	equalWorlds(MS1,MS2), 
 	!.
-sameAxiom(AX,_RN1,MS1,eq(_X,app(_F1:R1,Y1)),HYPS1,_D1,
-          constraint(rn(AX,_RN2,_,_),MS2,(card,app(_F2:R2,Y2),_Rel,_N),hyp(HYPS2))) :-
+sameAxiom(AX,_RN1,MS1,eq_M(_X,app(_F1:R1,Y1)),HYPS1,_D1,
+          constraint_M(rn(AX,_RN2,_,_),MS2,(card,app(_F2:R2,Y2),_Rel,_N),hyp(HYPS2))) :-
 	not(not(R1 = R2)),
 	not(not(Y1 = Y2)),
 	testEqualHypotheses(HYPS1,HYPS2),
 	equalWorlds(MS1,MS2), !.
-sameAxiom(AX,_RN1,MS1,eq(X1,app(_Y1)),HYPS1,_D1,
+sameAxiom(AX,_RN1,MS1,eq_M(X1,app(_Y1)),HYPS1,_D1,
           solveConstraint(rn(AX,_RN2,_,_),MS2,(card,app(_,X2),_Rel,_N),hyp(HYPS2))) :-   
 	not(not(X1 = X2)),
 	testEqualHypotheses(HYPS1,HYPS2),
 	equalWorlds(MS1,MS2), 
 	!.
-sameAxiom(AX,_RN1,MS1,eq(_X,app(_F1:R1,Y1)),HYPS1,_D1,
+sameAxiom(AX,_RN1,MS1,eq_M(_X,app(_F1:R1,Y1)),HYPS1,_D1,
           solveConstraint(rn(AX,_RN2,_,_),MS2,(card,app(_F2:R2,Y2),_Rel,_N),hyp(HYPS2))) :-
 	not(not(R1 = R2)),
 	not(not(Y1 = Y2)),
 	testEqualHypotheses(HYPS1,HYPS2),
 	equalWorlds(MS1,MS2), !.
-sameAxiom(AX,_RN1,MS1,eq(_X,Y1),HYPS1,_D1,
+sameAxiom(AX,_RN1,MS1,eq_M(_X,Y1),HYPS1,_D1,
           solveConstraint(rn(AX,_RN2,_,_),MS2,(card,app(_,Y2),_Rel,_N),hyp(HYPS2))) :-
 	not(not(Y1 = Y2)),
 	testEqualHypotheses(HYPS1,HYPS2),
 	equalWorlds(MS1,MS2), !.
 sameAxiom(AX,_RN1,MS1,c(X1,_,_),HYPS1,_D1,
-          in(rn(AX,_RN2,_,_),modal(MS2),_,X2,hyp(HYPS2),ab(_D2))) :- 
+          in_M(rn(AX,_RN2,_,_),modal(MS2),_,X2,hyp(HYPS2),ab(_D2))) :- 
 	not(not(X1 = X2)),
 	testEqualHypotheses(HYPS1,HYPS2),
 	equalWorlds(MS1,MS2), !.
 sameAxiom(AX,_RN1,MS1,c(X1,_,_),HYPS1,_D1,
-          eq(rn(AX,_RN2,_,_),modal(MS2),X2,_,hyp(HYPS2))) :- 
+          eq_M(rn(AX,_RN2,_,_),modal(MS2),X2,_,hyp(HYPS2))) :- 
 	not(not(X1 = X2)),
 	testEqualHypotheses(HYPS1,HYPS2),
 	equalWorlds(MS1,MS2), !.
 sameAxiom(AX,_RN1,MS1,c(X1,_,_),HYPS1,_D1,
-          eq(rn(AX,_RN2,_,_),modal(MS2),X2,_,hyp(HYPS2))) :- 
+          eq_M(rn(AX,_RN2,_,_),modal(MS2),X2,_,hyp(HYPS2))) :- 
 	not(not(X1 = X2)),
 	testEqualHypotheses(HYPS1,HYPS2),
 	equalWorlds(MS1,MS2), !.
 sameAxiom(AX,_RN1,MS1,c(X1,_,_),HYPS1,_D1,
-          eq(rn(AX,_RN2,_,_),modal(MS2),_,app(_,X2),hyp(HYPS2))) :- 
+          eq_M(rn(AX,_RN2,_,_),modal(MS2),_,app(_,X2),hyp(HYPS2))) :- 
 	not(not(X1 = X2)),
 	testEqualHypotheses(HYPS1,HYPS2),
 	equalWorlds(MS1,MS2), !.
 sameAxiom(AX,_RN1,MS1,c(X1,R1,Rel1),HYPS1,_D1,
-          constraint(rn(AX,_RN2,_,_),MS2,(card,app(_F:R2,X2),Rel2,_N),hyp(HYPS2))) :- 
+          constraint_M(rn(AX,_RN2,_,_),MS2,(card,app(_F:R2,X2),Rel2,_N),hyp(HYPS2))) :- 
 	not(not(X1 = X2)),
 	not(not(R1 = R2)),
 	not(not(Rel1 = Rel2)),
@@ -990,27 +1000,27 @@ sameAxiom(AX,_RN1,MS1,c(X1,R1,Rel1),HYPS1,_D1,
 	testEqualHypotheses(HYPS1,HYPS2),
 	equalWorlds(MS1,MS2), !.
 sameAxiom(AX,_RN1,MS1,sc(X1,_,_),HYPS1,_D1,
-          in(rn(AX,_RN2,_,_),modal(MS2),_,X2,hyp(HYPS2),ab(_D2))) :- 
+          in_M(rn(AX,_RN2,_,_),modal(MS2),_,X2,hyp(HYPS2),ab(_D2))) :- 
 	not(not(X1 = X2)),
 	testEqualHypotheses(HYPS1,HYPS2),
 	equalWorlds(MS1,MS2), !.
 sameAxiom(AX,_RN1,MS1,sc(X1,_,_),HYPS1,_D1,
-          eq(rn(AX,_RN2,_,_),modal(MS2),X2,_,hyp(HYPS2))) :- 
+          eq_M(rn(AX,_RN2,_,_),modal(MS2),X2,_,hyp(HYPS2))) :- 
 	not(not(X1 = X2)),
 	testEqualHypotheses(HYPS1,HYPS2),
 	equalWorlds(MS1,MS2), !.
 sameAxiom(AX,_RN1,MS1,sc(X1,_,_),HYPS1,_D1,
-          eq(rn(AX,_RN2,_,_),modal(MS2),X2,_,hyp(HYPS2))) :- 
+          eq_M(rn(AX,_RN2,_,_),modal(MS2),X2,_,hyp(HYPS2))) :- 
 	not(not(X1 = X2)),
 	testEqualHypotheses(HYPS1,HYPS2),
 	equalWorlds(MS1,MS2), !.
 sameAxiom(AX,_RN1,MS1,sc(X1,_,_),HYPS1,_D1,
-          eq(rn(AX,_RN2,_,_),modal(MS2),_,app(_,X2),hyp(HYPS2))) :- 
+          eq_M(rn(AX,_RN2,_,_),modal(MS2),_,app(_,X2),hyp(HYPS2))) :- 
 	not(not(X1 = X2)),
 	testEqualHypotheses(HYPS1,HYPS2),
 	equalWorlds(MS1,MS2), !.
 sameAxiom(AX,_RN1,MS1,sc(X1,R1,Rel1),HYPS1,_D1,
-          constraint(rn(AX,_RN2,_,_),MS2,(card,app(_F:R2,X2),Rel2,_N),hyp(HYPS2))) :- 
+          constraint_M(rn(AX,_RN2,_,_),MS2,(card,app(_F:R2,X2),Rel2,_N),hyp(HYPS2))) :- 
 	not(not(X1 = X2)),
 	not(not(R1 = R2)),
 	not(not(Rel1 = Rel2)),
@@ -1026,17 +1036,17 @@ sameAxiom(AX,_RN1,MS1,sc(X1,R1,Rel1),HYPS1,_D1,
 sameAxiom(_AX,_,_,_,_,_,_) :- !, fail.
 
 equalWorlds(W1,W2) :-
-	var(W1),
-	var(W2),
+	is_ftVar(W1),
+	is_ftVar(W2),
 	!.
 equalWorlds(W1,W2) :-
-	var(W1),
-	nonvar(W2),
+	is_ftVar(W1),
+	not_ftVar(W2),
 	!,
 	fail.
 equalWorlds(W1,W2) :-
-	var(W2),
-	nonvar(W1),
+	is_ftVar(W2),
+	not_ftVar(W1),
 	!,
 	fail.
 equalWorlds([],[]) :-
@@ -1049,15 +1059,15 @@ equalWorlds([],app(_F:m(_MOp,_A),_W2)) :-
 	fail.
 equalWorlds(app(F1:m(MOp,A1),W1),app(F2:m(MOp,A2),W2)) :-
 	A1 == A2,
-%	var(F1),
-%	var(F2),
+%	is_ftVar(F1),
+%	is_ftVar(F2),
 %       not(not(F1 = F2)),
 	!,
 	equalWorlds(W1,W2).
 equalWorlds(app(F1:m(MOp,A1),_W1),app(F2:m(MOp,A2),_W2)) :-
 	A1 == A2,
-	nonvar(F1),
-	nonvar(F2),
+	not_ftVar(F1),
+	not_ftVar(F2),
 	not(not(F1 = F2)),
 	!.
 equalWorlds(_W1,_W2) :-
@@ -1067,39 +1077,39 @@ equalWorlds(_W1,_W2) :-
 
 noAxiom(true,_) :- !.
 noAxiom(_,[]) :- !.
-noAxiom(in(rn(AX,RN,_,_),modal(MS),C,X,hyp(HYPS),ab(D)),[C1|CL]) :-
-	not(sameAxiom(AX,RN,MS,in(C,X),HYPS,D,C1)),
-	noAxiom(in(rn(AX,RN,_,_),modal(MS),C,X,hyp(HYPS),ab(D)),CL).
-noAxiom(eq(rn(AX,RN,_,_),modal(MS),X,Y,hyp(HYPS)),[C1|CL]) :-
-	not(sameAxiom(AX,RN,MS,eq(X,Y),HYPS,_D,C1)),
-	noAxiom(eq(rn(AX,RN,_,_),modal(MS),X,Y,hyp(HYPS)),CL).
-noAxiom(constraint(rn(AX,RN,_,_),MS,(card,app(_F:R,X),Rel,N),hyp(HYPS)),[C1|CL]) :-
+noAxiom(in_M(rn(AX,RN,_,_),modal(MS),C,X,hyp(HYPS),ab(D)),[C1|CL]) :-
+	not(sameAxiom(AX,RN,MS,in_M(C,X),HYPS,D,C1)),
+	noAxiom(in_M(rn(AX,RN,_,_),modal(MS),C,X,hyp(HYPS),ab(D)),CL).
+noAxiom(eq_M(rn(AX,RN,_,_),modal(MS),X,Y,hyp(HYPS)),[C1|CL]) :-
+	not(sameAxiom(AX,RN,MS,eq_M(X,Y),HYPS,_D,C1)),
+	noAxiom(eq_M(rn(AX,RN,_,_),modal(MS),X,Y,hyp(HYPS)),CL).
+noAxiom(constraint_M(rn(AX,RN,_,_),MS,(card,app(_F:R,X),Rel,N),hyp(HYPS)),[C1|CL]) :-
 	not(sameAxiom(AX,RN,MS,c(X,R,Rel),HYPS,_D,C1)),
-	noAxiom(constraint(rn(AX,RN,_,_),MS,(card,app(_,X),Rel,N),hyp(HYPS)),CL).
+	noAxiom(constraint_M(rn(AX,RN,_,_),MS,(card,app(_,X),Rel,N),hyp(HYPS)),CL).
 noAxiom(solveConstraint(rn(AX,RN,_,_),MS,(card,app(_F:R,X),Rel,N),hyp(HYPS)),[C1|CL]) :-
 	not(sameAxiom(AX,RN,MS,sc(X,R,Rel),HYPS,_D,C1)),
 	noAxiom(solveConstraint(rn(AX,RN,_,_),MS,(card,app(_,X),Rel,N),hyp(HYPS)),CL).
 
-noDouble([in(rn(AX,RN,_,_),modal(MS),isTDisjoint(C),X,hyp(_HYPS1),ab(D))|IL]) :-
+noDouble([in_M(rn(AX,RN,_,_),modal(MS),isTDisjoint(C),X,hyp(_HYPS1),ab(D))|IL]) :-
 	!,
-	not(member(in(rn(AX1,RN1,_,_),modal(MS),isTDisjoint(C),X,hyp(_HYPS2),ab(D)),IL)),
-	not(member(in(rn(AX2,RN2,_,_),modal(MS),C,X,hyps(_HYPS3),ab(noAb)),IL)),
-	!,
-	noDouble(IL).
-noDouble([in(rn(AX,RN,_,_),modal(MS),C,X,hyp(_HYPS1),ab(D))|IL]) :-
-	!,
-	not(member(in(rn(AX1,RN1,_,_),modal(MS),C,X,hyp(_HYPS2),ab(D)),IL)),
-	not(member(in(rn(AX2,RN2,_,_),modal(MS),isTDisjoint(C),X,hyps(_HYPS3),ab(noAb)),IL)),
+	not(member(in_M(rn(AX1,RN1,_,_),modal(MS),isTDisjoint(C),X,hyp(_HYPS2),ab(D)),IL)),
+	not(member(in_M(rn(AX2,RN2,_,_),modal(MS),C,X,hyps(_HYPS3),ab(noAb)),IL)),
 	!,
 	noDouble(IL).
-noDouble([eq(rn(AX,RN,_,_),modal(MS),X,Y,hyp(_HYPS1))|IL]) :-
+noDouble([in_M(rn(AX,RN,_,_),modal(MS),C,X,hyp(_HYPS1),ab(D))|IL]) :-
 	!,
-	not(member(eq(rn(AX1,RN1,_,_),modal(MS),X,Y,hyp(_HYPS2)),IL)),
+	not(member(in_M(rn(AX1,RN1,_,_),modal(MS),C,X,hyp(_HYPS2),ab(D)),IL)),
+	not(member(in_M(rn(AX2,RN2,_,_),modal(MS),isTDisjoint(C),X,hyps(_HYPS3),ab(noAb)),IL)),
 	!,
 	noDouble(IL).
-noDouble([constraint(rn(AX,RN,_,_),MS,(card,app(_F:R,X),Rel,N),hyp(_HYPS1))|IL]) :-
+noDouble([eq_M(rn(AX,RN,_,_),modal(MS),X,Y,hyp(_HYPS1))|IL]) :-
 	!,
-	not(member(constraint(rn(AX1,RN1,_,_),MS,(card,app(_F:R,X),Rel,N),hyp(_HYPS2)),IL)),
+	not(member(eq_M(rn(AX1,RN1,_,_),modal(MS),X,Y,hyp(_HYPS2)),IL)),
+	!,
+	noDouble(IL).
+noDouble([constraint_M(rn(AX,RN,_,_),MS,(card,app(_F:R,X),Rel,N),hyp(_HYPS1))|IL]) :-
+	!,
+	not(member(constraint_M(rn(AX1,RN1,_,_),MS,(card,app(_F:R,X),Rel,N),hyp(_HYPS2)),IL)),
 	!,
 	noDouble(IL).
 noDouble([solveConstraint(rn(AX,RN,_,_),MS,(card,app(_F:R,X),Rel,N),hyp(_HYPS1))|IL]) :-
@@ -1119,20 +1129,20 @@ printAxiom(solveConstraint(MS,(card,app((_FF:R),X),Rel,N),hyp(HYPS))) :-
 	print('   '),
 	print(solveConstraint(MS,(app(R,X),Rel,N),hyp(HYPS))),
 	!.
-printAxiom(eq(rn(AX,RN,_,_),modal(MS),Y,app((_FF:R),X),hyp(HYPS))) :-
+printAxiom(eq_M(rn(AX,RN,_,_),modal(MS),Y,app((_FF:R),X),hyp(HYPS))) :-
 	print(rn(AX,RN)),
 	print('   '),
-	print(eq(MS,Y,app(R,X),hyp(HYPS))),
+	print(eq_M(MS,Y,app(R,X),hyp(HYPS))),
 	!.
-printAxiom(in(rn(AX,RN,_,_),modal(_MS),CN,CON,hyp(HYP))) :-
+printAxiom(in_M(rn(AX,RN,_,_),modal(_MS),CN,CON,hyp(HYP))) :-
 	print(rn(AX,RN)),
 	print('   '),
-	print(in(CN,CON,hyp(HYP))),
+	print(in_M(CN,CON,hyp(HYP))),
 	!.
-printAxiom(constraint(rn(AX,RN,_,_),MS,(card,app((_FF:R),X),Rel,N),hyp(HYPS))) :-
+printAxiom(constraint_M(rn(AX,RN,_,_),MS,(card,app((_FF:R),X),Rel,N),hyp(HYPS))) :-
 	print(rn(AX,RN)),
 	print('   '),
-	print(constraint(MS,(app(R,X),Rel,N),hyp(HYPS))),
+	print(constraint_M(MS,(app(R,X),Rel,N),hyp(HYPS))),
 	!.
 printAxiom(true) :-
 	!.
@@ -1142,8 +1152,8 @@ printAxiom(true) :-
  * clashCS(+CL)
  * succeeds if CL is a clash, i.e. it obeys one of the following 
  * conditions:
- * - it contains in(tBOT,X) for someM X.
- * - it contains both in(A,X) andM in(isTDisjoint(A),X) for someM A andM someM X.
+ * - it contains in_M(tBOT,X) for someM X.
+ * - it contains both in_M(A,X) and in_M(isTDisjoint(A),X) for someM A and someM X.
  *
  */
 
@@ -1157,7 +1167,7 @@ last([L1|LL1],[L1|LL2],Last) :-
 	!.
 
 generateClashGoal(CS1,Goal) :-
-	last(CS1,CS2,in(rn(AX,RN,S,O),modal(W1),C,X,hyp(HYPS))),
+	last(CS1,CS2,in_M(rn(AX,RN,S,O),modal(W1),C,X,hyp(HYPS))),
 	getCurrentEnvironment(EnvName),
 	environment_M(EnvName,Env,_),
 	constructMLHead(Env,rn(_AX1,_RN1,user,_O1),W1,C1,X,CS1,noAb,[],_,Goal),
@@ -1176,8 +1186,8 @@ clashCS(_CL) :-
 	
 doClashTest(InHead1) :-
 	call(InHead1),
-	InHead1 = in(Env,_,modal(W1),C1,X,hyp(HYP),ab(_),call(_CALL),_),
-	atomic(X),
+	InHead1 = in_M(Env,_,modal(W1),C1,X,hyp(HYP),ab(_),call(_CALL),_),
+	isFORTIC(X),
 	normalizeNot(isTDisjoint(C1),C2),
 	constructMLHead(Env,rn(_AX2,_RN2,_S2,_O2),W1,C2,X,HYP,noAb,[],_,InHead2),
 	call(InHead2),
@@ -1204,25 +1214,25 @@ doClashTest(Goal) :-
 
 % clashCS(CL) :-
 % 	clashTest(possible),
-% 	member(in(rn(_,_,_,_),modal(_MS),tBOT,_X,hyp(_HYPS1)),CL),
+% 	member(in_M(rn(_,_,_,_),modal(_MS),tBOT,_X,hyp(_HYPS1)),CL),
 % 	!.
 % clashCS(CL) :-
 % 	clashTest(possible),
-% 	member(in(rn(_,_,_,_),modal(MS),isTDisjoint(A),X,hyp(_HYPS1)),CL),
-% 	member(in(rn(_,_,_,_),modal(MS),A,X,hyp(_HYPS2)),CL),
+% 	member(in_M(rn(_,_,_,_),modal(MS),isTDisjoint(A),X,hyp(_HYPS1)),CL),
+% 	member(in_M(rn(_,_,_,_),modal(MS),A,X,hyp(_HYPS2)),CL),
 % 	!.
 % clashCS(CL) :-
 % 	clashTest(possible),
-% 	member(constraint(rn(_,_,_,_),MS,
+% 	member(constraint_M(rn(_,_,_,_),MS,
 % 			  (card,app(_F1:R,X),'>=',N1),hyp(_HYPS1)),CL),
-% 	member(constraint(rn(_,_,_,_),MS,
+% 	member(constraint_M(rn(_,_,_,_),MS,
 % 			  (card,app(_F2:R,X),'=<',N2),hyp(_HYPS2)),CL),
 % 	number(N1),
 % 	number(N2),
 % 	N1 > N2,
 % 	!.
 % clashCS(CL) :-
-% 	member(constraint(rn(_,_,_,_),MS,
+% 	member(constraint_M(rn(_,_,_,_),MS,
 % 			  (card,app(_F1:R,X),'=<',N1),hyp(_HYPS1)),CL),
 % 	number(N1),
 % 	countAllRoleFillersInCS(MS,R,X,CL,N2),
@@ -1237,10 +1247,10 @@ doClashTest(Goal) :-
 % getAllRoleFillersInCS(_MS,_R,_X,[],RF,RF) :-
 % 	!.
 % getAllRoleFillersInCS(MS,R,X,
-%    [eq(rn(_,_,_,_),modal(MS),Y,app(_F:R,X),hyp(_HYPS))|CL],RF1,RF2) :-
-% 	nonvar(Y),
-% 	nonvar(X),
-% 	atomic(Y),
+%    [eq_M(rn(_,_,_,_),modal(MS),Y,app(_F:R,X),hyp(_HYPS))|CL],RF1,RF2) :-
+% 	not_ftVar(Y),
+% 	not_ftVar(X),
+% 	isFORTIC(Y),
 % 	not(member((X,Y),RF1)),
 % 	!,
 % 	getAllRoleFillersInCS(MS,R,CL,[(X,Y)|RF1],RF2).
@@ -1255,25 +1265,25 @@ doClashTest(Goal) :-
  */
 
 clashInHyp(CL) :-
-	member(in(_,modal(_MS),tBOT,_X,hyp(_HYPS1),ab(_)),CL),
+	member(in_M(_,modal(_MS),tBOT,_X,hyp(_HYPS1),ab(_)),CL),
 	!.
 clashInHyp(CL) :-
-	member(in(_N2,modal(MS2),A,X,hyp(_HYPS2),ab(_D2)),CL),
-	atomic(A),
-	member(in(_N1,modal(MS1),isTDisjoint(A),X,hyp(_HYPS1),ab(_D1)),CL),
+	member(in_M(_N2,modal(MS2),A,X,hyp(_HYPS2),ab(_D2)),CL),
+	isFORTIC(A),
+	member(in_M(_N1,modal(MS1),isTDisjoint(A),X,hyp(_HYPS1),ab(_D1)),CL),
 	not(not(MS1 = MS2)),
 	!.
 % clashInHyp(CL) :-
-% 	member(constraint(rn(_,_,_,_),MS,
+% 	member(constraint_M(rn(_,_,_,_),MS,
 % 			  (card,app(_F1:R,X),'>=',N1),hyp(_HYPS1)),CL),
-% 	member(constraint(rn(_,_,_,_),MS,
+% 	member(constraint_M(rn(_,_,_,_),MS,
 % 			  (card,app(_F2:R,X),'=<',N2),hyp(_HYPS2)),CL),
 % 	number(N1),
 % 	number(N2),
 % 	N1 > N2,
 % 	!.
 % clashInHyp(CL) :-
-% 	member(constraint(rn(_,_,_,_),MS,
+% 	member(constraint_M(rn(_,_,_,_),MS,
 % 			  (card,app(_F1:R,X),'=<',N1),hyp(_HYPS1)),CL),
 % 	number(N1),
 % 	countAllRoleFillersInCS(MS,R,X,CL,N2),
@@ -1288,10 +1298,10 @@ clashInHyp(CL) :-
 % getAllRoleFillersInCS(_MS,_R,_X,[],RF,RF) :-
 % 	!.
 % getAllRoleFillersInCS(MS,R,X,
-%    [eq(rn(_,_,_,_),modal(MS),Y,app(_F:R,X),hyp(_HYPS))|CL],RF1,RF2) :-
-% 	nonvar(Y),
-% 	nonvar(X),
-% 	atomic(Y),
+%    [eq_M(rn(_,_,_,_),modal(MS),Y,app(_F:R,X),hyp(_HYPS))|CL],RF1,RF2) :-
+% 	not_ftVar(Y),
+% 	not_ftVar(X),
+% 	isFORTIC(Y),
 % 	not(member((X,Y),RF1)),
 % 	!,
 % 	getAllRoleFillersInCS(MS,R,CL,[(X,Y)|RF1],RF2).
@@ -1308,10 +1318,10 @@ clashInHyp(CL) :-
 /***********************************************************************
  *
  * subsumes(+Name1,+Name2)
- * Parameter: Name1     concept orM role name
- *            Name2     concept orM role name
+ * Parameter: Name1     concept or role name
+ *            Name2     concept or role name
  * true iff Name1 subsumes Name2 in modal context []
- * (so Name1 andM Name2 must both be concept names orM role names).
+ * (so Name1 and Name2 must both be concept names or role names).
  *
  */
 
@@ -1323,47 +1333,47 @@ subsumes(N1,N2) :-
  *
  * subsumes(+MS,+Name1,+Name2)
  * Parameter: MS        modal context
- *            Name1     concept orM role name
- *            Name2     concept orM role name
- * true iff Name1 subsumes Name2 (so Name1 andM Name2 must both be
- * concept names orM role names).
+ *            Name1     concept or role name
+ *            Name2     concept or role name
+ * true iff Name1 subsumes Name2 (so Name1 and Name2 must both be
+ * concept names or role names).
  *
  */
 
 subsumes(MS,N1,N2) :-
-	nonvar(MS),
+	not_ftVar(MS),
 	(MS = [] ; MS = [_|_]),
 	currentEnvironment(Env),
 	clause(conceptName(Env,_MS1,_W1,N1),_),
 	clause(conceptName(Env,_MS2,_W2,N2),_),
 	!,
-	subsumes(concepts,Env,MS,N1,N2).
+	subsumes(tConcept,Env,MS,N1,N2).
 subsumes(MS,N1,N2) :-
-	nonvar(MS),
+	not_ftVar(MS),
 	(MS = [] ; MS = [_|_]),
 	currentEnvironment(Env),
 	clause(roleName(Env,_MS1,_W1,N1),_),
 	clause(roleName(Env,_MS2,_W2,N2),_),
-	subsumes(roles,Env,MS,N1,N2).
+	subsumes(tRole,Env,MS,N1,N2).
 
 subsumes(EnvName,MS,N1,N2) :-
 	environment_M(EnvName,Env,_),
-	nonvar(MS),
+	not_ftVar(MS),
 	(MS = [] ; MS = [_|_]),
 	clause(conceptName(Env,_MS1,_W1,N1),_),
 	clause(conceptName(Env,_MS2,_W2,N2),_),
 	!,
-	subsumes(concepts,Env,MS,N1,N2).
+	subsumes(tConcept,Env,MS,N1,N2).
 subsumes(EnvName,MS,N1,N2) :-
 	environment_M(EnvName,Env,_),
-	nonvar(MS),
+	not_ftVar(MS),
 	(MS = [] ; MS = [_|_]),
 	currentEnvironment(Env),
 	clause(roleName(Env,_MS1,_W1,N1),_),
 	clause(roleName(Env,_MS2,_W2,N2),_),
-	subsumes(roles,Env,MS,N1,N2).
+	subsumes(tRole,Env,MS,N1,N2).
 
-subsumes(concepts,Env,MS,C,D) :-
+subsumes(tConcept,Env,MS,C,D) :-
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	constructMLHead(Env,_RN1,W1,D,aaa,_HYPS,noAb,_CALLS,abox,InHeadD),
 	asserta_new((InHeadD :- call(G1))),
@@ -1372,22 +1382,22 @@ subsumes(concepts,Env,MS,C,D) :-
 %		      _PT2,InHeadC),
 	call((call(G1), InHeadC)),
 	retract((InHeadD :- _Body)).
-subsumes(concepts,Env,MS,_C,D) :-
+subsumes(tConcept,Env,MS,_C,D) :-
 	convertMS(positive,Env,[[],true],MS,[],[W1,_G1],_),
 	constructMLHead(Env,_RN1,W1,D,aaa,_HYPS,noAb,_CALLS,abox,InHeadD),
 	retract((InHeadD :- _Body)),
 	!,
 	fail.
-subsumes(roles,Env,MS,R,S) :-
+subsumes(tRole,Env,MS,R,S) :-
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	gensym(skolem,SF),
+	gensym(skolem_M,SF),
 	constructEqHead(Env,_RN1,W1,bbb,SF,S,aaa,_HYPS,noAb,_CALLS,abox,InHeadS),
 	asserta_new((InHeadS :- call(G1))),
 	constructEqHead(Env,_RN2,W1,bbb,_FF,R,aaa,[orM([]),rl([]),fl(_DML1)],
 			noAb,[],_PT2,InHeadR),
 	call((G1, InHeadR)),
 	retract((InHeadS :- _Body)).
-subsumes(roles,Env,MS,_R,S) :-
+subsumes(tRole,Env,MS,_R,S) :-
 	convertMS(positive,Env,[[],true],MS,[],[W1,_G1],_),
 	constructEqHead(Env,_RN2,W1,bbb,_FF,S,aaa,_HYPS,noAb,_CALLS,_,InHeadS),
 	retract((InHeadS :- _Body)),
@@ -1447,7 +1457,7 @@ searchSubtrees(Concept,[N1|NL],T2) :-
 
 /***********************************************************************
  *
- * classify
+ * classify_M
  * compute the subsumption hierarchy 
  * side effects: 
  * asserts a clause
@@ -1458,36 +1468,36 @@ searchSubtrees(Concept,[N1|NL],T2) :-
  *
  */
 
-classify :-
+classify_M:-
 	newClassify.
-classify(Arg1) :-
+classify_M(Arg1) :-
 	newClassify(Arg1).
-classify(EnvName,MS) :-
+classify_M(EnvName,MS) :-
 	newClassify(EnvName,MS).
 
 /***********************************************************************
  *
- * classify(+NewConcept)
+ * classify_M(+NewConcept)
  * adds concept NewConcept to the subsumption hierarchy in the modal
  * context [].
  * side effects: 
  * asserts a clause
  *               conceptHierarchy([],Tree)
- * orM            roleHierachy([],Tree)
+ * or            roleHierachy([],Tree)
  * where Tree is a tree representation of the subsumption hierarchy.
  *
  */
 
-classify(EnvName,NewConcept) :-
+classify_M(EnvName,NewConcept) :-
 	environment_M(EnvName,Env,_),
-	atomic(NewConcept),
+	isFORTIC(NewConcept),
 	clause(conceptName(Env,_MS1,_W2,NewConcept),_), % _MS1 might be [] ?
-	classify(concepts,[],NewConcept).
-classify(EnvName,NewRole) :-
+	classify_M(tConcept,[],NewConcept).
+classify_M(EnvName,NewRole) :-
 	environment_M(EnvName,Env,_),
-	atomic(NewRole),
+	isFORTIC(NewRole),
 	clause(roleName(Env,_MS1,_W1,NewRole),_), % _MS1 might be [] ?
-	classify(roles,[],NewRole).
+	classify_M(tRole,[],NewRole).
 
 
 /***********************************************************************
@@ -1519,12 +1529,12 @@ oldClassify(MS) :-
 oldClassify(EnvName,MS) :-
 	environment_M(EnvName,Env,_),
 	clause(conceptName(Env,MS,_,Concept),_),
-	once(classify(concepts,Env,MS,Concept)),
+	once(classify_M(tConcept,Env,MS,Concept)),
 	fail.
 oldClassify(EnvName,MS) :-
 	environment_M(EnvName,Env,_),
 	clause(roleName(Env,MS,_,Role),_),
-	once(classify(roles,Env,MS,Role)),
+	once(classify_M(tRole,Env,MS,Role)),
 	fail.
 oldClassify(_,_) :-
 	!.
@@ -1532,44 +1542,44 @@ oldClassify(_,_) :-
 
 /***********************************************************************
  *
- * classify(+MS,+NewConcept)
+ * classify_M(+MS,+NewConcept)
  * adds concept NewConcept to the subsumption hierarchy in the modal
  * context MS.
  * side effects: 
  * asserts a clause
  *               conceptHierarchy(MS,Tree)
- * orM            roleHierarchy(MS,Tree)
+ * or            roleHierarchy(MS,Tree)
  * where Tree is a tree representation of the subsumption hierarchy.
  *
  */
  
-classify(EnvName,MS,NewConcept) :-
+classify_M(EnvName,MS,NewConcept) :-
 	environment_M(EnvName,Env,_),
 	clause(conceptName(Env,_MS1,_W1,NewConcept),_), % _MS1 might be MS ?
 	!,
-	classify(concepts,Env,MS,NewConcept).
-classify(EnvName,MS,NewRole) :-
+	classify_M(tConcept,Env,MS,NewConcept).
+classify_M(EnvName,MS,NewRole) :-
 	environment_M(EnvName,Env,_),
 	clause(roleName(Env,_MS1,_W1,NewRole),_), % _MS1 might be MS ?
 	!,
-	classify(roles,Env,MS,NewRole).
+	classify_M(tRole,Env,MS,NewRole).
 
-classify(concepts,Env,MS,NewConcept) :-
+classify_M(tConcept,Env,MS,NewConcept) :-
 	classified(Env,MS,NewConcept),
 	!.
-classify(roles,Env,MS,NewRole) :-
+classify_M(tRole,Env,MS,NewRole) :-
 	classified(Env,MS,NewRole),
 	!.
-classify(concepts,Env,MS,NewConcept) :-
+classify_M(tConcept,Env,MS,NewConcept) :-
 	retract(conceptHierarchy(Env,MS,OldTree)),
-	classify(concepts,Env,MS,NewConcept,OldTree,NewTree),
+	classify_M(tConcept,Env,MS,NewConcept,OldTree,NewTree),
 	assertz_if_new(conceptHierarchy(Env,MS,NewTree)).
-classify(roles,Env,MS,NewRole) :-
+classify_M(tRole,Env,MS,NewRole) :-
 	retract(roleHierarchy(Env,MS,OldTree)),
-	classify(roles,Env,MS,NewRole,OldTree,NewTree),
+	classify_M(tRole,Env,MS,NewRole,OldTree,NewTree),
 	assertz_if_new(roleHierarchy(Env,MS,NewTree)).
 
-classify(Type,Env,MS,NewConcept,OldTree,NewTree) :-
+classify_M(Type,Env,MS,NewConcept,OldTree,NewTree) :-
 	testForSubsumption(Type,Env,MS,NewConcept,OldTree,NewTree,_Judgement),
 	!.
 
@@ -1585,11 +1595,11 @@ classify(Type,Env,MS,NewConcept,OldTree,NewTree) :-
  *          has NewConcept inserted in OldTree
  * beside : NewConcept is beside the tTOP concept of OldTree
  *          in this case NewTree is instantiated with the tree which
- *          has NewConcept as tTOP concept andM allM concepts of OldTree
+ *          has NewConcept as tTOP concept and all tConcept of OldTree
  *          which are subsumed by NewConcept below it
  * above  : NewConcept is above  the tTOP concept of OldTree
  *          in this case NewTree is isTDisjoint instantiated
- * in     : NewConcept is equivalent to the tTOP concept of OldTree
+ * in     : NewConcept is equivalentM to the tTOP concept of OldTree
  *          in this case NewTree is instantiated with the tree which
  *          has NewConcept inserted in OldTree
  *
@@ -1664,8 +1674,8 @@ continue1(Type,Env,MS,NewConcept,N,NL1,[Node1|NL2],
 	!.
 continue1(_Type,_,_MS,_NewConcept,N,NL1,[_Node1|NL2],
          below(_NL3),beside(_NL4),above(_NL5),
-         Tree,in,node(N,NL)) :-
-        % NL3, NL4 andM NL5 can be non-empty
+         Tree,in_M,node(N,NL)) :-
+        % NL3, NL4 and NL5 can be non-empty
 	reverseList(NL1,NL6),
 	union_m(NL6,[Tree|NL2],NL),
 	!.
@@ -1707,12 +1717,12 @@ continue2(Type,Env,MS,NewConcept,N,NL1,[Node1|NL2],
 	!.
 continue2(_Type,_,_MS,_NewConcept,_N,_NL1,[_Node1|_NL2],
          below(_NL3),beside(_NL4),above(_NL5),
-         _Tree,in,node(_N,_NL)) :-
+         _Tree,in_M,node(_N,_NL)) :-
 	!,
 	fail.
 
 testForEquivalence(Type,Env,MS,NewConcept,node([ClassifiedConcept|CL],AL),
-	           node([NewConcept,ClassifiedConcept|CL],AL),in) :-
+	           node([NewConcept,ClassifiedConcept|CL],AL),in_M) :-
 	once(subsume2(Type,Env,MS,ClassifiedConcept,NewConcept)),
 	% so NewConcept = ClassifiedConcept
 	!.
@@ -1722,8 +1732,8 @@ testForEquivalence(_Type,_,_MS,_NewConcept,node([_ClassifiedConcept|_CL],_AL),
         % but isTDisjoint x \in NewConcept        => x \in ClassifiedConcept
 	!.
 
-subsume2(Type,Env,MS,X,Y) :- var(X),!,fail.
-subsume2(Type,Env,MS,X,Y) :- var(Y),!,fail.
+subsume2(Type,Env,MS,X,Y) :- is_ftVar(X),!,fail.
+subsume2(Type,Env,MS,X,Y) :- is_ftVar(Y),!,fail.
 subsume2(Type,Env,MS,X,tTOP) :- !,fail.
 subsume2(Type,Env,MS,tBOT,X) :- !,fail.
 subsume2(Type,Env,MS,X,tBOT) :- !.
@@ -1770,7 +1780,7 @@ succ2(X,tBOT) :- !.
 /***********************************************************************
  *
  * showHierarchy(+Type)
- * Parameter: Type     'concepts' orM 'roles'
+ * Parameter: Type     'tConcept' or 'tRole'
  * display subsumption hierarchy in the modal context [].
  *
  */
@@ -1782,18 +1792,18 @@ showHierarchy(Type) :-
 /***********************************************************************
  *
  * showHierarchy(+EnvName,+MS,+Type)
- * Parameter: EnvName   environment_M name
+ * Parameter: EnvName   environment name
  *            MS        modal context
- *            Type      'concepts' orM 'roles'
+ *            Type      'tConcept' or 'tRole'
  * display subsumption hierarchy in the modal context MS.
  *
  */
 
-showHierarchy(EnvName,MS,concepts) :-
+showHierarchy(EnvName,MS,tConcept) :-
 	environment_M(EnvName,Env,_),
 	conceptHierarchy(Env,MS,Tree),
 	showDag([],Tree).
-showHierarchy(EnvName,MS,roles) :-
+showHierarchy(EnvName,MS,tRole) :-
 	environment_M(EnvName,Env,_),
 	roleHierarchy(Env,MS,Tree),
 	showDag([],Tree).
@@ -1811,9 +1821,9 @@ showHierarchy(MS,Type) :-
 /***********************************************************************
  *
  * getHierarchy(+Type,-H)
- * Parameter: Type     'concepts' orM 'roles'
+ * Parameter: Type     'tConcept' or 'tRole'
  * instantiates H with the internal representation of the subsumption 
- * hierarchy of Type in the current environment_M andM modal context [].
+ * hierarchy of Type in the current environment and modal context [].
  *
  */
 
@@ -1824,18 +1834,18 @@ getHierarchy(Type,H) :-
 /***********************************************************************
  *
  * getHierarchy(+EnvName,+MS,+Type,-H)
- * Parameter: EnvName   environment_M name
+ * Parameter: EnvName   environment name
  *            MS        modal context
- *            Type      'concepts' orM 'roles'
+ *            Type      'tConcept' or 'tRole'
  * instantiates H with the internal representation of the subsumption 
- * hierarchy of Type in environment_M EnvName andM modal context MS.
+ * hierarchy of Type in environment EnvName and modal context MS.
  *
  */
 
-getHierarchy(EnvName,MS,concepts,Tree) :-
+getHierarchy(EnvName,MS,tConcept,Tree) :-
 	environment_M(EnvName,Env,_),
 	conceptHierarchy(Env,MS,Tree).
-getHierarchy(EnvName,MS,roles,Tree) :-
+getHierarchy(EnvName,MS,tRole,Tree) :-
 	environment_M(EnvName,Env,_),
 	roleHierarchy(Env,MS,Tree).
 
@@ -1911,14 +1921,14 @@ init_new_daten(Env) :-
 	init_nsub(_),
 	assertz_if_new(conceptName1(Env,_,tTOP)),
 	assertz_if_new(roleName1(Env,_,tTOP)),
-       	assertz_if_new(succ(concepts,Env,_,tTOP,tBOT)),
-	assertz_if_new(sub(concepts,Env,_,tTOP,_)),
-	assertz_if_new(nsub(concepts,Env,_,X,X)),	
-	assertz_if_new(succ(roles,Env,_,tTOP,tBOT)),
-	assertz_if_new(sub(roles,Env,_,tTOP,_)),
-	assertz_if_new(nsub(roles,Env,_,X,X)),
-	assertz_if_new(sub(roles,Env,_,_,tBOT)),
-	assertz_if_new(sub(concepts,Env,_,_,tBOT)).
+       	assertz_if_new(succ_M(tConcept,Env,_,tTOP,tBOT)),
+	assertz_if_new(sub_M(tConcept,Env,_,tTOP,_)),
+	assertz_if_new(nsub_M(tConcept,Env,_,X,X)),	
+	assertz_if_new(succ_M(tRole,Env,_,tTOP,tBOT)),
+	assertz_if_new(sub_M(tRole,Env,_,tTOP,_)),
+	assertz_if_new(nsub_M(tRole,Env,_,X,X)),
+	assertz_if_new(sub_M(tRole,Env,_,_,tBOT)),
+	assertz_if_new(sub_M(tConcept,Env,_,_,tBOT)).
 
 init_new_daten1 :-
 	currentEnvironment(Env),
@@ -1942,14 +1952,14 @@ init_succ(MS) :-
 	!.
 init_succ(MS).
 init_succ(Env,MS) :- 
-	retractall1_M(succ(_,Env,MS,_,_)),
+	retractall1_M(succ_M(_,Env,MS,_,_)),
 	!.
 init_sub(MS) :-
 	currentEnvironment(Env),
 	init_sub(Env,MS).
 init_sub(MS).
 init_sub(Env,MS) :- 
-	retractall1_M(sub(_,Env,MS,_,_)),
+	retractall1_M(sub_M(_,Env,MS,_,_)),
 	!.
 
 init_nsub(MS) :-
@@ -1957,7 +1967,7 @@ init_nsub(MS) :-
 	init_nsub(Env,MS).
 init_nsub(MS).
 init_nsub(Env,MS) :-
-	retractall1_M(nsub(_,Env,MS,_,_)),
+	retractall1_M(nsub_M(_,Env,MS,_,_)),
 	!.
 
 /********************************************************************/
@@ -1965,7 +1975,7 @@ init_nsub(Env,MS) :-
 
 neu1 :- newClassify,
 	show_dag([]),printStat. 
-show :- getCurrentEnvironment(EnvName),
+showMotel :- getCurrentEnvironment(EnvName),
 	environment_M(EnvName,Env,_),
 	showDefconcept(Env),
 	showDefprimconcept(Env),
@@ -1974,9 +1984,9 @@ show :- getCurrentEnvironment(EnvName),
 test1(Concept):- 
 	environment_M(EnvName,Env,_),	
 	conceptEqualSets(Env,user,MS,Concept,CT,_),
-	find_concept2(concepts,Env,MS,Concept,CT).
+	find_concept2(tConcept,Env,MS,Concept,CT).
 
-test2 :- 
+test2Motel :- 
 	environment_M(EnvName,Env,_),	
 	conceptEqualSets(Env,user,MS,Concept,CT,_),
 	conceptEqualSets(Env,user,MS,Concept1,Concept,_),
@@ -1984,7 +1994,7 @@ test2 :-
 	print(Concept1),nl,
 	fail.
 
-test3(MS,_) :- 
+test3Motel(MS,_) :- 
 	environment_M(EnvName,Env,_),	
 	conceptEqualSets(Env,user,MS,Concept,CT,_),
 	clause(conceptName(Env,_MS1,_W1,Concept),_),
@@ -1995,7 +2005,7 @@ test3(MS,_) :-
 	print(Concept1),
 	nl,
 	fail.
-test3(MS,_) :- 
+test3Motel(MS,_) :- 
 	environment_M(EnvName,Env,_),	
 	conceptSubsets(Env,user,MS,Concept,CT,_),
 	clause(conceptName(Env,_MS1,_W1,Concept),_),
@@ -2006,7 +2016,7 @@ test3(MS,_) :-
 	print(Concept1),
 	nl,
 	fail.
-test3(MS) :- 
+test3Motel(MS) :- 
 	environment_M(EnvName,Env,_),	
 	roleEqualSets(Env,user,MS,Concept,CT,_),
 	clause(roleName(Env,_MS1,_W1,Concept),_),
@@ -2018,7 +2028,7 @@ test3(MS) :-
 	nl,
 	fail.
 
-test3(MS) :- 
+test3Motel(MS) :- 
 	environment_M(EnvName,Env,_),	
 	roleSubsets(Env,user,MS,Concept,CT,_),
 	clause(roleName(Env,_MS1,_W1,Concept),_),
@@ -2030,7 +2040,7 @@ test3(MS) :-
 	nl,
 	fail.
 	
-% just for fun andM test
+% just for fun and test
 
 neu1(MS) :- newClassify(MS).
 
@@ -2064,237 +2074,237 @@ testa(Env,MS) :-
 %	ifOption(testOutput,yes,show_dag(MS)),
 	!.	
 testb(Env,MS) :-
-        not(find_concept(concepts,Env,MS)),
-        not(find_role(roles,Env,MS)).
+        not(find_concept(tConcept,Env,MS)),
+        not(find_role(tRole,Env,MS)).
 	
-find_concept(concepts,Env,MS) :-
+find_concept(tConcept,Env,MS) :-
 	getConceptName(Env,MS,Concept),
 	not(name(Concept,[99,111,110,99,101,112,116|_])),
 	ifOption(testOutput,yes,(print(Concept), nl)),
 	addCounter(conceptsClassified,1),
-	find_concept1(concepts,Env,MS,Concept).
-find_role(roles,Env,MS) :-
+	find_concept1(tConcept,Env,MS,Concept).
+find_role(tRole,Env,MS) :-
 	getRoleName(Env,MS,Role),
 	not(name(Role,[114,111,108,101|_])),
 	addCounter(rolesClassified,1),
-	find_role1(roles,Env,MS,Role).
+	find_role1(tRole,Env,MS,Role).
 
-find_role1(roles,Env,MS,Role) :-
+find_role1(tRole,Env,MS,Role) :-
 	roleEqualSets(Env,user,MS,Role,CT,_),
-	find_role2(roles,Env,MS,Role,CT),
+	find_role2(tRole,Env,MS,Role,CT),
 	!,
  	fail.
-find_role1(roles,Env,MS,Role) :-
+find_role1(tRole,Env,MS,Role) :-
 	roleSubsets(Env,user,MS,Role,CT,_),
-	find_prole2(roles,Env,MS,Role,CT),
+	find_prole2(tRole,Env,MS,Role,CT),
  	!,
 	fail.
 /*
-find_role1(roles,Env,MS,Role) :-
+find_role1(tRole,Env,MS,Role) :-
 	roleEqualSets(Env,user,MS,Role,CT,_),
-	find_role11(roles,Env,MS,Role,CT),
+	find_role11(tRole,Env,MS,Role,CT),
 	!,
 	fail.
-find_role1(roles,Env,MS,Role) :-
+find_role1(tRole,Env,MS,Role) :-
 	roleSubsets(Env,user,MS,Role,CT,_),
-	find_role11(roles,Env,MS,Role,CT),
+	find_role11(tRole,Env,MS,Role,CT),
 	!,
 	fail.
-find_role11(roles,Env,MS,Role,CT) :-
+find_role11(tRole,Env,MS,Role,CT) :-
 	roleEqualSets(Env,user,MS,CT,CT1,_),
-	find_prole2(roles,Env,MS,Role,CT1),
-	find_role11(roles,Env,MS,Role,CT).
-find_role11(roles,Env,MS,Role,CT) :-
+	find_prole2(tRole,Env,MS,Role,CT1),
+	find_role11(tRole,Env,MS,Role,CT).
+find_role11(tRole,Env,MS,Role,CT) :-
 	roleSubsets(Env,user,MS,CT,CT1,_),
-	find_prole2(roles,Env,MS,Role,CT1),
-	find_role11(roles,Env,MS,Role,CT).
+	find_prole2(tRole,Env,MS,Role,CT1),
+	find_role11(tRole,Env,MS,Role,CT).
 */
 
-find_role1(roles,Env,MS,Role) :-
-	make_succ2(roles,Env,MS,Role),
+find_role1(tRole,Env,MS,Role) :-
+	make_succ2(tRole,Env,MS,Role),
 	!,
 	fail.
-find_concept1(concepts,Env,MS,Concept) :-
+find_concept1(tConcept,Env,MS,Concept) :-
 	conceptEqualSets(Env,user,MS,Concept,CT,_),
-	find_concept2(concepts,Env,MS,Concept,CT),
+	find_concept2(tConcept,Env,MS,Concept,CT),
 	!,
  	fail.
-find_concept1(concepts,Env,MS,Concept) :-
+find_concept1(tConcept,Env,MS,Concept) :-
 	conceptSubsets(Env,user,MS,Concept,CT,_),
-	find_pconcept2(concepts,Env,MS,Concept,CT),
+	find_pconcept2(tConcept,Env,MS,Concept,CT),
  	!,
 	fail.
 /*
-find_concept1(concepts,Env,MS,Concept) :-
+find_concept1(tConcept,Env,MS,Concept) :-
 	conceptEqualSets(Env,user,MS,Concept,CT,_),
-	find_concept11(concepts,Env,MS,Concept,CT),
+	find_concept11(tConcept,Env,MS,Concept,CT),
 	!,
 	fail.
-find_concept1(concepts,Env,MS,Concept) :-
+find_concept1(tConcept,Env,MS,Concept) :-
 	conceptSubsets(Env,user,MS,Concept,CT,_),
-	find_concept11(concepts,Env,MS,Concept,CT),
+	find_concept11(tConcept,Env,MS,Concept,CT),
 	!,
 	fail.
-find_concept11(concepts,Env,MS,Concept,CT) :-
+find_concept11(tConcept,Env,MS,Concept,CT) :-
 	conceptEqualSets(Env,user,MS,CT,CT1,_),
-	find_pconcept2(concepts,Env,MS,Concept,CT1),
-	find_concept11(concepts,Env,MS,Concept,CT).
-find_concept11(concepts,Env,MS,Concept,CT) :-
+	find_pconcept2(tConcept,Env,MS,Concept,CT1),
+	find_concept11(tConcept,Env,MS,Concept,CT).
+find_concept11(tConcept,Env,MS,Concept,CT) :-
 	conceptSubsets(Env,user,MS,CT,CT1,_),
-	find_pconcept2(concepts,Env,MS,Concept,CT1),
-	find_concept11(concepts,Env,MS,Concept,CT).
+	find_pconcept2(tConcept,Env,MS,Concept,CT1),
+	find_concept11(tConcept,Env,MS,Concept,CT).
 */
-find_concept1(concepts,Env,MS,Concept) :-
-	make_succ2(concepts,Env,MS,Concept),
+find_concept1(tConcept,Env,MS,Concept) :-
+	make_succ2(tConcept,Env,MS,Concept),
 	!,
 	fail.
 /***** Entwicklungsecke....
 
 test fuer den trans.abschluss von roleEqualSets,roleSubsets,concept...
-find_role1(roles,Env,MS,Role) :-
+find_role1(tRole,Env,MS,Role) :-
 	roleEqualSets(Env,user,MS,Role,CT,_),
-	find_role11(roles,Env,MS,Role,CT),
+	find_role11(tRole,Env,MS,Role,CT),
 	!,
 	fail.
-find_role11(roles,Env,MS,Role,CT) :-
-	find_role2(roles,Env,MS,Role,CT),
+find_role11(tRole,Env,MS,Role,CT) :-
+	find_role2(tRole,Env,MS,Role,CT),
 	!,
 	roleEqualSets(Env,user,MS,CT,CT1,_),
-	find_role11(roles,Env,MS,Role,CT1),
+	find_role11(tRole,Env,MS,Role,CT1),
 	!.
-find_role11(roles,Env,MS,Role,CT) :-
+find_role11(tRole,Env,MS,Role,CT) :-
 	!.
 
-find_role1(roles,Env,MS,Role) :-
+find_role1(tRole,Env,MS,Role) :-
 	roleSubsets(Env,user,MS,Role,CT,_),
-	find_prole11(roles,Env,MS,Role,CT),
+	find_prole11(tRole,Env,MS,Role,CT),
  	!,
 	fail.
-find_prole11(roles,Env,MS,Role,CT) :-
-	find_prole2(roles,Env,MS,Role,CT),
+find_prole11(tRole,Env,MS,Role,CT) :-
+	find_prole2(tRole,Env,MS,Role,CT),
 	!,
 	roleSubsets(Env,user,MS,CT,CT1,_),
-	find_prole11(roles,Env,MS,Role,CT1),
+	find_prole11(tRole,Env,MS,Role,CT1),
 	!.
-find_prole11(roles,Env,MS,Role,CT) :-
+find_prole11(tRole,Env,MS,Role,CT) :-
 	!.
 */
 
 /*******************************************/
 
-find_concept2(concepts,Env,MS,Concept,CT) :-
+find_concept2(tConcept,Env,MS,Concept,CT) :-
 	getConceptName(Env,MS,CT),
-	(succ(concepts,Env,MS,Topconcept,Concept),
-	subsume1(concepts,Env,MS,Topconcept,CT)),
-	assert1(nsub(concepts,Env,MS,Concept,CT)),
-	assert1(nsub(concepts,Env,MS,CT,Concept)),
-	assert_succ(concepts,Env,MS,Topconcept,CT),
+	(succ_M(tConcept,Env,MS,Topconcept,Concept),
+	subsume1(tConcept,Env,MS,Topconcept,CT)),
+	assert1(nsub_M(tConcept,Env,MS,Concept,CT)),
+	assert1(nsub_M(tConcept,Env,MS,CT,Concept)),
+	assert_succ(tConcept,Env,MS,Topconcept,CT),
 	!.	
-find_concept2(concepts,Env,MS,Concept,CT) :-
+find_concept2(tConcept,Env,MS,Concept,CT) :-
 %	getConceptName(Env,_MS1,W1,CT),
 	getConceptName(Env,MS,CT),
-	(succ(concepts,Env,MS,Topconcept,CT),
-	subsume1(concepts,Env,MS,Topconcept,Concept)),
-	assert1(nsub(concepts,Env,MS,Concept,CT)),
-	assert1(nsub(concepts,Env,MS,CT,Concept)),
-	assert_succ(concepts,Env,MS,Topconcept,Concept),
+	(succ_M(tConcept,Env,MS,Topconcept,CT),
+	subsume1(tConcept,Env,MS,Topconcept,Concept)),
+	assert1(nsub_M(tConcept,Env,MS,Concept,CT)),
+	assert1(nsub_M(tConcept,Env,MS,CT,Concept)),
+	assert_succ(tConcept,Env,MS,Topconcept,Concept),
 	!.
-find_concept2(concepts,Env,MS,Concept,CT) :-
+find_concept2(tConcept,Env,MS,Concept,CT) :-
 	getConceptName(Env,MS,CT),
-	assert1(nsub(concepts,Env,MS,Concept,CT)),
-	assert1(nsub(concepts,Env,MS,CT,Concept)),
-	assert1(succ(concepts,Env,MS,tTOP,Concept)),
-	assert1(succ(concepts,Env,MS,tTOP,CT)),
+	assert1(nsub_M(tConcept,Env,MS,Concept,CT)),
+	assert1(nsub_M(tConcept,Env,MS,CT,Concept)),
+	assert1(succ_M(tConcept,Env,MS,tTOP,Concept)),
+	assert1(succ_M(tConcept,Env,MS,tTOP,CT)),
 	!.
-find_concept2(concepts,Env,MS,Concept,CT) :-
+find_concept2(tConcept,Env,MS,Concept,CT) :-
 	CT = andM([X|[R]]),
 	conceptEqualSets(Env,user,MS,Concept1,R,_),
-	assert_succ(concepts,Env,MS,X,Concept),
-	assert_succ(concepts,Env,MS,Concept1,Concept),		
+	assert_succ(tConcept,Env,MS,X,Concept),
+	assert_succ(tConcept,Env,MS,Concept1,Concept),		
 	!. 
-find_concept2(concepts,Env,MS,Concept,CT) :-
+find_concept2(tConcept,Env,MS,Concept,CT) :-
 	CT = andM(L),
-	find_concept21(concepts,Env,MS,Concept,L),
+	find_concept21(tConcept,Env,MS,Concept,L),
 	!.
 
-find_concept2(concepts,Env,MS,Concept,CT) :-
+find_concept2(tConcept,Env,MS,Concept,CT) :-
 	CT = andM([X|[R]]),
 	R = someM(Role,Concept1),
 	getRoleName(Env,MS,Role),
 	X == Concept1,
-	assert_succ(concepts,Env,MS,X,Concept),	
+	assert_succ(tConcept,Env,MS,X,Concept),	
 	!.
 
-find_concept2(concepts,Env,MS,Concept,CT) :-
+find_concept2(tConcept,Env,MS,Concept,CT) :-
 	CT = someM(Role,Concept1),
 	find_concept25(Env,MS,Concept,Concept1),
 	!. 
 
-find_concept2(concepts,Env,MS,Concept,CT) :-
+find_concept2(tConcept,Env,MS,Concept,CT) :-
 	CT = orM([andM(L)]),
-	find_concept26(concepts,Env,MS,Concept,L),
+	find_concept26(tConcept,Env,MS,Concept,L),
 	!.
 	
-find_concept2(concepts,Env,MS,Concept,CT) :-
+find_concept2(tConcept,Env,MS,Concept,CT) :-
 	CT = orM([L|R]),
 	L = andM(L1),
 	find_concept3(Env,MS,Concept,R,L1,Z),
 	find_concept31(Env,MS,Concept,Z),	
 	!.
-find_concept2(concepts,Env,MS,Concept,CT) :-
+find_concept2(tConcept,Env,MS,Concept,CT) :-
 	CT = orM(L),
-	find_concept26(concepts,Env,MS,Concept,L),
+	find_concept26(tConcept,Env,MS,Concept,L),
 	!.
 
-find_concept21(concepts,Env,MS,Concept,[]) :-
+find_concept21(tConcept,Env,MS,Concept,[]) :-
 	!.
-find_concept21(concepts,Env,MS,Concept,[X|R]) :-
+find_concept21(tConcept,Env,MS,Concept,[X|R]) :-
 	getConceptName(Env,MS,X),
-	assert_succ(concepts,Env,MS,X,Concept),
-	find_concept21(concepts,Env,MS,Concept,R),
+	assert_succ(tConcept,Env,MS,X,Concept),
+	find_concept21(tConcept,Env,MS,Concept,R),
 	!.
-find_concept21(concepts,Env,MS,Concept,[X|R]) :-    
+find_concept21(tConcept,Env,MS,Concept,[X|R]) :-    
 	X = isTDisjoint(R1),
 	getConceptName(Env,MS,R1),
-	setofOrNil(K,find_concept22(concepts,Env,MS,Concept,R1,K),L),
-	find_concept23(concepts,Env,MS,Concept,L),
-	find_concept21(concepts,Env,MS,Concept,R),
+	setofOrNil(K,find_concept22(tConcept,Env,MS,Concept,R1,K),L),
+	find_concept23(tConcept,Env,MS,Concept,L),
+	find_concept21(tConcept,Env,MS,Concept,R),
 	!.
-find_concept21(concepts,Env,MS,Concept,[X|R]) :-
-	find_concept21(concepts,Env,MS,Concept,R),
+find_concept21(tConcept,Env,MS,Concept,[X|R]) :-
+	find_concept21(tConcept,Env,MS,Concept,R),
 	!,
 	fail.
 
-find_concept22(concepts,Env,MS,Concept,R1,K) :-
-	succ(concepts,Env,MS,K,R1),
-	isTDisjoint(succ(concepts,Env,MS,K,Concept)).
+find_concept22(tConcept,Env,MS,Concept,R1,K) :-
+	succ_M(tConcept,Env,MS,K,R1),
+	isTDisjoint(succ_M(tConcept,Env,MS,K,Concept)).
 
-find_concept23(concepts,Env,MS,Concept,[]) :-
+find_concept23(tConcept,Env,MS,Concept,[]) :-
 	!.	
-find_concept23(concepts,Env,MS,Concept,[L1|R1]) :-
-	find_concept24(concepts,Env,MS,Concept,L1),
-	find_concept23(concepts,Env,MS,Concept,R1),
+find_concept23(tConcept,Env,MS,Concept,[L1|R1]) :-
+	find_concept24(tConcept,Env,MS,Concept,L1),
+	find_concept23(tConcept,Env,MS,Concept,R1),
 	!.
-find_concept24(concepts,Env,MS,Concept,L1) :-
-	succ(concepts,Env,MS,Top,L1),
-	succ(concepts,Env,MS,Top,K),
-	subsume1(concepts,Env,MS,K,Concept),
-	setofOrNil(Nf,succ(concepts,Env,MS,K,Nf),Lnf),
-	make_succ1(concepts,Env,MS,K,Lnf,Concept),
+find_concept24(tConcept,Env,MS,Concept,L1) :-
+	succ_M(tConcept,Env,MS,Top,L1),
+	succ_M(tConcept,Env,MS,Top,K),
+	subsume1(tConcept,Env,MS,K,Concept),
+	setofOrNil(Nf,succ_M(tConcept,Env,MS,K,Nf),Lnf),
+	make_succ1(tConcept,Env,MS,K,Lnf,Concept),
 	!. 
 		
 find_concept25(Env,MS,Concept,Concept1) :-
-	succ(concepts,Env,MS,K,Concept1),
-	setofOrNil(Nf,succ(concepts,Env,MS,Concept1,Nf),Lnf),
-	make_succ1(concepts,Env,MS,K,Lnf,Concept),
+	succ_M(tConcept,Env,MS,K,Concept1),
+	setofOrNil(Nf,succ_M(tConcept,Env,MS,Concept1,Nf),Lnf),
+	make_succ1(tConcept,Env,MS,K,Lnf,Concept),
 	fail.
 find_concept25(Env,MS,Concept,Concept1).
 
-find_concept26(concepts,Env,MS,Concept,[C1|R]) :-
+find_concept26(tConcept,Env,MS,Concept,[C1|R]) :-
 	getConceptName(Env,MS,C1),
-	subsume1(concepts,Env,MS,C1,Concept),
-	assert_succ(concepts,Env,MS,C1,Concept),
-	find_concept26(concepts,Env,MS,Concept,R).
+	subsume1(tConcept,Env,MS,C1,Concept),
+	assert_succ(tConcept,Env,MS,C1,Concept),
+	find_concept26(tConcept,Env,MS,Concept,R).
 
 find_concept3(Env,MS,Concept,[],Z,Z) :- 
 	!.
@@ -2307,19 +2317,19 @@ find_concept3(Env,MS,Concept,[L|R],Z,K) :-
 find_concept31(Env,MS,Concept,[]) :-
 	!.
 find_concept31(Env,MS,Concept,[L1|R1]) :-
-	assert_succ(concepts,Env,MS,L1,Concept),
+	assert_succ(tConcept,Env,MS,L1,Concept),
 	find_concept31(Env,MS,Concept,R1),
 	!.
 
 % das hier ist die entwicklungsecke....	
 /*
 % weiss nicht ob das stimmt
-find_concept21(concepts,Env,MS,Concept,[X|R]) :-    
+find_concept21(tConcept,Env,MS,Concept,[X|R]) :-    
 	X = allM(R1,X1),
 	getRoleName(Env,MS,R1),
 	getConceptName(Env,MS,X1),
-	assert_succ(concepts,Env,MS,X1,Concept),
-	find_concept21(concepts,Env,MS,Concept,R),
+	assert_succ(tConcept,Env,MS,X1,Concept),
+	find_concept21(tConcept,Env,MS,Concept,R),
 	!.
 */
 % ********************** Primconcepte **************************
@@ -2327,72 +2337,72 @@ find_concept21(concepts,Env,MS,Concept,[X|R]) :-
 %                   "         (_,isTDisjoint(),...)
 %                   "         (_,...(),...)
 					
-find_pconcept2(concepts,Env,MS,PrimConcept,CT) :-
+find_pconcept2(tConcept,Env,MS,PrimConcept,CT) :-
 	CT = isTDisjoint(X),
 	getConceptName(Env,MS,X),
-	cont1a(concepts,Env,MS,[],X,PrimConcept),
-%	succ(concepts,Env,MS,Topconcept,X),
+	cont1a(tConcept,Env,MS,[],X,PrimConcept),
+%	succ_M(tConcept,Env,MS,Topconcept,X),
 	find_pconcept23(Env,MS,X,PrimConcept,Top),
-	assert_succ(concepts,Env,MS,Top,PrimConcept),
-	assert_succ(concepts,Env,MS,Top,X),
+	assert_succ(tConcept,Env,MS,Top,PrimConcept),
+	assert_succ(tConcept,Env,MS,Top,X),
 	!.
-find_pconcept2(concepts,Env,MS,Primconcept,CT) :-
+find_pconcept2(tConcept,Env,MS,Primconcept,CT) :-
 	CT = andM(L),
 	find_pconcept24(Env,MS,Primconcept,L),
 	!.
 
-find_pconcept2(concepts,Env,MS,PrimConcept,CT) :-
+find_pconcept2(tConcept,Env,MS,PrimConcept,CT) :-
 	getConceptName(Env,MS,CT),
-	assert1(sub(concepts,Env,MS,CT,PrimConcept)),
-	direct_succ(concepts,Env,MS,[],CT,PrimConcept,Z,L1),
-        contb(concepts,Env,MS,Z,L1,PrimConcept),
+	assert1(sub_M(tConcept,Env,MS,CT,PrimConcept)),
+	direct_succ(tConcept,Env,MS,[],CT,PrimConcept,Z,L1),
+        contb(tConcept,Env,MS,Z,L1,PrimConcept),
 	!.
 
-find_pconcept2(concepts,Env,MS,PrimConcept,CT) :-
+find_pconcept2(tConcept,Env,MS,PrimConcept,CT) :-
 	CT = someM(X,Y),
 	find_pconcept21(Env,MS,PrimConcept,X,Y),
 	!.
 
-find_pconcept2(concepts,Env,MS,Primconcept,CT) :-
+find_pconcept2(tConcept,Env,MS,Primconcept,CT) :-
 	CT = andM([X|[R]]),
 %	getConceptName(Env,MS,W1,X),
 	getConceptName(Env,MS,X),
 	R = isTDisjoint(Y),
 	getConceptName(Env,MS,Y),
 	find_pconcept23(Env,MS,X,Y,Top),
-	assert_succ(concepts,Env,MS,Top,PrimConcept),	
-%	assert1(sub(concepts,Env,MS,PrimConcept)),
+	assert_succ(tConcept,Env,MS,Top,PrimConcept),	
+%	assert1(sub_M(tConcept,Env,MS,PrimConcept)),
 	!.
 
 
 
-find_pconcept2(concepts,Env,MS,Primconcept,CT) :-
+find_pconcept2(tConcept,Env,MS,Primconcept,CT) :-
 	CT = orM([andM(L)]),
-	find_pconcept26(concepts,Env,MS,Primconcept,L),
+	find_pconcept26(tConcept,Env,MS,Primconcept,L),
 	!.
 	
-find_pconcept2(concepts,Env,MS,Primconcept,CT) :-
+find_pconcept2(tConcept,Env,MS,Primconcept,CT) :-
 	CT = orM([L|R]),
 	L = andM(L1),
 	find_pconcept3(Env,MS,Primconcept,R,L1,Z),
 	find_pconcept31(Env,MS,Primconcept,Z),	
 	!.
-find_pconcept2(concepts,Env,MS,Primconcept,CT) :-
+find_pconcept2(tConcept,Env,MS,Primconcept,CT) :-
 	CT = orM(L),
-	find_pconcept26(concepts,Env,MS,Primconcept,L),
+	find_pconcept26(tConcept,Env,MS,Primconcept,L),
 	!.
 
-find_pconcept26(concepts,Env,MS,Primconcept,[C1|R]) :-
+find_pconcept26(tConcept,Env,MS,Primconcept,[C1|R]) :-
 %	getConceptName(Env,_MS,W1,C1),
 	getConceptName(Env,MS,X),
-	subsume1(concepts,Env,MS,C1,Primconcept),
-	find_pconcept27(concepts,Env,MS,Primconcept,C1),
-  	find_pconcept26(concepts,Env,MS,Primconcept,R).
+	subsume1(tConcept,Env,MS,C1,Primconcept),
+	find_pconcept27(tConcept,Env,MS,Primconcept,C1),
+  	find_pconcept26(tConcept,Env,MS,Primconcept,R).
 
-find_pconcept27(concepts,Env,MS,Primconcept,C1):-
-	assert1(sub(concepts,Env,MS,C1,Primconcept)),
-	direct_succ(concepts,Env,MS,[],C1,PrimConcept,Z,L1),
-        contb(concepts,Env,MS,Z,L1,PrimConcept),
+find_pconcept27(tConcept,Env,MS,Primconcept,C1):-
+	assert1(sub_M(tConcept,Env,MS,C1,Primconcept)),
+	direct_succ(tConcept,Env,MS,[],C1,PrimConcept,Z,L1),
+        contb(tConcept,Env,MS,Z,L1,PrimConcept),
 	!.
 
 find_pconcept3(Env,MS,Primconcept,[],Z,Z) :- 
@@ -2406,7 +2416,7 @@ find_pconcept3(Env,MS,Primconcept,[L|R],Z,K) :-
 find_pconcept31(Env,MS,Primconcept,[]) :-
 	!.
 find_pconcept31(Env,MS,Primconcept,[L1|R1]) :-
-	find_pconcept27(concepts,Env,MS,Primconcept,L1),
+	find_pconcept27(tConcept,Env,MS,Primconcept,L1),
 	find_pconcept31(Env,MS,Primconcept,R1),
 	!.
 
@@ -2416,120 +2426,120 @@ find_pconcept21(Env,MS,PrimConcept,X,Y) :-
 	conceptEqualSets(Env,user,MS,Concept,someM(X,Y1),_),
 	conceptEqualSets(Env,user,MS,Concept1,someM(X,Y2),_),
 	find_pconcept23(Env,MS,Concept1,Concept,Top),
-	assert_succ(concepts,Env,MS,Top,PrimConcept),
+	assert_succ(tConcept,Env,MS,Top,PrimConcept),
 	!.
 
 find_pconcept23(Env,MS,X,Y,X) :-
-	sub(concepts,Env,MS,X,Y),
+	sub_M(tConcept,Env,MS,X,Y),
 	!.
 find_pconcept23(Env,MS,X,Y,Y) :-
-	sub(concepts,Env,MS,Y,X),
+	sub_M(tConcept,Env,MS,Y,X),
 	!.
 find_pconcept23(Env,MS,X,Y,Top) :-
-	sub(concepts,Env,MS,Top,X),sub(concepts,Env,MS,Top,Y).
+	sub_M(tConcept,Env,MS,Top,X),sub_M(tConcept,Env,MS,Top,Y).
 
 find_pconcept24(Env,MS,Primconcept,[X|R]) :-
 	getConceptName(Env,MS,X),
-	assert1(sub(concepts,Env,MS,X,PrimConcept)),
-	direct_succ(concepts,Env,MS,[],X,PrimConcept,Z,L1),
-        contb(concepts,Env,MS,Z,L1,PrimConcept),
+	assert1(sub_M(tConcept,Env,MS,X,PrimConcept)),
+	direct_succ(tConcept,Env,MS,[],X,PrimConcept,Z,L1),
+        contb(tConcept,Env,MS,Z,L1,PrimConcept),
 	find_pconcept24(Env,MS,Primconcept,R),
 	!.
 
 /*	
-find_pconcept2(concepts,Env,MS,Primconcept,CT) :-
+find_pconcept2(tConcept,Env,MS,Primconcept,CT) :-
 	CT = andM([X|[R]]),
 	getConceptName(Env,_MS1,W1,X),
 	getConceptName(Env,_MS2,W2,R),
-	direct_succ(concepts,Env,MS,[],X,PrimConcept,Z,L1),
-        contb(concepts,Env,MS,Z,L1,PrimConcept),
+	direct_succ(tConcept,Env,MS,[],X,PrimConcept,Z,L1),
+        contb(tConcept,Env,MS,Z,L1,PrimConcept),
 	!.
 
-find_pconcept2(concepts,Env,MS,PrimConcept,CT) :-
+find_pconcept2(tConcept,Env,MS,PrimConcept,CT) :-
 	conceptName1(Env,MS1,CT),
 	find_pconcept23(Env,MS,CT,PrimConcept,Top),
-	assert_succ(concepts,Env,MS,Top,PrimConcept),
-	assert_succ(concepts,Env,MS,Top,CT),
+	assert_succ(tConcept,Env,MS,Top,PrimConcept),
+	assert_succ(tConcept,Env,MS,Top,CT),
 	!.
 */
 
 /*************************************************************************
 *                    jetzt mit rollen
 */
-find_role2(roles,Env,MS,Role,CT) :-
+find_role2(tRole,Env,MS,Role,CT) :-
 	getRoleName(Env,MS,CT),
-	succ(roles,Env,MS,Toprole,Role),
-	assert1(nsub(roles,Env,MS,Role,Ct)),
-	assert1(nsub(roles,Env,MS,Ct,Role)),
-	assert_succ(roles,Env,MS,Toprole,CT),
+	succ_M(tRole,Env,MS,Toprole,Role),
+	assert1(nsub_M(tRole,Env,MS,Role,Ct)),
+	assert1(nsub_M(tRole,Env,MS,Ct,Role)),
+	assert_succ(tRole,Env,MS,Toprole,CT),
 	!.	
-find_role2(roles,Env,MS,Role,CT) :-
+find_role2(tRole,Env,MS,Role,CT) :-
 	getRoleName(Env,MS,CT),
-	succ(roles,Env,MS,Toprole,CT),
-	assert1(nsub(roles,Env,MS,Role,Ct)),
-	assert1(nsub(roles,Env,MS,Ct,Role)),
-	assert_succ(roles,Env,MS,Toprole,Role),
+	succ_M(tRole,Env,MS,Toprole,CT),
+	assert1(nsub_M(tRole,Env,MS,Role,Ct)),
+	assert1(nsub_M(tRole,Env,MS,Ct,Role)),
+	assert_succ(tRole,Env,MS,Toprole,Role),
 	!.
-find_role2(roles,Env,MS,Role,CT) :-	
+find_role2(tRole,Env,MS,Role,CT) :-	
 	getRoleName(Env,MS,CT),
-	assert1(nsub(roles,Env,MS,Role,Ct)),
-	assert1(nsub(roles,Env,MS,Ct,Role)),
-	assert_succ(roles,Env,MS,tTOP,Role),
-	assert_succ(roles,Env,MS,tTOP,CT),
+	assert1(nsub_M(tRole,Env,MS,Role,Ct)),
+	assert1(nsub_M(tRole,Env,MS,Ct,Role)),
+	assert_succ(tRole,Env,MS,tTOP,Role),
+	assert_succ(tRole,Env,MS,tTOP,CT),
 	!.	
-find_role2(roles,Env,MS,Role,CT) :-	
+find_role2(tRole,Env,MS,Role,CT) :-	
 	CT = andM([X|[R]]),
 	roleEqualSets(Env,user,MS,Role1,R,_),
-	assert_succ(roles,Env,MS,X,Role),
-	assert_succ(roles,Env,MS,Role1,Role),	
+	assert_succ(tRole,Env,MS,X,Role),
+	assert_succ(tRole,Env,MS,Role1,Role),	
 	!. 
-find_role2(roles,Env,MS,Role,CT) :-	
+find_role2(tRole,Env,MS,Role,CT) :-	
 	CT = andM([X|[R]]),
 	getRoleName(Env,MS,X),
 	getRoleName(Env,MS,R),
-	assert_succ(roles,Env,MS,X,Role),
-	assert_succ(roles,Env,MS,R,Roles),
+	assert_succ(tRole,Env,MS,X,Role),
+	assert_succ(tRole,Env,MS,R,Roles),
 	!.
-find_role2(roles,Env,MS,Role,CT) :-	
+find_role2(tRole,Env,MS,Role,CT) :-	
 	CT = andM([X|[R]]),
 	R = someM(_,Role1),
 	X == Role1,
 	assert_succ(Roles,Env,MS,X,Role),	
 	!.
-find_role2(roles,Env,MS,Role,CT) :-	
+find_role2(tRole,Env,MS,Role,CT) :-	
 	CT = orM([X|[R]]),
 	find_role3(Env,MS,Role,X,R).
-find_role2(roles,Env,MS,Role,CT) :-
+find_role2(tRole,Env,MS,Role,CT) :-
 	CT = andM(L),
-	find_role21(roles,Env,MS,Role,L),
+	find_role21(tRole,Env,MS,Role,L),
 	!.
-find_role2(roles,Env,MS,Role,CT) :-
+find_role2(tRole,Env,MS,Role,CT) :-
 	CT = restr(Role1,Concept),
-	assert_succ(roles,Env,MS,Role1,Role),
+	assert_succ(tRole,Env,MS,Role1,Role),
 	!.
 
 
-find_role2(roles,Env,MS,Role,CT) :-
+find_role2(tRole,Env,MS,Role,CT) :-
 	CT = orM([andM(L)]),
-	find_role26(roles,Env,MS,Role,L),
+	find_role26(tRole,Env,MS,Role,L),
 	!.
 	
-find_role2(roles,Env,MS,Role,CT) :-
+find_role2(tRole,Env,MS,Role,CT) :-
 	CT = orM([L|R]),
 	L = andM(L1),
 	find_role30(Env,MS,Role,R,L1,Z),
 	find_role31(Env,MS,Role,Z),	
 	!.
-find_role2(roles,Env,MS,Role,CT) :-
+find_role2(tRole,Env,MS,Role,CT) :-
 	CT = orM(L),
-	find_role26(roles,Env,MS,Role,L),
+	find_role26(tRole,Env,MS,Role,L),
 	!.
 
-find_role26(roles,Env,MS,Role,[C1|R]) :-
+find_role26(tRole,Env,MS,Role,[C1|R]) :-
 	getRoleName(Env,MS,C1),
-	subsume1(roles,Env,MS,C1,Role),
-	assert_succ(roles,Env,MS,C1,Role),
-	find_role26(roles,Env,MS,Role,R).
+	subsume1(tRole,Env,MS,C1,Role),
+	assert_succ(tRole,Env,MS,C1,Role),
+	find_role26(tRole,Env,MS,Role,R).
 
 find_role30(Env,MS,Role,[],Z,Z) :- 
 	!.
@@ -2542,113 +2552,113 @@ find_role30(Env,MS,Role,[L|R],Z,K) :-
 find_role31(Env,MS,Role,[]) :-
 	!.
 find_role31(Env,MS,Role,[L1|R1]) :-
-	assert_succ(roles,Env,MS,L1,Role),
+	assert_succ(tRole,Env,MS,L1,Role),
 	find_role31(Env,MS,Role,R1),
 	!.
 
 
 find_role3(Env,MS,Role,X,R) :-
 	X = andM([X1|[R1]]),
-	subsume1(roles,Env,MS,Role,R1),
-	find_role2(roles,Env,MS,Role,X).
+	subsume1(tRole,Env,MS,Role,R1),
+	find_role2(tRole,Env,MS,Role,X).
 find_role3(Env,MS,Role,X,R) :-
 	R = andM([X1|[R1]]),
-	subsume1(roles,Env,MS,Role,R1),
-	find_role2(roles,Env,MS,Role,X).
+	subsume1(tRole,Env,MS,Role,R1),
+	find_role2(tRole,Env,MS,Role,X).
 
-find_role21(roles,Env,MS,Role,[]) :-
+find_role21(tRole,Env,MS,Role,[]) :-
 	!.
-find_role21(roles,Env,MS,Role,[X|R]) :-
+find_role21(tRole,Env,MS,Role,[X|R]) :-
 	getRoleName(Env,MS,X),
-	assert_succ(roles,Env,MS,X,Role),
-	find_role21(roles,Env,MS,Role,R),
+	assert_succ(tRole,Env,MS,X,Role),
+	find_role21(tRole,Env,MS,Role,R),
 	!.
-find_role21(roles,Env,MS,Role,[X|R]) :-
+find_role21(tRole,Env,MS,Role,[X|R]) :-
 	X = isTDisjoint(R1),
 	getRoleName(Env,MS,R1),
-	setofOrNil(K,find_role22(roles,Env,MS,Role,R1,K),L),
-	find_role23(roles,Env,MS,Role,L),
+	setofOrNil(K,find_role22(tRole,Env,MS,Role,R1,K),L),
+	find_role23(tRole,Env,MS,Role,L),
 	!.
-find_role22(roles,Env,MS,Role,R1,K) :-
-	succ(roles,Env,MS,K,R1),
-	isTDisjoint(succ(roles,Env,MS,K,Role)).
+find_role22(tRole,Env,MS,Role,R1,K) :-
+	succ_M(tRole,Env,MS,K,R1),
+	isTDisjoint(succ_M(tRole,Env,MS,K,Role)).
 
-find_role23(roles,Env,MS,Role,[]) :-
+find_role23(tRole,Env,MS,Role,[]) :-
 	!.	
-find_role23(roles,Env,MS,Role,[L1|R1]) :-
-	find_role24(roles,Env,MS,Role,L1),
-	find_role23(roles,Env,MS,Role,R1),
+find_role23(tRole,Env,MS,Role,[L1|R1]) :-
+	find_role24(tRole,Env,MS,Role,L1),
+	find_role23(tRole,Env,MS,Role,R1),
 	!.
-find_role24(roles,Env,MS,Role,L1) :-
-	succ(roles,Env,MS,Top,L1),
-	succ(roles,Env,MS,Top,K),
-	subsume1(roles,Env,MS,K,Role),
-	setofOrNil(Nf,succ(roles,Env,MS,K,Nf),Lnf),
-	make_succ1(roles,Env,MS,K,Lnf,Role),
+find_role24(tRole,Env,MS,Role,L1) :-
+	succ_M(tRole,Env,MS,Top,L1),
+	succ_M(tRole,Env,MS,Top,K),
+	subsume1(tRole,Env,MS,K,Role),
+	setofOrNil(Nf,succ_M(tRole,Env,MS,K,Nf),Lnf),
+	make_succ1(tRole,Env,MS,K,Lnf,Role),
 	!.
 
 /******** PrimRollen ************************************************/
 
-find_prole2(roles,Env,MS,PrimRole,CT) :-
+find_prole2(tRole,Env,MS,PrimRole,CT) :-
 	CT = andM(L),
 	find_prole24(Env,MS,PrimRole,L),
 	!.
 
-find_prole2(roles,Env,MS,PrimRole,CT) :-
+find_prole2(tRole,Env,MS,PrimRole,CT) :-
 	CT = isTDisjoint(X),
 	getRoleName(Env,MS,X),
-	cont1a(roles,Env,MS,X,PrimRole),
+	cont1a(tRole,Env,MS,X,PrimRole),
 	find_prole23(Env,MS,X,PrimRole,Top),
-	assert_succ(roles,Env,MS,Top,PrimRole),
-	assert_succ(roles,Env,MS,Top,X),
+	assert_succ(tRole,Env,MS,Top,PrimRole),
+	assert_succ(tRole,Env,MS,Top,X),
 	!.
 
-find_prole2(roles,Env,MS,PrimRole,CT) :-
+find_prole2(tRole,Env,MS,PrimRole,CT) :-
 	convertMS(Env,[[],true],MS,[],[W1,G1],_),
 	call(G1),
 	getRoleName(Env,MS,CT),
-	assert1(sub(roles,Env,MS,CT,PrimRole)),
-	direct_succ(roles,Env,MS,[],CT,PrimRole,Z,L1),
-              contb(roles,Env,MS,Z,L1,PrimRole),
+	assert1(sub_M(tRole,Env,MS,CT,PrimRole)),
+	direct_succ(tRole,Env,MS,[],CT,PrimRole,Z,L1),
+              contb(tRole,Env,MS,Z,L1,PrimRole),
 	!.
 /*
-find_prole2(roles,Env,MS,PrimRole,CT) :-
+find_prole2(tRole,Env,MS,PrimRole,CT) :-
 	CT = andM([X|[R]]),
 	getRoleName(Env,MS,X),
 	getRoleName(Env,MS,R),	
 	find_prole23(Env,MS,X,R,Top),
-	assert_succ(roles,Env,MS,Top,PrimRole),
+	assert_succ(tRole,Env,MS,Top,PrimRole),
 	!.
 
-find_prole2(roles,Env,MS,PrimRole,CT) :-
+find_prole2(tRole,Env,MS,PrimRole,CT) :-
 	getRoleName(Env,MS,CT),
 	find_prole23(Env,MS,PrimRole,CT,Top),
-	assert_succ(roles,Env,MS,Top,PrimRole),
-	assert_succ(roles,Env,MS,Top,CT),
+	assert_succ(tRole,Env,MS,Top,PrimRole),
+	assert_succ(tRole,Env,MS,Top,CT),
 	!.
 */
-find_prole2(roles,Env,MS,PrimRole,CT) :-
+find_prole2(tRole,Env,MS,PrimRole,CT) :-
 	CT = someM(X,Y),
 	find_prole21(Env,MS,PrimRole,X,Y),
 	!.
-find_prole2(roles,Env,MS,PrimRole,CT) :-
+find_prole2(tRole,Env,MS,PrimRole,CT) :-
 	CT = andM([X|[R]]),
 	getRoleName(Env,MS,X),
 	R = isTDisjoint(Y),
 	getRoleName(Env,MS,Y),
 	find_prole23(Env,MS,X,Y,Top),
-	assert_succ(roles,Env,MS,Top,PrimRole),	
+	assert_succ(tRole,Env,MS,Top,PrimRole),	
 	!.
 	
-find_prole2(roles,Env,MS,Primrole,CT) :-
+find_prole2(tRole,Env,MS,Primrole,CT) :-
 	CT = orM([L|R]),
 	L = andM(L1),
 	find_prole3(Env,MS,Primrole,R,L1,Z),
 	find_prole31(Env,MS,Primrole,Z),	
 	!.
-find_prole2(roles,Env,MS,Primrole,CT) :-
+find_prole2(tRole,Env,MS,Primrole,CT) :-
 	CT = orM(L),
-	find_prole26(roles,Env,MS,Primrole,L),
+	find_prole26(tRole,Env,MS,Primrole,L),
 	!.
 
 find_prole21(Env,MS,PrimRole,X,Y) :-
@@ -2656,39 +2666,39 @@ find_prole21(Env,MS,PrimRole,X,Y) :-
 	roleEqualSets(Env,user,MS,Role,someM(X,Y1),_),
 	roleEqualSets(Env,user,MS,Role1,someM(X,Y2),_),
 	find_prole23(Env,MS,Role,Role1,Top),
-	assert_succ(roles,Env,MS,Top,PrimRole),
+	assert_succ(tRole,Env,MS,Top,PrimRole),
 	!.
 
 find_prole23(Env,MS,X,Y,X) :-
-	sub(roles,Env,MS,X,Y),
+	sub_M(tRole,Env,MS,X,Y),
 	!.
 find_prole23(Env,MS,X,Y,Y) :-
-	sub(roles,Env,MS,Y,X),
+	sub_M(tRole,Env,MS,Y,X),
 	!.
 find_prole23(Env,MS,X,Y,Top) :-
-	sub(roles,Env,MS,Top,X),sub(roles,Env,MS,Top,Y).
+	sub_M(tRole,Env,MS,Top,X),sub_M(tRole,Env,MS,Top,Y).
 
 find_prole24(Env,MS,PrimRole,[]).
 find_prole24(Env,MS,PrimRole,[X|R]) :-
 	getRoleName(Env,MS,X),
-	assert1(sub(roles,Env,MS,X,PrimRole)),
-	direct_succ(roles,Env,MS,[],X,PrimRole,Z,L1),
-              contb(roles,Env,MS,Z,L1,PrimRole),
+	assert1(sub_M(tRole,Env,MS,X,PrimRole)),
+	direct_succ(tRole,Env,MS,[],X,PrimRole,Z,L1),
+              contb(tRole,Env,MS,Z,L1,PrimRole),
 	find_prole24(Env,MS,PrimRole,R),
 	!.
 
-find_prole26(roles,Env,MS,Primrole,[C1|R]) :-
+find_prole26(tRole,Env,MS,Primrole,[C1|R]) :-
 	convertMS(Env,[[],true],MS,[],[W1,G1],_),
 	call(G1),
 	getRoleName(Env,MS,C1),
-	subsume1(roles,Env,MS,C1,Primrole),
-	find_prole27(roles,Env,MS,Primrole,C1),
-  	find_prole26(roles,Env,MS,Primrole,R).
+	subsume1(tRole,Env,MS,C1,Primrole),
+	find_prole27(tRole,Env,MS,Primrole,C1),
+  	find_prole26(tRole,Env,MS,Primrole,R).
 
-find_prole27(roles,Env,MS,Primrole,C1):-
-	assert1(sub(roles,Env,MS,C1,Primrole)),
-	direct_succ(roles,Env,MS,[],C1,PrimRole,Z,L1),
-              contb(roles,Env,MS,Z,L1,Primrole),
+find_prole27(tRole,Env,MS,Primrole,C1):-
+	assert1(sub_M(tRole,Env,MS,C1,Primrole)),
+	direct_succ(tRole,Env,MS,[],C1,PrimRole,Z,L1),
+              contb(tRole,Env,MS,Z,L1,Primrole),
 	!.
 
 find_prole3(Env,MS,Primrole,[],Z,Z) :- 
@@ -2702,7 +2712,7 @@ find_prole3(Env,MS,Primrole,[L|R],Z,K) :-
 find_prole31(Env,MS,Primrole,[]) :-
 	!.
 find_prole31(Env,MS,Primrole,[L1|R1]) :-
-	find_prole27(roles,Env,MS,Primrole,L1),
+	find_prole27(tRole,Env,MS,Primrole,L1),
 	find_prole31(Env,MS,Primrole,R1),
 	!.
 
@@ -2710,17 +2720,17 @@ find_prole31(Env,MS,Primrole,[L1|R1]) :-
 
 make_succ(MS) :-           
 	currentEnvironment(Env),            
-              not(make_succ(concepts,Env,MS)),
-	not(make_succ(roles,Env,MS)),!.
-make_succ(concepts,Env,MS) :-        
+              not(make_succ(tConcept,Env,MS)),
+	not(make_succ(tRole,Env,MS)),!.
+make_succ(tConcept,Env,MS) :-        
 	getConceptName(Env,MS,NewConcept),
 	ifOption(testOutput,yes,(print(NewConcept),nl)),
-	make_succ2(concepts,Env,MS,NewConcept),
+	make_succ2(tConcept,Env,MS,NewConcept),
 	fail.
-make_succ(roles,Env,MS) :-
+make_succ(tRole,Env,MS) :-
 	getRoleName(Env,MS,NewRole),
 	ifOption(testOutput,yes,(print(NewRole),nl)),
-	make_succ2(roles,Env,MS,NewRole),
+	make_succ2(tRole,Env,MS,NewRole),
        	fail.
 make_succ2(Type,Env,MS,NewConcept) :- 
               NewConcept \== tTOP,!,
@@ -2744,7 +2754,7 @@ contb(Type,Env,MS,X,L,NewConcept) :-
         !.
 
 contc(Type,Env,MS,X,Y,L) :-
-        sub(Type,Env,MS,X,Y),member(Y,L).
+        sub_M(Type,Env,MS,X,Y),member(Y,L).
 
 direct_succ(Type,Env,MS,_Done,tBOT,X,_,[]) :- fail.
 direct_succ(Type,Env,MS,Done,X,NewConcept,Z,L1) :-
@@ -2795,37 +2805,37 @@ check1(Type,Env,MS,Done,[Y|L],NewConcept,L1) :-
 	!.
 
 make_succ1(Type,Env,MS,X,[Y|L],NewConcept) :- 
-	not(succ(Type,Env,MS,NewConcept,Y)),
-        retract1(succ(Type,Env,MS,X,Y)),
-%	assert1(succ(Type,Env,MS,NewConcept,Y)),
+	not(succ_M(Type,Env,MS,NewConcept,Y)),
+        retract1(succ_M(Type,Env,MS,X,Y)),
+%	assert1(succ_M(Type,Env,MS,NewConcept,Y)),
         assert_succ(Type,Env,MS,NewConcept,Y),
 	!,
 	make_succ1(Type,Env,MS,X,L,NewConcept). 
 make_succ1(Type,Env,MS,X,[Y|L],NewConcept) :- 
-% 	assert1(succ(Type,Env,MS,x,NewConcept)),
+% 	assert1(succ_M(Type,Env,MS,x,NewConcept)),
         assert_succ(Type,Env,MS,X,NewConcept),
 	!,
 	make_succ1(Type,Env,MS,X,L,NewConcept).
 make_succ1(Type,Env,MS,X,[],NewConcept) :- 
-%	assert1(succ(Type,Env,MS,X,NewConcept)),
+%	assert1(succ_M(Type,Env,MS,X,NewConcept)),
         assert_succ(Type,Env,MS,X,NewConcept),
 	!.
 
 
 /****************  practical funktions ******************************/	
 
-subsume1(Type,Env,MS,X,Y) :- var(X),!,fail.
-subsume1(Type,Env,MS,X,Y) :- var(Y),!,fail.
+subsume1(Type,Env,MS,X,Y) :- is_ftVar(X),!,fail.
+subsume1(Type,Env,MS,X,Y) :- is_ftVar(Y),!,fail.
 subsume1(Type,Env,MS,X,tTOP) :- !,fail.
 subsume1(Type,Env,MS,tBOT,X) :- !,fail.
 subsume1(Type,Env,MS,X,[]) :- !.
 subsume1(Type,Env,MS,X,tBOT) :- !.
 subsume1(Type,Env,MS,tTOP,X) :- !.
 subsume1(Type,Env,MS,X,Y) :- 
-	sub(Type,Env,MS,X,Y),
+	sub_M(Type,Env,MS,X,Y),
 	!.
 subsume1(Type,Env,MS,X,Y) :- 
-	nsub(Type,Env,MS,X,Y),
+	nsub_M(Type,Env,MS,X,Y),
 	!,
 	fail. 
 subsume1(Type,Env,MS,X,Y) :- 
@@ -2842,7 +2852,7 @@ subsume1(Type,Env,MS,X,Y) :-
 
 cont(Type,Env,MS,_,tTOP,Y).
 cont(Type,Env,MS,Done,X,Y) :- 
-	assert1(sub(Type,Env,MS,X,Y)),
+	assert1(sub_M(Type,Env,MS,X,Y)),
 	succ1(Type,Env,MS,Z,X),
 	not(member(Z,Done)),
 	cont(Type,Env,MS,[Z|Done],Z,Y),!.
@@ -2855,7 +2865,7 @@ cont1a(Type,Env,MS,Done,X,Y) :-
        member(X,Done), 
        !.
 cont1a(Type,Env,MS,Done,X,Y) :-
-	assert1(nsub(Type,Env,MS,X,Y)),
+	assert1(nsub_M(Type,Env,MS,X,Y)),
 	succ1(Type,Env,MS,X,Z),
 	cont1a(Type,Env,MS,[X|Done],Z,Y),
 	!.
@@ -2899,14 +2909,14 @@ assert_succ(Type,Env,MS,X,X) :-
 	!.
 /*
 assert_succ(Type,Env,MS,X,RorC) :-
-	assert1(succ(Type,Env,MS,X,RorC)),
+	assert1(succ_M(Type,Env,MS,X,RorC)),
 	cont(Type,Env,MS,[],X,RorC),
 	!.
 */
 assert_succ(Type,Env,MS,X,RorC) :-
 	cont(Type,Env,MS,[],X,RorC),
-	isTDisjoint((sub(Type,Env,MS,X,Y),isTDisjoint(var(Y)),sub(Type,Env,MS,Y,RorC),Y \== RorC)),
-	assert1(succ(Type,Env,MS,X,RorC)),
+	isTDisjoint((sub_M(Type,Env,MS,X,Y),isTDisjoint(is_ftVar(Y)),sub_M(Type,Env,MS,Y,RorC),Y \== RorC)),
+	assert1(succ_M(Type,Env,MS,X,RorC)),
 	!.
 assert_succ(Type,Env,MS,X,RorC).
 
@@ -2918,13 +2928,13 @@ retract1(G) :-
 	!.
 
 succ1(Type,Env,MS,X,Y) :- 
-	succ(Type,Env,MS,X,Y).
+	succ_M(Type,Env,MS,X,Y).
 %	!.
 succ1(Type,Env,MS,X,tBOT).
 % 	:-  !.
 
 /*****************************************************************************/
-/***************** print andM statistic - functions ***************************/
+/***************** print and statistic - functions ***************************/
 newShowHierarchy :-
 	show_dag.
 
@@ -2937,22 +2947,22 @@ show_dag(MS) :-
 show_dag(Env,MS) :-
 	!,
 	print('Concepts'),nl,
-        isTDisjoint(show_dag(concepts,Env,MS,tTOP,[])),nl,nl,
+        not(show_dag(tConcept,Env,MS,tTOP,[])),nl,nl,
 	print('Roles'),nl,
-	isTDisjoint(show_dag(roles,Env,MS,tTOP,[])).
+	isTDisjoint(show_dag(tRole,Env,MS,tTOP,[])).
 show_dag(Type,Env,MS,tBOT,_) :- !,fail.
 show_dag(Type,Env,MS,Node,L) :-
 	writes(L),
 	print(Node),nl,
-	succ(Type,Env,MS,Node,N),
+	succ_M(Type,Env,MS,Node,N),
   	show_dag(Type,Env,MS,N,[45|L]),
 	fail.
 
 initStat :-
 	!,
 	setCounter(subsumptionTests,0),
-	setCounter(concepts,0),
-	setCounter(roles,0),
+	setCounter(tConcept,0),
+	setCounter(tRole,0),
 	setCounter(conceptsClassified,0),
 	setCounter(rolesClassified,0),
 	getRuntime(T0),
@@ -2962,9 +2972,9 @@ getStat(CN,CST,RN,RST,T) :-
 	!,
 	getRuntime(T1),
 	getCounter(subsumptionTests,ST),
-	getCounter(concepts,CST),
+	getCounter(tConcept,CST),
 	getCounter(conceptsClassified,CN),
-	getCounter(roles,RST),
+	getCounter(tRole,RST),
 	getCounter(rolesClassified,RN),
 	getCounter(runtime,T0),
 	T is T1 - T0,
@@ -2980,18 +2990,18 @@ printStat :-
 	!.
 
 buildOrdering(Env,MS,CTree,RTree) :- 
-	buildOrdering(concepts,Env,MS,tTOP,[],CTree),
-	buildOrdering(roles,Env,MS,tTOP,[],RTree),
+	buildOrdering(tConcept,Env,MS,tTOP,[],CTree),
+	buildOrdering(tRole,Env,MS,tTOP,[],RTree),
 	!.
 
 
 buildOrdering(Type,Env,MS,tBOT,Done,node([tBOT|EquivClass],[])) :-
 	!,
-	setofOrNil(Z2,(succ(Type,Env,MS,tBOT,Z2),succ(Type,Env,MS,Z2,tBOT)),EquivClass),
+	setofOrNil(Z2,(succ_M(Type,Env,MS,tBOT,Z2),succ_M(Type,Env,MS,Z2,tBOT)),EquivClass),
 	!.
 buildOrdering(Type,Env,MS,Concept1,Done,node([Concept1|EquivClass],SubtreeList)) :-
-	setofOrNil(Z1,succ(Type,Env,MS,Concept1,Z1),S1),
-	setofOrNil(Z2,(succ(Type,Env,MS,Concept1,Z2),succ(Type,Env,MS,Z2,Concept1)),EquivClass),
+	setofOrNil(Z1,succ_M(Type,Env,MS,Concept1,Z1),S1),
+	setofOrNil(Z2,(succ_M(Type,Env,MS,Concept1,Z2),succ_M(Type,Env,MS,Z2,Concept1)),EquivClass),
 	successorSet(S1,EquivClass,Succ),
 	append(Done,[Concept1|EquivClass],Done1),
 	buildOrderingList(Type,Env,MS,Succ,Done1,SubtreeList).
@@ -3053,31 +3063,31 @@ compileEnvironment(FileName,EnvName) :-
 	(removeEnvironment(EnvName) ; true),
 	termExpansion(on,Env,CPList),
 	tell('/tmp/compile.tmp'),
-	write((:- dynamic(constraint/8))), write('.'), nl,
+	write((:- dynamic(constraint_M/8))), write('.'), nl,
 	write((:- dynamic(numb/1))), write('.'), nl,
-%	write((:- dynamic(in/9))), write('.'), nl,
-%	write((:- dynamic(kb_in/10))), write('.'), nl,
+%	write((:- dynamic(in_M/9))), write('.'), nl,
+%	write((:- dynamic(kb_in_M/10))), write('.'), nl,
 	write((:- dynamic(falsum/2))), write('.'), nl,
 %	write((:- dynamic(conceptName/4))), write('.'), nl,
 %	write((:- dynamic(roleName/4))), write('.'), nl,
 %	write((:- dynamic(conceptEqualSets/6))), write('.'), nl,
 	write((:- dynamic(conceptSubsets/6))), write('.'), nl,
-%	write((:- dynamic(eq/9))), write('.'), nl,
+%	write((:- dynamic(eq_M/9))), write('.'), nl,
 	write((:- dynamic(inconsistencyCheck/3))), write('.'), nl,
 	write((:- dynamic(roleEqualSets/6))), write('.'), nl,
 	write((:- dynamic(roleSubsets/6))), write('.'), nl,
 	write((:- dynamic(conceptElement/7))), write('.'), nl,
 	write((:- dynamic(roleElement/8))), write('.'), nl,
-	write((:- dynamic(closed/5))), write('.'), nl,
-	write((:- dynamic(sub/4))), write('.'), nl,
-	write((:- dynamic(succ/4))), write('.'), nl,
-	write((:- dynamic(nsub/4))), write('.'), nl,
+	write((:- dynamic(closed_M/5))), write('.'), nl,
+	write((:- dynamic(sub_M/4))), write('.'), nl,
+	write((:- dynamic(succ_M/4))), write('.'), nl,
+	write((:- dynamic(nsub_M/4))), write('.'), nl,
 	write((:- dynamic(sub3/2))), write('.'), nl,
 	write((:- dynamic(succ3/2))), write('.'), nl,
 	write((:- dynamic(nsub3/2))), write('.'), nl,
 	write((:- dynamic(abductiveDerivation/3))), write('.'), nl,
 	write((:- dynamic(consistencyDerivation/3))), write('.'), nl,
-	write((:- dynamic(hypothesis/1))), write('.'), nl,
+	write((:- dynamic(hypothesis_M/1))), write('.'), nl,
 	write((:- dynamic(roleDomain/4))), write('.'), nl,
 	write((:- dynamic(roleRange/4))), write('.'), nl,
 	write((:- dynamic(roleDefault/4))), write('.'), nl,
@@ -3086,45 +3096,45 @@ compileEnvironment(FileName,EnvName) :-
 	write((:- dynamic(roleAttributes/5))), write('.'), nl,
 %	write((:- dynamic(given_inflLink/4))), write('.'), nl,
 %	write((:- dynamic(given_change/4))), write('.'), nl,
-	write((:- dynamic(value/2))), write('.'), nl,
+	write((:- dynamic(value_M/2))), write('.'), nl,
 	write((:- dynamic(option_M/2))), write('.'), nl,
 %	write((:- dynamic(environment_M/3))), write('.'), nl,
 %	write((:- dynamic(conceptHierarchy/3))), write('.'), nl,
 %	write((:- dynamic(roleHierarchy/3))), write('.'), nl,
 	write((:- dynamic(modalAxiom/6))), write('.'), nl,
-%	write((:- dynamic(rel/5))), write('.'), nl,
+%	write((:- dynamic(rel_M/5))), write('.'), nl,
 	write((:- dynamic(compiledPredicate/2))), write('.'), nl,
 	writeq((:- asserta(environment_M(EnvName,Env,Comment)))), write('.'), nl,
 	writeq((:- retractall1_M(currentEnvironment(_)))), write('.'), nl,
 	writeq((:- asserta(currentEnvironment(Env)))), write('.'), nl,
 	writeCompiledPredicateFactsToFile(Env,CPList),
-	expand_term_M((in(Env,Name,modal(MS),CN,CON,hyp(HYP),
+	expand_term_M((in_M(Env,Name,modal(MS),CN,CON,hyp(HYP),
                         ab(D),call(CALL),PT) :-
-	                   kb_in(Env,pr(5),Name,modal(MS),CN,CON,hyp(HYP),
+	                   kb_in_M(Env,pr(5),Name,modal(MS),CN,CON,hyp(HYP),
                                  ab(D),call(CALL),PT)),
 		    InClause1),
 	writeq(InClause1), write('.'), nl,
-	expand_term_M((in(Env,Name,modal(MS),CN,CON,
+	expand_term_M((in_M(Env,Name,modal(MS),CN,CON,
                         hyp([orM(H1),rl(H2),fl(H3)]),ab(noAb),call(CALL),PT) :-
 		           clashInHyp(H2), !, fail),
 		    InClause2),
 	writeq(InClause2), write('.'), nl,
-	expand_term_M(in(Env,X2,X3,X4,X5,X6,X7,X8,X9), Head3),
-	writeq((Head3 :- kb_in(Env,pr(3),X2,X3,X4,X5,X6,X7,X8,X9))),
+	expand_term_M(in_M(Env,X2,X3,X4,X5,X6,X7,X8,X9), Head3),
+	writeq((Head3 :- kb_in_M(Env,pr(3),X2,X3,X4,X5,X6,X7,X8,X9))),
 	write('.'), nl,
-	expand_term_M((in(Env,Name,modal(MS),CN,CON,hyp(HYP),
+	expand_term_M((in_M(Env,Name,modal(MS),CN,CON,hyp(HYP),
                         ab(D),call(CALL),PT) :-
 		          (CN \== tTOP, CN \== tBOT, CN \== isTDisjoint(tTOP), 
                            CN \== isTDisjoint(tBOT),
-	                   kb_in(Env,pr(3),Name,modal(MS),CN,CON,hyp(HYP),
+	                   kb_in_M(Env,pr(3),Name,modal(MS),CN,CON,hyp(HYP),
                                  ab(D),call(CALL),PT))),
 		    InClause4),
 	writeq(InClause4), write('.'), nl,
-	expand_term_M((in(Env,Name,modal(MS),CN,CON,hyp(HYP),
+	expand_term_M((in_M(Env,Name,modal(MS),CN,CON,hyp(HYP),
                         ab(D),call(CALL),PT) :-
 		          (CN \== tTOP,CN \== tBOT, CN \== isTDisjoint(tTOP), 
                            CN \== isTDisjoint(tBOT),
-			   kb_in(Env,pr(1),Name,modal(MS),CN,CON,hyp(HYP),
+			   kb_in_M(Env,pr(1),Name,modal(MS),CN,CON,hyp(HYP),
 				 ab(D),call(CALL),PT))),
 		    InClause5),
 	writeq(InClause5), write('.'), nl,
@@ -3150,7 +3160,7 @@ treatClause((:-dynamic Pred/Arity)) :-
 %	write((:-dynamic Pred/Arity)), write('.'), nl,
 	!,
 	fail.
-treatClause((in(_X1,_X2,_X3,_X4,_X5,_X6,_X7,_X8,_X9) :- _Body)) :-
+treatClause((in_M(_X1,_X2,_X3,_X4,_X5,_X6,_X7,_X8,_X9) :- _Body)) :-
 	!,
 	fail.
 treatClause(X) :-
@@ -3167,40 +3177,40 @@ writeCompiledPredicateFactsToFile(Env,[Pred/Arity|List]) :-
 	writeCompiledPredicateFactsToFile(Env,List).
 
 assertConnectionClauses(Env) :-
-	expand_term_M(constraint(Env,X2,X3,X4,X5,X6,X7,X8),CompConAtom),
-	assertz_if_new((constraint(Env,X2,X3,X4,X5,X6,X7,X8) :-
+	expand_term_M(constraint_M(Env,X2,X3,X4,X5,X6,X7,X8),CompConAtom),
+	assertz_if_new((constraint_M(Env,X2,X3,X4,X5,X6,X7,X8) :-
 		 CompConAtom)),
-	expand_term_M(eq(Env,X2,X3,X4,X5,X6,X7,X8,X9),CompEqAtom),
-	assertz_if_new((eq(Env,X2,X3,X4,X5,X6,X7,X8,X9) :-
+	expand_term_M(eq_M(Env,X2,X3,X4,X5,X6,X7,X8,X9),CompEqAtom),
+	assertz_if_new((eq_M(Env,X2,X3,X4,X5,X6,X7,X8,X9) :-
 		 CompEqAtom)),
-	expand_term_M(in(Env,X2,X3,X4,X5,X6,X7,X8,X9),CompInAtom),
-	assertz_if_new((in(Env,X2,X3,X4,X5,X6,X7,X8,X9) :-
+	expand_term_M(in_M(Env,X2,X3,X4,X5,X6,X7,X8,X9),CompInAtom),
+	assertz_if_new((in_M(Env,X2,X3,X4,X5,X6,X7,X8,X9) :-
 		 CompInAtom)),
-%	assertz_if_new((kb_in(Env,X2,X3,X4,X5,X6,X7,X8,X9,X10) :-
+%	assertz_if_new((kb_in_M(Env,X2,X3,X4,X5,X6,X7,X8,X9,X10) :-
 %		 comp_kb_in(Env,X2,X3,X4,X5,X6,X7,X8,X9,X10))),
-	expand_term_M(rel(Env,X2,X3,X4,X5),CompRelAtom),
-	assertz_if_new((rel(Env,X2,X3,X4,X5) :-
+	expand_term_M(rel_M(Env,X2,X3,X4,X5),CompRelAtom),
+	assertz_if_new((rel_M(Env,X2,X3,X4,X5) :-
 		 CompRelAtom)),
 	!.
 
 termExpansion(on,env(Id),
               [CompCon/8,CompEq/9,CompIn/9,CompKb_in/10,CompRel/6]) :-
-	% Generate the names for the compiled in, kb_in, constraint, andM rel
-	% predicates in environment_M Id.
+	% Generate the names for the compiled in_M, kb_in_M, constraint_M, and rel_M
+	% predicates in environment Id.
 	name(Id,IdChars),
-	name(in,InChars),
+	name(in_M,InChars),
 	append(InChars,[95,99,95|IdChars],CompInChars),
 	name(CompIn,CompInChars),
-	name(constraint,ConChars),
+	name(constraint_M,ConChars),
 	append(ConChars,[95,99,95|IdChars],CompConChars),
 	name(CompCon,CompConChars),
-	name(eq,EqChars),
+	name(eq_M,EqChars),
 	append(EqChars,[95,99,95|IdChars],CompEqChars),
 	name(CompEq,CompEqChars),
-	name('kb_in',Kb_inChars),
+	name('kb_in_M',Kb_inChars),
 	append(Kb_inChars,[95,99,95|IdChars],CompKb_inChars),
 	name(CompKb_in,CompKb_inChars),
-	name('rel',RelChars),
+	name('rel_M',RelChars),
 	append(RelChars,[95,99,95|IdChars],CompRelChars),
 	name(CompRel,CompRelChars),
 	% Abolish any previously asserted clauses for the 
@@ -3216,7 +3226,7 @@ termExpansion(on,env(Id),
 	CompInAtom =.. [CompIn|[X4-X5,X1,X2,X3,X6,X7,X8,X9]],
 	CompKb_inAtom =.. [CompKb_in|[X5-X6,X1,X2,X3,X4,X7,X8,X9,X10]],
 	CompRelAtom =.. [CompRel|[X1,X2,X3,X4,X5,X6]],
-	% Assert the term_expansion_M rules needed to translate the
+	% Assert the term_expansion rules needed to tranlate the
 	% interpreted clauses into compiled clauses.
 	abolish(term_expansion_M/2),
 	assertz_if_new((term_expansion_M((Head :- Body),(Head1 :- Body1)) :-
@@ -3230,15 +3240,15 @@ termExpansion(on,env(Id),
 	term_expansion_M(Body,Body1))),
 	assertz_if_new((term_expansion_M(\+Atom,\+Atom1) :-
 	term_expansion_M(Atom,Atom1))),
-	assertz_if_new((term_expansion_M(constraint(X1,X2,X3,X4,X5,X6,X7,X8),
+	assertz_if_new((term_expansion_M(constraint_M(X1,X2,X3,X4,X5,X6,X7,X8),
 				CompConAtom))),
-	assertz_if_new((term_expansion_M(eq(X1,X2,X3,X4,X5,X6,X7,X8,X9),
+	assertz_if_new((term_expansion_M(eq_M(X1,X2,X3,X4,X5,X6,X7,X8,X9),
 				CompEqAtom))),
-	assertz_if_new((term_expansion_M(in(X1,X2,X3,X4,X5,X6,X7,X8,X9),
+	assertz_if_new((term_expansion_M(in_M(X1,X2,X3,X4,X5,X6,X7,X8,X9),
 				CompInAtom))),
-	assertz_if_new((term_expansion_M(kb_in(X1,X2,X3,X4,X5,X6,X7,X8,X9,X10),
+	assertz_if_new((term_expansion_M(kb_in_M(X1,X2,X3,X4,X5,X6,X7,X8,X9,X10),
 				CompKb_inAtom))),
-	assertz_if_new((term_expansion_M(rel(X1,X2,X3,X4,X5),
+	assertz_if_new((term_expansion_M(rel_M(X1,X2,X3,X4,X5),
 				CompRelAtom))),
 	assertz_if_new((term_expansion_M(once(Body1),once(Body2)) :-
 		term_expansion_M(Body1,Body2))),
@@ -3361,7 +3371,7 @@ normalizeInverse(R1,R1).
 /***********************************************************************
  *
  * fatten_m(+C1,-C2)
- * deletes unnecessary occurrences of `andM' andM `orM' in C1 to get C2.
+ * deletes unnecessary occurrences of `andM' and `orM' in C1 to get C2.
  *
  */
 
@@ -3453,7 +3463,7 @@ flattenOr(L1,[],L1).
  */
 
 distributeAnd(andM(L1),orM([C2|L2]),orM([C3|L4])) :-
-	% L3 := L1 andM C2
+	% L3 := L1 and C2
 	append(L1,[C2],L3),
 	% C3 := deMorganAnd(L3)
 	deMorgan(andM(L3),C3),
@@ -3473,7 +3483,7 @@ distributeAnd(andM(_L1),orM([]),orM([])).
  */
 	
 distributeOr(orM(L1),andM([C2|L2]),andM([C3|L4])) :-
-	% L3 := L1 orM C2
+	% L3 := L1 or C2
 	append(L1,[C2],L3),
 	% C3 := deMorgan(L3)
 	deMorgan(orM(L3),C3),
@@ -3557,7 +3567,7 @@ cnf_m(C1,C6) :-
  * memberConcept(+Concept,+Dag)
  * Arguments: Concept     concept name
  *            Dag         subsumption hierarchy
- * checks wether orM isTDisjoint Concept occurs in the subsumption hierarchy.
+ * checks wether or isTDisjoint Concept occurs in the subsumption hierarchy.
  *
  */
 
@@ -3572,7 +3582,7 @@ memberConceptSubtrees(Concept,List) :-
  * memberDirectSubConcepts(+Concept,+Dag)
  * Arguments: Concept     concept name
  *            Dag         subsumption hierarchy
- * checks wether orM isTDisjoint Concept occurs in the direct subconcepts of
+ * checks wether or isTDisjoint Concept occurs in the direct subconcepts of
  * the tTOP concept of Dag.
  *
  */
@@ -3587,11 +3597,11 @@ memberDirectSubConcepts(Concept,List) :-
 /***********************************************************************
  *
  * getDirectSuperConcepts(+EnvName,+MS,+Concept,-CL)
- * Arguments: EnvName     environment_M identifier
+ * Arguments: EnvName     environment identifier
  *            MS          modal context
  *            Concept     concept name
  *            CL          list of concept names
- * CL is the list of allM concept names which are direct super concepts
+ * CL is the list of all concept names which are direct super tConcept
  * of Concept.
  *
  */
@@ -3605,11 +3615,11 @@ getDirectSuperConcepts(EnvName,MS,Concept,CL) :-
 /***********************************************************************
  *
  * getAllSuperConcepts(+EnvName,+MS,+Concept,-CL)
- * Arguments: EnvName     environment_M identifier
+ * Arguments: EnvName     environment identifier
  *            MS          modal context
  *            Concept     concept name
  *            CL          list of concept names
- * CL is the list of allM concept names which are super concepts of
+ * CL is the list of all concept names which are super tConcept of
  * Concept.
  *
  */
@@ -3622,11 +3632,11 @@ getAllSuperConcepts(EnvName,MS,Concept,CL) :-
 /***********************************************************************
  *
  * getDirectSubConcepts(+EnvName,+MS,+Concept,-CL)
- * Arguments: EnvName     environment_M identifier
+ * Arguments: EnvName     environment identifier
  *            MS          modal context
  *            Concept     concept name
  *            CL          list of concept names
- * CL is the list of allM concept names which are direct super concepts
+ * CL is the list of all concept names which are direct super tConcept
  * of Concept.
  *
  */
@@ -3639,11 +3649,11 @@ getDirectSubConcepts(EnvName,MS,Concept,CL) :-
 /***********************************************************************
  *
  * getAllSubConcepts(+EnvName,+MS,+Concept,-CL)
- * Arguments: EnvName     environment_M identifier
+ * Arguments: EnvName     environment identifier
  *            MS          modal context
  *            Concept     concept name
  *            CL          list of concept names
- * CL is the list of allM concept names which are super concepts of 
+ * CL is the list of all concept names which are super tConcept of 
  * Concept.
  *
  */
@@ -3656,10 +3666,10 @@ getAllSubConcepts(EnvName,MS,Concept,CL) :-
 /***********************************************************************
  *
  * getConcepts(+MS,-CL)
- * Arguments: EnvName     environment_M identifier
+ * Arguments: EnvName     environment identifier
  *            MS          modal context
  *            CL          list of concept names
- * CL is the list of allM concept names in the subsumption hierarchy.
+ * CL is the list of all concept names in the subsumption hierarchy.
  *
  */
 
@@ -3669,7 +3679,7 @@ getConcepts(EnvName,MS,['tTOP'|CL]) :-
 /***********************************************************************
  *
  * testDirectSuperConcept(+EnvName,+MS,+Concept1,+Concept2,-Concept)
- * Arguments: EnvName        environment_M identifier
+ * Arguments: EnvName        environment identifier
  *            MS             modal context
  *            Concept1       concept name
  *            Concept2       concept name
@@ -3690,7 +3700,7 @@ testDirectSuperConcept(EnvName,MS,Concept1,Concept2,Concept) :-
 /***********************************************************************
  *
  * testDirectSubConcept(+EnvName,+MS,+Concept1,+Concept2,-Concept)
- * Arguments: EnvName        environment_M identifier
+ * Arguments: EnvName        environment identifier
  *            MS             modal context
  *            Concept1       concept name
  *            Concept2       concept name
@@ -3711,7 +3721,7 @@ testDirectSubConcept(EnvName,MS,Concept1,Concept2,Concept) :-
 /***********************************************************************
  *
  * testSuperConcept(+EnvName,+MS,+Concept1,+Concept2,-Concept)
- * Arguments: EnvName        environment_M identifier
+ * Arguments: EnvName        environment identifier
  *            MS             modal context
  *            Concept1       concept name
  *            Concept2       concept name
@@ -3732,7 +3742,7 @@ testSuperConcept(EnvName,MS,Concept1,Concept2,Concept) :-
 /***********************************************************************
  *
  * testSubConcept(+EnvName,+MS,+Concept1,+Concept2,-Concept)
- * Arguments: EnvName        environment_M identifier
+ * Arguments: EnvName        environment identifier
  *            MS             modal context
  *            Concept1       concept name
  *            Concept2       concept name
@@ -3753,11 +3763,11 @@ testSubConcept(EnvName,MS,Concept1,Concept2,Concept) :-
 /***********************************************************************
  *
  * getCommonSuperConcepts(+EnvName,+MS,+CL1,-CL2)
- * Arguments: EnvName  environment_M identifier
+ * Arguments: EnvName  environment identifier
  *            MS       modal context
  *            CL1      list of concept names
  *            CL2      list of concept names
- * CL2 is the list of allM concept names subsuming allM concepts in CL1.
+ * CL2 is the list of all concept names subsuming all tConcept in CL1.
  *
  */
 
@@ -3768,12 +3778,12 @@ getCommonSuperConcepts(EnvName,MS,CL1,CL2) :-
 /***********************************************************************
  *
  * getCommonSubConcepts(+EnvName,+MS,+CL1,-CL2)
- * Arguments: EnvName  environment_M identifier
+ * Arguments: EnvName  environment identifier
  *            MS       modal context
  *            CL1      list of concept names
  *            CL2      list of concept names
- * CL2 is the list of allM concept names which are subsumed by allM
- * concepts in CL1.
+ * CL2 is the list of all concept names which are subsumed by allM
+ * tConcept in CL1.
  *
  */
 
@@ -3848,7 +3858,7 @@ reduceToSolutionSet([(E1,PT1,_)|L],[E1|L2],[PT1|L3]) :-
 
 continueSolve(_,_,(card,_,'=<',N),hyp(_),ab(_),call(_),(M,_PTAbox),_) :-
 	number(M),
-	nonvar(N),
+	not_ftVar(N),
 	M >= N,
 	!,
 	fail.
@@ -3868,7 +3878,7 @@ collectAllFillers(_,_,_,_,_,_,_,[]) :-
 
 collectAllConstraints(Env,MS,FF,R,X,Rel,HYPS,D,CALLS,S) :-
 %	constructConHead(Env,rn(AX,RN,S,O),MS,FF,R,X,Rel,M2,HYPS,D,CALLS,PT,C1),
-	C1 = constraint(Env,rn(AX,RN,S,O),MS,(card,app((FF:R),X),Rel,M2),
+	C1 = constraint_M(Env,rn(AX,RN,S,O),MS,(card,app((FF:R),X),Rel,M2),
                        hyp(HYPS),ab(D),call(CALLS),PT),
 	bagof((M2,PT,[Env,MS,FF,R,X,Rel,HYPS,D,CALLS]),AX^RN^S^O^FF^C1,S),
 	!.
@@ -3879,7 +3889,7 @@ collectAllConstraints(_,_MS,_FF,_R,_X,_Rel,_HYPS,_D,_CALLS,[]) :-
 /**********************************************************************
  * 
  * comparison(+Rel,+M,?N)
- * if N is a variable then N is instantiated with M andM the predicate
+ * if N is a variable then N is instantiated with M and the predicate
  * succeeds.
  * if N is a number, the predicates succeeds if then goal Rel(M,N)
  * succeeds.
@@ -3887,7 +3897,7 @@ collectAllConstraints(_,_MS,_FF,_R,_X,_Rel,_HYPS,_D,_CALLS,[]) :-
  */
 
 comparison(_Rel,M3,N) :-
-	var(N),
+	is_ftVar(N),
 	!,
 	N = M3.
 comparison(Rel,M3,N) :-
@@ -3944,39 +3954,39 @@ findNumberRestriction(_,_,[(N1,PT1,_)|_NL],(N1,PT1)) :-
  *
  */
 inProofTerm(MS,rn(AX,Rule,_,_),D,X,HYPS,PT1,PT) :-
-	nonvar(AX),
+	not_ftVar(AX),
 	conceptSubsets(_Env,_user,MS1,C1,C2,AX),
-	PT = proved(in(MS1,D,X),usingAxiom(defprimconcept(C1,C2)),basedOn(PT1)),
+	PT = proved(in_M(MS1,D,X),usingAxiom(defprimconcept(C1,C2)),basedOn(PT1)),
 	!.
 inProofTerm(MS,rn(AX,Rule,_,_),D,X,HYPS,PT1,PT) :-
-	nonvar(AX),
+	not_ftVar(AX),
 	conceptEqualSets(_Env,_user,MS1,C1,C2,AX),
-	PT = proved(in(MS1,D,X),usingAxiom(defconcept(C1,C2)),basedOn(PT1)),
+	PT = proved(in_M(MS1,D,X),usingAxiom(defconcept(C1,C2)),basedOn(PT1)),
 	!.
 inProofTerm(MS,rn(AX,Rule,_,_),D,X,HYPS,PT1,PT) :-
-	nonvar(AX),
+	not_ftVar(AX),
 	conceptElement(_Env,MS1,_,user,C1,C2,AX),
-	PT = proved(in(MS1,D,X),usingAxiom(assert_ind(C1,C2)),basedOn(PT1)),
+	PT = proved(in_M(MS1,D,X),usingAxiom(assert_ind(C1,C2)),basedOn(PT1)),
 	!.
 inProofTerm(MS,rn(AX,Rule,_,_),D,X,HYPS,PT1,PT) :-
 	!.
 
 inProofTerm(MS,Name,D,X,HYPS,PT1,PT) :-
-	PT = proved(in(MS,Name,D,X),basedOn(PT1)),
+	PT = proved(in_M(MS,Name,D,X),basedOn(PT1)),
 	!.
 inProofTerm(MS,D,X,HYPS,PT1,PT) :-
-	PT = proved(in(MS,D,X),basedOn(PT1)),
+	PT = proved(in_M(MS,D,X),basedOn(PT1)),
 	!.
 
 eqProofTerm(MS,Y,_FF,R,X,HYPS,PT1,PT) :-
-	nonvar(R),
-	atomic(R),
+	not_ftVar(R),
+	isFORTIC(R),
 	!,
 	Rel =.. [R,MS,X,Y],
 	PT = proved(Rel,basedOn(PT1)),
 	!.
 eqProofTerm(MS,Y,_FF,R,X,HYPS,PT1,PT) :-
-	Rel = rel(R,MS,X,Y),
+	Rel = rel_M(R,MS,X,Y),
 	PT = proved(Rel,basedOn(PT1)),
 	!.
 conProofTerm(MS,R,X,Rel,N,HYPS,PT1,PT) :-
@@ -3989,10 +3999,10 @@ conProofTerm(MS,R,X,Rel,N,HYPS,PT1,PT) :-
  */
 
 makeTerm(Term,Term) :-
-	var(Term),
+	is_ftVar(Term),
 	!.
 makeTerm(Term,Term) :-
-	atomic(Term),
+	isFORTIC(Term),
 	!.
 makeTerm([Functor|ArgList],Term) :-
 	hop_map(makeTerm,ArgListTerms,ArgList),
@@ -4000,24 +4010,24 @@ makeTerm([Functor|ArgList],Term) :-
 makeTerm(Term,Term).
 
 %element(X) :-
-%	atomic(X),
+%	isFORTIC(X),
 %	!.
 %element(X) :-
-%	var(X),
+%	is_ftVar(X),
 %	!.
 element(_) :- !.
 
 relation(R,RN,X1,Y1) :-
-%	nonvar(R),
+%	not_ftVar(R),
 %	R =.. [RN,X1,Y1].
 	T =.. [RN,X1,Y1],
 	R = T.
 
 eqGenerator(Env,AX,RN,S,O,MS,X,Y,HYPS,D,CALLS,PT) :-
-	eq(Env,rn(AX,RN,S,O),modal(MS),X,Y,hyp(HYPS),ab(D),call(CALLS),PT),
-	nonvar(X),
-	nonvar(Y),
-	atomic(X).
+	eq_M(Env,rn(AX,RN,S,O),modal(MS),X,Y,hyp(HYPS),ab(D),call(CALLS),PT),
+	not_ftVar(X),
+	not_ftVar(Y),
+	isFORTIC(X).
 
 gensymbol(Symbol,_L,NewSymbol) :-
 	gensym(Symbol,NewSymbol),
@@ -4039,20 +4049,20 @@ reverseOrientation(rInL,lInR) :- !.
 
 
 typeOfDefinition(_,_,C,system) :-
-	var(C),
+	is_ftVar(C),
 	!.
 typeOfDefinition(Env,MS,C,user) :-
 	getConceptName(Env,MS,C),
 	!.
 typeOfDefinition(_,_,C,system) :-
-	atomic(C),
+	isFORTIC(C),
 	name(C,[99,111,110,99,101,112,116|_]),
 	!.
 typeOfDefinition(Env,MS,R,user) :-
 	getRoleName(Env,MS,R),
 	!.
 typeOfDefinition(_,_,R,system) :-
-	atomic(R),
+	isFORTIC(R),
 	name(R,[114,111,108,101|_]),
 	!.
 typeOfDefinition(Env,MS,isTDisjoint(C),Type) :-
@@ -4076,14 +4086,14 @@ typeOfDefinition(_,_,_,user) :-
 % 	(call(I1) ; allInterpretation(IL)).
 % 
 % roleConjunction(X,IL) :-
-% 	var(X),
+% 	is_ftVar(X),
 % 	someInterpretation(IL).
 % roleConjunction(X,IL) :-
-% 	nonvar(X),
+% 	not_ftVar(X),
 % 	name(X,[115,107,111,108,101,109|_]),
 % 	allInterpretation(IL).
 % roleConjunction(X,IL) :-
-% 	nonvar(X),
+% 	not_ftVar(X),
 % 	not(name(X,[115,107,111,108,101,109|_])),
 % 	someInterpretation(IL).
 
@@ -4096,14 +4106,14 @@ typeOfDefinition(_,_,_,user) :-
  *            WVL1               list of free world variables already
  *                               generated during the conversion
  *            MS2                modal context
- *            WVL2               list of allM free world variables 
+ *            WVL2               list of all free world variables 
  *                               generated during the conversion
  * MS2 is the translation of ModalOperator appended to MS1.
  *
  */
 
 genagent(X,_,X) :-
-	var(X),
+	is_ftVar(X),
 	!.
 genagent(allM,free,_A) :-
 	!.
@@ -4116,7 +4126,7 @@ genagent(A,_,A) :-
 convertMS(positive,Env,Start,MS,WVL1,End,WVL2) :-
 	!,
 	convertMS(Env,Start,MS,WVL1,End,WVL2).
-convertMS(negative,Env,Start,MS1,WVL1,End,WVL2) :-
+convertMS(vNegative,Env,Start,MS1,WVL1,End,WVL2) :-
 	!,
 	hop_map(negate_m,MS1,MS2),
 	hop_map(normalizeNot,MS2,MS3),
@@ -4124,7 +4134,7 @@ convertMS(negative,Env,Start,MS1,WVL1,End,WVL2) :-
 	
 
 convertMS(_Env,_,MS,WVL,[_W1,true],WVL) :-
-	var(MS),
+	is_ftVar(MS),
 	!.
 convertMS(_Env,[MS1,Lits1],[],WVL,[MS1,Lits1],WVL) :-
 	!.
@@ -4137,7 +4147,7 @@ convertMS(Env,[MS1,Lits1],[d(MOp,A)|L],WVL,[MS3,Lits3],WVL3) :-
 	!.
 convertMS(Env,[MS1,Lits1],[b(MOp,A)|L],WVL,[MS3,Lits3],WVL3) :-
 	genagent(A,free,Agent),
-	Lit = rel(Env,_,m(MOp,Agent),MS1,MS2),
+	Lit = rel_M(Env,_,m(MOp,Agent),MS1,MS2),
 	convertMS(Env,[MS2,(Lit,Lits1)],L,[MS2|WVL],[MS3,Lits3],WVL3),
 	!.
 convertMS(Env,[MS1,Lits1],[dc(MOp,C)|L],WVL,[MS3,Lits3],WVL3) :-
@@ -4150,7 +4160,7 @@ convertMS(Env,[MS1,Lits1],[dc(MOp,C)|L],WVL,[MS3,Lits3],WVL3) :-
 	!.
 convertMS(Env,[MS1,Lits1],[bc(MOp,C)|L],WVL,[MS3,Lits3],WVL3) :-
 	genagent(allM,free,Agent),
-	Lit = rel(Env,_,m(MOp,Agent),MS1,MS2),
+	Lit = rel_M(Env,_,m(MOp,Agent),MS1,MS2),
 	getQuery(Env,MS1,C,Agent,_Exp,Body),
 	convertMS(Env,[MS2,((once(Body),Lit),Lits1)],L,[MS2|WVL],[MS3,Lits3],WVL3),
 	!.
@@ -4161,11 +4171,11 @@ convertMS(Env,[MS1,Lits1],[bc(MOp,C)|L],WVL,[MS3,Lits3],WVL3) :-
  * THE STRUCTURE OF THE IN-CLAUSES
  * 
  * 1) THE HEAD
- *    in(Env,RN,modal(W),A1,X,hyp(C1),ab(D),call(H1),Exp)
- *    Env is a internal environment_M name
+ *    in_M(Env,RN,modal(W),A1,X,hyp(C1),ab(D),call(H1),Exp)
+ *    Env is a internal environment name
  *    RN  is a rule name
  *    W   is a world
- *    A1  is a concept name orM the negation of a concept name
+ *    A1  is a concept name or the negation of a concept name
  *    X   is a free variable
  *    C1  is a list of clauses --- the hypotheses that can be used
  *    D   is a name identifying a specific abductive derivation
@@ -4186,36 +4196,36 @@ convertMS(Env,[MS1,Lits1],[bc(MOp,C)|L],WVL,[MS3,Lits3],WVL3) :-
 
 constructInHead(Env,Name,MS,CN,CON,HYP,D,CALL,PT1,InHead) :-
 	inProofTerm(MS,Name,CN,CON,HYP,PT1,PT),
-	InHead = in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT),
+	InHead = in_M(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT),
 	!.
 
 constructKBHead(Env,Priority,Name,MS,CN,CON,HYP,D,CALL,PT1,InHead) :-
 	inProofTerm(MS,Name,CN,CON,HYP,PT1,PT),
-	InHead = kb_in(Env,Priority,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT),
+	InHead = kb_in_M(Env,Priority,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT),
 	!.
 
 constructMLHead(Env,Name,MS,CN,CON,HYP,D,CALL,PT1,InHead) :-
 	inProofTerm(MS,Name,CN,CON,HYP,PT1,PT),
-	InHead = kb_in(Env,pr(3),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT),
+	InHead = kb_in_M(Env,pr(3),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT),
 	!.
 
-getEnvironment(kb_in(Env,pr(_),_,modal(_MS),_CN,_CON,hyp(_HYP),ab(_),call(_CALL),_),Env).
-getEnvironment(in(Env,_,modal(_MS),_CN,_CON,hyp(_HYP),ab(_),call(_CALL),_),Env).
-getModalSequence(kb_in(_,pr(_),_,modal(MS),_CN,_CON,hyp(_HYP),ab(_),call(_CALL),_),MS).
-getModalSequence(in(_,_,modal(MS),_CN,_CON,hyp(_HYP),ab(_),call(_CALL),_),MS).
-getConceptName(kb_in(_,pr(_),_,modal(_MS),CN,_CON,hyp(_HYP),ab(_),call(_CALL),_),CN).
-getConceptName(in(_,_,modal(_MS),CN,_CON,hyp(_HYP),ab(_),call(_CALL),_),CN).
-getConstraint(kb_in(_,pr(_),_,modal(_MS),_CN,CON,hyp(_HYP),ab(_),call(_CALL),_),CON).
-getConstraint(in(_,_,modal(_MS),_CN,CON,hyp(_HYP),ab(_),call(_CALL),_),CON).
-getHypotheses(kb_in(_,pr(_),_,modal(_MS),_CN,_CON,hyp(HYP),ab(_),call(_CALL),_),HYP).
-getHypotheses(in(_,_,modal(_MS),_CN,_CON,hyp(HYP),ab(_),call(_CALL),_),HYP).
-getCallStack(kb_in(_,pr(_),_,modal(_MS),_CN,_CON,hyp(_HYP),ab(_),call(CALL),_),CALL).
-getCallStack(in(_,_,modal(_MS),_CN,_CON,hyp(_HYP),ab(_),call(CALL),_),CALL).
-getExplanation(kb_in(_,pr(_),_,modal(_MS),_CN,_CON,hyp(_HYP),ab(_),call(_CALL),E),E).
-getExplanation(in(_,_,modal(_MS),_CN,_CON,hyp(_HYP),ab(_),call(_CALL),E),E).
-getInExplanation(kb_in(_,pr(_),_,modal(_MS),_CN,_CON,hyp(_HYP),ab(_),call(_CALL),
+getEnvironment(kb_in_M(Env,pr(_),_,modal(_MS),_CN,_CON,hyp(_HYP),ab(_),call(_CALL),_),Env).
+getEnvironment(in_M(Env,_,modal(_MS),_CN,_CON,hyp(_HYP),ab(_),call(_CALL),_),Env).
+getModalSequence(kb_in_M(_,pr(_),_,modal(MS),_CN,_CON,hyp(_HYP),ab(_),call(_CALL),_),MS).
+getModalSequence(in_M(_,_,modal(MS),_CN,_CON,hyp(_HYP),ab(_),call(_CALL),_),MS).
+getConceptName(kb_in_M(_,pr(_),_,modal(_MS),CN,_CON,hyp(_HYP),ab(_),call(_CALL),_),CN).
+getConceptName(in_M(_,_,modal(_MS),CN,_CON,hyp(_HYP),ab(_),call(_CALL),_),CN).
+getConstraint(kb_in_M(_,pr(_),_,modal(_MS),_CN,CON,hyp(_HYP),ab(_),call(_CALL),_),CON).
+getConstraint(in_M(_,_,modal(_MS),_CN,CON,hyp(_HYP),ab(_),call(_CALL),_),CON).
+getHypotheses(kb_in_M(_,pr(_),_,modal(_MS),_CN,_CON,hyp(HYP),ab(_),call(_CALL),_),HYP).
+getHypotheses(in_M(_,_,modal(_MS),_CN,_CON,hyp(HYP),ab(_),call(_CALL),_),HYP).
+getCallStack(kb_in_M(_,pr(_),_,modal(_MS),_CN,_CON,hyp(_HYP),ab(_),call(CALL),_),CALL).
+getCallStack(in_M(_,_,modal(_MS),_CN,_CON,hyp(_HYP),ab(_),call(CALL),_),CALL).
+getExplanation(kb_in_M(_,pr(_),_,modal(_MS),_CN,_CON,hyp(_HYP),ab(_),call(_CALL),E),E).
+getExplanation(in_M(_,_,modal(_MS),_CN,_CON,hyp(_HYP),ab(_),call(_CALL),E),E).
+getInExplanation(kb_in_M(_,pr(_),_,modal(_MS),_CN,_CON,hyp(_HYP),ab(_),call(_CALL),
 	         proved(I,_)),I).
-getInExplanation(in(_,_,modal(_MS),_CN,_CON,hyp(_HYP),ab(_),call(_CALL),
+getInExplanation(in_M(_,_,modal(_MS),_CN,_CON,hyp(_HYP),ab(_),call(_CALL),
 	         proved(I,_)),I).
 
 /**********************************************************************
@@ -4226,7 +4236,7 @@ getInExplanation(in(_,_,modal(_MS),_CN,_CON,hyp(_HYP),ab(_),call(_CALL),
 
 constructEqHead(Env,Name,MS,Y,F,R,X,HYPS,D,CALLS,PT1,L) :-
 	eqProofTerm(MS,Y,F,R,X,HYPS,PT1,PT),
-	L = eq(Env,Name,modal(MS),Y,app((F:R),X),hyp(HYPS),ab(D),call(CALLS),PT),
+	L = eq_M(Env,Name,modal(MS),Y,app((F:R),X),hyp(HYPS),ab(D),call(CALLS),PT),
 	!.
 
 /**********************************************************************
@@ -4237,7 +4247,7 @@ constructEqHead(Env,Name,MS,Y,F,R,X,HYPS,D,CALLS,PT1,L) :-
 
 constructEqMark(Name,MS,Y,F,R,X,HYPS,_D,_CALLS,L) :-
 	HYPS = [orM(H1),rl(H2),fl(H3)],
-	L = eq(Name,modal(MS),Y,app((F:R),X),hyp(H1)),
+	L = eq_M(Name,modal(MS),Y,app((F:R),X),hyp(H1)),
 	!.
 
 /**********************************************************************
@@ -4249,7 +4259,7 @@ constructEqMark(Name,MS,Y,F,R,X,HYPS,_D,_CALLS,L) :-
 constructEqCall(Env,rn(AX,RN,_Source,Orientation),bodyMC(MS1),headMC(MS2),
 	        Y,F,R,X,HYPS,D,CALLS,PT,L) :-
 	constructEqMark(rn(AX,RN,_S1,Orientation),MS2,Y,F,R,X,HYPS,D,CALLS,C1),
-	L = eq(Env,rn(_AX2,_RN2,_S2,_O2),modal(MS1),Y,app((F:R),X),
+	L = eq_M(Env,rn(_AX2,_RN2,_S2,_O2),modal(MS1),Y,app((F:R),X),
                hyp(HYPS),ab(D),call([C1|CALLS]),PT),
 	!.
 
@@ -4262,20 +4272,20 @@ constructEqCall(Env,rn(AX,RN,_Source,Orientation),bodyMC(MS1),headMC(MS2),
 
 constructMLMark(Name,MS,CN,CON,HYPS,D,LoopCheck) :-
 	HYPS = [orM(H1),rl(H2),fl(H3)],
-	LoopCheck = in(Name,modal(MS),CN,CON,hyp(H1),ab(D)),
+	LoopCheck = in_M(Name,modal(MS),CN,CON,hyp(H1),ab(D)),
 	!.
 
-constructMLMark(kb_in(_,Pr,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(_),_),LoopCheck) :-
+constructMLMark(kb_in_M(_,Pr,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(_),_),LoopCheck) :-
 	HYPS = [orM(H1),rl(H2),fl(H3)],
-	LoopCheck = in(Name,modal(MS),CN,CON,hyp(H1),ab(D)),
+	LoopCheck = in_M(Name,modal(MS),CN,CON,hyp(H1),ab(D)),
 	!.
-constructMLMark(in(_,Pr,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(_),_),LoopCheck) :-
+constructMLMark(in_M(_,Pr,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(_),_),LoopCheck) :-
 	HYPS = [orM(H1),rl(H2),fl(H3)],
-	LoopCheck = in(Name,modal(MS),CN,CON,hyp(H1),ab(D)),
+	LoopCheck = in_M(Name,modal(MS),CN,CON,hyp(H1),ab(D)),
 	!.
-constructMLMark(in(_,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(_),_),LoopCheck) :-
+constructMLMark(in_M(_,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(_),_),LoopCheck) :-
 	HYPS = [orM(H1),rl(H2),fl(H3)],
-	LoopCheck = in(Name,modal(MS),CN,CON,hyp(H1),ab(D)),
+	LoopCheck = in_M(Name,modal(MS),CN,CON,hyp(H1),ab(D)),
 	!.
 
 /***********************************************************************
@@ -4286,7 +4296,7 @@ constructMLMark(in(_,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(_),_),LoopCheck) 
  *                 -InTerm)
  *
  * The information in rn(AX1,RN1,S1,O1)  is used in the following way:
- * AX1, RN1, andM O1 is used in the construction of the MLMark
+ * AX1, RN1, and O1 is used in the construction of the MLMark
  * which is added to the call stack. If AX1 is `no' then the MLMark is
  * isTDisjoint added to the call stack at allM.
  * S1 is used in the construction of InHead. If S1 is a variable, any 
@@ -4302,16 +4312,16 @@ constructMLCall(Env,rn(AX1,RN1,S1,O1),bodyMC(MS1),headMC(MS2),
 	constructMLMark(rn(AX1,RN1,_S2,_O2),MS2,CN,CON,HYPS,D,Mark),
 	convert_loop(AX1,CALLS,Mark,CALLS1),
 	getNegatedConcept(CN,C2),
-	InHeadH = in(_NameH,modal(MS1),C2,CON,hyp(_H),ab(_D)),
+	InHeadH = in_M(_NameH,modal(MS1),C2,CON,hyp(_H),ab(_D)),
 	getSource(S1,Source),
-	InHead = in(Env,rn(_AX3,_RN3,Source,_O3),modal(MS1),CN,CON,
+	InHead = in_M(Env,rn(_AX3,_RN3,Source,_O3),modal(MS1),CN,CON,
                     hyp([orM(H1),rl([InHeadH|H2]),fl(H3)]),
                     ab(D),call(CALLS1),PT1),
 	!.
 
 
 getSource(V1,_V2) :-
-	var(V1),
+	is_ftVar(V1),
 	!.
 getSource(any,_V2) :-
 	!.
@@ -4319,7 +4329,7 @@ getSource(V1,V1) :-
 	!.
 
 getNegatedConcept(CN,isTDisjoint(CN)) :-
-	var(CN),
+	is_ftVar(CN),
 	!.
 getNegatedConcept(CN,C2) :-
 	normalizeNot(isTDisjoint(CN),C2),
@@ -4334,7 +4344,7 @@ getNegatedConcept(CN,C2) :-
 
 constructConHead(Env,Name,MS,F,R,X,Rel,N,HYPS,D,CALLS,PT1,L) :-
 	conProofTerm(MS,R,X,Rel,N,HYPS,PT1,PT),
-	L = constraint(Env,Name,MS,(card,app((F:R),X),Rel,N),
+	L = constraint_M(Env,Name,MS,(card,app((F:R),X),Rel,N),
                        hyp(HYPS),ab(D),call(CALLS),PT),
 	!.
 
@@ -4346,12 +4356,12 @@ constructConHead(Env,Name,MS,F,R,X,Rel,N,HYPS,D,CALLS,PT1,L) :-
 
 constructConMark(Name,MS,F,R,X,Rel,N,HYPS,_D,_CALLS,L) :-
 	HYPS = [orM(H1),rl(H2),fl(H3)],
-	L = constraint(Name,MS,(card,app((F:R),X),Rel,N),hyp(H1)),
+	L = constraint_M(Name,MS,(card,app((F:R),X),Rel,N),hyp(H1)),
 	!.
 
-constructConMark(constraint(_,Name,MS,(card,A,Rel,N),hyp(HYPS),ab(_D),call(_CALLS),_PT),L) :-
+constructConMark(constraint_M(_,Name,MS,(card,A,Rel,N),hyp(HYPS),ab(_D),call(_CALLS),_PT),L) :-
 	HYPS = [orM(H1),rl(H2),fl(H3)],
-	L = constraint(Name,MS,(card,A,Rel,N),hyp(H1)),
+	L = constraint_M(Name,MS,(card,A,Rel,N),hyp(H1)),
 	!.
 
 /***********************************************************************
@@ -4365,7 +4375,7 @@ constructSolveConMark(Name,MS,F,R,X,Rel,N,HYPS,_D,_CALLS,L) :-
 	L = solveConstraint(Name,MS,(card,app((F:R),X),Rel,N),hyp(H1)),
 	!.
 
-constructSolveConMark(constraint(_,Name,MS,(card,A,Rel,N),hyp(HYPS),ab(_D),call(_CALLS),_PT),L) :-
+constructSolveConMark(constraint_M(_,Name,MS,(card,A,Rel,N),hyp(HYPS),ab(_D),call(_CALLS),_PT),L) :-
 	HYPS = [orM(H1),rl(H2),fl(H3)],
 	L = solveConstraint(Name,MS,(card,A,Rel,N),hyp(H1)),
 	!.
@@ -4378,13 +4388,13 @@ constructSolveConMark(constraint(_,Name,MS,(card,A,Rel,N),hyp(HYPS),ab(_D),call(
 
 constructConCall(Env,bodyMC(MS1),headMC(MS2),F,R,X,Rel,N,HYPS,D,CALLS,AN,PT1,L) :-
 	constructConMark(MS2,F,R,X,Rel,N,HYPS,D,CALLS,AN,Mark),
-        L = constraint(Env,_Name,MS1,(card,app((F:R),X),Rel,N),
+        L = constraint_M(Env,_Name,MS1,(card,app((F:R),X),Rel,N),
                        hyp(HYPS),ab(D),call([Mark|CALLS]),PT1),
 	!.
 
 
 addDefaultML(I1,L1) :-
-	var(L1),
+	is_ftVar(L1),
 	!,
 	L1 = [I1|_L2],
 	!.
@@ -4393,11 +4403,11 @@ addDefaultML(I1,[_|L1]) :-
 	!.
 
 memberDML(I1,L) :-
-	nonvar(L),
+	not_ftVar(L),
 	L = [I1|L2],
 	!.
 memberDML(I1,L) :-
-	nonvar(L),
+	not_ftVar(L),
 	L = [_|L2],
 	memberDML(I1,L2).
 
@@ -4405,7 +4415,7 @@ memberDML(I1,L) :-
 /**********************************************************************
  *
  * getAxiom(+Env,+MS,AX)
- * succeeds if AX is an axiom in environment_M Env andM modal context
+ * succeeds if AX is an axiom in environment Env and modal context
  * MS.
  *
  */
@@ -4416,26 +4426,26 @@ getAxiom(Env,MS,Ax) :-
 /**********************************************************************
  *
  * getConceptName(+Env,+MS,CN)
- * succeeds if CN is a concept name in environment_M Env andM modal context
+ * succeeds if CN is a concept name in environment Env and modal context
  * MS.
  *
  */
 
 getConceptName(Env,MS1,CN) :-
-	convertMS(negative,Env,[[],true],MS1,[],[W1,G1],_),
+	convertMS(vNegative,Env,[[],true],MS1,[],[W1,G1],_),
 	clause(conceptName(Env,_,W1,CN),_),
 	once((call(G1),conceptName(Env,_,W1,CN))).
 
 /**********************************************************************
  *
  * getRoleName(+Env,+MS,CN)
- * succeeds if CN is a role name in environment_M Env andM modal context
+ * succeeds if CN is a role name in environment Env and modal context
  * MS.
  *
  */
 
 getRoleName(Env,MS1,CN) :-
-	convertMS(negative,Env,[[],true],MS3,[],[W1,G1],_),
+	convertMS(vNegative,Env,[[],true],MS3,[],[W1,G1],_),
 	clause(roleName(Env,_,W1,CN),_),
 	once((call(G1),roleName(Env,_,W1,CN))).
 
@@ -4451,7 +4461,7 @@ getRoleName(Env,MS1,CN) :-
  * memberElement(+Element,+Dag)
  * Parameter: Element     element name
  *            Dag         subsumption hierarchy
- * checks wether orM isTDisjoint Element occurs in the subsumption hierarchy.
+ * checks wether or isTDisjoint Element occurs in the subsumption hierarchy.
  *
  */
 
@@ -4476,7 +4486,7 @@ memberElementSubtrees(Element,[_N1|NL]) :-
  * memberDirectSubElements(+Element,+Dag)
  * Parameter: Element     element name
  *            Dag         subsumption hierarchy
- * checks wether orM isTDisjoint Element occurs in the direct subelements of
+ * checks wether or isTDisjoint Element occurs in the direct subelements of
  * the tTOP element of Dag.
  *
  */
@@ -4500,7 +4510,7 @@ memberDirectSubElements(Element,[_N1|NL]) :-
  * Parameter: Dag         subsumption hierarchy
  *            Element     element name
  *            CL          list of element names
- * CL is the list of allM element names which are direct super elements
+ * CL is the list of all element names which are direct super elements
  * of Element.
  *
  */
@@ -4524,7 +4534,7 @@ getDirectSuperElements(Element,CL,[N1|NL]) :-
  * Parameter: Element     element name
  *            CL          list of element names
  *            Dag         subsumption hierarchy
- * CL is the list of allM element names which are super elements of
+ * CL is the list of all element names which are super elements of
  * Element.
  *
  */
@@ -4553,7 +4563,7 @@ getAllSuperElements(Element,CL2,CL1,[N1|NL]) :-
  * Parameter: Element     element name
  *            CL          list of element names
  *            Dag         subsumption hierarchy
- * CL is the list of allM element names which are direct sub elements
+ * CL is the list of all element names which are direct sub elements
  * of Element.
  *
  */
@@ -4585,7 +4595,7 @@ getSubElements(CL,[node(CL1,_)|NL]) :-
  * Parameter: Element     element name
  *            CL          list of element names
  *            Dag         subsumption hierarchy
- * CL is the list of allM element names which are sub elements of 
+ * CL is the list of all element names which are sub elements of 
  * Element
  *
  */
@@ -4610,7 +4620,7 @@ getAllSubElements(Element,CL,[N1|NL1]) :-
  * getElements(-CL,+Dag)
  * Parameter: CL     list of element names
  *            Dag    subsumption hierarchy
- * CL is the list of allM element names in the subsumption hierarchy.
+ * CL is the list of all element names in the subsumption hierarchy.
  *
  */
 
@@ -4730,7 +4740,7 @@ testSubElement(Element1,Element2,Element2,node(CL,NL)) :-
  * Parameter: CL1      list of element names
  *            CL2      list of element names
  *            Dag      subsumption hierarchy
- * CL2 is the list of allM element names subsuming allM elements in CL1.
+ * CL2 is the list of all element names subsuming all elements in CL1.
  *
  */
 
@@ -4744,7 +4754,7 @@ getCommonSuperElements(CL1,CL2,Dag) :-
  * Parameter: CL1      list of element names
  *            CL2      list of element names
  *            Dag      subsumption hierarchy
- * CL2 is the list of allM element names which are subsumed by allM
+ * CL2 is the list of all element names which are subsumed by allM
  * elements in CL1.
  *
  */
@@ -4831,7 +4841,7 @@ showEnvironment(EnvName) :-
 
 showModalAxioms(Name) :-
 	modalAxioms(Name,user,K,C,MOp,A),
-	(nonvar(A) ; (A = C)),
+	(not_ftVar(A) ; (A = C)),
 	write('        '), write('     modalAxioms('), write(K), write(','),
 	write(MOp), write(','), write(A), write(')'), nl,
 	fail.
@@ -4880,7 +4890,7 @@ showDefprimrole(Name) :-
 showDefprimrole(_Name) :-
 	!.
 showDefclosed(Name) :-
-	closed(Name,MS,X,Y,R),
+	closed_M(Name,MS,X,Y,R),
 	write('axiom   '), write(':     defclosed('), write(MS), write(','),
 	write(X), write(','), write(Y), write(','), write(R), write(')'),
 	nl,
@@ -4925,12 +4935,12 @@ clearEnvironment :-
 clearEnvironment(EnvName) :-
 	environment_M(EnvName,Env,_),
 	retractCompiledPredicates(Env),
-	retractall1_M(Env,in/9),
-	retractall1_M(Env,kb_in/10),
-	retractall1_M(Env,eq/9),
-	retractall1_M(Env,constraint/8),
-	retractall1_M(Env,rel/5),
-	retractall1_M(Env,closed/5),
+	retractall1_M(Env,in_M/9),
+	retractall1_M(Env,kb_in_M/10),
+	retractall1_M(Env,eq_M/9),
+	retractall1_M(Env,constraint_M/8),
+	retractall1_M(Env,rel_M/5),
+	retractall1_M(Env,closed_M/5),
 	retractall1_M(Env,compiledPredicate/2),
 	retractall1_M(Env,conceptElement/7),
 	retractall1_M(Env,conceptEqualSets/6),
@@ -4952,14 +4962,14 @@ clearEnvironment(EnvName) :-
 	retractall1_M(Env,roleNr/5),
 	retractall1_M(Env,roleRange/4),
 	retractall1_M(Env,roleSubsets/6),
-	retractall1_M(Env,sub/4),
-	retractall1_M(Env,succ/4),
+	retractall1_M(Env,sub_M/4),
+	retractall1_M(Env,succ_M/4),
 	retractall1_M(Env,abductiveDerivation/3),
 	retractall1_M(Env,consistencyDerivation/3),
-	retractall1_M(Env,hypothesis/1),
+	retractall1_M(Env,hypothesis_M/1),
 	retractall1_M(Env,inconsistencyCheck/3),
 	retractall1_M(Env,option_M/2),
-	retractall1_M(Env,nsub/4),
+	retractall1_M(Env,nsub_M/4),
 	retractall1_M(Env,nsub3/2),
 	retractall1_M(Env,sub3/2),
 	retractall1_M(Env,succ3/2),
@@ -4968,10 +4978,10 @@ clearEnvironment(EnvName) :-
 /**********************************************************************
  *
  * retractCompiledPredicates(+Env)
- * if the environment_M Env contains compiled predicates, then for each
+ * if the environment Env contains compiled predicates, then for each
  * compiled predicate Pred there is a fact 
  *                    compilePredicate(Env,Pred/Arity).
- * So when the environment_M is to be removed, we just abolish the 
+ * So when the environment is to be removed, we just abolish the 
  * compiled predicates.
  *
  */
@@ -5000,25 +5010,25 @@ initEnvironment(EnvName) :-
 	environment_M(EnvName,Env,_),
 	assertz_if_new(theory(Env,
 	[
-        (in([],P,pair(X,Y)) <- equal(X,Z), in([],P,pair(Z,Y))),
-	(in([],P,pair(X,Y)) <- equal(Y,Z), in([],P,pair(X,Z))),
-	(in([],C,X) <- equal(X,Y), in([],C,Y)),
+        (in_M([],P,pair(X,Y)) <- equal(X,Z), in_M([],P,pair(Z,Y))),
+	(in_M([],P,pair(X,Y)) <- equal(Y,Z), in_M([],P,pair(X,Z))),
+	(in_M([],C,X) <- equal(X,Y), in_M([],C,Y)),
 	(equal(X,Y) <- equal(Y,X)),
 	(equal(X,X) <- true),
-	(in(MS,tTOP,X) <- true)])),
+	(in_M(MS,tTOP,X) <- true)])),
 	assertInRules(Env),
 	% Assert equality axioms
 	assertEqRule(Env,1),
 	% Assert 'tTOP' role
 %	assertEqRule(Env,2),
 	assertEqRule(Env,3),
-	% Proof by hypothesis for roles (Test 14.07.92)
+	% Proof by hypothesis for tRole (Test 14.07.92)
 	assertEqRule(Env,4),
 	% Assert 'tTOP' concept
 	assertInRule(Env,1),
 	% Assert 'tBOT' concept
 	assertInRule(Env,2),
-	% Proof by hypothesis for concepts
+	% Proof by hypothesis for tConcept
 	assertInRule(Env,3),
 	% Assert X in someM(r,c) => X in atleast(1,r)
 %	gensym(axiom,AN11),
@@ -5044,7 +5054,7 @@ initEnvironment(EnvName) :-
 %	assertInRule(Env,8,AN7),
 %	assertInRule(Env,9,AN7),
 	%%  Abductive Reasoning
-	% Proof by abductive hypothesis
+	% Proof by abductive hypothesis_M
 	assertAbductionRule(Env,1),
 	% Proof by abduction
 	assertAbductionRule(Env,2),
@@ -5066,7 +5076,7 @@ initEnvironment(EnvName) :-
  * asserts the clauses for the in predicate which is used to 
  * construct goals in the user interface. In general the in clauses
  * just call corresponding kb_in clauses. The kb_in clauses result
- * from the translation of terminological andM assertional axioms.
+ * from the translation of terminological and assertional axioms.
  *
  * !! Remember: Changes to this clauses have to be reflected in the
  *              definition of the compileEnv predicate.
@@ -5074,37 +5084,37 @@ initEnvironment(EnvName) :-
  */
 
 assertInRules(Env) :-
-	assertz_if_new((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
-		 ifOption(traceOutput,yes,(length(CALL,Depth), 'format'('trying ~d  in(~w,~w)~n',[Depth,CN,CON]))),
-	kb_in(Env,pr(5),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT),
-		 ifOption(traceOutput,yes,(length(CALL,Depth), 'format'('succeeded ~d  in(~w,~w)~n',[Depth,CN,CON]))))),
+	assertz_if_new((in_M(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
+		 ifOption(traceOutput,yes,(length(CALL,Depth), 'format'('trying ~d  in_M(~w,~w)~n',[Depth,CN,CON]))),
+	kb_in_M(Env,pr(5),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT),
+		 ifOption(traceOutput,yes,(length(CALL,Depth), 'format'('succeeded ~d  in_M(~w,~w)~n',[Depth,CN,CON]))))),
 % There are no kb_in clauses with priority 4 at the moment (07.10.92)
-%	assertz_if_new((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
-%	kb_in(Env,pr(4),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT))),
-	assertz_if_new((in(Env,Name,modal(MS),CN,CON,hyp([orM(H1),rl(H2),fl(H3)]),ab(noAb),call(CALL),PT) :-
+%	assertz_if_new((in_M(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
+%	kb_in_M(Env,pr(4),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT))),
+	assertz_if_new((in_M(Env,Name,modal(MS),CN,CON,hyp([orM(H1),rl(H2),fl(H3)]),ab(noAb),call(CALL),PT) :-
 		 clashInHyp(H2), !, fail)),
-	assertz_if_new((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
+	assertz_if_new((in_M(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
 		 (CN \== tTOP, CN \== tBOT, CN \== isTDisjoint(tTOP), CN \== isTDisjoint(tBOT),
-	kb_in(Env,pr(3),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT)))),
+	kb_in_M(Env,pr(3),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT)))),
 % There are no kb_in clauses with priority 2 at the moment (07.10.92)
-%	assertz_if_new((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
-%	kb_in(Env,pr(2),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT))),
-	assertz_if_new((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
+%	assertz_if_new((in_M(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
+%	kb_in_M(Env,pr(2),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT))),
+	assertz_if_new((in_M(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
 		 (CN \== tTOP,CN \== tBOT, CN \== isTDisjoint(tTOP), CN \== isTDisjoint(tBOT),
-	kb_in(Env,pr(1),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT)))),
+	kb_in_M(Env,pr(1),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT)))),
 % Experimental code (07.10.92 uh)
 % It might be useful to have global information about the failure of
 % derivations. With the code below such a failure is used to assertz_if_new to
 % hypothesis that the negation of the goal is true.
-%	assertz_if_new((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
-%		 (nonvar(CON), nonvar(CN), 
-%		  \+ hypothesis(in(Env,modal(MS),CN,CON,ab(D),PT)),
+%	assertz_if_new((in_M(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
+%		 (not_ftVar(CON), not_ftVar(CN), 
+%		  \+ hypothesis_M(in_M(Env,modal(MS),CN,CON,ab(D),PT)),
 %		  getNegatedConcept(CN,C1),
-%		  assertz_if_new(hypothesis(in(Env,modal(MS),C1,CON,ab(D),assume))),
+%		  assertz_if_new(hypothesis_M(in_M(Env,modal(MS),C1,CON,ab(D),assume))),
 %		  fail))),
 % There are no kb_in clauses with priority 0 at the moment (07.10.92)
-%	assertz_if_new((in(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
-%	kb_in(Env,pr(0),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT))),
+%	assertz_if_new((in_M(Env,Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT) :-
+%	kb_in_M(Env,pr(0),Name,modal(MS),CN,CON,hyp(HYP),ab(D),call(CALL),PT))),
 	!.
 
 assertEqRule(Env,1) :-
@@ -5116,8 +5126,8 @@ assertEqRule(Env,1) :-
 %       The following would be correct
 %	assertz_if_new((EqHead1 :- cCS(CALLS,true),  InHead2)),
 %       old code (uh 20.08.92)
-%	assertz_if_new((eq(Env,rn(AN1,RN1,user,lInR),modal(MS),X,X,hyp(HYPS),
-%                   ab(_AB),call(CALLS),proved(eq(MS,X,X,hyp(HYPS),
+%	assertz_if_new((eq_M(Env,rn(AN1,RN1,user,lInR),modal(MS),X,X,hyp(HYPS),
+%                   ab(_AB),call(CALLS),proved(eq_M(MS,X,X,hyp(HYPS),
 %                   basedOn(true)))) :- 
 %                (cCS(CALLS,true)))),
 	!.
@@ -5146,7 +5156,7 @@ assertEqRule(Env,4) :-
 
 
 assertInRule(Env,1) :-
-	% For allM X: X in tTOP
+	% For all X: X in tTOP
 	% Priority 5 (high priority)
 	gensym(axiom,AN2),
 	gensym(rule,RN2),
@@ -5155,16 +5165,16 @@ assertInRule(Env,1) :-
 	assertz_if_new(InHead),
 	!.
 assertInRule(Env,2) :-
-	% For allM X: X in isTDisjoint(tBOT) 
-	% What is actually needed is the equivalence of tTOP andM isTDisjoint(tBOT).
+	% For all X: X in isTDisjoint(tBOT) 
+	% What is actually needed is the equivalence of tTOP and isTDisjoint(tBOT).
 	% So we need
-	% For allM X: X in tTOP if X in isTDisjoint(tBOT)
+	% For all X: X in tTOP if X in isTDisjoint(tBOT)
 	% is subsumed by assertInRule(Env,1).
-	% For allM X: X in isTDisjoint(tTOP) if X in tBOT
+	% For all X: X in isTDisjoint(tTOP) if X in tBOT
 	% This rule will isTDisjoint be asserted.
-	% For allM X: X in tBOT if X in isTDisjoint(tTOP)
+	% For all X: X in tBOT if X in isTDisjoint(tTOP)
 	% is subsumed by assertInRule(Env,4).
-	% For allM X: X in isTDisjoint(tBOT) if X in tTOP.
+	% For all X: X in isTDisjoint(tBOT) if X in tTOP.
 	% is subsumed by assertInRule(Env,2), i.e. the rule we will
 	% assertz_if_new now.
 	% Priority 5 (high priority)
@@ -5175,7 +5185,7 @@ assertInRule(Env,2) :-
 	assertz_if_new(InHead1),
 	!.
 assertInRule(Env,3) :-
-	% For allM X: X in C if (X in C) is a hypothesis
+	% For all X: X in C if (X in C) is a hypothesis
 	% Priority 5 (high priority)
 	gensym(axiom,AN4),
 	gensym(rule,RN4),
@@ -5188,7 +5198,7 @@ assertInRule(Env,3) :-
 	assertz_if_new((InHead2 :- (append(H1,H2,H), member(Mark1,H)) ; memberDML(Mark1,H3))),
 	!.
 assertInRule(Env,4) :-
-	% For allM X: X in isTDisjoint(tTOP) => X in C 
+	% For all X: X in isTDisjoint(tTOP) => X in C 
 	% Priority 1 (vtLowSpeed priority)
 	% necessary for inconsistent knowledge bases ?
 	gensym(axiom,AN7),
@@ -5211,7 +5221,7 @@ assertInRule(Env,1,AN10) :-
 	constructMLMark(InHead,Mark),
 	convertInAntecedent(Env,rn(AN10,system,lInR),bodyMC(W),headMC(W),
 			    atmost(0,R),X,HYPS,AB,CALLS,PT,Body),
-	asserta_new((InHead :- (nonvar(C), (cCS(CALLS,Mark), once((EqLiteral, Body)))))),
+	asserta_new((InHead :- (not_ftVar(C), (cCS(CALLS,Mark), once((EqLiteral, Body)))))),
 	!.
 assertInRule(Env,2,AxiomName) :-
 	% Assert x in allM(r,'tBOT') => x in atmost(0,r)
@@ -5224,7 +5234,7 @@ assertInRule(Env,2,AxiomName) :-
 	convertInConsequence(Env,pr(1),RN1,_MS,W1,
 			     atmost(0,R),X,HYPS,AB,CALLS,PT1,InHead1),
 	constructConMark(InHead1,Mark1),
-	asserta_new((InHead1 :- (nonvar(R),(cCS(CALLS,Mark1), once(Body))))),
+	asserta_new((InHead1 :- (not_ftVar(R),(cCS(CALLS,Mark1), once(Body))))),
 	!.
 assertInRule(Env,3,AxiomName) :-
 	% Assert x in someM(R,tTOP) => x in atleast(1,R)
@@ -5237,7 +5247,7 @@ assertInRule(Env,3,AxiomName) :-
 	convertInConsequence(Env,pr(1),RN1,_MS,W1,
 			     atleast(1,R),X,HYPS,AB,CALLS,PT1,InHead1),
 	constructConMark(InHead1,Mark1),
-	asserta_new((InHead1 :- (nonvar(R), cCS(CALLS,Mark1), once(Body)))),
+	asserta_new((InHead1 :- (not_ftVar(R), cCS(CALLS,Mark1), once(Body)))),
 	!.
 assertInRule(Env,4,AxiomName) :-
 	% Assert x in atleast(1,R) => x in someM(R,tTOP)
@@ -5253,7 +5263,7 @@ assertInRule(Env,4,AxiomName) :-
 	asserta_new((InHead1 :- (cCS(CALLS,Mark1), once((EqLiteral, Body))))),
 	!.
 assertInRule(Env,5,AN6) :-
-	% For allM X: X in C => X in not(not(C))
+	% For all X: X in C => X in not(not(C))
 	% Priority 1 (vtLowSpeed priority)
 	gensym(rule,RN6),
 	constructKBHead(Env,pr(1),rn(AN6,RN6,system,lInR),MS,not(not(C)),X,
@@ -5264,7 +5274,7 @@ assertInRule(Env,5,AN6) :-
 	assertz_if_new((Consequence3 :- cCS(CALLS,AxiomHead3), Antecedent4)),
 	!.
 assertInRule(Env,6,AN6) :-
-	% For allM X: X in not(not(C)) => X in C 
+	% For all X: X in not(not(C)) => X in C 
 	% Priority 1 (vtLowSpeed priority)
 	gensym(rule,RN8),
 	constructKBHead(Env,pr(1),rn(AN6,RN8,system,lInR),MS,C,X,
@@ -5275,7 +5285,7 @@ assertInRule(Env,6,AN6) :-
 	assertz_if_new((Consequence4 :- cCS(CALLS,AxiomHead4), Antecedent3)),
 	!.
 assertInRule(Env,7,AN7) :-
-	% For allM X: X in setM(S2) andM subset_m(S2,S1) => X in S1
+	% For all X: X in setM(S2) and subset_m(S2,S1) => X in S1
 	% Priority 1 (vtLowSpeed priority)
 	gensym(rule,RN8),
 	constructKBHead(Env,pr(1),rn(AN7,RN8,system,lInR),MS,setM(S1),X,
@@ -5287,7 +5297,7 @@ assertInRule(Env,7,AN7) :-
 	assertz_if_new((Consequence1 :- cCS(CALLS,AxiomHead1), (Antecedent2, L1))),
 	!.
 assertInRule(Env,8,AN7) :-
-	% For allM X: X in setM(S2) andM X in setM(S3) andM 
+	% For all X: X in setM(S2) and X in setM(S3) and 
 	%            intersection_m(S2,S3,S1) => X in S1
 	% Priority 1 (vtLowSpeed priority)
 	gensym(rule,RN8),
@@ -5302,7 +5312,7 @@ assertInRule(Env,8,AN7) :-
 	assertz_if_new((Consequence1 :- cCS(CALLS,AxiomHead1), (Antecedent3, (Antecedent2, L1)))),
 	!.
 assertInRule(Env,9,AN7) :-
-	% For allM X: X in setM(S2) andM X in setM(S3) andM 
+	% For all X: X in setM(S2) and X in setM(S3) and 
 	%            intersection_m(S2,S3,S1) => X in S1
 	% Priority 1 (vtLowSpeed priority)
 	gensym(rule,RN8),
@@ -5319,12 +5329,12 @@ assertInRule(Env,9,AN7) :-
 
 
 assertAbductionRule(Env,1) :-
-	% Proof by abductive hypothesis
+	% Proof by abductive hypothesis_M
 	gensym(axiom,AN1),
 	gensym(rule,RN1),
 	constructInHead(Env,rn(_AN2,_RN2,_S2,_O2),MS,C,X,
 	                _HYPS1,_D,_CALLS1,_,InHead1),
-	constructMLHead(Env,rn(AN1,RN1,system,lInR),MS,C,X,_HYPS2,D1,_CALLS2,usingAbHyp(in(MS,C,X)),InHead2),
+	constructMLHead(Env,rn(AN1,RN1,system,lInR),MS,C,X,_HYPS2,D1,_CALLS2,usingAbHyp(in_M(MS,C,X)),InHead2),
 	assertz_if_new((InHead2 :- memberDML(InHead1,D1))),
 	!.
 assertAbductionRule(Env,2) :-
@@ -5333,7 +5343,7 @@ assertAbductionRule(Env,2) :-
 	gensym(rule,RN1),
 	constructInHead(Env,rn(_AN2,_RN2,_S2,_O2),MS,C,X,_HYPS,_D0,_CALLS3,_,InHead2),
 	constructMLHead(Env,rn(AN1,RN1,system,lInR),MS,C1,X,
-	                HYPS,D1,CALLS,usingAbHyp(in(MS,C,X)),InHead1),
+	                HYPS,D1,CALLS,usingAbHyp(in_M(MS,C,X)),InHead1),
 	L1 = normalizeNot(C1,C),
 	L2 = not(memberDML(InHead2,D1)),
 	L3 = addDefaultML(InHead2,D1),
@@ -5375,11 +5385,11 @@ saveEnvironment(EnvName,FileName) :-
 writeEnvironment(EnvName) :-
 	environment_M(EnvName,Env,C),
 	writeq(environment_M(EnvName,Env,C)), write('.'), nl,
-%	write(':- dynamic(constraint/8).'), nl,
-%	write(':- dynamic(in/9).'), nl,
-%	write(':- dynamic(kb_in/10).'), nl,
-%	write(':- dynamic(rel/5).'), nl,
-%	write(':- dynamic(eq/9).'), nl,
+%	write(':- dynamic(constraint_M/8).'), nl,
+%	write(':- dynamic(in_M/9).'), nl,
+%	write(':- dynamic(kb_in_M/10).'), nl,
+%	write(':- dynamic(rel_M/5).'), nl,
+%	write(':- dynamic(eq_M/9).'), nl,
 %	write(':- dynamic(conceptHierarchy/3).'), nl,
 %	write(':- dynamic(roleHierarchy/3).'), nl,
 %	write(':- dynamic(conceptEqualSets/6).'), nl,
@@ -5393,12 +5403,12 @@ writeEnvironment(EnvName) :-
 %	write(':- dynamic(conceptElement/6).'), nl,
 %	write(':- dynamic(roleElement/7).'), nl,
 %	write(':- dynamic(modalAxioms/6).'), nl,
-	writeall(in(Env,_A0,_B0,_C0,_D0,_E0,_F0,_G0,_H0)),
-	writeall(kb_in(Env,_A1,_B1,_C1,_D1,_E1,_F1,_G1,_H1,_I1)),
-	writeall(eq(Env,_A11,_B11,_C11,_D11,_E11,_F11,_G11,_H11)),
-	writeall(constraint(Env,_A12,_B12,_C12,_D12,_E12,_F12,_G12)),
-	writeall(rel(Env,_A17,_B17,_C17,_D17)),
-	writeall(closed(Env,_A18,_B18,_C18,_D18)),
+	writeall(in_M(Env,_A0,_B0,_C0,_D0,_E0,_F0,_G0,_H0)),
+	writeall(kb_in_M(Env,_A1,_B1,_C1,_D1,_E1,_F1,_G1,_H1,_I1)),
+	writeall(eq_M(Env,_A11,_B11,_C11,_D11,_E11,_F11,_G11,_H11)),
+	writeall(constraint_M(Env,_A12,_B12,_C12,_D12,_E12,_F12,_G12)),
+	writeall(rel_M(Env,_A17,_B17,_C17,_D17)),
+	writeall(closed_M(Env,_A18,_B18,_C18,_D18)),
 	writeall(compiledPredicate(Env,_A19)),
 	writeall(conceptElement(Env,_A14,_B14,_C14,_D14,_E14,_F14)),
 	writeall(conceptEqualSets(Env,_A4,_B4,_C4,_D4,_E4)),
@@ -5419,8 +5429,8 @@ writeEnvironment(EnvName) :-
 	writeall(Env,roleNr/5),
 	writeall(Env,roleRange/4),
 	writeall(Env,roleSubsets/6),
-	writeall(succ(_A17,Env,_B17,_C17)),
-	writeall(sub(_A18,Env,_B18,_C18)),
+	writeall(succ_M(_A17,Env,_B17,_C17)),
+	writeall(sub_M(_A18,Env,_B18,_C18)),
 	!.
 
 writeall(Head) :-
@@ -5492,7 +5502,7 @@ assertClause(Clause) :-
 /**********************************************************************
  *
  * copyEnvironment(Name1,Name2)
- * copies environment_M Name1 to environment_M Name2.
+ * copies environment Name1 to environment Name2.
  *
  */
 
@@ -5503,18 +5513,18 @@ copyEnvironment(Name2) :-
 copyEnvironment(Name1,Name2) :-
 	environment_M(Name1,Env1,Comment),
 	makeEnvironment(Name2,Comment),
-	% !! This environment_M mustn't be initializes because
+	% !! This environment mustn't be initializes because
 	% the clauses asserted usually during initialization
-	% will also be copied from environment_M Name1.
+	% will also be copied from environment Name1.
 	environment_M(Name2,Env2,_),
 	term_expansion_M(copy,on,Env1,Env2),
 	!,
-	copyAll(Env1,Env2,in/9),
-	copyAll(Env1,Env2,kb_in/10),
-	copyAll(Env1,Env2,eq/9),
-	copyAll(Env1,Env2,constraint/8),
-	copyAll(Env1,Env2,rel/5),
-	copyAll(Env1,Env2,closed/5),
+	copyAll(Env1,Env2,in_M/9),
+	copyAll(Env1,Env2,kb_in_M/10),
+	copyAll(Env1,Env2,eq_M/9),
+	copyAll(Env1,Env2,constraint_M/8),
+	copyAll(Env1,Env2,rel_M/5),
+	copyAll(Env1,Env2,closed_M/5),
 	copyAll(Env1,Env2,compiledPredicate/2),
 	copyAll(Env1,Env2,conceptElement/7),
 	copyAll(Env1,Env2,conceptEqualSets/6),
@@ -5536,10 +5546,10 @@ copyEnvironment(Name1,Name2) :-
 	copyAll(Env1,Env2,roleNr/5),
 	copyAll(Env1,Env2,roleRange/4),
 	copyAll(Env1,Env2,roleSubsets/6),
-%	copyAll(Env1,Env2,sub/4),
-%	copyAll(Env1,Env2,succ/4),
+%	copyAll(Env1,Env2,sub_M/4),
+%	copyAll(Env1,Env2,succ_M/4),
 %	copyAll(Env1,Env2,option_M/2),
-%	copyAll(Env1,Env2,nsub/4),
+%	copyAll(Env1,Env2,nsub_M/4),
 	term_expansion_M(copy,off,Env1,Env2),
 	!.
 
@@ -5560,12 +5570,12 @@ term_expansion_M(copy,on,Env1,Env2) :-
 		term_expansion_M(Body1,Body2))),
 	assertz_if_new((term_expansion_M(call(Body1),call(Body2)) :-
 		 term_expansion_M(Body1,Body2))),
-	assertTermExpansionClause(in/9,Env1,Env2),
-	assertTermExpansionClause(kb_in/10,Env1,Env2),
-	assertTermExpansionClause(eq/9,Env1,Env2),
-	assertTermExpansionClause(constraint/8,Env1,Env2),
-	assertTermExpansionClause(rel/5,Env1,Env2),
-	assertTermExpansionClause(closed/5,Env1,Env2),
+	assertTermExpansionClause(in_M/9,Env1,Env2),
+	assertTermExpansionClause(kb_in_M/10,Env1,Env2),
+	assertTermExpansionClause(eq_M/9,Env1,Env2),
+	assertTermExpansionClause(constraint_M/8,Env1,Env2),
+	assertTermExpansionClause(rel_M/5,Env1,Env2),
+	assertTermExpansionClause(closed_M/5,Env1,Env2),
 	assertTermExpansionClause(compiledPredicate/2,Env1,Env2),
 	assertTermExpansionClause(conceptElement/7,Env1,Env2),
 	assertTermExpansionClause(conceptEqualSets/6,Env1,Env2),
@@ -5587,12 +5597,12 @@ term_expansion_M(copy,on,Env1,Env2) :-
 	assertTermExpansionClause(roleNr/5,Env1,Env2),
 	assertTermExpansionClause(roleRange/4,Env1,Env2),
 	assertTermExpansionClause(roleSubsets/6,Env1,Env2),
-	assertTermExpansionClause(sub/4,Env1,Env2),
-	assertTermExpansionClause(succ/4,Env1,Env2),
-	assertz_if_new((term_expansion_M(succ(X1,Env1,X3,X4),
-				succ(X1,Env2,X3,X4)))),
-	assertz_if_new((term_expansion_M(sub(X1,Env1,X3,X4),
-				sub(X1,Env2,X3,X4)))),
+	assertTermExpansionClause(sub_M/4,Env1,Env2),
+	assertTermExpansionClause(succ_M/4,Env1,Env2),
+	assertz_if_new((term_expansion_M(succ_M(X1,Env1,X3,X4),
+				succ_M(X1,Env2,X3,X4)))),
+	assertz_if_new((term_expansion_M(sub_M(X1,Env1,X3,X4),
+				sub_M(X1,Env2,X3,X4)))),
 	assertz_if_new(term_expansion_M(X,X)),
 	!.
 
@@ -5631,7 +5641,7 @@ copyAll(_,_,_) :- !.
 /**********************************************************************
  *
  * renameEnvironment(Name1,Name2)
- * renames environment_M Name1 to environment_M Name2.
+ * renames environment Name1 to environment Name2.
  *
  */
 
@@ -5640,1162 +5650,6 @@ renameEnvironment(Name1,Name2) :-
 	asserta(environment_M(Name2,Env,C)),
 	% to be implemented
 	!.
-/**********************************************************************
- *
- * @(#) examples.pl 1.5@(#)
- *
- */
-
-example(1) :-
-	makeEnvironment('ex1','von HJO'),
-	initEnvironment,
-	defconcept(tFatherAcademic,andM([tMale,someM(mudChild,tAcademic)])),
-	defconcept(tGrandfatherAcademic,andM([tMale,someM(mudChild,tFatherAcademic)])),
-	assert_ind(iTom,iTim,mudChild),
-	assert_ind(iTim,iMike,mudChild),
-	assert_ind(iMike,tMale),
-	assert_ind(iMike,tAcademic),
-	assert_ind(iTim,tMale),
-	assert_ind(iTom,tMale).
-%%% Example  2:
-%%% KRIS-Example
-% setof(C,ask_M(mudIsa(iMary,C)),L)
-% gives L = ['tTOP',grandparent,tRangeParent,parent_with_sons_only,
-%            parent_with_two_children,tAgentGeneric] 
-% in Total runtime 12.167 sec. (05.06.92)
-example(2) :-
-	makeEnvironment('ex2','krisExample'),
-	initEnvironment,
-	defprimconcept(tMale),
-	defprimconcept(tFemale,isTDisjoint(tMale)),
-	defconcept(males,someM(mudSex,tMale)),
-	defconcept(females,someM(mudSex,tFemale)),
-	defprimconcept(tAgentGeneric,someM(mudSex,orM([tMale,tFemale]))),
-	defconcept(tRangeParent,andM([tAgentGeneric,someM(mudChild,tAgentGeneric)])),
-	defconcept(tRangeMother,andM([tRangeParent,someM(mudSex,tFemale)])),
-	defconcept(tRangeFather,andM([tRangeParent,isTDisjoint(tRangeMother)])),
-	defconcept(grandparent,andM([tRangeParent,someM(mudChild,tRangeParent)])),
-	defconcept(parent_with_sons_only,andM([tRangeParent,allM(mudChild,someM(mudSex,tMale))])),
-	defconcept(parent_with_two_children,andM([tRangeParent,atleast(2,mudChild)])),
-	assert_ind(iTom,tRangeFather),
-	assert_ind(iTom,iPeter,mudChild),
-	assert_ind(iTom,iHarry,mudChild),
-	assert_ind(iMary,parent_with_sons_only),
-	assert_ind(iMary,iTom,mudChild),
-	assert_ind(iMary,iChris,mudChild).
-%%% Example  3:
-% inconsistent([])
-% succeeds in Total runtime 0.000 sec. (05.06.92)
-example(3) :-
-	makeEnvironment('ex3','Inconsistence'),
-	initEnvironment,
-	defprimconcept(parent_with_one_child,atmost(1,mudChild)),
-	assert_ind(iMary,parent_with_one_child),
-	assert_ind(iMary,iTom,mudChild),
-	assert_ind(iMary,iChris,mudChild).
-%%% Example  4:
-% Modal Operators
-example(4) :-
-	makeEnvironment('ex4','Inconsistence'),
-	initEnvironment,
-	defconcept([b(believe,a1)],c1,b(want,a2,car)),
-	defconcept([b(believe,a1)],c2,b(want,a3,car)),
-	defprimconcept([b(believe,a1)],c1,c2),
-	assert_ind([b(believe,a1)],audi,c1).
-%%% Example  5:
-% subsumes([],c1,c2).
-% fails    in Total runtime 0.050 sec. (05.06.92)
-% subsumes([],c2,c1).
-% succeeds in Total runtime 0.050 sec. (05.06.92)
-example(5) :-
-	makeEnvironment('ex5','Subsumption'),
-	initEnvironment,
-	defconcept(c1,andM([allM(r,a),allM(andM([r,q]),b)])),
-	defconcept(c2,allM(andM([r,q]),andM([a,b]))).
-%%% Example  6:
-% subsumes([],c1,c2).
-% fails    in Total runtime 0.033 sec. (05.06.92)
-% subsumes([],c2,c1).
-% succeeds in Total runtime 0.033 sec. (05.06.92)
-example(6) :-
-	makeEnvironment('ex6','Subsumption'),
-	initEnvironment,
-	defrole(r1,andM([r,q])),
-	defconcept(d0,andM([a,b])),
-	defconcept(d1,allM(r,a)),
-	defconcept(d2,allM(r1,b)),
-	defconcept(c1,andM([d1,d2])),
-	defconcept(c2,allM(r1,d0)).
-%%% Example  7:
-example(7) :-
-	makeEnvironment('ex7','Subsumption'),
-	initEnvironment,
-	defconcept(c1,atleast(3,r)),
-	defconcept(c2,andM([allM(andM([r,p]),a),allM(andM([r,q]),isTDisjoint(a)),atleast(2,andM([r,p])),atleast(2,andM([r,q]))])).
-%%% Example  8;
-% ask_M(mudIsa(iTom,heterosexual))
-% succeeds in Total runtime 0.033 sec. (05.06.92)
-example(8) :-
-	makeEnvironment('ex8','Disjunction of complementary concepts'),
-	initEnvironment,
-	defprimconcept(tMale),
-	defconcept(tFemale,isTDisjoint(tMale)),
-	defconcept(heterosexual,orM([tMale,tFemale])).
-%%% Example  9:
-% Variation of the KRIS-Example
-% ask_M(mudIsa(iChris,tMale))
-% succeeds in Total runtime 0.000 sec. (05.06.92)
-example(9) :-
-	makeEnvironment('ex9','Variation of the KRIS example'),
-	initEnvironment,
-	defprimconcept(tMale),
-	defprimconcept(tFemale,isTDisjoint(tMale)),
-	defprimconcept(tAgentGeneric,orM([tMale,tFemale])),
-	defconcept(tRangeParent,andM([tAgentGeneric,someM(mudChild,tAgentGeneric)])),
-	defconcept(tRangeMother,andM([tRangeParent,tFemale])),
-	defconcept(tRangeFather,andM([tRangeParent,isTDisjoint(tRangeMother)])),
-	defconcept(grandparent,andM([tRangeParent,someM(mudChild,tRangeParent)])),
-	defconcept(parent_with_sons_only,andM([tRangeParent,allM(mudChild,tMale)])),
-	defconcept(parent_with_two_children,andM([tRangeParent,atleast(2,mudChild)])),
-	assert_ind(iTom,tRangeFather),
-	assert_ind(iTom,iPeter,mudChild),
-	assert_ind(iTom,iHarry,mudChild),
-	assert_ind(iMary,parent_with_sons_only),
-	assert_ind(iMary,iTom,mudChild),
-	assert_ind(iMary,iChris,mudChild).
-%%% Example 10:
-% ask_M(mudIsa(iTom,c2)) 
-% succeeds in Total runtime 0.017 sec. (05.06.92)
-example(10) :-
-	makeEnvironment('ex10','Inverse Role'),
-	initEnvironment,
-	defrole(r2,isMudInverseFn(r1)),
-	defconcept(c1,allM(r1,c2)),
-	defconcept(c3,someM(r2,c1)),
-	assert_ind(iTom,c3).
-%%% Example 11:
-% inconsistent([])
-% succeeds in Total runtime 0.034 sec. (05.06.92)
-example(11) :-
-	makeEnvironment('ex11','Inconsistence'),
-	initEnvironment,
-	defconcept(c1,andM([atleast(2,mudChild),atmost(1,mudChild)])),
-	assert_ind(iTom,c1).
-%%% Example 12:
-% subsumes([],c1,c2)
-% succeeds in Total runtime 0.050 sec. (05.06.92)
-% subsumes([],c2,c1)
-% fails    in Total runtime 0.200 sec. (05.06.92)
-example(12) :-
-	makeEnvironment('ex12','Subsumption'),
-	initEnvironment,
-	defconcept(c1,andM([tAgentGeneric,atleast(2,mudChild)])),
-	defconcept(c2,andM([tAgentGeneric,atleast(3,restr(mudChild,lawyer))])).
-%%% Example 13:
-% subsumes([],c1,c2)
-% succeeds in Total runtime 0.117 sec. (05.06.92)
-example(13) :-
-	makeEnvironment('ex13','Subsumption'),
-	initEnvironment,
-	defconcept(c1,andM([tAgentGeneric,atmost(4,restr(mudChild,tDoctor))])),
-	defconcept(c2,andM([tAgentGeneric,tFemale,atmost(3,mudChild)])).
-%%% Example 14:
-% subsumes([],c1,c2)
-% succeeds ???
-% subsumes([],c2,c1)
-% succeeds in Total runtime 0.250 sec. (06.06.92)
-example(14) :-
-	makeEnvironment('ex14','Subsumption'),
-	initEnvironment,
-	defconcept(c1,atmost(0,restr(r,andM([atleast(3,s1),atleast(4,s2)])))),
-	defconcept(c2,allM(restr(r,atleast(2,s1)),atmost(2,s2))).
-%%% Example 15:
-% subsumes([],c2,c1)
-% succeeds in Total runtime 0.067 sec. (05.06.92)
-example(15) :-
-	makeEnvironment('ex15','Subsumption'),
-	initEnvironment,
-	defconcept(c1,andM([tAgentGeneric,allM(friend,tDoctor),allM(restr(friend,tDoctor),atleast(1,speciality))])),
-	defconcept(c2,andM([tAgentGeneric,allM(friend,atleast(1,speciality))])).
-%%% Example 16:
-% subsumes([],c2,c1)
-% succeeds in Total runtime 0.450 sec. (06.06.92)
-example(16) :-
-	makeEnvironment('ex16','Subsumption'),
-	initEnvironment,
-	defconcept(c1,andM([atleast(1,restr(mudChild,lawyer)),atleast(1,restr(mudChild,tDoctor))])),
-	defconcept(c2,orM([atleast(2,mudChild),atleast(1,restr(mudChild,andM([lawyer,tDoctor])))])).
-%%% Example 17:
-% subsumes([],c2,c1)
-% succeeds in Total runtime 0.034 sec. (05.06.92)
-example(17) :-
-	makeEnvironment('ex17','Subsumption'),
-	initEnvironment,
-	defconcept(c1,someM(andM([mudChild,friend]),tDoctor)),
-	defconcept(c2,andM([someM(mudChild,tDoctor),someM(friend,tDoctor)])).
-%%% Example 18:
-% ask_M(mudIsa(iMary,c4))
-% succeeds in Total runtime 0.117 sec. (05.06.92)
-example(18) :-
-	makeEnvironment('ex18','Number restrictions'),
-	initEnvironment,
-	defprimconcept(tFemale),
-	defconcept(tMale,isTDisjoint(tFemale)),
-	defconcept(c3,andM([atmost(4,mudChild),atleast(2,restr(mudChild,tFemale))])),
-	defconcept(c4,atmost(2,restr(mudChild,tFemale))),
-	assert_ind(iTom,tMale),
-	assert_ind(iPeter,tMale),
-	assert_ind(iMary,iPeter,mudChild),
-	assert_ind(iMary,iTom,mudChild),
-	assert_ind(iMary,c3).
-%%% Example 19
-% ask_M(mudIsa(iAmy,tFemale))
-% succeeds in Total runtime 0.067 sec. (06.06.92)
-example(19) :-
-	makeEnvironment('ex19','Number restrictions'),
-	initEnvironment,
-	defprimconcept(tFemale),
-	defconcept(tMale,isTDisjoint(tFemale)),
-	defconcept(c5,andM([atmost(2,restr(mudChild,tMale))])),
-	assert_ind(iTom,tMale),
-	assert_ind(iPeter,tMale),
-	assert_ind(iMary,iTom,mudChild),
-	assert_ind(iMary,iPeter,mudChild),
-	assert_ind(iMary,iAmy,mudChild),
-	assert_ind(iMary,c5).
-%%% Example 20
-% inconsistent([])
-% succeeds in Total runtime 5.167 sec. (05.06.92)
-example(20) :-
-	makeEnvironment('ex20','Number restrictions'),
-	initEnvironment,
-	defprimconcept(tFemale),
-	defconcept(tMale,isTDisjoint(tFemale)),
-	defconcept(c5,andM([atmost(2,restr(mudChild,tMale)),atmost(1,restr(mudChild,tFemale))])),
-	assert_ind(iTom,tMale),
-	assert_ind(iPeter,tMale),
-	assert_ind(iMary,iTom,mudChild),
-	assert_ind(iMary,iPeter,mudChild),
-	assert_ind(iMary,iAmy,mudChild),
-	assert_ind(iMary,iJane,mudChild),
-	assert_ind(iMary,c5).
-%%% Example 21
-% ask_M(mudIsa(betty,tFemale))
-example(21) :-
-	makeEnvironment('ex21','Number restrictions'),
-	initEnvironment,
-	defprimconcept(tFemale),
-	defconcept(tMale,isTDisjoint(tFemale)),
-	defconcept(c1,andM([atmost(1,restr(teacher,tMale)),atmost(1,restr(teacher,tFemale))])),
-	defconcept(c2,andM([atmost(2,restr(teacher,tMale)),atmost(1,restr(teacher,tFemale))])),
-	assert_ind(iTom,c1),
-	assert_ind(sue,c1),
-	assert_ind(david,c2),
-	assert_ind(iTom,betty,teacher),
-	assert_ind(iTom,iPeter,teacher),
-	assert_ind(sue,betty,teacher),
-	assert_ind(sue,iChris,teacher),
-	assert_ind(david,betty,teacher),
-	assert_ind(david,iChris,teacher),
-	assert_ind(david,iPeter,teacher).
-%%% Example 22
-% ask_M(mudIsa(iAmy,tFemale))
-% should succeeds
-% but fails in the current implementation
-example(22) :-
-	makeEnvironment('ex22','Number restrictions'),
-	initEnvironment,
-	defprimconcept(tFemale),
-	defconcept(tMale,isTDisjoint(tFemale)),
-	defrole(maleTeacher,restr(teacher,tMale)),
-	defrole(femaleTeacher,restr(teacher,tFemale)),
-	defconcept(c1,andM([atmost(1,maleTeacher),atmost(1,femaleTeacher)])),
-	defconcept(c2,atmost(1,maleTeacher)),
-	assert_ind(iTom,c2),
-	assert_ind(sue,c1),
-	assert_ind(iTom,betty,teacher),
-	assert_ind(iTom,iChris,teacher),
-	assert_ind(iTom,robin,teacher),
-	assert_ind(sue,betty,teacher),
-	assert_ind(sue,iChris,teacher).
-%%% Example 23
-% is a variant of example 23 with user provided names for the 
-% restricted roles.
-% ask_M(mudIsa(iAmy,tFemale))
-% should succeeds
-% but fails in the current implementation
-example(23) :-
-	makeEnvironment('ex23','Number restrictions'),
-	initEnvironment,
-	defprimconcept(tFemale),
-	defconcept(tMale,isTDisjoint(tFemale)),
-	defprimrole(maleTeacher,teacher),
-	defprimrole(femaleTeacher,teacher),
-	defconcept(c1,andM([atmost(1,maleTeacher),atmost(1,femaleTeacher)])),
-	defconcept(c2,atmost(1,maleTeacher)),
-	assert_ind(iTom,c2),
-	assert_ind(sue,c1),
-	assert_ind(iTom,betty,teacher),
-	assert_ind(iTom,iChris,teacher),
-	assert_ind(iTom,robin,teacher),
-	assert_ind(sue,betty,teacher),
-	assert_ind(sue,iChris,teacher).
-%%% Example 24
-% ask_M(mudIsa(audi,c3))
-% succeeds in Total runtime 1.634 sec. (24.06.92)
-example(24) :-
-	makeEnvironment('ex24','Modal operators'),
-	initEnvironment,	
-	modalAxioms(kd45,believe,a1),
-	defconcept(c1,b(believe,a1,tAutomobile)),
-	defconcept(c3,b(believe,a1,c1)),
-	defconcept([b(believe,a1)],c1,b(believe,a1,tAutomobile)),
-	defconcept([b(believe,a1)],c3,b(believe,a1,c1)),
-	assert_ind(audi,c1).
-%%% Example 25
-% isTDisjoint(ask_M(mudIsa(audi,c3)))
-% succeeds in Total runtime 0.033 sec. (24.06.92)
-example(25) :-
-	makeEnvironment('ex25','Modal operators'),
-	initEnvironment,	
-	modalAxioms(kd45,believe,a1),
-	defconcept([b(believe,a1)],c1,b(believe,a1,tAutomobile)),
-	defconcept([b(believe,a1)],c3,b(believe,a1,c1)),
-	assert_ind(audi,c1).
-%%% Example 26
-% subsumes([],c2,c1)
-% succeeds in Total runtime 0.034 sec. (24.06.92)
-% isTDisjoint(subsumes([],c1,c2))
-% succeeds in Total runtime 1.333 sec. (24.06.92)
-example(26) :-
-	makeEnvironment('ex27','Subsumption'),
-	initEnvironment,
-	defconcept(c1,atmost(0,r)),
-	defconcept(c2,allM(r,c5)).
-%%% Example 27
-% subsumes([],c2,c1) 
-% succeeds in Total runtime 0.067 sec. (24.06.92)
-% isTDisjoint(subsumes([],c1,c2))
-% succeeds
-example(27) :-
-	makeEnvironment('ex28','Subsumption'),
-	initEnvironment,
-	defconcept(c1,isTDisjoint(someM(r,'tTOP'))),
-	defconcept(c2,allM(r,c5)).
-%%% Example 28
-% ask_M(ex28,[b(believe,iJohn)],mudIsa(audi,tAutomobile),P)
-% succeeds
-example(28) :-
-	makeEnvironment('ex28','Modal operators'),
-	initEnvironment,	
-	modalAxioms(kd45,believe,a1),
-	modalAxioms(kd45,believe,allM),
-	defprimconcept(tAutomobile),
-	assert_ind([b(believe,allM)],audi,tAutomobile).
-%%% Example 29
-% is a variant of example 23 with a more restricted definition of c1
-% ask_M(mudIsa(iAmy,tFemale))
-% should succeeds
-% but fails in the current implementation
-example(29) :-
-	makeEnvironment('ex29','Number restrictions'),
-	initEnvironment,
-	defprimconcept(tFemale),
-	defconcept(tMale,isTDisjoint(tFemale)),
-	defprimrole(teacher),
-	defrole(maleTeacher,restr(teacher,tMale)),
-	defrole(femaleTeacher,restr(teacher,tFemale)),
-	defconcept(c1,andM([atmost(1,maleTeacher),atmost(2,femaleTeacher)])),
-	assert_ind(iTom,c1),
-	assert_ind(sue,c1),
-	assert_ind(iTom,betty,teacher),
-	assert_ind(iTom,iChris,teacher),
-	assert_ind(iTom,robin,teacher),
-	assert_ind(sue,betty,teacher),
-	assert_ind(sue,iChris,teacher).
-example(30) :-
-	makeEnvironment('ex30','Number restrictions'),
-	initEnvironment,
-	defprimconcept(tFemale),
-	defrole(maleTeacher,restr(teacher,isTDisjoint(tFemale))),
-	defrole(femaleTeacher,restr(teacher,tFemale)),
-	defconcept(c1,andM([atmost(1,maleTeacher),atmost(1,femaleTeacher)])),
-	defconcept(c2,atmost(1,maleTeacher)),
-	assert_ind(iTom,c2),
-	assert_ind(sue,c1),
-	assert_ind(iTom,betty,teacher),
-	assert_ind(iTom,iChris,teacher),
-	assert_ind(iTom,robin,teacher),
-	assert_ind(sue,betty,teacher),
-	assert_ind(sue,iChris,teacher).
-%%% Example 31
-% First test example for defclosed
-% ask_M(mudIsa(iTom,onlyMaleChildren))
-% succeeds
-example(31) :-
-	makeEnvironment('ex31','defclosed'),
-	initEnvironment,
-	defconcept(onlyMaleChildren,allM(mudChild,tMale)),
-	assert_ind(iTom,iPeter,mudChild),
-	assert_ind(iTom,iChris,mudChild),
-	assert_ind(iTom,iTim,mudChild),
-	assert_ind(iPeter,tMale),
-	assert_ind(iChris,tMale),
-	assert_ind(iTim,tMale),
-	defclosed(iTom,_Y,mudChild).
-%%% Example 32
-% First test example for abduction
-% abduce(mudIsa(robin,tMale),H,E)
-% abduce(mudIsa(robin,tFemale),H,E)
-example(32) :-
-	makeEnvironment('ex32','abduction'),
-	initEnvironment,
-	defconcept(tMale,isTDisjoint(tFemale)).
-%%% Example 33
-% Second test example for abduction
-% abduce(mudIsa(nixon,dove),H,E)
-% abduce(mudIsa(nixon,hawk),H,E)
-% gives unexpected results!!!
-example(33) :-
-	makeEnvironment('ex33','abduction'),
-	initEnvironment,
-	defconcept(c1,andM([quaker,normalQuaker])),
-	defconcept(c2,andM([republican,normalRepublican])),
-	defprimconcept(c1,dove),
-	defprimconcept(c2,hawk),
-	assert_ind(nixon,quaker),
-	assert_ind(nixon,republican).
-%%% Example 34
-% The following gives an inconsistent specification of
-% the tPenguin - tBird problem. So
-% inconsistent(ex34)
-% succeeds
-example(34) :-
-	makeEnvironment('ex34',abduction),
-	initEnvironment,
-	defprimconcept(tPenguin,andM([tBird,isTDisjoint(tCanFly)])),
-	defprimconcept(tBird,tCanFly),
-	assert_ind(iTweety,tPenguin),
-	assert_ind(iJohn,tBird).
-%%% Example 35
-% This is a consistent specification of the tPenguin - tBird problem.
-% abduce(ex35,[],mudIsa(iJohn,tCanFly),H,E).
-% succeeds with
-% H = [in(env(e1),rn(_7982,_7983,_7984,_7985),modal([]),normalBird,iJohn,
-%         hyp(_7989),ab(_7991),call(_7993),
-%         proved(in([],normalBird,iJohn),hyp(_7989),basedOn(_8005)))],
-% E = proved(in([],tCanFly,iJohn),hyp([]),
-%            basedOn(andM([proved(in([],tBird,iJohn),hyp([]),basedOn(abox)),
-%                         proved(in([],normalBird,iJohn),hyp([]),
-%     basedOn(usingAbHyp(in(env(e1),rn(_7525,_7526,_7527,_7528),modal([]),
-%                           normalBird,iJohn,hyp(_7532),ab(_7534),call(_7536),
-%                           proved(in([],normalBird,iJohn),hyp(_7532),
-%                           basedOn(_7548))))))])))
-% andM
-% abduce(ex35,[],mudIsa(iTweety,tCanFly),H,E).
-% fails
-example(35) :-
-	makeEnvironment('ex35',abduction),
-	initEnvironment,
-	defprimconcept(tPenguin,andM([tBird,isTDisjoint(normalBird)])),
-	defprimconcept(andM([tBird,normalBird]),tCanFly),
-	assert_ind(iTweety,tPenguin),
-	assert_ind(iJohn,tBird).
-%%% Example 36
-% Variant of example 33 giving the expected results:
-% abduce(ex36,[],mudIsa(nixon,dove),H,E).
-% succeeds with
-% H = [in(env(e4),rn(_8077,_8078,_8079,_8080),modal([]),
-%         normalQuaker,nixon,hyp(_8084),ab(_8086),call(_8088),
-%         proved(in([],normalQuaker,nixon),hyp(_8084),basedOn(_8100)))],
-% E = proved(in([],dove,nixon),hyp([]),
-%        basedOn(andM([proved(in([],quaker,nixon),hyp([]),basedOn(abox)),
-%                     proved(in([],normalQuaker,nixon),hyp([]),
-%           basedOn(usingAbHyp(in(env(e4),rn(_7620,_7621,_7622,_7623),
-%                   modal([]),normalQuaker,nixon,hyp(_7627),ab(_7629),
-%                   call(_7631),proved(in([],normalQuaker,nixon),
-%                   hyp(_7627),basedOn(_7643))))))]))) 
-% andM
-% abduce(ex36,[],mudIsa(nixon,hawk),H,E).
-% succeeds with
-% H = [in(env(e4),rn(_8077,_8078,_8079,_8080),modal([]),
-%         normalRepublican,nixon, hyp(_8084),ab(_8086),call(_8088),
-%         proved(in([],normalRepublican,nixon),hyp(_8084),basedOn(_8100)))],
-% E = proved(in([],dove,nixon),hyp([]),
-%        basedOn(andM([proved(in([],republican,nixon),hyp([]),basedOn(abox)),
-%                     proved(in([],normalRepublican,nixon),hyp([]),
-%           basedOn(usingAbHyp(in(env(e4),rn(_7620,_7621,_7622,_7623),
-%                   modal([]),normalRepublican,nixon,hyp(_7627),ab(_7629),
-%                   call(_7631),proved(in([],normalRepublican,nixon),
-%                   hyp(_7627),basedOn(_7643))))))]))) 
-example(36) :-
-	makeEnvironment('ex36','abduction'),
-	initEnvironment,
-	defprimconcept(andM([quaker,normalQuaker]),dove),
-	defprimconcept(andM([republican,normalRepublican]),hawk),
-	assert_ind(nixon,quaker),
-	assert_ind(nixon,republican).
-%%% Example 37
-example(37) :-
-	makeEnvironment('ex37','abduction'),
-	initEnvironment,
-	defprimconcept(rained_last_night,grass_is_wet),
-	defprimconcept(sprinkler_was_on,grass_is_wet),
-	defprimconcept(grass_is_wet,shoes_are_wet).
-%%% Example 38
-% ask_M(mudIsa(ideaste,c2))
-% should succeed
-example(38) :-
-	makeEnvironment('ex38','disjunctive_information'),
-	initEnvironment,
-	assert_ind(ideaste,oedipus,hasChild),
-	assert_ind(oedipus,polyneikes,hasChild),
-	assert_ind(ideaste,polyneikes,hasChild),
-	assert_ind(polyneikes,thersandros,hasChild),
-	assert_ind(oedipus,fatherMurderer),
-	assert_ind(thersandros,isTDisjoint(fatherMurderer)),
-	defconcept(c1,andM([fatherMurderer,someM(hasChild,isTDisjoint(fatherMurderer))])),
-	defconcept(c2,someM(hasChild,c1)).
-%%% Example 39
-% ask_M(mudIsa(lucky,tFemale))
-% succeeds
-example(39) :-
-	makeEnvironment('ex39','negation_as_failure'),
-	initEnvironment,
-	defrole(parentOf,isMudInverseFn(childOf)),
-	defconcept(tMale,isTDisjoint(tFemale)),
-	defprimconcept(andM([someM(parentOf,tTOP),nafM(isTDisjoint(tFemale))]),tFemale),
-	assert_ind(iMary,lucky,childOf).
-%%% Example 40
-% ask_M(mudIsa(iPeter,tRichPerson))
-% succeeds.
-% After
-% assert_ind(iPeter,poorPerson)
-% the query_M
-% ask_M(mudIsa(iPeter,tRichPerson))
-% fails
-example(40) :-
-	makeEnvironment('ex40','negation_as_failure'),
-	initEnvironment,
-	defprimconcept(andM([tDoctor,nafM(isTDisjoint(tRichPerson))]),tRichPerson),
-	defconcept(poorPerson,isTDisjoint(tRichPerson)),
-	assert_ind(iPeter,tDoctor).
-%%% Example 41
-% ask_M(mudIsa(iTom,tRichPerson))
-% succeeds.
-% After 
-% assert_ind(iTom,poorPerson)
-% the query_M
-% ask_M(mudIsa(iTom,tRichPerson))
-% fails
-example(41) :-
-	makeEnvironment('ex41','negation_as_failure'),
-	initEnvironment,
-	defrole(doctorParentOf,restr(isMudInverseFn(childOf),tDoctor)),
-	defrole(childOfDoctor,isMudInverseFn(r1)),
-	defprimconcept(andM([someM(doctorParentOf,tTOP),nafM(isTDisjoint(tRichPerson))]),tRichPerson),
-	defconcept(poorPerson,isTDisjoint(tRichPerson)),
-	assert_ind(iChris,tDoctor),
-	assert_ind(iChris,iTom,childOf).
-%%% Example 42
-% ask_M(mudIsa(audi,fourWheels))
-% succeeds.
-% After
-% assert_ind(audi,fiveWheels)
-% the query_M
-% ask_M(mudIsa(audi,fourWheels))
-% fails
-example(42) :-
-	makeEnvironment('ex42','negation_as_failure'),
-	initEnvironment,
-	defconcept(fourWheels,andM([atleast(4,wheels),atmost(4,wheels)])),
-	defconcept(fiveWheels,andM([atleast(5,wheels),atmost(5,wheels)])),
-	defprimconcept(andM([car,nafM(isTDisjoint(fourWheels))]),fourWheels),
-	assert_ind(audi,car).
-%%% Example 43
-example(43) :-
-	makeEnvironment('ex43','concrete_domains'),
-	initEnvironment,
-	defconcept(colors,setM([b,y,r])),
-	defconcept(blueOrYellow,setM([b,y])),
-	defconcept(red,setM([r])),
-	defconcept(blue,setM([b])),
-	defconcept(yellow,setM([y])),
-	defconcept(redOrYellow,setM([r,y])),
-	defconcept(blueOrRed,setM([b,r])),
-	defconcept(yellowOrBlue,setM([y,b])).
-%%% Example 44
-% subsumes(c2,c1)
-% should succeed
-example(44) :-
-	makeEnvironment('ex44','concrete_domains'),
-	initEnvironment,
-	defconcept(c1,setM([a,b])),
-	defconcept(c2,setM([a,b,c])).
-%%% Example 45
-example(45) :-
-	makeEnvironment('ex45','concrete_domains'),
-	initEnvironment,
-	defconcept(c1,setM([a,b,c])),
-	defconcept(c2,setM([a,b])),
-	defconcept(nc2,isTDisjoint(c2)).
-%%% Example 46
-% An insufficient specification of 
-% The bmw is either yellow, blue, orM red but isTDisjoint yellow. 
-% ask_M(mudIsa(bmw,c3))
-% fails
-example(46) :-
-	makeEnvironment('ex46','concrete_domains'),
-	initEnvironment,
-	defconcept(c1,someM(hasCol,setM([yellow,blue,red]))),
-	defconcept(c2,someM(hasCol,isTDisjoint(setM([yellow])))),
-	defconcept(c3,someM(hasCol,setM([blue,red]))),
-	assert_ind(bmw,c1),
-	assert_ind(bmw,c2).
-%%% Example 47
-% A correct specification of
-% The bmw is either yellow, blue, orM red but isTDisjoint yellow. 
-% ask_M(mudIsa(bmw,c3))
-% succeeds
-example(47) :-
-	makeEnvironment('ex47','concrete_domains'),
-	initEnvironment,
-	defconcept(c1,andM([someM(hasCol,setM([yellow,blue,red])),allM(hasCol,setM([yellow,blue,red]))])),
-	defconcept(c2,someM(hasCol,isTDisjoint(setM([yellow])))),
-	defconcept(c3,someM(hasCol,setM([blue,red]))),
-	assert_ind(bmw,c1),
-	assert_ind(bmw,c2).
-example(48) :-
-	makeEnvironment('ex48','concrete_concepts'),
-	initEnvironment,
-	defconcept(tOneSpouse,andM([atleast(1,mudSpouse),atmost(1,mudSpouse)])),
-	assert_ind(m1,tOneSpouse),
-	defprimconcept(someM(isMudInverseFn(mudSpouse),setM([m1])),setM([g0,g1,g2])),
-	assert_ind(g0,tOneSpouse),
-	defprimconcept(someM(isMudInverseFn(mudSpouse),setM([g0])),setM([m1,g1,g2])),
-	assert_ind(g1,tOneSpouse),
-	defprimconcept(someM(isMudInverseFn(mudSpouse),setM([g1])),setM([m1,g0,g2])),
-	assert_ind(g2,tOneSpouse),
-	defprimconcept(someM(isMudInverseFn(mudSpouse),setM([g2])),setM([m1,g0,g1])),
-	defconcept(zeroSH,andM([atleast(0,mudSubH),atmost(0,mudSubH)])),
-	defconcept(oneSH,andM([atleast(1,mudSubH),atmost(1,mudSubH)])),
-	defconcept(twoSH,andM([atleast(2,mudSubH),atmost(2,mudSubH)])),
-	assert_ind(g0,zeroSH),
-	assert_ind(g1,oneSH),
-	assert_ind(g2,twoSH),
-	defprimconcept(andM([someM(isMudInverseFn(mudSubH),setM([m1])),setM([m1])]),tBOT),
-	defprimconcept(andM([someM(isMudInverseFn(mudSubH),setM([g0])),setM([g0])]),tBOT),
-	defprimconcept(andM([someM(isMudInverseFn(mudSubH),setM([g1])),setM([g1])]),tBOT),
-	defprimconcept(andM([someM(isMudInverseFn(mudSubH),setM([g2])),setM([g2])]),tBOT),
-	defprimconcept(andM([someM(isMudInverseFn(mudSpouse),setM([m1])),someM(isMudInverseFn(mudSubH),setM([m1]))]),tBOT),
-	defprimconcept(andM([someM(isMudInverseFn(mudSpouse),setM([g0])),someM(isMudInverseFn(mudSubH),setM([g0]))]),tBOT),
-	defprimconcept(andM([someM(isMudInverseFn(mudSpouse),setM([g1])),someM(isMudInverseFn(mudSubH),setM([g1]))]),tBOT),
-	defprimconcept(andM([someM(isMudInverseFn(mudSpouse),setM([g2])),someM(isMudInverseFn(mudSubH),setM([g2]))]),tBOT),
-%	defconcept(someM(mudSubH,setM([m1])),someM(isMudInverseFn(mudSubH),setM([m1]))),
-%	defconcept(someM(mudSubH,setM([g0])),someM(isMudInverseFn(mudSubH),setM([g0]))),
-%	defconcept(someM(mudSubH,setM([g1])),someM(isMudInverseFn(mudSubH),setM([g1]))),
-%	defconcept(someM(mudSubH,setM([g2])),someM(isMudInverseFn(mudSubH),setM([g2]))).
-	defrole(mudSubH,isMudInverseFn(mudSubH)),
-	defrole(mudSpouse,isMudInverseFn(mudSpouse)).
-%%% Example 49
-% ask_M(mudIsa(p,c4))
-% should fail
-example(49) :-
-	makeEnvironment('ex49','defaults'),
-	initEnvironment,
-	defconcept(c4,andM([c5,c6])),
-	defprimconcept(andM([c0,nafM(isTDisjoint(c2))]),c5),
-	defprimconcept(andM([c0,nafM(isTDisjoint(c3))]),c6),
-	defconcept(c1,orM([isTDisjoint(c2),isTDisjoint(c3)])),
-	assert_ind(p,c0),
-	assert_ind(p,c1).
-example(50) :-
-	makeEnvironment('ex50','complete_or'),
-	initEnvironment,
-	defprimconcept(c1,c0),
-	defprimconcept(isTDisjoint(c1),c0).
-example(51) :-
-	makeEnvironment('ex51','functional_dependencies'),
-	initEnvironment,
-	def(posInfl(f,d)),
-	def(posInfl(h,f)),
-	def(posInfl(a,b)),
-	def(posInfl(b,c)),
-	def(posInfl(c,d)),
-	def(negInfl(b,e)),
-	def(negInfl(e,d)),
-	def(posInfl(g,e)),
-	def(posInfl(a,g)),
-	def(increase(a)).
-example(52) :-
-	makeEnvironment('ex52','functional_dependencies'),
-	initEnvironment,
-	def(increase(hasCubicCapacity)),
-	def(negInfl(withRebate,hasPrice)),
-	def(posInfl(hasPrice,hasOverallCost)),
-	def(posInfl(hasCubicCapacity,hasListPrice)),
-	def(posInfl(hasListPrice,hasPrice)),
-	def(posInfl(hasCubicCapacity,hasFuelConsumption)),
-	def(posInfl(hasFuelConsumption,hasOverallCost)),
-	def(posInfl(hasCubicCapacity,hasMaxSpeed)),
-	def(negInfl(hasCatConverter,hasMaxSpeed)),
-	def(posInfl(hasCatConverter,hasFuelConsumption)),
-	def(posInfl(hasCubicCapacity,hasWeight)),
-	def(negInfl(hasWeight,hasMaxSpeed)).
-example(53) :-
-	makeEnvironment('ex53','functional_dependencies'),
-	initEnvironment,
-	def(increase(hasCubicCapacity)),
-	def(infl(withRebate,hasPrice,-1.0)),
-	def(infl(hasPrice,hasOverallCost,1.0)),
-	def(infl(hasCubicCapacity,hasListPrice,1.2)),
-	def(infl(hasListPrice,hasPrice,1.0)),
-	def(infl(hasCubicCapacity,hasFuelConsumption,0.8)),
-	def(infl(hasFuelConsumption,hasOverallCost,1.0)),
-	def(infl(hasCubicCapacity,hasHorsePower,1.0)),
-	def(infl(hasHorsePower,hasFuelConsumption,1.0)),
-	def(infl(hasHorsePower,hasMaxSpeed,1.0)),
-	def(infl(hasFuelType,hasMaxSpeed,0.8)),
-	def(infl(hasCatConverter,hasHorsePower,-0.5)),
-	def(infl(hasCubicCapacity,hasWeight,0.5)),
-	def(infl(hasWeight,hasHorsePower,-1.0)).
-example(54) :-
-	makeEnvironment('ex54','functional_dependencies'),
-	initEnvironment,
-	def(negInfl(a,b)),
-	def(posInfl(b,e)),
-	def(posInfl(e,d)),
-	def(negInfl(g,e)),
-	def(negInfl(a,g)).
-%
-%	Apart from the notation identical to ex54.
-%
-example(55) :-
-	makeEnvironment('ex55','functional_dependencies'),
-	initEnvironment,
-	def(infl(a,b,1.0)),
-	def(infl(b,e,1.0)),
-	def(infl(e,d,1.0)),
-	def(infl(g,e,1.0)),
-	def(infl(a,g,-1.0)).
-example(56) :-
-	makeEnvironment('ex56','functional_dependencies'),
-	initEnvironment,
-	def(infl(a,b,1.0)),
-	def(infl(b,e,1.0)),
-	def(infl(e,d,1.0)),
-	def(infl(g,e,1.0)),
-	def(infl(a,g,-1.0)),
-	def(infl(f,g,0.5)),
-	def(infl(f,h,-0.5)),
-	def(infl(h,d,0.3)).
-example(57) :-
-	makeEnvironment('ex57','functional_dependencies'),
-	initEnvironment,
-	def(posInfl(a,b)),
-	def(posInfl(b,c)),
-	def(posInfl(c,d)).
-example(58) :- 
-	makeEnvironment('ex58','functional_dependencies'),
-	initEnvironment,
-	def(posInfl(a,b)),
-	def(posInfl(b,c)),
-	def(posInfl(c,d)),
-	def(infl(e,b,-1.0)),
-	def(infl(e,c,0.5)).
-example(59) :-
-	sb_defenv('mybox','sb.lit'),
-	sb_initenv,
-	sb_primconcept(tAgentGeneric),
-	sb_primconcept(tFemale,[supers([tAgentGeneric])]),
-	sb_primconcept(tMale,[supers([tAgentGeneric])]),
-	sb_disjoint(tMale,tFemale),
-	sb_primelemrole(mudChild,'domain-range'(tRangeParent,tAgentGeneric,tAgentGeneric)),
-	sb_defconcept(tRangeParent,[supers([tAgentGeneric]),
-                              nr(mudChild,1,30,2)]),
-	sb_defconcept(tRangeMother,[supers([tRangeParent,tFemale])]),
-	sb_defconcept(tRangeFather,[supers([tRangeParent,tMale])]),
-	sb_defconcept(iGanny,[supers([grandparent,tRangeMother])]),
-	sb_defelem(iHarry,[mudIsa(tRangeParent)]),
-	sb_defelem(iMary,[mudIsa(tRangeMother), 
-                         irole(mudChild, 
-                               iname('marys-mudChild'),
-                               [nr(1,30,2), vr(iHarry)])]).
-example(60) :-
-	makeEnvironment('ex60','Modal operators'),
-	initEnvironment,	
-	modalAxioms(kd45,believe,iPeter),
-	defprimconcept([b(believe,iPeter)],tDoctor,tRichPerson),
-	assert_ind([b(believe,iPeter)],iTom,tDoctor).
-%%% Example 61
-% deduce_M(mudIsa(iTweety,tCanFly))
-% deduce_M(mudIsa(iTweety,tCanNest))
-% deduce_M(mudIsa(iTweety,isTDisjoint(tEmu)))
-% deduce_M(mudIsa(iTweety,isTDisjoint(tCuckoo)))
-% succeed
-example(61) :-
-	makeEnvironment('ex61','Defaults andM the lottery paradox'),
-	initEnvironment,	
-	defprimconcept(andM([tBird,nafM(isTDisjoint(tCanFly))]), tCanFly),
-	defprimconcept(andM([tBird,nafM(isTDisjoint(tCanNest))]), tCanNest),
-	defprimconcept(tEmu,isTDisjoint(tCanFly)),
-	defprimconcept(tCuckoo,isTDisjoint(tCanNest)),
-	assert_ind(iTweety,tBird).
-%%% Example 62
-% deduce_M(mudIsa(iTweety,tBird))
-% deduce_M(mudIsa(iTweety,tCanFly))
-% deduce_M(mudIsa(iTweety,tCanNest))
-% consistent([])
-% succeed
-% deduce_M(mudIsa(iTweety,isTDisjoint(tEmu)))
-% deduce_M(mudIsa(iTweety,tEmu))
-% deduce_M(mudIsa(iTweety,isTDisjoint(tCuckoo)))
-% deduce_M(mudIsa(iTweety,tCuckoo))
-% deduce_M(mudIsa(iTweety,isTDisjoint(tBird)))
-% fail
-example(62) :-
-	makeEnvironment('ex62','Defaults andM the lottery paradox'),
-	initEnvironment,	
-	defprimconcept(andM([tBird,nafM(isTDisjoint(tCanFly))]), tCanFly),
-	defprimconcept(andM([tBird,nafM(isTDisjoint(tCanNest))]), tCanNest),
-	defprimconcept(tEmu,isTDisjoint(tCanFly)),
-	defprimconcept(tCuckoo,isTDisjoint(tCanNest)),
-	defconcept(tBird,orM([tEmu,tCuckoo])),
-	assert_ind(iTweety,tBird).
-%%% Example 63
-% deduce_M(mudIsa(iTweety,tBird))
-% deduce_M(mudIsa(iTweety,tCanFly))
-% deduce_M(mudIsa(iTweety,tCanNest))
-% deduce_M(mudIsa(iTweety,sparrow))
-% deduce_M(mudIsa(iTweety,isTDisjoint(tEmu)))
-% deduce_M(mudIsa(iTweety,isTDisjoint(tCuckoo)))
-% consistent([])
-% succeed
-example(63) :-
-	makeEnvironment('ex63','Defaults andM the lottery paradox'),
-	initEnvironment,	
-	defprimconcept(andM([tBird,nafM(isTDisjoint(tCanFly))]), tCanFly),
-	defprimconcept(andM([tBird,nafM(isTDisjoint(tCanNest))]), tCanNest),
-	defprimconcept(tEmu,isTDisjoint(tCanFly)),
-	defprimconcept(tCuckoo,isTDisjoint(tCanNest)),
-	defconcept(tBird,orM([sparrow,tEmu,tCuckoo])),
-	assert_ind(iTweety,tBird).
-%%% Example 64
-% deduce_M(mudIsa(iPeter,tLeftHandUsable))
-% deduce_M(mudIsa(iPeter,tRightHandUsable))
-% deduce_M(mudIsa(iPeter,tOneHandUsable))
-% succeed
-% deduce_M(mudIsa(iPeter,tBothHandsUsable))
-% deduce_M(mudIsa(iPeter,isTDisjoint(tBothHandsUsable))
-% fail
-example(64) :-
-	makeEnvironment('ex64','Defaults andM the lottery paradox'),
-	initEnvironment,	
-	defprimconcept(nafM(tLeftHandBroken),tLeftHandUsable),
-	defprimconcept(nafM(tRightHandBroken),tRightHandUsable),
-	defconcept(tOneHandBroken,orM([tLeftHandBroken,tRightHandBroken])),
-	defconcept(tOneHandUsable,orM([tLeftHandUsable,tRightHandUsable])),
-	defconcept(tBothHandsUsable,andM([tLeftHandUsable,tRightHandUsable])),
-	assert_ind(iPeter,tOneHandBroken).
-%%% Example 65
-% deduce_M(mudIsa(iPeter,tLeftHandUsable))
-% can prove tLeftHandUsable by default because
-% cannot prove tLeftHandBroken because
-% can prove tOneHandBroken but
-% cannot prove isTDisjoint(tRightHandBroken) because
-% cannot prove tRightHandUsable because
-% can prove tRightHandBroken because
-% can prove tOneHandBroken andM
-% can prove isTDisjoint(tLeftHandBroken) because
-% can prove tLeftHandUsable by default because
-% cannot prove tLeftHandBroken because the loop check prevents
-%                                     the application of any axiom
-% deduce_M(mudIsa(iPeter,tRightHandUsable))
-% deduce_M(mudIsa(iPeter,isTDisjoint(tBothHandsUsable))
-% succeed
-% deduce_M(mudIsa(iPeter,tBothHandsUsable))
-% deduce_M(mudIsa(iPeter,tOneHandUsable))
-% cannot prove tOneHandUsable becauce
-% (cannot prove tLeftHandUsable because
-%  can prove tLeftHandBroken because
-%  tOneHandBroken is a fact andM
-%  (can prove isTDisjoint(tRightHandBroken) because
-%   can prove tRightHandUsable by default because
-%   cannot prove tRightHandBroken because
-%   can prove tOneHandBroken but 
-%   cannot prove isTDisjoint(tLeftHandBroken) because
-%   cannot prove tLeftHandUsable because the loop check prevents
-%                                       the application of any axiom))
-% andM it is also isTDisjoint possible possible to prove tRightHandUsable
-% for similar reasons
-% deduce_M(mudIsa(iPeter,isTDisjoint(tOneHandUsable)))
-% fail
-example(65) :-
-	makeEnvironment('ex65','Defaults andM the lottery paradox'),
-	initEnvironment,	
-	defprimconcept(nafM(tLeftHandBroken),tLeftHandUsable),
-	defprimconcept(nafM(tRightHandBroken),tRightHandUsable),
-	defconcept(tOneHandBroken,orM([tLeftHandBroken,tRightHandBroken])),
-	defconcept(tOneHandUsable,orM([tLeftHandUsable,tRightHandUsable])),
-	defconcept(tBothHandsUsable,andM([tLeftHandUsable,tRightHandUsable])),
-	defprimconcept(tLeftHandBroken,isTDisjoint(tLeftHandUsable)),
-	defprimconcept(tRightHandBroken,isTDisjoint(tRightHandUsable)),
-	assert_ind(iPeter,tOneHandBroken).
-%%% Example 66
-% deduce_M(mudIsa(iPeter,tLeftHandUsable))
-% deduce_M(mudIsa(iPeter,tRightHandUsable))
-% deduce_M(mudIsa(iPeter,tOneHandUsable))
-% deduce_M(mudIsa(iPeter,isTDisjoint(tBothHandsUsable))
-% succeed
-% deduce_M(mudIsa(iPeter,tBothHandsUsable))
-% deduce_M(mudIsa(iPeter,isTDisjoint(tOneHandUsable)))
-% fail
-example(66) :-
-	makeEnvironment('ex66','Defaults andM the lottery paradox'),
-	initEnvironment,	
-	defprimconcept(nafM(tLeftHandBroken),tLeftHandUsable),
-	defprimconcept(nafM(tRightHandBroken),tRightHandUsable),
-	defconcept(tOneHandBroken,orM([tLeftHandBroken,tRightHandBroken])),
-	defconcept(tOneHandUsable,orM([nafM(isTDisjoint(tLeftHandUsable)),nafM(isTDisjoint(tRightHandUsable))])),
-	defconcept(tBothHandsUsable,andM([tLeftHandUsable,tRightHandUsable])),
-	defprimconcept(tLeftHandBroken,isTDisjoint(tLeftHandUsable)),
-	defprimconcept(tRightHandBroken,isTDisjoint(tRightHandUsable)),
-	assert_ind(iPeter,tOneHandBroken).
-%%% Example 67
-example(67) :-
-	makeEnvironment('ex67','Defaults andM the lottery paradox'),
-        initEnvironment,        
-        defprimconcept(nafM(tLeftHandBroken),tLeftHandUsable),
-        defprimconcept(nafM(tRightHandBroken),tRightHandUsable),
-        defprimconcept(tLeftHandBroken,isTDisjoint(tLeftHandUsable)),
-        defprimconcept(tRightHandBroken,isTDisjoint(tRightHandUsable)),
-        defconcept(tOneHandUsable,orM([tLeftHandUsable,tRightHandUsable])),
-        defconcept(tOneHandBroken,orM([tLeftHandBroken,tRightHandBroken])),
-        defconcept(tBothHandsBroken,andM([tLeftHandBroken,tRightHandBroken])),
-        assert_ind(iPeter,tOneHandBroken),
-        assert_ind(iPeter,isTDisjoint(tBothHandsBroken)).
-example(68) :-
-	makeEnvironment('ex68','Defaults andM the lottery paradox'),
-        initEnvironment,        
-        defprimconcept(nafM(tBOT),tLeftHandUsable),
-        defprimconcept(nafM(tBOT),tRightHandUsable),
-        defprimconcept(tLeftHandBroken,isTDisjoint(tLeftHandUsable)),
-        defprimconcept(tRightHandBroken,isTDisjoint(tRightHandUsable)),
-        defconcept(tOneHandUsable,orM([tLeftHandUsable,tRightHandUsable])),
-        defconcept(tOneHandBroken,orM([tLeftHandBroken,tRightHandBroken])),
-        defconcept(tBothHandsBroken,andM([tLeftHandBroken,tRightHandBroken])),
-        assert_ind(iPeter,tOneHandBroken),
-        assert_ind(iPeter,isTDisjoint(tBothHandsBroken)).
-%%% Example 69
-% deduce_M(mudIsa(iTweety,tBird))
-% succeeds
-% deduce_M(mudIsa(iTweety,isTDisjoint(tBird)))
-% deduce_M(mudIsa(iTweety,tCanFly))
-% deduce_M(mudIsa(iTweety,isTDisjoint(tCanFly)))
-% deduce_M(mudIsa(iTweety,tCanNest))
-% deduce_M(mudIsa(iTweety,isTDisjoint(tCanNest)))
-% fail
-example(69) :-
-	makeEnvironment('ex69','Defaults andM the lottery paradox'),
-	initEnvironment,	
-	defprimconcept(andM([tBird,nafM(exception),nafM(isTDisjoint(tCanFly))]), tCanFly),
-	defprimconcept(andM([tBird,nafM(exception),nafM(isTDisjoint(tCanNest))]), tCanNest),
-	defprimconcept(tEmu,exception),
-	defprimconcept(tCuckoo,exception),
-	defconcept(tBird,orM([tEmu,tCuckoo])),
-	assert_ind(iTweety,tBird).
-%%% Example 70
-% deduce_M(mudIsa(a,clearTop))
-% deduce_M(mudIsa(a,isTDisjoint(clearTop)))
-% fail
-% deduce_M(mudIsa(b,clearTop))
-% deduce_M(mudIsa(b,clearTop))
-% succeed
-example(70) :-
-	makeEnvironment('ex70','Defaults andM existential quantification'),
-	initEnvironment,
-	defconcept(blocked,someM(on,tTOP)),
-	defprimconcept(andM([block,nafM(blocked)]),clearTop),
-	assert_ind(a,block),
-	assert_ind(b,block),
-	assert_ind(c,block),
-	assert_ind(a,b,on).
-example(71) :-
-	makeEnvironment('ex71','PRACMA'),
-	initEnvironment,
-	defprimconcept(sporttyp),
-	defprimconcept(envtyp),
-	sb_primconcept([b(believe,pk)],mudCarWish,[supers([car])]),
-	sb_primelemrole([bc(want,sporttyp)],has_tyre,'domain-range'(mudCarWish,broad_tyre,broad_tyre)),
-	sb_primelemrole([bc(believe,sporttyp)],mudSpeed,'domain-range'('2cv',vtLowSpeed,vtLowSpeed)),
-	sb_primelemrole([bc(want,envtyp)],has_part,'domain-range'(mudCarWish,cat_conv,cat_conv)),
-	sb_primelemrole([bc(believe,envtyp)],mudSpeed,'domain-range'('2cv',vtFastSpeed,vtFastSpeed)),
-%	modalAxioms(kd45,believe,pk),	
-%	modalAxioms(kd45,want,pk),	
-	modalAxioms(kd45,believe,concept(sporttyp)),
-	modalAxioms(kd45,want,concept(sporttyp)),
-	modalAxioms(kd45,believe,concept(envtyp)),
-	modalAxioms(kd45,want,concept(envtyp)).
-example(72) :-
-	makeEnvironment('ex72','DEMO'),
-	initEnvironment,
-	defprimconcept(sporttyp),
-	defprimconcept(umwelttyp),
-	modalAxioms([b(believe,pv)],k,want,concept(sporttyp)),
-	modalAxioms([b(believe,pv)],k,want,concept(umwelttyp)),
-	modalAxioms(kd45,believe,allM),
-	sb_primconcept([b(believe,allM)], tVolkswagon, [supers([tAutomobile])]),
-	sb_primconcept([b(believe,allM)], opel, [supers([tAutomobile])]),
-	assert_ind([b(believe,allM)],polo,tVolkswagon),
-	assert_ind([b(believe,allM)],manta,opel),
-	sb_defconcept([b(believe,pv),bc(want,sporttyp)],wunsch_auto,[supers([tAutomobile,tHasCarSpoiler])]),
-	% Anmerkung:
-        % In MOTEL ist es m"oglich, mehrere sich erg"anzende Definitionen 
-        % f"ur ein Konzept (hier z.B. tVolkswagon) zu haben. Damit ein Konzept im
-        % Verlauf des Dialogs st"andig zu verfeinern. 
-	sb_primconcept([b(believe,pv),bc(believe,sporttyp)],tVolkswagon,[supers([langsam])]),
-	defprimconcept([b(believe,pv),bc(believe,sporttyp)],andM([tAutomobile,hatKat,nafM(isTDisjoint(langsam))]),langsam),
-	sb_defconcept([b(believe,pv),bc(want,umwelttyp)],wunsch_auto,[supers([tAutomobile,hatKat])]),
-	sb_primconcept([b(believe,pv),bc(believe,umwelttyp)],tVolkswagon,[supers([isTDisjoint(langsam)])]),
-	assert_ind([b(believe,pv)],pk,sporttyp),
-        % Anmerkung:
-	% Bei der folgenden Definition reicht es nicht zu sagen, da\3
-        % polo ein Auto ist oder das alle glauben, da\3 polo ein Auto ist,
-        % da tMale durchaus Sachen im want haben kann, die der Realit"at 
-        % widersprechen. Deshalb mu\3 pk wollen, da\3 polo ein tAutomobile ist.
-	assert_ind([b(believe,pv),b(want,pk)],polo,tAutomobile).
-        % Demo:
-        %
-        % setof(C,ask_M([b(believe,pk)],mudIsa(polo,C)),L).
-        % L = [tAutomobile,langsam,tTOP,tVolkswagon,isTDisjoint(tBOT)]
-        % Zun"achst erbt hier der pk vom b(believe,allM), den Glauben, da\3
-        % polo ein tVolkswagon und damit ein tAutomobile ist. Vom b(believe,sporttyp) erbt 
-        % er, da\3 tVolkswagon's langsam sind, womit auch der polo langsam ist.
-        % 
-        % setof(C,ask_M([b(believe,pk)],mudIsa(manta,C)),L)
-        % L = [tAutomobile,opel,tTOP,isTDisjoint(tBOT)]
-        % Da es sich bei dem manta um einen opel handelt, wird zun"achst
-        % nicht angenommen, da\3 der manta langsam ist.
-        %
-        % assert_ind([b(believe,pv),b(believe,pk)],manta,hatKat)
-        % Hiermit haben wir festgelegt, da\3 der pk glaubt, da\3 der manta
-        % einen Katalysator hat. Nun erbt der pk vom sporttyp aber auch
-        % die Regel, da\3 Autos mit Katalysatoren normalerweise langsam sind.
-        % Dies f"uhrt bei der Wiederholung der letzten Anfrage zu folgendem
-        % Ergebnis:
-        %
-        % setof(C,ask_M([b(believe,pk)],mudIsa(manta,C)),L)
-        % L = [tAutomobile,hatKat,langsam,opel,tTOP,isTDisjoint(tBOT)]
-        %
-        % Wir k"onnen neben der Deduktion auf Abduktion verwenden:
-        %
-        % abduce([b(want,pk)],H,mudIsa(polo,wunsch_auto),E).
-        % E = proved(in(app(_A:m(want,pk),[]),wunsch_auto,polo),
-        %     basedOn(andM([proved(in(app(_A:m(want,pk),[]),tAutomobile,polo),
-        %     basedOn(abox)),
-        %     proved(in(app(_A:m(want,pk),[]),tHasCarSpoiler,polo),
-        %     basedOn(usingAbHyp(in(app(_A:m(want,pk),[]),tHasCarSpoiler,polo))))]))),
-        % H = [in(app(_B:m(want,pk),[]),tHasCarSpoiler,polo)]          
-        % D.h. pk will den polo als Wunschauto, wenn der polo einen Spoiler hat.
-        %
-        % Nun erhalten wir von PRACMA die Anweisungen zu einem 
-        % Stereotypwechsel:
-        %
-        % delete_ind(pk,sporttyp)
-        % assert_ind(pk,umwelttyp)
-        %
-        % Dadurch "andern sich die Anfrageergebnisse wie folgt:
-        %
-        % setof(C,ask_M([b(believe,pk)],mudIsa(polo,C)),L).
-        % L = [tAutomobile,tTOP,tVolkswagon,isTDisjoint(tBOT),isTDisjoint(langsam)]
-        %
-        % Der polo geh"ort nun zu den nicht langsamen Autos, da umwelttypen
-        % genau dies glauben.
-        % 
-        % setof(C,ask_M([b(believe,pk)],mudIsa(manta,C)),L).
-        % L = [tAutomobile,hatKat,opel,tTOP,isTDisjoint(tBOT)]
-        % 
-        % Der Manta hat zwar immernoch einen Katalysator, ist aber trotzdem
-        % nicht langsam, da umwelttypen nicht glauben, da\3 Katalysatoren ein
-        % Auto langsam machen.
-        %
-        % Wir k""onnen auch in diesem Fall fragen, unter welchen Umst"anden
-        % pk den polo f"ur sein Wunschauto halten w"urde:
-        %
-        % abduce([b(want,pk)],H,mudIsa(polo,wunsch_auto),E).
-        % E = proved(in(app(_A:m(want,pk),[]),wunsch_auto,polo),
-        %     basedOn(andM([proved(in(app(_A:m(want,pk),[]),tAutomobile,polo),
-        %     basedOn(abox)),
-        %     proved(in(app(_A:m(want,pk),[]),hatKat,polo),
-        %     basedOn(usingAbHyp(in(app(_A:m(want,pk),[]),hatKat,polo))))]))),
-        % H = [in(app(_B:m(want,pk),[]),hatKat,polo)]
-        %
-        % Wie erwartet, soll das Wunschauto von pk nun einen Katalysator haben.
-example(73) :-
-	assert_ind([b(believe,allM)],polo,tVolkswagon),
-	defprimconcept([b(believe,pv),bc(believe,sporttyp)],tVolkswagon,langsam),
-	assert_ind([b(believe,pv)],pk,sporttyp),
-	modalAxioms(kd45,believe,pv),
-	modalAxioms([b(believe,pv)],kd45,believe,concept(sporttyp)).
-example(74) :-
-	makeEnvironment('ex74','DEMO'),
-	initEnvironment,
-	defprimconcept(sporttyp),
-	defprimconcept(umwelttyp),
-	modalAxioms([b(believe,pv)],k,want,concept(sporttyp)),
-	modalAxioms([b(believe,pv)],k,want,concept(umwelttyp)),
-	modalAxioms(kd45,believe,allM),
-	sb_primconcept([b(believe,allM)], tVolkswagon, [supers([tAutomobile])]),
-	sb_primconcept([b(believe,allM)], opel, [supers([tAutomobile])]),
-	assert_ind([b(believe,allM)],polo,tVolkswagon),
-	assert_ind([b(believe,allM)],manta,opel),
-	defprimconcept([b(believe,pv),bc(want,sporttyp)],andM([tAutomobile,orM([tHasCarSpoiler,hatSchiebedach])]),wunsch_auto),
-	defprimconcept([b(believe,pv),bc(believe,sporttyp)],tVolkswagon,langsam),
-	defprimconcept([b(believe,pv),bc(believe,sporttyp)],andM([tAutomobile,hatKat,nafM(isTDisjoint(langsam))]),langsam),
-	defconcept([b(believe,pv),bc(want,umwelttyp)],wunsch_auto,andM([tAutomobile,hatKat])),
-	defprimconcept([b(believe,pv),bc(believe,umwelttyp)],tVolkswagon,isTDisjoint(langsam)),
-	assert_ind([b(believe,pv)],pk,sporttyp),
-	assert_ind([b(believe,pv),b(want,pk)],polo,tAutomobile).
-example(75) :-
-	makeEnvironment('ex75','DEMO'),
-	initEnvironment,
-	defprimconcept(racer),
-	defprimconcept(creeper),
-	modalAxioms([b(believe,ps)],k,want,concept(racer)),
-	modalAxioms([b(believe,ps)],k,want,concept(creeper)),
-	modalAxioms(kd45,believe,allM),
-	defprimconcept([b(believe,allM)], tVolkswagon, car),
-	defprimconcept([b(believe,allM)], bmw, car),
-	assert_ind([b(believe,allM)],beetle,tVolkswagon),
-	assert_ind([b(believe,allM)],'bmw735',bmw),
-	defprimconcept([b(believe,ps),bc(want,racer)],andM([car,orM([has_spoiler,has_sliding_roof])]),dream_car),
-	defprimconcept([b(believe,ps),bc(believe,racer)],tVolkswagon,slow),
-	defprimconcept([b(believe,ps),bc(believe,racer)],andM([car,has_cat_conv,nafM(isTDisjoint(slow))]),slow),
-	defconcept([b(believe,ps),bc(want,creeper)],dream_car,andM([car,has_cat_conv])),
-	defprimconcept([b(believe,ps),bc(believe,creeper)],tVolkswagon,isTDisjoint(slow)),
-	assert_ind([b(believe,ps)],pc,racer),
-	assert_ind([b(believe,ps),b(want,pc)],beetle,car).
-example(76) :-
-	makeEnvironment('ex76','SETHEO'),
-	initEnvironment,
-	defprimconcept(racer),
-	defprimconcept(creeper),
-	modalAxioms([b(believe,ps)],k,want,concept(racer)),
-	modalAxioms([b(believe,ps)],k,want,concept(creeper)),
-	modalAxioms(kd45,believe,allM),
-	defprimconcept([b(believe,allM)], tVolkswagon, car),
-	defprimconcept([b(believe,allM)], bmw, car),
-	assert_ind([b(believe,allM)],beetle,tVolkswagon),
-	assert_ind([b(believe,allM)],'bmw735',bmw),
-	defprimconcept([b(believe,ps),bc(want,racer)],andM([car,orM([has_spoiler,has_sliding_roof])]),dream_car),
-	defprimconcept([b(believe,ps),bc(believe,racer)],tVolkswagon,slow),
-	defconcept([b(believe,ps),bc(want,creeper)],dream_car,andM([car,has_cat_conv])),
-	defprimconcept([b(believe,ps),bc(believe,creeper)],tVolkswagon,isTDisjoint(slow)),
-	assert_ind([b(believe,ps)],pc,racer),
-	assert_ind([b(believe,ps),b(want,pc)],beetle,car).
-
-
-
 
 /**********************************************************************
  *
@@ -6818,7 +5672,7 @@ aux_abduce(Env,World,[change(X,Wx)|Hs],change(Y,_),[Wy|Ws]) :-
 aux2_abduce(_,_,_,[]).
 
 aux2_abduce(EnvName,MS,change(X,Wx),[Change|Changes]) :-
-	nonvar(Change),
+	not_ftVar(Change),
 	abduce(EnvName,MS,change(X,Wx),Change,[]),
 	abduce(EnvName,MS,change(X,Wx),Changes,[]).
 
@@ -6835,15 +5689,15 @@ aux2_abduce(EnvName,MS,change(X,Wx),[Change|Changes]) :-
  */
 
 default_change(increase(X),change(X,W)) :-
-	nonvar(W),
+	not_ftVar(W),
 	W > 0.0.
 
 default_change(decrease(X),change(X,W)) :-
-	nonvar(W),
+	not_ftVar(W),
 	W < 0.0.
 
 default_change(noChange(X),change(X,W)) :-
-	nonvar(W),
+	not_ftVar(W),
 	W = 0.0.
 
 default_change(increase(X),change(X,1.0)).
@@ -6905,7 +5759,7 @@ initFuncdep :-
  *
  * initializeMotel, initialise
  *
- *	Similar to initializeMotel in
+ *	Similar to initializeMotel in_M
  *	~hustadt/pop/motel/motel-0.0.6/userInterface.pl
  */
 
@@ -7063,23 +5917,23 @@ showNoChange(_).
  *
  *	This predicate is used to update the knowledge base of
  *	information about the functional dependencies. The definition
- *	of multiple influences between attributes andM multiple changes 
+ *	of multiple influences between attributes and multiple changes 
  *	on an attribute are prevented. 
  *
- *	Note that, X andM Y denote roles/attributes (of cars) andM W
- *	denotes the weight of X influencing Y orM W denotes the weight
+ *	Note that, X and Y denote tRole/attributes (of cars) and W
+ *	denotes the weight of X influencing Y or W denotes the weight
  *	of change of an attribute. 
  *
- *	posInfl is assigned the weight 1.0, negInfl the weight -1.0 andM 
+ *	posInfl is assigned the weight 1.0, negInfl the weight -1.0 and 
  *	noInfl the weight 0.0. The weights for increase, decrease andM
- *	noChange are 1.0, -1.0 andM 0.0, respectively.
+ *	noChange are 1.0, -1.0 and 0.0, respectively.
  */
 
 def(EnvName,MS,infl(X,Y,W)) :-
 	get_Env_World(EnvName,MS,Env,World),
-	atomic(X),
+	isFORTIC(X),
 	assertNames(Env,World,X,role),
-	atomic(Y),
+	isFORTIC(Y),
 	assertNames(Env,World,Y,role),
 	wellDefined_InflWeight(W),
 	isTDisjoint(given_inflLink(Env,World,app(_,_,X),Y)),
@@ -7088,7 +5942,7 @@ def(EnvName,MS,infl(X,Y,W)) :-
 
 def(EnvName,MS,change(X,W)) :-
 	get_Env_World(EnvName,MS,Env,World),
-	atomic(X),
+	isFORTIC(X),
 	assertNames(Env,World,X,role),
 	wellDefined_ChangeWeight(W),
 	isTDisjoint(given_change(Env,World,X,_)),
@@ -7116,8 +5970,8 @@ def(EnvName,MS,noChange(X)) :-
  *
  * def(:+Fact)
  *
- *	calls def(+EnvName,+MS,:+Fact) with default environment_M EnvName 
- *	andM empty modal sequence.
+ *	calls def(+EnvName,+MS,:+Fact) with default environment EnvName 
+ *	and empty modal sequence.
  */
 
 def(Fact) :-
@@ -7128,8 +5982,8 @@ def(Fact) :-
  *
  * def(+EnvName,:+Fact)
  *
- *	calls def(+EnvName,+MS,:+Fact) with default environment_M EnvName 
- *	andM empty modal sequence.
+ *	calls def(+EnvName,+MS,:+Fact) with default environment EnvName 
+ *	and empty modal sequence.
  */
 
 def(EnvName,Fact) :-
@@ -7140,12 +5994,12 @@ def(EnvName,Fact) :-
  *
  * def(+MS,:+Fact)
  *
- *	calls def(+EnvName,+MS,:+Fact) with default environment_M EnvName 
- *	andM empty modal sequence.
+ *	calls def(+EnvName,+MS,:+Fact) with default environment EnvName 
+ *	and empty modal sequence.
  */
 
 def(MS,Fact) :-
-        nonvar(MS),
+        not_ftVar(MS),
         (MS = [] ; MS = [_|_]),
         !,
         getCurrentEnvironment(EnvName),
@@ -7153,83 +6007,83 @@ def(MS,Fact) :-
 
 /***********************************************************************
  *
- * undef(+EnvName,+MS,:+-Fact)
+ * undefM(+EnvName,+MS,:+-Fact)
  *
- *	retracts allM facts matching Fact.
+ *	retracts all facts matching Fact.
  */
 
-undef(EnvName,MS,infl(X,Y,W)) :-
+undefM(EnvName,MS,infl(X,Y,W)) :-
         environment_M(EnvName,Env,_),
 	retract(given_inflLink(Env,MS,app(_,W,X),Y)),
 	fail.
-undef(EnvName,MS,change(X,W)) :-
+undefM(EnvName,MS,change(X,W)) :-
         environment_M(EnvName,Env,_),
 	retract(given_change(EnvName,MS,X,W)),
 	fail.
-undef(EnvName,MS,posInfl(X,Y)) :-
+undefM(EnvName,MS,posInfl(X,Y)) :-
         environment_M(EnvName,Env,_),
 	retract(given_inflLink(Env,MS,app(_,1.0,X),Y)),
 	fail.
-undef(EnvName,MS,negInfl(X,Y)) :-
+undefM(EnvName,MS,negInfl(X,Y)) :-
         environment_M(EnvName,Env,_),
 	retract(given_inflLink(Env,MS,app(_,-1.0,X),Y)),
 	fail.
-undef(EnvName,MS,noInfl(X,Y)) :-
+undefM(EnvName,MS,noInfl(X,Y)) :-
         environment_M(EnvName,Env,_),
 	retract(given_inflLink(Env,MS,app(_,0.0,X),Y)),
 	fail.
-undef(EnvName,MS,increase(X)) :-
+undefM(EnvName,MS,increase(X)) :-
         environment_M(EnvName,Env,_),
 	retract(given_change(Env,MS,X,1.0)),
 	fail.
-undef(EnvName,MS,decrease(X)) :-
+undefM(EnvName,MS,decrease(X)) :-
         environment_M(EnvName,Env,_),
 	retract(given_change(Env,MS,X,-1.0)),
 	fail.
-undef(EnvName,MS,noChange(X)) :-
+undefM(EnvName,MS,noChange(X)) :-
         environment_M(EnvName,Env,_),
 	retract(given_change(Env,MS,X,0.0)),
 	fail.
-undef(_,_,_).
+undefM(_,_,_).
 
 /***********************************************************************
  *
- * undef(:+-Fact)
+ * undefM(:+-Fact)
  *
- *	retracts allM facts matching Fact in default environment_M andM
+ *	retracts all facts matching Fact in default environment andM
  *	default modal context.
  */
 
-undef(Fact) :-
+undefM(Fact) :-
         getCurrentEnvironment(EnvName),
-	undef(EnvName,[],Fact).
+	undefM(EnvName,[],Fact).
 
 /***********************************************************************
  *
- * undef(+EnvName,:+-Fact)
+ * undefM(+EnvName,:+-Fact)
  *
- *	retracts allM facts matching Fact in default environment_M andM
+ *	retracts all facts matching Fact in default environment andM
  *	default modal context.
  */
 
-undef(EnvName,Fact) :-
+undefM(EnvName,Fact) :-
         environment_M(EnvName,_,_),
 	!,
-	undef(EnvName,[],Fact).
+	undefM(EnvName,[],Fact).
 
 /***********************************************************************
  *
- * undef(+MS,:+-Fact)
+ * undefM(+MS,:+-Fact)
  *
- *	retracts allM facts matching Fact in default environment_M andM
+ *	retracts all facts matching Fact in default environment andM
  *	default modal context.
  */
 
-undef(MS,Fact) :-
+undefM(MS,Fact) :-
         (MS = [] ; MS = [_|_]),
         !,
         getCurrentEnvironment(EnvName),
-	undef(EnvName,[],Fact).
+	undefM(EnvName,[],Fact).
 
 /***********************************************************************
  *
@@ -7266,18 +6120,18 @@ get_Env_World(EnvName,MS,Env,World) :-
 %
 % Syntax of first-order logic formulae
 % ====================================
-% Atom    => in(X,ConceptName)
-%            eq(PrologTerm,PrologTerm)
-%            rel(RoleName,PrologTerm,PrologTerm)
+% Atom    => in_M(X,ConceptName)
+%            eq_M(PrologTerm,PrologTerm)
+%            rel_M(RoleName,PrologTerm,PrologTerm)
 %         
 % Formula =>   Atom
 %            | andM([Formula,Formula]) 
 %            | orM([Formula,Formula])
 %            | isTDisjoint(Formula)
-%            | implies(Formula,Formula)
-%            | equivalent(Formula,Formula)
-%            | forall(PrologVar,Formula)
-%            | exists(PrologVar,Formula)
+%            | impliesM(Formula,Formula)
+%            | equivalentM(Formula,Formula)
+%            | forallM(PrologVar,Formula)
+%            | existsM(PrologVar,Formula)
 % 
 % Syntax of clauses
 % =================
@@ -7288,104 +6142,104 @@ get_Env_World(EnvName,MS,Env,World) :-
 %            | [Atom|Body]
     
 %----------------------------------------------------------------------
-% translate(+F,-C)
+% tranlate_M(+F,-C)
 % Parameter: F   First-order formula
 %            C   Clause
 
-translate(X,Clauses) :-
-	implout(X,X1),
-	negin(X1,X2),
-	skolem(X2,X3,[]),
-	univout(X3,X4),
-	conjn(X4,X5),
-	clausify(X5,Clauses,[]).
+tranlate_M(X,Clauses) :-
+	implout_M(X,X1),
+	negin_M(X1,X2),
+	skolem_M(X2,X3,[]),
+	univout_M(X3,X4),
+	conjn_M(X4,X5),
+	clausify_M(X5,Clauses,[]).
 
 
 %----------------------------------------------------------------------
-% implout(+F1,-F2)
+% implout_M(+F1,-F2)
 % Arguments: F1   First-order formula
 %            F2   First-order formula
-% removes implications andM equivalences in F1 resulting in F2
+% removes implications and equivalences in F1 resulting in F2
 %
 % Author: Ullrich Hustadt
 
-implout(equivalent(P,Q),orM([andM([P1,Q1]),andM([isTDisjoint(P1),isTDisjoint(Q1)])])) :-
+implout_M(equivalentM(P,Q),orM([andM([P1,Q1]),andM([isTDisjoint(P1),isTDisjoint(Q1)])])) :-
 	!,
-	implout(P,P1),
-	implout(Q,Q1).
-implout(implies(P,Q),orM([isTDisjoint(P1),Q1])) :-
+	implout_M(P,P1),
+	implout_M(Q,Q1).
+implout_M(impliesM(P,Q),orM([isTDisjoint(P1),Q1])) :-
 	!,
-	implout(P,P1),
-	implout(Q,Q1).
-implout(forall(X,P),forall(X,P1)) :-
+	implout_M(P,P1),
+	implout_M(Q,Q1).
+implout_M(forallM(X,P),forallM(X,P1)) :-
 	!,
-	implout(P,P1).
-implout(exists(X,P),exists(X,P1)) :-
+	implout_M(P,P1).
+implout_M(existsM(X,P),existsM(X,P1)) :-
 	!,
-	implout(P,P1).
-implout(andM(L),andM(L1)) :-
+	implout_M(P,P1).
+implout_M(andM(L),andM(L1)) :-
 	!,
-	map_M(implout,L,L1).
-implout(orM(L),orM(L1)) :-
+	map_M(implout_M,L,L1).
+implout_M(orM(L),orM(L1)) :-
 	!,
-	map_M(implout,L,L1).
-implout(isTDisjoint(P),isTDisjoint(P1)) :-
+	map_M(implout_M,L,L1).
+implout_M(isTDisjoint(P),isTDisjoint(P1)) :-
 	!,
-	implout(P,P1).
-implout(P,P).
+	implout_M(P,P1).
+implout_M(P,P).
 
 %----------------------------------------------------------------------
-% negin(+F1,-F2)
+% negin_M(+F1,-F2)
 % Parameter: F1   First-order formula
 %            F2   First-order formula
 % computes the negation normal form of F1 
 %
 % Author: Ullrich Hustadt
 
-negin(isTDisjoint(P),P1) :-
+negin_M(isTDisjoint(P),P1) :-
 	!,
-	neg(P,P1).
-negin(forall(X,P),forall(X,P1)) :-
+	neg_M(P,P1).
+negin_M(forallM(X,P),forallM(X,P1)) :-
 	!,
-	negin(P,P1).
-negin(exists(X,P),exists(X,P1)) :-
+	negin_M(P,P1).
+negin_M(existsM(X,P),existsM(X,P1)) :-
 	!,
-	negin(P,P1).
-negin(andM(L),andM(L1)) :-
+	negin_M(P,P1).
+negin_M(andM(L),andM(L1)) :-
 	!,
-	map_M(negin,L,L1).
-negin(orM(L),orM(L1)) :-
+	map_M(negin_M,L,L1).
+negin_M(orM(L),orM(L1)) :-
 	!,
-	map_M(negin,L,L1).
-negin(P,P).
+	map_M(negin_M,L,L1).
+negin_M(P,P).
 
 %----------------------------------------------------------------------
-% neg(+F1,-F2)
+% neg_M(+F1,-F2)
 % Parameter: F1   First-order formula
 %            F2   First-order formula
 % negates formula F1 to get F2
 %
 % Author: Ullrich Hustadt
 
-neg(isTDisjoint(P),P1) :-
+neg_M(isTDisjoint(P),P1) :-
 	!,
-	negin(P,P1).
-neg(forall(X,P),exists(X,P1)) :-
+	negin_M(P,P1).
+neg_M(forallM(X,P),existsM(X,P1)) :-
 	!,
-	neg(P,P1).
-neg(exists(X,P),forall(X,P1)) :-
+	neg_M(P,P1).
+neg_M(existsM(X,P),forallM(X,P1)) :-
 	!,
-	neg(P,P1).
-neg(andM(L),orM(L1)) :-
+	neg_M(P,P1).
+neg_M(andM(L),orM(L1)) :-
 	!,
-	map_M(neg,L,L1).
-neg(orM(L),andM(L1)) :-
+	map_M(neg_M,L,L1).
+neg_M(orM(L),andM(L1)) :-
 	!,
-	map_M(neg,L,L1).
-neg(P,isTDisjoint(P)).
+	map_M(neg_M,L,L1).
+neg_M(P,isTDisjoint(P)).
 
 %----------------------------------------------------------------------
-% skolem(+F1,-F2,*Vars)
+% skolem_M(+F1,-F2,*Vars)
 % Parameter: F1     First-order formula
 %            F2     First-order formula
 %            Vars   List of variables
@@ -7393,22 +6247,22 @@ neg(P,isTDisjoint(P)).
 %
 % Author: Ullrich Hustadt
 
-skolem(forall(X,P),forall(X,P1),Vars) :-
+skolem_M(forallM(X,P),forallM(X,P1),Vars) :-
 	!,
-	skolem(P,P1,[X|Vars]).
-skolem(exists(X,P),P2,Vars) :-
+	skolem_M(P,P1,[X|Vars]).
+skolem_M(existsM(X,P),P2,Vars) :-
 	!,
-	skolem(P,P1,Vars),
+	skolem_M(P,P1,Vars),
 	gensym(f,F),
 	Sk =.. [F|Vars],
 	subst4(P1,P2,X,Sk).
-skolem(andM(L),andM(L1),Vars) :-
+skolem_M(andM(L),andM(L1),Vars) :-
 	!,
-	map_M(skolem,[Vars],L,L1).
-skolem(orM(L),orM(L1),Vars) :-
+	map_M(skolem_M,[Vars],L,L1).
+skolem_M(orM(L),orM(L1),Vars) :-
 	!,
-	map_M(skolem,[Vars],L,L1).
-skolem(P,P,_).
+	map_M(skolem_M,[Vars],L,L1).
+skolem_M(P,P,_).
 
 
 %----------------------------------------------------------------------
@@ -7422,25 +6276,25 @@ skolem(P,P,_).
 % Author: Ullrich Hustadt
 
 subst4(T1,T2,X,Sk) :-
-	(atomic(T1) ; var(T1)),
+	(isFORTIC(T1) ; is_ftVar(T1)),
 	T1 == X,
 	!,
 	T2 = Sk.
 subst4(T1,T2,X,_Sk) :-
-	(atomic(T1) ; var(T1)),
-	isTDisjoint(T1 == X),
+	(isFORTIC(T1) ; is_ftVar(T1)),
+	not(T1 == X),
 	!,
 	T2 = T1.
-subst4(forall(Y,P),forall(Y,P),X,_Sk) :-
+subst4(forallM(Y,P),forallM(Y,P),X,_Sk) :-
 	X == Y,
 	!.
-subst4(forall(Y,P),forall(Y,P1),X,Sk) :-
+subst4(forallM(Y,P),forallM(Y,P1),X,Sk) :-
 	!,
 	subst4(P,P1,X,Sk).
-subst4(exists(Y,P),exists(Y,P),X,_Sk) :-
+subst4(existsM(Y,P),existsM(Y,P),X,_Sk) :-
 	X == Y,
 	!.
-subst4(exists(Y,P),exists(Y,P1),X,Sk) :-
+subst4(existsM(Y,P),existsM(Y,P1),X,Sk) :-
 	!,
 	subst4(P,P1,X,Sk).
 subst4(andM(L),andM(L1),X,Sk) :-
@@ -7459,60 +6313,60 @@ subst4(T1,T2,X,Sk) :-
 	T2 =.. [F|Args1].
 
 %----------------------------------------------------------------------
-% univout(+F1,-F1)
+% univout_M(+F1,-F1)
 % Parameter: F1   First-order formula
 %            F2   First-order formula
 % removes quantifiers
 %
 % Author: Ullrich Hustadt
 
-univout(forall(_X,P),P1) :-
+univout_M(forallM(_X,P),P1) :-
 	!,
-	univout(P,P1).
-univout(andM(L),andM(L1)) :-
+	univout_M(P,P1).
+univout_M(andM(L),andM(L1)) :-
 	!,
-	map_M(univout,L,L1).
-univout(orM(L),orM(L1)) :-
+	map_M(univout_M,L,L1).
+univout_M(orM(L),orM(L1)) :-
 	!,
-	map_M(univout,L,L1).
-univout(P,P).
+	map_M(univout_M,L,L1).
+univout_M(P,P).
 
 %----------------------------------------------------------------------
-% conjn(+F1,-F2)
+% conjn_M(+F1,-F2)
 % Parameter: F1   First-order formula
 %            F2   First-order formula
 % computes the conjunctive normal form of F1
 %
 % Author: Ullrich Hustadt
 
-conjn(andM(L),R) :-
+conjn_M(andM(L),R) :-
 	!,
-	map_M(conjn,L,L1),
+	map_M(conjn_M,L,L1),
 	conjn1(andM(L1),R).
-conjn(orM(L),R) :-
+conjn_M(orM(L),R) :-
 	!,
-	map_M(conjn,L,L1),
+	map_M(conjn_M,L,L1),
 	conjn1(orM(L1),R).
-conjn(P,P).
+conjn_M(P,P).
 
 conjn1(orM([andM([P,Q]),R]),andM([P1,Q1])) :-
 	!,
-	conjn(orM([P,R]),P1),
-	conjn(orM([Q,R]),Q1).
+	conjn_M(orM([P,R]),P1),
+	conjn_M(orM([Q,R]),Q1).
 conjn1(orM([R,andM([P,Q])]),andM([P1,Q1])) :-
 	!,
-	conjn(orM([P,R]),P1),
-	conjn(orM([Q,R]),Q1).
+	conjn_M(orM([P,R]),P1),
+	conjn_M(orM([Q,R]),Q1).
 conjn1(P,P).
 
-clausify(andM([P,Q]),C1,C2) :-
+clausify_M(andM([P,Q]),C1,C2) :-
 	!,
-	clausify(P,C1,C3),
-	clausify(Q,C3,C2).
-clausify(P,[cl(A,B)|Cs],Cs) :-
+	clausify_M(P,C1,C3),
+	clausify_M(Q,C3,C2).
+clausify_M(P,[cl(A,B)|Cs],Cs) :-
 	inclause(P,A,[],B,[]),
 	!.
-clausify(_,C,C).
+clausify_M(_,C,C).
 
 inclause(orM([P,Q]),A,A1,B,B1) :-
 	!,
@@ -7557,7 +6411,7 @@ memq(X,[_|L]) :-
 /***********************************************************************
  * 
  * hop_map(+Pred,+InList,-OutList)
- * calls Pred(X,Y) for allM X in InList andM collects allM Y to get
+ * calls Pred(X,Y) for all X in InList and collects all Y to get
  * OutList.
  *
  */
@@ -7571,7 +6425,7 @@ hop_map(Pred,[H1|T1],[H2|T2]) :-
 /***********************************************************************
  * 
  * hop_map(+Pred,+[A1,...,An],+InList,-OutList)
- * calls Pred(A1,...,An,X,Y) for allM X in InList andM collects allM Y to 
+ * calls Pred(A1,...,An,X,Y) for all X in InList and collects all Y to 
  * get OutList.
  *
  */
@@ -7591,7 +6445,7 @@ mapGoal(Goal,X,[(Y,_PTY)|L1]) :-
 /**********************************************************************
  *
  * try(+G)
- * calls G andM succeeds even if G fails.
+ * calls G and succeeds even if G fails.
  *
  */
 
@@ -7602,7 +6456,7 @@ try(_G) :- true.
 /**********************************************************************
  *
  * doboth(G1,G2)
- * calls G1 andM if G1 succeeds G2 is called.
+ * calls G1 and if G1 succeeds G2 is called.
  *
  */
 
@@ -7613,8 +6467,8 @@ doboth(G1,G2) :-
 /**********************************************************************
  *
  * tell(GoalList)
- * calls allM the goals given in argument GoalList which is either a
- * list of PROLOG goals orM a single PROLOG goal.
+ * calls all the goals given in argument GoalList which is either a
+ * list of PROLOG goals or a single PROLOG goal.
  *
  */
 
@@ -7679,7 +6533,7 @@ bagofOrNil(A,B,[]) :-
  *
  *	Given a role Y this predicate returns its description in terms
  *	of the least attribute on which Y depends as a possible chain 
- *	of influence relationships. DescriptY is an attribute orM it 
+ *	of influence relationships. DescriptY is an attribute or it 
  *	is of the form app(sk_,W,Z) where W denotes a weight.
  *
  *	This predicate is now superfluous. Its replacement is the one
@@ -7691,12 +6545,12 @@ getInflDescription(Env,World,app(F,W,DescriptZ),Y) :-
 	getInflDescription(Env,World,DescriptZ,Z).
 
 getInflDescription(Env,World,X,X) :-
-	atom(X),
+	isFORT(X),
 	!,
 	isTDisjoint(given_inflLink(Env,World,_,X)).
 
 getInflDescription(Env,World,X,X) :-
-	var(X),
+	is_ftVar(X),
 	!.
 
 /***********************************************************************
@@ -7705,7 +6559,7 @@ getInflDescription(Env,World,X,X) :-
  *
  *	Given a role Y this predicate returns its description in terms
  *	of the attribute X on which Y depends as a chain of influence 
- *	relationships. DescriptY is an attribute orM it is of the form 
+ *	relationships. DescriptY is an attribute or it is of the form 
  *	app(sk_,W,Z) where W denotes a weight.
  */
 
@@ -7720,30 +6574,30 @@ getInflDescription(Env,World,X,X,X) :-
  *
  * test_inflLink(+-X,+-Y,+-W)
  *
- *	X is either an attribute/role orM it is of the form
+ *	X is either an attribute/role or it is of the form
  *	app(sk_,_,_).
  *
- *	Y is of the form app(+-F,1.0,+Z) orM app(+-F,-1.0,+Z).
+ *	Y is of the form app(+-F,1.0,+Z) or app(+-F,-1.0,+Z).
  *
- *	This predicate tests for influence of weight W between X andM Y.
+ *	This predicate tests for influence of weight W between X and Y.
  */
 
 test_inflLink(X,Y,W) :-
-	nonvar(X),
+	not_ftVar(X),
 	Y = app(F,W,X),
 	!,
-	nonvar(F).
+	not_ftVar(F).
 
 test_inflLink(X,Y,W) :-
-	var(X),
-	nonvar(Y),
+	is_ftVar(X),
+	not_ftVar(Y),
 	Y = app(F,W,X),
-	atom(X),
+	isFORT(X),
 	!.
 
 test_inflLink(X,Y,W) :-
-	var(X),
-	var(Y),
+	is_ftVar(X),
+	is_ftVar(Y),
 	!,
 	fail.
 
@@ -7757,38 +6611,38 @@ test_inflLink(X,app(F,W1,Y),W) :-
  *
  *	tests if attribute X influences attribute Y with weight W.
  *
- *	Note: the output for uninstantiated X andM/orM Y depends on the
+ *	Note: the output for uninstantiated X andM/or Y depends on the
  *	order of the literals in the body of infl.
  */
 
 inflLink(Env,World,X,Y,W) :-
 	wellDefined_attribute(Env,World,X),
 	wellDefined_attribute(Env,World,Y),
-	(var(W);
+	(is_ftVar(W);
 	wellDefined_InflWeight(W)),
 	getInflDescription(Env,World,Z2,X,Y),
 	test_inflLink(X,Z2,W).
 
 inflLink(Env,World,X,Y,W) :-
-	var(X),
+	is_ftVar(X),
 	wellDefined_attribute(Env,World,Y),
-	(var(W);
+	(is_ftVar(W);
 	wellDefined_InflWeight(W)),
 	getInflDescription(Env,World,Z2,X,Y),
 	test_inflLink(X,Z2,W).
 
 inflLink(Env,World,X,Y,W) :-
 	wellDefined_attribute(Env,World,X),
-	var(Y),
-	(var(W);
+	is_ftVar(Y),
+	(is_ftVar(W);
 	wellDefined_InflWeight(W)),
 	getInflDescription(Env,World,Z2,X,Y),
 	test_inflLink(X,Z2,W).
 
 inflLink(Env,World,X,Y,W) :-
-	var(X),
-	var(Y),
-	(var(W);
+	is_ftVar(X),
+	is_ftVar(Y),
+	(is_ftVar(W);
 	wellDefined_InflWeight(W)),
 	getInflDescription(Env,World,Z2,X,Y),
 	test_inflLink(X,Z2,W).
@@ -7841,8 +6695,8 @@ greatestInfls(Env,World,X,Ys) :-
  *
  * infl(+Env,+World,+-X,+-Y,+-W)
  *
- *	computes the cumulative weight W of allM the influence links 
- *	between the attributes X andM Y.
+ *	computes the cumulative weight W of all the influence links 
+ *	between the attributes X and Y.
  */
 
 infl(Env,World,X,Y,W) :-
@@ -7858,20 +6712,20 @@ infl(Env,World,X,Y,W) :-
  */
 
 maxPosInfl(Env,World,X,Y,WMax) :-
-	var(X),
+	is_ftVar(X),
 	bagof(W,Z^posInfl(Env,World,Z,Y,W),Ws),
 	motel_max(Ws,WMax,wellDefined_InflWeight),
 	posInfl(Env,World,X,Y,WMax).
 
 maxPosInfl(Env,World,X,Y,WMax) :-
-	var(Y),
+	is_ftVar(Y),
 	bagof(W,Z^posInfl(Env,World,X,Z,W),Ws),
 	motel_max(Ws,WMax,wellDefined_InflWeight),
 	posInfl(Env,World,X,Y,WMax).
 
 maxPosInfl(Env,World,X,Y,WMax) :-
-	nonvar(X),
-	nonvar(Y),
+	not_ftVar(X),
+	not_ftVar(Y),
 	posInfl(Env,World,X,Y,WMax).
 
 /***********************************************************************
@@ -7883,20 +6737,20 @@ maxPosInfl(Env,World,X,Y,WMax) :-
  */
 
 maxNegInfl(Env,World,X,Y,WMin) :-
-	var(X),
+	is_ftVar(X),
 	bagof(W,Z^negInfl(Env,World,Z,Y,W),Ws),
 	motel_min(Ws,WMin,wellDefined_InflWeight),
 	negInfl(Env,World,X,Y,WMin).
 
 maxNegInfl(Env,World,X,Y,WMin) :-
-	var(Y),
+	is_ftVar(Y),
 	bagof(W,Z^negInfl(Env,World,X,Z,W),Ws),
 	motel_min(Ws,WMin,wellDefined_InflWeight),
 	negInfl(Env,World,X,Y,WMin).
 
 maxNegInfl(Env,World,X,Y,WMin) :-
-	nonvar(X),
-	nonvar(Y),
+	not_ftVar(X),
+	not_ftVar(Y),
 	negInfl(Env,World,X,Y,WMin).
 
 /***********************************************************************
@@ -7961,18 +6815,18 @@ noInfl(Env,World,X,Y) :-
  * simultInfl(+Env,+World,+-Xs,+-Y,+-W)
  *
  *	checks if the list Xs is well-defined (that is, is Xs a SET of
- *	independent attributes) andM computes the total weight W of the 
+ *	independent attributes) and computes the total weight W of the 
  *	attributes in the list Xs simultaneously influencing attribute Y.
  */
 
 simultInfl(Env,World,Xs,Y,W) :-
-	nonvar(Xs),
+	not_ftVar(Xs),
 	wellDefined_setOfAttributes(Env,World,Xs),
 	aux_simultInfl(Env,World,Xs,Y,Ws),
 	weightOf_SimultInfl(Ws,W).
 
 simultInfl(Env,World,Xs,Y,W) :-
-	var(Xs),
+	is_ftVar(Xs),
 	!,
 	leastInfl(Env,World,Xs,Y),
 	aux_simultInfl(Env,World,Xs,Y,Ws),
@@ -8092,12 +6946,12 @@ noChange(Env,World,Y) :-
  *
  *	Is X an attribute?
  *
- *	Note: At the moment this clause succeeds if X is an atom. We
+ *	Note: At the moment this clause succeeds if X is an isFORT. We
  *	may want to do more verifying here.
  */
 
 wellDefined_attribute(Env,World,X) :-
-	atom(X),
+	isFORT(X),
 	roleName(Env,_MS,World,X),
 	!.
 
@@ -8105,7 +6959,7 @@ wellDefined_attribute(Env,World,X) :-
  *
  * wellDefined_setOfAttributes(+Env,+World,+Xs)
  *
- *	Succeeds if Xs is a variable orM if Xs is a SET of independent
+ *	Succeeds if Xs is a variable or if Xs is a SET of independent
  *	(with respect to the influence relationship) atoms.
  *
  *	Note: In the current implementation the independence is NOT 
@@ -8283,17 +7137,17 @@ weightOf_SimultChange(Ws,W) :-
  *
  * arithm_Mean([+-Value|+Values],+-Mean,+IsWellDefName)
  *
- *	Given a list of values (Values) andM a predicate name for
+ *	Given a list of values (Values) and a predicate name for
  *	checking whether each of the values is well-defined this clause
  *	computes the arithmetical mean (Mean) over Values.
- *	Provided Mean is given the first value may be a variable.
+ *	Provided Mean is given the first value_M may be a variable.
  */
 
 arithm_Mean([],0.0,IsWellDefName) :-
 	!.
 
 arithm_Mean([Value|Values],Mean,IsWellDefName) :-
-	var(Value),
+	is_ftVar(Value),
 	!,
 	length([Value|Values],N),
 	Sum is Mean * N,
@@ -8308,14 +7162,14 @@ arithm_Mean(Values,Mean,IsWellDefName) :-
  *
  * sum([+-Value|+Values],+-Sum,+IsWellDefName)
  *
- *	Given a list of values (Values) andM a predicate name 
+ *	Given a list of values (Values) and a predicate name 
  *	(IsWellDefName) for checking whether each of the values is 
  *	well-defined this clause computes the sum (Sum) of the values.
- *	Provided Sum is given the first value may be a variable.
+ *	Provided Sum is given the first value_M may be a variable.
  */
 
 sum([Value|Values],Sum,IsWellDefName) :-
-	var(Value),
+	is_ftVar(Value),
 	!,
 	IsWellDef =.. [IsWellDefName,Sum],
 	IsWellDef,
@@ -8336,7 +7190,7 @@ sum([],0.0,_).
  * product(+-Factor1,+Factor2,+Product,+IsWellDefName)
  * product(+Factor1,+-Factor2,+Product,+IsWellDefName)
  *
- *	Given two values (Factor1 andM Factor2) andM a predicate name 
+ *	Given two values (Factor1 and Factor2) and a predicate name 
  *	(IsWellDefName) for checking whether each of the values is 
  *	well-defined this clause computes the product (Product) of the 
 *	values.
@@ -8370,14 +7224,14 @@ product(Factor1,Factor2,Product,IsWellDefName) :-
  *
  * max([+-Value|+Values],+-Max,+IsWellDefName)
  *
- *	Given a list of values (Values) andM a predicate name 
+ *	Given a list of values (Values) and a predicate name 
  *	(IsWellDefName) for checking whether each of the values is 
  *	well-defined this clause determines the maximum (Max) of the 
  *	values.
  *
  * max(+Value1,+Value2,+-Max)
  *
- *	returns the bigger value of Value1 andM Value2 in Max.
+ *	returns the bigger value_M of Value1 and Value2 in Max.
  */
 
 motel_max([Max],Max,_) :-
@@ -8399,14 +7253,14 @@ lub(Value1,Value2,Value2).
  *
  * min([+-Value|+Values],+-Min,+IsWellDefName)
  *
- *	Given a list of values (Values) andM a predicate name 
+ *	Given a list of values (Values) and a predicate name 
  *	(IsWellDefName) for checking whether each of the values is 
  *	well-defined this clause determines the minimum (Min) of the 
  *	values.
  *
  * min(+Value1,+Value2,+-Min)
  *
- *	returns the smaller value of Value1 andM Value2 in Min.
+ *	returns the smaller value_M of Value1 and Value2 in Min.
  */
 
 motel_min([Min],Min,_) :-
@@ -8456,7 +7310,7 @@ defprimconcept(EnvName,Left) :-
 	!,
 	defprimconcept(EnvName,[],Left).
 defprimconcept(MS,Left) :-
-	nonvar(MS),
+	not_ftVar(MS),
 	(MS = [] ; MS = [_|_]),
 	!,
 	getCurrentEnvironment(EnvName),
@@ -8478,14 +7332,14 @@ defprimconcept(Left,Right) :-
 defprimconcept(EnvName,MS,Left) :-
 	environment_M(EnvName,Env,_),
 	(MS = [] ; MS = [_|_]),
-	atomic(Left),
+	isFORTIC(Left),
 	assertz_if_new(conceptSubsets(Env,user,MS,Left,'tTOP',noAxiom)),
 	assertz_if_new(axiom(Env,MS,defprimconcept(MS,Left,'tTOP'))),
 	assertNames(Env,MS,Left,concept),
 	!.
 
 defprimconcept(MS,Left,Right) :-
-	nonvar(MS),
+	not_ftVar(MS),
 	(MS = [] ; MS = [_|_]),
 	!,
 	getCurrentEnvironment(EnvName),
@@ -8496,7 +7350,7 @@ defprimconcept(MS,Left,Right) :-
  * defprimconcept(+Environment,+Left,+Right)
  * Parameter: ConceptName       concept name
  *            ConceptTerm       concept term
- * defines the concept ConceptName to be a subset_m of the concept
+ * defines the concept ConceptName to be a subset of the concept
  * ConceptTerm in modal context [].
  *
  */
@@ -8511,14 +7365,14 @@ defprimconcept(EnvName,Left,Right) :-
  * Parameter: ModalSequence     modal context
  *            ConceptName       concept name
  *            ConceptTerm       concept term
- * defines the concept ConceptName to be a subset_m of the concept
+ * defines the concept ConceptName to be a subset of the concept
  * ConceptTerm in modal context ModalSequence.
  *
  */
 
 defprimconcept(EnvName,MS,L,R) :-
 	environment_M(EnvName,Env,_),
-%	nonvar(MS),
+%	not_ftVar(MS),
 	cnf_m(L,Left),
 	cnf_m(R,Right),
 	assertNames(Env,MS,Left,concept),
@@ -8548,7 +7402,7 @@ notClauseL(Env,MS,Left,Right) :-
 /* 
 notClauseL(Env,MS,Left,Right) :-
 	% assertz_if_new that Left is included in Right
-	atomic(Left),
+	isFORTIC(Left),
 	!,
 	unfold(Env,[(user,concept,Left,Right)],[(_O,_,Concept1,C3,Concept2)|DL2]),
 	defPositiveList(Env,MS,DL2),
@@ -8557,7 +7411,7 @@ notClauseL(Env,MS,Left,Right) :-
 	assertConceptLInR(Env,rn(AxiomName2,O,lInR),MS,Concept1,Concept2),
 	assertz_if_new(conceptSubsets(Env,user,MS,Concept1,C3,AxiomName2)).
 notClauseL(Env,MS,Left,Right) :-
-	atomic(Right),
+	isFORTIC(Right),
 	!,
 	gensym(concept,Concept1),
 	unfold(Env,[(system,concept,Concept1,Left)],DL2),
@@ -8585,7 +7439,7 @@ notClausesLR(Env,MS,Left,Right,DL2) :-
  * defconcept(+ConceptName,+ConceptTerm)
  * Parameter: ConceptName       concept name
  *            ConceptTerm       concept term
- * defines the concept ConceptName to be equivalent to the concept
+ * defines the concept ConceptName to be equivalentM to the concept
  * ConceptTerm in modal context [].
  *
  */ 
@@ -8595,7 +7449,7 @@ defconcept(ConceptName,ConceptTerm) :-
 	defconcept(EnvName,[],ConceptName,ConceptTerm).
 
 defconcept(MS,CN,CT) :-
-	nonvar(MS),
+	not_ftVar(MS),
 	(MS = [] ; MS = [_|_]),
 	!,
 	getCurrentEnvironment(EnvName),
@@ -8613,7 +7467,7 @@ defconcept(EnvName,ConceptName,ConceptTerm) :-
  * Parameter: ModalSequence     modal context
  *            ConceptName       concept name
  *            ConceptTerm       concept term
- * defines the concept ConceptName to be equivalent to the concept
+ * defines the concept ConceptName to be equivalentM to the concept
  * ConceptTerm in modal context ModalSequence.
  *
  */ 
@@ -8693,18 +7547,19 @@ assert_ind(MS,X,CT) :-
 	(MS = [] ; MS = [_|_]),
 	!,
 	getCurrentEnvironment(EnvName),
-	assert_ind(EnvName,MS,X,CT).
+	loop_check(assert_ind(EnvName,MS,X,CT)).
 
 assert_ind(X,Y,R) :-
 	getCurrentEnvironment(EnvName),
 	assert_ind(EnvName,X,Y,R).
 
-assert_ind(EnvName,MS,X,C) :-
+assert_ind(EnvName,MS,X,C) :- loop_check(assert_ind0(EnvName,MS,X,C)).
+assert_ind0(EnvName,MS,X,C) :-
 	environment_M(EnvName,Env,_),
-	nonvar(MS),
+	not_ftVar(MS),
 	(MS = [] ; MS = [_|_]),
 	!,
-	atomic(X),
+	isFORTIC(X),
 	gensym(axiom,AxiomName),
 	gensym(rule,RuleName),
 	ruleName(AxiomName,RuleName,user,lInR,RN1),
@@ -8730,8 +7585,8 @@ assert_ind(EnvName,MS,X,C) :-
 assert_ind(EnvName,X,Y,R) :-
 	environment_M(EnvName,_,_),
 	!,
-	atomic(X),
-	atomic(Y),
+	isFORTIC(X),
+	isFORTIC(Y),
 	!,
 	assert_ind(EnvName,[],X,Y,R).
 assert_ind(MS,X,Y,R) :-
@@ -8739,20 +7594,20 @@ assert_ind(MS,X,Y,R) :-
 	!,
 	getCurrentEnvironment(EnvName),
 	!,
-	atomic(X),
-	atomic(Y),
+	isFORTIC(X),
+	isFORTIC(Y),
 	!,
-	assert_ind(EnvName,MS,X,Y,R).
+	loop_check(assert_ind(EnvName,MS,X,Y,R)).
 
 assert_ind(EnvName,MS,X,Y,R) :-
 	environment_M(EnvName,Env,_),
-	atomic(X),
-	atomic(Y),
-	atomic(R),
+	isFORTIC(X),
+	isFORTIC(Y),
+	isFORTIC(R),
 	Role1 =.. [R,X,Y],
 	asserta_new(Role1),
 %	Role2 =.. [R,X,Y],
-	gensymbol(skolem,[X,Y],SF),
+	gensymbol(skolem_M,[X,Y],SF),
 	gensym(axiom,AX),
 	gensym(rule,RN),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
@@ -8794,7 +7649,7 @@ defprimrole(EnvName,Role) :-
  */
 
 defprimrole(MS,Role) :-
-	nonvar(MS),
+	not_ftVar(MS),
 	(MS = [] ; MS = [_|_]),
 	!,
 	currentEnvironment(Env),
@@ -8811,21 +7666,21 @@ defprimrole(R1,R2) :-
  * defprimrole(+RN,+Role)
  * Parameter: RN        role name
  *            Role      role term
- * defines the role RN to be a subset_m of the role Role in modal
+ * defines the role RN to be a subset of the role Role in modal
  * context [].
  * 
  */
 
 defprimrole(EnvName,RN,Role) :-
 	environment_M(EnvName,_,_),
-	atomic(RN),
+	isFORTIC(RN),
 	!,
 	defprimrole(EnvName,[],RN,Role).
 defprimrole(MS,RN,Role) :-
-	nonvar(MS),
+	not_ftVar(MS),
 	(MS = [] ; MS = [_|_]),
 	getCurrentEnvironment(EnvName),
-	atomic(RN),
+	isFORTIC(RN),
 	!,
 	defprimrole(EnvName,MS,RN,Role).
 
@@ -8835,14 +7690,14 @@ defprimrole(MS,RN,Role) :-
  * Parameter: MS        modal context
  *            RN        role name
  *            Role      role term
- * defines the role RN to be a subset_m of the role Role in modal
+ * defines the role RN to be a subset of the role Role in modal
  * context MS.
  *
  */
 
 defprimrole(EnvName,MS,RN,Role) :-
 	environment_M(EnvName,Env,_),
-	atomic(RN),
+	isFORTIC(RN),
 	assertNames(Env,MS,RN,role),
 	assertNames(Env,MS,Role,role),
 	unfold(Env,[(user,role,RN,Role)],[(user,role,RN,_,RT)|RDL]),
@@ -8857,7 +7712,7 @@ defprimrole(EnvName,MS,RN,Role) :-
  * defrole(+RN,+Role)
  * Parameter: RN        role name
  *            Role      role term
- * defines role RN to be equivalent to the role Role in modal context
+ * defines role RN to be equivalentM to the role Role in modal context
  * [].
  *
  */
@@ -8867,7 +7722,7 @@ defrole(RN,Role) :-
 	defrole(EnvName,[],RN,Role).
 
 defrole(MS,RN,Role) :-
-	nonvar(MS),
+	not_ftVar(MS),
 	(MS = [] ; MS = [_|_]),
 	getCurrentEnvironment(EnvName),
 	defrole(EnvName,[],RN,Role).
@@ -8882,14 +7737,14 @@ defrole(EnvName,RN,Role) :-
  * Parameter: MS        modal context
  *            RN        role name
  *            Role      role term
- * defines the role RN to be equivalent to the role Role in modal
+ * defines the role RN to be equivalentM to the role Role in modal
  * context MS.
  *
  */
 
 defrole(EnvName,MS,RN,Role) :-
 	environment_M(EnvName,Env,_),
-	atomic(RN),
+	isFORTIC(RN),
 	unfold(Env,[(user,role,RN,Role)],RDL),
 	assertNames(Env,MS,RN,role),
 	assertNames(Env,MS,Role,role),
@@ -8899,7 +7754,7 @@ defrole(EnvName,MS,RN,Role) :-
 /**********************************************************************
  *
  * defdisjoint(EnvName,MS,ConceptList)
- * Parameter: EnvName         environment_M name
+ * Parameter: EnvName         environment name
  *            MS              modal context
  *            ConceptList     list of concept names
  *
@@ -8915,7 +7770,7 @@ defdisjoint(EnvName,CL) :-
 	defdisjoint(EnvName,[],CL),
 	!.
 defdisjoint(MS,CL) :-
-	nonvar(MS),
+	not_ftVar(MS),
 	(MS = [] ; MS = [_|_]),
 	getCurrentEnvironment(EnvName),
 	defdisjoint(EnvName,MS,CL),
@@ -8951,7 +7806,7 @@ defclosed(EnvName,X,Y,R) :-
 	defclosed(EnvName,[],X,Y,R),
 	!.
 defclosed(MS,X,Y,R) :-
-	nonvar(MS),
+	not_ftVar(MS),
 	(MS = [] ; MS = [_|_]),
 	getCurrentEnvironment(EnvName),
 	defclosed(EnvName,MS,X,Y,R),
@@ -8959,20 +7814,20 @@ defclosed(MS,X,Y,R) :-
 
 defclosed(EnvName,MS,X,Y,R) :-
 	environment_M(EnvName,Env,_),
-	assertz_if_new(closed(Env,MS,X,Y,R)),
+	assertz_if_new(closed_M(Env,MS,X,Y,R)),
 	!.
 
 /***********************************************************************
  *
  * assertNames(+Type,+MS,+CT)
- * Arguments: Type   'concept' orM 'role'
+ * Arguments: Type   'concept' or 'role'
  *            MS     modal context
- *            T      concept orM role term
+ *            T      concept or role term
  * asserts for each concept name CN in T a fact
  *            conceptName(CN)
- * andM for each role name RN in T a fact
+ * and for each role name RN in T a fact
  *            roleName(RN)
- * These facts are used to distinguish concept andM role names introduced 
+ * These facts are used to distinguish concept and role names introduced 
  * by the user from those introduced by the system.
  *
  */
@@ -8996,7 +7851,7 @@ assertName((concept,CN1),newAsserted,Env,MS,W1,G1) :-
 % Otherwise we assertz_if_new the concept name
 % Remember: The fact that the concept name is isTDisjoint already asserted with
 % identical modal sequence does isTDisjoint mean that we are isTDisjoint already able to 
-% deduce_M that the concept name is present in the modal context corresponding
+% deduce that the concept name is present in the modal context corresponding
 % to the modal sequence.
 	assertz_if_new((conceptName(Env,MS,W1,CN1) :- G1)),
 	!.
@@ -9004,7 +7859,7 @@ assertName((role,CN1),newAsserted,Env,MS,W1,G1) :-
 % Otherwise we assertz_if_new the role name
 % Remember: The fact that the role name is isTDisjoint already asserted with
 % identical modal sequence does isTDisjoint mean that we are isTDisjoint already able to 
-% deduce_M that the role name is present in the modal context corresponding
+% deduce that the role name is present in the modal context corresponding
 % to the modal sequence.
 	assertz_if_new((roleName(Env,MS,W1,CN1) :- G1)),
 	!.
@@ -9012,10 +7867,10 @@ assertName((role,CN1),newAsserted,Env,MS,W1,G1) :-
 /***********************************************************************
  *
  * namesInTerm(+T1,-TL+Type) 
- * Arguments: T1     concept orM role term
+ * Arguments: T1     concept or role term
  *            TL     list of pairs (Type1,Name)
- *            Type   'concept' orM 'role'
- * TL is the list of allM concept andM role names in T1.
+ *            Type   'concept' or 'role'
+ * TL is the list of all concept and role names in T1.
  *
  */
 
@@ -9064,7 +7919,7 @@ namesInTerm(dc(_O,D,C),L,Type) :-
 namesInTerm(setM(_L),[],_Type) :-
 	!.
 namesInTerm(L,[(Type,L)],Type) :-
-	atomic(L),
+	isFORTIC(L),
 	!.
 
 
@@ -9095,22 +7950,22 @@ namesInTerm(L,[(Type,L)],Type) :-
 axiomToClause(MC,VL,T1,Op,T2,C) :-
 	axiomToFOL(MC,VL,T1,Op,T2,F),
 	forallQuantify(VL,F,F1),
-	translate(F1,C1),
+	tranlate_M(F1,C1),
 	clausesToLOP(C1,C).
 
 forallQuantify([],F,F) :-
 	!.
-forallQuantify([X|VL],F1,forall(X,F2)) :-
+forallQuantify([X|VL],F1,forallM(X,F2)) :-
 	forallQuantify(VL,F1,F2).
 
 %----------------------------------------------------------------------
 % axiomToFOL(+MODALCONTEXT,+VARLIST,+TERM1,+OPERATOR,+TERM2,-FORMULA)
-% If OPERATOR is 'equivalent', then FORMULA is the translation of the 
-% equivalence of TERM1 andM TERM2 in MODALCONTEXT.
-% If OPERATOR is 'implies', then FORMULA is the translation of the
+% If OPERATOR is 'equivalentM', then FORMULA is the translation of the 
+% equivalence of TERM1 and TERM2 in MODALCONTEXT.
+% If OPERATOR is 'impliesM', then FORMULA is the translation of the
 % implication of TERM2 by TERM1 in MODALCONTEXT.
 
-axiomToFOL(MC,VL,_,in,C,F) :-
+axiomToFOL(MC,VL,_,in_M,C,F) :-
 	!,
 	malcToFOL(functional,U,VL,C,F1),
 	modalContextToFOL(MC,[],U,F1,F).
@@ -9123,21 +7978,21 @@ axiomToFOL(MC,VL,C1,Op,C2,F) :-
 modalContextToFOL([],V,V,F,F) :-
 	!.
 modalContextToFOL([b(O,A)|MC],U1,V,F3,
-	          forall(U2,implies(rel(X1,X2,U1,U2),F4))) :-
-	convertMS(e1,[U1,true],[b(O,A)],[],[U2,(rel(e1,X1,X2,U1,U2), true)],_),
+	          forallM(U2,impliesM(rel_M(X1,X2,U1,U2),F4))) :-
+	convertMS(e1,[U1,true],[b(O,A)],[],[U2,(rel_M(e1,X1,X2,U1,U2), true)],_),
 	modalContextToFOL(MC,U2,V,F3,F4).
 modalContextToFOL([d(O,A)|MC],U1,V,F3,F4) :-
 	convertMS(e1,[U1,true],[d(O,A)],[],
                   [app(W1 : m(O,A), U1),true],_),
 	modalContextToFOL(MC,app(typed(W1,m(O,A)),U1),V,F3,F4).
 modalContextToFOL([bc(O,C)|MC],U1,V,F3,
-	          forall(A,forall(U2,implies(andM([F1,rel(X1,m(O,A),U1,U2)]),F4)))) :-
+	          forallM(A,forallM(U2,impliesM(andM([F1,rel_M(X1,m(O,A),U1,U2)]),F4)))) :-
 	convertMS(e1,[U1,true],[bc(O,C)],[],
-	          [U2,((once(_G),rel(e1,X1,m(O,A),U1,U2)),true)],_),
+	          [U2,((once(_G),rel_M(e1,X1,m(O,A),U1,U2)),true)],_),
 	malcToFOL(functional,U1,[A],C,F1),
 	modalContextToFOL(MC,U2,V,F3,F4).
 modalContextToFOL([dc(O,C)|MC],U1,V,F3,
-	          forall(V,andM([F1,F4]))) :-
+	          forallM(V,andM([F1,F4]))) :-
 	convertMS(e1,[U1,true],[dc(O,C)],[],
 	          [app(W1 : m(O,A), U1),_G],_),
 	malcToFOL(functional,U1,[A],C,F1),
@@ -9171,37 +8026,37 @@ malcToFOL(Trans,U,[X],nafM(C),F) :-
 	malcToFOL(Trans,U,[X],C,F),
 	!.
 malcToFOL(Trans,U,[X],allM(R,C),
-	   forall(Y,implies(F1,F2))) :-
+	   forallM(Y,impliesM(F1,F2))) :-
 	malcToFOL(Trans,U,[X,Y],R,F1),
 	malcToFOL(Trans,U,[Y],C,F2).
 malcToFOL(relational,U,[X],someM(R,C),
-	   exists(Y,andM([F1,F2]))) :-
+	   existsM(Y,andM([F1,F2]))) :-
 	malcToFOL(relational,U,[X,Y],R,F1),
 	malcToFOL(relational,U,[Y],C,F2).
 malcToFOL(functional,U,[X],someM(R,C),
-	   exists(F,F2)) :-
+	   existsM(F,F2)) :-
 	malcToFOL(functional,U,[app(fun(F,R),X)],C,F2).
 malcToFOL(Trans,U,[X],atleast(N,R),F) :-
 	nrToFOL(U,[X],atleast(N,R),F).
 malcToFOL(Trans,U,[X],atmost(N,R),F) :-
 	nrToFOL(U,[X],atmost(N,R),F).
 malcToFOL(Trans,U,[X],b(O,A,C2),
-           forall(V,implies(rel(O,A,U,V),F))) :-
+           forallM(V,impliesM(rel_M(O,A,U,V),F))) :-
 	malcToFOL(Trans,V,[X],C2,F).    
 malcToFOL(Trans,U,[X],d(O,A,C2),
-	   exists(V,andM([rel(O,A,U,V),F]))) :-
+	   existsM(V,andM([rel_M(O,A,U,V),F]))) :-
 	malcToFOL(Trans,V,[X],C2,F).
 malcToFOL(Trans,U,[X],bc(O,C1,C2),
-	   forall(A,forall(V,implies(andM([F1,rel(O,A,U,V)]),F2)))) :-
+	   forallM(A,forallM(V,impliesM(andM([F1,rel_M(O,A,U,V)]),F2)))) :-
         malcToFOL(Trans,U,[A],C1,F1),
 	malcToFOL(Trans,V,[X],C2,F2).
 malcToFOL(Trans,U,[X],dc(O,C1,C2),
-	   forall(A,exists(V,andM([andM([F1,rel(O,A,U,V)]),F2])))) :-
+	   forallM(A,existsM(V,andM([andM([F1,rel_M(O,A,U,V)]),F2])))) :-
 	malcToFOL(Trans,U,[A],C1,F1),
 	malcToFOL(Trans,V,[X],C2,F2).
 malcToFOL(Trans,U,[X],A,F) :-
-	atomic(A),
-	F =.. [in,U,A,X].
+	isFORTIC(A),
+	F =.. [in_M,U,A,X].
 malcToFOL(Trans,U,[X,Y],isMudInverseFn(R),F) :-
 	malcToFOL(Trans,U,[Y,X],R,F).
 malcToFOL(Trans,U,[X,Y],andM([R1]),F) :-
@@ -9220,16 +8075,16 @@ malcToFOL(Trans,U,[X,Y],restr(R,C),
 	malcToFOL(Trans,U,[X,Y],R,F1),
 	malcToFOL(Trans,U,[Y],C,F2).
 malcToFOL(relational,U,[X,Y],P,F) :-
-	atomic(P),
-	F =.. [in,U,P,pair(X,Y)].
+	isFORTIC(P),
+	F =.. [in_M,U,P,pair(X,Y)].
 malcToFOL(functional,U,[X,Y],P,equal(Y,app(fun(F,P),X))) :-
-	atomic(P),
-	atomic(X),
+	isFORTIC(P),
+	isFORTIC(X),
 	gensym(f,F),
 	!.
 malcToFOL(functional,U,[X,Y],P,equal(Y,app(fun(F,P),X))) :-
-	atomic(P),
-	var(X),
+	isFORTIC(P),
+	is_ftVar(X),
 	!.
 	
 	
@@ -9240,7 +8095,7 @@ malcToFOL(functional,U,[X,Y],P,equal(Y,app(fun(F,P),X))) :-
 %
 % Author: Ullrich Hustadt
 
-nrToFOL(U,[X],atmost(0,R),forall(Y,isTDisjoint(F1))) :-
+nrToFOL(U,[X],atmost(0,R),forallM(Y,isTDisjoint(F1))) :-
 	!,
 	malcToFOL(functional,U,[X,Y],R,F1).
 nrToFOL(U,[X],atmost(M,R),F) :-
@@ -9249,34 +8104,34 @@ nrToFOL(U,[X],atmost(M,R),F) :-
 	nVars(N,VarList),
 	relConjunction(U,X,VarList,R,F1),
 	eqDisjunction(VarList,F2),
-	quantify(forall,VarList,implies(F1,F2),F).
+	quantify(forallM,VarList,impliesM(F1,F2),F).
 nrToFOL(_U,[_X],atleast(0,_R),true) :-
 	!.
-nrToFOL(U,[X],atleast(1,R),exists(Y,F1)) :-
+nrToFOL(U,[X],atleast(1,R),existsM(Y,F1)) :-
 	!,
 	malcToFOL(functional,U,[X,Y],R,F1).
 nrToFOL(U,[X],atleast(N,R),F) :-
 	nVars(N,VarList),
 	relConjunction(U,X,VarList,R,F1),
 	neqConjunction(VarList,F2),
-	quantify(exists,VarList,andM([F1,F2]),F).
+	quantify(existsM,VarList,andM([F1,F2]),F).
 
 %----------------------------------------------------------------------
 % quantify(+QUANTIFIER,+VARLIST,+MATRIX,-FORMULA)
 % FORMULA is a formula with a quantifier prefix consisting only of
-% quantifiers equal to QUANTIFIER andM containing allM variables in 
-% VARLIST andM the matrix of FORMULA is MATRIX.
+% quantifiers equal to QUANTIFIER and containing all variables in 
+% VARLIST and the matrix of FORMULA is MATRIX.
 %
 % Author: Ullrich Hustadt
 
-quantify(forall,[Y1],F,forall(Y1,F)) :-
+quantify(forallM,[Y1],F,forallM(Y1,F)) :-
 	!.
-quantify(forall,[Y1|YL],F,forall(Y1,F3)) :-
-	quantify(forall,YL,F,F3).
-quantify(exists,[Y1],F,exists(Y1,F)) :-
+quantify(forallM,[Y1|YL],F,forallM(Y1,F3)) :-
+	quantify(forallM,YL,F,F3).
+quantify(existsM,[Y1],F,existsM(Y1,F)) :-
 	!.
-quantify(exists,[Y1|YL],F,exists(Y1,F3)) :-
-	quantify(exists,YL,F,F3).
+quantify(existsM,[Y1|YL],F,existsM(Y1,F3)) :-
+	quantify(existsM,YL,F,F3).
 
 %----------------------------------------------------------------------
 % eqDisjunction(+VARLIST,-FORMULA)
@@ -9323,7 +8178,7 @@ neqConjunction(Y1,[Y2|YL],andM([isTDisjoint(equal(Y1,Y2)),F2])) :-
 %----------------------------------------------------------------------
 % relConjunction(+VAR,+VARLIST,+ROLETERM,-FORMULA)
 % FORMULA is a conjunction containing the translation of ROLETERM for
-% any pair that can be build taking VAR andM an element of VARLIST.
+% any pair that can be build taking VAR and an element of VARLIST.
 %
 % Author: Ullrich Hustadt
 
@@ -9463,37 +8318,37 @@ translateModalAxiom([[MS,KClass,MOp,concept(C)]|L1],CL) :-
 	!,
 	malcToFOL(functional,U,[A],C,F1),
 	translateClass(KClass,MOp,C,[A],F2),
-	modalContextToFOL(MS,[],U,forall(A,implies(F1,F2)),F3),
-	translate(F3,C1),
+	modalContextToFOL(MS,[],U,forallM(A,impliesM(F1,F2)),F3),
+	tranlate_M(F3,C1),
 	clausesToLOP(C1,CL1),
 	translateModalAxiom(L1,CL2),
 	append(CL1,CL2,CL).
 translateModalAxiom([[MS,KClass,MOp,allM]|L1],CL) :-
 	!,
 	translateClass(KClass,MOp,allM,[A],F2),
-	modalContextToFOL(MC,[],U,forall(A,F2),F3),
-	translate(F3,C1),
+	modalContextToFOL(MC,[],U,forallM(A,F2),F3),
+	tranlate_M(F3,C1),
 	clausesToLOP(C1,CL1),
 	translateModalAxiom(L1,CL2),
 	append(CL1,CL2,CL).
 translateModalAxiom([[MS,KClass,MOp,A]|L1],CL) :-
 	!,
 	translateClass(KClass,MOp,C,[A],F2),
-	modalContextToFOL(MC,[],U,forall(A,F2),F3),
-	translate(F3,C1),
+	modalContextToFOL(MC,[],U,forallM(A,F2),F3),
+	tranlate_M(F3,C1),
 	clausesToLOP(C1,CL1),
 	translateModalAxiom(L1,CL2),
 	append(CL1,CL2,CL).
 
 translateClass(kd45,MOp,C,[A],
-	rel(C,m(MOp,A),B,app(typed(F,m(MOp,A)),D))) :-
+	rel_M(C,m(MOp,A),B,app(typed(F,m(MOp,A)),D))) :-
 	!.
 translateClass(k,   MOp,C,[A],
-        rel(C,m(MOp,A),B,app(typed(F,m(MOp,A)),B))) :-
+        rel_M(C,m(MOp,A),B,app(typed(F,m(MOp,A)),B))) :-
 	!.
 translateClass(kd5, MOp,C,[A],
-        andM([rel(C,m(MOp,A),app(typed(F1,m(MOp,A)),U),app(typed(F2,m(MOp,A)),V)),
-             rel(C,m(MOp,A),U,app(typed(F2,m(MOp,A)),U))])) :-
+        andM([rel_M(C,m(MOp,A),app(typed(F1,m(MOp,A)),U),app(typed(F2,m(MOp,A)),V)),
+             rel_M(C,m(MOp,A),U,app(typed(F2,m(MOp,A)),U))])) :-
 	!.
 
 
@@ -9512,31 +8367,31 @@ translateAxiom([[A1,A2,A3,A4,A5]|L1],CL) :-
 
 translateAxioms(Name,CL) :-
 	theory(Name,CL0),
-	setofOrNil([MS,[A],_,in,C],
+	setofOrNil([MS,[A],_,in_M,C],
 	           [X1,Ax,B1]^clause(conceptElement(Name,MS,X1,user,A,C,Ax),B1),
 		   L1),
 	translateAxiom(L1,CL1),
-	setofOrNil([MS,[A,B],_,in,R],
+	setofOrNil([MS,[A,B],_,in_M,R],
 	           [X1,Ax,B1]^clause(roleElement(Name,MS,X1,user,A,B,R,Ax),B1),
 		   L2),
 	translateAxiom(L2,CL2),
-	setofOrNil([MS,[X],CT1,equivalent,CT2],
+	setofOrNil([MS,[X],CT1,equivalentM,CT2],
 	           [Ax,B1]^clause(conceptEqualSets(Name,user,MS,CT1,CT2,Ax),B1),
 		   L3),
 	translateAxiom(L3,CL3),
-	setofOrNil([MS,[X],CT1,implies,CT2],
+	setofOrNil([MS,[X],CT1,impliesM,CT2],
 	           [Ax,B1]^clause(conceptSubsets(Name,user,MS,CT1,CT2,Ax),B1),
 		   L4),
 	translateAxiom(L4,CL4),
-	setofOrNil([MS,[X,Y],RN,equivalent,RT],
+	setofOrNil([MS,[X,Y],RN,equivalentM,RT],
 	           [Ax,B1]^clause(roleEqualSets(Name,user,MS,RN,RT,Ax),B1),
 		   L5),
 	translateAxiom(L5,CL5),
-	setofOrNil([MS,[X,Y],RN,implies,RT],
+	setofOrNil([MS,[X,Y],RN,impliesM,RT],
 	           [Ax,B1]^clause(roleSubSets(Name,user,MS,RN,RT,Ax),B1),
 		   L6),
 	translateAxiom(L6,CL6),
-%	closed(Name,MS,X,Y,R),
+%	closed_M(Name,MS,X,Y,R),
 	append(CL1,CL2,CL12),
 	append(CL12,CL3,CL13),
 	append(CL13,CL4,CL14),
@@ -9560,12 +8415,12 @@ modalAxioms(KName,MOp,A) :-
  *
  * genclass(+Agent,-Class) 
  * classifies Agent to distinguish axioms for a modal operator behaving
- * equally for allM agents from axioms for a mutual modal operator.
+ * equally for all agents from axioms for a mutual modal operator.
  *
  */
 
 genclass(_,_,A,A,every,true) :-
-	var(A),
+	is_ftVar(A),
 	!.
 genclass(_,_,allM,_,allM,true) :-
 	!.
@@ -9586,26 +8441,26 @@ genclass(_,_,A,A,someM,true) :-
  *
  */
 
-assertMA(A1,rel(Env,every,m(MOp,A1),X,Y), WG, G) :-
-	var(A1),
-	asserta_new((rel(Env,every,m(MOp,A1),X,Y) :- (WG, G))),
+assertMA(A1,rel_M(Env,every,m(MOp,A1),X,Y), WG, G) :-
+	is_ftVar(A1),
+	asserta_new((rel_M(Env,every,m(MOp,A1),X,Y) :- (WG, G))),
 	!.
-assertMA(allM,rel(Env,allM,m(MOp,A),X,Y), _WG, G) :-
-	asserta_new((rel(Env,allM,m(MOp,A),X,Y) :- G)),
+assertMA(allM,rel_M(Env,allM,m(MOp,A),X,Y), _WG, G) :-
+	asserta_new((rel_M(Env,allM,m(MOp,A),X,Y) :- G)),
 	!.
-assertMA(A,rel(Env,someM,m(MOp,A),X,Y), WG, G) :-
-	asserta_new((rel(Env,someM,m(MOp,A),X,Y) :- (WG, G))),
+assertMA(A,rel_M(Env,someM,m(MOp,A),X,Y), WG, G) :-
+	asserta_new((rel_M(Env,someM,m(MOp,A),X,Y) :- (WG, G))),
 	!.
-assertMA(concept(_),rel(Env,D,m(MOp,A),X,Y), WG, G) :-
-	asserta_new((rel(Env,D,m(MOp,A),X,Y) :- (WG, G))),
+assertMA(concept(_),rel_M(Env,D,m(MOp,A),X,Y), WG, G) :-
+	asserta_new((rel_M(Env,D,m(MOp,A),X,Y) :- (WG, G))),
 	!.
 
 
 /**********************************************************************
  *
  * modalAxioms(+EnvName,+KripkeClass,+MOp,+Agent)
- * asserts the modal axioms for the modal operator MOp andM agent Agent
- * in environment_M EnvName for KripkeClass.
+ * asserts the modal axioms for the modal operator MOp and agent Agent
+ * in environment EnvName for KripkeClass.
  *
  */
 	
@@ -9621,10 +8476,10 @@ modalAxioms(EnvName,MS,k,MOp,A1) :-
 	environment_M(EnvName,Env,_),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	genclass(Env,[W1,G1],A1,A,C,Goal),
-	retractall1_M(rel(Env,C,m(MOp,A),_,_)),
+	retractall1_M(rel_M(Env,C,m(MOp,A),_,_)),
 	retractall1_M(modalAxioms(Env,MS,user,_,A1,MOp,A)),
 	assertMA(A1,
-                 rel(Env,C,m(MOp,A),U,app(_FF:m(MOp,A),U)), 
+                 rel_M(Env,C,m(MOp,A),U,app(_FF:m(MOp,A),U)), 
 		 (not(not(world(Env,m(MOp,A),U,V)))), 
 		 (normal(Env,U), Goal)),
 	asserta_new(modalAxioms(Env,MS,user,k,A1,MOp,A)),
@@ -9633,14 +8488,14 @@ modalAxioms(EnvName,MS,kd45,MOp,A1) :-
 	environment_M(EnvName,Env,_),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	genclass(Env,[W1,G1],A1,A,C,Goal),
-	retractall1_M(rel(Env,C,m(MOp,A),_,_)),
+	retractall1_M(rel_M(Env,C,m(MOp,A),_,_)),
 	retractall1_M(modalAxioms(Env,MS,user,_,A1,MOp,A)),
 	assertMA(A1,
-	         rel(Env,C,m(MOp,A),U,app(_FF:m(MOp,A),V)), 
+	         rel_M(Env,C,m(MOp,A),U,app(_FF:m(MOp,A),V)), 
 		 (not(not(world(Env,m(MOp,A),U,V)))), 
 		 (normal(Env,U), Goal)),
 %	assertMA(A1,
-%                 rel(Env,C,m(MOp,A),U,app(_FF:m(MOp,A),U)), 
+%                 rel_M(Env,C,m(MOp,A),U,app(_FF:m(MOp,A),U)), 
 %		 (not(not(world(Env,m(MOp,A),U,V)))), 
 %		 (normal(Env,U), Goal)),
 	asserta_new(modalAxioms(Env,MS,user,kd45,A1,MOp,A)),
@@ -9651,14 +8506,14 @@ modalAxioms(EnvName,MS,kd5,MOp,A1) :-
 	environment_M(EnvName,Env,_),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	genclass(Env,[W1,G1],A1,A,C,Goal),
-	retractall1_M(rel(Env,C,m(MOp,A),_,_)),
+	retractall1_M(rel_M(Env,C,m(MOp,A),_,_)),
 	retractall1_M(modalAxioms(Env,MS,user,_,A1,MOp,A)),
 	assertMA(A1,
-	         rel(Env,C,m(MOp,A),app(_F1:m(MOp,A),U),app(_F2:m(MOp,A),V)), 
+	         rel_M(Env,C,m(MOp,A),app(_F1:m(MOp,A),U),app(_F2:m(MOp,A),V)), 
 		 ((world(Env,m(MOp,A),U,V), isTDisjoint(U == []))), 
 		 Goal),
 	assertMA(A1,
-	         rel(Env,C,m(MOp,A),U,app(_F2:m(MOp,A),U)), 
+	         rel_M(Env,C,m(MOp,A),U,app(_F2:m(MOp,A),U)), 
 		 true, 
 		 Goal),
 	asserta_new(modalAxioms(Env,MS,user,kd5,A1,MOp,A)),
@@ -9667,20 +8522,20 @@ modalAxioms(EnvName,MS,kd4,MOp,A1) :-
 	environment_M(EnvName,Env,_),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	genclass(Env,[W1,G1],A1,A,C,Goal),
-	retractall1_M(rel(Env,C,m(MOp,A),_,_)),
+	retractall1_M(rel_M(Env,C,m(MOp,A),_,_)),
 	retractall1_M(modalAxioms(Env,MS,user,_,A1,MOp,A)),
-	assertMA(A1,rel(Env,C,m(MOp,A),U,app(_F1:m(MOp,A),U)), Goal),
-	assertMA(A1,rel(Env,C,m(MOp,A),U,app(_F1:m(MOp,A),V)), (world(Env,m(MOp,A),U,V), (rel(Env,_,m(MOp,A),U,V), Goal))),
+	assertMA(A1,rel_M(Env,C,m(MOp,A),U,app(_F1:m(MOp,A),U)), Goal),
+	assertMA(A1,rel_M(Env,C,m(MOp,A),U,app(_F1:m(MOp,A),V)), (world(Env,m(MOp,A),U,V), (rel_M(Env,_,m(MOp,A),U,V), Goal))),
 	asserta_new(modalAxioms(Env,MS,user,k4,A1,MOp,A)),
 	!.
 modalAxioms(EnvName,MS,kt,MOp,A1) :-
 	environment_M(EnvName,Env,_),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	genclass(Env,[W1,G1],A1,A,C,Goal),
-	retractall1_M(rel(Env,C,m(MOp,A),_,_)),
+	retractall1_M(rel_M(Env,C,m(MOp,A),_,_)),
 	retractall1_M(modalAxioms(Env,MS,user,_,A1,MOp,A)),
-	assertMA(A1,rel(Env,C,m(MOp,A),U,app(_F1:m(MOp,A),U)), Goal),
-	assertMA(A1,rel(Env,C,m(MOp,A),U,U), Goal),
+	assertMA(A1,rel_M(Env,C,m(MOp,A),U,app(_F1:m(MOp,A),U)), Goal),
+	assertMA(A1,rel_M(Env,C,m(MOp,A),U,U), Goal),
 	asserta_new(modalAxioms(Env,MS,user,kt,A1,MOp,A)),
 	!.
 
@@ -9696,8 +8551,8 @@ normal(_,_).
 /**********************************************************************
  *
  * world(+EnvName,m(+MOp,+Agent),+WorldSequence) 
- * checks wether orM isTDisjoint WorldSequence is a sequence of worlds for
- * modal operator MOp andM agent Agent.
+ * checks wether or isTDisjoint WorldSequence is a sequence of worlds for
+ * modal operator MOp and agent Agent.
  *
  */
 
@@ -9714,11 +8569,11 @@ world(Env,m(MOp,A),U,app(_FF:m(MOp,A),V)) :-
 /***********************************************************************
  *
  * getDirectFatherRoles(+EnvName,+MS,+Role,-RL)
- * Arguments: EnvName     environment_M identifier
+ * Arguments: EnvName     environment identifier
  *            MS          modal context
  *            Role        role name
  *            RL          list of role names
- * RL is the list of allM role names which are direct tRangeFather roles
+ * RL is the list of all role names which are direct tRangeFather tRole
  * of Role.
  *
  */
@@ -9731,11 +8586,11 @@ getDirectFatherRoles(EnvName,MS,Role,RL) :-
 /***********************************************************************
  *
  * getAllFatherRoles(+EnvName,+MS,+Role,-RL)
- * Arguments: EnvName     environment_M identifier
+ * Arguments: EnvName     environment identifier
  *            MS          modal context
  *            Role        role name
  *            RL          list of role names
- * RL is the list of allM role names which are tRangeFather roles of
+ * RL is the list of all role names which are tRangeFather tRole of
  * Role
  *
  */
@@ -9748,11 +8603,11 @@ getAllFatherRoles(EnvName,MS,Role,RL) :-
 /***********************************************************************
  *
  * getDirectSonRoles(+EnvName,+MS,+Role,-RL)
- * Arguments: EnvName     environment_M identifier
+ * Arguments: EnvName     environment identifier
  *            MS          modal context
  *            Role        role name
  *            RL          list of role names
- * RL is the list of allM role names which are direct tRangeFather roles
+ * RL is the list of all role names which are direct tRangeFather tRole
  * of Role
  *
  */
@@ -9765,11 +8620,11 @@ getDirectSonRoles(EnvName,MS,Role,RL) :-
 /***********************************************************************
  *
  * getAllSonRoles(+EnvName,+MS,+Role,-RL)
- * Arguments: EnvName     environment_M identifier
+ * Arguments: EnvName     environment identifier
  *            MS          modal context
  *            Role        role name
  *            RL          list of role names
- * RL is the list of allM role names which are tRangeFather roles of 
+ * RL is the list of all role names which are tRangeFather tRole of 
  * Role
  *
  */
@@ -9782,10 +8637,10 @@ getAllSonRoles(EnvName,MS,Role,RL) :-
 /***********************************************************************
  *
  * getRoles(+EnvName,+MS,-RL)
- * Arguments: EnvName     environment_M identifier
+ * Arguments: EnvName     environment identifier
  *            MS     modal context
  *            RL     list of role names
- * RL is the list of allM role names in the subsumption hierarchy.
+ * RL is the list of all role names in the subsumption hierarchy.
  *
  */
 
@@ -9795,7 +8650,7 @@ getRoles(EnvName,MS,['tTOP'|RL]) :-
 /***********************************************************************
  *
  * testDirectFatherRole(+EnvName,+MS,+Role1,+Role2,-Role)
- * Arguments: EnvName     environment_M identifier
+ * Arguments: EnvName     environment identifier
  *            MS          modal context
  *            Role1       role name
  *            Role2       role name
@@ -9816,7 +8671,7 @@ testDirectFatherRole(EnvName,MS,Role1,Role2,Role) :-
 /***********************************************************************
  *
  * testDirectSonRole(+EnvName,+MS,+Role1,+Role2,-Role)
- * Arguments: EnvName     environment_M identifier
+ * Arguments: EnvName     environment identifier
  *            MS          modal context
  *            Role1       role name
  *            Role2       role name
@@ -9837,7 +8692,7 @@ testDirectSonRole(EnvName,MS,Role1,Role2,Role) :-
 /***********************************************************************
  *
  * testFatherRole(+EnvName,+MS,+Role1,+Role2,-Role)
- * Arguments: EnvName     environment_M identifier
+ * Arguments: EnvName     environment identifier
  *            MS          modal context
  *            Role1       role name
  *            Role2       role name
@@ -9858,7 +8713,7 @@ testFatherRole(EnvName,MS,Role1,Role2,Role) :-
 /***********************************************************************
  *
  * testSonRole(+EnvName,+MS,+Role1,+Role2,-Role)
- * Arguments: EnvName     environment_M identifier
+ * Arguments: EnvName     environment identifier
  *            MS          modal context
  *            Role1       role name
  *            Role2       role name
@@ -9878,11 +8733,11 @@ testSonRole(Env,MS,Role1,Role2,Role) :-
 /***********************************************************************
  *
  * getCommonFatherRoles(+EnvName,+MS,RL1,RL2)
- * Arguments: EnvName  environment_M identifier
+ * Arguments: EnvName  environment identifier
  *            MS       modal context
  *            RL1      list of role names
  *            RL2      list of role names
- * RL2 is the list of allM role names subsuming allM roles in RL1.
+ * RL2 is the list of all role names subsuming all tRole in RL1.
  *
  */
 
@@ -9893,12 +8748,12 @@ getCommonFatherRoles(EnvName,MS,RL1,RL2) :-
 /***********************************************************************
  *
  * getCommonSonRoles(+EnvName,+MS,RL1,RL2)
- * Arguments: EnvName  environment_M identifier
+ * Arguments: EnvName  environment identifier
  *            MS       modal context
  *            RL1      list of role names
  *            RL2      list of role names
- * RL2 is the list of allM role names which are subsumed by allM
- * roles in RL1.
+ * RL2 is the list of all role names which are subsumed by allM
+ * tRole in RL1.
  *
  */
 
@@ -9953,16 +8808,16 @@ undefconcept(EnvName,MS,CN,CT) :-
 	environment_M(EnvName,Env,_),
 	
 	conceptEqualSets(Env,_user,MS,CN,CT,AX),
-	retractall1_M(in(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-%	retractall1_M(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-%	retractall1_M(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
- 	retract_all_m(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
- 	retract_all_m(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
+	retractall1_M(in_M(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+%	retractall1_M(in_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+%	retractall1_M(kb_in_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+ 	retract_all_m(kb_in_M(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in_M([],Name,_,_),_))),
+ 	retract_all_m(in_M(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in_M([],Name,_,_),_))),
  	retractall_all(query_M(Env,MS,CN,_CT,_PT,_)),
-	retractall1_M(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-	retractall1_M(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall1_M(constraint(Env,rn(AX,_,_,_),_,_,_,_,_)),
-	retractall1_M(constraint(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall1_M(eq_M(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall1_M(eq_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall1_M(constraint_M(Env,rn(AX,_,_,_),_,_,_,_,_)),
+	retractall1_M(constraint_M(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
 	change_classifier(EnvName,MS,CN,CT),
 	retract(conceptEqualSets(Env,_user,MS,CN,CT,AX)),
 	!.
@@ -9970,16 +8825,16 @@ undefconcept(EnvName,MS,CN,CT) :-
 undefConcept(Env,MS,CN) :-
 	conceptEqualSets(Env,user,_,CN,_,Ax),
 	
-	retractall1_M(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-%	retractall1_M(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
-%	retractall1_M(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
- 	retract_all_m(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
- 	retract_all_m(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
+	retractall1_M(in_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+%	retractall1_M(in_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
+%	retractall1_M(kb_in_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
+ 	retract_all_m(kb_in_M(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in_M([],Name,_,_),_))),
+ 	retract_all_m(in_M(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in_M([],Name,_,_),_))),
    	retract_all_m(query_M(Env,MS,CN,_CT,_PT,_)),
-	retractall1_M(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-	retractall1_M(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall1_M(constraint(Env,rn(AX,_,_,_),_,_,_,_,_)),
-	retractall1_M(constraint(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall1_M(eq_M(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall1_M(eq_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall1_M(constraint_M(Env,rn(AX,_,_,_),_,_,_,_,_)),
+	retractall1_M(constraint_M(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
 	change_classifier(EnvName,MS,CN,CT),
 	retractall1_M(conceptEqualSets(Env,user,MS,CN,_CT,Ax)),
 	fail,
@@ -9987,21 +8842,21 @@ undefConcept(Env,MS,CN) :-
 undefConcept(_Env,_MS,_CN) :-
 	!.
 
-retract_all_m(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)) :-
-	clause(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_)),_),
+retract_all_m(kb_in_M(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)) :-
+	clause(kb_in_M(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in_M([],Name,_,_),_)),_),
 	member(rn(AX,_,_,_),[Name]),	
-	retractall1_M(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
+	retractall1_M(kb_in_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,proved(in_M([],Name,_,_),_))),
 	fail.
-retract_all_m(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)).
+retract_all_m(kb_in_M(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)).
 
-retract_all_m(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)) :-
-	clause(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_)),_),
+retract_all_m(in_M(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)) :-
+	clause(in_M(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in_M([],Name,_,_),_)),_),
 	member(rn(AX,_,_,_),[Name]),	
-	retractall1_M(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
+	retractall1_M(in_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,proved(in_M([],Name,_,_),_))),
 	fail.
-retract_all_m(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)) :-
-	retractall1_M(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall1_M(in(_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)).
+retract_all_m(in_M(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)) :-
+	retractall1_M(in_M(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall1_M(in_M(_Name1,rn(AX,_,_,_),_,_,_,_,_,_,_)).
 
 retract_all_m(query_M(Env,MS,CN,_CT,_PT,_PT1)) :-
 	query_M(Env,MS,CN1,CT,PT,PT1),
@@ -10049,33 +8904,33 @@ undefrole(EnvName,MS,RN,RT) :-
 	environment_M(EnvName,Env,_),
 
 	roleEqualSets(Env,_user,MS,RN,RT,AX),
-	retractall1_M(in(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall1_M(in_M(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
 
-%	retractall1_M(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-%	retractall1_M(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
- 	retract_all_m(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
- 	retract_all_m(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
+%	retractall1_M(in_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+%	retractall1_M(kb_in_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+ 	retract_all_m(kb_in_M(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in_M([],Name,_,_),_))),
+ 	retract_all_m(in_M(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in_M([],Name,_,_),_))),
  	retract_all_m(query_M(Env,MS,CN,_CT,_PT,_)),
-	retractall1_M(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-	retractall1_M(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall1_M(constraint(Env,rn(AX,_,_,_),_,_,_,_,_)),
-	retractall1_M(constraint(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall1_M(eq_M(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall1_M(eq_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall1_M(constraint_M(Env,rn(AX,_,_,_),_,_,_,_,_)),
+	retractall1_M(constraint_M(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
 	change_classifier(EnvName,MS,RN,RT),
 	retract(roleEqualSets(Env,_user,MS,RN,RT,AX)),
 	!.
 undefRole(Env,MS,RN) :-
 	roleEqualSets(Env,user,MS,RN,_,Ax),
 
-	retractall1_M(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall1_M(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
-%	retractall1_M(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
+	retractall1_M(in_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall1_M(in_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
+%	retractall1_M(kb_in_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
 % 	retract_all_m(query_M(Env,MS,RN,_RT,_PT,_)),
- 	retract_all_m(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
- 	retract_all_m(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
-	retractall1_M(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-	retractall1_M(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall1_M(constraint(Env,rn(AX,_,_,_),_,_,_,_,_)),
-	retractall1_M(constraint(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+ 	retract_all_m(kb_in_M(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in_M([],Name,_,_),_))),
+ 	retract_all_m(in_M(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in_M([],Name,_,_),_))),
+	retractall1_M(eq_M(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall1_M(eq_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall1_M(constraint_M(Env,rn(AX,_,_,_),_,_,_,_,_)),
+	retractall1_M(constraint_M(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
 	change_classifier(EnvName,MS,RN,_),
 	retractall1_M(roleEqualSets(Env,user,MS,RN,_RT,Ax)),
 	fail,
@@ -10111,16 +8966,16 @@ undefprimconcept(EnvName,MS,CN,CT) :-
 	environment_M(EnvName,Env,_),
 
 	conceptSubsets(Env,_user,MS,CN,CT,AX),
-	retractall1_M(in(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-%	retractall1_M(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-%	retractall1_M(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
- 	retract_all_m(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
- 	retract_all_m(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
+	retractall1_M(in_M(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+%	retractall1_M(in_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+%	retractall1_M(kb_in_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+ 	retract_all_m(kb_in_M(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in_M([],Name,_,_),_))),
+ 	retract_all_m(in_M(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in_M([],Name,_,_),_))),
  	retract_all_m(query_M(Env,MS,CN,_CT,_PT,_)),
-	retractall1_M(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-	retractall1_M(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall1_M(constraint(Env,rn(AX,_,_,lInR),_,_,_,_,_)),
-	retractall1_M(constraint(Env,rn(AX,_,_,lInR),_,_,_,_,_,_)),
+	retractall1_M(eq_M(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall1_M(eq_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall1_M(constraint_M(Env,rn(AX,_,_,lInR),_,_,_,_,_)),
+	retractall1_M(constraint_M(Env,rn(AX,_,_,lInR),_,_,_,_,_,_)),
 	change_classifier(EnvName,MS,CN,CT),
 	retract(conceptSubsets(Env,_user,MS,CN,CT,AX)),
 	!.
@@ -10162,32 +9017,32 @@ undefprimrole(EnvName,MS,RN,RT) :-
 	environment_M(EnvName,Env,_),
 
 	roleSubsets(Env,_user,MS,RN,RT,AX),
-	retractall1_M(in(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-%	retractall1_M(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-%	retractall1_M(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
- 	retract_all_m(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
- 	retract_all_m(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
+	retractall1_M(in_M(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+%	retractall1_M(in_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+%	retractall1_M(kb_in_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+ 	retract_all_m(kb_in_M(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in_M([],Name,_,_),_))),
+ 	retract_all_m(in_M(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in_M([],Name,_,_),_))),
  	retract_all_m(query_M(Env,MS,RN,_RT,_PT,_)),
-	retractall1_M(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-	retractall1_M(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall1_M(constraint(Env,rn(AX,_,_,lInR),_,_,_,_,_)),
-	retractall1_M(constraint(Env,rn(AX,_,_,lInR),_,_,_,_,_,_)),
+	retractall1_M(eq_M(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall1_M(eq_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall1_M(constraint_M(Env,rn(AX,_,_,lInR),_,_,_,_,_)),
+	retractall1_M(constraint_M(Env,rn(AX,_,_,lInR),_,_,_,_,_,_)),
 	change_classifier(EnvName,MS,RN,RT),
 	retract(roleSubsets(Env,_user,MS,RN,RT,AX)),
 	!.
 undefprimRole(Env,MS,RN) :-
 	roleSubsets(Env,user,MS,RN,_,Ax),
 
-	retractall1_M(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall1_M(in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
-	retractall1_M(kb_in(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
+	retractall1_M(in_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall1_M(in_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
+	retractall1_M(kb_in_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,_,_)),
  	retract_all_m(query_M(Env,MS,RN,_RT,_PT,_)),
- 	retract_all_m(kb_in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
- 	retract_all_m(in(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in([],Name,_,_),_))),
-	retractall1_M(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
-	retractall1_M(eq(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
-	retractall1_M(constraint(Env,rn(AX,_,_,_),_,_,_,_,_)),
-	retractall1_M(constraint(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+ 	retract_all_m(kb_in_M(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in_M([],Name,_,_),_))),
+ 	retract_all_m(in_M(Env,_Name1,rn(AX,_,_,_),_,_,_,_,_,_,proved(in_M([],Name,_,_),_))),
+	retractall1_M(eq_M(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
+	retractall1_M(eq_M(Env,rn(AX,_,_,_),_,_,_,_,_,_,_)),
+	retractall1_M(constraint_M(Env,rn(AX,_,_,_),_,_,_,_,_)),
+	retractall1_M(constraint_M(Env,rn(AX,_,_,_),_,_,_,_,_,_)),
 	change_classifier(EnvName,MS,RN,_),
 	retractall1_M(roleSubsets(Env,user,MS,RN,_RT,Ax)),
 	fail,
@@ -10213,10 +9068,10 @@ delete_ind(X,Y,R) :-
 	delete_ind(EnvName,[],X,Y,R).
 delete_ind(EnvName,MS,X,C) :-
 	environment_M(EnvName,Env,_),
-	nonvar(MS),
+	not_ftVar(MS),
 	(MS = [] ; MS = [_|_]),
 	!,
-	atomic(X),
+	isFORTIC(X),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	constructMLHead(Env,rn(_,_,user,lInR),W1,C,X,_HYPS,_D,_CALLS,abox,InHead),
 	not(not((retract((InHead :- call(user:G1))) ;
@@ -10232,9 +9087,9 @@ delete_ind(P1,X,Y,R) :-
 	delete_ind(EnvName,MS,X,Y,R).
 delete_ind(EnvName,MS,X,Y,R) :-
 	environment_M(EnvName,Env,_),
-	atomic(X),
-	atomic(Y),
-	atomic(R),
+	isFORTIC(X),
+	isFORTIC(Y),
+	isFORTIC(R),
 	Role1 =.. [R,X,Y],
 	retract(Role1),
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
@@ -10268,7 +9123,7 @@ change_classifier(EnvName,MS,CN,CT) :-
 	find_definition(CN,CL2),
  	union1(CL1,CL2,CL),print(CL),
 	change_classifier1(Env,MS,CN,CT,CL),
-	delete_hierarchy(concepts,Env,MS,CN),
+	delete_hierarchy(tConcept,Env,MS,CN),
 	change_classifier2(Env,MS,CT,CL),
 	!.
 change_classifier(EnvName,MS,RN,CT) :-
@@ -10278,7 +9133,7 @@ change_classifier(EnvName,MS,RN,CT) :-
 	find_definition(RN,CL2),
  	union1(CL1,CL2,CL),print(CL),
 	change_classifier1(Env,MS,RN,CT,CL),
-	delete_hierarchy(roles,Env,MS,RN),
+	delete_hierarchy(tRole,Env,MS,RN),
 	change_classifier2(Env,MS,CT,CL),
 	!.
 change_classifier(EnvName,MS,CN,CT).
@@ -10288,13 +9143,13 @@ change_classifier1(Env,MS,CR,CT,[]) :-
 change_classifier1(Env,MS,CR,CT,[H|T]) :-
 	getConceptName(Env,MS,H),
 	(H \== tTOP,H \== tBOT),
-	delete_hierarchy(concepts,Env,MS,H),
+	delete_hierarchy(tConcept,Env,MS,H),
 	change_classifier1(Env,MS,CR,CT,T),
 	!.
 change_classifier1(Env,MS,CR,CT,[H|T]) :-
 	getRoleName(Env,MS,H),
 	(H \== tTOP,H \== tBOT),
-	delete_hierarchy(roles,Env,MS,H),
+	delete_hierarchy(tRole,Env,MS,H),
 	change_classifier1(Env,MS,CR,CT,T),
 	!.
 change_classifier1(Env,MS,CR,CT,[H|T]) :-
@@ -10305,30 +9160,30 @@ change_classifier2(Env,MS,CT,[]) :-
 	!.
 change_classifier2(Env,MS,CT,[H|T]) :-
 	getConceptName(Env,MS,H),
-	isTDisjoint(make_succ2(concepts,Env,MS,H)),
+	isTDisjoint(make_succ2(tConcept,Env,MS,H)),
 	change_classifier2(Env,MS,CT,T),
 	!.
 change_classifier2(Env,MS,CT,[H|T]) :-
 	getRoleName(Env,MS,H),
-	isTDisjoint(make_succ2(roles,Env,MS,H)),
+	isTDisjoint(make_succ2(tRole,Env,MS,H)),
 	change_classifier2(Env,MS,CT,T),
 	!.
 change_classifier2(Env,MS,CT,[H|T]) :-
 	change_classifier2(Env,MS,CT,T),
 	!.
 delete_hierarchy(Type,Env,MS,CR) :-
-        clause(succ(Type,Env,MS,CR,SC),_),
-	clause(succ(Type,Env,MS,PC,CR),_),
+        clause(succ_M(Type,Env,MS,CR,SC),_),
+	clause(succ_M(Type,Env,MS,PC,CR),_),
 	subsume1(Type,Env,MS,PC,SC),
 	assert_succ(Type,Env,MS,PC,SC),
 	fail.
 delete_hierarchy(Type,Env,MS,CR) :-
-	retractall1_M(succ(Type,Env,MS,CR,_)),
-	retractall1_M(succ(Type,Env,MS,_,CR)),
-	retractall1_M(sub(Type,Env,MS,CR,_)),
-	retractall1_M(sub(Type,Env,MS,_,CR)),
-	retractall1_M(nsub(Type,Env,MS,CR,_)),
-	retractall1_M(nsub(Type,Env,MS,_,CR)),
+	retractall1_M(succ_M(Type,Env,MS,CR,_)),
+	retractall1_M(succ_M(Type,Env,MS,_,CR)),
+	retractall1_M(sub_M(Type,Env,MS,CR,_)),
+	retractall1_M(sub_M(Type,Env,MS,_,CR)),
+	retractall1_M(nsub_M(Type,Env,MS,CR,_)),
+	retractall1_M(nsub_M(Type,Env,MS,_,CR)),
 	!.
 	
 /*****************************************************************************
@@ -10399,13 +9254,13 @@ find_Def_concept(Env,MS,Concept,List_of_Concepts) :-
 
 find_Def_concept1(Env,MS,Concept,CN) :-
 	conceptEqualSets(Env,_user,MS,CN,CT,AX),
-	atom(CN),
+	isFORT(CN),
 	not(name(CN,[99,111,110,99,101,112,116|_])),	
 	collect(CT,Liste),
 	member(Concept,Liste).
 find_Def_concept1(Env,MS,Concept,CN) :-
 	conceptSubsets(Env,_user,MS,CN,CT,AX),
-	atom(CN),
+	isFORT(CN),
 	not(name(CN,[99,111,110,99,101,112,116|_])),
 	collect(CT,Liste),
 	member(Concept,Liste).
@@ -10418,13 +9273,13 @@ find_Def_role(Env,MS,Role,List_of_Roles) :-
 	!.
 find_Def_role1(Env,MS,Role,CN) :-
 	roleEqualSets(Env,_user,MS,CN,CT,AX),
-	atom(CN),
+	isFORT(CN),
 	not(name(CN,[99,111,110,99,101,112,116|_])),	
 	collect(CT,Liste),
 	member(Role,Liste).
 find_Def_role1(Env,MS,Role,CN) :-
 	roleSubsets(Env,_user,MS,CN,CT,AX),
-	atom(CN),
+	isFORT(CN),
 	not(name(CN,[99,111,110,99,101,112,116|_])),
 	collect(CT,Liste),
 	member(Role,Liste).
@@ -10442,7 +9297,7 @@ collect(CT,Liste) :-
 collect2([],[]).
 collect2([H|T],[H|L]) :-
 	currentEnvironment(Env),
-	nonvar(H),
+	not_ftVar(H),
 	(clause(conceptName(Env,_,_,H),_);clause(roleName(Env,_,_,H),_)),
 	collect2(T,L),
 	!.
@@ -10452,12 +9307,12 @@ collect2([H|T],L) :-
 collect1([],L) :-
 	!.
 collect1([X|R],L) :-
-	(atom(X);number(X)),
+	(isFORT(X);number(X)),
 	collect1(R,L1),
 	union1(X,L1,L),
 	!.
 collect1([[X1|R1]|R],L) :-
-	(atom(X1);number(X1)),
+	(isFORT(X1);number(X1)),
 	collect1(R1,L1),
 	collect1(R,L2),
 	union1(L1,L2,L3),
@@ -10478,7 +9333,7 @@ collect1([X|R],L3) :-
 	union1(L1,L2,L3),
 	!.
 collect1(X,[X|L]) :-
-	(atom(X);number(X)),
+	(isFORT(X);number(X)),
 	currentEnvironment(Env),
 	(clause(conceptName(Env,_,_,X),_);clause(roleName(Env,_,_,X),_)),
 	!.
@@ -10520,7 +9375,7 @@ collect1(X,[L|L1]) :-
  * Der 4-stellige Hilfskonstruktor make__primconcept mit folgenden Parametern:
  * (EnvName,MS,CName1,supers(Liste_von_Konzepte))  
  * definiert ein Konzept CName1 als Subkonzept von den in der Liste auftretenden 
- * Superkonzepten in environment_M EnvName und modal context MS.
+ * Superkonzepten in environment EnvName und modal context MS.
  *-------------------------------------------*/
 
 
@@ -10621,7 +9476,7 @@ sb_primconcept(EnvName,Left) :-
 
 
 sb_primconcept(MS,Left) :-
-	nonvar(MS),
+	not_ftVar(MS),
 	(MS = [] ; MS = [_|_]),
 	!,
 	getCurrentEnvironment(EnvName),
@@ -10633,9 +9488,9 @@ sb_primconcept(MS,Left) :-
 /*-----------------------------------------------------------------------------
  * Der 2-stellige Konstruktor sb_primconcept(CName1,SpecListe) hat als Argumente ein
  * CName1 und eine Liste von bis jetzt eingef"uhrten Pr"adikaten wie:
- * [supers(Liste von concepts) , restr-inh(...) , nr(...)], es werden dann jeweils die
+ * [supers(Liste von tConcept) , restr-inh(...) , nr(...)], es werden dann jeweils die
  * entsprechenden Hilfskonstruktoren mit dem einzelnen Listenelement als aktueller Parameter 
- * aktiviert bzw. aufgerufen und zwar in current environment_M und [] als modal context.
+ * aktiviert bzw. aufgerufen und zwar in current environment und [] als modal context.
  *-----------------------------------------*/
 
 sb_primconcept(CName1,[]) :-
@@ -10649,7 +9504,7 @@ sb_primconcept(CName1,[X|T]):-
 
 /*-----------------------------------------------------------------------------
  * Der 3-stellige Konstruktor sb_primconcept(A,CName1,SpecListe) funktioniert analog
- * nur in A= Environment und [] als modal context, bzw. in current environment_M und
+ * nur in A= Environment und [] als modal context, bzw. in current environment und
  * A=MS als modal context.
  *-----------------------------------------*/
 
@@ -10669,7 +9524,7 @@ sb_primconcept(A,CName1,[X|T]):-
 /*-------------------------------------------------------------------------------
  * Der 3-stellige Konstruktor von  sb_primconcept mit folgenden Parametern:
  * (Environment,MS,CName1)  
- * definiert ein Konzept CName1 in environment_M EnvName und modal context MS. 
+ * definiert ein Konzept CName1 in environment EnvName und modal context MS. 
  *-------------------------------------------*/
 
 sb_primconcept(EnvName,MS,CName):-
@@ -10767,7 +9622,7 @@ make_defconcept(EnvName,MS,CName1 , necres(RTerm, _),CNameDom):-
 
 
 expand_role(_,_,RTerm,RTerm,_,_,_) :-
-	atomic(RTerm),
+	isFORTIC(RTerm),
 	!.
 expand_role(EnvName,MS1,RTerm,RName1,CName1,CName2,CNameDef) :-
 	RTerm = sb_primelemrole(EnvName,MS2,RName1, 'domain-range'(CName1,CName2,CNameDef)),
@@ -10799,9 +9654,9 @@ elem(I,[H|T],X):- Hilf is I-1,
 /*-----------------------------------------------------------------------------
  * Der 2-stellige Konstruktor sb_defconcept(CName1,SpecListe) hat als Argumente ein
  * CName1 und eine Liste von bis jetzt eingef"uhrten Pr"adikaten wie:
- * [supers(Liste von concepts) , restr-inh(...) , nr(...)], es werden dann jeweils die
+ * [supers(Liste von tConcept) , restr-inh(...) , nr(...)], es werden dann jeweils die
  * entsprechenden Hilfskonstruktoren mit dem einzelnen Listenelement als aktueller Parameter 
- * aktiviert bzw. aufgerufen und zwar in current environment_M und [] als modal context.
+ * aktiviert bzw. aufgerufen und zwar in current environment und [] als modal context.
  *-----------------------------------------*/
 
 sb_defconcept(C1,SpecList):- 
@@ -10811,7 +9666,7 @@ sb_defconcept(C1,SpecList):-
 
 /*-----------------------------------------------------------------------------
  * Der 3-stellige Konstruktor sb_defconcept(A,CName1,SpecListe) funktioniert analog
- * nur in A= Environment und [] als modal context, bzw. in current environment_M und
+ * nur in A= Environment und [] als modal context, bzw. in current environment und
  * A=MS als modal context.
  *-----------------------------------------*/
 
@@ -10857,7 +9712,7 @@ sb_defconcept(EnvName,MS,C1,supers(L),[]) :-
 /*---------------------------------------------------------------------------
  * sb_primelemrole(RName1,domain-range(CName1,CName2,CNameDef))
  * definiert eine neue generelle Rolle RName1 mit CName1 als domain, CName2 
- * als range und CNameDef als "default value restriction" in modal context [].
+ * als range und CNameDef als "default value_M restriction" in modal context [].
  *------------------------------------------*/
 
 
@@ -10868,8 +9723,8 @@ sb_primelemrole(RName1, 'domain-range'(CName1,CName2,CNameDef)):-
 /*---------------------------------------------------------------------------
  * sb_primelemrole(X,RName1,domain-range(CName1,CName2,CNameDef))
  * definiert eine neue generelle Rolle RName1 mit CName1 als domain, CName2 
- * als range und CNameDef als "default value restriction" in modal context []
- * und X=environment_M bzw. in modal context X=MS und current environment_M.
+ * als range und CNameDef als "default value_M restriction" in modal context []
+ * und X=environment bzw. in modal context X=MS und current environment_M.
  *------------------------------------------*/
 
 
@@ -10884,8 +9739,8 @@ sb_primelemrole(X,RName1, 'domain-range'(CName1,CName2,CNameDef)):-
 /*---------------------------------------------------------------------------
  * sb_primelemrole(EnvName,MS,RName1,domain-range(CName1,CName2,CNameDef))
  * definiert eine neue generelle Rolle RName1 mit CName1 als domain, CName2 
- * als range und CNameDef als "default value restriction" in modal context MS 
- * und environment_M EnvName.
+ * als range und CNameDef als "default value_M restriction" in modal context MS 
+ * und environment EnvName.
  *------------------------------------------*/
 
 sb_primelemrole(EnvName,MS,RName1, 'domain-range'(CName1,CName2,CNameDef)):-
@@ -10915,7 +9770,7 @@ sb_defelemrole(RName1, restricts(RName2, range(CName1,CNameDef))):-
 /*----------------------------------------------------------------------------
  * sb_defelemrole(X,RName1,restricts(RName2,range(CName1,CNameDef)))
  * restrigniert die Rolle RName2 bzgl. des Rollenfuellers, auf CName1,
- * in modal context [] und X=environment_M bzw. in modal context X=MS und 
+ * in modal context [] und X=environment bzw. in modal context X=MS und 
  * current environment_M.
  *------------------------------------------*/
 
@@ -10933,7 +9788,7 @@ sb_defelemrole(X,RName1, restricts(RName2, range(CName1,CNameDef))):-
 /*----------------------------------------------------------------------------
  * sb_defelemrole(EnvName,MS,RName1,restricts(RName2,range(CName1,CNameDef)))
  * restrigniert die Rolle RName2 bzgl. des Rollenfuellers, auf CName1,
- * in modal context MS und  environment_M EnvName. 
+ * in modal context MS und  environment EnvName. 
  *------------------------------------------*/
 
 
@@ -11109,7 +9964,7 @@ sb_defelem(ICName1,SpecListe) :-
 
 
 /*-----------------------------------------------------------------------------
- *Wie oben, nur in A=environment_M und modal context [], bzw. in current environment_M
+ *Wie oben, nur in A=environment und modal context [], bzw. in current environment_M
  *und modal context A=MS.
  *-----------------------------------------*/
 
@@ -11128,7 +9983,7 @@ sb_defelem(A,ICName1,SpecList) :-
 
 
 /*-----------------------------------------------------------------------------
- *Wie oben, nur explizit in environment_M EnvName und modal context MS.
+ *Wie oben, nur explizit in environment EnvName und modal context MS.
  *-----------------------------------------*/
 
 
@@ -11271,9 +10126,9 @@ sb_ask(EnvName,MS,(subrole(Subrole,Superrole))) :-
 
 sb_ask(EnvName,MS,(irole(R,X,Y))) :-
 	environment_M(EnvName,Env,_),
-	convertMS(negative,Env,[[],true],MS,[],[W1,G1],_),
-	EqLiteral = eq(Env,rn(_AX,_RN,_S,_O),modal(W1),Y,CON,A1,X,Pc,call(_CALLS),ab(noAb),Exp,Gd,Od,L1,L2,Anc1,Anc2,Y,_PT),
-%	EqLiteral = eq(Env,rn(_AX,_RN,_S,_O),modal(W1),Y,app((FF:R),X),hyp(_HYPS),ab(noAb),call(_CALLS),_PT),
+	convertMS(vNegative,Env,[[],true],MS,[],[W1,G1],_),
+	EqLiteral = eq_M(Env,rn(_AX,_RN,_S,_O),modal(W1),Y,CON,A1,X,Pc,call(_CALLS),ab(noAb),Exp,Gd,Od,L1,L2,Anc1,Anc2,Y,_PT),
+%	EqLiteral = eq_M(Env,rn(_AX,_RN,_S,_O),modal(W1),Y,app((FF:R),X),hyp(_HYPS),ab(noAb),call(_CALLS),_PT),
 	call(G1),
 	call(EqLiteral).
 
@@ -11346,7 +10201,7 @@ sb_fact(EnvName,MS,(allRoles(RName,CName,CNameRan,[RName,CName,CNameRan]))) :-
 % Author: Patrick Brandmeier
 
 sb_ask(EnvName,MS,(direct_super_role(RName,CNameDom,CNameRan,RName,SCNameDom,CNameRan))) :-
-	var(CNameDom),
+	is_ftVar(CNameDom),
 	getDirectSubConcepts(EnvName,MS,SCNameDom,CL),
 	member(CNameDom,CL),
 	!.
@@ -11397,7 +10252,7 @@ sb_ask(EnvName,MS1,(rall(RName,CNameDom,CNameRan,CNameDef,MinNr,MaxNr,DefNr))) :
 	environment_M(EnvName,Env,_),
 	hop_map(negate_m,MS1,MS2),
 	hop_map(normalizeNot,MS2,MS3),
-	convertMS(negative,Env,[[],true],MS3,[],[W1,G1],_),
+	convertMS(vNegative,Env,[[],true],MS3,[],[W1,G1],_),
 	call(G1),
 	roleAll(Env,W1,RName,CNameDom,CNameRan,CNameDef,MinNr,MaxNr,DefNr),
 	!.
@@ -11631,7 +10486,7 @@ unmake_defconcept(EnvName,MS,CName1 , necres(RTerm, _),CNameDom):-
 
 
 unexpand_role(_,_,RTerm,RTerm) :-
-	 atomic(RTerm),
+	 isFORTIC(RTerm),
 	 !.
 
 unexpand_role(EnvName,MS,RTerm,R1) :-
@@ -11903,13 +10758,13 @@ sb_fact(P1,P2,P3) :-
 	sb_fact(EnvName,MS,Query,Proof).
 
 sb_fact(EnvName,MS,mudIsa(X,C),Exp) :-
-	retractall1_M(hypothesis(_)),
+	retractall1_M(hypothesis_M(_)),
  	environment_M(EnvName,Env,_),
- 	convertMS(negative,Env,[[],true],MS,[],[W1,G1],_),
+ 	convertMS(vNegative,Env,[[],true],MS,[],[W1,G1],_),
  	getNegatedConcept(C,C1),
  	getFactQuery(Env,W1,C,X,Exp,Goal),
  	call((call(G1), Goal)),
- 	atomic(X),
+ 	isFORTIC(X),
 	allowedAnswerConcept(Env,C).
 sb_fact(EnvName,MS,(role(RName,CNameDom,CNameRan)),proved(fact,basedOn(tbox))) :-
 	environment_M(EnvName,Env,_),
@@ -11921,9 +10776,9 @@ sb_fact(EnvName,MS,(attributes(CN,Attribute,Value)),proved(fact,basedOn(tbox))) 
 sb_fact(EnvName,MS,(attributes(CN,RN,Attribute,Value)),proved(fact,basedOn(tbox))) :-
 	attribute(role,EnvName,MS,[CN,RN],[Attribute,Value]).
 sb_fact(EnvName,MS,irole(R,X,Y),Exp) :-
-	retractall1_M(hypothesis(_)),
+	retractall1_M(hypothesis_M(_)),
 	environment_M(EnvName,Env,_),
-	convertMS(negative,Env,[[],true],MS,[],[W1,G1],_),
+	convertMS(vNegative,Env,[[],true],MS,[],[W1,G1],_),
 	getFactQuery(Env,W1,Y,R,X,Exp,Goal),
 	call(G1), 
 	call(Goal).
@@ -11941,27 +10796,27 @@ getFactQuery(Env,W1,Y,R,X,PT,Goal) :-
 	!.
 
 getRoleDomain(Env,MS1,RName,CDom) :-
-	convertMS(negative,Env,[[],true],MS1,[],[W1,G1],_),
+	convertMS(vNegative,Env,[[],true],MS1,[],[W1,G1],_),
 	clause(roleDomain(Env,W1,RName,CDom),_),
 	once((call(G1),roleDomain(Env,W1,RName,CDom))).
 
 getRoleRange(Env,MS1,RName,CRange) :-
-	convertMS(negative,Env,[[],true],MS1,[],[W1,G1],_),
+	convertMS(vNegative,Env,[[],true],MS1,[],[W1,G1],_),
 	clause(roleRange(Env,W1,RName,CRange),_),
 	once((call(G1),roleRange(Env,W1,RName,CRange))).
 
 getRoleDefault(Env,MS1,RName,CNameDef) :-
-	convertMS(negative,Env,[[],true],MS1,[],[W1,G1],_),
+	convertMS(vNegative,Env,[[],true],MS1,[],[W1,G1],_),
 	clause(roleDefault(Env,W1,RName,CNameDef),_),
 	once((call(G1),roleDefault(Env,W1,RName,CNameDef))).
 
 getRoleNr(Env,MS1,RName,MinNr,MaxNr) :- 
-	convertMS(negative,Env,[[],true],MS1,[],[W1,G1],_),
+	convertMS(vNegative,Env,[[],true],MS1,[],[W1,G1],_),
 	clause(roleNr(Env,W1,RName,MinNr,MaxNr),_),
 	once((call(G1),roleNr(Env,W1,RName,MinNr,MaxNr))).
 
 getRoleDefNr(Env,MS1,R1,DefNr) :-
-	convertMS(negative,Env,[[],true],MS1,[],[W1,G1],_),
+	convertMS(vNegative,Env,[[],true],MS1,[],[W1,G1],_),
 	clause(roleDefNr(Env,W1,R1,DefNr),_),
 	once((call(G1),roleDefNr(Env,W1,R1,DefNr))).
 
@@ -12062,7 +10917,7 @@ assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,isTDisjoint(D)) :-
 	asserta_new((InHead1 :- (cCS(CALLS,Mark1), (call(G1), once(Body))))),
 	!.
 assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,nafM(D)) :-
-	% in the consequence isTDisjoint andM nafM have the same meaning
+	% in the consequence isTDisjoint and nafM have the same meaning
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
 	gensym(rule,RuleName),
 	ruleName(AxiomName,RuleName,O,Orientation,RN1),
@@ -12130,7 +10985,7 @@ assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,b(MOp,P1,D)) :-
 	gensym(rule,RuleName),
 	ruleName(AxiomName,RuleName,O,Orientation,RN1),
 	genagent(P1,free,P),
-	C1 = rel(Env,_,m(MOp,P),W1,W2),
+	C1 = rel_M(Env,_,m(MOp,P),W1,W2),
 	convertInAntecedent(Env,rn(AxiomName,_AnySource1,Orientation),
 	                    bodyMC(W1),headMC(W2),CN,X,HYPS,AB,CALLS,PT1,Body),
 	constructMLHead(Env,RN1,W2,D,X,HYPS,AB,CALLS,andM([C1,PT1]),InHead1),
@@ -12142,7 +10997,7 @@ assertConceptLInR(Env,rn(AxiomName,O,Orientation),MS,CN,bc(MOp,C,D)) :-
 	gensym(rule,RuleName),
 	ruleName(AxiomName,RuleName,O,Orientation,RN1),
 	genagent(P1,free,P),
-	C1 = rel(Env,_,m(MOp,P),W1,W2),
+	C1 = rel_M(Env,_,m(MOp,P),W1,W2),
 	convertInAntecedent(Env,rn(AxiomName,_AnySource1,Orientation),
 	                    bodyMC(W1),headMC(W2),CN,X,HYPS,AB,CALLS,PT1,Body1),
 	convertInAntecedent(Env,rn(AxiomName,_AnySource2,Orientation),
@@ -12286,19 +11141,19 @@ convertOrList(Env,Name,bodyMC(W1),MC2,[CTerm|CTermList],X,
  */
 
 convertInAntecedent(Env,rn(AX,S1,_O),MC1,MC2,D,X,HYPS,AB,CALLS,PT1,InHead) :-
-	(var(D) ; atomic(D)),
+	(is_ftVar(D) ; isFORTIC(D)),
 	!,
 	constructMLCall(Env,rn(AX,_RN1,S1,_O1),MC1,MC2,
 	                D,X,HYPS,AB,CALLS,PT1,InHead).
 convertInAntecedent(Env,rn(AX,Source,_O),MC1,MC2,setM(S1),X,HYPS,AB,CALLS,PT1,Body) :-
 	constructMLCall(Env,rn(AX,_RN1,Source,_O1),MC1,MC2,
 	                setM(S1),X,HYPS,AB,CALLS,PT1,InHead1),
-	Body = ((nonvar(S1), (nongeneric(X), member(X,S1))) ; InHead1),
+	Body = ((not_ftVar(S1), (nongeneric(X), member(X,S1))) ; InHead1),
 	!.
 convertInAntecedent(Env,rn(AX,Source,_O),MC1,MC2,isTDisjoint(setM(S1)),X,HYPS,AB,CALLS,PT1,Body) :-
 	constructMLCall(Env,rn(AX,_RN1,Source,_O1),MC1,MC2,
 	                isTDisjoint(setM(S1)),X,HYPS,AB,CALLS,PT1,InHead1),
-	Body = ((nonvar(S1), (atomic(X), (nongeneric(X), not(member(X,S1)))) ; InHead1)),
+	Body = ((not_ftVar(S1), (isFORTIC(X), (nongeneric(X), not(member(X,S1)))) ; InHead1)),
 	!.
 convertInAntecedent(Env,Name,MC1,MC2,andM(L),X,HYPS,AB,CALLS,andM(PTL),Body) :-
 	convertAndList(Env,Name,MC1,MC2,L,X,HYPS,AB,CALLS,Body,PTL),
@@ -12316,18 +11171,18 @@ convertInAntecedent(Env,rn(AX,S1,_O1),bodyMC(MS1),MC2,
 	            nafM(D),X,HYPS,AB,CALLS,PT1,Body) :-
 	% in the antecedent `x in nafM(D) is provable' means 
 	% `x in D is isTDisjoint provable'
-	atomic(D),
+	isFORTIC(D),
 	!,
 	HYPS = [orM(H1),rl(H2),fl(H3)],
 	NewHYPS = [orM(H1),rl([]),fl(H3)],
 	convertInAntecedent(Env,rn(AX,S1,_O1),bodyMC(MS1),MC2,D,X,NewHYPS,
 			    AB,CALLS,PT2,BodyD),
-	PT1 = byDefault(in(MS1,isTDisjoint(D),X),hyp(NewHYPS),basedOn([])),
+	PT1 = byDefault(in_M(MS1,isTDisjoint(D),X),hyp(NewHYPS),basedOn([])),
 	constructMLHead(Env,rn(AX,_RN3,_S3,_O3),MS1,isTDisjoint(D),X,
 			HYPS,AB,_CALLS,_,DefaultMLTerm),
 	constructMLMark(DefaultMLTerm,DefaultTerm),
 	L1 = addDefaultML(DefaultTerm,H3),
-%	L1 = asserta_new(hypothesis(in(Env,modal(MS1),isTDisjoint(D),X,hyp(HYPS),ab(AB),PT1))),
+%	L1 = asserta_new(hypothesis_M(in_M(Env,modal(MS1),isTDisjoint(D),X,hyp(HYPS),ab(AB),PT1))),
 	constructMLMark(BodyD,MarkD),
 	Body = (member(MarkD,HYPS) ; (nongeneric(X), (isTDisjoint(BodyD), nongeneric(X), L1))),
 	!.
@@ -12341,25 +11196,25 @@ convertInAntecedent(Env,rn(AX,S1,_O1),bodyMC(MS1),MC2,
 			    AB,CALLS,PT2,BodyD),
 	constructMLMark(BodyD,MarkD),
 	normalizeNot(isTDisjoint(D),D1),
-	PT1 = byDefault(in(MS1,D1,X),hyp(NewHYPS),basedOn([])),
+	PT1 = byDefault(in_M(MS1,D1,X),hyp(NewHYPS),basedOn([])),
 	constructMLHead(Env,rn(AX,_RN3,_S3,_O3),MS1,D1,X,
 			HYPS,AB,_CALLS,_,DefaultMLTerm),
 	constructMLMark(DefaultMLTerm,DefaultTerm),
 	L1 = addDefaultML(DefaultTerm,H3),
-%	L1 = asserta_new(hypothesis(in(Env,modal(MS1),D1,X,hyp(HYPS),ab(AB),PT1))),
+%	L1 = asserta_new(hypothesis_M(in_M(Env,modal(MS1),D1,X,hyp(HYPS),ab(AB),PT1))),
 	Body = (nongeneric(X), (isTDisjoint(BodyD), nongeneric(X), L1)),
 	!.
 convertInAntecedent(Env,rn(AX,S1,_O1),MC1,MC2,
 	            allM(R,D),X,HYPS,AB,CALLS,orM([andM([PT2,PT1]),PT3]),
                     ((EqLiteral, Body); (InHead2; (C1, (C2, C3))))) :-
 	% create a new skolem constant 
-	gensymbol(skolem,[X,Y],SF),
+	gensymbol(skolem_M,[X,Y],SF),
 	% construct equational literal
 	constructEqCall(Env,rn(AX,_RN1,_S2,_O2),MC1,MC2,Y,SF,R,X,HYPS,AB,CALLS,PT2,EqLiteral),
 	convertInAntecedent(Env,rn(AX,S1,_O3),MC1,MC2,D,Y,HYPS,AB,CALLS,PT1,Body),
 	constructMLCall(Env,rn(AX,_RN4,_S4,_O4),MC1,MC2,isTDisjoint(normal(R)),X,HYPS,AB,CALLS,PT3,InHead2),
 	MC1 = bodyMC(W1),
-	C1 = closed(Env,MS,X,_,R),
+	C1 = closed_M(Env,MS,X,_,R),
 	C2 = collectAllFillers(Env,W1,R,X,HYPS,D,CALLS,S),
 	C3 = mapGoal(Body,Y,S),
 	!.
@@ -12452,14 +11307,14 @@ convertInAntecedentList(Env,Name,MC1,MC2,[NCT|NCTs],X,
  */
 
 convertInConsequence(Env,Pr,rn(AX,RN,_S,O),MS,W1,D,X,HYPS,AB,CALLS,PT1,InHead) :-
-	(var(D) ; atomic(D)),
+	(is_ftVar(D) ; isFORTIC(D)),
 	!,
 	typeOfDefinition(Env,MS,D,S2),
 	constructKBHead(Env,Pr,rn(AX,RN,S2,O),W1,D,X,HYPS,AB,CALLS,PT1,InHead).
 convertInConsequence(Env,Pr,rn(AX,RN,_S,O),MS,W1,someM(R,D),X,
                      HYPS,AB,CALLS,PT1,(EqLiteral, InHead)) :-
 	% construct equational literal
-	gensymbol(skolem,[X,Y],SF),
+	gensymbol(skolem_M,[X,Y],SF),
 	constructEqCall(Env,rn(AX,_RN2,_S2,_O2),bodyMC(W1),headMC(W1),
 	                Y,SF,R,X,HYPS,AB,CALLS,PT2,EqLiteral),
 	typeOfDefinition(Env,MS,D,S2),
@@ -12492,7 +11347,7 @@ convertInConsequence(Env,Pr,rn(AX,RN,_S,O),MS,W1,isTDisjoint(D),X,
 	!.
 convertInConsequence(Env,Pr,rn(AX,RN,_S,O),MS,W1,nafM(D),X,
                      HYPS,AB,CALLS,PT1,InHead) :-
-	% in the consequence isTDisjoint andM nafM have the same meaning
+	% in the consequence isTDisjoint and nafM have the same meaning
 	typeOfDefinition(Env,MS,D,S2),
 	constructKBHead(Env,Pr,rn(AX,RN,S2,O),W1,isTDisjoint(D),X,
 			HYPS,AB,CALLS,PT1,InHead),
@@ -12541,14 +11396,14 @@ convert_loop(no,CALLS,_,CALLS).
 convert_loop(_,CALLS,CON,[CON|CALLS]).
 
 convertToGoal(Env,RN,MS1,CN,X,HYPS,AB,CALLS,PT,G) :-
-	convertMS(negative,Env,[[],true],MS1,[],[W1,G1],_),
+	convertMS(vNegative,Env,[[],true],MS1,[],[W1,G1],_),
 	getQuery(Env,W1,CN,X,PT,G),
-%	G = call((in(Env,RN,modal(W1),CN,X,hyp(HYPS),ab(AB),call(CALLS),PT), G1)),
+%	G = call((in_M(Env,RN,modal(W1),CN,X,hyp(HYPS),ab(AB),call(CALLS),PT), G1)),
 	!.
 
 	
 nongeneric(X) :-
-	var(X),
+	is_ftVar(X),
 	!.
 nongeneric(aaa) :-
 	!,
@@ -12558,11 +11413,11 @@ nongeneric(_) :-
 
 
 ground(T,Result) :-
-	var(T),
+	is_ftVar(T),
 	!,
 	Result = false.
 ground(T,Result) :-
-	atomic(T),
+	isFORTIC(T),
 	!,
 	Result = true.
 ground(T,Result) :-
@@ -12620,14 +11475,14 @@ assertRoleLInR(Env,MS,R1,restr(R2,C),AN) :-
 assertRoleLInR(Env,MS,R1,R2,AN) :-
 	!,
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	gensymbol(skolem,[X,Y],SF1),
+	gensymbol(skolem_M,[X,Y],SF1),
 	gensym(rule,RN1),
 	ruleName(AN,RN1,user,lInR,Name1),
 	constructEqHead(Env,Name1,W1,Y,SF1,R2,X,HYPS,AB,CALLS,PT1,EqLiteral2),
 	constructEqMark(rn(AN,RN1,_S2,_O2),W1,Y,SF1,R2,X,HYPS,AB,CALLS,EqMark2),
 	constructEqCall(Env,rn(AN,RN1,_S3,_O3),bodyMC(W1),headMC(W1),Y,_FF,R1,X,HYPS,AB,CALLS,PT1,EqLiteral1),
 	asserta_new((EqLiteral2 :- (cCS(CALLS,EqMark2), (call(G1), EqLiteral1)))),
-	gensymbol(skolem,[X,Y],SF2),
+	gensymbol(skolem_M,[X,Y],SF2),
 	gensym(rule,RN2),
 	constructConHead(Env,rn(AN,RN2,user,lInR),W1,SF2,R2,X,'>=',N,
                          HYPS,AB,CALLS,PT1,C2),
@@ -12636,7 +11491,7 @@ assertRoleLInR(Env,MS,R1,R2,AN) :-
 	C1 = solveConstraint(Env,W1,(card,app((_FF:R1),X),'>=',N),_,hyp(HYPS),ab(AB),call([Mark1|CALLS]),PT1),
 	asserta_new((C2 :- (cCS(CALLS,Mark2), (call(G1), C1)))),
 	gensym(rule,RN5),
-	gensym(skolem,SF3),
+	gensym(skolem_M,SF3),
 	constructConHead(Env,rn(AN,RN5,user,lInR),W1,SF3,R1,X,'=<',N,
                          HYPS,AB,CALLS,PT1,C4),
 	constructConMark(C4,Mark4),
@@ -12648,8 +11503,8 @@ assertRoleLInR(Env,MS,R1,R2,AN) :-
  *
  * assertRoleLInRRestr1(+MS,+R1,restr(+R2,+C),+AN)
  * handles the case R1 is included in restr(R2,C).
- * asserts the constraints andM membership clauses describing the 
- * relationship of R1 andM R2.
+ * asserts the constraints and membership clauses describing the 
+ * relationship of R1 and R2.
  *
  */
 
@@ -12662,7 +11517,7 @@ assertRoleLInRRestr1(Env,MS,R1,restr(R2,C),AN) :-
 	constructEqCall(Env,rn(AN,RN1,_S2,_O2),bodyMC(W1),headMC(W1),
 	                Y,F,R1,X,HYPS,AB,[InMark|CALLS],PT1,EqLiteral11),
 	asserta_new((InHead :- (cCS(CALLS,InMark), (call(G1), (EqLiteral11, ground(Y,true)))))),
-	gensym(skolem,SF),
+	gensym(skolem_M,SF),
 	gensym(rule,RN2),
 	typeOfDefinition(Env,MS,C,S2),
 	constructEqHead(Env,rn(AN,RN2,S2,lInR),W1,Y,SF,R2,X,
@@ -12701,7 +11556,7 @@ assertRoleLInRRestr3(Env,MS,R1,restr(R2,C),AN) :-
  *                          +R3,restr(+R2,+C2),+AN)
  * handles the case R1 is included in restr(R2,C).
  * asserts the constraints describing the relationship between 
- * R1 = restr(R2,C1), R3 = restr(R2,isTDisjoint(C1)) andM R2.
+ * R1 = restr(R2,C1), R3 = restr(R2,isTDisjoint(C1)) and R2.
  *
  */
 
@@ -12731,7 +11586,7 @@ assertAndRoleLInR(_,_MS,_,andM([]),_AN) :-
 	!.
 assertAndRoleLInR(Env,MS,R1,andM([R2|RL]),AN) :-
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	gensym(skolem,SF),
+	gensym(skolem_M,SF),
 	gensym(rule,RN),
 	constructEqHead(Env,rn(AN,RN,user,lInR),
                         W1,Y,SF,R2,X,HYPS,AB,CALLS,PT1,EqLiteral2),
@@ -12756,7 +11611,7 @@ assertAndConstraintLInR(Env,MS,R1,andM([R2|RL]),AN) :-
 	constructConHead(Env,Name,W1,_FF,R1,X,Rel,N,HYPS,AB,CALLS,PT2,C1),
 	constructConMark(C1,Mark1),
 	constructSolveConMark(rn(AN,RN,_S1,_O1),W1,_FF2,R2,X,Rel,N,HYPS,AB,CALLS,Mark2),	
-	gensymbol(skolem,[X],SF),
+	gensymbol(skolem_M,[X],SF),
 	C2 = solveConstraint(Env,W1,(card,app((SF:R2),X),Rel,N),_,hyp(HYPS),ab(AB),call([Mark2|CALLS]),PT2),
 	asserta_new((C1 :- cCS(CALLS,Mark1), (call(G1), C2))),
 	assertAndConstraintLInR(Env,MS,R1,andM(RL),AN).
@@ -12776,7 +11631,7 @@ assertAndConstraintRInL(Env,MS,R1,andM([R2|RL]),AN) :-
 	                 HYPS,AB,CALLS,PT2,C1),
 	constructConMark(C1,Mark1),
 	constructSolveConMark(rn(AN,RN,_S1,_O1),W1,_FF1,R1,X,'>=',N,HYPS,AB,CALLS,Mark2),
-	gensymbol(skolem,[X],SF),
+	gensymbol(skolem_M,[X],SF),
 	C2 = solveConstraint(Env,W1,(card,app((SF:R1),X),'>=',N),_,hyp(HYPS),ab(AB),call([Mark2|CALLS]),PT2),
 	asserta_new((C1 :- cCS(CALLS,Mark1), (call(G1), C2))),
 	assertAndConstraintRInL(Env,MS,R1,andM(RL),AN).
@@ -12823,7 +11678,7 @@ assertRoleRInL(Env,MS,R1,restr(R2,C), AN) :-
 assertRoleRInL(Env,MS,R1,andM(RL),AN) :-
 	!,
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	gensymbol(skolem,[X,Y],SF),
+	gensymbol(skolem_M,[X,Y],SF),
 	gensym(rule,RN1),
 	roleBody(Env,W1,andM(RL),X,Y,HYPS,AB,CALLS,AN,Body,PTL),
 	constructEqHead(Env,rn(AN,RN1,user,rInL),
@@ -12834,7 +11689,7 @@ assertRoleRInL(Env,MS,R1,andM(RL),AN) :-
 assertRoleRInL(Env,MS,R1,R2,AN) :-
 	!,
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	gensymbol(skolem,[X,Y],SF),
+	gensymbol(skolem_M,[X,Y],SF),
 	gensym(rule,RN1),
 	constructEqHead(Env,rn(AN,RN1,user,rInL),W1,X,SF,R1,Y,
 	                HYPS,AB,CALLS,PT1,EqLiteral1),
@@ -12850,7 +11705,7 @@ assertRoleRInL(Env,MS,R1,R2,AN) :-
 	C1 = solveConstraint(Env,W1,(card,app((_FF:R2),X),'>=',N),_,hyp(HYPS),ab(AB),call([Mark1|CALLS]),PT1),
 	asserta_new((C2 :- (cCS(CALLS,Mark2), (call(G1), C1)))),
 	gensym(rule,RN5),
-	gensym(skolem,SF3),
+	gensym(skolem_M,SF3),
 	constructConHead(Env,rn(AN,RN5,user,rInL),W1,SF3,R2,X,'=<',N,
 	                 HYPS,AB,CALLS,PT5,C4),
 	constructConMark(C4,Mark4),
@@ -12865,7 +11720,7 @@ assertRoleRInL(Env,MS,R1,R2,AN) :-
  * If there is already a role name R for restr(R2,CNF) then R3
  * will be instantiated with R.
  * If there is no role name for restr(R2,CNF) then a role name R
- * is generated, clauses for R will be provided, andM R3 will be
+ * is generated, clauses for R will be provided, and R3 will be
  * instantiated with R.
  *
  */
@@ -12893,14 +11748,14 @@ getComplementRole(Env,MS,_R1,restr(R2,C),R3,restr(R2,CNF)) :-
  *
  * assertRoleRInLRestr1(+MS,+R1,restr(+R2,C),+AN)
  * handles the case restr(R2,C) is included in R1.
- * asserts the constraints andM membership clauses describing the 
- * relationship of R1 andM R2.
+ * asserts the constraints and membership clauses describing the 
+ * relationship of R1 and R2.
  *
  */
 
 assertRoleRInLRestr1(Env,MS,R1,restr(R2,C),AN) :-
 	convertMS(positive,Env,[[],true],MS,[],[W1,G1],_),
-	gensymbol(skolem,[X,Y],SF),
+	gensymbol(skolem_M,[X,Y],SF),
 	gensym(rule,RN),
 	constructEqHead(Env,rn(AN,RN,user,rInL),
                         W1,Y,SF,R1,X,HYPS,AB,CALLS,andM([PTEq2,PTIn]),EqLiteral1),
@@ -12989,279 +11844,6 @@ roleBody(Env,MS,andM([R1|RL]),X,Y,HYPS,AB,CALLS,AN,(EqLiteral, Body),[PT1|PTL]) 
 
 
 
-
-
-
-
-
-/**********************************************************************
- *
- * @(#) testMotel.pl 1.6@(#)
- *
- */
-
-testMotel :-
-	testAllMotelExamples(1),
-	!.
-
-testMotel(N) :-
-	testAllMotelExamples(N),
-	!.
-
-testAllMotelExamples(64) :-
-	print('Test complete'), nl, nl,
-	!.
-testAllMotelExamples(N) :-
-	initializeMotel,
-	% print('Example '), print(N), nl,
-        flag(current_example,_,N),
-        example(N),
-	once(testMotelExample(N)),
-	M is N + 1,
-	testAllMotelExamples(M).
-
-go_goal_for_example:-!.
-go_goal_for_example :- print('No goal for this example'), nl.
-
-testMotelExample(1) :-	
-	go_goal_for_example.
-testMotelExample(2) :-
-	printTime(setof(C,E^deduce_M(ex2,[],mudIsa(iMary,C),E),L1)), print(L1), nl,
-	printTime(setof(D,F^deduce_M(ex2,[],mudIsa(iTom,D),F),L2)), print(L2), nl.
-testMotelExample(3) :-
-	tryGoal(inconsistent(ex3)).
-testMotelExample(4) :-
-	go_goal_for_example.
-testMotelExample(5) :-
-	tryGoal(isTDisjoint(subsumes([],c1,c2))),
-	tryGoalF(subsumes([],c2,c1)).
-testMotelExample(6) :-
-	tryGoal(isTDisjoint(subsumes([],c1,c2))),
-	tryGoalF(subsumes([],c2,c1)).
-testMotelExample(7) :-
-	go_goal_for_example.
-testMotelExample(8) :-
-	tryGoal(deduce_M(mudIsa(iTom,heterosexual))).
-testMotelExample(9) :-
-	tryGoal(deduce_M(mudIsa(iChris,tMale))).
-testMotelExample(10) :-
-	tryGoal(deduce_M(mudIsa(iTom,c2))).
-testMotelExample(11) :-
-	tryGoal(inconsistent(ex11)).
-testMotelExample(12) :-
-	tryGoal(subsumes([],c1,c2)),
-	tryGoal(isTDisjoint(subsumes([],c2,c1))).
-testMotelExample(13) :-
-	tryGoal(subsumes([],c1,c2)).
-testMotelExample(14) :-
-%	initializeMotel, print('Example 14'), nl, example(14),
-%	tryGoal(subsumes([],c2,c1)),
-	!.
-testMotelExample(15) :-
-	tryGoal(subsumes([],c2,c1)).
-testMotelExample(16) :-
-	tryGoalF(subsumes([],c2,c1)).
-testMotelExample(17) :-
-	tryGoalF(subsumes([],c2,c1)).
-testMotelExample(18) :-
-	tryGoal(deduce_M(mudIsa(iMary,c4))).
-testMotelExample(19) :-
-	tryGoalF(deduce_M(mudIsa(iAmy,tFemale))).
-testMotelExample(20) :-
-	tryGoal(inconsistent(ex20)).
-testMotelExample(21) :-
-	go_goal_for_example,
-% 	deduce_M(mudIsa(betty,tFemale)),
-	!.
-testMotelExample(22) :-
-% 	deduce_M(mudIsa(iAmy,tFemale)),
-	go_goal_for_example.
-testMotelExample(23) :-
-% 	deduce_M(mudIsa(iAmy,tFemale))
-	go_goal_for_example.
-testMotelExample(24) :-
-	tryGoal(deduce_M(mudIsa(audi,c3))).
-testMotelExample(25) :-
-	tryGoal(isTDisjoint(deduce_M(mudIsa(audi,c3)))).
-testMotelExample(26) :-
-	tryGoal(isTDisjoint(subsumes([],c1,c2))),
-	tryGoalF(subsumes([],c2,c1)).
-testMotelExample(27) :-
-	tryGoal(isTDisjoint(subsumes([],c1,c2))),
-	tryGoalF(subsumes([],c2,c1)).
-testMotelExample(28) :-
-	tryGoalF(deduce_M(ex29,[b(believe,iJohn)],mudIsa(audi,tAutomobile),_P)).
-testMotelExample(29) :-
-	go_goal_for_example.
-testMotelExample(30) :-
-	go_goal_for_example.
-testMotelExample(31) :-
-	tryGoal(deduce_M(mudIsa(iTom,onlyMaleChildren))).
-testMotelExample(32) :-
-	tryGoal(abduce(_H1,mudIsa(robin,tMale),_E1)),
-	tryGoal(abduce(_H2,mudIsa(robin,tFemale),_E2)).
-testMotelExample(33) :-
-	tryGoal(abduce(_H3,mudIsa(nixon,dove),_E3)),
-	tryGoal(abduce(_H4,mudIsa(nixon,hawk),_E4)).
-testMotelExample(34) :-
-	tryGoal(inconsistent(ex34)).
-testMotelExample(35) :-
-	tryGoal(abduce(ex35,[],_H5,mudIsa(iJohn,tCanFly),_E5)),
-	tryGoal(isTDisjoint(abduce(ex35,[],_H8,mudIsa(iTweety,tCanFly),_E8))).
-testMotelExample(36) :-
-	tryGoal(abduce(ex36,[],_H6,mudIsa(nixon,dove),_E6)),
-	tryGoal(abduce(ex36,[],_H7,mudIsa(nixon,hawk),_E7)).
-testMotelExample(37) :-
-	go_goal_for_example.
-testMotelExample(38) :-
-	tryGoal(deduce_M(mudIsa(ideaste,c2))).
-testMotelExample(39) :-
-	tryGoal(deduce_M(mudIsa(lucky,tFemale))),
-	tryGoal(assert_ind(lucky,tMale)),
-	tryGoalF(isTDisjoint(deduce_M(mudIsa(lucky,tFemale)))),
-	tryGoal(consistent([])).
-testMotelExample(40) :-
-	tryGoal(deduce_M(mudIsa(iPeter,tRichPerson))),
-	tryGoal(assert_ind(iPeter,poorPerson)),
-	tryGoalF(isTDisjoint(deduce_M(mudIsa(iPeter,tRichPerson)))),
-	tryGoal(consistent([])),
-	tryGoal(isTDisjoint(subsumes(tRichPerson,tDoctor))).
-testMotelExample(41) :-
-	tryGoal(deduce_M(mudIsa(iTom,tRichPerson))),
-	tryGoal(assert_ind(iTom,poorPerson)),
-	tryGoalF(isTDisjoint(deduce_M(mudIsa(iTom,tRichPerson)))),
-	tryGoal(consistent([])).
-testMotelExample(42) :-
-	tryGoal(deduce_M(mudIsa(audi,fourWheels))),
-	tryGoal(assert_ind(audi,fiveWheels)),
-	tryGoalF(isTDisjoint(deduce_M(mudIsa(audi,fourWheels)))),
-	tryGoal(consistent([])).
-testMotelExample(43) :-
-	tryGoal(deduce_M(mudIsa(r,red))),
-	tryGoal(deduce_M(mudIsa(r,redOrYellow))),
-	tryGoal(deduce_M(mudIsa(r,colors))).
-testMotelExample(44) :-
-	tryGoalF(subsumes(c2,c12)).
-testMotelExample(45) :-
-	go_goal_for_example.
-testMotelExample(46) :-
-	go_goal_for_example.
-testMotelExample(47) :-
-	tryGoalF(deduce_M(mudIsa(bmw,c3))).
-testMotelExample(48) :-
-	go_goal_for_example.
-testMotelExample(49) :-
-	tryGoal(isTDisjoint(deduce_M(mudIsa(p,c4)))).
-testMotelExample(50) :-
-	tryGoal(deduce_M(mudIsa(iPeter,c0))).
-
-testMotelExample(51) :-
-	tryGoal(deduce_M(posInfl(a,d))),
-	tryGoal(deduce_M(posInfl(b,d))),
-	tryGoal(bagof(Y1,deduce_M(posInfl(a,Y1)),Y1s)),
-	tryGoal(verifySolution(Y1s,[b,c,d,g])),
-	tryGoal(deduce_M(infl(a,d,1.0))),
-	tryGoal(bagof((X1,W1),deduce_M(infl(X1,e,W1)),X1W1Pairs)),
-	tryGoal(verifySolution(X1W1Pairs,[(a,0.0),(b,-1.0),(g,1.0)])),
-	tryGoal(deduce_M(simultInfl([a,h],d,2.0))),
-	tryGoal(deduce_M(change(d,1.0))),
-	tryGoal(bagof(X2,deduce_M(increase(X2)),X2s)),
-	tryGoal(verifySolution(X2s,[b,c,d,g,a])).
-
-testMotelExample(52) :-
-	tryGoal(deduce_M(negInfl(withRebate,hasOverallCost))),
-	tryGoal(deduce_M(posInfl(hasListPrice,hasOverallCost))),
-	tryGoal(deduce_M(posInfl(hasCubicCapacity,hasPrice))),
-	tryGoal(deduce_M(posInfl(hasCubicCapacity,hasOverallCost))),
-	tryGoal(deduce_M(posInfl(hasCatConverter,hasOverallCost))),
-	tryGoal(deduce_M(simultInfl([hasCubicCapacity,hasCatConverter],hasOverallCost,3.0))),
-	tryGoal(deduce_M(simultInfl([hasCubicCapacity,hasCatConverter],hasMaxSpeed,-1.0))),
-	tryGoal(deduce_M(leastInfl(hasCubicCapacity,hasMaxSpeed))),
-	tryGoal(deduce_M(leastInfls([hasCatConverter,hasCubicCapacity],hasMaxSpeed))),
-	tryGoal(deduce_M(maxPosInfl(hasCubicCapacity,hasOverallCost,2.0))),
-	tryGoal(bagof((X1,W1),deduce_M(maxNegInfl(X1,hasMaxSpeed,W1)),X1W1Pairs)),
-	tryGoal(verifySolution(X1W1Pairs,[(hasCatConverter,-1.0),(hasWeight,-1.0)])),
-	tryGoal(bagof(X2,deduce_M(increase(X2)),X2s)),
-	tryGoal(verifySolution(X2s,[hasFuelConsumption,hasListPrice,hasOverallCost,hasPrice,hasWeight,hasCubicCapacity])),
-	tryGoal(bagof((X3,W3),(deduce_M(leastInfl(X3,hasMaxSpeed)),abduce(change(X3,W3),change(hasMaxSpeed,1.0))),X3W3s)),
-	tryGoal(verifySolution(X3W3s,[(hasCatConverter,-1.0)])).
-testMotelExample(53) :-
-	go_goal_for_example.
-testMotelExample(54) :-
-	go_goal_for_example.
-testMotelExample(55) :-
-	go_goal_for_example.
-testMotelExample(56) :-
-	go_goal_for_example.
-testMotelExample(57) :-
-	go_goal_for_example.
-testMotelExample(58) :-
-	go_goal_for_example.
-testMotelExample(59) :-
-	tryGoal(sb_ask(mudIsa(iHarry,tRangeParent))),
-	tryGoal(sb_ask(mudIsa(iHarry,tAgentGeneric))),
-	printTime(setof((X,Y),sb_ask(role(mudChild,X,Y)),L1)), print(L1), nl,
-	printTime(setof(X,sb_ask(roleDef(mudChild,X)),L2)), print(L2), nl,
-	printTime(setof((X,Y),sb_ask(roleNr('marys-mudChild',X,Y)),L3)), print(L3), nl,
-	printTime(setof(X,sb_ask(roleDefNr('marys-mudChild',X)),L4)), print(L4), nl.
-testMotelExample(60) :-
-	tryGoal(deduce_M(ex60,[b(believe,iPeter)],mudIsa(iTom,tRichPerson),E)),
-	tryGoal(assert_ind([b(believe,iPeter)],iTom,isTDisjoint(tRichPerson))),
-	tryGoal(inconsistent([b(believe,iPeter)])).
-testMotelExample(61) :-
-	tryGoal(deduce_M(mudIsa(iTweety,tCanFly))),
-	tryGoal(deduce_M(mudIsa(iTweety,tCanNest))),
-	tryGoal(deduce_M(mudIsa(iTweety,isTDisjoint(tEmu)))),
-	tryGoal(deduce_M(mudIsa(iTweety,isTDisjoint(tCuckoo)))),
-	tryGoal(consistent([])).
-testMotelExample(62) :-
-	tryGoal(deduce_M(mudIsa(iTweety,tCanFly))),
-	tryGoal(deduce_M(mudIsa(iTweety,tCanNest))),
-	tryGoal(isTDisjoint(deduce_M(mudIsa(iTweety,isTDisjoint(tEmu))))),
-	tryGoal(isTDisjoint(deduce_M(mudIsa(iTweety,isTDisjoint(tCuckoo))))),
-	tryGoal(isTDisjoint(deduce_M(mudIsa(iTweety,tEmu)))),
-	tryGoal(isTDisjoint(deduce_M(mudIsa(iTweety,tCuckoo)))),
-	tryGoal(consistent([])).
-testMotelExample(63) :-
-	tryGoal(deduce_M(mudIsa(iTweety,tCanFly))),
-	tryGoal(deduce_M(mudIsa(iTweety,tCanNest))),
-	tryGoal(deduce_M(mudIsa(iTweety,isTDisjoint(tEmu)))),
-	tryGoal(deduce_M(mudIsa(iTweety,isTDisjoint(tCuckoo)))),
-	tryGoal(deduce_M(mudIsa(iTweety,sparrow))),
-	tryGoal(consistent([])).
-
-
-tryGoal(G) :-
-	call(G),
-	!. %print('Goal '), print(G), print(' succeeded'), nl.
-tryGoal(G) :-
-	print('Goal '), print(G), print(' failed'), nl.
-
-tryGoalF(G) :-
-	call(G),
-	!,
-	print('Goal '), print(G), print(' failed_Not'), nl.
-tryGoalF(G) :- !. % print('Goal '), print(G), print(' succeeded_Not'), nl.
-
-/***********************************************************************
- *
- * verifySolution(+TestSol,+ExpectedSol)
- *
- *	prints an error message if TestSol andM ExpectedSol do isTDisjoint
- *	match.
- */
-
-verifySolution(TestSol,ExpectedSol) :-
-	nonvar(ExpectedSol),
-	nonvar(TestSol),
-	!,
-	TestSol = ExpectedSol.
-verifySolution(TestSol,ExpectedSol) :-
-	print('Solutions differ: test solution is '),
-	print(TestSol),
-	print(', while expected solution is '),
-	print(ExpectedSol).
-
 /**********************************************************************
  *
  * @(#) unfold.pl 1.3@(#)
@@ -13271,19 +11853,19 @@ verifySolution(TestSol,ExpectedSol) :-
 /***********************************************************************
  *
  * unfold(Env,+Type,+CT,+List1,-CN,-List2)
- * Parameter: Type      'concept' orM 'role'
+ * Parameter: Type      'concept' or 'role'
  *            CT        concept term
  *            List1     List of tuples (Origin,T,T1,T2)
- *                      where Origin is either 'user' orM 'system'
- *                            T      is either 'concept' orM 'role'
- *                            T1     is a concept term orM role term
- *                            T2     is a concept term orM role term
+ *                      where Origin is either 'user' or 'system'
+ *                            T      is either 'concept' or 'role'
+ *                            T1     is a concept term or role term
+ *                            T2     is a concept term or role term
  *            CN        concept name
  *            List2     List of triples (Origin,CN,CT)
- * unfolds concept terms orM role terms so that in List2 for allM tuples
+ * unfolds concept terms or role terms so that in List2 for all tuples
  * (O,T,CN,allM(R1,C1)), (O,T,CN,andM([C1,...,Cn])), 
  * (O,T,RN,andM([R1,...,Rn])), ...
- * CN andM the Ci are concept names andM RN andM the Ri are role names.
+ * CN and the Ci are concept names and RN and the Ri are role names.
  *
  * 130892   UH   (c)
  *
@@ -13320,15 +11902,15 @@ unfold(Env,_O,_Side,role,RT,DL1,system,R,DL2) :-
  *
  * unfold(Env,+List1,-List2)
  * Parameter: List1     List of tuples (Origin,Type,T1,T2)
- *                      where Origin is either 'user' orM 'system'
- *                            T      is either 'concept' orM 'role'
- *                            T1     is a concept orM role term
- *                            T2     is a concept orM role term
+ *                      where Origin is either 'user' or 'system'
+ *                            T      is either 'concept' or 'role'
+ *                            T1     is a concept or role term
+ *                            T2     is a concept or role term
  *            List2     List of tuples (Origin,Type,CN,CT)
- * unfolds concept terms orM role terms so that in List2 for allM tuples
+ * unfolds concept terms or role terms so that in List2 for all tuples
  * (O,T,CN,allM(R1,C1)), (O,T,CN,andM([C1,...,Cn])), 
  * (O,T,RN,andM([R1,...,Rn])), ...
- * CN andM the Ci are concept names andM RN andM the Ri are role names.
+ * CN and the Ci are concept names and RN and the Ri are role names.
  *
  * 130892   UH   (c)
  *
@@ -13438,28 +12020,28 @@ unfoldList(Env,Type,[CT1|CTL1],[CN|CNL2],DL1) :-
 /**********************************************************************
  *
  * atomicConcept(+CT) 
- * succeeds if the concept term CT can be regarded as a atomic concept
+ * succeeds if the concept term CT can be regarded as a isFORTIC concept
  * for our translation. In the current implementation variables, 
- * identifiers, singleton sets, andM their negation are regarded as 
- * atomic.
+ * identifiers, singleton sets, and their negation are regarded as 
+ * isFORTIC.
  *
  * 130892   UH   (c)
- * 140892   UH   Added clauses for sets andM negation of variables
+ * 140892   UH   Added clauses for sets and negation of variables
  * 140892   UH   Documented
  *
  */
 
 atomicConcept(CT) :-
-	var(CT),
+	is_ftVar(CT),
 	!.
 atomicConcept(CT) :-
-	atomic(CT),
+	isFORTIC(CT),
 	!.
 atomicConcept(isTDisjoint(CT)) :-
-	var(CT),
+	is_ftVar(CT),
 	!.
 atomicConcept(isTDisjoint(CT)) :-
-	atomic(CT),
+	isFORTIC(CT),
 	!.
 atomicConcept(setM([E1])) :-
 	!.
@@ -13469,8 +12051,8 @@ atomicConcept(setM([E1])) :-
 /**********************************************************************
  *
  * unfoldElementToSet(+Set,-CT)
- * for a given setM Set the concept term CT consisting of a disjunktion 
- * of allM singleton setM contained in Set is computed.
+ * for a given set Set the concept term CT consisting of a disjunktion 
+ * of all singleton set contained in Set is computed.
  *
  * 130892   UH   (c)  
  * 140892   UH   Documented
@@ -13503,12 +12085,12 @@ unfoldSetToConcept(setM([E1|L1]),orM(L2)) :-
 
 initializeMotel :-
 	retractCompiledPredicates(_),
-	retractall1_M(_,in/9),
-	retractall1_M(_,kb_in/10),
-	retractall1_M(_,eq/9),
-	retractall1_M(_,constraint/8),
-	retractall1_M(_,rel/5),
-	retractall1_M(_,closed/5),
+	retractall1_M(_,in_M/9),
+	retractall1_M(_,kb_in_M/10),
+	retractall1_M(_,eq_M/9),
+	retractall1_M(_,constraint_M/8),
+	retractall1_M(_,rel_M/5),
+	retractall1_M(_,closed_M/5),
 	retractall1_M(_,compiledPredicate/2),
 	retractall1_M(_,conceptElement/7),
 	retractall1_M(_,conceptEqualSets/6),
@@ -13530,18 +12112,18 @@ initializeMotel :-
 	retractall1_M(_,roleNr/4),
 	retractall1_M(_,roleRange/4),
 	retractall1_M(_,roleSubsets/6),
-	retractall1_M(_,sub/4),
-	retractall1_M(_,succ/4),
+	retractall1_M(_,sub_M/4),
+	retractall1_M(_,succ_M/4),
 	retractall1_M(_,abductiveDerivation/3),
 	retractall1_M(_,consistencyDerivation/3),
-	retractall1_M(_,hypothesis/1),
+	retractall1_M(_,hypothesis_M/1),
 	retractall1_M(_,inconsistencyCheck/3),
 	retractall1_M(_,option_M/2),
-	retractall1_M(_,nsub/4),
+	retractall1_M(_,nsub_M/4),
 	retractall1_M(_,nsub3/2),
 	retractall1_M(_,sub3/2),
 	retractall1_M(_,succ3/2),
-	retractall1_M(_,value/2),
+	retractall1_M(_,value_M/2),
 	retractall1_M(_,query_M/6),
 	asserta(environment_M(initial,env(e0),'Initial Environment')),
 	asserta(currentEnvironment(env(e0))),
@@ -13574,7 +12156,7 @@ loadKB(_) :-
 	fail.
 
 loadKB(FileName,EnvName) :-
-	var(EnvName),
+	is_ftVar(EnvName),
 	loadKB(FileName),
 	% The file FileName should contain a call to makeEnvironment
 	% Due to the definition of makeEnvironment the new environment_M
@@ -13594,7 +12176,7 @@ doFileGoal(Goal) :-
 /**********************************************************************
  *
  * getKB(+Name,-Set)
- * Set contains allM terminological andM assertional axioms in 
+ * Set contains all terminological and assertional axioms in 
  * knowledge base Name.
  *
  */
@@ -13628,7 +12210,7 @@ getKB(EnvName,Set08) :-
                    [MS7,CN7,CT7,Ax7]^(roleSubsets(Name,user,MS7,CN7,CT7,Ax7),
 		   Clause7 = defprimrole(MS7,CN7,CT7)),Set7),
 	bagofOrNil(Clause8,
-		   [MS8,X8,Y8,R8]^(closed(Name,MS8,X8,Y8,R8),
+		   [MS8,X8,Y8,R8]^(closed_M(Name,MS8,X8,Y8,R8),
 		   Clause8 = defclosed(MS8,X8,Y8,R8)),Set8),
 	append(   [],Set1,Set01),
 	append(Set01,Set2,Set02),
@@ -13721,14 +12303,14 @@ deduce_M(EnvName,MS,mudIsa(X,C),Exp) :-
 	deduceMOTEL(EnvName,MS,mudIsa(X,C),Exp).
 
 deduceMOTEL(EnvName,MS,mudIsa(X,C),Exp) :-
-	retractall1_M(hypothesis(_)),
+	retractall1_M(hypothesis_M(_)),
  	environment_M(EnvName,Env,_),
- 	convertMS(negative,Env,[[],true],MS,[],[W1,G1],_),
+ 	convertMS(vNegative,Env,[[],true],MS,[],[W1,G1],_),
 	clause(query_M(Env,W1,C,X,Exp,Goal),_).
 deduceMOTEL(EnvName,MS,mudIsa(X,C),Exp) :-
-	retractall1_M(hypothesis(_)),
+	retractall1_M(hypothesis_M(_)),
  	environment_M(EnvName,Env,_),
- 	convertMS(negative,Env,[[],true],MS,[],[W1,G1],_),
+ 	convertMS(vNegative,Env,[[],true],MS,[],[W1,G1],_),
  	getNegatedConcept(C,C1),
 	constructMLMark(rn(_AN5,_RN5,_S5,_O5),W1,C1,X,_HYPS,_D1,InHead1),
  	getQuery(Env,W1,C,X,Exp,Goal),
@@ -13738,18 +12320,18 @@ deduceMOTEL(EnvName,MS,mudIsa(X,C),Exp) :-
 % 	anlegen einer clausel die in undefconcept wieder geloescht wird...
  	setQuery(Env,W1,C,X,Exp,Goal).
 deduceMOTEL(EnvName,MS,roleFiller(X,R,L,N),Exp) :-
-	retractall1_M(hypothesis(_)),
+	retractall1_M(hypothesis_M(_)),
 	environment_M(EnvName,Env,_),
-	convertMS(negative,Env,[[],true],MS,[],[W1,G1],_),
+	convertMS(vNegative,Env,[[],true],MS,[],[W1,G1],_),
 	call(G1),
 	solveConstraint(Env,W1,(card,app((_FF:R),X),'>=',_N1),(_N,L),
 	                hyp([]),ab(noAb),call([]),Exp),
-	nonvar(X),
+	not_ftVar(X),
 	length(L,N).
 
 deduceSetheo(EnvName,MS,mudIsa(X,C),Exp) :-
  	environment_M(EnvName,Env,_),
- 	convertMS(negative,Env,[[],true],MS,[],[W1,G1],_),
+ 	convertMS(vNegative,Env,[[],true],MS,[],[W1,G1],_),
 	getQuery(Env,MS,C,X,GL),
 	write('Trying '), print(X), write(' in '), print(C), write('.'),nl,
 	tell('/tmp/aaa.lop'),
@@ -13771,90 +12353,90 @@ setQuery(Env,W1,C,X,Exp,Goal) :-
 setQuery(Env,W1,C,X,Exp,Goal) :-
 	!.
 
-splitGoal([(in(A1,B1,C1) <- true)],[(false <- in(A1,B1,C1))]) :-
+splitGoal([(in_M(A1,B1,C1) <- true)],[(false <- in_M(A1,B1,C1))]) :-
 	!.
-splitGoal([(~ in(A1,B1,C1) <- true)],[(false <- ~ in(A1,B1,C1))]) :-
+splitGoal([(~ in_M(A1,B1,C1) <- true)],[(false <- ~ in_M(A1,B1,C1))]) :-
 	!.
 splitGoal([B|C],[B|D]) :-
 	splitGoal(C, D).
 
 getQuery(Env,MS1,C0,X,C3) :-
-	var(C0),
-	var(X),
+	is_ftVar(C0),
+	is_ftVar(X),
 	clause(conceptName(Env,_,_,C0),_),
         conceptElement(Env,_,user,X,_,_),
 	hop_map(negate_m,MS1,MS2),
 	hop_map(normalizeNot,MS2,MS3),
-	axiomToFOL(MS3,[X],_,in,C0,F),
-	translate(F,C1),
+	axiomToFOL(MS3,[X],_,in_M,C0,F),
+	tranlate_M(F,C1),
 	clausesToLOP(C1,C2),
 	splitGoal(C2,C3).
 getQuery(Env,MS1,C0,X,C3) :-
-	var(C0),
-	var(X),
+	is_ftVar(C0),
+	is_ftVar(X),
 	clause(conceptName(Env,_,_,C0),_),
         conceptElement(Env,_,user,X,_,_),
 	hop_map(negate_m,MS1,MS2),
 	hop_map(normalizeNot,MS2,MS3),
-	axiomToFOL(MS3,[X],_,in,isTDisjoint(C0),F),
-	translate(F,C1),
+	axiomToFOL(MS3,[X],_,in_M,isTDisjoint(C0),F),
+	tranlate_M(F,C1),
 	clausesToLOP(C1,C2),
 	splitGoal(C2,C3).
 getQuery(Env,MS1,C0,X,C3) :-
-	var(C0),
-	nonvar(X),
+	is_ftVar(C0),
+	not_ftVar(X),
 	setof(F1,[A1,A2,A3]^clause(conceptName(Env,A1,A2,F1),A3),L1),
 	member(C0,L1),
 	hop_map(negate_m,MS1,MS2),
 	hop_map(normalizeNot,MS2,MS3),
-	axiomToFOL(MS3,[X],_,in,C0,F),
-	translate(F,C1),
+	axiomToFOL(MS3,[X],_,in_M,C0,F),
+	tranlate_M(F,C1),
 	clausesToLOP(C1,C2),
 	splitGoal(C2,C3).
 getQuery(Env,MS1,C0,X,C3) :-
-	var(C0),
-	nonvar(X),
+	is_ftVar(C0),
+	not_ftVar(X),
 	setof(F1,[A1,A2,A3]^clause(conceptName(Env,A1,A2,F1),A3),L1),
 	member(C0,L1),
 	hop_map(negate_m,MS1,MS2),
 	hop_map(normalizeNot,MS2,MS3),
-	axiomToFOL(MS3,[X],_,in,isTDisjoint(C0),F),
-	translate(F,C1),
+	axiomToFOL(MS3,[X],_,in_M,isTDisjoint(C0),F),
+	tranlate_M(F,C1),
 	clausesToLOP(C1,C2),
 	splitGoal(C2,C3).
 getQuery(Env,MS1,C0,X,C3) :-
-	nonvar(C0),
-	var(X),
+	not_ftVar(C0),
+	is_ftVar(X),
         conceptElement(Env,_,user,X,_,_),
 	hop_map(negate_m,MS1,MS2),
 	hop_map(normalizeNot,MS2,MS3),
-	axiomToFOL(MS3,[X],_,in,C0,F),
-	translate(F,C1),
+	axiomToFOL(MS3,[X],_,in_M,C0,F),
+	tranlate_M(F,C1),
 	clausesToLOP(C1,C2),
 	splitGoal(C2,C3).
 getQuery(Env,MS1,C0,X,C3) :-
-	nonvar(C0),
-	nonvar(X),
+	not_ftVar(C0),
+	not_ftVar(X),
 	hop_map(negate_m,MS1,MS2),
 	hop_map(normalizeNot,MS2,MS3),
-	axiomToFOL(MS3,[X],_,in,C0,F),
-	translate(F,C1),
+	axiomToFOL(MS3,[X],_,in_M,C0,F),
+	tranlate_M(F,C1),
 	clausesToLOP(C1,C2),
 	splitGoal(C2,C3).
 getQuery(Env,W1,C0,X,Exp,Goal) :-
-	var(C0),
+	is_ftVar(C0),
 	clause(conceptName(Env,_,_,C0),_),
 	constructMLCall(Env,rn(no,_RN1,user,_O1),bodyMC(W1),headMC(_),
 			C0,X,[orM([]),rl([]),fl(_DML1)],noAb,[],Exp,Goal).
 
 performQuery(X,G1,Goal) :-
-	nonvar(X),
+	not_ftVar(X),
 	!,
- 	once((call((call(G1), Goal)), atomic(X))).
+ 	once((call((call(G1), Goal)), isFORTIC(X))).
 performQuery(X,G1,Goal) :-
 	!,
  	call((call(G1), Goal)), 
-	atomic(X).
+	isFORTIC(X).
 
 /***********************************************************************
  *
@@ -13934,24 +12516,24 @@ deduce_M(EnvName,MS,noChange(Y),[]) :-
 
 
 getQuery(Env,W1,C0,X,Exp,Goal) :-
-	var(C0),
+	is_ftVar(C0),
 	clause(conceptName(Env,_,_,C0),_),
 	constructMLCall(Env,rn(no,_RN1,user,_O1),bodyMC(W1),headMC(_),
 			C0,X,[orM([]),rl([]),fl(_DML1)],noAb,[],Exp,Goal).
 getQuery(Env,W1,C0,X,Exp,Goal) :-
-	var(C0),
+	is_ftVar(C0),
 	clause(conceptName(Env,_,_,C1),_),
 	C0 = isTDisjoint(C1),
 	constructMLCall(Env,rn(no,_RN1,user,_O1),bodyMC(W1),headMC(_),
 			C0,X,[orM([]),rl([]),fl(_DML1)],noAb,[],Exp,Goal).
 %getQuery(Env,W1,C0,X,Exp,Goal) :-
-% 	var(C0),
+% 	is_ftVar(C0),
 %	!,
 %	constructMLCall(Env,rn(no,_RN1,user,_O1),bodyMC(W1),headMC(_),
 %			C0,X,[orM([]),rl([]),fl(_DML1)],noAb,[],Exp,Goal),
 %	!.
 getQuery(Env,W1,C0,X,Exp,Goal) :-
-	nonvar(C0),
+	not_ftVar(C0),
 	convertInAntecedent(Env,rn(no,user,_O1),bodyMC(W1),headMC(_),
 			    C0,X,[orM([]),rl([]),fl(_DML1)],noAb,[],Exp,Goal),
 	!.
@@ -13983,7 +12565,7 @@ abduce(EnvName,Hypothesis,mudIsa(X,C)) :-
 	!,
 	abduce(EnvName,[],mudIsa(X,C),_Exp).
 abduce(MS,Hypothesis,mudIsa(X,C)) :-
-	nonvar(MS),
+	not_ftVar(MS),
 	(MS = [] ; MS = [_|_]),
         getCurrentEnvironment(EnvName),
 	!,
@@ -13997,7 +12579,7 @@ abduce(EnvName,Hypothesis,Consequent) :-
 	!,
 	abduce(EnvName,[],Hypothesis,Consequent,[]).
 abduce(MS,Hypothesis,Consequent) :-
-	nonvar(MS),
+	not_ftVar(MS),
         (MS = [] ; MS = [_|_]),
         getCurrentEnvironment(EnvName),
 	!,
@@ -14009,7 +12591,7 @@ abduce(EnvName,Hyps,mudIsa(X,Y),Exp) :-
 	!,
 	abduce(EnvName,[],Hyps,mudIsa(X,Y),Exp).
 abduce(MS,Hyps,mudIsa(X,Y),Exp) :-
-	nonvar(MS),
+	not_ftVar(MS),
 	(MS = [] ; MS = [_|_]),
 	getCurrentEnvironment(EnvName),
 	!,
@@ -14020,12 +12602,12 @@ abduce(EnvName,MS,Hyps,mudIsa(X,Y)) :-
 
 abduce(EnvName,MS,Hyps,mudIsa(X,C),Exp) :-
 	environment_M(EnvName,Env,_),
-	convertMS(negative,Env,[[],true],MS,[],[W1,G1],_),
+	convertMS(vNegative,Env,[[],true],MS,[],[W1,G1],_),
 	constructMLCall(Env,rn(no,_RN1,user,_O1),bodyMC(W1),headMC(_),
 			C,X,[orM([]),rl([]),fl(_DML1)],D,[],_Exp1,InHead),
 	call((call(G1), InHead)),
 	getConstraint(InHead,X),
-	atomic(X),
+	isFORTIC(X),
 	allowedAnswerConcept(Env,C),
 	getAbductionHyps(D,GL),
 	once((doConsistencyCheck([],GL),doMinimalityCheck([],GL))),
@@ -14033,11 +12615,11 @@ abduce(EnvName,MS,Hyps,mudIsa(X,C),Exp) :-
 	getAbductionHypotheses(D,Hyps).
 
 getAbductionHypotheses(L,[]) :-
-	var(L),
+	is_ftVar(L),
 	!.
 getAbductionHypotheses([],[]) :-
 	!.
-getAbductionHypotheses([in(Env,RN,modal(MS),C,X,_,_,_,_)|L1],
+getAbductionHypotheses([in_M(Env,RN,modal(MS),C,X,_,_,_,_)|L1],
 	                [assert_ind(MS1,X,C)|L2]) :- 
 	!,
 	translateModalContext(MS,MS1),
@@ -14051,7 +12633,7 @@ getAbductionHypotheses([C1|L1],
 translateModalContext([],[]) :-
 	!.
 translateModalContext(app([WP,_]:m(M,A),W),MS) :-
-	var(WP),
+	is_ftVar(WP),
 	!,
 	translateAgent(A,A1),
 	translateModalContext(W,MS2),
@@ -14063,7 +12645,7 @@ translateModalContext(app([WP,_]:m(M,A),W),MS) :-
 	append(MS2,[b(M,A1)],MS).
 
 translateAgent(A,allM) :-
-	var(A),
+	is_ftVar(A),
 	!.
 translateAgent(A,A) :-
 	!.
@@ -14087,7 +12669,7 @@ abduce(EnvName,MS,change(X,Wx),change(Y,Wy),[]) :-
 
 abduce(EnvName,MS,change(X,Wx),change(Y,Wy),[]) :-
 	get_Env_World(EnvName,MS,Env,World),
-	var(Wx),
+	is_ftVar(Wx),
 	wellDefined_ChangeWeight(Wy),
 	infl(Env,World,X,Y,Wxy),
 	not(given_change(Env,World,X,_)),
@@ -14113,20 +12695,20 @@ abduce(EnvName,MS,change(X,Wx),change(X,Wx),[]) :-
  *
  *	Succeeds if Consequent follows under the hypothesis Hypothesis.
  *
- *	Hypothesis andM Consequent are of the form:
+ *	Hypothesis and Consequent are of the form:
  *		increase(+-X), decrease(+-X), noChange(+-X). 
  */
 
 abduce(EnvName,MS,Hypothesis,Consequent,[]) :-
-	var(Hypothesis),
-	nonvar(Consequent),
+	is_ftVar(Hypothesis),
+	not_ftVar(Consequent),
 	once(default_change(Consequent,WeightedConsequent)),
 	abduce(EnvName,MS,change(X,Wx),WeightedConsequent,[]),
 	once(default_change(Hypothesis,change(X,Wx),[])).
 
 abduce(EnvName,MS,Hypothesis,Consequent,[]) :-
-	nonvar(Hypothesis),
-%	var(Consequent),
+	not_ftVar(Hypothesis),
+%	is_ftVar(Consequent),
 	once(default_change(Hypothesis,WeightedHypothesis)),
 	abduce(EnvName,MS,WeightedHypothesis,change(Y,Wy),[]),
 	once(default_change(Consequent,change(Y,Wy))).
@@ -14142,7 +12724,7 @@ abduce(EnvName,MS,Hypothesis,Consequent,[]) :-
 
 abduce(EnvName,MS,Hs,change(Y,W),[]) :-
 	get_Env_World(EnvName,MS,Env,World),
-	nonvar(Hs),
+	not_ftVar(Hs),
 	aux_abduce(Env,World,Hs,change(Y,W),Ws),
 	wellDefined_SimultChanges(Hs),
 	weightOf_SimultChange(Ws,W).
@@ -14155,19 +12737,19 @@ abduce(EnvName,MS,Hs,change(Y,W),[]) :-
  *
  *	Hypotheses  is a list of 
  *		increase(+-X), decrease(+-X), noChange(+-X). 
- *	predicates andM Consequent is one of these.
+ *	predicates and Consequent is one of these.
  */
 
 abduce(EnvName,MS,Hypotheses,Consequent,[]) :-
-	nonvar(Hypotheses),
-	nonvar(Consequent),
+	not_ftVar(Hypotheses),
+	not_ftVar(Consequent),
 	once(default_changes(Hypotheses,WeightedHypotheses)),
 	once(default_change(Consequent,WeightedConsequent)),
 	abduce(EnvName,MS,WeightedHypotheses,WeightedConsequent,[]).
 
 abduce(EnvName,MS,Hypotheses,Consequent,[]) :-
-	nonvar(Hypotheses),
-%	var(Consequent),
+	not_ftVar(Hypotheses),
+%	is_ftVar(Consequent),
 	once(default_changes(Hypotheses,WeightedHypotheses)),
 	abduce(EnvName,MS,WeightedHypotheses,change(Y,Wy),[]),
 	once(default_change(Consequent,change(Y,Wy))).
@@ -14184,7 +12766,7 @@ abduce(EnvName,MS,Hypotheses,Consequent,[]) :-
  */
 
 abduce(EnvName,MS,Change,Changes,[]) :-
-	nonvar(Changes),
+	not_ftVar(Changes),
 	aux2_abduce(EnvName,MS,Change,Changes).
 
 /***********************************************************************
@@ -14199,15 +12781,15 @@ abduce(EnvName,MS,Change,Changes,[]) :-
  */
 
 abduce(EnvName,MS,Hypothesis,Consequents,[]) :-
-	nonvar(Hypothesis),
-	nonvar(Consequents),
+	not_ftVar(Hypothesis),
+	not_ftVar(Consequents),
 	once(default_change(Hypothesis,WeightedHypothesis)),
 	once(default_changes(Consequents,WeightedConsequents)),
 	abduce(EnvName,MS,WeightedHypothesis,WeightedConsequents,[]).
 
 abduce(EnvName,MS,Hypothesis,Consequents,[]) :-
-	var(Hypothesis),
-	nonvar(Consequents),
+	is_ftVar(Hypothesis),
+	not_ftVar(Consequents),
 	once(default_changes(Consequents,WeightedConsequents)),
 	abduce(EnvName,MS,change(X,Wx),WeightedConsequents,[]),
 	once(default_change(Hypothesis,change(X,Wx))).
@@ -14220,35 +12802,35 @@ abduce(EnvName,MS,Hypothesis,Consequents,[]) :-
  *
  * allowedAnswerConcept(+C)
  * true iff C is a concept introduced by the user. No concept names
- * introduces by the system orM concept terms are allowed as answer.
+ * introduces by the system or concept terms are allowed as answer.
  *
  */
 
 allowedAnswerConcept(Env,C) :-
-	atomic(C),
+	isFORTIC(C),
 	!,
 	clause(conceptName(Env,_,_,C),_),
 	!.
 % allowedAnswerConcept(Env,C) :-
-%	atomic(C),
+%	isFORTIC(C),
 %	conceptEqualSets(Env,user,_,C,_,_),
 %	!.
 % allowedAnswerConcept(Env,C) :-
-%	atomic(C),
+%	isFORTIC(C),
 %	conceptEqualSets(Env,user,_,_,C,_),
 %	!.
 %allowedAnswerConcept(Env,C) :-
-%	atomic(C),
+%	isFORTIC(C),
 %	conceptSubsets(Env,user,_,C,_,_),
 %	!.
 %allowedAnswerConcept(Env,C) :-
-%	atomic(C),
+%	isFORTIC(C),
 %	conceptSubsets(Env,user,_,_,C,_).
 allowedAnswerConcept(Env,C) :-
-	nonvar(C),
+	not_ftVar(C),
 	C = isTDisjoint(D),
 	!,
-	nonvar(D),
+	not_ftVar(D),
 	isTDisjoint(D = isTDisjoint(E)),
 	!,
 	allowedAnswerConcept(Env,D).
@@ -14259,59 +12841,59 @@ allowedAnswerConcept(_,isTDisjoint(normat(_))) :-
 	!,
 	fail.
 allowedAnswerConcept(Env,C) :-
-	not(atomic(C)),
+	not(isFORTIC(C)),
 	!.
 
 /***********************************************************************
  *
- * inconsistent(+EnvName)
+ * inconsistent_M(+EnvName)
  *
  */
 
 
-inconsistent :-
+inconsistent_M:-
 	getCurrentEnvironment(EnvName),
-	inconsistent(EnvName,[]).
+	inconsistent_M(EnvName,[]).
 
-inconsistent(EnvName) :-
+inconsistent_M(EnvName) :-
 	nonvar(EnvName),
 	environment_M(EnvName,_,_),
-	inconsistent(EnvName,[]).
-inconsistent(MS) :-
+	inconsistent_M(EnvName,[]).
+inconsistent_M(MS) :-
 	(MS = [] ; MS = [_|_]),
 	getCurrentEnvironment(EnvName),
-	inconsistent(EnvName,MS).
+	inconsistent_M(EnvName,MS).
 
-inconsistent(EnvName,MS) :-
+inconsistent_M(EnvName,MS) :-
 	environment_M(EnvName,Env,_),
-	convertMS(negative,Env,[[],true],MS,[],[W1,G1],_),
+	convertMS(vNegative,Env,[[],true],MS,[],[W1,G1],_),
 	constructMLHead(Env,rn(_AX1,_RN1,user,_O1),W1,C,X,[orM([]),rl([]),fl(_DML1)],noAb,[],_,InHead1),
 	call((call(G1), InHead1)),
 	getConstraint(InHead1,X),
-	atomic(X),
+	isFORTIC(X),
 	constructMLHead(Env,rn(_AX2,_RN2,_S2,_O2),W1,isTDisjoint(C),X,[orM([]),rl([]),fl(_DML1)],noAb,[],_,InHead2),
 	call((call(G1), InHead2)).
 
 /***********************************************************************
  *
- * consistent(+EnvName)
+ * consistent_M(+EnvName)
  *
  */
 
-consistent :-
-	not(inconsistent).
+consistent_M:-
+	not(inconsistent_M).
 
-consistent(EnvName) :-
+consistent_M(EnvName) :-
 	nonvar(EnvName),
 	environment_M(EnvName,_,_),
-	not(inconsistent(EnvName,[])).
-consistent(MS) :-
+	not(inconsistent_M(EnvName,[])).
+consistent_M(MS) :-
 	(MS = [] ; MS = [_|_]),
 	getCurrentEnvironment(EnvName),
-	not(inconsistent(EnvName,MS)).
+	not(inconsistent_M(EnvName,MS)).
 
-consistent(EnvName,MS) :-
-	not(inconsistent(EnvName,MS)).
+consistent_M(EnvName,MS) :-
+	not(inconsistent_M(EnvName,MS)).
 
 /***********************************************************************
  *
@@ -14327,15 +12909,15 @@ metaReasoning :-
 	Lit13 = asserta_new(InHead2),
 	Lit14 = asserta_new(inconsistencyCheck(MS,C,X)),
 	Lit15 = tryInconsistency(MS,C,X,InHead2),
-	assertz_if_new((InHead1 :- atomic(C), atomic(X), Lit11, Lit13, Lit14, Lit15)),
+	assertz_if_new((InHead1 :- isFORTIC(C), isFORTIC(X), Lit11, Lit13, Lit14, Lit15)),
 	Lit23 = asserta_new(InHead1),
 	Lit24 = asserta_new(inconsistencyCheck(MS,C,X)),
 	Lit25 = tryInconsistency(MS,C,X,InHead1),
-	assertz_if_new((InHead2 :- atomic(C), atomic(X), Lit11, Lit23, Lit24, Lit25)).
+	assertz_if_new((InHead2 :- isFORTIC(C), isFORTIC(X), Lit11, Lit23, Lit24, Lit25)).
 
 
 tryInconsistency(MS,C,X,InHead) :-
-	inconsistent(MS),
+	inconsistent_M(MS),
 	!,
 	retract(inconsistencyCheck(MS,C,X)),
 	retract(InHead).
@@ -14408,7 +12990,7 @@ askNode(_,_,_,_,_,[]) :-
 /**********************************************************************
  *
  * completeParameter(+ParameterList,-EnvName,-MS,-Query,-Proof)
- * takes a list of parameters ParameterList andM instantiates the
+ * takes a list of parameters ParameterList and instantiates the
  * variables EnvName,MS,Query,Proof correctly.
  *
  */
@@ -14417,44 +12999,44 @@ completeParameter([Query],EnvName,[],Query,_Proof) :-
 	getCurrentEnvironment(EnvName),
 	!.
 completeParameter([P1,P2],P1,_MS,P2,_Proof) :-
-	var(P1),
+	is_ftVar(P1),
 	!.
 completeParameter([P1,P2],P1,_MS,P2,_Proof) :-
-	nonvar(P1),
-	atomic(P1),
+	not_ftVar(P1),
+	isFORTIC(P1),
 	P1 \== [],
 	!.
 completeParameter([P1,P2],EnvName,P1,P2,_Proof) :-
-	nonvar(P1),
+	not_ftVar(P1),
 	(P1 = [] ; P1 = [_|_]),
 	!,
 	getCurrentEnvironment(EnvName).
 completeParameter([P1,P2],EnvName,[],P1,P2) :-
-	nonvar(P1),
+	not_ftVar(P1),
 	!,
 	getCurrentEnvironment(EnvName).
 completeParameter([P1,P2,P3],P1,P2,P3,_Proof) :-
-	var(P1),
-	var(P2),
+	is_ftVar(P1),
+	is_ftVar(P2),
 	!.
 completeParameter([P1,P2,P3],P1,P2,P3,_Proof) :-
-	nonvar(P1),
-	atomic(P1),
+	not_ftVar(P1),
+	isFORTIC(P1),
 	P1 \== [],
-	var(P2),
+	is_ftVar(P2),
 	!.
 completeParameter([P1,P2,P3],EnvName,P1,P2,P3) :-
-	nonvar(P1),
+	not_ftVar(P1),
 	(P1 = [] ; P1 = [_|_]),
 	!,
 	getCurrentEnvironment(EnvName).
 completeParameter([P1,P2,P3],P1,P2,P3,_Proof) :-
-	nonvar(P2),
+	not_ftVar(P2),
 	(P2 = [] ; P2 = [_|_]),
 	!.
 completeParameter([P1,P2,P3],P1,[],P2,P3) :-
-	nonvar(P1),
-	atomic(P1),
+	not_ftVar(P1),
+	isFORTIC(P1),
 	P1 \== [],
 	!.
 completeParameter([P1,P2,P3],P1,[],P2,P3) :-
@@ -14462,127 +13044,1440 @@ completeParameter([P1,P2,P3],P1,[],P2,P3) :-
 completeParameter([P1,P2,P3,P4],P1,P2,P3,P4) :-
 	!.
 
+
+
+
+
+
 /**********************************************************************
  *
- * @(#) initCall.pl 1.4@(#)
+ * @(#) examples.pl 1.5@(#)
  *
  */
 
-:- nl, nl.
-:- write('Welcome to MOTEL (Version 0.8 July 1993)').
-:- nl.
-:- write('Copyright (c) 1993, Patrick Brandmeier, Ullrich Hustadt').
-:- nl.
-:- write('                    Renate Schmidt, Jan Timm. All rights preserved.').
-:- nl, nl.
-:- write('MOTEL is distributed in the hope that it will be useful, but').
-:- nl.
-:- write('WITHOUT ANY WARRANTY;  without even the implied warranty of,').
-:- nl.
-:- write('MERCHANTABILITY orM FITNESS FOR A PARTICULAR PURPOSE.').
-:- nl, nl.
-:- initializeMotel.
-
-isTDisjoint(G):-not(G).
-
-% :-testMotel.
-
-
-:-multifile(user:hasInstance_dyn/2).
-:-dynamic(user:hasInstance_dyn/2).
-
-:-assert_ind(tCol,tCol).
-:-assert_ind(tChannel,tCol).
-
-:-forall(user:hasInstance_dyn(T,I),show_call(assert_ind(I,T))).
-:-forall(is_asserted(mudSubclass(C1,C2)),show_call(defconcept(C1,C2))).
-:-forall(is_asserted(disjointWith0(C1,C2)),show_call(defconcept(C1,isTDisjoint(C2)))).
-
-end_of_file.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+example(1) :-
+	makeEnvironment('ex1','von HJO'),
+	initEnvironment,
+	defconcept(tFatherAcademic,andM([tMale,someM(roleChild,tAcademic)])),
+	defconcept(tGrandfatherAcademic,andM([tMale,someM(roleChild,tFatherAcademic)])),
+	assert_ind(iTom,iTim,roleChild),
+	assert_ind(iTim,iMike,roleChild),
+	assert_ind(iMike,tMale),
+	assert_ind(iMike,tAcademic),
+	assert_ind(iTim,tMale),
+	assert_ind(iTom,tMale).
+%%% Example  2:
+%%% KRIS-Example
+% setof(C,ask_M(mudIsa(iMary,C)),L)
+% gives L = ['tTOP',grandparent,tRangeParent,parent_with_sons_only,
+%            parent_with_two_children,tAgentGeneric] 
+% in Total runtime 12.167 sec. (05.06.92)
+example(2) :-
+	makeEnvironment('ex2','krisExample'),
+	initEnvironment,
+	defprimconcept(tMale),
+	defprimconcept(tFemale,isTDisjoint(tMale)),
+	defconcept(males,someM(mudSex,tMale)),
+	defconcept(females,someM(mudSex,tFemale)),
+	defprimconcept(tAgentGeneric,someM(mudSex,orM([tMale,tFemale]))),
+	defconcept(tRangeParent,andM([tAgentGeneric,someM(roleChild,tAgentGeneric)])),
+	defconcept(tRangeMother,andM([tRangeParent,someM(mudSex,tFemale)])),
+	defconcept(tRangeFather,andM([tRangeParent,isTDisjoint(tRangeMother)])),
+	defconcept(grandparent,andM([tRangeParent,someM(roleChild,tRangeParent)])),
+	defconcept(parent_with_sons_only,andM([tRangeParent,allM(roleChild,someM(mudSex,tMale))])),
+	defconcept(parent_with_two_children,andM([tRangeParent,atleast(2,roleChild)])),
+	assert_ind(iTom,tRangeFather),
+	assert_ind(iTom,iPeter,roleChild),
+	assert_ind(iTom,iHarry,roleChild),
+	assert_ind(iMary,parent_with_sons_only),
+	assert_ind(iMary,iTom,roleChild),
+	assert_ind(iMary,iChris,roleChild).
+%%% Example  3:
+% inconsistent_M([])
+% succeeds in Total runtime 0.000 sec. (05.06.92)
+example(3) :-
+	makeEnvironment('ex3','Inconsistence'),
+	initEnvironment,
+	defprimconcept(parent_with_one_child,atmost(1,roleChild)),
+	assert_ind(iMary,parent_with_one_child),
+	assert_ind(iMary,iTom,roleChild),
+	assert_ind(iMary,iChris,roleChild).
+%%% Example  4:
+% Modal Operators
+example(4) :-
+	makeEnvironment('ex4','Inconsistence'),
+	initEnvironment,
+	defconcept([b(believe,a1)],c1,b(want,a2,car)),
+	defconcept([b(believe,a1)],c2,b(want,a3,car)),
+	defprimconcept([b(believe,a1)],c1,c2),
+	assert_ind([b(believe,a1)],iAudi7,c1).
+%%% Example  5:
+% subsumes([],c1,c2).
+% fails    in Total runtime 0.050 sec. (05.06.92)
+% subsumes([],c2,c1).
+% succeeds in Total runtime 0.050 sec. (05.06.92)
+example(5) :-
+	makeEnvironment('ex5','Subsumption'),
+	initEnvironment,
+	defconcept(c1,andM([allM(r,a),allM(andM([r,q]),b)])),
+	defconcept(c2,allM(andM([r,q]),andM([a,b]))).
+%%% Example  6:
+% subsumes([],c1,c2).
+% fails    in Total runtime 0.033 sec. (05.06.92)
+% subsumes([],c2,c1).
+% succeeds in Total runtime 0.033 sec. (05.06.92)
+example(6) :-
+	makeEnvironment('ex6','Subsumption'),
+	initEnvironment,
+	defrole(r1,andM([r,q])),
+	defconcept(d0,andM([a,b])),
+	defconcept(d1,allM(r,a)),
+	defconcept(d2,allM(r1,b)),
+	defconcept(c1,andM([d1,d2])),
+	defconcept(c2,allM(r1,d0)).
+%%% Example  7:
+example(7) :-
+	makeEnvironment('ex7','Subsumption'),
+	initEnvironment,
+	defconcept(c1,atleast(3,r)),
+	defconcept(c2,andM([allM(andM([r,p]),a),allM(andM([r,q]),isTDisjoint(a)),atleast(2,andM([r,p])),atleast(2,andM([r,q]))])).
+%%% Example  8;
+% ask_M(mudIsa(iTom,heterosexual))
+% succeeds in Total runtime 0.033 sec. (05.06.92)
+example(8) :-
+	makeEnvironment('ex8','Disjunction of complementary tConcept'),
+	initEnvironment,
+	defprimconcept(tMale),
+	defconcept(tFemale,isTDisjoint(tMale)),
+	defconcept(heterosexual,orM([tMale,tFemale])).
+%%% Example  9:
+% Variation of the KRIS-Example
+% ask_M(mudIsa(iChris,tMale))
+% succeeds in Total runtime 0.000 sec. (05.06.92)
+example(9) :-
+	makeEnvironment('ex9','Variation of the KRIS example'),
+	initEnvironment,
+	defprimconcept(tMale),
+	defprimconcept(tFemale,isTDisjoint(tMale)),
+	defprimconcept(tAgentGeneric,orM([tMale,tFemale])),
+	defconcept(tRangeParent,andM([tAgentGeneric,someM(roleChild,tAgentGeneric)])),
+	defconcept(tRangeMother,andM([tRangeParent,tFemale])),
+	defconcept(tRangeFather,andM([tRangeParent,isTDisjoint(tRangeMother)])),
+	defconcept(grandparent,andM([tRangeParent,someM(roleChild,tRangeParent)])),
+	defconcept(parent_with_sons_only,andM([tRangeParent,allM(roleChild,tMale)])),
+	defconcept(parent_with_two_children,andM([tRangeParent,atleast(2,roleChild)])),
+	assert_ind(iTom,tRangeFather),
+	assert_ind(iTom,iPeter,roleChild),
+	assert_ind(iTom,iHarry,roleChild),
+	assert_ind(iMary,parent_with_sons_only),
+	assert_ind(iMary,iTom,roleChild),
+	assert_ind(iMary,iChris,roleChild).
+%%% Example 10:
+% ask_M(mudIsa(iTom,c2)) 
+% succeeds in Total runtime 0.017 sec. (05.06.92)
+example(10) :-
+	makeEnvironment('ex10','Inverse Role'),
+	initEnvironment,
+	defrole(r2,isMudInverseFn(r1)),
+	defconcept(c1,allM(r1,c2)),
+	defconcept(c3,someM(r2,c1)),
+	assert_ind(iTom,c3).
+%%% Example 11:
+% inconsistent_M([])
+% succeeds in Total runtime 0.034 sec. (05.06.92)
+example(11) :-
+	makeEnvironment('ex11','Inconsistence'),
+	initEnvironment,
+	defconcept(c1,andM([atleast(2,roleChild),atmost(1,roleChild)])),
+	assert_ind(iTom,c1).
+%%% Example 12:
+% subsumes([],c1,c2)
+% succeeds in Total runtime 0.050 sec. (05.06.92)
+% subsumes([],c2,c1)
+% fails    in Total runtime 0.200 sec. (05.06.92)
+example(12) :-
+	makeEnvironment('ex12','Subsumption'),
+	initEnvironment,
+	defconcept(c1,andM([tAgentGeneric,atleast(2,roleChild)])),
+	defconcept(c2,andM([tAgentGeneric,atleast(3,restr(roleChild,tLawyerJob))])).
+%%% Example 13:
+% subsumes([],c1,c2)
+% succeeds in Total runtime 0.117 sec. (05.06.92)
+example(13) :-
+	makeEnvironment('ex13','Subsumption'),
+	initEnvironment,
+	defconcept(c1,andM([tAgentGeneric,atmost(4,restr(roleChild,tDoctor))])),
+	defconcept(c2,andM([tAgentGeneric,tFemale,atmost(3,roleChild)])).
+%%% Example 14:
+% subsumes([],c1,c2)
+% succeeds ???
+% subsumes([],c2,c1)
+% succeeds in Total runtime 0.250 sec. (06.06.92)
+example(14) :-
+	makeEnvironment('ex14','Subsumption'),
+	initEnvironment,
+	defconcept(c1,atmost(0,restr(r,andM([atleast(3,s1),atleast(4,s2)])))),
+	defconcept(c2,allM(restr(r,atleast(2,s1)),atmost(2,s2))).
+%%% Example 15:
+% subsumes([],c2,c1)
+% succeeds in Total runtime 0.067 sec. (05.06.92)
+example(15) :-
+	makeEnvironment('ex15','Subsumption'),
+	initEnvironment,
+	defconcept(c1,andM([tAgentGeneric,allM(friend,tDoctor),allM(restr(friend,tDoctor),atleast(1,speciality))])),
+	defconcept(c2,andM([tAgentGeneric,allM(friend,atleast(1,speciality))])).
+%%% Example 16:
+% subsumes([],c2,c1)
+% succeeds in Total runtime 0.450 sec. (06.06.92)
+example(16) :-
+	makeEnvironment('ex16','Subsumption'),
+	initEnvironment,
+	defconcept(c1,andM([atleast(1,restr(roleChild,tLawyerJob)),atleast(1,restr(roleChild,tDoctor))])),
+	defconcept(c2,orM([atleast(2,roleChild),atleast(1,restr(roleChild,andM([tLawyerJob,tDoctor])))])).
+%%% Example 17:
+% subsumes([],c2,c1)
+% succeeds in Total runtime 0.034 sec. (05.06.92)
+example(17) :-
+	makeEnvironment('ex17','Subsumption'),
+	initEnvironment,
+	defconcept(c1,someM(andM([roleChild,friend]),tDoctor)),
+	defconcept(c2,andM([someM(roleChild,tDoctor),someM(friend,tDoctor)])).
+%%% Example 18:
+% ask_M(mudIsa(iMary,c4))
+% succeeds in Total runtime 0.117 sec. (05.06.92)
+example(18) :-
+	makeEnvironment('ex18','Number restrictions'),
+	initEnvironment,
+	defprimconcept(tFemale),
+	defconcept(tMale,isTDisjoint(tFemale)),
+	defconcept(c3,andM([atmost(4,roleChild),atleast(2,restr(roleChild,tFemale))])),
+	defconcept(c4,atmost(2,restr(roleChild,tFemale))),
+	assert_ind(iTom,tMale),
+	assert_ind(iPeter,tMale),
+	assert_ind(iMary,iPeter,roleChild),
+	assert_ind(iMary,iTom,roleChild),
+	assert_ind(iMary,c3).
+%%% Example 19
+% ask_M(mudIsa(iAmy,tFemale))
+% succeeds in Total runtime 0.067 sec. (06.06.92)
+example(19) :-
+	makeEnvironment('ex19','Number restrictions'),
+	initEnvironment,
+	defprimconcept(tFemale),
+	defconcept(tMale,isTDisjoint(tFemale)),
+	defconcept(c5,andM([atmost(2,restr(roleChild,tMale))])),
+	assert_ind(iTom,tMale),
+	assert_ind(iPeter,tMale),
+	assert_ind(iMary,iTom,roleChild),
+	assert_ind(iMary,iPeter,roleChild),
+	assert_ind(iMary,iAmy,roleChild),
+	assert_ind(iMary,c5).
+%%% Example 20
+% inconsistent_M([])
+% succeeds in Total runtime 5.167 sec. (05.06.92)
+example(20) :-
+	makeEnvironment('ex20','Number restrictions'),
+	initEnvironment,
+	defprimconcept(tFemale),
+	defconcept(tMale,isTDisjoint(tFemale)),
+	defconcept(c5,andM([atmost(2,restr(roleChild,tMale)),atmost(1,restr(roleChild,tFemale))])),
+	assert_ind(iTom,tMale),
+	assert_ind(iPeter,tMale),
+	assert_ind(iMary,iTom,roleChild),
+	assert_ind(iMary,iPeter,roleChild),
+	assert_ind(iMary,iAmy,roleChild),
+	assert_ind(iMary,iJane,roleChild),
+	assert_ind(iMary,c5).
+%%% Example 21
+% ask_M(mudIsa(betty,tFemale))
+example(21) :-
+	makeEnvironment('ex21','Number restrictions'),
+	initEnvironment,
+	defprimconcept(tFemale),
+	defconcept(tMale,isTDisjoint(tFemale)),
+	defconcept(c1,andM([atmost(1,restr(teacher,tMale)),atmost(1,restr(teacher,tFemale))])),
+	defconcept(c2,andM([atmost(2,restr(teacher,tMale)),atmost(1,restr(teacher,tFemale))])),
+	assert_ind(iTom,c1),
+	assert_ind(sue,c1),
+	assert_ind(david,c2),
+	assert_ind(iTom,betty,teacher),
+	assert_ind(iTom,iPeter,teacher),
+	assert_ind(sue,betty,teacher),
+	assert_ind(sue,iChris,teacher),
+	assert_ind(david,betty,teacher),
+	assert_ind(david,iChris,teacher),
+	assert_ind(david,iPeter,teacher).
+%%% Example 22
+% ask_M(mudIsa(iAmy,tFemale))
+% should succeeds
+% but fails in the current implementation
+example(22) :-
+	makeEnvironment('ex22','Number restrictions'),
+	initEnvironment,
+	defprimconcept(tFemale),
+	defconcept(tMale,isTDisjoint(tFemale)),
+	defrole(maleTeacher,restr(teacher,tMale)),
+	defrole(femaleTeacher,restr(teacher,tFemale)),
+	defconcept(c1,andM([atmost(1,maleTeacher),atmost(1,femaleTeacher)])),
+	defconcept(c2,atmost(1,maleTeacher)),
+	assert_ind(iTom,c2),
+	assert_ind(sue,c1),
+	assert_ind(iTom,betty,teacher),
+	assert_ind(iTom,iChris,teacher),
+	assert_ind(iTom,robin,teacher),
+	assert_ind(sue,betty,teacher),
+	assert_ind(sue,iChris,teacher).
+%%% Example 23
+% is a variant of example 23 with user provided names for the 
+% restricted tRole.
+% ask_M(mudIsa(iAmy,tFemale))
+% should succeeds
+% but fails in the current implementation
+example(23) :-
+	makeEnvironment('ex23','Number restrictions'),
+	initEnvironment,
+	defprimconcept(tFemale),
+	defconcept(tMale,isTDisjoint(tFemale)),
+	defprimrole(maleTeacher,teacher),
+	defprimrole(femaleTeacher,teacher),
+	defconcept(c1,andM([atmost(1,maleTeacher),atmost(1,femaleTeacher)])),
+	defconcept(c2,atmost(1,maleTeacher)),
+	assert_ind(iTom,c2),
+	assert_ind(sue,c1),
+	assert_ind(iTom,betty,teacher),
+	assert_ind(iTom,iChris,teacher),
+	assert_ind(iTom,robin,teacher),
+	assert_ind(sue,betty,teacher),
+	assert_ind(sue,iChris,teacher).
+%%% Example 24
+% ask_M(mudIsa(iAudi7,c3))
+% succeeds in Total runtime 1.634 sec. (24.06.92)
+example(24) :-
+	makeEnvironment('ex24','Modal operators'),
+	initEnvironment,	
+	modalAxioms(kd45,believe,a1),
+	defconcept(c1,b(believe,a1,tAutomobile)),
+	defconcept(c3,b(believe,a1,c1)),
+	defconcept([b(believe,a1)],c1,b(believe,a1,tAutomobile)),
+	defconcept([b(believe,a1)],c3,b(believe,a1,c1)),
+	assert_ind(iAudi7,c1).
+%%% Example 25
+% isTDisjoint(ask_M(mudIsa(iAudi7,c3)))
+% succeeds in Total runtime 0.033 sec. (24.06.92)
+example(25) :-
+	makeEnvironment('ex25','Modal operators'),
+	initEnvironment,	
+	modalAxioms(kd45,believe,a1),
+	defconcept([b(believe,a1)],c1,b(believe,a1,tAutomobile)),
+	defconcept([b(believe,a1)],c3,b(believe,a1,c1)),
+	assert_ind(iAudi7,c1).
+%%% Example 26
+% subsumes([],c2,c1)
+% succeeds in Total runtime 0.034 sec. (24.06.92)
+% isTDisjoint(subsumes([],c1,c2))
+% succeeds in Total runtime 1.333 sec. (24.06.92)
+example(26) :-
+	makeEnvironment('ex27','Subsumption'),
+	initEnvironment,
+	defconcept(c1,atmost(0,r)),
+	defconcept(c2,allM(r,c5)).
+%%% Example 27
+% subsumes([],c2,c1) 
+% succeeds in Total runtime 0.067 sec. (24.06.92)
+% isTDisjoint(subsumes([],c1,c2))
+% succeeds
+example(27) :-
+	makeEnvironment('ex28','Subsumption'),
+	initEnvironment,
+	defconcept(c1,isTDisjoint(someM(r,'tTOP'))),
+	defconcept(c2,allM(r,c5)).
+%%% Example 28
+% ask_M(ex28,[b(believe,iJohn)],mudIsa(iAudi7,tAutomobile),P)
+% succeeds
+example(28) :-
+	makeEnvironment('ex28','Modal operators'),
+	initEnvironment,	
+	modalAxioms(kd45,believe,a1),
+	modalAxioms(kd45,believe,allM),
+	defprimconcept(tAutomobile),
+	assert_ind([b(believe,allM)],iAudi7,tAutomobile).
+%%% Example 29
+% is a variant of example 23 with a more restricted definition of c1
+% ask_M(mudIsa(iAmy,tFemale))
+% should succeeds
+% but fails in the current implementation
+example(29) :-
+	makeEnvironment('ex29','Number restrictions'),
+	initEnvironment,
+	defprimconcept(tFemale),
+	defconcept(tMale,isTDisjoint(tFemale)),
+	defprimrole(teacher),
+	defrole(maleTeacher,restr(teacher,tMale)),
+	defrole(femaleTeacher,restr(teacher,tFemale)),
+	defconcept(c1,andM([atmost(1,maleTeacher),atmost(2,femaleTeacher)])),
+	assert_ind(iTom,c1),
+	assert_ind(sue,c1),
+	assert_ind(iTom,betty,teacher),
+	assert_ind(iTom,iChris,teacher),
+	assert_ind(iTom,robin,teacher),
+	assert_ind(sue,betty,teacher),
+	assert_ind(sue,iChris,teacher).
+example(30) :-
+	makeEnvironment('ex30','Number restrictions'),
+	initEnvironment,
+	defprimconcept(tFemale),
+	defrole(maleTeacher,restr(teacher,isTDisjoint(tFemale))),
+	defrole(femaleTeacher,restr(teacher,tFemale)),
+	defconcept(c1,andM([atmost(1,maleTeacher),atmost(1,femaleTeacher)])),
+	defconcept(c2,atmost(1,maleTeacher)),
+	assert_ind(iTom,c2),
+	assert_ind(sue,c1),
+	assert_ind(iTom,betty,teacher),
+	assert_ind(iTom,iChris,teacher),
+	assert_ind(iTom,robin,teacher),
+	assert_ind(sue,betty,teacher),
+	assert_ind(sue,iChris,teacher).
+%%% Example 31
+% First test example for defclosed
+% ask_M(mudIsa(iTom,onlyMaleChildren))
+% succeeds
+example(31) :-
+	makeEnvironment('ex31','defclosed'),
+	initEnvironment,
+	defconcept(onlyMaleChildren,allM(roleChild,tMale)),
+	assert_ind(iTom,iPeter,roleChild),
+	assert_ind(iTom,iChris,roleChild),
+	assert_ind(iTom,iTim,roleChild),
+	assert_ind(iPeter,tMale),
+	assert_ind(iChris,tMale),
+	assert_ind(iTim,tMale),
+	defclosed(iTom,_Y,roleChild).
+%%% Example 32
+% First test example for abduction
+% abduce(mudIsa(robin,tMale),H,E)
+% abduce(mudIsa(robin,tFemale),H,E)
+example(32) :-
+	makeEnvironment('ex32','abduction'),
+	initEnvironment,
+	defconcept(tMale,isTDisjoint(tFemale)).
+%%% Example 33
+% Second test example for abduction
+% abduce(mudIsa(iNixon,tWarDove),H,E)
+% abduce(mudIsa(iNixon,tWarHawk),H,E)
+% gives unexpected results!!!
+example(33) :-
+	makeEnvironment('ex33','abduction'),
+	initEnvironment,
+	defconcept(c1,andM([quaker,normalQuaker])),
+	defconcept(c2,andM([republican,normalRepublican])),
+	defprimconcept(c1,tWarDove),
+	defprimconcept(c2,tWarHawk),
+	assert_ind(iNixon,quaker),
+	assert_ind(iNixon,republican).
+%%% Example 34
+% The following gives an inconsistent specification of
+% the tPenguin - tBird problem. So
+% inconsistent_M(ex34)
+% succeeds
+example(34) :-
+	makeEnvironment('ex34',abduction),
+	initEnvironment,
+	defprimconcept(tPenguin,andM([tBird,isTDisjoint(tCanFly)])),
+	defprimconcept(tBird,tCanFly),
+	assert_ind(iTweety,tPenguin),
+	assert_ind(iJohn,tBird).
+%%% Example 35
+% This is a consistent specification of the tPenguin - tBird problem.
+% abduce(ex35,[],mudIsa(iJohn,tCanFly),H,E).
+% succeeds with
+% H = [in_M(env(e1),rn(_7982,_7983,_7984,_7985),modal([]),normalBird,iJohn,
+%         hyp(_7989),ab(_7991),call(_7993),
+%         proved(in_M([],normalBird,iJohn),hyp(_7989),basedOn(_8005)))],
+% E = proved(in_M([],tCanFly,iJohn),hyp([]),
+%            basedOn(andM([proved(in_M([],tBird,iJohn),hyp([]),basedOn(abox)),
+%                         proved(in_M([],normalBird,iJohn),hyp([]),
+%     basedOn(usingAbHyp(in_M(env(e1),rn(_7525,_7526,_7527,_7528),modal([]),
+%                           normalBird,iJohn,hyp(_7532),ab(_7534),call(_7536),
+%                           proved(in_M([],normalBird,iJohn),hyp(_7532),
+%                           basedOn(_7548))))))])))
+% andM
+% abduce(ex35,[],mudIsa(iTweety,tCanFly),H,E).
+% fails
+example(35) :-
+	makeEnvironment('ex35',abduction),
+	initEnvironment,
+	defprimconcept(tPenguin,andM([tBird,isTDisjoint(normalBird)])),
+	defprimconcept(andM([tBird,normalBird]),tCanFly),
+	assert_ind(iTweety,tPenguin),
+	assert_ind(iJohn,tBird).
+%%% Example 36
+% Variant of example 33 giving the expected results:
+% abduce(ex36,[],mudIsa(iNixon,tWarDove),H,E).
+% succeeds with
+% H = [in_M(env(e4),rn(_8077,_8078,_8079,_8080),modal([]),
+%         normalQuaker,iNixon,hyp(_8084),ab(_8086),call(_8088),
+%         proved(in_M([],normalQuaker,iNixon),hyp(_8084),basedOn(_8100)))],
+% E = proved(in_M([],tWarDove,iNixon),hyp([]),
+%        basedOn(andM([proved(in_M([],quaker,iNixon),hyp([]),basedOn(abox)),
+%                     proved(in_M([],normalQuaker,iNixon),hyp([]),
+%           basedOn(usingAbHyp(in_M(env(e4),rn(_7620,_7621,_7622,_7623),
+%                   modal([]),normalQuaker,iNixon,hyp(_7627),ab(_7629),
+%                   call(_7631),proved(in_M([],normalQuaker,iNixon),
+%                   hyp(_7627),basedOn(_7643))))))]))) 
+% andM
+% abduce(ex36,[],mudIsa(iNixon,tWarHawk),H,E).
+% succeeds with
+% H = [in_M(env(e4),rn(_8077,_8078,_8079,_8080),modal([]),
+%         normalRepublican,iNixon, hyp(_8084),ab(_8086),call(_8088),
+%         proved(in_M([],normalRepublican,iNixon),hyp(_8084),basedOn(_8100)))],
+% E = proved(in_M([],tWarDove,iNixon),hyp([]),
+%        basedOn(andM([proved(in_M([],republican,iNixon),hyp([]),basedOn(abox)),
+%                     proved(in_M([],normalRepublican,iNixon),hyp([]),
+%           basedOn(usingAbHyp(in_M(env(e4),rn(_7620,_7621,_7622,_7623),
+%                   modal([]),normalRepublican,iNixon,hyp(_7627),ab(_7629),
+%                   call(_7631),proved(in_M([],normalRepublican,iNixon),
+%                   hyp(_7627),basedOn(_7643))))))]))) 
+example(36) :-
+	makeEnvironment('ex36','abduction'),
+	initEnvironment,
+	defprimconcept(andM([quaker,normalQuaker]),tWarDove),
+	defprimconcept(andM([republican,normalRepublican]),tWarHawk),
+	assert_ind(iNixon,quaker),
+	assert_ind(iNixon,republican).
+%%% Example 37
+example(37) :-
+	makeEnvironment('ex37','abduction'),
+	initEnvironment,
+	defprimconcept(rained_last_night,grass_is_wet),
+	defprimconcept(sprinkler_was_on,grass_is_wet),
+	defprimconcept(grass_is_wet,shoes_are_wet).
+%%% Example 38
+% ask_M(mudIsa(ideaste,c2))
+% should succeed
+example(38) :-
+	makeEnvironment('ex38','disjunctive_information'),
+	initEnvironment,
+	assert_ind(ideaste,oedipus,hasChild),
+	assert_ind(oedipus,polyneikes,hasChild),
+	assert_ind(ideaste,polyneikes,hasChild),
+	assert_ind(polyneikes,thersandros,hasChild),
+	assert_ind(oedipus,fatherMurderer),
+	assert_ind(thersandros,isTDisjoint(fatherMurderer)),
+	defconcept(c1,andM([fatherMurderer,someM(hasChild,isTDisjoint(fatherMurderer))])),
+	defconcept(c2,someM(hasChild,c1)).
+%%% Example 39
+% ask_M(mudIsa(iLucky,tFemale))
+% succeeds
+example(39) :-
+	makeEnvironment('ex39','negation_as_failure'),
+	initEnvironment,
+	defrole(parentOf,isMudInverseFn(childOf)),
+	defconcept(tMale,isTDisjoint(tFemale)),
+	defprimconcept(andM([someM(parentOf,tTOP),nafM(isTDisjoint(tFemale))]),tFemale),
+	assert_ind(iMary,iLucky,childOf).
+%%% Example 40
+% ask_M(mudIsa(iPeter,tRichPerson))
+% succeeds.
+% After
+% assert_ind(iPeter,tPoorPerson)
+% the query_M
+% ask_M(mudIsa(iPeter,tRichPerson))
+% fails
+example(40) :-
+	makeEnvironment('ex40','negation_as_failure'),
+	initEnvironment,
+	defprimconcept(andM([tDoctor,nafM(isTDisjoint(tRichPerson))]),tRichPerson),
+	defconcept(tPoorPerson,isTDisjoint(tRichPerson)),
+	assert_ind(iPeter,tDoctor).
+%%% Example 41
+% ask_M(mudIsa(iTom,tRichPerson))
+% succeeds.
+% After 
+% assert_ind(iTom,tPoorPerson)
+% the query_M
+% ask_M(mudIsa(iTom,tRichPerson))
+% fails
+example(41) :-
+	makeEnvironment('ex41','negation_as_failure'),
+	initEnvironment,
+	defrole(doctorParentOf,restr(isMudInverseFn(childOf),tDoctor)),
+	defrole(childOfDoctor,isMudInverseFn(r1)),
+	defprimconcept(andM([someM(doctorParentOf,tTOP),nafM(isTDisjoint(tRichPerson))]),tRichPerson),
+	defconcept(tPoorPerson,isTDisjoint(tRichPerson)),
+	assert_ind(iChris,tDoctor),
+	assert_ind(iChris,iTom,childOf).
+%%% Example 42
+% ask_M(mudIsa(iAudi7,tFourWheels))
+% succeeds.
+% After
+% assert_ind(iAudi7,fiveWheels)
+% the query_M
+% ask_M(mudIsa(iAudi7,tFourWheels))
+% fails
+example(42) :-
+	makeEnvironment('ex42','negation_as_failure'),
+	initEnvironment,
+	defconcept(tFourWheels,andM([atleast(4,wheels),atmost(4,wheels)])),
+	defconcept(fiveWheels,andM([atleast(5,wheels),atmost(5,wheels)])),
+	defprimconcept(andM([car,nafM(isTDisjoint(tFourWheels))]),tFourWheels),
+	assert_ind(iAudi7,car).
+%%% Example 43
+example(43) :-
+	makeEnvironment('ex43','concrete_domains'),
+	initEnvironment,
+	defconcept(tIsColors,setM([b,y,r])),
+	defconcept(blueOrYellow,setM([b,y])),
+	defconcept(tRed,setM([r])),
+	defconcept(blue,setM([b])),
+	defconcept(yellow,setM([y])),
+	defconcept(tRedOrYellow,setM([r,y])),
+	defconcept(blueOrRed,setM([b,r])),
+	defconcept(yellowOrBlue,setM([y,b])).
+%%% Example 44
+% subsumes(c2,c1)
+% should succeed
+example(44) :-
+	makeEnvironment('ex44','concrete_domains'),
+	initEnvironment,
+	defconcept(c1,setM([a,b])),
+	defconcept(c2,setM([a,b,c])).
+%%% Example 45
+example(45) :-
+	makeEnvironment('ex45','concrete_domains'),
+	initEnvironment,
+	defconcept(c1,setM([a,b,c])),
+	defconcept(c2,setM([a,b])),
+	defconcept(nc2,isTDisjoint(c2)).
+%%% Example 46
+% An insufficient specification of 
+% The bmw is either yellow, blue, or tRed but isTDisjoint yellow. 
+% ask_M(mudIsa(bmw,c3))
+% fails
+example(46) :-
+	makeEnvironment('ex46','concrete_domains'),
+	initEnvironment,
+	defconcept(c1,someM(hasCol,setM([yellow,blue,tRed]))),
+	defconcept(c2,someM(hasCol,isTDisjoint(setM([yellow])))),
+	defconcept(c3,someM(hasCol,setM([blue,tRed]))),
+	assert_ind(bmw,c1),
+	assert_ind(bmw,c2).
+%%% Example 47
+% A correct specification of
+% The bmw is either yellow, blue, or tRed but isTDisjoint yellow. 
+% ask_M(mudIsa(bmw,c3))
+% succeeds
+example(47) :-
+	makeEnvironment('ex47','concrete_domains'),
+	initEnvironment,
+	defconcept(c1,andM([someM(hasCol,setM([yellow,blue,tRed])),allM(hasCol,setM([yellow,blue,tRed]))])),
+	defconcept(c2,someM(hasCol,isTDisjoint(setM([yellow])))),
+	defconcept(c3,someM(hasCol,setM([blue,tRed]))),
+	assert_ind(bmw,c1),
+	assert_ind(bmw,c2).
+example(48) :-
+	makeEnvironment('ex48','concrete_concepts'),
+	initEnvironment,
+	defconcept(tOneSpouse,andM([atleast(1,mudSpouse),atmost(1,mudSpouse)])),
+	assert_ind(m1,tOneSpouse),
+	defprimconcept(someM(isMudInverseFn(mudSpouse),setM([m1])),setM([g0,g1,g2])),
+	assert_ind(g0,tOneSpouse),
+	defprimconcept(someM(isMudInverseFn(mudSpouse),setM([g0])),setM([m1,g1,g2])),
+	assert_ind(g1,tOneSpouse),
+	defprimconcept(someM(isMudInverseFn(mudSpouse),setM([g1])),setM([m1,g0,g2])),
+	assert_ind(g2,tOneSpouse),
+	defprimconcept(someM(isMudInverseFn(mudSpouse),setM([g2])),setM([m1,g0,g1])),
+	defconcept(zeroSH,andM([atleast(0,mudSubH),atmost(0,mudSubH)])),
+	defconcept(oneSH,andM([atleast(1,mudSubH),atmost(1,mudSubH)])),
+	defconcept(twoSH,andM([atleast(2,mudSubH),atmost(2,mudSubH)])),
+	assert_ind(g0,zeroSH),
+	assert_ind(g1,oneSH),
+	assert_ind(g2,twoSH),
+	defprimconcept(andM([someM(isMudInverseFn(mudSubH),setM([m1])),setM([m1])]),tBOT),
+	defprimconcept(andM([someM(isMudInverseFn(mudSubH),setM([g0])),setM([g0])]),tBOT),
+	defprimconcept(andM([someM(isMudInverseFn(mudSubH),setM([g1])),setM([g1])]),tBOT),
+	defprimconcept(andM([someM(isMudInverseFn(mudSubH),setM([g2])),setM([g2])]),tBOT),
+	defprimconcept(andM([someM(isMudInverseFn(mudSpouse),setM([m1])),someM(isMudInverseFn(mudSubH),setM([m1]))]),tBOT),
+	defprimconcept(andM([someM(isMudInverseFn(mudSpouse),setM([g0])),someM(isMudInverseFn(mudSubH),setM([g0]))]),tBOT),
+	defprimconcept(andM([someM(isMudInverseFn(mudSpouse),setM([g1])),someM(isMudInverseFn(mudSubH),setM([g1]))]),tBOT),
+	defprimconcept(andM([someM(isMudInverseFn(mudSpouse),setM([g2])),someM(isMudInverseFn(mudSubH),setM([g2]))]),tBOT),
+%	defconcept(someM(mudSubH,setM([m1])),someM(isMudInverseFn(mudSubH),setM([m1]))),
+%	defconcept(someM(mudSubH,setM([g0])),someM(isMudInverseFn(mudSubH),setM([g0]))),
+%	defconcept(someM(mudSubH,setM([g1])),someM(isMudInverseFn(mudSubH),setM([g1]))),
+%	defconcept(someM(mudSubH,setM([g2])),someM(isMudInverseFn(mudSubH),setM([g2]))).
+	defrole(mudSubH,isMudInverseFn(mudSubH)),
+	defrole(mudSpouse,isMudInverseFn(mudSpouse)).
+%%% Example 49
+% ask_M(mudIsa(p,c4))
+% should fail
+example(49) :-
+	makeEnvironment('ex49','defaults'),
+	initEnvironment,
+	defconcept(c4,andM([c5,c6])),
+	defprimconcept(andM([c0,nafM(isTDisjoint(c2))]),c5),
+	defprimconcept(andM([c0,nafM(isTDisjoint(c3))]),c6),
+	defconcept(c1,orM([isTDisjoint(c2),isTDisjoint(c3)])),
+	assert_ind(p,c0),
+	assert_ind(p,c1).
+example(50) :-
+	makeEnvironment('ex50','complete_or'),
+	initEnvironment,
+	defprimconcept(c1,c0),
+	defprimconcept(isTDisjoint(c1),c0).
+example(51) :-
+	makeEnvironment('ex51','functional_dependencies'),
+	initEnvironment,
+	def(posInfl(f,d)),
+	def(posInfl(h,f)),
+	def(posInfl(a,b)),
+	def(posInfl(b,c)),
+	def(posInfl(c,d)),
+	def(negInfl(b,e)),
+	def(negInfl(e,d)),
+	def(posInfl(g,e)),
+	def(posInfl(a,g)),
+	def(increase(a)).
+example(52) :-
+	makeEnvironment('ex52','functional_dependencies'),
+	initEnvironment,
+	def(increase(hasCubicCapacity)),
+	def(negInfl(withRebate,hasPrice)),
+	def(posInfl(hasPrice,hasOverallCost)),
+	def(posInfl(hasCubicCapacity,hasListPrice)),
+	def(posInfl(hasListPrice,hasPrice)),
+	def(posInfl(hasCubicCapacity,hasFuelConsumption)),
+	def(posInfl(hasFuelConsumption,hasOverallCost)),
+	def(posInfl(hasCubicCapacity,hasMaxSpeed)),
+	def(negInfl(hasCatConverter,hasMaxSpeed)),
+	def(posInfl(hasCatConverter,hasFuelConsumption)),
+	def(posInfl(hasCubicCapacity,hasWeight)),
+	def(negInfl(hasWeight,hasMaxSpeed)).
+example(53) :-
+	makeEnvironment('ex53','functional_dependencies'),
+	initEnvironment,
+	def(increase(hasCubicCapacity)),
+	def(infl(withRebate,hasPrice,-1.0)),
+	def(infl(hasPrice,hasOverallCost,1.0)),
+	def(infl(hasCubicCapacity,hasListPrice,1.2)),
+	def(infl(hasListPrice,hasPrice,1.0)),
+	def(infl(hasCubicCapacity,hasFuelConsumption,0.8)),
+	def(infl(hasFuelConsumption,hasOverallCost,1.0)),
+	def(infl(hasCubicCapacity,hasHorsePower,1.0)),
+	def(infl(hasHorsePower,hasFuelConsumption,1.0)),
+	def(infl(hasHorsePower,hasMaxSpeed,1.0)),
+	def(infl(hasFuelType,hasMaxSpeed,0.8)),
+	def(infl(hasCatConverter,hasHorsePower,-0.5)),
+	def(infl(hasCubicCapacity,hasWeight,0.5)),
+	def(infl(hasWeight,hasHorsePower,-1.0)).
+example(54) :-
+	makeEnvironment('ex54','functional_dependencies'),
+	initEnvironment,
+	def(negInfl(a,b)),
+	def(posInfl(b,e)),
+	def(posInfl(e,d)),
+	def(negInfl(g,e)),
+	def(negInfl(a,g)).
+%
+%	Apart from the notation identical to ex54.
+%
+example(55) :-
+	makeEnvironment('ex55','functional_dependencies'),
+	initEnvironment,
+	def(infl(a,b,1.0)),
+	def(infl(b,e,1.0)),
+	def(infl(e,d,1.0)),
+	def(infl(g,e,1.0)),
+	def(infl(a,g,-1.0)).
+example(56) :-
+	makeEnvironment('ex56','functional_dependencies'),
+	initEnvironment,
+	def(infl(a,b,1.0)),
+	def(infl(b,e,1.0)),
+	def(infl(e,d,1.0)),
+	def(infl(g,e,1.0)),
+	def(infl(a,g,-1.0)),
+	def(infl(f,g,0.5)),
+	def(infl(f,h,-0.5)),
+	def(infl(h,d,0.3)).
+example(57) :-
+	makeEnvironment('ex57','functional_dependencies'),
+	initEnvironment,
+	def(posInfl(a,b)),
+	def(posInfl(b,c)),
+	def(posInfl(c,d)).
+example(58) :- 
+	makeEnvironment('ex58','functional_dependencies'),
+	initEnvironment,
+	def(posInfl(a,b)),
+	def(posInfl(b,c)),
+	def(posInfl(c,d)),
+	def(infl(e,b,-1.0)),
+	def(infl(e,c,0.5)).
+example(59) :-
+	sb_defenv('mybox','sb.lit'),
+	sb_initenv,
+	sb_primconcept(tAgentGeneric),
+	sb_primconcept(tFemale,[supers([tAgentGeneric])]),
+	sb_primconcept(tMale,[supers([tAgentGeneric])]),
+	sb_disjoint(tMale,tFemale),
+	sb_primelemrole(roleChild,'domain-range'(tRangeParent,tAgentGeneric,tAgentGeneric)),
+	sb_defconcept(tRangeParent,[supers([tAgentGeneric]),
+                              nr(roleChild,1,30,2)]),
+	sb_defconcept(tRangeMother,[supers([tRangeParent,tFemale])]),
+	sb_defconcept(tRangeFather,[supers([tRangeParent,tMale])]),
+	sb_defconcept(tGranny,[supers([grandparent,tRangeMother])]),
+	sb_defelem(iHarry,[mudIsa(tRangeParent)]),
+	sb_defelem(iMary,[mudIsa(tRangeMother), 
+                         irole(roleChild, 
+                               iname('marys-roleChild'),
+                               [nr(1,30,2), vr(iHarry)])]).
+example(60) :-
+	makeEnvironment('ex60','Modal operators'),
+	initEnvironment,	
+	modalAxioms(kd45,believe,iPeter),
+	defprimconcept([b(believe,iPeter)],tDoctor,tRichPerson),
+	assert_ind([b(believe,iPeter)],iTom,tDoctor).
+%%% Example 61
+% deduce_M(mudIsa(iTweety,tCanFly))
+% deduce_M(mudIsa(iTweety,tCanNest))
+% deduce_M(mudIsa(iTweety,isTDisjoint(tEmu)))
+% deduce_M(mudIsa(iTweety,isTDisjoint(tCuckoo)))
+% succeed
+example(61) :-
+	makeEnvironment('ex61','Defaults and the lottery paradox'),
+	initEnvironment,	
+	defprimconcept(andM([tBird,nafM(isTDisjoint(tCanFly))]), tCanFly),
+	defprimconcept(andM([tBird,nafM(isTDisjoint(tCanNest))]), tCanNest),
+	defprimconcept(tEmu,isTDisjoint(tCanFly)),
+	defprimconcept(tCuckoo,isTDisjoint(tCanNest)),
+	assert_ind(iTweety,tBird).
+%%% Example 62
+% deduce_M(mudIsa(iTweety,tBird))
+% deduce_M(mudIsa(iTweety,tCanFly))
+% deduce_M(mudIsa(iTweety,tCanNest))
+% consistent_M([])
+% succeed
+% deduce_M(mudIsa(iTweety,isTDisjoint(tEmu)))
+% deduce_M(mudIsa(iTweety,tEmu))
+% deduce_M(mudIsa(iTweety,isTDisjoint(tCuckoo)))
+% deduce_M(mudIsa(iTweety,tCuckoo))
+% deduce_M(mudIsa(iTweety,isTDisjoint(tBird)))
+% fail
+example(62) :-
+	makeEnvironment('ex62','Defaults and the lottery paradox'),
+	initEnvironment,	
+	defprimconcept(andM([tBird,nafM(isTDisjoint(tCanFly))]), tCanFly),
+	defprimconcept(andM([tBird,nafM(isTDisjoint(tCanNest))]), tCanNest),
+	defprimconcept(tEmu,isTDisjoint(tCanFly)),
+	defprimconcept(tCuckoo,isTDisjoint(tCanNest)),
+	defconcept(tBird,orM([tEmu,tCuckoo])),
+	assert_ind(iTweety,tBird).
+%%% Example 63
+% deduce_M(mudIsa(iTweety,tBird))
+% deduce_M(mudIsa(iTweety,tCanFly))
+% deduce_M(mudIsa(iTweety,tCanNest))
+% deduce_M(mudIsa(iTweety,sparrow))
+% deduce_M(mudIsa(iTweety,isTDisjoint(tEmu)))
+% deduce_M(mudIsa(iTweety,isTDisjoint(tCuckoo)))
+% consistent_M([])
+% succeed
+example(63) :-
+	makeEnvironment('ex63','Defaults and the lottery paradox'),
+	initEnvironment,	
+	defprimconcept(andM([tBird,nafM(isTDisjoint(tCanFly))]), tCanFly),
+	defprimconcept(andM([tBird,nafM(isTDisjoint(tCanNest))]), tCanNest),
+	defprimconcept(tEmu,isTDisjoint(tCanFly)),
+	defprimconcept(tCuckoo,isTDisjoint(tCanNest)),
+	defconcept(tBird,orM([sparrow,tEmu,tCuckoo])),
+	assert_ind(iTweety,tBird).
+%%% Example 64
+% deduce_M(mudIsa(iPeter,tLeftHandUsable))
+% deduce_M(mudIsa(iPeter,tRightHandUsable))
+% deduce_M(mudIsa(iPeter,tOneHandUsable))
+% succeed
+% deduce_M(mudIsa(iPeter,tBothHandsUsable))
+% deduce_M(mudIsa(iPeter,isTDisjoint(tBothHandsUsable))
+% fail
+example(64) :-
+	makeEnvironment('ex64','Defaults and the lottery paradox'),
+	initEnvironment,	
+	defprimconcept(nafM(tLeftHandBroken),tLeftHandUsable),
+	defprimconcept(nafM(tRightHandBroken),tRightHandUsable),
+	defconcept(tOneHandBroken,orM([tLeftHandBroken,tRightHandBroken])),
+	defconcept(tOneHandUsable,orM([tLeftHandUsable,tRightHandUsable])),
+	defconcept(tBothHandsUsable,andM([tLeftHandUsable,tRightHandUsable])),
+	assert_ind(iPeter,tOneHandBroken).
+%%% Example 65
+% deduce_M(mudIsa(iPeter,tLeftHandUsable))
+% can prove tLeftHandUsable by default because
+% cannot prove tLeftHandBroken because
+% can prove tOneHandBroken but
+% cannot prove isTDisjoint(tRightHandBroken) because
+% cannot prove tRightHandUsable because
+% can prove tRightHandBroken because
+% can prove tOneHandBroken andM
+% can prove isTDisjoint(tLeftHandBroken) because
+% can prove tLeftHandUsable by default because
+% cannot prove tLeftHandBroken because the loop check prevents
+%                                     the application of any axiom
+% deduce_M(mudIsa(iPeter,tRightHandUsable))
+% deduce_M(mudIsa(iPeter,isTDisjoint(tBothHandsUsable))
+% succeed
+% deduce_M(mudIsa(iPeter,tBothHandsUsable))
+% deduce_M(mudIsa(iPeter,tOneHandUsable))
+% cannot prove tOneHandUsable becauce
+% (cannot prove tLeftHandUsable because
+%  can prove tLeftHandBroken because
+%  tOneHandBroken is a fact andM
+%  (can prove isTDisjoint(tRightHandBroken) because
+%   can prove tRightHandUsable by default because
+%   cannot prove tRightHandBroken because
+%   can prove tOneHandBroken but 
+%   cannot prove isTDisjoint(tLeftHandBroken) because
+%   cannot prove tLeftHandUsable because the loop check prevents
+%                                       the application of any axiom))
+% and it is also isTDisjoint possible possible to prove tRightHandUsable
+% for similar reasons
+% deduce_M(mudIsa(iPeter,isTDisjoint(tOneHandUsable)))
+% fail
+example(65) :-
+	makeEnvironment('ex65','Defaults and the lottery paradox'),
+	initEnvironment,	
+	defprimconcept(nafM(tLeftHandBroken),tLeftHandUsable),
+	defprimconcept(nafM(tRightHandBroken),tRightHandUsable),
+	defconcept(tOneHandBroken,orM([tLeftHandBroken,tRightHandBroken])),
+	defconcept(tOneHandUsable,orM([tLeftHandUsable,tRightHandUsable])),
+	defconcept(tBothHandsUsable,andM([tLeftHandUsable,tRightHandUsable])),
+	defprimconcept(tLeftHandBroken,isTDisjoint(tLeftHandUsable)),
+	defprimconcept(tRightHandBroken,isTDisjoint(tRightHandUsable)),
+	assert_ind(iPeter,tOneHandBroken).
+%%% Example 66
+% deduce_M(mudIsa(iPeter,tLeftHandUsable))
+% deduce_M(mudIsa(iPeter,tRightHandUsable))
+% deduce_M(mudIsa(iPeter,tOneHandUsable))
+% deduce_M(mudIsa(iPeter,isTDisjoint(tBothHandsUsable))
+% succeed
+% deduce_M(mudIsa(iPeter,tBothHandsUsable))
+% deduce_M(mudIsa(iPeter,isTDisjoint(tOneHandUsable)))
+% fail
+example(66) :-
+	makeEnvironment('ex66','Defaults and the lottery paradox'),
+	initEnvironment,	
+	defprimconcept(nafM(tLeftHandBroken),tLeftHandUsable),
+	defprimconcept(nafM(tRightHandBroken),tRightHandUsable),
+	defconcept(tOneHandBroken,orM([tLeftHandBroken,tRightHandBroken])),
+	defconcept(tOneHandUsable,orM([nafM(isTDisjoint(tLeftHandUsable)),nafM(isTDisjoint(tRightHandUsable))])),
+	defconcept(tBothHandsUsable,andM([tLeftHandUsable,tRightHandUsable])),
+	defprimconcept(tLeftHandBroken,isTDisjoint(tLeftHandUsable)),
+	defprimconcept(tRightHandBroken,isTDisjoint(tRightHandUsable)),
+	assert_ind(iPeter,tOneHandBroken).
+%%% Example 67
+example(67) :-
+	makeEnvironment('ex67','Defaults and the lottery paradox'),
+        initEnvironment,        
+        defprimconcept(nafM(tLeftHandBroken),tLeftHandUsable),
+        defprimconcept(nafM(tRightHandBroken),tRightHandUsable),
+        defprimconcept(tLeftHandBroken,isTDisjoint(tLeftHandUsable)),
+        defprimconcept(tRightHandBroken,isTDisjoint(tRightHandUsable)),
+        defconcept(tOneHandUsable,orM([tLeftHandUsable,tRightHandUsable])),
+        defconcept(tOneHandBroken,orM([tLeftHandBroken,tRightHandBroken])),
+        defconcept(tBothHandsBroken,andM([tLeftHandBroken,tRightHandBroken])),
+        assert_ind(iPeter,tOneHandBroken),
+        assert_ind(iPeter,isTDisjoint(tBothHandsBroken)).
+example(68) :-
+	makeEnvironment('ex68','Defaults and the lottery paradox'),
+        initEnvironment,        
+        defprimconcept(nafM(tBOT),tLeftHandUsable),
+        defprimconcept(nafM(tBOT),tRightHandUsable),
+        defprimconcept(tLeftHandBroken,isTDisjoint(tLeftHandUsable)),
+        defprimconcept(tRightHandBroken,isTDisjoint(tRightHandUsable)),
+        defconcept(tOneHandUsable,orM([tLeftHandUsable,tRightHandUsable])),
+        defconcept(tOneHandBroken,orM([tLeftHandBroken,tRightHandBroken])),
+        defconcept(tBothHandsBroken,andM([tLeftHandBroken,tRightHandBroken])),
+        assert_ind(iPeter,tOneHandBroken),
+        assert_ind(iPeter,isTDisjoint(tBothHandsBroken)).
+%%% Example 69
+% deduce_M(mudIsa(iTweety,tBird))
+% succeeds
+% deduce_M(mudIsa(iTweety,isTDisjoint(tBird)))
+% deduce_M(mudIsa(iTweety,tCanFly))
+% deduce_M(mudIsa(iTweety,isTDisjoint(tCanFly)))
+% deduce_M(mudIsa(iTweety,tCanNest))
+% deduce_M(mudIsa(iTweety,isTDisjoint(tCanNest)))
+% fail
+example(69) :-
+	makeEnvironment('ex69','Defaults and the lottery paradox'),
+	initEnvironment,	
+	defprimconcept(andM([tBird,nafM(exception),nafM(isTDisjoint(tCanFly))]), tCanFly),
+	defprimconcept(andM([tBird,nafM(exception),nafM(isTDisjoint(tCanNest))]), tCanNest),
+	defprimconcept(tEmu,exception),
+	defprimconcept(tCuckoo,exception),
+	defconcept(tBird,orM([tEmu,tCuckoo])),
+	assert_ind(iTweety,tBird).
+%%% Example 70
+% deduce_M(mudIsa(a,clearTop))
+% deduce_M(mudIsa(a,isTDisjoint(clearTop)))
+% fail
+% deduce_M(mudIsa(b,clearTop))
+% deduce_M(mudIsa(b,clearTop))
+% succeed
+example(70) :-
+	makeEnvironment('ex70','Defaults and existential quantification'),
+	initEnvironment,
+	defconcept(blocked,someM(on,tTOP)),
+	defprimconcept(andM([block,nafM(blocked)]),clearTop),
+	assert_ind(a,block),
+	assert_ind(b,block),
+	assert_ind(c,block),
+	assert_ind(a,b,on).
+example(71) :-
+	makeEnvironment('ex71','PRACMA'),
+	initEnvironment,
+	defprimconcept(sporttyp),
+	defprimconcept(envtyp),
+	sb_primconcept([b(believe,pk)],mudCarWish,[supers([car])]),
+	sb_primelemrole([bc(want,sporttyp)],has_tyre,'domain-range'(mudCarWish,broad_tyre,broad_tyre)),
+	sb_primelemrole([bc(believe,sporttyp)],mudSpeed,'domain-range'('2cv',vtLowSpeed,vtLowSpeed)),
+	sb_primelemrole([bc(want,envtyp)],has_part,'domain-range'(mudCarWish,cat_conv,cat_conv)),
+	sb_primelemrole([bc(believe,envtyp)],mudSpeed,'domain-range'('2cv',vtFastSpeed,vtFastSpeed)),
+%	modalAxioms(kd45,believe,pk),	
+%	modalAxioms(kd45,want,pk),	
+	modalAxioms(kd45,believe,concept(sporttyp)),
+	modalAxioms(kd45,want,concept(sporttyp)),
+	modalAxioms(kd45,believe,concept(envtyp)),
+	modalAxioms(kd45,want,concept(envtyp)).
+example(72) :-
+	makeEnvironment('ex72','DEMO'),
+	initEnvironment,
+	defprimconcept(sporttyp),
+	defprimconcept(umwelttyp),
+	modalAxioms([b(believe,pv)],k,want,concept(sporttyp)),
+	modalAxioms([b(believe,pv)],k,want,concept(umwelttyp)),
+	modalAxioms(kd45,believe,allM),
+	sb_primconcept([b(believe,allM)], tVolkswagon, [supers([tAutomobile])]),
+	sb_primconcept([b(believe,allM)], opel, [supers([tAutomobile])]),
+	assert_ind([b(believe,allM)],polo,tVolkswagon),
+	assert_ind([b(believe,allM)],manta,opel),
+	sb_defconcept([b(believe,pv),bc(want,sporttyp)],wunsch_auto,[supers([tAutomobile,tHasCarSpoiler])]),
+	% Anmerkung:
+        % In MOTEL ist es m"oglich, mehrere sich erg"anzende Definitionen 
+        % f"ur ein Konzept (hier z.B. tVolkswagon) zu haben. Damit ein Konzept im
+        % Verlauf des Dialogs st"andig zu verfeinern. 
+	sb_primconcept([b(believe,pv),bc(believe,sporttyp)],tVolkswagon,[supers([langsam])]),
+	defprimconcept([b(believe,pv),bc(believe,sporttyp)],andM([tAutomobile,hatKat,nafM(isTDisjoint(langsam))]),langsam),
+	sb_defconcept([b(believe,pv),bc(want,umwelttyp)],wunsch_auto,[supers([tAutomobile,hatKat])]),
+	sb_primconcept([b(believe,pv),bc(believe,umwelttyp)],tVolkswagon,[supers([isTDisjoint(langsam)])]),
+	assert_ind([b(believe,pv)],pk,sporttyp),
+        % Anmerkung:
+	% Bei der folgenden Definition reicht es nicht zu sagen, da\3
+        % polo ein Auto ist oder das alle glauben, da\3 polo ein Auto ist,
+        % da tMale durchaus Sachen im want haben kann, die der Realit"at 
+        % widersprechen. Deshalb mu\3 pk wollen, da\3 polo ein tAutomobile ist.
+	assert_ind([b(believe,pv),b(want,pk)],polo,tAutomobile).
+        % Demo:
+        %
+        % setof(C,ask_M([b(believe,pk)],mudIsa(polo,C)),L).
+        % L = [tAutomobile,langsam,tTOP,tVolkswagon,isTDisjoint(tBOT)]
+        % Zun"achst erbt hier der pk vom b(believe,allM), den Glauben, da\3
+        % polo ein tVolkswagon und damit ein tAutomobile ist. Vom b(believe,sporttyp) erbt 
+        % er, da\3 tVolkswagon's langsam sind, womit auch der polo langsam ist.
+        % 
+        % setof(C,ask_M([b(believe,pk)],mudIsa(manta,C)),L)
+        % L = [tAutomobile,opel,tTOP,isTDisjoint(tBOT)]
+        % Da es sich bei dem manta um einen opel handelt, wird zun"achst
+        % nicht angenommen, da\3 der manta langsam ist.
+        %
+        % assert_ind([b(believe,pv),b(believe,pk)],manta,hatKat)
+        % Hiermit haben wir festgelegt, da\3 der pk glaubt, da\3 der manta
+        % einen Katalysator hat. Nun erbt der pk vom sporttyp aber auch
+        % die Regel, da\3 Autos mit Katalysatoren normalerweise langsam sind.
+        % Dies f"uhrt bei der Wiederholung der letzten Anfrage zu folgendem
+        % Ergebnis:
+        %
+        % setof(C,ask_M([b(believe,pk)],mudIsa(manta,C)),L)
+        % L = [tAutomobile,hatKat,langsam,opel,tTOP,isTDisjoint(tBOT)]
+        %
+        % Wir k"onnen neben der Deduktion auf Abduktion verwenden:
+        %
+        % abduce([b(want,pk)],H,mudIsa(polo,wunsch_auto),E).
+        % E = proved(in_M(app(_A:m(want,pk),[]),wunsch_auto,polo),
+        %     basedOn(andM([proved(in_M(app(_A:m(want,pk),[]),tAutomobile,polo),
+        %     basedOn(abox)),
+        %     proved(in_M(app(_A:m(want,pk),[]),tHasCarSpoiler,polo),
+        %     basedOn(usingAbHyp(in_M(app(_A:m(want,pk),[]),tHasCarSpoiler,polo))))]))),
+        % H = [in_M(app(_B:m(want,pk),[]),tHasCarSpoiler,polo)]          
+        % D.h. pk will den polo als Wunschauto, wenn der polo einen Spoiler hat.
+        %
+        % Nun erhalten wir von PRACMA die Anweisungen zu einem 
+        % Stereotypwechsel:
+        %
+        % delete_ind(pk,sporttyp)
+        % assert_ind(pk,umwelttyp)
+        %
+        % Dadurch "andern sich die Anfrageergebnisse wie folgt:
+        %
+        % setof(C,ask_M([b(believe,pk)],mudIsa(polo,C)),L).
+        % L = [tAutomobile,tTOP,tVolkswagon,isTDisjoint(tBOT),isTDisjoint(langsam)]
+        %
+        % Der polo geh"ort nun zu den nicht langsamen Autos, da umwelttypen
+        % genau dies glauben.
+        % 
+        % setof(C,ask_M([b(believe,pk)],mudIsa(manta,C)),L).
+        % L = [tAutomobile,hatKat,opel,tTOP,isTDisjoint(tBOT)]
+        % 
+        % Der Manta hat zwar immernoch einen Katalysator, ist aber trotzdem
+        % nicht langsam, da umwelttypen nicht glauben, da\3 Katalysatoren ein
+        % Auto langsam machen.
+        %
+        % Wir k""onnen auch in diesem Fall fragen, unter welchen Umst"anden
+        % pk den polo f"ur sein Wunschauto halten w"urde:
+        %
+        % abduce([b(want,pk)],H,mudIsa(polo,wunsch_auto),E).
+        % E = proved(in_M(app(_A:m(want,pk),[]),wunsch_auto,polo),
+        %     basedOn(andM([proved(in_M(app(_A:m(want,pk),[]),tAutomobile,polo),
+        %     basedOn(abox)),
+        %     proved(in_M(app(_A:m(want,pk),[]),hatKat,polo),
+        %     basedOn(usingAbHyp(in_M(app(_A:m(want,pk),[]),hatKat,polo))))]))),
+        % H = [in_M(app(_B:m(want,pk),[]),hatKat,polo)]
+        %
+        % Wie erwartet, soll das Wunschauto von pk nun einen Katalysator haben.
+example(73) :-
+	assert_ind([b(believe,allM)],polo,tVolkswagon),
+	defprimconcept([b(believe,pv),bc(believe,sporttyp)],tVolkswagon,langsam),
+	assert_ind([b(believe,pv)],pk,sporttyp),
+	modalAxioms(kd45,believe,pv),
+	modalAxioms([b(believe,pv)],kd45,believe,concept(sporttyp)).
+example(74) :-
+	makeEnvironment('ex74','DEMO'),
+	initEnvironment,
+	defprimconcept(sporttyp),
+	defprimconcept(umwelttyp),
+	modalAxioms([b(believe,pv)],k,want,concept(sporttyp)),
+	modalAxioms([b(believe,pv)],k,want,concept(umwelttyp)),
+	modalAxioms(kd45,believe,allM),
+	sb_primconcept([b(believe,allM)], tVolkswagon, [supers([tAutomobile])]),
+	sb_primconcept([b(believe,allM)], opel, [supers([tAutomobile])]),
+	assert_ind([b(believe,allM)],polo,tVolkswagon),
+	assert_ind([b(believe,allM)],manta,opel),
+	defprimconcept([b(believe,pv),bc(want,sporttyp)],andM([tAutomobile,orM([tHasCarSpoiler,hatSchiebedach])]),wunsch_auto),
+	defprimconcept([b(believe,pv),bc(believe,sporttyp)],tVolkswagon,langsam),
+	defprimconcept([b(believe,pv),bc(believe,sporttyp)],andM([tAutomobile,hatKat,nafM(isTDisjoint(langsam))]),langsam),
+	defconcept([b(believe,pv),bc(want,umwelttyp)],wunsch_auto,andM([tAutomobile,hatKat])),
+	defprimconcept([b(believe,pv),bc(believe,umwelttyp)],tVolkswagon,isTDisjoint(langsam)),
+	assert_ind([b(believe,pv)],pk,sporttyp),
+	assert_ind([b(believe,pv),b(want,pk)],polo,tAutomobile).
+example(75) :-
+	makeEnvironment('ex75','DEMO'),
+	initEnvironment,
+	defprimconcept(racer),
+	defprimconcept(creeper),
+	modalAxioms([b(believe,ps)],k,want,concept(racer)),
+	modalAxioms([b(believe,ps)],k,want,concept(creeper)),
+	modalAxioms(kd45,believe,allM),
+	defprimconcept([b(believe,allM)], tVolkswagon, car),
+	defprimconcept([b(believe,allM)], bmw, car),
+	assert_ind([b(believe,allM)],beetle,tVolkswagon),
+	assert_ind([b(believe,allM)],'bmw735',bmw),
+	defprimconcept([b(believe,ps),bc(want,racer)],andM([car,orM([has_spoiler,has_sliding_roof])]),dream_car),
+	defprimconcept([b(believe,ps),bc(believe,racer)],tVolkswagon,slow),
+	defprimconcept([b(believe,ps),bc(believe,racer)],andM([car,has_cat_conv,nafM(isTDisjoint(slow))]),slow),
+	defconcept([b(believe,ps),bc(want,creeper)],dream_car,andM([car,has_cat_conv])),
+	defprimconcept([b(believe,ps),bc(believe,creeper)],tVolkswagon,isTDisjoint(slow)),
+	assert_ind([b(believe,ps)],pc,racer),
+	assert_ind([b(believe,ps),b(want,pc)],beetle,car).
+example(76) :-
+	makeEnvironment('ex76','SETHEO'),
+	initEnvironment,
+	defprimconcept(racer),
+	defprimconcept(creeper),
+	modalAxioms([b(believe,ps)],k,want,concept(racer)),
+	modalAxioms([b(believe,ps)],k,want,concept(creeper)),
+	modalAxioms(kd45,believe,allM),
+	defprimconcept([b(believe,allM)], tVolkswagon, car),
+	defprimconcept([b(believe,allM)], bmw, car),
+	assert_ind([b(believe,allM)],beetle,tVolkswagon),
+	assert_ind([b(believe,allM)],'bmw735',bmw),
+	defprimconcept([b(believe,ps),bc(want,racer)],andM([car,orM([has_spoiler,has_sliding_roof])]),dream_car),
+	defprimconcept([b(believe,ps),bc(believe,racer)],tVolkswagon,slow),
+	defconcept([b(believe,ps),bc(want,creeper)],dream_car,andM([car,has_cat_conv])),
+	defprimconcept([b(believe,ps),bc(believe,creeper)],tVolkswagon,isTDisjoint(slow)),
+	assert_ind([b(believe,ps)],pc,racer),
+	assert_ind([b(believe,ps),b(want,pc)],beetle,car).
+
+/**********************************************************************
+ *
+ * @(#) testMotel.pl 1.6@(#)
+ *
+ */
+
+testMotel :-
+	testAllMotelExamples(1),
+	!.
+
+testMotel(N) :-
+	testAllMotelExamples(N),
+	!.
+
+testAllMotelExamples(64) :-
+	print('Test complete'), nl, nl,
+	!.
+testAllMotelExamples(N) :-
+	initializeMotel,
+	% print('Example '), print(N), nl,
+        flag(current_example,_,N),
+        example(N),
+	once(testMotelExample(N)),
+	M is N + 1,
+	testAllMotelExamples(M).
+
+go_goal_for_example:-!.
+go_goal_for_example :- print('No goal for this example'), nl.
+
+testMotelExample(1) :-	
+	go_goal_for_example.
+testMotelExample(2) :-
+	printTime(setof(C,E^deduce_M(ex2,[],mudIsa(iMary,C),E),L1)), print(L1), nl,
+	printTime(setof(D,F^deduce_M(ex2,[],mudIsa(iTom,D),F),L2)), print(L2), nl.
+testMotelExample(3) :-
+	tryGoal(inconsistent_M(ex3)).
+testMotelExample(4) :-
+	go_goal_for_example.
+testMotelExample(5) :-
+	tryGoal(not(subsumes([],c1,c2))),
+	tryGoalF(subsumes([],c2,c1)).
+testMotelExample(6) :-
+	tryGoal(not(subsumes([],c1,c2))),
+	tryGoalF(subsumes([],c2,c1)).
+testMotelExample(7) :-
+	go_goal_for_example.
+testMotelExample(8) :-
+	tryGoal(deduce_M(mudIsa(iTom,heterosexual))).
+testMotelExample(9) :-
+	tryGoal(deduce_M(mudIsa(iChris,tMale))).
+testMotelExample(10) :-
+	tryGoal(deduce_M(mudIsa(iTom,c2))).
+testMotelExample(11) :-
+	tryGoal(inconsistent_M(ex11)).
+testMotelExample(12) :-
+	tryGoal(subsumes([],c1,c2)),
+	tryGoal(not(subsumes([],c2,c1))).
+testMotelExample(13) :-
+	tryGoal(subsumes([],c1,c2)).
+testMotelExample(14) :-
+%	initializeMotel, print('Example 14'), nl, example(14),
+%	tryGoal(subsumes([],c2,c1)),
+	!.
+testMotelExample(15) :-
+	tryGoal(subsumes([],c2,c1)).
+testMotelExample(16) :-
+	tryGoalF(subsumes([],c2,c1)).
+testMotelExample(17) :-
+	tryGoalF(subsumes([],c2,c1)).
+testMotelExample(18) :-
+	tryGoal(deduce_M(mudIsa(iMary,c4))).
+testMotelExample(19) :-
+	tryGoalF(deduce_M(mudIsa(iAmy,tFemale))).
+testMotelExample(20) :-
+	tryGoal(inconsistent_M(ex20)).
+testMotelExample(21) :-
+	go_goal_for_example,
+% 	deduce_M(mudIsa(betty,tFemale)),
+	!.
+testMotelExample(22) :-
+% 	deduce_M(mudIsa(iAmy,tFemale)),
+	go_goal_for_example.
+testMotelExample(23) :-
+% 	deduce_M(mudIsa(iAmy,tFemale))
+	go_goal_for_example.
+testMotelExample(24) :-
+	tryGoal(deduce_M(mudIsa(iAudi7,c3))).
+testMotelExample(25) :-
+	tryGoal(not(deduce_M(mudIsa(iAudi7,c3)))).
+testMotelExample(26) :-
+	tryGoal(not(subsumes([],c1,c2))),
+	tryGoalF(subsumes([],c2,c1)).
+testMotelExample(27) :-
+	tryGoal(not(subsumes([],c1,c2))),
+	tryGoalF(subsumes([],c2,c1)).
+testMotelExample(28) :-
+	tryGoalF(deduce_M(ex29,[b(believe,iJohn)],mudIsa(iAudi7,tAutomobile),_P)).
+testMotelExample(29) :-
+	go_goal_for_example.
+testMotelExample(30) :-
+	go_goal_for_example.
+testMotelExample(31) :-
+	tryGoal(deduce_M(mudIsa(iTom,onlyMaleChildren))).
+testMotelExample(32) :-
+	tryGoal(abduce(_H1,mudIsa(robin,tMale),_E1)),
+	tryGoal(abduce(_H2,mudIsa(robin,tFemale),_E2)).
+testMotelExample(33) :-
+	tryGoal(abduce(_H3,mudIsa(iNixon,tWarDove),_E3)),
+	tryGoal(abduce(_H4,mudIsa(iNixon,tWarHawk),_E4)).
+testMotelExample(34) :-
+	tryGoal(inconsistent_M(ex34)).
+testMotelExample(35) :-
+	tryGoal(abduce(ex35,[],_H5,mudIsa(iJohn,tCanFly),_E5)),
+	tryGoal(not(abduce(ex35,[],_H8,mudIsa(iTweety,tCanFly),_E8))).
+testMotelExample(36) :-
+	tryGoal(abduce(ex36,[],_H6,mudIsa(iNixon,tWarDove),_E6)),
+	tryGoal(abduce(ex36,[],_H7,mudIsa(iNixon,tWarHawk),_E7)).
+testMotelExample(37) :-
+	go_goal_for_example.
+testMotelExample(38) :-
+	tryGoal(deduce_M(mudIsa(ideaste,c2))).
+testMotelExample(39) :-
+	tryGoal(deduce_M(mudIsa(iLucky,tFemale))),
+	tryGoal(assert_ind(iLucky,tMale)),
+	tryGoalF(not(deduce_M(mudIsa(iLucky,tFemale)))),
+	tryGoal(consistent_M([])).
+testMotelExample(40) :-
+	tryGoal(deduce_M(mudIsa(iPeter,tRichPerson))),
+	tryGoal(assert_ind(iPeter,tPoorPerson)),
+	tryGoalF(not(deduce_M(mudIsa(iPeter,tRichPerson)))),
+	tryGoal(consistent_M([])),
+	tryGoal(not(subsumes(tRichPerson,tDoctor))).
+testMotelExample(41) :-
+	tryGoal(deduce_M(mudIsa(iTom,tRichPerson))),
+	tryGoal(assert_ind(iTom,tPoorPerson)),
+	tryGoalF(not(deduce_M(mudIsa(iTom,tRichPerson)))),
+	tryGoal(consistent_M([])).
+testMotelExample(42) :-
+	tryGoal(deduce_M(mudIsa(iAudi7,tFourWheels))),
+	tryGoal(assert_ind(iAudi7,fiveWheels)),
+	tryGoalF(not(deduce_M(mudIsa(iAudi7,tFourWheels)))),
+	tryGoal(consistent_M([])).
+testMotelExample(43) :-
+	tryGoal(deduce_M(mudIsa(r,tRed))),
+	tryGoal(deduce_M(mudIsa(r,tRedOrYellow))),
+	tryGoal(deduce_M(mudIsa(r,tIsColors))).
+testMotelExample(44) :-
+	tryGoalF(subsumes(c2,c12)).
+testMotelExample(45) :-
+	go_goal_for_example.
+testMotelExample(46) :-
+	go_goal_for_example.
+testMotelExample(47) :-
+	tryGoalF(deduce_M(mudIsa(bmw,c3))).
+testMotelExample(48) :-
+	go_goal_for_example.
+testMotelExample(49) :-
+	tryGoal(not(deduce_M(mudIsa(p,c4)))).
+testMotelExample(50) :-
+	tryGoal(deduce_M(mudIsa(iPeter,c0))).
+
+testMotelExample(51) :-
+	tryGoal(deduce_M(posInfl(a,d))),
+	tryGoal(deduce_M(posInfl(b,d))),
+	tryGoal(bagof(Y1,deduce_M(posInfl(a,Y1)),Y1s)),
+	tryGoal(verifySolution(Y1s,[b,c,d,g])),
+	tryGoal(deduce_M(infl(a,d,1.0))),
+	tryGoal(bagof((X1,W1),deduce_M(infl(X1,e,W1)),X1W1Pairs)),
+	tryGoal(verifySolution(X1W1Pairs,[(a,0.0),(b,-1.0),(g,1.0)])),
+	tryGoal(deduce_M(simultInfl([a,h],d,2.0))),
+	tryGoal(deduce_M(change(d,1.0))),
+	tryGoal(bagof(X2,deduce_M(increase(X2)),X2s)),
+	tryGoal(verifySolution(X2s,[b,c,d,g,a])).
+
+testMotelExample(52) :-
+	tryGoal(deduce_M(negInfl(withRebate,hasOverallCost))),
+	tryGoal(deduce_M(posInfl(hasListPrice,hasOverallCost))),
+	tryGoal(deduce_M(posInfl(hasCubicCapacity,hasPrice))),
+	tryGoal(deduce_M(posInfl(hasCubicCapacity,hasOverallCost))),
+	tryGoal(deduce_M(posInfl(hasCatConverter,hasOverallCost))),
+	tryGoal(deduce_M(simultInfl([hasCubicCapacity,hasCatConverter],hasOverallCost,3.0))),
+	tryGoal(deduce_M(simultInfl([hasCubicCapacity,hasCatConverter],hasMaxSpeed,-1.0))),
+	tryGoal(deduce_M(leastInfl(hasCubicCapacity,hasMaxSpeed))),
+	tryGoal(deduce_M(leastInfls([hasCatConverter,hasCubicCapacity],hasMaxSpeed))),
+	tryGoal(deduce_M(maxPosInfl(hasCubicCapacity,hasOverallCost,2.0))),
+	tryGoal(bagof((X1,W1),deduce_M(maxNegInfl(X1,hasMaxSpeed,W1)),X1W1Pairs)),
+	tryGoal(verifySolution(X1W1Pairs,[(hasCatConverter,-1.0),(hasWeight,-1.0)])),
+	tryGoal(bagof(X2,deduce_M(increase(X2)),X2s)),
+	tryGoal(verifySolution(X2s,[hasFuelConsumption,hasListPrice,hasOverallCost,hasPrice,hasWeight,hasCubicCapacity])),
+	tryGoal(bagof((X3,W3),(deduce_M(leastInfl(X3,hasMaxSpeed)),abduce(change(X3,W3),change(hasMaxSpeed,1.0))),X3W3s)),
+	tryGoal(verifySolution(X3W3s,[(hasCatConverter,-1.0)])).
+testMotelExample(53) :-
+	go_goal_for_example.
+testMotelExample(54) :-
+	go_goal_for_example.
+testMotelExample(55) :-
+	go_goal_for_example.
+testMotelExample(56) :-
+	go_goal_for_example.
+testMotelExample(57) :-
+	go_goal_for_example.
+testMotelExample(58) :-
+	go_goal_for_example.
+testMotelExample(59) :-
+	tryGoal(sb_ask(mudIsa(iHarry,tRangeParent))),
+	tryGoal(sb_ask(mudIsa(iHarry,tAgentGeneric))),
+	printTime(setof((X,Y),sb_ask(role(roleChild,X,Y)),L1)), print(L1), nl,
+	printTime(setof(X,sb_ask(roleDef(roleChild,X)),L2)), print(L2), nl,
+	printTime(setof((X,Y),sb_ask(roleNr('marys-roleChild',X,Y)),L3)), print(L3), nl,
+	printTime(setof(X,sb_ask(roleDefNr('marys-roleChild',X)),L4)), print(L4), nl.
+testMotelExample(60) :-
+	tryGoal(deduce_M(ex60,[b(believe,iPeter)],mudIsa(iTom,tRichPerson),E)),
+	tryGoal(assert_ind([b(believe,iPeter)],iTom,isTDisjoint(tRichPerson))),
+	tryGoal(inconsistent_M([b(believe,iPeter)])).
+testMotelExample(61) :-
+	tryGoal(deduce_M(mudIsa(iTweety,tCanFly))),
+	tryGoal(deduce_M(mudIsa(iTweety,tCanNest))),
+	tryGoal(deduce_M(mudIsa(iTweety,isTDisjoint(tEmu)))),
+	tryGoal(deduce_M(mudIsa(iTweety,isTDisjoint(tCuckoo)))),
+	tryGoal(consistent_M([])).
+testMotelExample(62) :-
+	tryGoal(deduce_M(mudIsa(iTweety,tCanFly))),
+	tryGoal(deduce_M(mudIsa(iTweety,tCanNest))),
+	tryGoal(not(deduce_M(mudIsa(iTweety,isTDisjoint(tEmu))))),
+	tryGoal(not(deduce_M(mudIsa(iTweety,isTDisjoint(tCuckoo))))),
+	tryGoal(not(deduce_M(mudIsa(iTweety,tEmu)))),
+	tryGoal(not(deduce_M(mudIsa(iTweety,tCuckoo)))),
+	tryGoal(consistent_M([])).
+testMotelExample(63) :-
+	tryGoal(deduce_M(mudIsa(iTweety,tCanFly))),
+	tryGoal(deduce_M(mudIsa(iTweety,tCanNest))),
+	tryGoal(deduce_M(mudIsa(iTweety,isTDisjoint(tEmu)))),
+	tryGoal(deduce_M(mudIsa(iTweety,isTDisjoint(tCuckoo)))),
+	tryGoal(deduce_M(mudIsa(iTweety,sparrow))),
+	tryGoal(consistent_M([])).
+
+
+tryGoal(G) :-
+	call(G),
+	!. %print('Goal '), print(G), print(' succeeded'), nl.
+tryGoal(G) :-
+	print('Goal '), print(G), print(' failed'), nl.
+
+tryGoalF(G) :-
+	call(G),
+	!,
+	print('Goal '), print(G), print(' failed_Not'), nl.
+tryGoalF(G) :- !. % print('Goal '), print(G), print(' succeeded_Not'), nl.
+
+/***********************************************************************
+ *
+ * verifySolution(+TestSol,+ExpectedSol)
+ *
+ *	prints an error message if TestSol and ExpectedSol do isTDisjoint
+ *	match.
+ */
+
+verifySolution(TestSol,ExpectedSol) :-
+	not_ftVar(ExpectedSol),
+	not_ftVar(TestSol),
+	!,
+	TestSol = ExpectedSol.
+verifySolution(TestSol,ExpectedSol) :-
+	print('Solutions differ: test solution is '),
+	print(TestSol),
+	print(', while expected solution is '),
+	print(ExpectedSol).
 
 
 :-dynamic(term_expansion_M/0).
+
+
+/*
+
+term_expansion_M:-in_motel_kb(_),!.
 
 user:term_expansion(X,Y):-term_expansion_M,term_expansion_M(X,Y).
 
@@ -15309,12 +15204,12 @@ assert(roleRange(env(fssKB),[],worth_mod,worth)).
 'sb_defconcept'('predicate', ['supers'(['fss']), 'nr'('sb_primelemrole'('subject', 'domain-range'('predicate', 'thing', 'tBOT')), 1, 1, 1), 'nr'('sb_primelemrole'('purpose', 'domain-range'('predicate', 'predicate', 'tBOT')), 1, 1, 1), 'nr'('sb_primelemrole'('time', 'domain-range'('predicate', 'time', 'tBOT')), 1, 1, 1), 'nr'('sb_primelemrole'('illoc', 'domain-range'('predicate', 'speech_act', 'tBOT')), 1, 1, 1), 'nr'('sb_primelemrole'('cause', 'domain-range'('predicate', 'predicate', 'tBOT')), 1, 1, 1), 'nr'('sb_primelemrole'('result', 'domain-range'('predicate', 'thing', 'tBOT')), 1, 1, 1), 'nr'('sb_primelemrole'('location', 'domain-range'('predicate', 'thing', 'tBOT')), 1, 1, 1), 'necres'('subject', 'nec')]).
 'sb_primconcept'('state', ['supers'(['predicate']), 'restrict_inh'('time_state', 'restricts'('time', 'range'('period', 'tBOT')))]).
 'sb_attributes'('state', 'subject', 'role_to_case'('nominativ')).
-'sb_attributes'('state', 'location', 'role_to_case'('prep_stems'('in'))).
+'sb_attributes'('state', 'location', 'role_to_case'('prep_stems'('in_M'))).
 'sb_defconcept'('human', ['supers'(['animate']), 'nr'('sb_primelemrole'('volition', 'domain-range'('human', 'volitional_sq', 'tBOT')), 1, 1, 1)]).
 'sb_defconcept'('geographical_object', ['supers'(['inanimate']), 'nr'('sb_primelemrole'('origin_mod', 'domain-range'('geographical_object', 'origin', 'tBOT')), 1, 1, 1)]).
 'sb_primconcept'('wohn', ['supers'(['lexicon', 'state']), 'restrict_inh'('agent', 'restricts'('subject', 'range'('human', 'thing'))), 'restrict_inh'('location_wohn', 'restricts'('location', 'range'('geographical_object', 'tBOT')))]).
 'sb_attributes'('wohn', 'agent', 'role_to_case'('nominativ')).
-'sb_attributes'('wohn', 'location', 'role_to_case'('prep_stems'('in'))).
+'sb_attributes'('wohn', 'location', 'role_to_case'('prep_stems'('in_M'))).
 'sb_primconcept'('qualitative', ['supers'(['adjective_property'])]).
 'sb_primconcept'('quality', ['supers'(['qualitative'])]).
 'sb_primconcept'('colour', ['supers'(['quality'])]).
@@ -15367,7 +15262,7 @@ assert(roleRange(env(fssKB),[],worth_mod,worth)).
 'sb_attributes'('schenk', 'beneficative', 'role_to_case'('dativ')).
 'sb_primconcept'('zahl', ['supers'(['lexicon', 'transaction'])]).
 'sb_defconcept'('kauf', ['supers'(['lexicon', 'transaction']), 'necres'('concerned', 'nec')]).
-'sb_attributes'('kauf', 'location', 'role_to_case'('prep_stems'('in'))).
+'sb_attributes'('kauf', 'location', 'role_to_case'('prep_stems'('in_M'))).
 'sb_attributes'('kauf', 'beneficative', 'role_to_case'('dativ')).
 'sb_attributes'('kauf', 'result', 'role_to_case'('akkusativ')).
 'sb_attributes'('kauf', 'agent', 'role_to_case'('nominativ')).
@@ -15471,3 +15366,56 @@ assert(roleRange(env(fssKB),[],worth_mod,worth)).
 'sb_defconcept'('was', ['supers'(['lexicon', 'thing'])]).
 
 :-retract(in_motel_kb(fssKB)).
+
+*/
+
+/**********************************************************************
+ *
+ * @(#) initCall.pl 1.4@(#)
+ *
+ */
+
+:- nl, nl.
+:- write('Welcome to MOTEL (Version 0.8 July 1993)').
+:- nl.
+:- write('Copyright (c) 1993, Patrick Brandmeier, Ullrich Hustadt').
+:- nl.
+:- write('                    Renate Schmidt, Jan Timm. All rights preserved.').
+:- nl, nl.
+:- write('MOTEL is distributed in the hope that it will be useful, but').
+:- nl.
+:- write('WITHOUT ANY WARRANTY;  without even the implied warranty of,').
+:- nl.
+:- write('MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.').
+:- nl, nl.
+:- initializeMotel.
+
+isTDisjoint(G):-not(G).
+
+% :-testMotel.
+
+
+:-multifile(user:hasInstance_dyn/2).
+:-dynamic(user:hasInstance_dyn/2).
+
+%:-assert_ind(ttObjectType,ttObjectType).
+%:-assert_ind(tChannel,ttObjectType).
+
+:-forall(user:hasInstance_dyn(T,I),show_call(must(assert_ind(I,T)))).
+:-forall(is_asserted(typeSubclass(C1,C2)),show_call(must(defconcept(C1,C2)))).
+:-forall(is_asserted(disjointWith0(C1,C2)),show_call(must(defconcept(C1,isTDisjoint(C2))))).
+
+mudIsa_motel(ttObjectType,ttObjectType).
+mudIsa_motel(I,T):-no_repeats_av(deduce_M(mudIsa(I,T))),I\=ttObjectType,I\==isTDisjoint(tBOT),I\==tTOP,T\=isTDisjoint(tBOT),T\==tTOP.
+
+motel_literal_assert_retract(typeSubclass(X,Y),defprimconcept(X,Y),undefprimconcept(X,Y)).
+motel_literal_assert_retract(disjointWith(X,Y),sb_disjoint(X,Y),undefprimconcept(X,isTDisjoint(Y))).
+motel_literal_assert_retract(mudIsa(X,Y),assert_ind(X,Y),delete_ind(X,Y)).
+
+user:decl_database_hook(OP,FACT):-motel_decl_database_hook(OP,FACT).
+
+motel_decl_database_hook(assert(_),mudIsa(C,ttObjectType)):-!,must(sb_primconcept(C)).
+motel_decl_database_hook(assert(_),mudIsa(C,CT)):- ttObjectType(C),!,must(sb_defelem(C,[mudIsa(CT)])).
+motel_decl_database_hook(assert(_),Lit):-motel_literal_assert_retract(Lit, Assert, _Retract),!,must(Assert).
+motel_decl_database_hook(retract(_),Lit):-motel_literal_assert_retract(Lit,_Assert, Retract),!,must(Retract).
+

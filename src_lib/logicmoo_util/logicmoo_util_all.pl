@@ -2,10 +2,10 @@
 */
 :-module(logicmoo_util_all,[if_flag_true/2,add_to_search_path/2,add_to_search_path_first/2,prolog_file_dir/2,if_startup_script/1,if_startup_script/0]).
 :- set_prolog_flag(generate_debug_info, true).
-:-export(prolog_file_dir/1).
+:- export(prolog_file_dir/1).
 prolog_file_dir(Here):- prolog_load_context(file, HereF),file_directory_name(HereF,Here).
 prolog_file_dir(Here):- working_directory(Here,Here).
-:-export(prolog_file_dir/2).
+:- export(prolog_file_dir/2).
 prolog_file_dir(Rel,ABSF):-prolog_file_dir(Here),absolute_file_name(Rel,ABSF,[relative_to(Here),file_type(directory),expand(true)]),!.
 prolog_file_dir(Rel,ABSF):-prolog_file_dir(Here),absolute_file_name(Rel,ABSF,[relative_to(Here),expand(true)]),!.
 
@@ -59,11 +59,11 @@ clip_dir_sep('/','/'):-!.
 clip_dir_sep(Where,WhereF2):-atom_concat(WhereF2,'/',Where),!.
 clip_dir_sep(Where,Where):-!.
 
-:-export(normalize_path/2).
+:- export(normalize_path/2).
 normalize_path(Where,WhereF3):-absolute_file_name(Where,WhereF),prolog_to_os_filename(WhereF,WhereF1),prolog_to_os_filename(WhereF2,WhereF1),!,clip_dir_sep(WhereF2,WhereF3).
 normalize_path(Where,WhereF2):-clip_dir_sep(Where,WhereF2).
 
-:-export(enumerate_files/2).
+:- export(enumerate_files/2).
 
 enumerate_files(Spec,Result):-no_repeats([Result],((enumerate_files0(Spec,NResult),normalize_path(NResult,Result)))),exists_file_or_dir(Result).
 
@@ -86,12 +86,12 @@ expand_file_name_safe(I,[O]):-catch(expand_file_search_path(I,O),_,fail).
 expand_file_name_safe(I,L):- findall(O,absolute_file_name(I,O,[expand(true),solutions(all)]);
  absolute_file_name(I,O,[expand(true),solutions(all),file_type(directory)]),L).
 
-:-export(exists_file_or_dir/1).
+:- export(exists_file_or_dir/1).
 exists_file_or_dir(X):-atomic(X),once((catch(exists_file(X),E,(fmt(E:X),fail));is_directory(X))).
-:-export(is_directory/1).
+:- export(is_directory/1).
 is_directory(X):-exists_directory(X).
 
-:-export(concat_paths/3).
+:- export(concat_paths/3).
 concat_paths(A,'',A).
 concat_paths(A,'/',A).
 concat_paths(ParentIn,'**',Result):-!, member(Child,['./','./*/','./*/*/','./*/*/*','./*/*/*/*','./*/*/*/*/*']),concat_paths(ParentIn,Child,Result).
@@ -99,7 +99,7 @@ concat_paths(ParentIn,Child,Result):- enumerate_files(ParentIn,Parent),
    once(is_directory(Parent) -> directory_file_path(Parent,Child,Joined) ; atom_concat(Parent,Child,Joined)),
    enumerate_files(Joined,Result).
 
-:-export(concat_paths/2).
+:- export(concat_paths/2).
 concat_paths([Joined],Result):- !,enumerate_files(Joined,Result).
 concat_paths([ParentIn,Child|MORE],Result):- concat_paths(ParentIn,Child,ResultM),concat_paths([ResultM|MORE],Result).
 
@@ -115,18 +115,19 @@ concat_paths([ParentIn,Child|MORE],Result):- concat_paths(ParentIn,Child,ResultM
 */
 
 % Add the locations that the MUD source files will be picked up by the system
-local_directory_search('../..').
-%local_directory_search('~logicmoo-mud/cynd/startrek'). % home dir CynD world
+%local_directory_search('../..').
+%local_directory_search('~logicmoo-mud/cynd/startrek'). % home vtDirection CynD world
 % local_directory_search('.').
-local_directory_search('..'). 
-local_directory_search('../runtime'). 
-local_directory_search('../src_game'). % for user overrides and uploads
-local_directory_search('../src_assets').  % for non uploadables (downloadables)
+%local_directory_search('..'). 
+%local_directory_search('../runtime'). 
+%local_directory_search('../src_game'). % for user overrides and uploads
+%local_directory_search('../src_assets').  % for non uploadables (downloadables)
+%local_directory_search('../src_modules'). % for big modules
+%local_directory_search('../src_webui').  % for web UI modules
+local_directory_search('../src'). % shared_library preds
+local_directory_search('../src_lib').
 local_directory_search('../src_mud').  % for vetted src of the MUD
-local_directory_search('../src_modules'). % for big modules
-local_directory_search('../src_webui').  % for web UI modules
-local_directory_search('../src_lib'). % shared_library preds
-local_directory_search('../externals/XperiMental/src_incoming').  % areeba underlay
+%local_directory_search('../externals/XperiMental/src_incoming').  % areeba underlay
 
 :- current_prolog_flag(windows,true)->
    setenv('PATH_INDIGOLOG','../../indigolog');
