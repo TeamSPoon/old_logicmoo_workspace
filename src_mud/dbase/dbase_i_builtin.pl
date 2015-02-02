@@ -270,7 +270,7 @@ mudSubclass(areaPath,tDoor).
 mudSubclass(tDoor,tFurniture).
 mudSubclass(tFurniture,tPartofObj).
 
-% subclass(dir,value).
+% mudSubclass(dir,value).
 
 % database backing impls
 % builtin = ftCallable native
@@ -447,7 +447,7 @@ ruleEquiv(mudDescription(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
 :-decl_mpred_hybrid(mudStowing(tAgentGeneric,tItem)).
 
 
-% formattype(FormatType):-subclass(FormatType,formattype).
+% formattype(FormatType):-mudSubclass(FormatType,formattype).
 
 % single valued
 mudSubclass(tAgentGeneric,tObj).

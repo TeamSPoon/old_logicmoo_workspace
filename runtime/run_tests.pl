@@ -10,7 +10,7 @@ mud_test(test_movedist,
    test_name("teleport to main enginering"),
    do_player_action('tp self to Area1000'),
   test_name("now we are really somewhere"),
-   test_true(req(atloc(P,_Somewhere))),
+   test_true(req(mudAtLoc(P,_Somewhere))),
   test_name("in main engineering?"),
    test_true(req(localityOfObject(P,'Area1000'))),
    test_name("set the move dist to 5 meters"),
@@ -30,7 +30,7 @@ mud_test(test_movedist,
 mud_test_level2(create_gensym_named,
   with_all_dmsg(((do_player_action('create food999'),
   foc_current_player(P),
-  must(( req(( possess(P,Item),isa(Item,food))))))))) .
+  must(( req(( mudPossess(P,Item),isa(Item,food))))))))) .
 
 mud_test_level2(drop_take,
   with_all_dmsg(((do_player_action('create food'),
@@ -55,41 +55,44 @@ mud_test_local:-
    test_true(show_call(foc_current_player(_Agent))).
 
 mud_test_local:-
-   test_name("tests to see if we have: atloc"),
-   test_true((foc_current_player(Agent),show_call(atloc(Agent,_Where)))).
+   test_name("tests to see if we have: mudAtLoc"),
+   test_true((foc_current_player(Agent),show_call(mudAtLoc(Agent,_Where)))).
 
 mud_test_local:- 
    test_name("tests to see if we have: localityOfObject"),
    test_true((foc_current_player(Agent),show_call(localityOfObject(Agent,_Where)))).
 
 mud_test_local:- 
-   test_name("tests to see if our clothing doesnt: atloc"),
-   test_false(atloc('ArtifactCol1003-Gold-Uniform775',_X)).
+   test_name("tests to see if our clothing doesnt: mudAtLoc"),
+   test_false(mudAtLoc('ArtifactCol1003-Gold-Uniform775',_X)).
     
 mud_test_local:- 
    foc_current_player(Agent),
-   test_name("tests to see if we have: argIsas on charge"),
-   test_true(correctArgsIsa(charge(Agent,_),_)).
+   test_name("tests to see if we have: argIsas on mudEnergy"),
+   test_true(correctArgsIsa(mudEnergy(Agent,_),_)).
 
 mud_test_local:- 
    test_name("tests to see if we have: singleValued on mudMoveDist"),
-   must(add(mudMoveDist(explorer(player1),3))),
-   test_true(must((findall(X,mudMoveDist(explorer(player1),X),L),length(L,1)))).
+   foc_current_player(Agent),
+   must(add(mudMoveDist(Agent,3))),
+   test_true(must((findall(X,mudMoveDist(Agent,X),L),length(L,1)))).
 
 mud_test_local:- 
       test_name("nudity test"), 
-       test_true_req(wearsClothing(explorer(player1), 'ArtifactCol1003-Gold-Uniform775')).
+      foc_current_player(Agent),
+       test_true_req(wearsClothing(Agent, 'ArtifactCol1003-Gold-Uniform775')).
 
 mud_test_local:- 
       test_name("genlInverse test"), 
-       test_true_req(possess(explorer(player1), 'ArtifactCol1003-Gold-Uniform775')).
+      foc_current_player(Agent),
+       test_true_req(mudPossess(Agent, 'ArtifactCol1003-Gold-Uniform775')).
 
-mud_test_local:- 
-   test_name("Tests our action templates"), doall((get_type_action_templates(Templates),dmsg(get_type_action_templates(Templates)))).
+\:- 
+   test_name("Tests our action templates"), doall((get_all_templates(Templates),dmsg(get_all_templates(Templates)))).
 
 mud_test_local:-
    test_name("tests to see if 'food' can be an item"),
-      test_true(parseIsa0(item, _, [food], [])).
+      test_true(parseIsa(tItem, _, [food], [])).
 
 mud_test_local:-call_mpred(cmdShowRoomGrid('Area1000')).
 
@@ -103,15 +106,15 @@ mud_test_local:-
   test_name("Tests our types to populate bad_instance/2 at level 5"),
   retractall(is_instance_consistent(_,_)),
   retractall(bad_instance(_,_)),
-  forall(subclass(T,spatialthing),check_consistent(T,1000)),
+  forall(mudSubclass(T,tSpatialThing),check_consistent(T,1000)),
   listing(bad_instance/2).
 
 :-thread_local thlocal:is_checking_instance/1.
 
-:-decl_mpred_prolog(user:check_consistent(term,int)).
-:-decl_mpred_prolog(user:is_instance_consistent(term,int)).
-:-decl_mpred_prolog(user:bad_instance(term,why)).
-:-decl_mpred_prolog(user:is_checking_instance(term)).
+:-decl_mpred_prolog(check_consistent(ftTerm,ftInt)).
+:-decl_mpred_prolog(is_instance_consistent(ftTerm,ftInt)).
+:-decl_mpred_prolog(bad_instance(ftTerm,ftTerm)).
+:-decl_mpred_prolog(is_checking_instance(ftTerm)).
 
 check_consistent(Obj,Scope):-var(Scope),!,check_consistent(Obj,0).
 check_consistent(Obj,Scope):-is_instance_consistent(Obj,Was),!,Was>=Scope.
@@ -126,7 +129,7 @@ hook:hooked_check_consistent(Obj,20):-must(object_string(_,Obj,0-5,String)),dmsg
 % ---------------------------------------------------------------------------------------------
 
 
-% mud_test("local sanity tests", doall(mud_test_local)).
+% mud_test("local sanity tests",  do_mud_test_locals).
 
 
 :- moo_hide_childs(dbase:record_on_thread/2).
@@ -135,11 +138,11 @@ hook:hooked_check_consistent(Obj,20):-must(object_string(_,Obj,0-5,String)),dmsg
 :- if_flag_true(was_runs_tests_pl, at_start(run_setup)).
 
 % the real tests now (once)
-now_run_local_tests:- doall(mud_test_local).
+do_mud_test_locals:- forall(clause(mud_test_local,B),must(B)).
 :- if_flag_true(was_runs_tests_pl,at_start(must_det(run_mud_tests))).
 
 % the local tests each reload (once)
-:- if_flag_true(was_runs_tests_pl, now_run_local_tests).
+:- if_flag_true(was_runs_tests_pl, do_mud_test_locals).
 
 % halt if this was the script file
 :- if_flag_true(was_runs_tests_pl, halt).
@@ -160,7 +163,7 @@ mud_test_local :-do_player_action("look").
 mud_test_local :-forall(localityOfObject(O,L),dmsg(localityOfObject(O,L))).
 
 must_test("tests to see if poorly canonicalized code (unrestricted quantification) will not be -too- inneffienct",
-   forall(atloc(O,L),fmt(atloc(O,L)))).
+   forall(mudAtLoc(O,L),fmt(mudAtLoc(O,L)))).
 
 % the real tests now (once)
 mud_test_local :- at_start(must_det(run_mud_tests)).

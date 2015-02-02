@@ -218,7 +218,7 @@ coerce(_ ,_,     NewThing,Else):- NewThing = Else.
    db_op/2,
    ireq/1,
   del/1,  
-  padd/2, padd/3, prop/3, prop_or/4, props/2, iprops/2, upprop/2,add_fast/1, ireq/1, mreq/1, upprop/1, req/1, term_listing/1, 
+  padd/2, padd/3, prop/3, prop_or/4, props/2, iprops/2, upprop/2,add_fast/1, ireq/1, mreq/1, upprop/1, req/1, 
   use_term_listing/2,  world_clear/1,  
    with_kb_assertions/2
   )).
@@ -238,7 +238,7 @@ coerce(_ ,_,     NewThing,Else):- NewThing = Else.
 
 
 % :-dynamic((weight/2)).
-% :-dynamic(subclass/2).
+% :-dynamic(mudSubclass/2).
 :-dynamic_multifile_exported(mudSubclass/2).
 
 :- dynamic_multifile_exported mtForPred/2.
@@ -388,7 +388,7 @@ kb_update(New,OldV):- db_op_int(change(assert,OldV),New).
 
 user:decl_database_hook(assert(_),mudFtInfo(FT,_)):- define_ft(FT).
 % user:decl_database_hook(assert(_),mudSubclass(FT,OFT)):- define_ft(OFT),define_ft(FT).
-% user:decl_database_hook(assert(_),subclass(FT,OFT)):- formattype(OFT),dmsg(warning(subclass_of_define_ft(FT))).
+% user:decl_database_hook(assert(_),mudSubclass(FT,OFT)):- formattype(OFT),dmsg(warning(subclass_of_define_ft(FT))).
 
 dmsg_hook(transform_holds(dbase_t,_What,props(ttCreateable,[mudIsa(mudIsa),mudIsa]))):-trace_or_throw(dtrace).
 
@@ -526,8 +526,8 @@ db_op0(Op,props(Obj,PropVal)):- PropVal=..[OP,Pred|Val],comparitiveOp(OP),not(co
 db_op0(Op,props(Obj,PropVal)):- PropVal=..[Prop|Val],not(infix_op(Prop,_)),!,db_reop(Op,[dbase_t,Prop,Obj|Val]).
 db_op0(Op,props(Obj,PropVal)):- PropVal=..[Prop|Val],!,trace_or_throw(dtrace),db_reop(Op,[dbase_t,Prop,Obj|Val]).
 
-db_op0(Op,macroSomethingIsa(A,List)):- !,forall_member(E,List,must(db_reop(Op, mudIsa(A,E)))).
-db_op0(Op,macroSomethingDescription(A,List)):- !,forall_member(E,List, must(db_reop(Op, mudDescription(A,E)))).
+db_op0(Op,pddlSomethingIsa(A,List)):- !,forall_member(E,List,must(db_reop(Op, mudIsa(A,E)))).
+db_op0(Op,pddlDescription(A,List)):- !,forall_member(E,List, must(db_reop(Op, mudDescription(A,E)))).
 db_op0(Op,pddlObjects(Type,List)):- !,forall_member(I,List,must(db_reop(Op,mudIsa(I,Type)))).
 db_op0(Op,pddlSorts(Type,List)):- !,forall_member(I,List,must(db_reop(Op, mudSubclass(I,Type)))).
 db_op0(Op,pddlTypes(List)):- !,forall_member(I,List,must(db_reop(Op, mudIsa(I,tCol)))).

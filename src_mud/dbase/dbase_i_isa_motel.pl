@@ -38,7 +38,7 @@ c2p(impliesM(andM([  subrelation(R1, R2), holds(R1, A, B)]), holds(R1, A, B)),X,
 
 c2p(impliesM(andM([  negInverse(R1, R2), -(holds(R1, A, B))]), holds(R1, B, A)),X,Y).
 
-c2p(impliesM(andM([ subrelation(A, B), domain(A, C, E), domain(B, C, D)  ]), subclass(E, D)),X,Y).
+c2p(impliesM(andM([ subrelation(A, B), domain(A, C, E), domain(B, C, D)  ]), mudSubclass(E, D)),X,Y).
 
 c2p(impliesM(andM([predSplit(R1,R2,R3), orM([  holds(R1, A, B), holds(R2, A, B) ])]), holds(R3, A, B) ),X,Y).
 

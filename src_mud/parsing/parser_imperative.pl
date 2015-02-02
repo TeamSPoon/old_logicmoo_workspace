@@ -369,7 +369,7 @@ name_text_atomic(Name,Text):-atom_string(Name,Text).
 
 hook_coerce(TextS,vtDirection,Dir):-
   member(Dir-Text,[vNorth-"n",vSouth-"s",vEast-"e",vWest-"w",vNE-"ne",vNW-"nw",vSE-"se",vSW-"sw",vUp-"u",vDown-"d"]),
-  (name_text(Dir,TextS);TextS=Text).
+  (name_text(Dir,TextS);TextS=Text;atom_string(TextS,Text)).
 
 hook_coerce(Text,Subclass,X):- 
    not(memberchk(Subclass,[vtDirection,tTemporallyExistingThing])),

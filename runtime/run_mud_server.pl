@@ -98,7 +98,8 @@ user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),s
 % :- add_game_dir('../games/src_game_wumpus',prolog_repl).       
 % :- add_game_dir('../games/src_game_nani',prolog_repl).       
 % :- add_game_dir('../games/src_game_sims',prolog_repl).       
-% :- add_game_dir('../games/src_game_startrek',prolog_repl).       
+
+:- add_game_dir('../games/src_game_startrek',prolog_repl).
 
 tAgentGeneric(iCommanderData66).
 mudIsa(iCommanderData66,'tMonster').

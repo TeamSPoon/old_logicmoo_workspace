@@ -262,10 +262,10 @@ print_sentence(Proof):- fix_sentence(Proof,New),!,ignore((Proof\=New,!,must_det(
 
 relax_term(P,P,Aic,Aic,Bic,Bic):- !.
 /*
-relax_term(P,P,A,A,Bi,Bc):- arg(_,v(subclass,isa),P),!,fail.
+relax_term(P,P,A,A,Bi,Bc):- arg(_,v(mudSubclass,isa),P),!,fail.
 relax_term(P,P,Ai,Ac,Bic,Bic):- when_met(nonvar(Ac), same_arg(same_or(isa),Ac,Ai)),!.
-relax_term(P,P,Ai,Ac,Bi,Bc):- is_type(Ai),!,when_met(pred(nonvar,Ac), (same_arg(same_or(subclass),Ac,Ai),same_arg(same_or(equals),Bc,Bi))),!.
-relax_term(P,P,Ai,Ac,Bi,Bc):- when_met(pred(nonvar,Ac),when_met(pred(nonvar,Bc), (same_arg(same_or(subclass),Ac,Ai),same_arg(same_or(equals),Bc,Bi)))).
+relax_term(P,P,Ai,Ac,Bi,Bc):- is_type(Ai),!,when_met(pred(nonvar,Ac), (same_arg(same_or(mudSubclass),Ac,Ai),same_arg(same_or(equals),Bc,Bi))),!.
+relax_term(P,P,Ai,Ac,Bi,Bc):- when_met(pred(nonvar,Ac),when_met(pred(nonvar,Bc), (same_arg(same_or(mudSubclass),Ac,Ai),same_arg(same_or(equals),Bc,Bi)))).
 */
 
 % ?- member(R,[a,b,c]),when_met(nonvar(Re), dbase:same_arg(same_or(termOfUnit),n,Re)),Re=R,write(chose(R)).

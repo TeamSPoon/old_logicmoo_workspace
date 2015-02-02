@@ -181,7 +181,7 @@ isa_backchaing_0(I,T):-  var(T),!,setof(TT,AT^(isa_asserted(I,AT),transitive_sub
 isa_backchaing_0(I,T):-  nonvar(I),isa_backchaing_nv_nv(I,T),!.
 isa_backchaing_0(I,T):-  transitive_subclass_or_same(AT,T),isa_asserted(I,AT).
 % ==========================
-% taxonomicPair(isa,subclass)
+% taxonomicPair(isa,mudSubclass)
 % ==========================
 
 % A->TL = (isa_asserted_0(A,AT),transitive_subclass_or_same(AT,TL))
@@ -486,7 +486,7 @@ not_mud_isa(X,tCol):-never_type(X).
 :-dynamic_multifile_exported(has_free_args/1).
 has_free_args(C):- not(ground(C)), compound(C),not(not(arg(_,C,var))),!.
 
-% is_known_false(subclass(A,B)):-disjointWith(A,B).
+% is_known_false(mudSubclass(A,B)):-disjointWith(A,B).
 
 disjointWith0(tAgentGeneric,tItem).
 disjointWith0(tRegion,tObj).

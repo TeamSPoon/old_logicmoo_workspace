@@ -118,7 +118,7 @@ metaclass(itemcol).
 
 % user:decl_database_hook(assert(_),typeGenls(_,MC)):-assert_isa(MC,metaclass).
 
-% deduce_facts(typeGenls(T,MC),deduce_facts(subclass(S,T),isa(S,MC))).
+% deduce_facts(typeGenls(T,MC),deduce_facts(mudSubclass(S,T),isa(S,MC))).
 
 typeGenls(region,regioncol).
 typeGenls(tAgentGeneric,agentcol).
@@ -132,7 +132,7 @@ isa(tAgentGeneric,agentcol).
 isa(item,itemcol).
 */
 
-%subclass(SubType,formattype):-isa(SubType,formattype).
+%mudSubclass(SubType,formattype):-isa(SubType,formattype).
 
 cached(G):-ccatch(G,_,fail).
 

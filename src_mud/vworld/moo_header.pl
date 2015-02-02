@@ -127,7 +127,7 @@
 :- dynamic_multifile_exported user:subFormat/2.
 :- dynamic_multifile_exported user:mudIsa/2.
 :- dynamic_multifile_exported user:decl_type/1.
-:- dynamic_multifile_exported user:subClass/2.
+:- dynamic_multifile_exported user:mudSubClass/2.
 :- dynamic_multifile_exported user:ttFormatType/1.
 :- dynamic_multifile_exported user:forwardRule/2.
 :- dynamic_multifile_exported user:fact_maybe_deduced/1.
