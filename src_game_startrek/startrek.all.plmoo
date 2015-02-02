@@ -36,16 +36,16 @@ pddlPredicates([
 % dynamic startrek
   nameStrings(ftTerm,ftString),
   pathName(tRegion,vtDirection,ftString),
-  localityOfObject(tAgentGeneric,'BPVLocation'),
-  mudStowing(tAgentGeneric,'ProtectiveAttire'),
+  localityOfObject(tAgentGeneric,tRegion),
+  mudStowing(tAgentGeneric,tClothing),
   mudStowing(tAgentGeneric,tWeapon),
-  mudStowing(tAgentGeneric,'PortableObject'),
-  wearsClothing(tAgentGeneric,'ProtectiveAttire'),
-  wearsClothing(tAgentGeneric,'PortableObject'),
+  mudStowing(tAgentGeneric,tCarryAble),
+  wearsClothing(tAgentGeneric,tClothing),
+  wearsClothing(tAgentGeneric,tCarryAble),
 
 % static startrek
-  pathBetween('BPVLocation',vtDirection,'BPVLocation'),
-  agentRoute(areaPath,'BPVLocation','BPVLocation') ]).
+  pathBetween(tRegion,vtDirection,tRegion),
+  agentRoute(areaPath,tRegion,tRegion) ]).
 
 /* Prediate:  tAgentGeneric/1 
 interpreted.
@@ -85,7 +85,7 @@ line_count(58).
 number_of_clauses(1).
 Pattern: wearsClothing(_G1304,_G1305). 
  */
-pddlSomethingIsa('iBoots673',['tBoots','ProtectiveAttire','PortableObject','SomethingToWear']).
+pddlSomethingIsa('iBoots673',[tOntoFeet,tClothing,tCarryAble,'tWearAble']).
 wearsClothing(iCommanderData,'iBoots673').
 wearsClothing(iCommanderData,'iComBadge674').
 wearsClothing(iCommanderData,'iGoldUniform675').
@@ -168,12 +168,12 @@ mudStowing('NPC2Worf720','iPhaser724').
 
  /* found 16 for mudStowing(_G1328,_G1329). */ 
 
-/* Prediate:  item/1 
+/* Prediate:  tItem/1 
 interpreted.
 file('c:/development/opensim4opencog/bin/cynd/startrek/mudreader.pl').
 line_count(56).
 number_of_clauses(1).
-Pattern: item(_G1352). 
+Pattern: tItem(_G1352). 
  */
 tItem('iPhaser676').
 tItem('iPhaser776').
@@ -251,7 +251,7 @@ tItem('Item23RomulanWhisky693').
 tItem('Item24LemonadePruneJuice694').
 tItem('Item25VulcanBeer695').
 
- /* found 75 for item(_G1352). */ 
+ /* found 75 for tItem(_G1352). */ 
 
 /* Prediate:  localityOfObject/2 
 interpreted.
@@ -297,12 +297,12 @@ localityOfObject('Tricorder761','iArea1015').
 
  /* found 32 for localityOfObject(_G1375,_G1376). */ 
 
-/* Prediate:  region/1 
+/* Prediate:  tRegion/1 
 interpreted.
 file('c:/development/opensim4opencog/bin/cynd/startrek/mudreader.pl').
 line_count(30).
 number_of_clauses(1).
-Pattern: region(_G1399). 
+Pattern: tRegion(_G1399). 
  */
 tRegion('iArea1000').
 tRegion('iArea1002').
@@ -348,7 +348,7 @@ tRegion('iArea1037').
 tRegion('iArea1040').
 tRegion('iArea1041').
 
- /* found 45 for region(_G1399). */ 
+ /* found 45 for tRegion(_G1399). */ 
 
 /* Prediate:  pddlSomethingIsa/2 
 interpreted.
@@ -357,145 +357,145 @@ line_count(50).
 number_of_clauses(1).
 Pattern: pddlSomethingIsa(_G1422,_G1423). 
  */
-pddlSomethingIsa('NPC0Geordi684',['NPC0',tAgentGeneric,'MaleAnimal']).
-pddlSomethingIsa(iCommanderData,['NPC1',tAgentGeneric,'MaleAnimal']).
-% pddlSomethingIsa(iPlayer1,[['OSimClassFn',ftString("player_osimmarine_mp")],tAgentGeneric,'MaleAnimal']).
-pddlSomethingIsa('NPC2Worf720',['NPC2',tAgentGeneric,'MaleAnimal']).
-pddlSomethingIsa('NPC3DrCrusher677',['NPC3',tAgentGeneric,'FemaleAnimal']).
-pddlSomethingIsa('NPC4Troi712',['NPC4',tAgentGeneric,'FemaleAnimal']).
-pddlSomethingIsa('NPC5Riker707',['NPC5',tAgentGeneric,'MaleAnimal']).
-pddlSomethingIsa('NPC6Picard701',['NPC6',tAgentGeneric,'MaleAnimal']).
-pddlSomethingIsa('NPC7Guinan689',['NPC7',tAgentGeneric,'FemaleAnimal']).
-pddlSomethingIsa('NPC8OBrien696',['NPC8',tAgentGeneric,'MaleAnimal']).
-pddlSomethingIsa('NPC9Wesley716',['NPC9',tAgentGeneric,'MaleAnimal']).
-pddlSomethingIsa('NPC1010Livingston726',['NPC1010',tAgentGeneric,'MaleAnimal']).
-pddlSomethingIsa('NPC1011Spot727',['NPC1011',tAgentGeneric,'MaleAnimal']).
-pddlSomethingIsa('iEnsign728',['tEnsign',tAgentGeneric,'MaleAnimal']).
-pddlSomethingIsa('iEnsign732',['tEnsign',tAgentGeneric,'MaleAnimal']).
-pddlSomethingIsa('iEnsign736',['tEnsign',tAgentGeneric,'MaleAnimal']).
-pddlSomethingIsa('iEnsign740',['tEnsign',tAgentGeneric,'MaleAnimal']).
-pddlSomethingIsa('iEnsign744',['tEnsign',tAgentGeneric,'MaleAnimal']).
-pddlSomethingIsa('iEnsign748',['tEnsign',tAgentGeneric,'MaleAnimal']).
-pddlSomethingIsa('iEnsign752',['tEnsign',tAgentGeneric,'MaleAnimal']).
-pddlSomethingIsa('NPC1013Alexander671',['NPC1013',tAgentGeneric,'MaleAnimal']).
-pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','SomethingToWear']).
-pddlSomethingIsa('iPhaser776',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','SomethingToWear']).
-pddlSomethingIsa('iPhaser700',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','SomethingToWear']).
-pddlSomethingIsa('iPhaser724',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','SomethingToWear']).
-pddlSomethingIsa('Item15PhaserRifle705',['Item1',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','SomethingToWear']).
-pddlSomethingIsa('Item2RedUniform704',['Item2','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('Item2RedUniform710',['Item2','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('Item2RedUniform719',['Item2','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('Item2RedUniform739',['Item2','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('Item2RedUniform743',['Item2','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iGoldUniform675',['tGoldUniform','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iGoldUniform775',['tGoldUniform','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iGoldUniform687',['tGoldUniform','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iGoldUniform699',['tGoldUniform','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iGoldUniform723',['tGoldUniform','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iGoldUniform731',['tGoldUniform','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iGoldUniform735',['tGoldUniform','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('Item4BlueUniform680',['Item4','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('Item4BlueUniform715',['Item4','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('Item4BlueUniform747',['Item4','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('Item4BlueUniform751',['Item4','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('Item4BlueUniform755',['Item4','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iBoots673',['tBoots','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iBoots773',['tBoots','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iBoots678',['tBoots','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iBoots685',['tBoots','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iBoots697',['tBoots','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iBoots702',['tBoots','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iBoots708',['tBoots','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iBoots713',['tBoots','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iBoots717',['tBoots','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iBoots721',['tBoots','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iBoots729',['tBoots','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iBoots733',['tBoots','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iBoots737',['tBoots','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iBoots741',['tBoots','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iBoots745',['tBoots','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iBoots749',['tBoots','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iBoots753',['tBoots','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iComBadge674',['tComBadge','ProtectiveAttire','PortableObject','Necklace']).
-pddlSomethingIsa('iComBadge774',['tComBadge','ProtectiveAttire','PortableObject','Necklace']).
-pddlSomethingIsa('iComBadge679',['tComBadge','ProtectiveAttire','PortableObject','Necklace']).
-pddlSomethingIsa('iComBadge686',['tComBadge','ProtectiveAttire','PortableObject','Necklace']).
-pddlSomethingIsa('iComBadge698',['tComBadge','ProtectiveAttire','PortableObject','Necklace']).
-pddlSomethingIsa('iComBadge703',['tComBadge','ProtectiveAttire','PortableObject','Necklace']).
-pddlSomethingIsa('iComBadge709',['tComBadge','ProtectiveAttire','PortableObject','Necklace']).
-pddlSomethingIsa('iComBadge714',['tComBadge','ProtectiveAttire','PortableObject','Necklace']).
-pddlSomethingIsa('iComBadge718',['tComBadge','ProtectiveAttire','PortableObject','Necklace']).
-pddlSomethingIsa('iComBadge722',['tComBadge','ProtectiveAttire','PortableObject','Necklace']).
-pddlSomethingIsa('iComBadge730',['tComBadge','ProtectiveAttire','PortableObject','Necklace']).
-pddlSomethingIsa('iComBadge734',['tComBadge','ProtectiveAttire','PortableObject','Necklace']).
-pddlSomethingIsa('iComBadge738',['tComBadge','ProtectiveAttire','PortableObject','Necklace']).
-pddlSomethingIsa('iComBadge742',['tComBadge','ProtectiveAttire','PortableObject','Necklace']).
-pddlSomethingIsa('iComBadge746',['tComBadge','ProtectiveAttire','PortableObject','Necklace']).
-pddlSomethingIsa('iComBadge750',['tComBadge','ProtectiveAttire','PortableObject','Necklace']).
-pddlSomethingIsa('iComBadge754',['tComBadge','ProtectiveAttire','PortableObject','Necklace']).
-pddlSomethingIsa('Item7Sash725',['Item7','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('Item8VISOR688',['Item8','ProtectiveAttire','PortableObject']).
-pddlSomethingIsa('MedicalTricorder681',['','RodShapedObject',tContolDevice,'HandTool','PortableObject']).
-pddlSomethingIsa('MedicalTricorder682',['','RodShapedObject',tContolDevice,'HandTool','PortableObject']).
-pddlSomethingIsa('MedicalTricorder683',['','RodShapedObject',tContolDevice,'HandTool','PortableObject']).
-pddlSomethingIsa('Tricorder759',['','RodShapedObject',tContolDevice,'HandTool','PortableObject']).
-pddlSomethingIsa('Tricorder760',['','RodShapedObject',tContolDevice,'HandTool','PortableObject']).
-pddlSomethingIsa('Tricorder761',['','RodShapedObject',tContolDevice,'HandTool','PortableObject']).
-pddlSomethingIsa('Item10DilithiumCrystal756',['Item10','LightingDevice','PortableObject','HandTool']).
-pddlSomethingIsa('Item10DilithiumCrystal757',['Item10','LightingDevice','PortableObject','HandTool']).
-pddlSomethingIsa('Item10DilithiumCrystal758',['Item10','LightingDevice','PortableObject','HandTool']).
-pddlSomethingIsa('iPicardsFlute',['Item11','ArtifactGeneric','InformationStore','PortableObject','HandTool']).
-pddlSomethingIsa('Item12Trombone711',['Item12','ArtifactGeneric','InformationStore','PortableObject','HandTool']).
-pddlSomethingIsa('Item20Tea690',['Item20','FlaskLabGlassware','Bottle','FluidReservoir','Container','Portal','PortableObject','HandTool']).
-pddlSomethingIsa('Item21Synthehol691',['Item21','FlaskLabGlassware','Bottle','FluidReservoir','Container','Portal','LimitedAccess','PortableObject','HandTool']).
-pddlSomethingIsa('Item22FerengiAle692',['Item22','FlaskLabGlassware','Bottle','FluidReservoir','Container','Portal','LimitedAccess','PortableObject','HandTool']).
-pddlSomethingIsa('Item23RomulanWhisky693',['Item23','FlaskLabGlassware','Bottle','FluidReservoir','Container','Portal','LimitedAccess','PortableObject','HandTool']).
-pddlSomethingIsa('Item24LemonadePruneJuice694',['Item24','FlaskLabGlassware','Bottle','FluidReservoir','Container','Portal','LimitedAccess','PortableObject','HandTool']).
-pddlSomethingIsa('Item25VulcanBeer695',['Item25','FlaskLabGlassware','Bottle','FluidReservoir','Container','Portal','LimitedAccess','PortableObject','HandTool']).
-pddlSomethingIsa('iArea1000',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1002',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1001',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1005',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1003',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1004',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1008',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1006',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1042',['BPVLocation','FreeSpaceContext']).
-pddlSomethingIsa('iArea1007',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1010',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1009',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1011',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1013',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1032',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1012',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1016',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1014',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1015',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1019',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1017',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1018',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1021',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1020',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1022',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1024',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1039',['BPVLocation','FreeSpaceContent']).
-pddlSomethingIsa('iArea1023',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1027',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1025',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1026',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1030',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1028',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1029',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1031',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1033',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1034',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1036',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1035',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1038',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1037',['BPVLocation','IndoorsIsolatedFromOutside','SpaceInAHOC']).
-pddlSomethingIsa('iArea1040',['BPVLocation','FreeSpaceContent']).
-pddlSomethingIsa('iArea1041',['BPVLocation','FreeSpaceContent']).
+pddlSomethingIsa('NPC0Geordi684',['NPC0',tAgentGeneric,'tMaleAnimal']).
+pddlSomethingIsa(iCommanderData,['NPC1',tAgentGeneric,'tMaleAnimal']).
+% pddlSomethingIsa(iPlayer1,[['OSimClassFn',mudStr("player_osimmarine_mp")],tAgentGeneric,'tMaleAnimal']).
+pddlSomethingIsa('NPC2Worf720',['NPC2',tAgentGeneric,'tMaleAnimal']).
+pddlSomethingIsa('NPC3DrCrusher677',['NPC3',tAgentGeneric,'tFemaleAnimal']).
+pddlSomethingIsa('NPC4Troi712',['NPC4',tAgentGeneric,'tFemaleAnimal']).
+pddlSomethingIsa('NPC5Riker707',['NPC5',tAgentGeneric,'tMaleAnimal']).
+pddlSomethingIsa('NPC6Picard701',['NPC6',tAgentGeneric,'tMaleAnimal']).
+pddlSomethingIsa('NPC7Guinan689',['NPC7',tAgentGeneric,'tFemaleAnimal']).
+pddlSomethingIsa('NPC8OBrien696',['NPC8',tAgentGeneric,'tMaleAnimal']).
+pddlSomethingIsa('NPC9Wesley716',['NPC9',tAgentGeneric,'tMaleAnimal']).
+pddlSomethingIsa('NPC1010Livingston726',['NPC1010',tAgentGeneric,'tMaleAnimal']).
+pddlSomethingIsa('NPC1011Spot727',['NPC1011',tAgentGeneric,'tMaleAnimal']).
+pddlSomethingIsa('iEnsign728',['tEnsign',tAgentGeneric,'tMaleAnimal']).
+pddlSomethingIsa('iEnsign732',['tEnsign',tAgentGeneric,'tMaleAnimal']).
+pddlSomethingIsa('iEnsign736',['tEnsign',tAgentGeneric,'tMaleAnimal']).
+pddlSomethingIsa('iEnsign740',['tEnsign',tAgentGeneric,'tMaleAnimal']).
+pddlSomethingIsa('iEnsign744',['tEnsign',tAgentGeneric,'tMaleAnimal']).
+pddlSomethingIsa('iEnsign748',['tEnsign',tAgentGeneric,'tMaleAnimal']).
+pddlSomethingIsa('iEnsign752',['tEnsign',tAgentGeneric,'tMaleAnimal']).
+pddlSomethingIsa('NPC1013Alexander671',['NPC1013',tAgentGeneric,'tMaleAnimal']).
+pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice',tCarryAble,'DeviceSingleUser','tWearAble']).
+pddlSomethingIsa('iPhaser776',['tPhaser','Handgun',tWeapon,'LightingDevice',tCarryAble,'DeviceSingleUser','tWearAble']).
+pddlSomethingIsa('iPhaser700',['tPhaser','Handgun',tWeapon,'LightingDevice',tCarryAble,'DeviceSingleUser','tWearAble']).
+pddlSomethingIsa('iPhaser724',['tPhaser','Handgun',tWeapon,'LightingDevice',tCarryAble,'DeviceSingleUser','tWearAble']).
+pddlSomethingIsa('Item15PhaserRifle705',['Item1',tWeapon,'LightingDevice',tCarryAble,'DeviceSingleUser','tWearAble']).
+pddlSomethingIsa('Item2RedUniform704',['Item2',tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('Item2RedUniform710',['Item2',tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('Item2RedUniform719',['Item2',tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('Item2RedUniform739',['Item2',tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('Item2RedUniform743',['Item2',tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('iGoldUniform675',['tGoldUniform',tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('iGoldUniform775',['tGoldUniform',tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('iGoldUniform687',['tGoldUniform',tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('iGoldUniform699',['tGoldUniform',tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('iGoldUniform723',['tGoldUniform',tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('iGoldUniform731',['tGoldUniform',tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('iGoldUniform735',['tGoldUniform',tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('Item4BlueUniform680',['Item4',tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('Item4BlueUniform715',['Item4',tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('Item4BlueUniform747',['Item4',tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('Item4BlueUniform751',['Item4',tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('Item4BlueUniform755',['Item4',tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('iBoots673',[tOntoFeet,tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('iBoots773',[tOntoFeet,tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('iBoots678',[tOntoFeet,tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('iBoots685',[tOntoFeet,tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('iBoots697',[tOntoFeet,tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('iBoots702',[tOntoFeet,tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('iBoots708',[tOntoFeet,tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('iBoots713',[tOntoFeet,tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('iBoots717',[tOntoFeet,tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('iBoots721',[tOntoFeet,tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('iBoots729',[tOntoFeet,tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('iBoots733',[tOntoFeet,tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('iBoots737',[tOntoFeet,tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('iBoots741',[tOntoFeet,tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('iBoots745',[tOntoFeet,tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('iBoots749',[tOntoFeet,tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('iBoots753',[tOntoFeet,tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('iComBadge674',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iComBadge774',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iComBadge679',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iComBadge686',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iComBadge698',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iComBadge703',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iComBadge709',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iComBadge714',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iComBadge718',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iComBadge722',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iComBadge730',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iComBadge734',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iComBadge738',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iComBadge742',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iComBadge746',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iComBadge750',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('iComBadge754',['tComBadge',tClothing,tCarryAble,tOntoNeck]).
+pddlSomethingIsa('Item7Sash725',['Item7',tClothing,tCarryAble,'tWearAble']).
+pddlSomethingIsa('Item8VISOR688',['Item8',tClothing,tCarryAble]).
+pddlSomethingIsa('MedicalTricorder681',['','RodShapedObject',tContolDevice,tPortableDevice,tCarryAble]).
+pddlSomethingIsa('MedicalTricorder682',['','RodShapedObject',tContolDevice,tPortableDevice,tCarryAble]).
+pddlSomethingIsa('MedicalTricorder683',['','RodShapedObject',tContolDevice,tPortableDevice,tCarryAble]).
+pddlSomethingIsa('Tricorder759',['','RodShapedObject',tContolDevice,tPortableDevice,tCarryAble]).
+pddlSomethingIsa('Tricorder760',['','RodShapedObject',tContolDevice,tPortableDevice,tCarryAble]).
+pddlSomethingIsa('Tricorder761',['','RodShapedObject',tContolDevice,tPortableDevice,tCarryAble]).
+pddlSomethingIsa('Item10DilithiumCrystal756',['Item10','LightingDevice',tCarryAble,tPortableDevice]).
+pddlSomethingIsa('Item10DilithiumCrystal757',['Item10','LightingDevice',tCarryAble,tPortableDevice]).
+pddlSomethingIsa('Item10DilithiumCrystal758',['Item10','LightingDevice',tCarryAble,tPortableDevice]).
+pddlSomethingIsa('iPicardsFlute',['Item11','ArtifactGeneric','InformationStore',tCarryAble,tPortableDevice]).
+pddlSomethingIsa('Item12Trombone711',['Item12','ArtifactGeneric','InformationStore',tCarryAble,tPortableDevice]).
+pddlSomethingIsa('Item20Tea690',['Item20','FlaskLabGlassware',tBottle,'FluidReservoir',tContainer,'Portal',tCarryAble,tPortableDevice]).
+pddlSomethingIsa('Item21Synthehol691',['Item21','FlaskLabGlassware',tBottle,'FluidReservoir',tContainer,'Portal','LimitedAccess',tCarryAble,tPortableDevice]).
+pddlSomethingIsa('Item22FerengiAle692',['Item22','FlaskLabGlassware',tBottle,'FluidReservoir',tContainer,'Portal','LimitedAccess',tCarryAble,tPortableDevice]).
+pddlSomethingIsa('Item23RomulanWhisky693',['Item23','FlaskLabGlassware',tBottle,'FluidReservoir',tContainer,'Portal','LimitedAccess',tCarryAble,tPortableDevice]).
+pddlSomethingIsa('Item24LemonadePruneJuice694',['Item24','FlaskLabGlassware',tBottle,'FluidReservoir',tContainer,'Portal','LimitedAccess',tCarryAble,tPortableDevice]).
+pddlSomethingIsa('Item25VulcanBeer695',['Item25','FlaskLabGlassware',tBottle,'FluidReservoir',tContainer,'Portal','LimitedAccess',tCarryAble,tPortableDevice]).
+pddlSomethingIsa('iArea1000',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1002',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1001',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1005',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1003',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1004',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1008',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1006',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1042',[tRegion,'FreeSpaceContext']).
+pddlSomethingIsa('iArea1007',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1010',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1009',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1011',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1013',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1032',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1012',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1016',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1014',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1015',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1019',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1017',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1018',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1021',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1020',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1022',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1024',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1039',[tRegion,'FreeSpaceContent']).
+pddlSomethingIsa('iArea1023',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1027',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1025',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1026',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1030',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1028',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1029',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1031',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1033',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1034',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1036',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1035',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1038',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1037',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC']).
+pddlSomethingIsa('iArea1040',[tRegion,'FreeSpaceContent']).
+pddlSomethingIsa('iArea1041',[tRegion,'FreeSpaceContent']).
 pddlSomethingIsa('ShipMap123',[tItem]).
 localityOfObject('ShipMap123','iArea1000').
 verbOverride('ShipMap123',actExamine(this),
@@ -539,7 +539,7 @@ STARSHIP ENTERPRISE
 
 
 "))).
-%pddlSomethingIsa('iArea1004075',['BPVLocation']).
+%pddlSomethingIsa('iArea1004075',[tRegion]).
 
  /* found 141 for pddlSomethingIsa(_G1422,_G1423). */ 
 
@@ -810,8 +810,8 @@ macroSomethingDescription('NPC2Worf720',["Lieutenant","Worf","Klingon","Lieutena
 
 macroSomethingDescription('NPC3DrCrusher677',["Doctor","Beverly","Crusher","Doctor Crusher","Lieutenant Beverly Crusher is here, looking for someone to heal","Doctor Crusher is the Enterprise's Chief Medical Officer","Wesley is her son","Her husband was killed years ago in an accident on another starship which was also commanded by Captain Picard","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 3","mudMaxHitPoints: 12d12+3200","#$PunchingSomething mudBareHandDamage: 9d9+42","Dr. Crusher","Doctor Crusher","Lieutenant Beverly Crusher is here, looking for someone to heal","Doctor Crusher is the Enterprise's Chief Medical Officer","Wesley is her son","Her husband was killed years ago in an accident on another starship which was also commanded by Captain Picard"]).
 macroSomethingDescription('NPC4Troi712',["Counselor","Deanna","Troi","Counselor Troi","Counselor Deanna Troi is here","Counselor Troi is the ship's main counselor","She's half betazoid, which means that she can read people's minds","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 3","mudMaxHitPoints: 12d12+3200","#$PunchingSomething mudBareHandDamage: 9d9+42","Troi","Counselor Troi","Counselor Deanna Troi is here","Counselor Troi is the ship's main counselor","She's half betazoid, which means that she can read people's minds"]).
-macroSomethingDescription('NPC5Riker707',["Commander","William","Riker","Commander Riker","Commander William Riker is here, staring at you","Commander Riker is the Enterprise's first officer","He's in charge of keeping the crew in line","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 2","mudMaxHitPoints: 12d12+3200","#$PunchingSomething mudBareHandDamage: 9d9+52","Riker","Commander Riker","Commander William Riker is here, staring at you","Commander Riker is the Enterprise's first officer","He's in charge of keeping the crew in line"]).
-macroSomethingDescription('NPC6Picard701',["Captain","Jean","Luc","JeanLuc","Picard","Captain Picard","Captain JeanLuc Picard is standing here, watching you","Captain Picard is a very important man","He's in charge of Starfleet's flagship, the Enterprise","He's very smart, and very wise","Don't mess with him!","ACT_NICE_THIEF","AWARE","NOBACKSTAB","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOSUMMON","NOSLEEP","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_SANCTUARY","NPC_NOTRACK","+mudToHitArmorClass0: 0","mudMaxHitPoints: 20d20+5000","#$PunchingSomething mudBareHandDamage: 12d12+75","Picard","Captain Picard","Captain JeanLuc Picard is standing here, watching you","Captain Picard is a very important man","He's in charge of Starfleet's flagship, the Enterprise","He's very smart, and very wise","Don't mess with him!"]).
+macroSomethingDescription('NPC5Riker707',["Commander","William","Riker","Commander Riker","Commander William Riker is here, staring at you","Commander Riker is the Enterprise's first officer","He's in mudEnergy of keeping the crew in line","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 2","mudMaxHitPoints: 12d12+3200","#$PunchingSomething mudBareHandDamage: 9d9+52","Riker","Commander Riker","Commander William Riker is here, staring at you","Commander Riker is the Enterprise's first officer","He's in mudEnergy of keeping the crew in line"]).
+macroSomethingDescription('NPC6Picard701',["Captain","Jean","Luc","JeanLuc","Picard","Captain Picard","Captain JeanLuc Picard is standing here, watching you","Captain Picard is a very important man","He's in mudEnergy of Starfleet's flagship, the Enterprise","He's very smart, and very wise","Don't mess with him!","ACT_NICE_THIEF","AWARE","NOBACKSTAB","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOSUMMON","NOSLEEP","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_SANCTUARY","NPC_NOTRACK","+mudToHitArmorClass0: 0","mudMaxHitPoints: 20d20+5000","#$PunchingSomething mudBareHandDamage: 12d12+75","Picard","Captain Picard","Captain JeanLuc Picard is standing here, watching you","Captain Picard is a very important man","He's in mudEnergy of Starfleet's flagship, the Enterprise","He's very smart, and very wise","Don't mess with him!"]).
 macroSomethingDescription('NPC7Guinan689',["Guinan","Guinan","Guinan is here, tending the bar","Guinan is a strange being","She's lived for thousands of years and experienced many things, but now she's decided to work on the Enterprise as a bartender","ACT_SENTINEL","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 4","mudMaxHitPoints: 12d12+2600","#$PunchingSomething mudBareHandDamage: 9d9+36","Guinan","Guinan","Guinan is here, tending the bar","Guinan is a strange being","She's lived for thousands of years and experienced many things, but now she's decided to work on the Enterprise as a bartender"]).
 macroSomethingDescription('NPC8OBrien696',["Chief","O'Brien","Transporter","Chief O'Brien","Chief O'Brien is here, waiting to teleport you somwhere","Chief O'Brien is the transporter chief on the Enterprise","It's his job to make sure everyone arrives(and leaves) in one piece, instead of trillions of atoms","ACT_SENTINEL","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 4","mudMaxHitPoints: 12d12+2600","#$PunchingSomething mudBareHandDamage: 9d9+36","O'Brien","Chief O'Brien","Chief O'Brien is here, waiting to teleport you somwhere","Chief O'Brien is the transporter chief on the Enterprise","It's his job to make sure everyone arrives(and leaves) in one piece, instead of trillions of atoms"]).
 macroSomethingDescription('NPC9Wesley716',["Wesley","Crusher","Wesley","Wesley Crusher is here, eagerly trying to earn your praise","Wesley Crusher is not even an official officer, but he serves as an acting Ensign on the bridge","He got this position only because Captain Picard feels guilty about killing his father","ACT_STAY_ZONE","ACT_WIMPY","wimpy mobile will try to flee when it gets low on hit points. A mobile which is both aggressive and wimpy will not attack a player that is awake","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 12d12+1400","#$PunchingSomething mudBareHandDamage: 9d9+24","Wesley","Wesley","Wesley Crusher is here, eagerly trying to earn your praise","Wesley Crusher is not even an official officer, but he serves as an acting Ensign on the bridge","He got this position only because Captain Picard feels guilty about killing his father"]).
@@ -825,81 +825,81 @@ macroSomethingDescription('iEnsign744',["ensign","the ensign","A nervous looking
 macroSomethingDescription('iEnsign748',["ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time"]).
 macroSomethingDescription('iEnsign752',["ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Ensign","the ensign","A nervous looking ensign is standing here, watching you","These ensigns make up the backbone of the Enterprise","They clean things, do jobs the higher ups won't even consider doing, and get yelled at all the time"]).
 macroSomethingDescription('NPC1013Alexander671',["alexander","rozhenko","alexander rozhenko","Alexander Rozhenko is here, practicing laughing hour","Alexander Rozhenko is Worf's son","His mother was half human and half Klingon, so Alexander is 3/4 Klingon","He's quite small, but since he's a Klingon he's very strong","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 6","mudMaxHitPoints: 8d8+1600","#$PunchingSomething mudBareHandDamage: 8d8+26","Alexander","alexander rozhenko","Alexander Rozhenko is here, practicing laughing hour","Alexander Rozhenko is Worf's son","His mother was half human and half Klingon, so Alexander is 3/4 Klingon","He's quite small, but since he's a Klingon he's very strong"]).
-macroSomethingDescription('iPhaser676',["standard","issue","starfleet","phaser","a standard issue phaser","A standard issue Starfleet phaser has been left here","damageNumberDice 5","damageSizeDice 5","WeaponBlasting","These phasers are the standard weapon of Starfleet officers. It offers decent damage for its fairly small size","Phaser","a standard issue phaser"]).
-macroSomethingDescription('iPhaser776',["standard","issue","starfleet","phaser","a standard issue phaser","A standard issue Starfleet phaser has been left here","damageNumberDice 5","damageSizeDice 5","WeaponBlasting","These phasers are the standard weapon of Starfleet officers. It offers decent damage for its fairly small size","Phaser","a standard issue phaser"]).
-macroSomethingDescription('iPhaser700',["standard","issue","starfleet","phaser","a standard issue phaser","A standard issue Starfleet phaser has been left here","damageNumberDice 5","damageSizeDice 5","WeaponBlasting","These phasers are the standard weapon of Starfleet officers. It offers decent damage for its fairly small size","Phaser","a standard issue phaser"]).
-macroSomethingDescription('iPhaser724',["standard","issue","starfleet","phaser","a standard issue phaser","A standard issue Starfleet phaser has been left here","damageNumberDice 5","damageSizeDice 5","WeaponBlasting","These phasers are the standard weapon of Starfleet officers. It offers decent damage for its fairly small size","Phaser","a standard issue phaser"]).
-macroSomethingDescription('Item15PhaserRifle705',["phaser","rifle","a phaser rifle","A large phaser rifle is lying here","damageNumberDice 7","damageSizeDice 6","WeaponBlasting","This phaser rifle looks pretty powerful. These weapons are used mainly on assault type missions, where power is important","5 Phaser Rifle","a phaser rifle"]).
-macroSomethingDescription('Item2RedUniform704',["burgandy","starfleet","command","uniform","a burgandy Starfleet command uniform","A neatly folded burgandy Starfleet command uniform is lying here","armorLevel: 10","These uniforms are worn by command officers on Federation starships. It's kind of tight, but it looks pretty good","Red Uniform","a burgandy Starfleet command uniform"]).
-macroSomethingDescription('Item2RedUniform710',["burgandy","starfleet","command","uniform","a burgandy Starfleet command uniform","A neatly folded burgandy Starfleet command uniform is lying here","armorLevel: 10","These uniforms are worn by command officers on Federation starships. It's kind of tight, but it looks pretty good","Red Uniform","a burgandy Starfleet command uniform"]).
-macroSomethingDescription('Item2RedUniform719',["burgandy","starfleet","command","uniform","a burgandy Starfleet command uniform","A neatly folded burgandy Starfleet command uniform is lying here","armorLevel: 10","These uniforms are worn by command officers on Federation starships. It's kind of tight, but it looks pretty good","Red Uniform","a burgandy Starfleet command uniform"]).
-macroSomethingDescription('Item2RedUniform739',["burgandy","starfleet","command","uniform","a burgandy Starfleet command uniform","A neatly folded burgandy Starfleet command uniform is lying here","armorLevel: 10","These uniforms are worn by command officers on Federation starships. It's kind of tight, but it looks pretty good","Red Uniform","a burgandy Starfleet command uniform"]).
-macroSomethingDescription('Item2RedUniform743',["burgandy","starfleet","command","uniform","a burgandy Starfleet command uniform","A neatly folded burgandy Starfleet command uniform is lying here","armorLevel: 10","These uniforms are worn by command officers on Federation starships. It's kind of tight, but it looks pretty good","Red Uniform","a burgandy Starfleet command uniform"]).
-macroSomethingDescription('iGoldUniform675',["gold","starfleet","engineering","uniform","a gold Starfleet engineering uniform","A neatly folded gold Starfleet engineering uniform is lying here","armorLevel: 10","These uniforms are worn by engineering officers on Federation starships. It's kind of tight, but it looks pretty good","Gold Uniform","a gold Starfleet engineering uniform"]).
-macroSomethingDescription('iGoldUniform775',["gold","starfleet","engineering","uniform","a gold Starfleet engineering uniform","A neatly folded gold Starfleet engineering uniform is lying here","armorLevel: 10","These uniforms are worn by engineering officers on Federation starships. It's kind of tight, but it looks pretty good","Gold Uniform","a gold Starfleet engineering uniform"]).
-macroSomethingDescription('iGoldUniform687',["gold","starfleet","engineering","uniform","a gold Starfleet engineering uniform","A neatly folded gold Starfleet engineering uniform is lying here","armorLevel: 10","These uniforms are worn by engineering officers on Federation starships. It's kind of tight, but it looks pretty good","Gold Uniform","a gold Starfleet engineering uniform"]).
-macroSomethingDescription('iGoldUniform699',["gold","starfleet","engineering","uniform","a gold Starfleet engineering uniform","A neatly folded gold Starfleet engineering uniform is lying here","armorLevel: 10","These uniforms are worn by engineering officers on Federation starships. It's kind of tight, but it looks pretty good","Gold Uniform","a gold Starfleet engineering uniform"]).
-macroSomethingDescription('iGoldUniform723',["gold","starfleet","engineering","uniform","a gold Starfleet engineering uniform","A neatly folded gold Starfleet engineering uniform is lying here","armorLevel: 10","These uniforms are worn by engineering officers on Federation starships. It's kind of tight, but it looks pretty good","Gold Uniform","a gold Starfleet engineering uniform"]).
-macroSomethingDescription('iGoldUniform731',["gold","starfleet","engineering","uniform","a gold Starfleet engineering uniform","A neatly folded gold Starfleet engineering uniform is lying here","armorLevel: 10","These uniforms are worn by engineering officers on Federation starships. It's kind of tight, but it looks pretty good","Gold Uniform","a gold Starfleet engineering uniform"]).
-macroSomethingDescription('iGoldUniform735',["gold","starfleet","engineering","uniform","a gold Starfleet engineering uniform","A neatly folded gold Starfleet engineering uniform is lying here","armorLevel: 10","These uniforms are worn by engineering officers on Federation starships. It's kind of tight, but it looks pretty good","Gold Uniform","a gold Starfleet engineering uniform"]).
-macroSomethingDescription('Item4BlueUniform680',["blue","starfleet","medical","uniform","a blue Starfleet medical uniform","A neatly folded blue Starfleet medical uniform is lying here","armorLevel: 10","These uniforms are worn by medical officers on Federation starships. It's kind of tight, but it looks pretty good","Blue Uniform","a blue Starfleet medical uniform"]).
-macroSomethingDescription('Item4BlueUniform715',["blue","starfleet","medical","uniform","a blue Starfleet medical uniform","A neatly folded blue Starfleet medical uniform is lying here","armorLevel: 10","These uniforms are worn by medical officers on Federation starships. It's kind of tight, but it looks pretty good","Blue Uniform","a blue Starfleet medical uniform"]).
-macroSomethingDescription('Item4BlueUniform747',["blue","starfleet","medical","uniform","a blue Starfleet medical uniform","A neatly folded blue Starfleet medical uniform is lying here","armorLevel: 10","These uniforms are worn by medical officers on Federation starships. It's kind of tight, but it looks pretty good","Blue Uniform","a blue Starfleet medical uniform"]).
-macroSomethingDescription('Item4BlueUniform751',["blue","starfleet","medical","uniform","a blue Starfleet medical uniform","A neatly folded blue Starfleet medical uniform is lying here","armorLevel: 10","These uniforms are worn by medical officers on Federation starships. It's kind of tight, but it looks pretty good","Blue Uniform","a blue Starfleet medical uniform"]).
-macroSomethingDescription('Item4BlueUniform755',["blue","starfleet","medical","uniform","a blue Starfleet medical uniform","A neatly folded blue Starfleet medical uniform is lying here","armorLevel: 10","These uniforms are worn by medical officers on Federation starships. It's kind of tight, but it looks pretty good","Blue Uniform","a blue Starfleet medical uniform"]).
-macroSomethingDescription('iBoots673',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
-macroSomethingDescription('iBoots773',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
-macroSomethingDescription('iBoots678',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
-macroSomethingDescription('iBoots685',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
-macroSomethingDescription('iBoots697',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
-macroSomethingDescription('iBoots702',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
-macroSomethingDescription('iBoots708',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
-macroSomethingDescription('iBoots713',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
-macroSomethingDescription('iBoots717',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
-macroSomethingDescription('iBoots721',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
-macroSomethingDescription('iBoots729',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
-macroSomethingDescription('iBoots733',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
-macroSomethingDescription('iBoots737',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
-macroSomethingDescription('iBoots741',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
-macroSomethingDescription('iBoots745',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
-macroSomethingDescription('iBoots749',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
-macroSomethingDescription('iBoots753',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","armorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
-macroSomethingDescription('iComBadge674',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-macroSomethingDescription('iComBadge774',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-macroSomethingDescription('iComBadge679',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-macroSomethingDescription('iComBadge686',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1",
+macroSomethingDescription('iPhaser676',["standard","issue","starfleet","phaser","a standard issue phaser","A standard issue Starfleet phaser has been left here","damageNumberDice 5","damageSizeDice 5","WeaponBlasting","These phasers are the standard weapon of Starfleet officers. It offers decent mudHealth for its fairly small size","Phaser","a standard issue phaser"]).
+macroSomethingDescription('iPhaser776',["standard","issue","starfleet","phaser","a standard issue phaser","A standard issue Starfleet phaser has been left here","damageNumberDice 5","damageSizeDice 5","WeaponBlasting","These phasers are the standard weapon of Starfleet officers. It offers decent mudHealth for its fairly small size","Phaser","a standard issue phaser"]).
+macroSomethingDescription('iPhaser700',["standard","issue","starfleet","phaser","a standard issue phaser","A standard issue Starfleet phaser has been left here","damageNumberDice 5","damageSizeDice 5","WeaponBlasting","These phasers are the standard weapon of Starfleet officers. It offers decent mudHealth for its fairly small size","Phaser","a standard issue phaser"]).
+macroSomethingDescription('iPhaser724',["standard","issue","starfleet","phaser","a standard issue phaser","A standard issue Starfleet phaser has been left here","damageNumberDice 5","damageSizeDice 5","WeaponBlasting","These phasers are the standard weapon of Starfleet officers. It offers decent mudHealth for its fairly small size","Phaser","a standard issue phaser"]).
+macroSomethingDescription('Item15PhaserRifle705',["phaser","rifle","a phaser rifle","A large phaser rifle is lying here","damageNumberDice 7","damageSizeDice 6","WeaponBlasting","This phaser rifle looks pretty powerful. These weapons are used mainly on assault tCol missions, where power is important","5 Phaser Rifle","a phaser rifle"]).
+macroSomethingDescription('Item2RedUniform704',["burgandy","starfleet","command","uniform","a burgandy Starfleet command uniform","A neatly folded burgandy Starfleet command uniform is lying here","mudArmorLevel: 10","These uniforms are worn by command officers on Federation starships. It's kind of tight, but it looks pretty good","Red Uniform","a burgandy Starfleet command uniform"]).
+macroSomethingDescription('Item2RedUniform710',["burgandy","starfleet","command","uniform","a burgandy Starfleet command uniform","A neatly folded burgandy Starfleet command uniform is lying here","mudArmorLevel: 10","These uniforms are worn by command officers on Federation starships. It's kind of tight, but it looks pretty good","Red Uniform","a burgandy Starfleet command uniform"]).
+macroSomethingDescription('Item2RedUniform719',["burgandy","starfleet","command","uniform","a burgandy Starfleet command uniform","A neatly folded burgandy Starfleet command uniform is lying here","mudArmorLevel: 10","These uniforms are worn by command officers on Federation starships. It's kind of tight, but it looks pretty good","Red Uniform","a burgandy Starfleet command uniform"]).
+macroSomethingDescription('Item2RedUniform739',["burgandy","starfleet","command","uniform","a burgandy Starfleet command uniform","A neatly folded burgandy Starfleet command uniform is lying here","mudArmorLevel: 10","These uniforms are worn by command officers on Federation starships. It's kind of tight, but it looks pretty good","Red Uniform","a burgandy Starfleet command uniform"]).
+macroSomethingDescription('Item2RedUniform743',["burgandy","starfleet","command","uniform","a burgandy Starfleet command uniform","A neatly folded burgandy Starfleet command uniform is lying here","mudArmorLevel: 10","These uniforms are worn by command officers on Federation starships. It's kind of tight, but it looks pretty good","Red Uniform","a burgandy Starfleet command uniform"]).
+macroSomethingDescription('iGoldUniform675',["gold","starfleet","engineering","uniform","a gold Starfleet engineering uniform","A neatly folded gold Starfleet engineering uniform is lying here","mudArmorLevel: 10","These uniforms are worn by engineering officers on Federation starships. It's kind of tight, but it looks pretty good","Gold Uniform","a gold Starfleet engineering uniform"]).
+macroSomethingDescription('iGoldUniform775',["gold","starfleet","engineering","uniform","a gold Starfleet engineering uniform","A neatly folded gold Starfleet engineering uniform is lying here","mudArmorLevel: 10","These uniforms are worn by engineering officers on Federation starships. It's kind of tight, but it looks pretty good","Gold Uniform","a gold Starfleet engineering uniform"]).
+macroSomethingDescription('iGoldUniform687',["gold","starfleet","engineering","uniform","a gold Starfleet engineering uniform","A neatly folded gold Starfleet engineering uniform is lying here","mudArmorLevel: 10","These uniforms are worn by engineering officers on Federation starships. It's kind of tight, but it looks pretty good","Gold Uniform","a gold Starfleet engineering uniform"]).
+macroSomethingDescription('iGoldUniform699',["gold","starfleet","engineering","uniform","a gold Starfleet engineering uniform","A neatly folded gold Starfleet engineering uniform is lying here","mudArmorLevel: 10","These uniforms are worn by engineering officers on Federation starships. It's kind of tight, but it looks pretty good","Gold Uniform","a gold Starfleet engineering uniform"]).
+macroSomethingDescription('iGoldUniform723',["gold","starfleet","engineering","uniform","a gold Starfleet engineering uniform","A neatly folded gold Starfleet engineering uniform is lying here","mudArmorLevel: 10","These uniforms are worn by engineering officers on Federation starships. It's kind of tight, but it looks pretty good","Gold Uniform","a gold Starfleet engineering uniform"]).
+macroSomethingDescription('iGoldUniform731',["gold","starfleet","engineering","uniform","a gold Starfleet engineering uniform","A neatly folded gold Starfleet engineering uniform is lying here","mudArmorLevel: 10","These uniforms are worn by engineering officers on Federation starships. It's kind of tight, but it looks pretty good","Gold Uniform","a gold Starfleet engineering uniform"]).
+macroSomethingDescription('iGoldUniform735',["gold","starfleet","engineering","uniform","a gold Starfleet engineering uniform","A neatly folded gold Starfleet engineering uniform is lying here","mudArmorLevel: 10","These uniforms are worn by engineering officers on Federation starships. It's kind of tight, but it looks pretty good","Gold Uniform","a gold Starfleet engineering uniform"]).
+macroSomethingDescription('Item4BlueUniform680',["blue","starfleet","medical","uniform","a blue Starfleet medical uniform","A neatly folded blue Starfleet medical uniform is lying here","mudArmorLevel: 10","These uniforms are worn by medical officers on Federation starships. It's kind of tight, but it looks pretty good","Blue Uniform","a blue Starfleet medical uniform"]).
+macroSomethingDescription('Item4BlueUniform715',["blue","starfleet","medical","uniform","a blue Starfleet medical uniform","A neatly folded blue Starfleet medical uniform is lying here","mudArmorLevel: 10","These uniforms are worn by medical officers on Federation starships. It's kind of tight, but it looks pretty good","Blue Uniform","a blue Starfleet medical uniform"]).
+macroSomethingDescription('Item4BlueUniform747',["blue","starfleet","medical","uniform","a blue Starfleet medical uniform","A neatly folded blue Starfleet medical uniform is lying here","mudArmorLevel: 10","These uniforms are worn by medical officers on Federation starships. It's kind of tight, but it looks pretty good","Blue Uniform","a blue Starfleet medical uniform"]).
+macroSomethingDescription('Item4BlueUniform751',["blue","starfleet","medical","uniform","a blue Starfleet medical uniform","A neatly folded blue Starfleet medical uniform is lying here","mudArmorLevel: 10","These uniforms are worn by medical officers on Federation starships. It's kind of tight, but it looks pretty good","Blue Uniform","a blue Starfleet medical uniform"]).
+macroSomethingDescription('Item4BlueUniform755',["blue","starfleet","medical","uniform","a blue Starfleet medical uniform","A neatly folded blue Starfleet medical uniform is lying here","mudArmorLevel: 10","These uniforms are worn by medical officers on Federation starships. It's kind of tight, but it looks pretty good","Blue Uniform","a blue Starfleet medical uniform"]).
+macroSomethingDescription('iBoots673',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","mudArmorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+macroSomethingDescription('iBoots773',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","mudArmorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+macroSomethingDescription('iBoots678',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","mudArmorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+macroSomethingDescription('iBoots685',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","mudArmorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+macroSomethingDescription('iBoots697',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","mudArmorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+macroSomethingDescription('iBoots702',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","mudArmorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+macroSomethingDescription('iBoots708',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","mudArmorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+macroSomethingDescription('iBoots713',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","mudArmorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+macroSomethingDescription('iBoots717',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","mudArmorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+macroSomethingDescription('iBoots721',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","mudArmorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+macroSomethingDescription('iBoots729',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","mudArmorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+macroSomethingDescription('iBoots733',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","mudArmorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+macroSomethingDescription('iBoots737',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","mudArmorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+macroSomethingDescription('iBoots741',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","mudArmorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+macroSomethingDescription('iBoots745',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","mudArmorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+macroSomethingDescription('iBoots749',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","mudArmorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+macroSomethingDescription('iBoots753',["starfleet","black","boots","a pair of Starfleet black boots","A pair of Starfleet black boots are sitting here","mudArmorLevel: 5","These boots must be worn by all Starfleet officers while on duty. They're quite light, and offer good protection for the feet","Boots","a pair of Starfleet black boots"]).
+macroSomethingDescription('iComBadge674',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+macroSomethingDescription('iComBadge774',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+macroSomethingDescription('iComBadge679',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+macroSomethingDescription('iComBadge686',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1",
                      "These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-macroSomethingDescription('iComBadge698',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-macroSomethingDescription('iComBadge703',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-macroSomethingDescription('iComBadge709',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-macroSomethingDescription('iComBadge714',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-macroSomethingDescription('iComBadge718',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-macroSomethingDescription('iComBadge722',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-macroSomethingDescription('iComBadge730',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-macroSomethingDescription('iComBadge734',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-macroSomethingDescription('iComBadge738',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-macroSomethingDescription('iComBadge742',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-macroSomethingDescription('iComBadge746',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-macroSomethingDescription('iComBadge750',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-macroSomethingDescription('iComBadge754',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","armorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
-macroSomethingDescription('Item7Sash725',["worf's","worf","sash","Worf's sash","Worf's silver chain sash has been left here","armorLevel: 8","Worf's sash is some sort of Klingon clothing. Worf always wears it, which makes you wonder how you managed to get a hold of it..","Sash","Worf's sash"]).
-macroSomethingDescription('Item8VISOR688',["geordi","geordi's","visor","Geordi's VISOR","Geordi's VISOR is lying here","armorLevel: 2","Geordi's VISOR was made specially for him, because he's blind. This piece of equipment allows him to see things, but differently than normal eyes. I wonder how Geordi is managing, now that you've stolen his only way of seeing?","VISOR","Geordi's VISOR"]).
-macroSomethingDescription('MedicalTricorder681',["medical","tricorder","a medical Tricorder","A medical Tricorder is lying here, ready to be used","mudLevelOf: 10","chargeCapacity: 5","mudCharge: 5","This medical Tricorder is used to heal small wounds and cuts. While it isn't made for major injuries, it can help you limp home. To use, hold it and then use it","Medical Tricorder","a medical Tricorder"]).
-macroSomethingDescription('MedicalTricorder682',["medical","tricorder","a medical Tricorder","A medical Tricorder is lying here, ready to be used","mudLevelOf: 10","chargeCapacity: 5","mudCharge: 5","This medical Tricorder is used to heal small wounds and cuts. While it isn't made for major injuries, it can help you limp home. To use, hold it and then use it","Medical Tricorder","a medical Tricorder"]).
-macroSomethingDescription('MedicalTricorder683',["medical","tricorder","a medical Tricorder","A medical Tricorder is lying here, ready to be used","mudLevelOf: 10","chargeCapacity: 5","mudCharge: 5","This medical Tricorder is used to heal small wounds and cuts. While it isn't made for major injuries, it can help you limp home. To use, hold it and then use it","Medical Tricorder","a medical Tricorder"]).
-macroSomethingDescription('Tricorder759',["medical","tricorder","a medical Tricorder","A medical Tricorder is lying here, ready to be used","mudLevelOf: 10","chargeCapacity: 5","mudCharge: 5","This medical Tricorder is used to heal small wounds and cuts. While it isn't made for major injuries, it can help you limp home. To use, hold it and then use it","Tricorder","a medical Tricorder"]).
+macroSomethingDescription('iComBadge698',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+macroSomethingDescription('iComBadge703',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+macroSomethingDescription('iComBadge709',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+macroSomethingDescription('iComBadge714',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+macroSomethingDescription('iComBadge718',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+macroSomethingDescription('iComBadge722',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+macroSomethingDescription('iComBadge730',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+macroSomethingDescription('iComBadge734',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+macroSomethingDescription('iComBadge738',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+macroSomethingDescription('iComBadge742',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+macroSomethingDescription('iComBadge746',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+macroSomethingDescription('iComBadge750',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+macroSomethingDescription('iComBadge754',["starfleet","comm","com","communication","badge","a Starfleet communication badge","A Starfleet communication badge is lying here","mudArmorLevel: 1","These communication badges must be worn by all officers while on a starship. It looks like a silver arrow head on top of a golden coloured oval: ____/____ / /   | /  | _/ _/_ _/ // \\ ","Comm Badge","a Starfleet communication badge"]).
+macroSomethingDescription('Item7Sash725',["worf's","worf","sash","Worf's sash","Worf's silver chain sash has been left here","mudArmorLevel: 8","Worf's sash is some sort of Klingon clothing. Worf always wears it, which makes you wonder how you managed to get a hold of it..","Sash","Worf's sash"]).
+macroSomethingDescription('Item8VISOR688',["geordi","geordi's","visor","Geordi's VISOR","Geordi's VISOR is lying here","mudArmorLevel: 2","Geordi's VISOR was made specially for him, because he's blind. This piece of equipment allows him to see things, but differently than normal eyes. I wonder how Geordi is managing, now that you've stolen his only way of seeing?","VISOR","Geordi's VISOR"]).
+macroSomethingDescription('MedicalTricorder681',["medical","tricorder","a medical Tricorder","A medical Tricorder is lying here, ready to be used","mudLevelOf: 10","chargeCapacity: 5","mudEnergy: 5","This medical Tricorder is used to heal small wounds and cuts. While it isn't made for major injuries, it can help you limp home. To use, hold it and then use it","Medical Tricorder","a medical Tricorder"]).
+macroSomethingDescription('MedicalTricorder682',["medical","tricorder","a medical Tricorder","A medical Tricorder is lying here, ready to be used","mudLevelOf: 10","chargeCapacity: 5","mudEnergy: 5","This medical Tricorder is used to heal small wounds and cuts. While it isn't made for major injuries, it can help you limp home. To use, hold it and then use it","Medical Tricorder","a medical Tricorder"]).
+macroSomethingDescription('MedicalTricorder683',["medical","tricorder","a medical Tricorder","A medical Tricorder is lying here, ready to be used","mudLevelOf: 10","chargeCapacity: 5","mudEnergy: 5","This medical Tricorder is used to heal small wounds and cuts. While it isn't made for major injuries, it can help you limp home. To use, hold it and then use it","Medical Tricorder","a medical Tricorder"]).
+macroSomethingDescription('Tricorder759',["medical","tricorder","a medical Tricorder","A medical Tricorder is lying here, ready to be used","mudLevelOf: 10","chargeCapacity: 5","mudEnergy: 5","This medical Tricorder is used to heal small wounds and cuts. While it isn't made for major injuries, it can help you limp home. To use, hold it and then use it","Tricorder","a medical Tricorder"]).
 macroSomethingDescription('Tricorder760',["medical","tricorder",
                      "a medical Tricorder","A medical Tricorder is lying here, ready to be used",
                      "mudLevelOf: 10",
                      "chargeCapacity: 5",
-                     "mudCharge: 5",
+                     "mudEnergy: 5",
                      "This medical Tricorder is used to heal small wounds and cuts. While it isn't made for major injuries, it can help you limp home. To use, hold it and then use it",
                      "Tricorder","a medical Tricorder"]).
-macroSomethingDescription('Tricorder761',["medical","tricorder","a medical Tricorder","A medical Tricorder is lying here, ready to be used","mudLevelOf: 10","chargeCapacity: 5","mudCharge: 5","This medical Tricorder is used to heal small wounds and cuts. While it isn't made for major injuries, it can help you limp home. To use, hold it and then use it","Tricorder","a medical Tricorder"]).
+macroSomethingDescription('Tricorder761',["medical","tricorder","a medical Tricorder","A medical Tricorder is lying here, ready to be used","mudLevelOf: 10","chargeCapacity: 5","mudEnergy: 5","This medical Tricorder is used to heal small wounds and cuts. While it isn't made for major injuries, it can help you limp home. To use, hold it and then use it","Tricorder","a medical Tricorder"]).
 macroSomethingDescription('Item10DilithiumCrystal756',["dilithium","crystal","a dilithium crystal","A shard of dilithium crystal is lying here","maybe a #$LightingDevice","Dilithium crystals are used to power warp cores of starships. This particular crystal is glowing brightly, and gives off a blueish tinge","Dilithium Crystal","a dilithium crystal"]).
 macroSomethingDescription('Item10DilithiumCrystal757',["dilithium","crystal","a dilithium crystal","A shard of dilithium crystal is lying here","maybe a #$LightingDevice","Dilithium crystals are used to power warp cores of starships. This particular crystal is glowing brightly, and gives off a blueish tinge","Dilithium Crystal","a dilithium crystal"]).
 macroSomethingDescription('Item10DilithiumCrystal758',["dilithium","crystal","a dilithium crystal","A shard of dilithium crystal is lying here","maybe a #$LightingDevice","Dilithium crystals are used to power warp cores of starships. This particular crystal is glowing brightly, and gives off a blueish tinge","Dilithium Crystal","a dilithium crystal"]).
-macroSomethingDescription('iPicardsFlute',["picard","picard's","flute","Picard's flute","Captain Picard's wooden flute is sitting here","Captain Picard recieved this flute when he lost his memory and was stuck on some strange world. Now, he plays it to relieve stress","5 Picard's Flute","Picard's flute"]).
+macroSomethingDescription('iPicardsFlute',["picard","picard's","flute","Picard's flute","Captain Picard's wooden flute is sitting here","Captain Picard recieved this flute when he lost his mudMemory and was stuck on some strange world. Now, he plays it to relieve stress","5 Picard's Flute","Picard's flute"]).
 macroSomethingDescription('Item12Trombone711',["riker","riker's","trombone","Riker's trombone","Commander Riker's trombone has been placed here","Commander Riker considers himself to be a talented jazz musician. He practices on this trombone all the time","Trombone","Riker's trombone"]).
 macroSomethingDescription('Item20Tea690',["tea","cup","a small cup","A small cup of tea is sitting here","Tea","a small cup"]).
 macroSomethingDescription('Item21Synthehol691',["wine","bottle","synthehol","a synthehol","A bottle of synthehol is standing here","Synthehol","a synthehol"]).
@@ -957,8 +957,8 @@ macroSomethingDescription('iArea1013',["A Corridor","You find yourself in the mi
 macroSomethingDescription('iArea1032',["Turbolift","You're in the turbolift","The turbolift walls have been rounded off, making it in the shape of a tube","Several vertical rows of lights make this place very well lit","From here, you can access the other decks on the Enterprise"]).
 macroSomethingDescription('iArea1012',["Cargo Bay 1","You're in the main cargo bay of the Enterprise","It's quite a large room, with a very high ceiling and a lot of floor space","You can see several hundred plastic crates and barrels with the Starfleet insignia on them stacked right up to the ceiling"]).
 macroSomethingDescription('iArea1016',["A Corridor","You find yourself in the middle of a well lit corridor on the Enterprise","It isn't very wide, and the light beige walls have been rounded, making the corridor an oval shape","You see the holodeck's control panel beside the holodeck door, and it has some information on it"]).
-macroSomethingDescription('iArea1014',["Riker's Quarters","You've arrived in Riker's quarters","The room is very neat and tidy, with a couch and several chairs aranged around a coffee table by the eastern wall","A small partition at the northern part of the room seperates his sleeping area with the rest of the room"]).
-macroSomethingDescription('iArea1015',["Sick Bay","You're in the middle of the Enterprise's Sick Bay","About a dozen beds are arranged along the walls of the room, while several carts covered with medical supplies are scattered around the room","A large glass window in the northern part of the room separates the doctor's office with the rest of the room",'
+macroSomethingDescription('iArea1014',["Riker's Quarters","You've arrived in Riker's quarters","The room is very neat and tidy, with a couch and several chairs aranged around a coffee table by the eastern wall","A small partition at the northern part of the room seperates his sleeping area with the ftRest of the room"]).
+macroSomethingDescription('iArea1015',["Sick Bay","You're in the middle of the Enterprise's Sick Bay","About a dozen beds are arranged along the walls of the room, while several carts covered with medical supplies are scattered around the room","A large glass window in the northern part of the room separates the doctor's office with the ftRest of the room",'
 ***************************************************
 *                                                 *
 *            NCC1701D  "ENTERPRISE"            *
@@ -981,7 +981,7 @@ macroSomethingDescription('iArea1015',["Sick Bay","You're in the middle of the E
 ***************************************************
 ']).
 macroSomethingDescription('iArea1019',["A Corridor","You find yourself in the middle of a well lit corridor on the Enterprise","It isn't very wide, and the light beige walls have been rounded, making the corridor an oval shape"]).
-macroSomethingDescription('iArea1017',["Holodeck 4 Entrance  A Narrow Alley","You emerge into a dark narrow alley","Tall dark brick buildings block your way north and south","You can see that the windows on the buildings are fairly high, and some have been boarded up","The smell from the rotting food and garbage mixing with the foul water on the ground is unbearable","You can hear the sounds of a bustling marketpace to the east","The archway leading out of the holodeck is west"]).
+macroSomethingDescription('iArea1017',["Holodeck 4 Entrance  A Narrow Alley","You emerge into a dark narrow alley","Tall dark brick buildings block your way north and south","You can see that the windows on the buildings are fairly high, and some have been boarded up","The smell from the rotting tFood and garbage mixing with the foul water on the ground is unbearable","You can hear the sounds of a bustling marketpace to the east","The archway leading out of the holodeck is west"]).
 macroSomethingDescription('iArea1018',["Crusher's Quarters","You're in Doctor Crusher's quarters","Several different paintings are attached to the walls, and you also notice a few sculptures","A neatly made bed is located by the northern wall, in between two large windows looking out into space"]).
 macroSomethingDescription('iArea1021',["Ten Forward","You're now in Ten Forward, the entertainment room of the Enterprise","The entire northern wall is covered with windows looking out into space, while two large wooden doors with the Starfleet insignia stamped on them face south","Many vRound metal tables are scattered around the room, surrounded by metal chairs","A long bar spans almost the entire length of the southern part of the room, and about two dozen bar stools are sitting in front of it","It's very noisy in here, due to all the talking and laughing"]).
 macroSomethingDescription('iArea1020',["Enterprise Security","You're standing in the dimly lit Enterprise Security","Weapons lockers cover all of the walls, except along the northern wall, where a large glass window protects dozens of different phasors, blaster rifles, and other high tech weapons","Three long tables surrounded by chairs stretch across the room"]).
@@ -1009,14 +1009,14 @@ macroSomethingDescription('iArea1027',["A Corridor","You find yourself in the mi
 macroSomethingDescription('iArea1025',["Worf's Quarters","You're in Worf's quarters","A small table is sitting in the southeastern corner, and on it is a small potted plant","An impressive selection of Klingon weapons have been mounted on the northern wall, and a partition splits this room with Worf's bedroom to the east"]).
 macroSomethingDescription('iArea1026',["Enterprise Gym","You emerge into the Enterprise gym","The room is quite large, with a soft grey floor","A set of lockers against the southern wall contain all of the necessary equipment needed for using the gym","A thick stack of mats have been piled high in one corner, which can be used for different activities","Captain Picard likes to come here to practice his fencing"]).
 macroSomethingDescription('iArea1030',["A Corridor","You find yourself in the middle of a well lit corridor on the Enterprise","It isn't very wide, and the light beige walls have been rounded, making the corridor an oval shape"]).
-macroSomethingDescription('iArea1028',["Picard's Quarters","You find yourself standing by the door of Captain Picard's quarters","He isn't very fond of visitors, but you decide to stay and have a look around","You can see several different ancient artifacts on tables and small pedestals, and a large wooden wardrobe is facing south","A comfortable looking recliner with a matching footrest sits beside the door, along with a bright reading lamp and end table","Two large windows offer a great view of space","A small partition at the northern part of the room contains Picard's sleeping area"]).
-macroSomethingDescription('iArea1029',["Science Lab","You're in the Enterprise science lab","A strange looking machine sits in the middle of the room, up on a slightly raised platform","It looks as though something(or someone) could be placed inside, hooked up to the multitude of wires and cables, and have scientific tests performed on it(or them)","A complex looking computer console is facing this machine","Around the rest of the room are counterops with with the odd computer terminal"]).
+macroSomethingDescription('iArea1028',["Picard's Quarters","You find yourself standing by the door of Captain Picard's quarters","He isn't very fond of visitors, but you decide to stay and have a look around","You can see several different ancient artifacts on tables and small pedestals, and a large wooden wardrobe is mudFacing south","A comfortable looking recliner with a matching footrest sits beside the door, along with a bright reading lamp and end table","Two large windows offer a great view of space","A small partition at the northern part of the room contains Picard's sleeping area"]).
+macroSomethingDescription('iArea1029',["Science Lab","You're in the Enterprise science lab","A strange looking machine sits in the middle of the room, up on a slightly raised platform","It looks as though something(or someone) could be placed inside, hooked up to the multitude of wires and cables, and have scientific tests performed on it(or them)","A complex looking computer console is mudFacing this machine","Around the ftRest of the room are counterops with with the odd computer terminal"]).
 macroSomethingDescription('iArea1031',["Cargo Bay 2","You're in the cargo bay 2 of the Enterprise","It's quite a large room, with a very high ceiling and a lot of floor space","You can see several hundred plastic crates and barrels with the Starfleet insignia on them stacked right up to the ceiling"]).
 macroSomethingDescription('iArea1033',["Turbolift","You're in the turbolift","The turbolift walls have been rounded off, making it in the shape of a tube","Several vertical rows of lights make this place very well lit","From here, you can access the other decks on the Enterprise"]).
 macroSomethingDescription('iArea1034',["Turbolift","You're in the turbolift","The turbolift walls have been rounded off, making it in the shape of a tube","Several vertical rows of lights make this place very well lit","From here, you can access the other decks on the Enterprise"]).
 macroSomethingDescription('iArea1036',["Main Bridge  Upper Half","You find yourself on the upper half of the main bridge of the USS Enterprise","Directly in front of you is a thick railing that contains many different computer panels used for the tactical systems of the ship","The entire southern wall is covered with computer consoles, where the ship's main systems are controlled","Two small curved ramps on either side of the room lead north to the lower part of the bridge, and a large circular skylight shows the space outside the ship"]).
 macroSomethingDescription('iArea1035',["Picard's Ready Room","You're standing in Captain Picard's ready room","A long couch has been placed beside the door, while a large U shaped desk is located by the northern wall","A small computer screen is sitting on the desk, as well as several other papers and documents","A single high window beside the desk looks into space, and a fish tank is located in the northwestern corner of the room","This is where the Captain makes all of his important decisions"]).
-macroSomethingDescription('iArea1038',["Main Bridge  Lower Half","You find yourself on the lower half of the main bridge of the USS Enterprise","An enormous view screen covers almost the entire northern wall, and is currently displaying a view of the stars rushing by","Three large chairs in the northern part of the room, in front of the railing, face the screen","This is where the Captain, Commander Riker, and Counselor Troi sit","Two computer consoles with built in chairs rest about ten feet in front of the chairs, also facing the view screen","This is where the ship's pilot and information officer sit"]).
+macroSomethingDescription('iArea1038',["Main Bridge  Lower Half","You find yourself on the lower half of the main bridge of the USS Enterprise","An enormous view screen covers almost the entire northern wall, and is currently displaying a view of the stars rushing by","Three large chairs in the northern part of the room, in front of the railing, face the screen","This is where the Captain, Commander Riker, and Counselor Troi sit","Two computer consoles with built in chairs ftRest about ten feet in front of the chairs, also mudFacing the view screen","This is where the ship's pilot and information officer sit"]).
 macroSomethingDescription('iArea1037',["Conference Room","You're in the conference room of the Enterprise","A large glass rectangular table sits in the middle of the room, surrounded by about a dozen comfortable looking office chairs","The entire eastern wall is covered with windows, looking out into space","This is where the senior officers of the Enterprise meet and discuss important issues"]).
 macroSomethingDescription('iArea1040',["Outer Space","You're floating in outer space right above the USS Enterprise","You can see stars in every direction, which provide the only light here","You feel very cold"]).
 macroSomethingDescription('iArea1041',["Outer Space","You're floating in outer space right above the USS Enterprise","You can see stars in every direction, which provide the only light here","You feel very cold"]).
@@ -1220,25 +1220,25 @@ pddlSomethingIsa0(X,Y):pddlSomethingIsa(X,List),member(Y,List).
 domain_name(startrek).
 
 sorts(non_primitive_sorts, [
-       region, city_location,tcentre,not_tcentre, route, 
-       physical_obj, vehicle, railv, actorNPC, dir]).
+       tRegion, city_location,tcentre,not_tcentre, route, 
+       physical_obj, vehicle, railv, actorNPC, vtDirection]).
 sorts(primitive_sorts, [
         airport, aircraft, train_station, post_office, clocation, city, package, 
-        train, traincar, truck, road_route, rail_route, region,tAgentGeneric]).
+        train, traincar, truck, road_route, rail_route, tRegion,tAgentGeneric]).
 
-sorts(physical_obj, [vehicle, package,'PortableObject',tAgentGeneric]).
-sorts('PortableObject',['SomethingToWear',tWeapon,tContolDevice,'ProtectiveAttire','FluidReservoir']).
+sorts(physical_obj, [vehicle, package,tCarryAble,tAgentGeneric]).
+sorts(tCarryAble,['tWearAble',tWeapon,tContolDevice,tClothing,'FluidReservoir']).
 sorts(actorNPC, [tAgentGeneric]).
 */
 
 
-% objects(SW,List):member(SW,[tWeapon,tContolDevice,'ProtectiveAttire','FluidReservoir','BPVLocation','PortableObject','SomethingToWear',tAgentGeneric,'SomethingToWear']),findall(O,pddlSomethingIsa0(O,SW),ULIST),sort(ULIST,List).
+% objects(SW,List):member(SW,[tWeapon,tContolDevice,tClothing,'FluidReservoir',tRegion,tCarryAble,'tWearAble',tAgentGeneric,'tWearAble']),findall(O,pddlSomethingIsa0(O,SW),ULIST),sort(ULIST,List).
 %SLOW 
 objects(tWeapon,['iPhaser676','iPhaser700','iPhaser724','iPhaser776','Item15PhaserRifle705']).
 objects(tContolDevice,['MedicalTricorder681','MedicalTricorder682','MedicalTricorder683','Tricorder759','Tricorder760','Tricorder761']).
-objects('ProtectiveAttire',['Item2RedUniform704','Item2RedUniform710','Item2RedUniform719','Item2RedUniform739','Item2RedUniform743','iGoldUniform675','iGoldUniform687','iGoldUniform699','iGoldUniform723','iGoldUniform731','iGoldUniform735','iGoldUniform775','Item4BlueUniform680','Item4BlueUniform715','Item4BlueUniform747','Item4BlueUniform751','Item4BlueUniform755','iBoots673','iBoots678','iBoots685','iBoots697','iBoots702','iBoots708','iBoots713','iBoots717','iBoots721','iBoots729','iBoots733','iBoots737','iBoots741','iBoots745','iBoots749','iBoots753','iBoots773','iComBadge674','iComBadge679','iComBadge686','iComBadge698','iComBadge703','iComBadge709','iComBadge714','iComBadge718','iComBadge722','iComBadge730','iComBadge734','iComBadge738','iComBadge742','iComBadge746','iComBadge750','iComBadge754','iComBadge774','Item7Sash725','Item8VISOR688']).
+objects(tClothing,['Item2RedUniform704','Item2RedUniform710','Item2RedUniform719','Item2RedUniform739','Item2RedUniform743','iGoldUniform675','iGoldUniform687','iGoldUniform699','iGoldUniform723','iGoldUniform731','iGoldUniform735','iGoldUniform775','Item4BlueUniform680','Item4BlueUniform715','Item4BlueUniform747','Item4BlueUniform751','Item4BlueUniform755','iBoots673','iBoots678','iBoots685','iBoots697','iBoots702','iBoots708','iBoots713','iBoots717','iBoots721','iBoots729','iBoots733','iBoots737','iBoots741','iBoots745','iBoots749','iBoots753','iBoots773','iComBadge674','iComBadge679','iComBadge686','iComBadge698','iComBadge703','iComBadge709','iComBadge714','iComBadge718','iComBadge722','iComBadge730','iComBadge734','iComBadge738','iComBadge742','iComBadge746','iComBadge750','iComBadge754','iComBadge774','Item7Sash725','Item8VISOR688']).
 objects('FluidReservoir',['Item20Tea690','Item21Synthehol691','Item22FerengiAle692','Item23RomulanWhisky693','Item24LemonadePruneJuice694','Item25VulcanBeer695']).
-objects('BPVLocation',['iArea1000','iArea1001','iArea1002','iArea1003','iArea1004','iArea1005','iArea1006','iArea1007','iArea1008','iArea1009','iArea1010','iArea1011','iArea1012','iArea1013','iArea1014','iArea1015','iArea1016','iArea1017','iArea1018','iArea1019','iArea1020','iArea1021','iArea1022','iArea1023','iArea1024','iArea1025','iArea1026','iArea1027','iArea1028','iArea1029','iArea1030','iArea1031','iArea1032','iArea1033','iArea1034','iArea1035','iArea1036','iArea1037','iArea1038','iArea1039','iArea1040','iArea1041','iArea1042'
+objects(tRegion,['iArea1000','iArea1001','iArea1002','iArea1003','iArea1004','iArea1005','iArea1006','iArea1007','iArea1008','iArea1009','iArea1010','iArea1011','iArea1012','iArea1013','iArea1014','iArea1015','iArea1016','iArea1017','iArea1018','iArea1019','iArea1020','iArea1021','iArea1022','iArea1023','iArea1024','iArea1025','iArea1026','iArea1027','iArea1028','iArea1029','iArea1030','iArea1031','iArea1032','iArea1033','iArea1034','iArea1035','iArea1036','iArea1037','iArea1038','iArea1039','iArea1040','iArea1041','iArea1042'
 % ,'iArea1004075'
 ]).
 objects(tAgentGeneric,['NPC0Geordi684','NPC2Worf720','NPC3DrCrusher677','NPC4Troi712','NPC5Riker707','NPC6Picard701','NPC7Guinan689','NPC8OBrien696','NPC9Wesley716','NPC1010Livingston726','NPC1011Spot727','iEnsign728','iEnsign732','iEnsign736','iEnsign740','iEnsign744','iEnsign748','iEnsign752','NPC1013Alexander671',iCommanderData,iExplorer1]).

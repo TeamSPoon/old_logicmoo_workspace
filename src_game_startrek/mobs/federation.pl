@@ -15,7 +15,7 @@
 
 
 % Declare the module name and the exported (public) predicates.
-:-swi_module(modFederation,[]).
+:-module(modFederation,[]).
 
 :- include(logicmoo(vworld/moo_header)).
 :- register_module_type(planning).
@@ -28,36 +28,32 @@ vette_federation_idea(Agent,Act,Act):-dmsg(vette_federation_idea(Agent,Act)).
 
 mudLabelTypeProps('Px',tFederation,[]).
 
-user:world_agent_plan(_World,Agent,ActV):-
+moo:world_agent_plan(_World,Agent,ActV):-
    tAgentGeneric(Agent),
-  % isa(Agent,federation),
+  % mudIsa(Agent,federation),
    federation_idea(Agent,Act),
    vette_federation_idea(Agent,Act,ActV).
 
-% Possible agent actions.
+% Possible tAgentGeneric actions.
 federation_idea(Agent,actEat(Elixer)) :-
 	mudHealth(Agent,Damage),
 	Damage < 15,
-   mudPossess(Agent,List),
-   obj_memb(Elixer,List),
+   mudPossess(Agent,Elixer),   
    mudIsa(Elixer,tElixer).
 
 federation_idea(Agent,actEat(tFood)) :-
-	mudCharge(Agent,Charge),
+	mudEnergy(Agent,Charge),
 	Charge < 150,
-   mudPossess(Agent,List),
-   obj_memb(Food,List),
+   mudPossess(Agent,Food),
    mudIsa(Food,tFood).
 
-federation_idea(Agent,actTake(Good)) :-
+federation_idea(Agent,actTake(What)) :-
 	mudNearFeet(Agent,What),
-        obj_memb(Good,What),
-	isa_any(Good,[tGold,tElixer,tTreasure]).  
+	isa_any(What,[tGold,tElixer,tTreasure]).  
 
-federation_idea(Agent,actTake(Good)) :-
+federation_idea(Agent,actTake(What)) :-
 	mudNearFeet(Agent,What),
-        obj_memb(Good,What),
-	isa_any(Good,[tFood,tUsefull,tItem]).
+	isa_any(What,[tFood,tUsefull,tItem]).
 
 federation_idea(Agent,actMove(1,Dir)) :-
 	mudGetPrecepts(Agent,List),

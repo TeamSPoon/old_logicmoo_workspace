@@ -8,7 +8,7 @@
 :- use_module(library(http/html_head)).
 
 
-%%	style_name(-Style:term) is nondet
+%%	style_name(-Style:ftTerm) is nondet
 %
 %       binds Style to a styling option.
 %	usually called with a partially bound argument whose unbound
@@ -60,5 +60,5 @@ user:head(startrek, Head) -->
 user:body(startrek, Body) -->
 	html(body([
 		 h1('Star Trek'),
-		 div(id(content), Body)
+		 div(ftID(content), Body)
 	     ])).

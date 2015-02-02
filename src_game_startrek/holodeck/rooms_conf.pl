@@ -8,7 +8,7 @@ A single number, with the following meaning:
                     commands.  The latter is useful for secret doors, trap doors,
                     or other doors that are opened and closed by something other
                     than the normal commands, like a special procedure or script
-                    assigned to the room or an object in the room.
+                    assigned to the room or an tObj in the room.
 
 1) Closeable door - Normal doors that can be opened, closed, locked, unlocked,
                     and picked.
@@ -18,7 +18,7 @@ A single number, with the following meaning:
 
 Room Flags:
 
-A short description of the roomflags:
+A short mudDescription of the roomflags:
 
 A bitvector, with the following values:
 1) DARK       - self explanatory
@@ -42,9 +42,9 @@ A bitvector, with the following values:
 Sector Type
 
      A single number (not a bitvector)
-defining the type of terrain in the room.  Note that this value
+defining the tCol of terrain in the room.  Note that this value
 is not the number of movement points needed but just a number to
-identify the sector type.  It can be any of the following:
+identify the sector tCol.  It can be any of the following:
 
 0    INSIDE         Indoors - typically small number of move points needed.
 1    CITY           The streets of a city.

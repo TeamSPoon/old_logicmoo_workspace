@@ -1,13 +1,13 @@
 /** <module> 
 % This file contains the definitions for the objects in a household
-% To create a new world, simply change the object definitions as
+% To create a new world, simply change the tObj definitions as
 % described below (or in manual)
 %
 % *******Object definitions*******
 %.
 % Use the label_type_props(label,typecode,[property1,property2,etc.]]).
-% label is whats used to refer to the object in the running world
-% typecode is whats used to refer to the object for initialization (see world.pl)
+% label is whats used to refer to the tObj in the running world
+% typecode is whats used to refer to the tObj for initialization (see world.pl)
 */
 
 :- style_check(-singleton).
@@ -19,7 +19,7 @@
 % ==================================================
 
 :-decl_mpred_hybrid(localityOfObject(tObj,tSpatialThing)).
-% which will imply ... :-decl_mpred_hybrid(localityOfObject(kappa(Self,subclass(Self,obj)),kappa(Self2,subclass(Self2,tSpatialThing)))).
+% which will imply ... :-decl_mpred_hybrid(localityOfObject(kappa(Self,mudSubclass(Self,obj)),kappa(Self2,mudSubclass(Self2,tSpatialThing)))).
 
 
 
@@ -92,45 +92,46 @@
 
 mudSubclass(tCandle,tPortableDevice).
 mudSubclass(tFlashlight, tPortableDevice).
+mudSubclass(tFlashlight, tTurnOnAble).
 mudSubclass(tDesk, tOfficeRoomFurnature).
 mudSubclass(tApple, tFood).
 mudSubclass(tNani, tArt).
-mudSubclass(tNani, tWashable).
-mudSubclass(tClothing, tWashable).
-mudSubclass(tNani, tPortable).
+mudSubclass(tNani, tWashAble).
+mudSubclass(tClothing, tWashAble).
+mudSubclass(tNani, tCarryAble).
 mudSubclass(tBroccoli, tFood).
-mudSubclass(tFood,tEatable).
+mudSubclass(tFood,tEatAble).
 mudSubclass(tCrackers, tFood).
 mudSubclass(tEnvelope, tOfficeItem).
 mudSubclass(tStamp, tOfficeItem).
 mudSubclass(tKey, tOfficeItem).
-mudSubclass(tBall, tThrowable).
+mudSubclass(tBall, tThrowAble).
 
 mudSubclass(tPajamas, tClothing).
 mudSubclass(tShirt, tClothing).
 mudSubclass(tCoat, tClothing).
 mudSubclass(tPants, tClothing).
-mudSubclass(tClothing, tFoldable).
-mudSubclass(tClothing, tWearable).
+mudSubclass(tClothing, tFoldAble).
+mudSubclass(tClothing, tWearAble).
 
 mudSubclass(tCoffeeCup, tLiquidContainer).
-mudSubclass(tCoffeeCup, tDrinkable).
-mudSubclass(tCoffeeCup, tThrowable).
+mudSubclass(tCoffeeCup, tDrinkAble).
+mudSubclass(tCoffeeCup, tThrowAble).
 mudSubclass(tCoffee, tLiquid).
-mudSubclass(tBook, tReadable).
+mudSubclass(tBook, tReadAble).
 
 mudSubclass(tPillow, tBedding).
 mudSubclass(tBlanket, tBedding).                                                              
-mudSubclass(tBedding, tFoldable).
-mudSubclass(tFoldable, tPortable).
-mudSubclass(tThrowable, tPortable).
-mudSubclass(tPortableDevice,tPortable).
+mudSubclass(tBedding, tFoldAble).
+mudSubclass(tFoldAble, tCarryAble).
+mudSubclass(tThrowAble, tCarryAble).
+mudSubclass(tPortableDevice,tCarryAble).
 mudSubclass(tPhysicalDevice,tUseable).
-mudSubclass(tWearable, tPortable).
-mudSubclass(tPortable, tTakeable).
-mudSubclass(tFood,tTakeable).
-mudSubclass(tTakeable,tObj).
-mudSubclass(tPartofObj,tNotTakable).
+mudSubclass(tWearAble, tCarryAble).
+mudSubclass(tCarryAble, tCarryAble).
+mudSubclass(tFood,tCarryAble).
+mudSubclass(tCarryAble,tObj).
+mudSubclass(tPartofObj,isTDisjoint(tCarryAble)).
 
 mudSubclass(tLightSwitch, tWallFurnature).
 mudSubclass(tComputer, tOfficeFurnature).
@@ -148,8 +149,7 @@ mudSubclass(tEasyChair, tLivingRoomFurnature).
 mudSubclass(tCoffeeTable, tLivingRoomFurnature).
 mudSubclass(tBookcase, tWallFurnature).
 mudSubclass(tDrawer, tContainer).
-mudSubclass(tDrawer, tOpenable).
-mudSubclass(tDrawer, tCloseable).
+mudSubclass(tDrawer, tOpenCloseAble).
 mudSubclass(tDrawer, tPartofFurnature).
 mudSubclass(tTopDrawer, tPartofFurnature).
 mudSubclass(tMiddleDrawer, tPartofFurnature).
@@ -158,7 +158,7 @@ mudSubclass(tHousePlant, tPartofObj).
 mudSubclass(tPlanter, tContainer). 
 mudSubclass(tGueridon, tLivingRoomFurnature).
 mudSubclass(tGardenPlant, tOutdoorFurnature).
-mudSubclass(tSpatialThing,tLookable).
+mudSubclass(tSpatialThing,tLookAble).
 mudSubclass(tNani,tTeddybear).
 mudSubclass(tTeddybear,tTreasure).
 
@@ -193,7 +193,7 @@ typeProps(tWashingMachine,[mudColor(vWhite),mudSize(vLarge),mudShape(isEach(vCub
 typeProps(tBroccoli,[mudColor(vGreen),mudSize(vSmall),mudShape(isLike(mudShape,tTree)),mudIsa(tVegetable),mudTexture(isEach(vPorous,vBumpy))]).                                                                    
 typeProps(tCrackers,[mudColor(vTan),mudIsa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]).
 typeProps(tComputer,[mudColor(vGrey),mudMaterial(vPlastic),mudShape(isEach(vCubular,vRectangular)),mudSize(vMedium),mudTexture(vSmooth)]).
-typeProps(tStamp,[mudColor(vPolychromatic),mudSize(isEach(vTiny,thin)),mudShape(vSquare),mudMaterial(vPaper),mudTexture(isEach(vSmooth,vSticky))]).
+typeProps(tStamp,[mudColor(vPolychromeatic),mudSize(isEach(vTiny,thin)),mudShape(vSquare),mudMaterial(vPaper),mudTexture(isEach(vSmooth,vSticky))]).
 typeProps(tCoat,[mudColor(vBlack),mudSize(isEach(vMedium,vFits)),mudShape(isLike(mudShape,tTorso)),mudMaterial(isEach(vWool,vCotton,vRayon)),mudTexture(vCoarse)]).
 typeProps(tPants,[mudColor(vBlack),mudSize(isEach(vMedium,vFits)),mudShape(isLike(mudShape,tAss)),mudMaterial(vDenim),mudTexture(vCoarse)]).
 typeProps(tNani,[mudColor(vBrown),mudColor(vWhite),mudSize(vMedium),mudShape(isLike(mudShape,tTeddybear)),mudMaterial(vPlush),mudTexture(isEach(vFuzzy,vSoft))]).
