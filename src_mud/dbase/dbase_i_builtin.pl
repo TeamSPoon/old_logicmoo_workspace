@@ -322,7 +322,7 @@ prologMultiValued(mudDescription(ftTerm,ftString),prologOrdered).
 prologMultiValued(mudKeyword(ftTerm,ftString)).
 prologMultiValued(mudActAffect(ftTerm,ftTerm,ftTerm)).
 prologMultiValued(mudMemory(tAgentGeneric,ftTerm)).
-predArgTypes(mudWearing(tAgentGeneric,tWearable)).
+predArgTypes(mudWearing(tAgentGeneric,tWearAble)).
 predArgTypes(mudLastCmdSuccess(tAgentGeneric,ftTerm)).
 
 :-decl_mpred(mudActAffect/3).
@@ -354,9 +354,9 @@ mudSubclass(tItem,tSpatialThing).
 mudSubclass(tDrinkable,tItem).
 mudSubclass(tPossessable,tItem).
 mudSubclass(tUseable,tItem).
-mudSubclass(tEatable,tItem).
+mudSubclass(tEatAble,tItem).
 mudSubclass(tChargeable,tItem).
-mudSubclass(tWearable,tItem).
+mudSubclass(tWearAble,tItem).
 
 
 :-decl_mpred_hybrid(pathBetween,3).
@@ -459,7 +459,7 @@ prologMultiValued(verbOverride(ftTerm,ftAction,ftAction)).
 
 prologSingleValued(mudAgentTurnnum(tAgentGeneric,ftInt(0))).
 prologSingleValued(mudAgentTurnnum(tAgentGeneric,ftInt)).
-prologSingleValued(armorLevel(tWearable,ftInt)).
+prologSingleValued(armorLevel(tWearAble,ftInt)).
 prologSingleValued(mudAttack(tObj,ftInt)).
 prologSingleValued(mudCharge(tChargable,ftInt(500))).
 prologSingleValued(mudCharge(tObj,ftInt),[argSingleValueDefault(2,500)]).
@@ -568,13 +568,13 @@ mudSubclass(areaPath,tDoor).
 mudSubclass(tChargeable,tItem).
 mudSubclass(tDoor,tItem).
 mudSubclass(tDrinkable,tItem).
-mudSubclass(tEatable,tItem).
+mudSubclass(tEatAble,tItem).
 mudSubclass(tItem,tSpatialThing).
 mudSubclass(tObj,tSpatialThing).
 mudSubclass(tPossessable,tItem).
 mudSubclass(tRegion,tSpatialThing).
 mudSubclass(tUseable,tItem).
-mudSubclass(tWearable,tItem).
+mudSubclass(tWearAble,tItem).
 
 disjointWith(tObj,tRegion).
 mudIsa(vtDirection,ttValueType).
@@ -644,7 +644,7 @@ mudSubclass(tNpcPlayer,tPlayer).
 mudSubclass('MaleAnimal',tPlayer).
 mudSubclass('FemaleAnimal',tPlayer).
 mudSubclass(isEach('PortableObject','ProtectiveAttire','SomethingToWear'),tPossessable).
-mudSubclass(isEach('ProtectiveAttire','SomethingToWear'),tWearable).
+mudSubclass(isEach('ProtectiveAttire','SomethingToWear'),tWearAble).
 mudSubclass(tContolDevice,tChargable).
 mudSubclass(vtPosture,vtVerb).
 

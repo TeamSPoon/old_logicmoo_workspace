@@ -434,7 +434,7 @@ is_known_trew(mudIsa(ttFormatType,ttNotCreatableType)).
 is_known_trew(mudSubclass(ttFormatType,ttNotCreatableType)).
 is_known_trew(mudIsa(tTemporallyExistingThing, 'ttCreateable')).
 is_known_trew(mudIsa(ftTerm,ttNotCreatableType)).
-is_known_trew(mudIsa(C,I)):-hasInstance(C,I).
+is_known_trew(mudIsa(I,C)):-hasInstance(C,I).
 is_known_trew(mudSubclass(predArgTypes,tRelation)).
 is_known_trew(mudSubclass(tFunction,tRelation)).
 

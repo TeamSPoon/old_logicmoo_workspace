@@ -29,7 +29,7 @@ not_ftVar(V):-not(is_ftVar(V)).
 
 */
 
-% bugger:action_verb_useable(actWearUnused,wearsClothing,tWearable,mudPossess).
+% bugger:action_verb_useable(actWearUnused,wearsClothing,tWearAble,mudPossess).
 
 % [Manditory] define how we interact with the module system
 swi_module(M,E):-dmsg(swi_module(M,E)).

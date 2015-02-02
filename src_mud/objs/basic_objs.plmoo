@@ -54,9 +54,9 @@ mudSubclass(tApple, tFood).
 mudSubclass(tNani, tArt).
 mudSubclass(tNani, tWashable).
 mudSubclass(tClothing, tWashable).
-mudSubclass(tNani, tPortable).
+mudSubclass(tNani, tCarryAble).
 mudSubclass(tBroccoli, tFood).
-mudSubclass(tFood,tEatable).
+mudSubclass(tFood,tEatAble).
 mudSubclass(tCrackers, tFood).
 mudSubclass(tEnvelope, tOfficeItem).
 mudSubclass(tStamp, tOfficeItem).
@@ -66,20 +66,20 @@ mudSubclass(tOfficeItem, tItem).
 mudSubclass(tFood, tItem).
 mudSubclass(tClothing, tItem).
 
-mudSubclass(tItem, tPortable).
-mudSubclass( tPortable, tDropable).
+mudSubclass(tItem, tCarryAble).
+mudSubclass( tCarryAble, tDropable).
 
-mudSubclass( tPortable, tThrowable).
-mudSubclass( tPortable, tTakeable).
+mudSubclass( tCarryAble, tThrowable).
+mudSubclass( tCarryAble, tCarryAble).
 
-mudSubclass(tPortableDevice,tPortable).
+mudSubclass(tPortableDevice,tCarryAble).
 
 mudSubclass(tPajamas, tClothing).
 mudSubclass(tShirt, tClothing).
 mudSubclass(tCoat, tClothing).
 mudSubclass(tPants, tClothing).
 mudSubclass(tClothing, tFoldable).
-mudSubclass(tClothing, tWearable).
+mudSubclass(tClothing, tWearAble).
 
 mudSubclass(tCoffeeCup, tLiquidContainer).
 mudSubclass(tCoffeeCup, tDrinkable).
@@ -90,15 +90,15 @@ mudSubclass(tBook, tReadable).
 mudSubclass(tPillow, tBedding).
 mudSubclass(tBlanket, tBedding).                                                              
 mudSubclass(tBedding, tFoldable).
-mudSubclass(tFoldable, tPortable).
-mudSubclass(tThrowable, tPortable).
-mudSubclass(tPortableDevice,tPortable).
+mudSubclass(tFoldable, tCarryAble).
+mudSubclass(tThrowable, tCarryAble).
+mudSubclass(tPortableDevice,tCarryAble).
 mudSubclass(tPortableDevice,tPhysicalDevice).
 mudSubclass(tPhysicalDevice,tUseable).
-mudSubclass(tWearable, tPortable).
-mudSubclass(tPortable,tTakeable).
-mudSubclass(tFood,tTakeable).
-mudSubclass(tTakeable,tObj).
+mudSubclass(tWearAble, tCarryAble).
+mudSubclass(tCarryAble,tCarryAble).
+mudSubclass(tFood,tCarryAble).
+mudSubclass(tCarryAble,tObj).
 mudSubclass(tPartofObj,tNotTakable).
 mudSubclass(tBodyPart,tPartofObj).
 
@@ -133,7 +133,7 @@ mudSubclass(tHousePlant, tPartofObj).
 mudSubclass(tPlanter, tContainer). 
 mudSubclass(tGueridon, tLivingRoomFurnature).
 mudSubclass(tGardenPlant, tOutdoorFurnature).
-mudSubclass(tSpatialThing,tLookable).
+mudSubclass(tSpatialThing,tLookAble).
 mudSubclass(tNani,tTeddybear).
 mudSubclass(tTeddybear,tTreasure).
 

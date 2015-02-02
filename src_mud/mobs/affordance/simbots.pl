@@ -263,7 +263,7 @@ defined_affordance([subjType= "Container",stringMatch= "Plastic",actionVerb(2)="
 defined_affordance([subjType= "Table",
 stringMatch= " * Coffee Table",
 acceptsChild= tReadable,
-acceptsChild= tEatable,
+acceptsChild= tEatAble,
 actionVerb(2)="Put_X_On"]).
 
 defined_affordance([subjType= "Trash_Container",
@@ -298,7 +298,7 @@ slAnim= anim_LAUGH_SHORT,
 actionVerb= "Take",
 textName= "Take the materials"]).
 
-defined_affordance([subjType= tEatable,
+defined_affordance([subjType= tEatAble,
 'slAcceptsParent'= "Avatar",
 actionVerb= "Eat",
 textName= "Eat the food",
@@ -368,13 +368,13 @@ slAnim= anim_FINGER_WAG,
 'Energy'= 0 * -1]).
 
 
-defined_affordance([subjType= tConsumable,actionVerb= "Eat",
+defined_affordance([subjType= tEatAble,actionVerb= "Eat",
 textName= "Eat it",
 slDestroyedOnUse= true,
 'NonHunger'= 100 * 100,
 'Hygiene'= 0 * -10]).
 
-defined_affordance([subjType= tTakeable,actionVerb= "Take", 
+defined_affordance([subjType= tCarryAble,actionVerb= "Take", 
 textName= "Take it",
 'slAcceptsParent'= "Avatar"]).
 
@@ -385,13 +385,13 @@ defined_affordance([subjType= tLayable,actionVerb= "Sleep",
    'Comfort'= 5 * 5,
    'Energy'= 20 * 20]).
 
-defined_affordance([alsoType= tLookable,actionVerb= "Clean",
+defined_affordance([alsoType= tLookAble,actionVerb= "Clean",
    textName= "Clean",
    slAnim= anim_FINGER_WAG,
    'Fun'= -2 * 2,
    'Energy'= 0 * -1]).
 
-defined_affordance([alsoType= tLookable,actionVerb= "Observe",
+defined_affordance([alsoType= tLookAble,actionVerb= "Observe",
    textName= "Observe",
    mudActionMaxDistance= 5,
    slAnim= anim_CLAP,
@@ -407,7 +407,7 @@ slAnim= animETWO_PUNCH,
 defined_affordance([subjType= tAgentGeneric,actionVerb= "Tickle",
 textName= "Play with",
 slAnim= anim_SHOOT_BOW_L,
-alsoType= tLookable,
+alsoType= tLookAble,
 'Energy'= -10 * -10,
 'Fun'= 20 * 10]).
 
@@ -419,14 +419,14 @@ slAnim= anim_DRINK,
 
 defined_affordance([subjType= tAgentGeneric,actionVerb= "Argue",
 textName= "Argue",
-alsoType= tLookable,
+alsoType= tLookAble,
 slAnim= anim_ONETWO_PUNCH,
 'Energy'= -11 * -20]).
 
 defined_affordance([subjType= tAgentGeneric,actionVerb= "Talk",
 textName= "Talk to",
 mudActionMaxDistance= 3,
-alsoType= tLookable,
+alsoType= tLookAble,
 slAnim= anim_TALK,
 'NonLoneliness_Social'= 11 * 20]).
 
@@ -441,7 +441,7 @@ slAnim= anim_BLOW_KISS,
 'NonLoneliness_Social'= 11 * 20,
 'Fun'= 21 * 20]).
 
-defined_affordance([subjType= tLookable,actionVerb= "Think_About",
+defined_affordance([subjType= tLookAble,actionVerb= "Think_About",
 textName= "Think about",
 slAnim= anim_SHRUG,
 'Fun'= 1 * 2]).
@@ -471,7 +471,7 @@ do_define_type_affordance1(Type,alsoType= TWhat):-i_name(t,TWhat,ParentType),add
 do_define_type_affordance1(Type,superType= TWhat):-i_name(t,TWhat,ParentType),add(mudSubclass(Type,ParentType)).
 do_define_type_affordance1(Type,actionVerb= SVerb):-i_name(act,SVerb,Verb),nb_setval(actionVerb,Verb),!,assert_if_new(verb_for_type(Verb,Type)).
 do_define_type_affordance1(Type,actionVerb(2)= SVerb):-i_name(act,SVerb,Verb),nb_setval(actionVerb,Verb),
-  (nb_current(acceptsChild,ChildType)->true;ChildType=tTakeable),
+  (nb_current(acceptsChild,ChildType)->true;ChildType=tCarryAble),
   assert_if_new(verb_affordance_2(Verb,Type,ChildType)).
 do_define_type_affordance1(Type,acceptsChild= TWhat):-i_name(t,TWhat,ChildType),
   nb_setval(acceptsChild,ChildType),!,assert_if_new(can_hold_type(Type,ChildType)),
@@ -558,7 +558,7 @@ agent_call_command(Agent,actTextcmd(A,B,C)):-sformat(CMD,'~w ~w ~w',[A,B,C]),!,d
 
 mudSubclass(tShelf,tHasSurface).
 mudSubclass(tCounter,tHasSurface).
-mudSubclass(tEatable,tConsumable).
+mudSubclass(tEatAble,tEatAble).
 mudSubclass(tBar,tHasSurface).
 mudSubclass(tSittable,tHasSurface).
 mudSubclass(tSofa,tCouch).
@@ -640,19 +640,19 @@ verb_desc(actOperate, tPooltable, "Play pool").
 verb_desc(actPutXOn, tBookcase, "Browse books").
 verb_desc(actObserve, tReadable, "Read book").
 verb_desc(actTake, tReadable, "Take the materials").
-verb_desc(actEat, tEatable, "Eat the food").
-verb_desc(actTake, tEatable, "Take the food").
+verb_desc(actEat, tEatAble, "Eat the food").
+verb_desc(actTake, tEatAble, "Take the food").
 verb_desc(actObserve, tArt, "Apreciate the Art").
 verb_desc(actOperate, tDanceFloor, "Dance! Dance!").
 verb_desc(actOperate, tComputer, "Look busy doing something!").
 verb_desc(actTouch, tTouchable, "Touch").
 verb_desc(actSit, tSittable, "Sit on").
 verb_desc(actPutXOn, tHasSurface, "This is a Put_X_On placeholder").
-verb_desc(actEat, tConsumable, "Eat it").
-verb_desc(actTake, tTakeable, "Take it").
+verb_desc(actEat, tEatAble, "Eat it").
+verb_desc(actTake, tCarryAble, "Take it").
 verb_desc(actSleep, tLayable, "Lay on").
-verb_desc(actClean, tLookable, "Clean").
-verb_desc(actObserve, tLookable, "Observe").
+verb_desc(actClean, tLookAble, "Clean").
+verb_desc(actObserve, tLookAble, "Observe").
 verb_desc(actExcersize, tSittable, "Excersize").
 verb_desc(actTickle, tAgentGeneric, "Play with").
 verb_desc(actSearch, tContainer, "Eat_from").
@@ -660,7 +660,7 @@ verb_desc(actArgue, tAgentGeneric, "Argue").
 verb_desc(actTalk, tAgentGeneric, "Talk to").
 verb_desc(actAttack, tAgentGeneric, "Beat up").
 verb_desc(actKiss, tAgentGeneric, "Kiss").
-verb_desc(actThinkAbout, tLookable, "Think about").
+verb_desc(actThinkAbout, tLookAble, "Think about").
 
 :- dynamic verb_affordance/5.
 
@@ -745,14 +745,14 @@ verb_affordance(actSit, tSittable, mudFun, 1, 1).
 verb_affordance(actSit, tSittable, mudSecureRoom, 1, 1).
 verb_affordance(actPutXOn, tHasSurface, mudFun, -2, 2).
 verb_affordance(actPutXOn, tHasSurface, mudEnergy, 0, -1).
-verb_affordance(actEat, tConsumable, mudNonHunger, 100, 100).
-verb_affordance(actEat, tConsumable, mudHygiene, 0, -10).
+verb_affordance(actEat, tEatAble, mudNonHunger, 100, 100).
+verb_affordance(actEat, tEatAble, mudHygiene, 0, -10).
 verb_affordance(actSleep, tLayable, mudComfort, 5, 5).
 verb_affordance(actSleep, tLayable, mudEnergy, 20, 20).
-verb_affordance(actClean, tLookable, mudFun, -2, 2).
-verb_affordance(actClean, tLookable, mudEnergy, 0, -1).
-verb_affordance(actObserve, tLookable, mudFun, 2, 1).
-verb_affordance(actObserve, tLookable, mudEnergy, 0, -1).
+verb_affordance(actClean, tLookAble, mudFun, -2, 2).
+verb_affordance(actClean, tLookAble, mudEnergy, 0, -1).
+verb_affordance(actObserve, tLookAble, mudFun, 2, 1).
+verb_affordance(actObserve, tLookAble, mudEnergy, 0, -1).
 verb_affordance(actExcersize, tSittable, mudFun, 10, 10).
 verb_affordance(actExcersize, tSittable, mudHygiene, -10, -10).
 verb_affordance(actTickle, tAgentGeneric, mudEnergy, -10, -10).
@@ -764,7 +764,7 @@ verb_affordance(actTalk, tAgentGeneric, mudNonLonelinessSocial, 11, 20).
 verb_affordance(actAttack, tAgentGeneric, mudEnergy, -11, -20).
 verb_affordance(actKiss, tAgentGeneric, mudNonLonelinessSocial, 11, 20).
 verb_affordance(actKiss, tAgentGeneric, mudFun, 21, 20).
-verb_affordance(actThinkAbout, tLookable, mudFun, 1, 2).
+verb_affordance(actThinkAbout, tLookAble, mudFun, 1, 2).
 
 :- dynamic verb_for_type/2.
 
@@ -806,8 +806,8 @@ verb_for_type(actPutXIn, tTrashContainer).
 verb_for_type(actPutXOn, tBookcase).
 verb_for_type(actObserve, tReadable).
 verb_for_type(actTake, tReadable).
-verb_for_type(actEat, tEatable).
-verb_for_type(actTake, tEatable).
+verb_for_type(actEat, tEatAble).
+verb_for_type(actTake, tEatAble).
 verb_for_type(actObserve, tArt).
 verb_for_type(actOperate, tDanceFloor).
 verb_for_type(actOperate, tComputer).
@@ -818,15 +818,15 @@ verb_for_type(actKiss, tAgentGeneric).
 verb_for_type(actTouch, tTouchable).
 verb_for_type(actSit, tSittable).
 verb_for_type(actPutXOn, tHasSurface).
-verb_for_type(actEat, tConsumable).
-verb_for_type(actTake, tTakeable).
+verb_for_type(actEat, tEatAble).
+verb_for_type(actTake, tCarryAble).
 verb_for_type(actSleep, tLayable).
-verb_for_type(actClean, tLookable).
-verb_for_type(actObserve, tLookable).
+verb_for_type(actClean, tLookAble).
+verb_for_type(actObserve, tLookAble).
 verb_for_type(actExcersize, tSittable).
 verb_for_type(actTickle, tAgentGeneric).
 verb_for_type(actSearch, tContainer).
-verb_for_type(actThinkAbout, tLookable).
+verb_for_type(actThinkAbout, tLookAble).
 
 
 */

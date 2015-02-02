@@ -548,8 +548,8 @@ instances_of_type_0(Inst,Type):- mudIsa(Inst,Type).
 
 instances_sortable(TYPE,HOW):-instances_sortable0(TYPE,HOW),!.
 instances_sortable(TYPE,HOW):-mudSubclass(TYPE,SUPER),instances_sortable0(SUPER,HOW),!.
-instances_sortable0(tWieldable,distance_to_current_avatar(Agent)):-current_agent_or_var(Agent).
-instances_sortable0(tWearable,distance_to_current_avatar(Agent)):-current_agent_or_var(Agent).
+instances_sortable0(tWieldAble,distance_to_current_avatar(Agent)):-current_agent_or_var(Agent).
+instances_sortable0(tWearAble,distance_to_current_avatar(Agent)):-current_agent_or_var(Agent).
 
 distance_to_current_avatar(Agent,ORDEROUT,L,R):-mudDistance(Agent,L,L1),mudDistance(Agent,R,R1),compare(ORDER,L1,R1),!, (ORDER == '=' -> naming_order(ORDEROUT,L,R) ; ORDEROUT=ORDER).
 

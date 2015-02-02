@@ -22,8 +22,8 @@
 
 :- register_module_type(mtCommand).
 
-mudSubclass(tFood,tEatable).
-action_info(actEat(tEatable),"nourish oneself").
+mudSubclass(tFood,tEatAble).
+action_info(actEat(tEatAble),"nourish oneself").
 
 % Eat something held
 % Check to make sure it's in the agents possession... 
@@ -31,6 +31,7 @@ action_info(actEat(tEatable),"nourish oneself").
 agent_call_command(Agent,actEat(Obj)) :-
 	mudPossess(Agent,Obj),
 	must((do_act_affect(Agent,actEat,Obj))),
+        dmsg_show(_),
 	must((clr(mudPossess(Agent,Obj)))),
         must(not(mudPossess(Agent,Obj))),
 	must((call_update_charge(Agent,actEat))).

@@ -154,8 +154,8 @@ create_meta(SuggestedName,SuggestedClass,BaseClass,SystemName):-
 ttNotCreatableType(ftInt).
 ttNotCreatableType(ftTerm).
 
-mudSubclass(tWearable,tItem).
-mudSubclass(tLookable,tItem).
+mudSubclass(tWearAble,tItem).
+mudSubclass(tLookAble,tItem).
 mudSubclass(tKnife,tItem).
 mudSubclass(tFood,tItem).
 

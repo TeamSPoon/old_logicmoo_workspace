@@ -35,8 +35,8 @@ alt_forms1(AR,P,NP):-compound(P),P=..[F,A,B|R],alt_forms2(AR,F,A,B,R,NP).
 
 %alt_forms2(r,F,A,B,R,NP):-dbase_t(genlInverse,F,FF),NP=..[FF,B,A|R].
 %alt_forms2(r,F,A,B,R,NP):-dbase_t(genlInverse,FF,F),NP=..[FF,B,A|R].
-% alt_forms2(r,F,A,B,R,NP):-dbase_t(genlPreds,F,FF),NP=..[FF,A,B|R].
-alt_forms2(r,F,A,B,R,NP):-dbase_t(genlPreds,FF,F),NP=..[FF,A,B|R].
+% alt_forms2(r,F,A,B,R,NP):-genlPreds(F,FF),NP=..[FF,A,B|R].
+alt_forms2(r,F,A,B,R,NP):-genlPreds(FF,F),NP=..[FF,A,B|R].
 
 user:decl_database_hook(retract(Kind),P):- forall(alt_forms(r,P,NP),ignore(hooked_op(retract(Kind),NP))).
 
