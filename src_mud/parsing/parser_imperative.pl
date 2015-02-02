@@ -153,7 +153,7 @@ object_string_0_5(O,String):-object_string(_,O,0-5,String),!.
 :-retractall(object_string_fmt(_,_,_)).
 object_string(_,O,DescSpecs,String):- object_string_fmt(O,DescSpecs,String),!.
 object_string(Agent,O,DescSpecs,String):- String = [O], 
-   object_print_details(save_fmt(String),Agent,O,DescSpecs,[tCol,tItem,tAgentGeneric,tChannel]),
+   object_print_details(save_fmt(String),Agent,O,DescSpecs,[tCol,tItem,ftProlog,ftID,ftTerm,tAgentGeneric,tChannel]),
    asserta(object_string_fmt(O,DescSpecs,String)),!.
 
 save_fmt(OS,' ~w ',[A]):-!,save_fmt_e(OS,A),!.
@@ -171,7 +171,7 @@ save_fmt_e(O,E):- string(E),!,must((to_word_list(E,WL),save_fmt_e(O,WL))),!.
 save_fmt_e(O,E):- member(E,O) -> true ; (O=[_|CDR],nb_setarg(2,O,[E|CDR])).
 
 save_fmt_a(_,A):-atom_length(A,L),L =< 1.
-save_fmt_a(_,A):-vtSkippedPrintNames(A).
+save_fmt_a(_,A):-vtSkippedPrintNames(A),!.
 %save_fmt_a(O,E):-atom_contains(E,'-'),!,must((to_word_list(E,WL),save_fmt_e(O,WL))),!.
 
 
@@ -525,7 +525,7 @@ parseIsa(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{coerce(String
 parseIsaMost(List,Term) --> parseIsa(isAnd(List),Term),{!}.
 % parseIsaMost(A, B, C, D) :- parseIsa(isAnd(A), B, C, E), !, D=E.
 
-coerce(A,B,C):-no_repeats(coerce0(A,B,C)),must(mudIsa(C,B)),!.
+coerce(A,B,C):-no_repeats(coerce0(A,B,C)),(show_call_failure(mudIsa(C,B))->!;true).
 
 coerce0(String,Type,Inst):- var(Type),trace_or_throw(var_specifiedItemType(String,Type,Inst)).
 coerce0(String,isNot(Type),Inst):-!,not(coerce0(String,Type,Inst)).
@@ -564,11 +564,12 @@ get_sorted_instances(Inst,Type,HOW):-findall(Inst,mudIsa(Inst,Type),List),predso
 
 % instances_of_type(Inst,Type):- atom(Type), Term =..[Type,Inst], logOnError(req(Term)).
 % longest_string(?Order, @Term1, @Term2)
+/*
 longest_string(Order,TStr1,TStr2):-
    text_to_string(TStr1,Str1),string_length(Str1,L1),
    text_to_string(TStr2,Str2),string_length(Str2,L2),
    compare(Order,L2-Str2,L1-Str1).
-
+*/
 
 :- include(logicmoo('vworld/moo_footer.pl')).
 

@@ -557,7 +557,8 @@ mudFtInfo(ftAtom,prologCall(atom(isSelf))).
 mudFtInfo(ftBoolean,prologCall(member(isSelf,[vTrue,vFalse]))).
 mudFtInfo(ftID,prologCall((atom(isSelf),compound(isSelf)))).
 mudFtInfo(ftNumber,prologCall(number(isSelf))).
-mudFtInfo(ftCallable,prologCall(callable(isSelf))).
+mudFtInfo(ftCallable,prologCall(predicate_property(isSelf,visible))).
+mudFtInfo(ftProlog,prologCall(predicate_property(isSelf,visible))).
 mudFtInfo(ftRest,prologCall(true)).
 mudFtInfo(ftString,prologCall(string(isSelf))).
 mudFtInfo(ftTerm,prologCall(nonvar(isSelf))).

@@ -89,7 +89,7 @@ action_info(actTick(tAgentGeneric),"Makes some agent do something brilliant").
 action_info(actTick,"Makes *your* agent do something brilliant").
 
 action_info(actIdea(isOptional(tAgentGeneric,isSelfAgent)),"Makes some agent (or self) think of something brilliant").
-action_info(actProlog(tCallable),"Call a tCallable").
+action_info(actProlog(ftCallable),"Call a ftCallable").
 
 agent_text_command(Agent,["prolog",X],Agent,actProlog(X)):-ignore(X=someCode).
 agent_text_command(Agent,["prolog"],Agent,actProlog(user:prolog_repl)).
