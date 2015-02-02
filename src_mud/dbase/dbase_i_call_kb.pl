@@ -2,7 +2,7 @@
 
 
 :- dynamic(assertion_f/1).
-:- swi_export(kb_f/1).
+:- dynamic_multifile_exported(kb_f/1).
 kb_f(X):-assertion_f(X).
 
 /*
@@ -21,7 +21,7 @@ big_kb_ASSERTION(PLIST,[dir(DIR),refcl(A1437)|PROPS]):- 'ASSERTION'(TRUTH, DNF, 
 big_kb_ASSERTION(PLIST,[dir(DIR),refcl(A1437)|PROPS]):- 'ASSERTION'(TRUTH, _DNF, MT, VARS, A1437, DIR,_,PLIST),get_props(TRUTH,VARS,MT,PROPS).
 big_kb_ASSERTION(PLIST,[dir(DIR),refcl(A1437)|PROPS]):- 'ASSERTION'(TRUTH, _DNF, MT, VARS, A1437, DIR,PLIST),get_props(TRUTH,VARS,MT,PROPS).
 
-:-swi_export(get_assertions/2).
+:-dynamic_multifile_exported(get_assertions/2).
 % get_assertions(PLIST,PROPS):-big_kb_ASSERTION(PLISTIn,PROPS),nv1000(PLISTIn-PROPS),fix_sentence(PLISTIn,PLIST).
 get_assertions(PLIST,PROPS):-tiny_kb_ASSERTION(PLISTIn,PROPS),nv1000(PLISTIn-PROPS),fix_sentence(PLISTIn,PLIST).
 get_assertions(PLIST,PROPS):-between(2,19,X),length(PLISTIn,X),kbp_t_list(PLISTIn,PROPS,_),nv1000(PLISTIn-PROPS),fix_sentence(PLISTIn,PLIST).
@@ -34,7 +34,7 @@ nv1000(S):-numbervars(S,100,_,[singletons(true),attvar(bind)]).
 % length(SENT,N),N>1,append(SENT,[MT,Props],PLIST),apply(el_holds,PLIST),member(Var,SENT),var(Var).
 % length(SENT,N),N>1,kbp_t_list(SENT,Proof),member(Var,SENT),var(Var).
 
-:-swi_export((kb_t/1)).
+:-dynamic_multifile_exported((kb_t/1)).
 kb_t(Call):- into_plist(Call,PLIST),[AH|LIST]=PLIST,!, kb_t(AH,LIST,PLIST).
 
 
@@ -45,7 +45,7 @@ kb_t(AH,PLIST,_):- is_holds_true(AH),!,kb_t(PLIST). % is_holds_true/1 is temp di
 kb_t(AH,PLIST,_):- is_holds_false(AH),!,kb_f(PLIST). % is_holds_false(not).
 kb_t(_,_,PLIST):- kbp_t(PLIST).
 
-:-swi_export(kbp_t/1). 
+:-dynamic_multifile_exported(kbp_t/1). 
 
 kbp_t(_):- not(loaded_external_kbs),!,fail.
 % kbp_t(PLIST):- ground(PLIST),!,no_repeats(call_no_cuts(kbp_t_list_prehook(PLIST,PLISTO))),kbp_t_list(PLISTO).
@@ -53,7 +53,7 @@ kbp_t(_):- not(loaded_external_kbs),!,fail.
 kbp_t(PLIST):- kbp_t_list(PLIST). % append(PLIST,[_MT,_PROOF],PLISTO), apply(el_holds,PLISTO).  % el_holds has 2 extra args our callers shouldnt be forced to use.. but this is a big slowdown
 
 
-:-swi_export(link_to_holds2/2).
+:-dynamic_multifile_exported(link_to_holds2/2).
 link_to_holds2(Pred,TargetPred):- 
   doall((between(2,12,X),length(PLIST,X),append(PLIST,[_MT],PLISTMT),append(PLISTMT,[_PROOF],PLISTMTPROOF),
          X2 is X + 2,
@@ -63,7 +63,7 @@ link_to_holds2(Pred,TargetPred):-
           B=..[TargetPred|PLISTMTPROOF],              
          assertz_if_new((A:-B)))).
 
-:-swi_export(link_to_holds/2).
+:-dynamic_multifile_exported(link_to_holds/2).
 link_to_holds(Pred,TargetPred):- 
   doall((between(2,12,X),length(PLIST,X),
          dynamic_multifile_exported(Pred/X),          
@@ -72,7 +72,7 @@ link_to_holds(Pred,TargetPred):-
           B=..[TargetPred|PLIST],              
          assertz_if_new((A:-B)))).
 
-:-swi_export(link_to_holds_DYNAMIC/2).
+:-dynamic_multifile_exported(link_to_holds_DYNAMIC/2).
 link_to_holds_DYNAMIC(Pred,TargetPred):- 
   doall((between(2,12,X),length(PLIST,X),
          dynamic_multifile_exported(Pred/X),          
@@ -80,7 +80,7 @@ link_to_holds_DYNAMIC(Pred,TargetPred):-
           A=..[Pred|PLIST],
           B=..[TargetPred|PLIST],              
          assertz_if_new((A:-B)))).
-:-swi_export(link_to_holds_list/2).
+:-dynamic_multifile_exported(link_to_holds_list/2).
 link_to_holds_list(Pred,TargetPred):- 
   doall((between(2,12,X),length(PLIST,X),
          dynamic_multifile_exported(Pred/X),          
@@ -107,14 +107,14 @@ cyckb_t(P,A1):- dbase_t([P,A1]).
 */
 
 :-dynamic(el_holds_DISABLED_KB/0).
-:-swi_export(el_holds_DISABLED_KB/0).
+:-dynamic_multifile_exported(el_holds_DISABLED_KB/0).
 %:- link_to_holds_DYNAMIC(cyckb_t,el_holds_DISABLED_KB).
 :- link_to_holds2(cyckb_t,el_holds).
 
-:-swi_export(cyckb_t/1).
+:-dynamic_multifile_exported(cyckb_t/1).
 cyckb_t(PLIST):- not(el_holds_DISABLED_KB), apply(cyckb_t,PLIST).
 
-:-swi_export(noGenlPreds/1).
+:-dynamic_multifile_exported(noGenlPreds/1).
 noGenlPreds(coGenlPreds).
 noGenlPreds(mudIsa).
 noGenlPreds(genls).
@@ -137,19 +137,19 @@ cyckb_t_implies(ANTE,CONSEQ):- nop(cyckb_t_implies(ANTE,CONSEQ)),!,fail.
 
 kbp_t_list_prehook(PLIST,PLIST).
 
-:-swi_export(kbp_t_list/1). 
+:-dynamic_multifile_exported(kbp_t_list/1). 
 kbp_t_list(PLIST):- thlocal:useDbase_t, dbase_t(PLIST).
 kbp_t_list(PLIST):- apply(cyckb_t,PLIST).
 
 
-:-swi_export(kbp_t_list/2). 
+:-dynamic_multifile_exported(kbp_t_list/2). 
 % kbp_t_list(PLIST,dbase_t(PLIST)):- thlocal:useDbase_t,  dbase_t(PLIST).
 kbp_t_list(PLIST,Proof):- kbp_t_list(PLIST,_,Proof).
 
 % 
 %  current_predicate(F/A),functor(P,F,A),predicate_property(P,number_of_clauses(N)),dif(B,true), clause(P, B, Ref),B\=(!,_), B=true.
 
-:-swi_export(kbp_t_list/3). 
+:-dynamic_multifile_exported(kbp_t_list/3). 
 % kbp_t_list(PLIST):- tiny_kb_ASSERTION(PLIST).
 kbp_t_list(PLIST,[amt(dbase_t)],Proof):- thlocal:useDbase_t,  CallList = [dbase_t|PLIST],Call=..CallList,/*Call,*/ clause(Call,true,Ref),clause(Head, Body, Ref),proof_from_clause(Head, Body, Proof).
 kbp_t_list(PLIST,Props,Proof):- is_list(PLIST),!,kbp_t_list_1(PLIST,Props,Proof).
@@ -164,7 +164,7 @@ kbp_t_list_1(PLIST,[amt(MT)|PropsV], Proof):- append(PLIST,[MT,PropsV],CallList)
 prove_calllist(Functor,CallList,Proof):- Call =.. [Functor|CallList], clause(Call, true,Ref),clause(PHead, PBody, Ref),proof_from_clause(PHead, PBody, Proof).
 prove_calllist(Functor,CallList,Proof):- dif(Body,true), Head =.. [Functor|CallList],clause(Head, Body, Ref),must_det(not(Body=true)),Body,clause(PHead, PBody, Ref),proof_from_clause(PHead, PBody, Proof).
 
-:-swi_export(kb_mt/2).
+:-dynamic_multifile_exported(kb_mt/2).
 kb_mt(C,MT):- into_plist(C,PLIST),!,  append([el_holds|PLIST],[MT,_PropsV],CallList),Call=..CallList,Call.
 kb_mt(C,dbase_t):- thlocal:useDbase_t, dbase_t(C).
 
@@ -173,9 +173,9 @@ proof_from_clause(Head, true, Head):-!.
 proof_from_clause(Head, Body, ((Head:- Body))).
 
 :-dynamic assert_next/1.
-:-swi_export(assert_next/1).
+:-dynamic_multifile_exported(assert_next/1).
 
-:-swi_export(move_kb_assertions_matching/4).
+:-dynamic_multifile_exported(move_kb_assertions_matching/4).
 move_kb_assertions_matching(PLIST,Match,Replace,Where):- 
 %   dmsg(move_kb_assertions_matching(PLIST,Match,Replace,to(Where))),
         doall((kbp_t_list(PLIST,Call),
@@ -189,7 +189,7 @@ assert_to_db_list(HOLDS,PLIST):- safe_univ(Call,[HOLDS|PLIST]), assert(assert_ne
 
 with_kb_assertions_matching(PLIST,Proof,Call):- doall((kbp_t_list(PLIST, Proof),Call)).
    
-:-swi_export(kbp_to_dbase_t/0).
+:-dynamic_multifile_exported(kbp_to_dbase_t/0).
 
 kbp_to_dbase_t:- must_det(with_assertions(thlocal:useOnlyExternalDBs,kbp_to_dbase_0)).
 
@@ -205,7 +205,7 @@ kbp_to_dbase_no_more:- forall((into_plist(_Call,PLIST),kbp_t(PLIST)),assert_to_d
    retractall(thglobal:use_cyc_database),tell('a.txt'),listing(dbase_t),listing('ASSERTION'),told,dmsg(done_dbase_t).
 
 
-:-swi_export(move_implied/0).
+:-dynamic_multifile_exported(move_implied/0).
 move_implied:-doall((between(2,6,Len),length(PLIST,Len), 
                      Call=..[assertion_holds,implied|PLIST],
                      retract(hl_holds:Call),
@@ -213,7 +213,7 @@ move_implied:-doall((between(2,6,Len),length(PLIST,Len),
                      assert(assert_next(hl_holds:NewCall)))),
                      drain_assert_next_buffer.
 
-:-swi_export(hide_term_rewrites/0).
+:-dynamic_multifile_exported(hide_term_rewrites/0).
 hide_term_rewrites :- with_assertions(thlocal:useOnlyExternalDBs,
  % remove badjuju from the KB (that is unbould slots in the middle of GAFs)
    % hl_holds:retractall(assertion_holds(isa, badjuju, 'Thing')),
@@ -224,7 +224,7 @@ hide_term_rewrites :- with_assertions(thlocal:useOnlyExternalDBs,
      forall(member(vvvar,PLIST),move_kb_assertions_matching(PLIST,vvvar,_,term_rewrites_kb))))),
    drain_assert_next_buffer.
 
-:-swi_export(hide_empty_strings/0).
+:-dynamic_multifile_exported(hide_empty_strings/0).
 hide_empty_strings :- with_assertions(thlocal:useOnlyExternalDBs,
  % remove more badjuju from the KB (that is unbould slots in the middle of GAFs)
  % the next few lines will cover the top
@@ -233,7 +233,7 @@ hide_empty_strings :- with_assertions(thlocal:useOnlyExternalDBs,
    drain_assert_next_buffer.
 
 
-:-swi_export(convert_easy_strings/0).
+:-dynamic_multifile_exported(convert_easy_strings/0).
 convert_easy_strings:-
    doall((between(2,6,Len),length(PLIST,Len),
      forall(member(string(_),PLIST),
@@ -331,7 +331,7 @@ xcall_t(P,A1):- call(P,A1).
 xcall_t(P):- call(P).
 
 % todo hook into loaded files!
-:- swi_export(assertion_t/1).
+:- dynamic_multifile_exported(assertion_t/1).
 
 % assertion_t(Call):- thlocal:useOnlyExternalDBs,!,thglobal:use_cyc_database,with_no_assertions(thlocal:useOnlyExternalDBs,kb_t(Call)).
 assertion_t(Call):- thglobal:use_cyc_database,!,with_assertions(thlocal:useOnlyExternalDBs,kb_t(Call)).

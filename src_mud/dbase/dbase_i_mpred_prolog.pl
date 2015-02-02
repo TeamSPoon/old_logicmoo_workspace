@@ -48,14 +48,14 @@ provide_mpred_setup(OP,Head,StubType,OUT):-  StubType = prologOnly,
 
 :-op(0,fx,decl_mpred_prolog).
 
-:-swi_export(decl_mpred_prolog/1).
+:-dynamic_multifile_exported(decl_mpred_prolog/1).
 decl_mpred_prolog(P):- with_pi(P,decl_mpred_prolog).
 
-:-swi_export(decl_mpred_prolog/3).
+:-dynamic_multifile_exported(decl_mpred_prolog/3).
 decl_mpred_prolog(M,PI,F/A):- 
  decl_mpred_prolog(_,M,PI,F/A).
 
-:-swi_export(decl_mpred_prolog/4).
+:-dynamic_multifile_exported(decl_mpred_prolog/4).
 decl_mpred_prolog(CM,M,PI,FA):- loop_check(must(decl_mpred_prolog_lc(CM,M,PI,FA)),true).
 
 decl_mpred_prolog_lc(CM,M,PI,F/A):-
@@ -77,9 +77,9 @@ decl_mpred_prolog_lc(CM,M,PI,F/A):-
 
  
 
-user_swi_export(_):- dbase_mod(user),!.
-user_swi_export(Prop/Arity):- 
-   dbase_mod(M), '@'( M:swi_export(Prop/Arity) , M).
+user_dynamic_multifile_exported(_):- dbase_mod(user),!.
+user_dynamic_multifile_exported(Prop/Arity):- 
+   dbase_mod(M), '@'( M:dynamic_multifile_exported(Prop/Arity) , M).
 
 
 provide_mpred_read_attributes(Obj,PropVal):- fail, safe_univ(PropVal,[Prop,NonVar|Val]),safe_univ(CallVal,[Prop,Obj,NonVar|Val]),

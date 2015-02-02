@@ -13,19 +13,19 @@
 
 :- register_module_type(mtCommand).
 
-:- swi_export(found_undef/3).
+:- dynamic_multifile_exported(found_undef/3).
 found_undef(_,_,_).
 :- dynamic undef/2.
 
 % when we import new and awefull code base (the previous )this can be helpfull
 % we redfine list_undefined/1 .. this is the old version
-:- swi_export(scansrc_list_undefined/1).
+:- dynamic_multifile_exported(scansrc_list_undefined/1).
 scansrc_list_undefined(_):-!.
 scansrc_list_undefined(A):- real_list_undefined(A).
 
 list_undefined:-real_list_undefined([]).
 
-:- swi_export(real_list_undefined/1).
+:- dynamic_multifile_exported(real_list_undefined/1).
 real_list_undefined(A):-
  merge_options(A, [module_class([user])], B),
         prolog_walk_code([undefined(trace), on_trace(found_undef)|B]),
@@ -39,7 +39,7 @@ real_list_undefined(A):-
         ).
 
 
-:- swi_export(remove_undef_search/0).
+:- dynamic_multifile_exported(remove_undef_search/0).
 remove_undef_search:- ((
  '@'(use_module(library(check)),'user'),
  redefine_system_predicate(check:list_undefined(_)),
@@ -52,7 +52,7 @@ remove_undef_search:- ((
 action_info(actScansrc,"Scan for sourcecode modifed on filesystem and TeamSPoon. NOTE: only new files with this mask (src_incoming/*/?*.pl) are picked up on").
 agent_call_command(Agent,actScansrc):-  once('@'(agent_call_safely(Agent,actScansrc),'user')).
 
-:-swi_export(actScansrc/0).
+:-dynamic_multifile_exported(actScansrc/0).
 actScansrc :- 
  ensure_loaded(library(make)),
  debugOnError((
@@ -74,9 +74,9 @@ include_moo_files_not_included(Mask):-
 
 include_moo_file_ni(M):-absolute_file_name(M,EX,[expand(true),access(read),file_type(prolog)]),include_moo_file_ni_1(EX).
 
-:-swi_export(mmake/0).
+:-dynamic_multifile_exported(mmake/0).
 mmake:- update_changed_files.
-:-swi_export(update_changed_files/0).
+:-dynamic_multifile_exported(update_changed_files/0).
 update_changed_files :-
         set_prolog_flag(verbose_load,true),
         ensure_loaded(library(make)),

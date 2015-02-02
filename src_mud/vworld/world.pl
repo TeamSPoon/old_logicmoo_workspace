@@ -14,7 +14,7 @@
 */
 
 %:-swi_module(world, [
-:-swi_export((
+:-dynamic_multifile_exported((
         call_agent_command/2,
        % call_agent_action/2,
             %mud_isa/2,
@@ -69,7 +69,7 @@
 
 :-discontiguous create_instance_0/3.
 
-:-swi_export((
+:-dynamic_multifile_exported((
           create_instance/2,
           create_instance/3,
           create_instance_0/3,
@@ -116,7 +116,7 @@ metaclass(itemcol).
 
 % predArgTypes(typeGenls(col,metaclass)).
 
-% decl_database_hook(assert(_),typeGenls(_,MC)):-assert_isa(MC,metaclass).
+% user:decl_database_hook(assert(_),typeGenls(_,MC)):-assert_isa(MC,metaclass).
 
 % deduce_facts(typeGenls(T,MC),deduce_facts(subclass(S,T),isa(S,MC))).
 
@@ -136,7 +136,7 @@ isa(item,itemcol).
 
 cached(G):-ccatch(G,_,fail).
 
-:-swi_export(create_meta/4).
+:-dynamic_multifile_exported(create_meta/4).
 % if SuggestedName was 'food666' it'd like the SuggestedClass to be 'food' and the stystem name will remain 'food666'
 % if SuggestedName was 'food' it'd like the SuggestedClass to be 'food' and the stystem name will become a gensym like 'food1'
 create_meta(SuggestedName,SuggestedClass,BaseClass,SystemName):-
@@ -180,12 +180,12 @@ create_agent(P,List):-must_det(create_instance(P,tAgentGeneric,List)).
 
 % decl_type(Spec):-create_instance(Spec,col,[]).
 
-:-swi_export(create_instance/1).
+:-dynamic_multifile_exported(create_instance/1).
 create_instance(P):- must_det((mudIsa(P,What),ttCreateable(What))),must_det(create_instance(P,What,[])).
 :-export(create_instance/2).
 create_instance(Name,Type):-create_instance(Name,Type,[]).
 user:create_instance(Name,Type):-create_instance(Name,Type,[]).
-:-swi_export(create_instance/3).
+:-dynamic_multifile_exported(create_instance/3).
 create_instance(What,Type,Props):- 
   loop_check_local(time_call(create_instance_now(What,Type,Props)),dmsg(already_create_instance(What,Type,Props))).
 
@@ -202,7 +202,7 @@ create_instance_now(What,Type,Props):-
 
 :-discontiguous create_instance_0/3.
 
-:- swi_export(is_creating_now/1).
+:- dynamic_multifile_exported(is_creating_now/1).
 :- dynamic(is_creating_now/1).
 
 create_instance_0(What,Type,List):- (var(What);var(Type);var(List)),trace_or_throw((var_create_instance_0(What,Type,List))).

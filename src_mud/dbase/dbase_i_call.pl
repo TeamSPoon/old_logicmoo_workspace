@@ -117,7 +117,7 @@ deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),not(is_asserted(Call)
 % ================================================
 % call_expanded_for/2
 % ================================================
-:-swi_export((call_expanded_for/2)).
+:-dynamic_multifile_exported((call_expanded_for/2)).
 
 call_expanded_for(req,Call):- !,call_mpred(Call).
 call_expanded_for(must,Call):- !,must(call_mpred(Call)).
@@ -129,8 +129,8 @@ call_expanded_for(_Req,Call):- !,call_mpred(Call).
 :-meta_predicate_transparent(is_callable(0)).
 is_callable(C):-predicate_property(C,_),!.
 
-:-swi_export(call_mpred/1).
-:-swi_export(call_mpred/2).
+:-dynamic_multifile_exported(call_mpred/1).
+:-dynamic_multifile_exported(call_mpred/2).
 
 check_mcall_ok(_):-!.
 check_mcall_ok(C):-functor(C,F,_),not(mpred_prop(F,_)),!,ignore(check_was_known_false(C)),!.

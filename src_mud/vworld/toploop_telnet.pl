@@ -165,13 +165,13 @@ read_and_do_telnet:-
             must(once(do_player_action(List))),!.
 
 
-:-swi_export(prompt_read/2).
+:-dynamic_multifile_exported(prompt_read/2).
 prompt_read_telnet(Prompt,Atom):-
       get_session_id(O),
       prompt_read(Prompt,IAtom),
       (IAtom==end_of_file -> (assert(thlocal:wants_logout(O)),Atom='quit') ; IAtom=Atom),!.
 
-:-swi_export(prompt_read/2).
+:-dynamic_multifile_exported(prompt_read/2).
 prompt_read(Prompt,Atom):-        
         ansi_format([reset,hfg(white),bold],'~w',[Prompt]),flush_output,        
         repeat,read_code_list_or_next_command(Atom),!.
@@ -197,7 +197,7 @@ code_list_to_next_command( [],actLook).
 code_list_to_next_command( [91|REST],TERM):- catchv((atom_codes(A,[91|REST]),atom_to_term(A,TERM,[])),_,fail),!.
 code_list_to_next_command(NewCodes,Atom):-atom_codes(Atom,NewCodes),!.
 
-:-swi_export(scan_src_updates/0).
+:-dynamic_multifile_exported(scan_src_updates/0).
 
 tick_tock:-
            scan_src_updates,!,fmt('tick tock',[]),sleep(0.1),!.
@@ -205,7 +205,7 @@ tick_tock:-
 scan_src_updates:- !.
 scan_src_updates:- ignore((thread_self(main),ignore((catch(make,E,dmsg(E)))))).
 
-decl_database_hook(Type,C):- current_agent(Agent),interesting_to_player(Type,Agent,C).
+user:decl_database_hook(Type,C):- current_agent(Agent),interesting_to_player(Type,Agent,C).
 
 interesting_to_player(Type,Agent,C):- contains_var(C,Agent),dmsg(agent_database_hook(Type,C)),!.
 interesting_to_player(Type,Agent,C):-is_asserted(localityOfObject(Agent,Region)),contains_var(C,Region),dmsg(region_database_hook(Type,C)),!.
@@ -215,10 +215,10 @@ interesting_to_player(Type,Agent,C):-is_asserted(localityOfObject(Agent,Region))
 % USES PACKRAT PARSER 
 % ===========================================================
 
-:-swi_export(do_player_action/1).
+:-dynamic_multifile_exported(do_player_action/1).
 do_player_action(VA):- debug, foc_current_player(Agent),!, do_player_action(Agent,VA),!.
 
-:-swi_export(do_player_action/2).
+:-dynamic_multifile_exported(do_player_action/2).
 do_player_action(Agent,CMD):-var(CMD),!,fmt('unknown_var_command(~q,~q).',[Agent,CMD]).
 do_player_action(_,EOF):- end_of_file == EOF, !, tick_tock.
 do_player_action(_,''):-!, tick_tock.
@@ -292,7 +292,7 @@ cmdShowRoomGrid(Room) :- ignore(show_room_grid_new(Room)),!.
 % ===================================================================
 % show_room_grid_new(Room)
 % ===================================================================
-:-swi_export(show_room_grid_new/1).
+:-dynamic_multifile_exported(show_room_grid_new/1).
 show_room_grid_new(Room):-
    grid_size(Room,Xs,Ys,_Zs),
    Ys1 is Ys+1,Xs1 is Xs+1,

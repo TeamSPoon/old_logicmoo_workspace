@@ -33,8 +33,6 @@ not_ftVar(V):-not(is_ftVar(V)).
 
 % [Manditory] define how we interact with the module system
 swi_module(M,E):-dmsg(swi_module(M,E)).
-swi_export(_):-!.
-swi_export(E):-dmsg(swi_export(E)).
 
 % [Optionaly] Set the Prolog optimize/debug flags
 :- set_prolog_flag(verbose_load,true).
@@ -75,6 +73,8 @@ user:semweb_startup :- register_ros_package(euler).
 user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),show_call(asserta(prolog_debug:debugging(http(X), false, O)))).
 % user:semweb_startup:- forall(retract(prolog_debug:debugging((X), true, O)),show_call(asserta(prolog_debug:debugging((X), false, O)))).
 
+
+:- include(logicmoo(vworld/moo_header)).
 
 
 :-multifile(pre_file_search_path/2).

@@ -26,7 +26,7 @@ mudObjNearLoc(Whom,Where):-findall(Whom+Where,atlocNear0(Whom,Where),List),list_
 atlocNear0(Whom,Where):-mudNearbyLocs(Where,LOC),is_asserted(mudAtLoc(Whom,LOC)).
 
 raise_location_event(Where,Event):- forall(mudObjNearLoc(Whom,Where),ignore(show_event_to(Whom,Event))).
-:-swi_export(raise_location_event/2).
+:-dynamic_multifile_exported(raise_location_event/2).
 
 
 show_event_to(Whom,Event):-subst(Event,reciever,you,NewEventM),subst(NewEventM,Whom,you,NewEvent),direct_to_agent(Whom,NewEvent),!.
@@ -39,11 +39,11 @@ direct_to_agent(_Whom,_NewEvent):-!.
 direct_to_agent(Whom,NewEvent):- dmsg(could_not(direct_to_agent(Whom,NewEvent))).
 
 
-%%:-swi_export(direct_to_agent/2).
+%%:-dynamic_multifile_exported(direct_to_agent/2).
 get_agent_stream(Whom,Input,Output):- thglobal:agent_message_stream(Whom,_,Input,Output),is_stream(Input),is_stream(Output),!.
 get_agent_stream(Whom,_Input,_Output):-ignore(retract(thglobal:agent_message_stream(Whom,_,_,_))),!,fail.
 
-:-swi_export(mudDeliverableLocationEvents/3).
+:-dynamic_multifile_exported(mudDeliverableLocationEvents/3).
 :-decl_mpred_hybrid(mudDeliverableLocationEvents(tAgentGeneric,tRegion,ftTerm)).
 
 mudDeliverableLocationEvents(Agent,Loc,actTick(Agent,Loc)).

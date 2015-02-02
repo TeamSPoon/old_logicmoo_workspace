@@ -26,7 +26,7 @@ ztrace:-dmsg(ztrace),trace_or_throw(dtrace).
 when_debugging(What,Call):-debugging(What),!,Call.
 when_debugging(_,_).
 
-:-swi_export(listprolog/0).
+:-dynamic_multifile_exported(listprolog/0).
 listprolog:-listing(mpred_prop(_,prologOnly)).
 
 
@@ -112,17 +112,17 @@ typename_to_iname0(I,Type,IType):-nonvar(Type),toUpperCamelcase(Type,UType),atom
 % A tiny bit of TMS
 % ================================================
 
-decl_database_hook(assert(_),Fact):- check_was_known_false(Fact).
+user:decl_database_hook(assert(_),Fact):- check_was_known_false(Fact).
 
 was_known_false(Fact):-is_known_false(Fact),doall(retract((is_known_false(_):-true))),dmsg(trace_or_throw(error+was_known_false(Fact))).
 
 check_was_known_false(Fact):- ignore(((is_known_false(Fact),was_known_false(Fact)))).
 
-decl_database_hook(assert(_A_or_Z),mudLabelTypeProps(Lbl,T,Props)):- hooked_asserta(typeProps(T,[mudKwLabel(Lbl)|Props])).
+user:decl_database_hook(assert(_A_or_Z),mudLabelTypeProps(Lbl,T,Props)):- hooked_asserta(typeProps(T,[mudKwLabel(Lbl)|Props])).
 
-decl_database_hook(assert(_A_or_Z),typeProps(T,_)):- decl_type_safe(T).
+user:decl_database_hook(assert(_A_or_Z),typeProps(T,_)):- decl_type_safe(T).
 
-decl_database_hook(assert(_A_or_Z),mpred_prop(F,_)):- must_det(atom(F)).
+user:decl_database_hook(assert(_A_or_Z),mpred_prop(F,_)):- must_det(atom(F)).
 
 
 % ================================================
@@ -140,10 +140,10 @@ after_game_load_pass2:- not(thglobal:will_call_after(after_game_load,_)).
 % call_after_game_load(Code):- after_game_load,!, call_after_next(after_game_load_pass2,Code).
 call_after_game_load(Code):- call_after_next(after_game_load,Code).
 
-:-swi_export(rescan_game_loaded/0).
+:-dynamic_multifile_exported(rescan_game_loaded/0).
 rescan_game_loaded:- ignore((after_game_load, loop_check(call_after(after_game_load, true ),true))).
 
-:-swi_export(rescan_game_loaded_pass2/0).
+:-dynamic_multifile_exported(rescan_game_loaded_pass2/0).
 rescan_game_loaded_pass2:- ignore((after_game_load, loop_check(call_after(after_game_load_pass2,  dmsg(rescan_game_loaded_pass2_comlpete)),true))).
 
 % ================================================
@@ -153,12 +153,12 @@ rescan_game_loaded_pass2:- ignore((after_game_load, loop_check(call_after(after_
 % do_db_op_hooks:-!.
 do_db_op_hooks:- loop_check_local(rescan_dbase_ops,true).
 
-:-swi_export(rescan_slow_kb_ops/0).
+:-dynamic_multifile_exported(rescan_slow_kb_ops/0).
 
 % rescan_slow_kb_ops:-!.
 rescan_slow_kb_ops:- loop_check(forall(retract(do_slow_kb_op_later(Slow)),must_det(Slow)),true).
 
-:-swi_export(rescan_dbase_ops/0).
+:-dynamic_multifile_exported(rescan_dbase_ops/0).
 rescan_dbase_ops:- test_tl(skip_db_op_hooks),!.
 rescan_dbase_ops:- rescan_module_ready.
 
@@ -212,7 +212,7 @@ coerce(_ ,_,     NewThing,Else):- NewThing = Else.
 %:- trace, (dynamic_multifile_exported  obj/1). 
 
 
-:- swi_export(( 
+:- dynamic_multifile_exported(( 
    (add)/1, 
    clr/1,
    db_op/2,
@@ -239,7 +239,7 @@ coerce(_ ,_,     NewThing,Else):- NewThing = Else.
 
 % :-dynamic((weight/2)).
 % :-dynamic(subclass/2).
-:-swi_export(mudSubclass/2).
+:-dynamic_multifile_exported(mudSubclass/2).
 
 :- dynamic_multifile_exported mtForPred/2.
 
@@ -302,7 +302,7 @@ verify_sanity(P):- dmsg('$ERROR_incomplete_SANITY'(P)),!.
 % Found new meta-predicates in iteration 1 (0.281 sec)
 %:- meta_predicate db_op_exact(?,?,?,0).
 
-:- swi_export(mudMoveDist/2).
+:- dynamic_multifile_exported(mudMoveDist/2).
 :- dynamic(mudMoveDist/2).
 
 
@@ -363,7 +363,7 @@ iprops(Obj,PropSpecs):- ireq(props(Obj,PropSpecs)).
 add_fast(CO:-BODY):- dmsg(add_fast(CO:-BODY)),must_det((add_fast_unchecked((CO:-BODY)))),!.
 add_fast(CO):- dmsg(add_fast(CO)),must_det((add_fast_unchecked(CO), nop(xtreme_debug(ireq(CO)->true;dmsg(warn(failed_ireq(CO))))))),!.
 
-:-swi_export(add_fast_unchecked/1).
+:-dynamic_multifile_exported(add_fast_unchecked/1).
 add_fast_unchecked((CO:-BODY)):-BODY==true,!,add_fast_unchecked(CO).
 add_fast_unchecked((CO:-BODY)):-!,must_det(assertz_clause(CO,BODY)).
 add_fast_unchecked(CO):-must_det(db_op(change(assert,add), CO)).
@@ -386,9 +386,9 @@ kb_update(New,OldV):- db_op_int(change(assert,OldV),New).
 
 :-decl_thlocal((record_on_thread/2)).
 
-decl_database_hook(assert(_),mudFtInfo(FT,_)):- define_ft(FT).
-% decl_database_hook(assert(_),mudSubclass(FT,OFT)):- define_ft(OFT),define_ft(FT).
-% decl_database_hook(assert(_),subclass(FT,OFT)):- formattype(OFT),dmsg(warning(subclass_of_define_ft(FT))).
+user:decl_database_hook(assert(_),mudFtInfo(FT,_)):- define_ft(FT).
+% user:decl_database_hook(assert(_),mudSubclass(FT,OFT)):- define_ft(OFT),define_ft(FT).
+% user:decl_database_hook(assert(_),subclass(FT,OFT)):- formattype(OFT),dmsg(warning(subclass_of_define_ft(FT))).
 
 dmsg_hook(transform_holds(dbase_t,_What,props(ttCreateable,[mudIsa(mudIsa),mudIsa]))):-trace_or_throw(dtrace).
 
@@ -432,7 +432,7 @@ good_for_chaining(_Op,Term):-not(contains_singletons(Term)).
 db_rewrite(_Op,Term,NewTerm):-equivRule_call(Term,NewTerm).
 db_rewrite(_Op,Term,NewTerm):-forwardRule_call(Term,NewTerm).
 
-:-swi_export(simply_functors/3).
+:-dynamic_multifile_exported(simply_functors/3).
 simply_functors(Db_pred,query(HLDS,Must),Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=@=Simpler,!,call(Db_pred,query(HLDS,Must),Simpler).
 simply_functors(Db_pred,Op,Wild):- once(into_mpred_form(Wild,Simpler)),Wild\=@=Simpler,!,call(Db_pred,Op,Simpler).
 
@@ -454,7 +454,7 @@ univ_left(Comp,[H,M:P|List]):- nonvar(M),univ_left0(M,Comp,[H,P|List]),!.
 univ_left(Comp,[P|List]):-dbase_mod(DBASE), univ_left0(DBASE,Comp,[P|List]),!.
 univ_left0(M,M:Comp,List):- Comp=..List,!.
 
-decl_database_hook(AR,C):- record_on_thread(dbase_change,changing(AR,C)).
+user:decl_database_hook(AR,C):- record_on_thread(dbase_change,changing(AR,C)).
 
 record_on_thread(Dbase_change,O):- thread_self(ID),thlocal:dbase_capture(ID,Dbase_change),!,Z=..[Dbase_change,ID,O],assertz(Z).
 
@@ -467,6 +467,7 @@ db_op(Op,Term):- expands_on(isEach,Term),!,forall(do_expand_args(isEach,Term,O),
 db_op(change(_,_),props(_Obj,Props)):- Props ==[], !.
 db_op(query(_,Must),NC):- not(compound(NC)),!,call_expanded_for(Must,NC).
 db_op(query(Dbase_t, Req), must(Call)):-!, must(db_op(query(Dbase_t, Req), Call)).
+db_op(query(_Dbase_t, _Req), prologCall(Call)):-!, call(Call).
 db_op(query(HLDS,Must),B):-!, loop_check_term(db_op0(query(HLDS,Must),B),req(B),((loop_check_term(call_mpred(B),req2(B),show_call(is_asserted(B)))))). 
 db_op(change(assert,CB2),B):- !,loop_check(db_op0(change(assert,CB2),B),must((dmsg(warn(looping(db_op(change(assert,CB2),B)))),hooked_asserta(B)))),!. % true = we are already processing this assert
 db_op(change(retract,CB2),B):- !,loop_check(db_op0(change(retract,CB2),B),must((dmsg(warn(looping(db_op(change(retract,CB2),B)))),hooked_retract(B)))),!. % true = we are already processing this retract
@@ -636,7 +637,7 @@ addTypeProps_getOverlap(_Type,List,Overlap):-!,List=Overlap.
 :-dmsg_hide(into_mpred_form).
 
 % assert_with to change(CA1,CB2) mutlivalue pred
-:-swi_export((db_assert_mv/4)).
+:-dynamic_multifile_exported((db_assert_mv/4)).
 db_assert_mv(_Must,end_of_file,_,_):-!.
 % db_assert_mv(_Must,C,_F,_A):- hooked_assertz(C),!.
 db_assert_mv(Must,C,F,A):- test_tl(thlocal:adding_from_srcfile), dmsg(db_assert_mv(Must,C,F,A)), hooked_assertz(C).
@@ -644,21 +645,21 @@ db_assert_mv(Must,C,F,A):- dmsg(db_assert_mv(Must,C,F,A)), must_det(mpred_prop(F
 
 
 % assert_with to change(CA1,CB2) singlevalue pred
-:-swi_export((db_assert_sv/4)).
+:-dynamic_multifile_exported((db_assert_sv/4)).
 %db_assert_sv(_Must,C,F,A):- throw_if_true_else_fail(contains_singletons(C),db_assert_sv(C,F,A)).
 db_assert_sv(Must,C,F,A):- ignore(( loop_check(db_assert_sv_lc(Must,C,F,A),true))).
 
-:-swi_export((db_assert_sv_lc/4)).
+:-dynamic_multifile_exported((db_assert_sv_lc/4)).
 db_assert_sv_lc(Must,C,F,A):- arg(A,C,UPDATE),db_assert_sv_now(Must,C,F,A,UPDATE),!.
 
-:-swi_export(db_assert_sv_now/5).
+:-dynamic_multifile_exported(db_assert_sv_now/5).
 db_assert_sv_now(Must,C,F,A, UPDATE):- has_free_args(db_assert_sv_now(Must,C,F,A, UPDATE)),!,trace_or_throw(var_db_assert_sv_now(Must,C,F,A, UPDATE)).
 db_assert_sv_now(Must,C,F,A, UPDATE):- number(UPDATE),UPDATE<0, !,db_assert_sv_update(Must,C,F,A,UPDATE).
 db_assert_sv_now(Must,C,F,A,+UPDATE):-!, db_assert_sv_update(Must,C,F,A,+UPDATE).
 db_assert_sv_now(Must,C,F,A,-UPDATE):-!, db_assert_sv_update(Must,C,F,A,-UPDATE).
 db_assert_sv_now(Must,C,F,A, REPLACE):- db_assert_sv_replace(Must,C,F,A, REPLACE).
 
-:-swi_export(db_assert_sv_update/5).
+:-dynamic_multifile_exported(db_assert_sv_update/5).
 db_assert_sv_update(Must,C,F,A,UPDATE):-
    replace_arg(C,A,OLD,COLD),
    % prefer updated values to come from instances but will settle with anything legal
@@ -666,7 +667,7 @@ db_assert_sv_update(Must,C,F,A,UPDATE):-
    update_value(OLD,UPDATE,NEW),!,
    db_assert_sv_replace(Must,C,F,A,NEW),!.
 
-:-swi_export(db_assert_sv_replace/5).
+:-dynamic_multifile_exported(db_assert_sv_replace/5).
 
 :-style_check(-singleton).
 % db_assert_sv_replace_noisey_so_disabled
@@ -798,9 +799,9 @@ hook_coerce(Text,tPred,Pred):- mpred_prop(Pred,predArity(_)),name_text(Pred,Text
 
 
 /*
-:-swi_export(makeConstant/1).
+:-dynamic_multifile_exported(makeConstant/1).
 makeConstant(X):-trace_or_throw(makeConstant(X)).
-:-swi_export(cycAssert/2).
+:-dynamic_multifile_exported(cycAssert/2).
 cycAssert(A,B):-trace_or_throw(cycAssert(A,B)).
 */
 
@@ -812,7 +813,7 @@ cycAssert(A,B):-trace_or_throw(cycAssert(A,B)).
 
 
 
-:-swi_export(forall_setof/2).
+:-dynamic_multifile_exported(forall_setof/2).
 forall_setof(ForEach,Call):-
    findall(ForEach,ForEach,ForEachAll),
    list_to_set(ForEachAll,Set),!,
@@ -820,13 +821,13 @@ forall_setof(ForEach,Call):-
 
 :-dynamic_multifile_exported((was_imported_kb_content/2)).
 
-:-swi_export(add_later/1).
+:-dynamic_multifile_exported(add_later/1).
 add_later(Fact):- call_after_game_load(add(Fact)).
 
 :-decl_thlocal add_thread_override/1.
 % thlocal:add_thread_override(A):-add_from_macropred(A),!.
 
-:-swi_export(((add)/1)).
+:-dynamic_multifile_exported(((add)/1)).
 :-moo_hide_childs((add)/1).
 add(A):- A==end_of_file,!.
 add(A):- not(compound(A)),!,trace_or_throw(not_compound(add(A))),!.
@@ -839,12 +840,12 @@ add(tCol(A)):- must_det(decl_type(A)),!.
 add(A):-must(add_fast(A)),!.
 add(A):-trace_or_throw(fmt('add is skipping ~q.',[A])).
 
-:-swi_export(begin_prolog_source/0).
-:-swi_export(end_prolog_source/0).
+:-dynamic_multifile_exported(begin_prolog_source/0).
+:-dynamic_multifile_exported(end_prolog_source/0).
 begin_prolog_source:- must_det(asserta(thlocal:in_prolog_source_code)).
 end_prolog_source:- must_det(retract(thlocal:in_prolog_source_code)).
 
-:-swi_export(add_from_macropred/1).
+:-dynamic_multifile_exported(add_from_macropred/1).
 add_from_macropred(C):- loop_check(add_from_macropred_lc(C),((dmsg(loopING_add_from_macropred(C)),add_fast(C)))).
 add_from_macropred_lc(A):-A==end_of_file,!.
 add_from_macropred_lc(Term):- expands_on(isEach,Term), !,forall(do_expand_args(isEach,Term,O),add_from_macropred_lc(O)).
@@ -879,9 +880,9 @@ englishServerInterface(SomeEnglish):-dmsg(todo(englishServerInterface(SomeEnglis
 :-export(user:call_OnEachLoad/1).
 :-dynamic(user:call_OnEachLoad/1).
 
-:-swi_export(onLoad/1).
+:-dynamic_multifile_exported(onLoad/1).
 onLoad(C):-call_after_game_load(C).
-:-swi_export(user:onEachLoad/1).
+:-dynamic_multifile_exported(user:onEachLoad/1).
 onEachLoad(C):-assert_if_new(user:call_OnEachLoad(C)).
 
 call_OnEachLoad:-forall(call_OnEachLoad(C),doall(C)).
@@ -941,16 +942,16 @@ verb_after_arg(_,_,1).
 :- style_check(+discontiguous).
 :- style_check(-discontiguous).
 
-:-swi_export(thlocal:in_dynamic_reader/1).
+:-dynamic_multifile_exported(thlocal:in_dynamic_reader/1).
 
-:-swi_export(begin_dynamic_reader/0).
+:-dynamic_multifile_exported(begin_dynamic_reader/0).
 begin_dynamic_reader:-  dynamic_multifile_exported((was_imported_kb_content/2)),
   !. %  must_det(( prolog_load_context(file,Source),asserta(thlocal:in_dynamic_reader(Source)))).
-:-swi_export(end_dynamic_reader/0).
+:-dynamic_multifile_exported(end_dynamic_reader/0).
 end_dynamic_reader:-  
   !. % must_det(( prolog_load_context(file,Source),retract(thlocal:in_dynamic_reader(Source)))).
 
-:-swi_export(inside_dynamic_reader/0).
+:-dynamic_multifile_exported(inside_dynamic_reader/0).
 inside_dynamic_reader :- prolog_load_context(file,Source),test_tl(thlocal:in_dynamic_reader(Source)),!.
 inside_dynamic_reader :- prolog_load_context(source,Source),test_tl(thlocal:in_dynamic_reader(Source)),!.
 

@@ -9,10 +9,10 @@
 :-swi_module(moo_loader, []).
 
 :-dynamic(registered_game_file/1).
-:-swi_export(declare_load_game/1).
+:-dynamic_multifile_exported(declare_load_game/1).
 declare_load_game(Spec):- forall(filematch(Spec,File),show_call(asserta_if_new(registered_game_file(File)))).
 
-:-swi_export(load_game_files/0).
+:-dynamic_multifile_exported(load_game_files/0).
 load_game_files :- forall(registered_game_file(File),ensure_plmoo_loaded(File)).
 
 :-dynamic thglobal:current_world/1.
@@ -133,7 +133,7 @@ finish_processing_world :- load_game_files, loop_check_local(with_assertions(thl
 doall_and_fail(Call):- time_call(once(doall(Call))),fail.
 
 
-:-swi_export(etrace/0).
+:-dynamic_multifile_exported(etrace/0).
 etrace:-leash(-all),leash(+exception),trace.
 
 current_filesource(F):-seeing(X),stream_property(X,file_name(F)).

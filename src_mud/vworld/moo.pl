@@ -13,8 +13,11 @@
          register_module_type/1,          
          end_module_type/1,
          op(1120,fx,export),
-         op(1120,fx,swi_export),
+         op(1120,fx,dynamic_multifile_exported),
          register_timer_thread/3]).
+
+:-dynamic_multifile_exported(hasInstance/2).
+:-dynamic_multifile_exported(mudSubclass/2).
 
 :-multifile(user:mudIsa/2).
 :-dynamic(user:mudIsa/2).
@@ -23,9 +26,8 @@
 :- ensure_loaded(logicmoo('dbase/dbase_i_rdf_store.pl')).
 */
 
+:- include(logicmoo(vworld/moo_header)).
 
-:-multifile(user:hasInstance_dyn/2).
-:-dynamic(user:hasInstance_dyn/2).
 
 mudIsa_motel(tCol,tCol).
 mudIsa_motel(I,T):-no_repeats_av(deduce_M(mudIsa(I,T))),I\=tCol,I\==isTDisjoint(tBOT),I\==tTOP,T\==isTDisjoint(tBOT),T\==tTOP.
@@ -45,12 +47,6 @@ assert_hasInstance_real(T,I):- not(current_predicate(assert_ind/2)),!,assert_if_
 assert_hasInstance_real(T,I):- assert_if_new(user:hasInstance_dyn(T,I)),!,(atom(I)->must(assert_ind(I,T));true),!.
 
 
-:-dynamic_multifile_exported loading_module_h/1.
-:-dynamic_multifile_exported(mpred_prop/2).
-:-dynamic_multifile_exported(mpred_arity/2).
-:-dynamic_multifile_exported(never_type/1).
-% :-dynamic_multifile_exported(localityOfObject/2).
-
 mpred_prop(member,prologOnly).
 mpred_prop(mpred_prop,prologOnly).
 mpred_prop(mpred_arity,prologOnly).
@@ -60,16 +56,16 @@ mpred_arity(mpred_prop,2).
 mpred_arity(mpred_arity,2).
 mpred_arity(never_type,1).
 
-:-swi_export(is_stable/0).
+:-dynamic_multifile_exported(is_stable/0).
 is_stable:-fail.
 
 fast_mud.
 
 xperimental:-fail.
 xperimental_big_data:-fail.
-:-swi_export(is_release/0).
+:-dynamic_multifile_exported(is_release/0).
 is_release :- fail,1 is random(3).
-:-swi_export(not_is_release/0).
+:-dynamic_multifile_exported(not_is_release/0).
 not_is_release :- true. % 1 is random(3).
 simple_code :- fail.
 save_in_dbase_t:-true.
@@ -145,11 +141,11 @@ load_moo_files(M:F0,List):-!,
   locate_moo_file(M:F0,F),  % scope_settings  expand(true),register(false),
   % 'format'(user_error,'%  ~q + ~q -> ~q.~n',[M,F0,F]),
   load_files(F,[if(not_loaded), must_be_module(true)|List]).
-   %load_files(F,[redefine_module(false),if(not_loaded),silent(false),reswi_export(true),must_be_module(true)|List]).   
+   %load_files(F,[redefine_module(false),if(not_loaded),silent(false),redynamic_multifile_exported(true),must_be_module(true)|List]).   
 load_moo_files(M:F0,List):-
   locate_moo_file(M:F0,F),  % scope_settings
   'format'(user_error,'% load_moo_files_M ~q.~n',[M=locate_moo_file(F0,F)]),
-   load_files(F,[redefine_module(false),module(M),expand(true),if(not_loaded),reswi_export(true),register(false),silent(false),must_be_module(true)|List]).
+   load_files(F,[redefine_module(false),module(M),expand(true),if(not_loaded),redynamic_multifile_exported(true),register(false),silent(false),must_be_module(true)|List]).
 
 
 
@@ -210,7 +206,7 @@ current_context_module(Ctx):-context_module(Ctx).
 is_compiling:-is_compiling_clause;compiling.
 :-decl_thlocal ended_transform_moo_preds/0, always_expand_on_thread/1, prevent_transform_moo_preds/0, may_moo_term_expand/1, always_transform_heads/0.
 :-module_transparent begin_transform_moo_preds/0, end_transform_moo_preds/0.
-:-swi_export(((begin_transform_moo_preds/0,end_transform_moo_preds/0))).
+:-dynamic_multifile_exported(((begin_transform_moo_preds/0,end_transform_moo_preds/0))).
 begin_transform_moo_preds:- retractall(ended_transform_moo_preds),context_module(CM),asserta(may_moo_term_expand(CM)).
 end_transform_moo_preds:- retractall(ended_transform_moo_preds),asserta(ended_transform_moo_preds).
 
@@ -224,7 +220,7 @@ register_module_type(Type):-current_context_module(CM),register_module_type(CM,T
 register_module_type(CM,Types):-is_list(Types),!,forall(member(T,Types),register_module_type(CM,T)).
 register_module_type(CM,Type):-asserta_new(registered_module_type(CM,Type)).
 
-:-swi_export(end_module_type/2).
+:-dynamic_multifile_exported(end_module_type/2).
 end_module_type(Type):-current_context_module(CM),end_module_type(CM,Type).
 end_module_type(CM,Type):-retractall(registered_module_type(CM,Type)).
 

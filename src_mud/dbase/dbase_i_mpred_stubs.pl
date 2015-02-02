@@ -59,11 +59,11 @@ has_storage_stub(StubType,Head):-
 must_have_storage_stub(StubType,Head):-
  (has_storage_stub(StubType,Head)->true;(get_functor(Head,F),listing(F),term_listing(F),listing(F),dtrace(add_storage_stub(StubType,Head)))).
 
-:-swi_export(ensure_universal_stub/1).
+:-dynamic_multifile_exported(ensure_universal_stub/1).
 ensure_universal_stub(F):- must_det(mpred_arity(F,A)),add_storage_stub(prologHybrid,F/A).
-:-swi_export(ensure_universal_stub/2).
+:-dynamic_multifile_exported(ensure_universal_stub/2).
 ensure_universal_stub(F,A):- dbase_mod(M), M:ensure_universal_stub(M,F,A).
-:-swi_export(ensure_universal_stub/3).
+:-dynamic_multifile_exported(ensure_universal_stub/3).
 ensure_universal_stub(M,F,AIn):-AIn==0, must((ensure_arity(F,A),A\==0)),!,ensure_universal_stub(M,F,A).
 ensure_universal_stub(M,F,AIn):- AIn==0, trace_or_throw(illegal_argument_ensure_universal_stub(M,F,AIn)).
 %ensure_universal_stub(M,F,A):- cannot_override(F,A,Why),!,dmsg(todo(cannot_override(F,A,Why))),nop(listing(M:F/A)).
@@ -125,7 +125,7 @@ get_provided_mpred_storage_op(OP,PHead,StubType,CALL):-
 
 /*
 EVENTUALLY MOVE TO PDDL
-  decl_database_hook(assert(_),mpred_prop(F,ENV)):- ((assert_if_new(env_precol(ENV)),mpred_arity(Head), doall(provide_mpred_write_attributes(Head,ENV)))).
+  user:decl_database_hook(assert(_),mpred_prop(F,ENV)):- ((assert_if_new(env_precol(ENV)),mpred_arity(Head), doall(provide_mpred_write_attributes(Head,ENV)))).
 
 */
   
@@ -193,7 +193,7 @@ mpred_missing_stubs(F,A,StubType):-mpred_prop(F,predStubType(StubType)),must(mpr
 
 
 
-:-swi_export(rescan_missing_stubs/0).
+:-dynamic_multifile_exported(rescan_missing_stubs/0).
 rescan_missing_stubs:-no_rescans,!.
 rescan_missing_stubs:-loop_check_local(time_call(rescan_missing_stubs_lc),true).
 rescan_missing_stubs_lc:- once(thglobal:use_cyc_database), once(with_assertions(thlocal:useOnlyExternalDBs,forall((kb_t(arity(F,A)),A>1,good_pred_relation_name(F,A),not(mpred_arity(F,A))),with_no_dmsg(decl_mpred_mfa,decl_mpred_hybrid(F,A))))),fail.
@@ -201,7 +201,7 @@ rescan_missing_stubs_lc:- hotrace((doall((mpred_missing_stubs(F,A,StubType),mpre
 
 no_rescans.
 
-:-swi_export(rescan_mpred_props/0).
+:-dynamic_multifile_exported(rescan_mpred_props/0).
 
 rescan_mpred_props:- loop_check(rescan_mpred_props_lc,true).
 rescan_mpred_props_lc:-no_rescans,!.
@@ -223,7 +223,7 @@ provide_clauses_list(Head,HBLIST):- get_pifunctor(Head,PHead,_),
 % ASSERT INTO STORAGE STUBS
 % ================================================================================
 
-:-swi_export((assertz_clause/1)).
+:-dynamic_multifile_exported((assertz_clause/1)).
 assertz_to_system(Before):- expand_term(Before,Replaced),Before \=@= Replaced,!, assertz_to_system(Replaced).
 assertz_to_system((':-'(Body))):-!,must_det(show_call(Body)),!.
 assertz_to_system((Head :- Body)):- !,assertz_clause(Head,Body),!.

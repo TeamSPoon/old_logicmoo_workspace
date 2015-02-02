@@ -15412,10 +15412,11 @@ motel_literal_assert_retract(typeSubclass(X,Y),defprimconcept(X,Y),undefprimconc
 motel_literal_assert_retract(disjointWith(X,Y),sb_disjoint(X,Y),undefprimconcept(X,isTDisjoint(Y))).
 motel_literal_assert_retract(mudIsa(X,Y),assert_ind(X,Y),delete_ind(X,Y)).
 
-user:decl_database_hook(OP,FACT):-motel_decl_database_hook(OP,FACT).
+user:decl_database_hook(OP,FACT):-motel_user_decl_database_hook(OP,FACT).
 
-motel_decl_database_hook(assert(_),mudIsa(C,ttObjectType)):-!,must(sb_primconcept(C)).
-motel_decl_database_hook(assert(_),mudIsa(C,CT)):- ttObjectType(C),!,must(sb_defelem(C,[mudIsa(CT)])).
-motel_decl_database_hook(assert(_),Lit):-motel_literal_assert_retract(Lit, Assert, _Retract),!,must(Assert).
-motel_decl_database_hook(retract(_),Lit):-motel_literal_assert_retract(Lit,_Assert, Retract),!,must(Retract).
+
+motel_user_decl_database_hook(assert(_),mudIsa(C,ttObjectType)):-!,must(sb_primconcept(C)).
+motel_user_decl_database_hook(assert(_),mudIsa(C,CT)):- ttObjectType(C),!,must(sb_defelem(C,[mudIsa(CT)])).
+motel_user_decl_database_hook(assert(_),Lit):-motel_literal_assert_retract(Lit, Assert, _Retract),!,must(Assert).
+motel_user_decl_database_hook(retract(_),Lit):-motel_literal_assert_retract(Lit,_Assert, Retract),!,must(Retract).
 

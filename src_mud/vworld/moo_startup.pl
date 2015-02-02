@@ -18,7 +18,7 @@
 :- include(logicmoo('vworld/moo_header.pl')).
 
 /*
-:-swi_export(include_moo_files/1).
+:-dynamic_multifile_exported(include_moo_files/1).
 include_moo_files(Mask):- expand_file_name(Mask,X), forall(member(E,X),user_ensure_loaded(E)).
 */
 

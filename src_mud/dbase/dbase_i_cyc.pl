@@ -59,17 +59,17 @@ make_functorskel(F,N,fskel(F,DBASE,Call,I,NList,MtVars,Call2)):-typical_mtvars(M
 :-dynamic(isCycUnavailable_known/1).
 :-dynamic(isCycAvailable_known/0).
 
-:-swi_export(isCycAvailable/0).
+:-dynamic_multifile_exported(isCycAvailable/0).
 isCycAvailable:-isCycUnavailable_known(_),!,fail.
 isCycAvailable:-isCycAvailable_known,!.
 isCycAvailable:-checkCycAvailablity,isCycAvailable.
 
-:-swi_export(isCycUnavailable/0).
+:-dynamic_multifile_exported(isCycUnavailable/0).
 isCycUnavailable:-isCycUnavailable_known(_),!.
 isCycUnavailable:-isCycAvailable_known,!,fail.
 isCycUnavailable:-checkCycAvailablity,isCycUnavailable.
 
-:-swi_export(checkCycAvailablity/0).
+:-dynamic_multifile_exported(checkCycAvailablity/0).
 checkCycAvailablity:- (isCycAvailable_known;isCycUnavailable_known(_)),!.
 checkCycAvailablity:- ccatch((ignore((invokeSubL("(+ 1 1)",R))),(R==2->assert_if_new(isCycAvailable_known);assert_if_new(isCycUnavailable_known(R)))),E,assert_if_new(isCycUnavailable_known(E))),!.
 

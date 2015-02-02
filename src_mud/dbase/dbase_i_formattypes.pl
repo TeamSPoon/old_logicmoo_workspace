@@ -400,7 +400,7 @@ correctType(_Op,A,T,AA):- get_functor(A,F),formatted_resultIsa(F,T),must_det(A=A
 
 
 correctType(_O,A,ftInt,AA):- any_to_number(A,AA).
-correctType(_O,A,ftNumber,AA):- must(any_to_number(A,AA)).
+correctType(_O,A,ftNumber,AA):- any_to_number(A,AA).
 correctType(_O,A,ftCallable,AA):- must_equals(A,AA).
 correctType(_O,A,ftProlog,AA):- must_equals(A,AA).
 correctType(_O,A,ftString,AA):- must(any_to_string(A,AA)).

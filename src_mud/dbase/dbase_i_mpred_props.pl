@@ -27,10 +27,10 @@ mpred_prop(dbase_t,prologOnly).
 mpred_prop(mpred_prop,prologOnly).
 mpred_prop(prologMultiValued, tCol).
 
-decl_database_hook(assert(_),Fact):- ignore((compound(Fact),Fact=..[F,Arg1|PROPS],is_pred_declarer(F),decl_mpred(Arg1,[F|PROPS]))).
-decl_database_hook(assert(_),mudIsa(F,P)):- is_pred_declarer(P),decl_mpred(F,P).
-% this causes too many bugs decl_database_hook(assert(_),mpred_prop(F,predArity(A))):- ignore((A==1,atom(F),not(never_type(F)),not(mpred_prop(F,prologOnly)),decl_type(F))).
-decl_database_hook(assert(_),mpred_prop(F,P)):- decl_mpred(F,P).
+user:decl_database_hook(assert(_),Fact):- ignore((compound(Fact),Fact=..[F,Arg1|PROPS],is_pred_declarer(F),decl_mpred(Arg1,[F|PROPS]))).
+user:decl_database_hook(assert(_),mudIsa(F,P)):- is_pred_declarer(P),decl_mpred(F,P).
+% this causes too many bugs user:decl_database_hook(assert(_),mpred_prop(F,predArity(A))):- ignore((A==1,atom(F),not(never_type(F)),not(mpred_prop(F,prologOnly)),decl_type(F))).
+user:decl_database_hook(assert(_),mpred_prop(F,P)):- decl_mpred(F,P).
 
 mpred_arity(predArgTypes,1).
 mpred_arity(mpred_prop,2).
@@ -42,6 +42,7 @@ mpred_arity(ruleEquiv,2).
 
 never_type(Var):-var(Var),!,trace_or_throw(var_never_type(Var)).
 never_type('Area1000').
+never_type(iPlayer2).
 never_type(mudSubclass).
 never_type(must).
 never_type(mpred_prop).
@@ -50,7 +51,7 @@ never_type(C):- compound(C),functor(C,F,1),isa_asserted(F,tCol).
 never_type(F):- mpred_arity(F,A),!, A > 1.
 
 decl_mpred_pi(PI):-ignore((ground(PI),compound(PI),decl_mpred(PI))).
-:-swi_export(decl_mpred_mfa/3).
+:-dynamic_multifile_exported(decl_mpred_mfa/3).
 decl_mpred_mfa(_,M:F,A):-atom(M),!,decl_mpred_mfa(M,F,A).
 decl_mpred_mfa(M,FF,A):-var(M),!,context_module(M),!,decl_mpred_mfa(M,FF,A).
 decl_mpred_mfa(M,FF,A):-
@@ -71,7 +72,7 @@ ensure_universal_stub_plus_minus_2(F,AMinus2):-
    decl_mpred_mfa(user,F,AMinus2).
    
 
-:-swi_export(registerCycPredPlus2/1).
+:-dynamic_multifile_exported(registerCycPredPlus2/1).
 
 
 registerCycPredPlus2_3(_CM,M,PI,F/A2):-
@@ -88,7 +89,7 @@ registerCycPredPlus2(P):-!,user:with_pi(P,registerCycPredPlus2_3).
 % ========================================
 % mpred_props database
 % ========================================
-:-swi_export(is_pred_declarer/1).
+:-dynamic_multifile_exported(is_pred_declarer/1).
 is_pred_declarer(Prop):- 
 	arg(_,v(predArgTypes,vFormatted,predIsFlag,tPred,
                 prologMultiValued,prologSingleValued,prologMacroHead,prologOnly,
@@ -114,8 +115,6 @@ mpred_prop(G,predProxyAssert(add)):- atom(G),prologMacroHead(G).
 mpred_prop(G,predProxyQuery(ireq)):- atom(G),prologMacroHead(G).
 mpred_prop(G,predProxyRetract(del)):- atom(G),prologMacroHead(G).
 */
-
-:-dynamic_multifile_exported(hasInstance/2).
 
 :-forall(is_pred_declarer(F),dynamic(F/1)).
 :-forall(is_pred_declarer(F),assert_hasInstance(macroDeclarer,F)).
@@ -209,7 +208,7 @@ decl_mpred_1(_CM,M,PI,F/A):-
 functor_check_univ(M:G1,F,List):-atom(M),member(M,[dbase,user]),!,functor_check_univ(G1,F,List),!.
 functor_check_univ(G1,F,List):-must_det(compound(G1)),must_det(G1 \= _:_),must_det(G1 \= _/_),G1=..[F|List],!.
 
-:-swi_export(glean_pred_props_maybe/1).
+:-dynamic_multifile_exported(glean_pred_props_maybe/1).
 glean_pred_props_maybe(_:G):-!,compound(G),glean_pred_props_maybe(G).
 glean_pred_props_maybe(G):-compound(G),G=..[F,Arg1|RGS],is_pred_declarer(F),!,add_mpred_prop_gleaned(Arg1,[F|RGS]),!.
 

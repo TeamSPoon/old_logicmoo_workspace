@@ -23,7 +23,7 @@ strip_f_module(_:P,FA):-nonvar(P),!,strip_f_module(P,F),!,F=FA.
 strip_f_module(P,PA):-atom(P),!,P=PA.
 
 strip_f_module(P,FA):- is_list(P),catch(text_to_string(P,S),_,fail),!,atom_string(F,S),!,F=FA.
-strip_f_module(P,FA):- notrace(ftStringFn(P);atomic(P)), atom_string(F,P),!,F=FA.
+strip_f_module(P,FA):- notrace(string(P);atomic(P)), atom_string(F,P),!,F=FA.
 strip_f_module(P,P).
 
 % use ccatch/3 to replace catch/3 works around SWI specific issues arround using $abort/0 and block/3
@@ -56,7 +56,7 @@ functor_safe(P,F,A):-functor_safe0(P,F,A),!.
 functor_safe0(M:P,M:F,A):-var(P),atom(M),functor_catch(P,F,A),!,warn_bad_functor(F).
 functor_safe0(P,F,A):-var(P),strip_f_module(F,F0),functor_catch(P,F0,A),!,warn_bad_functor(F).
 functor_safe0(P,F,A):-compound(P),!,functor_safe_compound(P,F,A),warn_bad_functor(F).
-functor_safe0(P,F,0):- notrace(ftStringFn(P);atomic(P)), atom_string(F,P),warn_bad_functor(F).
+functor_safe0(P,F,0):- notrace(string(P);atomic(P)), atom_string(F,P),warn_bad_functor(F).
 functor_safe_compound((_,_),',',2).
 functor_safe_compound([_|_],'.',2).
 functor_safe_compound(_:P,F,A):- functor_catch(P,F,A),!.

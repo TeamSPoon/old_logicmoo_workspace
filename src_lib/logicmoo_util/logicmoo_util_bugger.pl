@@ -420,7 +420,7 @@ dynamic_safe(MFA):- with_mfa(MFA,dynamic_safe).
 :- export((((dynamic_safe)/3))).
 :- meta_predicate(dynamic_safe(+,+,+)).
 :- module_transparent((((dynamic_safe)/3))).
-dynamic_safe(M,F,A):- (static_predicate(M,F,A) -> true ; M:dynamic(M:F/A)). % , warn_module_dupes(M,F,A).
+dynamic_safe(M,F,A):- (static_predicate(M,F,A) -> dmsg(warn(not(M:dynamic(M:F/A)))) ; M:dynamic(M:F/A)). % , warn_module_dupes(M,F,A).
 :-op(1150,fx,user:dynamic_safe).
 
 
@@ -2687,8 +2687,8 @@ writeFailureLog(E,X):-
 % Some prologs have a printf() tCol predicate.. so I made up fmtString/fmt in the Cyc code that calls the per-prolog mechaism
 % in SWI it''s formzat/N and sformat/N
 % ========================================================================================
-:-ib_multi_transparent33(isConsoleOverwritten/0).
-:- ib_multi_transparent33(formatter_hook/4).
+:- dynamic(isConsoleOverwritten/0).
+:- dynamic(formatter_hook/4).
 
 
 fmtString(X,Y,Z):-sformat(X,Y,Z).

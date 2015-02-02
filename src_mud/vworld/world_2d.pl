@@ -8,7 +8,7 @@
 */
 % :-swi_module(world_2d,[]).
 
-:- swi_export(((
+:- dynamic_multifile_exported(((
          check_for_fall/3,
          dir_offset/5,
          doorLocation/5,
@@ -140,14 +140,14 @@ locationToRegion_0(Obj,Obj):-nonvar(Obj),!,mudIsa(Obj,tRegion),!.
 locationToRegion_0(Obj,Region):-nonvar(Obj),must(localityOfObject(Obj,Location)),!,locationToRegion_0(Location,Region).
 locationToRegion_0(Obj,Obj):-dmsg(warn(locationToRegion(Obj,Obj))),!.
 
-:-swi_export(mudNearbyLocs/2).
+:-dynamic_multifile_exported(mudNearbyLocs/2).
 mudNearbyLocs(L1,L2):- var(L1),nonvar(L2),!,mudNearbyLocs(L2,L1).
 mudNearbyLocs(L1,L2):- nonvar(L1),nonvar(L2),L2=xyzFn(_,_,_,_),locationToRegion(L1,R),!,call_tabled(locs_near_i(R,L2)).
 mudNearbyLocs(L1,L2):- nonvar(L1),nonvar(L2),locationToRegion(L1,R1),locationToRegion(L2,R2),!,mudNearbyRegions(R1,R2).
 mudNearbyLocs(L1,L2):- must((hotrace(mudNearbyRegions(R1,R2)),in_grid_no_rnd(R1,L1),in_grid_no_rnd(R2,L2))).
 
 % :- decl_not_mpred(locs_near_i,2).
-:-swi_export(locs_near_i/2).
+:-dynamic_multifile_exported(locs_near_i/2).
 locs_near_i(L1,L2):- locationToRegion(L1,R),in_grid_no_rnd(R,L2).
 locs_near_i(L1,L2):- locationToRegion(L1,R),pathBetween_call(R,_,R2),in_grid_no_rnd(R2,L2).
 
@@ -160,7 +160,7 @@ transitive_other(mudAtLoc,1,Obj,What):-mudInsideOf(Obj,What).
 % transitive_other(localityOfObject,1,Obj,What):-mudInsideOf(Obj,What).
 
 :-decl_mpred_hybrid(mudInsideOf/2).
-:-swi_export(mudInsideOf/2).
+:-dynamic_multifile_exported(mudInsideOf/2).
 mudInsideOf(Inner,Outer):-is_asserted(mudStowing(Outer,Inner)).
 mudInsideOf(Inner,Outer):-is_asserted(mudContains(Outer,Inner)).
 
@@ -250,7 +250,7 @@ put_in_world_lc_gen(Obj):-choose_for(mudFacing,Obj,_),!,must_det((choose_for(mud
 ensure_in_world(What):-must_det(put_in_world(What)).
 
 
-:- dynamic_multifile_exported decl_database_hook/2.
+:- dynamic_multifile_exported user:decl_database_hook/2.
 :- dynamic_multifile_exported deduce_facts/2.
 :- dynamic_multifile_exported create_random_fact/1.
 :- dynamic_multifile_exported hooked_random_instance/3.
@@ -381,10 +381,10 @@ p2c_dir2('d','vDown').
 p2c_dir2('e','vEast').
 p2c_dir2('n','vNorth').
 
-:-swi_export(is_any_dir/1).
+:-dynamic_multifile_exported(is_any_dir/1).
 is_any_dir(Dir):-var(Dir),!,fail.
 is_any_dir(Dir):-any_to_dir(Dir,_).
-:-swi_export(any_to_dir/2).
+:-dynamic_multifile_exported(any_to_dir/2).
 
 any_to_dir(D,D):-var(D),!.
 any_to_dir(S,D):-string(S),string_to_atom(S,A),any_to_dir(A,D),!.
@@ -393,7 +393,7 @@ any_to_dir(A,D):-p2c_dir2(D,A),!.
 any_to_dir(D,O):-atom(D),sub_atom(D, 0, 1, _, S),toLowercase(S,L),p2c_dir2(L,O),!.
 any_to_dir(D,D):-pathBetween(_,D,_),!.
 
-:-swi_export(dir_offset/5).
+:-dynamic_multifile_exported(dir_offset/5).
 
 % :-decl_mpred_hybrid(dir_offset(term,int,int,int,int)).
 
@@ -429,7 +429,7 @@ facing_offset(front,F,X,Y,Z):-dir_offset(vNorth,F,X,Y,Z).
 
 
 
-decl_database_hook(retract(_),mudAtLoc(Agent,_)):-padd(Agent,mudNeedsLook(vTrue)).
+user:decl_database_hook(retract(_),mudAtLoc(Agent,_)):-padd(Agent,mudNeedsLook(vTrue)).
 
 % dir_mult(X,Y,Z,X1,Y1,Z1,X2,Y2,Z2):- X2 is X * X1,Y2 is Y * Y1,Z2 is Z * Z1.
 

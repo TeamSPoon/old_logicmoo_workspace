@@ -62,14 +62,14 @@ agent_call_command(Agent,actLook(_Dir,SObj)):-
    objects_match_for_agent(Agent,SObj,tObj,Percepts),
    forall_member(P,Percepts,call_agent_action(Agent,actExamine(P))).
 
-:-swi_export(look_as/1).
+:-dynamic_multifile_exported(look_as/1).
 look_as(Agent):-
    get_session_id(O),
    with_assertions(thlocal:session_agent(O,Agent),
         ((mudAtLoc(Agent,LOC),cmdLook(Agent,LOC)))).
 
 
-:-swi_export(cmdLook/2).
+:-dynamic_multifile_exported(cmdLook/2).
 cmdLook(Agent,LOC):-  mmake, call(cmdLook_proc,Agent,LOC).
 
 :-decl_mpred_prolog(cmdLook_proc/3).

@@ -44,7 +44,7 @@
           M:holds_t/11)).
 
 
-:-swi_export((dbase_t/1,hasInstance/2)).
+:-dynamic_multifile_exported((dbase_t/1,hasInstance/2)).
 :- dynamic_multifile_exported((
          % dbase_t/1,
          % dbase_t/2,
@@ -78,7 +78,7 @@
           dbase_f/7)).
 
 
-:-swi_export(into_plist/2).
+:-dynamic_multifile_exported(into_plist/2).
 into_plist(In,Out):-into_plist_arities(2,12,In,Out).
 
 :-export(into_plist_arities/4).
@@ -166,10 +166,10 @@ holds_plist_t(P,LIST):- apply(holds_t,[P|LIST]).
 
 
 :-op(0,fx,((decl_mpred_hybrid))).
-:-swi_export((decl_mpred_hybrid)/1).
-:-swi_export((decl_mpred_hybrid)/2).
-:-swi_export((decl_mpred_hybrid)/3).
-:-swi_export((decl_mpred_hybrid)/4).
+:-dynamic_multifile_exported((decl_mpred_hybrid)/1).
+:-dynamic_multifile_exported((decl_mpred_hybrid)/2).
+:-dynamic_multifile_exported((decl_mpred_hybrid)/3).
+:-dynamic_multifile_exported((decl_mpred_hybrid)/4).
 
 :-op(0,fx,decl_mpred_hybrid).
 
@@ -359,7 +359,10 @@ constrain_args(_P,[AR,GS]):-!,dif(AR,GS).
 constrain_args(_,[_P,AR,GS]):-!,dif(AR,GS).
 constrain_args(A,B):-constrain_args_pttp(A,B).
 
-call_for_literal_db(HEAD,DB):-HEAD=..[P|ARGS],constrain_args(P,ARGS),call_for_literal_db0(HEAD,DB),constrain_args(P,ARGS).
+call_for_literal_db(HEAD,DB):-HEAD=..[P|ARGS],get_functor(HEAD,F,A),
+    %decl_mpred_stubcol(F,A,prologHybrid),
+    %decl_mpred_hybrid(F,A),
+   constrain_args(P,ARGS),call_for_literal_db0(HEAD,DB),constrain_args(P,ARGS).
 
 call_for_literal_db0(HEAD,DB):-no_repeats_av(HEAD,call_for_literal_db00(HEAD,DB)).
 
@@ -453,7 +456,7 @@ foo_b(b3):-!.
 :-must_det((findall(R,call_no_cuts(foo_b(R)),List),length(List,3))).
 
 
-decl_database_hook(AR,C):-smart_decl_database(AR,C).
+user:decl_database_hook(AR,C):-smart_decl_database(AR,C).
 
 smart_decl_database(AR,svo(S,V,O)):- !,dbase2pred2svo(DBASE,PRED,svo(S,V,O)),!,smart_db_op(AR,DBASE,PRED,svo(S,V,O)).
 smart_decl_database(AR,DBASE):- functor_catch(DBASE,dbase_t,_),!,dbase2pred2svo(DBASE,PRED,SVO),!,smart_db_op(AR,DBASE,PRED,SVO).
