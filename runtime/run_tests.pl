@@ -64,7 +64,7 @@ mud_test_local:-
 
 mud_test_local:- 
    test_name("tests to see if our clothing doesnt: mudAtLoc"),
-   test_false(mudAtLoc('ArtifactCol1003-Gold-Uniform775',_X)).
+   test_false(mudAtLoc('iGoldUniform775',_X)).
     
 mud_test_local:- 
    foc_current_player(Agent),
@@ -87,7 +87,7 @@ mud_test_local:-
       foc_current_player(Agent),
        test_true_req(mudPossess(Agent, 'ArtifactCol1003-Gold-Uniform775')).
 
-\:- 
+mud_test_local:- 
    test_name("Tests our action templates"), doall((get_all_templates(Templates),dmsg(get_all_templates(Templates)))).
 
 mud_test_local:-

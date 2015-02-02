@@ -98,11 +98,11 @@
 :- dynamic_multifile_exported user:mudStrowing/2.
 :- dynamic_multifile_exported user:hasInstance_dyn/2.
 :- dynamic_multifile_exported user:loading_module_h/1.
-:- dynamic_multifile_exported(mpred_prop/2).
-:- dynamic_multifile_exported(mpred_arity/2).
-:- dynamic_multifile_exported(never_type/1).
+:- dynamic_multifile_exported(user:mpred_prop/2).
+:- dynamic_multifile_exported(user:mpred_arity/2).
+:- dynamic_multifile_exported(user:never_type/1).
 :- dynamic_multifile_exported user:mudToHitArmorClass0/2.
-:- dynamic_multifile_exported fact_always_true/1.
+:- dynamic_multifile_exported user:fact_always_true/1.
 :- dynamic_multifile_exported user:mudStowing/2.
 :- dynamic_multifile_exported user:mudSubclass/2.
 :- dynamic_multifile_exported user:mudIsa/2.
