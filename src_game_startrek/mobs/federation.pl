@@ -28,7 +28,7 @@ vette_federation_idea(Agent,Act,Act):-dmsg(vette_federation_idea(Agent,Act)).
 
 mudLabelTypeProps('Px',tFederation,[]).
 
-moo:world_agent_plan(_World,Agent,ActV):-
+user:world_agent_plan(_World,Agent,ActV):-
    tAgentGeneric(Agent),
   % mudIsa(Agent,federation),
    federation_idea(Agent,Act),

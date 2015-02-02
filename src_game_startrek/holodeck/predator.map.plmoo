@@ -25,26 +25,26 @@ grid_key( nt=tNnut).
 %
 
 
-type_grid(forest,1, [ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed]).
-type_grid(forest,2, [ed,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,ed]).
-type_grid(forest,3, [ed,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,ed]).
-type_grid(forest,4, [ed,--,tr,--,nt,--,--,--,tr,tr,--,--,--,--,--,nt,nt,--,--,ed]).
-type_grid(forest,5, [ed,--,--,tr,--,--,--,--,tr,--,--,--,--,nt,nt,nt,--,--,--,ed]).
-type_grid(forest,6, [ed,--,--,--,--,--,tr,tr,tr,tr,tr,tr,--,--,nt,nt,--,--,--,ed]).
-type_grid(forest,7, [ed,--,--,--,--,--,tr,--,--,--,--,--,--,--,--,nt,--,--,--,ed]).
-type_grid(forest,8, [ed,--,--,--,--,--,--,--,--,--,--,--,tr,tr,tr,tr,tr,tr,--,ed]).
-type_grid(forest,9, [ed,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,ed]).
-type_grid(forest,10,[ed,--,--,--,nt,--,--,--,--,--,--,--,--,--,--,--,--,--,--,ed]).
-type_grid(forest,11,[ed,--,--,--,nt,--,--,--,--,--,tr,tr,--,--,--,--,--,--,--,ed]).
-type_grid(forest,12,[ed,--,--,tr,tr,nt,nt,--,--,tr,tr,nt,nt,nt,nt,nt,nt,--,--,ed]).
-type_grid(forest,13,[ed,--,--,--,--,--,nt,--,--,tr,--,--,nt,nt,nt,nt,nt,--,--,ed]).
-type_grid(forest,14,[ed,--,--,--,--,--,--,--,tr,tr,--,--,--,--,nt,nt,--,--,--,ed]).
-type_grid(forest,15,[ed,--,--,--,--,tr,tr,tr,tr,tr,--,--,--,nt,nt,--,--,--,--,ed]).
-type_grid(forest,16,[ed,--,--,--,--,--,--,--,--,--,--,--,nt,nt,--,--,tr,--,--,ed]).
-type_grid(forest,17,[ed,--,--,--,--,--,--,--,--,tr,--,nt,nt,--,tr,--,tr,--,--,ed]).
-type_grid(forest,18,[ed,--,--,--,--,--,--,--,--,--,nt,nt,--,--,tr,--,--,--,--,ed]).
-type_grid(forest,19,[ed,--,--,--,--,--,--,--,--,--,--,--,--,--,tr,--,--,--,--,ed]).
-type_grid(forest,20,[ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed]).
+typeGrid(forest,1, [ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed]).
+typeGrid(forest,2, [ed,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,ed]).
+typeGrid(forest,3, [ed,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,ed]).
+typeGrid(forest,4, [ed,--,tr,--,nt,--,--,--,tr,tr,--,--,--,--,--,nt,nt,--,--,ed]).
+typeGrid(forest,5, [ed,--,--,tr,--,--,--,--,tr,--,--,--,--,nt,nt,nt,--,--,--,ed]).
+typeGrid(forest,6, [ed,--,--,--,--,--,tr,tr,tr,tr,tr,tr,--,--,nt,nt,--,--,--,ed]).
+typeGrid(forest,7, [ed,--,--,--,--,--,tr,--,--,--,--,--,--,--,--,nt,--,--,--,ed]).
+typeGrid(forest,8, [ed,--,--,--,--,--,--,--,--,--,--,--,tr,tr,tr,tr,tr,tr,--,ed]).
+typeGrid(forest,9, [ed,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,--,ed]).
+typeGrid(forest,10,[ed,--,--,--,nt,--,--,--,--,--,--,--,--,--,--,--,--,--,--,ed]).
+typeGrid(forest,11,[ed,--,--,--,nt,--,--,--,--,--,tr,tr,--,--,--,--,--,--,--,ed]).
+typeGrid(forest,12,[ed,--,--,tr,tr,nt,nt,--,--,tr,tr,nt,nt,nt,nt,nt,nt,--,--,ed]).
+typeGrid(forest,13,[ed,--,--,--,--,--,nt,--,--,tr,--,--,nt,nt,nt,nt,nt,--,--,ed]).
+typeGrid(forest,14,[ed,--,--,--,--,--,--,--,tr,tr,--,--,--,--,nt,nt,--,--,--,ed]).
+typeGrid(forest,15,[ed,--,--,--,--,tr,tr,tr,tr,tr,--,--,--,nt,nt,--,--,--,--,ed]).
+typeGrid(forest,16,[ed,--,--,--,--,--,--,--,--,--,--,--,nt,nt,--,--,tr,--,--,ed]).
+typeGrid(forest,17,[ed,--,--,--,--,--,--,--,--,tr,--,nt,nt,--,tr,--,tr,--,--,ed]).
+typeGrid(forest,18,[ed,--,--,--,--,--,--,--,--,--,nt,nt,--,--,tr,--,--,--,--,ed]).
+typeGrid(forest,19,[ed,--,--,--,--,--,--,--,--,--,--,--,--,--,tr,--,--,--,--,ed]).
+typeGrid(forest,20,[ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed]).
 
 
 % :- include(logicmoo(vworld/moo_footer)).
