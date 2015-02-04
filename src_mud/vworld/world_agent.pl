@@ -118,7 +118,7 @@ acceptableArg(Arg,Type):-dmsg(acceptableArg(Arg,Type)).
 agent_call_command_now(Agent,CMD):-
   with_current_agent(Agent,
       (must(correctCommand(CMD,NewCMD)),
-      agent_call_command(Agent,NewCMD))).
+      user:agent_call_command(Agent,NewCMD))).
 
 % need to return http sessions as well
 get_session_id(IDIn):-current_input(ID),is_stream(ID),!,ID=IDIn.
@@ -185,7 +185,7 @@ agent_into_corpse(Agent) :-
 % Displays all the agents stats. Used at end of a run.
 display_stats(Agents) :-
 	forall(member(Agent,Agents),
-	          (mudCharge(Agent,Chg),
+	          (mudEnergy(Agent,Chg),
 		  mudHealth(Agent,Dam),
 		  mudScore(Agent,Scr),
 		  findall(Obj,mudPossess(Agent,Obj),Inv),

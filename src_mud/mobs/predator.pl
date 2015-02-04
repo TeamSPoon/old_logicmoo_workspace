@@ -29,7 +29,7 @@ user:world_agent_plan(_World,Agent,Act):-
    predator_idea(Agent,Act).
 
 predator_idea(Agent,actEat(Corpse)) :-
-	mudCharge(Agent,Charge),
+	mudEnergy(Agent,Charge),
 	Charge < 100,
 	mudPossess(Agent, List),                
 	obj_memb(Corpse,List),

@@ -237,7 +237,7 @@ make_db_listing:-
 "uniform",
 "a burgandy Starfleet command uniform",
 "A neatly folded burgandy Starfleet command uniform is lying here",
-"armorLevel: 10",
+"mudArmorLevel: 10",
 "These uniforms are worn by command officers on Federation starships. It's kind of tight, but it looks pretty good",
 "Red Uniform",
 "a burgandy Starfleet command uniform"
@@ -261,7 +261,7 @@ remove_description(mudDescription(I,S)):- dmsg(trace_or_throw(remove_description
 add_description(mudDescription(I,S)):-add_description(I,S).
 
 :-meta_predicate_transparent(add_description/2).
-add_description(A,S0):-hooked_asserta(mudDescription(A,S0)),fail.
+add_description(A,S0):-hooked_assertz(mudDescription(A,S0)),fail.
 add_description(A,S0):- atomic(S0),string_concat('#$PunchingSomething ',S,S0),!,add_description(A,S).
 % add_description(A,S0):-determinerRemoved(S0,String,S),!,add_description(A,S),add(determinerString(A,String)).
 add_description(A,S0):-
@@ -283,9 +283,9 @@ add_description(A,_S,_S0,1,_,[Word]):-add_description_word(A,Word),!.
 
 %#$PunchingSomething ..
 add_description(A,S,S0,Ws,Sents,['#$PunchingSomething',B|C]):-add_description(A,S,S0,Ws,Sents,[B|C]).
-add_description(A,S,S0,Ws,Sents,[Det,B|C]):-ddeterminer(Det,L),add_description(A,S,S0,Ws,Sents,[B|C]),hooked_asserta(determinerString(A,L)).
-add_description(A,S,S0,Ws,_Sents,_Words):-Ws>3,is_here_String(S),text_to_string(S0,String),!,hooked_asserta(descriptionHere(A,String)).
-add_description(A,_S,S0,_Ws,_Sents,_Words):- any_to_string(S0,String),hooked_asserta(mudDescription(A,String)).
+add_description(A,S,S0,Ws,Sents,[Det,B|C]):-ddeterminer(Det,L),add_description(A,S,S0,Ws,Sents,[B|C]),hooked_assertz(determinerString(A,L)).
+add_description(A,S,S0,Ws,_Sents,_Words):-Ws>3,is_here_String(S),text_to_string(S0,String),!,hooked_assertz(descriptionHere(A,String)).
+add_description(A,_S,S0,_Ws,_Sents,_Words):- any_to_string(S0,String),hooked_assertz(mudDescription(A,String)).
 
 is_here_String(S):- atomic_list_concat_safe([_,is,_,here,_],S).
 is_here_String(S):- atomic_list_concat_safe([_,here],S).

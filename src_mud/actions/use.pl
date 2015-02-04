@@ -49,7 +49,7 @@ action_verb_useable(actStow,tStowable,mudStowing,mudPossess,mudWielding).
 % action_verb_useable(actUse,mudUsing,tUsable,mudPossess,mudPossess).
 
 
-action_info(Syntax,String):-
+user:action_info(Syntax,String):-
  action_verb_useable(ActUse,Wieldable,NowWielding,Possessing,Unstowed),
    Syntax=..[ActUse,Wieldable],
    sformat(String,'~w a ~w that you ~w so it will be ~w and not be ~w.',[ActUse,Wieldable,Possessing,NowWielding,Unstowed]).
@@ -59,7 +59,7 @@ use_action_templates(Syntax):-no_repeats([Syntax],(
 
 vtActionTemplate(Templ):-use_action_templates(Templ).
 
-agent_call_command(Agent,Syntax) :- 
+user:agent_call_command(Agent,Syntax) :- 
     call((action_verb_useable(ActUse,_Wieldable,_NowWielding,_Possessing,_Unstowed),Syntax=..[ActUse,Obj])),
     agent_call_command_use(Agent,ActUse,Obj),!.
 
@@ -140,7 +140,7 @@ must_post_use(ActUse,Agent,Obj):-
 
 % Record keeping
 update_charge(Agent,_ActWield) :- 
-        padd(Agent,mudCharge(-2)).
+        padd(Agent,mudEnergy(-2)).
 
 :- include(logicmoo(vworld/moo_footer)).
 

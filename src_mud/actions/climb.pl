@@ -25,7 +25,7 @@ vtActionTemplate(actClimb(vtDirection)).
 % Climb
 % If there is nothing there to climb, move to location
 % plus take some damage and loose charge 
-agent_call_command(Agent,actClimb(Dir)) :-	
+user:agent_call_command(Agent,actClimb(Dir)) :-	
 	mudAtLoc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	can_move_into(LOC,XXYY),
@@ -33,13 +33,13 @@ agent_call_command(Agent,actClimb(Dir)) :-
 	call_update_stats(Agent,trip),
 	call_update_charge(Agent,actClimb).
 % Object is too high to climb, or it is another agent. 
-agent_call_command(Agent,actClimb(Dir)) :-
+user:agent_call_command(Agent,actClimb(Dir)) :-
 	
 	\+ climbable(Agent,Dir),
 	call_update_stats(Agent,pulled),
 	call_update_charge(Agent,actClimb).
 % Successful climb
-agent_call_command(Agent,actClimb(Dir)) :-	
+user:agent_call_command(Agent,actClimb(Dir)) :-	
 	in_world_move(_,Agent,Dir),
 	call_update_charge(Agent,actClimb).
 
@@ -56,9 +56,9 @@ climbable(Agent,Dir) :-
 
 %Record keeping
 update_charge(Agent,actClimb) :-
-	del(mudCharge(Agent,Old)),
+	del(mudEnergy(Agent,Old)),
 	New is Old - 5,
-	add(mudCharge(Agent,New)).
+	add(mudEnergy(Agent,New)).
 
 update_stats(Agent,trip) :- 
         del(mudHealth(Agent,Old)),

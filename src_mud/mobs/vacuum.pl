@@ -25,7 +25,7 @@ user:world_agent_plan(_World,Agent,Act):-
    vacuum_idea(Agent,Act).
 
 vacuum_idea(Agent,actTake(tOutlet)) :-
-	mudCharge(Agent,Charge),
+	mudEnergy(Agent,Charge),
 	Charge < 490,
 	mudNearFeet(Agent,What),
 	member(tOutlet,What).
@@ -33,7 +33,7 @@ vacuum_idea(Agent,actTake(tDirt)) :-
 	mudNearFeet(Agent,What),
 	member(tDirt,What).
 vacuum_idea(Agent,actMove(Dir)) :-
-	mudCharge(Agent,Charge),
+	mudEnergy(Agent,Charge),
 	Charge < 200,
 	mudGetPrecepts(Agent,List),
 	list_object_dir_sensed(_,List,tOutlet,Dir),
@@ -43,7 +43,7 @@ vacuum_idea(Agent,actMove(Dir)) :-
 	    What == [tDirt];
 	    What == [tOutlet]).
 vacuum_idea(Agent,actClimb(Dir)) :-
-	mudCharge(Agent,Charge),
+	mudEnergy(Agent,Charge),
 	Charge < 200,
 	mudGetPrecepts(Agent,List),
 	list_object_dir_sensed(_,List,tOutlet,Dir),

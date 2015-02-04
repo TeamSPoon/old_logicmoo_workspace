@@ -15,6 +15,8 @@
 % [Manditory] Load the Logicmioo utils
 :- '@'(ensure_loaded('../src_lib/logicmoo_util/logicmoo_util_all'),user).
 
+:- include(logicmoo(vworld/moo_header)).
+
 :- '@'(if_file_exists(user_ensure_loaded(logicmoo('../externals/MUD_ScriptEngines/snark/snark_in_prolog'))),'user').
 /*
 else
@@ -74,9 +76,6 @@ user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),s
 % user:semweb_startup:- forall(retract(prolog_debug:debugging((X), true, O)),show_call(asserta(prolog_debug:debugging((X), false, O)))).
 
 
-:- include(logicmoo(vworld/moo_header)).
-
-
 :-multifile(pre_file_search_path/2).
 % user:pre_file_search_path(_,_):-!,fail.
 % :- do_semweb_startup.
@@ -98,6 +97,8 @@ user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),s
 % :- add_game_dir('../games/src_game_wumpus',prolog_repl).       
 % :- add_game_dir('../games/src_game_nani',prolog_repl).       
 % :- add_game_dir('../games/src_game_sims',prolog_repl).       
+
+:- prolog.
 
 :- add_game_dir('../games/src_game_startrek',prolog_repl).
 

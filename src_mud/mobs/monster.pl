@@ -27,7 +27,7 @@ user:world_agent_plan(_World,Agent,Act):-
    monster_idea(Agent,Act).
    
 monster_idea(Agent,actEat(Food)) :-
-	mudCharge(Agent,Charge),
+	mudEnergy(Agent,Charge),
 	Charge < 100,
         mudPossess(Agent, Food),
         isa_any(Food,[tFood,tCorpse]).
@@ -52,6 +52,6 @@ monster_idea(Agent,actMove(1,Dir)) :-
 
 monster_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[tCorpse]).
 
-default_inst_props(Instance,tMonster,[mudDescription(txtFormatFn("Very screy looking monster named ~w",[Instance])),wearsClothing(tToughHide),mudPossess(tToughHide)]).
+user:instTypeProps(Instance,tMonster,[mudDescription(txtFormatFn("Very screy looking monster named ~w",[Instance])),wearsClothing(tToughHide),mudPossess(tToughHide)]).
 
 :- include(logicmoo(vworld/moo_footer)).

@@ -44,7 +44,7 @@ prey_idea(Self,actTake(tNut)) :-
 	mudNearFeet(Self,What),
 	member(tNut,What).
 prey_idea(Self,actEat(tNut)) :-
-	mudCharge(Self,Charge),
+	mudEnergy(Self,Charge),
 	Charge < 120,
 	mudPossess(Self,tNut).
 prey_idea(Self,actMove(Dir)) :-
@@ -62,7 +62,7 @@ prey_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[tNut]).
 
 vtActionTemplate(actSpawn(tCol)).
 
-agent_call_command(_Agent,actSpawn(tPrey)):-actSpawn.
+user:agent_call_command(_Agent,actSpawn(tPrey)):-actSpawn.
 
 actSpawn :-
 	maybe(10),
@@ -82,11 +82,11 @@ spawn_prey(N) :-
        assert_isa(Prey,tPrey),
        get_instance_default_props(Prey,Traits),
 	\+ mudAgentTurnnum(Prey,_),
-         req(predInstMax(mudCharge,Prey,NRG)),
-         req(predInstMax(mudHealth,Prey,Dam)),
-         clr(mudCharge(Prey,_)),
+         req(predInstMax(Prey,mudEnergy,NRG)),
+         req(predInstMax(Prey,mudHealth,Dam)),
+         clr(mudEnergy(Prey,_)),
          clr(mudHealth(Prey,_)),
-         add(mudCharge(Prey,NRG)),
+         add(mudEnergy(Prey,NRG)),
          add(mudHealth(Prey,Dam)),
          add(mudAgentTurnnum(Prey,1)),
          clr(mudPossess(Prey,_)),

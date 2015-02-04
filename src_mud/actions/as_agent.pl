@@ -10,7 +10,7 @@
 
 :- register_module_type(mtCommand).
 
-action_info('actAs'(tAgentGeneric,ftAction), "actAs <agent> <command>").
-agent_call_command(_Agent,'actAs'(OtherAgent,Command)):- call_agent_command(OtherAgent,Command).
+user:action_info('actAs'(tAgentGeneric,ftAction), "actAs <agent> <command>").
+user:agent_call_command(_Agent,'actAs'(OtherAgent,Command)):- call_agent_command(OtherAgent,Command).
 
 :- include(logicmoo(vworld/moo_footer)).

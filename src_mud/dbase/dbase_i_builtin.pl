@@ -34,12 +34,14 @@
 :- decl_mpred_hybrid(predTypeMax/3).
 :- decl_mpred_hybrid(argIsa/3).
 
-tCol(tTemporallyExistingThing).
+tCol(tSpatialThing).
 
 tCol(tChannel).
 tCol(ttCompleteExtentAsserted).
 
 predArgTypes(mudFtInfo(ttFormatType,ftTerm)).
+ttCompleteExtentAsserted(mudFtInfo).
+ttCompleteExtentAsserted(ttCompleteExtentAsserted).
 
 :-decl_mpred_hybrid((genlInverse/2,genlPreds/2)).
 
@@ -57,17 +59,17 @@ mudSubclass(isEach(tRegion,tAgentGeneric),tChannel).
 :-decl_mpred_hybrid(mudTextSame(ftText,ftText)).
 
 :- decl_mpred_prolog(stat_total/2).
-:- decl_mpred_prolog(createableSubclassType/2).
+% :- decl_mpred_prolog(createableSubclassType/2).
 :- decl_mpred_prolog(mudMoveDist/2).
 :- decl_mpred_prolog(was_imported_kb_content/2).
-:- must(decl_mpred_prolog(agent_call_command/2)).
+:- must(decl_mpred_prolog(user:agent_call_command/2)).
 
 :-ensure_universal_stub(mudAtLoc,2).
 
 
 :- decl_mpred_hybrid((
      tCol/1, tAgentGeneric/1, tItem/1, tRegion/1,
-     verbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, 
+     instVerbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, 
      mudToHitArmorClass0/2,
 
       tThinking/1,
@@ -78,13 +80,13 @@ mudSubclass(isEach(tRegion,tAgentGeneric),tChannel).
       mudAgentTurnnum/2,
       
       mudAtLoc/2,
-      mudCharge/2,
+      mudEnergy/2,
       mudHealth/2,
       mudDescription/2,
       mudFacing/2,
-      mudCmdfailure/2,
+      mudCmdFailure/2,
       mudSpd/2,
-      mudGrid/4,
+      typeGrid/3,
       mudHeight/2,
       mudMemory/2,
       
@@ -97,14 +99,14 @@ mudSubclass(isEach(tRegion,tAgentGeneric),tChannel).
       wearsClothing/2)).
 
 :- decl_mpred_hybrid((
-      armorLevel/2,
+      mudArmorLevel/2,
       mudLevelOf/2,
       mudToHitArmorClass0/2,
       mudBareHandDamage/2,
       chargeCapacity/2,
-      mudCharge/2,
+      mudEnergy/2,
      tCol/1, tAgentGeneric/1, tItem/1, tRegion/1,
-     verbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, 
+     instVerbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, 
 
       tThinking/1,
  mudWeight/2,
@@ -113,12 +115,12 @@ mudSubclass(isEach(tRegion,tAgentGeneric),tChannel).
       mudAgentTurnnum/2,
       
       mudAtLoc/2,
-      mudCharge/2,
+      mudEnergy/2,
       mudHealth/2,
       mudDescription/2,
       mudFacing/2,
       failure/2,
-      mudGrid/4,
+      gridValue/4,
       mudHeight/2,
       mudMemory/2,
       mudIsa/2,
@@ -138,7 +140,7 @@ mudSubclass(isEach(tRegion,tAgentGeneric),tChannel).
 
 */
 
-:- decl_mpred_hybrid((ttNotCreatableType/1, tCol/1, mudSubclass/2, predArgTypes/1 ,ttCreateable/1)).
+:- decl_mpred_hybrid((ttNotCreatable/1, tCol/1, mudSubclass/2, predArgTypes/1 ,ttCreateable/1)).
 
 
 :- decl_mpred_hybrid(((vFormatted/1,
@@ -149,7 +151,7 @@ mudSubclass(isEach(tRegion,tAgentGeneric),tChannel).
 :- decl_mpred_hybrid mudNamed/2, mudSpd/2.
 :- decl_mpred_hybrid mudStr/2. 
 :- decl_mpred_hybrid mudSubclass/2.
-:- decl_mpred_hybrid mudTypeGrid/3.
+:- decl_mpred_hybrid typeGrid/3.
 :- decl_mpred_hybrid(mudSubclass/2).
 :- decl_mpred_hybrid(prologSingleValued/1).
 :- discontiguous(prologSingleValued/1).
@@ -184,10 +186,10 @@ mudSubclass(isEach(tRegion,tAgentGeneric),tChannel).
 
 tChannel(iGossupChannel).
 
-% ttCreateable(tTemporallyExistingThing).
+% ttCreateable(tSpatialThing).
 
 
-prologMultiValued(mudGrid(tRegion,ftInt,ftInt,tObj)).
+% prologMultiValued(gridValue(tRegion,ftInt,ftInt,tObj)).
 
 
 prologMultiValued(mudSubclass(tCol,tCol)).
@@ -236,14 +238,13 @@ tCol(macroDeclarer).
 :- debug.
 
 
+:-decl_mpred_prolog(verb_alias(ftString,vtVerb)).
 
-prologMultiValued(verb_alias(ftString,ftString)).
+prologHybrid(mudLabelTypeProps(ftString,tCol,ftVoprop)).
 
-prologHybrid(mudLabelTypeProps(ftString,tCol,ftListFn(ftTerm(property)))).
+prologHybrid(typeGrid(tCol,ftInt,ftListFn(ftString))).
 
-prologHybrid(mudTypeGrid(tCol,ftInt,ftTerm)).
-
-prologMultiValued(action_rules(tAgentGeneric,vtVerb,ftTerm(tObj),ftTerm(ftListFn(ftTerm(ftVoprop))))).
+prologMultiValued(user:action_rules(tAgentGeneric,vtVerb,ftTerm(tObj),ftVoprop)).
 
 
 tCol(vtActionTemplate).
@@ -260,13 +261,17 @@ prologSingleValued(mudAtLoc(tObj,xyzFn(tRegion,ftInt,ftInt,ftInt))).
 predArgTypes(resultIsa(tFunction,tCol)).
 predArgTypes(formatted_resultIsa(ttFormatType,tCol)).
 
-formatted_resultIsa(apathFn(tRegion,vtDirection),areaPath).
+formatted_resultIsa(apathFn(tRegion,vtDirection),tPathway).
 formatted_resultIsa(ftDice(ftInt,ftInt,ftInt),ftInt).
-resultIsa(apathFn,areaPath).
+resultIsa(apathFn,tPathway).
 resultIsa(txtFormatFn,ftString).
 
 
-mudSubclass(areaPath,tDoor).
+
+mudSubclass(tPathway,tDoor).
+
+
+
 mudSubclass(tDoor,tFurniture).
 mudSubclass(tFurniture,tPartofObj).
 
@@ -314,7 +319,7 @@ prologMultiValued(mudNamed(ftTerm,ftTerm),[]).
  
 prologHybrid(mudKnowing(tAgentGeneric,ftTerm)).
 prologMultiValued(cmdsuccess(tAgentGeneric,ftAction)).
-prologMultiValued(mudCmdfailure(tAgentGeneric,ftAction)).
+prologMultiValued(mudCmdFailure(tAgentGeneric,ftAction)).
 prologMultiValued(nameStrings(ftTerm,ftString)).
 prologMultiValued(determinerString(ftTerm,ftString)).
 prologMultiValued(descriptionHere(ftTerm,ftString),prologOrdered).
@@ -323,7 +328,7 @@ prologMultiValued(mudKeyword(ftTerm,ftString)).
 prologMultiValued(mudActAffect(ftTerm,ftTerm,ftTerm)).
 prologMultiValued(mudMemory(tAgentGeneric,ftTerm)).
 predArgTypes(mudWearing(tAgentGeneric,tWearAble)).
-predArgTypes(mudLastCmdSuccess(tAgentGeneric,ftTerm)).
+predArgTypes(mudLastCmdSuccess(tAgentGeneric,ftBoolean)).
 
 :-decl_mpred(mudActAffect/3).
 
@@ -339,7 +344,7 @@ mudSubclass(tFurniture,tObj).
 
 % single valued
 predArgTypes(pathName(tRegion,vtDirection,ftString)).
-predArgTypes(verbOverride(ftTerm,ftAction,ftAction),[prologHybrid]).
+predArgTypes(instVerbOverride(ftTerm,ftAction,ftAction),[prologHybrid]).
 
 :-dynamic(spawn_rate/2).
 
@@ -367,7 +372,7 @@ mudSubclass(tWearAble,tItem).
 % we need a way to call this: typeMaxCapacity
 prologSingleValued(predTypeMax(prologSingleValued,tCol,ftInt)).
 % we need a way to call this: maxCapacity
-prologSingleValued(predInstMax(prologSingleValued,ftTerm,ftInt)).
+prologSingleValued(predInstMax(ftID,prologSingleValued,ftInt)).
 
 :- assert_if_new(mpred_prop(localityOfObject,call_tabled)).
 
@@ -416,19 +421,20 @@ prologMultiValued(predProxyQuery(prologMultiValued,ftTerm)).
 
 mudIsa(ftText,ttFormatType).
 
-predArgTypes(type_action_info(ttAgentType,vtActionTemplate,ftText)).
+predArgTypes(user:type_action_info(tCol,vtActionTemplate,ftText)).
 predArgTypes(argIsa(tRelation,ftInt,tCol)).
 predArgTypes(argFormat(tRelation,ftInt,ttFormatType)).
 
 prologOnly(action_template(ftTerm)).
-prologOnly(action_info(vtActionTemplate,ftText)).
-prologOnly(agent_text_command(tAgentGeneric,ftText,tAgentGeneric,ftAction)).
+prologOnly(user:action_info(vtActionTemplate,ftText)).
+prologOnly(user:agent_text_command(tAgentGeneric,ftText,tAgentGeneric,ftAction)).
 
-prologMultiValued(mudDescription(ftTerm,ftText),[predProxyAssert(add_description),predProxyRetract(remove_description),predProxyQuery(query_description)]).
+prologMultiValued(mudDescription(ftTerm,ftText),
+  [predProxyAssert(add_description),predProxyRetract(remove_description),predProxyQuery(query_description)]).
 
 
-mudSubclass(AT,ttAgentGeneric):-mudIsa(AT,ttAgentType).
-mudIsa(AT,ttAgentType):-mudSubclass(AT,ttAgentGeneric).
+%mudSubclass(AT,ttAgentGeneric):-mudIsa(AT,ttAgentType).
+%mudIsa(AT,ttAgentType):-mudSubclass(AT,ttAgentGeneric).
 
 mudSubclass(tMonster,ttAgentGeneric).
 
@@ -442,7 +448,7 @@ tCol(vtVerb).
 ruleEquiv(nameStrings(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
 ruleEquiv(mudDescription(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
 
-% dbase_t(action_info,What,text("command is: ",What)):- holds_t(action_type,What).
+% dbase_t(user:action_info,What,text("command is: ",What)):- holds_t(action_type,What).
 
 :-decl_mpred_hybrid(mudStowing(tAgentGeneric,tItem)).
 
@@ -455,16 +461,16 @@ mudSubclass(tItem,tObj).
 
 
 prologMultiValued(pathName(tRegion,vtDirection,ftString)).
-prologMultiValued(verbOverride(ftTerm,ftAction,ftAction)).
+prologMultiValued(instVerbOverride(ftTerm,ftAction,ftAction)).
 
 prologSingleValued(mudAgentTurnnum(tAgentGeneric,ftInt(0))).
 prologSingleValued(mudAgentTurnnum(tAgentGeneric,ftInt)).
-prologSingleValued(armorLevel(tWearAble,ftInt)).
+prologSingleValued(mudArmorLevel(tWearAble,ftInt)).
 prologSingleValued(mudAttack(tObj,ftInt)).
-prologSingleValued(mudCharge(tChargable,ftInt(500))).
-prologSingleValued(mudCharge(tObj,ftInt),[argSingleValueDefault(2,500)]).
+prologSingleValued(mudEnergy(tChargable,ftInt(500))).
+prologSingleValued(mudEnergy(tObj,ftInt),[argSingleValueDefault(2,500)]).
 prologSingleValued(chargeCapacity(tChargable,ftInt)).
-prologSingleValued(mudCharge(tChargable,ftInt)).
+prologSingleValued(mudEnergy(tChargable,ftInt)).
 prologSingleValued(mudHealth(tObj,ftInt)).
 prologSingleValued(mudArmor(tObj,ftInt)).
 prologSingleValued(mudFacing(tObj,vtDirection(vNorth))).
@@ -490,7 +496,7 @@ prologSingleValued(mudSpd(tAgentGeneric,ftInt)).
 prologSingleValued(stat_total(tAgentGeneric,ftInt)).
 prologSingleValued(mudStm(tAgentGeneric,ftInt)).
 prologSingleValued(mudStr(tAgentGeneric,ftInt)).
-prologSingleValued(mudTypeGrid(regioncol,ftInt,ftListFn(ftTerm))).
+prologSingleValued(typeGrid(tCol,ftInt,ftListFn(ftString))).
 prologSingleValued(mudWeight(tObj,ftInt)).
 
 prologSingleValued(mudHeight(tSpatialThing,ftInt)).
@@ -499,7 +505,7 @@ prologMultiValued(comment(ftTerm,ftString)).
 prologMultiValued(pathBetween(tRegion,vtDirection,tRegion)).
 
 prologOnly(typeProps(tCol,ftVoprop)).
-prologOnly(default_inst_props(ftID,tCol,ftVoprop)).
+prologOnly(instTypeProps(ftID,tCol,ftVoprop)).
 
 
 typeProps(tFood,[mudHeight(0)]).
@@ -509,15 +515,18 @@ typeProps(tSpatialThing,mudHeight(0)).
 
 
 :-decl_type(vtBasicDir).
+
 vtBasicDir(vNorth).
 vtBasicDir(vEast).
 vtBasicDir(vSouth).
 vtBasicDir(vWest).
 
 :-decl_type(vtBasicDirPlusUpDown).
-vtBasicDirPlusUpDown(X):-vtBasicDir(X).
+mudSubclass(vtBasicDir,vtBasicDirPlusUpDown).
 vtBasicDirPlusUpDown(vUp).
 vtBasicDirPlusUpDown(vDown).
+
+mudSubclass(vtBasicDirPlusUpDown,vtDirection).
 
 % :- must((argIsa_call_0(comment,2,W), W\=term)).
 
@@ -552,7 +561,7 @@ mudFtInfo(ftDice(ftInt,ftInt,ftInt),vFormatted).
 mudFtInfo(ftListFn(tCol),vFormatted).
 mudFtInfo(xyzFn(tRegion,ftInt,ftInt,ftInt),vFormatted).
 
-mudFtInfo(ftAction,prologCall(vtActionTemplate(isSelf))).
+mudFtInfo(ftAction,prologCall(is_vtActionTemplate(isSelf))).
 mudFtInfo(ftAtom,prologCall(atom(isSelf))).
 mudFtInfo(ftBoolean,prologCall(member(isSelf,[vTrue,vFalse]))).
 mudFtInfo(ftID,prologCall((atom(isSelf),compound(isSelf)))).
@@ -565,7 +574,7 @@ mudFtInfo(ftTerm,prologCall(nonvar(isSelf))).
 mudFtInfo(ftVar,prologCall(var(isSelf))).
 
 mudSubclass(tAgentGeneric,tSpatialThing).
-mudSubclass(areaPath,tDoor).
+mudSubclass(tPathway,tDoor).
 mudSubclass(tChargeable,tItem).
 mudSubclass(tDoor,tItem).
 mudSubclass(tDrinkable,tItem).
@@ -635,7 +644,8 @@ prologMultiValued(mudKeyword(ftTerm,ftString)).
 prologMultiValued(mudKwLabel(ftTerm,ftString)).
 prologMultiValued(mudActAffect(tItem,vtVerb,ftTerm(ftVoprop))).
 prologMultiValued(mudMemory(tAgentGeneric,ftTerm)).
-prologMultiValued(mudGrid(tRegion,ftInt,ftInt,tObj)).
+prologMultiValued(typeGrid(tCol,ftInt,ftListFn(ftString))).
+prologMultiValued(gridValue(tRegion,ftInt,ftInt,tObj)).
 prologMultiValued(mudSubclass(tCol,tCol)).
 prologMultiValued(mudIsa(ftTerm,tCol)).
 
@@ -656,12 +666,12 @@ prologListValued(aDirectionsFn(ftTerm,ftListFn(ftTerm))).
 
 prologMultiValued(predModule(tRelation,ftAtom)).
 
-prologOnly(agent_call_command(tAgentGeneric,ftAction)).
+prologOnly(user:agent_call_command(tAgentGeneric,ftAction)).
 
 predTypeMax(mudHealth,tObj,500).
-predTypeMax(mudCharge,tObj,130).
+predTypeMax(mudEnergy,tObj,130).
 
-typeProps(tItem,mudCharge(140)).
+typeProps(tItem,mudEnergy(140)).
 
 
 % =================================================================================================

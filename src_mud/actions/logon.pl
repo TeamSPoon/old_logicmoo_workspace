@@ -16,8 +16,8 @@
 :- multifile thlocal:wants_logout/1.
 
 % rename
-action_info(actRename(string),"Rename your player").
-agent_call_command(Agent,actRename(Other)):- padd(Agent,mudNamed(Other)).
+user:action_info(actRename(string),"Rename your player").
+user:agent_call_command(Agent,actRename(Other)):- padd(Agent,mudNamed(Other)).
 
 % become
 verb_alias(become,actLogin).
@@ -26,12 +26,12 @@ verb_alias(become,actLogin).
 verb_alias(logon,actLogin).
 
 % login
-action_info(actLogin(isOptional(tAgentGeneric,isRandom(tAgentGeneric))),"(Re)Login and assume the role of an agent").
-agent_call_command(Agent,actLogin(Other)):- show_call(become_player(Agent,Other)).
+user:action_info(actLogin(isOptional(tAgentGeneric,isRandom(tAgentGeneric))),"(Re)Login and assume the role of an agent").
+user:agent_call_command(Agent,actLogin(Other)):- show_call(become_player(Agent,Other)).
 
 % logout
-action_info(actLogout(isOptional(tAgentGeneric,isSelfAgent)),"logs out of game (quits)").
-agent_call_command(_Agent,actLogout(Other)):-get_agent_session(Other,O),assert(thlocal:wants_logout(O)).
+user:action_info(actLogout(isOptional(tAgentGeneric,isSelfAgent)),"logs out of game (quits)").
+user:agent_call_command(_Agent,actLogout(Other)):-get_agent_session(Other,O),assert(thlocal:wants_logout(O)).
 
 % quit
 verb_alias(quit,actLogout).

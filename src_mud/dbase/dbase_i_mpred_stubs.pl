@@ -31,10 +31,10 @@ get_pifunctor(Head,PHead,F,A):-atom(Head),ensure_arity(Head,A),!,get_pifunctor(H
 % INSTALL STORAGE STUBS
 % ================================================================================
 
-user:decl_database_hook(assert(_),mpred_prop(F,StubType)):- tPredStubImpl(StubType),must(add_storage_stub(StubType,F)).
-user:decl_database_hook(assert(_),mpred_prop(F,predStubType(StubType))):- add_storage_stub(StubType,F).
-user:decl_database_hook(assert(_),mudIsa(F,(StubType))):- tPredStubImpl(StubType),must(add_storage_stub(StubType,F)).
-user:decl_database_hook(assert(_),mudIsa(F,predStubType(StubType))):- add_storage_stub(StubType,F).
+%user:decl_database_hook(assert(_),mpred_prop(F,StubType)):- tPredStubImpl(StubType),must(add_storage_stub(StubType,F)).
+%user:decl_database_hook(assert(_),mpred_prop(F,predStubType(StubType))):- add_storage_stub(StubType,F).
+%user:decl_database_hook(assert(_),mudIsa(F,(StubType))):- tPredStubImpl(StubType),must(add_storage_stub(StubType,F)).
+%user:decl_database_hook(assert(_),mudIsa(F,predStubType(StubType))):- add_storage_stub(StubType,F).
 
 
 decl_mpred_stubcol(F,A,StubType):-loop_check(decl_mpred_stubcol_lc(F,A,StubType),dmsg(looping_decl_mpred_stubcol_lc(F,A,StubType))).
@@ -49,15 +49,15 @@ has_storage_stub(prologOnly,Head):-
      get_functor(Head,F),mpred_prop(F,hasStub(StubType)),must(tPredStubImpl(StubType)),!.
 has_storage_stub(StubType,Head):-       
       get_pifunctor(Head,PHead,F),mpred_prop(F,hasStub(StubType)),must(tPredStubImpl(StubType)),
-      predicate_property(PHead,number_of_rules(1)),
+      predicate_property(PHead,number_of_rules(_)),
       predicate_property(PHead,number_of_clauses(1)),!,
-      user:clause(PHead,call_provided_mpred_storage_op(call(_),PHead,_)).
+      user:clause(PHead,(!,call_provided_mpred_storage_op(call(_),PHead,_))).
       
 
 
-
+must_have_storage_stub(StubType,Head):-!.
 must_have_storage_stub(StubType,Head):-
- (has_storage_stub(StubType,Head)->true;(get_functor(Head,F),listing(F),term_listing(F),listing(F),dtrace(add_storage_stub(StubType,Head)))).
+ (has_storage_stub(StubType,Head)->true;(get_functor(Head,F),listing(F),term_listing(F),listing(F),add_storage_stub(StubType,Head))).
 
 :-dynamic_multifile_exported(ensure_universal_stub/1).
 ensure_universal_stub(F):- must_det(mpred_arity(F,A)),add_storage_stub(prologHybrid,F/A).
@@ -106,8 +106,8 @@ add_storage_op(OP,Head,StubType):-
          asserta_if_new(provide_mpred_currently(OP,Head,StubType,Result)))).
 
 
-add_stub_now(PHead,StubType,OP):- predicate_property(PHead,number_of_clauses(NC)),NC>0,!,asserta_if_new(PHead:-call_provided_mpred_storage_op(OP,PHead,StubType)).
-add_stub_now(PHead,StubType,OP):- asserta_if_new(PHead:-call_provided_mpred_storage_op(OP,PHead,StubType)).
+add_stub_now(PHead,StubType,OP):- predicate_property(PHead,number_of_clauses(NC)),NC>0,!,asserta_if_new((PHead :- (!,call_provided_mpred_storage_op(OP,PHead,StubType)))).
+add_stub_now(PHead,StubType,OP):- asserta_if_new((PHead:- (!,call_provided_mpred_storage_op(OP,PHead,StubType)))).
 
 :-export(call_provided_mpred_storage_op/3).    
 call_provided_mpred_storage_op(OP,Head,StubType):-
@@ -159,6 +159,28 @@ same_functors(Head1,Head2):-must_det(get_functor(Head1,F1,A1)),must_det(get_func
 ensure_exists(Head):-get_pifunctor(Head,PHead,F),get_functor(Head,F,A),(predicate_property(PHead,dynamic)->true;(predicate_property(PHead,_)->dmsg(warn(static_pred,F/A));dynamic(F/A))).
 
 
+
+database_modify(P,G):- thlocal:noDBaseMODs(_),!,dmsg(noDBaseMODs(P,G)).
+database_modify(P,M:G):-nonvar(M),!,database_modify(P,G).
+%database_modify(assert(_),G):- was_isa(G,I,C),!,assert_hasInstance(C,I),!.
+database_modify(assert(a),G):- !,asserta(G).
+database_modify(assert(z),G):- !,assertz(G).
+database_modify(retract(all),G):- !,doall(retract(G)).
+database_modify(retract(_),G):- !,must(retract(G)).
+database_modify(OP,HeadBody):- current_predicate(get_mpred_storage_provider/3),
+  one_must(show_call_failure(get_mpred_storage_provider(OP,HeadBody,StubType)),
+   StubType=prologOnly),
+  must(call_provided_mpred_storage_op(OP,HeadBody,StubType)).
+
+database_check(P,M:G):-nonvar(M),!,database_check(P,G).
+%database_check(clause_asserted,G):-!,was_isa(G,I,C),moo:hasInstance_dyn(C,I),!.
+%database_check(mpred_asserted,G):-!,was_isa(G,I,C),moo:hasInstance_dyn(C,I),!.
+database_check(OP,HeadBody):- current_predicate(get_mpred_storage_provider/3),
+  one_must(show_call_failure(get_mpred_storage_provider(OP,HeadBody,StubType)),StubType=prologOnly),
+  call_provided_mpred_storage_op(OP,HeadBody,StubType).
+database_check(OP,HeadBody):- debugOnError(call(OP,HeadBody)).
+
+/*
 database_modify(P,G):- thlocal:noDBaseMODs(_),!,dmsg(noDBaseMODs(P,G)).
 database_modify(P,M:G):-nonvar(M),!,database_modify(P,G).
 database_modify(assert(_),G):- was_isa(G,I,C),!,assert_hasInstance(C,I),!.
@@ -172,7 +194,7 @@ database_check(clause_asserted,G):-!,was_isa(G,I,C),user:hasInstance_dyn(C,I),!.
 database_check(OP,HeadBody):-
   one_must(show_call_failure(get_mpred_storage_provider(OP,HeadBody,StubType)),StubType=prologOnly),
   call_provided_mpred_storage_op(OP,HeadBody,StubType).
-
+*/
 
 
 call_wdmsg(P,DB):- thlocal:noDBaseMODs(_),!,wdmsg(error(noDBaseMODs(P,DB))).
@@ -258,7 +280,7 @@ make_body_clause(_Head,Body,Body):-special_wrapper_body(Body),!.
 make_body_clause(Head,Body,call_mpred_body(Head,Body)).
 
 
-special_head(_,agent_text_command):-!,fail.
+special_head(_,user:agent_text_command):-!,fail.
 special_head(Head,_):- provide_mpred_currently(_OP,Head,StubType,Will),Will=declared(_),!,StubType\==prologOnly.
 special_head(_,F):-mpred_prop(F,hasStub(StubType)),!,StubType\==prologOnly.
 special_head(_,F):-mpred_prop(F,predStubType(StubType)),!,StubType\==prologOnly.

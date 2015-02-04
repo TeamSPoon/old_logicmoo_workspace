@@ -457,7 +457,7 @@ recreate(F/A):-dynamic(F/A),functor(P,F,A),retractall(P),!.
 :- decl_mpred_hybrid(mudSubclass/2).
 :- decl_mpred_hybrid(mudActionMaxDistance(vtActionType,ttObjectType,ftInt)).
 
-to_personal(mudCharge,mudCharge).
+to_personal(mudEnergy,mudEnergy).
 to_personal(Pred,APred):-atom_concat('',Pred,APred).
 
 do_define_affordance(LIST):-(member(subjType= SType,LIST);member(alsoType= SType,LIST)),i_name('t',SType,Type),!,
@@ -515,7 +515,7 @@ call_clause_last(CLREAL,Goal):-functor(CLREAL,F,A),functor(Goal,GF,GA),functor(C
      (call(EACH) -> ! ; ignore(show_call_failure(Goal))),!.
   
 % this is doing a trick to make sure it gets called very last
-agent_call_command(Agent,Templ) :- call((nonvar(Templ),simbots_templates(Templ))),!,call_clause_last(agent_call_command(Agent,Templ),agent_call_command_simbots_real(Agent,Templ)).
+user:agent_call_command(Agent,Templ) :- call((nonvar(Templ),simbots_templates(Templ))),!,call_clause_last(user:agent_call_command(Agent,Templ),agent_call_command_simbots_real(Agent,Templ)).
 
 % args_match_types(ARGS,Type).
 %args_match_types([],_):-!,fail.
@@ -541,19 +541,19 @@ affordance_message(Agent,Templ,Template):- Templ=..[ActVerb|ARGS],
 verb_desc_or_else(ActVerb,Types,Mesg):-verb_desc(ActVerb,Types,Mesg).
 verb_desc_or_else(ActVerb,Types,verb_desc(ActVerb,Types)):-nonvar(ActVerb),nonvar(Types),not(verb_desc(ActVerb,Types,_)).
 
-agent_call_command(Agent,Templ):- simbots_templates(Templ), (fmt(agent_call_command_simbots_real_3(Agent,Templ)),fail).
+user:agent_call_command(Agent,Templ):- simbots_templates(Templ), (fmt(agent_call_command_simbots_real_3(Agent,Templ)),fail).
 
-action_info(actDo(vtVerb,ftListFn(ftTerm)),"reinterps a action").
-agent_call_command(Agent,actDo(A)):-CMD=..[A],!,agent_call_command(Agent,CMD).
-agent_call_command(Agent,actDo(A,B)):-CMD=..[A,B],!,agent_call_command(Agent,CMD).
-agent_call_command(Agent,actDo(A,B,C)):- CMD=..[A,B,C],!,agent_call_command(Agent,CMD).
-agent_call_command(Agent,actDo(A,B,C,D)):- CMD=..[A,B,C,D],!,agent_call_command(Agent,CMD).
-agent_call_command(Agent,actDo(A,B,C,D,E)):- CMD=..[A,B,C,D,E],!,agent_call_command(Agent,CMD).
+user:action_info(actDo(vtVerb,ftListFn(ftTerm)),"reinterps a action").
+user:agent_call_command(Agent,actDo(A)):-CMD=..[A],!,user:agent_call_command(Agent,CMD).
+user:agent_call_command(Agent,actDo(A,B)):-CMD=..[A,B],!,user:agent_call_command(Agent,CMD).
+user:agent_call_command(Agent,actDo(A,B,C)):- CMD=..[A,B,C],!,user:agent_call_command(Agent,CMD).
+user:agent_call_command(Agent,actDo(A,B,C,D)):- CMD=..[A,B,C,D],!,user:agent_call_command(Agent,CMD).
+user:agent_call_command(Agent,actDo(A,B,C,D,E)):- CMD=..[A,B,C,D,E],!,user:agent_call_command(Agent,CMD).
 
-action_info(actTextcmd(ftString),"reinterps a term as text").
-agent_call_command(Agent,actTextcmd(A)):-sformat(CMD,'~w',[A]),!,do_player_action(Agent,CMD).
-agent_call_command(Agent,actTextcmd(A,B)):-sformat(CMD,'~w ~w',[A,B]),!,do_player_action(Agent,CMD).
-agent_call_command(Agent,actTextcmd(A,B,C)):-sformat(CMD,'~w ~w ~w',[A,B,C]),!,do_player_action(Agent,CMD).
+user:action_info(actTextcmd(ftString),"reinterps a term as text").
+user:agent_call_command(Agent,actTextcmd(A)):-sformat(CMD,'~w',[A]),!,do_player_action(Agent,CMD).
+user:agent_call_command(Agent,actTextcmd(A,B)):-sformat(CMD,'~w ~w',[A,B]),!,do_player_action(Agent,CMD).
+user:agent_call_command(Agent,actTextcmd(A,B,C)):-sformat(CMD,'~w ~w ~w',[A,B,C]),!,do_player_action(Agent,CMD).
 
 
 mudSubclass(tShelf,tHasSurface).
@@ -590,8 +590,8 @@ verb_alias("observe",actUse).
 verb_alias("operate",actUse).
 
 
-action_info(Templ,DESC):-verb_desc(V,O,DESC),Templ=..[V,O].
-action_info(Templ,text([verb_for_type,V,O,DOC])):- no_repeats([V,O],verb_affordance(V,O,_,_,_)),Templ=..[V,O], 
+user:action_info(Templ,DESC):-verb_desc(V,O,DESC),Templ=..[V,O].
+user:action_info(Templ,text([verb_for_type,V,O,DOC])):- no_repeats([V,O],verb_affordance(V,O,_,_,_)),Templ=..[V,O], 
                   findall(pir(P,I,R),((verb_affordance(V, O,P,I,R))),DOC).
 
 vtActionTemplate(Templ):-simbots_templates(Templ).

@@ -18,7 +18,7 @@
 vtActionTemplate(actDrop(tDropable)).
 
 % Drop something
-agent_call_command(Agent,actDrop(Obj)) :-
+user:agent_call_command(Agent,actDrop(Obj)) :-
 	mudPossess(Agent,Obj),        
         clr(mudPossess(Agent,Obj)),
         must(not((mudPossess(Agent,Obj)))),
@@ -27,14 +27,14 @@ agent_call_command(Agent,actDrop(Obj)) :-
 	must(call_update_charge(Agent,actDrop)).
 
 %Nothing to drop
-agent_call_command(Agent,actDrop(_)) :-
+user:agent_call_command(Agent,actDrop(_)) :-
 	call_update_charge(Agent,actDrop),
 	(add_cmdfailure(Agent,actDrop)).
 
 % Record keeping
-update_charge(Agent,actDrop) :- add(mudCharge(Agent,-1)).
+update_charge(Agent,actDrop) :- add(mudEnergy(Agent,-1)).
 
-agent_text_command(Agent,[actDrop,X],Agent,actDrop(X)).
+user:agent_text_command(Agent,[actDrop,X],Agent,actDrop(X)).
 
 %:-must_det(show_call(get_agent_text_command(agent1,[drop,item1],_R,_CMD))).
 

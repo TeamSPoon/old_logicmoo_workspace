@@ -43,7 +43,7 @@ explorer_idea(Agent,actEat(Elixer)) :-
    mudIsa(Elixer,tElixer).
 
 explorer_idea(Agent,actEat(tFood)) :-
-	mudCharge(Agent,Charge),
+	mudEnergy(Agent,Charge),
 	Charge < 150,
    mudPossess(Agent,List),
    obj_memb(Food,List),

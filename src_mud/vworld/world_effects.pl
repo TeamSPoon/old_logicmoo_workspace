@@ -26,12 +26,12 @@ do_act_affect(Agent,Action,Obj) :-
 	fail. % fail to check for charge too
 % Charge up those batteries
 do_act_affect(Agent,Action,Obj) :-
-          props(Obj,mudActAffect(Action,mudCharge(NRG))),
-	req(mudCharge(Agent,Chg)),
+          props(Obj,mudActAffect(Action,mudEnergy(NRG))),
+	req(mudEnergy(Agent,Chg)),
 	req(mudStm(Agent,Stm)),
-	predInstMax(mudCharge,Agent,Max),
+	predInstMax(Agent,mudEnergy,Max),
 	(Chg + NRG) < (((Stm * 10) -20) + Max),
-	add(mudCharge(Agent,+NRG)),
+	add(mudEnergy(Agent,+NRG)),
 	fail. % fail to check for healing
 % Heal
 do_act_affect(Agent,Action,Obj) :-
@@ -39,21 +39,21 @@ do_act_affect(Agent,Action,Obj) :-
 	req((mudHealth(Agent,Dam),
              mudStm(Agent,Stm),
              mudStr(Agent,Str))),
-	req(predInstMax(mudHealth,Agent,Max)),
+	req(predInstMax(Agent,mudHealth,Max)),
 	(Dam + Hl) < ((((Stm * 10) -20) + ((Str * 5) - 10)) + Max),
-	add(mudCharge(Agent,+Hl)),
+	add(mudEnergy(Agent,+Hl)),
 	!.
 do_act_affect(_,_,_).
 
 
 % Check to see if last action was successful or not
-:-dynamic_multifile_exported(success/2).
-mudLastCmdSuccess(Agent,YN) :- mudCmdfailure(Agent,_)-> YN=no ; YN=yes.
+:-dynamic_multifile_exported(mudLastCmdSuccess/2).
+mudLastCmdSuccess(Agent,YN) :- mudCmdFailure(Agent,_)-> YN=vFalse ; YN=vTrue.
 
 :-dynamic_multifile_exported(add_cmdfailure/2).
-add_cmdfailure(Agent,What):-add(mudCmdfailure(Agent,What)).
+add_cmdfailure(Agent,What):-add(mudCmdFailure(Agent,What)).
 
-user:decl_database_hook(assert(_),mudCmdfailure(Agent,What)):- /*once(idel(cmdsuccess(Agent,What));*/clr(cmdsuccess(Agent,_)).
+user:decl_database_hook(assert(_),mudCmdFailure(Agent,What)):- /*once(idel(cmdsuccess(Agent,What));*/clr(cmdsuccess(Agent,_)).
 
 % Initialize world.
 % This keeps the old databases messing with new runs.
@@ -95,9 +95,9 @@ process_stats(Agent,mudStm(Stm)) :-
 	req(mudHealth(Agent,Dam)),
 	NewDam is (((Stm * 10) - 20) + Dam),
 	add(mudHealth(Agent,NewDam)),
-	req(mudCharge(Agent,NRG)),
+	req(mudEnergy(Agent,NRG)),
 	Charge is (((Stm * 10) - 20) + NRG),
-	add(mudCharge(Agent,Charge)),
+	add(mudEnergy(Agent,Charge)),
 	add(stat_total(Agent,+Stm)).
 
 process_stats(Agent,mudSpd(Spd)) :-

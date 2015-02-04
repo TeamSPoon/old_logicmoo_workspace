@@ -33,17 +33,17 @@ rez_to_inventory(Agent,NameOrType,NewObj):-
    mudPossess(Agent,NewObj)]).
 
 
-action_info(actRez(isOneOf([tCol,ftTerm])),"Rezes a new 'item' of some NameOrType into mudStowing inventory").
-agent_call_command(Agent,actRez(NameOrType)):- nonvar(NameOrType),
+user:action_info(actRez(isOneOf([tCol,ftTerm])),"Rezes a new 'item' of some NameOrType into mudStowing inventory").
+user:agent_call_command(Agent,actRez(NameOrType)):- nonvar(NameOrType),
         must(rez_to_inventory(Agent,NameOrType,NewObj)),
         fmt([rezed,NameOrType,NewObj]).
 
 % ====================================================
 % object/col creation
 % ====================================================
-action_info(actCreate(ftListFn(ftTerm)), "Rezes a new 'tSpatialThing' or creates a new 'col' of some NameOrType and if it's an 'item' it will put in mudStowing inventory").
+user:action_info(actCreate(ftListFn(ftTerm)), "Rezes a new 'tSpatialThing' or creates a new 'col' of some NameOrType and if it's an 'item' it will put in mudStowing inventory").
 
-agent_call_command(Agent,actCreate(SWhat)):- with_all_dmsg(must_det(create_new_object(Agent,SWhat))).
+user:agent_call_command(Agent,actCreate(SWhat)):- with_all_dmsg(must_det(create_new_object(Agent,SWhat))).
 
 :-decl_mpred_prolog(authorWas(ftTerm,ftTerm)).
 :-decl_mpred_prolog(current_pronoun(tAgentGeneric,ftString,ftTerm)).

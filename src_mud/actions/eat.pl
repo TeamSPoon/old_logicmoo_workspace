@@ -23,12 +23,12 @@
 :- register_module_type(mtCommand).
 
 mudSubclass(tFood,tEatAble).
-action_info(actEat(tEatAble),"nourish oneself").
+user:action_info(actEat(tEatAble),"nourish oneself").
 
 % Eat something held
 % Check to make sure it's in the agents possession... 
 % if it is, process it's worth, then destroy it
-agent_call_command(Agent,actEat(Obj)) :-
+user:agent_call_command(Agent,actEat(Obj)) :-
 	mudPossess(Agent,Obj),
 	must((do_act_affect(Agent,actEat,Obj))),
         dmsg_show(_),
@@ -37,8 +37,8 @@ agent_call_command(Agent,actEat(Obj)) :-
 	must((call_update_charge(Agent,actEat))).
 
 update_charge(Agent,actEat) :-
-	del(mudCharge(Agent,Old)),
+	del(mudEnergy(Agent,Old)),
 	New is Old - 1,
-	add(mudCharge(Agent,New)).
+	add(mudEnergy(Agent,New)).
 
 :- include(logicmoo(vworld/moo_footer)).

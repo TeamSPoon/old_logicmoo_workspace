@@ -18,7 +18,7 @@
 vtActionTemplate(actTake(tCarryAble)).
 
 % Command Hook
-agent_call_command(Agent,actTake(Obj)) :- 
+user:agent_call_command(Agent,actTake(Obj)) :- 
   not(action_verb_useable(actTake,_,_,_,_)),
   agent_call_take(Agent,Obj).
 
@@ -76,6 +76,6 @@ must_post_for_take(Agent,Obj):-
 
 % Record keeping
 update_charge(Agent,actTake) :- 
-        padd(Agent,mudCharge(-2)).
+        padd(Agent,mudEnergy(-2)).
 
 :- include(logicmoo(vworld/moo_footer)).

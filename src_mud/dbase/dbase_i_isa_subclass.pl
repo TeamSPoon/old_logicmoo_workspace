@@ -12,6 +12,8 @@
 % Douglas Miles
 */
 
+:- include(logicmoo('vworld/moo_header.pl')).
+
 :- dynamic_multifile_exported fact_always_true/1.
 
 :- ensure_loaded(dbase_i_isa_motel).
@@ -101,7 +103,7 @@ assert_isa(I,T):- loop_check(assert_isa_lc(I,T),true).
 :-dynamic_multifile_exported(assert_isa_lc/2).
 % skip formatter cols
 assert_isa_lc(_I,T):- member(T,[ftString,ftAction,vtDirection,apathFn]),!.
-assert_isa_lc(I,T):- hotrace(ttFormatType(T)),(compound(I)->true;dmsg(once(dont_assert_is_ft(I,T)))).
+assert_isa_lc(I,T):- hotrace(ttFormatType(T)),(compound(I)->true;dmsg(once(dont_assert_is_ft(I,T)))),rtrace((ttFormatType(T))).
 assert_isa_lc(I,T):- cannot_table_call(isa_asserted(I,T)),!.
 assert_isa_lc(_,T):- once(decl_type(T)),fail.
 assert_isa_lc(I,tCol):- decl_type(I),!.
@@ -147,12 +149,13 @@ assert_isa_hooked_after(_,ttFormatType):-!.
 assert_isa_hooked_after(I,T):- not(ttCompleteExtentAsserted(T)),impliedSubClass(T,ST),ttCompleteExtentAsserted(ST),assert_isa(I,ST).
 %assert_isa_hooked_after(I,T):- assert_isa_hooked_creation(I,T).
 
-ttCompleteExtentAsserted(Ext):- arg(_,vv(tCol,vtDirection,ttFormatType,ftString),Ext).
-ttCompleteExtentAsserted(F):- ttCreateable(F).
+ttCompleteExtentAsserted(Ext):- arg(_,vv(tCol,vtDirection,ttFormatType,ftString,genlPreds),Ext).
+%ttCompleteExtentAsserted(F):- ttCreateable(F).
 ttCompleteExtentAsserted(F):- is_pred_declarer(F).
-ttCompleteExtentAsserted(F):- (isa_asserted(F,ttCompleteExtentAsserted)).
+%ttCompleteExtentAsserted(F):- (isa_asserted(F,ttCompleteExtentAsserted)).
 
 
+is_vtActionTemplate(C):-nonvar(C),get_functor(C,F),!,atom_concat(act,_,F).
 
 
 % one of 4 special cols
@@ -310,12 +313,12 @@ isa_w_type_atom(I,T):- G=..[T,I],once_if_ground(isa_atom_call(T,G),_).
 
 dont_call_type_arity_one(tCol).
 dont_call_type_arity_one(ttFormatType).
-dont_call_type_arity_one(ttAgentType).
+%dont_call_type_arity_one(ttAgentType).
 dont_call_type_arity_one(F):-mpred_prop(F,predStubType(prologHybrid)),!.
 
 isa_atom_call(T,G):-loop_check(isa_atom_call_lc(T,G),fail).
 
-isa_atom_call_lc(_,G):- predicate_property(G,builtin),!,G.
+isa_atom_call_lc(_,G):- predicate_property(G,built_in),!,G.
 isa_atom_call_lc(Type,_):-dont_call_type_arity_one(Type),!,fail.
 isa_atom_call_lc(_,G):- predicate_property(G,number_of_clauses(_)),!,clause(G,B),call_mpred_body(G,B).
 isa_atom_call_lc(_,G):- predicate_property(G,number_of_rules(R)),R>0,!,G.
@@ -328,6 +331,8 @@ cached_isa(I,T):-hotrace(isa_backchaing(I,T)).
 % ============================================
 :- dynamic_multifile_exported never_type/1.
 :- dynamic_multifile_exported decl_type/1.
+
+:- dynamic_multifile_exported user:tCol/1.
 
 tCol(vtDirection).
 tCol(tCol).
@@ -402,14 +407,12 @@ is_known_true(F):-is_known_false0(F),!,fail.
 is_known_true(mudIsa(X,tSpatialThing)):- (isa_asserted(X,_)),is_known_false0(mudIsa(X,tCol)),is_known_false0(mudIsa(X,ttFormatType)),is_known_false0(mudIsa(X,tPred)).
 is_known_true(mudSubclass(X,X)).
 is_known_true(mudIsa(_,ftID)).
-is_known_true(mudIsa(apathFn(_,_),areaPath)).
+is_known_true(mudIsa(apathFn(_,_),tPathway)).
 is_known_true(mudIsa(apathFn(_,_),apathFn)).
 is_known_true(mudIsa(_,ftTerm)).
 
 :-listing(is_known_trew/1).
-:-prolog.
-is_known_trew(mudIsa(tContainer,ttCompleteExtentAsserted)).
-% is_known_trew(isa(formattype,metaclass)).
+
 is_known_trew(mudIsa(ttCompleteExtentAsserted,ttCompleteExtentAsserted)).
 is_known_trew(mudIsa(tCol,ttCompleteExtentAsserted)).
 is_known_trew(mudSubclass(tRegion,tChannel)).
@@ -419,7 +422,7 @@ is_known_trew(mudIsa(tRegion,ttCreateable)).
 is_known_trew(mudIsa(prologSingleValued, ttCompleteExtentAsserted)).
 is_known_trew(mudIsa(ttCreateable,ttCompleteExtentAsserted)).
 is_known_trew(mudIsa(ttFormatType,ttCompleteExtentAsserted)).
-is_known_trew(mudIsa(ftInt,ttNotCreatableType)).
+is_known_trew(mudIsa(ftInt,ttNotCreatable)).
 is_known_trew(mudIsa(tCol,tCol)).
 is_known_trew(mudIsa(prologSingleValued, tCol)).
 is_known_trew(mudIsa(ttCompleteExtentAsserted, tCol)).
@@ -427,13 +430,12 @@ is_known_trew(mudSubclass(ttCompleteExtentAsserted, extentDecidable)).
 is_known_trew(mudSubclass(prologSingleValued, extentDecidable)).
 is_known_trew(mudSubclass('MaleAnimal',tAgentGeneric)).
 is_known_trew(mudSubclass(ttFormatType,tCol)).
-is_known_trew(mudIsa(tCol,ttNotCreatableType)).
+is_known_trew(mudIsa(tCol,ttNotCreatable)).
 is_known_trew(mudIsa(tItem,ttCreateable)).
-is_known_trew(mudSubclass(tItem,ttCreateable)).
-is_known_trew(mudIsa(ttFormatType,ttNotCreatableType)).
-is_known_trew(mudSubclass(ttFormatType,ttNotCreatableType)).
-is_known_trew(mudIsa(tTemporallyExistingThing, 'ttCreateable')).
-is_known_trew(mudIsa(ftTerm,ttNotCreatableType)).
+is_known_trew(mudIsa(ttFormatType,ttNotCreatable)).
+is_known_trew(mudSubclass(ttFormatType,ttNotCreatable)).
+is_known_trew(mudIsa(tSpatialThing, 'ttCreateable')).
+is_known_trew(mudIsa(ftTerm,ttNotCreatable)).
 is_known_trew(mudIsa(I,C)):-hasInstance(C,I).
 is_known_trew(mudSubclass(predArgTypes,tRelation)).
 is_known_trew(mudSubclass(tFunction,tRelation)).
@@ -466,15 +468,15 @@ is_known_false0(mudSubclass(Type,_)):-arg(_,vv(tCol,tRelation,ttFormatType),Type
 not_mud_isa(tAgentGeneric,ttFormatType).
 not_mud_isa(tItem,ttFormatType).
 not_mud_isa(tCol,ttFormatType).
-not_mud_isa(tObj, ttCompleteExtentAsserted).
-not_mud_isa(tObj, ttCreateable).
+%not_mud_isa(tObj, ttCompleteExtentAsserted).
+%not_mud_isa(tObj, ttCreateable).
 not_mud_isa(prologMacroHead, ttFormatType).
 not_mud_isa(tObj, ttFormatType).
 not_mud_isa(ttFormatType,ttFormatType).
 not_mud_isa(mudSubclass,tCol).
-not_mud_isa(tTemporallyExistingThing, tTemporallyExistingThing).
-not_mud_isa(ttCreateable,tTemporallyExistingThing).
-not_mud_isa(tTemporallyExistingThing,ttCreateable).
+not_mud_isa(tSpatialThing, tSpatialThing).
+not_mud_isa(ttCreateable,tSpatialThing).
+not_mud_isa(tSpatialThing,ttCreateable).
 not_mud_isa(Type,ttFormatType):- \+ (hasInstance(ttFormatType, Type)).
 not_mud_isa(Type, prologMacroHead):- \+ (mpred_prop(Type, prologMacroHead)).
 not_mud_isa(Type, ttCompleteExtentAsserted):- \+ (mpred_prop(Type, ttCompleteExtentAsserted)).
@@ -493,7 +495,7 @@ disjointWith0(tRegion,tObj).
 disjointWith0(ttFormatType,tItem).
 disjointWith0(ttFormatType,tObj).
 disjointWith0(ttFormatType,tRegion).
-disjointWith0(ttCreateable,ttNotCreatableType).
+disjointWith0(ttCreateable,ttNotCreatable).
 
 disjointWithT(A,B):-disjointWith0(A,B).
 disjointWithT(B,A):-disjointWith0(A,B).
@@ -506,7 +508,7 @@ disjointWith(A,B):- once((type_isa(A,AT),type_isa(B,BT))),AT \= BT.
 :- assert_hasInstance(ttFormatType,ftString).
 :- assert_hasInstance(tCol,tContainer).
 /*
-'$toplevel':mudIsa(X,Y):-call_provided_mpred_storage_op(call(conjecture),
+'$toplevel':mudIsa(X,Y):-!, call_provided_mpred_storage_op(call(conjecture),
                                        mudIsa(A, B),
                                        prologHybrid).
 
@@ -514,6 +516,6 @@ disjointWith(A,B):- once((type_isa(A,AT),type_isa(B,BT))),AT \= BT.
 user:goal_expansion(G,mudIsa(I,C)):-notrace((was_isa(G,I,C),(is_ftVar(C)->true;(not(mpred_prop(C,prologOnly)))))).
 user:term_expansion(G,mudIsa(I,C)):-notrace((was_isa(G,I,C),(is_ftVar(C)->true;(not(mpred_prop(C,prologOnly)))))).
 
-ttFormatType(I):- clause(mudFtInfo(I,_),true).
-ttFormatType(I):- clause(mudSubclass(I,_),true).
+ttFormatType(I):- mudFtInfo(I,_).
+ttFormatType(I):- mudSubclass(I,FT),I\=FT,ttFormatType(FT).
 

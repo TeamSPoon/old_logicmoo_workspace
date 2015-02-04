@@ -63,11 +63,11 @@ is_3d(LOC):- compound(LOC).
 
 % Quintus random(1,MaxX,X) and random(1,MaxY,Y)
 grid_size(Region,MaxX,MaxY,MaxZ):- fail,
-    tbox:mudTypeGrid(What,1,L),
+    typeGrid(What,1,L),
    mudIsa(Region,What),!,
    maxZ(MaxZ),
 	length(L,MaxX),
-	findall(1,tbox:mudTypeGrid(What,_,_),LL),
+	findall(1,typeGrid(What,_,_),LL),
 	length(LL,MaxY),!.
 
 grid_size(_Room,MaxX,MaxY,MaxZ):- MaxX = 5 ,MaxY = 5 ,maxZ(MaxZ) ,!.
@@ -101,7 +101,7 @@ init_location_grid(LocName,LocType):-
 
 % process map file (world.map.pl)
 init2(LocName,LocType,Y,1) :-
-	mudGrid(LocName,1,Y,L),
+	gridValue(LocName,1,Y,L),
 	!,
 	init3(LocName,LocType,xyzFn(LocName,1,Y,_),L).
 init2(_LocName,_LocType,_,_).
@@ -154,7 +154,7 @@ locs_near_i(L1,L2):- locationToRegion(L1,R),pathBetween_call(R,_,R2),in_grid_no_
 mudNearbyRegions(R1,R2):-pathBetween_call(R1,_,R2).
 mudNearbyRegions(R1,R1).
 
-% 345345  default_inst_props(OfAgent,agent,[facing(F),atloc(L)]):-  dfsdfd ignore((nonvar(OfAgent),create_someval(facing,OfAgent,F),create_someval(atloc,OfAgent,L))).
+% 345345  instTypeProps(OfAgent,agent,[facing(F),atloc(L)]):-  dfsdfd ignore((nonvar(OfAgent),create_someval(facing,OfAgent,F),create_someval(atloc,OfAgent,L))).
 
 transitive_other(mudAtLoc,1,Obj,What):-mudInsideOf(Obj,What).
 % transitive_other(localityOfObject,1,Obj,What):-mudInsideOf(Obj,What).

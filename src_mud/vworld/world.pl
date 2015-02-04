@@ -149,10 +149,10 @@ create_meta(SuggestedName,SuggestedClass,BaseClass,SystemName):-
    assert_isa_safe(SystemName,SuggestedClass).
 
 
-:-decl_type(ttNotCreatableType).
+:-decl_type(ttNotCreatable).
 
-ttNotCreatableType(ftInt).
-ttNotCreatableType(ftTerm).
+ttNotCreatable(ftInt).
+ttNotCreatable(ftTerm).
 
 mudSubclass(tWearAble,tItem).
 mudSubclass(tLookAble,tItem).
@@ -160,14 +160,14 @@ mudSubclass(tKnife,tItem).
 mudSubclass(tFood,tItem).
 
 
-ttCreateable(FT):- nonvar(FT),ttFormatType(FT),!,fail.
-ttCreateable(FT):- nonvar(FT),ttNotCreatableType(FT),!,fail.
-ttCreateable(tItem). %  col, formattype, 
+%ttCreateable(FT):- nonvar(FT),ttFormatType(FT),!,fail.
+%ttCreateable(FT):- nonvar(FT),ttNotCreatable(FT),!,fail.
+%ttCreateable(tItem). %  col, formattype, 
 ttCreateable(SubType):-member(SubType,[tAgentGeneric,tItem,tRegion]).
-ttCreateable(S):- is_asserted(ttCreateable(T)), impliedSubClass(S,T).
+%ttCreateable(S):- is_asserted(ttCreateable(T)), impliedSubClass(S,T).
 
-createableSubclassType(S,T):-call_mpred(  ttCreateable(T)),is_asserted(mudSubclass(S,T)).
-%createableSubclassType(T,tTemporallyExistingThing):-call_mpred( ttCreateable(T)).
+%createableSubclassType(S,T):-call_mpred(  ttCreateable(T)),is_asserted(mudSubclass(S,T)).
+%createableSubclassType(T,tSpatialThing):-call_mpred( ttCreateable(T)).
 
 mudIsa(ftInt,ttFormatType).
 mudIsa(vtDirection,ttValueType).
@@ -218,8 +218,8 @@ mudSubclass(tExplorer,tAgentGeneric).
 :-dynamic_multifile_exported(predTypeMax/3).
 :-dynamic_multifile_exported(predInstMax/3).
 
-predInstMax(mudCharge,T,NRG):- infSecondOrder, predTypeMax(mudCharge,AgentType,NRG),mudIsa(T,AgentType).
-%predInstMax(mudHealth,T,Dam):- predTypeMax(mudHealth,AgentType,Dam),isa(T,AgentType).
+predInstMax(I,mudEnergy,NRG):- infSecondOrder, predTypeMax(mudEnergy,AgentType,NRG),mudIsa(I,AgentType).
+%predInstMax(I,mudHealth,Dam):- predTypeMax(mudHealth,AgentType,Dam),isa(I,AgentType).
 
 punless(Cond,Action):- once((call(Cond);call(Action))).
 
@@ -233,9 +233,9 @@ create_instance_0(T,tAgentGeneric,List):-
    rez_to_inventory(P,tFood,_Food),
    %reset_values(P),   
    padd(P, [ predInstMax(mudHealth,500),
-                       predInstMax(mudCharge,200),
+                       predInstMax(mudEnergy,200),
                        mudHealth(500),
-                       mudCharge(200),
+                       mudEnergy(200),
                        mudAgentTurnnum(0),
                        mudScore(1)]),   
    % set_stats(P,[]),
@@ -263,12 +263,14 @@ ttCreateable(tRegion).
 create_instance_0(T, tItem, List):-
    mudIsa(T,What),What\=tItem, ttCreateable(What),!,create_instance_0(T, What, List).
 
+/*
 create_instance_0(T,Type,List):-
-  createableSubclassType(Type,MetaType),
+  createableSubclassType(Type,MetaType),!,
   must_det_l([
    create_meta(T,Type,MetaType,P),
    padd(P,List),
    add_missing_instance_defaults(P)]). 
+*/
 
 create_instance_0(T,MetaType,List):-  
   must_det_l([
@@ -300,9 +302,9 @@ typeProps(tItem,mudListPrice(0)).
 typeProps(tAgentGeneric,mudLastCommand(actStand)).
 typeProps(tAgentGeneric,[
                        predInstMax(mudHealth,500),
-                       predInstMax(mudCharge,200),
+                       predInstMax(mudEnergy,200),
                        mudHealth(500),
-                       mudCharge(200),
+                       mudEnergy(200),
                        % mudFacing(vNorth), % later on Test that "n" will work on assertions
                        mudFacing(isRandom(vtBasicDir)), % later on Test that "n" will work on assertions
                        mudAgentTurnnum(0),

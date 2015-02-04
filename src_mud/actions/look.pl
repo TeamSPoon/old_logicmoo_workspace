@@ -19,7 +19,9 @@
 */
 
 % :-swi_module(user). 
-:-swi_module(modLook, [ mudGetPrecepts/2,  mudNearReach/2, mudNearFeet/2, mudHeightOnObj/2, mudCanSense/5 , cmdLook/2]).
+:-swi_module(modLook, []).
+
+:- decl_mpred_prolog((  mudGetPrecepts/2,  mudNearReach/2, mudNearFeet/2, mudHeightOnObj/2, mudCanSense/5 , cmdLook/2)).
 
 :- include(logicmoo(vworld/moo_header)).
 
@@ -27,6 +29,9 @@
 
 :- dynamic blocks/1.
 
+:-decl_mpred_prolog(mudAtLoc_first_of/2).
+
+predArgTypes(mudAtLoc_first_of(tObj,tSpatialThing)).
 
 mudAtLoc_first_of(X,Y):-no_repeats(mudAtLoc_first_of0(X,Y)).
 mudAtLoc_first_of0(X,Y):-mudAtLoc(X,Y).
@@ -37,8 +42,8 @@ mudAtLoc_first_of0(X,Y):-inRegion(X,Y).
 % mudCanSense(Agent,Sense,InList,CanDetect,CantDetect).
 mudCanSense(_Agent,visual,InList,InList,[]).
 
-action_info(actExamine(tItem), "view details of item (see also @list)").
-agent_call_command(_Gent,actExamine(SObj)):- term_listing(SObj).
+user:action_info(actExamine(tItem), "view details of item (see also @list)").
+user:agent_call_command(_Gent,actExamine(SObj)):- term_listing(SObj).
 
 visibleTo(Agent,Agent).
 visibleTo(Agent,Obj):-mudPossess(Agent,Obj).
@@ -46,24 +51,24 @@ visibleTo(Agent,Obj):-same_regions(Agent,Obj).
 
 :- decl_type(txtPrepOf).
 :- decl_type(txtPrepSpatial).
-hook_coerce(Prep,txtPrepSpatial,Str):-member(Prep,[in,on,north_of,inside,onto,ontop]),name_text(Prep,Str).
-hook_coerce(Prep,txtPrepSpatial,Inst):-hook_coerce(Prep,txtPrepOf,Inst).
-hook_coerce([SDir,of],txtPrepOf,vDirFn(Dir)):-hook_coerce(SDir,vtDirection,Dir).
+user:hook_coerce(Prep,txtPrepSpatial,Str):-member(Prep,[in,on,north_of,inside,onto,ontop]),name_text(Prep,Str).
+user:hook_coerce(Prep,txtPrepSpatial,Inst):-user:hook_coerce(Prep,txtPrepOf,Inst).
+user:hook_coerce([SDir,of],txtPrepOf,vDirFn(Dir)):-user:hook_coerce(SDir,vtDirection,Dir).
 
-action_info(actLook, "generalized look in region").
-action_info(actLook(isOptionalStr("in"),isOptionalStr("here")), "generalized look in region").
-action_info(actLook(txtPrepOf,isOptionalStr("self")), "Look in a direction (TODO: look north of isSelfAgent)").
-action_info(actLook(isOptional(txtPrepSpatial,"at"),tObj),"look [in|at|on|under|at] somewhere").
-%action_info(look(obj), "Look at a speficific item").
-%action_info(look_at(isOptional(call(visibleTo(isSelfAgent,value)),call(visibleTo(isSelfAgent,value)))), "Look at a speficific item").
+user:action_info(actLook, "generalized look in region").
+user:action_info(actLook(isOptionalStr("in"),isOptionalStr("here")), "generalized look in region").
+user:action_info(actLook(txtPrepOf,isOptionalStr("self")), "Look in a direction (TODO: look north of isSelfAgent)").
+user:action_info(actLook(isOptional(txtPrepSpatial,"at"),tObj),"look [in|at|on|under|at] somewhere").
+%user:action_info(look(obj), "Look at a speficific item").
+%user:action_info(look_at(isOptional(call(visibleTo(isSelfAgent,value)),call(visibleTo(isSelfAgent,value)))), "Look at a speficific item").
 
-agent_call_command(Agent,actLook):- look_as(Agent),!.
-agent_call_command(Agent,actLook("here")):- look_as(Agent),!.
-agent_call_command(Agent,actLook(_,"here")):- look_as(Agent),!.
-agent_call_command(Agent,actLook(DirS,"self")):- coerce(DirS,vtDirection,Dir),!,
+user:agent_call_command(Agent,actLook):- look_as(Agent),!.
+user:agent_call_command(Agent,actLook("here")):- look_as(Agent),!.
+user:agent_call_command(Agent,actLook(_,"here")):- look_as(Agent),!.
+user:agent_call_command(Agent,actLook(DirS,"self")):- coerce(DirS,vtDirection,Dir),!,
    view_dirs(Agent,[[Dir,vHere],[Dir,Dir],[Dir,Dir,vAdjacent]],Percepts),
    forall_member(P,Percepts,call_agent_action(Agent,actExamine(P))).
-agent_call_command(Agent,actLook(_Dir,SObj)):-
+user:agent_call_command(Agent,actLook(_Dir,SObj)):-
    objects_match_for_agent(Agent,SObj,tObj,Percepts),
    forall_member(P,Percepts,call_agent_action(Agent,actExamine(P))).
 
@@ -85,7 +90,7 @@ cmdLook_proc_0(Agent,LOC):-
    add(props(Agent,mudNeedsLook(vFalse))),
      show_kb_preds(Agent,LOC,
          [
-         location= (value=LOC),
+         location= LOC,
       % TODO make this work
          %  why does this this work on Prolog REPL?
          %   with_output_to(string(Str),cmdShowRoomGrid('Area1000'))
@@ -111,6 +116,9 @@ cmdLook_proc_0(Agent,LOC):-
        ]),
     show_inventory(Agent,Agent).
 
+:-decl_mpred_prolog(nameStringsList/2).
+
+nameStringsList(Region,ValueList)
 nameStringsList(Region,ValueList):-findall(Value,nameStrings(Region,Value),ValueList).
 
 tLooking(Agent):- current_agent(Agent),!.
@@ -124,7 +132,7 @@ tLooking(Agent):- tAgentGeneric(Agent),not(tDeleted(Agent)).
 get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
   call((
 	tLooking(Agent),
-	mudCharge(Agent,Vit),
+	mudEnergy(Agent,Vit),
         mudHealth(Agent,Dam),
 	success(Agent,Suc),
 	mudScore(Agent,Scr),

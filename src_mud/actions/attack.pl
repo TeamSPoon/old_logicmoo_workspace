@@ -22,7 +22,7 @@ vtActionTemplate(actAttack(vtDirection)).
 
 % Attack
 % Successful Attack
-agent_call_command(Agent,actAttack(Dir)) :-	
+user:agent_call_command(Agent,actAttack(Dir)) :-	
 	mudAtLoc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	mudAtLoc(What,XXYY),
@@ -30,7 +30,7 @@ agent_call_command(Agent,actAttack(Dir)) :-
 	call_update_charge(Agent,actAttack).
 
 % Destroy small objects (food, etc.)
-agent_call_command(Agent,actAttack(Dir)) :-	
+user:agent_call_command(Agent,actAttack(Dir)) :-	
 	mudAtLoc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	mudAtLoc(What,XXYY),	
@@ -39,7 +39,7 @@ agent_call_command(Agent,actAttack(Dir)) :-
 	call_update_charge(Agent,actAttack).
 
 % Hit a big object... causes damage to agent attacking
-agent_call_command(Agent,actAttack(Dir)) :-	
+user:agent_call_command(Agent,actAttack(Dir)) :-	
 	mudAtLoc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	mudAtLoc(What,XXYY),	
@@ -49,7 +49,7 @@ agent_call_command(Agent,actAttack(Dir)) :-
 	call_update_charge(Agent,actAttack).
 
 % Hit nothing (empty space)... causes a little damage
-agent_call_command(Agent,actAttack(Dir)) :-	
+user:agent_call_command(Agent,actAttack(Dir)) :-	
 	mudAtLoc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	not(mudAtLoc(_,XXYY)),
@@ -87,7 +87,7 @@ damage_foe(Agent,What,hit) :-
 	add(mudHealth(What,NewDam)).
 
 % Record keeping
-update_charge(Agent,actAttack) :- upprop(Agent,mudCharge(-5)).
+update_charge(Agent,actAttack) :- upprop(Agent,mudEnergy(-5)).
 update_stats(Agent,bash) :-  upprop(Agent,mudHealth(-2)),
 	(add_cmdfailure(Agent,bash)).
 update_stats(Agent,wiff) :- 

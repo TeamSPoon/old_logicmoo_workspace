@@ -35,6 +35,7 @@
 :- thread_local thlocal:skip_db_op_hooks/0.
 :- thread_local thlocal:session_agent/2.
 :- thread_local thlocal:noRandomValues/1.
+:- thread_local thlocal:trust_argIsas/0.
 :- thread_local thlocal:noDBaseMODs/1.
 :- thread_local thlocal:noDBaseHOOKS/1.
 :- thread_local thlocal:no_arg_type_error_checking/0.
@@ -52,8 +53,10 @@
 :- thread_local thlocal:caller_module/2.
 :- thread_local thlocal:agent_current_action/2.
 :- thread_local thlocal:adding_from_srcfile/0.
+:- thread_local thlocal:inVoProp/0.
 
 
+:- dynamic_multifile_exported thglobal:after_game_load/0.
 :- dynamic_multifile_exported thglobal:use_cyc_database/0.
 :- dynamic_multifile_exported thglobal:global_session_agent/2.
 
@@ -102,6 +105,9 @@
 :- dynamic_multifile_exported(user:mpred_arity/2).
 :- dynamic_multifile_exported(user:never_type/1).
 :- dynamic_multifile_exported user:mudToHitArmorClass0/2.
+:- dynamic_multifile_exported user:argIsa/3.
+:- dynamic_multifile_exported user:tCol/1.
+:- dynamic_multifile_exported user:fskel/7.
 :- dynamic_multifile_exported user:fact_always_true/1.
 :- dynamic_multifile_exported user:mudStowing/2.
 :- dynamic_multifile_exported user:mudSubclass/2.
@@ -110,6 +116,7 @@
 :- dynamic_multifile_exported user:mudLabelTypeProps/3.
 :- dynamic_multifile_exported user:mudFtInfo/2.
 :- dynamic_multifile_exported user:mudContains/2.
+:- dynamic_multifile_exported user:hook_coerce/3.
 :- dynamic_multifile_exported user:mud_test_local/2.
 :- dynamic_multifile_exported user:mud_test_local/1.
 :- dynamic_multifile_exported user:mud_test_local/0.
@@ -134,6 +141,8 @@
 :- dynamic_multifile_exported user:fact_is_false/2.
 :- dynamic_multifile_exported user:default_type_props/3.
 :- dynamic_multifile_exported user:deduce_facts/2.
+:- dynamic_multifile_exported user:resultIsa/2.
+:- dynamic_multifile_exported user:formatted_resultIsa/2.
 :- dynamic_multifile_exported user:create_random_fact/1.
 :- dynamic_multifile_exported user:check_permanence/4.
 :- dynamic_multifile_exported user:agent_text_command/4.

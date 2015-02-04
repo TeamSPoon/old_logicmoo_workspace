@@ -22,7 +22,7 @@ vtActionTemplate(actPush(vtDirection)).
 % Push a box
 % Nothing to push... agent moves and takes a little damage.
 %Plus it still costs the same charge as if the agent did push something
-agent_call_command(Agent,actPush(Dir)) :-	
+user:agent_call_command(Agent,actPush(Dir)) :-	
 	mudAtLoc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	mudAtLoc(What,XXYY),
@@ -33,7 +33,7 @@ agent_call_command(Agent,actPush(Dir)) :-
 
 % Pushing what cannot be pushed
 % Some damage and loss of charge (same as normal push)
-agent_call_command(Agent,actPush(Dir)) :-	
+user:agent_call_command(Agent,actPush(Dir)) :-	
 	mudAtLoc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	mudAtLoc(What,XXYY),
@@ -42,7 +42,7 @@ agent_call_command(Agent,actPush(Dir)) :-
 	call_update_charge(Agent,actPush).
 
 % A successful PUSH
-agent_call_command(Agent,actPush(Dir)) :-	
+user:agent_call_command(Agent,actPush(Dir)) :-	
 	mudAtLoc(Agent,LOC),
 	move_dir_target(LOC,Dir,XXYY),
 	mudAtLoc(What,XXYY),
@@ -97,8 +97,8 @@ squish_behind(_,_).
 crashbang(Obj) :- padd(Obj,[mudHealth(-5)]).
 
 % Record keeping
-update_charge(Agent,actPush) :- padd(Agent,[mudCharge(-6)]).
+update_charge(Agent,actPush) :- padd(Agent,[mudEnergy(-6)]).
 update_stats(Agent,strain) :- padd(Agent,[mudHealth(-2)]).
-update_stats(Agent,hernia) :- padd(Agent,[mudHealth(-4),mudCmdfailure(hernia)]).
+update_stats(Agent,hernia) :- padd(Agent,[mudHealth(-4),mudCmdFailure(hernia)]).
 
 :- include(logicmoo(vworld/moo_footer)).

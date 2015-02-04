@@ -327,14 +327,14 @@ inst_label(_Obj,'&&').
 % ===================================================================
 % Display world
 show_room_grid_old(Room) :-  
-	mudGrid(Room,1,G,_),
+	gridValue(Room,1,G,_),
 	length(G,N),
 	M is N + 1,
 	cmdShowRoomGrid(Room,1,1,M).
 
 cmdShowRoomGrid(Room,Old,N,N) :-
 	New is Old + 1,
-	\+ mudGrid(Room,New,N,_),
+	\+ gridValue(Room,New,N,_),
 	nl,
 	!.
 

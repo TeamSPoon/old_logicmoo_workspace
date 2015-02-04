@@ -37,23 +37,23 @@ get_agent_text_command(Agent,VERBOrListIn,AgentR,CMD):-
 
 get_agent_text_command_0(Agent,ListIn,AgentR,CMD):- 
    (is_list(ListIn) -> UseList=ListIn ; UseList=[ListIn]),
-       call_no_cuts(agent_text_command(Agent,UseList,AgentR,CMD)).
+       call_no_cuts(user:agent_text_command(Agent,UseList,AgentR,CMD)).
 
 
 % ===========================================================
 % PARSE command
 % ===========================================================
-type_action_info(tHumanPlayer,actParse(ftProlog,ftListFn(ftTerm)),"Development test to parse some Text for a human.  Usage: parse 'item' the blue backpack").
+user:type_action_info(tHumanPlayer,actParse(ftProlog,ftListFn(ftTerm)),"Development test to parse some Text for a human.  Usage: parse 'item' the blue backpack").
 
-agent_call_command(_Gent,actParse(Type,StringM)):-
+user:agent_call_command(_Gent,actParse(Type,StringM)):-
    parse_for(Type,StringM,_Term,_LeftOver).
 
 % ===========================================================
 % CMDPARSE command
 % ===========================================================
-type_action_info(tHumanPlayer,actCmdparse(ftListFn(ftTerm)),"Development test to parse some Text for a human.  Usage: cmdparse take the blue backpack").
+user:type_action_info(tHumanPlayer,actCmdparse(ftListFn(ftTerm)),"Development test to parse some Text for a human.  Usage: cmdparse take the blue backpack").
 
-agent_call_command(_Gent,actCmdparse(StringM)):- parse_for(ftAction,StringM,Term,LeftOver),fmt('=>'(parse_for(StringM) , [Term,LeftOver])).
+user:agent_call_command(_Gent,actCmdparse(StringM)):- parse_for(ftAction,StringM,Term,LeftOver),fmt('=>'(parse_for(StringM) , [Term,LeftOver])).
 
 % mud_test("cmdparse test",...)
   
@@ -61,11 +61,11 @@ agent_call_command(_Gent,actCmdparse(StringM)):- parse_for(ftAction,StringM,Term
 % ===========================================================
 % parsetempl command
 % ===========================================================
-type_action_info(tHumanPlayer,actParsetempl(ftListFn(ftTerm)),"Development test to see what verb phrase heads are found. (uses get_vp_templates/4)  Usage: parsetempl who").
+user:type_action_info(tHumanPlayer,actParsetempl(ftListFn(ftTerm)),"Development test to see what verb phrase heads are found. (uses get_vp_templates/4)  Usage: parsetempl who").
 
-agent_text_command(Agent,[actParsetempl|List],Agent,actParsetempl(List)).
+user:agent_text_command(Agent,[actParsetempl|List],Agent,actParsetempl(List)).
 
-agent_call_command(Agent,actParsetempl(StringM)):-
+user:agent_call_command(Agent,actParsetempl(StringM)):-
   to_word_list(StringM,[SVERB|ARGS]),
   get_vp_templates(Agent,SVERB,ARGS,TEMPLATES),fmt(templates=TEMPLATES),
   ignore((
@@ -195,7 +195,7 @@ object_print_details0(Print,Agent,O,DescSpecs,Skipped):-
 :-decl_type(ttTypeType).
 vtSkippedPrintNames(T):-ttFormatType(T).
 vtSkippedPrintNames(T):-mudIsa(T,ttTypeType).
-vtSkippedPrintNames(E):-member(E,[tObj,isSelf,the,is,tSpatialThing,ttNotCreatableType,ttCreateable,prologHybrid,prologPTTP,prologOnly,tRelation,tPred,'',[]]).
+vtSkippedPrintNames(E):-member(E,[tObj,isSelf,the,is,tSpatialThing,ttNotCreatable,ttCreateable,prologHybrid,prologPTTP,prologOnly,tRelation,tPred,'',[]]).
 
 
 must_make_object_string_list(_,Obj,WList):- object_string(Obj,WList),!.
@@ -255,11 +255,11 @@ parse_agent_text_command(Agent,IVERB,ARGS,Agent,GOAL):-
 
 % try directly parsing first
 parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL):- 
-   call_no_cuts(agent_text_command(Agent,[SVERB|ARGS],NewAgent,GOAL)),nonvar(NewAgent),nonvar(GOAL),!.   
+   call_no_cuts(user:agent_text_command(Agent,[SVERB|ARGS],NewAgent,GOAL)),nonvar(NewAgent),nonvar(GOAL),!.   
 
 % try indirectly parsing
 parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL):- 
-   call_no_cuts(agent_text_command(Agent,[VERB|ARGS],NewAgent,GOAL)),ground(GOAL),nonvar(VERB),
+   call_no_cuts(user:agent_text_command(Agent,[VERB|ARGS],NewAgent,GOAL)),ground(GOAL),nonvar(VERB),
    verb_matches(SVERB,VERB).
 
 parse_agent_text_command_0(Agent,SVERB,ARGS,Agent,GOAL):-
@@ -304,7 +304,7 @@ get_vp_templates(_Agent,SVERB,_ARGS,TEMPLATES):-
     ((
       get_all_templates(TEMPL),
      %isa(Agent,What),
-     %action_info(What,TEMPL,_),
+     %user:action_info(What,TEMPL,_),
      TEMPL=..[VERB|TYPEARGS],
      verb_matches(SVERB,VERB))),
      TEMPLATES_FA),
@@ -367,16 +367,16 @@ name_text_atomic(Name,Text):-i_name('',Name,TextN),atom_string(TextN,Text).
 name_text_atomic(Name,Text):-atom_string(Name,Text).
 
 
-hook_coerce(TextS,vtDirection,Dir):-
+user:hook_coerce(TextS,vtDirection,Dir):-
   member(Dir-Text,[vNorth-"n",vSouth-"s",vEast-"e",vWest-"w",vNE-"ne",vNW-"nw",vSE-"se",vSW-"sw",vUp-"u",vDown-"d"]),
   (name_text(Dir,TextS);TextS=Text;atom_string(TextS,Text)).
 
-hook_coerce(Text,Subclass,X):- 
-   not(memberchk(Subclass,[vtDirection,tTemporallyExistingThing])),
+user:hook_coerce(Text,Subclass,X):- 
+   not(memberchk(Subclass,[vtDirection,tSpatialThing])),
    once((isa_asserted(X,Subclass),
    arg_to_var(ftText,Text,TextVar),
    req(mudKeyword(X,TextVar)),   
-   same_arg(ftText,TextVar,Text))). % dmsg(todo(hook_coerce(Text,Subclass))),impliedSubClass(Subclass,tSpatialThing).
+   same_arg(ftText,TextVar,Text))). % dmsg(todo(user:hook_coerce(Text,Subclass))),impliedSubClass(Subclass,tSpatialThing).
 
 
 phrase_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver):-length(TYPEARGS,N),length(GOODARGS,N),!,
@@ -532,7 +532,7 @@ coerce0(String,isNot(Type),Inst):-!,not(coerce0(String,Type,Inst)).
 coerce0([String],Type,Inst):- nonvar(String),!,coerce0(String,Type,Inst).
 coerce0(String,Type,Inst):- ttFormatType(Type),checkAnyType(assert(actParse),String,Type,AAA),Inst=AAA.
 coerce0(Text,Type,Inst):- call_tabled_can(no_repeats_old(call_no_cuts(hook_coerce(Text,Type,Inst)))).
-%coerce0(String,Type,Longest) :- findall(Inst, (hook_coerce(Inst,Type,Inst),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
+%coerce0(String,Type,Longest) :- findall(Inst, (user:hook_coerce(Inst,Type,Inst),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
 coerce0(String,Type,Inst):- var(String),!,instances_of_type(Inst,Type),name_text(Inst,String).
 coerce0(String,Type,Inst):- not(ttFormatType(Type)),must(tCol(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
 coerce0(String,Type,Inst):- not(string(String)),!,text_to_string(String,StringS),!,coerce0(StringS,Type,Inst).

@@ -35,14 +35,14 @@ provide_mpred_write_attributes(F,external(Module)):- dmsg(decl_mpred(F,external(
 provide_mpred_setup(OP,Head,StubType,OUT):-  StubType = prologOnly, 
   must_det_l(( 
    get_pifunctor(Head,PHead,F,A),   
-   doall((clause(PHead,call_provided_mpred_storage_op(call(_),PHead,_),Ref),erase(Ref))),
+   doall((clause(PHead,(_,call_provided_mpred_storage_op(call(_),PHead,_)),Ref),erase(Ref))),
    show_call(provide_clauses_list(PHead,HBLIST)),
    (predicate_property(PHead,thread_local)->retract_all(PHead:-_);abolish(F,A)),
    dynamic_multifile_exported(F/A),
    asserta_if_new(mpred_prop(F,hasStub(StubType))),         
    asserta_if_new(mpred_prop(F,StubType)), 
    forall(member(HB,HBLIST),must(add(HB))),!,   
-   doall(retract((PHead:-call_provided_mpred_storage_op(call(_),PHead,_)))),
+   doall(retract((PHead:- (!,call_provided_mpred_storage_op(call(_),PHead,_))))),
    must_same_clauses(PHead,HBLIST))),
    must(OUT=defined(provide_mpred_setup(OP,StubType))).
 
@@ -92,7 +92,7 @@ provide_mpred_read_attributes(F,A,Why):-functor_safe(P,F,A),provide_mpred_read_a
 
 provide_mpred_read_attributes(P,F,A,static_predicate(P)):-static_predicate(user,F,A).
 provide_mpred_read_attributes(P,_,_,predicate_property(P,foreign)):-predicate_property(P,foreign),!.
-provide_mpred_read_attributes(P,_,_,predicate_property(P,builtin)):-predicate_property(P,builtin),!.
+provide_mpred_read_attributes(P,_,_,predicate_property(P,built_in)):-predicate_property(P,built_in),!.
 provide_mpred_read_attributes(P,_,_,predicate_property(P,imported_from(system))):-predicate_property(P,imported_from(system)).
 
 %retract_all((H:-B)) :-!, forall(clause(H,B,Ref),erase(Ref)).
@@ -102,7 +102,7 @@ retract_all(HB) :- ignore((retract(HB),fail)).
 is_static_pred(Head:-_):-!,predicate_property(Head,_),not(predicate_property(Head,dynamic)).
 is_static_pred(Head):-predicate_property(Head,_),not(predicate_property(Head,dynamic)).
 
-% get_mpred_storage_provider(assert(a), mpred_prop(agent_call_command, info((decl_mpred_prolog agent_call_command/2))),S,W)
+% get_mpred_storage_provider(assert(a), mpred_prop(user:agent_call_command, info((decl_mpred_prolog user:agent_call_command/2))),S,W)
 
 provide_mpred_storage_op(clause_asserted,Head,prologOnly,CALL):- CALL = clause_asserted(Head).
 

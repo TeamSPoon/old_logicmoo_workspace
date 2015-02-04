@@ -50,9 +50,9 @@ detatch_object(Obj):-
   (with_no_modifications(mudAtLoc(Obj,LOC))-> clr(mudAtLoc(Obj,LOC));true),
   (with_no_modifications(localityOfObject(Obj,R))-> clr(localityOfObject(Obj,R));true).
 
-action_info(actInventory(isOptional(tAgentGeneric,isSelfAgent)), "Examine an inventory").
+user:action_info(actInventory(isOptional(tAgentGeneric,isSelfAgent)), "Examine an inventory").
 
-agent_call_command(Agent,actInventory(Who)):- show_inventory(Agent,Who).
+user:agent_call_command(Agent,actInventory(Who)):- show_inventory(Agent,Who).
 
 show_inventory(Agent,Who):-
         show_kb_preds(Agent,[                                                  

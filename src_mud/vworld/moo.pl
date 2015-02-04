@@ -8,13 +8,15 @@
 % Dec 13, 2035
 %
 */
-:-swi_module(moo,[current_context_module/1,
+:-swi_module(moo,[]).
+
+:-export(((current_context_module/1,
     term_expansion_local/2,
          register_module_type/1,          
          end_module_type/1,
-         op(1120,fx,export),
-         op(1120,fx,dynamic_multifile_exported),
-         register_timer_thread/3]).
+         register_timer_thread/3))).
+
+:-  op(1120,fx,export),op(1120,fx,dynamic_multifile_exported).
 
 :-dynamic_multifile_exported(hasInstance/2).
 :-dynamic_multifile_exported(mudSubclass/2).

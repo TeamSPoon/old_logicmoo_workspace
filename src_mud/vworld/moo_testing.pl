@@ -34,14 +34,14 @@
 run_mud_tests:-
   forall(mud_test(Name,Test),run_mud_test(Name,Test)).
 
-action_info(actTests,"run run_mud_tests/:").
+user:action_info(actTests,"run run_mud_tests/:").
 
-agent_call_command(_Agent,actTests) :- scan_updates, run_mud_tests.
+user:agent_call_command(_Agent,actTests) :- scan_updates, run_mud_tests.
 
 
-action_info(actTest(ftTerm),"run tests containing term").
+user:action_info(actTest(ftTerm),"run tests containing term").
 
-agent_call_command(Agent,actTest(Obj)):-foc_current_player(Agent),run_mud_test(Obj).
+user:agent_call_command(Agent,actTest(Obj)):-foc_current_player(Agent),run_mud_test(Obj).
 
 
 test_name(String):-fmt(start_moo_test(mudNamed(String))),asserta(was_test_name(String)).

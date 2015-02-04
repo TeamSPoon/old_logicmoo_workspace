@@ -420,6 +420,7 @@ dynamic_safe(MFA):- with_mfa(MFA,dynamic_safe).
 :- export((((dynamic_safe)/3))).
 :- meta_predicate(dynamic_safe(+,+,+)).
 :- module_transparent((((dynamic_safe)/3))).
+dynamic_safe(M,F,A):- functor(C,F,A),predicate_property(C,imported_from(system)),!.
 dynamic_safe(M,F,A):- (static_predicate(M,F,A) -> dmsg(warn(not(M:dynamic(M:F/A)))) ; M:dynamic(M:F/A)). % , warn_module_dupes(M,F,A).
 :-op(1150,fx,user:dynamic_safe).
 
@@ -528,7 +529,8 @@ dynamic_multifile_exported( (M:F)/A ):- !,context_module(CM),
    % make_transparent(CM,M,PI,F/A),
    M:export(F/A)),M). %,dmsg(dynamic_multifile_exported(CALL)).
 dynamic_multifile_exported( FA ):- with_pi(FA,(dynamic_multifile_exported)).
-dynamic_multifile_exported(CM, M, _PI, F/A):-'@'((dynamic_safe(M,F,A), 
+dynamic_multifile_exported(CM, M, _PI, F/A):-
+'@'((dynamic_safe(M,F,A), 
    M:multifile(F/A), 
    CM:multifile(F/A),
    % make_transparent(CM,M,PI,F/A),
@@ -1099,13 +1101,13 @@ shrink_clause(P,Body,Prop):- (Body==true-> Prop=P ; (Prop= (P:-Body))).
 
 :-use_module(library(ansi_term)).
 
-:-dynamic(moo:mpred_prop/2).
-:-multifile(moo:mpred_prop/2).
+:-dynamic(user:mpred_prop/2).
+:-multifile(user:mpred_prop/2).
 :- meta_predicate_transparent(tlocal_show/6).
 tlocal_show(M,F,A,P,_ON,TF):-
    copy_term(P,PL),
    must_det((predicate_property(M:P,number_of_clauses(_)) -> findall(Prop,(clause(M:PL,Body),shrink_clause(PL,Body,Prop)),Props1);Props1=[no_clause_Access])),
-   findall(' ++'(Prop),call(moo:mpred_prop,F,Prop),Props2),
+   findall(' ++'(Prop),call(user:mpred_prop,F,Prop),Props2),
    findall(' -'(yes(Prop)),(predicate_property(M:P,Prop),not(member(Prop,[number_of_rules(0),number_of_clauses(0),/*thread_local,*/volatile,dynamic,visible,interpreted]))),Props3),
    findall(' -'(not(Prop)),(member(Prop,[number_of_clauses(_),thread_local,volatile,dynamic,visible,exported,interpreted]),not(predicate_property(M:P,Prop))),Props4),   
    flatten([[Props1],[Props2],[Props3],[Props4],[TF/A]],PropsR),
@@ -2827,17 +2829,11 @@ module_notrace(M):- forall(predicate_property(P,imported_from(M)),bugger:moo_hid
 % =====================================================================================================================
 :- export((call_no_cuts/1)).
 % =====================================================================================================================
+:- meta_predicate call_no_cuts(0).
 :- module_transparent call_no_cuts/1.
-:- meta_predicate_transparent call_no_cuts(^).
-call_no_cuts(CALL):-clause_safe(CALL,TEST),call(TEST).
+call_no_cuts(M:CALL):- atomic(M),!,get_functor(CALL,F,A),functor(C,F,A),'@'((must(once(not(not(clause_safe(C,_))))),clause_safe(CALL,TEST),call(TEST)),M).
+call_no_cuts(CALL):-get_functor(CALL,F,A),functor(C,F,A),must(once(not(not(clause_safe(C,_))))),clause_safe(CALL,TEST),call(TEST).
 
-:- module_transparent call_no_cuts_0/1.
-:- meta_predicate_transparent call_no_cuts_0(^).
-call_no_cuts_0(true):-!.
-call_no_cuts_0((!)):-!.
-call_no_cuts_0((A,B)):-!,call_no_cuts_0(A),call_no_cuts_0(B).
-call_no_cuts_0((A;B)):-!,call_no_cuts_0(A);call_no_cuts_0(B).
-call_no_cuts_0(C):-call(C).
 
 % =====================================================================================================================
 :- export((call_tabled/1)).

@@ -82,22 +82,22 @@ command_actIdea(Who,IdeaS):-
              dmsg(get_world_agent_plan(current,Who,Idea))),IdeaS),
   (IdeaS==[]->dmsg(noidea(actIdea(Who)));true).
 
-action_info(actNpcTimer(ftInt),"sets how often to let NPCs run").
+user:action_info(actNpcTimer(ftInt),"sets how often to let NPCs run").
 
-action_info(actTock,"Makes All NPCs do something brilliant").
-action_info(actTick(tAgentGeneric),"Makes some agent do something brilliant").
-action_info(actTick,"Makes *your* agent do something brilliant").
+user:action_info(actTock,"Makes All NPCs do something brilliant").
+user:action_info(actTick(tAgentGeneric),"Makes some agent do something brilliant").
+user:action_info(actTick,"Makes *your* agent do something brilliant").
 
-action_info(actIdea(isOptional(tAgentGeneric,isSelfAgent)),"Makes some agent (or self) think of something brilliant").
-action_info(actProlog(ftCallable),"Call a ftCallable").
+user:action_info(actIdea(isOptional(tAgentGeneric,isSelfAgent)),"Makes some agent (or self) think of something brilliant").
+user:action_info(actProlog(ftCallable),"Call a ftCallable").
 
-agent_text_command(Agent,["prolog",X],Agent,actProlog(X)):-ignore(X=someCode).
-agent_text_command(Agent,["prolog"],Agent,actProlog(user:prolog_repl)).
-agent_text_command(Agent,["tlocals"],Agent,actProlog(tlocals)).
+user:agent_text_command(Agent,["prolog",X],Agent,actProlog(X)):-ignore(X=someCode).
+user:agent_text_command(Agent,["prolog"],Agent,actProlog(prolog_repl)).
+user:agent_text_command(Agent,["tlocals"],Agent,actProlog(tlocals)).
 
 warnOnError(X):-catch(X,E,dmsg(error(E:X))).
 
-agent_call_command(Agent,actProlog(C)) :- true,must(nonvar(C)),agent_call_safely(Agent,C).
+user:agent_call_command(Agent,actProlog(C)) :- true,must(nonvar(C)),agent_call_safely(Agent,C).
 
 :-dynamic_multifile_exported(agent_call_safely/2).
 agent_call_safely(_Agnt,C):- any_to_callable(C,X,Vars), !, gensym(result_count_,RC),flag(RC,_,0),agent_call_safely(RC,X,Vars),flag(RC,CC,CC),fmt(result_count(CC)).
@@ -110,10 +110,10 @@ any_to_callable(C,X,Vs):-atom(C),!,atom_to_term_safe(C,X,Vs).
 any_to_callable(C,X,Vs):- (expand_goal(C,X)),term_variables((C,X),Vs),!.
 % any_to_callable(C,X,Vs):-force_expand(expand_goal(C,X)),term_variables((C,X),Vs),!.
 
-agent_call_command(_Agent,actNpcTimer(Time)):-retractall(npc_tick_tock_time(_)),asserta(npc_tick_tock_time(Time)).
-agent_call_command(Who,actTick) :-  debugOnError(command_actTick(Who)).
-agent_call_command(_Agent,actIdea(Who)) :-  must(command_actIdea(Who,Idea)),fmt(result_actIdea(Who,Idea)).
-agent_call_command(_Agent,actTock) :- npc_tick.
-agent_call_command(_Agent,actTick(Other)) :-agent_call_command(Other,actTick).
+user:agent_call_command(_Agent,actNpcTimer(Time)):-retractall(npc_tick_tock_time(_)),asserta(npc_tick_tock_time(Time)).
+user:agent_call_command(Who,actTick) :-  debugOnError(command_actTick(Who)).
+user:agent_call_command(_Agent,actIdea(Who)) :-  must(command_actIdea(Who,Idea)),fmt(result_actIdea(Who,Idea)).
+user:agent_call_command(_Agent,actTock) :- npc_tick.
+user:agent_call_command(_Agent,actTick(Other)) :-user:agent_call_command(Other,actTick).
 
 :- include(logicmoo(vworld/moo_footer)).

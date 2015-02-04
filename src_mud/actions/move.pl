@@ -20,12 +20,12 @@
 % :- begin_transform_moo_preds.
 
 
-agent_text_command(Agent,[DirSS],Agent,OUT):-nonvar(DirSS), to_case_breaks(DirSS,[t(DirS,_),t(Dist,digit)]),show_call(coerce(DirS,vtDirection,Dir)),OUT=actMove(Dist,Dir).
-agent_text_command(Agent,[DirSS],Agent,OUT):-nonvar(DirSS), show_call(coerce(DirSS,vtDirection,Dir)),OUT=actMove(Dir).
+user:agent_text_command(Agent,[DirSS],Agent,OUT):-nonvar(DirSS), to_case_breaks(DirSS,[t(DirS,_),t(Dist,digit)]),show_call(coerce(DirS,vtDirection,Dir)),OUT=actMove(Dist,Dir).
+user:agent_text_command(Agent,[DirSS],Agent,OUT):-nonvar(DirSS), show_call(coerce(DirSS,vtDirection,Dir)),OUT=actMove(Dir).
 
-agent_call_command(Agnt,Cmd):- compound(Cmd),functor(Cmd,actMove,_),!,must(move_command(Agnt,Cmd)).
+user:agent_call_command(Agnt,Cmd):- compound(Cmd),functor(Cmd,actMove,_),!,must(move_command(Agnt,Cmd)).
 
-action_info(actMove(isOptional(ftNumber,1),vtDirection),"Move [n=1] distance in direction").
+user:action_info(actMove(isOptional(ftNumber,1),vtDirection),"Move [n=1] distance in direction").
 
 /*
 % dir###
@@ -99,7 +99,7 @@ move_command_1(Agent,Dir) :-
 
 %Record keeping
 
-update_charge(Agent,actMove) :- padd(Agent,mudCharge,-4).
+update_charge(Agent,actMove) :- padd(Agent,mudEnergy,-4).
 
 update_stats(Agent,collide) :- padd(Agent,mudHealth,-5),(add_cmdfailure(Agent,collide)).
 
@@ -108,7 +108,7 @@ update_stats(Agent,fall) :- padd(Agent,mudHealth,-10).
 % cheating but to test
 
 vtActionTemplate(actGo(vtDirection)).
-agent_call_command(Agent,actGo(Dir)) :-
+user:agent_call_command(Agent,actGo(Dir)) :-
 	mudAtLoc(Agent,LOC),
         in_world_move(LOC,Agent,Dir),
 	call_update_charge(Agent,actMove).

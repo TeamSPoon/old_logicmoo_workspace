@@ -232,7 +232,7 @@ violatesType(_,Type):- unverifiableType(Type),!,fail.
 violatesType(Value,ftInt):-number(Value),!,fail.
 violatesType(Value,Type):-atom(Type),isa_backchaing(Value,Type),!,fail.
 violatesType(Value,ftString):-string(Value),!,fail.
-%violatesType(apath(_,_),Type):-!,(Type\=areaPath,Type\=obj).
+%violatesType(apath(_,_),Type):-!,(Type\=tPathway,Type\=obj).
 violatesType(Value,Type):- compound(Type),!,ttFormatType(Type),not(term_is_ft(Value,Type)),!.
 violatesType(Value,Type):- once((isa_backchaing(Value,_))), no_loop_check(not(isa_backchaing(Value,Type))).
 
@@ -268,7 +268,7 @@ no_fallback(P,2):-not(mpred_prop(P,prologSingleValued)).
 :-dynamic_multifile_exported(defaultArgValue/4).
 defaultArgValue(Fact,F,A,OLD):- stack_check, mpred_prop(F,argSingleValueDefault(A,OLD)),!,dmsg(defaultArgValue(fallback_value(Fact,F,argSingleValueDefault(A,OLD)))).
 defaultArgValue(mudFacing(_,_),_,2,vNorth):-!.
-defaultArgValue(mudCharge(_,_),_,2,200):-!.
+defaultArgValue(mudEnergy(_,_),_,2,200):-!.
 defaultArgValue(mudHealth(_,_),_,2,500):-!.
 defaultArgValue(Fact,F,A,Value):- Fact=..[F,P|Args],is_fact_consistent(Fact),defaultArgValue(Fact,F,A,P,Args,Value).
 
@@ -305,15 +305,15 @@ get_type_default_props(DefType,TraitsO):- type_w_default_props(DefType), Inst = 
 
 type_w_default_props(Type):-call_tabled_can(type_w_defaults_asserted(Type)).
 
-type_w_defaults_asserted(Type):- is_asserted(default_inst_props(_,Type,_)),nonvar(Type).
+type_w_defaults_asserted(Type):- is_asserted(instTypeProps(_,Type,_)),nonvar(Type).
 type_w_defaults_asserted(Type):- is_asserted(typeProps(Type,_)),nonvar(Type).
 type_w_defaults_asserted(Type):- is_asserted(mudLabelTypeProps(_,Type,_)),nonvar(Type).
 
-each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(default_inst_props(Inst,Type,TProps)),subst(TProps,isSelf,Inst,Prop),flatten([Prop],Props).
+each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(instTypeProps(Inst,Type,TProps)),subst(TProps,isSelf,Inst,Prop),flatten([Prop],Props).
 each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(typeProps(Type,TProps)),subst(TProps,isSelf,Inst,Prop),flatten([Prop],Props).
 each_default_inst_type_props(_,Type,[mudKwLabel(Lbl)|Props]):-call_no_cuts(mudLabelTypeProps(Lbl,Type,Props)).
 
-default_inst_props(apathFn(Region,_Dir),areaPath,[localityOfObject(Region)]).
+user:instTypeProps(apathFn(Region,_Dir),tPathway,[localityOfObject(Region)]).
 
 
 :-dynamic_multifile_exported((add_missing_instance_defaults/1)).

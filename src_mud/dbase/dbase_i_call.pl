@@ -152,6 +152,7 @@ call_mpred_0(C):- debugOnError(C),!.  % just atoms
 % call_mpred_1(F,G):-loop_check(call_mpred(F,G),trace_or_throw(call_mpred(F,G))).
 
 % call_mpred(_,Goal):-mcall(Goal).
+call_mpred(call,C):- !,debugOnError(C).
 call_mpred(_,C):- into_mpred_form(C,MP),MP\=@=C,!,call_mpred(MP).
 call_mpred(_,dbase_t([H|T])):- !,dbase_t([H|T]).
 call_mpred(F,C):- mpred_prop(F,prologPTTP),!,debugOnError(pttp_call(C)).
@@ -164,7 +165,7 @@ call_mpred(F,C):- not(is_callable(C)),!,functor(C,F,A),dmsg(todo(non_existent(F/
 call_mpred(F,C):-call_mpred_hybrid(F,C).
 
 
-call_mpred_hybrid(F,C):- (use_pttp;true),!,call_provided_mpred_storage_op(call(call_mpred_hybrid),C,prologHybrid).
+call_mpred_hybrid(F,C):- (use_pttp;true),!,call_provided_mpred_storage_op(call(conjecture),C,prologHybrid).
 
 
 call_mpred_hybrid(F,C):- ground(C),!,call_mpred_real_g(F,C),!.

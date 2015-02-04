@@ -131,20 +131,19 @@ user:decl_database_hook(assert(_A_or_Z),mpred_prop(F,_)):- must_det(atom(F)).
 
 :-dynamic_multifile_exported((thglobal:loading_game_file/2, thglobal:loaded_game_file/2)).
 
-:-export(after_game_load/0).
-after_game_load:- not(thglobal:loading_game_file(_,_)),thglobal:loaded_game_file(_,_),!.
+thglobal:after_game_load:- not(thglobal:loading_game_file(_,_)),thglobal:loaded_game_file(_,_),!.
 
 % when all previous tasks have completed
-after_game_load_pass2:- not(thglobal:will_call_after(after_game_load,_)).
+after_game_load_pass2:- not(thglobal:will_call_after(thglobal:after_game_load,_)).
 :- meta_predicate(call_after_game_load(0)).
-% call_after_game_load(Code):- after_game_load,!, call_after_next(after_game_load_pass2,Code).
-call_after_game_load(Code):- call_after_next(after_game_load,Code).
+% call_after_game_load(Code):- thglobal:after_game_load,!, call_after_next(after_game_load_pass2,Code).
+call_after_game_load(Code):- call_after_next(thglobal:after_game_load,Code).
 
 :-dynamic_multifile_exported(rescan_game_loaded/0).
-rescan_game_loaded:- ignore((after_game_load, loop_check(call_after(after_game_load, true ),true))).
+rescan_game_loaded:- ignore((thglobal:after_game_load, loop_check(call_after(thglobal:after_game_load, true ),true))).
 
 :-dynamic_multifile_exported(rescan_game_loaded_pass2/0).
-rescan_game_loaded_pass2:- ignore((after_game_load, loop_check(call_after(after_game_load_pass2,  dmsg(rescan_game_loaded_pass2_comlpete)),true))).
+rescan_game_loaded_pass2:- ignore((thglobal:after_game_load, loop_check(call_after(after_game_load_pass2,  dmsg(rescan_game_loaded_pass2_comlpete)),true))).
 
 % ================================================
 % Agenda system - standard database
@@ -225,7 +224,7 @@ coerce(_ ,_,     NewThing,Else):- NewThing = Else.
 
 
 :- dynamic_multifile_exported 
-   tAgentGeneric/1,  mudCharge/2,mudHealth/2, mudAtLoc/2, failure/2, mudGrid/4, mudIsa/2, tItem/1, 
+   tAgentGeneric/1,  mudEnergy/2,mudHealth/2, mudAtLoc/2, failure/2, typeGrid/3, gridValue/4, mudIsa/2, tItem/1, 
   mudMemory/2,  pathName/3, mudPossess/2,  tRegion/1, mudScore/2, mudStm/2,   mudFacing/2,
    % col/1,
    % localityOfObject/2,
@@ -265,7 +264,7 @@ logical_functor(X):-atom(X),member(X,[',',';']).
 
 :- register_module_type(utility).
 
-agent_call_command(_Gent,actGrep(Obj)):- term_listing(Obj).
+user:agent_call_command(_Gent,actGrep(Obj)):- term_listing(Obj).
 
 
 :-ensure_loaded(dbase_i_pldoc).
@@ -330,14 +329,14 @@ db_reop0(OP,Call) :- dmsg(warn(db_reop(OP,Call))),db_op0(OP,Call).
 del(C0):- ireq(C0),!,idel(C0),!.
 del(C0):- mreq(C0),!,mdel(C0),!.
 
-idel(C0):- dmsg(idel(C0)),db_op_int(change(retract,one),C0), verify_sanity(ireq(C0)->(dmsg(warn(incomplete_I_DEL(C0))),fail);true),!.
+idel(C0):- expire_dont_add,dmsg(idel(C0)),db_op_int(change(retract,one),C0), verify_sanity(ireq(C0)->(dmsg(warn(incomplete_I_DEL(C0))),fail);true),!.
 idel(C0):- dmsg(warn(failed(idel(C0)))),!,fail.
 
-mdel(C0):- dmsg(mdel(C0)),db_op_int(change(retract,one),C0), verify_sanity(mreq(C0)->(dmsg(warn(incomplete_M_DEL(C0))),fail);true),!.
+mdel(C0):- expire_dont_add,dmsg(mdel(C0)),db_op_int(change(retract,one),C0), verify_sanity(mreq(C0)->(dmsg(warn(incomplete_M_DEL(C0))),fail);true),!.
 mdel(C0):- dmsg(warn(failed(mdel(C0)))),!,fail.
 
 % -  clr(Retractall)
-clr(C0):- dmsg(clr(C0)),db_op_int(change(retract,all),C0),verify_sanity(ireq(C0)->(dmsg(warn(incomplete_CLR(C0))));true).
+clr(C0):- expire_dont_add,dmsg(clr(C0)),db_op_int(change(retract,all),C0),verify_sanity(ireq(C0)->(dmsg(warn(incomplete_CLR(C0))));true).
 
 % -  preq(Query) = query with P note
 preq(P,C0):- db_op_int(query(dbase_t,P),C0).
@@ -358,10 +357,23 @@ ireq(C0):- dmsg(ireq(C0)), rescan_module_ready,no_loop_check(with_assertions([+i
 % -  props(Obj,QueryPropSpecs)
 props(Obj,PropSpecs):- req(props(Obj,PropSpecs)).
 iprops(Obj,PropSpecs):- ireq(props(Obj,PropSpecs)).
+
+
+expire_dont_add:-dmsg(expire_dont_add),retractall(implied_dont_add(_)).
+
 % -  add_fast(Assertion)
 % add_fast(CO):- must_det((add_fast_unchecked(CO), xtreme_debug(once(ireq(CO);(with_all_dmsg((debug(blackboard),show_call(add_fast_unchecked(CO)),rtrace(add_fast_unchecked(CO)),dtrace(ireq(CO))))))))),!.
 add_fast(CO:-BODY):- dmsg(add_fast(CO:-BODY)),must_det((add_fast_unchecked((CO:-BODY)))),!.
-add_fast(CO):- dmsg(add_fast(CO)),must_det((add_fast_unchecked(CO), nop(xtreme_debug(ireq(CO)->true;dmsg(warn(failed_ireq(CO))))))),!.
+add_fast(Skipped):- ground(Skipped),implied_skipped(Skipped),!. %, dmsg(skip_add_fast(mudSubclass(CO,CO))).
+add_fast(CO):- dmsg(add_fast(CO)),ignore((ground(CO),asserta(implied_dont_add(CO)))),!,must_det((add_fast_unchecked(CO), nop(xtreme_debug(ireq(CO)->true;dmsg(warn(failed_ireq(CO))))))),!.
+
+implied_skipped(mudSubclass(CO,CO)).
+implied_skipped(props(_,[])).
+implied_skipped(Skipped):-implied_dont_add(Skipped).
+
+:-dynamic(implied_dont_add/1).
+
+
 
 :-dynamic_multifile_exported(add_fast_unchecked/1).
 add_fast_unchecked((CO:-BODY)):-BODY==true,!,add_fast_unchecked(CO).
@@ -481,6 +493,16 @@ db_op(Op,Term):- loop_check_local(db_op0(Op,Term),trace_or_throw(loop_check(db_o
 db_op0(query(HLDS,Must),Term):- expands_on(isEach,Term), !, forall(do_expand_args(isEach,Term,O),no_loop_check(db_reop(query(HLDS,Must),O))).
 db_op0(Op,Term):- expands_on(isEach,Term), !,forall(do_expand_args(isEach,Term,O),db_op0(Op,O)).
 
+db_op0(change(assert,add),mudIsa(ArgTypes,PrologMultiValued)):- compound(ArgTypes), 
+   atom(PrologMultiValued), 
+   hasInstance(macroDeclarer,PrologMultiValued),
+   get_functor(ArgTypes,F,A),
+   assert_arity(F,A),
+   must(not(((PrologMultiValued=predProxyRetract)))),
+   decl_mpred(F,[predArity(A),PrologMultiValued,predArgTypes(ArgTypes)]),!.
+
+db_op0(Op,A):- ground(A),A=mudIsa(I,C), must_det(once(correctArgsIsa(Op,I,II))),I\=II,!,db_op0(Op,mudIsa(II,C)).
+
 db_op0(Op,G):- when_debugging(blackboard,dmsg(db_op0(Op,G))),fail.
 db_op0(query(_HLDS,Must),mudIsa(I,Type)):- !,call_expanded_for(Must,isa_backchaing(I,Type)).
 db_op0(_,end_of_file):-!.
@@ -515,6 +537,11 @@ db_op0(Op,(C1;C2)):- !,db_reop(Op,C1);db_reop(Op,C2).
 
 db_op0(query(HLDS,Must),props(Obj,Props)):- nonvar(Obj),var(Props),!,gather_props_for(query(HLDS,Must),Obj,Props).
 
+db_op0(change(assert,add),mudIsa(ArgTypes,PrologMultiValued)):- compound(ArgTypes), 
+   atom(PrologMultiValued), 
+   hasInstance(macroDeclarer,PrologMultiValued),
+   get_functor(ArgTypes,F,A),must(not(((PrologMultiValued=predProxyRetract)))),
+   decl_mpred(F,[predArity(A),PrologMultiValued,predArgTypes(ArgTypes)]),!.
 
 db_op0(Op,props(Obj,Open)):- var(Open),!,trace_or_throw(db_reop(Op,props(Obj,Open))).
 db_op0(_Op,props(_Obj,[])):- !.
@@ -541,17 +568,19 @@ db_op0(Op,db_op_exact(Term)):- !,db_op_exact(Op,Term).
 % use assert_with_pred db_op0(change(assert,_)),description(A,E)):- once(must(add_description(A,E))),fail. % db_reop(change(CA1,CB2),descriptionHere(A,E)).
 db_op0(Op,nameStrings(A,S0)):- nonvar(S0),determinerRemoved(S0,String,S),!,db_reop(Op, nameStrings(A,S)),add(determinerString(A,String)).
 
+db_op0(Op,A):- must_det(once(correctArgsIsa(Op,A,AA))),
+ acceptable_xform(  A , AA),dmsg(correctArgsIsa(Op,A->AA)), !, db_reop(Op,AA).
 
 db_op0(Op,props(Obj,nameStrings(Str))):-!,db_reop(Op,nameStrings(Obj,Str)).
 db_op0(query(HLDS,Must),mudIsa(Term,Var)):- !,call_expanded_for(query(HLDS,Must),call(call,isa_backchaing(Term,Var))).
-db_op0(Op,mudIsa(A,SubType)):- dbase_t(createableSubclassType,SubType,Type),!,db_reop(Op,mudIsa(A,Type)),db_reop(Op,mudIsa(A,SubType)).
+% db_op0(Op,mudIsa(A,SubType)):- dbase_t( cre ateableSubclassType,SubType,Type),!,db_reop(Op,mudIsa(A,Type)),db_reop(Op,mudIsa(A,SubType)).
 db_op0(query(HLDS,Must),argIsa(P,N,T)):- call_expanded_for(query(HLDS,Must),(get_mpred_prop(P,predArgTypes(ArgsIsa)),arg(N,ArgsIsa,T),must(nonvar(T)))).
 
 db_op0(change(_,_),Term):- glean_pred_props_maybe(Term),fail.
 
 
 db_op0(Op,Wild):- into_mpred_form(Wild,Simpler), acceptable_xform( Wild , Simpler),dmsg(into_mpred_form(Op,Wild->Simpler)), !,db_reop(Op,Simpler).
-db_op0(Op,A):- must_det(once(correctArgsIsa(Op,A,AA))),acceptable_xform(  A , AA),dmsg(correctArgsIsa(Op,A->AA)), !, db_reop(Op,AA).
+
 db_op0(Op,Wild):- transform_holds(dbase_t,Wild,Simpler),acceptable_xform(  Wild , Simpler),!,dmsg(transform_holds(Op,Wild->Simpler)),db_reop(Op,Simpler).
 % db_op0(Op,Term):- call(call,good_for_chaining(Op,Term)), db_rewrite(Op,Term,NewTerm),not(contains_singletons(NewTerm)),db_reop(Op,NewTerm).
 % db_op0(Op,Wild):- dsfdf db_op_simpler_wlc(Op,Wild,Simpler),!,db_reop(Op,Simpler).
@@ -641,7 +670,7 @@ addTypeProps_getOverlap(_Type,List,Overlap):-!,List=Overlap.
 db_assert_mv(_Must,end_of_file,_,_):-!.
 % db_assert_mv(_Must,C,_F,_A):- hooked_assertz(C),!.
 db_assert_mv(Must,C,F,A):- test_tl(thlocal:adding_from_srcfile), dmsg(db_assert_mv(Must,C,F,A)), hooked_assertz(C).
-db_assert_mv(Must,C,F,A):- dmsg(db_assert_mv(Must,C,F,A)), must_det(mpred_prop(F,prologOrdered) -> hooked_assertz(C) ; hooked_asserta(C)).
+db_assert_mv(Must,C,F,A):- dmsg(db_assert_mv(Must,C,F,A)), must_det((mpred_prop(F,prologOrdered) -> hooked_assertz(C) ; hooked_asserta(C))).
 
 
 % assert_with to change(CA1,CB2) singlevalue pred
@@ -791,7 +820,7 @@ insert_into([Carry|ARGS],After,Insert,[Carry|NEWARGS]):-
    After1 is After - 1,
    insert_into(ARGS,After1,Insert,NEWARGS).
 
-hook_coerce(Text,tPred,Pred):- mpred_prop(Pred,predArity(_)),name_text(Pred,Text).
+user:hook_coerce(Text,tPred,Pred):- mpred_prop(Pred,predArity(_)),name_text(Pred,Text).
 
 :- multifile(mudToHitArmorClass0 / 2).
 
@@ -981,12 +1010,12 @@ user:term_expansion((H:-B),Out):- fail,test_tl(enable_src_loop_checking),
 
 :- ensure_loaded(logicmoo('vworld/moo_footer.pl')).
 
-agent_text_command(_Agent,_Text,_AgentTarget,_Cmd):-fail.
+user:agent_text_command(_Agent,_Text,_AgentTarget,_Cmd):-fail.
 /*
     coerce/3,
     rescan_dbase_facts/0,
           enter_term_anglify/2,
-           agent_text_command/4,         
+           user:agent_text_command/4,         
 */
 
 

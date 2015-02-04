@@ -37,7 +37,7 @@ in_user_startup(Call):- '@'(Call,user).
 % logicmoo utils shared with other systems
 :- set_prolog_flag(double_quotes, atom).
 :- set_prolog_flag(double_quotes, string).
-
+/*
 :- '@'((ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_bugger)),
          ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_library)),
          use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)),
@@ -45,7 +45,7 @@ in_user_startup(Call):- '@'(Call,user).
          use_module(logicmoo(logicmoo_util/logicmoo_util_terms)),
          use_module(logicmoo(logicmoo_util/logicmoo_util_dcg)),
          use_module(logicmoo(vworld/moo))),'user').
-
+*/
 
 :- user_ensure_loaded(logicmoo('vworld/moo_loader.pl')).
 :- load_data_file(logicmoo('dbase/dbase_i_builtin.pl')).
@@ -207,7 +207,7 @@ download_and_install_el:-
 
 :- begin_transform_moo_preds.
 
-agent_text_command(Agent,["run",Term], Agent,actProlog(Term)):- ignore(Term=someCode).
+user:agent_text_command(Agent,["run",Term], Agent,actProlog(Term)):- ignore(Term=someCode).
 
 % [Optionaly] Start the telent server
 :-at_start(toploop_telnet:start_mud_telnet(4000)).

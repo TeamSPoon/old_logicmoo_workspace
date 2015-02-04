@@ -152,8 +152,8 @@ to_tclass(Prop,New):- mudIsa(Prop,tCol),ensure_starts_with_prefix(Prop,t,New),!.
 to_tclass(Prop,New):- (dbase_t(_,_,Prop);dbase_t(_,_,Prop,_);dbase_t(_,_,_,Prop)),ensure_starts_with_prefix(Prop,v,New),!.
 % to_tclass(Prop,actDrop).
 
-is_actverb(X):-type_action_info(_,PX,_),functor(PX,X,_).
-is_actverb(X):-action_info(PX,_),functor(PX,X,_).
+is_actverb(X):-user:type_action_info(_,PX,_),functor(PX,X,_).
+is_actverb(X):-user:action_info(PX,_),functor(PX,X,_).
 is_actverb(X):-vtActionTemplate(PX),functor(PX,X,_).
 is_actverb(X):-vtPosture(PX),functor(PX,X,_).
 is_actverb(X):-verb_alias(_,X).

@@ -20,18 +20,18 @@
 
 
 % where 
-agent_text_command(Agent,["where",BE,X],Agent,actWhere(X)):-memberchk(BE,[is,are,be,were]).
-agent_text_command(Agent,["where_is",X],Agent,actWhere(X)).
-action_info(actWhere(ftTerm),"Tells where something is").
-agent_call_command(_Agent,actWhere(SObj)) :-
+user:agent_text_command(Agent,["where",BE,X],Agent,actWhere(X)):-memberchk(BE,[is,are,be,were]).
+user:agent_text_command(Agent,["where_is",X],Agent,actWhere(X)).
+user:action_info(actWhere(ftTerm),"Tells where something is").
+user:agent_call_command(_Agent,actWhere(SObj)) :-
     forall(
      (mudAtLoc(Obj,LOC), match_object(SObj,Obj)),
         fmt(cmdresult(actWhere,mudAtLoc(Obj,LOC)))).
 
 
-action_info(actWho(isOptional(tAgentGeneric,isMissing)),"Lists who is online (where they are at least)").
+user:action_info(actWho(isOptional(tAgentGeneric,isMissing)),"Lists who is online (where they are at least)").
 
-agent_call_command(_Gent,actWho(W)) :- mud_cmd_who(W).
+user:agent_call_command(_Gent,actWho(W)) :- mud_cmd_who(W).
 
 mud_cmd_who(isMissing):-!,mud_cmd_who_1(_).
 mud_cmd_who(Who):- mud_cmd_who_1(Who).

@@ -49,8 +49,8 @@ remove_undef_search:- ((
  assert((check:list_undefined(A):- ignore(A=[]),scansrc_list_undefined(A))))).
 
 
-action_info(actScansrc,"Scan for sourcecode modifed on filesystem and TeamSPoon. NOTE: only new files with this mask (src_incoming/*/?*.pl) are picked up on").
-agent_call_command(Agent,actScansrc):-  once('@'(agent_call_safely(Agent,actScansrc),'user')).
+user:action_info(actScansrc,"Scan for sourcecode modifed on filesystem and TeamSPoon. NOTE: only new files with this mask (src_incoming/*/?*.pl) are picked up on").
+user:agent_call_command(Agent,actScansrc):-  once('@'(agent_call_safely(Agent,actScansrc),'user')).
 
 :-dynamic_multifile_exported(actScansrc/0).
 actScansrc :- 
