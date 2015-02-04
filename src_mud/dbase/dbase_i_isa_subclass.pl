@@ -45,11 +45,12 @@ define_compound_as_type(Spec):- compound(Spec),trace_or_throw(never_compound_def
 :-dynamic_multifile_exported(define_ft/1).
 define_ft(ftListFn(Spec)):- never_type(Spec),!,trace_or_throw(never_ft(ftListFn(Spec))).
 define_ft(ftListFn(_)):-!.
-define_ft(Spec):- never_type(Spec),!,trace_or_throw(never_ft(Spec)).
+define_ft(Spec):- never_type(Spec),!,trace_or_throw(never_ft(never_type(Spec))).
 define_ft(M:F):- !, '@'(define_ft(F), M).
 define_ft(Spec):- compound(Spec),functor(Spec,F,_),!,define_ft_0(F),define_ft_0(Spec).
 define_ft(Spec):- define_ft_0(Spec).
 
+define_ft_0(xyzFn):-!.
 define_ft_0(Spec):- hasInstance(ttFormatType,Spec),!.
 define_ft_0(Spec):- hasInstance(tCol,Spec),dmsg(once(maybe_converting_plain_type_to_formattype(Spec))),fail.
 define_ft_0(Spec):- hooked_asserta(mudIsa(Spec,ttFormatType)),(assert_hasInstance(ttFormatType,Spec)).
@@ -170,7 +171,7 @@ transitive_subclass_tst(_,_):-!,fail.
 % isa_backchaing(I,T):- stack_depth(Level),Level>650,trace_or_throw(skip_dmsg_nope(failing_stack_overflow(isa_backchaing(I,T)))),!,fail.
 
 :-decl_mpred_prolog(isa_backchaing/2).
-isa_backchaing(I,T):- fact_loop_checked(mudIsa(I,T),no_repeats_old(isa_backchaing_0(I,T))).
+isa_backchaing(I,T):- call_tabled(fact_loop_checked(mudIsa(I,T),no_repeats_old(isa_backchaing_0(I,T)))).
 
 isa_backchaing_v_nv(I,ftTerm):-nonvar(I),!.
 isa_backchaing_v_nv(_,var):-!.
@@ -186,12 +187,13 @@ isa_backchaing_0(I,T):-  transitive_subclass_or_same(AT,T),isa_asserted(I,AT).
 % ==========================
 % taxonomicPair(isa,mudSubclass)
 % ==========================
-
+/*
 % A->TL = (isa_asserted_0(A,AT),transitive_subclass_or_same(AT,TL))
 build_isa_inst_list_cache(A,Isa,B,(!,dbase_t(cache_I_I,Isa,A,B))):- Isa=mudIsa, nonvar(A),once(dbase_t(cache_I_I,Isa,A,_)),!.
 build_isa_inst_list_cache(A,Isa,B,(!,dbase_t(cache_I_I,Isa,A,B))):- Isa=mudIsa, nonvar(A),
       forall(((isa_asserted_0(A,AT),transitive_subclass_or_same(AT,T))),assertz_if_new(dbase_t(cache_I_I,Isa,A,T))).
       
+*/
 
 % A->TL = transitive_subclass(T,TL).
 build_genls_inst_list_cache(A,Subclass,B,dbase_t(cache_I_I,Subclass,A,B)):- Subclass=mudSubclass, nonvar(A),once(dbase_t(cache_I_I,Subclass,A,_)),!.
@@ -211,7 +213,7 @@ not_ft(T):-transitive_subclass_or_same(T,tSpatialThing).
 % ============================================
 % isa_asserted/1
 % ============================================
-isa_asserted(I,T):-no_repeats_old(isa_asserted_nr(I,T)).
+isa_asserted(I,T):-call_tabled(no_repeats_old(isa_asserted_nr(I,T))).
 isa_asserted_motel(I,T):-no_repeats_old(isa_asserted_nr(I,T)).
 
 :-dynamic_multifile_exported(type_isa/2).

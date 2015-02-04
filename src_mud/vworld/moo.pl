@@ -55,6 +55,7 @@ mpred_prop(mpred_arity,prologOnly).
 mpred_prop(never_type,prologOnly).
 mpred_prop(dbase_t, prologHybrid).
 mpred_arity(mpred_prop,2).
+mpred_arity(xyzFn,4).
 mpred_arity(mpred_arity,2).
 mpred_arity(never_type,1).
 

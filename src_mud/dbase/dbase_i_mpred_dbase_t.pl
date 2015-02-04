@@ -348,13 +348,13 @@ provide_mpred_call_op(_,X,prologHybrid, CALL):- was_isa(X,I,C),!, CALL=no_loop_c
 
 % FACT CALL HOOK
 provide_mpred_call_op(_,FACT,prologHybrid,CALL):- get_functor(FACT, F,A), !,
-     CALL= call_for_literal(F,A,FACT),!.
+     CALL= call_tabled(call_for_literal(F,A,FACT)),!.
 
 
 cwdl(CALL,DEEP7):- call_with_depth_limit(CALL,DEEP7,Result),
    ( Result == depth_limit_exceeded -> (!,fail) ; true).
 
-call_for_literal_ideep_lc(HEAD):- must(into_assertable_form(dbase_t,HEAD,DB)),!, call_for_literal_db(HEAD,DB).
+call_for_literal_ideep_lc(HEAD):- get_functor(HEAD,F,A),call_for_literal_db(F,A,HEAD).
 
 constrain_args(HEAD):-HEAD=..[P|ARGS],constrain_args(P,ARGS).
 
@@ -362,17 +362,17 @@ constrain_args(_P,[AR,GS]):-!,dif(AR,GS).
 constrain_args(_,[_P,AR,GS]):-!,dif(AR,GS).
 constrain_args(A,B):-constrain_args_pttp(A,B).
 
-call_for_literal_db(HEAD,DB):-HEAD=..[P|ARGS],get_functor(HEAD,F,A),
-    %decl_mpred_stubcol(F,A,prologHybrid),
-   (thglobal:after_game_load->decl_mpred_hybrid(F,A);true),
-   constrain_args(P,ARGS),call_for_literal_db0(F,A,HEAD,DB),constrain_args(P,ARGS).
+call_for_literal_db(F,A,HEAD):- P=F, HEAD=..[P|ARGS],
+   ((thglobal:after_game_load,((functor(PHEAD,F,A),clause_safe(PHEAD,true));not(mpred_prop(F,hasStub(prologHybrid)))))->decl_mpred_hybrid(F,A);true),
+   constrain_args(P,ARGS),call_for_literal_db0(F,A,HEAD),constrain_args(P,ARGS).
 
-call_for_literal_db0(F,A,HEAD,DB):-no_repeats_av(HEAD,call_for_literal_db00(F,A,HEAD,DB)).
+call_for_literal_db0(F,A,HEAD):-no_repeats_av(HEAD,call_for_literal_db00(F,A,HEAD)).
 
-call_for_literal_db00(F,A,HEAD,DB):-loop_check(is_asserted(HEAD),loop_check(is_asserted(DB),(DB))).
-call_for_literal_db00(F,A,HEAD,DB):- ttCompleteExtentAsserted(F),!,fail.
-call_for_literal_db00(F,A,HEAD,DB):- loop_check(call_rule_db(F,A,HEAD,DB),DB).
-call_for_literal_db00(F,A, _,dbase_t(P1,A1,A2)):-  not(use_pttp),dif(P1,P2),loop_check_term(genlPreds(P2,P1),gp(P1),fail),call(dbase_t,P2,A1,A2).
+call_for_literal_db00(F,A,HEAD):- dbase_t(HEAD);clause_safe(HEAD,true).
+call_for_literal_db00(F,A,HEAD):- ttCompleteExtentAsserted(F),!,fail.
+call_for_literal_db00(F,A,HEAD):- loop_check(call_rule_db(F,A,HEAD)).
+call_for_literal_db00(F,A,HEAD):- not(use_pttp),HEAD=..[P1,A1,A2],dif(P2,P1),loop_check_term(genlPreds(P2,P1),gp(P1),fail),
+   call(dbase_t,P2,A1,A2).
 
 :- dynamic(use_ideep/0).
 :- retractall(use_pttp).
@@ -380,11 +380,11 @@ call_for_literal_db00(F,A, _,dbase_t(P1,A1,A2)):-  not(use_pttp),dif(P1,P2),loop
 
 call_for_literal(F,A,HEAD):- use_pttp,!,snark_ask(HEAD).
 call_for_literal(F,A,HEAD):- use_ideep, CALL = call_for_literal_ideep_lc(HEAD),!,loop_check_term(cwdl(CALL,7),HEAD,(CALL)).
-call_for_literal(F,A,HEAD):- must(into_assertable_form(dbase_t,HEAD,DB)),!,call_for_literal_db(HEAD,DB).
+call_for_literal(F,A,HEAD):- call_for_literal_db(F,A,HEAD).
 
-call_rule_db(F,A,HEAD,DB):- mudIsa(F,ttCompleteExtentAsserted),!,fail.
-call_rule_db(F,A,HEAD,_DB):- use_pttp,!,snark_ask(HEAD).
-call_rule_db(F,A,HEAD,_DB):- ruleHybridChain(HEAD,BODY),call_mpred_body(HEAD,BODY).
+call_rule_db(F,A,HEAD):- mudIsa(F,ttCompleteExtentAsserted),!,fail.
+call_rule_db(F,A,HEAD):- use_pttp,!,snark_ask(HEAD).
+call_rule_db(F,A,HEAD):- ruleHybridChain(HEAD,BODY),call_mpred_body(HEAD,BODY).
 
 call_mpred_body(_,true):-!.
 call_mpred_body(HEAD,and(A,B)):- !,call_mpred_body(HEAD,A),!,call_mpred_body(HEAD,B).

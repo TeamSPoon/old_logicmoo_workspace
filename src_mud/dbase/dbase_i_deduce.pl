@@ -48,7 +48,7 @@ user:decl_database_hook(retract(Kind),P):- forall(alt_forms(r,P,NP),ignore(hooke
 % ========================================================================================
 
 
-user:decl_database_hook(Type,Fact):- predicate_property(add_deduction(_,_),_),run_deduce_facts_from(Type,Fact).
+user:decl_database_hook(Type,Fact):- current_predicate(add_deduction/3),run_deduce_facts_from(Type,Fact).
 
 
 user:decl_database_hook(_,mpred_prop('ArtifactCol1008-VISOR688', flagged_visor)):- trace_or_throw(mpred_prop('ArtifactCol1008-VISOR688', flagged_visor)).
@@ -58,10 +58,15 @@ run_deduce_facts_from(Type,Fact):-loop_check_local(run_deduce_facts_from_lc(Type
 run_deduce_facts_from_lc(Type,Fact):-doall((call_no_cuts(deduce_facts(Fact,Deduction)),add_deduction(Type,Deduction,Fact))).
 
 
-user:decl_database_hook(assert(_),mudAtLoc(R,W)):- mudIsa(R,tRegion),trace_or_throw(mudAtLoc(R,W)).
+user:decl_database_hook(assert(_),BadFact):-bad_fact_why(BadFact,WHY),trace_or_throw(bad_fact_why(BadFact,WHY)).
 
+bad_fact_why(mudAtLoc(iArea1025, _),mudIsa(iArea1025,tRegion)).
+bad_fact_why(localityOfObject(iArea1025, iOfficeRoom7),mudIsa(iArea1025,tRegion)).
+bad_fact_why(localityOfObject(R,_),mudIsa(R,tRegion)):- mudIsa(R,tRegion).
+bad_fact_why(mudFacing(R,_),mudIsa(R,tRegion)):- mudIsa(R,tRegion).
+bad_fact_why(mudAtLoc(R,_),mudIsa(R,tRegion)):- mudIsa(R,tRegion).
 
-deduce_facts(localityOfObject(_,Region),mudIsa(Region,tSpatialThing)).
+%deduce_facts(localityOfObject(_,Region),mudIsa(Region,tSpatialThing)).
 deduce_facts(localityOfObject(Obj,_),mudIsa(Obj,tObj)).
 
 deduce_facts(Fact,mpred_prop(AF,[predArgTypes(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],is_pred_declarer(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,
@@ -72,14 +77,15 @@ deduce_facts(predArgTypes(ArgTs),mpred_prop(F,predArgTypes(ArgTs))):-mpred_arity
 deduce_facts(mpred_prop(F,predArgTypes(ArgTs)),predArgTypes(ArgTs)):-mpred_arity(F,A),functor(ArgTs,F,A).
 
 
-deduce_facts(predArgTypes(ArgTs),argIsa(F,A,Type)):-ztrace,functor(ArgTs,F,_),arg(A,ArgTs,Type).
+deduce_facts(predArgTypes(ArgTs),argIsa(F,A,Type)):-get_functor(ArgTs,F,_),arg(A,ArgTs,Type).
 deduce_facts(mpred_prop(F,predArgTypes(ArgTs)),argIsa(F,A,Type)):-arg(A,ArgTs,Type).
 
 deduce_facts(argIsa(F,_A,Type),[mudIsa(Type,tCol),mudIsa(F,tRelation)]):-atom(Type),not(hasInstance(ttFormatType,Type)).
 
 %deduce_facts(B,A):- is_asserted(ruleEquiv(B,A)),not(contains_singletons(A)).
 %deduce_facts(B,A):- is_asserted(ruleEquiv(A,B)),not(contains_singletons(A)).
-deduce_facts(Term,NewTerm):- hotrace(good_for_chaining(Op,Term)), db_rewrite(Op,Term,NewTerm),not(contains_singletons(NewTerm)).
+deduce_facts(Term,NewTerm):- current_predicate(good_for_chaining/2),
+  hotrace(good_for_chaining(Op,Term)), db_rewrite(Op,Term,NewTerm),not(contains_singletons(NewTerm)).
 
 
 fix_argIsa(F,N,vtDirection(Val),vtDirection):-add(mpred_prop(F,argSingleValueDefault(N,Val))),!.

@@ -241,7 +241,7 @@ put_in_world(Agent):-loop_check(put_in_world_lc(Agent),true),!.
 
 put_in_world_lc(Obj):-isa_asserted(Obj,tRegion),!.
 put_in_world_lc(Obj):-is_asserted(mudAtLoc(Obj,_)),!.
-put_in_world_lc(Obj):-localityOfObject(Obj,What),!,ensure_in_world(What),!.
+put_in_world_lc(Obj):-localityOfObject(Obj,What),not(tRegion(What)),!,ensure_in_world(What),!.
 put_in_world_lc(Obj):-with_fallbacksg(with_fallbacks(put_in_world_lc_gen(Obj))),!.
 
 put_in_world_lc_gen(Obj):-choose_for(mudFacing,Obj,_),!,must_det((choose_for(mudAtLoc,Obj,LOC),nonvar(LOC))).
@@ -285,7 +285,9 @@ hooked_random_instance(ftInt,3,Test):-call(Test),dmsg(random_instance(ftInt,3,Te
 
 %  give required forward deductions
 deduce_facts(mudAtLoc(Obj,LOC),localityOfObject(Obj,Region)):- nonvar(LOC),locationToRegion(LOC,Region).
-deduce_facts(localityOfObject(Obj,_Region),mudAtLoc(Obj,LOC)):- nonvar(Obj),put_in_world(Obj),must_det(mudAtLoc(Obj,LOC)).
+deduce_facts(localityOfObject(Obj,Region),mudAtLoc(Obj,LOC)):- tRegion(Region),not(is_asserted(mudAtLoc(Obj,_))), nonvar(Obj),
+  show_call(put_in_world(Obj)),
+  must_det(mudAtLoc(Obj,LOC)).
 
 
 % random_region(LOC):- findall(O,isa(O,region),LOCS),my_random_member(LOC,LOCS).

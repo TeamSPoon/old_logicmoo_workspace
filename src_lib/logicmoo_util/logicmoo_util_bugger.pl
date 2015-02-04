@@ -729,21 +729,19 @@ snumbervars(Term):-numbervars_impl(Term,0,_).
 % Loop checking
 % ===================================================================
 :- thread_local ilc/1.
-:- dynamic(ilc/1).
-
 :- thread_local ilc_local/2.
-:- dynamic(ilc_local/2).
 
+make_key(M:CC,Key):- atom(M),!, notrace(ground(CC)->Key=CC ; (copy_term(CC,Key,_),numbervars(Key,0,_))).
 make_key(CC,Key):- notrace(ground(CC)->Key=CC ; (copy_term(CC,Key,_),numbervars(Key,0,_))).
 
 is_loop_checked(Call):-  make_key(Call,Key),!,ilc(Key).
 is_module_loop_checked(Module, Call):- (var(Call)->true;make_key(Call,Key)),!,ilc_local(Module,Key).
 
-no_loop_check_unsafe(Call):- % make_key(Call,Key),
-   with_assertions([-ilc(_),-ilc_local(_,_)],loop_check(Call,fail)).
+no_loop_check_unsafe(Call):-
+   with_assertions([-(ilc(_)),-(ilc_local(_,_))],loop_check(Call,fail)).
 
 % WAS no_loop_check(Call):- no_loop_check(Call,trace_or_throw(loop_to_no_loop_check(Call))).
-no_loop_check(Call):- make_key(Call,Key), with_assertions([-ilc(_),ilc(Key)],Call).
+no_loop_check(Call):- make_key(Call,Key), with_assertions([-(ilc(_)),ilc(Key)],Call).
 
 no_loop_check(Call, TODO):-  with_no_assertions(ilc(_),loop_check_local(Call,TODO)).
 
@@ -1242,9 +1240,7 @@ user_use_module(What):- '@'(use_module(What),'user').
 %:- meta_predicate_transparent((loop_check_fail(0))).
 
 
-:- (decl_thlocal  tlbugger:can_table/0).
-:-decl_thlocal  tlbugger:cannot_table/0.
-% thread locals should defaults to false:  tlbugger:can_table.
+:-decl_thlocal tlbugger:cannot_table/0.
 
 cannot_table_call(Call):- with_assertions( tlbugger:cannot_table,Call).
 
@@ -1986,9 +1982,10 @@ to_thread_head(TL:Head,TL,TL:Head,Head):-!, check_thread_local(TL:Head).
 % to_thread_head(Head,Module,Module:Head,Head):-Head \= (_:_), predicate_module(Head,Module),!.
 to_thread_head(user:Head,user,user:Head,Head):- !.
 to_thread_head(Head,thlocal,thlocal:Head,Head):-!,check_thread_local(thlocal:Head).
-to_thread_head(Head,tlbugger, tlbugger:Head,Head):- check_thread_local( tlbugger:Head).
+to_thread_head(Head,tlbugger,tlbugger:Head,Head):-check_thread_local(tlbugger:Head).
 
 check_thread_local(thlocal:_):-!.
+check_thread_local(tlbugger:_):-!.
 check_thread_local(_):-!.
 check_thread_local(user:_):-!.
 check_thread_local(TL:Head):-slow_sanity(( predicate_property(TL:Head,(dynamic)),must_det(predicate_property(TL:Head,(thread_local))))).
@@ -2849,13 +2846,13 @@ call_no_cuts(CALL):-get_functor(CALL,F,A),functor(C,F,A),must(once(not(not(claus
 :- meta_predicate_transparent findall_nodupes(?,0,-).
 :- module_transparent call_setof_tabled/3.
 
-:- dynamic(call_tabled_list/2).
+:- dynamic(table_bugger:call_tabled_list/2).
 
 :- meta_predicate_transparent(make_key(?,-)).
 
-expire_tabled_list(all):-!,retractall(call_tabled_list(_,_)).
-expire_tabled_list(_):-!,retractall(call_tabled_list(_,_)).
-expire_tabled_list(T):- atoms_of(T,A1), CT= call_tabled_list(Key,List),ignore(((CT,once(any_term_overlap_atoms_of(A1,List);(not(member(Key,List)),any_term_overlap_atoms_of(A1,Key))),retractall(CT)),fail)).
+expire_tabled_list(all):-!,retractall(table_bugger:call_tabled_list(_,_)).
+expire_tabled_list(_):-!,retractall(table_bugger:call_tabled_list(_,_)).
+expire_tabled_list(T):- atoms_of(T,A1), CT= table_bugger:call_tabled_list(Key,List),ignore(((CT,once(any_term_overlap_atoms_of(A1,List);(not(member(Key,List)),any_term_overlap_atoms_of(A1,Key))),retractall(CT)),fail)).
 
 any_term_overlap_atoms_of(A1,T2):-atoms_of(T2,A2),!,member(A,A1),member(A,A2),!.
 
@@ -2863,8 +2860,7 @@ any_term_overlap(T1,T2):- atoms_of(T1,A1),atoms_of(T2,A2),!,member(A,A1),member(
 
 :-meta_predicate_transparent(call_tabled_can(0)).
 
-call_tabled_can(Call):- tlbugger:cannot_table,!,no_repeats(Call).
-call_tabled_can(Call):-with_assertions( tlbugger:can_table,with_no_assertions( tlbugger:cannot_table,call_tabled(Call))).
+call_tabled_can(Call):- with_no_assertions(tlbugger:cannot_table,call_tabled(Call)).
 
 call_tabled(setof(Vars,C,List)):- !,call_setof_tabled(Vars,C,List).
 call_tabled(findall(Vars,C,List)):- !,call_setof_tabled(Vars,C,List).
@@ -2875,13 +2871,13 @@ call_vars_tabled(Vars,C):- call_setof_tabled(Vars,C,Set),!,member(Vars,Set).
 call_setof_tabled(Vars,C,List):- make_key(Vars+C,Key),call_tabled0(Key,Vars,C,List).
 
 findall_nodupes(Vs,C,List):- ground(Vs),!,(C->List=[Vs];List=[]),!.
-findall_nodupes(Vs,C,L):- setof(Vs,C,L).
+findall_nodupes(Vs,C,L):- setof(Vs,no_repeats_old(Vs,C),L).
 
-call_tabled0(Key,_,_,List):- call_tabled_list(Key,List),!.
-call_tabled0(Key,Vars,C,List):- not(tlbugger:cannot_table),really_can_table,!,findall_nodupes(Vars,C,List),!,asserta_if_ground(call_tabled_list(Key,List)),!.
-call_tabled0(_,Vars,C,List):- findall_nodupes(Vars,C,List),!.
+call_tabled0(Key,_,_,List):- table_bugger:call_tabled_list(Key,List),!.
+call_tabled0(Key,Vars,C,List):- findall_nodupes(Vars,C,List),
+  ignore((really_can_table,asserta_if_ground(table_bugger:call_tabled_list(Key,List)))),!.
 
-really_can_table:-not(test_tl( tlbugger:cannot_table)),test_tl( tlbugger:can_table).
+really_can_table:- not(test_tl(tlbugger:cannot_table)),(clause(ilc(_),B)->B=(!,fail);true),(clause(ilc_local(_,_),BL)->BL=(!,fail);true),!.
 
 
 :-meta_predicate_transparent(test_tl(1,+)).
@@ -3077,8 +3073,6 @@ user:prolog_exception_hook(A,B,C,D):- fail,
 %:-prolog.
 
 :-retract(double_quotes_was(WAS)),set_prolog_flag(double_quotes,WAS).
-
-% :- trace,(decl_thlocal  tlbugger:can_table/0).
 
 end_of_file.
 

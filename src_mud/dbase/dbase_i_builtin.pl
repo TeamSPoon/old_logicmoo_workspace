@@ -62,7 +62,7 @@ mudSubclass(isEach(tRegion,tAgentGeneric),tChannel).
 % :- decl_mpred_prolog(createableSubclassType/2).
 :- decl_mpred_prolog(mudMoveDist/2).
 :- decl_mpred_prolog(was_imported_kb_content/2).
-:- must(decl_mpred_prolog(user:agent_call_command/2)).
+:- must(decl_mpred_prolog(agent_call_command/2)).
 
 :-ensure_universal_stub(mudAtLoc,2).
 
@@ -244,7 +244,7 @@ prologHybrid(mudLabelTypeProps(ftString,tCol,ftVoprop)).
 
 prologHybrid(typeGrid(tCol,ftInt,ftListFn(ftString))).
 
-prologMultiValued(user:action_rules(tAgentGeneric,vtVerb,ftTerm(tObj),ftVoprop)).
+prologMultiValued(action_rules(tAgentGeneric,vtVerb,ftTerm(tObj),ftVoprop)).
 
 
 tCol(vtActionTemplate).
@@ -421,13 +421,13 @@ prologMultiValued(predProxyQuery(prologMultiValued,ftTerm)).
 
 mudIsa(ftText,ttFormatType).
 
-predArgTypes(user:type_action_info(tCol,vtActionTemplate,ftText)).
+predArgTypes(type_action_info(tCol,vtActionTemplate,ftText)).
 predArgTypes(argIsa(tRelation,ftInt,tCol)).
 predArgTypes(argFormat(tRelation,ftInt,ttFormatType)).
 
 prologOnly(action_template(ftTerm)).
-prologOnly(user:action_info(vtActionTemplate,ftText)).
-prologOnly(user:agent_text_command(tAgentGeneric,ftText,tAgentGeneric,ftAction)).
+prologOnly(action_info(vtActionTemplate,ftText)).
+prologOnly(agent_text_command(tAgentGeneric,ftText,tAgentGeneric,ftAction)).
 
 prologMultiValued(mudDescription(ftTerm,ftText),
   [predProxyAssert(add_description),predProxyRetract(remove_description),predProxyQuery(query_description)]).
@@ -448,7 +448,7 @@ tCol(vtVerb).
 ruleEquiv(nameStrings(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
 ruleEquiv(mudDescription(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
 
-% dbase_t(user:action_info,What,text("command is: ",What)):- holds_t(action_type,What).
+% dbase_t(action_info,What,text("command is: ",What)):- holds_t(action_type,What).
 
 :-decl_mpred_hybrid(mudStowing(tAgentGeneric,tItem)).
 
@@ -666,7 +666,7 @@ prologListValued(aDirectionsFn(ftTerm,ftListFn(ftTerm))).
 
 prologMultiValued(predModule(tRelation,ftAtom)).
 
-prologOnly(user:agent_call_command(tAgentGeneric,ftAction)).
+prologOnly(agent_call_command(tAgentGeneric,ftAction)).
 
 predTypeMax(mudHealth,tObj,500).
 predTypeMax(mudEnergy,tObj,130).

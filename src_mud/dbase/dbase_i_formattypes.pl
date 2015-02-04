@@ -535,7 +535,7 @@ learnArgIsaInst(_,_,_).
 
 
 
-deduce_facts(Fact,mudIsa(Arg,Type)):- slow_kb_op(deduce_argIsa_facts(Fact,Arg,Type)).
+deduce_facts(Fact,mudIsa(Arg,Type)):- test_tl(do_slow_kb_op_now),slow_kb_op(deduce_argIsa_facts(Fact,Arg,Type)).
 
 call_argIsa_ForAssert(F,N,Type):-argIsa_call(F,N,Type),atom(Type),!,not(nonusefull_deduction_type(Type)),tCol(Type).
 

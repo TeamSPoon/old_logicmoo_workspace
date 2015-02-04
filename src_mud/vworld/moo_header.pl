@@ -85,6 +85,7 @@
 :- dynamic_multifile_exported user:term_anglify_last/2.
 :- dynamic_multifile_exported user:term_anglify/2.
 :- dynamic_multifile_exported user:ruleHybridChain/2.
+:- dynamic_multifile_exported user:inRegion/2.
 :- dynamic_multifile_exported user:ruleEquiv/2.
 :- dynamic_multifile_exported user:registered_module_type/2.
 :- dynamic_multifile_exported user:provide_mpred_write_attributes/2.

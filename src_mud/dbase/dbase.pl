@@ -365,6 +365,7 @@ expire_dont_add:-dmsg(expire_dont_add),retractall(implied_dont_add(_)).
 % add_fast(CO):- must_det((add_fast_unchecked(CO), xtreme_debug(once(ireq(CO);(with_all_dmsg((debug(blackboard),show_call(add_fast_unchecked(CO)),rtrace(add_fast_unchecked(CO)),dtrace(ireq(CO))))))))),!.
 add_fast(CO:-BODY):- dmsg(add_fast(CO:-BODY)),must_det((add_fast_unchecked((CO:-BODY)))),!.
 add_fast(Skipped):- ground(Skipped),implied_skipped(Skipped),!. %, dmsg(skip_add_fast(mudSubclass(CO,CO))).
+add_fast(grid_key(KW=COL)):- add_fast(typeProps(COL,[mudKwLabel(KW)])).
 add_fast(CO):- dmsg(add_fast(CO)),ignore((ground(CO),asserta(implied_dont_add(CO)))),!,must_det((add_fast_unchecked(CO), nop(xtreme_debug(ireq(CO)->true;dmsg(warn(failed_ireq(CO))))))),!.
 
 implied_skipped(mudSubclass(CO,CO)).

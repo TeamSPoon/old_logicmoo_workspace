@@ -34,6 +34,9 @@
 dbase_mod(user).
 
 
+
+user:decl_database_hook(One_or_All,Fact):- expire_tabled_list(all).
+
 :-dynamic_multifile_exported(is_svo_functor/1).
 is_svo_functor(Prop):- notrace((atom(Prop),arg(_,svo(svo,prop,valueOf,rdf),Prop))).
 
@@ -369,9 +372,9 @@ is_asserted(F,A,M:G):- atom(M),!,is_asserted(F,A,G).
 is_asserted(_,_,G):-was_isa(G,I,G),!,loop_check(isa_asserted(I,G)).
 
 is_asserted(dbase_t,1,dbase_t(G)):-!,dbase_t(G).
-is_asserted(dbase_t,_,G):-G=..[_,NA|IST],nonvar(NA),NA=nart(Fist),!,nart_to_atomic(Fist,F),atom(F),CC=..[F|IST],is_asserted_mpred(F,CC).
+is_asserted(dbase_t,_,G):-G=..[_,NA|IST],nonvar(NA),NA=nart(Fist),!,must((nart_to_atomic(Fist,F),atom(F),CC=..[F|IST],is_asserted_mpred(F,CC))).
 is_asserted(dbase_t,_,G):-G=..[_,F|IST],atom(F),!,CC=..[F|IST],is_asserted_mpred(F,CC).
-%  %  is_asserted(Holds,_,G):-is_holds_true(Holds), G=..[_,F|IST],atom(F),!,CC=..[F|IST],is_asserted_mpred(F,CC).
+is_asserted(Holds,_,G):-is_holds_true(Holds), G=..[_,F|IST],atom(F),!,CC=..[F|IST],is_asserted_mpred(F,CC).
 is_asserted(F,_,G):-is_asserted_mpred(F,G).
 
 
