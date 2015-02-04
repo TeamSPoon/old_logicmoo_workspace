@@ -227,7 +227,7 @@ Object applies:
 
 :-register_module_type([world_types,parser]).
 
-moo:label_type(Label,Type):- mudLabelTypeProps(Label,Type,_).
+user:label_type(Label,Type):- mudLabelTypeProps(Label,Type,_).
 
 % :-register_module_type(dynamic).
 

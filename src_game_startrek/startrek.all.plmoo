@@ -45,7 +45,7 @@ pddlPredicates([
 
 % static startrek
   pathBetween(tRegion,vtDirection,tRegion),
-  agentRoute(areaPath,tRegion,tRegion) ]).
+  agentRoute(tPathway,tRegion,tRegion) ]).
 
 /* Prediate:  tAgentGeneric/1 
 interpreted.
@@ -498,7 +498,7 @@ pddlSomethingIsa('iArea1040',[tRegion,'FreeSpaceContent']).
 pddlSomethingIsa('iArea1041',[tRegion,'FreeSpaceContent']).
 pddlSomethingIsa('ShipMap123',[tItem]).
 localityOfObject('ShipMap123','iArea1000').
-verbOverride('ShipMap123',actExamine(this),
+instVerbOverride('ShipMap123',actExamine('ShipMap123'),
   actProlog(fmt("
 STARSHIP ENTERPRISE
 
@@ -1243,8 +1243,8 @@ pddlObjects(tRegion,['iArea1000','iArea1001','iArea1002','iArea1003','iArea1004'
 ]).
 pddlObjects(tAgentGeneric,['NPC0Geordi684','NPC2Worf720','NPC3DrCrusher677','NPC4Troi712','NPC5Riker707','NPC6Picard701','NPC7Guinan689','NPC8OBrien696','NPC9Wesley716','NPC1010Livingston726','NPC1011Spot727','iEnsign728','iEnsign732','iEnsign736','iEnsign740','iEnsign744','iEnsign748','iEnsign752','NPC1013Alexander671',iCommanderData,iExplorer1]).
 
-%%pddlObjects(areaPath,List):findall(apath(A,B),pathBetween(A,B,C),List).
-pddlObjects(areaPath,[apathFn('iArea1000',"n"),apathFn('iArea1001',"e"),apathFn('iArea1002',"n"),apathFn('iArea1002',"e"),apathFn('iArea1002',"s"),apathFn('iArea1002',"w"),apathFn('iArea1003',"w"),apathFn('iArea1004',"e"),apathFn('iArea1005',"n"),apathFn('iArea1005',"e"),apathFn('iArea1005',"s"),apathFn('iArea1005',"w"),apathFn('iArea1006',"n"),apathFn('iArea1006',"w"),apathFn('iArea1007',"e"),apathFn('iArea1008',"n"),apathFn('iArea1008',"e"),apathFn('iArea1008',"s"),apathFn('iArea1008',"w"),apathFn('iArea1009',"w"),apathFn('iArea1010',"s"),apathFn('iArea1010',"u"),apathFn('iArea1011',"n"),apathFn('iArea1011',"u"),apathFn('iArea1011',"d"),apathFn('iArea1012',"e"),apathFn('iArea1013',"n"),apathFn('iArea1013',"e"),apathFn('iArea1013',"s"),apathFn('iArea1013',"w"),apathFn('iArea1014',"w"),apathFn('iArea1015',"e"),apathFn('iArea1016',"n"),apathFn('iArea1016',"e"),apathFn('iArea1016',"s"),apathFn('iArea1016',"w"),apathFn('iArea1017',"w"),apathFn('iArea1018',"e"),apathFn('iArea1019',"n"),apathFn('iArea1019',"e"),apathFn('iArea1019',"s"),apathFn('iArea1019',"w"),apathFn('iArea1020',"w"),apathFn('iArea1021',"s"),apathFn('iArea1022',"n"),apathFn('iArea1022',"s"),apathFn('iArea1023',"e"),apathFn('iArea1024',"n"),apathFn('iArea1024',"e"),apathFn('iArea1024',"s"),apathFn('iArea1024',"w"),apathFn('iArea1025',"w"),apathFn('iArea1026',"e"),apathFn('iArea1027',"n"),apathFn('iArea1027',"e"),apathFn('iArea1027',"s"),apathFn('iArea1027',"w"),apathFn('iArea1028',"w"),apathFn('iArea1029',"e"),apathFn('iArea1030',"n"),apathFn('iArea1030',"e"),apathFn('iArea1030',"s"),apathFn('iArea1030',"w"),apathFn('iArea1031',"w"),apathFn('iArea1032',"s"),apathFn('iArea1032',"u"),apathFn('iArea1032',"d"),apathFn('iArea1033',"u"),apathFn('iArea1033',"d"),apathFn('iArea1034',"u"),apathFn('iArea1034',"d"),apathFn('iArea1035',"e"),apathFn('iArea1036',"n"),apathFn('iArea1036',"e"),apathFn('iArea1036',"d"),apathFn('iArea1037',"w"),apathFn('iArea1038',"s"),apathFn('iArea1038',"w"),apathFn('iArea1039',"n"),apathFn('iArea1039',"u"),apathFn('iArea1040',"u"),apathFn('iArea1040',"d"),apathFn('iArea1041',"u"),apathFn('iArea1041',"d"),apathFn('iArea1042',"n"),apathFn('iArea1042',"s")]).
+%%pddlObjects(tPathway,List):findall(apath(A,B),pathBetween(A,B,C),List).
+pddlObjects(tPathway,[apathFn('iArea1000',"n"),apathFn('iArea1001',"e"),apathFn('iArea1002',"n"),apathFn('iArea1002',"e"),apathFn('iArea1002',"s"),apathFn('iArea1002',"w"),apathFn('iArea1003',"w"),apathFn('iArea1004',"e"),apathFn('iArea1005',"n"),apathFn('iArea1005',"e"),apathFn('iArea1005',"s"),apathFn('iArea1005',"w"),apathFn('iArea1006',"n"),apathFn('iArea1006',"w"),apathFn('iArea1007',"e"),apathFn('iArea1008',"n"),apathFn('iArea1008',"e"),apathFn('iArea1008',"s"),apathFn('iArea1008',"w"),apathFn('iArea1009',"w"),apathFn('iArea1010',"s"),apathFn('iArea1010',"u"),apathFn('iArea1011',"n"),apathFn('iArea1011',"u"),apathFn('iArea1011',"d"),apathFn('iArea1012',"e"),apathFn('iArea1013',"n"),apathFn('iArea1013',"e"),apathFn('iArea1013',"s"),apathFn('iArea1013',"w"),apathFn('iArea1014',"w"),apathFn('iArea1015',"e"),apathFn('iArea1016',"n"),apathFn('iArea1016',"e"),apathFn('iArea1016',"s"),apathFn('iArea1016',"w"),apathFn('iArea1017',"w"),apathFn('iArea1018',"e"),apathFn('iArea1019',"n"),apathFn('iArea1019',"e"),apathFn('iArea1019',"s"),apathFn('iArea1019',"w"),apathFn('iArea1020',"w"),apathFn('iArea1021',"s"),apathFn('iArea1022',"n"),apathFn('iArea1022',"s"),apathFn('iArea1023',"e"),apathFn('iArea1024',"n"),apathFn('iArea1024',"e"),apathFn('iArea1024',"s"),apathFn('iArea1024',"w"),apathFn('iArea1025',"w"),apathFn('iArea1026',"e"),apathFn('iArea1027',"n"),apathFn('iArea1027',"e"),apathFn('iArea1027',"s"),apathFn('iArea1027',"w"),apathFn('iArea1028',"w"),apathFn('iArea1029',"e"),apathFn('iArea1030',"n"),apathFn('iArea1030',"e"),apathFn('iArea1030',"s"),apathFn('iArea1030',"w"),apathFn('iArea1031',"w"),apathFn('iArea1032',"s"),apathFn('iArea1032',"u"),apathFn('iArea1032',"d"),apathFn('iArea1033',"u"),apathFn('iArea1033',"d"),apathFn('iArea1034',"u"),apathFn('iArea1034',"d"),apathFn('iArea1035',"e"),apathFn('iArea1036',"n"),apathFn('iArea1036',"e"),apathFn('iArea1036',"d"),apathFn('iArea1037',"w"),apathFn('iArea1038',"s"),apathFn('iArea1038',"w"),apathFn('iArea1039',"n"),apathFn('iArea1039',"u"),apathFn('iArea1040',"u"),apathFn('iArea1040',"d"),apathFn('iArea1041',"u"),apathFn('iArea1041',"d"),apathFn('iArea1042',"n"),apathFn('iArea1042',"s")]).
 
 pddlObjects(vtDirection,["n","s","e","w","u","d"]).
 /*********************** predcate defns ***********************************/
