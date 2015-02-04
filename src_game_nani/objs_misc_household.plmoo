@@ -32,6 +32,18 @@
 % onSpawn accepts class in any argument
 % though also isntances like 
 
+:-onSpawn tRegion(tKitchen).
+:-onSpawn tRegion(tHall).
+:-onSpawn tRegion(tCellar).
+:-onSpawn tRegion(tOfficeRoom).
+:-onSpawn tRegion(tLivingRoom).
+:-onSpawn tRegion(tDiningRoom).
+:-onSpawn tRegion(tBedRoom).
+:-onSpawn tRegion(tBathRoom).
+:-onSpawn tRegion(tClosetRoom).
+:-onSpawn tRegion(tBackYard).
+
+
 :-onSpawn localityOfObject(tRedApple, tKitchen).
 :-onSpawn localityOfObject(tGreanApple, tKitchen).
 %:-onSpawn localityOfObject(iFn(tApple,[mudColor(vRed)]), tKitchen).
