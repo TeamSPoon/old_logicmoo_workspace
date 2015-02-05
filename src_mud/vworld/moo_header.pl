@@ -93,7 +93,7 @@
 :- dynamic_multifile_exported user:provide_mpred_storage_clauses/3.
 :- dynamic_multifile_exported user:provide_mpred_setup/4.
 :- dynamic_multifile_exported user:provide_mpred_read_attributes/3.
-:- dynamic_multifile_exported user:provide_mpred_currently/4.
+:- dynamic_multifile_exported user:provide_mpred_currently/5.
 :- dynamic_multifile_exported user:now_unused/1.
 :- dynamic_multifile_exported user:mudTermAnglify/2.
 :- dynamic_multifile_exported(user:is_known_trew/1).
@@ -128,7 +128,6 @@
 :- dynamic_multifile_exported user:loaded_external_kbs/0.
 :- dynamic_multifile_exported user:latitude/2.
 :- dynamic_multifile_exported user:label_type/2.
-:- dynamic_multifile_exported user:hasInstance_dyn/2.
 :- dynamic_multifile_exported user:hooked_random_instance/3.
 :- dynamic_multifile_exported user:decl_coerce/3.
 :- dynamic_multifile_exported user:ft_info/2.

@@ -301,14 +301,14 @@ qname_to_prolog_1(NS,Name,Atom):-toPropercase(Name,AtomU),!,atom_concat(NS,AtomU
 
 :- dynamic(rdf_alias/3).
 cache_rdf_alias(_,URL,URL):- is_url(URL),!.
-cache_rdf_alias(DB,From,To):- must(ground(rdf_alias(DB,From,To))),rdf_alias(DB,From,To),!.
+cache_rdf_alias(DB,From,To):- sanity(ground(rdf_alias(DB,From,To))),rdf_alias(DB,From,To),!.
 cache_rdf_alias(DB,NS:From,To):- DB==NS,!,asserta(rdf_alias(DB,NS:From,To)),!.
 cache_rdf_alias(DB,R:From,To):- trace_or_throw(cache_rdf_alias(DB:R:From,To)).
 cache_rdf_alias(DB,From,To):- dmsg(rdf_alias(DB,From,To)),asserta(rdf_alias(DB,From,To)),!.
 list_rdf_alias:-listing(rdf_alias).
 
 
-any_to_rdf(From,To):-must(ground(From)),any_to_rdf(mud,From,To),must(ground(To)).
+any_to_rdf(From,To):-sanity(ground(From)),any_to_rdf(mud,From,To),sanity(ground(To)).
 
 any_to_rdf(_,Var,V):-var(Var),!,must(copy_term(Var,V)).
 %any_to_rdf(DB,DB:From,To):-!,any_to_rdf(DB,From,To).
@@ -340,7 +340,7 @@ any_to_rdf_0(DB,[H|T],List):-
 	rdf_assert(List, rdf:first, HH, DB),
 	rdf_assert(List, rdf:type, rdf:'List', DB).
 
-any_to_rdf_0(_,NS:R,URL):-must(ground(NS:R)),must(rdf_global_dbase_object(NS:R,URL)),!.
+any_to_rdf_0(_,NS:R,URL):-sanity(ground(NS:R)),must(rdf_global_dbase_object(NS:R,URL)),!.
 any_to_rdf_0(DB,S,Sxx):-atom(S),atom_to_qname(S,Sx),Sx\=S,!,any_to_rdf(DB,Sx,Sxx).
 any_to_rdf_0(DB,S,URL):-atom(S),rdf_graph_ns(DB,NS),rdf_global_dbase_object(NS:S,URL),!.
 

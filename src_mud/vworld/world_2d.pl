@@ -133,7 +133,7 @@ rez_loc_object(XY,Type):-
 mudNearbyObjs(X,Y):-mudAtLoc(X,L1),mudAtLoc(Y,L2),mudNearbyLocs(L1,L2).
 
 locationToRegion(Obj,RegionIn):-var(Obj),!,dmsg(warn(var_locationToRegion(Obj,RegionIn))),mudIsa(RegionIn,tRegion).
-locationToRegion(Obj,RegionIn):-locationToRegion_0(Obj,Region),must((nonvar(Region),mudIsa(Region,tRegion))),!,RegionIn=Region.
+locationToRegion(Obj,RegionIn):-locationToRegion_0(Obj,Region),sanity((nonvar(Region),mudIsa(Region,tRegion))),!,RegionIn=Region.
 locationToRegion_0(Obj,Obj):-var(Obj),dmsg(warn(var_locationToRegion(Obj,Obj))),!.
 locationToRegion_0(xyzFn(Region,_,_,_),Region2):-nonvar(Region),!,locationToRegion_0(Region,Region2).
 locationToRegion_0(Obj,Obj):-nonvar(Obj),!,mudIsa(Obj,tRegion),!.
@@ -327,7 +327,7 @@ move_dir_target(RegionXYZ,DirS,Force,XXYY):-
    (locationToRegion(RegionXYZ,Region1)),
    (round_loc_target(Region1,X,Y,Z,Region2,X2,Y2,Z2)),
    XXYY = xyzFn(Region2,X2,Y2,Z2),
-   must_det(ground(XXYY)))),
+   sanity(ground(XXYY)))),
    check_ahead_for_ground(XXYY),!.
 
 move_dir_target(RegionXYZ,Dir,_Force,XXYY):-
@@ -336,7 +336,7 @@ move_dir_target(RegionXYZ,Dir,_Force,XXYY):-
    pathBetween_call(Region1,DirS,Region2),
    in_grid_rnd(Region2,XXYY),
    XXYY = xyzFn(Region2,_X2,_Y2,_Z2),
-   must_det(ground(XXYY)),
+   sanity(ground(XXYY)),
    check_ahead_for_ground(XXYY),!.
 
 
@@ -456,9 +456,9 @@ in_world_move0(LOC,Agent,Dir) :-
         dmsg(move_dir_target(LOC,DirS,XXYY)),
         locationToRegion(LOC,Region1),
         locationToRegion(XXYY,Region2),
-        ((add(mudAtLoc(Agent,XXYY)),
-        is_asserted(mudAtLoc(Agent,LOC2)),
-         LOC2 \== LOC)),
+              
+        ((expire_dont_add, add(mudAtLoc(Agent,XXYY)),
+        sanity((is_asserted(mudAtLoc(Agent,LOC2)),LOC2 \== LOC)))),         
    ifThen(( Region1\==Region2) ,raise_location_event(LOC,actNotice(reciever,actLeave(Agent,Region1,to(Dir))))),
         reverse_dir(Dir,Rev),
    ifThen(( Region1\==Region2) ,raise_location_event(XXYY,actNotice(reciever,actEnter(Agent,Region2,from(Rev))))),!,

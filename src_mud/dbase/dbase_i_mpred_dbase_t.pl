@@ -272,8 +272,8 @@ mpred_op(call(_)).
 
 
 % ISA DECL
-provide_mpred_currently(call(conjecture),mudIsa(_,_),prologHybrid):-!.
-provide_mpred_currently(_OP, X, prologHybrid, declared(_)):-was_isa(X,_,_),!.
+provide_mpred_currently(call(conjecture),_F,mudIsa(_,_),prologHybrid):-!.
+provide_mpred_currently(_OP,_F, X, prologHybrid, declared(_)):-was_isa(X,_,_),!.
 
 
 % ALL CALLS
@@ -320,7 +320,8 @@ provide_mpred_storage_op(OP,HeadBody,prologHybrid,CALL):-
 provide_mpred_storage_op(OP1,HeadBody,prologHybrid,CALL):- trace_or_throw(provide_mpred_storage_op(OP1,HeadBody,prologHybrid,CALL)).
 
 % SETUP HOOK
-provide_mpred_setup(OP,Head,StubType,OUT):-  StubType = prologHybrid, 
+provide_mpred_setup(OP,Head,StubType,OUT):- sanity(var(OUT)),
+ StubType = prologHybrid, 
   must_det_l(( get_pifunctor(Head,PHead,F,A),  
    show_call(provide_clauses_list(PHead,HBLIST)),
    user:dynamic(F/A),retractall(PHead),
@@ -330,9 +331,9 @@ provide_mpred_setup(OP,Head,StubType,OUT):-  StubType = prologHybrid,
    call((asserta_if_new(mpred_prop(F,hasStub(StubType))))), 
    asserta_if_new(mpred_prop(F,StubType)), 
    add_stub_now(PHead,StubType,call(conjecture)),
-   forall(member(HB,HBLIST),must(add(HB))),!,
+   forall(member(HB,HBLIST),must(database_modify(assert(z),HB))),!,
    must_same_clauses(PHead,HBLIST))),
-   must(OUT=defined(provide_mpred_setup(OP,StubType))).
+   OUT=defined(provide_mpred_setup(OP,StubType)).
 
 
 % :- forall(current_predicate(M:F/A),catch(module_transparent(M:F/A),_,true)).
@@ -351,36 +352,32 @@ provide_mpred_call_op(_,FACT,prologHybrid,CALL):- get_functor(FACT, F,A), !,
      CALL= call_tabled(call_for_literal(F,A,FACT)),!.
 
 
-cwdl(CALL,DEEP7):- call_with_depth_limit(CALL,DEEP7,Result),
-   ( Result == depth_limit_exceeded -> (!,fail) ; true).
-
-call_for_literal_ideep_lc(HEAD):- get_functor(HEAD,F,A),call_for_literal_db(F,A,HEAD).
-
-constrain_args(HEAD):-HEAD=..[P|ARGS],constrain_args(P,ARGS).
-
-constrain_args(_P,[AR,GS]):-!,dif(AR,GS).
-constrain_args(_,[_P,AR,GS]):-!,dif(AR,GS).
-constrain_args(A,B):-constrain_args_pttp(A,B).
-
-call_for_literal_db(F,A,HEAD):- P=F, HEAD=..[P|ARGS],
-   ((thglobal:after_game_load,((functor(PHEAD,F,A),clause_safe(PHEAD,true));not(mpred_prop(F,hasStub(prologHybrid)))))->decl_mpred_hybrid(F,A);true),
-   constrain_args(P,ARGS),call_for_literal_db0(F,A,HEAD),constrain_args(P,ARGS).
-
-call_for_literal_db0(F,A,HEAD):-no_repeats_av(HEAD,call_for_literal_db00(F,A,HEAD)).
-
-call_for_literal_db00(F,A,HEAD):- dbase_t(HEAD);clause_safe(HEAD,true).
-call_for_literal_db00(F,A,HEAD):- ttCompleteExtentAsserted(F),!,fail.
-call_for_literal_db00(F,A,HEAD):- loop_check(call_rule_db(F,A,HEAD)).
-call_for_literal_db00(F,A,HEAD):- not(use_pttp),HEAD=..[P1,A1,A2],dif(P2,P1),loop_check_term(genlPreds(P2,P1),gp(P1),fail),
-   call(dbase_t,P2,A1,A2).
-
 :- dynamic(use_ideep/0).
 :- retractall(use_pttp).
 %:- asserta_if_new(use_pttp).
 
 call_for_literal(F,A,HEAD):- use_pttp,!,snark_ask(HEAD).
-call_for_literal(F,A,HEAD):- use_ideep, CALL = call_for_literal_ideep_lc(HEAD),!,loop_check_term(cwdl(CALL,7),HEAD,(CALL)).
+call_for_literal(F,A,HEAD):- use_ideep,!, CALL = call_for_literal_ideep_lc(HEAD),!,loop_check_term(cwdl(CALL,7),HEAD,(CALL)).
 call_for_literal(F,A,HEAD):- call_for_literal_db(F,A,HEAD).
+
+call_for_literal_db(F,A,HEAD):- P=F, HEAD=..[P|ARGS],
+   ((thglobal:after_game_load,((functor(PHEAD,F,A),predicate_property(PHEAD,number_of_clauses(NC)),NC>1);not(mpred_prop(F,hasStub(prologHybrid)))))->decl_mpred_hybrid(F,A);true),
+   constrain_args(P,ARGS),call_for_literal_db0(F,A,HEAD),constrain_args(P,ARGS).
+
+
+cwdl(CALL,DEEP7):- call_with_depth_limit(CALL,DEEP7,Result),
+   ( Result == depth_limit_exceeded -> (!,fail) ; true).
+
+call_for_literal_ideep_lc(HEAD):- get_functor(HEAD,F,A),call_for_literal_db(F,A,HEAD).
+
+call_for_literal_db0(F,A,HEAD):-no_repeats_av(HEAD,call_for_literal_db00(F,A,HEAD)).
+
+call_for_literal_db00(F,A,HEAD):- is_asserted_dbase_t(HEAD).
+call_for_literal_db00(F,A,HEAD):- ttCompleteExtentAsserted(F),!,fail.
+call_for_literal_db00(F,A,HEAD):- loop_check(call_rule_db(F,A,HEAD)).
+call_for_literal_db00(F,A,HEAD):- not(use_pttp),HEAD=..[P1,A1,A2],dif(P2,P1),loop_check_term(is_asserted_dbase_t(genlPreds(P2,P1)),gp(P1),fail),
+   call(dbase_t,P2,A1,A2).
+
 
 call_rule_db(F,A,HEAD):- mudIsa(F,ttCompleteExtentAsserted),!,fail.
 call_rule_db(F,A,HEAD):- use_pttp,!,snark_ask(HEAD).
@@ -393,6 +390,11 @@ call_mpred_body(HEAD,BODY):- no_repeats(loop_check_term(call_mpred_body_lc(HEAD,
 
 call_mpred_body_lc(_HEAD,BODY):- debugOnError(BODY).
 
+constrain_args(HEAD):-HEAD=..[P|ARGS],constrain_args(P,ARGS).
+
+constrain_args(_P,[AR,GS]):-!,dif(AR,GS).
+constrain_args(_,[_P,AR,GS]):-!,dif(AR,GS).
+constrain_args(A,B):-constrain_args_pttp(A,B).
 
 % =====================================
 % = body_req

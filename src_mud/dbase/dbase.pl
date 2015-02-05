@@ -75,6 +75,11 @@ shrink_clause( HB,HB).
 % DBASE_T System
 % ================================================
 
+:-dynamic(implied_dont_add/1).
+expire_dont_add:-dmsg(expire_dont_add),retractall(implied_dont_add(_)).
+is_asserted_dbase_t(HEAD):-dbase_t(HEAD);clause_safe(HEAD,true);fact_always_true(HEAD).
+
+
 :-ensure_loaded(dbase_i_kb_store).
 
 % ================================================
@@ -122,7 +127,7 @@ user:decl_database_hook(assert(_A_or_Z),mudLabelTypeProps(Lbl,T,Props)):- hooked
 
 user:decl_database_hook(assert(_A_or_Z),typeProps(T,_)):- decl_type_safe(T).
 
-user:decl_database_hook(assert(_A_or_Z),mpred_prop(F,_)):- must_det(atom(F)).
+user:decl_database_hook(assert(_A_or_Z),mpred_prop(F,_)):- sanity(atom(F)).
 
 
 % ================================================
@@ -233,7 +238,7 @@ coerce(_ ,_,     NewThing,Else):- NewThing = Else.
   %str/2,
   mudFacing/2, mudHeight/2, act_term/2, nameStrings/2, mudDescription/2, pathBetween/3, mudAgentTurnnum/2.
 
-:- must(dbase_mod(user)).
+:- sanity(dbase_mod(user)).
 
 
 % :-dynamic((weight/2)).
@@ -329,14 +334,14 @@ db_reop0(OP,Call) :- dmsg(warn(db_reop(OP,Call))),db_op0(OP,Call).
 del(C0):- ireq(C0),!,idel(C0),!.
 del(C0):- mreq(C0),!,mdel(C0),!.
 
-idel(C0):- expire_dont_add,dmsg(idel(C0)),db_op_int(change(retract,one),C0), verify_sanity(ireq(C0)->(dmsg(warn(incomplete_I_DEL(C0))),fail);true),!.
+idel(C0):- dmsg(idel(C0)),db_op_int(change(retract,one),C0), verify_sanity(ireq(C0)->(dmsg(warn(incomplete_I_DEL(C0))),fail);true),!.
 idel(C0):- dmsg(warn(failed(idel(C0)))),!,fail.
 
-mdel(C0):- expire_dont_add,dmsg(mdel(C0)),db_op_int(change(retract,one),C0), verify_sanity(mreq(C0)->(dmsg(warn(incomplete_M_DEL(C0))),fail);true),!.
+mdel(C0):- dmsg(mdel(C0)),db_op_int(change(retract,one),C0), verify_sanity(mreq(C0)->(dmsg(warn(incomplete_M_DEL(C0))),fail);true),!.
 mdel(C0):- dmsg(warn(failed(mdel(C0)))),!,fail.
 
 % -  clr(Retractall)
-clr(C0):- expire_dont_add,dmsg(clr(C0)),db_op_int(change(retract,all),C0),verify_sanity(ireq(C0)->(dmsg(warn(incomplete_CLR(C0))));true).
+clr(C0):- dmsg(clr(C0)),db_op_int(change(retract,all),C0),verify_sanity(ireq(C0)->(dmsg(warn(incomplete_CLR(C0))));true).
 
 % -  preq(Query) = query with P note
 preq(P,C0):- db_op_int(query(dbase_t,P),C0).
@@ -359,20 +364,19 @@ props(Obj,PropSpecs):- req(props(Obj,PropSpecs)).
 iprops(Obj,PropSpecs):- ireq(props(Obj,PropSpecs)).
 
 
-expire_dont_add:-dmsg(expire_dont_add),retractall(implied_dont_add(_)).
 
 % -  add_fast(Assertion)
 % add_fast(CO):- must_det((add_fast_unchecked(CO), xtreme_debug(once(ireq(CO);(with_all_dmsg((debug(blackboard),show_call(add_fast_unchecked(CO)),rtrace(add_fast_unchecked(CO)),dtrace(ireq(CO))))))))),!.
-add_fast(CO:-BODY):- dmsg(add_fast(CO:-BODY)),must_det((add_fast_unchecked((CO:-BODY)))),!.
+add_fast(CO:-BODY):- BODY==true,!,add_fast(CO),!.
+add_fast(CO:-BODY):- dmsg(add_fast((CO:-BODY))),must_det((add_fast_unchecked((CO:-BODY)))),!.
 add_fast(Skipped):- ground(Skipped),implied_skipped(Skipped),!. %, dmsg(skip_add_fast(mudSubclass(CO,CO))).
 add_fast(grid_key(KW=COL)):- add_fast(typeProps(COL,[mudKwLabel(KW)])).
 add_fast(CO):- dmsg(add_fast(CO)),ignore((ground(CO),asserta(implied_dont_add(CO)))),!,must_det((add_fast_unchecked(CO), nop(xtreme_debug(ireq(CO)->true;dmsg(warn(failed_ireq(CO))))))),!.
 
 implied_skipped(mudSubclass(CO,CO)).
 implied_skipped(props(_,[])).
+implied_skipped(Skipped):-compound(Skipped), not(functor(Skipped,_,1)), is_asserted_dbase_t(Skipped).
 implied_skipped(Skipped):-implied_dont_add(Skipped).
-
-:-dynamic(implied_dont_add/1).
 
 
 
@@ -499,7 +503,7 @@ db_op0(change(assert,add),mudIsa(ArgTypes,PrologMultiValued)):- compound(ArgType
    hasInstance(macroDeclarer,PrologMultiValued),
    get_functor(ArgTypes,F,A),
    assert_arity(F,A),
-   must(not(((PrologMultiValued=predProxyRetract)))),
+   sanity(not(((PrologMultiValued=predProxyRetract)))),
    decl_mpred(F,[predArity(A),PrologMultiValued,predArgTypes(ArgTypes)]),!.
 
 db_op0(Op,A):- ground(A),A=mudIsa(I,C), must_det(once(correctArgsIsa(Op,I,II))),I\=II,!,db_op0(Op,mudIsa(II,C)).
@@ -641,7 +645,7 @@ db_op_exact(Op,G):- G=..[_SubType,_Arg],not(prolog_side_effects(G)),dmsg(todo(en
 db_op_exact(query(HLDS,Must),Term):- !,call_expanded_for(query(HLDS,Must),Term).
 db_op_exact(query, Term):- !,call_expanded_for(findall,Term).
 db_op_exact(must, Term):- !,call_expanded_for(must,Term).
-db_op_exact(u,C):- trace_or_throw(dtrace),db_quf(u,C,U,Template),call_mpred_fast(U),Template,must(ground(Template)),!,ignore(hooked_retractall(Template)).
+db_op_exact(u,C):- trace_or_throw(dtrace),db_quf(u,C,U,Template),call_mpred_fast(U),Template,sanity(ground(Template)),!,ignore(hooked_retractall(Template)).
 db_op_exact(Op,G):- when_debugging(blackboard,dmsg(db_op_exact(Op,G))),fail.
 db_op_exact(change(retract,all),C):- !, db_quf(change(retract,all),C,U,Template),!, when_debugging(retract,dtrace), doall((call_mpred_fast(U),hooked_retractall(Template))).
 db_op_exact(change(retract,A),C):- must(db_quf(change(retract,A),C,U,Template)),!,  when_debugging(retract,dtrace), call_mpred_fast(U),!,hooked_retract(Template).
@@ -723,7 +727,7 @@ db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):- unify_with_occurs_chec
 db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):- equals_call(OLD,NEW),!,dmsg(db_assert_sv_same(COLD,'__same__',CNEW)),trace_or_throw(dtrace).
 db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):-
    dmsg(db_assert_sv(COLD,'__replace__',CNEW)),
-   ignore(show_call_failure((del(COLD), not(ireq(COLD))))),
+   ignore(show_call_failure((clr(COLD), not(ireq(COLD))))),
    %replace_arg(C,A,_,CBLANK),must_det(clr(CBLANK)),hooked_retractall(CBLANK),   
    must_det(hooked_asserta_confirmed(CNEW,A,NEW)),!.
 
@@ -736,7 +740,7 @@ equals_call(X,Y):-once((to_word_list(X,XX),to_word_list(Y,YY))),unify_with_occur
 equals_call(X,Y):-compound(X),compound(Y),once((correctArgsIsa(X,XX),correctArgsIsa(Y,YY))),unify_with_occurs_check(XX,YY),!.
 
 confirm_hook(CNEW:NEW=@=CNOW:NOW):-
-   must_det(var(NOW)),               
+   sanity(var(NOW)),               
    once(ireq(CNOW)),
    CNEW:NEW=@=CNOW:NOW,!.
 
@@ -749,7 +753,7 @@ confirm_hook(CNEW:NEW=@=CNOW:NOW):-
 % Expect CNEW to be what is found
 hooked_asserta_confirmed(CNEW,A,NEW):-
    replace_arg(CNEW,A,NOW,CNOW),
-   must_det(ground(CNEW)),
+   sanity(ground(CNEW)),
    hooked_asserta(CNEW),!,
    verify_sanity(confirm_hook(CNEW:NEW=@=CNOW:NOW)),!.
 
@@ -876,7 +880,7 @@ begin_prolog_source:- must_det(asserta(thlocal:in_prolog_source_code)).
 end_prolog_source:- must_det(retract(thlocal:in_prolog_source_code)).
 
 :-dynamic_multifile_exported(add_from_macropred/1).
-add_from_macropred(C):- loop_check(add_from_macropred_lc(C),((dmsg(loopING_add_from_macropred(C)),add_fast(C)))).
+add_from_macropred(C):- loop_check(add_from_macropred_lc(C),must(((dmsg(loopING_add_from_macropred(C)),add_fast(C))))).
 add_from_macropred_lc(A):-A==end_of_file,!.
 add_from_macropred_lc(Term):- expands_on(isEach,Term), !,forall(do_expand_args(isEach,Term,O),add_from_macropred_lc(O)).
 add_from_macropred_lc(A):- not(compound(A)),!,trace_or_throw(not_compound(add_from_macropred_lc(A))).
@@ -951,7 +955,7 @@ createByNameMangle0(InstA,InstA,Type):-compound(InstA),InstA=..[Type|Props],asse
 createByNameMangle0(InstA,Inst,Type):- compound(InstA),!,functor_catch(InstA,Type,A),must(A==1),assert_isa(InstA,Type),InstA=Inst.
 createByNameMangle0(InstA,_,_Type):- not(atom(InstA)),!,trace_or_throw(todo(not_atom_createByNameMangle(InstA))).
 createByNameMangle0(Suggest,InstA,Type):- once(split_name_type(Suggest,InstA,Type)),Suggest==InstA,assert_isa(InstA,Type).
-createByNameMangle0(OType,InstA,Type):- must(var(InstA)),i_name(t,OType,Type),atom_concat(Type,'7',InstA7),i_name(i,InstA7,InstA),must_det(assert_isa(InstA,Type)), 
+createByNameMangle0(OType,InstA,Type):- sanity(var(InstA)),i_name(t,OType,Type),atom_concat(Type,'7',InstA7),i_name(i,InstA7,InstA),must_det(assert_isa(InstA,Type)), 
  call_after_game_load(create_instance(InstA,Type)).
 createByNameMangle0(InstA,IDA,InstA):- gensym(InstA,IDA), englishServerInterface([actCreate,InstA,IDA]).
 

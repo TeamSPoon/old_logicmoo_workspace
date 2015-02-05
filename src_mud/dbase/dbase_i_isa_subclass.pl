@@ -48,12 +48,12 @@ define_ft(ftListFn(_)):-!.
 define_ft(Spec):- never_type(Spec),!,trace_or_throw(never_ft(never_type(Spec))).
 define_ft(M:F):- !, '@'(define_ft(F), M).
 define_ft(Spec):- compound(Spec),functor(Spec,F,_),!,define_ft_0(F),define_ft_0(Spec).
-define_ft(Spec):- define_ft_0(Spec).
+define_ft(Spec):- loop_check(define_ft_0(Spec),true).
 
 define_ft_0(xyzFn):-!.
 define_ft_0(Spec):- hasInstance(ttFormatType,Spec),!.
 define_ft_0(Spec):- hasInstance(tCol,Spec),dmsg(once(maybe_converting_plain_type_to_formattype(Spec))),fail.
-define_ft_0(Spec):- hooked_asserta(mudIsa(Spec,ttFormatType)),(assert_hasInstance(ttFormatType,Spec)).
+define_ft_0(Spec):- hooked_asserta(mudIsa(Spec,ttFormatType)).
 
 %col(Spec):- (isa_asserted(Spec,col)).
 
@@ -291,7 +291,7 @@ isa_asserted_nr(I,T):-nonvar(T),type_prefix(_Prefix,T),atom(I),!,isa_from_morpho
 
 :- dynamic_multifile_exported(ruleHybridChain/2).
 isa_asserted_0(I,T):-type_isa(I,T).
-isa_asserted_0(I,T):-nonvar(T),append_term(T,I,HEAD),dbase_t(ruleHybridChain,HEAD,BODY),call_mpred_body(HEAD,BODY).
+isa_asserted_0(I,T):-nonvar(T),append_term(T,I,HEAD),is_asserted_dbase_t(ruleHybridChain(HEAD,BODY)),call_mpred_body(HEAD,BODY).
 isa_asserted_0(I,T):-isa_asserted_ft(I,T).
 
 

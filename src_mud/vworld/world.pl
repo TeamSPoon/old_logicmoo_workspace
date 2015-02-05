@@ -82,6 +82,7 @@
 :- include(logicmoo('vworld/moo_header.pl')).
 :- register_module_type(utility).
 
+% :- ensure_loaded(logicmoo('vworld/world_2d.pl')).
 :- include(logicmoo('vworld/world_2d.pl')).
 :- include(logicmoo('vworld/world_text.pl')).
 :- include(logicmoo('vworld/world_effects.pl')).

@@ -17,7 +17,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- '@'(if_file_exists(user_ensure_loaded(logicmoo('../externals/MUD_ScriptEngines/snark/snark_in_prolog'))),'user').
+:- '@'(if_file_exists(user_ensure_loaded(logicmoo('../externals/MUD_XperiMental/snark/snark_in_prolog'))),'user').
 /*
 else
 
@@ -96,9 +96,7 @@ user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),s
 % the following 4 worlds are in version control in examples
 % :- add_game_dir('../games/src_game_wumpus',prolog_repl).       
 % :- add_game_dir('../games/src_game_nani',prolog_repl).       
-% :- add_game_dir('../games/src_game_sims',prolog_repl).       
-
-:- prolog.
+% :- add_game_dir('../games/src_game_sims',prolog_repl).
 
 :- add_game_dir('../games/src_game_startrek',prolog_repl).
 

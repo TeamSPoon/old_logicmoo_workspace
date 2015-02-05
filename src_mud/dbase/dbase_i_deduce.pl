@@ -48,7 +48,7 @@ user:decl_database_hook(retract(Kind),P):- forall(alt_forms(r,P,NP),ignore(hooke
 % ========================================================================================
 
 
-user:decl_database_hook(Type,Fact):- current_predicate(add_deduction/3),run_deduce_facts_from(Type,Fact).
+user:decl_database_hook(Type,Fact):- current_predicate(add_deduction/3),current_predicate(add/1),run_deduce_facts_from(Type,Fact).
 
 
 user:decl_database_hook(_,mpred_prop('ArtifactCol1008-VISOR688', flagged_visor)):- trace_or_throw(mpred_prop('ArtifactCol1008-VISOR688', flagged_visor)).
@@ -70,7 +70,7 @@ bad_fact_why(mudAtLoc(R,_),mudIsa(R,tRegion)):- mudIsa(R,tRegion).
 deduce_facts(localityOfObject(Obj,_),mudIsa(Obj,tObj)).
 
 deduce_facts(Fact,mpred_prop(AF,[predArgTypes(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],is_pred_declarer(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,
-                ArgTs=..[AF|ARGS],!,must_det(ground(ARGS)).
+                ArgTs=..[AF|ARGS],!,sanity(ground(ARGS)).
 
 
 deduce_facts(predArgTypes(ArgTs),mpred_prop(F,predArgTypes(ArgTs))):-mpred_arity(F,A),functor(ArgTs,F,A).

@@ -257,6 +257,8 @@ prologSingleValued(mudAtLoc(tObj,xyzFn(tRegion,ftInt,ftInt,ftInt))).
 
 :- begin_transform_moo_preds.
 
+mpred_arity(isLike,2).
+predArgTypes(isLike(tPred,tCol)).
 
 predArgTypes(resultIsa(tFunction,tCol)).
 predArgTypes(formatted_resultIsa(ttFormatType,tCol)).

@@ -86,9 +86,9 @@ safe_univ(Call,List):-hotrace(safe_univ0(Call,List)),!.
 safe_univ0(M:Call,[N:L|List]):- nonvar(M),nonvar(N),!,safe_univ0(Call,[L|List]).
 safe_univ0(Call,[M:L|List]):- nonvar(M),!,safe_univ(Call,[L|List]).
 safe_univ0(M:Call,[L|List]):- nonvar(M),!,safe_univ(Call,[L|List]).
-safe_univ0(Call,[L|List]):- not(is_list(Call)),must(atom(L);compound(Call)), Call =..[L|List],!,warn_bad_functor(L).
+safe_univ0(Call,[L|List]):- not(is_list(Call)),sanity(atom(L);compound(Call)), Call =..[L|List],!,warn_bad_functor(L).
 safe_univ0([L|List],[L|List]):- var(List),atomic(Call),!,grtrace,Call =.. [L|List],warn_bad_functor(L).
-safe_univ0(Call,[L|List]):- must(atom(L);compound(Call)),ccatch(Call =.. [L|List],E,(dumpST,'format'('~q~n',[E=safe_univ(Call,List)]))),warn_bad_functor(L).
+safe_univ0(Call,[L|List]):- sanity(atom(L);compound(Call)),ccatch(Call =.. [L|List],E,(dumpST,'format'('~q~n',[E=safe_univ(Call,List)]))),warn_bad_functor(L).
 
 :- export(append_term/3).
 append_term(T,I,HEAD):-atom(T),HEAD=..[T,I],!.

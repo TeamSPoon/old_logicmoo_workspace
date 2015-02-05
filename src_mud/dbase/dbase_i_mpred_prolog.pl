@@ -19,8 +19,8 @@ provide_mpred_write_attributes(F,A,thread_local):- decl_thlocal(F/A).
 provide_mpred_write_attributes(F,A,dynamic):- dynamic(F/A).
 
 
-provide_mpred_currently(_OP,Head,prologOnly,declared(_)):- get_functor(Head,F),mpred_prop(F,prologOnly).
-provide_mpred_currently(_OP,Head,prologOnly, Will):- get_functor(Head,F,A), current_predicate(F/A) -> Will= will(_) ; Will = wont(_).
+provide_mpred_currently(_OP,F,Head,prologOnly,declared(_)):- get_functor(Head,F),mpred_prop(F,prologOnly).
+provide_mpred_currently(_OP,F,Head,prologOnly, Will):- get_functor(Head,F,A), current_predicate(F/A) -> Will= will(_) ; Will = wont(_).
 
 
 provide_mpred_storage_clauses(prolog,H,B):-predicate_property(H,number_of_clauses(_)),clause(H,B).
@@ -41,7 +41,7 @@ provide_mpred_setup(OP,Head,StubType,OUT):-  StubType = prologOnly,
    dynamic_multifile_exported(F/A),
    asserta_if_new(mpred_prop(F,hasStub(StubType))),         
    asserta_if_new(mpred_prop(F,StubType)), 
-   forall(member(HB,HBLIST),must(add(HB))),!,   
+   forall(member(HB,HBLIST),must(database_modify(assert(z),HB))),!,
    doall(retract((PHead:- (!,call_provided_mpred_storage_op(call(_),PHead,_))))),
    must_same_clauses(PHead,HBLIST))),
    must(OUT=defined(provide_mpred_setup(OP,StubType))).

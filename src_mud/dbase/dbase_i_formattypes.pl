@@ -11,8 +11,7 @@
 
 % :-swi_module(dbase_formattypes, []).
 
-:-dynamic_multifile_exported((
-          any_to_dir_ns/2,
+:-dynamic_multifile_exported((          
           any_to_number/2,
           any_to_value/2,
           argIsa_call/4,
@@ -27,6 +26,7 @@
 
 :- include(logicmoo('vworld/moo_header.pl')).
 :- dynamic_multifile_exported correctArgsIsa/3.
+% :- ensure_loaded(logicmoo('vworld/world_2d.pl')).
 
 
 :-export(split_name_type/3).
@@ -107,8 +107,6 @@ argIsa_call_nt(_O,F,N,Type):-argIsa_call_nt(F,N,Type).
 argIsa(F,N,Isa):-argIsa_call(F,N,Isa).
 
 :-export(argIsa_call/3).
-argIsa_call(F,N,Type):- thlocal:inVoProp,!,N2 is N+1,
- with_no_assertions(thlocal:inVoProp,argIsa_call(F,N2,Type)).
 argIsa_call(F,N,Type):- argIsa_known(F,N,Type),!.
 argIsa_call(F,N,Type):- argIsa_call_1(F,N,Type),!.
 
@@ -129,8 +127,6 @@ argIsa_call_nt(F,N,Type):- findall(T,argIsa_call_0(F,N,Type),T),Types=[_|_],!,as
 resultIsa(apathFn,tPathway).
 
 :-dynamic_multifile_exported(argIsa_call_0/3).
-argIsa_call_0(F,N,Type):- thlocal:inVoProp,!,N2 is N+1,
- with_no_assertions(thlocal:inVoProp,argIsa_call_0(F,N2,Type)).
 argIsa_call_0(argIsa,1,tRelation).
 argIsa_call_0(argIsa,2,ftInt).
 argIsa_call_0(argIsa,3,tCol).
@@ -207,7 +203,7 @@ argIsa_call_1(F,_,ftTerm(ftCallable)):-member(F/_,
                                 formatted_resultIsa/2,
                                 bracket/3]).
 
-argIsa_call_1(Prop,N1,Type):- must(mpred_arity(Prop,Arity)),dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),must(N1=<Arity),must( Type=argIsaFn(Prop,N1)).
+argIsa_call_1(Prop,N1,Type):- mpred_arity(Prop,Arity),dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),must(N1=<Arity),must( Type=argIsaFn(Prop,N1)).
 
 argIsa_call_1(Prop,N1,Type):- dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),must( Type=argIsaFn(Prop,N1)).
 argIsa_call_1(_,_,ftTerm).
@@ -339,23 +335,34 @@ correctArgsIsa00(_ ,[Prop|Args],AA):-stack_check(1000), var(Prop),!,AA=[Prop|Arg
 correctArgsIsa00(Op,[KP,Prop|Args],AA):-is_holds_true(KP),!,correctArgsIsa00(Op,[Prop|Args],AA).
 correctArgsIsa00(Op,[KP,Prop|Args],[KP|AArgs]):-logical_functor(KP),!,correctAnyType(Op,[Prop|Args],ftListFn(ftAskable),AArgs).
 correctArgsIsa00(Op,[KP,Prop|Args],[KP|AA]):-is_holds_false(KP),!,correctArgsIsa00(Op,[KP,Prop|Args],AA).
-correctArgsIsa00(_ ,[Prop,Arg],[Prop,Arg]):- !.
+%correctArgsIsa00(_ ,[Prop,Arg],[Prop,Arg]):- !.
 correctArgsIsa00(Op,[Prop,ArgI],[Prop,ArgO]):- !, correctAnyType(Op,ArgI,Prop,ArgO).
 correctArgsIsa00(Op,[Prop|Args],[Prop|AArgs]):- discoverAndCorrectArgsIsa(Op,Prop,1,Args,AArgs).
 
-discoverAndCorrectArgsIsa(_O,_Prop,_N1,[],[]):-!.
-discoverAndCorrectArgsIsa(Op,Prop,N1,[A|Args],Out):-
+discoverAndCorrectArgsIsa(Op,Prop,_,ArgsIn,ArgsOut):- show_call_failure(mpred_arity(Prop,Arity)),
+    discoverAndCorrectArgsIsa_0(Op,Prop,Arity,ArgsIn,ArgsOut).
+discoverAndCorrectArgsIsa(Op,Prop,N,ArgsIn,ArgsOut):-discoverAndCorrectArgsIsa_1(Op,Prop,N,ArgsIn,ArgsOut).
+
+discoverAndCorrectArgsIsa_0(_O,_Prop,_N1,[],[]):-!.
+discoverAndCorrectArgsIsa_0(Op,Prop,N1,In,Out):- append(Args,[A],In),
+   must((argIsa_call(Op,Prop,N1,Type),correctAnyType(Op,A,Type,AA))),
+   N2 is N1-1,
+   discoverAndCorrectArgsIsa_0(Op,Prop,N2,Args,AArgs),
+   append(AArgs,[AA],Out).
+
+discoverAndCorrectArgsIsa_1(_O,_Prop,_N1,[],[]):-!.
+discoverAndCorrectArgsIsa_1(Op,Prop,N1,[A|Args],Out):-
    must((argIsa_call(Op,Prop,N1,Type),correctAnyType(Op,A,Type,AA))),
    N2 is N1+1,
-   discoverAndCorrectArgsIsa(Op,Prop,N2,Args,AArgs),
+   discoverAndCorrectArgsIsa_1(Op,Prop,N2,Args,AArgs),
     Out = [AA|AArgs].
 
 :-export(correctAnyType/4).
 
 % correctAnyType(_,A,_,A):-is_release.
 
-correctAnyType(_Op,A,_Type,AA):- var(A),!,must_det(var(AA)),must_det(A=AA),!.
-correctAnyType(Op,A,Type,AA):- var(A),correctType(Op,A,Type,AA),must_det(var(AA)),must_det(A==AA),!.
+correctAnyType(_Op,A,_Type,AA):- var(A),!,sanity(var(AA)),must_det(A=AA),!.
+correctAnyType(Op,A,Type,AA):- var(A),correctType(Op,A,Type,AA),sanity(var(AA)),must_det(A==AA),!.
 correctAnyType(Op,A,Type,AA):- var(Type),trace_or_throw(correctAnyType(Op,A,Type,AA)).
 % TODO snags on new tpyes correctAnyType(Op,A,Type,AA):- correctType(Op,A,Type,AA),nonvar(AA),!.
 correctAnyType(Op,A,Type,AA):- one_must(correctType(Op,A,Type,AA),A=AA).
@@ -366,7 +373,7 @@ correctAnyType(Op,A,Type,A):- dtrace,dmsg(warn(not(correctAnyType(Op,A,Type)))).
 %  @set mudMoveDist 4
 
 :-export(correctFormatType/4).
-correctFormatType(Op,A,Type,AA):- var(A),correctType(Op,A,Type,AA),must_det(var(AA)),must_det(A==AA),!.
+correctFormatType(Op,A,Type,AA):- var(A),correctType(Op,A,Type,AA),sanity(var(AA)),must_det(A==AA),!.
 correctFormatType(Op,A,Type,AA):- var(Type),trace_or_throw(correctFormatType(Op,A,Type,AA)).
 correctFormatType(Op,A,Type,AA):- correctType(Op,A,Type,AA),nonvar(AA),!.
 correctFormatType(Op,A,Type,AA):- grtrace,correctType(Op,A,Type,AA).
@@ -374,7 +381,7 @@ correctFormatType(Op,A,Type,A):- dmsg(todo(not(correctFormatType(Op,A,Type)))).
 
 :-export(checkAnyType/4).
 
-checkAnyType(Op,A,Type,AA):- var(A),correctType(Op,A,Type,AA),must_det(var(AA)),must_det(A==AA),!.
+checkAnyType(Op,A,Type,AA):- var(A),correctType(Op,A,Type,AA),sanity(var(AA)),must_det(A==AA),!.
 checkAnyType(Op,A,Type,AA):- correctType(Op,A,Type,AA),nonvar(AA),!.
 
 correctAnyTypeOrFail(Op,A,Type,AA):- with_assertions(tlbugger:skipMust,checkAnyType(Op,A,Type,AA)).
@@ -389,7 +396,7 @@ correctType_gripe(Op,A,Type,AA):- fail,atom(Type),must_equals(A,AA),
       thlocal:can_coerce(Op),dmsg(warning(add(mudIsa(A,Type)))),dtrace,
       add(mudIsa(A,Type)),!.
 
-correctType_gripe(Op,A,C,A):-must(ground(A)),dtrace, dmsg(todo(define(correctType(Op,A,C,'ConvertedArg')))),throw(retry(_)).
+correctType_gripe(Op,A,C,A):-sanity(ground(A)),dtrace, dmsg(todo(define(correctType(Op,A,C,'ConvertedArg')))),throw(retry(_)).
 correctType_gripe(Op,A,Type,NewArg):-trace_or_throw(failure(correctType(Op,A,Type,NewArg))).
 
 :- style_check(+singleton).
@@ -402,7 +409,8 @@ correctType(Op,A,'&'(Type1,Type2),AAA):-!,correctType(Op,A,Type1,AA),correctType
 
 correctType(Op,+A,Type,+AA):-nonvar(A),!,correctType(Op,A,Type,AA).
 correctType(Op,-A,Type,-AA):-nonvar(A),!,correctType(Op,A,Type,AA).
-correctType(_O,A,vtDirection,AA):- any_to_dir(A,AA).
+correctType(_O,A,vtDirection,AA):- current_predicate(any_to_dir/2),!,any_to_dir(A,AA).
+correctType(_O,A,vtDirection,AA):- must_equals(A,AA).
 correctType(Op,A,ftInteger,AA):-!,correctType(Op,A,ftInt,AA).
 correctType(Op,A,ftAskable,AA):-!,must_equals_correct(Op,A,AA).
 correctType(_O,A,ftInt,AA):- any_to_number(A,AA).
@@ -553,7 +561,7 @@ assert_deduced_arg_isa_facts_0(Fact):- ignore(((ground(Fact),forall(deduce_argIs
 
 
 deduce_argIsa_facts(Fact,Arg,Type):- ground(Fact), functor(Fact,F,A),A>1, deduce_from_predicate(F), arg(N,Fact,Arg),ground(Arg),
-   call_argIsa_ForAssert(F,N,Type),must_det(atom(Type)),must_det(ground(Arg)).
+   call_argIsa_ForAssert(F,N,Type),sanity(atom(Type)),sanity(ground(Arg)).
 
 never_deduce_from_predicate(mudIsa).
 never_deduce_from_predicate(mpred_prop).

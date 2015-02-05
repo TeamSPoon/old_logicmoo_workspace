@@ -23,7 +23,7 @@ tPredStubImpl(prologSNARK).
 get_pifunctor(Head,PHead):-must(get_pifunctor(Head,PHead,_,_)).
 get_pifunctor(Head,PHead,F):-must(get_pifunctor(Head,PHead,F,_)).
 
-get_pifunctor(Head,PHead,F,A):-var(Head),!,must(atom(F)),must(ensure_arity(F,A)),functor(PHead,F,A),ignore(PHead=Head).
+get_pifunctor(Head,PHead,F,A):-var(Head),!,sanity(atom(F)),must(ensure_arity(F,A)),functor(PHead,F,A),ignore(PHead=Head).
 get_pifunctor(Head,PHead,F,A):-get_functor(Head,F,A),functor(PHead,F,A),ignore(PHead=Head),!.
 get_pifunctor(Head,PHead,F,A):-atom(Head),ensure_arity(Head,A),!,get_pifunctor(Head/A,PHead,F,A).
 
@@ -85,7 +85,7 @@ add_storage_stub(StubType,Head,PHead,F,_):-
          asserta_if_new(mpred_prop(F,predStubType(StubType))), 
          one_must(show_call_failure(call_no_cuts(provide_mpred_setup(OP,PHead,StubType,Result))),
            (show_call_failure(add_mpred_universal_call_stub(StubType,Head)),Result=defined(universal))),
-         asserta_if_new(provide_mpred_currently(OP,Head,StubType,Result)),
+         asserta_if_new(provide_mpred_currently(OP,F,Head,StubType,Result)),
          must_have_storage_stub(StubType,Head),
          must_same_clauses(Head,HBLIST))),
          must(must_have_storage_stub(StubType,Head)).
@@ -148,9 +148,9 @@ get_mpred_storage_provider(OP,PHead,StubType):-get_mpred_storage_provider(OP,PHe
 get_mpred_storage_provider(_OP,Head,StubType,Declared):-get_functor(Head,F),mpred_prop(F,hasStub(StubType)),!,declared(_)=Declared.
 get_mpred_storage_provider(_OP,Head,StubType,Declared):-get_functor(Head,F),mpred_prop(F,predStubType(StubType)),!,declared(_)=Declared.
 get_mpred_storage_provider( OP,Head,StubType,Will):- get_pifunctor(Head,PHead,F,A),
-  CALL = (provide_mpred_currently(OP,Head,StubType,Will);
-   (Head \= PHead,provide_mpred_currently(OP,PHead,StubType,Will));
-      provide_mpred_currently(OP,F/A,StubType,Will)),
+  CALL = (provide_mpred_currently(OP,F,Head,StubType,Will);
+   (Head \= PHead,provide_mpred_currently(OP,F,PHead,StubType,Will));
+      provide_mpred_currently(OP,F,F/A,StubType,Will)),
   one_must((Will=declared(_),CALL,!),one_must((CALL,Will\==wont(Why)),(Will=wont(Why)))).
 
 
@@ -162,15 +162,22 @@ ensure_exists(Head):-get_pifunctor(Head,PHead,F),get_functor(Head,F,A),(predicat
 
 database_modify(P,G):- thlocal:noDBaseMODs(_),!,dmsg(noDBaseMODs(P,G)).
 database_modify(P,M:G):-nonvar(M),!,database_modify(P,G).
-%database_modify(assert(_),G):- was_isa(G,I,C),!,assert_hasInstance(C,I),!.
-database_modify(assert(a),G):- !,asserta(G).
-database_modify(assert(z),G):- !,assertz(G).
-database_modify(retract(all),G):- !,doall(retract(G)).
-database_modify(retract(_),G):- !,must(retract(G)).
+database_modify(assert(_),G):- was_isa(G,I,C),!,assert_hasInstance(C,I),!.
+database_modify(OP,(HeadBody:-TRUE)):-TRUE==true,!,database_modify(OP,HeadBody).
 database_modify(OP,HeadBody):- current_predicate(get_mpred_storage_provider/3),
   one_must(show_call_failure(get_mpred_storage_provider(OP,HeadBody,StubType)),
    StubType=prologOnly),
   must(call_provided_mpred_storage_op(OP,HeadBody,StubType)).
+
+database_modify(OP,G):- functor(G,F,A), database_f_modify(OP,F,G).
+
+database_f_modify(OP,F,G):- once(mpred_prop(F,prologOnly);must((F=dbase_t,wdmsg(database_modify(OP,G))))),fail.
+database_f_modify(assert(_),_,G):- is_asserted_dbase_t(G),!.
+database_f_modify(assert(_),_,G):- must(not(debugOnError(G))),!.
+database_f_modify(assert(a),_,G):-  expire_tabled_list(all),!,asserta(G).
+database_f_modify(assert(z),_,G):- expire_tabled_list(all),!,assertz(G).
+database_f_modify(retract(all),_,G):- !,doall((retract(G),expire_dont_add,expire_tabled_list(all))).
+database_f_modify(retract(one),_,G):- !,must((retract(G),expire_dont_add,expire_tabled_list(all))).
 
 database_check(P,M:G):-nonvar(M),!,database_check(P,G).
 %database_check(clause_asserted,G):-!,was_isa(G,I,C),moo:hasInstance_dyn(C,I),!.
@@ -281,7 +288,7 @@ make_body_clause(Head,Body,call_mpred_body(Head,Body)).
 
 
 special_head(_,user:agent_text_command):-!,fail.
-special_head(Head,_):- provide_mpred_currently(_OP,Head,StubType,Will),Will=declared(_),!,StubType\==prologOnly.
+special_head(Head,F):- provide_mpred_currently(_OP,F,Head,StubType,Will),Will=declared(_),!,StubType\==prologOnly.
 special_head(_,F):-mpred_prop(F,hasStub(StubType)),!,StubType\==prologOnly.
 special_head(_,F):-mpred_prop(F,predStubType(StubType)),!,StubType\==prologOnly.
 special_head(_,F):-mpred_prop(F,prologPTTP),!.

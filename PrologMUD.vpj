@@ -28,40 +28,22 @@
 	<Files AutoFolders="DirectoryView">
 		<Folder Name="externals">
 			<Folder Name="MUD_ircbot">
-				<Folder Name="prolog">
-					<F N="externals/MUD_ircbot/prolog/eggdrop.pl"/>
-					<F N="externals/MUD_ircbot/prolog/tn_eggdrop.pl"/>
-				</Folder>
+				<F
+					N="externals/MUD_ircbot/*.*"
+					Recurse="1"
+					Excludes=".git/"/>
 			</Folder>
 			<Folder Name="MUD_ScriptEngines">
-				<Folder Name="ext">
-					<Folder Name="r6rs-plt-redex-model">
-						<F N="externals/MUD_ScriptEngines/ext/r6rs-plt-redex-model/r6rs-tests.scm"/>
-						<F N="externals/MUD_ScriptEngines/ext/r6rs-plt-redex-model/r6rs.scm"/>
-						<F N="externals/MUD_ScriptEngines/ext/r6rs-plt-redex-model/README"/>
-						<F N="externals/MUD_ScriptEngines/ext/r6rs-plt-redex-model/show-examples.scm"/>
-						<F N="externals/MUD_ScriptEngines/ext/r6rs-plt-redex-model/test.scm"/>
-					</Folder>
-					<F N="externals/MUD_ScriptEngines/ext/moo_ext_common.pl"/>
-					<F N="externals/MUD_ScriptEngines/ext/moo_ext_cyc_new.pl"/>
-					<F N="externals/MUD_ScriptEngines/ext/moo_ext_lisp_triska.pl"/>
-					<F N="externals/MUD_ScriptEngines/ext/moo_ext_scheme_r6rs.pl"/>
-					<F N="externals/MUD_ScriptEngines/ext/moo_ext_scheme_sip.pl"/>
-					<F N="externals/MUD_ScriptEngines/ext/moo_ext_scheme_sis.pl"/>
-					<F N="externals/MUD_ScriptEngines/ext/moo_ext_strips.pl"/>
-				</Folder>
-				<Folder Name="snark">
-					<F N="externals/MUD_ScriptEngines/snark/dbase_i_bootstrap_dnf.pl"/>
-					<F N="externals/MUD_ScriptEngines/snark/dbase_rules_nnf.pl"/>
-					<F N="externals/MUD_ScriptEngines/snark/dbase_rules_pttp.pl"/>
-					<F N="externals/MUD_ScriptEngines/snark/dbase_rules_pttp_precompiled.pl"/>
-					<F N="externals/MUD_ScriptEngines/snark/dbase_rules_pttp_statics.pl"/>
-					<F N="externals/MUD_ScriptEngines/snark/dbase_rules_testing.pl"/>
-					<F N="externals/MUD_ScriptEngines/snark/snark_ailog2.pl"/>
-					<F N="externals/MUD_ScriptEngines/snark/snark_in_prolog.pl"/>
-					<F N="externals/MUD_ScriptEngines/snark/snark_metacall.pl"/>
-					<F N="externals/MUD_ScriptEngines/snark/snark_theorist.pl"/>
-				</Folder>
+				<F
+					N="externals/MUD_ScriptEngines/*.*"
+					Recurse="1"
+					Excludes=".git/"/>
+			</Folder>
+			<Folder Name="MUD_XperiMental">
+				<F
+					N="externals/MUD_XperiMental/*.*"
+					Recurse="1"
+					Excludes=".git/"/>
 			</Folder>
 		</Folder>
 		<Folder Name="games">

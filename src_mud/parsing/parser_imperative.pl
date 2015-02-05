@@ -24,9 +24,6 @@
 
 :- register_module_type(utility).
 
-user:decl_database_hook(assert(_),C):- expire_tabled_list(C).
-user:decl_database_hook(retract(_),C):- expire_tabled_list(C).
-
 % =====================================================================================================================
 % get_agent_text_command/4
 % =====================================================================================================================
@@ -205,7 +202,7 @@ must_make_object_string_list_cached(P,Obj,WList):-
 
 same_ci(A,B):-notrace((must((non_empty(A),non_empty(B))),any_to_string(A,StringA),any_to_string(B,StringB),!,string_ci(StringA,StringB))),!.
 
-match_object(S,Obj):-must(ground(S:Obj)),must(((atoms_of(S,Atoms),!,Atoms\=[]))),match_object_0(Atoms,Obj).
+match_object(S,Obj):-sanity(ground(S:Obj)),must(((atoms_of(S,Atoms),!,Atoms\=[]))),match_object_0(Atoms,Obj).
 
 match_object_0([S],Obj):-nonvar(S),match_object_1(S,Obj),!.
 match_object_0(Atoms,Obj):-

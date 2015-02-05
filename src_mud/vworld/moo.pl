@@ -45,7 +45,7 @@ assert_hasInstance(T,I):- loop_check(hooked_asserta(mudIsa(I,T)),assert_hasInsta
 assert_hasInstance(T,I):- rdf_assert_x(I,rdf:type,T).
 
 assert_hasInstance_real(T,I):- user:hasInstance_dyn(T,I),!.
-assert_hasInstance_real(T,I):- not(current_predicate(assert_ind/2)),!,assert_if_new(user:hasInstance_dyn(T,I)),!.
+assert_hasInstance_real(T,I):- expire_tabled_list(all), not(current_predicate(assert_ind/2)),!,assert_if_new(user:hasInstance_dyn(T,I)),!.
 assert_hasInstance_real(T,I):- assert_if_new(user:hasInstance_dyn(T,I)),!,(atom(I)->must(assert_ind(I,T));true),!.
 
 

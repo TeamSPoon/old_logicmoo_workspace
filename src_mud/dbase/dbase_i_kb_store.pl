@@ -34,9 +34,6 @@
 dbase_mod(user).
 
 
-
-user:decl_database_hook(One_or_All,Fact):- expire_tabled_list(all).
-
 :-dynamic_multifile_exported(is_svo_functor/1).
 is_svo_functor(Prop):- notrace((atom(Prop),arg(_,svo(svo,prop,valueOf,rdf),Prop))).
 
@@ -101,7 +98,7 @@ into_hilog_form_ic(X,O):- is_list(X),list_to_dbase_t(X,D),into_hilog_form_ic(D,O
 into_hilog_form_ic(X,O):- X=..[F|A],into_hilog_form(X,F,A,O).
 
 % TODO finish negations
-into_hilog_form(X,_,_,hasInstance(C,I)):-was_isa(X,I,C),!.
+into_hilog_form(X,_,_,mudIsa(I,C)):-was_isa(X,I,C),!.
 into_hilog_form(X,F,_A,X):- mpred_prop(F,prologOnly),!.
 into_hilog_form(X,F,_A,X):- mpred_prop(F,actProlog),!.
 into_hilog_form(X,dbase_t,_A,X).
@@ -316,11 +313,17 @@ holds_args(HOFDS,FIST):- compound(HOFDS),HOFDS=..[H|FIST],is_holds_true(H),!.
 %        user:decl_database_hook(assert(A_or_Z),Fact):- ...
 %        user:decl_database_hook(retract(One_or_All),Fact):- ...
 
-run_database_hooks(Type,Hook):- thlocal:noDBaseHOOKS(_),dmsg(noDBaseHOOKS(Type,Hook)),!.
+run_database_hooks_d1(Type,Hook):- thlocal:noDBaseHOOKS(_),dmsg(noDBaseHOOKS(Type,Hook)),!.
+run_database_hooks_d1(Type,Hook):- with_assertions(thlocal:noDBaseHOOKS(_),run_database_hooks_d2(Type,Hook)).
 
-run_database_hooks(change(A,B),Hook):- Change=..[A,B],!,run_database_hooks(Change,Hook).
-run_database_hooks(Type,M:Hook):-atom(M),!,run_database_hooks(Type,Hook).
-run_database_hooks(Type,HookIn):- into_mpred_form(HookIn,Hook),loop_check_local(run_database_hooks_1(Type,Hook),dmsg(looped_run_database_hooks(Type,Hook))).
+
+run_database_hooks(Type,Hook):- thlocal:noDBaseHOOKS(_),dmsg(noDBaseHOOKS(Type,Hook)),!.
+run_database_hooks(Type,HookIn):-run_database_hooks_d2(Type,HookIn).
+
+
+run_database_hooks_d2(change(A,B),Hook):- Change=..[A,B],!,run_database_hooks(Change,Hook).
+run_database_hooks_d2(Type,HookIn):- into_mpred_form(HookIn,Hook),
+  loop_check(run_database_hooks_1(Type,Hook),dmsg(looped_run_database_hooks(Type,Hook))).
 
 run_database_hooks_1(Type,M:Hook):-atom(M),!,run_database_hooks_1(Type,Hook).
 run_database_hooks_1(Type,Hook):- loop_check(run_database_hooks_2(Type,Hook),true).
@@ -334,25 +337,13 @@ run_database_hooks_2(Type,Hook):- copy_term(Hook,HCopy),doall(call_no_cuts(user:
 :- meta_predicate_transparent(fact_checked(?,0)).
 
 
-fact_checked(Fact,Call):- not(ground(Fact)),!,no_loop_check(Call,fail).
+fact_checked(Fact,Call):- not(ground(Fact)),!,no_loop_check(call_tabled(Call),is_asserted(Fact)).
 fact_checked(Fact,_):- is_known_false0(Fact),!,fail.
 fact_checked(Fact,_):- is_known_trew(Fact),!.
-fact_checked(Fact,Call):- no_loop_check(Call,fail),(really_can_table_fact(Fact,true)->asserta(is_known_trew(Fact));true).
-% fact_checked0(_Fact,Call):- asserta(is_known_false(Fact)),!,fail.
-% would only work outside a loop checker (so disable)
-% fact_checked0(Fact,_Call):- really_can_table_fact(Fact),asserta(is_known_false(Fact)),!,dmsg(is_known_false(Fact)),!,fail.
-
-really_can_table_fact(Fact,TF):-really_can_table,functor(Fact,F,_),can_table_functor(F,TF),!.
-
-
-can_table_functor(F,AsTrueOrFalse):-cannot_table_functor(F,AsTrueOrFalse),!,fail.
-can_table_functor(_,_).
-
-cannot_table_functor(mudAtFoc,_).
-cannot_table_functor(mudIsa,false).
+fact_checked(Fact,Call):- no_loop_check(call_tabled(Call),is_asserted(Fact)).
 
 :-meta_predicate_transparent(fact_loop_checked(+,0)).
-fact_loop_checked(Fact,Call):- no_repeats(fact_checked(Fact,loop_check(Call,is_asserted(Fact)))).
+fact_loop_checked(Fact,Call):- no_repeats(fact_checked(Fact,Call)).
 
 % ================================================
 % is_asserted/1
@@ -369,7 +360,7 @@ is_asserted(F,G):-must_det(functor(G,F,A)),is_asserted(F,A,G).
 is_asserted(once,1,once(G)):-!,is_asserted(G),!.
 is_asserted(M:F,A,G):- atom(M),!,is_asserted(F,A,G).
 is_asserted(F,A,M:G):- atom(M),!,is_asserted(F,A,G).
-is_asserted(_,_,G):-was_isa(G,I,G),!,loop_check(isa_asserted(I,G)).
+is_asserted(_,_,G):-was_isa(G,I,C),!,loop_check(isa_asserted(I,C)).
 
 is_asserted(dbase_t,1,dbase_t(G)):-!,dbase_t(G).
 is_asserted(dbase_t,_,G):-G=..[_,NA|IST],nonvar(NA),NA=nart(Fist),!,must((nart_to_atomic(Fist,F),atom(F),CC=..[F|IST],is_asserted_mpred(F,CC))).
@@ -386,7 +377,7 @@ nart_to_atomic(F,F).
 
 is_asserted_mpred(_,G):-var(G),!,trace_or_throw(var_is_asserted_mpred(F,G)).
 is_asserted_mpred(mpred_prop,mpred_prop(F,P)):-!,mpred_prop(F,P).
-is_asserted_mpred(F,G):-fact_loop_checked(G,(dbase_t(G);fact_always_true(G))).
+is_asserted_mpred(F,G):-fact_loop_checked(G,is_asserted_dbase_t(G)).
 
 % ============================================
 % Prolog is_asserted_clause/2
@@ -443,8 +434,6 @@ ensure_predicate_reachable(_,_).
 %ensure_predicate_reachable(M,C,dbase_t,Ap1):-C=..[_,F|_RGS],A is Ap1 -1, dmsg(( ensure_universal_stub(M,F,A))).
 
 % singletons_throw_else_fail(_):- is_release,!,fail.
-singletons_throw_else_fail(C):- not_is_release,contains_singletons(C),!,(test_tl(thlocal:adding_from_srcfile) ->dmsg(contains_singletons(C)); trace_or_throw(contains_singletons(C))),fail.
-nonground_throw_else_fail(C):- not_is_release,not(ground(C)),!,( (test_tl(thlocal:adding_from_srcfile) ->dmsg(not_ground(C)); trace_or_throw(not_ground(C)))),fail.
 
 
 into_assertable_form_trans(G,was_asserted_gaf(G)):- functor_catch(G,F,_),mpred_prop(F,was_asserted_gaf),!.
@@ -489,16 +478,15 @@ hooked_assertz(MP,CA):- assertz_cloc(MP,CA),run_database_hooks(assert(z),MP).
 
 hooked_retract(MP,_):- nonground_throw_else_fail(hooked_retract(MP)).
 hooked_retract(_,CA):- once(show_call_failure(must(is_asserted(CA)))),fail.
-hooked_retract(MP,CA):- copy_term(MP,CMP),
+hooked_retract(MP,CA):-
    retract_cloc(MP,CA),   
-   ignore((differnt_assert(CA,MP),retractall_cloc(MP))),
-   copy_term(MP,CMP),run_database_hooks(retract(one),CMP).
+   copy_term(MP,CMP),loop_check(run_database_hooks_d1(retract(one),CMP)).
 
 %hooked_retractall(MP,CA):- nonground_throw_else_fail(hooked_retractall(MP)).
 hooked_retractall(_,CA):- ground(CA), once(show_call_failure((is_asserted(CA)))),fail.
 hooked_retractall(MP,CA):-
    retractall_cloc(MP,CA),
-   copy_term(MP,CMP),run_database_hooks(retract(all),CMP).
+   copy_term(MP,CMP),loop_check(run_database_hooks_d1(retract(all),CMP)).
 
 
 differnt_assert(G1,G2):- notrace(differnt_assert1(G1,G2)),dmsg(differnt_assert(G1,G2)),ztrace.
@@ -525,14 +513,21 @@ retractall_cloc(C):- into_mpred_aform(C,MP,CA),retractall_cloc(MP,CA).
 asserta_cloc(MP,CA):- singletons_throw_else_fail(asserta_cloc(MP)); singletons_throw_else_fail(asserta_cloc(CA)).
 asserta_cloc(_,CA):- database_modify(assert(a),CA).
 assertz_cloc(MP,CA):- singletons_throw_else_fail(assertz_cloc(MP)); singletons_throw_else_fail(assertz_cloc(CA)).
-assertz_cloc(_,CA):-database_modify(assert(z),CA).
+assertz_cloc(_,CA):- database_modify(assert(z),CA).
 retract_cloc(MP,CA):- show_call_failure((database_check(clause_asserted,MP);database_check(clause_asserted,CA))),fail.
 retract_cloc(MP,CA):- singletons_throw_else_fail(assertz_cloc(MP)); singletons_throw_else_fail(assertz_cloc(CA)).
-retract_cloc(_,CA):- database_modify(retract(one),CA).
-retractall_cloc(MP,CA):-database_modify(retract(all),CA),must(not(is_asserted(MP))).
+retract_cloc(MP,CA):- 
+  database_modify(retract(one),CA),
+  ignore((database_modify(retract(all),MP))),
+  must(not(is_asserted(MP))).
+retractall_cloc(MP,CA):-  
+  database_modify(retract(all),CA),
+  ignore((database_modify(retract(all),MP))),
+  must(not(is_asserted(MP))).
 
 
 clause_stored(HB):- database_check(clause_asserted,HB).
+
 
 
 % ========================================
