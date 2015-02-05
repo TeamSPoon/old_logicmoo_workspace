@@ -53,11 +53,18 @@ mpred_prop(member,prologOnly).
 mpred_prop(mpred_prop,prologOnly).
 mpred_prop(mpred_arity,prologOnly).
 mpred_prop(never_type,prologOnly).
-mpred_prop(dbase_t, prologHybrid).
-mpred_arity(mpred_prop,2).
+mpred_prop(argIsa,prologHybrid).
+mpred_prop(dbase_t, prologOnly).
+mpred_prop(term_expansion,prologOnly).
+mpred_prop(agent_text_command,prologOnly).
+
+
 mpred_arity(xyzFn,4).
 mpred_arity(mpred_arity,2).
+mpred_arity(mpred_prop,2).
 mpred_arity(never_type,1).
+mpred_arity(argIsa, 3).
+mpred_arity(mudIsa, 2).
 
 :-dynamic_multifile_exported(is_stable/0).
 is_stable:-fail.

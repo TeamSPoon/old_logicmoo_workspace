@@ -32,16 +32,15 @@ get_pifunctor(Head,PHead,F,A):-atom(Head),ensure_arity(Head,A),!,get_pifunctor(H
 % ================================================================================
 
 %user:decl_database_hook(assert(_),mpred_prop(F,StubType)):- tPredStubImpl(StubType),must(add_storage_stub(StubType,F)).
-%user:decl_database_hook(assert(_),mpred_prop(F,predStubType(StubType))):- add_storage_stub(StubType,F).
+%user:decl_database_hook(assert(_),mpred_stubtype(F,StubType)):- add_storage_stub(StubType,F).
 %user:decl_database_hook(assert(_),mudIsa(F,(StubType))):- tPredStubImpl(StubType),must(add_storage_stub(StubType,F)).
-%user:decl_database_hook(assert(_),mudIsa(F,predStubType(StubType))):- add_storage_stub(StubType,F).
 
 
 decl_mpred_stubcol(F,A,StubType):-loop_check(decl_mpred_stubcol_lc(F,A,StubType),dmsg(looping_decl_mpred_stubcol_lc(F,A,StubType))).
 decl_mpred_stubcol_lc(Head,_Isa,StubType):-get_functor(Head,F,A),A>0,!,decl_mpred_stubcol(F,A,StubType).
 decl_mpred_stubcol_lc(F,A,StubType):- ignore(((number(A),assert_arity(F,A)))),
      functor(Head,F,A),add_storage_stub(StubType,Head),!.
-     %must(tPredStubImpl(StubType)),decl_mpred(F,predStubType(StubType)),decl_mpred(F,StubType).
+     %must(tPredStubImpl(StubType)),decl_mpred(F,/*predStubType*/(StubType)),decl_mpred(F,StubType).
 
 
 has_storage_stub(Var,Head):- var(Var),!,tPredStubImpl(Var),has_storage_stub(Var,Head).
@@ -79,13 +78,13 @@ add_storage_stub(StubType,Head,PHead,F,_):-
      must(tPredStubImpl(StubType)),
          provide_clauses_list(Head,HBLIST),
          retractall(mpred_prop(F,hasStub(_))),
-         forall(tPredStubImpl(Impl),(retractall(mpred_prop(F,Impl)),retractall(mpred_prop(F,predStubType(Impl))))),
+         forall(tPredStubImpl(Impl),retractall(mpred_prop(F,Impl))),
          user:asserta_if_new(mpred_prop(F,hasStub(StubType))),       
          asserta_if_new(mpred_prop(F,StubType)),         
-         asserta_if_new(mpred_prop(F,predStubType(StubType))), 
          one_must(show_call_failure(call_no_cuts(provide_mpred_setup(OP,PHead,StubType,Result))),
            (show_call_failure(add_mpred_universal_call_stub(StubType,Head)),Result=defined(universal))),
          asserta_if_new(provide_mpred_currently(OP,F,Head,StubType,Result)),
+         asserta_if_new(hasStub(F,StubType)), 
          must_have_storage_stub(StubType,Head),
          must_same_clauses(Head,HBLIST))),
          must(must_have_storage_stub(StubType,Head)).
@@ -111,6 +110,7 @@ add_stub_now(PHead,StubType,OP):- asserta_if_new((PHead:- (!,call_provided_mpred
 
 :-export(call_provided_mpred_storage_op/3).    
 call_provided_mpred_storage_op(OP,Head,StubType):-
+  
   must(get_provided_mpred_storage_op(OP,Head,StubType,CALL)),!,
   debugOnError(user:call(CALL)).
 
@@ -143,10 +143,13 @@ retract(all)  using =
 
 */
 
+mpred_stubtype(F,StubType) :- nonvar(StubType),must(tPredStubImpl(StubType)),!,
+  (mpred_prop(F,hasStub(StubTypeWas));(mpred_prop(F,/*predStubType*/(StubTypeWas)),tPredStubImpl(StubTypeWas))),!,StubType=StubTypeWas.
+mpred_stubtype(F,StubType) :- (mpred_prop(F,hasStub(StubType));(mpred_prop(F,StubType),tPredStubImpl(StubType))),!.
+
 get_mpred_storage_provider(OP,PHead,StubType):-get_mpred_storage_provider(OP,PHead,StubType,Will),Will\==wont(_),!.
 
-get_mpred_storage_provider(_OP,Head,StubType,Declared):-get_functor(Head,F),mpred_prop(F,hasStub(StubType)),!,declared(_)=Declared.
-get_mpred_storage_provider(_OP,Head,StubType,Declared):-get_functor(Head,F),mpred_prop(F,predStubType(StubType)),!,declared(_)=Declared.
+get_mpred_storage_provider(_OP,Head,StubType,Declared):-get_functor(Head,F),mpred_stubtype(F,StubTypeWas),!,(StubTypeWas=StubType -> declared(_)=Declared ; wont(already(StubTypeWas))=Declared).
 get_mpred_storage_provider( OP,Head,StubType,Will):- get_pifunctor(Head,PHead,F,A),
   CALL = (provide_mpred_currently(OP,F,Head,StubType,Will);
    (Head \= PHead,provide_mpred_currently(OP,F,PHead,StubType,Will));
@@ -187,21 +190,6 @@ database_check(OP,HeadBody):- current_predicate(get_mpred_storage_provider/3),
   call_provided_mpred_storage_op(OP,HeadBody,StubType).
 database_check(OP,HeadBody):- debugOnError(call(OP,HeadBody)).
 
-/*
-database_modify(P,G):- thlocal:noDBaseMODs(_),!,dmsg(noDBaseMODs(P,G)).
-database_modify(P,M:G):-nonvar(M),!,database_modify(P,G).
-database_modify(assert(_),G):- was_isa(G,I,C),!,assert_hasInstance(C,I),!.
-database_modify(OP,HeadBody):- 
-  one_must(show_call_failure(get_mpred_storage_provider(OP,HeadBody,StubType)),
-   StubType=prologOnly),
-  must(call_provided_mpred_storage_op(OP,HeadBody,StubType)).
-
-database_check(P,M:G):-nonvar(M),!,database_check(P,G).
-database_check(clause_asserted,G):-!,was_isa(G,I,C),user:hasInstance_dyn(C,I),!.
-database_check(OP,HeadBody):-
-  one_must(show_call_failure(get_mpred_storage_provider(OP,HeadBody,StubType)),StubType=prologOnly),
-  call_provided_mpred_storage_op(OP,HeadBody,StubType).
-*/
 
 
 call_wdmsg(P,DB):- thlocal:noDBaseMODs(_),!,wdmsg(error(noDBaseMODs(P,DB))).
@@ -289,10 +277,10 @@ make_body_clause(Head,Body,call_mpred_body(Head,Body)).
 
 special_head(_,user:agent_text_command):-!,fail.
 special_head(Head,F):- provide_mpred_currently(_OP,F,Head,StubType,Will),Will=declared(_),!,StubType\==prologOnly.
-special_head(_,F):-mpred_prop(F,hasStub(StubType)),!,StubType\==prologOnly.
-special_head(_,F):-mpred_prop(F,predStubType(StubType)),!,StubType\==prologOnly.
-special_head(_,F):-mpred_prop(F,prologPTTP),!.
-special_head(_,F):-mpred_prop(F,prologHybrid),!.
+special_head(_,F):-mpred_stubtype(F,prologOnly),!,fail.
+special_head(_,F):-mpred_stubtype(F,prologHybrid),!.
+% special_head(_,F):-mpred_stubtype(F,prologPTTP),!.
+special_head(_,F):-mpred_stubtype(F,UNK),wdmsg(mpred_stubtype(F,UNK)),!.
 
 
 

@@ -105,8 +105,8 @@ load_data_file_end(World,File):-
 load_game_name_stream(_Name):- repeat,read_one_term(Term),myDebugOnError(add_term(Term)),Term == end_of_file,!.
 load_game_name_stream(_Name,Stream):- repeat,read_one_term(Stream,Term),myDebugOnError(add_term(Term)),Term == end_of_file,!.
 
-add_term(':-'(dynamic(F/A))):-mpred_arity(F,A),!.
-add_term(A):-add(A).
+add_term(':-'(dynamic(F/A))):-assert_arity(F,A),!.
+add_term(A):-must(add(A)).
 
 myDebugOnError(Term):-catch(once((call(Term))),E,(dmsg(error(E,start_myDebugOnError(Term))),trace,rtrace(call(Term)),dmsginfo(stop_myDebugOnError(E=Term)),trace)).
 

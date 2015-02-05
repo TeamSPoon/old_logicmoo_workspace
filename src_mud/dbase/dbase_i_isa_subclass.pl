@@ -316,7 +316,7 @@ isa_w_type_atom(I,T):- G=..[T,I],once_if_ground(isa_atom_call(T,G),_).
 dont_call_type_arity_one(tCol).
 dont_call_type_arity_one(ttFormatType).
 %dont_call_type_arity_one(ttAgentType).
-dont_call_type_arity_one(F):-mpred_prop(F,predStubType(prologHybrid)),!.
+dont_call_type_arity_one(F):-mpred_stubtype(F,prologHybrid),!.
 
 isa_atom_call(T,G):-loop_check(isa_atom_call_lc(T,G),fail).
 

@@ -104,6 +104,8 @@ argIsa_call(Op,F,N,Type):-hotrace((loop_check((argIsa_call_nt(Op,F,N,Type),!),Ty
 argIsa_call_nt(_O,F,N,Type):-argIsa_call_nt(F,N,Type).
 
 
+:- decl_mpred_hybrid(argIsa/3).
+
 argIsa(F,N,Isa):-argIsa_call(F,N,Isa).
 
 :-export(argIsa_call/3).

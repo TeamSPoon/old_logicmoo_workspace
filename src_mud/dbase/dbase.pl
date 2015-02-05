@@ -317,17 +317,12 @@ verify_sanity(P):- dmsg('$ERROR_incomplete_SANITY'(P)),!.
 expands_on(EachOf,Term):-subst(Term,EachOf,foooz,Term2),!,Term2\=Term,not((do_expand_args(EachOf,Term,O),O = Term)).
 if_expands_on(EachOf,Term,Call):- expands_on(EachOf,Term),subst(Call,Term,O,OCall),!, forall(do_expand_args(EachOf,Term,O),OCall).
 
-db_reop(WhatNot,Call) :- into_mpred_form(Call,NewCall),NewCall\=@=Call,!,db_reop(WhatNot,NewCall).
-
+%db_reop(WhatNot,Call) :- into_mpred_form(Call,NewCall),NewCall\=@=Call,!,db_reop(WhatNot,NewCall).
 db_reop(Op,Term):- expands_on(isEach,Term), !,forall(do_expand_args(isEach,Term,O),db_reop_l(Op,O)).
 db_reop(Op,Term):-db_reop_l(Op,Term).
 
 db_reop_l(query(_HLDS,Must),Call) :- !,preq(Must,Call).
-db_reop_l(OP,DATA):-no_loop_check(db_reop0(OP,DATA)).
-db_reop0(change(assert,_),Call) :- !,add_fast(Call).
-db_reop0(change(retract,one),Call) :- !,del(Call).
-db_reop0(change(retract,all),Call) :- !,clr(Call).
-db_reop0(OP,Call) :- dmsg(warn(db_reop(OP,Call))),db_op0(OP,Call).
+db_reop_l(OP,DATA):-no_loop_check(db_op0(OP,DATA)).
 
 
 % -  del(RetractOne) 

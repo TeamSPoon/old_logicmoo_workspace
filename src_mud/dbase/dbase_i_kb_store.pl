@@ -164,19 +164,24 @@ into_mpred_form_lc(G,O):- functor(G,F,A),G=..[F,P|ARGS],!,into_mpred_form(G,F,P,
 
 into_mpred_form(_,F,_,1,[C],O):-alt_calls(F),!,into_mpred_form(C,O),!.
 into_mpred_form(_,':-',C,1,_,':-'(C)):-!.
-into_mpred_form(C,mudIsa,_,2,_,C):-!.
-% into_mpred_form(H,_,_,_,_,GO):- call(once((expand_term( (H :- true) , C ), reduce_clause(C,G)))),expanded_different(H,G),!,into_mpred_form(G,GO),!.
 into_mpred_form(_,not,C,1,_,not(O)):-into_mpred_form(C,O),!.
-into_mpred_form(G,F,_,_,_,G):-mpred_prop(F,prologOnly),!.
-into_mpred_form(G,F,_,1,_,G):-mpred_prop(F,predStubType((prologOnly))),!.
-into_mpred_form(G,_,_,1,_,G):-predicate_property(G,number_of_rules(N)),N >0, !.
-into_mpred_form(G,F,C,1,_,O):-predicate_property(G,builtin),!,into_mpred_form(C,OO),O=..[F,OO].
-into_mpred_form(C,_,_,_,_,mudIsa(I,T)):-was_isa(C,I,T),!.
+into_mpred_form(C,mudIsa,_,2,_,C):-!.
 into_mpred_form(_X,dbase_t,P,_N,A,O):-!,(atom(P)->O=..[P|A];O=..[dbase_t,P|A]).
+into_mpred_form(G,F,_,_,_,G):-mpred_stubtype(F,prologHybrid),!.
+into_mpred_form(G,F,_,_,_,G):-mpred_stubtype(F,prologOnly),!.
+into_mpred_form(G,F,_,_,_,G):-dmsg(warn(unknown_mpred_type(F,G))).
+/*
+
+% into_mpred_form(H,_,_,_,_,GO):- call(once((expand_term( (H :- true) , C ), reduce_clause(C,G)))),expanded_different(H,G),!,into_mpred_form(G,GO),!.
+into_mpred_form(G,_,_,1,_,G):-predicate_property(G,number_of_rules(N)),N >0, !.
+into_mpred_form(G,F,C,1,_,O):-predicate_property(G,built_in),!,into_mpred_form(C,OO),O=..[F,OO].
+
+into_mpred_form(C,_,_,_,_,mudIsa(I,T)):-was_isa(C,I,T),!.
 into_mpred_form(_X,H,P,_N,A,O):-is_holds_false(H),(atom(P)->(G=..[P|A],O=not(G));O=..[holds_f,P|A]).
 into_mpred_form(_X,H,P,_N,A,O):-is_holds_true(H),(atom(P)->O=..[P|A];O=..[dbase_t,P|A]).
 %into_mpred_form(PropsWas,props,_,2,_,Was):- props_into_mpred_form(PropsWas,Was).
 into_mpred_form(X,_H,_P,_N,_A,X).
+*/
 
 reduce_clause((C:- _:B),C):-B==true,!.
 reduce_clause((C:- B),C):-B==true,!.
@@ -195,7 +200,8 @@ props_into_mpred_form(PROPS,MPRED):- trace_or_throw(unk_props_into_mpred_form(PR
 
 acceptable_xform(From,To):- From \=@= To,  (To = mudIsa(I,C) -> was_isa(From,I,C); true).
 
-
+cant_be_col(V):-is_ftVar(V),!,fail.
+cant_be_col('$VAR'):-dmsg(cant_be_col('$VAR')),!,fail.
 cant_be_col(':-').
 cant_be_col('include').
 cant_be_col('onSpawn').
@@ -203,11 +209,11 @@ cant_be_col('ensure_loaded').
 cant_be_col(C):-mpred_prop(C,prologOnly),!.
 cant_be_col('declare_load_game').
 cant_be_col('user_ensure_loaded').
-cant_be_col(C):-user:hasInstance_dyn(tCol,C),!,fail.
-cant_be_col(_).
-/*
-cant_be_col('meta_predicate').
 cant_be_col(C):-functor(G,C,1),predicate_property(G,built_in),!.
+cant_be_col(C):-user:hasInstance_dyn(tCol,C),!,fail.
+cant_be_col('meta_predicate').
+/*
+cant_be_col(_).
 cant_be_col(C):-current_predicate(C/1),!.
 cant_be_col(C):-prolog_side_effects(C/1),!.
 cant_be_col(C):-dmsg(cant_be_col(C)),!,asserta_if_new(mpred_prop(C,prologOnly)).
@@ -215,7 +221,7 @@ cant_be_col(C):-dmsg(cant_be_col(C)),!,asserta_if_new(mpred_prop(C,prologOnly)).
 
 :-dynamic_multifile_exported(was_isa/3).
 was_isa(V,_,_):-call(is_ftVar(V)),!,fail.
-was_isa(X,I,C):-nonvar(X),!,once(was_isa0(X,I,C)),!.
+was_isa(X,I,C):-compound(X),!,once(was_isa0(X,I,C)),!,not(cant_be_col(C)).
 
 was_isa0(mudIsa(I,C),I,C).
 was_isa0(is_typef(_),_,_):-!,fail.
