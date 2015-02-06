@@ -189,7 +189,7 @@ cant_be_col('ensure_loaded').
 cant_be_col(C):-mpred_prop(C,prologOnly),!.
 cant_be_col('declare_load_game').
 cant_be_col('user_ensure_loaded').
-cant_be_col(C):-functor(G,C,1),predicate_property(G,built_in),!.
+cant_be_col(C):-atom(C),functor(G,C,1),predicate_property(G,built_in),!.
 cant_be_col(C):-user:hasInstance_dyn(tCol,C),!,fail.
 cant_be_col('meta_predicate').
 /*

@@ -1311,7 +1311,7 @@ must_not_repeat(C):-call(C).
 % ===================================================
 
 
-memberchk_same(X, [Y|Ys]) :- (   X =@= Y ->  (var(X) -> X==Y ; true) ;   memberchk_same(X, Ys) ).
+memberchk_same(X, [Y|Ys]) :- (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (nonvar(Ys),memberchk_same(X, Ys) )).
 
 
 no_repeats_av:-tlbugger:attributedVars.
@@ -2889,7 +2889,51 @@ call_vars_tabled(Vars,C):- call_setof_tabled(Vars,C,Set),!,member(Vars,Set).
 call_setof_tabled(Vars,C,List):- make_key(Vars+C,Key),call_tabled0(Key,Vars,C,List).
 
 findall_nodupes(Vs,C,List):- ground(Vs),!,(C->List=[Vs];List=[]),!.
-findall_nodupes(Vs,C,L):- setof(Vs,no_repeats_old(Vs,C),L).
+findall_nodupes(Vs,C,L):- findall(Vs,no_repeats_old(Vs,C),L).
+%findall_nodupes(Vs,C,L):- setof(Vs,no_repeats_old(Vs,C),L).
+
+
+:- export(no_repeats_findall4/4).
+:- meta_predicate no_repeats_findall4(+,0,-,-).
+no_repeats_findall4(Vs,Call,ExitDET,USE,NEW):- 
+   (((HOLDER = fa([]),
+   Call,arg(1,HOLDER,CONS),
+   ((
+   ((\+ memberchk_same(Vs,CONS), 
+   copy_term(Vs,CVs), 
+   append(CONS,[CVs],NEW),
+    nb_setarg(1, HOLDER, NEW)))
+      ->
+       USE=true;
+       ((USE=false,CONS=NEW))
+       )),
+   deterministic(ExitDET))) 
+    *-> true;
+     (NEW=[],ExitDET=true,USE=false)).
+
+:- export(no_repeats_save/3).
+:- meta_predicate no_repeats_save(+,0,-).
+no_repeats_save(Vs,Call,Saved,USE):-
+ SavedHolder = saved(_),
+  no_repeats_findall4(Vs,Call,ExitDET,USE,NEW),
+  ( ExitDET==true -> (nb_setarg(1,SavedHolder,NEW),!) ; true),  
+  arg(1,SavedHolder,Saved).
+
+:- export(no_repeats_save/2).
+:- meta_predicate no_repeats_save(+,0).
+no_repeats_save(Vs,Call):-  
+  call_cleanup(
+   (( no_repeats_save(Vs,Call,SavedList,USE),
+      (USE==true -> true ; fail))), 
+   (is_list(SavedList) -> writeln(saving(SavedList)) ; writeln(givingup_on(Call)))).
+  
+
+:- export(no_repeats_findall_r/5).
+:- meta_predicate no_repeats_findall_r(+,0,-,-,-).
+no_repeats_findall_r(Vs,Call,CONS,ExitDET,List):- 
+   CONS = [ExitDET],
+   (Call,once((\+ memberchk_same(Vs,CONS), copy_term(Vs,CVs), CONS=[_|T],List=[CVs|T], nb_setarg(2, CONS, List)))),
+   deterministic(ExitDET).
 
 call_tabled0(_,Vars,C,List):- true,!,findall_nodupes(Vars,C,List).
 
