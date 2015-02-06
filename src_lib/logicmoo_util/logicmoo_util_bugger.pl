@@ -751,8 +751,7 @@ make_key(CC,Key):- notrace(ground(CC)->Key=CC ; (copy_term(CC,Key,_),numbervars(
 is_loop_checked(Call):-  make_key(Call,Key),!,ilc(Key).
 is_module_loop_checked(Module, Call):- (var(Call)->true;make_key(Call,Key)),!,ilc_local(Module,Key).
 
-no_loop_check_unsafe(Call):-
-   with_assertions([-(ilc(_)),-(ilc_local(_,_))],loop_check(Call,fail)).
+no_loop_check_unsafe(Call):- with_no_assertions(ilc(_),with_no_assertions(ilc_local(_,_),loop_check(Call,fail))).
 
 % WAS no_loop_check(Call):- no_loop_check(Call,trace_or_throw(loop_to_no_loop_check(Call))).
 no_loop_check(Call):- make_key(Call,Key), with_assertions([-(ilc(_)),ilc(Key)],Call).

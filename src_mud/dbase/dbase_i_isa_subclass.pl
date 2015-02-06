@@ -65,7 +65,8 @@ decl_type_safe(T):- ignore((atom(T),not(never_type(T)),not(number(T)),decl_type(
 assert_subclass(O,T):-assert_subclass_safe(O,T).
 
 :-dynamic_multifile_exported(assert_subclass_safe/2).
-assert_subclass_safe(O,T):- ignore((nonvar(O),decl_type_safe(O),nonvar(T),decl_type_safe(T),nonvar(O),not(ttFormatType(O)),not(ttFormatType(T)),add(mudSubclass(O,T)))).
+assert_subclass_safe(O,T):-
+  ignore((nonvar(O),decl_type_safe(O),nonvar(T),decl_type_safe(T),nonvar(O),nop((not(ttFormatType(O)),not(ttFormatType(T)))),add(mudSubclass(O,T)))).
 
 :-dynamic_multifile_exported(assert_isa_safe/2).
 assert_isa_safe(O,T):- ignore((nonvar(O),nonvar(T),decl_type_safe(T),assert_isa(O,T))).
@@ -171,10 +172,10 @@ transitive_subclass_tst(_,_):-!,fail.
 % isa_backchaing(I,T):- stack_depth(Level),Level>650,trace_or_throw(skip_dmsg_nope(failing_stack_overflow(isa_backchaing(I,T)))),!,fail.
 
 :-decl_mpred_prolog(isa_backchaing/2).
-isa_backchaing(I,T):- call_tabled(fact_loop_checked(mudIsa(I,T),no_repeats_old(isa_backchaing_0(I,T)))).
+isa_backchaing(I,T):- call_tabled(fact_loop_checked(mudIsa(I,T),isa_backchaing_0(I,T))).
 
 isa_backchaing_v_nv(I,ftTerm):-nonvar(I),!.
-isa_backchaing_v_nv(_,var):-!.
+isa_backchaing_v_nv(_,ftVar):-!.
 isa_backchaing_v_nv(I,T):-no_repeats_old([I],(transitive_subclass_or_same(AT,T),isa_asserted(I,AT))).
 
 :-dynamic_multifile_exported(isa_backchaing_0/2).
@@ -202,11 +203,19 @@ build_genls_inst_list_cache(A,Subclass,B,dbase_t(cache_I_I,Subclass,A,B)):- Subc
 
 
 
-isa_backchaing_nv_nv(A,predArgTypes):-!,compound(A).
-isa_backchaing_nv_nv(I,T):-compound(I),functor(I,F,_),isa_backchaing(F,T),!.
-isa_backchaing_nv_nv(I,T):-atom(T),current_predicate(T/1),!,catch(call(T,I),_,fail).
+isa_backchaing_nv_nv(I,ttCompleteExtentAsserted):- !,hasInstance(ttCompleteExtentAsserted,I).
+isa_backchaing_nv_nv(I,C):-!,hasInstance(ttCompleteExtentAsserted,C),!,hasInstance(C,I).
+% isa_backchaing_nv_nv(A,predArgTypes):-!,compound(A).
+isa_backchaing_nv_nv(I,T):-compound(I),functor(I,F,_),hasInstance(functorType,F),!,isa_backchaing(F,T),!.
+isa_backchaing_nv_nv(I,T):-atom(T),!,current_predicate(T/1),!,catch(call(T,I),_,fail).
 
-not_ft(T):-transitive_subclass_or_same(T,tSpatialThing).
+/*
+isa_backchaing_nv_nv(I,T):-compound(T),T=..[F|ARGS],is_col_nart(F),C=..[F,I|ARGS],!,catch(C,_,fail).
+
+is_col_nart(_):-fail.
+*/
+
+not_ft(T):-not(ttFormatType(T)),transitive_subclass_or_same(T,tSpatialThing).
 
 
 
@@ -301,12 +310,12 @@ isa_asserted_0(I,T):-nonvar(T),isa_asserted_1(I,T).
 
 isa_asserted_1(I,T):- HEAD= mudIsa(I, T),ruleHybridChain(HEAD,BODY),call_mpred_body(HEAD,BODY).
 isa_asserted_1(I,T):-T\=predStubType(_),mpred_prop(I,T).
-isa_asserted_1(I,'&'(T1 , T2)):-nonvar(T1),var(T2),!,dif:dif(T1,T2),isa_backchaing(I,T1),impliedSubClass(T1,T2),isa_backchaing(I,T2).
-isa_asserted_1(I,'&'(T1 , T2)):-nonvar(T1),!,dif:dif(T1,T2),isa_backchaing(I,T1),isa_backchaing(I,T2).
-isa_asserted_1(I,(T1 ; T2)):-nonvar(T1),!,dif:dif(T1,T2),isa_backchaing(I,T1),isa_backchaing(I,T2).
 isa_asserted_1(I,tCol):-!,isa_w_type_atom(I,tCol).
 isa_asserted_1(I,T):-atom(T),isa_w_type_atom(I,T).
 isa_asserted_1(I,T):-nonvar(I),ttFormatType(T),term_is_ft(I,T).
+isa_asserted_1(I,'&'(T1 , T2)):-!,nonvar(T1),var(T2),!,dif:dif(T1,T2),isa_backchaing(I,T1),impliedSubClass(T1,T2),isa_backchaing(I,T2).
+isa_asserted_1(I,'&'(T1 , T2)):-!,nonvar(T1),!,dif:dif(T1,T2),isa_backchaing(I,T1),isa_backchaing(I,T2).
+isa_asserted_1(I,(T1 ; T2)):-!,nonvar(T1),!,dif:dif(T1,T2),isa_backchaing(I,T1),isa_backchaing(I,T2).
 % isa_asserted_1(I,T):- compound(I),functor(I,F,_),!,isa_backchaing_1(F,T).
 
 isa_w_type_atom(I,T):- is_pred_declarer(T),!,mpred_prop(I,T).
@@ -517,7 +526,7 @@ disjointWith(A,B):- once((type_isa(A,AT),type_isa(B,BT))),AT \= BT.
 */
 user:goal_expansion(G,mudIsa(I,C)):-notrace((was_isa(G,I,C),(is_ftVar(C)->true;(not(mpred_prop(C,prologOnly)))))).
 user:term_expansion(G,mudIsa(I,C)):-notrace((was_isa(G,I,C),(is_ftVar(C)->true;(not(mpred_prop(C,prologOnly)))))).
-
-ttFormatType(I):- mudFtInfo(I,_).
-ttFormatType(I):- mudSubclass(I,FT),I\=FT,ttFormatType(FT).
+ttFormatType(I):- !,hasInstance(ttFormatType,I).
+ttFormatType(I):- dbase_t(mudFtInfo,I,_),!.
+ttFormatType(I):- dbase_t(mudSubclass,I,FT),I\=FT,ttFormatType(FT),!.
 

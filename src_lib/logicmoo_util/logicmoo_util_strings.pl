@@ -124,7 +124,7 @@ clean_out_atom(X,Y):-atom_codes(X,C),clean_codes(C,D),!,atom_codes(X,D),!,Y=X.
 
 all_upper_atom(X):-toUppercase(X,N),!,N=X.
 
-atom_contains(F0,C0):- notrace((any_to_string(F0,F),any_to_string(C0,C),sub_string(F,_,_,_,C))).
+atom_contains(F0,C0):- must((any_to_string(F0,F),!,any_to_string(C0,C))),!,sub_string(F,_,_,_,C).
 
 any_to_atom(A,A):-atom(A),!.
 any_to_atom(T,A):-sformat(S,'~w',[T]),atom_string(A,S).

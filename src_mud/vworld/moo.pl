@@ -48,13 +48,15 @@ assert_hasInstance_real(T,I):- user:hasInstance_dyn(T,I),!.
 assert_hasInstance_real(T,I):- expire_tabled_list(all), not(current_predicate(assert_ind/2)),!,assert_if_new(user:hasInstance_dyn(T,I)),!.
 assert_hasInstance_real(T,I):- assert_if_new(user:hasInstance_dyn(T,I)),!,(atom(I)->must(assert_ind(I,T));true),!.
 
-
+mpred_prop(determinerString, prologMultiValued).
+mpred_prop(mudActAffect, prologMultiValued).
 mpred_prop(member,prologOnly).
 mpred_prop(mpred_prop,prologOnly).
 mpred_prop(mpred_arity,prologOnly).
 mpred_prop(never_type,prologOnly).
 mpred_prop(argIsa,prologHybrid).
 mpred_prop(dbase_t, prologOnly).
+mpred_prop(F,prologOnly):- not(mpred_prop(F,prologHybrid)),(F=is_pred_declarer;(current_predicate(F/1);not(hasInstance(F,tCol)))).
 mpred_prop(term_expansion,prologOnly).
 mpred_prop(agent_text_command,prologOnly).
 

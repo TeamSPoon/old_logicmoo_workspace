@@ -109,19 +109,22 @@ add_stub_now(PHead,StubType,OP):- predicate_property(PHead,number_of_clauses(NC)
 add_stub_now(PHead,StubType,OP):- asserta_if_new((PHead:- (!,call_provided_mpred_storage_op(OP,PHead,StubType)))).
 
 :-export(call_provided_mpred_storage_op/3).    
-call_provided_mpred_storage_op(OP,Head,StubType):-
-  
-  must(get_provided_mpred_storage_op(OP,Head,StubType,CALL)),!,
+call_provided_mpred_storage_op(OP,Head,StubType):-  
+  must(get_provided_mpred_storage_oper(OP,Head,StubType,CALL)),!,
   debugOnError(user:call(CALL)).
 
 :-export(get_provided_mpred_storage_op/4).
-get_provided_mpred_storage_op(OP,OrigHead,StubType,CALL):-
-   into_mpred_form(OrigHead,NewHead),NewHead \=@= OrigHead,!,
-    get_provided_mpred_storage_op(OP,NewHead,StubType,CALL),!.
+get_provided_mpred_storage_oper(OP,OrigHead,StubType,CALLO):-
+   into_mpred_form(OrigHead,NewHead),
+   must(get_mpred_storage_provider(OP,NewHead,StubType)),
+   must(provide_mpred_storage_op(OP,NewHead,StubType,CALL)),!,
+   CALLO = will_call(StubType,CALL).
 
-get_provided_mpred_storage_op(OP,PHead,StubType,CALL):- 
-   must((must(get_mpred_storage_provider(OP,PHead,StubType)),
-   provide_mpred_storage_op(OP,PHead,StubType,CALL))),!.
+will_call(_,user:clause_asserted(mpred_prop(A, B))):-!,mpred_prop(A,B).
+will_call(_,user:call(clause_asserted, dbase_t(mudIsa, I, C))):-!,hasInstance(C,I).
+will_call(_,user:call_tabled(call_for_literal(F, A, G))):-!,call_for_literal(F, A, G).
+will_call(_StubType,CALL):-!,(CALL).
+will_call(_StubType,CALL):-show_call(CALL).
 
 /*
 EVENTUALLY MOVE TO PDDL
@@ -168,19 +171,58 @@ database_modify(P,M:G):-nonvar(M),!,database_modify(P,G).
 database_modify(assert(_),G):- was_isa(G,I,C),!,assert_hasInstance(C,I),!.
 database_modify(OP,(HeadBody:-TRUE)):-TRUE==true,!,database_modify(OP,HeadBody).
 database_modify(OP,HeadBody):- current_predicate(get_mpred_storage_provider/3),
-  one_must(show_call_failure(get_mpred_storage_provider(OP,HeadBody,StubType)),
-   StubType=prologOnly),
+  show_call_failure(get_mpred_storage_provider(OP,HeadBody,StubType)),
   must(call_provided_mpred_storage_op(OP,HeadBody,StubType)).
 
 database_modify(OP,G):- functor(G,F,A), database_f_modify(OP,F,G).
 
-database_f_modify(OP,F,G):- once(mpred_prop(F,prologOnly);must((F=dbase_t,wdmsg(database_modify(OP,G))))),fail.
+% database_f_modify(OP,F,G):- once(mpred_prop(F,prologOnly);must((F=dbase_t,wdmsg(database_modify(OP,G))))),fail.
 database_f_modify(assert(_),_,G):- is_asserted_dbase_t(G),!.
 database_f_modify(assert(_),_,G):- must(not(debugOnError(G))),!.
 database_f_modify(assert(a),_,G):-  expire_tabled_list(all),!,asserta(G).
 database_f_modify(assert(z),_,G):- expire_tabled_list(all),!,assertz(G).
 database_f_modify(retract(all),_,G):- !,doall((retract(G),expire_dont_add,expire_tabled_list(all))).
 database_f_modify(retract(one),_,G):- !,must((retract(G),expire_dont_add,expire_tabled_list(all))).
+/*
+
+database_modify(OP,G):- get_functor(G,F,A), database_f_modify(OP,F,A,G).
+
+database_f_modify(OP,F,A,G):- mpred_stubtype(F,prologHybrid),F=dbase_t,!,database_f_modify0(OP,G).
+database_f_modify(OP,F,A,G):- mpred_stubtype(F,prologHybrid),into_functor_form(dbase_t,G,DB),!,database_f_modify0(OP,DB).
+
+database_f_modify(OP,F,A,G):- mpred_stubtype(F,prologOnly),F=dbase_t,!,database_f_modify0(OP,G),dmsg(warn(database_f_modify0(OP,G))).
+database_f_modify(OP,F,A,G):- mpred_stubtype(F,prologOnly),!,database_f_modify0(OP,G),database_f_modify0(OP,G).
+
+database_f_modify(OP,F,A,HeadBody):- mpred_stubtype(F,_ANY_),!, current_predicate(get_mpred_storage_provider/3),
+  show_call_failure(get_mpred_storage_provider(OP,HeadBody,StubType)),!,
+  must(call_provided_mpred_storage_op(OP,HeadBody,StubType)).
+
+
+
+database_f_modify(OP,F,A,G):- not(mpred_stubtype(F,_ANY_)),good_for_hybrid(G,F),
+   functor(PHead,F,A),
+  show_call(provide_mpred_setup(OP,PHead,prologHybrid,OUT)),
+  into_functor_form(dbase_t,G,DB),must(G\=@=DB),!,database_f_modify0(OP,DB).
+
+database_f_modify(OP,F,A,HeadBody):- mpred_stubtype(F,_ANY_),!, current_predicate(get_mpred_storage_provider/3),
+  show_call_failure(get_mpred_storage_provider(OP,HeadBody,StubType)),!,
+  must(call_provided_mpred_storage_op(OP,HeadBody,StubType)).
+
+
+
+good_for_hybrid(G,F):- not(mpred_stubtype(F,_ANY_)),predicate_property(G,number_of_clauses(0)),predicate_property(G,dynamic).
+
+
+
+database_f_modify(OP,F,A,G):- once(mpred_prop(F,prologOnly);must((F=dbase_t,wdmsg(database_modify(OP,G))))),fail.
+
+database_f_modify0(assert(_),G):- is_asserted_dbase_t(G),!.
+database_f_modify0(assert(_),G):- predicate_property(G,_), must(not(debugOnError(G))),!.
+database_f_modify0(assert(a),G):- expire_tabled_list(all),!,asserta(G).
+database_f_modify0(assert(z),G):- expire_tabled_list(all),!,assertz(G).
+database_f_modify0(retract(all),G):- !,doall((retract(G),expire_dont_add,expire_tabled_list(all))).
+database_f_modify0(retract(one),G):- !,must((retract(G),expire_dont_add,expire_tabled_list(all))).
+*/
 
 database_check(P,M:G):-nonvar(M),!,database_check(P,G).
 %database_check(clause_asserted,G):-!,was_isa(G,I,C),moo:hasInstance_dyn(C,I),!.
@@ -193,7 +235,13 @@ database_check(OP,HeadBody):- debugOnError(call(OP,HeadBody)).
 
 
 call_wdmsg(P,DB):- thlocal:noDBaseMODs(_),!,wdmsg(error(noDBaseMODs(P,DB))).
-call_wdmsg(P,DB):- append_term(P,DB,CALL),dmsg((CALL)),call(CALL).
+call_wdmsg(P,DB):- get_functor(DB,F,A), call_wdmsg(P,DB,F,A).
+
+call_wdmsg(P,DB,dbase_t,A):-!, append_term(P,DB,CALL),dmsg((CALL)),call(CALL).
+call_wdmsg(P,MP,F,A):- mpred_stubtype(F,prologHybrid)),into_functor_form(dbase_t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,call(CALL).
+call_wdmsg(P,MP,F,A):- not(mpred_prop(F,prologOnly)),decl_mpred_hybrid(F/A), into_functor_form(dbase_t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,call(CALL).
+call_wdmsg(P,DB,F,A):- append_term(P,DB,CALL),dmsg(info(CALL)),must(mpred_prop(F,prologOnly)),!,call(CALL).
+%call_wdmsg(P,DB,S,_):-  dtrace((append_term(P,DB,CALL),dmsg((CALL)),call(CALL))).
 
 % ================================================================================
 % INSTALL MISSING STUBS
@@ -206,7 +254,7 @@ scan_missing_stubs(F):-
    ignore((forall(mpred_missing_stubs(F,A,StubType),
       (mpred_arity(F,A),show_call(add_storage_stub(StubType,F/A)))))).
 
-mpred_missing_stubs(F,A,StubType):-mpred_prop(F,predStubType(StubType)),must(mpred_arity(F,A)),not(mpred_prop(F,hasStub(StubType))),not(has_storage_stub(StubType,F/A)).
+mpred_missing_stubs(F,A,StubType):-mpred_stubtype(F,StubType),must(mpred_arity(F,A)),not(mpred_prop(F,hasStub(StubType))),not(has_storage_stub(StubType,F/A)).
 
 
 

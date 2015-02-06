@@ -145,6 +145,7 @@ argIsa_call_0(mudFtInfo,2,ftTerm).
 argIsa_call_0(localityOfObject,1,tObj).
 argIsa_call_0(localityOfObject,2,tSpatialThing).
 argIsa_call_0(mudIsa,1,ftID).
+argIsa_call_0(prop,2,ftVoprop).
 argIsa_call_0(mudIsa,2,tCol).
 argIsa_call_0(mudMemory,2,ftTerm).
 argIsa_call_0(mpred_prop,1,tPred).
@@ -312,11 +313,11 @@ same_vars(T1,T2):-term_variables(T1,V1),term_variables(T2,V2),!,V1==V2.
 correctArgsIsa(In,Out):- correctArgsIsa(query(must,dbase_t),In,Out),!.
 
 :-export(correctArgsIsa/3).
-correctArgsIsa(_,G,G):- bad_idea,!.
-% correctArgsIsa(_,G,G):- is_release,!.
+% correctArgsIsa(_,G,G):- bad_idea,!.
+correctArgsIsa(_,G,G):- is_release,!.
 correctArgsIsa(_,NC,NC):-not(compound(NC)),!.
 correctArgsIsa(Op,M:G,MAA):- nonvar(M),!,correctArgsIsa(Op,G,GG),M:GG=MAA.
-correctArgsIsa(_,G,GG):- get_functor(G,F,A),arg(_,vv(mudSubclass/_,mudDescription/_,ruleEquiv/_,formatted_resultIsa/_,resultIsa/_,mudFtInfo/_),F/A),!,must_equals(G,GG).
+correctArgsIsa(_,G,GG):- get_functor(G,F,A),arg(_,vv(mudSubclass/_,mpred_prop/_,mpred_arity/_,mudSubclass/_,mudDescription/_,ruleEquiv/_,formatted_resultIsa/_,resultIsa/_,mudFtInfo/_),F/A),!,must_equals(G,GG).
 correctArgsIsa(_,G,GG):- get_functor(G,F),hasInstance(macroDeclarer,F),!,must_equals(G,GG).
 correctArgsIsa(_,G,GG):- thlocal:trust_argIsas, !,must_equals(G,GG).
 correctArgsIsa(Op,G,GG):- correctArgsIsa0(Op,G,GG),nonvar(GG),!.
@@ -423,7 +424,7 @@ correctType(_O,A,ftProlog,AA):- must_equals(A,AA).
 correctType(_O,A,ftString,AA):- must(any_to_string(A,AA)).
 correctType(Op,A,ftTerm(_),AA):- must_equals_correct(Op,A,AA).
 correctType(Op,A,ftVoprop,AA):- is_list(A),!,maplist(correctTypeArg(Op,ftVoprop),A,AA).
-correctType(Op,A,ftVoprop,AA):- !,with_assertions(thlocal:inVoProp,correctType(Op,A,ftAskable,AA)).
+correctType(Op,A,ftVoprop,AA):- !,with_assertions(thlocal:inVoprop,correctType(Op,A,ftAskable,AA)).
 
 correctType(_O,Obj,argIsaFn(Prop,N),AA):-must_equals(Obj,AA),
    ignore((thlocal:deduceArgTypes(_),findall(OT,mudIsa(Obj,OT),OType),

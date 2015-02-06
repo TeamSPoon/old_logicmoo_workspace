@@ -55,7 +55,7 @@ create_new_object(Agent,[tCol,NameOfType|DefaultParams]):-!,create_new_type(Agen
 create_new_object(Agent,[NameOrType|Params]):-
    create_meta(NameOrType,NewType,tSpatialThing,NewObj),
    assert_isa(NewObj,NewType),
-   add(mudSubclass(NewType,tItem)),
+   add_fast(mudSubclass(NewType,tItem)),
    padd(NewObj,authorWas(create_new_object(Agent,[NameOrType|Params]))),
    padd(Agent,current_pronoun("it",NewObj)),   
    getPropInfo(Agent,NewObj,Params,2,PropList),!,

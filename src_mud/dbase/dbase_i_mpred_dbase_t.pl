@@ -313,8 +313,8 @@ provide_mpred_storage_op(OP1,HeadBody,prologHybrid,CALL):-
 % FACT DB HOOK
 provide_mpred_storage_op(OP,HeadBody,prologHybrid,CALL):-
  transitive(how_to_op,OP,OP2),
-    into_assertable_form(dbase_t,HeadBody,DB),   
-     CALL=loop_check(call(OP2,DB),fail),!.
+    into_functor_form(dbase_t,HeadBody,DB),   
+     CALL=call(OP2,DB),!.
 
 % THROW HOOK
 provide_mpred_storage_op(OP1,HeadBody,prologHybrid,CALL):- trace_or_throw(provide_mpred_storage_op(OP1,HeadBody,prologHybrid,CALL)).
@@ -390,6 +390,7 @@ call_mpred_body(HEAD,BODY):- no_repeats(loop_check_term(call_mpred_body_lc(HEAD,
 
 call_mpred_body_lc(_HEAD,BODY):- debugOnError(BODY).
 
+constrain_args(_):-!.
 constrain_args(HEAD):-HEAD=..[P|ARGS],constrain_args(P,ARGS).
 
 constrain_args(_P,[AR,GS]):-!,dif(AR,GS).
