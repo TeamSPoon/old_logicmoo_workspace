@@ -9,6 +9,8 @@ runtime/store/*
 *.zip
 *.rar
 *.vtg
+*.bak
+*merge_me*
 application.linux32
 application.linux64
 application.windows32

@@ -98,8 +98,8 @@ must_same_clauses(Head,HBLIST):-
    length(HBLIST,LO),
    list_difference_eq(HBLIST,NEWHBLIST,MISSING),length(MISSING,LM),
    list_difference_eq(NEWHBLIST,HBLIST,EXTRA),length(EXTRA,LE),
-   (NEWHBLIST=@=HBLIST -> true ;((NEWHBLISTS=@=HBLISTS;LM=0) -> wdmsg(trace_or_throw(must_same_clauses(Head,[missing(LM)|MISSING],[extra(LE)|EXTRA]))) ;  
-     wdmsg(error(trace_or_throw(must_same_clauses(Head,[LO|HBLIST],[LN|NEWHBLIST],[missing(LM)|MISSING],[extra(LE)|EXTRA])))))).
+   (NEWHBLIST=@=HBLIST -> true ;((NEWHBLISTS=@=HBLISTS;LM=0) -> wdmsg(trace_or_throw(must_same_clauses(Head,[extra(LE)|EXTRA],[missing(LM)|MISSING]))) ;  
+     wdmsg(error(trace_or_throw(must_same_clauses(Head,[LO|HBLIST],[LN|NEWHBLIST],[extra(LE)|EXTRA],[missing(LM)|MISSING])))))).
 
 
 
