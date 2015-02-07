@@ -36,7 +36,7 @@ pddlPredicates([
 % dynamic startrek
   nameStrings(ftTerm,ftString),
   pathName(tRegion,vtDirection,ftString),
-  inRegion(tObj,tRegion),
+%  localityOfObject(tObj,tRegion),
   mudStowing(tAgentGeneric,tClothing),
   mudStowing(tAgentGeneric,tWeapon),
   mudStowing(tAgentGeneric,tCarryAble),
@@ -110,7 +110,7 @@ number_of_clauses(1).
 Pattern: tAgentGeneric(_G1281). 
  */
 tAgentGeneric('NPC0Geordi684').
-tAgentGeneric(iCommanderData).
+tAgentGeneric(iCommanderData66).
 tAgentGeneric(iExplorer1).
 tAgentGeneric('NPC2Worf720').
 tAgentGeneric('NPC3DrCrusher677').
@@ -141,9 +141,9 @@ number_of_clauses(1).
 Pattern: wearsClothing(_G1304,_G1305). 
  */
 pddlSomethingIsa('iBoots673',[tOntoFeet,tClothing,tCarryAble,'tWearAble']).
-wearsClothing(iCommanderData,'iBoots673').
-wearsClothing(iCommanderData,'iComBadge674').
-wearsClothing(iCommanderData,'iGoldUniform675').
+wearsClothing(iCommanderData66,'iBoots673').
+wearsClothing(iCommanderData66,'iComBadge674').
+wearsClothing(iCommanderData66,'iGoldUniform675').
 wearsClothing(iExplorer1,'iBoots773').
 wearsClothing(iExplorer1,'iComBadge774').
 wearsClothing(iExplorer1,'iGoldUniform775').
@@ -204,7 +204,7 @@ line_count(57).
 number_of_clauses(1).
 Pattern: mudStowing(_G1328,_G1329). 
  */
-mudStowing(iCommanderData,'iPhaser676').
+mudStowing(iCommanderData66,'iPhaser676').
 mudStowing(iExplorer1,'iPhaser776').
 mudStowing('NPC3DrCrusher677','MedicalTricorder681').
 mudStowing('NPC3DrCrusher677','MedicalTricorder682').
@@ -308,49 +308,49 @@ tItem('Item25VulcanBeer695').
 
  /* found 75 for tItem(_G1352). */ 
 
-/* Prediate:  inRegion/2 
+/* Prediate:  localityOfObject/2 
 interpreted.
 file('c:/development/opensim4opencog/bin/cynd/startrek/mudreader.pl').
 line_count(59).
 number_of_clauses(1).
-Pattern: inRegion(_G1375,_G1376). 
+Pattern: localityOfObject(_G1375,_G1376). 
  */
 /*
-inRegion('iArea1005Object666','iArea1005').
-inRegion('iArea1008Object667','iArea1008').
-inRegion('iArea1013Object668','iArea1013').
-inRegion('iArea1016Object669','iArea1016').
-inRegion('iArea1024Object670','iArea1024').
+localityOfObject('iArea1005Object666','iArea1005').
+localityOfObject('iArea1008Object667','iArea1008').
+localityOfObject('iArea1013Object668','iArea1013').
+localityOfObject('iArea1016Object669','iArea1016').
+localityOfObject('iArea1024Object670','iArea1024').
 */
-inRegion('NPC1013Alexander671','iArea1025').
-inRegion(iCommanderData,'iArea1010').
-inRegion(iExplorer1,'iArea1000').
-inRegion('NPC3DrCrusher677','iArea1015').
-inRegion('NPC0Geordi684','iArea1000').
-inRegion('NPC7Guinan689','iArea1021').
-inRegion('NPC8OBrien696','iArea1006').
-inRegion('NPC6Picard701','iArea1035').
-inRegion('NPC5Riker707','iArea1036').
-inRegion('NPC4Troi712','iArea1007').
-inRegion('NPC9Wesley716','iArea1016').
-inRegion('NPC2Worf720','iArea1025').
-inRegion('NPC1010Livingston726','iArea1035').
-inRegion('NPC1011Spot727','iArea1003').
-inRegion('iEnsign728','iArea1000').
-inRegion('iEnsign732','iArea1004').
-inRegion('iEnsign736','iArea1011').
-inRegion('iEnsign740','iArea1020').
-inRegion('iEnsign744','iArea1024').
-inRegion('iEnsign748','iArea1022').
-inRegion('iEnsign752','iArea1036').
-inRegion('Item10DilithiumCrystal756','iArea1000').
-inRegion('Item10DilithiumCrystal757','iArea1000').
-inRegion('Item10DilithiumCrystal758','iArea1000').
-inRegion('Tricorder759','iArea1015').
-inRegion('Tricorder760','iArea1015').
-inRegion('Tricorder761','iArea1015').
+localityOfObject('NPC1013Alexander671','iArea1025').
+localityOfObject(iCommanderData66,'iArea1010').
+localityOfObject(iExplorer1,'iArea1000').
+localityOfObject('NPC3DrCrusher677','iArea1015').
+localityOfObject('NPC0Geordi684','iArea1000').
+localityOfObject('NPC7Guinan689','iArea1021').
+localityOfObject('NPC8OBrien696','iArea1006').
+localityOfObject('NPC6Picard701','iArea1035').
+localityOfObject('NPC5Riker707','iArea1036').
+localityOfObject('NPC4Troi712','iArea1007').
+localityOfObject('NPC9Wesley716','iArea1016').
+localityOfObject('NPC2Worf720','iArea1025').
+localityOfObject('NPC1010Livingston726','iArea1035').
+localityOfObject('NPC1011Spot727','iArea1003').
+localityOfObject('iEnsign728','iArea1000').
+localityOfObject('iEnsign732','iArea1004').
+localityOfObject('iEnsign736','iArea1011').
+localityOfObject('iEnsign740','iArea1020').
+localityOfObject('iEnsign744','iArea1024').
+localityOfObject('iEnsign748','iArea1022').
+localityOfObject('iEnsign752','iArea1036').
+localityOfObject('Item10DilithiumCrystal756','iArea1000').
+localityOfObject('Item10DilithiumCrystal757','iArea1000').
+localityOfObject('Item10DilithiumCrystal758','iArea1000').
+localityOfObject('Tricorder759','iArea1015').
+localityOfObject('Tricorder760','iArea1015').
+localityOfObject('Tricorder761','iArea1015').
 
- /* found 32 for inRegion(_G1375,_G1376). */ 
+ /* found 32 for localityOfObject(_G1375,_G1376). */ 
 
 /* Prediate:  pddlSomethingIsa/2 
 interpreted.
@@ -360,7 +360,7 @@ number_of_clauses(1).
 Pattern: pddlSomethingIsa(_G1422,_G1423). 
  */
 pddlSomethingIsa('NPC0Geordi684',['NPC0',tAgentGeneric,'tMaleAnimal']).
-pddlSomethingIsa(iCommanderData,['NPC1',tAgentGeneric,'tMaleAnimal']).
+pddlSomethingIsa(iCommanderData66,['NPC1',tAgentGeneric,'tMaleAnimal']).
 % pddlSomethingIsa(iPlayer1,[['OSimClassFn',mudStr("player_osimmarine_mp")],tAgentGeneric,'tMaleAnimal']).
 pddlSomethingIsa('NPC2Worf720',['NPC2',tAgentGeneric,'tMaleAnimal']).
 pddlSomethingIsa('NPC3DrCrusher677',['NPC3',tAgentGeneric,'tFemaleAnimal']).
@@ -499,7 +499,7 @@ pddlSomethingIsa('iArea1037',[tRegion,'IndoorsIsolatedFromOutside','SpaceInAHOC'
 pddlSomethingIsa('iArea1040',[tRegion,'FreeSpaceContent']).
 pddlSomethingIsa('iArea1041',[tRegion,'FreeSpaceContent']).
 pddlSomethingIsa('ShipMap123',[tItem]).
-inRegion('ShipMap123','iArea1000').
+localityOfObject('ShipMap123','iArea1000').
 instVerbOverride('ShipMap123',actExamine('ShipMap123'),
   actProlog(fmt("
 STARSHIP ENTERPRISE
@@ -596,10 +596,10 @@ nameStrings('iArea1040',"Outer Space").
 nameStrings('iArea1041',"Outer Space").
 nameStrings('iArea1042',"Transporter Beam").
 nameStrings('NPC1013Alexander671',"Alexander").
-nameStrings(iCommanderData,"Data").
-nameStrings(iCommanderData,"CycLBot").
-nameStrings(iCommanderData,"CycBot").
-nameStrings(iCommanderData,"CycBot1").
+nameStrings(iCommanderData66,"Data").
+nameStrings(iCommanderData66,"CycLBot").
+nameStrings(iCommanderData66,"CycBot").
+nameStrings(iCommanderData66,"CycBot1").
 nameStrings('iBoots673',"Boots").
 nameStrings('iComBadge674',"Comm Badge").
 nameStrings('iGoldUniform675',"Gold Uniform").
@@ -695,7 +695,7 @@ nameStrings('Tricorder759',"Tricorder").
 nameStrings('Tricorder760',"Tricorder").
 nameStrings('Tricorder761',"Tricorder").
 nameStrings('NPC1013Alexander671',"alexander rozhenko").
-nameStrings(iCommanderData,"Data").
+nameStrings(iCommanderData66,"Data").
 nameStrings(iExplorer1,"Player").
 nameStrings('NPC3DrCrusher677',"Doctor Crusher").
 nameStrings('NPC0Geordi684',"Geordi LaForge").
@@ -801,7 +801,7 @@ number_of_clauses(1).
 Pattern: pddlDescription(_G1470,_G1471). 
  */
 pddlDescription('NPC0Geordi684',["Lieutenant","Commander","Geordi","LaForge","Geordi LaForge","Lieutenant Commander Geordi LaForge is standing here","Geordi is the Chief Engineer of the Enterprise","He's blind, so he wears a special VISOR that lets him see things","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 3","mudMaxHitPoints: 12d12+3200","#$PunchingSomething mudBareHandDamage: 9d9+42","Geordi","Geordi LaForge","Lieutenant Commander Geordi LaForge is standing here","Geordi is the Chief Engineer of the Enterprise","He's blind, so he wears a special VISOR that lets him see things"]).
-pddlDescription(iCommanderData,["Lieutenant","Commander","Data","Android","Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He mudStowing superhuman strength, and is extremely tough","ACT_NICE_THIEF","AWARE","NOBACKSTAB","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOSUMMON","NOSLEEP","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 1","mudMaxHitPoints: 18d18+4000","#$PunchingSomething mudBareHandDamage: 10d10+75","Data","CycLBot","CycBot","CycBot1","Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He mudStowing superhuman strength, and is extremely tough"]).
+pddlDescription(iCommanderData66,["Lieutenant","Commander","Data","Android","Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He mudStowing superhuman strength, and is extremely tough","ACT_NICE_THIEF","AWARE","NOBACKSTAB","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOSUMMON","NOSLEEP","NOBASH","NOBLIND","NPC_DETECT_INVIS","NPC_NOTRACK","+mudToHitArmorClass0: 1","mudMaxHitPoints: 18d18+4000","#$PunchingSomething mudBareHandDamage: 10d10+75","Data","CycLBot","CycBot","CycBot1","Data","Lieutenant Commander Data is here, trying to be more human","Data is the only android on the Enterprise, and the only android in all of Starfleet","He mudStowing superhuman strength, and is extremely tough"]).
 pddlDescription(iExplorer1,["Lieutenant","Commander","Human","Player",
             "Explorer Player",
             "ACT_NICE_THIEF","AWARE","NOBACKSTAB","ACT_STAY_ZONE","MEMORY","HELPER","ACT_FRIEND","NOCHARM","NOSUMMON",
@@ -1243,7 +1243,7 @@ pddlObjects('FluidReservoir',['Item20Tea690','Item21Synthehol691','Item22Ferengi
 pddlObjects(tRegion,['iArea1000','iArea1001','iArea1002','iArea1003','iArea1004','iArea1005','iArea1006','iArea1007','iArea1008','iArea1009','iArea1010','iArea1011','iArea1012','iArea1013','iArea1014','iArea1015','iArea1016','iArea1017','iArea1018','iArea1019','iArea1020','iArea1021','iArea1022','iArea1023','iArea1024','iArea1025','iArea1026','iArea1027','iArea1028','iArea1029','iArea1030','iArea1031','iArea1032','iArea1033','iArea1034','iArea1035','iArea1036','iArea1037','iArea1038','iArea1039','iArea1040','iArea1041','iArea1042'
 % ,'iArea1004075'
 ]).
-pddlObjects(tAgentGeneric,['NPC0Geordi684','NPC2Worf720','NPC3DrCrusher677','NPC4Troi712','NPC5Riker707','NPC6Picard701','NPC7Guinan689','NPC8OBrien696','NPC9Wesley716','NPC1010Livingston726','NPC1011Spot727','iEnsign728','iEnsign732','iEnsign736','iEnsign740','iEnsign744','iEnsign748','iEnsign752','NPC1013Alexander671',iCommanderData,iExplorer1]).
+pddlObjects(tAgentGeneric,['NPC0Geordi684','NPC2Worf720','NPC3DrCrusher677','NPC4Troi712','NPC5Riker707','NPC6Picard701','NPC7Guinan689','NPC8OBrien696','NPC9Wesley716','NPC1010Livingston726','NPC1011Spot727','iEnsign728','iEnsign732','iEnsign736','iEnsign740','iEnsign744','iEnsign748','iEnsign752','NPC1013Alexander671',iCommanderData66,iExplorer1]).
 
 %%pddlObjects(tPathway,List):findall(apath(A,B),pathBetween(A,B,C),List).
 pddlObjects(tPathway,[apathFn('iArea1000',"n"),apathFn('iArea1001',"e"),apathFn('iArea1002',"n"),apathFn('iArea1002',"e"),apathFn('iArea1002',"s"),apathFn('iArea1002',"w"),apathFn('iArea1003',"w"),apathFn('iArea1004',"e"),apathFn('iArea1005',"n"),apathFn('iArea1005',"e"),apathFn('iArea1005',"s"),apathFn('iArea1005',"w"),apathFn('iArea1006',"n"),apathFn('iArea1006',"w"),apathFn('iArea1007',"e"),apathFn('iArea1008',"n"),apathFn('iArea1008',"e"),apathFn('iArea1008',"s"),apathFn('iArea1008',"w"),apathFn('iArea1009',"w"),apathFn('iArea1010',"s"),apathFn('iArea1010',"u"),apathFn('iArea1011',"n"),apathFn('iArea1011',"u"),apathFn('iArea1011',"d"),apathFn('iArea1012',"e"),apathFn('iArea1013',"n"),apathFn('iArea1013',"e"),apathFn('iArea1013',"s"),apathFn('iArea1013',"w"),apathFn('iArea1014',"w"),apathFn('iArea1015',"e"),apathFn('iArea1016',"n"),apathFn('iArea1016',"e"),apathFn('iArea1016',"s"),apathFn('iArea1016',"w"),apathFn('iArea1017',"w"),apathFn('iArea1018',"e"),apathFn('iArea1019',"n"),apathFn('iArea1019',"e"),apathFn('iArea1019',"s"),apathFn('iArea1019',"w"),apathFn('iArea1020',"w"),apathFn('iArea1021',"s"),apathFn('iArea1022',"n"),apathFn('iArea1022',"s"),apathFn('iArea1023',"e"),apathFn('iArea1024',"n"),apathFn('iArea1024',"e"),apathFn('iArea1024',"s"),apathFn('iArea1024',"w"),apathFn('iArea1025',"w"),apathFn('iArea1026',"e"),apathFn('iArea1027',"n"),apathFn('iArea1027',"e"),apathFn('iArea1027',"s"),apathFn('iArea1027',"w"),apathFn('iArea1028',"w"),apathFn('iArea1029',"e"),apathFn('iArea1030',"n"),apathFn('iArea1030',"e"),apathFn('iArea1030',"s"),apathFn('iArea1030',"w"),apathFn('iArea1031',"w"),apathFn('iArea1032',"s"),apathFn('iArea1032',"u"),apathFn('iArea1032',"d"),apathFn('iArea1033',"u"),apathFn('iArea1033',"d"),apathFn('iArea1034',"u"),apathFn('iArea1034',"d"),apathFn('iArea1035',"e"),apathFn('iArea1036',"n"),apathFn('iArea1036',"e"),apathFn('iArea1036',"d"),apathFn('iArea1037',"w"),apathFn('iArea1038',"s"),apathFn('iArea1038',"w"),apathFn('iArea1039',"n"),apathFn('iArea1039',"u"),apathFn('iArea1040',"u"),apathFn('iArea1040',"d"),apathFn('iArea1041',"u"),apathFn('iArea1041',"d"),apathFn('iArea1042',"n"),apathFn('iArea1042',"s")]).
@@ -1456,7 +1456,7 @@ substate_classes(physical_obj, P,
 
 substate_classes(tAgentGeneric, P,
        [
-        [inRegion(P,L)]
+        [localityOfObject(P,L)]
        ]).
 
 substate_classes(railv, V,
@@ -1750,44 +1750,44 @@ docs ready */
 
 % TESTS
 
-actorStartState(tAgentGeneric,X,[inRegion(X,Y)|List]):tAgentGeneric(X),inRegion(X,Y),findall(mudStowing(X,P),mudStowing(X,P),List1),findall(wearsClothing(X,P),wearsClothing(X,P),List2),flatten([List1,List2],List).
+actorStartState(tAgentGeneric,X,[localityOfObject(X,Y)|List]):tAgentGeneric(X),localityOfObject(X,Y),findall(mudStowing(X,P),mudStowing(X,P),List1),findall(wearsClothing(X,P),wearsClothing(X,P),List2),flatten([List1,List2],List).
 initialStart([ 
 
 /*
-inRegion('iArea1005Object666','iArea1005').
-inRegion('iArea1008Object667','iArea1008').
-inRegion('iArea1013Object668','iArea1013').
-inRegion('iArea1016Object669','iArea1016').
-inRegion('iArea1024Object670','iArea1024').
-inRegion('Item10DilithiumCrystal756','iArea1000').
-inRegion('Item10DilithiumCrystal757','iArea1000').
-inRegion('Item10DilithiumCrystal758','iArea1000').
-inRegion('Tricorder759','iArea1015').
-inRegion('Tricorder760','iArea1015').
-inRegion('Tricorder761','iArea1015').
+localityOfObject('iArea1005Object666','iArea1005').
+localityOfObject('iArea1008Object667','iArea1008').
+localityOfObject('iArea1013Object668','iArea1013').
+localityOfObject('iArea1016Object669','iArea1016').
+localityOfObject('iArea1024Object670','iArea1024').
+localityOfObject('Item10DilithiumCrystal756','iArea1000').
+localityOfObject('Item10DilithiumCrystal757','iArea1000').
+localityOfObject('Item10DilithiumCrystal758','iArea1000').
+localityOfObject('Tricorder759','iArea1015').
+localityOfObject('Tricorder760','iArea1015').
+localityOfObject('Tricorder761','iArea1015').
 */
 %% printAll(actorStartState(tAgentGeneric,X,List),ss(tAgentGeneric,X,List)).
-   ss(tAgentGeneric,'NPC0Geordi684',[inRegion('NPC0Geordi684','iArea1000'),wearsClothing('NPC0Geordi684','iBoots685'),wearsClothing('NPC0Geordi684','iComBadge686'),wearsClothing('NPC0Geordi684','iGoldUniform687'),wearsClothing('NPC0Geordi684','Item8VISOR688')]),
-   ss(tAgentGeneric,vacuum(1),[inRegion(vacuum(1),'iArea1010'),mudStowing(vacuum(1),'iPhaser676'),wearsClothing(vacuum(1),'iBoots673'),wearsClothing(vacuum(1),'iComBadge674'),wearsClothing(vacuum(1),'iGoldUniform675')]),
-   ss(tAgentGeneric,iPlayer1,[inRegion(iPlayer1,'iArea1000'),mudStowing(iPlayer1,'iPhaser776'),wearsClothing(iPlayer1,'iBoots773'),wearsClothing(iPlayer1,'iComBadge774'),wearsClothing(iPlayer1,'iGoldUniform775')]),
-   ss(tAgentGeneric,'NPC2Worf720',[inRegion('NPC2Worf720','iArea1025'),mudStowing('NPC2Worf720','iPhaser724'),wearsClothing('NPC2Worf720','iBoots721'),wearsClothing('NPC2Worf720','iComBadge722'),wearsClothing('NPC2Worf720','iGoldUniform723'),wearsClothing('NPC2Worf720','Item7Sash725')]),
-   ss(tAgentGeneric,'NPC3DrCrusher677',[inRegion('NPC3DrCrusher677','iArea1015'),mudStowing('NPC3DrCrusher677','MedicalTricorder681'),mudStowing('NPC3DrCrusher677','MedicalTricorder682'),mudStowing('NPC3DrCrusher677','MedicalTricorder683'),wearsClothing('NPC3DrCrusher677','iBoots678'),wearsClothing('NPC3DrCrusher677','iComBadge679'),wearsClothing('NPC3DrCrusher677','Item4BlueUniform680')]),
-   ss(tAgentGeneric,'NPC4Troi712',[inRegion('NPC4Troi712','iArea1007'),wearsClothing('NPC4Troi712','iBoots713'),wearsClothing('NPC4Troi712','iComBadge714'),wearsClothing('NPC4Troi712','Item4BlueUniform715')]),
-   ss(tAgentGeneric,'NPC5Riker707',[inRegion('NPC5Riker707','iArea1036'),mudStowing('NPC5Riker707','Item12Trombone711'),wearsClothing('NPC5Riker707','iBoots708'),wearsClothing('NPC5Riker707','iComBadge709'),wearsClothing('NPC5Riker707','Item2RedUniform710')]),
-   ss(tAgentGeneric,'NPC6Picard701',[inRegion('NPC6Picard701','iArea1035'),mudStowing('NPC6Picard701','Item15PhaserRifle705'),mudStowing('NPC6Picard701','iPicardsFlute'),wearsClothing('NPC6Picard701','iBoots702'),wearsClothing('NPC6Picard701','iComBadge703'),wearsClothing('NPC6Picard701','Item2RedUniform704')]),
-   ss(tAgentGeneric,'NPC7Guinan689',[inRegion('NPC7Guinan689','iArea1021'),mudStowing('NPC7Guinan689','Item20Tea690'),mudStowing('NPC7Guinan689','Item21Synthehol691'),mudStowing('NPC7Guinan689','Item22FerengiAle692'),mudStowing('NPC7Guinan689','Item23RomulanWhisky693'),mudStowing('NPC7Guinan689','Item24LemonadePruneJuice694'),mudStowing('NPC7Guinan689','Item25VulcanBeer695')]),
-   ss(tAgentGeneric,'NPC8OBrien696',[inRegion('NPC8OBrien696','iArea1006'),mudStowing('NPC8OBrien696','iPhaser700'),wearsClothing('NPC8OBrien696','iBoots697'),wearsClothing('NPC8OBrien696','iComBadge698'),wearsClothing('NPC8OBrien696','iGoldUniform699')]),
-   ss(tAgentGeneric,'NPC9Wesley716',[inRegion('NPC9Wesley716','iArea1016'),wearsClothing('NPC9Wesley716','iBoots717'),wearsClothing('NPC9Wesley716','iComBadge718'),wearsClothing('NPC9Wesley716','Item2RedUniform719')]),
-   ss(tAgentGeneric,'NPC1010Livingston726',[inRegion('NPC1010Livingston726','iArea1035')]),
-   ss(tAgentGeneric,'NPC1011Spot727',[inRegion('NPC1011Spot727','iArea1003')]),
-   ss(tAgentGeneric,'iEnsign728',[inRegion('iEnsign728','iArea1000'),wearsClothing('iEnsign728','iBoots729'),wearsClothing('iEnsign728','iComBadge730'),wearsClothing('iEnsign728','iGoldUniform731')]),
-   ss(tAgentGeneric,'iEnsign732',[inRegion('iEnsign732','iArea1004'),wearsClothing('iEnsign732','iBoots733'),wearsClothing('iEnsign732','iComBadge734'),wearsClothing('iEnsign732','iGoldUniform735')]),
-   ss(tAgentGeneric,'iEnsign736',[inRegion('iEnsign736','iArea1011'),wearsClothing('iEnsign736','iBoots737'),wearsClothing('iEnsign736','iComBadge738'),wearsClothing('iEnsign736','Item2RedUniform739')]),
-   ss(tAgentGeneric,'iEnsign740',[inRegion('iEnsign740','iArea1020'),wearsClothing('iEnsign740','iBoots741'),wearsClothing('iEnsign740','iComBadge742'),wearsClothing('iEnsign740','Item2RedUniform743')]),
-   ss(tAgentGeneric,'iEnsign744',[inRegion('iEnsign744','iArea1024'),wearsClothing('iEnsign744','iBoots745'),wearsClothing('iEnsign744','iComBadge746'),wearsClothing('iEnsign744','Item4BlueUniform747')]),
-   ss(tAgentGeneric,'iEnsign748',[inRegion('iEnsign748','iArea1022'),wearsClothing('iEnsign748','iBoots749'),wearsClothing('iEnsign748','iComBadge750'),wearsClothing('iEnsign748','Item4BlueUniform751')]),
-   ss(tAgentGeneric,'iEnsign752',[inRegion('iEnsign752','iArea1036'),wearsClothing('iEnsign752','iBoots753'),wearsClothing('iEnsign752','iComBadge754'),wearsClothing('iEnsign752','Item4BlueUniform755')]),
-   ss(tAgentGeneric,'NPC1013Alexander671',[inRegion('NPC1013Alexander671','iArea1025')])
+   ss(tAgentGeneric,'NPC0Geordi684',[localityOfObject('NPC0Geordi684','iArea1000'),wearsClothing('NPC0Geordi684','iBoots685'),wearsClothing('NPC0Geordi684','iComBadge686'),wearsClothing('NPC0Geordi684','iGoldUniform687'),wearsClothing('NPC0Geordi684','Item8VISOR688')]),
+   ss(tAgentGeneric,vacuum(1),[localityOfObject(vacuum(1),'iArea1010'),mudStowing(vacuum(1),'iPhaser676'),wearsClothing(vacuum(1),'iBoots673'),wearsClothing(vacuum(1),'iComBadge674'),wearsClothing(vacuum(1),'iGoldUniform675')]),
+   ss(tAgentGeneric,iPlayer1,[localityOfObject(iPlayer1,'iArea1000'),mudStowing(iPlayer1,'iPhaser776'),wearsClothing(iPlayer1,'iBoots773'),wearsClothing(iPlayer1,'iComBadge774'),wearsClothing(iPlayer1,'iGoldUniform775')]),
+   ss(tAgentGeneric,'NPC2Worf720',[localityOfObject('NPC2Worf720','iArea1025'),mudStowing('NPC2Worf720','iPhaser724'),wearsClothing('NPC2Worf720','iBoots721'),wearsClothing('NPC2Worf720','iComBadge722'),wearsClothing('NPC2Worf720','iGoldUniform723'),wearsClothing('NPC2Worf720','Item7Sash725')]),
+   ss(tAgentGeneric,'NPC3DrCrusher677',[localityOfObject('NPC3DrCrusher677','iArea1015'),mudStowing('NPC3DrCrusher677','MedicalTricorder681'),mudStowing('NPC3DrCrusher677','MedicalTricorder682'),mudStowing('NPC3DrCrusher677','MedicalTricorder683'),wearsClothing('NPC3DrCrusher677','iBoots678'),wearsClothing('NPC3DrCrusher677','iComBadge679'),wearsClothing('NPC3DrCrusher677','Item4BlueUniform680')]),
+   ss(tAgentGeneric,'NPC4Troi712',[localityOfObject('NPC4Troi712','iArea1007'),wearsClothing('NPC4Troi712','iBoots713'),wearsClothing('NPC4Troi712','iComBadge714'),wearsClothing('NPC4Troi712','Item4BlueUniform715')]),
+   ss(tAgentGeneric,'NPC5Riker707',[localityOfObject('NPC5Riker707','iArea1036'),mudStowing('NPC5Riker707','Item12Trombone711'),wearsClothing('NPC5Riker707','iBoots708'),wearsClothing('NPC5Riker707','iComBadge709'),wearsClothing('NPC5Riker707','Item2RedUniform710')]),
+   ss(tAgentGeneric,'NPC6Picard701',[localityOfObject('NPC6Picard701','iArea1035'),mudStowing('NPC6Picard701','Item15PhaserRifle705'),mudStowing('NPC6Picard701','iPicardsFlute'),wearsClothing('NPC6Picard701','iBoots702'),wearsClothing('NPC6Picard701','iComBadge703'),wearsClothing('NPC6Picard701','Item2RedUniform704')]),
+   ss(tAgentGeneric,'NPC7Guinan689',[localityOfObject('NPC7Guinan689','iArea1021'),mudStowing('NPC7Guinan689','Item20Tea690'),mudStowing('NPC7Guinan689','Item21Synthehol691'),mudStowing('NPC7Guinan689','Item22FerengiAle692'),mudStowing('NPC7Guinan689','Item23RomulanWhisky693'),mudStowing('NPC7Guinan689','Item24LemonadePruneJuice694'),mudStowing('NPC7Guinan689','Item25VulcanBeer695')]),
+   ss(tAgentGeneric,'NPC8OBrien696',[localityOfObject('NPC8OBrien696','iArea1006'),mudStowing('NPC8OBrien696','iPhaser700'),wearsClothing('NPC8OBrien696','iBoots697'),wearsClothing('NPC8OBrien696','iComBadge698'),wearsClothing('NPC8OBrien696','iGoldUniform699')]),
+   ss(tAgentGeneric,'NPC9Wesley716',[localityOfObject('NPC9Wesley716','iArea1016'),wearsClothing('NPC9Wesley716','iBoots717'),wearsClothing('NPC9Wesley716','iComBadge718'),wearsClothing('NPC9Wesley716','Item2RedUniform719')]),
+   ss(tAgentGeneric,'NPC1010Livingston726',[localityOfObject('NPC1010Livingston726','iArea1035')]),
+   ss(tAgentGeneric,'NPC1011Spot727',[localityOfObject('NPC1011Spot727','iArea1003')]),
+   ss(tAgentGeneric,'iEnsign728',[localityOfObject('iEnsign728','iArea1000'),wearsClothing('iEnsign728','iBoots729'),wearsClothing('iEnsign728','iComBadge730'),wearsClothing('iEnsign728','iGoldUniform731')]),
+   ss(tAgentGeneric,'iEnsign732',[localityOfObject('iEnsign732','iArea1004'),wearsClothing('iEnsign732','iBoots733'),wearsClothing('iEnsign732','iComBadge734'),wearsClothing('iEnsign732','iGoldUniform735')]),
+   ss(tAgentGeneric,'iEnsign736',[localityOfObject('iEnsign736','iArea1011'),wearsClothing('iEnsign736','iBoots737'),wearsClothing('iEnsign736','iComBadge738'),wearsClothing('iEnsign736','Item2RedUniform739')]),
+   ss(tAgentGeneric,'iEnsign740',[localityOfObject('iEnsign740','iArea1020'),wearsClothing('iEnsign740','iBoots741'),wearsClothing('iEnsign740','iComBadge742'),wearsClothing('iEnsign740','Item2RedUniform743')]),
+   ss(tAgentGeneric,'iEnsign744',[localityOfObject('iEnsign744','iArea1024'),wearsClothing('iEnsign744','iBoots745'),wearsClothing('iEnsign744','iComBadge746'),wearsClothing('iEnsign744','Item4BlueUniform747')]),
+   ss(tAgentGeneric,'iEnsign748',[localityOfObject('iEnsign748','iArea1022'),wearsClothing('iEnsign748','iBoots749'),wearsClothing('iEnsign748','iComBadge750'),wearsClothing('iEnsign748','Item4BlueUniform751')]),
+   ss(tAgentGeneric,'iEnsign752',[localityOfObject('iEnsign752','iArea1036'),wearsClothing('iEnsign752','iBoots753'),wearsClothing('iEnsign752','iComBadge754'),wearsClothing('iEnsign752','Item4BlueUniform755')]),
+   ss(tAgentGeneric,'NPC1013Alexander671',[localityOfObject('NPC1013Alexander671','iArea1025')])
    ]).
 
 
