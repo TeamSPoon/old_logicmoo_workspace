@@ -376,8 +376,15 @@ rdf_to_graph(DB,DB):- atom(DB),atomic_list_concat(['source://',DB,'#'],S),
 
 rdf_from_graph(DB,DB).
 
+/*
+:- mode fully_det rdf_to_prolog_io(+,+,+,-).
+rdf_to_prolog_io(DB,o,S,Sx):-any_to_prolog(DB,S,Sx).
+rdf_to_prolog_io(_ ,i,S,S):-ground(S).
+rdf_to_prolog_io(DB,i,S,Sx):-any_to_prolog(DB,S,Sx).
+*/
+
 rdf_to_prolog_io(DB,o,S,Sx):-!,must(any_to_prolog(DB,S,Sx)),!.
-rdf_to_prolog_io(_,i,S,Sx):-ground(S),!,ignore(S=Sx).
+rdf_to_prolog_io(_,i,S,Sx):-ground(S),!,must(S=Sx).
 rdf_to_prolog_io(DB,i,S,Sx):-must(notrace(any_to_prolog(DB,S,Sx))),!.
 
 to_rdf_io(_,S,Sx,o):-var(S),!,must(copy_term(S,Sx)).

@@ -245,10 +245,16 @@ add_hybrid_rules(HEAD,true):-!,hooked_assertz(HEAD).
 add_hybrid_rules(HEAD,BDY):- show_call(hooked_assertz(ruleHybridChain(HEAD,BDY))).
 
 
-provide_mpred_storage_clauses(forwardRule,H,B):-forwardRule(H,B).
-provide_mpred_storage_clauses(ruleHybridChain,H,B):-ruleHybridChain(H,B).
-provide_mpred_storage_clauses(ruleEquiv,H,B):-ruleEquiv(HH,B),each_subterm(HH,SubTerm),compound(SubTerm),SubTerm = H.
-provide_mpred_storage_clauses(ruleEquiv,H,B):-ruleEquiv(B,HH),each_subterm(HH,SubTerm),compound(SubTerm),SubTerm = H.
+provide_mpred_storage_clauses_rules(forwardRule,H,B):-forwardRule(H,B).
+provide_mpred_storage_clauses_rules(ruleHybridChain,H,B):-ruleHybridChain(H,B).
+provide_mpred_storage_clauses_rules(ruleEquiv,H,B):-ruleEquiv(HH,B),each_subterm(HH,SubTerm),compound(SubTerm),SubTerm = H.
+provide_mpred_storage_clauses_rules(ruleEquiv,H,B):-ruleEquiv(B,HH),each_subterm(HH,SubTerm),compound(SubTerm),SubTerm = H.
+
+provide_mpred_storage_clauses(W,H,B):-provide_mpred_storage_clauses_rules(W,H,B).
+provide_mpred_storage_clauses(hasInstance,H,true):-compound(H),functor(H,C,1),H=..[C,I], hasInstance(C,I).
+provide_mpred_storage_clauses(hasInstance,H,true):-var(H), isa_asserted(I,C),append_term(C,I,H).
+provide_mpred_storage_clauses(W,H,B):-compound(H),functor(H,C,1),H=..[C,I], provide_mpred_storage_clauses_rules(W,mudIsa(I,C),B).
+provide_mpred_storage_clauses(W,H,B):-var(H),provide_mpred_storage_clauses_rules(W,mudIsa(I,C),B),nonvar(C),append_term(C,I,H).
 
 
 
@@ -269,7 +275,8 @@ mpred_op(retract(_)).
 mpred_op(call(_)).
 
 
-
+% FACT:-true HOOK   
+provide_mpred_storage_op(OP,(Head:-Body),ANY,CALL):- Body == true,!,provide_mpred_storage_op(OP,(Head),ANY,CALL).
 
 % ISA DECL
 provide_mpred_currently(call(conjecture),_F,mudIsa(_,_),prologHybrid):-!.
@@ -291,14 +298,15 @@ provide_mpred_storage_op(OP,(Head:-Body),_ANY,CALL):-
 
 % OLD RULE HOOK   
 provide_mpred_storage_op(OP,(Head:-Body),prologHybrid,CALL):- \+ use_pttp,
- transitive(how_to_op,OP,OP2),
-  CALL = (call(OP2,ruleHybridChain(Head,Body))),
-  wdmsg(saved_clause_in_hybridRule(OP2,Head,Body)),!.
+   transitive(how_to_op,OP,OP2),
+  wdmsg(saved_clause_in_hybridRule(OP,Head,Body)),!,
+     CALL = (call(OP2,ruleHybridChain(Head,Body))).  
 
 % PTTP RULE HOOK   
 provide_mpred_storage_op(OP,(Head:-Body),prologHybrid,CALL):- use_pttp,!,
   transitive(how_to_op,OP,OP2),
-  CALL = (((call(OP2,ruleHybridChain(Head,Body)),dbase_t_tell_snark(OP2,(Head:-Body))))),!.
+  CALL0 = (call(OP2,ruleHybridChain(Head,Body))),
+  CALL = (((CALL0,dbase_t_tell_snark(OP2,(Head:-Body))))),!.
 
 % SNARK RULE HOOK   
 provide_mpred_storage_op(OP,RULE,prologHybrid,CALL):- use_pttp,is_rule(RULE),!,
@@ -324,15 +332,16 @@ provide_mpred_setup(OP,Head,StubType,OUT):- sanity(var(OUT)),
  StubType = prologHybrid, 
   must_det_l(( get_pifunctor(Head,PHead,F,A),  
    show_call(provide_clauses_list(PHead,HBLIST)),
-   user:dynamic(F/A),retractall(PHead),
-  % abolish(F,A),
-   user:dynamic(F/A),
-   user:dynamic_multifile_exported(F/A),
-   call((asserta_if_new(mpred_prop(F,hasStub(StubType))))), 
-   asserta_if_new(mpred_prop(F,StubType)), 
+   user:dynamic_safe(F/A),
+   abolish(F,A),user:dynamic_safe(F/A),
+   asserta_if_new(mpred_prop(F,StubType)),
+   call((asserta_if_new(mpred_prop(F,hasStub(StubType))))),   
    add_stub_now(PHead,StubType,call(conjecture)),
-   forall(member(HB,HBLIST),must(database_modify(assert(z),HB))),!,
-   must_same_clauses(PHead,HBLIST))),
+   public(F/A),
+   compile_predicates([F/A]))),
+   expire_dont_add,
+   forall(member(HB,HBLIST),must(show_call(add(HB)))),!,
+   must_same_clauses(PHead,HBLIST),
    OUT=defined(provide_mpred_setup(OP,StubType)).
 
 
@@ -356,12 +365,16 @@ provide_mpred_call_op(_,FACT,prologHybrid,CALL):- get_functor(FACT, F,A), !,
 :- retractall(use_pttp).
 %:- asserta_if_new(use_pttp).
 
-call_for_literal(F,A,HEAD):- use_pttp,!,snark_ask(HEAD).
-call_for_literal(F,A,HEAD):- use_ideep,!, CALL = call_for_literal_ideep_lc(HEAD),!,loop_check_term(cwdl(CALL,7),HEAD,(CALL)).
+call_for_literal(_,_,HEAD):- use_pttp,!,snark_ask(HEAD).
+call_for_literal(_,_,HEAD):- use_ideep,!, CALL = call_for_literal_ideep_lc(HEAD),!,loop_check_term(cwdl(CALL,7),HEAD,(CALL)).
 call_for_literal(F,A,HEAD):- call_for_literal_db(F,A,HEAD).
 
+missing_stub(Head):-has_storage_stub(prologHybrid,Head),!,fail.
+missing_stub(Head):-not(predicate_property(Head,public)),listing(Head).
+%((functor(PHEAD,F,A),predicate_property(PHEAD,number_of_clauses(NC)),NC>1);not(mpred_prop(F,hasStub(prologHybrid)))
+
 call_for_literal_db(F,A,HEAD):- P=F, HEAD=..[P|ARGS],
-   ((thglobal:after_game_load,((functor(PHEAD,F,A),predicate_property(PHEAD,number_of_clauses(NC)),NC>1);not(mpred_prop(F,hasStub(prologHybrid)))))->decl_mpred_hybrid(F,A);true),
+   ((thglobal:after_game_load,missing_stub(HEAD))->decl_mpred_hybrid(F,A);true),
    constrain_args(P,ARGS),call_for_literal_db0(F,A,HEAD),constrain_args(P,ARGS).
 
 
@@ -373,7 +386,7 @@ call_for_literal_ideep_lc(HEAD):- get_functor(HEAD,F,A),call_for_literal_db(F,A,
 call_for_literal_db0(F,A,HEAD):-no_repeats_av(HEAD,call_for_literal_db00(F,A,HEAD)).
 
 call_for_literal_db00(F,A,HEAD):- is_asserted_dbase_t(HEAD).
-call_for_literal_db00(F,A,HEAD):- ttCompleteExtentAsserted(F),!,fail.
+call_for_literal_db00(F,_,   _):- ttCompleteExtentAsserted(F),!,fail.
 call_for_literal_db00(F,A,HEAD):- loop_check(call_rule_db(F,A,HEAD)).
 call_for_literal_db00(F,A,HEAD):- not(use_pttp),HEAD=..[P1,A1,A2],dif(P2,P1),loop_check_term(is_asserted_dbase_t(genlPreds(P2,P1)),gp(P1),fail),
    call(dbase_t,P2,A1,A2).
@@ -390,9 +403,15 @@ call_mpred_body(HEAD,BODY):- no_repeats(loop_check_term(call_mpred_body_lc(HEAD,
 
 call_mpred_body_lc(_HEAD,BODY):- debugOnError(BODY).
 
+
+
+mustIsa(I,C):-nonvar(I),!,mudIsa(I,C),!.
+mustIsa(I,C):-when(nonvar(I),mudIsa(I,C)).
+
 constrain_args(_):-!.
 constrain_args(HEAD):-HEAD=..[P|ARGS],constrain_args(P,ARGS).
 
+constrain_args(_,_):-!.
 constrain_args(_P,[AR,GS]):-!,dif(AR,GS).
 constrain_args(_,[_P,AR,GS]):-!,dif(AR,GS).
 constrain_args(A,B):-constrain_args_pttp(A,B).

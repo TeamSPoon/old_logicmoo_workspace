@@ -34,7 +34,35 @@
 mudIsa_motel(tCol,tCol).
 mudIsa_motel(I,T):-no_repeats_av(deduce_M(mudIsa(I,T))),I\=tCol,I\==isTDisjoint(tBOT),I\==tTOP,T\==isTDisjoint(tBOT),T\==tTOP.
 
-user:hasInstance_dyn(tCol, tChannel).
+user:hasInstance_dyn(tCol,ttCompleteExtentAsserted).
+user:hasInstance_dyn(tCol,tCol).
+user:hasInstance_dyn(tCol,tChannel).
+user:hasInstance_dyn(ttCompleteExtentAsserted,ttCompleteExtentAsserted).
+user:hasInstance_dyn(ttCompleteExtentAsserted,prologSingleValued).
+user:hasInstance_dyn(ttCompleteExtentAsserted,tCol).
+user:hasInstance_dyn(ttCompleteExtentAsserted,ttFormatType).
+
+user:hasInstance_dyn(ttCompleteExtentAsserted,ttValueType).
+user:hasInstance_dyn(ttCompleteExtentAsserted,ttSpatialType).
+user:hasInstance_dyn(ttCompleteExtentAsserted,tRelation).
+user:hasInstance_dyn(ttCompleteExtentAsserted,tPred).
+
+user:hasInstance_dyn(ttCompleteExtentAsserted,mudFtInfo).
+user:hasInstance_dyn(ttCompleteExtentAsserted,genlPreds).
+
+% CANT user:hasInstance_dyn(ttCompleteExtentAsserted,tRegion).
+%user:hasInstance_dyn(ttNotSpatialType,ftInt).
+%user:hasInstance_dyn(ttNotSpatialType,ftTerm).
+user:hasInstance_dyn(ttNotSpatialType,tCol).
+user:hasInstance_dyn(ttNotSpatialType,ttFormatType).
+user:hasInstance_dyn(ttNotSpatialType,ttValueType).
+
+user:hasInstance_dyn(ttSpatialType,tAgentGeneric).
+user:hasInstance_dyn(ttSpatialType,tItem).
+user:hasInstance_dyn(ttSpatialType,tObj).
+user:hasInstance_dyn(ttSpatialType,tRegion).
+user:hasInstance_dyn(ttSpatialType,tSpatialThing).
+
 
 hasInstance(T,I):- not(current_predicate(deduce_M/1)),!,user:hasInstance_dyn(T,I).
 hasInstance(T,I):- !, (mudIsa_motel(I,T) *-> true ; (((atom(I),must(not(user:hasInstance_dyn(T,I)))),fail))).
@@ -65,6 +93,7 @@ mpred_arity(xyzFn,4).
 mpred_arity(mpred_arity,2).
 mpred_arity(mpred_prop,2).
 mpred_arity(never_type,1).
+mpred_arity(self_call,1).
 mpred_arity(argIsa, 3).
 mpred_arity(mudIsa, 2).
 

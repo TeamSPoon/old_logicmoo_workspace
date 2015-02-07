@@ -181,7 +181,24 @@ same_regions(Agent,Obj):-must(inRegion(Agent,Where1)),dif_safe(Agent,Obj),inRegi
 %:- add_storage_stub(prologPTTP,inRegion/2).
 %:- add_storage_stub(prologPTTP,mudTestAgentWearing/2).
 
-% inRegion(Agent,Region):- nonvar(Agent),!, loop_check(( (is_asserted(mudAtLoc(Agent,Where));localityOfObject(Agent,Where)), locationToRegion(Where,Region)),fail).
+mudAtLoc_deduced(X,Y):-show_call_failure(is_asserted(mudAtLoc(X,Y))),!.
+mudAtLoc_deduced(X,Y):-is_asserted(localityOfObject(X,_)),!,create_random_fact(mudAtLoc(X,Y)).
+
+:-decl_mpred_prolog(mudAtLoc_deduced/2).
+
+predArgTypes(mudAtLoc_deduced(tObj,tSpatialThing)).
+
+
+localityOfObject_deduced(Obj,Region):-loop_check(inRegion(Obj,Region)).
+localityOfObject(Inner,Container):-mudInsideOf(Inner,Container).
+localityOfObject(Above,HasSurface):-mudLocOnSurface(Above,HasSurface).
+localityOfObject(Clothes,Agent):-mudSubPart(Agent,Clothes).
+localityOfObject(Inner,Outer):-use_pttp,localityOfObject(Inner,Container),localityOfObject(Container,Outer).
+
+
+inRegion(Agent,RegionIn):- nonvar(Agent),!, loop_check(( localityOfObject_deduced(Agent,Where), locationToRegion(Where,Region)),fail),!,Region=RegionIn.
+inRegion(Agent,RegionIn):- must(nonvar(RegionIn)),!,(tItem(Agent);tAgentGeneric(Agent)),inRegion(Agent,RegionIn).
+
 %inRegion(Agent,Region):- nonvar(Region),!, loop_check(( (is_asserted(atloc(Agent,Where));localityOfObject(Agent,Where)), locationToRegion(Where,Region)),fail).
 
 /*
@@ -190,18 +207,21 @@ same_regions(Agent,Obj):-must(inRegion(Agent,Where1)),dif_safe(Agent,Obj),inRegi
 :- must(show_call(get_mpred_storage_provider(assert(_),inRegion(_,_),O))).
 */
 
-inRegion(Obj,Where):- localityOfObject(Obj,Where), tRegion(Where).
+% inRegion(Obj,Where):- localityOfObject(Obj,Where), tRegion(Where).
 
 % :-snark_tell(localityOfObject(A,B) &  localityOfObject(B,C) => localityOfObject(A,C)).
 
 
 %localityOfObject(fo_T__T_T_T_TTTT_________TT__To,fo_T__T_T_T_TTTT_________TT__To_R).
 
+localityOfObject_deduced(Agent,Where):-must(is_asserted(mudAtLoc(Agent,Where));is_asserted(localityOfObject(Agent,Where));mudAtLoc_deduced(Agent,Where)).
+
+
+localityOfObject_deduced(Obj,Region):-loop_check(inRegion(Obj,Region)).
 localityOfObject(Inner,Container):-mudInsideOf(Inner,Container).
 localityOfObject(Above,HasSurface):-mudLocOnSurface(Above,HasSurface).
 localityOfObject(Clothes,Agent):-mudSubPart(Agent,Clothes).
 localityOfObject(Inner,Outer):-use_pttp,localityOfObject(Inner,Container),localityOfObject(Container,Outer).
-localityOfObject(Obj,Region):-loop_check(inRegion(Obj,Region),fail).
 
 
 mudSubPart(Outer,Inner):-is_asserted(mudInsideOf(Inner,Outer)).
@@ -316,6 +336,12 @@ calc_xyz(Region1,Dir,force(X1,Y1,Z1),X2,Y2,Z2):-
    to_3d(Region1,xyzFn(_,X,Y,Z)),
    get_dir_offset(Dir,1,OX,OY,OZ),
    X2 is X+ (OX*X1),Y2 is Y+OY*Y1,Z2 is Z+OZ*Z1.
+
+from_dir_target(LOC,Dir,XXYY):- is_3d(LOC),!,
+  move_dir_target(LOC,Dir,XXYY).
+from_dir_target(Agent,Dir,XXYY):-
+  mudAtLoc(Agent,RegionXYZ),
+  move_dir_target(RegionXYZ,Dir,XXYY).
 
 move_dir_target(RegionXYZ,Dir,XXYY):-
    move_dir_target(RegionXYZ,Dir,1,XXYY).

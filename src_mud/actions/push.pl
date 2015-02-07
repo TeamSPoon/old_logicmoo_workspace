@@ -24,7 +24,7 @@ vtActionTemplate(actPush(vtDirection)).
 %Plus it still costs the same charge as if the agent did push something
 user:agent_call_command(Agent,actPush(Dir)) :-	
 	mudAtLoc(Agent,LOC),
-	move_dir_target(LOC,Dir,XXYY),
+	from_dir_target(LOC,Dir,XXYY),
 	mudAtLoc(What,XXYY),
 	integer(What),
 	in_world_move(_,Agent,Dir),
@@ -35,7 +35,7 @@ user:agent_call_command(Agent,actPush(Dir)) :-
 % Some damage and loss of charge (same as normal push)
 user:agent_call_command(Agent,actPush(Dir)) :-	
 	mudAtLoc(Agent,LOC),
-	move_dir_target(LOC,Dir,XXYY),
+	from_dir_target(LOC,Dir,XXYY),
 	mudAtLoc(What,XXYY),
 	\+ pushable(Agent,What,XXYY,Dir),
 	call_update_stats(Agent,hernia),
@@ -44,7 +44,7 @@ user:agent_call_command(Agent,actPush(Dir)) :-
 % A successful PUSH
 user:agent_call_command(Agent,actPush(Dir)) :-	
 	mudAtLoc(Agent,LOC),
-	move_dir_target(LOC,Dir,XXYY),
+	from_dir_target(LOC,Dir,XXYY),
 	mudAtLoc(What,XXYY),
 	move_object(XXYY,What,Dir),
 	in_world_move(_,Agent,Dir),
@@ -69,14 +69,14 @@ pushable(Agent,Obj,LOC,Dir) :-
 
 % Is the location behind the pushed item/agent empty (or near empty).
 anything_behind(LOC,Dir) :-
-	move_dir_target(LOC,Dir,XXYY),
+	from_dir_target(LOC,Dir,XXYY),
 	mudAtLoc(What,XXYY),
 	props(What,[mudWeight > 1,mudPermanence(or(Pm,0))]),
 	Pm < 2.
 
 % Move the object.
 move_object(LOC,Obj,Dir) :-
-	move_dir_target(LOC,Dir,XXYY),
+	from_dir_target(LOC,Dir,XXYY),
 	squish_behind(XXYY,Obj),
 	in_world_move(LOC,Obj,Dir).
 

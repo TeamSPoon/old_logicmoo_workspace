@@ -47,8 +47,8 @@ do_act_affect(_,_,_).
 
 
 % Check to see if last action was successful or not
-:-dynamic_multifile_exported(mudLastCmdSuccess/2).
-mudLastCmdSuccess(Agent,YN) :- mudCmdFailure(Agent,_)-> YN=vFalse ; YN=vTrue.
+:-dynamic_multifile_exported(success/2).
+success(Agent,YN) :- mudCmdFailure(Agent,_)-> YN=vFalse ; YN=vTrue.
 
 :-dynamic_multifile_exported(add_cmdfailure/2).
 add_cmdfailure(Agent,What):-add(mudCmdFailure(Agent,What)).

@@ -45,21 +45,18 @@ split_name_type_0(C,P,C):- var(P),atom(C),i_name(i,C,I),gensym(I,P),!.
 
 formattype_guessable(S):- mudFtInfo(S,_).
 
+
 term_is_ft(Term,Type):- var(Term),!,member(Type,[ftVar,ftProlog]).
-term_is_ft(Term,Type):- var(Type),!,formattype_guessable(Type),term_is_ft(Term,Type).
-term_is_ft(_ANY,ftVar):- !,fail.
-term_is_ft(Term,Type):- ttFormatType(Type),
-   must_det(ttFormatType(Type)),
-   once(trans_subft_info(Type,How)),   
+term_is_ft(_ANY,Type):- Type==ftVar,!,fail.
+term_is_ft(Term,Type):- trans_subft_info(Type,How),   
    correctFormatType(query(_HLDS,_OldV),Term,How,NewTerm),!,
    sameArgTypes(NewTerm,Term).
 
-ft_info_how(FT,vFormatted(FT)):-mudFtInfo(FT,vFormatted).
-ft_info_how(FT,self_call(Info)):-mudFtInfo(FT,Info),Info\=vFormatted.
+ft_info_how(FT,vFormatted(FT)):- mudFtInfo(FT,vFormatted).
+ft_info_how(FT,req(Info)):- mudFtInfo(FT,Info),Info\=vFormatted.
 
 trans_subft_info(FT,Info):-ft_info_how(FT,Info).
-trans_subft_info(FT,Info):-trans_subft(Sub,FT),ft_info_how(Sub,Info),!.
-trans_subft_info(FT,Info):-trans_subft(FT,Sub),ft_info_how(Sub,Info),!.
+trans_subft_info(FT,Info):-ttFormatType(FT),ft_info_how(Sub,Info),trans_subft(Sub,FT).
 trans_subft(FT,Sub):-mudSubclass(FT,Sub).
 trans_subft(FT,Sub):-mudSubclass(FT,A),mudSubclass(A,Sub).
 trans_subft(FT,Sub):-mudSubclass(FT,A),mudSubclass(A,B),mudSubclass(B,Sub).
@@ -441,6 +438,7 @@ correctType(change(_,_),A,tCol,AA):- atom(A),decl_type(A),must_equals(A,AA).
 correctType(_O,A,vtVerb,AA):- must_equals(A,AA).
 correctType(_O,A,Type,AA):- compound(A),not(is_list(A)),atom(Type),functor_safe(A,Type,_), must_equals(A,AA).
 
+correctType(_O,A,req(Code),A):- !,subst(Code,isSelf,A,Call),with_assertions(thlocal:no_arg_type_error_checking,req(Call)).   
 correctType(_O,A,Type,AA):- compound(Type),contains_var(Type,isSelf),predicate_property(Type,_),!,
    subst(Type,isSelf,A,Call1),
    subst(Call1,value,AA,Call2),!,
@@ -477,7 +475,7 @@ correctType(Op,Args,Types,NewArgs):-compound(Args), compound(Types),
    NewArgs=..[F|NewArgsL],
    correctAnyType(Op,ArgsL,TypesL,NewArgsL).
 
-correctType(_O,A,Fmt,A):- mudFtInfo(Fmt,Code),!,subst(Code,isSelf,A,Call),with_assertions(thlocal:no_arg_type_error_checking,show_call_failure(req(Call))).   
+correctType(Op,A,Fmt,AA):- trans_subft_info(Fmt,Code),!,correctType(Op,A,Code,AA).
 correctType(Op,A,Super,AA):- ttFormatType(Super),req(mudSubclass(Sub,Super)),Sub\=Super,correctType(Op,A,Sub,AA).
 
 correctType(Op,Arg,Props,NewArg):- compound(Props),
@@ -553,7 +551,7 @@ call_argIsa_ForAssert(F,N,Type):-argIsa_call(F,N,Type),atom(Type),!,not(nonusefu
 nonusefull_deduction_type(ftTerm).
 nonusefull_deduction_type(ftVoprop).
 nonusefull_deduction_type(vtDirection).
-nonusefull_deduction_type(Type):-ttCreateable(Type),!,fail.
+nonusefull_deduction_type(Type):-ttSpatialType(Type),!,fail.
 nonusefull_deduction_type(tObj).
 nonusefull_deduction_type(Type):-is_asserted(ttFormatType(Type)).
 

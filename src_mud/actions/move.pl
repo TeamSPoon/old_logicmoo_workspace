@@ -56,7 +56,7 @@ move_command(Agent,DirS,DistS) :-
 % cant get anywhere since the map fails it
 move_command_1(Agent,Dir) :-
 	mudAtLoc(Agent,LOC),
-        not(move_dir_target(LOC,Dir,_)),!,
+        not(from_dir_target(LOC,Dir,_)),!,
 		(add_cmdfailure(Agent,actMove)),
       throw(giveup(nopath(Agent,actMove))).
 
@@ -64,7 +64,7 @@ move_command_1(Agent,Dir) :-
 % damage and charge... plus it doesn't get anywhere
 move_command_1(Agent,Dir) :-
 	mudAtLoc(Agent,LOC),
-        move_dir_target(LOC,Dir,XXYY),
+        from_dir_target(LOC,Dir,XXYY),
         is_3d(XXYY),
          mudAtLoc(Obj,LOC),        
          prop_or(Obj,mudHeight,ObjHt,1),
@@ -82,7 +82,7 @@ move_command_1(Agent,Dir) :-
 % Another Agent is in the way
 move_command_1(Agent,Dir):- 
 	mudAtLoc(Agent,LOC),
-	move_dir_target(LOC,Dir,XXYY),
+	from_dir_target(LOC,Dir,XXYY),
 	is_3d(XXYY),
         mudAtLoc(Agent2,XXYY),
 	mudIsa(Agent2,tAgentGeneric),

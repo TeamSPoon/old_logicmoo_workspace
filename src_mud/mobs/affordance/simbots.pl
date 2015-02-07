@@ -732,8 +732,8 @@ verb_affordance(actArgue, tAgentGeneric, mudEnergy, 0, -10).
 verb_affordance(actArgue, tAgentGeneric, mudSadToHappy, -10, -10).
 verb_affordance(actArgue, tAgentGeneric, mudFun, 20, 10).
 verb_affordance(actAttack, tAgentGeneric, mudNonLonelinessSocial, 10, 15).
-verb_affordance(actAttack, tAgentGeneric, mudEnergy, 0, -10).
 verb_affordance(actAttack, tAgentGeneric, mudSadToHappy, 0, -10).
+verb_affordance(actAttack, tAgentGeneric, mudEnergy, 0, -10).
 verb_affordance(actAttack, tAgentGeneric, mudFun, 20, 10).
 verb_affordance(actKiss, tAgentGeneric, mudNonLonelinessSocial, 10, 15).
 verb_affordance(actKiss, tAgentGeneric, mudSadToHappy, 10, 10).

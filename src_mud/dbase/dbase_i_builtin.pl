@@ -140,7 +140,7 @@ mudSubclass(isEach(tRegion,tAgentGeneric),tChannel).
 
 */
 
-:- decl_mpred_hybrid((ttNotCreatable/1, tCol/1, mudSubclass/2, predArgTypes/1 ,ttCreateable/1)).
+:- decl_mpred_hybrid((ttNotSpatialType/1, tCol/1, mudSubclass/2, predArgTypes/1 ,ttSpatialType/1)).
 
 
 :- decl_mpred_hybrid(((vFormatted/1,
@@ -186,7 +186,7 @@ mudSubclass(isEach(tRegion,tAgentGeneric),tChannel).
 
 tChannel(iGossupChannel).
 
-% ttCreateable(tSpatialThing).
+% ttSpatialType(tSpatialThing).
 
 
 % prologMultiValued(gridValue(tRegion,ftInt,ftInt,tObj)).
@@ -201,7 +201,7 @@ prologMultiValued(mudPossess(tObj,tObj)).
 :- decl_mpred_hybrid(predProxyAssert,2).
 :- begin_transform_moo_preds.
 
-mudSubclass(ttCreateable,tCol).
+mudSubclass(ttSpatialType,tCol).
 
 % :- (do_term_expansions->true;throw(not_term_expansions)).
 
@@ -210,7 +210,7 @@ mudSubclass(ttCreateable,tCol).
 tCol(tItem).
 tCol(prologMultiValued).
 tCol(prologSingleValued).
-tCol(ttCreateable).
+tCol(ttSpatialType).
 tCol(macroDeclarer).
 
 :-add((mudSubclass(isEach(prologMultiValued,prologOrdered,prologNegByFailure,predArgTypes,prologHybrid,prologPTTP,prologOnly,prologMacroHead,prologListValued,prologSingleValued),tPred))).
@@ -330,7 +330,7 @@ prologMultiValued(mudKeyword(ftTerm,ftString)).
 prologMultiValued(mudActAffect(ftTerm,ftTerm,ftTerm)).
 prologMultiValued(mudMemory(tAgentGeneric,ftTerm)).
 predArgTypes(mudWearing(tAgentGeneric,tWearAble)).
-predArgTypes(mudLastCmdSuccess(tAgentGeneric,ftBoolean)).
+predArgTypes(success(tAgentGeneric,ftBoolean)).
 
 :-decl_mpred(mudActAffect/3).
 
@@ -572,6 +572,7 @@ mudFtInfo(ftCallable,prologCall(predicate_property(isSelf,visible))).
 mudFtInfo(ftProlog,prologCall(predicate_property(isSelf,visible))).
 mudFtInfo(ftRest,prologCall(true)).
 mudFtInfo(ftString,prologCall(string(isSelf))).
+mudFtInfo(ftText,prologCall(is_string(isSelf))).
 mudFtInfo(ftTerm,prologCall(nonvar(isSelf))).
 mudFtInfo(ftVar,prologCall(var(isSelf))).
 

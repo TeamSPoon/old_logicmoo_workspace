@@ -104,6 +104,7 @@ objects_match_for_agent(Agent,Text,ObjList):- objects_match_for_agent(Agent,Text
 :-dynamic_multifile_exported(objects_match_for_agent/4).
 objects_match_for_agent(Agent,Text,Match,ObjList):- objects_for_agent(Agent,isOneOf([text_means(Agent,Text,isSelf),isAnd([isOneOf(Match),match_object(Text,isSelf)])]),ObjList).  
 
+
 text_means(Agent,Text,Agent):- equals_icase(Text,"self"),!.
 text_means(Agent,Text,Loc):- equals_icase(Text,"here"),where_atloc(Agent,Loc).
 text_means(Agent,Text,Region):- equals_icase(Text,"region"),where_atloc(Agent,Loc),locationToRegion(Loc,Region).
@@ -192,7 +193,7 @@ object_print_details0(Print,Agent,O,DescSpecs,Skipped):-
 :-decl_type(ttTypeType).
 vtSkippedPrintNames(T):-ttFormatType(T).
 vtSkippedPrintNames(T):-mudIsa(T,ttTypeType).
-vtSkippedPrintNames(E):-member(E,[tObj,isSelf,the,is,tSpatialThing,ttNotCreatable,ttCreateable,prologHybrid,prologPTTP,prologOnly,tRelation,tPred,'',[]]).
+vtSkippedPrintNames(E):-member(E,[tObj,isSelf,the,is,tSpatialThing,ttNotSpatialType,ttSpatialType,prologHybrid,prologPTTP,prologOnly,tRelation,tPred,'',[]]).
 
 
 must_make_object_string_list(_,Obj,WList):- object_string(Obj,WList),!.
@@ -290,7 +291,7 @@ verb_alias('where is',actWhere).
 verb_alias_to_verb(IVERB,SVERB):- verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.
 verb_alias_to_verb(IVERB,SVERB):- coerce(IVERB,vtVerb,SVERB), IVERB \= SVERB.
 
-subst_parser_vars(Agent,TYPEARGS,TYPEARGS_R):- subst(TYPEARGS,isSelfAgent,Agent,S1),where_atloc(Agent,Here),subst(S1,here,Here,TYPEARGS_R).
+subst_parser_vars(Agent,TYPEARGS,TYPEARGS_R):- subst(TYPEARGS,isSelfAgent,Agent,S1),where_atloc(Agent,Here),subst(S1,isSelfLOC,Here,TYPEARGS_R).
 
 % verb_matches("go",VERB):-!,VERB=go.
 verb_matches(SVERB,VERB):-samef(VERB,SVERB).
@@ -452,9 +453,17 @@ query_trans_subft(FT,Sub):-mudSubclass(FT,A),mudSubclass(A,B),mudSubclass(B,Sub)
 parseFmt_vp1(Agent, do(NewAgent,Goal),[SVERB|ARGS],[]):- parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,Goal),!.
 parseFmt_vp2(Agent,GOAL,[SVERB|ARGS],UNPARSED):- parse_vp_real(Agent,SVERB,ARGS,TRANSLATIONS),!,member(UNPARSED-GOAL,TRANSLATIONS).
 
-to_arg_value(isRandom(Type),Term):- nonvar(Type),!, random_instance(Type,Term,true).
-to_arg_value(call(Call),TermO):-nonvar(Call),subst(Call,isSelf,Term,NewCall),!,must(req(NewCall)),to_arg_value(Term,TermO).
-to_arg_value(Term,Term).
+to_arg_value(Var,Var):-is_ftVar(Var),!.
+to_arg_value(isSelfLOC,Here):-must((current_agent(Who),where_atloc(Who,Here))).
+to_arg_value(isSelfAgent,Who):-must((current_agent(Who))).
+to_arg_value(isRandom(Type),Term):- nonvar(Type),!,must((to_arg_value(Type,TypeR),random_instance(TypeR,Term,true))).
+to_arg_value(Call,TermO):-compound(Call),Call=..[call|CALLARGS],must((subst(CALLARGS,isSelf,Term,CALLARGS2),maplist(to_arg_value,CALLARGS2,CALLARGS3),NewCall=..[call|CALLARGS3],must(req(NewCall)),to_arg_value(Term,TermO))).
+to_arg_value(Term,TermO):-must((map_term(to_arg_value,Term,TermO))).
+
+map_term(Pred,Term,TermO):-var(Term),!,must(call(Pred,Term,TermO)).
+map_term(Pred,Term,TermO):-is_list(Term),!,must(maplist(Pred,Term,TermO)).
+map_term(Pred,Term,TermO):-compound(Term),Term=..TermL,!,must(maplist(Pred,TermL,TermOL)),TermO=..TermOL.
+map_term(Pred,Term,Term):-!.
 
 /*
 

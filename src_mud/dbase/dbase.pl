@@ -71,14 +71,29 @@ shrink_clause( HB,HB).
 % TODO uncomment the next line without breaking it all!
 % thglobal:use_cyc_database.
 
+% - 	list_difference_eq(+List, -Subtract, -Rest)
+%
+%	Delete all elements of Subtract from List and unify the result
+%	with Rest.  Element comparision is done using ==/2.
+list_difference_eq([],_,[]).
+list_difference_eq([X|Xs],Ys,L) :-
+ 	(   list_difference_eq_memberchk_eq(X,Ys)
+ 	->  list_difference_eq(Xs,Ys,L)
+ 	;   L = [X|T],
+ 	    list_difference_eq(Xs,Ys,T)
+ 	).
+list_difference_eq_memberchk_eq(X, [Y|Ys]) :- (   X == Y ->  true ;   list_difference_eq_memberchk_eq(X, Ys) ).
+
 % ================================================
 % DBASE_T System
 % ================================================
 
 :-dynamic(implied_dont_add/1).
-expire_dont_add:-dmsg(expire_dont_add),retractall(implied_dont_add(_)).
+expire_dont_add:-dmsg(expire_dont_add),retractall(implied_dont_add(_)),expire_tabled_list(all).
 is_asserted_dbase_t(HEAD):-dbase_t(HEAD);clause_safe(HEAD,true);fact_always_true(HEAD).
 
+expire_post_retract(_):- expire_dont_add.
+expire_post_assert(_):- expire_tabled_list(all).
 
 :-ensure_loaded(dbase_i_kb_store).
 
@@ -441,7 +456,7 @@ user:decl_database_hook(assert(_),mudFtInfo(FT,_)):- define_ft(FT).
 % user:decl_database_hook(assert(_),mudSubclass(FT,OFT)):- define_ft(OFT),define_ft(FT).
 % user:decl_database_hook(assert(_),mudSubclass(FT,OFT)):- formattype(OFT),dmsg(warning(subclass_of_define_ft(FT))).
 
-dmsg_hook(transform_holds(dbase_t,_What,props(ttCreateable,[mudIsa(mudIsa),mudIsa]))):-trace_or_throw(dtrace).
+dmsg_hook(transform_holds(dbase_t,_What,props(ttSpatialType,[mudIsa(mudIsa),mudIsa]))):-trace_or_throw(dtrace).
 
 % expand_goal_correct_argIsa(A,A):-simple_code,!.
 expand_goal_correct_argIsa(A,B):- expand_goal(A,B).
@@ -839,18 +854,6 @@ update_value(OLDI,X,NEW):- number(X),X<0,compute_value(OLDI,OLD),number(OLD),cat
 update_value(_,NEW,NEWV):-compute_value_no_dice(NEW,NEWV),!.
 
 
-% - 	list_difference_eq(+List, -Subtract, -Rest)
-%
-%	Delete all elements of Subtract from List and unify the result
-%	with Rest.  Element comparision is done using ==/2.
-
-list_difference_eq([],_,[]).
-list_difference_eq([X|Xs],Ys,L) :-
-	(   memberchk_eq(X,Ys)
-	->  list_difference_eq(Xs,Ys,L)
-	;   L = [X|T],
-	    list_difference_eq(Xs,Ys,T)
-	).
 
 list_update_op(OLDI,+X,NEW):-flatten_append(OLDI,X,NEW),!.
 list_update_op(OLDI,-X,NEW):-flatten([OLDI],OLD),flatten([X],XX),!,list_difference_eq(OLD,XX,NEW),!.
@@ -912,9 +915,10 @@ onLoad(C):-call_after_game_load(C).
 :-dynamic_multifile_exported(user:onEachLoad/1).
 onEachLoad(C):-assert_if_new(user:call_OnEachLoad(C)).
 
+
 call_OnEachLoad:-forall(call_OnEachLoad(C),doall(C)).
 
-onSpawn(ClassFact):- ClassFact=..[Funct,InstA],createByNameMangle(InstA,Inst,Type2),assert_isa(Type2,ttCreateable),assert_isa(Inst,Funct),assert_isa(Inst,Type2),!.
+onSpawn(ClassFact):- ClassFact=..[Funct,InstA],createByNameMangle(InstA,Inst,Type2),assert_isa(Type2,ttSpatialType),assert_isa(Inst,Funct),assert_isa(Inst,Type2),!.
 onSpawn(ClassFact):- ClassFact=..[Funct|InstADeclB],must_det(onSpawn_f_args(Funct,InstADeclB)).
 
 onSpawn_f_args(Funct,List):-
@@ -939,7 +943,7 @@ convertOneSpawnArg(Funct,N,A,O):-spawnOneSpawnArg(Funct,N,A,O).
 spawnOneSpawnArg(Funct,N,A,O):-
   createByNameMangle(A,O,TypeA),
   assert_subclass_on_argIsa(Funct,N,TypeA),
-  assert_isa(TypeA,ttCreateable).
+  assert_isa(TypeA,ttSpatialType).
 
 
 createByNameMangle(InstA,IDA,InstAO):-must(createByNameMangle0(InstA,IDA,InstAO)),!.

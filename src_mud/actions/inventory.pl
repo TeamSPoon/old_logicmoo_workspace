@@ -14,15 +14,15 @@
 % ====================================================
 :- decl_type(tNearestReachableItem).
 tNearestReachableItem(Obj):-
-  current_agent_or_var(Agent),
+  current_agent(Agent),
   nearest_reachable_object(Agent,Obj).
 
 :- decl_type(tFarthestReachableItem).
 tFarthestReachableItem(Obj):-
-  current_agent_or_var(Agent),
+  current_agent(Agent),
   farthest_reachable_object(Agent,Obj).
 
-nearest_reachable_object(Agent,Obj):-
+nearest_reachable_object(Agent,Obj):- 
   with_no_modifications((findall(Obj,farthest_reachable_object(Agent,Obj),List),reverse(List,Reverse),!,member(Obj,Reverse))).
 
 farthest_reachable_object(Agent,Obj):-with_no_modifications((farthest_reachable_object0(Agent,Obj))).

@@ -24,7 +24,7 @@
             pathBetween_call/3,
             obj_memb/2,
             prop_memb/2,            
-            move_dir_target/3,
+            from_dir_target/3,
             create_instance/2,create_instance/3,
             create_agent/1,
             create_agent/2,
@@ -150,10 +150,10 @@ create_meta(SuggestedName,SuggestedClass,BaseClass,SystemName):-
    assert_isa_safe(SystemName,SuggestedClass).
 
 
-:-decl_type(ttNotCreatable).
+:-decl_type(ttNotSpatialType).
 
-ttNotCreatable(ftInt).
-ttNotCreatable(ftTerm).
+ttNotSpatialType(ftInt).
+ttNotSpatialType(ftTerm).
 
 mudSubclass(tWearAble,tItem).
 mudSubclass(tLookAble,tItem).
@@ -161,14 +161,14 @@ mudSubclass(tKnife,tItem).
 mudSubclass(tFood,tItem).
 
 
-%ttCreateable(FT):- nonvar(FT),ttFormatType(FT),!,fail.
-%ttCreateable(FT):- nonvar(FT),ttNotCreatable(FT),!,fail.
-%ttCreateable(tItem). %  col, formattype, 
-ttCreateable(SubType):-member(SubType,[tAgentGeneric,tItem,tRegion]).
-%ttCreateable(S):- is_asserted(ttCreateable(T)), impliedSubClass(S,T).
+%ttSpatialType(FT):- nonvar(FT),ttFormatType(FT),!,fail.
+%ttSpatialType(FT):- nonvar(FT),ttNotSpatialType(FT),!,fail.
+%ttSpatialType(tItem). %  col, formattype, 
+ttSpatialType(SubType):-member(SubType,[tAgentGeneric,tItem,tRegion]).
+%ttSpatialType(S):- is_asserted(ttSpatialType(T)), impliedSubClass(S,T).
 
-%createableSubclassType(S,T):-call_mpred(  ttCreateable(T)),is_asserted(mudSubclass(S,T)).
-%createableSubclassType(T,tSpatialThing):-call_mpred( ttCreateable(T)).
+%createableSubclassType(S,T):-call_mpred(  ttSpatialType(T)),is_asserted(mudSubclass(S,T)).
+%createableSubclassType(T,tSpatialThing):-call_mpred( ttSpatialType(T)).
 
 mudIsa(ftInt,ttFormatType).
 mudIsa(vtDirection,ttValueType).
@@ -182,7 +182,7 @@ create_agent(P,List):-must_det(create_instance(P,tAgentGeneric,List)).
 % decl_type(Spec):-create_instance(Spec,col,[]).
 
 :-dynamic_multifile_exported(create_instance/1).
-create_instance(P):- must_det((mudIsa(P,What),ttCreateable(What))),must_det(create_instance(P,What,[])).
+create_instance(P):- must_det((mudIsa(P,What),ttSpatialType(What))),must_det(create_instance(P,What,[])).
 :-export(create_instance/2).
 create_instance(Name,Type):-create_instance(Name,Type,[]).
 user:create_instance(Name,Type):-create_instance(Name,Type,[]).
@@ -212,7 +212,7 @@ create_instance_0(I,_,_):-asserta_if_new(is_creating_now(I)),fail.
 create_instance_0(What,FormatType,List):- FormatType\==tCol, ttFormatType(FormatType),!,trace_or_throw(ttFormatType(FormatType,create_instance(What,FormatType,List))).
 create_instance_0(SubType,tCol,List):-decl_type(SubType),padd(SubType,List).
 
-ttCreateable(tAgentGeneric).
+ttSpatialType(tAgentGeneric).
 mudSubclass(tActor,tAgentGeneric).
 mudSubclass(tExplorer,tAgentGeneric).
 
@@ -259,10 +259,10 @@ valueReset(charge,max_charge).
 
 */
 
-ttCreateable(tRegion).
+ttSpatialType(tRegion).
 
 create_instance_0(T, tItem, List):-
-   mudIsa(T,What),What\=tItem, ttCreateable(What),!,create_instance_0(T, What, List).
+   mudIsa(T,What),What\=tItem, ttSpatialType(What),!,create_instance_0(T, What, List).
 
 /*
 create_instance_0(T,Type,List):-
@@ -291,7 +291,7 @@ leash(+call),trace,
 
 create_instance_0(What,Type,Props):- leash(+call),trace,dtrace,trace_or_throw(dmsg(assumed_To_HAVE_creted_isnance(What,Type,Props))),!.
 
-%ttCreateable(col).
+%ttSpatialType(col).
 
 
 :-decl_mpred_hybrid(mudKwLabel(ftTerm,ftTerm)).

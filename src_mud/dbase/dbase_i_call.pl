@@ -165,9 +165,7 @@ call_mpred(F,C):- not(is_callable(C)),!,functor(C,F,A),dmsg(todo(non_existent(F/
 call_mpred(F,C):-call_mpred_hybrid(F,C).
 
 
-call_mpred_hybrid(F,C):- (use_pttp;true),!,call_provided_mpred_storage_op(call(conjecture),C,prologHybrid).
-
-
+call_mpred_hybrid(_,C):- (use_pttp;true),!,call_provided_mpred_storage_op(call(conjecture),C,prologHybrid).
 call_mpred_hybrid(F,C):- ground(C),!,call_mpred_real_g(F,C),!.
 
 % nonground

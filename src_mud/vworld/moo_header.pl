@@ -111,7 +111,6 @@
 :- dynamic_multifile_exported user:fskel/7.
 :- dynamic_multifile_exported user:fact_always_true/1.
 :- dynamic_multifile_exported user:mudStowing/2.
-:- dynamic_multifile_exported user:mudSubclass/2.
 :- dynamic_multifile_exported user:mudIsa/2.
 :- dynamic_multifile_exported user:mudMoveDist/2.
 :- dynamic_multifile_exported user:mudLabelTypeProps/3.
@@ -134,7 +133,6 @@
 :- dynamic_multifile_exported user:subFormat/2.
 :- dynamic_multifile_exported user:mudIsa/2.
 :- dynamic_multifile_exported user:decl_type/1.
-:- dynamic_multifile_exported user:mudSubClass/2.
 :- dynamic_multifile_exported user:ttFormatType/1.
 :- dynamic_multifile_exported user:forwardRule/2.
 :- dynamic_multifile_exported user:fact_maybe_deduced/1.
@@ -153,3 +151,4 @@
 :- dynamic_multifile_exported user:action_info/2.
 :- dynamic_multifile_exported user:action_info/1.
 
+:-retractall(mpred_prop(dbase_t,prologHybrid)).

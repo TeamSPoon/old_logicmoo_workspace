@@ -54,7 +54,7 @@ has_storage_stub(StubType,Head):-
       
 
 
-must_have_storage_stub(StubType,Head):-!.
+% must_have_storage_stub(StubType,Head):-!.
 must_have_storage_stub(StubType,Head):-
  (has_storage_stub(StubType,Head)->true;(get_functor(Head,F),listing(F),term_listing(F),listing(F),add_storage_stub(StubType,Head))).
 
@@ -91,9 +91,15 @@ add_storage_stub(StubType,Head,PHead,F,_):-
 
 
 must_same_clauses(Head,HBLIST):-
-  get_pifunctor(Head,PHead,_F),
-   provide_clauses_list(PHead,NEWHBLIST),
-   (NEWHBLIST=@=HBLIST -> true ;([]==HBLIST -> true ;  wdmsg(error(provide_clauses_list(PHead,HBLIST\==NEWHBLIST))))).
+   provide_clauses_list(Head,NEWHBLIST),
+   sort(NEWHBLIST,NEWHBLISTS),
+   sort(HBLIST,HBLISTS),
+   length(NEWHBLIST,LN),
+   length(HBLIST,LO),
+   list_difference_eq(HBLIST,NEWHBLIST,MISSING),length(MISSING,LM),
+   list_difference_eq(NEWHBLIST,HBLIST,EXTRA),length(EXTRA,LE),
+   (NEWHBLIST=@=HBLIST -> true ;((NEWHBLISTS=@=HBLISTS;LM=0) -> wdmsg(trace_or_throw(must_same_clauses(Head,[missing(LM)|MISSING],[extra(LE)|EXTRA]))) ;  
+     wdmsg(error(trace_or_throw(must_same_clauses(Head,[LO|HBLIST],[LN|NEWHBLIST],[missing(LM)|MISSING],[extra(LE)|EXTRA])))))).
 
 
 
@@ -120,9 +126,13 @@ get_provided_mpred_storage_oper(OP,OrigHead,StubType,CALLO):-
    must(provide_mpred_storage_op(OP,NewHead,StubType,CALL)),!,
    CALLO = will_call(StubType,CALL).
 
-will_call(_,user:clause_asserted(mpred_prop(A, B))):-!,mpred_prop(A,B).
-will_call(_,user:call(clause_asserted, dbase_t(mudIsa, I, C))):-!,hasInstance(C,I).
-will_call(_,user:call_tabled(call_for_literal(F, A, G))):-!,call_for_literal(F, A, G).
+will_call(W,user:call(OP,OPRAND)):-!,will_call(W,call(OP,OPRAND)).
+will_call(W,user:CALL):-!,will_call(W,CALL).
+will_call(_,clause_asserted(mpred_prop(A, B))):-!,mpred_prop(A,B).
+will_call(_,call(assertz_if_new, dbase_t(C, I))):-!,assert_hasInstance(C,I).
+will_call(_,call(asserta_new, dbase_t(C, I))):-!,assert_hasInstance(C,I).
+will_call(_,call(clause_asserted, dbase_t(mudIsa, I, C))):-!,hasInstance(C,I).
+will_call(_,call_tabled(call_for_literal(F, A, G))):-!,call_for_literal(F, A, G).
 will_call(_StubType,CALL):-!,(CALL).
 will_call(_StubType,CALL):-show_call(CALL).
 
@@ -164,8 +174,6 @@ same_functors(Head1,Head2):-must_det(get_functor(Head1,F1,A1)),must_det(get_func
 
 ensure_exists(Head):-get_pifunctor(Head,PHead,F),get_functor(Head,F,A),(predicate_property(PHead,dynamic)->true;(predicate_property(PHead,_)->dmsg(warn(static_pred,F/A));dynamic(F/A))).
 
-
-
 database_modify(P,G):- thlocal:noDBaseMODs(_),!,dmsg(noDBaseMODs(P,G)).
 database_modify(P,M:G):-nonvar(M),!,database_modify(P,G).
 database_modify(assert(_),G):- was_isa(G,I,C),!,assert_hasInstance(C,I),!.
@@ -174,15 +182,16 @@ database_modify(OP,HeadBody):- current_predicate(get_mpred_storage_provider/3),
   show_call_failure(get_mpred_storage_provider(OP,HeadBody,StubType)),
   must(call_provided_mpred_storage_op(OP,HeadBody,StubType)).
 
-database_modify(OP,G):- functor(G,F,A), database_f_modify(OP,F,G).
+database_modify(OP,G):- functor(G,F,_), database_f_modify(OP,F,G).
 
 % database_f_modify(OP,F,G):- once(mpred_prop(F,prologOnly);must((F=dbase_t,wdmsg(database_modify(OP,G))))),fail.
+database_f_modify(retract(all), F, G):- mpred_prop(F,prologHybrid),sanity(not(dbase_t=F)), into_functor_form(dbase_t,G,GG),!,doall((retract(GG),expire_post_retract(GG))).
 database_f_modify(assert(_),_,G):- is_asserted_dbase_t(G),!.
 database_f_modify(assert(_),_,G):- must(not(debugOnError(G))),!.
-database_f_modify(assert(a),_,G):-  expire_tabled_list(all),!,asserta(G).
-database_f_modify(assert(z),_,G):- expire_tabled_list(all),!,assertz(G).
-database_f_modify(retract(all),_,G):- !,doall((retract(G),expire_dont_add,expire_tabled_list(all))).
-database_f_modify(retract(one),_,G):- !,must((retract(G),expire_dont_add,expire_tabled_list(all))).
+database_f_modify(assert(a),_,G):-  expire_post_assert(G),!,asserta(G).
+database_f_modify(assert(z),_,G):- expire_post_assert(G),!,assertz(G).
+database_f_modify(retract(all),_,G):- !,doall((retract(G),expire_post_retract(G))).
+database_f_modify(retract(one),_,G):- !,must((retract(G),expire_post_retract(G))).
 /*
 
 database_modify(OP,G):- get_functor(G,F,A), database_f_modify(OP,F,A,G).
@@ -218,10 +227,10 @@ database_f_modify(OP,F,A,G):- once(mpred_prop(F,prologOnly);must((F=dbase_t,wdms
 
 database_f_modify0(assert(_),G):- is_asserted_dbase_t(G),!.
 database_f_modify0(assert(_),G):- predicate_property(G,_), must(not(debugOnError(G))),!.
-database_f_modify0(assert(a),G):- expire_tabled_list(all),!,asserta(G).
-database_f_modify0(assert(z),G):- expire_tabled_list(all),!,assertz(G).
-database_f_modify0(retract(all),G):- !,doall((retract(G),expire_dont_add,expire_tabled_list(all))).
-database_f_modify0(retract(one),G):- !,must((retract(G),expire_dont_add,expire_tabled_list(all))).
+database_f_modify0(assert(a),G):- expire_post_assert(G),!,asserta(G).
+database_f_modify0(assert(z),G):- expire_post_assert(G),!,assertz(G).
+database_f_modify0(retract(all),G):- !,doall((retract(G),expire_post_retract(G))).
+database_f_modify0(retract(one),G):- !,must((retract(G),expire_post_retract(G)).
 */
 
 database_check(P,M:G):-nonvar(M),!,database_check(P,G).
@@ -237,10 +246,10 @@ database_check(OP,HeadBody):- debugOnError(call(OP,HeadBody)).
 call_wdmsg(P,DB):- thlocal:noDBaseMODs(_),!,wdmsg(error(noDBaseMODs(P,DB))).
 call_wdmsg(P,DB):- get_functor(DB,F,A), call_wdmsg(P,DB,F,A).
 
-call_wdmsg(P,DB,dbase_t,A):-!, append_term(P,DB,CALL),dmsg((CALL)),call(CALL).
-call_wdmsg(P,MP,F,A):- mpred_stubtype(F,prologHybrid)),into_functor_form(dbase_t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,call(CALL).
+call_wdmsg(P,DB,dbase_t,_A):-!, append_term(P,DB,CALL),dmsg((CALL)),call(CALL).
+call_wdmsg(P,MP,F,A):- mpred_stubtype(F,prologHybrid),must(A>1),into_functor_form(dbase_t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,call(CALL).
 call_wdmsg(P,MP,F,A):- not(mpred_prop(F,prologOnly)),decl_mpred_hybrid(F/A), into_functor_form(dbase_t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,call(CALL).
-call_wdmsg(P,DB,F,A):- append_term(P,DB,CALL),dmsg(info(CALL)),must(mpred_prop(F,prologOnly)),!,call(CALL).
+call_wdmsg(P,DB,F,_):- append_term(P,DB,CALL),dmsg(info(CALL)),must(mpred_prop(F,prologOnly)),!,call(CALL).
 %call_wdmsg(P,DB,S,_):-  dtrace((append_term(P,DB,CALL),dmsg((CALL)),call(CALL))).
 
 % ================================================================================
@@ -254,12 +263,13 @@ scan_missing_stubs(F):-
    ignore((forall(mpred_missing_stubs(F,A,StubType),
       (mpred_arity(F,A),show_call(add_storage_stub(StubType,F/A)))))).
 
-mpred_missing_stubs(F,A,StubType):-mpred_stubtype(F,StubType),must(mpred_arity(F,A)),not(mpred_prop(F,hasStub(StubType))),not(has_storage_stub(StubType,F/A)).
+mpred_missing_stubs(F,A,StubType):-prologHybrid = StubType, tPredStubImpl(StubType),mpred_prop(F,StubType),must(mpred_arity(F,A)),not(has_storage_stub(StubType,F/A)).
 
 
+:-assertz_if_new(call_OnEachLoad(rescan_missing_stubs)).
 
 :-dynamic_multifile_exported(rescan_missing_stubs/0).
-rescan_missing_stubs:-no_rescans,!.
+% rescan_missing_stubs:-no_rescans,!.
 rescan_missing_stubs:-loop_check_local(time_call(rescan_missing_stubs_lc),true).
 rescan_missing_stubs_lc:- once(thglobal:use_cyc_database), once(with_assertions(thlocal:useOnlyExternalDBs,forall((kb_t(arity(F,A)),A>1,good_pred_relation_name(F,A),not(mpred_arity(F,A))),with_no_dmsg(decl_mpred_mfa,decl_mpred_hybrid(F,A))))),fail.
 rescan_missing_stubs_lc:- hotrace((doall((mpred_missing_stubs(F,A,StubType),mpred_arity(F,A),add_storage_stub(StubType,F/A))))).
@@ -279,8 +289,11 @@ rescan_mpred_props_lc.
 % ================================================================================
 % GRABOUT STORAGE STUB CLAUSES
 % ================================================================================
-provide_clauses_list(Head,HBLIST):- get_pifunctor(Head,PHead,_),  
-  findall((PHead :- B),no_repeats_old([PHead:B],call_no_cuts(provide_mpred_storage_clauses(_,PHead,B))),HBLIST).
+provide_clauses_list(Head,HBLISTO):- get_pifunctor(Head,PHead,_),  
+  findall((PHead :- B),no_repeats_old([PHead:B],call_no_cuts(provide_mpred_storage_clauses(_,PHead,B))),HBLIST),
+  delete(HBLIST,(PHead:-!, call_provided_mpred_storage_op(call(conjecture), PHead, _)),HBLISTO),!.
+
+
 
 
 

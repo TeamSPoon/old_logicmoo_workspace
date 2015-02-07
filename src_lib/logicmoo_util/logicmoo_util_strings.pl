@@ -287,6 +287,8 @@ toCamelcase(VAR,VAR):-var(VAR),!.
 toCamelcase([],[]):-!.
 toCamelcase('',''):-!.
 toCamelcase('_',''):-!.
+toCamelcase(' ',''):-!.
+toCamelcase(" ",''):-!.
 toCamelcase('-',''):-!.
 toCamelcase([CX|Y],[D3|YY]):-!,toCamelcase(CX,D3),toCamelcase(Y,YY).
 toCamelcase(MiXed,UPPER):-compound(MiXed),MiXed=..MList,toCamelcase(MList,UList),!,UPPER=..UList.

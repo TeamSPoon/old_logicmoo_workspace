@@ -534,6 +534,6 @@ contains_singletons(Term):- not(ground(Term)),not(not((term_variables(Term,Vs),n
 % this is a backwards compatablity block for SWI-Prolog 6.6.6
 :- current_prolog_flag(double_quotes,WAS),asserta(double_quotes_was_lib(WAS)).
 
-:- module_predicates_are_exported(logicmoo_util_library).
+:- module_predicates_are_exported.
 :- all_module_predicates_are_transparent(logicmoo_util_library).
 

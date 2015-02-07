@@ -180,7 +180,7 @@ acceptable_xform(From,To):- From \=@= To,  (To = mudIsa(I,C) -> was_isa(From,I,C
 % cant_be_col(F).
 % Checks F for not_mudIsa(F,tCol).
 % ========================================
-cant_be_col(V):-is_ftVar(V),!,fail.
+cant_be_col(V):-var(V),!,fail.
 cant_be_col('$VAR'):-dmsg(cant_be_col('$VAR')),!,fail.
 cant_be_col(':-').
 cant_be_col('include').
@@ -213,7 +213,7 @@ prolog_side_effects(P):-atom(P),!,prolog_side_effects(P/_).
 % was_isa(Goal,I,C) recognises mudIsa/2 and its many alternative forms
 % ========================================
 :-dynamic_multifile_exported(was_isa/3).
-was_isa(X,I,C):-compound(X),was_isa0(X,I,C),!,not(cant_be_col(C)).
+was_isa(X,I,C):-compound(X),was_isa0(X,I,C).
 
 was_isa0('$VAR'(_),_,_):-!,fail.
 was_isa0(mudIsa(I,C),I,C).
@@ -222,16 +222,15 @@ was_isa0(notrace(_),_,_):-!,fail.
 was_isa0(call(_),_,_):-!,fail.
 was_isa0(trace(_),_,_):-!,fail.
 was_isa0(tCol(I),I,tCol).
-was_isa0(ttNotCreatable(I),I,ttNotCreatable).
+was_isa0(ttNotSpatialType(I),I,ttNotSpatialType).
 was_isa0(tChannel(I),I,tChannel).
 was_isa0(tAgentGeneric(I),I,tAgentGeneric).
 was_isa0(dbase_t(C,I),I,C).
-was_isa0(dbase_t(P,I,C),I,C):-P==mudIsa.
+was_isa0(dbase_t(P,I,C),I,C):-!,P==mudIsa.
 was_isa0(isa(I,C),I,C).
+was_isa0(M:X,I,C):-atom(M),!,was_isa0(X,I,C).
+was_isa0(X,I,C):-X=..[C,I],!,is_typef(C),!,not(cant_be_col(C)).
 % was_isa0(hasInstance(C,I),I,C).
-was_isa0(M:X,I,C):-atom(M),!,was_isa(X,I,C).
-was_isa0(X,I,C):-X=..[C,I],!,is_typef(C).
-
 
 % ========================================
 % is_typef(F).
@@ -370,9 +369,9 @@ nart_to_atomic(F,F).
 
 :-dynamic_multifile_exported(is_asserted_mpred/1).
 
-is_asserted_mpred(_,G):-var(G),!,trace_or_throw(var_is_asserted_mpred(F,G)).
+is_asserted_mpred(F,G):-var(G),!,trace_or_throw(var_is_asserted_mpred(F,G)).
 is_asserted_mpred(mpred_prop,mpred_prop(F,P)):-!,mpred_prop(F,P).
-is_asserted_mpred(F,G):-fact_loop_checked(G,is_asserted_dbase_t(G)).
+is_asserted_mpred(_,G):-fact_loop_checked(G,is_asserted_dbase_t(G)).
 
 % ============================================
 % Prolog is_asserted_clause/2
@@ -437,15 +436,18 @@ nonground_throw_else_fail(C):- not_is_release,not(ground(C)),!,( (test_tl(thloca
 % ========================================
 
 asserta_cloc(MP):- singletons_throw_else_fail(asserta_cloc(MP)).
-asserta_cloc(MP):- database_modify(assert(a),MP).
+asserta_cloc(MP):- database_modify(assert(a),MP),expire_post_assert(MP).
 
 assertz_cloc(MP):- singletons_throw_else_fail(assertz_cloc(MP)).
-assertz_cloc(MP):- database_modify(assert(z),MP).
+assertz_cloc(MP):- database_modify(assert(z),MP),expire_post_assert(MP).
 
-retract_cloc(MP):- slow_sanity(ignore(show_call_failure((database_check(clause_asserted,MP))))),
+retract_cloc(MP):- slow_sanity(ignore(show_call_failure((database_check(clause_asserted,MP))))),fail.
 retract_cloc(MP):- singletons_throw_else_fail(assertz_cloc(MP)).
-retract_cloc(MP):- database_modify(retract(one),MP),sanity(not(is_asserted(MP))).
-retractall_cloc(MP):- database_modify(retract(all),MP), sanity(not(is_asserted(MP))).
+retract_cloc(MP):-    slow_sanity(ignore(((ground(MP), once(show_call_failure((is_asserted(MP)))))))),
+                      database_modify(retract(one),MP),expire_post_retract(MP),sanity(not(is_asserted(MP))).
+
+retractall_cloc(MP):- slow_sanity(ignore(((ground(MP), once(show_call_failure((is_asserted(MP)))))))),
+                      database_modify(retract(all),MP),expire_post_retract(MP),sanity(not(is_asserted(MP))).
 
 
 clause_stored(HB):- database_check(clause_asserted,HB).
@@ -473,11 +475,9 @@ hooked_assertz(MP):- database_check(clause_asserted,MP),!.
 hooked_assertz(MP):- assertz_cloc(MP),run_database_hooks(assert(z),MP).
 
 hooked_retract(MP):- nonground_throw_else_fail(hooked_retract(MP)).
-hooked_retract(MP):-  slow_sanity(ignore(((ground(MP), once(show_call_failure((is_asserted(MP)))))))),
-    retract_cloc(MP),loop_check(run_database_hooks_depth_1(retract(one),MP)).
+hooked_retract(MP):- retract_cloc(MP),loop_check(run_database_hooks_depth_1(retract(one),MP)).
 
-hooked_retractall(MP):- slow_sanity(ignore(((ground(MP), once(show_call_failure((is_asserted(MP)))))))),
-   retractall_cloc(MP), loop_check(run_database_hooks_depth_1(retract(all),MP)).
+hooked_retractall(MP):- retractall_cloc(MP), loop_check(run_database_hooks_depth_1(retract(all),MP)).
 
 
 differnt_assert(G1,G2):- notrace(differnt_assert1(G1,G2)),dmsg(differnt_assert(G1,G2)),ztrace.

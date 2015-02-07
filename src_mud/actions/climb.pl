@@ -27,7 +27,7 @@ vtActionTemplate(actClimb(vtDirection)).
 % plus take some damage and loose charge 
 user:agent_call_command(Agent,actClimb(Dir)) :-	
 	mudAtLoc(Agent,LOC),
-	move_dir_target(LOC,Dir,XXYY),
+	from_dir_target(LOC,Dir,XXYY),
 	can_move_into(LOC,XXYY),
 	in_world_move(_,Agent,Dir),
 	call_update_stats(Agent,trip),
@@ -46,7 +46,7 @@ user:agent_call_command(Agent,actClimb(Dir)) :-
 % Test to see if agent can climb the object
 climbable(Agent,Dir) :-
 	mudAtLoc(Agent,LOC),
-	move_dir_target(LOC,Dir,XXYY),
+	from_dir_target(LOC,Dir,XXYY),
 	mudAtLoc(Obj,XXYY),
 	props(Obj,mudHeight(ObjHt)), % If object is an agent, it will fail at this point
 	mudHeightOnObj(Agent,AgHt),

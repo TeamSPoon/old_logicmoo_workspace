@@ -325,20 +325,48 @@ for obvious reasons.
 
 :- set_prolog_flag(generate_debug_info, true).
 
+
+logOnError(C):-prolog_ecall(0,logOnError0,C).
+logOnError0(C):- catchv(C,E,dmsg(logOnError(E,C))).
+logOnErrorEach(C):-prolog_ecall(1,logOnError,C).
+logOnErrorIgnore(C):-ignore(logOnError0(C)).
+
+
 :- meta_predicate(one_must(0,0)).
 one_must(MCall,OnFail):- strip_module(MCall,M,Call), '@'(( Call *->  true ;    OnFail ),M).
 
 
+must_det(C):- must(C),!.
+
+one_must_det(Call,_OnFail):-Call,!.
+one_must_det(_Call,OnFail):-OnFail,!.
+
 must_det(Call,_OnFail):-Call,!.
 must_det(_Call,OnFail):-OnFail.
+
+:-module_transparent(must_det_l/1).
+must_det_l(MC):- strip_module(MC,M,C),!, '@'(must_det_lm(M,C),M).
+
+:-module_transparent(must_det_lm/2).
+must_det_lm(_,C):-var(C),trace_or_throw(var_must_det_l(C)),!.
+must_det_lm(_,[]):-!.
+must_det_lm(M,[C|List]):-nonvar(C),!,M:must(M:C),!,must_det_lm(M,List).
+must_det_lm(M,(C,List)):-nonvar(C),!,M:must(M:C),!,must_det_lm(M,List).
+must_det_lm(M,C):- is_list(C),!,trace_or_throw(list_must_det_lm(M,C)),!.
+must_det_lm(M,C):- !,must_det(M:C).
+
+:-thread_local  tlbugger:skip_use_slow_sanity/0.
+% thread locals should defaults to false  tlbugger:skip_use_slow_sanity.
+
+slow_sanity(C):-  sanity(C),!. %  ( tlbugger:skip_use_slow_sanity ; must_det(C)),!.
 
 % -- CODEBLOCK
 :- export(sanity/1).
 :-meta_predicate(sanity(0)).
 
-% sanity is used for type checking (does not require 
-sanity(Call):-bugger_flag(release,true),!,assertion(Call).
-sanity(Call):-one_must(Call,will_debug_else_throw(sanity(Call),Call)),!.
+% sanity is used for type checking (is not required)
+%sanity(Call):-bugger_flag(release,true),!,assertion(Call).
+%sanity(Call):-one_must(Call,will_debug_else_throw(sanity(Call),Call)),!.
 sanity(MCall):- 
  strip_module(MCall,M,Call),
  (
@@ -434,8 +462,8 @@ dynamic_safe(MFA):- with_mfa(MFA,dynamic_safe).
 :- export((((dynamic_safe)/3))).
 :- meta_predicate(dynamic_safe(+,+,+)).
 :- module_transparent((((dynamic_safe)/3))).
-dynamic_safe(M,F,A):- functor(C,F,A),predicate_property(C,imported_from(system)),!.
-dynamic_safe(M,F,A):- (static_predicate(M,F,A) -> dmsg(warn(not(M:dynamic(M:F/A)))) ; M:dynamic(M:F/A)). % , warn_module_dupes(M,F,A).
+dynamic_safe(M,F,A):- functor(C,F,A),predicate_property(C,imported_from(system)),!,dmsg(warn(predicate_property(M:C,imported_from(system)))).
+dynamic_safe(M,F,A):- (static_predicate(M,F,A) -> dmsg(warn(not(M:dynamic(M:F/A)))) ; logOnErrorIgnore(M:dynamic(M:F/A))). % , warn_module_dupes(M,F,A).
 :-op(1150,fx,user:dynamic_safe).
 
 
@@ -525,7 +553,7 @@ make_transparent(_CM,M,PI,F/A):-
    motrace(((var(PI)->functor_safe(PI,F,A);true),
    M:module_transparent(F/A),
    fill_args(PI,('?')),!,
-   dbgsubst(PI, (^),(0),PI1),
+   dbgsubst(PI, (^),(^),PI1),
    dbgsubst(PI1,(0),(0),PI2),
    dbgsubst(PI2,(:),(:),PI3),
    (compound(PI3) -> M:meta_predicate(PI3) ; true))).
@@ -1258,6 +1286,7 @@ user_use_module(What):- '@'(use_module(What),'user').
 :-decl_thlocal tlbugger:cannot_table/0.
 
 cannot_table_call(Call):- with_assertions( tlbugger:cannot_table,Call).
+skipped_table_call(Call):- with_assertions( tlbugger:cannot_table,Call).
 
 :-use_module(logicmoo_util_coroutining_was).
 
@@ -1708,11 +1737,6 @@ debugOnFailure0(C):- one_must(rtraceOnError(C),debugCallWhy(failed(debugOnFailur
 debugOnFailureEach(C):-prolog_ecall(1,debugOnFailure,C).
 debugOnFailureIgnore(C):-ignore(debugOnFailure(C)).
 
-logOnError(C):-prolog_ecall(0,logOnError0,C).
-logOnError0(C):- catchv(C,E,dmsg(logOnError(E,C))).
-logOnErrorEach(C):-prolog_ecall(1,logOnError,C).
-logOnErrorIgnore(C):-ignore(logOnError(C)).
-
 logOnFailure0(C):- one_must(C,dmsg(logOnFailure(C))).
 logOnFailureEach(C):-prolog_ecall(1,logOnFailure,C).
 logOnFailureIgnore(C):-ignore(logOnFailure(C)).
@@ -1905,25 +1929,6 @@ is_deterministic(var(_)).
 %is_deterministic(Call):-predicate_property(Call,nodebug),!.
 %is_deterministic(Call):-predicate_property(Call,foreign),!.
 
-:-module_transparent(must_det_l/1).
-must_det_l(MC):- strip_module(MC,M,C),!, '@'(must_det_lm(M,C),M).
-
-:-module_transparent(must_det_lm/2).
-must_det_lm(_,C):-var(C),trace_or_throw(var_must_det_l(C)),!.
-must_det_lm(_,[]):-!.
-must_det_lm(M,[C|List]):-nonvar(C),!,M:must(M:C),!,must_det_lm(M,List).
-must_det_lm(M,(C,List)):-nonvar(C),!,M:must(M:C),!,must_det_lm(M,List).
-must_det_lm(M,C):- is_list(C),!,trace_or_throw(list_must_det_lm(M,C)),!.
-must_det_lm(M,C):- !,must_det(M:C).
-
-:-decl_thlocal  tlbugger:skip_use_slow_sanity/0.
-% thread locals should defaults to false  tlbugger:skip_use_slow_sanity.
-
-slow_sanity(C):-  must(C),!. %  ( tlbugger:skip_use_slow_sanity ; must_det(C)),!.
-must_det(C):- must(C),!.
-
-one_must_det(Call,_OnFail):-Call,!.
-one_must_det(_Call,OnFail):-OnFail,!.
 
 
 randomVars(Term):- random(R), StartR is round('*'(R,1000000)), !,
@@ -2935,9 +2940,12 @@ no_repeats_findall_r(Vs,Call,CONS,ExitDET,List):-
    (Call,once((\+ memberchk_same(Vs,CONS), copy_term(Vs,CVs), CONS=[_|T],List=[CVs|T], nb_setarg(2, CONS, List)))),
    deterministic(ExitDET).
 
-call_tabled0(_,Vars,C,List):- true,!,findall_nodupes(Vars,C,List).
+% call_tabled0(_,Vars,C,List):- true,!,findall_nodupes(Vars,C,List).
 
-call_tabled0(Key,_,_,List):- table_bugger:call_tabled_list(Key,List),!.
+call_tabled0(Key,Vars,C,List):- table_bugger:call_tabled_list(Key,ListW),!,
+  (not((tlbugger:cannot_table))->List=ListW;
+    (findall_nodupes(Vars,C,List),must(List=ListW))).
+
 call_tabled0(Key,Vars,C,List):- outside_of_loop_check,!, findall_nodupes(Vars,C,List),
   ignore((really_can_table,!,asserta_if_ground(table_bugger:call_tabled_list(Key,List)))),!.
 call_tabled0(Key,Vars,C,List):- asserta(table_bugger:maybe_table_key(Key)), findall_nodupes(Vars,C,List),
