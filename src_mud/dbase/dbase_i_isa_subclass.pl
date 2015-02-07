@@ -234,10 +234,11 @@ atom_type_prefix_other(Inst,Type,Suffix,Other):-type_suffix(Suffix,Type),current
 %mpred_prop(F,tCol):-isa_from_morphology(F,Col),atom_concat(_,'Type',Col).
 
 isa_from_morphology(Inst,Type):-type_prefix(Prefix,Type),current_atom(Inst),atom_concat(Prefix,Other,Inst),capitalized(Other),!.
-isa_from_morphology(Inst,Type):-type_suffix(Suffix,Type),current_atom(Inst),atom_concat(_,Suffix,Inst),!.
+isa_from_morphology(Inst,Type):-type_suffix(Suffix,Type),current_atom(Inst),atom_concat(Base,Suffix,Inst),!,atom_length(Base,BL),BL>2.
 
 type_suffix('Fn',ftFunctional).
 type_suffix('Type',ttTypeType).
+type_suffix('Able',ttTypeByAction).
 type_suffix('able',ttTypeByAction).
 
 

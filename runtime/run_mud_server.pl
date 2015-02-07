@@ -103,14 +103,14 @@ user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),s
 tAgentGeneric(iCommanderData66).
 mudIsa(iCommanderData66,'tMonster').
 mudIsa(iCommanderData66,'tExplorer').
-wearsClothing(iCommanderData66,'iBoots6673').
-wearsClothing(iCommanderData66,'iComBadge6674').
-wearsClothing(iCommanderData66,'iGoldUniform6675').
-mudStowing(iCommanderData6,'iPhaser6676').
-pddlSomethingIsa('iBoots6673',['tBoots','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iComBadge6674',['tComBadge','ProtectiveAttire','PortableObject','tNecklace']).
-pddlSomethingIsa('iGoldUniform6675',['tGoldUniform','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iPhaser6676',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','SomethingToWear']).
+wearsClothing(iCommanderData66,'iBoots673').
+wearsClothing(iCommanderData66,'iComBadge674').
+wearsClothing(iCommanderData66,'iGoldUniform675').
+mudStowing(iCommanderData6,'iPhaser676').
+pddlSomethingIsa('iBoots673',['tBoots','ProtectiveAttire','PortableObject','SomethingToWear']).
+pddlSomethingIsa('iComBadge674',['tComBadge','ProtectiveAttire','PortableObject','tNecklace']).
+pddlSomethingIsa('iGoldUniform675',['tGoldUniform','ProtectiveAttire','PortableObject','SomethingToWear']).
+pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','SomethingToWear']).
 mudDescription(iCommanderData66,txtFormatFn("Very screy looking monster named ~w",[iCommanderData66])).
 
 tAgentGeneric(iExplorer77).
