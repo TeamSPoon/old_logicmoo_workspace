@@ -21,8 +21,8 @@
 % Douglas Miles
 */
 
-:-dynamic_multifile_exported((force_expand_head/2,force_head_expansion/2)).
-:-dynamic_multifile_exported((force_expand_goal/2)).
+:-decl_mpred_prolog((force_expand_head/2,force_head_expansion/2)).
+:-decl_mpred_prolog((force_expand_goal/2)).
 force_expand_head(G,GH) :- force_head_expansion(G,GH),!.
 force_expand_goal(A, B) :- force_expand(expand_goal(A, B)).
 
@@ -41,7 +41,7 @@ if_mud_asserted(F,A2,A,Why):-using_holds_db(F,A2,A,Why).
 
 declare_as_code(F,A):-findall(n(File,Line),source_location(File,Line),SL),ignore(inside_clause_expansion(CE)),decl_mpred(F,prologOnly),decl_mpred(F,info(discoveredInCode(F/A,SL,CE))),!.
 
-:-dynamic_multifile_exported(if_use_holds_db/4).
+:-decl_mpred_prolog(if_use_holds_db/4).
 if_use_holds_db(F,A2,_,_):- is_mpred_prolog(F,A2),!,fail.
 if_use_holds_db(F,A,_,_):-  never_use_holds_db(F,A,_Why),!,fail.
 if_use_holds_db(F,A2,A,Why):- using_holds_db(F,A2,A,Why),!.
@@ -104,7 +104,7 @@ try_mud_asserted_expansion(G0,G2):-  must(is_compiling_sourcecode),
    while_capturing_changes(add_from_file(G1,G2),Changes),!,ignore((Changes\==[],dmsg(add(todo(Changes-G2))))).
 mud_asserted_expansion_0(G1,G2):- ((get_asserted_wrappers(If_mud_asserted, Asserted_dbase_t , Asserted_dbase_f),!,Asserted_dbase_t\=nil,mud_pred_expansion(If_mud_asserted, Asserted_dbase_t - Asserted_dbase_f,G1,G2))),!.
 
-% :-dynamic_multifile_exported((is_compiling_sourcecode/1)).
+% :-decl_mpred_prolog((is_compiling_sourcecode/1)).
 is_compiling_sourcecode:-is_compiling,!.
 is_compiling_sourcecode:-compiling, current_input(X),not((stream_property(X,file_no(0)))),prolog_load_context(source,F),not((thglobal:loading_game_file(_,_))),F=user,!.
 is_compiling_sourcecode:-compiling,dmsg(system_compiling),!.
@@ -119,7 +119,7 @@ dmsg_p(P):-once(dmsg(P)),!.
 dmsg_p(_):-!.
 
 
-:-dynamic_multifile_exported(force_clause_expansion/2).
+:-decl_mpred_prolog(force_clause_expansion/2).
 
 attempt_clause_expansion(B,BR):- compound(B), copy_term(B,BC),snumbervars(BC),!, attempt_clause_expansion(B,BC,BR).
 attempt_clause_expansion(_,BC,_):-inside_clause_expansion(BC),!,fail.

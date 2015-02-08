@@ -117,7 +117,7 @@ deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),not(is_asserted(Call)
 % ================================================
 % call_expanded_for/2
 % ================================================
-:-dynamic_multifile_exported((call_expanded_for/2)).
+:-decl_mpred_prolog((call_expanded_for/2)).
 
 call_expanded_for(req,Call):- !,call_mpred(Call).
 call_expanded_for(must,Call):- !,must(call_mpred(Call)).

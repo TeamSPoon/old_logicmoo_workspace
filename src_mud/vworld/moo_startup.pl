@@ -18,7 +18,7 @@
 :- include(logicmoo('vworld/moo_header.pl')).
 
 /*
-:-dynamic_multifile_exported(include_moo_files/1).
+:-decl_mpred_prolog(include_moo_files/1).
 include_moo_files(Mask):- expand_file_name(Mask,X), forall(member(E,X),user_ensure_loaded(E)).
 */
 
@@ -126,7 +126,7 @@ make_qlfs:-
 :- include_moo_files('../src_asserts/pldata/?*.pl').
 
 */
-:- dynamic_multifile_exported(user_ensure_nl_loaded/1).
+:- decl_mpred_prolog(user_ensure_nl_loaded/1).
 user_ensure_nl_loaded(_):-!.
 user_ensure_nl_loaded(F):-load_files([F],[expand(true),if(changed),qcompile(auto)]).
 

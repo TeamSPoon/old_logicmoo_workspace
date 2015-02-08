@@ -8,7 +8,7 @@
 */
 % :-swi_module(world_2d,[]).
 
-:- dynamic_multifile_exported(((
+:- decl_mpred_prolog(((
          check_for_fall/3,
          dir_offset/5,
          doorLocation/5,
@@ -140,14 +140,14 @@ locationToRegion_0(Obj,Obj):-nonvar(Obj),!,mudIsa(Obj,tRegion),!.
 locationToRegion_0(Obj,Region):-nonvar(Obj),must(localityOfObject(Obj,Location)),!,locationToRegion_0(Location,Region).
 locationToRegion_0(Obj,Obj):-dmsg(warn(locationToRegion(Obj,Obj))),!.
 
-:-dynamic_multifile_exported(mudNearbyLocs/2).
+:-decl_mpred_prolog(mudNearbyLocs/2).
 mudNearbyLocs(L1,L2):- var(L1),nonvar(L2),!,mudNearbyLocs(L2,L1).
 mudNearbyLocs(L1,L2):- nonvar(L1),nonvar(L2),L2=xyzFn(_,_,_,_),locationToRegion(L1,R),!,call_tabled(locs_near_i(R,L2)).
 mudNearbyLocs(L1,L2):- nonvar(L1),nonvar(L2),locationToRegion(L1,R1),locationToRegion(L2,R2),!,mudNearbyRegions(R1,R2).
 mudNearbyLocs(L1,L2):- must((hotrace(mudNearbyRegions(R1,R2)),in_grid_no_rnd(R1,L1),in_grid_no_rnd(R2,L2))).
 
 % :- decl_not_mpred(locs_near_i,2).
-:-dynamic_multifile_exported(locs_near_i/2).
+:-decl_mpred_prolog(locs_near_i/2).
 locs_near_i(L1,L2):- locationToRegion(L1,R),in_grid_no_rnd(R,L2).
 locs_near_i(L1,L2):- locationToRegion(L1,R),pathBetween_call(R,_,R2),in_grid_no_rnd(R2,L2).
 
@@ -175,7 +175,7 @@ mudLocOnSurface(Clothes,Agent):-loop_check(wearsClothing(Agent,Clothes),fail).
 :-export(same_regions/2).
 same_regions(Agent,Obj):-must(inRegion(Agent,Where1)),dif_safe(Agent,Obj),inRegion(Obj,Where2),Where1=Where2.
 
-%:-decl_mpred(prologPTTP(inRegion(tObj,tRegion))).
+%:-add(prologPTTP(inRegion(tObj,tRegion))).
 %prologPTTP(localityOfObject(tObj,tSpatialthing)).
 
 %:- add_storage_stub(prologPTTP,inRegion/2).
@@ -189,7 +189,6 @@ mudAtLoc_deduced(X,Y):-is_asserted(localityOfObject(X,_)),!,create_random_fact(m
 predArgTypes(mudAtLoc_deduced(tObj,tSpatialThing)).
 
 
-localityOfObject_deduced(Obj,Region):-loop_check(inRegion(Obj,Region)).
 localityOfObject(Inner,Container):-mudInsideOf(Inner,Container).
 localityOfObject(Above,HasSurface):-mudLocOnSurface(Above,HasSurface).
 localityOfObject(Clothes,Agent):-mudSubPart(Agent,Clothes).
@@ -214,6 +213,7 @@ inRegion(Agent,RegionIn):- must(nonvar(RegionIn)),!,(tItem(Agent);tAgentGeneric(
 
 %localityOfObject(fo_T__T_T_T_TTTT_________TT__To,fo_T__T_T_T_TTTT_________TT__To_R).
 
+localityOfObject_deduced(Obj,Region):-loop_check(inRegion(Obj,Region)).
 localityOfObject_deduced(Agent,Where):-must(is_asserted(mudAtLoc(Agent,Where));is_asserted(localityOfObject(Agent,Where));mudAtLoc_deduced(Agent,Where)).
 
 
@@ -270,13 +270,13 @@ put_in_world_lc_gen(Obj):-choose_for(mudFacing,Obj,_),!,must_det((choose_for(mud
 ensure_in_world(What):-must_det(put_in_world(What)).
 
 
-:- dynamic_multifile_exported user:decl_database_hook/2.
-:- dynamic_multifile_exported deduce_facts/2.
-:- dynamic_multifile_exported create_random_fact/1.
-:- dynamic_multifile_exported hooked_random_instance/3.
-:- dynamic_multifile_exported fact_always_true/1.
-:- dynamic_multifile_exported fact_maybe_deduced/1.
-:- dynamic_multifile_exported fact_is_false/2.
+:- decl_mpred_prolog user:decl_database_hook/2.
+:- decl_mpred_prolog deduce_facts/2.
+:- decl_mpred_prolog create_random_fact/1.
+:- decl_mpred_prolog hooked_random_instance/3.
+:- decl_mpred_prolog fact_always_true/1.
+:- decl_mpred_prolog fact_maybe_deduced/1.
+:- decl_mpred_prolog fact_is_false/2.
 
 :-decl_mpred_hybrid(mudInsideOf(tObj,tObj)).
 

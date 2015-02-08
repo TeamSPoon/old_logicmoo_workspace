@@ -52,7 +52,7 @@ remove_undef_search:- ((
 user:action_info(actScansrc,"Scan for sourcecode modifed on filesystem and TeamSPoon. NOTE: only new files with this mask (src_incoming/*/?*.pl) are picked up on").
 user:agent_call_command(Agent,actScansrc):-  once('@'(agent_call_safely(Agent,actScansrc),'user')).
 
-:-dynamic_multifile_exported(actScansrc/0).
+:-decl_mpred_prolog(actScansrc/0).
 actScansrc :- 
  ensure_loaded(library(make)),
  debugOnError((
@@ -74,9 +74,9 @@ include_moo_files_not_included(Mask):-
 
 include_moo_file_ni(M):-absolute_file_name(M,EX,[expand(true),access(read),file_type(prolog)]),include_moo_file_ni_1(EX).
 
-:-dynamic_multifile_exported(mmake/0).
+:-decl_mpred_prolog(mmake/0).
 mmake:- update_changed_files.
-:-dynamic_multifile_exported(update_changed_files/0).
+:-decl_mpred_prolog(update_changed_files/0).
 update_changed_files :-
         set_prolog_flag(verbose_load,true),
         ensure_loaded(library(make)),

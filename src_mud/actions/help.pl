@@ -18,10 +18,10 @@ user:type_action_info(tHumanPlayer,actHelp(isOptional(ftString,"")), "shows this
 
 
 
-:-dynamic_multifile_exported(get_type_action_help_commands_list/3).
+:-decl_mpred_prolog(get_type_action_help_commands_list/3).
 get_type_action_help_commands_list(A,B,C):-no_repeats_old(get_type_action_help_0(A,B,C)).
 
-:-dynamic_multifile_exported(get_all_templates/1).
+:-decl_mpred_prolog(get_all_templates/1).
 get_all_templates(Templ):- call_tabled_can(no_repeats_old(get_all_templates0(Templ))).
 get_all_templates0(Templ):-get_good_templates(Templ).
 get_all_templates0(Templ):-get_bad_templates(Templ),not(get_good_templates(Templ)).
@@ -31,7 +31,7 @@ get_bad_templates(Templ):- no_repeats_old((get_type_action_help_1(_,Templ,_),not
 
 vtActionTemplate(Templ):- loop_check(get_all_templates(Templ),fail).
 
-:-dynamic_multifile_exported(good_template/1).
+:-decl_mpred_prolog(good_template/1).
 good_template(Templ):- \+ contains_singletons(Templ).
 
 

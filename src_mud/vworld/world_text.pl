@@ -11,7 +11,7 @@
 %      default_repl_obj_to_string/3,default_repl_writer/4,show_kb_via_pred/3,show_kb_preds/2,show_kb_preds/3,success/2
 :- include(logicmoo(vworld/moo_header)).
 
-:-dynamic_multifile_exported(fully_expand/2).
+:-decl_mpred_prolog(fully_expand/2).
 
 :- begin_prolog_source.
 
@@ -22,7 +22,7 @@
 % generatePhrase_local(+Term,-English).
 % Generate english version of a message
 % ===========================================
-:-dynamic_multifile_exported(generatePhrase_local/2).
+:-decl_mpred_prolog(generatePhrase_local/2).
 
 bugger:term_to_message_string(T,T):-var(T),!.
 bugger:term_to_message_string(T,T):-!.

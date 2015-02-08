@@ -137,7 +137,7 @@ write_count(H,N):- writeq(H:N),write(', ').
 
 */
 :-export(to_tclass/2).
-to_tclass(F,F):- current_predicate(_:F/A),functor(P,F,A),(predicate_property(P,built_in);predicate_property(P, nodebug );predicate_property(P, meta_predicate(P) )).
+to_tclass(F,F):- current_predicate(_:F/A),functor(P,F,A),(real_builtin_predicate(P);predicate_property(P, nodebug );predicate_property(P, meta_predicate(P) )).
 to_tclass(F,F):-atom_string(F,S),string_lower(S,L),S\=L,!.
 
 

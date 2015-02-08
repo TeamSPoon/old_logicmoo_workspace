@@ -18,7 +18,7 @@
 % item rez (to mudStowing inventory)
 % ====================================================
 
-:-dynamic_multifile_exported(rez_to_inventory/3).
+:-decl_mpred_prolog(rez_to_inventory/3).
 rez_to_inventory(Agent,NameOrType,NewObj):-   
   must_det_l([
    create_meta(NameOrType,Clz,tItem,NewObj),
@@ -48,7 +48,7 @@ user:agent_call_command(Agent,actCreate(SWhat)):- with_all_dmsg(must_det(create_
 :-decl_mpred_prolog(authorWas(ftTerm,ftTerm)).
 :-decl_mpred_prolog(current_pronoun(tAgentGeneric,ftString,ftTerm)).
 
-:-dynamic_multifile_exported(create_new_object/2).
+:-decl_mpred_prolog(create_new_object/2).
 
 create_new_object(Agent,[tCol,NameOfType|DefaultParams]):-!,create_new_type(Agent,[NameOfType|DefaultParams]).
 
@@ -63,7 +63,7 @@ create_new_object(Agent,[NameOrType|Params]):-
    must((mudIsa(NewObj,tItem),padd(Agent,mudStowing(NewObj)))),
    add_missing_instance_defaults(NewObj).
 
-:-dynamic_multifile_exported(create_new_type/2).
+:-decl_mpred_prolog(create_new_type/2).
 create_new_type(Agent,[NewObj|DefaultParams]):-
    decl_type(NewObj),
    padd(NewObj,authorWas(create_new_type(Agent,[NewObj|DefaultParams]))),

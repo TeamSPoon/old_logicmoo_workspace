@@ -14,7 +14,7 @@
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
-:- dynamic_multifile_exported fact_always_true/1.
+:- decl_mpred_prolog fact_always_true/1.
 
 :- ensure_loaded(dbase_i_isa_motel).
 
@@ -273,7 +273,7 @@ callOr(Pred,I,T):-(call(Pred,I);call(Pred,T)),!.
 type_deduced(I,T):-atom(T),i_name(mud,T,P),!,dbase_t(P,_,I).
 type_deduced(I,T):-nonvar(I),not(number(I)),dbase_t(P,_,I),(argIsa_known(P,2,AT)->T=AT;i_name(vt,P,T)).
 
-:- dynamic_multifile_exported(ruleHybridChain/2).
+:- decl_mpred_prolog(ruleHybridChain/2).
 
 isa_asserted_0(ttCompleteExtentAsserted,ttCompleteExtentAsserted).
 isa_asserted_0(I,T):-hasInstance(T,I).  %isa_asserted_0(I,T):-clause(hasInstance(T,I),true). %isa_asserted_0(I,T):-clause(isa(I,T),true).
@@ -339,11 +339,11 @@ tCol(tRegion).
 tCol(tContainer).
 
 
-:- dynamic_multifile_exported(impliedSubClass/2).
+:- decl_mpred_prolog(impliedSubClass/2).
 impliedSubClass(T,ST):-ground(T:ST),is_known_false(mudSubclass(T,ST)),!,fail.
 impliedSubClass(T,ST):-predicate_property(transitive_subclass(T,ST),_),!,call_tabled(transitive_subclass(T,ST)).
 
-:- dynamic_multifile_exported(asserted_subclass/2).
+:- decl_mpred_prolog(asserted_subclass/2).
 asserted_subclass(I,T):- ((thlocal:useOnlyExternalDBs,!);thglobal:use_cyc_database),(kbp_t([genls,I,T])).
 asserted_subclass(T,ST):-dbase_t(mudSubclass,T,ST).
 
@@ -390,7 +390,6 @@ is_known_true(F):-is_known_trew(F),!.
 %is_known_true(mudIsa(X,tSpatialThing)):- hasInstance(_,X),not_mud_isa(X,tCol),not_mud_isa(X,tPred).
 is_known_true(mudSubclass(X,X)).
 is_known_true(mudIsa(apathFn(_,_),tPathway)).
-is_known_true(mudIsa(apathFn(_,_),apathFn)).
 is_known_true(mudIsa(_,ftTerm)).
 is_known_true(mudIsa(_,ftID)).
 
@@ -476,6 +475,7 @@ disjointWith(A,B):- once((type_isa(A,AT),type_isa(B,BT))),AT \= BT.
                                        prologHybrid).
 
 */
+
 user:goal_expansion(G,mudIsa(I,C)):-notrace((was_isa(G,I,C),(is_ftVar(C)->true;(not(mpred_prop(C,prologOnly)))))).
 user:term_expansion(G,mudIsa(I,C)):-notrace((was_isa(G,I,C),(is_ftVar(C)->true;(not(mpred_prop(C,prologOnly)))))).
 p_is_ttFormatType(I):- !,hasInstance(ttFormatType,I).

@@ -16,7 +16,7 @@
 % Douglas Miles
 */
 % ========================================
-% decl_mpred_hybrid/1/2/3
+% mpred_prop/1/2/3
 % ========================================
 
 :- dynamic_multifile_exported mpred_arity/2.

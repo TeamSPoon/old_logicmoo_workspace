@@ -428,7 +428,7 @@ ensure_predicate_reachable(_,_).
 %ensure_predicate_reachable(M,C,dbase_t,Ap1):-C=..[_,F|_RGS],A is Ap1 -1, dmsg(( ensure_universal_stub(M,F,A))).
 
 
-singletons_throw_else_fail(C):- not_is_release,contains_singletons(C),!,(test_tl(thlocal:adding_from_srcfile) ->dmsg(contains_singletons(C)); trace_or_throw(contains_singletons(C))),fail.
+singletons_throw_else_fail(C):- not_is_release,contains_singletons(C),!,(test_tl(thlocal:adding_from_srcfile) ->dmsg(contains_singletons(C)); dmsg(trace_or_throw(contains_singletons(C)))),fail.
 nonground_throw_else_fail(C):- not_is_release,not(ground(C)),!,( (test_tl(thlocal:adding_from_srcfile) ->dmsg(not_ground(C)); trace_or_throw(not_ground(C)))),fail.
 
 % ========================================

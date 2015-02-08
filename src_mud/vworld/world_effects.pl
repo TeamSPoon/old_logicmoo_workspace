@@ -63,10 +63,10 @@ user:decl_database_hook(assert(_),mudCmdFailure(Agent,What)):- /*once(idel(cmdsu
 
 % Check to see if any of the objects should be placed in the world as it runs.
 
-:-dynamic_multifile_exported(call_update_charge/2).
+:-decl_mpred_prolog(call_update_charge/2).
 call_update_charge(Agent,What):- padd(Agent,cmdsuccess(What)), doall(must(update_charge(Agent,What))),!.
 
-:-dynamic_multifile_exported(call_update_stats/2).
+:-decl_mpred_prolog(call_update_stats/2).
 call_update_stats(Agent,What):- padd(Agent,cmdsuccess(What)), doall(must(update_stats(Agent,What))),!.
 
 set_stats(Agent,[]) :- set_stats(Agent,[mudStr(2),mudHeight(2),mudStm(2),mudSpd(2)]).

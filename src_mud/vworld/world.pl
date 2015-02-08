@@ -69,7 +69,7 @@
 
 :-discontiguous create_instance_0/3.
 
-:-dynamic_multifile_exported((
+:-decl_mpred_prolog((
           create_instance/2,
           create_instance/3,
           create_instance_0/3,
@@ -137,7 +137,7 @@ isa(item,itemcol).
 
 cached(G):-ccatch(G,_,fail).
 
-:-dynamic_multifile_exported(create_meta/4).
+:-decl_mpred_prolog(create_meta/4).
 % if SuggestedName was 'food666' it'd like the SuggestedClass to be 'food' and the stystem name will remain 'food666'
 % if SuggestedName was 'food' it'd like the SuggestedClass to be 'food' and the stystem name will become a gensym like 'food1'
 create_meta(SuggestedName,SuggestedClass,BaseClass,SystemName):-
@@ -181,12 +181,12 @@ create_agent(P,List):-must_det(create_instance(P,tAgentGeneric,List)).
 
 % decl_type(Spec):-create_instance(Spec,col,[]).
 
-:-dynamic_multifile_exported(create_instance/1).
+:-decl_mpred_prolog(create_instance/1).
 create_instance(P):- must_det((mudIsa(P,What),ttSpatialType(What))),must_det(create_instance(P,What,[])).
 :-export(create_instance/2).
 create_instance(Name,Type):-create_instance(Name,Type,[]).
 user:create_instance(Name,Type):-create_instance(Name,Type,[]).
-:-dynamic_multifile_exported(create_instance/3).
+:-decl_mpred_prolog(create_instance/3).
 create_instance(What,Type,Props):- 
   loop_check_local(time_call(create_instance_now(What,Type,Props)),dmsg(already_create_instance(What,Type,Props))).
 
@@ -203,7 +203,7 @@ create_instance_now(What,Type,Props):-
 
 :-discontiguous create_instance_0/3.
 
-:- dynamic_multifile_exported(is_creating_now/1).
+:- decl_mpred_prolog(is_creating_now/1).
 :- dynamic(is_creating_now/1).
 
 create_instance_0(What,Type,List):- (var(What);var(Type);var(List)),trace_or_throw((var_create_instance_0(What,Type,List))).

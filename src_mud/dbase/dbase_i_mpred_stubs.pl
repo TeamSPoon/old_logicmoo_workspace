@@ -35,12 +35,12 @@ get_pifunctor(Head,PHead,F,A):-atom(Head),ensure_arity(Head,A),!,get_pifunctor(H
 %user:decl_database_hook(assert(_),mpred_stubtype(F,StubType)):- add_storage_stub(StubType,F).
 %user:decl_database_hook(assert(_),mudIsa(F,(StubType))):- tPredStubImpl(StubType),must(add_storage_stub(StubType,F)).
 
-
+:-export(decl_mpred_stubcol/3).
 decl_mpred_stubcol(F,A,StubType):-loop_check(decl_mpred_stubcol_lc(F,A,StubType),dmsg(looping_decl_mpred_stubcol_lc(F,A,StubType))).
 decl_mpred_stubcol_lc(Head,_Isa,StubType):-get_functor(Head,F,A),A>0,!,decl_mpred_stubcol(F,A,StubType).
 decl_mpred_stubcol_lc(F,A,StubType):- ignore(((number(A),assert_arity(F,A)))),
      functor(Head,F,A),add_storage_stub(StubType,Head),!.
-     %must(tPredStubImpl(StubType)),decl_mpred(F,/*predStubType*/(StubType)),decl_mpred(F,StubType).
+     %must(tPredStubImpl(StubType)),dynamic_multifile_exported(F,/*predStubType*/(StubType)),dynamic_multifile_exported(F,StubType).
 
 
 has_storage_stub(Var,Head):- var(Var),!,tPredStubImpl(Var),has_storage_stub(Var,Head).
@@ -82,7 +82,7 @@ add_storage_stub(StubType,Head,PHead,F,_):-
          user:asserta_if_new(mpred_prop(F,hasStub(StubType))),       
          asserta_if_new(mpred_prop(F,StubType)),         
          one_must(show_call_failure(call_no_cuts(provide_mpred_setup(OP,PHead,StubType,Result))),
-           (show_call_failure(add_mpred_universal_call_stub(StubType,Head)),Result=defined(universal))),
+           (show_call_failure(add_mpred_universal_call_stub(StubType,Head)),Result=declared(universal))),
          asserta_if_new(provide_mpred_currently(OP,F,Head,StubType,Result)),
          asserta_if_new(hasStub(F,StubType)), 
          must_have_storage_stub(StubType,Head),
@@ -157,7 +157,9 @@ retract(one)  using =
 retract(all)  using =
 
 */
-
+% todo uncomment these
+% mpred_stubtype(Head:-_,StubType) :- nonvar(Head),!,mpred_stubtype(Head,StubType).
+% mpred_stubtype(Head,StubType) :- compound(Head),get_functor(Head,F),mpred_stubtype(F,StubType).
 mpred_stubtype(F,StubType) :- nonvar(StubType),must(tPredStubImpl(StubType)),!,
   (mpred_prop(F,hasStub(StubTypeWas));(mpred_prop(F,/*predStubType*/(StubTypeWas)),tPredStubImpl(StubTypeWas))),!,StubType=StubTypeWas.
 mpred_stubtype(F,StubType) :- (mpred_prop(F,hasStub(StubType));(mpred_prop(F,StubType),tPredStubImpl(StubType))),!.

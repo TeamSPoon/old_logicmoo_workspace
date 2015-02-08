@@ -105,7 +105,7 @@ user:decl_database_hook(assert(_),predArgTypes(ArgTs)):-
    Good=..[F|GList],
    Good\=ArgTs,!,del(mpred_prop(F,predArgTypes(ArgTs))),decl_mpred(F,predArgTypes(Good)).
 
-:-dynamic_multifile_exported(add_deduction/3).
+:-decl_mpred_prolog(add_deduction/3).
 quiet_fact(Fact):-functor(Fact,F,A),quiet_fact(F,A).
 quiet_fact(mudIsa,_).
 quiet_fact(argIsa,_).

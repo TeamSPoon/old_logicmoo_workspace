@@ -11,7 +11,7 @@
 
 % :-swi_module(dbase_formattypes, []).
 
-:-dynamic_multifile_exported((          
+:-decl_mpred_prolog((          
           any_to_number/2,
           any_to_value/2,
           argIsa_call/4,
@@ -25,7 +25,7 @@
 
 
 :- include(logicmoo('vworld/moo_header.pl')).
-:- dynamic_multifile_exported correctArgsIsa/3.
+:- decl_mpred_prolog correctArgsIsa/3.
 % :- ensure_loaded(logicmoo('vworld/world_2d.pl')).
 
 
@@ -125,7 +125,7 @@ argIsa_call_nt(F,N,Type):- findall(T,argIsa_call_0(F,N,Type),T),Types=[_|_],!,as
 
 resultIsa(apathFn,tPathway).
 
-:-dynamic_multifile_exported(argIsa_call_0/3).
+:-decl_mpred_prolog(argIsa_call_0/3).
 argIsa_call_0(argIsa,1,tRelation).
 argIsa_call_0(argIsa,2,ftInt).
 argIsa_call_0(argIsa,3,tCol).
@@ -401,12 +401,16 @@ correctType_gripe(Op,A,Type,NewArg):-trace_or_throw(failure(correctType(Op,A,Typ
 
 :- style_check(+singleton).
 
+is_renamed_to(A,AA):- fail,atomic(A),not(A=[];A='';A=""),not(atom_concat(_,'Table',A)),not(atom_concat(_,'table',A)),
+    atom_concat(Base,'able',A),atom_length(Base,AL),AL>2,!,atom_concat(Base,'Able',AA).
+
 correctType(Op,A,Type,AA):- var(Type),trace_or_throw(correctType(Op,A,Type,AA)).
 correctType(_O,A,Type,AA):- (var(A);var(Type)),!, must(must_equals(A,AA)).
 
 correctType(Op,A,'&'(Type1,Type2),AA):-var(Type2),!,correctType(Op,A,Type1,AA).
 correctType(Op,A,'&'(Type1,Type2),AAA):-!,correctType(Op,A,Type1,AA),correctType(Op,AA,Type2,AAA).
 
+correctType(Op,A,Type,AAA):-is_renamed_to(A,AA),!,must(correctType(Op,AA,Type,AAA)).
 correctType(Op,+A,Type,+AA):-nonvar(A),!,correctType(Op,A,Type,AA).
 correctType(Op,-A,Type,-AA):-nonvar(A),!,correctType(Op,A,Type,AA).
 correctType(_O,A,vtDirection,AA):- current_predicate(any_to_dir/2),!,any_to_dir(A,AA).
