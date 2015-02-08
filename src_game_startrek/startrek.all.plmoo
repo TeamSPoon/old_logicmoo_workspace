@@ -41,7 +41,6 @@ pddlPredicates([
   mudStowing(tAgentGeneric,tWeapon),
   mudStowing(tAgentGeneric,tCarryAble),
   wearsClothing(tAgentGeneric,tClothing),
-  wearsClothing(tAgentGeneric,tCarryAble),
 
 % static startrek
   pathBetween(tRegion,vtDirection,tRegion),

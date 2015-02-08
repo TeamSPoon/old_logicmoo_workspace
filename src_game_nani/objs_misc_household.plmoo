@@ -138,7 +138,7 @@ mudSubclass(tBedding, tFoldAble).
 mudSubclass(tFoldAble, tCarryAble).
 mudSubclass(tThrowAble, tCarryAble).
 mudSubclass(tPortableDevice,tCarryAble).
-mudSubclass(tPhysicalDevice,tUseable).
+mudSubclass(tPhysicalDevice,tUseAble).
 mudSubclass(tWearAble, tCarryAble).
 mudSubclass(tCarryAble, tCarryAble).
 mudSubclass(tFood,tCarryAble).
@@ -202,7 +202,7 @@ typeProps(tKey,[mudColor(vSilver),mudSize(isEach(vSmall,vTiny)),mudShape(vUnique
 typeProps(tEnvelope,[mudColor(vWhite),mudSize(vSmall),mudShape(vRectangular),mudMaterial(vPaper),mudTexture(vSmooth)]).
 typeProps(tDesk,[mudColor(isEach(vBrown,vShiney)),mudSize(vLarge),mudShape(isEach(vCubular,vRectangular)),mudTexture(isEach(vSmooth,vRidged)),mudWeight(175)]).
 typeProps(tWashingMachine,[mudColor(vWhite),mudSize(vLarge),mudShape(isEach(vCubular,vSquare)),mudMaterial(vMetal),mudTexture(vSmooth),mudWeight(125)]).
-typeProps(tBroccoli,[mudColor(vGreen),mudSize(vSmall),mudShape(isLike(mudShape,tTree)),mudIsa(tVegetable),mudTexture(isEach(vPorous,vBumpy))]).                                                                    
+typeProps(tBroccoli,[mudColor(vGreen),mudSize(vSmall),mudShape(isLike(mudShape,tTree)),mudIsa(tVegetAble),mudTexture(isEach(vPorous,vBumpy))]).                                                                    
 typeProps(tCrackers,[mudColor(vTan),mudIsa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]).
 typeProps(tComputer,[mudColor(vGrey),mudMaterial(vPlastic),mudShape(isEach(vCubular,vRectangular)),mudSize(vMedium),mudTexture(vSmooth)]).
 typeProps(tStamp,[mudColor(vPolychromeatic),mudSize(isEach(vTiny,thin)),mudShape(vSquare),mudMaterial(vPaper),mudTexture(isEach(vSmooth,vSticky))]).

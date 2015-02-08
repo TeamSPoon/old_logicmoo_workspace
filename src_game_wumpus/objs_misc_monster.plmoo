@@ -227,7 +227,7 @@ Object applies:
 
 :-register_module_type([world_types,parser]).
 
-user:label_type(Label,Type):- mudLabelTypeProps(Label,Type,_).
+user:glyphType(Label,Type):- mudLabelTypeProps(Label,Type,_).
 
 % :-register_module_type(dynamic).
 
@@ -238,7 +238,7 @@ typeProps(tAgentGeneric,[predInstMax(mudHealth,500)]).
 
 % :-end_module_type(dynamic).
 
-typeProps(isSelf,Type,[mudNamed(isSelf),mudKwLabel(Lbl)|SP]):-  mudLabelTypeProps(Lbl,Type,SomeProps),nonvar(Type),flatten(SomeProps,SP).
+typeProps(isSelf,Type,[mudNamed(isSelf),glyphType(Lbl)|SP]):-  mudLabelTypeProps(Lbl,Type,SomeProps),nonvar(Type),flatten(SomeProps,SP).
 
 % Vacuum World example objects........
 mudLabelTypeProps(wl,tWall,[mudHeight(3),mudWeight(4)]).
