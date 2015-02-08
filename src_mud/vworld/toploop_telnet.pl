@@ -261,7 +261,7 @@ write_pretty(Percepts) :-
 write_pretty_aux(Rest,Rest,5).
 write_pretty_aux([[]|Tail],Return,Column) :-
 	Ctemp is Column + 1,
-	label_type(Obj,0),
+	glyphType(Obj,0),
 	write(Obj), write(' '),
 	write_pretty_aux(Tail,Return,Ctemp).
 write_pretty_aux([[vDark]|Tail],Return,Column) :-
@@ -270,7 +270,7 @@ write_pretty_aux([[vDark]|Tail],Return,Column) :-
 	write_pretty_aux(Tail,Return,Ctemp).
 write_pretty_aux([[Head]|Tail], Return, Column) :-
 	Ctemp is Column + 1,
-	label_type(Map,Head),
+	glyphType(Map,Head),
 	write(Map), write(' '),
 	write_pretty_aux(Tail, Return, Ctemp).
 write_pretty_aux([[Agent]|Tail],Return,Column) :-
@@ -316,7 +316,7 @@ show_room_grid_single(_Room,_LOC,_OutsideTest):- write('--'), !.
 
 inst_label(Obj,SLabe2):- call(term_to_atom(Obj,SLabel)),sub_atom(SLabel,1,2,_,SLabe2),!.
 inst_label(Obj,SLabe2):- call(term_to_atom(Obj,SLabel)),sub_atom(SLabel,0,2,_,SLabe2),!.
-inst_label(Obj,Label):- label_type(Label,Obj),!.
+inst_label(Obj,Label):- glyphType(Label,Obj),!.
 inst_label(Obj,Label):-  iprops(Obj,nameStrings(Val)),Val\=Obj,inst_label(Val,Label),!.
 inst_label(Obj,Label):-  iprops(Obj,mudNamed(Val)),Val\=Obj,!,inst_label(Val,Label),!.
 inst_label(Obj,Label):-  iprops(Obj,mudIsa(Val)),Val\=Obj,inst_label(Val,Label),!.
@@ -358,7 +358,7 @@ cmdShowRoomGrid(Room,Y,X,N) :-
         loc_to_xy(Room,X,Y,LOC),
 	asserted_atloc(Obj,LOC),
         prop(Obj,mudIsa,Class),
-	label_type(Label,Class),
+	glyphType(Label,Class),
 	write(Label), write(' '),
 	XX is X + 1,
 	!,
@@ -376,7 +376,7 @@ cmdShowRoomGrid(Room,Y,X,N) :-
 % Used to display the labels of the grid locations. (the key to the map).
 % Used at end of run.
 display_grid_labels :-
-	findall([Label,Name],label_type(Label,Name),List),
+	findall([Label,Name],glyphType(Label,Name),List),
 	forall(prop_memb([Label,Name],List),
 	           (write(Label), write('='), write(Name), write(' '))),
 		   nl.

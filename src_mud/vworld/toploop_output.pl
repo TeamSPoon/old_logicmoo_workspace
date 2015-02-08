@@ -17,9 +17,9 @@
 % local_decl_db_prop(repl_writer(tAgentGeneric,term),[prologSingleValued,argSingleValueDefault(2,default_repl_writer)]).
 % local_decl_db_prop(repl_to_string(tAgentGeneric,term),[prologSingleValued,argSingleValueDefault(2,default_repl_obj_to_string)]).
 
-:-dynamic_multifile_exported(default_repl_writer/4).
+:-decl_mpred_prolog(default_repl_writer/4).
 default_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=o),  ( TypeO == o -> fmt('~q= ~q.~n',[N,V]) ; fmt('~q=D(~w) ~q.~n',[N,TypeO,V])).
-:-dynamic_multifile_exported(default_repl_obj_to_string/3).
+:-decl_mpred_prolog(default_repl_obj_to_string/3).
 default_repl_obj_to_string(O,Type,Out):- copy_term(Type,TypeO), ignore((TypeO = o )), ( TypeO == o -> Out=O ; Out = stringD(TypeO,O)).
 
 
@@ -28,11 +28,11 @@ default_repl_obj_to_string(O,Type,Out):- copy_term(Type,TypeO), ignore((TypeO = 
 canUseEnglish:-true.
 
 
-:-dynamic_multifile_exported(show_kb_preds/2).
+:-decl_mpred_prolog(show_kb_preds/2).
 show_kb_preds(Agent,List):- mmake,
       show_kb_preds(Agent,_,List).
 
-:-dynamic_multifile_exported(show_kb_preds/3).
+:-decl_mpred_prolog(show_kb_preds/3).
 show_kb_preds(Agent,LOC,List):-
     must_det_l([       
         ignore((once(mudAtLoc(Agent,LOC);localityOfObject(Agent,LOC)))),
@@ -45,7 +45,7 @@ show_kb_preds(Agent,LOC,List):-
 
 
 
-:-dynamic_multifile_exported(show_kb_via_pred/3).
+:-decl_mpred_prolog(show_kb_via_pred/3).
 show_kb_via_pred(_,_,[]).
 show_kb_via_pred(WPred,ToSTR,[L|List]):-!,
    show_kb_via_pred(WPred,ToSTR,L),
@@ -55,7 +55,7 @@ show_kb_via_pred(WPred,ToSTR,L):-!,
 
 
 
-:-dynamic_multifile_exported(show_kb_via_pred_0/3).
+:-decl_mpred_prolog(show_kb_via_pred_0/3).
 
 show_kb_via_pred_0(WPred,ToSTR,listof(Call)):- contains_var(Call,value),subst(Call,value,P,PCall),subst(Call,value,PS,PSCall),!,
                                                show_kb_via_pred_0(WPred,ToSTR,forEach(findall(P,PCall,PS),fmt(PSCall))).

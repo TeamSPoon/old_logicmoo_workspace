@@ -239,7 +239,7 @@ was_isa0(X,I,C):-X=..[C,I],!,is_typef(C),!,not(cant_be_col(C)).
 :-dynamic_multifile_exported(is_typef/1).
 is_typef(C):-var(C),!,fail.
 is_typef(prologSingleValued).
-is_typef(F):- (hasInstance_dyn(macroDeclarer,F);hasInstance_dyn(tCol,F);clause(mpred_prop(F,tCol),true)),!.
+is_typef(F):- (user:hasInstance_dyn(macroDeclarer,F);user:hasInstance_dyn(tCol,F);clause(mpred_prop(F,tCol),true)),!.
 is_typef(F):- atom(F),current_predicate(isa_from_morphology/2),isa_from_morphology(F,TT),!,atom_concat(_,'Type',TT).
 
 

@@ -170,8 +170,8 @@ holds_plist_t(P,LIST):- apply(holds_t,[P|LIST]).
 :-op(0,fx,((decl_mpred_hybrid))).
 :-dynamic_multifile_exported((decl_mpred_hybrid)/1).
 :-dynamic_multifile_exported((decl_mpred_hybrid)/2).
-:-dynamic_multifile_exported((decl_mpred_hybrid)/3).
-:-dynamic_multifile_exported((decl_mpred_hybrid)/4).
+:-dynamic_multifile_exported((decl_mpred_hybrid_lc)/3).
+:-dynamic_multifile_exported((decl_mpred_hybrid4)/4).
 
 :-op(0,fx,decl_mpred_hybrid).
 
@@ -180,7 +180,7 @@ holds_plist_t(P,LIST):- apply(holds_t,[P|LIST]).
 :-meta_predicate_transparent(decl_mpred_hybrid(+,+,+)).
 
 
-decl_mpred_hybrid(M):- with_pi(M,decl_mpred_hybrid).
+decl_mpred_hybrid(M):- with_pi(M,decl_mpred_hybrid4).
 
 decl_mpred_hybrid(F,A):- integer(A),!,decl_mpred_hybrid(F/A).
 decl_mpred_hybrid(F,Other):- 
@@ -188,8 +188,8 @@ decl_mpred_hybrid(F,Other):-
      decl_mpred_hybrid(F).
 
 :-export(decl_mpred_hybrid/3).
-decl_mpred_hybrid(M, F, A):- atom(F),integer(A),!,functor(PI,F,A),decl_mpred_hybrid(M,PI,F/A).
-decl_mpred_hybrid(M,PI,FA):- loop_check(must(decl_mpred_hybrid_lc(M,PI,FA)),true).
+decl_mpred_hybrid3(M, F, A):- atom(F),integer(A),!,functor(PI,F,A),decl_mpred_hybrid(M,PI,F/A).
+decl_mpred_hybrid3(M,PI,FA):- loop_check(must(decl_mpred_hybrid_lc(M,PI,FA)),true).
 
 
 decl_mpred_hybrid_lc(M,PI,F/A):-
@@ -198,8 +198,8 @@ decl_mpred_hybrid_lc(M,PI,F/A):-
      decl_mpred_pi(PI),
      decl_mpred_stubcol(F,A,prologHybrid).
 
-decl_mpred_hybrid(_CM,M,PI,F/A):-
-   decl_mpred_hybrid(M,PI,F/A).
+decl_mpred_hybrid4(_CM,M,PI,F/A):-
+   decl_mpred_hybrid3(M,PI,F/A).
 
 :-op(1150,fx,decl_mpred_hybrid).
 
@@ -421,6 +421,8 @@ constrain_args(_,_):-!.
 constrain_args(_P,[AR,GS]):-!,dif(AR,GS).
 constrain_args(_,[_P,AR,GS]):-!,dif(AR,GS).
 constrain_args(A,B):-constrain_args_pttp(A,B).
+
+:-decl_mpred_hybrid(mudIsa/2).
 
 % =====================================
 % = body_req

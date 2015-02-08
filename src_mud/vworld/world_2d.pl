@@ -112,7 +112,7 @@ init3(LocName,LocType,xyzFn(LocName,_,Y,1),[]) :-
 	init2(LocName,LocType,X,1).
 
 init3(LocName,LocType,xyzFn(LocName,X,Y,1),[O|T]) :-
-	label_type(O,Type),
+	glyphType(O,Type),
            rez_loc_object(xyzFn(LocName,X,Y,1),Type),
 	K is X + 1,
 	init3(LocName,LocType,xyzFn(LocName,K,Y,1),T).

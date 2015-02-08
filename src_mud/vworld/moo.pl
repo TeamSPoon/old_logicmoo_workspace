@@ -21,8 +21,10 @@
 :-dynamic_multifile_exported(hasInstance/2).
 :-dynamic_multifile_exported(mudSubclass/2).
 
+/*
 :-multifile(user:mudIsa/2).
 :-dynamic(user:mudIsa/2).
+*/
 /*
 :- '@'(ensure_loaded('../src_lib/logicmoo_util/logicmoo_util_all'),user).
 :- ensure_loaded(logicmoo('dbase/dbase_i_rdf_store.pl')).

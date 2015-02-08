@@ -52,6 +52,10 @@ monster_idea(Agent,actMove(1,Dir)) :-
 
 monster_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[tCorpse]).
 
-user:instTypeProps(Instance,tMonster,[mudDescription(txtFormatFn("Very screy looking monster named ~w",[Instance])),wearsClothing(tToughHide),mudPossess(tToughHide)]).
+% TODO fingure out why term_expansion is not working
+% :-visible(+all),leash(+all),trace.
+:-add(user:instTypeProps(Instance,tMonster,[mudDescription(txtFormatFn("Very screy looking monster named ~w",[Instance])),wearsClothing(tToughHide),mudPossess(tToughHide)])).
+% :- prolog.
+
 
 :- include(logicmoo(vworld/moo_footer)).

@@ -126,7 +126,7 @@
 :- dynamic_multifile_exported user:longitude/2.
 :- dynamic_multifile_exported user:loaded_external_kbs/0.
 :- dynamic_multifile_exported user:latitude/2.
-:- dynamic_multifile_exported user:label_type/2.
+:- dynamic_multifile_exported user:glyphType/2.
 :- dynamic_multifile_exported user:hooked_random_instance/3.
 :- dynamic_multifile_exported user:decl_coerce/3.
 :- dynamic_multifile_exported user:ft_info/2.

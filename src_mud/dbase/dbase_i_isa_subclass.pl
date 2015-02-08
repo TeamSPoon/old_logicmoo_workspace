@@ -43,7 +43,7 @@ define_compound_as_type(Spec):- compound(Spec),trace_or_throw(never_compound_def
 
 :-must(forall(is_pred_declarer(F),decl_type(F))).
 
-:-dynamic_multifile_exported(define_ft/1).
+:-decl_mpred_prolog(define_ft/1).
 define_ft(ftListFn(Spec)):- never_type(Spec),!,trace_or_throw(never_ft(ftListFn(Spec))).
 define_ft(ftListFn(_)):-!.
 define_ft(Spec):- never_type(Spec),!,trace_or_throw(never_ft(never_type(Spec))).
@@ -60,18 +60,18 @@ define_ft_0(Spec):- hooked_asserta(mudIsa(Spec,ttFormatType)).
 
 %col(Spec):- (isa_asserted(Spec,col)).
 
-:-dynamic_multifile_exported(decl_type_safe/1).
+:-decl_mpred_prolog(decl_type_safe/1).
 decl_type_safe(T):- compound(T),!.
 decl_type_safe(T):- ignore((atom(T),not(never_type(T)),not(number(T)),decl_type(T))).
 
-:-dynamic_multifile_exported(assert_subclass/2).
+:-decl_mpred_prolog(assert_subclass/2).
 assert_subclass(O,T):-assert_subclass_safe(O,T).
 
-:-dynamic_multifile_exported(assert_subclass_safe/2).
+:-decl_mpred_prolog(assert_subclass_safe/2).
 assert_subclass_safe(O,T):-
   ignore((nonvar(O),decl_type_safe(O),nonvar(T),decl_type_safe(T),nonvar(O),nop((not(p_is_ttFormatType(O)),not(p_is_ttFormatType(T)))),add(mudSubclass(O,T)))).
 
-:-dynamic_multifile_exported(assert_isa_safe/2).
+:-decl_mpred_prolog(assert_isa_safe/2).
 assert_isa_safe(O,T):- ignore((nonvar(O),nonvar(T),decl_type_safe(T),assert_isa(O,T))).
 
 user:decl_database_hook(assert(_A_or_Z),mudSubclass(S,C)):-decl_type_safe(S),decl_type_safe(C).
@@ -97,7 +97,7 @@ guess_supertypes(W):-atom(W),T=t,to_first_break(W,lower,T,All,upper),!,to_first_
 % assert_isa/2
 % ================================================
 :-meta_predicate(assert_isa(+,+)).
-:-dynamic_multifile_exported i_countable/1.
+:-decl_mpred_prolog i_countable/1.
 
 assert_isa(I,T):- not(ground(I:T)),trace_or_throw(not(ground(assert_isa(I,T)))).
 assert_isa(_,ftTerm):-!.
@@ -105,9 +105,10 @@ assert_isa(_,ftTerm(_)):-!.
 assert_isa(I,PT):- nonvar(PT),is_pred_declarer(PT),!,decl_mpred(I,PT),assert_hasInstance(PT,I).
 assert_isa(I,T):- loop_check(assert_isa_lc(I,T),true).
 
-:-dynamic_multifile_exported(assert_isa_lc/2).
+:-decl_mpred_prolog(assert_isa_lc/2).
 % skip formatter cols
 assert_isa_lc(_I,T):- member(T,[ftString,ftAction,vtDirection,apathFn]),!.
+assert_isa_lc(I,T):- is_list(I),!,maplist(assert_isa_reversed(T),I).
 assert_isa_lc(I,T):- hotrace(p_is_ttFormatType(T)),(compound(I)->true;dmsg(once(dont_assert_is_ft(I,T)))),rtrace((p_is_ttFormatType(T))).
 assert_isa_lc(I,T):- cannot_table_call(isa_asserted(I,T)),!.
 assert_isa_lc(_,T):- once(decl_type(T)),fail.
@@ -118,6 +119,8 @@ assert_isa_lc(I,_):- not(mpred_prop(I,_)),not(tCol(I)),show_call(assert_if_new(i
 % assert_isa_lc(I,T):- not_is_release, must_det((hooked_asserta(mudIsa(I,T)),(isa_backchaing(I,T)))).
 assert_isa_lc(I,T):- cannot_table_call((must_det((hooked_asserta(mudIsa(I,T)),logOnFailureIgnore(isa_backchaing(I,T)))),assert_hasInstance(T,I))).
 
+
+assert_isa_reversed(T,I):-assert_isa(I,T).
 
 % ================================================
 % assert_isa HOOKS
@@ -137,7 +140,7 @@ assert_isa_hooked(Term,tPred):-!,decl_mpred(Term).
 assert_isa_hooked(Term,prologHybrid):-!,decl_mpred_hybrid(Term).
 assert_isa_hooked(Term,prologOnly):-!,decl_mpred_prolog(Term).
 assert_isa_hooked(Term,prologPTTP):-!,decl_mpred_hybrid(Term,prologPTTP).
-assert_isa_hooked(I,_):- glean_pred_props_maybe(I),fail.
+assert_isa_hooked(I,_):- I\=prologHybrid(_),glean_pred_props_maybe(I),fail.
 assert_isa_hooked(food5,tWeapon):-trace_or_throw(assert_isa(food5,tWeapon)).
 
 % assert_isa_hooked(I,T):- motel:defconcept(I,isAnd([lexicon,T])).
@@ -168,7 +171,7 @@ is_vtActionTemplate(C):-nonvar(C),get_functor(C,F),!,atom_concat(act,_,F).
 % sublass of 4 special cols
 % assert_isa_hooked_creation(I,T):- doall((ttSpatialType(ST),impliedSubClass(T,ST),call_after_game_load((create_instance(I,ST,[mudIsa(T)]))))).
 
-:-dynamic_multifile_exported( transitive_subclass_tst/2).
+:-decl_mpred_prolog( transitive_subclass_tst/2).
 transitive_subclass_tst(_,_):-!,fail.
 
 
@@ -177,7 +180,7 @@ transitive_subclass_tst(_,_):-!,fail.
 :-decl_mpred_prolog(isa_backchaing/2).
 isa_backchaing(I,T):- call_tabled(fact_loop_checked(mudIsa(I,T),isa_backchaing_0(I,T))).
 
-:-dynamic_multifile_exported(isa_backchaing_0/2).
+:-decl_mpred_prolog(isa_backchaing_0/2).
 isa_backchaing_0(I,T):-  T==ftVar,!,var(I).
 isa_backchaing_0(I,T):-  var(I),nonvar(T),!,no_repeats_old(transitive_subclass_or_same(AT,T)),no_repeats_old(isa_asserted(I,AT)).
 isa_backchaing_0(I,T):-  var(I),   var(T),!,setof(TT,AT^(isa_asserted_0(I,AT),transitive_subclass_or_same(AT,TT)),List),!,member(T,List).
@@ -218,7 +221,7 @@ is_col_nart(_):-fail.
 isa_asserted(I,T):-call_tabled(no_repeats_old(isa_asserted_0(I,T))).
 isa_asserted_motel(I,T):-no_repeats_old(isa_asserted_0(I,T)).
 
-:-dynamic_multifile_exported(type_isa/2).
+:-decl_mpred_prolog(type_isa/2).
 
 type_isa(Type,ttSpatialType):-arg(_,vv(tAgentGeneric,tItem,tObj,tRegion),Type),!.
 type_isa(ArgIsa,ttPredType):-is_pred_declarer(ArgIsa),!.
@@ -305,7 +308,7 @@ dont_call_type_arity_one(F):-mpred_stubtype(F,prologHybrid),!.
 
 isa_atom_call(T,G):-loop_check(isa_atom_call_lc(T,G)).
 
-isa_atom_call_lc(_,G):- predicate_property(G,built_in),!,G.
+isa_atom_call_lc(_,G):- real_builtin_predicate(G),!,G.
 isa_atom_call_lc(_,G):- predicate_property(G,number_of_clauses(_)),!,clause(G,B),call_mpred_body(G,B).
 isa_atom_call_lc(_,G):- predicate_property(G,number_of_rules(R)),R>0,!,G.
 
@@ -315,8 +318,8 @@ cached_isa(I,T):-hotrace(isa_backchaing(I,T)).
 % ============================================
 % decl_type/1
 % ============================================
-:- dynamic_multifile_exported never_type/1.
-:- dynamic_multifile_exported decl_type/1.
+:- decl_mpred_prolog never_type/1.
+:- decl_mpred_prolog decl_type/1.
 
 
 tCol(vtDirection).
@@ -351,12 +354,12 @@ into_single_class('&'(A,Var),VV):-var(Var),!,into_single_class(A,VV).
 into_single_class('&'(A,B),VV):-!, into_single_class((B),VV);into_single_class((A),VV).
 into_single_class(A,A).
 
-:- dynamic_multifile_exported((transitive_subclass_or_same/2)).
+:- decl_mpred_prolog((transitive_subclass_or_same/2)).
 transitive_subclass_or_same(A,B):- (var(A),var(B)),!,A=B.
 transitive_subclass_or_same(A,A):-nonvar(A).
 transitive_subclass_or_same(A,B):-transitive_subclass(A,B).
 
-:- dynamic_multifile_exported((transitive_subclass/2)).
+:- decl_mpred_prolog((transitive_subclass/2)).
 transitive_subclass(_,T):-T==ttFormatType,!,fail.
 transitive_subclass(A,_):-A==ttFormatType,!,fail.
 transitive_subclass(A,T):- fail, bad_idea,!, into_single_class(A,AA), into_single_class(T,TT), fact_loop_checked(mudSubclass(A,T),transitive_P_l_r(dbase_t,mudSubclass,AA,TT)).
@@ -378,8 +381,8 @@ transitive_P_r_l(DB,P,L,R):-nonvar(R),call(DB,P,A3,R),call(DB,P,A2,A3),call(DB,P
 transitive_P_r_l(DB,P,L,R):-ground(L:R),call(DB,P,A3,R),call(DB,P,A2,A3),call(DB,P,A1,A2),call(DB,P,A0,A1),call(DB,P,L,A0).
 
 
-:-dynamic_multifile_exported(is_known_trew/1).
-:-dynamic_multifile_exported(is_known_true/1).
+:-decl_mpred_prolog(is_known_trew/1).
+:-decl_mpred_prolog(is_known_true/1).
 
 is_known_true(C):-has_free_args(C),!,trace_or_throw(has_free_args(is_known_trew,C)).
 is_known_true(F):-is_known_false0(F),!,fail.
@@ -407,17 +410,17 @@ is_known_trew(mudSubclass(F,tPred)):-is_pred_declarer(F).
 is_known_trew(disjointWith(A,B)):-disjointWithT(A,B).
 
 
-:-dynamic_multifile_exported(is_known_false/1).
+:-decl_mpred_prolog(is_known_false/1).
 % :-dynamic(is_known_false/1).
 is_known_false(C):-has_free_args(C),!,fail.
 is_known_false(F):-is_known_trew(F),!,fail.
 is_known_false(F):-is_known_false0(F),!.
 
-:-dynamic_multifile_exported(is_known_false0/1).
+:-decl_mpred_prolog(is_known_false0/1).
 is_known_false0(mudIsa(X,Y)):-!,not_mud_isa(X,Y).
 is_known_false0(mudSubclass(Type,_)):-arg(_,vv(tCol,tRelation,ttFormatType),Type).
 
-:-dynamic_multifile_exported(not_mud_isa/2).
+:-decl_mpred_prolog(not_mud_isa/2).
 not_mud_isa(I,T):-(var(I);var(T)),trace_or_throw(var_not_mud_isa(I,T)).
 not_mud_isa(actGossup,tChannel).
 not_mud_isa(mudSubclass, ttCompleteExtentAsserted).
@@ -443,9 +446,9 @@ not_mud_isa(Type, ttCompleteExtentAsserted):- \+ (mpred_prop(Type, ttCompleteExt
 not_mud_isa(X,tCol):-never_type(X).
 
 
-:-dynamic_multifile_exported(disjointWith/2).
+:-decl_mpred_hybrid(disjointWith/2).
 
-:-dynamic_multifile_exported(has_free_args/1).
+:-decl_mpred_prolog(has_free_args/1).
 has_free_args(C):- not(ground(C)), compound(C),not(not(arg(_,C,var))),!.
 
 % is_known_false(mudSubclass(A,B)):-disjointWith(A,B).
@@ -478,4 +481,5 @@ user:term_expansion(G,mudIsa(I,C)):-notrace((was_isa(G,I,C),(is_ftVar(C)->true;(
 p_is_ttFormatType(I):- !,hasInstance(ttFormatType,I).
 p_is_ttFormatType(I):- dbase_t(mudFtInfo,I,_),!.
 p_is_ttFormatType(I):- dbase_t(mudSubclass,I,FT),I\=FT,p_is_ttFormatType(FT),!.
+p_is_ttFormatType(Type):-mudIsa(Type,ttFormatType).
 

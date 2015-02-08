@@ -23,7 +23,7 @@
 % mdif(A,B):- tlbugger:attributedVars,!,dif(A,B).
 mdif(_,_).
 
-:-dynamic_multifile_exported((samef/2,same/2)).
+:-decl_mpred_prolog((samef/2,same/2)).
 same(X,Y):- samef(X,Y),!.
 same(X,Y):- compound(X),arg(1,X,Y),!.
 same(X,Y):- compound(Y),arg(1,Y,X),!.
@@ -33,10 +33,10 @@ samef(X,Y):- X=Y,!.
 samef(X,Y):- hotrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci(XF,YF)))).
 
 
-:-dynamic_multifile_exported(arg_to_var/3).
+:-decl_mpred_prolog(arg_to_var/3).
 arg_to_var(_Type,_String,_Var).
 
-:-dynamic_multifile_exported(same_arg/3).
+:-decl_mpred_prolog(same_arg/3).
 
 same_arg(_How,X,Y):-var(X),var(Y),!,X=Y.
 same_arg(equals,X,Y):-!,equals_call(X,Y).
@@ -280,7 +280,7 @@ or_list([H|T], (H;OT)) :-
 
 % :-swi_module(domain, [ domain/2  ]). % Var, ?Domain
 :- use_module(library(ordsets)).
-:-dynamic_multifile_exported(domain/2).
+:-decl_mpred_prolog(domain/2).
 domain(X, Dom) :-
       var(Dom), !,
       get_attr(X, domain, Dom).
@@ -289,13 +289,13 @@ domain(X, List) :-
       put_attr(Y, domain, Domain),
       X = Y.
 
-:-dynamic_multifile_exported(extend_domain/2).
+:-decl_mpred_prolog(extend_domain/2).
 extend_domain(X, DomL):- init_dom(X, Dom2), ord_union(Dom2, DomL, NewDomain),put_attr( X, domain, NewDomain ).
 
-:-dynamic_multifile_exported(extend_dom/2).
+:-decl_mpred_prolog(extend_dom/2).
 extend_dom(X, DomE):-  init_dom(X, Dom2),ord_add_element(Dom2, DomE, NewDomain),put_attr( X, domain, NewDomain ).
 
-:-dynamic_multifile_exported(init_dom/2).
+:-decl_mpred_prolog(init_dom/2).
 init_dom(X,Dom):-get_attr(X, domain, Dom),!.
 init_dom(X,Dom):-Dom =[_], put_attr(X, domain, Dom),!.
 
@@ -325,7 +325,7 @@ domain:attribute_goals(X) -->
 
 
 
-:-dynamic_multifile_exported(isac/2).
+:-decl_mpred_prolog(isac/2).
 isac(X, Dom) :-
       var(Dom), !,
       get_attr(X, isac, Dom).

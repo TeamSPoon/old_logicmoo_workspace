@@ -163,7 +163,7 @@ mudSubclass(isEach(tRegion,tAgentGeneric),tChannel).
 :- decl_mpred_hybrid(predProxyQuery, 2).
 :- decl_mpred_hybrid(argSingleValueDefault, 3).
 
-:- decl_mpred(mudMoveDist/2,[predArgTypes(mudMoveDist(tAgentGeneric,ftInt)),prologSingleValued,predModule(user),query(call),argSingleValueDefault(2,1)]).
+:- decl_mpred_prolog(mudMoveDist/2,[predArgTypes(mudMoveDist(tAgentGeneric,ftInt)),prologSingleValued,predModule(user),query(call),argSingleValueDefault(2,1)]).
 
 % mudMoveDist(X,Y):-callStub_moo(holds_t,mudMoveDist(X,Y)).
 
@@ -332,7 +332,7 @@ prologMultiValued(mudMemory(tAgentGeneric,ftTerm)).
 predArgTypes(mudWearing(tAgentGeneric,tWearAble)).
 predArgTypes(success(tAgentGeneric,ftBoolean)).
 
-:-decl_mpred(mudActAffect/3).
+:-decl_mpred_hybrid(mudActAffect/3).
 
 % :-decl_mpred_prolog(member/2).
 
@@ -403,9 +403,6 @@ prologOnly(member(ftTerm,ftTerm)).
 % live another day to fight (meaning repl_to_string/1 for now is in ftCallable)
 % prologSingleValued(repl_writer(tAgentGeneric,term),argSingleValueDefault(2,default_repl_writer)).
 % prologSingleValued(repl_to_string(tAgentGeneric,term),[prologSingleValued,argSingleValueDefault(2,default_repl_obj_to_string)]).
-
-%prologMultiValued(label_type(ftString,col),[prologSingleValued]).
-
 
 
 prologListValued(mudNearFeet(tAgentGeneric,ftListFn(tSpatialThing)),[]).
@@ -486,7 +483,6 @@ prologSingleValued(mudMoveDist(tAgentGeneric,ftInt(1))).
 prologSingleValued(mudMoveDist(tAgentGeneric,ftNumber)).
 prologSingleValued(mudBareHandDamage(tAgentGeneric,ftDice)).
 prologSingleValued(mudLevelOf(tCarryAble,ftInt)).
-prologSingleValued(mudMaxHitPoints(tAgentGeneric,ftInt)).
 prologSingleValued(mudMaxHitPoints(tAgentGeneric,ftInt),[prologHybrid]).
 prologSingleValued(mudToHitArmorClass0(tAgentGeneric,ftInt)).
 prologSingleValued(mudPermanence(tItem,vtVerb,vtPerminance)).
