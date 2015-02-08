@@ -52,8 +52,8 @@ mudSubclass(tFlashlight, tPortableDevice).
 mudSubclass(tDesk, tOfficeRoomFurnature).
 mudSubclass(tApple, tFood).
 mudSubclass(tNani, tArt).
-mudSubclass(tNani, tWashable).
-mudSubclass(tClothing, tWashable).
+mudSubclass(tNani, tWashAble).
+mudSubclass(tClothing, tWashAble).
 mudSubclass(tNani, tCarryAble).
 mudSubclass(tBroccoli, tFood).
 mudSubclass(tFood,tEatAble).
@@ -67,9 +67,9 @@ mudSubclass(tFood, tItem).
 mudSubclass(tClothing, tItem).
 
 mudSubclass(tItem, tCarryAble).
-mudSubclass( tCarryAble, tDropable).
+mudSubclass( tCarryAble, tDropAble).
 
-mudSubclass( tCarryAble, tThrowable).
+mudSubclass( tCarryAble, tThrowAble).
 mudSubclass( tCarryAble, tCarryAble).
 
 mudSubclass(tPortableDevice,tCarryAble).
@@ -78,28 +78,28 @@ mudSubclass(tPajamas, tClothing).
 mudSubclass(tShirt, tClothing).
 mudSubclass(tCoat, tClothing).
 mudSubclass(tPants, tClothing).
-mudSubclass(tClothing, tFoldable).
+mudSubclass(tClothing, tFoldAble).
 mudSubclass(tClothing, tWearAble).
 
 mudSubclass(tCoffeeCup, tLiquidContainer).
-mudSubclass(tCoffeeCup, tDrinkable).
-mudSubclass(tCoffeeCup, tThrowable).
+mudSubclass(tCoffeeCup, tDrinkAble).
+mudSubclass(tCoffeeCup, tThrowAble).
 mudSubclass(tCoffee, tLiquid).
-mudSubclass(tBook, tReadable).
+mudSubclass(tBook, tReadAble).
 
 mudSubclass(tPillow, tBedding).
 mudSubclass(tBlanket, tBedding).                                                              
-mudSubclass(tBedding, tFoldable).
-mudSubclass(tFoldable, tCarryAble).
-mudSubclass(tThrowable, tCarryAble).
+mudSubclass(tBedding, tFoldAble).
+mudSubclass(tFoldAble, tCarryAble).
+mudSubclass(tThrowAble, tCarryAble).
 mudSubclass(tPortableDevice,tCarryAble).
 mudSubclass(tPortableDevice,tPhysicalDevice).
-mudSubclass(tPhysicalDevice,tUseable).
+mudSubclass(tPhysicalDevice,tUseAble).
 mudSubclass(tWearAble, tCarryAble).
 mudSubclass(tCarryAble,tCarryAble).
 mudSubclass(tFood,tCarryAble).
 mudSubclass(tCarryAble,tObj).
-mudSubclass(tPartofObj,tNotTakable).
+mudSubclass(tPartofObj,tNotTakAble).
 mudSubclass(tBodyPart,tPartofObj).
 
 
@@ -114,17 +114,17 @@ mudSubclass(tDresser, tBedRoomFurnature).
 mudSubclass(tWashingMachine, tDeviceFurnature).
 mudSubclass(tTable, tFurnature).
 
-mudSubclass(tTable, tFurnatureMoveable).
+mudSubclass(tTable, tFurnatureMoveAble).
 
 mudSubclass(tTable, tHasSurface).
 mudSubclass(tSofa, tLivingRoomFurnature).
 mudSubclass(tEasyChair, tLivingRoomFurnature).
-mudSubclass(tEasyChair, tSittable).
+mudSubclass(tEasyChair, tSitAble).
 mudSubclass(tCoffeeTable, tLivingRoomFurnature).
 mudSubclass(tBookcase, tWallFurnature).
 mudSubclass(tDrawer, tContainer).
-mudSubclass(tDrawer, tOpenable).
-mudSubclass(tDrawer, tCloseable).
+mudSubclass(tDrawer, tOpenAble).
+mudSubclass(tDrawer, tCloseAble).
 mudSubclass(tDrawer, tPartofFurnature).
 mudSubclass(tTopDrawer, tPartofFurnature).
 mudSubclass(tMiddleDrawer, tPartofFurnature).
@@ -145,7 +145,7 @@ mudSubclass(tKitchenSink,tKitchenFurnature).
 mudSubclass(tFridge,tKitchenFurnature).
 mudSubclass(tStove,tKitchenFurnature).
 mudSubclass(tKitchenCounter,tKitchenFurnature).
-mudSubclass(tFurnature,tOntoable).
+mudSubclass(tFurnature,tOntoAble).
 
 mudSubclass(tBathRoomFurnature,tFurnature).
 mudSubclass(tKitchenFurnature,tFurnature).
@@ -209,7 +209,7 @@ typeProps(tAgentGeneric,[predInstMax(mudHealth,500)]).
 
 % :-end_module_type(dynamic).
 
-typeProps(isSelf,Type,[mudNamed(isSelf),mudKwLabel(Lbl)|SP]):-  mudLabelTypeProps(Lbl,Type,SomeProps),nonvar(Type),flatten(SomeProps,SP).
+typeProps(isSelf,Type,[mudNamed(isSelf),glyphType(Lbl)|SP]):-  mudLabelTypeProps(Lbl,Type,SomeProps),nonvar(Type),flatten(SomeProps,SP).
 
 % Vacuum World example objects........
 mudLabelTypeProps(wl,tWall,[mudHeight(3),mudWeight(4)]).

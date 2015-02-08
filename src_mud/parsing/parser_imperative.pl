@@ -191,7 +191,7 @@ object_print_details0(Print,Agent,O,DescSpecs,Skipped):-
        forall(mudIsa(O,S),ignore((not(vtSkippedPrintNames(S)),object_print_details0(Print,Agent,S,DescSpecs,[O|Skipped])))))))).
 
 :-decl_type(ttTypeType).
-vtSkippedPrintNames(T):-ttFormatType(T).
+vtSkippedPrintNames(T):-p_is_ttFormatType(T).
 vtSkippedPrintNames(T):-mudIsa(T,ttTypeType).
 vtSkippedPrintNames(E):-member(E,[tObj,isSelf,the,is,tSpatialThing,ttNotSpatialType,ttSpatialType,prologHybrid,prologPTTP,prologOnly,tRelation,tPred,'',[]]).
 
@@ -388,7 +388,7 @@ is_counted_for_parse(I):-i_countable(I),not(excluded_in_parse(I)),!.
 
 excluded_in_parse(apathFn(_, _)).
 excluded_in_parse(I):-tCol(I).
-excluded_in_parse(I):-ttFormatType(I).
+excluded_in_parse(I):-p_is_ttFormatType(I).
 excluded_in_parse(I):-mpred_prop(_,predArgTypes(I)).
 excluded_in_parse(apathFn(_ = _)).
 
@@ -427,7 +427,7 @@ parseIsa_Call(FT, BO, CIn, D):- list_tail(CIn,D), to_word_list(CIn,C),!, parseIs
 % this parseIsa(T)-->parseIsa(T,_).
 parseIsa(A, B, C) :- parseIsa(A, _, B, C).
 
-is_parsable_type(T):-ttFormatType(T).
+is_parsable_type(T):-p_is_ttFormatType(T).
 is_parsable_type(T):-tCol(T).
 is_parsable_type(vp).
 
@@ -536,11 +536,11 @@ coerce(A,B,C):-no_repeats(coerce0(A,B,C)),(show_call_failure(mudIsa(C,B))->!;tru
 coerce0(String,Type,Inst):- var(Type),trace_or_throw(var_specifiedItemType(String,Type,Inst)).
 coerce0(String,isNot(Type),Inst):-!,not(coerce0(String,Type,Inst)).
 coerce0([String],Type,Inst):- nonvar(String),!,coerce0(String,Type,Inst).
-coerce0(String,Type,Inst):- ttFormatType(Type),checkAnyType(assert(actParse),String,Type,AAA),Inst=AAA.
+coerce0(String,Type,Inst):- p_is_ttFormatType(Type),checkAnyType(assert(actParse),String,Type,AAA),Inst=AAA.
 coerce0(Text,Type,Inst):- call_tabled_can(no_repeats_old(call_no_cuts(hook_coerce(Text,Type,Inst)))).
 %coerce0(String,Type,Longest) :- findall(Inst, (user:hook_coerce(Inst,Type,Inst),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
 coerce0(String,Type,Inst):- var(String),!,instances_of_type(Inst,Type),name_text(Inst,String).
-coerce0(String,Type,Inst):- not(ttFormatType(Type)),must(tCol(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
+coerce0(String,Type,Inst):- not(p_is_ttFormatType(Type)),must(tCol(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
 coerce0(String,Type,Inst):- not(string(String)),!,text_to_string(String,StringS),!,coerce0(StringS,Type,Inst).
 % coerce0(A,Type,AA):- correctAnyType(change(_,_),A,Type,AA).
 

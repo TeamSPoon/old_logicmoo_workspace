@@ -262,7 +262,7 @@ defined_affordance([subjType= "Container",stringMatch= "Plastic",actionVerb(2)="
 
 defined_affordance([subjType= "Table",
 stringMatch= " * Coffee Table",
-acceptsChild= tReadable,
+acceptsChild= tReadAble,
 acceptsChild= tEatAble,
 actionVerb(2)="Put_X_On"]).
 
@@ -273,20 +273,20 @@ defined_affordance([subjType= "Trash_Container",
    stringMatch= "waste",
    stringMatch= "recycle * bin",
    acceptsChild= "Take",
-   actionVerb(2)="Put_X_In",acceptsChild= takeable]).
+   actionVerb(2)="Put_X_In",acceptsChild= takeAble]).
 
 defined_affordance([subjType= "Bookcase",
 stringMatch= " * Bookcase",
 stringMatch= " * Bookshelf",
 stringMatch= " * Bookshelve",
-acceptsChild= tReadable,
+acceptsChild= tReadAble,
 actionVerb(2)="Put_X_On",
 textName= "Organize books",
 slAnim= anim_YES,
 'Fun'= 10 * 10,
 'Secure_Room'= 20 * 20]).
 
-defined_affordance([subjType= tReadable,
+defined_affordance([subjType= tReadAble,
 stringMatch= "Book",
 stringMatch= "Magazine",
 actionVerb= "Observe",
@@ -347,13 +347,13 @@ actionVerb= "Kiss",
 'Sad_To_Happy'= 10 * 10,
 'Fun'= 10 * 10]).
 
-defined_affordance([subjType= touchable,actionVerb= "Touch",
+defined_affordance([subjType= touchAble,actionVerb= "Touch",
 textName= "Touch",
 slGrab= true,
 'Fun'= 1 * 1,
 'Secure_Room'= 1 * 1]).
 
-defined_affordance([subjType= tSittable,actionVerb= "Sit",
+defined_affordance([subjType= tSitAble,actionVerb= "Sit",
 textName= "Sit on",
 slSit= true,
 slAnim= anim_SIT,
@@ -378,7 +378,7 @@ defined_affordance([subjType= tCarryAble,actionVerb= "Take",
 textName= "Take it",
 'slAcceptsParent'= "Avatar"]).
 
-defined_affordance([subjType= tLayable,actionVerb= "Sleep",
+defined_affordance([subjType= tLayAble,actionVerb= "Sleep",
    textName= "Lay on",
    slSit= true,
    slAnim= anim_SLEEP,
@@ -398,7 +398,7 @@ defined_affordance([alsoType= tLookAble,actionVerb= "Observe",
    'Fun'= 2 * 1,
    'Energy'= 0 * -1]).
 
-defined_affordance([subjType= tSittable,actionVerb= "Excersize",
+defined_affordance([subjType= tSitAble,actionVerb= "Excersize",
 textName= "Excersize",
 slAnim= animETWO_PUNCH,
 'Fun'= 10 * 10,
@@ -560,30 +560,30 @@ mudSubclass(tShelf,tHasSurface).
 mudSubclass(tCounter,tHasSurface).
 mudSubclass(tEatAble,tEatAble).
 mudSubclass(tBar,tHasSurface).
-mudSubclass(tSittable,tHasSurface).
+mudSubclass(tSitAble,tHasSurface).
 mudSubclass(tSofa,tCouch).
-mudSubclass(tCouch,tSittable).
-mudSubclass(tChair,tSittable).
-mudSubclass(tMattress,tLayable).
-mudSubclass(tLayable,tSittable).
+mudSubclass(tCouch,tSitAble).
+mudSubclass(tChair,tSitAble).
+mudSubclass(tMattress,tLayAble).
+mudSubclass(tLayAble,tSitAble).
 mudSubclass(tBed,tMattress).
-mudSubclass(tCrib,tLayable).
+mudSubclass(tCrib,tLayAble).
 mudSubclass(tHasSurface, tContainer).
-mudSubclass(tHasSurface, tPutTargetable).
-mudSubclass(tContainer, tPutTargetable).
+mudSubclass(tHasSurface, tPutTargetAble).
+mudSubclass(tContainer, tPutTargetAble).
 
 
 
 mudSubclass(tClothesDryer,tFurniture).
 mudSubclass(tWashingMachine,tFurniture).
 mudSubclass(tShower,tFurniture).
-mudSubclass(tSittable,tFurniture).
+mudSubclass(tSitAble,tFurniture).
 mudSubclass(tChair,tFurniture).
 mudSubclass(tBed,tFurniture).
 mudSubclass(tSink,tFurniture).
 mudSubclass(tToilet,tFurniture).
 mudSubclass(tBathTub,tFurniture).
-mudSubclass(tFurniture,tUseable).
+mudSubclass(tFurniture,tUseAble).
 mudSubclass(tFurniture,tObj).
 
 verb_alias("observe",actUse).
@@ -636,24 +636,24 @@ verb_desc(actOperate, tMicrowave, "see what was forgotten in the microwave").
 verb_desc(actOperate, tTreadmill, "Excersize with X").
 verb_desc(actOperate, tTreadmill, "Tread the mill").
 verb_desc(actOperate, tFixedLamp, "flip the switch").
-verb_desc(actOperate, tPooltable, "Play pool").
+verb_desc(actOperate, tPoolTable, "Play pool").
 verb_desc(actPutXOn, tBookcase, "Browse books").
-verb_desc(actObserve, tReadable, "Read book").
-verb_desc(actTake, tReadable, "Take the materials").
+verb_desc(actObserve, tReadAble, "Read book").
+verb_desc(actTake, tReadAble, "Take the materials").
 verb_desc(actEat, tEatAble, "Eat the food").
 verb_desc(actTake, tEatAble, "Take the food").
 verb_desc(actObserve, tArt, "Apreciate the Art").
 verb_desc(actOperate, tDanceFloor, "Dance! Dance!").
 verb_desc(actOperate, tComputer, "Look busy doing something!").
-verb_desc(actTouch, tTouchable, "Touch").
-verb_desc(actSit, tSittable, "Sit on").
+verb_desc(actTouch, tTouchAble, "Touch").
+verb_desc(actSit, tSitAble, "Sit on").
 verb_desc(actPutXOn, tHasSurface, "This is a Put_X_On placeholder").
 verb_desc(actEat, tEatAble, "Eat it").
 verb_desc(actTake, tCarryAble, "Take it").
-verb_desc(actSleep, tLayable, "Lay on").
+verb_desc(actSleep, tLayAble, "Lay on").
 verb_desc(actClean, tLookAble, "Clean").
 verb_desc(actObserve, tLookAble, "Observe").
-verb_desc(actExcersize, tSittable, "Excersize").
+verb_desc(actExcersize, tSitAble, "Excersize").
 verb_desc(actTickle, tAgentGeneric, "Play with").
 verb_desc(actSearch, tContainer, "Eat_from").
 verb_desc(actArgue, tAgentGeneric, "Argue").
@@ -721,8 +721,8 @@ verb_affordance(actClean, tToilet, mudHygiene, 1, 4).
 verb_affordance(actClean, tToilet, mudFun, 5, 4).
 verb_affordance(actPutXOn, tBookcase, mudFun, 10, 10).
 verb_affordance(actPutXOn, tBookcase, mudSecureRoom, 20, 20).
-verb_affordance(actObserve, tReadable, mudFun, 10, 10).
-verb_affordance(actObserve, tReadable, mudSecureRoom, 20, 20).
+verb_affordance(actObserve, tReadAble, mudFun, 10, 10).
+verb_affordance(actObserve, tReadAble, mudSecureRoom, 20, 20).
 verb_affordance(actObserve, tArt, mudFun, 10, 10).
 verb_affordance(actObserve, tArt, mudSecureRoom, 20, 20).
 verb_affordance(actTalk, tAgentGeneric, mudNonLonelinessSocial, 10, 15).
@@ -738,23 +738,23 @@ verb_affordance(actAttack, tAgentGeneric, mudFun, 20, 10).
 verb_affordance(actKiss, tAgentGeneric, mudNonLonelinessSocial, 10, 15).
 verb_affordance(actKiss, tAgentGeneric, mudSadToHappy, 10, 10).
 verb_affordance(actKiss, tAgentGeneric, mudFun, 10, 10).
-verb_affordance(actTouch, tTouchable, mudFun, 1, 1).
-verb_affordance(actTouch, tTouchable, mudSecureRoom, 1, 1).
-verb_affordance(actSit, tSittable, mudComfort, 1, 0).
-verb_affordance(actSit, tSittable, mudFun, 1, 1).
-verb_affordance(actSit, tSittable, mudSecureRoom, 1, 1).
+verb_affordance(actTouch, tTouchAble, mudFun, 1, 1).
+verb_affordance(actTouch, tTouchAble, mudSecureRoom, 1, 1).
+verb_affordance(actSit, tSitAble, mudComfort, 1, 0).
+verb_affordance(actSit, tSitAble, mudFun, 1, 1).
+verb_affordance(actSit, tSitAble, mudSecureRoom, 1, 1).
 verb_affordance(actPutXOn, tHasSurface, mudFun, -2, 2).
 verb_affordance(actPutXOn, tHasSurface, mudEnergy, 0, -1).
 verb_affordance(actEat, tEatAble, mudNonHunger, 100, 100).
 verb_affordance(actEat, tEatAble, mudHygiene, 0, -10).
-verb_affordance(actSleep, tLayable, mudComfort, 5, 5).
-verb_affordance(actSleep, tLayable, mudEnergy, 20, 20).
+verb_affordance(actSleep, tLayAble, mudComfort, 5, 5).
+verb_affordance(actSleep, tLayAble, mudEnergy, 20, 20).
 verb_affordance(actClean, tLookAble, mudFun, -2, 2).
 verb_affordance(actClean, tLookAble, mudEnergy, 0, -1).
 verb_affordance(actObserve, tLookAble, mudFun, 2, 1).
 verb_affordance(actObserve, tLookAble, mudEnergy, 0, -1).
-verb_affordance(actExcersize, tSittable, mudFun, 10, 10).
-verb_affordance(actExcersize, tSittable, mudHygiene, -10, -10).
+verb_affordance(actExcersize, tSitAble, mudFun, 10, 10).
+verb_affordance(actExcersize, tSitAble, mudHygiene, -10, -10).
 verb_affordance(actTickle, tAgentGeneric, mudEnergy, -10, -10).
 verb_affordance(actTickle, tAgentGeneric, mudFun, 20, 10).
 verb_affordance(actSearch, tContainer, mudHygiene, 0, -5).
@@ -768,7 +768,7 @@ verb_affordance(actThinkAbout, tLookAble, mudFun, 1, 2).
 
 :- dynamic verb_for_type/2.
 
-verb_for_type(actTravelThru, tPassable).
+verb_for_type(actTravelThru, tPassAble).
 verb_for_type(actObserve, tTelevision).
 verb_for_type(actBumpIntoBarrier, tFurniture).
 verb_for_type(actLiveAtLeastAMinute, tAgentSelf).
@@ -796,7 +796,7 @@ verb_for_type(actOperate, tStove).
 verb_for_type(actOperate, tMicrowave).
 verb_for_type(actOperate, tTreadmill).
 verb_for_type(actOperate, tFixedLamp).
-verb_for_type(actOperate, tPooltable).
+verb_for_type(actOperate, tPoolTable).
 verb_for_type(actPutXOn, tShelf).
 verb_for_type(actPutXOn, tDesk).
 verb_for_type(actPutXOn, tCounter).
@@ -804,8 +804,8 @@ verb_for_type(actPutXIn, tContainer).
 verb_for_type(actPutXOn, tTable).
 verb_for_type(actPutXIn, tTrashContainer).
 verb_for_type(actPutXOn, tBookcase).
-verb_for_type(actObserve, tReadable).
-verb_for_type(actTake, tReadable).
+verb_for_type(actObserve, tReadAble).
+verb_for_type(actTake, tReadAble).
 verb_for_type(actEat, tEatAble).
 verb_for_type(actTake, tEatAble).
 verb_for_type(actObserve, tArt).
@@ -815,15 +815,15 @@ verb_for_type(actTalk, tAgentGeneric).
 verb_for_type(actArgue, tAgentGeneric).
 verb_for_type(actAttack, tAgentGeneric).
 verb_for_type(actKiss, tAgentGeneric).
-verb_for_type(actTouch, tTouchable).
-verb_for_type(actSit, tSittable).
+verb_for_type(actTouch, tTouchAble).
+verb_for_type(actSit, tSitAble).
 verb_for_type(actPutXOn, tHasSurface).
 verb_for_type(actEat, tEatAble).
 verb_for_type(actTake, tCarryAble).
-verb_for_type(actSleep, tLayable).
+verb_for_type(actSleep, tLayAble).
 verb_for_type(actClean, tLookAble).
 verb_for_type(actObserve, tLookAble).
-verb_for_type(actExcersize, tSittable).
+verb_for_type(actExcersize, tSitAble).
 verb_for_type(actTickle, tAgentGeneric).
 verb_for_type(actSearch, tContainer).
 verb_for_type(actThinkAbout, tLookAble).

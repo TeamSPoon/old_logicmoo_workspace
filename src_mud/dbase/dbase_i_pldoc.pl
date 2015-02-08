@@ -141,7 +141,7 @@ to_tclass(F,F):- current_predicate(_:F/A),functor(P,F,A),(predicate_property(P,b
 to_tclass(F,F):-atom_string(F,S),string_lower(S,L),S\=L,!.
 
 
-to_tclass(Prop,New):- ttFormatType(Prop),ensure_starts_with_prefix(Prop,ft,New),!.
+to_tclass(Prop,New):- p_is_ttFormatType(Prop),ensure_starts_with_prefix(Prop,ft,New),!.
 to_tclass(Prop,New):- ttValueType(Prop),ensure_starts_with_prefix(Prop,vt,New),!.
 
 to_tclass(Prop,New):- mpred_arity(Prop,1),mpred_arity(Prop,tCol),ensure_starts_with_prefix(Prop,t,New),!.

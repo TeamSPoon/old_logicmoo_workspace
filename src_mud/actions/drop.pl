@@ -15,7 +15,7 @@
 
 :- register_module_type(mtCommand).
 
-vtActionTemplate(actDrop(tDropable)).
+vtActionTemplate(actDrop(tDropAble)).
 
 % Drop something
 user:agent_call_command(Agent,actDrop(Obj)) :-

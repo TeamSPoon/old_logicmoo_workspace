@@ -51,7 +51,7 @@ define_ft(M:F):- !, '@'(define_ft(F), M).
 define_ft(Spec):- compound(Spec),functor(Spec,F,_),!,define_ft_0(F),define_ft_0(Spec).
 define_ft(Spec):- loop_check(define_ft_0(Spec),true).
 
-not_ft(T):-nonvar(T),(T=tItem;T=tRegion;(not(ttFormatType(T)),transitive_subclass_or_same(T,tSpatialThing))).
+not_ft(T):-nonvar(T),(T=tItem;T=tRegion;(not(p_is_ttFormatType(T)),transitive_subclass_or_same(T,tSpatialThing))).
 
 define_ft_0(xyzFn):-!.
 define_ft_0(Spec):- hasInstance(ttFormatType,Spec),!.
@@ -69,7 +69,7 @@ assert_subclass(O,T):-assert_subclass_safe(O,T).
 
 :-dynamic_multifile_exported(assert_subclass_safe/2).
 assert_subclass_safe(O,T):-
-  ignore((nonvar(O),decl_type_safe(O),nonvar(T),decl_type_safe(T),nonvar(O),nop((not(ttFormatType(O)),not(ttFormatType(T)))),add(mudSubclass(O,T)))).
+  ignore((nonvar(O),decl_type_safe(O),nonvar(T),decl_type_safe(T),nonvar(O),nop((not(p_is_ttFormatType(O)),not(p_is_ttFormatType(T)))),add(mudSubclass(O,T)))).
 
 :-dynamic_multifile_exported(assert_isa_safe/2).
 assert_isa_safe(O,T):- ignore((nonvar(O),nonvar(T),decl_type_safe(T),assert_isa(O,T))).
@@ -108,7 +108,7 @@ assert_isa(I,T):- loop_check(assert_isa_lc(I,T),true).
 :-dynamic_multifile_exported(assert_isa_lc/2).
 % skip formatter cols
 assert_isa_lc(_I,T):- member(T,[ftString,ftAction,vtDirection,apathFn]),!.
-assert_isa_lc(I,T):- hotrace(ttFormatType(T)),(compound(I)->true;dmsg(once(dont_assert_is_ft(I,T)))),rtrace((ttFormatType(T))).
+assert_isa_lc(I,T):- hotrace(p_is_ttFormatType(T)),(compound(I)->true;dmsg(once(dont_assert_is_ft(I,T)))),rtrace((p_is_ttFormatType(T))).
 assert_isa_lc(I,T):- cannot_table_call(isa_asserted(I,T)),!.
 assert_isa_lc(_,T):- once(decl_type(T)),fail.
 assert_isa_lc(I,tCol):- decl_type(I),!.
@@ -223,7 +223,7 @@ isa_asserted_motel(I,T):-no_repeats_old(isa_asserted_0(I,T)).
 type_isa(Type,ttSpatialType):-arg(_,vv(tAgentGeneric,tItem,tObj,tRegion),Type),!.
 type_isa(ArgIsa,ttPredType):-is_pred_declarer(ArgIsa),!.
 type_isa(ftString,ttFormatType):-!.
-type_isa(Type,ttFormatType):-ttFormatType(Type),!. % text
+type_isa(Type,ttFormatType):-p_is_ttFormatType(Type),!. % text
 %  from name
 
 
@@ -475,7 +475,7 @@ disjointWith(A,B):- once((type_isa(A,AT),type_isa(B,BT))),AT \= BT.
 */
 user:goal_expansion(G,mudIsa(I,C)):-notrace((was_isa(G,I,C),(is_ftVar(C)->true;(not(mpred_prop(C,prologOnly)))))).
 user:term_expansion(G,mudIsa(I,C)):-notrace((was_isa(G,I,C),(is_ftVar(C)->true;(not(mpred_prop(C,prologOnly)))))).
-ttFormatType(I):- !,hasInstance(ttFormatType,I).
-ttFormatType(I):- dbase_t(mudFtInfo,I,_),!.
-ttFormatType(I):- dbase_t(mudSubclass,I,FT),I\=FT,ttFormatType(FT),!.
+p_is_ttFormatType(I):- !,hasInstance(ttFormatType,I).
+p_is_ttFormatType(I):- dbase_t(mudFtInfo,I,_),!.
+p_is_ttFormatType(I):- dbase_t(mudSubclass,I,FT),I\=FT,p_is_ttFormatType(FT),!.
 

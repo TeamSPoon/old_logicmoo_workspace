@@ -196,7 +196,7 @@ guessed_mpred_arity(_,2).
 
 suggestedType(Prop,N,_,argIsaFn(Prop, N),FinalType):- guessed_mpred_arity(Prop,N),i_name('vt',Prop,FinalType),!,must((decl_type(FinalType),assert_isa(FinalType,discoverableType))).
 suggestedType(Prop,N,_,_,FinalType):- guessed_mpred_arity(Prop,N),i_name('vt',Prop,FinalType),!,must((decl_type(FinalType),assert_isa(FinalType,discoverableType))).
-suggestedType( _ ,_,_ ,FinalType,FinalType):-atom(FinalType),tCol(FinalType),not(ttFormatType(FinalType)),!.
+suggestedType( _ ,_,_ ,FinalType,FinalType):-atom(FinalType),tCol(FinalType),not(p_is_ttFormatType(FinalType)),!.
 suggestedType( _ ,_,Possibles,_ ,FinalType):- member(FinalType,[tPred,tCol,ttFormatType,ftText,tRegion,tAgentGeneric,tItem,tObj,tSpatialThing]),member(FinalType,Possibles),!.
 
 deduce_argN(Prop,N,_,ObjectTypes,Type):- suggestedType(Prop,N,ObjectTypes,Type,FinalType),FinalType\=Type,assert_argIsa(Prop,N,FinalType).
@@ -233,7 +233,7 @@ violatesType(Value,ftInt):-number(Value),!,fail.
 violatesType(Value,Type):-atom(Type),isa_backchaing(Value,Type),!,fail.
 violatesType(Value,ftString):-string(Value),!,fail.
 %violatesType(apath(_,_),Type):-!,(Type\=tPathway,Type\=obj).
-violatesType(Value,Type):- compound(Type),!,ttFormatType(Type),not(term_is_ft(Value,Type)),!.
+violatesType(Value,Type):- compound(Type),!,p_is_ttFormatType(Type),not(term_is_ft(Value,Type)),!.
 violatesType(Value,Type):- once((isa_backchaing(Value,_))), no_loop_check(not(isa_backchaing(Value,Type))).
 
 user:decl_database_hook(Type,Changer):- retract(on_change_once(Type,Changer,Fact)),Fact.
@@ -311,7 +311,7 @@ type_w_defaults_asserted(Type):- is_asserted(mudLabelTypeProps(_,Type,_)),nonvar
 
 each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(instTypeProps(Inst,Type,TProps)),subst(TProps,isSelf,Inst,Prop),flatten([Prop],Props).
 each_default_inst_type_props(Inst,Type,Props):-call_no_cuts(typeProps(Type,TProps)),subst(TProps,isSelf,Inst,Prop),flatten([Prop],Props).
-each_default_inst_type_props(_,Type,[mudKwLabel(Lbl)|Props]):-call_no_cuts(mudLabelTypeProps(Lbl,Type,Props)).
+each_default_inst_type_props(_,Type,[glyphType(Lbl)|Props]):-call_no_cuts(mudLabelTypeProps(Lbl,Type,Props)).
 
 user:instTypeProps(apathFn(Region,_Dir),tPathway,[localityOfObject(Region)]).
 

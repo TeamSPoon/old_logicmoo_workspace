@@ -13890,95 +13890,95 @@ example(63) :-
 	defconcept(tBird,orM([sparrow,tEmu,tCuckoo])),
 	assert_ind(iTweety,tBird).
 %%% Example 64
-% deduce_M(mudIsa(iPeter,tLeftHandUsable))
-% deduce_M(mudIsa(iPeter,tRightHandUsable))
-% deduce_M(mudIsa(iPeter,tOneHandUsable))
+% deduce_M(mudIsa(iPeter,tLeftHandUseAble))
+% deduce_M(mudIsa(iPeter,tRightHandUseAble))
+% deduce_M(mudIsa(iPeter,tOneHandUseAble))
 % succeed
-% deduce_M(mudIsa(iPeter,tBothHandsUsable))
-% deduce_M(mudIsa(iPeter,isTDisjoint(tBothHandsUsable))
+% deduce_M(mudIsa(iPeter,tBothHandsUseAble))
+% deduce_M(mudIsa(iPeter,isTDisjoint(tBothHandsUseAble))
 % fail
 example(64) :-
 	makeEnvironment('ex64','Defaults and the lottery paradox'),
 	initEnvironment,	
-	defprimconcept(nafM(tLeftHandBroken),tLeftHandUsable),
-	defprimconcept(nafM(tRightHandBroken),tRightHandUsable),
+	defprimconcept(nafM(tLeftHandBroken),tLeftHandUseAble),
+	defprimconcept(nafM(tRightHandBroken),tRightHandUseAble),
 	defconcept(tOneHandBroken,orM([tLeftHandBroken,tRightHandBroken])),
-	defconcept(tOneHandUsable,orM([tLeftHandUsable,tRightHandUsable])),
-	defconcept(tBothHandsUsable,andM([tLeftHandUsable,tRightHandUsable])),
+	defconcept(tOneHandUseAble,orM([tLeftHandUseAble,tRightHandUseAble])),
+	defconcept(tBothHandsUseAble,andM([tLeftHandUseAble,tRightHandUseAble])),
 	assert_ind(iPeter,tOneHandBroken).
 %%% Example 65
-% deduce_M(mudIsa(iPeter,tLeftHandUsable))
-% can prove tLeftHandUsable by default because
+% deduce_M(mudIsa(iPeter,tLeftHandUseAble))
+% can prove tLeftHandUseAble by default because
 % cannot prove tLeftHandBroken because
 % can prove tOneHandBroken but
 % cannot prove isTDisjoint(tRightHandBroken) because
-% cannot prove tRightHandUsable because
+% cannot prove tRightHandUseAble because
 % can prove tRightHandBroken because
 % can prove tOneHandBroken andM
 % can prove isTDisjoint(tLeftHandBroken) because
-% can prove tLeftHandUsable by default because
+% can prove tLeftHandUseAble by default because
 % cannot prove tLeftHandBroken because the loop check prevents
 %                                     the application of any axiom
-% deduce_M(mudIsa(iPeter,tRightHandUsable))
-% deduce_M(mudIsa(iPeter,isTDisjoint(tBothHandsUsable))
+% deduce_M(mudIsa(iPeter,tRightHandUseAble))
+% deduce_M(mudIsa(iPeter,isTDisjoint(tBothHandsUseAble))
 % succeed
-% deduce_M(mudIsa(iPeter,tBothHandsUsable))
-% deduce_M(mudIsa(iPeter,tOneHandUsable))
-% cannot prove tOneHandUsable becauce
-% (cannot prove tLeftHandUsable because
+% deduce_M(mudIsa(iPeter,tBothHandsUseAble))
+% deduce_M(mudIsa(iPeter,tOneHandUseAble))
+% cannot prove tOneHandUseAble becauce
+% (cannot prove tLeftHandUseAble because
 %  can prove tLeftHandBroken because
 %  tOneHandBroken is a fact andM
 %  (can prove isTDisjoint(tRightHandBroken) because
-%   can prove tRightHandUsable by default because
+%   can prove tRightHandUseAble by default because
 %   cannot prove tRightHandBroken because
 %   can prove tOneHandBroken but 
 %   cannot prove isTDisjoint(tLeftHandBroken) because
-%   cannot prove tLeftHandUsable because the loop check prevents
+%   cannot prove tLeftHandUseAble because the loop check prevents
 %                                       the application of any axiom))
-% and it is also isTDisjoint possible possible to prove tRightHandUsable
+% and it is also isTDisjoint possible possible to prove tRightHandUseAble
 % for similar reasons
-% deduce_M(mudIsa(iPeter,isTDisjoint(tOneHandUsable)))
+% deduce_M(mudIsa(iPeter,isTDisjoint(tOneHandUseAble)))
 % fail
 example(65) :-
 	makeEnvironment('ex65','Defaults and the lottery paradox'),
 	initEnvironment,	
-	defprimconcept(nafM(tLeftHandBroken),tLeftHandUsable),
-	defprimconcept(nafM(tRightHandBroken),tRightHandUsable),
+	defprimconcept(nafM(tLeftHandBroken),tLeftHandUseAble),
+	defprimconcept(nafM(tRightHandBroken),tRightHandUseAble),
 	defconcept(tOneHandBroken,orM([tLeftHandBroken,tRightHandBroken])),
-	defconcept(tOneHandUsable,orM([tLeftHandUsable,tRightHandUsable])),
-	defconcept(tBothHandsUsable,andM([tLeftHandUsable,tRightHandUsable])),
-	defprimconcept(tLeftHandBroken,isTDisjoint(tLeftHandUsable)),
-	defprimconcept(tRightHandBroken,isTDisjoint(tRightHandUsable)),
+	defconcept(tOneHandUseAble,orM([tLeftHandUseAble,tRightHandUseAble])),
+	defconcept(tBothHandsUseAble,andM([tLeftHandUseAble,tRightHandUseAble])),
+	defprimconcept(tLeftHandBroken,isTDisjoint(tLeftHandUseAble)),
+	defprimconcept(tRightHandBroken,isTDisjoint(tRightHandUseAble)),
 	assert_ind(iPeter,tOneHandBroken).
 %%% Example 66
-% deduce_M(mudIsa(iPeter,tLeftHandUsable))
-% deduce_M(mudIsa(iPeter,tRightHandUsable))
-% deduce_M(mudIsa(iPeter,tOneHandUsable))
-% deduce_M(mudIsa(iPeter,isTDisjoint(tBothHandsUsable))
+% deduce_M(mudIsa(iPeter,tLeftHandUseAble))
+% deduce_M(mudIsa(iPeter,tRightHandUseAble))
+% deduce_M(mudIsa(iPeter,tOneHandUseAble))
+% deduce_M(mudIsa(iPeter,isTDisjoint(tBothHandsUseAble))
 % succeed
-% deduce_M(mudIsa(iPeter,tBothHandsUsable))
-% deduce_M(mudIsa(iPeter,isTDisjoint(tOneHandUsable)))
+% deduce_M(mudIsa(iPeter,tBothHandsUseAble))
+% deduce_M(mudIsa(iPeter,isTDisjoint(tOneHandUseAble)))
 % fail
 example(66) :-
 	makeEnvironment('ex66','Defaults and the lottery paradox'),
 	initEnvironment,	
-	defprimconcept(nafM(tLeftHandBroken),tLeftHandUsable),
-	defprimconcept(nafM(tRightHandBroken),tRightHandUsable),
+	defprimconcept(nafM(tLeftHandBroken),tLeftHandUseAble),
+	defprimconcept(nafM(tRightHandBroken),tRightHandUseAble),
 	defconcept(tOneHandBroken,orM([tLeftHandBroken,tRightHandBroken])),
-	defconcept(tOneHandUsable,orM([nafM(isTDisjoint(tLeftHandUsable)),nafM(isTDisjoint(tRightHandUsable))])),
-	defconcept(tBothHandsUsable,andM([tLeftHandUsable,tRightHandUsable])),
-	defprimconcept(tLeftHandBroken,isTDisjoint(tLeftHandUsable)),
-	defprimconcept(tRightHandBroken,isTDisjoint(tRightHandUsable)),
+	defconcept(tOneHandUseAble,orM([nafM(isTDisjoint(tLeftHandUseAble)),nafM(isTDisjoint(tRightHandUseAble))])),
+	defconcept(tBothHandsUseAble,andM([tLeftHandUseAble,tRightHandUseAble])),
+	defprimconcept(tLeftHandBroken,isTDisjoint(tLeftHandUseAble)),
+	defprimconcept(tRightHandBroken,isTDisjoint(tRightHandUseAble)),
 	assert_ind(iPeter,tOneHandBroken).
 %%% Example 67
 example(67) :-
 	makeEnvironment('ex67','Defaults and the lottery paradox'),
         initEnvironment,        
-        defprimconcept(nafM(tLeftHandBroken),tLeftHandUsable),
-        defprimconcept(nafM(tRightHandBroken),tRightHandUsable),
-        defprimconcept(tLeftHandBroken,isTDisjoint(tLeftHandUsable)),
-        defprimconcept(tRightHandBroken,isTDisjoint(tRightHandUsable)),
-        defconcept(tOneHandUsable,orM([tLeftHandUsable,tRightHandUsable])),
+        defprimconcept(nafM(tLeftHandBroken),tLeftHandUseAble),
+        defprimconcept(nafM(tRightHandBroken),tRightHandUseAble),
+        defprimconcept(tLeftHandBroken,isTDisjoint(tLeftHandUseAble)),
+        defprimconcept(tRightHandBroken,isTDisjoint(tRightHandUseAble)),
+        defconcept(tOneHandUseAble,orM([tLeftHandUseAble,tRightHandUseAble])),
         defconcept(tOneHandBroken,orM([tLeftHandBroken,tRightHandBroken])),
         defconcept(tBothHandsBroken,andM([tLeftHandBroken,tRightHandBroken])),
         assert_ind(iPeter,tOneHandBroken),
@@ -13986,11 +13986,11 @@ example(67) :-
 example(68) :-
 	makeEnvironment('ex68','Defaults and the lottery paradox'),
         initEnvironment,        
-        defprimconcept(nafM(tBOT),tLeftHandUsable),
-        defprimconcept(nafM(tBOT),tRightHandUsable),
-        defprimconcept(tLeftHandBroken,isTDisjoint(tLeftHandUsable)),
-        defprimconcept(tRightHandBroken,isTDisjoint(tRightHandUsable)),
-        defconcept(tOneHandUsable,orM([tLeftHandUsable,tRightHandUsable])),
+        defprimconcept(nafM(tBOT),tLeftHandUseAble),
+        defprimconcept(nafM(tBOT),tRightHandUseAble),
+        defprimconcept(tLeftHandBroken,isTDisjoint(tLeftHandUseAble)),
+        defprimconcept(tRightHandBroken,isTDisjoint(tRightHandUseAble)),
+        defconcept(tOneHandUseAble,orM([tLeftHandUseAble,tRightHandUseAble])),
         defconcept(tOneHandBroken,orM([tLeftHandBroken,tRightHandBroken])),
         defconcept(tBothHandsBroken,andM([tLeftHandBroken,tRightHandBroken])),
         assert_ind(iPeter,tOneHandBroken),

@@ -161,7 +161,7 @@ mudSubclass(tKnife,tItem).
 mudSubclass(tFood,tItem).
 
 
-%ttSpatialType(FT):- nonvar(FT),ttFormatType(FT),!,fail.
+%ttSpatialType(FT):- nonvar(FT),p_is_ttFormatType(FT),!,fail.
 %ttSpatialType(FT):- nonvar(FT),ttNotSpatialType(FT),!,fail.
 %ttSpatialType(tItem). %  col, formattype, 
 ttSpatialType(SubType):-member(SubType,[tAgentGeneric,tItem,tRegion]).
@@ -209,7 +209,7 @@ create_instance_now(What,Type,Props):-
 create_instance_0(What,Type,List):- (var(What);var(Type);var(List)),trace_or_throw((var_create_instance_0(What,Type,List))).
 create_instance_0(I,_,_):-is_creating_now(I),!.
 create_instance_0(I,_,_):-asserta_if_new(is_creating_now(I)),fail.
-create_instance_0(What,FormatType,List):- FormatType\==tCol, ttFormatType(FormatType),!,trace_or_throw(ttFormatType(FormatType,create_instance(What,FormatType,List))).
+create_instance_0(What,FormatType,List):- FormatType\==tCol, p_is_ttFormatType(FormatType),!,trace_or_throw(p_is_ttFormatType(FormatType,create_instance(What,FormatType,List))).
 create_instance_0(SubType,tCol,List):-decl_type(SubType),padd(SubType,List).
 
 ttSpatialType(tAgentGeneric).
@@ -294,7 +294,7 @@ create_instance_0(What,Type,Props):- leash(+call),trace,dtrace,trace_or_throw(dm
 %ttSpatialType(col).
 
 
-:-decl_mpred_hybrid(mudKwLabel(ftTerm,ftTerm)).
+:-decl_mpred_hybrid(glyphType(ftTerm,ftTerm)).
 :-decl_mpred_hybrid(mudOpaqueness(ftTerm,ftPercent)).
 typeProps(tRegion,mudOpaqueness(1)).
 typeProps(tObj,mudOpaqueness(100)).

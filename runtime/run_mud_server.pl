@@ -106,7 +106,7 @@ user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),s
 
 :- add_game_dir('../games/src_game_startrek',prolog_repl).
 
-:-prolog.
+% :-prolog.
 
 tAgentGeneric(iCommanderData66).
 mudIsa(iCommanderData66,'tMonster').

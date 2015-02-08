@@ -462,7 +462,7 @@ dynamic_safe(MFA):- with_mfa(MFA,dynamic_safe).
 :- meta_predicate(dynamic_safe(+,+,+)).
 :- module_transparent((((dynamic_safe)/3))).
 dynamic_safe(M,F,A):- functor(C,F,A),predicate_property(C,imported_from(system)),!,dmsg(warn(predicate_property(M:C,imported_from(system)))).
-dynamic_safe(M,F,A):- (static_predicate(M,F,A) -> dmsg(warn(not(M:dynamic(M:F/A)))) ; logOnErrorIgnore(M:dynamic(M:F/A))). % , warn_module_dupes(M,F,A).
+dynamic_safe(M,F,A):- (static_predicate(M,F,A) -> nop(dmsg(warn(not(M:dynamic(M:F/A))))) ; logOnErrorIgnore(M:dynamic(M:F/A))). % , warn_module_dupes(M,F,A).
 :-op(1150,fx,user:dynamic_safe).
 
 

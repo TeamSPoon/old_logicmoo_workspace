@@ -14,12 +14,12 @@
 
 predArgTypes(action_verb_useable(vtVerb,tCol,ftTerm(tPred),ftTerm(tPred),ftTerm(tPred))).
 
-mudSubclass(isEach('PortableObject','ProtectiveAttire',tStowable),tWieldAble).
-mudSubclass('FluidReservoir',tDrinkable).
+mudSubclass(isEach('PortableObject','ProtectiveAttire',tStowAble),tWieldAble).
+mudSubclass('FluidReservoir',tDrinkAble).
 mudSubclass(tWeapon,tWieldAble).
-mudSubclass(tContolDevice,tUsable).
-mudSubclass(tUsable,tWieldAble).
-mudSubclass(tStowable,tCarryAble).
+mudSubclass(tContolDevice,tUseAble).
+mudSubclass(tUseAble,tWieldAble).
+mudSubclass(tStowAble,tCarryAble).
 
 
 :-decl_mpred_hybrid(mudWielding/2).
@@ -31,7 +31,7 @@ mudPossess(A,O):-wearsClothing(A,O).
 
 prologMultiValued(wearsClothing(tAgentGeneric,tWearAble)).
 prologMultiValued(mudWielding(tAgentGeneric,tWieldAble)).
-prologMultiValued(mudStowing(tAgentGeneric,tStowable)).
+prologMultiValued(mudStowing(tAgentGeneric,tStowAble)).
 prologMultiValued(mudContains(tContainer,tObj)).
 genlPreds(wearsClothing,mudPossess).
 genlPreds(mudWielding,mudPossess).
@@ -45,8 +45,8 @@ genlInverse(mudContains,mudInsideOf).
 % action_verb_useable(Actionn,RequiredArg,AddedProp,PrecondProp,RemovedProp).
 action_verb_useable(actWear,tWearAble,wearsClothing,mudPossess,mudStowing).
 action_verb_useable(actWield,tWieldAble,mudWielding,mudPossess,mudStowing).
-action_verb_useable(actStow,tStowable,mudStowing,mudPossess,mudWielding).
-% action_verb_useable(actUse,mudUsing,tUsable,mudPossess,mudPossess).
+action_verb_useable(actStow,tStowAble,mudStowing,mudPossess,mudWielding).
+% action_verb_useable(actUse,mudUsing,tUseAble,mudPossess,mudPossess).
 
 
 user:action_info(Syntax,String):-

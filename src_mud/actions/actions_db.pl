@@ -96,7 +96,7 @@ end_of_file.
 %<domain name="fairytalecastle">
 %    <symbols>
 %      <predicates>
-%        takeable/1, complete ...
+%        takeAble/1, complete ...
 %      </predicates>
 %      <functions>
 %
@@ -142,7 +142,7 @@ look(agent(Agent),theme(Theme)) :- % -->
 % <!--
 take(agent(Agent),theme(Theme),source(Source)) :- % -->
 %       <preconds>
-	k(takeable(Theme)),
+	k(takeAble(Theme)),
 	k(accessible(Theme)),
 	notk(hold(Agent,Theme)),
 	k(hasdetail(Source,Theme)),
@@ -159,7 +159,7 @@ take(agent(Agent),theme(Theme),source(Source)) :- % -->
 % <!--
 take(agent(Agent),theme(Theme),source(Source)) :- % -->
 %       <preconds>
-	k(takeable(Theme)),
+	k(takeAble(Theme)),
 	k(accessible(Theme)),
 	notk(hold(Agent,Theme)),
 	k(hold(Source,Theme)),

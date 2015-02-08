@@ -34,7 +34,7 @@
 split_name_type(Suggest,InstName,Type):- must_det(split_name_type_0(Suggest,NewInstName,NewType)),!,must((NewInstName=InstName,NewType=Type)),!.
 
 split_name_type_0(S,P,C):- string(S),!,atom_string(A,S),split_name_type_0(A,P,C),!.
-split_name_type_0(FT,FT,ttFormatType):-ttFormatType(FT),dmsg(trace_or_throw(ttFormatType(FT))),fail.
+split_name_type_0(FT,FT,ttFormatType):-p_is_ttFormatType(FT),dmsg(trace_or_throw(p_is_ttFormatType(FT))),fail.
 split_name_type_0(T,T,C):- compound(T),functor(T,C,_),!.
 split_name_type_0(T,T,C):- notrace((once(atomic_list_concat_safe([CO,'-'|_],T)),atom_string(C,CO))).
 split_name_type_0(T,T,C):- notrace((atom(T),atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),catchv(number_codes(_,Digits),_,fail),atom_codes(CC,Type),!,i_name(t,CC,C))).
@@ -56,7 +56,7 @@ ft_info_how(FT,vFormatted(FT)):- mudFtInfo(FT,vFormatted).
 ft_info_how(FT,req(Info)):- mudFtInfo(FT,Info),Info\=vFormatted.
 
 trans_subft_info(FT,Info):-ft_info_how(FT,Info).
-trans_subft_info(FT,Info):-ttFormatType(FT),ft_info_how(Sub,Info),trans_subft(Sub,FT).
+trans_subft_info(FT,Info):-p_is_ttFormatType(FT),ft_info_how(Sub,Info),trans_subft(Sub,FT).
 trans_subft(FT,Sub):-mudSubclass(FT,Sub).
 trans_subft(FT,Sub):-mudSubclass(FT,A),mudSubclass(A,Sub).
 trans_subft(FT,Sub):-mudSubclass(FT,A),mudSubclass(A,B),mudSubclass(B,Sub).
@@ -112,8 +112,8 @@ argIsa_call(F,N,Type):- argIsa_call_1(F,N,Type),!.
 argIsa_known(F,N,Type):- argIsa_call_0(F,N,Type),!.
 argIsa_known(F,N,Type):- argIsa_asserted(F,N,Type),!.
 
-to_format_type(FT,FT):-ttFormatType(FT),!.
-to_format_type(FT,FT):-ttFormatType(FT),!.
+to_format_type(FT,FT):-p_is_ttFormatType(FT),!.
+to_format_type(FT,FT):-p_is_ttFormatType(FT),!.
 
 argIsa_ft(F,N,FTO):-argIsa_known(F,N,FT),to_format_type(FT,FTO),!.
 argIsa_ft(_,_,ftTerm).
@@ -389,7 +389,7 @@ correctAnyTypeOrFail(Op,A,Type,AA):- with_assertions(tlbugger:skipMust,checkAnyT
 
 
 :-decl_thlocal thlocal:can_coerce/1.
-correctType_gripe(Op,A,Fmt,AA):- ttFormatType(Fmt),!,trace_or_throw(correctType(is_ft_correctFormatType(Op,A,Fmt,AA))).
+correctType_gripe(Op,A,Fmt,AA):- p_is_ttFormatType(Fmt),!,trace_or_throw(correctType(is_ft_correctFormatType(Op,A,Fmt,AA))).
 correctType_gripe(Op,A,Type,AA):- fail,atom(Type),must_equals(A,AA),
       dmsg(todo(isa_assert_type(Type))),
       % decl_type(Type),
@@ -476,7 +476,7 @@ correctType(Op,Args,Types,NewArgs):-compound(Args), compound(Types),
    correctAnyType(Op,ArgsL,TypesL,NewArgsL).
 
 correctType(Op,A,Fmt,AA):- trans_subft_info(Fmt,Code),!,correctType(Op,A,Code,AA).
-correctType(Op,A,Super,AA):- ttFormatType(Super),req(mudSubclass(Sub,Super)),Sub\=Super,correctType(Op,A,Sub,AA).
+correctType(Op,A,Super,AA):- p_is_ttFormatType(Super),req(mudSubclass(Sub,Super)),Sub\=Super,correctType(Op,A,Sub,AA).
 
 correctType(Op,Arg,Props,NewArg):- compound(Props),
    Props=..[F|TypesL],
@@ -486,7 +486,7 @@ correctType(Op,Arg,Props,NewArg):- compound(Props),
 
 correctType(Op,A,T,AAA):-  compound(A),once(correctArgsIsa(Op,A,AA)),A\=AA,!,correctType(Op,AA,T,AAA).
 
-correctType(_O,A,Type,AA):-not(ttFormatType(Type)),tCol(Type),mudIsa(A,Type),!,must_equals(A,AA).
+correctType(_O,A,Type,AA):-not(p_is_ttFormatType(Type)),tCol(Type),mudIsa(A,Type),!,must_equals(A,AA).
 
 correctType(_Op,A,T,AA):- get_functor(A,F),resultIsa(F,T),must_det(A=AA),!.
 correctType(_Op,A,T,AA):- get_functor(A,F),formatted_resultIsa(F,T),must_det(A=AA),!.
@@ -553,7 +553,7 @@ nonusefull_deduction_type(ftVoprop).
 nonusefull_deduction_type(vtDirection).
 nonusefull_deduction_type(Type):-ttSpatialType(Type),!,fail.
 nonusefull_deduction_type(tObj).
-nonusefull_deduction_type(Type):-is_asserted(ttFormatType(Type)).
+nonusefull_deduction_type(Type):-is_asserted(p_is_ttFormatType(Type)).
 
 assert_deduced_arg_isa_facts(Fact):- !, ignore(((ground(Fact),forall(deduce_argIsa_facts(Fact,Arg,Type),add(mudIsa(Arg,Type)))))).
 

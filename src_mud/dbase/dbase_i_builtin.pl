@@ -230,7 +230,7 @@ tCol(macroDeclarer).
 %mpred(ArgTypes,PropTypes):-decl_mpred_prop(ArgTypes,PropTypes).
 % pddlSomethingIsa('NpcCol1012-Ensign732',['NpcCol1012',actor,'MaleAnimal']).
 
-:-dynamic_multifile_exported((mudNeedsLook/2)).
+:-decl_mpred_prolog((mudNeedsLook/2)).
 
 
 
@@ -358,11 +358,11 @@ mudSubclass(tRegion,tSpatialThing).
 mudSubclass(tObj,tSpatialThing).
 mudSubclass(tItem,tSpatialThing).
 
-mudSubclass(tDrinkable,tItem).
-mudSubclass(tPossessable,tItem).
-mudSubclass(tUseable,tItem).
+mudSubclass(tDrinkAble,tItem).
+mudSubclass(tCarryAble,tItem).
+mudSubclass(tUseAble,tItem).
 mudSubclass(tEatAble,tItem).
-mudSubclass(tChargeable,tItem).
+mudSubclass(tChargeAble,tItem).
 mudSubclass(tWearAble,tItem).
 
 
@@ -469,10 +469,10 @@ prologSingleValued(mudAgentTurnnum(tAgentGeneric,ftInt(0))).
 prologSingleValued(mudAgentTurnnum(tAgentGeneric,ftInt)).
 prologSingleValued(mudArmorLevel(tWearAble,ftInt)).
 prologSingleValued(mudAttack(tObj,ftInt)).
-prologSingleValued(mudEnergy(tChargable,ftInt(500))).
+prologSingleValued(mudEnergy(tChargeAble,ftInt(500))).
 prologSingleValued(mudEnergy(tObj,ftInt),[argSingleValueDefault(2,500)]).
-prologSingleValued(chargeCapacity(tChargable,ftInt)).
-prologSingleValued(mudEnergy(tChargable,ftInt)).
+prologSingleValued(chargeCapacity(tChargeAble,ftInt)).
+prologSingleValued(mudEnergy(tChargeAble,ftInt)).
 prologSingleValued(mudHealth(tObj,ftInt)).
 prologSingleValued(mudArmor(tObj,ftInt)).
 prologSingleValued(mudFacing(tObj,vtDirection(vNorth))).
@@ -485,7 +485,7 @@ prologSingleValued(location_center(tRegion,xyzFn(tRegion,ftInt,ftInt,ftInt))).
 prologSingleValued(mudMoveDist(tAgentGeneric,ftInt(1))).
 prologSingleValued(mudMoveDist(tAgentGeneric,ftNumber)).
 prologSingleValued(mudBareHandDamage(tAgentGeneric,ftDice)).
-prologSingleValued(mudLevelOf(tPossessable,ftInt)).
+prologSingleValued(mudLevelOf(tCarryAble,ftInt)).
 prologSingleValued(mudMaxHitPoints(tAgentGeneric,ftInt)).
 prologSingleValued(mudMaxHitPoints(tAgentGeneric,ftInt),[prologHybrid]).
 prologSingleValued(mudToHitArmorClass0(tAgentGeneric,ftInt)).
@@ -543,8 +543,8 @@ typeProps(tAgentGeneric,mudNeedsLook(vFalse)).
 
 tCol(ftVar).
 tCol(ftString).
-ttFormatType(ftVar).
-ttFormatType(ftString).
+p_is_ttFormatType(ftVar).
+p_is_ttFormatType(ftString).
 /*
 :-decl_mpred_prolog(ftVar/1).
 :-decl_mpred_prolog(ftString/1).
@@ -578,15 +578,15 @@ mudFtInfo(ftVar,prologCall(var(isSelf))).
 
 mudSubclass(tAgentGeneric,tSpatialThing).
 mudSubclass(tPathway,tDoor).
-mudSubclass(tChargeable,tItem).
+mudSubclass(tChargeAble,tItem).
 mudSubclass(tDoor,tItem).
-mudSubclass(tDrinkable,tItem).
+mudSubclass(tDrinkAble,tItem).
 mudSubclass(tEatAble,tItem).
 mudSubclass(tItem,tSpatialThing).
 mudSubclass(tObj,tSpatialThing).
-mudSubclass(tPossessable,tItem).
+mudSubclass(tCarryAble,tItem).
 mudSubclass(tRegion,tSpatialThing).
-mudSubclass(tUseable,tItem).
+mudSubclass(tUseAble,tItem).
 mudSubclass(tWearAble,tItem).
 
 disjointWith(tObj,tRegion).
@@ -595,7 +595,7 @@ mudIsa(vtDirection,ttValueType).
 mudSubclass(vtDirection,tTypevalue).
 
 
-ttFormatType(ftVoprop).
+p_is_ttFormatType(ftVoprop).
 %  subft(ftNumber,term).
 % subft(ftNumber,term).
 mudSubclass(ftPercent,ftNumber).
@@ -639,12 +639,12 @@ mudSubclass(discoverableType,tCol).
 discoverableType(vtTexture).
 discoverableType(vtSize).
 
-:-decl_mpred_hybrid(mudKwLabel,2).
+:-decl_mpred_hybrid(glyphType,2).
 :-decl_mpred_hybrid(argIsa/3).
 
 prologMultiValued(mudDescription(ftTerm,ftString)).
 prologMultiValued(mudKeyword(ftTerm,ftString)).
-prologMultiValued(mudKwLabel(ftTerm,ftString)).
+prologMultiValued(glyphType(ftTerm,ftString)).
 prologMultiValued(mudActAffect(tItem,vtVerb,ftTerm(ftVoprop))).
 prologMultiValued(mudMemory(tAgentGeneric,ftTerm)).
 prologMultiValued(typeGrid(tCol,ftInt,ftListFn(ftString))).
@@ -657,9 +657,9 @@ mudSubclass(tHumanPlayer,tPlayer).
 mudSubclass(tNpcPlayer,tPlayer).
 mudSubclass('MaleAnimal',tPlayer).
 mudSubclass('FemaleAnimal',tPlayer).
-mudSubclass(isEach('PortableObject','ProtectiveAttire','SomethingToWear'),tPossessable).
+mudSubclass(isEach('PortableObject','ProtectiveAttire','SomethingToWear'),tCarryAble).
 mudSubclass(isEach('ProtectiveAttire','SomethingToWear'),tWearAble).
-mudSubclass(tContolDevice,tChargable).
+mudSubclass(tContolDevice,tChargeAble).
 mudSubclass(vtPosture,vtVerb).
 
 

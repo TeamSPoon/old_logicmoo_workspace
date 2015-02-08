@@ -138,7 +138,7 @@ was_known_false(Fact):-is_known_false(Fact),doall(retract((is_known_false(_):-tr
 
 check_was_known_false(Fact):- ignore(((is_known_false(Fact),was_known_false(Fact)))).
 
-user:decl_database_hook(assert(_A_or_Z),mudLabelTypeProps(Lbl,T,Props)):- hooked_asserta(typeProps(T,[mudKwLabel(Lbl)|Props])).
+user:decl_database_hook(assert(_A_or_Z),mudLabelTypeProps(Lbl,T,Props)):- hooked_asserta(typeProps(T,[glyphType(Lbl)|Props])).
 
 user:decl_database_hook(assert(_A_or_Z),typeProps(T,_)):- decl_type_safe(T).
 
@@ -419,7 +419,7 @@ add(A):-trace_or_throw(fmt('add is skipping ~q.',[A])).
 add_fast(CO:-BODY):- BODY==true,!,add_fast(CO),!.
 add_fast(CO:-BODY):- dmsg(add_fast((CO:-BODY))),must_det((add_fast_unchecked((CO:-BODY)))),!.
 add_fast(Skipped):- ground(Skipped),implied_skipped(Skipped),!. %, dmsg(skip_add_fast(mudSubclass(CO,CO))).
-add_fast(grid_key(KW=COL)):- add_fast(typeProps(COL,[mudKwLabel(KW)])).
+add_fast(grid_key(KW=COL)):- add_fast(typeProps(COL,[glyphType(KW)])).
 add_fast(CO):- dmsg(add_fast(CO)),ignore((ground(CO),asserta(implied_dont_add(CO)))),!,must_det((add_fast_unchecked(CO), nop(xtreme_debug(ireq(CO)->true;dmsg(warn(failed_ireq(CO))))))),!.
 
 implied_skipped(mudSubclass(CO,CO)).

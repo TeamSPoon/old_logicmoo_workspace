@@ -27,8 +27,8 @@ action_removes_states(_Agent,List,Dels):-findall(A,member(A -> _,List),Dels).
 action_requires_states(_Agent,List,Preconds):-findall(A,(member(A,List),\+ functor(A,(->),_)),Preconds).
 
 
-user:action_rules(Agent,actUse,[Obj],[mudPossess(Agent,Obj),mudIsa(Obj,tUseable),mudStowing(Agent,Obj)->using(Agent,Obj)]).
-user:action_rules(Agent,actStow,[Obj],[mudPossess(Agent,Obj),mudIsa(Obj,tStowable),genlPreds(Using,'mudControls'),[Using,Agent,Obj]]->[mudStowing,Agent,Obj]).
+user:action_rules(Agent,actUse,[Obj],[mudPossess(Agent,Obj),mudIsa(Obj,tUseAble),mudStowing(Agent,Obj)->using(Agent,Obj)]).
+user:action_rules(Agent,actStow,[Obj],[mudPossess(Agent,Obj),mudIsa(Obj,tStowAble),genlPreds(Using,'mudControls'),[Using,Agent,Obj]]->[mudStowing,Agent,Obj]).
 
 % Use something
 user:agent_call_command(Agent,ACT) :-

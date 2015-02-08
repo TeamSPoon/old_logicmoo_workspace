@@ -20,7 +20,7 @@
 :- register_module_type(mtCommand).
 
 % actPut
-user:action_info(actPut(tThrowable,txtPrepSpatial,tPutTargetable),"actPut [obj] [onto|inside] [somewhere]").
+user:action_info(actPut(tThrowAble,txtPrepSpatial,tPutTargetAble),"actPut [obj] [onto|inside] [somewhere]").
 
 verb_alias(set,actPut).
 verb_alias(place,actPut).
@@ -31,7 +31,7 @@ verb_alias(stow,actPut).
 %targeted
 user:agent_call_command(_Agent,actPut(Other,_Prep,Where)):-
    coerce(Other,tObj,Target),
-   coerce(Where,tPutTargetable,Location),
+   coerce(Where,tPutTargetAble,Location),
    clr(localityOfObject(Target,_)),
    clr(mudAtLoc(Target,_)),
    to_3d(Location,Where3D),
