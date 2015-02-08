@@ -89,9 +89,11 @@ add_storage_stub(StubType,Head,PHead,F,_):-
          must_same_clauses(Head,HBLIST))),
          must(must_have_storage_stub(StubType,Head)).
 
-
-must_same_clauses(Head,HBLIST):-
-   provide_clauses_list(Head,NEWHBLIST),
+renumbervarZ(G,GGG):-copy_term(G,GG),unnumbervars(GG,GGG),numbervars(GGG,0,_).
+must_same_clauses(Head,HBLISTN):-
+   provide_clauses_list(Head,NEWHBLISTN),
+   maplist(renumbervarZ,HBLISTN,HBLIST),
+   maplist(renumbervarZ,NEWHBLISTN,NEWHBLIST),
    sort(NEWHBLIST,NEWHBLISTS),
    sort(HBLIST,HBLISTS),
    length(NEWHBLIST,LN),
@@ -234,8 +236,8 @@ database_f_modify0(retract(one),G):- !,must((retract(G),expire_post_retract(G)).
 */
 
 database_check(P,M:G):-nonvar(M),!,database_check(P,G).
-%database_check(clause_asserted,G):-!,was_isa(G,I,C),moo:hasInstance_dyn(C,I),!.
-%database_check(mpred_asserted,G):-!,was_isa(G,I,C),moo:hasInstance_dyn(C,I),!.
+%database_check(clause_asserted,G):-!,was_isa(G,I,C),moo:user:hasInstance_dyn(C,I),!.
+%database_check(mpred_asserted,G):-!,was_isa(G,I,C),moo:user:hasInstance_dyn(C,I),!.
 database_check(OP,HeadBody):- current_predicate(get_mpred_storage_provider/3),
   one_must(show_call_failure(get_mpred_storage_provider(OP,HeadBody,StubType)),StubType=prologOnly),
   call_provided_mpred_storage_op(OP,HeadBody,StubType).

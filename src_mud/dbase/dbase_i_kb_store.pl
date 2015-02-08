@@ -145,12 +145,12 @@ into_mpred_form6(C,mudIsa,_,2,_,C):-!.
 into_mpred_form6(_X,dbase_t,P,_N,A,O):-!,(atom(P)->O=..[P|A];O=..[dbase_t,P|A]).
 into_mpred_form6(G,F,_,_,_,G):-mpred_stubtype(F,prologHybrid),!.
 into_mpred_form6(G,F,_,_,_,G):-mpred_stubtype(F,prologOnly),!.
-into_mpred_form6(G,F,_,_,_,G):-dmsg(warn(unknown_mpred_type(F,G))).
+into_mpred_form6(G,F,_,_,_,G):-nop(dmsg(warn(unknown_mpred_type(F,G)))).
 /*
 
 % into_mpred_form(H,_,_,_,_,GO):- call(once((expand_term( (H :- true) , C ), reduce_clause(C,G)))),expanded_different(H,G),!,into_mpred_form(G,GO),!.
 into_mpred_form(G,_,_,1,_,G):-predicate_property(G,number_of_rules(N)),N >0, !.
-into_mpred_form(G,F,C,1,_,O):-predicate_property(G,built_in),!,into_mpred_form(C,OO),O=..[F,OO].
+into_mpred_form(G,F,C,1,_,O):-real_builtin_predicate(G),!,into_mpred_form(C,OO),O=..[F,OO].
 
 into_mpred_form(C,_,_,_,_,mudIsa(I,T)):-was_isa(C,I,T),!.
 into_mpred_form(_X,H,P,_N,A,O):-is_holds_false(H),(atom(P)->(G=..[P|A],O=not(G));O=..[holds_f,P|A]).
@@ -189,7 +189,7 @@ cant_be_col('ensure_loaded').
 cant_be_col(C):-mpred_prop(C,prologOnly),!.
 cant_be_col('declare_load_game').
 cant_be_col('user_ensure_loaded').
-cant_be_col(C):-atom(C),functor(G,C,1),predicate_property(G,built_in),!.
+cant_be_col(C):-atom(C),functor(G,C,1),real_builtin_predicate(G),!.
 cant_be_col(C):-user:hasInstance_dyn(tCol,C),!,fail.
 cant_be_col('meta_predicate').
 /*

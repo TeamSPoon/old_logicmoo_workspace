@@ -163,7 +163,9 @@ holds_t(CALL):- '=..'(CALL,PLIST),holds_t(PLIST).
 
 holds_plist_t(P,LIST):- apply(holds_t,[P|LIST]).
 
-
+% ========================================
+% decl_mpred_hybrid/1/2/3
+% ========================================
 
 :-op(0,fx,((decl_mpred_hybrid))).
 :-dynamic_multifile_exported((decl_mpred_hybrid)/1).
@@ -333,6 +335,7 @@ provide_mpred_setup(OP,Head,StubType,OUT):- sanity(var(OUT)),
   must_det_l(( get_pifunctor(Head,PHead,F,A),  
    show_call(provide_clauses_list(PHead,HBLIST)),
    user:dynamic_safe(F/A),
+   unlock_predicate(PHead),
    abolish(F,A),user:dynamic_safe(F/A),
    asserta_if_new(mpred_prop(F,StubType)),
    call((asserta_if_new(mpred_prop(F,hasStub(StubType))))),   
@@ -385,7 +388,8 @@ call_for_literal_ideep_lc(HEAD):- get_functor(HEAD,F,A),call_for_literal_db(F,A,
 
 call_for_literal_db0(F,A,HEAD):-no_repeats_av(HEAD,call_for_literal_db00(F,A,HEAD)).
 
-call_for_literal_db00(F,A,HEAD):- is_asserted_dbase_t(HEAD).
+:- style_check(-singleton).
+call_for_literal_db00(_,_,HEAD):- is_asserted_dbase_t(HEAD).
 call_for_literal_db00(F,_,   _):- ttCompleteExtentAsserted(F),!,fail.
 call_for_literal_db00(F,A,HEAD):- loop_check(call_rule_db(F,A,HEAD)).
 call_for_literal_db00(F,A,HEAD):- not(use_pttp),HEAD=..[P1,A1,A2],dif(P2,P1),loop_check_term(is_asserted_dbase_t(genlPreds(P2,P1)),gp(P1),fail),
@@ -395,6 +399,8 @@ call_for_literal_db00(F,A,HEAD):- not(use_pttp),HEAD=..[P1,A1,A2],dif(P2,P1),loo
 call_rule_db(F,A,HEAD):- mudIsa(F,ttCompleteExtentAsserted),!,fail.
 call_rule_db(F,A,HEAD):- use_pttp,!,snark_ask(HEAD).
 call_rule_db(F,A,HEAD):- ruleHybridChain(HEAD,BODY),call_mpred_body(HEAD,BODY).
+
+:- style_check(+singleton).
 
 call_mpred_body(_,true):-!.
 call_mpred_body(HEAD,and(A,B)):- !,call_mpred_body(HEAD,A),!,call_mpred_body(HEAD,B).

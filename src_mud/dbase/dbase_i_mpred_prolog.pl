@@ -55,11 +55,16 @@ decl_mpred_prolog(P):- with_pi(P,decl_mpred_prolog).
 decl_mpred_prolog(M,PI,F/A):- 
  decl_mpred_prolog(_,M,PI,F/A).
 
+decl_mpred_prolog(F,A):- integer(A),!,decl_mpred_prolog(F/A).
+decl_mpred_prolog(F,Other):- 
+     decl_mpred(F,Other),
+     decl_mpred_prolog(F).
+
 :-dynamic_multifile_exported(decl_mpred_prolog/4).
 decl_mpred_prolog(CM,M,PI,FA):- loop_check(must(decl_mpred_prolog_lc(CM,M,PI,FA)),true).
 
 decl_mpred_prolog_lc(CM,M,PI,F/A):-
-      dynamic_multifile_exported(CM,M,PI,F/A),
+      decl_mpred_prolog(CM,M,PI,F/A),
       assert_if_new(mpred_prop(F,prologOnly)),
       assert_if_new(mpred_arity(F,A)),
       assert_arity(F,A),
@@ -79,7 +84,7 @@ decl_mpred_prolog_lc(CM,M,PI,F/A):-
 
 user_dynamic_multifile_exported(_):- dbase_mod(user),!.
 user_dynamic_multifile_exported(Prop/Arity):- 
-   dbase_mod(M), '@'( M:dynamic_multifile_exported(Prop/Arity) , M).
+   dbase_mod(M), '@'( M:decl_mpred(Prop/Arity) , M).
 
 
 provide_mpred_read_attributes(Obj,PropVal):- fail, safe_univ(PropVal,[Prop,NonVar|Val]),safe_univ(CallVal,[Prop,Obj,NonVar|Val]),
@@ -92,7 +97,7 @@ provide_mpred_read_attributes(F,A,Why):-functor_safe(P,F,A),provide_mpred_read_a
 
 provide_mpred_read_attributes(P,F,A,static_predicate(P)):-static_predicate(user,F,A).
 provide_mpred_read_attributes(P,_,_,predicate_property(P,foreign)):-predicate_property(P,foreign),!.
-provide_mpred_read_attributes(P,_,_,predicate_property(P,built_in)):-predicate_property(P,built_in),!.
+provide_mpred_read_attributes(P,_,_,predicate_property(P,built_in)):-real_builtin_predicate(P),!.
 provide_mpred_read_attributes(P,_,_,predicate_property(P,imported_from(system))):-predicate_property(P,imported_from(system)).
 
 %retract_all((H:-B)) :-!, forall(clause(H,B,Ref),erase(Ref)).
@@ -133,12 +138,13 @@ provide_mpred_storage_op(retract(How),Head,prologOnly,CALL):-
 
 provide_mpred_storage_op(How,Head,prologOnly,CALL):- 
  transitive(how_to_op,How,OP),
- wdmsg(provide_mpred_storage_op(How,Head,prologOnly,defined(OP))),
+ wdmsg(provide_mpred_storage_op(How,Head,prologOnly,declared(OP))),
  CALL = call_wdmsg(OP,Head).
 
 transitive(X,A,B):- (call(X,A,R) -> ( R\=@=A -> transitive(X,R,B) ; B=R); B=A).
 
 
+how_to_op(change(OP,HOW),O):- !, O=..[OP,HOW].
 how_to_op(assert(a),asserta_new).
 how_to_op(assert(z),assertz_if_new).
 how_to_op(retract(one),retract).
@@ -148,6 +154,8 @@ how_to_op(asserta,asserta_new).
 how_to_op(assertz,assertz_if_new).
 how_to_op(call(_),call).
 how_to_op(assert,assert_if_new).
+how_to_op(assert(add),asserta_new).
+how_to_op(retract(_),retract_all).
 how_to_op(HowOP,HowOP).
 
 

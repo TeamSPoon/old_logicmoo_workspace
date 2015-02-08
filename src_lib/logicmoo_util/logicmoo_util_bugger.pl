@@ -365,14 +365,13 @@ slow_sanity(C):-  sanity(C),!. %  ( tlbugger:skip_use_slow_sanity ; must_det(C))
 :-meta_predicate(sanity(0)).
 
 % sanity is used for type checking (is not required)
-%sanity(Call):-bugger_flag(release,true),!,assertion(Call).
-%sanity(Call):-one_must(Call,will_debug_else_throw(sanity(Call),Call)),!.
+sanity(Call):-bugger_flag(release,true),!,assertion(Call).
 sanity(MCall):- 
  strip_module(MCall,M,Call),
  (
-  '@'(catch(Call,E,(wdmsg(must_ex(E:Call)),debug,rtrace((leash(+exception),Call)),dtrace(Call))),M) 
+  '@'(catch(Call,E,(wdmsg(sanity_ex(E:Call)),debug,rtrace((leash(+exception),Call)),dtrace(Call))),M) 
   *-> true ; 
-  '@'((notrace((ignore(ftrace(Call)),leash(+all),repeat,wdmsg(must_failed(Call)))),dtrace(Call)),M)).
+  '@'((notrace((ignore(ftrace(Call)),leash(+all),repeat,wdmsg(sanity_failed(Call)))),dtrace(Call)),M)).
 
 
 % -- CODEBLOCK
@@ -382,7 +381,7 @@ sanity(MCall):-
 must(MCall):- 
  strip_module(MCall,M,Call),
  (
-  '@'(catch(Call,E,(wdmsg(must_ex(E:Call)),debug,rtrace((leash(+exception),Call)),dtrace(Call))),M) 
+  '@'(catch(Call,E,(dumpST,wdmsg(must_ex(E:Call)),debug,rtrace((leash(+exception),Call)),dtrace(Call))),M) 
   *-> true ; 
   '@'((notrace((ignore(ftrace(Call)),leash(+all),repeat,wdmsg(must_failed(Call)))),dtrace(Call)),M)).
 
@@ -1769,14 +1768,15 @@ kill_term_expansion:-
 
 local_predicate(_,_/0):-!,fail.
 local_predicate(_,_/N):-N>7,!,fail.
-local_predicate(P,_):-predicate_property(P,built_in),!,fail.
+local_predicate(P,_):-real_builtin_predicate(P),!,fail.
 local_predicate(P,_):-predicate_property(P,imported_from(_)),!,fail.
 %local_predicate(P,_):-predicate_property(P,file(F)),!,atom_contains666(F,'aiml_'),!.
 local_predicate(P,F/N):-functor_safe(P,F,N),!,fail.
 
 %atom_contains666(F,C):- hotrace((atom(F),atom(C),sub_atom(F,_,_,_,C))).
 
-
+real_builtin_predicate(G):- predicate_property(G,foreign),!.
+real_builtin_predicate(G):- (predicate_property(G,built_in),(functor(G,F,_),not(user:mpred_prop(F,prologHybrid)))).
 
 will_debug_else_throw(E,Goal):- dmsg(bugger(will_debug_else_throw(E,Goal))),grtrace,Goal.
 

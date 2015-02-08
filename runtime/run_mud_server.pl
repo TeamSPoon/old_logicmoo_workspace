@@ -4,10 +4,13 @@
 */
 
 :- multifile(user:mud_regression_test/0).
+
+/*
 :- multifile(user:mudIsa/2).
 :- dynamic(user:mudIsa/2).
 :-import(user:mudIsa/2).
 '$toplevel':mudIsa(X,Y):-user:mudIsa(X,Y).
+*/
 
 :- set_prolog_flag(generate_debug_info, true).
 :- exists_directory(runtime)->working_directory(_,runtime);(exists_directory('../runtime')->working_directory(_,'../runtime');true).
@@ -16,10 +19,13 @@
 :- '@'(ensure_loaded('../src_lib/logicmoo_util/logicmoo_util_all'),user).
 
 :- include(logicmoo(vworld/moo_header)).
+'$toplevel':mudIsa(X,Y):-'user':mudIsa(X,Y).
 
 :- '@'(if_file_exists(user_ensure_loaded(logicmoo('../externals/MUD_XperiMental/snark/snark_in_prolog'))),'user').
 /*
 else
+
+    decl_mpred_stubcol_lc(mudIsa,2,prologHybrid).
 
 % -- CODEBLOCK
 :-export(is_ftVar/1).
@@ -100,13 +106,15 @@ user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),s
 
 :- add_game_dir('../games/src_game_startrek',prolog_repl).
 
+:-prolog.
+
 tAgentGeneric(iCommanderData66).
 mudIsa(iCommanderData66,'tMonster').
 mudIsa(iCommanderData66,'tExplorer').
 wearsClothing(iCommanderData66,'iBoots673').
 wearsClothing(iCommanderData66,'iComBadge674').
 wearsClothing(iCommanderData66,'iGoldUniform675').
-mudStowing(iCommanderData6,'iPhaser676').
+mudStowing(iCommanderData66,'iPhaser676').
 pddlSomethingIsa('iBoots673',['tBoots','ProtectiveAttire','PortableObject','SomethingToWear']).
 pddlSomethingIsa('iComBadge674',['tComBadge','ProtectiveAttire','PortableObject','tNecklace']).
 pddlSomethingIsa('iGoldUniform675',['tGoldUniform','ProtectiveAttire','PortableObject','SomethingToWear']).
@@ -123,7 +131,8 @@ pddlSomethingIsa('iBoots7773',['tBoots','ProtectiveAttire','PortableObject','Som
 pddlSomethingIsa('iComBadge7774',['tComBadge','ProtectiveAttire','PortableObject','tNecklace']).
 pddlSomethingIsa('iGoldUniform7775',['tGoldUniform','ProtectiveAttire','PortableObject','SomethingToWear']).
 pddlSomethingIsa('iPhaser7776',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','SomethingToWear']).
-
+mudIsa(iExplorer77,'tExplorer').
+localityOfObject(iExplorer77,'tLivingRoom').
 
 % [Manditory] This loads the game and initializes so test can be ran
 
