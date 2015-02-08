@@ -9,10 +9,10 @@
 :-swi_module(moo_loader, []).
 
 :-dynamic(registered_game_file/1).
-:-dynamic_multifile_exported(declare_load_game/1).
+:-decl_mpred_prolog(declare_load_game/1).
 declare_load_game(Spec):- forall(filematch(Spec,File),show_call(asserta_if_new(registered_game_file(File)))).
 
-:-dynamic_multifile_exported(load_game_files/0).
+:-decl_mpred_prolog(load_game_files/0).
 load_game_files :- forall(registered_game_file(File),ensure_plmoo_loaded(File)).
 
 :-dynamic thglobal:current_world/1.
@@ -106,7 +106,7 @@ load_game_name_stream(_Name):- repeat,read_one_term(Term),myDebugOnError(add_ter
 load_game_name_stream(_Name,Stream):- repeat,read_one_term(Stream,Term),myDebugOnError(add_term(Term)),Term == end_of_file,!.
 
 add_term(':-'(dynamic(F/A))):-assert_arity(F,A),!.
-add_term(A):-must(add(A)).
+add_term(A):-must(fast_add(A)).
 
 myDebugOnError(Term):-catch(once((call(Term))),E,(dmsg(error(E,start_myDebugOnError(Term))),trace,rtrace(call(Term)),dmsginfo(stop_myDebugOnError(E=Term)),trace)).
 
@@ -133,7 +133,7 @@ finish_processing_world :- load_game_files, loop_check_local(with_assertions(thl
 doall_and_fail(Call):- time_call(once(doall(Call))),fail.
 
 
-:-dynamic_multifile_exported(etrace/0).
+:-decl_mpred_prolog(etrace/0).
 etrace:-leash(-all),leash(+exception),trace.
 
 current_filesource(F):-seeing(X),stream_property(X,file_name(F)).
@@ -263,7 +263,7 @@ add_description(mudDescription(I,S)):-add_description(I,S).
 :-meta_predicate_transparent(add_description/2).
 add_description(A,S0):-hooked_assertz(mudDescription(A,S0)),fail.
 add_description(A,S0):- atomic(S0),string_concat('#$PunchingSomething ',S,S0),!,add_description(A,S).
-% add_description(A,S0):-determinerRemoved(S0,String,S),!,add_description(A,S),add(determinerString(A,String)).
+% add_description(A,S0):-determinerRemoved(S0,String,S),!,add_description(A,S),fast_add(determinerString(A,String)).
 add_description(A,S0):-
    any_to_string(S0,S),
    atomic_list_concat(Words,' ',S),
@@ -308,11 +308,12 @@ add_description_word(A,Word):- string_lower(Word,Lower),fast_add((mudKeyword(A,L
 
 add_description_kv(A,K,V):- atom_concat('#$PunchingSomething ',Key,K),!,add_description_kv(A,Key,V).
 add_description_kv(A,K,V):- atom_concat('+',Key,K),!,add_description_kv(A,Key,V).
-add_description_kv(A,K,V):-atom_to_value(V,Term),C=..[K,A,Term],show_load_call(add(C)).
+add_description_kv(A,K,V):-atom_to_value(V,Term),C=..[K,A,Term],show_load_call(fast_add(C)).
 
 
 % =======================================================
 
+fast_add(pddlPredicates(List)):- !, with_assert_op_override(change(assert,one),maplist(decl_mpred,List)).
 fast_add(C):- correctArgsIsa(change(assert,add),C,CC),!, add(CC),!.
 
 show_load_call(C):- 
