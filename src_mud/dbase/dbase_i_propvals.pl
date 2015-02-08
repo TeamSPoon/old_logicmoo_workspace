@@ -41,7 +41,7 @@ infSecondOrder :- not(thlocal:infInstanceOnly(_)).
 infThirdOrder :- fail, infSecondOrder, not(thlocal:noRandomValues(_)).
 
 
-:- dynamic_multifile_exported(transitive_other/4).
+:- decl_mpred_prolog(transitive_other/4).
 
 choose_val(Prop,Obj,Value):- thlocal:useOnlyExternalDBs,!, body_call_cyckb(dbase_t(Prop,Obj,Value)).
 choose_val(Prop,Obj,Value):- var(Obj),nonvar(Value),!,mdif(Obj,Value),is_asserted(dbase_t(Prop,Obj,Value)).
@@ -62,7 +62,7 @@ choose_right(Prop,Obj,Value):- findall(Obj,generate_candidate_arg_values(Prop,1,
 choose_right(Prop,Obj,Value):- dmsg(var_choose_right(Prop,Obj,Value)),!,dtrace,is_asserted(dbase_t(Prop,Obj,Value)).
 choose_right(Prop,Obj,Value):- choose_for(Prop,Obj,RValue),RValue=Value.
 
-:-dynamic_multifile_exported(choose_for/3).
+:-decl_mpred_prolog(choose_for/3).
 
 choose_for(mudAtLoc,Obj,_):-nonvar(Obj),isa_asserted(Obj,tRegion),!,fail.
 choose_for(Prop,Obj,Value):- var(Obj),trace_or_throw(var_choose_for(Prop,Obj,Value)).
@@ -92,7 +92,7 @@ choose_asserted_mid_order_all(Prop,Obj,_Value):- atom(Prop), Fact=.. [Prop,Obj,_
 choose_asserted_mid_order_all(Prop,Obj,Value):- is_asserted(genlPreds(Other,Prop)),choose_asserted(Other,Obj,Value).
 % choose_asserted_mid_order_all(Prop,Obj,Value):- is_asserted(genlInverse(Prop,Other)),choose_val(Other,Value,Obj).
 
-:-dynamic_multifile_exported(create_someval/3).
+:-decl_mpred_prolog(create_someval/3).
 create_someval(Prop,Obj,Value):- ground(Prop-Obj-Value),!,dmsg(error_create_someval(Prop,Obj,Value)).
 create_someval(Prop,Obj,Value):- into_mpred_form(dbase_t(Prop,Obj,Value),Fact),asserted_or_deduced(Fact),!.
 create_someval(Prop,Obj,Value):- into_mpred_form(dbase_t(Prop,Obj,Value),Fact),not(test_tl(thlocal:noRandomValues,Fact)),create_random_fact(Fact),!.
@@ -106,10 +106,10 @@ asserted_or_deduced(Fact):- test_tl(thlocal:infAssertedOnly,Fact),!,fail.
 asserted_or_deduced(Fact):- fact_maybe_deduced(Fact),is_fact_consistent(Fact),add(Fact).
 asserted_or_deduced(Fact):- deducedSimply(Fact),is_fact_consistent(Fact),add(Fact).
 
-:-dynamic_multifile_exported(my_random_member/2).
+:-decl_mpred_prolog(my_random_member/2).
 my_random_member(LOC,LOCS):- must_det((length(LOCS,Len),Len>0)),random_permutation(LOCS,LOCS2),!,member(LOC,LOCS2).
 
-:-dynamic_multifile_exported(random_instance/3).
+:-decl_mpred_prolog(random_instance/3).
 random_instance_no_throw(Type,Value,Test):- copy_term(ri(Type,Value,Test),ri(RType,RValue,RTest)),
    hooked_random_instance(RType,RValue,RTest),
    checkAnyType(query(_,_),RValue,Type,Value),
@@ -128,7 +128,7 @@ save_fallback(Obj,Prop,Value):-is_fact_consistent(dbase_t(Prop,Obj,Value)),padd(
 maybe_cache(_Prop,_Obj,_Value,_What):-!.
 maybe_cache(Prop,Obj,Value,What):-not(not(maybe_cache_0(Prop,Obj,Value,What))).
 
-:-dynamic_multifile_exported(checkNoArgViolation/1).
+:-decl_mpred_prolog(checkNoArgViolation/1).
 % checkNoArgViolation(_).
 checkNoArgViolation(_):- (bad_idea),!.
 checkNoArgViolation(Fact):-get_prop_args(Fact,Prop,ARGS),checkNoArgViolation_p_args(Prop,ARGS),!.
@@ -208,8 +208,8 @@ maybe_cache_0(Prop,Obj,Value,What):- padd(Obj,Prop,Value),
   ignore((What\=Obj,
    into_mpred_form(dbase_t(Prop,What,_),Trigger),hooked_asserta(on_change_once(retract(_),Trigger,del(dbase_t(Prop,Obj,Value)))))).
 
-:-dynamic_multifile_exported(on_change_once/3).
-:-dynamic_multifile_exported(on_change_always/3).
+:-decl_mpred_prolog(on_change_once/3).
+:-decl_mpred_prolog(on_change_always/3).
 
 unverifiableType(ftTerm).
 unverifiableType(ftVoprop).
@@ -251,7 +251,7 @@ user:decl_database_hook(assert(_),Fact):- fact_is_false(Fact,Why),trace_or_throw
 user:decl_database_hook(assert(_),Fact):- ignore((not(dont_check_args(Fact)),slow_kb_op(checkNoArgViolation(Fact)))).
 
 
-:-dynamic_multifile_exported(fallback_value/3).
+:-decl_mpred_prolog(fallback_value/3).
 fallback_value(Prop,Obj,Value):- is_asserted(dbase_t(Prop,Obj,Value)),!.
 fallback_value(_Prop,Obj,_Value):-var(Obj),!,fail.
 fallback_value(Prop,_Obj,_Value):-no_fallback(Prop,2),!,fail.
@@ -265,7 +265,7 @@ fallback_value(Prop,Obj,Value):-Fact=..[Prop,Obj,Value],
 no_fallback(mudSubclass,2).
 no_fallback(P,2):-not(mpred_prop(P,prologSingleValued)).
 
-:-dynamic_multifile_exported(defaultArgValue/4).
+:-decl_mpred_prolog(defaultArgValue/4).
 defaultArgValue(Fact,F,A,OLD):- stack_check, mpred_prop(F,argSingleValueDefault(A,OLD)),!,dmsg(defaultArgValue(fallback_value(Fact,F,argSingleValueDefault(A,OLD)))).
 defaultArgValue(mudFacing(_,_),_,2,vNorth):-!.
 defaultArgValue(mudEnergy(_,_),_,2,200):-!.
@@ -288,13 +288,13 @@ defaultTypeValue(_Info,ftInt,0).
 defaultTypeValue(Fact,Type,Out):- random_instance(Type,ROut,nonvar(ROut)),dmsg(defaultArgValue(random_instance(Fact,Type,ROut=Out))),!,Out=ROut.
 
 
-:-dynamic_multifile_exported(get_instance_default_props/2).
+:-decl_mpred_prolog(get_instance_default_props/2).
 
 get_instance_default_props(Inst,TraitsO):- must_det(nonvar(Inst)),!,
    findall(Props,((type_w_default_props(Type),mudIsa(Inst,Type),each_default_inst_type_props(Inst,Type,Props))),Traits),flatten_set(Traits,TraitsO),!.
 
 
-:-dynamic_multifile_exported((get_type_default_props/2)).
+:-decl_mpred_prolog((get_type_default_props/2)).
 
 get_type_default_props(Type,TraitsO):- nonvar(Type),!, Inst = isSelf,
    findall(Props,((type_w_default_props(DefType),transitive_subclass_or_same(Type,DefType),each_default_inst_type_props(Inst,DefType,Props))),Traits),flatten_set(Traits,TraitsO),!.
@@ -316,7 +316,7 @@ each_default_inst_type_props(_,Type,[glyphType(Lbl)|Props]):-call_no_cuts(mudLab
 user:instTypeProps(apathFn(Region,_Dir),tPathway,[localityOfObject(Region)]).
 
 
-:-dynamic_multifile_exported((add_missing_instance_defaults/1)).
+:-decl_mpred_prolog((add_missing_instance_defaults/1)).
 add_missing_instance_defaults(_P):-dontAssertTypeProps,!.
 add_missing_instance_defaults(P):-
    loop_check_local(add_missing_instance_defaults_lc(P),true).
@@ -324,16 +324,16 @@ add_missing_instance_defaults_lc(P):-
    get_inst_default_props(P,_PropListL,Missing),
    once(Missing=[];show_call(padd(P,Missing))).
 
-:-dynamic_multifile_exported(gather_props_for/3).
+:-decl_mpred_prolog(gather_props_for/3).
 gather_props_for(_Op,Obj,Props):-setof(Prop,(between(1,7,L),length(REST,L),(dbase_t([P,Obj|REST])),Prop=..[P|REST]),Props).
 
-:-dynamic_multifile_exported(get_inst_default_props/3).
+:-decl_mpred_prolog(get_inst_default_props/3).
 get_inst_default_props(I,PropListL,Missing):-
    get_instance_default_props(I,PropListL),
    instance_missing_props(I,PropListL,Missing).
 
 
-:-dynamic_multifile_exported(instance_missing_props/3).
+:-decl_mpred_prolog(instance_missing_props/3).
 instance_missing_props(I,LPS,PS):-
        must_det(once((nonvar(LPS);get_instance_default_props(I,LPS)))),
        findall(P,(member(P,LPS),inst_missing_prop(I,P)),PS),!.
@@ -346,7 +346,7 @@ get_sv_argnum(F,Args,ArgNum):-once(mpred_prop(F,functionalArg(ArgNum));length(Ar
 
 dontAssertTypeProps:-!.
 
-:-dynamic_multifile_exported(rescan_default_props/0).
+:-decl_mpred_prolog(rescan_default_props/0).
 
 rescan_default_props:- loop_check_local(rescan_default_props_lc,true).
 % rescan_default_props_lc:- dmsg(todo(fix(rescan_default_props,"to not set atloc/2"))),!,

@@ -9,7 +9,7 @@
 
 :-swi_module(parser_imperative, []).
 
-:-dynamic_multifile_exported((
+:-decl_mpred_prolog((
                    parse_agent_text_command/5,            
                    parse_agent_text_command_0/5,            
                    parseIsa//2,
@@ -27,7 +27,7 @@
 % =====================================================================================================================
 % get_agent_text_command/4
 % =====================================================================================================================
-:-dynamic_multifile_exported(get_agent_text_command/4).
+:-decl_mpred_prolog(get_agent_text_command/4).
 
 get_agent_text_command(Agent,VERBOrListIn,AgentR,CMD):-
    debugOnError(loop_check(get_agent_text_command_0(Agent,VERBOrListIn,AgentR,CMD),fail)).
@@ -79,7 +79,7 @@ parse_for(Type,StringM, Term):-parse_for(Type,StringM, Term, []).
 list_tail(_,[]).
 list_tail(String,LeftOver):-ground(String),to_word_list(String,List),length(List,L),!,between(1,L,X),length(LeftOver,X).
 
-:-dynamic_multifile_exported(parse_for/4).
+:-decl_mpred_prolog(parse_for/4).
 parse_for(Type,StringM,Term,LeftOver):-
    to_word_list(StringM,String),  
    list_tail(String,LeftOver),
@@ -99,9 +99,9 @@ desc_len(S0,Region):- call(term_to_atom(S0,S)),
    atomic_list_concat_catch(Words,' ',S),length(Words,Ws),atomic_list_concat_catch(Sents,'.',S),length(Sents,Ss),Region is Ss+Ws,!.
 
 
-:-dynamic_multifile_exported(objects_match_for_agent/3).
+:-decl_mpred_prolog(objects_match_for_agent/3).
 objects_match_for_agent(Agent,Text,ObjList):- objects_match_for_agent(Agent,Text,[mudPossess(Agent,isSelf),isSame(mudAtLoc),isSame(localityOfObject),tAgentGeneric,tItem,tRegion],ObjList).  
-:-dynamic_multifile_exported(objects_match_for_agent/4).
+:-decl_mpred_prolog(objects_match_for_agent/4).
 objects_match_for_agent(Agent,Text,Match,ObjList):- objects_for_agent(Agent,isOneOf([text_means(Agent,Text,isSelf),isAnd([isOneOf(Match),match_object(Text,isSelf)])]),ObjList).  
 
 
@@ -146,7 +146,7 @@ objects_match(Text,Possibles,MatchList):- findall(Obj,(member(Obj,Possibles),mat
 object_string(O,String):-object_string(_,O,1-4,String),!.
 object_string_0_5(O,String):-object_string(_,O,0-5,String),!.
 
-:-dynamic_multifile_exported(object_string/4).
+:-decl_mpred_prolog(object_string/4).
 :-dynamic object_string_fmt/3.
 :-retractall(object_string_fmt(_,_,_)).
 object_string(_,O,DescSpecs,String):- object_string_fmt(O,DescSpecs,String),!.
@@ -175,7 +175,7 @@ save_fmt_a(_,A):-vtSkippedPrintNames(A),!.
 
 object_name_is_descriptive(O):- (mudIsa(O,tCol);mudIsa(O,tPred);hasInstance(macroDeclarer,O);mudIsa(O,ttValueType),mudIsa(O,name_is_descriptive)).
 
-:-dynamic_multifile_exported(object_print_details/5).
+:-decl_mpred_prolog(object_print_details/5).
 
 
 object_print_details(Print,Agent,O,DescSpecs,Skipped):- atoms_of(O,OS),!,
@@ -193,7 +193,7 @@ object_print_details0(Print,Agent,O,DescSpecs,Skipped):-
 :-decl_type(ttTypeType).
 vtSkippedPrintNames(T):-p_is_ttFormatType(T).
 vtSkippedPrintNames(T):-mudIsa(T,ttTypeType).
-vtSkippedPrintNames(E):-member(E,[tObj,isSelf,the,is,tSpatialThing,ttNotSpatialType,ttSpatialType,prologHybrid,prologPTTP,prologOnly,tRelation,tPred,'',[]]).
+vtSkippedPrintNames(E):-member(E,[tObj,isSelf,the,is,tSpatialThing,ttNotSpatialType,ttSpatialType,prologHybrid,dbase_t,prologPTTP,prologOnly,tRelation,tPred,'',[]]).
 
 
 must_make_object_string_list(_,Obj,WList):- object_string(Obj,WList),!.
@@ -228,7 +228,7 @@ dmsg_parserm(F,A):-ignore((debugging(parser),dmsg(F,A))).
 must_atomic(A):-must(atomic(A)).
 
 parse_agent_text_command(Agent,SVERB,[],NewAgent,GOAL):-compound(SVERB),!,must((NewAgent=Agent,GOAL=SVERB)),!.
-parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL):-must(atomic(SVERB)),maplist(must_atomic,ARGS),fail.
+parse_agent_text_command(Agent,SVERB,ARGS,_,_):-must(atomic(SVERB)),maplist(must_atomic,ARGS),fail.
 
 parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL):-
   dmsg(parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL)),
@@ -270,7 +270,7 @@ parse_agent_text_command_0(Agent,IVERB,ARGS,NewAgent,GOAL):-
 parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,actProlog(call_mpred(PROLOGTERM))):- compound(PROLOGTERM),functor(PROLOGTERM,F,_),mpred_prop(F,_),!.
 parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,actProlog(req(PROLOGTERM))):- compound(PROLOGTERM),is_callable(PROLOGTERM),!.
 
-:-dynamic_multifile_exported(parse_agent_text_command_1/5).
+:-decl_mpred_prolog(parse_agent_text_command_1/5).
 % parses a verb phrase and retuns one interpretation (action)
 parse_agent_text_command_1(Agent,SVERB,ARGS,Agent,GOAL):-
    parse_vp_real(Agent,SVERB,ARGS,GOALANDLEFTOVERS),
@@ -463,7 +463,7 @@ to_arg_value(Term,TermO):-must((map_term(to_arg_value,Term,TermO))).
 map_term(Pred,Term,TermO):-var(Term),!,must(call(Pred,Term,TermO)).
 map_term(Pred,Term,TermO):-is_list(Term),!,must(maplist(Pred,Term,TermO)).
 map_term(Pred,Term,TermO):-compound(Term),Term=..TermL,!,must(maplist(Pred,TermL,TermOL)),TermO=..TermOL.
-map_term(Pred,Term,Term):-!.
+map_term(_,Term,Term):-!.
 
 /*
 

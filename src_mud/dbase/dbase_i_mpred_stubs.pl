@@ -320,7 +320,7 @@ assertz_clause(Head,Body):- must_det(database_modify(assert(z), (Head:-Body))).
 % DETECT PREDS THAT NEED STORAGE 
 % ================================================================================
 
-requires_storage((Head :- Body)):-!, requires_storage(Head,Body).
+requires_storage((Head :- Body)):- nonvar(Head),!, requires_storage(Head,Body).
 requires_storage(C):- requires_storage(C,true).
 
 requires_storage(M:H,B):-atomic(M),!,requires_storage(H,B).

@@ -160,7 +160,7 @@ transitive_other(mudAtLoc,1,Obj,What):-mudInsideOf(Obj,What).
 % transitive_other(localityOfObject,1,Obj,What):-mudInsideOf(Obj,What).
 
 :-decl_mpred_hybrid(mudInsideOf/2).
-:-dynamic_multifile_exported(mudInsideOf/2).
+% :-sanity(( requires_storage((mudInsideOf(_G3775190, _G3775191):-is_asserted(mudStowing(_G3775191, _G3775190))))  )).
 mudInsideOf(Inner,Outer):-is_asserted(mudStowing(Outer,Inner)).
 mudInsideOf(Inner,Outer):-is_asserted(mudContains(Outer,Inner)).
 

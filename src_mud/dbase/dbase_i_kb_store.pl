@@ -97,8 +97,9 @@ expanded_different_1(G0,G1):- G0 \= G1,!.
 into_assertable_form(M:H,G):-atom(M),!,into_assertable_form(H,G).
 into_assertable_form(H,G):- get_functor(H,F,A),into_assertable_form4(H,F,A,G).
 
-into_assertable_form4(G,F,_,GG):- mpred_prop(F,prologPTTP),!,into_mpred_form(G,GG).
+into_assertable_form4(G,F,_,Dbase):-mpred_prop(F,prologHybridFunctor(Tdbase_t)),!,into_functor_form(Tdbase_t,G,Dbase).
 into_assertable_form4(G,F,_,GG):- mpred_prop(F,prologOnly),!,into_mpred_form(G,GG).
+into_assertable_form4(G,F,_,GG):- mpred_prop(F,prologPTTP),!,into_mpred_form(G,GG).
 into_assertable_form4(G,F,_,Dbase):-mpred_prop(F,prologHybrid),!,into_functor_form(dbase_t,G,Dbase).
 
 
@@ -282,9 +283,9 @@ transform_holds_3(Op,[Fogical|ARGS],OUT):-
 
 transform_holds_3(_,[props,Obj,Props],props(Obj,Props)).
 transform_holds_3(_,[Type,Inst|PROPS],props(Inst,[mudIsa(Type)|PROPS])):- 
-                  nonvar(Inst), not(Type=props), hasInstance_dyn(tCol,Type), must_det(not(never_type(Type))),!.
+                  nonvar(Inst), not(Type=props), user:hasInstance_dyn(tCol,Type), must_det(not(never_type(Type))),!.
 transform_holds_3(_,[Type,Inst|PROPS],props(Inst,[mudIsa(Type)|PROPS])):- 
-                  nonvar(Inst), not(Type=props), hasInstance_dyn(macroDeclarer,Type), must_det(not(never_type(Type))),!.
+                  nonvar(Inst), not(Type=props), user:hasInstance_dyn(macroDeclarer,Type), must_det(not(never_type(Type))),!.
 
 transform_holds_3(_,[P,A|ARGS],DBASE):- atom(P),!,DBASE=..[P,A|ARGS].
 transform_holds_3(_,[P,A|ARGS],DBASE):- !, nonvar(P),dumpST,trace_or_throw(dtrace), DBASE=..[P,A|ARGS].
