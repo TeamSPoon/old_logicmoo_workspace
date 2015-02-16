@@ -255,13 +255,13 @@ mudLabelTypeProps(hb,tHighBox,[mudHeight(3),mudWeight(3)]).
  mudLabelTypeProps(gd,tGold,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenDeletes),mudActAffect(actTake,mudScore(+10))]).
  mudLabelTypeProps(fd,tFood,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudEnergy(+80))]).
 mudLabelTypeProps(el,tElixer,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudHealth(+80))]).
-mudLabelTypeProps(ed,tEdge,[mudHeight(10),mudWeight(4)]).
+mudLabelTypeProps(ed,tEdgeOfWorld,[mudHeight(10),mudWeight(4)]).
  mudLabelTypeProps(dt,tDirt,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenDeletes),mudActAffect(actTake,mudScore(+1)),spawn_rate(5)]).
 mudLabelTypeProps(dr,tDoor,[mudHeight(3),mudWeight(2)]).
 
 %Empty Location
-% You *have* to use 0 as the ftID of the empty location. (no way!)
-mudLabelTypeProps(--,var,[]).
+% You *have* to use ftVar/isMissing as the ftID of the empty location. (no way!)
+mudLabelTypeProps(--,isMissing,[]).
 
 % What an agent turns into upon death.
 % Must be named iCorpseFn (or edit agent_to_corpse/1 in lib.pl.

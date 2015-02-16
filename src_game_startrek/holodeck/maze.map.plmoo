@@ -17,7 +17,7 @@
 */
 
 
-grid_key(ed='edge of world').
+grid_key(ed='tEdgeOfWorld').
 grid_key(wl=tWall).
 grid_key(lg=tLedge).
 grid_key(dr=tDoor).

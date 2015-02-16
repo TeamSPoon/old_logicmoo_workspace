@@ -30,7 +30,7 @@ mudLabelTypeProps('Px',tFederation,[]).
 
 user:world_agent_plan(_World,Agent,ActV):-
    tAgentGeneric(Agent),
-  % mudIsa(Agent,federation),
+  % instance(Agent,federation),
    federation_idea(Agent,Act),
    vette_federation_idea(Agent,Act,ActV).
 
@@ -39,13 +39,13 @@ federation_idea(Agent,actEat(Elixer)) :-
 	mudHealth(Agent,Damage),
 	Damage < 15,
    mudPossess(Agent,Elixer),   
-   mudIsa(Elixer,tElixer).
+   instance(Elixer,tElixer).
 
 federation_idea(Agent,actEat(tFood)) :-
 	mudEnergy(Agent,Charge),
 	Charge < 150,
    mudPossess(Agent,Food),
-   mudIsa(Food,tFood).
+   instance(Food,tFood).
 
 federation_idea(Agent,actTake(What)) :-
 	mudNearFeet(Agent,What),

@@ -18,7 +18,7 @@
 */
 
 
-grid_key(ed='edge of world').
+grid_key(ed='tEdgeOfWorld').
 grid_key(tr=tTree).
 grid_key( rk=tRock).
 grid_key( nt=tNnut).

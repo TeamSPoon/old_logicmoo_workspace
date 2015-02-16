@@ -17,5 +17,5 @@
 :- style_check(-discontiguous).
 :- style_check(-atom).
 
-:- loaded_game('../src_game_nani/**/*.plmoo').
+:- declare_load_game('../src_game_nani/**/*.plmoo').
 

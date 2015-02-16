@@ -12,4 +12,4 @@
 % ===============================================================================================
 */
 
-:- loaded_game('../games/src_game_nani/**/*.plmoo').
+:- declare_load_game('../games/src_game_nani/**/*.plmoo').

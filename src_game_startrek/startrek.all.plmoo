@@ -7,22 +7,22 @@
 */
 
 
-/*
+
 typeGrid('SpaceInAHOC',0, [ed,ed,ed,ex,ed,ed,ed]).
-typeGrid('SpaceInAHOC',1, [ed,,,,,,ed]).
-typeGrid('SpaceInAHOC',2, [ed,,,,,,ed]).
-typeGrid('SpaceInAHOC',3, [ex,,,,,,ex]).
-typeGrid('SpaceInAHOC',4, [ed,,,,,,ed]).
-typeGrid('SpaceInAHOC',5, [ed,,,,,,ed]).
+typeGrid('SpaceInAHOC',1, [ed,--,--,--,--,--,ed]).
+typeGrid('SpaceInAHOC',2, [ed,--,--,--,--,--,ed]).
+typeGrid('SpaceInAHOC',3, [ex,--,--,--,--,--,ex]).
+typeGrid('SpaceInAHOC',4, [ed,--,--,--,--,--,ed]).
+typeGrid('SpaceInAHOC',5, [ed,--,--,--,--,--,ed]).
 typeGrid('SpaceInAHOC',6, [ed,ed,ed,ex,ed,ed,ed]).
-*/
-/*
-typeGrid('SpaceInAHOC',1, [,,,,]).
-typeGrid('SpaceInAHOC',2, [,,,,]).
-typeGrid('SpaceInAHOC',3, [,,,,]).
-typeGrid('SpaceInAHOC',4, [,,,,]).
-typeGrid('SpaceInAHOC',5, [,,,,]).
-*/
+
+
+typeGrid('FreeSpaceContent',1, [--,--,--,--,--]).
+typeGrid('FreeSpaceContent',2, [--,--,--,--,--]).
+typeGrid('FreeSpaceContent',3, [--,--,--,--,--]).
+typeGrid('FreeSpaceContent',4, [--,--,--,--,--]).
+typeGrid('FreeSpaceContent',5, [--,--,--,--,--]).
+
 % center of room is 3,3,1 (rooms ranges are (15,15,13))
 
 % : style_check(singleton).

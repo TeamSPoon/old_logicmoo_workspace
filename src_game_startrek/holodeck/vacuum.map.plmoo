@@ -18,13 +18,13 @@
 */
 
 
-grid_key( ed='edge of world').
-grid_key( hw='high wall').
-grid_key( lw='low wall').
-grid_key( hb='high box').
-grid_key( lb='low box').
-grid_key( dt=dirt).
-grid_key( ot=outlet).
+grid_key( ed='tEdgeOfWorld').
+grid_key( hw='tHighWall').
+grid_key( lw='tLowWall').
+grid_key( hb='tHighBox').
+grid_key( lb='tLowBox').
+grid_key( dt=tDirt).
+grid_key( ot=tOutlet).
 
 
 
