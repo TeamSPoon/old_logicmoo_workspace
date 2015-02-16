@@ -10,6 +10,8 @@
 %
  */
 
+:- include(logicmoo(vworld/moo_header)).
+
 % See the the seemingly white (not dirrectly usable) in some tUsefull way
 defined_affordance([subjType= "Passable",actionVerb= "TravelThru"]).
 
@@ -454,7 +456,7 @@ recreate(F/A):-dynamic(F/A),functor(P,F,A),retractall(P),!.
 :-recreate(verb_affordance/5).
 
 :- decl_mpred_hybrid(argIsa/3).
-:- decl_mpred_hybrid(mudSubclass/2).
+:- decl_mpred_hybrid(subclass/2).
 :- decl_mpred_hybrid(mudActionMaxDistance(vtActionType,ttObjectType,ftInt)).
 
 to_personal(mudEnergy,mudEnergy).
@@ -467,8 +469,8 @@ do_define_type_affordance1(Type,_= Type):-!.
 do_define_type_affordance1(Type,subjType= String):- add(nameStrings(Type,String)).
 
 
-do_define_type_affordance1(Type,alsoType= TWhat):-i_name(t,TWhat,ParentType),add(mudSubclass(Type,ParentType)).
-do_define_type_affordance1(Type,superType= TWhat):-i_name(t,TWhat,ParentType),add(mudSubclass(Type,ParentType)).
+do_define_type_affordance1(Type,alsoType= TWhat):-i_name(t,TWhat,ParentType),add(subclass(Type,ParentType)).
+do_define_type_affordance1(Type,superType= TWhat):-i_name(t,TWhat,ParentType),add(subclass(Type,ParentType)).
 do_define_type_affordance1(Type,actionVerb= SVerb):-i_name(act,SVerb,Verb),nb_setval(actionVerb,Verb),!,assert_if_new(verb_for_type(Verb,Type)).
 do_define_type_affordance1(Type,actionVerb(2)= SVerb):-i_name(act,SVerb,Verb),nb_setval(actionVerb,Verb),
   (nb_current(acceptsChild,ChildType)->true;ChildType=tCarryAble),
@@ -488,7 +490,7 @@ do_define_type_affordance(_,[]).
 do_define_type_affordance(Type,[H|LIST]):-do_define_type_affordance1(Type,H),!,do_define_type_affordance(Type,LIST),!.
 
 user:world_agent_plan(_World,Agent,Act):-
-   (mudIsa(Agent,tSimian);mudIsa(Agent,tAgentGeneric)),
+   (isa(Agent,tSimian);isa(Agent,tAgentGeneric)),
    simian_idea(Agent,Act).
 
 :-export(simian_ideas_possible/2).
@@ -519,8 +521,8 @@ user:agent_call_command(Agent,Templ) :- call((nonvar(Templ),simbots_templates(Te
 
 % args_match_types(ARGS,Type).
 %args_match_types([],_):-!,fail.
-args_match_types([Obj],Type):-!,mudIsa(Obj,Type).
-args_match_types(Obj,Type):-!,mudIsa(Obj,Type).
+args_match_types([Obj],Type):-!,isa(Obj,Type).
+args_match_types(Obj,Type):-!,isa(Obj,Type).
 
 
 agent_call_command_simbots_real(Agent,Templ):- must(simbots_templates(Templ)),nonvar(Templ),
@@ -556,35 +558,35 @@ user:agent_call_command(Agent,actTextcmd(A,B)):-sformat(CMD,'~w ~w',[A,B]),!,do_
 user:agent_call_command(Agent,actTextcmd(A,B,C)):-sformat(CMD,'~w ~w ~w',[A,B,C]),!,do_player_action(Agent,CMD).
 
 
-mudSubclass(tShelf,tHasSurface).
-mudSubclass(tCounter,tHasSurface).
-mudSubclass(tEatAble,tEatAble).
-mudSubclass(tBar,tHasSurface).
-mudSubclass(tSitAble,tHasSurface).
-mudSubclass(tSofa,tCouch).
-mudSubclass(tCouch,tSitAble).
-mudSubclass(tChair,tSitAble).
-mudSubclass(tMattress,tLayAble).
-mudSubclass(tLayAble,tSitAble).
-mudSubclass(tBed,tMattress).
-mudSubclass(tCrib,tLayAble).
-mudSubclass(tHasSurface, tContainer).
-mudSubclass(tHasSurface, tPutTargetAble).
-mudSubclass(tContainer, tPutTargetAble).
+subclass(tShelf,tHasSurface).
+subclass(tCounter,tHasSurface).
+subclass(tEatAble,tEatAble).
+subclass(tBar,tHasSurface).
+subclass(tSitAble,tHasSurface).
+subclass(tSofa,tCouch).
+subclass(tCouch,tSitAble).
+subclass(tChair,tSitAble).
+subclass(tMattress,tLayAble).
+subclass(tLayAble,tSitAble).
+subclass(tBed,tMattress).
+subclass(tCrib,tLayAble).
+subclass(tHasSurface, tContainer).
+subclass(tHasSurface, tPutTargetAble).
+subclass(tContainer, tPutTargetAble).
 
 
 
-mudSubclass(tClothesDryer,tFurniture).
-mudSubclass(tWashingMachine,tFurniture).
-mudSubclass(tShower,tFurniture).
-mudSubclass(tSitAble,tFurniture).
-mudSubclass(tChair,tFurniture).
-mudSubclass(tBed,tFurniture).
-mudSubclass(tSink,tFurniture).
-mudSubclass(tToilet,tFurniture).
-mudSubclass(tBathTub,tFurniture).
-mudSubclass(tFurniture,tUseAble).
-mudSubclass(tFurniture,tObj).
+subclass(tClothesDryer,tFurniture).
+subclass(tWashingMachine,tFurniture).
+subclass(tShower,tFurniture).
+subclass(tSitAble,tFurniture).
+subclass(tChair,tFurniture).
+subclass(tBed,tFurniture).
+subclass(tSink,tFurniture).
+subclass(tToilet,tFurniture).
+subclass(tBathTub,tFurniture).
+subclass(tFurniture,tUseAble).
+subclass(tFurniture,tObj).
 
 verb_alias("observe",actUse).
 verb_alias("operate",actUse).
@@ -664,28 +666,28 @@ verb_desc(actThinkAbout, tLookAble, "Think about").
 
 :- dynamic verb_affordance/5.
 
-verb_affordance(actObserve, tTelevision, mudNonLonelinessSocial, 3, -2).
-verb_affordance(actObserve, tTelevision, mudNonHunger, 1, -1).
+verb_affordance(actObserve, tTelevision, mudNonLonelinessSocial, 3, + -2).
+verb_affordance(actObserve, tTelevision, mudNonHunger, 1, + -1).
 verb_affordance(actObserve, tTelevision, mudBladderEmpty, 0, 0).
 verb_affordance(actObserve, tTelevision, mudHygiene, 0, 0).
 verb_affordance(actObserve, tTelevision, mudSecureRoom, 1, 0).
 verb_affordance(actObserve, tTelevision, mudFun, 2, 1).
 verb_affordance(actObserve, tTelevision, mudSadToHappy, 2, 1).
-verb_affordance(actObserve, tTelevision, mudEnergy, 1, -1).
-verb_affordance(actBumpIntoBarrier, tFurniture, mudNonLonelinessSocial, -300, 0).
-verb_affordance(actBumpIntoBarrier, tFurniture, mudHygiene, -300, 0).
-verb_affordance(actBumpIntoBarrier, tFurniture, mudComfort, -300, 0).
-verb_affordance(actBumpIntoBarrier, tFurniture, mudEnergy, -300, 0).
-verb_affordance(actBumpIntoBarrier, tFurniture, mudFun, -300, 0).
-verb_affordance(actLiveAtLeastAMinute, tAgentSelf, mudEnergy, 0, -1).
-verb_affordance(actLiveAtLeastAMinute, tAgentSelf, mudNonHunger, 0, -1).
-verb_affordance(actLiveAtLeastAMinute, tAgentSelf, mudBladderEmpty, 0, -1).
-verb_affordance(actLiveAtLeastAMinute, tAgentSelf, mudHygiene, 0, -1).
-verb_affordance(actLiveAtLeastAMinute, tAgentSelf, mudSecureRoom, 0, -1).
-verb_affordance(actLiveAtLeastAMinute, tAgentSelf, mudNonLonelinessSocial, 0, -1).
-verb_affordance(actLiveAtLeastAMinute, tAgentSelf, mudFun, 0, -1).
-verb_affordance(actLiveAtLeastAMinute, tAgentSelf, mudSadToHappy, 0, -1).
-verb_affordance(actLiveAtLeastAMinute, tAgentSelf, mudComfort, 0, -1).
+verb_affordance(actObserve, tTelevision, mudEnergy, 1, + -1).
+verb_affordance(actBumpIntoBarrier, tFurniture, mudNonLonelinessSocial, + -300, 0).
+verb_affordance(actBumpIntoBarrier, tFurniture, mudHygiene, + -300, 0).
+verb_affordance(actBumpIntoBarrier, tFurniture, mudComfort, + -300, 0).
+verb_affordance(actBumpIntoBarrier, tFurniture, mudEnergy, + -300, 0).
+verb_affordance(actBumpIntoBarrier, tFurniture, mudFun, + -300, 0).
+verb_affordance(actLiveAtLeastAMinute, tAgentSelf, mudEnergy, 0, + -1).
+verb_affordance(actLiveAtLeastAMinute, tAgentSelf, mudNonHunger, 0, + -1).
+verb_affordance(actLiveAtLeastAMinute, tAgentSelf, mudBladderEmpty, 0, + -1).
+verb_affordance(actLiveAtLeastAMinute, tAgentSelf, mudHygiene, 0, + -1).
+verb_affordance(actLiveAtLeastAMinute, tAgentSelf, mudSecureRoom, 0, + -1).
+verb_affordance(actLiveAtLeastAMinute, tAgentSelf, mudNonLonelinessSocial, 0, + -1).
+verb_affordance(actLiveAtLeastAMinute, tAgentSelf, mudFun, 0, + -1).
+verb_affordance(actLiveAtLeastAMinute, tAgentSelf, mudSadToHappy, 0, + -1).
+verb_affordance(actLiveAtLeastAMinute, tAgentSelf, mudComfort, 0, + -1).
 verb_affordance(actOperate, tShower, mudComfort, 10, 10).
 verb_affordance(actOperate, tShower, mudHygiene, 30, 30).
 verb_affordance(actOperate, tBathTub, mudComfort, 20, 20).
@@ -694,7 +696,7 @@ verb_affordance(actOperate, tSink, mudComfort, 0, 0).
 verb_affordance(actOperate, tSink, mudHygiene, 10, 10).
 verb_affordance(actDance, tDanceBall, mudNonLonelinessSocial, 10, 10).
 verb_affordance(actDance, tDanceBall, mudFun, 10, 10).
-verb_affordance(actDance, tDanceBall, mudHygiene, -10, -10).
+verb_affordance(actDance, tDanceBall, mudHygiene, + -10, + -10).
 verb_affordance(actOperate, tWashingMachine, mudComfort, 0, 0).
 verb_affordance(actOperate, tWashingMachine, mudHygiene, 10, 10).
 verb_affordance(actOperate, tClothesDryer, mudComfort, 0, 0).
@@ -710,13 +712,13 @@ verb_affordance(actSit, tCouch, mudEnergy, 10, 20).
 verb_affordance(actObserve, tRadio, mudSecureRoom, 1, 0).
 verb_affordance(actObserve, tRadio, mudFun, 10, 10).
 verb_affordance(actObserve, tRadio, mudSadToHappy, 10, 10).
-verb_affordance(actObserve, tRadio, mudEnergy, 1, -1).
+verb_affordance(actObserve, tRadio, mudEnergy, 1, + -1).
 verb_affordance(actObserve, tMirror, mudSecureRoom, 1, 0).
 verb_affordance(actObserve, tMirror, mudFun, 10, 10).
-verb_affordance(actObserve, tMirror, mudSadToHappy, 10, -1).
-verb_affordance(actObserve, tMirror, mudEnergy, 1, -1).
+verb_affordance(actObserve, tMirror, mudSadToHappy, 10, + -1).
+verb_affordance(actObserve, tMirror, mudEnergy, 1, + -1).
 verb_affordance(actPotty, tToilet, mudBladderEmpty, 100, 100).
-verb_affordance(actPotty, tToilet, mudHygiene, 0, -10).
+verb_affordance(actPotty, tToilet, mudHygiene, 0, + -10).
 verb_affordance(actClean, tToilet, mudHygiene, 1, 4).
 verb_affordance(actClean, tToilet, mudFun, 5, 4).
 verb_affordance(actPutXOn, tBookcase, mudFun, 10, 10).
@@ -728,12 +730,12 @@ verb_affordance(actObserve, tArt, mudSecureRoom, 20, 20).
 verb_affordance(actTalk, tAgentGeneric, mudNonLonelinessSocial, 10, 15).
 verb_affordance(actTalk, tAgentGeneric, mudFun, 1, 1).
 verb_affordance(actArgue, tAgentGeneric, mudNonLonelinessSocial, 10, 15).
-verb_affordance(actArgue, tAgentGeneric, mudEnergy, 0, -10).
-verb_affordance(actArgue, tAgentGeneric, mudSadToHappy, -10, -10).
+verb_affordance(actArgue, tAgentGeneric, mudEnergy, 0, + -10).
+verb_affordance(actArgue, tAgentGeneric, mudSadToHappy, + -10, + -10).
 verb_affordance(actArgue, tAgentGeneric, mudFun, 20, 10).
 verb_affordance(actAttack, tAgentGeneric, mudNonLonelinessSocial, 10, 15).
-verb_affordance(actAttack, tAgentGeneric, mudSadToHappy, 0, -10).
-verb_affordance(actAttack, tAgentGeneric, mudEnergy, 0, -10).
+verb_affordance(actAttack, tAgentGeneric, mudSadToHappy, 0, + -10).
+verb_affordance(actAttack, tAgentGeneric, mudEnergy, 0, + -10).
 verb_affordance(actAttack, tAgentGeneric, mudFun, 20, 10).
 verb_affordance(actKiss, tAgentGeneric, mudNonLonelinessSocial, 10, 15).
 verb_affordance(actKiss, tAgentGeneric, mudSadToHappy, 10, 10).
@@ -743,25 +745,25 @@ verb_affordance(actTouch, tTouchAble, mudSecureRoom, 1, 1).
 verb_affordance(actSit, tSitAble, mudComfort, 1, 0).
 verb_affordance(actSit, tSitAble, mudFun, 1, 1).
 verb_affordance(actSit, tSitAble, mudSecureRoom, 1, 1).
-verb_affordance(actPutXOn, tHasSurface, mudFun, -2, 2).
-verb_affordance(actPutXOn, tHasSurface, mudEnergy, 0, -1).
+verb_affordance(actPutXOn, tHasSurface, mudFun, + -2, 2).
+verb_affordance(actPutXOn, tHasSurface, mudEnergy, 0, + -1).
 verb_affordance(actEat, tEatAble, mudNonHunger, 100, 100).
-verb_affordance(actEat, tEatAble, mudHygiene, 0, -10).
+verb_affordance(actEat, tEatAble, mudHygiene, 0, + -10).
 verb_affordance(actSleep, tLayAble, mudComfort, 5, 5).
 verb_affordance(actSleep, tLayAble, mudEnergy, 20, 20).
-verb_affordance(actClean, tLookAble, mudFun, -2, 2).
-verb_affordance(actClean, tLookAble, mudEnergy, 0, -1).
+verb_affordance(actClean, tLookAble, mudFun, + -2, 2).
+verb_affordance(actClean, tLookAble, mudEnergy, 0, + -1).
 verb_affordance(actObserve, tLookAble, mudFun, 2, 1).
-verb_affordance(actObserve, tLookAble, mudEnergy, 0, -1).
+verb_affordance(actObserve, tLookAble, mudEnergy, 0, + -1).
 verb_affordance(actExcersize, tSitAble, mudFun, 10, 10).
-verb_affordance(actExcersize, tSitAble, mudHygiene, -10, -10).
-verb_affordance(actTickle, tAgentGeneric, mudEnergy, -10, -10).
+verb_affordance(actExcersize, tSitAble, mudHygiene, + -10, + -10).
+verb_affordance(actTickle, tAgentGeneric, mudEnergy, + -10, + -10).
 verb_affordance(actTickle, tAgentGeneric, mudFun, 20, 10).
-verb_affordance(actSearch, tContainer, mudHygiene, 0, -5).
+verb_affordance(actSearch, tContainer, mudHygiene, 0, + -5).
 verb_affordance(actSearch, tContainer, mudNonHunger, 40, 20).
-verb_affordance(actArgue, tAgentGeneric, mudEnergy, -11, -20).
+verb_affordance(actArgue, tAgentGeneric, mudEnergy, + -11, + -20).
 verb_affordance(actTalk, tAgentGeneric, mudNonLonelinessSocial, 11, 20).
-verb_affordance(actAttack, tAgentGeneric, mudEnergy, -11, -20).
+verb_affordance(actAttack, tAgentGeneric, mudEnergy, + -11, + -20).
 verb_affordance(actKiss, tAgentGeneric, mudNonLonelinessSocial, 11, 20).
 verb_affordance(actKiss, tAgentGeneric, mudFun, 21, 20).
 verb_affordance(actThinkAbout, tLookAble, mudFun, 1, 2).

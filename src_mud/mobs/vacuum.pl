@@ -21,7 +21,7 @@
 tCol(tVacuum).
 
 user:world_agent_plan(_World,Agent,Act):-
-   mudIsa(Agent,tVacuum),
+   isa(Agent,tVacuum),
    vacuum_idea(Agent,Act).
 
 vacuum_idea(Agent,actTake(tOutlet)) :-

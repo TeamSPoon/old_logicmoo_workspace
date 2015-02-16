@@ -106,7 +106,7 @@ mud_test_local:-
   test_name("Tests our types to populate bad_instance/2 at level 5"),
   retractall(is_instance_consistent(_,_)),
   retractall(bad_instance(_,_)),
-  forall(mudSubclass(T,tSpatialThing),check_consistent(T,1000)),
+  forall(subclass(T,tSpatialThing),check_consistent(T,1000)),
   listing(bad_instance/2).
 
 :-thread_local thlocal:is_checking_instance/1.

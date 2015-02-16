@@ -12,6 +12,8 @@
 %
 */
 
+:- include(logicmoo(vworld/moo_header)).
+
 % Declare the module name and the exported (public) predicates.
 :-swi_module(tPrey,[]).
 
@@ -27,7 +29,7 @@ tCol(tPrey).
 %:- dynamic agent_list/1.
 
 user:world_agent_plan(_World,Self,Act):-
-   mudIsa(Self,tPrey),
+   isa(Self,tPrey),
    prey_idea(Self,Act).
    
 % Possible agent actions.

@@ -1,7 +1,11 @@
+/*
+
 :- module(zxz, 
           [ 
           ]). 
+*/
 
+end_of_file.
 
 :-multifile(system:goal_expansion/2).
 :- export(system:goal_expansion/2).
@@ -103,8 +107,6 @@ trace_query(In, Out, Query):-
     told,
     unload_file(In),
     true.
-
-mpred_arity(A,L):-atom_length(A,L).
 
 
 new_bugger_expansion(Goal,GO) :- \+ inxp, wyes(inxp,mcall_expansion(Goal,GO)),!.

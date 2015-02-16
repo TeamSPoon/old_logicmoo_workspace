@@ -165,13 +165,13 @@ read_and_do_telnet:-
             must(once(do_player_action(List))),!.
 
 
-:-declare_mpred_prolog(prompt_read/2).
+:-decl_mpred_prolog(prompt_read/2).
 prompt_read_telnet(Prompt,Atom):-
       get_session_id(O),
       prompt_read(Prompt,IAtom),
-      (IAtom==end_of_file -> (assert(thlocal:wants_logout(O)),Atom='quit') ; IAtom=Atom),!.
+      (IAtom==end_of_file -> (change(assert,thlocal:wants_logout(O)),Atom='quit') ; IAtom=Atom),!.
 
-:-declare_mpred_prolog(prompt_read/2).
+:-decl_mpred_prolog(prompt_read/2).
 prompt_read(Prompt,Atom):-        
         ansi_format([reset,hfg(white),bold],'~w',[Prompt]),flush_output,        
         repeat,read_code_list_or_next_command(Atom),!.
@@ -269,7 +269,7 @@ write_pretty_aux([[Head]|Tail], Return, Column) :-
 	write_pretty_aux(Tail, Return, Ctemp).
 write_pretty_aux([[Agent]|Tail],Return,Column) :-
 	Ctemp is Column + 1,
-	mudIsa(Agent,tAgentGeneric),
+	isa(Agent,tAgentGeneric),
 	write('Ag'), write(' '),
 	write_pretty_aux(Tail,Return,Ctemp).
 write_pretty_aux([[_|_]|Tail],Return,Column) :-
@@ -286,7 +286,7 @@ cmdShowRoomGrid(Room) :- ignore(show_room_grid_new(Room)),!.
 % ===================================================================
 % show_room_grid_new(Room)
 % ===================================================================
-:-declare_mpred_prolog(show_room_grid_new/1).
+:-decl_mpred_prolog(show_room_grid_new/1).
 show_room_grid_new(Room):-
    grid_size(Room,Xs,Ys,_Zs),
    Ys1 is Ys+1,Xs1 is Xs+1,
@@ -313,7 +313,7 @@ inst_label(Obj,SLabe2):- call(term_to_atom(Obj,SLabel)),sub_atom(SLabel,0,2,_,SL
 inst_label(Obj,Label):- glyphType(Label,Obj),!.
 inst_label(Obj,Label):-  iprops(Obj,nameStrings(Val)),Val\=Obj,inst_label(Val,Label),!.
 inst_label(Obj,Label):-  iprops(Obj,mudNamed(Val)),Val\=Obj,!,inst_label(Val,Label),!.
-inst_label(Obj,Label):-  iprops(Obj,mudIsa(Val)),Val\=Obj,inst_label(Val,Label),!.
+inst_label(Obj,Label):-  iprops(Obj,isa(Val)),Val\=Obj,inst_label(Val,Label),!.
 inst_label(_Obj,'&&').
 
 % ===================================================================
@@ -340,7 +340,7 @@ cmdShowRoomGrid(Room,Old,N,N) :-
 cmdShowRoomGrid(Room,Y,X,N) :-
       loc_to_xy(Room,X,Y,LOC),
 	asserted_atloc(Obj,LOC),
-        props(Obj,mudIsa(tAgentGeneric)),
+        props(Obj,isa(tAgentGeneric)),
 	list_agents(Agents),
 	obj_memb(Agent,Agents),
 	asserted_atloc(Agent,LOC),
@@ -351,7 +351,7 @@ cmdShowRoomGrid(Room,Y,X,N) :-
 cmdShowRoomGrid(Room,Y,X,N) :-
         loc_to_xy(Room,X,Y,LOC),
 	asserted_atloc(Obj,LOC),
-        prop(Obj,mudIsa,Class),
+        prop(Obj,isa,Class),
 	glyphType(Label,Class),
 	write(Label), write(' '),
 	XX is X + 1,
@@ -360,7 +360,7 @@ cmdShowRoomGrid(Room,Y,X,N) :-
 cmdShowRoomGrid(Room,Y,X,N) :-
       loc_to_xy(Room,X,Y,LOC),
 	asserted_atloc(Agent,LOC),
-	mudIsa(Agent,tAgentGeneric),
+	isa(Agent,tAgentGeneric),
 	write('Ag'), write(' '),
 	XX is X + 1,
 	!,

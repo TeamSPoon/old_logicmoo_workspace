@@ -8,8 +8,8 @@
 
 :- register_module_type(mtCommand).
 
-%mudIsa(tHumanPlayer,ttAgentType).
-%mudSubclass(ttAgentType,tCol).
+%isa(tHumanPlayer,ttAgentType).
+%subclass(ttAgentType,tCol).
 
 % user:type_action_info(human_player,help, "shows this help").
 user:type_action_info(tHumanPlayer,actHelp(isOptional(ftString,"")), "shows this help").
@@ -22,7 +22,8 @@ user:type_action_info(tHumanPlayer,actHelp(isOptional(ftString,"")), "shows this
 get_type_action_help_commands_list(A,B,C):-no_repeats_old(get_type_action_help_0(A,B,C)).
 
 :-decl_mpred_prolog(get_all_templates/1).
-get_all_templates(Templ):- call_tabled_can(no_repeats_old(get_all_templates0(Templ))).
+get_all_templates(Templ):- call_tabled(get_all_templates0(Templ)).
+
 get_all_templates0(Templ):-get_good_templates(Templ).
 get_all_templates0(Templ):-get_bad_templates(Templ),not(get_good_templates(Templ)).
 get_good_templates(Templ):- no_repeats_old((get_type_action_help_1(_,Templ,_),good_template(Templ))).
@@ -47,7 +48,7 @@ get_type_action_help_0(What,Syntax,txtConcatFn(makes,happen,List)):- call_no_cut
                       ignore(Agent=an(What)),ignore(What=tAgentGeneric).
 
 get_type_action_help_1(What,TEMPL,S):- get_type_action_help_0(What,TEMPL,S).
-get_type_action_help_1(_What,TEMPL,S):- call_no_cuts(mudIsa(TEMPL,vtActionTemplate)),to_param_doc(TEMPL,S).
+get_type_action_help_1(_What,TEMPL,S):- call_no_cuts(isa(TEMPL,vtActionTemplate)),to_param_doc(TEMPL,S).
 
 
 first_pl((BODY,_),PL):-!,

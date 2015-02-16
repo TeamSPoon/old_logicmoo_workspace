@@ -21,7 +21,7 @@
 % :-swi_module(user). 
 :-swi_module(modLook, []).
 
-:- decl_mpred_prolog((  mudGetPrecepts/2,  mudNearReach/2, mudNearFeet/2, mudHeightOnObj/2, mudCanSense/5 , cmdLook/2)).
+:- decl_mpred_prolog((  mudGetPrecepts/2,  mudNearReach/2, mudNearFeet/2,  mudCanSense/5 , cmdLook/2)).
 
 :- include(logicmoo(vworld/moo_header)).
 
@@ -48,10 +48,10 @@ user:hook_coerce([SDir,of],txtPrepOf,vDirFn(Dir)):-user:hook_coerce(SDir,vtDirec
 
 user:action_info(actLook, "generalized look in region").
 user:action_info(actLook(isOptionalStr("in"),isOptionalStr("here")), "generalized look in region").
-user:action_info(actLook(txtPrepOf,isOptionalStr("self")), "Look in a direction (TODO: look north of isSelfAgent)").
+user:action_info(actLook(txtPrepOf,isOptionalStr("self")), "Look in a direction (TODO: look north of vHere)").
 user:action_info(actLook(isOptional(txtPrepSpatial,"at"),tObj),"look [in|at|on|under|at] somewhere").
 %user:action_info(look(obj), "Look at a speficific item").
-%user:action_info(look_at(isOptional(call(visibleTo(isSelfAgent,value)),call(visibleTo(isSelfAgent,value)))), "Look at a speficific item").
+%user:action_info(look_at(isOptional(call(visibleTo(vHere,value)),call(visibleTo(vHere,value)))), "Look at a speficific item").
 
 user:agent_call_command(Agent,actLook):- look_as(Agent),!.
 user:agent_call_command(Agent,actLook("here")):- look_as(Agent),!.
@@ -88,15 +88,15 @@ cmdLook_proc_0(Agent,LOC):-
          %  but yet this doent?
        %   cmdShowRoomGrid = once(with_output_to(string(value),cmdShowRoomGrid(region))),
          % for now workarround is 
-         call(cmdShowRoomGrid(isSelfLOC)),
+         call(cmdShowRoomGrid(vHere)),
          mudAtLoc_deduced(Agent,value),
-         nameStringsList(isSelfLOC,value),
-         forEach(mudDescription(isSelfLOC,Value),fmt(mudDescription(Value))),
+         nameStringsList(vHere,value),
+         forEach(mudDescription(vHere,Value),fmt(mudDescription(Value))),
          events=mudDeliverableLocationEvents(Agent,LOC,value),
-         path(D) = pathBetween(isSelfLOC,D,value),
-         pathName(D) = pathName(isSelfLOC,D,value),
-         % value = localityOfObject(value,isSelfLOC),
-         localityOfObject(value,isSelfLOC),
+         path(D) = pathBetween(vHere,D,value),
+         pathName(D) = pathName(vHere,D,value),
+         % value = localityOfObject(value,vHere),
+         localityOfObject(value,vHere),
          mudFacing(Agent,value),
          mudNearFeet(Agent,value),
          mudNearReach(Agent,value),
@@ -109,7 +109,6 @@ cmdLook_proc_0(Agent,LOC):-
 
 :-decl_mpred_prolog(nameStringsList/2).
 
-nameStringsList(Region,ValueList)
 nameStringsList(Region,ValueList):-findall(Value,nameStrings(Region,Value),ValueList).
 
 tLooking(Agent):- current_agent(Agent),!.
@@ -191,7 +190,7 @@ near_vectors([[vNW,vHere],[vNorth,vHere],[vNE,vHere],
 :-dynamic(visually_blocked/2).
 :-decl_mpred_prolog(visually_blocked(tAgentGeneric,ftListFn(vtDirection))).
 
-:-listing(visually_blocked).
+% :-listing(visually_blocked).
 
 % Series of predicates to modify agents vision so return 'dar(k)' for locations
 % which are blocked from view
@@ -206,10 +205,10 @@ check_for_blocks(Agent) :-
 	add(visually_blocked(Agent,Blocked_Percepts)).
 check_for_blocks(_,[]).
 
-prologSingleValued(mudSize(tSpatialThing,ftTerm)).
-prologSingleValued(mudShape(tSpatialThing,vtShape)).
+predArgTypes(mudSize(tSpatialThing,ftTerm)).
+predArgTypes(mudShape(tSpatialThing,vtShape)).
 prologSingleValued(mudHeightOnObj(tSpatialThing,ftNumber)).
-% prologSingleValued(texture(tSpatialThing,term)).
+predArgTypes(mudTexture(tSpatialThing,vtTexture)).
 
 :-decl_mpred_hybrid(mudHeightOnObj(tSpatialThing,ftNumber)).
 % High enough to see over obstacles??

@@ -12,12 +12,13 @@
 :-decl_mpred_prolog((
                    parse_agent_text_command/5,            
                    parse_agent_text_command_0/5,            
-                   parseIsa//2,
-                   phrase_parseForTypes_9//2,
                    objects_match/3,
                    match_object/2,
                    object_string/2,
-                   coerce/3,
+                   coerce/3)).
+:-export((
+                   parseIsa//2,
+                   phrase_parseForTypes_9//2,
                    parseForTypes//2)).
 
 :- include(logicmoo('vworld/moo_header.pl')).
@@ -112,7 +113,7 @@ text_means(_Agent,_Text,_Value):-fail.
 
 relates(Agent,Relation,Obj):-loop_check(relates_lc(Agent,Relation,Obj),fail).
 relates_lc(Agent,Relation,Obj):-text_means(Agent,Relation,Obj),!.
-relates_lc(_    ,Relation,Obj):- atom(Relation),tCol(Relation),!,mudIsa(Obj,Relation).
+relates_lc(_    ,Relation,Obj):- atom(Relation),tCol(Relation),!,isa(Obj,Relation).
 relates_lc(_    ,Relation,Obj):-contains_var(Relation,isSelf),subst(Relation,isSelf,Obj,Call),!,req(Call).
 relates_lc(Agent,isSame(Relation),Obj):- !, relates(Agent,Relation,Value),relates(Obj,Relation,Value).
 relates_lc(Agent,Relation,Obj):- atom(Relation),!, prop(Agent,Relation,Obj).
@@ -159,21 +160,25 @@ save_fmt(OS,'~w',[A]):-!,save_fmt_e(OS,A),!.
 save_fmt(OS,'~w',[A]):-!,save_fmt_e(OS,A),!.
 save_fmt(OS,Fmt,[A|KW]):-sformat(Str,Fmt,[A|KW]),to_word_list(Str,WL),save_fmt_e(OS,WL),!.
 
+save_fmt_e(_,E):-var(E),!.
 save_fmt_e(_,[]):-!.
-save_fmt_e(O,A):-atom(A),save_fmt_a(O,A),!.
+save_fmt_e(O,A):-atom(A),!,save_fmt_a(O,A),!.
 save_fmt_e(O,[E|L]):-!,save_fmt_e(O,E),!,save_fmt_e(O,L),!.
-save_fmt_e(O,mudIsa(A)):-!,must(save_fmt_e(O,A)).
+save_fmt_e(O,isa(A)):-!,must(save_fmt_e(O,A)).
 save_fmt_e(O,t(A,_)):-!,must(save_fmt_e(O,A)).
-save_fmt_e(_,E):-compound(E),!. % cycPred(_),predStubType(_),cycPlus2(_),hasStub(_),def_module(_),arity(_),
-save_fmt_e(O,E):- string(E),!,must((to_word_list(E,WL),save_fmt_e(O,WL))),!.
-save_fmt_e(O,E):- member(E,O) -> true ; (O=[_|CDR],nb_setarg(2,O,[E|CDR])).
+save_fmt_e(_,E):-compound(E),!. % cycPred(_),predStubType(_),cycPlus2(_),predStub(_),predModule(_),arity(_),
+%save_fmt_e(O,E):- string(E),!,must((to_word_list(E,WL),save_fmt_e(O,WL))),!.
+save_fmt_e(O,E):- identical_member(E,O) -> true ; (O=[_|CDR],nb_setarg(2,O,[E|CDR])).
 
+save_fmt_a(_,E):-var(E),!.
+save_fmt_a(O,t(E,_)):-!,save_fmt_a(O,E).
+save_fmt_a(O,E):-compound(O),arg(1,O,E),!,save_fmt_a(O,E).
 save_fmt_a(_,A):-atom_length(A,L),L =< 1.
 save_fmt_a(_,A):-vtSkippedPrintNames(A),!.
-%save_fmt_a(O,E):-atom_contains(E,'-'),!,must((to_word_list(E,WL),save_fmt_e(O,WL))),!.
+save_fmt_a(O,E):-to_case_breaks(E,List),maplist(save_fmt_a(O),List).
 
 
-object_name_is_descriptive(O):- (mudIsa(O,tCol);mudIsa(O,tPred);hasInstance(macroDeclarer,O);mudIsa(O,ttValueType),mudIsa(O,name_is_descriptive)).
+object_name_is_descriptive(O):- (isa(O,tCol);isa(O,tPred);hasInstance(macroDeclarer,O);isa(O,ttValueType),isa(O,name_is_descriptive)).
 
 :-decl_mpred_prolog(object_print_details/5).
 
@@ -188,21 +193,25 @@ object_print_details0(Print,Agent,O,DescSpecs,Skipped):-
    (object_name_is_descriptive(O) -> true ; 
     (( 
        forall(is_asserted(descriptionHere(O,KW)),ignore((meets_desc_spec(KW,DescSpecs)->call(Print,' ~w ',[KW])))),
-       forall(mudIsa(O,S),ignore((not(vtSkippedPrintNames(S)),object_print_details0(Print,Agent,S,DescSpecs,[O|Skipped])))))))).
+       forall(isa(O,S),ignore((not(vtSkippedPrintNames(S)),object_print_details0(Print,Agent,S,DescSpecs,[O|Skipped])))))))).
 
-:-decl_type(ttTypeType).
-vtSkippedPrintNames(T):-p_is_ttFormatType(T).
-vtSkippedPrintNames(T):-mudIsa(T,ttTypeType).
-vtSkippedPrintNames(E):-member(E,[tObj,isSelf,the,is,tSpatialThing,ttNotSpatialType,ttSpatialType,prologHybrid,dbase_t,prologPTTP,prologOnly,tRelation,tPred,'',[]]).
+%:-decl_type(ttTypeType).
+vtSkippedPrintNames(T):-var(T),!,fail.
+vtSkippedPrintNames(T):-ttFormatType(T).
+%vtSkippedPrintNames(T):-isa(T,ttTypeType).
+vtSkippedPrintNames(E):-member(E,[tObj,isSelf,the,is,tSpatialThing,ttNotSpatialType,ttSpatialType,prologHybrid,dbase_t,prologPTTP,prologSNARK,prologOnly,tRelation,tPred,'',[]]).
 
 
 must_make_object_string_list(_,Obj,WList):- object_string(Obj,WList),!.
-must_make_object_string_list(P,Obj,WList):- call_tabled_can(must_make_object_string_list_cached(P,Obj,WList)).
+must_make_object_string_list(P,Obj,WList):- call_tabled(must_make_object_string_list_cached(P,Obj,WList)).
 must_make_object_string_list_cached(P,Obj,WList):-
   must((object_string(P,Obj,0-5,String),nonvar(String),non_empty(String),string_ci(String,LString),to_word_list(LString,WList))).
 
 same_ci(A,B):-notrace((must((non_empty(A),non_empty(B))),any_to_string(A,StringA),any_to_string(B,StringB),!,string_ci(StringA,StringB))),!.
 
+match_object(S,Obj):-name_text(Obj,S).
+
+/*
 match_object(S,Obj):-sanity(ground(S:Obj)),must(((atoms_of(S,Atoms),!,Atoms\=[]))),match_object_0(Atoms,Obj).
 
 match_object_0([S],Obj):-nonvar(S),match_object_1(S,Obj),!.
@@ -211,8 +220,9 @@ match_object_0(Atoms,Obj):-
    forall(member(A,Atoms),(member(W,WList),notrace(string_equal_ci(A,W)))).
 
 match_object_1(A,Obj):-same_ci(A,Obj),!.
-match_object_1(A,Obj):-notrace((mudIsa(Obj,Type))),same_ci(A,Type),!.
+match_object_1(A,Obj):-notrace((isa(Obj,Type))),same_ci(A,Type),!.
 
+*/
 
 dmsg_parserm(D):-dmsg(D),!.
 dmsg_parserm(D):-ignore((debugging(parser),dmsg(D))).
@@ -228,7 +238,7 @@ dmsg_parserm(F,A):-ignore((debugging(parser),dmsg(F,A))).
 must_atomic(A):-must(atomic(A)).
 
 parse_agent_text_command(Agent,SVERB,[],NewAgent,GOAL):-compound(SVERB),!,must((NewAgent=Agent,GOAL=SVERB)),!.
-parse_agent_text_command(Agent,SVERB,ARGS,_,_):-must(atomic(SVERB)),maplist(must_atomic,ARGS),fail.
+parse_agent_text_command(_Agent,SVERB,ARGS,_,_):-slow_sanity((must(atomic(SVERB)),maplist(must_atomic,ARGS))),fail.
 
 parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL):-
   dmsg(parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL)),
@@ -291,7 +301,7 @@ verb_alias('where is',actWhere).
 verb_alias_to_verb(IVERB,SVERB):- verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.
 verb_alias_to_verb(IVERB,SVERB):- coerce(IVERB,vtVerb,SVERB), IVERB \= SVERB.
 
-subst_parser_vars(Agent,TYPEARGS,TYPEARGS_R):- subst(TYPEARGS,isSelfAgent,Agent,S1),where_atloc(Agent,Here),subst(S1,isSelfLOC,Here,TYPEARGS_R).
+subst_parser_vars(Agent,TYPEARGS,TYPEARGS_R):- subst(TYPEARGS,isSelfAgent,Agent,S1),where_atloc(Agent,Here),subst(S1,vHere,Here,TYPEARGS_R).
 
 % verb_matches("go",VERB):-!,VERB=go.
 verb_matches(SVERB,VERB):-samef(VERB,SVERB).
@@ -352,8 +362,8 @@ bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
 :-export(name_text/2).
 name_text(Name,Text):-nameStrings(Name,Text).
 name_text(Name,Text):-mudKeyword(Name,Text).
-% name_text(Name,Text):-argIsa(N,2,ftString),not(is_asserted(argIsa(N,1,ftString))),dbase_t(N,Name,Text).
 name_text(Name,Text):-nonvar(Text),!,name_text(Name,TextS),equals_icase(Text,TextS).
+% name_text(Name,Text):-argIsa(N,2,ftString),not(is_asserted(argIsa(N,1,ftString))),dbase_t(N,Name,Text).
 name_text(Name,Text):-atomic(Name),!,name_text_atomic(Name,Text).
 name_text(Name,Text):-is_list(Name),!,member(N,Name),name_text(N,Text).
 name_text(Name,Text):-compound(Name),!,Name=..[F,A|List],!,name_text([F,A|List],Text).
@@ -388,12 +398,12 @@ is_counted_for_parse(I):-i_countable(I),not(excluded_in_parse(I)),!.
 
 excluded_in_parse(apathFn(_, _)).
 excluded_in_parse(I):-tCol(I).
-excluded_in_parse(I):-p_is_ttFormatType(I).
+excluded_in_parse(I):-ttFormatType(I).
 excluded_in_parse(I):-mpred_prop(_,predArgTypes(I)).
 excluded_in_parse(apathFn(_ = _)).
 
 instance_for_parse(I):-is_counted_for_parse(I).
-insttype_for_parse(I):-findall(C,(instance_for_parse(I),mudIsa(I,C)),List),list_to_set(List,Set),member(I,Set).
+insttype_for_parse(I):-findall(C,(instance_for_parse(I),isa(I,C)),List),list_to_set(List,Set),member(I,Set).
 
 optional_strings_opt.
 
@@ -427,7 +437,7 @@ parseIsa_Call(FT, BO, CIn, D):- list_tail(CIn,D), to_word_list(CIn,C),!, parseIs
 % this parseIsa(T)-->parseIsa(T,_).
 parseIsa(A, B, C) :- parseIsa(A, _, B, C).
 
-is_parsable_type(T):-p_is_ttFormatType(T).
+is_parsable_type(T):-ttFormatType(T).
 is_parsable_type(T):-tCol(T).
 is_parsable_type(vp).
 
@@ -445,16 +455,17 @@ mud_test(food_is_a_droppable, [ true(
 
 %:- end_tests(test_bad_verb).
 
-query_trans_subft(FT,Sub):-mudSubclass(FT,Sub).
-query_trans_subft(FT,Sub):-mudSubclass(FT,A),mudSubclass(A,Sub).
-query_trans_subft(FT,Sub):-mudSubclass(FT,A),mudSubclass(A,B),mudSubclass(B,Sub).
+
+query_trans_subft(FT,Sub):-subFormat(FT,Sub).
+query_trans_subft(FT,Sub):-subFormat(FT,A),subclass(A,Sub).
+query_trans_subft(FT,Sub):-subFormat(FT,A),subFormat(A,B),subFormat(B,Sub).
 
 
 parseFmt_vp1(Agent, do(NewAgent,Goal),[SVERB|ARGS],[]):- parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,Goal),!.
 parseFmt_vp2(Agent,GOAL,[SVERB|ARGS],UNPARSED):- parse_vp_real(Agent,SVERB,ARGS,TRANSLATIONS),!,member(UNPARSED-GOAL,TRANSLATIONS).
 
 to_arg_value(Var,Var):-is_ftVar(Var),!.
-to_arg_value(isSelfLOC,Here):-must((current_agent(Who),where_atloc(Who,Here))).
+to_arg_value(vHere,Here):-must((current_agent(Who),where_atloc(Who,Here))).
 to_arg_value(isSelfAgent,Who):-must((current_agent(Who))).
 to_arg_value(isRandom(Type),Term):- nonvar(Type),!,must((to_arg_value(Type,TypeR),random_instance(TypeR,Term,true))).
 to_arg_value(Call,TermO):-compound(Call),Call=..[call|CALLARGS],must((subst(CALLARGS,isSelf,Term,CALLARGS2),maplist(to_arg_value,CALLARGS2,CALLARGS3),NewCall=..[call|CALLARGS3],must(req(NewCall)),to_arg_value(Term,TermO))).
@@ -493,7 +504,7 @@ parseIsa(dbase_t(P,S,O),TermV) -->{!},parseIsa(call(dbase_t(P,S,O)),TermV).
 parseIsa(call(Call),TermV) --> {!,subst(Call,isSelf,TermV,NewCall)},theText(TermT), {req(NewCall),match_object(TermT,TermV)}.
 parseIsa(exactStr(Str),Str) --> {!},[Atom],{equals_icase(Atom,Str),!}.
 parseIsa(isOptionalStr(Str),Str) --> {not(optional_strings_opt)},[Atom],{equals_icase(Atom,Str),!}.
-parseIsa(isOptionalStr(Str),isMissing(Str)) --> {!},[].
+parseIsa(isOptionalStr(_),isMissing) --> {!},[].
 parseIsa(isOptionalStr(_Str),_) --> {!,fail}.
 parseIsa(isOptional(_,Term),TermV) --> {to_arg_value(Term,TermV)}, [TermT], {samef(TermV,TermT)}.
 parseIsa(isOptional(Type, _), TermV, C, D) :- nonvar(Type),parseIsa(Type, TermV, C, D).
@@ -531,29 +542,29 @@ parseIsa(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{coerce(String
 parseIsaMost(List,Term) --> parseIsa(isAnd(List),Term),{!}.
 % parseIsaMost(A, B, C, D) :- parseIsa(isAnd(A), B, C, E), !, D=E.
 
-coerce(A,B,C):-no_repeats(coerce0(A,B,C)),(show_call_failure(mudIsa(C,B))->!;true).
+coerce(A,B,C):-no_repeats(coerce0(A,B,C)),(show_call_failure(isa(C,B))->!;true).
 
 coerce0(String,Type,Inst):- var(Type),trace_or_throw(var_specifiedItemType(String,Type,Inst)).
 coerce0(String,isNot(Type),Inst):-!,not(coerce0(String,Type,Inst)).
 coerce0([String],Type,Inst):- nonvar(String),!,coerce0(String,Type,Inst).
-coerce0(String,Type,Inst):- p_is_ttFormatType(Type),checkAnyType(assert(actParse),String,Type,AAA),Inst=AAA.
-coerce0(Text,Type,Inst):- call_tabled_can(no_repeats_old(call_no_cuts(hook_coerce(Text,Type,Inst)))).
+coerce0(String,Type,Inst):- ttFormatType(Type),checkAnyType(change(assert,actParse),String,Type,AAA),Inst=AAA.
+coerce0(Text,Type,Inst):- (no_repeats_old(call_no_cuts(hook_coerce(Text,Type,Inst)))).
 %coerce0(String,Type,Longest) :- findall(Inst, (user:hook_coerce(Inst,Type,Inst),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
 coerce0(String,Type,Inst):- var(String),!,instances_of_type(Inst,Type),name_text(Inst,String).
-coerce0(String,Type,Inst):- not(p_is_ttFormatType(Type)),must(tCol(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
+coerce0(String,Type,Inst):- not(ttFormatType(Type)),must(tCol(Type)),instances_of_type(Inst,Type),match_object(String,Inst).
 coerce0(String,Type,Inst):- not(string(String)),!,text_to_string(String,StringS),!,coerce0(StringS,Type,Inst).
 % coerce0(A,Type,AA):- correctAnyType(change(_,_),A,Type,AA).
 
 instances_of_type(Inst,Type):- no_repeats_old(instances_of_type_0(Inst,Type)).
 
-available_instances_of_type(Agent,Obj,Type):- must(current_agent(Agent)), current_agent_or_var(Agent), mudIsa(Obj,Type), same_regions(Agent,Obj),!.
+available_instances_of_type(Agent,Obj,Type):- must(current_agent(Agent)), current_agent_or_var(Agent), isa(Obj,Type), same_regions(Agent,Obj),!.
 
 instances_of_type_0(Inst,Type):- instances_sortable(Type,HOW),!,get_sorted_instances(Inst,Type,HOW).
-% should never need this but .. instances_of_type_0(Inst,Type):- mudSubclass(SubType,Type),mudIsa(Inst,SubType).
-instances_of_type_0(Inst,Type):- mudIsa(Inst,Type).
+% should never need this but .. instances_of_type_0(Inst,Type):- subclass(SubType,Type),isa(Inst,SubType).
+instances_of_type_0(Inst,Type):- isa(Inst,Type).
 
 instances_sortable(TYPE,HOW):-instances_sortable0(TYPE,HOW),!.
-instances_sortable(TYPE,HOW):-mudSubclass(TYPE,SUPER),instances_sortable0(SUPER,HOW),!.
+instances_sortable(TYPE,HOW):-subclass(TYPE,SUPER),instances_sortable0(SUPER,HOW),!.
 instances_sortable0(tWieldAble,distance_to_current_avatar(Agent)):-current_agent_or_var(Agent).
 instances_sortable0(tWearAble,distance_to_current_avatar(Agent)):-current_agent_or_var(Agent).
 
@@ -566,7 +577,7 @@ mudDistance(_Agent,_Obj,2).
 
 naming_order(_,ORDER,L,R):-compare(ORDER,L,R).
 
-get_sorted_instances(Inst,Type,HOW):-findall(Inst,mudIsa(Inst,Type),List),predsort(HOW,List,Sorted),!,member(Inst,Sorted).
+get_sorted_instances(Inst,Type,HOW):-findall(Inst,isa(Inst,Type),List),predsort(HOW,List,Sorted),!,member(Inst,Sorted).
 
 % instances_of_type(Inst,Type):- atom(Type), Term =..[Type,Inst], logOnError(req(Term)).
 % longest_string(?Order, @Term1, @Term2)
@@ -583,7 +594,7 @@ end_of_file.
 
 text_isa(I,T):-no_repeats_old(hook_text_isa(I,T)).
 
-hook_text_isa(Text,Whatnot):- no_repeats_old(tCol(Whatnot)),mudIsa(Inst,Whatnot),not(tCol(Inst)),once(name_text(Inst,Text)).
+hook_text_isa(Text,Whatnot):- no_repeats_old(tCol(Whatnot)),isa(Inst,Whatnot),not(tCol(Inst)),once(name_text(Inst,Text)).
 hook_text_isa(Text,txtVerb):- get_all_templates(A),nonvar(A),functor_safe(A,Inst,_),name_text(Inst,Text).
 
 

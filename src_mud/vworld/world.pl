@@ -91,7 +91,7 @@
 
 :-export(isaOrSame/2).
 isaOrSame(A,B):-A==B,!.
-isaOrSame(A,B):-mudIsa(A,B).
+isaOrSame(A,B):-isa(A,B).
 
 intersect(A,EF,B,LF,Tests,Results):-findall( A-B, ((member(A,EF),member(B,LF),once(Tests))), Results),[A-B|_]=Results.
 % is_property(P,_A),PROP=..[P|ARGS],CALL=..[P,Obj|ARGS],req(CALL).
@@ -107,47 +107,19 @@ anyInst(O):-exisitingThing(O).
 
 /*
 
-:-decl_type(metaclass).
-
-metaclass(formattype).
-metaclass(regioncol).
-metaclass(agentcol).
-metaclass(itemcol).
-% isa(metaclass,metaclass).
 
 % predArgTypes(typeGenls(col,metaclass)).
 
-% user:decl_database_hook(assert(_),typeGenls(_,MC)):-assert_isa(MC,metaclass).
+user:decl_database_hook(change(assert,_),typeGenls(_,MC)):-assert_isa(MC,ttTypeType).
 
-% deduce_facts(typeGenls(T,MC),deduce_facts(mudSubclass(S,T),isa(S,MC))).
+% deduce_facts(typeGenls(T,MC),deduce_facts(subclass(S,T),isa(S,MC))).
 
-typeGenls(region,regioncol).
-typeGenls(tAgentGeneric,agentcol).
-typeGenls(item,itemcol).
-*/
-mudSubclass(tSillyitem,tItem).
 
-/*
-isa(region,regioncol).
-isa(tAgentGeneric,agentcol).
-isa(item,itemcol).
 */
 
-%mudSubclass(SubType,formattype):-isa(SubType,formattype).
+%subclass(SubType,formattype):-isa(SubType,formattype).
 
-cached(G):-ccatch(G,_,fail).
-
-:-decl_mpred_prolog(create_meta/4).
-% if SuggestedName was 'food666' it'd like the SuggestedClass to be 'food' and the stystem name will remain 'food666'
-% if SuggestedName was 'food' it'd like the SuggestedClass to be 'food' and the stystem name will become a gensym like 'food1'
-create_meta(SuggestedName,SuggestedClass,BaseClass,SystemName):-
-   must_det(split_name_type(SuggestedName,SystemName,NewSuggestedClass)),
-   ignore(SuggestedClass=NewSuggestedClass),   
-   assert_subclass_safe(SuggestedClass,BaseClass),
-   assert_subclass_safe(NewSuggestedClass,BaseClass),
-   assert_isa_safe(SystemName,BaseClass),
-   assert_isa_safe(SystemName,NewSuggestedClass),
-   assert_isa_safe(SystemName,SuggestedClass).
+%cached(G):-ccatch(G,_,fail).
 
 
 :-decl_type(ttNotSpatialType).
@@ -155,25 +127,20 @@ create_meta(SuggestedName,SuggestedClass,BaseClass,SystemName):-
 ttNotSpatialType(ftInt).
 ttNotSpatialType(ftTerm).
 
-mudSubclass(tWearAble,tItem).
-mudSubclass(tLookAble,tItem).
-mudSubclass(tKnife,tItem).
-mudSubclass(tFood,tItem).
+subclass(tWearAble,tItem).
+subclass(tLookAble,tItem).
+subclass(tKnife,tItem).
+subclass(tFood,tItem).
 
 
-%ttSpatialType(FT):- nonvar(FT),p_is_ttFormatType(FT),!,fail.
+%ttSpatialType(FT):- nonvar(FT),ttFormatType(FT),!,fail.
 %ttSpatialType(FT):- nonvar(FT),ttNotSpatialType(FT),!,fail.
 %ttSpatialType(tItem). %  col, formattype, 
 ttSpatialType(SubType):-member(SubType,[tAgentGeneric,tItem,tRegion]).
 %ttSpatialType(S):- is_asserted(ttSpatialType(T)), impliedSubClass(S,T).
 
-%createableSubclassType(S,T):-call_mpred(  ttSpatialType(T)),is_asserted(mudSubclass(S,T)).
+%createableSubclassType(S,T):-call_mpred(  ttSpatialType(T)),is_asserted(subclass(S,T)).
 %createableSubclassType(T,tSpatialThing):-call_mpred( ttSpatialType(T)).
-
-mudIsa(ftInt,ttFormatType).
-mudIsa(vtDirection,ttValueType).
-mudIsa(ftNumber,ttFormatType).
-mudIsa(ftString,ttFormatType).
 
 
 create_agent(P):-create_agent(P,[]).
@@ -182,7 +149,7 @@ create_agent(P,List):-must_det(create_instance(P,tAgentGeneric,List)).
 % decl_type(Spec):-create_instance(Spec,col,[]).
 
 :-decl_mpred_prolog(create_instance/1).
-create_instance(P):- must_det((mudIsa(P,What),ttSpatialType(What))),must_det(create_instance(P,What,[])).
+create_instance(P):- must_det((isa(P,What),ttSpatialType(What))),must_det(create_instance(P,What,[])).
 :-export(create_instance/2).
 create_instance(Name,Type):-create_instance(Name,Type,[]).
 user:create_instance(Name,Type):-create_instance(Name,Type,[]).
@@ -209,17 +176,17 @@ create_instance_now(What,Type,Props):-
 create_instance_0(What,Type,List):- (var(What);var(Type);var(List)),trace_or_throw((var_create_instance_0(What,Type,List))).
 create_instance_0(I,_,_):-is_creating_now(I),!.
 create_instance_0(I,_,_):-asserta_if_new(is_creating_now(I)),fail.
-create_instance_0(What,FormatType,List):- FormatType\==tCol, p_is_ttFormatType(FormatType),!,trace_or_throw(p_is_ttFormatType(FormatType,create_instance(What,FormatType,List))).
+create_instance_0(What,FormatType,List):- FormatType\==tCol, ttFormatType(FormatType),!,trace_or_throw(ttFormatType(FormatType,create_instance(What,FormatType,List))).
 create_instance_0(SubType,tCol,List):-decl_type(SubType),padd(SubType,List).
 
 ttSpatialType(tAgentGeneric).
-mudSubclass(tActor,tAgentGeneric).
-mudSubclass(tExplorer,tAgentGeneric).
+subclass(tActor,tAgentGeneric).
+subclass(tExplorer,tAgentGeneric).
 
 :-dynamic_multifile_exported(predTypeMax/3).
 :-dynamic_multifile_exported(predInstMax/3).
 
-predInstMax(I,mudEnergy,NRG):- infSecondOrder, predTypeMax(mudEnergy,AgentType,NRG),mudIsa(I,AgentType).
+predInstMax(I,mudEnergy,NRG):- infSecondOrder, predTypeMax(mudEnergy,AgentType,NRG),isa(I,AgentType).
 %predInstMax(I,mudHealth,Dam):- predTypeMax(mudHealth,AgentType,Dam),isa(I,AgentType).
 
 punless(Cond,Action):- once((call(Cond);call(Action))).
@@ -228,7 +195,7 @@ create_instance_0(T,tAgentGeneric,List):-
   must_det_l([
    retractall(agent_list(_)),
    create_meta(T,_,tAgentGeneric,P),
-   mreq(mudIsa(P,tAgentGeneric)),
+   mreq(isa(P,tAgentGeneric)),
    padd(P,List),   
    % punless(mudPossess(P,_),rez_to_inventory(P,food,_Food)),
    rez_to_inventory(P,tFood,_Food),
@@ -262,7 +229,7 @@ valueReset(charge,max_charge).
 ttSpatialType(tRegion).
 
 create_instance_0(T, tItem, List):-
-   mudIsa(T,What),What\=tItem, ttSpatialType(What),!,create_instance_0(T, What, List).
+   isa(T,What),What\=tItem, ttSpatialType(What),!,create_instance_0(T, What, List).
 
 /*
 create_instance_0(T,Type,List):-
@@ -292,26 +259,6 @@ leash(+call),trace,
 create_instance_0(What,Type,Props):- leash(+call),trace,dtrace,trace_or_throw(dmsg(assumed_To_HAVE_creted_isnance(What,Type,Props))),!.
 
 %ttSpatialType(col).
-
-
-:-decl_mpred_hybrid(glyphType(ftTerm,ftTerm)).
-:-decl_mpred_hybrid(mudOpaqueness(ftTerm,ftPercent)).
-typeProps(tRegion,mudOpaqueness(1)).
-typeProps(tObj,mudOpaqueness(100)).
-:-decl_mpred_hybrid(mudListPrice(tItem,ftNumber)).
-typeProps(tItem,mudListPrice(0)).
-typeProps(tAgentGeneric,mudLastCommand(actStand)).
-typeProps(tAgentGeneric,[
-                       predInstMax(mudHealth,500),
-                       predInstMax(mudEnergy,200),
-                       mudHealth(500),
-                       mudEnergy(200),
-                       % mudFacing(vNorth), % later on Test that "n" will work on assertions
-                       mudFacing(isRandom(vtBasicDir)), % later on Test that "n" will work on assertions
-                       mudAgentTurnnum(0),
-                       mudScore(1),
-                       mudMemory(aDirectionsFn([n,s,e,w,ne,nw,se,sw,u,d]))]).
-
 
 
 

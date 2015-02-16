@@ -46,3 +46,5 @@ mud_cmd_who_1(Who):-
             fmt(cmdresult(actWho(Who),localityOfObject(Who,Where)))))).
 
 :- include(logicmoo(vworld/moo_footer)).
+
+

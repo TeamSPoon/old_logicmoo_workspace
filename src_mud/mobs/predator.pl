@@ -25,7 +25,7 @@
 tCol(tPredator).
 
 user:world_agent_plan(_World,Agent,Act):-
-   mudIsa(Agent,tPredator),
+   isa(Agent,tPredator),
    predator_idea(Agent,Act).
 
 predator_idea(Agent,actEat(Corpse)) :-
@@ -33,10 +33,10 @@ predator_idea(Agent,actEat(Corpse)) :-
 	Charge < 100,
 	mudPossess(Agent, List),                
 	obj_memb(Corpse,List),
-        mudIsa(Corpse,tCorpse).
+        isa(Corpse,tCorpse).
 predator_idea(Agent,actTake(What)) :-
 	mudNearFeet(Agent,What),
-	mudIsa(What,tCorpse).
+	isa(What,tCorpse).
 predator_idea(Agent,actMove(Dir)) :-
 	mudGetPrecepts(Agent,List),
 	list_object_dir_sensed(_,List,iCorpseFn(_),Dir).

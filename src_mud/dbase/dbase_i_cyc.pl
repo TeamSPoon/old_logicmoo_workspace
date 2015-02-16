@@ -16,10 +16,11 @@
 
 :-if_file_exists(user_ensure_loaded(logicmoo(ext/moo_ext_cyc_new))).
 
+
 % ============================================
 % DBASE to Cyc Predicate Mapping
 % ============================================
-
+/*
 mpred_arity('abbreviationString-PN', 2).
 
 typical_mtvars([_,_]).
@@ -37,6 +38,7 @@ make_functorskel(RXyz,5,fskel(RXyz,dbase_t(RXyz,I,R,X,Y,Z),Call,I,[R,X,Y,Z],MtVa
 % arity >6 
 make_functorskel(F,N,fskel(F,DBASE,Call,I,NList,MtVars,Call2)):-typical_mtvars(MtVars),functor(Call,F,N),Call=..[F,I|NList],DBASE=..[dbase_t,F,I|NList],append([F,I|NList],MtVars,CALL2List),Call2=..CALL2List.
 
+*/
 
 % ============================================
 % Prolog to Cyc Predicate Mapping

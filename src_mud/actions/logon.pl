@@ -16,7 +16,7 @@
 :- multifile thlocal:wants_logout/1.
 
 % rename
-user:action_info(actRename(string),"Rename your player").
+user:action_info(actRename(ftString),"Rename your player").
 user:agent_call_command(Agent,actRename(Other)):- padd(Agent,mudNamed(Other)).
 
 % become

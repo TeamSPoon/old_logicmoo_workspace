@@ -10,6 +10,7 @@
 */
 % :-swi_module(world_agent,[]).
 
+:- include(logicmoo(vworld/moo_header)).
 /*
 % This file is "included" from world.pl 
 :-swi_module(modr, [ call_agent_command_0/2,  call_agent_action/2 ]).
@@ -108,7 +109,7 @@ correctCommand(CMD,OUT):-compound(CMD),
 correctCommand(CMD,CMD).
 
 correctEachTypeOrFail( Who, F, Q,ARGS,TYPES,NEWS):- is_list(TYPES),!,maplist(correctEachTypeOrFail(Who,F,Q),ARGS,TYPES,NEWS).
-correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- mudIsa(Arg,Type),!,Inst = Arg.
+correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- isa(Arg,Type),!,Inst = Arg.
 correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- !,acceptableArg(Arg,Type),!,Inst = Arg.
 correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- must(coerce(Arg,Type,Inst)).
 
@@ -154,7 +155,7 @@ foc_current_player(P):-
               asserta(thglobal:global_session_agent(O,P)),assert_isa(P,tHumanPlayer),must_det(create_agent(P))]),!.
 
 
-get_dettached_npc(P):-random_instance_no_throw(tAgentGeneric,P,true),not(mudIsa(P,tHumanPlayer)),!.
+get_dettached_npc(P):-random_instance_no_throw(tAgentGeneric,P,true),not(isa(P,tHumanPlayer)),!.
 
 % generate_new_player(P):- req(agent(P)),!.
 generate_new_player(P):- prolog_must_l([gensym(iPlayer,N),not((isa_asserted(N,tAgentGeneric))),P=N,ensure_new_player(P)]),!.

@@ -23,7 +23,7 @@
 % mdif(A,B):- tlbugger:attributedVars,!,dif(A,B).
 mdif(_,_).
 
-:-decl_mpred_prolog((samef/2,same/2)).
+:-export((samef/2,same/2)).
 same(X,Y):- samef(X,Y),!.
 same(X,Y):- compound(X),arg(1,X,Y),!.
 same(X,Y):- compound(Y),arg(1,Y,X),!.
@@ -33,10 +33,10 @@ samef(X,Y):- X=Y,!.
 samef(X,Y):- hotrace(((functor_safe(X,XF,_),functor_safe(Y,YF,_),string_equal_ci(XF,YF)))).
 
 
-:-decl_mpred_prolog(arg_to_var/3).
+:-export(arg_to_var/3).
 arg_to_var(_Type,_String,_Var).
 
-:-decl_mpred_prolog(same_arg/3).
+:-export(same_arg/3).
 
 same_arg(_How,X,Y):-var(X),var(Y),!,X=Y.
 same_arg(equals,X,Y):-!,equals_call(X,Y).
@@ -45,10 +45,10 @@ same_arg(tCol(_Type),X,Y):-!, unify_with_occurs_check(X,Y).
 same_arg(ftText,X,Y):-!, string_equal_ci(X,Y).
 
 same_arg(same_or(equals),X,Y):- same_arg(equals,X,Y).
-same_arg(same_or(mudSubclass),X,Y):- same_arg(equals,X,Y).
-same_arg(same_or(mudSubclass),Sub,Sup):- holds_t(mudSubclass,Sub,Sup),!.
-same_arg(same_or(mudIsa),X,Y):- same_arg(equals,X,Y).
-same_arg(same_or(mudIsa),I,Sup):- !, holds_t(Sup,I),!.
+same_arg(same_or(subclass),X,Y):- same_arg(equals,X,Y).
+same_arg(same_or(subclass),Sub,Sup):- holds_t(subclass,Sub,Sup),!.
+same_arg(same_or(isa),X,Y):- same_arg(equals,X,Y).
+same_arg(same_or(isa),I,Sup):- !, holds_t(Sup,I),!.
 
 same_arg(same_or(_Pred),X,Y):- same_arg(equals,X,Y).
 same_arg(same_or(Pred),I,Sup):- holds_t(Pred,I,Sup),!.
@@ -280,7 +280,7 @@ or_list([H|T], (H;OT)) :-
 
 % :-swi_module(domain, [ domain/2  ]). % Var, ?Domain
 :- use_module(library(ordsets)).
-:-decl_mpred_prolog(domain/2).
+:-export(domain/2).
 domain(X, Dom) :-
       var(Dom), !,
       get_attr(X, domain, Dom).
@@ -289,13 +289,13 @@ domain(X, List) :-
       put_attr(Y, domain, Domain),
       X = Y.
 
-:-decl_mpred_prolog(extend_domain/2).
+:-export(extend_domain/2).
 extend_domain(X, DomL):- init_dom(X, Dom2), ord_union(Dom2, DomL, NewDomain),put_attr( X, domain, NewDomain ).
 
-:-decl_mpred_prolog(extend_dom/2).
+:-export(extend_dom/2).
 extend_dom(X, DomE):-  init_dom(X, Dom2),ord_add_element(Dom2, DomE, NewDomain),put_attr( X, domain, NewDomain ).
 
-:-decl_mpred_prolog(init_dom/2).
+:-export(init_dom/2).
 init_dom(X,Dom):-get_attr(X, domain, Dom),!.
 init_dom(X,Dom):-Dom =[_], put_attr(X, domain, Dom),!.
 
@@ -325,7 +325,7 @@ domain:attribute_goals(X) -->
 
 
 
-:-decl_mpred_prolog(isac/2).
+:-export(isac/2).
 isac(X, Dom) :-
       var(Dom), !,
       get_attr(X, isac, Dom).
@@ -334,8 +334,8 @@ isac(X, List) :-
       put_attr(Y, isac, Domain),
       X = Y.
 
-type_size(C,S):-mudIsa(C,completeExtentKnown),!,setof(E,mudIsa(E,C),L),length(L,S).
-type_size(C,1000000):-mudIsa(C,ttFormatType),!.
+type_size(C,S):-isa(C,completeExtentKnown),!,setof(E,isa(E,C),L),length(L,S).
+type_size(C,1000000):-isa(C,ttFormatType),!.
 type_size(_,1000).
 
 comp_type(Comp,Col1,Col2):-type_size(Col1,S1),type_size(Col2,S2),compare(Comp,S1,S2).
@@ -360,7 +360,7 @@ isac:attr_unify_hook(Domain, Y):-
 isac_chk(E,Cs):-once(isac_gen(E,Cs)).
 
 isac_gen(_, []).
-isac_gen(Y, [H|List]):-mudIsa(Y,H),!,isac_gen(Y, List).
+isac_gen(Y, [H|List]):-isa(Y,H),!,isac_gen(Y, List).
 
 
 

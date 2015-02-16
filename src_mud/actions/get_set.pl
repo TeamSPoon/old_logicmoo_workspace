@@ -22,6 +22,6 @@ user:agent_call_command(Agent,actSet(Obj0,Prop0,Value0)) :- coerce(Prop0,tPred,P
 
 user:agent_call_command(Agent,actGet(Obj0,Prop0)) :- subst(dbase_t(Prop0,Obj0,Value),isSelfAgent,Agent,K), 
                                                         ccatch((findall(Value,(req(K),fmt(K)),L),
-                                                          (L==[_|_]->true;fmt(isMissing(K)))),E,fmt('@get Error ~q',[E:K])).
+                                                          (L==[_|_]->true;fmt(wasMissing(K)))),E,fmt('@get Error ~q',[E:K])).
 
 :- include(logicmoo(vworld/moo_footer)).

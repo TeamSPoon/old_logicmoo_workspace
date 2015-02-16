@@ -15,18 +15,18 @@ end_of_file.
 /*
 
 nt: notice(explorer(player1),do(explorer(player1),prolog)). 
- 1 ?- tranlate_M(impliesM(andM(mudIsa(X,C),genls(C,SC)),mudIsa(X,SC)),X).
-X = [cl([mudIsa(X, SC)], [andM(mudIsa(X, C), genls(C, SC))])].
+ 1 ?- tranlate_M(impliesM(andM(isa(X,C),genls(C,SC)),isa(X,SC)),X).
+X = [cl([isa(X, SC)], [andM(isa(X, C), genls(C, SC))])].
 
 
-- tranlate_M(existsM(Z,impliesM(andM([mudIsa(X,C),genls(C,SC)]),mudIsa(X,SC),knows(X,Z))),F).
-F = [cl([impliesM(andM([mudIsa(X, C), genls(C, SC)]), mudIsa(X, SC), knows(X, f1))], [])].
+- tranlate_M(existsM(Z,impliesM(andM([isa(X,C),genls(C,SC)]),isa(X,SC),knows(X,Z))),F).
+F = [cl([impliesM(andM([isa(X, C), genls(C, SC)]), isa(X, SC), knows(X, f1))], [])].
 
-4 ?- tranlate_M(existsM(Z,impliesM(andM([mudIsa(X,C),genls(C,SC)]),andM([mudIsa(X,SC),knows(X,Z)]))),F).
-F = [cl([mudIsa(X, SC)], [mudIsa(X, C), genls(C, SC)]), cl([knows(X, f2)], [mudIsa(X, C), genls(C, SC)])].
+4 ?- tranlate_M(existsM(Z,impliesM(andM([isa(X,C),genls(C,SC)]),andM([isa(X,SC),knows(X,Z)]))),F).
+F = [cl([isa(X, SC)], [isa(X, C), genls(C, SC)]), cl([knows(X, f2)], [isa(X, C), genls(C, SC)])].
 
-5 ?- tranlate_M(existsM(Z,impliesM(andM([mudIsa(X,C),allHasPred(C,Pred)]),holds(Pred,X,Z))),F).
-F = [cl([holds(Pred, X, f3)], [mudIsa(X, C), allHasPred(C, Pred)])].
+5 ?- tranlate_M(existsM(Z,impliesM(andM([isa(X,C),allHasPred(C,Pred)]),holds(Pred,X,Z))),F).
+F = [cl([holds(Pred, X, f3)], [isa(X, C), allHasPred(C, Pred)])].
 
 6 ?- 
 
@@ -38,7 +38,7 @@ c2p(impliesM(andM([  subrelation(R1, R2), holds(R1, A, B)]), holds(R1, A, B)),X,
 
 c2p(impliesM(andM([  negInverse(R1, R2), -(holds(R1, A, B))]), holds(R1, B, A)),X,Y).
 
-c2p(impliesM(andM([ subrelation(A, B), domain(A, C, E), domain(B, C, D)  ]), mudSubclass(E, D)),X,Y).
+c2p(impliesM(andM([ subrelation(A, B), domain(A, C, E), domain(B, C, D)  ]), subclass(E, D)),X,Y).
 
 c2p(impliesM(andM([predSplit(R1,R2,R3), orM([  holds(R1, A, B), holds(R2, A, B) ])]), holds(R3, A, B) ),X,Y).
 
@@ -9883,7 +9883,7 @@ constructRestriction(RName,[vr(ICName2)|L1],[ICName2|L2]) :-
 	!.
      
  /*-------------------------------------------------------------------------------
-  * make_defelem(ICName,mudIsa(CName))
+  * make_defelem(ICName,isa(CName))
   * individualisiert ein Konzept CName mit dem Instanz-Namen ICName vom Typ string,
   * d.h. es wird das Abox-Element ICName zu Konzept hinzugefuegt und zwar in modal
   * context [] bzw MS.
@@ -9894,10 +9894,10 @@ consistCheck(Env,MS,IC,Concept) :-
 % vor dem Test die Normalform von isTDisjoint(Concept) mittels
 % normalizeNot(isTDisjoint(Concept),NotConcept)
 % bilden und dann
-% sb_ask(Env,MS,(mudIsa(IC,NotConcept)))
+% sb_ask(Env,MS,(isa(IC,NotConcept)))
 % aufrufen
 			 normalizeNot(isTDisjoint(Concept),NotConcept),
-			 sb_ask(Env,MS,(mudIsa(IC,NotConcept))),
+			 sb_ask(Env,MS,(isa(IC,NotConcept))),
 			 nl,
 			 write('--- impossible --- '),
 			 !,
@@ -9912,7 +9912,7 @@ consistCheck(Env,MS,IC,Concept) :-
 
 
 
-make_defelem(EnvName,MS,ICName,mudIsa(CName)):-
+make_defelem(EnvName,MS,ICName,isa(CName)):-
 	  consistCheck(EnvName,MS,ICName,CName),
 	  assert_ind(EnvName,MS,ICName,CName),
 	  !.
@@ -9946,7 +9946,7 @@ make_defelem_list(EnvName,MS,ICName1,irole(RName,iname(IRName),[X|T])) :-
 
 /*--------------------------------------------------------------------------------
  * sb_defelem(ICName1,ISpecListe)
- * ISpecListe=[mudIsa(...),irole(iname(...)nr(...)vr(...))]
+ * ISpecListe=[isa(...),irole(iname(...)nr(...)vr(...))]
  * erzeugt eine Instanz ICName1 fuer ein Konzept, an dem auch die Rolle RName
  * individualisiert werden kann mit dem Instanznamen IRName,
  * der Kardinalitaet der indiv. Rolle nr(MinNr,MaxNr,DefNr),
@@ -10104,15 +10104,15 @@ sb_ask(M,Q) :-
 /*----------------------------------------------------------------------------
  ************************* sb_ask-Selektoren fuer die ABox ***********************
  *
- * sb_ask(EnvName,MS,(mudIsa(ICName,CName)))
+ * sb_ask(EnvName,MS,(isa(ICName,CName)))
  *
  * ermoeglicht den Zugriff Initial.-Beziehung einer Instanz ICName zum entsprech-
  * ende generellen Konzept CName.
  *------------------------------------------*/
 
 
- sb_ask(EnvName,MS,(mudIsa(ICName,CName))) :- 
-	ask_M(EnvName,MS,mudIsa(ICName,CName),_).
+ sb_ask(EnvName,MS,(isa(ICName,CName))) :- 
+	ask_M(EnvName,MS,isa(ICName,CName),_).
 
 
 sb_ask(EnvName,MS,(attributes(CN,Attribute,Value))) :-
@@ -10689,7 +10689,7 @@ unmake_irole(EnvName,MS,ICName1,irole(RName,iname(IRName),vr(ICName2))) :-
 	undefprimrole(EnvName,MS,IRName, restr(RName,CName2)),
         delete_ind(EnvName,MS,ICName1,ICName2,IRName).
 
-unmake_defelem(EnvName,MS,ICName,mudIsa(CName)):-
+unmake_defelem(EnvName,MS,ICName,isa(CName)):-
 	delete_ind(EnvName,MS,ICName,CName),
 	!.
 
@@ -10743,7 +10743,7 @@ sb_undefelem(EnvName,MS,ICName1,[X|T]):-
 
 /**********************************************************************
  *
- * sb_fact(EnvName,MS,mudIsa(X,C),P)
+ * sb_fact(EnvName,MS,isa(X,C),P)
  *
  */
 
@@ -10757,7 +10757,7 @@ sb_fact(P1,P2,P3) :-
 	completeParameter([P1,P2,P3],EnvName,MS,Query,Proof),
 	sb_fact(EnvName,MS,Query,Proof).
 
-sb_fact(EnvName,MS,mudIsa(X,C),Exp) :-
+sb_fact(EnvName,MS,isa(X,C),Exp) :-
 	retractall1_M(hypothesis_M(_)),
  	environment_M(EnvName,Env,_),
  	convertMS(vNegative,Env,[[],true],MS,[],[W1,G1],_),
@@ -12295,19 +12295,19 @@ deduce_M(P1,P2,P3) :-
 	completeParameter([P1,P2,P3],EnvName,MS,Query,Proof),
 	deduce_M(EnvName,MS,Query,Proof).
 
-deduce_M(EnvName,MS,mudIsa(X,C),Exp) :-
+deduce_M(EnvName,MS,isa(X,C),Exp) :-
 	option_M(useSetheo,yes),
 	!,
-	deduceSetheo(EnvName,MS,mudIsa(X,C),Exp).
-deduce_M(EnvName,MS,mudIsa(X,C),Exp) :-
-	deduceMOTEL(EnvName,MS,mudIsa(X,C),Exp).
+	deduceSetheo(EnvName,MS,isa(X,C),Exp).
+deduce_M(EnvName,MS,isa(X,C),Exp) :-
+	deduceMOTEL(EnvName,MS,isa(X,C),Exp).
 
-deduceMOTEL(EnvName,MS,mudIsa(X,C),Exp) :-
+deduceMOTEL(EnvName,MS,isa(X,C),Exp) :-
 	retractall1_M(hypothesis_M(_)),
  	environment_M(EnvName,Env,_),
  	convertMS(vNegative,Env,[[],true],MS,[],[W1,G1],_),
 	clause(query_M(Env,W1,C,X,Exp,Goal),_).
-deduceMOTEL(EnvName,MS,mudIsa(X,C),Exp) :-
+deduceMOTEL(EnvName,MS,isa(X,C),Exp) :-
 	retractall1_M(hypothesis_M(_)),
  	environment_M(EnvName,Env,_),
  	convertMS(vNegative,Env,[[],true],MS,[],[W1,G1],_),
@@ -12329,7 +12329,7 @@ deduceMOTEL(EnvName,MS,roleFiller(X,R,L,N),Exp) :-
 	not_ftVar(X),
 	length(L,N).
 
-deduceSetheo(EnvName,MS,mudIsa(X,C),Exp) :-
+deduceSetheo(EnvName,MS,isa(X,C),Exp) :-
  	environment_M(EnvName,Env,_),
  	convertMS(vNegative,Env,[[],true],MS,[],[W1,G1],_),
 	getQuery(Env,MS,C,X,GL),
@@ -12544,10 +12544,10 @@ getQuery(Env,W1,C0,X,Exp,Goal) :-
  *
  *	Succeeds if Consequent follows under the hypothesis Hypothesis.
  */
-abduce(Hyps,mudIsa(X,Y)) :-
+abduce(Hyps,isa(X,Y)) :-
 	!,
 	getCurrentEnvironment(EnvName),
-	abduce(EnvName,[],Hyps,mudIsa(X,Y),_).
+	abduce(EnvName,[],Hyps,isa(X,Y),_).
 abduce(Hypothesis,Consequent) :-
         getCurrentEnvironment(EnvName),
 	abduce(EnvName,[],Hypothesis,Consequent,[]).
@@ -12559,21 +12559,21 @@ abduce(Hypothesis,Consequent) :-
  *	Succeeds if Consequent follows under the hypothesis Hypothesis.
  */
 
-abduce(EnvName,Hypothesis,mudIsa(X,C)) :-
+abduce(EnvName,Hypothesis,isa(X,C)) :-
 	nonvar(EnvName),
 	environment_M(EnvName,_,_),
 	!,
-	abduce(EnvName,[],mudIsa(X,C),_Exp).
-abduce(MS,Hypothesis,mudIsa(X,C)) :-
+	abduce(EnvName,[],isa(X,C),_Exp).
+abduce(MS,Hypothesis,isa(X,C)) :-
 	not_ftVar(MS),
 	(MS = [] ; MS = [_|_]),
         getCurrentEnvironment(EnvName),
 	!,
-	abduce(EnvName,MS,Hypothesis,mudIsa(X,C),_Exp).
-abduce(Hypothesis,mudIsa(X,C),Exp) :-
+	abduce(EnvName,MS,Hypothesis,isa(X,C),_Exp).
+abduce(Hypothesis,isa(X,C),Exp) :-
 	getCurrentEnvironment(EnvName),
 	!,
-	abduce(EnvName,[],Hypothesis,mudIsa(X,C),Exp).
+	abduce(EnvName,[],Hypothesis,isa(X,C),Exp).
 abduce(EnvName,Hypothesis,Consequent) :-
         environment_M(EnvName,_,_),
 	!,
@@ -12585,22 +12585,22 @@ abduce(MS,Hypothesis,Consequent) :-
 	!,
 	abduce(EnvName,MS,Hypothesis,Consequent,[]).
 
-abduce(EnvName,Hyps,mudIsa(X,Y),Exp) :-
+abduce(EnvName,Hyps,isa(X,Y),Exp) :-
 	nonvar(EnvName),
 	environment_M(EnvName,_,_),
 	!,
-	abduce(EnvName,[],Hyps,mudIsa(X,Y),Exp).
-abduce(MS,Hyps,mudIsa(X,Y),Exp) :-
+	abduce(EnvName,[],Hyps,isa(X,Y),Exp).
+abduce(MS,Hyps,isa(X,Y),Exp) :-
 	not_ftVar(MS),
 	(MS = [] ; MS = [_|_]),
 	getCurrentEnvironment(EnvName),
 	!,
-	abduce(EnvName,MS,Hyps,mudIsa(X,Y),Exp).
-abduce(EnvName,MS,Hyps,mudIsa(X,Y)) :-
+	abduce(EnvName,MS,Hyps,isa(X,Y),Exp).
+abduce(EnvName,MS,Hyps,isa(X,Y)) :-
 	!,
-	abduce(EnvName,MS,Hyps,mudIsa(X,Y),_Exp).
+	abduce(EnvName,MS,Hyps,isa(X,Y),_Exp).
 
-abduce(EnvName,MS,Hyps,mudIsa(X,C),Exp) :-
+abduce(EnvName,MS,Hyps,isa(X,C),Exp) :-
 	environment_M(EnvName,Env,_),
 	convertMS(vNegative,Env,[[],true],MS,[],[W1,G1],_),
 	constructMLCall(Env,rn(no,_RN1,user,_O1),bodyMC(W1),headMC(_),
@@ -12955,7 +12955,7 @@ realizeArgs(EnvName,MS,X,[C|AL],CL3) :-
 realizeNode(EnvName,MS,X,_CL,[C0|CL0],[C0|CL0]) :-
 	!.
 realizeNode(EnvName,MS,X,[C|CL],[],CL1) :-
-	deduce_M(EnvName,MS,mudIsa(X,C),_),
+	deduce_M(EnvName,MS,isa(X,C),_),
 	!,
 	CL1 = [C|CL].
 realizeNode(_,_,_,_,_,[]) :-
@@ -12981,7 +12981,7 @@ askNode(_EnvName,_MS,_esX,CL,[C0|CL0],CL1) :-
 	!,
 	append([C0|CL0],CL,CL1).
 askNode(EnvName,MS,X,[C|CL],[],CL1) :-
-	deduce_M(EnvName,MS,mudIsa(X,C),_),
+	deduce_M(EnvName,MS,isa(X,C),_),
 	!,
 	CL1 = [C|CL].
 askNode(_,_,_,_,_,[]) :-
@@ -13068,7 +13068,7 @@ example(1) :-
 	assert_ind(iTom,tMale).
 %%% Example  2:
 %%% KRIS-Example
-% setof(C,ask_M(mudIsa(iMary,C)),L)
+% setof(C,ask_M(isa(iMary,C)),L)
 % gives L = ['tTOP',grandparent,tRangeParent,parent_with_sons_only,
 %            parent_with_two_children,tAgentGeneric] 
 % in Total runtime 12.167 sec. (05.06.92)
@@ -13142,7 +13142,7 @@ example(7) :-
 	defconcept(c1,atleast(3,r)),
 	defconcept(c2,andM([allM(andM([r,p]),a),allM(andM([r,q]),isTDisjoint(a)),atleast(2,andM([r,p])),atleast(2,andM([r,q]))])).
 %%% Example  8;
-% ask_M(mudIsa(iTom,heterosexual))
+% ask_M(isa(iTom,heterosexual))
 % succeeds in Total runtime 0.033 sec. (05.06.92)
 example(8) :-
 	makeEnvironment('ex8','Disjunction of complementary tConcept'),
@@ -13152,7 +13152,7 @@ example(8) :-
 	defconcept(heterosexual,orM([tMale,tFemale])).
 %%% Example  9:
 % Variation of the KRIS-Example
-% ask_M(mudIsa(iChris,tMale))
+% ask_M(isa(iChris,tMale))
 % succeeds in Total runtime 0.000 sec. (05.06.92)
 example(9) :-
 	makeEnvironment('ex9','Variation of the KRIS example'),
@@ -13173,7 +13173,7 @@ example(9) :-
 	assert_ind(iMary,iTom,roleChild),
 	assert_ind(iMary,iChris,roleChild).
 %%% Example 10:
-% ask_M(mudIsa(iTom,c2)) 
+% ask_M(isa(iTom,c2)) 
 % succeeds in Total runtime 0.017 sec. (05.06.92)
 example(10) :-
 	makeEnvironment('ex10','Inverse Role'),
@@ -13243,7 +13243,7 @@ example(17) :-
 	defconcept(c1,someM(andM([roleChild,friend]),tDoctor)),
 	defconcept(c2,andM([someM(roleChild,tDoctor),someM(friend,tDoctor)])).
 %%% Example 18:
-% ask_M(mudIsa(iMary,c4))
+% ask_M(isa(iMary,c4))
 % succeeds in Total runtime 0.117 sec. (05.06.92)
 example(18) :-
 	makeEnvironment('ex18','Number restrictions'),
@@ -13258,7 +13258,7 @@ example(18) :-
 	assert_ind(iMary,iTom,roleChild),
 	assert_ind(iMary,c3).
 %%% Example 19
-% ask_M(mudIsa(iAmy,tFemale))
+% ask_M(isa(iAmy,tFemale))
 % succeeds in Total runtime 0.067 sec. (06.06.92)
 example(19) :-
 	makeEnvironment('ex19','Number restrictions'),
@@ -13289,7 +13289,7 @@ example(20) :-
 	assert_ind(iMary,iJane,roleChild),
 	assert_ind(iMary,c5).
 %%% Example 21
-% ask_M(mudIsa(betty,tFemale))
+% ask_M(isa(betty,tFemale))
 example(21) :-
 	makeEnvironment('ex21','Number restrictions'),
 	initEnvironment,
@@ -13308,7 +13308,7 @@ example(21) :-
 	assert_ind(david,iChris,teacher),
 	assert_ind(david,iPeter,teacher).
 %%% Example 22
-% ask_M(mudIsa(iAmy,tFemale))
+% ask_M(isa(iAmy,tFemale))
 % should succeeds
 % but fails in the current implementation
 example(22) :-
@@ -13330,7 +13330,7 @@ example(22) :-
 %%% Example 23
 % is a variant of example 23 with user provided names for the 
 % restricted tRole.
-% ask_M(mudIsa(iAmy,tFemale))
+% ask_M(isa(iAmy,tFemale))
 % should succeeds
 % but fails in the current implementation
 example(23) :-
@@ -13350,7 +13350,7 @@ example(23) :-
 	assert_ind(sue,betty,teacher),
 	assert_ind(sue,iChris,teacher).
 %%% Example 24
-% ask_M(mudIsa(iAudi7,c3))
+% ask_M(isa(iAudi7,c3))
 % succeeds in Total runtime 1.634 sec. (24.06.92)
 example(24) :-
 	makeEnvironment('ex24','Modal operators'),
@@ -13362,7 +13362,7 @@ example(24) :-
 	defconcept([b(believe,a1)],c3,b(believe,a1,c1)),
 	assert_ind(iAudi7,c1).
 %%% Example 25
-% isTDisjoint(ask_M(mudIsa(iAudi7,c3)))
+% isTDisjoint(ask_M(isa(iAudi7,c3)))
 % succeeds in Total runtime 0.033 sec. (24.06.92)
 example(25) :-
 	makeEnvironment('ex25','Modal operators'),
@@ -13392,7 +13392,7 @@ example(27) :-
 	defconcept(c1,isTDisjoint(someM(r,'tTOP'))),
 	defconcept(c2,allM(r,c5)).
 %%% Example 28
-% ask_M(ex28,[b(believe,iJohn)],mudIsa(iAudi7,tAutomobile),P)
+% ask_M(ex28,[b(believe,iJohn)],isa(iAudi7,tAutomobile),P)
 % succeeds
 example(28) :-
 	makeEnvironment('ex28','Modal operators'),
@@ -13403,7 +13403,7 @@ example(28) :-
 	assert_ind([b(believe,allM)],iAudi7,tAutomobile).
 %%% Example 29
 % is a variant of example 23 with a more restricted definition of c1
-% ask_M(mudIsa(iAmy,tFemale))
+% ask_M(isa(iAmy,tFemale))
 % should succeeds
 % but fails in the current implementation
 example(29) :-
@@ -13439,7 +13439,7 @@ example(30) :-
 	assert_ind(sue,iChris,teacher).
 %%% Example 31
 % First test example for defclosed
-% ask_M(mudIsa(iTom,onlyMaleChildren))
+% ask_M(isa(iTom,onlyMaleChildren))
 % succeeds
 example(31) :-
 	makeEnvironment('ex31','defclosed'),
@@ -13454,16 +13454,16 @@ example(31) :-
 	defclosed(iTom,_Y,roleChild).
 %%% Example 32
 % First test example for abduction
-% abduce(mudIsa(robin,tMale),H,E)
-% abduce(mudIsa(robin,tFemale),H,E)
+% abduce(isa(robin,tMale),H,E)
+% abduce(isa(robin,tFemale),H,E)
 example(32) :-
 	makeEnvironment('ex32','abduction'),
 	initEnvironment,
 	defconcept(tMale,isTDisjoint(tFemale)).
 %%% Example 33
 % Second test example for abduction
-% abduce(mudIsa(iNixon,tWarDove),H,E)
-% abduce(mudIsa(iNixon,tWarHawk),H,E)
+% abduce(isa(iNixon,tWarDove),H,E)
+% abduce(isa(iNixon,tWarHawk),H,E)
 % gives unexpected results!!!
 example(33) :-
 	makeEnvironment('ex33','abduction'),
@@ -13488,7 +13488,7 @@ example(34) :-
 	assert_ind(iJohn,tBird).
 %%% Example 35
 % This is a consistent specification of the tPenguin - tBird problem.
-% abduce(ex35,[],mudIsa(iJohn,tCanFly),H,E).
+% abduce(ex35,[],isa(iJohn,tCanFly),H,E).
 % succeeds with
 % H = [in_M(env(e1),rn(_7982,_7983,_7984,_7985),modal([]),normalBird,iJohn,
 %         hyp(_7989),ab(_7991),call(_7993),
@@ -13501,7 +13501,7 @@ example(34) :-
 %                           proved(in_M([],normalBird,iJohn),hyp(_7532),
 %                           basedOn(_7548))))))])))
 % andM
-% abduce(ex35,[],mudIsa(iTweety,tCanFly),H,E).
+% abduce(ex35,[],isa(iTweety,tCanFly),H,E).
 % fails
 example(35) :-
 	makeEnvironment('ex35',abduction),
@@ -13512,7 +13512,7 @@ example(35) :-
 	assert_ind(iJohn,tBird).
 %%% Example 36
 % Variant of example 33 giving the expected results:
-% abduce(ex36,[],mudIsa(iNixon,tWarDove),H,E).
+% abduce(ex36,[],isa(iNixon,tWarDove),H,E).
 % succeeds with
 % H = [in_M(env(e4),rn(_8077,_8078,_8079,_8080),modal([]),
 %         normalQuaker,iNixon,hyp(_8084),ab(_8086),call(_8088),
@@ -13525,7 +13525,7 @@ example(35) :-
 %                   call(_7631),proved(in_M([],normalQuaker,iNixon),
 %                   hyp(_7627),basedOn(_7643))))))]))) 
 % andM
-% abduce(ex36,[],mudIsa(iNixon,tWarHawk),H,E).
+% abduce(ex36,[],isa(iNixon,tWarHawk),H,E).
 % succeeds with
 % H = [in_M(env(e4),rn(_8077,_8078,_8079,_8080),modal([]),
 %         normalRepublican,iNixon, hyp(_8084),ab(_8086),call(_8088),
@@ -13552,7 +13552,7 @@ example(37) :-
 	defprimconcept(sprinkler_was_on,grass_is_wet),
 	defprimconcept(grass_is_wet,shoes_are_wet).
 %%% Example 38
-% ask_M(mudIsa(ideaste,c2))
+% ask_M(isa(ideaste,c2))
 % should succeed
 example(38) :-
 	makeEnvironment('ex38','disjunctive_information'),
@@ -13566,7 +13566,7 @@ example(38) :-
 	defconcept(c1,andM([fatherMurderer,someM(hasChild,isTDisjoint(fatherMurderer))])),
 	defconcept(c2,someM(hasChild,c1)).
 %%% Example 39
-% ask_M(mudIsa(iLucky,tFemale))
+% ask_M(isa(iLucky,tFemale))
 % succeeds
 example(39) :-
 	makeEnvironment('ex39','negation_as_failure'),
@@ -13576,12 +13576,12 @@ example(39) :-
 	defprimconcept(andM([someM(parentOf,tTOP),nafM(isTDisjoint(tFemale))]),tFemale),
 	assert_ind(iMary,iLucky,childOf).
 %%% Example 40
-% ask_M(mudIsa(iPeter,tRichPerson))
+% ask_M(isa(iPeter,tRichPerson))
 % succeeds.
 % After
 % assert_ind(iPeter,tPoorPerson)
 % the query_M
-% ask_M(mudIsa(iPeter,tRichPerson))
+% ask_M(isa(iPeter,tRichPerson))
 % fails
 example(40) :-
 	makeEnvironment('ex40','negation_as_failure'),
@@ -13590,12 +13590,12 @@ example(40) :-
 	defconcept(tPoorPerson,isTDisjoint(tRichPerson)),
 	assert_ind(iPeter,tDoctor).
 %%% Example 41
-% ask_M(mudIsa(iTom,tRichPerson))
+% ask_M(isa(iTom,tRichPerson))
 % succeeds.
 % After 
 % assert_ind(iTom,tPoorPerson)
 % the query_M
-% ask_M(mudIsa(iTom,tRichPerson))
+% ask_M(isa(iTom,tRichPerson))
 % fails
 example(41) :-
 	makeEnvironment('ex41','negation_as_failure'),
@@ -13607,12 +13607,12 @@ example(41) :-
 	assert_ind(iChris,tDoctor),
 	assert_ind(iChris,iTom,childOf).
 %%% Example 42
-% ask_M(mudIsa(iAudi7,tFourWheels))
+% ask_M(isa(iAudi7,tFourWheels))
 % succeeds.
 % After
 % assert_ind(iAudi7,fiveWheels)
 % the query_M
-% ask_M(mudIsa(iAudi7,tFourWheels))
+% ask_M(isa(iAudi7,tFourWheels))
 % fails
 example(42) :-
 	makeEnvironment('ex42','negation_as_failure'),
@@ -13651,7 +13651,7 @@ example(45) :-
 %%% Example 46
 % An insufficient specification of 
 % The bmw is either yellow, blue, or tRed but isTDisjoint yellow. 
-% ask_M(mudIsa(bmw,c3))
+% ask_M(isa(bmw,c3))
 % fails
 example(46) :-
 	makeEnvironment('ex46','concrete_domains'),
@@ -13664,7 +13664,7 @@ example(46) :-
 %%% Example 47
 % A correct specification of
 % The bmw is either yellow, blue, or tRed but isTDisjoint yellow. 
-% ask_M(mudIsa(bmw,c3))
+% ask_M(isa(bmw,c3))
 % succeeds
 example(47) :-
 	makeEnvironment('ex47','concrete_domains'),
@@ -13707,7 +13707,7 @@ example(48) :-
 	defrole(mudSubH,isMudInverseFn(mudSubH)),
 	defrole(mudSpouse,isMudInverseFn(mudSpouse)).
 %%% Example 49
-% ask_M(mudIsa(p,c4))
+% ask_M(isa(p,c4))
 % should fail
 example(49) :-
 	makeEnvironment('ex49','defaults'),
@@ -13825,8 +13825,8 @@ example(59) :-
 	sb_defconcept(tRangeMother,[supers([tRangeParent,tFemale])]),
 	sb_defconcept(tRangeFather,[supers([tRangeParent,tMale])]),
 	sb_defconcept(tGranny,[supers([grandparent,tRangeMother])]),
-	sb_defelem(iHarry,[mudIsa(tRangeParent)]),
-	sb_defelem(iMary,[mudIsa(tRangeMother), 
+	sb_defelem(iHarry,[isa(tRangeParent)]),
+	sb_defelem(iMary,[isa(tRangeMother), 
                          irole(roleChild, 
                                iname('marys-roleChild'),
                                [nr(1,30,2), vr(iHarry)])]).
@@ -13837,10 +13837,10 @@ example(60) :-
 	defprimconcept([b(believe,iPeter)],tDoctor,tRichPerson),
 	assert_ind([b(believe,iPeter)],iTom,tDoctor).
 %%% Example 61
-% deduce_M(mudIsa(iTweety,tCanFly))
-% deduce_M(mudIsa(iTweety,tCanNest))
-% deduce_M(mudIsa(iTweety,isTDisjoint(tEmu)))
-% deduce_M(mudIsa(iTweety,isTDisjoint(tCuckoo)))
+% deduce_M(isa(iTweety,tCanFly))
+% deduce_M(isa(iTweety,tCanNest))
+% deduce_M(isa(iTweety,isTDisjoint(tEmu)))
+% deduce_M(isa(iTweety,isTDisjoint(tCuckoo)))
 % succeed
 example(61) :-
 	makeEnvironment('ex61','Defaults and the lottery paradox'),
@@ -13851,16 +13851,16 @@ example(61) :-
 	defprimconcept(tCuckoo,isTDisjoint(tCanNest)),
 	assert_ind(iTweety,tBird).
 %%% Example 62
-% deduce_M(mudIsa(iTweety,tBird))
-% deduce_M(mudIsa(iTweety,tCanFly))
-% deduce_M(mudIsa(iTweety,tCanNest))
+% deduce_M(isa(iTweety,tBird))
+% deduce_M(isa(iTweety,tCanFly))
+% deduce_M(isa(iTweety,tCanNest))
 % consistent_M([])
 % succeed
-% deduce_M(mudIsa(iTweety,isTDisjoint(tEmu)))
-% deduce_M(mudIsa(iTweety,tEmu))
-% deduce_M(mudIsa(iTweety,isTDisjoint(tCuckoo)))
-% deduce_M(mudIsa(iTweety,tCuckoo))
-% deduce_M(mudIsa(iTweety,isTDisjoint(tBird)))
+% deduce_M(isa(iTweety,isTDisjoint(tEmu)))
+% deduce_M(isa(iTweety,tEmu))
+% deduce_M(isa(iTweety,isTDisjoint(tCuckoo)))
+% deduce_M(isa(iTweety,tCuckoo))
+% deduce_M(isa(iTweety,isTDisjoint(tBird)))
 % fail
 example(62) :-
 	makeEnvironment('ex62','Defaults and the lottery paradox'),
@@ -13872,12 +13872,12 @@ example(62) :-
 	defconcept(tBird,orM([tEmu,tCuckoo])),
 	assert_ind(iTweety,tBird).
 %%% Example 63
-% deduce_M(mudIsa(iTweety,tBird))
-% deduce_M(mudIsa(iTweety,tCanFly))
-% deduce_M(mudIsa(iTweety,tCanNest))
-% deduce_M(mudIsa(iTweety,sparrow))
-% deduce_M(mudIsa(iTweety,isTDisjoint(tEmu)))
-% deduce_M(mudIsa(iTweety,isTDisjoint(tCuckoo)))
+% deduce_M(isa(iTweety,tBird))
+% deduce_M(isa(iTweety,tCanFly))
+% deduce_M(isa(iTweety,tCanNest))
+% deduce_M(isa(iTweety,sparrow))
+% deduce_M(isa(iTweety,isTDisjoint(tEmu)))
+% deduce_M(isa(iTweety,isTDisjoint(tCuckoo)))
 % consistent_M([])
 % succeed
 example(63) :-
@@ -13890,12 +13890,12 @@ example(63) :-
 	defconcept(tBird,orM([sparrow,tEmu,tCuckoo])),
 	assert_ind(iTweety,tBird).
 %%% Example 64
-% deduce_M(mudIsa(iPeter,tLeftHandUseAble))
-% deduce_M(mudIsa(iPeter,tRightHandUseAble))
-% deduce_M(mudIsa(iPeter,tOneHandUseAble))
+% deduce_M(isa(iPeter,tLeftHandUseAble))
+% deduce_M(isa(iPeter,tRightHandUseAble))
+% deduce_M(isa(iPeter,tOneHandUseAble))
 % succeed
-% deduce_M(mudIsa(iPeter,tBothHandsUseAble))
-% deduce_M(mudIsa(iPeter,isTDisjoint(tBothHandsUseAble))
+% deduce_M(isa(iPeter,tBothHandsUseAble))
+% deduce_M(isa(iPeter,isTDisjoint(tBothHandsUseAble))
 % fail
 example(64) :-
 	makeEnvironment('ex64','Defaults and the lottery paradox'),
@@ -13907,7 +13907,7 @@ example(64) :-
 	defconcept(tBothHandsUseAble,andM([tLeftHandUseAble,tRightHandUseAble])),
 	assert_ind(iPeter,tOneHandBroken).
 %%% Example 65
-% deduce_M(mudIsa(iPeter,tLeftHandUseAble))
+% deduce_M(isa(iPeter,tLeftHandUseAble))
 % can prove tLeftHandUseAble by default because
 % cannot prove tLeftHandBroken because
 % can prove tOneHandBroken but
@@ -13919,11 +13919,11 @@ example(64) :-
 % can prove tLeftHandUseAble by default because
 % cannot prove tLeftHandBroken because the loop check prevents
 %                                     the application of any axiom
-% deduce_M(mudIsa(iPeter,tRightHandUseAble))
-% deduce_M(mudIsa(iPeter,isTDisjoint(tBothHandsUseAble))
+% deduce_M(isa(iPeter,tRightHandUseAble))
+% deduce_M(isa(iPeter,isTDisjoint(tBothHandsUseAble))
 % succeed
-% deduce_M(mudIsa(iPeter,tBothHandsUseAble))
-% deduce_M(mudIsa(iPeter,tOneHandUseAble))
+% deduce_M(isa(iPeter,tBothHandsUseAble))
+% deduce_M(isa(iPeter,tOneHandUseAble))
 % cannot prove tOneHandUseAble becauce
 % (cannot prove tLeftHandUseAble because
 %  can prove tLeftHandBroken because
@@ -13937,7 +13937,7 @@ example(64) :-
 %                                       the application of any axiom))
 % and it is also isTDisjoint possible possible to prove tRightHandUseAble
 % for similar reasons
-% deduce_M(mudIsa(iPeter,isTDisjoint(tOneHandUseAble)))
+% deduce_M(isa(iPeter,isTDisjoint(tOneHandUseAble)))
 % fail
 example(65) :-
 	makeEnvironment('ex65','Defaults and the lottery paradox'),
@@ -13951,13 +13951,13 @@ example(65) :-
 	defprimconcept(tRightHandBroken,isTDisjoint(tRightHandUseAble)),
 	assert_ind(iPeter,tOneHandBroken).
 %%% Example 66
-% deduce_M(mudIsa(iPeter,tLeftHandUseAble))
-% deduce_M(mudIsa(iPeter,tRightHandUseAble))
-% deduce_M(mudIsa(iPeter,tOneHandUseAble))
-% deduce_M(mudIsa(iPeter,isTDisjoint(tBothHandsUseAble))
+% deduce_M(isa(iPeter,tLeftHandUseAble))
+% deduce_M(isa(iPeter,tRightHandUseAble))
+% deduce_M(isa(iPeter,tOneHandUseAble))
+% deduce_M(isa(iPeter,isTDisjoint(tBothHandsUseAble))
 % succeed
-% deduce_M(mudIsa(iPeter,tBothHandsUseAble))
-% deduce_M(mudIsa(iPeter,isTDisjoint(tOneHandUseAble)))
+% deduce_M(isa(iPeter,tBothHandsUseAble))
+% deduce_M(isa(iPeter,isTDisjoint(tOneHandUseAble)))
 % fail
 example(66) :-
 	makeEnvironment('ex66','Defaults and the lottery paradox'),
@@ -13996,13 +13996,13 @@ example(68) :-
         assert_ind(iPeter,tOneHandBroken),
         assert_ind(iPeter,isTDisjoint(tBothHandsBroken)).
 %%% Example 69
-% deduce_M(mudIsa(iTweety,tBird))
+% deduce_M(isa(iTweety,tBird))
 % succeeds
-% deduce_M(mudIsa(iTweety,isTDisjoint(tBird)))
-% deduce_M(mudIsa(iTweety,tCanFly))
-% deduce_M(mudIsa(iTweety,isTDisjoint(tCanFly)))
-% deduce_M(mudIsa(iTweety,tCanNest))
-% deduce_M(mudIsa(iTweety,isTDisjoint(tCanNest)))
+% deduce_M(isa(iTweety,isTDisjoint(tBird)))
+% deduce_M(isa(iTweety,tCanFly))
+% deduce_M(isa(iTweety,isTDisjoint(tCanFly)))
+% deduce_M(isa(iTweety,tCanNest))
+% deduce_M(isa(iTweety,isTDisjoint(tCanNest)))
 % fail
 example(69) :-
 	makeEnvironment('ex69','Defaults and the lottery paradox'),
@@ -14014,11 +14014,11 @@ example(69) :-
 	defconcept(tBird,orM([tEmu,tCuckoo])),
 	assert_ind(iTweety,tBird).
 %%% Example 70
-% deduce_M(mudIsa(a,clearTop))
-% deduce_M(mudIsa(a,isTDisjoint(clearTop)))
+% deduce_M(isa(a,clearTop))
+% deduce_M(isa(a,isTDisjoint(clearTop)))
 % fail
-% deduce_M(mudIsa(b,clearTop))
-% deduce_M(mudIsa(b,clearTop))
+% deduce_M(isa(b,clearTop))
+% deduce_M(isa(b,clearTop))
 % succeed
 example(70) :-
 	makeEnvironment('ex70','Defaults and existential quantification'),
@@ -14075,13 +14075,13 @@ example(72) :-
 	assert_ind([b(believe,pv),b(want,pk)],polo,tAutomobile).
         % Demo:
         %
-        % setof(C,ask_M([b(believe,pk)],mudIsa(polo,C)),L).
+        % setof(C,ask_M([b(believe,pk)],isa(polo,C)),L).
         % L = [tAutomobile,langsam,tTOP,tVolkswagon,isTDisjoint(tBOT)]
         % Zun"achst erbt hier der pk vom b(believe,allM), den Glauben, da\3
         % polo ein tVolkswagon und damit ein tAutomobile ist. Vom b(believe,sporttyp) erbt 
         % er, da\3 tVolkswagon's langsam sind, womit auch der polo langsam ist.
         % 
-        % setof(C,ask_M([b(believe,pk)],mudIsa(manta,C)),L)
+        % setof(C,ask_M([b(believe,pk)],isa(manta,C)),L)
         % L = [tAutomobile,opel,tTOP,isTDisjoint(tBOT)]
         % Da es sich bei dem manta um einen opel handelt, wird zun"achst
         % nicht angenommen, da\3 der manta langsam ist.
@@ -14093,12 +14093,12 @@ example(72) :-
         % Dies f"uhrt bei der Wiederholung der letzten Anfrage zu folgendem
         % Ergebnis:
         %
-        % setof(C,ask_M([b(believe,pk)],mudIsa(manta,C)),L)
+        % setof(C,ask_M([b(believe,pk)],isa(manta,C)),L)
         % L = [tAutomobile,hatKat,langsam,opel,tTOP,isTDisjoint(tBOT)]
         %
         % Wir k"onnen neben der Deduktion auf Abduktion verwenden:
         %
-        % abduce([b(want,pk)],H,mudIsa(polo,wunsch_auto),E).
+        % abduce([b(want,pk)],H,isa(polo,wunsch_auto),E).
         % E = proved(in_M(app(_A:m(want,pk),[]),wunsch_auto,polo),
         %     basedOn(andM([proved(in_M(app(_A:m(want,pk),[]),tAutomobile,polo),
         %     basedOn(abox)),
@@ -14115,13 +14115,13 @@ example(72) :-
         %
         % Dadurch "andern sich die Anfrageergebnisse wie folgt:
         %
-        % setof(C,ask_M([b(believe,pk)],mudIsa(polo,C)),L).
+        % setof(C,ask_M([b(believe,pk)],isa(polo,C)),L).
         % L = [tAutomobile,tTOP,tVolkswagon,isTDisjoint(tBOT),isTDisjoint(langsam)]
         %
         % Der polo geh"ort nun zu den nicht langsamen Autos, da umwelttypen
         % genau dies glauben.
         % 
-        % setof(C,ask_M([b(believe,pk)],mudIsa(manta,C)),L).
+        % setof(C,ask_M([b(believe,pk)],isa(manta,C)),L).
         % L = [tAutomobile,hatKat,opel,tTOP,isTDisjoint(tBOT)]
         % 
         % Der Manta hat zwar immernoch einen Katalysator, ist aber trotzdem
@@ -14131,7 +14131,7 @@ example(72) :-
         % Wir k""onnen auch in diesem Fall fragen, unter welchen Umst"anden
         % pk den polo f"ur sein Wunschauto halten w"urde:
         %
-        % abduce([b(want,pk)],H,mudIsa(polo,wunsch_auto),E).
+        % abduce([b(want,pk)],H,isa(polo,wunsch_auto),E).
         % E = proved(in_M(app(_A:m(want,pk),[]),wunsch_auto,polo),
         %     basedOn(andM([proved(in_M(app(_A:m(want,pk),[]),tAutomobile,polo),
         %     basedOn(abox)),
@@ -14235,8 +14235,8 @@ go_goal_for_example :- print('No goal for this example'), nl.
 testMotelExample(1) :-	
 	go_goal_for_example.
 testMotelExample(2) :-
-	printTime(setof(C,E^deduce_M(ex2,[],mudIsa(iMary,C),E),L1)), print(L1), nl,
-	printTime(setof(D,F^deduce_M(ex2,[],mudIsa(iTom,D),F),L2)), print(L2), nl.
+	printTime(setof(C,E^deduce_M(ex2,[],isa(iMary,C),E),L1)), print(L1), nl,
+	printTime(setof(D,F^deduce_M(ex2,[],isa(iTom,D),F),L2)), print(L2), nl.
 testMotelExample(3) :-
 	tryGoal(inconsistent_M(ex3)).
 testMotelExample(4) :-
@@ -14250,11 +14250,11 @@ testMotelExample(6) :-
 testMotelExample(7) :-
 	go_goal_for_example.
 testMotelExample(8) :-
-	tryGoal(deduce_M(mudIsa(iTom,heterosexual))).
+	tryGoal(deduce_M(isa(iTom,heterosexual))).
 testMotelExample(9) :-
-	tryGoal(deduce_M(mudIsa(iChris,tMale))).
+	tryGoal(deduce_M(isa(iChris,tMale))).
 testMotelExample(10) :-
-	tryGoal(deduce_M(mudIsa(iTom,c2))).
+	tryGoal(deduce_M(isa(iTom,c2))).
 testMotelExample(11) :-
 	tryGoal(inconsistent_M(ex11)).
 testMotelExample(12) :-
@@ -14273,25 +14273,25 @@ testMotelExample(16) :-
 testMotelExample(17) :-
 	tryGoalF(subsumes([],c2,c1)).
 testMotelExample(18) :-
-	tryGoal(deduce_M(mudIsa(iMary,c4))).
+	tryGoal(deduce_M(isa(iMary,c4))).
 testMotelExample(19) :-
-	tryGoalF(deduce_M(mudIsa(iAmy,tFemale))).
+	tryGoalF(deduce_M(isa(iAmy,tFemale))).
 testMotelExample(20) :-
 	tryGoal(inconsistent_M(ex20)).
 testMotelExample(21) :-
 	go_goal_for_example,
-% 	deduce_M(mudIsa(betty,tFemale)),
+% 	deduce_M(isa(betty,tFemale)),
 	!.
 testMotelExample(22) :-
-% 	deduce_M(mudIsa(iAmy,tFemale)),
+% 	deduce_M(isa(iAmy,tFemale)),
 	go_goal_for_example.
 testMotelExample(23) :-
-% 	deduce_M(mudIsa(iAmy,tFemale))
+% 	deduce_M(isa(iAmy,tFemale))
 	go_goal_for_example.
 testMotelExample(24) :-
-	tryGoal(deduce_M(mudIsa(iAudi7,c3))).
+	tryGoal(deduce_M(isa(iAudi7,c3))).
 testMotelExample(25) :-
-	tryGoal(not(deduce_M(mudIsa(iAudi7,c3)))).
+	tryGoal(not(deduce_M(isa(iAudi7,c3)))).
 testMotelExample(26) :-
 	tryGoal(not(subsumes([],c1,c2))),
 	tryGoalF(subsumes([],c2,c1)).
@@ -14299,56 +14299,56 @@ testMotelExample(27) :-
 	tryGoal(not(subsumes([],c1,c2))),
 	tryGoalF(subsumes([],c2,c1)).
 testMotelExample(28) :-
-	tryGoalF(deduce_M(ex29,[b(believe,iJohn)],mudIsa(iAudi7,tAutomobile),_P)).
+	tryGoalF(deduce_M(ex29,[b(believe,iJohn)],isa(iAudi7,tAutomobile),_P)).
 testMotelExample(29) :-
 	go_goal_for_example.
 testMotelExample(30) :-
 	go_goal_for_example.
 testMotelExample(31) :-
-	tryGoal(deduce_M(mudIsa(iTom,onlyMaleChildren))).
+	tryGoal(deduce_M(isa(iTom,onlyMaleChildren))).
 testMotelExample(32) :-
-	tryGoal(abduce(_H1,mudIsa(robin,tMale),_E1)),
-	tryGoal(abduce(_H2,mudIsa(robin,tFemale),_E2)).
+	tryGoal(abduce(_H1,isa(robin,tMale),_E1)),
+	tryGoal(abduce(_H2,isa(robin,tFemale),_E2)).
 testMotelExample(33) :-
-	tryGoal(abduce(_H3,mudIsa(iNixon,tWarDove),_E3)),
-	tryGoal(abduce(_H4,mudIsa(iNixon,tWarHawk),_E4)).
+	tryGoal(abduce(_H3,isa(iNixon,tWarDove),_E3)),
+	tryGoal(abduce(_H4,isa(iNixon,tWarHawk),_E4)).
 testMotelExample(34) :-
 	tryGoal(inconsistent_M(ex34)).
 testMotelExample(35) :-
-	tryGoal(abduce(ex35,[],_H5,mudIsa(iJohn,tCanFly),_E5)),
-	tryGoal(not(abduce(ex35,[],_H8,mudIsa(iTweety,tCanFly),_E8))).
+	tryGoal(abduce(ex35,[],_H5,isa(iJohn,tCanFly),_E5)),
+	tryGoal(not(abduce(ex35,[],_H8,isa(iTweety,tCanFly),_E8))).
 testMotelExample(36) :-
-	tryGoal(abduce(ex36,[],_H6,mudIsa(iNixon,tWarDove),_E6)),
-	tryGoal(abduce(ex36,[],_H7,mudIsa(iNixon,tWarHawk),_E7)).
+	tryGoal(abduce(ex36,[],_H6,isa(iNixon,tWarDove),_E6)),
+	tryGoal(abduce(ex36,[],_H7,isa(iNixon,tWarHawk),_E7)).
 testMotelExample(37) :-
 	go_goal_for_example.
 testMotelExample(38) :-
-	tryGoal(deduce_M(mudIsa(ideaste,c2))).
+	tryGoal(deduce_M(isa(ideaste,c2))).
 testMotelExample(39) :-
-	tryGoal(deduce_M(mudIsa(iLucky,tFemale))),
+	tryGoal(deduce_M(isa(iLucky,tFemale))),
 	tryGoal(assert_ind(iLucky,tMale)),
-	tryGoalF(not(deduce_M(mudIsa(iLucky,tFemale)))),
+	tryGoalF(not(deduce_M(isa(iLucky,tFemale)))),
 	tryGoal(consistent_M([])).
 testMotelExample(40) :-
-	tryGoal(deduce_M(mudIsa(iPeter,tRichPerson))),
+	tryGoal(deduce_M(isa(iPeter,tRichPerson))),
 	tryGoal(assert_ind(iPeter,tPoorPerson)),
-	tryGoalF(not(deduce_M(mudIsa(iPeter,tRichPerson)))),
+	tryGoalF(not(deduce_M(isa(iPeter,tRichPerson)))),
 	tryGoal(consistent_M([])),
 	tryGoal(not(subsumes(tRichPerson,tDoctor))).
 testMotelExample(41) :-
-	tryGoal(deduce_M(mudIsa(iTom,tRichPerson))),
+	tryGoal(deduce_M(isa(iTom,tRichPerson))),
 	tryGoal(assert_ind(iTom,tPoorPerson)),
-	tryGoalF(not(deduce_M(mudIsa(iTom,tRichPerson)))),
+	tryGoalF(not(deduce_M(isa(iTom,tRichPerson)))),
 	tryGoal(consistent_M([])).
 testMotelExample(42) :-
-	tryGoal(deduce_M(mudIsa(iAudi7,tFourWheels))),
+	tryGoal(deduce_M(isa(iAudi7,tFourWheels))),
 	tryGoal(assert_ind(iAudi7,fiveWheels)),
-	tryGoalF(not(deduce_M(mudIsa(iAudi7,tFourWheels)))),
+	tryGoalF(not(deduce_M(isa(iAudi7,tFourWheels)))),
 	tryGoal(consistent_M([])).
 testMotelExample(43) :-
-	tryGoal(deduce_M(mudIsa(r,tRed))),
-	tryGoal(deduce_M(mudIsa(r,tRedOrYellow))),
-	tryGoal(deduce_M(mudIsa(r,tIsColors))).
+	tryGoal(deduce_M(isa(r,tRed))),
+	tryGoal(deduce_M(isa(r,tRedOrYellow))),
+	tryGoal(deduce_M(isa(r,tIsColors))).
 testMotelExample(44) :-
 	tryGoalF(subsumes(c2,c12)).
 testMotelExample(45) :-
@@ -14356,13 +14356,13 @@ testMotelExample(45) :-
 testMotelExample(46) :-
 	go_goal_for_example.
 testMotelExample(47) :-
-	tryGoalF(deduce_M(mudIsa(bmw,c3))).
+	tryGoalF(deduce_M(isa(bmw,c3))).
 testMotelExample(48) :-
 	go_goal_for_example.
 testMotelExample(49) :-
-	tryGoal(not(deduce_M(mudIsa(p,c4)))).
+	tryGoal(not(deduce_M(isa(p,c4)))).
 testMotelExample(50) :-
-	tryGoal(deduce_M(mudIsa(iPeter,c0))).
+	tryGoal(deduce_M(isa(iPeter,c0))).
 
 testMotelExample(51) :-
 	tryGoal(deduce_M(posInfl(a,d))),
@@ -14407,36 +14407,36 @@ testMotelExample(57) :-
 testMotelExample(58) :-
 	go_goal_for_example.
 testMotelExample(59) :-
-	tryGoal(sb_ask(mudIsa(iHarry,tRangeParent))),
-	tryGoal(sb_ask(mudIsa(iHarry,tAgentGeneric))),
+	tryGoal(sb_ask(isa(iHarry,tRangeParent))),
+	tryGoal(sb_ask(isa(iHarry,tAgentGeneric))),
 	printTime(setof((X,Y),sb_ask(role(roleChild,X,Y)),L1)), print(L1), nl,
 	printTime(setof(X,sb_ask(roleDef(roleChild,X)),L2)), print(L2), nl,
 	printTime(setof((X,Y),sb_ask(roleNr('marys-roleChild',X,Y)),L3)), print(L3), nl,
 	printTime(setof(X,sb_ask(roleDefNr('marys-roleChild',X)),L4)), print(L4), nl.
 testMotelExample(60) :-
-	tryGoal(deduce_M(ex60,[b(believe,iPeter)],mudIsa(iTom,tRichPerson),E)),
+	tryGoal(deduce_M(ex60,[b(believe,iPeter)],isa(iTom,tRichPerson),E)),
 	tryGoal(assert_ind([b(believe,iPeter)],iTom,isTDisjoint(tRichPerson))),
 	tryGoal(inconsistent_M([b(believe,iPeter)])).
 testMotelExample(61) :-
-	tryGoal(deduce_M(mudIsa(iTweety,tCanFly))),
-	tryGoal(deduce_M(mudIsa(iTweety,tCanNest))),
-	tryGoal(deduce_M(mudIsa(iTweety,isTDisjoint(tEmu)))),
-	tryGoal(deduce_M(mudIsa(iTweety,isTDisjoint(tCuckoo)))),
+	tryGoal(deduce_M(isa(iTweety,tCanFly))),
+	tryGoal(deduce_M(isa(iTweety,tCanNest))),
+	tryGoal(deduce_M(isa(iTweety,isTDisjoint(tEmu)))),
+	tryGoal(deduce_M(isa(iTweety,isTDisjoint(tCuckoo)))),
 	tryGoal(consistent_M([])).
 testMotelExample(62) :-
-	tryGoal(deduce_M(mudIsa(iTweety,tCanFly))),
-	tryGoal(deduce_M(mudIsa(iTweety,tCanNest))),
-	tryGoal(not(deduce_M(mudIsa(iTweety,isTDisjoint(tEmu))))),
-	tryGoal(not(deduce_M(mudIsa(iTweety,isTDisjoint(tCuckoo))))),
-	tryGoal(not(deduce_M(mudIsa(iTweety,tEmu)))),
-	tryGoal(not(deduce_M(mudIsa(iTweety,tCuckoo)))),
+	tryGoal(deduce_M(isa(iTweety,tCanFly))),
+	tryGoal(deduce_M(isa(iTweety,tCanNest))),
+	tryGoal(not(deduce_M(isa(iTweety,isTDisjoint(tEmu))))),
+	tryGoal(not(deduce_M(isa(iTweety,isTDisjoint(tCuckoo))))),
+	tryGoal(not(deduce_M(isa(iTweety,tEmu)))),
+	tryGoal(not(deduce_M(isa(iTweety,tCuckoo)))),
 	tryGoal(consistent_M([])).
 testMotelExample(63) :-
-	tryGoal(deduce_M(mudIsa(iTweety,tCanFly))),
-	tryGoal(deduce_M(mudIsa(iTweety,tCanNest))),
-	tryGoal(deduce_M(mudIsa(iTweety,isTDisjoint(tEmu)))),
-	tryGoal(deduce_M(mudIsa(iTweety,isTDisjoint(tCuckoo)))),
-	tryGoal(deduce_M(mudIsa(iTweety,sparrow))),
+	tryGoal(deduce_M(isa(iTweety,tCanFly))),
+	tryGoal(deduce_M(isa(iTweety,tCanNest))),
+	tryGoal(deduce_M(isa(iTweety,isTDisjoint(tEmu)))),
+	tryGoal(deduce_M(isa(iTweety,isTDisjoint(tCuckoo)))),
+	tryGoal(deduce_M(isa(iTweety,sparrow))),
 	tryGoal(consistent_M([])).
 
 
@@ -15392,6 +15392,7 @@ assert(roleRange(env(fssKB),[],worth_mod,worth)).
 
 isTDisjoint(G):-not(G).
 
+
 % :-testMotel.
 
 
@@ -15406,17 +15407,17 @@ isTDisjoint(G):-not(G).
 :-forall(is_asserted(disjointWith0(C1,C2)),show_call(must(defconcept(C1,isTDisjoint(C2))))).
 
 mudIsa_motel(ttObjectType,ttObjectType).
-mudIsa_motel(I,T):-no_repeats_av(deduce_M(mudIsa(I,T))),I\=ttObjectType,I\==isTDisjoint(tBOT),I\==tTOP,T\=isTDisjoint(tBOT),T\==tTOP.
+mudIsa_motel(I,T):-no_repeats_av(deduce_M(isa(I,T))),I\=ttObjectType,I\==isTDisjoint(tBOT),I\==tTOP,T\=isTDisjoint(tBOT),T\==tTOP.
 
 motel_literal_assert_retract(typeSubclass(X,Y),defprimconcept(X,Y),undefprimconcept(X,Y)).
 motel_literal_assert_retract(disjointWith(X,Y),sb_disjoint(X,Y),undefprimconcept(X,isTDisjoint(Y))).
-motel_literal_assert_retract(mudIsa(X,Y),assert_ind(X,Y),delete_ind(X,Y)).
+motel_literal_assert_retract(isa(X,Y),assert_ind(X,Y),delete_ind(X,Y)).
 
 user:decl_database_hook(OP,FACT):-motel_user_decl_database_hook(OP,FACT).
 
 
-motel_user_decl_database_hook(assert(_),mudIsa(C,ttObjectType)):-!,must(sb_primconcept(C)).
-motel_user_decl_database_hook(assert(_),mudIsa(C,CT)):- ttObjectType(C),!,must(sb_defelem(C,[mudIsa(CT)])).
-motel_user_decl_database_hook(assert(_),Lit):-motel_literal_assert_retract(Lit, Assert, _Retract),!,must(Assert).
-motel_user_decl_database_hook(retract(_),Lit):-motel_literal_assert_retract(Lit,_Assert, Retract),!,must(Retract).
+motel_user_decl_database_hook(change(assert,_),isa(C,ttObjectType)):-!,must(sb_primconcept(C)).
+motel_user_decl_database_hook(change(assert,_),isa(C,CT)):- ttObjectType(C),!,must(sb_defelem(C,[isa(CT)])).
+motel_user_decl_database_hook(change(assert,_),Lit):-motel_literal_assert_retract(Lit, Assert, _Retract),!,must(Assert).
+motel_user_decl_database_hook(change( retract,_),Lit):-motel_literal_assert_retract(Lit,_Assert, Retract),!,must(Retract).
 

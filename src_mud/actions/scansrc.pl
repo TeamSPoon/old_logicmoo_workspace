@@ -17,6 +17,7 @@
 found_undef(_,_,_).
 :- dynamic undef/2.
 
+/*
 % when we import new and awefull code base (the previous )this can be helpfull
 % we redfine list_undefined/1 .. this is the old version
 :- dynamic_multifile_exported(scansrc_list_undefined/1).
@@ -47,12 +48,12 @@ remove_undef_search:- ((
  assert((check:list_undefined(A):- not(thread_self(main)),!, ignore(A=[]))),
  assert((check:list_undefined(A):- reload_library_index,  update_changed_files,call(thread_self(main)),!, ignore(A=[]))),
  assert((check:list_undefined(A):- ignore(A=[]),scansrc_list_undefined(A))))).
-
+*/
 
 user:action_info(actScansrc,"Scan for sourcecode modifed on filesystem and TeamSPoon. NOTE: only new files with this mask (src_incoming/*/?*.pl) are picked up on").
 user:agent_call_command(Agent,actScansrc):-  once('@'(agent_call_safely(Agent,actScansrc),'user')).
 
-:-decl_mpred_prolog(actScansrc/0).
+:-export(actScansrc/0).
 actScansrc :- 
  ensure_loaded(library(make)),
  debugOnError((
@@ -74,9 +75,12 @@ include_moo_files_not_included(Mask):-
 
 include_moo_file_ni(M):-absolute_file_name(M,EX,[expand(true),access(read),file_type(prolog)]),include_moo_file_ni_1(EX).
 
-:-decl_mpred_prolog(mmake/0).
+
+/*
+
+:-export(mmake/0).
 mmake:- update_changed_files.
-:-decl_mpred_prolog(update_changed_files/0).
+:-export(update_changed_files/0).
 update_changed_files :-
         set_prolog_flag(verbose_load,true),
         ensure_loaded(library(make)),
@@ -94,7 +98,7 @@ update_changed_files :-
 	;   
            true %list_undefined,list_void_declarations
 	).
-
+*/
 
 include_moo_file_ni_1(M):- atomic_list_concat([_,_|_],'_i_',M),!.
 include_moo_file_ni_1(M):- atomic_list_concat([_,_|_],'_c_',M),!.

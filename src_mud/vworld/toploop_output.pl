@@ -39,7 +39,7 @@ show_kb_preds(Agent,LOC,List):-
         ignore((once(locationToRegion(LOC,Region);localityOfObject(Agent,Region)))),
          once((thlocal:repl_writer(Agent,WPred);WPred=default_repl_writer)),
          once((thlocal:repl_to_string(Agent,ToSTR);ToSTR=default_repl_obj_to_string)),!,
-        subst(List,isSelfLOC,Region,ListRR),
+        subst(List,vHere,Region,ListRR),
         subst(ListRR,isSelfAgent,Agent,ListR),
         show_kb_via_pred(WPred,ToSTR,ListR)]),!.
 

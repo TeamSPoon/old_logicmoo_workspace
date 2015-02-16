@@ -53,8 +53,6 @@ success(Agent,YN) :- mudCmdFailure(Agent,_)-> YN=vFalse ; YN=vTrue.
 :-dynamic_multifile_exported(add_cmdfailure/2).
 add_cmdfailure(Agent,What):-add(mudCmdFailure(Agent,What)).
 
-user:decl_database_hook(assert(_),mudCmdFailure(Agent,What)):- /*once(idel(cmdsuccess(Agent,What));*/clr(cmdsuccess(Agent,_)).
-
 % Initialize world.
 % This keeps the old databases messing with new runs.
            

@@ -11,8 +11,8 @@
 
 :-decl_type(vtOnOff).
 
-mudIsa(vOn,vtOnOff).
-mudIsa(vOff,vtOnOff).
+isa(vOn,vtOnOff).
+isa(vOff,vtOnOff).
 
 user:hook_coerce(Text,vtOnOff,ON_OFF):-text_to_string(Text,FLAG),to_on_off(FLAG,vOn,vOff,ON_OFF).
 

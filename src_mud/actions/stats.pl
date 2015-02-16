@@ -56,7 +56,7 @@ manipulation.
 morph to the best of its physical ability, including
 the fundamental utilization of the morph�s strength,
 endurance, and sustained positioning and motion.
-� Willpower (WIL) is your skill for isSelfAgent-control,
+� Willpower (WIL) is your skill for self-control,
 your ability to command your own destiny.
 */
 

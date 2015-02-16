@@ -64,7 +64,7 @@ is_3d(LOC):- compound(LOC).
 % Quintus random(1,MaxX,X) and random(1,MaxY,Y)
 grid_size(Region,MaxX,MaxY,MaxZ):- fail,
     typeGrid(What,1,L),
-   mudIsa(Region,What),!,
+   isa(Region,What),!,
    maxZ(MaxZ),
 	length(L,MaxX),
 	findall(1,typeGrid(What,_,_),LL),
@@ -92,11 +92,11 @@ in_grid_rnd(LocName,xyzFn(LocName,1,1,1)).
 
 
 init_location_grid(LocName):-
-        mudIsa(LocName,LocType),
+        isa(LocName,LocType),
         init_location_grid(LocName,LocType),!.
 
 init_location_grid(LocName,LocType):-
-        mudIsa(LocName,LocType),
+        isa(LocName,LocType),
         init2(LocName,LocType,1,1).
 
 % process map file (world.map.pl)
@@ -132,11 +132,11 @@ rez_loc_object(XY,Type):-
 %predModule(mudNearbyObjs(tObj,tObj),user).
 mudNearbyObjs(X,Y):-mudAtLoc(X,L1),mudAtLoc(Y,L2),mudNearbyLocs(L1,L2).
 
-locationToRegion(Obj,RegionIn):-var(Obj),!,dmsg(warn(var_locationToRegion(Obj,RegionIn))),mudIsa(RegionIn,tRegion).
-locationToRegion(Obj,RegionIn):-locationToRegion_0(Obj,Region),sanity((nonvar(Region),mudIsa(Region,tRegion))),!,RegionIn=Region.
+locationToRegion(Obj,RegionIn):-var(Obj),!,dmsg(warn(var_locationToRegion(Obj,RegionIn))),isa(RegionIn,tRegion).
+locationToRegion(Obj,RegionIn):-locationToRegion_0(Obj,Region),sanity((nonvar(Region),isa(Region,tRegion))),!,RegionIn=Region.
 locationToRegion_0(Obj,Obj):-var(Obj),dmsg(warn(var_locationToRegion(Obj,Obj))),!.
 locationToRegion_0(xyzFn(Region,_,_,_),Region2):-nonvar(Region),!,locationToRegion_0(Region,Region2).
-locationToRegion_0(Obj,Obj):-nonvar(Obj),!,mudIsa(Obj,tRegion),!.
+locationToRegion_0(Obj,Obj):-nonvar(Obj),!,isa(Obj,tRegion),!.
 locationToRegion_0(Obj,Region):-nonvar(Obj),must(localityOfObject(Obj,Location)),!,locationToRegion_0(Location,Region).
 locationToRegion_0(Obj,Obj):-dmsg(warn(locationToRegion(Obj,Obj))),!.
 
@@ -178,57 +178,38 @@ same_regions(Agent,Obj):-must(inRegion(Agent,Where1)),dif_safe(Agent,Obj),inRegi
 %:-add(prologPTTP(inRegion(tObj,tRegion))).
 %prologPTTP(localityOfObject(tObj,tSpatialthing)).
 
-%:- add_storage_stub(prologPTTP,inRegion/2).
-%:- add_storage_stub(prologPTTP,mudTestAgentWearing/2).
+%:- ensure_universal_stub(prologPTTP,inRegion/2).
+%:- ensure_universal_stub(prologPTTP,mudTestAgentWearing/2).
+
+:-decl_mpred_hybrid(mudAtLoc_deduced/2).
+
+predArgTypes(mudAtLoc_deduced(tObj,tSpatialThing)).
 
 mudAtLoc_deduced(X,Y):-show_call_failure(is_asserted(mudAtLoc(X,Y))),!.
 mudAtLoc_deduced(X,Y):-is_asserted(localityOfObject(X,_)),!,create_random_fact(mudAtLoc(X,Y)).
 
-:-decl_mpred_prolog(mudAtLoc_deduced/2).
 
-predArgTypes(mudAtLoc_deduced(tObj,tSpatialThing)).
-
-
-localityOfObject(Inner,Container):-mudInsideOf(Inner,Container).
-localityOfObject(Above,HasSurface):-mudLocOnSurface(Above,HasSurface).
-localityOfObject(Clothes,Agent):-mudSubPart(Agent,Clothes).
-localityOfObject(Inner,Outer):-use_pttp,localityOfObject(Inner,Container),localityOfObject(Container,Outer).
-
+localityOfObject_deduced(Agent,Where):- must(is_asserted(mudAtLoc(Agent,Where));is_asserted(localityOfObject(Agent,Where));mudAtLoc_deduced(Agent,Where)).
+localityOfObject_deduced(Obj,Region):- loop_check(inRegion(Obj,Region)).
 
 inRegion(Agent,RegionIn):- nonvar(Agent),!, loop_check(( localityOfObject_deduced(Agent,Where), locationToRegion(Where,Region)),fail),!,Region=RegionIn.
 inRegion(Agent,RegionIn):- must(nonvar(RegionIn)),!,(tItem(Agent);tAgentGeneric(Agent)),inRegion(Agent,RegionIn).
 
 %inRegion(Agent,Region):- nonvar(Region),!, loop_check(( (is_asserted(atloc(Agent,Where));localityOfObject(Agent,Where)), locationToRegion(Where,Region)),fail).
 
-/*
-:- must(show_call(get_mpred_storage_provider(assert(_),inRegion,O))).
-:- must(show_call(get_mpred_storage_provider(assert(_),inRegion/2,O))).
-:- must(show_call(get_mpred_storage_provider(assert(_),inRegion(_,_),O))).
-*/
 
 % inRegion(Obj,Where):- localityOfObject(Obj,Where), tRegion(Where).
 
 % :-snark_tell(localityOfObject(A,B) &  localityOfObject(B,C) => localityOfObject(A,C)).
 
 
-%localityOfObject(fo_T__T_T_T_TTTT_________TT__To,fo_T__T_T_T_TTTT_________TT__To_R).
-
-localityOfObject_deduced(Obj,Region):-loop_check(inRegion(Obj,Region)).
-localityOfObject_deduced(Agent,Where):-must(is_asserted(mudAtLoc(Agent,Where));is_asserted(localityOfObject(Agent,Where));mudAtLoc_deduced(Agent,Where)).
-
-
-localityOfObject_deduced(Obj,Region):-loop_check(inRegion(Obj,Region)).
-localityOfObject(Inner,Container):-mudInsideOf(Inner,Container).
-localityOfObject(Above,HasSurface):-mudLocOnSurface(Above,HasSurface).
-localityOfObject(Clothes,Agent):-mudSubPart(Agent,Clothes).
-localityOfObject(Inner,Outer):-use_pttp,localityOfObject(Inner,Container),localityOfObject(Container,Outer).
-
-
 mudSubPart(Outer,Inner):-is_asserted(mudInsideOf(Inner,Outer)).
 mudSubPart(Agent,Clothes):-wearsClothing(Agent,Clothes).
+mudSubPart(Subj,Obj):- thlocal:infThirdOrder, find_instance_of(mudSubPart,Subj,Obj).
 
-mudSubclass(tPlayer,tHominid).
-mudSubclass(tHumanBody,tBodyPart).
+
+subclass(tPlayer,tHominid).
+subclass(tHumanBody,tBodyPart).
 
 predInnerArgIsa(mudSubPart(tBodyPart,tBodyPart)).
 
@@ -243,10 +224,8 @@ predPredicateToFunction(Pred,SubjT,ObjT,FullNameFnO):-
 
 simplifyFullName(FullNameFn,FullNameFn).
 
-mudSubPart(Subj,Obj):- thlocal:infThirdOrder, find_instance_of(mudSubPart,Subj,Obj).
-
-find_instance_of(Pred,Subj,Obj):- predRelationAllExists(Pred,SubjT,ObjT), mudIsa(Subj,SubjT), 
- (is_asserted(dbase_t(Pred,Subj,Obj),mudIsa(Obj,ObjT)) *-> true ; (predPredicateToFunction(Pred,SubjT,ObjT,PredFn), Obj =.. [PredFn,Subj])).
+find_instance_of(Pred,Subj,Obj):- predRelationAllExists(Pred,SubjT,ObjT), isa(Subj,SubjT), 
+ (is_asserted(dbase_t(Pred,Subj,Obj),isa(Obj,ObjT)) *-> true ; (predPredicateToFunction(Pred,SubjT,ObjT,PredFn), Obj =.. [PredFn,Subj])).
 
 % mudSubPart(face,isEach(eyes,nose,mouth)).
 % mudSubPart([upper_torso,arms,left_arm,left_hand,left_digits]).
@@ -270,11 +249,11 @@ put_in_world_lc_gen(Obj):-choose_for(mudFacing,Obj,_),!,must_det((choose_for(mud
 ensure_in_world(What):-must_det(put_in_world(What)).
 
 
-:- decl_mpred_prolog user:decl_database_hook/2.
+% :- decl_mpred_prolog user:decl_database_hook/2.
 :- decl_mpred_prolog deduce_facts/2.
 :- decl_mpred_prolog create_random_fact/1.
 :- decl_mpred_prolog hooked_random_instance/3.
-:- decl_mpred_prolog fact_always_true/1.
+%:- decl_mpred_prolog fact_always_true/1.
 :- decl_mpred_prolog fact_maybe_deduced/1.
 :- decl_mpred_prolog fact_is_false/2.
 
@@ -282,14 +261,14 @@ ensure_in_world(What):-must_det(put_in_world(What)).
 
 % facts that cant be true
 
-%fact_is_false(mudAtLoc(Obj,_LOC),mudInsideOf(Obj,What)) :- nonvar(Obj),is_asserted(mudInsideOf(Obj,What)),not(mudIsa(What,tRegion)).
+%fact_is_false(mudAtLoc(Obj,_LOC),mudInsideOf(Obj,What)) :- nonvar(Obj),is_asserted(mudInsideOf(Obj,What)),not(isa(What,tRegion)).
 %fact_is_false(mudAtLoc(Obj,LOC),mudInsideOf(Obj,What)) :- nonvar(Obj),(mudInsideOf(Obj,What)),not(mudAtLoc(What,LOC)).
 %fact_is_false(localityOfObject(Obj,_LOC),mudInsideOf(Obj,What)) :- nonvar(Obj),(mudInsideOf(Obj,What)),!.
 
 % facts that must be true 
 %  suggest a deducable fact that is always defiantely true but not maybe asserted
-fact_always_true(localityOfObject(apathFn(Region,Dir),Region)):-is_asserted(pathBetween(Region,Dir,_)).
-fact_always_true(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,LOC)),locationToRegion(LOC,Region),!.
+user:fact_always_true(localityOfObject(apathFn(Region,Dir),Region)):-is_asserted(pathBetween(Region,Dir,_)).
+user:fact_always_true(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,LOC)),locationToRegion(LOC,Region),!.
 
 %  suggest a deducable fact that is probably true but not already asserted
 fact_maybe_deduced(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,LOC)),locationToRegion(LOC,Region),!.
@@ -457,7 +436,7 @@ facing_offset(front,F,X,Y,Z):-dir_offset(vNorth,F,X,Y,Z).
 
 
 
-user:decl_database_hook(retract(_),mudAtLoc(Agent,_)):-padd(Agent,mudNeedsLook(vTrue)).
+user:decl_database_hook(change( retract,_),mudAtLoc(Agent,_)):-padd(Agent,mudNeedsLook(vTrue)).
 
 % dir_mult(X,Y,Z,X1,Y1,Z1,X2,Y2,Z2):- X2 is X * X1,Y2 is Y * Y1,Z2 is Z * Z1.
 
@@ -588,7 +567,7 @@ list_object_dir_near(List,Type,Dir) :-
 
 scan_lists_aux([Loc|_],Type,N,N) :-
 	member(Obj,Loc),
-        mudIsa(Obj,Type),
+        isa(Obj,Type),
 	!.
 scan_lists_aux([_|Rest],Type,M,N) :-
 	Mtemp is M + 1,

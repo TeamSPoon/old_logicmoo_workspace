@@ -4,13 +4,9 @@
 */
 
 :- multifile(user:mud_regression_test/0).
-
-/*
-:- multifile(user:mudIsa/2).
-:- dynamic(user:mudIsa/2).
-:-import(user:mudIsa/2).
-'$toplevel':mudIsa(X,Y):-user:mudIsa(X,Y).
-*/
+:- multifile user:was_imported_kb_content/2.
+:- dynamic user:was_imported_kb_content/2.
+:- discontiguous(user:was_imported_kb_content/2).
 
 :- set_prolog_flag(generate_debug_info, true).
 :- exists_directory(runtime)->working_directory(_,runtime);(exists_directory('../runtime')->working_directory(_,'../runtime');true).
@@ -19,23 +15,7 @@
 :- '@'(ensure_loaded('../src_lib/logicmoo_util/logicmoo_util_all'),user).
 
 :- include(logicmoo(vworld/moo_header)).
-'$toplevel':mudIsa(X,Y):-'user':mudIsa(X,Y).
 
-:- '@'(if_file_exists(user_ensure_loaded(logicmoo('../externals/MUD_XperiMental/snark/snark_in_prolog'))),'user').
-/*
-else
-
-    decl_mpred_stubcol_lc(mudIsa,2,prologHybrid).
-
-% -- CODEBLOCK
-:-export(is_ftVar/1).
-user:is_ftVar(V):-var(V),!.
-user:is_ftVar('$VAR'(_)).
-:-export(not_ftVar/1).
-not_ftVar(V):-not(is_ftVar(V)).
-   
-
-*/
 
 % bugger:action_verb_useable(actWearUnused,wearsClothing,tWearAble,mudPossess).
 
@@ -47,8 +27,8 @@ swi_module(M,E):-dmsg(swi_module(M,E)).
 :- use_module(library(gui_tracer)).
 :- set_prolog_flag(gui_tracer, false).
 :- set_prolog_flag(answer_write_options, [quoted(true), portray(true), max_depth(1000), spacing(next_argument)]).
-:- set_prolog_flag(debug,false).
-:- set_mem_opt(false).
+%:- set_prolog_flag(debug,false).
+%:- set_mem_opt(false).
 
 :- multifile(user:semweb_startup).
 :- export(do_semweb_startup/0).
@@ -58,7 +38,8 @@ do_semweb_startup:-forall(clause(user:semweb_startup,Body),must(show_call(Body))
 :- if_file_exists(ensure_loaded('../externals/swish/logicmoo_run_swish')).
 
 % [Optionaly] register/run Cliopatria sparql server (remote RDF browsing)
-:- if_startup_script(ensure_loaded('run_clio')).
+% :- if_startup_script(ensure_loaded('run_clio')).
+user:semweb_startup:-ensure_loaded('run_clio').
 
 % [Optionaly] register/run KnowRob robot services (we use it for the ontology mainly)
 user:semweb_startup :- with_no_term_expansions(if_file_exists(ensure_loaded('../externals/MUD_KnowRob/knowrob_addons/knowrob_mud/prolog/init.pl'))).
@@ -78,14 +59,14 @@ user:semweb_startup :- register_ros_package(euler).
 % :- include(run_common).
 
 % [Optionaly] remove debug noises
-user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),show_call(asserta(prolog_debug:debugging(http(X), false, O)))).
+% user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),show_call(asserta(prolog_debug:debugging(http(X), false, O)))).
 % user:semweb_startup:- forall(retract(prolog_debug:debugging((X), true, O)),show_call(asserta(prolog_debug:debugging((X), false, O)))).
-
 
 :-multifile(pre_file_search_path/2).
 % user:pre_file_search_path(_,_):-!,fail.
 % :- do_semweb_startup.
 % :- do_web_startup.
+
 
 % [Manditory] load_default_game
 % this is what happens when the world is not found
@@ -104,44 +85,42 @@ user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),s
 % :- add_game_dir('../games/src_game_nani',prolog_repl).       
 % :- add_game_dir('../games/src_game_sims',prolog_repl).
 
-:- add_game_dir('../games/src_game_startrek',prolog_repl).
 
-% :-prolog.
+%:- add_game_dir('../games/src_game_startrek',prolog_repl).
 
 tAgentGeneric(iCommanderData66).
-mudIsa(iCommanderData66,'tMonster').
-mudIsa(iCommanderData66,'tExplorer').
+instance(iCommanderData66,'tMonster').
+instance(iCommanderData66,'tExplorer').
 wearsClothing(iCommanderData66,'iBoots673').
 wearsClothing(iCommanderData66,'iComBadge674').
 wearsClothing(iCommanderData66,'iGoldUniform675').
 mudStowing(iCommanderData66,'iPhaser676').
-pddlSomethingIsa('iBoots673',['tBoots','ProtectiveAttire','PortableObject','SomethingToWear']).
+pddlSomethingIsa('iBoots673',['tBoots','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iComBadge674',['tComBadge','ProtectiveAttire','PortableObject','tNecklace']).
-pddlSomethingIsa('iGoldUniform675',['tGoldUniform','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','SomethingToWear']).
+pddlSomethingIsa('iGoldUniform675',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
+pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
 mudDescription(iCommanderData66,txtFormatFn("Very screy looking monster named ~w",[iCommanderData66])).
 
 tAgentGeneric(iExplorer77).
 wearsClothing(iExplorer77,'iBoots7773').
 wearsClothing(iExplorer77,'iComBadge7774').
 wearsClothing(iExplorer77,'iGoldUniform7775').
-mudIsa(iExplorer77,'tExplorer').
-mudStowing(iExplorer6,'iPhaser7776').
-pddlSomethingIsa('iBoots7773',['tBoots','ProtectiveAttire','PortableObject','SomethingToWear']).
+instance(iExplorer77,'tExplorer').
+mudStowing(iExplorer77,'iPhaser7776').
+pddlSomethingIsa('iBoots7773',['tBoots','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iComBadge7774',['tComBadge','ProtectiveAttire','PortableObject','tNecklace']).
-pddlSomethingIsa('iGoldUniform7775',['tGoldUniform','ProtectiveAttire','PortableObject','SomethingToWear']).
-pddlSomethingIsa('iPhaser7776',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','SomethingToWear']).
-mudIsa(iExplorer77,'tExplorer').
+pddlSomethingIsa('iGoldUniform7775',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
+pddlSomethingIsa('iPhaser7776',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
+instance(iExplorer77,'tExplorer').
 localityOfObject(iExplorer77,'tLivingRoom').
 
+:- prolog.
+
 % [Manditory] This loads the game and initializes so test can be ran
-
-
 :- if_startup_script( at_start(finish_processing_world)).
 
 % :- if_startup_script( doall(now_run_local_tests_dbg)).
 
-/*
 :-enqueue_player_command(actWho).
 :-enqueue_player_command("rez crackers").
 :-enqueue_player_command("drop crackers").
@@ -154,7 +133,6 @@ localityOfObject(iExplorer77,'tLivingRoom').
 :-enqueue_player_command("tp to closet").
 :-enqueue_player_command("take shirt").
 :-enqueue_player_command("inventory").
-*/
 
 :-enqueue_player_command(prolog).
 

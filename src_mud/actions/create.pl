@@ -22,7 +22,7 @@
 rez_to_inventory(Agent,NameOrType,NewObj):-   
   must_det_l([
    create_meta(NameOrType,Clz,tItem,NewObj),
-   add(mudIsa(NewObj,Clz)),
+   add(isa(NewObj,Clz)),
    padd(Agent,mudStowing(NewObj)),
    padd(NewObj,authorWas(rez_to_inventory(Agent,NameOrType,NewObj))),
    add_missing_instance_defaults(NewObj),
@@ -55,12 +55,12 @@ create_new_object(Agent,[tCol,NameOfType|DefaultParams]):-!,create_new_type(Agen
 create_new_object(Agent,[NameOrType|Params]):-
    create_meta(NameOrType,NewType,tSpatialThing,NewObj),
    assert_isa(NewObj,NewType),
-   add_fast(mudSubclass(NewType,tItem)),
+   add(subclass(NewType,tItem)),
    padd(NewObj,authorWas(create_new_object(Agent,[NameOrType|Params]))),
    padd(Agent,current_pronoun("it",NewObj)),   
    getPropInfo(Agent,NewObj,Params,2,PropList),!,
    padd(NewObj,PropList),
-   must((mudIsa(NewObj,tItem),padd(Agent,mudStowing(NewObj)))),
+   must((isa(NewObj,tItem),padd(Agent,mudStowing(NewObj)))),
    add_missing_instance_defaults(NewObj).
 
 :-decl_mpred_prolog(create_new_type/2).

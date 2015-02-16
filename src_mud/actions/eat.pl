@@ -22,7 +22,7 @@
 
 :- register_module_type(mtCommand).
 
-mudSubclass(tFood,tEatAble).
+subclass(tFood,tEatAble).
 user:action_info(actEat(tEatAble),"nourish oneself").
 
 % Eat something held

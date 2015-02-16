@@ -56,7 +56,7 @@ end_of_file.
 
     Wishlist: Another thing is that actions need to be primitives (I
     think in most of the AI literature actions are taken to be basic
-    constructs). Modification of an action is a problem. For instance,
+    constructs). Modification of an action is a problem. For isa,
     you could have
 
     Take the key with your left hand!

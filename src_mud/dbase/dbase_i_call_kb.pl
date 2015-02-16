@@ -40,7 +40,7 @@ kb_t(Call):- into_plist(Call,PLIST),[AH|LIST]=PLIST,!, kb_t(AH,LIST,PLIST).
 
 kb_t(AH,_,PLIST):-var(AH),!,kbp_t(PLIST).
 kb_t(dbase_t,PLIST,_):- !,kbp_t(PLIST).  % dbase_t is our versuion of '$holds' or call/N
-kb_t(mudSubclass,PLIST,_):- !,kbp_t([genls|PLIST]). % rewrite hack for SUMO callers
+kb_t(subclass,PLIST,_):- !,kbp_t([genls|PLIST]). % rewrite hack for SUMO callers
 kb_t(AH,PLIST,_):- is_holds_true(AH),!,kb_t(PLIST). % is_holds_true/1 is temp disabled for speed
 kb_t(AH,PLIST,_):- is_holds_false(AH),!,kb_f(PLIST). % is_holds_false(not).
 kb_t(_,_,PLIST):- kbp_t(PLIST).
@@ -116,7 +116,7 @@ cyckb_t(PLIST):- not(el_holds_DISABLED_KB), apply(cyckb_t,PLIST).
 
 :-dynamic_multifile_exported(noGenlPreds/1).
 noGenlPreds(coGenlPreds).
-noGenlPreds(mudIsa).
+noGenlPreds(isa).
 noGenlPreds(genls).
 noGenlPreds(X):-not(atom(X)),!.
 noGenlPreds(_).
@@ -262,14 +262,17 @@ print_sentence(Proof):- fix_sentence(Proof,New),!,ignore((Proof\=New,!,must_det(
 
 relax_term(P,P,Aic,Aic,Bic,Bic):- !.
 /*
-relax_term(P,P,A,A,Bi,Bc):- arg(_,v(mudSubclass,isa),P),!,fail.
+relax_term(P,P,A,A,Bi,Bc):- arg(_,v(subclass,isa),P),!,fail.
 relax_term(P,P,Ai,Ac,Bic,Bic):- when_met(nonvar(Ac), same_arg(same_or(isa),Ac,Ai)),!.
-relax_term(P,P,Ai,Ac,Bi,Bc):- is_type(Ai),!,when_met(pred(nonvar,Ac), (same_arg(same_or(mudSubclass),Ac,Ai),same_arg(same_or(equals),Bc,Bi))),!.
-relax_term(P,P,Ai,Ac,Bi,Bc):- when_met(pred(nonvar,Ac),when_met(pred(nonvar,Bc), (same_arg(same_or(mudSubclass),Ac,Ai),same_arg(same_or(equals),Bc,Bi)))).
+relax_term(P,P,Ai,Ac,Bi,Bc):- is_type(Ai),!,when_met(pred(nonvar,Ac), (same_arg(same_or(subclass),Ac,Ai),same_arg(same_or(equals),Bc,Bi))),!.
+relax_term(P,P,Ai,Ac,Bi,Bc):- when_met(pred(nonvar,Ac),when_met(pred(nonvar,Bc), (same_arg(same_or(subclass),Ac,Ai),same_arg(same_or(equals),Bc,Bi)))).
 */
 
 % ?- member(R,[a,b,c]),when_met(nonvar(Re), dbase:same_arg(same_or(termOfUnit),n,Re)),Re=R,write(chose(R)).
 
+
+callable_tf(P,2):- mpred_arity_pred(P),!,fail.
+callable_tf(F,A):- functor_safe(P,F,A),predicate_property(P,_),!.
 
 
 call_whichlist_t(dac(d,_,_,_),CALL,_):- dbase_t(CALL).

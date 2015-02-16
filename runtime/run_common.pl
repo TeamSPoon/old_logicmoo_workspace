@@ -13,9 +13,9 @@ prolog:message(git(update_versions),A,A):-!.
 % :- make.
 :- portray_text(true).
 
-:-set_prolog_stack(global, limit(16*10**9)).
-:-set_prolog_stack(local, limit(16*10**9)).
-:-set_prolog_stack(trail, limit(16*10**9)).
+:-set_prolog_stack(global, limit(64*10**9)).
+:-set_prolog_stack(local, limit(64*10**9)).
+:-set_prolog_stack(trail, limit(64*10**9)).
 
 :- ((current_prolog_flag(readline, true))->expand_file_name("~/.pl-history", [File|_]),(exists_file(File) -> rl_read_history(File); true),at_halt(rl_write_history(File));true).
 
@@ -105,7 +105,7 @@ user:file_search_path(swish, '../externals/swish'):- current_prolog_flag(unix,tr
    %save_settings('moo_settings.db').
    %%setting(cliopatria_binding:path, atom, SP, 'Path to root of cliopatria install'),!.
 
-:- user_use_module(logicmoo('http/user_page')).
+% :- user_use_module(logicmoo('http/user_page')).
 
 :- meta_predicate(startup_mod:if_version_greater(?,0)).
 

@@ -85,7 +85,7 @@ move_command_1(Agent,Dir):-
 	from_dir_target(LOC,Dir,XXYY),
 	is_3d(XXYY),
         mudAtLoc(Agent2,XXYY),
-	mudIsa(Agent2,tAgentGeneric),
+	isa(Agent2,tAgentGeneric),
 	call_update_stats(Agent,collide),
 	call_update_charge(Agent,actMove),
         raise_location_event(XXYY,collide(Agent,Agent2)),

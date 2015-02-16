@@ -6,28 +6,28 @@
 % Dec 13, 2035
 %
 */
-:-swi_module(moo_loader, []).
+:-swi_module(dbase_i_loader, []).
 
-:-dynamic(registered_game_file/1).
-:-decl_mpred_prolog(declare_load_game/1).
-declare_load_game(Spec):- forall(filematch(Spec,File),show_call(asserta_if_new(registered_game_file(File)))).
+:- include(dbase_i_header).
 
-:-decl_mpred_prolog(load_game_files/0).
-load_game_files :- forall(registered_game_file(File),ensure_plmoo_loaded(File)).
+:-dynamic(registered_dbase_file/1).
+:-decl_mpred_prolog(declare_load_dbase/1).
+declare_load_dbase(Spec):- forall(filematch(Spec,File),show_call(asserta_if_new(registered_dbase_file(File)))).
+
+:-decl_mpred_prolog(load_dbase_files/0).
+load_dbase_files :- forall(registered_dbase_file(File),ensure_plmoo_loaded(File)).
 
 :-dynamic thglobal:current_world/1.
 thglobal:current_world(current).
 
 :- meta_predicate show_load_call(0).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+ensure_dbase_file(Mask):- ensure_plmoo_loaded(Mask).
 
-ensure_game_file(Mask):- ensure_plmoo_loaded(Mask).
+:-meta_predicate_transparent(load_dbase/1).
 
-:-meta_predicate_transparent(load_game/1).
-
-load_game(File):-thglobal:current_world(World), load_game(World,File),!.
-load_game(World,File):- 
+load_dbase(File):-thglobal:current_world(World), load_dbase(World,File),!.
+load_dbase(World,File):- 
  with_no_assertions(thglobal:use_cyc_database,
     ( world_clear(World),
       retractall(thglobal:loaded_file_world_time(_,_,_)),
@@ -79,7 +79,7 @@ reload_plmoo_file(FileIn):-
    dbase_mod(DBASE),'@'(load_data_file(World,File),DBASE).
 
 :-meta_predicate_transparent(load_data_file/2).
-load_data_file(World,FileIn):- with_assertions(thglobal:current_world(World),load_data_file(FileIn)).
+load_data_file(World,FileIn):-  with_assertions(thglobal:current_world(World),load_data_file(FileIn)).
 
 :-thread_local(thlocal:onEndOfFile/2).
 :-meta_predicate_transparent(load_data_file/1).
@@ -89,26 +89,24 @@ load_data_file(FileIn):-
   time_file_safe(File,NewTime),
   assert(thglobal:loaded_file_world_time(File,World,NewTime)), 
    dmsginfo(loading_data_file(File,World,NewTime)),!,
-  catch((with_assertions(thglobal:loading_game_file(World,File),
-      setup_call_cleanup(see(File),load_game_name_stream(World),seen)),
+
+  catch((with_assertions(thglobal:loading_dbase_file(World,File),
+      setup_call_cleanup(see(File),load_dbase_name_stream(World),seen)),
       load_data_file_end(World,File)),
    Error,
-    (wdmsg(error(Error,File)),retractall(thglobal:loaded_game_file(World,File)),
+    (wdmsg(error(Error,File)),retractall(thglobal:loaded_dbase_file(World,File)),
      retractall(thglobal:loaded_file_world_time(File,World,NewTime)))).
 
 :-export(load_data_file_end/2).
 load_data_file_end(World,File):-
-   asserta_new(thglobal:loaded_game_file(World,File)),
+   asserta_new(thglobal:loaded_dbase_file(World,File)),
    dmsginfo(info(load_data_file_complete(File))),
-   forall(onEndOfFile(File,Call),must((call(Call),retractall(onEndOfFile(File,Call))))).
+   forall(onEndOfFile(File,Call),must((prologCall(Call),retractall(onEndOfFile(File,Call))))).
 
-load_game_name_stream(_Name):- repeat,read_one_term(Term),myDebugOnError(add_term(Term)),Term == end_of_file,!.
-load_game_name_stream(_Name,Stream):- repeat,read_one_term(Stream,Term),myDebugOnError(add_term(Term)),Term == end_of_file,!.
+load_dbase_name_stream(_Name):- do_gc,repeat,read_one_term(Term),myDebugOnError(add_term(Term)),Term == end_of_file,!.
+load_dbase_name_stream(_Name,Stream):- do_gc,repeat,read_one_term(Stream,Term),myDebugOnError(add_term(Term)),Term == end_of_file,!.
 
-add_term(':-'(dynamic(F/A))):-assert_arity(F,A),!.
-add_term(A):-must(fast_add(A)).
-
-myDebugOnError(Term):-catch(once((call(Term))),E,(dmsg(error(E,start_myDebugOnError(Term))),trace,rtrace(call(Term)),dmsginfo(stop_myDebugOnError(E=Term)),trace)).
+myDebugOnError(Term):-catch(once(must(prologCall(Term))),E,(dmsg(error(E,start_myDebugOnError(Term))),trace,rtrace(prologCall(Term)),dmsginfo(stop_myDebugOnError(E=Term)),trace)).
 
 read_one_term(Term):- catch(once(( read_term(Term,[double_quotes(string)]))),E,(Term=error(E),dmsg(error(E,read_one_term(Term))))).
 read_one_term(Stream,Term):- catch(once(( read_term(Stream,Term,[double_quotes(string)]))),E,(Term=error(E),dmsg(error(E,read_one_term(Term))))).
@@ -124,11 +122,11 @@ rescan_mpred_stubs:- doall((mpred_prop(F,prologHybrid),mpred_arity(F,A),A>0,warn
 % :-module_transparent(finish_processing_world()).
 
 % :-meta_predicate_transparent(finish_processing_world).
-% :-meta_predicate_transparent(finish_processing_game()).
+% :-meta_predicate_transparent(finish_processing_dbase()).
 %:-meta_predicate_transparent(rescan_all/0).
 :-meta_predicate_transparent(doall_and_fail(0)).
 
-finish_processing_world :- load_game_files, loop_check_local(with_assertions(thlocal:do_slow_kb_op_now,doall(finish_processing_game)),true).
+finish_processing_world :- load_dbase_files, loop_check_local(with_assertions(thlocal:do_slow_kb_op_now,doall(finish_processing_dbase)),true).
 
 doall_and_fail(Call):- time_call(once(doall(Call))),fail.
 
@@ -142,10 +140,12 @@ current_filesource(F):-seeing(X),stream_property(X,file_name(F)).
 :-dynamic(onEndOfFile/2).
 onEndOfFile(Call):-current_filesource(F),asserta(onEndOfFile(F,Call)).
 
-assert_until_end_of_file(Fact):-must_det_l((thread_local(Fact),asserta(Fact),onEndOfFile(retract(Fact)))).
+assert_until_end_of_file(Fact):-must_det_l((thread_local(Fact),asserta(Fact),((onEndOfFile(database_op(change( retract,one),Fact)))))).
 
 %:-meta_predicate_transparent(rescan_all/0).
-rescan_all:- doall_and_fail(rescan_game_loaded).
+rescan_all:- doall_and_fail(rescan_dbase_ops).
+rescan_all:- doall_and_fail(rescan_dbase_facts).
+rescan_all:- doall_and_fail(rescan_dbase_loaded).
 rescan_all:- doall_and_fail(rescan_dbase_ops).
 rescan_all:- doall_and_fail(rescan_dbase_facts).
 rescan_all:- doall_and_fail(rescan_default_props).
@@ -153,22 +153,22 @@ rescan_all:- doall_and_fail(rescan_slow_kb_ops).
 rescan_all:- doall_and_fail(rescan_mpred_props).
 rescan_all.
 
-ensure_at_least_one_region:- (mudIsa(_,tRegion)->true;create_instance(oneRegion1,tRegion)),!.
+ensure_at_least_one_region:- (isa(_,tRegion)->true;create_instance(oneRegion1,tRegion)),!.
 
-% :-meta_predicate_transparent(finish_processing_game).
-finish_processing_game:- dmsginfo(begin_finish_processing_game),fail.
-finish_processing_game:- doall_and_fail(rescan_all).
-finish_processing_game:- doall_and_fail(ensure_at_least_one_region).
-finish_processing_game:- doall_and_fail(call_OnEachLoad).
-finish_processing_game:- dmsginfo(saving_finish_processing_game),fail.
-finish_processing_game:- savedb,fail.
-finish_processing_game:- dmsginfo(end_finish_processing_game),fail.
-finish_processing_game.
+% :-meta_predicate_transparent(finish_processing_dbase).
+finish_processing_dbase:- do_gc,dmsginfo(begin_finish_processing_dbase),fail.
+finish_processing_dbase:- doall_and_fail(rescan_all).
+finish_processing_dbase:- doall_and_fail(ensure_at_least_one_region).
+finish_processing_dbase:- doall_and_fail(call_OnEachLoad).
+finish_processing_dbase:- dmsginfo(saving_finish_processing_dbase),fail.
+finish_processing_dbase:- savedb,fail.
+finish_processing_dbase:- do_gc,dmsginfo(end_finish_processing_dbase),fail.
+finish_processing_dbase.
 
 
 %:-meta_predicate_transparent(rescandb/0).
-% rescandb:- forall(thglobal:current_world(World),(findall(File,thglobal:loaded_file_world_time(File,World,_),Files),forall(member(File,Files),ensure_plmoo_loaded_each(File)),call(finish_processing_world))).
-rescandb:- call(finish_processing_world).
+% rescandb:- forall(thglobal:current_world(World),(findall(File,thglobal:loaded_file_world_time(File,World,_),Files),forall(member(File,Files),ensure_plmoo_loaded_each(File)),prologCall(finish_processing_world))).
+rescandb:- prologCall(finish_processing_world).
 
 
 
@@ -176,8 +176,8 @@ rescandb:- call(finish_processing_world).
 :- style_check(-discontiguous).
 % :- style_check(-atom).
 
-% gload:- load_game(savedb),!.
-gload:- load_game(logicmoo('rooms/startrek.all.plmoo')).
+% gload:- load_dbase(savedb),!.
+gload:- load_dbase(logicmoo('rooms/startrek.all.plmoo')).
 
 %:-meta_predicate_transparent(savedb/0).
 savedb:-!.
@@ -204,45 +204,7 @@ make_db_listing:-
      listing(world :_),
      listing(_),!.
 
-/*
-"Lieutenant",
-"Commander",
-"Human",
-"Player",
-"Explorer Player",
-"ACT_NICE_THIEF",
-"AWARE",
-"NOBACKSTAB",
-"ACT_STAY_ZONE",
-"MEMORY",
-"HELPER",
-"ACT_FRIEND",
-"NOCHARM",
-"NOSUMMON",
-"NOSLEEP",
-"NOBASH",
-"NOBLIND",
-"NPC_DETECT_INVIS",
-"NPC_NOTRACK",
-"+mudToHitArmorClass0: 1",
-"mudMaxHitPoints: 18d18+4000",
-"#$PunchingSomething mudBareHandDamage: 10d10+75",
-"Player",
-"Player",
-"Human",
-"Logged on player character",
-"burgandy",
-"starfleet",
-"command",
-"uniform",
-"a burgandy Starfleet command uniform",
-"A neatly folded burgandy Starfleet command uniform is lying here",
-"mudArmorLevel: 10",
-"These uniforms are worn by command officers on Federation starships. It's kind of tight, but it looks pretty good",
-"Red Uniform",
-"a burgandy Starfleet command uniform"
 
-*/
 detWithSpace(WithSpace,String):-ddeterminer0(String),atom_concat(String,' ',WithSpace).
 detWithSpace(WithSpace,String):-ddeterminer1(String),atom_concat(String,' ',WithSpace).
 
@@ -263,7 +225,7 @@ add_description(mudDescription(I,S)):-add_description(I,S).
 :-meta_predicate_transparent(add_description/2).
 add_description(A,S0):-hooked_assertz(mudDescription(A,S0)),fail.
 add_description(A,S0):- atomic(S0),string_concat('#$PunchingSomething ',S,S0),!,add_description(A,S).
-% add_description(A,S0):-determinerRemoved(S0,String,S),!,add_description(A,S),fast_add(determinerString(A,String)).
+% add_description(A,S0):-determinerRemoved(S0,String,S),!,add_description(A,S),add(determinerString(A,String)).
 add_description(A,S0):-
    any_to_string(S0,S),
    atomic_list_concat(Words,' ',S),
@@ -301,22 +263,23 @@ ddeterminer0(the).
 ddeterminer(L,L):-ddeterminer0(L).
 ddeterminer(U,L):-string_lower(U,L),U\=L,!,ddeterminer0(L).
 
-add_description_word(A,Word):- string_upper(Word,Word),string_lower(Word,Flag),string_to_atom(Flag,Atom),atom_concat(flagged_,Atom,FAtom),fast_add((mudIsa(A,FAtom))).
-add_description_word(A,Word):- string_lower(Word,Word),fast_add((mudKeyword(A,Word))).
-add_description_word(A,Word):- string_lower(Word,Lower),fast_add((mudKeyword(A,Lower))).
+add_description_word(A,Word):- string_upper(Word,Word),string_lower(Word,Flag),string_to_atom(Flag,Atom),atom_concat(flagged_,Atom,FAtom),add((isa(A,FAtom))).
+add_description_word(A,Word):- string_lower(Word,Word),add((mudKeyword(A,Word))).
+add_description_word(A,Word):- string_lower(Word,Lower),add((mudKeyword(A,Lower))).
 
 
 add_description_kv(A,K,V):- atom_concat('#$PunchingSomething ',Key,K),!,add_description_kv(A,Key,V).
 add_description_kv(A,K,V):- atom_concat('+',Key,K),!,add_description_kv(A,Key,V).
-add_description_kv(A,K,V):-atom_to_value(V,Term),C=..[K,A,Term],show_load_call(fast_add(C)).
+add_description_kv(A,K,V):-atom_to_value(V,Term),C=..[K,A,Term],show_load_call(add(C)).
 
 
 % =======================================================
 
-fast_add(pddlPredicates(List)):- !, with_assert_op_override(change(assert,one),maplist(decl_mpred,List)).
-fast_add(C):- correctArgsIsa(change(assert,add),C,CC),!, add(CC),!.
+add_term(A):-A==end_of_file.
+add_term(pddlPredicates(List)):- !, with_assert_op_override(change(assert,one),maplist(decl_mpred,List)).
+% add_term(C):- correctArgsIsa(change(assert,add),C,CC),!, add(CC),!.
+add_term(':-'(A)):-(must(show_call((A)))).
+add_term(A):-must(add(A)).
 
-show_load_call(C):- 
-   logOnFailure(debugOnError(show_call(C))).
+show_load_call(C):- logOnFailure(debugOnError(show_call(C))).
 
-:- include(logicmoo('vworld/moo_footer.pl')).

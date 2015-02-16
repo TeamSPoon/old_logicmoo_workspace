@@ -47,8 +47,7 @@ in_user_startup(Call):- '@'(Call,user).
          use_module(logicmoo(vworld/moo))),'user').
 */
 
-:- user_ensure_loaded(logicmoo('vworld/moo_loader.pl')).
-:- load_data_file(logicmoo('dbase/dbase_i_builtin.pl')).
+:- user_ensure_loaded(moo_loader).
 
 % logicmoo vworld mud server
 %:- user_ensure_loaded(logicmoo(vworld/world)).
@@ -131,13 +130,14 @@ user_ensure_nl_loaded(_):-!.
 user_ensure_nl_loaded(F):-load_files([F],[expand(true),if(changed),qcompile(auto)]).
 
 % :- user_ensure_loaded(logicmoo(pldata/tiny_kb)).
+/*
 :- user_ensure_nl_loaded(logicmoo(pldata/nldata_freq_pdat)).
 :- user_ensure_nl_loaded(logicmoo(pldata/nldata_BRN_WSJ_LEXICON)).
 :- user_ensure_nl_loaded(logicmoo(pldata/nldata_colloc_pdat)).
 :- user_ensure_nl_loaded(logicmoo(pldata/nldata_cycl_pos0)).
 :- user_ensure_nl_loaded(logicmoo(pldata/nldata_dictionary_some01)).
 :- user_ensure_nl_loaded(logicmoo(pldata/nldata_talk_db_pdat)).
-
+*/
 % :- user_ensure_loaded(logicmoo(pldata/tt0_00022_cycl)).
 % :- user_ensure_loaded(logicmoo(pldata/hl_holds)).
 % :- user_ensure_loaded(logicmoo(pldata/mworld0)).
@@ -208,6 +208,9 @@ download_and_install_el:-
 :- begin_transform_moo_preds.
 
 user:agent_text_command(Agent,["run",Term], Agent,actProlog(Term)):- ignore(Term=someCode).
+
+%:-forall(make_tabled_perm(get_all_templates(TEMPL)),dmsg(TEMPL)).
+%:-forall(make_tabled_perm(grab_argsIsa(F,Types)),dmsg(grab_argsIsa(F,Types))).
 
 % [Optionaly] Start the telent server
 :-at_start(toploop_telnet:start_mud_telnet(4000)).

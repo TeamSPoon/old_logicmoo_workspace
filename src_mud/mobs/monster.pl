@@ -23,7 +23,7 @@
 :-decl_type(tMonster).
 
 user:world_agent_plan(_World,Agent,Act):-
-   mudIsa(Agent,tMonster),
+   isa(Agent,tMonster),
    monster_idea(Agent,Act).
    
 monster_idea(Agent,actEat(Food)) :-
@@ -52,10 +52,13 @@ monster_idea(Agent,actMove(1,Dir)) :-
 
 monster_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[tCorpse]).
 
+predArgTypes(wearsClothing(tObj,tClothing)).
+
 % TODO fingure out why term_expansion is not working
-% :-visible(+all),leash(+all),trace.
-:-add(user:instTypeProps(Instance,tMonster,[mudDescription(txtFormatFn("Very screy looking monster named ~w",[Instance])),wearsClothing(tToughHide),mudPossess(tToughHide)])).
-% :- prolog.
+%:-visible(+all),leash(-all),trace.
+:-add(instTypeProps(Instance,tMonster,[mudDescription(txtFormatFn("Very screy looking monster named ~w",[Instance])),wearsClothing(tToughHide),mudPossess(tToughHide)])).
+%:-notrace.
+%:- prolog.
 
 
 :- include(logicmoo(vworld/moo_footer)).

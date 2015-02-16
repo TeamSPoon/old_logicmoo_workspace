@@ -129,7 +129,7 @@ flatten_dedupe(Percepts0,Percepts):-
 % peekAttributes/2,pushAttributes/2,pushCateElement/2.
 :- module_transparent((asserta_new/1,asserta_if_new/1,assertz_new/1,assertz_if_new/1,assert_if_new/1,assertz_if_new_clause/1,assertz_if_new_clause/2,clause_asserted/2,as_clause/2,clause_asserted/1,eraseall/2)).
 :- meta_predicate asserta_new(0),asserta_if_new(0),assertz_new(0),assertz_if_new(0),assert_if_new(0),assertz_if_new_clause(0),assertz_if_new_clause(0,0).
-:- meta_predicate clause_asserted(-,-),as_clause(-,-),clause_asserted(-),eraseall(-,-).
+:- meta_predicate clause_asserted(-,-),as_clause(-,-,-),clause_asserted(-),eraseall(-,-).
 
 asserta_new(_Ctx,NEW):-ignore((retract(NEW),fail)),asserta(NEW).
 writeqnl(_Ctx,NEW):- fmt('~q.~n',[NEW]),!.
@@ -355,11 +355,12 @@ remove_dupes([I|In],Out,Shown):-member(I,Shown),!,remove_dupes(In,Out,Shown).
 remove_dupes([I|In],[I|Out],Shown):-remove_dupes(In,Out,[I|Shown]).
 
 functor_h(Obj,F):-notrace(functor_h(Obj,F,_)).
-get_functor(Obj,F):-notrace(functor_h(Obj,F,_)).
-get_functor(Obj,F,A):-notrace(functor_h(Obj,F,A)).
+get_functor(Obj,FO):-notrace((must(functor_h(Obj,F,_)),FO=F)).
+get_functor(Obj,FO,AO):-notrace((must(functor_h(Obj,F,A)),FO=F,AO=A)).
 
 functor_h(Obj,F,A):-var(Obj),trace_or_throw(var_functor_h(Obj,F,A)).
 functor_h(Obj,F,A):-var(Obj),!,(number(A)->functor(Obj,F,A);((current_predicate(F/A);throw(var_functor_h(Obj,F,A))))).
+functor_h(F//A,F,Ap2):-number(A),!,Ap2 is A+2,( atom(F) ->  true ; current_predicate(F/Ap2)).
 functor_h(F/A,F,A):-number(A),!,( atom(F) ->  true ; current_predicate(F/A)).
 functor_h(':'(_,Obj),F,A):-nonvar(Obj),!,functor_h(Obj,F,A).
 functor_h(M:_,F,A):- atom(M),!, ( M=F -> current_predicate(F/A) ; current_predicate(M:F/A)).

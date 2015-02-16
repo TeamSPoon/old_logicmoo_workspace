@@ -272,7 +272,7 @@ any_to_prolog(_,Ss,Sx):-copy_term(Ss,Sx).
 
 % for atom_to_qname
 p2q(P,N,A):-p2q_alias(P,N,A).
-p2q(mudIsa,rdf,type).
+p2q(isa,rdf,type).
 p2q(tFood,knowrob,'Food').
 p2q(mpred_arity, mud,predArity).
 p2q(predArity, mud,predArity).
@@ -280,7 +280,7 @@ p2q(tCol, rdfs,'Class').
 p2q(tCol,owl,'Class').
 p2q(tItem,knowrob,'HumanScaleObject').
 p2q(tSpatialThing,knowrob,'SpatialThing').
-p2q(mudSubclass,rdfs,subClassOf).
+p2q(subclass,rdfs,subClassOf).
 p2q(tRegion,knowrob,'FixedStructure').
 p2q(tAgentGeneric,knowrob,'Agent-Generic').
 p2q(ftInt,xsd,integer).
@@ -409,7 +409,7 @@ rdf_object(O):-ground(O).
 user:semweb_startup:- assert_if_new(use_rdf_hooks).
 
 :-multifile(user:decl_database_hook).
-user:decl_database_hook(assert(_A_or_Z),DB):-use_rdf_hooks,rdf_assert_hook(DB),!.
+user:decl_database_hook(change(assert,_A_or_Z),DB):-use_rdf_hooks,rdf_assert_hook(DB),!.
 
 :-thread_local(thlocal:rdf_asserting/2).
 
@@ -417,14 +417,14 @@ rdf_assert_ignored(DB):-thlocal:rdf_asserting(_,DB),!.
 rdf_assert_ignored(svo(_,prologOnly,_)).
 rdf_assert_ignored(mpred_prop(_,predArity(1))).
 rdf_assert_ignored(mpred_prop(_,predArgTypes(_))).
-rdf_assert_ignored(DB):-functor(DB,F,_),member(F,[ruleHybridChain,mudTermAnglify,ruleEquiv]).
+rdf_assert_ignored(DB):-functor(DB,F,_),member(F,[ruleBackward,mudTermAnglify,ruleEquiv]).
 rdf_assert_ignored(DB):-functor(DB,_,1).
 rdf_assert_ignored(DB):-  not(ground(DB)). 
 
 
 cyc_to_rdf(mpred_prop(P,PST),svo(F,StubType,S)):- PST=..[StubType,S],rdf_object(S),rdf_to_pred(P,F).
 cyc_to_rdf(argIsa(P,1,D),domain(P,D)).
-cyc_to_rdf(mudIsa(apathFn(A,Dir),T),mudIsa([apathFn,A,Dir],T)).
+cyc_to_rdf(isa(apathFn(A,Dir),T),isa([apathFn,A,Dir],T)).
 cyc_to_rdf(pathName(A,Dir,String),mudNamed([apathFn,A,Dir],String)).
 cyc_to_rdf(argSingleValueDefault(PAB, 2, V),type_default(A,[P,isSelf,V])):-PAB=[P,A,_].
 cyc_to_rdf(argIsa(P,2,D),range(P,D)):-mpred_arity(P,2).
@@ -436,16 +436,16 @@ rdf_assert_hook(PSO):-rdf_assert_hook0(PSO),!.
 rdf_assert_hook(PSO):-dmsg(once(skipped(rdf_assert_hook(PSO)))).
 
 
-rdf_assert_hook0(mudLabelTypeProps(A,Food,Props)):-atom_string(A,S),!,must((rdf_assert_hook(typeProps(Food,[label(S)|Props])))).
+rdf_assert_hook0(mudLabelTypeProps(A,Food,Props)):-nonvar(A),atom_string(A,S),!,must((rdf_assert_hook(typeProps(Food,[label(S)|Props])))).
 rdf_assert_hook0(typeProps(Food,Props)):-is_list(Props),!,forall(member(P,Props),must(rdf_assert_hook(typeProps(Food,P)))).
 rdf_assert_hook0(typeProps(Food,Prop)):-Prop=..[P|ARGS],must(rdf_assert_hook(type_default(Food,[P,isSelf|ARGS]))).
-rdf_assert_hook0(mudSubclass(C,P)):-!,rdf_object(C),rdf_object(P),rdf_assert_x(C,rdfs:subClassOf,P).
+rdf_assert_hook0(subclass(C,P)):-!,rdf_object(C),rdf_object(P),rdf_assert_x(C,rdfs:subClassOf,P).
 rdf_assert_hook0(mudDescription(C,P)):-!,rdf_object(C),rdf_object(P),rdf_assert_x(C,rdfs:comment,P).
-rdf_assert_hook0(mudIsa(Prop,tPred)):- rdf_to_pred(Prop,P),!,rdf_object(P),rdf_assert_x(P,rdf:type,owl:'Property').
-rdf_assert_hook0(mudIsa(Prop,prologSingleValued)):- functor(Prop,P,_),!,rdf_object(P),rdf_assert_x(P,rdf:type,owl:'FunctionalProperty').
+rdf_assert_hook0(isa(Prop,tPred)):- rdf_to_pred(Prop,P),!,rdf_object(P),rdf_assert_x(P,rdf:type,owl:'Property').
+rdf_assert_hook0(isa(Prop,prologSingleValued)):- functor(Prop,P,_),!,rdf_object(P),rdf_assert_x(P,rdf:type,owl:'FunctionalProperty').
 rdf_assert_hook0(predArity(W1,N)):-rdf_to_pred(W1,W),N>1,rdf_assert_x(W,rdf:type,owl:'Property').
-rdf_assert_hook0(mudIsa(W,tCol)):-!,rdf_object(W),rdf_assert_x(W,rdf:type,owl:'Class').
-rdf_assert_hook0(mudIsa(C,P)):-!,rdf_object(C),rdf_object(P),P\=tCol,rdf_assert_x(C,rdf:type,P).
+rdf_assert_hook0(isa(W,tCol)):-!,rdf_object(W),rdf_assert_x(W,rdf:type,owl:'Class').
+rdf_assert_hook0(isa(C,P)):-!,rdf_object(C),rdf_object(P),P\=tCol,rdf_assert_x(C,rdf:type,P).
 rdf_assert_hook0(svo(S,P,O)):-!,must(rdf_assert_x(S,P,O)).
 rdf_assert_hook0(PSO):-PSO=..[P,S,O],!,rdf_assert_x(S,P,O).
 rdf_assert_hook0(PSO):-PSO=..[P,S|O],!,rdf_assert_x(S,P,O).
@@ -638,12 +638,12 @@ sync_to_rdf:-
    forall(p2q(P,NS,N),rdf_assert_p2q(P,NS,N)),
   
    forall(mpred_prop(P,O),rdf_assert_hook(mpred_prop(P,O))),
-   forall(hasInstance(C,I),rdf_assert_hook(mudIsa(I,C))),
+   forall(hasInstance(C,I),rdf_assert_hook(isa(I,C))),
    forall(disjointWith0(A,B),rdf_assert_hook(disjointWith(A,B))),
    forall(is_known_trew(B),rdf_assert_hook(B)),
    forall(dbase_t(P,S,O),rdf_assert_hook(dbase_t(P,S,O))),   
    forall(dbase_t(P,S,O,O2),rdf_assert_hook(dbase_t(P,S,O,O2))),   
-   % forall(atom_to_qname(P,O),rdf_assert_hook(mudSubclass(P,O))),
+   % forall(atom_to_qname(P,O),rdf_assert_hook(subclass(P,O))),
    asserta_if_new(user:call_OnEachLoad(sync_to_rdf)),
    asserta_if_new(user:call_OnEachLoad(sync_from_rdf)),
    !.

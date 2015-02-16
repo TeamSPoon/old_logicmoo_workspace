@@ -40,14 +40,14 @@ explorer_idea(Agent,actEat(Elixer)) :-
 	Damage < 15,
    mudPossess(Agent,List),
    obj_memb(Elixer,List),
-   mudIsa(Elixer,tElixer).
+   isa(Elixer,tElixer).
 
 explorer_idea(Agent,actEat(tFood)) :-
 	mudEnergy(Agent,Charge),
 	Charge < 150,
    mudPossess(Agent,List),
    obj_memb(Food,List),
-   mudIsa(Food,tFood).
+   isa(Food,tFood).
 
 explorer_idea(Agent,actTake(Good)) :-
 	mudNearFeet(Agent,What),

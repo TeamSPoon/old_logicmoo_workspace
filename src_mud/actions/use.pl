@@ -14,12 +14,12 @@
 
 predArgTypes(action_verb_useable(vtVerb,tCol,ftTerm(tPred),ftTerm(tPred),ftTerm(tPred))).
 
-mudSubclass(isEach('PortableObject','ProtectiveAttire',tStowAble),tWieldAble).
-mudSubclass('FluidReservoir',tDrinkAble).
-mudSubclass(tWeapon,tWieldAble).
-mudSubclass(tContolDevice,tUseAble).
-mudSubclass(tUseAble,tWieldAble).
-mudSubclass(tStowAble,tCarryAble).
+subclass(isEach('PortableObject','ProtectiveAttire',tStowAble),tWieldAble).
+subclass('FluidReservoir',tDrinkAble).
+subclass(tWeapon,tWieldAble).
+subclass(tContolDevice,tUseAble).
+subclass(tUseAble,tWieldAble).
+subclass(tStowAble,tCarryAble).
 
 
 :-decl_mpred_hybrid(mudWielding/2).
@@ -33,6 +33,9 @@ prologMultiValued(wearsClothing(tAgentGeneric,tWearAble)).
 prologMultiValued(mudWielding(tAgentGeneric,tWieldAble)).
 prologMultiValued(mudStowing(tAgentGeneric,tStowAble)).
 prologMultiValued(mudContains(tContainer,tObj)).
+
+
+:-decl_mpred_hybrid(genlPreds/2).
 genlPreds(wearsClothing,mudPossess).
 genlPreds(mudWielding,mudPossess).
 genlPreds(mudStowing,mudPossess).
@@ -91,7 +94,7 @@ do_act_use(ActUse,Agent,Obj) :-
 get_add_remove_use(ActUse,Agent,NowWielding,Obj,Unstowed):-     
  must_det_l([
      action_verb_useable(ActUse,Wieldable,NowWielding,Possessing,Unstowed),
-      show_call_failure(mudIsa(Obj,Wieldable)),
+      show_call_failure(isa(Obj,Wieldable)),
   %   show_call_failure(ireq(dbase_t(Unstowed,Agent,Obj))),
   %   show_call_failure(not(ireq(dbase_t(NowWielding,Agent,Obj)))),
      show_call_failure(ireq(dbase_t(Possessing,Agent,Obj)))]).

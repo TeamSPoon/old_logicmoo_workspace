@@ -13,6 +13,286 @@
 % ===============================================================================================
 */
 
+
+
+
+user:instTypeProps(apathFn(Region,_Dir),tPathway,[localityOfObject(Region)]).
+isa(localityOfObject,prologHybrid). 
+
+
+
+argIsa(localityOfObject,1,tObj).
+argIsa(localityOfObject,2,tSpatialThing).
+argIsa(aDirectionsFn,2,ftListFn(vtDirection)).
+argIsa(mudFacing,1,tObj).
+argIsa(mudFacing,2,vtDirection).
+argIsa(mudColor,1,tObj).
+argIsa(mudColor,2,vtColor).
+argIsa(apathFn,1,tRegion).
+argIsa(apathFn,2,vtDirection).
+argIsa(mudMemory,2,ftTerm).
+% argsIsa(mudFacing,ftTerm).
+
+
+
+
+alt_forms1(none_AR,mudAtLoc(P,L),localityOfObject(P,R)):-ground(mudAtLoc(P,L)),once(locationToRegion(L,R)),nonvar(R).
+alt_forms1(none_AR,localityOfObject(P,R),mudAtLoc(P,L)):-ground(localityOfObject(P,R)),is_asserted(mudAtLoc(P,L)),nonvar(L),once(locationToRegion(L,R)).
+
+
+bad_fact_why(mudAtLoc(iArea1025, _),isa(iArea1025,tRegion)).
+bad_fact_why(localityOfObject(iArea1025, iOfficeRoom7),isa(iArea1025,tRegion)).
+bad_fact_why(localityOfObject(R,_),isa(R,tRegion)):- isa(R,tRegion).
+bad_fact_why(mudFacing(R,_),isa(R,tRegion)):- isa(R,tRegion).
+bad_fact_why(mudAtLoc(R,_),isa(R,tRegion)):- isa(R,tRegion).
+
+%deduce_facts_forward(localityOfObject(_,Region),isa(Region,tSpatialThing)).
+deduce_facts_forward(localityOfObject(Obj,_),isa(Obj,tObj)).
+fix_argIsa(F,N,vtDirection(Val),vtDirection):-add(mpred_prop(F,argSingleValueDefault(N,Val))),!.
+
+
+
+
+
+
+
+
+
+tCol(vtVerb).
+tCol(vtActionTemplate).
+tCol(ttSpatialType).
+tCol(ttCompleteExtentAsserted).
+tCol(tSpatialThing).
+
+
+tCol(tItem).
+tCol(tChannel).
+subclass(vtPosture,vtVerb).
+subclass(vtDirection,tTypevalue).
+subclass(vtBasicDirPlusUpDown,vtDirection).
+subclass(vtBasicDir,vtBasicDirPlusUpDown).
+subclass(tWearAble,tItem).
+subclass(tUseAble,tItem).
+subclass(ttSpatialType,tCol).
+subclass(ttObjectType,tCol).
+subclass(tRegion,tSpatialThing).
+subclass(tPred,tRelation).
+subclass(tPlayer,tAgentGeneric).
+subclass(tPathway,tDoor).
+subclass(tObj,tSpatialThing).
+subclass(tNpcPlayer,tPlayer).
+subclass(tMonster,ttAgentGeneric).
+subclass(tItem,tSpatialThing).
+subclass(tItem,tObj).
+subclass(tHumanPlayer,tPlayer).
+subclass(tFurniture,tPartofObj).
+subclass(tFurniture,tObj).
+subclass(tFunction,tRelation).
+subclass(tEatAble,tItem).
+subclass(tDrinkAble,tItem).
+subclass(tDoor,tItem).
+subclass(tDoor,tFurniture).
+subclass(tContolDevice,tChargeAble).
+subclass(tChargeAble,tItem).
+subclass(tCarryAble,tItem).
+subclass(tAgentGeneric,tSpatialThing).
+subclass(tAgentGeneric,tObj).
+subclass(isEach(tRegion,tAgentGeneric),tChannel).
+subclass(isEach('ProtectiveAttire','SomethingToWear'),tWearAble).
+subclass(isEach('PortableObject','ProtectiveAttire','SomethingToWear'),tCarryAble).
+subclass('MaleAnimal',tPlayer).
+subclass('FemaleAnimal',tPlayer).
+formatted_resultIsa(apathFn(tRegion,vtDirection),tPathway).
+mudFtInfo(ftAction,prologCall(is_vtActionTemplate(isSelf))).
+mudFormatted(xyzFn(tRegion,ftInt,ftInt,ftInt)).
+
+
+
+mudFormatted(apathFn(tRegion,vtDirection)).
+mudFormatted(aDirectionsFn(ftTerm,ftListFn(ftTerm))).
+ruleEquiv(nameStrings(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
+ruleEquiv(isa(Whom,tNpcPlayer),whenAnd(isa(Whom,tPlayer),naf(isa(Whom,tHumanPlayer)))).
+ruleEquiv(mudDescription(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
+resultIsa(apathFn,tPathway).
+prologSingleValued(typeGrid(tCol,ftInt,ftListFn(ftString))).
+prologSingleValued(stat_total(tAgentGeneric,ftInt)).
+prologSingleValued(mudWeight(tObj,ftInt)).
+prologSingleValued(mudToHitArmorClass0(tAgentGeneric,ftInt)).
+prologSingleValued(mudStr(tAgentGeneric,ftInt)).
+prologSingleValued(mudStm(tAgentGeneric,ftInt)).
+prologSingleValued(mudSpd(tAgentGeneric,ftInt)).
+prologSingleValued(mudScore(tObj,ftInt)).
+prologSingleValued(mudPermanence(tItem,vtVerb,vtPerminance)).
+prologSingleValued(mudNeedsLook(tAgentGeneric,ftBoolean),argSingleValueDefault(2,vFalse)).
+prologSingleValued(mudMoveDist(tAgentGeneric,ftInt),[argSingleValueDefault(2,1)]).
+prologSingleValued(mudMaxHitPoints(tAgentGeneric,ftInt),[prologHybrid]).
+prologSingleValued(mudLevelOf(tCarryAble,ftInt)).
+prologSingleValued(mudLastCommand(tAgentGeneric,ftAction)).
+prologSingleValued(mudID(tObj,ftID)).
+prologSingleValued(mudHeight(tSpatialThing,ftInt)).
+prologSingleValued(mudHeight(tObj,ftInt)).
+prologSingleValued(mudHealth(tObj,ftInt)).
+prologSingleValued(mudFacing(tObj,vtDirection),[argSingleValueDefault(2,vNorth)]).
+prologSingleValued(mudEnergy(tObj,ftInt),[argSingleValueDefault(2,500)]).
+prologSingleValued(mudEnergy(tChargeAble,ftInt)).
+prologSingleValued(mudBareHandDamage(tAgentGeneric,ftDice)).
+prologSingleValued(mudAttack(tObj,ftInt)).
+prologSingleValued(mudAtLoc(tObj,xyzFn(tRegion,ftInt,ftInt,ftInt))).
+prologSingleValued(mudArmorLevel(tWearAble,ftInt)).
+prologSingleValued(mudArmor(tObj,ftInt)).
+prologSingleValued(mudAgentTurnnum(tAgentGeneric,ftInt),[argSingleValueDefault(2,0)]).
+prologSingleValued(location_center(tRegion,xyzFn(tRegion,ftInt,ftInt,ftInt))).
+prologSingleValued(chargeCapacity(tChargeAble,ftInt)).
+
+prologOnly(use_action_templates(ftTerm)).
+prologOnly(mud_test(ftTerm,ftCallable)).
+prologOnly(member(ftTerm,ftTerm)).
+prologOnly(agent_text_command(tAgentGeneric,ftText,tAgentGeneric,ftAction)).
+prologOnly(agent_call_command(tAgentGeneric,ftAction)).
+prologOnly(action_info(vtActionTemplate,ftText)).
+prologNegByFailure(tThinking(tAgentGeneric)).
+prologNegByFailure(tRegion(ftID)).
+prologNegByFailure(tItem(ftID)).
+prologNegByFailure(tCol(ftID)).
+prologNegByFailure(tAgentGeneric(ftID)).
+prologNegByFailure(mudNeedsLook(tObj,ftBoolean)).
+prologMultiValued(verbAsWell(ftTerm,ftAction,ftAction)).
+prologMultiValued(typeGrid(tCol,ftInt,ftListFn(ftString))).
+prologMultiValued(pathName(tRegion,vtDirection,ftString)).
+prologMultiValued(pathBetween(tRegion,vtDirection,tRegion)).
+prologMultiValued(nameStrings(ftTerm,ftString)).
+prologMultiValued(subclass(tCol,tCol)).
+prologMultiValued(mudPossess(tObj,tObj)).
+prologMultiValued(mudNamed(ftTerm,ftTerm),[]).
+prologMultiValued(mudMemory(tAgentGeneric,ftTerm)).
+prologMultiValued(mudKeyword(ftTerm,ftString)).
+prologMultiValued(isa(ftTerm,tCol)).
+prologMultiValued(mudDescription(ftTerm,ftText),[predProxyAssert(add_description)]).
+prologMultiValued(mudDescription(ftTerm,ftText), [predProxyAssert(add_description),predProxyRetract(remove_description),predProxyQuery(query_description)]).
+prologMultiValued(mudDescription(ftTerm,ftString),prologOrdered).
+prologMultiValued(mudDescription(ftTerm,ftString)).
+prologMultiValued(mudCmdFailure(tAgentGeneric,ftAction)).
+prologMultiValued(mudActAffect(tItem,vtVerb,ftTerm(ftVoprop))).
+prologMultiValued(mudActAffect(ftTerm,ftTerm,ftTerm)).
+prologMultiValued(instVerbOverride(ftTerm,ftAction,ftAction)).
+prologMultiValued(gridValue(tRegion,ftInt,ftInt,tObj)).
+prologMultiValued(glyphType(ftTerm,ftString)).
+prologMultiValued(determinerString(ftTerm,ftString)).
+prologMultiValued(descriptionHere(ftTerm,ftString),prologOrdered).
+prologMultiValued(descriptionHere(ftTerm,ftString)).
+
+prologMultiValued(cmdsuccess(tAgentGeneric,ftAction)).
+prologMultiValued(action_rules(tAgentGeneric,vtVerb,ftListFn(ftVar),ftVoprop)).
+prologListValued(mudNearReach(tAgentGeneric,ftListFn(tSpatialThing)),[predModule(user)]).
+prologListValued(mudNearFeet(tAgentGeneric,ftListFn(tSpatialThing)),[]).
+prologListValued(mudGetPrecepts(tAgentGeneric,ftListFn(tSpatialThing)),[predModule(user)]).
+prologListValued(aDirectionsFn(ftTerm,ftListFn(ftTerm))).
+prologHybrid(typeGrid(tCol,ftInt,ftListFn(ftString))).
+prologHybrid(mudTexture(tSpatialThing,vtTexture)).
+prologHybrid(mudTextSame(ftText,ftText)).
+prologHybrid(mudSize(tSpatialThing,ftNumber)).
+prologHybrid(mudShape(tSpatialThing,vtShape)).
+prologHybrid(mudPossess(tAgentGeneric,tObj)).
+prologHybrid(mudOpaqueness(ftTerm,ftPercent)).
+prologHybrid(mudListPrice(tItem,ftNumber)).
+prologHybrid(mudLabelTypeProps(ftString,tCol,ftVoprop)).
+prologHybrid(mudKnowing(tAgentGeneric,ftTerm)).
+prologHybrid(mudColor(tSpatialThing,vtColor)).
+prologHybrid(glyphType(ftTerm,ftTerm)).
+predTypeMax(mudHealth,tObj,500).
+predTypeMax(mudEnergy,tObj,130).
+predArgTypes(type_action_info(tCol,vtActionTemplate,ftText)).
+predArgTypes(success(tAgentGeneric,ftBoolean)).
+predArgTypes(resultIsa(tFunction,tCol)).
+predArgTypes(pathName(tRegion,vtDirection,ftString)).
+predArgTypes(mudWearing(tAgentGeneric,tWearAble)).
+predArgTypes(mudTexture(tSpatialThing,vtTexture)).
+predArgTypes(mudSize(tSpatialThing,vtSize)).
+predArgTypes(mudMaterial(tSpatialThing,vtMaterial)).
+predArgTypes(localityOfObject(tObj,tSpatialThing)).
+
+
+predArgTypes(instVerbOverride(ftTerm,ftAction,ftAction),[prologHybrid]).
+vtBasicDirPlusUpDown(vUp).
+vtBasicDirPlusUpDown(vDown).
+vtBasicDir(vWest).
+vtBasicDir(vSouth).
+vtBasicDir(vNorth).
+vtBasicDir(vEast).
+typeProps(tSpatialThing,mudHeight(0)).
+typeProps(tRegion,[mudOpaqueness(1)]).
+typeProps(tObj,[mudOpaqueness(100)]).
+typeProps(tItem,mudListPrice(0)).
+typeProps(tItem,mudEnergy(140)).
+typeProps(tFood,[mudHeight(0)]).
+typeProps(tAgentGeneric,mudNeedsLook(vFalse)).
+typeProps(tAgentGeneric,mudLastCommand(actStand)).
+typeProps(tAgentGeneric,[predInstMax(mudHealth,500), predInstMax(mudEnergy,200), mudHealth(500), mudEnergy(200),  mudFacing(isRandom(vtBasicDir)), mudAgentTurnnum(0), mudScore(1), mudMemory(aDirectionsFn([n,s,e,w,ne,nw,se,sw,u,d]))]).
+discoverableType(vtSize).
+discoverableType(vtTexture).
+
+nameStrings(apathFn(Region,Dir),Text):- pathName(Region,Dir,Text).
+mudDescription(apathFn(Region,Dir),Text):- pathName(Region,Dir,Text).
+
+localityOfObject(Above,HasSurface):- mudLocOnSurface(Above,HasSurface).
+localityOfObject(Clothes,Agent):- mudSubPart(Agent,Clothes).
+localityOfObject(Inner,Container):- mudInsideOf(Inner,Container).
+localityOfObject(Inner,Outer):- use_pttp,localityOfObject(Inner,Container),localityOfObject(Container,Outer).
+
+
+
+
+
+
+:- dynamic stat_total/2.
+:- dynamic(spawn_rate/2).
+:- dynamic(tMonster/1).
+:- dynamic_multifile_exported tAgentGeneric/1, mudEnergy/2,mudHealth/2, mudAtLoc/2, failure/2, typeGrid/3, gridValue/4, isa/2, tItem/1, mudMemory/2, pathName/3, mudPossess/2, tRegion/1, mudScore/2, mudStm/2, mudFacing/2, localityOfObject/2, tThinking/1, mudWearing/2, mudFacing/2, mudHeight/2, act_term/2, nameStrings/2, mudDescription/2, pathBetween/3, mudAgentTurnnum/2.
+:- dynamic_multifile_exported(subclass/2).
+:- dynamic_safe(mudToHitArmorClass0 / 2).
+:- ensure_universal_stub(mudAtLoc/2).
+:- multifile(mudToHitArmorClass0 / 2).
+:- user:decl_mpred_hybrid((argIsa/3, formatted_resultIsa/2, glyphType/2, inRegion/2, mudContains/2, mudFtInfo/2, isa/2, mudLabelTypeProps/3, mudMemory/2, mudPossess/2, mudStowing/2, subclass/2, mudToHitArmorClass0/2, pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, ttCompleteExtentAsserted/1, ttFormatType/1, typeProps/2)).
+
+
+:- decl_mpred_hybrid(( mudArmorLevel/2, mudLevelOf/2, mudToHitArmorClass0/2, mudBareHandDamage/2, chargeCapacity/2, mudEnergy/2, tCol/1, tAgentGeneric/1, tItem/1, tRegion/1, instVerbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, tThinking/1, mudWeight/2, mudPermanence/3, act_term/2, mudAgentTurnnum/2, mudAtLoc/2, mudEnergy/2, mudHealth/2, mudDescription/2, mudFacing/2, failure/2, gridValue/4, mudHeight/2, mudMemory/2, isa/2, pathName/3, mudPossess/2, mudScore/2, mudStm/2, mudStr/2, mudWearing/2)).
+:- decl_mpred_hybrid((( mudContains/2))).
+:- decl_mpred_hybrid((tItem/1, tRegion/1, instVerbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, mudToHitArmorClass0/2, tThinking/1, tDeleted/1, mudWeight/2, mudPermanence/3, act_term/2, mudAgentTurnnum/2, mudAtLoc/2, mudEnergy/2, mudHealth/2, mudDescription/2, mudFacing/2, mudCmdFailure/2, mudSpd/2, typeGrid/3, mudHeight/2, mudMemory/2, isa/2, pathName/3, mudPossess/2, mudScore/2, mudStm/2, mudStr/2, wearsClothing/2)).
+:- decl_mpred(tItem(ftID),[predIsFlag]).
+:- decl_type(tContainer).
+:- decl_type(tRegion).
+:- decl_type(vtBasicDir).
+:- decl_type(vtBasicDirPlusUpDown).
+:- decl_type(vtDirection).
+:- decl_type(vtVerb).
+:- decl_mpred(tRegion(ftID),[predIsFlag]).
+:- decl_mpred(tRegion(ftID),tCol).
+:- decl_mpred(tThinking(tAgentGeneric),[predIsFlag]).
+:- decl_mpred_hybrid mudLastCommand/2.
+:- decl_mpred_hybrid mudNamed/2, mudSpd/2.
+:- decl_mpred_hybrid mudStr/2.
+:- decl_mpred_hybrid typeGrid/3.
+:- decl_mpred_hybrid(glyphType,2).
+:- decl_mpred_hybrid(mudActAffect/3).
+:- decl_mpred_hybrid(mudAtLoc,2).
+:- decl_mpred_hybrid(mudColor/2).
+:- decl_mpred_hybrid(mudFtInfo/2).
+:- decl_mpred_hybrid(mudHealth,2).
+:- decl_mpred_hybrid(mudMaterial/2).
+:- decl_mpred_hybrid(mudMaxHitPoints(tAgentGeneric,ftInt)).
+:- decl_mpred_hybrid(mudNeedsLook/2,[ttCompleteExtentAsserted]).
+:- decl_mpred_hybrid(mudShape/2).
+:- decl_mpred_hybrid(mudSize/2).
+:- decl_mpred_hybrid(mudStowing(tAgentGeneric,tItem)).
+:- decl_mpred_prolog(verb_alias(ftString,vtVerb)).
+:- decl_mpred_prolog(stat_total/2).
+:- decl_mpred_hybrid(mudTexture/2).
+:- decl_mpred_hybrid(pathBetween,3).
+
+
+:- must(decl_mpred_prolog(agent_call_command/2)).
+
+
 :-decl_mpred_hybrid(pathBetween(tRegion,vtDirection,tRegion)).
 :-decl_mpred_hybrid(pathConnects(tRegion,tRegion),symmetric).
 pathConnects(R1,R2):-pathBetween(R1,Dir,R2),nop(Dir).
@@ -43,114 +323,116 @@ ensure_some_pathBetween:- forall(no_repeats(is_asserted(pathConnects(R1,R2))),sh
 % ==================================================
 % Classes of things
 % ==================================================
+:- do_gc.
 
-mudSubclass(tAgentGeneric,tObj).
-mudSubclass(tItem,tObj).
+subclass(tAgentGeneric,tObj).
+subclass(tItem,tObj).
 
-mudSubclass(tCandle,tPortableDevice).
-mudSubclass(tFlashlight, tPortableDevice).
-mudSubclass(tDesk, tOfficeRoomFurnature).
-mudSubclass(tApple, tFood).
-mudSubclass(tNani, tArt).
-mudSubclass(tNani, tWashAble).
-mudSubclass(tClothing, tWashAble).
-mudSubclass(tNani, tCarryAble).
-mudSubclass(tBroccoli, tFood).
-mudSubclass(tFood,tEatAble).
-mudSubclass(tCrackers, tFood).
-mudSubclass(tEnvelope, tOfficeItem).
-mudSubclass(tStamp, tOfficeItem).
-mudSubclass(tKey, tOfficeItem).
+subclass(tCandle,tPortableDevice).
+subclass(tFlashlight, tPortableDevice).
+subclass(tDesk, tOfficeRoomFurnature).
+subclass(tApple, tFood).
+subclass(tNani, tArt).
+subclass(tNani, tWashAble).
+subclass(tClothing, tWashAble).
+subclass(tNani, tCarryAble).
+subclass(tBroccoli, tFood).
+subclass(tFood,tEatAble).
+subclass(tCrackers, tFood).
+subclass(tEnvelope, tOfficeItem).
+subclass(tStamp, tOfficeItem).
+subclass(tKey, tOfficeItem).
 
-mudSubclass(tOfficeItem, tItem).
-mudSubclass(tFood, tItem).
-mudSubclass(tClothing, tItem).
+subclass(tOfficeItem, tItem).
+subclass(tFood, tItem).
+subclass(tClothing, tItem).
 
-mudSubclass(tItem, tCarryAble).
-mudSubclass( tCarryAble, tDropAble).
+subclass(tItem, tCarryAble).
+subclass( tCarryAble, tDropAble).
 
-mudSubclass( tCarryAble, tThrowAble).
-mudSubclass( tCarryAble, tCarryAble).
+subclass( tCarryAble, tThrowAble).
+subclass( tCarryAble, tCarryAble).
 
-mudSubclass(tPortableDevice,tCarryAble).
+subclass(tPortableDevice,tCarryAble).
 
-mudSubclass(tPajamas, tClothing).
-mudSubclass(tShirt, tClothing).
-mudSubclass(tCoat, tClothing).
-mudSubclass(tPants, tClothing).
-mudSubclass(tClothing, tFoldAble).
-mudSubclass(tClothing, tWearAble).
+subclass(tPajamas, tClothing).
+subclass(tShirt, tClothing).
+subclass(tCoat, tClothing).
+subclass(tPants, tClothing).
+subclass(tClothing, tFoldAble).
+subclass(tClothing, tWearAble).
 
-mudSubclass(tCoffeeCup, tLiquidContainer).
-mudSubclass(tCoffeeCup, tDrinkAble).
-mudSubclass(tCoffeeCup, tThrowAble).
-mudSubclass(tCoffee, tLiquid).
-mudSubclass(tBook, tReadAble).
+subclass(tCoffeeCup, tLiquidContainer).
+subclass(tCoffeeCup, tDrinkAble).
+subclass(tCoffeeCup, tThrowAble).
+subclass(tCoffee, tLiquid).
+subclass(tBook, tReadAble).
 
-mudSubclass(tPillow, tBedding).
-mudSubclass(tBlanket, tBedding).                                                              
-mudSubclass(tBedding, tFoldAble).
-mudSubclass(tFoldAble, tCarryAble).
-mudSubclass(tThrowAble, tCarryAble).
-mudSubclass(tPortableDevice,tCarryAble).
-mudSubclass(tPortableDevice,tPhysicalDevice).
-mudSubclass(tPhysicalDevice,tUseAble).
-mudSubclass(tWearAble, tCarryAble).
-mudSubclass(tCarryAble,tCarryAble).
-mudSubclass(tFood,tCarryAble).
-mudSubclass(tCarryAble,tObj).
-mudSubclass(tPartofObj,tNotTakAble).
-mudSubclass(tBodyPart,tPartofObj).
+subclass(tPillow, tBedding).
+subclass(tBlanket, tBedding).                                                              
+subclass(tBedding, tFoldAble).
+subclass(tFoldAble, tCarryAble).
+subclass(tThrowAble, tCarryAble).
+subclass(tPortableDevice,tCarryAble).
+subclass(tPortableDevice,tPhysicalDevice).
+subclass(tPhysicalDevice,tUseAble).
+subclass(tWearAble, tCarryAble).
+subclass(tCarryAble,tCarryAble).
+subclass(tFood,tCarryAble).
+subclass(tCarryAble,tObj).
+subclass(tPartofObj,tNotTakAble).
+subclass(tBodyPart,tPartofObj).
 
 
-mudSubclass(tLightSwitch, tWallFurnature).
-mudSubclass(tComputer, tOfficeFurnature).
-mudSubclass(tPartofFurnature,tPartofObj).
+subclass(tLightSwitch, tWallFurnature).
+subclass(tComputer, tOfficeFurnature).
+subclass(tPartofFurnature,tPartofObj).
 
-mudSubclass(tBed, tBedRoomFurnature).
-mudSubclass(tStandTable, tBedRoomFurnature).
-mudSubclass(tDresser, tBedRoomFurnature).
+subclass(tBed, tBedRoomFurnature).
+subclass(tStandTable, tBedRoomFurnature).
+subclass(tDresser, tBedRoomFurnature).
 
-mudSubclass(tWashingMachine, tDeviceFurnature).
-mudSubclass(tTable, tFurnature).
+subclass(tWashingMachine, tDeviceFurnature).
+subclass(tTable, tFurnature).
 
-mudSubclass(tTable, tFurnatureMoveAble).
+subclass(tTable, tFurnatureMoveAble).
 
-mudSubclass(tTable, tHasSurface).
-mudSubclass(tSofa, tLivingRoomFurnature).
-mudSubclass(tEasyChair, tLivingRoomFurnature).
-mudSubclass(tEasyChair, tSitAble).
-mudSubclass(tCoffeeTable, tLivingRoomFurnature).
-mudSubclass(tBookcase, tWallFurnature).
-mudSubclass(tDrawer, tContainer).
-mudSubclass(tDrawer, tOpenAble).
-mudSubclass(tDrawer, tCloseAble).
-mudSubclass(tDrawer, tPartofFurnature).
-mudSubclass(tTopDrawer, tPartofFurnature).
-mudSubclass(tMiddleDrawer, tPartofFurnature).
-mudSubclass(tBottomDrawer, tPartofFurnature). 
-mudSubclass(tHousePlant, tPartofObj).
-mudSubclass(tPlanter, tContainer). 
-mudSubclass(tGueridon, tLivingRoomFurnature).
-mudSubclass(tGardenPlant, tOutdoorFurnature).
-mudSubclass(tSpatialThing,tLookAble).
-mudSubclass(tNani,tTeddybear).
-mudSubclass(tTeddybear,tTreasure).
+subclass(tTable, tHasSurface).
+subclass(tSofa, tLivingRoomFurnature).
+subclass(tEasyChair, tLivingRoomFurnature).
+subclass(tEasyChair, tSitAble).
+subclass(tCoffeeTable, tLivingRoomFurnature).
+subclass(tBookcase, tWallFurnature).
+subclass(tDrawer, tContainer).
+subclass(tDrawer, tOpenAble).
+subclass(tDrawer, tCloseAble).
+subclass(tDrawer, tPartofFurnature).
+subclass(tTopDrawer, tPartofFurnature).
+subclass(tMiddleDrawer, tPartofFurnature).
+subclass(tBottomDrawer, tPartofFurnature). 
+subclass(tHousePlant, tPartofObj).
+subclass(tPlanter, tContainer). 
+subclass(tGueridon, tLivingRoomFurnature).
+subclass(tGardenPlant, tOutdoorFurnature).
+subclass(tSpatialThing,tLookAble).
+subclass(tNani,tTeddybear).
+subclass(tTeddybear,tTreasure).
 
-mudSubclass(tBathTub,tBathRoomFurnature).
-mudSubclass(tShower,tBathRoomFurnature).
-mudSubclass(tToilet,tBathRoomFurnature).
-mudSubclass(tSink,tBathRoomFurnature).
-mudSubclass(tKitchenSink,tKitchenFurnature).
-mudSubclass(tFridge,tKitchenFurnature).
-mudSubclass(tStove,tKitchenFurnature).
-mudSubclass(tKitchenCounter,tKitchenFurnature).
-mudSubclass(tFurnature,tOntoAble).
+subclass(tBathTub,tBathRoomFurnature).
+subclass(tShower,tBathRoomFurnature).
+subclass(tToilet,tBathRoomFurnature).
+subclass(tSink,tBathRoomFurnature).
+subclass(tKitchenSink,tKitchenFurnature).
+subclass(tFridge,tKitchenFurnature).
+subclass(tStove,tKitchenFurnature).
+subclass(tKitchenCounter,tKitchenFurnature).
+subclass(tFurnature,tOntoAble).
 
-mudSubclass(tBathRoomFurnature,tFurnature).
-mudSubclass(tKitchenFurnature,tFurnature).
-mudSubclass(tLivingRoomFurnature,tFurnature).
-mudSubclass(tOutdoorFurnature,tFurnature).
+subclass(tBathRoomFurnature,tFurnature).
+subclass(tKitchenFurnature,tFurnature).
+subclass(tLivingRoomFurnature,tFurnature).
+subclass(tOutdoorFurnature,tFurnature).
+
 
 
 
@@ -159,26 +441,26 @@ mudSubclass(tOutdoorFurnature,tFurnature).
 % ==================================================
 
 typeProps(tCandle,[mudColor(vBlue),mudSize(vSmall),mudShape(vTriangular),mudMaterial(vWax),mudTexture(vSticky)]).
-typeProps(tRedApple,[mudColor(vRed),mudSize(vSmall),mudShape(vRound),mudIsa(tFruit),mudTexture(vSmooth)]).
-typeProps(tGreenApple,[mudColor(isEach(vGreen,vPastel)),mudSize(vSmall),mudShape(vRound),mudIsa(tFruit),mudTexture(vSmooth)]).
+typeProps(tRedApple,[mudColor(vRed),mudSize(vSmall),mudShape(vRound),isa(tFruit),mudTexture(vSmooth)]).
+typeProps(tGreenApple,[mudColor(isEach(vGreen,vPastel)),mudSize(vSmall),mudShape(vRound),isa(tFruit),mudTexture(vSmooth)]).
 typeProps(tTable,[mudColor(isEach(vBlue,vWhite)),mudSize(vLarge),mudShape(vOval),mudMaterial(vWood),mudTexture(isEach(vBumpy,vIrregular)),mudWeight(50)]).
 typeProps(tPillow,[mudColor(vWhite),mudSize(vMedium),mudShape(vRectangular),mudMaterial(isEach(vCotton,vFlannel)),mudTexture(isEach(vFluffy,vSoft))]).
 typeProps(tBlanket,[mudColor(isEach(vGreen,vDark)),mudSize(isEach(vLarge,vBulky)),mudShape(vRectangular),mudMaterial(vRayon),mudTexture(isEach(vPlush,vSoft))]).                                                              
 typeProps(tStandTable,[mudColor(isEach(vBlack,vShiney)),mudSize(vMedium),mudShape(isEach(vCubular,vRectangular)),mudMaterial(vWood),mudTexture(vSmooth),mudWeight(25)]).
 typeProps(tPajams,[mudColor(isEach(vBlue,vPastel)),mudSize(isEach(vMedium,vFits)),mudShape(vUnique),mudMaterial(isEach(vCotton,vRayon)),mudTexture(vSoft)]).
-typeProps(tShirt,[mudColor(vBlack),mudSize(isEach(vMedium,vFits)),mudShape(isLike(mudShape,tTorso)),mudMaterial(vCotton),mudTexture(isEach(vSoft,vThreadbare))]).
+typeProps(tShirt,[mudColor(vBlack),mudSize(isEach(vMedium,vFits)),mudShape(isLikeFn(mudShape,tTorso)),mudMaterial(vCotton),mudTexture(isEach(vSoft,vThreadbare))]).
 typeProps(tFlashlight,[mudColor(vYellow),mudSize(isEach(vMedium,vSmall)),mudShape(vCylindrical),mudMaterial(vPlastic),mudTexture(vRibbed)]).
 typeProps(tKey,[mudColor(vSilver),mudSize(isEach(vSmall,vTiny)),mudShape(vUnique),mudMaterial(vMetal),mudTexture(isEach(vRidged,vBumpy))]).
 typeProps(tEnvelope,[mudColor(vWhite),mudSize(vSmall),mudShape(vRectangular),mudMaterial(vPaper),mudTexture(vSmooth)]).
 typeProps(tDesk,[mudColor(isEach(vBrown,vShiney)),mudSize(vLarge),mudShape(isEach(vCubular,vRectangular)),mudTexture(isEach(vSmooth,vRidged)),mudWeight(175)]).
 typeProps(tWashingMachine,[mudColor(vWhite),mudSize(vLarge),mudShape(isEach(vCubular,vSquare)),mudMaterial(vMetal),mudTexture(vSmooth),mudWeight(125)]).
-typeProps(tBroccoli,[mudColor(vGreen),mudSize(vSmall),mudShape(isLike(mudShape,tTree)),mudIsa(tVegetable),mudTexture(isEach(vPorous,vBumpy))]).                                                                    
-typeProps(tCrackers,[mudColor(vTan),mudIsa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]).
+typeProps(tBroccoli,[mudColor(vGreen),mudSize(vSmall),mudShape(isLikeFn(mudShape,tTree)),isa(tVegetable),mudTexture(isEach(vPorous,vBumpy))]).                                                                    
+typeProps(tCrackers,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]).
 typeProps(tComputer,[mudColor(vGrey),mudMaterial(vPlastic),mudShape(isEach(vCubular,vRectangular)),mudSize(vMedium),mudTexture(vSmooth)]).
 typeProps(tStamp,[mudColor(vPolychromatic),mudSize(isEach(vTiny,thin)),mudShape(vSquare),mudMaterial(vPaper),mudTexture(isEach(vSmooth,vSticky))]).
-typeProps(tCoat,[mudColor(vBlack),mudSize(isEach(vMedium,vFits)),mudShape(isLike(mudShape,tTorso)),mudMaterial(isEach(vWool,vCotton,vRayon)),mudTexture(vCoarse)]).
-typeProps(tPants,[mudColor(vBlack),mudSize(isEach(vMedium,vFits)),mudShape(isLike(mudShape,tAss)),mudMaterial(vDenim),mudTexture(vCoarse)]).
-typeProps(tNani,[mudColor(vBrown),mudColor(vWhite),mudSize(vMedium),mudShape(isLike(mudShape,tTeddybear)),mudMaterial(vPlush),mudTexture(isEach(vFuzzy,vSoft))]).
+typeProps(tCoat,[mudColor(vBlack),mudSize(isEach(vMedium,vFits)),mudShape(isLikeFn(mudShape,tTorso)),mudMaterial(isEach(vWool,vCotton,vRayon)),mudTexture(vCoarse)]).
+typeProps(tPants,[mudColor(vBlack),mudSize(isEach(vMedium,vFits)),mudShape(isLikeFn(mudShape,tAss)),mudMaterial(vDenim),mudTexture(vCoarse)]).
+typeProps(tNani,[mudColor(vBrown),mudColor(vWhite),mudSize(vMedium),mudShape(isLikeFn(mudShape,tTeddybear)),mudMaterial(vPlush),mudTexture(isEach(vFuzzy,vSoft))]).
 typeProps(tLightSwitch,[mudColor(vCream),mudSize(vSmall),mudShape(vRectangular),mudMaterial(vPlastic),mudTexture(vSmooth)]).
 
 typeProps(tBall,[mudColor(vRed),mudSize(vMedium),mudShape(vSpherical),mudMaterial(vRubber),mudTexture(vBumpy)]).
@@ -199,7 +481,7 @@ typeProps(tHousePlant,[mudColor(vGreen),mudSize(vMedium),mudShape(vAnthuriumCrys
 typeProps(tGueridon,[mudColor(isEach(vBrown,vShiney)),mudSize(vMedium),mudShape(vCircular),mudMaterial(vWood),mudTexture(vSmooth),mudWeight(25)]).		 
 
 typeProps(tTeddybear,[mudColor(vNatural),mudShape(vUnique)]).
-typeProps(tTorso,[mudColor(isLike(mudColor,tSkin)),mudShape(vUnique)]).
+typeProps(tTorso,[mudColor(isLikeFn(mudColor,tSkin)),mudShape(vUnique)]).
 typeProps(tSkin,[mudColor(vUnique),mudShape(vUnique)]).
 
 predTypeMax(mudEnergy,tAgentGeneric,120).
@@ -226,7 +508,7 @@ mudLabelTypeProps(hb,tHighBox,[mudHeight(3),mudWeight(3)]).
  mudLabelTypeProps(gd,tGold,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenDeletes),mudActAffect(actTake,mudScore(+10))]).
  mudLabelTypeProps(fd,tFood,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudEnergy(+80))]).
 mudLabelTypeProps(el,tElixer,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudHealth(+80))]).
-mudLabelTypeProps(ed,tEdge,[mudHeight(10),mudWeight(4)]).
+mudLabelTypeProps(ed,tEdgeOfWorld,[mudHeight(10),mudWeight(4)]).
  mudLabelTypeProps(dt,tDirt,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenDeletes),mudActAffect(actTake,mudScore(+1)),spawn_rate(5)]).
 mudLabelTypeProps(dr,tDoor,[mudHeight(3),mudWeight(2)]).
 
@@ -242,7 +524,7 @@ mudLabelTypeProps(da,tCorpsec,[mudHeight(2),mudWeight(2)]).
 % This is used to make the monster roaming the maze a bit tougher
 % It doesn't require any of the usual traits since the monster will never 
 % leave the monster's possession.
-mudLabelTypeProps(th,tNastyKnife,[mudActAffect(actWield,mudAttack(2))]).
+mudLabelTypeProps(nk,tNastyKnife,[mudActAffect(actWield,mudAttack(2))]).
 mudLabelTypeProps(th,tToughHide,[mudActAffect(actWear,mudArmor(2))]).
 
 

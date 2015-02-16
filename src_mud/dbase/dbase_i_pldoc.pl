@@ -5,59 +5,134 @@
           s_to_html/3
 	  ]).
 
+:- include(dbase_i_header).
+
 :-export((term_listing/1)).
 term_listing([]):-!.
-term_listing(Match):-
-   '@'((ignore((catch(listing(Match),E,wdmsg(E)))),
-   doall((
-      dbase_i_pldoc:synth_clause_for(H,B),
-      once(dbase_i_pldoc:ok_pred(H)),
-      once(dbase_i_pldoc:use_term_listing(Match,H,B)),
-      dbase_i_pldoc:show_term_listing(H,B),
-      fail))),'user').
+term_listing(Match):- 
+  '@'(ignore((catch(listing(Match),E,wdmsg(E)))),'user'),
+  term_non_listing(Match),!.
 
-synth_clause_for(H,B):- cur_predicate(H,_),synth_clause_db(H,B).
+:- export term_non_listing/1.
+term_non_listing(Match):- 
+   format('/* term_non_listing(~q) => ~n',[Match]),
+   '@'(ignore((doall((
+      dbase_i_pldoc:synth_clause_for(H,B,_Ref),
+      once(dbase_i_pldoc:ok_show(H)),
+      once(dbase_i_pldoc:term_matches_hb(Match,H,B)),
+      dbase_i_pldoc:portray_hb(H,B),
+      fail)))),'user'),
+   format(' <= term_non_listing(~q) */ ~n',[Match]).
+
+:- multifile user:prolog_list_goal/1.
+% user:prolog_list_goal(Goal):- writeq(hello(prolog_list_goal(Goal))),nl.
+
+:- multifile prolog:locate_clauses/2.
+% prolog:locate_clauses(A, _) :- get_functor(A,F),term_non_listing(F),!,fail.
+
+:-export((synth_clause_for/3)).
+synth_clause_for(H,B,Ref):- cur_predicate(_,H),synth_clause_ref(H,B,Ref).
 
 
+:-export((synth_clause_ref/3)).
+synth_clause_ref(H,(fail,synth_clause_info(Props)),0):- once(pred_info(H,Props)).
+synth_clause_ref(H,B,Ref):- predicate_property(M:H,number_of_clauses(_)),!,clause(M:H,B,Ref).
 
-synth_clause_db(H,info(Props)):- once(pred_info(H,Props)).
-synth_clause_db(H,B):- predicate_property(M:H,number_of_clauses(_)),!,clause(M:H,B).
+:-export((term_matches_hb/3)).
+term_matches_hb(noinfo,_,info(_)):-!,fail. 
+term_matches_hb(HO,H,B):- atom(HO),!, term_matches_hb_2(exact,HO,H,B).
+term_matches_hb([],_,_):-!.
+term_matches_hb([F1],H,B):-!,term_matches_hb(F1,H,B),!.
+term_matches_hb([F1|FS],H,B):-!,term_matches_hb(F1,H,B),!,term_matches_hb(FS,H,B),!.
+term_matches_hb((F1,FS),H,B):-!,term_matches_hb(F1,H,B),!,term_matches_hb(FS,H,B),!.
+term_matches_hb((F1;FS),H,B):-!,term_matches_hb(F1,H,B);term_matches_hb(FS,H,B).
+term_matches_hb(arity(A),H,_):-!,functor(H,_,A).
+term_matches_hb(functor(F),H,_):-!,functor(H,F,_).
+term_matches_hb(not(C),H,B):-nonvar(C),!,not(term_matches_hb(C,H,B)).
+term_matches_hb(-(C),H,B):-nonvar(C),!,not(term_matches_hb(C,H,B)).
+term_matches_hb(+(C),H,B):-nonvar(C),!,(term_matches_hb(C,H,B)).
+term_matches_hb(module(M),H,_):-!,predicate_property(H,imported_from(M)).
+term_matches_hb(M:HO,H,B):-!,term_matches_hb(module(M),H,B),!,term_matches_hb(h(HO),H,B).
+term_matches_hb(F/A,H,_):-atom(F),functor(H,F,A),!.
+term_matches_hb(h(P),H,_):-!,term_matches_hb(P,H,666666).
+term_matches_hb(b(P),_,B):-!,term_matches_hb(P,666666,B).
+term_matches_hb(HO,H,B):- string(HO),!, term_matches_hb_2(mudContains,HO,H,B).
+term_matches_hb(mudContains(HO),H,B):-!, term_matches_hb_2(mudContains,HO,H,B).
+term_matches_hb(HO,H,B):- !,term_matches_hb_2(exact,HO,H,B).
 
-:-export((use_term_listing/3)).
-use_term_listing(noinfo,_,info(_)):-!,fail. 
-use_term_listing(HO,H,B):- atom(HO),!, use_term_listing_2(exact,HO,H,B).
-use_term_listing([],_,_):-!.
-use_term_listing([F1],H,B):-!,use_term_listing(F1,H,B),!.
-use_term_listing([F1|FS],H,B):-!,use_term_listing(F1,H,B),!,use_term_listing(FS,H,B),!.
-use_term_listing((F1,FS),H,B):-!,use_term_listing(F1,H,B),!,use_term_listing(FS,H,B),!.
-use_term_listing((F1;FS),H,B):-!,use_term_listing(F1,H,B);use_term_listing(FS,H,B).
-use_term_listing(arity(A),H,_):-!,functor(H,_,A).
-use_term_listing(functor(F),H,_):-!,functor(H,F,_).
-use_term_listing(not(C),H,B):-nonvar(C),!,not(use_term_listing(C,H,B)).
-use_term_listing(-(C),H,B):-nonvar(C),!,not(use_term_listing(C,H,B)).
-use_term_listing(+(C),H,B):-nonvar(C),!,(use_term_listing(C,H,B)).
-use_term_listing(module(M),H,_):-!,predicate_property(H,imported_from(M)).
-use_term_listing(M:HO,H,B):-!,use_term_listing(module(M),H,B),!,use_term_listing(h(HO),H,B).
-use_term_listing(F/A,H,_):-atom(F),functor(H,F,A),!.
-use_term_listing(h(P),H,_):-!,use_term_listing(P,H,666666).
-use_term_listing(b(P),_,B):-!,use_term_listing(P,666666,B).
-use_term_listing(HO,H,B):- string(HO),!, use_term_listing_2(mudContains,HO,H,B).
-use_term_listing(mudContains(HO),H,B):-!, use_term_listing_2(mudContains,HO,H,B).
-use_term_listing(HO,H,B):- !,use_term_listing_2(exact,HO,H,B).
+:- export term_matches_hb_2/4.
+term_matches_hb_2(mudContains,HO,H,B):- any_to_string(HO,HS),!, with_output_to(string(H1B1),write_canonical((H:-B))), (sub_atom_icasechk(HS,_,H1B1);sub_atom_icasechk(H1B1,_,HS)),!.
+term_matches_hb_2(exact,HO,H,B):- contains_var(HO,(H:-B)).
 
-use_term_listing_2(mudContains,HO,H,B):- any_to_string(HO,HS),!, with_output_to(string(H1B1),write_canonical((H:-B))), (sub_atom_icasechk(HS,_,H1B1);sub_atom_icasechk(H1B1,_,HS)),!.
-use_term_listing_2(exact,HO,H,B):- contains_var(HO,(H:-B)).
-
-use_term_listing(HO,(H:-B)):-!, synth_clause_db(H,B), use_term_listing(HO,H,B).
+% match_term_listing(HO,H,B):-!, synth_clause_ref(H,B,_Ref), term_matches_hb(HO,H,B).
 
 :-dynamic cur_predicates/1.
-cur_predicate(M:P,M:F/A):-
+:- export cur_predicate/2.
+cur_predicate(M:F/A,M:P):-
    current_predicate(M:F/A),functor(P,F,A),not(predicate_property(user:P,imported_from(_))).
 
 
-ok_pred(F/A):-!,functor(P,F,A),ok_pred(P),!.
-ok_pred(P):-not(bad_pred(P)).
+:- export ok_show/1.
+ok_show(F/A):-!,functor(P,F,A),ok_show(P),!.
+ok_show(P):-not(bad_pred(P)).
 
+
+
+% when we import new and awefull code base (the previous )this can be helpfull
+% we redfine list_undefined/1 .. this is the old version
+:- dynamic_multifile_exported(scansrc_list_undefined/1).
+scansrc_list_undefined(_):-!.
+scansrc_list_undefined(A):- real_list_undefined(A).
+
+list_undefined:-real_list_undefined([]).
+
+:- dynamic_multifile_exported(real_list_undefined/1).
+real_list_undefined(A):-
+ merge_options(A, [module_class([user])], B),
+        prolog_walk_code([undefined(trace), on_trace(found_undef)|B]),
+        findall(C-D, retract(undef(C, D)), E),
+        (   E==[]
+        ->  true
+        ;   print_message(warning, check(undefined_predicates)),
+            keysort(E, F),
+            group_pairs_by_key(F, G),
+            maplist(check:report_undefined, G)
+        ).
+
+:-export(mmake/0).
+mmake:- update_changed_files.
+:-export(update_changed_files/0).
+update_changed_files :-
+        set_prolog_flag(verbose_load,true),
+        ensure_loaded(library(make)),
+	findall(File, make:modified_file(File), Reload0),
+	list_to_set(Reload0, Reload),
+	(   prolog:make_hook(before, Reload)
+	->  true
+	;   true
+	),
+	print_message(silent, make(reload(Reload))),
+	maplist(make:reload_file, Reload),
+	print_message(silent, make(done(Reload))),
+	(   prolog:make_hook(after, Reload)
+	->  true
+	;   
+           true %list_undefined,list_void_declarations
+	).
+
+:- dynamic_multifile_exported(remove_undef_search/0).
+remove_undef_search:- ((
+ '@'(use_module(library(check)),'user'),
+ redefine_system_predicate(check:list_undefined(_)),
+ abolish(check:list_undefined/1),
+ assert((check:list_undefined(A):- not(thread_self(main)),!, ignore(A=[]))),
+ assert((check:list_undefined(A):- reload_library_index,  update_changed_files,call(thread_self(main)),!, ignore(A=[]))),
+ assert((check:list_undefined(A):- ignore(A=[]),scansrc_list_undefined(A))))).
+
+% :- remove_undef_search.
+
+
+:-export(bad_pred/1).
 bad_pred(M:P):-!,atom(M),bad_pred(P). 
 bad_pred(P):-functor(P,F,A),arg(_,v(cur_predicates/_,db_op/_,db_op00/_,db_op0/_,db_op_loop/_,do_expand_args_l/3),F/A).
 bad_pred(P):-predicate_property(P,autoloaded(_)).
@@ -65,13 +140,16 @@ bad_pred(P):-not(predicate_property(P,number_of_clauses(_))).
 bad_pred(P):-predicate_property(P,imported_from(_)),predicate_property(P,static).
 bad_pred(P):-predicate_property(P,foreign).
 
+:-export(pred_info/2).
 pred_info(H,Props):- get_functor(H,F), findall(PP,mpred_prop(F,PP),Props).
 
+:-export(portray_hb/2).
+portray_hb(H,B):- B==true, !, portray_one_line(H).
+portray_hb(H,B):- portray_one_line((H:-B)).
 
-show_term_listing(H,true):- !, show_term_listing(H).
-show_term_listing(H,B):- show_term_listing((H:-B)).
-
-show_term_listing(H):- not(not((snumbervars(H),writeq(H),write('.'),nl))),!.
+:-export(portray_one_line/1).
+portray_one_line(H):- current_predicate(wdmsg/1),wdmsg(H),!.
+portray_one_line(H):- not(not((snumbervars(H),writeq(H),write('.'),nl))),!.
 
 
 
@@ -137,18 +215,18 @@ write_count(H,N):- writeq(H:N),write(', ').
 
 */
 :-export(to_tclass/2).
-to_tclass(F,F):- current_predicate(_:F/A),functor(P,F,A),(real_builtin_predicate(P);predicate_property(P, nodebug );predicate_property(P, meta_predicate(P) )).
-to_tclass(F,F):-atom_string(F,S),string_lower(S,L),S\=L,!.
+to_tclass(F,FO):- atom(F),current_predicate(_:F/A),!,functor(P,F,A),(real_builtin_predicate(P);predicate_property(P, nodebug );predicate_property(P, meta_predicate(P) )),FO=F.
+to_tclass(F,FO):- string(F),!,atom_string(F,S),to_tclass(S,FO).
 
 
-to_tclass(Prop,New):- p_is_ttFormatType(Prop),ensure_starts_with_prefix(Prop,ft,New),!.
+to_tclass(Prop,New):- ttFormatType(Prop),ensure_starts_with_prefix(Prop,ft,New),!.
 to_tclass(Prop,New):- ttValueType(Prop),ensure_starts_with_prefix(Prop,vt,New),!.
 
 to_tclass(Prop,New):- mpred_arity(Prop,1),mpred_arity(Prop,tCol),ensure_starts_with_prefix(Prop,t,New),!.
 to_tclass(Prop,New):- mpred_prop(Prop,prologHybrid),mpred_arity(Prop,M),M>1,mpred_prop(Prop,predArgTypes(_)),ensure_starts_with_prefix(Prop,mud,New),!.
 to_tclass(Prop,New):- (call(dbase_t,Prop,_,_);dbase_t(Prop,_,_,_);dbase_t(Prop,_,_,_,_)),ensure_starts_with_prefix(Prop,mud,New),!.
 to_tclass(Prop,New):- is_actverb(Prop),ensure_starts_with_prefix(Prop,act,New),!.
-to_tclass(Prop,New):- mudIsa(Prop,tCol),ensure_starts_with_prefix(Prop,t,New),!.
+to_tclass(Prop,New):- isa(Prop,tCol),ensure_starts_with_prefix(Prop,t,New),!.
 to_tclass(Prop,New):- (dbase_t(_,_,Prop);dbase_t(_,_,Prop,_);dbase_t(_,_,_,Prop)),ensure_starts_with_prefix(Prop,v,New),!.
 % to_tclass(Prop,actDrop).
 
@@ -785,3 +863,5 @@ psaveall3:- forall(enumerate_files('../games/*start*/*.pl*',F),cp_src(F)).
 psaveall4:- forall(enumerate_files('../games/*wump*/*.pl*',F),cp_src(F)).
 :-export(psaveall5/0).
 psaveall5:- forall(enumerate_files('../games/*e_sim*/*.pl*',F),cp_src(F)).
+
+

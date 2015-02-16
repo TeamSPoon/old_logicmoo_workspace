@@ -3,9 +3,9 @@ PrologMUD_base.vpj=Release
 [Global]
 CurrentProject=PrologMUD.vpj
 [ProjectDates]
-PrologMUD.vpj=20150206132954245
+PrologMUD.vpj=20150215202042343
 PrologMUD_base.vpj=20150118165844771
-externals\PrologMUD_ext.vpj=20150128041104409
+externals\PrologMUD_ext.vpj=20150209214117951
 [TreeExpansion2]
 - PrologMUD.vpj
   - externals
@@ -17,10 +17,10 @@ externals\PrologMUD_ext.vpj=20150128041104409
         + r6rs-plt-redex-model
     - MUD_XperiMental
       + GOAL\.jedit
-      + apapl-code\.settings
+      - apapl-code\.settings
       + SmartPMsuite\.settings
       + apapl-code\.svn
-        - pristine
+        + pristine
           + 01
           + 02
           + 03
@@ -491,25 +491,25 @@ externals\PrologMUD_ext.vpj=20150128041104409
           + gui
             + icons
       - Blocks-World
-        + notes
-        + src
+        - notes
+        - src
           - congolog
-          + sitcalc
-          + tex
+          - sitcalc
+          - tex
       + ext
       + GOAL
         + modes\.svn
           + text-base
         + doc
-        + environments
+        - environments
           + BW4TServer
-            + bin
-              + nl
-                + tudelft
-                  + bw4t
+            - bin
+              - nl
+                - tudelft
+                  - bw4t
                     + agent
                     + blocks
-                    + client
+                    - client
                     + doors
                     + eis
                       + translators
@@ -521,25 +521,25 @@ externals\PrologMUD_ext.vpj=20150128041104409
                     + util
                     + visualizations
             + BW4T.rs
-            + maps
-          + maps
-          + WumpusWorlds
-        + GOALagents
-          + BlocksWorld
+            - maps
+          - maps
+          - WumpusWorlds
+        - GOALagents
+          - BlocksWorld
           + BW4T2
-          + CoffeeAgents
+          - CoffeeAgents
           + Domestic
           + Elevator
           + HelloWorld
           + TarzanAndJane
-          + Tower
-          + Transport
-          + WumpusAgents
-        + licenses
-          + gpl-3.0_files
-          + lesser_files
-        + modes
-        + swifiles
+          - Tower
+          - Transport
+          - WumpusAgents
+        - licenses
+          - gpl-3.0_files
+          - lesser_files
+        - modes
+        - swifiles
           + boot
           + library
           + libs
@@ -597,15 +597,22 @@ externals\PrologMUD_ext.vpj=20150128041104409
           + ontologies
             + examples
           + scripts
-      - MUD_PDDL
+      + MUD_PDDL
         - prolog
-          - planner
-            + bkwld_pddl_parser
-            + Blocks_world
-            + domains
-              + failing_or_too_slow
-              + others
-              + sanity
+          + Blocks_world
+          + domains
+            - failing_or_too_slow
+            + others
+            + sanity
+          + misc_planner
+          + Rakiduam07
+            + continuos
+            + socket_udp
+          + test
+            + blocks
+            + elevators
+            + gripper
+            + hanoi
             + ipc2008-no-cybersec
               + netben-opt
                 + crewplanning-numeric
@@ -633,61 +640,13 @@ externals\PrologMUD_ext.vpj=20150128041104409
                 + openstacks-strips
                 + parcprinter-strips
                 + pegsol-strips
-            + orig_pddl_parser
-              + charts
-              + docs
-              + output
-              + test
-                + blocks
-                + elevators
-                + gripper
-                + hanoi
-            + pddlParser
-            + Rakiduam07
-              + continuos
-              + socket_udp
-      + PPL
-        + charts
-        + docs
-        + ipc2008-no-cybersec
-          + netben-opt
-            + crewplanning-numeric
-            + elevators-numeric
-            + elevators-strips
-            + openstacks-adl
-            + openstacks-numericadl
-            + openstacks-stripsneg
-            + pegsol-strips
-            + transport-numeric
-            + woodworking-numeric
-          + seq-opt
-            + elevators-strips
-            + openstacks-adl
-            + openstacks-strips
-            + parcprinter-strips
-            + pegsol-strips
-            + scanalyzer-strips
-            + sokoban-strips
-            + transport-strips
-            + woodworking-strips
-          + seq-sat
-            + elevators-strips
-            + openstacks-adl
-            + openstacks-strips
-            + parcprinter-strips
-            + pegsol-strips
-        + test
-          + blocks
-          + elevators
-          + gripper
-          + hanoi
       - sitcalc_async_knowledge
-      + SmartPMsuite
-        - aPMS
+      - SmartPMsuite
+        + aPMS
           + Original aPMS.pl File
-          + Planners
-            + LPG-TD
-              + Originals
+          - Planners
+            - LPG-TD
+              - Originals
         + images
         + lib
         + properties
@@ -732,7 +691,7 @@ externals\PrologMUD_ext.vpj=20150128041104409
         + js
         + prolog
         + snd
-    - src_game_wumpus
+    + src_game_wumpus
   - runtime
     + config-enabled
     + RDF-store
@@ -1093,7 +1052,7 @@ externals\PrologMUD_ext.vpj=20150128041104409
       - affordance
       + planner
     + objs
-    + parsing
+    - parsing
     - vworld
 - externals\PrologMUD_ext.vpj
   + MUD_DeepParsing\.git
@@ -1713,17 +1672,17 @@ externals\PrologMUD_ext.vpj=20150128041104409
     + Plugins
     + src
       + Keep
-scroll:0
+scroll:27
 [State]
-SCREEN: 1920 1080 0 0 1612 648 0 0 M 0 0 0 0 1469 568
-CWD: src_mud\dbase
+SCREEN: 1920 1080 0 0 1612 648 0 0 M 0 0 0 0 1593 568
+CWD: src_mud
 FILEHIST: 9
-C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.345\planner\output\gripper-backward-dfs-h_add.out
-externals\MUD_XperiMental\PPL\COPYING
-externals\MUD_XperiMental\PPL\pddl_robert_sasak.pl
-externals\MUD_XperiMental\MUD_PDDL\prolog\planner\test_validate_input_2009.pl
-externals\MUD_XperiMental\MUD_PDDL\prolog\planner\pddlParser\module_lists.pl
-externals\MUD_XperiMental\MUD_PDDL\prolog\planner\orig_pddl_parser\output\blocks-backward-dfs-h_max.out.avg
-externals\MUD_XperiMental\MUD_PDDL\prolog\planner\README
-C:\Users\ADMINI~1\AppData\Local\Temp\Rar$DRa0.141\planner\domain.pl
-externals\MUD_XperiMental\MUD_PDDL\prolog\planner\pddl_robert_sasak.pl
+externals\MUD_XperiMental\SmartPMsuite\aPMS\Original aPMS.pl File\apms_KR_2014.pl
+externals\MUD_XperiMental\SmartPMsuite\aPMS\Original aPMS.pl File\apms.pl
+externals\MUD_XperiMental\SmartPMsuite\aPMS\Planners\LPG-TD\Originals\problem_with_abortion.pddl
+externals\MUD_XperiMental\Blocks-World\src\sitcalc\README
+externals\MUD_XperiMental\Blocks-World\src\sitcalc\sitcalc.pl
+externals\MUD_XperiMental\Blocks-World\src\sitcalc_async_knowledge\sitcalc.pl
+externals\MUD_XperiMental\Blocks-World\src\sitcalc_async_knowledge\domain_wumpus.pl
+externals\MUD_XperiMental\sitcalc_async_knowledge\main.pl
+externals\MUD_XperiMental\Blocks-World\src\sitcalc_async_knowledge\prover.pl
