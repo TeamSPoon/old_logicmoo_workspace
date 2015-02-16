@@ -13,6 +13,7 @@ externals\PrologMUD_ext.vpj=20150209214117951
       + eggdrop
       + prolog
     + MUD_ScriptEngines
+      + lisp5000
       + prolog
         + r6rs-plt-redex-model
     - MUD_XperiMental
@@ -497,6 +498,20 @@ externals\PrologMUD_ext.vpj=20150209214117951
           - sitcalc
           - tex
       + ext
+      + finin_prolog
+        + adventure
+        + constraints
+        + fc
+        + games
+        + learning
+        + meta
+        + nlp
+        + planning
+          + backup
+        + pttp
+        + search
+        + sibling
+        + text
       + GOAL
         + modes\.svn
           + text-base
@@ -640,7 +655,6 @@ externals\PrologMUD_ext.vpj=20150209214117951
                 + openstacks-strips
                 + parcprinter-strips
                 + pegsol-strips
-      - sitcalc_async_knowledge
       - SmartPMsuite
         + aPMS
           + Original aPMS.pl File
@@ -665,7 +679,6 @@ externals\PrologMUD_ext.vpj=20150209214117951
                 + model
                 + view
           + Devices
-      - snark
       + vworld
   - games
     - src_game_nani
@@ -1583,15 +1596,6 @@ externals\PrologMUD_ext.vpj=20150209214117951
           + media_ptr
   + MUD_PDDL
     + prolog
-      + planner
-        + bkwld_pddl_parser
-        + Blocks_world
-        + orig_pddl_parser
-        + Rakiduam07
-          + continuos
-          + socket_udp
-  + MUD_ScriptEngines
-    + ext
   + MUD_WebTHEA
     + apps
       + labelgen
@@ -1672,10 +1676,10 @@ externals\PrologMUD_ext.vpj=20150209214117951
     + Plugins
     + src
       + Keep
-scroll:27
+scroll:0
 [State]
 SCREEN: 1920 1080 0 0 1612 648 0 0 M 0 0 0 0 1593 568
-CWD: src_mud
+CWD: externals
 FILEHIST: 9
 externals\MUD_XperiMental\SmartPMsuite\aPMS\Original aPMS.pl File\apms_KR_2014.pl
 externals\MUD_XperiMental\SmartPMsuite\aPMS\Original aPMS.pl File\apms.pl
