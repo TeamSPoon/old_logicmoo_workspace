@@ -13,14 +13,14 @@
 % ==============================================
 %  Basic functions and relations new non-rigid universals introduced in specialized theories or in new versions of DOLCE need to be added in this definition as new disjunction clauses of form (=?f=8A)
 % ==============================================
-:-load_kif(";;; ND1 ==: universals
+:-assert_kif_dolce(";;; ND1 ==: universals
 (defrelation UNIVERSAL (?f) :=
      (or (X ?f)))
 ").
 % ==============================================
 % new rigid universals introduced in new versions of DOLCE or by the user) need to be added in this definition
 % ==============================================
-:-load_kif(";;; ND2==rigid universals
+:-assert_kif_dolce(";;; ND2==rigid universals
 (defrelation X (?f) :=
      (or (=?f ALL) (=?f AB) (=?f R) (=?f TR) (=?f T) (=?f PR) (=?f S) (=?f AR)
          (=?f Q) (=?f TQ) (=?f TL) (=?f PQ) (=?f SL)
@@ -32,7 +32,7 @@
 % ==============================================
 %   there are no particulars in this version of DOLCE, any particular has to be added in this definition, the def. will have form : (or (=?x=8A) (=?x=8A).
 % ==============================================
-:-load_kif(";;; ND3==particulars
+:-assert_kif_dolce(";;; ND3==particulars
 (defrelation PARTICULAR(?x) :=
     )
 ").
@@ -40,67 +40,67 @@
 % there are no named worlds in this version of DOLCE, any world has to be added in this definition, the def.
 %  Will have form : (or (=?w=8A) (=?w=8A).
 % ==============================================
-:-load_kif(";;; ND4==worlds
+:-assert_kif_dolce(";;; ND4==worlds
 (defrelation WORLD(?w) :=
    )
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; ND5==accessibility relation on worlds
+:-assert_kif_dolce(";;; ND5==accessibility relation on worlds
 (defrelation WLDR(?w ?v) :=
     (and (WORLD ?w) (WORLD ?v)))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; ND6==Parthood
+:-assert_kif_dolce(";;; ND6==Parthood
 (defrelation P (?w ?x ?y) :=>
     (and (WORLD ?w) (PARTICULAR ?x) (PARTICULAR ?y)))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; ND7==Temporal Parthood
+:-assert_kif_dolce(";;; ND7==Temporal Parthood
 (defrelation P (?w ?x ?y ?t) :=>
     (and (WORLD ?w) (PARTICULAR ?x) (PARTICULAR ?y) (PARTICULAR ?t)))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; ND8==Constitution
+:-assert_kif_dolce(";;; ND8==Constitution
 (defrelation K (?w ?x ?y ?t) :=>
     (and (WORLD ?w) (PARTICULAR ?x) (PARTICULAR ?y) (PARTICULAR ?t)))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; ND9==Participation
+:-assert_kif_dolce(";;; ND9==Participation
 (defrelation PC (?w ?x ?y ?t) :=>
     (and (WORLD ?w) (PARTICULAR ?x) (PARTICULAR ?y) (PARTICULAR ?t)))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; ND10==Quality
+:-assert_kif_dolce(";;; ND10==Quality
 (defrelation qt (?w ?x ?y) :=>
     (and (WORLD ?w) (PARTICULAR ?x) (PARTICULAR ?y)))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; ND11==Quale
+:-assert_kif_dolce(";;; ND11==Quale
 (defrelation ql (?w ?x ?y) :=>
     (and (WORLD ?w) (PARTICULAR ?x) (PARTICULAR ?y)))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; ND12==Quale (temporal)
+:-assert_kif_dolce(";;; ND12==Quale (temporal)
 (defrelation ql (?w ?x ?y ?t) :=>
     (and (WORLD ?w) (PARTICULAR ?x) (PARTICULAR ?y) (PARTICULAR ?t)))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; NA1==NEW total domain
+:-assert_kif_dolce(";;; NA1==NEW total domain
 (forall (?x)
         (or (PARTICULAR ?x) (UNIVERSAL ?x) (WORLD ?x)))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; NA2==partition of the domain
+:-assert_kif_dolce(";;; NA2==partition of the domain
 (forall (?x)
         (and (<=> (PARTICULAR ?x)
                   (and (not (UNIVERSAL ?x)) (not (WORLD ?x))))
@@ -135,19 +135,19 @@
 % ==============================================
 %  ***THE UNIVERSALS ARE NECESSARILY NON-EMPY***
 % ==============================================
-:-load_kif(";;; NA14==-- axiom
+:-assert_kif_dolce(";;; NA14==-- axiom
 (forall (?w ?f) (=> (and (UNIVERSAL ?f) (WORLD ?w))
                        (NEP ?w ?f)))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; NA15==-- axiom
+:-assert_kif_dolce(";;; NA15==-- axiom
 (forall (?w ?f) (=> (and (UNIVERSAL ?f) (WORLD ?w))
                        (or (not (X ?f)) (RG ?w ?f))))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; NA16==Instances of PT -- axiom
+:-assert_kif_dolce(";;; NA16==Instances of PT -- axiom
 (forall (?w0) (=> (WORLD ?w0)
   				     	(and (PT ?w0 ALL ED PD Q AB)
                           (PT ?w0 ED PED NPED AS)
@@ -164,7 +164,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; NA17==Instances of SB -- axiom
+:-assert_kif_dolce(";;; NA17==Instances of SB -- axiom
 (forall (?w0)
        (=> (WORLD ?w0)
            (and (SB ?w0 ALL ED) (SB ?w0 ALL PD) (SB ?w0 ALL Q) (SB ?w0 ALL AB)
@@ -188,7 +188,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; NA18==Existence of sum
+:-assert_kif_dolce(";;; NA18==Existence of sum
 (forall (?w0 ?x ?y)
            (=> (and (PARTICULAR ?x) (PARTICULAR ?y) (WORLD ?w0))
                (exists (?z)
@@ -196,7 +196,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; NA19==Existence of sigma
+:-assert_kif_dolce(";;; NA19==Existence of sigma
 (forall (?w0 ?f)
            (=> (and (UNIVERSAL ?f) (WORLD ?w0))
                (exists (?z)
@@ -204,7 +204,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; NA20==Existence of sum.t
+:-assert_kif_dolce(";;; NA20==Existence of sum.t
 (forall (?w0 ?x ?y)
            (=> (and (PARTICULAR ?x) (PARTICULAR ?y) (WORLD ?w0))
                (exists (?z)
@@ -212,7 +212,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; NA21==Existence of sigma.t
+:-assert_kif_dolce(";;; NA21==Existence of sigma.t
 (forall (?w0 ?f)
            (=> (and (UNIVERSAL ?f) (WORLD ?w0))
                (exists (?z)
@@ -231,7 +231,7 @@
 %                                     (or (PARTICULAR @z) (=@z (listof)))
 %                                     (=@x (listof ?y @z))))).
 % ==============================================
-:-load_kif(";;; D1== RG: Rigid Universal
+:-assert_kif_dolce(";;; D1== RG: Rigid Universal
 (defrelation RG (?w0 ?f) :=
     (and (UNIVERSAL ?f)
          (WORLD ?w0)
@@ -244,7 +244,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D2==NEP: Non-Empty Universal
+:-assert_kif_dolce(";;; D2==NEP: Non-Empty Universal
 (defrelation NEP (?w0 ?f) :=
     (and (UNIVERSAL ?f)
          (WORLD ?w0)
@@ -255,7 +255,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D3==DJ: Disjoint Universals
+:-assert_kif_dolce(";;; D3==DJ: Disjoint Universals
 (defrelation DJ (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f)
          (UNIVERSAL ?g)
@@ -268,7 +268,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D4==SB: Subsumption
+:-assert_kif_dolce(";;; D4==SB: Subsumption
 (defrelation SB (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f)
          (UNIVERSAL ?g)
@@ -281,18 +281,18 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D5==EQ: Equal Universals
+:-assert_kif_dolce(";;; D5==EQ: Equal Universals
 (defrelation EQ (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f) (UNIVERSAL ?g) (WORLD ?w0) (SB ?w0 ?f ?g) (SB ?w0 ?g ?f)).
 % ==============================================
-:-load_kif(";;; D6==PSB: Properly Subsuming
+:-assert_kif_dolce(";;; D6==PSB: Properly Subsuming
 (defrelation PSB (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f) (UNIVERSAL ?g) (WORLD ?w0) (SB ?w0 ?f ?g)
          (not (SB ?w0 ?f ?g))))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D7==L: Leaf Universal
+:-assert_kif_dolce(";;; D7==L: Leaf Universal
 (defrelation L (?w0 ?f) :=
     (and (UNIVERSAL ?f)
          (WORLD ?w0)
@@ -304,19 +304,19 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D8==SBL: Leaf Subsumed by
+:-assert_kif_dolce(";;; D8==SBL: Leaf Subsumed by
 (defrelation SBL (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f) (UNIVERSAL ?g) (WORLD ?w0) (SB ?w0 ?f ?g) (L ?w0 ?g)))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D9==PSBL: Leaf Properly Subsumed by
+:-assert_kif_dolce(";;; D9==PSBL: Leaf Properly Subsumed by
 (defrelation PSBL (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f) (UNIVERSAL ?g) (WORLD ?w0) (PSB ?w0 ?f ?g) (L ?w0 ?g)))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D10==L__: Leaf in the set X
+:-assert_kif_dolce(";;; D10==L__: Leaf in the set X
 (defrelation L.X (?w0 ?f) :=
     (and (UNIVERSAL ?f)
          (WORLD ?w0)
@@ -328,13 +328,13 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D11==SBL__
+:-assert_kif_dolce(";;; D11==SBL__
 (defrelation SBL.X (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f) (UNIVERSAL ?g) (WORLD ?w0) (SB ?w0 ?f ?g) (L.X ?w0 ?g)))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D12==PSBL__
+:-assert_kif_dolce(";;; D12==PSBL__
 (defrelation PSBL.X (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f) (UNIVERSAL ?g) (WORLD ?w0) (PSB ?w0 ?f ?g) (L.X ?w0 ?g)))
 ").
@@ -342,7 +342,7 @@
 % Definition (D13) is left for expressivity. In practice it becomes superfluous since the user needs to
 %  give a list of the n-tuple satisfying relation PT in axiom (NA17)
 % ==============================================
-:-load_kif(";;; D13==PT: Partition
+:-assert_kif_dolce(";;; D13==PT: Partition
 (defrelation PT (?w0 ?f @g) :=
     (and (UNIVERSAL ?f)
        (UNIVERSAL @g)
@@ -368,7 +368,7 @@
 % ==============================================
 % Mereological Definitions
 % ==============================================
-:-load_kif(";;; D14==PP: Proper Part
+:-assert_kif_dolce(";;; D14==PP: Proper Part
 (defrelation PP (?w0 ?x ?y) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -378,7 +378,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D15==O: Overlap
+:-assert_kif_dolce(";;; D15==O: Overlap
 (defrelation O (?w0 ?x ?y) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -389,7 +389,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D16==At: Atom
+:-assert_kif_dolce(";;; D16==At: Atom
 (defrelation At (?w0 ?x) :=
     (and (PARTICULAR ?x)
          (WORLD ?w0)
@@ -398,7 +398,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D17==AtP: Atomic Part
+:-assert_kif_dolce(";;; D17==AtP: Atomic Part
 (defrelation AtP (?w0 ?x ?y) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -408,7 +408,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D18==__ Binary Sum
+:-assert_kif_dolce(";;; D18==__ Binary Sum
 (defrelation + (?w0 ?x ?y ?z) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -430,7 +430,7 @@
 % Sum Note: the rendition in KIF is weaker than the corresponding definition  in modal FOL here ?f has to be one of the universal introduced explicitly. 
 % [A possible way out: use string-variables (@f) to code Boolean combinations of universals. ]
 % ==============================================
-:-load_kif(";;; D19==(general)
+:-assert_kif_dolce(";;; D19==(general)
 (defrelation sigma (?w0 ?f ?z) :=
     (and (PARTICULAR ?z)
          (UNIVERSAL ?f)
@@ -455,7 +455,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D20==PP: Temporary Proper Part
+:-assert_kif_dolce(";;; D20==PP: Temporary Proper Part
 (defrelation PP (?w0 ?x ?y ?t) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -466,7 +466,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D21==O: Temporary Overlap
+:-assert_kif_dolce(";;; D21==O: Temporary Overlap
 (defrelation O (?w0 ?x ?y ?t) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -478,7 +478,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D22==At: Temporary Atom
+:-assert_kif_dolce(";;; D22==At: Temporary Atom
 (defrelation At (?w0 ?x ?t) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?t)
@@ -488,7 +488,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D23==AtP: Temporary Atomic Part
+:-assert_kif_dolce(";;; D23==AtP: Temporary Atomic Part
 (defrelation AtP (?w0 ?x ?y ?t) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -499,7 +499,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D24==Coincidence
+:-assert_kif_dolce(";;; D24==Coincidence
 (defrelation=.t (?w0 ?x ?y ?t) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -510,7 +510,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D25==CP: Constant Part
+:-assert_kif_dolce(";;; D25==CP: Constant Part
 (defrelation CP (?w0 ?x ?y) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -523,7 +523,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D26 ==
+:-assert_kif_dolce(";;; D26 ==
 (defrelation +.t (?w0 ?x ?y ?z) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -545,7 +545,7 @@
 % ==============================================
 % NOTE: this rendition includes only the listed universal, for instance, no Boolean combination of universals is included [see also comment on (D19)==
 % ==============================================
-:-load_kif(";;; D27 ==
+:-assert_kif_dolce(";;; D27 ==
 (defrelation sigma.t (?w0 ?f ?z) :=
     (and (PARTICULAR ?z)
          (UNIVERSAL ?f)
@@ -571,7 +571,7 @@
 % ==============================================
 % Quality
 % ==============================================
-:-load_kif(";;; D28==dqt: Direct Quality
+:-assert_kif_dolce(";;; D28==dqt: Direct Quality
 (defrelation dqt (?w0 ?x ?y) :=
     (and (WORLD ?w0)
          (PARTICULAR ?x)
@@ -584,7 +584,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D29==qt: Quality of type
+:-assert_kif_dolce(";;; D29==qt: Quality of type
 (defrelation qtf (?w0 ?f ?x ?y) :=
     (and (UNIVERSAL ?f)
          (PARTICULAR ?x)
@@ -597,7 +597,7 @@
 % ==============================================
 % Temporal and Spatial Quale
 % ==============================================
-:-load_kif(";;; D30==ql_T,PD
+:-assert_kif_dolce(";;; D30==ql_T,PD
 (defrelation ql.T.PD (?w0 ?t ?x) :=
     (and (PARTICULAR ?t)
          (PARTICULAR ?x)
@@ -609,7 +609,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D31==ql_T,ED
+:-assert_kif_dolce(";;; D31==ql_T,ED
 (defrelation ql.T.ED (?w0 ?t ?x) :=
     (and (PARTICULAR ?t)
          (PARTICULAR ?x)
@@ -637,7 +637,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D32==ql_T,TQ
+:-assert_kif_dolce(";;; D32==ql_T,TQ
 (defrelation ql.T.TQ (?w0 ?t ?x) :=
     (and (PARTICULAR ?t)
          (PARTICULAR ?x)
@@ -649,7 +649,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D33==ql_T,PQ_or_AQ
+:-assert_kif_dolce(";;; D33==ql_T,PQ_or_AQ
 (defrelation ql.T.PQAQ (?w0 ?t ?x) :=
     (and (PARTICULAR ?t)
          (PARTICULAR ?x)
@@ -661,7 +661,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D34==ql_T,Q
+:-assert_kif_dolce(";;; D34==ql_T,Q
 (defrelation ql.T.Q (?w0 ?t ?x) :=
     (and (PARTICULAR ?t)
          (PARTICULAR ?x)
@@ -671,7 +671,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D35==ql_T: Temporal Quale
+:-assert_kif_dolce(";;; D35==ql_T: Temporal Quale
 (defrelation ql.T (?w0 ?t ?x) :=
     (and (PARTICULAR ?t)
          (PARTICULAR ?x)
@@ -682,7 +682,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D36==ql_S,PED
+:-assert_kif_dolce(";;; D36==ql_S,PED
 (defrelation ql.S.PED (?w0 ?s ?x ?t) :=
     (and (PARTICULAR ?s)
          (PARTICULAR ?x)
@@ -695,7 +695,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D37==ql_S,PQ
+:-assert_kif_dolce(";;; D37==ql_S,PQ
 (defrelation ql.S.PQ (?s ?x ?t) :=
     (and (PARTICULAR ?s)
          (PARTICULAR ?x)
@@ -708,7 +708,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D38==ql_S,PD
+:-assert_kif_dolce(";;; D38==ql_S,PD
 (defrelation ql.S.PD (?w0 ?s ?x ?t) :=
     (and (PARTICULAR ?s)
          (PARTICULAR ?x)
@@ -721,7 +721,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D39==ql_S: Spatial Quale
+:-assert_kif_dolce(";;; D39==ql_S: Spatial Quale
 (defrelation ql.S (?w0 ?s ?x ?t) :=
     (and (PARTICULAR ?s)
          (PARTICULAR ?x)
@@ -735,7 +735,7 @@
 % ==============================================
 % =%  Being present
 % ==============================================
-:-load_kif(";;; D40==PRE: Being Present at
+:-assert_kif_dolce(";;; D40==PRE: Being Present at
 (defrelation PRE (?w0 ?x ?t) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?t)
@@ -746,7 +746,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D41==PRE: Being Present in at
+:-assert_kif_dolce(";;; D41==PRE: Being Present in at
 (defrelation PRE (?w0 ?x ?s ?t) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?s)
@@ -760,7 +760,7 @@
 % ==============================================
 % Inclusion and Coincidence
 % ==============================================
-:-load_kif(";;; D42==Temporal Inclusion
+:-assert_kif_dolce(";;; D42==Temporal Inclusion
 (defrelation incl.T (?w0 ?x ?y) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -773,7 +773,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D43==Proper Temporal Inclusion
+:-assert_kif_dolce(";;; D43==Proper Temporal Inclusion
 (defrelation sincl.T (?w0 ?x ?y) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -786,7 +786,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D44==Temporary Spatial Inclusion
+:-assert_kif_dolce(";;; D44==Temporary Spatial Inclusion
 (defrelation incl.S.t (?w0 ?x ?y ?t) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -800,7 +800,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D45==Temp. Proper Sp. Inclusion
+:-assert_kif_dolce(";;; D45==Temp. Proper Sp. Inclusion
 (defrelation sincl.S.t (?w0 ?x ?y ?t) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -814,7 +814,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D46==Spatio-temporal Inclusion
+:-assert_kif_dolce(";;; D46==Spatio-temporal Inclusion
 (defrelation incl.S.T (?w0 ?x ?y) :=
     (and (PARTICULAR ?x)
        (PARTICULAR ?y)
@@ -825,7 +825,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D47==Spatio-temp. Incl. during
+:-assert_kif_dolce(";;; D47==Spatio-temp. Incl. during
 (defrelation incl.S.T.t (?w0 ?x ?y ?t) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -837,7 +837,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D48==Temporal Coincidence
+:-assert_kif_dolce(";;; D48==Temporal Coincidence
 (defrelation ~.T (?w0 ?x ?y) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -847,7 +847,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D49==Temporary Spatial Coincidence
+:-assert_kif_dolce(";;; D49==Temporary Spatial Coincidence
 (defrelation ~.S.t (?w0 ?x ?y ?t) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -858,7 +858,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D50==Spatio-temporal Coincidence
+:-assert_kif_dolce(";;; D50==Spatio-temporal Coincidence
 (defrelation ~.S.T (?w0 ?x ?y) :=
     (and (WORLD ?w0)
          (PARTICULAR ?x)
@@ -868,7 +868,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D51==Spatio-temp. Coincidence during
+:-assert_kif_dolce(";;; D51==Spatio-temp. Coincidence during
 (defrelation ~.S.T.t (?w0 ?x ?y ?t) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -880,7 +880,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D52==O_T: Temporal Overlap
+:-assert_kif_dolce(";;; D52==O_T: Temporal Overlap
 (defrelation O.T (?w0 ?x ?y) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -893,7 +893,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D53==O_S,t: Temporary Spatial Overlap
+:-assert_kif_dolce(";;; D53==O_S,t: Temporary Spatial Overlap
 (defrelation O.S.t (?x ?y ?t) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -908,7 +908,7 @@
 % ==============================================
 % Perdurant
 % ==============================================
-:-load_kif(";;; D54==P_T: Temporal Part
+:-assert_kif_dolce(";;; D54==P_T: Temporal Part
 (defrelation P.T (?w0 ?x ?y) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -922,7 +922,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D55==P_S: Spatial Part
+:-assert_kif_dolce(";;; D55==P_S: Spatial Part
 (defrelation P.S (?w0 ?x ?y) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -933,7 +933,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D56==NEP_S: Strongly Non-Empty
+:-assert_kif_dolce(";;; D56==NEP_S: Strongly Non-Empty
 (defrelation NEP.S (?w0 ?f) :=
     (and (UNIVERSAL ?f)
          (WORLD ?w0)
@@ -949,7 +949,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D57==CM: Cumulative
+:-assert_kif_dolce(";;; D57==CM: Cumulative
 (defrelation CM (?w0 ?f) :=
     (and (UNIVERSAL ?f)
          (WORLD ?w0)
@@ -967,7 +967,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D58==CM=97: Anti-Cumulative
+:-assert_kif_dolce(";;; D58==CM=97: Anti-Cumulative
 (defrelation CM~ (?w0 ?f) :=
     (and (UNIVERSAL ?f)
          (WORLD ?w0)
@@ -987,7 +987,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D59==HOM: Homeomerous
+:-assert_kif_dolce(";;; D59==HOM: Homeomerous
 (defrelation HOM (?w0 ?f) :=
     (and (UNIVERSAL ?f)
          (WORLD ?w0)
@@ -1002,7 +1002,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D60==HOM=97: Anti-Homeom.
+:-assert_kif_dolce(";;; D60==HOM=97: Anti-Homeom.
 (defrelation HOM~ (?w0 ?f) :=
     (and (UNIVERSAL ?f)
       (WORLD ?w0)
@@ -1019,7 +1019,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D61==AT: Atomic
+:-assert_kif_dolce(";;; D61==AT: Atomic
 (defrelation AT (?w0 ?f) :=
     (and (UNIVERSAL ?f)
          (WORLD ?w0)
@@ -1032,7 +1032,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D62==AT=97: Anti-Atomic
+:-assert_kif_dolce(";;; D62==AT=97: Anti-Atomic
 (defrelation AT~ (?w0 ?f) :=
     (and (UNIVERSAL ?f)
          (WORLD ?w0)
@@ -1047,7 +1047,7 @@
 % ==============================================
 % =%  Participation
 % ==============================================
-:-load_kif(";;; D63==PC_C: Constant Participation
+:-assert_kif_dolce(";;; D63==PC_C: Constant Participation
 (defrelation PC.C (?w0 ?x ?y) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -1059,7 +1059,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D64==PC_T: Temporary Total Particip.
+:-assert_kif_dolce(";;; D64==PC_T: Temporary Total Particip.
 (defrelation PC.T (?w0 ?x ?y ?t) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -1074,7 +1074,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D65==PC_T: Total Participation
+:-assert_kif_dolce(";;; D65==PC_T: Total Participation
 (defrelation PC.T (?w0 ?x ?y) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -1085,7 +1085,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D66==mpc: Maximal Participant
+:-assert_kif_dolce(";;; D66==mpc: Maximal Participant
 (defrelation mpc (?w0 ?x ?y) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -1110,7 +1110,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D67==mppc: Maximal Physical Participant
+:-assert_kif_dolce(";;; D67==mppc: Maximal Physical Participant
 (defrelation mppc (?w0 ?x ?y) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -1137,7 +1137,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D68==lf: Life
+:-assert_kif_dolce(";;; D68==lf: Life
 (defrelation lf (?w0 ?x ?y) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -1161,7 +1161,7 @@
 % ==============================================
 % Dependence
 % ==============================================
-:-load_kif(";;; D69==SD: Specific Constant Dep.
+:-assert_kif_dolce(";;; D69==SD: Specific Constant Dep.
 (defrelation SD (?w0 ?x ?y) :=
     (or (and (PARTICULAR ?x)
              (PARTICULAR ?y)
@@ -1188,11 +1188,11 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D70==SD: Specific Const. Dep. included in def (D69)
+:-assert_kif_dolce(";;; D70==SD: Specific Const. Dep. included in def (D69)
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D71==GD: Generic Const. Dep.
+:-assert_kif_dolce(";;; D71==GD: Generic Const. Dep.
 (defrelation GD (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f)
          (UNIVERSAL ?g)
@@ -1214,7 +1214,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D72==D: Constant Dependence
+:-assert_kif_dolce(";;; D72==D: Constant Dependence
 (defrelation D (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f)
          (UNIVERSAL ?g)
@@ -1223,7 +1223,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D73==OD: One-sided Constant Dependence
+:-assert_kif_dolce(";;; D73==OD: One-sided Constant Dependence
 (defrelation OD (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f)
          (UNIVERSAL ?g)
@@ -1233,7 +1233,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D74==OSD: One-sided Specific Constant Dependence
+:-assert_kif_dolce(";;; D74==OSD: One-sided Specific Constant Dependence
 (defrelation OSD (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f)
          (UNIVERSAL ?g)
@@ -1243,7 +1243,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D75==OGD: One-sided Generic Constant Dependence
+:-assert_kif_dolce(";;; D75==OGD: One-sided Generic Constant Dependence
 (defrelation OGD (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f)
          (UNIVERSAL ?g)
@@ -1253,7 +1253,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D76==MSD: Mutual Specific Constant Dependence
+:-assert_kif_dolce(";;; D76==MSD: Mutual Specific Constant Dependence
 (defrelation MSD (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f)
          (UNIVERSAL ?g)
@@ -1263,7 +1263,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D77==MGD: Mutual Generic Constant Dependence
+:-assert_kif_dolce(";;; D77==MGD: Mutual Generic Constant Dependence
 (defrelation MGD (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f)
          (UNIVERSAL ?g)
@@ -1274,7 +1274,7 @@
 % ==============================================
 % Spatial Dependence
 % ==============================================
-:-load_kif(";;; D78==SD_S: Specific Spatial Dependence
+:-assert_kif_dolce(";;; D78==SD_S: Specific Spatial Dependence
 (defrelation SD.S (?w0 ?x ?y) :=
     (or (and (WORLD ?w0)
              (PARTICULAR ?x)
@@ -1306,7 +1306,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D79==PSD_S: Partial Specific Spatial Dependence
+:-assert_kif_dolce(";;; D79==PSD_S: Partial Specific Spatial Dependence
 (defrelation PSD.S (?w0 ?x ?y) :=
     (or (and (WORLD ?w0)
          (PARTICULAR ?x)
@@ -1341,7 +1341,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D80==P-1SD_S: Inverse Partial Specific Spatial Dependence
+:-assert_kif_dolce(";;; D80==P-1SD_S: Inverse Partial Specific Spatial Dependence
 (defrelation P1SD.S (?w0 ?x ?y) :=
     (or (and (WORLD ?w0)
           (PARTICULAR ?x)
@@ -1381,7 +1381,7 @@
 % ==============================================
 %  D83==P-1SD_S included in def (D80)
 % ==============================================
-:-load_kif(";;; D84==GD_S: Generic Spatial Dependence
+:-assert_kif_dolce(";;; D84==GD_S: Generic Spatial Dependence
 (defrelation GD.S (?w0 ?f ?g) :=
     (and (WORLD ?w0)
          (UNIVERSAL ?f)
@@ -1406,7 +1406,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D85==PGD_S: Partial Generic Spatial Dependence
+:-assert_kif_dolce(";;; D85==PGD_S: Partial Generic Spatial Dependence
 (defrelation PGD.S (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f)
        (UNIVERSAL ?g)
@@ -1433,7 +1433,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D86==P-1GD_S: Inverse Partial Generic Spatial Dependence
+:-assert_kif_dolce(";;; D86==P-1GD_S: Inverse Partial Generic Spatial Dependence
 (defrelation P1GD.S (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f)
        (UNIVERSAL ?g)
@@ -1460,7 +1460,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D87==DGD_S: Direct Generic Spatial Dependence
+:-assert_kif_dolce(";;; D87==DGD_S: Direct Generic Spatial Dependence
 (defrelation DGD.S (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f)
          (UNIVERSAL ?g)
@@ -1472,7 +1472,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D88==Sdt_S: Temporary Specific Spatial Dependence
+:-assert_kif_dolce(";;; D88==Sdt_S: Temporary Specific Spatial Dependence
 (defrelation SDt.S (?w0 ?x ?y ?t) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -1483,7 +1483,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D89==GDt_S: Temp. Gen. Sp. Dep.
+:-assert_kif_dolce(";;; D89==GDt_S: Temp. Gen. Sp. Dep.
 (defrelation GDt.S (?w0 ?x ?y ?t) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -1498,7 +1498,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D90==DGDt_S: Temp. Direct Sp. Dep.
+:-assert_kif_dolce(";;; D90==DGDt_S: Temp. Direct Sp. Dep.
 (defrelation DGDt.S (?w0 ?x ?y ?t) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -1513,7 +1513,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D91==OSD_S: One-sided Specific Spatial Dependence
+:-assert_kif_dolce(";;; D91==OSD_S: One-sided Specific Spatial Dependence
 (defrelation OSD.S (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f)
          (UNIVERSAL ?g)
@@ -1523,7 +1523,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D92==OGD_S: One-sided Generic Spatial Dependence
+:-assert_kif_dolce(";;; D92==OGD_S: One-sided Generic Spatial Dependence
 (defrelation OGD.S (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f)
          (UNIVERSAL ?g)
@@ -1533,7 +1533,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D93==MSD_S: Mutual Specific Spatial Dependence
+:-assert_kif_dolce(";;; D93==MSD_S: Mutual Specific Spatial Dependence
 (defrelation MSD.S (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f)
          (UNIVERSAL ?g)
@@ -1543,7 +1543,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D94==MGD_S: Mutual Generic Spatial Dependence
+:-assert_kif_dolce(";;; D94==MGD_S: Mutual Generic Spatial Dependence
 (defrelation MGD.S (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f)
          (UNIVERSAL ?g)
@@ -1554,7 +1554,7 @@
 % ==============================================
 % Constitution
 % ==============================================
-:-load_kif(";;; D95==DK: Direct Constitution
+:-assert_kif_dolce(";;; D95==DK: Direct Constitution
 (defrelation DK (?w0 ?x ?y ?t) :=
     (and (PARTICULAR ?x)
          (PARTICULAR ?y)
@@ -1567,7 +1567,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D96==SK: Constantly Specifically Constituted by
+:-assert_kif_dolce(";;; D96==SK: Constantly Specifically Constituted by
 (defrelation SK (?w0 ?x ?y) :=
     (or (and (WORLD ?w0)
              (PARTICULAR ?x)
@@ -1597,7 +1597,7 @@
 % ==============================================
 % D97==SK: Constantly Specifically Constituted by included in def (D96)
 % ==============================================
-:-load_kif(";;; D98==GK: Constantly Generically Constituted by
+:-assert_kif_dolce(";;; D98==GK: Constantly Generically Constituted by
 (defrelation GK (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f)
          (UNIVERSAL ?g)
@@ -1619,7 +1619,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D99==K__Constituted by
+:-assert_kif_dolce(";;; D99==K__Constituted by
 (defrelation K (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f)
          (UNIVERSAL ?g)
@@ -1628,7 +1628,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D100==OSK: One-sided Cons. Specif. Const. by
+:-assert_kif_dolce(";;; D100==OSK: One-sided Cons. Specif. Const. by
 (defrelation OSK (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f)
          (UNIVERSAL ?g)
@@ -1638,7 +1638,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D101==OGK: One-sided Cons. Generic. Const. by
+:-assert_kif_dolce(";;; D101==OGK: One-sided Cons. Generic. Const. by
 (defrelation OGK (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f)
          (UNIVERSAL ?g)
@@ -1648,7 +1648,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D102==MSK: Mutual Specific Constitution
+:-assert_kif_dolce(";;; D102==MSK: Mutual Specific Constitution
 (defrelation MSK (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f)
          (UNIVERSAL ?g)
@@ -1658,7 +1658,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; D103==MGK: Mutual Generic Constitution
+:-assert_kif_dolce(";;; D103==MGK: Mutual Generic Constitution
 (defrelation MSK (?w0 ?f ?g) :=
     (and (UNIVERSAL ?f)
          (UNIVERSAL ?g)
@@ -1669,7 +1669,7 @@
 % ==============================================
 % Characterization of functions and relations Parthood Argument Restrictions
 % ==============================================
-:-load_kif(";;; A1 ==
+:-assert_kif_dolce(";;; A1 ==
 (forall (?w0 ?x ?y)
        (=> (and (P ?w0 ?x ?y)
                 (WORLD ?w0)
@@ -1680,7 +1680,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A2 ==
+:-assert_kif_dolce(";;; A2 ==
 (forall (?w0 ?x ?y)
        (=> (and (P ?w0 ?x ?y)
                 (WORLD ?w0)
@@ -1690,7 +1690,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A3 ==
+:-assert_kif_dolce(";;; A3 ==
 (forall (?w0 ?x ?y)
        (=> (and (P ?w0 ?x ?y)
                 (WORLD ?w0)
@@ -1701,7 +1701,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A4 ==
+:-assert_kif_dolce(";;; A4 ==
 (forall (?w0 ?x ?y ?f)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -1715,7 +1715,7 @@
 % ==============================================
 % Ground Axioms
 % ==============================================
-:-load_kif(";;; A5 ==
+:-assert_kif_dolce(";;; A5 ==
 (forall (?w0 ?x)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -1724,7 +1724,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A6 ==
+:-assert_kif_dolce(";;; A6 ==
 (forall (?w0 ?x ?y)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -1735,7 +1735,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A7 ==
+:-assert_kif_dolce(";;; A7 ==
 (forall (?w0 ?x ?y ?z)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -1747,7 +1747,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A8 ==
+:-assert_kif_dolce(";;; A8 ==
 (forall (?w0 ?x ?y)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -1761,7 +1761,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A9 == Note: this version in KIF consider only the universal explicitly listed see comment on (D19)==
+:-assert_kif_dolce(";;; A9 == Note: this version in KIF consider only the universal explicitly listed see comment on (D19)==
 (forall (?w0 ?f)
        (=> (and (WORLD ?w0)
                 (UNIVERSAL ?f)
@@ -1779,7 +1779,7 @@
 % ==============================================
 % Temporary Parthood Argument restrictions
 % ==============================================
-:-load_kif(";;; A10 ==
+:-assert_kif_dolce(";;; A10 ==
 (forall (?w0 ?x ?y ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -1790,7 +1790,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A11 ==
+:-assert_kif_dolce(";;; A11 ==
 (forall (?w0 ?x ?y ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -1801,7 +1801,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A12 ==
+:-assert_kif_dolce(";;; A12 ==
 (forall (?w0 ?x ?y ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -1813,7 +1813,7 @@
 % ==============================================
 % Ground Axioms
 % ==============================================
-:-load_kif(";;; A13 ==
+:-assert_kif_dolce(";;; A13 ==
 (forall (?w0 ?x ?y ?z ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -1826,7 +1826,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A14 ==
+:-assert_kif_dolce(";;; A14 ==
 (forall (?w0 ?x ?y ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -1844,7 +1844,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A15 == [see comment on (D19)==
+:-assert_kif_dolce(";;; A15 == [see comment on (D19)==
 (forall (?w0 ?f)
        (=> (and (WORLD ?w0)
                 (UNIVERSAL ?f)
@@ -1859,7 +1859,7 @@
 % ==============================================
 % Links With Other Primitives
 % ==============================================
-:-load_kif(";;; A16 ==
+:-assert_kif_dolce(";;; A16 ==
 (forall (?w0 ?x ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -1870,7 +1870,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A17 ==
+:-assert_kif_dolce(";;; A17 ==
 (forall (?w0 ?x ?y ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -1881,7 +1881,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A18 ==
+:-assert_kif_dolce(";;; A18 ==
 (forall (?w0 ?x ?y ?t ?u)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -1894,7 +1894,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A19 ==
+:-assert_kif_dolce(";;; A19 ==
 (forall (?w0 ?x ?y ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -1907,7 +1907,7 @@
 % ==============================================
 % Constitution Argument restrictions
 % ==============================================
-:-load_kif(";;; A20 ==
+:-assert_kif_dolce(";;; A20 ==
 (forall (?w0 ?x ?y ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -1920,7 +1920,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A21 ==
+:-assert_kif_dolce(";;; A21 ==
 (forall (?w0 ?x ?y ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -1931,7 +1931,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A22 ==
+:-assert_kif_dolce(";;; A22 ==
 (forall (?w0 ?x ?y ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -1942,7 +1942,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A23 ==
+:-assert_kif_dolce(";;; A23 ==
 (forall (?w0 ?x ?y ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -1954,7 +1954,7 @@
 % ==============================================
 % Ground Axioms
 % ==============================================
-:-load_kif(";;; A24 ==
+:-assert_kif_dolce(";;; A24 ==
 (forall (?w0 ?x ?y ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -1965,7 +1965,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A25 ==
+:-assert_kif_dolce(";;; A25 ==
 (forall (?w0 ?x ?y ?z ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -1979,7 +1979,7 @@
 % ==============================================
 % Links with other Primitives
 % ==============================================
-:-load_kif(";;; A26 ==
+:-assert_kif_dolce(";;; A26 ==
 (forall (?w0 ?x ?y ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -1990,7 +1990,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A27 ==
+:-assert_kif_dolce(";;; A27 ==
 (forall (?w0 ?x ?y ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2003,7 +2003,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A28 ==
+:-assert_kif_dolce(";;; A28 ==
 (forall (?w0 ?x ?y ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2015,7 +2015,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A29 ==
+:-assert_kif_dolce(";;; A29 ==
 (forall (?w0 ?x ?y ?y1 ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2032,23 +2032,23 @@
 % ==============================================
 % Links between Categories
 % ==============================================
-:-load_kif(";;; A30 ==
+:-assert_kif_dolce(";;; A30 ==
 (forall (?w0) (=> (WORLD ?w0) (GK ?w0 NAPO M)))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A31 ==
+:-assert_kif_dolce(";;; A31 ==
 (forall (?w0) (=> (WORLD ?w0) (GK ?w0 APO NAPO)))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A32 ==
+:-assert_kif_dolce(";;; A32 ==
 (forall (?w0) (=> (WORLD ?w0) (GK ?w0 SC SAG)))
 ").
 % ==============================================
 % Participation Argument restrictions
 % ==============================================
-:-load_kif(";;; A33 ==
+:-assert_kif_dolce(";;; A33 ==
 (forall (?w0 ?x ?y ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2060,7 +2060,7 @@
 % ==============================================
 % Existential Axioms
 % ==============================================
-:-load_kif(";;; a34 ==
+:-assert_kif_dolce(";;; a34 ==
 (forall (?w0 ?x ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2072,7 +2072,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; a35 ==
+:-assert_kif_dolce(";;; a35 ==
 (forall (?w0 ?x)
        (=> (and (WORLD ?w0) (PARTICULAR ?x) (ED ?w0 ?x))
            (exists (?y ?t)
@@ -2081,7 +2081,7 @@
 % ==============================================
 % Links with other Primitives
 % ==============================================
-:-load_kif(";;; a36 ==
+:-assert_kif_dolce(";;; a36 ==
 (forall (?w0 ?x ?y ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2092,7 +2092,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; a37 ==
+:-assert_kif_dolce(";;; a37 ==
 (forall (?w0 ?x ?y ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2106,7 +2106,7 @@
 % ==============================================
 % Quality Argument restrictions:
 % ==============================================
-:-load_kif(";;; a38 ==
+:-assert_kif_dolce(";;; a38 ==
 (forall (?w0 ?x ?y)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2117,7 +2117,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; a39 ==
+:-assert_kif_dolce(";;; a39 ==
 (forall (?w0 ?x ?y)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2128,7 +2128,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; a40 ==
+:-assert_kif_dolce(";;; a40 ==
 (forall (?w0 ?x ?y)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2139,7 +2139,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; a41 ==
+:-assert_kif_dolce(";;; a41 ==
 (forall (?w0 ?x ?y)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2151,7 +2151,7 @@
 % ==============================================
 % Ground Axioms:
 % ==============================================
-:-load_kif(";;; a42 ==
+:-assert_kif_dolce(";;; a42 ==
 (forall (?w0 ?x ?y ?z)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2163,7 +2163,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; a43 ==
+:-assert_kif_dolce(";;; a43 ==
 (forall (?w0 ?x ?y ?z)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2175,7 +2175,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; a44 ==
+:-assert_kif_dolce(";;; a44 ==
 (forall (?w0 ?f ?x ?y ?z)
        (=> (and (WORLD ?w0)
                 (UNIVERSAL ?f)
@@ -2188,7 +2188,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; a45 ==
+:-assert_kif_dolce(";;; a45 ==
 (forall (?w0 ?f ?g ?x ?y ?z)
        (=> (and (WORLD ?w0)
                 (UNIVERSAL ?f)
@@ -2203,7 +2203,7 @@
 % ==============================================
 % Existential Axioms:
 % ==============================================
-:-load_kif(";;; a46 ==
+:-assert_kif_dolce(";;; a46 ==
 (forall (?w0 ?x)
        (=> (and (WORLD ?w0) (PARTICULAR ?x) (TQ ?w0 ?x))
            (exists (?y)
@@ -2218,7 +2218,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; a47 ==
+:-assert_kif_dolce(";;; a47 ==
 (forall (?w0 ?x)
        (=> (and (WORLD ?w0) (PARTICULAR ?x) (PQ ?w0 ?x))
            (exists (?y)
@@ -2233,7 +2233,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; a48 ==
+:-assert_kif_dolce(";;; a48 ==
 (forall (?w0 ?x)
        (=> (and (WORLD ?w0) (PARTICULAR ?x) (AQ ?w0 ?x))
            (exists (?y)
@@ -2248,7 +2248,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; a49 ==
+:-assert_kif_dolce(";;; a49 ==
 (forall (?w0 ?x)
        (=> (and (WORLD ?w0) (PARTICULAR ?x) (PD ?w0 ?x))
            (exists (?y)
@@ -2256,7 +2256,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; a50 ==
+:-assert_kif_dolce(";;; a50 ==
 (forall (?w0 ?x)
        (=> (and (WORLD ?w0) (PARTICULAR ?x) (PED ?w0 ?x))
            (exists (?y)
@@ -2264,7 +2264,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; a51 ==
+:-assert_kif_dolce(";;; a51 ==
 (forall (?w0 ?x)
        (=> (and (WORLD ?w0) (PARTICULAR ?x) (NPED ?w0 ?x))
            (exists (?f ?y)
@@ -2276,7 +2276,7 @@
 % ==============================================
 % Quale Immediate Quale Argument restrictions:
 % ==============================================
-:-load_kif(";;; A52 ==
+:-assert_kif_dolce(";;; A52 ==
 (forall (?w0 ?x ?y)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2286,7 +2286,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A53 ==
+:-assert_kif_dolce(";;; A53 ==
 (forall (?w0 ?x ?y)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2298,7 +2298,7 @@
 % ==============================================
 % Basic Axioms:
 % ==============================================
-:-load_kif(";;; A54 ==
+:-assert_kif_dolce(";;; A54 ==
 (forall (?w0 ?x ?x1 ?y)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2311,7 +2311,7 @@
 % ==============================================
 % Existential Axioms:
 % ==============================================
-:-load_kif(";;; A55 ==
+:-assert_kif_dolce(";;; A55 ==
 (forall (?w0 ?x)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2321,7 +2321,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A56 ==
+:-assert_kif_dolce(";;; A56 ==
 (forall (?w0 ?f ?x ?y ?r ?r1)
        (=> (and (WORLD ?w0)
                 (UNIVERSAL ?f)
@@ -2342,7 +2342,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A57 ==
+:-assert_kif_dolce(";;; A57 ==
 (forall (?w0 ?f ?x ?y ?r ?r1)
        (=> (and (WORLD ?w0)
                 (UNIVERSAL ?f)
@@ -2364,7 +2364,7 @@
 % ==============================================
 % Temporary Quale Argument restrictions:
 % ==============================================
-:-load_kif(";;; A58 ==
+:-assert_kif_dolce(";;; A58 ==
 (forall (?w0 ?x ?y ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2377,7 +2377,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A59 ==
+:-assert_kif_dolce(";;; A59 ==
 (forall (?w0 ?x ?y ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2388,7 +2388,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A60 ==
+:-assert_kif_dolce(";;; A60 ==
 (forall (?w0 ?x ?y ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2399,7 +2399,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A61 ==
+:-assert_kif_dolce(";;; A61 ==
 (forall (?w0 ?x ?y ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2412,7 +2412,7 @@
 % ==============================================
 % Existential Axioms:
 % ==============================================
-:-load_kif(";;; A62 ==
+:-assert_kif_dolce(";;; A62 ==
 (forall (?w0 ?x)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2423,7 +2423,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A63 ==
+:-assert_kif_dolce(";;; A63 ==
 (forall (?w0 ?f ?x ?y ?r ?r1 ?t)
        (=> (and (WORLD ?w0)
                 (UNIVERSAL ?f)
@@ -2445,7 +2445,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A64 ==
+:-assert_kif_dolce(";;; A64 ==
 (forall (?w0 ?f ?x ?y ?r ?r1 ?t)
        (=> (and (WORLD ?w0)
                 (UNIVERSAL ?f)
@@ -2468,7 +2468,7 @@
 % ==============================================
 % Link with Parthood and extension:
 % ==============================================
-:-load_kif(";;; A65 ==
+:-assert_kif_dolce(";;; A65 ==
 (forall (?w0 ?x ?y ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2479,7 +2479,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A66 ==
+:-assert_kif_dolce(";;; A66 ==
 (forall (?w0 ?x ?y ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2493,48 +2493,48 @@
 % ==============================================
 % Dependence and Spatial Dependence Links between categories
 % ==============================================
-:-load_kif(";;; A67 ==
+:-assert_kif_dolce(";;; A67 ==
 (forall (?w0) (=> (WORLD ?w0) (MSD ?w0 TQ PD)))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A68 ==
+:-assert_kif_dolce(";;; A68 ==
 (forall (?w0) (=> (WORLD ?w0) (MSD.S ?w0 PQ PED)))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A69 ==
+:-assert_kif_dolce(";;; A69 ==
 (forall (?w0) (=> (WORLD ?w0) (MSD ?w0 AQ NPED)))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A70 ==
+:-assert_kif_dolce(";;; A70 ==
 (forall (?w0) (=> (WORLD ?w0) (OGD ?w0 F NAPO)))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A71 ==
+:-assert_kif_dolce(";;; A71 ==
 (forall (?w0) (=> (WORLD ?w0) (OSD ?w0 MOB APO)))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A72 ==
+:-assert_kif_dolce(";;; A72 ==
 (forall (?w0) (=> (WORLD ?w0) (OGD ?w0 SAG APO)))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A73 ==
+:-assert_kif_dolce(";;; A73 ==
 (forall (?w0) (=> (WORLD ?w0) (OGD ?w0 NASO SC)))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A74 ==
+:-assert_kif_dolce(";;; A74 ==
 (forall (?w0) (=> (WORLD ?w0) (OD ?w0 NPED PED)))
 ").
 % ==============================================
 % Characterization of Categories Perdurant Conditions on Perdurant's Leaves
 % ==============================================
-:-load_kif(";;; A75 ==
+:-assert_kif_dolce(";;; A75 ==
 (forall (?w0 ?f)
        (=> (and (WORLD ?w0)
                 (UNIVERSAL ?f)
@@ -2543,7 +2543,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A76 ==
+:-assert_kif_dolce(";;; A76 ==
 (forall (?w0 ?f)
        (=> (and (WORLD ?w0)
                 (UNIVERSAL ?f)
@@ -2552,7 +2552,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A77 ==
+:-assert_kif_dolce(";;; A77 ==
 (forall (?w0 ?f)
        (=> (and (WORLD ?w0)
                 (UNIVERSAL ?f)
@@ -2561,7 +2561,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A78 ==
+:-assert_kif_dolce(";;; A78 ==
 (forall (?w0 ?f)
        (=> (and (WORLD ?w0)
                 (UNIVERSAL ?f)
@@ -2571,28 +2571,28 @@
 % ==============================================
 % Existential Axioms
 % ==============================================
-:-load_kif(";;; A79 ==
+:-assert_kif_dolce(";;; A79 ==
   (forall (?w0)
        (=> (WORLD ?w0)
            (exists (?f) (and (UNIVERSAL ?f) (PSBL ?w0 ACH ?f)))))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A80 ==
+:-assert_kif_dolce(";;; A80 ==
   (forall (?w0)
        (=> (WORLD ?w0)
            (exists (?f) (and (UNIVERSAL ?f) (PSBL ?w0 ACC ?f)))))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A81 ==
+:-assert_kif_dolce(";;; A81 ==
   (forall (?w0)
        (=> (WORLD ?w0)
            (exists (?f) (and (UNIVERSAL ?f) (PSBL ?w0 ST ?f)))))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; A82 ==
+:-assert_kif_dolce(";;; A82 ==
   (forall (?w0)
        (=> (WORLD ?w0)
            (exists (?f) (and (UNIVERSAL ?f) (PSBL ?w0 PRO ?f)))))
@@ -2600,28 +2600,28 @@
 % ==============================================
 %  =========================================THEOREMS General Properties
 % ==============================================
-:-load_kif(";;; T1 ==
+:-assert_kif_dolce(";;; T1 ==
   (forall (?w0 ?x ?t)
        (=> (and (WORLD ?w0) (PARTICULAR ?x) (PARTICULAR ?t))
            (not (K ?w0 ?x ?x ?t))))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; T2 ==
+:-assert_kif_dolce(";;; T2 ==
   (forall (?w0 ?f ?g)
        (=> (and (WORLD ?w0) (UNIVERSAL ?f) (UNIVERSAL ?g) (SK ?w0 ?f ?g))
            (SD ?w0 ?f ?g)))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; T3 ==
+:-assert_kif_dolce(";;; T3 ==
   (forall (?w0 ?f ?g)
        (=> (and (WORLD ?w0) (UNIVERSAL ?f) (UNIVERSAL ?g) (GK ?w0 ?f ?g))
            (GD ?w0 ?f ?g)))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; T4 ==
+:-assert_kif_dolce(";;; T4 ==
   (forall (?w0 ?f ?g ?h)
        (=> (and (WORLD ?w0)
                 (UNIVERSAL ?f)
@@ -2634,7 +2634,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; T5 ==
+:-assert_kif_dolce(";;; T5 ==
   (forall (?w0 ?f ?g ?h)
        (=> (and (WORLD ?w0)
                 (UNIVERSAL ?f)
@@ -2648,14 +2648,14 @@
 % ==============================================
 % Ground Properties
 % ==============================================
-:-load_kif(";;; T6 ==
+:-assert_kif_dolce(";;; T6 ==
   (forall (?w0 ?x ?t)
        (=> (and (WORLD ?w0) (PARTICULAR ?x) (PARTICULAR ?t))
            (not (PC ?w0 ?x ?x ?t))))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; T7 ==
+:-assert_kif_dolce(";;; T7 ==
   (forall (?w0 ?x ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2666,7 +2666,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; T8 ==
+:-assert_kif_dolce(";;; T8 ==
   (forall (?w0 ?x)
        (=> (and (WORLD ?w0) (PARTICULAR ?x))
            (not (qt ?w0 ?x ?x))))
@@ -2674,7 +2674,7 @@
 % ==============================================
 % General properties
 % ==============================================
-:-load_kif(";;; T9 ==
+:-assert_kif_dolce(";;; T9 ==
   (forall (?w0 ?f ?g ?h)
        (=> (and (WORLD ?w0)
                 (UNIVERSAL ?f)
@@ -2687,7 +2687,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; T10 ==
+:-assert_kif_dolce(";;; T10 ==
   (forall (?w0 ?f ?g ?h)
        (=> (and (WORLD ?w0)
                 (UNIVERSAL ?f)
@@ -2700,7 +2700,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; T11 ==
+:-assert_kif_dolce(";;; T11 ==
   (forall (?w0 ?f ?g ?h)
        (=> (and (WORLD ?w0)
                 (UNIVERSAL ?f)
@@ -2713,7 +2713,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; T12 ==
+:-assert_kif_dolce(";;; T12 ==
   (forall (?w0 ?f ?g ?h)
        (=> (and (WORLD ?w0)
                 (UNIVERSAL ?f)
@@ -2726,14 +2726,14 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; T13 ==
+:-assert_kif_dolce(";;; T13 ==
   (forall (?w0 ?f ?g)
        (=> (and (WORLD ?w0) (UNIVERSAL ?f) (UNIVERSAL ?g) (SD.S ?w0 ?f ?g))
            (SD ?w0 ?f ?g)))
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; T14 ==
+:-assert_kif_dolce(";;; T14 ==
   (forall (?w0 ?f ?g)
        (=> (and (WORLD ?w0) (UNIVERSAL ?f) (UNIVERSAL ?g) (GD.S ?w0 ?f ?g))
            (GD ?w0 ?f ?g)))
@@ -2741,7 +2741,7 @@
 % ==============================================
 % Being Present
 % ==============================================
-:-load_kif(";;; T15 ==
+:-assert_kif_dolce(";;; T15 ==
   (forall (?w0 ?x)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2751,7 +2751,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; T16 ==
+:-assert_kif_dolce(";;; T16 ==
   (forall (?w0 ?x ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2763,7 +2763,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; T17 ==
+:-assert_kif_dolce(";;; T17 ==
   (forall (?w0 ?x ?t ?t1)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
@@ -2775,7 +2775,7 @@
 ").
 % ==============================================
 % ==============================================
-:-load_kif(";;; T18 ==
+:-assert_kif_dolce(";;; T18 ==
   (forall (?w0 ?x ?s ?t)
        (=> (and (WORLD ?w0)
                 (PARTICULAR ?x)
