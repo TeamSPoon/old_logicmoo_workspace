@@ -917,9 +917,11 @@ snark_read(In,Wff,Vs):-
 :-export(snarky/0).
 snarky:-current_input(In),current_output(Out),!,snarky(In,Out).
 :-export(snarky/2).
+:-ensure_loaded(dbase_i_sexpr_reader).
 
 open_input(InS,InS):-is_stream(InS),!.
 open_input(string(InS),In):-text_to_string(InS,Str),string_codes(Str,Codes),open_chars_stream(Codes,In),!.
+
 
 snarky(InS,Out) :-
   open_input(InS,In),

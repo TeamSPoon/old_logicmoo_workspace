@@ -391,13 +391,16 @@ typename_to_iname0(I,Type,IType):-nonvar(Type),toUpperCamelcase(Type,UType),atom
 :- ensure_loaded(dbase_i_formattypes).
 
 :- decl_mpred_hybrid(predArgTypes/1).
-:- forall((current_predicate(F/A),functor(P,F,A),(predicate_property(P,foreign)->true;predicate_property(P,imported_from(system)))),
-  (F\=instance,F\=',',asserta_if_new(mpred_prop(F,prologOnly)))).
+
+:- forall(
+   (current_predicate(F/A),functor(P,F,A),(predicate_property(P,foreign)->true;predicate_property(P,imported_from(system)))),
+  ignore((F\=instance,F\=',',asserta_if_new(mpred_prop(F,prologOnly))))).
 
 :- ensure_loaded(dbase_i_call_kb).
 :- ensure_loaded(dbase_i_deduce).
 :- ensure_loaded(dbase_i_propvals).
 
+'$toplevel':isa(I,C):-isa_backchaing(I,C).
 user:goal_expansion(G,isa(I,C)):-notrace((was_isa(G,I,C),(is_ftVar(C)->true;(not(mpred_prop(C,prologOnly)))))).
 user:term_expansion(G,isa(I,C)):-notrace((was_isa(G,I,C),(is_ftVar(C)->true;(not(mpred_prop(C,prologOnly)))))).
 user:term_expansion(IN,OUT):- may_expand_currently(IN),kb_term_expansion(IN,WHY),!,must(OUT = user:WHY).
@@ -425,6 +428,7 @@ is_pred_declarer(ArgsIsa)=>isa(ArgsIsa,tCol).
 
 :- pfcAdd((isa(_,ArgsIsa)=>tCol(ArgsIsa))).
 
+:- foreach(retract(isa(I,C)),assert_hasInstance(C,I)).
 :- compile_predicates([isa/2]).
 
 :-add(predArgTypes(typeGenls(ttTypeType,tCol))).
@@ -436,6 +440,9 @@ is_pred_declarer(ArgsIsa)=>isa(ArgsIsa,tCol).
 
 isa(_,ArgsIsa)=>tCol(ArgsIsa).
 
+isa(COLTYPEINST,COLTYPE) , typeGenls(COLTYPE,COL) => subclass(COLTYPEINST,COL).
+
+
 typeGenls(ttRegionType,tRegion).
 typeGenls(ttAgentType,tAgentGeneric).
 typeGenls(ttItemType,tItem).
@@ -444,8 +451,8 @@ typeGenls(ttPredType,tPred).
 typeGenls(ttFormatTypeType,ttFormatType).
 typeGenls(ttTypeType,tCol).
 typeGenls(ttSpatialType,tSpatialThing).
-       
-isa(COLTYPEINST,COLTYPE) , typeGenls(COLTYPE,COL) => subclass(COLTYPEINST,COL).
+
+:-prolog.
 
 subclass(Sub, _Super) => tCol(Sub).
 subclass(_Sub, Super) => tCol(Super).

@@ -21,7 +21,7 @@
 :- assert_kif("(instance instance BinaryPredicate)").
 :- assert_kif("(domain instance 1 Entity)").
 :- assert_kif("(domain instance 2 SetOrClass)").
-:- assert_kif("(documentation instance EnglishLanguage \"An object is an &%instance of a &%SetOrClass if it is included in that &%SetOrClass. An individual may be an instance of many classes, some of which may be subclasses of others. Thus, there is no assumption in the meaning of &%instance about specificity or uniqueness.\")").
+:- assert_kif("(documentation instance EnglishLanguage \"An object is an &%instance of a &%SetOrClass if it is included in that &%SetOrClass. An individual may be an instance of many classes, some of which may be subclasses of others. Thus, there is no assumption in the meaning of &%instance about specificity or uniqueness.\") ").
 :- assert_kif("(subrelation immediateInstance instance)").
 :- assert_kif("(instance immediateInstance AsymmetricRelation)").
 :- assert_kif("(instance immediateInstance IntransitiveRelation)").
@@ -325,7 +325,7 @@
 :- assert_kif("(documentation ElementalSubstance EnglishLanguage \"The &%Class of &%PureSubstances that cannot be separated into two or more &%Substances by ordinary chemical").
 :- assert_kif("(or physical) means. This excludes nuclear reactions. &%ElementalSubstances are composed of only one kind of atom. Examples: Iron (Fe), copper (Cu), and oxygen (O_2). &%ElementalSubstances are the simplest &%PureSubstances.\")").
 :- assert_kif("(subclass Metal ElementalSubstance)").
-:- assert_kif("(documentation Metal EnglishLanguage \"A &%Metal is an &%ElementalSubstance that conducts heat and electricity, is shiny and reflects many colors of light, and can be hammered into sheets or drawn into wire. About 80% of the known chemical elements"). (&%ElementalSubstances) are metals.\")").
+:- assert_kif("(documentation Metal EnglishLanguage \"A &%Metal is an &%ElementalSubstance that conducts heat and electricity, is shiny and reflects many colors of light, and can be hammered into sheets or drawn into wire. About 80% of the known chemical elements (&%ElementalSubstances) are metals.\")").
 :- assert_kif("(subclass Atom ElementalSubstance)").
 :- assert_kif("(documentation Atom EnglishLanguage \"An extremely small unit of matter that retains its identity in Chemical reactions. It consists of an &%AtomicNucleus and &%Electrons surrounding the &%AtomicNucleus.\")").
 :- assert_kif("(=> (instance ?ATOM Atom) (exists (?PROTON ?ELECTRON) (and (component ?PROTON ?ATOM) (component ?ELECTRON ?ATOM) (instance ?PROTON Proton) (instance ?ELECTRON Electron))))").
@@ -490,7 +490,7 @@
 :- assert_kif("(instance attribute IrreflexiveRelation)").
 :- assert_kif("(subrelation attribute property)").
 :- assert_kif("(domain attribute 1 Object)").
-:- assert_kif("(documentation attribute EnglishLanguage \"(&%attribute ?OBJECT ?PROPERTY) means that ?PROPERTY is a &%Attribute of ?OBJECT. For example,"). (&%attribute &%MyLittleRedWagon &%Red).\")").
+:- assert_kif("(documentation attribute EnglishLanguage \"(&%attribute ?OBJECT ?PROPERTY) means that ?PROPERTY is a &%Attribute of ?OBJECT. For example, (&%attribute &%MyLittleRedWagon &%Red).\")").
 :- assert_kif("(instance manner AsymmetricRelation)").
 :- assert_kif("(instance manner IrreflexiveRelation)").
 :- assert_kif("(subrelation manner property)").
@@ -891,7 +891,7 @@
 :- assert_kif("(domain ListOrderFn 1 List)").
 :- assert_kif("(domain ListOrderFn 2 PositiveInteger)").
 :- assert_kif("(range ListOrderFn Entity)").
-:- assert_kif("(documentation ListOrderFn EnglishLanguage \"(&%ListOrderFn ?LIST ?NUMBER) denotes the item that is in the ?NUMBER position in the &%List ?LIST. For example,"). (&%ListOrderFn (&%ListFn &%Monday &%Tuesday &%Wednesday) 2) would return the value &%Tuesday.\")").
+:- assert_kif("(documentation ListOrderFn EnglishLanguage \"(&%ListOrderFn ?LIST ?NUMBER) denotes the item that is in the ?NUMBER position in the &%List ?LIST. For example, (&%ListOrderFn (&%ListFn &%Monday &%Tuesday &%Wednesday) 2) would return the value &%Tuesday.\")").
 :- assert_kif(" (=> (and (instance ?LIST1 List) (not (equal ?LIST1 NullList)) (not (equal ?LIST2 NullList)) (instance ?LIST2 List) (forall (?NUMBER) (equal (ListOrderFn ?LIST1 ?NUMBER) (ListOrderFn ?LIST2 ?NUMBER)))) (equal ?LIST1 ?LIST2))").
 :- assert_kif("(=> (and (domain ?REL ?NUMBER ?CLASS) (instance ?REL Predicate) (?REL @ROW)) (instance (ListOrderFn (ListFn @ROW) ?NUMBER) ?CLASS))").
 :- assert_kif("(=> (and (domainSubclass ?REL ?NUMBER ?CLASS) (instance ?REL Predicate) (?REL @ROW)) (subclass (ListOrderFn (ListFn @ROW) ?NUMBER) ?CLASS))").
@@ -899,7 +899,7 @@
 :- assert_kif("(instance ListLengthFn TotalValuedRelation)").
 :- assert_kif("(domain ListLengthFn 1 List)").
 :- assert_kif("(range ListLengthFn NonnegativeInteger)").
-:- assert_kif("(documentation ListLengthFn EnglishLanguage \"A &%Function that takes a &%List as its sole argument and returns the number of items in the &%List. For example,"). (&%ListLengthFn (&%ListFn &%Monday &%Tuesday &%Wednesday)) would return the value 3.\")").
+:- assert_kif("(documentation ListLengthFn EnglishLanguage \"A &%Function that takes a &%List as its sole argument and returns the number of items in the &%List. For example, (&%ListLengthFn (&%ListFn &%Monday &%Tuesday &%Wednesday)) would return the value 3.\")").
 :- assert_kif(" (=> (and (equal (ListLengthFn ?LIST) ?NUMBER1) (instance ?LIST List) (not (equal ?LIST NullList)) (instance ?NUMBER1 PositiveInteger)) (forall (?NUMBER2) (<=> (exists (?ITEM) (and (equal (ListOrderFn ?LIST ?NUMBER2) ?ITEM) (inList ?ITEM ?LIST))) (lessThanOrEqualTo ?NUMBER2 ?NUMBER1))))").
 :- assert_kif("(forall (@ROW ?ITEM) (equal (ListLengthFn (ListFn @ROW ?ITEM)) (SuccessorFn (ListLengthFn (ListFn @ROW)))))").
 :- assert_kif("(forall (@ROW ?ITEM) (equal (ListOrderFn (ListFn @ROW ?ITEM) (ListLengthFn (ListFn @ROW ?ITEM))) ?ITEM))").
@@ -918,7 +918,7 @@
 :- assert_kif("(instance inList AsymmetricRelation)").
 :- assert_kif("(domain inList 1 Entity)").
 :- assert_kif("(domain inList 2 List)").
-:- assert_kif("(documentation inList EnglishLanguage \"The analog of &%element and &%instance for &%Lists.  (&%inList ?OBJ ?LIST) means that ?OBJ is in the &%List ?LIST. For example,"). (&%inList &%Tuesday (&%ListFn &%Monday &%Tuesday &%Wednesday)) would be true.\")").
+:- assert_kif("(documentation inList EnglishLanguage \"The analog of &%element and &%instance for &%Lists.  (&%inList ?OBJ ?LIST) means that ?OBJ is in the &%List ?LIST. For example, (&%inList &%Tuesday (&%ListFn &%Monday &%Tuesday &%Wednesday)) would be true.\")").
 :- assert_kif("(=> (inList ?ITEM ?LIST) (exists (?NUMBER) (equal (ListOrderFn ?LIST ?NUMBER) ?ITEM)))").
 :- assert_kif("(instance subList BinaryPredicate)").
 :- assert_kif("(instance subList PartialOrderingRelation)").
@@ -1006,7 +1006,7 @@
 :- assert_kif("(=> (instance ?REL VariableArityRelation) (not (exists (?INT) (valence ?REL ?INT))))").
 :- assert_kif("(subclass RelationExtendedToQuantities Relation)").
 :- assert_kif("(subclass RelationExtendedToQuantities InheritableRelation)").
-:- assert_kif("(documentation RelationExtendedToQuantities EnglishLanguage \"A &%RelationExtendedToQuantities is a &%Relation that, when it is true on a sequence of arguments that are &%RealNumbers, it is also true on a sequence of instances of &%ConstantQuantity with those magnitudes in some unit of measure. For example, the &%lessThan relation is extended to quantities. This means that for all pairs of quantities ?QUANTITY1 and ?QUANTITY2,"). (&%lessThan ?QUANTITY1 ?QUANTITY2) if and only if, for some ?NUMBER1, ?NUMBER2, and ?UNIT, ?QUANTITY1 = (&%MeasureFn ?NUMBER1 ?UNIT), ?QUANTITY2 = (&%MeasureFn ?NUMBER2 ?UNIT), and (&%lessThan ?NUMBER1 ?NUMBER2), for all units ?UNIT on which ?QUANTITY1 and ?QUANTITY2 can be measured. Note that, when a &%RelationExtendedToQuantities is extended from &%RealNumbers to instances of &%ConstantQuantity, the &%ConstantQuantity must be measured along the same physical dimension.\")").
+:- assert_kif("(documentation RelationExtendedToQuantities EnglishLanguage \"A &%RelationExtendedToQuantities is a &%Relation that, when it is true on a sequence of arguments that are &%RealNumbers, it is also true on a sequence of instances of &%ConstantQuantity with those magnitudes in some unit of measure. For example, the &%lessThan relation is extended to quantities. This means that for all pairs of quantities ?QUANTITY1 and ?QUANTITY2, (&%lessThan ?QUANTITY1 ?QUANTITY2) if and only if, for some ?NUMBER1, ?NUMBER2, and ?UNIT, ?QUANTITY1 = (&%MeasureFn ?NUMBER1 ?UNIT), ?QUANTITY2 = (&%MeasureFn ?NUMBER2 ?UNIT), and (&%lessThan ?NUMBER1 ?NUMBER2), for all units ?UNIT on which ?QUANTITY1 and ?QUANTITY2 can be measured. Note that, when a &%RelationExtendedToQuantities is extended from &%RealNumbers to instances of &%ConstantQuantity, the &%ConstantQuantity must be measured along the same physical dimension.\")").
 :- assert_kif("(subclass LogicalOperator Predicate)").
 :- assert_kif("(documentation LogicalOperator EnglishLanguage \"This &%Class comprises all of the logical operators (viz. 'and', 'or', 'not', '=>', and '<=>').\")").
 :- assert_kif("(subclass Proposition Abstract)").
@@ -1133,7 +1133,7 @@
 :- assert_kif("(domain hasPurposeForAgent 1 Physical)").
 :- assert_kif("(domain hasPurposeForAgent 2 Formula)").
 :- assert_kif("(domain hasPurposeForAgent 3 CognitiveAgent)").
-:- assert_kif("(documentation hasPurposeForAgent EnglishLanguage \"Expresses a cognitive attitude of an agent with respect to a particular instance of Physical. More precisely,"). (&%hasPurposeForAgent ?THING ?FORMULA ?AGENT) means that the purpose of ?THING for ?AGENT is the proposition expressed by ?FORMULA. Very complex issues are involved here. In particular, the rules of inference of the first order predicate calculus are not truth-preserving for the second argument position of this &%Predicate.\")").
+:- assert_kif("(documentation hasPurposeForAgent EnglishLanguage \"Expresses a cognitive attitude of an agent with respect to a particular instance of Physical. More precisely, (&%hasPurposeForAgent ?THING ?FORMULA ?AGENT) means that the purpose of ?THING for ?AGENT is the proposition expressed by ?FORMULA. Very complex issues are involved here. In particular, the rules of inference of the first order predicate calculus are not truth-preserving for the second argument position of this &%Predicate.\")").
 :- assert_kif("(=> (hasPurpose ?THING ?PURPOSE) (exists (?AGENT) (hasPurposeForAgent ?THING ?PURPOSE ?AGENT)))").
 :- assert_kif("(instance hasSkill BinaryPredicate)").
 :- assert_kif("(instance hasSkill AsymmetricRelation)").
@@ -1298,7 +1298,7 @@
 :- assert_kif("(instance equivalentContentClass EquivalenceRelation)").
 :- assert_kif("(domainSubclass equivalentContentClass 1 ContentBearingPhysical)").
 :- assert_kif("(domainSubclass equivalentContentClass 2 ContentBearingPhysical)").
-:- assert_kif("(documentation equivalentContentClass EnglishLanguage \"A &%BinaryPredicate that relates two subclasses of &%ContentBearingPhysical. (&%equivalentContentClass ?CLASS1 ?CLASS2) means that the content expressed by each instance of ?CLASS1 is also expressed by each instance of ?CLASS2, and vice versa. An example would be the relationship between English and Russian editions of Agatha Christie's 'Murder on the Orient Express'. Note that"). (&%equivalentContentClass ?CLASS1 ?CLASS2) implies (&%subsumesContentClass ?CLASS1 ?CLASS2) and (&%subsumesContentClass ?CLASS2 ?CLASS1).\")").
+:- assert_kif("(documentation equivalentContentClass EnglishLanguage \"A &%BinaryPredicate that relates two subclasses of &%ContentBearingPhysical. (&%equivalentContentClass ?CLASS1 ?CLASS2) means that the content expressed by each instance of ?CLASS1 is also expressed by each instance of ?CLASS2, and vice versa. An example would be the relationship between English and Russian editions of Agatha Christie's 'Murder on the Orient Express'. Note that (&%equivalentContentClass ?CLASS1 ?CLASS2) implies (&%subsumesContentClass ?CLASS1 ?CLASS2) and (&%subsumesContentClass ?CLASS2 ?CLASS1).\")").
 :- assert_kif("(<=> (and (subsumesContentClass ?CLASS1 ?CLASS2) (subsumesContentClass ?CLASS2 ?CLASS1)) (equivalentContentClass ?CLASS1 ?CLASS2))").
 :- assert_kif("(instance subsumesContentClass BinaryPredicate)").
 :- assert_kif("(instance subsumesContentClass PartialOrderingRelation)").
@@ -1311,7 +1311,7 @@
 :- assert_kif("(domain equivalentContentInstance 1 ContentBearingPhysical)").
 :- assert_kif("(domain equivalentContentInstance 2 ContentBearingPhysical)").
 :- assert_kif("(relatedInternalConcept equivalentContentInstance equivalentContentClass)").
-:- assert_kif("(documentation equivalentContentInstance EnglishLanguage \"A &%BinaryPredicate relating two instances of &%ContentBearingPhysical. (&%equivalentContentInstance ?OBJ1 ?OBJ2) means that the content expressed by ?OBJ1 is identical to the content expressed by ?OBJ2. An example would be the relationship between a handwritten draft of a letter to one's lawyer and a typed copy of the same letter. Note that (&%equivalentContentInstance ?OBJ1 ?OBJ2) implies (&%subsumesContentInstance ?OBJ1 ?OBJ2) and"). (&%subsumesContentInstance ?OBJ2 ?OBJ2).\")").
+:- assert_kif("(documentation equivalentContentInstance EnglishLanguage \"A &%BinaryPredicate relating two instances of &%ContentBearingPhysical. (&%equivalentContentInstance ?OBJ1 ?OBJ2) means that the content expressed by ?OBJ1 is identical to the content expressed by ?OBJ2. An example would be the relationship between a handwritten draft of a letter to one's lawyer and a typed copy of the same letter. Note that (&%equivalentContentInstance ?OBJ1 ?OBJ2) implies (&%subsumesContentInstance ?OBJ1 ?OBJ2) and (&%subsumesContentInstance ?OBJ2 ?OBJ2).\")").
 :- assert_kif("(<=> (and (subsumesContentInstance ?OBJ1 ?OBJ2) (subsumesContentInstance ?OBJ2 ?OBJ1)) (equivalentContentInstance ?OBJ1 ?OBJ2))").
 :- assert_kif("(instance subsumesContentInstance BinaryPredicate)").
 :- assert_kif("(instance subsumesContentInstance PartialOrderingRelation)").
@@ -1374,7 +1374,7 @@
 :- assert_kif("(domain AdditionFn 1 Quantity)").
 :- assert_kif("(domain AdditionFn 2 Quantity)").
 :- assert_kif("(range AdditionFn Quantity)").
-:- assert_kif("(documentation AdditionFn EnglishLanguage \"If ?NUMBER1 and ?NUMBER2 are &%Numbers, then"). (&%AdditionFn ?NUMBER1 ?NUMBER2) is the arithmetical sum of these numbers.\")").
+:- assert_kif("(documentation AdditionFn EnglishLanguage \"If ?NUMBER1 and ?NUMBER2 are &%Numbers, then (&%AdditionFn ?NUMBER1 ?NUMBER2) is the arithmetical sum of these numbers.\")").
 :- assert_kif("(forall (?NUMBER) (equal (SuccessorFn ?NUMBER) (AdditionFn ?NUMBER 1)))").
 :- assert_kif("(instance SubtractionFn BinaryFunction)").
 :- assert_kif("(instance SubtractionFn AssociativeFunction)").
@@ -1383,7 +1383,7 @@
 :- assert_kif("(domain SubtractionFn 1 Quantity)").
 :- assert_kif("(domain SubtractionFn 2 Quantity)").
 :- assert_kif("(range SubtractionFn Quantity)").
-:- assert_kif("(documentation SubtractionFn EnglishLanguage \"If ?NUMBER1 and ?NUMBER2 are &%Numbers, then (&%SubtractionFn ?NUMBER1 ?NUMBER2) is the arithmetical difference between ?NUMBER1 and ?NUMBER2, i.e. ?NUMBER1 minus ?NUMBER2. An exception occurs when ?NUMBER1 is equal to 0, in which case"). (&%SubtractionFn ?NUMBER1 ?NUMBER2) is the negation of ?NUMBER2.\")").
+:- assert_kif("(documentation SubtractionFn EnglishLanguage \"If ?NUMBER1 and ?NUMBER2 are &%Numbers, then (&%SubtractionFn ?NUMBER1 ?NUMBER2) is the arithmetical difference between ?NUMBER1 and ?NUMBER2, i.e. ?NUMBER1 minus ?NUMBER2. An exception occurs when ?NUMBER1 is equal to 0, in which case (&%SubtractionFn ?NUMBER1 ?NUMBER2) is the negation of ?NUMBER2.\")").
 :- assert_kif("(forall (?NUMBER) (equal (PredecessorFn ?NUMBER) (SubtractionFn ?NUMBER 1)))").
 :- assert_kif("(instance DivisionFn BinaryFunction)").
 :- assert_kif("(instance DivisionFn AssociativeFunction)").
@@ -1392,7 +1392,7 @@
 :- assert_kif("(domain DivisionFn 1 Quantity)").
 :- assert_kif("(domain DivisionFn 2 Quantity)").
 :- assert_kif("(range DivisionFn Quantity)").
-:- assert_kif("(documentation DivisionFn EnglishLanguage \"If ?NUMBER1 and ?NUMBER2 are &%Numbers, then"). (&%DivisionFn ?NUMBER1 ?NUMBER2) is the result of dividing ?NUMBER1 by ?NUMBER2. Note that when ?NUMBER1 = 1 (&%DivisionFn ?NUMBER1 ?NUMBER2) is the reciprocal of ?NUMBER2. Note too that (&%DivisionFn ?NUMBER1 ?NUMBER2) is undefined when ?NUMBER2 = 0.\")").
+:- assert_kif("(documentation DivisionFn EnglishLanguage \"If ?NUMBER1 and ?NUMBER2 are &%Numbers, then (&%DivisionFn ?NUMBER1 ?NUMBER2) is the result of dividing ?NUMBER1 by ?NUMBER2. Note that when ?NUMBER1 = 1 (&%DivisionFn ?NUMBER1 ?NUMBER2) is the reciprocal of ?NUMBER2. Note too that (&%DivisionFn ?NUMBER1 ?NUMBER2) is undefined when ?NUMBER2 = 0.\")").
 :- assert_kif("(=> (instance ?NUMBER RationalNumber) (exists (?INT1 ?INT2) (and (instance ?INT1 Integer) (instance ?INT2 Integer) (equal ?NUMBER (DivisionFn ?INT1 ?INT2)))))").
 :- assert_kif("(instance AbsoluteValueFn UnaryFunction)").
 :- assert_kif("(instance AbsoluteValueFn TotalValuedRelation)").
@@ -1507,7 +1507,7 @@
 :- assert_kif("(instance ReciprocalFn TotalValuedRelation)").
 :- assert_kif("(domain ReciprocalFn 1 Quantity)").
 :- assert_kif("(range ReciprocalFn Quantity)").
-:- assert_kif("(documentation ReciprocalFn EnglishLanguage \"(ReciprocalFn ?NUMBER) is the reciprocal element of ?NUMBER with respect to the multiplication operator"). (&%MultiplicationFn), i.e. 1/?NUMBER. Not all numbers have a reciprocal element. For example the number 0 does not. If a number ?NUMBER has a reciprocal ?RECIP, then the product of ?NUMBER and ?RECIP will be 1, e.g. 3*1/3 = 1. The reciprocal of an element is &%equal to applying the &%ExponentiationFn function to the element to the power -1.\")").
+:- assert_kif("(documentation ReciprocalFn EnglishLanguage \"(ReciprocalFn ?NUMBER) is the reciprocal element of ?NUMBER with respect to the multiplication operator (&%MultiplicationFn), i.e. 1/?NUMBER. Not all numbers have a reciprocal element. For example the number 0 does not. If a number ?NUMBER has a reciprocal ?RECIP, then the product of ?NUMBER and ?RECIP will be 1, e.g. 3*1/3 = 1. The reciprocal of an element is &%equal to applying the &%ExponentiationFn function to the element to the power -1.\")").
 :- assert_kif("(=> (instance ?NUMBER Quantity) (equal (ReciprocalFn ?NUMBER) (ExponentiationFn ?NUMBER -1)))").
 :- assert_kif("(=> (instance ?NUMBER Quantity) (equal 1 (MultiplicationFn ?NUMBER (ReciprocalFn ?NUMBER))))").
 :- assert_kif("(instance RemainderFn BinaryFunction)").
@@ -1964,13 +1964,13 @@
 :- assert_kif("(domain PerFn 1 PhysicalQuantity)").
 :- assert_kif("(domain PerFn 2 PhysicalQuantity)").
 :- assert_kif("(range PerFn FunctionQuantity)").
-:- assert_kif("(documentation PerFn EnglishLanguage \"&%PerFn maps two instances of &%PhysicalQuantity to the &%FunctionQuantity composed of these two instances. For example,"). (&%PerFn (&%MeasureFn 2 (&%MicroFn &%Gram)) (&%MeasureFn 1 (&%KiloFn &%Gram))) denotes the &%FunctionQuantity of 2 micrograms per kiogram. This function is useful, because it allows the knowledge engineer to dynamically generate instances of &%FunctionQuantity.\")").
+:- assert_kif("(documentation PerFn EnglishLanguage \"&%PerFn maps two instances of &%PhysicalQuantity to the &%FunctionQuantity composed of these two instances. For example, (&%PerFn (&%MeasureFn 2 (&%MicroFn &%Gram)) (&%MeasureFn 1 (&%KiloFn &%Gram))) denotes the &%FunctionQuantity of 2 micrograms per kiogram. This function is useful, because it allows the knowledge engineer to dynamically generate instances of &%FunctionQuantity.\")").
 :- assert_kif("(subrelation DensityFn PerFn)").
 :- assert_kif("(instance DensityFn TotalValuedRelation)").
 :- assert_kif("(domain DensityFn 1 MassMeasure)").
 :- assert_kif("(domain DensityFn 2 VolumeMeasure)").
 :- assert_kif("(range DensityFn FunctionQuantity)").
-:- assert_kif("(documentation DensityFn EnglishLanguage \"&%DensityFn maps an instance of &%MassMeasure and an instance of &%VolumeMeasure to the density represented by this proportion of mass and volume. For example, (&%DensityFn (&%MeasureFn 3 &%Gram)"). (&%MeasureFn 1 &%Liter)) represents the density of 3 grams per liter.\")").
+:- assert_kif("(documentation DensityFn EnglishLanguage \"&%DensityFn maps an instance of &%MassMeasure and an instance of &%VolumeMeasure to the density represented by this proportion of mass and volume. For example, (&%DensityFn (&%MeasureFn 3 &%Gram) (&%MeasureFn 1 &%Liter)) represents the density of 3 grams per liter.\")").
 :- assert_kif("(subrelation SpeedFn PerFn)").
 :- assert_kif("(instance SpeedFn TotalValuedRelation)").
 :- assert_kif("(domain SpeedFn 1 LengthMeasure)").
@@ -1984,7 +1984,7 @@
 :- assert_kif("(domain VelocityFn 3 Region)").
 :- assert_kif("(domain VelocityFn 4 DirectionalAttribute)").
 :- assert_kif("(range VelocityFn FunctionQuantity)").
-:- assert_kif("(documentation VelocityFn EnglishLanguage \"Specifies the velocity of an object, i.e. the speed and the direction of the speed. For example (&%VelocityFn (&%MeasureFn 55 &%Mile)"). (&%MeasureFn 2 &%HourDuration) ?REFERENCE &%North) denotes the velocity of 55 miles per hour North of the given reference point ?REFERENCE.\")").
+:- assert_kif("(documentation VelocityFn EnglishLanguage \"Specifies the velocity of an object, i.e. the speed and the direction of the speed. For example (&%VelocityFn (&%MeasureFn 55 &%Mile) (&%MeasureFn 2 &%HourDuration) ?REFERENCE &%North) denotes the velocity of 55 miles per hour North of the given reference point ?REFERENCE.\")").
 :- assert_kif("(=> (measure ?OBJECT (VelocityFn ?DISTANCE ?TIME ?REF ?DIRECTION)) (measure ?OBJECT (SpeedFn ?DISTANCE ?TIME)))").
 % :- assert_kif("; Now the units of measure:").
 % :- assert_kif("; First base units for the SI system. No conversion functions are provided for these units.").
@@ -2355,7 +2355,7 @@
 :- assert_kif("(subrelation barometricPressure measure)").
 :- assert_kif("(domain barometricPressure 1 Object)").
 :- assert_kif("(domain barometricPressure 2 UnitOfAtmosphericPressure)").
-:- assert_kif("(documentation barometricPressure EnglishLanguage \"(&%barometricPressure ?AREA ?PRESSURE) means that the atmospheric pressure measured at ?AREA is ?PRESSURE. Barometric pressure is typically expressed in units of &%InchMercury or &%MmMercury. For example, standard sea level pressure is 29.92 inches (760 mm) of mercury:"). (&%barometricPressure &%SeaLevel (&%MeasureFn 29.92 &%InchMercury)).\")").
+:- assert_kif("(documentation barometricPressure EnglishLanguage \"(&%barometricPressure ?AREA ?PRESSURE) means that the atmospheric pressure measured at ?AREA is ?PRESSURE. Barometric pressure is typically expressed in units of &%InchMercury or &%MmMercury. For example, standard sea level pressure is 29.92 inches (760 mm) of mercury: (&%barometricPressure &%SeaLevel (&%MeasureFn 29.92 &%InchMercury)).\")").
 :- assert_kif("(subclass UnitOfAtmosphericPressure CompositeUnitOfMeasure)").
 :- assert_kif("(documentation UnitOfAtmosphericPressure EnglishLanguage \"&%UnitOfAtmosphericPressure includes those instances of &%UnitOfMeasure used to measure atmospheric pressure (&%barometricPressure), e.g., &%InchMercury.\")").
 :- assert_kif("(instance InchMercury UnitOfAtmosphericPressure)").
@@ -2520,7 +2520,7 @@
 :- assert_kif("(domainSubclass RecurrentTimeIntervalFn 1 TimeInterval)").
 :- assert_kif("(domainSubclass RecurrentTimeIntervalFn 2 TimeInterval)").
 :- assert_kif("(rangeSubclass RecurrentTimeIntervalFn TimeInterval)").
-:- assert_kif("(documentation RecurrentTimeIntervalFn EnglishLanguage \"A function that is useful for generating recurring time intervals. For example, (&%RecurrentTimeIntervalFn (&%HourFn 6 &%Day)"). (&%HourFn 12 &%Day)) returns the &%Class of &%TimeIntervals beginning at 6 in the morning and ending at 12 noon. For another example, (&%RecurrentTimeInterval &%Saturday &%Sunday) returns the &%Class of all weekends. For still another example,"). (&%RecurrentTimeInterval &%June &%August) returns the &%Class containing the academic summer period.\")").
+:- assert_kif("(documentation RecurrentTimeIntervalFn EnglishLanguage \"A function that is useful for generating recurring time intervals. For example, (&%RecurrentTimeIntervalFn (&%HourFn 6 &%Day) (&%HourFn 12 &%Day)) returns the &%Class of &%TimeIntervals beginning at 6 in the morning and ending at 12 noon. For another example, (&%RecurrentTimeInterval &%Saturday &%Sunday) returns the &%Class of all weekends. For still another example, (&%RecurrentTimeInterval &%June &%August) returns the &%Class containing the academic summer period.\")").
 :- assert_kif("(=> (instance ?INTERVAL (RecurrentTimeIntervalFn ?TIMECLASS1 ?TIMECLASS2)) (exists (?TIME1 ?TIME2) (and (instance ?TIME1 ?TIMECLASS1) (instance ?TIME2 ?TIMECLASS2) (starts ?TIME1 ?INTERVAL) (finishes ?TIME2 ?INTERVAL))))").
 :- assert_kif("(instance WhenFn TemporalRelation)").
 :- assert_kif("(instance WhenFn UnaryFunction)").
@@ -2583,7 +2583,7 @@
 :- assert_kif("(domain DayFn 1 PositiveInteger)").
 :- assert_kif("(domainSubclass DayFn 2 Month)").
 :- assert_kif("(rangeSubclass DayFn Day)").
-:- assert_kif("(documentation DayFn EnglishLanguage \"A &%BinaryFunction that assigns a &%PositiveRealNumber and a subclass of &%Months to the &%Days within each &%Month corresponding to that &%PositiveRealNumber. For example, (&%DayFn 16 &%August) is the &%Class of all sixteenth days of August. For another example, (&%DayFn 9 &%Month) would return the class of all ninth days of any month. For still another example, (&%DayFn 18"). (&%MonthFn &%August (&%YearFn 1912))) denotes the 18th day of August 1912.\")").
+:- assert_kif("(documentation DayFn EnglishLanguage \"A &%BinaryFunction that assigns a &%PositiveRealNumber and a subclass of &%Months to the &%Days within each &%Month corresponding to that &%PositiveRealNumber. For example, (&%DayFn 16 &%August) is the &%Class of all sixteenth days of August. For another example, (&%DayFn 9 &%Month) would return the class of all ninth days of any month. For still another example, (&%DayFn 18 (&%MonthFn &%August (&%YearFn 1912))) denotes the 18th day of August 1912.\")").
 :- assert_kif("(=> (instance ?DAY (DayFn ?NUMBER ?MONTH)) (lessThanOrEqualTo ?NUMBER 31))").
 :- assert_kif("(=> (and (instance ?DAY1 (DayFn ?NUMBER1 ?MONTH)) (instance ?DAY2 (DayFn ?NUMBER2 ?MONTH)) (equal (SubtractionFn ?NUMBER2 ?NUMBER1) 1)) (meetsTemporally ?DAY1 ?DAY2))").
 :- assert_kif("(instance HourFn TemporalRelation)").
@@ -2591,7 +2591,7 @@
 :- assert_kif("(domain HourFn 1 NonnegativeInteger)").
 :- assert_kif("(domainSubclass HourFn 2 Day)").
 :- assert_kif("(rangeSubclass HourFn Hour)").
-:- assert_kif("(documentation HourFn EnglishLanguage \"A &%BinaryFunction that assigns a &%PositiveRealNumber and a subclass of &%Days to the &%Hours within each &%Day corresponding to that &%NonnegativeInteger. For example, (&%HourFn 12 &%Thursday) is the &%Class of all instances of noon Thursday. For another example, (&%HourFn 0 &%Day) would return the class of all instances of midnight. For still another example, (&%HourFn 14"). (&%DayFn 18 (&%MonthFn &%August (&%YearFn 1912)))) denotes 2 PM on the 18th day of August 1912.\")").
+:- assert_kif("(documentation HourFn EnglishLanguage \"A &%BinaryFunction that assigns a &%PositiveRealNumber and a subclass of &%Days to the &%Hours within each &%Day corresponding to that &%NonnegativeInteger. For example, (&%HourFn 12 &%Thursday) is the &%Class of all instances of noon Thursday. For another example, (&%HourFn 0 &%Day) would return the class of all instances of midnight. For still another example, (&%HourFn 14 (&%DayFn 18 (&%MonthFn &%August (&%YearFn 1912)))) denotes 2 PM on the 18th day of August 1912.\")").
 :- assert_kif("(=> (instance ?HOUR (HourFn ?NUMBER ?DAY)) (lessThan ?NUMBER 24))").
 :- assert_kif("(=> (and (instance ?HOUR1 (HourFn ?NUMBER1 ?DAY)) (instance ?HOUR2 (HourFn ?NUMBER2 ?DAY)) (equal (SubtractionFn ?NUMBER2 ?NUMBER1) 1)) (meetsTemporally ?HOUR1 ?HOUR2))").
 :- assert_kif("(instance MinuteFn TemporalRelation)").
@@ -2599,7 +2599,7 @@
 :- assert_kif("(domain MinuteFn 1 NonnegativeInteger)").
 :- assert_kif("(domainSubclass MinuteFn 2 Hour)").
 :- assert_kif("(rangeSubclass MinuteFn Minute)").
-:- assert_kif("(documentation MinuteFn EnglishLanguage \"A &%BinaryFunction that assigns a &%PositiveRealNumber and a subclass of &%Hours to the &%Minutes within each &%Hour corresponding to that &%NonnegativeInteger. For example, (&%MinuteFn 30 (&%HourFn 17 &%Day)) is the &%Class of all 5:30's in the afternoon. For another example, (&%MinuteFn 15 &%Hour) would return the class of all instances of quarter past the hour. For still another example,"). (&%MinuteFn 15 (&%HourFn 14 (&%DayFn 18 (&%MonthFn &%August (&%YearFn 1912))))) denotes 15 minutes after 2 PM on the 18th day of August 1912.\")").
+:- assert_kif("(documentation MinuteFn EnglishLanguage \"A &%BinaryFunction that assigns a &%PositiveRealNumber and a subclass of &%Hours to the &%Minutes within each &%Hour corresponding to that &%NonnegativeInteger. For example, (&%MinuteFn 30 (&%HourFn 17 &%Day)) is the &%Class of all 5:30's in the afternoon. For another example, (&%MinuteFn 15 &%Hour) would return the class of all instances of quarter past the hour. For still another example, (&%MinuteFn 15 (&%HourFn 14 (&%DayFn 18 (&%MonthFn &%August (&%YearFn 1912))))) denotes 15 minutes after 2 PM on the 18th day of August 1912.\")").
 :- assert_kif("(=> (instance ?MINUTE (MinuteFn ?NUMBER ?HOUR)) (lessThan ?NUMBER 60))").
 :- assert_kif("(=> (and (instance ?MINUTE1 (MinuteFn ?NUMBER1 ?HOUR)) (instance ?MINUTE2 (MinuteFn ?NUMBER2 ?HOUR)) (equal (SubtractionFn ?NUMBER2 ?NUMBER1) 1)) (meetsTemporally ?MINUTE1 ?MINUTE2))").
 :- assert_kif("(instance SecondFn TemporalRelation)").
@@ -2607,7 +2607,7 @@
 :- assert_kif("(domain SecondFn 1 PositiveRealNumber)").
 :- assert_kif("(domainSubclass SecondFn 2 Minute)").
 :- assert_kif("(rangeSubclass SecondFn Second)").
-:- assert_kif("(documentation SecondFn EnglishLanguage \"A &%BinaryFunction that assigns a &%PositiveRealNumber and a subclass of &%Minutes to the &%Seconds within each &%Minute corresponding to that &%PositiveRealNumber. For example, (&%SecondFn 4 (&%MinuteFn 5 &%Hour)) is the &%Class of all fourth &%Seconds of every fifth &%Minute of every hour. For another example,"). (&%SecondFn 8 &%Minute) would return the eighth second of every minute. For still another example, (&%SecondFn 9 (&%MinuteFn 15 (&%HourFn 14 (&%DayFn 18 (&%MonthFn &%August (&%YearFn 1912)))))) denotes 9 seconds and 15 minutes after 2 PM on the 18th day of August 1912.\")").
+:- assert_kif("(documentation SecondFn EnglishLanguage \"A &%BinaryFunction that assigns a &%PositiveRealNumber and a subclass of &%Minutes to the &%Seconds within each &%Minute corresponding to that &%PositiveRealNumber. For example, (&%SecondFn 4 (&%MinuteFn 5 &%Hour)) is the &%Class of all fourth &%Seconds of every fifth &%Minute of every hour. For another example, (&%SecondFn 8 &%Minute) would return the eighth second of every minute. For still another example, (&%SecondFn 9 (&%MinuteFn 15 (&%HourFn 14 (&%DayFn 18 (&%MonthFn &%August (&%YearFn 1912)))))) denotes 9 seconds and 15 minutes after 2 PM on the 18th day of August 1912.\")").
 :- assert_kif("(=> (instance ?SECOND (SecondFn ?NUMBER ?MINUTE)) (lessThan ?NUMBER 60))").
 :- assert_kif("(=> (and (instance ?SECOND1 (SecondFn ?NUMBER1 ?MINUTE)) (instance ?SECOND2 (SecondFn ?NUMBER2 ?MINUTE)) (equal (SubtractionFn ?NUMBER2 ?NUMBER1) 1)) (meetsTemporally ?SECOND1 ?SECOND2))").
 :- assert_kif("(subclass Year TimeInterval)").
@@ -2720,7 +2720,7 @@
 :- assert_kif("(domain TemporalCompositionFn 1 TimeInterval)").
 :- assert_kif("(domainSubclass TemporalCompositionFn 2 TimeInterval)").
 :- assert_kif("(rangeSubclass TemporalCompositionFn TimeInterval)").
-:- assert_kif("(documentation TemporalCompositionFn EnglishLanguage \"The basic &%Function for expressing the composition of larger &%TimeIntervals out of smaller &%TimeIntervals. For example, if &%ThisSeptember is an &%instance of &%September,"). (&%TemporalCompositionFn &%ThisSeptember &%Day) denotes the &%Class of consecutive days that make up &%ThisSeptember. Note that one can obtain the number of instances of this &%Class by using the function &%CardinalityFn.\")").
+:- assert_kif("(documentation TemporalCompositionFn EnglishLanguage \"The basic &%Function for expressing the composition of larger &%TimeIntervals out of smaller &%TimeIntervals. For example, if &%ThisSeptember is an &%instance of &%September, (&%TemporalCompositionFn &%ThisSeptember &%Day) denotes the &%Class of consecutive days that make up &%ThisSeptember. Note that one can obtain the number of instances of this &%Class by using the function &%CardinalityFn.\")").
 :- assert_kif("(=> (equal (TemporalCompositionFn ?INTERVAL ?INTERVAL-TYPE) ?CLASS) (forall (?TIME1 ?TIME2) (=> (and (instance ?TIME1 ?INTERVAL-TYPE) (instance ?TIME2 ?CLASS)) (exists (?DURATION) (and (duration ?TIME1 ?DURATION) (duration ?TIME2 ?DURATION))))))").
 :- assert_kif("(=> (equal (TemporalCompositionFn ?INTERVAL ?INTERVAL-TYPE) ?CLASS) (forall (?TIME1 ?TIME2) (=> (and (instance ?TIME1 ?CLASS) (instance ?TIME2 ?CLASS) (not (equal ?TIME1 ?TIME2))) (or (meetsTemporally ?TIME1 ?TIME2) (meetsTemporally ?TIME2 ?TIME1) (earlier ?TIME1 ?TIME2) (earlier ?TIME2 ?TIME1)))))").
 :- assert_kif("(=> (equal (TemporalCompositionFn ?INTERVAL ?INTERVAL-TYPE) ?CLASS) (exists (?TIME) (and (instance ?TIME ?CLASS) (starts ?TIME ?INTERVAL))))").
@@ -4289,7 +4289,7 @@
 :- assert_kif("(subrelation connectedEngineeringComponents connected)").
 :- assert_kif("(domain connectedEngineeringComponents 1 EngineeringComponent)").
 :- assert_kif("(domain connectedEngineeringComponents 2 EngineeringComponent)").
-:- assert_kif("(documentation connectedEngineeringComponents EnglishLanguage \"This is the most general connection relation between &%EngineeringComponents. If"). (&%connectedEngineeringComponents ?COMP1 ?COMP2), then neither ?COMP1 nor ?COMP2 can be an &%engineeringSubcomponent of the other. The relation &%connectedEngineeringComponents is a &%SymmetricRelation, there is no information in the direction of connection between two components. It is also an &%IrreflexiveRelation, no &%EngineeringComponent bears this relation to itself. Note that this relation does not associate a name or type with the connection.\")").
+:- assert_kif("(documentation connectedEngineeringComponents EnglishLanguage \"This is the most general connection relation between &%EngineeringComponents. If (&%connectedEngineeringComponents ?COMP1 ?COMP2), then neither ?COMP1 nor ?COMP2 can be an &%engineeringSubcomponent of the other. The relation &%connectedEngineeringComponents is a &%SymmetricRelation, there is no information in the direction of connection between two components. It is also an &%IrreflexiveRelation, no &%EngineeringComponent bears this relation to itself. Note that this relation does not associate a name or type with the connection.\")").
 :- assert_kif("(=> (connectedEngineeringComponents ?COMP1 ?COMP2) (and (not (engineeringSubcomponent ?COMP1 ?COMP2)) (not (engineeringSubcomponent ?COMP2 ?COMP1))))").
 :- assert_kif("(subclass EngineeringConnection EngineeringComponent)").
 :- assert_kif("(documentation EngineeringConnection EnglishLanguage \"An &%EngineeringConnection is an &%EngineeringComponent that represents a connection relationship between two other &%EngineeringComponents. It is a reification of the &%Predicate &%connectedEngineeringComponents. That means that whenever this &%Predicate holds between two &%EngineeringComponents, there exists an &%EngineeringConnection. The practical reason for reifying a relationship is to be able to attach other information about it. For example, one might want to say that a particular connection is associated with some shared parameters, or that it is of a particular type. &%EngineeringConnections are &%EngineeringComponents and can therefore be an &%engineeringSubcomponent of other &%EngineeringComponents. However, to provide for modular regularity in component systems, &%EngineeringConnections cannot be connected. For each pair of &%EngineeringComponents related by &%connectedEngineeringComponents, there exists at least one &%EngineeringConnection. However, that object may not be unique, and the same &%EngineeringConnection may be associated with several pairs of &%EngineeringComponents.\")").
@@ -4492,7 +4492,7 @@
 :- assert_kif("(instance GovernmentFn UnaryFunction)").
 :- assert_kif("(domain GovernmentFn 1 GeopoliticalArea)").
 :- assert_kif("(range GovernmentFn Government)").
-:- assert_kif("(documentation GovernmentFn EnglishLanguage \"(&%GovernmentFn ?AREA) denotes the &%Government of the &%GeopoliticalArea ?AREA. For example,"). (&%GovernmentFn &%UnitedStates) denotes the Federal-level government of the United States, (&%GovernmentFn &%PuertoRico) denotes the government of the Commonwealth of Puerto Rico.\")").
+:- assert_kif("(documentation GovernmentFn EnglishLanguage \"(&%GovernmentFn ?AREA) denotes the &%Government of the &%GeopoliticalArea ?AREA. For example, (&%GovernmentFn &%UnitedStates) denotes the Federal-level government of the United States, (&%GovernmentFn &%PuertoRico) denotes the government of the Commonwealth of Puerto Rico.\")").
 :- assert_kif("(subclass PoliceOrganization GovernmentOrganization)").
 :- assert_kif("(documentation PoliceOrganization EnglishLanguage \"Any &%GovernmentOrganization that is charged with domestic enforcement of the laws of the &%Government.\")").
 :- assert_kif("(subclass JudicialOrganization Organization)").
@@ -4703,7 +4703,7 @@
 :- assert_kif("(subrelation modalAttribute property)").
 :- assert_kif("(domain modalAttribute 1 Formula)").
 :- assert_kif("(domain modalAttribute 2 NormativeAttribute)").
-:- assert_kif("(documentation modalAttribute EnglishLanguage \"A &%BinaryRelation that is used to state the normative force of a &%Proposition. (&%modalAttribute ?FORMULA ?PROP) means that the &%Proposition expressed by ?FORMULA has the &%NormativeAttribute ?PROP. For example, (&%modalAttribute (&%exists (?ACT ?OBJ) (&%and"). (&%instance ?ACT &%Giving) (&%agent ?ACT John) (&%patient ?ACT ?OBJ)"). (&%destination ?ACT Tom))) &%Obligation) means that John is obligated to give Tom something.\")").
+:- assert_kif("(documentation modalAttribute EnglishLanguage \"A &%BinaryRelation that is used to state the normative force of a &%Proposition. (&%modalAttribute ?FORMULA ?PROP) means that the &%Proposition expressed by ?FORMULA has the &%NormativeAttribute ?PROP. For example, (&%modalAttribute (&%exists (?ACT ?OBJ) (&%and (&%instance ?ACT &%Giving) (&%agent ?ACT John) (&%patient ?ACT ?OBJ) (&%destination ?ACT Tom))) &%Obligation) means that John is obligated to give Tom something.\")").
 :- assert_kif("(=> (and (modalAttribute ?FORMULA1 ?PROP) (entails ?FORMULA1 ?FORMULA2)) (modalAttribute ?FORMULA2 ?PROP))").
 :- assert_kif("(=> (modalAttribute ?FORMULA Permission) (modalAttribute ?FORMULA Possibility))").
 :- assert_kif("(subclass SubjectiveAssessmentAttribute NormativeAttribute)").

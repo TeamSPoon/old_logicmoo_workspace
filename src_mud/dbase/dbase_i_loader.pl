@@ -113,6 +113,19 @@ read_one_term(Stream,Term):- catch(once(( read_term(Stream,Term,[double_quotes(s
 
 rescan_mpred_stubs:- doall((mpred_prop(F,prologHybrid),mpred_arity(F,A),A>0,warnOnError(declare_dbase_local_dynamic(moo,F,A)))).
 
+:-ensure_loaded(dbase_i_sexpr_reader).
+
+
+
+:- parse_to_source(
+  "(documentation instance EnglishLanguage \"An object is an &%instance of a &%SetOrClass if it is included in that &%SetOrClass. 
+  An individual may be an instance of many classes, some of which may be subclasses of others. 
+  Thus, there is no assumption in the meaning of &%instance about specificity or uniqueness.\")",
+  Out),writeq(Out).
+
+
+assert_kif(String):-must((codelist_to_forms(String,Forms);parse_to_source(string(String),Forms))),dmsg(Forms),!.
+assert_kif_dolce(_).
 
 %:-meta_predicate_transparent(finish_processing_world).
 %:-meta_predicate(finish_processing_world).
