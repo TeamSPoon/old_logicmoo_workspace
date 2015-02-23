@@ -39,12 +39,11 @@ maybe_storage_stub(F,StubType):- hybrid_tPredStubImpl(StubType),not((StubType==p
 
 
 % has_storage_stub(Head):- !.
-has_storage_stub(Head):-
-has_storage_stub(Head):-  
+has_storage_stub(Head):-  thglobal:pfcManageHybrids,!,
       get_pifunctor(Head,PHead,_F),
       create_stub_body(PHead,Body),
-      (predicate_property(PHead,dynamic);user:clause(PHead,Body)),
-      thglobal:pfcManageHybrids,!.
+      (predicate_property(PHead,dynamic);user:clause_safe(PHead,Body)),!.
+      
       
 
 has_storage_stub(Head):-       

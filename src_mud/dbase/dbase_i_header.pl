@@ -25,6 +25,9 @@
 :- discontiguous(user:was_enabled/1).
 :- multifile user:listing_mpred_hook/3.
 
+:- multifile user:subclass/2.
+:- dynamic user:subclass/2.
+
 :-op(1190,fx,(disabled)).
 :-op(1190,fx,(enabled)).
 :-op(1190,fy,(disabled)).

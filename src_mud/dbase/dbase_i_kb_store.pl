@@ -49,26 +49,32 @@ world_clear(Named):-fmt('Clearing world database: ~q.~n',[Named]).
 % ================================================
 % is_asserted/1/2/3
 % ================================================
+
+is_asserted_eq(HB):- ( \+ \+ is_asserted(HB)).
+
 is_asserted(V):-var(V),!,trace_or_throw(var_is_asserted(V)).
-is_asserted(HB):-reduce_clause(is_asserted,HB,HBO),not_same_nvars(HB,HBO),!,is_asserted(HBO).
-is_asserted(prologHybrid(G)):-get_functor(G,F),!,isa_asserted(F,prologHybrid).
-is_asserted(HB):-notrace((fully_expand(is_asserted,HB,HBO),not_same_nvars(HB,HBO))),!,is_asserted(HBO).
-is_asserted(clause(G,B)):-!,is_asserted(G:-B).
-is_asserted(isa(G,B)):-!,isa_asserted(G,B).
-is_asserted((H1,H2)):-!,is_asserted(H1),is_asserted(H2).
-%is_asserted((H1;H2)):-!,is_asserted(H1);is_asserted(H2).
-is_asserted(clause(G,B,Ref)):-!,is_asserted(G,B,Ref).
-is_asserted((G:-B)):-is_asserted(G,B).
-is_asserted(G):-!,is_asserted(G,true).
+is_asserted(HB):-notrace((reduce_clause(is_asserted,HB,HHBB),(HB\=@=HHBB))),!,is_asserted(HHBB).
+is_asserted(prologHybrid(H)):-get_functor(H,F),!,isa_asserted(F,prologHybrid).
+is_asserted(HB):-notrace((fully_expand(is_asserted,HB,HHBB))),!,is_asserted_1(HHBB).
 
-is_asserted(PHeadIn,BIn):-fully_expand(is_asserted,(PHeadIn:-BIn),CL),!,is_asserted_0(CL).
+is_asserted_1(clause(H,B)):-!,is_asserted(H,B).
+is_asserted_1((H1,H2)):-!,is_asserted_1(H1),is_asserted_1(H2).
+is_asserted_1((H1;H2)):-!,is_asserted_1(H1);is_asserted_1(H2).
+is_asserted_1(clause(H,B,Ref)):-!,is_asserted(H,B,Ref).
+is_asserted_1(isa(H,B)):-!,isa_asserted(H,B).
+is_asserted_1(HB):-expand_to_hb(HB,H,B),!,is_asserted(H,B).
 
-is_asserted_0(PHead,B):- thglobal:pfcManageHybrids,pfc_clause_db(PHead,B).
-is_asserted_0((PHead:-B)):-!,no_repeats_old([PHead:B],is_asserted(PHead,B,_Proof)).
-is_asserted_0(PHead):-B=true,!, no_repeats_old([PHead:B],is_asserted(PHead,B,_Proof)).
+is_asserted((H:-BB),B):- is_true(B),!,is_asserted(H,BB).
+is_asserted(H,B):-notrace((fully_expand(is_asserted,(H:-B),CL),expand_to_hb(CL,HH,BB))),!,is_asserted_2(HH,BB).
 
-is_asserted(PHead,B,Ref):- thglobal:pfcManageHybrids,!,clause(PHead,B,Ref).
-is_asserted(PHead,B,Ref):- call_no_cuts(user:provide_mpred_storage_clauses(_,PHead,B,Ref)),not(notrace(special_wrapper_body(B,_))).
+is_asserted_2(H,B):-thglobal:pfcManageHybrids,!,pfc_clause_db(H,B).
+is_asserted_2(H,B):-call_no_cuts(user:provide_mpred_storage_clauses(_,H,B,_Ref)),not(notrace(special_wrapper_body(B,_))).
+
+is_asserted((H:-BB),B,Ref):- is_true(B),!,is_asserted(H,BB,Ref).
+is_asserted(H,B,Ref):-notrace((fully_expand(is_asserted,(H:-B),CL),expand_to_hb(CL,HH,BB))),is_asserted_3(HH,BB,Ref).
+
+is_asserted_3(H,B,Ref):-thglobal:pfcManageHybrids,!,pfc_clause_db_ref(H,B,Ref).
+is_asserted_3(H,B,Ref):-call_no_cuts(user:provide_mpred_storage_clauses(_,H,B,Ref)),not(notrace(special_wrapper_body(B,_))).
 
 is_source_proof(_).
 
@@ -144,24 +150,28 @@ database_modify_0(change(retract,a),          G):- hooked_retract(G).
 database_modify_0(change(retract,one),        G):- hooked_retract(G).
 database_modify_0(change(retract,_),          G):- hooked_retractall(G).
 database_modify_0(change(assert,AZ),          G):- singletons_throw_else_fail(assert(AZ,G)).
-database_modify_0(change(assert,AZ),          G):- copy_term(G,GG),database_modify_1(change(assert,AZ),G,GG),(must(same_nvars(G,GG))).
+database_modify_0(change(assert,AZ),          G):- copy_term(G,GG),database_modify_3(change(assert,AZ),G,GG),(must(same_nvars(G,GG))).
 
-database_modify_1(change(assert,_),         G,GG):- dbase_op(is_asserted,GG),(must(same_nvars(G,GG))),!.
-database_modify_1(change(assert,AZ),       _G,GG):- expire_pre_change(AZ,GG),fail.
-database_modify_1(change(assert,AorZ),      G,GG):- G \= (_:-_), get_functor(G,F,A),
+database_modify_3(change(assert,_),         G,GG):- ( \+ \+ is_asserted(GG)),must(same_nvars(G,GG)),!.
+database_modify_3(change(assert,AZ),       _G,GG):- expire_pre_change(AZ,GG),fail.
+database_modify_3(change(assert,AorZ),      G,GG):- G \= (_:-_), get_functor(G,F,A),
    (mpred_prop(F,prologSingleValued) -> (AorZ \== sv -> db_assert_sv(AorZ,G,F,A); fail); 
-       mpred_prop(F,prologOrdered) -> (AorZ\==z -> database_modify_1(change(assert,z),G,GG);true)).
- 
-database_modify_1(change(assert,AorZ),      G,GG):-!, Op = change(assert,AorZ),
-                              %  must_mpred_op(Op,GG),
-                              database_modify_2(Op,GG),
-                              database_modify_3(Op,GG),
-                              database_modify_4(Op,GG),
-                              database_modify_5(Op,GG).
-database_modify_2(Op,GG):- must((copy_term(GG,GGG),pfcAdd(GGG), same_nvars(GG,GGG))),!.
-database_modify_3(Op,GG):- must((copy_term(GG,GGE),doall(call_no_cuts(expire_post_change(Op,GGE))),same_nvars(GG,GGE))),!.
-database_modify_4(Op,GG):- must((copy_term(GG,GGH),run_database_hooks(Op,GGH),same_nvars(GG,GGH))),!.
-database_modify_5(Op,GG):- must((copy_term(GG,GGA),show_call_failure(dbase_op(is_asserted,GGA)),same_nvars(GG,GGA))),!.
+       mpred_prop(F,prologOrdered) -> (AorZ\==z -> database_modify_4(change(assert,z),G,GG);true)).
+database_modify_3(change(assert,AorZ),      G,GG):-database_modify_4(change(assert,AorZ),G,GG).
+
+
+database_modify_4(change(assert,AorZ),      G,GG):- Op = change(assert,AorZ),                              
+                              database_modify_5(Op,GG),
+                              database_modify_6(Op,GG),
+                              database_modify_7(Op,GG),
+                              database_modify_8(Op,GG).
+
+database_modify_5(Op,GG):- thglobal:pfcManageHybrids,!,must((copy_term(GG,GGG),pfcAdd(GGG), same_nvars(GG,GGG))),!.
+database_modify_5(Op,GG):- must((copy_term(GG,GGG),must_mpred_op(Op,GGG), same_nvars(GG,GGG))),!.
+
+database_modify_6(Op,GG):- must((copy_term(GG,GGE),doall(call_no_cuts(expire_post_change(Op,GGE))),same_nvars(GG,GGE))),!.
+database_modify_7(Op,GG):- must((copy_term(GG,GGH),run_database_hooks(Op,GGH),same_nvars(GG,GGH))),!.
+database_modify_8(Op,GG):- must((copy_term(GG,GGA),is_asserted_eq(GGA),same_nvars(GG,GGA))),!.
                                
 
 
@@ -238,6 +248,7 @@ special_head(_,F,Why):-special_head0(F,Why),!,show_call_failure(not(mpred_prop(F
 special_head0(F,is_pred_declarer):-is_pred_declarer(F),!.
 special_head0(F,functorDeclares):-hasInstance(functorDeclares,F),!.
 special_head0(F,prologMacroHead):-isa_backchaing(F,prologMacroHead),!.
+special_head0(isa,isa).
 special_head0(F,tCol):-hasInstance(tCol,F),!.
 special_head0(F,prologHybrid):-mpred_prop(F,prologHybrid).
 

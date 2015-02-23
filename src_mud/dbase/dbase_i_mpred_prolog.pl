@@ -95,7 +95,8 @@ decl_mpred_prolog(CM,M,PI,FA):- loop_check(must(decl_mpred_prolog_lc(CM,M,PI,FA)
 % decl_mpred_prolog_lc(_,_,_,_):-!.
 decl_mpred_prolog_lc(CM,M,PI,F/A):-
       assert_if_new(mpred_arity(F,A)),
-      assert_if_new(mpred_prop(F,prologOnly)),            
+      assert_if_new(mpred_prop(F,prologOnly)),
+      assert_if_new(mpred_prop(F,predCanHaveSingletons)),
       assert_if_new(mpred_prop(F,[info(decl_mpred_prolog(CM,M,PI,F/A))])),
       decl_mpred(PI,predModule(M)),    
       must(call_no_cuts((user:provide_mpred_setup(call(_),PI,prologOnly,OUT),dmsg(PI=OUT)))),!.      

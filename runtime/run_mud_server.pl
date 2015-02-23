@@ -16,6 +16,8 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
+with_no_dbase_expansions(Goal):-
+  with_assertions(user:prolog_mud_disable_term_expansions,Goal).
 
 % bugger:action_verb_useable(actWearUnused,wearsClothing,tWearAble,mudPossess).
 
@@ -35,7 +37,7 @@ swi_module(M,E):-dmsg(swi_module(M,E)).
 do_semweb_startup:-forall(clause(user:semweb_startup,Body),must(show_call(Body))).
 
 % [Optionaly] register swish server (remote file editing)
-:- if_file_exists(ensure_loaded('../externals/swish/logicmoo_run_swish')).
+:- with_no_dbase_expansions(if_file_exists(ensure_loaded('../externals/swish/logicmoo_run_swish'))).
 
 % [Optionaly] register/run Cliopatria sparql server (remote RDF browsing)
 % :- if_startup_script(ensure_loaded('run_clio')).
@@ -50,7 +52,7 @@ user:semweb_startup :- register_ros_package(milo).
 % [Optionaly] register/run EulerSharp robot services (we use it for the ontology mainly)
 user:semweb_startup :- register_ros_package(euler).
 
-:- with_assertions(user:prolog_mud_disable_term_expansions,if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop.pl'))).
+:- with_no_dbase_expansions(if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop.pl'))).
 :- current_predicate(egg_go/0)->egg_go;true.
 
 % [Manditory] run_tests (includes run_common)

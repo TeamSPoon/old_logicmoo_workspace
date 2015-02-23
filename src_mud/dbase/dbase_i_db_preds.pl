@@ -75,7 +75,7 @@ non_assertable(WW,notAssertable(Why)):- compound(WW),get_functor(WW,F),mpred_pro
 is_logical_functor(And):-notrace(is_logical_functor0(And)).
 is_logical_functor0(X):-atom(X),member(X,[',',';']).
 is_logical_functor0(X):-call_if_defined(logical_functor_pttp(X)).
-is_logical_functor0(And):-member(And,[(,),(;),('<='),('=>'),('<=>'),(':-'),(and)]).
+is_logical_functor0(And):-member(And,[(,),(;),('<='),('=>'),('<=>'),(':-'),(and),nop]).
 
 
 
@@ -155,4 +155,76 @@ split_name_type_0(T,T,C):- compound(T),functor(T,C,_),!.
 split_name_type_0(T,T,C):- notrace((once(atomic_list_concat_safe([CO,'-'|_],T)),atom_string(C,CO))).
 split_name_type_0(T,T,C):- notrace((atom(T),atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),catchv(number_codes(_,Digits),_,fail),atom_codes(CC,Type),!,i_name(t,CC,C))).
 split_name_type_0(C,P,C):- var(P),atom(C),i_name(i,C,I),gensym(I,P),!.
+
+
+
+
+% =======================================================
+% term utils
+% =======================================================
+
+:-export(inverse_args/2).
+inverse_args([AR,GS],[GS,AR]):-!.
+inverse_args([AR,G,S],[S,G,AR]):-!.
+inverse_args([A,R,G,S],[S,R,G,A]):-!.
+inverse_args([P,A,R,G,S],[S,A,R,G,P]):-!.
+
+:-export(same_vars/2).
+same_vars(T1,T2):-term_variables(T1,V1),term_variables(T2,V2),!,V1==V2.
+
+
+:-moo_hide_childs(replace_arg/4).
+replace_arg(C,A,OLD,CC):- 
+   C=..FARGS,
+   replace_nth(FARGS,A,OLD,FARGO),!,
+   CC=..FARGO.
+
+:-moo_hide_childs(replace_nth/4).
+replace_nth([],_,_,[]):- !.
+replace_nth([_|ARGO],0,OLD,[OLD|ARGO]):- !.
+replace_nth([T|FARGS],A,OLD,[T|FARGO]):- 
+    A2 is A-1,replace_nth(FARGS,A2,OLD,FARGO).
+
+
+replace_nth([],_N,_OldVar,_NewVar,[]):- !,trace_or_throw(missed_the_boat).
+replace_nth([OldVar|ARGS],1,OldVar,NewVar,[NewVar|ARGS]):- !.
+replace_nth([Carry|ARGS],Which,OldVar,NewVar,[Carry|NEWARGS]):- 
+ Which1 is Which-1,
+ replace_nth(ARGS,Which1,OldVar,NewVar,NEWARGS),!.
+
+
+:-moo_hide_childs(update_value/4).
+update_value(OLD,NEW,NEXT):- var(NEW),!,trace_or_throw(logicmoo_bug(update_value(OLD,NEW,NEXT))).
+update_value(OLD,NEW,NEWV):- var(OLD),!,compute_value_no_dice(NEW,NEWV).
+update_value(OLD,X,NEW):- is_list(OLD),!,list_update_op(OLD,X,NEW),!.
+update_value(OLDI,+X,NEW):- compute_value(OLDI,OLD),number(OLD),catch(NEW is OLD + X,_,fail),!.
+update_value(OLDI,-X,NEW):- compute_value(OLDI,OLD),number(OLD),catch(NEW is OLD - X,_,fail),!.
+update_value(OLDI,X,NEW):- number(X),X<0,compute_value(OLDI,OLD),number(OLD),catch(NEW is OLD + X,_,fail),!.
+update_value(_,NEW,NEWV):-compute_value_no_dice(NEW,NEWV),!.
+
+
+list_update_op(OLDI,+X,NEW):-flatten_append(OLDI,X,NEW),!.
+list_update_op(OLDI,-X,NEW):-flatten([OLDI],OLD),flatten([X],XX),!,list_difference_eq(OLD,XX,NEW),!.
+
+compute_value_no_dice(NEW,NEW):- compound(NEW),functor_catch(NEW,ftDice,_),!.
+compute_value_no_dice(NEW,NEWV):-compute_value(NEW,NEWV).
+
+compute_value(NEW,NEWV):-catch(NEWV is NEW,_,fail),!.
+compute_value(NEW,NEWV):-catch(any_to_value(NEW,NEWV),_,fail),!.
+compute_value(NEW,NEW).
+
+insert_into(ARGS,0,Insert,[Insert|ARGS]):- !.
+insert_into([Carry|ARGS],After,Insert,[Carry|NEWARGS]):- 
+   After1 is After - 1,
+   insert_into(ARGS,After1,Insert,NEWARGS).
+
+
+add_arg_parts_of_speech(_F,_N,[],[]).
+add_arg_parts_of_speech(F,N,[A|ARGS0],[ARG|ARGS]):-argIsa_call_or_undressed(F,N,A,ARG),N1 is N+1, add_arg_parts_of_speech(F,N1,ARGS0,ARGS).
+
+argIsa_call_or_undressed(F,N,Obj,fN(Obj,Type)):- argIsa_call_0(F,N,Type),!.
+argIsa_call_or_undressed(_F,_N,Obj,Obj).
+
+verb_after_arg(_,_,1).
+
 

@@ -183,6 +183,8 @@ decl_mpred_0(F,A):-number(A),!,decl_mpred_2(F,mpred_arity(A)),!.
 decl_mpred_0(F,tPred):-!,assert_hasInstance(tPred,F).
 decl_mpred_0(C,More):-string(C),!,dmsg(trace_or_throw(var_string_decl_mpred(C,More))).
 decl_mpred_0(mudDescription, predProxyRetract):-dtrace(decl_mpred_0(mudDescription, predProxyRetract)).
+decl_mpred_0(_,predArgTypes):-!.
+decl_mpred_0(F,predArgTypes(ArgTypes)):-!,decl_mpred_2(F,predArgTypes(ArgTypes)).
 decl_mpred_0(C,More):-compound(C),C=..[F,Arg1|PROPS],is_pred_declarer(F),!,ground(Arg1),decl_mpred(Arg1,[F,PROPS,More]).
 decl_mpred_0(C,More):-compound(C),!,functor(C,F,A),decl_mpred_2(F,mpred_arity(A)),decl_mpred_0(F,More),!,ignore((ground(C),decl_mpred(F,predArgTypes(C)))),!.
 decl_mpred_0(_,[]):-!.

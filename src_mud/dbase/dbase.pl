@@ -42,6 +42,8 @@ type_error_checking:-false.
 % slow_sanity(A):-nop(A).
 xtreme_debug(P):- is_release,!,nop(P).
 xtreme_debug(P):- not_is_release, verify_sanity(P).
+xtreme_debug(_).
+
 verify_sanity(P):-(true; is_release),!,nop(P).
 verify_sanity(P):- debugOnError(notrace(P)),!.
 verify_sanity(P):- dmsg('$ERROR_incomplete_SANITY'(P)),!.
@@ -49,6 +51,7 @@ verify_sanity(P):- dmsg('$ERROR_incomplete_SANITY'(P)),!.
 when_debugging(What,Call):- debugging(What),!,Call.
 when_debugging(_,_).
 
+:- asserta(tlbugger:no_colors).
 
 :- set_prolog_flag(double_quotes, atom).
 :- set_prolog_flag(double_quotes, string).
@@ -196,6 +199,7 @@ resolveConflict(C) :-
 :- multifile(user:term_expansion/2).
 
 :- asserta((user:isa(I,C):-loop_check(isa_backchaing(I,C)))).
+:- asserta(('$toplevel':isa(I,C):-user:isa(I,C))).
 
 :- ensure_loaded(dbase_i_mpred_props).
 :- ensure_loaded(dbase_i_mpred_stubs).
@@ -204,6 +208,9 @@ resolveConflict(C) :-
 :- ensure_loaded(dbase_i_loader).
 :- ensure_loaded(dbase_i_cyc).
 :- ensure_loaded(dbase_i_propvals).
+
+:- dynamic(isa/2).
+:- decl_mpred_hybrid(isa/2).
 
 :- ensure_loaded(dbase_i_formattypes).
 :- ensure_loaded(dbase_i_deduce).
@@ -215,13 +222,12 @@ resolveConflict(C) :-
 user:goal_expansion(G,isa(I,C)):-G\=isa(_,_),(was_isa(G,I,C)),!.
 user:term_expansion(G,isa(I,C)):-not(user:prolog_mud_disable_term_expansions),notrace((was_isa(G,I,C))).
 
-'$toplevel':isa(I,C):-user:isa(I,C).
-
-:- decl_mpred_hybrid(argIsa/3).
-user:ruleBackward(argIsa(F,N,Isa),argIsa_call(F,N,Isa)).
-
 
 dbase_module_ready.
+
+:- decl_mpred_hybrid(argIsa/3).
+user:ruleBackward( argIsa(F,N,Isa), argIsa_call(F,N,Isa)).
+
 :-asserta(pfcExpansion).
 :-decl_mpred_prolog(resolveConflict/1).
 :-decl_mpred_prolog(pfcSelect/1).
@@ -283,7 +289,7 @@ vtTestType(vTest2).
 
 % :-asserta(user:isa_pred_now_locked).
 
-:-asserta(user:prolog_mud_disable_term_expansions).
+% :-asserta(user:prolog_mud_disable_term_expansions).
 
 end_of_file.
 

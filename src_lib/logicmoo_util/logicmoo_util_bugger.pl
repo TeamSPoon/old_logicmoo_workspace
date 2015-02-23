@@ -328,6 +328,8 @@ for obvious reasons.
 
 :- set_prolog_flag(generate_debug_info, true).
 
+:- thread_local(tlbugger:no_colors/0).
+
 % -- CODEBLOCK
 :-export(is_ftVar/1).
 user:is_ftVar(V):-var(V),!.
@@ -2413,7 +2415,7 @@ ansi_control_conv(Level,Ctrl):- ansi_term:level_attrs(Level,Ansi),Level\=Ansi,!,
 ansi_control_conv(Color,Ctrl):- ansi_term:ansi_color(Color,_),!,ansi_control_conv(fg(Color),Ctrl).
 ansi_control_conv(Ctrl,CtrlO):-flatten([Ctrl],CtrlO),!.
 
-is_tty(Out):- is_stream(Out),stream_property(Out,tty(true)).
+is_tty(Out):- not(tlbugger:no_colors), is_stream(Out),stream_property(Out,tty(true)).
 
 ansicall(Out,_,Call):- \+ is_tty(Out),!,Call.
 ansicall(Out,CtrlIn,Call):- once(ansi_control_conv(CtrlIn,Ctrl)),  CtrlIn\=Ctrl,!,ansicall(Out,Ctrl,Call).

@@ -183,6 +183,8 @@ same_regions(Agent,Obj):-must(inRegion(Agent,Where1)),dif_safe(Agent,Obj),inRegi
 
 :-decl_mpred_prolog(mudAtLoc_deduced/2).
 
+
+
 predArgTypes(mudAtLoc_deduced(tObj,tSpatialThing)).
 
 mudAtLoc_deduced(X,Y):-show_call_failure(is_asserted(mudAtLoc(X,Y))),!.
@@ -202,10 +204,9 @@ inRegion(Agent,RegionIn):- must(nonvar(RegionIn)),!,(tItem(Agent);tAgentGeneric(
 
 % :-snark_tell(localityOfObject(A,B) &  localityOfObject(B,C) => localityOfObject(A,C)).
 
-
-mudSubPart(Outer,Inner):-is_asserted(mudInsideOf(Inner,Outer)).
-mudSubPart(Agent,Clothes):-wearsClothing(Agent,Clothes).
-mudSubPart(Subj,Obj):- thlocal:infThirdOrder, find_instance_of(mudSubPart,Subj,Obj).
+:- decl_mpred_hybrid(mudSubPart/2).
+:- decl_mpred_hybrid(predInnerArgIsa/1).
+:- decl_mpred_hybrid(predRelationAllExists/3).
 
 
 subclass(tPlayer,tHominid).
@@ -227,6 +228,9 @@ simplifyFullName(FullNameFn,FullNameFn).
 find_instance_of(Pred,Subj,Obj):- predRelationAllExists(Pred,SubjT,ObjT), isa(Subj,SubjT), 
  (is_asserted(dbase_t(Pred,Subj,Obj),isa(Obj,ObjT)) *-> true ; (predPredicateToFunction(Pred,SubjT,ObjT,PredFn), Obj =.. [PredFn,Subj])).
 
+mudSubPart(Outer,Inner):-is_asserted(mudInsideOf(Inner,Outer)).
+mudSubPart(Agent,Clothes):-wearsClothing(Agent,Clothes).
+mudSubPart(Subj,Obj):- tl_true(thlocal:infThirdOrder), find_instance_of(mudSubPart,Subj,Obj).
 % mudSubPart(face,isEach(eyes,nose,mouth)).
 % mudSubPart([upper_torso,arms,left_arm,left_hand,left_digits]).
 % mudSubPart([upper_torso,arms,right_arm,right_hand,right_digits]).

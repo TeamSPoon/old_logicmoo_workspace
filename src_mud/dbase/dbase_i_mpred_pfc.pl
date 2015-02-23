@@ -102,11 +102,13 @@ throw_on_bad_fact(assert(a,G)):-!,dtrace,pfc_asserta0(G).
 throw_on_bad_fact(assert(z,G)):-!,dtrace,pfc_assertz0(G).
 throw_on_bad_fact(assert(_,G)):-!,dtrace,pfc_assert0(G).
 throw_on_bad_fact(G):-ground(G),!,fail.
-throw_on_bad_fact(G):-why_throw_on_bad_fact(G,Why),dtrace(why_throw_on_bad_fact(G,Why)),trace_or_throw(throw_on_bad_fact(Why,G)).
+throw_on_bad_fact(G):-why_throw_on_bad_fact(G,Why),
+   dtrace(why_throw_on_bad_fact(G,Why)),trace_or_throw(throw_on_bad_fact(Why,G)).
 
-why_throw_on_bad_fact(GIn,singletons(O,HeadSingletons,Rest)):- copy_term(GIn,G),
-  pfcRuleOutcomeRest(G,O,Rest),
-  numbervars(Rest,99,_),term_variables(O,HeadSingletons),numbervars(O,999,N,[singletons(true)]),!,member('$VAR'('_'),HeadSingletons).
+why_throw_on_bad_fact(GIn,singletons(H,HeadSingletons,B)):- copy_term(GIn,G),
+  pfcRuleOutcomeRest(G,H,B),
+  numbervars(B,99,_),term_variables(H,HeadSingletons),numbervars(H,66,_,[singletons(true)]),!,
+    member('$VAR'('_'),HeadSingletons),get_functor(H,F,A),!,not(mpred_prop(F,predCanHaveSingletons)).
 
 /*
 TODO: WHY CANT I GET THIS TO WORK?!? (Using the numbervars version is nutso)
@@ -123,9 +125,10 @@ subtract_seq([A|C], B, D) :- member_seq(A, B) -> subtract_eq(C, B, D) ; (subtrac
         
 
 
-pfc_retractall(G):-show_call_success_local(pfc_local(G)),!,assert(G),retractall(G).
+pfc_retractall(G):-pfc_local(G),!,ignore((retract(G),fail)).
 pfc_retractall(G):-hooked_retractall(G).
-pfc_retract(G):- show_call_success_local(pfc_local(G)),!,retract(G).
+
+pfc_retract(G):- pfc_local(G),!,retract(G).
 pfc_retract(G):- hooked_retract(G).
 
 pfc_assertz(G):- unnumbervars(G,GG),pfc_assertz0(GG).
@@ -143,14 +146,14 @@ pfc_assert0(G):- throw_on_bad_fact(G),!.
 pfc_assert0(G):- pfc_local(G),!,assert(G).
 pfc_assert0(G):- add(G),pfcMark(G).
 
-pfc_clause_ref(H,B,Ref):-must(pfc_local(H)),!,clause(H,B,Ref).
 
+pfc_clause_db(H,B):- must(pfc_local(H)),!,pfc_clause_local_db(H,B).
+pfc_clause_db_unify(H,B):- must(pfc_local(H)), clause(H,B),!.
+pfc_clause_db_ref(H,B,Ref):-must(pfc_local(H)),!,pfc_clause_local_db_ref(H,B,Ref).
 
-pfc_clause_local_db(H,B):- is_true(B),!,clause(H,B).
-pfc_clause_local_db(H,B):- copy_term(H:B,HH:BB),numbervars(HH:BB,0,_),!,clause(HH,BB).
+pfc_clause_local_db(H,B):- copy_term(H:B,HH:BB),clause(HH,BB,Ref),clause(CH,CB,Ref),H:B=@=CH:CB,!.
+pfc_clause_local_db_ref(H,B,Ref):- copy_term(H:B,HH:BB),clause(HH,BB,Ref),clause(CH,CB,Ref),H:B=@=CH:CB,!.
 
-pfc_clause_db(H,B):- pfc_local(H),!,pfc_clause_local_db(H,B).
-pfc_clause_db(H,B):- dmsg(pfc_clause_db(H,B)),dtrace(dbase_op(is_asserted,clause(H,B))).
 
 pfc_call(G):- pfc_call(nonPFC,G).
 pfc_call(_,G):- pfc_local(G),!,must(predicate_property(G,_)),!, debugOnError(call(G)).
@@ -1617,7 +1620,8 @@ pfcTraceAdd(pfcNT(_,_),_) :-
 pfcTraceAdd(P,S) :-
    pfcTraceAddPrint(P,S),
    pfcTraceBreak(P,S).
-   
+
+pfcTraceAddPrint(P,S) :- P = mpred_prop(_,predArgTypes),!,trace_or_throw(crazy_pfcTraceAddPrint(P,S)).
 pfcTraceAddPrint(P,S) :-
   P=@= ((isa(A,formatTypePrologCode),subclass(formatTypePrologCode,formatTypePrologCode),{dif(formatTypePrologCode,formatTypePrologCode)})=>isa(A,formatTypePrologCode)),
    trace_or_throw(crazy_pfcTraceAddPrint(P,S)).
@@ -1687,7 +1691,7 @@ pfcNospy :- pfcNospy(_,_,_).
 pfcNospy(Form) :- pfcNospy(Form,_,_).
 
 pfcNospy(Form,Mode,Condition) :- 
-  pfc_clause_ref(pfc_settings(spied,Form,Mode), Condition, Ref),
+  pfc_clause_db_ref(pfc_settings(spied,Form,Mode), Condition, Ref),
   erase(Ref),
   fail.
 pfcNospy(_,_,_).

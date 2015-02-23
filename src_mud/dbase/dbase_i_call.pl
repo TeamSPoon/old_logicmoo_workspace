@@ -40,6 +40,7 @@ deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),not(is_asserted(Call)
 
 
 dbase_op(Op,     H ):- (var(Op);var(H)),!,trace_or_throw(var_database_call(Op,  H )).
+dbase_op(is_asserted,H):-!,is_asserted(H).
 dbase_op(Op,     H ):- once(fully_expand(Op,H,HH)),H\=@=HH,!,dbase_op(Op, HH).
 dbase_op(neg(_,Op),  H ):- !, show_call(not(dbase_op(Op,  H ))).
 dbase_op(change(assert,Op),H):-!,must(dbase_modify(change(assert,Op),H)),!.
@@ -59,8 +60,6 @@ dbase_op(once,Call):- !,once(dbase_op(req,Call)).
 dbase_op(_ , clause(H,B) ):- !, is_asserted(H,B).
 dbase_op(_ , clause(H,B,Ref) ):- !,  is_asserted(H,B,Ref).
 dbase_op(_ , (H :- B) ):- !, is_asserted(H,B).
-dbase_op(is_asserted,X):-was_isa(X,I,C),!,isa_asserted(I,C).
-dbase_op(is_asserted,H):-!,is_asserted(H).
 dbase_op(clauses(Op),  H):-!,dbase_op((Op),  H).
 dbase_op(conjecture,X):-was_isa(X,I,C),!,isa_backchaing(I,C).
 dbase_op(conjecture,H):-!,mpred_call(H).
