@@ -67,7 +67,7 @@ user:agent_call_command(Agent,actLook(_Dir,SObj)):-
 look_as(Agent):-
    get_session_id(O),
    with_assertions(thlocal:session_agent(O,Agent),
-        must((mudAtLoc_deduced(Agent,LOC),cmdLook(Agent,LOC)))).
+        must((mudAtLoc(Agent,LOC),cmdLook(Agent,LOC)))).
 
 
 :-export(cmdLook/2).
@@ -89,7 +89,7 @@ cmdLook_proc_0(Agent,LOC):-
        %   cmdShowRoomGrid = once(with_output_to(string(value),cmdShowRoomGrid(region))),
          % for now workarround is 
          call(cmdShowRoomGrid(vHere)),
-         mudAtLoc_deduced(Agent,value),
+         mudAtLoc(Agent,value),
          nameStringsList(vHere,value),
          forEach(mudDescription(vHere,Value),fmt(mudDescription(Value))),
          events=mudDeliverableLocationEvents(Agent,LOC,value),
@@ -103,7 +103,7 @@ cmdLook_proc_0(Agent,LOC):-
          mudGetPrecepts(Agent,value),         
          mudMoveDist(Agent,value),
          mudHeightOnObj(Agent,value),
-         mudLastCmdSuccess=success(Agent,value)
+         mudLastCmdSuccess=wasSuccess(Agent,value)
        ]),
     show_inventory(Agent,Agent).
 
@@ -124,7 +124,7 @@ get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
 	tLooking(Agent),
 	mudEnergy(Agent,Vit),
         mudHealth(Agent,Dam),
-	success(Agent,Suc),
+	wasSuccess(Agent,Suc),
 	mudScore(Agent,Scr),
 	mudPossess(Agent,Inv),
 	mudGetPrecepts(Agent,Percepts))),!.
@@ -160,7 +160,7 @@ mudNearFeet(Agent,PerceptsO) :-  get_feet0(Agent,Percepts0),!,flatten_set(Percep
 get_feet0(Agent,Percepts):-
   call((
 	tLooking(Agent),
-	mudAtLoc_deduced(Agent,LOC),
+	mudAtLoc(Agent,LOC),
         mudFacing(Agent,Facing),
         reverse_dir(Facing,Rev),
 	get_mdir_u(Agent,[Facing,Rev],LOC,Percepts))),
@@ -215,7 +215,7 @@ predArgTypes(mudTexture(tSpatialThing,vtTexture)).
 % High enough to see over obstacles??
 % Check to see how tall the tAgentGeneric is and if they are standing on an item
 mudHeightOnObj(Agent,Ht) :-
-	mudAtLoc_deduced(Agent,LOC),
+	mudAtLoc(Agent,LOC),
 	mudAtLocList(LOC,Objs),
 	member(Obj,Objs),
 	props(Obj,mudHeight(ObjHt)),
@@ -267,7 +267,7 @@ view_dirs(_,[],[]).
 view_dirs(Agent,[[D1|D2]|Rest],Percepts) :-
       tLooking(Agent),
 	view_dirs(Agent,Rest,Psofar),
-	mudAtLoc_deduced(Agent,LOC),
+	mudAtLoc(Agent,LOC),
 	get_mdir_u(Agent,[D1|D2],LOC,What),
 	append([What],Psofar,Percepts).
 
@@ -293,7 +293,7 @@ get_mdir_u(Agent,[_|D],LOC,What) :-
 
 % Reports everything at a location.
 mudAtLocList(LOC,List) :-
-	findall(Z,mudAtLoc_deduced(Z,LOC),List).
+	findall(Z,mudAtLoc(Z,LOC),List).
 
 % Converts the objects seen... basically to weed out the 0'vSouth the empty locations mudAtLocList
 mask([],What,What).

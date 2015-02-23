@@ -112,12 +112,12 @@ anyInst(O):-exisitingThing(O).
 
 user:decl_database_hook(change(assert,_),typeGenls(_,MC)):-assert_isa(MC,ttTypeType).
 
-% deduce_facts(typeGenls(T,MC),deduce_facts(subclass(S,T),isa(S,MC))).
+% deduce_facts(typeGenls(T,MC),deduce_facts(genls(S,T),isa(S,MC))).
 
 
 */
 
-%subclass(SubType,formattype):-isa(SubType,formattype).
+%genls(SubType,formattype):-isa(SubType,formattype).
 
 %cached(G):-ccatch(G,_,fail).
 
@@ -127,10 +127,10 @@ user:decl_database_hook(change(assert,_),typeGenls(_,MC)):-assert_isa(MC,ttTypeT
 ttNotSpatialType(ftInt).
 ttNotSpatialType(ftTerm).
 
-subclass(tWearAble,tItem).
-subclass(tLookAble,tItem).
-subclass(tKnife,tItem).
-subclass(tFood,tItem).
+genls(tWearAble,tItem).
+genls(tLookAble,tItem).
+genls(tKnife,tItem).
+genls(tFood,tItem).
 
 
 %ttSpatialType(FT):- nonvar(FT),ttFormatType(FT),!,fail.
@@ -139,7 +139,7 @@ subclass(tFood,tItem).
 ttSpatialType(SubType):-member(SubType,[tAgentGeneric,tItem,tRegion]).
 %ttSpatialType(S):- is_asserted(ttSpatialType(T)), impliedSubClass(S,T).
 
-%createableSubclassType(S,T):-mpred_call(  ttSpatialType(T)),is_asserted(subclass(S,T)).
+%createableSubclassType(S,T):-mpred_call(  ttSpatialType(T)),is_asserted(genls(S,T)).
 %createableSubclassType(T,tSpatialThing):-mpred_call( ttSpatialType(T)).
 
 
@@ -180,8 +180,8 @@ create_instance_0(What,FormatType,List):- FormatType\==tCol, ttFormatType(Format
 create_instance_0(SubType,tCol,List):-decl_type(SubType),padd(SubType,List).
 
 ttSpatialType(tAgentGeneric).
-subclass(tActor,tAgentGeneric).
-subclass(tExplorer,tAgentGeneric).
+genls(tActor,tAgentGeneric).
+genls(tExplorer,tAgentGeneric).
 
 :-dynamic_multifile_exported(predTypeMax/3).
 :-dynamic_multifile_exported(predInstMax/3).

@@ -17,9 +17,9 @@ user:term_expansion(A,B):- once(pfc_file_expansion(A,B)),A\=@=B.
 :- pfcWarn.
 next_test :- sleep(1),pfcReset.
 
-:-dynamic((disjointWith/2,subclass/2)).
+:-dynamic((disjointWith/2,genls/2)).
 
-(disjointWith(P1,P2) , subclass(C1,P1)) =>    disjointWith(C1,P2).
+(disjointWith(P1,P2) , genls(C1,P1)) =>    disjointWith(C1,P2).
 disjointWith(Sub, Super) => disjointWith( Super, Sub).
 disjointWith(tObj,tRegion).
 disjointWith(ttSpatialType,ttAbstractType).
@@ -27,13 +27,13 @@ disjointWith(ttSpatialType,ttAbstractType).
 
 tCol(Col) <=> isa(Col,tCol).
 
-(isa(I,Sub), subclass(Sub, Super)) => isa(I,Super).
+(isa(I,Sub), genls(Sub, Super)) => isa(I,Super).
 
 
 
 (isa(I,Sub), disjointWith(Sub, Super)) => not(isa(I,Super)).
 
-subclass(tPartOfobj,tItem).
+genls(tPartOfobj,tItem).
 
 % dividesBetween(tItem,tPathways).
 dividesBetween(tItem,tMassfull,tMassless).
@@ -42,7 +42,7 @@ dividesBetween(tObj,tMassfull,tMassless).
 dividesBetween(tSpatialThing,tObj,tRegion).
 dividesBetween(tAgentGeneric,tPlayer,tNpcPlayer).
 
-dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , subclass(C1,S) ,subclass(C2,S)).
+dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
 
 disjointWith(P1,P2) => (not(isa(C,P1)) <=> isa(C,P2)).
 
@@ -102,7 +102,7 @@ pfcDefault((P => Q))/pfcAtom(Q) => (P, ~not(Q) => Q).
 => pfcDefault((bird(X) => fly(X))).
 
 % here's one way to do an isa hierarchy.
-% isa = subclass.
+% isa = genls.
 
 isa(C1,C2) =>
   {P1 =.. [C1,X],
@@ -578,30 +578,30 @@ termSubst(Old,New,Term,Term2) :-
 %% a simple Knowledge Representation Language:
 %%   class(Class)
 %%   isa(Individual,Class)
-%%   subclass(SuperClass,SubClass)
+%%   genls(SuperClass,SubClass)
 %%   role(Class,Role)
 %%   type(Class,Role,Type)
 %%   range(Class,Role,Range)
 
 
 % roles are inherited.
-role(Super,R), subclass(Super,Sub) => role(Sub,R).
+role(Super,R), genls(Super,Sub) => role(Sub,R).
 
 % types are inherited.
-type(Super,Role,Type), subclass(Super,Sub) => type(Sub,Role,Type).
+type(Super,Role,Type), genls(Super,Sub) => type(Sub,Role,Type).
 
 % classification rule
-subclass(Super,Sub),
-      subclass(Super,SubSub),
+genls(Super,Sub),
+      genls(Super,SubSub),
       {Sub \== SubSub},
       \+ not(subsumes(Sub,SubSub)),
       \+ not(primitive(SubSub))
       =>
-      subclass(Sub,SubSub).
+      genls(Sub,SubSub).
 
 disjoint(C1,C2) => disjoint(C2,C1).
 
-not(subsume(C1,C2)) <= subclass(C2,C1).
+not(subsume(C1,C2)) <= genls(C2,C1).
 
 not(subsumes(C1,C2)) <= disjoint(C1,C2).
 
@@ -742,7 +742,7 @@ pfcDefault((P => Q))/pfcAtom(Q) => (P, ~not(Q) => Q).
 => pfcDefault((bird(X) => fly(X))).
 
 % here's one way to do an isa hierarchy.
-% isa = subclass.
+% isa = genls.
 
 isa(C1,C2) =>
   {P1 =.. [C1,X],

@@ -9,7 +9,7 @@ prolog_file_dir(Here):- working_directory(Here,Here).
 prolog_file_dir(Rel,ABSF):-prolog_file_dir(Here),absolute_file_name(Rel,ABSF,[relative_to(Here),file_type(directory),expand(true)]),!.
 prolog_file_dir(Rel,ABSF):-prolog_file_dir(Here),absolute_file_name(Rel,ABSF,[relative_to(Here),expand(true)]),!.
 
-add_to_search_path_first(Alias, Abs) :- asserta(user:file_search_path(Alias, Abs)).
+add_to_search_path_first(Alias, Abs) :- asserta_new(user:file_search_path(Alias, Abs)).
 
 add_to_search_path(Alias, Abs) :- is_absolute_file_name(Abs) ->
     assertz(user:file_search_path(Alias, Abs)) 
@@ -169,9 +169,10 @@ win_fork(G,SERVIO,PID):-atom_concat('swipl-win.exe ',G,AC),writeq(win_fork(AC,SE
 */
 
 
-show_file_search_path:-'format'('% ~q.~n',[forall(user:file_search_path(_,_))]), 
+show_file_search_path:- % 'format'('% ~q.~n',[forall(user:file_search_path(_,_))]), 
   forall(user:file_search_path(A,B),'format'('% ~q.~n',[user:file_search_path(A,B)])).
-% :-show_file_search_path.
+
+:-show_file_search_path.
 
 % :- list_undefined.
 

@@ -70,10 +70,11 @@ grid_size(Region,MaxX,MaxY,MaxZ):- fail,
 	findall(1,typeGrid(What,_,_),LL),
 	length(LL,MaxY),!.
 
-grid_size(_Room,MaxX,MaxY,MaxZ):- MaxX = 5 ,MaxY = 5 ,maxZ(MaxZ) ,!.
+grid_size(Room,MaxX,MaxY,MaxZ):- must(tRegion(Room)), MaxX = 5 ,MaxY = 5 ,maxZ(MaxZ).
 
 maxZ(2).
 
+in_grid(LocName,Var):-var(LocName),!,no_repeats_old([LocName,Var],(tRegion(LocName),in_grid_rnd(LocName,Var))).
 in_grid(LocName,Var):-var(Var),!,in_grid_rnd(LocName,Var).
 in_grid(LocName,Var):-in_grid_no_rnd(LocName,Var).
 
@@ -82,7 +83,7 @@ in_grid_no_rnd(LocName,xyzFn(LocName,X,Y,Z)) :- !,
 in_grid_no_rnd(LocName,LocName).
 
 in_grid_rnd(LocName,xyzFn(LocName,X,Y,1)) :-
-   grid_size(LocName,MaxX,MaxY,_MaxZ),!,
+   grid_size(LocName,MaxX,MaxY,_MaxZ),
    repeat,
 	X is (1 + random(MaxX-2)),
 	Y is (1 + random(MaxY-2)).	
@@ -181,20 +182,15 @@ same_regions(Agent,Obj):-must(inRegion(Agent,Where1)),dif_safe(Agent,Obj),inRegi
 %:- ensure_universal_stub(prologPTTP,inRegion/2).
 %:- ensure_universal_stub(prologPTTP,mudTestAgentWearing/2).
 
-:-decl_mpred_prolog(mudAtLoc_deduced/2).
+:-decl_mpred_prolog(mudAtLoc/2).
+predArgTypes(mudAtLoc(tObj,tSpatialThing)).
 
 
+mudAtLoc(X,Y):-tObj(X),not_asserted(mudAtLoc(X,Y)),with_fail_is_asserted(mudAtLoc(X,Y),put_in_world_ilc(X)).
 
-predArgTypes(mudAtLoc_deduced(tObj,tSpatialThing)).
+mostSpecificLocalityOfObject(Agent,Where):-  is_asserted_lc(mudAtLoc(Agent,Where));is_asserted_lc(localityOfObject(Agent,Where));is_asserted_lc(inRegion(Obj,Region)).
 
-mudAtLoc_deduced(X,Y):-show_call_failure(is_asserted(mudAtLoc(X,Y))),!.
-mudAtLoc_deduced(X,Y):-is_asserted(localityOfObject(X,_)),!,must((create_random_fact(mudAtLoc(X,Y)),is_asserted(mudAtLoc(X,Y)))).
-
-
-localityOfObject_deduced(Agent,Where):- must(is_asserted(mudAtLoc(Agent,Where));is_asserted(localityOfObject(Agent,Where));mudAtLoc_deduced(Agent,Where)).
-localityOfObject_deduced(Obj,Region):- loop_check(inRegion(Obj,Region)).
-
-inRegion(Agent,RegionIn):- nonvar(Agent),!, loop_check(( localityOfObject_deduced(Agent,Where), locationToRegion(Where,Region)),fail),!,Region=RegionIn.
+inRegion(Agent,RegionIn):- nonvar(Agent),!, loop_check(( mostSpecificLocalityOfObject(Agent,Where), locationToRegion(Where,Region)),fail),!,Region=RegionIn.
 inRegion(Agent,RegionIn):- must(nonvar(RegionIn)),!,(tItem(Agent);tAgentGeneric(Agent)),inRegion(Agent,RegionIn).
 
 %inRegion(Agent,Region):- nonvar(Region),!, loop_check(( (is_asserted(atloc(Agent,Where));localityOfObject(Agent,Where)), locationToRegion(Where,Region)),fail).
@@ -209,8 +205,8 @@ inRegion(Agent,RegionIn):- must(nonvar(RegionIn)),!,(tItem(Agent);tAgentGeneric(
 :- decl_mpred_hybrid(predRelationAllExists/3).
 
 
-subclass(tPlayer,tHominid).
-subclass(tHumanBody,tBodyPart).
+genls(tPlayer,tHominid).
+genls(tHumanBody,tBodyPart).
 
 predInnerArgIsa(mudSubPart(tBodyPart,tBodyPart)).
 
@@ -240,14 +236,14 @@ mudSubPart(Subj,Obj):- test_tl(infThirdOrder), find_instance_of(mudSubPart,Subj,
 
 
 put_in_world(isSelf):-!.
-put_in_world(Agent):-loop_check(put_in_world_lc(Agent),true),!.
+put_in_world(Agent):-loop_check(put_in_world_ilc(Agent),true),!.
 
-put_in_world_lc(Obj):-isa_asserted(Obj,tRegion),!.
-put_in_world_lc(Obj):-is_asserted(mudAtLoc(Obj,_)),!.
-put_in_world_lc(Obj):-localityOfObject(Obj,What),not(tRegion(What)),!,ensure_in_world(What),!.
-put_in_world_lc(Obj):-with_fallbacksg(with_fallbacks(put_in_world_lc_gen(Obj))),!.
+put_in_world_ilc(Obj):-isa_asserted(Obj,tRegion),!.
+put_in_world_ilc(Obj):-is_asserted(mudAtLoc(Obj,_)),!.
+put_in_world_ilc(Obj):-localityOfObject(Obj,What),not(tRegion(What)),!,ensure_in_world(What),!.
+put_in_world_ilc(Obj):-with_fallbacksg(with_fallbacks(put_in_world_ilc_gen(Obj))),!.
 
-put_in_world_lc_gen(Obj):-choose_for(mudFacing,Obj,_),!,must_det((choose_for(mudAtLoc,Obj,LOC),nonvar(LOC))).
+put_in_world_ilc_gen(Obj):-choose_for(mudFacing,Obj,_),!,must_det((choose_for(mudAtLoc,Obj,LOC),nonvar(LOC))).
 
 
 ensure_in_world(What):-must_det(put_in_world(What)).
@@ -279,7 +275,9 @@ fact_maybe_deduced(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,LOC)
 fact_maybe_deduced(localityOfObject(apathFn(Region,Dir),Region)):-is_asserted(pathBetween(Region,Dir,_)).
 
 %  suggest a random fact that is probably is not already true
-create_random_fact(mudAtLoc(Obj,LOC)) :- nonvar(Obj),asserted_or_deduced(localityOfObject(Obj,Region)),!,((in_grid(Region,LOC),unoccupied(Obj,LOC),is_fact_consistent(mudAtLoc(Obj,LOC)))).
+create_random_fact(mudAtLoc(Obj,LOC)) :- nonvar(Obj),asserted_or_deduced(localityOfObject(Obj,Region)),!,
+   ((in_grid(Region,LOC),unoccupied(Obj,LOC),is_fact_consistent(mudAtLoc(Obj,LOC)))).
+create_random_fact(mudAtLoc(Obj,LOC)) :- nonvar(Obj),((in_grid(Region,LOC),unoccupied(Obj,LOC),is_fact_consistent(mudAtLoc(Obj,LOC)))).
 create_random_fact(localityOfObject(Obj,Region)) :- nonvar(Obj),not(is_asserted(localityOfObject(Obj,_))),asserted_or_deduced(localityOfObject(Obj,Region)).
 
 %  suggest random values
@@ -304,10 +302,10 @@ random_xyzFn(xyzFn('Area1000',1,1,1)):-  trace_or_throw(dbase_not_loaded).
 
 unoccupied(_,Loc):- not(is_asserted(mudAtLoc(_,Loc))),!.
 unoccupied(_,_):-!.
-unoccupied(Obj,Loc):- loop_check(unoccupied_lc(Obj,Loc),not(is_asserted(mudAtLoc(_,Loc)))),!.
+unoccupied(Obj,Loc):- loop_check(unoccupied_ilc(Obj,Loc),not(is_asserted(mudAtLoc(_,Loc)))),!.
 
-unoccupied_lc(Obj,Loc):- is_occupied(Loc,What),!,What=Obj.
-unoccupied_lc(_,_).
+unoccupied_ilc(Obj,Loc):- is_occupied(Loc,What),!,What=Obj.
+unoccupied_ilc(_,_).
 
 is_occupied(Loc,What):- is_asserted(mudAtLoc(What,Loc)),!.
 is_occupied(Loc,What):- locationToRegion(Loc,Region),localityOfObject(What,Region),ensure_in_world(What),mudAtLoc(What,Loc),!.

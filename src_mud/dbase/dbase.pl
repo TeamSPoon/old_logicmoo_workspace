@@ -52,6 +52,7 @@ when_debugging(What,Call):- debugging(What),!,Call.
 when_debugging(_,_).
 
 :- asserta(tlbugger:no_colors).
+:- asserta(tlbugger:show_must_go_on).
 
 :- set_prolog_flag(double_quotes, atom).
 :- set_prolog_flag(double_quotes, string).
@@ -149,7 +150,7 @@ was_known_false(Fact):-is_known_false(Fact),doall(retract((is_known_false(_):-tr
 
 resolve_if_false(Fact):- ignore(((is_known_false(Fact),was_known_false(Fact)))).
 
-user:ruleRewrite(isa(isInstFn(Sub),Super),subclass(Sub,Super)):-ground(Sub:Super),!.
+user:ruleRewrite(isa(isInstFn(Sub),Super),genls(Sub,Super)):-ground(Sub:Super),!.
 user:ruleRewrite(mudLabelTypeProps(Lbl,T,[]),typeHasGlyph(T,Lbl)):-must(nonvar(T)).
 user:ruleRewrite(mudLabelTypeProps(Lbl,T,Props),typeProps(T,[typeHasGlyph(Lbl)|Props])).
 
@@ -290,18 +291,4 @@ vtTestType(vTest2).
 % :-asserta(user:isa_pred_now_locked).
 
 % :-asserta(user:prolog_mud_disable_term_expansions).
-
-end_of_file.
-
-
-
-% ========================================
-% enter_term_anglify(MASK)
-% ========================================
-
-enter_term_anglify(X,Y):-findall(X-Y-Body,clause( mudTermAnglify(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
-enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_np(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
-enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_last(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
-enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_np_last(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
-
 

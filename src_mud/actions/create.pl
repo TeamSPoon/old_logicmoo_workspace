@@ -3,7 +3,7 @@
 /** <module> A command to  ...
 % charge(Agent,Chg) = charge (amount of charge agent has)
 % health(Agent,Dam) = damage
-% cmdsuccess(Agent,Suc) = checks success of last action (actually checks the cmdfailure predicate)
+% mudLastCmdSuccess(Agent,Suc) = checks success of last action (actually checks the cmdfailure predicate)
 % score(Agent,Scr) = score
 % to do this.
 % Douglas Miles 2014
@@ -55,7 +55,7 @@ create_new_object(Agent,[tCol,NameOfType|DefaultParams]):-!,create_new_type(Agen
 create_new_object(Agent,[NameOrType|Params]):-
    create_meta(NameOrType,NewType,tSpatialThing,NewObj),
    assert_isa(NewObj,NewType),
-   add(subclass(NewType,tItem)),
+   add(genls(NewType,tItem)),
    padd(NewObj,authorWas(create_new_object(Agent,[NameOrType|Params]))),
    padd(Agent,current_pronoun("it",NewObj)),   
    getPropInfo(Agent,NewObj,Params,2,PropList),!,

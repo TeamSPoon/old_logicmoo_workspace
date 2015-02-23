@@ -458,7 +458,7 @@ recreate(F/A):-dynamic(F/A),functor(P,F,A),retractall(P),!.
 :-recreate(verb_affordance/5).
 
 :- decl_mpred_hybrid(argIsa/3).
-:- decl_mpred_hybrid(subclass/2).
+:- decl_mpred_hybrid(genls/2).
 :- decl_mpred_hybrid(mudActionMaxDistance(vtActionType,ttObjectType,ftInt)).
 
 to_personal(mudEnergy,mudEnergy).
@@ -471,8 +471,8 @@ do_define_type_affordance1(Type,_= Type):-!.
 do_define_type_affordance1(Type,subjType= String):- add(nameStrings(Type,String)).
 
 
-do_define_type_affordance1(Type,alsoType= TWhat):-i_name(t,TWhat,ParentType),add(subclass(Type,ParentType)).
-do_define_type_affordance1(Type,superType= TWhat):-i_name(t,TWhat,ParentType),add(subclass(Type,ParentType)).
+do_define_type_affordance1(Type,alsoType= TWhat):-i_name(t,TWhat,ParentType),add(genls(Type,ParentType)).
+do_define_type_affordance1(Type,superType= TWhat):-i_name(t,TWhat,ParentType),add(genls(Type,ParentType)).
 do_define_type_affordance1(Type,actionVerb= SVerb):-i_name(act,SVerb,Verb),nb_setval(actionVerb,Verb),!,assert_if_new(verb_for_type(Verb,Type)).
 do_define_type_affordance1(Type,actionVerb(2)= SVerb):-i_name(act,SVerb,Verb),nb_setval(actionVerb,Verb),
   (nb_current(acceptsChild,ChildType)->true;ChildType=tCarryAble),
@@ -560,35 +560,35 @@ user:agent_call_command(Agent,actTextcmd(A,B)):-sformat(CMD,'~w ~w',[A,B]),!,do_
 user:agent_call_command(Agent,actTextcmd(A,B,C)):-sformat(CMD,'~w ~w ~w',[A,B,C]),!,do_player_action(Agent,CMD).
 
 
-subclass(tShelf,tHasSurface).
-subclass(tCounter,tHasSurface).
-subclass(tEatAble,tEatAble).
-subclass(tBar,tHasSurface).
-subclass(tSitAble,tHasSurface).
-subclass(tSofa,tCouch).
-subclass(tCouch,tSitAble).
-subclass(tChair,tSitAble).
-subclass(tMattress,tLayAble).
-subclass(tLayAble,tSitAble).
-subclass(tBed,tMattress).
-subclass(tCrib,tLayAble).
-subclass(tHasSurface, tContainer).
-subclass(tHasSurface, tPutTargetAble).
-subclass(tContainer, tPutTargetAble).
+genls(tShelf,tHasSurface).
+genls(tCounter,tHasSurface).
+genls(tEatAble,tEatAble).
+genls(tBar,tHasSurface).
+genls(tSitAble,tHasSurface).
+genls(tSofa,tCouch).
+genls(tCouch,tSitAble).
+genls(tChair,tSitAble).
+genls(tMattress,tLayAble).
+genls(tLayAble,tSitAble).
+genls(tBed,tMattress).
+genls(tCrib,tLayAble).
+genls(tHasSurface, tContainer).
+genls(tHasSurface, tPutTargetAble).
+genls(tContainer, tPutTargetAble).
 
 
 
-subclass(tClothesDryer,tFurniture).
-subclass(tWashingMachine,tFurniture).
-subclass(tShower,tFurniture).
-subclass(tSitAble,tFurniture).
-subclass(tChair,tFurniture).
-subclass(tBed,tFurniture).
-subclass(tSink,tFurniture).
-subclass(tToilet,tFurniture).
-subclass(tBathTub,tFurniture).
-subclass(tFurniture,tUseAble).
-subclass(tFurniture,tObj).
+genls(tClothesDryer,tFurniture).
+genls(tWashingMachine,tFurniture).
+genls(tShower,tFurniture).
+genls(tSitAble,tFurniture).
+genls(tChair,tFurniture).
+genls(tBed,tFurniture).
+genls(tSink,tFurniture).
+genls(tToilet,tFurniture).
+genls(tBathTub,tFurniture).
+genls(tFurniture,tUseAble).
+genls(tFurniture,tObj).
 
 verb_alias("observe",actUse).
 verb_alias("operate",actUse).

@@ -186,7 +186,7 @@ holds_plist_t(P,LIST):- apply(holds_t,[P|LIST]).
 :-op(0,fx,((decl_mpred_hybrid))).
 :-export((decl_mpred_hybrid)/1).
 :-export((decl_mpred_hybrid)/2).
-:-export((decl_mpred_hybrid_lc)/3).
+:-export((decl_mpred_hybrid_ilc)/3).
 :-export((decl_mpred_hybrid4)/4).
 
 :-op(0,fx,decl_mpred_hybrid).
@@ -208,15 +208,15 @@ decl_mpred_hybrid(F,Other):-
 
 :-export(decl_mpred_hybrid/3).
 decl_mpred_hybrid3(M, F, A):- atom(F),integer(A),!,must((functor(PI,F,A),decl_mpred_hybrid3(M,PI,F/A))).
-decl_mpred_hybrid3(M,PI,FA):- loop_check(must(decl_mpred_hybrid_lc(M,PI,FA)),true).
+decl_mpred_hybrid3(M,PI,FA):- loop_check(must(decl_mpred_hybrid_ilc(M,PI,FA)),true).
 
 
-decl_mpred_hybrid_lc(M,F,F/0):-
+decl_mpred_hybrid_ilc(M,F,F/0):-
     mpred_arity(F,A),!,
     must((functor(PI,F,A),
-    decl_mpred_hybrid_lc(M,PI,F/A))).
+    decl_mpred_hybrid_ilc(M,PI,F/A))).
 
-decl_mpred_hybrid_lc(M,PI,F/A):-
+decl_mpred_hybrid_ilc(M,PI,F/A):-
      must(not(mpred_prop(F,prologOnly))),
      assert_arity(F,A),
      must(mpred_arity(F,A)),
@@ -468,7 +468,7 @@ dbase_t_call_op(_,FACT):- get_functor(FACT, F,A), !,
 % call_for_literal/3
 % ====================================================
 call_for_literal(_,_,HEAD):- use_snark(HEAD,true),!,snark_ask(HEAD).
-call_for_literal(_,_,HEAD):- use_ideep_swi,!,  call_for_literal_ideep_lc(HEAD),!,loop_check_term(cwdl(CALL,7),HEAD,(CALL)).
+call_for_literal(_,_,HEAD):- use_ideep_swi,!,  call_for_literal_ideep_ilc(HEAD),!,loop_check_term(cwdl(CALL,7),HEAD,(CALL)).
 call_for_literal(F,A,HEAD):- call_for_literal_db(F,A,HEAD).
 
 call_for_literal_db(F,A,HEAD):- P=F, HEAD=..[P|ARGS],
@@ -479,7 +479,7 @@ call_for_literal_db(F,A,HEAD):- P=F, HEAD=..[P|ARGS],
 cwdl(CALL,DEEP7):- call_with_depth_limit(CALL,DEEP7,Result),
    ( Result == depth_limit_exceeded -> (!,fail) ; true).
 
-call_for_literal_ideep_lc(HEAD):- get_functor(HEAD,F,A),call_for_literal_db(F,A,HEAD).
+call_for_literal_ideep_ilc(HEAD):- get_functor(HEAD,F,A),call_for_literal_db(F,A,HEAD).
 
 call_for_literal_db0(F,A,HEAD):-no_repeats(HEAD,call_for_literal_db00(F,A,HEAD)).
 
@@ -503,9 +503,9 @@ call_rule_db(F,A,HEAD):- ruleBackward(HEAD,BODY),call_mpred_body(HEAD,BODY).
 call_mpred_body(_,true):-!.
 call_mpred_body(HEAD,and(A,B)):- !,call_mpred_body(HEAD,A),!,call_mpred_body(HEAD,B).
 call_mpred_body(HEAD,(A,B)):- !,call_mpred_body(HEAD,A),call_mpred_body(HEAD,B).
-call_mpred_body(HEAD,BODY):- no_repeats(loop_check_term(call_mpred_body_lc(HEAD,BODY),body_of(HEAD),(nop(failure(call_mpred_body_lc(HEAD,BODY))),!,fail))).
+call_mpred_body(HEAD,BODY):- no_repeats(loop_check_term(call_mpred_body_ilc(HEAD,BODY),body_of(HEAD),(nop(failure(call_mpred_body_ilc(HEAD,BODY))),!,fail))).
 
-call_mpred_body_lc(_HEAD,BODY):- debugOnError(BODY).
+call_mpred_body_ilc(_HEAD,BODY):- debugOnError(BODY).
 
 
 mustIsa(I,C):-nonvar(I),!,isa(I,C),!.

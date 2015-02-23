@@ -45,8 +45,8 @@ fix_argIsa(F,N,vtDirection(Val),vtDirection):-add(mpred_prop(F,argSingleValueDef
 % :- decl_mpred_hybrid(repl_writer(tAgentGeneric,term),[prologSingleValued,argSingleValueDefault(2,default_repl_writer)]).
 %:- forall(is_pred_declarer(F),dynamic(F/1)).
 %:- foreach(retract(isa(I,C)),assert_hasInstance(C,I)).
-%isa(AT,ttAgentType):- subclass(AT,ttAgentGeneric).
-%subclass(AT,ttAgentGeneric):- isa(AT,ttAgentType).
+%isa(AT,ttAgentType):- genls(AT,ttAgentGeneric).
+%genls(AT,ttAgentGeneric):- isa(AT,ttAgentType).
 %subFormat(ftTextType,ftText).
 :- decl_mpred(tItem(ftID),[predIsFlag]).
 :- decl_mpred(tRegion(ftID),[predIsFlag]).
@@ -57,7 +57,7 @@ fix_argIsa(F,N,vtDirection(Val),vtDirection):-add(mpred_prop(F,argSingleValueDef
 :- decl_mpred_hybrid mudStr/2.
 :- decl_mpred_hybrid typeGrid/3.
 :- decl_mpred_hybrid((( mudContains/2))).
-
+:- decl_mpred_hybrid((( mudLastCmdSuccess/2 ))).
 :- do_gc.
 
 :- decl_mpred_hybrid((tItem/1, tRegion/1, instVerbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, mudToHitArmorClass0/2, tThinking/1, tDeleted/1, mudWeight/2, mudPermanence/3, act_term/2, mudAgentTurnnum/2, mudAtLoc/2, mudEnergy/2, mudHealth/2, mudDescription/2, mudFacing/2, mudCmdFailure/2, mudSpd/2, typeGrid/3, mudHeight/2, mudMemory/2, isa/2, pathName/3, mudPossess/2, mudScore/2, mudStm/2, mudStr/2, wearsClothing/2)).
@@ -99,7 +99,7 @@ prologHybrid(typeHasGlyph(tCol,ftString)).
 :- dynamic_safe(mudToHitArmorClass0 / 2).
 :- ensure_universal_stub(mudAtLoc/2).
 :- must(decl_mpred_prolog(agent_call_command/2)).
-%:- user:decl_mpred_hybrid((argIsa/3, formatted_resultIsa/2, typeHasGlyph/2, inRegion/2, mudContains/2, isa/2, mudLabelTypeProps/3, mudMemory/2, mudPossess/2, mudStowing/2, subclass/2, mudToHitArmorClass0/2, pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, ttFormatType/1, typeProps/2)).
+%:- user:decl_mpred_hybrid((argIsa/3, formatted_resultIsa/2, typeHasGlyph/2, inRegion/2, mudContains/2, isa/2, mudLabelTypeProps/3, mudMemory/2, mudPossess/2, mudStowing/2, genls/2, mudToHitArmorClass0/2, pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, ttFormatType/1, typeProps/2)).
 
 
 prologHybrid(instVerbOverride(ftTerm,ftAction,ftAction)).
@@ -127,11 +127,11 @@ formatted_resultIsa(apathFn(tRegion,vtDirection),tPathway).
 is_vtActionTemplate(C):-nonvar(C),get_functor(C,F),!,atom_concat(act,_,F).
 formatTypePrologCode(ftAction,is_vtActionTemplate).
 
-subclass('FemaleAnimal',tPlayer).
-subclass('MaleAnimal',tPlayer).
-subclass(isEach('PortableObject','ProtectiveAttire','SomethingToWear'),tCarryAble).
-subclass(isEach('ProtectiveAttire','SomethingToWear'),tWearAble).
-subclass(isEach(tRegion,tAgentGeneric),tChannel).
+genls('FemaleAnimal',tPlayer).
+genls('MaleAnimal',tPlayer).
+genls(isEach('PortableObject','ProtectiveAttire','SomethingToWear'),tCarryAble).
+genls(isEach('ProtectiveAttire','SomethingToWear'),tWearAble).
+genls(isEach(tRegion,tAgentGeneric),tChannel).
 
 ttFormatted(aDirectionsFn(ftTerm,ftListFn(ftTerm))).
 ttFormatted(apathFn(tRegion,vtDirection)).
@@ -142,36 +142,36 @@ ttFormatted(xyzFn(tRegion,ftInt,ftInt,ftInt)).
 
 % (isa(Inst,Type),isa(Type,ttTypeByAction)) => isa(Inst,tHasAction).
 
-subclass(tAgentGeneric,tObj).
-subclass(tAgentGeneric,tSpatialThing).
-subclass(tCarryAble,tItem).
-subclass(tChargeAble,tItem).
-subclass(tContolDevice,tChargeAble).
-subclass(tDoor,tFurniture).
-subclass(tDoor,tItem).
-subclass(tDrinkAble,tItem).
-subclass(tEatAble,tItem).
-subclass(tFunction,tRelation).
-subclass(tFurniture,tObj).
-subclass(tFurniture,tPartofObj).
-subclass(tHumanPlayer,tPlayer).
-subclass(tItem,tObj).
-subclass(tItem,tSpatialThing).
-subclass(tMonster,ttAgentGeneric).
-subclass(tNpcPlayer,tPlayer).
-subclass(tObj,tSpatialThing).
-subclass(tPathway,tDoor).
-subclass(tPlayer,tAgentGeneric).
-subclass(tPred,tRelation).
-subclass(tRegion,tSpatialThing).
-subclass(ttObjectType,tCol).
-subclass(ttSpatialType,tCol).
-subclass(tUseAble,tItem).
-subclass(tWearAble,tItem).
-subclass(vtBasicDir,vtBasicDirPlusUpDown).
-subclass(vtBasicDirPlusUpDown,vtDirection).
-subclass(vtDirection,tTypevalue).
-subclass(vtPosture,vtVerb).
+genls(tAgentGeneric,tObj).
+genls(tAgentGeneric,tSpatialThing).
+genls(tCarryAble,tItem).
+genls(tChargeAble,tItem).
+genls(tContolDevice,tChargeAble).
+genls(tDoor,tFurniture).
+genls(tDoor,tItem).
+genls(tDrinkAble,tItem).
+genls(tEatAble,tItem).
+genls(tFunction,tRelation).
+genls(tFurniture,tObj).
+genls(tFurniture,tPartofObj).
+genls(tHumanPlayer,tPlayer).
+genls(tItem,tObj).
+genls(tItem,tSpatialThing).
+genls(tMonster,ttAgentGeneric).
+genls(tNpcPlayer,tPlayer).
+genls(tObj,tSpatialThing).
+genls(tPathway,tDoor).
+genls(tPlayer,tAgentGeneric).
+genls(tPred,tRelation).
+genls(tRegion,tSpatialThing).
+genls(ttObjectType,tCol).
+genls(ttSpatialType,tCol).
+genls(tUseAble,tItem).
+genls(tWearAble,tItem).
+genls(vtBasicDir,vtBasicDirPlusUpDown).
+genls(vtBasicDirPlusUpDown,vtDirection).
+genls(vtDirection,tTypevalue).
+genls(vtPosture,vtVerb).
 
 prologHybrid(typeHasGlyph(tCol,ftString)).
 prologHybrid(mudColor(tSpatialThing,vtColor)).
@@ -191,7 +191,7 @@ prologListValued(mudGetPrecepts(tAgentGeneric,ftListFn(tSpatialThing)),[predModu
 prologListValued(mudNearFeet(tAgentGeneric,ftListFn(tSpatialThing)),[]).
 prologListValued(mudNearReach(tAgentGeneric,ftListFn(tSpatialThing)),[predModule(user)]).
 prologMultiValued(action_rules(tAgentGeneric,vtVerb,ftListFn(ftVar),ftVoprop)).
-prologMultiValued(cmdsuccess(tAgentGeneric,ftAction)).
+prologMultiValued(mudLastCmdSuccess(tAgentGeneric,ftAction)).
 prologMultiValued(descriptionHere(ftTerm,ftString)).
 prologMultiValued(descriptionHere(ftTerm,ftString),prologOrdered).
 prologMultiValued(determinerString(ftTerm,ftString)).
@@ -216,7 +216,7 @@ prologMultiValued(mudPossess(tObj,tObj),prologHybrid).
 prologMultiValued(nameStrings(ftTerm,ftString),prologHybrid).
 prologMultiValued(pathBetween(tRegion,vtDirection,tRegion),prologHybrid).
 prologMultiValued(pathName(tRegion,vtDirection,ftString),prologHybrid).
-prologMultiValued(subclass(tCol,tCol),prologHybrid).
+prologMultiValued(genls(tCol,tCol),prologHybrid).
 prologMultiValued(typeGrid(tCol,ftInt,ftListFn(ftString)),prologHybrid).
 prologMultiValued(verbAsWell(ftTerm,ftAction,ftAction),prologHybrid).
 
@@ -258,7 +258,7 @@ prologSingleValued(mudStm(tAgentGeneric,ftInt),prologHybrid).
 prologSingleValued(mudStr(tAgentGeneric,ftInt),prologHybrid).
 prologSingleValued(mudToHitArmorClass0(tAgentGeneric,ftInt),prologHybrid).
 prologSingleValued(mudWeight(tObj,ftInt),prologHybrid).
-prologSingleValued(spawn_rate(isPropFn(subclass(tObj)),ftInt)).
+prologSingleValued(spawn_rate(isPropFn(genls(tObj)),ftInt)).
 prologSingleValued(stat_total(tAgentGeneric,ftInt)).
 prologSingleValued(typeGrid(tCol,ftInt,ftListFn(ftString))).
 resultIsa(apathFn,tPathway).
@@ -287,7 +287,7 @@ predArgTypes(mudTexture(tSpatialThing,vtTexture)).
 predArgTypes(mudWearing(tAgentGeneric,tWearAble)).
 predArgTypes(pathName(tRegion,vtDirection,ftString)).
 predArgTypes(resultIsa(tFunction,tCol)).
-predArgTypes(success(tAgentGeneric,ftBoolean)).
+predArgTypes(wasSuccess(tAgentGeneric,ftBoolean)).
 predArgTypes(type_action_info(tCol,vtActionTemplate,ftText)).
 %NEXT TODO predTypeMax(mudEnergy,tObj,130).
 %NEXT TODO predTypeMax(mudHealth,tObj,500).
@@ -315,9 +315,10 @@ ensure_some_pathBetween(R1,R2):-
    random_instance(vtDirection,Dir,true),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
    must((add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)))),!.
 
-ensure_some_pathBetween:- forall(no_repeats(is_asserted(pathConnects(R1,R2))),show_call_failure((ensure_some_pathBetween(R1,R2),ensure_some_pathBetween(R2,R1)))).
+:- decl_mpred_prolog(do_ensure_some_pathBetween/0).
+do_ensure_some_pathBetween:- forall(no_repeats((is_asserted(pathConnects(R1,R2)),ground(R1:R2),tRegion(R1),tRegion(R2),dif(R1,R2))),show_call_failure((ensure_some_pathBetween(R1,R2),ensure_some_pathBetween(R2,R1)))).
 
-:-onEachLoad(ensure_some_pathBetween).
+:-onEachLoad(do_ensure_some_pathBetween).
 
 :-assert_until_end_of_file(infSupertypeName).
 :-onEndOfFile(dmsg(infSupertypeName)).
@@ -327,115 +328,115 @@ ensure_some_pathBetween:- forall(no_repeats(is_asserted(pathConnects(R1,R2))),sh
 % ==================================================
 :- do_gc.
 
-subclass(tAgentGeneric,tObj).
-subclass(tItem,tObj).
+genls(tAgentGeneric,tObj).
+genls(tItem,tObj).
 
-subclass(tCandle,tPortableDevice).
-subclass(tFlashlight, tPortableDevice).
-subclass(tDesk, tOfficeRoomFurnature).
-subclass(tApple, tFood).
-subclass(tNani, tArt).
-subclass(tNani, tWashAble).
-subclass(tClothing, tWashAble).
-subclass(tNani, tCarryAble).
-subclass(tBroccoli, tFood).
-subclass(tFood,tEatAble).
-subclass(tCrackers, tFood).
-subclass(tEnvelope, tOfficeItem).
-subclass(tStamp, tOfficeItem).
-subclass(tKey, tOfficeItem).
+genls(tCandle,tPortableDevice).
+genls(tFlashlight, tPortableDevice).
+genls(tDesk, tOfficeRoomFurnature).
+genls(tApple, tFood).
+genls(tNani, tArt).
+genls(tNani, tWashAble).
+genls(tClothing, tWashAble).
+genls(tNani, tCarryAble).
+genls(tBroccoli, tFood).
+genls(tFood,tEatAble).
+genls(tCrackers, tFood).
+genls(tEnvelope, tOfficeItem).
+genls(tStamp, tOfficeItem).
+genls(tKey, tOfficeItem).
 
-subclass(tOfficeItem, tItem).
-subclass(tFood, tItem).
-subclass(tClothing, tItem).
+genls(tOfficeItem, tItem).
+genls(tFood, tItem).
+genls(tClothing, tItem).
 
-subclass(tItem, tCarryAble).
-subclass( tCarryAble, tDropAble).
+genls(tItem, tCarryAble).
+genls( tCarryAble, tDropAble).
 
-subclass( tCarryAble, tThrowAble).
-subclass( tCarryAble, tCarryAble).
+genls( tCarryAble, tThrowAble).
+genls( tCarryAble, tCarryAble).
 
-subclass(tPortableDevice,tCarryAble).
+genls(tPortableDevice,tCarryAble).
 
 :-do_gc.
 
-subclass(tPajamas, tClothing).
-subclass(tShirt, tClothing).
-subclass(tCoat, tClothing).
-subclass(tPants, tClothing).
-subclass(tClothing, tFoldAble).
-subclass(tClothing, tWearAble).
+genls(tPajamas, tClothing).
+genls(tShirt, tClothing).
+genls(tCoat, tClothing).
+genls(tPants, tClothing).
+genls(tClothing, tFoldAble).
+genls(tClothing, tWearAble).
 
-subclass(tCoffeeCup, tLiquidContainer).
-subclass(tCoffeeCup, tDrinkAble).
-subclass(tCoffeeCup, tThrowAble).
-subclass(tCoffee, tLiquid).
-subclass(tBook, tReadAble).
+genls(tCoffeeCup, tLiquidContainer).
+genls(tCoffeeCup, tDrinkAble).
+genls(tCoffeeCup, tThrowAble).
+genls(tCoffee, tLiquid).
+genls(tBook, tReadAble).
 
-subclass(tPillow, tBedding).
-subclass(tBlanket, tBedding).                                                              
-subclass(tBedding, tFoldAble).
-subclass(tFoldAble, tCarryAble).
-subclass(tThrowAble, tCarryAble).
-subclass(tPortableDevice,tCarryAble).
-subclass(tPortableDevice,tPhysicalDevice).
-subclass(tPhysicalDevice,tUseAble).
-subclass(tWearAble, tCarryAble).
-subclass(tCarryAble,tCarryAble).
-subclass(tFood,tCarryAble).
-subclass(tCarryAble,tObj).
-subclass(tPartofObj,tNotTakAble).
-subclass(tBodyPart,tPartofObj).
+genls(tPillow, tBedding).
+genls(tBlanket, tBedding).                                                              
+genls(tBedding, tFoldAble).
+genls(tFoldAble, tCarryAble).
+genls(tThrowAble, tCarryAble).
+genls(tPortableDevice,tCarryAble).
+genls(tPortableDevice,tPhysicalDevice).
+genls(tPhysicalDevice,tUseAble).
+genls(tWearAble, tCarryAble).
+genls(tCarryAble,tCarryAble).
+genls(tFood,tCarryAble).
+genls(tCarryAble,tObj).
+genls(tPartofObj,tNotTakAble).
+genls(tBodyPart,tPartofObj).
 
 
-subclass(tLightSwitch, tWallFurnature).
-subclass(tComputer, tOfficeFurnature).
-subclass(tPartofFurnature,tPartofObj).
+genls(tLightSwitch, tWallFurnature).
+genls(tComputer, tOfficeFurnature).
+genls(tPartofFurnature,tPartofObj).
 
-subclass(tBed, tBedRoomFurnature).
-subclass(tStandTable, tBedRoomFurnature).
-subclass(tDresser, tBedRoomFurnature).
+genls(tBed, tBedRoomFurnature).
+genls(tStandTable, tBedRoomFurnature).
+genls(tDresser, tBedRoomFurnature).
 
-subclass(tWashingMachine, tDeviceFurnature).
-subclass(tTable, tFurnature).
+genls(tWashingMachine, tDeviceFurnature).
+genls(tTable, tFurnature).
 
-subclass(tTable, tFurnatureMoveAble).
+genls(tTable, tFurnatureMoveAble).
 
-subclass(tTable, tHasSurface).
-subclass(tSofa, tLivingRoomFurnature).
-subclass(tEasyChair, tLivingRoomFurnature).
-subclass(tEasyChair, tSitAble).
-subclass(tCoffeeTable, tLivingRoomFurnature).
-subclass(tBookcase, tWallFurnature).
-subclass(tDrawer, tContainer).
-subclass(tDrawer, tOpenAble).
-subclass(tDrawer, tCloseAble).
-subclass(tDrawer, tPartofFurnature).
-subclass(tTopDrawer, tPartofFurnature).
-subclass(tMiddleDrawer, tPartofFurnature).
-subclass(tBottomDrawer, tPartofFurnature). 
-subclass(tHousePlant, tPartofObj).
-subclass(tPlanter, tContainer). 
-subclass(tGueridon, tLivingRoomFurnature).
-subclass(tGardenPlant, tOutdoorFurnature).
-subclass(tSpatialThing,tLookAble).
-subclass(tNani,tTeddybear).
-subclass(tTeddybear,tTreasure).
+genls(tTable, tHasSurface).
+genls(tSofa, tLivingRoomFurnature).
+genls(tEasyChair, tLivingRoomFurnature).
+genls(tEasyChair, tSitAble).
+genls(tCoffeeTable, tLivingRoomFurnature).
+genls(tBookcase, tWallFurnature).
+genls(tDrawer, tContainer).
+genls(tDrawer, tOpenAble).
+genls(tDrawer, tCloseAble).
+genls(tDrawer, tPartofFurnature).
+genls(tTopDrawer, tPartofFurnature).
+genls(tMiddleDrawer, tPartofFurnature).
+genls(tBottomDrawer, tPartofFurnature). 
+genls(tHousePlant, tPartofObj).
+genls(tPlanter, tContainer). 
+genls(tGueridon, tLivingRoomFurnature).
+genls(tGardenPlant, tOutdoorFurnature).
+genls(tSpatialThing,tLookAble).
+genls(tNani,tTeddybear).
+genls(tTeddybear,tTreasure).
 
-subclass(tBathTub,tBathRoomFurnature).
-subclass(tShower,tBathRoomFurnature).
-subclass(tToilet,tBathRoomFurnature).
-subclass(tSink,tBathRoomFurnature).
-subclass(tKitchenSink,tKitchenFurnature).
-subclass(tFridge,tKitchenFurnature).
-subclass(tStove,tKitchenFurnature).
-subclass(tKitchenCounter,tKitchenFurnature).
-subclass(tFurnature,tOntoAble).
+genls(tBathTub,tBathRoomFurnature).
+genls(tShower,tBathRoomFurnature).
+genls(tToilet,tBathRoomFurnature).
+genls(tSink,tBathRoomFurnature).
+genls(tKitchenSink,tKitchenFurnature).
+genls(tFridge,tKitchenFurnature).
+genls(tStove,tKitchenFurnature).
+genls(tKitchenCounter,tKitchenFurnature).
+genls(tFurnature,tOntoAble).
 
-subclass(tBathRoomFurnature,tFurnature).
-subclass(tKitchenFurnature,tFurnature).
-subclass(tLivingRoomFurnature,tFurnature).
-subclass(tOutdoorFurnature,tFurnature).
+genls(tBathRoomFurnature,tFurnature).
+genls(tKitchenFurnature,tFurnature).
+genls(tLivingRoomFurnature,tFurnature).
+genls(tOutdoorFurnature,tFurnature).
 
 :- do_gc.
 

@@ -63,7 +63,8 @@ user:provide_mpred_setup(Op,HeadIn,StubType,OUT):-  StubType = prologOnly, get_p
   not(current_predicate(F/A)),
   module_transparent(F/A),export(F/A),dynamic_safe(F/A),
   asserta_if_new(mpred_prop(F,predStub(StubType))),
-  asserta_if_new(mpred_prop(F,StubType)),!.
+  asserta_if_new(mpred_prop(F,StubType)),!,
+  must(OUT=defined(user:provide_mpred_setup(Op,Head,StubType))).
    
 user:provide_mpred_setup(Op,HeadIn,StubType,OUT):-  StubType = prologOnly, get_pifunctor(HeadIn,Head,F,A),  
   show_call_failure(not(cant_redefine(Head))),
@@ -98,10 +99,10 @@ decl_mpred_prolog(F,Other):-
      decl_mpred_prolog(F0/A).
 
 :-export(decl_mpred_prolog/4).
-decl_mpred_prolog(CM,M,PI,FA):- loop_check(must(decl_mpred_prolog_lc(CM,M,PI,FA)),true).
+decl_mpred_prolog(CM,M,PI,FA):- loop_check(must(decl_mpred_prolog_ilc(CM,M,PI,FA)),true).
 
-% decl_mpred_prolog_lc(_,_,_,_):-!.
-decl_mpred_prolog_lc(CM,M,PI,F/A):-
+% decl_mpred_prolog_ilc(_,_,_,_):-!.
+decl_mpred_prolog_ilc(CM,M,PI,F/A):-
       assert_if_new(mpred_arity(F,A)),
       assert_if_new(mpred_prop(F,prologOnly)),
       assert_if_new(mpred_prop(F,predCanHaveSingletons)),

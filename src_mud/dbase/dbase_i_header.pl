@@ -25,8 +25,8 @@
 :- discontiguous(user:was_enabled/1).
 :- multifile user:listing_mpred_hook/3.
 
-:- multifile user:subclass/2.
-:- dynamic user:subclass/2.
+:- multifile user:genls/2.
+:- dynamic user:genls/2.
 
 :-op(1190,fx,(disabled)).
 :-op(1190,fx,(enabled)).
@@ -54,7 +54,7 @@
 
 :- dynamic_multifile_exported user:must_compile_special_clause_file/1.
 
-:- multifile user:term_anglify/2.
+:- multifile user:local_term_anglify/2.
 :- multifile user:term_anglify_last/2.
 :- multifile user:term_anglify_np/3.
 :- multifile user:term_anglify_np_last/3.

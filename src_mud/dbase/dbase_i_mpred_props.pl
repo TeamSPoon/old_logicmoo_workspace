@@ -135,7 +135,7 @@ assert_arity(F,0):- dmsg(trace_or_throw(assert_arity(F,0))),!.
 assert_arity(F,A):-assert_if_new(mpred_arity(F,A)),assert_if_new(mpred_prop(F,mpred_arity(A))),!.
 assert_arity(F,A):-dmsg(failed_assert_arity(F,A)).
 
-assert_arity_lc(F,A):-
+assert_arity_ilc(F,A):-
   % A2 is A+2,ensure_universal_stub_plus_2(F,A2),
   retractall(mpred_prop(F,mpred_arity(_))),
   retractall(mpred_arity(F,_)),

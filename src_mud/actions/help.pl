@@ -9,7 +9,7 @@
 % :- register_module_type (mtCommand).
 
 %isa(tHumanPlayer,ttAgentType).
-%subclass(ttAgentType,tCol).
+%genls(ttAgentType,tCol).
 
 % user:type_action_info(human_player,help, "shows this help").
 user:type_action_info(tHumanPlayer,actHelp(isOptional(ftString,"")), "shows this help").
@@ -103,6 +103,6 @@ user:hook_coerce(Text,vtVerb,Inst):- get_all_templates(A),nonvar(A),functor_safe
 :-export(good_template/1).
 good_template(Templ):- \+ contains_singletons(Templ).
 
-vtActionTemplate(Templ) <= (loop_check(get_all_templates(Templ),fail)).
+:-pfcAdd((vtActionTemplate(Templ) <= (loop_check(get_all_templates(Templ),fail)))).
 
 

@@ -21,12 +21,7 @@
   use_term_listing/2,  world_clear/1,  
    with_kb_assertions/2)).
 
-same_nvars(G,GG):-
- not(not((
-  %numbervars(G,0,_),
-  %numbervars(GG,0,_),
-  G=@=GG))).
-not_same_nvars(G,GG):-
+not_variant(G,GG):-
  not(not((
   %numbervars(G,0,_),
   %numbervars(GG,0,_),
@@ -49,29 +44,40 @@ world_clear(Named):-fmt('Clearing world database: ~q.~n',[Named]).
 % ================================================
 % is_asserted/1/2/3
 % ================================================
+:- thread_local thlocal:fail_is_asserted/1.
 
+with_fail_is_asserted(Temp,Goal):-with_assertions(thlocal:fail_is_asserted(Temp),Goal).
+
+not_asserted(X):- not(is_asserted_ilc(X)).
 is_asserted_eq(HB):- ( \+ \+ is_asserted(HB)).
 
-is_asserted(V):-var(V),!,trace_or_throw(var_is_asserted(V)).
-is_asserted(HB):-notrace((reduce_clause(is_asserted,HB,HHBB),(HB\=@=HHBB))),!,is_asserted(HHBB).
-is_asserted(prologHybrid(H)):-get_functor(H,F),!,isa_asserted(F,prologHybrid).
-is_asserted(HB):-notrace((fully_expand(is_asserted,HB,HHBB))),!,is_asserted_1(HHBB).
+is_asserted(X):- loop_check(is_asserted_ilc(X)).
+is_asserted(X,Y):- loop_check(is_asserted_ilc(X,Y)).
+is_asserted(X,Y,Z):- loop_check(is_asserted_ilc(X,Y,Z)).
 
-is_asserted_1(clause(H,B)):-!,is_asserted(H,B).
+is_asserted_ilc(V):-var(V),!,trace_or_throw(var_is_asserted(V)).
+is_asserted_ilc(X):- thlocal:fail_is_asserted(X),!,fail.
+is_asserted_ilc(HB):-notrace((reduce_clause(is_asserted_ilc,HB,HHBB),(HB\=@=HHBB))),!,is_asserted_ilc(HHBB).
+% TODO: test removal
+is_asserted_ilc(prologHybrid(H)):-get_functor(H,F),!,isa_asserted(F,prologHybrid).
+is_asserted_ilc(HB):-notrace((fully_expand(is_asserted,HB,HHBB))),!,is_asserted_1(HHBB).
+
+is_asserted_1(clause(H,B,Ref)):-!,is_asserted_ilc(H,B,Ref).
+is_asserted_1(clause(H,B)):-!,is_asserted_ilc(H,B).
 is_asserted_1((H1,H2)):-!,is_asserted_1(H1),is_asserted_1(H2).
 is_asserted_1((H1;H2)):-!,is_asserted_1(H1);is_asserted_1(H2).
-is_asserted_1(clause(H,B,Ref)):-!,is_asserted(H,B,Ref).
+% TODO: test removal
 is_asserted_1(isa(H,B)):-!,isa_asserted(H,B).
-is_asserted_1(HB):-expand_to_hb(HB,H,B),!,is_asserted(H,B).
+is_asserted_1(HB):-expand_to_hb(HB,H,B),!,is_asserted_ilc(H,B).
 
-is_asserted((H:-BB),B):- is_true(B),!,is_asserted(H,BB).
-is_asserted(H,B):-notrace((fully_expand(is_asserted,(H:-B),CL),expand_to_hb(CL,HH,BB))),!,is_asserted_2(HH,BB).
+is_asserted_ilc((H:-BB),B):- is_true(B),!,is_asserted_ilc(H,BB).
+is_asserted_ilc(H,B):-notrace((fully_expand(is_asserted,(H:-B),CL),expand_to_hb(CL,HH,BB))),!,is_asserted_2(HH,BB).
 
-is_asserted_2(H,B):-thglobal:pfcManageHybrids,!,pfc_clause_db(H,B).
+is_asserted_2(H,B):-thglobal:pfcManageHybrids,!,pfc_clause_db_check(H,B).
 is_asserted_2(H,B):-call_no_cuts(user:provide_mpred_storage_clauses(_,H,B,_Ref)),not(notrace(special_wrapper_body(B,_))).
 
-is_asserted((H:-BB),B,Ref):- is_true(B),!,is_asserted(H,BB,Ref).
-is_asserted(H,B,Ref):-notrace((fully_expand(is_asserted,(H:-B),CL),expand_to_hb(CL,HH,BB))),is_asserted_3(HH,BB,Ref).
+is_asserted_ilc((H:-BB),B,Ref):- is_true(B),!,is_asserted_ilc(H,BB,Ref).
+is_asserted_ilc(H,B,Ref):-notrace((fully_expand(is_asserted,(H:-B),CL),expand_to_hb(CL,HH,BB))),is_asserted_3(HH,BB,Ref).
 
 is_asserted_3(H,B,Ref):-thglobal:pfcManageHybrids,!,pfc_clause_db_ref(H,B,Ref).
 is_asserted_3(H,B,Ref):-call_no_cuts(user:provide_mpred_storage_clauses(_,H,B,Ref)),not(notrace(special_wrapper_body(B,_))).
@@ -122,11 +128,11 @@ with_logical_functor(And,[G|T],Call):-
    call(DO).
 
 dbase_modify(Op,                 G):- (var(Op);var(G)),!,trace_or_throw(var_database_modify_op(Op,  G )).
-dbase_modify(Op,                 G):- G\=predArgTypes(_),fully_expand(Op,G,GG),not_same_nvars(G,GG),!,dbase_modify(Op, GG ),!.
+dbase_modify(Op,                 G):- G\=predArgTypes(_),fully_expand(Op,G,GG),not_variant(G,GG),!,dbase_modify(Op, GG ),!.
 dbase_modify(_,  (:-include(FILE))):- !,must(load_data_file_now(FILE)).
 dbase_modify(Op,  (:-(G))         ):- !,must(with_assert_op_override(Op,debugOnError(G))).
 dbase_modify(P,                  G):- thlocal:noDBaseMODs(_),!,dmsg(noDBaseMODs(P,G)).
-dbase_modify(Op,                 G):- dbase_head_expansion(clause,G,GG),not_same_nvars(G,GG),database_modify_0(Op, GG ),!.
+dbase_modify(Op,                 G):- dbase_head_expansion(clause,G,GG),not_variant(G,GG),database_modify_0(Op, GG ),!.
 dbase_modify(Op,                 G):- database_modify_0(Op,G ),!.
 dbase_modify(Op,                 G):- trace_or_throw(unknown_database_modify(Op,G)).
 
@@ -150,9 +156,9 @@ database_modify_0(change(retract,a),          G):- hooked_retract(G).
 database_modify_0(change(retract,one),        G):- hooked_retract(G).
 database_modify_0(change(retract,_),          G):- hooked_retractall(G).
 database_modify_0(change(assert,AZ),          G):- singletons_throw_else_fail(assert(AZ,G)).
-database_modify_0(change(assert,AZ),          G):- copy_term(G,GG),database_modify_3(change(assert,AZ),G,GG),(must(same_nvars(G,GG))).
+database_modify_0(change(assert,AZ),          G):- copy_term(G,GG),database_modify_3(change(assert,AZ),G,GG),(must(variant(G,GG))).
 
-database_modify_3(change(assert,_),         G,GG):- ( \+ \+ is_asserted(GG)),must(same_nvars(G,GG)),!.
+database_modify_3(change(assert,_),         G,GG):- ( \+ \+ is_asserted(GG)),must(variant(G,GG)),!.
 database_modify_3(change(assert,AZ),       _G,GG):- expire_pre_change(AZ,GG),fail.
 database_modify_3(change(assert,AorZ),      G,GG):- G \= (_:-_), get_functor(G,F,A),
    (mpred_prop(F,prologSingleValued) -> (AorZ \== sv -> db_assert_sv(AorZ,G,F,A); fail); 
@@ -164,14 +170,13 @@ database_modify_4(change(assert,AorZ),      G,GG):- Op = change(assert,AorZ),
                               database_modify_5(Op,GG),
                               database_modify_6(Op,GG),
                               database_modify_7(Op,GG),
-                              database_modify_8(Op,GG).
+                              sanity(database_modify_8(Op,GG)).
 
-database_modify_5(Op,GG):- thglobal:pfcManageHybrids,!,must((copy_term(GG,GGG),pfcAdd(GGG), same_nvars(GG,GGG))),!.
-database_modify_5(Op,GG):- must((copy_term(GG,GGG),must_mpred_op(Op,GGG), same_nvars(GG,GGG))),!.
-
-database_modify_6(Op,GG):- must((copy_term(GG,GGE),doall(call_no_cuts(expire_post_change(Op,GGE))),same_nvars(GG,GGE))),!.
-database_modify_7(Op,GG):- must((copy_term(GG,GGH),run_database_hooks(Op,GGH),same_nvars(GG,GGH))),!.
-database_modify_8(Op,GG):- must((copy_term(GG,GGA),must(is_asserted_eq(GGA)),same_nvars(GG,GGA))),!.
+database_modify_5(Op,GG):- thglobal:pfcManageHybrids,!,copy_term(GG,GGG),must((pfcAdd(GGG),sanity(variant(GG,GGG)))),!.
+database_modify_5(Op,GG):- copy_term(GG,GGG),must((must_mpred_op(Op,GGG), sanity(variant(GG,GGG)))),!.
+database_modify_6(Op,GG):- copy_term(GG,GGE),doall(must(call_no_cuts(expire_post_change(Op,GGE)))),sanity(variant(GG,GGE)),!.
+database_modify_7(Op,GG):- copy_term(GG,GGH),must((run_database_hooks(Op,GGH),sanity(variant(GG,GGH)))),!.
+database_modify_8(Op,GG):- copy_term(GG,GGA),is_asserted_eq(GGA),sanity(variant(GG,GGA)),!.
                                
 
 
@@ -330,7 +335,7 @@ add(C0):- ignore((ground(C0),asserta(already_added_this_round(C0)))),!,must_det(
 add(A):-trace_or_throw(fmt('add is skipping ~q.',[A])).
 
 
-implied_skipped(subclass(C0,C0)).
+implied_skipped(genls(C0,C0)).
 implied_skipped(props(_,[])).
 implied_skipped(Skipped):-compound(Skipped), not(functor(Skipped,_,1)),fail, (dbase_t(Skipped);out_of_dbase_t(Skipped)).
 implied_skipped(Skipped):-already_added_this_round(Skipped).
@@ -378,10 +383,10 @@ database_api_entry(Op,Term):- agenda_do_prequery,dbase_op(Op,Term).
 % assert_with to change(CA1,CB2) singlevalue pred
 :-export((db_assert_sv/4)).
 %db_assert_sv(_Must,C,F,A):- throw_if_true_else_fail(contains_singletons(C),db_assert_sv(C,F,A)).
-db_assert_sv(Must,C,F,A):- ex, ignore(( loop_check(db_assert_sv_lc(Must,C,F,A),true))).
+db_assert_sv(Must,C,F,A):- ex, ignore(( loop_check(db_assert_sv_ilc(Must,C,F,A),true))).
 
-:-export((db_assert_sv_lc/4)).
-db_assert_sv_lc(Must,C,F,A):- arg(A,C,UPDATE),db_assert_sv_now(Must,C,F,A,UPDATE),!.
+:-export((db_assert_sv_ilc/4)).
+db_assert_sv_ilc(Must,C,F,A):- arg(A,C,UPDATE),db_assert_sv_now(Must,C,F,A,UPDATE),!.
 
 :-export(db_assert_sv_now/5).
 db_assert_sv_now(Must,C,F,A, UPDATE):- has_free_args(db_assert_sv_now(Must,C,F,A, UPDATE)),!,trace_or_throw(var_db_assert_sv_now(Must,C,F,A, UPDATE)).

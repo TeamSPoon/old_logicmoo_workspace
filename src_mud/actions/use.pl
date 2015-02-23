@@ -14,12 +14,12 @@
 
 predArgTypes(action_verb_useable(vtVerb,tCol,ftTerm(tPred),ftTerm(tPred),ftTerm(tPred))).
 
-subclass(isEach('PortableObject','ProtectiveAttire',tStowAble),tWieldAble).
-subclass('FluidReservoir',tDrinkAble).
-subclass(tWeapon,tWieldAble).
-subclass(tContolDevice,tUseAble).
-subclass(tUseAble,tWieldAble).
-subclass(tStowAble,tCarryAble).
+genls(isEach('PortableObject','ProtectiveAttire',tStowAble),tWieldAble).
+genls('FluidReservoir',tDrinkAble).
+genls(tWeapon,tWieldAble).
+genls(tContolDevice,tUseAble).
+genls(tUseAble,tWieldAble).
+genls(tStowAble,tCarryAble).
 
 
 :-decl_mpred_hybrid(mudWielding/2).

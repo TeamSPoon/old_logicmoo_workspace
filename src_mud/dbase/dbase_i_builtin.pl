@@ -40,14 +40,14 @@
 :- decl_type(ttFormatType).
 :- decl_mpred_hybrid isa/2.
 :- decl_mpred_pfc not/1.
-:- decl_mpred_hybrid subclass/2.
-:- decl_mpred_hybrid(( tCol/1, subclass/2, predArgTypes/1)).
+:- decl_mpred_hybrid genls/2.
+:- decl_mpred_hybrid(( tCol/1, genls/2, predArgTypes/1)).
 :- decl_mpred_hybrid(typeProps/2).
 :- must(mpred_arity(typeProps,2)).
 :- add((argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,predArgTypes,prologHybrid,prologPTTP,predCanHaveSingletons,prologOnly,prologMacroHead,prologListValued,prologSingleValued),1,tPred))).
 :- add((argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,predArgTypes,prologHybrid,prologPTTP,prologOnly,prologMacroHead,prologListValued,prologSingleValued),2,ftListFn(ftVoprop)))).
 :- add((isa(isEach(prologMultiValued,prologOrdered,prologNegByFailure,predArgTypes,prologPTTP,prologHybrid,predCanHaveSingletons,prologOnly,prologOnly,prologMacroHead,prologListValued,prologSingleValued),functorDeclares))).
-:- add((subclass(isEach(prologMultiValued,prologOrdered,prologNegByFailure,predArgTypes,prologHybrid,prologPTTP,prologOnly,prologMacroHead,prologListValued,prologSingleValued),tPred))).
+:- add((genls(isEach(prologMultiValued,prologOrdered,prologNegByFailure,predArgTypes,prologHybrid,prologPTTP,prologOnly,prologMacroHead,prologListValued,prologSingleValued),tPred))).
 :- assert_hasInstance(tCol,tCol).
 :- begin_transform_moo_preds.
 :- debug.
@@ -67,9 +67,9 @@
 :- decl_mpred_hybrid(predTypeMax/3).
 :- decl_mpred_hybrid(prologSingleValued/1).
 :- decl_mpred_hybrid(resultIsa/2).
-:- decl_mpred_hybrid(subclass/2).
+:- decl_mpred_hybrid(genls/2).
 :- decl_mpred_hybrid(isa/2).
-:- decl_mpred_hybrid(subclass/2).
+:- decl_mpred_hybrid(genls/2).
 :- decl_mpred_hybrid(typeGenls/2).
 :- decl_mpred_prolog(arg/3).
 :- decl_type(functorDeclares).
@@ -94,10 +94,10 @@
 %prologHybrid(typeProps(tCol,ftVoprop)).
 :- discontiguous(prologSingleValued/1).
 :- do_gc.
-:- forall(is_pred_declarer(F),must((decl_type(F),add(isa(F,functorDeclares)),add(subclass(F,tPred))))).
+:- forall(is_pred_declarer(F),must((decl_type(F),add(isa(F,functorDeclares)),add(genls(F,tPred))))).
 :- export mtForPred/2.
 :- must_det(argIsa_call(genlPreds,2,_Type)).
-:- user:decl_mpred_hybrid((argIsa/3, formatted_resultIsa/2, localityOfObject/2, subFormat/2, isa/2, mudLabelTypeProps/3, subclass/2, pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, ttFormatType/1, typeProps/2)).
+:- user:decl_mpred_hybrid((argIsa/3, formatted_resultIsa/2, localityOfObject/2, subFormat/2, isa/2, mudLabelTypeProps/3, genls/2, pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, ttFormatType/1, typeProps/2)).
 :-add(isa(tObj,ttSpatialType)).
 :-add(isa(tRegion,ttSpatialType)).
 :-add(isa(ttFormatType,ttAbstractType)).
@@ -138,7 +138,7 @@ ttFormatType(ftVoprop).
 % next_test :- sleep(1),pfcReset.
 
 
-% :-dynamic((disjointWith/2,subclass/2)).
+% :-dynamic((disjointWith/2,genls/2)).
 
 
 predArgTypes(argQuotedIsa(tRelation,ftInt,ttFormatType)).
@@ -239,7 +239,7 @@ disjointWith(tObj,tRegion).
 disjointWith(tRegion,tObj).
 disjointWith(ttSpatialType,ttAbstractType).
 
-dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , subclass(C1,S) ,subclass(C2,S)).
+dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
 dividesBetween(tItem,tMassfull,tMassless).
 dividesBetween(tObj,tItem,tAgentGeneric).
 dividesBetween(tObj,tMassfull,tMassless).
@@ -264,9 +264,9 @@ formatTypePrologCode(ftBoolean,is_boolean).
 formatTypePrologCode(ftText,is_string).
 formatTypePrologCode(ftCodeIs(SomeCode),SomeCode):-nonvar(SomeCode).
 
-(isa(Inst,ttSpatialType), tCol(Inst)) => subclass(Inst,tSpatialThing).
+(isa(Inst,ttSpatialType), tCol(Inst)) => genls(Inst,tSpatialThing).
 % (isa(Inst,Type), tCol(Inst)) => isa(Type,ttTypeType).
-% (isa(TypeType,ttTypeType) , isa(Inst,TypeType), subclass(SubInst,Inst)) => isa(SubInst,TypeType).
+% (isa(TypeType,ttTypeType) , isa(Inst,TypeType), genls(SubInst,Inst)) => isa(SubInst,TypeType).
 
 (ttFormatType(FT),{compound(FT)})=>ttFormatted(FT).
 
@@ -278,7 +278,7 @@ disjointWith(ttSpatialType,ttAbstractType).
 
 
 
-subclass(tPartOfobj,tItem).
+genls(tPartOfobj,tItem).
 
 :-decl_mpred_hybrid(dividesBetween(tCol,tCol,tCol)).
 :-pfcAdd(dividesBetween(tAgentGeneric,tMale,tFemale)).
@@ -290,7 +290,7 @@ dividesBetween(tObj,tMassfull,tMassless).
 dividesBetween(tSpatialThing,tObj,tRegion).
 dividesBetween(tAgentGeneric,tPlayer,tNpcPlayer).
 
-dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , subclass(C1,S) ,subclass(C2,S)).
+dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
 
 % disjointWith(P1,P2) => (not(isa(C,P1)) <=> isa(C,P2)).
 
@@ -334,7 +334,7 @@ pfcSelect(conflict(X)) :- pfcQueue(conflict(X)).
 => pfcDefault((ttBirdType(X) => tFly(X))).
 
 % here's one way to do an isa hierarchy.
-% isa = subclass.
+% isa = genls.
 % isa(C1,C2) => ({P1 =.. [C1,X], P2 =.. [C2,X]}, (P1 => P2)).
 
 => isa(tCanary,ttBirdType).
@@ -358,20 +358,20 @@ tPenguin(X) => not(tFly(X)).
 
 (tCol(Inst), {isa_from_morphology(Inst,Type)}) => isa(Inst,Type).
 
-((disjointWith(P1,P2) , subclass(C1,P1), {dif:dif(C1,P1)}) =>    disjointWith(C1,P2)).
+((disjointWith(P1,P2) , genls(C1,P1), {dif:dif(C1,P1)}) =>    disjointWith(C1,P2)).
 
-((is_asserted(isa(I,Sub)), is_asserted(subclass(Sub, Super)),{dif:dif(Sub, Super)}) => isa(I,Super)).
+((is_asserted(isa(I,Sub)), is_asserted(genls(Sub, Super)),{dif:dif(Sub, Super)}) => isa(I,Super)).
 /*
 :-prolog.
 
-(isa(COLTYPEINST,COLTYPE) , typeGenls(COLTYPE,COL)) => subclass(COLTYPEINST,COL).
-subclass(_Sub, Super) => tCol(Super).
-subclass(Sub, _Super) => tCol(Sub).
+(isa(COLTYPEINST,COLTYPE) , typeGenls(COLTYPE,COL)) => genls(COLTYPEINST,COL).
+genls(_Sub, Super) => tCol(Super).
+genls(Sub, _Super) => tCol(Sub).
 % use backchain instead (isa(I,Sub), disjointWith(Sub, Super)) => not(isa(I,Super)).
 
-( ttFormatted(FT), {dif:dif(FT,COL)}, subclass(FT, COL),tCol(COL),{not(isa(COL,ttFormatType))}) => formatted_resultIsa(FT,COL).
+( ttFormatted(FT), {dif:dif(FT,COL)}, genls(FT, COL),tCol(COL),{not(isa(COL,ttFormatType))}) => formatted_resultIsa(FT,COL).
 
-(subclass(I,Sub),{dif:dif(I,Super),is_asserted(subclass(I,Sub)),is_asserted(subclass(Sub, Super)), nonvar(I),nonvar(Sub),nonvar(Super)})    => (subclass(I,Super) , completeExtentAsserted(subclass)).
+(genls(I,Sub),{dif:dif(I,Super),is_asserted(genls(I,Sub)),is_asserted(genls(Sub, Super)), nonvar(I),nonvar(Sub),nonvar(Super)})    => (genls(I,Super) , completeExtentAsserted(genls)).
 
 
 % tCol(Col) <=> isa(Col,tCol).

@@ -86,7 +86,7 @@ mpred_arity_pred(P):- nonvar(P),arg(_,a(arity,mpred_arity,arityMax,arityMin),P).
 mpred_arity_pred(mpred_arity).
 
 as_one_of(Types,Type):-nonvar(Type),tCol(Type),!,member(Type,Types).
-as_one_of([Type],TypeO):-!,same_arg(same_or(subclass),Type,TypeO).
+as_one_of([Type],TypeO):-!,same_arg(same_or(genls),Type,TypeO).
 as_one_of(Types,isOneOf(Types)).
 
 
@@ -187,7 +187,7 @@ argIsa_call_3(WP,tPred(mpred_arity(2))):-member(WP,[predProxyRetract,predProxyAs
 argIsa_call_3(disjointWith,tCol).
 argIsa_call_3(ftFormFn,ftTerm).
 argIsa_call_3(mudTermAnglify,ftTerm).
-argIsa_call_3(subclass,tCol).
+argIsa_call_3(genls,tCol).
 argIsa_call_3(subFormat,ttFormatType).
 
 % argIsa_call_0(HILOG,_,term):-hilog_functor(HILOG).
@@ -241,7 +241,7 @@ correctArgsIsa(_,NC,NC):-as_is_term(NC),!.
 correctArgsIsa(_,G,G):- (is_release; bad_idea;  thlocal:infSkipArgIsa),!.
 correctArgsIsa(Op,M:G,MAA):- nonvar(M),!,correctArgsIsa(Op,G,GG),M:GG=MAA.
 correctArgsIsa(Op,(A,B),(AA,BB)):-!,correctArgsIsa(Op,A,AA),correctArgsIsa(Op,B,BB).
-correctArgsIsa(_,G,GG):- get_functor(G,F,A),arg(_,vv(subclass/_,mpred_prop/_,mpred_arity/_,subclass/_,mudDescription/_,'<=>'/_,formatted_resultIsa/_,resultIsa/_,formatTypePrologCode/_),F/A),!,must_equals(G,GG).
+correctArgsIsa(_,G,GG):- get_functor(G,F,A),arg(_,vv(genls/_,mpred_prop/_,mpred_arity/_,genls/_,mudDescription/_,'<=>'/_,formatted_resultIsa/_,resultIsa/_,formatTypePrologCode/_),F/A),!,must_equals(G,GG).
 correctArgsIsa(_,G,GG):- get_functor(G,F),hasInstance(functorDeclares,F),!,must_equals(G,GG).
 correctArgsIsa(_,G,GG):- thlocal:trust_argIsas, !,must_equals(G,GG).
 correctArgsIsa(Op,G,GG):- correctArgsIsa0(Op,G,GG),nonvar(GG),!.
@@ -429,7 +429,7 @@ correctType0(Op,Args,Types,NewArgs):-compound(Args), compound(Types),
    correctAnyType(Op,ArgsL,TypesL,NewArgsL).
 
 correctType0(Op,A,Fmt,AA):- trans_subft(Fmt,Code),Fmt\=Code,loop_check(correctType0(Op,A,Code,AA)).
-correctType0(Op,A,Super,AA):- hasInstance(ttFormatType,Super),req(subclass(Sub,Super)),Sub\=Super,loop_check(correctType0(Op,A,Sub,AA)).
+correctType0(Op,A,Super,AA):- hasInstance(ttFormatType,Super),req(genls(Sub,Super)),Sub\=Super,loop_check(correctType0(Op,A,Sub,AA)).
 
 correctType0(Op,Arg,Props,NewArg):- compound(Props),
    Props=..[F|TypesL],

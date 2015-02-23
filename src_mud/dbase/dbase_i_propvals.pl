@@ -64,11 +64,11 @@ choose_right(Prop,Obj,Value):- choose_for(Prop,Obj,RValue),RValue=Value.
 
 :-export(choose_for/3).
 
-choose_for(mudAtLoc,Obj,_):-nonvar(Obj),isa_asserted(Obj,tRegion),!,fail.
+choose_for(mudAtLoc,Obj,_):- nonvar(Obj),isa_asserted(Obj,tRegion),!,fail.
 choose_for(Prop,Obj,Value):- var(Obj),trace_or_throw(var_choose_for(Prop,Obj,Value)).
 choose_for(Prop,Obj,Value):- not(is_fact_consistent(dbase_t(Prop,Obj,Value))),!,fail.
-choose_for(Prop,Obj,Value):- mpred_prop(Prop,prologSingleValued),!,choose_one(Prop,Obj,Value),!.
-choose_for(Prop,Obj,Value):- nonvar(Value),!,choose_each(Prop,Obj,RValue),!,RValue=Value.
+choose_for(Prop,Obj,Value):- nonvar(Value),!,choose_for(Prop,Obj,RValue),!,RValue=Value.
+choose_for(Prop,Obj,Value):- mpred_prop(Prop,prologSingleValued),!,must(choose_one(Prop,Obj,Value)),!.
 choose_for(Prop,Obj,Value):- no_repeats(choose_each(Prop,Obj,Value)).
 
 choose_one(mudAtLoc,Obj,_):-nonvar(Obj),isa_asserted(Obj,tRegion),!,fail.
@@ -76,13 +76,13 @@ choose_one(Prop,Obj,Value):- choose_asserted(Prop,Obj,RValue),!,Value=RValue.
 % was choose_one(Prop,Obj,Value):- with_fallbacks(with_fallbacksg(fallback_value(Prop,Obj,RValue))),checkNoArgViolation(Prop,Obj,RValue),!,Value = RValue,maybe_save(Obj,Prop,Value).
 choose_one(Prop,Obj,_Value):- Fact=.. [Prop,Obj,_],thlocal:infInstanceOnly(Fact),!,fail.
 choose_one(Prop,Obj,Value):- with_fallbacks(fallback_value(Prop,Obj,RValue)),ground(choose_one(Prop,Obj,RValue)),checkNoArgViolation(Prop,Obj,RValue),!,Value = RValue,save_fallback(Obj,Prop,Value).
-choose_one(Prop,Obj,Value):- create_someval(Prop,Obj,RValue),ground(create_someval(Prop,Obj,RValue)),ground(create_someval(Prop,Obj,RValue)),checkNoArgViolation(Prop,Obj,RValue),!,Value = RValue,save_fallback(Obj,Prop,Value).
+choose_one(Prop,Obj,Value):- create_someval(Prop,Obj,RValue),ground(create_someval(Prop,Obj,RValue)),checkNoArgViolation(Prop,Obj,RValue),!,Value = RValue,save_fallback(Obj,Prop,Value).
 
-choose_each(Prop,Obj,Value):- mpred_prop(Prop, completelyAssertedCollection),!,choose_asserted(Prop,Obj,Value).
+choose_each(Prop,Obj,Value):- hasInstance(completeExtentAsserted, Prop),!,choose_asserted(Prop,Obj,Value).
 choose_each(Prop,Obj,Value):- one_must(choose_asserted(Prop,Obj,Value),(fallback_value(Prop,Obj,Value),maybe_cache(Prop,Obj,Value,Obj))).
 
 % choose_asserted(Prop,Obj,Value):- dbase_t(Prop,Obj,Value). % ,must_det(is_asserted(dbase_t(Prop,Obj,Value))).
-% choose_asserted(Prop,Obj,Value):- is_asserted(dbase_t(Prop,Obj,Value)).
+choose_asserted(Prop,Obj,Value):- is_asserted(dbase_t(Prop,Obj,Value)).
 choose_asserted(Prop,Obj,Value):- choose_asserted_mid_order(Prop,Obj,Value).
 choose_asserted(Prop,Obj,Value):- nonvar(Obj),transitive_other(Prop,1,Obj,What),choose_asserted_mid_order(Prop,Obj,Value),maybe_cache(Prop,Obj,Value,What).
 
@@ -110,15 +110,21 @@ asserted_or_deduced(Fact):- deducedSimply(Fact),is_fact_consistent(Fact),add(Fac
 my_random_member(LOC,LOCS):- must_det((length(LOCS,Len),Len>0)),random_permutation(LOCS,LOCS2),!,member(LOC,LOCS2).
 
 :-export(random_instance/3).
+random_instance_no_throw(Type,Value,Test):-var(Test),!,random_instance_no_throw(Type,Value,true).
 random_instance_no_throw(Type,Value,Test):- copy_term(ri(Type,Value,Test),ri(RType,RValue,RTest)),
    hooked_random_instance(RType,RValue,RTest),
    checkAnyType(query(_,_),RValue,Type,Value),
    must_det(Test),!.
 random_instance_no_throw(Type,Value,Test):- atom(Type),atom_concat('random_',Type,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),call(Fact),Test,!.
-random_instance_no_throw(Type,Value,Test):- compound(Type),get_functor(Type,F),isa(F,_),atom_concat('random_',F,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),Fact,Test,!.
+random_instance_no_throw(Type,Value,Test):- compound(Type),get_functor(Type,F),atom_concat('random_',F,Pred),current_predicate(F/1),Fact=..[Pred,Value],predicate_property(Fact,_),Fact,Test,!.
+random_instance_no_throw(Type,Value,Test):- compound(Type),get_functor(Type,F,GA),guess_arity(F,GA,A),functor(Formatted,F,A),hasInstance(ttFormatted,Formatted),
+                         Formatted=..[F|ArgTypes],functor(Value,F,A),Value=..[F|ValueArgs],must((maplist(random_instance_no_throw,ArgTypes,ValueArgs,_),Test)),!.
 random_instance_no_throw(Type,Value,Test):- findall(V,isa(V,Type),Possibles),Possibles\=[],must_det((my_random_member(Value,Possibles),Test)),!.
 
 random_instance(Type,Value,Test):- must(random_instance_no_throw(Type,Value,Test)).
+
+guess_arity(F,GA,A):-GA=0,!,must(mpred_arity(F,A)).
+guess_arity(F,GA,A):-mpred_arity(F,A);A=GA.
 
 save_fallback(Fact):-not(ground(Fact)),trace_or_throw(var_save_fallback(Fact)).
 save_fallback(Fact):-is_fact_consistent(Fact),add(Fact).
@@ -168,7 +174,7 @@ user:hook_coerce(Text,tPred,Pred):- mpred_prop(Pred,mpred_arity(_)),name_text(Pr
 
 
 subft_or_subclass_or_same(C,C):-!.
-subft_or_subclass_or_same(S,C):-subclass(S,C),!.
+subft_or_subclass_or_same(S,C):-genls(S,C),!.
 checkNoArgViolationOrDeduceInstead(_Prop,_,Obj,_OType,_Type):-var(Obj),!.
 checkNoArgViolationOrDeduceInstead(_Prop,_N,_Obj,[H|T],Type):-nonvar(T),!,member(E,[H|T]),subft_or_subclass_or_same(E,Type),!.
 checkNoArgViolationOrDeduceInstead(Prop,N,[H|T],OType,Type):-!,forall(member(Obj,[H|T]),checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type)).
@@ -239,7 +245,7 @@ user:decl_database_hook(change(assert,_),Fact):- ignore((not(dont_check_args(Fac
 
 
 :-export(fallback_value/3).
-fallback_value(Prop,Obj,Value):- is_asserted(dbase_t(Prop,Obj,Value)),!.
+fallback_value(Prop,Obj,Value):- isa(Obj,ObjType),is_asserted(dbase_t(Prop,isTypeFn(ObjType),Value)),!.
 fallback_value(_Prop,Obj,_Value):-var(Obj),!,fail.
 fallback_value(Prop,_Obj,_Value):-no_fallback(Prop,2),!,fail.
 fallback_value(Prop,Obj,Value):-Fact=..[Prop,Obj,Value], 
@@ -249,7 +255,7 @@ fallback_value(Prop,Obj,Value):-Fact=..[Prop,Obj,Value],
 
 %:-dmsg_hide(defaultArgValue).
 
-no_fallback(subclass,2).
+no_fallback(genls,2).
 no_fallback(P,2):-not(mpred_prop(P,prologSingleValued)).
 
 :-export(defaultArgValue/4).
@@ -313,8 +319,8 @@ each_default_inst_type_props(_,Type,[typeHasGlyph(Lbl)|Props]):-call_no_cuts(mud
 :-export((add_missing_instance_defaults/1)).
 add_missing_instance_defaults(_P):-dontAssertTypeProps,!.
 add_missing_instance_defaults(P):-
-   loop_check_local(add_missing_instance_defaults_lc(P),true).
-add_missing_instance_defaults_lc(P):-
+   loop_check_local(add_missing_instance_defaults_ilc(P),true).
+add_missing_instance_defaults_ilc(P):-
    get_inst_default_props(P,_PropListL,Missing),
    once(Missing=[];show_call(padd(P,Missing))).
 
@@ -348,10 +354,10 @@ dontAssertTypeProps:-!.
 
 :-export(agenda_rescan_sim_objects/0).
 
-agenda_rescan_sim_objects:- loop_check_local(agenda_rescan_sim_objects_lc,true).
-% agenda_rescan_sim_objects_lc:- dmsg(todo(fix(agenda_rescan_sim_objects,"to not set atloc/2"))),!,
-agenda_rescan_sim_objects_lc:-dontAssertTypeProps,!.
-agenda_rescan_sim_objects_lc:-
+agenda_rescan_sim_objects:- loop_check_local(agenda_rescan_sim_objects_ilc,true).
+% agenda_rescan_sim_objects_ilc:- dmsg(todo(fix(agenda_rescan_sim_objects,"to not set atloc/2"))),!,
+agenda_rescan_sim_objects_ilc:-dontAssertTypeProps,!.
+agenda_rescan_sim_objects_ilc:-
    once((forall_setof(get_type_default_props(Type,PropList),
     once((dmsg(get_type_default_props(Type,PropList)),
      ignore((fail,forall_setof(isa(I,Type), 
@@ -362,7 +368,7 @@ agenda_rescan_sim_objects_lc:-
           dmsg(agenda_rescan_sim_objects_for(I,Type,missing_from(Missing))),
           padd(I,Missing))))))))))),fail.
 
-agenda_rescan_sim_objects_lc:-ignore(loop_check_local(rescan_duplicated_facts,true)).
+agenda_rescan_sim_objects_ilc:-ignore(loop_check_local(rescan_duplicated_facts,true)).
 
 
 % :- include(logicmoo(parsing/parser_chat80)). 

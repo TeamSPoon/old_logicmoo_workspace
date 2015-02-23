@@ -88,14 +88,14 @@ call_after_next(When,C):- ignore((When,!,do_all_of(When))),assert_next(When,C).
 do_all_of_when(When):- ignore((more_to_do(When),When,do_all_of(When))).
 
 :-export(do_all_of/1).
-do_all_of(When):- ignore(loop_check_local(do_all_of_lc(When),true)),!.
-do_all_of_lc(When):- not(thglobal:will_call_after(When,_)),!.
-do_all_of_lc(When):-  repeat,do_stuff_of_lc(When), not(more_to_do(When)).
+do_all_of(When):- ignore(loop_check_local(do_all_of_ilc(When),true)),!.
+do_all_of_ilc(When):- not(thglobal:will_call_after(When,_)),!.
+do_all_of_ilc(When):-  repeat,do_stuff_of_ilc(When), not(more_to_do(When)).
 
 more_to_do(When):-predicate_property(thglobal:will_call_after(When,_),number_of_clauses(N)),!,N>0.
 
-do_stuff_of_lc(When):-not(more_to_do(When)),!.
-do_stuff_of_lc(When):- thglobal:will_call_after(When,A),!,retract(thglobal:will_call_after(When,A)),!,call(A),!.
+do_stuff_of_ilc(When):-not(more_to_do(When)),!.
+do_stuff_of_ilc(When):- thglobal:will_call_after(When,A),!,retract(thglobal:will_call_after(When,A)),!,call(A),!.
 
 
 
@@ -217,7 +217,7 @@ rescan_duplicated_facts(M,H,BB):-notrace(doall((gather_fact_heads(M,H),BB=true,o
                                                                      list_to_set(CF1,CF2),once(reduce_fact_heads(M,H,CF1,CF2))))))).
 rerun_database_hooks:-!.
 rerun_database_hooks:-time_call(doall((gather_fact_heads(_M,H),forall(is_asserted(H),run_database_hooks(change(assert,z),H))))),fail.
-rerun_database_hooks:-time_call(doall((is_asserted(subclass(I,C)),run_database_hooks(change(assert,z),subclass(I,C))))),fail.
+rerun_database_hooks:-time_call(doall((is_asserted(genls(I,C)),run_database_hooks(change(assert,z),genls(I,C))))),fail.
 rerun_database_hooks:-time_call(doall((isa_asserted(I,C),run_database_hooks(change(assert,z),isa(I,C))))),fail.
 
 reduce_fact_heads(_M,_H,CF1,CF1):-!. % no change

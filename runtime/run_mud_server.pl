@@ -78,8 +78,7 @@ tCol(tLivingRoom).
 subclass(tLivingRoom,tRegion).
 subclass(tOfficeRoom,tRegion).
 :- onSpawn(pathConnects(tLivingRoom,tOfficeRoom)).
-:- prolog.
-:- ensure_some_pathBetween.
+:- do_ensure_some_pathBetween.
 % int_firstOrder(some_query, 666, What, C, E, A, J, D, L, B)
 % :- forall(clause(user:mud_regression_test,Call),must(Call)).
 
@@ -92,7 +91,9 @@ subclass(tOfficeRoom,tRegion).
 % :- add_game_dir('../games/src_game_sims',prolog_repl).
 
 
-%:- add_game_dir('../games/src_game_startrek',prolog_repl).
+% :- add_game_dir('../games/src_game_startrek',prolog_repl).
+:- declare_load_dbase('../games/src_game_startrek/startrek.all.plmoo').
+
 
 tAgentGeneric(iCommanderData66).
 isa(iCommanderData66,'tMonster').
@@ -107,25 +108,24 @@ pddlSomethingIsa('iGoldUniform675',['tGoldUniform','ProtectiveAttire','PortableO
 pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
 mudDescription(iCommanderData66,txtFormatFn("Very screy looking monster named ~w",[iCommanderData66])).
 
-tAgentGeneric(iExplorer77).
-wearsClothing(iExplorer77,'iBoots7773').
-wearsClothing(iExplorer77,'iComBadge7774').
-wearsClothing(iExplorer77,'iGoldUniform7775').
-isa(iExplorer77,'tExplorer').
-mudStowing(iExplorer77,'iPhaser7776').
+tAgentGeneric(iExplorer1).
+wearsClothing(iExplorer1,'iBoots7773').
+wearsClothing(iExplorer1,'iComBadge7774').
+wearsClothing(iExplorer1,'iGoldUniform7775').
+isa(iExplorer1,'tExplorer').
+mudStowing(iExplorer1,'iPhaser7776').
 pddlSomethingIsa('iBoots7773',['tBoots','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iComBadge7774',['tComBadge','ProtectiveAttire','PortableObject','tNecklace']).
 pddlSomethingIsa('iGoldUniform7775',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iPhaser7776',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
-isa(iExplorer77,'tExplorer').
+isa(iExplorer1,'tExplorer').
 
-:-onSpawn(localityOfObject(iExplorer77,'tLivingRoom')).
+:-onSpawn(localityOfObject(iExplorer1,'tLivingRoom')).
 
 
 % [Manditory] This loads the game and initializes so test can be ran
 :- if_startup_script( at_start(finish_processing_world)).
 
-:- prolog.
 % :- if_startup_script( doall(now_run_local_tests_dbg)).
 
 :-enqueue_player_command(actWho).

@@ -94,7 +94,7 @@ never_type_f('user_ensure_loaded').
 never_type_f('meta_predicate').
 never_type_f('Area1000').
 never_type_f(iPlayer2).
-never_type_f(subclass).
+never_type_f(genls).
 never_type_f(must).
 never_type_f(mpred_prop).
 never_type_f(formatTypePrologCode).
@@ -189,7 +189,7 @@ not_ft_quick(T):-nonvar(T),(T=tItem;T=tRegion;T=tCol;T=completelyAssertedCollect
 
 :-export(asserted_subclass/2).
 asserted_subclass(I,T):- ((thlocal:useOnlyExternalDBs,!);thglobal:use_cyc_database),(kbp_t([genls,I,T])).
-asserted_subclass(T,ST):-dbase_t(subclass,T,ST).
+asserted_subclass(T,ST):-dbase_t(genls,T,ST).
 
 chk_ft(T):- not_ft_quick(T),!,fail.
 %chk_ft(I):- thlocal:infForward, dbase_t(formatTypePrologCode,I,_),!.
@@ -212,12 +212,12 @@ transitive_subclass_or_same(A,B):-transitive_subclass(A,B).
 :-export((transitive_subclass/2)).
 transitive_subclass(_,T):-T==ttFormatType,!,fail.
 transitive_subclass(A,_):-A==ttFormatType,!,fail.
-transitive_subclass(A,T):-thglobal:pfcManageHybrids,!,clause(subclass(A,T),true).
-transitive_subclass(A,T):- fail, bad_idea,!, into_single_class(A,AA), into_single_class(T,TT), fact_loop_checked(subclass(A,T),transitive_P_l_r(dbase_t,subclass,AA,TT)).
+transitive_subclass(A,T):-thglobal:pfcManageHybrids,!,clause(genls(A,T),true).
+transitive_subclass(A,T):- fail, bad_idea,!, into_single_class(A,AA), into_single_class(T,TT), fact_loop_checked(genls(A,T),transitive_P_l_r(dbase_t,genls,AA,TT)).
 transitive_subclass(I,T):- fail,stack_check,((thlocal:useOnlyExternalDBs,!);thglobal:use_cyc_database),
-   fact_loop_checked(subclass(I,T),transitive_P_l_r(cyckb_t,genls,I,T)).
-% transitive_subclass(A,T):- subclass(A,T).
-transitive_subclass(A,T):- fact_loop_checked(subclass(A,T),transitive_P(dbase_t,subclass,A,T)).
+   fact_loop_checked(genls(I,T),transitive_P_l_r(cyckb_t,genls,I,T)).
+% transitive_subclass(A,T):- genls(A,T).
+transitive_subclass(A,T):- fact_loop_checked(genls(A,T),transitive_P(dbase_t,genls,A,T)).
 
 transitive_P(DB,P,L,R):-call(DB,P,L,R).
 transitive_P(DB,P,L,R):-var(L),!,transitive_P_r_l(DB,P,L,R).
@@ -236,23 +236,23 @@ is_known_true(C):-has_free_args(C),!,trace_or_throw(has_free_args(is_known_trew,
 is_known_true(F):-is_known_false0(F),!,fail.
 is_known_true(F):-is_known_trew(F),!.
 %is_known_true(isa(G,tSpatialThing)):- hasInstance(_,G),not_mud_isa(G,tCol),not_mud_isa(G,tPred).
-is_known_true(subclass(G,G)).
+is_known_true(genls(G,G)).
 is_known_true(isa(apathFn(_,_),tPathway)).
 is_known_true(isa(_,ftTerm)).
 is_known_true(isa(_,ftID)).
 
 
 :-export(is_known_trew/1).
-is_known_trew(subclass(tRegion,tChannel)).
-is_known_trew(subclass('MaleAnimal',tAgentGeneric)).
-is_known_trew(subclass(prologSingleValued, extentDecidable)).
-is_known_trew(subclass(tAgentGeneric,tChannel)).
-is_known_trew(subclass(completelyAssertedCollection, extentDecidable)).
-is_known_trew(subclass(ttFormatType,tCol)).
-is_known_trew(subclass(ttFormatType,ttNotSpatialType)).
-is_known_trew(subclass(predArgTypes,tRelation)).
-is_known_trew(subclass(tFunction,tRelation)).
-is_known_trew(subclass(F,tPred)):-is_pred_declarer(F).
+is_known_trew(genls(tRegion,tChannel)).
+is_known_trew(genls('MaleAnimal',tAgentGeneric)).
+is_known_trew(genls(prologSingleValued, extentDecidable)).
+is_known_trew(genls(tAgentGeneric,tChannel)).
+is_known_trew(genls(completelyAssertedCollection, extentDecidable)).
+is_known_trew(genls(ttFormatType,tCol)).
+is_known_trew(genls(ttFormatType,ttNotSpatialType)).
+is_known_trew(genls(predArgTypes,tRelation)).
+is_known_trew(genls(tFunction,tRelation)).
+is_known_trew(genls(F,tPred)):-is_pred_declarer(F).
 is_known_trew(disjointWith(A,B)):-disjointWithT(A,B).
 
 pfcNeverTrue(P):-is_known_false(P).
@@ -263,13 +263,13 @@ is_known_false(F):-is_known_false0(F),!.
 
 :-export(is_known_false0/1).
 is_known_false0(isa(G,Why)):-!,catch(not_mud_isa(G,Why),_,fail).
-is_known_false0(subclass(Type,_)):-arg(_,vv(tCol,tRelation,ttFormatType),Type).
+is_known_false0(genls(Type,_)):-arg(_,vv(tCol,tRelation,ttFormatType),Type).
 
 
 :-export(has_free_args/1).
 has_free_args(C):- not(ground(C)), compound(C),not(not(arg(_,C,var))),!.
 
-% is_known_false(subclass(A,B)):-disjointWith(A,B).
+% is_known_false(genls(A,B)):-disjointWith(A,B).
 
 disjointWith0(tAgentGeneric,tItem).
 disjointWith0(tRegion,tObj).
@@ -326,7 +326,7 @@ isa_backchaing_i_i(I,T):-isa_asserted_bc(I,T),!.
 isa_backchaing_i_i(I,T):-not(hasInstance(completelyAssertedCollection,T)),!,no_repeats_old(transitive_subclass_or_same(AT,T)),isa_asserted_bc(I,AT).
 
 % ==========================
-% taxonomicPair(isa,subclass)
+% taxonomicPair(isa,genls)
 % ==========================
 /*
 % A->TL = (isa_asserted_0(A,AT),transitive_subclass_or_same(AT,TL))
@@ -337,8 +337,8 @@ build_isa_inst_list_cache(A,Isa,B,(!,dbase_t(cache_I_I,Isa,A,B))):- Isa=isa, non
 */
 
 % A->TL = transitive_subclass(T,TL).
-build_genls_inst_list_cache(A,Subclass,B,dbase_t(cache_I_I,Subclass,A,B)):- Subclass=subclass, nonvar(A),once(dbase_t(cache_I_I,Subclass,A,_)),!.
-build_genls_inst_list_cache(A,Subclass,B,dbase_t(cache_I_I,Subclass,A,B)):- Subclass=subclass, nonvar(A),forall(transitive_subclass(A,T),assertz_if_new(dbase_t(cache_I_I,Subclass,A,T))).
+build_genls_inst_list_cache(A,Subclass,B,dbase_t(cache_I_I,Subclass,A,B)):- Subclass=genls, nonvar(A),once(dbase_t(cache_I_I,Subclass,A,_)),!.
+build_genls_inst_list_cache(A,Subclass,B,dbase_t(cache_I_I,Subclass,A,B)):- Subclass=genls, nonvar(A),forall(transitive_subclass(A,T),assertz_if_new(dbase_t(cache_I_I,Subclass,A,T))).
 
 
 /*
@@ -416,11 +416,11 @@ dont_call_type_arity_one(ttFormatType).
 dont_call_type_arity_one(ttAgentType).
 dont_call_type_arity_one(F):-mpred_prop(F,prologHybrid),!.
 
-isa_atom_call(T,G):-loop_check(isa_atom_call_lc(T,G)).
+isa_atom_call(T,G):-loop_check(isa_atom_call_ilc(T,G)).
 
-isa_atom_call_lc(_,G):- real_builtin_predicate(G),!,G.
-isa_atom_call_lc(_,G):- predicate_property(G,number_of_clauses(_)),!,clause(G,B),call_mpred_body(G,B).
-isa_atom_call_lc(_,G):- predicate_property(G,number_of_rules(R)),R>0,!,G.
+isa_atom_call_ilc(_,G):- real_builtin_predicate(G),!,G.
+isa_atom_call_ilc(_,G):- predicate_property(G,number_of_clauses(_)),!,clause(G,B),call_mpred_body(G,B).
+isa_atom_call_ilc(_,G):- predicate_property(G,number_of_rules(R)),R>0,!,G.
 
 
 cached_isa(I,T):-hotrace(isa_backchaing(I,T)).
@@ -486,12 +486,12 @@ assert_subclass(O,T):-assert_subclass_safe(O,T).
 
 :-export(assert_subclass_safe/2).
 assert_subclass_safe(O,T):-
-  ignore((nonvar(O),decl_type_safe(O),nonvar(T),decl_type_safe(T),nonvar(O),nop((not(chk_ft(O)),not(chk_ft(T)))),add(subclass(O,T)))).
+  ignore((nonvar(O),decl_type_safe(O),nonvar(T),decl_type_safe(T),nonvar(O),nop((not(chk_ft(O)),not(chk_ft(T)))),add(genls(O,T)))).
 
 :-export(assert_isa_safe/2).
 assert_isa_safe(O,T):- ignore((nonvar(O),nonvar(T),decl_type_safe(T),assert_isa(O,T))).
 
-user:decl_database_hook(change(assert,_A_or_Z),subclass(S,C)):-decl_type_safe(S),decl_type_safe(C).
+user:decl_database_hook(change(assert,_A_or_Z),genls(S,C)):-decl_type_safe(S),decl_type_safe(C).
 
 
 user:decl_database_hook(change(assert,_A_or_Z),isa(W,ttSpatialType)):-decl_type_safe(W). %,call_after_dbase_load(forall(isa(I,W),create_instance(I,W))).
@@ -547,24 +547,24 @@ assert_isa_i(_,ftTerm):-!.
 assert_isa_i(_,ftTerm(_)):-!.
 assert_isa_i(I,T):-not_mud_isa(I,T,Why),!,throw(Why).
 assert_isa_i(I,PT):- nonvar(PT),is_pred_declarer(PT),!,decl_mpred(I,PT),assert_hasInstance(PT,I).
-assert_isa_i(I,T):- skipped_table_call(loop_check(assert_isa_lc(I,T),loop_check(assert_hasInstance(T,I),dtrace(assert_isa_lc(I,T))))).
+assert_isa_i(I,T):- skipped_table_call(loop_check(assert_isa_ilc(I,T),loop_check(assert_hasInstance(T,I),dtrace(assert_isa_ilc(I,T))))).
 
-:-export(assert_isa_lc/2).
+:-export(assert_isa_ilc/2).
 % skip formatter cols
-assert_isa_lc(isKappaFn(_,_),_):-!.
-assert_isa_lc(_I,T):- member(T,[ftString]),!.
-assert_isa_lc(I,T):- is_list(I),!,maplist(assert_isa_reversed(T),I).
-assert_isa_lc(I,T):- not(not(hasInstance(T,I))),!.
-assert_isa_lc(I,T):- hotrace(chk_ft(T)),(compound(I)->dmsg(once(dont_assert_c_is_ft(I,T)));dmsg(once(dont_assert_is_ft(I,T)))),rtrace((chk_ft(T))).
-assert_isa_lc(I,T):- once(decl_type(T)),
-  skipped_table_call(must((assert_isa_lc_unchecked(I,T),show_call_failure(isa_backchaing(I,T))))),
+assert_isa_ilc(isKappaFn(_,_),_):-!.
+assert_isa_ilc(_I,T):- member(T,[ftString]),!.
+assert_isa_ilc(I,T):- is_list(I),!,maplist(assert_isa_reversed(T),I).
+assert_isa_ilc(I,T):- not(not(hasInstance(T,I))),!.
+assert_isa_ilc(I,T):- hotrace(chk_ft(T)),(compound(I)->dmsg(once(dont_assert_c_is_ft(I,T)));dmsg(once(dont_assert_is_ft(I,T)))),rtrace((chk_ft(T))).
+assert_isa_ilc(I,T):- once(decl_type(T)),
+  skipped_table_call(must((assert_isa_ilc_unchecked(I,T),show_call_failure(isa_backchaing(I,T))))),
   assert_hasInstance(T,I).
 
-assert_isa_lc_unchecked(I,T):- compound(I),!,must((get_functor(I,F),assert_compound_isa(I,T,F))),!.
-assert_isa_lc_unchecked(I,tCol):- must(show_call(decl_type(I))).
-assert_isa_lc_unchecked(I,ttFormatType):- must(show_call(define_ft(I))).
-assert_isa_lc_unchecked(I,_):- not(mpred_prop(I,_)),not(hasInstance(tCol,I)),show_call_failure(assert_if_new(i_countable(I))),fail.
-assert_isa_lc_unchecked(I,T):-
+assert_isa_ilc_unchecked(I,T):- compound(I),!,must((get_functor(I,F),assert_compound_isa(I,T,F))),!.
+assert_isa_ilc_unchecked(I,tCol):- must(show_call(decl_type(I))).
+assert_isa_ilc_unchecked(I,ttFormatType):- must(show_call(define_ft(I))).
+assert_isa_ilc_unchecked(I,_):- not(mpred_prop(I,_)),not(hasInstance(tCol,I)),show_call_failure(assert_if_new(i_countable(I))),fail.
+assert_isa_ilc_unchecked(I,T):-
   with_assertions([thlocal:infSkipArgIsa,thlocal:infSkipFullExpand],((  hooked_asserta(isa(I,T)),assert_hasInstance(T,I)))).
 
 assert_compound_isa(I,_,_):- compound(I), I\=resultIsaFn(_),glean_pred_props_maybe(I),fail.
@@ -585,7 +585,7 @@ assert_isa_reversed(T,I):-assert_isa(I,T).
 % ================================================
 % assert_isa HOOKS
 % ================================================
-user:decl_database_hook(_,subclass(_,_)):-retractall(dbase_t(_,isa,_,_)),retractall(dbase_t(_,subclass,_,_)).
+user:decl_database_hook(_,genls(_,_)):-retractall(dbase_t(_,isa,_,_)),retractall(dbase_t(_,genls,_,_)).
 user:decl_database_hook(change(assert,_),DATA):-into_mpred_form(DATA,O),!,O=isa(I,T),hotrace(doall(assert_isa_hooked(I,T))).
 user:decl_database_hook(change(assert,_),isa(I,T)):- assert_hasInstance(T,I),fail.
 % user:decl_database_hook(change( retract,_),isa(I,T)):-doall(db_retract_isa_hooked(I,T)).
@@ -623,7 +623,7 @@ assert_isa_hooked_after(_,ttFormatType):-!.
 /*
 assert_isa_hooked_after(I,T):- not(completelyAssertedCollection(T)),impliedSubClass(T,ST),completelyAssertedCollection(ST),assert_isa(I,ST).
 :-export(impliedSubClass/2).
-impliedSubClass(T,ST):-ground(T:ST),is_known_false(subclass(T,ST)),!,fail.
+impliedSubClass(T,ST):-ground(T:ST),is_known_false(genls(T,ST)),!,fail.
 impliedSubClass(T,ST):-predicate_property(transitive_subclass(T,ST),_),!,call_tabled(transitive_subclass(T,ST)).
 */
 

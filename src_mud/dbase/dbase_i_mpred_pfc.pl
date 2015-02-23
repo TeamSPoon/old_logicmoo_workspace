@@ -67,7 +67,7 @@ pfc_pre_expansion_each(Sent,OUT):-Sent=..[And|C12],current_predicate(is_logical_
 pfc_pre_expansion_each(C12,OUT):-is_list(C12),!,maplist(pfc_pre_expansion_each,C12,OUT),!.
 pfc_pre_expansion_each(X,X):- \+ \+ ((get_functor(X,F,A),must(maybe_hybrid(F/A)))),!.
 
-{G}:-mpred_call(G).
+% {G}:-mpred_call(G).
 user:mpred_arity(F,A):-pfcDatabaseTerm(F/A).
 user:mpred_prop(F,argIsa(_,ftAskable)):-pfcDatabaseTerm(F/_).
 
@@ -102,13 +102,13 @@ throw_on_bad_fact(assert(a,G)):-!,dtrace,pfc_asserta0(G).
 throw_on_bad_fact(assert(z,G)):-!,dtrace,pfc_assertz0(G).
 throw_on_bad_fact(assert(_,G)):-!,dtrace,pfc_assert0(G).
 throw_on_bad_fact(G):-ground(G),!,fail.
-throw_on_bad_fact(G):-why_throw_on_bad_fact(G,Why),
-   dtrace(why_throw_on_bad_fact(G,Why)),trace_or_throw(throw_on_bad_fact(Why,G)).
+% by returning true we veto the assertion  (fail accepts assertion)
+throw_on_bad_fact(G):-why_throw_on_bad_fact(G,Why), dmsg(error(trace_or_throw(throw_on_bad_fact(Why,G)))),!.
 
 why_throw_on_bad_fact(GIn,singletons(H,HeadSingletons,B)):- copy_term(GIn,G),
   pfcRuleOutcomeRest(G,H,B),
   numbervars(B,99,_),term_variables(H,HeadSingletons),numbervars(H,66,_,[singletons(true)]),!,
-    member('$VAR'('_'),HeadSingletons),get_functor(H,F,A),!,not(mpred_prop(F,predCanHaveSingletons)).
+    member('$VAR'('_'),HeadSingletons),get_functor(H,F),!,not(mpred_prop(F,predCanHaveSingletons)).
 
 /*
 TODO: WHY CANT I GET THIS TO WORK?!? (Using the numbervars version is nutso)
@@ -147,18 +147,18 @@ pfc_assert0(G):- pfc_local(G),!,assert(G).
 pfc_assert0(G):- add(G),pfcMark(G).
 
 
-pfc_clause_db(H,B):- must(pfc_local(H)), clause(H,B),!.
-pfc_clause_db_unify(H,B):- must(pfc_local(H)), clause(H,B),!.
-pfc_clause_db_check(H,B):- must(pfc_local(H)), pfc_clause_local_db(H,B),!.
+pfc_clause_db_unify(H,B):- must(pfc_local(H)),
+   (current_predicate(_,H) -> (predicate_property(H,number_of_clauses(_)) -> clause(H,B) ; B = call(H)); % simulates a body for system predicates
+                                             B = mpred_call(H)).
+pfc_clause_db_check(H,B):- copy_term(H:B,HH:BB), clause(HH,BB,Ref),clause(CH,CB,Ref),H:B=@=CH:CB,!.
 pfc_clause_db_ref(H,B,Ref):-must(pfc_local(H)),!,pfc_clause_local_db_ref(H,B,Ref).
 
-pfc_clause_local_db(H,B):- copy_term(H:B,HH:BB),clause(HH,BB,Ref),clause(CH,CB,Ref),H:B=@=CH:CB,!.
 pfc_clause_local_db_ref(H,B,Ref):- copy_term(H:B,HH:BB),clause(HH,BB,Ref),clause(CH,CB,Ref),H:B=@=CH:CB,!.
 
 
 pfc_call(G):- pfc_call(nonPFC,G).
 pfc_call(_,G):- pfc_local(G),!,must(predicate_property(G,_)),!, debugOnError(call(G)).
-pfc_call(What,X):-dbase_op(call(What),X).
+pfc_call(Why,X):-dbase_op(call(Why),X).
 
 :-thread_local ntd_max_depth/2.
 
@@ -299,7 +299,7 @@ pfcAdd(P0,S0) :- copy_term(P0:S0,P1:S1),
   pfcRun.
 
 %pfcAdd(_,_).
-%pfcAdd(P,S) :- pfcWarn("pfcAdd(~w,~w) failed",[P,S]).
+pfcAdd(P,S) :- pfcWarn("pfcAdd(~w,~w) failed",[P,S]),!,fail.
 
 
 % pfcPost(+Ps,+S) tries to add a fact or set of fact to the database.  For
@@ -323,9 +323,9 @@ pfcPost1(P,S) :-
   copy_term(P,PC),
   must((
   \+ \+ pfcAddSupport(P,S),
-  PC=@=P)),
+  sanity(PC=@=P))),
   \+ \+ pfcUnique(P),
-  must(PC=@=P),
+  sanity(PC=@=P),
   \+ \+ must(pfcAssertIfUnknown(P)), % was simply pfc_assert(P),
    (\+ \+ pfcTraceAdd(P,S)),
    !,
@@ -917,7 +917,7 @@ pfcDefineBcRule(Head,Body,ParentRule) :-
  
 pfcEvalLHS((Test->Body),Support) :-  
   !, 
-  (pfc_call(nonPFC,Test) -> pfcEvalLHS(Body,Support)),
+  (pfc_call(pfcTest,Test) -> pfcEvalLHS(Body,Support)),
   !.
 
 pfcEvalLHS(rhs(X),Support) :-
@@ -979,7 +979,7 @@ pfc_eval_rhs1(X,_) :-
 %%
 
 pfcEvalAction(Action,Support) :-
-  pfc_call(nonPFC,Action), 
+  pfc_call(pfcEval,Action), 
   (pfcUndoable(Action) 
      -> pfcAddActionTrace(Action,Support) 
       ; true).
@@ -1024,12 +1024,11 @@ pfcBC(P) :-
 pfcBC(F) :-
   %= this is probably not advisable due to extreme inefficiency.
   var(F)    ->  pfcFact(F) ;
-  otherwise ->  pfc_clause_db_unify(F,Condition),pfc_call(nonPFC,Condition).
+  ( \+ current_predicate(_,F)) -> mpred_call(F) ;
+  % check for system predicates as well.
+  not(predicate_property(F,number_of_clauses(_))) -> pfc_call(systemPred,F) ; 
+  otherwise ->  pfc_clause_db_unify(F,Condition),pfc_call(neck(F),Condition).
 
-%%pfcBC(F) :- 
-%=  %= we really need to check for system predicates as well.
-%=  % current_predicate(_,F) -> pfc_call(nonPFC,F).
-%=  pfc_clause_db(F,Condition),pfc_call(nonPFC,Condition).
 
 
 % an action is pfcUndoable if there exists a method for undoing it.
@@ -1283,7 +1282,7 @@ pfcType(_,fact) :-
   !.
 
 pfcAssertIfUnknown(P):- is_asserted_eq(P),!.
-pfcAssertIfUnknown(P):- show_call(pfc_assert(P)),!,sanity(must(is_asserted_eq(P))).
+pfcAssertIfUnknown(P):- show_call(pfc_assert(P)),!,sanity(is_asserted_eq(P)).
 
 pfcAssert(P,Support) :- 
   (pfc_clause(P) ; pfc_assert(P)),
@@ -1588,7 +1587,7 @@ pfcFact(P) :- pfcFact(P,true).
 pfcFact(P,C) :- 
   pfcGetSupport(P,_),
   pfcType(P,fact),
-  pfc_call(nonPFC,C).
+  pfc_call(fact,C).
 
 %= pfcFacts(-ListofPfcFacts) returns a list of facts added.
 
@@ -1624,7 +1623,7 @@ pfcTraceAdd(P,S) :-
 
 pfcTraceAddPrint(P,S) :- P = mpred_prop(_,predArgTypes),!,trace_or_throw(crazy_pfcTraceAddPrint(P,S)).
 pfcTraceAddPrint(P,S) :-
-  P=@= ((isa(A,formatTypePrologCode),subclass(formatTypePrologCode,formatTypePrologCode),{dif(formatTypePrologCode,formatTypePrologCode)})=>isa(A,formatTypePrologCode)),
+  P=@= ((isa(A,formatTypePrologCode),genls(formatTypePrologCode,formatTypePrologCode),{dif(formatTypePrologCode,formatTypePrologCode)})=>isa(A,formatTypePrologCode)),
    trace_or_throw(crazy_pfcTraceAddPrint(P,S)).
 
 pfcTraceAddPrint(P,S) :-

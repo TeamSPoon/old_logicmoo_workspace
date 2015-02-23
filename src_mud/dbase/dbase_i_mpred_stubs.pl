@@ -202,20 +202,20 @@ mpred_missing_stubs(F,A):-prologHybrid = StubType, hybrid_tPredStubImpl(StubType
 
 :-export(rescan_missing_stubs/0).
 % rescan_missing_stubs:-no_rescans,!.
-rescan_missing_stubs:-loop_check_local(time_call(rescan_missing_stubs_lc),true).
-rescan_missing_stubs_lc:- once(thglobal:use_cyc_database), once(with_assertions(thlocal:useOnlyExternalDBs,forall((kb_t(arity(F,A)),A>1,good_pred_relation_name(F,A),not(mpred_arity(F,A))),with_no_dmsg(decl_mpred_mfa,decl_mpred_hybrid(F,A))))),fail.
-rescan_missing_stubs_lc:- hotrace((doall((mpred_missing_stubs(F,A),mpred_arity(F,A),ensure_universal_stub(F/A))))).
+rescan_missing_stubs:-loop_check_local(time_call(rescan_missing_stubs_ilc),true).
+rescan_missing_stubs_ilc:- once(thglobal:use_cyc_database), once(with_assertions(thlocal:useOnlyExternalDBs,forall((kb_t(arity(F,A)),A>1,good_pred_relation_name(F,A),not(mpred_arity(F,A))),with_no_dmsg(decl_mpred_mfa,decl_mpred_hybrid(F,A))))),fail.
+rescan_missing_stubs_ilc:- hotrace((doall((mpred_missing_stubs(F,A),mpred_arity(F,A),ensure_universal_stub(F/A))))).
 
 no_rescans.
 
 :-export(agenda_rescan_mpred_props/0).
 
-agenda_rescan_mpred_props:- loop_check(rescan_mpred_props_lc,true).
-rescan_mpred_props_lc:-no_rescans,!.
-rescan_mpred_props_lc:-rescan_duplicated_facts(user,mpred_prop(_,_)),fail.
-rescan_mpred_props_lc:-time(forall(mpred_prop_ordered(Pred,Prop),hooked_asserta(mpred_prop(Pred,Prop)))),fail.
-rescan_mpred_props_lc:-rescan_missing_stubs.
-rescan_mpred_props_lc.
+agenda_rescan_mpred_props:- loop_check(rescan_mpred_props_ilc,true).
+rescan_mpred_props_ilc:-no_rescans,!.
+rescan_mpred_props_ilc:-rescan_duplicated_facts(user,mpred_prop(_,_)),fail.
+rescan_mpred_props_ilc:-time(forall(mpred_prop_ordered(Pred,Prop),hooked_asserta(mpred_prop(Pred,Prop)))),fail.
+rescan_mpred_props_ilc:-rescan_missing_stubs.
+rescan_mpred_props_ilc.
 
 
 % ================================================================================

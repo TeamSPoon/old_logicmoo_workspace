@@ -53,8 +53,8 @@ user:decl_database_hook(Type,Fact):- current_predicate(add_deduction/3),current_
 user:decl_database_hook(_,mpred_prop('ArtifactCol1008-VISOR688', flagged_visor)):- trace_or_throw(mpred_prop('ArtifactCol1008-VISOR688', flagged_visor)).
 
 run_deduce_facts_from(Type,M:Fact):-atom(M),!,run_deduce_facts_from(Type,Fact).
-run_deduce_facts_from(Type,Fact):-loop_check_local(run_deduce_facts_from_lc(Type,Fact),true).
-run_deduce_facts_from_lc(Type,Fact):-doall((call_no_cuts(deduce_facts_forward(Fact,Deduction)),add_deduction(Type,Deduction,Fact))).
+run_deduce_facts_from(Type,Fact):-loop_check_local(run_deduce_facts_from_ilc(Type,Fact),true).
+run_deduce_facts_from_ilc(Type,Fact):-doall((call_no_cuts(deduce_facts_forward(Fact,Deduction)),add_deduction(Type,Deduction,Fact))).
 
 
 user:decl_database_hook(change(assert,_),BadFact):-mpred_call(tms_reject_why(BadFact,WHY)),trace_or_throw(tms_reject_why(BadFact,WHY)).
@@ -100,10 +100,10 @@ quiet_fact(mpred_prop,_).
 
 add_deduction(_Type,[],_How):-!.
 add_deduction(Type,[Fact|S],How):-!,add_deduction(Type,Fact,How),add_deduction(Type,S,How),!.
-add_deduction(Type,Fact,How):- ignore(loop_check_term(add_deduction_lc(Type,Fact,How),add_deduction_lc(Type,Fact),true)),!.
+add_deduction(Type,Fact,How):- ignore(loop_check_term(add_deduction_ilc(Type,Fact,How),add_deduction_ilc(Type,Fact),true)),!.
 
-add_deduction_lc(Type,Fact,_How):-quiet_fact(Fact),!,do_deduction_type(Type,Fact),!.
-add_deduction_lc(Type,Fact,How):-dmsg(add_deduction(Type,Fact,'_________from________',How)),do_deduction_type(Type,Fact),!.
+add_deduction_ilc(Type,Fact,_How):-quiet_fact(Fact),!,do_deduction_type(Type,Fact),!.
+add_deduction_ilc(Type,Fact,How):-dmsg(add_deduction(Type,Fact,'_________from________',How)),do_deduction_type(Type,Fact),!.
 
 do_deduction_type(change(assert,_),Fact):-add(Fact).
 do_deduction_type(change( retract,_),Fact):-functor(Fact,F,A),(F=isa;F=mpred_prop;A=1),!.
@@ -143,7 +143,7 @@ deduce_argIsa_facts(Fact,Arg,Type):- ground(Fact), functor(Fact,F,A),A>1, deduce
 never_deduce_from_predicate(isa).
 never_deduce_from_predicate(mpred_prop).
 never_deduce_from_predicate(mpred_arity).
-never_deduce_from_predicate(subclass).
+never_deduce_from_predicate(genls).
 never_deduce_from_predicate(typeProps).
 never_deduce_from_predicate(P):-mpred_arity(P,1).
 never_deduce_from_predicate(P):-mpred_prop(P,ftCallable).

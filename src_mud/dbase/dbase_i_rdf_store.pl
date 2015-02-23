@@ -280,7 +280,7 @@ p2q(tCol, rdfs,'Class').
 p2q(tCol,owl,'Class').
 p2q(tItem,knowrob,'HumanScaleObject').
 p2q(tSpatialThing,knowrob,'SpatialThing').
-p2q(subclass,rdfs,subClassOf).
+p2q(genls,rdfs,subClassOf).
 p2q(tRegion,knowrob,'FixedStructure').
 p2q(tAgentGeneric,knowrob,'Agent-Generic').
 p2q(ftInt,xsd,integer).
@@ -439,7 +439,7 @@ rdf_assert_hook(PSO):-dmsg(once(skipped(rdf_assert_hook(PSO)))).
 rdf_assert_hook0(mudLabelTypeProps(A,Food,Props)):-nonvar(A),atom_string(A,S),!,must((rdf_assert_hook(typeProps(Food,[label(S)|Props])))).
 rdf_assert_hook0(typeProps(Food,Props)):-is_list(Props),!,forall(member(P,Props),must(rdf_assert_hook(typeProps(Food,P)))).
 rdf_assert_hook0(typeProps(Food,Prop)):-Prop=..[P|ARGS],must(rdf_assert_hook(type_default(Food,[P,isSelf|ARGS]))).
-rdf_assert_hook0(subclass(C,P)):-!,rdf_object(C),rdf_object(P),rdf_assert_x(C,rdfs:subClassOf,P).
+rdf_assert_hook0(genls(C,P)):-!,rdf_object(C),rdf_object(P),rdf_assert_x(C,rdfs:subClassOf,P).
 rdf_assert_hook0(mudDescription(C,P)):-!,rdf_object(C),rdf_object(P),rdf_assert_x(C,rdfs:comment,P).
 rdf_assert_hook0(isa(Prop,tPred)):- rdf_to_pred(Prop,P),!,rdf_object(P),rdf_assert_x(P,rdf:type,owl:'Property').
 rdf_assert_hook0(isa(Prop,prologSingleValued)):- functor(Prop,P,_),!,rdf_object(P),rdf_assert_x(P,rdf:type,owl:'FunctionalProperty').
@@ -643,7 +643,7 @@ sync_to_rdf:-
    forall(is_known_trew(B),rdf_assert_hook(B)),
    forall(dbase_t(P,S,O),rdf_assert_hook(dbase_t(P,S,O))),   
    forall(dbase_t(P,S,O,O2),rdf_assert_hook(dbase_t(P,S,O,O2))),   
-   % forall(atom_to_qname(P,O),rdf_assert_hook(subclass(P,O))),
+   % forall(atom_to_qname(P,O),rdf_assert_hook(genls(P,O))),
    asserta_if_new(user:call_OnEachLoad(sync_to_rdf)),
    asserta_if_new(user:call_OnEachLoad(sync_from_rdf)),
    !.

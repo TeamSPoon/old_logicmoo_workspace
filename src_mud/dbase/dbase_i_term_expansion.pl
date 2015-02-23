@@ -113,7 +113,7 @@ db_expand_0(_,Term,CL):- expands_on(isEach,Term),!,findall(O,do_expand_args(isEa
 db_expand_0(Op,pddlSomethingIsa(A,List),O):- !,db_expand_maplist(fully_expand(Op),List,E,isa(A,E),O).
 db_expand_0(Op,pddlDescription(A,List),O):- !,db_expand_maplist(fully_expand(Op),List,E,mudDescription(A,E),O).
 db_expand_0(Op,pddlObjects(Type,List),O):- !,db_expand_maplist(fully_expand(Op),List,I,isa(I,Type),O).
-db_expand_0(Op,pddlSorts(Type,List),O):- !,db_expand_maplist(fully_expand(Op),List,I,subclass(I,Type),O).
+db_expand_0(Op,pddlSorts(Type,List),O):- !,db_expand_maplist(fully_expand(Op),List,I,genls(I,Type),O).
 db_expand_0(Op,pddlTypes(List),O):- !,db_expand_maplist(fully_expand(Op),List,I,isa(I,tCol),O).
 db_expand_0(Op,pddlPredicates(List),O):- !,db_expand_maplist(fully_expand(Op),List,I,isa(I,tPred),O).
 db_expand_0(Op,EACH,O):- EACH=..[each|List],db_expand_maplist(fully_expand(Op),List,T,T,O).
@@ -364,16 +364,16 @@ into_mpred_form(WAS,isa(I,C)):-was_isa(WAS,I,C),!.
 into_mpred_form(dbase_t(P,A,B),O):-atomic(P),!,O=..[P,A,B].
 into_mpred_form(dbase_t(P,A,B,C),O):-atomic(P),!,O=..[P,A,B,C].
 into_mpred_form(Var,MPRED):- var(Var), trace_or_throw(var_into_mpred_form(Var,MPRED)).
-into_mpred_form(I,O):-loop_check(into_mpred_form_lc(I,O),O=I). % trace_or_throw(into_mpred_form(I,O))).
+into_mpred_form(I,O):-loop_check(into_mpred_form_ilc(I,O),O=I). % trace_or_throw(into_mpred_form(I,O))).
 
-into_mpred_form_lc([F|Fist],O):-!,G=..[dbase_t|[F|Fist]], into_mpred_form(G,O).
-into_mpred_form_lc(G,O):- functor(G,F,A),G=..[F,P|ARGS],!,into_mpred_form6(G,F,P,A,ARGS,O),!.
+into_mpred_form_ilc([F|Fist],O):-!,G=..[dbase_t|[F|Fist]], into_mpred_form(G,O).
+into_mpred_form_ilc(G,O):- functor(G,F,A),G=..[F,P|ARGS],!,into_mpred_form6(G,F,P,A,ARGS,O),!.
 
 % TODO confirm negations
 
 into_mpred_form6(H,_,_,_,_,GO):- once(with_assertions(thlocal:into_form_code,(expand_term( (H :- true) , C ), reduce_clause(is_asserted,C,G)))),expanded_different(H,G),!,into_mpred_form(G,GO),!.
 into_mpred_form6(_,F,_,1,[C],O):-alt_calls(F),!,into_mpred_form(C,O),!.
-into_mpred_form6(_,':-',C,1,_,':-'(O)):-!,into_mpred_form_lc(C,O).
+into_mpred_form6(_,':-',C,1,_,':-'(O)):-!,into_mpred_form_ilc(C,O).
 into_mpred_form6(_,not,C,1,_,not(O)):-into_mpred_form(C,O),!.
 into_mpred_form6(C,isa,_,2,_,C):-!.
 into_mpred_form6(C,_,_,_,_,isa(I,T)):-was_isa(C,I,T),!.

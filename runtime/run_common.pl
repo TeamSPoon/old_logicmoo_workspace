@@ -47,8 +47,9 @@ add_game_dir(GAMEDIR,Else):- add_to_search_path_first(game, GAMEDIR),now_try_gam
 
 now_try_game_dir(Else):-  enumerate_files(game('.'), GAMEDIR) *-> 
   ((exists_directory(GAMEDIR) -> 
-    with_all_dmsg(( forall(enumerate_files(game('**/*.pl'),X),user_ensure_loaded(X)),
-      forall(enumerate_files(game('**/*.plmoo'),X),declare_load_dbase(X)))); (fmt(missing(GAMEDIR)),Else)));  (fmt(no_game_dir),Else).
+    with_all_dmsg(( 
+      % forall(enumerate_files(game('**/*.pl'),X),user_ensure_loaded(X)),
+      forall(no_repeats_old(X,enumerate_files(game('**/*.plmoo'),X)),declare_load_dbase(X)))); (fmt(missing(GAMEDIR)),Else)));  (fmt(no_game_dir),Else).
 
 
 :-context_module(CM),assert(startup_mod:loading_from_cm(CM)).

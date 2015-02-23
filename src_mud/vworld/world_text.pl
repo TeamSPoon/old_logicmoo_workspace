@@ -8,7 +8,7 @@
 %
 */
 % :-swi_module(world_text,[]).
-%      default_repl_obj_to_string/3,default_repl_writer/4,show_kb_via_pred/3,show_kb_preds/2,show_kb_preds/3,success/2
+%      default_repl_obj_to_string/3,default_repl_writer/4,show_kb_via_pred/3,show_kb_preds/2,show_kb_preds/3,wasSuccess/2
 :- include(logicmoo(vworld/moo_header)).
 
 :-export(eng_fully_expand/2).
@@ -188,6 +188,20 @@ is_phrase_type(posNP).
 :- decl_mpred_prolog(local_term_anglify/2).
 :- decl_mpred_prolog(local_term_anglify_first/2).
 :- decl_mpred_prolog(local_term_anglify_last/2).
+:- decl_mpred_prolog(local_term_anglify_np/2).
+:- decl_mpred_prolog(enter_term_anglify/2).
+:- decl_mpred_prolog(term_anglify_np_last/2).
+
+% ========================================
+% enter_term_anglify(MASK)
+% ========================================
+
+enter_term_anglify(X,Y):-findall(X-Y-Body,clause( mudTermAnglify(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
+enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_np(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
+enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_last(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
+enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_np_last(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
+
+
 
 local_term_anglify_first(T,TA):-compound(T),local_term_anglify(T,TA).
 % local_term_anglify_first(FmtObj,String):-compound(FmtObj),functor(FmtObj,Fmt,_),corece(FmtObj,Fmt,String),!.

@@ -31,7 +31,7 @@ end_module_type(CM,Type):-retractall(registered_module_type(CM,Type)).
 
 :-dynamic(registered_dbase_file/1).
 :-export(declare_load_dbase/1).
-declare_load_dbase(Spec):- forall(filematch(Spec,File),show_call(asserta_if_new(registered_dbase_file(File)))).
+declare_load_dbase(Spec):- forall(no_repeats_old(File,filematch(Spec,File)),show_call(asserta_if_new(registered_dbase_file(File)))).
 
 % :-export((is_compiling_sourcecode/1)).
 is_compiling_sourcecode:-is_compiling,!.
@@ -137,16 +137,27 @@ load_data_file_end(World,File):-
    dmsginfo(info(load_data_file_complete(File))),
    forall(onEndOfFile(File,Call),must((mpred_call(Call),retractall(onEndOfFile(File,Call))))).
 
-load_dbase_name_stream(_Name):- do_gc,repeat,read_one_term(Term),myDebugOnError(add_term(Term)),Term == end_of_file,!.
-load_dbase_name_stream(_Name,Stream):- do_gc,repeat,read_one_term(Stream,Term),myDebugOnError(add(Term)),Term == end_of_file,!.
+load_dbase_name_stream(_Name):- do_gc,repeat,read_one_term(Term,Vs),myDebugOnError(add_term(Term,Vs)),Term == end_of_file,!.
+load_dbase_name_stream(_Name,Stream):- do_gc,repeat,read_one_term(Stream,Term,Vs),myDebugOnError(add_term(Term,Vs)),Term == end_of_file,!.
 
-add_term(end_of_file):-!.
-add_term(Term):- with_assertions(thlocal:already_in_kb_term_expansion,must(add(Term))).
+
+dbase_numbervars_with_names(Term):-
+   term_variables(Term,Vars),dbase_name_variables(Vars),!,numbervars(Vars,91,_,[attvar(skip),singletons(true)]),!.
+
+dbase_name_variables([]).
+dbase_name_variables([Var|Vars]):-
+   (var_property(Var, name(Name)) -> Var = '$VAR'(Name) ; true),
+   dbase_name_variables(Vars).
+
+add_term(end_of_file,_):-!.
+add_term(Term,Vs):- 
+   b_setval('$variable_names', Vs),
+    with_assertions(thlocal:already_in_kb_term_expansion,must(add(Term))).
 
 myDebugOnError(Term):-catch(once(must((Term))),E,(dmsg(error(E,start_myDebugOnError(Term))),trace,rtrace((Term)),dmsginfo(stop_myDebugOnError(E=Term)),trace)).
-
-read_one_term(Term):- catch(once(( read_term(Term,[double_quotes(string)]))),E,(Term=error(E),dmsg(error(E,read_one_term(Term))))).
-read_one_term(Stream,Term):- catch(once(( read_term(Stream,Term,[double_quotes(string)]))),E,(Term=error(E),dmsg(error(E,read_one_term(Term))))).
+         
+read_one_term(Term,Vs):- catch(once(( read_term(Term,[double_quotes(string),variable_names(Vs)]))),E,(Term=error(E),dmsg(error(E,read_one_term(Term))))).
+read_one_term(Stream,Term,Vs):- catch(once(( read_term(Stream,Term,[double_quotes(string),variable_names(Vs)]))),E,(Term=error(E),dmsg(error(E,read_one_term(Term))))).
 
 rescan_mpred_stubs:- doall((mpred_prop(F,prologHybrid),mpred_arity(F,A),A>0,warnOnError(declare_dbase_local_dynamic(moo,F,A)))).
 

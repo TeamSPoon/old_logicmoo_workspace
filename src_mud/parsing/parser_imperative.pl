@@ -111,15 +111,15 @@ text_means(Agent,Text,Loc):- equals_icase(Text,"here"),where_atloc(Agent,Loc).
 text_means(Agent,Text,Region):- equals_icase(Text,"region"),where_atloc(Agent,Loc),locationToRegion(Loc,Region).
 text_means(_Agent,_Text,_Value):-fail.
 
-relates(Agent,Relation,Obj):-loop_check(relates_lc(Agent,Relation,Obj),fail).
-relates_lc(Agent,Relation,Obj):-text_means(Agent,Relation,Obj),!.
-relates_lc(_    ,Relation,Obj):- atom(Relation),tCol(Relation),!,isa(Obj,Relation).
-relates_lc(_    ,Relation,Obj):-contains_var(Relation,isSelf),subst(Relation,isSelf,Obj,Call),!,req(Call).
-relates_lc(Agent,isSame(Relation),Obj):- !, relates(Agent,Relation,Value),relates(Obj,Relation,Value).
-relates_lc(Agent,Relation,Obj):- atom(Relation),!, prop(Agent,Relation,Obj).
-relates_lc(_    ,Relation,Obj):-contains_var(Relation,Obj),!,req(Relation).
-relates_lc(Agent,Relation,Obj):-contains_var(Relation,Agent),append_term(Relation,Obj,Call),!,req(Call).
-relates_lc(Agent,Relation,Obj):-objects_for_agent(Agent,Relation,MatchList),MatchList\=[],!,member(MatchList,Obj).
+relates(Agent,Relation,Obj):-loop_check(relates_ilc(Agent,Relation,Obj),fail).
+relates_ilc(Agent,Relation,Obj):-text_means(Agent,Relation,Obj),!.
+relates_ilc(_    ,Relation,Obj):- atom(Relation),tCol(Relation),!,isa(Obj,Relation).
+relates_ilc(_    ,Relation,Obj):-contains_var(Relation,isSelf),subst(Relation,isSelf,Obj,Call),!,req(Call).
+relates_ilc(Agent,isSame(Relation),Obj):- !, relates(Agent,Relation,Value),relates(Obj,Relation,Value).
+relates_ilc(Agent,Relation,Obj):- atom(Relation),!, prop(Agent,Relation,Obj).
+relates_ilc(_    ,Relation,Obj):-contains_var(Relation,Obj),!,req(Relation).
+relates_ilc(Agent,Relation,Obj):-contains_var(Relation,Agent),append_term(Relation,Obj,Call),!,req(Call).
+relates_ilc(Agent,Relation,Obj):-objects_for_agent(Agent,Relation,MatchList),MatchList\=[],!,member(MatchList,Obj).
 
 
 objects_for_agent(_Agent,isAnd([]),[]):-!.
@@ -457,7 +457,7 @@ mud_test(food_is_a_droppable, [ true(
 
 
 query_trans_subft(FT,Sub):-subFormat(FT,Sub).
-query_trans_subft(FT,Sub):-subFormat(FT,A),subclass(A,Sub).
+query_trans_subft(FT,Sub):-subFormat(FT,A),genls(A,Sub).
 query_trans_subft(FT,Sub):-subFormat(FT,A),subFormat(A,B),subFormat(B,Sub).
 
 
@@ -560,11 +560,11 @@ instances_of_type(Inst,Type):- no_repeats_old(instances_of_type_0(Inst,Type)).
 available_instances_of_type(Agent,Obj,Type):- must(current_agent(Agent)), current_agent_or_var(Agent), isa(Obj,Type), same_regions(Agent,Obj),!.
 
 instances_of_type_0(Inst,Type):- instances_sortable(Type,HOW),!,get_sorted_instances(Inst,Type,HOW).
-% should never need this but .. instances_of_type_0(Inst,Type):- subclass(SubType,Type),isa(Inst,SubType).
+% should never need this but .. instances_of_type_0(Inst,Type):- genls(SubType,Type),isa(Inst,SubType).
 instances_of_type_0(Inst,Type):- isa(Inst,Type).
 
 instances_sortable(TYPE,HOW):-instances_sortable0(TYPE,HOW),!.
-instances_sortable(TYPE,HOW):-subclass(TYPE,SUPER),instances_sortable0(SUPER,HOW),!.
+instances_sortable(TYPE,HOW):-genls(TYPE,SUPER),instances_sortable0(SUPER,HOW),!.
 instances_sortable0(tWieldAble,distance_to_current_avatar(Agent)):-current_agent_or_var(Agent).
 instances_sortable0(tWearAble,distance_to_current_avatar(Agent)):-current_agent_or_var(Agent).
 

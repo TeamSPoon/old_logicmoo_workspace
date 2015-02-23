@@ -22,9 +22,12 @@ tFarthestReachableItem(Obj):-
   current_agent(Agent),
   farthest_reachable_object(Agent,Obj).
 
+
+:-decl_mpred_prolog(nearest_reachable_object(tAgentGeneric,tObj)).
 nearest_reachable_object(Agent,Obj):- 
   with_no_modifications((findall(Obj,farthest_reachable_object(Agent,Obj),List),reverse(List,Reverse),!,member(Obj,Reverse))).
 
+:-decl_mpred_prolog(farthest_reachable_object(tAgentGeneric,tObj)).
 farthest_reachable_object(Agent,Obj):-with_no_modifications((farthest_reachable_object0(Agent,Obj))).
 farthest_reachable_object0(Agent,Obj):-
   test_exists(Obj),

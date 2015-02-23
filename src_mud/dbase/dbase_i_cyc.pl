@@ -18,6 +18,9 @@
 :-if_file_exists(user_ensure_loaded(logicmoo(ext/moo_ext_cyc_new))).
 
 
+dbase_to_cyc(tCol,'Collection').
+dbase_to_cyc(ttFormatType,'CycLExpressionType').
+
 % ============================================
 % DBASE to Cyc Predicate Mapping
 % ============================================
@@ -85,7 +88,6 @@ checkCycAvailablity:- ccatch((ignore((invokeSubL("(+ 1 1)",R))),(R==2->assert_if
 :-style_check(-atom).
 % :-style_check(-string).
 :-set_prolog_flag(double_quotes,string).
-
 
 'TINYKB-ASSERTION'(':TRUE-MON',[[],[['termOfUnit','NART'(['CollectionRuleTemplateFn','ArgIsaPredicate']),['CollectionRuleTemplateFn','ArgIsaPredicate']]]],'BaseKB',[],/*HL*/['termOfUnit','NART'(['CollectionRuleTemplateFn','ArgIsaPredicate']),['CollectionRuleTemplateFn','ArgIsaPredicate']]).
 'TINYKB-ASSERTION'(':TRUE-MON',[[],[['termOfUnit','NART'(['CollectionRuleTemplateFn','HypotheticalContext']),['CollectionRuleTemplateFn','HypotheticalContext']]]],'BaseKB',[],/*HL*/['termOfUnit','NART'(['CollectionRuleTemplateFn','HypotheticalContext']),['CollectionRuleTemplateFn','HypotheticalContext']]).
@@ -5329,7 +5331,7 @@ A CycLVariable is a character string consisting of a question mark '?' (as its i
 'TINYKB-ASSERTION'(':TRUE-DEF',[[],[['oldConstantName','CycSupportDatastructure',"CycLSupportDatastructure"]]],'BookkeepingMt',[],/*HL*/['oldConstantName','CycSupportDatastructure',"CycLSupportDatastructure"]).
 'TINYKB-ASSERTION'(':TRUE-DEF',[[],[['argIsa','CycTacticFn',2,'CycTactic']]],'UniversalVocabularyMt',[],/*HL*/['argIsa','CycTacticFn',2,'CycTactic']).
 'TINYKB-ASSERTION'(':TRUE-DEF',[[],[['argIsa','CycTacticFn',1,'NonNegativeInteger']]],'UniversalVocabularyMt',[],/*HL*/['argIsa','CycTacticFn',1,'NonNegativeInteger']).
-'TINYKB-ASSERTION'(':TRUE-MON',[[],[['comment','CycTransformationProof',"The subclass of CycProof each of whose instances uses a CycLRuleAssertion to prove a query."]]],'UniversalVocabularyMt',[],/*HL*/['comment','CycTransformationProof',"The subclass of CycProof each of whose instances uses a CycLRuleAssertion to prove a query."]).
+'TINYKB-ASSERTION'(':TRUE-MON',[[],[['comment','CycTransformationProof',"The subclass of CycProof each of whose instances uses a CycLRuleAssertion to prove a query."]]],'UniversalVocabularyMt',[],/*HL*/['comment','CycTransformationProof',"The nearestGenls of CycProof each of whose instances uses a CycLRuleAssertion to prove a query."]).
 'TINYKB-ASSERTION'(':TRUE-DEF',[[],[['comment','Cyclist',"A specialization of IndividualAgent. Each instance of Cyclist is an agent (usually a person) entitled to inspect and modify the Cyc knowledge base."]]],'UniversalVocabularyMt',[],/*HL*/['comment','Cyclist',"A specialization of IndividualAgent. Each instance of Cyclist is an agent (usually a person) entitled to inspect and modify the Cyc knowledge base."]).
 'TINYKB-ASSERTION'(':TRUE-MON',[[],[['comment','CyclistDefinitionalMt',"The microtheory in which instances of Cyclist are defined.  Assertions about them belong in CyclistsMt."]]],'BaseKB',[],/*HL*/['comment','CyclistDefinitionalMt',"The microtheory in which instances of Cyclist are defined.  Assertions about them belong in CyclistsMt."]).
 'TINYKB-ASSERTION'(':TRUE-MON',[[],[['evaluationDefn','DateDecodeStringFn',['SubLQuoteFn','CYC-DATE-DECODE-STRING']]]],'BaseKB',[],/*HL*/['evaluationDefn','DateDecodeStringFn',['SubLQuoteFn','CYC-DATE-DECODE-STRING']]).

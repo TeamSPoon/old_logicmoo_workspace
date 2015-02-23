@@ -45,8 +45,8 @@ same_arg(tCol(_Type),X,Y):-!, unify_with_occurs_check(X,Y).
 same_arg(ftText,X,Y):-!, string_equal_ci(X,Y).
 
 same_arg(same_or(equals),X,Y):- same_arg(equals,X,Y).
-same_arg(same_or(subclass),X,Y):- same_arg(equals,X,Y).
-same_arg(same_or(subclass),Sub,Sup):- holds_t(subclass,Sub,Sup),!.
+same_arg(same_or(genls),X,Y):- same_arg(equals,X,Y).
+same_arg(same_or(genls),Sub,Sup):- holds_t(genls,Sub,Sup),!.
 same_arg(same_or(isa),X,Y):- same_arg(equals,X,Y).
 same_arg(same_or(isa),I,Sup):- !, holds_t(Sup,I),!.
 

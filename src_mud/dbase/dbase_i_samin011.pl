@@ -102,9 +102,9 @@
 :-assert_kif("(subrelation immediateInstance instance)").
 :-assert_kif("(instance immediateInstance AsymmetricRelation)").
 :-assert_kif("(instance immediateInstance IntransitiveRelation)").
-:-assert_kif("(documentation immediateInstance \"An object is an &%immediateInstance of a &%SetOrClass if it is an instance of the &%SetOrClass and there does not exist a subclass of &%SetOrClass such that it is an instance of the subclass.\")").
+:-assert_kif("(documentation immediateInstance \"An object is an &%immediateInstance of a &%SetOrClass if it is an instance of the &%SetOrClass and there does not exist a genls of &%SetOrClass such that it is an instance of the genls.\")").
 %
-:-assert_kif("(=> (immediateInstance ?ENTITY ?CLASS) (not (exists (?SUBCLASS) (and (subclass ?SUBCLASS ?CLASS) (instance ?ENTITY ?SUBCLASS)))))").
+:-assert_kif("(=> (immediateInstance ?ENTITY ?CLASS) (not (exists (?SUBCLASS) (and (genls ?SUBCLASS ?CLASS) (instance ?ENTITY ?SUBCLASS)))))").
 %
 :-assert_kif("(instance inverse BinaryPredicate)").
 :-assert_kif("(instance inverse IrreflexiveRelation)").
@@ -116,20 +116,20 @@
 %
 :-assert_kif("(=> (inverse ?REL1 ?REL2) (forall (?INST1 ?INST2) (<=> (holds ?REL1 ?INST1 ?INST2) (holds ?REL2 ?INST2 ?INST1))))").
 %
-:-assert_kif("(instance subclass BinaryPredicate)").
-:-assert_kif("(instance subclass PartialOrderingRelation)").
-:-assert_kif("(domain subclass 1 SetOrClass)").
-:-assert_kif("(domain subclass 2 SetOrClass)").
-:-assert_kif("(documentation subclass \" (&%subclass ?CLASS1 ?CLASS2) means that ?CLASS1 is a subclass of ?CLASS2, i.e. every instance of ?CLASS1 is also an instance of ?CLASS2. A class may have multiple superclasses and subclasses.\")").
+:-assert_kif("(instance genls BinaryPredicate)").
+:-assert_kif("(instance genls PartialOrderingRelation)").
+:-assert_kif("(domain genls 1 SetOrClass)").
+:-assert_kif("(domain genls 2 SetOrClass)").
+:-assert_kif("(documentation genls \" (&%genls ?CLASS1 ?CLASS2) means that ?CLASS1 is a genls of ?CLASS2, i.e. every instance of ?CLASS1 is also an instance of ?CLASS2. A class may have multiple superclasses and subclasses.\")").
 %
-:-assert_kif("(<=> (subclass ?SUBCLASS ?CLASS) (and (instance ?SUBCLASS SetOrClass) (instance ?CLASS SetOrClass) (forall (?INST) (=> (instance ?INST ?SUBCLASS) (instance ?INST ?CLASS)))))").
+:-assert_kif("(<=> (genls ?SUBCLASS ?CLASS) (and (instance ?SUBCLASS SetOrClass) (instance ?CLASS SetOrClass) (forall (?INST) (=> (instance ?INST ?SUBCLASS) (instance ?INST ?CLASS)))))").
 %
-:-assert_kif("(subrelation immediateSubclass subclass)").
+:-assert_kif("(subrelation immediateSubclass genls)").
 :-assert_kif("(instance immediateSubclass AsymmetricRelation)").
 :-assert_kif("(instance immediateSubclass IntransitiveRelation)").
-:-assert_kif("(documentation immediateSubclass \"A &%SetOrClass ?CLASS1 is an &%immediateSubclass of another &%SetOrClass ?CLASS2 just in case ?CLASS1 is a subclass of ?CLASS2 and there is no other subclass of ?CLASS2 such that ?CLASS1 is also a subclass of it.\")").
+:-assert_kif("(documentation immediateSubclass \"A &%SetOrClass ?CLASS1 is an &%immediateSubclass of another &%SetOrClass ?CLASS2 just in case ?CLASS1 is a genls of ?CLASS2 and there is no other genls of ?CLASS2 such that ?CLASS1 is also a genls of it.\")").
 %
-:-assert_kif("(=> (immediateSubclass ?CLASS1 ?CLASS2) (not (exists (?CLASS3) (and (subclass ?CLASS3 ?CLASS2) (subclass ?CLASS1 ?CLASS3) (not (equal ?CLASS2 ?CLASS3)) (not (equal ?CLASS1 ?CLASS3))))))").
+:-assert_kif("(=> (immediateSubclass ?CLASS1 ?CLASS2) (not (exists (?CLASS3) (and (genls ?CLASS3 ?CLASS2) (genls ?CLASS1 ?CLASS3) (not (equal ?CLASS2 ?CLASS3)) (not (equal ?CLASS1 ?CLASS3))))))").
 %
 :-assert_kif("(instance subrelation BinaryPredicate)").
 :-assert_kif("(instance subrelation PartialOrderingRelation)").
@@ -152,19 +152,19 @@
 :-assert_kif("(documentation domain \"Provides a computationally and heuristically convenient mechanism for declaring the argument types of a given relation. The formula (&%domain ?REL ?INT ?CLASS) means that the ?INT'th element of each tuple in the relation ?REL must be an instance of ?CLASS. Specifying argument types is very helpful in maintaining ontologies. Representation systems can use these specifications to classify terms and check integrity constraints. If the restriction on the argument type of a &%Relation is not captured by a &%SetOrClass already defined in the ontology, one can specify a &%SetOrClass compositionally with the functions &%UnionFn, &%IntersectionFn, etc.\")").
 %
 % :-assert_kif(";<axiomgloss>The following axiom is relevant to cases where a subrelation of ").
-% :-assert_kif(";a parent relation has its own declared domain, which must be a subclass ").
+% :-assert_kif(";a parent relation has its own declared domain, which must be a genls ").
 % :-assert_kif(";of the corresponding parent domain class. ").
-:-assert_kif("(=> (and (domain ?REL ?NUMBER ?CLASS1) (domain ?REL ?NUMBER ?CLASS2)) (or (subclass ?CLASS1 ?CLASS2) (subclass ?CLASS2 ?CLASS1)))").
+:-assert_kif("(=> (and (domain ?REL ?NUMBER ?CLASS1) (domain ?REL ?NUMBER ?CLASS2)) (or (genls ?CLASS1 ?CLASS2) (genls ?CLASS2 ?CLASS1)))").
 %
 :-assert_kif("(instance domainSubclass TernaryPredicate)").
 :-assert_kif("(domain domainSubclass 1 Relation)").
 :-assert_kif("(domain domainSubclass 2 PositiveInteger)").
 :-assert_kif("(domain domainSubclass 3 SetOrClass)").
-:-assert_kif("(documentation domainSubclass \"&%Predicate used to specify argument type restrictions of &%Predicates. The formula (&%domainSubclass ?REL ?INT ?CLASS) means that the ?INT'th element of each tuple in the relation ?REL must be a subclass of ?CLASS.\")").
+:-assert_kif("(documentation domainSubclass \"&%Predicate used to specify argument type restrictions of &%Predicates. The formula (&%domainSubclass ?REL ?INT ?CLASS) means that the ?INT'th element of each tuple in the relation ?REL must be a genls of ?CLASS.\")").
 %
 :-assert_kif("(=> (and (subrelation ?REL1 ?REL2) (domainSubclass ?REL2 ?NUMBER ?CLASS1)) (domainSubclass ?REL1 ?NUMBER ?CLASS1))").
 %
-:-assert_kif("(=> (and (domainSubclass ?REL ?NUMBER ?CLASS1) (domainSubclass ?REL ?NUMBER ?CLASS2)) (or (subclass ?CLASS1 ?CLASS2) (subclass ?CLASS2 ?CLASS1)))").
+:-assert_kif("(=> (and (domainSubclass ?REL ?NUMBER ?CLASS1) (domainSubclass ?REL ?NUMBER ?CLASS2)) (or (genls ?CLASS1 ?CLASS2) (genls ?CLASS2 ?CLASS1)))").
 %
 :-assert_kif("(instance equal BinaryPredicate)").
 :-assert_kif("(instance equal EquivalenceRelation)").
@@ -197,7 +197,7 @@
 %
 :-assert_kif("(=> (and (subrelation ?REL1 ?REL2) (range ?REL2 ?CLASS1)) (range ?REL1 ?CLASS1))").
 %
-:-assert_kif("(=> (and (range ?REL ?CLASS1) (range ?REL ?CLASS2)) (or (subclass ?CLASS1 ?CLASS2) (subclass ?CLASS2 ?CLASS1)))").
+:-assert_kif("(=> (and (range ?REL ?CLASS1) (range ?REL ?CLASS2)) (or (genls ?CLASS1 ?CLASS2) (genls ?CLASS2 ?CLASS1)))").
 %
 :-assert_kif("(instance rangeSubclass BinaryPredicate)").
 :-assert_kif("(instance rangeSubclass AsymmetricRelation)").
@@ -205,11 +205,11 @@
 :-assert_kif("(domainSubclass rangeSubclass 2 SetOrClass)").
 :-assert_kif("(documentation rangeSubclass \" (&%rangeSubclass ?FUNCTION ?CLASS) means that all of the values assigned by ?FUNCTION are &%subclasses of ?CLASS.\")").
 %
-:-assert_kif("(=> (and (rangeSubclass ?FUNCTION ?CLASS) (equal (AssignmentFn ?FUNCTION @ROW) ?VALUE)) (subclass ?VALUE ?CLASS))").
+:-assert_kif("(=> (and (rangeSubclass ?FUNCTION ?CLASS) (equal (AssignmentFn ?FUNCTION @ROW) ?VALUE)) (genls ?VALUE ?CLASS))").
 %
 :-assert_kif("(=> (and (subrelation ?REL1 ?REL2) (rangeSubclass ?REL2 ?CLASS1)) (rangeSubclass ?REL1 ?CLASS1))").
 %
-:-assert_kif("(=> (and (rangeSubclass ?REL ?CLASS1) (rangeSubclass ?REL ?CLASS2)) (or (subclass ?CLASS1 ?CLASS2) (subclass ?CLASS2 ?CLASS1)))").
+:-assert_kif("(=> (and (rangeSubclass ?REL ?CLASS1) (rangeSubclass ?REL ?CLASS2)) (or (genls ?CLASS1 ?CLASS2) (genls ?CLASS2 ?CLASS1)))").
 %
 :-assert_kif("(instance valence BinaryPredicate)").
 :-assert_kif("(instance valence AsymmetricRelation)").
@@ -278,7 +278,7 @@
 :-assert_kif("(instance exhaustiveDecomposition VariableArityRelation)").
 :-assert_kif("(domain exhaustiveDecomposition 1 Class)").
 :-assert_kif("(relatedInternalConcept exhaustiveDecomposition partition)").
-:-assert_kif("(documentation exhaustiveDecomposition \"An &%exhaustiveDecomposition of a &%Class C is a set of subclasses of C such that every subclass of C either is an element of the set or is a subclass of an element of the set. Note: this does not necessarily mean that the elements of the set are disjoint (see &%partition - a &%partition is a disjoint exhaustive decomposition.)\")").
+:-assert_kif("(documentation exhaustiveDecomposition \"An &%exhaustiveDecomposition of a &%Class C is a set of subclasses of C such that every genls of C either is an element of the set or is a genls of an element of the set. Note: this does not necessarily mean that the elements of the set are disjoint (see &%partition - a &%partition is a disjoint exhaustive decomposition.)\")").
 %
 :-assert_kif("(=> (exhaustiveDecomposition @ROW) (=> (inList ?ELEMENT (ListFn @ROW)) (instance ?ELEMENT Class)))").
 %
@@ -293,14 +293,14 @@
 %
 :-assert_kif("(=> (disjointDecomposition @ROW) (=> (inList ?ELEMENT (ListFn @ROW)) (instance ?ELEMENT Class)))").
 %
-:-assert_kif("(=> (disjointDecomposition ?CLASS @ROW) (forall (?ITEM) (=> (inList ?ITEM (ListFn @ROW)) (subclass ?ITEM ?CLASS))))").
+:-assert_kif("(=> (disjointDecomposition ?CLASS @ROW) (forall (?ITEM) (=> (inList ?ITEM (ListFn @ROW)) (genls ?ITEM ?CLASS))))").
 %
 :-assert_kif("(=> (disjointDecomposition ?CLASS @ROW) (forall (?ITEM1 ?ITEM2) (=> (and (inList ?ITEM1 (ListFn @ROW)) (inList ?ITEM2 (ListFn @ROW)) (not (equal ?ITEM1 ?ITEM2))) (disjoint ?ITEM1 ?ITEM2))))").
 %
 :-assert_kif("(instance partition Predicate)").
 :-assert_kif("(instance partition VariableArityRelation)").
 :-assert_kif("(domain partition 1 Class)").
-:-assert_kif("(documentation partition \"A &%partition of a class C is a set of mutually &%disjoint classes (a subclass partition) which covers C. Every instance of C is an instance of exactly one of the subclasses in the partition.\")").
+:-assert_kif("(documentation partition \"A &%partition of a class C is a set of mutually &%disjoint classes (a genls partition) which covers C. Every instance of C is an instance of exactly one of the subclasses in the partition.\")").
 %
 :-assert_kif("(<=> (partition @ROW) (and (exhaustiveDecomposition @ROW) (disjointDecomposition @ROW)))").
 %
@@ -477,18 +477,18 @@
 %
 :-assert_kif("(exists (?THING) (instance ?THING Entity))").
 %
-:-assert_kif("(<=> (instance ?CLASS Class) (subclass ?CLASS Entity))").
+:-assert_kif("(<=> (instance ?CLASS Class) (genls ?CLASS Entity))").
 %
-:-assert_kif("(subclass Physical Entity)").
+:-assert_kif("(genls Physical Entity)").
 :-assert_kif("(partition Physical Object Process)").
 :-assert_kif("(documentation Physical \"An entity that has a location in space-time. Note that locations are themselves understood to have a location in space -time.\")").
 %
 :-assert_kif("(<=> (instance ?PHYS Physical) (exists (?LOC ?TIME) (and (located ?PHYS ?LOC) (time ?PHYS ?TIME))))").
 %
-:-assert_kif("(subclass Object Physical)").
+:-assert_kif("(genls Object Physical)").
 :-assert_kif("(documentation Object \"Corresponds roughly to the class of ordinary objects . Examples include normal physical objects, geographical regions, and locations of &%Processes, the complement of &%Objects in the &%Physical class . In a 4D ontology, an &%Object is something whose spatiotemporal extent is thought of as dividing into spatial parts roughly parallel to the time -axis.\")").
 %
-:-assert_kif("(subclass SelfConnectedObject Object)").
+:-assert_kif("(genls SelfConnectedObject Object)").
 :-assert_kif("(documentation SelfConnectedObject \"A &%SelfConnectedObject is any &%Object that does not consist of two or more disconnected parts.\")").
 %
 :-assert_kif("(instance FrontFn SpatialRelation)").
@@ -553,76 +553,76 @@
 %
 :-assert_kif("(<=> (contains ?OBJ1 ?OBJ2) (exists (?HOLE) (and (hole ?HOLE ?OBJ1) (properlyFills ?OBJ2 ?HOLE))))").
 %
-:-assert_kif("(subclass Substance SelfConnectedObject)").
+:-assert_kif("(genls Substance SelfConnectedObject)").
 :-assert_kif("(documentation Substance \"An &%Object in which every part is similar to every other in every relevant respect. More precisely, something is a &%Substance when it has only arbitrary pieces as parts - any parts have properties which are similar to those of the whole. Note that a &%Substance may nonetheless have physical properties that vary. For example, the temperature , chemical constitution, density, etc. may change from one part to another. An example would be a body of water.\")").
 %
-:-assert_kif("(=> (and (subclass ?OBJECTTYPE Substance) (instance ?OBJECT ?OBJECTTYPE) (part ?PART ?OBJECT)) (instance ?PART ?OBJECTTYPE))").
+:-assert_kif("(=> (and (genls ?OBJECTTYPE Substance) (instance ?OBJECT ?OBJECTTYPE) (part ?PART ?OBJECT)) (instance ?PART ?OBJECTTYPE))").
 %
 :-assert_kif("(=> (and (instance ?OBJ Substance) (attribute ?OBJ ?ATTR) (part ?PART ?OBJ)) (attribute ?PART ?ATTR))").
 %
-:-assert_kif("(subclass PureSubstance Substance)").
+:-assert_kif("(genls PureSubstance Substance)").
 :-assert_kif("(partition PureSubstance CompoundSubstance ElementalSubstance)").
 :-assert_kif("(documentation PureSubstance \"The &%Class of &%Substances with constant composition . A &%PureSubstance can be either an element (&%ElementalSubstance) or a compound of elements (&%CompoundSubstance). Examples: Table salt (sodium chloride, NaCl), sugar (sucrose, C_{12}H_{22}O_{11}), water (H_2O), iron (Fe), copper (Cu), and oxygen (O_2).\")").
 %
-:-assert_kif("(subclass ElementalSubstance PureSubstance)").
+:-assert_kif("(genls ElementalSubstance PureSubstance)").
 :-assert_kif("(documentation ElementalSubstance \"The &%Class of &%PureSubstances that cannot be separated into two or more &%Substances by ordinary chemical (or physical) means. This excludes nuclear reactions. &%ElementalSubstances are composed of only one kind of atom. Examples: Iron (Fe), copper (Cu), and oxygen (O_2). &%ElementalSubstances are the simplest &%PureSubstances.\")").
 %
-:-assert_kif("(subclass Metal ElementalSubstance)").
+:-assert_kif("(genls Metal ElementalSubstance)").
 :-assert_kif("(documentation Metal \"A &%Metal is an &%ElementalSubstance that conducts heat and electricity, is shiny and reflects many colors of light, and can be hammered into sheets or drawn into wire. About 80% of the known chemical elements (&%ElementalSubstances) are metals.\")").
 %
-:-assert_kif("(subclass Atom ElementalSubstance)").
+:-assert_kif("(genls Atom ElementalSubstance)").
 :-assert_kif("(documentation Atom \"An extremely small unit of matter that retains its identity in Chemical reactions. It consists of an &%AtomicNucleus and &%Electrons surrounding the &%AtomicNucleus.\")").
 %
 :-assert_kif("(=> (instance ?ATOM Atom) (exists (?PROTON ?ELECTRON) (and (component ?PROTON ?ATOM) (component ?ELECTRON ?ATOM) (instance ?PROTON Proton) (instance ?ELECTRON Electron))))").
 %
 :-assert_kif("(=> (instance ?ATOM Atom) (forall (?NUCLEUS1 ?NUCLEUS2) (=> (and (component ?NUCLEUS1 ?ATOM) (component ?NUCLEUS2 ?ATOM) (instance ?NUCLEUS1 AtomicNucleus) (instance ?NUCLEUS2 AtomicNucleus)) (equal ?NUCLEUS1 ?NUCLEUS2))))").
 %
-:-assert_kif("(subclass SubatomicParticle ElementalSubstance)").
+:-assert_kif("(genls SubatomicParticle ElementalSubstance)").
 :-assert_kif("(documentation SubatomicParticle \"The class of &%ElementalSubstances that are smaller than &%Atoms and compose &%Atoms.\")").
 %
 :-assert_kif("(=> (instance ?PARTICLE SubatomicParticle) (exists (?ATOM) (and (instance ?ATOM Atom) (part ?PARTICLE ?ATOM))))").
 %
-:-assert_kif("(subclass AtomicNucleus SubatomicParticle)").
+:-assert_kif("(genls AtomicNucleus SubatomicParticle)").
 :-assert_kif("(documentation AtomicNucleus \"The core of the &%Atom. It is composed of &%Protons and &%Neutrons.\")").
 %
 :-assert_kif("(=> (instance ?NUCLEUS AtomicNucleus) (exists (?NEUTRON ?PROTON) (and (component ?NEUTRON ?NUCLEUS) (component ?PROTON ?NUCLEUS) (instance ?NEUTRON Neutron) (instance ?PROTON Proton))))").
 %
-:-assert_kif("(subclass Electron SubatomicParticle)").
+:-assert_kif("(genls Electron SubatomicParticle)").
 :-assert_kif("(documentation Electron \"&%SubatomicParticles that surround the &%AtomicNucleus. They have a negative charge.\")").
 %
-:-assert_kif("(subclass Proton SubatomicParticle)").
+:-assert_kif("(genls Proton SubatomicParticle)").
 :-assert_kif("(documentation Proton \"Components of the &%AtomicNucleus. They have a positive charge.\")").
 %
-:-assert_kif("(subclass Neutron SubatomicParticle)").
+:-assert_kif("(genls Neutron SubatomicParticle)").
 :-assert_kif("(documentation Neutron \"Components of the &%AtomicNucleus. They have no charge .\")").
 %
-:-assert_kif("(subclass CompoundSubstance PureSubstance)").
+:-assert_kif("(genls CompoundSubstance PureSubstance)").
 :-assert_kif("(documentation CompoundSubstance \"The &%Class of &%Substances that contain two or more elements (&%ElementalSubstances), in definite proportion by weight. The composition of a pure compound will be invariant, regardless of the method of preparation. Compounds are composed of more than one kind of atom (element). The term molecule is often used for the smallest unit of a compound that still retains all of the properties of the compound. Examples: Table salt (sodium chloride , NaCl), sugar (sucrose, C_{12}H_{22}O_{11}), and water (H_2O). \")").
 %
-:-assert_kif("(subclass Mixture Substance)").
+:-assert_kif("(genls Mixture Substance)").
 :-assert_kif("(documentation Mixture \"A &%Mixture is two or more &%PureSubstances, combined in varying proportions - each retaining its own specific properties. The components of a &%Mixture can be separated by physical means, i.e. without the making and breaking of chemical bonds. Examples: Air, table salt thoroughly dissolved in water, milk, wood, and concrete. \")").
 %
 :-assert_kif("(=> (instance ?MIXTURE Mixture) (exists (?PURE1 ?PURE2) (and (instance ?PURE1 PureSubstance) (instance ?PURE2 PureSubstance) (not (equal ?PURE1 ?PURE2)) (part ?PURE1 ?MIXTURE) (part ?PURE2 ?MIXTURE))))").
 %
 :-assert_kif("(=> (and (instance ?MIXTURE Mixture) (part ?SUBSTANCE ?MIXTURE) (not (instance ?SUBSTANCE Mixture))) (instance ?SUBSTANCE PureSubstance))").
 %
-:-assert_kif("(subclass Solution Mixture)").
+:-assert_kif("(genls Solution Mixture)").
 :-assert_kif("(documentation Solution \"A liquid mixture. The most abundant component in a solution is called the solvent. Other components are called solutes. A solution, though homogeneous, may nonetheless have variable composition. Any amount of salt, up to a maximum limit, can be dissolved in a given amount of water.\")").
 %
-:-assert_kif("(subclass CorpuscularObject SelfConnectedObject)").
+:-assert_kif("(genls CorpuscularObject SelfConnectedObject)").
 :-assert_kif("(disjoint CorpuscularObject Substance)").
 :-assert_kif("(documentation CorpuscularObject \"A &%SelfConnectedObject whose parts have properties that are not shared by the whole.\")").
 %
-:-assert_kif("(=> (instance ?OBJ CorpuscularObject) (exists (?SUBSTANCE1 ?SUBSTANCE2) (and (subclass ?SUBSTANCE1 Substance) (subclass ?SUBSTANCE2 Substance) (material ?SUBSTANCE1 ?OBJ) (material ?SUBSTANCE2 ?OBJ) (not (equal ?SUBSTANCE1 ?SUBSTANCE2)))))").
+:-assert_kif("(=> (instance ?OBJ CorpuscularObject) (exists (?SUBSTANCE1 ?SUBSTANCE2) (and (genls ?SUBSTANCE1 Substance) (genls ?SUBSTANCE2 Substance) (material ?SUBSTANCE1 ?OBJ) (material ?SUBSTANCE2 ?OBJ) (not (equal ?SUBSTANCE1 ?SUBSTANCE2)))))").
 %
-:-assert_kif("(subclass Region Object)").
-:-assert_kif("(subclass Region Location)").
+:-assert_kif("(genls Region Object)").
+:-assert_kif("(genls Region Location)").
 :-assert_kif("(partition Region GeographicArea SpaceRegion)").
-:-assert_kif("(documentation Region \"A topographic location. &%Regions encompass surfaces of &%Objects, imaginary places, and &%GeographicAreas. Note that a &%Region is the only kind of &%Object which can be located at itself . Note too that &%Region is not a subclass of &%SelfConnectedObject, because some &%Regions, e.g. archipelagos, have &%parts which are not &%connected with one another.\")").
+:-assert_kif("(documentation Region \"A topographic location. &%Regions encompass surfaces of &%Objects, imaginary places, and &%GeographicAreas. Note that a &%Region is the only kind of &%Object which can be located at itself . Note too that &%Region is not a genls of &%SelfConnectedObject, because some &%Regions, e.g. archipelagos, have &%parts which are not &%connected with one another.\")").
 %
 :-assert_kif("(=> (instance ?REGION Region) (exists (?PHYS) (located ?PHYS ?REGION)))").
 %
-:-assert_kif("(subclass Collection Object)").
+:-assert_kif("(genls Collection Object)").
 :-assert_kif("(disjoint Collection SelfConnectedObject)").
 :-assert_kif("(documentation Collection \"Collections have &%members like &%Classes, but, unlike &%Classes, they have a position in space-time and &%members can be added and subtracted without thereby changing the identity of the &%Collection. Some examples are toolkits, football teams, and flocks of sheep.\")").
 %
@@ -645,16 +645,16 @@
 %
 :-assert_kif("(<=> (subCollection ?COLL1 ?COLL2) (and (instance ?COLL1 Collection) (instance ?COLL2 Collection) (forall (?MEMBER) (=> (member ?MEMBER ?COLL1) (member ?MEMBER ?COLL2)))))").
 %
-:-assert_kif("(subclass ContentBearingObject CorpuscularObject)").
+:-assert_kif("(genls ContentBearingObject CorpuscularObject)").
 :-assert_kif("(relatedInternalConcept ContentBearingObject containsInformation)").
 :-assert_kif("(documentation ContentBearingObject \"Any &%SelfConnectedObject that expresses information .\")").
 %
-:-assert_kif("(subclass SymbolicString ContentBearingObject)").
+:-assert_kif("(genls SymbolicString ContentBearingObject)").
 :-assert_kif("(:hasRestrictedVal SymbolicString hasAbstractContent AbstractString)").
 :-assert_kif("(documentation SymbolicString \"The &%Class of alphanumeric sequences.\")").
 %
-:-assert_kif("(subclass Character SymbolicString)").
-:-assert_kif("(documentation Character \"An element of an alphabet, a set of numerals, etc. Note that a &%Character may or may not be part of a &%Language. &%Character is a subclass of &%SymbolicString, because every instance of &%Character is an alphanumeric sequence consisting of a single element.\")").
+:-assert_kif("(genls Character SymbolicString)").
+:-assert_kif("(documentation Character \"An element of an alphabet, a set of numerals, etc. Note that a &%Character may or may not be part of a &%Language. &%Character is a genls of &%SymbolicString, because every instance of &%Character is an alphanumeric sequence consisting of a single element.\")").
 %
 :-assert_kif("(=> (instance ?STRING SymbolicString) (exists (?PART) (and (part ?PART ?STRING) (instance ?PART Character))))").
 %
@@ -665,75 +665,75 @@
 :-assert_kif("(domain containsInformation 2 Proposition)").
 :-assert_kif("(documentation containsInformation \"A subrelation of &%represents. This predicate relates a &%ContentBearingObject to the &%Proposition that is` expressed by the &%ContentBearingObject. Examples include the relationships between a physical novel and its story and between a printed score and its musical content.\")").
 %
-:-assert_kif("(subclass Icon ContentBearingObject)").
-:-assert_kif("(documentation Icon \"This is the subclass of &%ContentBearingObjects which are not part of a &%Language and which have some sort of similarity with the &%Objects that they represent. This &%Class would include symbolic roadway signs, representational art works, photographs, etc.\")").
+:-assert_kif("(genls Icon ContentBearingObject)").
+:-assert_kif("(documentation Icon \"This is the genls of &%ContentBearingObjects which are not part of a &%Language and which have some sort of similarity with the &%Objects that they represent. This &%Class would include symbolic roadway signs, representational art works, photographs, etc.\")").
 %
-:-assert_kif("(subclass MotionPicture Text)").
+:-assert_kif("(genls MotionPicture Text)").
 :-assert_kif("(documentation MotionPicture \"A &%ContentBearingObject which depicts motion (and which may have an audio or text component as well). This &%Class covers films , videos, etc.\")").
 %
-:-assert_kif("(subclass LinguisticExpression ContentBearingObject)").
+:-assert_kif("(genls LinguisticExpression ContentBearingObject)").
 :-assert_kif("(disjoint LinguisticExpression Icon)").
-:-assert_kif("(documentation LinguisticExpression \"This is the subclass of &%ContentBearingObjects which are language-related. Note that this &%Class encompasses both &%Language and the the elements of &%Languages, e .g. &%Words.\")").
+:-assert_kif("(documentation LinguisticExpression \"This is the genls of &%ContentBearingObjects which are language-related. Note that this &%Class encompasses both &%Language and the the elements of &%Languages, e .g. &%Words.\")").
 %
-:-assert_kif("(subclass Language LinguisticExpression)").
+:-assert_kif("(genls Language LinguisticExpression)").
 :-assert_kif("(disjointDecomposition Language AnimalLanguage HumanLanguage ComputerLanguage)").
 :-assert_kif("(documentation Language \"A system of signs for expressing thought. The system can be either natural or artificial, i.e. something that emerges gradually as a cultural artifact or something that is intentionally created by a person or group of people.\")").
 %
-:-assert_kif("(subclass AnimalLanguage Language)").
-:-assert_kif("(documentation AnimalLanguage \"The &%subclass of &%Languages used by &%Animals other than &%Humans.\")").
+:-assert_kif("(genls AnimalLanguage Language)").
+:-assert_kif("(documentation AnimalLanguage \"The &%genls of &%Languages used by &%Animals other than &%Humans.\")").
 %
 :-assert_kif("(=> (and (instance ?LANG AnimalLanguage) (agent ?PROC ?AGENT) (instrument ?PROC ?LANG)) (and (instance ?AGENT Animal) (not (instance ?AGENT Human))))").
 %
-:-assert_kif("(subclass ArtificialLanguage Language)").
-:-assert_kif("(documentation ArtificialLanguage \"The &%subclass of &%Languages that are designed by &%Humans.\")").
+:-assert_kif("(genls ArtificialLanguage Language)").
+:-assert_kif("(documentation ArtificialLanguage \"The &%genls of &%Languages that are designed by &%Humans.\")").
 %
-:-assert_kif("(subclass ComputerLanguage ArtificialLanguage)").
+:-assert_kif("(genls ComputerLanguage ArtificialLanguage)").
 :-assert_kif("(documentation ComputerLanguage \"The class of &%Languages designed for and interpreted by a computer.\")").
 %
 :-assert_kif("(=> (and (instance ?LANG ComputerLanguage) (agent ?PROC ?AGENT) (instrument ?PROC ?LANG)) (instance ?AGENT Machine))").
 %
-:-assert_kif("(subclass HumanLanguage Language)").
+:-assert_kif("(genls HumanLanguage Language)").
 :-assert_kif("(partition HumanLanguage NaturalLanguage ConstructedLanguage)").
 :-assert_kif("(partition HumanLanguage SpokenHumanLanguage ManualHumanLanguage)").
-:-assert_kif("(documentation HumanLanguage \"The &%subclass of &%Languages used by &%Humans.\")").
+:-assert_kif("(documentation HumanLanguage \"The &%genls of &%Languages used by &%Humans.\")").
 %
 :-assert_kif("(=> (and (instance ?LANG HumanLanguage) (agent ?PROC ?AGENT) (instrument ?PROC ?LANG)) (instance ?AGENT Human))").
 %
-:-assert_kif("(subclass ConstructedLanguage HumanLanguage)").
-:-assert_kif("(subclass ConstructedLanguage ArtificialLanguage)").
+:-assert_kif("(genls ConstructedLanguage HumanLanguage)").
+:-assert_kif("(genls ConstructedLanguage ArtificialLanguage)").
 :-assert_kif("(documentation ConstructedLanguage \"An &%ConstructedLanguage is a &%HumanLanguage that did not evolve spontaneously within a language community , but rather had its core grammar and vocabulary invented by one or more language experts, often with an aim to produce a more grammatically regular language than any language that has evolved naturally . This &%Class includes languages like Esperanto that were created to facilitate international communication\")").
 %
 :-assert_kif("(=> (instance ?LANG ConstructedLanguage) (exists (?PLAN) (and (instance ?PLAN Planning) (result ?PLAN ?LANG))))").
 %
-:-assert_kif("(subclass NaturalLanguage HumanLanguage)").
-:-assert_kif("(documentation NaturalLanguage \"The &%subclass of &%HumanLanguages which are not designed and which evolve from generation to generation. This &%Class includes all of the national languages, e.g. English, Spanish, Japanese , etc. Note that this class includes dialects of natural languages .\")").
+:-assert_kif("(genls NaturalLanguage HumanLanguage)").
+:-assert_kif("(documentation NaturalLanguage \"The &%genls of &%HumanLanguages which are not designed and which evolve from generation to generation. This &%Class includes all of the national languages, e.g. English, Spanish, Japanese , etc. Note that this class includes dialects of natural languages .\")").
 %
-:-assert_kif("(subclass ManualHumanLanguage HumanLanguage)").
+:-assert_kif("(genls ManualHumanLanguage HumanLanguage)").
 :-assert_kif("(documentation ManualHumanLanguage \"A &%ManualHumanLanguage is a &%HumanLanguage which has as its medium gestures and movement, such as the shape, position, and movement of the hands.\")").
 %
-:-assert_kif("(subclass SpokenHumanLanguage HumanLanguage)").
+:-assert_kif("(genls SpokenHumanLanguage HumanLanguage)").
 :-assert_kif("(documentation SpokenHumanLanguage \"A &%SpokenHumanLanguage is a &%HumanLanguage which has as its medium the human voice. It can also berepresented visually through writing, although not all &%SpokenHumanLanguages have a codified written form.\")").
 %
-:-assert_kif("(subclass Word LinguisticExpression)").
+:-assert_kif("(genls Word LinguisticExpression)").
 :-assert_kif("(partition Word Noun Verb Adjective Adverb Particle)").
 :-assert_kif("(documentation Word \"A term of a &%Language that represents a concept.\")").
 %
-:-assert_kif("(subclass Formula Sentence)").
+:-assert_kif("(genls Formula Sentence)").
 :-assert_kif("(documentation Formula \"A syntactically well-formed formula in the SUO -KIF knowledge representation language.\")").
 %
 % :-assert_kif(";The following ground facts incorporate the 'Agent' hierarchy from the ").
 % :-assert_kif(";corresponding ontology on the Ontolingua server. It also includes ").
 % :-assert_kif(";predicates defined in the ITBM-CNR ontology \"Actors\". ").
-:-assert_kif("(subclass Agent Object)").
+:-assert_kif("(genls Agent Object)").
 :-assert_kif("(documentation Agent \"Something or someone that can act on its own and produce changes in the world.\")").
 %
 :-assert_kif("(<=> (instance ?AGENT Agent) (exists (?PROC) (agent ?PROC ?AGENT)))").
 %
-:-assert_kif("(subclass SentientAgent Agent)").
+:-assert_kif("(genls SentientAgent Agent)").
 :-assert_kif("(documentation SentientAgent \"An &%Agent that has rights but may or may not have responsibilities and the ability to reason. If the latter are present , then the &%Agent is also an instance of &%CognitiveAgent. Domesticated animals are an example of &%SentientAgents that are not also &%CognitiveAgents.\")").
 %
-:-assert_kif("(subclass CognitiveAgent SentientAgent)").
-:-assert_kif("(documentation CognitiveAgent \"A &%SentientAgent with responsibilities and the ability to reason, deliberate, make plans, etc. This is essentially the legal/ethical notion of a person. Note that, although &%Human is a subclass of &%CognitiveAgent, there may be instances of &%CognitiveAgent which are not also instances of &%Human. For example, chimpanzees , gorillas, dolphins, whales, and some extraterrestrials (if they exist) may be &%CognitiveAgents.\")").
+:-assert_kif("(genls CognitiveAgent SentientAgent)").
+:-assert_kif("(documentation CognitiveAgent \"A &%SentientAgent with responsibilities and the ability to reason, deliberate, make plans, etc. This is essentially the legal/ethical notion of a person. Note that, although &%Human is a genls of &%CognitiveAgent, there may be instances of &%CognitiveAgent which are not also instances of &%Human. For example, chimpanzees , gorillas, dolphins, whales, and some extraterrestrials (if they exist) may be &%CognitiveAgents.\")").
 %
 :-assert_kif("(instance leader BinaryPredicate)").
 :-assert_kif("(instance leader AsymmetricRelation)").
@@ -747,15 +747,15 @@
 :-assert_kif("(=> (and (instance ?AREA GeopoliticalArea) (leader ?AREA ?PERSON))").
 :-assert_kif("(leader (GovernmentFn ?AREA) ?PERSON))").
 %
-:-assert_kif("(subclass Process Physical)").
+:-assert_kif("(genls Process Physical)").
 :-assert_kif("(documentation Process \"Intuitively, the class of things that happen and have temporal parts or stages. Examples include extended events like a football match or a race, actions like &%Pursuing and &%Reading, and biological processes. The formal definition is: anything that lasts for a time but is not an &%Object. Note that a &%Process may have participants 'inside' it which are &%Objects, such as the players in a football match. In a 4D ontology, a &%Process is something whose spatiotemporal extent is thought of as dividing into temporal stages roughly perpendicular to the time-axis.\")").
 %
-:-assert_kif("(subclass DualObjectProcess Process)").
+:-assert_kif("(genls DualObjectProcess Process)").
 :-assert_kif("(documentation DualObjectProcess \"Any &%Process that requires two, nonidentical &%patients.\")").
 %
 :-assert_kif("(=> (instance ?PROCESS DualObjectProcess) (exists (?OBJ1 ?OBJ2) (and (patient ?PROCESS ?OBJ1) (patient ?PROCESS ?OBJ2) (not (equal ?OBJ1 ?OBJ2)))))").
 %
-:-assert_kif("(subclass Abstract Entity)").
+:-assert_kif("(genls Abstract Entity)").
 :-assert_kif("(disjointDecomposition Abstract Quantity Attribute SetOrClass Relation Proposition Graph GraphElement)").
 :-assert_kif("(documentation Abstract \"Properties or qualities as distinguished from any particular embodiment of the properties/qualities in a physical medium. Instances of Abstract can be said to exist in the same sense as mathematical objects such as sets and relations, but they cannot exist at a particular place and time without some physical encoding or embodiment.\")").
 %
@@ -763,11 +763,11 @@
 % :-assert_kif(";location. ").
 :-assert_kif("(<=> (instance ?ABS Abstract) (not (exists (?POINT) (or (located ?ABS ?POINT) (time ?ABS ?POINT)))))").
 %
-:-assert_kif("(subclass Quantity Abstract)").
+:-assert_kif("(genls Quantity Abstract)").
 :-assert_kif("(partition Quantity FiniteQuantity InfiniteQuantity)").
 :-assert_kif("(documentation Quantity \"Any specification of how many or how much of something there is. Accordingly, there are two subclasses of &%Quantity: &%Number (how many) and &%PhysicalQuantity (how much).\")").
 %
-:-assert_kif("(subclass Attribute Abstract)").
+:-assert_kif("(genls Attribute Abstract)").
 :-assert_kif("(partition Attribute InternalAttribute RelationalAttribute)").
 :-assert_kif("(documentation Attribute \"Qualities which we cannot or choose not to reify into subclasses of &%Object.\")").
 %
@@ -805,15 +805,15 @@
 %
 :-assert_kif("(<=> (equal (ExtensionFn ?ATTRIBUTE) ?CLASS) (equal (AbstractionFn ?CLASS) ?ATTRIBUTE))").
 %
-:-assert_kif("(subclass InternalAttribute Attribute)").
+:-assert_kif("(genls InternalAttribute Attribute)").
 :-assert_kif("(documentation InternalAttribute \"Any &%Attribute of an &%Entity that is an internal property of the &%Entity, e.g. its shape, its color, its fragility, etc .\")").
 %
-:-assert_kif("(subclass RelationalAttribute Attribute)").
+:-assert_kif("(genls RelationalAttribute Attribute)").
 :-assert_kif("(documentation RelationalAttribute \"Any &%Attribute that an &%Entity has by virtue of a relationship that it bears to another &%Entity or set of &%Entities, e .g. &%SocialRoles and &%PositionalAttributes.\")").
 %
 % :-assert_kif(";The following formulas incorporate the Number hierarchy from the ").
 % :-assert_kif(";ontology 'kif-numbers' on the Ontolingua server. ").
-:-assert_kif("(subclass Number Quantity)").
+:-assert_kif("(genls Number Quantity)").
 :-assert_kif("(necessarily Number isReferencedBy AbstractNumericString)").
 :-assert_kif("(:hasRestrictedVal Number isRepresentedBy NumericString)").
 :-assert_kif("(partition Number RealNumber ImaginaryNumber ComplexNumber)").
@@ -859,126 +859,126 @@
 %
 :-assert_kif("(<=> (greaterThanOrEqualTo ?NUMBER1 ?NUMBER2) (or (equal ?NUMBER1 ?NUMBER2) (greaterThan ?NUMBER1 ?NUMBER2)))").
 %
-:-assert_kif("(subclass RealNumber Number)").
+:-assert_kif("(genls RealNumber Number)").
 :-assert_kif("(partition RealNumber NegativeRealNumber NonnegativeRealNumber)").
 :-assert_kif("(partition RealNumber RationalNumber IrrationalNumber)").
 :-assert_kif("(documentation RealNumber \"Any &%Number that can be expressed as a (possibly infinite) decimal, i.e. any &%Number that has a position on the number line.\")").
 %
-:-assert_kif("(subclass ImaginaryNumber Number)").
+:-assert_kif("(genls ImaginaryNumber Number)").
 :-assert_kif("(documentation ImaginaryNumber \"Any &%Number that is the result of multiplying a &%RealNumber by the square root of -1.\")").
 %
 :-assert_kif("(=> (instance ?NUMBER ImaginaryNumber) (exists (?REAL) (and (instance ?REAL RealNumber) (equal ?NUMBER (MultiplicationFn ?REAL (SquareRootFn -1))))))").
 %
-:-assert_kif("(subclass RationalNumber RealNumber)").
+:-assert_kif("(genls RationalNumber RealNumber)").
 :-assert_kif("(documentation RationalNumber \"Any &%RealNumber that is the product of dividing two &%Integers.\")").
 %
-:-assert_kif("(subclass IrrationalNumber RealNumber)").
+:-assert_kif("(genls IrrationalNumber RealNumber)").
 :-assert_kif("(documentation IrrationalNumber \"Any &%RealNumber that is not also a &%RationalNumber.\")").
 %
-:-assert_kif("(subclass NonnegativeRealNumber RealNumber)").
+:-assert_kif("(genls NonnegativeRealNumber RealNumber)").
 :-assert_kif("(documentation NonnegativeRealNumber \"A &%RealNumber that is greater than or equal to zero.\")").
 %
 :-assert_kif("(<=> (instance ?NUMBER NonnegativeRealNumber) (and (greaterThanOrEqualTo ?NUMBER 0) (instance ?NUMBER RealNumber)))").
 %
-:-assert_kif("(subclass PositiveRealNumber NonnegativeRealNumber)").
+:-assert_kif("(genls PositiveRealNumber NonnegativeRealNumber)").
 :-assert_kif("(documentation PositiveRealNumber \"A &%RealNumber that is greater than zero .\")").
 %
 :-assert_kif("(<=> (instance ?NUMBER PositiveRealNumber) (and (greaterThan ?NUMBER 0) (instance ?NUMBER RealNumber)))").
 %
-:-assert_kif("(subclass NegativeRealNumber RealNumber)").
+:-assert_kif("(genls NegativeRealNumber RealNumber)").
 :-assert_kif("(documentation NegativeRealNumber \"A &%RealNumber that is less than zero .\")").
 %
 :-assert_kif("(<=> (instance ?NUMBER NegativeRealNumber) (and (lessThan ?NUMBER 0) (instance ?NUMBER RealNumber)))").
 %
-:-assert_kif("(subclass Integer RationalNumber)").
+:-assert_kif("(genls Integer RationalNumber)").
 :-assert_kif("(partition Integer OddInteger EvenInteger)").
 :-assert_kif("(partition Integer NegativeInteger NonnegativeInteger)").
 :-assert_kif("(documentation Integer \"A negative or nonnegative whole number.\")").
 %
-:-assert_kif("(subclass EvenInteger Integer)").
+:-assert_kif("(genls EvenInteger Integer)").
 :-assert_kif("(documentation EvenInteger \"An &%Integer that is evenly divisible by 2.\")").
 %
-:-assert_kif("(subclass OddInteger Integer)").
+:-assert_kif("(genls OddInteger Integer)").
 :-assert_kif("(documentation OddInteger \"An &%Integer that is not evenly divisible by 2.\")").
 %
-:-assert_kif("(subclass PrimeNumber Integer)").
+:-assert_kif("(genls PrimeNumber Integer)").
 :-assert_kif("(documentation PrimeNumber \"An &%Integer that is evenly divisible only by itself and 1.\")").
 %
-:-assert_kif("(subclass NonnegativeInteger Integer)").
-:-assert_kif("(subclass NonnegativeInteger NonnegativeRealNumber)").
+:-assert_kif("(genls NonnegativeInteger Integer)").
+:-assert_kif("(genls NonnegativeInteger NonnegativeRealNumber)").
 :-assert_kif("(documentation NonnegativeInteger \"An &%Integer that is greater than or equal to zero.\")").
 %
-:-assert_kif("(subclass NegativeInteger Integer)").
-:-assert_kif("(subclass NegativeInteger NegativeRealNumber)").
+:-assert_kif("(genls NegativeInteger Integer)").
+:-assert_kif("(genls NegativeInteger NegativeRealNumber)").
 :-assert_kif("(documentation NegativeInteger \"An &%Integer that is less than zero.\")").
 %
-:-assert_kif("(subclass PositiveInteger NonnegativeInteger)").
-:-assert_kif("(subclass PositiveInteger PositiveRealNumber)").
+:-assert_kif("(genls PositiveInteger NonnegativeInteger)").
+:-assert_kif("(genls PositiveInteger PositiveRealNumber)").
 :-assert_kif("(documentation PositiveInteger \"An &%Integer that is greater than zero.\")").
 %
-:-assert_kif("(subclass BinaryNumber RealNumber)").
+:-assert_kif("(genls BinaryNumber RealNumber)").
 :-assert_kif("(documentation BinaryNumber \"Elements from the number system with base 2. Every &%BinaryNumber is expressed as a sequence of the digits 1 and 0.\")").
 %
-:-assert_kif("(subclass ComplexNumber Number)").
+:-assert_kif("(genls ComplexNumber Number)").
 :-assert_kif("(disjoint ComplexNumber RealNumber)").
 :-assert_kif("(documentation ComplexNumber \"A &%Number that has the form: x + yi, where x and y are &%RealNumbers and i is the square root of -1.\")").
 %
 :-assert_kif("(=> (instance ?NUMBER ComplexNumber) (exists (?REAL1 ?REAL2) (and (instance ?REAL1 RealNumber) (instance ?REAL2 RealNumber) (equal ?NUMBER (AdditionFn ?REAL1 (MultiplicationFn ?REAL2 (SquareRootFn -1)))))))").
 %
-:-assert_kif("(subclass PhysicalQuantity Quantity)").
+:-assert_kif("(genls PhysicalQuantity Quantity)").
 :-assert_kif("(partition PhysicalQuantity ConstantQuantity FunctionQuantity)").
 :-assert_kif("(documentation PhysicalQuantity \"&%A PhysicalQuantity is a measure of some quantifiable aspect of the modeled world, such as 'the earth's diameter ' (a constant length) and 'the stress in a loaded deformable solid ' (a measure of stress, which is a function of three spatial coordinates ). All &%PhysicalQuantities are either &%ConstantQuantities or &%FunctionQuantities. Instances of &%ConstantQuantity are dependent on a &%UnitOfMeasure, while instances of &%FunctionQuantity are &%Functions that map instances of &%ConstantQuantity to other instances of &%ConstantQuantity (e.g., &%TimeDependentQuantities are &%FunctionQuantities). Although the name and definition of &%PhysicalQuantity is borrowed from physics, &%PhysicalQuantities need not be material. Aside from the dimensions of length, time, velocity, etc ., nonphysical dimensions such as currency are also possible. Accordingly , amounts of money would be instances of &%PhysicalQuantity. &%PhysicalQuantities are distinguished from &%Numbers by the fact that the former are associated with a dimension of measurement.\")").
 %
-:-assert_kif("(subclass ConstantQuantity PhysicalQuantity)").
+:-assert_kif("(genls ConstantQuantity PhysicalQuantity)").
 :-assert_kif("(documentation ConstantQuantity \"A &%ConstantQuantity is a &%PhysicalQuantity which has a constant value, e.g. 3 meters and 5 hours. The magnitude (see &%MagnitudeFn) of every &%ConstantQuantity is a &%RealNumber. &%ConstantQuantities are distinguished from &%FunctionQuantities, which map &%ConstantQuantities to other &%ConstantQuantities. All &%ConstantQuantites are expressed with the &%BinaryFunction &%MeasureFn, which takes a &%Number and a &%UnitOfMeasure as arguments. For example, 3 &%Meters can be expressed as (&%MeasureFn 3 &%Meter). &%ConstantQuantities form a partial order (see &%PartialOrderingRelation) with the &%lessThan relation, since &%lessThan is a &%RelationExtendedToQuantities and &%lessThan is defined over the &%RealNumbers. The &%lessThan relation is not a total order (see &%TotalOrderingRelation) over the class &%ConstantQuantity since elements of some subclasses of &%ConstantQuantity (such as length quantities) are incomparable to elements of other subclasses of &%ConstantQuantity (such as mass quantities).\")").
 %
-:-assert_kif("(subclass TimeMeasure ConstantQuantity)").
+:-assert_kif("(genls TimeMeasure ConstantQuantity)").
 :-assert_kif("(documentation TimeMeasure \"The class of temporal durations (instances of &%TimeDuration) and positions of &%TimePoints and &%TimeIntervals along the universal timeline (instances of &%TimePosition).\")").
 %
-:-assert_kif("(subclass TimeDuration TimeMeasure)").
+:-assert_kif("(genls TimeDuration TimeMeasure)").
 :-assert_kif("(documentation TimeDuration \"Any measure of length of time, with or without respect to the universal timeline.\")").
 %
-:-assert_kif("(subclass TimePosition TimeMeasure)").
-:-assert_kif("(subclass TimePosition Context)").
+:-assert_kif("(genls TimePosition TimeMeasure)").
+:-assert_kif("(genls TimePosition Context)").
 :-assert_kif("(partition TimePosition TimeInterval TimePoint)").
 :-assert_kif("(documentation TimePosition \"Any &%TimePoint or &%TimeInterval along the universal timeline from &%NegativeInfinity to &%PositiveInfinity.\")").
 %
-:-assert_kif("(subclass TimeInterval TimePosition)").
+:-assert_kif("(genls TimeInterval TimePosition)").
 :-assert_kif("(documentation TimeInterval \"An interval of time. Note that a &%TimeInterval has both an extent and a location on the universal timeline . Note too that a &%TimeInterval has no gaps, i.e. this class contains only convex time intervals.\")").
 %
-:-assert_kif("(subclass RecurrentTimeInterval TimeInterval)").
+:-assert_kif("(genls RecurrentTimeInterval TimeInterval)").
 :-assert_kif("(documentation RecurrentTimeInterval \"A class of intervals of time that may recur, such as specific hours of a day or specific days of the year. Note that a &%TimeInterval has both an extent and a location on the universal timeline . Note too that a &%TimeInterval has no gaps, i.e. this class contains only convex time intervals.\")").
 %
-:-assert_kif("(subclass TimePoint TimePosition)").
+:-assert_kif("(genls TimePoint TimePosition)").
 :-assert_kif("(documentation TimePoint \"An extensionless point on the universal timeline. The &%TimePoints at which &%Processes occur can be known with various degrees of precision and approximation, but conceptually &%TimePoints are point -like and not interval-like. That is, it doesn't make sense to talk about how long a &%TimePoint lasts.\")").
 %
-:-assert_kif("(subclass FunctionQuantity PhysicalQuantity)").
-% :-assert_kif(";(subclass FunctionQuantity Function)").
+:-assert_kif("(genls FunctionQuantity PhysicalQuantity)").
+% :-assert_kif(";(genls FunctionQuantity Function)").
 % :-assert_kif(";commented out because ofdisjoint conflict -- PJC (documentation FunctionQuantity \"A &%FunctionQuantity is a &%Function that maps from one or more instances of &%ConstantQuantity to another instance of &%ConstantQuantity. For example, the velocity of a particle would be represented by a &%FunctionQuantity mapping values of time (which are &%ConstantQuantities) to values of distance (also &%ConstantQuantities). Note that all instances of &%FunctionQuantity are &%Functions with a fixed arity . Note too that all elements of the range of a &%FunctionQuantity have the same physical dimension as the &%FunctionQuantity itself.\")").
 %
-:-assert_kif("(subclass UnaryConstantFunctionQuantity FunctionQuantity)").
-:-assert_kif("(subclass UnaryConstantFunctionQuantity UnaryFunction)").
+:-assert_kif("(genls UnaryConstantFunctionQuantity FunctionQuantity)").
+:-assert_kif("(genls UnaryConstantFunctionQuantity UnaryFunction)").
 :-assert_kif("(documentation UnaryConstantFunctionQuantity \"The class of &%UnaryFunctions that map from the &%Class &%ConstantQuantity to the &%Class &%ConstantQuantity.\")").
 %
 :-assert_kif("(=> (instance ?FUNCTION UnaryConstantFunctionQuantity) (and (domain ?FUNCTION 1 ConstantQuantity) (range ?FUNCTION ConstantQuantity)))").
 %
-:-assert_kif("(subclass TimeDependentQuantity UnaryConstantFunctionQuantity)").
-% :-assert_kif("; (subclass TimeDependentQuantity ContinuousFunction)").
+:-assert_kif("(genls TimeDependentQuantity UnaryConstantFunctionQuantity)").
+% :-assert_kif("; (genls TimeDependentQuantity ContinuousFunction)").
 :-assert_kif("(documentation TimeDependentQuantity \"A &%UnaryConstantFunction of continuous time . All instances of this &%Class map a time quantity into another &%ConstantQuantity such as temperature. For example, 'the temperature at the top of the Empire State Building' is a &%TimeDependentQuantity since its value depends on the time.\")").
 %
 :-assert_kif("(=> (instance ?FUNCTION TimeDependentQuantity) (domain ?FUNCTION 1 TimeMeasure))").
 %
-:-assert_kif("(subclass SetOrClass Abstract)").
+:-assert_kif("(genls SetOrClass Abstract)").
 :-assert_kif("(partition SetOrClass Set Class)").
 :-assert_kif("(documentation SetOrClass \"The &%SetOrClass of &%Sets and &%Classes, i.e. any instance of &%Abstract that has &%elements or &%instances.\")").
 %
-:-assert_kif("(subclass Class SetOrClass)").
+:-assert_kif("(genls Class SetOrClass)").
 :-assert_kif("(documentation Class \"&%Classes differ from &%Sets in three important respects. First , &%Classes are not assumed to be extensional. That is, distinct &%Classes might well have exactly the same instances. Second, &%Classes typically have an associated `condition' that determines the instances of the &%Class. So, for example, the condition `human' determines the &%Class of &%Humans. Note that some &%Classes might satisfy their own condition (e.g., the &%Class of &%Abstract things is &%Abstract) and hence be instances of themselves. Third, the instances of a class may occur only once within the class, i.e. a class cannot contain duplicate instances.\")").
 %
-:-assert_kif("(subclass Set SetOrClass)").
+:-assert_kif("(genls Set SetOrClass)").
 :-assert_kif("(documentation Set \"A &%SetOrClass that satisfies extensionality as well as other constraints specified by some choice of set theory. &%Sets differ from &%Classes in two important respects. First, &%Sets are extensional - two &%Sets with the same &%elements are identical. Second, a &%Set can be an arbitrary stock of objects. That is, there is no requirement that &%Sets have an associated condition that determines their membership. Note that &%Sets are not assumed to be unique sets, i.e. &%elements of a &%Set may occur more than once in the &%Set.\")").
 %
-:-assert_kif("(subclass Relation Abstract)").
+:-assert_kif("(genls Relation Abstract)").
 :-assert_kif("(disjointDecomposition Relation UnaryRelation BinaryRelation TernaryRelation QuaternaryRelation QuintaryRelation VariableArityRelation)").
 :-assert_kif("(partition Relation Predicate Function List)").
 :-assert_kif("(partition Relation TotalValuedRelation PartialValuedRelation)").
@@ -989,90 +989,90 @@
 % :-assert_kif(";The following part of the ontology covers the various classes under ").
 % :-assert_kif(";'Relation'. Most of the content here is taken from frame-ontology, ").
 % :-assert_kif(";abstract-algebra, kif-relations, and kif-extensions (ontologie available on the Ontolingua server). ").
-:-assert_kif("(subclass SingleValuedRelation Relation)").
+:-assert_kif("(genls SingleValuedRelation Relation)").
 :-assert_kif("(instance SingleValuedRelation InheritableRelation)").
 :-assert_kif("(documentation SingleValuedRelation \"A &%Relation is a &%SingleValuedRelation just in case an assignment of values to every argument position except the last one determines at most one assignment for the last argument position. Note that not all &%SingleValuedRelations are &%TotalValuedRelations.\")").
 %
 :-assert_kif("(=> (instance ?REL SingleValuedRelation) (forall (@ROW ?ITEM1 ?ITEM2) (=> (and (holds ?REL @ROW ?ITEM1) (holds ?REL @ROW ?ITEM2)) (equal ?ITEM1 ?ITEM2))))").
 %
-:-assert_kif("(subclass TotalValuedRelation Relation)").
+:-assert_kif("(genls TotalValuedRelation Relation)").
 :-assert_kif("(instance TotalValuedRelation InheritableRelation)").
 :-assert_kif("(documentation TotalValuedRelation \"A &%Relation is a &%TotalValuedRelation just in case there exists an assignment for the last argument position of the &%Relation given any assignment of values to every argument position except the last one. Note that declaring a &%Relation to be both a &%TotalValuedRelation and a &%SingleValuedRelation means that it is a total function.\")").
 %
 :-assert_kif("(<=> (instance ?REL TotalValuedRelation) (exists (?VALENCE) (and (instance ?REL Relation) (valence ?REL ?VALENCE) (=> (forall (?NUMBER ?ELEMENT ?CLASS) (=> (and (lessThan ?NUMBER ?VALENCE) (domain ?REL ?NUMBER ?CLASS) (equal ?ELEMENT (ListOrderFn (ListFn @ROW) ?NUMBER))) (instance ?ELEMENT ?CLASS))) (exists (?ITEM) (holds ?REL @ROW ?ITEM))))))").
 %
-:-assert_kif("(subclass PartialValuedRelation Relation)").
+:-assert_kif("(genls PartialValuedRelation Relation)").
 :-assert_kif("(documentation PartialValuedRelation \"A &%Relation is a &%PartialValuedRelation just in case it is not a &%TotalValuedRelation, i.e. just in case assigning values to every argument position except the last one does not necessarily mean that there is a value assignment for the last argument position. Note that, if a &%Relation is both a &%PartialValuedRelation and a &%SingleValuedRelation, then it is a partial function.\")").
 %
-:-assert_kif("(subclass UnaryRelation Relation)").
+:-assert_kif("(genls UnaryRelation Relation)").
 :-assert_kif("(documentation UnaryRelation \"This relation was added to the SUMO 1.55 in November 2003 by P. Cassidy to allow consistent inclusion of the 'not' logical operator within the hierarchy of relations.\")").
 %
-:-assert_kif("(subclass BinaryRelation Relation)").
+:-assert_kif("(genls BinaryRelation Relation)").
 :-assert_kif("(instance BinaryRelation InheritableRelation)").
 :-assert_kif("(documentation BinaryRelation \"&%BinaryRelations are relations that are true only of pairs of things. &%BinaryRelations are represented as slots in frame systems.\")").
 %
 :-assert_kif("(=> (instance ?REL BinaryRelation) (not (exists (?ITEM1 ?ITEM2 ?ITEM3 @ROW) (holds ?REL ?ITEM1 ?ITEM2 ?ITEM3 @ROW))))").
 %
-:-assert_kif("(subclass ReflexiveRelation BinaryRelation)").
+:-assert_kif("(genls ReflexiveRelation BinaryRelation)").
 :-assert_kif("(documentation ReflexiveRelation \"&%Relation ?REL is reflexive if (?REL ?INST ?INST) for all ?INST.\")").
 %
 :-assert_kif("(=> (instance ?REL ReflexiveRelation) (=> (or (holds ?REL ?INST1 ?INST2) (holds ?REL ?INST2 ?INST1)) (holds ?REL ?INST1 ?INST1)))").
 %
-:-assert_kif("(subclass IrreflexiveRelation BinaryRelation)").
+:-assert_kif("(genls IrreflexiveRelation BinaryRelation)").
 :-assert_kif("(documentation IrreflexiveRelation \"&%Relation ?REL is irreflexive if (?REL ?INST ?INST) holds for no value of ?INST.\")").
 %
 :-assert_kif("(=> (instance ?REL IrreflexiveRelation) (forall (?INST) (not (holds ?REL ?INST ?INST))))").
 %
-:-assert_kif("(subclass SymmetricRelation BinaryRelation)").
+:-assert_kif("(genls SymmetricRelation BinaryRelation)").
 :-assert_kif("(documentation SymmetricRelation \"A &%BinaryRelation ?REL is symmetric just in case (?REL ?INST1 ?INST2) imples (?REL ?INST2 ?INST1), for all ?INST1 and ?INST2.\")").
 %
 :-assert_kif("(=> (instance ?REL SymmetricRelation) (forall (?INST1 ?INST2) (=> (holds ?REL ?INST1 ?INST2) (holds ?REL ?INST2 ?INST1))))").
 %
-:-assert_kif("(subclass AsymmetricRelation IrreflexiveRelation)").
-:-assert_kif("(subclass AsymmetricRelation AntisymmetricRelation)").
+:-assert_kif("(genls AsymmetricRelation IrreflexiveRelation)").
+:-assert_kif("(genls AsymmetricRelation AntisymmetricRelation)").
 :-assert_kif("(documentation AsymmetricRelation \"A &%BinaryRelation is asymmetric only if it is both an &%AntisymmetricRelation and an &%IrreflexiveRelation.\")").
 %
 :-assert_kif("(=> (and (instance ?REL BinaryRelation) (or (domain ?REL 1 ?CLASS1) (domainSubclass ?REL 1 ?CLASS1)) (or (domain ?REL 2 ?CLASS2) (domainSubclass ?REL 2 ?CLASS2) (range ?REL ?CLASS2) (rangeSubclass ?REL ?CLASS2)) (disjoint ?CLASS1 ?CLASS2)) (instance ?REL AsymmetricRelation))").
 %
-:-assert_kif("(subclass AntisymmetricRelation BinaryRelation)").
+:-assert_kif("(genls AntisymmetricRelation BinaryRelation)").
 :-assert_kif("(documentation AntisymmetricRelation \"&%BinaryRelation ?REL is an &%AntisymmetricRelation if for distinct ?INST1 and ?INST2, (?REL ?INST1 ?INST2) implies not (?REL ?INST2 ?INST1). In other words, for all ?INST1 and ?INST2, (?REL ?INST1 ?INST2) and (?REL ?INST2 ?INST1) imply that ?INST1 and ?INST2 are identical. Note that it is possible for an &%AntisymmetricRelation to be a &%ReflexiveRelation.\")").
 %
 :-assert_kif("(=> (instance ?REL AntisymmetricRelation) (forall (?INST1 ?INST2) (=> (and (holds ?REL ?INST1 ?INST2) (holds ?REL ?INST2 ?INST1)) (equal ?INST1 ?INST2))))").
 %
-:-assert_kif("(subclass TrichotomizingRelation BinaryRelation)").
+:-assert_kif("(genls TrichotomizingRelation BinaryRelation)").
 :-assert_kif("(documentation TrichotomizingRelation \"A &%BinaryRelation ?REL is a &%TrichotomizingRelation just in case all ordered pairs consisting of distinct individuals are elements of ?REL.\")").
 %
 :-assert_kif("(=> (instance ?REL TrichotomizingRelation) (forall (?INST1 ?INST2) (or (holds ?REL ?INST1 ?INST2) (equal ?INST1 ?INST2) (holds ?REL ?INST2 ?INST1))))").
 %
-:-assert_kif("(subclass TransitiveRelation BinaryRelation)").
+:-assert_kif("(genls TransitiveRelation BinaryRelation)").
 :-assert_kif("(documentation TransitiveRelation \"A &%BinaryRelation ?REL is transitive if (?REL ?INST1 ?INST2) and (?REL ?INST2 ?INST3) imply (?REL ?INST1 ?INST3), for all ?INST1, ?INST2, and ?INST3.\")").
 %
 :-assert_kif("(=> (instance ?REL TransitiveRelation) (forall (?INST1 ?INST2 ?INST3) (=> (and (holds ?REL ?INST1 ?INST2) (holds ?REL ?INST2 ?INST3)) (holds ?REL ?INST1 ?INST3))))").
 %
-:-assert_kif("(subclass IntransitiveRelation BinaryRelation)").
+:-assert_kif("(genls IntransitiveRelation BinaryRelation)").
 :-assert_kif("(documentation IntransitiveRelation \"A &%BinaryRelation ?REL is intransitive only if (?REL ?INST1 ?INST2) and (?REL ?INST2 ?INST3) imply not (?REL ?INST1 ?INST3), for all ?INST1, ?INST2, and ?INST3.\")").
 %
 :-assert_kif("(=> (instance ?REL IntransitiveRelation) (forall (?INST1 ?INST2 ?INST3) (=> (and (holds ?REL ?INST1 ?INST2) (holds ?REL ?INST2 ?INST3)) (not (holds ?REL ?INST1 ?INST3)))))").
 %
-:-assert_kif("(subclass PartialOrderingRelation TransitiveRelation)").
-:-assert_kif("(subclass PartialOrderingRelation AntisymmetricRelation)").
-:-assert_kif("(subclass PartialOrderingRelation ReflexiveRelation)").
+:-assert_kif("(genls PartialOrderingRelation TransitiveRelation)").
+:-assert_kif("(genls PartialOrderingRelation AntisymmetricRelation)").
+:-assert_kif("(genls PartialOrderingRelation ReflexiveRelation)").
 :-assert_kif("(documentation PartialOrderingRelation \"A &%BinaryRelation is a partial ordering if it is a &%ReflexiveRelation, an &%AntisymmetricRelation, and a &%TransitiveRelation.\")").
 %
-:-assert_kif("(subclass TotalOrderingRelation PartialOrderingRelation)").
-:-assert_kif("(subclass TotalOrderingRelation TrichotomizingRelation)").
+:-assert_kif("(genls TotalOrderingRelation PartialOrderingRelation)").
+:-assert_kif("(genls TotalOrderingRelation TrichotomizingRelation)").
 :-assert_kif("(documentation TotalOrderingRelation \"A &%BinaryRelation is a &%TotalOrderingRelation if it is a &%PartialOrderingRelation and a &%TrichotomizingRelation.\")").
 %
 :-assert_kif("(=> (instance ?REL TotalOrderingRelation) (forall (?INST1 ?INST2) (or (holds ?REL ?INST1 ?INST2) (holds ?REL ?INST2 ?INST1))))").
 %
-:-assert_kif("(subclass EquivalenceRelation TransitiveRelation)").
-:-assert_kif("(subclass EquivalenceRelation SymmetricRelation)").
-:-assert_kif("(subclass EquivalenceRelation ReflexiveRelation)").
+:-assert_kif("(genls EquivalenceRelation TransitiveRelation)").
+:-assert_kif("(genls EquivalenceRelation SymmetricRelation)").
+:-assert_kif("(genls EquivalenceRelation ReflexiveRelation)").
 :-assert_kif("(documentation EquivalenceRelation \"A &%BinaryRelation is an equivalence relation if it is a &%ReflexiveRelation, a &%SymmetricRelation, and a &%TransitiveRelation.\")").
 %
-:-assert_kif("(subclass CaseRole BinaryPredicate)").
+:-assert_kif("(genls CaseRole BinaryPredicate)").
 :-assert_kif("(instance CaseRole InheritableRelation)").
-:-assert_kif("(subclass CaseRole AsymmetricRelation)").
+:-assert_kif("(genls CaseRole AsymmetricRelation)").
 :-assert_kif("(documentation CaseRole \"The &%Class of &%Predicates relating the spatially distinguished parts of a &%Process. &%CaseRoles include, for example , the &%agent, &%patient or &%destination of an action, the flammable substance in a burning process, or the water that falls in rain.\")").
 %
 :-assert_kif("(instance agent CaseRole)").
@@ -1119,9 +1119,9 @@
 :-assert_kif("(documentation result \" (result ?ACTION ?OUTPUT) means that ?OUTPUT is a product of ?ACTION. For example, house is a &%result in the following proposition: Eric built a house.\")").
 %
 :-assert_kif("(instance InheritableRelation Class)").
-:-assert_kif("(documentation InheritableRelation \"This is a &%Class of &%Classes. Each &%instance of &%InheritableRelation is a &%subclass of &%Relation whose properties can be inherited downward in the class hierarchy via the &%subrelation &%Predicate.\")").
+:-assert_kif("(documentation InheritableRelation \"This is a &%Class of &%Classes. Each &%instance of &%InheritableRelation is a &%genls of &%Relation whose properties can be inherited downward in the class hierarchy via the &%subrelation &%Predicate.\")").
 %
-:-assert_kif("(subclass ProbabilityRelation Relation)").
+:-assert_kif("(genls ProbabilityRelation Relation)").
 :-assert_kif("(instance ProbabilityRelation InheritableRelation)").
 :-assert_kif("(documentation ProbabilityRelation \"The &%Class of &%Relations that permit assessment of the probability of an event or situation.\")").
 %
@@ -1170,11 +1170,11 @@
 %
 :-assert_kif("(=> (and (instance ?FORMULA1 Formula) (instance ?FORMULA2 Formula)) (or (increasesLikelihood ?FORMULA1 ?FORMULA2) (decreasesLikelihood ?FORMULA1 ?FORMULA2) (independentProbability ?FORMULA1 ?FORMULA2)))").
 %
-:-assert_kif("(subclass SpatialRelation Relation)").
+:-assert_kif("(genls SpatialRelation Relation)").
 :-assert_kif("(instance SpatialRelation InheritableRelation)").
 :-assert_kif("(documentation SpatialRelation \"The &%Class of &%Relations that are spatial in a wide sense. This &%Class includes mereological relations and topological relations.\")").
 %
-:-assert_kif("(subclass TemporalRelation Relation)").
+:-assert_kif("(genls TemporalRelation Relation)").
 :-assert_kif("(instance TemporalRelation InheritableRelation)").
 :-assert_kif("(documentation TemporalRelation \"The &%Class of temporal &%Relations. This &%Class includes notions of (temporal) topology of intervals, (temporal) schemata, and (temporal) extension.\")").
 %
@@ -1192,14 +1192,14 @@
 %
 :-assert_kif("(=> (prefers ?AGENT ?FORMULA1 ?FORMULA2) (not (and (true ?FORMULA1 True) (true ?FORMULA2 True))))").
 %
-:-assert_kif("(subclass PropositionalAttitude IntentionalRelation)").
-:-assert_kif("(subclass PropositionalAttitude AsymmetricRelation)").
+:-assert_kif("(genls PropositionalAttitude IntentionalRelation)").
+:-assert_kif("(genls PropositionalAttitude AsymmetricRelation)").
 :-assert_kif("(instance PropositionalAttitude InheritableRelation)").
 :-assert_kif("(documentation PropositionalAttitude \"The &%Class of &%IntentionalRelations where the &%Agent has awareness of a &%Proposition.\")").
 %
 :-assert_kif("(=> (and (instance ?REL PropositionalAttitude) (holds ?REL ?AGENT ?FORMULA)) (instance ?FORMULA Formula))").
 %
-:-assert_kif("(subclass ObjectAttitude IntentionalRelation)").
+:-assert_kif("(genls ObjectAttitude IntentionalRelation)").
 :-assert_kif("(instance ObjectAttitude InheritableRelation)").
 :-assert_kif("(disjoint ObjectAttitude PropositionalAttitude)").
 :-assert_kif("(documentation ObjectAttitude \"The &%Class of &%IntentionalRelations where the &%Agent has awareness of an instance of &%Physical.\")").
@@ -1264,30 +1264,30 @@
 %
 :-assert_kif("(=> (knows ?AGENT ?FORMULA) (true ?FORMULA True))").
 %
-:-assert_kif("(subclass TernaryRelation Relation)").
+:-assert_kif("(genls TernaryRelation Relation)").
 :-assert_kif("(instance TernaryRelation InheritableRelation)").
 :-assert_kif("(documentation TernaryRelation \"&%TernaryRelations relate three items. The two &%subclasses of &%TernaryRelation are &%TernaryPredicate and &%BinaryFunction.\")").
 %
 :-assert_kif("(=> (instance ?REL TernaryRelation) (not (exists (?ITEM1 ?ITEM2 ?ITEM3 ?ITEM4 @ROW) (holds ?REL ?ITEM1 ?ITEM2 ?ITEM3 ?ITEM4 @ROW))))").
 %
-:-assert_kif("(subclass QuaternaryRelation Relation)").
+:-assert_kif("(genls QuaternaryRelation Relation)").
 :-assert_kif("(instance QuaternaryRelation InheritableRelation)").
 :-assert_kif("(documentation QuaternaryRelation \"&%QuaternaryRelations relate four items . The two &%subclasses of &%QuaternaryRelation are &%QuaternaryPredicate and &%TernaryFunction.\")").
 %
 :-assert_kif("(=> (instance ?REL QuaternaryRelation) (not (exists (?ITEM1 ?ITEM2 ?ITEM3 ?ITEM4 ?ITEM5 @ROW) (holds ?REL ?ITEM1 ?ITEM2 ?ITEM3 ?ITEM4 ?ITEM5 @ROW))))").
 %
-:-assert_kif("(subclass QuintaryRelation Relation)").
+:-assert_kif("(genls QuintaryRelation Relation)").
 :-assert_kif("(instance QuintaryRelation InheritableRelation)").
 :-assert_kif("(documentation QuintaryRelation \"&%QuintaryRelations relate five items. The two &%subclasses of &%QuintaryRelation are &%QuintaryPredicate and &%QuaternaryFunction.\")").
 %
 :-assert_kif("(=> (instance ?REL QuintaryRelation) (not (exists (?ITEM1 ?ITEM2 ?ITEM3 ?ITEM4 ?ITEM5 ?ITEM6 @ROW) (holds ?REL ?ITEM1 ?ITEM2 ?ITEM3 ?ITEM4 ?ITEM5 ?ITEM6 @ROW))))").
 %
-:-assert_kif("(subclass List Relation)").
+:-assert_kif("(genls List Relation)").
 :-assert_kif("(documentation List \"Every &%List is a particular ordered n-tuple of items . Generally speaking, &%Lists are created by means of the &%ListFn &%Function, which takes any number of items as arguments and returns a &%List with the items in the same order. Anything, including other &%Lists, may be an item in a &%List. Note too that &%Lists are extensional - two lists that have the same items in the same order are identical . Note too that a &%List may contain no items. In that case, the &%List is the &%NullList.\")").
 %
 :-assert_kif("(=> (instance ?LIST List) (exists (?NUMBER1) (exists (?ITEM1) (and (not (equal (ListOrderFn ?LIST ?NUMBER1) ?ITEM1)) (forall (?NUMBER2) (=> (and (instance ?NUMBER2 PositiveInteger) (lessThan ?NUMBER2 ?NUMBER1)) (exists (?ITEM2) (equal (ListOrderFn ?LIST ?NUMBER2) ?ITEM2))))))))").
 %
-:-assert_kif("(subclass UniqueList List)").
+:-assert_kif("(genls UniqueList List)").
 :-assert_kif("(documentation UniqueList \"A &%List in which no item appears more than once, i.e. a &%List for which there are no distinct numbers ?NUMBER1 and ?NUMBER2 such that (&%ListOrderFn ?LIST ?NUMBER1) and (&%ListOrderFn ?LIST ?NUMBER2) return the same value.\")").
 %
 :-assert_kif("(=> (instance ?LIST UniqueList) (forall (?NUMBER1 ?NUMBER2) (=> (equal (ListOrderFn ?LIST ?NUMBER1) (ListOrderFn ?LIST ?NUMBER2)) (equal ?NUMBER1 ?NUMBER2))))").
@@ -1315,7 +1315,7 @@
 %
 :-assert_kif("(=> (and (domain ?REL ?NUMBER ?CLASS) (holds ?REL @ROW)) (instance (ListOrderFn (ListFn @ROW) ?NUMBER) ?CLASS))").
 %
-:-assert_kif("(=> (and (domainSubclass ?REL ?NUMBER ?CLASS) (holds ?REL @ROW)) (subclass (ListOrderFn (ListFn @ROW) ?NUMBER) ?CLASS))").
+:-assert_kif("(=> (and (domainSubclass ?REL ?NUMBER ?CLASS) (holds ?REL @ROW)) (genls (ListOrderFn (ListFn @ROW) ?NUMBER) ?CLASS))").
 %
 :-assert_kif("(instance ListLengthFn UnaryFunction)").
 :-assert_kif("(instance ListLengthFn TotalValuedRelation)").
@@ -1373,106 +1373,106 @@
 % :-assert_kif("; we rephrase it -- PJC ").
 :-assert_kif("(=> (equal ?LIST (ListFn @ROW)) (forall (?ITEM) (initialList ?LIST (ListFn @ROW ?ITEM))))").
 %
-:-assert_kif("(subclass Predicate Relation)").
+:-assert_kif("(genls Predicate Relation)").
 :-assert_kif("(instance Predicate InheritableRelation)").
 :-assert_kif("(documentation Predicate \"A &%Predicate is a sentence-forming &%Relation. Each tuple in the &%Relation is a finite, ordered sequence of objects. The fact that a particular tuple is an element of a &%Predicate is denoted by ' (*predicate* arg_1 arg_2 .. arg_n)', where the arg_i are the objects so related. In the case of &%BinaryPredicates, the fact can be read as `arg_1 is *predicate* arg_2' or `a *predicate* of arg_1 is arg_2'.\")").
 %
-:-assert_kif("(subclass Function SingleValuedRelation)").
+:-assert_kif("(genls Function SingleValuedRelation)").
 :-assert_kif("(instance Function InheritableRelation)").
 :-assert_kif("(documentation Function \"A &%Function is a term-forming &%Relation that maps from a n-tuple of arguments to a range and that associates this n -tuple with at most one range element. Note that the range is a &%SetOrClass, and each element of the range is an instance of the &%SetOrClass.\")").
 %
-:-assert_kif("(subclass UnaryFunction Function)").
-:-assert_kif("(subclass UnaryFunction BinaryRelation)").
+:-assert_kif("(genls UnaryFunction Function)").
+:-assert_kif("(genls UnaryFunction BinaryRelation)").
 :-assert_kif("(instance UnaryFunction InheritableRelation)").
 :-assert_kif("(documentation UnaryFunction \"The &%Class of &%Functions that require a single argument.\")").
 %
 :-assert_kif("(=> (instance ?FUNCTION UnaryFunction) (valence ?FUNCTION 1))").
 %
-:-assert_kif("(subclass OneToOneFunction UnaryFunction)").
+:-assert_kif("(genls OneToOneFunction UnaryFunction)").
 :-assert_kif("(documentation OneToOneFunction \"The &%Class of &%UnaryFunctions which are one to one. A function F is one to one just in case for all X, Y in the domain of F, if X is not identical to Y, then F (X) is not identical to F (Y).\")").
 %
 :-assert_kif("(=> (instance ?FUN OneToOneFunction) (forall (?ARG1 ?ARG2) (=> (and (domain ?FUN 1 ?CLASS) (instance ?ARG1 ?CLASS) (instance ?ARG2 ?CLASS) (not (equal ?ARG1 ?ARG2))) (not (equal (AssignmentFn ?FUN ?ARG1) (AssignmentFn ?FUN ?ARG2))))))").
 %
-:-assert_kif("(subclass SequenceFunction OneToOneFunction)").
-:-assert_kif("(documentation SequenceFunction \"The &%Class of &%OneToOneFunctions whose range is a subclass of the &%PositiveIntegers.\")").
+:-assert_kif("(genls SequenceFunction OneToOneFunction)").
+:-assert_kif("(documentation SequenceFunction \"The &%Class of &%OneToOneFunctions whose range is a genls of the &%PositiveIntegers.\")").
 %
-:-assert_kif("(=> (and (instance ?SEQ SequenceFunction) (range ?SEQ ?CLASS)) (subclass ?CLASS Integer))").
+:-assert_kif("(=> (and (instance ?SEQ SequenceFunction) (range ?SEQ ?CLASS)) (genls ?CLASS Integer))").
 %
-:-assert_kif("(subclass BinaryFunction Function)").
-:-assert_kif("(subclass BinaryFunction TernaryRelation)").
+:-assert_kif("(genls BinaryFunction Function)").
+:-assert_kif("(genls BinaryFunction TernaryRelation)").
 :-assert_kif("(instance BinaryFunction InheritableRelation)").
 :-assert_kif("(documentation BinaryFunction \"The &%Class of &%Functions that require two arguments.\")").
 %
 :-assert_kif("(=> (instance ?FUNCTION BinaryFunction) (valence ?FUNCTION 2))").
 %
-:-assert_kif("(subclass AssociativeFunction BinaryFunction)").
+:-assert_kif("(genls AssociativeFunction BinaryFunction)").
 :-assert_kif("(documentation AssociativeFunction \"A &%BinaryFunction is associative if bracketing has no effect on the value returned by the &%Function. More precisely , a &%Function ?FUNCTION is associative just in case (?FUNCTION ?INST1 (?FUNCTION ?INST2 ?INST3)) is equal to (?FUNCTION (?FUNCTION ?INST1 ?INST2) ?INST3), for all ?INST1, ?INST2, and ?INST3.\")").
 %
 :-assert_kif("(=> (instance ?FUNCTION AssociativeFunction) (forall (?INST1 ?INST2 ?INST3) (=> (and (domain ?FUNCTION 1 ?CLASS) (instance ?INST1 ?CLASS) (instance ?INST2 ?CLASS) (instance ?INST3 ?CLASS)) (equal (AssignmentFn ?FUNCTION ?INST1 (AssignmentFn ?FUNCTION ?INST2 ?INST3)) (AssignmentFn ?FUNCTION (AssignmentFn ?FUNCTION ?INST1 ?INST2) ?INST3)))))").
 %
-:-assert_kif("(subclass CommutativeFunction BinaryFunction)").
+:-assert_kif("(genls CommutativeFunction BinaryFunction)").
 :-assert_kif("(documentation CommutativeFunction \"A &%BinaryFunction is commutative if the ordering of the arguments of the function has no effect on the value returned by the function. More precisely, a function ?FUNCTION is commutative just in case (?FUNCTION ?INST1 ?INST2) is equal to (?FUNCTION ?INST2 ?INST1), for all ?INST1 and ?INST2.\")").
 %
 :-assert_kif("(=> (instance ?FUNCTION CommutativeFunction) (forall (?INST1 ?INST2) (=> (and (domain ?FUNCTION 1 ?CLASS) (instance ?INST1 ?CLASS) (instance ?INST2 ?CLASS)) (equal (AssignmentFn ?FUNCTION ?INST1 ?INST2) (AssignmentFn ?FUNCTION ?INST2 ?INST1)))))").
 %
-:-assert_kif("(subclass TernaryFunction Function)").
-:-assert_kif("(subclass TernaryFunction QuaternaryRelation)").
+:-assert_kif("(genls TernaryFunction Function)").
+:-assert_kif("(genls TernaryFunction QuaternaryRelation)").
 :-assert_kif("(instance TernaryFunction InheritableRelation)").
 :-assert_kif("(documentation TernaryFunction \"The &%Class of &%Functions that require exactly three arguments.\")").
 %
 :-assert_kif("(=> (instance ?FUNCTION TernaryFunction) (valence ?FUNCTION 3))").
 %
-:-assert_kif("(subclass QuaternaryFunction Function)").
-:-assert_kif("(subclass QuaternaryFunction QuintaryRelation)").
+:-assert_kif("(genls QuaternaryFunction Function)").
+:-assert_kif("(genls QuaternaryFunction QuintaryRelation)").
 :-assert_kif("(instance QuaternaryFunction InheritableRelation)").
 :-assert_kif("(documentation QuaternaryFunction \"The &%Class of &%Functions that require exactly four arguments.\")").
 %
 :-assert_kif("(=> (instance ?FUNCTION QuaternaryFunction) (valence ?FUNCTION 4))").
 %
-:-assert_kif("(subclass ContinuousFunction Function)").
+:-assert_kif("(genls ContinuousFunction Function)").
 :-assert_kif("(documentation ContinuousFunction \"&%Functions which are continuous. This concept is taken as primitive until representations for limits are devised.\")").
 %
-:-assert_kif("(subclass LogicalOperator Predicate)").
+:-assert_kif("(genls LogicalOperator Predicate)").
 :-assert_kif("(documentation LogicalOperator \"This &%Class currently comprises all of the logical operators (viz. 'and', 'or', 'not', '=>', and '<=>').\")").
 %
-:-assert_kif("(subclass BinaryPredicate Predicate)").
-:-assert_kif("(subclass BinaryPredicate BinaryRelation)").
+:-assert_kif("(genls BinaryPredicate Predicate)").
+:-assert_kif("(genls BinaryPredicate BinaryRelation)").
 :-assert_kif("(instance BinaryPredicate InheritableRelation)").
 :-assert_kif("(documentation BinaryPredicate \"A &%Predicate relating two items - its valence is two.\")").
 %
 :-assert_kif("(=> (instance ?REL BinaryPredicate) (valence ?REL 2))").
 %
-:-assert_kif("(subclass TernaryPredicate Predicate)").
-:-assert_kif("(subclass TernaryPredicate TernaryRelation)").
+:-assert_kif("(genls TernaryPredicate Predicate)").
+:-assert_kif("(genls TernaryPredicate TernaryRelation)").
 :-assert_kif("(instance TernaryPredicate InheritableRelation)").
 :-assert_kif("(documentation TernaryPredicate \"The &%Class of &%Predicates that require exactly three arguments.\")").
 %
 :-assert_kif("(=> (instance ?REL TernaryPredicate) (valence ?REL 3))").
 %
-:-assert_kif("(subclass QuaternaryPredicate Predicate)").
-:-assert_kif("(subclass QuaternaryPredicate QuaternaryRelation)").
+:-assert_kif("(genls QuaternaryPredicate Predicate)").
+:-assert_kif("(genls QuaternaryPredicate QuaternaryRelation)").
 :-assert_kif("(instance QuaternaryPredicate InheritableRelation)").
 :-assert_kif("(documentation QuaternaryPredicate \"The &%Class of &%Predicates that require four arguments.\")").
 %
 :-assert_kif("(=> (instance ?REL QuaternaryPredicate) (valence ?REL 4))").
 %
-:-assert_kif("(subclass QuintaryPredicate Predicate)").
-:-assert_kif("(subclass QuintaryPredicate QuintaryRelation)").
+:-assert_kif("(genls QuintaryPredicate Predicate)").
+:-assert_kif("(genls QuintaryPredicate QuintaryRelation)").
 :-assert_kif("(instance QuintaryPredicate InheritableRelation)").
 :-assert_kif("(documentation QuintaryPredicate \"The &%Class of &%Predicates that require five arguments.\")").
 %
 :-assert_kif("(=> (instance ?REL QuintaryPredicate) (valence ?REL 5))").
 %
-:-assert_kif("(subclass VariableArityRelation Relation)").
+:-assert_kif("(genls VariableArityRelation Relation)").
 :-assert_kif("(documentation VariableArityRelation \"The &%Class of &%Relations that do not have a fixed number of arguments.\")").
 %
 :-assert_kif("(=> (instance ?REL VariableArityRelation) (not (exists (?INT) (valence ?REL ?INT))))").
 %
-:-assert_kif("(subclass RelationExtendedToQuantities Relation)").
+:-assert_kif("(genls RelationExtendedToQuantities Relation)").
 :-assert_kif("(instance RelationExtendedToQuantities InheritableRelation)").
 :-assert_kif("(documentation RelationExtendedToQuantities \"A &%RelationExtendedToQuantities is a &%Relation that, when it is true on a sequence of arguments that are &%RealNumbers, it is also true on a sequence of &%ConstantQuantites with those magnitudes in some unit of measure . For example, the &%lessThan relation is extended to quantities. This means that for all pairs of quantities ?QUANTITY1 and ?QUANTITY2, (lessThan ?QUANTITY1 ?QUANTITY2) if and only if, for some ?NUMBER1, ?NUMBER2, and ?UNIT, ?QUANTITY1 = (MeasureFn ?NUMBER1 ?UNIT), ?QUANTITY2 = (MeasureFn ?NUMBER2 ?UNIT), and (lessThan ?NUMBER1 ?NUMBER2), for all units ?UNIT on which ?QUANTITY1 and ?QUANTITY2 can be measured. Note that, when a &%RelationExtendedToQuantities is extended from &%RealNumbers to &%ConstantQuantities, the &%ConstantQuantities must be measured along the same physical dimension.\")").
 %
-:-assert_kif("(subclass Proposition Abstract)").
+:-assert_kif("(genls Proposition Abstract)").
 :-assert_kif("(documentation Proposition \"&%Propositions are &%Abstract entities that express a complete thought or a set of such thoughts. As an example, the formula ' (instance Yojo Cat)' expresses the &%Proposition that the entity named Yojo is an element of the &%Class of Cats. Note that propositions are not restricted to the content expressed by individual sentences of a &%Language. They may encompass the content expressed by theories , books, and even whole libraries. It is important to distinguish &%Propositions from the &%ContentBearingObjects that express them. A &%Proposition is a piece of information, e.g. that the cat is on the mat, but a &%ContentBearingObject is an &%Object that represents this information. A &%Proposition is an abstraction that may have multiple representations: strings , sounds, icons, etc. For example, the &%Proposition that the cat is on the mat is represented here as a string of graphical characters displayed on a monitor and/or printed on paper, but it can be represented by a sequence of sounds or by some non-latin alphabet or by some cryptographic form\")").
 %
 :-assert_kif("(instance closedOn BinaryPredicate)").
@@ -1554,7 +1554,7 @@
 :-assert_kif("(instance causesSubclass AsymmetricRelation)").
 :-assert_kif("(domainSubclass causesSubclass 1 Process)").
 :-assert_kif("(domainSubclass causesSubclass 2 Process)").
-:-assert_kif("(documentation causesSubclass \"The causation relation between subclasses of &%Process. (&%causesSubclass ?PROCESS1 ?PROCESS2) means that the subclass of &%Process ?PROCESS1 brings about the subclass of &%Process ?PROCESS2, e.g. (&%causes &%Killing &%Death).\")").
+:-assert_kif("(documentation causesSubclass \"The causation relation between subclasses of &%Process. (&%causesSubclass ?PROCESS1 ?PROCESS2) means that the genls of &%Process ?PROCESS1 brings about the genls of &%Process ?PROCESS2, e.g. (&%causes &%Killing &%Death).\")").
 %
 :-assert_kif("(=> (causesSubclass ?PROC1 ?PROC2) (forall (?INST2) (=> (instance ?INST2 ?PROC2) (exists (?INST1) (and (instance ?INST1 ?PROC1) (causes ?INST1 ?INST2))))))").
 %
@@ -1589,7 +1589,7 @@
 :-assert_kif("(domain capability 3 Object)").
 :-assert_kif("(documentation capability \" (&%capability ?PROCESS ?ROLE ?OBJ) means that ?OBJ has the ability to play the role of ?ROLE in &%Processes of type ?PROCESS.\")").
 %
-:-assert_kif("(=> (and (instance ?ROLE CaseRole) (holds ?ROLE ?ARG1 ?ARG2) (instance ?ARG1 ?PROC) (subclass ?PROC Process)) (capability ?PROC ?ROLE ?ARG2))").
+:-assert_kif("(=> (and (instance ?ROLE CaseRole) (holds ?ROLE ?ARG1 ?ARG2) (instance ?ARG1 ?PROC) (genls ?PROC Process)) (capability ?PROC ?ROLE ?ARG2))").
 %
 :-assert_kif("(instance exploits BinaryPredicate)").
 :-assert_kif("(instance exploits AsymmetricRelation)").
@@ -2181,7 +2181,7 @@
 % :-assert_kif(";The following part of the ontology covers set-theoretic predicates ").
 % :-assert_kif(";and functions. Most of the content here is taken from the kif-sets ").
 % :-assert_kif(";ontology (available on the Ontolingua server). ").
-:-assert_kif("(subrelation subset subclass)").
+:-assert_kif("(subrelation subset genls)").
 :-assert_kif("(domain subset 1 Set)").
 :-assert_kif("(domain subset 2 Set)").
 :-assert_kif("(documentation subset \" (subset ?SET1 ?SET2) is true just in case the &%elements of the &%Set ?SET1 are also &%elements of the &%Set ?SET2.\")").
@@ -2244,27 +2244,27 @@
 :-assert_kif("(range CardinalityFn Number)").
 :-assert_kif("(documentation CardinalityFn \" (CardinalityFn ?CLASS) returns the number of instances in the &%SetOrClass or &%Collection ?CLASS.\")").
 %
-:-assert_kif("(subclass NullSet SetOrClass)").
+:-assert_kif("(genls NullSet SetOrClass)").
 :-assert_kif("(documentation NullSet \"Any &%SetOrClass that contains no instances.\")").
 %
 :-assert_kif("(=> (instance ?SET NullSet) (not (exists (?INST) (instance ?INST ?SET))))").
 %
-:-assert_kif("(subclass NonNullSet SetOrClass)").
+:-assert_kif("(genls NonNullSet SetOrClass)").
 :-assert_kif("(documentation NonNullSet \"Any &%SetOrClass that contains at least one instance .\")").
 %
 :-assert_kif("(=> (instance ?SET NonNullSet) (exists (?INST) (instance ?INST ?SET)))").
 %
-:-assert_kif("(subclass FiniteSet Set)").
+:-assert_kif("(genls FiniteSet Set)").
 :-assert_kif("(documentation FiniteSet \"A &%Set containing a finite number of elements.\")").
 %
 :-assert_kif("(=> (instance ?SET FiniteSet) (exists (?NUMBER) (and (instance ?NUMBER NonnegativeInteger) (equal ?NUMBER (CardinalityFn ?SET)))))").
 %
-:-assert_kif("(subclass PairwiseDisjointClass SetOrClass)").
+:-assert_kif("(genls PairwiseDisjointClass SetOrClass)").
 :-assert_kif("(documentation PairwiseDisjointClass \"A &%SetOrClass is a &%PairwiseDisjointClass just in case every instance of the &%SetOrClass is either &%equal to or &%disjoint from every other instance of the &%SetOrClass.\")").
 %
 :-assert_kif("(=> (instance ?SUPERCLASS PairwiseDisjointClass) (forall (?CLASS1 ?CLASS2) (=> (and (instance ?CLASS1 ?SUPERCLASS) (instance ?CLASS2 ?SUPERCLASS)) (or (equal ?CLASS1 ?CLASS2) (disjoint ?CLASS1 ?CLASS2)))))").
 %
-:-assert_kif("(subclass MutuallyDisjointClass SetOrClass)").
+:-assert_kif("(genls MutuallyDisjointClass SetOrClass)").
 :-assert_kif("(documentation MutuallyDisjointClass \"A &%SetOrClass is a &%MutuallyDisjointClass just in case there exists nothing which is an instance of all of the instances of the original &%SetOrClass.\")").
 %
 :-assert_kif("(=> (instance ?CLASS MutuallyDisjointClass) (forall (?INST1 ?INST2) (=> (and (instance ?INST1 ?CLASS) (instance ?INST2 ?INST1)) (exists (?INST3) (and (instance ?INST3 ?CLASS) (not (instance ?INST2 ?INST3)))))))").
@@ -2296,62 +2296,62 @@
 % :-assert_kif(";;; ").
 % :-assert_kif("; GRAPH THEORY ;; ").
 % :-assert_kif(";;; ").
-:-assert_kif("(subclass Graph Abstract)").
+:-assert_kif("(genls Graph Abstract)").
 :-assert_kif("(documentation Graph \"The &%Class of graphs, where a graph is understood to be a set of &%GraphNodes connected by &%GraphArcs. Note that this &%Class includes only connected graphs, i.e. graphs in which there is a &%GraphPath between any two &%GraphNodes. Note too that every &%Graph is assumed to contain at least two &%GraphArcs and three &%GraphNodes.\")").
 %
 :-assert_kif("(=> (and (instance ?GRAPH Graph) (instance ?NODE1 GraphNode) (instance ?NODE2 GraphNode) (graphPart ?NODE1 ?GRAPH) (graphPart ?NODE2 ?GRAPH) (not (equal ?NODE1 ?NODE2))) (exists (?ARC ?PATH) (or (links ?NODE1 ?NODE2 ?ARC) (and (subGraph ?PATH ?GRAPH) (instance ?PATH GraphPath) (or (and (equal (BeginNodeFn ?PATH) ?NODE1) (equal (EndNodeFn ?PATH) ?NODE2)) (and (equal (BeginNodeFn ?PATH) ?NODE2) (equal (EndNodeFn ?PATH) ?NODE1)))))))").
 %
 :-assert_kif("(=> (instance ?GRAPH Graph) (exists (?NODE1 ?NODE2 ?NODE3 ?ARC1 ?ARC2) (and (graphPart ?NODE1 ?GRAPH) (graphPart ?NODE2 ?GRAPH) (graphPart ?NODE3 ?GRAPH) (graphPart ?ARC1 ?GRAPH) (graphPart ?ARC2 ?GRAPH) (links ?ARC1 ?NODE1 ?NODE2) (links ?ARC2 ?NODE2 ?NODE3) (not (equal ?NODE1 ?NODE2)) (not (equal ?NODE2 ?NODE3)) (not (equal ?NODE1 ?NODE3)) (not (equal ?ARC1 ?ARC2)))))").
 %
-:-assert_kif("(subclass DirectedGraph Graph)").
+:-assert_kif("(genls DirectedGraph Graph)").
 :-assert_kif("(documentation DirectedGraph \"The &%Class of directed graphs. A directed graph is a &%Graph in which all &%GraphArcs have direction, i.e. every &%GraphArc has an initial node (see &%InitialNodeFn) and a terminal node (see &%TerminalNodeFn).\")").
 %
 :-assert_kif("(=> (and (instance ?GRAPH DirectedGraph) (instance ?ARC GraphArc) (graphPart ?ARC ?GRAPH)) (exists (?NODE1 ?NODE2) (and (equal (InitialNodeFn ?ARC) ?NODE1) (equal (TerminalNodeFn ?ARC) ?NODE2))))").
 %
-:-assert_kif("(subclass TreeGraph Graph)").
+:-assert_kif("(genls TreeGraph Graph)").
 :-assert_kif("(documentation TreeGraph \"A TreeGraph is a &%DirectedGraph that has no &%GraphLoops.\")").
 %
 :-assert_kif("(=> (instance ?GRAPH TreeGraph) (not (exists (?LOOP) (and (instance ?LOOP GraphLoop) (graphPart ?LOOP ?GRAPH)))))").
 %
-:-assert_kif("(subclass GraphPath DirectedGraph)").
+:-assert_kif("(genls GraphPath DirectedGraph)").
 :-assert_kif("(documentation GraphPath \"Informally, a single, directed route between two &%GraphNodes in a &%Graph. Formally, a &%DirectedGraph that is a &%subGraph of the original &%Graph and such that no two &%GraphArcs in the &%DirectedGraph have the same intial node (see &%InitialNodeFn) or the same terminal node (see &%TerminalNodeFn).\")").
 %
 :-assert_kif("(=> (and (instance ?GRAPH GraphPath) (instance ?ARC GraphArc) (graphPart ?ARC ?GRAPH)) (=> (equal (InitialNodeFn ?ARC) ?NODE) (not (exists (?OTHER) (and (equal (InitialNodeFn ?OTHER) ?NODE) (not (equal ?OTHER ?ARC)))))))").
 %
 :-assert_kif("(=> (and (instance ?GRAPH GraphPath) (instance ?ARC GraphArc) (graphPart ?ARC ?GRAPH)) (=> (equal (TerminalNodeFn ?ARC) ?NODE) (not (exists (?OTHER) (and (equal (TerminalNodeFn ?OTHER) ?NODE) (not (equal ?OTHER ?ARC)))))))").
 %
-:-assert_kif("(subclass GraphCircuit GraphPath)").
+:-assert_kif("(genls GraphCircuit GraphPath)").
 :-assert_kif("(documentation GraphCircuit \"A &%GraphPath that begins (see &%BeginNodeFn) and ends (see &%EndNodeFn) at the same &%GraphNode.\")").
 %
 :-assert_kif("(<=> (instance ?GRAPH GraphCircuit) (exists (?NODE) (and (equal (BeginNodeFn ?GRAPH) ?NODE) (equal (EndNodeFn ?GRAPH) ?NODE))))").
 %
-:-assert_kif("(subclass MultiGraph Graph)").
+:-assert_kif("(genls MultiGraph Graph)").
 :-assert_kif("(documentation MultiGraph \"The &%Class of multigraphs. A multigraph is a &%Graph containing at least one pair of &%GraphNodes that are connected by more than one &%GraphArc.\")").
 %
 :-assert_kif("(<=> (instance ?GRAPH MultiGraph) (exists (?ARC1 ?ARC2 ?NODE1 ?NODE2) (and (graphPart ?ARC1 ?GRAPH) (graphPart ?ARC2 ?GRAPH) (graphPart ?NODE1 ?GRAPH) (graphPart ?NODE2 ?GRAPH) (links ?NODE1 ?NODE2 ?ARC1) (links ?NODE1 ?NODE2 ?ARC2) (not (equal ?ARC1 ?ARC2)))))").
 %
-:-assert_kif("(subclass PseudoGraph Graph)").
+:-assert_kif("(genls PseudoGraph Graph)").
 :-assert_kif("(documentation PseudoGraph \"The &%Class of pseudographs. A pseudograph is a &%Graph containing at least one &%GraphLoop.\")").
 %
 :-assert_kif("(<=> (instance ?GRAPH PseudoGraph) (exists (?LOOP) (and (instance ?LOOP GraphLoop) (graphPart ?LOOP ?GRAPH))))").
 %
-:-assert_kif("(subclass GraphElement Abstract)").
+:-assert_kif("(genls GraphElement Abstract)").
 :-assert_kif("(partition GraphElement GraphNode GraphArc)").
 :-assert_kif("(documentation GraphElement \"Noncompositional parts of &%Graphs. These parts are restricted to &%GraphNodes and &%GraphArcs.\")").
 %
 :-assert_kif("(=> (instance ?PART GraphElement) (exists (?GRAPH) (and (instance ?GRAPH Graph) (graphPart ?PART ?GRAPH))))").
 %
-:-assert_kif("(subclass GraphNode GraphElement)").
+:-assert_kif("(genls GraphNode GraphElement)").
 :-assert_kif("(documentation GraphNode \"&%Graphs are comprised of &%GraphNodes and &%GraphArcs. Every &%GraphNode is linked by a &%GraphArc.\")").
 %
 :-assert_kif("(=> (instance ?NODE GraphNode) (exists (?OTHER ?ARC) (links ?NODE ?OTHER ?ARC)))").
 %
-:-assert_kif("(subclass GraphArc GraphElement)").
+:-assert_kif("(genls GraphArc GraphElement)").
 :-assert_kif("(documentation GraphArc \"&%Graphs are comprised of &%GraphNodes and &%GraphArcs. Every &%GraphArc links two &%GraphNodes.\")").
 %
 :-assert_kif("(=> (instance ?ARC GraphArc) (exists (?NODE1 ?NODE2) (links ?NODE1 ?NODE2 ?ARC)))").
 %
-:-assert_kif("(subclass GraphLoop GraphArc)").
+:-assert_kif("(genls GraphLoop GraphArc)").
 :-assert_kif("(documentation GraphLoop \"A &%GraphArc in which a &%GraphNode is linked to itself.\")").
 %
 :-assert_kif("(<=> (instance ?LOOP GraphLoop) (exists (?NODE) (links ?NODE ?NODE ?LOOP)))").
@@ -2470,7 +2470,7 @@
 :-assert_kif("(relatedInternalConcept MinimalCutSetFn CutSetFn)").
 :-assert_kif("(documentation MinimalCutSetFn \"A &%UnaryFunction that assigns a &%Graph the &%Class of &%GraphPaths which comprise cutsets for the &%Graph and which have the least number of &%GraphArcs.\")").
 %
-:-assert_kif("(=> (instance ?GRAPH Graph) (subclass (MinimalCutSetFn ?GRAPH) (CutSetFn ?GRAPH)))").
+:-assert_kif("(=> (instance ?GRAPH Graph) (genls (MinimalCutSetFn ?GRAPH) (CutSetFn ?GRAPH)))").
 %
 :-assert_kif("(=> (equal (MinimalCutSetFn ?GRAPH) ?PATHCLASS) (exists (?NUMBER) (forall (?PATH) (=> (instance ?PATH ?PATHCLASS) (pathLength ?PATH ?NUMBER)))))").
 %
@@ -2494,37 +2494,37 @@
 % :-assert_kif("; International System of Units (SI), 1995. ").
 % :-assert_kif(";- Encyclopaedia Britannica (on-line version at http://www.britannica.com)").
 %
-:-assert_kif("(subclass UnitOfMeasure PhysicalQuantity)").
+:-assert_kif("(genls UnitOfMeasure PhysicalQuantity)").
 :-assert_kif("(documentation UnitOfMeasure \"A standard of measurement for some dimension. For example, the &%Meter is a &%UnitOfMeasure for the dimension of length, as is the &%Inch. There is no intrinsic property of a &%UnitOfMeasure that makes it primitive or fundamental;rather, a system of units (e.g. &%SystemeInternationalUnit) defines a set of orthogonal dimensions and assigns units for each.\")").
 %
-:-assert_kif("(subclass SystemeInternationalUnit UnitOfMeasure)").
+:-assert_kif("(genls SystemeInternationalUnit UnitOfMeasure)").
 :-assert_kif("(documentation SystemeInternationalUnit \"The &%Class of Systeme International (SI) units.\")").
 %
-:-assert_kif("(subclass LengthMeasure ConstantQuantity)").
+:-assert_kif("(genls LengthMeasure ConstantQuantity)").
 :-assert_kif("(documentation LengthMeasure \"The &%Class of &%ConstantQuantities relating to length.\")").
 %
-:-assert_kif("(subclass MassMeasure ConstantQuantity)").
+:-assert_kif("(genls MassMeasure ConstantQuantity)").
 :-assert_kif("(documentation MassMeasure \"The &%Class of &%ConstantQuantities relating to the amount of matter in an &%Object.\")").
 %
-:-assert_kif("(subclass AreaMeasure ConstantQuantity)").
+:-assert_kif("(genls AreaMeasure ConstantQuantity)").
 :-assert_kif("(documentation AreaMeasure \"Measures of the amount of space in two dimensions .\")").
 %
-:-assert_kif("(subclass VolumeMeasure ConstantQuantity)").
+:-assert_kif("(genls VolumeMeasure ConstantQuantity)").
 :-assert_kif("(documentation VolumeMeasure \"Measures of the amount of space in three dimensions .\")").
 %
-:-assert_kif("(subclass TemperatureMeasure ConstantQuantity)").
+:-assert_kif("(genls TemperatureMeasure ConstantQuantity)").
 :-assert_kif("(documentation TemperatureMeasure \"Measures of temperature. In scientific circles, the temperature of something is understood as the average velocity of the atoms or molecules that make up the thing.\")").
 %
-:-assert_kif("(subclass CurrencyMeasure ConstantQuantity)").
+:-assert_kif("(genls CurrencyMeasure ConstantQuantity)").
 :-assert_kif("(documentation CurrencyMeasure \"Includes all standard measures of monetary value , including &%UnitedStatesDollar, &%UnitedStatesCent, Lire, Yen, etc.\")").
 %
-:-assert_kif("(subclass AngleMeasure ConstantQuantity)").
+:-assert_kif("(genls AngleMeasure ConstantQuantity)").
 :-assert_kif("(documentation AngleMeasure \"The value of an angle in a plane or in a solid.\")").
 %
-:-assert_kif("(subclass PlaneAngleMeasure AngleMeasure)").
+:-assert_kif("(genls PlaneAngleMeasure AngleMeasure)").
 :-assert_kif("(documentation PlaneAngleMeasure \"The value of an angle in a plane.\")").
 %
-:-assert_kif("(subclass SolidAngleMeasure AngleMeasure)").
+:-assert_kif("(genls SolidAngleMeasure AngleMeasure)").
 :-assert_kif("(disjoint SolidAngleMeasure PlaneAngleMeasure)").
 :-assert_kif("(documentation SolidAngleMeasure \"The value of an angle in a solid.\")").
 %
@@ -2535,7 +2535,7 @@
 :-assert_kif("(range MeasureFn ConstantQuantity)").
 :-assert_kif("(documentation MeasureFn \"This &%BinaryFunction maps a &%RealNumber and a &%UnitOfMeasure to that &%Number of units. It is used for expressing &%ConstantQuantities. For example, the concept of three meters is represented as (&%MeasureFn 3 &%Meter).\")").
 %
-:-assert_kif("(=> (and (equal (MeasureFn ?NUMBER ?UNIT) ?QUANT) (subclass ?UNIT ?QUANTTYPE)) (instance ?QUANT ?QUANTTYPE))").
+:-assert_kif("(=> (and (equal (MeasureFn ?NUMBER ?UNIT) ?QUANT) (genls ?UNIT ?QUANTTYPE)) (instance ?QUANT ?QUANTTYPE))").
 %
 :-assert_kif("(=> (and (instance ?REL RelationExtendedToQuantities) (instance ?REL TernaryRelation) (instance ?NUMBER1 RealNumber) (instance ?NUMBER2 RealNumber) (holds ?REL ?NUMBER1 ?NUMBER2 ?VALUE)) (forall (?UNIT) (=> (instance ?UNIT UnitOfMeasure) (holds ?REL (MeasureFn ?NUMBER1 ?UNIT) (MeasureFn ?NUMBER2 ?UNIT) (MeasureFn ?VALUE ?UNIT)))))").
 %
@@ -2658,45 +2658,45 @@
 % :-assert_kif(";First base units for the SI system. No conversion functions are ").
 % :-assert_kif(";provided for these units. ").
 % :-assert_kif(";Length Base Unit ").
-:-assert_kif("(subclass Meter LengthMeasure)").
+:-assert_kif("(genls Meter LengthMeasure)").
 :-assert_kif("(instance Meter SystemeInternationalUnit)").
 :-assert_kif("(documentation Meter \"SI &%LengthMeasure. Symbol: m. It is one of the base units in SI, and it is currently defined as follows: the &%Meter is the length of the path traveled by light in a vacuum during a time interval of 1/299792458 of a &%SecondDuration.\")").
 %
 % :-assert_kif(";Mass Base Unit ").
-:-assert_kif("(subclass Gram MassMeasure)").
+:-assert_kif("(genls Gram MassMeasure)").
 :-assert_kif("(instance Gram SystemeInternationalUnit)").
 :-assert_kif("(documentation Gram \"Submultiple of kilogram. Symbol: g. 1 kilogram = 1000 &%Grams.\")").
 %
 % :-assert_kif(";Time Base Unit ").
-:-assert_kif("(subclass SecondDuration TimeDuration)").
+:-assert_kif("(genls SecondDuration TimeDuration)").
 :-assert_kif("(instance SecondDuration SystemeInternationalUnit)").
 :-assert_kif("(documentation SecondDuration \"SI &%TimeDuration. Symbol: s. It is one of the base units in SI, and it is currently defined as follows : the &%SecondDuration is the duration of 9192631770 periods of the radiation corresponding to the transition between the two hyperfine levels of the ground state of the cesium 133 atom.\")").
 %
 % :-assert_kif(";Electric Current Base Unit ").
-:-assert_kif("(subclass Ampere FunctionQuantity)").
+:-assert_kif("(genls Ampere FunctionQuantity)").
 :-assert_kif("(instance Ampere SystemeInternationalUnit)").
 :-assert_kif("(documentation Ampere \"SI electric current measure. Symbol: A. It is one of the base units in SI. It is defined as follows: the &%Ampere is that constant current which, if maintained in two straight parallel conductors of infinite length, of negligible circular cross-section, and placed 1 &%Meter apart in a vacuum, would produce between these conductors a force equal to 2*10^ (-7) &%Newton per &%Meter of length.\")").
 %
 % :-assert_kif(";Thermodynamic Temperature Base Unit ").
-:-assert_kif("(subclass KelvinDegree TemperatureMeasure)").
+:-assert_kif("(genls KelvinDegree TemperatureMeasure)").
 :-assert_kif("(instance KelvinDegree SystemeInternationalUnit)").
 :-assert_kif("(documentation KelvinDegree \"SI &%TemperatureMeasure. Symbol: K. It is one of the base units in SI (it is also a unit in the ITS system). Kelvin differs from the Celsius scale in that the triple point of water is defined to be 273.16 &%KelvinDegrees while it is 0 &%CelsiusDegrees. The magnitudes of intervals in the two scales are the same. By definition the conversion constant is 273.15.\")").
 %
 % :-assert_kif(";Amount Of Substance Base Unit ").
-:-assert_kif("(subclass Mole MassMeasure)").
+:-assert_kif("(genls Mole MassMeasure)").
 :-assert_kif("(instance Mole SystemeInternationalUnit)").
 :-assert_kif("(documentation Mole \"SI amount of substance unit. symbol: mol. It is one of the base units in SI. It is defined as follows: the &%Mole is the amount of substance of a system which contains as many elementary entities as there are atoms in 0.012 &%Kilograms of carbon 12. Note that, when this &%UnitOfMeasure is used, the elementary entities must be specified - they may be atoms, molecules, ions, electrons, etc. or groups of such particles .\")").
 %
 % :-assert_kif(";Luminosity Intensity Base Unit ").
-:-assert_kif("(subclass Candela FunctionQuantity)").
+:-assert_kif("(genls Candela FunctionQuantity)").
 :-assert_kif("(instance Candela SystemeInternationalUnit)").
 :-assert_kif("(documentation Candela \"SI luminosity intensity measure. Symbol: cd. It is one of the base units in SI, and it is currently defined as follows : the &%Candela is the luminous intensity, in a given direction, of a source that emits monochromatic radiation of frequency 540*10^12 &%Hertz and that has a radiant intensity in that direction of 1/683 &%Watt per &%Steradian.\")").
 %
-:-assert_kif("(subclass Liter VolumeMeasure)").
+:-assert_kif("(genls Liter VolumeMeasure)").
 :-assert_kif("(instance Liter UnitOfMeasure)").
 :-assert_kif("(documentation Liter \"Unit of volume in the metric system. It is currently defined to be equal to one cubic decimeter (0.001 cubic meter). Symbol: l.\")").
 %
-:-assert_kif("(subclass Centimeter LengthMeasure)").
+:-assert_kif("(genls Centimeter LengthMeasure)").
 :-assert_kif("(instance Centimeter UnitOfMeasure)").
 :-assert_kif("(documentation Centimeter \"Submultiple of &%Meter. Symbol: cm. It is the 100th part of a &%Meter\")").
 %
@@ -2706,71 +2706,71 @@
 % :-assert_kif("; (multiples and submultiples are together since they represent ").
 % :-assert_kif(";quantities of the same kind). ").
 % :-assert_kif(";Plane angle unit ").
-:-assert_kif("(subclass Radian PlaneAngleMeasure)").
+:-assert_kif("(genls Radian PlaneAngleMeasure)").
 :-assert_kif("(instance Radian SystemeInternationalUnit)").
 :-assert_kif("(documentation Radian \"SI plane angle measure. Symbol: rad. It is the angle of a circle subtended by an arc equal in length to the circle's radius . Another definition is: the plane angle between two radii of a circle which cut off on the circumference an arc equal in length to the radius . &%Radian = m/m = 1.\")").
 %
 % :-assert_kif(";Solid angle unit ").
-:-assert_kif("(subclass Steradian SolidAngleMeasure)").
+:-assert_kif("(genls Steradian SolidAngleMeasure)").
 :-assert_kif("(instance Steradian SystemeInternationalUnit)").
 :-assert_kif("(documentation Steradian \"SI solid angle measure. Symbol: sr. It is the solid angle of a sphere subtended by a portion of the surface whose area is equal to the square of the sphere's radius. Another definition is : the solid angle which, having its vertex in the center of the sphere, cuts off an area of the surface of the sphere equal to that of a square with sides of length equal to the radius of the sphere. &%Steradian = m ^2/m^2 = 1.\")").
 %
 % :-assert_kif(";Frequency units ").
-:-assert_kif("(subclass Hertz TimeDependentQuantity)").
+:-assert_kif("(genls Hertz TimeDependentQuantity)").
 :-assert_kif("(instance Hertz SystemeInternationalUnit)").
 :-assert_kif("(documentation Hertz \"SI frequency measure. Symbol: Hz. It is the number of cycles per second. &%Hertz = s^ (-1). Note that &%Hertz does not have a conversion function.\")").
 % :-assert_kif(";Force Unit ").
-:-assert_kif("(subclass Newton FunctionQuantity)").
+:-assert_kif("(genls Newton FunctionQuantity)").
 :-assert_kif("(instance Newton SystemeInternationalUnit)").
 :-assert_kif("(documentation Newton \"SI force measure. Symbol: N. It is that force which gives to a mass of 1 kilogram an acceleration of 1 &%Meter per &%SecondDuration. &%Newton = m*kg*s^ (-2).\")").
 % :-assert_kif(";Pressure unit ").
-:-assert_kif("(subclass Pascal FunctionQuantity)").
+:-assert_kif("(genls Pascal FunctionQuantity)").
 :-assert_kif("(instance Pascal SystemeInternationalUnit)").
 :-assert_kif("(documentation Pascal \"SI pressure measure. Symbol:Pa. It is the pressure of one &%Newton per square &%Meter. &%Pascal = N/m^2 = m^ (-1)*kg*s^ (-2).\")").
 % :-assert_kif(";Energy Unit ").
-:-assert_kif("(subclass Joule FunctionQuantity)").
+:-assert_kif("(genls Joule FunctionQuantity)").
 :-assert_kif("(instance Joule SystemeInternationalUnit)").
 :-assert_kif("(documentation Joule \"SI energy measure. Symbol: J. It is the work done when the point of application of 1 &%Newton is displaced a distance of 1 &%Meter in the direction of the force. &%Joule = N*m = m ^2*kg*s^ (-2).\")").
 % :-assert_kif(";Power Units ").
-:-assert_kif("(subclass Watt FunctionQuantity)").
+:-assert_kif("(genls Watt FunctionQuantity)").
 :-assert_kif("(instance Watt SystemeInternationalUnit)").
 :-assert_kif("(documentation Watt \"SI power measure. Symbol: W. A &%UnitOfMeasure that measures power, i.e. energy produced or expended divided by &%TimeDuration. It is the power which gives rise to the production of energy (or work) at the rate of one &%Joule per &%SecondDuration. &%Watt = J/s = m^2*kg*s^ (-3).\")").
 %
 % :-assert_kif(";;;Note: According to SI one should not use the expression \"per unit of.\" ").
 % :-assert_kif(";Electric Charge Units ").
-:-assert_kif("(subclass Coulomb TimeDependentQuantity)").
+:-assert_kif("(genls Coulomb TimeDependentQuantity)").
 :-assert_kif("(instance Coulomb SystemeInternationalUnit)").
 :-assert_kif("(documentation Coulomb \"SI electric charge measure. Symbol: C. It is the quantity of electric charge transported through a cross section of a conductor in an electric circuit during each &%SecondDuration by a current of 1 &%Ampere. Coulomb = s*A.\")").
 % :-assert_kif(";Electric Potential Units ").
-:-assert_kif("(subclass Volt FunctionQuantity)").
+:-assert_kif("(genls Volt FunctionQuantity)").
 :-assert_kif("(instance Volt SystemeInternationalUnit)").
 :-assert_kif("(documentation Volt \"SI electric potential measure. Symbol: V. It is the difference of electric potential between two points of a conducting wire carrying a constant current of 1 &%Ampere, when the power dissipated between these points is equal to 1 &%Watt. &%Volt = W/A = m ^2*kg*s^ (-3)*A^ (-1).\")").
 % :-assert_kif(";Capacitance Units ").
-:-assert_kif("(subclass Farad FunctionQuantity)").
+:-assert_kif("(genls Farad FunctionQuantity)").
 :-assert_kif("(instance Farad SystemeInternationalUnit)").
 :-assert_kif("(documentation Farad \"SI capacitance measure. Symbol: F. It is the capacitance of a capacitator between the plates of which there appears a difference of potential of 1 &%Volt when it is charged by a quantity of electricity equal to 1 Coulomb. &%Farad = C/V = m ^ (-2)*kg (-1)*s^4*A^2.\")").
 % :-assert_kif(";Electric Resistance Units ").
-:-assert_kif("(subclass Ohm FunctionQuantity)").
+:-assert_kif("(genls Ohm FunctionQuantity)").
 :-assert_kif("(instance Ohm SystemeInternationalUnit)").
 :-assert_kif("(documentation Ohm \"SI electric resistance measure. It is the electric resistance between two points of a conductor when a constant difference of potential of 1 &%Volt, applied between these two points, produces in this conductor a current of 1 &%Ampere, this conductor not being the force of any electromotive force. &%Ohm = V/A = m ^2*kg*s^ (-3)*A^ (-2).\")").
 % :-assert_kif(";Electric Conductance Units ").
-:-assert_kif("(subclass Siemens FunctionQuantity)").
+:-assert_kif("(genls Siemens FunctionQuantity)").
 :-assert_kif("(instance Siemens SystemeInternationalUnit)").
 :-assert_kif("(documentation Siemens \"SI electric conductance measure. Symbol: S. In the case of direct current, the conductance in &%Siemens is the reciprocal of the resistance in &%Ohms;in the case of alternating current, it is the reciprocal of the impedance in ohms. siemens = A/V = m ^ (-2)*kg (-1)*s^ (3)*A^2.\")").
 % :-assert_kif(";Magnetic Flux Units ").
-:-assert_kif("(subclass Weber FunctionQuantity)").
+:-assert_kif("(genls Weber FunctionQuantity)").
 :-assert_kif("(instance Weber SystemeInternationalUnit)").
 :-assert_kif("(documentation Weber \"SI magnetic flux measure. Symbol: Wb. It is the magnetic flux which, linking a circuit of one turn, produces in it an electromotive force of 1 &%Volt as it is reduced to zero at a uniform rate in 1 &%SecondDuration. &%Weber = V*s = m^2*kg*s^ (-2)*A^ (-1).\" )").
 % :-assert_kif(";Magnetic Flux Density Units ").
-:-assert_kif("(subclass Tesla FunctionQuantity)").
+:-assert_kif("(genls Tesla FunctionQuantity)").
 :-assert_kif("(instance Tesla SystemeInternationalUnit)").
 :-assert_kif("(documentation Tesla \"SI magnetic flux density measure. Symbol: T. One &%Tesla equals one &%Weber per square &%Meter. &%Tesla = Wb/m^2 = kg *s^ (-2)*A^ (-1).\")").
 % :-assert_kif(";Inductance Units ").
-:-assert_kif("(subclass Henry FunctionQuantity)").
+:-assert_kif("(genls Henry FunctionQuantity)").
 :-assert_kif("(instance Henry SystemeInternationalUnit)").
 :-assert_kif("(documentation Henry \"SI inductance measure. Symbol: H. One &%Henry is equivalent to one &%Volt divided by one &%Ampere per &%SecondDuration. If a current changing at the rate of one &%Ampere per &%SecondDuration induces an electromotive force of one &%Volt, the circuit has an inductance of one &%Henry. &%Henry = Wb/A = m^2*kg*s^ (-2)*A^ (-2).\")").
 % :-assert_kif(";Celsius Temperature unit ").
-:-assert_kif("(subclass CelsiusDegree TemperatureMeasure)").
+:-assert_kif("(genls CelsiusDegree TemperatureMeasure)").
 :-assert_kif("(instance CelsiusDegree SystemeInternationalUnit)").
 :-assert_kif("(documentation CelsiusDegree \"A &%TemperatureMeasure. The freezing point and the boiling point of water are, respectively, 0 &%CelsiusDegrees and 100 &%CelsiusDegrees.\")").
 %
@@ -2778,51 +2778,51 @@
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER CelsiusDegree) (MeasureFn (DivisionFn (SubtractionFn ?NUMBER 32) 1.8) FahrenheitDegree)))").
 % :-assert_kif(";Luminous Flux Units ").
-:-assert_kif("(subclass Lumen FunctionQuantity)").
+:-assert_kif("(genls Lumen FunctionQuantity)").
 :-assert_kif("(instance Lumen SystemeInternationalUnit)").
 :-assert_kif("(documentation Lumen \"SI luminous flux measure. Symbol: lm. It is the amount streaming outward through one solid angle of 1 &%Steradian from a uniform point source having an intensity of one &%Candela. &%Lumen = cd *sr = cd * 1.\")").
 % :-assert_kif(";Illuminance Units ").
-:-assert_kif("(subclass Lux FunctionQuantity)").
+:-assert_kif("(genls Lux FunctionQuantity)").
 :-assert_kif("(instance Lux SystemeInternationalUnit)").
 :-assert_kif("(documentation Lux \"SI illuminance measure. Symbol: lx. It is the amount of illumination provided when one &%Lumen is evenly distributed over an area of 1 square &%Meter. This is also equivalent to the illumination that would exist on a surface all points of which are one &%Meter from a point source of one &%Candela. &%Lux = lm/m^2 = m ^ (-2)*cd.\")").
 % :-assert_kif(";Activity Units ").
-:-assert_kif("(subclass Becquerel TimeDependentQuantity)").
+:-assert_kif("(genls Becquerel TimeDependentQuantity)").
 :-assert_kif("(instance Becquerel SystemeInternationalUnit)").
 :-assert_kif("(documentation Becquerel \"SI activity measure. Symbol: Bq. It measures the amount of radioactivity contained in a given sample of matter. It is that quantity of a radioactive element in which there is one atomic disintegration per &%SecondDuration. &%Becquerel = s^ (-1).\")").
 % :-assert_kif(";Absorbed Dose Units ").
-:-assert_kif("(subclass Gray FunctionQuantity)").
+:-assert_kif("(genls Gray FunctionQuantity)").
 :-assert_kif("(instance Gray SystemeInternationalUnit)").
 :-assert_kif("(documentation Gray \"SI absorbed dose measure. Symbol: Gy. It measures the dose of radiation absorbed in living tissue. It is equal approximately to the absorbed dose delivered when the energy per unit mass imparted to matter by ionizing radiation is 1 &%Joule per kilogram. &%Gray = J/kg = m^2*s^ (-2).\")").
 % :-assert_kif(";Dose Equivalent Units ").
-:-assert_kif("(subclass Sievert FunctionQuantity)").
+:-assert_kif("(genls Sievert FunctionQuantity)").
 :-assert_kif("(instance Sievert SystemeInternationalUnit)").
 :-assert_kif("(documentation Sievert \"SI dose equivalent measure. Symbol: Sv. It is a unit of biologic dose of ionizing radiation. The &%Sievert makes it possible to normalize doses of different types of radiation. It takes into account the relative biologic effectiveness of ionizing radiation, since each form of such radiation--e.g., X rays, gamma rays, neutrons-- has a slightly different effect on living tissue for a given absorbed dose . The dose equivalent of a given type of radiation (in &%Sievert) is the dose of the radiation in &%Gray multiplied by a quality factor that is based on the relative biologic effectiveness of the radiation. Accordingly , one &%Sievert is generally defined as the amount of radiation roughly equivalent in biologic effectiveness to one &%Gray of gamma radiation . &%Sievert = J/kg = m^2*s^ (-2)\")").
 % :-assert_kif(";Units that are accepted for -use- with SI ").
-:-assert_kif("(subclass DayDuration TimeDuration)").
+:-assert_kif("(genls DayDuration TimeDuration)").
 :-assert_kif("(instance DayDuration UnitOfMeasure)").
 :-assert_kif("(documentation DayDuration \"Time unit. 1 day = 24 hours.\")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER DayDuration) (MeasureFn (MultiplicationFn ?NUMBER 24) HourDuration)))").
 %
-:-assert_kif("(subclass HourDuration TimeDuration)").
+:-assert_kif("(genls HourDuration TimeDuration)").
 :-assert_kif("(instance HourDuration UnitOfMeasure)").
 :-assert_kif("(documentation HourDuration \"Time unit. 1 hour = 60 minutes.\")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER HourDuration) (MeasureFn (MultiplicationFn ?NUMBER 60) MinuteDuration)))").
 %
-:-assert_kif("(subclass MinuteDuration TimeDuration)").
+:-assert_kif("(genls MinuteDuration TimeDuration)").
 :-assert_kif("(instance MinuteDuration UnitOfMeasure)").
 :-assert_kif("(documentation MinuteDuration \"Time unit. 1 minute = 60 seconds. \")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER MinuteDuration) (MeasureFn (MultiplicationFn ?NUMBER 60) SecondDuration)))").
 %
-:-assert_kif("(subclass WeekDuration TimeDuration)").
+:-assert_kif("(genls WeekDuration TimeDuration)").
 :-assert_kif("(instance WeekDuration UnitOfMeasure)").
 :-assert_kif("(documentation WeekDuration \"Time unit. A week's duration is seven days.\")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER WeekDuration) (MeasureFn (MultiplicationFn ?NUMBER 7) DayDuration)))").
 %
-:-assert_kif("(subclass YearDuration TimeDuration)").
+:-assert_kif("(genls YearDuration TimeDuration)").
 :-assert_kif("(instance YearDuration UnitOfMeasure)").
 :-assert_kif("(documentation YearDuration \"Time unit. one calendar year. 1 year = 365 days = 31536000 seconds.\")").
 %
@@ -2830,13 +2830,13 @@
 %
 % :-assert_kif(";What follows are units that are also accepted for use with SI. The ").
 % :-assert_kif(";SI equivalents for these units are obtained experimentally. ").
-:-assert_kif("(subclass Amu MassMeasure)").
+:-assert_kif("(genls Amu MassMeasure)").
 :-assert_kif("(instance Amu UnitOfMeasure)").
 :-assert_kif("(documentation Amu \"Atomic mass unit. Symbol: u. It is the mass of the twelfth part of an atom of the Carbon 12 isotope.\")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER Amu) (MeasureFn (MultiplicationFn ?NUMBER 1.6605402E-24) Gram)))").
 %
-:-assert_kif("(subclass ElectronVolt FunctionQuantity)").
+:-assert_kif("(genls ElectronVolt FunctionQuantity)").
 :-assert_kif("(instance ElectronVolt UnitOfMeasure)").
 :-assert_kif("(documentation ElectronVolt \"The &%ElectronVolt is an energy measure. Symbol : eV. It is the kinetic energy acquired by an electron in passing through a potential difference of 1 &%Volt in a vacuum.\")").
 %
@@ -2844,7 +2844,7 @@
 %
 % :-assert_kif(";The following units have been temporarily accepted for use with ").
 % :-assert_kif(";SI units. ").
-:-assert_kif("(subclass Angstrom LengthMeasure)").
+:-assert_kif("(genls Angstrom LengthMeasure)").
 :-assert_kif("(instance Angstrom UnitOfMeasure)").
 :-assert_kif("(documentation Angstrom \"The &%Angstrom is a &%LengthMeasure. 1 &%Angstrom = 10^ (-10) m\")").
 %
@@ -2853,112 +2853,112 @@
 % :-assert_kif(";The following units are unacceptable in SI but are part of other ").
 % :-assert_kif(";systems of measurement that are widely used. ").
 % :-assert_kif(";More Length units ").
-:-assert_kif("(subclass FootLength LengthMeasure)").
+:-assert_kif("(genls FootLength LengthMeasure)").
 :-assert_kif("(instance FootLength UnitOfMeasure)").
 :-assert_kif("(documentation FootLength \"English length unit of feet.\")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER FootLength) (MeasureFn (MultiplicationFn ?NUMBER 0.3048) Meter)))").
 %
-:-assert_kif("(subclass Inch LengthMeasure)").
+:-assert_kif("(genls Inch LengthMeasure)").
 :-assert_kif("(instance Inch UnitOfMeasure)").
 :-assert_kif("(documentation Inch \"English length unit of inches.\")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER Inch) (MeasureFn (MultiplicationFn ?NUMBER 0.0254) Meter)))").
 %
-:-assert_kif("(subclass Mile LengthMeasure)").
+:-assert_kif("(genls Mile LengthMeasure)").
 :-assert_kif("(instance Mile UnitOfMeasure)").
 :-assert_kif("(documentation Mile \"English length unit of miles.\")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER Mile) (MeasureFn (MultiplicationFn ?NUMBER 1609.344) Meter)))").
 %
 % :-assert_kif(";More Volume units ").
-:-assert_kif("(subclass UnitedStatesGallon VolumeMeasure)").
+:-assert_kif("(genls UnitedStatesGallon VolumeMeasure)").
 :-assert_kif("(instance UnitedStatesGallon UnitOfMeasure)").
 :-assert_kif("(relatedInternalConcept UnitedStatesGallon UnitedKingdomGallon)").
 :-assert_kif("(documentation UnitedStatesGallon \"Unit of volume commonly used in the United States.\")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER UnitedStatesGallon) (MeasureFn (MultiplicationFn ?NUMBER 3.785411784) Liter)))").
 %
-:-assert_kif("(subclass Quart VolumeMeasure)").
+:-assert_kif("(genls Quart VolumeMeasure)").
 :-assert_kif("(instance Quart UnitOfMeasure)").
 :-assert_kif("(documentation Quart \"English unit of volume equal to 1/4 of a &%UnitedStatesGallon.\")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER Quart) (MeasureFn (DivisionFn ?NUMBER 4) UnitedStatesGallon)))").
 %
-:-assert_kif("(subclass Pint VolumeMeasure)").
+:-assert_kif("(genls Pint VolumeMeasure)").
 :-assert_kif("(instance Pint UnitOfMeasure)").
 :-assert_kif("(documentation Pint \"English unit of volume equal to 1/2 of a &%Quart.\")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER Pint) (MeasureFn (DivisionFn ?NUMBER 2) Quart)))").
 %
-:-assert_kif("(subclass CupMeasure VolumeMeasure)").
+:-assert_kif("(genls CupMeasure VolumeMeasure)").
 :-assert_kif("(instance CupMeasure UnitOfMeasure)").
 :-assert_kif("(documentation CupMeasure \"English unit of volume equal to 1/2 of a &%Pint.\")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER Cup) (MeasureFn (DivisionFn ?NUMBER 2) Pint)))").
 %
-:-assert_kif("(subclass Ounce VolumeMeasure)").
+:-assert_kif("(genls Ounce VolumeMeasure)").
 :-assert_kif("(instance Ounce UnitOfMeasure)").
 :-assert_kif("(documentation Ounce \"English unit of volume equal to 1/8 of a &%Cup.\")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER Ounce) (MeasureFn (DivisionFn ?NUMBER 8) Cup)))").
 %
-:-assert_kif("(subclass UnitedKingdomGallon VolumeMeasure)").
+:-assert_kif("(genls UnitedKingdomGallon VolumeMeasure)").
 :-assert_kif("(instance UnitedKingdomGallon UnitOfMeasure)").
 :-assert_kif("(documentation UnitedKingdomGallon \"Unit of volume commonly used in the United Kingdom.\")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER UnitedKingdomGallon) (MeasureFn (MultiplicationFn ?NUMBER 4.54609) Liter)))").
 %
 % :-assert_kif(";More Mass units ").
-:-assert_kif("(subclass AtomGram MassMeasure)").
+:-assert_kif("(genls AtomGram MassMeasure)").
 :-assert_kif("(instance AtomGram UnitOfMeasure)").
 :-assert_kif("(documentation AtomGram \"&%MassMeasure that is also known as the gram-atom. Defined as the mass in grams of 1 &%Mole of pure substance. For example, 1 &%AtomGram of Carbon 12 will be 12 &%Grams of pure Carbon 12. 2 &%AtomGrams of the same substance will be 24 &%Grams of it. This is an unusual unit in that it is essentially 1 &%Mole of 'stuff' measured in grams, so that the actual value (i.e. mass) depends on the type of substance.\")").
 %
-:-assert_kif("(subclass PoundMass MassMeasure)").
+:-assert_kif("(genls PoundMass MassMeasure)").
 :-assert_kif("(instance PoundMass UnitOfMeasure)").
 :-assert_kif("(documentation PoundMass \"English mass unit of pounds.\")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER PoundMass) (MeasureFn (MultiplicationFn ?NUMBER 453.59237) Gram)))").
 %
-:-assert_kif("(subclass Slug MassMeasure)").
+:-assert_kif("(genls Slug MassMeasure)").
 :-assert_kif("(instance Slug UnitOfMeasure)").
 :-assert_kif("(documentation Slug \"English mass unit of slugs.\")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER Slug) (MeasureFn (MultiplicationFn ?NUMBER 14593.90) Gram)))").
 %
 % :-assert_kif(";More Temperature units ").
-:-assert_kif("(subclass RankineDegree TemperatureMeasure)").
+:-assert_kif("(genls RankineDegree TemperatureMeasure)").
 :-assert_kif("(instance RankineDegree UnitOfMeasure)").
 :-assert_kif("(documentation RankineDegree \"A &%TemperatureMeasure. Note that 0 &%RankineDegrees is the same as the absolute zero (i.e. 0 &%KelvinDegrees).\")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER RankineDegree) (MeasureFn (MultiplicationFn ?NUMBER 1.8) KelvinDegree)))").
 %
-:-assert_kif("(subclass FahrenheitDegree TemperatureMeasure)").
+:-assert_kif("(genls FahrenheitDegree TemperatureMeasure)").
 :-assert_kif("(instance FahrenheitDegree UnitOfMeasure)").
 :-assert_kif("(documentation FahrenheitDegree \"A &%TemperatureMeasure that is commonly used in the United States. On the Fahrenheit scale, the freezing point of water is 32 &%FahrenheitDegrees, and the boiling point of water is 212 &%FahrenheitDegrees.\")").
 %
 % :-assert_kif(";More Force units ").
-:-assert_kif("(subclass PoundForce FunctionQuantity)").
+:-assert_kif("(genls PoundForce FunctionQuantity)").
 :-assert_kif("(instance PoundForce UnitOfMeasure)").
 :-assert_kif("(documentation PoundForce \"English pound of force. The conversion factor depends on the local value of the acceleration of free fall. A mean value is used in the conversion axiom associated with this constant .\")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER PoundForce) (MeasureFn (MultiplicationFn ?NUMBER 4.448222) Newton)))").
 %
 % :-assert_kif(";More Energy units ").
-:-assert_kif("(subclass Calorie FunctionQuantity)").
+:-assert_kif("(genls Calorie FunctionQuantity)").
 :-assert_kif("(instance Calorie UnitOfMeasure)").
 :-assert_kif("(documentation Calorie \"A &%Calorie is an energy measure.\")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER Calorie) (MeasureFn (MultiplicationFn ?NUMBER 4.1868) Joule)))").
 %
-:-assert_kif("(subclass BritishThermalUnit FunctionQuantity)").
+:-assert_kif("(genls BritishThermalUnit FunctionQuantity)").
 :-assert_kif("(instance BritishThermalUnit UnitOfMeasure)").
 :-assert_kif("(documentation BritishThermalUnit \"An energy measure.\")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER BritishThermalUnit) (MeasureFn (MultiplicationFn ?NUMBER 1055.05585262) Joule)))").
 %
 % :-assert_kif(";More plane angle units ").
-:-assert_kif("(subclass AngularDegree PlaneAngleMeasure)").
+:-assert_kif("(genls AngularDegree PlaneAngleMeasure)").
 :-assert_kif("(instance AngularDegree UnitOfMeasure)").
 :-assert_kif("(documentation AngularDegree \"A plane angle measure.\")").
 %
@@ -2969,46 +2969,46 @@
 :-assert_kif("(equal (MeasureFn 0 AngularDegree) (MeasureFn 360 AngularDegree))").
 % :-assert_kif(";Other interesting units of measure ").
 % :-assert_kif(";Currency units ").
-:-assert_kif("(subclass UnitedStatesDollar CurrencyMeasure)").
+:-assert_kif("(genls UnitedStatesDollar CurrencyMeasure)").
 :-assert_kif("(instance UnitedStatesDollar UnitOfCurrency)").
 :-assert_kif("(documentation UnitedStatesDollar \"A currency measure.\")").
 %
-:-assert_kif("(subclass UnitedStatesCent CurrencyMeasure)").
+:-assert_kif("(genls UnitedStatesCent CurrencyMeasure)").
 :-assert_kif("(instance UnitedStatesCent UnitOfCurrency)").
 :-assert_kif("(documentation UnitedStatesCent \"A currency measure. 1 &%UnitedStatesCent is equal to .01 &%UnitedStatesDollars.\")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER UnitedStatesCent) (MeasureFn (MultiplicationFn ?NUMBER 0.01) UnitedStatesDollar)))").
 %
-:-assert_kif("(subclass EuroDollar CurrencyMeasure)").
+:-assert_kif("(genls EuroDollar CurrencyMeasure)").
 :-assert_kif("(instance EuroDollar UnitOfCurrency)").
 :-assert_kif("(documentation EuroDollar \"A currency measure of most European Union countries. It is based on the &%UnitedStatesDollar.\")").
 %
-:-assert_kif("(subclass EuroCent CurrencyMeasure)").
+:-assert_kif("(genls EuroCent CurrencyMeasure)").
 :-assert_kif("(instance EuroCent UnitOfCurrency)").
 :-assert_kif("(documentation EuroCent \"A currency measure. 1 &%EuroCent is equal to .01 &%EuroDollars.\")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER EuroCent) (MeasureFn (MultiplicationFn ?NUMBER 0.01) EuroDollar)))").
 % :-assert_kif(";Information units ").
-:-assert_kif("(subclass InformationMeasure ConstantQuantity)").
+:-assert_kif("(genls InformationMeasure ConstantQuantity)").
 :-assert_kif("(documentation InformationMeasure \"Measures of the amount of information. Includes &%Bit, &%Byte, and multiples of these, e.g. &%KiloByte and &%MegaByte.\")").
 %
-:-assert_kif("(subclass Bit InformationMeasure)").
+:-assert_kif("(genls Bit InformationMeasure)").
 :-assert_kif("(instance Bit UnitOfMeasure)").
 :-assert_kif("(documentation Bit \"One &%Bit of information. A one or a zero.\")").
 %
-:-assert_kif("(subclass Byte InformationMeasure)").
+:-assert_kif("(genls Byte InformationMeasure)").
 :-assert_kif("(instance Byte UnitOfMeasure)").
 :-assert_kif("(documentation Byte \"One &%Byte of information. A &%Byte is eight &%Bits.\")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER Byte) (MeasureFn (MultiplicationFn ?NUMBER 8) Bit)))").
 %
-:-assert_kif("(subclass KiloByte InformationMeasure)").
+:-assert_kif("(genls KiloByte InformationMeasure)").
 :-assert_kif("(instance KiloByte UnitOfMeasure)").
 :-assert_kif("(documentation KiloByte \"One &%KiloByte (KB) of information. One &%KiloByte is 1024 &%Bytes. Note that this sense of 'kilo' is different from the one accepted in the SI system.\")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER KiloByte) (MeasureFn (MultiplicationFn ?NUMBER 1024) Byte)))").
 %
-:-assert_kif("(subclass MegaByte InformationMeasure)").
+:-assert_kif("(genls MegaByte InformationMeasure)").
 :-assert_kif("(instance MegaByte UnitOfMeasure)").
 :-assert_kif("(documentation MegaByte \"One &%MegaByte (MB) of information. One &%MegaByte is 1024 &%KiloBytes. Note that this sense of 'mega' is different from the one accepted in the SI system.\")").
 %
@@ -3385,14 +3385,14 @@
 :-assert_kif("(domainSubclass MonthFn 1 Month)").
 :-assert_kif("(domainSubclass MonthFn 2 Year)").
 :-assert_kif("(rangeSubclass MonthFn Month)").
-:-assert_kif("(documentation MonthFn \"A &%BinaryFunction that maps a subclass of &%Month and a subclass of &%Year to the class containing the &%Months corresponding to thos &%Years. For example (&%MonthFn &%January (&%YearFn 1912)) is the class containing the eighth &%Month, i.e. August, of the &%Year 1912. For another example, (&%MonthFn &%August &%Year) is equal to &%August, the class of all months of August. Note that this function returns a &%Class as a value. The reason for this is that the related functions, viz. DayFn , HourFn, MinuteFn, and SecondFn, are used to generate both specific &%TimeIntervals and recurrent intervals, and the only way to do this is to make the domains and ranges of these functions classes rather than individuals.\")").
+:-assert_kif("(documentation MonthFn \"A &%BinaryFunction that maps a genls of &%Month and a genls of &%Year to the class containing the &%Months corresponding to thos &%Years. For example (&%MonthFn &%January (&%YearFn 1912)) is the class containing the eighth &%Month, i.e. August, of the &%Year 1912. For another example, (&%MonthFn &%August &%Year) is equal to &%August, the class of all months of August. Note that this function returns a &%Class as a value. The reason for this is that the related functions, viz. DayFn , HourFn, MinuteFn, and SecondFn, are used to generate both specific &%TimeIntervals and recurrent intervals, and the only way to do this is to make the domains and ranges of these functions classes rather than individuals.\")").
 %
 :-assert_kif("(instance DayFn TemporalRelation)").
 :-assert_kif("(instance DayFn BinaryFunction)").
 :-assert_kif("(domain DayFn 1 PositiveRealNumber)").
 :-assert_kif("(domainSubclass DayFn 2 Month)").
 :-assert_kif("(rangeSubclass DayFn RecurringDay)").
-:-assert_kif("(documentation DayFn \"A &%BinaryFunction that assigns a &%PositiveRealNumber and a subclass of &%Months to the &%Days within each &%Month corresponding to that &%PositiveRealNumber. For example, (&%DayFn 16 &%August) is the &%Class of all sixteenth days of August. For another example, (&%DayFn 9 &%Month) would return the class of all ninth days of any month. For still another example, (&%DayFn 18 (&%MonthFn 8 (YearFn 1912))) denotes the 18th day of August 1912.\")").
+:-assert_kif("(documentation DayFn \"A &%BinaryFunction that assigns a &%PositiveRealNumber and a genls of &%Months to the &%Days within each &%Month corresponding to that &%PositiveRealNumber. For example, (&%DayFn 16 &%August) is the &%Class of all sixteenth days of August. For another example, (&%DayFn 9 &%Month) would return the class of all ninth days of any month. For still another example, (&%DayFn 18 (&%MonthFn 8 (YearFn 1912))) denotes the 18th day of August 1912.\")").
 %
 :-assert_kif("(=> (instance ?DAY (DayFn ?NUMBER ?MONTH)) (lessThanOrEqualTo ?NUMBER 31))").
 %
@@ -3403,7 +3403,7 @@
 :-assert_kif("(domain HourFn 1 PositiveRealNumber)").
 :-assert_kif("(domainSubclass HourFn 2 Day)").
 :-assert_kif("(rangeSubclass HourFn Hour)").
-:-assert_kif("(documentation HourFn \"A &%BinaryFunction that assigns a &%PositiveRealNumber and a subclass of &%Days to the &%Hours within each &%Day corresponding to that &%PositiveRealNumber. For example, (&%HourFn 12 &%Thursday) is the &%Class of all instances of noon Thursday. For another example, (&%HourFn 24 &%Day) would return the class of all instances of midnight. For still another example, (&%HourFn 14 (&%DayFn 18 (&%MonthFn 8 (YearFn 1912)))) denotes 2 PM on the 18th day of August 1912.\")").
+:-assert_kif("(documentation HourFn \"A &%BinaryFunction that assigns a &%PositiveRealNumber and a genls of &%Days to the &%Hours within each &%Day corresponding to that &%PositiveRealNumber. For example, (&%HourFn 12 &%Thursday) is the &%Class of all instances of noon Thursday. For another example, (&%HourFn 24 &%Day) would return the class of all instances of midnight. For still another example, (&%HourFn 14 (&%DayFn 18 (&%MonthFn 8 (YearFn 1912)))) denotes 2 PM on the 18th day of August 1912.\")").
 %
 :-assert_kif("(=> (instance ?HOUR (HourFn ?NUMBER ?DAY)) (lessThan ?NUMBER 24))").
 %
@@ -3414,7 +3414,7 @@
 :-assert_kif("(domain MinuteFn 1 PositiveRealNumber)").
 :-assert_kif("(domainSubclass MinuteFn 2 Hour)").
 :-assert_kif("(rangeSubclass MinuteFn Minute)").
-:-assert_kif("(documentation MinuteFn \"A &%BinaryFunction that assigns a &%PositiveRealNumber and a subclass of &%Hours to the &%Minutes within each &%Hour corresponding to that &%PositiveRealNumber. For example, (&%MinuteFn 30 (&%HourFn 17 &%Day)) is the &%Class of all 5:30's in the afternoon. For another example, (&%MinuteFn 15 &%Hour) would return the class of all instances of quarter past the hour. For still another example, (&%MinuteFn 15 (&%HourFn 14 (&%DayFn 18 (&%MonthFn 8 (YearFn 1912))))) denotes 15 minutes after 2 PM on the 18th day of August 1912.\")").
+:-assert_kif("(documentation MinuteFn \"A &%BinaryFunction that assigns a &%PositiveRealNumber and a genls of &%Hours to the &%Minutes within each &%Hour corresponding to that &%PositiveRealNumber. For example, (&%MinuteFn 30 (&%HourFn 17 &%Day)) is the &%Class of all 5:30's in the afternoon. For another example, (&%MinuteFn 15 &%Hour) would return the class of all instances of quarter past the hour. For still another example, (&%MinuteFn 15 (&%HourFn 14 (&%DayFn 18 (&%MonthFn 8 (YearFn 1912))))) denotes 15 minutes after 2 PM on the 18th day of August 1912.\")").
 %
 :-assert_kif("(=> (instance ?MINUTE (MinuteFn ?NUMBER ?HOUR)) (lessThan ?NUMBER 60))").
 %
@@ -3425,13 +3425,13 @@
 :-assert_kif("(domain SecondFn 1 PositiveRealNumber)").
 :-assert_kif("(domainSubclass SecondFn 2 Minute)").
 :-assert_kif("(rangeSubclass SecondFn Second)").
-:-assert_kif("(documentation SecondFn \"A &%BinaryFunction that assigns a &%PositiveRealNumber and a subclass of &%Minutes to the &%Seconds within each &%Minute corresponding to that &%PositiveRealNumber. For example, (&%SecondFn 4 (&%MinuteFn 5 &%Hour)) is the &%Class of all fourth &%Seconds of every fifth &%Minute of every hour. For another example, (&%SecondFn 8 &%Minute) would return the eighth second of every minute. For still another example, (&%SecondFn 9 (&%MinuteFn 15 (&%HourFn 14 (&%DayFn 18 (&%MonthFn 8 (YearFn 1912)))))) denotes 9 seconds and 15 minutes after 2 PM on the 18th day of August 1912.\")").
+:-assert_kif("(documentation SecondFn \"A &%BinaryFunction that assigns a &%PositiveRealNumber and a genls of &%Minutes to the &%Seconds within each &%Minute corresponding to that &%PositiveRealNumber. For example, (&%SecondFn 4 (&%MinuteFn 5 &%Hour)) is the &%Class of all fourth &%Seconds of every fifth &%Minute of every hour. For another example, (&%SecondFn 8 &%Minute) would return the eighth second of every minute. For still another example, (&%SecondFn 9 (&%MinuteFn 15 (&%HourFn 14 (&%DayFn 18 (&%MonthFn 8 (YearFn 1912)))))) denotes 9 seconds and 15 minutes after 2 PM on the 18th day of August 1912.\")").
 %
 :-assert_kif("(=> (instance ?SECOND (SecondFn ?NUMBER ?MINUTE)) (lessThan ?NUMBER 60))").
 %
 :-assert_kif("(=> (and (instance ?SECOND1 (SecondFn ?NUMBER1 ?MINUTE)) (instance ?SECOND2 (SecondFn ?NUMBER2 ?MINUTE)) (equal (SubtractionFn ?NUMBER2 ?NUMBER1) 1)) (meetsTemporally ?SECOND1 ?SECOND2))").
 %
-:-assert_kif("(subclass Year TimeInterval)").
+:-assert_kif("(genls Year TimeInterval)").
 :-assert_kif("(relatedInternalConcept Year YearFn)").
 :-assert_kif("(relatedInternalConcept Year YearDuration)").
 :-assert_kif("(documentation Year \"The &%Class of all calendar &%Years.\")").
@@ -3440,23 +3440,23 @@
 %
 :-assert_kif("(=> (and (instance ?YEAR1 Year) (instance ?YEAR2 Year) (equal (SubtractionFn ?YEAR2 ?YEAR1) 1)) (meetsTemporally ?YEAR1 ?YEAR2))").
 %
-:-assert_kif("(subclass LeapYear Year)").
+:-assert_kif("(genls LeapYear Year)").
 :-assert_kif("(documentation LeapYear \"The &%Class of all leap years. These are years which are either (i.) evenly divisible by 4 and not by 100 or (ii.) evenly divisible by 400 (this latter case is known as a leap century).\")").
 %
 :-assert_kif("(=> (and (instance ?LEAP LeapYear) (equal ?LEAP (MeasureFn ?NUMBER Year))) (or (and (equal (RemainderFn ?NUMBER 4) 0) (not (equal (RemainderFn ?NUMBER 100) 0))) (equal (RemainderFn ?NUMBER 400) 0)))").
 %
-:-assert_kif("(subclass Month TimeInterval)").
+:-assert_kif("(genls Month TimeInterval)").
 :-assert_kif("(relatedInternalConcept Month MonthFn)").
 :-assert_kif("(documentation Month \"The &%Class of all calendar &%Months.\")").
 %
-:-assert_kif("(subclass January Month)").
+:-assert_kif("(genls January Month)").
 :-assert_kif("(documentation January \"The &%Class of all &%Months which are January.\")").
 %
 :-assert_kif("(=> (instance ?MONTH January) (duration ?MONTH (MeasureFn 31 DayDuration)))").
 %
 :-assert_kif("(=> (and (equal ?MONTH1 (MonthFn January ?YEAR)) (equal ?MONTH2 (MonthFn February ?YEAR))) (meetsTemporally ?MONTH1 ?MONTH2))").
 %
-:-assert_kif("(subclass February Month)").
+:-assert_kif("(genls February Month)").
 :-assert_kif("(documentation February \"The &%Class of all &%Months which are February.\")").
 %
 :-assert_kif("(=> (and (equal (MonthFn February ?YEAR) ?MONTH) (not (instance ?YEAR LeapYear))) (duration ?MONTH (MeasureFn 28 DayDuration)))").
@@ -3465,138 +3465,138 @@
 %
 :-assert_kif("(=> (and (equal ?MONTH1 (MonthFn February ?YEAR)) (equal ?MONTH2 (MonthFn March ?YEAR))) (meetsTemporally ?MONTH1 ?MONTH2))").
 %
-:-assert_kif("(subclass March Month)").
+:-assert_kif("(genls March Month)").
 :-assert_kif("(documentation March \"The &%Class of all &%Months which are March.\")").
 %
 :-assert_kif("(=> (instance ?MONTH March) (duration ?MONTH (MeasureFn 31 DayDuration)))").
 %
 :-assert_kif("(=> (and (equal ?MONTH1 (MonthFn March ?YEAR)) (equal ?MONTH2 (MonthFn April ?YEAR))) (meetsTemporally ?MONTH1 ?MONTH2))").
 %
-:-assert_kif("(subclass April Month)").
+:-assert_kif("(genls April Month)").
 :-assert_kif("(documentation April \"The &%Class of all &%Months which are April.\")").
 %
 :-assert_kif("(=> (instance ?MONTH April) (duration ?MONTH (MeasureFn 30 DayDuration)))").
 %
 :-assert_kif("(=> (and (equal ?MONTH1 (MonthFn April ?YEAR)) (equal ?MONTH2 (MonthFn May ?YEAR))) (meetsTemporally ?MONTH1 ?MONTH2))").
 %
-:-assert_kif("(subclass May Month)").
+:-assert_kif("(genls May Month)").
 :-assert_kif("(documentation May \"The &%Class of all &%Months which are May.\")").
 %
 :-assert_kif("(=> (instance ?MONTH May) (duration ?MONTH (MeasureFn 31 DayDuration)))").
 %
 :-assert_kif("(=> (and (equal ?MONTH1 (MonthFn May ?YEAR)) (equal ?MONTH2 (MonthFn June ?YEAR))) (meetsTemporally ?MONTH1 ?MONTH2))").
 %
-:-assert_kif("(subclass June Month)").
+:-assert_kif("(genls June Month)").
 :-assert_kif("(documentation June \"The &%Class of all &%Months which are June.\")").
 %
 :-assert_kif("(=> (instance ?MONTH June) (duration ?MONTH (MeasureFn 30 DayDuration)))").
 %
 :-assert_kif("(=> (and (equal ?MONTH1 (MonthFn June ?YEAR)) (equal ?MONTH2 (MonthFn July ?YEAR))) (meetsTemporally ?MONTH1 ?MONTH2))").
 %
-:-assert_kif("(subclass July Month)").
+:-assert_kif("(genls July Month)").
 :-assert_kif("(documentation July \"The &%Class of all &%Months which are July.\")").
 %
 :-assert_kif("(=> (instance ?MONTH July) (duration ?MONTH (MeasureFn 31 DayDuration)))").
 %
 :-assert_kif("(=> (and (equal ?MONTH1 (MonthFn July ?YEAR)) (equal ?MONTH2 (MonthFn August ?YEAR))) (meetsTemporally ?MONTH1 ?MONTH2))").
 %
-:-assert_kif("(subclass August Month)").
+:-assert_kif("(genls August Month)").
 :-assert_kif("(documentation August \"The &%Class of all &%Months which are August.\")").
 %
 :-assert_kif("(=> (instance ?MONTH August) (duration ?MONTH (MeasureFn 31 DayDuration)))").
 %
 :-assert_kif("(=> (and (equal ?MONTH1 (MonthFn August ?YEAR)) (equal ?MONTH2 (MonthFn September ?YEAR))) (meetsTemporally ?MONTH1 ?MONTH2))").
 %
-:-assert_kif("(subclass September Month)").
+:-assert_kif("(genls September Month)").
 :-assert_kif("(documentation September \"The &%Class of all &%Months which are September.\")").
 %
 :-assert_kif("(=> (instance ?MONTH September) (duration ?MONTH (MeasureFn 30 DayDuration)))").
 %
 :-assert_kif("(=> (and (equal ?MONTH1 (MonthFn September ?YEAR)) (equal ?MONTH2 (MonthFn October ?YEAR))) (meetsTemporally ?MONTH1 ?MONTH2))").
 %
-:-assert_kif("(subclass October Month)").
+:-assert_kif("(genls October Month)").
 :-assert_kif("(documentation October \"The &%Class of all &%Months which are October.\")").
 %
 :-assert_kif("(=> (instance ?MONTH October) (duration ?MONTH (MeasureFn 31 DayDuration)))").
 %
 :-assert_kif("(=> (and (equal ?MONTH1 (MonthFn October ?YEAR)) (equal ?MONTH2 (MonthFn November ?YEAR))) (meetsTemporally ?MONTH1 ?MONTH2))").
 %
-:-assert_kif("(subclass November Month)").
+:-assert_kif("(genls November Month)").
 :-assert_kif("(documentation November \"The &%Class of all &%Months which are November.\")").
 %
 :-assert_kif("(=> (instance ?MONTH November) (duration ?MONTH (MeasureFn 30 DayDuration)))").
 %
 :-assert_kif("(=> (and (equal ?MONTH1 (MonthFn November ?YEAR)) (equal ?MONTH2 (MonthFn December ?YEAR))) (meetsTemporally ?MONTH1 ?MONTH2))").
 %
-:-assert_kif("(subclass December Month)").
+:-assert_kif("(genls December Month)").
 :-assert_kif("(documentation December \"The &%Class of all &%Months which are December.\")").
 %
 :-assert_kif("(=> (instance ?MONTH December) (duration ?MONTH (MeasureFn 31 DayDuration)))").
 %
 :-assert_kif("(=> (and (equal ?MONTH1 (MonthFn December ?YEAR1)) (equal ?MONTH2 (MonthFn January ?YEAR2)) (meetsTemporally ?YEAR1 ?YEAR2)) (meetsTemporally ?MONTH1 ?MONTH2))").
 %
-:-assert_kif("(subclass Day TimeInterval)").
+:-assert_kif("(genls Day TimeInterval)").
 :-assert_kif("(relatedInternalConcept Day DayFn)").
 :-assert_kif("(relatedInternalConcept Day DayDuration)").
 :-assert_kif("(documentation Day \"The &%Class of all calendar &%Days.\")").
 %
 :-assert_kif("(=> (instance ?DAY Day) (duration ?DAY (MeasureFn 1 DayDuration)))").
 %
-:-assert_kif("(subclass Monday RecurringDay)").
+:-assert_kif("(genls Monday RecurringDay)").
 :-assert_kif("(documentation Monday \"The &%Class of all calendar Mondays.\")").
 %
-:-assert_kif("(subclass Tuesday RecurringDay)").
+:-assert_kif("(genls Tuesday RecurringDay)").
 :-assert_kif("(documentation Tuesday \"The &%Class of all calendar Tuesdays.\")").
 %
 :-assert_kif("(=> (and (instance ?DAY1 Monday) (instance ?DAY2 Tuesday) (instance ?WEEK Week) (temporalPart ?DAY1 ?WEEK) (temporalPart ?DAY2 ?WEEK)) (meetsTemporally ?DAY1 ?DAY2))").
 %
-:-assert_kif("(subclass Wednesday RecurringDay)").
+:-assert_kif("(genls Wednesday RecurringDay)").
 :-assert_kif("(documentation Wednesday \"The &%Class of all calendar Wednesdays.\")").
 %
 :-assert_kif("(=> (and (instance ?DAY1 Tuesday) (instance ?DAY2 Wednesday) (instance ?WEEK Week) (temporalPart ?DAY1 ?WEEK) (temporalPart ?DAY2 ?WEEK)) (meetsTemporally ?DAY1 ?DAY2))").
 %
-:-assert_kif("(subclass Thursday RecurringDay)").
+:-assert_kif("(genls Thursday RecurringDay)").
 :-assert_kif("(documentation Thursday \"The &%Class of all calendar Thursdays.\")").
 %
 :-assert_kif("(=> (and (instance ?DAY1 Wednesday) (instance ?DAY2 Thursday) (instance ?WEEK Week) (temporalPart ?DAY1 ?WEEK) (temporalPart ?DAY2 ?WEEK)) (meetsTemporally ?DAY1 ?DAY2))").
 %
-:-assert_kif("(subclass Friday RecurringDay)").
+:-assert_kif("(genls Friday RecurringDay)").
 :-assert_kif("(documentation Friday \"The &%Class of all calendar Fridays.\")").
 %
 :-assert_kif("(=> (and (instance ?DAY1 Thursday) (instance ?DAY2 Friday) (instance ?WEEK Week) (temporalPart ?DAY1 ?WEEK) (temporalPart ?DAY2 ?WEEK)) (meetsTemporally ?DAY1 ?DAY2))").
 %
-:-assert_kif("(subclass Saturday RecurringDay)").
+:-assert_kif("(genls Saturday RecurringDay)").
 :-assert_kif("(documentation Saturday \"The &%Class of all calendar Saturdays.\")").
 %
 :-assert_kif("(=> (and (instance ?DAY1 Friday) (instance ?DAY2 Saturday) (instance ?WEEK Week) (temporalPart ?DAY1 ?WEEK) (temporalPart ?DAY2 ?WEEK)) (meetsTemporally ?DAY1 ?DAY2))").
 %
-:-assert_kif("(subclass Sunday RecurringDay)").
+:-assert_kif("(genls Sunday RecurringDay)").
 :-assert_kif("(documentation Sunday \"The &%Class of all calendar Sundays.\")").
 %
 :-assert_kif("(=> (and (instance ?DAY1 Saturday) (instance ?DAY2 Sunday) (instance ?WEEK Week) (temporalPart ?DAY1 ?WEEK) (temporalPart ?DAY2 ?WEEK)) (meetsTemporally ?DAY1 ?DAY2))").
 %
 :-assert_kif("(=> (and (instance ?DAY1 Sunday) (instance ?DAY2 Monday) (instance ?WEEK1 Week) (instance ?WEEK2 Week) (temporalPart ?DAY1 ?WEEK1) (temporalPart ?DAY2 ?WEEK2) (meetsTemporally ?WEEK1 ?WEEK2)) (meetsTemporally ?DAY1 ?DAY2))").
 %
-:-assert_kif("(subclass Week TimeInterval)").
+:-assert_kif("(genls Week TimeInterval)").
 :-assert_kif("(documentation Week \"The &%Class of all calendar weeks.\")").
 %
 :-assert_kif("(=> (instance ?WEEK Week) (duration ?WEEK (MeasureFn 1 WeekDuration)))").
 %
-:-assert_kif("(subclass Hour TimeInterval)").
+:-assert_kif("(genls Hour TimeInterval)").
 :-assert_kif("(relatedInternalConcept Hour HourFn)").
 :-assert_kif("(relatedInternalConcept Hour HourDuration)").
 :-assert_kif("(documentation Hour \"The &%Class of all clock &%Hours.\")").
 %
 :-assert_kif("(=> (instance ?HOUR Hour) (duration ?HOUR (MeasureFn 1 HourDuration)))").
 %
-:-assert_kif("(subclass Minute TimeInterval)").
+:-assert_kif("(genls Minute TimeInterval)").
 :-assert_kif("(relatedInternalConcept Minute MinuteFn)").
 :-assert_kif("(relatedInternalConcept Minute MinuteDuration)").
 :-assert_kif("(documentation Minute \"The &%Class of all clock &%Minutes.\")").
 %
 :-assert_kif("(=> (instance ?MINUTE Minute) (duration ?MINUTE (MeasureFn 1 MinuteDuration)))").
 %
-:-assert_kif("(subclass Second TimeInterval)").
+:-assert_kif("(genls Second TimeInterval)").
 :-assert_kif("(relatedInternalConcept Second SecondDuration)").
 :-assert_kif("(relatedInternalConcept Second SecondFn)").
 :-assert_kif("(documentation Second \"The &%Class of all clock &%Seconds.\")").
@@ -3786,7 +3786,7 @@
 :-assert_kif("(domain hole 2 SelfConnectedObject)").
 :-assert_kif("(documentation hole \" (&%hole ?HOLE ?OBJ) means that ?HOLE is a &%Hole in ?OBJ. A &%Hole is a fillable body located at the &%surface an &%Object.\")").
 %
-:-assert_kif("(subclass Hole Region)").
+:-assert_kif("(genls Hole Region)").
 :-assert_kif("(documentation Hole \"A hole is an immaterial body located at the surface of an &%Object. Since every &%Hole is ontologically dependent on its host (i.e., the object in which it is a hole), being a &%Hole is defined as being a &%hole in something. Note that two &%Holes may occupy the same region , or part of the same region, without sharing any parts.\")").
 %
 :-assert_kif("(<=> (instance ?HOLE Hole) (exists (?OBJ) (hole ?HOLE ?OBJ)))").
@@ -3926,114 +3926,114 @@
 %
 % :-assert_kif(";The following formulas cover the hierarchy of &%Classes under ").
 % :-assert_kif(";&%BiologicalProcess. ").
-:-assert_kif("(subclass BiologicalProcess InternalChange)").
+:-assert_kif("(genls BiologicalProcess InternalChange)").
 :-assert_kif("(documentation BiologicalProcess \"A &%Process embodied in an &%Organism.\")").
 %
 :-assert_kif("(=> (instance ?PROC BiologicalProcess) (exists (?OBJ) (and (instance ?OBJ Organism) (located ?PROC ?OBJ))))").
 %
 :-assert_kif("(=> (and (instance ?PROC BiologicalProcess) (experiencer ?PROC ?ORG)) (instance ?ORG Organism))").
 %
-:-assert_kif("(subclass PhysiologicProcess BiologicalProcess)").
+:-assert_kif("(genls PhysiologicProcess BiologicalProcess)").
 :-assert_kif("(documentation PhysiologicProcess \"A normal process of an &%Organism or part of an &%Organism.\")").
 %
-:-assert_kif("(subclass AutonomicProcess BiologicalProcess)").
+:-assert_kif("(genls AutonomicProcess BiologicalProcess)").
 :-assert_kif("(disjoint AutonomicProcess IntentionalProcess)").
 :-assert_kif("(documentation AutonomicProcess \"The class of &%BiologicalProcesses of which there is not conscious awareness and control.\")").
 %
 :-assert_kif("(=> (and (instance ?PROCESS AutonomicProcess) (agent ?PROCESS ?AGENT)) (instance ?AGENT Hypothalamus))").
 %
-:-assert_kif("(subclass OrganismProcess PhysiologicProcess)").
+:-assert_kif("(genls OrganismProcess PhysiologicProcess)").
 :-assert_kif("(documentation OrganismProcess \"A physiologic function of the &%Organism as a whole, of multiple organ systems or of multiple &%Organs or &%Tissues.\")").
 %
-:-assert_kif("(subclass Birth OrganismProcess)").
+:-assert_kif("(genls Birth OrganismProcess)").
 :-assert_kif("(documentation Birth \"The &%Process of being born.\")").
 %
 :-assert_kif("(=> (and (instance ?BIRTH Birth) (experiencer ?BIRTH ?AGENT)) (exists (?DEATH) (and (instance ?DEATH Death) (experiencer ?DEATH ?AGENT))))").
 %
-:-assert_kif("(subclass Death OrganismProcess)").
+:-assert_kif("(genls Death OrganismProcess)").
 :-assert_kif("(documentation Death \"The &%Process of dying.\")").
 %
 :-assert_kif("(=> (and (instance ?DEATH Death) (experiencer ?DEATH ?AGENT)) (holdsDuring (FutureFn (WhenFn ?DEATH)) (attribute ?AGENT Dead)))").
 %
 :-assert_kif("(=> (and (instance ?DEATH Death) (instance ?BIRTH Birth) (experiencer ?DEATH ?AGENT) (experiencer ?BIRTH ?AGENT)) (exists (?TIME) (and (meetsTemporally (WhenFn ?BIRTH) ?TIME) (meetsTemporally ?TIME (WhenFn ?DEATH)) (holdsDuring ?TIME (attribute ?AGENT Living)))))").
 %
-:-assert_kif("(subclass Breathing OrganismProcess)").
+:-assert_kif("(genls Breathing OrganismProcess)").
 :-assert_kif("(documentation Breathing \"The &%Process of respiration, by which oxygen is made available to an &%Animal. This covers processes of inhalation, exhalation , and alternations between the two.\")").
 %
-:-assert_kif("(subclass Ingesting OrganismProcess)").
+:-assert_kif("(genls Ingesting OrganismProcess)").
 :-assert_kif("(documentation Ingesting \"The &%Process by which &%Food is taken into an &%Animal.\")").
 %
 :-assert_kif("(=> (and (instance ?ACT Ingesting) (patient ?ACT ?FOOD)) (instance ?FOOD Food))").
 %
-:-assert_kif("(subclass Eating Ingesting)").
+:-assert_kif("(genls Eating Ingesting)").
 :-assert_kif("(documentation Eating \"The &%Process by which solid &%Food is incorporated into an &%Animal.\")").
 %
 :-assert_kif("(=> (and (instance ?ACT Eating) (patient ?ACT ?FOOD)) (attribute ?FOOD Solid))").
 %
-:-assert_kif("(subclass Drinking Ingesting)").
+:-assert_kif("(genls Drinking Ingesting)").
 :-assert_kif("(documentation Drinking \"The &%Process by which liquid &%Food, i.e. &%Beverages, are incorporated into an &%Animal.\")").
 %
-:-assert_kif("(subclass Digesting OrganismProcess)").
+:-assert_kif("(genls Digesting OrganismProcess)").
 :-assert_kif("(documentation Digesting \"The &%Process by which &%Food that has been ingested is broken down into simpler chemical compounds and absorbed by the &%Organism.\")").
 %
 :-assert_kif("(=> (and (instance ?DIGEST Digesting) (agent ?DIGEST ?ORGANISM)) (exists (?INGEST) (and (instance ?INGEST Ingesting) (agent ?INGEST ?ORGANISM) (overlapsTemporally (WhenFn ?INGEST) (WhenFn ?DIGEST)))))").
 %
 :-assert_kif("(=> (instance ?DIGEST Digesting) (exists (?DECOMP) (and (instance ?DECOMP ChemicalDecomposition) (subProcess ?DECOMP ?DIGEST))))").
 %
-:-assert_kif("(subclass Growth OrganismProcess)").
+:-assert_kif("(genls Growth OrganismProcess)").
 :-assert_kif("(documentation Growth \"The &%Process of biological development in which an &%Organism or part of an &%Organism changes its form or its size.\")").
 %
-:-assert_kif("(subclass Replication OrganismProcess)").
+:-assert_kif("(genls Replication OrganismProcess)").
 :-assert_kif("(documentation Replication \"The &%Process of biological reproduction. This can be either a sexual or an asexual process.\")").
 %
 :-assert_kif("(=> (and (instance ?REP Replication) (agent ?REP ?PARENT) (result ?REP ?CHILD)) (parent ?CHILD ?PARENT))").
 %
 :-assert_kif("(=> (instance ?REP Replication) (exists (?BODY) (and (instance ?BODY ReproductiveBody) (result ?REP ?BODY))))").
 %
-:-assert_kif("(subclass SexualReproduction Replication)").
+:-assert_kif("(genls SexualReproduction Replication)").
 :-assert_kif("(disjoint SexualReproduction AsexualReproduction)").
 :-assert_kif("(documentation SexualReproduction \"Sexual &%Processes of biological reproduction .\")").
 %
 :-assert_kif("(=> (and (instance ?REP SexualReproduction) (result ?REP ?ORGANISM)) (exists (?MOTHER ?FATHER) (and (mother ?ORGANISM ?MOTHER) (father ?ORGANISM ?FATHER))))").
 %
-:-assert_kif("(subclass AsexualReproduction Replication)").
+:-assert_kif("(genls AsexualReproduction Replication)").
 :-assert_kif("(documentation AsexualReproduction \"Asexual &%Processes of biological reproduction .\")").
 %
 :-assert_kif("(=> (and (instance ?REP AsexualReproduction) (result ?REP ?ORGANISM)) (not (exists (?PARENT1 ?PARENT2) (and (parent ?ORGANISM ?PARENT1) (parent ?ORGANISM ?PARENT2) (not (equal ?PARENT1 ?PARENT2))))))").
 %
-:-assert_kif("(subclass PsychologicalProcess BiologicalProcess)").
+:-assert_kif("(genls PsychologicalProcess BiologicalProcess)").
 :-assert_kif("(documentation PsychologicalProcess \"A &%BiologicalProcess which takes place in the mind or brain of an &%Organism and which may be manifested in the behavior of the &%Organism.\")").
 %
 :-assert_kif("(=> (instance ?PROCESS PsychologicalProcess) (exists (?ANIMAL) (and (instance ?ANIMAL Animal) (experiencer ?PROCESS ?ANIMAL))))").
 %
-:-assert_kif("(subclass OrganOrTissueProcess PhysiologicProcess)").
+:-assert_kif("(genls OrganOrTissueProcess PhysiologicProcess)").
 :-assert_kif("(disjoint OrganOrTissueProcess OrganismProcess)").
 :-assert_kif("(documentation OrganOrTissueProcess \"A &%PhysiologicProcess of a particular &%Organ or &%Tissue.\")").
 %
 :-assert_kif("(=> (instance ?PROC OrganOrTissueProcess) (exists (?THING) (and (located ?PROC ?THING) (or (instance ?THING Organ) (instance ?THING Tissue)))))").
 %
-:-assert_kif("(subclass PathologicProcess BiologicalProcess)").
+:-assert_kif("(genls PathologicProcess BiologicalProcess)").
 :-assert_kif("(disjoint PathologicProcess PhysiologicProcess)").
 :-assert_kif("(documentation PathologicProcess \"A disordered process, activity, or state of the &%Organism as a whole, of a body system or systems, or of multiple &%Organs or &%Tissues. Included here are normal responses to a negative stimulus as well as patholologic conditions or states that are less specific than a disease. Pathologic functions frequently have systemic effects.\")").
 %
 :-assert_kif("(=> (and (instance ?PATH PathologicProcess) (experiencer ?PATH ?ORG)) (exists (?PART ?DISEASE) (and (part ?PART ?ORG) (instance ?DISEASE DiseaseOrSyndrome) (attribute ?PART ?DISEASE))))").
 %
-:-assert_kif("(subclass Injuring PathologicProcess)").
-:-assert_kif("(subclass Injuring Damaging)").
-:-assert_kif("(documentation Injuring \"The process of creating a traumatic wound or injury . Since &%Injuring is not possible without some biologic function of the organism being injured, it is a subclass of &%BiologicalProcess.\")").
+:-assert_kif("(genls Injuring PathologicProcess)").
+:-assert_kif("(genls Injuring Damaging)").
+:-assert_kif("(documentation Injuring \"The process of creating a traumatic wound or injury . Since &%Injuring is not possible without some biologic function of the organism being injured, it is a genls of &%BiologicalProcess.\")").
 %
 :-assert_kif("(=> (instance ?INJ Injuring) (exists (?STRUCT) (and (instance ?STRUCT AnatomicalStructure) (patient ?INJ ?STRUCT))))").
 %
 :-assert_kif("(<=> (instance ?INJ Injuring) (and (instance ?INJ Damaging) (exists (?ORGANISM) (and (instance ?ORGANISM Organism) (patient ?INJ ?ORGANISM)))))").
 %
-:-assert_kif("(subclass Poisoning Injuring)").
-:-assert_kif("(documentation Poisoning \"A &%Poisoning is caused by an external substance . Since &%Poisoning is not possible without some biologic function which affects the &%Organism being injured, it is a subclass of &%BiologicalProcess.\")").
+:-assert_kif("(genls Poisoning Injuring)").
+:-assert_kif("(documentation Poisoning \"A &%Poisoning is caused by an external substance . Since &%Poisoning is not possible without some biologic function which affects the &%Organism being injured, it is a genls of &%BiologicalProcess.\")").
 %
 :-assert_kif("(=> (instance ?POISON Poisoning) (exists (?THING) (and (patient ?POISON ?THING) (or (instance ?THING Organism) (instance ?THING AnatomicalStructure)))))").
 %
 :-assert_kif("(=> (instance ?POISON Poisoning) (exists (?SUBSTANCE) (and (instance ?SUBSTANCE BiologicallyActiveSubstance) (instrument ?POISON ?SUBSTANCE))))").
 %
-:-assert_kif("(subclass IntentionalProcess Process)").
+:-assert_kif("(genls IntentionalProcess Process)").
 :-assert_kif("(documentation IntentionalProcess \"A &%Process that has a specific purpose for the &%CognitiveAgent who performs it.\")").
 %
 :-assert_kif("(=> (and (instance ?PROC IntentionalProcess) (agent ?PROC ?AGENT)) (exists (?PURP) (hasPurposeForAgent ?PROC ?PURP ?AGENT)))").
@@ -4042,120 +4042,120 @@
 %
 :-assert_kif("(=> (and (instance ?PROC IntentionalProcess) (agent ?PROC ?HUMAN) (instance ?HUMAN Animal)) (holdsDuring (WhenFn ?PROC) (attribute ?HUMAN Awake)))").
 %
-:-assert_kif("(subclass IntentionalPsychologicalProcess IntentionalProcess)").
-:-assert_kif("(subclass IntentionalPsychologicalProcess PsychologicalProcess)").
-:-assert_kif("(documentation IntentionalPsychologicalProcess \"An &%IntentionalProcess that can be realized entirely within the mind or brain of an &%Organism. Thus, for example, &%Reasoning is a subclass of &%IntentionalPsychologicalProcess, because one can reason simply by exercising one's mind/brain. On the other hand , &%RecreationOrExercise is not a subclass of &%IntentionalPsychologicalProcess, because many instances of &%RecreationOrExercise necessarily have &%subProcesses of &%BodyMotion.\")").
+:-assert_kif("(genls IntentionalPsychologicalProcess IntentionalProcess)").
+:-assert_kif("(genls IntentionalPsychologicalProcess PsychologicalProcess)").
+:-assert_kif("(documentation IntentionalPsychologicalProcess \"An &%IntentionalProcess that can be realized entirely within the mind or brain of an &%Organism. Thus, for example, &%Reasoning is a genls of &%IntentionalPsychologicalProcess, because one can reason simply by exercising one's mind/brain. On the other hand , &%RecreationOrExercise is not a genls of &%IntentionalPsychologicalProcess, because many instances of &%RecreationOrExercise necessarily have &%subProcesses of &%BodyMotion.\")").
 %
-:-assert_kif("(subclass RecreationOrExercise IntentionalProcess)").
-:-assert_kif("(documentation RecreationOrExercise \"A &%Process that is carried out for the purpose of recreation or exercise. Since &%RecreationOrExercise is a subclass of &%IntentionalProcess, the intent of a process determines whether or not it is an instance of the class. Hence, if John and Bill watch the same program on television, and John watches it to relax while Bill watches it solely to satisfy an educational requirement, then John's watching the movie is an instance of &%RecreationOrExercise, while Bill's is not (both cases of watching the television program would however be in the class of &%Seeing, since being an instance of this latter class is not determined by intention).\")").
+:-assert_kif("(genls RecreationOrExercise IntentionalProcess)").
+:-assert_kif("(documentation RecreationOrExercise \"A &%Process that is carried out for the purpose of recreation or exercise. Since &%RecreationOrExercise is a genls of &%IntentionalProcess, the intent of a process determines whether or not it is an instance of the class. Hence, if John and Bill watch the same program on television, and John watches it to relax while Bill watches it solely to satisfy an educational requirement, then John's watching the movie is an instance of &%RecreationOrExercise, while Bill's is not (both cases of watching the television program would however be in the class of &%Seeing, since being an instance of this latter class is not determined by intention).\")").
 %
-:-assert_kif("(subclass OrganizationalProcess IntentionalProcess)").
+:-assert_kif("(genls OrganizationalProcess IntentionalProcess)").
 :-assert_kif("(documentation OrganizationalProcess \"An &%IntentionalProcess that involves an &%Organization.\")").
 %
 :-assert_kif("(=> (and (instance ?ACT OrganizationalProcess) (agent ?ACT ?AGENT)) (or (instance ?AGENT Organization) (exists (?ORG) (and (instance ?ORG Organization) (member ?AGENT ?ORG)))))").
 %
-:-assert_kif("(subclass Election OrganizationalProcess)").
+:-assert_kif("(genls Election OrganizationalProcess)").
 :-assert_kif("(documentation Election \"&%Election is the class of events conducted by an organization , in which qualified participants vote for officers, adopt resolutions , or settle other issues in that &%Organization.\")").
 %
 :-assert_kif("(=> (and (instance ?EVENT Election) (agent ?EVENT ?AGENT) (instance ?AGENT GeopoliticalArea)) (instance ?EVENT PoliticalProcess))").
 %
 :-assert_kif("(=> (and (instance ?EVENT Election) (agent ?EVENT ?AGENT) (instance ?AREA GeopoliticalArea) (instance ?AGENT (GovernmentFn ?AREA))) (instance ?EVENT PoliticalProcess))").
 %
-:-assert_kif("(subclass ReligiousProcess OrganizationalProcess)").
+:-assert_kif("(genls ReligiousProcess OrganizationalProcess)").
 :-assert_kif("(documentation ReligiousProcess \"An &%OrganizationalProcess that is carried out within or by a &%ReligiousOrganization.\")").
 %
 :-assert_kif("(=> (and (instance ?ACT ReligiousProcess) (agent ?ACT ?AGENT)) (or (instance ?AGENT ReligiousOrganization) (exists (?ORG) (and (member ?AGENT ?ORG) (instance ?ORG ReligiousOrganization)))))").
 %
-:-assert_kif("(subclass JoiningAnOrganization OrganizationalProcess)").
+:-assert_kif("(genls JoiningAnOrganization OrganizationalProcess)").
 :-assert_kif("(documentation JoiningAnOrganization \"The &%OrganizationalProcess of becoming a &%member of an &%Organization.\")").
 %
 :-assert_kif("(=> (and (instance ?JOIN JoiningAnOrganization) (instance ?ORG Organization) (agent ?JOIN ?PERSON) (patient ?JOIN ?ORG)) (and (holdsDuring (BeginFn (WhenFn ?JOIN)) (not (member ?PERSON ?ORG))) (holdsDuring (EndFn (WhenFn ?JOIN)) (member ?PERSON ?ORG))))").
 %
-:-assert_kif("(subclass LeavingAnOrganization OrganizationalProcess)").
+:-assert_kif("(genls LeavingAnOrganization OrganizationalProcess)").
 :-assert_kif("(disjoint LeavingAnOrganization JoiningAnOrganization)").
 :-assert_kif("(documentation LeavingAnOrganization \"The &%OrganizationalProcess of leaving an &%Organization, whether voluntarily or involuntarily.\")").
 %
 :-assert_kif("(=> (and (instance ?LEAVE LeavingAnOrganization) (instance ?ORG Organization) (agent ?LEAVE ?PERSON) (patient ?LEAVE ?ORG)) (and (holdsDuring (BeginFn (WhenFn ?LEAVE)) (member ?PERSON ?ORG)) (holdsDuring (EndFn (WhenFn ?LEAVE)) (not (member ?PERSON ?ORG)))))").
 %
-:-assert_kif("(subclass Graduation LeavingAnOrganization)").
+:-assert_kif("(genls Graduation LeavingAnOrganization)").
 :-assert_kif("(documentation Graduation \"The &%OrganizationalProcess of graduating from an &%EducationalOrganization.\")").
 %
 :-assert_kif("(=> (and (instance ?GRAD Graduation) (agent ?GRAD ?ORG) (patient ?GRAD ?PERSON)) (instance ?ORG EducationalOrganization))").
 %
-:-assert_kif("(subclass Matriculation JoiningAnOrganization)").
+:-assert_kif("(genls Matriculation JoiningAnOrganization)").
 :-assert_kif("(documentation Matriculation \"The &%OrganizationalProcess of joining an &%EducationalOrganization as a student.\")").
 %
 :-assert_kif("(=> (and (instance ?MAT Matriculation) (agent ?MAT ?ORG) (patient ?MAT ?PERSON)) (instance ?ORG EducationalOrganization))").
 %
-:-assert_kif("(subclass Hiring JoiningAnOrganization)").
+:-assert_kif("(genls Hiring JoiningAnOrganization)").
 :-assert_kif("(documentation Hiring \"&%OrganizationalProcesses where someone is made an employee of an &%Organization.\")").
 %
 :-assert_kif("(=> (and (instance ?HIRE Hiring) (instance ?ORG Organization) (agent ?HIRE ?ORG) (patient ?HIRE ?PERSON)) (and (holdsDuring (BeginFn (WhenFn ?HIRE)) (not (employs ?ORG ?PERSON))) (holdsDuring (EndFn (WhenFn ?HIRE)) (employs ?ORG ?PERSON))))").
 %
-:-assert_kif("(subclass TerminatingEmployment LeavingAnOrganization)").
+:-assert_kif("(genls TerminatingEmployment LeavingAnOrganization)").
 :-assert_kif("(documentation TerminatingEmployment \"&%OrganizationalProcesses where someone ceases to be an employee of an &%Organization. Note that this covers being laid off, being fired, and voluntarily leaving a job.\")").
 %
 :-assert_kif("(=> (and (instance ?FIRE TerminatingEmployment) (instance ?ORG Organization) (agent ?FIRE ?ORG) (patient ?FIRE ?PERSON)) (and (holdsDuring (BeginFn (WhenFn ?FIRE)) (employs ?ORG ?PERSON)) (holdsDuring (EndFn (WhenFn ?FIRE)) (not (employs ?ORG ?PERSON)))))").
 %
-:-assert_kif("(subclass PoliticalProcess OrganizationalProcess)").
+:-assert_kif("(genls PoliticalProcess OrganizationalProcess)").
 :-assert_kif("(documentation PoliticalProcess \"An &%OrganizationalProcess carried out by, for or against officially constituted governments. Some examples would be voting on proposed legislation, electing a government representative, or even overthrowing a government in a revolution.\")").
 %
 :-assert_kif("(=> (instance ?PROC PoliticalProcess) (exists (?POL) (and (or (instance ?POL Government) (exists (?GOV) (and (instance ?GOV Government) (member ?POL ?GOV)))) (or (agent ?PROC ?POL) (patient ?PROC ?POL)))))").
 %
-:-assert_kif("(subclass JudicialProcess PoliticalProcess)").
+:-assert_kif("(genls JudicialProcess PoliticalProcess)").
 :-assert_kif("(documentation JudicialProcess \"Any legal proceeding which is conducted by a &%JudicialOrganization. Note that there is an important difference between the concepts &%LegalAction and &%JudicialProcess. The former refers to legal claims that are brought by a plaintiff, e.g. law suits, while the second refers to trials and other sorts of judicial hearings where the merits of a &%LegalAction are decided.\")").
 %
 :-assert_kif("(=> (and (instance ?PROCESS JudicialProcess) (agent ?PROCESS ?ORG) (instance ?ORG Organization)) (instance ?ORG JudicialOrganization))").
 %
-:-assert_kif("(subclass MilitaryProcess PoliticalProcess)").
+:-assert_kif("(genls MilitaryProcess PoliticalProcess)").
 :-assert_kif("(documentation MilitaryProcess \"Any &%Process that is carried out by a military organization. Note that this class covers &%Processes, e.g. military operations, that are the result of careful planning, as well as those which are unscripted.\")").
 %
-:-assert_kif("(subclass RegulatoryProcess Guiding)").
+:-assert_kif("(genls RegulatoryProcess Guiding)").
 :-assert_kif("(documentation RegulatoryProcess \"an &%Guiding whose aim is the enforcement of rules or regulations. Note the key differences between &%RegulatoryProcess and the related concept &%Managing. The latter implies a long-term relationship between a single manager and limited number of agents who are managed, while the former implies a normative standard to which the activities of the regulated are referred .\")").
 %
-:-assert_kif("(subclass Managing OrganizationalProcess)").
-:-assert_kif("(subclass Managing Guiding)").
+:-assert_kif("(genls Managing OrganizationalProcess)").
+:-assert_kif("(genls Managing Guiding)").
 :-assert_kif("(documentation Managing \"&%OrganizationalProcesses that involve overseeing the activities of others. Note the key differences between &%RegulatoryProcess and its sibling &%Managing. The latter implies a long-term relationship between the manager and the managed, while the former implies a normative standard to which the activities of the regulated are referred.\")").
 %
-:-assert_kif("(subclass Planning IntentionalPsychologicalProcess)").
+:-assert_kif("(genls Planning IntentionalPsychologicalProcess)").
 :-assert_kif("(documentation Planning \"Specifying a set of actions in order to meet a set of goals or objectives.\")").
 %
-:-assert_kif("(subclass Designing IntentionalPsychologicalProcess)").
+:-assert_kif("(genls Designing IntentionalPsychologicalProcess)").
 :-assert_kif("(documentation Designing \"The spatial analogue of &%Planning. &%Designing a &%Collection of &%Objects involves determining a placement of the &%Objects with respect to one another and perhaps other &%Objects as well, in order to satisfy a particular purpose.\")").
 %
-:-assert_kif("(subclass Interpreting IntentionalPsychologicalProcess)").
+:-assert_kif("(genls Interpreting IntentionalPsychologicalProcess)").
 :-assert_kif("(documentation Interpreting \"Any &%Process of assigning a &%Proposition to a &%Text, i.e. understanding the &%Text.\")").
 %
 :-assert_kif("(=> (and (instance ?INTERPRET Interpreting) (agent ?INTERPRET ?AGENT) (patient ?INTERPRET ?CONTENT) (instance ?CONTENT ContentBearingObject)) (exists (?PROP) (holdsDuring (EndFn (WhenFn ?INTERPRET)) (believes ?AGENT (containsInformation ?CONTENT ?PROP)))))").
 %
-:-assert_kif("(subclass QuantityChange InternalChange)").
+:-assert_kif("(genls QuantityChange InternalChange)").
 :-assert_kif("(partition QuantityChange Increasing Decreasing)").
 :-assert_kif("(documentation QuantityChange \"Any &%InternalChange where a &%PhysicalQuantity associated with the &%patient is altered.\")").
 %
-:-assert_kif("(subclass Increasing QuantityChange)").
+:-assert_kif("(genls Increasing QuantityChange)").
 :-assert_kif("(relatedInternalConcept Increasing Putting)").
 :-assert_kif("(documentation Increasing \"Any &%QuantityChange where the &%PhysicalQuantity is increased.\")").
 %
 :-assert_kif("(=> (and (instance ?INCREASE Increasing) (patient ?INCREASE ?OBJ)) (exists (?UNIT ?QUANT1 ?QUANT2) (and (holdsDuring (BeginFn (WhenFn ?INCREASE)) (equal (MeasureFn ?OBJ ?UNIT) ?QUANT1)) (holdsDuring (EndFn (WhenFn ?INCREASE)) (equal (MeasureFn ?OBJ ?UNIT) ?QUANT2)) (greaterThan ?QUANT2 ?QUANT1))))").
 %
-:-assert_kif("(subclass Heating Increasing)").
+:-assert_kif("(genls Heating Increasing)").
 :-assert_kif("(disjoint Heating Cooling)").
 :-assert_kif("(documentation Heating \"Any &%Increasing &%Process where the &%PhysicalQuantity increased is a &%TemperatureMeasure.\")").
 %
 :-assert_kif("(=> (and (instance ?HEAT Heating) (patient ?HEAT ?OBJ)) (exists (?UNIT ?QUANT1 ?QUANT2) (and (instance ?UNIT TemperatureMeasure) (holdsDuring (BeginFn (WhenFn ?HEAT)) (equal (MeasureFn ?OBJ ?UNIT) ?QUANT1)) (holdsDuring (EndFn (WhenFn ?HEAT)) (equal (MeasureFn ?OBJ ?UNIT) ?QUANT2)) (greaterThan ?QUANT2 ?QUANT1))))").
 %
-:-assert_kif("(subclass Decreasing QuantityChange)").
+:-assert_kif("(genls Decreasing QuantityChange)").
 :-assert_kif("(relatedInternalConcept Decreasing Removing)").
 :-assert_kif("(documentation Decreasing \"Any &%QuantityChange where the &%PhysicalQuantity is decreased.\")").
 %
 :-assert_kif("(=> (and (instance ?DECREASE Decreasing) (patient ?DECREASE ?OBJ)) (exists (?UNIT ?QUANT1 ?QUANT2) (and (holdsDuring (BeginFn (WhenFn ?DECREASE)) (equal (MeasureFn ?OBJ ?UNIT) ?QUANT1)) (holdsDuring (EndFn (WhenFn ?DECREASE)) (equal (MeasureFn ?OBJ ?UNIT) ?QUANT2)) (lessThan ?QUANT2 ?QUANT1))))").
 %
-:-assert_kif("(subclass Cooling Decreasing)").
+:-assert_kif("(genls Cooling Decreasing)").
 :-assert_kif("(documentation Cooling \"Any &%Decreasing &%Process where the &%PhysicalQuantity decreased is a &%TemperatureMeasure.\")").
 %
 :-assert_kif("(=> (and (instance ?COOL Cooling) (patient ?COOL ?OBJ)) (exists (?UNIT ?QUANT1 ?QUANT2) (and (instance ?UNIT TemperatureMeasure) (holdsDuring (BeginFn (WhenFn ?COOL)) (equal (MeasureFn ?OBJ ?UNIT) ?QUANT1)) (holdsDuring (EndFn (WhenFn ?COOL)) (equal (MeasureFn ?OBJ ?UNIT) ?QUANT2)) (lessThan ?QUANT2 ?QUANT1))))").
 %
-:-assert_kif("(subclass Motion Process)").
+:-assert_kif("(genls Motion Process)").
 :-assert_kif("(documentation Motion \"Any &%Process of movement.\")").
 %
 :-assert_kif("(=> (and (instance ?MOTION Motion) (patient ?MOTION ?OBJ) (origin ?MOTION ?PLACE)) (holdsDuring (BeginFn (WhenFn ?MOTION)) (located ?OBJ ?PLACE)))").
@@ -4169,120 +4169,120 @@
 %
 :-assert_kif("(=> (and (path ?PROCESS ?PATH1) (origin ?PROCESS ?SOURCE) (destination ?PROCESS ?DEST) (length ?PATH1 ?MEASURE1) (distance ?SOURCE ?DEST ?DISTANCE) (not (greaterThan ?MEASURE1 ?DISTANCE))) (forall (?OBJ) (=> (part ?OBJ ?PATH1) (between ?SOURCE ?OBJ ?DEST))))").
 %
-:-assert_kif("(subclass BodyMotion Motion)").
+:-assert_kif("(genls BodyMotion Motion)").
 :-assert_kif("(documentation BodyMotion \"Any &%Motion where the &%agent is an &%Organism and the &%patient is a &%BodyPart.\")").
 %
 :-assert_kif("(=> (instance ?MOTION BodyMotion) (exists (?OBJ ?AGENT) (and (instance ?OBJ BodyPart) (patient ?MOTION ?OBJ) (instance ?AGENT Organism) (agent ?MOTION ?AGENT))))").
 %
-:-assert_kif("(subclass Vocalizing RadiatingSound)").
-:-assert_kif("(subclass Vocalizing BodyMotion)").
+:-assert_kif("(genls Vocalizing RadiatingSound)").
+:-assert_kif("(genls Vocalizing BodyMotion)").
 :-assert_kif("(documentation Vocalizing \"Any instance of &%RadiatingSound where the &%instrument is the &%Human vocal cords. This covers grunts, screams, roars , as well as &%Speaking.\")").
 %
 :-assert_kif("(=> (instance ?VOCAL Vocalizing) (exists (?HUMAN) (and (instance ?HUMAN Human) (agent ?VOCAL ?HUMAN) (instrument ?VOCAL ?HUMAN))))").
 %
-:-assert_kif("(subclass OralCommunicating Process)").
+:-assert_kif("(genls OralCommunicating Process)").
 :-assert_kif("(documentation OralCommunicating \"\")").
 %
-:-assert_kif("(subclass Speaking LinguisticCommunication)").
-:-assert_kif("(subclass Speaking Vocalizing)").
-:-assert_kif("(subclass Speaking CommunicationsChannel)").
+:-assert_kif("(genls Speaking LinguisticCommunication)").
+:-assert_kif("(genls Speaking Vocalizing)").
+:-assert_kif("(genls Speaking CommunicationsChannel)").
 :-assert_kif("(documentation Speaking \"Any &%LinguisticGeneration which is also a &%Vocalizing, i.e. any &%LinguisticCommunication by a &%Human which involves his/her vocal cords. This is a process in which IntelligentAgents communicate by exchanging spoken sounds, whether in person (not necessarily face-to-face, but where the sounds are not converted to other forms), or at a distance via electronic or other means of converting sound to signal and back.\")").
 %
-:-assert_kif("(subclass Singing Speaking)").
-:-assert_kif("(subclass Singing Music)").
+:-assert_kif("(genls Singing Speaking)").
+:-assert_kif("(genls Singing Music)").
 :-assert_kif("(documentation Singing \"&%Speaking that is also &%Music.\")").
 %
-:-assert_kif("(subclass Ambulating BodyMotion)").
-:-assert_kif("(subclass Ambulating Translocation)").
+:-assert_kif("(genls Ambulating BodyMotion)").
+:-assert_kif("(genls Ambulating Translocation)").
 :-assert_kif("(partition Ambulating Walking Running)").
 :-assert_kif("(documentation Ambulating \"Any &%BodyMotion which is accomplished by means of the legs of an &%Animal for the purpose of moving from one point to another.\")").
 %
-:-assert_kif("(subclass Walking Ambulating)").
+:-assert_kif("(genls Walking Ambulating)").
 :-assert_kif("(documentation Walking \"&%Ambulating relatively slowly, i.e. moving in such a way that at least one foot is always in contact with the ground.\")").
 %
-:-assert_kif("(subclass Running Ambulating)").
+:-assert_kif("(genls Running Ambulating)").
 :-assert_kif("(documentation Running \"&%Ambulating relatively quickly, i.e. moving in such a way that, with each step, neither foot is in contact with the ground for a period of time.\")").
 %
 :-assert_kif("(=> (and (instance ?WALK Walking) (instance ?RUN Running) (agent ?WALK ?AGENT) (agent ?RUN ?AGENT) (holdsDuring (WhenFn ?WALK) (measure ?AGENT (SpeedFn ?LENGTH1 ?TIME))) (holdsDuring (WhenFn ?RUN) (measure ?AGENT (SpeedFn ?LENGTH2 ?TIME)))) (greaterThan ?LENGTH2 ?LENGTH1))").
 %
-:-assert_kif("(subclass Swimming BodyMotion)").
+:-assert_kif("(genls Swimming BodyMotion)").
 :-assert_kif("(documentation Swimming \"Any deliberate and controlled &%BodyMotion through water that is accomplished by an &%Organism.\")").
 %
 :-assert_kif("(=> (and (instance ?SWIM Swimming) (agent ?SWIM ?AGENT)) (exists (?AREA) (and (instance ?AREA WaterArea) (located ?AGENT ?AREA))))").
 %
-:-assert_kif("(subclass Dancing BodyMotion)").
+:-assert_kif("(genls Dancing BodyMotion)").
 :-assert_kif("(documentation Dancing \"Any &%BodyMotion of &%Humans which is deliberately coordinated with music.\")").
 %
 % :-assert_kif(";SUMO Mid-Level uses this rather than the disjoint ").
 % :-assert_kif("; proposition. For simplicity, we leave in the ").
 % :-assert_kif("; disjopint proposition -- PJC 01-19-04 ").
-% :-assert_kif(";(subclass GeologicalProcess (ComplementFn IntentionalProcess))").
+% :-assert_kif(";(genls GeologicalProcess (ComplementFn IntentionalProcess))").
 %
-:-assert_kif("(subclass GeologicalProcess Motion)").
+:-assert_kif("(genls GeologicalProcess Motion)").
 :-assert_kif("(disjoint GeologicalProcess IntentionalProcess)").
 :-assert_kif("(documentation GeologicalProcess \"The class of activities that are caused by geological forces and affect geological features, and which may affect the biosphere as well.\")").
 %
-:-assert_kif("(subclass DirectionChange Motion)").
+:-assert_kif("(genls DirectionChange Motion)").
 :-assert_kif("(documentation DirectionChange \"The act of changing the direction in which the &%patient of the act is oriented.\")").
 %
 :-assert_kif("(=> (instance ?PROC DirectionChange) (exists (?ATTR) (and (instance ?ATTR DirectionalAttribute) (or (and (holdsDuring (BeginFn (WhenFn ?PROC)) (manner ?PROC ?ATTR)) (holdsDuring (EndFn (WhenFn ?PROC)) (not (manner ?PROC ?ATTR)))) (and (holdsDuring (EndFn (WhenFn ?PROC)) (manner ?PROC ?ATTR)) (holdsDuring (BeginFn (WhenFn ?PROC)) (not (manner ?PROC ?ATTR))))))))").
 %
-:-assert_kif("(subclass Transfer Translocation)").
+:-assert_kif("(genls Transfer Translocation)").
 :-assert_kif("(documentation Transfer \"Any &%instance of &%Translocation where the &%agent and the &%patient are not the same thing.\")").
 %
 :-assert_kif("(=> (and (instance ?TRANSFER Transfer) (agent ?TRANSFER ?AGENT) (patient ?TRANSFER ?PATIENT)) (not (equal ?AGENT ?PATIENT)))").
 %
-:-assert_kif("(subclass Carrying Transfer)").
+:-assert_kif("(genls Carrying Transfer)").
 :-assert_kif("(documentation Carrying \"&%Transfer from one point to another by means of an &%Animal or &%Human.\")").
 %
 :-assert_kif("(=> (instance ?CARRY Carrying) (exists (?ANIMAL) (and (instance ?ANIMAL Animal) (instrument ?TRANS ?ANIMAL))))").
 %
-:-assert_kif("(subclass Removing Transfer)").
+:-assert_kif("(genls Removing Transfer)").
 :-assert_kif("(documentation Removing \"The &%Class of &%Processes where something is taken away from a location. Note that the thing removed and the location are specified with the &%CaseRoles &%patient and &%origin, respectively.\")").
 %
 :-assert_kif("(=> (and (instance ?REMOVE Removing) (origin ?REMOVE ?PLACE) (patient ?REMOVE ?OBJ)) (and (holdsDuring (BeginFn (WhenFn ?REMOVE)) (located ?OBJ ?PLACE)) (holdsDuring (EndFn (WhenFn ?REMOVE)) (not (located ?OBJ ?PLACE)))))").
 %
-:-assert_kif("(subclass Uncovering Removing)").
+:-assert_kif("(genls Uncovering Removing)").
 :-assert_kif("(disjoint Uncovering Covering)").
 :-assert_kif("(documentation Uncovering \"The &%Class of &%Removing processes where the &%agent uncovers the &%patient, either completely or only partially.\")").
 %
-:-assert_kif("(subclass Putting Transfer)").
+:-assert_kif("(genls Putting Transfer)").
 :-assert_kif("(documentation Putting \"The &%Class of &%Processes where something is put in a location. Note that the location is specified with the &%CaseRole &%destination.\")").
 %
 :-assert_kif("(=> (and (instance ?PUT Putting) (destination ?PUT ?PLACE) (patient ?PUT ?OBJ)) (and (holdsDuring (BeginFn (WhenFn ?PUT)) (not (located ?OBJ ?PLACE))) (holdsDuring (EndFn (WhenFn ?PUT)) (located ?OBJ ?PLACE))))").
 %
-:-assert_kif("(subclass Covering Putting)").
+:-assert_kif("(genls Covering Putting)").
 :-assert_kif("(documentation Covering \"The &%Class of &%Putting processes where the &%agent covers the &%patient, either completely or only partially, with something else .\")").
 %
-:-assert_kif("(subclass Dressing Putting)").
-:-assert_kif("(subclass Dressing Covering)").
+:-assert_kif("(genls Dressing Putting)").
+:-assert_kif("(genls Dressing Covering)").
 :-assert_kif("(documentation Dressing \"The &%Process of putting on &%Clothing.\")").
 %
 :-assert_kif("(=> (and (instance ?DRESS Dressing) (agent ?DRESS ?AGENT) (patient ?DRESS ?CLOTHING)) (and (instance ?CLOTHING Clothing) (holdsDuring (BeginFn (WhenFn ?DRESS)) (not (wears ?AGENT ?CLOTHING))) (holdsDuring (EndFn (WhenFn ?DRESS)) (wears ?AGENT ?CLOTHING))))").
 %
-:-assert_kif("(subclass Inserting Putting)").
+:-assert_kif("(genls Inserting Putting)").
 :-assert_kif("(documentation Inserting \"&%Putting one thing inside of another thing.\")").
 %
 :-assert_kif("(=> (and (instance ?INSERT Inserting) (patient ?INSERT ?OBJ1) (destination ?INSERT ?OBJ2)) (and (holdsDuring (BeginFn (WhenFn ?INSERT)) (not (contains ?OBJ2 ?OBJ1))) (holdsDuring (EndFn (WhenFn ?INSERT)) (contains ?OBJ2 ?OBJ1))))").
 %
-:-assert_kif("(subclass Injecting Inserting)").
+:-assert_kif("(genls Injecting Inserting)").
 :-assert_kif("(documentation Injecting \"&%Inserting a &%BiologicallyActiveSubstance into an &%Animal or a &%Human with a syringe.\")").
 %
 :-assert_kif("(=> (instance ?INJECT Injecting) (exists (?SUBSTANCE ?ANIMAL) (and (patient ?INJECT ?SUBSTANCE) (instance ?SUBSTANCE BiologicallyActiveSubstance) (attribute ?SUBSTANCE Liquid) (destination ?INJECT ?ANIMAL) (instance ?ANIMAL Animal))))").
 %
-:-assert_kif("(subclass Substituting Transfer)").
-:-assert_kif("(subclass Substituting DualObjectProcess)").
+:-assert_kif("(genls Substituting Transfer)").
+:-assert_kif("(genls Substituting DualObjectProcess)").
 :-assert_kif("(documentation Substituting \"The &%Class of &%Transfers where one thing is replaced with something else.\")").
 %
 :-assert_kif("(=> (instance ?SUB Substituting) (exists (?PUT ?REMOVE ?OBJ1 ?OBJ2 ?PLACE) (and (instance ?PUT Putting) (instance ?REMOVE Removing) (subProcess ?PUT ?SUB) (subProcess ?REMOVE ?SUB) (patient ?REMOVE ?OBJ1) (origin ?REMOVE ?PLACE) (patient ?PUT ?OBJ2) (destination ?PUT ?PLACE) (not (equal ?OBJ1 ?OBJ2)))))").
 %
-:-assert_kif("(subclass Impelling Transfer)").
-:-assert_kif("(documentation Impelling \"The &%subclass of &%Transfer where the &%patient travels through space by means of a sudden, forceful event. Some examples would be shooting, throwing, tossing, etc.\")").
+:-assert_kif("(genls Impelling Transfer)").
+:-assert_kif("(documentation Impelling \"The &%genls of &%Transfer where the &%patient travels through space by means of a sudden, forceful event. Some examples would be shooting, throwing, tossing, etc.\")").
 %
-:-assert_kif("(subclass Shooting Impelling)").
-:-assert_kif("(documentation Shooting \"The &%subclass of &%Impelling where the &%patient is a projectile that is fired through the air by means of some sort of &%Device.\")").
+:-assert_kif("(genls Shooting Impelling)").
+:-assert_kif("(documentation Shooting \"The &%genls of &%Impelling where the &%patient is a projectile that is fired through the air by means of some sort of &%Device.\")").
 %
-:-assert_kif("(subclass Touching Transfer)").
+:-assert_kif("(genls Touching Transfer)").
 :-assert_kif("(documentation Touching \"Any &%Transfer where two &%Objects are brought into immediate physical contact with one another.\")").
 %
 :-assert_kif("(=> (and (instance ?TOUCH Touching) (agent ?TOUCH ?OBJ1) (patient ?TOUCH ?OBJ2)) (and (holdsDuring (BeginFn (WhenFn ?TOUCH)) (not (connected ?OBJ1 ?OBJ2))) (holdsDuring (EndFn (WhenFn ?TOUCH)) (connected ?OBJ1 ?OBJ2))))").
@@ -4292,46 +4292,46 @@
 :-assert_kif("(domain grasps 2 Object)").
 :-assert_kif("(documentation grasps \"The state of grasping an &%Object. (&%grasps ?ANIMAL ?OBJ) means that the &%Animal ?ANIMAL is intentionally holding on to the &%Object ?OBJ.\")").
 %
-:-assert_kif("(subclass Grabbing Touching)").
+:-assert_kif("(genls Grabbing Touching)").
 :-assert_kif("(documentation Grabbing \"Any instance of &%Touching which results in a situation where the &%agent &%grasps the &%patient of the &%Touching.\")").
 %
 :-assert_kif("(=> (and (instance ?GRAB Grabbing) (agent ?GRAB ?AGENT) (patient ?GRAB ?THING)) (and (holdsDuring (BeginFn (WhenFn ?GRAB)) (not (grasps ?AGENT ?THING))) (holdsDuring (EndFn (WhenFn ?GRAB)) (grasps ?AGENT ?THING))))").
 %
-:-assert_kif("(subclass Releasing Transfer)").
+:-assert_kif("(genls Releasing Transfer)").
 :-assert_kif("(documentation Releasing \"Any instance of &%Transfer which results in a situation where it is not the case that the &%agent &%grasps something which he/she &%grasps previously.\")").
 %
 :-assert_kif("(=> (and (instance ?RELEASE Releasing) (agent ?GRAB ?AGENT) (patient ?GRAB ?THING)) (and (holdsDuring (BeginFn (WhenFn ?RELEASE)) (grasps ?AGENT ?THING)) (holdsDuring (EndFn (WhenFn ?RELEASE)) (not (grasps ?AGENT ?THING)))))").
 %
-:-assert_kif("(subclass Impacting Touching)").
+:-assert_kif("(genls Impacting Touching)").
 :-assert_kif("(documentation Impacting \"Any &%Touching where something comes into sudden , forceful, physical contact with something else. Some examples would be striking, knocking, whipping etc.\")").
 %
 :-assert_kif("(=> (and (instance ?IMPACT Impacting) (patient ?IMPACT ?OBJ)) (exists (?IMPEL) (and (instance ?IMPEL Impelling) (patient ?IMPEL ?OBJ) (earlier (WhenFn ?IMPEL) (WhenFn ?IMPACT)))))").
 %
-:-assert_kif("(subclass Translocation Motion)").
+:-assert_kif("(genls Translocation Motion)").
 :-assert_kif("(documentation Translocation \"&%Translocation is that class of &%Motions in which an object moves from one place to another. In the case of round trips , the &%origin and &%destination are the same, but the intervening motion passes through other locations. &%Translocation represents linear motion , in contrast to rotation or other movement in place. A vehicle is not necessary;&%Ambulating is a kind of &%Translocation.\")").
 %
 :-assert_kif("(=> (and (instance ?MOVEMENT Translocation) (origin ?MOVEMENT ?PLACE1)) (exists (?PLACE2 ?STAGE) (and (instance ?PLACE2 Region) (not (equal ?PLACE1 ?PLACE2)) (subProcess ?STAGE ?MOVEMENT) (located ?STAGE ?PLACE2))))").
 %
-:-assert_kif("(subclass Transportation Translocation)").
+:-assert_kif("(genls Transportation Translocation)").
 :-assert_kif("(relatedInternalConcept Transportation TransportationDevice)").
 :-assert_kif("(documentation Transportation \"&%Motion from one point to another by means of a &%TransportationDevice.\")").
 %
 :-assert_kif("(=> (instance ?TRANS Transportation) (exists (?DEVICE) (and (instance ?DEVICE TransportationDevice) (instrument ?TRANS ?DEVICE))))").
 %
-:-assert_kif("(subclass Guiding IntentionalProcess)").
+:-assert_kif("(genls Guiding IntentionalProcess)").
 :-assert_kif("(documentation Guiding \"Any &%IntentionalProcess where the &%agent tries to direct the movements of another &%Object, whether an &%Agent or not.\")").
 %
-:-assert_kif("(subclass Steering Guiding)").
+:-assert_kif("(genls Steering Guiding)").
 :-assert_kif("(documentation Steering \"Controlling the direction and/or speed of a &%TransportationDevice. This includes navigating a ship, driving a car or truck, operating a train, etc.\")").
 %
 :-assert_kif("(=> (instance ?STEER Steering) (exists (?VEHICLE) (and (instance ?VEHICLE TransportationDevice) (patient ?STEER ?VEHICLE))))").
 %
-:-assert_kif("(subclass EducationalProcess Guiding)").
+:-assert_kif("(genls EducationalProcess Guiding)").
 :-assert_kif("(documentation EducationalProcess \"Any &%Process which is intended to result in &%Learning.\")").
 %
 :-assert_kif("(=> (and (instance ?EDUCATION EducationalProcess) (patient ?EDUCATION ?PERSON)) (hasPurpose ?EDUCATION (exists (?LEARN) (and (instance ?LEARN Learning) (patient ?LEARN ?PERSON)))))").
 %
-:-assert_kif("(subclass ChangeOfPossession SocialInteraction)").
+:-assert_kif("(genls ChangeOfPossession SocialInteraction)").
 :-assert_kif("(relatedInternalConcept ChangeOfPossession possesses)").
 :-assert_kif("(documentation ChangeOfPossession \"The &%Class of &%Processes where ownership of something is transferred from one &%Agent to another.\")").
 %
@@ -4339,54 +4339,54 @@
 %
 :-assert_kif("(=> (and (instance ?CHANGE ChangeOfPossession) (origin ?CHANGE ?AGENT1) (destination ?CHANGE ?AGENT2) (instance ?AGENT1 Agent) (instance ?AGENT2 Agent) (patient ?CHANGE ?OBJ)) (and (holdsDuring (BeginFn (WhenFn ?CHANGE)) (possesses ?AGENT1 ?OBJ)) (holdsDuring (EndFn (WhenFn ?CHANGE)) (possesses ?AGENT2 ?OBJ))))").
 %
-:-assert_kif("(subclass Giving ChangeOfPossession)").
-:-assert_kif("(documentation Giving \"The &%subclass of &%ChangeOfPossession where the &%agent gives the &%destination something.\")").
+:-assert_kif("(genls Giving ChangeOfPossession)").
+:-assert_kif("(documentation Giving \"The &%genls of &%ChangeOfPossession where the &%agent gives the &%destination something.\")").
 %
 :-assert_kif("(=> (and (instance ?GIVE Giving) (agent ?GIVE ?AGENT1) (destination ?GIVE ?AGENT2) (instance ?AGENT2 Agent) (patient ?GIVE ?OBJ)) (exists (?GET) (and (instance ?GET Getting) (agent ?GET ?AGENT2) (origin ?GET ?AGENT1) (patient ?GET ?OBJ))))").
 %
 :-assert_kif("(=> (and (instance ?GIVE Giving) (agent ?GIVE ?AGENT)) (origin ?GIVE ?AGENT))").
 %
-:-assert_kif("(subclass Funding Giving)").
+:-assert_kif("(genls Funding Giving)").
 :-assert_kif("(documentation Funding \"Any instance of &%Giving where the &%patient is an instance of &%Currency. Note that this class covers both &%FinancialTransactions, e.g. where a firm funds a software company with venture capital with the agreement that a certain percentage of the profits on the investment will be returned to the firm, and instances of &%UnilateralGiving, e.g. a stipend provided to a student as part of scholarship or fellowship.\")").
 %
 :-assert_kif("(=> (instance ?FUND Funding) (exists (?MONEY) (and (instance ?MONEY Currency) (patient ?FUND ?MONEY))))").
 %
-:-assert_kif("(subclass UnilateralGiving Giving)").
+:-assert_kif("(genls UnilateralGiving Giving)").
 :-assert_kif("(documentation UnilateralGiving \"Any instance of &%Giving that is not part of a &%Transaction. In other words, any instance of &%Giving where nothing is received in return. Some examples of &%UnilateralGiving are: honorary awards , gifts, and financial grants.\")").
 %
 :-assert_kif("(=> (instance ?GIVE UnilateralGiving) (not (exists (?TRANS) (and (instance ?TRANS Transaction) (subProcess ?GIVE ?TRANS)))))").
 %
-:-assert_kif("(subclass Lending Giving)").
-:-assert_kif("(documentation Lending \"The &%subclass of &%Giving &%Processes where the &%agent gives the &%destination something for a limited period of time with the expectation that it will be returned later (perhaps with interest ).\")").
+:-assert_kif("(genls Lending Giving)").
+:-assert_kif("(documentation Lending \"The &%genls of &%Giving &%Processes where the &%agent gives the &%destination something for a limited period of time with the expectation that it will be returned later (perhaps with interest ).\")").
 %
 :-assert_kif("(<=> (exists (?BORROW) (and (instance ?BORROW Borrowing) (agent ?BORROW ?AGENT1) (origin ?BORROW ?AGENT2) (patient ?BORROW ?OBJECT))) (exists (?LEND) (and (instance ?LEND Lending) (agent ?LEND ?AGENT2) (destination ?LEND ?AGENT1) (patient ?LEND ?OBJECT))))").
 %
-:-assert_kif("(subclass GivingBack Giving)").
+:-assert_kif("(genls GivingBack Giving)").
 :-assert_kif("(documentation GivingBack \"Any instance of &%Giving where the &%agent gives something to the &%destination which was previously given to the &%agent by the &%destination, e.g. returing a book that was borrowed from someone.\")").
 %
 :-assert_kif("(=> (and (instance ?RETURN GivingBack) (agent ?RETURN ?AGENT) (destination ?RETURN ?DEST)) (exists (?GIVE) (and (instance ?GIVE Giving) (agent ?GIVE ?DEST) (destination ?GIVE ?AGENT) (earlier (WhenFn ?GIVE) (WhenFn ?RETURN)))))").
 %
-:-assert_kif("(subclass Getting ChangeOfPossession)").
-:-assert_kif("(documentation Getting \"The &%subclass of &%ChangeOfPossession where the &%agent gets something. Note that the source from which something is obtained is specified with the &%origin &%CaseRole.\")").
+:-assert_kif("(genls Getting ChangeOfPossession)").
+:-assert_kif("(documentation Getting \"The &%genls of &%ChangeOfPossession where the &%agent gets something. Note that the source from which something is obtained is specified with the &%origin &%CaseRole.\")").
 %
 :-assert_kif("(=> (and (instance ?GET Getting) (agent ?GET ?AGENT)) (destination ?GET ?AGENT))").
 %
-:-assert_kif("(subclass UnilateralGetting Getting)").
+:-assert_kif("(genls UnilateralGetting Getting)").
 :-assert_kif("(relatedInternalConcept UnilateralGetting UnilateralGiving)").
 :-assert_kif("(documentation UnilateralGetting \"Any instance of &%Getting that is not part of a &%Transaction. In other words, any instance of &%Getting where nothing is given in return. Some examples of &%UnilateralGetting are: appropriating, commandeering , stealing, etc.\")").
 %
 :-assert_kif("(=> (instance ?GET UnilateralGetting) (not (exists (?TRANS) (and (instance ?TRANS Transaction) (subProcess ?GET ?TRANS)))))").
 %
-:-assert_kif("(subclass Borrowing Getting)").
-:-assert_kif("(documentation Borrowing \"The &%subclass of &%Getting &%Processes where the &%agent gets something for a limited period of time with the expectation that it will be returned later (perhaps with interest).\")").
+:-assert_kif("(genls Borrowing Getting)").
+:-assert_kif("(documentation Borrowing \"The &%genls of &%Getting &%Processes where the &%agent gets something for a limited period of time with the expectation that it will be returned later (perhaps with interest).\")").
 %
-:-assert_kif("(subclass Transaction ChangeOfPossession)").
-:-assert_kif("(subclass Transaction DualObjectProcess)").
-:-assert_kif("(documentation Transaction \"The &%subclass of &%ChangeOfPossession where something is exchanged for something else.\")").
+:-assert_kif("(genls Transaction ChangeOfPossession)").
+:-assert_kif("(genls Transaction DualObjectProcess)").
+:-assert_kif("(documentation Transaction \"The &%genls of &%ChangeOfPossession where something is exchanged for something else.\")").
 %
 :-assert_kif("(=> (instance ?TRANS Transaction) (exists (?AGENT1 ?AGENT2 ?GIVE1 ?GIVE2 ?OBJ1 ?OBJ2) (and (instance ?GIVE1 Giving) (instance ?GIVE2 Giving) (subProcess ?GIVE1 ?TRANS) (subProcess ?GIVE2 ?TRANS) (agent ?GIVE1 ?AGENT1) (agent ?GIVE2 ?AGENT2) (patient ?GIVE1 ?OBJ1) (patient ?GIVE2 ?OBJ2) (destination ?GIVE1 ?AGENT2) (destination ?GIVE2 ?AGENT1) (not (equal ?AGENT1 ?AGENT2)) (not (equal ?OBJ1 ?OBJ2)))))").
 %
-:-assert_kif("(subclass FinancialTransaction Transaction)").
+:-assert_kif("(genls FinancialTransaction Transaction)").
 :-assert_kif("(documentation FinancialTransaction \"A &%Transaction where an instance of &%CurrencyMeasure is exchanged for something else.\")").
 %
 :-assert_kif("(=> (instance ?TRANS FinancialTransaction) (exists (?OBJ) (and (patient ?TRANS ?OBJ) (instance ?OBJ CurrencyMeasure))))").
@@ -4400,7 +4400,7 @@
 %
 :-assert_kif("(=> (transactionAmount ?Transaction ?Amount) (exists (?Obj) (and (patient ?Transaction ?Obj) (monetaryValue ?Obj ?Amount))))").
 %
-:-assert_kif("(subclass CommercialService FinancialTransaction)").
+:-assert_kif("(genls CommercialService FinancialTransaction)").
 :-assert_kif("(documentation CommercialService \"Any &%FinancialTransaction by a &%Corporation where the aim is to produce a &%profit.\")").
 %
 :-assert_kif("(=> (instance ?BUSINESS CommercialService) (hasPurpose ?BUSINESS (exists (?PROFIT) (profit ?BUSINESS ?PROFIT))))").
@@ -4412,136 +4412,136 @@
 % :-assert_kif(";Agent ").
 :-assert_kif("(=> (instance ?BUSINESS CommercialService) (exists (?AGENT) (and (instance ?AGENT CommercialAgent) (agent ?BUSINESS ?AGENT))))").
 %
-:-assert_kif("(subclass Betting FinancialTransaction)").
+:-assert_kif("(genls Betting FinancialTransaction)").
 :-assert_kif("(documentation Betting \"A &%FinancialTransaction where an instance of &%CurrencyMeasure is exchanged for the possibility of winning a larger instance of &%CurrencyMeasure within the context of some sort of &%Game.\")").
 %
-:-assert_kif("(subclass Buying FinancialTransaction)").
+:-assert_kif("(genls Buying FinancialTransaction)").
 :-assert_kif("(relatedInternalConcept Buying Selling)").
 :-assert_kif("(documentation Buying \"A &%FinancialTransaction in which an instance of &%CurrencyMeasure is exchanged for an instance of &%Physical.\")").
 %
 :-assert_kif("(=> (and (instance ?BUY Buying) (agent ?BUY ?AGENT)) (destination ?BUY ?AGENT))").
 %
-:-assert_kif("(subclass Selling FinancialTransaction)").
+:-assert_kif("(genls Selling FinancialTransaction)").
 :-assert_kif("(documentation Selling \"A &%FinancialTransaction in which an instance of &%Physical is exchanged for an instance of &%CurrencyMeasure.\")").
 %
 :-assert_kif("(<=> (exists (?BUY) (and (instance ?BUY Buying) (agent ?BUY ?AGENT1) (origin ?BUY ?AGENT2) (patient ?BUY ?OBJECT))) (exists (?SELL) (and (instance ?SELL Selling) (agent ?SELL ?AGENT2) (destination ?SELL ?AGENT1) (patient ?SELL ?OBJECT))))").
 %
 :-assert_kif("(=> (and (instance ?SELL Selling) (agent ?SELL ?AGENT)) (origin ?SELL ?AGENT))").
 %
-:-assert_kif("(subclass Learning IntentionalPsychologicalProcess)").
+:-assert_kif("(genls Learning IntentionalPsychologicalProcess)").
 :-assert_kif("(documentation Learning \"The &%Class of &%Processes which relate to the acquisition of information.\")").
 %
 :-assert_kif("(=> (and (instance ?LEARN Learning) (agent ?LEARN ?AGENT)) (instance ?AGENT CognitiveAgent))").
 %
 :-assert_kif("(=> (and (instance ?LEARN Learning) (agent ?LEARN ?AGENT) (patient ?LEARN ?PROP)) (and (holdsDuring (BeginFn (WhenFn ?LEARN)) (not (knows ?AGENT ?PROP))) (holdsDuring (EndFn (WhenFn ?LEARN)) (knows ?AGENT ?PROP))))").
 %
-:-assert_kif("(subclass Discovering IntentionalPsychologicalProcess)").
+:-assert_kif("(genls Discovering IntentionalPsychologicalProcess)").
 :-assert_kif("(documentation Discovering \"Finding something that was sought. Note that this class is restricted to cases of discovering something &%Physical. For cases involving the acquisition of knowledge, the class &%Learning should be used.\")").
 %
 :-assert_kif("(=> (and (instance ?DISCOVER Discovering) (patient ?DISCOVER ?OBJ)) (exists (?PURSUE) (and (instance ?PURSUE Pursuing) (meetsTemporally (WhenFn ?PURSUE) (WhenFn ?DISCOVER)))))").
 %
 :-assert_kif("(=> (and (instance ?DISCOVER Discovering) (patient ?DISCOVER ?OBJ) (holdsDuring (WhenFn ?DISCOVER) (located ?OBJ ?PLACE))) (exists (?LEARN) (and (instance ?LEARN Learning) (subProcess ?LEARN ?DISCOVER) (patient ?LEARN (located ?OBJ ?PLACE)))))").
 %
-:-assert_kif("(subclass Classifying IntentionalPsychologicalProcess)").
+:-assert_kif("(genls Classifying IntentionalPsychologicalProcess)").
 :-assert_kif("(documentation Classifying \"The &%Class of &%IntentionalPsychologicalProcesses which involve attaching a name or category to a thing or set of things. Note that &%Classifying is distinguished from &%Learning by the fact that the latter covers the acquisition by a &%CognitiveAgent of any &%Proposition, while the former involves the assignment of a label or category.\")").
 %
-:-assert_kif("(subclass Reasoning IntentionalPsychologicalProcess)").
+:-assert_kif("(genls Reasoning IntentionalPsychologicalProcess)").
 :-assert_kif("(documentation Reasoning \"The &%Class of &%IntentionalPsychologicalProcesses which involve concluding, on the basis of either deductive or inductive evidence , that a particular &%Proposition or &%Sentence is true.\")").
 %
 :-assert_kif("(=> (instance ?AGENT CognitiveAgent) (capability Reasoning agent ?AGENT))").
 %
-:-assert_kif("(subclass Selecting IntentionalPsychologicalProcess)").
+:-assert_kif("(genls Selecting IntentionalPsychologicalProcess)").
 :-assert_kif("(documentation Selecting \"The &%Class of &%IntentionalPsychologicalProcesses which involve opting for one or more &%Entity out of a larger set of &%Entities.\")").
 %
-:-assert_kif("(subclass Deciding Selecting)").
-:-assert_kif("(documentation Deciding \"The subclass of &%Selecting where the &%agent opts for one course of action out of a set of multiple possibilities.\")").
+:-assert_kif("(genls Deciding Selecting)").
+:-assert_kif("(documentation Deciding \"The genls of &%Selecting where the &%agent opts for one course of action out of a set of multiple possibilities.\")").
 %
 :-assert_kif("(=> (and (instance ?DECIDE Deciding) (agent ?DECIDE ?AGENT) (patient ?DECIDE ?PROCESS)) (and (instance ?PROCESS IntentionalProcess) (agent ?PROCESS ?AGENT)))").
 %
-:-assert_kif("(subclass LegalDecision Deciding)").
-:-assert_kif("(subclass LegalDecision Declaring)").
+:-assert_kif("(genls LegalDecision Deciding)").
+:-assert_kif("(genls LegalDecision Declaring)").
 :-assert_kif("(documentation LegalDecision \"A decision issued by a court with respect to a &%LegalAction.\")").
 %
 :-assert_kif("(=> (instance ?DECISION LegalDecision) (exists (?ACTION) (and (instance ?ACTION LegalAction) (refers ?DECISION ?ACTION))))").
 %
 :-assert_kif("(=> (instance ?DECISION LegalDecision) (exists (?PROCESS) (and (instance ?PROCESS JudicialProcess) (subProcess ?DECISION ?PROCESS))))").
 %
-:-assert_kif("(subclass Voting Selecting)").
+:-assert_kif("(genls Voting Selecting)").
 :-assert_kif("(documentation Voting \"&%Voting is the activity of voting in an &%Election. Voting is typically done by individuals, while &%Elections are conducted by &%Organizations. The voting process by an individual voter is part of an &%Election process.\")").
 %
 :-assert_kif("(=> (instance ?VOTE Voting) (exists (?ELECT) (and (instance ?ELECT Election) (subProcess ?VOTE ?ELECT))))").
 %
-:-assert_kif("(subclass Comparing IntentionalPsychologicalProcess)").
-:-assert_kif("(subclass Comparing DualObjectProcess)").
+:-assert_kif("(genls Comparing IntentionalPsychologicalProcess)").
+:-assert_kif("(genls Comparing DualObjectProcess)").
 :-assert_kif("(documentation Comparing \"The &%Class of &%IntentionalPsychologicalProcesses which involve comparing, relating, contrasting, etc. the properties of two or more &%Entities.\")").
 %
-:-assert_kif("(subclass Calculating IntentionalPsychologicalProcess)").
+:-assert_kif("(genls Calculating IntentionalPsychologicalProcess)").
 :-assert_kif("(documentation Calculating \"&%IntentionalPsychologicalProcesses which involve the consideration and/or manipulation of instances of &%Quantity.\")").
 %
-:-assert_kif("(subclass Measuring Calculating)").
+:-assert_kif("(genls Measuring Calculating)").
 :-assert_kif("(documentation Measuring \"The &%Class of &%Calculating &%Processes where the aim is to determine the &%PhysicalQuantity of some aspect of the &%patient.\")").
 %
 :-assert_kif("(=> (and (instance ?MEAS Measuring) (agent ?MEAS ?AGENT) (patient ?MEAS ?OBJ)) (exists (?QUANT ?UNIT) (holdsDuring (EndFn (WhenFn ?MEAS)) (knows ?AGENT (measure ?OBJ (MeasureFn ?QUANT ?UNIT))))))").
 %
-:-assert_kif("(subclass Counting Calculating)").
+:-assert_kif("(genls Counting Calculating)").
 :-assert_kif("(documentation Counting \"Enumerating something. The &%Class of &%Calculating &%Processes where the aim is to determine the &%Number corresponding to the &%patient.\")").
 %
 :-assert_kif("(=> (and (instance ?COUNT Counting) (agent ?COUNT ?AGENT) (patient ?COUNT ?ENTITY)) (exists (?NUMBER) (knows ?AGENT (equal (CardinalityFn ?ENTITY) ?NUMBER))))").
 %
-:-assert_kif("(subclass Predicting IntentionalPsychologicalProcess)").
+:-assert_kif("(genls Predicting IntentionalPsychologicalProcess)").
 :-assert_kif("(documentation Predicting \"The &%Class of &%IntentionalPsychologicalProcesses which involve the formulation of a &%Proposition about a state of affairs which might be realized in the future.\")").
 %
 :-assert_kif("(=> (and (instance ?PREDICT Predicting) (patient ?PREDICT ?FORMULA)) (exists (?TIME) (and (holdsDuring ?TIME ?FORMULA) (or (before ?TIME (WhenFn ?PREDICT)) (earlier ?TIME (WhenFn ?PREDICT))))))").
 %
-:-assert_kif("(subclass Remembering PsychologicalProcess)").
+:-assert_kif("(genls Remembering PsychologicalProcess)").
 :-assert_kif("(documentation Remembering \"The &%Class of &%PsychologicalProcesses which involve the recollection of prior experiences and/or of knowledge which was previously acquired.\")").
 %
 :-assert_kif("(=> (and (instance ?REMEMBER Remembering) (patient ?REMEMBER ?FORMULA)) (exists (?TIME) (and (holdsDuring ?TIME ?FORMULA) (or (before ?TIME (WhenFn ?REMEMBER)) (earlier ?TIME (WhenFn ?REMEMBER))))))").
 %
-:-assert_kif("(subclass Keeping IntentionalProcess)").
+:-assert_kif("(genls Keeping IntentionalProcess)").
 :-assert_kif("(documentation Keeping \"The &%Class of &%Processes where the &%agent keeps something in a particular location for an extended period of time.\")").
 %
 :-assert_kif("(=> (and (instance ?KEEP Keeping) (agent ?KEEP ?AGENT) (patient ?KEEP ?OBJ)) (exists (?PUT) (and (instance ?PUT Putting) (agent ?PUT ?AGENT) (patient ?PUT ?OBJ) (earlier (WhenFn ?PUT) (WhenFn ?KEEP)))))").
 %
 :-assert_kif("(=> (and (instance ?KEEP Keeping) (patient ?KEEP ?OBJ)) (exists (?PLACE) (forall (?TIME) (=> (temporalPart ?TIME (WhenFn ?KEEP)) (holdsDuring ?TIME (located ?OBJ ?PLACE))))))").
 %
-:-assert_kif("(subclass Confining Keeping)").
+:-assert_kif("(genls Confining Keeping)").
 :-assert_kif("(documentation Confining \"The &%Class of &%Keeping &%Processes where the &%patient is a &%Human or an &%Animal and is kept involuntarily. This covers caging , imprisonment, jailing, etc.\")").
 %
 :-assert_kif("(=> (instance ?CONFINE Confining) (exists (?AGENT) (and (or (instance ?AGENT Animal) (instance ?AGENT Human)) (patient ?CONFINE ?AGENT))))").
 %
 :-assert_kif("(=> (and (instance ?CONFINE Confining) (patient ?CONFINE ?PERSON) (instance ?PERSON Human)) (not (desires ?PERSON (patient ?CONFINE ?PERSON))))").
 %
-:-assert_kif("(subclass Maintaining IntentionalProcess)").
+:-assert_kif("(genls Maintaining IntentionalProcess)").
 :-assert_kif("(documentation Maintaining \"The &%Class of &%Processes where the &%agent cares for or maintains the &%Object.\")").
 %
-:-assert_kif("(subclass Repairing IntentionalProcess)").
+:-assert_kif("(genls Repairing IntentionalProcess)").
 :-assert_kif("(relatedInternalConcept Repairing Maintaining)").
 :-assert_kif("(documentation Repairing \"The &%Class of &%Processes where the &%agent makes a modification or series of modifications to an &%Object that is not functioning as intended so that it works properly.\")").
 %
 :-assert_kif("(=> (and (instance ?REPAIR Repairing) (patient ?REPAIR ?OBJ)) (exists (?DAMAGE) (and (instance ?DAMAGE Damaging) (patient ?DAMAGE ?OBJ) (earlier (WhenFn ?DAMAGE) (WhenFn ?REPAIR)))))").
 %
-:-assert_kif("(subclass TherapeuticProcess Repairing)").
+:-assert_kif("(genls TherapeuticProcess Repairing)").
 :-assert_kif("(documentation TherapeuticProcess \"A &%Process that is carried out for the purpose of curing, improving or reducing the pain associated with a &%DiseaseOrSyndrome.\")").
 %
 :-assert_kif("(=> (and (instance ?PROC TherapeuticProcess) (patient ?PROC ?BIO)) (or (instance ?BIO Organism) (exists (?ORG) (and (instance ?ORG Organism) (part ?BIO ?ORG)))))").
 %
-:-assert_kif("(subclass Surgery TherapeuticProcess)").
+:-assert_kif("(genls Surgery TherapeuticProcess)").
 :-assert_kif("(documentation Surgery \"Any &%TherapeuticProcess that involves making an incision in the &%Animal that is the &%patient of the &%TherapeuticProcess.\")").
 %
 :-assert_kif("(=> (and (instance ?ACT Surgery) (patient ?ACT ?ANIMAL)) (exists (?SUBACT) (and (instance ?SUBACT Cutting) (instance ?ANIMAL Animal) (patient ?ANIMAL ?CUTTING) (subProcess ?SUBACT ?ACT))))").
 %
-:-assert_kif("(subclass Damaging InternalChange)").
+:-assert_kif("(genls Damaging InternalChange)").
 :-assert_kif("(disjoint Damaging Repairing)").
 :-assert_kif("(documentation Damaging \"The &%Class of &%Processes where the &%agent brings about a situation where the &%patient no longer functions normally or as intended.\")").
 %
-:-assert_kif("(subclass Destruction Damaging)").
-:-assert_kif("(documentation Destruction \"The &%subclass of &%Damagings in which the &%patient (or an essential element of the &%patient) is destroyed. Note that the difference between this concept and its superclass is solely one of extent.\")").
+:-assert_kif("(genls Destruction Damaging)").
+:-assert_kif("(documentation Destruction \"The &%genls of &%Damagings in which the &%patient (or an essential element of the &%patient) is destroyed. Note that the difference between this concept and its superclass is solely one of extent.\")").
 %
 :-assert_kif("(<=> (instance ?PROCESS Destruction) (exists (?PATIENT) (and (patient ?PROCESS ?PATIENT) (time ?PATIENT (BeginFn (WhenFn ?PROCESS))) (not (time ?PATIENT (EndFn (WhenFn ?PROCESS)))))))").
 %
-:-assert_kif("(subclass Killing Destruction)").
-:-assert_kif("(documentation Killing \"The &%subclass of &%Destruction in which the death of an &%Organism is caused by an &%Organism. Note that in cases of suicide the &%Organism would be the same in both cases.\")").
+:-assert_kif("(genls Killing Destruction)").
+:-assert_kif("(documentation Killing \"The &%genls of &%Destruction in which the death of an &%Organism is caused by an &%Organism. Note that in cases of suicide the &%Organism would be the same in both cases.\")").
 %
 :-assert_kif("(=> (and (instance ?KILL Killing) (agent ?KILL ?AGENT) (patient ?KILL ?PATIENT)) (and (instance ?AGENT Organism) (instance ?PATIENT Organism)))").
 %
@@ -4549,164 +4549,164 @@
 %
 :-assert_kif("(=> (and (instance ?KILL Killing) (patient ?KILL ?OBJ)) (exists (?DEATH) (and (instance ?DEATH Death) (experiencer ?DEATH ?OBJ) (causes ?KILL ?DEATH))))").
 %
-:-assert_kif("(subclass Poking IntentionalProcess)").
+:-assert_kif("(genls Poking IntentionalProcess)").
 :-assert_kif("(documentation Poking \"The &%Class of &%Processes where the &%agent pierces the surface of the &%Object with an &%instrument.\")").
 %
 :-assert_kif("(=> (and (instance ?POKE Poking) (agent ?POKE ?AGENT) (patient ?POKE ?OBJ) (instrument ?POKE ?INST)) (holdsDuring (WhenFn ?POKE) (connects ?INST ?AGENT ?OBJ)))").
 %
-:-assert_kif("(subclass Cutting Poking)").
-:-assert_kif("(documentation Cutting \"The &%subclass of &%Poking &%Processes which involve a sharp &%instrument.\")").
+:-assert_kif("(genls Cutting Poking)").
+:-assert_kif("(documentation Cutting \"The &%genls of &%Poking &%Processes which involve a sharp &%instrument.\")").
 %
-:-assert_kif("(subclass Attaching DualObjectProcess)").
+:-assert_kif("(genls Attaching DualObjectProcess)").
 :-assert_kif("(disjoint Attaching Detaching)").
 :-assert_kif("(relatedInternalConcept Attaching Putting)").
 :-assert_kif("(documentation Attaching \"A &%Process where one &%Object becomes attached to another &%Object. Note that this differs from &%Putting in that two things which are attached may already be in the same location.\")").
 %
 :-assert_kif("(=> (and (instance ?ATTACH Attaching) (patient ?ATTACH ?OBJ1) (patient ?ATTACH ?OBJ2)) (and (holdsDuring (BeginFn (WhenFn ?ATTACH)) (not (connected ?OBJ1 ?OBJ2))) (holdsDuring (EndFn (WhenFn ?ATTACH)) (connected ?OBJ1 ?OBJ2))))").
 %
-:-assert_kif("(subclass Detaching DualObjectProcess)").
+:-assert_kif("(genls Detaching DualObjectProcess)").
 :-assert_kif("(documentation Detaching \"A &%Process where the &%agent detaches one thing from something else. Note that this is different from &%Removing in that neither of the two things which are detached may be removed from the location where it was attached.\")").
 %
 :-assert_kif("(=> (and (instance ?DETACH Detaching) (patient ?DETACH ?OBJ1) (patient ?DETACH ?OBJ2)) (and (holdsDuring (BeginFn (WhenFn ?DETACH)) (connected ?OBJ1 ?OBJ2)) (holdsDuring (EndFn (WhenFn ?DETACH)) (not (connected ?OBJ1 ?OBJ2)))))").
 %
-:-assert_kif("(subclass Combining DualObjectProcess)").
+:-assert_kif("(genls Combining DualObjectProcess)").
 :-assert_kif("(documentation Combining \"A &%Process where two or more &%Substances are combined into a single &%Substance.\")").
 %
 :-assert_kif("(<=> (and (instance ?COMBINE Combining) (resource ?COMBINE ?OBJ1) (result ?COMBINE ?OBJ2)) (and (holdsDuring (BeginFn (WhenFn ?COMBINE)) (not (piece ?OBJ1 ?OBJ2))) (holdsDuring (EndFn (WhenFn ?COMBINE)) (piece ?OBJ1 ?OBJ2))))").
 %
-:-assert_kif("(subclass Separating DualObjectProcess)").
+:-assert_kif("(genls Separating DualObjectProcess)").
 :-assert_kif("(disjoint Separating Combining)").
 :-assert_kif("(documentation Separating \"A &%Process where a &%Substance is separated into (some of) its &%pieces.\")").
 %
-:-assert_kif("(subclass ChemicalProcess InternalChange)").
+:-assert_kif("(genls ChemicalProcess InternalChange)").
 :-assert_kif("(partition ChemicalProcess ChemicalSynthesis ChemicalDecomposition)").
 :-assert_kif("(documentation ChemicalProcess \"A &%ChemicalProcess occurs whenever chemical compounds (&%CompoundSubstances) are formed or decomposed. For example, reactants disappear as chemical change occurs, and products appear as chemical change occurs. In a chemical change a chemical reaction takes place. Catalysts in a &%ChemicalProcess may speed up the reaction , but aren't themselves produced or consumed. Examples: rusting of iron and the decomposition of water, induced by an electric current, to gaseous hydrogen and gaseous oxygen.\")").
 %
 :-assert_kif("(=> (and (instance ?PROC ChemicalProcess) (or (resource ?PROC ?STUFF) (result ?PROC ?STUFF))) (instance ?STUFF PureSubstance))").
 %
-:-assert_kif("(subclass ChemicalSynthesis ChemicalProcess)").
-:-assert_kif("(subclass ChemicalSynthesis Combining)").
+:-assert_kif("(genls ChemicalSynthesis ChemicalProcess)").
+:-assert_kif("(genls ChemicalSynthesis Combining)").
 :-assert_kif("(documentation ChemicalSynthesis \"The &%Class of &%ChemicalProcesses in which a &%CompoundSubstance is formed from simpler reactants.\")").
 %
 :-assert_kif("(=> (and (resource ?PROC ?SUBSTANCE1) (result ?PROC ?SUBSTANCE2) (instance ?SUBSTANCE1 ElementalSubstance) (instance ?SUBSTANCE2 CompoundSubstance)) (instance ?PROC ChemicalSynthesis))").
 %
 :-assert_kif("(<=> (instance ?COMPOUND CompoundSubstance) (exists (?ELEMENT1 ?ELEMENT2 ?PROCESS) (and (instance ?ELEMENT1 ElementalSubstance) (instance ?ELEMENT2 ElementalSubstance) (not (equal ?ELEMENT1 ?ELEMENT2)) (instance ?PROCESS ChemicalSynthesis) (resource ?PROCESS ?ELEMENT1) (resource ?PROCESS ?ELEMENT2) (result ?PROCESS ?COMPOUND))))").
 %
-:-assert_kif("(subclass ChemicalDecomposition ChemicalProcess)").
-:-assert_kif("(subclass ChemicalDecomposition Separating)").
+:-assert_kif("(genls ChemicalDecomposition ChemicalProcess)").
+:-assert_kif("(genls ChemicalDecomposition Separating)").
 :-assert_kif("(documentation ChemicalDecomposition \"The &%Class of &%ChemicalProcesses in which a &%CompoundSubstance breaks down into simpler products.\")").
 %
 :-assert_kif("(=> (and (resource ?PROC ?SUBSTANCE1) (result ?PROC ?SUBSTANCE2) (instance ?SUBSTANCE1 CompoundSubstance) (instance ?SUBSTANCE2 ElementalSubstance)) (instance ?PROC ChemicalDecomposition))").
 %
-:-assert_kif("(subclass Combustion ChemicalDecomposition)").
+:-assert_kif("(genls Combustion ChemicalDecomposition)").
 :-assert_kif("(documentation Combustion \"The &%Class of &%ChemicalProcesses in which an &%Object reacts with oxygen and gives off heat. This includes all &%Processes in which something is burning.\")").
 %
 :-assert_kif("(=> (instance ?COMBUSTION Combustion) (exists (?HEAT ?LIGHT) (and (instance ?HEAT Heating) (instance ?LIGHT RadiatingLight) (subProcess ?HEAT ?COMBUSTION) (subProcess ?LIGHT ?COMBUSTION))))").
 %
-:-assert_kif("(subclass InternalChange Process)").
+:-assert_kif("(genls InternalChange Process)").
 :-assert_kif("(documentation InternalChange \"&%Processes which involve altering an internal property of an &%Object, e.g. the shape of the &%Object, its coloring, its structure , etc. &%Processes that are not instances of this class include changes that only affect the relationship to other objects, e.g. changes in spatial or temporal location.\")").
 %
 :-assert_kif("(=> (and (instance ?CHANGE InternalChange) (patient ?CHANGE ?OBJ)) (exists (?PROPERTY) (or (and (holdsDuring (BeginFn (WhenFn ?CHANGE)) (attribute ?OBJ ?PROPERTY)) (holdsDuring (EndFn (WhenFn ?CHANGE)) (not (attribute ?OBJ ?PROPERTY)))) (and (holdsDuring (BeginFn (WhenFn ?CHANGE)) (not (attribute ?OBJ ?PROPERTY))) (holdsDuring (EndFn (WhenFn ?CHANGE)) (attribute ?OBJ ?PROPERTY))))))").
 %
-:-assert_kif("(subclass WeatherProcess InternalChange)").
+:-assert_kif("(genls WeatherProcess InternalChange)").
 :-assert_kif("(documentation WeatherProcess \"&%WeatherProcess is the broadest class of processes that involve weather, including weather seasons (not to be confused with instances of &%SeasonOfYear), weather systems, and short-term weather events .\")").
 %
-:-assert_kif("(subclass Precipitation WeatherProcess)").
-:-assert_kif("(subclass Precipitation WaterMotion)").
-:-assert_kif("(subclass Precipitation Falling)").
+:-assert_kif("(genls Precipitation WeatherProcess)").
+:-assert_kif("(genls Precipitation WaterMotion)").
+:-assert_kif("(genls Precipitation Falling)").
 :-assert_kif("(documentation Precipitation \"&%Precipitation is the process of water molecules falling from the air to the ground, in either a liquid or frozen state.\")").
 %
 :-assert_kif("(=> (instance ?PROCESS Precipitation) (exists (?STUFF) (and (instance ?STUFF Water) (patient ?PROCESS ?STUFF))))").
 %
-:-assert_kif("(subclass SurfaceChange InternalChange)").
+:-assert_kif("(genls SurfaceChange InternalChange)").
 :-assert_kif("(documentation SurfaceChange \"&%Processes which involve altering the properties that apply to the surface of an &%Object.\")").
 %
 :-assert_kif("(=> (and (instance ?ALT SurfaceChange) (patient ?ALT ?OBJ)) (exists (?PART ?PROPERTY) (and (superficialPart ?PART ?OBJ) (or (and (holdsDuring (BeginFn (WhenFn ?ALT)) (attribute ?PART ?PROPERTY)) (holdsDuring (EndFn (WhenFn ?ALT)) (not (attribute ?PART ?PROPERTY)))) (and (holdsDuring (BeginFn (WhenFn ?ALT)) (not (attribute ?PART ?PROPERTY))) (holdsDuring (EndFn (WhenFn ?ALT)) (attribute ?PART ?PROPERTY)))))))").
 %
-:-assert_kif("(subclass Coloring SurfaceChange)").
-:-assert_kif("(documentation Coloring \"The &%subclass of &%SurfaceChange where a &%ColorAttribute of the &%patient is altered.\")").
+:-assert_kif("(genls Coloring SurfaceChange)").
+:-assert_kif("(documentation Coloring \"The &%genls of &%SurfaceChange where a &%ColorAttribute of the &%patient is altered.\")").
 %
 :-assert_kif("(=> (and (instance ?COLORING Coloring) (patient ?COLORING ?OBJ)) (exists (?PROPERTY) (and (instance ?PROPERTY ColorAttribute) (or (and (holdsDuring (BeginFn (WhenFn ?ALT)) (attribute ?PART ?PROPERTY)) (holdsDuring (EndFn (WhenFn ?ALT)) (not (attribute ?PART ?PROPERTY)))) (and (holdsDuring (BeginFn (WhenFn ?ALT)) (not (attribute ?PART ?PROPERTY))) (holdsDuring (EndFn (WhenFn ?ALT)) (attribute ?PART ?PROPERTY)))))))").
 %
-:-assert_kif("(subclass ShapeChange InternalChange)").
+:-assert_kif("(genls ShapeChange InternalChange)").
 :-assert_kif("(documentation ShapeChange \"The &%Process of changing the shape of an &%Object.\")").
 %
 :-assert_kif("(=> (and (instance ?ALT ShapeChange) (patient ?ALT ?OBJ)) (exists (?PROPERTY) (and (instance ?PROPERTY ShapeAttribute) (or (and (holdsDuring (BeginFn (WhenFn ?ALT)) (attribute ?OBJ ?PROPERTY)) (holdsDuring (EndFn (WhenFn ?ALT)) (not (attribute ?OBJ ?PROPERTY)))) (and (holdsDuring (BeginFn (WhenFn ?ALT)) (not (attribute ?OBJ ?PROPERTY))) (holdsDuring (EndFn (WhenFn ?ALT)) (attribute ?OBJ ?PROPERTY)))))))").
 %
-:-assert_kif("(subclass ContentDevelopment IntentionalProcess)").
-:-assert_kif("(documentation ContentDevelopment \"A &%subclass of &%IntentionalProcess in which content is modified, its form is altered or it is created anew.\")").
+:-assert_kif("(genls ContentDevelopment IntentionalProcess)").
+:-assert_kif("(documentation ContentDevelopment \"A &%genls of &%IntentionalProcess in which content is modified, its form is altered or it is created anew.\")").
 %
 :-assert_kif("(=> (instance ?DEVELOP ContentDevelopment) (exists (?OBJ) (and (instance ?OBJ ContentBearingObject) (patient ?DEVELOP ?OBJ))))").
 %
-:-assert_kif("(subclass Reading ContentDevelopment)").
+:-assert_kif("(genls Reading ContentDevelopment)").
 :-assert_kif("(relatedInternalConcept Reading Interpreting)").
-:-assert_kif("(documentation Reading \"A &%subclass of &%ContentDevelopment in which content is converted from a written form into a spoken representation. Note that the class &%Interpreting should be used in cases where a &%Text is read silently.\")").
+:-assert_kif("(documentation Reading \"A &%genls of &%ContentDevelopment in which content is converted from a written form into a spoken representation. Note that the class &%Interpreting should be used in cases where a &%Text is read silently.\")").
 %
 :-assert_kif("(=> (instance ?READ Reading) (exists (?TEXT ?PROP) (and (instance ?TEXT Text) (containsInformation ?TEXT ?PROP) (realization ?READ ?PROP))))").
 %
-:-assert_kif("(subclass Writing ContentDevelopment)").
-:-assert_kif("(documentation Writing \"A &%subclass of &%ContentDevelopment in which content is converted from one form (e.g. uttered, written or represented mentally ) into a written form. Note that this class covers both transcription and original creation of written &%Texts.\")").
+:-assert_kif("(genls Writing ContentDevelopment)").
+:-assert_kif("(documentation Writing \"A &%genls of &%ContentDevelopment in which content is converted from one form (e.g. uttered, written or represented mentally ) into a written form. Note that this class covers both transcription and original creation of written &%Texts.\")").
 %
-:-assert_kif("(subclass Encoding Writing)").
+:-assert_kif("(genls Encoding Writing)").
 :-assert_kif("(:hasRestrictedVal Encoding creates EncodedDocument)").
 :-assert_kif("(documentation Encoding \"Converting a document or message into a formal language or into a code that can be understood only by a relatively small body of &%Agents. Generally speaking, this hinders wide dissemination of the content in the original document or message. Encoding must use some procedure other than simple writing in a widely-used language, it must have some non-obvious features that make interpretation more difficult without knowledge of the encoding procedure. However, intentional hiding of the information is not Encoding, but Encryption.\")").
 %
-:-assert_kif("(subclass Decoding Writing)").
+:-assert_kif("(genls Decoding Writing)").
 :-assert_kif("(disjoint Decoding Encoding)").
 :-assert_kif("(documentation Decoding \"Converting a document or message that has previously been encoded (see &%Encoding) into a &%Language that can be understood by a relatively large number of speakers.\")").
 %
 :-assert_kif("(=> (and (instance ?DECODE Decoding) (patient ?DECODE ?DOC1)) (exists (?ENCODE ?DOC2 ?TIME) (and (containsInformation ?DOC2 ?PROP) (containsInformation ?DOC1 ?PROP) (temporalPart ?TIME (PastFn (WhenFn ?DECODE))) (holdsDuring ?TIME (and (instance ?ENCODE Encoding) (patient ?ENCODE ?DOC2))))))").
 %
-:-assert_kif("(subclass Translating ContentDevelopment)").
-:-assert_kif("(subclass Translating DualObjectProcess)").
+:-assert_kif("(genls Translating ContentDevelopment)").
+:-assert_kif("(genls Translating DualObjectProcess)").
 :-assert_kif("(documentation Translating \"Converting content from one &%Language into another.\")").
 %
 :-assert_kif("(=> (and (instance ?TRANSLATE Translating) (resource ?TRANSLATE ?EXPRESSION1) (result ?TRANSLATE ?EXPRESSION2)) (exists (?LANGUAGE1 ?LANGUAGE2 ?ENTITY) (and (representsInLanguage ?EXPRESSION1 ?ENTITY ?LANGUAGE1) (representsInLanguage ?EXPRESSION2 ?ENTITY ?LANGUAGE2) (not (equal ?LANGUAGE1 ?LANGUAGE2)))))").
 %
-:-assert_kif("(subclass Wetting Putting)").
+:-assert_kif("(genls Wetting Putting)").
 :-assert_kif("(documentation Wetting \"The &%Class of &%Processes where a &%Liquid is added to an &%Object.\")").
 %
 :-assert_kif("(=> (and (instance ?WET Wetting) (patient ?WET ?OBJ)) (holdsDuring (EndFn (WhenFn ?WET)) (or (attribute ?OBJ Wet) (attribute ?OBJ Damp))))").
 %
 :-assert_kif("(=> (instance ?WET Wetting) (exists (?OBJ) (and (attribute ?OBJ Liquid) (patient ?WET ?OBJ))))").
 %
-:-assert_kif("(subclass Drying Removing)").
+:-assert_kif("(genls Drying Removing)").
 :-assert_kif("(documentation Drying \"The &%Class of &%Processes where a &%Liquid is removed from an &%Object.\")").
 %
 :-assert_kif("(=> (and (instance ?DRY Drying) (patient ?DRY ?OBJ)) (holdsDuring (EndFn (WhenFn ?DRY)) (attribute ?OBJ Dry)))").
 %
-:-assert_kif("(subclass Creation InternalChange)").
+:-assert_kif("(genls Creation InternalChange)").
 :-assert_kif("(relatedInternalConcept Creation Destruction)").
-:-assert_kif("(documentation Creation \"The &%subclass of &%Process in which something is created. Note that the thing created is specified with the &%result &%CaseRole.\")").
+:-assert_kif("(documentation Creation \"The &%genls of &%Process in which something is created. Note that the thing created is specified with the &%result &%CaseRole.\")").
 %
 :-assert_kif("(=> (instance ?ACTION Creation) (exists (?RESULT) (result ?ACTION ?RESULT)))").
 %
 :-assert_kif("(<=> (instance ?PROCESS Creation) (exists (?PATIENT) (and (patient ?PROCESS ?PATIENT) (time ?PATIENT (EndFn (WhenFn ?PROCESS))) (not (time ?PATIENT (BeginFn (WhenFn ?PROCESS)))))))").
 %
-:-assert_kif("(subclass Making Creation)").
-:-assert_kif("(subclass Making IntentionalProcess)").
-:-assert_kif("(documentation Making \"The &%subclass of &%Creation in which an individual &%Artifact or a type of &%Artifact is made.\")").
+:-assert_kif("(genls Making Creation)").
+:-assert_kif("(genls Making IntentionalProcess)").
+:-assert_kif("(documentation Making \"The &%genls of &%Creation in which an individual &%Artifact or a type of &%Artifact is made.\")").
 %
-:-assert_kif("(subclass Constructing Making)").
-:-assert_kif("(documentation Constructing \"The &%subclass of &%Making in which a &%StationaryArtifact is built.\")").
+:-assert_kif("(genls Constructing Making)").
+:-assert_kif("(documentation Constructing \"The &%genls of &%Making in which a &%StationaryArtifact is built.\")").
 %
 :-assert_kif("(<=> (exists (?BUILD) (and (instance ?BUILD Constructing) (result ?BUILD ?ARTIFACT))) (instance ?ARTIFACT StationaryArtifact))").
 %
-:-assert_kif("(subclass Manufacture Making)").
+:-assert_kif("(genls Manufacture Making)").
 :-assert_kif("(documentation Manufacture \"The &%Making of &%Artifacts on a mass scale .\")").
 %
-:-assert_kif("(subclass Publication Manufacture)").
-:-assert_kif("(subclass Publication ContentDevelopment)").
+:-assert_kif("(genls Publication Manufacture)").
+:-assert_kif("(genls Publication ContentDevelopment)").
 :-assert_kif("(documentation Publication \"The &%Manufacture of &%Texts. Note that there is no implication that the &%Texts are distributed. Such distribution , when it occurs, is an instance of &%Dissemination.\")").
 %
-:-assert_kif("(=> (and (instance ?PUB Publication) (patient ?PUB ?TEXT)) (subclass ?TEXT Text))").
+:-assert_kif("(=> (and (instance ?PUB Publication) (patient ?PUB ?TEXT)) (genls ?TEXT Text))").
 %
-:-assert_kif("(subclass Cooking Making)").
+:-assert_kif("(genls Cooking Making)").
 :-assert_kif("(documentation Cooking \"The &%Making of an &%instance of &%Food.\")").
 %
 :-assert_kif("(=> (instance ?COOK Cooking) (exists (?FOOD) (and (instance ?FOOD Food) (result ?COOK ?FOOD))))").
 %
-:-assert_kif("(subclass Pursuing IntentionalProcess)").
+:-assert_kif("(genls Pursuing IntentionalProcess)").
 :-assert_kif("(documentation Pursuing \"The class of &%IntentionalProcesses where something is sought . Some examples would be hunting, shopping, trawling, and stalking.\")").
 %
 :-assert_kif("(=> (instance ?PURSUE Pursuing) (exists (?OBJ) (and (instance ?OBJ Object) (patient ?PURSUE ?OBJ))))").
@@ -4715,40 +4715,40 @@
 %
 :-assert_kif("(=> (and (instance ?PURSUE Pursuing) (agent ?PURSUE ?AGENT) (patient ?PURSUE ?OBJ)) (holdsDuring ?PURSUE (not (possesses ?AGENT ?OBJ))))").
 %
-:-assert_kif("(subclass Investigating IntentionalPsychologicalProcess)").
+:-assert_kif("(genls Investigating IntentionalPsychologicalProcess)").
 :-assert_kif("(documentation Investigating \"The class of &%IntentionalPsychologicalProcesses where the &%agent attempts to obtaina information (i.e. a &%Proposition denoted by a &%Formula).\")").
 %
 :-assert_kif("(=> (and (instance ?INVESTIGATE Investigating) (patient ?INVESTIGATE ?PROP)) (instance ?PROP Formula))").
 %
 :-assert_kif("(=> (and (instance ?INVESTIGATE Investigating) (agent ?INVESTIGATE ?AGENT) (patient ?INVESTIGATE ?PROP)) (holdsDuring (WhenFn ?INVESTIGATE) (not (knows ?AGENT ?PROP))))").
 %
-:-assert_kif("(subclass DiagnosticProcess Investigating)").
+:-assert_kif("(genls DiagnosticProcess Investigating)").
 :-assert_kif("(documentation DiagnosticProcess \"A &%Process that is carried out for the purpose of determining the nature of a &%DiseaseOrSyndrome.\")").
 %
 :-assert_kif("(=> (and (instance ?PROC DiagnosticProcess) (agent ?PROC ?AGENT)) (exists (?CAUSE) (hasPurposeForAgent ?PROC (knows ?AGENT (causes ?CAUSE ?PROC)) ?AGENT)))").
 %
-:-assert_kif("(subclass SocialInteraction IntentionalProcess)").
-:-assert_kif("(documentation SocialInteraction \"The &%subclass of &%IntentionalProcess that involves interactions between &%CognitiveAgents.\")").
+:-assert_kif("(genls SocialInteraction IntentionalProcess)").
+:-assert_kif("(documentation SocialInteraction \"The &%genls of &%IntentionalProcess that involves interactions between &%CognitiveAgents.\")").
 %
 :-assert_kif("(=> (instance ?INTERACTION SocialInteraction) (exists (?AGENT1 ?AGENT2) (and (agent ?INTERACTION ?AGENT1) (agent ?INTERACTION ?AGENT2) (not (equal ?AGENT1 ?AGENT2)))))").
 %
-:-assert_kif("(subclass Pretending SocialInteraction)").
+:-assert_kif("(genls Pretending SocialInteraction)").
 :-assert_kif("(documentation Pretending \"Any &%SocialInteraction where a &%CognitiveAgent or &%Group of &%CognitiveAgents attempts to make another &%CognitiveAgent or &%Group of &%CognitiveAgents believe something that is false. This covers deceit, affectation, impersonation , and entertainment productions, to give just a few examples .\")").
 %
 :-assert_kif("(=> (instance ?PRETEND Pretending) (exists (?PERSON ?PROP) (and (hasPurpose ?PRETEND (believes ?PERSON ?PROP)) (true ?PROP True))))").
 %
-:-assert_kif("(subclass Communicating SocialInteraction)").
+:-assert_kif("(genls Communicating SocialInteraction)").
 :-assert_kif("(relatedInternalConcept Communicating ContentDevelopment)").
 :-assert_kif("(documentation Communicating \"A &%SocialInteraction that involves the transfer of information between two or more &%CognitiveAgents. Note that &%Communicating is closely related to, but essentially different from, &%ContentDevelopment. The latter involves the creation or modification of a &%ContentBearingObject, while &%Communicating is the transfer of information for the purpose of conveying a message. The product of the process Communicating is a Communication, which is a Proposition. See realization -- Communicating is the realization of a Proposition.\")").
 %
 :-assert_kif("(=> (instance ?COMMUNICATE Communicating) (exists (?PHYS ?ENTITY ?AGENT1 ?AGENT2) (and (refers ?PHYS ?ENTITY) (patient ?COMMUNICATE ?PHYS) (instance ?AGENT1 CognitiveAgent) (agent ?COMMUNICATE ?AGENT1) (instance ?AGENT2 CognitiveAgent) (destination ?COMMUNICATE ?AGENT2))))").
 %
-:-assert_kif("(subclass Disseminating Communicating)").
+:-assert_kif("(genls Disseminating Communicating)").
 :-assert_kif("(documentation Disseminating \"Any &%Communicating that involves a single &%agent and many &%destinations. This covers the release of a published book, broadcasting, a theatrical performance, giving orders to assembled troops, delivering a public lecture, etc.\")").
 %
 :-assert_kif("(=> (instance ?DISSEMINATE Disseminating) (exists (?AGENT1 ?AGENT2) (and (destination ?DISSEMINATE ?AGENT1) (instance ?AGENT1 CognitiveAgent) (destination ?DISSEMINATE ?AGENT2) (instance ?AGENT2 CognitiveAgent) (not (equal ?AGENT1 ?AGENT2)))))").
 %
-:-assert_kif("(subclass Demonstrating Disseminating)").
+:-assert_kif("(genls Demonstrating Disseminating)").
 :-assert_kif("(documentation Demonstrating \"Exhibiting something or a range of things before the public in a particular location. This would cover software demos , theatrical plays, lectures, dance and music recitals, museum exhibitions , etc.\")").
 %
 :-assert_kif("(=> (instance ?DEMO Demonstrating) (exists (?PERSON) (attends ?DEMO ?PERSON)))").
@@ -4758,140 +4758,140 @@
 :-assert_kif("(domain attends 2 Human)").
 :-assert_kif("(documentation attends \" (&%attends ?DEMO ?PERSON) means that ?PERSON attends, i .e. is a member of the audience, of the performance event ?DEMO.\")").
 %
-:-assert_kif("(subclass Advertising Disseminating)").
+:-assert_kif("(genls Advertising Disseminating)").
 :-assert_kif("(documentation Advertising \"A &%Disseminating whose purpose is to promote the sale of an &%Object represented in a &%Text or &%Icon (the advertisement).\")").
 %
 :-assert_kif("(=> (instance ?ADVERT Advertising) (exists (?OBJ) (and (refers ?ADVERT ?OBJ) (hasPurpose ?ADVERT (exists (?SALE) (and (instance ?SALE Selling) (patient ?SALE ?OBJ)))))))").
 %
-:-assert_kif("(subclass Expressing Communicating)").
+:-assert_kif("(genls Expressing Communicating)").
 :-assert_kif("(partition Expressing Gesture ExpressingInLanguage)").
 :-assert_kif("(disjointDecomposition Expressing ExpressingApproval ExpressingDisapproval)").
-:-assert_kif("(documentation Expressing \"Instances of this &%Class express a state of the &%agent. For example, Jane thanked Barbara for the present she had given her. The thanking in this case expresses the gratitude of Jane towards Barbara. Note that &%Expressing, unlike the other speech act types, is not a subclass of &%LinguisticCommunication. This is because emotions, for example, can be expressed without language, e.g. by smiling.\")").
+:-assert_kif("(documentation Expressing \"Instances of this &%Class express a state of the &%agent. For example, Jane thanked Barbara for the present she had given her. The thanking in this case expresses the gratitude of Jane towards Barbara. Note that &%Expressing, unlike the other speech act types, is not a genls of &%LinguisticCommunication. This is because emotions, for example, can be expressed without language, e.g. by smiling.\")").
 %
 :-assert_kif("(=> (and (instance ?EXPRESS Expressing) (agent ?EXPRESS ?AGENT)) (exists (?STATE) (and (instance ?STATE StateOfMind) (attribute ?AGENT ?STATE) (represents ?EXPRESS ?STATE))))").
 %
-:-assert_kif("(subclass Gesture Expressing)").
-:-assert_kif("(subclass Gesture BodyMotion)").
+:-assert_kif("(genls Gesture Expressing)").
+:-assert_kif("(genls Gesture BodyMotion)").
 :-assert_kif("(documentation Gesture \"Any &%BodyMotion, e.g. a hand wave, a nod of the head , a smile, which expresses a &%StateOfMind.\")").
 %
 :-assert_kif("(=> (and (instance ?GESTURE Gesture) (agent ?GESTURE ?AGENT)) (exists (?STATE) (and (instance ?STATE StateOfMind) (attribute ?AGENT ?STATE) (represents ?GESTURE ?STATE))))").
 %
-:-assert_kif("(subclass ExpressingInLanguage Expressing)").
-:-assert_kif("(subclass ExpressingInLanguage LinguisticCommunication)").
+:-assert_kif("(genls ExpressingInLanguage Expressing)").
+:-assert_kif("(genls ExpressingInLanguage LinguisticCommunication)").
 :-assert_kif("(documentation ExpressingInLanguage \"Any instance of &%Expressing that is also an instance of &%LinguisticCommunication, e.g. thanking someone, expressing condolence, expressing disapproval with an utterance rather than a &%Gesture, etc.\")").
 %
-:-assert_kif("(subclass LinguisticCommunication Communicating)").
+:-assert_kif("(genls LinguisticCommunication Communicating)").
 :-assert_kif("(partition LinguisticCommunication Stating Supposing Directing Committing ExpressingInLanguage Declaring)").
 :-assert_kif("(documentation LinguisticCommunication \"A &%Communicating that involves the transfer of information via a &%LinguisticExpression.\")").
 %
 :-assert_kif("(=> (instance ?COMMUNICATE LinguisticCommunication) (exists (?OBJ) (and (represents ?COMMUNICATE ?OBJ) (instance ?OBJ LinguisticExpression) (patient ?COMMUNICATE ?OBJ))))").
 %
-:-assert_kif("(subclass Stating LinguisticCommunication)").
+:-assert_kif("(genls Stating LinguisticCommunication)").
 :-assert_kif("(documentation Stating \"Instances of this &%Class commit the &%agent to some truth. For example, John claimed that the moon is made of green cheese.\")").
 %
 :-assert_kif("(=> (and (instance ?STATE Stating) (agent ?STATE ?AGENT) (patient ?STATE ?FORMULA) (instance ?FORMULA Formula)) (holdsDuring (WhenFn ?STATE) (believes ?AGENT ?FORMULA)))").
 %
-:-assert_kif("(subclass Supposing LinguisticCommunication)").
+:-assert_kif("(genls Supposing LinguisticCommunication)").
 :-assert_kif("(documentation Supposing \"Instances of this &%Class suppose, for the sake of argument , that a proposition is true. For example, John considered what he would do if he won the lottery.\")").
 %
-:-assert_kif("(subclass Directing LinguisticCommunication)").
+:-assert_kif("(genls Directing LinguisticCommunication)").
 :-assert_kif("(documentation Directing \"Instances of this &%Class urge some further action among the receivers. A &%Directing can be an &%Ordering, a &%Requesting or a &%Questioning.\")").
 %
-:-assert_kif("(subclass Ordering Directing)").
+:-assert_kif("(genls Ordering Directing)").
 :-assert_kif("(documentation Ordering \"A &%Directing in which the receiver is commanded to realize the content of a &%ContentBearingObject. Orders are injunctions, the disobedience of which involves sanctions, or which express an obligation upon the part of the orderee.\")").
 %
 :-assert_kif("(=> (and (instance ?ORDER Ordering) (patient ?ORDER ?FORMULA)) (modalAttribute ?FORMULA Obligatory))").
 %
-:-assert_kif("(subclass Requesting Directing)").
+:-assert_kif("(genls Requesting Directing)").
 :-assert_kif("(documentation Requesting \"A request expresses a desire that some future action be performed. For example, the 5th Battalion requested air support from the 3rd Bomber Group. Note that this class covers proposals, recommendations , suggestions, etc.\")").
 %
 :-assert_kif("(=> (and (instance ?REQUEST Requesting) (agent ?REQUEST ?AGENT) (patient ?REQUEST ?FORMULA) (instance ?FORMULA Formula)) (desires ?AGENT ?FORMULA))").
 %
-:-assert_kif("(subclass Questioning Directing)").
+:-assert_kif("(genls Questioning Directing)").
 :-assert_kif("(documentation Questioning \"A request for information. For example, John asked Bill if the President had said anything about taxes in his State of the Union address.\")").
 %
 :-assert_kif("(=> (and (instance ?QUESTION Questioning) (agent ?QUESTION ?AGENT) (patient ?QUESTION ?FORMULA) (instance ?FORMULA Formula)) (holdsDuring (WhenFn ?QUESTION) (not (knows ?AGENT ?FORMULA))))").
 %
-:-assert_kif("(subclass Committing LinguisticCommunication)").
+:-assert_kif("(genls Committing LinguisticCommunication)").
 :-assert_kif("(documentation Committing \"Instances of this &%Class commit the &%agent to some future course. For example, Bob promised Susan that he would be home by 11pm.\")").
 %
 :-assert_kif("(=> (and (instance ?COMMIT Committing) (patient ?COMMIT ?FORMULA) (instance ?FORMULA Formula)) (modalAttribute ?FORMULA Promise))").
 %
-:-assert_kif("(subclass Offering Committing)").
-:-assert_kif("(documentation Offering \"The subclass of &%Committing in which a &%CognitiveAgent offers something &%Physical to another agent. Offerings may be unconditional (in which case they are a promise to effect a &%UnilateralGiving) or conditional (in which case they are a promise to effect a &%Transaction of some sort).\")").
+:-assert_kif("(genls Offering Committing)").
+:-assert_kif("(documentation Offering \"The genls of &%Committing in which a &%CognitiveAgent offers something &%Physical to another agent. Offerings may be unconditional (in which case they are a promise to effect a &%UnilateralGiving) or conditional (in which case they are a promise to effect a &%Transaction of some sort).\")").
 %
-:-assert_kif("(subclass Declaring LinguisticCommunication)").
+:-assert_kif("(genls Declaring LinguisticCommunication)").
 :-assert_kif("(documentation Declaring \"The &%Class of &%LinguisticCommunications that effect an institutional alteration when performed by competent authority. Some examples are nominating, marrying, and excommunicating.\")").
 %
 :-assert_kif("(=> (and (instance ?DECLARE Declaring) (agent ?DECLARE ?AGENT1)) (exists (?PROC ?AGENT2) (or (confersRight ?PROC ?DECLARE ?AGENT2) (confersObligation ?PROC ?DECLARE ?AGENT2))))").
 %
-:-assert_kif("(subclass Wedding Declaring)").
+:-assert_kif("(genls Wedding Declaring)").
 :-assert_kif("(documentation Wedding \"Any &%Declaring that leads to one person being the &%spouse of another.\")").
 %
 :-assert_kif("(=> (instance ?WED Wedding) (exists (?PERSON1 ?PERSON2) (result ?WED (spouse ?PERSON1 ?PERSON2))))").
 %
-:-assert_kif("(subclass Naming Declaring)").
+:-assert_kif("(genls Naming Declaring)").
 :-assert_kif("(documentation Naming \"The &%Process of assigning a name to someone or something.\")").
 %
 :-assert_kif("(=> (and (instance ?PROCESS Naming) (patient ?PROCESS ?THING) (destination ?PROCESS ?NAME)) (holdsDuring (FutureFn (WhenFn ?PROCESS)) (names ?NAME ?THING)))").
 %
-:-assert_kif("(subclass Cooperation SocialInteraction)").
-:-assert_kif("(documentation Cooperation \"The &%subclass of &%SocialInteraction where the participants involved work together for the achievement of a common goal .\")").
+:-assert_kif("(genls Cooperation SocialInteraction)").
+:-assert_kif("(documentation Cooperation \"The &%genls of &%SocialInteraction where the participants involved work together for the achievement of a common goal .\")").
 %
 :-assert_kif("(=> (instance ?COOPERATE Cooperation) (exists (?PURP) (forall (?AGENT) (=> (agent ?COOPERATE ?AGENT) (hasPurposeForAgent ?COOPERATE ?PURP ?AGENT)))))").
 %
-:-assert_kif("(subclass Meeting SocialInteraction)").
+:-assert_kif("(genls Meeting SocialInteraction)").
 :-assert_kif("(documentation Meeting \"The coming together of two or more &%CognitiveAgents for the purpose of &%Communicating. This covers informal meetings , e.g. visits with family members, and formal meetings, e.g. a board of directors meeting.\")").
 %
 :-assert_kif("(=> (and (instance ?MEET Meeting) (agent ?MEET ?AGENT1) (agent ?MEET ?AGENT2)) (holdsDuring (WhenFn ?MEET) (orientation ?AGENT1 ?AGENT2 Near)))").
 %
 :-assert_kif("(=> (instance ?MEET Meeting) (exists (?AGENT1 ?AGENT2) (and (agent ?MEET ?AGENT1) (agent ?MEET ?AGENT2) (hasPurpose ?MEET (exists (?COMM) (and (instance ?COMM Communicating) (agent ?COMM ?AGENT1) (agent ?COMM ?AGENT2)))))))").
 %
-:-assert_kif("(subclass Contest SocialInteraction)").
+:-assert_kif("(genls Contest SocialInteraction)").
 :-assert_kif("(documentation Contest \"A &%SocialInteraction where the &%agent and &%patient are &%CognitiveAgents who are trying to defeat one another. Note that this concept is often applied in a metaphorical sense in natural language , when we speak, e.g., of the struggle of plants for space or sunlight , or of bacteria for food resources in some environment.\")").
 %
 :-assert_kif("(=> (instance ?CONTEST Contest) (exists (?AGENT1 ?AGENT2 ?PURP1 ?PURP2) (and (agent ?CONTEST ?AGENT1) (agent ?CONTEST ?AGENT2) (hasPurposeForAgent ?CONTEST ?PURP1 ?AGENT1) (hasPurposeForAgent ?CONTEST ?PURP2 ?AGENT2) (not (equal ?AGENT1 ?AGENT2)) (not (equal ?PURP1 ?PURP2)))))").
 %
-:-assert_kif("(subclass ViolentContest Contest)").
+:-assert_kif("(genls ViolentContest Contest)").
 :-assert_kif("(documentation ViolentContest \"A &%Contest where one participant attempts to physically injure another participant.\")").
 %
-:-assert_kif("(subclass War ViolentContest)").
+:-assert_kif("(genls War ViolentContest)").
 :-assert_kif("(documentation War \"A military confrontation between two or more &%GeopoliticalAreas or &%Organizations whose members are &%GeopoliticalAreas. As the corresponding axiom specifies, a &%War is made up of &%Battles.\")").
 %
 :-assert_kif("(=> (instance ?WAR War) (exists (?BATTLE) (and (instance ?BATTLE Battle) (subProcess ?BATTLE ?WAR))))").
 %
 :-assert_kif("(=> (and (instance ?WAR War) (agent ?WAR ?AGENT)) (or (instance ?AGENT GeopoliticalArea) (and (instance ?AGENT Organization) (forall (?MEMBER) (=> (member ?MEMBER ?AGENT) (instance ?MEMBER GeopoliticalArea))))))").
 %
-:-assert_kif("(subclass Battle ViolentContest)").
+:-assert_kif("(genls Battle ViolentContest)").
 :-assert_kif("(documentation Battle \"A &%ViolentContest between two or more military units within the context of a war. Note that this does not cover the metaphorical sense of 'battle', which simply means a struggle of some sort . This sense should be represented with the more general concept of &%Contest.\")").
 %
 :-assert_kif("(=> (instance ?BATTLE Battle) (exists (?WAR) (and (instance ?WAR War) (subProcess ?BATTLE ?WAR))))").
 %
 :-assert_kif("(=> (instance ?BATTLE Battle) (exists (?ATTACK) (and (instance ?ATTACK ViolentContest) (subProcess ?ATTACK ?BATTLE))))").
 %
-:-assert_kif("(subclass Game Contest)").
-:-assert_kif("(subclass Game RecreationOrExercise)").
+:-assert_kif("(genls Game Contest)").
+:-assert_kif("(genls Game RecreationOrExercise)").
 :-assert_kif("(documentation Game \"A &%Contest whose purpose is the enjoyment /stimulation of the participants or spectators of the &%Game.\")").
 %
-:-assert_kif("(subclass Sport Game)").
+:-assert_kif("(genls Sport Game)").
 :-assert_kif("(documentation Sport \"A &%Game which requires some degree of physical exercion from the participants of the game.\")").
 %
-:-assert_kif("(subclass LegalAction Contest)").
+:-assert_kif("(genls LegalAction Contest)").
 :-assert_kif("(documentation LegalAction \"Any &%Process where a &%CognitiveAgent seeks to obtain something through a court of law.\")").
 %
-:-assert_kif("(subclass Maneuver IntentionalProcess)").
+:-assert_kif("(genls Maneuver IntentionalProcess)").
 :-assert_kif("(documentation Maneuver \"An intentional move or play within a &%Contest. In many cases, a &%Maneuver is a realization of part of a strategy for winning the &%Contest, but it also may be just an arbitrary or semi-arbitrary division of the overarching &%Contest, e.g. innings in a baseball game.\")").
 %
 :-assert_kif("(=> (instance ?MOVE Maneuver) (exists (?CONTEST) (and (instance ?CONTEST Contest) (subProcess ?MOVE ?CONTEST))))").
 %
-:-assert_kif("(subclass Attack Maneuver)").
+:-assert_kif("(genls Attack Maneuver)").
 :-assert_kif("(documentation Attack \"A &%Maneuver in a &%ViolentContest where the &%agent attempts to inflict damage on the &%patient.\")").
 %
 :-assert_kif("(=> (instance ?ATTACK Attack) (exists (?CONTEST) (and (instance ?CONTEST ViolentContest) (subProcess ?ATTACK ?CONTEST))))").
 %
 :-assert_kif("(=> (and (instance ?ATTACK Attack) (agent ?ATTACK ?AGENT) (patient ?ATTACK ?OBJ)) (hasPurposeForAgent ?ATTACK (exists (?DAMAGE) (and (instance ?DAMAGE Damaging) (patient ?DAMAGE ?OBJ))) ?AGENT))").
 %
-:-assert_kif("(subclass DefensiveManeuver Maneuver)").
+:-assert_kif("(genls DefensiveManeuver Maneuver)").
 :-assert_kif("(documentation DefensiveManeuver \"A &%Maneuver in a &%ViolentContest where the &%agent attempts to avoid being damaged.\")").
 %
 :-assert_kif("(=> (instance ?DEFENSE DefensiveManeuver) (exists (?CONTEST) (and (instance ?CONTEST ViolentContest) (subProcess ?DEFENSE ?CONTEST))))").
@@ -4900,96 +4900,96 @@
 %
 :-assert_kif("(=> (and (instance ?MANEUVER Maneuver) (instance ?CONTEST ViolentContest) (subProcess ?MANEUVER ?CONTEST)) (or (instance ?MANEUVER Attack) (instance ?MANEUVER DefensiveManeuver)))").
 %
-:-assert_kif("(subclass Perception PsychologicalProcess)").
+:-assert_kif("(genls Perception PsychologicalProcess)").
 :-assert_kif("(documentation Perception \"Sensing some aspect of the material world. Note that the &%agent of this sensing is assumed to be an &%Animal.\")").
 %
 :-assert_kif("(=> (and (instance ?PERCEPT Perception) (agent ?PERCEPT ?AGENT)) (instance ?AGENT Animal))").
 %
 :-assert_kif("(=> (instance ?AGENT SentientAgent) (capability Perception experiencer ?AGENT))").
 %
-:-assert_kif("(subclass Seeing Perception)").
-:-assert_kif("(documentation Seeing \"The &%subclass of &%Perception in which the sensing is done by an ocular &%Organ.\")").
+:-assert_kif("(genls Seeing Perception)").
+:-assert_kif("(documentation Seeing \"The &%genls of &%Perception in which the sensing is done by an ocular &%Organ.\")").
 %
 :-assert_kif("(=> (and (instance ?SEE Seeing) (agent ?SEE ?AGENT) (patient ?SEE ?OBJ)) (and (attribute ?OBJ Illuminated) (exists (?PROP) (and (instance ?PROP ColorAttribute) (knows ?AGENT (attribute ?OBJ ?PROP))))))").
 %
-:-assert_kif("(subclass Looking Seeing)").
-:-assert_kif("(subclass Looking IntentionalProcess)").
+:-assert_kif("(genls Looking Seeing)").
+:-assert_kif("(genls Looking IntentionalProcess)").
 :-assert_kif("(documentation Looking \"Any instance of &%Seeing which is intentional.\")").
 %
-:-assert_kif("(subclass Smelling Perception)").
-:-assert_kif("(documentation Smelling \"The &%subclass of &%Perception in which the sensing is done by an olefactory &%Organ.\")").
+:-assert_kif("(genls Smelling Perception)").
+:-assert_kif("(documentation Smelling \"The &%genls of &%Perception in which the sensing is done by an olefactory &%Organ.\")").
 %
 :-assert_kif("(=> (and (instance ?SMELL Smelling) (patient ?SMELL ?OBJ)) (exists (?ATTR) (and (instance ?ATTR OlfactoryAttribute) (attribute ?OBJ ?ATTR))))").
 %
-:-assert_kif("(subclass Tasting Perception)").
-:-assert_kif("(documentation Tasting \"The &%subclass of &%Perception in which the sensing is done by of an &%Organ which can discriminate various tastes.\")").
+:-assert_kif("(genls Tasting Perception)").
+:-assert_kif("(documentation Tasting \"The &%genls of &%Perception in which the sensing is done by of an &%Organ which can discriminate various tastes.\")").
 %
 :-assert_kif("(=> (and (instance ?TASTE Tasting) (patient ?TASTE ?OBJ)) (exists (?ATTR) (and (instance ?ATTR TasteAttribute) (attribute ?OBJ ?ATTR))))").
 %
-:-assert_kif("(subclass Hearing Perception)").
-:-assert_kif("(documentation Hearing \"The &%subclass of &%Perception in which the sensing is done by an auditory &%Organ.\")").
+:-assert_kif("(genls Hearing Perception)").
+:-assert_kif("(documentation Hearing \"The &%genls of &%Perception in which the sensing is done by an auditory &%Organ.\")").
 %
 :-assert_kif("(=> (and (instance ?HEAR Hearing) (patient ?HEAR ?OBJ)) (exists (?ATTR) (and (instance ?ATTR SoundAttribute) (attribute ?OBJ ?ATTR))))").
 %
-:-assert_kif("(subclass Listening Hearing)").
-:-assert_kif("(subclass Listening IntentionalProcess)").
+:-assert_kif("(genls Listening Hearing)").
+:-assert_kif("(genls Listening IntentionalProcess)").
 :-assert_kif("(documentation Listening \"Any instance of &%Hearing which is intentional.\")").
 %
-:-assert_kif("(subclass TactilePerception Perception)").
-:-assert_kif("(documentation TactilePerception \"The &%subclass of &%Perception in which the sensing is done by &%Touching. Note that &%Touching need not involve &%TactilePerception. For example, a person who has lost all sensation in both of his legs would have no &%TactilePerception of anything his legs were &%Touching.\")").
+:-assert_kif("(genls TactilePerception Perception)").
+:-assert_kif("(documentation TactilePerception \"The &%genls of &%Perception in which the sensing is done by &%Touching. Note that &%Touching need not involve &%TactilePerception. For example, a person who has lost all sensation in both of his legs would have no &%TactilePerception of anything his legs were &%Touching.\")").
 %
 :-assert_kif("(=> (instance ?TACTILE TactilePerception) (exists (?TOUCH) (and (instance ?TOUCH Touching) (subProcess ?TOUCH ?TACTILE))))").
 %
-:-assert_kif("(subclass Radiating Motion)").
+:-assert_kif("(genls Radiating Motion)").
 :-assert_kif("(documentation Radiating \"Processes in which some form of electromagnetic radiation , e.g. radio waves, light waves, electrical energy, etc., is given off or absorbed by something else.\")").
 %
-:-assert_kif("(subclass RadiatingLight Radiating)").
-:-assert_kif("(documentation RadiatingLight \"The &%subclass of &%Radiating in which light is given off or absorbed. Some examples include blinking, flashing, and glittering.\")").
+:-assert_kif("(genls RadiatingLight Radiating)").
+:-assert_kif("(documentation RadiatingLight \"The &%genls of &%Radiating in which light is given off or absorbed. Some examples include blinking, flashing, and glittering.\")").
 %
 :-assert_kif("(<=> (exists (?EMIT) (and (instance ?EMIT RadiatingLight) (patient ?EMIT ?REGION) (instance ?REGION Region))) (attribute ?REGION Illuminated))").
 %
-:-assert_kif("(subclass RadiatingSound Radiating)").
-:-assert_kif("(documentation RadiatingSound \"The &%subclass of &%Radiating in which sound waves are given off or absorbed. Some examples include creaking, roaring , and whistling.\")").
+:-assert_kif("(genls RadiatingSound Radiating)").
+:-assert_kif("(documentation RadiatingSound \"The &%genls of &%Radiating in which sound waves are given off or absorbed. Some examples include creaking, roaring , and whistling.\")").
 %
 :-assert_kif("(=> (and (instance ?EMIT RadiatingSound) (agent ?EMIT ?SOUND)) (exists (?ATTR) (and (instance ?ATTR SoundAttribute) (attribute ?SOUND ?ATTR))))").
 %
-:-assert_kif("(subclass Music RadiatingSound)").
+:-assert_kif("(genls Music RadiatingSound)").
 :-assert_kif("(partition Music MonophonicMusic PolyphonicMusic)").
-:-assert_kif("(documentation Music \"The &%subclass of &%RadiatingSound where the sound is intended to be melodic and is produced deliberately.\")").
+:-assert_kif("(documentation Music \"The &%genls of &%RadiatingSound where the sound is intended to be melodic and is produced deliberately.\")").
 %
-:-assert_kif("(subclass RadiatingElectromagnetic Radiating)").
-:-assert_kif("(documentation RadiatingElectromagnetic \"&%RadiatingElectromagnetic is the subclass of &%Radiating processes in which electromagnetic radiation is transmitted or absorbed.\")").
+:-assert_kif("(genls RadiatingElectromagnetic Radiating)").
+:-assert_kif("(documentation RadiatingElectromagnetic \"&%RadiatingElectromagnetic is the genls of &%Radiating processes in which electromagnetic radiation is transmitted or absorbed.\")").
 %
-:-assert_kif("(subclass RadiatingNuclear Radiating)").
+:-assert_kif("(genls RadiatingNuclear Radiating)").
 :-assert_kif("(documentation RadiatingNuclear \"Releasing atomic energy, i.e. energy from a nuclear reaction.\")").
 %
-:-assert_kif("(subclass StateChange InternalChange)").
+:-assert_kif("(genls StateChange InternalChange)").
 :-assert_kif("(documentation StateChange \"Any &%Process where the &%PhysicalState of &%part of the &%patient of the &%Process changes.\")").
 %
 :-assert_kif("(=> (and (instance ?PROCESS StateChange) (patient ?PROCESS ?OBJ)) (exists (?PART ?STATE1 ?STATE2) (and (part ?PART ?OBJ) (instance ?STATE1 PhysicalState) (instance ?STATE2 PhysicalState) (not (equal ?STATE1 ?STATE2)) (holdsDuring (BeginFn (WhenFn ?PROCESS)) (attribute ?PART ?STATE1)) (holdsDuring (EndFn (WhenFn ?PROCESS)) (attribute ?PART ?STATE2)))))").
 %
-:-assert_kif("(subclass Melting StateChange)").
+:-assert_kif("(genls Melting StateChange)").
 :-assert_kif("(documentation Melting \"The &%Class of &%Processes where an &%Object is heated and converted from a &%Solid to a &%Liquid.\")").
 %
 :-assert_kif("(=> (instance ?MELT Melting) (exists (?HEAT) (and (instance ?HEAT Heating) (subProcess ?HEAT ?MELT))))").
 %
 :-assert_kif("(=> (and (instance ?MELT Melting) (patient ?MELT ?OBJ)) (exists (?PART) (and (part ?PART ?OBJ) (holdsDuring (BeginFn (WhenFn ?MELT)) (attribute ?PART Solid)) (holdsDuring (EndFn (WhenFn ?MELT)) (attribute ?PART Liquid)))))").
 %
-:-assert_kif("(subclass Boiling StateChange)").
+:-assert_kif("(genls Boiling StateChange)").
 :-assert_kif("(documentation Boiling \"The &%Class of &%Processes where an &%Object is heated and converted from a &%Liquid to a &%Gas.\")").
 %
 :-assert_kif("(=> (instance ?BOIL Boiling) (exists (?HEAT) (and (instance ?HEAT Heating) (subProcess ?HEAT ?BOIL))))").
 %
 :-assert_kif("(=> (and (instance ?BOIL Boiling) (patient ?BOIL ?OBJ)) (exists (?PART) (and (part ?PART ?OBJ) (holdsDuring (BeginFn (WhenFn ?BOIL)) (attribute ?PART Liquid)) (holdsDuring (EndFn (WhenFn ?BOIL)) (attribute ?PART Gas)))))").
 %
-:-assert_kif("(subclass Condensing StateChange)").
+:-assert_kif("(genls Condensing StateChange)").
 :-assert_kif("(documentation Condensing \"The &%Class of &%Processes where an &%Object is cooled and converted from a &%Gas to a &%Liquid.\")").
 %
 :-assert_kif("(=> (instance ?COND Condensing) (exists (?COOL) (and (instance ?COOL Cooling) (subProcess ?COOL ?COND))))").
 %
 :-assert_kif("(=> (and (instance ?COND Condensing) (patient ?COND ?OBJ)) (exists (?PART) (and (part ?PART ?OBJ) (holdsDuring (BeginFn (WhenFn ?COND)) (attribute ?PART Gas)) (holdsDuring (EndFn (WhenFn ?COND)) (attribute ?PART Liquid)))))").
 %
-:-assert_kif("(subclass Freezing StateChange)").
+:-assert_kif("(genls Freezing StateChange)").
 :-assert_kif("(documentation Freezing \"The &%Class of &%Processes where an &%Object is cooled and converted from a &%Liquid to a &%Solid.\")").
 %
 :-assert_kif("(=> (instance ?FREEZE Freezing) (exists (?COOL) (and (instance ?COOL Cooling) (subProcess ?COOL ?FREEZE))))").
@@ -5005,11 +5005,11 @@
 % :-assert_kif(";INCLUDES 'MEREOTOPOLOGY' ").
 % :-assert_kif(";INCLUDES 'PROCESSES' ").
 % :-assert_kif(";INCLUDES 'QUALITIES' ").
-:-assert_kif("(subclass AstronomicalBody Region)").
+:-assert_kif("(genls AstronomicalBody Region)").
 :-assert_kif("(disjoint AstronomicalBody GeographicArea)").
 :-assert_kif("(documentation AstronomicalBody \"The &%Class of all astronomical objects of significant size. It includes &%SelfConnectedObjects like planets, stars, and asteroids, as well as &%Collections like nebulae , galaxies, and constellations. Note that the planet Earth is an &%AstronomicalBody, but every &%Region of Earth is a &%GeographicArea.\")").
 %
-:-assert_kif("(subclass GeographicArea Region)").
+:-assert_kif("(genls GeographicArea Region)").
 :-assert_kif("(partition GeographicArea WaterArea LandArea)").
 :-assert_kif("(documentation GeographicArea \"A geographic location, generally having definite boundaries. Note that this differs from its immediate superclass &%Region in that a &%GeographicArea is a three-dimensional &%Region of the earth . Accordingly, all astronomical objects other than earth and all one -dimensional and two-dimensional &%Regions are not classed under &%GeographicArea.\")").
 %
@@ -5022,8 +5022,8 @@
 :-assert_kif("(domain geographicSubregion 2 GeographicArea)").
 :-assert_kif("(documentation geographicSubregion \" (&%geographicSubregion ?PART ?WHOLE) means that the &%GeographicArea ?PART is part of the &%GeographicArea ?WHOLE.\")").
 %
-:-assert_kif("(subclass GeopoliticalArea GeographicArea)").
-:-assert_kif("(subclass GeopoliticalArea Agent)").
+:-assert_kif("(genls GeopoliticalArea GeographicArea)").
+:-assert_kif("(genls GeopoliticalArea Agent)").
 :-assert_kif("(documentation GeopoliticalArea \"Any &%GeographicArea which is associated with some sort of political structure. This class includes &%Lands, &%Cities, districts of cities, counties, etc. Note that the identity of a &%GeopoliticalArea may remain constant after a change in borders.\")").
 %
 :-assert_kif("(=> (and (instance ?AREA GeopoliticalArea) (leader (GovernmentFn ?AREA) ?PERSON)) (leader ?AREA ?PERSON))").
@@ -5044,41 +5044,41 @@
 %
 :-assert_kif("(=> (geopoliticalSubdivision ?SUB ?AREA) (not (instance ?SUB Nation)))").
 %
-:-assert_kif("(subclass WaterArea GeographicArea)").
+:-assert_kif("(genls WaterArea GeographicArea)").
 :-assert_kif("(documentation WaterArea \"A body which is made up predominantly of water, e .g. rivers, lakes, oceans, etc.\")").
 %
 :-assert_kif("(=> (instance ?AREA WaterArea) (exists (?BED ?HOLE ?WATER) (and (equal (PrincipalHostFn ?HOLE) ?BED) (instance ?WATER Water) (properlyFills ?WATER ?HOLE) (equal (MereologicalSumFn ?BED ?WATER) ?AREA))))").
 %
-:-assert_kif("(subclass SaltWaterArea WaterArea)").
+:-assert_kif("(genls SaltWaterArea WaterArea)").
 :-assert_kif("(disjoint SaltWaterArea FreshWaterArea)").
 :-assert_kif("(documentation SaltWaterArea \"A &%WaterArea whose &%Water is saline, e.g. oceans and seas.\")").
 %
-:-assert_kif("(subclass FreshWaterArea WaterArea)").
+:-assert_kif("(genls FreshWaterArea WaterArea)").
 :-assert_kif("(documentation FreshWaterArea \"A &%WaterArea whose &%Water is not saline, e .g. most rivers and lakes.\")").
 %
-:-assert_kif("(subclass StreamWaterArea WaterArea)").
+:-assert_kif("(genls StreamWaterArea WaterArea)").
 :-assert_kif("(disjoint StreamWaterArea StaticWaterArea)").
 :-assert_kif("(documentation StreamWaterArea \"A relatively narrow &%WaterArea where the water flows constantly and in the same direction, e.g. a river, a stream, etc .\")").
 %
-:-assert_kif("(subclass StaticWaterArea WaterArea)").
+:-assert_kif("(genls StaticWaterArea WaterArea)").
 :-assert_kif("(documentation StaticWaterArea \"A &%WaterArea in which water does not flow constantly or in the same direction, e.g. most lakes and ponds.\")").
 %
-:-assert_kif("(subclass LandArea GeographicArea)").
+:-assert_kif("(genls LandArea GeographicArea)").
 :-assert_kif("(documentation LandArea \"An area which is predominantly solid ground, e .g. a &%Nation, a mountain, a desert, etc. Note that a &%LandArea may contain some relatively small &%WaterAreas. For example, Australia is a &%LandArea even though it contains various rivers and lakes.\")").
 %
 :-assert_kif("(=> (instance ?LAND1 LandArea) (exists (?LAND2) (and (part ?LAND1 ?LAND2) (or (instance ?LAND2 Continent) (instance ?LAND2 Island)))))").
 %
-:-assert_kif("(subclass ShoreArea LandArea)").
+:-assert_kif("(genls ShoreArea LandArea)").
 :-assert_kif("(documentation ShoreArea \"A &%ShoreArea is a &%LandArea approximately 1-3 km wide bordering a body of water, such as an ocean, bay, river, or lake. A &%ShoreArea may comprise a variety of &%LandForms, such as dunes, sloughs, and marshes.\")").
 %
 :-assert_kif("(=> (instance ?BANK ShoreArea) (exists (?WATER) (and (instance ?WATER WaterArea) (meetsSpatially ?BANK ?WATER))))").
 %
-:-assert_kif("(subclass Continent LandArea)").
+:-assert_kif("(genls Continent LandArea)").
 :-assert_kif("(documentation Continent \"One of the seven largest land masses on earth, viz . Africa, North America, South America, Antarctica, Europe, Asia, and Oceania (also known by the &%Nation which is coextensive with the &%Continent - Australia).\")").
 %
 :-assert_kif("(equal (CardinalityFn Continent) 7)").
 %
-:-assert_kif("(subclass Island LandArea)").
+:-assert_kif("(genls Island LandArea)").
 :-assert_kif("(documentation Island \"A &%LandArea that is completely surrounded by a &%WaterArea.\")").
 %
 :-assert_kif("(=> (instance ?ISLAND Island) (not (exists (?AREA ?PART1 ?PART2) (and (instance ?AREA LandArea) (part ?PART1 ?ISLAND) (part ?PART2 ?AREA) (not (part ?ISLAND ?AREA)) (not (part ?AREA ?ISLAND)) (meetsSpatially ?PART1 ?PART2)))))").
@@ -5087,38 +5087,38 @@
 %
 :-assert_kif("(=> (instance ?ISLE Island) (exists (?WATER) (and (instance ?WATER WaterArea) (meetsSpatially ?ISLE ?WATER))))").
 %
-:-assert_kif("(subclass Nation GeopoliticalArea)").
-:-assert_kif("(subclass Nation LandArea)").
+:-assert_kif("(genls Nation GeopoliticalArea)").
+:-assert_kif("(genls Nation LandArea)").
 :-assert_kif("(documentation Nation \"The broadest &%GeopoliticalArea, i.e. &%Nations are &%GeopoliticalAreas that are not part of any other overarching and comprehensive governance structure (excepting commonwealths and other sorts of loose international organizations).\")").
 %
-:-assert_kif("(subclass StateOrProvince GeopoliticalArea)").
-:-assert_kif("(subclass StateOrProvince LandArea)").
+:-assert_kif("(genls StateOrProvince GeopoliticalArea)").
+:-assert_kif("(genls StateOrProvince LandArea)").
 :-assert_kif("(documentation StateOrProvince \"Administrative subdivisions of a &%Nation that are broader than any other political subdivisions that may exist. This &%Class includes the states of the United States, as well as the provinces of Canada and European countries.\")").
 %
 :-assert_kif("(=> (instance ?STATE StateOrProvince) (exists (?LAND) (and (instance ?LAND Nation) (properPart ?STATE ?LAND))))").
 %
-:-assert_kif("(subclass City GeopoliticalArea)").
-:-assert_kif("(subclass City LandArea)").
+:-assert_kif("(genls City GeopoliticalArea)").
+:-assert_kif("(genls City LandArea)").
 :-assert_kif("(documentation City \"A &%LandArea of relatively small size, inhabited by a community of people, and having some sort of political structure. Note that this class includes both large cities and small settlements like towns, villages, hamlets, etc.\")").
 %
-:-assert_kif("(subclass Transitway Region)").
-:-assert_kif("(subclass Transitway SelfConnectedObject)").
+:-assert_kif("(genls Transitway Region)").
+:-assert_kif("(genls Transitway SelfConnectedObject)").
 :-assert_kif("(documentation Transitway \"&%Transitway is the broadest class of regions which may be passed through as a &%path in instances of &%Translocation. &%Transitway includes land, air, and sea regions , and it includes both natural and artificial transitways.\")").
 %
-:-assert_kif("(subclass Roadway LandTransitway)").
-:-assert_kif("(subclass Roadway LandArea)").
-:-assert_kif("(documentation Roadway \"&%Roadway is the subclass of &%LandTransitways that are areas intended for surface travel by self-powered, wheeled vehicles , excluding those that travel on tracks. &%Roadways have been at least minimally improved to enable the passage of vehicles. &%Roadways include dirt and gravelled roads, paved streets, and expressways .\")").
+:-assert_kif("(genls Roadway LandTransitway)").
+:-assert_kif("(genls Roadway LandArea)").
+:-assert_kif("(documentation Roadway \"&%Roadway is the genls of &%LandTransitways that are areas intended for surface travel by self-powered, wheeled vehicles , excluding those that travel on tracks. &%Roadways have been at least minimally improved to enable the passage of vehicles. &%Roadways include dirt and gravelled roads, paved streets, and expressways .\")").
 %
-:-assert_kif("(subclass LandTransitway Transitway)").
-:-assert_kif("(subclass LandTransitway LandArea)").
-:-assert_kif("(documentation LandTransitway \"&%LandTransitway is the subclass of &%Transitway that represents areas intended for motion over the ground.\")").
+:-assert_kif("(genls LandTransitway Transitway)").
+:-assert_kif("(genls LandTransitway LandArea)").
+:-assert_kif("(documentation LandTransitway \"&%LandTransitway is the genls of &%Transitway that represents areas intended for motion over the ground.\")").
 %
 :-assert_kif("(=> (instance ?WAY LandTransitway) (hasPurpose (exists (?TRANSPORT) (and (instance ?TRANSPORT Transportation) (path ?TRANSPORT ?WAY)))))").
 %
-:-assert_kif("(subclass Water CompoundSubstance)").
+:-assert_kif("(genls Water CompoundSubstance)").
 :-assert_kif("(documentation Water \"The &%Class of samples of the compound H20. Note that this &%Class covers both pure and impure &%Water.\")").
 %
-:-assert_kif("(subclass Mineral Mixture)").
+:-assert_kif("(genls Mineral Mixture)").
 :-assert_kif("(documentation Mineral \" Any of various naturally occurring homogeneous substances (such as stone, coal, salt, sulfur, sand, petroleum), or synthetic substances having the chemical composition and crystalline form and properties of a naturally occurring mineral.\")").
 %
 :-assert_kif("(instance developmentalForm BinaryPredicate)").
@@ -5131,12 +5131,12 @@
 %
 :-assert_kif("(=> (and (holdsDuring ?TIME1 (developmentalForm ?OBJ ?ATTR1)) (successorAttributeClosure ?ATTR2 ?ATTR1)) (exists (?TIME2) (and (earlier ?TIME2 ?TIME1) (holdsDuring ?TIME2 (developmentalForm ?OBJ ?ATTR2)))))").
 %
-:-assert_kif("(subclass OrganicObject CorpuscularObject)").
+:-assert_kif("(genls OrganicObject CorpuscularObject)").
 :-assert_kif("(partition OrganicObject Organism AnatomicalStructure)").
 :-assert_kif("(documentation OrganicObject \"This class encompasses &%Organisms, &%CorpuscularObjects that are parts of &%Organisms, i.e. &%BodyParts, and &%CorpuscularObjects that are nonintentionally produced by &%Organisms, e.g. &%ReproductiveBodies.\")").
 %
-:-assert_kif("(subclass Organism OrganicObject)").
-:-assert_kif("(subclass Organism Agent)").
+:-assert_kif("(genls Organism OrganicObject)").
+:-assert_kif("(genls Organism Agent)").
 :-assert_kif("(partition Organism Animal Plant Microorganism)").
 :-assert_kif("(documentation Organism \"Generally, a living individual, including all &%Plants and &%Animals.\")").
 %
@@ -5165,7 +5165,7 @@
 %
 :-assert_kif("(=> (parent ?CHILD ?PARENT) (before (BeginFn (WhenFn ?PARENT)) (BeginFn (WhenFn ?CHILD))))").
 %
-:-assert_kif("(=> (and (parent ?CHILD ?PARENT) (subclass ?CLASS Organism) (instance ?PARENT ?CLASS)) (instance ?CHILD ?CLASS))").
+:-assert_kif("(=> (and (parent ?CHILD ?PARENT) (genls ?CLASS Organism) (instance ?PARENT ?CLASS)) (instance ?CHILD ?CLASS))").
 %
 :-assert_kif("(=> (parent ?CHILD ?PARENT) (or (mother ?CHILD ?PARENT) (father ?CHILD ?PARENT)))").
 %
@@ -5233,48 +5233,48 @@
 % :-assert_kif(";The following formulas incorporate the content in the Natural-Kinds ").
 % :-assert_kif(";ontology developed by ITBM-CNR. This content is essentially a set of ").
 % :-assert_kif(";high-level biological categories. ").
-:-assert_kif("(subclass Plant Organism)").
+:-assert_kif("(genls Plant Organism)").
 :-assert_kif("(documentation Plant \"An &%Organism having cellulose cell walls, growing by synthesis of &%Substances, generally distinguished by the presence of chlorophyll , and lacking the power of locomotion.\")").
 %
-:-assert_kif("(subclass FloweringPlant Plant)").
+:-assert_kif("(genls FloweringPlant Plant)").
 :-assert_kif("(documentation FloweringPlant \"A &%Plant that produces seeds and flowers. This class includes trees, shrubs, herbs, and flowers.\")").
 %
-:-assert_kif("(subclass NonFloweringPlant Plant)").
+:-assert_kif("(genls NonFloweringPlant Plant)").
 :-assert_kif("(disjoint NonFloweringPlant FloweringPlant)").
 :-assert_kif("(disjointDecomposition NonFloweringPlant Alga Fern Fungus Moss)").
 :-assert_kif("(documentation NonFloweringPlant \"A &%Plant that reproduces with spores and does not produce flowers.\")").
 %
-:-assert_kif("(subclass Alga NonFloweringPlant)").
+:-assert_kif("(genls Alga NonFloweringPlant)").
 :-assert_kif("(documentation Alga \"A chiefly aquatic plant that contains chlorophyll, but does not form embryos during development and lacks vascular tissue.\")").
 %
 :-assert_kif("(=> (instance ?ALGA Alga) (exists (?WATER) (and (inhabits ?ALGA ?WATER) (instance ?WATER Water))))").
 %
-:-assert_kif("(subclass Fungus NonFloweringPlant)").
+:-assert_kif("(genls Fungus NonFloweringPlant)").
 :-assert_kif("(documentation Fungus \"A eukaryotic &%Organism characterized by the absence of chlorophyll and the presence of rigid cell walls. Included here are both slime molds and true fungi such as yeasts, molds, mildews, and mushrooms.\")").
 %
 :-assert_kif("(=> (and (instance ?FUNGUS Fungus) (inhabits ?FUNGUS ?OBJ)) (instance ?OBJ Organism))").
 %
-:-assert_kif("(subclass Moss NonFloweringPlant)").
+:-assert_kif("(genls Moss NonFloweringPlant)").
 :-assert_kif("(documentation Moss \"A &%NonFloweringPlant without true roots and little if any vascular tissue.\")").
 %
-:-assert_kif("(subclass Fern NonFloweringPlant)").
+:-assert_kif("(genls Fern NonFloweringPlant)").
 :-assert_kif("(documentation Fern \"A &%NonFloweringPlant that contains vascular tissue. This class includes true ferns, as well as horsetails, club mosses, and whisk ferns.\")").
 %
-:-assert_kif("(subclass Animal Organism)").
+:-assert_kif("(genls Animal Organism)").
 :-assert_kif("(partition Animal Vertebrate Invertebrate)").
 :-assert_kif("(documentation Animal \"An &%Organism with eukaryotic &%Cells, and lacking stiff cell walls, plastids, and photosynthetic pigments.\")").
 %
-:-assert_kif("(subclass Microorganism Organism)").
+:-assert_kif("(genls Microorganism Organism)").
 :-assert_kif("(documentation Microorganism \"An &%Organism that can be seen only with the aid of a microscope.\")").
 %
-:-assert_kif("(subclass Bacterium Microorganism)").
+:-assert_kif("(genls Bacterium Microorganism)").
 :-assert_kif("(documentation Bacterium \"A small, typically one-celled, prokaryotic &%Microorganism.\")").
 %
 :-assert_kif("(=> (instance ?BACTERIUM Bacterium) (exists (?CELL1) (and (component ?CELL1 ?BACTERIUM) (instance ?CELL1 Cell) (forall (?CELL2) (=> (and (component ?CELL2 ?BACTERIUM) (instance ?CELL2 Cell)) (equal ?CELL1 ?CELL2))))))").
 %
 :-assert_kif("(=> (and (instance ?BACTERIUM Bacterium) (inhabits ?BACTERIUM ?OBJ)) (instance ?OBJ Organism))").
 %
-:-assert_kif("(subclass Virus Microorganism)").
+:-assert_kif("(genls Virus Microorganism)").
 :-assert_kif("(documentation Virus \"An &%Organism consisting of a core of a single nucleic acid enclosed in a protective coat of protein. A virus may replicate only inside a host living cell. A virus exhibits some but not all of the usual characteristics of living things.\")").
 %
 :-assert_kif("(=> (instance ?VIRUS Virus) (exists (?MOL1) (and (component ?MOL1 ?VIRUS) (instance ?MOL1 Molecule) (forall (?MOL2) (=> (and (component ?MOL2 ?VIRUS) (instance ?MOL2 Molecule)) (equal ?MOL1 ?MOL2))))))").
@@ -5283,156 +5283,156 @@
 %
 :-assert_kif("(=> (and (instance ?VIRUS Virus) (instance ?PROC Replication) (agent ?PROC ?VIRUS)) (exists (?CELL) (and (located ?PROC ?CELL) (instance ?CELL Cell))))").
 %
-:-assert_kif("(subclass Vertebrate Animal)").
+:-assert_kif("(genls Vertebrate Animal)").
 :-assert_kif("(documentation Vertebrate \"An &%Animal which has a spinal column.\")").
 %
-:-assert_kif("(subclass Invertebrate Animal)").
+:-assert_kif("(genls Invertebrate Animal)").
 :-assert_kif("(disjointDecomposition Invertebrate Worm Mollusk Arthropod)").
 :-assert_kif("(documentation Invertebrate \"An &%Animal which has no spinal column.\")").
 %
-:-assert_kif("(subclass Worm Invertebrate)").
+:-assert_kif("(genls Worm Invertebrate)").
 :-assert_kif("(documentation Worm \"Long, narrow, soft-bodied &%Invertebrates.\")").
 %
-:-assert_kif("(subclass Mollusk Invertebrate)").
+:-assert_kif("(genls Mollusk Invertebrate)").
 :-assert_kif("(documentation Mollusk \"Soft-bodied &%Invertebrate that is usually contained in a shell. Includes oysters, clams, mussels, snails, slugs, octopi , and squid.\")").
 %
-:-assert_kif("(subclass Arthropod Invertebrate)").
+:-assert_kif("(genls Arthropod Invertebrate)").
 :-assert_kif("(disjointDecomposition Arthropod Arachnid Myriapod Insect Crustacean)").
 :-assert_kif("(documentation Arthropod \"A &%Class of &%Invertebrate that includes &%Arachnids and &%Insects.\")").
 %
-:-assert_kif("(subclass Arachnid Arthropod)").
+:-assert_kif("(genls Arachnid Arthropod)").
 :-assert_kif("(documentation Arachnid \"A &%Class of &%Arthropods that includes ticks and spiders.\")").
 %
-:-assert_kif("(subclass Myriapod Arthropod)").
+:-assert_kif("(genls Myriapod Arthropod)").
 :-assert_kif("(documentation Myriapod \"A &%Class of &%Arthropods that includes centipedes and millipedes.\")").
 %
-:-assert_kif("(subclass Insect Arthropod)").
+:-assert_kif("(genls Insect Arthropod)").
 :-assert_kif("(documentation Insect \"A &%Class of small &%Arthropods that are air -breathing and that are distinguished by appearance.\")").
 %
-:-assert_kif("(subclass Crustacean Arthropod)").
+:-assert_kif("(genls Crustacean Arthropod)").
 :-assert_kif("(documentation Crustacean \"A &%Class of &%Arthropods that mainly dwells in water and has a segmented body and a chitinous exoskeleton. Includes lobsters , crabs, shrimp, and barnacles.\")").
 %
-:-assert_kif("(subclass ColdBloodedVertebrate Vertebrate)").
+:-assert_kif("(genls ColdBloodedVertebrate Vertebrate)").
 :-assert_kif("(disjointDecomposition ColdBloodedVertebrate Amphibian Fish Reptile)").
 :-assert_kif("(documentation ColdBloodedVertebrate \"&%Vertebrates whose body temperature is not internally regulated.\")").
 %
-:-assert_kif("(subclass WarmBloodedVertebrate Vertebrate)").
+:-assert_kif("(genls WarmBloodedVertebrate Vertebrate)").
 :-assert_kif("(disjoint WarmBloodedVertebrate ColdBloodedVertebrate)").
 :-assert_kif("(documentation WarmBloodedVertebrate \"&%Vertebrates whose body temperature is internally regulated.\")").
 %
-:-assert_kif("(subclass Amphibian ColdBloodedVertebrate)").
+:-assert_kif("(genls Amphibian ColdBloodedVertebrate)").
 :-assert_kif("(documentation Amphibian \"A cold-blooded, smooth-skinned &%Vertebrate which characteristically hatches as an aquatic larva, breathing by gills . When mature, the &%Amphibian breathes with &%Lungs.\")").
 %
-:-assert_kif("(subclass Bird WarmBloodedVertebrate)").
+:-assert_kif("(genls Bird WarmBloodedVertebrate)").
 :-assert_kif("(disjoint Bird Mammal)").
 :-assert_kif("(documentation Bird \"A &%Vertebrate having a constant body temperature and characterized by the presence of feathers.\")").
 %
-:-assert_kif("(subclass Fish ColdBloodedVertebrate)").
+:-assert_kif("(genls Fish ColdBloodedVertebrate)").
 :-assert_kif("(documentation Fish \"A cold-blooded aquatic &%Vertebrate characterized by fins and breathing by gills. Included here are &%Fish having either a bony skeleton , such as a perch, or a cartilaginous skeleton, such as a shark. Also included are those &%Fish lacking a jaw, such as a lamprey or hagfish .\")").
 %
 :-assert_kif("(=> (instance ?FISH Fish) (exists (?WATER) (and (inhabits ?FISH ?WATER) (instance ?WATER Water))))").
 %
-:-assert_kif("(subclass Mammal WarmBloodedVertebrate)").
+:-assert_kif("(genls Mammal WarmBloodedVertebrate)").
 :-assert_kif("(disjointDecomposition Mammal AquaticMammal HoofedMammal Marsupial Rodent Primate)").
 :-assert_kif("(documentation Mammal \"A &%Vertebrate having a constant body temperature and characterized by the presence of hair, mammary glands, and sweat glands .\")").
 %
-:-assert_kif("(subclass AquaticMammal Mammal)").
+:-assert_kif("(genls AquaticMammal Mammal)").
 :-assert_kif("(documentation AquaticMammal \"The &%Class of &%Mammals that dwell chiefly in the water. Includes whales, dolphins, manatees, seals, and walruses.\")").
 %
-:-assert_kif("(subclass HoofedMammal Mammal)").
+:-assert_kif("(genls HoofedMammal Mammal)").
 :-assert_kif("(documentation HoofedMammal \"The &%Class of quadruped &%Mammals with hooves. Includes horses, cows, sheep, pigs, antelope, etc.\")").
 %
-:-assert_kif("(subclass Marsupial Mammal)").
+:-assert_kif("(genls Marsupial Mammal)").
 :-assert_kif("(documentation Marsupial \"The &%Class of &%Mammals which have a pouch for their young.\")").
 %
-:-assert_kif("(subclass Carnivore Mammal)").
+:-assert_kif("(genls Carnivore Mammal)").
 :-assert_kif("(documentation Carnivore \"The &%Class of flesh-eating &%Mammals. Members of this &%Class typically have four or five claws on each paw. Includes cats , dogs, bears, racoons, and skunks.\")").
 %
 :-assert_kif("(=> (and (instance ?CARNIVORE Carnivore) (instance ?EAT Eating) (agent ?EAT ?CARNIVORE) (patient ?EAT ?PREY)) (instance ?PREY Animal))").
 %
-:-assert_kif("(subclass Canine Carnivore)").
+:-assert_kif("(genls Canine Carnivore)").
 :-assert_kif("(disjoint Canine Feline)").
 :-assert_kif("(documentation Canine \"The &%Class of &%Carnivores with completely separable toes, nonretractable claws, and long muzzles.\")").
 %
-:-assert_kif("(subclass Feline Carnivore)").
+:-assert_kif("(genls Feline Carnivore)").
 :-assert_kif("(documentation Feline \"The &%Class of &%Carnivores with completely separable toes, nonretractable claws, slim bodies, and rounded heads.\")").
 %
-:-assert_kif("(subclass Rodent Mammal)").
+:-assert_kif("(genls Rodent Mammal)").
 :-assert_kif("(documentation Rodent \"The &%Class of &%Mammals with one or two pairs of incisors for gnawing. Includes rats, mice, guinea pigs, and rabbits .\")").
 %
-:-assert_kif("(subclass Primate Mammal)").
+:-assert_kif("(genls Primate Mammal)").
 :-assert_kif("(disjointDecomposition Primate Ape Monkey Hominid)").
 :-assert_kif("(documentation Primate \"The &%Class of &%Mammals which are &%Primates.\")").
 %
-:-assert_kif("(subclass Ape Primate)").
+:-assert_kif("(genls Ape Primate)").
 :-assert_kif("(documentation Ape \"Various &%Primates with no tails or only short tails .\")").
 %
-:-assert_kif("(subclass Monkey Primate)").
+:-assert_kif("(genls Monkey Primate)").
 :-assert_kif("(documentation Monkey \"Various &%Primates with relatively long tails .\")").
 %
-:-assert_kif("(subclass Hominid Primate)").
+:-assert_kif("(genls Hominid Primate)").
 :-assert_kif("(documentation Hominid \"Includes &%Humans and relatively recent ancestors of &%Humans.\")").
 %
-:-assert_kif("(subclass Human Hominid)").
-:-assert_kif("(subclass Human CognitiveAgent)").
+:-assert_kif("(genls Human Hominid)").
+:-assert_kif("(genls Human CognitiveAgent)").
 :-assert_kif("(documentation Human \"Modern man, the only remaining species of the Homo genus .\")").
 %
-:-assert_kif("(subclass Man Human)").
+:-assert_kif("(genls Man Human)").
 :-assert_kif("(documentation Man \"The class of &%Male &%Humans.\")").
 %
 :-assert_kif("(=> (instance ?MAN Man) (attribute ?MAN Male))").
 %
-:-assert_kif("(subclass Woman Human)").
+:-assert_kif("(genls Woman Human)").
 :-assert_kif("(documentation Woman \"The class of &%Female &%Humans.\")").
 %
 :-assert_kif("(=> (instance ?WOMAN Woman) (attribute ?WOMAN Female))").
 %
-:-assert_kif("(subclass Reptile ColdBloodedVertebrate)").
+:-assert_kif("(genls Reptile ColdBloodedVertebrate)").
 :-assert_kif("(documentation Reptile \"A &%ColdBloodedVertebrate having an external covering of scales or horny plates. &%Reptiles breathe by means of &%Lungs and generally lay eggs.\")").
 %
 % :-assert_kif(";The following formulas cover biologically related &%Classes under ").
 % :-assert_kif(";&%Substance. ").
-:-assert_kif("(subclass BiologicallyActiveSubstance Substance)").
+:-assert_kif("(genls BiologicallyActiveSubstance Substance)").
 :-assert_kif("(documentation BiologicallyActiveSubstance \"A &%Substance that is capable of inducing a change in the structure or functioning of an &%Organism. This &%Class includes &%Substances used in the treatment, diagnosis , prevention or analysis of normal and abnormal body function. This &%Class also includes &%Substances that occur naturally in the body and are administered therapeutically. Finally, &%BiologicallyActiveSubstance includes &%Nutrients, most drugs of abuse, and agents that require special handling because of their toxicity.\")").
 %
-:-assert_kif("(subclass Nutrient BiologicallyActiveSubstance)").
+:-assert_kif("(genls Nutrient BiologicallyActiveSubstance)").
 :-assert_kif("(disjointDecomposition Nutrient Protein Carbohydrate Vitamin)").
 :-assert_kif("(documentation Nutrient \"A &%BiologicallyActiveSubstance required by an &%Organism. It is generally ingested as &%Food, and it is of primary interest because of its role in the biologic functioning of the &%Organism.\")").
 %
-:-assert_kif("(subclass Protein Nutrient)").
+:-assert_kif("(genls Protein Nutrient)").
 :-assert_kif("(documentation Protein \"A &%Nutrient made up of amino acids joined by peptide bonds.\")").
 %
-:-assert_kif("(subclass Enzyme Protein)").
+:-assert_kif("(genls Enzyme Protein)").
 :-assert_kif("(documentation Enzyme \"A complex &%Protein that is produced by living cells and which catalyzes specific biochemical reactions. There are six main types of enzymes: oxidoreductases, transferases, hydrolases, lyases , isomerases, and ligases.\")").
 %
-:-assert_kif("(subclass Carbohydrate Nutrient)").
+:-assert_kif("(genls Carbohydrate Nutrient)").
 :-assert_kif("(documentation Carbohydrate \"An element of living cells and a source of energy for &%Animals. This class includes both simple &%Carbohydrates, i .e. sugars, and complex &%Carbohydrates, i.e. starches.\")").
 %
-:-assert_kif("(subclass Vitamin Nutrient)").
+:-assert_kif("(genls Vitamin Nutrient)").
 :-assert_kif("(documentation Vitamin \"A &%Nutrient present in natural products or made synthetically , which is essential in the diet of &%Humans and other higher &%Animals. Included here are &%Vitamin precursors and provitamins.\")").
 %
-:-assert_kif("(subclass GasMixture Mixture)").
+:-assert_kif("(genls GasMixture Mixture)").
 :-assert_kif("(documentation GasMixture \"Any &%Mixture that satisfies two conditions, viz . it is made up predominantly of things which are a &%Gas and any component other than &%Gas in the &%Mixture is in the form of fine particles which are suspended in the &%Gas.\")").
 %
-:-assert_kif("(subclass Smoke GasMixture)").
+:-assert_kif("(genls Smoke GasMixture)").
 :-assert_kif("(documentation Smoke \"A mixture of fine particles suspended in a gas that is produced by &%Combustion.\")").
 %
 :-assert_kif("(=> (instance ?SMOKE Smoke) (exists (?BURNING) (and (instance ?BURNING Combustion) (result ?BURNING ?SMOKE))))").
 %
-:-assert_kif("(subclass Cloud GasMixture)").
+:-assert_kif("(genls Cloud GasMixture)").
 :-assert_kif("(documentation Cloud \"Any &%GasMixture that is visible, e.g. clouds of &%Smoke produced by a fire or clouds of water vapor in the sky.\")").
 %
 :-assert_kif("(=> (instance ?CLOUD Cloud) (capability Seeing patient ?CLOUD))").
 %
-:-assert_kif("(subclass WaterCloud Cloud)").
+:-assert_kif("(genls WaterCloud Cloud)").
 :-assert_kif("(documentation WaterCloud \"Any &%Cloud that is composed primarily of water vapor.\")").
 %
 :-assert_kif("(=> (instance ?CLOUD WaterCloud) (exists (?WATER) (and (instance ?WATER Water) (part ?WATER ?CLOUD))))").
 %
 :-assert_kif("(=> (instance ?CLOUD WaterCloud) (forall (?PART) (=> (and (part ?PART ?CLOUD) (not (instance ?PART Water))) (exists (?WATER) (and (instance ?WATER Water) (part ?WATER ?CLOUD) (measure ?WATER ?MEASURE1) (measure ?PART ?MEASURE2) (greaterThan ?WATER ?PART))))))").
 %
-:-assert_kif("(subclass Air Mixture)").
-:-assert_kif("(subclass Air (ExtensionFn Gas))").
+:-assert_kif("(genls Air Mixture)").
+:-assert_kif("(genls Air (ExtensionFn Gas))").
 :-assert_kif("(documentation Air \"&%Air is the gaseous stuff that makes up the atmosphere surrounding Earth.\")").
 %
 :-assert_kif("(=> (instance ?AIR Air) (piece ?AIR EarthsAtmosphere))").
@@ -5445,19 +5445,19 @@
 %
 :-assert_kif("(=> (instance ?WIND Wind) (exists (?AIR) (and (patient ?WIND ?AIR) (instance ?AIR Air))))").
 %
-:-assert_kif("(subclass BodySubstance Mixture)").
+:-assert_kif("(genls BodySubstance Mixture)").
 :-assert_kif("(documentation BodySubstance \"Extracellular material and mixtures of cells and extracellular material that are produced, excreted or accreted by an &%Organism. Included here are &%Substances such as saliva, dental enamel , sweat, and gastric acid.\")").
 %
-:-assert_kif("(subclass Hormone BodySubstance)").
-:-assert_kif("(subclass Hormone BiologicallyActiveSubstance)").
+:-assert_kif("(genls Hormone BodySubstance)").
+:-assert_kif("(genls Hormone BiologicallyActiveSubstance)").
 :-assert_kif("(documentation Hormone \"In &%Animals, a chemical secreted by an endocrine gland whose products are released into the circulating fluid. &%Plant hormones or synthetic hormones which are used only to alter or control various physiologic processes, e.g., reproductive control agents, are assigned to the &%Class &%BiologicallyActiveSubstance. &%Hormones act as chemical messengers and regulate various physiologic processes such as growth , reproduction, metabolism, etc. They usually fall into two broad categories , viz. steroid hormones and peptide hormones.\")").
 %
 :-assert_kif("(=> (instance ?HORMONE Hormone) (exists (?PROCESS ?GLAND) (and (instance ?GLAND Gland) (instrument ?PROCESS ?GLAND) (result ?PROCESS ?HORMONE))))").
 %
-:-assert_kif("(subclass Blood BodySubstance)").
+:-assert_kif("(genls Blood BodySubstance)").
 :-assert_kif("(documentation Blood \"A fluid present in &%Animals that transports &%Nutrients to and waste products away from various &%BodyParts.\")").
 %
-:-assert_kif("(subclass Food SelfConnectedObject)").
+:-assert_kif("(genls Food SelfConnectedObject)").
 :-assert_kif("(disjointDecomposition Food Meat Beverage)").
 :-assert_kif("(documentation Food \"Any &%SelfConnectedObject containing &%Nutrients, such as carbohydrates, proteins, and fats, that can be ingested by a living &%Animal and metabolized into energy and body tissue.\")").
 %
@@ -5465,19 +5465,19 @@
 %
 :-assert_kif("(=> (instance ?FOOD Food) (forall (?PART1) (=> (part ?PART1 ?FOOD) (exists (?PART2 ?ANIMAL) (and (part ?PART1 ?PART2) (part ?PART2 ?ANIMAL) (instance ?ANIMAL Animal))))))").
 %
-:-assert_kif("(subclass Meat Food)").
+:-assert_kif("(genls Meat Food)").
 :-assert_kif("(documentation Meat \"Any &%Food which was originally part of an &%Animal and is not ingested by drinking, including eggs and animal blood that is eaten as food. Note that this class covers both raw meat and meat that has been prepared in some way, e.g. by cooking. Note too that preparations involving &%Meat and &%FruitOrVegetable are classed directly under &%Food.\")").
 %
 :-assert_kif("(=> (instance ?MEAT Meat) (forall (?PART) (=> (part ?PART ?MEAT) (exists (?SUBPART ?TIME ?ANIMAL) (and (part ?SUBPART ?PART) (holdsDuring ?TIME (and (instance ?ANIMAL Animal) (part ?SUBPART ?ANIMAL))))))))").
 %
-:-assert_kif("(subclass Beverage Food)").
+:-assert_kif("(genls Beverage Food)").
 :-assert_kif("(documentation Beverage \"Any &%Food that is ingested by &%Drinking. Note that this class is disjoint with the other subclasses of &%Food, i .e. &%Meat and &%FruitOrVegetable.\")").
 %
 :-assert_kif("(=> (instance ?BEV Beverage) (attribute ?BEV Liquid))").
 %
 :-assert_kif("(=> (and (instance ?DRINK Drinking) (patient ?DRINK ?BEV)) (instance ?BEV Beverage))").
 %
-:-assert_kif("(subclass AnatomicalStructure OrganicObject)").
+:-assert_kif("(genls AnatomicalStructure OrganicObject)").
 :-assert_kif("(partition AnatomicalStructure BodyPart AbnormalAnatomicalStructure)").
 :-assert_kif("(partition AnatomicalStructure AnimalAnatomicalStructure PlantAnatomicalStructure)").
 :-assert_kif("(documentation AnatomicalStructure \"A normal or pathological part of the anatomy or structural organization of an &%Organism. This class covers &%BodyParts, as well as structures that are given off by &%Organisms, e.g. &%ReproductiveBodies.\")").
@@ -5486,82 +5486,82 @@
 %
 :-assert_kif("(=> (instance ?PART AnatomicalStructure) (exists (?CELL) (and (instance ?CELL Cell) (part ?CELL ?PART))))").
 %
-:-assert_kif("(subclass AbnormalAnatomicalStructure AnatomicalStructure)").
+:-assert_kif("(genls AbnormalAnatomicalStructure AnatomicalStructure)").
 :-assert_kif("(documentation AbnormalAnatomicalStructure \"Any &%AnatomicalStructure which is not normally found in the &%Organism of which it is a part, i.e. it is the result of a &%PathologicProcess. This class covers tumors, birth marks, goiters , etc.\")").
 %
 :-assert_kif("(=> (instance ?STRUCTURE AbnormalAnatomicalStructure) (exists (?PROC) (and (instance ?PROC PathologicProcess) (result ?PROC ?PART))))").
 %
-:-assert_kif("(subclass BodyPart AnatomicalStructure)").
+:-assert_kif("(genls BodyPart AnatomicalStructure)").
 :-assert_kif("(documentation BodyPart \"A collection of &%Cells and &%Tissues which are localized to a specific area of an &%Organism and which are not pathological . The instances of this &%Class range from gross structures to small components of complex &%Organs.\")").
 %
 :-assert_kif("(=> (instance ?PART BodyPart) (exists (?ORGANISM ?TIME) (and (instance ?ORGANISM Organism) (temporalPart ?TIME (WhenFn ?ORGANISM)) (holdsDuring ?TIME (part ?ANAT ?ORGANISM)))))").
 %
 :-assert_kif("(=> (instance ?PART BodyPart) (exists (?PROC) (and (instance ?PROC PhysiologicProcess) (result ?PROC ?PART))))").
 %
-:-assert_kif("(subclass AnimalAnatomicalStructure AnatomicalStructure)").
+:-assert_kif("(genls AnimalAnatomicalStructure AnatomicalStructure)").
 :-assert_kif("(documentation AnimalAnatomicalStructure \"&%AnatomicalStructures that are possessed exclusively by &%Animals.\")").
 %
 :-assert_kif("(=> (and (instance ?STRUCTURE AnimalAnatomicalStructure) (instance ?ANIMAL Organism) (part ?STRUCTURE ?ANIMAL)) (instance ?ANIMAL Animal))").
 %
-:-assert_kif("(subclass PlantAnatomicalStructure AnatomicalStructure)").
+:-assert_kif("(genls PlantAnatomicalStructure AnatomicalStructure)").
 :-assert_kif("(documentation PlantAnatomicalStructure \"&%AnatomicalStructures that are possessed exclusively by &%Plants.\")").
 %
 :-assert_kif("(=> (and (instance ?STRUCTURE PlantAnatomicalStructure) (instance ?PLANT Organism) (part ?STRUCTURE ?PLANT)) (instance ?PLANT Plant))").
 %
-:-assert_kif("(subclass ReproductiveBody BodyPart)").
+:-assert_kif("(genls ReproductiveBody BodyPart)").
 :-assert_kif("(documentation ReproductiveBody \"Reproductive structure of &%Organisms. Consists of an &%Embryonic &%Object and a nutritive/protective envelope. Note that this class includes seeds, spores, and &%FruitOrVegetables, as well as the eggs produced by &%Animals.\")").
 %
-:-assert_kif("(subclass Egg ReproductiveBody)").
-:-assert_kif("(subclass Egg AnimalAnatomicalStructure)").
+:-assert_kif("(genls Egg ReproductiveBody)").
+:-assert_kif("(genls Egg AnimalAnatomicalStructure)").
 :-assert_kif("(documentation Egg \"The fertilized or unfertilized female &%ReproductiveBody of an &%Animal. This includes &%Bird and &%Reptile eggs, as well as mammalian ova.\")").
 %
-:-assert_kif("(subclass Pollen ReproductiveBody)").
-:-assert_kif("(subclass Pollen PlantAnatomicalStructure)").
+:-assert_kif("(genls Pollen ReproductiveBody)").
+:-assert_kif("(genls Pollen PlantAnatomicalStructure)").
 :-assert_kif("(documentation Pollen \"A powder produced by &%FloweringPlants that contains male gametes and is capable of fertilizing the seeds of &%FloweringPlants of the same species .\")").
 %
-:-assert_kif("(subclass Spore ReproductiveBody)").
-:-assert_kif("(subclass Spore PlantAnatomicalStructure)").
+:-assert_kif("(genls Spore ReproductiveBody)").
+:-assert_kif("(genls Spore PlantAnatomicalStructure)").
 :-assert_kif("(documentation Spore \"Any &%ReproductiveBody of a &%NonFloweringPlant.\")").
 %
 :-assert_kif("(=> (instance ?SPORE Spore) (exists (?PLANT ?TIME) (and (instance ?PLANT NonFloweringPlant) (holdsDuring ?TIME (part ?SPORE ?PLANT)))))").
 %
-:-assert_kif("(subclass Seed ReproductiveBody)").
-:-assert_kif("(subclass Seed PlantAnatomicalStructure)").
+:-assert_kif("(genls Seed ReproductiveBody)").
+:-assert_kif("(genls Seed PlantAnatomicalStructure)").
 :-assert_kif("(documentation Seed \"The fertilized or unfertilized female &%ReproductiveBody of a &%FloweringPlant.\")").
 %
 :-assert_kif("(=> (instance ?SEED Seed) (exists (?PLANT ?TIME) (and (instance ?PLANT FloweringPlant) (holdsDuring ?TIME (part ?SEED ?PLANT)))))").
 %
-:-assert_kif("(subclass FruitOrVegetable PlantAnatomicalStructure)").
-:-assert_kif("(subclass FruitOrVegetable ReproductiveBody)").
-:-assert_kif("(documentation FruitOrVegetable \"Any fruit or vegetable, i.e. a ripened &%ReproductiveBody of a &%Plant. Note that &%FruitOrVegetable is not a subclass of &%Food, because some fruits, e.g. poisonous berries , are not edible.\")").
+:-assert_kif("(genls FruitOrVegetable PlantAnatomicalStructure)").
+:-assert_kif("(genls FruitOrVegetable ReproductiveBody)").
+:-assert_kif("(documentation FruitOrVegetable \"Any fruit or vegetable, i.e. a ripened &%ReproductiveBody of a &%Plant. Note that &%FruitOrVegetable is not a genls of &%Food, because some fruits, e.g. poisonous berries , are not edible.\")").
 %
-:-assert_kif("(subclass BodyCovering BodyPart)").
+:-assert_kif("(genls BodyCovering BodyPart)").
 :-assert_kif("(documentation BodyCovering \"Any &%BodyPart which is a covering of another &%BodyPart or of an entire &%Organism. This would include the rinds of &%FruitOrVegetables and the skins of &%Animals.\")").
 %
 :-assert_kif("(=> (instance ?COVER BodyCovering) (exists (?BODY) (and (superficialPart ?COVER ?BODY) (or (instance ?BODY Organism) (instance ?BODY BodyPart)))))").
 %
-:-assert_kif("(subclass BodyJunction BodyPart)").
+:-assert_kif("(genls BodyJunction BodyPart)").
 :-assert_kif("(documentation BodyJunction \"The place where two &%BodyParts meet or connect.\")").
 %
 :-assert_kif("(=> (instance ?JUNCT BodyJunction) (exists (?STRUCT) (and (instance ?STRUCT BodyPart) (component ?JUNCT ?STRUCT))))").
 %
 :-assert_kif("(=> (instance ?JUNCT BodyJunction) (exists (?STRUCT1 ?STRUCT2) (and (connected ?JUNCT ?STRUCT1) (connected ?JUNCT ?STRUCT2) (instance ?STRUCT1 BodyPart) (instance ?STRUCT2 BodyPart) (not (equal ?STRUCT1 ?STRUCT2)))))").
 %
-:-assert_kif("(subclass BodyVessel BodyPart)").
+:-assert_kif("(genls BodyVessel BodyPart)").
 :-assert_kif("(documentation BodyVessel \"Any tube-like structure which occurs naturally in an &%Organism and through which a &%BodySubstance can circulate.\")").
 %
-:-assert_kif("(subclass Cell BodyPart)").
+:-assert_kif("(genls Cell BodyPart)").
 :-assert_kif("(documentation Cell \"The fundamental structural and functional unit of living &%Organisms.\")").
 %
-:-assert_kif("(subclass Organ BodyPart)").
+:-assert_kif("(genls Organ BodyPart)").
 :-assert_kif("(documentation Organ \"A somewhat independent &%BodyPart that performs a specialized function. Note that this functional definition covers bodily systems , e.g. the digestive system or the central nervous system.\")").
 %
 :-assert_kif("(=> (instance ?ORGAN Organ) (exists (?PURP) (hasPurpose ?ORGAN ?PURP)))").
 %
-:-assert_kif("(subclass Gland Organ)").
+:-assert_kif("(genls Gland Organ)").
 :-assert_kif("(documentation Gland \"An &%Organ that removes &%Substances from the &%Blood, alters them in some way, and then releases them.\")").
 %
-:-assert_kif("(subclass Tissue BodySubstance)").
+:-assert_kif("(genls Tissue BodySubstance)").
 :-assert_kif("(disjointDecomposition Tissue Bone Muscle FatTissue)").
 :-assert_kif("(documentation Tissue \"An aggregation of similarly specialized &%Cells and the associated intercellular substance. &%Tissues are relatively non -localized in comparison to &%BodyParts, &%Organs or &%Organ components. The main features of &%Tissues are self-connectivity (see &%SelfConnectedObject) and being a homogeneous mass (all parts in the same granularity are instances of &%Tissue as well).\")").
 %
@@ -5569,33 +5569,33 @@
 %
 :-assert_kif("(=> (instance ?STUFF Tissue) (exists (?ORGANISM) (and (instance ?ORGANISM Organism) (part ?STUFF ?ORGANISM))))").
 %
-:-assert_kif("(subclass Bone Tissue)").
+:-assert_kif("(genls Bone Tissue)").
 :-assert_kif("(documentation Bone \"Rigid &%Tissue composed largely of calcium that makes up the skeleton of &%Vertebrates. Note that this &%Class also includes teeth.\")").
 %
 :-assert_kif("(=> (instance ?BONE Bone) (exists (?VERT) (and (instance ?VERT Vertebrate) (part ?BONE ?VERT))))").
 %
-:-assert_kif("(subclass Muscle Tissue)").
+:-assert_kif("(genls Muscle Tissue)").
 :-assert_kif("(documentation Muscle \"Nonrigid &%Tissue appearing only in &%Animals and composed largely of contractile cells.\")").
 %
-:-assert_kif("(subclass FatTissue Tissue)").
+:-assert_kif("(genls FatTissue Tissue)").
 :-assert_kif("(documentation FatTissue \"Nonrigid &%Tissue that is composed largely of fat cells.\")").
 %
-:-assert_kif("(subclass Noun Word)").
+:-assert_kif("(genls Noun Word)").
 :-assert_kif("(documentation Noun \"One of the parts of speech. The &%Class of &%Words that conventionally denote &%Objects.\")").
 %
-:-assert_kif("(subclass Verb Word)").
+:-assert_kif("(genls Verb Word)").
 :-assert_kif("(documentation Verb \"One of the parts of speech. The &%Class of &%Words that conventionally denote &%Processes.\")").
 %
-:-assert_kif("(subclass Adjective Word)").
+:-assert_kif("(genls Adjective Word)").
 :-assert_kif("(documentation Adjective \"One of the parts of speech. The &%Class of &%Words that conventionally denote &%Attributes of &%Objects.\")").
 %
-:-assert_kif("(subclass Adverb Word)").
+:-assert_kif("(genls Adverb Word)").
 :-assert_kif("(documentation Adverb \"One of the parts of speech. The &%Class of &%Words that conventionally denote &%Attributes of &%Processes.\")").
 %
-:-assert_kif("(subclass Particle Word)").
+:-assert_kif("(genls Particle Word)").
 :-assert_kif("(documentation Particle \"An umbrella &%Class for any &%Word that does not fit into the other subclasses of &%Word. A &%Particle is generally a small term that serves a grammatical or logical function, e.g. 'and', 'of', 'since', etc. At some point, this class might be broken up into the subclasses 'Connective', 'Preposition', etc. Note that the class &%Particle includes both personal and possessive pronouns, e.g. 'she', 'hers', 'it', 'its', etc .\")").
 %
-:-assert_kif("(subclass Morpheme LinguisticExpression)").
+:-assert_kif("(genls Morpheme LinguisticExpression)").
 :-assert_kif("(documentation Morpheme \"Part of a &%Word which cannot be subdivided and which expresses a meaning.\")").
 %
 :-assert_kif("(=> (instance ?MORPH Morpheme) (not (exists (?OTHERMORPH) (and (instance ?OTHERMORPH Morpheme) (part ?OTHERMORPH ?MORPH) (not (equal ?OTHERMORPH ?MORPH))))))").
@@ -5604,18 +5604,18 @@
 %
 :-assert_kif("(=> (instance ?WORD Word) (exists (?PART) (and (part ?PART ?WORD) (instance ?PART Morpheme))))").
 %
-:-assert_kif("(subclass Phrase LinguisticExpression)").
+:-assert_kif("(genls Phrase LinguisticExpression)").
 :-assert_kif("(disjointDecomposition Phrase VerbPhrase NounPhrase PrepositionalPhrase)").
 :-assert_kif("(documentation Phrase \"A set of &%Words in a &%Language which form a unit, i .e. express a meaning in the &%Language.\")").
 %
 :-assert_kif("(=> (instance ?PHRASE Phrase) (exists (?PART1 ?PART2) (and (part ?PART1 ?PHRASE) (part ?PART2 ?PHRASE) (instance ?PART1 Word) (instance ?PART2 Word) (not (equal ?PART1 ?PART2)))))").
 %
-:-assert_kif("(subclass VerbPhrase Phrase)").
+:-assert_kif("(genls VerbPhrase Phrase)").
 :-assert_kif("(documentation VerbPhrase \"A &%Phrase that has the same function as a &%Verb.\")").
 %
 :-assert_kif("(=> (instance ?PHRASE VerbPhrase) (exists (?VERB) (and (instance ?VERB Verb) (part ?VERB ?PHRASE))))").
 %
-:-assert_kif("(subclass NounPhrase Phrase)").
+:-assert_kif("(genls NounPhrase Phrase)").
 :-assert_kif("(disjoint NounPhrase VerbPhrase)").
 :-assert_kif("(documentation NounPhrase \"A &%Phrase that has the same function as a &%Noun.\")").
 %
@@ -5623,31 +5623,31 @@
 %
 :-assert_kif("(=> (instance ?PHRASE NounPhrase) (exists (?NOUN) (and (instance ?NOUN Noun) (part ?NOUN ?PHRASE))))").
 %
-:-assert_kif("(subclass PrepositionalPhrase Phrase)").
+:-assert_kif("(genls PrepositionalPhrase Phrase)").
 :-assert_kif("(documentation PrepositionalPhrase \"A &%Phrase that begins with a preposition and that functions as an &%Adjective or an &%Adverb.\")").
 %
 :-assert_kif("(=> (instance ?PHRASE PrepositionalPhrase) (exists (?PREP) (and (instance ?PREP Particle) (part ?PREP ?PHRASE))))").
 %
-:-assert_kif("(subclass Text LinguisticExpression)").
-:-assert_kif("(subclass Text Artifact)").
+:-assert_kif("(genls Text LinguisticExpression)").
+:-assert_kif("(genls Text Artifact)").
 :-assert_kif("(documentation Text \"A &%LinguisticExpression or set of &%LinguisticExpressions that perform a specific function related to &%Communicating, e.g. express a discourse about a particular topic , and that are inscribed in a &%CorpuscularObject by &%Humans.\")").
 %
 :-assert_kif("(=> (instance ?TEXT Text) (exists (?PART) (and (part ?PART ?TEXT) (instance ?PART LinguisticExpression))))").
 %
 :-assert_kif("(=> (instance ?TEXT Text) (exists (?WRITE) (and (instance ?WRITE Writing) (result ?WRITE ?TEXT))))").
 %
-:-assert_kif("(subclass FactualText Text)").
+:-assert_kif("(genls FactualText Text)").
 :-assert_kif("(disjoint FactualText FictionalText)").
 :-assert_kif("(documentation FactualText \"The class of &%Texts that purport to reveal facts about the world. Such texts are often known as information or as non-fiction. Note that something can be an instance of &%FactualText, even if it is wholly inaccurate. Whether something is a &%FactualText is determined by the beliefs of the agent creating the text.\")").
 %
 :-assert_kif("(=> (and (instance ?TEXT FactualText) (authors ?AGENT ?TEXT) (subsumesContentInstance ?TEXT ?CONTENT) (instance ?CONTENT Formula)) (believes ?AGENT ?CONTENT))").
 %
-:-assert_kif("(subclass FictionalText Text)").
+:-assert_kif("(genls FictionalText Text)").
 :-assert_kif("(documentation FictionalText \"The class of &%Texts that purport to be largely a product of the author's imagination, i.e. the author does not believe that most of the content conveyed by the text is an accurate depiction of the real world. Note that something can be an instance of &%FictionalText, even if it is completely true. Whether something is a &%FictionalText is determined by the beliefs of the agent creating the text.\")").
 %
 :-assert_kif("(=> (and (instance ?TEXT FactualText) (authors ?AGENT ?TEXT)) (exists (?CONTENT) (and (subsumesContentInstance ?TEXT ?CONTENT) (instance ?CONTENT Formula) (not (believes ?AGENT ?CONTENT)))))").
 %
-:-assert_kif("(subclass Sentence LinguisticExpression)").
+:-assert_kif("(genls Sentence LinguisticExpression)").
 :-assert_kif("(disjointDecomposition Sentence Statement Supposition Question Request Order)").
 :-assert_kif("(documentation Sentence \"A syntactically well-formed formula of a &%Language. It includes, at minimum, a predicate and a subject (which may be explicit or implicit), and it expresses a &%Proposition.\")").
 %
@@ -5695,7 +5695,7 @@
 :-assert_kif("(rangeSubclass SeriesVolumeFn Text)").
 :-assert_kif("(documentation SeriesVolumeFn \"A &%BinaryFunction that maps a type of &%Series (e.g. the Encyclopedia_Britannica or the Popular_Mechanics periodical) and a number to the volumes of the text type designated by the number.\")").
 %
-:-assert_kif("(=> (and (subclass ?TEXT Periodical) (equal (SeriesVolumeFn ?TEXT ?INT1) ?VOLUME1) (equal (SeriesVolumeFn ?TEXT ?INT2) ?VOLUME2) (greaterThan ?INT2 ?INT1) (instance ?PUB1 Publication) (instance ?PUB2 Publication) (patient ?PUB1 ?VOLUME1) (patient ?PUB2 ?VOLUME2) (date ?PUB1 ?DATE1) (date ?PUB2 ?DATE2)) (before (EndFn ?DATE1) (EndFn ?DATE2)))").
+:-assert_kif("(=> (and (genls ?TEXT Periodical) (equal (SeriesVolumeFn ?TEXT ?INT1) ?VOLUME1) (equal (SeriesVolumeFn ?TEXT ?INT2) ?VOLUME2) (greaterThan ?INT2 ?INT1) (instance ?PUB1 Publication) (instance ?PUB2 Publication) (patient ?PUB1 ?VOLUME1) (patient ?PUB2 ?VOLUME2) (date ?PUB1 ?DATE1) (date ?PUB2 ?DATE2)) (before (EndFn ?DATE1) (EndFn ?DATE2)))").
 %
 :-assert_kif("(=> (equal (SeriesVolumeFn ?SERIES ?NUMBER) ?VOLUME) (subsumesContentClass ?SERIES ?VOLUME))").
 %
@@ -5704,70 +5704,70 @@
 :-assert_kif("(domainSubclass PeriodicalIssueFn 1 Periodical)").
 :-assert_kif("(domain PeriodicalIssueFn 2 PositiveInteger)").
 :-assert_kif("(rangeSubclass PeriodicalIssueFn Periodical)").
-:-assert_kif("(documentation PeriodicalIssueFn \"A &%BinaryFunction that maps a subclass of &%Periodical and a number to all of the issues of the &%Periodical corresponding to the number.\")").
+:-assert_kif("(documentation PeriodicalIssueFn \"A &%BinaryFunction that maps a genls of &%Periodical and a number to all of the issues of the &%Periodical corresponding to the number.\")").
 %
 :-assert_kif("(=> (equal (PeriodicalIssueFn ?PERIODICAL ?NUMBER) ?ISSUE) (subsumesContentClass ?PERIODICAL ?ISSUE))").
 %
-:-assert_kif("(subclass Book Text)").
+:-assert_kif("(genls Book Text)").
 :-assert_kif("(documentation Book \"A &%Text that has pages and is bound.\")").
 %
-:-assert_kif("(subclass Summary Text)").
+:-assert_kif("(genls Summary Text)").
 :-assert_kif("(documentation Summary \"A short &%Text that is a summary of another, longer &%Text.\")").
 %
 :-assert_kif("(=> (instance ?TEXT Summary) (exists (?TEXT2) (and (instance ?TEXT2 Text) (subsumesContentInstance ?TEXT2 ?TEXT))))").
 %
-:-assert_kif("(subclass Series Text)").
+:-assert_kif("(genls Series Text)").
 :-assert_kif("(documentation Series \"A &%Text consisting of multiple self-contained units. Some examples are an encyclopedia containing a couple dozen volumes, a television series made up of many episodes, a film serial, etc.\")").
 %
 :-assert_kif("(=> (instance ?SERIES Series) (exists (?BOOK1 ?BOOK2) (and (instance ?BOOK1 Book) (instance ?BOOK2 Book) (subsumesContentInstance ?SERIES ?BOOK1) (subsumesContentInstance ?SERIES ?BOOK2) (not (equal ?BOOK1 ?BOOK2)))))").
 %
-:-assert_kif("(subclass Periodical Series)").
+:-assert_kif("(genls Periodical Series)").
 :-assert_kif("(documentation Periodical \"A &%Series whose elements are published separately and on a periodic basis.\")").
 %
-:-assert_kif("(subclass Article Text)").
+:-assert_kif("(genls Article Text)").
 :-assert_kif("(disjoint Article Book)").
 :-assert_kif("(documentation Article \"A relatively short &%Text that either is unbound or is bound with other &%Articles in a &%Book.\")").
 %
 :-assert_kif("(=> (and (instance ?ARTICLE1 Article) (instance ?BOOK Book) (subsumesContentInstance ?BOOK ?ARTICLE1)) (exists (?ARTICLE2) (and (instance ?ARTICLE2 Article) (not (equal ?ARTICLE2 ?ARTICLE1)) (subsumesContentInstance ?BOOK ?ARTICLE2))))").
 %
-:-assert_kif("(subclass Certificate Text)").
+:-assert_kif("(genls Certificate Text)").
 :-assert_kif("(documentation Certificate \"A &%Text that confers a right or obligation on the holder of the &%Certificate. Note that the right or obligation need not be a legal one, as in the case of an academic diploma that grants certain privileges in the professional world.\")").
 %
 :-assert_kif("(=> (and (instance ?DOC Certificate) (possesses ?AGENT ?DOC)) (exists (?PROC) (or (confersRight ?PROC ?DOC ?AGENT) (confersObligation ?PROC ?DOC ?AGENT))))").
 %
-:-assert_kif("(subclass FinancialInstrument Certificate)").
+:-assert_kif("(genls FinancialInstrument Certificate)").
 :-assert_kif("(documentation FinancialInstrument \"A document having monetary value or recording a monetary transaction\")").
 %
-:-assert_kif("(subclass Currency FinancialInstrument)").
+:-assert_kif("(genls Currency FinancialInstrument)").
 :-assert_kif("(partition Currency CurrencyBill CurrencyCoin)").
 :-assert_kif("(documentation Currency \"Any element of the official currency of some &%Nation. This covers both &%CurrencyBills and &%CurrencyCoins.\")").
 %
 :-assert_kif("(=> (instance ?CURRENCY Currency) (exists (?MEASURE) (monetaryValue ?CURRENCY ?MEASURE)))").
 %
-:-assert_kif("(subclass CurrencyBill Currency)").
+:-assert_kif("(genls CurrencyBill Currency)").
 :-assert_kif("(documentation CurrencyBill \"Any instance of &%Currency that is made of paper.\")").
 %
 :-assert_kif("(=> (instance ?BILL CurrencyBill) (exists (?PAPER) (and (instance ?PAPER Paper) (part ?PAPER ?BILL))))").
 %
-:-assert_kif("(subclass CurrencyCoin Currency)").
+:-assert_kif("(genls CurrencyCoin Currency)").
 :-assert_kif("(documentation CurrencyCoin \"Any instance of &%Currency that is made of &%Metal.\")").
 %
-:-assert_kif("(=> (instance ?COIN CurrencyCoin) (exists (?METAL) (and (subclass ?METAL Metal) (material ?METAL ?COIN))))").
+:-assert_kif("(=> (instance ?COIN CurrencyCoin) (exists (?METAL) (and (genls ?METAL Metal) (material ?METAL ?COIN))))").
 %
-:-assert_kif("(subclass Patent Certificate)").
+:-assert_kif("(genls Patent Certificate)").
 :-assert_kif("(documentation Patent \"A &%Certificate that expresses the content of an invention that has been accorded legal protection by a governemental entity .\")").
 %
-:-assert_kif("(subclass Molecule CompoundSubstance)").
+:-assert_kif("(genls Molecule CompoundSubstance)").
 :-assert_kif("(documentation Molecule \"A molecule is the smallest unit of matter of a &%CompoundSubstance that retains all the physical and chemical properties of that substance, e.g., Ne, H2, H2O. A molecule is two or more &%Atoms linked by a chemical bond.\")").
 %
 :-assert_kif("(=> (instance ?MOLE Molecule) (exists (?ATOM1 ?ATOM2) (and (instance ?ATOM1 Atom) (instance ?ATOM2 Atom) (part ?ATOM1 ?MOLE) (part ?ATOM2 ?MOLE) (not (equal ?ATOM1 ?ATOM2)))))").
 %
-:-assert_kif("(subclass Artifact CorpuscularObject)").
+:-assert_kif("(genls Artifact CorpuscularObject)").
 :-assert_kif("(documentation Artifact \"A &%CorpuscularObject that is the product of a &%Making.\")").
 %
 :-assert_kif("(<=> (instance ?ARTIFACT Artifact) (exists (?MAKING) (and (instance ?MAKING Making) (result ?MAKING ?ARTIFACT))))").
 %
-:-assert_kif("(subclass Product Artifact)").
+:-assert_kif("(genls Product Artifact)").
 :-assert_kif("(documentation Product \"An &%Artifact that is produced by &%Manufacture and that is intended to be sold.\")").
 %
 :-assert_kif("(=> (instance ?PRODUCT Product) (exists (?MANUFACTURE) (and (instance ?MANUFACTURE Manufacture) (result ?MANUFACTURE ?PRODUCT))))").
@@ -5779,70 +5779,70 @@
 :-assert_kif("(domainSubclass version 2 Artifact)").
 :-assert_kif("(documentation version \"Some &%Artifacts have a life cycle with discrete stages or versions. (&%version ARTIFACT1 ARTIFACT2) means that ARTIFACT1 is a version of ARTIFACT2. Note that this &%Predicate relates subclasses of &%Artifact and not instances.\")").
 %
-:-assert_kif("(=> (version ?ARTIFACT1 ?ARTIFACT2) (subclass ?ARTIFACT1 ?ARTIFACT2))").
+:-assert_kif("(=> (version ?ARTIFACT1 ?ARTIFACT2) (genls ?ARTIFACT1 ?ARTIFACT2))").
 %
 % :-assert_kif(";The following part of the ontology will eventually encompass all ").
 % :-assert_kif(";artifacts. For the time being, it is mostly restricted to the content ").
 % :-assert_kif(";of the Ontolingua ontology component-assemblies, which covers the types ").
 % :-assert_kif(";of elements used to construct engineering systems. ").
-:-assert_kif("(subclass StationaryArtifact Artifact)").
+:-assert_kif("(genls StationaryArtifact Artifact)").
 :-assert_kif("(documentation StationaryArtifact \"A &%StationaryArtifact is an &%Artifact that has a fixed spatial location. Most instances of this &%Class are architectural works, e.g. the Eiffel Tower, the Great Pyramids, office towers, single -family houses, etc.\")").
 %
 :-assert_kif("(=> (instance ?ARTIFACT StationaryArtifact) (exists (?PLACE) (holdsDuring (WhenFn ?ARTIFACT) (located ?ARTIFACT ?PLACE))))").
 %
-:-assert_kif("(subclass Building StationaryArtifact)").
+:-assert_kif("(genls Building StationaryArtifact)").
 :-assert_kif("(documentation Building \"The Class of &%StationaryArtifacts which are intended to house &%Humans and their activities.\")").
 %
 :-assert_kif("(=> (instance ?BUILDING Building) (exists (?HUMAN) (and (instance ?HUMAN Human) (or (inhabits ?HUMAN ?BUILDING) (exists (?ACT) (and (agent ?ACT ?HUMAN) (located ?ACT ?BUILDING)))))))").
 %
-:-assert_kif("(subclass Room StationaryArtifact)").
+:-assert_kif("(genls Room StationaryArtifact)").
 :-assert_kif("(disjoint Room Building)").
 :-assert_kif("(documentation Room \"A &%properPart of a &%Building which is separated from the exterior of the &%Building and/or other &%Rooms of the &%Building by walls. Some &%Rooms may have a specific purpose, e.g. sleeping, bathing, cooking, entertainment , etc.\")").
 %
 :-assert_kif("(=> (instance ?ROOM Room) (exists (?BUILD) (and (instance ?BUILD Building) (properPart ?ROOM ?BUILD))))").
 %
-:-assert_kif("(subclass Residence StationaryArtifact)").
+:-assert_kif("(genls Residence StationaryArtifact)").
 :-assert_kif("(partition Residence PermanentResidence TemporaryResidence)").
 :-assert_kif("(documentation Residence \"A &%Building or part of a &%Building which provides some accomodation for sleeping.\")").
 %
 :-assert_kif("(=> (instance ?RESIDENCE Residence) (or (instance ?RESIDENCE House) (exists (?BUILDING) (and (instance ?BUILDING ResidentialBuilding) (part ?RESIDENCE ?BUILDING)))))").
 %
-:-assert_kif("(subclass PermanentResidence Residence)").
+:-assert_kif("(genls PermanentResidence Residence)").
 :-assert_kif("(documentation PermanentResidence \"A &%Residence where people live, i.e. where people have a &%home.\")").
 %
 :-assert_kif("(=> (instance ?RESIDENCE PermanentResidence) (exists (?PERSON) (home ?PERSON ?HOTEL)))").
 %
-:-assert_kif("(subclass TemporaryResidence Residence)").
+:-assert_kif("(genls TemporaryResidence Residence)").
 :-assert_kif("(documentation TemporaryResidence \"A &%Residence which is strictly temporary, i .e. where no one makes his/her &%home.\")").
 %
 :-assert_kif("(=> (instance ?RESIDENCE TemporaryResidence) (not (exists (?PERSON) (home ?PERSON ?HOTEL))))").
 %
-:-assert_kif("(subclass ResidentialBuilding Building)").
-:-assert_kif("(subclass ResidentialBuilding Residence)").
+:-assert_kif("(genls ResidentialBuilding Building)").
+:-assert_kif("(genls ResidentialBuilding Residence)").
 :-assert_kif("(documentation ResidentialBuilding \"A &%Building which provides some accomodation for sleeping. Note that this class does not cover just permanent residences, e.g. &%Houses and condominium and apartment buildings, but also temporary residences, e.g. hotels and dormitories. &%ResidentialBuildings are also distinguished from &%CommercialBuildings, which are intended to serve an organizational rather than a residential function .\")").
 %
-:-assert_kif("(subclass Hotel ResidentialBuilding)").
-:-assert_kif("(subclass Hotel TemporaryResidence)").
-:-assert_kif("(subclass Hotel CommercialAgent)").
+:-assert_kif("(genls Hotel ResidentialBuilding)").
+:-assert_kif("(genls Hotel TemporaryResidence)").
+:-assert_kif("(genls Hotel CommercialAgent)").
 :-assert_kif("(documentation Hotel \"A &%ResidentialBuilding which provides temporary accommodations to guests in exchange for money.\")").
 %
-:-assert_kif("(subclass SingleFamilyResidence PermanentResidence)").
+:-assert_kif("(genls SingleFamilyResidence PermanentResidence)").
 :-assert_kif("(documentation SingleFamilyResidence \"A &%PermanentResidence which is intended to be the &%home of a single &%SocialUnit. This class covers &%Houses, &%ApartmentUnits, and &%CondominiumUnits.\")").
 %
 :-assert_kif("(=> (instance ?RESIDENCE SingleFamilyResidence) (hasPurpose ?RESIDENCE (forall (?AGENT1 ?AGENT2) (=> (and (home ?AGENT1 ?RESIDENCE) (home ?AGENT2 ?RESIDENCE)) (exists (?UNIT) (and (instance ?UNIT SocialUnit) (member ?AGENT1 ?UNIT) (member ?AGENT2 ?UNIT)))))))").
 %
-:-assert_kif("(subclass ArtWork Artifact)").
+:-assert_kif("(genls ArtWork Artifact)").
 :-assert_kif("(documentation ArtWork \"&%Artifacts that are created primarily for aesthetic appreciation. Note that this &%Class does not include most examples of architecture, which belong under &%StationaryArtifact.\")").
 %
-:-assert_kif("(subclass RepresentationalArtWork ArtWork)").
-:-assert_kif("(subclass RepresentationalArtWork Icon)").
+:-assert_kif("(genls RepresentationalArtWork ArtWork)").
+:-assert_kif("(genls RepresentationalArtWork Icon)").
 :-assert_kif("(documentation RepresentationalArtWork \"Any &%ArtWork that represents something &%Physical.\")").
 %
-:-assert_kif("(subclass Fabric Artifact)").
+:-assert_kif("(genls Fabric Artifact)").
 :-assert_kif("(disjoint Fabric StationaryArtifact)").
-:-assert_kif("(documentation Fabric \"&%Artifacts that are created by weaving together natural or synthetic fibers or by treating the skins of certain sorts of &%Animals. Note that this &%Class includes articles that are created by stitching together various types of fabrics, e.g. bedspreads. On the other hand , &%Clothing is not a &%subclass of &%Fabric, because many clothing items contain elements that are not fabrics.\")").
+:-assert_kif("(documentation Fabric \"&%Artifacts that are created by weaving together natural or synthetic fibers or by treating the skins of certain sorts of &%Animals. Note that this &%Class includes articles that are created by stitching together various types of fabrics, e.g. bedspreads. On the other hand , &%Clothing is not a &%genls of &%Fabric, because many clothing items contain elements that are not fabrics.\")").
 %
-:-assert_kif("(subclass Clothing Artifact)").
+:-assert_kif("(genls Clothing Artifact)").
 :-assert_kif("(disjoint Clothing StationaryArtifact)").
 :-assert_kif("(documentation Clothing \"&%Artifact made out of fabrics and possibly other materials that are used to cover the bodies of &%Humans.\")").
 %
@@ -5855,55 +5855,55 @@
 %
 :-assert_kif("(=> (wears ?AGENT ?CLOTHING) (located ?CLOTHING ?AGENT))").
 %
-:-assert_kif("(subclass Device Artifact)").
-:-assert_kif("(documentation Device \"A &%Device is an &%Artifact whose purpose is to serve as an &%instrument in a specific subclass of &%Process.\")").
+:-assert_kif("(genls Device Artifact)").
+:-assert_kif("(documentation Device \"A &%Device is an &%Artifact whose purpose is to serve as an &%instrument in a specific genls of &%Process.\")").
 %
 :-assert_kif("(=> (instance ?DEVICE Device) (exists (?PROC) (capability ?PROC instrument ?DEVICE)))").
 %
 :-assert_kif("(=> (instance ?DEVICE Device) (exists (?PROC) (hasPurpose ?DEVICE (exists (?INST) (and (instance ?INST ?PROC) (instrument ?INST ?DEVICE))))))").
 %
-:-assert_kif("(subclass MusicalInstrument Device)").
+:-assert_kif("(genls MusicalInstrument Device)").
 :-assert_kif("(documentation MusicalInstrument \"A &%Device which is manipulated by a &%Human and whose purpose is to produce &%Music.\")").
 %
 :-assert_kif("(=> (instance ?INSTRUMENT MusicalInstrument) (capability Music instrument ?INSTRUMENT))").
 %
-:-assert_kif("(subclass TransportationDevice Device)").
+:-assert_kif("(genls TransportationDevice Device)").
 :-assert_kif("(documentation TransportationDevice \"A &%TransportationDevice is a &%Device which serves as the &%instrument in a &%Transportation &%Process which carries the &%patient of the &%Process from one point to another.\")").
 %
 :-assert_kif("(=> (instance ?DEVICE TransportationDevice) (capability Transportation instrument ?DEVICE))").
 %
-:-assert_kif("(subclass Vehicle TransportationDevice)").
-:-assert_kif("(documentation Vehicle \"&%Vehicle is the subclass of &%TransportationDevices that transport passengers or goods from one place to another by moving from one place to the other with them, e.g., cars, trucks, ferries, and airplanes. Contrast with devices such as &%Pipelines, escalators, or supermarket checkout belts, which carry items from one place to another by means of a moving part, without the device removing from the origin to the destination.\")").
+:-assert_kif("(genls Vehicle TransportationDevice)").
+:-assert_kif("(documentation Vehicle \"&%Vehicle is the genls of &%TransportationDevices that transport passengers or goods from one place to another by moving from one place to the other with them, e.g., cars, trucks, ferries, and airplanes. Contrast with devices such as &%Pipelines, escalators, or supermarket checkout belts, which carry items from one place to another by means of a moving part, without the device removing from the origin to the destination.\")").
 %
 :-assert_kif("(=> (and (instance ?TRANSPORT Vehicle) (instance ?MOVE Translocation) (instrument ?MOVE ?TRANSPORT) (origin ?MOVE ?FROM)) (holdsDuring (BeginFn (WhenFn ?MOVE)) (located ?TRANSPORT ?FROM)))").
 %
 :-assert_kif("(=> (and (instance ?TRANSPORT Vehicle) (instance ?MOVE Translocation) (instrument ?MOVE ?TRANSPORT) (destination ?MOVE ?TO)) (holdsDuring (BeginFn (WhenFn ?MOVE)) (located ?TRANSPORT ?TO)))").
 %
-:-assert_kif("(subclass MeasuringDevice Device)").
+:-assert_kif("(genls MeasuringDevice Device)").
 :-assert_kif("(documentation MeasuringDevice \"Any &%Device whose purpose is to measure a &%PhysicalQuantity.\")").
 %
 :-assert_kif("(=> (instance ?DEVICE MeasuringDevice) (hasPurpose ?DEVICE (exists (?MEASURE) (and (instance ?MEASURE Measuring) (instrument ?MEASURE ?DEVICE)))))").
 %
-:-assert_kif("(subclass AttachingDevice Device)").
+:-assert_kif("(genls AttachingDevice Device)").
 :-assert_kif("(documentation AttachingDevice \"A &%Device whose purpose is to attach one thing to something else, e.g. nails, screws, buttons, etc.\")").
 %
 :-assert_kif("(=> (instance ?DEVICE AttachingDevice) (exists (?ATTACH) (and (instance ?ATTACH Attaching) (instrument ?ATTACH ?DEVICE))))").
 %
-:-assert_kif("(subclass Weapon Device)").
+:-assert_kif("(genls Weapon Device)").
 :-assert_kif("(documentation Weapon \"The &%Class of &%Devices that are designed primarily to damage or destroy &%Humans/&%Animals, &%StationaryArtifacts or the places inhabited by &%Humans/&%Animals.\")").
 %
 :-assert_kif("(=> (instance ?WEAPON Weapon) (capability Damaging instrument ?WEAPON))").
 %
 :-assert_kif("(=> (instance ?WEAPON Weapon) (hasPurpose ?WEAPON (exists (?DEST ?PATIENT) (and (instance ?DEST Damaging) (patient ?DEST ?PATIENT) (or (instance ?PATIENT StationaryArtifact) (instance ?PATIENT Animal) (exists (?ANIMAL) (and (instance ?ANIMAL Animal) (inhabits ?ANIMAL ?PATIENT))))))))").
 %
-:-assert_kif("(subclass Machine Device)").
+:-assert_kif("(genls Machine Device)").
 :-assert_kif("(documentation Machine \"&%Machines are &%Devices that that have a well -defined &%resource and &%result and that automatically convert the &%resource into the &%result.\")").
 %
 :-assert_kif("(=> (instance ?MACHINE Machine) (forall (?PROC) (=> (instrument ?PROC ?MACHINE) (exists (?RESOURCE ?RESULT) (and (resource ?PROC ?RESOURCE) (result ?PROC ?RESULT))))))").
 %
 :-assert_kif("(=> (instance ?MACHINE Machine) (exists (?COMP1 ?COMP2) (and (instance ?COMP1 EngineeringComponent) (instance ?COMP2 EngineeringComponent) (not (equal ?COMP1 ?COMP2)) (part ?COMP1 ?MACHINE) (part ?COMP2 ?MACHINE))))").
 %
-:-assert_kif("(subclass EngineeringComponent Device)").
+:-assert_kif("(genls EngineeringComponent Device)").
 :-assert_kif("(documentation EngineeringComponent \"A fundamental concept that applies in many engineering domains. An &%EngineeringComponent is an element of a &%Device that is a physically whole object, such as one might see listed as standard parts in a catalog. The main difference betweeen &%EngineeringComponents and arbitrary globs of matter is that &%EngineeringComponents are object-like in a modeling sense. Thus, an &%EngineeringComponent is not an arbtrary subregion, but a part of a system with a stable identity.\")").
 %
 :-assert_kif("(=> (instance ?COMP EngineeringComponent) (exists (?DEVICE) (and (instance ?DEVICE Device) (component ?COMP ?DEVICE))))").
@@ -5926,7 +5926,7 @@
 %
 :-assert_kif("(<=> (connectedEngineeringComponents ?COMP1 ?COMP2) (exists (?CONNECTION) (connectsEngineeringComponents ?CONNECTION ?COMP1 ?COMP2)))").
 %
-:-assert_kif("(subclass EngineeringConnection EngineeringComponent)").
+:-assert_kif("(genls EngineeringConnection EngineeringComponent)").
 :-assert_kif("(documentation EngineeringConnection \"An &%EngineeringConnection is an &%EngineeringComponent that represents a connection relationship between two other &%EngineeringComponents. It is a reification of the &%Predicate &%connectedEngineeringComponents. That means that whenever this &%Predicate holds between two &%EngineeringComponents, there exists an &%EngineeringConnection. The practical reason for reifying a relationship is to be able to attach other information about it. For example, one might want to say that a particular connection is associated with some shared parameters, or that it is of a particular type. &%EngineeringConnections are &%EngineeringComponents and can therefore be an &%engineeringSubcomponent of other &%EngineeringComponents. However, to provide for modular regularity in component systems, &%EngineeringConnections cannot be connected. For each pair of &%EngineeringComponents related by &%connectedEngineeringComponents, there exists at least one &%EngineeringConnection. However, that object may not be unique, and the same &%EngineeringConnection may be associated with several pairs of &%EngineeringComponents.\")").
 %
 :-assert_kif("(=> (instance ?CONNECTION EngineeringConnection) (exists (?COMP1 ?COMP2) (connectsEngineeringComponents ?CONNECTION ?COMP1 ?COMP2)))").
@@ -5939,48 +5939,48 @@
 %
 % :-assert_kif(";This following part contains definitions and axioms relating to social ").
 % :-assert_kif(";groups and the relations between them. ").
-:-assert_kif("(subclass CommercialAgent Agent)").
+:-assert_kif("(genls CommercialAgent Agent)").
 :-assert_kif("(documentation CommercialAgent \"An &%Agent that provides products and/or services for a fee with the aim of making a profit.\")").
 %
-:-assert_kif("(subclass Corporation CommercialAgent)").
-:-assert_kif("(subclass Corporation Organization)").
+:-assert_kif("(genls Corporation CommercialAgent)").
+:-assert_kif("(genls Corporation Organization)").
 :-assert_kif("(documentation Corporation \"An &%Organization that has a special legal status that allows a group of persons to act as a &%CommercialAgent and that insulates the owners (shareholders) from many liabilities that might result from the corporation 's operation.\")").
 %
-:-assert_kif("(subclass Manufacturer Corporation)").
+:-assert_kif("(genls Manufacturer Corporation)").
 :-assert_kif("(documentation Manufacturer \"Any &%Corporation which manufactures &%Products.\")").
 %
 :-assert_kif("(=> (instance ?MANUFACTURER Manufacturer) (exists (?PLANT) (and (instance ?PLANT IndustrialPlant) (possesses ?MANUFACTURER ?PLANT))))").
 %
 :-assert_kif("(=> (instance ?ORG Manufacturer) (hasPurpose (exists (?MANUFACTURE) (and (instance ?MANUFACTURE Manufacturing) (instance ?MANUFACTURE CommercialService) (agent ?MANUFACTURE ?ORG)))))").
 %
-:-assert_kif("(subclass MercantileOrganization Corporation)").
+:-assert_kif("(genls MercantileOrganization Corporation)").
 :-assert_kif("(documentation MercantileOrganization \"Any &%Corporation which sells physical goods to customers for a profit.\")").
 %
 :-assert_kif("(=> (instance ?ORG MercantileOrganization) (hasPurpose (exists (?SELL) (and (instance ?SELL Selling) (instance ?SELL CommercialService) (agent ?SELL ?ORG)))))").
 %
-:-assert_kif("(subclass Group Collection)").
-:-assert_kif("(subclass Group Agent)").
+:-assert_kif("(genls Group Collection)").
+:-assert_kif("(genls Group Agent)").
 :-assert_kif("(documentation Group \"A &%Collection of &%Agents, e.g. a flock of sheep, a herd of goats, or the local Boy Scout troop.\")").
 %
 :-assert_kif("(=> (and (instance ?GROUP Group) (member ?MEMB ?GROUP)) (instance ?MEMB Agent))").
 %
-:-assert_kif("(subclass GroupOfPeople Group)").
-:-assert_kif("(subclass GroupOfPeople AgentGroup)").
+:-assert_kif("(genls GroupOfPeople Group)").
+:-assert_kif("(genls GroupOfPeople AgentGroup)").
 :-assert_kif("(documentation GroupOfPeople \"Any &%Group whose &%members are exclusively &%Humans.\")").
 %
 :-assert_kif("(=> (and (instance ?GROUP GroupOfPeople) (member ?MEMBER ?GROUP)) (instance ?MEMBER Human))").
 %
-:-assert_kif("(subclass AgeGroup Group)").
+:-assert_kif("(genls AgeGroup Group)").
 :-assert_kif("(documentation AgeGroup \"A &%Group whose &%members all have the same &%age.\")").
 %
 :-assert_kif("(=> (instance ?GROUP AgeGroup) (forall (?MEMB1 ?MEMB2 ?AGE1 ?AGE2) (=> (and (member ?MEMB1 ?GROUP) (member ?MEMB2 ?GROUP) (age ?MEMB1 ?AGE1) (age ?MEMB2 ?AGE2)) (equal ?AGE1 ?AGE2))))").
 %
-:-assert_kif("(subclass FamilyGroup Group)").
+:-assert_kif("(genls FamilyGroup Group)").
 :-assert_kif("(documentation FamilyGroup \"A &%Group whose &%members bear &%familyRelations to one another.\")").
 %
 :-assert_kif("(=> (instance ?GROUP FamilyGroup) (forall (?MEMB1 ?MEMB2) (=> (and (member ?MEMB1 ?GROUP) (member ?MEMB2 ?GROUP)) (familyRelation ?MEMB1 ?MEMB2))))").
 %
-:-assert_kif("(subclass SocialUnit Group)").
+:-assert_kif("(genls SocialUnit Group)").
 :-assert_kif("(documentation SocialUnit \"A group of people who all have the same &%home.\")").
 %
 :-assert_kif("(=> (instance ?UNIT SocialUnit) (exists (?HOME) (=> (member ?MEMBER ?UNIT) (home ?MEMBER ?HOME))))").
@@ -6030,17 +6030,17 @@
 :-assert_kif("(domain wife 2 Man)").
 :-assert_kif("(documentation wife \" (&%wife ?WOMAN ?MAN) means that ?WOMAN is the wife of ?MAN.\")").
 %
-:-assert_kif("(subclass EthnicGroup Group)").
+:-assert_kif("(genls EthnicGroup Group)").
 :-assert_kif("(documentation EthnicGroup \"A &%Group whose &%members originate from the same &%GeographicArea or share the same &%Language and/or cultural practices .\")").
 %
-:-assert_kif("(subclass BeliefGroup Group)").
+:-assert_kif("(genls BeliefGroup Group)").
 :-assert_kif("(documentation BeliefGroup \"A &%Group whose &%members share a belief or set of beliefs.\")").
 %
 :-assert_kif("(=> (instance ?GROUP BeliefGroup) (exists (?BELIEF) (forall (?MEMB) (=> (member ?MEMB ?GROUP) (believes ?MEMB ?BELIEF)))))").
 %
-:-assert_kif("(subclass Organization Group)").
-:-assert_kif("(subclass Organization CognitiveAgent)").
-:-assert_kif("(documentation Organization \"An &%Organization is a corporate or similar institution . The &%members of an &%Organization typically have a common purpose or function. Note that this class also covers divisions, departments, etc . of organizations. For example, both the Shell Corporation and the accounting department at Shell would both be instances of &%Organization. Note too that the existence of an &%Organization is dependent on the existence of at least one &%member (since &%Organization is a subclass of &%Collection). Accordingly , in cases of purely legal organizations, a fictitious &%member should be assumed.\")").
+:-assert_kif("(genls Organization Group)").
+:-assert_kif("(genls Organization CognitiveAgent)").
+:-assert_kif("(documentation Organization \"An &%Organization is a corporate or similar institution . The &%members of an &%Organization typically have a common purpose or function. Note that this class also covers divisions, departments, etc . of organizations. For example, both the Shell Corporation and the accounting department at Shell would both be instances of &%Organization. Note too that the existence of an &%Organization is dependent on the existence of at least one &%member (since &%Organization is a genls of &%Collection). Accordingly , in cases of purely legal organizations, a fictitious &%member should be assumed.\")").
 %
 :-assert_kif("(=> (instance ?ORG Organization) (exists (?PURP) (forall (?MEMBER) (=> (member ?MEMBER ?ORG) (hasPurpose ?MEMBER ?PURP)))))").
 %
@@ -6053,17 +6053,17 @@
 %
 :-assert_kif("(=> (employs ?ORG ?PERSON) (member ?PERSON ?ORG))").
 %
-:-assert_kif("(subclass PoliticalOrganization Organization)").
+:-assert_kif("(genls PoliticalOrganization Organization)").
 :-assert_kif("(documentation PoliticalOrganization \"An &%Organization that is a &%Government, a &%subOrganization of a &%Government, or an &%Organization that is attempting to bring about some sort of political change.\")").
 %
 :-assert_kif("(=> (instance ?POL PoliticalOrganization) (exists (?PROC) (and (instance ?PROC PoliticalProcess) (agent ?PROC ?POL))))").
 %
-:-assert_kif("(subclass GovernmentOrganization Organization)").
+:-assert_kif("(genls GovernmentOrganization Organization)").
 :-assert_kif("(documentation GovernmentOrganization \"&%GovernmentOrganization is the class of official &%Organizations that are concerned with the government of a &%GeopoliticalArea at some level. They may be a &%Government or the &%subOrganization of a government.\")").
 %
 :-assert_kif("(<=> (instance ?ORG GovernmentOrganization) (or (instance ?ORG Government) (exists (?GOV) (and (instance ?GOV Government) (subOrganization ?ORG ?GOV)))))").
 %
-:-assert_kif("(subclass Government GovernmentOrganization)").
+:-assert_kif("(genls Government GovernmentOrganization)").
 :-assert_kif("(documentation Government \"The ruling body of a &%GeopoliticalArea.\")").
 %
 :-assert_kif("(instance GovernmentFn UnaryFunction)").
@@ -6073,22 +6073,22 @@
 %
 :-assert_kif("(<=> (instance ?COUNTRY Nation) (instance (GovernmentFn ?COUNTRY) NationalGovernment))").
 %
-:-assert_kif("(subclass MilitaryOrganization GovernmentOrganization)").
+:-assert_kif("(genls MilitaryOrganization GovernmentOrganization)").
 :-assert_kif("(documentation MilitaryOrganization \"Any heavily armed &%Organization that is part of a &%Government and that is charged with representing the &%Government in international conflicts.\")").
 %
-:-assert_kif("(subclass PoliceOrganization GovernmentOrganization)").
+:-assert_kif("(genls PoliceOrganization GovernmentOrganization)").
 :-assert_kif("(documentation PoliceOrganization \"Any &%GovernmentOrganization that is charged with domestic enforcement of the laws of the &%Government.\")").
 %
-:-assert_kif("(subclass JudicialOrganization Organization)").
+:-assert_kif("(genls JudicialOrganization Organization)").
 :-assert_kif("(documentation JudicialOrganization \"&%JudicialOrganization is the class of &%Organizations whose primary purpose is to render judgments according to the statutes or regulations of a government or other organization. Judicial bodies are not necessarily government organizations, for example, those associated with sporting associations.\")").
 %
 :-assert_kif("(=> (and (instance ?ORG JudicialOrganization) (subOrganization ?ORG ?GOV) (instance ?GOV GovernmentOrganization)) (instance ?ORG GovernmentOrganization))").
 %
-:-assert_kif("(subclass EducationalOrganization Organization)").
+:-assert_kif("(genls EducationalOrganization Organization)").
 :-assert_kif("(documentation EducationalOrganization \"A &%EducationalOrganization is an institution of learning. Some examples are public and private K-12 schools , and colleges and universities.\")").
 %
-:-assert_kif("(subclass ReligiousOrganization Organization)").
-:-assert_kif("(subclass ReligiousOrganization BeliefGroup)").
+:-assert_kif("(genls ReligiousOrganization Organization)").
+:-assert_kif("(genls ReligiousOrganization BeliefGroup)").
 :-assert_kif("(documentation ReligiousOrganization \"An &%Organization whose members share a set of religious beliefs.\")").
 %
 :-assert_kif("(subrelation subOrganization subCollection)").
@@ -6112,43 +6112,43 @@
 % :-assert_kif(";INCLUDES 'MEREOTOPOLOGY' ").
 % :-assert_kif(";INCLUDES 'PROCESSES' ").
 % :-assert_kif(";INCLUDES 'OBJECTS' ").
-:-assert_kif("(subclass FieldOfStudy Proposition)").
-:-assert_kif("(documentation FieldOfStudy \"An academic or applied discipline with recognized experts and with a core of accepted theory or practice. Note that &%FieldOfStudy is a &%subclass of &%Proposition, because a &%FieldOfStudy is understood to be a body of abstract, informational content , with varying degrees of certainty attached to each element of this content.\")").
+:-assert_kif("(genls FieldOfStudy Proposition)").
+:-assert_kif("(documentation FieldOfStudy \"An academic or applied discipline with recognized experts and with a core of accepted theory or practice. Note that &%FieldOfStudy is a &%genls of &%Proposition, because a &%FieldOfStudy is understood to be a body of abstract, informational content , with varying degrees of certainty attached to each element of this content.\")").
 %
-:-assert_kif("(subclass Procedure Proposition)").
-:-assert_kif("(subclass Procedure Specification)").
+:-assert_kif("(genls Procedure Proposition)").
+:-assert_kif("(genls Procedure Specification)").
 :-assert_kif("(documentation Procedure \"A sequence-dependent specification. Some examples are &%ComputerPrograms, finite-state machines, cooking recipes, musical scores, conference schedules, driving directions, and the scripts of plays and movies.\")").
 %
-:-assert_kif("(subclass ComputerProgram Procedure)").
+:-assert_kif("(genls ComputerProgram Procedure)").
 :-assert_kif("(documentation ComputerProgram \"A set of instructions in a computer programming language that can be executed by a computer.\")").
 %
-:-assert_kif("(subclass Plan Procedure)").
+:-assert_kif("(genls Plan Procedure)").
 :-assert_kif("(documentation Plan \"A specification of a sequence of &%Processes which is intended to satisfy a specified purpose at some future time.\")").
 %
 :-assert_kif("(=> (and (instance ?PLAN Plan) (instance ?OBJ ContentBearingObject) (containsInformation ?OBJ ?PLAN)) (exists (?PLANNING) (and (instance ?PLANNING Planning) (result ?PLANNING ?OBJ))))").
 %
 :-assert_kif("(=> (instance ?PLAN Plan) (exists (?PURP) (hasPurpose ?PLAN ?PURP)))").
 %
-:-assert_kif("(subclass Argument Assertion)").
+:-assert_kif("(genls Argument Assertion)").
 :-assert_kif("(documentation Argument \"Any proposition which has the form of a deductive or inductive argument, i.e. a set of premises which, it is claimed, imply a conclusion.\")").
 %
 :-assert_kif("(=> (instance ?REASON Reasoning) (exists (?ARGUMENT) (and (instance ?ARGUMENT Argument) (realization ?REASON ?ARGUMENT))))").
 %
 :-assert_kif("(=> (instance ?ARGUMENT Argument) (exists (?PREMISES ?CONCLUSION) (and (equal (PremisesFn ?ARGUMENT) ?PREMISES) (conclusion ?CONCLUSION ?ARGUMENT))))").
 %
-:-assert_kif("(subclass DeductiveArgument Argument)").
+:-assert_kif("(genls DeductiveArgument Argument)").
 :-assert_kif("(partition DeductiveArgument ValidDeductiveArgument InvalidDeductiveArgument)").
 :-assert_kif("(documentation DeductiveArgument \"An &%Argument which has the form of a deduction , i.e. it is claimed that the set of &%premises &%entails the &%conclusion.\")").
 %
-:-assert_kif("(subclass ValidDeductiveArgument DeductiveArgument)").
+:-assert_kif("(genls ValidDeductiveArgument DeductiveArgument)").
 :-assert_kif("(documentation ValidDeductiveArgument \"A &%DeductiveArgument which is valid , i.e. the set of &%premises in fact &%entails the &%conclusion.\")").
 %
 :-assert_kif("(=> (and (instance ?ARGUMENT ValidDeductiveArgument) (equal ?PREMISES (PremisesFn ?ARGUMENT)) (conclusion ?CONCLUSION ?ARGUMENT)) (exists (?FORMULA1 ?FORMULA2) (and (containsInformation ?FORMULA1 ?PREMISES) (containsInformation ?FORMULA2 ?CONCLUSION) (entails ?PREMISES ?CONCLUSION))))").
 %
-:-assert_kif("(subclass InvalidDeductiveArgument DeductiveArgument)").
+:-assert_kif("(genls InvalidDeductiveArgument DeductiveArgument)").
 :-assert_kif("(documentation InvalidDeductiveArgument \"&%DeductiveArguments that are not &%ValidDeductiveArguments, i.e. it is not the case that the set of &%premises in fact &%entails the &%conclusion.\")").
 %
-:-assert_kif("(subclass Explanation DeductiveArgument)").
+:-assert_kif("(genls Explanation DeductiveArgument)").
 :-assert_kif("(documentation Explanation \"An &%Argument where the conclusion is an observed fact and the premises are other facts which collectively imply the conclusion. Note that this is the they hypothetico-deductive model of explanation.\")").
 %
 :-assert_kif("(instance premise BinaryPredicate)").
@@ -6200,7 +6200,7 @@
 %
 :-assert_kif("(=> (holdsDuring ?TIME (faces ?PROC ?ATTR1)) (forall (?ATTR2) (=> (holdsDuring ?TIME (faces ?PROC ?ATTR2)) (equal ?ATTR2 ?ATTR1))))").
 %
-:-assert_kif("(subclass TruthValue RelationalAttribute)").
+:-assert_kif("(genls TruthValue RelationalAttribute)").
 :-assert_kif("(documentation TruthValue \"The &%Class of truth values, e.g. &%True and &%False. These are &%Attributes of &%Sentences and &%Propositions.\")").
 %
 :-assert_kif("(=> (and (property ?ITEM ?VALUE) (instance ?VALUE TruthValue)) (or (instance ?ITEM Sentence) (instance ?ITEM Proposition)))").
@@ -6228,11 +6228,11 @@
 :-assert_kif("(domain true 2 TruthValue)").
 :-assert_kif("(documentation true \"The &%BinaryPredicate that relates a &%Sentence to its &%TruthValue.\")").
 %
-:-assert_kif("(subclass PositionalAttribute RelationalAttribute)").
+:-assert_kif("(genls PositionalAttribute RelationalAttribute)").
 :-assert_kif("(documentation PositionalAttribute \"&%Attributes characterizing the orientation of an &%Object, e.g. &%Vertical versus &%Horizontal, &%Left versus &%Right etc.\")").
 %
-:-assert_kif("(subclass DirectionalAttribute PositionalAttribute)").
-:-assert_kif("(documentation DirectionalAttribute \"The subclass of &%PositionalAttributes that concern compass directions.\")").
+:-assert_kif("(genls DirectionalAttribute PositionalAttribute)").
+:-assert_kif("(documentation DirectionalAttribute \"The genls of &%PositionalAttributes that concern compass directions.\")").
 %
 :-assert_kif("(=> (and (orientation ?OBJ1 ?OBJ2 ?ATTR1) (instance ?ATTR1 DirectionalAttribute) (instance ?ATTR2 DirectionalAttribute) (not (equal ?ATTR1 ?ATTR2))) (not (orientation ?OBJ1 ?OBJ2 ?ATTR2)))").
 %
@@ -6307,7 +6307,7 @@
 %
 :-assert_kif("(=> (orientation ?OBJ1 ?OBJ2 On) (not (orientation ?OBJ2 ?OBJ1 On)))").
 %
-:-assert_kif("(subclass TimeZone RelationalAttribute)").
+:-assert_kif("(genls TimeZone RelationalAttribute)").
 :-assert_kif("(documentation TimeZone \"An &%Attribute which is used to specify coordinates in which time measures are uniform, i.e. all time devices are synchronized to the same &%TimePositions.\")").
 %
 :-assert_kif("(instance CoordinatedUniversalTimeZone TimeZone)").
@@ -6341,7 +6341,7 @@
 :-assert_kif("(range RelativeTimeFn TimePosition)").
 :-assert_kif("(documentation RelativeTimeFn \"A means of converting &%TimePositions between different &%TimeZones. (&%RelativeTimeFn ?TIME ?ZONE) denotes the &%TimePosition in &%CoordinatedUniversalTime that is contemporaneous with the &%TimePosition ?TIME in &%TimeZone ?ZONE. For example, (&%RelativeTimeFn (&%MeasureFn 14 &%Hour) &%EasternTimeZone) would return the value (&%MeasureFn 19 &%Hour).\")").
 %
-:-assert_kif("(subclass SocialRole RelationalAttribute)").
+:-assert_kif("(genls SocialRole RelationalAttribute)").
 :-assert_kif("(documentation SocialRole \"The &%Class of all &%Attributes that specify the position or status of a &%CognitiveAgent within an &%Organization or other &%Group.\")").
 %
 :-assert_kif("(=> (and (attribute ?PERSON ?ATTRIBUTE) (instance ?ATTRIBUTE SocialRole)) (instance ?PERSON Human))").
@@ -6351,7 +6351,7 @@
 %
 :-assert_kif("(<=> (forall (?ORG) (not (employs ?ORG ?PERSON))) (attribute ?PERSON Unemployed))").
 %
-:-assert_kif("(subclass Position SocialRole)").
+:-assert_kif("(genls Position SocialRole)").
 :-assert_kif("(partition Position FullTimePosition PartTimePosition)").
 :-assert_kif("(documentation Position \"A formal position of reponsibility within an &%Organization. Examples of &%Positions include president, laboratory director, senior researcher, sales representative, etc.\")").
 %
@@ -6365,7 +6365,7 @@
 %
 :-assert_kif("(<=> (employs ?ORG ?PERSON) (exists (?POSITION) (occupiesPosition ?PERSON ?POSITION ?ORG)))").
 %
-:-assert_kif("(subclass NormativeAttribute RelationalAttribute)").
+:-assert_kif("(genls NormativeAttribute RelationalAttribute)").
 :-assert_kif("(documentation NormativeAttribute \"A &%Class containing all of the &%Attributes that are specific to morality, legality, aesthetics, etiquette , etc. Many of these attributes express a judgement that something ought or ought not to be the case.\")").
 %
 :-assert_kif("(instance modalAttribute BinaryPredicate)").
@@ -6387,19 +6387,19 @@
 %
 :-assert_kif("(=> (holdsObligation ?FORMULA ?AGENT) (modalAttribute ?FORMULA Obligatory))").
 %
-:-assert_kif("(subclass SubjectiveAssessmentAttribute NormativeAttribute)").
+:-assert_kif("(genls SubjectiveAssessmentAttribute NormativeAttribute)").
 :-assert_kif("(disjoint SubjectiveAssessmentAttribute ObjectiveNorm)").
 :-assert_kif("(documentation SubjectiveAssessmentAttribute \"The &%Class of &%NormativeAttributes which lack an objective criterion for their attribution, i.e. the attribution of these &%Attributes varies from subject to subject and even with respect to the same subject over time. This &%Class is, generally speaking, only used when mapping external knowledge sources to the SUMO. If a term from such a knowledge source seems to lack objective criteria for its attribution, it is assigned to this &%Class.\")").
 %
-:-assert_kif("(subclass ObjectiveNorm NormativeAttribute)").
+:-assert_kif("(genls ObjectiveNorm NormativeAttribute)").
 :-assert_kif("(documentation ObjectiveNorm \"The &%Class of &%NormativeAttributes that are associated with an objective criterion for their attribution, i.e. there is broad consensus about the cases where these attributes are applicable.\")").
 %
-:-assert_kif("(subclass ContestAttribute ObjectiveNorm)").
+:-assert_kif("(genls ContestAttribute ObjectiveNorm)").
 :-assert_kif("(documentation ContestAttribute \"A &%Class containing all of the &%Attributes that are specific to participants in a &%Contest. Some of these &%Attributes are winning, losing, won, lost, etc.\")").
 %
 :-assert_kif("(=> (and (property ?THING ?ATTR) (instance ?ATTR ContestAttribute)) (exists (?CONTEST) (and (instance ?CONTEST Contest) (or (agent ?CONTEST ?THING) (patient ?CONTEST ?THING) (subProcess ?THING ?CONTEST)))))").
 %
-:-assert_kif("(subclass AlethicAttribute ObjectiveNorm)").
+:-assert_kif("(genls AlethicAttribute ObjectiveNorm)").
 :-assert_kif("(documentation AlethicAttribute \"A &%Class containing all of the &%Attributes relating to the notions of possibility and necessity.\")").
 %
 :-assert_kif("(instance Possibility AlethicAttribute)").
@@ -6412,7 +6412,7 @@
 %
 :-assert_kif("(=> (modalAttribute ?FORMULA Necessity) (modalAttribute ?FORMULA Possibility))").
 %
-:-assert_kif("(subclass DeonticAttribute ObjectiveNorm)").
+:-assert_kif("(genls DeonticAttribute ObjectiveNorm)").
 :-assert_kif("(documentation DeonticAttribute \"A &%Class containing all of the &%Attributes relating to the notions of permission, obligation, and prohibition.\")").
 %
 :-assert_kif("(instance Permission DeonticAttribute)").
@@ -6449,7 +6449,7 @@
 :-assert_kif("(contraryAttribute NakedPromise Contractual)").
 :-assert_kif("(documentation NakedPromise \"A &%Promise where nothing is promised in return, i.e. a nudum pactum.\")").
 %
-:-assert_kif("(subclass PhysicalState InternalAttribute)").
+:-assert_kif("(genls PhysicalState InternalAttribute)").
 :-assert_kif("(exhaustiveAttribute PhysicalState Solid Fluid Liquid Gas)").
 :-assert_kif("(documentation PhysicalState \"The physical state of an &%Object. There are three reified instances of this &%Class: &%Solid, &%Liquid, and &%Gas. Physical changes are not characterized by the transformation of one substance into another, but rather by the change of the form (physical states ) of a given substance. For example, melting an iron nail yields a substance still called iron.\")").
 %
@@ -6476,20 +6476,20 @@
 %
 :-assert_kif("(=> (and (instance ?MOTION GasMotion) (patient ?MOTION ?OBJ)) (attribute ?OBJ Gas))").
 %
-:-assert_kif("(subclass PerceptualAttribute InternalAttribute)").
+:-assert_kif("(genls PerceptualAttribute InternalAttribute)").
 :-assert_kif("(documentation PerceptualAttribute \"Any &%Attribute whose presence is detected by an act of &%Perception.\")").
 %
 :-assert_kif("(=> (and (instance ?PERCEPTION Perception) (patient ?PERCEPTION ?OBJ)) (exists (?PROP) (and (instance ?PROP PerceptualAttribute) (attribute ?OBJ ?PROP))))").
 %
-:-assert_kif("(subclass TasteAttribute PerceptualAttribute)").
+:-assert_kif("(genls TasteAttribute PerceptualAttribute)").
 :-assert_kif("(documentation TasteAttribute \"The &%Class of &%Attributes relating to the taste of &%Objects.\")").
 %
 :-assert_kif("(=> (instance ?OBJ Food) (exists (?ATTR) (and (instance ?ATTR TasteAttribute) (attribute ?OBJ ?ATTR))))").
 %
-:-assert_kif("(subclass OlfactoryAttribute PerceptualAttribute)").
+:-assert_kif("(genls OlfactoryAttribute PerceptualAttribute)").
 :-assert_kif("(documentation OlfactoryAttribute \"The &%Class of properties that are detectable by smell.\")").
 %
-:-assert_kif("(subclass VisualAttribute PerceptualAttribute)").
+:-assert_kif("(genls VisualAttribute PerceptualAttribute)").
 :-assert_kif("(documentation VisualAttribute \"The &%Class of visually discernible properties .\")").
 %
 :-assert_kif("(instance Illuminated VisualAttribute)").
@@ -6499,10 +6499,10 @@
 :-assert_kif("(contraryAttribute Unilluminated Illuminated)").
 :-assert_kif("(documentation Unilluminated \"The &%Attribute of &%Regions that are unilluminated , i.e in which no shapes are visually discernable.\")").
 %
-:-assert_kif("(subclass ColorAttribute VisualAttribute)").
+:-assert_kif("(genls ColorAttribute VisualAttribute)").
 :-assert_kif("(documentation ColorAttribute \"The &%Class of &%VisualAttributes relating to the color of &%Objects.\")").
 %
-:-assert_kif("(subclass PrimaryColor ColorAttribute)").
+:-assert_kif("(genls PrimaryColor ColorAttribute)").
 :-assert_kif("(documentation PrimaryColor \"Colors which can be blended to form any color and which cannot be derived from any other colors.\")").
 %
 :-assert_kif("(instance Red PrimaryColor)").
@@ -6533,7 +6533,7 @@
 %
 :-assert_kif("(=> (attribute ?OBJ Polychromatic) (exists (?PART1 ?PART2 ?COLOR1 ?COLOR2) (and (superficialPart ?PART1 ?OBJ) (superficialPart ?PART2 ?OBJ) (attribute ?PART1 ?COLOR1) (attribute ?PART2 ?COLOR2) (instance ?COLOR1 ColorAttribute) (instance ?COLOR2 ColorAttribute) (not (equal ?COLOR1 ?COLOR2)))))").
 %
-:-assert_kif("(subclass ShapeAttribute InternalAttribute)").
+:-assert_kif("(genls ShapeAttribute InternalAttribute)").
 :-assert_kif("(documentation ShapeAttribute \"Any &%Attribute that relates to the shape of an &%Object.\")").
 %
 :-assert_kif("(instance Pliable ShapeAttribute)").
@@ -6547,48 +6547,48 @@
 %
 :-assert_kif("(=> (instance ?OBJ SelfConnectedObject) (or (attribute ?OBJ Pliable) (attribute ?OBJ Rigid)))").
 %
-:-assert_kif("(subclass TwoDimensionalAngle OpenTwoDimensionalFigure)").
+:-assert_kif("(genls TwoDimensionalAngle OpenTwoDimensionalFigure)").
 :-assert_kif("(documentation TwoDimensionalAngle \"Any two &%OneDimensionalFigures (i.e. straight lines) meeting at a single &%GeometricPoint.\")").
 %
-:-assert_kif("(subclass RightAngle TwoDimensionalAngle)").
+:-assert_kif("(genls RightAngle TwoDimensionalAngle)").
 :-assert_kif("(documentation RightAngle \"Any &%TwoDimensionalAngle that has the &%angularMeasure of 90 &%AngularDegrees.\")").
 %
 :-assert_kif("(=> (instance ?ANGLE RightAngle) (angularMeasure ?ANGLE (MeasureFn 90 AngularDegree)))").
 %
-:-assert_kif("(subclass ClosedTwoDimensionalFigure TwoDimensionalFigure)").
+:-assert_kif("(genls ClosedTwoDimensionalFigure TwoDimensionalFigure)").
 :-assert_kif("(documentation ClosedTwoDimensionalFigure \"Any &%TwoDimensionalFigure which has a well defined interior and exterior.\")").
 %
-:-assert_kif("(subclass Polygon ClosedTwoDimensionalFigure)").
+:-assert_kif("(genls Polygon ClosedTwoDimensionalFigure)").
 :-assert_kif("(documentation Polygon \"A &%ClosedTwoDimensionalFigure that is composed exclusively of straight lines, i.e. &%OneDimensionalFigures.\")").
 %
 :-assert_kif("(=> (instance ?POLYGON Polygon) (=> (geometricPart ?PART ?POLYGON) (or (sideOfFigure ?PART ?POLYGON) (exists (?SIDE) (and (sideOfFigure ?SIDE ?POLYGON) (geometricPart ?PART ?SIDE))))))").
 %
-:-assert_kif("(subclass Triangle Polygon)").
+:-assert_kif("(genls Triangle Polygon)").
 :-assert_kif("(documentation Triangle \"Any three-sided &%Polygon.\")").
 %
 :-assert_kif("(=> (instance ?TRIANGLE Triangle) (equal (CardinalityFn (KappaFn ?SIDE (sideOfFigure ?SIDE ?TRIANGLE))) 3))").
 %
-:-assert_kif("(subclass Quadrilateral Polygon)").
+:-assert_kif("(genls Quadrilateral Polygon)").
 :-assert_kif("(documentation Quadrilateral \"Any four-sided &%Polygon.\")").
 %
 :-assert_kif("(=> (instance ?QUAD Quadrilateral) (equal (CardinalityFn (KappaFn ?SIDE (sideOfFigure ?SIDE ?QUAD))) 4))").
 %
-:-assert_kif("(subclass Rectangle Quadrilateral)").
+:-assert_kif("(genls Rectangle Quadrilateral)").
 :-assert_kif("(documentation Rectangle \"Any &%Quadrilateral whose angles are all &%RightAngles.\")").
 %
 :-assert_kif("(=> (instance ?RECTANGLE Rectangle) (=> (angleOfFigure ?ANGLE ?RECTANGLE) (instance ?ANGLE RightAngle)))").
 %
-:-assert_kif("(subclass Square Rectangle)").
+:-assert_kif("(genls Square Rectangle)").
 :-assert_kif("(documentation Square \"Any &%Rectangle whose sides are all equal.\")").
 %
 :-assert_kif("(=> (instance ?SQUARE Square) (exists (?LENGTH) (forall (?SIDE) (=> (sideOfFigure ?SIDE ?SQUARE) (lineMeasure ?SIDE ?LENGTH)))))").
 %
-:-assert_kif("(subclass Circle ClosedTwoDimensionalFigure)").
+:-assert_kif("(genls Circle ClosedTwoDimensionalFigure)").
 :-assert_kif("(documentation Circle \"The class of &%ClosedTwoDimensionalFigures such that all &%GeometricPoints that make up the &%Circle are equidistant from a single &%GeometricPoint, known as the center of the &%Circle.\")").
 %
 :-assert_kif("(=> (instance ?CIRCLE Circle) (exists (?RADIUS) (radius ?CIRCLE ?RADIUS)))").
 %
-:-assert_kif("(subclass ThreeDimensionalFigure GeometricFigure)").
+:-assert_kif("(genls ThreeDimensionalFigure GeometricFigure)").
 :-assert_kif("(documentation ThreeDimensionalFigure \"The class of &%GeometricFigures that have position and an extension along three dimensions, viz. geometric solids like polyhedrons and cylinders.\")").
 %
 :-assert_kif("(instance geometricPart BinaryPredicate)").
@@ -6667,16 +6667,16 @@
 %
 :-assert_kif("(=> (diameter ?CIRCLE ?LENGTH) (exists (?HALF) (and (radius ?CIRCLE ?HALF) (equal (MultiplicationFn ?HALF 2) ?LENGTH))))").
 %
-:-assert_kif("(subclass TextureAttribute PerceptualAttribute)").
-:-assert_kif("(subclass TextureAttribute ShapeAttribute)").
+:-assert_kif("(genls TextureAttribute PerceptualAttribute)").
+:-assert_kif("(genls TextureAttribute ShapeAttribute)").
 :-assert_kif("(documentation TextureAttribute \"Any &%Attribute that characterizes the texture of an &%Object. Note that a &%TextureAttribute always applies to the surface of an object whenever it applies to the object itself.\")").
 %
 :-assert_kif("(=> (and (instance ?ATTRIBUTE TextureAttribute) (attribute ?OBJ ?ATTRIBUTE) (surface ?SURFACE ?OBJ)) (attribute ?SURFACE ?ATTRIBUTE))").
 %
-:-assert_kif("(subclass SoundAttribute PerceptualAttribute)").
+:-assert_kif("(genls SoundAttribute PerceptualAttribute)").
 :-assert_kif("(documentation SoundAttribute \"Any &%Attribute that characterizes the sound made by an &%Object.\")").
 %
-:-assert_kif("(subclass SaturationAttribute InternalAttribute)").
+:-assert_kif("(genls SaturationAttribute InternalAttribute)").
 :-assert_kif("(documentation SaturationAttribute \"A &%Class of &%Attributes that specify, in a qualitative manner, the extent of the presence of one kind of &%Object in another kind of &%Object.\")").
 %
 :-assert_kif("(instance Dry SaturationAttribute)").
@@ -6694,8 +6694,8 @@
 %
 :-assert_kif("(=> (attribute ?OBJ Wet) (forall (?PART) (=> (part ?PART ?OBJ) (exists (?SUBPART) (and (part ?SUBPART ?PART) (attribute ?SUBPART Liquid))))))").
 %
-:-assert_kif("(subclass BreakabilityAttribute InternalAttribute)").
-:-assert_kif("(documentation BreakabilityAttribute \"A &%subclass of &%Attributes for characterizing the breakability of &%CorpuscularObjects.\")").
+:-assert_kif("(genls BreakabilityAttribute InternalAttribute)").
+:-assert_kif("(documentation BreakabilityAttribute \"A &%genls of &%Attributes for characterizing the breakability of &%CorpuscularObjects.\")").
 %
 :-assert_kif("(instance Fragile BreakabilityAttribute)").
 :-assert_kif("(documentation Fragile \"An &%Attribute which indicates that the associated &%Object is very breakable.\")").
@@ -6706,12 +6706,12 @@
 %
 :-assert_kif("(=> (attribute ?OBJ Unbreakable) (not (exists (?DAMAGE) (and (instance ?DAMAGE Damaging) (patient ?DAMAGE ?OBJ)))))").
 %
-:-assert_kif("(subclass BiologicalAttribute InternalAttribute)").
+:-assert_kif("(genls BiologicalAttribute InternalAttribute)").
 :-assert_kif("(documentation BiologicalAttribute \"&%Attributes that apply specifically to instances of &%Organism.\")").
 %
 :-assert_kif("(=> (and (attribute ?ORG ?ATT) (instance ?ATT BiologicalAttribute)) (instance ?ORG Organism))").
 %
-:-assert_kif("(subclass BodyPosition BiologicalAttribute)").
+:-assert_kif("(genls BodyPosition BiologicalAttribute)").
 :-assert_kif("(documentation BodyPosition \"The class of &%Attributes expressing configurations of bodies or parts of bodies of animals or humans, e .g. standing, sitting, kneeling, lying down, etc.\")").
 %
 :-assert_kif("(=> (instance ?ANIMAL Animal) (or (exists (?MOTION) (and (instance ?MOTION BodyMotion) (agent ?MOTION ?ANIMAL))) (exists (?ATTR) (and (instance ?ATTR BodyPosition) (attribute ?ANIMAL ?ATTR)))))").
@@ -6727,7 +6727,7 @@
 :-assert_kif("(instance Prostrate BodyPosition)").
 :-assert_kif("(documentation Prostrate \"The &%BodyPosition of lying down, being in a horizontal position.\")").
 %
-:-assert_kif("(subclass AnimacyAttribute BiologicalAttribute)").
+:-assert_kif("(genls AnimacyAttribute BiologicalAttribute)").
 :-assert_kif("(exhaustiveAttribute AnimacyAttribute Living Dead)").
 :-assert_kif("(documentation AnimacyAttribute \"&%Attributes that indicate whether an &%Organism is alive or not.\")").
 %
@@ -6743,7 +6743,7 @@
 %
 :-assert_kif("(=> (instance ?ORG Organism) (exists (?ATTR) (and (instance ?ATTR AnimacyAttribute) (attribute ?ORG ?ATTR))))").
 %
-:-assert_kif("(subclass SexAttribute BiologicalAttribute)").
+:-assert_kif("(genls SexAttribute BiologicalAttribute)").
 :-assert_kif("(exhaustiveAttribute SexAttribute Female Male)").
 :-assert_kif("(documentation SexAttribute \"&%Attributes that indicate the sex of an &%Organism.\")").
 %
@@ -6763,7 +6763,7 @@
 %
 :-assert_kif("(=> (instance ?MAN Man) (attribute ?MAN Male))").
 %
-:-assert_kif("(subclass DevelopmentalAttribute BiologicalAttribute)").
+:-assert_kif("(genls DevelopmentalAttribute BiologicalAttribute)").
 :-assert_kif("(exhaustiveAttribute DevelopmentalAttribute FullyFormed NonFullyFormed)").
 :-assert_kif("(documentation DevelopmentalAttribute \"&%Attributes that indicate the stage of development of an &%Organism.\")").
 %
@@ -6794,10 +6794,10 @@
 %
 :-assert_kif("(=> (holdsDuring ?TIME (attribute ?ORG Embryonic)) (holdsDuring ?TIME (not (exists (?BIRTH) (and (instance ?BIRTH Birth) (experiencer ?BIRTH ?ORG))))))").
 %
-:-assert_kif("(subclass DiseaseOrSyndrome BiologicalAttribute)").
+:-assert_kif("(genls DiseaseOrSyndrome BiologicalAttribute)").
 :-assert_kif("(documentation DiseaseOrSyndrome \"A &%BiologicalAttribute which qualifies something that alters or interferes with a normal process, state or activity of an &%Organism. It is usually characterized by the abnormal functioning of one or more of the host's systems, parts, or &%Organs.\")").
 %
-:-assert_kif("(subclass PsychologicalAttribute BiologicalAttribute)").
+:-assert_kif("(genls PsychologicalAttribute BiologicalAttribute)").
 :-assert_kif("(partition PsychologicalAttribute StateOfMind TraitAttribute)").
 :-assert_kif("(documentation PsychologicalAttribute \"&%Attributes that characterize the mental or behavioral life of an &%Organism.\")").
 %
@@ -6805,13 +6805,13 @@
 %
 :-assert_kif("(=> (and (instance ?ATTR PsychologicalAttribute) (attribute ?AGENT ?ATTR)) (instance ?AGENT SentientAgent))").
 %
-:-assert_kif("(subclass StateOfMind PsychologicalAttribute)").
+:-assert_kif("(genls StateOfMind PsychologicalAttribute)").
 :-assert_kif("(documentation StateOfMind \"The class &%StateOfMind is distinguished from its complement &%TraitAttribute by the fact that instances of the former are transient while instances of the latter are persistent features of a creature's behavioral/psychological make-up.\")").
 %
-:-assert_kif("(subclass EmotionalState StateOfMind)").
+:-assert_kif("(genls EmotionalState StateOfMind)").
 :-assert_kif("(documentation EmotionalState \"The &%Class of &%Attributes that denote emotional states of &%Organisms.\")").
 %
-:-assert_kif("(subclass ConsciousnessAttribute StateOfMind)").
+:-assert_kif("(genls ConsciousnessAttribute StateOfMind)").
 :-assert_kif("(documentation ConsciousnessAttribute \"&%Attributes that indicate whether an &%Organism is conscious or the qualitative degree of consciousness of an &%Organism.\")").
 %
 :-assert_kif("(<=> (and (instance ?AGENT SentientAgent) (attribute ?AGENT Living)) (exists (?ATTR) (and (instance ?ATTR ConsciousnessAttribute) (attribute ?AGENT ?ATTR))))").
@@ -6828,11 +6828,11 @@
 %
 :-assert_kif("(=> (or (attribute ?AGENT Asleep) (attribute ?AGENT Awake)) (attribute ?AGENT Living))").
 %
-:-assert_kif("(subclass TraitAttribute PsychologicalAttribute)").
+:-assert_kif("(genls TraitAttribute PsychologicalAttribute)").
 :-assert_kif("(documentation TraitAttribute \"&%Attributes that indicate the the behavior /personality traits of an &%Organism.\")").
 %
-:-assert_kif("(subclass PsychologicalDysfunction PsychologicalAttribute)").
-:-assert_kif("(subclass PsychologicalDysfunction DiseaseOrSyndrome)").
+:-assert_kif("(genls PsychologicalDysfunction PsychologicalAttribute)").
+:-assert_kif("(genls PsychologicalDysfunction DiseaseOrSyndrome)").
 :-assert_kif("(documentation PsychologicalDysfunction \"A clinically significant dysfunction whose major manifestation is behavioral or psychological. These dysfunctions may have identified or presumed biological etiologies or manifestations.\")").
 %
 % :-assert_kif(";END FILE ").
@@ -6859,7 +6859,7 @@
 %
 :-assert_kif("(<=> (instance ?ENTITY (GeneralizedIntersectionFn ?SUPERCLASS)) (forall (?CLASS) (=> (instance ?CLASS ?SUPERCLASS) (instance ?ENTITY ?CLASS))))").
 %
-:-assert_kif("(<=> (instance ?SUBCLASS (PowerSetFn ?CLASS)) (subclass ?SUBCLASS ?CLASS))").
+:-assert_kif("(<=> (instance ?SUBCLASS (PowerSetFn ?CLASS)) (genls ?SUBCLASS ?CLASS))").
 %
 % :-assert_kif(";<module>MidLevel</module> ").
 % :-assert_kif("; BEGIN FILE ").
@@ -6891,144 +6891,144 @@
 % :-assert_kif(";=========== ").
 % :-assert_kif(";The following content (down to the header for \"Elements Ontology\") was ").
 % :-assert_kif(";newly created for the MILO. ").
-:-assert_kif("(subclass HumanCorpse Human)").
+:-assert_kif("(genls HumanCorpse Human)").
 :-assert_kif("(documentation HumanCorpse \"A &%Human which is &%Dead.\")").
 %
 :-assert_kif("(<=> (instance ?CORPSE HumanCorpse) (and (instance ?CORPSE Human) (attribute ?CORPSE Dead)))").
 %
-:-assert_kif("(subclass HumanSlave Human)").
+:-assert_kif("(genls HumanSlave Human)").
 :-assert_kif("(documentation HumanSlave \"A &%Human who is owned by someone else.\")").
 %
 :-assert_kif("(=> (instance ?SLAVE HumanSlave) (exists (?PERSON) (and (instance ?PERSON Human) (not (equal ?PERSON ?SLAVE)) (possesses ?PERSON ?SLAVE))))").
 %
-:-assert_kif("(subclass HumanAdult Human)").
+:-assert_kif("(genls HumanAdult Human)").
 :-assert_kif("(documentation HumanAdult \"The class of &%Humans that are 18 years of age or older.\")").
 %
 :-assert_kif("(=> (and (instance ?ADULT HumanAdult) (age ?ADULT (MeasureFn ?NUMBER YearDuration))) (greaterThanOrEqualTo ?NUMBER 18))").
 %
-:-assert_kif("(subclass HumanYouth Human)").
+:-assert_kif("(genls HumanYouth Human)").
 :-assert_kif("(documentation HumanYouth \"The class of &%Humans that are younger than 18 years of age.\")").
 %
 :-assert_kif("(=> (and (instance ?YOUTH HumanYouth) (age ?YOUTH (MeasureFn ?NUMBER YearDuration))) (lessThan ?NUMBER 18))").
 %
-:-assert_kif("(subclass HumanChild HumanYouth)").
+:-assert_kif("(genls HumanChild HumanYouth)").
 :-assert_kif("(documentation HumanChild \"A &%HumanYouth between birth and puberty, i.e a &%Human who is &%NonFullyFormed.\")").
 %
 :-assert_kif("(=> (instance ?CHILD HumanChild) (attribute ?CHILD NonFullyFormed))").
 %
 :-assert_kif("(=> (and (instance ?CHILD HumanChild) (age ?CHILD (MeasureFn ?NUMBER YearDuration))) (lessThanOrEqualTo ?NUMBER 14))").
 %
-:-assert_kif("(subclass Teenager HumanYouth)").
+:-assert_kif("(genls Teenager HumanYouth)").
 :-assert_kif("(documentation Teenager \"A &%HumanYouth between puberty and the age of 20.\")").
 %
 :-assert_kif("(=> (and (instance ?TEEN Teenager) (age ?TEEN (MeasureFn ?NUMBER YearDuration))) (and (greaterThan ?NUMBER 12) (lessThan ?NUMBER 20)))").
 %
-:-assert_kif("(subclass Boy HumanChild)").
-:-assert_kif("(subclass Boy Man)").
+:-assert_kif("(genls Boy HumanChild)").
+:-assert_kif("(genls Boy Man)").
 :-assert_kif("(documentation Boy \"A &%HumanChild who is &%Male.\")").
 %
-:-assert_kif("(subclass Girl HumanChild)").
-:-assert_kif("(subclass Girl Woman)").
+:-assert_kif("(genls Girl HumanChild)").
+:-assert_kif("(genls Girl Woman)").
 :-assert_kif("(documentation Girl \"A &%HumanChild who is &%Female.\")").
 %
-:-assert_kif("(subclass HumanBaby HumanChild)").
+:-assert_kif("(genls HumanBaby HumanChild)").
 :-assert_kif("(documentation HumanBaby \"A &%Human between birth and the first year of age.\")").
 %
 :-assert_kif("(=> (and (instance ?BABY HumanBaby) (age ?CHILD (MeasureFn ?NUMBER YearDuration))) (lessThanOrEqualTo ?NUMBER 1))").
 %
-:-assert_kif("(subclass Stepping BodyMotion)").
+:-assert_kif("(genls Stepping BodyMotion)").
 :-assert_kif("(documentation Stepping \"The &%BodyMotion of extending one foot forward and then bringing the other foot to the same lateral position as the first leg.\")").
 %
 :-assert_kif("(=> (and (instance ?AMBULATE Ambulating) (agent ?AMBULATE ?AGENT)) (attribute ?AGENT Standing))").
 %
-:-assert_kif("(=> (instance ?AMBULATE Ambulating) (exists (?SUB) (and (subclass ?SUB Stepping) (forall (?INST) (<=> (instance ?INST ?SUB) (subProcess ?INST ?AMBULATE))))))").
+:-assert_kif("(=> (instance ?AMBULATE Ambulating) (exists (?SUB) (and (genls ?SUB Stepping) (forall (?INST) (<=> (instance ?INST ?SUB) (subProcess ?INST ?AMBULATE))))))").
 %
-:-assert_kif("(subclass ReflectingLight RadiatingLight)").
+:-assert_kif("(genls ReflectingLight RadiatingLight)").
 :-assert_kif("(documentation ReflectingLight \"Those instances of &%RadiatingLight where the &%instrument is not a light source, but is simply a surface which bends light waves that come in contact with it.\")").
 %
-:-assert_kif("(subclass Lyrics Text)").
+:-assert_kif("(genls Lyrics Text)").
 :-assert_kif("(documentation Lyrics \"Any &%Text which is intended to be sung.\")").
 %
 :-assert_kif("(=> (instance ?LYRIC Lyrics) (hasPurpose ?LYRIC (exists (?SING) (and (instance ?SING Singing) (patient ?SING ?LYRIC)))))").
 %
-:-assert_kif("(subclass InstrumentalMusic Music)").
+:-assert_kif("(genls InstrumentalMusic Music)").
 :-assert_kif("(documentation InstrumentalMusic \"&%Music which is produced (at least in part) by a &%MusicalInstrument.\")").
 %
 :-assert_kif("(=> (instance ?MUSIC InstrumentalMusic) (exists (?INSTRUMENT) (and (instance ?INSTRUMENT MusicalInstrument) (instrument ?MUSIC ?INSTRUMENT))))").
 %
-:-assert_kif("(subclass Piano MusicalInstrument)").
+:-assert_kif("(genls Piano MusicalInstrument)").
 :-assert_kif("(documentation Piano \"A &%MusicalInstrument with keys that, when pressed down, activate hammers that, in turn, strike strings.\")").
 %
-:-assert_kif("(subclass MonophonicMusic Music)").
+:-assert_kif("(genls MonophonicMusic Music)").
 :-assert_kif("(documentation MonophonicMusic \"&%Music which has a single part, i.e. &%Music which cannot be divided into two or more contemporaneous &%subProcesses which are also instances of &%Music.\")").
 %
-:-assert_kif("(subclass PolyphonicMusic Music)").
+:-assert_kif("(genls PolyphonicMusic Music)").
 :-assert_kif("(documentation PolyphonicMusic \"&%Music which has two or more parts, i.e. &%Music which can be divided into two or more contemporaneous &%subProcesses which are also instances of &%Music.\")").
 %
 :-assert_kif("(<=> (instance ?MUSIC PolyphonicMusic) (exists (?PART1 ?PART2) (and (instance ?MUSIC Music) (instance ?PART1 Music) (instance ?PART2 Music) (subProcess ?PART1 ?MUSIC) (subProcess ?PART2 ?MUSIC) (not (equal ?PART1 ?PART2)) (cooccur ?PART1 ?MUSIC) (cooccur ?PART2 ?MUSIC))))").
 %
-:-assert_kif("(subclass WrittenCommunication LinguisticCommunication)").
+:-assert_kif("(genls WrittenCommunication LinguisticCommunication)").
 :-assert_kif("(documentation WrittenCommunication \"Any &%LinguisticCommunication where the &%instrument is a &%Text, e.g. a letter, an email, a memo, etc.\")").
 %
 :-assert_kif("(=> (instance ?COMMUNICATE WrittenCommunication) (exists (?WRITE ?READ ?TEXT) (and (instance ?WRITE Writing) (instance ?READ Reading) (instance ?TEXT Text) (instrument ?COMMUNICATE ?TEXT) (result ?WRITE ?TEXT) (patient ?READ ?TEXT) (subProcess ?WRITE ?COMMUNICATE) (subProcess ?READ ?COMMUNICATE))))").
 %
-:-assert_kif("(subclass Reminding Requesting)").
+:-assert_kif("(genls Reminding Requesting)").
 :-assert_kif("(documentation Reminding \"Any &%Requesting that is intended to cause a &%Remembering of something.\")").
 %
 :-assert_kif("(=> (instance ?REMIND Reminding) (exists (?REMEMBER) (and (instance ?REMEMBER Remembering) (causes ?REMIND ?REMEMBER))))").
 %
-:-assert_kif("(subclass Threatening Committing)").
+:-assert_kif("(genls Threatening Committing)").
 :-assert_kif("(documentation Threatening \"Any &%Committing where the thing promised is something that is deemed undesirable by the &%destination of the &%Committing.\")").
 %
 :-assert_kif("(=> (and (instance ?THREATEN Threatening) (agent ?THREATEN ?AGENT) (patient ?THREATEN ?PROP) (destination ?THREATEN ?DEST)) (not (desires ?DEST ?PROP)))").
 %
-:-assert_kif("(subclass Punishing OrganizationalProcess)").
+:-assert_kif("(genls Punishing OrganizationalProcess)").
 :-assert_kif("(documentation Punishing \"Any &%OrganizationalProcess where the &%agent does something to the &%destination that the &%agent knows is undesirable for the &%destination.\")").
 %
 :-assert_kif("(=> (and (instance ?PUNISH Punishing) (agent ?PUNISH ?AGENT) (patient ?PUNISH ?PROP) (destination ?PUNISH ?DEST)) (knows ?AGENT (not (desires ?DEST ?PROP))))").
 %
-:-assert_kif("(subclass Registering Stating)").
-:-assert_kif("(subclass Registering PoliticalProcess)").
+:-assert_kif("(genls Registering Stating)").
+:-assert_kif("(genls Registering PoliticalProcess)").
 :-assert_kif("(documentation Registering \"Submitting official paperwork in a government agency , e.g. filing for divorce, making a legal claim against someone.\")").
 %
 :-assert_kif("(=> (instance ?ACTION LegalAction) (exists (?REGISTER) (and (instance ?REGISTER Registering) (subProcess ?REGISTER ?ACTION))))").
 %
-:-assert_kif("(subclass Answering Stating)").
+:-assert_kif("(genls Answering Stating)").
 :-assert_kif("(documentation Answering \"Responding to a &%Questioning, i.e. trying to answer someone 's question.\")").
 %
 :-assert_kif("(=> (instance ?ANSWER Answering) (exists (?QUESTION) (and (instance ?QUESTION Questioning) (refers ?ANSWER ?QUESTION) (earlier (WhenFn ?QUESTION) (WhenFn ?ANSWER)))))").
 %
-:-assert_kif("(subclass Arguing Stating)").
+:-assert_kif("(genls Arguing Stating)").
 :-assert_kif("(documentation Arguing \"Any &%Stating which has the form of an &%Argument.\")").
 %
 :-assert_kif("(=> (instance ?ARGUE Arguing) (exists (?STATEMENT) (and (patient ?ARGUE ?STATEMENT) (instance ?STATEMENT Statement) (containsInformation ?STATEMENT ?ARGUMENT) (instance ?ARGUMENT Argument))))").
 %
-:-assert_kif("(subclass StatingALie Stating)").
+:-assert_kif("(genls StatingALie Stating)").
 :-assert_kif("(documentation StatingALie \"Any &%Stating which is both &%False and believed to be &%False by the &%agent of the &%Stating.\")").
 %
 :-assert_kif("(=> (and (instance ?STATE StatingALie) (agent ?STATE ?AGENT) (patient ?STATE ?STATEMENT)) (and (true ?STATMENT False) (believes ?AGENT (true ?STATEMENT False))))").
 %
-:-assert_kif("(subclass Founding Declaring)").
-:-assert_kif("(subclass Founding OrganizationalProcess)").
+:-assert_kif("(genls Founding Declaring)").
+:-assert_kif("(genls Founding OrganizationalProcess)").
 :-assert_kif("(documentation Founding \"Setting up an &%Organization.\")").
 %
 :-assert_kif("(=> (instance ?FOUND Founding) (exists (?ORG) (and (instance ?ORG Organization) (result ?FOUND ?ORG))))").
 %
-:-assert_kif("(subclass Indicating Communicating)").
-:-assert_kif("(subclass Indicating BodyMotion)").
+:-assert_kif("(genls Indicating Communicating)").
+:-assert_kif("(genls Indicating BodyMotion)").
 :-assert_kif("(documentation Indicating \"Pointing out a person, place or thing with one 's hand or with an &%Artifact.\")").
 %
-:-assert_kif("(subclass Projectile Weapon)").
+:-assert_kif("(genls Projectile Weapon)").
 :-assert_kif("(documentation Projectile \"A missile, bullet, etc. that is fired from a &%Weapon.\")").
 %
 :-assert_kif("(=> (instance ?PROJECTILE Projectile) (capability Shooting patient ?PROJECTILE))").
 %
-:-assert_kif("(subclass ProjectileShell Container)").
+:-assert_kif("(genls ProjectileShell Container)").
 :-assert_kif("(documentation ProjectileShell \"The outer casing of a &%Projectile.\")").
 %
 :-assert_kif("(=> (instance ?PROJECTILE Projectile) (exists (?SHELL) (and (instance ?SHELL ProjectileShell) (part ?SHELL ?PROJECTILE))))").
 %
-:-assert_kif("(subclass Gun Weapon)").
+:-assert_kif("(genls Gun Weapon)").
 :-assert_kif("(partition Gun ArtilleryGun Firearm)").
 :-assert_kif("(documentation Gun \"A &%Weapon that shoots a &%Projectile.\")").
 %
@@ -7036,94 +7036,94 @@
 %
 :-assert_kif("(=> (instance ?SHOOT Shooting) (exists (?PROJECTILE ?GUN) (and (instance ?PROJECTILE Projectile) (patient ?SHOOT ?PROJECTILE) (instance ?GUN Gun) (instrument ?SHOOT ?GUN))))").
 %
-:-assert_kif("(subclass GunStock EngineeringComponent)").
+:-assert_kif("(genls GunStock EngineeringComponent)").
 :-assert_kif("(documentation GunStock \"The part of a &%Gun that is placed against the shoulder to absorb some of the recoil action when it is fired.\")").
 %
 :-assert_kif("(=> (instance ?STOCK GunStock) (exists (?GUN) (and (instance ?GUN Gun) (part ?STOCK ?GUN))))").
 %
-:-assert_kif("(subclass ArtilleryGun Gun)").
+:-assert_kif("(genls ArtilleryGun Gun)").
 :-assert_kif("(documentation ArtilleryGun \"A &%Gun that is too large to be carried and fired by a single &%Human. Typically, &%ArtilleryGuns are on wheels.\")").
 %
-:-assert_kif("(subclass Firearm Gun)").
+:-assert_kif("(genls Firearm Gun)").
 :-assert_kif("(partition Firearm Rifle Pistol)").
 :-assert_kif("(documentation Firearm \"A &%Gun that is small enough to be carried and fired by a single &%Human.\")").
 %
-:-assert_kif("(subclass Rifle Firearm)").
+:-assert_kif("(genls Rifle Firearm)").
 :-assert_kif("(documentation Rifle \"A &%Firearm with a long barrel that is intended to be fired from the shoulder.\")").
 %
-:-assert_kif("(subclass Pistol Firearm)").
+:-assert_kif("(genls Pistol Firearm)").
 :-assert_kif("(documentation Pistol \"A &%Firearm that is intended to be aimed and fired with a single hand.\")").
 %
-:-assert_kif("(subclass Manifold EngineeringComponent)").
+:-assert_kif("(genls Manifold EngineeringComponent)").
 :-assert_kif("(documentation Manifold \"A pipe which has several outlets for other pipes that flow into or out of it.\")").
 %
-:-assert_kif("(subclass BirthControlDevice Device)").
+:-assert_kif("(genls BirthControlDevice Device)").
 :-assert_kif("(documentation BirthControlDevice \"&%Devices which permit sexual intercourse but which reduce the likelihood of conception.\")").
 %
-:-assert_kif("(subclass SwitchDevice Device)").
+:-assert_kif("(genls SwitchDevice Device)").
 :-assert_kif("(documentation SwitchDevice \"A &%Device which is capable of turning an &%ElectricDevice on and off.\")").
 %
 :-assert_kif("(=> (instance ?DEVICE SwitchDevice) (exists (?PROC1 ?PROC2 ?ELECTRIC) (and (instrument ?PROC1 ?DEVICE) (causes ?PROC1 ?PROC2) (instrument ?PROC2 ?ELECTRIC) (instance ?ELECTRIC ElectricDevice))))").
 %
-:-assert_kif("(subclass Transducer Device)").
+:-assert_kif("(genls Transducer Device)").
 :-assert_kif("(documentation Transducer \"A &%Device which is capable of converting one form of energy into another.\")").
 %
-:-assert_kif("(subclass Aerator Device)").
+:-assert_kif("(genls Aerator Device)").
 :-assert_kif("(documentation Aerator \"A &%Device whose purpose is to mix &%Substances with &%Air.\")").
 %
 :-assert_kif("(=> (instance ?AERATOR Aerator) (hasPurpose ?AERATOR (exists (?COMBINE) (and (instance ?COMBINE Combining) (resource ?COMBINE ?AIR) (instance ?AIR Air) (instrument ?COMBINE ?AERATOR)))))").
 %
-:-assert_kif("(subclass Filter Device)").
+:-assert_kif("(genls Filter Device)").
 :-assert_kif("(documentation Filter \"A &%Device whose purpose is to remove part of a &%Solution that is passed through the &%Filter.\")").
 %
 :-assert_kif("(=> (instance ?FILTER Filter) (hasPurpose ?FILTER (exists (?REMOVE ?SOLUTION) (and (instance ?REMOVE Removing) (origin ?REMOVE ?SOLUTION) (instance ?SOLUTION Solution) (instrument ?REMOVE ?FILTER)))))").
 %
-:-assert_kif("(subclass FileDevice Device)").
+:-assert_kif("(genls FileDevice Device)").
 :-assert_kif("(documentation FileDevice \"A &%Device whose purpose is to make something smoother . For example, a nail file is used to even out the tips of one's finger nails.\")").
 %
 :-assert_kif("(=> (instance ?DEVICE FileDevice) (capability SurfaceChange instrument ?DEVICE))").
 %
-:-assert_kif("(subclass ElectricDevice Device)").
+:-assert_kif("(genls ElectricDevice Device)").
 :-assert_kif("(documentation ElectricDevice \"Any &%Device that is powered by electricity.\")").
 %
-:-assert_kif("(subclass Radar ElectricDevice)").
+:-assert_kif("(genls Radar ElectricDevice)").
 :-assert_kif("(documentation Radar \"An &%ElectricDevice that emits and receives microwave radiation for the purpose of locating and tracking distant objects.\")").
 %
 :-assert_kif("(=> (instance ?RADAR Radar) (hasPurpose ?RADAR (exists (?DISCOVER) (and (instance ?DISCOVER Discovering) (instrument ?DISCOVER ?RADAR)))))").
 %
-:-assert_kif("(subclass SecurityDevice Device)").
+:-assert_kif("(genls SecurityDevice Device)").
 :-assert_kif("(documentation SecurityDevice \"A &%Device whose purpose is to protect people or property from kidnappers and/or thieves.\")").
 %
-:-assert_kif("(subclass Lock SecurityDevice)").
+:-assert_kif("(genls Lock SecurityDevice)").
 :-assert_kif("(documentation Lock \"A &%Device, which, through a &%Key or a combination prevents access to a &%Container or &%StationaryArtifact.\")").
 %
-:-assert_kif("(subclass Key SecurityDevice)").
+:-assert_kif("(genls Key SecurityDevice)").
 :-assert_kif("(documentation Key \"A &%Device which opens and closes a &%Lock.\")").
 %
 :-assert_kif("(=> (instance ?KEY Key) (exists (?LOCK) (and (instance ?LOCK Lock) (capability Opening instrument ?LOCK) (capability Closing instrument ?LOCK))))").
 %
-:-assert_kif("(subclass SecurityAlarm SecurityDevice)").
-:-assert_kif("(subclass SecurityAlarm ElectricDevice)").
+:-assert_kif("(genls SecurityAlarm SecurityDevice)").
+:-assert_kif("(genls SecurityAlarm ElectricDevice)").
 :-assert_kif("(documentation SecurityAlarm \"A &%SecurityDevice that detects intrusions to a &%StationaryArtifact and issues a warning of some sort.\")").
 %
-:-assert_kif("(subclass FiniteQuantity Quantity)").
+:-assert_kif("(genls FiniteQuantity Quantity)").
 :-assert_kif("(documentation FiniteQuantity \"Any &%Quantity that is limited or bounded in magnitude .\")").
 %
-:-assert_kif("(subclass InfiniteQuantity Quantity)").
+:-assert_kif("(genls InfiniteQuantity Quantity)").
 :-assert_kif("(documentation InfiniteQuantity \"Any &%Quantity that is not limited or bounded in magnitude.\")").
 %
-:-assert_kif("(subclass Clock MeasuringDevice)").
+:-assert_kif("(genls Clock MeasuringDevice)").
 :-assert_kif("(documentation Clock \"Any &%Device that measures and represents &%TimeDuration or &%TimePosition.\")").
 %
 :-assert_kif("(=> (and (instance ?MEASURE Measuring) (result ?MEASURE ?QUANTITY) (instrument ?MEASURE ?CLOCK) (instance ?CLOCK Clock)) (instance ?QUANTITY TimeMeasure))").
 %
-:-assert_kif("(subclass Thermometer MeasuringDevice)").
+:-assert_kif("(genls Thermometer MeasuringDevice)").
 :-assert_kif("(documentation Thermometer \"Any &%Device that measures and represents &%TemperatureMeasure.\")").
 %
 :-assert_kif("(=> (and (instance ?MEASURE Measuring) (result ?MEASURE ?QUANTITY) (instrument ?MEASURE ?THERMOMETER) (instance ?THERMOMETER Thermometer)) (instance ?QUANTITY TemperatureMeasure))").
 %
-:-assert_kif("(subclass Telephone ElectricDevice)").
-:-assert_kif("(subclass Telephone CommunicationDevice)").
+:-assert_kif("(genls Telephone ElectricDevice)").
+:-assert_kif("(genls Telephone CommunicationDevice)").
 :-assert_kif("(documentation Telephone \"A &%Device that permits &%LinguisticCommunication between remote points by converting sound into electrical signals that are then transmitted. When the signals are received, they are converted back into sound.\")").
 %
 :-assert_kif("(subrelation telephoneNumber uniqueIdentifier)").
@@ -7132,217 +7132,217 @@
 :-assert_kif("(relatedInternalConcept telephoneNumber address)").
 :-assert_kif("(documentation telephoneNumber \" (&%telephoneNumber ?NUMBER ?AGENT) means that ?NUMBER is a telephone number at which ?AGENT can be regularly contacted.\")").
 %
-:-assert_kif("(subclass LightFixture Device)").
+:-assert_kif("(genls LightFixture Device)").
 :-assert_kif("(documentation LightFixture \"Any &%Device whose purpose is to be a source of visible light.\")").
 %
 :-assert_kif("(=> (instance ?FIXTURE LightFixture) (capability RadiatingLight instrument ?FIXTURE))").
 %
-:-assert_kif("(subclass PaintedPicture ArtWork)").
+:-assert_kif("(genls PaintedPicture ArtWork)").
 :-assert_kif("(documentation PaintedPicture \"Any &%ArtWork which is produced by &%Painting.\")").
 %
-:-assert_kif("(subclass Sketch ArtWork)").
+:-assert_kif("(genls Sketch ArtWork)").
 :-assert_kif("(documentation Sketch \"Any &%ArtWork which is produced by a pencil or piece of charcoal.\")").
 %
-:-assert_kif("(subclass Collage ArtWork)").
-:-assert_kif("(subclass Collage (ComplementFn RepresentationalArtWork))").
+:-assert_kif("(genls Collage ArtWork)").
+:-assert_kif("(genls Collage (ComplementFn RepresentationalArtWork))").
 :-assert_kif("(documentation Collage \"Any abstract &%ArtWork that is produced by arranging bits of paper or photographs.\")").
 %
-:-assert_kif("(subclass Painting Covering)").
-:-assert_kif("(subclass Painting Coloring)").
+:-assert_kif("(genls Painting Covering)").
+:-assert_kif("(genls Painting Coloring)").
 :-assert_kif("(documentation Painting \"The application of &%Paint to a &%surface. Note that this class covers both &%ArtPainting (the creation of &%PaintedPictures), as well as painting one's kitchen, for example.\")").
 %
 :-assert_kif("(=> (and (instance ?PAINT Painting) (patient ?PAINT ?SURFACE) (instrument ?PAINT ?STUFF)) (exists (?OBJ) (and (surface ?SURFACE ?OBJ) (instance ?STUFF Paint))))").
 %
-:-assert_kif("(subclass Paint Solution)").
+:-assert_kif("(genls Paint Solution)").
 :-assert_kif("(documentation Paint \"Any &%Solution which is capable of &%Coloring something.\")").
 %
 :-assert_kif("(=> (instance ?PAINT Paint) (capability Coloring instrument ?PAINT))").
 %
-:-assert_kif("(subclass ArtPainting ContentDevelopment)").
-:-assert_kif("(subclass ArtPainting Painting)").
+:-assert_kif("(genls ArtPainting ContentDevelopment)").
+:-assert_kif("(genls ArtPainting Painting)").
 :-assert_kif("(documentation ArtPainting \"Any &%ContentDevelopment that results in a &%PaintedPicture.\")").
 %
 :-assert_kif("(=> (instance ?PAINT ArtPainting) (exists (?PICTURE) (and (instance ?PICTURE PaintedPicture) (result ?PAINT ?PICTURE))))").
 %
-:-assert_kif("(subclass Drawing ContentDevelopment)").
-:-assert_kif("(subclass Drawing SurfaceChange)").
+:-assert_kif("(genls Drawing ContentDevelopment)").
+:-assert_kif("(genls Drawing SurfaceChange)").
 :-assert_kif("(documentation Drawing \"Any &%ContentDevelopment that results in a &%Sketch.\")").
 %
 :-assert_kif("(=> (instance ?DRAW Drawing) (exists (?SKETCH) (and (instance ?SKETCH Sketch) (result ?DRAW ?SKETCH))))").
 %
-:-assert_kif("(subclass DisplayBoard Artifact)").
+:-assert_kif("(genls DisplayBoard Artifact)").
 :-assert_kif("(documentation DisplayBoard \"A large board for posting information so that it can be disseminated to the public.\")").
 %
 :-assert_kif("(=> (instance ?BOARD DisplayBoard) (hasPurpose ?BOARD (exists (?PUT ?DISSEMINATE ?INFO) (and (instance ?PUT Putting) (instance ?DISSEMINATE Disseminating) (instance ?INFO ContentBearingObject) (patient ?PUT ?INFO) (patient ?DISSEMINATE ?INFO) (destination ?PUT ?BOARD)))))").
 %
-:-assert_kif("(subclass Wheel Artifact)").
+:-assert_kif("(genls Wheel Artifact)").
 :-assert_kif("(documentation Wheel \"A circular &%Artifact which is a component of &%LandVehicles and of some &%Devices.\")").
 %
 :-assert_kif("(=> (instance ?VEHICLE LandVehicle) (exists (?WHEEL) (and (instance ?WHEEL Wheel) (part ?WHEEL ?VEHICLE))))").
 %
-:-assert_kif("(subclass Paper Artifact)").
+:-assert_kif("(genls Paper Artifact)").
 :-assert_kif("(documentation Paper \"An &%Artifact made of cellulose pulp that is intended to contain a &%Text.\")").
 %
 :-assert_kif("(=> (instance ?PAPER Paper) (hasPurpose ?PAPER (exists (?TEXT) (and (instance ?TEXT Text) (part ?TEXT ?PAPER)))))").
 %
-:-assert_kif("(subclass Wire Artifact)").
+:-assert_kif("(genls Wire Artifact)").
 :-assert_kif("(documentation Wire \"A long, thin strand of &%Metal that is used in a wide range of applications, including the wiring of electrical systems, creating bundles and the construction of cages.\")").
 %
 :-assert_kif("(=> (instance ?WIRE Wire) (material Metal ?WIRE))").
 %
-:-assert_kif("(subclass Plug Artifact)").
+:-assert_kif("(genls Plug Artifact)").
 :-assert_kif("(documentation Plug \"An &%Artifact which is designed to fit snugly within a &%Hole.\")").
 %
 :-assert_kif("(=> (instance ?PLUG Plug) (exists (?HOLE) (completelyFills ?PLUG ?HOLE)))").
 %
-:-assert_kif("(subclass CigarOrCigarette Artifact)").
+:-assert_kif("(genls CigarOrCigarette Artifact)").
 :-assert_kif("(documentation CigarOrCigarette \"A tube of thin paper containing finely ground tobacco that is smoked.\")").
 %
-:-assert_kif("(subclass Pottery Artifact)").
+:-assert_kif("(genls Pottery Artifact)").
 :-assert_kif("(documentation Pottery \"Household &%Artifacts that are made out of baked &%Clay.\")").
 %
 :-assert_kif("(=> (instance ?POTTERY Pottery) (exists (?CLAY) (and (instance ?CLAY Clay) (part ?CLAY ?POTTERY))))").
 %
-:-assert_kif("(subclass Furniture Artifact)").
+:-assert_kif("(genls Furniture Artifact)").
 :-assert_kif("(disjoint Furniture Device)").
 :-assert_kif("(documentation Furniture \"Any free-standing &%Artifacts which are not &%Devices and which are used in day-to-day living.\")").
 %
-:-assert_kif("(subclass Seat Furniture)").
+:-assert_kif("(genls Seat Furniture)").
 :-assert_kif("(documentation Seat \"Any instance of &%Furniture which is designed to accommodate &%Humans who are &%Sitting.\")").
 %
 :-assert_kif("(=> (instance ?SEAT Seat) (hasPurpose ?SEAT (exists (?PERSON) (and (instance ?PERSON Human) (located ?PERSON ?SEAT) (attribute ?PERSON Sitting)))))").
 %
-:-assert_kif("(subclass Chair Seat)").
+:-assert_kif("(genls Chair Seat)").
 :-assert_kif("(documentation Chair \"A &%Seat that is designed to accommodate a single &%Human.\")").
 %
 :-assert_kif("(=> (instance ?CHAIR Chair) (not (exists (?PERSON1 ?PERSON2) (and (instance ?PERSON1 Human) (instance ?PERSON2 Human) (attribute ?PERSON1 Sitting) (attribute ?PERSON2 Sitting) (located ?PERSON1 ?CHAIR) (located ?PERSON2 ?CHAIR) (not (equal ?PERSON1 ?PERSON2))))))").
 %
-:-assert_kif("(subclass Bed Furniture)").
+:-assert_kif("(genls Bed Furniture)").
 :-assert_kif("(documentation Bed \"A piece of &%Furniture which is primarily for sleeping.\")").
 %
 :-assert_kif("(=> (instance ?BED Bed) (hasPurpose ?BED (exists (?PERSON) (and (attribute ?PERSON Asleep) (located ?PERSON ?BED)))))").
 %
-:-assert_kif("(subclass Table Furniture)").
+:-assert_kif("(genls Table Furniture)").
 :-assert_kif("(documentation Table \"A piece of &%Furniture with four legs and a flat top. It is used either for eating, paperwork or meetings.\")").
 %
-:-assert_kif("(subclass Desk Table)").
+:-assert_kif("(genls Desk Table)").
 :-assert_kif("(documentation Desk \"A &%Table for a single person which is intended to be used for paperwork.\")").
 %
-:-assert_kif("(subclass Screw AttachingDevice)").
+:-assert_kif("(genls Screw AttachingDevice)").
 :-assert_kif("(documentation Screw \"An &%AttachingDevice which contains a spiral of grooves to hold it in place and which is fastened with a screwdriver.\")").
 %
-:-assert_kif("(subclass Tape AttachingDevice)").
+:-assert_kif("(genls Tape AttachingDevice)").
 :-assert_kif("(documentation Tape \"A thin strip of &%Fabric or &%Paper that is used to attach two things.\")").
 %
 :-assert_kif("(=> (instance ?TAPE Tape) (exists (?PART) (and (part ?PART ?TAPE) (or (instance ?PART Paper) (instance ?PART Fabric)))))").
 %
-:-assert_kif("(subclass Holder Device)").
+:-assert_kif("(genls Holder Device)").
 :-assert_kif("(documentation Holder \"A large class of &%Devices whose purpose is to hold something else, i.e. be the &%instrument of a &%Keeping.\")").
 %
 :-assert_kif("(=> (instance ?DEVICE Holder) (capability Keeping instrument ?DEVICE))").
 %
-:-assert_kif("(subclass Saddle Holder)").
+:-assert_kif("(genls Saddle Holder)").
 :-assert_kif("(documentation Saddle \"A &%Device which allows a &%Human to ride on a &%Horse.\")").
 %
 :-assert_kif("(=> (instance ?SADDLE Saddle) (capability (KappaFn ?RIDE (and (instance ?RIDE Carrying) (patient ?RIDE ?HUMAN) (instance ?HUMAN Human) (agent ?RIDE ?HORSE) (instance ?HORSE Horse))) instrument ?SADDLE))").
 %
-:-assert_kif("(subclass Tray Holder)").
+:-assert_kif("(genls Tray Holder)").
 :-assert_kif("(documentation Tray \"A &%Holder that is designed for &%Food, dishes, and flatware .\")").
 %
-:-assert_kif("(subclass Container Holder)").
+:-assert_kif("(genls Container Holder)").
 :-assert_kif("(documentation Container \"Any &%Holder whose purpose is to contain something else. Note that &%Container is more specific in meaning than &%Holder, because a &%Container must have a &%Hole that is at least partially filled by the thing contained.\")").
 %
 :-assert_kif("(=> (instance ?CONTAINER Container) (hasPurpose ?CONTAINER (exists (?OBJ) (contains ?CONTAINER ?OBJ))))").
 %
-:-assert_kif("(subclass Box Container)").
+:-assert_kif("(genls Box Container)").
 :-assert_kif("(documentation Box \"Any six-sided &%Container whose sides are rectangular in shape.\")").
 %
 :-assert_kif("(=> (instance ?BOX Box) (equal (CardinalityFn (KappaFn ?SIDE (or (top ?SIDE ?BOX) (bottom ?SIDE ?BOX) (side ?SIDE ?BOX)))) 6))").
 %
-:-assert_kif("(subclass TravelContainer Container)").
+:-assert_kif("(genls TravelContainer Container)").
 :-assert_kif("(documentation TravelContainer \"Any &%Container which is intended to be used for carrying clothing, toiletries, and other personal effects that would be needed on a overnight trip.\")").
 %
-:-assert_kif("(subclass FluidContainer Container)").
+:-assert_kif("(genls FluidContainer Container)").
 :-assert_kif("(documentation FluidContainer \"A &%Container which is used to store &%Fluids, i.e. &%Liquids and &%Gases.\")").
 %
 :-assert_kif("(=> (and (instance ?TANK TankContainer) (contains ?TANK ?STUFF)) (attribute ?STUFF Fluid))").
 %
-:-assert_kif("(subclass Bottle FluidContainer)").
+:-assert_kif("(genls Bottle FluidContainer)").
 :-assert_kif("(documentation Bottle \"A &%Container whose top is narrower than its bottom, which has no handle, and which is intended to store &%Liquids.\")").
 %
 :-assert_kif("(=> (and (instance ?BOTTLE Bottle) (contains ?BOTTLE ?STUFF)) (attribute ?STUFF Liquid))").
 %
 :-assert_kif("(=> (and (instance ?BOTTLE Bottle) (bottom ?BOTTOM ?BOTTLE) (top ?TOP ?BOTTLE) (width ?BOTTOM ?WIDTH1) (width ?TOP ?WIDTH2)) (lessThan ?WIDTH2 ?WIDTH1))").
 %
-:-assert_kif("(subclass Cup FluidContainer)").
+:-assert_kif("(genls Cup FluidContainer)").
 :-assert_kif("(documentation Cup \"An open &%FluidContainer that is intended to serve a &%Beverage to a single person. Note that this class includes both cups with handles and drinking glasses.\")").
 %
 :-assert_kif("(=> (and (instance ?CUP Cup) (contains ?CUP ?STUFF)) (instance ?STUFF Beverage))").
 %
-:-assert_kif("(subclass BoardOrBlock Artifact)").
+:-assert_kif("(genls BoardOrBlock Artifact)").
 :-assert_kif("(documentation BoardOrBlock \"A piece of material with flat, rectangular sides. Note that boards and blocks are lumped into a single concept, because the difference between these notions cannot be precisely defined.\")").
 %
 :-assert_kif("(=> (instance ?BOARD BoardOrBlock) (capability Constructing resource ?BOARD))").
 %
-:-assert_kif("(subclass Nest CorpuscularObject)").
+:-assert_kif("(genls Nest CorpuscularObject)").
 :-assert_kif("(documentation Nest \"Any structure which is created by nonhuman &%Animals for the purpose of giving birth to their offspring.\")").
 %
 :-assert_kif("(=> (instance ?NEST Nest) (hasPurpose ?NEST (exists (?BIRTH) (and (instance ?BIRTH Birth) (located ?BIRTH ?NEST)))))").
 %
-:-assert_kif("(subclass OutdoorClothing Clothing)").
+:-assert_kif("(genls OutdoorClothing Clothing)").
 :-assert_kif("(documentation OutdoorClothing \"&%Clothing that is intended to be worn outdoors .\")").
 %
 :-assert_kif("(=> (and (instance ?CLOTHING OutdoorClothing) (holdsDuring ?TIME (wears ?PERSON ?CLOTHING))) (not (exists (?BUILDING) (and (instance ?BUILDING Building) (holdsDuring ?TIME (located ?PERSON ?BUILDING))))))").
 %
-:-assert_kif("(subclass Hat OutdoorClothing)").
+:-assert_kif("(genls Hat OutdoorClothing)").
 :-assert_kif("(documentation Hat \"A type of &%Clothing that is worn on the &%Head. Note that this class covers caps, bonnets, berets, etc.\")").
 %
 :-assert_kif("(=> (and (wears ?PERSON ?HAT) (instance ?HAT Hat)) (exists (?HEAD) (and (instance ?HEAD Head) (part ?HEAD ?PERSON) (meetsSpatially ?HAT ?HEAD))))").
 %
-:-assert_kif("(subclass Coat OutdoorClothing)").
+:-assert_kif("(genls Coat OutdoorClothing)").
 :-assert_kif("(documentation Coat \"&%Clothing that has sleeves and covers from the neck down . &%Coats are intended to be worn outdoors.\")").
 %
-:-assert_kif("(subclass Shoe Clothing)").
+:-assert_kif("(genls Shoe Clothing)").
 :-assert_kif("(documentation Shoe \"&%Clothing that is intended to be worn on the &%Foot. It consists of an upper, a sole, and a heel.\")").
 %
 :-assert_kif("(=> (and (wears ?PERSON ?SHOE) (instance ?SHOE Shoe)) (exists (?FOOT) (and (instance ?FOOT Foot) (part ?FOOT ?PERSON) (meetsSpatially ?SHOE ?FOOT))))").
 %
-:-assert_kif("(subclass Shirt Clothing)").
+:-assert_kif("(genls Shirt Clothing)").
 :-assert_kif("(documentation Shirt \"An item of &%Clothing which covers the upper body of a &%Human.\")").
 %
 :-assert_kif("(=> (and (instance ?SHIRT Shirt) (wears ?PERSON ?SHIRT)) (instance ?PERSON Human))").
 %
-:-assert_kif("(subclass Dress Clothing)").
+:-assert_kif("(genls Dress Clothing)").
 :-assert_kif("(documentation Dress \"An item of &%Clothing which covers the lower body of a &%Woman.\")").
 %
 :-assert_kif("(=> (and (instance ?DRESS Dress) (wears ?PERSON ?DRESS)) (instance ?PERSON Woman))").
 %
-:-assert_kif("(subclass ClothingSuit Collection)").
+:-assert_kif("(genls ClothingSuit Collection)").
 :-assert_kif("(documentation ClothingSuit \"A &%Collection of instances of &%Clothing that are designed to be worn together.\")").
 %
 :-assert_kif("(=> (and (instance ?SUIT ClothingSuit) (member ?ITEM1 ?SUIT) (holdsDuring ?TIME (wears ?PERSON ?ITEM1))) (forall (?ITEM2) (=> (member ?ITEM2 ?SUIT) (holdsDuring ?TIME (wears ?PERSON ?ITEM2)))))").
 %
-:-assert_kif("(subclass Leather Fabric)").
+:-assert_kif("(genls Leather Fabric)").
 :-assert_kif("(documentation Leather \"A &%Fabric that is the result of tanning an &%Animal &%Skin.\")").
 %
 :-assert_kif("(=> (instance ?LEATHER Leather) (exists (?MAKE) (and (instance ?MAKE Making) (resource ?MAKE ?SKIN) (instance ?SKIN Skin) (result ?MAKE ?LEATHER))))").
 %
-:-assert_kif("(subclass Pocket Fabric)").
+:-assert_kif("(genls Pocket Fabric)").
 :-assert_kif("(documentation Pocket \"A pouch of &%Fabric in an instance of &%Clothing where something can be kept.\")").
 %
 :-assert_kif("(=> (instance ?POCKET Pocket) (exists (?CLOTHING) (and (instance ?CLOTHING Clothing) (part ?POCKET ?CLOTHING))))").
 %
 :-assert_kif("(=> (instance ?POCKET Pocket) (capability Keeping instrument ?POCKET))").
 %
-:-assert_kif("(subclass Blanket Fabric)").
+:-assert_kif("(genls Blanket Fabric)").
 :-assert_kif("(documentation Blanket \"A piece of &%Fabric whose purpose is to keep a sleeping person warm.\")").
 %
 :-assert_kif("(=> (instance ?BLANKET Blanket) (hasPurpose ?BLANKET (exists (?HEAT ?PERSON) (and (instance ?HEAT Heating) (patient ?HEAT ?PERSON) (instance ?PERSON Human) (located ?PERSON ?BED) (instance ?BED Bed)))))").
 %
-:-assert_kif("(subclass Tying Attaching)").
+:-assert_kif("(genls Tying Attaching)").
 :-assert_kif("(documentation Tying \"The &%Process of tying two things, or two strands of the same thing, together.\")").
 %
-:-assert_kif("(subclass Untying Detaching)").
+:-assert_kif("(genls Untying Detaching)").
 :-assert_kif("(disjoint Untying Tying)").
 :-assert_kif("(documentation Untying \"The &%Process of untying two things, or two strands of the same thing.\")").
 %
@@ -7353,7 +7353,7 @@
 %
 :-assert_kif("(=> (patientMedical ?PATIENT ?DOCTOR) (exists (?PROCESS) (and (patient ?PROCESS ?PATIENT) (agent ?PROCESS ?DOCTOR) (or (instance ?PROCESS DiagnosticProcess) (instance ?PROCESS TherapeuticProcess)))))").
 %
-:-assert_kif("(subclass NonspecificDisease DiseaseOrSyndrome)").
+:-assert_kif("(genls NonspecificDisease DiseaseOrSyndrome)").
 :-assert_kif("(documentation NonspecificDisease \"The class of &%DiseaseOrSyndromes that are not caused by a single type of &%Microorganism.\")").
 %
 :-assert_kif("(=> (instance ?DISEASE NonspecificDisease) (not (exists (?AGENT) (and (instance ?AGENT Microorganism) (forall (?VICTIM) (=> (attribute ?VICTIM ?DISEASE) (located ?AGENT ?VICTIM)))))))").
@@ -7373,22 +7373,22 @@
 %
 :-assert_kif("(=> (conjugate ?COMPOUND1 ?COMPOUND2) (exists (?NUMBER1 ?NUMBER2) (and (protonNumber ?COMPOUND1 ?NUMBER1) (protonNumber ?COMPOUND2 ?NUMBER2) (or (equal ?NUMBER1 (AdditionFn ?NUMBER2 1)) (equal ?NUMBER2 (AdditionFn ?NUMBER1 1))))))").
 %
-:-assert_kif("(subclass Biting Grabbing)").
+:-assert_kif("(genls Biting Grabbing)").
 :-assert_kif("(documentation Biting \"Any instance of &%Grabbing where the &%instrument is the &%Mouth of the &%agent.\")").
 %
 :-assert_kif("(=> (and (instance ?BITE Biting) (agent ?BITE ?ANIMAL)) (exists (?MOUTH) (and (instance ?MOUTH Mouth) (part ?MOUTH ?ANIMAL) (instrument ?BITE ?MOUTH))))").
 %
-:-assert_kif("(subclass Spitting Impelling)").
+:-assert_kif("(genls Spitting Impelling)").
 :-assert_kif("(documentation Spitting \"Any instance of &%Impelling where the &%origin is the &%Mouth of the &%agent.\")").
 %
 :-assert_kif("(=> (and (instance ?SPIT Spitting) (agent ?SPIT ?ANIMAL)) (exists (?MOUTH) (and (instance ?MOUTH Mouth) (part ?MOUTH ?ANIMAL) (origin ?SPIT ?MOUTH))))").
 %
-:-assert_kif("(subclass Kicking Impelling)").
+:-assert_kif("(genls Kicking Impelling)").
 :-assert_kif("(documentation Kicking \"Any instance of &%Impelling where the &%instrument is a &%Foot of the &%agent.\")").
 %
 :-assert_kif("(=> (and (instance ?KICK Kicking) (agent ?KICK ?ANIMAL)) (exists (?FOOT) (and (instance ?FOOT Foot) (part ?FOOT ?ANIMAL) (instrument ?KICK ?FOOT))))").
 %
-:-assert_kif("(subclass Mailing Transfer)").
+:-assert_kif("(genls Mailing Transfer)").
 :-assert_kif("(documentation Mailing \"Any instance of &%Transfer where a postal system is used to move the &%patient, either a letter or a package.\")").
 %
 :-assert_kif("(instance neighbor BinaryPredicate)").
@@ -7433,8 +7433,8 @@
 :-assert_kif("(domain address 2 Address)").
 :-assert_kif("(documentation address \" (&%address ?AGENT ?ADDRESS) means that ?ADDRESS is an address or part of an address for the &%Agent ?AGENT. address relates an instance of a CognitiveAgent to the unique designation of a stationary artifact, location, or mail drop where that agent can be contacted. This address includes buildings, room numbers, streets, mail drop numbers, and post office boxes, but excludes telephone numbers and other addresses that are not stationary. This is not the most general type of address.\")").
 %
-:-assert_kif("(subclass Address RelationalAttribute)").
-:-assert_kif("(subclass Address Location)").
+:-assert_kif("(genls Address RelationalAttribute)").
+:-assert_kif("(genls Address Location)").
 :-assert_kif("(documentation Address \"A &%RelationalAttribute that indicates an address where an &%Agent can regularly be contacted.\")").
 %
 :-assert_kif("(subrelation postalCode uniqueIdentifier)").
@@ -7479,98 +7479,98 @@
 %
 :-assert_kif("(=> (equal (StreetAddressFn ?PLACE ?ROAD ?CITY ?COUNTRY) ?AGENT) (exists (?BUILDING) (and (instance ?BUILDING Building) (part ?PLACE ?BUILDING))))").
 %
-:-assert_kif("(subclass ArtStudio StationaryArtifact)").
+:-assert_kif("(genls ArtStudio StationaryArtifact)").
 :-assert_kif("(documentation ArtStudio \"A &%Room, suite of &%Rooms or &%Building which is devoted to the creation of &%ArtWorks.\")").
 %
 :-assert_kif("(=> (instance ?STUDIO ArtStudio) (hasPurpose ?STUDIO (exists (?MAKE) (and (instance ?MAKE Making) (result ?MAKE ?WORK) (instance ?WORK ArtWork)))))").
 %
-:-assert_kif("(subclass Mine StationaryArtifact)").
+:-assert_kif("(genls Mine StationaryArtifact)").
 :-assert_kif("(documentation Mine \"An construction in the earth from which &%Minerals are removed, either in pure form or as part of ores.\")").
 %
 :-assert_kif("(=> (instance ?MINE Mine) (hasPurpose ?MINE (exists (?REMOVE ?MINERAL) (and (instance ?REMOVE Removing) (patient ?REMOVE ?MINERAL) (instance ?MINERAL Mineral) (origin ?REMOVE ?MINE)))))").
 %
-:-assert_kif("(subclass MobileResidence Artifact)").
+:-assert_kif("(genls MobileResidence Artifact)").
 :-assert_kif("(disjoint MobileResidence Residence)").
-:-assert_kif("(documentation MobileResidence \"Anything which serves to house people but which changes its location from time to time, e.g. a motorhome, a mobile home , a camp, etc. Note that &%MobileResidence is disjoint from &%Residence, because the latter is a subclass of &%StationaryArtifact.\")").
+:-assert_kif("(documentation MobileResidence \"Anything which serves to house people but which changes its location from time to time, e.g. a motorhome, a mobile home , a camp, etc. Note that &%MobileResidence is disjoint from &%Residence, because the latter is a genls of &%StationaryArtifact.\")").
 %
-:-assert_kif("(subclass Camp MobileResidence)").
+:-assert_kif("(genls Camp MobileResidence)").
 :-assert_kif("(documentation Camp \"A &%MobileResidence consisting of tents and other temporary living quarters that is constructed on an undeveloped &%LandArea.\")").
 %
 :-assert_kif("(=> (instance ?CAMP Camp) (exists (?TENT) (and (instance ?TENT Tent) (part ?TENT ?CAMP))))").
 %
-:-assert_kif("(subclass Tent MobileResidence)").
+:-assert_kif("(genls Tent MobileResidence)").
 :-assert_kif("(documentation Tent \"A &%MobileResidence that is made of &%Fabric and poles and can be easily assembled and disassembled.\")").
 %
 :-assert_kif("(=> (instance ?TENT Tent) (exists (?FABRIC) (and (instance ?FABRIC Fabric) (part ?FABRIC ?TENT))))").
 %
-:-assert_kif("(subclass ExecutiveResidence PermanentResidence)").
+:-assert_kif("(genls ExecutiveResidence PermanentResidence)").
 :-assert_kif("(documentation ExecutiveResidence \"A &%Residence of a &%chiefOfState, e.g. the White House, a state governor's mansion, Buckingham Palace, etc.\")").
 %
 :-assert_kif("(=> (instance ?RESIDENCE ExecutiveResidence) (exists (?AREA ?POSITION ?PERSON) (and (located ?RESIDENCE ?AREA) (home ?PERSON ?RESIDENCE) (chiefOfState ?AREA ?POSITION ?PERSON))))").
 %
-:-assert_kif("(subclass ApartmentUnit SingleFamilyResidence)").
+:-assert_kif("(genls ApartmentUnit SingleFamilyResidence)").
 :-assert_kif("(documentation ApartmentUnit \"A &%SingleFamilyResidence that is not owned by any member of the &%SocialUnit that lives there.\")").
 %
 :-assert_kif("(=> (and (instance ?UNIT ApartmentUnit) (home ?PERSON ?UNIT)) (not (possesses ?PERSON ?UNIT)))").
 %
 :-assert_kif("(=> (instance ?UNIT ApartmentUnit) (exists (?BUILDING) (and (instance ?BUILDING ApartmentBuilding) (part ?UNIT ?BUILDING))))").
 %
-:-assert_kif("(subclass CondominiumUnit SingleFamilyResidence)").
+:-assert_kif("(genls CondominiumUnit SingleFamilyResidence)").
 :-assert_kif("(documentation CondominiumUnit \"A &%SingleFamilyResidence that may be owned by a member of the &%SocialUnit that lives there.\")").
 %
 :-assert_kif("(=> (and (instance ?UNIT SingleFamilyResidence) (home ?PERSON ?UNIT) (possesses ?PERSON ?UNIT) (not (instance ?UNIT Building))) (instance ?UNIT CondominiumUnit))").
 %
 :-assert_kif("(=> (instance ?UNIT CondominiumUnit) (exists (?BUILDING) (and (instance ?BUILDING CondominiumBuilding) (part ?UNIT ?BUILDING))))").
 %
-:-assert_kif("(subclass House ResidentialBuilding)").
-:-assert_kif("(subclass House SingleFamilyResidence)").
+:-assert_kif("(genls House ResidentialBuilding)").
+:-assert_kif("(genls House SingleFamilyResidence)").
 :-assert_kif("(documentation House \"A &%ResidentialBuilding which is intended to be inhabited by members of the same &%SocialUnit. &%Houses are distinguished from temporary housing like hotels and multi-family dwellings like condominium and apartment buildings.\")").
 %
-:-assert_kif("(subclass ApartmentBuilding ResidentialBuilding)").
+:-assert_kif("(genls ApartmentBuilding ResidentialBuilding)").
 :-assert_kif("(disjoint ApartmentBuilding SingleFamilyResidence)").
 :-assert_kif("(documentation ApartmentBuilding \"A &%ResidentialBuilding containing &%ApartmentUnits.\")").
 %
 :-assert_kif("(=> (instance ?BUILDING ApartmentBuilding) (exists (?UNIT1 ?UNIT2) (and (instance ?UNIT1 ApartmentUnit) (instance ?UNIT2 ApartmentUnit) (part ?UNIT1 ?BUILDING) (part ?UNIT2 ?BUILDING) (not (equal ?UNIT1 ?UNIT2)))))").
 %
-:-assert_kif("(subclass CondominiumBuilding ResidentialBuilding)").
+:-assert_kif("(genls CondominiumBuilding ResidentialBuilding)").
 :-assert_kif("(disjoint CondominiumBuilding SingleFamilyResidence)").
 :-assert_kif("(documentation CondominiumBuilding \"A &%ResidentialBuilding containing &%CondominiumUnits.\")").
 %
 :-assert_kif("(=> (instance ?BUILDING CondominiumBuilding) (exists (?UNIT1 ?UNIT2) (and (instance ?UNIT1 CondominiumUnit) (instance ?UNIT2 CondominiumUnit) (part ?UNIT1 ?BUILDING) (part ?UNIT2 ?BUILDING) (not (equal ?UNIT1 ?UNIT2)))))").
 %
-:-assert_kif("(subclass AnimalResidence Artifact)").
+:-assert_kif("(genls AnimalResidence Artifact)").
 :-assert_kif("(documentation AnimalResidence \"An &%Artifact which is intended to house &%Animals and not &%Humans. Note that an &%AnimalResidence may or may not be a &%StationaryArtifact, e.g. a horse stall is stationary while a doghouse generally is not.\")").
 %
 :-assert_kif("(=> (instance ?RESIDENCE AnimalResidence) (hasPurpose ?RESIDENCE (exists (?ANIMAL) (and (instance ?ANIMAL Animal) (not (instance ?ANIMAL Human)) (inhabits ?ANIMAL ?RESIDENCE)))))").
 %
-:-assert_kif("(subclass PlaceOfCommerce StationaryArtifact)").
+:-assert_kif("(genls PlaceOfCommerce StationaryArtifact)").
 :-assert_kif("(partition PlaceOfCommerce CommercialBuilding CommercialUnit)").
 :-assert_kif("(documentation PlaceOfCommerce \"A &%Building or part of a &%Building which is intended for organizational activities, e.g. retail or wholesale selling, manufacturing , office work, etc.\")").
 %
 :-assert_kif("(=> (instance ?OFFICE PlaceOfCommerce) (or (instance ?OFFICE CommercialBuilding) (exists (?BUILDING) (and (instance ?BUILDING CommercialBuilding) (part ?OFFICE ?BUILDING)))))").
 %
-:-assert_kif("(subclass CommercialBuilding Building)").
-:-assert_kif("(subclass CommercialBuilding PlaceOfCommerce)").
+:-assert_kif("(genls CommercialBuilding Building)").
+:-assert_kif("(genls CommercialBuilding PlaceOfCommerce)").
 :-assert_kif("(documentation CommercialBuilding \"A &%Building which is intended for organizational activities, e.g. retail or wholesale selling, manufacturing, office work, etc.\")").
 %
-:-assert_kif("(subclass CommercialUnit PlaceOfCommerce)").
+:-assert_kif("(genls CommercialUnit PlaceOfCommerce)").
 :-assert_kif("(documentation CommercialUnit \"A &%Room or suite of &%Rooms intended for clerical and/or professional work of a single &%Organization.\")").
 %
 :-assert_kif("(=> (and (instance ?UNIT CommercialUnit) (instance ?ORG Organization) (located ?ORG ?UNIT)) (not (exists (?OTHER) (and (instance ?OTHER Organization) (located ?OTHER ?UNIT) (not (equal ?OTHER ?ORG))))))").
 %
-:-assert_kif("(subclass Auditorium Building)").
+:-assert_kif("(genls Auditorium Building)").
 :-assert_kif("(documentation Auditorium \"Any &%Building whose purpose is to hold concerts, sports events, plays, etc. before an audience. This class includes theaters, sports stadiums, university auditoriums, etc.\")").
 %
 :-assert_kif("(=> (instance ?AUDITORIUM Auditorium) (hasPurpose ?AUDITORIUM (exists (?DEMO) (and (instance ?DEMO Demonstrating) (located ?DEMO ?AUDITORIUM)))))").
 %
 :-assert_kif("(=> (instance ?AUDITORIUM Auditorium) (exists (?STAGE) (and (instance ?STAGE PerformanceStage) (part ?STAGE ?AUDITORIUM))))").
 %
-:-assert_kif("(subclass AuditoriumSeat Seat)").
+:-assert_kif("(genls AuditoriumSeat Seat)").
 :-assert_kif("(documentation AuditoriumSeat \"A &%Seat within an &%Auditorium from which one can observe the &%PerformanceStage.\")").
 %
 :-assert_kif("(=> (instance ?SEAT AuditoriumSeat) (exists (?AUDITORIUM) (and (instance ?AUDITORIUM Auditorium) (part ?SEAT ?AUDITORIUM))))").
 %
-:-assert_kif("(=> (and (instance ?SEAT AuditoriumSeat) (part ?SEAT ?AUDITORIUM) (part ?STAGE ?AUDITORIUM) (instance ?AUDITORIUM Auditorium) (instance ?STAGE PerformanceStage) (located ?PERSON ?SEAT) (instance ?PERSON Human) (subclass ?SEE Seeing) (forall (?INST) (=> (instance ?INST ?SEE) (patient ?INST ?STAGE)))) (capability ?SEE agent ?PERSON))").
+:-assert_kif("(=> (and (instance ?SEAT AuditoriumSeat) (part ?SEAT ?AUDITORIUM) (part ?STAGE ?AUDITORIUM) (instance ?AUDITORIUM Auditorium) (instance ?STAGE PerformanceStage) (located ?PERSON ?SEAT) (instance ?PERSON Human) (genls ?SEE Seeing) (forall (?INST) (=> (instance ?INST ?SEE) (patient ?INST ?STAGE)))) (capability ?SEE agent ?PERSON))").
 %
 :-assert_kif("(subrelation enjoys inScopeOfInterest)").
 :-assert_kif("(domain enjoys 1 CognitiveAgent)").
@@ -7637,133 +7637,133 @@
 %
 :-assert_kif("(=> (and (instance ?PERSON Human) (equal (DescendantsFn ?PERSON) ?DESCENDANTS)) (forall (?MEMBER) (<=> (member ?MEMBER ?DESCENDANTS) (ancestor ?MEMBER ?PERSON))))").
 %
-:-assert_kif("(subclass GroupOfAnimals Group)").
+:-assert_kif("(genls GroupOfAnimals Group)").
 :-assert_kif("(documentation GroupOfAnimals \"Any &%Group which contains exclusively non -human &%members.\")").
 %
 :-assert_kif("(=> (instance ?GROUP GroupOfAnimals) (forall (?MEMBER) (=> (member ?MEMBER ?GROUP) (and (instance ?MEMBER Animal) (not (instance ?MEMBER Human))))))").
 %
-:-assert_kif("(subclass Brood GroupOfAnimals)").
+:-assert_kif("(genls Brood GroupOfAnimals)").
 :-assert_kif("(documentation Brood \"A &%GroupOfAnimals that are all born at the same time and to the same parents.\")").
 %
 :-assert_kif("(=> (instance ?BROOD Brood) (forall (?MEMBER1 ?MEMBER2) (=> (and (member ?MEMBER1 ?BROOD) (member ?MEMBER2 ?BROOD)) (sibling ?MEMBER1 ?MEMBER2))))").
 %
 :-assert_kif("(=> (instance ?BROOD Brood) (exists (?TIME) (forall (?MEMBER) (=> (member ?MEMBER ?BROOD) (exists (?BIRTH) (and (instance ?BIRTH Birth) (experiencer ?BIRTH ?MEMBER) (equal ?TIME (WhenFn ?BIRTH))))))))").
 %
-:-assert_kif("(subclass SportsTeam GroupOfPeople)").
+:-assert_kif("(genls SportsTeam GroupOfPeople)").
 :-assert_kif("(documentation SportsTeam \"A &%GroupOfPeople who habitually play a &%Sport together , either as an occupation or as a leisure activity.\")").
 %
-:-assert_kif("(=> (instance ?TEAM SportsTeam) (exists (?SPORT) (and (subclass ?SPORT Sport) (capability ?SPORT agent ?TEAM))))").
+:-assert_kif("(=> (instance ?TEAM SportsTeam) (exists (?SPORT) (and (genls ?SPORT Sport) (capability ?SPORT agent ?TEAM))))").
 %
 :-assert_kif("(subrelation groupMember member)").
 :-assert_kif("(domain groupMember 1 Human)").
 :-assert_kif("(domain groupMember 2 GroupOfPeople)").
 :-assert_kif("(documentation groupMember \"A &%subrelation of &%member, &%groupMember is used to relate a &%Human to a &%GroupOfPeople of which he/she is a &%member.\")").
 %
-:-assert_kif("(subclass CareOrganization Organization)").
+:-assert_kif("(genls CareOrganization Organization)").
 :-assert_kif("(partition CareOrganization Hospital MedicalClinic)").
 :-assert_kif("(documentation CareOrganization \"Any &%Organization whose purpose is to provide medical care for for &%Humans who reside there, either permanently or temporarily.\")").
 %
 :-assert_kif("(=> (instance ?ORG CareOrganization) (hasPurpose ?ORG (exists (?PATIENT) (medicalPatient ?PATIENT ?ORG))))").
 %
-:-assert_kif("(subclass HospitalBuilding TemporaryResidence)").
-% :-assert_kif("; (subclass Hospital CareOrganization)").
+:-assert_kif("(genls HospitalBuilding TemporaryResidence)").
+% :-assert_kif("; (genls Hospital CareOrganization)").
 % :-assert_kif(";commented out due to disjoint conflict -- PJC (documentation HospitalBuilding \"The building facility of a Hospital (A &%CareOrganization) where patients reside for a short period of time while they undergo treatment for a disease or disorder.\")").
 %
-:-assert_kif("(subclass Hospital CareOrganization)").
-% :-assert_kif("; (subclass Hospital TemporaryResidence)").
+:-assert_kif("(genls Hospital CareOrganization)").
+% :-assert_kif("; (genls Hospital TemporaryResidence)").
 % :-assert_kif(";comented out due to disjoint conflict - PJC. see HospitalBuilding (documentation Hospital \"A &%CareOrganization that maintains a &%HospitalBuilding (which see)a where patients reside for a short period of time while they undergo treatment for a disease or disorder.\")").
 %
-:-assert_kif("(subclass MedicalClinic CareOrganization)").
-:-assert_kif("(subclass MedicalClinic (ComplementFn Residence))").
+:-assert_kif("(genls MedicalClinic CareOrganization)").
+:-assert_kif("(genls MedicalClinic (ComplementFn Residence))").
 :-assert_kif("(documentation MedicalClinic \"A &%CareOrganization which provides medical care on an out-patient basis only, i.e. there are no rooms where patients may take up residence for a period of time while they receive care.\")").
 %
-:-assert_kif("(subclass Proprietorship Corporation)").
+:-assert_kif("(genls Proprietorship Corporation)").
 :-assert_kif("(documentation Proprietorship \"A &%Corporation that is owned by a single person.\")").
 %
 :-assert_kif("(=> (instance ?CORP Proprietorship) (exists (?HUMAN) (and (instance ?HUMAN Human) (possesses ?HUMAN ?CORP) (forall (?PERSON) (=> (possesses ?PERSON ?CORP) (equal ?PERSON ?HUMAN))))))").
 %
-:-assert_kif("(subclass Restaurant Corporation)").
+:-assert_kif("(genls Restaurant Corporation)").
 :-assert_kif("(documentation Restaurant \"Any &%Corporation whose services include selling &%Food to customers which is intended to be eaten on the premises.\")").
 %
 :-assert_kif("(=> (instance ?COMPANY Restaurant) (exists (?SERVICE ?FOOD) (and (instance ?SERVICE CommercialService) (agent ?SERVICE ?COMPANY) (instance ?SERVICE Selling) (patient ?SERVICE ?FOOD) (instance ?FOOD Food))))").
 %
-:-assert_kif("(subclass Cafeteria Restaurant)").
+:-assert_kif("(genls Cafeteria Restaurant)").
 :-assert_kif("(documentation Cafeteria \"Any &%Restaurant which does not offer table service. &%Food is selected and purchased at a central counter.\")").
 %
-:-assert_kif("(subclass Tavern Restaurant)").
+:-assert_kif("(genls Tavern Restaurant)").
 :-assert_kif("(documentation Tavern \"A &%Restaurant whose primary service is selling &%AlcoholicBeverages to customers.\")").
 %
 :-assert_kif("(=> (instance ?COMPANY Tavern) (exists (?SERVICE ?BEVERAGE) (and (instance ?SERVICE CommercialService) (agent ?SERVICE ?COMPANY) (instance ?SERVICE Selling) (patient ?SERVICE ?BEVERAGE) (instance ?BEVERAGE Beverage))))").
 %
-:-assert_kif("(subclass TransportationCompany Corporation)").
+:-assert_kif("(genls TransportationCompany Corporation)").
 :-assert_kif("(documentation TransportationCompany \"Any &%Corporation whose services include &%Transportation, e.g. a &%RailroadCompany, an airline, a cruise ship line, etc.\")").
 %
 :-assert_kif("(=> (instance ?COMPANY TransportationCompany) (exists (?SERVICE) (and (instance ?SERVICE CommercialService) (agent ?SERVICE ?COMPANY) (instance ?SERVICE Transportation))))").
 %
-:-assert_kif("(subclass RailroadCompany TransportationCompany)").
+:-assert_kif("(genls RailroadCompany TransportationCompany)").
 :-assert_kif("(documentation RailroadCompany \"Any &%TransportationCompany whose services include &%Transportation by &%Train.\")").
 %
 :-assert_kif("(=> (instance ?COMPANY RailroadCompany) (exists (?SERVICE) (and (instance ?SERVICE CommercialService) (agent ?SERVICE ?COMPANY) (instance ?SERVICE Transportation) (instrument ?SERVICE ?TRAIN) (instance ?TRAIN Train))))").
 %
-:-assert_kif("(subclass WholesaleStore MercantileOrganization)").
+:-assert_kif("(genls WholesaleStore MercantileOrganization)").
 :-assert_kif("(documentation WholesaleStore \"A &%MercantileOrganization that sells its goods exclusively to &%Corporations.\")").
 %
 :-assert_kif("(=> (and (instance ?STORE WholesaleStore) (customer ?CUSTOMER ?STORE)) (instance ?CUSTOMER Corporation))").
 %
-:-assert_kif("(subclass RetailStore MercantileOrganization)").
+:-assert_kif("(genls RetailStore MercantileOrganization)").
 :-assert_kif("(disjoint RetailStore WholesaleStore)").
 :-assert_kif("(documentation RetailStore \"The complement of &%WholesaleStore, i.e. &%MercantileOrganizations that sell their goods to the general public.\")").
 %
-:-assert_kif("(subclass GroceryStore RetailStore)").
+:-assert_kif("(genls GroceryStore RetailStore)").
 :-assert_kif("(documentation GroceryStore \"A &%RetailStore that sells &%Food, and perhaps other items as well.\")").
 %
 :-assert_kif("(=> (instance ?STORE GroceryStore) (exists (?SELL) (and (instance ?SELL Selling) (agent ?SELL ?STORE) (patient ?SELL ?FOOD) (instance ?FOOD Food))))").
 %
-:-assert_kif("(subclass OfferingForSale Offering)").
+:-assert_kif("(genls OfferingForSale Offering)").
 :-assert_kif("(documentation OfferingForSale \"&%Offering to sell something to someone.\")").
 %
 :-assert_kif("(=> (and (instance ?SALE OfferingForSale) (agent ?SALE ?AGENT)) (patient ?SALE (exists (?SELL ?OBJ) (and (instance ?SELL Selling) (patient ?SELL ?OBJ) (agent ?SELL ?AGENT)))))").
 %
-:-assert_kif("(subclass BargainSale Offering)").
+:-assert_kif("(genls BargainSale Offering)").
 :-assert_kif("(documentation BargainSale \"&%Offering to sell something to someone at a reduced price.\")").
 %
 :-assert_kif("(=> (and (instance ?SALE BargainSale) (patient ?SALE ?OBJ) (instance ?OBJ Object)) (exists (?PRICE1 ?PRICE2 ?AGENT1 ?AGENT2) (and (holdsDuring (ImmediatePastFn (WhenFn ?SALE)) (price ?OBJ ?PRICE1 ?AGENT1)) (holdsDuring (WhenFn ?SALE) (price ?OBJ ?PRICE2 ?AGENT2)) (lessThan ?PRICE2 ?PRICE1))))").
 %
-:-assert_kif("(subclass HolyBible Book)").
+:-assert_kif("(genls HolyBible Book)").
 :-assert_kif("(documentation HolyBible \"Any instance of the collection of writings which is regarded as scripture by those who embrace &%Christianity.\")").
 %
-:-assert_kif("(subclass MissionOrganization ReligiousOrganization)").
+:-assert_kif("(genls MissionOrganization ReligiousOrganization)").
 :-assert_kif("(documentation MissionOrganization \"The class of &%ReligiousOrganizations that send members to foreign countries with the aim of coverting citizens of those countries to the beliefs of the &%ReligiousOrganization.\")").
 %
-:-assert_kif("(subclass ReligiousBuilding Building)").
+:-assert_kif("(genls ReligiousBuilding Building)").
 :-assert_kif("(documentation ReligiousBuilding \"A &%Building which is intended to be used for religious worship. This class covers churches, temples, religious shrines, etc.\")").
 %
 :-assert_kif("(=> (instance ?BUILDING ReligiousBuilding) (hasPurpose ?BUILDING (exists (?SERVICE) (and (instance ?SERVICE ReligiousService) (located ?SERVICE ?BUILDING)))))").
 %
-:-assert_kif("(subclass Steeple StationaryArtifact)").
+:-assert_kif("(genls Steeple StationaryArtifact)").
 :-assert_kif("(documentation Steeple \"A component of a &%ReligiousBuilding that is tall and narrow and symbolizes the connection between humanity and a deity.\")").
 %
 :-assert_kif("(=> (instance ?STEEPLE Steeple) (exists (?BUILDING) (and (instance ?BUILDING Building) (part ?STEEPLE ?BUILDING))))").
 %
-:-assert_kif("(subclass ReligiousService ReligiousProcess)").
-:-assert_kif("(subclass ReligiousService Demonstrating)").
+:-assert_kif("(genls ReligiousService ReligiousProcess)").
+:-assert_kif("(genls ReligiousService Demonstrating)").
 :-assert_kif("(documentation ReligiousService \"A formal process of public worship which is typically carried out in a church, temple or other sanctified building and which typically accords with a prescribed set of rules.\")").
 %
-:-assert_kif("(subclass ChristianService ReligiousService)").
+:-assert_kif("(genls ChristianService ReligiousService)").
 :-assert_kif("(documentation ChristianService \"Any &%ReligiousService that is conducted by &%members of &%Christianity.\")").
 %
 :-assert_kif("(=> (and (instance ?SERVICE ChristianService) (agent ?SERVICE ?PERSON) (instance ?PERSON Human)) (member ?PERSON Christianity))").
 %
-:-assert_kif("(subclass Praying ReligiousProcess)").
-:-assert_kif("(subclass Praying Requesting)").
+:-assert_kif("(genls Praying ReligiousProcess)").
+:-assert_kif("(genls Praying Requesting)").
 :-assert_kif("(documentation Praying \"A formal or informal process of private worship which may or may not be carried out in a &%ReligiousBuilding.\")").
 %
-:-assert_kif("(subclass PartyPlatform FactualText)").
+:-assert_kif("(genls PartyPlatform FactualText)").
 :-assert_kif("(documentation PartyPlatform \"A &%Text which is authored by a &%PoliticalParty and which contains the core goals and principles of the &%PoliticalParty for a particular year or election cycle.\")").
 %
-:-assert_kif("(=> (and (subclass ?PLATFORM PartyPlatform) (authors ?PARTY ?PLATFORM) (instance ?PARTY Organization)) (instance ?PARTY PoliticalParty))").
+:-assert_kif("(=> (and (genls ?PLATFORM PartyPlatform) (authors ?PARTY ?PLATFORM) (instance ?PARTY Organization)) (instance ?PARTY PoliticalParty))").
 %
-:-assert_kif("(=> (and (subclass ?PLATFORM PartyPlatform) (authors ?PARTY ?PLATFORM) (instance ?PARTY PoliticalParty) (instance ?INST ?PLATFORM) (containsInformation ?INST ?PROP)) (believes ?PARTY ?PROP))").
+:-assert_kif("(=> (and (genls ?PLATFORM PartyPlatform) (authors ?PARTY ?PLATFORM) (instance ?PARTY PoliticalParty) (instance ?INST ?PLATFORM) (containsInformation ?INST ?PROP)) (believes ?PARTY ?PROP))").
 %
 :-assert_kif("(instance ResidentFn UnaryFunction)").
 :-assert_kif("(domain ResidentFn 1 GeopoliticalArea)").
@@ -7787,198 +7787,198 @@
 %
 :-assert_kif("(=> (equal (PerCapitaFn ?AREA ?QUANTITY1) ?QUANTITY2) (exists (?POPULATION) (and (equal ?POPULATION (CardinalityFn (ResidentFn ?AREA))) (equal ?QUANTITY2 (DivisionFn ?QUANTITY1 ?POPULATION)))))").
 %
-:-assert_kif("(subclass CityDistrict GeopoliticalArea)").
+:-assert_kif("(genls CityDistrict GeopoliticalArea)").
 :-assert_kif("(documentation CityDistrict \"Any &%geopoliticalSubdivision of a &%City.\")").
 %
 :-assert_kif("(<=> (instance ?DISTRICT CityDistrict) (exists (?CITY) (and (instance ?CITY City) (geopoliticalSubdivision ?DISTRICT ?CITY))))").
 %
-:-assert_kif("(subclass Downtown CityDistrict)").
+:-assert_kif("(genls Downtown CityDistrict)").
 :-assert_kif("(documentation Downtown \"The commercial center of a &%City. The part of the &%City that contains more shops and offices than any other part.\")").
 %
-:-assert_kif("(subclass Park LandArea)").
+:-assert_kif("(genls Park LandArea)").
 :-assert_kif("(documentation Park \"A publicly owned &%LandArea which is intended to be used for recreation and/or exercise.\")").
 %
 :-assert_kif("(=> (instance ?PARK Park) (exists (?GOV) (and (instance ?GOV Government) (possesses ?GOV ?PARK))))").
 %
 :-assert_kif("(=> (instance ?PARK Park) (hasPurpose ?PARK (exists (?REC) (and (instance ?REC RecreationOrExercise) (located ?REC ?PARK)))))").
 %
-:-assert_kif("(subclass County GeopoliticalArea)").
-:-assert_kif("(subclass County LandArea)").
+:-assert_kif("(genls County GeopoliticalArea)").
+:-assert_kif("(genls County LandArea)").
 :-assert_kif("(documentation County \"A &%GeopoliticalArea that is a subdivision of a &%StateOrProvince.\")").
 %
 :-assert_kif("(=> (instance ?COUNTY County) (exists (?STATE) (and (instance ?STATE StateOrProvince) (part ?COUNTY ?STATE))))").
 %
-:-assert_kif("(subclass AmericanState StateOrProvince)").
+:-assert_kif("(genls AmericanState StateOrProvince)").
 :-assert_kif("(documentation AmericanState \"The class of states that make up the &%UnitedStates.\")").
 %
 :-assert_kif("(=> (instance ?STATE AmericanState) (part ?STATE UnitedStates))").
 %
-:-assert_kif("(subclass AmericanCity City)").
+:-assert_kif("(genls AmericanCity City)").
 :-assert_kif("(documentation AmericanCity \"The class of cities that are in the &%UnitedStates.\")").
 %
 :-assert_kif("(=> (instance ?CITY AmericanCity) (part ?CITY UnitedStates))").
 %
-:-assert_kif("(subclass EuropeanCity City)").
+:-assert_kif("(genls EuropeanCity City)").
 :-assert_kif("(documentation EuropeanCity \"The class of cities that are in &%Europe.\")").
 %
 :-assert_kif("(=> (instance ?CITY EuropeanCity) (part ?CITY Europe))").
 %
-:-assert_kif("(subclass GovernmentSecretary Position)").
+:-assert_kif("(genls GovernmentSecretary Position)").
 :-assert_kif("(documentation GovernmentSecretary \"The class of &%Positions where the position holder is head of an adminstrative department of &%Government.\")").
 %
-:-assert_kif("(subclass StateGovernment Government)").
+:-assert_kif("(genls StateGovernment Government)").
 :-assert_kif("(documentation StateGovernment \"The class of &%Governments whose jurisdictions are &%StateOrProvinces.\")").
 %
 :-assert_kif("(=> (instance ?GOVERNMENT StateGovernment) (exists (?STATE) (and (instance ?STATE StateOrProvince) (equal (GovernmentFn ?STATE) ?GOVERNMENT))))").
 %
-:-assert_kif("(subclass MilitaryService MilitaryOrganization)").
+:-assert_kif("(genls MilitaryService MilitaryOrganization)").
 :-assert_kif("(documentation MilitaryService \"A branch of the armed forces of a &%Nation. For example, there are five military services in the United States, the army, the navy, the air force, the marines, and the coast guard.\")").
 %
-:-assert_kif("(subclass Army MilitaryService)").
+:-assert_kif("(genls Army MilitaryService)").
 :-assert_kif("(documentation Army \"&%MilitaryServices that are land forces.\")").
 %
-:-assert_kif("(subclass MilitaryUnit MilitaryOrganization)").
+:-assert_kif("(genls MilitaryUnit MilitaryOrganization)").
 :-assert_kif("(documentation MilitaryUnit \"Any &%MilitaryOrganization that can be dispatched to an area of operations.\")").
 %
-:-assert_kif("(subclass InfantryUnit MilitaryUnit)").
+:-assert_kif("(genls InfantryUnit MilitaryUnit)").
 :-assert_kif("(documentation InfantryUnit \"A &%MilitaryUnit composed primarily of &%Soldiers who fight on foot, i.e. without the use of heavy artillery.\")").
 %
-:-assert_kif("(subclass MilitaryDivision MilitaryUnit)").
+:-assert_kif("(genls MilitaryDivision MilitaryUnit)").
 :-assert_kif("(documentation MilitaryDivision \"Any &%MilitaryUnit with the rank of division .\")").
 %
-:-assert_kif("(subclass MilitaryBrigade MilitaryUnit)").
+:-assert_kif("(genls MilitaryBrigade MilitaryUnit)").
 :-assert_kif("(documentation MilitaryBrigade \"Any &%MilitaryUnit with the rank of brigade .\")").
 %
-:-assert_kif("(subclass MilitaryCompany MilitaryUnit)").
+:-assert_kif("(genls MilitaryCompany MilitaryUnit)").
 :-assert_kif("(documentation MilitaryCompany \"Any &%MilitaryUnit with the rank of company .\")").
 %
-:-assert_kif("(subclass MilitaryRegiment MilitaryUnit)").
+:-assert_kif("(genls MilitaryRegiment MilitaryUnit)").
 :-assert_kif("(documentation MilitaryRegiment \"Any &%MilitaryUnit with the rank of regiment .\")").
 %
-:-assert_kif("(subclass Commission Organization)").
+:-assert_kif("(genls Commission Organization)").
 :-assert_kif("(documentation Commission \"A small, temporary &%Organization whose purpose is to investigate some issue.\")").
 %
 :-assert_kif("(=> (instance ?COMMISSION Commission) (hasPurpose ?COMMISSION (exists (?INVESTIGATE ?ISSUE) (and (instance ?INVESTIGATE Investigating) (patient ?INVESTIGATE ?ISSUE) (agent ?INVESTIGATE ?COMMISSION)))))").
 %
-:-assert_kif("(subclass ServiceOrganization Organization)").
+:-assert_kif("(genls ServiceOrganization Organization)").
 :-assert_kif("(documentation ServiceOrganization \"An &%Organization that performs a public service and is regulated by the &%Government.\")").
 %
 :-assert_kif("(=> (instance ?ORG ServiceOrganization) (exists (?PROC ?GOV) (and (instance ?PROC RegulatoryProcess) (patient ?PROC ?ORG) (agent ?PROC ?GOV) (instance ?GOV Government))))").
 %
-:-assert_kif("(subclass OrganizationalBoard Organization)").
+:-assert_kif("(genls OrganizationalBoard Organization)").
 :-assert_kif("(documentation OrganizationalBoard \"Part of an &%Organization that is responsible for managing the &%Organization.\")").
 %
 :-assert_kif("(=> (instance ?BOARD OrganizationalBoard) (exists (?ORG ?MANAGE) (and (subOrganization ?BOARD ?ORG) (instance ?MANAGE Managing) (agent ?MANAGE ?BOARD) (patient ?MANAGE ?ORG))))").
 %
-:-assert_kif("(subclass SecurityUnit Organization)").
+:-assert_kif("(genls SecurityUnit Organization)").
 :-assert_kif("(documentation SecurityUnit \"The &%Organization that is charged with ensuring the security of members of the overall &%Organization and the property of the &%Organization.\")").
 %
 :-assert_kif("(=> (and (instance ?UNIT SecurityUnit) (subOrganization (OrganizationFn ?UNIT) ?ORG)) (holdsObligation (exists (?MAINTAIN) (and (instance ?MAINTAIN Maintaining) (agent ?MAINTAIN ?UNIT) (patient ?MAINTAIN ?ORG)))))").
 %
-:-assert_kif("(subclass UnionOrganization Organization)").
+:-assert_kif("(genls UnionOrganization Organization)").
 :-assert_kif("(documentation UnionOrganization \"An &%Organization comprised of workers from the same &%Corporation or &%Industry. The purpose of the &%UnionOrganization is to strengthen its representation in bargaining with the &%Corporation or &%Industry.\")").
 %
 :-assert_kif("(=> (instance ?ORG UnionOrganization) (exists (?COLL) (=> (member ?MEMBER ?ORG) (or (and (instance ?COLL Corporation) (employs ?COLL ?MEMBER)) (exists (?CORP) (and (instance ?COLL Industry) (member ?CORP ?COLL) (employs ?CORP ?MEMBER)))))))").
 %
-:-assert_kif("(subclass OrganicCompound CompoundSubstance)").
+:-assert_kif("(genls OrganicCompound CompoundSubstance)").
 :-assert_kif("(documentation OrganicCompound \"Any &%CompoundSubstance that has a &%Carbon base .\")").
 %
 :-assert_kif("(=> (and (instance ?COMPOUND OrganicCompound) (instance ?COMPOUND Molecule)) (exists (?CARBON) (and (instance ?CARBON Carbon) (part ?CARBON ?COMPOUND))))").
 %
-:-assert_kif("(subclass Alcohol OrganicCompound)").
+:-assert_kif("(genls Alcohol OrganicCompound)").
 :-assert_kif("(documentation Alcohol \"&%OrganicCompounds that are produced from hydrocarbons by distillation.\")").
 %
-:-assert_kif("(subclass SodiumChloride CompoundSubstance)").
+:-assert_kif("(genls SodiumChloride CompoundSubstance)").
 :-assert_kif("(documentation SodiumChloride \"The &%CompoundSubstance formed from &%Sodium and &%Chlorine.\")").
 %
 :-assert_kif("(=> (instance ?SALT SodiumChloride) (exists (?SYNTHESIS ?SODIUM ?CHLORINE) (and (instance ?SYNTHESIS ChemicalSynthesis) (resource ?SYNTHESIS ?SODIUM) (instance ?SODIUM Sodium) (resource ?SYNTHESIS ?CHLORINE) (instance ?CHLORINE Chlorine) (result ?SYNTHESIS ?SALT))))").
 %
-:-assert_kif("(subclass SalineSolution Solution)").
+:-assert_kif("(genls SalineSolution Solution)").
 :-assert_kif("(documentation SalineSolution \"A &%Solution consisting of &%SodiumChloride and &%Water.\")").
 %
 :-assert_kif("(=> (and (instance ?SOLUTION SalineSolution) (part ?PART ?SOLUTION)) (or (instance ?PART SodiumChloride) (instance ?PART Water)))").
 %
 :-assert_kif("(=> (instance ?WATER Water) (exists (?SYNTHESIS ?HYDROGEN ?OXYGEN) (and (instance ?SYNTHESIS ChemicalSynthesis) (resource ?SYNTHESIS ?HYDROGEN) (instance ?HYDROGEN Hydrogen) (resource ?SYNTHESIS ?OXYGEN) (instance ?OXYGEN Oxygen) (result ?SYNTHESIS ?WATER))))").
 %
-:-assert_kif("(subclass Oil Solution)").
+:-assert_kif("(genls Oil Solution)").
 :-assert_kif("(documentation Oil \"A greasy, viscous &%Solution that cannot be mixed with &%Water. Note that this general class covers petroleum oil, vegetable oil, animal fat, etc.\")").
 %
 :-assert_kif("(=> (instance ?OIL Oil) (not (exists (?MIX ?WATER) (and (instance ?MIX Mixture) (part ?WATER ?MIX) (instance ?WATER Water) (part ?OIL ?MIX)))))").
 %
-:-assert_kif("(subclass Detergent Mixture)").
+:-assert_kif("(genls Detergent Mixture)").
 :-assert_kif("(documentation Detergent \"Any &%Mixture whose purpose is to remove &%Soil and /or other undesirable substances from the surfaces of objects.\")").
 %
 :-assert_kif("(=> (instance ?DETERGENT Detergent) (hasPurpose ?DETERGENT (exists (?REMOVE ?SUBSTANCE ?SURFACE ?OBJECT) (and (instance ?REMOVE Removing) (instance ?SUBSTANCE Substance) (patient ?REMOVE ?SUBSTANCE) (origin ?REMOVE ?SURFACE) (surface ?SURFACE ?OBJECT)))))").
 %
-:-assert_kif("(subclass Glue Mixture)").
+:-assert_kif("(genls Glue Mixture)").
 :-assert_kif("(documentation Glue \"Any &%Mixture whose purpose is to be used as the &%instrument of &%Attaching one thing to another.\")").
 %
 :-assert_kif("(=> (instance ?GLUE Glue) (hasPurpose ?GLUE (exists (?ATTACH) (and (instance ?ATTACH Attaching) (instrument ?ATTACH ?GLUE)))))").
 %
-:-assert_kif("(subclass Glass Mixture)").
+:-assert_kif("(genls Glass Mixture)").
 :-assert_kif("(documentation Glass \"A transparent or translucent &%Mixture of silicates.\")").
 %
-:-assert_kif("(subclass MetallicAlloy Mixture)").
+:-assert_kif("(genls MetallicAlloy Mixture)").
 :-assert_kif("(documentation MetallicAlloy \"A &%Mixture of two or more &%Metals, and possibly nonmetallic elements as well. For example, steel is an alloy containing iron and manganese.\")").
 %
 :-assert_kif("(=> (instance ?ALLOY MetallicAlloy) (exists (?METAL1 ?METAL2) (and (instance ?METAL1 Metal) (instance ?METAL2 Metal) (not (equal ?METAL1 ?METAL2)) (part ?METAL1 ?ALLOY) (part ?METAL2 ?ALLOY))))").
 %
-:-assert_kif("(subclass Steel MetallicAlloy)").
+:-assert_kif("(genls Steel MetallicAlloy)").
 :-assert_kif("(documentation Steel \"A &%MetallicAlloy made from &%Iron and other elements.\")").
 %
 :-assert_kif("(=> (instance ?STEEL Steel) (exists (?IRON) (and (instance ?IRON Iron) (part ?IRON ?STEEL))))").
 %
-:-assert_kif("(subclass Brass MetallicAlloy)").
+:-assert_kif("(genls Brass MetallicAlloy)").
 :-assert_kif("(documentation Brass \"A &%MetallicAlloy made from &%Copper and &%Zinc.\")").
 %
 :-assert_kif("(=> (instance ?BRASS Brass) (exists (?COPPER ?ZINC) (and (instance ?COPPER Copper) (instance ?ZINC Zinc) (part ?COPPER ?BRASS) (part ?ZINC ?BRASS))))").
 %
-:-assert_kif("(subclass Powder Substance)").
+:-assert_kif("(genls Powder Substance)").
 :-assert_kif("(documentation Powder \"Any &%Solid &%Substance which consists of loose, identical , and very small particles.\")").
 %
 :-assert_kif("(=> (instance ?POWDER Powder) (attribute ?POWDER Solid))").
 %
-:-assert_kif("(subclass Fallout Powder)").
+:-assert_kif("(genls Fallout Powder)").
 :-assert_kif("(documentation Fallout \"Radioactive powder that is typically dispersed by the explosion of a nuclear weapon.\")").
 %
 :-assert_kif("(=> (instance ?POWDER Fallout) (capability RadiatingNuclear instrument ?POWDER))").
 %
-:-assert_kif("(subclass Fog WaterCloud)").
+:-assert_kif("(genls Fog WaterCloud)").
 :-assert_kif("(documentation Fog \"Any &%WaterCloud that is in contact with the ground.\")").
 %
 :-assert_kif("(=> (instance ?FOG Fog) (exists (?LAND) (and (instance ?LAND LandArea) (meetsSpatially ?FOG ?LAND))))").
 %
-:-assert_kif("(subclass Ice Water)").
+:-assert_kif("(genls Ice Water)").
 :-assert_kif("(documentation Ice \"&%Water that has the &%PhysicalState of &%Solid.\")").
 %
 :-assert_kif("(<=> (instance ?ICE Ice) (and (instance ?ICE Water) (attribute ?ICE Solid)))").
 %
 :-assert_kif("(=> (and (instance ?ICE Ice) (measure ?ICE (MeasureFn ?NUMBER CelsiusDegree))) (lessThanOrEqualTo ?NUMBER 0))").
 %
-:-assert_kif("(subclass Field LandArea)").
-:-assert_kif("(documentation Field \"A &%LandArea that has been cleared of &%BotanicalTrees. Note that a &%Field is not necessarily used for the cultivation of crops and that a &%Field may be very small, e.g. &%Lawn is a subclass of &%Field.\")").
+:-assert_kif("(genls Field LandArea)").
+:-assert_kif("(documentation Field \"A &%LandArea that has been cleared of &%BotanicalTrees. Note that a &%Field is not necessarily used for the cultivation of crops and that a &%Field may be very small, e.g. &%Lawn is a genls of &%Field.\")").
 %
 :-assert_kif("(=> (instance ?FIELD Field) (not (exists (?TREE) (and (instance ?TREE BotanicalTree) (located ?TREE ?FIELD)))))").
 %
-:-assert_kif("(subclass Lawn Field)").
+:-assert_kif("(genls Lawn Field)").
 :-assert_kif("(documentation Lawn \"A &%Field of cultivated and mowed &%Grass.\")").
 %
 :-assert_kif("(=> (instance ?LAWN Lawn) (exists (?GRASS) (and (instance ?GRASS Grass) (located ?GRASS ?LAWN))))").
 %
-:-assert_kif("(subclass MilitaryFront GeographicArea)").
+:-assert_kif("(genls MilitaryFront GeographicArea)").
 :-assert_kif("(documentation MilitaryFront \"A &%GeographicArea along which opposing military forces confront one another in a &%Battle.\")").
 %
 :-assert_kif("(=> (holdsDuring ?TIME (instance ?AREA MilitaryFront)) (exists (?BATTLE) (and (instance ?BATTLE Battle) (located ?BATTLE ?AREA) (temporalPart ?TIME ?BATTLE))))").
 %
-:-assert_kif("(subclass SpaceRegion Region)").
+:-assert_kif("(genls SpaceRegion Region)").
 :-assert_kif("(disjoint SpaceRegion GeographicArea)").
 :-assert_kif("(partition SpaceRegion AtmosphericRegion OuterSpaceRegion)").
 :-assert_kif("(documentation SpaceRegion \"The class of all &%Regions which are not &%GeographicAreas.\")").
 %
-:-assert_kif("(subclass OuterSpaceRegion SpaceRegion)").
+:-assert_kif("(genls OuterSpaceRegion SpaceRegion)").
 :-assert_kif("(documentation OuterSpaceRegion \"The class of all &%Regions which are neither &%GeographicAreas nor &%AtmosphericRegions.\")").
 %
-:-assert_kif("(subclass StormFront AtmosphericRegion)").
+:-assert_kif("(genls StormFront AtmosphericRegion)").
 :-assert_kif("(documentation StormFront \"The &%Region where two or more unstable air masses meet.\")").
 %
 :-assert_kif("(=> (instance ?FRONT StormFront) (exists (?AIR1 ?AIR2) (and (instance ?AIR1 Air) (instance ?AIR2 Air) (between ?AIR1 ?FRONT ?AIR2))))").
@@ -7988,173 +7988,173 @@
 %
 :-assert_kif("(=> (instance ?OUTSIDE Outside) (not (exists (?BUILDING ?THING) (and (instance ?BUILDING Building) (located ?THING ?BUILDING) (located ?THING ?OUTSIDE)))))").
 %
-:-assert_kif("(subclass BiologicalSpecies Class)").
+:-assert_kif("(genls BiologicalSpecies Class)").
 :-assert_kif("(documentation BiologicalSpecies \"The &%Class of all biological species, i.e. the class of all classes of &%Organism whose instances can interbreed.\")").
 %
-:-assert_kif("(=> (instance ?SPECIES BiologicalSpecies) (subclass ?SPECIES Organism))").
+:-assert_kif("(=> (instance ?SPECIES BiologicalSpecies) (genls ?SPECIES Organism))").
 %
-:-assert_kif("(subclass Wood PlantSubstance)").
+:-assert_kif("(genls Wood PlantSubstance)").
 :-assert_kif("(documentation Wood \"A &%Tissue that comprises the inner trunk of &%Trees. It is often used in constructing &%Buildings and other &%Artifacts;Wood is a natural substance obtained by processing trees, typically by removing the outer portions of the trunk or of thick branches. For commercial purposes Wood may be considered as non-living. The 'Wood' (woody substance) which may contain living cells in a living tree should therefore be labeled by a different name.\")").
 %
-:-assert_kif("(subclass Opium BiologicallyActiveSubstance)").
-:-assert_kif("(subclass Opium PlantSubstance)").
+:-assert_kif("(genls Opium BiologicallyActiveSubstance)").
+:-assert_kif("(genls Opium PlantSubstance)").
 :-assert_kif("(documentation Opium \"A substance harvested from the seed capsules of the opium poppy that contains various powerful alkaloids.\")").
 %
-:-assert_kif("(subclass Grass FloweringPlant)").
+:-assert_kif("(genls Grass FloweringPlant)").
 :-assert_kif("(documentation Grass \"&%FloweringPlants with green, narrow leaves that are used for lawns and &%Fields.\")").
 %
-:-assert_kif("(subclass Tumor AbnormalAnatomicalStructure)").
+:-assert_kif("(genls Tumor AbnormalAnatomicalStructure)").
 :-assert_kif("(documentation Tumor \"Any &%AbnormalAnatomicalStructure which consists of a mass of &%Tissue. Note that this class covers both malignant (i.e. cancerous) and benign tumors.\")").
 %
 :-assert_kif("(=> (instance ?TUMOR Tumor) (forall (?PART) (=> (part ?PART ?TUMOR) (instance ?PART Tissue))))").
 %
-:-assert_kif("(subclass AnimalSubstance BodySubstance)").
+:-assert_kif("(genls AnimalSubstance BodySubstance)").
 :-assert_kif("(documentation AnimalSubstance \"&%BodySubstances that are produced exclusively by &%Animals.\")").
 %
 :-assert_kif("(=> (and (instance ?SUBSTANCE AnimalSubstance) (instance ?ANIMAL Organism) (part ?SUBSTANCE ?ANIMAL)) (instance ?ANIMAL Animal))").
 %
-:-assert_kif("(subclass PlantSubstance BodySubstance)").
+:-assert_kif("(genls PlantSubstance BodySubstance)").
 :-assert_kif("(documentation PlantSubstance \"&%BodySubstances that are produced exclusively by &%Plants.\")").
 %
 :-assert_kif("(=> (and (instance ?SUBSTANCE PlantSubstance) (instance ?PLANT Organism) (part ?SUBSTANCE ?PLANT)) (instance ?PLANT Plant))").
 %
-:-assert_kif("(subclass Sweat AnimalSubstance)").
+:-assert_kif("(genls Sweat AnimalSubstance)").
 :-assert_kif("(documentation Sweat \"An &%AnimalSubstance that contains &%SodiumChloride and is produced by the sweat glands.\")").
 %
 :-assert_kif("(=> (instance ?SWEAT Sweat) (exists (?PART) (and (instance ?PART SodiumChloride) (part ?PART ?SWEAT))))").
 %
-:-assert_kif("(subclass PlantLeaf PlantAnatomicalStructure)").
-:-assert_kif("(subclass PlantLeaf Organ)").
+:-assert_kif("(genls PlantLeaf PlantAnatomicalStructure)").
+:-assert_kif("(genls PlantLeaf Organ)").
 :-assert_kif("(documentation PlantLeaf \"An &%Organ of &%Plants whose main purpose is photosynthesis .\")").
 %
-:-assert_kif("(subclass PlantBranch PlantAnatomicalStructure)").
-:-assert_kif("(subclass PlantBranch BodyPart)").
+:-assert_kif("(genls PlantBranch PlantAnatomicalStructure)").
+:-assert_kif("(genls PlantBranch BodyPart)").
 :-assert_kif("(documentation PlantBranch \"The stem of a &%Plant or any shoot arising from the stem of a &%Plant.\")").
 %
-:-assert_kif("(subclass PlantRoot PlantAnatomicalStructure)").
-:-assert_kif("(subclass PlantRoot Organ)").
+:-assert_kif("(genls PlantRoot PlantAnatomicalStructure)").
+:-assert_kif("(genls PlantRoot Organ)").
 :-assert_kif("(documentation PlantRoot \"An &%Organ of &%Plants whose main purpose is twofold , viz. to absorb nutrients from the ground and to anchor the &%Plant in place.\")").
 %
-:-assert_kif("(subclass Flower PlantAnatomicalStructure)").
-:-assert_kif("(subclass Flower Organ)").
+:-assert_kif("(genls Flower PlantAnatomicalStructure)").
+:-assert_kif("(genls Flower Organ)").
 :-assert_kif("(documentation Flower \"The reproductive organ of &%FloweringPlants.\")").
 %
 :-assert_kif("(=> (instance ?FLOWER Flower) (exists (?PLANT) (and (instance ?PLANT FloweringPlant) (part ?FLOWER ?PLANT))))").
 %
-:-assert_kif("(subclass Antibody Protein)").
+:-assert_kif("(genls Antibody Protein)").
 :-assert_kif("(documentation Antibody \"An immunoglobulin which is produced by the body and which has the ability to neutralize &%Antigens.\")").
 %
 :-assert_kif("(=> (instance ?BODY Antibody) (hasPurpose ?BODY (exists (?DEST) (and (instance ?DEST Destruction) (agent ?DEST ?BODY) (patient ?DEST ?ANTI) (instance ?ANTI Antigen)))))").
 %
-:-assert_kif("(subclass Antigen BiologicallyActiveSubstance)").
+:-assert_kif("(genls Antigen BiologicallyActiveSubstance)").
 :-assert_kif("(documentation Antigen \"Any &%BiologicallyActiveSubstance that has the capacity to stimulate the production of &%Antibodies.\")").
 %
-:-assert_kif("(subclass LiquidBodySubstance BodySubstance)").
+:-assert_kif("(genls LiquidBodySubstance BodySubstance)").
 :-assert_kif("(documentation LiquidBodySubstance \"Any &%BodySubstance which is &%Liquid under normal circumstances.\")").
 %
 :-assert_kif("(=> (instance ?SUBSTANCE LiquidBodySubstance) (attribute ?SUBSTANCE Liquid))").
 %
-:-assert_kif("(subclass Serum LiquidBodySubstance)").
+:-assert_kif("(genls Serum LiquidBodySubstance)").
 :-assert_kif("(disjoint Serum Blood)").
 :-assert_kif("(documentation Serum \"Any &%LiquidBodySubstance other than &%Blood.\")").
 %
-:-assert_kif("(subclass Milk LiquidBodySubstance)").
-:-assert_kif("(subclass Milk Beverage)").
+:-assert_kif("(genls Milk LiquidBodySubstance)").
+:-assert_kif("(genls Milk Beverage)").
 :-assert_kif("(documentation Milk \"A nutritious &%BodySubstance produced by &%Mammals.\")").
 %
 :-assert_kif("(=> (instance ?MILK Milk) (exists (?PROCESS ?MAMMAL) (and (instance ?MAMMAL Mammal) (instrument ?PROCESS ?MAMMAL) (result ?PROCESS ?MILK))))").
 %
-:-assert_kif("(subclass CellNucleus OrganicObject)").
+:-assert_kif("(genls CellNucleus OrganicObject)").
 :-assert_kif("(documentation CellNucleus \"The part of the &%Cell that contains DNA and RNA .\")").
 %
 :-assert_kif("(=> (instance ?NUCLEUS CellNucleus) (exists (?CELL) (and (instance ?CELL Cell) (part ?NUCLEUS ?CELL))))").
 %
-:-assert_kif("(subclass AlcoholicBeverage Beverage)").
+:-assert_kif("(genls AlcoholicBeverage Beverage)").
 :-assert_kif("(documentation AlcoholicBeverage \"Any &%Beverage that contains &%Alcohol.\")").
 %
 :-assert_kif("(=> (instance ?BEVERAGE AlcoholicBeverage) (exists (?ALCOHOL) (and (instance ?ALCOHOL Alcohol) (part ?ALCOHOL ?BEVERAGE))))").
 %
-:-assert_kif("(subclass DistilledAlcoholicBeverage AlcoholicBeverage)").
+:-assert_kif("(genls DistilledAlcoholicBeverage AlcoholicBeverage)").
 :-assert_kif("(documentation DistilledAlcoholicBeverage \"An &%AlcoholicBeverage that has had some part of its &%Water content removed by distillation. This class covers drinks of unmixed, hard liquor.\")").
 %
 :-assert_kif("(=> (instance ?BEVERAGE DistilledAlcoholicBeverage) (exists (?REMOVE ?WATER) (and (instance ?REMOVE Removing) (patient ?REMOVE ?WATER) (instance ?WATER Water) (origin ?REMOVE ?BEVERAGE))))").
 %
-:-assert_kif("(subclass Whiskey DistilledAlcoholicBeverage)").
+:-assert_kif("(genls Whiskey DistilledAlcoholicBeverage)").
 :-assert_kif("(documentation Whiskey \"A &%DistilledAlcoholicBeverage that is prepared by distilling fermented grain mash.\")").
 %
-:-assert_kif("(subclass Beer AlcoholicBeverage)").
+:-assert_kif("(genls Beer AlcoholicBeverage)").
 :-assert_kif("(documentation Beer \"An &%AlcoholicBeverage that is prepared by fermenting malt and hops.\")").
 %
-:-assert_kif("(subclass SpinalColumn Organ)").
-:-assert_kif("(subclass SpinalColumn AnimalAnatomicalStructure)").
+:-assert_kif("(genls SpinalColumn Organ)").
+:-assert_kif("(genls SpinalColumn AnimalAnatomicalStructure)").
 :-assert_kif("(documentation SpinalColumn \"A flexible column made out of bones called vertebrae . The main function of the &%SpinalColumn is to protect the spinal cord.\")").
 %
 :-assert_kif("(<=> (instance ?VERT Vertebrate) (exists (?SPINE) (and (instance ?VERT Animal) (component ?SPINE ?VERT) (instance ?SPINE SpinalColumn))))").
 %
-:-assert_kif("(subclass Skin BodyCovering)").
-:-assert_kif("(subclass Skin AnimalAnatomicalStructure)").
+:-assert_kif("(genls Skin BodyCovering)").
+:-assert_kif("(genls Skin AnimalAnatomicalStructure)").
 :-assert_kif("(documentation Skin \"A BodyCovering that comprises part of the surface of &%Animals.\")").
 %
 :-assert_kif("(=> (instance ?SKIN Skin) (exists (?SURFACE ?ANIMAL) (and (surface ?SURFACE ?ANIMAL) (part ?SKIN ?ANIMAL) (instance ?ANIMAL Animal) (overlapsSpatially ?SKIN ?SURFACE))))").
 %
-:-assert_kif("(subclass BronchialDuct BodyVessel)").
-:-assert_kif("(subclass BronchialDuct AnimalAnatomicalStructure)").
+:-assert_kif("(genls BronchialDuct BodyVessel)").
+:-assert_kif("(genls BronchialDuct AnimalAnatomicalStructure)").
 :-assert_kif("(documentation BronchialDuct \"Any &%BodyVessel which is located in a &%Lung and which carries oxygen from the trachea to the alveoli.\")").
 %
 :-assert_kif("(=> (instance ?DUCT BronchialDuct) (exists (?LUNG) (and (instance ?LUNG Lung) (located ?DUCT ?LUNG))))").
 %
-:-assert_kif("(subclass BloodVessel BodyVessel)").
-:-assert_kif("(subclass BloodVessel AnimalAnatomicalStructure)").
+:-assert_kif("(genls BloodVessel BodyVessel)").
+:-assert_kif("(genls BloodVessel AnimalAnatomicalStructure)").
 :-assert_kif("(documentation BloodVessel \"Any &%BodyVessel which is used to circulate &%Blood from one part of the body to another.\")").
 %
 :-assert_kif("(=> (instance ?VESSEL BloodVessel) (exists (?BLOOD ?TRANSFER) (and (instance ?BLOOD Blood) (instance ?TRANSFER Transfer) (patient ?TRANSFER ?BLOOD) (instrument ?TRANSFER ?VESSEL))))").
 %
-:-assert_kif("(subclass Artery BloodVessel)").
+:-assert_kif("(genls Artery BloodVessel)").
 :-assert_kif("(documentation Artery \"Any &%BloodVessel which transfers &%Blood from the &%Heart to the extremities of the body.\")").
 %
 :-assert_kif("(=> (and (instance ?ARTERY Artery) (instance ?TRANSFER Transfer) (patient ?TRANSFER ?BLOOD) (instrument ?TRANSFER ?ARTERY) (instance ?BLOOD Blood)) (exists (?HEART) (and (instance ?HEART Heart) (origin ?TRANSFER ?HEART))))").
 %
-:-assert_kif("(subclass PulmonaryArtery Artery)").
+:-assert_kif("(genls PulmonaryArtery Artery)").
 :-assert_kif("(documentation PulmonaryArtery \"An &%Artery that carries &%Blood from the &%Heart to a &%Lung.\")").
 %
 :-assert_kif("(=> (and (instance ?ARTERY PulmonaryArtery) (instance ?TRANSFER Transfer) (patient ?TRANSFER ?BLOOD) (instrument ?TRANSFER ?ARTERY) (instance ?BLOOD Blood)) (exists (?LUNG) (and (instance ?LUNG Lung) (destination ?TRANSFER ?LUNG))))").
 %
-:-assert_kif("(subclass Lung Organ)").
-:-assert_kif("(subclass Lung AnimalAnatomicalStructure)").
+:-assert_kif("(genls Lung Organ)").
+:-assert_kif("(genls Lung AnimalAnatomicalStructure)").
 :-assert_kif("(documentation Lung \"A respiratory organ of &%Vertebrates. Its function is to furnish the blood with oxygen and to remove carbon dioxide.\")").
 %
 :-assert_kif("(=> (instance ?VERT Vertebrate) (exists (?LUNG) (and (component ?LUNG ?VERT) (instance ?LUNG Lung))))").
 %
 :-assert_kif("(=> (capability Breathing experiencer ?ANIMAL) (exists (?LUNG) (and (component ?LUNG ?ANIMAL) (instance ?LUNG Lung))))").
 %
-:-assert_kif("(subclass Heart Organ)").
-:-assert_kif("(subclass Heart AnimalAnatomicalStructure)").
+:-assert_kif("(genls Heart Organ)").
+:-assert_kif("(genls Heart AnimalAnatomicalStructure)").
 :-assert_kif("(documentation Heart \"The &%Organ that pumps &%Blood throughout the body.\")").
 %
 :-assert_kif("(=> (instance ?HEART Heart) (exists (?TRANSFER ?BLOOD) (and (instance ?TRANSFER Transfer) (instance ?BLOOD Blood) (instrument ?TRANSFER ?HEART) (patient ?TRANSFER ?BLOOD))))").
 %
-:-assert_kif("(subclass Liver Organ)").
-:-assert_kif("(subclass Liver AnimalAnatomicalStructure)").
+:-assert_kif("(genls Liver Organ)").
+:-assert_kif("(genls Liver AnimalAnatomicalStructure)").
 :-assert_kif("(documentation Liver \"An &%Organ that secretes bile and serves metabolic functions .\")").
 %
-:-assert_kif("(subclass Mouth AnimalAnatomicalStructure)").
-:-assert_kif("(subclass Mouth BodyPart)").
+:-assert_kif("(genls Mouth AnimalAnatomicalStructure)").
+:-assert_kif("(genls Mouth BodyPart)").
 :-assert_kif("(documentation Mouth \"Part of the &%Face, used for &%Ingesting &%Food and &%Vocalizing.\")").
 %
 :-assert_kif("(=> (instance ?MOUTH Mouth) (exists (?FACE) (and (instance ?FACE Face) (part ?FACE ?MOUTH))))").
 %
-:-assert_kif("(subclass Tongue AnimalAnatomicalStructure)").
-:-assert_kif("(subclass Tongue BodyPart)").
+:-assert_kif("(genls Tongue AnimalAnatomicalStructure)").
+:-assert_kif("(genls Tongue BodyPart)").
 :-assert_kif("(documentation Tongue \"Part of the &%Mouth, used for &%Tasting &%Food, &%Vocalizing, and the initial stage of &%Digesting.\")").
 %
 :-assert_kif("(=> (instance ?TONGUE Tongue) (exists (?MOUTH) (and (instance ?MOUTH Mouth) (part ?TONGUE ?MOUTH))))").
 %
-:-assert_kif("(subclass Tooth Bone)").
+:-assert_kif("(genls Tooth Bone)").
 :-assert_kif("(documentation Tooth \"Part of the &%Mouth, used for biting and chewing.\")").
 %
 :-assert_kif("(=> (instance ?TOOTH Tooth) (exists (?MOUTH) (and (instance ?MOUTH Mouth) (part ?TOOTH ?MOUTH))))").
 %
-:-assert_kif("(subclass Chewing BodyMotion)").
+:-assert_kif("(genls Chewing BodyMotion)").
 :-assert_kif("(documentation Chewing \"Breaking up or mashing &%Food with one's teeth.\")").
 %
 :-assert_kif("(=> (and (instance ?CHEW Chewing) (resource ?CHEW ?FOOD)) (instance ?FOOD Food))").
@@ -8163,261 +8163,261 @@
 %
 :-assert_kif("(=> (instance ?CHEW Chewing) (exists (?EAT) (and (instance ?EAT Eating) (subProcess ?CHEW ?EAT))))").
 %
-:-assert_kif("(subclass Lip AnimalAnatomicalStructure)").
-:-assert_kif("(subclass Lip BodyPart)").
+:-assert_kif("(genls Lip AnimalAnatomicalStructure)").
+:-assert_kif("(genls Lip BodyPart)").
 :-assert_kif("(documentation Lip \"Folds of &%Tissue surrounding the mouths of some &%Vertebrates.\")").
 %
 :-assert_kif("(=> (instance ?LIP Lip) (exists (?MOUTH) (and (instance ?MOUTH Mouth) (part ?LIP ?MOUTH))))").
 %
-:-assert_kif("(subclass Kissing Touching)").
+:-assert_kif("(genls Kissing Touching)").
 :-assert_kif("(documentation Kissing \"The class of &%Touching processes where the lips of two persons are brought into contact with each other.\")").
 %
 :-assert_kif("(=> (instance ?KISS Kissing) (exists (?PERSON1 ?PERSON2 ?LIP1 ?LIP2) (and (agent ?KISS ?PERSON1) (agent ?KISS ?PERSON2) (instance ?PERSON1 Human) (instance ?PERSON2 Human) (not (equal ?PERSON1 ?PERSON2)) (instance ?LIP1 Lip) (instance ?LIP2 Lip) (part ?LIP1 ?PERSON1) (part ?LIP2 ?PERSON2) (holdsDuring (BeginFn (WhenFn ?KISS)) (not (meetsSpatially ?LIP1 ?LIP2))) (holdsDuring (EndFn (WhenFn ?KISS)) (meetsSpatially ?LIP1 ?LIP2)))))").
 %
-:-assert_kif("(subclass Skeleton AnimalAnatomicalStructure)").
-:-assert_kif("(subclass Skeleton BodyPart)").
+:-assert_kif("(genls Skeleton AnimalAnatomicalStructure)").
+:-assert_kif("(genls Skeleton BodyPart)").
 :-assert_kif("(documentation Skeleton \"The system of &%Bones that make up the supporting structure of &%Vertebrates.\")").
 %
 :-assert_kif("(=> (and (instance ?ANIMAL Animal) (instance ?SKELETON Skeleton) (part ?SKELETON ?ANIMAL)) (instance ?ANIMAL Vertebrate))").
 %
 :-assert_kif("(<=> (instance ?BONE Bone) (exists (?SKELETON) (and (instance ?SKELETON Skeleton) (part ?BONE ?SKELETON))))").
 %
-:-assert_kif("(subclass Throat AnimalAnatomicalStructure)").
-:-assert_kif("(subclass Throat BodyVessel)").
+:-assert_kif("(genls Throat AnimalAnatomicalStructure)").
+:-assert_kif("(genls Throat BodyVessel)").
 :-assert_kif("(documentation Throat \"A &%BodyVessel which connects the &%Mouth to the lungs and stomach.\")").
 %
 :-assert_kif("(=> (instance ?THROAT Throat) (exists (?MOUTH) (and (instance ?MOUTH Mouth) (connected ?THROAT ?MOUTH))))").
 %
-:-assert_kif("(subclass Hair AnimalAnatomicalStructure)").
+:-assert_kif("(genls Hair AnimalAnatomicalStructure)").
 :-assert_kif("(documentation Hair \"A filament that covers part of the body of many &%Mammals.\")").
 %
 :-assert_kif("(=> (instance ?HAIR Hair) (exists (?MAMMAL ?TIME) (and (instance ?MAMMAL Mammal) (holdsDuring ?TIME (part ?HAIR ?MAMMAL)))))").
 %
-:-assert_kif("(subclass HairRemoval Removing)").
+:-assert_kif("(genls HairRemoval Removing)").
 :-assert_kif("(documentation HairRemoval \"&%Removing (some or all) the &%Hair from the body of an &%Animal. Note that this covers shaving hair, cutting hair, pulling hair out by the roots, etc.\")").
 %
 :-assert_kif("(=> (and (instance ?REMOVE HairRemoval) (resource ?REMOVE ?HAIR)) (instance ?HAIR Hair))").
 %
-:-assert_kif("(subclass Brain Organ)").
-:-assert_kif("(subclass Brain AnimalAnatomicalStructure)").
+:-assert_kif("(genls Brain Organ)").
+:-assert_kif("(genls Brain AnimalAnatomicalStructure)").
 :-assert_kif("(documentation Brain \"The seat of the central nervous system.\")").
 %
-:-assert_kif("(subclass Stomach Organ)").
-:-assert_kif("(subclass Stomach AnimalAnatomicalStructure)").
+:-assert_kif("(genls Stomach Organ)").
+:-assert_kif("(genls Stomach AnimalAnatomicalStructure)").
 :-assert_kif("(documentation Stomach \"A muscular sac that is the principal organ of digestion .\")").
 %
 :-assert_kif("(=> (instance ?STOMACH Stomach) (capability Digesting instrument ?STOMACH))").
 %
-:-assert_kif("(subclass Hypothalamus BodyPart)").
-:-assert_kif("(subclass Hypothalamus AnimalAnatomicalStructure)").
+:-assert_kif("(genls Hypothalamus BodyPart)").
+:-assert_kif("(genls Hypothalamus AnimalAnatomicalStructure)").
 :-assert_kif("(documentation Hypothalamus \"The part of the &%Brain lying below the thalamus that serves to regulate &%AutonomicProcesses.\")").
 %
 :-assert_kif("(=> (instance ?HYPO Hypothalamus) (exists (?BRAIN) (and (instance ?BRAIN Brain) (part ?HYPO ?BRAIN))))").
 %
-:-assert_kif("(subclass Eye Organ)").
-:-assert_kif("(subclass Eye AnimalAnatomicalStructure)").
+:-assert_kif("(genls Eye Organ)").
+:-assert_kif("(genls Eye AnimalAnatomicalStructure)").
 :-assert_kif("(documentation Eye \"The &%Organ of sight.\")").
 %
 :-assert_kif("(=> (instance ?EYE Eye) (capability Seeing instrument ?EYE))").
 %
 :-assert_kif("(=> (instance ?EYE Eye) (exists (?HEAD) (and (instance ?HEAD Head) (part ?EYE ?HEAD))))").
 %
-:-assert_kif("(subclass Ear Organ)").
-:-assert_kif("(subclass Ear AnimalAnatomicalStructure)").
+:-assert_kif("(genls Ear Organ)").
+:-assert_kif("(genls Ear AnimalAnatomicalStructure)").
 :-assert_kif("(documentation Ear \"The &%Organ of hearing.\")").
 %
 :-assert_kif("(=> (instance ?EAR Ear) (capability Hearing instrument ?EAR))").
 %
 :-assert_kif("(=> (instance ?EAR Ear) (exists (?HEAD) (and (instance ?HEAD Head) (part ?EAR ?HEAD))))").
 %
-:-assert_kif("(subclass Nose Organ)").
-:-assert_kif("(subclass Nose AnimalAnatomicalStructure)").
+:-assert_kif("(genls Nose Organ)").
+:-assert_kif("(genls Nose AnimalAnatomicalStructure)").
 :-assert_kif("(documentation Nose \"The &%Organ of &%Smelling.\")").
 %
 :-assert_kif("(=> (instance ?NOSE Nose) (capability Smelling instrument ?NOSE))").
 %
 :-assert_kif("(=> (instance ?NOSE Nose) (exists (?FACE) (and (instance ?FACE Face) (part ?NOSE ?FACE))))").
 %
-:-assert_kif("(subclass ThyroidGland Gland)").
+:-assert_kif("(genls ThyroidGland Gland)").
 :-assert_kif("(documentation ThyroidGland \"A &%Gland in the neck that produces &%HormoneTSH, which regulates body weight, metabolic rate, etc.\")").
 %
-:-assert_kif("(subclass HormoneTSH Hormone)").
+:-assert_kif("(genls HormoneTSH Hormone)").
 :-assert_kif("(documentation HormoneTSH \"A &%Hormone secreted by the &%ThyroidGland.\")").
 %
 :-assert_kif("(=> (instance ?HORMONE HormoneTSH) (exists (?PROC ?GLAND) (and (instance ?GLAND ThyroidGland) (instrument ?PROC ?GLAND) (result ?PROC ?HORMONE))))").
 %
-:-assert_kif("(subclass Arm Limb)").
+:-assert_kif("(genls Arm Limb)").
 :-assert_kif("(documentation Arm \"The upper &%Limbs of a &%Primate.\")").
 %
 :-assert_kif("(=> (instance ?ARM Arm) (exists (?PRIMATE) (and (instance ?PRIMATE Primate) (part ?ARM ?PRIMATE))))").
 %
-:-assert_kif("(subclass Hand AnimalAnatomicalStructure)").
-:-assert_kif("(subclass Hand BodyPart)").
+:-assert_kif("(genls Hand AnimalAnatomicalStructure)").
+:-assert_kif("(genls Hand BodyPart)").
 :-assert_kif("(documentation Hand \"The grasping, fingered part of an upper limb of a &%Primate.\")").
 %
 :-assert_kif("(=> (instance ?HAND Hand) (exists (?ARM) (and (instance ?ARM Arm) (part ?HAND ?ARM))))").
 %
-:-assert_kif("(subclass Finger AnimalAnatomicalStructure)").
-:-assert_kif("(subclass Finger BodyPart)").
+:-assert_kif("(genls Finger AnimalAnatomicalStructure)").
+:-assert_kif("(genls Finger BodyPart)").
 :-assert_kif("(documentation Finger \"The five extremities of &%Hands.\")").
 %
 :-assert_kif("(=> (instance ?FINGER Finger) (exists (?HAND) (and (instance ?HAND Hand) (part ?FINGER ?HAND))))").
 %
-:-assert_kif("(subclass Limb AnimalAnatomicalStructure)").
-:-assert_kif("(subclass Limb BodyPart)").
+:-assert_kif("(genls Limb AnimalAnatomicalStructure)").
+:-assert_kif("(genls Limb BodyPart)").
 :-assert_kif("(documentation Limb \"Any of the limbs of a &%Vertebrate.\")").
 %
 :-assert_kif("(=> (instance ?LIMB Limb) (exists (?VERTEBRATE) (and (instance ?VERTEBRATE Vertebrate) (part ?LIMB ?VERTEBRATE))))").
 %
-:-assert_kif("(subclass Snake Reptile)").
+:-assert_kif("(genls Snake Reptile)").
 :-assert_kif("(documentation Snake \"A long and narrow &%Reptile which lacks &%Limbs.\")").
 %
 :-assert_kif("(=> (instance ?SNAKE Snake) (not (exists (?LIMB) (and (instance ?LIMB Limb) (part ?LIMB ?SNAKE)))))").
 %
-:-assert_kif("(subclass ConstrictorSnake Snake)").
+:-assert_kif("(genls ConstrictorSnake Snake)").
 :-assert_kif("(documentation ConstrictorSnake \"A &%Snake that lacks venom and kills its prey by crushing it to death.\")").
 %
-:-assert_kif("(subclass Anaconda ConstrictorSnake)").
+:-assert_kif("(genls Anaconda ConstrictorSnake)").
 :-assert_kif("(documentation Anaconda \"A very large Boa that is found in South America.\")").
 %
-:-assert_kif("(subclass Bee Insect)").
+:-assert_kif("(genls Bee Insect)").
 :-assert_kif("(documentation Bee \"A hairy &%Insect, some species of which produce honey and /or sting.\")").
 %
-:-assert_kif("(subclass BumbleBee Bee)").
+:-assert_kif("(genls BumbleBee Bee)").
 :-assert_kif("(documentation BumbleBee \"A large &%Bee which lacks a stinger.\")").
 %
-:-assert_kif("(subclass QueenInsect Insect)").
+:-assert_kif("(genls QueenInsect Insect)").
 :-assert_kif("(documentation QueenInsect \"A &%Female &%Insect which is the sole member of her colony with the capability to reproduce.\")").
 %
 :-assert_kif("(=> (instance ?INSECT QueenInsect) (and (attribute ?INSECT Female) (capability Replication agent ?INSECT)))").
 %
 :-assert_kif("(=> (instance ?INSECT QueenInsect) (exists (?GROUP) (and (instance ?GROUP Group) (member ?INSECT ?GROUP) (not (exists (?MEMBER) (and (member ?MEMBER ?GROUP) (capability Replication agent ?MEMBER) (not (equal ?MEMBER ?INSECT))))))))").
 %
-:-assert_kif("(subclass Leg Limb)").
+:-assert_kif("(genls Leg Limb)").
 :-assert_kif("(documentation Leg \"The lower &%Limbs of &%Primates.\")").
 %
 :-assert_kif("(=> (instance ?LEG Leg) (exists (?PRIMATE) (and (instance ?PRIMATE Primate) (part ?LEG ?PRIMATE))))").
 %
-:-assert_kif("(subclass Foot AnimalAnatomicalStructure)").
-:-assert_kif("(subclass Foot BodyPart)").
+:-assert_kif("(genls Foot AnimalAnatomicalStructure)").
+:-assert_kif("(genls Foot BodyPart)").
 :-assert_kif("(documentation Foot \"The lower part of a &%Limb, the part which makes contact with the ground in locomotion of the &%Animal.\")").
 %
 :-assert_kif("(=> (instance ?FOOT Foot) (exists (?LIMB) (and (instance ?LIMB Leg) (part ?FOOT ?LIMB))))").
 %
-:-assert_kif("(subclass Toe AnimalAnatomicalStructure)").
-:-assert_kif("(subclass Toe BodyPart)").
+:-assert_kif("(genls Toe AnimalAnatomicalStructure)").
+:-assert_kif("(genls Toe BodyPart)").
 :-assert_kif("(documentation Toe \"The five extremities of a &%Foot.\")").
 %
 :-assert_kif("(=> (instance ?TOE Toe) (exists (?FOOT) (and (instance ?FOOT Foot) (part ?TOE ?FOOT))))").
 %
-:-assert_kif("(subclass Knee AnimalAnatomicalStructure)").
-:-assert_kif("(subclass Knee BodyJunction)").
+:-assert_kif("(genls Knee AnimalAnatomicalStructure)").
+:-assert_kif("(genls Knee BodyJunction)").
 :-assert_kif("(documentation Knee \"The joint in the &%Leg connecting the tibia and fibula with the femur.\")").
 %
 :-assert_kif("(=> (instance ?KNEE Knee) (exists (?LEG) (and (instance ?LEG Leg) (part ?KNEE ?LEG))))").
 %
-:-assert_kif("(subclass Shoulder AnimalAnatomicalStructure)").
-:-assert_kif("(subclass Shoulder BodyPart)").
+:-assert_kif("(genls Shoulder AnimalAnatomicalStructure)").
+:-assert_kif("(genls Shoulder BodyPart)").
 :-assert_kif("(documentation Shoulder \"The part of a &%Primate between the &%Arm and the neck.\")").
 %
 :-assert_kif("(=> (instance ?SHOULDER Shoulder) (exists (?PRIMATE) (and (instance ?PRIMATE Primate) (part ?SHOULDER ?PRIMATE))))").
 %
-:-assert_kif("(subclass Torso AnimalAnatomicalStructure)").
-:-assert_kif("(subclass Torso BodyPart)").
+:-assert_kif("(genls Torso AnimalAnatomicalStructure)").
+:-assert_kif("(genls Torso BodyPart)").
 :-assert_kif("(documentation Torso \"The body of a &%Primate excluding its &%Limbs.\")").
 %
 :-assert_kif("(=> (and (instance ?TORSO Torso) (instance ?LIMB Limb)) (not (overlapsSpatially ?TORSO ?LIMB)))").
 %
-:-assert_kif("(subclass Head AnimalAnatomicalStructure)").
-:-assert_kif("(subclass Head BodyPart)").
+:-assert_kif("(genls Head AnimalAnatomicalStructure)").
+:-assert_kif("(genls Head BodyPart)").
 :-assert_kif("(documentation Head \"The part of the body containing the sense organs and the brain.\")").
 %
-:-assert_kif("(subclass Neck AnimalAnatomicalStructure)").
-:-assert_kif("(subclass Neck BodyPart)").
+:-assert_kif("(genls Neck AnimalAnatomicalStructure)").
+:-assert_kif("(genls Neck BodyPart)").
 :-assert_kif("(documentation Neck \"The part of the body that connects the &%Head to the rest of the body.\")").
 %
 :-assert_kif("(=> (instance ?NECK Neck) (exists (?HEAD) (and (instance ?HEAD Head) (connected ?NECK ?HEAD))))").
 %
-:-assert_kif("(subclass Face AnimalAnatomicalStructure)").
-:-assert_kif("(subclass Face BodyPart)").
+:-assert_kif("(genls Face AnimalAnatomicalStructure)").
+:-assert_kif("(genls Face BodyPart)").
 :-assert_kif("(documentation Face \"The part of the &%Head from forehead to chin and from ear to ear.\")").
 %
 :-assert_kif("(=> (instance ?FACE Face) (exists (?HEAD) (and (instance ?HEAD Head) (part ?FACE ?HEAD))))").
 %
 :-assert_kif("(=> (instance ?FACE Face) (exists (?VERTEBRATE) (and (instance ?VERTEBRATE Vertebrate) (part ?FACE ?VERTEBRATE))))").
 %
-:-assert_kif("(subclass Chin AnimalAnatomicalStructure)").
-:-assert_kif("(subclass Chin BodyPart)").
+:-assert_kif("(genls Chin AnimalAnatomicalStructure)").
+:-assert_kif("(genls Chin BodyPart)").
 :-assert_kif("(documentation Chin \"A part of the &%Face which protrudes slightly and which is lower than all other parts of the &%Face.\")").
 %
 :-assert_kif("(=> (instance ?CHIN Chin) (exists (?FACE) (and (instance ?FACE Face) (part ?CHIN ?FACE))))").
 %
 :-assert_kif("(=> (instance ?CHIN Chin) (forall (?PART) (=> (and (part ?PART ?FACE) (not (part ?PART ?CHIN))) (orientation ?PART ?CHIN Below))))").
 %
-:-assert_kif("(subclass ExpressingApproval Expressing)").
+:-assert_kif("(genls ExpressingApproval Expressing)").
 :-assert_kif("(documentation ExpressingApproval \"&%Expressing favor about a physical thing or a state of affairs.\")").
 %
 :-assert_kif("(=> (and (instance ?EXPRESS ExpressingApproval) (agent ?EXPRESS ?AGENT) (patient ?EXPRESS ?THING)) (or (wants ?AGENT ?THING) (desires ?AGENT ?THING)))").
 %
-:-assert_kif("(subclass ExpressingDisapproval Expressing)").
+:-assert_kif("(genls ExpressingDisapproval Expressing)").
 :-assert_kif("(documentation ExpressingDisapproval \"&%Expressing disfavor about a physical thing or a state of affairs.\")").
 %
 :-assert_kif("(=> (and (instance ?EXPRESS ExpressingDisapproval) (agent ?EXPRESS ?AGENT) (patient ?EXPRESS ?THING)) (or (dislikes ?AGENT ?THING) (disapproves ?AGENT ?THING)))").
 %
-:-assert_kif("(subclass FacialExpression Gesture)").
+:-assert_kif("(genls FacialExpression Gesture)").
 :-assert_kif("(documentation FacialExpression \"Any &%Gesture whose &%instrument is the &%Face.\")").
 %
 :-assert_kif("(=> (and (instance ?EXPRESS FacialExpression) (agent ?EXPRESS ?AGENT)) (exists (?FACE) (and (part ?FACE ?AGENT) (instance ?FACE Face) (instrument ?EXPRESS ?FACE))))").
 %
-:-assert_kif("(subclass Smiling FacialExpression)").
+:-assert_kif("(genls Smiling FacialExpression)").
 :-assert_kif("(documentation Smiling \"Spreading the lips in such a way as to convey happiness .\")").
 %
 :-assert_kif("(=> (and (instance ?SMILE Smiling) (agent ?SMILE ?AGENT)) (holdsDuring (WhenFn ?SMILE) (attribute ?AGENT Happiness)))").
 %
-:-assert_kif("(subclass Frowning FacialExpression)").
+:-assert_kif("(genls Frowning FacialExpression)").
 :-assert_kif("(documentation Frowning \"Furrowing the forehead in such a way as to convey unhappiness .\")").
 %
 :-assert_kif("(=> (and (instance ?FROWN Frowning) (agent ?FROWN ?AGENT)) (holdsDuring (WhenFn ?FROWN) (attribute ?AGENT Unhappiness)))").
 %
-:-assert_kif("(subclass Laughing Vocalizing)").
-:-assert_kif("(subclass Laughing FacialExpression)").
+:-assert_kif("(genls Laughing Vocalizing)").
+:-assert_kif("(genls Laughing FacialExpression)").
 :-assert_kif("(documentation Laughing \"Expressing happiness by &%Vocalizing in a certain way.\")").
 %
 :-assert_kif("(=> (instance ?LAUGH Laughing) (exists (?SMILE) (and (instance ?SMILE Smiling) (subProcess ?SMILE ?LAUGH))))").
 %
-:-assert_kif("(subclass Weeping FacialExpression)").
+:-assert_kif("(genls Weeping FacialExpression)").
 :-assert_kif("(documentation Weeping \"&%Expressing unhappiness by shedding tears.\")").
 %
 :-assert_kif("(=> (and (instance ?WEEP Weeping) (agent ?WEEP ?AGENT)) (holdsDuring (WhenFn ?WEEP) (attribute ?AGENT Unhappiness)))").
 %
-:-assert_kif("(subclass Nodding Gesture)").
+:-assert_kif("(genls Nodding Gesture)").
 :-assert_kif("(documentation Nodding \"Moving the &%Head up and down or side to side to indicate approval or disapproval.\")").
 %
 :-assert_kif("(=> (and (instance ?NOD Nodding) (patient ?NOD ?HEAD)) (instance ?HEAD Head))").
 %
-:-assert_kif("(subclass Waving Gesture)").
+:-assert_kif("(genls Waving Gesture)").
 :-assert_kif("(documentation Waving \"Moving a &%Hand to indicate a greeting, farewell, recognition , goodwill, etc.\")").
 %
 :-assert_kif("(=> (and (instance ?WAVE Waving) (patient ?WAVE ?HAND)) (instance ?HAND Hand))").
 %
-:-assert_kif("(subclass Bowing Gesture)").
-:-assert_kif("(subclass Bowing MotionDownward)").
+:-assert_kif("(genls Bowing Gesture)").
+:-assert_kif("(genls Bowing MotionDownward)").
 :-assert_kif("(documentation Bowing \"Any downward motion of the body that indicates respect for or submission to another &%Agent.\")").
 %
-:-assert_kif("(subclass Ducking IntentionalProcess)").
-:-assert_kif("(subclass Ducking BodyMotion)").
-:-assert_kif("(subclass Ducking MotionDownward)").
+:-assert_kif("(genls Ducking IntentionalProcess)").
+:-assert_kif("(genls Ducking BodyMotion)").
+:-assert_kif("(genls Ducking MotionDownward)").
 :-assert_kif("(documentation Ducking \"Purposely moving one's body downward in such a way as to avoid being hit by something.\")").
 %
 :-assert_kif("(=> (and (instance ?MOTION Ducking) (agent ?MOTION ?AGENT)) (hasPurpose ?MOTION (not (exists (?IMPACT) (and (instance ?IMPACT Impacting) (patient ?IMPACT ?AGENT))))))").
 %
-:-assert_kif("(subclass Thanking ExpressingInLanguage)").
+:-assert_kif("(genls Thanking ExpressingInLanguage)").
 :-assert_kif("(documentation Thanking \"Any &%ExpressingInLanguage of appreciation to a person for something that the person did in the past.\")").
 %
 :-assert_kif("(=> (and (instance ?THANK Thanking) (agent ?THANK ?AGENT) (patient ?THANK ?THING) (destination ?THANK ?PERSON)) (and (instance ?PERSON Human) (or (holdsDuring (WhenFn ?THANK) (wants ?AGENT ?THING)) (holdsDuring (WhenFn ?THANK) (desires ?AGENT ?THING)))))").
 %
-:-assert_kif("(subclass Greeting Expressing)").
-:-assert_kif("(documentation Greeting \"Any instance of &%Expressing an acknowledgment of a person 's arrival. Note that this class is not a subclass of &%ExpressingInLanguage, because it covers gestures of greeting, e.g. &%Waving and &%Nodding in certain circumstances .\")").
+:-assert_kif("(genls Greeting Expressing)").
+:-assert_kif("(documentation Greeting \"Any instance of &%Expressing an acknowledgment of a person 's arrival. Note that this class is not a genls of &%ExpressingInLanguage, because it covers gestures of greeting, e.g. &%Waving and &%Nodding in certain circumstances .\")").
 %
 :-assert_kif("(subrelation half part)").
 :-assert_kif("(documentation half \" (&%half ?HALF ?WHOLE) means that ?HALF is one half of ?WHOLE.\")").
@@ -8429,68 +8429,68 @@
 %
 :-assert_kif("(=> (most ?MOST ?WHOLE) (exists (?HALF ?NUMBER1 ?NUMBER2 ?UNIT) (and (half ?HALF ?WHOLE) (measure ?HALF (MeasureFn ?NUMBER1 ?UNIT)) (measure ?MOST (MeasureFn ?NUMBER2 ?UNIT)) (greaterThan ?NUMBER2 ?NUMBER1))))").
 %
-:-assert_kif("(subclass Blueprint Icon)").
+:-assert_kif("(genls Blueprint Icon)").
 :-assert_kif("(documentation Blueprint \"An &%Icon which is a scale model of an &%Artifact, whether the &%Artifact actually exists or not.\")").
 %
 :-assert_kif("(=> (instance ?PLAN Blueprint) (exists (?ARTIFACT) (and (instance ?ARTIFACT Artifact) (represents ?PLAN ?ARTIFACT))))").
 %
-:-assert_kif("(subclass GraphIcon Icon)").
+:-assert_kif("(genls GraphIcon Icon)").
 :-assert_kif("(documentation GraphIcon \"An &%Icon which depicts one or more quantities.\")").
 %
 :-assert_kif("(=> (instance ?GRAPH Graph) (exists (?QUANTITY) (and (instance ?QUANTITY PhysicalQuantity) (refers ?GRAPH ?QUANTITY))))").
 %
-:-assert_kif("(subclass Flag Icon)").
+:-assert_kif("(genls Flag Icon)").
 :-assert_kif("(documentation Flag \"An &%Icon made of &%Fabric that refers to a particular &%GeopoliticalArea.\")").
 %
 :-assert_kif("(=> (instance ?FLAG Flag) (exists (?FABRIC) (and (instance ?FABRIC Fabric) (part ?FABRIC ?FLAG))))").
 %
 :-assert_kif("(=> (instance ?FLAG Flag) (exists (?AREA) (and (instance ?AREA GeopoliticalArea) (refers ?FLAG ?AREA))))").
 %
-:-assert_kif("(subclass ArrowIcon Icon)").
+:-assert_kif("(genls ArrowIcon Icon)").
 :-assert_kif("(documentation ArrowIcon \"An &%Icon which has the shape of an arrow and which is used to indicate direction or a relationship betwee two things.\")").
 %
-:-assert_kif("(subclass Photograph Icon)").
+:-assert_kif("(genls Photograph Icon)").
 :-assert_kif("(documentation Photograph \"An &%Icon that is the result of a process of &%Photographing.\")").
 %
-:-assert_kif("(subclass Photographing ContentDevelopment)").
+:-assert_kif("(genls Photographing ContentDevelopment)").
 :-assert_kif("(documentation Photographing \"&%ContentDevelopment where the &%instrument is a camera and the &%result is a &%Photograph.\")").
 %
 :-assert_kif("(=> (instance ?SHOOT Photographing) (exists (?PHOTO) (and (instance ?PHOTO Photograph) (result ?SHOOT ?PHOTO) (instrument ?SHOOT ?CAMERA) (instance ?CAMERA Camera))))").
 %
-:-assert_kif("(subclass Camera Device)").
+:-assert_kif("(genls Camera Device)").
 :-assert_kif("(documentation Camera \"A &%Device which is capable of &%Photographing.\")").
 %
 :-assert_kif("(=> (instance ?CAMERA Camera) (capability Photographing instrument ?CAMERA))").
 %
-:-assert_kif("(subclass Composing ContentDevelopment)").
+:-assert_kif("(genls Composing ContentDevelopment)").
 :-assert_kif("(documentation Composing \"&%ContentDevelopment which results in a &%MusicalComposition.\")").
 %
 :-assert_kif("(=> (instance ?COMPOSE Composing) (exists (?MUSIC) (and (instance ?MUSIC MusicalComposition) (result ?COMPOSE ?MUSIC))))").
 %
-:-assert_kif("(subclass TonMass MassMeasure)").
+:-assert_kif("(genls TonMass MassMeasure)").
 :-assert_kif("(instance TonMass UnitOfMeasure)").
 :-assert_kif("(documentation TonMass \"English mass unit that is equal to 2000 pounds.\")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER TonMass) (MeasureFn (MultiplicationFn ?NUMBER 2000) PoundMass)))").
 %
-:-assert_kif("(subclass Page InformationMeasure)").
+:-assert_kif("(genls Page InformationMeasure)").
 :-assert_kif("(instance Page UnitOfMeasure)").
 :-assert_kif("(documentation Page \"A single page of &%Text.\")").
 %
-:-assert_kif("(subclass LiquorShot VolumeMeasure)").
+:-assert_kif("(genls LiquorShot VolumeMeasure)").
 :-assert_kif("(instance LiquorShot UnitOfMeasure)").
 :-assert_kif("(documentation LiquorShot \"A &%UnitOfMeasure used in preparing &%AlcoholicBeverages.\")").
 %
-:-assert_kif("(subclass Acre AreaMeasure)").
+:-assert_kif("(genls Acre AreaMeasure)").
 :-assert_kif("(instance Acre UnitOfMeasure)").
 :-assert_kif("(documentation Acre \"A &%UnitOfMeasure equal to 4840 square yards.\")").
 %
-:-assert_kif("(subclass MusicalComposition Text)").
+:-assert_kif("(genls MusicalComposition Text)").
 :-assert_kif("(documentation MusicalComposition \"A &%Text that expresses the notes, words , etc. of a song or other sort of &%Music.\")").
 %
 :-assert_kif("(=> (and (instance ?COMP MusicalComposition) (containsInformation ?COMP ?INFO) (realization ?MUSIC ?INFO)) (instance ?MUSIC Music))").
 %
-:-assert_kif("(subclass DeviceAttribute ObjectiveNorm)").
+:-assert_kif("(genls DeviceAttribute ObjectiveNorm)").
 :-assert_kif("(documentation DeviceAttribute \"This class contains two &%Attributes to indicate whether a &%Device is or is not behaving as it is intended to behave , &%Functioning and &%Malfunctioning.\")").
 %
 :-assert_kif("(=> (and (attribute ?DEVICE ?ATTRIBUTE) (instance ?ATTRIBUTE DeviceAttribute)) (instance ?DEVICE Device))").
@@ -8511,8 +8511,8 @@
 %
 :-assert_kif("(=> (holdsDuring ?TIME1 (modalAttribute ?TEXT Law)) (exists (?TIME2) (and (holdsDuring ?TIME2 (attribute ?TEXT LegislativeBill)) (earlier ?TIME2 ?TIME1))))").
 %
-:-assert_kif("(subclass PassingABill PoliticalProcess)").
-:-assert_kif("(subclass PassingABill Declaring)").
+:-assert_kif("(genls PassingABill PoliticalProcess)").
+:-assert_kif("(genls PassingABill Declaring)").
 :-assert_kif("(documentation PassingABill \"The &%Process of converting a &%LegislativeBill into &%Law by a duly authorized legislative body of &%Government.\")").
 %
 :-assert_kif("(=> (instance ?ORG LegislativeOrganization) (capability PassingABill agent ?ORG))").
@@ -8522,81 +8522,81 @@
 :-assert_kif("(subAttribute InternationalLaw Law)").
 :-assert_kif("(documentation InternationalLaw \"An &%Attribute that applies to &%Propositions that express &%Laws concerning the relations between &%Nations.\")").
 %
-:-assert_kif("(subclass CriminalAction IntentionalProcess)").
+:-assert_kif("(genls CriminalAction IntentionalProcess)").
 :-assert_kif("(documentation CriminalAction \"Any &%IntentionalProcess that violates a &%Law.\")").
 %
 :-assert_kif("(=> (instance ?ACTION CriminalAction) (exists (?LAW ?CONTENT ?CRIME) (and (modalAttribute ?LAW Law) (containsInformation ?LAW ?CONTENT) (realization ?ACTION ?CRIME) (not (consistent ?CONTENT ?CRIME)))))").
 %
-:-assert_kif("(subclass Statement Sentence)").
+:-assert_kif("(genls Statement Sentence)").
 :-assert_kif("(documentation Statement \"A &%Sentence that is stated to be true;A communication between two agents asserting what the speaker considers as a fact.\")").
 %
 :-assert_kif("(=> (and (instance ?STATE Stating) (result ?STATE ?SENTENCE) (instance ?SENTENCE Sentence)) (instance ?SENTENCE Statement))").
 %
-:-assert_kif("(subclass Fact Statement)").
+:-assert_kif("(genls Fact Statement)").
 :-assert_kif("(documentation Fact \"The class of &%Statements that are &%True.\")").
 %
 :-assert_kif("(=> (instance ?FACT Fact) (true ?FACT True))").
 %
-:-assert_kif("(subclass Question Sentence)").
+:-assert_kif("(genls Question Sentence)").
 :-assert_kif("(documentation Question \"An interrogative &%Sentence, a &%Sentence that poses a question.\")").
 %
 :-assert_kif("(=> (and (instance ?QUESTION Questioning) (result ?QUESTION ?SENTENCE) (instance ?SENTENCE Sentence)) (instance ?SENTENCE Question))").
 %
-:-assert_kif("(subclass Supposition Sentence)").
+:-assert_kif("(genls Supposition Sentence)").
 :-assert_kif("(documentation Supposition \"A &%Sentence that is assumed to be true, possibly just for the sake of argument.\")").
 %
 :-assert_kif("(=> (and (instance ?SUPPOSE Supposing) (result ?SUPPOSE ?SENTENCE) (instance ?SENTENCE Sentence)) (instance ?SENTENCE Supposition))").
 %
-:-assert_kif("(subclass Request Sentence)").
+:-assert_kif("(genls Request Sentence)").
 :-assert_kif("(documentation Request \"A &%Sentence that expresses a request for something or that something be done.\")").
 %
 :-assert_kif("(=> (and (instance ?REQUEST Requesting) (result ?REQUEST ?SENTENCE) (instance ?SENTENCE Sentence)) (instance ?SENTENCE Request))").
 %
-:-assert_kif("(subclass Order Sentence)").
+:-assert_kif("(genls Order Sentence)").
 :-assert_kif("(documentation Order \"A &%Sentence that expresses an order for something or that something be done.\")").
 %
 :-assert_kif("(=> (and (instance ?ORDER Ordering) (result ?ORDER ?SENTENCE) (instance ?SENTENCE Sentence)) (instance ?SENTENCE Order))").
 %
-:-assert_kif("(subclass SoundRecording Text)").
+:-assert_kif("(genls SoundRecording Text)").
 :-assert_kif("(documentation SoundRecording \"Any &%Text which is a recording of &%RadiatingSound.\")").
 %
 :-assert_kif("(=> (instance ?RECORD SoundRecording) (exists (?INFO ?SOUND) (and (containsInformation ?RECORD ?INFO) (realization ?SOUND ?INFO) (instance ?SOUND RadiatingSound))))").
 %
-:-assert_kif("(subclass RecordAlbum SoundRecording)").
+:-assert_kif("(genls RecordAlbum SoundRecording)").
 :-assert_kif("(documentation RecordAlbum \"A &%SoundRecording that has the form of a plastic or glass disk with continuous grooves that are transformed into sound by a record player.\")").
 %
-:-assert_kif("(subclass Label Text)").
+:-assert_kif("(genls Label Text)").
 :-assert_kif("(documentation Label \"A very brief &%Text that is attached to an &%Object and that indicates very specific information about the &%Object, e.g. its name , its &%monetaryValue, etc.\")").
 %
 :-assert_kif("(=> (instance ?LABEL Label) (exists (?OBJ) (and (instance ?OBJ SelfConnectedObject) (connected ?LABEL ?OBJ) (refers ?LABEL ?OBJ))))").
 %
-:-assert_kif("(subclass Form Text)").
+:-assert_kif("(genls Form Text)").
 :-assert_kif("(documentation Form \"A page or set of pages containing spaces where information is to be entered by an &%Agent.\")").
 %
-:-assert_kif("(subclass TaxReturn Form)").
+:-assert_kif("(genls TaxReturn Form)").
 :-assert_kif("(documentation TaxReturn \"A &%Form that is used for calculating the amount of income tax owed in a given year.\")").
 %
 :-assert_kif("(=> (instance ?RETURN TaxReturn) (hasPurpose ?RETURN (exists (?CALCULATE ?AMOUNT ?TAX) (and (instance ?CALULATE Calculating) (instrument ?CALCULATE ?RETURN) (result ?CALCULATE ?AMOUNT) (transactionAmount ?TAX ?AMOUNT) (instance ?TAX Tax)))))").
 %
-:-assert_kif("(subclass Application Form)").
+:-assert_kif("(genls Application Form)").
 :-assert_kif("(documentation Application \"A &%Form whose purpose is to obtain admission to an &%Organization or to receive assistance from an &%Organization.\")").
 %
 :-assert_kif("(=> (instance ?APP Application) (hasPurpose ?APP (exists (?JOIN ?GIVE) (or (instance ?JOIN JoiningAnOrganization) (instance ?GIVE UnilateralGiving)))))").
 %
-:-assert_kif("(subclass MotionPictureShot MotionPicture)").
+:-assert_kif("(genls MotionPictureShot MotionPicture)").
 :-assert_kif("(documentation MotionPictureShot \"A unit of action in a &%MotionPicture, a &%MotionPictureShot is a sequence of images which are captured by a single camera without interruption.\")").
 %
-:-assert_kif("(subclass BroadcastProgram Series)").
+:-assert_kif("(genls BroadcastProgram Series)").
 :-assert_kif("(documentation BroadcastProgram \"A &%Series of episodes that are broadcast on television or radio.\")").
 %
 :-assert_kif("(=> (instance ?PROGRAM BroadcastProgram) (exists (?BROADCAST) (and (instance ?BROADCAST Broadcasting) (patient ?BROADCAST ?PROGRAM))))").
 %
-:-assert_kif("(subclass NewsProgram BroadcastProgram)").
+:-assert_kif("(genls NewsProgram BroadcastProgram)").
 :-assert_kif("(documentation NewsProgram \"A &%BroadcastProgram that is devoted to reporting the latest events in a city, region, nation or the world at large .\")").
 %
-:-assert_kif("(=> (and (subclass ?PROGRAM NewsProgram) (equal ?EPISODE (SeriesVolumeFn ?PROGRAM ?NUMBER))) (exists (?DISSEMINATE) (and (instance ?DISSEMINATE Disseminating) (patient ?DISSEMINATE ?EPISODE))))").
+:-assert_kif("(=> (and (genls ?PROGRAM NewsProgram) (equal ?EPISODE (SeriesVolumeFn ?PROGRAM ?NUMBER))) (exists (?DISSEMINATE) (and (instance ?DISSEMINATE Disseminating) (patient ?DISSEMINATE ?EPISODE))))").
 %
-:-assert_kif("(subclass Chapter Article)").
+:-assert_kif("(genls Chapter Article)").
 :-assert_kif("(documentation Chapter \"A numbered and/or titled section of a &%Book, which is typically indicated in a table of contents for the &%Book.\")").
 %
 :-assert_kif("(=> (instance ?CHAPTER Chapter) (exists (?BOOK) (and (instance ?BOOK Book) (subsumesContentInstance ?BOOK ?CHAPTER))))").
@@ -8604,61 +8604,61 @@
 :-assert_kif("(subrelation titles names)").
 :-assert_kif("(domain titles 1 SymbolicString)").
 :-assert_kif("(domainSubclass titles 2 Text)").
-:-assert_kif("(documentation titles \"A predicate used to indicate the title of a &%Text. Note that the second argument type restriction is a subclass, rather than an instance, of &%Text. Thus, the title Murder_on_the_Orient_Express corresponds to a large class of &%Books, and not just to a single copy of the book.\")").
+:-assert_kif("(documentation titles \"A predicate used to indicate the title of a &%Text. Note that the second argument type restriction is a genls, rather than an instance, of &%Text. Thus, the title Murder_on_the_Orient_Express corresponds to a large class of &%Books, and not just to a single copy of the book.\")").
 %
-:-assert_kif("(subclass Report FactualText)").
-:-assert_kif("(subclass Report Article)").
+:-assert_kif("(genls Report FactualText)").
+:-assert_kif("(genls Report Article)").
 :-assert_kif("(documentation Report \"A relatively brief &%FactualText, often it describes the findings of a study or experiment, or a series of observations .\")").
 %
-:-assert_kif("(subclass Newspaper Periodical)").
+:-assert_kif("(genls Newspaper Periodical)").
 :-assert_kif("(documentation Newspaper \"A &%Periodical that is published on a daily or weekly basis, that contains &%Reports, and whose issues are printed on newsprint paper.\")").
 %
 :-assert_kif("(=> (instance ?PAPER Newspaper) (exists (?REPORT) (and (instance ?REPORT Report) (subsumesContentInstance ?PAPER ?REPORT))))").
 %
-:-assert_kif("(=> (and (subclass ?PAPER Newspaper) (instance ?WEEK Week)) (exists (?PUBLICATION) (and (instance ?PUBLICATION Publication) (temporalPart (WhenFn ?PUBLICATION) ?WEEK) (result ?PUBLICATION ?ISSUE) (instance ?ISSUE ?PAPER))))").
+:-assert_kif("(=> (and (genls ?PAPER Newspaper) (instance ?WEEK Week)) (exists (?PUBLICATION) (and (instance ?PUBLICATION Publication) (temporalPart (WhenFn ?PUBLICATION) ?WEEK) (result ?PUBLICATION ?ISSUE) (instance ?ISSUE ?PAPER))))").
 %
-:-assert_kif("(subclass Magazine Periodical)").
+:-assert_kif("(genls Magazine Periodical)").
 :-assert_kif("(documentation Magazine \"A &%Periodical that is softbound and printed on glossy paper.\")").
 %
-:-assert_kif("(subclass Letter FactualText)").
+:-assert_kif("(genls Letter FactualText)").
 :-assert_kif("(documentation Letter \"A brief message which is intended to be mailed to a person or &%Organization.\")").
 %
-:-assert_kif("(subclass HistoricalAccount FactualText)").
+:-assert_kif("(genls HistoricalAccount FactualText)").
 :-assert_kif("(documentation HistoricalAccount \"A &%FactualAccount that describes significant events that occurred in the past.\")").
 %
 :-assert_kif("(=> (instance ?ACCOUNT HistoricalAccount) (exists (?EVENT) (and (represents ?ACCOUNT ?EVENT) (earlier (WhenFn ?EVENT) (WhenFn ?ACCOUNT)))))").
 %
-:-assert_kif("(subclass FinancialText Report)").
+:-assert_kif("(genls FinancialText Report)").
 :-assert_kif("(documentation FinancialText \"A &%Report about monetary figures. This class covers &%FinancialBills, balance sheets, account statements, etc.\")").
 %
-:-assert_kif("(subclass FinancialBill FinancialText)").
+:-assert_kif("(genls FinancialBill FinancialText)").
 :-assert_kif("(documentation FinancialBill \"A brief statement that the stated amount of money is owed by the person to whom the bill is delivered.\")").
 %
-:-assert_kif("(subclass ReferenceBook Book)").
-:-assert_kif("(subclass ReferenceBook FactualText)").
+:-assert_kif("(genls ReferenceBook Book)").
+:-assert_kif("(genls ReferenceBook FactualText)").
 :-assert_kif("(documentation ReferenceBook \"A &%Book which is not intended to be read from cover to cover, but which is meant to be consulted to answer specific factual questions, e.g. about the meaning of a word, the location of a country , etc.\")").
 %
-:-assert_kif("(subclass Dictionary ReferenceBook)").
+:-assert_kif("(genls Dictionary ReferenceBook)").
 :-assert_kif("(documentation Dictionary \"A &%ReferenceBook which specifies the meanings of the &%Words of a &%Language.\")").
 %
-:-assert_kif("(subclass NarrativeText Text)").
+:-assert_kif("(genls NarrativeText Text)").
 :-assert_kif("(partition NarrativeText FictionalText HistoricalAccount)").
 :-assert_kif("(documentation NarrativeText \"Any &%Text that tells a story, whether true or false.\")").
 %
-:-assert_kif("(subclass ShortStory FictionalText)").
-:-assert_kif("(subclass ShortStory Article)").
+:-assert_kif("(genls ShortStory FictionalText)").
+:-assert_kif("(genls ShortStory Article)").
 :-assert_kif("(documentation ShortStory \"A brief work of fiction, often bound with other short stories in a &%Book or &%Periodical.\")").
 %
-:-assert_kif("(subclass Novel FictionalText)").
-:-assert_kif("(subclass Novel Book)").
+:-assert_kif("(genls Novel FictionalText)").
+:-assert_kif("(genls Novel Book)").
 :-assert_kif("(documentation Novel \"A &%FictionalText that is larger than a &%ShortStory and that is bound independently (i.e. it is a &%Book).\")").
 %
-:-assert_kif("(subclass DramaticPlay FictionalText)").
+:-assert_kif("(genls DramaticPlay FictionalText)").
 :-assert_kif("(documentation DramaticPlay \"A &%FictionalText that is intended to be realized as &%DramaticActing.\")").
 %
 :-assert_kif("(=> (instance ?PLAY DramaticPlay) (hasPurpose ?PLAY (exists (?ACT ?PROP) (and (instance ?ACT DramaticActing) (containsInformation ?PLAY ?PROP) (realization ?ACT ?PROP)))))").
 %
-:-assert_kif("(subclass Opera DramaticPlay)").
+:-assert_kif("(genls Opera DramaticPlay)").
 :-assert_kif("(documentation Opera \"A &%DramaticPlay that is set to &%Music.\")").
 %
 :-assert_kif("(=> (and (instance ?OPERA Opera) (realization ?ACT ?OPERA)) (instance ?ACT Music))").
@@ -8666,197 +8666,197 @@
 :-assert_kif("(instance EnglishLanguage NaturalLanguage)").
 :-assert_kif("(documentation EnglishLanguage \"A Germanic language that incorporates many roots from the Romance languages. It is the official language of the &%UnitedStates, the &%UnitedKingdomOfGreatBritainAndNorthernIreland, and many other countries.\")").
 %
-:-assert_kif("(subclass Industry Collection)").
+:-assert_kif("(genls Industry Collection)").
 :-assert_kif("(documentation Industry \"The class of &%Collections of &%Corporations which are in the same line of business.\")").
 %
-:-assert_kif("(=> (instance ?INDUSTRY Industry) (=> (and (member ?MEMB1 ?INDUSTRY) (member ?MEMB2 ?INDUSTRY)) (exists (?CLASS) (and (subclass ?CLASS Corporation) (immediateInstance ?MEMB1 ?CLASS) (immediateInstance ?MEMB2 ?CLASS)))))").
+:-assert_kif("(=> (instance ?INDUSTRY Industry) (=> (and (member ?MEMB1 ?INDUSTRY) (member ?MEMB2 ?INDUSTRY)) (exists (?CLASS) (and (genls ?CLASS Corporation) (immediateInstance ?MEMB1 ?CLASS) (immediateInstance ?MEMB2 ?CLASS)))))").
 %
-:-assert_kif("(subclass Steps StationaryArtifact)").
+:-assert_kif("(genls Steps StationaryArtifact)").
 :-assert_kif("(documentation Steps \"A &%StationaryArtifact which allows one to climb, step by step, from one level to another.\")").
 %
 :-assert_kif("(=> (instance ?STEPS Steps) (and (capability MotionUpward instrument ?STEPS) (capability MotionDownward instrument ?STEPS)))").
 %
 :-assert_kif("(=> (and (instance ?LEVEL1 BuildingLevel) (instance ?LEVEL2 BuildingLevel) (instance ?BUILDING Building) (part ?LEVEL1 ?BUILDING) (part ?LEVEL2 ?BUILDING)) (exists (?STEPS) (and (instance ?STEPS Steps) (connects ?STEPS ?LEVEL1 ?LEVEL2))))").
 %
-:-assert_kif("(subclass Door Artifact)").
+:-assert_kif("(genls Door Artifact)").
 :-assert_kif("(documentation Door \"An &%Artifact that restricts and permits access to a &%StationaryArtifact (e.g. &%Building or &%Room) depending on whether the &%Door is open or locked. Note that the class &%Door also covers gates, because it is not possible to define objective criteria that reliably distinguish doors from gates.\")").
 %
 :-assert_kif("(=> (instance ?DOOR Door) (exists (?ARTIFACT) (and (part ?DOOR ?WAY) (instance ?WAY Doorway))))").
 %
-:-assert_kif("(subclass Doorway StationaryArtifact)").
+:-assert_kif("(genls Doorway StationaryArtifact)").
 :-assert_kif("(documentation Doorway \"A &%StationaryArtifact consisting of a frame that holds a &%Door.\")").
 %
 :-assert_kif("(=> (instance ?WAY Doorway) (exists (?ARTIFACT) (and (part ?WAY ?ARTIFACT) (or (instance ?ARTIFACT Building) (instance ?ARTIFACT Room)))))").
 %
-:-assert_kif("(subclass Window StationaryArtifact)").
+:-assert_kif("(genls Window StationaryArtifact)").
 :-assert_kif("(documentation Window \"A &%StationaryArtifact composed of transparent glass or plastic that admits light (and possibly air) into a &%Room or &%Building.\")").
 %
 :-assert_kif("(=> (instance ?DOOR Door) (exists (?ARTIFACT) (and (part ?DOOR ?ARTIFACT) (or (instance ?ARTIFACT Building) (instance ?ARTIFACT Room)))))").
 %
-:-assert_kif("(subclass Wall StationaryArtifact)").
+:-assert_kif("(genls Wall StationaryArtifact)").
 :-assert_kif("(documentation Wall \"A &%StationaryArtifact that supports a &%Building or partitions it into &%Rooms.\")").
 %
 :-assert_kif("(=> (instance ?WALL Wall) (exists (?ARTIFACT) (and (part ?WALL ?ARTIFACT) (or (instance ?ARTIFACT Building) (instance ?ARTIFACT Room)))))").
 %
-:-assert_kif("(subclass Floor StationaryArtifact)").
+:-assert_kif("(genls Floor StationaryArtifact)").
 :-assert_kif("(documentation Floor \"A &%StationaryArtifact that is the bottom surface of a &%Room.\")").
 %
 :-assert_kif("(=> (instance ?FLOOR Floor) (exists (?ARTIFACT) (and (part ?FLOOR ?ARTIFACT) (instance ?ARTIFACT Room))))").
 %
-:-assert_kif("(subclass Roof StationaryArtifact)").
+:-assert_kif("(genls Roof StationaryArtifact)").
 :-assert_kif("(documentation Roof \"The &%top of a &%Building.\")").
 %
 :-assert_kif("(=> (instance ?ROOF Roof) (exists (?BUILDING) (and (instance ?BUILDING Building) (top ?ROOF ?BUILDING))))").
 %
-:-assert_kif("(subclass BuildingLevel StationaryArtifact)").
+:-assert_kif("(genls BuildingLevel StationaryArtifact)").
 :-assert_kif("(documentation BuildingLevel \"The story or level of a building, e.g. the &%Basement, the &%Attic, the ground level, the fourteenth floor, etc.\")").
 %
 :-assert_kif("(=> (instance ?LEVEL BuildingLevel) (exists (?BUILDING) (and (instance ?BUILDING Building) (part ?LEVEL ?BUILDING))))").
 %
-:-assert_kif("(subclass Basement BuildingLevel)").
+:-assert_kif("(genls Basement BuildingLevel)").
 :-assert_kif("(documentation Basement \"A &%BuildingLevel which satisfies two conditions, viz. it is lower than all of the other &%BuildingLevels in the same &%Building and it is below ground level.\")").
 %
 :-assert_kif("(=> (instance ?BASEMENT Basement) (not (exists (?LEVEL ?BUILDING) (and (instance ?LEVEL BuildingLevel) (instance ?BUILDING Building) (part ?LEVEL ?BUILDING) (part ?BASEMENT ?BUILDING) (not (equal ?LEVEL ?BASEMENT)) (orientation ?LEVEL ?BASEMENT Below)))))").
 %
-:-assert_kif("(subclass Garage StationaryArtifact)").
+:-assert_kif("(genls Garage StationaryArtifact)").
 :-assert_kif("(documentation Garage \"A &%Building or part of a &%Building which is intended to house one or more &%Automobiles.\")").
 %
 :-assert_kif("(=> (instance ?GARAGE Garage) (hasPurpose (exists (?AUTO) (and (instance ?AUTO Automobile) (contains ?GARAGE ?Automobile)))))").
 %
 :-assert_kif("(=> (instance ?GARAGE Garage) (exists (?BUILDING) (and (instance ?BUILDING Building) (part ?GARAGE ?BUILDING))))").
 %
-:-assert_kif("(subclass Kitchen Room)").
+:-assert_kif("(genls Kitchen Room)").
 :-assert_kif("(documentation Kitchen \"A &%Room intended for &%Cooking.\")").
 %
 :-assert_kif("(=> (instance ?ROOM Kitchen) (hasPurpose ?ROOM (exists (?COOK) (and (instance ?COOK Cooking) (located ?COOK ?ROOM)))))").
 %
-:-assert_kif("(subclass Bedroom Room)").
+:-assert_kif("(genls Bedroom Room)").
 :-assert_kif("(documentation Bedroom \"A &%Room intended primarily for sleeping.\")").
 %
 :-assert_kif("(=> (instance ?ROOM Bedroom) (exists (?BED) (and (instance ?BED Bed) (located ?BED ?ROOM))))").
 %
-:-assert_kif("(subclass Porch StationaryArtifact)").
+:-assert_kif("(genls Porch StationaryArtifact)").
 :-assert_kif("(documentation Porch \"A &%StationaryArtifact which is &%connected to a &%Building and which provides some shelter in entering or leaving the &%Building or in sitting outside.\")").
 %
 :-assert_kif("(=> (instance ?PORCH Porch) (exists (?BUILDING) (and (instance ?BUILDING Building) (connected ?PORCH ?BUILDING))))").
 %
-:-assert_kif("(subclass Sidewalk StationaryArtifact)").
+:-assert_kif("(genls Sidewalk StationaryArtifact)").
 :-assert_kif("(documentation Sidewalk \"A prepared path for pedestrians alongside a &%Roadway.\")").
 %
 :-assert_kif("(=> (instance ?SIDE Sidewalk) (hasPurpose ?SIDE (exists (?WALK) (and (instance ?WALK Walking) (path ?WALK ?SIDE)))))").
 %
 :-assert_kif("(=> (instance ?SIDE Sidewalk) (exists (?ROAD) (and (instance ?ROAD Roadway) (orientation ?SIDE ?ROAD Near))))").
 %
-:-assert_kif("(subclass Fence StationaryArtifact)").
+:-assert_kif("(genls Fence StationaryArtifact)").
 :-assert_kif("(documentation Fence \"A &%StationaryArtifact that serves to demarcate or to prevent access to or from the area that the &%Fence surrounds.\")").
 %
-:-assert_kif("(subclass SportsGround StationaryArtifact)").
+:-assert_kif("(genls SportsGround StationaryArtifact)").
 :-assert_kif("(documentation SportsGround \"A specially designated and maintained area where &%Sports are played.\")").
 %
 :-assert_kif("(=> (instance ?GROUND SportsGround) (hasPurpose ?GROUND (exists (?SPORT) (and (instance ?SPORT Sport) (located ?SPORT ?GROUND)))))").
 %
-:-assert_kif("(subclass IndustrialPlant StationaryArtifact)").
+:-assert_kif("(genls IndustrialPlant StationaryArtifact)").
 :-assert_kif("(documentation IndustrialPlant \"A &%Building or part of a &%Building or group of &%Buildings whose purpose is to &%Manufacture something.\")").
 %
 :-assert_kif("(=> (instance ?PLANT IndustrialPlant) (or (instance ?PLANT Building) (exists (?BUILDING) (and (instance ?BUILDING Building) (located ?BUILDING ?PLANT)))))").
 %
 :-assert_kif("(=> (instance ?PLANT IndustrialPlant) (hasPurpose ?PLANT (exists (?MANUFACTURE) (and (instance ?MANUFACTURE Manufacture) (located ?MANUFACTURE ?PLANT)))))").
 %
-:-assert_kif("(subclass Laboratory StationaryArtifact)").
+:-assert_kif("(genls Laboratory StationaryArtifact)").
 :-assert_kif("(documentation Laboratory \"A &%Building, &%Room or suite of &%Rooms where scientific research, i.e. &%Experimenting, is conducted.\")").
 %
 :-assert_kif("(=> (instance ?LAB Laboratory) (exists (?EXPERIMENT) (and (instance ?EXPERIMENT Experimenting) (located ?EXPERIMENT ?LAB))))").
 %
-:-assert_kif("(subclass Farm StationaryArtifact)").
+:-assert_kif("(genls Farm StationaryArtifact)").
 :-assert_kif("(documentation Farm \"A &%StationaryArtifact consisting of a cultivated &%LandArea and &%Buildings for maintaining the land and/or the &%Animals on the land.\")").
 %
-:-assert_kif("(subclass Barn Building)").
+:-assert_kif("(genls Barn Building)").
 :-assert_kif("(disjoint Barn ResidentialBuilding)").
 :-assert_kif("(documentation Barn \"A &%Building on a &%Farm that is used for keeping &%DomesticAnimals, &%Fodder or harvested crops.\")").
 %
 :-assert_kif("(=> (instance ?BARN Barn) (exists (?FARM) (and (instance ?FARM Farm) (located ?BARN ?FARM))))").
 %
-:-assert_kif("(subclass PerformanceStage StationaryArtifact)").
+:-assert_kif("(genls PerformanceStage StationaryArtifact)").
 :-assert_kif("(documentation PerformanceStage \"A large platform for theatrical plays, lectures , dances, music recitals, etc, which can be observed by an audience.\")").
 %
 :-assert_kif("(=> (instance ?STAGE PerformanceStage) (hasPurpose ?STAGE (exists (?PERF) (and (instance ?PERF Demonstrating) (located ?PERF ?STAGE)))))").
 %
 :-assert_kif("(=> (instance ?STAGE PerformanceStage) (exists (?AUDITORIUM) (and (instance ?AUDITORIUM Auditorium) (part ?STAGE ?AUDITORIUM))))").
 %
-:-assert_kif("(subclass Magnetism RadiatingElectromagnetic)").
+:-assert_kif("(genls Magnetism RadiatingElectromagnetic)").
 :-assert_kif("(documentation Magnetism \"Any instance of &%RadiatingElectromagnetic which involves the attraction of &%Iron.\")").
 %
-:-assert_kif("(subclass RadioEmission RadiatingElectromagnetic)").
+:-assert_kif("(genls RadioEmission RadiatingElectromagnetic)").
 :-assert_kif("(documentation RadioEmission \"Any instance of &%RadiatingElectromagnetic where the waves have a wavelength between 5 milimeters and 30,000 meters.\")").
 %
-:-assert_kif("(subclass Broadcasting Disseminating)").
-:-assert_kif("(subclass Broadcasting RadioEmission)").
+:-assert_kif("(genls Broadcasting Disseminating)").
+:-assert_kif("(genls Broadcasting RadioEmission)").
 :-assert_kif("(documentation Broadcasting \"&%Disseminating information by using a &%CommunicationDevice that radiates &%RadioEmissions.\")").
 %
 :-assert_kif("(=> (instance ?BROADCAST Broadcasting) (exists (?DEVICE) (and (instance ?DEVICE CommunicationDevice) (instrument ?BROADCAST ?DEVICE))))").
 %
-:-assert_kif("(subclass RadioBroadcasting Broadcasting)").
+:-assert_kif("(genls RadioBroadcasting Broadcasting)").
 :-assert_kif("(documentation RadioBroadcasting \"Any instance of &%Broadcasting which is intended to be received by a &%Radio.\")").
 %
 :-assert_kif("(=> (instance ?RADIO Radio) (capability RadioBroadcasting patient ?RADIO))").
 %
-:-assert_kif("(subclass TelevisionBroadcasting Broadcasting)").
+:-assert_kif("(genls TelevisionBroadcasting Broadcasting)").
 :-assert_kif("(documentation TelevisionBroadcasting \"Any instance of &%Broadcasting which is intended to be received by a &%Television.\")").
 %
 :-assert_kif("(=> (instance ?TELEVISION Television) (capability TelevisionBroadcasting patient ?TELEVISION))").
 %
-:-assert_kif("(subclass Antenna CommunicationDevice)").
+:-assert_kif("(genls Antenna CommunicationDevice)").
 :-assert_kif("(documentation Antenna \"A &%CommunicationDevice which enables or improves the reception of &%RadioEmissions by another &%CommunicationDevice (the radio or television receiver).\")").
 %
 :-assert_kif("(=> (instance ?ANTENNA Antenna) (capability RadioEmission instrument ?ANTENNA))").
 %
-:-assert_kif("(subclass Explosion Radiating)").
+:-assert_kif("(genls Explosion Radiating)").
 :-assert_kif("(documentation Explosion \"Any sudden and massive release of energy that is the product of a chemical reaction.\")").
 %
 :-assert_kif("(=> (instance ?EXPLOSION Explosion) (exists (?PROC) (and (instance ?PROC ChemicalProcess) (causes ?PROC ?EXPLOSION))))").
 %
 :-assert_kif("(=> (instance ?EXPLOSION Explosion) (capability Damaging instrument ?EXPLOSION))").
 %
-:-assert_kif("(subclass Performance Demonstrating)").
+:-assert_kif("(genls Performance Demonstrating)").
 :-assert_kif("(documentation Performance \"A &%Demonstrating which includes &%DramaticActing and /or &%Music and which is intended to entertain the audience.\")").
 %
 :-assert_kif("(=> (instance ?PERFORMANCE Performance) (exists (?SUB) (and (subProcess ?SUB ?PERFORMANCE) (or (instance ?SUB DramaticActing) (instance ?SUB Music)))))").
 %
 :-assert_kif("(=> (instance ?PERFORMANCE Performance) (exists (?STAGE) (and (instance ?STAGE PerformanceStage) (located ?PERFORMANCE ?STAGE))))").
 %
-:-assert_kif("(subclass Lecture Demonstrating)").
-:-assert_kif("(subclass Lecture Speaking)").
+:-assert_kif("(genls Lecture Demonstrating)").
+:-assert_kif("(genls Lecture Speaking)").
 :-assert_kif("(documentation Lecture \"Any instance of &%Speaking which is done before an assembled audience.\")").
 %
-:-assert_kif("(subclass Sermon Lecture)").
+:-assert_kif("(genls Sermon Lecture)").
 :-assert_kif("(documentation Sermon \"A &%Lecture that is part of a &%ReligiousService.\")").
 %
 :-assert_kif("(=> (instance ?SERMON Sermon) (exists (?SERVICE) (and (instance ?SERVICE ReligiousService) (subProcess ?SERMON ?SERVICE))))").
 %
-:-assert_kif("(subclass DramaticActing Pretending)").
+:-assert_kif("(genls DramaticActing Pretending)").
 :-assert_kif("(documentation DramaticActing \"Playing a character in a &%Performance, &%MotionPicture, etc.\")").
 %
-:-assert_kif("(subclass DramaticCast GroupOfPeople)").
+:-assert_kif("(genls DramaticCast GroupOfPeople)").
 :-assert_kif("(documentation DramaticCast \"The &%GroupOfPeople who engage in &%DramaticActing as part of the realization of a single &%FictionalText.\")").
 %
 :-assert_kif("(=> (instance ?CAST DramaticCast) (exists (?TEXT ?PROP ?PROC) (and (instance ?TEXT FictionalText) (containsInformation ?TEXT ?PROP) (realization ?PROC ?PROP) (forall (?MEMBER) (=> (member ?MEMBER ?CAST) (exists (?SUB) (and (instance ?SUB DramaticActing) (agent ?SUB ?MEMBER) (subProcess ?SUB ?PROC))))))))").
 %
-:-assert_kif("(subclass SocialParty Meeting)").
-:-assert_kif("(subclass SocialParty RecreationOrExercise)").
+:-assert_kif("(genls SocialParty Meeting)").
+:-assert_kif("(genls SocialParty RecreationOrExercise)").
 :-assert_kif("(documentation SocialParty \"Any &%Meeting where the intent is primarily to socialize and be entertained.\")").
 %
-:-assert_kif("(subclass FormalMeeting Meeting)").
+:-assert_kif("(genls FormalMeeting Meeting)").
 :-assert_kif("(disjoint FormalMeeting SocialParty)").
 :-assert_kif("(documentation FormalMeeting \"Any &%Meeting which is the result of &%Planning and whose purpose is not socializing.\")").
 %
 :-assert_kif("(=> (instance ?MEETING FormalMeeting) (exists (?PLANNING) (and (instance ?PLANNING Planning) (result ?PLANNING ?MEETING) (earlier (WhenFn ?PLANNING) (WhenFn ?MEETING)))))").
 %
-:-assert_kif("(subclass Resolution Deciding)").
+:-assert_kif("(genls Resolution Deciding)").
 :-assert_kif("(documentation Resolution \"Any instance of &%Deciding which is conducted at a &%FormalMeeting and where the &%agent is an &%Organization.\")").
 %
 :-assert_kif("(=> (instance ?RESOLUTION Resolution) (exists (?AGENT ?MEETING) (and (instance ?AGENT Organization) (agent ?RESOLUTION ?AGENT) (subProcess ?RESOLUTION ?MEETING) (instance ?MEETING FormalMeeting))))").
 %
-:-assert_kif("(subclass Smoking RecreationOrExercise)").
+:-assert_kif("(genls Smoking RecreationOrExercise)").
 :-assert_kif("(documentation Smoking \"Inhaling and exhaling &%Smoke produced by a &%CigarOrCigarette.\")").
 %
 :-assert_kif("(=> (instance ?SMOKING Smoking) (exists (?BURN ?CIGAR ?BREATHE) (and (subProcess ?BURN ?SMOKING) (instance ?BURN Combustion) (resource ?BURN ?CIGAR) (instance ?CIGAR CigarOrCigarette) (result ?BURN ?SMOKE) (patient ?BREATHE ?SMOKE) (instance ?BREATHE Breathing) (subProcess ?BREATHE ?SMOKING))))").
@@ -8866,99 +8866,99 @@
 %
 :-assert_kif("(=> (instance ?JURY Jury) (holdsRight (exists (?DECISION) (and (instance ?DECISION LegalDecision) (agent ?DECISION ?JURY))) ?JURY))").
 %
-:-assert_kif("(subclass LegalCharge LegalAction)").
+:-assert_kif("(genls LegalCharge LegalAction)").
 :-assert_kif("(documentation LegalCharge \"Any &%LegalAction of which a &%Government is the &%agent.\")").
 %
 :-assert_kif("(=> (instance ?CHARGE LegalCharge) (exists (?GOV) (and (instance ?GOV Government) (agent ?CHARGE ?GOV))))").
 %
-:-assert_kif("(subclass Testifying Stating)").
+:-assert_kif("(genls Testifying Stating)").
 :-assert_kif("(documentation Testifying \"Giving testimony as part of a &%JudicialProcess.\")").
 %
 :-assert_kif("(=> (instance ?TESTIFY Testifying) (exists (?PROC) (and (instance ?PROC JudicialProcess) (subProcess ?TESTIFY ?PROC))))").
 %
-:-assert_kif("(subclass CourtRoom Room)").
+:-assert_kif("(genls CourtRoom Room)").
 :-assert_kif("(documentation CourtRoom \"Any &%Room whose purpose is to realize &%JudicialProcesses.\")").
 %
 :-assert_kif("(=> (instance ?PROCESS JudicialProcess) (exists (?ROOM) (and (instance ?ROOM CourtRoom) (located ?PROCESS ?ROOM))))").
 %
-:-assert_kif("(subclass LegalOpinion Argument)").
+:-assert_kif("(genls LegalOpinion Argument)").
 :-assert_kif("(documentation LegalOpinion \"An &%Argument that explains the reasoning behind a &%LegalDecision.\")").
 %
 :-assert_kif("(=> (instance ?OPINION LegalOpinion) (exists (?DECISION ?TEXT ?PROPOSITION) (and (instance ?DECISION LegalDecision) (result ?DECISION ?TEXT) (containsInformation ?TEXT ?PROPOSITION) (conclusion ?PROPOSITION ?OPINION))))").
 %
-:-assert_kif("(subclass LegalAward LegalDecision)").
+:-assert_kif("(genls LegalAward LegalDecision)").
 :-assert_kif("(documentation LegalAward \"Any &%LegalDecision which gives to the plaintiff of the corresponding &%LegalAction some amount of monetary compensation.\")").
 %
 :-assert_kif("(=> (and (instance ?AWARD LegalAward) (refers ?AWARD ?ACTION) (instance ?ACTION LegalAction) (agent ?ACTION ?PLAINTIFF)) (confersRight (exists (?GET ?OBJ ?VALUE) (and (instance ?GET Getting) (experiencer ?GET ?PLAINTIFF) (patient ?GET ?OBJ) (monetaryValue ?OBJ ?VALUE))) ?AWARD ?PLAINTIFF))").
 %
-:-assert_kif("(subclass LegalConviction LegalDecision)").
+:-assert_kif("(genls LegalConviction LegalDecision)").
 :-assert_kif("(documentation LegalConviction \"Any &%LegalDecision where the defendant is found guilty of the crime for which the corresponding trial was held.\")").
 %
-:-assert_kif("(subclass LegalAquittal LegalDecision)").
+:-assert_kif("(genls LegalAquittal LegalDecision)").
 :-assert_kif("(documentation LegalAquittal \"Any &%LegalDecision where the defendant is found not to be guilty of the crime for which the corresponding trial was held.\")").
 %
-:-assert_kif("(subclass GameCall Deciding)").
-:-assert_kif("(subclass GameCall Declaring)").
-:-assert_kif("(documentation GameCall \"A decision issued by an official referee in a &%Game. Note that &%GameCall is a subclass of &%Declaring, because these decisions have binding, normative force.\")").
+:-assert_kif("(genls GameCall Deciding)").
+:-assert_kif("(genls GameCall Declaring)").
+:-assert_kif("(documentation GameCall \"A decision issued by an official referee in a &%Game. Note that &%GameCall is a genls of &%Declaring, because these decisions have binding, normative force.\")").
 %
 :-assert_kif("(=> (instance ?CALL GameCall) (exists (?GAME) (and (instance ?GAME Game) (refers ?CALL ?GAME))))").
 %
-:-assert_kif("(subclass BeginningOperations OrganizationalProcess)").
+:-assert_kif("(genls BeginningOperations OrganizationalProcess)").
 :-assert_kif("(disjoint BeginningOperations CeasingOperations)").
 :-assert_kif("(documentation BeginningOperations \"The process of an &%Organization commencing operations. In the case of a &%Corporation, this would be the process of going into business.\")").
 %
 :-assert_kif("(=> (and (instance ?OP BeginningOperations) (instance ?ORG Organization) (agent ?OP ?ORG)) (starts ?OP (WhenFn ?ORG)))").
 %
-:-assert_kif("(subclass CeasingOperations OrganizationalProcess)").
+:-assert_kif("(genls CeasingOperations OrganizationalProcess)").
 :-assert_kif("(documentation CeasingOperations \"The process of an &%Organization ceasing operations, i.e. its folding or going out of business in some other fashion.\")").
 %
 :-assert_kif("(=> (and (instance ?OP CeasingOperations) (instance ?ORG Organization) (agent ?OP ?ORG)) (finishes ?OP (WhenFn ?ORG)))").
 %
-:-assert_kif("(subclass FallingAsleep PsychologicalProcess)").
+:-assert_kif("(genls FallingAsleep PsychologicalProcess)").
 :-assert_kif("(disjoint FallingAsleep WakingUp)").
 :-assert_kif("(documentation FallingAsleep \"The process of transitioning from a state of being &%Awake to a state of being &%Asleep.\")").
 %
 :-assert_kif("(=> (and (instance ?FALL FallingAsleep) (experiencer ?FALL ?AGENT)) (exists (?START ?FINISH) (and (starts ?START (WhenFn ?FALL)) (finishes ?FINISH (WhenFn ?FALL)) (holdsDuring ?START (attribute ?AGENT Awake)) (holdsDuring ?FINISH (attribute ?AGENT Asleep)))))").
 %
-:-assert_kif("(subclass WakingUp PsychologicalProcess)").
+:-assert_kif("(genls WakingUp PsychologicalProcess)").
 :-assert_kif("(documentation WakingUp \"The process of transitioning from a state of being &%Asleep to a state of being &%Awake.\")").
 %
 :-assert_kif("(=> (and (instance ?WAKE WakingUp) (experiencer ?WAKE ?AGENT)) (exists (?START ?FINISH) (and (starts ?START (WhenFn ?WAKE)) (finishes ?FINISH (WhenFn ?WAKE)) (holdsDuring ?START (attribute ?AGENT Asleep)) (holdsDuring ?FINISH (attribute ?AGENT Awake)))))").
 %
-:-assert_kif("(subclass AcademicDegree Certificate)").
+:-assert_kif("(genls AcademicDegree Certificate)").
 :-assert_kif("(documentation AcademicDegree \"A &%Certificate that demonstrates that the holder of the &%Certificate has successfully completed an &%EducationalProgram.\")").
 %
 :-assert_kif("(=> (and (instance ?DEGREE AcademicDegree) (possesses ?AGENT ?DEGREE)) (exists (?PROGRAM ?STUDY) (and (instance ?PROGRAM EducationalProgram) (realization ?STUDY ?PROGRAM) (experiencer ?STUDY ?AGENT))))").
 %
-:-assert_kif("(subclass EducationalProgram Plan)").
+:-assert_kif("(genls EducationalProgram Plan)").
 :-assert_kif("(documentation EducationalProgram \"A series of &%EducationalCourses that must be completed to receive an &%AcademicDegree or other &%Certificate. Note that an &%EducationalProgram, unlike an &%EducationalCourse, may be realized at more than one &%EducationalOrganization.\")").
 %
 :-assert_kif("(=> (instance ?PROGRAM EducationalProgram) (exists (?COURSE1 ?COURSE2) (and (instance ?COURSE1 EducationalCourse) (instance ?COURSE2 EducationalCourse) (not (equal ?COURSE1 ?COURSE2)) (subPlan ?COURSE1 ?PROGRAM) (subPlan ?COURSE2 ?PROGRAM))))").
 %
-:-assert_kif("(subclass EducationalCourse EducationalProgram)").
+:-assert_kif("(genls EducationalCourse EducationalProgram)").
 :-assert_kif("(documentation EducationalCourse \"A schedule of class meetings offered by an &%EducationalOrganization.\")").
 %
 :-assert_kif("(=> (instance ?COURSE EducationalCourse) (exists (?CLASS) (and (realization ?CLASS ?COURSE) (instance ?CLASS EducationalProcess) (located ?CLASS ?ORG) (instance ?ORG EducationalOrganization))))").
 %
-:-assert_kif("(subclass School EducationalOrganization)").
+:-assert_kif("(genls School EducationalOrganization)").
 :-assert_kif("(documentation School \"An &%EducationalOrganization with a curriculum, teachers , and students. Most &%Schools are housed in a &%Building dedicated to the &%EducationalOrganization.\")").
 %
-:-assert_kif("(subclass HighSchool School)").
+:-assert_kif("(genls HighSchool School)").
 :-assert_kif("(documentation HighSchool \"A &%School which admits &%students who have graduated from a middle school and which normally covers the ninth through twelfth grades. A &%HighSchool confers a high school diploma.\")").
 %
 :-assert_kif("(=> (and (instance ?ENTER Matriculation) (agent ?ENTER ?COLLEGE) (patient ?ENTER ?STUDENT) (instance ?COLLEGE College)) (exists (?GRAD ?SCHOOL) (and (instance ?GRAD Graduation) (agent ?GRAD ?SCHOOL) (patient ?GRAD ?STUDENT) (instance ?SCHOOL HighSchool) (earlier (WhenFn ?GRAD) (WhenFn ?ENTER)))))").
 %
-:-assert_kif("(subclass PostSecondarySchool School)").
+:-assert_kif("(genls PostSecondarySchool School)").
 :-assert_kif("(partition PostSecondarySchool JuniorCollege College University)").
 :-assert_kif("(documentation PostSecondarySchool \"The class of &%Schools that offer an associate's degree or a bachelor's degree.\")").
 %
-:-assert_kif("(subclass JuniorCollege PostSecondarySchool)").
+:-assert_kif("(genls JuniorCollege PostSecondarySchool)").
 :-assert_kif("(documentation JuniorCollege \"The class of &%PostSecondarySchools that offer an associate's degree and do not offer a bachelor's degree.\")").
 %
-:-assert_kif("(subclass College PostSecondarySchool)").
+:-assert_kif("(genls College PostSecondarySchool)").
 :-assert_kif("(documentation College \"A &%School which admits &%students who have graduated from high school and which confers a bachelor's degree, normally requiring four years of study. Note that a &%College does not confer any graduate degrees. For institutions that confer both bachelor 's and graduate degrees, the concept &%University should be used .\")").
 %
-:-assert_kif("(subclass University PostSecondarySchool)").
+:-assert_kif("(genls University PostSecondarySchool)").
 :-assert_kif("(documentation University \"A &%School which admits &%students that have graduated from high school (known as undergraduate students) and &%students who have received a bachelor's degree (known as graduate students ). A &%University confers both bachelor's and graduate degrees .\")").
 %
 :-assert_kif("(subrelation student member)").
@@ -8975,25 +8975,25 @@
 %
 :-assert_kif("(=> (teacher ?ORG ?AGENT) (exists (?PROCESS) (and (instance ?PROCESS EducationalProcess) (located ?PROCESS ?ORG) (agent ?PROCESS ?AGENT))))").
 %
-:-assert_kif("(subclass InsurancePolicy Certificate)").
+:-assert_kif("(genls InsurancePolicy Certificate)").
 :-assert_kif("(documentation InsurancePolicy \"A &%Certificate that states the terms of an insurance contract.\")").
 %
-:-assert_kif("(subclass Telephoning Speaking)").
+:-assert_kif("(genls Telephoning Speaking)").
 :-assert_kif("(documentation Telephoning \"Any instance of &%Speaking where the &%instrument of &%Communicating is a &%Telephone.\")").
 %
 :-assert_kif("(=> (instance ?TEL Telephoning) (exists (?DEVICE) (and (instance ?DEVICE Telephone) (instrument ?TEL ?DEVICE))))").
 %
-:-assert_kif("(subclass EconomicRelation BinaryRelation)").
+:-assert_kif("(genls EconomicRelation BinaryRelation)").
 :-assert_kif("(documentation EconomicRelation \"A class of &%Relations which are used to specify various economic measures, e.g. the GDP, the consumer price index , and the trade deficit.\")").
 %
-:-assert_kif("(=> (and (instance ?REL EconomicRelation) (domain ?REL 1 ?CLASS)) (subclass ?CLASS GeopoliticalArea))").
+:-assert_kif("(=> (and (instance ?REL EconomicRelation) (domain ?REL 1 ?CLASS)) (genls ?CLASS GeopoliticalArea))").
 %
-:-assert_kif("(subclass LaborStriking OrganizationalProcess)").
+:-assert_kif("(genls LaborStriking OrganizationalProcess)").
 :-assert_kif("(documentation LaborStriking \"A &%Process in which some or all of the employees of an &%Organization refuse to work until their pay is increased or their working conditions are improved in some respect.\")").
 %
 :-assert_kif("(=> (and (instance ?STRIKE LaborStriking) (agent ?STRIKE ?PERSON) (instance ?PERSON Human) (patient ?STRIKE ?ORG) (instance ?ORG Organization)) (employs ?ORG ?PERSON))").
 %
-:-assert_kif("(subclass Retiring TerminatingEmployment)").
+:-assert_kif("(genls Retiring TerminatingEmployment)").
 :-assert_kif("(documentation Retiring \"Voluntarily leaving employment at the end of one's career in order to take time off in the later years of one's life.\")").
 %
 :-assert_kif("(instance monetaryWage QuaternaryPredicate)").
@@ -9005,25 +9005,25 @@
 %
 :-assert_kif("(=> (monetaryWage ?ORG ?PERSON ?TIME ?MONEY) (employs ?ORG ?PERSON))").
 %
-:-assert_kif("(subclass GameArtifact Artifact)").
+:-assert_kif("(genls GameArtifact Artifact)").
 :-assert_kif("(disjointDecomposition GameArtifact GameBoard GamePiece)").
 :-assert_kif("(documentation GameArtifact \"An &%Artifact that is designed to be used as an &%instrument in a &%Game.\")").
 %
-:-assert_kif("(=> (instance ?ARTIFACT GameArtifact) (exists (?GAME) (and (subclass ?GAME Game) (capability ?GAME instrument ?ARTIFACT))))").
+:-assert_kif("(=> (instance ?ARTIFACT GameArtifact) (exists (?GAME) (and (genls ?GAME Game) (capability ?GAME instrument ?ARTIFACT))))").
 %
-:-assert_kif("(subclass GameBoard GameArtifact)").
+:-assert_kif("(genls GameBoard GameArtifact)").
 :-assert_kif("(documentation GameBoard \"A &%GameArtifact which is intended to be used as the game area for playing a particular game.\")").
 %
 :-assert_kif("(=> (instance ?BOARD GameBoard) (hasPurpose ?BOARD (exists (?GAME) (and (instance ?GAME Game) (located ?GAME ?BOARD)))))").
 %
-:-assert_kif("(subclass GamePiece GameArtifact)").
+:-assert_kif("(genls GamePiece GameArtifact)").
 :-assert_kif("(documentation GamePiece \"A &%GameArtifact that is moved around in a game area .\")").
 %
-:-assert_kif("(subclass Ball GamePiece)").
+:-assert_kif("(genls Ball GamePiece)").
 :-assert_kif("(documentation Ball \"Any &%GamePiece which has the shape of a sphere.\")").
 %
-:-assert_kif("(subclass GameShot Impelling)").
-:-assert_kif("(subclass GameShot Maneuver)").
+:-assert_kif("(genls GameShot Impelling)").
+:-assert_kif("(genls GameShot Maneuver)").
 :-assert_kif("(documentation GameShot \"Impelling a &%GamePiece for the purpose of scoring a point or preventing the opposing player or team from scoring a point. Note that this class does not cover shots which are disallowed by the rules of the game.\")").
 %
 :-assert_kif("(=> (instance ?SHOT GameShot) (exists (?PIECE) (and (instance ?PIECE GamePiece) (patient ?SHOT ?PIECE))))").
@@ -9032,397 +9032,397 @@
 %
 :-assert_kif("(=> (instance ?SHOT GameShot) (hasPurpose ?SHOT (instance ?SHOT Score)))").
 %
-:-assert_kif("(subclass Score GameShot)").
+:-assert_kif("(genls Score GameShot)").
 :-assert_kif("(documentation Score \"A successful attempt to score a point in a &%Game.\")").
 %
-:-assert_kif("(subclass GameGoal GameArtifact)").
+:-assert_kif("(genls GameGoal GameArtifact)").
 :-assert_kif("(documentation GameGoal \"The location where a &%GameShot must end up if it is to constitute a &%Score.\")").
 %
 :-assert_kif("(=> (and (instance ?GOAL GameGoal) (instrument ?GAME ?GOAL) (instance ?GAME Game) (subProcess ?SCORE ?GAME) (instance ?SCORE Score)) (exists (?PIECE ?TIME) (and (instance ?PIECE GamePiece) (patient ?SCORE ?PIECE) (temporalPart ?TIME (WhenFn ?SCORE)) (holdsDuring ?TIME (located ?PIECE ?GOAL)))))").
 %
-:-assert_kif("(subclass BaseballManeuver Maneuver)").
+:-assert_kif("(genls BaseballManeuver Maneuver)").
 :-assert_kif("(documentation BaseballManeuver \"Any &%Maneuver in &%Baseball.\")").
 %
 :-assert_kif("(=> (instance ?MOVE BaseballManeuver) (exists (?BASEBALL) (and (instance ?BASEBALL Baseball) (subProcess ?MOVE ?BASEBALL))))").
 %
-:-assert_kif("(subclass BaseballWalk BaseballManeuver)").
+:-assert_kif("(genls BaseballWalk BaseballManeuver)").
 :-assert_kif("(documentation BaseballWalk \"Taking first base after four balls have been called by the umpire.\")").
 %
-:-assert_kif("(subclass BaseballHit GameShot)").
-:-assert_kif("(subclass BaseballHit BaseballManeuver)").
+:-assert_kif("(genls BaseballHit GameShot)").
+:-assert_kif("(genls BaseballHit BaseballManeuver)").
 :-assert_kif("(documentation BaseballHit \"Any base hit in &%Baseball.\")").
 %
-:-assert_kif("(subclass BaseballRun BaseballHit)").
-:-assert_kif("(subclass BaseballRun Score)").
+:-assert_kif("(genls BaseballRun BaseballHit)").
+:-assert_kif("(genls BaseballRun Score)").
 :-assert_kif("(documentation BaseballRun \"A &%Score in &%Baseball. It consists of hitting the ball with the bat and then touching all four bases of the diamond before being tagged with the ball by a member of the opposite team.\")").
 %
-:-assert_kif("(subclass HomeRun BaseballRun)").
+:-assert_kif("(genls HomeRun BaseballRun)").
 :-assert_kif("(documentation HomeRun \"A &%BaseballRun where the batter touches home base during his turn at bat.\")").
 %
-:-assert_kif("(subclass Throwing Impelling)").
-:-assert_kif("(subclass Throwing BodyMotion)").
+:-assert_kif("(genls Throwing Impelling)").
+:-assert_kif("(genls Throwing BodyMotion)").
 :-assert_kif("(documentation Throwing \"Any instance of &%Impelling where the &%instrument is an &%Arm.\")").
 %
 :-assert_kif("(=> (instance ?THROW Throwing) (exists (?ARM) (and (instance ?ARM Arm) (instrument ?THROW ?ARM))))").
 %
-:-assert_kif("(subclass Pitching Throwing)").
-:-assert_kif("(subclass Pitching GameShot)").
+:-assert_kif("(genls Pitching Throwing)").
+:-assert_kif("(genls Pitching GameShot)").
 :-assert_kif("(documentation Pitching \"&%Throwing a &%Ball to the batter in a game of &%Baseball or softball.\")").
 %
 :-assert_kif("(=> (and (instance ?PITCH Pitching) (patient ?PITCH ?BALL)) (instance ?BALL Ball))").
 %
-:-assert_kif("(subclass Catching Touching)").
-:-assert_kif("(subclass Catching Maneuver)").
+:-assert_kif("(genls Catching Touching)").
+:-assert_kif("(genls Catching Maneuver)").
 :-assert_kif("(documentation Catching \"Any &%Maneuver in a &%Game which results in a situation where the &%agent &%grasps the &%Ball.\")").
 %
 :-assert_kif("(=> (and (instance ?CATCH Catching) (patient ?CATCH ?BALL)) (instance ?CATCH Ball))").
 %
 :-assert_kif("(=> (and (instance ?CATCH Catching) (agent ?CATCH ?AGENT) (patient ?CATCH ?BALL)) (holdsDuring (EndFn (WhenFn ?CATCH)) (grasps ?AGENT ?BALL)))").
 %
-:-assert_kif("(subclass Stretching Motion)").
+:-assert_kif("(genls Stretching Motion)").
 :-assert_kif("(documentation Stretching \"Moving two sides of an object in opposite directions so that the object becomes both longer and thinner.\")").
 %
-:-assert_kif("(subclass Accelerating Translocation)").
-:-assert_kif("(subclass Accelerating Increasing)").
+:-assert_kif("(genls Accelerating Translocation)").
+:-assert_kif("(genls Accelerating Increasing)").
 :-assert_kif("(documentation Accelerating \"Increasing the speed with which someone or something is moving.\")").
 %
 :-assert_kif("(=> (and (instance ?ACCELERATE Accelerating) (agent ?ACCELERATE ?AGENT)) (exists (?LENGTH1 ?LENGTH2 ?TIME1 ?TIME2) (and (holdsDuring (BeginFn (WhenFn ?ACCELERATE)) (measure ?AGENT (SpeedFn ?LENGTH1 ?TIME1))) (holdsDuring (EndFn (WhenFn ?ACCELERATE)) (measure ?AGENT (SpeedFn ?LENGTH2 ?TIME2))) (or (greaterThan ?LENGTH2 ?LENGTH1) (greaterThan ?TIME2 ?TIME1)))))").
 %
-:-assert_kif("(subclass Flying Translocation)").
+:-assert_kif("(genls Flying Translocation)").
 :-assert_kif("(documentation Flying \"Any instance of &%Translocation which is through an &%AtmosphericRegion and which is powered by the wings of an &%Animal.\")").
 %
 :-assert_kif("(=> (instance ?FLY Flying) (exists (?REGION) (and (instance ?REGION AtmosphericRegion) (located ?FLY ?REGION))))").
 %
-:-assert_kif("(subclass TakingOff Translocation)").
+:-assert_kif("(genls TakingOff Translocation)").
 :-assert_kif("(documentation TakingOff \"Any instance of &%Translocation which starts on something other than an &%AtmosphericRegion and which has an instance of &%Flying as a &%subProcess.\")").
 %
 :-assert_kif("(=> (instance ?OFF TakingOff) (exists (?REGION ?FLYING) (and (not (instance ?REGION AtmosphericRegion)) (holdsDuring (BeginFn (WhenFn ?OFF)) (located ?OFF ?REGION)) (subProcess ?FLYING ?OFF) (instance ?FLYING Flying))))").
 %
-:-assert_kif("(subclass Landing Translocation)").
+:-assert_kif("(genls Landing Translocation)").
 :-assert_kif("(documentation Landing \"Any instance of &%Translocation which ends up on something other than an &%AtmosphericRegion and which has an instance of &%Flying as a &%subProcess.\")").
 %
 :-assert_kif("(=> (instance ?LAND Landing) (exists (?REGION ?FLYING) (and (not (instance ?REGION AtmosphericRegion)) (holdsDuring (EndFn (WhenFn ?LAND)) (located ?LAND ?REGION)) (subProcess ?FLYING ?OFF) (instance ?FLYING Flying))))").
 %
-:-assert_kif("(subclass Returning Translocation)").
+:-assert_kif("(genls Returning Translocation)").
 :-assert_kif("(documentation Returning \"Any instance of &%Translocation where the &%agent goes to a location where he/she had been before the &%Translocation took place.\")").
 %
 :-assert_kif("(=> (and (instance ?RETURN Returning) (experiencer ?RETURN ?AGENT) (destination ?RETURN ?DEST)) (exists (?TIME) (and (earlier ?TIME (WhenFn ?RETURN)) (holdsDuring ?TIME (located ?AGENT ?DEST)))))").
 %
-:-assert_kif("(subclass Escaping Translocation)").
+:-assert_kif("(genls Escaping Translocation)").
 :-assert_kif("(documentation Escaping \"Any instance of &%Translocation where the &%agent brings it about that he/she is no longer confined without having the right to do so .\")").
 %
 :-assert_kif("(=> (and (instance ?ESCAPE Escaping) (agent ?ESCAPE ?AGENT)) (exists (?CONFINE) (and (instance ?CONFINE Confining) (patient ?CONFINE ?AGENT) (meetsTemporally (WhenFn ?CONFINE) (WhenFn ?ESCAPE)))))").
 %
 :-assert_kif("(=> (instance ?ESCAPE Escaping) (not (holdsRight (agent ?ESCAPE ?AGENT) ?AGENT)))").
 %
-:-assert_kif("(subclass Leaving Motion)").
+:-assert_kif("(genls Leaving Motion)").
 :-assert_kif("(documentation Leaving \"The initial part of any instance of &%Translocation.\")").
 %
 :-assert_kif("(=> (instance ?LEAVE Leaving) (exists (?GO) (and (instance ?GO Translocation) (subProcess ?LEAVE ?GO) (starts (WhenFn ?LEAVE) (WhenFn ?GO)))))").
 %
-:-assert_kif("(subclass Arriving Motion)").
+:-assert_kif("(genls Arriving Motion)").
 :-assert_kif("(documentation Arriving \"The final part of any instance of &%Translocation.\")").
 %
 :-assert_kif("(=> (instance ?ARRIVE Arriving) (exists (?GO) (and (instance ?GO Translocation) (subProcess ?ARRIVE ?GO) (finishes (WhenFn ?ARRIVE) (WhenFn ?GO)))))").
 %
-:-assert_kif("(subclass Rotating Motion)").
+:-assert_kif("(genls Rotating Motion)").
 :-assert_kif("(documentation Rotating \"&%Motion that begins and ends at the same point, because the trajectory of the &%Motion is circular.\")").
 %
 :-assert_kif("(=> (and (instance ?ROTATE Rotating) (experiencer ?ROTATE ?AGENT)) (exists (?LOC) (and (holdsDuring (BeginFn (WhenFn ?ROTATE)) (located ?AGENT ?LOC)) (holdsDuring (EndFn (WhenFn ?ROTATE)) (located ?AGENT ?LOC)))))").
 %
-:-assert_kif("(subclass MotionUpward Motion)").
+:-assert_kif("(genls MotionUpward Motion)").
 :-assert_kif("(disjoint MotionUpward MotionDownward)").
 :-assert_kif("(documentation MotionUpward \"&%Motion where an &%Object is moving away from the ground.\")").
 %
-:-assert_kif("(subclass MotionDownward Motion)").
+:-assert_kif("(genls MotionDownward Motion)").
 :-assert_kif("(documentation MotionDownward \"&%Motion where an &%Object is moving toward the ground .\")").
 %
-:-assert_kif("(subclass Reversing Motion)").
+:-assert_kif("(genls Reversing Motion)").
 :-assert_kif("(documentation Reversing \"Moving something in such a way that its &%top becomes its &%bottom and vice versa.\")").
 %
 :-assert_kif("(=> (and (instance ?REVERSE Reversing) (patient ?REVERSE ?OBJ) (holdsDuring (BeginFn (WhenFn ?REVERSE)) (and (top ?TOP ?OBJ) (bottom ?BOTTOM ?OBJ)))) (holdsDuring (EndFn (WhenFn ?REVERSE)) (and (top ?BOTTOM ?OBJ) (bottom ?TOP ?OBJ))))").
 %
-:-assert_kif("(subclass LiquidMotion Motion)").
+:-assert_kif("(genls LiquidMotion Motion)").
 :-assert_kif("(documentation LiquidMotion \"Any &%Motion where the &%patient is a &%Liquid. This class would cover, in particular, the flow of &%Water.\")").
 %
 :-assert_kif("(=> (and (instance ?MOTION LiquidMotion) (patient ?MOTION ?OBJ)) (attribute ?OBJ Liquid))").
 %
-:-assert_kif("(subclass Dripping LiquidMotion)").
+:-assert_kif("(genls Dripping LiquidMotion)").
 :-assert_kif("(documentation Dripping \"Any &%LiquidMotion where the &%Liquid is moved drop by drop.\")").
 %
-:-assert_kif("(subclass Pouring LiquidMotion)").
-:-assert_kif("(subclass Pouring Transfer)").
+:-assert_kif("(genls Pouring LiquidMotion)").
+:-assert_kif("(genls Pouring Transfer)").
 :-assert_kif("(documentation Pouring \"Any instance of &%Transfer from one &%Container to another , where the thing transferred is a &%Liquid.\")").
 %
 :-assert_kif("(=> (instance ?POUR Pouring) (exists (?LIQUID ?CONTAINER1 ?CONTAINER2) (and (origin ?POUR ?CONTAINER1) (destination ?POUR ?CONTAINER2) (instance ?CONTAINER1 Container) (instance ?CONTAINER2 Container))))").
 %
-:-assert_kif("(subclass WaterMotion LiquidMotion)").
+:-assert_kif("(genls WaterMotion LiquidMotion)").
 :-assert_kif("(documentation WaterMotion \"Any &%LiquidMotion where the &%Liquid is &%Water.\")").
 %
 :-assert_kif("(=> (instance ?MOTION WaterMotion) (exists (?WATER) (and (patient ?MOTION ?WATER) (instance ?WATER Water))))").
 %
-:-assert_kif("(subclass WaterWave LiquidMotion)").
+:-assert_kif("(genls WaterWave LiquidMotion)").
 :-assert_kif("(documentation WaterWave \"A &%WaterWave is a raised ridge of water moving along the surface of a body of water. The &%WaterWave moves in a direction approximately transverse to the crest line of the wave. The &%patient of the &%WaterWave is successive regions of water, which do not travel in the direction of the wave or with it.\")").
 %
 :-assert_kif("(=> (instance ?WAVE WaterWave) (exists (?AREA) (and (instance ?AREA WaterArea) (located ?WAVE ?AREA))))").
 %
-:-assert_kif("(subclass GasMotion Motion)").
+:-assert_kif("(genls GasMotion Motion)").
 :-assert_kif("(documentation GasMotion \"Any &%Motion where the &%patient is a &%Gas. This class would cover, in particular, the motion of &%Air, e.g. a breeze or wind.\")").
 %
 :-assert_kif("(=> (and (instance ?MOTION GasMotion) (patient ?MOTION ?OBJ)) (attribute ?OBJ Gas))").
 %
-:-assert_kif("(subclass Wind AirStream)").
-% :-assert_kif("; (subclass Wind GasMotion)").
+:-assert_kif("(genls Wind AirStream)").
+% :-assert_kif("; (genls Wind GasMotion)").
 % :-assert_kif(";commented out due to disjoint conflict - PJC (documentation Wind \"&%Wind is the class of variable &%AirStreams that occur in &%EarthsAtmosphere.\")").
 %
 :-assert_kif("(=> (instance ?BLOW Wind) (located ?BLOW EarthsAtmosphere))").
 %
 :-assert_kif("(=> (instance ?WIND Wind) (exists (?AIR) (and (patient ?WIND ?AIR) (instance ?AIR Air))))").
 %
-:-assert_kif("(subclass Pulling Transportation)").
+:-assert_kif("(genls Pulling Transportation)").
 :-assert_kif("(documentation Pulling \"Any instance of &%Transportation, where a &%TransportationDevice is dragged by something else, whether the something else is an &%Animal or a self-powered &%TransportationDevice.\")").
 %
 :-assert_kif("(=> (and (instance ?PULL Pulling) (patient ?PULL ?DEVICE)) (instance ?DEVICE TransportationDevice))").
 %
-:-assert_kif("(subclass AirTransportation Transportation)").
+:-assert_kif("(genls AirTransportation Transportation)").
 :-assert_kif("(documentation AirTransportation \"Any instance of &%Transportation where the &%instrument is an &%Aircraft and which is through an &%AtmosphericRegion.\")").
 %
 :-assert_kif("(=> (instance ?TRANSPORT AirTransportation) (exists (?CRAFT ?REGION) (and (instance ?CRAFT Aircraft) (instance ?REGION AtmosphericRegion) (instrument ?TRANSPORT ?CRAFT) (located ?TRANSPORT ?REGION))))").
 %
 :-assert_kif("(=> (instance ?CRAFT Aircraft) (capability AirTransportation instrument ?CRAFT))").
 %
-:-assert_kif("(subclass Helicopter Aircraft)").
+:-assert_kif("(genls Helicopter Aircraft)").
 :-assert_kif("(documentation Helicopter \"Any &%Aircraft with rapidly rotating wings.\")").
 %
-:-assert_kif("(subclass LandTransportation Transportation)").
+:-assert_kif("(genls LandTransportation Transportation)").
 :-assert_kif("(documentation LandTransportation \"Any instance of &%Transportation where the &%instrument is a &%LandVehicle.\")").
 %
 :-assert_kif("(=> (instance ?LAND LandTransportation) (exists (?CRAFT ?AREA) (and (instance ?CRAFT LandCraft) (instance ?AREA LandArea) (instrument ?LAND ?CRAFT) (located ?CRAFT ?AREA))))").
 %
 :-assert_kif("(=> (instance ?VEHICLE LandVehicle) (capability LandTransportation instrument ?VEHICLE))").
 %
-:-assert_kif("(subclass StageCoach Wagon)").
+:-assert_kif("(genls StageCoach Wagon)").
 :-assert_kif("(documentation StageCoach \"A &%Wagon that is pulled by &%Horses and whose purpose was to transport &%Humans and their luggage from one &%City to the next, especially in areas which did not have an established transportation system, e.g. the old west.\")").
 %
 :-assert_kif("(=> (and (instance ?STAGE StageCoach) (instance ?PULL Pulling) (patient ?PULL ?STAGE) (agent ?PULL ?HORSE)) (instance ?HORSE Horse))").
 %
-:-assert_kif("(subclass WaterTransportation Transportation)").
+:-assert_kif("(genls WaterTransportation Transportation)").
 :-assert_kif("(documentation WaterTransportation \"Any instance of &%Transportation where the &%instrument is a &%Watercraft.\")").
 %
 :-assert_kif("(=> (instance ?TRANSPORT WaterTransportation) (exists (?CRAFT ?AREA) (and (instance ?CRAFT Watercraft) (instance ?AREA WaterArea) (instrument ?TRANSPORT ?CRAFT) (located ?TRANSPORT ?AREA))))").
 %
 :-assert_kif("(=> (instance ?CRAFT Watercraft) (capability WaterTransportation instrument ?CRAFT))").
 %
-:-assert_kif("(subclass SpaceTransportation Transportation)").
+:-assert_kif("(genls SpaceTransportation Transportation)").
 :-assert_kif("(documentation SpaceTransportation \"Any instance of &%Transportation where the &%instrument is a &%Spacecraft and which is through a &%SpaceRegion.\")").
 %
 :-assert_kif("(=> (instance ?TRANSPORT SpaceTransportation) (exists (?CRAFT ?REGION) (and (instance ?CRAFT Spacecraft) (instance ?REGION SpaceRegion) (instrument ?TRANSPORT ?CRAFT) (located ?TRANSPORT ?REGION))))").
 %
-:-assert_kif("(subclass Spacecraft Vehicle)").
+:-assert_kif("(genls Spacecraft Vehicle)").
 :-assert_kif("(documentation Spacecraft \"Any &%Vehicle which is capable of &%SpaceTransportation.\")").
 %
 :-assert_kif("(=> (instance ?CRAFT Spacecraft) (capability SpaceTransportation instrument ?CRAFT))").
 %
-:-assert_kif("(subclass Missile Spacecraft)").
+:-assert_kif("(genls Missile Spacecraft)").
 :-assert_kif("(documentation Missile \"A &%Spacecraft which is propelled by a rocket.\")").
 %
-:-assert_kif("(subclass Installing Putting)").
+:-assert_kif("(genls Installing Putting)").
 :-assert_kif("(documentation Installing \"&%Putting a &%Device in a location and configuring the &%Device so that it can be used as intended after the installation.\")").
 %
 :-assert_kif("(=> (and (instance ?INSTALL Installing) (patient ?INSTALL ?DEVICE)) (instance ?DEVICE Device))").
 %
 :-assert_kif("(=> (and (instance ?INSTALL Installing) (patient ?INSTALL ?DEVICE) (hasPurpose ?DEVICE ?PURPOSE)) (holdsDuring (EndFn (WhenFn ?INSTALL)) (true ?PURPOSE True)))").
 %
-:-assert_kif("(subclass MovingResidence Transfer)").
+:-assert_kif("(genls MovingResidence Transfer)").
 :-assert_kif("(documentation MovingResidence \"The process of changing one's residence, i.e. moving one's belongs to a new &%home.\")").
 %
 :-assert_kif("(=> (and (instance ?MOVE MovingResidence) (agent ?MOVE ?AGENT)) (exists (?HOME1 ?HOME2) (and (holdsDuring (BeginFn (WhenFn ?MOVE)) (home ?AGENT ?HOME1)) (holdsDuring (EndFn (WhenFn ?MOVE)) (home ?AGENT ?HOME2)) (not (equal ?HOME1 ?HOME2)))))").
 %
-:-assert_kif("(subclass Tilling IntentionalProcess)").
-:-assert_kif("(subclass Tilling SurfaceChange)").
+:-assert_kif("(genls Tilling IntentionalProcess)").
+:-assert_kif("(genls Tilling SurfaceChange)").
 :-assert_kif("(documentation Tilling \"Any &%Process of altering &%Soil in such a way as to facilitate &%Agriculture.\")").
 %
 :-assert_kif("(=> (and (instance ?TILL Tilling) (patient ?TILL ?SOIL)) (instance ?SOIL Soil))").
 %
 :-assert_kif("(=> (instance ?TILL Tilling) (exists (?CULTURE) (and (instance ?CULTURE Agriculture) (subProcess ?TILL ?CULTURE))))").
 %
-:-assert_kif("(subclass Drilling IntentionalProcess)").
-:-assert_kif("(subclass Drilling SurfaceChange)").
+:-assert_kif("(genls Drilling IntentionalProcess)").
+:-assert_kif("(genls Drilling SurfaceChange)").
 :-assert_kif("(documentation Drilling \"Any &%Process of producing a &%hole in a &%SelfConnectedObject which involves rotating a long, thin bit.\")").
 %
 :-assert_kif("(=> (and (instance ?DRILL Drilling) (patient ?DRILL ?OBJ)) (exists (?HOLE) (and (holdsDuring (BeginFn (WhenFn ?DRILL)) (not (hole ?HOLE ?OBJ))) (holdsDuring (EndFn (WhenFn ?DRILL)) (hole ?HOLE ?OBJ)))))").
 %
-:-assert_kif("(subclass Imagining PsychologicalProcess)").
+:-assert_kif("(genls Imagining PsychologicalProcess)").
 :-assert_kif("(documentation Imagining \"Forming a mental picture of something which is not present.\")").
 %
-:-assert_kif("(subclass Dreaming Imagining)").
+:-assert_kif("(genls Dreaming Imagining)").
 :-assert_kif("(disjoint Dreaming IntentionalProcess)").
 :-assert_kif("(documentation Dreaming \"A &%Process of producing metal images which occurs while one is &%Asleep.\")").
 %
 :-assert_kif("(=> (and (instance ?DREAM Dreaming) (experiencer ?DREAM ?AGENT)) (holdsDuring (WhenFn ?DREAM) (attribute ?AGENT Asleep)))").
 %
-:-assert_kif("(subclass Frightening PsychologicalProcess)").
+:-assert_kif("(genls Frightening PsychologicalProcess)").
 :-assert_kif("(documentation Frightening \"Any &%PsychologicalProcess where the &%patient comes to feel &%Anxiety.\")").
 %
 :-assert_kif("(=> (and (instance ?FRIGHTEN Frightening) (experiencer ?FRIGHTEN ?AGENT)) (and (holdsDuring (BeginFn (WhenFn ?FRIGHTEN)) (not (attribute ?AGENT Anxiety))) (holdsDuring (EndFn (WhenFn ?FRIGHTEN)) (attribute ?AGENT Anxiety))))").
 %
-:-assert_kif("(subclass Murder Killing)").
-:-assert_kif("(subclass Murder CriminalAction)").
+:-assert_kif("(genls Murder Killing)").
+:-assert_kif("(genls Murder CriminalAction)").
 :-assert_kif("(documentation Murder \"Impermissible &%Killing of a &%Human.\")").
 %
 :-assert_kif("(=> (instance ?MURDER Murder) (exists (?PERSON) (and (patient ?MURDER ?PERSON) (instance ?PERSON Human))))").
 %
-:-assert_kif("(subclass Hanging Killing)").
+:-assert_kif("(genls Hanging Killing)").
 :-assert_kif("(documentation Hanging \"&%Killing someone by suspending him/her from a rope wound around the neck until asphyxiation occurs.\")").
 %
-:-assert_kif("(subclass OrchestralConducting Guiding)").
+:-assert_kif("(genls OrchestralConducting Guiding)").
 :-assert_kif("(documentation OrchestralConducting \"The &%Process of directing an orchestra.\")").
 %
 :-assert_kif("(=> (instance ?CONDUCT OrchestralConducting) (exists (?MUSIC) (and (instance ?MUSIC Music) (result ?CONDUCT ?MUSIC))))").
 %
 :-assert_kif("(=> (and (instance ?CONDUCT OrchestralConducting) (patient ?CONDUCT ?ORCHESTRA)) (instance ?ORCHESTRA Orchestra))").
 %
-:-assert_kif("(subclass Orchestra GroupOfPeople)").
+:-assert_kif("(genls Orchestra GroupOfPeople)").
 :-assert_kif("(documentation Orchestra \"A &%GroupOfPeople that create &%InstrumentalMusic together .\")").
 %
 :-assert_kif("(=> (instance ?ORCHESTRA Orchestra) (hasPurpose ?ORCHESTRA (exists (?MUSIC) (and (instance ?MUSIC InstrumentalMusic) (agent ?MUSIC ?ORCHESTRA)))))").
 %
-:-assert_kif("(subclass DramaticDirecting Guiding)").
+:-assert_kif("(genls DramaticDirecting Guiding)").
 :-assert_kif("(documentation DramaticDirecting \"The process of directing a &%DramaticActing in a &%MotionPicture or the &%Performance of a &%DramaticPlay.\")").
 %
 :-assert_kif("(=> (and (instance ?DIRECT DramaticDirecting) (patient ?DIRECT ?ACT)) (instance ?ACT DramaticActing))").
 %
-:-assert_kif("(subclass Experimenting Investigating)").
+:-assert_kif("(genls Experimenting Investigating)").
 :-assert_kif("(documentation Experimenting \"&%Investigating the truth of a &%Proposition by constructing and observing a trial. Note that the trial may be either controlled or uncontrolled, blind or not blind.\")").
 %
-:-assert_kif("(subclass Sharing ChangeOfPossession)").
-:-assert_kif("(documentation Sharing \"The subclass of &%ChangeOfPossession where a &%properPart of the &%patient is given by the &%agent or the &%destination.\")").
+:-assert_kif("(genls Sharing ChangeOfPossession)").
+:-assert_kif("(documentation Sharing \"The genls of &%ChangeOfPossession where a &%properPart of the &%patient is given by the &%agent or the &%destination.\")").
 %
 :-assert_kif("(=> (and (instance ?SHARE Sharing) (agent ?SHARE ?AGENT1) (destination ?SHARE ?AGENT2) (patient ?SHARE ?OBJ)) (exists (?GIVE ?PART) (and (instance ?GIVE Giving) (subProcess ?GIVE ?SHARE) (patient ?GIVE ?PART) (properPart ?PART ?OBJ) (agent ?GIVE ?AGENT1) (destination ?GIVE ?AGENT2))))").
 %
-:-assert_kif("(subclass Stealing UnilateralGetting)").
-:-assert_kif("(subclass Stealing CriminalAction)").
+:-assert_kif("(genls Stealing UnilateralGetting)").
+:-assert_kif("(genls Stealing CriminalAction)").
 :-assert_kif("(documentation Stealing \"Any &%UnilateralGetting which is not permitted by the &%origin of the &%UnilateralGetting. These cases of &%UnilateralGetting are distinguished from ones where the &%destination is the subject of charity or other forms of benefaction.\")").
 %
 :-assert_kif("(=> (and (instance ?STEAL Stealing) (destination ?STEAL ?AGENT) (origin ?STEAL ?VICTIM) (instance ?VICTIM CognitiveAgent)) (not (confersRight (destination ?STEAL ?AGENT) ?VICTIM ?AGENT)))").
 %
-:-assert_kif("(subclass Inheriting UnilateralGetting)").
+:-assert_kif("(genls Inheriting UnilateralGetting)").
 :-assert_kif("(documentation Inheriting \"Any &%UnilateralGetting where the &%agent receives some part of the property of a person upon the death of the person .\")").
 %
 :-assert_kif("(=> (and (instance ?INHERIT Inheriting) (agent ?INHERIT ?HEIR) (origin ?INHERIT ?PERSON) (patient ?INHERIT ?PROPERTY)) (exists (?DEATH) (and (instance ?DEATH Death) (experiencer ?DEATH ?PERSON) (earlier (WhenFn ?DEATH) (WhenFn ?INHERIT)) (holdsDuring (ImmediatePastFn (WhenFn ?DEATH)) (possesses ?PERSON ?PROPERTY)) (confersRight (possesses ?HEIR ?PROPERTY) ?PERSON ?HEIR))))").
 %
-:-assert_kif("(subclass FullTimePosition Position)").
+:-assert_kif("(genls FullTimePosition Position)").
 :-assert_kif("(documentation FullTimePosition \"Any &%Position where the employee is either salaried or paid for at least 40 hour of work per week.\")").
 %
-:-assert_kif("(subclass PartTimePosition Position)").
+:-assert_kif("(genls PartTimePosition Position)").
 :-assert_kif("(documentation PartTimePosition \"Any &%Position where the employee is not salaried and is paid for less than 40 hours of work per week.\")").
 %
-:-assert_kif("(subclass ClericalSecretary Position)").
+:-assert_kif("(genls ClericalSecretary Position)").
 :-assert_kif("(documentation ClericalSecretary \"The class of &%Positions where the position holder is responsible for clerical duties, e.g. typing documents, answering phones , keeping schedules, etc.\")").
 %
-:-assert_kif("(subclass Soldier Position)").
+:-assert_kif("(genls Soldier Position)").
 :-assert_kif("(documentation Soldier \"The class of &%Positions which involve serving in the armed forces of a &%Nation.\")").
 %
-:-assert_kif("(subclass RedcoatSoldier Soldier)").
+:-assert_kif("(genls RedcoatSoldier Soldier)").
 :-assert_kif("(documentation RedcoatSoldier \"Any &%Soldier that served on the British side during the American revolutionary war.\")").
 %
-:-assert_kif("(subclass ConfederateSoldier Soldier)").
+:-assert_kif("(genls ConfederateSoldier Soldier)").
 :-assert_kif("(documentation ConfederateSoldier \"Any &%Soldier that served on the confederate side during the American Civil War.\")").
 %
-:-assert_kif("(subclass MilitaryPrivate Soldier)").
+:-assert_kif("(genls MilitaryPrivate Soldier)").
 :-assert_kif("(documentation MilitaryPrivate \"An enlisted &%Soldier of the lowest rank.\")").
 %
-:-assert_kif("(subclass MilitaryOfficer Soldier)").
+:-assert_kif("(genls MilitaryOfficer Soldier)").
 :-assert_kif("(documentation MilitaryOfficer \"The class of &%Soldiers who have authority or command.\")").
 %
 :-assert_kif("(=> (instance ?OFFICER MilitaryOfficer) (exists (?MANAGE ?PATIENT) (and (instance ?MANAGE Managing) (agent ?MANAGE ?OFFICER) (patient ?MANAGE ?PATIENT) (or (instance ?PATIENT MilitaryOrganization) (instance ?PATIENT Soldier)))))").
 %
-:-assert_kif("(subclass Lieutenant MilitaryOfficer)").
+:-assert_kif("(genls Lieutenant MilitaryOfficer)").
 :-assert_kif("(documentation Lieutenant \"A commissioned &%MilitaryOfficer.\")").
 %
-:-assert_kif("(subclass CaptainOfficer MilitaryOfficer)").
+:-assert_kif("(genls CaptainOfficer MilitaryOfficer)").
 :-assert_kif("(documentation CaptainOfficer \"A commissioned &%MilitaryOfficer who ranks above a &%Lieutenant but below a &%MajorOfficer.\")").
 %
-:-assert_kif("(subclass Colonel MilitaryOfficer)").
+:-assert_kif("(genls Colonel MilitaryOfficer)").
 :-assert_kif("(documentation Colonel \"A commissioned &%MilitaryOfficer who ranks above a lieutenant colonel and below a brigadier general.\")").
 %
-:-assert_kif("(subclass Century TimeDuration)").
+:-assert_kif("(genls Century TimeDuration)").
 :-assert_kif("(documentation Century \"The &%TimeDuration of 100 years.\")").
 %
 :-assert_kif("(=> (instance ?CENTURY Century) (duration ?CENTURY (MeasureFn 100 YearDuration)))").
 %
-:-assert_kif("(subclass Decade TimeDuration)").
+:-assert_kif("(genls Decade TimeDuration)").
 :-assert_kif("(documentation Decade \"The &%TimeDuration of 10 years.\")").
 %
 :-assert_kif("(=> (instance ?DECADE Decade) (duration ?DECADE (MeasureFn 10 YearDuration)))").
 %
-:-assert_kif("(subclass YardLength LengthMeasure)").
+:-assert_kif("(genls YardLength LengthMeasure)").
 :-assert_kif("(instance YardLength UnitOfMeasure)").
 :-assert_kif("(documentation YardLength \"English unit of length, equal to 3 &%FeetLength.\")").
 %
 :-assert_kif("(=> (instance ?NUMBER RealNumber) (equal (MeasureFn ?NUMBER YardLength) (MeasureFn (MultiplicationFn 3 ?NUMBER) FootLength)))").
 %
-:-assert_kif("(subclass NightTime RecurrentTimeInterval)").
+:-assert_kif("(genls NightTime RecurrentTimeInterval)").
 :-assert_kif("(documentation NightTime \"The class of &%TimeIntervals that begin at &%Sunset and end at &%Sunrise.\")").
 %
 :-assert_kif("(=> (instance ?NIGHT NightTime) (exists (?DAY1 ?DAY2) (and (instance ?DAY1 DayTime) (instance ?DAY2 DayTime) (meetsTemporally ?NIGHT ?DAY1) (meetsTemporally ?DAY2 ?NIGHT))))").
 %
 :-assert_kif("(=> (instance ?NIGHT NightTime) (exists (?RISE ?SET) (and (instance ?RISE Sunrise) (instance ?SET Sunset) (starts ?SET ?NIGHT) (finishes ?RISE ?NIGHT))))").
 %
-:-assert_kif("(subclass DayTime RecurrentTimeInterval)").
+:-assert_kif("(genls DayTime RecurrentTimeInterval)").
 :-assert_kif("(documentation DayTime \"The class of &%TimeIntervals that begin at &%Sunrise and end at &%Sunset.\")").
 %
 :-assert_kif("(=> (instance ?DAY DayTime) (exists (?NIGHT1 ?NIGHT2) (and (instance ?NIGHT1 NightTime) (instance ?NIGHT2 NightTime) (meetsTemporally ?DAY ?NIGHT1) (meetsTemporally ?NIGHT2 ?DAY))))").
 %
 :-assert_kif("(=> (instance ?DAY DayTime) (exists (?RISE ?SET) (and (instance ?RISE Sunrise) (instance ?SET Sunset) (starts ?RISE ?DAY) (finishes ?SET ?DAY))))").
 %
-:-assert_kif("(subclass Morning DayTime)").
+:-assert_kif("(genls Morning DayTime)").
 :-assert_kif("(documentation Morning \"The class of &%TimeIntervals that begin at &%Sunrise and end at noon.\")").
 %
 :-assert_kif("(=> (instance ?MORNING Morning) (exists (?HOUR) (and (instance ?HOUR (HourFn 12 ?DAY)) (finishes ?HOUR ?MORNING))))").
 %
-:-assert_kif("(subclass Afternoon DayTime)").
+:-assert_kif("(genls Afternoon DayTime)").
 :-assert_kif("(documentation Afternoon \"The class of &%TimeIntervals that begin at noon and end at &%Sunset.\")").
 %
 :-assert_kif("(=> (instance ?AFTERNOON Afternoon) (exists (?HOUR) (and (instance ?HOUR (HourFn 12 ?DAY)) (starts ?HOUR ?AFTERNOON))))").
 %
-:-assert_kif("(subclass Sunrise TimeInterval)").
+:-assert_kif("(genls Sunrise TimeInterval)").
 :-assert_kif("(documentation Sunrise \"The &%TimeInterval of each &%Day when the sun is rising and is partially overlapped by the horizon line.\")").
 %
-:-assert_kif("(subclass Sunset TimeInterval)").
+:-assert_kif("(genls Sunset TimeInterval)").
 :-assert_kif("(documentation Sunset \"The &%TimeInterval of each &%Day when the sun is setting and is partially overlapped by the horizon line.\")").
 %
-:-assert_kif("(subclass Weekend TimeInterval)").
+:-assert_kif("(genls Weekend TimeInterval)").
 :-assert_kif("(documentation Weekend \"Any &%Saturday and &%Sunday which are contiguous.\")").
 %
 :-assert_kif("(=> (instance ?WEEKEND Weekend) (exists (?SATURDAY ?SUNDAY) (and (instance ?SATURDAY Saturday) (instance ?SUNDAY Sunday) (starts ?SATURDAY ?WEEKEND) (finishes ?SUNDAY ?WEEKEND) (meetsTemporally ?SATURDAY ?SUNDAY))))").
 %
-:-assert_kif("(subclass SeasonOfYear TimeInterval)").
+:-assert_kif("(genls SeasonOfYear TimeInterval)").
 :-assert_kif("(partition SeasonOfYear WinterSeason SpringSeason SummerSeason FallSeason)").
 :-assert_kif("(documentation SeasonOfYear \"&%SeasonOfYear is the class of four seasons correlated with the calendar &%Year and associated with changes in the length of daylight and with overall temperature changes. Depending upon the &%GeographicArea, a &%SeasonOfYear may also be associated with weather patterns (e.g., rainy, dry, windy). The characteristics of seasons (cold vs. hot temperatures, long vs. short days) are reversed from the &%NorthernHemisphere to the &%SouthernHemisphere.\")").
 %
-:-assert_kif("(subclass WinterSeason SeasonOfYear)").
+:-assert_kif("(genls WinterSeason SeasonOfYear)").
 :-assert_kif("(documentation WinterSeason \"The &%SeasonOfYear that begins at the winter solstice and ends at the spring equinox.\")").
 %
 :-assert_kif("(=> (instance ?WINTER WinterSeason) (exists (?SPRING) (and (instance ?SPRING SpringSeason) (meetsTemporally ?WINTER ?SPRING))))").
 %
 :-assert_kif("(=> (instance ?WINTER WinterSeason) (exists (?AUTUMN) (and (instance ?AUTUMN FallSeason) (meetsTemporally ?AUTUMN ?WINTER))))").
 %
-:-assert_kif("(subclass SpringSeason SeasonOfYear)").
+:-assert_kif("(genls SpringSeason SeasonOfYear)").
 :-assert_kif("(documentation SpringSeason \"The &%SeasonOfYear that begins at the spring equinox and ends at the summer solstice.\")").
 %
 :-assert_kif("(=> (instance ?SPRING SpringSeason) (exists (?SUMMER) (and (instance ?SUMMER SummerSeason) (meetsTemporally ?SPRING ?SUMMER))))").
 %
 :-assert_kif("(=> (instance ?Spring SpringSeason) (exists (?WINTER) (and (instance ?WINTER WinterSeason) (meetsTemporally ?WINTER ?SPRING))))").
 %
-:-assert_kif("(subclass SummerSeason SeasonOfYear)").
+:-assert_kif("(genls SummerSeason SeasonOfYear)").
 :-assert_kif("(documentation SummerSeason \"The &%SeasonOfYear that begins at the summer solstice and ends at the autumnal equinox.\")").
 %
 :-assert_kif("(=> (instance ?SUMMER SummerSeason) (exists (?SPRING) (and (instance ?SPRING SpringSeason) (meetsTemporally ?SPRING ?SUMMER))))").
 %
 :-assert_kif("(=> (instance ?SUMMER SummerSeason) (exists (?AUTUMN) (and (instance ?AUTUMN FallSeason) (meetsTemporally ?SUMMER ?AUTUMN))))").
 %
-:-assert_kif("(subclass FallSeason SeasonOfYear)").
+:-assert_kif("(genls FallSeason SeasonOfYear)").
 :-assert_kif("(documentation FallSeason \"The &%SeasonOfYear that begins at the autumnal equinox and ends at the winter solstice.\")").
 %
 :-assert_kif("(=> (instance ?AUTUMN FallSeason) (exists (?SUMMER) (and (instance ?SUMMER SummerSeason) (meetsTemporally ?SUMMER ?AUTUMN))))").
@@ -9472,7 +9472,7 @@
 %
 :-assert_kif("(=> (holdsDuring ?TIME (attribute ?AGENT Surprise)) (exists (?PART ?PROP) (and (temporalPart ?PART (PastFn ?TIME)) (holdsDuring ?PART (expects ?AGENT ?PROP)) (holdsDuring ?TIME (true ?PROP False)))))").
 %
-:-assert_kif("(subclass SecondaryColor ColorAttribute)").
+:-assert_kif("(genls SecondaryColor ColorAttribute)").
 :-assert_kif("(documentation SecondaryColor \"A color that is the product of mixing together two or more &%PrimaryColors.\")").
 %
 :-assert_kif("(=> (and (instance ?COLOR SecondaryColor) (attribute ?OBJ ?COLOR)) (exists (?PROCESS ?RESOURCE1 ?RESOURCE2) (and (result ?PROCESS ?OBJ) (resource ?PROCESS ?RESOURCE1) (resource ?PROCESS ?RESOURCE2) (attribute ?RESOURCE1 ?PRIMARY1) (attribute ?RESOURCE2 ?PRIMARY2) (instance ?PRIMARY1 PrimaryColor) (instance ?PRIMARY2 PrimaryColor) (not (equal ?PRIMARY1 ?PRIMARY2)))))").
@@ -9501,12 +9501,12 @@
 %
 :-assert_kif("(=> (and (attribute ?SYLLABLE Stressed) (instance ?WORD Word) (part ?SYLLABLE ?WORD)) (not (exists (?SYLLABLE2) (and (instance ?SYLLABLE2 Syllable) (part ?SYLLABLE2 ?WORD) (not (equal ?SYLLABLE2 ?SYLLABLE))))))").
 %
-:-assert_kif("(subclass Syllable SymbolicString)").
+:-assert_kif("(genls Syllable SymbolicString)").
 :-assert_kif("(documentation Syllable \"A sequence of &%Characters from the same &%Word that denote a single sound.\")").
 %
 :-assert_kif("(=> (instance ?WORD Word) (exists (?SYLLABLE) (and (instance ?SYLLABLE Syllable) (part ?SYLLABLE ?WORD))))").
 %
-:-assert_kif("(subclass DigitCharacter Character)").
+:-assert_kif("(genls DigitCharacter Character)").
 :-assert_kif("(documentation DigitCharacter \"Any &%Character that is comprised of a single digit, i .e. one of the numerals 0, 1, 2, 3, 4, 5, 6, 7, 8, 9.\")").
 %
 :-assert_kif("(instance Lost ContestAttribute)").
@@ -9516,12 +9516,12 @@
 :-assert_kif("(instance Won ContestAttribute)").
 :-assert_kif("(documentation Won \"The &%ContestAttribute that applies to a &%Contest participant who has won the &%Contest.\")").
 %
-:-assert_kif("(subclass GameAttribute ContestAttribute)").
+:-assert_kif("(genls GameAttribute ContestAttribute)").
 :-assert_kif("(documentation GameAttribute \"Any &%ContestAttribute that is specific to a &%Game.\")").
 %
 :-assert_kif("(=> (and (property ?THING ?ATTR) (instance ?ATTR GameAttribute)) (exists (?GAME) (and (instance ?GAME Game) (or (agent ?GAME ?THING) (patient ?GAME ?THING) (subProcess ?THING ?GAME)))))").
 %
-:-assert_kif("(subclass SportAttribute GameAttribute)").
+:-assert_kif("(genls SportAttribute GameAttribute)").
 :-assert_kif("(documentation SportAttribute \"Any &%GameAttribute that is specific to a &%Sport.\")").
 %
 :-assert_kif("(=> (and (property ?THING ?ATTR) (instance ?ATTR SportAttribute)) (exists (?SPORT) (and (instance ?SPORT Game) (or (agent ?SPORT ?THING) (patient ?SPORT ?THING) (subProcess ?THING ?SPORT)))))").
@@ -9529,18 +9529,18 @@
 :-assert_kif("(instance BaseballStrike SportAttribute)").
 :-assert_kif("(documentation BaseballStrike \"A baseball pitch that is in the strike zone and that is not hit by the batter.\")").
 %
-:-assert_kif("(subclass PoliticoEconomicAttribute RelationalAttribute)").
+:-assert_kif("(genls PoliticoEconomicAttribute RelationalAttribute)").
 :-assert_kif("(partition PoliticoEconomicAttribute FormOfGovernment EconomicAttribute)").
 :-assert_kif("(documentation PoliticoEconomicAttribute \"Any &%Attribute of a &%Government which specifies some aspect of the political or economic system of the &%Government.\")").
 %
 :-assert_kif("(=> (and (instance ?ATTRIBUTE PoliticoEconomicAttribute) (attribute ?GOVERNMENT ?ATTRIBUTE)) (instance ?GOVERNMENT Government))").
 %
-:-assert_kif("(subclass Oxidation ChemicalProcess)").
+:-assert_kif("(genls Oxidation ChemicalProcess)").
 :-assert_kif("(documentation Oxidation \"Any &%ChemicalProcess where &%Electrons are removed from the substance undergoing the &%ChemicalProcess.\")").
 %
 :-assert_kif("(=> (and (instance ?OXIDATE Oxidation) (patient ?OXIDATE ?SUBSTANCE) (holdsDuring (BeginFn (WhenFn ?OXIDATE)) (electronNumber ?SUBSTANCE ?GREATER))) (exists (?LOWER) (and (lessThan ?LOWER ?GREATER) (holdsDuring (EndFn (WhenFn ?OXIDATE)) (electronNumber ?SUBSTANCE ?LOWER)))))").
 %
-:-assert_kif("(subclass Dialysis Separating)").
+:-assert_kif("(genls Dialysis Separating)").
 :-assert_kif("(documentation Dialysis \"Any process of &%Separating a &%Solution into two or more constituent &%PureSubstances by means of their unequal diffusion through membranes that are partially permeable.\")").
 %
 :-assert_kif("(=> (instance ?DIALYSIS Dialysis) (exists (?SOLUTION ?SUBSTANCE1 ?SUBSTANCE2) (and (resource ?DIALYSIS ?SOLUTION) (instance ?SOLUTION Solution) (result ?DIALYSIS ?SUBSTANCE1) (instance ?SUBSTANCE1 PureSubstance) (result ?DIALYSIS ?SUBSTANCE2) (instance ?SUBSTANCE2 PureSubstance) (not (equal ?SUBSTANCE1 ?SUBSTANCE2)))))").
@@ -9552,21 +9552,21 @@
 %
 :-assert_kif("(=> (property ?PROCESS ChemicalEquilibrium) (exists (?RATIO) (=> (and (holdsDuring ?TIME (resource ?PROCESS ?RESOURCE)) (holdsDuring ?TIME (result ?PROCESS ?RESULT))) (equal ?RATIO (DivisionFn ?RESOURCE ?RESULT)))))").
 %
-:-assert_kif("(subclass GeometricFigure ShapeAttribute)").
+:-assert_kif("(genls GeometricFigure ShapeAttribute)").
 :-assert_kif("(partition GeometricFigure GeometricPoint OneDimensionalFigure TwoDimensionalFigure ThreeDimensionalFigure)").
 :-assert_kif("(documentation GeometricFigure \"The class of all geometric figures, i.e. the class of all abstract, spatial representations. The instances of this class are &%GeometricPoints, &%TwoDimensionalFigures or &%ThreeDimensionalFigures.\")").
 %
-:-assert_kif("(subclass GeometricPoint GeometricFigure)").
+:-assert_kif("(genls GeometricPoint GeometricFigure)").
 :-assert_kif("(documentation GeometricPoint \"The class of zero-dimensional &%GeometricFigures, i.e. the class of &%GeometricFigures that have position but lack extension in any dimension.\")").
 %
-:-assert_kif("(subclass OneDimensionalFigure GeometricFigure)").
+:-assert_kif("(genls OneDimensionalFigure GeometricFigure)").
 :-assert_kif("(documentation OneDimensionalFigure \"The class of &%GeometricFigures that have position and an extension along a single dimension, viz. straight lines.\")").
 %
-:-assert_kif("(subclass TwoDimensionalFigure GeometricFigure)").
+:-assert_kif("(genls TwoDimensionalFigure GeometricFigure)").
 :-assert_kif("(partition TwoDimensionalFigure OpenTwoDimensionalFigure ClosedTwoDimensionalFigure)").
 :-assert_kif("(documentation TwoDimensionalFigure \"The class of &%GeometricFigures that have position and an extension along two dimensions, viz. plane figures like circles and polygons.\")").
 %
-:-assert_kif("(subclass OpenTwoDimensionalFigure TwoDimensionalFigure)").
+:-assert_kif("(genls OpenTwoDimensionalFigure TwoDimensionalFigure)").
 :-assert_kif("(documentation OpenTwoDimensionalFigure \"The class of &%TwoDimensionalFigures that are not &%ClosedTwoDimensionalFigures.\")").
 %
 :-assert_kif("(subrelation contestParticipant agent)").
@@ -9575,42 +9575,42 @@
 :-assert_kif("(domain contestParticipant 2 Agent)").
 :-assert_kif("(documentation contestParticipant \" (&%contestParticipant ?CONTEST ?AGENT) means that ?AGENT is one of the sides in the &%Contest ?CONTEST. For example , if the ?CONTEST is a football game, then ?AGENT would be one of the opposing teams. For another example, if ?CONTEST is a &%Battle, then ?AGENT would be one of the sides fighting each other.\")").
 %
-:-assert_kif("(subclass CivilWar War)").
+:-assert_kif("(genls CivilWar War)").
 :-assert_kif("(documentation CivilWar \"A &%War in which the fighting &%GeopoliticalAreas are both part of the same &%Nation.\")").
 %
 :-assert_kif("(=> (instance ?WAR CivilWar) (exists (?NATION) (and (instance ?NATION Nation) (forall (?AGENT) (=> (contestParticipant ?WAR ?AGENT) (geopoliticalSubdivision ?AGENT ?NATION))))))").
 %
-:-assert_kif("(subclass Debating Contest)").
-:-assert_kif("(subclass Debating LinguisticCommunication)").
+:-assert_kif("(genls Debating Contest)").
+:-assert_kif("(genls Debating LinguisticCommunication)").
 :-assert_kif("(documentation Debating \"A &%Contest where each participant holds a different view regarding some issue, and each participant attempts to prove, by rhetoric or evidence, that his/her own views about a particular matter are correct and/or that the views of the other participants are incorrect.\")").
 %
-:-assert_kif("(subclass Negotiating Contest)").
-:-assert_kif("(subclass Negotiating LinguisticCommunication)").
+:-assert_kif("(genls Negotiating Contest)").
+:-assert_kif("(genls Negotiating LinguisticCommunication)").
 :-assert_kif("(documentation Negotiating \"A &%Contest where each participant attempts to maximize his self-interest in a &%Promise that marks the end of the &%Contest.\")").
 %
 :-assert_kif("(=> (instance ?NEGOTIATE Negotiating) (hasPurpose ?NEGOTIATE (exists (?COMMIT) (and (instance ?COMMIT Committing) (subProcess ?COMMIT ?NEGOTIATE) (finishes (WhenFn ?COMMIT) (WhenFn ?NEGOTIATE))))))").
 %
-:-assert_kif("(subclass BusinessCompetition Contest)").
+:-assert_kif("(genls BusinessCompetition Contest)").
 :-assert_kif("(documentation BusinessCompetition \"Any &%Contest where the &%contestParticipants are &%Corporations and the aim is to win as many customers as possible.\")").
 %
 :-assert_kif("(=> (and (instance ?CONTEST BusinessCompetition) (contestParticipant ?CONTEST ?AGENT)) (instance ?AGENT Corporation))").
 %
-:-assert_kif("(subclass Boxing ViolentContest)").
-:-assert_kif("(subclass Boxing Sport)").
+:-assert_kif("(genls Boxing ViolentContest)").
+:-assert_kif("(genls Boxing Sport)").
 :-assert_kif("(documentation Boxing \"A sport which involves two participants who try to knock each other out in a limited number of rounds. Note that each instance of &%Boxing is a boxing match.\")").
 %
-:-assert_kif("(subclass Gymnastics Sport)").
+:-assert_kif("(genls Gymnastics Sport)").
 :-assert_kif("(documentation Gymnastics \"A sport which involves exercises of agility on a range of gymnastic equipment.\")").
 %
-:-assert_kif("(subclass Baseball Sport)").
+:-assert_kif("(genls Baseball Sport)").
 :-assert_kif("(documentation Baseball \"A sport which involves two teams of 9 players each that take turns at bat and attempt to score runs. Note that each instance of &%Baseball is a baseball game.\")").
 %
-:-assert_kif("(subclass BaseballTeam SportsTeam)").
+:-assert_kif("(genls BaseballTeam SportsTeam)").
 :-assert_kif("(documentation BaseballTeam \"The class of &%SportsTeams that play &%Baseball.\")").
 %
 :-assert_kif("(=> (instance ?TEAM BaseballTeam) (capability Baseball agent ?TEAM))").
 %
-:-assert_kif("(subclass BaseballInning Maneuver)").
+:-assert_kif("(genls BaseballInning Maneuver)").
 :-assert_kif("(documentation BaseballInning \"A division of a &%Baseball game. A normal game consists of 9 innings, and each inning involves a turn a bat for both teams.\")").
 %
 :-assert_kif("(=> (instance ?INNING BaseballInning) (exists (?GAME) (and (instance ?GAME Baseball) (subProcess ?INNING ?GAME))))").
@@ -9625,43 +9625,43 @@
 %
 :-assert_kif("(=> (attribute ?HAND Fist) (instance ?HAND Hand))").
 %
-:-assert_kif("(subclass LyingDown BodyMotion)").
+:-assert_kif("(genls LyingDown BodyMotion)").
 :-assert_kif("(documentation LyingDown \"The &%BodyMotion of moving from a &%Sitting to a &%Prostrate position.\")").
 %
 :-assert_kif("(=> (and (instance ?LIE LyingDown) (agent ?LIE ?AGENT)) (and (holdsDuring (BeginFn (WhenFn ?LIE)) (attribute ?AGENT Sitting)) (holdsDuring (EndFn (WhenFn ?LIE)) (attribute ?AGENT Prostrate))))").
 %
-:-assert_kif("(subclass SittingDown BodyMotion)").
+:-assert_kif("(genls SittingDown BodyMotion)").
 :-assert_kif("(documentation SittingDown \"The &%BodyMotion of moving from a &%Standing to a &%Sitting position.\")").
 %
 :-assert_kif("(=> (and (instance ?SIT SittingDown) (agent ?SIT ?AGENT)) (and (holdsDuring (BeginFn (WhenFn ?SIT)) (attribute ?AGENT Standing)) (holdsDuring (EndFn (WhenFn ?SIT)) (attribute ?AGENT Sitting))))").
 %
-:-assert_kif("(subclass StandingUp BodyMotion)").
+:-assert_kif("(genls StandingUp BodyMotion)").
 :-assert_kif("(documentation StandingUp \"The &%BodyMotion of moving from a &%Sitting to a &%Standing position.\")").
 %
 :-assert_kif("(=> (and (instance ?STAND StandingUp) (agent ?STAND ?AGENT)) (and (holdsDuring (BeginFn (WhenFn ?STAND)) (attribute ?AGENT Sitting)) (holdsDuring (EndFn (WhenFn ?STAND)) (attribute ?AGENT Standing))))").
 %
-:-assert_kif("(subclass OpeningEyes BodyMotion)").
+:-assert_kif("(genls OpeningEyes BodyMotion)").
 :-assert_kif("(disjoint OpeningEyes ClosingEyes)").
 :-assert_kif("(documentation OpeningEyes \"The &%BodyMotion of relaxing the eye lids so that the corneas are exposed to light.\")").
 %
-:-assert_kif("(subclass ClosingEyes BodyMotion)").
+:-assert_kif("(genls ClosingEyes BodyMotion)").
 :-assert_kif("(documentation ClosingEyes \"The &%BodyMotion of tensing the eye lids so that the corneas are not exposed to light.\")").
 %
-:-assert_kif("(subclass Winking ClosingEyes)").
-:-assert_kif("(subclass Winking Gesture)").
+:-assert_kif("(genls Winking ClosingEyes)").
+:-assert_kif("(genls Winking Gesture)").
 :-assert_kif("(documentation Winking \"Any instance of &%ClosingEyes which is intended to express something to someone else.\")").
 %
-:-assert_kif("(subclass Shrugging BodyMotion)").
-:-assert_kif("(subclass Shrugging Gesture)").
+:-assert_kif("(genls Shrugging BodyMotion)").
+:-assert_kif("(genls Shrugging Gesture)").
 :-assert_kif("(documentation Shrugging \"Moving the &%Shoulders in such a way that the motion is intended to express something to someone else.\")").
 %
 :-assert_kif("(=> (and (instance ?SHRUG Shrugging) (patient ?SHRUG ?SHOULDER)) (instance ?SHOULDER Shoulder))").
 %
-:-assert_kif("(subclass Trembling BodyMotion)").
-:-assert_kif("(subclass Trembling (ComplementFn IntentionalProcess))").
+:-assert_kif("(genls Trembling BodyMotion)").
+:-assert_kif("(genls Trembling (ComplementFn IntentionalProcess))").
 :-assert_kif("(documentation Trembling \"Any &%BodyMotion which is involuntary and which is repeated many times over a short time frame, e.g. a tremor in the hands.\")").
 %
-:-assert_kif("(subclass DomesticAnimal Animal)").
+:-assert_kif("(genls DomesticAnimal Animal)").
 :-assert_kif("(disjoint DomesticAnimal Human)").
 :-assert_kif("(documentation DomesticAnimal \"Any &%Animal that is kept by a &%Human, as a pet, as livestock, for exhibition, etc.\")").
 %
@@ -9669,93 +9669,93 @@
 %
 :-assert_kif("(=> (instance ?FEED Fodder) (hasPurpose ?FEED (exists (?ANIMAL ?EAT) (and (instance ?ANIMAL DomesticAnimal) (instance ?EAT Eating) (agent ?EAT ?ANIMAL) (patient ?EAT ?FEED)))))").
 %
-:-assert_kif("(subclass Horse HoofedMammal)").
-:-assert_kif("(subclass Horse DomesticAnimal)").
+:-assert_kif("(genls Horse HoofedMammal)").
+:-assert_kif("(genls Horse DomesticAnimal)").
 :-assert_kif("(documentation Horse \"A domesticated &%HoofedMammal that is used for transportation and work.\")").
 %
-:-assert_kif("(subclass Donkey HoofedMammal)").
-:-assert_kif("(subclass Donkey DomesticAnimal)").
+:-assert_kif("(genls Donkey HoofedMammal)").
+:-assert_kif("(genls Donkey DomesticAnimal)").
 :-assert_kif("(documentation Donkey \"A domesticated &%HoofedMammal that is used for work .\")").
 %
-:-assert_kif("(subclass Mule HoofedMammal)").
-:-assert_kif("(subclass Mule DomesticAnimal)").
+:-assert_kif("(genls Mule HoofedMammal)").
+:-assert_kif("(genls Mule DomesticAnimal)").
 :-assert_kif("(documentation Mule \"The product of a &%Male &%Donkey and a &%Female &%Horse. &%Mules are always sterile.\")").
 %
 :-assert_kif("(=> (instance ?MULE Mule) (exists (?DONKEY ?HORSE) (and (father ?MULE ?DONKEY) (instance ?DONKEY Donkey) (mother ?MULE ?HORSE) (instance ?HORSE Horse))))").
 %
 :-assert_kif("(=> (instance ?MULE Mule) (not (capability SexualReproduction agent ?MULE)))").
 %
-:-assert_kif("(subclass Sheep HoofedMammal)").
-:-assert_kif("(subclass Sheep DomesticAnimal)").
+:-assert_kif("(genls Sheep HoofedMammal)").
+:-assert_kif("(genls Sheep DomesticAnimal)").
 :-assert_kif("(documentation Sheep \"A domesticated &%HoofedMammal that is bred for its wool and for its meat (known as mutton).\")").
 %
-:-assert_kif("(subclass Cow HoofedMammal)").
-:-assert_kif("(subclass Cow DomesticAnimal)").
+:-assert_kif("(genls Cow HoofedMammal)").
+:-assert_kif("(genls Cow DomesticAnimal)").
 :-assert_kif("(documentation Cow \"A domesticated &%HoofedMammal that is raised for milk and beef, and is also used for work.\")").
 %
-:-assert_kif("(subclass FemaleCow Cow)").
+:-assert_kif("(genls FemaleCow Cow)").
 :-assert_kif("(documentation FemaleCow \"A &%Cow that is &%Female.\")").
 %
 :-assert_kif("(<=> (instance ?COW FemaleCow) (and (instance ?COW Cow) (attribute ?COW Female)))").
 %
-:-assert_kif("(subclass Chicken Bird)").
-:-assert_kif("(subclass Chicken DomesticAnimal)").
-:-assert_kif("(documentation Chicken \"A subclass of &%Bird that is raised for its meat and for its eggs.\")").
+:-assert_kif("(genls Chicken Bird)").
+:-assert_kif("(genls Chicken DomesticAnimal)").
+:-assert_kif("(documentation Chicken \"A genls of &%Bird that is raised for its meat and for its eggs.\")").
 %
-:-assert_kif("(subclass Hen Chicken)").
+:-assert_kif("(genls Hen Chicken)").
 :-assert_kif("(documentation Hen \"A &%Female &%Chicken.\")").
 %
 :-assert_kif("(<=> (instance ?HEN Hen) (and (instance ?HEN Chicken) (attribute ?HEN Female)))").
 %
-:-assert_kif("(subclass ChickenMeat Meat)").
+:-assert_kif("(genls ChickenMeat Meat)").
 :-assert_kif("(documentation ChickenMeat \"&%Meat that was originally part of a &%Chicken.\")").
 %
 :-assert_kif("(<=> (instance ?MEAT ChickenMeat) (exists (?CHICKEN) (and (instance ?MEAT Meat) (instance ?CHICKEN Chicken) (part ?MEAT ?CHICKEN))))").
 %
-:-assert_kif("(subclass Mouse Rodent)").
+:-assert_kif("(genls Mouse Rodent)").
 :-assert_kif("(documentation Mouse \"A &%Rodent that has a hairless tail like a rat but that is smaller than a rat.\")").
 %
-:-assert_kif("(subclass Hay Fodder)").
+:-assert_kif("(genls Hay Fodder)").
 :-assert_kif("(documentation Hay \"&%Grass that has been cut and cured for use as &%Fodder.\")").
 %
 :-assert_kif("(=> (instance ?HAY Hay) (exists (?MAKE) (and (instance ?MAKE Making) (resource ?MAKE ?GRASS) (instance ?GRASS Grass) (result ?MAKE ?HAY))))").
 %
-:-assert_kif("(subclass Copying Making)").
+:-assert_kif("(genls Copying Making)").
 :-assert_kif("(documentation Copying \"&%Making a &%copy of something.\")").
 %
 :-assert_kif("(=> (and (instance ?COPY Copying) (resource ?COPY ?THING1) (result ?COPY ?THING2)) (copy ?THING1 ?THING2))").
 %
-:-assert_kif("(subclass Vacationing RecreationOrExercise)").
+:-assert_kif("(genls Vacationing RecreationOrExercise)").
 :-assert_kif("(documentation Vacationing \"Taking time off from &%Working.\")").
 %
 :-assert_kif("(=> (and (instance ?VACATION Vacationing) (instance ?WORK Working) (agent ?VACATION ?PERSON) (agent ?WORK ?PERSON) (instance ?PERSON Human)) (not (overlapsTemporally (WhenFn ?VACATION) (WhenFn ?WORK))))").
 %
-:-assert_kif("(subclass Working FinancialTransaction)").
+:-assert_kif("(genls Working FinancialTransaction)").
 :-assert_kif("(documentation Working \"Any &%FinancialTransaction where someone exchanges his /her labor for an instance of &%CurrencyMeasure.\")").
 %
-:-assert_kif("(subclass Farming Working)").
+:-assert_kif("(genls Farming Working)").
 :-assert_kif("(documentation Farming \"Operating a farm, e.g. planting and harvesting crops, tending livestock, etc.\")").
 %
 :-assert_kif("(=> (and (instance ?FARMING Farming) (agent ?FARMING ?FARMER)) (exists (?FARM) (and (instance ?FARM Farm) (holdsDuring (WhenFn ?FARMING) (located ?FARMER ?FARM)))))").
 %
-:-assert_kif("(subclass Serving Working)").
+:-assert_kif("(genls Serving Working)").
 :-assert_kif("(documentation Serving \"Working as a waiter or servant, either for an &%Organization (e.g. a restaurant) or for a person or family.\")").
 %
-:-assert_kif("(subclass Sales Working)").
+:-assert_kif("(genls Sales Working)").
 :-assert_kif("(documentation Sales \"Any instance of &%Working that involves &%Selling or trying to sell items.\")").
 %
 :-assert_kif("(subAttribute Retired Unemployed)").
 :-assert_kif("(documentation Retired \"Voluntary unemployment toward the end of one's life.\")").
 %
-:-assert_kif("(subclass SkilledOccupation Position)").
+:-assert_kif("(genls SkilledOccupation Position)").
 :-assert_kif("(documentation SkilledOccupation \"Any &%Position which requires learning a set of skills.\")").
 %
 :-assert_kif("(=> (and (instance ?OCCUPATION SkilledOccupation) (attribute ?PERSON ?OCCUPATION)) (exists (?TRAINING) (and (instance ?TRAINING EducationalProcess) (destination ?TRAINING ?PERSON))))").
 %
-:-assert_kif("(subclass ManualLabor Position)").
+:-assert_kif("(genls ManualLabor Position)").
 :-assert_kif("(documentation ManualLabor \"Any &%Position which involves manual work .\")").
 %
-:-assert_kif("(subclass UnskilledOccupation ManualLabor)").
+:-assert_kif("(genls UnskilledOccupation ManualLabor)").
 :-assert_kif("(disjoint UnskilledOccupation SkilledOccupation)").
 :-assert_kif("(documentation UnskilledOccupation \"Any &%Position which does not require learning a set of skills.\")").
 %
@@ -9769,51 +9769,51 @@
 :-assert_kif("(instance TheaterProfession SkilledOccupation)").
 :-assert_kif("(documentation TheaterProfession \"Often know as the stage, the &%Position of performing live plays.\")").
 %
-:-assert_kif("(subclass Coach SkilledOccupation)").
+:-assert_kif("(genls Coach SkilledOccupation)").
 :-assert_kif("(documentation Coach \"Any occupation that involves training an athlete or a sports team.\")").
 %
-:-assert_kif("(subclass OccupationalTrade SkilledOccupation)").
-:-assert_kif("(subclass OccupationalTrade ManualLabor)").
+:-assert_kif("(genls OccupationalTrade SkilledOccupation)").
+:-assert_kif("(genls OccupationalTrade ManualLabor)").
 :-assert_kif("(documentation OccupationalTrade \"Any &%Position that involves skilled manual work.\")").
 %
-:-assert_kif("(subclass Profession SkilledOccupation)").
+:-assert_kif("(genls Profession SkilledOccupation)").
 :-assert_kif("(disjoint Profession OccupationalTrade)").
 :-assert_kif("(documentation Profession \"SUMO: Any occupation that requires at least a bachelor's degree. NOTE: this wasn't always true, and still may not be true in borderline cases. Better would be to require a degree *or* some form of licensing - e.g. one can be a teacher by passing a teacher certification test. - PJC.\")").
 %
 :-assert_kif("(=> (and (or (instance ?ROLE SkilledTrade) (instance ?ROLE Profession)) (attribute ?HUMAN ?ROLE)) (exists (?FIELD) (and (instance ?FIELD FieldOfStudy) (knows ?HUMAN ?FIELD))))").
 %
-:-assert_kif("(subclass Cleric Profession)").
+:-assert_kif("(genls Cleric Profession)").
 :-assert_kif("(documentation Cleric \"The &%Profession of being in charge of or ministering to a &%ReligousOrganization.\")").
 %
 :-assert_kif("(<=> (occupiesPosition ?PERSON Cleric ?ORG) (and (leader ?ORG ?PERSON) (instance ?ORG ReligiousOrganization)))").
 %
-:-assert_kif("(subclass PoliceOfficer Profession)").
+:-assert_kif("(genls PoliceOfficer Profession)").
 :-assert_kif("(documentation PoliceOfficer \"The &%Profession of being a police officer, i.e. working for a law enforcement agency that is part of a &%Government.\")").
 %
-:-assert_kif("(subclass PoliceDetective PoliceOfficer)").
+:-assert_kif("(genls PoliceDetective PoliceOfficer)").
 :-assert_kif("(documentation PoliceDetective \"The &%Profession of being a police detective , i.e. being a &%PoliceOfficer whose duties include the investigation of crimes.\")").
 %
-:-assert_kif("(subclass PrivateDetective Profession)").
+:-assert_kif("(genls PrivateDetective Profession)").
 :-assert_kif("(disjoint PrivateDetective PoliceDetective)").
 :-assert_kif("(documentation PrivateDetective \"The &%Profession of being a private detective, i .e. a detective who can be hired for a fee to investigate something.\")").
 %
-:-assert_kif("(subclass Professor Profession)").
+:-assert_kif("(genls Professor Profession)").
 :-assert_kif("(documentation Professor \"The &%Profession of being a &%teacher at a &%PostSecondarySchool.\")").
 %
 :-assert_kif("(=> (and (instance ?PROF Professor) (occupiesPosition ?PERSON ?PROF ?ORG)) (and (teacher ?ORG ?PROF) (instance ?ORG PostSecondarySchool)))").
 %
-:-assert_kif("(subclass MedicalDoctor Profession)").
+:-assert_kif("(genls MedicalDoctor Profession)").
 :-assert_kif("(documentation MedicalDoctor \"The &%Profession of being a medical doctor, i .e. having attended medical school and being licensed to practice medicine.\")").
 %
-:-assert_kif("(=> (attribute ?DOCTOR MedicalDoctor) (exists (?PROCESS1 ?PROCESS2) (and (subclass ?PROCESS1 DiagnosticProcess) (subclass ?PROCESS2 TherapeuticProcess) (capability ?PROCESS1 agent ?DOCTOR) (capability ?PROCESS2 agent ?DOCTOR))))").
+:-assert_kif("(=> (attribute ?DOCTOR MedicalDoctor) (exists (?PROCESS1 ?PROCESS2) (and (genls ?PROCESS1 DiagnosticProcess) (genls ?PROCESS2 TherapeuticProcess) (capability ?PROCESS1 agent ?DOCTOR) (capability ?PROCESS2 agent ?DOCTOR))))").
 %
-:-assert_kif("(subclass NewsReporter Profession)").
+:-assert_kif("(genls NewsReporter Profession)").
 :-assert_kif("(documentation NewsReporter \"The &%Profession of being a news reporter, i.e. investigating and reporting, in a publication or broadcast program, current events .\")").
 %
-:-assert_kif("(subclass Science FieldOfStudy)").
+:-assert_kif("(genls Science FieldOfStudy)").
 :-assert_kif("(documentation Science \"Any &%FieldOfStudy which tests theories on the basis of careful observations and/or experiments and which has a cumulative body of results.\")").
 %
-:-assert_kif("(subclass SocialScience Science)").
+:-assert_kif("(genls SocialScience Science)").
 :-assert_kif("(documentation SocialScience \"Any &%Science which studies human behavior, either in the aggregate, as do, for example, &%Economics and &%Linguistics, or with respect to the individual, as does &%Psychology.\")").
 %
 :-assert_kif("(subrelation subField subProposition)").
@@ -9837,7 +9837,7 @@
 %
 :-assert_kif("(=> (hasOccupation ?PERSON ?WORK) (exists (?INST) (and (instance ?INST ?WORK) (instance ?INST Working) (agent ?INST ?PERSON))))").
 %
-:-assert_kif("(subclass Bleeding AutonomicProcess)").
+:-assert_kif("(genls Bleeding AutonomicProcess)").
 :-assert_kif("(documentation Bleeding \"The release of &%Blood from an &%Animal in response to an &%Injuring of some sort.\")").
 %
 :-assert_kif("(=> (instance ?BLEED Bleeding) (exists (?INJURY) (and (instance ?INJURY Injuring) (causes ?INJURY ?BLEED))))").
@@ -9852,8 +9852,8 @@
 % :-assert_kif(";and we substitute LegalContract where a class is required, ").
 % :-assert_kif(";and changed the attribute 'Contract' to 'Contractual'. ").
 % :-assert_kif("; This class is not yet properly axiomatized. ").
-:-assert_kif("(subclass LegalContract Assertion)").
-:-assert_kif("(subclass LegalContract DocumentalProposition)").
+:-assert_kif("(genls LegalContract Assertion)").
+:-assert_kif("(genls LegalContract DocumentalProposition)").
 :-assert_kif("(hasAttributeInstance LegalContract Contractual)").
 :-assert_kif("(documentation LegalContract \"A LegalContract is a Proposition consisting of a pair of promises, each conditioned upon the other.\")").
 %
@@ -9868,39 +9868,39 @@
 %
 :-assert_kif("(=> (hasAttributeInstance ?CLASS ?ATTRIB) (forall (?ENT) (=> (instance ?ENT ?CLASS) (property ?ENT ?ATTRIB))))").
 %
-:-assert_kif("(subclass ClosingContract Committing)").
+:-assert_kif("(genls ClosingContract Committing)").
 :-assert_kif("(documentation ClosingContract \"Completing a &%Contract of some sort, e .g. the purchase of a house, closing a business deal, etc.\")").
 %
 :-assert_kif("(=> (and (instance ?CLOSE ClosingContract) (agent ?CLOSE ?AGENT) (destination ?CLOSE ?CONTRACT) (instance ?CONTRACT LegalContract)) (agreementMember ?CONTRACT ?AGENT))").
 %
-:-assert_kif("(subclass Opening Motion)").
+:-assert_kif("(genls Opening Motion)").
 :-assert_kif("(relatedInternalConcept Opening Closing)").
 :-assert_kif("(documentation Opening \"The &%Class of &%Processes where an aperture is created in an &%Object. Note that the aperture may be created intentionally, as when one opens a door, or unintentionally, as when the ground ruptures in a seismic event.\")").
 %
-:-assert_kif("(subclass Closing Motion)").
+:-assert_kif("(genls Closing Motion)").
 :-assert_kif("(documentation Closing \"The &%Class of &%Processes where an aperture is closed in an &%Object.\")").
 %
-:-assert_kif("(subclass PreparedFood Food)").
+:-assert_kif("(genls PreparedFood Food)").
 :-assert_kif("(documentation PreparedFood \"&%Food that is the result of &%Cooking.\")").
 %
 :-assert_kif("(=> (instance ?FOOD PreparedFood) (exists (?COOK) (and (instance ?COOK Cooking) (result ?COOK ?FOOD))))").
 %
-:-assert_kif("(subclass RawFood Food)").
+:-assert_kif("(genls RawFood Food)").
 :-assert_kif("(documentation RawFood \"&%Food that is not the result of &%Cooking.\")").
 %
 :-assert_kif("(=> (instance ?FOOD RawFood) (not (exists (?COOK) (and (instance ?COOK Cooking) (result ?COOK ?FOOD)))))").
 %
-:-assert_kif("(subclass SoupStock PreparedFood)").
+:-assert_kif("(genls SoupStock PreparedFood)").
 :-assert_kif("(documentation SoupStock \"&%Food which is prepared by reducing &%Meat and /or &%FruitOrVegetables to a translucent broth which can be used as a base for soups or sauces.\")").
 %
-:-assert_kif("(subclass Coffee Beverage)").
-:-assert_kif("(subclass Coffee PreparedFood)").
+:-assert_kif("(genls Coffee Beverage)").
+:-assert_kif("(genls Coffee PreparedFood)").
 :-assert_kif("(documentation Coffee \"A &%Beverage which is prepared by infusing ground, roasted coffee beans into hot water.\")").
 %
-:-assert_kif("(subclass DateFruit FruitOrVegetable)").
+:-assert_kif("(genls DateFruit FruitOrVegetable)").
 :-assert_kif("(documentation DateFruit \"A &%FruitOrVegetable that is produced by the date palm .\")").
 %
-:-assert_kif("(subclass Avocado FruitOrVegetable)").
+:-assert_kif("(genls Avocado FruitOrVegetable)").
 :-assert_kif("(documentation Avocado \"A &%FruitOrVegetable that is shaped like a pear and has a dark green skin and a rich meat.\")").
 %
 :-assert_kif("(instance protonNumber BinaryPredicate)").
@@ -9930,67 +9930,67 @@
 :-assert_kif("(domain atomicNumber 2 PositiveInteger)").
 :-assert_kif("(documentation atomicNumber \" (&%atomicNumber ?ELEMENT ?NUMBER) means that the &%ElementalSubstance ?ELEMENT has the atomic number ?NUMBER. The atomic number is the number of &%Protons in the nucleus of an &%Atom.\")").
 %
-:-assert_kif("(subclass Oxygen ElementalSubstance)").
+:-assert_kif("(genls Oxygen ElementalSubstance)").
 :-assert_kif("(atomicNumber Oxygen 8)").
 :-assert_kif("(documentation Oxygen \"A colourless, odourless gaseous element belonging to group 16 of the periodic table. It is the most abundant element present in the earth's crust. It also makes up 20.8 percent of the Earth's atmosphere. For industrial purposes, it is separated from liquid air by fractional distillation . It is used in high temperature welding, and in breathing. It commonly comes in the form of Oxygen, but is found as Ozone in the upper atmosphere . It was discovered by Priestley in 1774.\")").
 %
 :-assert_kif("(=> (and (instance ?ATOM Oxygen) (instance ?ATOM Atom)) (measure ?ATOM (MeasureFn 15.9994 Amu)))").
 %
-:-assert_kif("(subclass Chlorine ElementalSubstance)").
+:-assert_kif("(genls Chlorine ElementalSubstance)").
 :-assert_kif("(atomicNumber Chlorine 17)").
 :-assert_kif("(documentation Chlorine \"Halogen element. Poisonous greenish-yellow gas. Occurs widely in nature as sodium chloride in seawater. Reacts directly with many elements and compounds, strong oxidizing agent. Discovered by Karl Scheele in 1774. Humphrey David confirmed it as an element in 1810.\")").
 %
 :-assert_kif("(=> (and (instance ?ATOM Chlorine) (instance ?ATOM Atom)) (measure ?ATOM (MeasureFn 35.453 Amu)))").
 %
-:-assert_kif("(subclass Sodium ElementalSubstance)").
+:-assert_kif("(genls Sodium ElementalSubstance)").
 :-assert_kif("(atomicNumber Sodium 11)").
 :-assert_kif("(documentation Sodium \"Soft silvery reactive element belonging to group 1 of the periodic table (alkali metals). It is highly reactive, oxidizing in air and reacting violently with water, forcing it to be kept under oil. It was first isolated by Humphrey Davy in 1807.\")").
 %
 :-assert_kif("(=> (and (instance ?ATOM Sodium) (instance ?ATOM Atom)) (measure ?ATOM (MeasureFn 22.9898 Amu)))").
 %
-:-assert_kif("(subclass Hydrogen ElementalSubstance)").
+:-assert_kif("(genls Hydrogen ElementalSubstance)").
 :-assert_kif("(atomicNumber Hydrogen 1)").
 :-assert_kif("(documentation Hydrogen \"Colourless, odourless gaseous chemical element. Lightest and most abundant element in the universe. Present in water and in all organic compounds. Chemically reacts with most elements. Discovered by Henry Cavendish in 1776.\")").
 %
 :-assert_kif("(=> (and (instance ?ATOM Hydrogen) (instance ?ATOM Atom)) (measure ?ATOM (MeasureFn 1.0079 Amu)))").
 %
-:-assert_kif("(subclass Carbon ElementalSubstance)").
+:-assert_kif("(genls Carbon ElementalSubstance)").
 :-assert_kif("(atomicNumber Carbon 6)").
 :-assert_kif("(documentation Carbon \"Carbon is a member of group 14 of the periodic table . It has three allotropic forms of it, diamonds, graphite and fullerite . Carbon-14 is commonly used in radioactive dating. Carbon occurs in all organic life and is the basis of organic chemistry. Carbon has the interesting chemical property of being able to bond with itself, and a wide variety of other elements.\")").
 %
 :-assert_kif("(=> (and (instance ?ATOM Carbon) (instance ?ATOM Atom)) (measure ?ATOM (MeasureFn 12.01115 Amu)))").
 %
-:-assert_kif("(subclass Iodine ElementalSubstance)").
+:-assert_kif("(genls Iodine ElementalSubstance)").
 :-assert_kif("(atomicNumber Iodine 53)").
 :-assert_kif("(documentation Iodine \"Dark violet nonmetallic element, belongs to group 17 of the periodic table. Insoluble in water. Required as a trace element for living organisms. One stable isotope, I-127 exists, in addition to fourteen radioactive isotopes. Chemically the least reactive of the halogens, and the most electropositive metallic halogen. Discovered in 1812 by Courtois.\")").
 %
 :-assert_kif("(=> (and (instance ?ATOM Iodine) (instance ?ATOM Atom)) (measure ?ATOM (MeasureFn 126.904 Amu)))").
 %
-:-assert_kif("(subclass Iron ElementalSubstance)").
+:-assert_kif("(genls Iron ElementalSubstance)").
 :-assert_kif("(atomicNumber Iron 26)").
 :-assert_kif("(documentation Iron \"Silvery malleable and ductile metallic transition element . Has nine isotopes and is the fourth most abundant element in the earth 's crust. Required by living organisms as a trace element (used in hemoglobin in humans.) Quite reactive, oxidizes in moist air, displaces hydrogen from dilute acids and combines with nonmetallic elements.\")").
 %
 :-assert_kif("(=> (and (instance ?ATOM Iron) (instance ?ATOM Atom)) (measure ?ATOM (MeasureFn 55.847 Amu)))").
 %
-:-assert_kif("(subclass Helium ElementalSubstance)").
+:-assert_kif("(genls Helium ElementalSubstance)").
 :-assert_kif("(atomicNumber Helium 2)").
 :-assert_kif("(documentation Helium \"Colourless, odourless gaseous nonmetallic element. Belongs to group 18 of the periodic table. Lowest boiling point of all elements and can only be solidified under pressure. Chemically inert, no known compounds. Discovered in the solar spectrum in 1868 by Lockyer.\")").
 %
 :-assert_kif("(=> (and (instance ?ATOM Helium) (instance ?ATOM Atom)) (measure ?ATOM (MeasureFn 4.0026 Amu)))").
 %
-:-assert_kif("(subclass Nitrogen ElementalSubstance)").
+:-assert_kif("(genls Nitrogen ElementalSubstance)").
 :-assert_kif("(atomicNumber Nitrogen 7)").
 :-assert_kif("(documentation Nitrogen \"Colourless, gaseous element which belongs to group 15 of the periodic table. Constitutes ~78 percent of the atmosphere and is an essential part of the ecosystem. Nitrogen for industrial purposes is acquired by the fractional distillation of liquid air. Chemically inactive, reactive generally only at high temperatures or in electrical discharges. It was discovered in 1772 by D. Rutherford.\")").
 %
 :-assert_kif("(=> (and (instance ?ATOM Nitrogen) (instance ?ATOM Atom)) (measure ?ATOM (MeasureFn 14.0067 Amu)))").
 %
-:-assert_kif("(subclass Copper ElementalSubstance)").
+:-assert_kif("(genls Copper ElementalSubstance)").
 :-assert_kif("(atomicNumber Copper 29)").
 :-assert_kif("(documentation Copper \"Red-brown transition element. Known by the Romans as 'cuprum.' Extracted and used for thousands of years. Malleable, ductile and an excellent conductor of heat and electricity. When in moist conditions , a greenish layer forms on the outside.\")").
 %
 :-assert_kif("(=> (and (instance ?ATOM Copper) (instance ?ATOM Atom)) (measure ?ATOM (MeasureFn 63.54 Amu)))").
 %
-:-assert_kif("(subclass Zinc ElementalSubstance)").
+:-assert_kif("(genls Zinc ElementalSubstance)").
 :-assert_kif("(atomicNumber Zinc 30)").
 :-assert_kif("(documentation Zinc \"Blue-white metallic element. Occurs in multiple compounds naturally. Five stable isotopes are six radioactive isotopes have been found. Chemically a reactive metal, combines with oxygen and other non-metals, reacts with dilute acids to release hydrogen.\")").
 %
@@ -10000,10 +10000,10 @@
 % :-assert_kif(";Financial Ontology ").
 % :-assert_kif(";================== ").
 % :-assert_kif(";The following content is borrowed from the Financial Ontology. ").
-:-assert_kif("(subclass Stock FinancialInstrument)").
+:-assert_kif("(genls Stock FinancialInstrument)").
 :-assert_kif("(documentation Stock \"An instrument that signifies an ownership position, or equity, in a &%Corporation, and represents a claim on its proportionate share in the corporation's assets and profits.\")").
 %
-:-assert_kif("(subclass Share CurrencyMeasure)").
+:-assert_kif("(genls Share CurrencyMeasure)").
 :-assert_kif("(instance Share UnitOfMeasure)").
 :-assert_kif("(documentation Share \"A &%UnitOfMeasure representing one unit of ownership in a corporation, &%MutualFund, or limited partnership.\")").
 %
@@ -10017,19 +10017,19 @@
 :-assert_kif("(domain stockHolder 2 CognitiveAgent)").
 :-assert_kif("(documentation stockHolder \" (&%stockHolder ?Stock ?Agent) means that ?Agent possesses the &%Stock ?Stock.\")").
 %
-:-assert_kif("(subclass FinancialOrganization Corporation)").
+:-assert_kif("(genls FinancialOrganization Corporation)").
 :-assert_kif("(documentation FinancialOrganization \"The class &%FinancialOrganization includes , as subclasses, &%BankOrganization, &%CreditUnion and &%SavingsAndLoan.\")").
 %
-:-assert_kif("(subclass BankOrganization FinancialOrganization)").
+:-assert_kif("(genls BankOrganization FinancialOrganization)").
 :-assert_kif("(documentation BankOrganization \"An organization, chartered by a state or federal government, which does most or all of the following: receives &%Deposits, honors &%FinancialInstruments drawn on them, and pays interest on them;discounts &%Notes, makes &%Loans, and invests in &%SecuredLoans;collects &%Checks, &%Drafts and &%Notes, certifies depositor 's checks;and issues drafts and Cashier's checks.\")").
 %
-:-assert_kif("(subclass CreditUnion FinancialOrganization)").
+:-assert_kif("(genls CreditUnion FinancialOrganization)").
 :-assert_kif("(documentation CreditUnion \"Credit unions are non-profit, member-owned, financial cooperatives. They are operated entirely by and for their members . When money is deposited in a credit union, the depositor becomes a member of the union because the deposit is considered partial ownership in the credit union. Many large organizations have established credit unions for their employees.\")").
 %
-:-assert_kif("(subclass SavingsAndLoan FinancialOrganization)").
+:-assert_kif("(genls SavingsAndLoan FinancialOrganization)").
 :-assert_kif("(documentation SavingsAndLoan \"A federally or state chartered &%FinancialOrganization that takes &%Deposits from individuals, funds &%Mortgages, and pays &%Dividends.\")").
 %
-:-assert_kif("(subclass FinancialAccount LegalContract)").
+:-assert_kif("(genls FinancialAccount LegalContract)").
 :-assert_kif("(documentation FinancialAccount \"A formal banking, brokerage, or business relationship established to provide for regular services, dealings, and other financial transactions.\")").
 %
 :-assert_kif("(instance agreementMember BinaryPredicate)").
@@ -10068,16 +10068,16 @@
 %
 :-assert_kif("(=> (financialAsset ?Agent ?Asset) (exists (?Value) (monetaryValue ?Asset ?Value)))").
 %
-:-assert_kif("(subclass SomethingOfValue Entity)").
+:-assert_kif("(genls SomethingOfValue Entity)").
 :-assert_kif("(documentation SomethingOfValue \"Any entity which has any kind of value, monetary or emotional, to a cognitive agent. The value may be negative.\")").
 %
-:-assert_kif("(subclass SomethingOfPositiveValue SomethingOfValue)").
+:-assert_kif("(genls SomethingOfPositiveValue SomethingOfValue)").
 :-assert_kif("(documentation SomethingOfPositiveValue \"Anything which is viewed as a positive or good thing by a CognitiveAgent. CognitiveAgents will try to acquire good things unless they are associated with something negative.\")").
 %
-:-assert_kif("(subclass SomethingOfNegativeValue SomethingOfValue)").
+:-assert_kif("(genls SomethingOfNegativeValue SomethingOfValue)").
 :-assert_kif("(documentation SomethingOfNegativeValue \"Anything which is viewed as a negative or bad thing by a CognitiveAgent. CognitiveAgents will try to avoid bad things unless they are associated with something positive.\")").
 %
-:-assert_kif("(subclass Asset SomethingOfPositiveValue)").
+:-assert_kif("(genls Asset SomethingOfPositiveValue)").
 :-assert_kif("(documentation Asset \"Something of positive monetary value owned by a cognitive agent. Something that has negative monetary vaue is an obligaion or a debt.\")").
 %
 % :-assert_kif("; <axcom>An asset belongs to a CognitiveAgent.</axcom> ").
@@ -10086,7 +10086,7 @@
 % :-assert_kif("; <axcom>An asset has a positive monetary value for the agent that owns it.</axcom> ").
 :-assert_kif("(=> (instance ?Asset Asset) (exists (?Value) (and (instance ?Value CurrencyMeasure) (monetaryValue ?Asset ?Value) (greaterThanOrEqualTo MagnitudeFn (?Value) 0))))").
 %
-:-assert_kif("(subclass Debt SomethingOfNegativeValue)").
+:-assert_kif("(genls Debt SomethingOfNegativeValue)").
 :-assert_kif("(documentation Debt \"Something of negative monetary value which is an obligation (legal or moral) of a CognitiveAgent.\")").
 %
 % :-assert_kif("; <axcom>A debt has a negative monetary value to the agent. Note that debts are always expressed as negative monetary values -- a \"debt\" with a negative value would have to be an asset.</axcom> ").
@@ -10097,12 +10097,12 @@
 :-assert_kif("(domain hasAssociatedSituation 2 Situation)").
 :-assert_kif("(documentation hasAssociatedSituation \" (hasAssociatedSituation ?Sit1 ?Sit2) asserts that ?Sit1 has ?Sit2 associated with it, either necessarily or pragmatically (i.e. probabilistically, e.g. one situation usually is followed by or simultaneously occurs with ?Sit2, whether causally or otherwise). Such associations are important to Agent in determining whether one action may be beneficial or harmful.\")").
 %
-:-assert_kif("(subclass FillingAnOrder FinancialTransaction)").
+:-assert_kif("(genls FillingAnOrder FinancialTransaction)").
 :-assert_kif("(documentation FillingAnOrder \"Execute an order or buy or sell a &%Security.\")").
 %
 :-assert_kif("(=> (instance ?FILL FillingAnOrder) (exists (?OBJ) (and (patient ?TRANS ?OBJ) (instance ?OBJ Security))))").
 %
-:-assert_kif("(subclass Security FinancialInstrument)").
+:-assert_kif("(genls Security FinancialInstrument)").
 :-assert_kif("(documentation Security \"An investment instrument, other than an insurance policy or a fixed annuity issued by a corporation, government, or other organization which offers evidence of debt or equity.\")").
 %
 :-assert_kif("(instance currentAccountBalance TernaryPredicate)").
@@ -10119,7 +10119,7 @@
 %
 :-assert_kif("(=> (and (interestEarned ?Account ?Interest ?Time) (currentAccountBalance ?Account (BeginFn ?Time) ?Balance)) (currentAccountBalance ?Account (EndFn ?Time) (AdditionFn ?Balance ?Interest)))").
 %
-:-assert_kif("(subclass FinancialService CommercialService)").
+:-assert_kif("(genls FinancialService CommercialService)").
 :-assert_kif("(documentation FinancialService \"Services performed by &%FinancialOrganizations.\")").
 %
 :-assert_kif("(=> (instance ?Service FinancialService) (exists (?Org) (and (instance ?Org FinancialOrganization) (agent ?Service ?Org))))").
@@ -10154,27 +10154,27 @@
 %
 :-assert_kif("(=> (incomeEarned ?Agent ?Money ?Activity) (agent ?Activity ?Agent))").
 %
-:-assert_kif("(subclass ChargingAFee FinancialTransaction)").
+:-assert_kif("(genls ChargingAFee FinancialTransaction)").
 :-assert_kif("(documentation ChargingAFee \"An activity of a fee being charged\")").
 %
-:-assert_kif("(subclass Tax ChargingAFee)").
+:-assert_kif("(genls Tax ChargingAFee)").
 :-assert_kif("(documentation Tax \"A fee charged by a government on a product, income or activity.\")").
 %
 :-assert_kif("(=> (instance ?Tax Tax) (exists (?Org) (and (instance ?Org Government) (agent ?Tax ?Org))))").
 %
-:-assert_kif("(subclass DutyTax Tax)").
+:-assert_kif("(genls DutyTax Tax)").
 :-assert_kif("(documentation DutyTax \"A &%Tax that is levied on imports and/or exports.\")").
 %
 :-assert_kif("(=> (and (instance ?TAX DutyTax) (patient ?TAX ?OBJ)) (exists (?TRANSFER ?NATION1 ?NATION2) (and (instance ?TRANSFER Transfer) (patient ?TRANSFER ?OBJ) (origin ?TRANSFER ?NATION1) (destination ?TRANSFER ?NATION2) (instance ?NATION1 Nation) (instance ?NATION2 Nation) (not (equal ?NATION1 ?NATION2)) (earlier (WhenFn ?TRANSFER) (WhenFn ?TAX)) (causes ?TRANSFER ?TAX))))").
 %
 % :-assert_kif(";definition of Payment ").
-:-assert_kif("(subclass Payment FinancialTransaction)").
+:-assert_kif("(genls Payment FinancialTransaction)").
 :-assert_kif("(documentation Payment \"The partial or complete discharge of an obligation by its settlement in the form of the transfer of funds, assets, or services equal to the monetary value of part or all of the debtor's obligation.\")").
 %
 :-assert_kif("(=> (and (instance ?Payment Payment) (origin ?Payment ?Account) (instance ?Account FinancialAccount) (transactionAmount ?Payment ?Amount) (currentAccountBalance ?Account (ImmediatePastFn (WhenFn ?Payment)) ?Balance1) (equal ?Balance2 (SubtractionFn ?Balance1 ?Amount))) (currentAccountBalance ?Account (ImmediateFutureFn (WhenFn ?Payment)) ?Balance2))").
 %
 % :-assert_kif(";definition of Check ").
-:-assert_kif("(subclass Check FinancialInstrument)").
+:-assert_kif("(genls Check FinancialInstrument)").
 :-assert_kif("(documentation Check \"A &%FinancialInstrument drawn against deposited funds, to pay a specified amount of money to a specific person upon demand.\")").
 %
 :-assert_kif("(=> (instance ?Check Check) (exists (?Value) (monetaryValue ?Check ?Value)))").
@@ -10192,15 +10192,15 @@
 :-assert_kif("(=> (and (instance ?Drawing DrawingACheck) (patient ?Drawing ?Check) (instance ?Processing ProcessingACheck) (patient ?Processing ?Check) (meetsTemporally (WhenFn ?Drawing) ?Time) (meetsTemporally ?Time (WhenFn ?Processing)) (duration ?Time ?Duration)) (lessThan ?Duration (MeasureFn 6 MonthDuration)))").
 %
 % :-assert_kif(";Definition of PayCheck. ").
-:-assert_kif("(subclass PayCheck Check)").
+:-assert_kif("(genls PayCheck Check)").
 :-assert_kif("(documentation PayCheck \"A check issued to an employee in payment of salary or wages.\")").
 %
 :-assert_kif("(=> (and (instance ?Check Paycheck) (issuedBy ?Check ?Organization) (instance ?Give Giving) (destination ?Give ?Agent)) (employs ?Organization ?Agent))").
 %
-:-assert_kif("(subclass EconomicActivity IntentionalProcess)").
+:-assert_kif("(genls EconomicActivity IntentionalProcess)").
 :-assert_kif("(documentation EconomicActivity \"Broadly, any intentional action by a CognitiveAgent that involves creation or consumption of articles of commerce, transfer or conversion of financial assets, or any other action performed with the general intention of designing, creating, transporting, or exchanging things of value.\")").
 %
-:-assert_kif("(subclass UsingAnAccount EconomicActivity)").
+:-assert_kif("(genls UsingAnAccount EconomicActivity)").
 :-assert_kif("(documentation UsingAnAccount \"Putting money into ro taking money out of a FinancialAccount.\")").
 %
 % :-assert_kif(";definition of checkAccount ").
@@ -10210,13 +10210,13 @@
 :-assert_kif("(documentation checkAccount \" (&%checkAccount ?Check ?Account) means that ?Account is the &%FinancialAccount from which the amount specifed on the check is paid.\")").
 %
 % :-assert_kif(";definition of DrawingACheck ").
-:-assert_kif("(subclass DrawingACheck UsingAnAccount)").
+:-assert_kif("(genls DrawingACheck UsingAnAccount)").
 :-assert_kif("(documentation DrawingACheck \"An activity of paying by a check.\")").
 %
 :-assert_kif("(=> (and (instance ?Drawing DrawingACheck) (patient ?Drawing ?Check) (agent ?Drawing ?Agent) (checkAccount ?Check ?Account)) (accountHolder ?Account ?Agent))").
 %
 % :-assert_kif(";definition of DepositingACheck ").
-:-assert_kif("(subclass DepositingACheck UsingAnAccount)").
+:-assert_kif("(genls DepositingACheck UsingAnAccount)").
 :-assert_kif("(documentation DepositingACheck \"An activity of depositing a check into a &%FinancialOrganization.\")").
 %
 :-assert_kif("(=> (instance ?Depositing DepositingACheck) (exists (?Check) (and (instance ?Check Check) (patient ?Depositing ?Check))))").
@@ -10224,7 +10224,7 @@
 :-assert_kif("(=> (and (instance ?Depositing DepositingACheck) (patient ?Depositing ?Check) (instance ?Check Check) (checkAccount ?Check ?Account) (monetaryValue ?Check ?Amount)) (exists (?Deposit) (and (instance ?Deposit Deposit) (destination ?Deposit ?Account) (transactionAmount ?Deposit ?Amount))))").
 %
 % :-assert_kif(";definition of ProcessingACheck ").
-:-assert_kif("(subclass ProcessingACheck AuthorizationOfTransaction)").
+:-assert_kif("(genls ProcessingACheck AuthorizationOfTransaction)").
 :-assert_kif("(documentation ProcessingACheck \"An activity of paying the amount specified on the check from funds on deposit.\")").
 %
 :-assert_kif("(=> (instance ?Processing ProcessingACheck) (exists (?Check) (and (instance ?Check Check) (patient ?Processing ?Check))))").
@@ -10232,18 +10232,18 @@
 :-assert_kif("(=> (instance ?Processing ProcessingACheck) (exists (?Authorization) (and (instance ?Authorization AuthorizationOfTransaction) (subProcess ?Authorization ?Processing))))").
 %
 % :-assert_kif(";definition of DepositAccount ").
-:-assert_kif("(subclass DepositAccount FinancialAccount)").
+:-assert_kif("(genls DepositAccount FinancialAccount)").
 :-assert_kif("(documentation DepositAccount \"An account where money is deposited for checking, savings or brokerage use.\")").
 %
 % :-assert_kif(";Definition of CheckingAccount ").
-:-assert_kif("(subclass CheckingAccount DepositAccount)").
+:-assert_kif("(genls CheckingAccount DepositAccount)").
 :-assert_kif("(documentation CheckingAccount \"A bank account against which the depositor can draw checks\")").
 %
 :-assert_kif("(=> (and (instance ?Account CheckingAccount) (instance ?Transaction FinancialTransaction) (origin ?Transaction ?Account)) (exists (?Check) (and (instance ?Check Check) (instrument ?Transaction ?Check))))").
 %
 % :-assert_kif(";definition of AuthorizationOfTransaction ").
-:-assert_kif("(subclass AuthorizationOfTransaction FinancialService)").
-:-assert_kif("(subclass AuthorizationOfTransaction RegulatoryProcess)").
+:-assert_kif("(genls AuthorizationOfTransaction FinancialService)").
+:-assert_kif("(genls AuthorizationOfTransaction RegulatoryProcess)").
 :-assert_kif("(documentation AuthorizationOfTransaction \"An activity which approves or disapproves a transaction.\")").
 %
 :-assert_kif("(=> (and (instance ?Authorization AuthorizationOfTransaction) (patient ?Authorization ?Account) (financialAccount ?Account ?Bank)) (agent ?Authorization ?Bank))").
@@ -10251,7 +10251,7 @@
 :-assert_kif("(=> (and (financialAccount ?Account ?Organization) (instance ?Transaction FinancialTransaction) (origin ?Transaction ?Account)) (exists (?Authorization) (and (instance ?Authorization AuthorizationOfTransaction) (subProcess ?Authorization ?Transaction))))").
 %
 % :-assert_kif(";definition of Deposit ").
-:-assert_kif("(subclass Deposit FinancialTransaction)").
+:-assert_kif("(genls Deposit FinancialTransaction)").
 :-assert_kif("(disjoint Deposit Withdrawal)").
 :-assert_kif("(documentation Deposit \"An Activity of money being transferred into a customer's account at a financial institution.\")").
 %
@@ -10260,7 +10260,7 @@
 :-assert_kif("(=> (and (instance ?Deposit Deposit) (time ?Deposit ?TimeOfDeposit) (instance ?Account FinancialAccount) (destination ?Deposit ?Account) (transactionAmount ?Deposit ?Amount) (currentAccountBalance ?Account (ImmediatePastFn (WhenFn ?Deposit)) ?Balance1) (equal ?Balance2 (AdditionFn ?Balance1 ?Amount))) (currentAccountBalance ?Account (ImmediateFutureFn (FutureFn ?Deposit)) ?Balance2))").
 %
 % :-assert_kif(";definition of Withdrawal ").
-:-assert_kif("(subclass Withdrawal FinancialTransaction)").
+:-assert_kif("(genls Withdrawal FinancialTransaction)").
 :-assert_kif("(documentation Withdrawal \"An activity of money being transferred from a customer's account at a financial institution.\")").
 %
 :-assert_kif("(=> (instance ?Withdrawal Withdrawal) (exists (?Account) (and (instance ?Account FinancialAccount) (origin ?Withdrawal ?Account))))").
@@ -10282,13 +10282,13 @@
 :-assert_kif("(<=> (signedBy ?INSTRUMENT ?AGENT) (exists (?SIGN) (and (instance ?SIGN SigningADocument) (agent ?SIGN ?AGENT) (resource ?SIGN ?INSTRUMENT))))").
 %
 % :-assert_kif(";definition of Investing ").
-:-assert_kif("(subclass Investing FinancialTransaction)").
+:-assert_kif("(genls Investing FinancialTransaction)").
 :-assert_kif("(documentation Investing \"An activity of commiting money or capital in order to gain a financial return.\")").
 %
 :-assert_kif("(=> (and (agent ?Purchase ?Buyer) (origin ?Purchase ?Seller) (patient ?Purchase ?Object) (monetaryValue ?Object ?Money)) (exists (?Payment) (and (subProcess ?Payment ?Purchase) (instance ?Payment Payment) (transactionAmount ?Payment ?Money) (destination ?Payment ?Seller))))").
 %
 % :-assert_kif(";Definition of Bond. ").
-:-assert_kif("(subclass Bond FinancialInstrument)").
+:-assert_kif("(genls Bond FinancialInstrument)").
 :-assert_kif("(documentation Bond \"A debt instrument issued for a period of more than one year with the purpose of raising capital by borrowing. The Federal government, states, cities, corporations , and many other types of institutions sell bonds. A bond is generally a promise to repay the principal along with interest on a specified &%maturityDate.\")").
 %
 :-assert_kif("(=> (instance ?Bond Bond) (exists (?Date) (maturityDate ?Bond ?Date)))").
@@ -10324,7 +10324,7 @@
 :-assert_kif("(domain periodicPayment 3 TimeDuration)").
 :-assert_kif("(documentation periodicPayment \" (&%periodicPayment ?Account ?Amount ?Period) holds if ?Amount is the amount that must be made from the &%FinancialAccount ?Account after every period of duration ?Period.\")").
 %
-:-assert_kif("(=> (periodicPayment ?Account ?Amount ?Period) (exists (?Payment ?Type) (and (instance ?Payment ?Type) (subclass ?Type Payment) (origin ?Payment ?Account) (transactionAmount ?Payment ?Amount) (frequency ?Type ?Period))))").
+:-assert_kif("(=> (periodicPayment ?Account ?Amount ?Period) (exists (?Payment ?Type) (and (instance ?Payment ?Type) (genls ?Type Payment) (origin ?Payment ?Account) (transactionAmount ?Payment ?Amount) (frequency ?Type ?Period))))").
 %
 % :-assert_kif(";Definition of amountDue. ").
 :-assert_kif("(instance amountDue TernaryPredicate)").
@@ -10336,7 +10336,7 @@
 :-assert_kif("(=> (and (amountDue ?Account ?Amount ?DueDate) (accountHolder ?Account ?Agent)) (holdsObligation (exists (?Payment ?Date) (and (instance ?Payment Payment) (transactionAmount ?Payment ?Amount) (agent ?Payment ?Agent) (origin ?Payment ?Account) (date ?Payment ?Date) (beforeOrEqual (EndFn ?Date) (EndFn ?DueDate)))) ?Agent))").
 %
 % :-assert_kif(";definition of securedBy ").
-:-assert_kif("(subclass Collateral Asset)").
+:-assert_kif("(genls Collateral Asset)").
 :-assert_kif("(documentation Collateral \"An Asset which has been pledged as security for some form of credit.\")").
 %
 :-assert_kif("(instance securedBy BinaryPredicate)").
@@ -10348,33 +10348,33 @@
 % :-assert_kif(";Geography Ontology ").
 % :-assert_kif(";================== ").
 % :-assert_kif(";The following content is borrowed from the Geography Ontology. ").
-:-assert_kif("(subclass Fishing Hunting)").
+:-assert_kif("(genls Fishing Hunting)").
 :-assert_kif("(documentation Fishing \"&%Fishing is the class of &%Processes in which &%Fish are hunted.\")").
 %
 :-assert_kif("(=> (and (instance ?FISHING Fishing) (patient ?FISHING ?TARGET) (instance ?TARGET Animal)) (instance ?TARGET Fish))").
 %
-:-assert_kif("(subclass Hunting Pursuing)").
+:-assert_kif("(genls Hunting Pursuing)").
 :-assert_kif("(documentation Hunting \"&%Hunting is the class of &%Processes in which an animal or animals are pursued and sometimes captured and/or killed.\")").
 %
 :-assert_kif("(=> (instance ?HUNT Hunting) (exists (?TARGET) (and (instance ?TARGET Animal) (patient ?HUNT ?TARGET))))").
 %
 :-assert_kif("(=> (and (instance ?HUNT Hunting) (patient ?HUNT ?PREY)) (hasPurpose ?HUNT (exists (?PROC) (and (patient ?PROC ?PREY) (or (instance ?PROC Confining) (instance ?PROC Killing))))))").
 %
-:-assert_kif("(subclass SquareMeter AreaMeasure)").
+:-assert_kif("(genls SquareMeter AreaMeasure)").
 :-assert_kif("(instance SquareMeter UnitOfMeasure)").
 :-assert_kif("(documentation SquareMeter \"&%SquareMeter represents a &%UnitOfMeasure equal to one square &%Meter.\")").
 %
 :-assert_kif("(equal (MeasureFn 1 SquareMeter) (PerFn (MeasureFn 1 Meter) (MeasureFn 1 Meter)))").
 %
-:-assert_kif("(subclass Earthquake GeologicalProcess)").
+:-assert_kif("(genls Earthquake GeologicalProcess)").
 :-assert_kif("(documentation Earthquake \"&%Earthquake is the class of events in which the earth shakes while its layers readjust due to tensional stresses in the surface of the earth. A single earthquake may consist of one or more &%EarthTremors.\")").
 %
 :-assert_kif("(=> (instance ?QUAKE Earthquake) (exists (?TREMOR) (and (instance ?TREMOR EarthTremor) (subProcess ?TREMOR ?QUAKE))))").
 %
-:-assert_kif("(subclass EarthTremor GeologicalProcess)").
+:-assert_kif("(genls EarthTremor GeologicalProcess)").
 :-assert_kif("(documentation EarthTremor \"An &%EarthTremor is an individual seismic event in which the earth shakes due to release of seismic pressures.\")").
 %
-:-assert_kif("(subclass Planting Putting)").
+:-assert_kif("(genls Planting Putting)").
 :-assert_kif("(documentation Planting \"&%Planting is the class of processes in which &%Plants are planted or transplanted, whether as seeds, seedlings, or mature plants.\")").
 %
 :-assert_kif("(=> (and (instance ?PLANT Planting) (patient ?PLANT ?OBJ)) (or (instance ?OBJ Plant) (instance ?OBJ Seed) (instance ?OBJ Spore)))").
@@ -10386,24 +10386,24 @@
 %
 :-assert_kif("(=> (instance ?TEXT (DocumentFn ?PROP)) (containsInformation ?TEXT ?PROP))").
 %
-:-assert_kif("(subclass SigningADocument Committing)").
+:-assert_kif("(genls SigningADocument Committing)").
 :-assert_kif("(documentation SigningADocument \"&%SigningADocument is the class of actions in which an agent affixes a signature, stamp, or other evidence of authorization or attestation to a document. The document and signature may be electronic. Signings count as &%SocialInteractions even if done in private , because their significance derives from a social context.\")").
 %
 :-assert_kif("(=> (and (instance ?SIGN SigningADocument) (agent ?SIGN ?AGENT) (result ?SIGN ?SIGNATURE) (resource ?SIGN ?TEXT)) (exists (?NAME) (and (names ?NAME ?AGENT) (refers ?SIGNATURE ?NAME) (instance ?TEXT Text))))").
 %
-:-assert_kif("(subclass Star AstronomicalBody)").
+:-assert_kif("(genls Star AstronomicalBody)").
 :-assert_kif("(documentation Star \"&%Star is the class of hot gaseous astronomical bodies.\")").
 %
 :-assert_kif("(instance Sol Star)").
 :-assert_kif("(documentation Sol \"&%Sol is the nearest &%Star to &%PlanetEarth and the focus of its &%SolarSystem.\")").
 %
-:-assert_kif("(subclass SolarSystem Collection)").
+:-assert_kif("(genls SolarSystem Collection)").
 :-assert_kif("(documentation SolarSystem \"&%SolarSystem is the class of systems that consist of a star or stars and any encircling astronomical bodies.\")").
 %
-:-assert_kif("(subclass Meteoroid AstronomicalBody)").
+:-assert_kif("(genls Meteoroid AstronomicalBody)").
 :-assert_kif("(documentation Meteoroid \"Any &%AstronomicalBody that breaks through the atmosphere of &%Earth.\")").
 %
-:-assert_kif("(subclass Meteorite Meteoroid)").
+:-assert_kif("(genls Meteorite Meteoroid)").
 :-assert_kif("(documentation Meteorite \"Any &%Meteoroid that leaves traces on the surface of &%Earth.\")").
 %
 :-assert_kif("(instance orbits BinaryPredicate)").
@@ -10414,20 +10414,20 @@
 %
 :-assert_kif("(=> (instance ?SAT Satellite) (exists (?BODY) (and (instance ?BODY AstronomicalBody) (orbits ?SAT ?FOCUS))))").
 %
-:-assert_kif("(subclass NaturalSatellite Satellite)").
-:-assert_kif("(subclass NaturalSatellite AstronomicalBody)").
+:-assert_kif("(genls NaturalSatellite Satellite)").
+:-assert_kif("(genls NaturalSatellite AstronomicalBody)").
 :-assert_kif("(disjoint NaturalSatellite ArtificialSatellite)").
 :-assert_kif("(documentation NaturalSatellite \"&%NaturalSatellite is the class of large , naturally occurring astronomical bodies orbiting some other &%AstronomicalBody.\")").
 %
-:-assert_kif("(subclass Moon NaturalSatellite)").
+:-assert_kif("(genls Moon NaturalSatellite)").
 :-assert_kif("(documentation Moon \"&%Moon is the class of &%NaturalSatellites that orbit planets or large asteroids.\")").
 %
-:-assert_kif("(subclass Planet NaturalSatellite)").
+:-assert_kif("(genls Planet NaturalSatellite)").
 :-assert_kif("(documentation Planet \"&%Planet is the class of large &%NaturalSatellites that revolve around a star.\")").
 %
 :-assert_kif("(=> (instance ?AREA GeographicArea) (geographicSubregion ?AREA PlanetEarth))").
 %
-:-assert_kif("(subclass WeatherFront WeatherProcess)").
+:-assert_kif("(genls WeatherFront WeatherProcess)").
 :-assert_kif("(documentation WeatherFront \"&%WeatherFront is the class of weather processes that are involve relationships between two air masses, such as a high pressure weather system or a low pressure system.\")").
 %
 :-assert_kif("(=> (instance ?WEATHER WeatherFront) (exists (?FRONT) (and (instance ?FRONT StormFront) (located ?WEATHER ?FRONT))))").
@@ -10439,19 +10439,19 @@
 :-assert_kif("(domain barometricPressure 2 PressureMeasure)").
 :-assert_kif("(documentation barometricPressure \" (&%barometricPressure ?AREA ?PRESSURE) means that the atmospheric pressure measured at ?AREA is ?PRESSURE. Barometric pressure is typically expressed in units of &%InchMercury or &%MmMercury. For example, standard sea level pressure is 29.92 inches (760 mm) of mercury: (&%barometricPressure &%SeaLevel (&%MeasureFn 29.92 &%InchMercury)).\")").
 %
-:-assert_kif("(subclass PressureMeasure ConstantQuantity)").
+:-assert_kif("(genls PressureMeasure ConstantQuantity)").
 :-assert_kif("(documentation PressureMeasure \"&%PressureMeasure is the class of &%UnitsOfMeasure used to measure pressure (&%barometricPressure), e .g., &%InchMercury.\")").
 %
-:-assert_kif("(subclass InchMercury PressureMeasure)").
+:-assert_kif("(genls InchMercury PressureMeasure)").
 :-assert_kif("(instance InchMercury UnitOfMeasure)").
 :-assert_kif("(documentation InchMercury \"&%InchMercury is a &%UnitOfMeasure for &%barometricPressure. It is used to express the number of inches of mercury supported in a mercurial barometer by the surrounding air pressure.\")").
 %
-:-assert_kif("(subclass MmMercury PressureMeasure)").
+:-assert_kif("(genls MmMercury PressureMeasure)").
 :-assert_kif("(instance MmMercury UnitOfMeasure)").
 :-assert_kif("(documentation MmMercury \"&%MmMercury is a &%UnitOfMeasure for &%barometricPressure. It is used to express the number of millimeters of mercury supported in a mercurial barometer by the surrounding air pressure.\")").
 %
-:-assert_kif("(subclass Atmosphere Region)").
-:-assert_kif("(subclass Atmosphere (ExtensionFn Gas))").
+:-assert_kif("(genls Atmosphere Region)").
+:-assert_kif("(genls Atmosphere (ExtensionFn Gas))").
 :-assert_kif("(documentation Atmosphere \"&%Atmosphere is a mixture of gases surrounding any celestial object that has a gravitational field strong enough to prevent the gases from escaping.\")").
 %
 :-assert_kif("(=> (instance ?AIR Atmosphere) (exists (?BODY) (and (instance ?BODY AstronomicalBody) (meetsSpatially ?AIR ?BODY))))").
@@ -10459,60 +10459,60 @@
 :-assert_kif("(instance EarthsAtmosphere Atmosphere)").
 :-assert_kif("(documentation EarthsAtmosphere \"The envelope of air surrounding the Earth, extending about 100 miles and thinning gradually outward.\")").
 %
-:-assert_kif("(subclass AtmosphericRegion GeographicArea)").
+:-assert_kif("(genls AtmosphericRegion GeographicArea)").
 :-assert_kif("(documentation AtmosphericRegion \"&%AtmosphericRegion is the class of all subregions of &%EarthsAtmosphere.\")").
 %
 :-assert_kif("(=> (instance ?AIRSPACE AtmosphericRegion) (part ?AIRSPACE EarthsAtmosphere))").
 %
-:-assert_kif("(subclass FlowRegion SelfConnectedObject)").
-:-assert_kif("(subclass FlowRegion (ExtensionFn Fluid))").
+:-assert_kif("(genls FlowRegion SelfConnectedObject)").
+:-assert_kif("(genls FlowRegion (ExtensionFn Fluid))").
 :-assert_kif("(documentation FlowRegion \"&%FlowRegion is a class of things whose boundaries are relatively stable but whose constitutive &%material is continuously moving through the region itself and being replaced by other , similar material. Each &%FlowRegion is constituted by a stream of matter moving as a whole. A &%FlowRegion may be liquid or gaseous. A wind may be considered as a &%Process or as a &%FlowRegion, similarly an ocean current or a &%WaterWave. Note that certain properties belong to the &%FlowRegion itself (e.g., mass, length, volume, temperature , and speed or velocity of the region moving as a whole), while other properties of interest belong to the &%Motion of its constitutive stuff (e.g., velocity, direction). The motion of a &%FlowRegion as a whole (e.g. the jet stream moves within the atmosphere) is distinguished from the motion of the &%pieces of stuff constituting the &%FlowRegion.\")").
 %
 :-assert_kif("(=> (instance ?FLUID FlowRegion) (attribute ?FLUID Fluid))").
 %
-:-assert_kif("(subclass AirStream FlowRegion)").
-:-assert_kif("(subclass AirStream Air)").
+:-assert_kif("(genls AirStream FlowRegion)").
+:-assert_kif("(genls AirStream Air)").
 :-assert_kif("(documentation AirStream \"&%AirStream is the class of &%FlowRegions that consist of air.\")").
 %
-:-assert_kif("(subclass Falling Translocation)").
-:-assert_kif("(subclass Falling MotionDownward)").
+:-assert_kif("(genls Falling Translocation)").
+:-assert_kif("(genls Falling MotionDownward)").
 :-assert_kif("(documentation Falling \"&%Falling is the class of events in which something moves from a higher location to a lower location under the force of gravity.\")").
 %
 :-assert_kif("(=> (and (instance ?DROP Falling) (origin ?DROP ?START) (destination ?DROP ?FINISH)) (orientation ?FINISH ?START Below))").
 %
-:-assert_kif("(subclass Raining Precipitation)").
+:-assert_kif("(genls Raining Precipitation)").
 :-assert_kif("(documentation Raining \"&%Raining is a precipitation process in which water falls in a &%Liquid state.\")").
 %
 :-assert_kif("(=> (instance ?PROCESS Raining) (attribute ?PROCESS Liquid))").
 %
-:-assert_kif("(subclass Snowing Precipitation)").
+:-assert_kif("(genls Snowing Precipitation)").
 :-assert_kif("(documentation Snowing \"&%Snowing is a precipitation process in which water falls in a &%Solid state.\")").
 %
 :-assert_kif("(=> (instance ?PROCESS Snowing) (attribute ?PROCESS Solid))").
 %
-:-assert_kif("(subclass BotanicalTree FloweringPlant)").
-:-assert_kif("(subclass BotanicalTree Tree)").
+:-assert_kif("(genls BotanicalTree FloweringPlant)").
+:-assert_kif("(genls BotanicalTree Tree)").
 :-assert_kif("(documentation BotanicalTree \"&%BotanicalTree is an imprecise term for a perennial woody plant that is larger than a bush or shrub, generally understood to describe a large growth having one main trunk with few or no branches projecting from its base, a well-developed crown of foliage, and a height at maturity of at least 12 feet.\")").
 %
 :-assert_kif("(=> (instance ?TREE BotanicalTree) (exists (?WOOD) (and (instance ?WOOD Wood) (part ?WOOD ?TREE))))").
 %
-:-assert_kif("(subclass Shrub FloweringPlant)").
+:-assert_kif("(genls Shrub FloweringPlant)").
 :-assert_kif("(documentation Shrub \"&%Shrub is the class of low, perennial, typically multi-stemmed woody plants, called shrubs or bushes.\")").
 %
 :-assert_kif("(=> (and (instance ?TREE BotanicalTree) (instance ?BUSH Shrub) (height ?TREE ?TALL) (height ?BUSH ?SHORT)) (greaterThan ?TALL ?SHORT))").
 %
-:-assert_kif("(subclass Forest LandArea)").
+:-assert_kif("(genls Forest LandArea)").
 :-assert_kif("(disjoint Forest Field)").
 :-assert_kif("(documentation Forest \"&%Forest is the class of large &%LandAreas that are covered by trees and associated undergrowth, either growing wild or managed for the purpose of timber production.\")").
 %
 :-assert_kif("(=> (instance ?WOODS Forest) (exists (?TREE) (and (instance ?TREE BotanicalTree) (located ?TREE ?WOODS))))").
 %
-:-assert_kif("(subclass Agriculture Maintaining)").
+:-assert_kif("(genls Agriculture Maintaining)").
 :-assert_kif("(documentation Agriculture \"&%Agriculture is a class of &%Processes in which land, plants, or animals are cultivated in order to produce food or other organic products.\")").
 %
 :-assert_kif("(=> (instance ?AGRO Agriculture) (exists (?GROWTH) (and (instance ?GROWTH Growth) (subProcess ?GROWTH ?AGRO))))").
 %
-:-assert_kif("(subclass Inlet BodyOfWater)").
+:-assert_kif("(genls Inlet BodyOfWater)").
 :-assert_kif("(documentation Inlet \"&%Inlet is the class of bays or other recesses into the shore of a lake, sea, or river;includes narrow inlets, which are passages leading from open water through some barrier to a bay or lagoon .\")").
 %
 :-assert_kif("(=> (instance ?INLET Inlet) (exists (?LAND) (and (instance ?LAND LandArea) (penetrates ?INLET ?LAND))))").
@@ -10523,13 +10523,13 @@
 %
 :-assert_kif("(=> (and (instance ?INLET Inlet) (meetsSpatially ?INLET ?WATER) (instance ?WATER FreshWaterArea)) (instance ?INLET FreshWaterArea))").
 %
-:-assert_kif("(subclass BodyOfWater WaterArea)").
-:-assert_kif("(subclass BodyOfWater SelfConnectedObject)").
+:-assert_kif("(genls BodyOfWater WaterArea)").
+:-assert_kif("(genls BodyOfWater SelfConnectedObject)").
 :-assert_kif("(documentation BodyOfWater \"A &%BodyOfWater is a connected body of water with established boundaries marked by either geographical features or conventional borders.\")").
 %
-:-assert_kif("(subclass River BodyOfWater)").
-:-assert_kif("(subclass River StreamWaterArea)").
-:-assert_kif("(subclass River FreshWaterArea)").
+:-assert_kif("(genls River BodyOfWater)").
+:-assert_kif("(genls River StreamWaterArea)").
+:-assert_kif("(genls River FreshWaterArea)").
 :-assert_kif("(documentation River \"&%River is the class of large streams of fresh water flowing through land into a lake, ocean, or other body of water.\")").
 %
 :-assert_kif("(instance WorldOcean SaltWaterArea)").
@@ -10538,8 +10538,8 @@
 %
 :-assert_kif("(=> (instance ?AREA Continent) (meetsSpatially ?AREA WorldOcean))").
 %
-:-assert_kif("(subclass Ocean SaltWaterArea)").
-:-assert_kif("(subclass Ocean BodyOfWater)").
+:-assert_kif("(genls Ocean SaltWaterArea)").
+:-assert_kif("(genls Ocean BodyOfWater)").
 :-assert_kif("(documentation Ocean \"&%Ocean is the class containing the oceans that are the major subdivisions of the &%WorldOcean. According to the International Hydrographic Association, there are five oceans: the &%AtlanticOcean, &%PacificOcean, &%IndianOcean, &%SouthernOcean, and &%ArcticOcean. Note: The largest oceans, the Atlantic and Pacific, are subdivided into Northern and Southern regions, but those regions are not separate &%Oceans.\")").
 %
 :-assert_kif("(=> (and (instance ?WATER BodyOfWater) (not (instance ?WATER Ocean)) (instance ?OCEAN Ocean)) (larger ?OCEAN ?water))").
@@ -10552,30 +10552,30 @@
 :-assert_kif("(instance PacificOcean Ocean)").
 :-assert_kif("(documentation PacificOcean \"&%PacificOcean represents the Pacific Ocean .\")").
 %
-:-assert_kif("(subclass LandForm LandArea)").
+:-assert_kif("(genls LandForm LandArea)").
 :-assert_kif("(documentation LandForm \"A &%LandForm is the class of geographically and/or geologically distinct areas that occur on Earth's surface, including mountains, hills , plains, valleys, deltas, and features of submerged land areas such as the ocean floor.\")").
 %
-:-assert_kif("(subclass SlopedArea LandForm)").
+:-assert_kif("(genls SlopedArea LandForm)").
 :-assert_kif("(documentation SlopedArea \"A &%SlopedArea is a land surface which lies at an angle to the horizontal so that some points on it are higher than others;a slope .\")").
 %
 :-assert_kif("(=> (instance ?incline SlopedArea) (exists (?top ?bottom ?height1 ?height2) (and (top ?top ?incline) (bottom ?bottom ?incline) (altitude ?top ?height1) (altitude ?bottom ?height2) (successorAttributeClosure ?height2 ?height1);needed? (greaterThan ?height1 ?height2))))").
 %
-:-assert_kif("(subclass Soil Mixture)").
+:-assert_kif("(genls Soil Mixture)").
 :-assert_kif("(documentation Soil \"&%Soil is a substance composed of fine rock material disintegrated by geological processes, mixed with humus, the organic remains of decomposed vegetation.\")").
 %
 :-assert_kif("(=> (instance ?Soil Soil) (exists (?Humus ?Mineral) (and (instance ?Humus Humus) (instance ?Mineral Mineral) (part ?Humus ?Soil) (part ?Mineral ?Soil))))").
 %
-:-assert_kif("(subclass Humus Mixture)").
+:-assert_kif("(genls Humus Mixture)").
 :-assert_kif("(documentation Humus \"&%Humus is decaying organic matter found in &%Soil and derived from dead animal and plant material.\")").
 %
 :-assert_kif("(=> (instance ?Humus Humus) (exists (?Soil) (and (instance ?Soil Soil) (part ?Humus ?Soil))))").
 %
-:-assert_kif("(subclass Clay Soil)").
+:-assert_kif("(genls Clay Soil)").
 :-assert_kif("(documentation Clay \"Fine-grained soil consisting of mineral particles, not necessarily clay minerals, that are less than 0.002 mm in their maximum dimension.\")").
 %
 :-assert_kif("(=> (and (part ?Particle ?Soil) (instance ?Soil Clay) (diameter ?Particle (MeasureFn ?Size Centimeter))) (greaterThan 0.0002 ?Size))").
 %
-:-assert_kif("(subclass Sand Soil)").
+:-assert_kif("(genls Sand Soil)").
 :-assert_kif("(documentation Sand \"&%Sand is loose fragments of minerals or rocks. Smaller than gravel and larger than silt and clay, sand particles range from 8/10,000 to 8/100 inch (0.02 to 2 millimeters) in diameter. &%Sand is formed by the &%Erosion of rocks through the action of water, ice, or air.\")").
 %
 :-assert_kif("(<=> (instance ?CONTINENT Continent) (or (equal Africa ?CONTINENT) (equal NorthAmerica ?CONTINENT) (equal SouthAmerica ?CONTINENT) (equal Antarctica ?CONTINENT) (equal Europe ?CONTINENT) (equal Asia ?CONTINENT) (equal Oceania ?CONTINENT)))").
@@ -10619,7 +10619,7 @@
 %
 :-assert_kif("(=> (dependentGeopoliticalArea ?AREA ?COUNTRY) (not (geopoliticalSubdivision ?AREA ?COUNTRY)))").
 %
-:-assert_kif("(subclass NationalGovernment Government)").
+:-assert_kif("(genls NationalGovernment Government)").
 :-assert_kif("(documentation NationalGovernment \"&%NationalGovernment is the class of national -level governments of &%Nations.\")").
 %
 :-assert_kif("(instance governmentType BinaryPredicate)").
@@ -10634,7 +10634,7 @@
 %
 :-assert_kif("(=> (and (attribute (GovernmentFn ?AREA) ?TYPE) (instance ?TYPE FormOfGovernment)) (governmentType ?AREA ?TYPE))").
 %
-:-assert_kif("(subclass FormOfGovernment PoliticoEconomicAttribute)").
+:-assert_kif("(genls FormOfGovernment PoliticoEconomicAttribute)").
 :-assert_kif("(documentation FormOfGovernment \"&%FormOfGovernment is a class of &%Attributes used to describe the characteristics of a government, especially a &%NationalGovernment. The concept &%FormOfGovernment is interpreted broadly enough to include &%Anarchy and &%Factionalism.\")").
 %
 :-assert_kif("(instance Monarchy FormOfGovernment)").
@@ -10834,13 +10834,13 @@
 :-assert_kif("(subrelation primaryGeopoliticalSubdivision geopoliticalSubdivision)").
 :-assert_kif("(documentation primaryGeopoliticalSubdivision \" (&%primaryGeopoliticalSubdivision ?AREA ?COUNTRY) means that the &%GeopoliticalArea ?AREA is one of the first-order administrative divisions of the &%Nation ?COUNTRY. For example, in the United States, any of the fifty states. This does not include subordinate regions that have a lesser status, such as British Crown colonies, U.S. territories, or protectorates. See &%geopoliticalSubdivision.\")").
 %
-:-assert_kif("(subclass Holiday TimeInterval)").
+:-assert_kif("(genls Holiday TimeInterval)").
 :-assert_kif("(documentation Holiday \"&%Holiday is the class of time periods that are observed as holidays in a country, culture, or religion. Holidays may recur annually on the same date, or they may be moveable, for example, Thanksgiving Day falls on the last &%Thursday of each &%November.\")").
 %
-:-assert_kif("(subclass FixedHoliday Holiday)").
+:-assert_kif("(genls FixedHoliday Holiday)").
 :-assert_kif("(documentation FixedHoliday \"&%FixedHoliday is the class of &%Holidays whose observance is fixed to recurrences of the calendar day that the holiday commemorates.\")").
 %
-:-assert_kif("(subclass MoveableHoliday Holiday)").
+:-assert_kif("(genls MoveableHoliday Holiday)").
 :-assert_kif("(documentation MoveableHoliday \"&%MoveableHoliday is the class of &%Holidays whose observance is not fixed to recurrences of any particular calendar day. For example, Memorial Day is observed on the last &%Monday of &%May.\")").
 %
 :-assert_kif("(instance ExecutiveBranchFn UnaryFunction)").
@@ -10956,13 +10956,13 @@
 %
 :-assert_kif("(=> (and (instance ?ELECTION PopularElection) (electionWinner ?ELECTION ?POSITION ?PERSON1) (voteFractionReceived ?ELECTION ?POSITION ?PERSON1 ?NUMBER1) (voteFractionReceived ?ELECTION ?POSITION ?PERSON2 ?NUMBER2) (not (equal ?PERSON1 ?PERSON2))) (greaterThan ?NUMBER1 ?NUMBER2))").
 %
-:-assert_kif("(subclass LegislativeOrganization Organization)").
+:-assert_kif("(genls LegislativeOrganization Organization)").
 :-assert_kif("(documentation LegislativeOrganization \"&%LegislativeOrganization is the class of &%Organizations that have as their main purpose the passing of laws or regulations.\")").
 %
 :-assert_kif("(=> (and (instance ?ORG LegislativeOrganization) (subOrganization ?ORG ?GOV) (instance ?GOV GovernmentOrganization)) (instance ?ORG GovernmentOrganization))").
 %
-:-assert_kif("(subclass Parliament LegislativeOrganization)").
-:-assert_kif("(documentation Parliament \"&%Parliament is the subclass of &%LegislativeOrganizations similar to that of the United Kingdom.\")").
+:-assert_kif("(genls Parliament LegislativeOrganization)").
+:-assert_kif("(documentation Parliament \"&%Parliament is the genls of &%LegislativeOrganizations similar to that of the United Kingdom.\")").
 %
 :-assert_kif("(instance LegislatureFn UnaryFunction)").
 :-assert_kif("(domain LegislatureFn 1 GeopoliticalArea)").
@@ -10975,7 +10975,7 @@
 :-assert_kif("(range JudiciaryFn JudicialOrganization)").
 :-assert_kif("(documentation JudiciaryFn \" (&%JudiciaryFn ?AREA) denotes the judicial branch of the &%GeopoliticalArea ?AREA, that is, the &%JudicialOrganization (s) associated with the government of ?AREA, considered as a whole.\")").
 %
-:-assert_kif("(subclass PoliticalParty PoliticalOrganization)").
+:-assert_kif("(genls PoliticalParty PoliticalOrganization)").
 :-assert_kif("(documentation PoliticalParty \"&%PoliticalParty is the class of &%PoliticalOrganizations that may sponsor candidates for &%Elections.\")").
 %
 :-assert_kif("(=> (instance ?PARTY PoliticalParty) (hasPurpose ?PARTY (exists (?MEMBER ?GOVERNMENT) (and (instance ?GOVERNMENT Government) (member ?MEMBER ?GOVERNMENT) (member ?MEMBER ?PARTY)))))").
@@ -10989,138 +10989,138 @@
 % :-assert_kif(";Transportation Ontology ").
 % :-assert_kif(";======================= ").
 % :-assert_kif(";The following content is borrowed from the Transportation Ontology. ").
-:-assert_kif("(subclass Airport TransitTerminal)").
-:-assert_kif("(subclass Airport LandTransitway)").
-:-assert_kif("(documentation Airport \"&%Airport is the subclass of &%TransitTerminals for &%Airplanes (fixed-wing &%Aircraft).\")").
+:-assert_kif("(genls Airport TransitTerminal)").
+:-assert_kif("(genls Airport LandTransitway)").
+:-assert_kif("(documentation Airport \"&%Airport is the genls of &%TransitTerminals for &%Airplanes (fixed-wing &%Aircraft).\")").
 %
 :-assert_kif("(=> (instance ?PORT Airport) (exists (?RUNWAY) (and (instance ?RUNWAY Runway) (part ?RUNWAY ?PORT))))").
 %
-:-assert_kif("(subclass Runway LandTransitway)").
+:-assert_kif("(genls Runway LandTransitway)").
 :-assert_kif("(documentation Runway \"&%Runway is the class of &%Transitways that are used for the takeoff and landing of &%Airplanes. &%Runways are &%Transitways for an intermodal transit, which begins with a land transit and ends with air transit, or vice versa.\")").
 %
-:-assert_kif("(subclass Pipeline Transitway)").
+:-assert_kif("(genls Pipeline Transitway)").
 :-assert_kif("(documentation Pipeline \"&%Pipeline is the class of pipelines used to transport various kinds of fluids.\")").
 %
 :-assert_kif("(=> (and (instance ?PIPE Pipeline) (instance ?MOTION Motion) (instrument ?MOTION ?PIPE) (patient ?MOTION ?STUFF)) (instance ?STUFF (ExtensionFn Fluid)))").
 %
-:-assert_kif("(subclass Waterway Transitway)").
-:-assert_kif("(subclass Waterway WaterArea)").
+:-assert_kif("(genls Waterway Transitway)").
+:-assert_kif("(genls Waterway WaterArea)").
 :-assert_kif("(documentation Waterway \"&%Waterway is the class of navigable waters, including oceans, seaLanes, rivers, canals, lakes, and inland bodies of water.\")").
 %
-:-assert_kif("(subclass Canal Waterway)").
-:-assert_kif("(subclass Canal StationaryArtifact)").
-:-assert_kif("(documentation Canal \"&%Canal is the subclass of &%Waterways that are &%Artifacts constructed for the passage of &%Ships.\")").
+:-assert_kif("(genls Canal Waterway)").
+:-assert_kif("(genls Canal StationaryArtifact)").
+:-assert_kif("(documentation Canal \"&%Canal is the genls of &%Waterways that are &%Artifacts constructed for the passage of &%Ships.\")").
 %
-:-assert_kif("(subclass SurfacedRoadway Roadway)").
+:-assert_kif("(genls SurfacedRoadway Roadway)").
 :-assert_kif("(disjoint SurfacedRoadway UnsurfacedRoadway)").
-:-assert_kif("(documentation SurfacedRoadway \"&%SurfacedRoadway is the subclass of &%Roadways that have been improved by covering them with a substance to increase the hardness and smoothness of the surface. Covering materials include pavement, concrete, asphalt, macadam, and gravel.\")").
+:-assert_kif("(documentation SurfacedRoadway \"&%SurfacedRoadway is the genls of &%Roadways that have been improved by covering them with a substance to increase the hardness and smoothness of the surface. Covering materials include pavement, concrete, asphalt, macadam, and gravel.\")").
 %
-:-assert_kif("(subclass Expressway SurfacedRoadway)").
-:-assert_kif("(documentation Expressway \"&%Expressway is the subclass of &%SurfacedRoadways that are multiple-lane, limited-access highways designed for rapid travel by &%MotorVehicles.\")").
+:-assert_kif("(genls Expressway SurfacedRoadway)").
+:-assert_kif("(documentation Expressway \"&%Expressway is the genls of &%SurfacedRoadways that are multiple-lane, limited-access highways designed for rapid travel by &%MotorVehicles.\")").
 %
-:-assert_kif("(subclass UnsurfacedRoadway Roadway)").
-:-assert_kif("(documentation UnsurfacedRoadway \"&%UnsurfacedRoadway is the subclass of &%Roadways that have natural, unimproved surfaces of dirt or sand.\")").
+:-assert_kif("(genls UnsurfacedRoadway Roadway)").
+:-assert_kif("(documentation UnsurfacedRoadway \"&%UnsurfacedRoadway is the genls of &%Roadways that have natural, unimproved surfaces of dirt or sand.\")").
 %
-:-assert_kif("(subclass Railway LandTransitway)").
-:-assert_kif("(subclass Railway StationaryArtifact)").
-:-assert_kif("(documentation Railway \"&%Railway is the subclass of &%LandTransitways that have rails along which &%Trains may travel. A railway consists of the rail bed, sleepers, tracks, electric rails , switches, sensors, lights, crossing grades, and any other integral machinery or parts of a section of railway.\")").
+:-assert_kif("(genls Railway LandTransitway)").
+:-assert_kif("(genls Railway StationaryArtifact)").
+:-assert_kif("(documentation Railway \"&%Railway is the genls of &%LandTransitways that have rails along which &%Trains may travel. A railway consists of the rail bed, sleepers, tracks, electric rails , switches, sensors, lights, crossing grades, and any other integral machinery or parts of a section of railway.\")").
 %
-:-assert_kif("(subclass Bridge LandTransitway)").
-:-assert_kif("(subclass Bridge StationaryArtifact)").
-:-assert_kif("(documentation Bridge \"&%Bridge is the subclass of &%LandTransitways that are artifacts used for crossing water or air-filled gaps that could not be transited over a natural surface.\")").
+:-assert_kif("(genls Bridge LandTransitway)").
+:-assert_kif("(genls Bridge StationaryArtifact)").
+:-assert_kif("(documentation Bridge \"&%Bridge is the genls of &%LandTransitways that are artifacts used for crossing water or air-filled gaps that could not be transited over a natural surface.\")").
 %
-:-assert_kif("(subclass Tunnel LandTransitway)").
-:-assert_kif("(subclass Tunnel StationaryArtifact)").
-:-assert_kif("(documentation Tunnel \"&%Tunnel is a subclass of &%Transitways that consist of a lengthwise enclosed &%Hole that allows for transit underground , as through mountains, below a body of water, or beneath a city .\")").
+:-assert_kif("(genls Tunnel LandTransitway)").
+:-assert_kif("(genls Tunnel StationaryArtifact)").
+:-assert_kif("(documentation Tunnel \"&%Tunnel is a genls of &%Transitways that consist of a lengthwise enclosed &%Hole that allows for transit underground , as through mountains, below a body of water, or beneath a city .\")").
 %
-:-assert_kif("(subclass RailroadTrack StationaryArtifact)").
+:-assert_kif("(genls RailroadTrack StationaryArtifact)").
 :-assert_kif("(documentation RailroadTrack \"&%RailroadTrack is the class of &%StationaryArtifacts consisting of rails laid on supports to form a track for railway vehicles.\")").
 %
-:-assert_kif("(subclass LandVehicle Vehicle)").
+:-assert_kif("(genls LandVehicle Vehicle)").
 :-assert_kif("(documentation LandVehicle \"&%LandVehicle is the class of &%Vehicles that travel on land. The two main types of &%LandVehicle are &%RoadVehicle and &%RailVehicle.\")").
 %
-:-assert_kif("(subclass RoadVehicle LandVehicle)").
+:-assert_kif("(genls RoadVehicle LandVehicle)").
 :-assert_kif("(documentation RoadVehicle \"A LandVehicle which is designed primarily to travel on roads, in contrast to land vehicles like tanks that can travel across country.\")").
 %
-:-assert_kif("(subclass Automobile RoadVehicle)").
+:-assert_kif("(genls Automobile RoadVehicle)").
 :-assert_kif("(documentation Automobile \"A &%RoadVehicle with an internal combustion engine.\")").
 %
-:-assert_kif("(subclass Truck RoadVehicle)").
+:-assert_kif("(genls Truck RoadVehicle)").
 :-assert_kif("(documentation Truck \"An &%RoadVehicle whose primary purpose is the &%Transportation of entities other than &%Humans.\")").
 %
-:-assert_kif("(subclass Trailer RoadVehicle)").
+:-assert_kif("(genls Trailer RoadVehicle)").
 :-assert_kif("(documentation Trailer \"An unpowered vehicle moved by attaching to the rear of a powered vehicle.\")").
 %
-:-assert_kif("(subclass UserPoweredDevice Device)").
+:-assert_kif("(genls UserPoweredDevice Device)").
 :-assert_kif("(documentation UserPoweredDevice \"A device which moves by application of the muscle power of the user.\")").
 %
-:-assert_kif("(subclass Cycle LandVehicle)").
-:-assert_kif("(subclass Cycle UserPoweredDevice)").
+:-assert_kif("(genls Cycle LandVehicle)").
+:-assert_kif("(genls Cycle UserPoweredDevice)").
 :-assert_kif("(documentation Cycle \"A type of land vehicle with wheels ppowered by the user.\")").
 %
-:-assert_kif("(subclass Bicycle Cycle)").
+:-assert_kif("(genls Bicycle Cycle)").
 :-assert_kif("(documentation Bicycle \"A type of Cycle having two wheels.\")").
 %
-:-assert_kif("(subclass Motorcycle RoadVehicle)").
+:-assert_kif("(genls Motorcycle RoadVehicle)").
 :-assert_kif("(documentation Motorcycle \"A powered vehicle similar to a Cycle, but with a motor.\")").
 %
-:-assert_kif("(subclass RailVehicle LandVehicle)").
+:-assert_kif("(genls RailVehicle LandVehicle)").
 :-assert_kif("(documentation RailVehicle \"A &%LandVehicle that runs along fixed rails.\")").
 %
-:-assert_kif("(subclass Wagon LandVehicle)").
+:-assert_kif("(genls Wagon LandVehicle)").
 :-assert_kif("(documentation Wagon \"A &%Landcraft that is not self-propelled, but must be pulled by either an &%Animal or a self-propelled &%Vehicle to move along the ground .\")").
 %
 :-assert_kif("(=> (and (instance ?WAGON Wagon) (instance ?TRANSPORT Transportation) (instrument ?TRANSPORT ?WAGON)) (exists (?POWER) (and (instance ?TRANSPORT Pulling) (agent ?PULL ?POWER) (patient ?PULL ?WAGON) (or (instance ?POWER DomesticAnimal) (instance ?POWER Vehicle)))))").
 %
-:-assert_kif("(subclass Train RailVehicle)").
-:-assert_kif("(documentation Train \"&%Train is the subclass of &%Vehicle whose instances are linked sequences of &%Wagons.\")").
+:-assert_kif("(genls Train RailVehicle)").
+:-assert_kif("(documentation Train \"&%Train is the genls of &%Vehicle whose instances are linked sequences of &%Wagons.\")").
 %
 :-assert_kif("(=> (instance ?TRAIN Train) (exists (?WAGON) (and (instance ?WAGON Wagon) (part ?WAGON ?TRAIN))))").
 %
-:-assert_kif("(subclass Watercraft Vehicle)").
+:-assert_kif("(genls Watercraft Vehicle)").
 :-assert_kif("(documentation Watercraft \"&%Watercraft is the class of all &%Vehicles used to travel on or in water.\")").
 %
 :-assert_kif("(=> (and (instance ?CRAFT Watercraft) (instance ?EVENT Transportation) (instrument ?EVENT ?CRAFT)) (exists (?WATER) (and (instance ?WATER WaterArea) (located ?EVENT ?WATER))))").
 %
-:-assert_kif("(=> (and (subclass ?TYPE Watercraft) (instance ?EVENT WaterTransportation) (located ?EVENT ?PLACE)) (instance ?PLACE WaterArea))").
+:-assert_kif("(=> (and (genls ?TYPE Watercraft) (instance ?EVENT WaterTransportation) (located ?EVENT ?PLACE)) (instance ?PLACE WaterArea))").
 %
-:-assert_kif("(subclass CubicFoot VolumeMeasure)").
+:-assert_kif("(genls CubicFoot VolumeMeasure)").
 :-assert_kif("(instance CubicFoot UnitOfMeasure)").
 :-assert_kif("(documentation CubicFoot \"&%CubicFoot is a unit for measuring volume, equal to a volume of one foot length in each dimension of length, width, and height.\")").
 %
 :-assert_kif("(equal (MeasureFn 1 CubitFoot) (MultiplicationFn (MeasureFn 1 Foot) (MultiplicationFn (MeasureFn 1 Foot) (MeasureFn 1 Foot))))").
 %
-:-assert_kif("(subclass Aircraft Vehicle)").
+:-assert_kif("(genls Aircraft Vehicle)").
 :-assert_kif("(partition Aircraft FixedWingAircraft Helicopter)").
 :-assert_kif("(documentation Aircraft \"Any &%Vehicle which is capable of &%AirTransportation. Note that this class covers both fixed-wing aircraft and helicopters.\")").
 %
-:-assert_kif("(subclass FixedWingAircraft Aircraft)").
+:-assert_kif("(genls FixedWingAircraft Aircraft)").
 :-assert_kif("(documentation FixedWingAircraft \"A heavier-than-air aricraft whose wings do not rotate in order to provide lift.\")").
 %
-:-assert_kif("(subclass Airplane Aircraft)").
-:-assert_kif("(documentation Airplane \"&%Airplane is the subclass of &%Aircraft that are fixed-wing aircraft which carry their own power sources. &%Airplane includes jet airplanes and propeller planes, but not gliders.\")").
+:-assert_kif("(genls Airplane Aircraft)").
+:-assert_kif("(documentation Airplane \"&%Airplane is the genls of &%Aircraft that are fixed-wing aircraft which carry their own power sources. &%Airplane includes jet airplanes and propeller planes, but not gliders.\")").
 %
-:-assert_kif("(subclass TransitTerminal StationaryArtifact)").
+:-assert_kif("(genls TransitTerminal StationaryArtifact)").
 :-assert_kif("(documentation TransitTerminal \"A &%TransitTerminal is a place where travellers or transportation devices begin or end their journeys, or where passengers and/or goods may be transferred. At a terminal, &%Vehicles may be received, assigned, sent out, or stored .\")").
 %
-:-assert_kif("(subclass TrainStation TransitTerminal)").
+:-assert_kif("(genls TrainStation TransitTerminal)").
 :-assert_kif("(documentation TrainStation \"A TransitTerminal where trains may stop to pick up or discharge passengers or cargo.\")").
 %
-:-assert_kif("(subclass TerminalBuilding Building)").
+:-assert_kif("(genls TerminalBuilding Building)").
 :-assert_kif("(documentation TerminalBuilding \"A &%TerminalBuilding is a &%Building located at a &%TransitTerminal and used in connection with its functions .\")").
 %
-:-assert_kif("(subclass CommonCarrier TransportationCompany)").
+:-assert_kif("(genls CommonCarrier TransportationCompany)").
 :-assert_kif("(disjoint CommonCarrier ContractCarrier)").
-:-assert_kif("(documentation CommonCarrier \"&%CommonCarrier is the subclass of &%TransportationCompany whose instances must offer services to all customers . Contrast with &%ContractCarrier.\")").
+:-assert_kif("(documentation CommonCarrier \"&%CommonCarrier is the genls of &%TransportationCompany whose instances must offer services to all customers . Contrast with &%ContractCarrier.\")").
 %
-:-assert_kif("(subclass ContractCarrier TransportationCompany)").
-:-assert_kif("(documentation ContractCarrier \"&%ContractCarrier is the subclass of &%TransportationCompany whose instances offer services to only one customer , under contract. Contrast with &%CommonCarrier.\")").
+:-assert_kif("(genls ContractCarrier TransportationCompany)").
+:-assert_kif("(documentation ContractCarrier \"&%ContractCarrier is the genls of &%TransportationCompany whose instances offer services to only one customer , under contract. Contrast with &%CommonCarrier.\")").
 %
 % :-assert_kif(";======================= ").
 % :-assert_kif(";Communications Ontology ").
 % :-assert_kif(";======================= ").
 % :-assert_kif(";The following content is borrowed from the Communications Ontology. ").
-:-assert_kif("(subclass CommunicationDevice EngineeringComponent)").
+:-assert_kif("(genls CommunicationDevice EngineeringComponent)").
 :-assert_kif("(relatedInternalConcept CommunicationDevice Communicating)").
 :-assert_kif("(documentation CommunicationDevice \"A &%CommunicationDevice is a &%Device which serves at the &%instrument in a &%Communication &%Process by allowing the communicated message to be conveyed between the participants.\")").
 %
@@ -11128,30 +11128,30 @@
 %
 :-assert_kif("(=> (instance ?DEVICE CommunicationDevice) (hasPurpose ?DEVICE (exists (?COMMUNICATION) (and (instance ?COMMUNICATION Communicating) (instrument ?COMMUNICATION ?DEVICE)))))").
 %
-:-assert_kif("(subclass Satellite Object)").
+:-assert_kif("(genls Satellite Object)").
 :-assert_kif("(partition Satellite NaturalSatellite ArtificialSatellite)").
 :-assert_kif("(documentation Satellite \"&%Satellite is the collection of bodies that revolve around some astronomical body, e.g., planets around a star.\")").
 %
-:-assert_kif("(subclass ArtificialSatellite Satellite)").
-:-assert_kif("(subclass ArtificialSatellite Device)").
+:-assert_kif("(genls ArtificialSatellite Satellite)").
+:-assert_kif("(genls ArtificialSatellite Device)").
 :-assert_kif("(documentation ArtificialSatellite \"An &%ArtificialSatellite is a &%Device that orbits the earth in space and performs various functions such as aiding in communication, photographing the earth's surface, and others. A Satellite that is an artifact;a solid object created by humans orbiting an astronomical body.\")").
 %
-:-assert_kif("(subclass BroadcastingStation StationaryArtifact)").
+:-assert_kif("(genls BroadcastingStation StationaryArtifact)").
 :-assert_kif("(partition BroadcastingStation RadioStation TelevisionStation)").
 :-assert_kif("(documentation BroadcastingStation \"A &%BroadcastingStation is a &%TelevisionStation or a &%RadioStation.\")").
 %
-:-assert_kif("(subclass RadioStation BroadcastingStation)").
+:-assert_kif("(genls RadioStation BroadcastingStation)").
 :-assert_kif("(documentation RadioStation \"A &%RadioStation is a &%BroadcastingStation that broadcasts programs that are intended to be received by &%Radios.\")").
 %
-:-assert_kif("(subclass Radio CommunicationDevice)").
-:-assert_kif("(subclass Radio ElectricDevice)").
+:-assert_kif("(genls Radio CommunicationDevice)").
+:-assert_kif("(genls Radio ElectricDevice)").
 :-assert_kif("(documentation Radio \"A &%Radio is a &%Device for receiving radio broadcast signals from a &%RadioStation.\")").
 %
-:-assert_kif("(subclass TelevisionStation BroadcastingStation)").
+:-assert_kif("(genls TelevisionStation BroadcastingStation)").
 :-assert_kif("(documentation TelevisionStation \"A &%TelevisionStation is a &%BroadcastingStation that broadcasts programs that are intended to be received by &%Television.\")").
 %
-:-assert_kif("(subclass Television CommunicationDevice)").
-:-assert_kif("(subclass Television ElectricDevice)").
+:-assert_kif("(genls Television CommunicationDevice)").
+:-assert_kif("(genls Television ElectricDevice)").
 :-assert_kif("(documentation Television \"A &%Television is a &%Device for receiving television broadcast signals from a &%TelevisionStation.\")").
 %
 % :-assert_kif(";================ ").
@@ -11167,10 +11167,10 @@
 %
 :-assert_kif("(=> (economyType ?AGENT ?ATTRIBUTE) (or (instance ?AGENT GeopoliticalArea) (instance ?AGENT Organization)))").
 %
-:-assert_kif("(subclass EconomicAttribute PoliticoEconomicAttribute)").
+:-assert_kif("(genls EconomicAttribute PoliticoEconomicAttribute)").
 :-assert_kif("(documentation EconomicAttribute \"&%EconomicAttribute is the class of terms including all &%Attributes used to characterize the economic systems or development levels of &%Nations or dependent &%GeopoliticalAreas.\")").
 %
-:-assert_kif("(subclass EconomicSystemAttribute EconomicAttribute)").
+:-assert_kif("(genls EconomicSystemAttribute EconomicAttribute)").
 :-assert_kif("(documentation EconomicSystemAttribute \"&%EconomicSystemAttribute is the class of &%Attributes that describe the type of economic system that a country or area has. For example, &%CapitalistEconomy or &%SocialistEconomy.\")").
 %
 :-assert_kif("(instance CapitalistEconomy EconomicSystemAttribute)").
@@ -11244,7 +11244,7 @@
 :-assert_kif("(subAttribute WelfareCapitalism GovernmentSubsidizedEconomy)").
 :-assert_kif("(documentation WelfareCapitalism \"&%WelfareCapitalism is an &%Attribute describing an economy in which the government provides economic subsidies to unemployed or disabled individuals.\")").
 %
-:-assert_kif("(subclass IndustryAttribute Attribute)").
+:-assert_kif("(genls IndustryAttribute Attribute)").
 :-assert_kif("(documentation IndustryAttribute \"The economic sector, in terms of good or services produced. Used in industryOfArea relation.\")").
 %
 :-assert_kif("(instance industryOfArea BinaryPredicate)").
@@ -11259,7 +11259,7 @@
 %
 :-assert_kif("(=> (and (instance ?ORG Organization) (attribute ?ORG ?INDUSTRY) (industryProductType ?INDUSTRY ?TYPE)) (exists (?EVENT ?ITEM) (and (instance ?EVENT Making) (instance ?ITEM ?TYPE) (agent ?EVENT ?ORG) (result ?EVENT ?ITEM))))").
 %
-:-assert_kif("(subclass KilowattHour FunctionQuantity)").
+:-assert_kif("(genls KilowattHour FunctionQuantity)").
 :-assert_kif("(instance KilowattHour UnitOfMeasure)").
 :-assert_kif("(documentation KilowattHour \"&%KilowattHour is a &%UnitOfMeasure for energy that represents 1000 &%Watts (1 kW) of power expended over one hour (1 h) of time. This is the unit commonly used in commercial power contexts. It is equivalent to 3,600,000 &%Joules.\")").
 %
@@ -11267,7 +11267,7 @@
 %
 :-assert_kif("(<=> (equal ?AMOUNT (MeasureFn ?NUMBER Joule)) (equal ?AMOUNT (MeasureFn (MultiplicationFn 0.0000002778 ?NUMBER) Kilowatt)))").
 %
-:-assert_kif("(subclass Exporting FinancialTransaction)").
+:-assert_kif("(genls Exporting FinancialTransaction)").
 :-assert_kif("(documentation Exporting \"&%Exporting is the class of actions in which there is a &%ChangeOfPossession of goods shipped from a provider in one &%Nation to a destination in another &%Nation. Typically , there are &%Selling and &%Buying events associated with an &%Exporting. Either the seller or the exporting country may be considered the &%origin of &%Exporting.\")").
 %
 :-assert_kif("(=> (instance ?EXPORT Exporting) (exists (?ITEM) (and (instance ?ITEM Object) (patient ?EXPORT ?ITEM))))").
@@ -11297,20 +11297,20 @@
 :-assert_kif("(domainSubclass fiscalYearPeriod 2 TimeInterval)").
 :-assert_kif("(documentation fiscalYearPeriod \"The predicate &%fiscalYearPeriod indicates the period that an &%Agent or &%Organization uses as its 12-month accounting period. (&%fiscalYearPeriod ?AGENT &%Year) means that ?AGENT observes its 12-month accounting period during the regular calendar year (CY), from &%January to &%December. For fiscal years with other beginning and ending months (FYs), use (&%fiscalYearPeriod ?AGENT (&%RecurrentTimeIntervalFn ?STARTMONTH ?ENDMONTH)). For example, (&%fiscalYearPeriod (&%GovernmentFn &%UnitedStates) (&%RecurrentTimeIntervalFn &%October &%September)). For FYs that begin or end mid-month, days may be specified within &%RecurrentTimeIntervalFn.\")").
 %
-:-assert_kif("(subclass Narcotic ControlledSubstance)").
-:-assert_kif("(documentation Narcotic \"&%Narcotic is a subclass of addictive &%BiologicallyActiveSubstances that have damping effects on the nervous system and may be fatal in large doses.\")").
+:-assert_kif("(genls Narcotic ControlledSubstance)").
+:-assert_kif("(documentation Narcotic \"&%Narcotic is a genls of addictive &%BiologicallyActiveSubstances that have damping effects on the nervous system and may be fatal in large doses.\")").
 %
-:-assert_kif("(subclass ControlledSubstance BiologicallyActiveSubstance)").
-:-assert_kif("(documentation ControlledSubstance \"&%ControlledSubstance is the subclass of &%BiologicallyActiveSubstances whose distribution and use is controlled by government regulation.\")").
+:-assert_kif("(genls ControlledSubstance BiologicallyActiveSubstance)").
+:-assert_kif("(documentation ControlledSubstance \"&%ControlledSubstance is the genls of &%BiologicallyActiveSubstances whose distribution and use is controlled by government regulation.\")").
 %
-:-assert_kif("(subclass Fodder Food)").
-:-assert_kif("(documentation Fodder \"&%Fodder is the subclass of &%Food that is intended for instances of &%DomesticAnimal.\")").
+:-assert_kif("(genls Fodder Food)").
+:-assert_kif("(documentation Fodder \"&%Fodder is the genls of &%Food that is intended for instances of &%DomesticAnimal.\")").
 %
-:-assert_kif("(subclass Cement Mixture)").
-:-assert_kif("(documentation Cement \"&%Cement is a subclass of &%Mixture whose instances may contain various minerals or ores, prepared by heating and pulverizing, and used in binding &%Concrete or in laying brick or stone.\")").
+:-assert_kif("(genls Cement Mixture)").
+:-assert_kif("(documentation Cement \"&%Cement is a genls of &%Mixture whose instances may contain various minerals or ores, prepared by heating and pulverizing, and used in binding &%Concrete or in laying brick or stone.\")").
 %
-:-assert_kif("(subclass Concrete Mixture)").
-:-assert_kif("(documentation Concrete \"&%Concrete is a subclass of &%Mixture used as building materials. Concrete is made up of &%Mineral pieces (sand or gravel) and a &%Cement material used to bind them together.\")").
+:-assert_kif("(genls Concrete Mixture)").
+:-assert_kif("(documentation Concrete \"&%Concrete is a genls of &%Mixture used as building materials. Concrete is made up of &%Mineral pieces (sand or gravel) and a &%Cement material used to bind them together.\")").
 %
 :-assert_kif("(=> (instance ?CONCRETE Concrete) (exists (?PART) (and (instance ?PART Mineral) (component ?PART ?CONCRETE))))").
 %
@@ -11344,22 +11344,22 @@
 % :-assert_kif(";in the original list. The average of the first list is equal to the final ").
 % :-assert_kif(";element in the running total divided by the number of list elements. (<=> (average ?LIST1 ?AVERAGE) (exists (?LIST2) (and (equal (ListLengthFn ?LIST2) (ListLengthFn ?LIST1)) (equal (ListOrderFn ?LIST2 1) (ListOrderFn ?LIST1 1)) (forall (?ITEMFROM2) (=> (inList ?ITEMFROM2 ?LIST2) (exists (?POSITION ?POSITIONMINUSONE ?ITEMFROM1 ?PRIORFROM2) (and (greaterThan ?POSITION 1) (lessThanOrEqualTo ?POSITION (ListLengthFn ?LIST2)) (equal (ListOrderFn ?LIST2 ?ITEMFROM2) ?POSITION) (inList ?ITEMFROM1 ?LIST1) (equal ?POSITION (ListOrderFn ?LIST1 ?ITEMFROM1)) (inList ?PRIORFROM2 ?LIST2) (equal ?POSITIONMINUSONE (SubtractionFn ?POSITION 1)) (equal ?POSITIONMINUSONE (ListOrderFn ?LIST2 ?PRIORFROM2)) (equal ?ITEMFROM2 (AdditionFn ?ITEMFROM1 ?PRIORFROM2)))))) (equal ?LASTPLACE (ListLengthFn ?LIST2)) (equal ?AVERAGE (DivisionFn (ListOrderFn ?LIST2 ?LASTPLACE) ?LASTPLACE)))))").
 %
-:-assert_kif("(subclass RacialEthnicGroup EthnicGroup)").
+:-assert_kif("(genls RacialEthnicGroup EthnicGroup)").
 :-assert_kif("(documentation RacialEthnicGroup \"A &%RacialEthnicGroup is an &%EthnicGroup based on common racial background.\")").
 %
-:-assert_kif("(subclass DeafSignLanguage ManualHumanLanguage)").
+:-assert_kif("(genls DeafSignLanguage ManualHumanLanguage)").
 :-assert_kif("(documentation DeafSignLanguage \"A &%DeafSignLanguage is a &%ManualHumanLanguage primarily intended for communication between a deaf individual and a hearing individual or between deaf individuals.\")").
 %
-:-assert_kif("(subclass CreoleLanguage SpokenHumanLanguage)").
+:-assert_kif("(genls CreoleLanguage SpokenHumanLanguage)").
 :-assert_kif("(documentation CreoleLanguage \"A &%CreoleLanguage is a &%PidginLanguage that has developed and become the mother tongue for a community of people. This process is called 'creolization' and results in an expanded vocabulary and grammar structure that allow for communication as rich and complex as that of non -creole languages. While pidgins are regarded as reduced languages, creoles are considered expanded languages. That is, while pidgins develop to enable communication in relatively isolated domains, creoles allow for a full range of expressive possibilities on a par with more 'recognized' languages.\")").
 %
-:-assert_kif("(subclass PidginLanguage SpokenHumanLanguage)").
+:-assert_kif("(genls PidginLanguage SpokenHumanLanguage)").
 :-assert_kif("(documentation PidginLanguage \"A &%PidginLanguage is not the native language of anyone but is used as an auxiliary or supplemental language between two mutually unintelligible speech communities. Pidgins are reduced languages, characterized by having a limited vocabulary and a simple grammar which serve to satisfy basic communication needs. Historically these languages have primarily arisen in trade centers and plantations (with slaves from different language backgrounds), areas where large groups of people lacking a common language need to communicate. By definition, a pidgin has no native speakers;it is always a person's second (or more) language.\")").
 %
-:-assert_kif("(subclass MixedLanguage SpokenHumanLanguage)").
+:-assert_kif("(genls MixedLanguage SpokenHumanLanguage)").
 :-assert_kif("(documentation MixedLanguage \"A &%MixedLanguage is a &%SpokenHumanLanguage that combines grammar and lexical items from two or more languages to create a new language that is essentially a linguistic mixture.\")").
 %
-:-assert_kif("(subclass LiteracyAttribute TraitAttribute)").
+:-assert_kif("(genls LiteracyAttribute TraitAttribute)").
 :-assert_kif("(documentation LiteracyAttribute \"If an ?INDIVIDUAL has the &%attribute &%LiteracyAttribute, that ?INDIVIDUAL is able to read and write.\")").
 %
 :-assert_kif("(<=> (attribute ?INDIVIDUAL LiteracyAttribute) (and (hasSkill Reading ?INDIVIDUAL) (hasSkill Writing ?INDIVIDUAL)))").
@@ -11516,7 +11516,7 @@
 :-assert_kif("(instance Alaska AmericanState)").
 :-assert_kif("(documentation Alaska \"The largest state in the &%UnitedStates.\")").
 %
-:-assert_kif("(=> (and (subclass ?UNIT AreaMeasure) (measure Alaska (MeasureFn ?NUMBER1 ?UNIT)) (measure ?STATE (MeasureFn ?NUMBER2 ?UNIT)) (instance ?STATE AmericanState) (not (equal Alaska ?STATE))) (lessThan ?NUMBER2 ?NUMBER1))").
+:-assert_kif("(=> (and (genls ?UNIT AreaMeasure) (measure Alaska (MeasureFn ?NUMBER1 ?UNIT)) (measure ?STATE (MeasureFn ?NUMBER2 ?UNIT)) (instance ?STATE AmericanState) (not (equal Alaska ?STATE))) (lessThan ?NUMBER2 ?NUMBER1))").
 %
 :-assert_kif("(instance California AmericanState)").
 :-assert_kif("(documentation California \"The &%AmericanState with the highest population.\")").
@@ -11668,10 +11668,10 @@
 % :-assert_kif(";PJC Jan 9, 2004 ").
 % :-assert_kif(";BEGIN Definitions added by PJC to those proposed by Adam Pease ").
 % :-assert_kif(";***************************************************** ").
-:-assert_kif("(subclass Tree Plant)").
+:-assert_kif("(genls Tree Plant)").
 :-assert_kif("(documentation Tree \"A plant having a permanently woody stem or trunk, usually developing branches at a distance from the ground.\")").
 %
-:-assert_kif("(subclass CommercialItem Product)").
+:-assert_kif("(genls CommercialItem Product)").
 :-assert_kif("(documentation CommercialItem \"An article of commerce sold as a unit, corresponding to the 'Item' class used in the UBL specification. This represents a 'package' for sale and may have any number of individual manufactured objects in it, such as a pair of shoes, a bag of potatoes, or a kit with several different types of items as components.\")").
 %
 % :-assert_kif(";note that the order of the arguments for the ").
@@ -11694,13 +11694,13 @@
 :-assert_kif("(domain hasPostalCode 2 PostOfficeCode)").
 :-assert_kif("(documentation hasPostalCode \"hasPostalCode is not exactly the inverse of relation postalCode because the code value is a string, not an integer.\")").
 %
-:-assert_kif("(subclass PostOfficeCode SymbolicString)").
+:-assert_kif("(genls PostOfficeCode SymbolicString)").
 :-assert_kif("(documentation PostOfficeCode \"A string of symbols which need not be exclusively numeric. A ZIP code was originally all numeric, but the extended ZIP+4 can have a hyphen in it.\")").
 %
-:-assert_kif("(subclass ZipCode PostOfficeCode)").
+:-assert_kif("(genls ZipCode PostOfficeCode)").
 :-assert_kif("(documentation ZipCode \"A ZipCode is a US post office code, which may be five digits or in ZIP+4 format, nine digits in 5-4 format.\")").
 %
-:-assert_kif("(subclass Message Communication)").
+:-assert_kif("(genls Message Communication)").
 :-assert_kif("(:hasRestrictedVal Message hasIntendedAudience Addressees)").
 :-assert_kif("(documentation Message \"Message is a Communication which is an AbstractText and for which the intended audience is an instance of Addressees, group corresponding to a specified list of CognitiveAgents and the distribution is restricted to those agents, i.e. it is not a broadcast or a publication which is intended to be read by anyone who chances upon it. There may be cases where an author publishes a book and writes it for understanding by a particular audience, but if its distribution is not restricted it is not a Message.\")").
 %
@@ -11723,18 +11723,18 @@
 %
 :-assert_kif("(=> (authors ?AGENT ?TEXT) (exists ?PROP (and (instance ?PROP Communication) (containsInformation ?TEXT ?PROP) (hasAuthors ?PROP ?AGENT))))").
 %
-:-assert_kif("(subclass AgentGroup Group)").
-:-assert_kif("(subclass AgentGroup Agent)").
+:-assert_kif("(genls AgentGroup Group)").
+:-assert_kif("(genls AgentGroup Agent)").
 :-assert_kif("(documentation AgentGroup \"An AgentGroup is one or more agents considered for some purpose as a single Agent.\")").
 %
-:-assert_kif("(subclass SpecifiedGroup AgentGroup)").
+:-assert_kif("(genls SpecifiedGroup AgentGroup)").
 :-assert_kif("(documentation SpecifiedGroup \"A SpecifiedGroup is one or more agents who are individually identified and form the elements of a list (whether actually recorded in some physical medium or merely implied by the circumstances of a message.) For example, a phone call is a communication and the listener or recipient of each component message transmitted is the unique member of the SpecifiedGroup which is the intended recipeint of the message -- specified by the circumstances of the telephone call, not by any recorded list.\")").
 %
 % :-assert_kif(";for each SpecifiedGroup there is a list whose members have a one-to-one ").
 % :-assert_kif(";correspondence with the members of the group. ").
 :-assert_kif("(=> (instance ?SPECGROUP SpecifiedGroup) (exists (?LIST) (and (forall (?AGENT) (<=> (member ?AGENT ?SPECGROUP) (inList ?AGENT ?LIST))))))").
 %
-:-assert_kif("(subclass Addressees SpecifiedGroup)").
+:-assert_kif("(genls Addressees SpecifiedGroup)").
 :-assert_kif("(documentation Addressees \"Each instance of Addressees is a group of agents to whom a message is addressed.\")").
 %
 % :-assert_kif(";Added for samin006: authority, obligations, etc ").
@@ -11771,8 +11771,8 @@
 % :-assert_kif("; The order of the propositions has been changed from ").
 % :-assert_kif("; the original. ; Modified Jan. 10, 2004 ").
 % :-assert_kif(";******************************************** ").
-:-assert_kif("(subclass Invoice Statement)").
-:-assert_kif("(subclass Invoice DocumentPhysical)").
+:-assert_kif("(genls Invoice Statement)").
+:-assert_kif("(genls Invoice DocumentPhysical)").
 :-assert_kif("(:hasRestrictedVal Invoice containsInformation InvoiceProposition)").
 :-assert_kif("(:hasRestrictedVal Invoice hasAbstractContent AbstractInvoice)").
 :-assert_kif("(documentation Invoice \"A physical document which states that a buyer owes, or does not owe, money for goods or services purchased from a seller.\")").
@@ -11787,10 +11787,10 @@
 %
 :-assert_kif("(=> (quantityInEvent ?P ?Q ?OBJ) (exists (?INST) (equal ?Q (CardinalityFn (KappaFn ?INST (and (instance ?INST ?OBJ) (patient ?P ?INST)))))))").
 %
-:-assert_kif("(subclass Softwood Wood)").
+:-assert_kif("(genls Softwood Wood)").
 :-assert_kif("(documentation Softwood \"Wood obtained from trees classified in the family of Softwoods or gymnosperms. Examples include scrub pine, spruce and cedar.\")").
 %
-:-assert_kif("(subclass Hardwood Wood)").
+:-assert_kif("(genls Hardwood Wood)").
 :-assert_kif("(disjoint Hardwood Softwood)").
 :-assert_kif("(documentation Hardwood \"Wood obtained from trees classified in the family of Hardwoods, or angiosperms. Examples include oak, birch and maple.\")").
 %
@@ -11816,8 +11816,8 @@
 :-assert_kif("(quantityInEvent JoineryPurchase-2003-00645 2 JoineryObject-236WV)").
 :-assert_kif("(documentation JoineryPurchase-2003-00645 \"This is the selling event referred to in the sample invoice JoineryInvoice-2003-00645, used in development of the Ontology Invoice ontology. This is a fictional event.\")").
 %
-:-assert_kif("(subclass JoineryObject-236WV Product)").
-:-assert_kif("(subclass JoineryObject-236WV Softwood)").
+:-assert_kif("(genls JoineryObject-236WV Product)").
+:-assert_kif("(genls JoineryObject-236WV Softwood)").
 :-assert_kif("(documentation JoineryObject-236WV \"This is the class of objects, the sale of certain instances of which is referred to in the sample invoice JoineryInvoice-2003-00645, used in development of the Ontology Invoice ontology.\")").
 %
 % :-assert_kif(";The Axiom below states that every instance of the class of objects ").
@@ -11893,8 +11893,8 @@
 % :-assert_kif(";must be a real number ").
 :-assert_kif("(=> (SumFn @ROW) (forall (?NUM) (=> (inList ?NUM (ListFn @ROW)) (instance ?NUM RealNumber))))").
 %
-:-assert_kif("(subclass EfficiencyMeasure Attribute)").
-% :-assert_kif("; (subclass EfficiencyMeasure Quantity)").
+:-assert_kif("(genls EfficiencyMeasure Attribute)").
+% :-assert_kif("; (genls EfficiencyMeasure Quantity)").
 :-assert_kif("(documentation EfficiencyMeasure \"an attribute of a process or procedure which may be quantitative (as, ten units per hour), measuring the outputs per unit input.\")").
 %
 :-assert_kif("(instance mm-dd-yy DateFormat)").
@@ -11932,23 +11932,23 @@
 % :-assert_kif(";an object, quantity of substance, or time ").
 % :-assert_kif(";note SUMO resource relation: (subrelation resource patient)").
 %
-:-assert_kif("(subclass ProductiveProcess Process)").
+:-assert_kif("(genls ProductiveProcess Process)").
 :-assert_kif("(documentation ProductiveProcess \"A ProductiveProcess is an IntentionalProcess which has some output that can be measured, so that a measure of productivity (= efficiency) can be created and used. Mere recreation would not qualify. Even though the same form of recreation can be performed, for example, for different prices, the payment of money for a product or service is not considered as consumption of resources. Money is not a consumable resource for the purpose of measuring efficiency. Price and efficiency measure different concepts in this ontology.\")").
 %
-:-assert_kif("(subclass InheritableClassRelation BinaryPredicate)").
-:-assert_kif("(documentation InheritableClassRelation \"An InheritableClassRelation is a binary relation that has a class as its argument1 type (domainSubclass 1) and which also applies to all subclasses. Thus, though it is a class-level predicate, it functions as a template slot in a frame representation. Any assertion using a class-level relation that is not an InheritableClassRelation will not necessarily be true of all subclasses of the domain 1 asserted in the assertion. For binary relations, the arg2 class variable may be restricted at a subclass level by the :hasRestrictedVal relation.\")").
+:-assert_kif("(genls InheritableClassRelation BinaryPredicate)").
+:-assert_kif("(documentation InheritableClassRelation \"An InheritableClassRelation is a binary relation that has a class as its argument1 type (domainSubclass 1) and which also applies to all subclasses. Thus, though it is a class-level predicate, it functions as a template slot in a frame representation. Any assertion using a class-level relation that is not an InheritableClassRelation will not necessarily be true of all subclasses of the domain 1 asserted in the assertion. For binary relations, the arg2 class variable may be restricted at a genls level by the :hasRestrictedVal relation.\")").
 %
-:-assert_kif("(=> (and (instance ?REL InheritableClassRelation) (?REL ?CLASS1 ?CLASS2)) (forall ?CLASS (=> (subclass ?CLASS ?CLASS1) (?REL ?CLASS ?CLASS2))))").
+:-assert_kif("(=> (and (instance ?REL InheritableClassRelation) (?REL ?CLASS1 ?CLASS2)) (forall ?CLASS (=> (genls ?CLASS ?CLASS1) (?REL ?CLASS ?CLASS2))))").
 %
 % :-assert_kif(";inheritability also applies to ternary predicates, ").
 % :-assert_kif("; if the last argument is a class -- this latter must ").
 % :-assert_kif(";be true for ternary relations that are inheritable, ").
 % :-assert_kif("; so it is not specified in the defining axiom ").
-:-assert_kif("(=> (and (instance ?REL InheritableClassRelation) (?REL ?CLASS1 ?ENT ?CLASS2)) (forall ?CLASS (=> (subclass ?CLASS ?CLASS1) (?REL ?CLASS ?ENT ?CLASS2))))").
+:-assert_kif("(=> (and (instance ?REL InheritableClassRelation) (?REL ?CLASS1 ?ENT ?CLASS2)) (forall ?CLASS (=> (genls ?CLASS ?CLASS1) (?REL ?CLASS ?ENT ?CLASS2))))").
 %
-:-assert_kif("(subclass TotalValuedClassRelation TernaryRelation)").
+:-assert_kif("(genls TotalValuedClassRelation TernaryRelation)").
 :-assert_kif("(instance TotalValuedClassRelation InheritableClassRelation)").
-:-assert_kif("(documentation TotalValuedClassRelation \"A TotalValuedClassRelation is a binary relation between classes that implies that every instance of every subclass of the first class is related to some instance of the second class by an instance-level relation.\")").
+:-assert_kif("(documentation TotalValuedClassRelation \"A TotalValuedClassRelation is a binary relation between classes that implies that every instance of every genls of the first class is related to some instance of the second class by an instance-level relation.\")").
 %
 :-assert_kif("(=> (and (instance ?REL TotalValuedClassRelation) (?REL ?CLASS1 ?INSTREL ?CLASS2)) (forall (?INST1) (=> (instance ?INST1 ?CLASS1 ?CLASS2) (exists (?INST2) (and (instance ?INSTREL BinaryRelation) (instance ?INST2 ?CLASS2) (?INSTREL ?INST1 ?INST2))))))").
 %
@@ -11956,14 +11956,14 @@
 :-assert_kif("(instance hasNecessaryPart InheritableClassRelation)").
 :-assert_kif("(domainSubclass hasNecessaryPart 1 Entity)").
 :-assert_kif("(domainSubclass hasNecessaryPart 2 Entity)").
-:-assert_kif("(documentation hasNecessaryPart \" (hasNecessaryPart ?CLASS1 ?CLASS2) means that every instance of ?CLASS1 has a part which is an instance of ?CLASS2. Since this is an InheritableClassRelation, then it is true of every instance of every subclass of ?CLASS1 that each such instance also has a part which is an instance of ?CLASS2. See hasOptionalPart for an alternative part relation.\")").
+:-assert_kif("(documentation hasNecessaryPart \" (hasNecessaryPart ?CLASS1 ?CLASS2) means that every instance of ?CLASS1 has a part which is an instance of ?CLASS2. Since this is an InheritableClassRelation, then it is true of every instance of every genls of ?CLASS1 that each such instance also has a part which is an instance of ?CLASS2. See hasOptionalPart for an alternative part relation.\")").
 %
 :-assert_kif("(=> (hasNecessaryPart ?Class1 ?Class2) (forall (?INST) (=> (instance ?INST ?Class1) (exists (?PART) (and (instance ?PART ?Class2) (properPart ?PART ?INST))))))").
 %
 :-assert_kif("(instance hasOptionalPart BinaryPredicate)").
 :-assert_kif("(domainSubclass hasOptionalPart 1 Entity)").
 :-assert_kif("(domainSubclass hasOptionalPart 2 Entity)").
-:-assert_kif("(documentation hasOptionalPart \" (hasOptionalPart ?CLASS1 ?CLASS2) means that there is some instance of ?CLASS1 which has a part which is an instance of ?CLASS2. More informally, this relation may be stated 'instances of CLASS1 may have an instance of CLASS 2 as a part'. Note that not every subclass of CLASS1 will necessarily have instances with parts of type CLASS2. A car manufacturer may sell a line of 'Belcher' autos with GPS as an optional part. But the 'Belcher' (a subclass of Belcher) may not have that part as an option. Thus it is true that (hasOptionalPart Belcher GPS) but it is not true that (hasOptionalPart BelcherQQ GPS). Thus the relation is not an InheritableClassRelation. If there are subclasses of Belcher that have optional GPS, that assertion must be made on that subclass explicitly.\")").
+:-assert_kif("(documentation hasOptionalPart \" (hasOptionalPart ?CLASS1 ?CLASS2) means that there is some instance of ?CLASS1 which has a part which is an instance of ?CLASS2. More informally, this relation may be stated 'instances of CLASS1 may have an instance of CLASS 2 as a part'. Note that not every genls of CLASS1 will necessarily have instances with parts of type CLASS2. A car manufacturer may sell a line of 'Belcher' autos with GPS as an optional part. But the 'Belcher' (a genls of Belcher) may not have that part as an option. Thus it is true that (hasOptionalPart Belcher GPS) but it is not true that (hasOptionalPart BelcherQQ GPS). Thus the relation is not an InheritableClassRelation. If there are subclasses of Belcher that have optional GPS, that assertion must be made on that genls explicitly.\")").
 %
 :-assert_kif("(=> (hasOptionalPart ?Class1 ?Class2) (exists (?INST ?PART) (and (instance ?INST ?Class1) (instance ?PART ?Class2) (properPart ?PART ?INST))))").
 %
@@ -11997,17 +11997,17 @@
 %
 % :-assert_kif("; domain 1 of SUMO containsInformation is ContentBearingObject ").
 % :-assert_kif("; in SKIF, not in Protege!! -- problem in importation ").
-:-assert_kif("(subclass PhysicalSymbol ContentBearingObject)").
+:-assert_kif("(genls PhysicalSymbol ContentBearingObject)").
 :-assert_kif("(documentation PhysicalSymbol \"a PhysicalSymbol is a ContentBearingObject that respresents a single concept. It may be composed of more than one smaller symbol, as a word can be composed of letters, but the conceptual content of the whole symbol must not be merely a concatenation of the individual symbols, but must have content unpredictable from the individual symbols. Thus a sentence is not a symbol because its content is predictable by analyzing the syntactic relations among the individual words. Printing characters, icons, and images are the most common symbols. Each of these has a corresponding AbstractSymbol that it represents.\")").
 %
-:-assert_kif("(subclass ContentBearingArtifact ContentBearingObject)").
-:-assert_kif("(subclass ContentBearingArtifact Artifact)").
+:-assert_kif("(genls ContentBearingArtifact ContentBearingObject)").
+:-assert_kif("(genls ContentBearingArtifact Artifact)").
 :-assert_kif("(documentation ContentBearingArtifact \"A ContentBearingObject that is an Artifact.\")").
 %
-:-assert_kif("(subclass IntelligentAgent CognitiveAgent)").
+:-assert_kif("(genls IntelligentAgent CognitiveAgent)").
 :-assert_kif("(documentation IntelligentAgent \"An IntelligentAgent is a class of CognitiveAgents, the typical adult member of which can understand and generate abstract linguistic utterances (not necessarily speech). This distinguishes people (and at some time in the future intelligent machines) from animals such as apes that have some understanding and planning ability, but no use of language with the complexity of natural languages. This also includes groups, organizations, and artifactual agents with the legal capabilities of people, such as corporations.\")").
 %
-:-assert_kif("(subclass NormativeProposition Assertion)").
+:-assert_kif("(genls NormativeProposition Assertion)").
 :-assert_kif("(documentation NormativeProposition \"A Proposition that asserts that you should or should not do something. This may be asserted by some agent, but may have no force or no agreement from other agents. Such an ineffective assertion might be, for example, 'If you don't eat your spinach, the boogieman will get you'.\")").
 %
 :-assert_kif("(instance isaModalAttributeOf BinaryRelation)").
@@ -12015,49 +12015,49 @@
 :-assert_kif("(domain isaModalAttributeOf 2 Assertion)").
 :-assert_kif("(documentation isaModalAttributeOf \"The inverse of hasModalAttribute - it relates a NormativeAttribute to a proposition that it applies to.\")").
 %
-:-assert_kif("(subclass Rule NormativeProposition)").
+:-assert_kif("(genls Rule NormativeProposition)").
 :-assert_kif("(documentation Rule \"A Rule is a set of one or more NormativePropositions that are issued by some Agent which is considered by some group of agents to be as an authority --not necessarily a legal authority, it can be very informal, such as an agreement among a group of people. Failing to adhere to a Rule need not have any negative consequences, but typically there is some negative consequence, which may be minimal, so most Rules are also Obligations. A formalistic grammatical rule (which is often violated without loss of comprehensibility) may be an example of a rule with no consequences for violation.\")").
 %
-:-assert_kif("(subclass Obligation Rule)").
+:-assert_kif("(genls Obligation Rule)").
 :-assert_kif("(documentation Obligation \"An obligation is a Rule stating that a certain act, if not performed by a cognitive agent, leads to some potential negative consequence -- a 'Sanction', which may be an event, state, or process. The sanction may not actually be imposed -- one can get away with crimes-- but it must cause some negative state -- e.g. the potential for being imprisoned is itself a negative. Potential danger is also considered a negative state. Obligations must be imposed by some authority: legal obligations are imposed by a legal authority, moral obligations are imposed by a moral authority, which can be the obligated agent - if an agent imposes rules on him/herself, the resulting negative effect for violation will be pangs of conscience. . SUMO NOTE: the SUMO Attribute 'Obligation' has been renamed 'Obligatory'. Note that individual may disagree as to whether something is or is not an obligation. A rule may only be a desideratum of some agent, with no real sanctions attached, in which case it is not an obligation. ======== Morality : moral rules have no objective basis but they achieve force by being agreed to by some community. Communities try to impose the dominant morality on the whole community. some members may reject the dominant consensus Is a rule of the community an obligation to all, or only to those who agree to the rules? If the community enforces its rules by some sanction, it is an obligation If a member accepts the rule, it is a moral obligation, and the sanction is conscience if there is no enforcement and member does not accept the rule, it is not an obligation.\")").
 %
-:-assert_kif("(subclass Authority IntelligentAgent)").
+:-assert_kif("(genls Authority IntelligentAgent)").
 :-assert_kif("(documentation Authority \"An Authority is an agent that is recognized by some CognitiveAgent as having the capability of creating a Rule.\")").
 %
-:-assert_kif("(subclass StandardsAuthority Authority)").
-:-assert_kif("(subclass StandardsAuthority Organization)").
+:-assert_kif("(genls StandardsAuthority Authority)").
+:-assert_kif("(genls StandardsAuthority Organization)").
 :-assert_kif("(documentation StandardsAuthority \"An authority which is an organization recognized by some group of agents as being able to declare a standard.\")").
 %
 % :-assert_kif(";has assent (to code-issuing power)").
 % :-assert_kif("; by group ").
-:-assert_kif("(subclass CodeListAgency StandardsAuthority)").
+:-assert_kif("(genls CodeListAgency StandardsAuthority)").
 :-assert_kif("(necessarily CodeListAgency hasAbstractName CodeListAgencyNameString)").
 :-assert_kif("(documentation CodeListAgency \"A CodeListAgency is a StandardsAuthority that maintains a CodeList. UBL: 'An agency that maintains one or more code lists'.\")").
 %
-:-assert_kif("(subclass CodeListAgencyIdentifier Identifier)").
+:-assert_kif("(genls CodeListAgencyIdentifier Identifier)").
 :-assert_kif("(:hasRestrictedVal CodeListAgencyIdentifier isaNameOf CodeListAgency)").
 :-assert_kif("(:hasRestrictedVal CodeListAgencyIdentifier hasReferent CodeListAgency)").
 :-assert_kif("(necessarily CodeListAgencyIdentifier isaNameOf CodeListAgency)").
 :-assert_kif("(documentation CodeListAgencyIdentifier \"A CodeListAgencyIdentifier is an abstract string that is a formal identifier (in some identification scheme) of a CodeListAgency.\")").
 %
-:-assert_kif("(subclass DocumentPhysical Text)").
+:-assert_kif("(genls DocumentPhysical Text)").
 :-assert_kif("(:hasRestrictedVal DocumentPhysical hasAbstractContent AbstractDocument)").
 :-assert_kif("(:hasRestrictedVal DocumentPhysical containsInformation DocumentalProposition)").
 :-assert_kif("(documentation DocumentPhysical \"A DocumentPhysical is a solid object containing at least some written linguistic information.\")").
 %
-:-assert_kif("(subclass EncodedDocument DocumentPhysical)").
+:-assert_kif("(genls EncodedDocument DocumentPhysical)").
 :-assert_kif("(documentation EncodedDocument \"An EncodedDocument is a Document produced by some process of Encoding. Encoding must use some procedure other than writing in a widely-used language, it must have some non-obvious features that make interpretation more difficult without knowledge of the encoding procedure.\")").
 %
-:-assert_kif("(subclass EncryptedDocument EncodedDocument)").
+:-assert_kif("(genls EncryptedDocument EncodedDocument)").
 :-assert_kif("(documentation EncryptedDocument \"An EncryptedDocument is a Document produced by an EncryptionProcess. The encryption is intended to prevent interpretation of the document by unintended recipients.\")").
 %
-:-assert_kif("(subclass AbstractInformationalEntity AbstractObject)").
-:-assert_kif("(subclass AbstractInformationalEntity SomethingUseful)").
+:-assert_kif("(genls AbstractInformationalEntity AbstractObject)").
+:-assert_kif("(genls AbstractInformationalEntity SomethingUseful)").
 :-assert_kif("(documentation AbstractInformationalEntity \"An AbstractInformationalEntity is any abstract entity that carries information that can be interpreted by a cognitive agent (possibly with the use of tools such as a computer). It can be a simple abstract symbol, or a complex concatenation of propositions. It is any form of abstract information in a symbolic form that can be represented in a physical object and interpreted by IntelligentAgents. This symbolic information refers to another entity, but is not itself the entity it refers to.\")").
 %
-:-assert_kif("(subclass Specification Rule)").
-:-assert_kif("(subclass Specification TextualProposition)").
-:-assert_kif("(subclass Specification SomethingUseful)").
+:-assert_kif("(genls Specification Rule)").
+:-assert_kif("(genls Specification TextualProposition)").
+:-assert_kif("(genls Specification SomethingUseful)").
 :-assert_kif("(documentation Specification \"A Specification is a set of Rules prescribing how something must be done in order to achieve a desired result. This is a very general concept. It includes natural-language grammars and computer programs as well as industrial manufacturing procedures. It is a TextualProposition, and therefore needs to be encoded as text in some physical object at some time.\")").
 %
 :-assert_kif("(instance specifiesProcess BinaryPredicate)").
@@ -12067,26 +12067,26 @@
 %
 :-assert_kif("(=> (specifiesProcess ?SPECCLASS ?PROCCLASS) (forall (?PROC ?SPEC) (=> (and (instance ?PROC ?PROCCLASS) (realization ?PROC ?SPEC)) (instance ?SPEC ?SPECCLASS))))").
 %
-:-assert_kif("(subclass InformationAttribute InternalAttribute)").
+:-assert_kif("(genls InformationAttribute InternalAttribute)").
 :-assert_kif("(documentation InformationAttribute \"An InformationAttribute is any of a broad class of attributes that apply specifically to abstract information.\")").
 %
-:-assert_kif("(subclass FileAttribute InformationAttribute)").
+:-assert_kif("(genls FileAttribute InformationAttribute)").
 :-assert_kif("(documentation FileAttribute \"A FileAttribute is an attribute of an abstract ComputerFile.\")").
 %
-:-assert_kif("(subclass FileFormat FileAttribute)").
-:-assert_kif("(subclass FileFormat Format)").
+:-assert_kif("(genls FileFormat FileAttribute)").
+:-assert_kif("(genls FileFormat Format)").
 :-assert_kif("(documentation FileFormat \"A FileFormat is a specification for the linear arrangement of data in a ComputerFile. A FileFormat is any of several specific formats that may apply to ComputerFiles. Some FileFormats are compatible with others, i.e. a file may have more than one format. All normal files are binary encoded.\")").
 %
-:-assert_kif("(subclass TextAttribute InformationAttribute)").
+:-assert_kif("(genls TextAttribute InformationAttribute)").
 :-assert_kif("(documentation TextAttribute \"A TextAttribute is any of several attributes that a text may have. It may be shared by physical texts and abstract texts.\")").
 %
-:-assert_kif("(subclass DateFormat TextFormat)").
+:-assert_kif("(genls DateFormat TextFormat)").
 :-assert_kif("(documentation DateFormat \"A DateFormat is some specified arrangement of text representing a specific date, such as 3/4/96 or 4 March 1996.\")").
 %
-:-assert_kif("(subclass TimeFormat TextFormat)").
+:-assert_kif("(genls TimeFormat TextFormat)").
 :-assert_kif("(documentation TimeFormat \"A TimeFormat is some specified arrangement of text representing a time of day, such as '1:30 PM' or '13:30'.\")").
 %
-:-assert_kif("(subclass DateTimeFormat TextFormat)").
+:-assert_kif("(genls DateTimeFormat TextFormat)").
 :-assert_kif("(documentation DateTimeFormat \"A DateTimeFormat is some specified arrangement of a date string and a time string, such a '1:30 PM on 4 March 1996'.\")").
 %
 :-assert_kif("(instance Binary InformationAttribute)").
@@ -12096,41 +12096,41 @@
 :-assert_kif("(documentation MimeEncoded \"An informational entity has MimeEncoded format if its encoding is recognizable as one of the Mime formats.\")").
 %
 % :-assert_kif(";<module>UBL-invoice</module> ").
-:-assert_kif("(subclass Agreement Proposition)").
+:-assert_kif("(genls Agreement Proposition)").
 :-assert_kif("(documentation Agreement \"An agreement is a proposition that states that the speaker believes the proposition asserted by another speaker.\")").
 %
-:-assert_kif("(subclass Assent Agreement)").
+:-assert_kif("(genls Assent Agreement)").
 :-assert_kif("(documentation Assent \"Assent is a response by one agent to an assertion by another agent that the responding agent agrees to the truth of the assertion.\")").
 %
-:-assert_kif("(subclass Communication AbstractInformationalEntity)").
-:-assert_kif("(subclass Communication Proposition)").
+:-assert_kif("(genls Communication AbstractInformationalEntity)").
+:-assert_kif("(genls Communication Proposition)").
 :-assert_kif("(:hasRestrictedVal Communication isUsedIn Communicating)").
 :-assert_kif("(relatedInternalConcept Communication Communicating)").
 :-assert_kif("(documentation Communication \"A Communication is the product of the process of Communicating. It is an Proposition which could have been conveyed by a text or a non-textual signal. It has one or more authors and an audience -- i.e. an agent or group of agents to whom it is directed. For some Communications, e.g. general publications or novels, the audience may be the entire human race. Note that the process of Communicating has an experiencer -- but an experiencer is not necessarily a member of the audience to whom the communication is addressed;an intercepted private communication provides an example. Therefore thereis a need for a special relation describing the audience to whom a communication is directed. Note that this is the abstract content of a communication, which may be realized as a series of sound waves or electromagnetic waves or gestures, or in some fixed medium such as text of a CD-ROM;the realization may be a physical object or an event.\")").
 %
-:-assert_kif("(subclass Assertion Communication)").
+:-assert_kif("(genls Assertion Communication)").
 :-assert_kif("(:hasRestrictedVal Assertion isRepresentedBy Statement)").
 :-assert_kif("(documentation Assertion \"An Assertion is a Communication which describes a state of affairs and asserts that the state holds. It may have the value of true or false. Assertions usually are simple, describing one fact, but may be more complex, i.e. may be composed of multiple assertions. An Assertion is a communication from one IntelligentAgent to another. This is the abstract propositional content of a SUMO physical 'Statement'.\")").
 %
-:-assert_kif("(subclass EncodingProcedure Specification)").
+:-assert_kif("(genls EncodingProcedure Specification)").
 :-assert_kif("(specifiesProcess EncodingProcedure Encoding)").
 :-assert_kif("(documentation EncodingProcedure \"An EncodingProcedure is a specification of how information is to be represented so that the content can be recovered from the encoded form.\")").
 %
-:-assert_kif("(subclass EncryptionProcedure EncodingProcedure)").
+:-assert_kif("(genls EncryptionProcedure EncodingProcedure)").
 :-assert_kif("(specifiesProcess EncryptionProcedure Encryption)").
 :-assert_kif("(documentation EncryptionProcedure \"An EncryptionProcedure is a specification of how information in a human-recognizable form is to be represented so that the content cannot be recovered without knowledge of the decryption method. The decryption method may or may not be deducible from knowledge external to the encrypted data.\")").
 %
-:-assert_kif("(subclass Encryption Encoding)").
+:-assert_kif("(genls Encryption Encoding)").
 :-assert_kif("(:hasRestrictedVal Encryption creates EncryptedDocument)").
 :-assert_kif("(documentation Encryption \"Encryption is the process of executing an EncryptionProcedure so that information in a human-recognizable form is represented so that the content cannot be recovered without knowledge of the decryption method. The decryption method may or may not be deducible from knowledge external to the encrypted data.\")").
 %
-:-assert_kif("(subclass FormatSpecification EncodingProcedure)").
+:-assert_kif("(genls FormatSpecification EncodingProcedure)").
 :-assert_kif("(documentation FormatSpecification \"A FormatSpecification is a specification for a spatial arrangement of information, which may be linear or higher-dimensional. The spatial relations between component entities in a Format may or may not contain information not otherwise encoded. A simple layout Format will not usually have information encoded in the arrangement of the components.\")").
 %
-:-assert_kif("(subclass Grammar Specification)").
+:-assert_kif("(genls Grammar Specification)").
 :-assert_kif("(documentation Grammar \"A Grammar is a set of rules regarding how symbols may be combined so as to form meaningful combinations. This includes natural-language grammars and formal grammars.\")").
 %
-:-assert_kif("(subclass AbstractLanguage AbstractLinguisticExpression)").
+:-assert_kif("(genls AbstractLanguage AbstractLinguisticExpression)").
 :-assert_kif("(:hasRestrictedVal AbstractLanguage isAbstractContentOf Language)").
 :-assert_kif("(:hasRestrictedVal AbstractLanguage isRepresentedBy Language)").
 :-assert_kif("(necessarily AbstractLanguage isAbstractContentOf Language)").
@@ -12150,18 +12150,18 @@
 :-assert_kif("(relatedInternalConcept usesLanguage expressedInLanguage)").
 :-assert_kif("(documentation usesLanguage \" (usesLanguage ?EXP ?LANG) means that ?EXP is a valid expression or combination of expressions of the language ?LANG, and contains propositional content. This relation is similar to the SUMO expressedInLanguage, but the SUMO relation has physical objects as its domain 1, rather than abstract objects.\")").
 %
-:-assert_kif("(subclass AbstractLinguisticExpression AbstractInformationalEntity)").
+:-assert_kif("(genls AbstractLinguisticExpression AbstractInformationalEntity)").
 :-assert_kif("(:hasRestrictedVal AbstractLinguisticExpression isAbstractContentOf LinguisticExpression)").
 :-assert_kif("(documentation AbstractLinguisticExpression \"Any linguistic elements in their abstract form.\")").
 %
-:-assert_kif("(subclass Description TextualProposition)").
+:-assert_kif("(genls Description TextualProposition)").
 :-assert_kif("(:hasRestrictedVal Description hasTextualExpression DescriptiveText)").
 :-assert_kif("(documentation Description \"A Description is the propositional content a text that is intended to explain a relatively restricted concept or object. It has one central theme and can be considered as a description of that theme. It is very flexible and can vary from a brief definition to an encylopedia-length article, provided that it sticks pretty closely to a single theme.\")").
 %
-:-assert_kif("(subclass DescriptiveText AbstractText)").
+:-assert_kif("(genls DescriptiveText AbstractText)").
 :-assert_kif("(documentation DescriptiveText \"A DescriptiveText is the AbstractText representation of a proposition that is intended to explain a relatively restricted concept or object. It has one central theme and can be considered as a description of that theme. It is very flexible and can vary from a brief definition to an encylopedia-length article, provided that it sticks pretty closely to a single theme.\")").
 %
-:-assert_kif("(subclass Definition DescriptiveText)").
+:-assert_kif("(genls Definition DescriptiveText)").
 :-assert_kif("(documentation Definition \"A Definition is a structured AbstractText that has term string (which may be more than one word), and a definition of that term.\")").
 %
 :-assert_kif("(instance hasListElement BinaryRelation)").
@@ -12172,59 +12172,59 @@
 %
 :-assert_kif("(=> (hasListElement ?LISTCLASS ?ENTITYCLASS) (forall (?LIST) (=> (instance ?LIST ?LISTCLASS) (and (exists (?ENT) (instance ?ENT ?ENTITYCLASS)) (inList ?ENT ?LIST)))))").
 %
-:-assert_kif("(subclass BinaryObject AbstractInformationalEntity)").
+:-assert_kif("(genls BinaryObject AbstractInformationalEntity)").
 :-assert_kif("(hasAttributeInstance BinaryObject Binary)").
 :-assert_kif("(documentation BinaryObject \"A BinaryObject is any abstract binary-encoded data representable in any physical form, whether or not it is readable by a computer.\")").
 %
-:-assert_kif("(subclass ComputerFile BinaryObject)").
+:-assert_kif("(genls ComputerFile BinaryObject)").
 :-assert_kif("(necessarily ComputerFile property FileFormat)").
 :-assert_kif("(necessarily ComputerFile hasAbstractName FileName)").
 :-assert_kif("(:hasRestrictedVal ComputerFile hasAbstractName FileName)").
 :-assert_kif("(documentation ComputerFile \"A ComputerFile is binary-encoded data in any physical form that can be read into a computer, usually using some computer peripheral device. This is the abstract concept, and a linear set of bytes on paper tape is considered to represent the exact same ComputerFile as the same set of bytes in a computer memory.\")").
 %
-:-assert_kif("(subclass TextFile ComputerFile)").
-:-assert_kif("(subclass TextFile AbstractText)").
+:-assert_kif("(genls TextFile ComputerFile)").
+:-assert_kif("(genls TextFile AbstractText)").
 :-assert_kif("(documentation TextFile \"A TextFile is a computerFile whose content is predominantly a text, that is the content contains mostly linear strings of characters. Some images may be associated with the text. The text is encoded in some CharacterSet\")").
 %
-:-assert_kif("(subclass ImageFile ComputerFile)").
+:-assert_kif("(genls ImageFile ComputerFile)").
 :-assert_kif("(documentation ImageFile \"An ImageFile is a ComputerFile whose content is predominantly some image, though some text may be associated with the image.\")").
 %
-:-assert_kif("(subclass FileName Identifier)").
+:-assert_kif("(genls FileName Identifier)").
 :-assert_kif("(:hasRestrictedVal FileName isaNameOf ComputerFile)").
 :-assert_kif("(documentation FileName \"A FileName is the identifying string that names a ComputerFile.\")").
 %
-:-assert_kif("(subclass Location Entity)").
+:-assert_kif("(genls Location Entity)").
 :-assert_kif("(documentation Location \"A Location can be abstract, for abstract objects, or physical, for physical objects. This is a broad concept.\")").
 %
-:-assert_kif("(subclass InternetLocation Location)").
+:-assert_kif("(genls InternetLocation Location)").
 :-assert_kif("(hasNecesaryRelationTo InternetLocation hasAbstractName URL)").
 :-assert_kif("(documentation InternetLocation \"The InternetLocation is a location in the abstract space of the Internet -- it can be a domain, a directory, or a file -- whether or not it is accessible at any one time.\")").
 %
-:-assert_kif("(subclass FileInternetLocation InternetLocation)").
+:-assert_kif("(genls FileInternetLocation InternetLocation)").
 :-assert_kif("(documentation FileInternetLocation \"The InternetLocation of a ComputerFile.\")").
 %
 % :-assert_kif(";communication methods: oral, written, electronic ").
 % :-assert_kif("; start with events ").
-:-assert_kif("(subclass AbstractText AbstractLinguisticExpression)").
+:-assert_kif("(genls AbstractText AbstractLinguisticExpression)").
 :-assert_kif("(:hasRestrictedval AbstractText isAbstractContentOf Text)").
-:-assert_kif("(documentation AbstractText \"An AbstractText is an AbstractInformationalEntity containing at least some linguistic elements, though image and musical elements may be included. A song is an AbstractText. It is not necessarily a Proposition - AbstractTexts that are propositions are found in the subclass TextualProposition.\")").
+:-assert_kif("(documentation AbstractText \"An AbstractText is an AbstractInformationalEntity containing at least some linguistic elements, though image and musical elements may be included. A song is an AbstractText. It is not necessarily a Proposition - AbstractTexts that are propositions are found in the genls TextualProposition.\")").
 %
-:-assert_kif("(subclass TextualProposition Proposition)").
+:-assert_kif("(genls TextualProposition Proposition)").
 :-assert_kif("(documentation TextualProposition \"A TextualProposition is a Proposition that is the content of a Text. Single words like 'cat' may have certain entities as referents, but cannot be said to express a proposition.\")").
 %
-:-assert_kif("(subclass CommunicationProposition TextualProposition)").
+:-assert_kif("(genls CommunicationProposition TextualProposition)").
 :-assert_kif("(:hasRestrictedval CommunicationProposition isReferencedBy Communication)").
 :-assert_kif("(documentation CommunicationProposition \"A CommunicationProposition is a Proposition that is the propositional content of a communication.\")").
 %
-:-assert_kif("(subclass MessageProposition CommunicationProposition)").
+:-assert_kif("(genls MessageProposition CommunicationProposition)").
 :-assert_kif("(:hasRestrictedval MessageProposition isReferencedBy MessageProposition)").
 :-assert_kif("(documentation MessageProposition \"A MessageProposition is a Proposition that is the propositional content of a Message.\")").
 %
-:-assert_kif("(subclass AbstractFormattedText AbstractText)").
+:-assert_kif("(genls AbstractFormattedText AbstractText)").
 :-assert_kif("(minCardinalityAtClasses AbstractFormattedText hasaTextComponent 2 AbstractText)").
 :-assert_kif("(documentation AbstractFormattedText \"A text with at least two components in a particular arrangement. See also AbstractDocument.\")").
 %
-:-assert_kif("(subclass TextFormat TextAttribute)").
+:-assert_kif("(genls TextFormat TextAttribute)").
 :-assert_kif("(documentation TextFormat \"A TextFormat is one of the attributes of a formatted text. It can take any of a very large variety of specific values, as for example, any HTML format specification.\")").
 %
 :-assert_kif("(instance hasTextFormat BinaryPredicate)").
@@ -12232,8 +12232,8 @@
 :-assert_kif("(domain hasTextFormat 2 TextFormat)").
 :-assert_kif("(documentation hasTextFormat \"hasTextFormat relates an AbstractLinguisticExpression to the format in which it is arranged.\")").
 %
-:-assert_kif("(subclass AbstractDateTimeText AbstractFormattedText)").
-:-assert_kif("(subclass AbstractDateTimeText DocumentFieldString)").
+:-assert_kif("(genls AbstractDateTimeText AbstractFormattedText)").
+:-assert_kif("(genls AbstractDateTimeText DocumentFieldString)").
 :-assert_kif("(necessarily AbstractDateTimeText hasaTextComponent AbstractDateText)").
 :-assert_kif("(:hasRestrictedVal AbstractDateTimeText hasComponentList DateAndTimeList)").
 :-assert_kif("(:hasRestrictedVal AbstractDateTimeText hasReferent TimePosition)").
@@ -12241,109 +12241,109 @@
 :-assert_kif("(:hasRestrictedVal AbstractDateTimeText isAbstractContentOf SymbolicString)").
 :-assert_kif("(documentation AbstractDateTimeText \"An AbstractDateTimeText is an AbstractText that contains both date and time strings.\")").
 %
-:-assert_kif("(subclass ExpirationDateText AbstractFormattedText)").
+:-assert_kif("(genls ExpirationDateText AbstractFormattedText)").
 :-assert_kif("(documentation ExpirationDateText \"An ExpirationDateText specifies explicitly or in abbreviated form the day on which some condition expires, such as validity of a credit card. The ExpirationDateText may contain only a specified year or year and month, in which case it is the end of the year or end of the month which is the implied meaning of the date.\")").
 %
-:-assert_kif("(subclass AbstractYearText AbstractString)").
+:-assert_kif("(genls AbstractYearText AbstractString)").
 :-assert_kif("(necessarily AbstractYearText hasaTextComponent AbstractYearNumberText)").
 :-assert_kif("(documentation AbstractYearText \"An AbstractYearText must contain a number and may contain an era - 40 BC or 2004 AD, or 1993. Abnormal-looking dates (such as 345 without an era) must be caught by the implementation with respect to the context.\")").
 %
-:-assert_kif("(subclass AbstractYearNumberText AbstractString)").
+:-assert_kif("(genls AbstractYearNumberText AbstractString)").
 :-assert_kif("(documentation AbstractYearNumberText \"An AbstractYearNumberText is a numeric string specifying some year, without any era information.\")").
 %
-:-assert_kif("(subclass AbstractDateText AbstractFormattedText)").
-:-assert_kif("(subclass AbstractDateText DocumentFieldString)").
+:-assert_kif("(genls AbstractDateText AbstractFormattedText)").
+:-assert_kif("(genls AbstractDateText DocumentFieldString)").
 :-assert_kif("(:hasRestrictedVal AbstractDateText represents TimeInterval)").
 :-assert_kif("(:hasRestrictedVal AbstractDateText hasReferent TimeInterval)").
 :-assert_kif("(:hasRestrictedVal AbstractDateText hasTextFormat DateFormat)").
 :-assert_kif("(:hasRestrictedVal AbstractDateText isAbstractContentOf SymbolicString)").
 :-assert_kif("(documentation AbstractDateText \"An AbstractDateText is an AbstractText specifying some specific day in some date era.\")").
 %
-:-assert_kif("(subclass AbstractTimeText AbstractFormattedText)").
-:-assert_kif("(subclass AbstractTimeText DocumentFieldString)").
+:-assert_kif("(genls AbstractTimeText AbstractFormattedText)").
+:-assert_kif("(genls AbstractTimeText DocumentFieldString)").
 :-assert_kif("(:hasRestrictedVal AbstractTimeText hasTextFormat TimeFormat)").
 :-assert_kif("(:hasRestrictedVal AbstractTimeText isAbstractContentOf SymbolicString)").
 :-assert_kif("(:hasRestrictedVal AbstractTimeText hasReferent TimePosition)").
 :-assert_kif("(documentation AbstractTimeText \"An AbstractTimeText is an AbstractText specifying a time of day. It may be in twelve-hour or twenty-four hour format.\")").
 %
-:-assert_kif("(subclass TimeOfDay RecurrentTimeInterval)").
-:-assert_kif("(documentation TimeOfDay \"A TimeOfDay is a class of TimeIntervals, each of which specifies an hour and minute, without specifying the specific day. 12:01 AM would be a subclass of TimeOfDay, as would 12:01.34 AM. This is considered as an interval rather than a TimePoint, the interval lasting as long as the precision of the specification indicates. The typical precision is a one-munite interval, such as 14:30.\")").
+:-assert_kif("(genls TimeOfDay RecurrentTimeInterval)").
+:-assert_kif("(documentation TimeOfDay \"A TimeOfDay is a class of TimeIntervals, each of which specifies an hour and minute, without specifying the specific day. 12:01 AM would be a genls of TimeOfDay, as would 12:01.34 AM. This is considered as an interval rather than a TimePoint, the interval lasting as long as the precision of the specification indicates. The typical precision is a one-munite interval, such as 14:30.\")").
 %
-:-assert_kif("(subclass RecurringDay Day)").
-:-assert_kif("(subclass RecurringDay RecurrentTimeInterval)").
+:-assert_kif("(genls RecurringDay Day)").
+:-assert_kif("(genls RecurringDay RecurrentTimeInterval)").
 :-assert_kif("(documentation RecurringDay \"A RecurringDay is class of Day that has more than one instance, e.g. the class of Mondays or the class of January 1sts.\")").
 %
-:-assert_kif("(subclass DocumentalProposition TextualProposition)").
+:-assert_kif("(genls DocumentalProposition TextualProposition)").
 :-assert_kif("(:hasRestrictedVal DocumentalProposition isTheInformationContainedIn DocumentPhysical)").
 :-assert_kif("(:hasRestrictedVal DocumentalProposition isReferencedBy AbstractDocument)").
 :-assert_kif("(:hasRestrictedVal DocumentalProposition hasTextualExpression AbstractDocument)").
 :-assert_kif("(documentation DocumentalProposition \"A DocumentalProposition is a Proposition that is the conceptual content of a Document.\")").
 %
-:-assert_kif("(subclass AbstractDocument AbstractFormattedText)").
+:-assert_kif("(genls AbstractDocument AbstractFormattedText)").
 :-assert_kif("(:hasRestrictedVal AbstractDocument hasPropositionalContent DocumentalProposition)").
 :-assert_kif("(:hasRestrictedVal AbstractDocument hasReferent DocumentalProposition)").
 :-assert_kif("(documentation AbstractDocument \"A AbstractDocument is an AbstractFormattedText with at least two different AbstractText components. The document expresses at least one proposition\")").
 %
-:-assert_kif("(subclass StructuredDocumentText AbstractFormattedText)").
+:-assert_kif("(genls StructuredDocumentText AbstractFormattedText)").
 :-assert_kif("(necessarily StructuredDocumentText hasPropositionalContent DocumentalProposition)").
 :-assert_kif("(documentation StructuredDocumentText \"A StructuredDocumentText the AbstractText representation of the propositional content of a DocumentPhysical, having at least two different AbstractText components.\")").
 %
-:-assert_kif("(subclass CommunicationEvent PhysicalEvent)").
+:-assert_kif("(genls CommunicationEvent PhysicalEvent)").
 :-assert_kif("(documentation CommunicationEvent \"A CommunicationEvent is an event in which one IntelligentAgent transmits information to another via a communications channel. The information may be of any form, speech ,music, images, etc.\")").
 %
-:-assert_kif("(subclass ConversationEvent CommunicationEvent)").
+:-assert_kif("(genls ConversationEvent CommunicationEvent)").
 :-assert_kif("(documentation ConversationEvent \"A CommunicationEvent in which two or more IntelligentAgents transmit information by language, which may be sign language, formal or informal. The transmission can occur at short range or over a distance by electronic communication, but must be interactive in the sense that a response can come within a few seconds, and the event includes speaking by and transmission of information between at least two participants.\")").
 %
-:-assert_kif("(subclass BusinessMessage Message)").
+:-assert_kif("(genls BusinessMessage Message)").
 :-assert_kif("(:hasRestrictedVal BusinessMessage isUsedIn BusinessProcess)").
 :-assert_kif("(documentation BusinessMessage \"A BusinessMessage is a Message used to conduct a business goal, commonly in purchasing and sales, but any business goal can be a purpose.\")").
 %
-:-assert_kif("(subclass TelephoneConversation ConversationEvent)").
+:-assert_kif("(genls TelephoneConversation ConversationEvent)").
 :-assert_kif("(documentation TelephoneConversation \"A TelephoneConversation is a ConversationEvent in which voice signals are converted to transmitted as electrical signals at a point near the speaker and the electrical signals are reconverted back to voice at a point near the listener.\")").
 %
-:-assert_kif("(subclass TelephoneOrder TelephoneConversation)").
+:-assert_kif("(genls TelephoneOrder TelephoneConversation)").
 :-assert_kif("(:hasRestrictedVal TelephoneOrder represents TelephoneOrderProposition)").
 :-assert_kif("(documentation TelephoneOrder \"A telephone conversation or part of a telephone conversation in which a product or service was ordered. This is a physical event with a propositional content.\")").
 %
-:-assert_kif("(subclass TelephoneOrderProposition BusinessMessage)").
+:-assert_kif("(genls TelephoneOrderProposition BusinessMessage)").
 :-assert_kif("(documentation TelephoneOrderProposition \"A TelephoneOrderProposition is the propositional content of a telephone conversation or part of a telephone conversation in which a product or service was ordered. This is directly related to a TelephoneOrder, a physical event with the same propositional content.\")").
 %
-:-assert_kif("(subclass TransactionMessage AbstractDocument)").
+:-assert_kif("(genls TransactionMessage AbstractDocument)").
 :-assert_kif("(:hasRestrictedVal TransactionMessage isUsedIn FinancialTransaction)").
 :-assert_kif("(documentation TransactionMessage \"A TransactionMessage is an AbstractDocument transmitted in the course of purchasing and sales.\")").
 %
-:-assert_kif("(subclass AbstractOrder TransactionMessage)").
+:-assert_kif("(genls AbstractOrder TransactionMessage)").
 :-assert_kif("(documentation AbstractOrder \"UBL: A document that contains information directly relating to the economic event of ordering products.\")").
 %
-:-assert_kif("(subclass AbstractInvoice TransactionMessage)").
+:-assert_kif("(genls AbstractInvoice TransactionMessage)").
 :-assert_kif("(:hasRestrictedval AbstractInvoice isRepresentedBy Invoice)").
 :-assert_kif("(:hasRestrictedVal AbstractInvoice isAbstractContentOf Invoice)").
 :-assert_kif("(necessarily AbstractInvoice hasaTextComponent InvoiceLine)").
 :-assert_kif("(necessarily AbstractInvoice hasaTextComponent LegalTotalsText)").
 :-assert_kif("(documentation AbstractInvoice \"UBL: the document that describes the financial commitment of the Order.\")").
 %
-:-assert_kif("(subclass InvoiceProposition MessageProposition)").
+:-assert_kif("(genls InvoiceProposition MessageProposition)").
 :-assert_kif("(documentation InvoiceProposition \"An InvoiceProposition is a MessageProposition expressing the propositional content of an Invoice.\")").
 %
-:-assert_kif("(subclass AbstractOrderChange TransactionMessage)").
+:-assert_kif("(genls AbstractOrderChange TransactionMessage)").
 :-assert_kif("(documentation AbstractOrderChange \"UBL: A document that contains information directly relating to the economic event of changing an order.\")").
 %
-:-assert_kif("(subclass AbstractOrderResponseSimple TransactionMessage)").
+:-assert_kif("(genls AbstractOrderResponseSimple TransactionMessage)").
 :-assert_kif("(documentation AbstractOrderResponseSimple \"UBL: The document responding to the Buyer to indicate simple acceptance or rejection of the entire Order.\")").
 %
-:-assert_kif("(subclass AbstractOrderResponse TransactionMessage)").
+:-assert_kif("(genls AbstractOrderResponse TransactionMessage)").
 :-assert_kif("(documentation AbstractOrderResponse \"UBL: The document responding to the Buyer to indicate detailed responses against a single Order.\")").
 %
-:-assert_kif("(subclass AbstractOrderCancellation TransactionMessage)").
+:-assert_kif("(genls AbstractOrderCancellation TransactionMessage)").
 :-assert_kif("(documentation AbstractOrderCancellation \"UBL: The document that advises either party of the cancellation of an Order.\")").
 %
-:-assert_kif("(subclass AbstractDespatchAdvice TransactionMessage)").
+:-assert_kif("(genls AbstractDespatchAdvice TransactionMessage)").
 :-assert_kif("(documentation AbstractDespatchAdvice \"UBL: The document that describes the content of goods shipped.\")").
 %
-:-assert_kif("(subclass AbstractReceiptAdvice TransactionMessage)").
+:-assert_kif("(genls AbstractReceiptAdvice TransactionMessage)").
 :-assert_kif("(documentation AbstractReceiptAdvice \"UBL: The document that advises the goods received and accepted by the buyer.\")").
 %
-:-assert_kif("(subclass WrittenCommunicationEvent CommunicationEvent)").
+:-assert_kif("(genls WrittenCommunicationEvent CommunicationEvent)").
 :-assert_kif("(documentation WrittenCommunicationEvent \"In a WrittenCommunicationEvent, one IntelligentAgent creates a written document intended to be read by another agent.\")").
 %
 :-assert_kif("(instance isUsedIn BinaryPredicate)").
@@ -12351,25 +12351,25 @@
 :-assert_kif("(domain isUsedIn 2 IntentionalProcess)").
 :-assert_kif("(documentation isUsedIn \"isUsedIn relates a useful thing - concrete or abstract to the Process in which it is used by some unspecified CognitiveAgent who uses it in that process. See related relation 'uses', specifying an object used by an Agent in an unspecified process.\")").
 %
-:-assert_kif("(subclass BusinessProcess IntentionalProcess)").
+:-assert_kif("(genls BusinessProcess IntentionalProcess)").
 :-assert_kif("(documentation BusinessProcess \"Any process used in business including but not restricted to buying, selling, manufacturing, or performing a service.\")").
 %
-:-assert_kif("(subclass SomethingUseful Entity)").
+:-assert_kif("(genls SomethingUseful Entity)").
 :-assert_kif("(documentation SomethingUseful \"SomethingUseful can be any entity, an object, process, event, procedure, theory, that a CognitiveAgent uses to accomplish a goal.\")").
 %
-:-assert_kif("(subclass CommunicationsChannel SomethingUseful)").
+:-assert_kif("(genls CommunicationsChannel SomethingUseful)").
 :-assert_kif("(documentation CommunicationsChannel \"Any means used by IntelligentAgents to transmit information from one to another.\")").
 %
-:-assert_kif("(subclass TelephoneConversing Speaking)").
+:-assert_kif("(genls TelephoneConversing Speaking)").
 :-assert_kif("(documentation TelephoneConversing \"A process of orally communicating in which a telephone is used to convert sounds to electrical signals at one end and reconvert the signals to sound at another end.\")").
 %
-:-assert_kif("(subclass BusinessAgent IntelligentAgent)").
+:-assert_kif("(genls BusinessAgent IntelligentAgent)").
 :-assert_kif("(documentation BusinessAgent \"An IntelligentAgent that is participating in a BusinessProcess.\")").
 %
-:-assert_kif("(subclass BusinessParty BusinessAgent)").
+:-assert_kif("(genls BusinessParty BusinessAgent)").
 :-assert_kif("(documentation BusinessParty \"A BusinessAgent who is participating in a FinancialTransaction - buying or selling.\")").
 %
-:-assert_kif("(subclass :UBL-Synonym :Synonym)").
+:-assert_kif("(genls :UBL-Synonym :Synonym)").
 :-assert_kif("(documentation :UBL-Synonym \":UBL-Synonym is the class containing instances of UBLK terms which will have pointers to corresponding terms in the ontology.\")").
 %
 :-assert_kif("(instance hasInternetLocation BinaryRelation)").
@@ -12404,43 +12404,43 @@
 :-assert_kif("(inverse hasUniquePosition isUniqueFor)").
 :-assert_kif("(documentation hasUniquePosition \"hasUniquePosition specifies the name of a position in an organization for which there can be only one person occupying that position at any one time.\")").
 %
-:-assert_kif("(subclass UnitOfCurrency UnitOfMeasure)").
+:-assert_kif("(genls UnitOfCurrency UnitOfMeasure)").
 :-assert_kif("(documentation UnitOfCurrency \"A UnitOfCurrency is the specific unit in which amounts of currency are measured.\")").
 %
-:-assert_kif("(subclass CurrencyAmount RationalNumber)").
+:-assert_kif("(genls CurrencyAmount RationalNumber)").
 :-assert_kif("(documentation CurrencyAmount \"A CurrencyAmount is a rational number that is used to specify some number of monetary units in a business transaction. This is the equivalent of UBL Amount.Content. This is rational number rather than a real number because the number of decimal digits will in general be restricted. In invoices, it is unlikely that more than 3 decimal digits will appear in a price.\")").
 %
-:-assert_kif("(subclass UBLCurrencyMeasure CurrencyMeasure)").
-:-assert_kif("(documentation UBLCurrencyMeasure \"UBLCurrencyMeasure is a class added to correspond to UBL 'Amount.Type'. This is represented as a subclass of SUMO CurrencyMeasure because according to the UBL specification, the unit of currency may only be implied rather than explicitly represented in the physical embodiments of this abstract concept. The 'Content' (quantifier) of this UBL concept is a rational number rather than a real number because the number of decimal digits will in general be restricted. In invoices, it is unlikely that more than 3 decimal digits will appear in a price. UBL: A number of monetary units specified in a currency where the unit of currency is explicit or implied.\")").
+:-assert_kif("(genls UBLCurrencyMeasure CurrencyMeasure)").
+:-assert_kif("(documentation UBLCurrencyMeasure \"UBLCurrencyMeasure is a class added to correspond to UBL 'Amount.Type'. This is represented as a genls of SUMO CurrencyMeasure because according to the UBL specification, the unit of currency may only be implied rather than explicitly represented in the physical embodiments of this abstract concept. The 'Content' (quantifier) of this UBL concept is a rational number rather than a real number because the number of decimal digits will in general be restricted. In invoices, it is unlikely that more than 3 decimal digits will appear in a price. UBL: A number of monetary units specified in a currency where the unit of currency is explicit or implied.\")").
 %
-:-assert_kif("(subclass AbstractNumericString AbstractString)").
+:-assert_kif("(genls AbstractNumericString AbstractString)").
 :-assert_kif("(necessarily AbstractNumericString hasTextFormat NumericFormat)").
 :-assert_kif("(:hasRestrictedVal AbstractNumericString hasTextFormat NumericFormat)").
 :-assert_kif("(:hasRestrictedVal AbstractNumericString hasReferent Number)").
 :-assert_kif("(:hasRestrictedVal AbstractNumericString isRepresentedBy NumericString)").
 :-assert_kif("(documentation AbstractNumericString \"A AbstractNumericString is an abstract string of characters representing a number.\")").
 %
-:-assert_kif("(subclass NumericString SymbolicString)").
+:-assert_kif("(genls NumericString SymbolicString)").
 :-assert_kif("(necessarily NumericString represents Number)").
 :-assert_kif("(:hasRestrictedVal NumericString represents Number)").
 :-assert_kif("(necessarily NumericString isReferencedBy AbstractNumericString)").
 :-assert_kif("(:hasRestrictedVal NumericString isReferencedBy AbstractNumericString)").
 :-assert_kif("(documentation NumericString \"A NumericString is a physical object bearing the character sequence representing a number. It is referenced by an AbstractNumericString.\")").
 %
-:-assert_kif("(subclass AbstractCharacter AbstractSymbol)").
+:-assert_kif("(genls AbstractCharacter AbstractSymbol)").
 :-assert_kif("(:hasRestrictedVal AbstractCharacter isRepresentedBy Character)").
 :-assert_kif("(documentation AbstractCharacter \"An AbstractCharacter is one of a class of symbols contained in AbstractStrings, linear sequences of which constitute an AbstractString. Most such characters are printable, but characters such as white space and control characters are instances.\")").
 %
-:-assert_kif("(subclass AbstractDigit AbstractCharacter)").
+:-assert_kif("(genls AbstractDigit AbstractCharacter)").
 :-assert_kif("(:hasRestrictedVal AbstractDigit isRepresentedBy DigitCharacter)").
 :-assert_kif("(documentation AbstractDigit \"An AbstractDigit is one of a restricted class of symbols representing single numerals, usually 0 to 9.\")").
 %
-:-assert_kif("(subclass ComponentList List)").
+:-assert_kif("(genls ComponentList List)").
 :-assert_kif("(documentation ComponentList \"A ComponentList is a list of Classes each of which has instances which are potentially a component of another compound entity. This concept provides a mechanism to state that an instance of class A may or may not have parts which are instances of classes B, C, or D. This is an *optional* part list, but any given part may be specified as *required* by a hasNecessaryPart or necessarily proposition. An entity *must* have at least one component from this list.\")").
 %
 :-assert_kif("(=> (and (instance ?CLIST ComponentList) (inList ?CLASS ?CLIST)) (instance ?CLASS CLASS))").
 %
-:-assert_kif("(subclass DateAndTimeList ComponentList)").
+:-assert_kif("(genls DateAndTimeList ComponentList)").
 :-assert_kif("(hasListElement DateAndTimeList AbstractDateText)").
 :-assert_kif("(hasListElement DateAndTimeList AbstractTimeText)").
 :-assert_kif("(documentation DateAndTimeList \"A DateAndTimeList is a list containing two elements, a date string and a time string\".)").
@@ -12455,7 +12455,7 @@
 % :-assert_kif(";classes in the component list. ").
 :-assert_kif("(=> (hasComponentList ?ENTCLASS ?CLIST) (forall (?INST) (=> (instance ?INST ?ENTCLASS) (and (exists (?COMPONENT ?CLASS) (inList ?CLASS ?CLIST) (instance ?COMPONENT ?CLASS) (hasProperPart ?INST ?COMPONENT))))))").
 %
-:-assert_kif("(subclass TextComponentList ComponentList)").
+:-assert_kif("(genls TextComponentList ComponentList)").
 :-assert_kif("(documentation TextComponentList \"A TextComponentList is a list containing a set of text classes which constitute the exclusive text classes that may be found as the primary partition of a larger structured text. Note that each of these text components may itself have smaller components, but the TextComponentList must contain only the immediate components, not the subcomponents.\")").
 %
 :-assert_kif("(instance hasTextPartition BinaryPredicate)").
@@ -12468,8 +12468,8 @@
 % :-assert_kif(";text component of an instance of one of the partition classes. ").
 :-assert_kif("(=> (hasTextPartition ?TEXT ?PARTLIST) (forall (?SUBTEXT) (=> (isaTextComponentOf ?SUBTEXT ?TEXT) (exists (?TEXTCLASS) (or (and (inList ?TEXTCLASS ?PARTLIST) (instance ?SUBTEXT ?TEXTCLASS)) (exists (?SUBTEXT2) (and (inList ?TEXTCLASS ?PARTLIST) (instance ?SUBTEXT2 ?TEXTCLASS) (isaTextComponentOf ?SUBTEXT ?SUBTEXT2))))))))").
 %
-:-assert_kif("(subclass AbstractObject Abstract)").
-:-assert_kif("(subclass AbstractObject Location)").
+:-assert_kif("(genls AbstractObject Abstract)").
+:-assert_kif("(genls AbstractObject Location)").
 :-assert_kif("(documentation AbstractObject \"AbstractObject can be a useful concept for things that have abstract locations, such as conceptual objects in an abstract space.\")").
 %
 :-assert_kif("(instance hasLocation BinaryPredicate)").
@@ -12497,10 +12497,10 @@
 % :-assert_kif(";to physical locations specified by the 'located' relation. ").
 :-assert_kif("(=> (and (hasProperPart ?ENT ?PART) (located ?ENT ?LOC)) (located ?PART ?LOC))").
 %
-:-assert_kif("(subclass NumericFormat TextFormat)").
+:-assert_kif("(genls NumericFormat TextFormat)").
 :-assert_kif("(documentation NumericFormat \"A NumericFormat is a specification for the linear arrangement of characters to form a number - the format may apply to an AnstractNumericString or a physical NumericString. Formats are of varying type, for example scientific format uses a decimal fraction plus a power of ten. The minimum and maximum number of decimal digits may be specified by a NumericFormat.\")").
 %
-:-assert_kif("(subclass DocumentFieldString AbstractString)").
+:-assert_kif("(genls DocumentFieldString AbstractString)").
 :-assert_kif("(:hasRestrictedVal DocumentFieldString hasLocation AbstractDocument)").
 :-assert_kif("(:hasRestrictedVal DocumentFieldString isaTextComponentOf AbstractDocument)").
 :-assert_kif("(:hasRestrictedVal DocumentFieldString isUsedIn Communicating)").
@@ -12508,64 +12508,64 @@
 :-assert_kif("(:hasRestrictedVal DocumentFieldString hasaTextComponent AbstractString)").
 :-assert_kif("(documentation DocumentFieldString \"A DocumentFieldString is an AbstractString which is located within a defined field in an AbstractDocument.\")").
 %
-:-assert_kif("(subclass InvoiceLine DocumentFieldString)").
+:-assert_kif("(genls InvoiceLine DocumentFieldString)").
 :-assert_kif("(necessarily InvoiceLine hasLocation AbstractInvoice)").
 :-assert_kif("(:hasRestrictedVal InvoiceLine hasLocation AbstractInvoice)").
 :-assert_kif("(documentation InvoiceLine \"InvoiceLine is an abstract string containing the textual content of one line item of an invoice. It contains a reference to the item ordered as well as other information relevant to the item, such as quantity and base price. This is necessarily a part of an abstract invoice. UBL: information directly relating to a line item of a transaction. It identifies the item but only includes details about the item that are pertinent to one occurrence on a line item, e.g. quantity etc.;an invoice has one or more invoice lines.\")").
 %
-:-assert_kif("(subclass AmountType DocumentFieldString)").
+:-assert_kif("(genls AmountType DocumentFieldString)").
 :-assert_kif("(:hasRestrictedVal AmountType hasReferent CurrencyMeasure)").
 :-assert_kif("(documentation AmountType \"An AmountType is a string specifying a number of monetary units, as part of a document.\")").
 %
-:-assert_kif("(subclass LineExtensionAmount AmountType)").
+:-assert_kif("(genls LineExtensionAmount AmountType)").
 :-assert_kif("(necessarily LineExtensionAmount hasLocation AbstractInvoice)").
 :-assert_kif("(documentation LineExtensionAmount \"A DocumentFieldString specific to an invoice, stating the total for one line item. UBL: the monetary amount that is the total for the line item, including any pricing variation (allowances, charges or discounts) but not adjusted by any overall payment settlement discount or taxation. (equals BasePrice multiplied by Quantity).\")").
 %
-:-assert_kif("(subclass BasePriceAmount AmountType)").
+:-assert_kif("(genls BasePriceAmount AmountType)").
 :-assert_kif("(necessarily BasePriceAmount hasLocation BasePriceText)").
 :-assert_kif("(:hasRestrictedVal BasePriceAmount hasLocation BasePriceText)").
 :-assert_kif("(documentation BasePriceAmount \"A DocumentFieldString specific to an invoice, stating the price per unit for one line item. A unit price. UBL: specifies the base price.\")").
 %
-:-assert_kif("(subclass BasePriceText DocumentFieldString)").
+:-assert_kif("(genls BasePriceText DocumentFieldString)").
 :-assert_kif("(necessarily BasePriceText hasLocation TransactionMessage)").
 :-assert_kif("(necessarily BasePriceText hasaTextComponent BasePriceAmount)").
 :-assert_kif("(documentation BasePriceText \"A DocumentFieldString specific to an invoice, stating at least the price per quantity unit for one line item, and potentially other information such as the number of units on which the base price is predicated, maximum and minimum quantities required. This information may occur in several types of transaction document. UBL: information that directly relates to a base price for an object.\")").
 %
-:-assert_kif("(subclass LegalTotalsText DocumentFieldString)").
+:-assert_kif("(genls LegalTotalsText DocumentFieldString)").
 :-assert_kif("(:hasRestrictedVal LegalTotalsText hasLocation AbstractInvoice)").
 :-assert_kif("(necessarily LegalTotalsText hasaTextComponent LineExtensionTotal)").
 :-assert_kif("(necessarily LegalTotalsText hasaTextComponent AmountDue)").
 :-assert_kif("(documentation LegalTotalsText \"One or more amounts of currency due, stated in an invoice in a manner adequate to create a legally binding demand. Note that in the propositions above, the AmountDue and the LineExtensionTotal may be the same text string. UBL: Calculated amounts that are required on an invoice for legal purposes. (Note: totals required for taxation purposes are under tax totals). Associates the invoice with a set of totals required for the invoice to be a legal document. **NOTE** this may be a set of currency amounts, rather than one. It may be modified depending on clarification - 022504.\")").
 %
-:-assert_kif("(subclass LineExtensionTotal AmountType)").
+:-assert_kif("(genls LineExtensionTotal AmountType)").
 :-assert_kif("(:hasRestrictedVal LineExtensionTotal hasLocation LegalTotalsText)").
 :-assert_kif("(documentation LineExtensionTotal \"The sum of all of the extension amounts in the line items of an invoice. UBL: the total of line item extension amounts for the entire invoice, but not adjusted by an +R204y payment settlement discount or taxation.\")").
 %
-:-assert_kif("(subclass AmountDue AmountType)").
+:-assert_kif("(genls AmountDue AmountType)").
 :-assert_kif("(:hasRestrictedVal AmountDue hasLocation LegalTotalsText)").
 :-assert_kif("(documentation AmountDue \"The sum of all of the extension amounts in the line items of an invoice, including taxes. UBL: the total that is to be paid for this invoice, including all taxes, but not adjusted by any payment settlement discount or possible penalty charges.\")").
 %
-:-assert_kif("(subclass QuantityType DocumentFieldString)").
+:-assert_kif("(genls QuantityType DocumentFieldString)").
 :-assert_kif("(:hasRestrictedVal QuantityType hasReferent ConstantQuantity)").
 :-assert_kif("(documentation QuantityType \"A QuantityType is a string specifying a number of units of objects, potentially including fractions.\")").
 %
-:-assert_kif("(subclass AmountCurrencyType DocumentFieldString)").
+:-assert_kif("(genls AmountCurrencyType DocumentFieldString)").
 :-assert_kif("(:hasRestrictedVal AmountCurrencyType hasReferent UnitOfCurrency)").
 :-assert_kif("(documentation AmountCurrencyType \"An AmountCurrencyType is a string specifying a monetary unit.\")").
 %
-:-assert_kif("(subclass MeasureType DocumentFieldString)").
+:-assert_kif("(genls MeasureType DocumentFieldString)").
 :-assert_kif("(:hasRestrictedVal MeasureType hasReferent ConstantQuantity)").
 :-assert_kif("(documentation MeasureType \"An MeasureUnit is a string specifying a unit of measure.\")").
 %
-:-assert_kif("(subclass MeasureUnitType DocumentFieldString)").
+:-assert_kif("(genls MeasureUnitType DocumentFieldString)").
 :-assert_kif("(:hasRestrictedVal MeasureUnitType hasReferent UnitOfMeasure)").
 :-assert_kif("(documentation MeasureUnitType \"An MeasureUnit is a string specifying a unit of measure.\")").
 %
-:-assert_kif("(subclass QuantityUnitType DocumentFieldString)").
+:-assert_kif("(genls QuantityUnitType DocumentFieldString)").
 :-assert_kif("(:hasRestrictedVal QuantityUnitType hasReferent UnitOfMeasure)").
 :-assert_kif("(documentation QuantityUnitType \"A QuantityUnitType is a string specifying some kind of unit of measure. The UBL specification is vague, and it appears intended to refer to units of items being ordered on a line item, therefore the unit might be any individual object. But in SUMO concrete objects would not qualify as units of measure. This needs clarification.\")").
 %
-:-assert_kif("(subclass RealNumberString AbstractNumericString)").
+:-assert_kif("(genls RealNumberString AbstractNumericString)").
 :-assert_kif("(:hasRestrictedVal RealNumberString hasReferent RealNumber)").
 :-assert_kif("(documentation RealNumberString \"A RealNumberString is a string of mostly numeric characters that represent a real number. Certain alphabetical characters may be present in a RealNumberString depending on format, such as in scientific notation 6.023 E23 could represent Avogadro's Number.\")").
 %
@@ -12588,62 +12588,62 @@
 :-assert_kif("(=> (and (hasaTextComponent ?TEXT1 ?TEXT2) (isRepresentedBy ?TEXT1 ?OBJ1) (isRepresentedBy ?TEXT2 ?OBJ2)) (located ?OBJ2 ?OBJ1))").
 %
 % :-assert_kif(";<module>STANDARDS</module> standards, codes, and identifiers ").
-:-assert_kif("(subclass AbstractString AbstractText)").
+:-assert_kif("(genls AbstractString AbstractText)").
 :-assert_kif("(:hasRestrictedval AbstractString isAbstractContentOf SymbolicString)").
 :-assert_kif("(:hasRestrictedval AbstractString hasProperPart (UnionFn AbstractCharacter AbstractString))").
 :-assert_kif("(hasNecessaryPart AbstractString AbstractCharacter)").
 :-assert_kif("(documentation AbstractString \"The abstract notion of a String of abstract character symbols. This is the abstract equivalent of a SymbolicString, which in SUMO is a physical object. This concept is the string itself, and is not the referent entity that the string symbolizes. The abstract String represented by the characters 'cat', for example, may have many concrete references in large numbers of physical documents, but each of these physical strings will represent a single conceptual symbol, the abstract symbol represented by the physical symbol 'cat', which abstract symbol in turn refers to a specific type of physical object. It does not necessarily refer to a specific physical object, but may refer to the class of cats, depending on the context in which the symbol occurs.\")").
 %
-:-assert_kif("(subclass Standard Specification)").
+:-assert_kif("(genls Standard Specification)").
 :-assert_kif("(:hasRestrictedVal Standard isMaintainedBy StandardsAuthority)").
 :-assert_kif("(documentation Standard \"A Standard is a set of assertions that, in order to achieve some specified interoperability, an object must be designed with certain properties or must behave in a certain manner. A standard is promulgated and maintained by a StandardsAuthority, which may be relatively informal such as a group that agrees to do certain things a certain way.\")").
 %
-:-assert_kif("(subclass NameString Identifier)").
+:-assert_kif("(genls NameString Identifier)").
 :-assert_kif("(documentation NameString \"A NameString is an AbstractString that identifies an entity. It can be a label for anything.\")").
 %
-:-assert_kif("(subclass ProperNameString NameString)").
+:-assert_kif("(genls ProperNameString NameString)").
 :-assert_kif("(documentation ProperNameString \"A ProperNameString is an abstract string which is a name for some individual thing. It may be composed of more than one component string separated by spaces and sometimes by other characters such as commas. The named individual may be physical or abstract. Common things having names are people, places (cities, countries), organizations, books, movies, boats, as well as many others. The name is not necessarily unique for a named individual, and several individuals may have the same name. In English a ProperNameString typically has capitals as the initial letters of each component string.\")").
 %
-:-assert_kif("(subclass AgentNameString ProperNameString)").
+:-assert_kif("(genls AgentNameString ProperNameString)").
 :-assert_kif("(necessarily AgentNameString isaNameOf Agent)").
 :-assert_kif("(:hasRestrictedVal AgentNameString isaNameOf Agent)").
 :-assert_kif("(documentation AgentNameString \"A AgentNameString is an abstract string that is a name for some agent, usually a human or an organization - but it could be an animal.\")").
 %
-:-assert_kif("(subclass PersonNameString ProperNameString)").
+:-assert_kif("(genls PersonNameString ProperNameString)").
 :-assert_kif("(necessarily PersonNameString isaNameOf Human)").
 :-assert_kif("(:hasRestrictedVal PersonNameString isaNameOf Human)").
 :-assert_kif("(documentation PersonNameString \"A PersonNameString is any name applied to a human, family name, give nname, nickname, alias, cognoment, etc.\")").
 %
-:-assert_kif("(subclass OrganizationNameString ProperNameString)").
+:-assert_kif("(genls OrganizationNameString ProperNameString)").
 :-assert_kif("(necessarily OrganizationNameString isaNameOf Organization)").
 :-assert_kif("(:hasRestrictedVal OrganizationNameString isaNameOf Organization)").
 :-assert_kif("(documentation OrganizationNameString \"An OrganizationNameString is an abstract text which is the name of an Organization.\")").
 %
-:-assert_kif("(subclass CodeListAgencyNameString OrganizationNameString)").
+:-assert_kif("(genls CodeListAgencyNameString OrganizationNameString)").
 :-assert_kif("(necessarily CodeListAgencyNameString isaNameOf CodeListAgency)").
 :-assert_kif("(:hasRestrictedVal CodeListAgencyNameString isaNameOf CodeListAgency)").
 :-assert_kif("(documentation CodeListAgencyNameString \"A CodeListAgencyNameString is the formal name of a CodeListAgency. It can be different from an identifier.\")").
 %
-:-assert_kif("(subclass OpusNameString ProperNameString)").
+:-assert_kif("(genls OpusNameString ProperNameString)").
 :-assert_kif("(documentation OpusNameString \"An OpusNameString is the name of some form of conceptual work such as a text, a movie, a song, a musical composition. It is the name of an individual, so that if it is the name of a series, such as a magazine, the individual is the series considered as an instance of a class of SerialPublications. An abstract serial will have its representation in the instances of physical Series.\")").
 %
-:-assert_kif("(subclass CodeListName OpusNameString)").
+:-assert_kif("(genls CodeListName OpusNameString)").
 :-assert_kif("(documentation CodeListName \"A CodeListName is an abstract string naming a CodeList.\")").
 %
-:-assert_kif("(subclass CharacterCodeSet AbstractCodeList)").
+:-assert_kif("(genls CharacterCodeSet AbstractCodeList)").
 :-assert_kif("(documentation CharacterCodeSet \"A CharacterCodeSet is the set of binary codes, usually an integral number of bytes (1 to 4) that are used in a binary file to represent characters, spaces, and formatting characters in visual representations -- on a computer screen or printout.\")").
 %
-:-assert_kif("(subclass IdentifierList UniqueList)").
+:-assert_kif("(genls IdentifierList UniqueList)").
 :-assert_kif("(documentation IdentifierList \"An IdentifierList is a list of definitions of identifiers, each definition containing an abstract string and a description of what the string is intended to symbolize. The terms in the list do not need to be unique, though each entry on the list (which is a combination of a term and its definition) does have to be unique.\")").
 %
-:-assert_kif("(subclass AbstractCodeList IdentifierList)").
-% :-assert_kif(";? (subclass AbstractCodeList TextualProposition)").
+:-assert_kif("(genls AbstractCodeList IdentifierList)").
+% :-assert_kif(";? (genls AbstractCodeList TextualProposition)").
 % :-assert_kif(";;? (necessarily AbstractCodeList subProposition CodeStandard)").
 :-assert_kif("(:hasRestrictedVal AbstractCodeList hasListElement CodeDefinition)").
 :-assert_kif("(hasListElement AbstractCodeList CodeDefinition)").
 :-assert_kif("(documentation AbstractCodeList \"An AbstractCodeList is a list of CodeDefinitions (and nothing else), each of which consists of at least one abstract entity, a code string, plus optionally the definition of the code. The list may have references to the language of the code, and a back-reference to the code list of which it is a part. That is, a code list consists of a list of codes together with the code definitions, not merely the list of codes. A full CodeStandard may contain other information in addition to the AbstractCodeList, such as when to apply it and how to expand it. The code list is an Assertion because it functions as a statement, in effect: 'In context ?C, symbol ?x shall represent entity ?E'. Those who agree to this assertion and adopt the code list assent to the truth of this assertion.\")").
 %
-:-assert_kif("(subclass StandardSpecificationDocument AbstractDocument)").
+:-assert_kif("(genls StandardSpecificationDocument AbstractDocument)").
 :-assert_kif("(documentation StandardSpecificationDocument \"A StandardSpecificationDocument is a document describing the specification of a standard. It may contain texts representing lists, such as identifier lists or code lists.\")").
 %
 :-assert_kif("(instance conformsToSpecification BinaryPredicate)").
@@ -12651,37 +12651,37 @@
 :-assert_kif("(domain conformsToSpecification 2 StandardSpecificationSchemeDocument)").
 :-assert_kif("(documentation conformsToSpecification \"conformsToSpecification relates a specific abstract text of a specification to the general scheme that describes how to create a specification of that type.\")").
 %
-:-assert_kif("(subclass StandardSpecificationSchemeDocument AbstractDocument)").
+:-assert_kif("(genls StandardSpecificationSchemeDocument AbstractDocument)").
 :-assert_kif("(documentation StandardSpecificationSchemeDocument \"A StandardSpecificationSchemeDocument is a document describing the manner for creating a standard of a particular type.\")").
 %
-:-assert_kif("(subclass IdentificationSchemeDocument StandardSpecificationSchemeDocument)").
+:-assert_kif("(genls IdentificationSchemeDocument StandardSpecificationSchemeDocument)").
 :-assert_kif("(documentation IdentificationSchemeDocument \"An IdentificationSchemeDocument is a document specifying the manner of creating an Identification Scheme. There may be informal identification schemes without any formal specifications.\")").
 %
-:-assert_kif("(subclass IdentificationScheme StandardSpecificationDocument)").
+:-assert_kif("(genls IdentificationScheme StandardSpecificationDocument)").
 :-assert_kif("(necessarily IdentificationScheme hasaTextComponent IdentifierListText)").
 :-assert_kif("(necessarily IdentificationScheme hasaTextComponent Identifier)").
 :-assert_kif("(documentation IdentificationScheme \"An IdentificationScheme is a document specifying a list of unique identifiers, references to the agent that maintains the list, a pointer to the list itself, and potentially other attributes of the list. There may be informal identification schemes without any formal specifications.\")").
 %
-:-assert_kif("(subclass CodeListIdentifierString Identifier)").
+:-assert_kif("(genls CodeListIdentifierString Identifier)").
 :-assert_kif("(documentation CodeListIdentifierString \"A CodeListIdentifier is an AbstractString which is the identifier for a CodeListTypeText. URL: The identification of a list of codes.\")").
 %
-:-assert_kif("(subclass CodeListText IdentifierListText)").
+:-assert_kif("(genls CodeListText IdentifierListText)").
 :-assert_kif("(documentation CodeListText \"A CodeListText is the abstract text representation of a list of codes, i.e. a list of abstract texts each consisting of a code string and a description of the meaning (and/or usage) of the code string.\")").
 %
-:-assert_kif("(subclass CodeListTypeText StructuredDocumentText)").
+:-assert_kif("(genls CodeListTypeText StructuredDocumentText)").
 :-assert_kif("(documentation CodeListTypeText \"A CodeListTypeText is a document that is not itself a code list nor a complete code specification, but has information about and pointers to a code list and the specification that describes the code list. This is intended to correspond to the UBL Code.List.Type, but the description of that concept is somewhat ambiguous and this identifaction may change. (PJC 030104).\")").
 %
-:-assert_kif("(subclass CodeStandardText IdentificationScheme)").
+:-assert_kif("(genls CodeStandardText IdentificationScheme)").
 :-assert_kif("(necessarily CodeStandardText hasPropositionalContent CodeStandard)").
 :-assert_kif("(:hasRestrictedVal CodeStandardText hasPropositionalContent CodeStandard)").
 :-assert_kif("(necessarily CodeStandardText hasaTextComponent CodeListText)").
 :-assert_kif("(documentation CodeStandardText \"A CodeStandardText is the AbstractText representation of the propositional content of a Code Standard, and has direct correlation with the physical documents that represent the code standard. The propositional content of the CodeStandardText is contained in a CodeStandard. This corresponds to UBL Code.List.Scheme.Type.\")").
 %
-:-assert_kif("(subclass CodeStandard Standard)").
+:-assert_kif("(genls CodeStandard Standard)").
 :-assert_kif("(:hasRestrictedVal CodeStandard hasAbstractName CodeListName)").
 :-assert_kif("(documentation CodeStandard \"The SMINK correlate of UBL CodeList.Type. This is a text with subtexts, including a SMINK AbstractCodeList, which is the actual list of code symbols and their associated definitions. A CodeStandard contains other information, such as version and referents to the agency that promulgates or maintains the code standard.\")").
 %
-:-assert_kif("(subclass CodeDefinition Specification)").
+:-assert_kif("(genls CodeDefinition Specification)").
 :-assert_kif("(:SYNONYMS CodeDefinition UBLCode)").
 :-assert_kif("(necessarily CodeDefinition subProposition CodeStandard)").
 % :-assert_kif(";(hasListElement CodeDefinition AbstractCodeString)").
@@ -12689,75 +12689,75 @@
 :-assert_kif("(necessarily CodeDefinition inList AbstractCodeList)").
 :-assert_kif("(documentation CodeDefinition \"A CodeDefinition is the propositional content of a CodeDefinitionText, consisting of two elements, each of which has a textual representation: (1) an abstract Code, which is an AbstractSymbol referring to some other entity; (2) a proposition definining the code. The proposition describes the entity to which the code refers (and may describe the circumstances for using the code). This list is related to two other entities (a) the CodeList which the CodeDefinition is an element of;and (b) the language of the code. Its implied propositional content is the assertion that these correspondences of code and meaning are required for interoperability among those agents using the code in some activity.\")").
 %
-:-assert_kif("(subclass IdentifierDefinition Specification)").
+:-assert_kif("(genls IdentifierDefinition Specification)").
 :-assert_kif("(necessarily IdentifierDefinition usesLanguage AbstractLanguage)").
 :-assert_kif("(necessarily IdentifierDefinition inList IdentifierList)").
 :-assert_kif("(documentation IdentifierDefinition \"A IdentifierDefinition is the propositional content of a IdentifierDefinitionText, consisting of two elements, each of which has a textual representation: (1) an abstract Identifier, which is an AbstractSymbol referring to some other entity; (2) a proposition defining the Identifier. The proposition describes the entity to which the Identifier refers (and may describe the circumstances for using the Identifier). This list is related to two other entities (a) the IdentifierList which the IdentifierDefinition is an element of;and (b) the language of the code. Its implied propositional content is the assertion that these correspondences of Identifier and meaning are required for interoperability among those agents using the Identifier in some activity. An Identifier may be defined and used by only a single Agent and is not necessarily part of a formal standard.\")").
 %
-:-assert_kif("(subclass CodeDefinitionText IdentifierDefinitionText)").
+:-assert_kif("(genls CodeDefinitionText IdentifierDefinitionText)").
 :-assert_kif("(necessarily CodeDefinitionText hasaTextComponent AbstractCodeString)").
 :-assert_kif("(necessarily CodeDefinitionText hasaTextComponent CodeNameText)").
 :-assert_kif("(necessarily CodeDefinitionText hasPropositionalContent CodeDefinition)").
 % :-assert_kif("; (:hasRestrictedVal CodeDefinitionText hasaTextComponent (UnionFn CodeNameText AbstractCodeString))").
 :-assert_kif("(documentation CodeDefinitionText \"A CodeDefinitionText is a text containing a code string (the AbstractCodeString) and a descriptive text (the CodeNameText) explaining the intended meaning and possibly also usage of the code string. This is the abstract textual representation of the CodeDefinition, which is a proposition.\")").
 %
-:-assert_kif("(subclass IdentifierDefinitionText Definition)").
+:-assert_kif("(genls IdentifierDefinitionText Definition)").
 :-assert_kif("(necessarily IdentifierDefinitionText hasaTextComponent Identifier)").
 :-assert_kif("(necessarily IdentifierDefinitionText hasaTextComponent IdentifierDefiningText)").
 :-assert_kif("(necessarily IdentifierDefinitionText hasPropositionalContent IdentifierDefinition)").
 :-assert_kif("(documentation IdentifierDefinitionText \"A IdentifierDefinitionText is a text containing an identifier string (the Identifier) and a descriptive text (the IdentifierDefiningText) explaining the intended meaning and possibly also usage of the identifier string. This is the abstract textual representation of the IdentifierDefinition, which is a proposition.\")").
 %
-:-assert_kif("(subclass IdentifierDefiningText DescriptiveText)").
+:-assert_kif("(genls IdentifierDefiningText DescriptiveText)").
 :-assert_kif("(documentation IdentifierDefiningText \"A IdentifierDefiningText is a text accompanying an Identifier (a string) within a IdentifierDefinitionText, and which contains a definition of the accompanying identifier.\")").
 %
-:-assert_kif("(subclass IdentifierSchemeProposition Specification)").
+:-assert_kif("(genls IdentifierSchemeProposition Specification)").
 :-assert_kif("(documentation IdentifierSchemeProposition \"An IdentifierSchemeProposition is the propositional content of an IdentifierListText, which is an abstract text. This proposition states explicitly or implicitly that a particular list of identifiers should be used in some context or process to achieve some form of interoperability of different information processing activities. The scheme contains an identifier list, which does not have to be a UniqueList.\")").
 %
-:-assert_kif("(subclass IdentifierListText StructuredDocumentText)").
+:-assert_kif("(genls IdentifierListText StructuredDocumentText)").
 :-assert_kif("(necessarily IdentifierListText hasReferent IdentifierList)").
 :-assert_kif("(:hasRestrictedVal IdentifierListText hasReferent IdentifierList)").
 :-assert_kif("(documentation IdentifierListText \"A IdentifierListText is the AbstractText representation of an Identifier List. There may or may not exist any physical documents that represent the text, except what is in the mind of an individual.\")").
 %
-:-assert_kif("(subclass CodeNameText DescriptiveText)").
+:-assert_kif("(genls CodeNameText DescriptiveText)").
 :-assert_kif("(documentation CodeNameText \"A CodeNameText is an AbstractText that accompanies a code symbol, and explains in language what the symbol is intended to refer to.\")").
 %
-:-assert_kif("(subclass AbstractSymbol AbstractInformationalEntity)").
+:-assert_kif("(genls AbstractSymbol AbstractInformationalEntity)").
 :-assert_kif("(documentation AbstractSymbol \"An AbstractSymbol is an abstract representation of a simple object that serves as a symbolic referent to something else. It can be an abstract image of an icon, an abstract string, or something else non-physical which serves as a referent for another entity.\")").
 %
-:-assert_kif("(subclass AbstractCode AbstractSymbol)").
+:-assert_kif("(genls AbstractCode AbstractSymbol)").
 :-assert_kif("(:hasRestrictedVal AbstractCode createdBy StandardsAuthority)").
 :-assert_kif("(documentation AbstractCode \"An AbstractCode is an Abstract Symbol, which can be an AbstractString, that is created and maintained by a coding authority to refer to some other entity. A word in a natural language may refer to some other entity, but is not a code unless it is designated as such by a coding authority.\")").
 %
-:-assert_kif("(subclass AbstractCodeString Identifier)").
-:-assert_kif("(subclass AbstractCodeString AbstractCode)").
+:-assert_kif("(genls AbstractCodeString Identifier)").
+:-assert_kif("(genls AbstractCodeString AbstractCode)").
 % :-assert_kif("; (necessarily AbstractCodeString inList CodeDefinition)").
 :-assert_kif("(documentation AbstractCodeString \"An AbstractCode is an Abstract code which is an AbstractString, that is created and maintained by a coding authority to refer to some other entity. A word in a natural language may refer to some other entity, but is not a code unless it is designated as such by a coding authority.\")").
 %
-:-assert_kif("(subclass CurrencyCode AbstractCodeString)").
+:-assert_kif("(genls CurrencyCode AbstractCodeString)").
 :-assert_kif("(necessarily CurrencyCode isaNameOf UnitOfCurrency)").
 :-assert_kif("(:hasRestrictedVal CurrencyCode isaNameOf UnitOfCurrency)").
 :-assert_kif("(documentation CurrencyCode \"A CurrencyCode is an AbstractString of characters which is the assigned code for some unit of currency on some AbstractCodeList. For example the abstract string 'USD' may refer to the unit United States Dollar\")").
 %
-:-assert_kif("(subclass Identifier AbstractString)").
+:-assert_kif("(genls Identifier AbstractString)").
 :-assert_kif("(documentation Identifier \"An identifier is a String which is intended to provide a unique designation for something. An identifier can be created by anyone for personal purposes, therefore does not require a coding authority and is not a code. A thing can have more than one identifier, but one identifier should refer only to one thing.\")").
 %
-:-assert_kif("(subclass URL Identifier)").
-:-assert_kif("(subclass URL AbstractCode)").
+:-assert_kif("(genls URL Identifier)").
+:-assert_kif("(genls URL AbstractCode)").
 :-assert_kif("(:hasRestrictedVal URL isaNameOf FileInternetLocation)").
 % :-assert_kif(";****+++ not really. it should be a location (documentation URL \"A URL is a String which identifies the location on the Internet where a resource (file) can be found.\")").
 %
-:-assert_kif("(subclass VersionIdentifier Identifier)").
+:-assert_kif("(genls VersionIdentifier Identifier)").
 :-assert_kif("(documentation VersionIdentifier \"A VersionIdentifier is an abstract string that is intended to identify a version of something.\")").
 %
-:-assert_kif("(subclass CodeListVersionIdentifier Identifier)").
+:-assert_kif("(genls CodeListVersionIdentifier Identifier)").
 :-assert_kif("(:hasRestrictedVal CodeListVersionIdentifier isaNameOf CodeListVersion)").
 :-assert_kif("(:hasRestrictedVal CodeListVersionIdentifier hasReferent CodeListVersion)").
 :-assert_kif("(documentation CodeListVersionIdentifier \"A VersionIdentifier is an abstract string that is intended to identify a CodeStandard. UBL: 'The Version of the UN/ECE Rec. 9 code list'.\")").
 %
-:-assert_kif("(subclass TextVersion TextAttribute)").
+:-assert_kif("(genls TextVersion TextAttribute)").
 :-assert_kif("(documentation TextVersion \"A TextVersion is an attribute that specifies which version of a text the text is.\")").
 %
-:-assert_kif("(subclass CodeListVersion TextVersion)").
+:-assert_kif("(genls CodeListVersion TextVersion)").
 :-assert_kif("(documentation CodeListVersion \"A CodeListVersion is an attribute of a CodeStandard that specifies which version of the CodeStandard the specific text is.\")").
 %
 :-assert_kif("(instance hasUniqueIdentifier TernaryRelation)").
@@ -12770,7 +12770,7 @@
 %
 :-assert_kif("(=> (and (hasUniqueIdentifier ?THING ?LIST ?ID1) (hasUniqueIdentifier ?THING ?LIST ?ID2)) (equal ?ID1 ?ID2))").
 %
-:-assert_kif("(subclass VersionNumberString VersionIdentifier)").
+:-assert_kif("(genls VersionNumberString VersionIdentifier)").
 :-assert_kif("(documentation VersionNumberString \"A version number is the number assigned to some copy of an object with propositional content to distinguish it from earlier and somewhat different instances of related objects of the same name. A version number can contain letters and/or numbers, e.g. '1.2a'. The relation .hasVersionNumber associates an abstract text of a particular name with its version number;all versions are tagged with the same name\")").
 %
 :-assert_kif("(instance hasCreationTime BinaryPredicate)").
@@ -12799,24 +12799,24 @@
 % :-assert_kif(";if version number uses some unique naming scheme, which needs to be specified ").
 :-assert_kif("(=> (and (hasVersionNumber ?ABSTEXT ?NAME ?NUMBER1) (hasVersionNumber ?ABSTEXT2 ?NAME ?NUMBER2) (instance ?NUMBER RealNumberString) (instance ?NUMBER2 RealNumberString) (hasReferent ?NUMBER1 ?REALNUM1) (hasReferent ?NUMBER2 ?REALNUM2) (greaterThan ?REALNUM2 ?REALNUM1)) (exists (?TIME1 ?TIME2) (and (hasCreationTime ?ABSTEXT ?TIME1) (hasCreationTime ?ABSTEXT2 ?TIME2) (before ?TIME1 ?TIME2))))").
 %
-:-assert_kif("(subclass AttributeValueString AbstractString)").
+:-assert_kif("(genls AttributeValueString AbstractString)").
 :-assert_kif("(necessarily AttributeValueString hasReferent Attribute)").
-:-assert_kif("(documentation AttributeValueString \"An AttributeValueString is a subclass of AbstractString which includes those strings that refer to values of Attributes (instances of the class 'Attribute').\")").
+:-assert_kif("(documentation AttributeValueString \"An AttributeValueString is a genls of AbstractString which includes those strings that refer to values of Attributes (instances of the class 'Attribute').\")").
 %
 % :-assert_kif(";NOTE - the axiomatization of the notion of an exhaustive list ").
 % :-assert_kif(";has not been done here yet (samni011). ").
-:-assert_kif("(subclass AttributeList List)").
+:-assert_kif("(genls AttributeList List)").
 :-assert_kif("(documentation AttributeList \"An AttributeList is an exhaustive list of all possible values of a particular attribute. The values are not necessarily disjoint or contradictory.\")").
 %
 :-assert_kif("(=> (and (instance ?ALIST AttributeList) (inList ?INST ?ALIST)) (instance ?INST Attribute))").
 %
-:-assert_kif("(subclass BinaryList List)").
+:-assert_kif("(genls BinaryList List)").
 :-assert_kif("(documentation BinaryList \"A BinaryList is a list having exactly two elements.\")").
 %
 :-assert_kif("(=> (instance ?BINLIST BinaryList) (equal (CardinalityFn (KappaFn ?THING (inList ?THING ?BINLIST))) 2))").
 %
-:-assert_kif("(subclass IndicatorList AttributeList)").
-:-assert_kif("(subclass IndicatorList BinaryList)").
+:-assert_kif("(genls IndicatorList AttributeList)").
+:-assert_kif("(genls IndicatorList BinaryList)").
 :-assert_kif("(documentation IndicatorList \"A IndicatorList is an AttributeList list having exactly two elements, each of which is an Attribute. This corresponds to the UBL Indicator.Type. UBL: A list of two mutually exclusive Boolean values that express the only possible states of a Property.\")").
 %
 % :-assert_kif(";<axiomgloss>If an entity possesses one of the two attributes in ").
@@ -13086,7 +13086,7 @@
 :-assert_kif("(:hasFrequency UBLCodeListType 1.0)").
 :-assert_kif("(:SUO-name UBLCodeListType \"Code List Type\")").
 :-assert_kif("(:isaSynonymOf UBLCodeListType CodeListTypeText)").
-:-assert_kif("(documentation UBLCodeListType \"The UBL equivalent of SMINK CodeListTypeText, a subclass of text that refers to a CodeListText and a CodeListScheme, both abstract text, referring to a CodeStandard,a proposition. A CodeListTypeText may or may not include the actual list of codes or a pointer to its location, plus ancillary information, such as the maintaining Code Authority, the conditions of use, the manner for changing the code, etc.\")").
+:-assert_kif("(documentation UBLCodeListType \"The UBL equivalent of SMINK CodeListTypeText, a genls of text that refers to a CodeListText and a CodeListScheme, both abstract text, referring to a CodeStandard,a proposition. A CodeListTypeText may or may not include the actual list of codes or a pointer to its location, plus ancillary information, such as the maintaining Code Authority, the conditions of use, the manner for changing the code, etc.\")").
 %
 :-assert_kif("(instance CodeListVersionID :UBL-Synonym)").
 :-assert_kif("(:synonymousTerm CodeListVersionID \"Code List Version ID\")").
@@ -13112,8 +13112,8 @@
 :-assert_kif("(:isaSynonymOf CodeAgencyID CodeListAgencyIdentifier)").
 :-assert_kif("(documentation CodeAgencyID \"The UBL equivalent of SMINK CodeListAgencyIdentifier. This is the abstract string that serves to identify a CodeList Agency, in some identification scheme. UBL: 'An agency that maintains one or more code lists'.\")").
 %
-:-assert_kif("(subclass PhysicalEvent Physical)").
-% :-assert_kif(";(subclass PhysicalEvent Event)").
+:-assert_kif("(genls PhysicalEvent Physical)").
+% :-assert_kif(";(genls PhysicalEvent Event)").
 :-assert_kif("(documentation PhysicalEvent \"A PhysicalEvent is an Event that occurs in SpaceTime, involving PhysicalObjects. It is the total collection of all changes in a physical state occurring during the operation of some PhysicalProcess.\")").
 %
 % :-assert_kif(";</assertion> ").
@@ -13189,8 +13189,8 @@
 % :-assert_kif("; easily removed to allow viewing a simplified ontology. This module and all ").
 % :-assert_kif("; after it should be able to be deleted from the SKIF ontology file ").
 % :-assert_kif("; without causing any logical inconsistencies ").
-:-assert_kif("(subclass BadSituation SomethingOfNegativeValue)").
-:-assert_kif("(subclass BadSituation Situation)").
+:-assert_kif("(genls BadSituation SomethingOfNegativeValue)").
+:-assert_kif("(genls BadSituation Situation)").
 :-assert_kif("(documentation BadSituation \"A BadSituation is any state, process, or event the as negative value for a CognitiveAgent. A BadSituation can be the consequence of certain events or processes,in which case a knowledgeable CognitiveAgent will try to avoid such events or processes unless they also have counterbalancing positive consequences.\")").
 %
 % :-assert_kif(";<axgloss>every BadSituation is bad for some CognitiveAgent</axgloss> ").
@@ -13233,38 +13233,38 @@
 :-assert_kif("(relatedInternalConcept isTheMentalRepresentationOf represents)").
 :-assert_kif("(documentation isTheMentalRepresentationOf \"hasMentalRepresentation is the relation between a MentalEntity and the Physical entity that represents it.\")").
 %
-:-assert_kif("(subclass MentalEntity Entity)").
+:-assert_kif("(genls MentalEntity Entity)").
 :-assert_kif("(disjoint MentalEntity Physical)").
 :-assert_kif("(documentation MentalEntity \"An entity which is created by a CognitiveAgent and is not a physical entity. The important distinction of MentalEntity from Abstract entities is that a MentalEntity can be conceived of as existing in Time, such as a law that may exist for a while, then be repealed. It can thus have temporal existence, but is not a physical object.\")").
 %
 % :-assert_kif(";every MentalEntity was created by some CognitiveAgent ").
 :-assert_kif("(=> (instance ?M MentalEntity) (exists (?AGENT) (and (instance ?AGENT CognitiveAgent) (createdBy ?M ?AGENT))))").
 %
-:-assert_kif("(subclass MentalContent MentalEntity)").
+:-assert_kif("(genls MentalContent MentalEntity)").
 :-assert_kif("(:hasRestrictedVal MentalContent isTheMentalRepresentationOf ContentBearingObject)").
 :-assert_kif("(documentation MentalContent \"MentalContent is the MentalEntity that is represented by a ContentBearingObject and has a Proposition as its propositional content.\")").
 %
-:-assert_kif("(subclass MentalLinguisticExpression MentalContent)").
+:-assert_kif("(genls MentalLinguisticExpression MentalContent)").
 :-assert_kif("(:hasRestrictedVal MentalLinguisticExpression hasInformationalContent AbstractLinguisticExpression)").
 :-assert_kif("(:hasRestrictedVal MentalLinguisticExpression isTheMentalRepresentationOf LinguisticExpression)").
 :-assert_kif("(documentation MentalLinguisticExpression \"A MentalLinguisticExpression is the MentalEntity that is represented by a LinguisticExpression and has an AbstractLinguisticExpression as its propositional content.\")").
 %
-:-assert_kif("(subclass MentalString MentalText)").
+:-assert_kif("(genls MentalString MentalText)").
 :-assert_kif("(:hasRestrictedVal MentalString hasInformationalContent AbstractString)").
 :-assert_kif("(:hasRestrictedVal MentalString isTheMentalRepresentationOf SymbolicString)").
 :-assert_kif("(documentation MentalString \"A MentalString is a MentalEntity that is represented by a physical string of characters 'SymbolicString' in SUMO, and has abstract content that may be a proposition or something simpler.\")").
 %
-:-assert_kif("(subclass MentalDocument MentalText)").
+:-assert_kif("(genls MentalDocument MentalText)").
 :-assert_kif("(:hasRestrictedVal MentalDocument hasInformationalContent AbstractDocument)").
 :-assert_kif("(:hasRestrictedVal MentalDocument isTheMentalRepresentationOf DocumentPhysical)").
 :-assert_kif("(documentation MentalDocument \"A MentalDocument is a MentalEntity that is represented by a physical document, which is a type of Text in SUMO.\")").
 %
-:-assert_kif("(subclass MentalText MentalLinguisticExpression)").
+:-assert_kif("(genls MentalText MentalLinguisticExpression)").
 :-assert_kif("(:hasRestrictedVal MentalText hasInformationalContent AbstractText)").
 :-assert_kif("(:hasRestrictedVal MentalText isTheMentalRepresentationOf Text)").
 :-assert_kif("(documentation MentalText \"A MentalText is the mental representation of a physical text, which contains some linguistic words and may contain some visual or audio components as well. This is not the physical object that represents the text, and not the entity or propositional content that is referred to by the text. It is one of a triad of concept classes that represent different aspects of texts.\")").
 %
-:-assert_kif("(subclass MentalSymbol MentalEntity)").
+:-assert_kif("(genls MentalSymbol MentalEntity)").
 :-assert_kif("(:hasRestrictedVal MentalSymbol isTheMentalRepresentationOf PhysicalSymbol)").
 :-assert_kif("(documentation MentalSymbol \"A MentalEntity which is used to represent another entity. A single abstract symbol, such as the abstract letter 'A', may have innumerable physical referents.\")").
 %
@@ -13278,22 +13278,22 @@
 :-assert_kif("(relatedInternalConcept holdsInContext holds)").
 :-assert_kif("(documentation holdsInContext \"holdsInContext means that there is some context in which a particular assertion is true. The context can be a real-world context, a fictional context, a hypothetical context, etc.\")").
 %
-:-assert_kif("(subclass Context Entity)").
+:-assert_kif("(genls Context Entity)").
 :-assert_kif("(documentation Context \"Context is a very broad concept which is used to allow assertions to be made relative to different situations, theories, hypotheses, possible worlds, time intervals, or anything else that can affect the truth of an assertion.\")").
 %
 :-assert_kif("(instance SpaceAndTime Context)").
 :-assert_kif("(instance SpaceAndTime Physical)").
 :-assert_kif("(documentation SpaceAndTime \"SpaceAndTime is the space-time that humans live in. It is the context that applies when one wants to assert that something is true in the real world.\")").
 %
-:-assert_kif("(subclass Situation Context)").
+:-assert_kif("(genls Situation Context)").
 :-assert_kif("(partition Situation State Process Event)").
 :-assert_kif("(documentation Situation \"A Situation can be any state, process or event. This is a convenient class which can be used as an argument when an instance of any one of the component classes may serve as a value of an argument.\")").
 %
-:-assert_kif("(subclass State Situation)").
+:-assert_kif("(genls State Situation)").
 :-assert_kif("(documentation State \"A State is a set of properties of objects and processes in some System. Changes in a State are represented as Processes and Events.\")").
 %
-:-assert_kif("(subclass Event Situation)").
+:-assert_kif("(genls Event Situation)").
 :-assert_kif("(documentation Event \"An Event is the total collection of all changes in state occurring during the operation of some Process.\")").
-% :-assert_kif("; (subclass contextState: Situation )").
+% :-assert_kif("; (genls contextState: Situation )").
 % :-assert_kif("; (documentation contextState: \"existence in a place, (e.g. textual context is existence between other texts)\")").
 % :-assert_kif(";END FILE ").

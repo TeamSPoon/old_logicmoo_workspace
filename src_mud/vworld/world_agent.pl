@@ -70,7 +70,7 @@ call_agent_action(Agent,CMDI):-
    (TS=main -> Wrapper = call ; Wrapper = notrace),
    with_assertions(thlocal:session_agent(TS,Agent),
      with_assertions(thlocal:agent_current_action(Agent,CMD),
-      call(Wrapper, call_agent_action_lc(Agent,CMD)))).
+      call(Wrapper, call_agent_action_ilc(Agent,CMD)))).
 
 :-export(where_atloc/2).
 where_atloc(Agent,Where):-mudAtLoc(Agent,Where).
@@ -78,12 +78,12 @@ where_atloc(Agent,Where):-localityOfObject(Agent,Where).
 where_atloc(Agent,Where):-mudAtLoc(Agent,Loc),!,locationToRegion(Loc,Where).
 where_atloc(Agent,'OffStage'):-nonvar(Agent).
 
-% call_agent_action_lc(Agent,CMD):- with_no_fallbacksg(with_no_fallbacks(call_agent_action_lc0(Agent,CMD))).
-call_agent_action_lc(Agent,CMD):-
+% call_agent_action_ilc(Agent,CMD):- with_no_fallbacksg(with_no_fallbacks(call_agent_action_ilc0(Agent,CMD))).
+call_agent_action_ilc(Agent,CMD):-
    % start event
  ignore((must_det_l([where_atloc(Agent,Where),
    raise_location_event(Where,actNotice(reciever,begin(Agent,CMD))),   
-   catch(call_agent_where_action_lc(Agent,Where,CMD),E,(fmt('call_agent_action/2 Error ~q ',[E])))]))),!.
+   catch(call_agent_where_action_ilc(Agent,Where,CMD),E,(fmt('call_agent_action/2 Error ~q ',[E])))]))),!.
 
 :-export(send_command_completed_message/4).
 send_command_completed_message(Agent,Where,Done,CMD):-
@@ -93,9 +93,9 @@ send_command_completed_message(Agent,Where,Done,CMD):-
 
 
 % complete event
-call_agent_where_action_lc(Agent,Where,CMD):- debugOnError(agent_call_command_now(Agent,CMD)),send_command_completed_message(Agent,Where,done,CMD),!.
+call_agent_where_action_ilc(Agent,Where,CMD):- debugOnError(agent_call_command_now(Agent,CMD)),send_command_completed_message(Agent,Where,done,CMD),!.
 % fail event
-call_agent_where_action_lc(Agent,Where,CMD):-  send_command_completed_message(Agent,Where,failed,CMD),!. 
+call_agent_where_action_ilc(Agent,Where,CMD):-  send_command_completed_message(Agent,Where,failed,CMD),!. 
 
 correctCommand(CMD,OUT):-compound(CMD),
    must(current_agent(Who)),

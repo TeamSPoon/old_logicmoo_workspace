@@ -372,15 +372,11 @@ must_det_lm(M,C):- is_list(C),!,trace_or_throw(list_must_det_lm(M,C)),!.
 must_det_lm(M,C):- !,must_det(M:C).
 
 :-thread_local  tlbugger:skip_use_slow_sanity/0.
+
 % thread locals should defaults to false  tlbugger:skip_use_slow_sanity.
 
 slow_sanity(C):-  sanity(C),!. %  ( tlbugger:skip_use_slow_sanity ; must_det(C)),!.
 
-% -- CODEBLOCK
-:- export(sanely/1).
-:-meta_predicate(sanely(0)).
-
-sanely(G):-ignore(show_call_failure(G)).
 
 print_dmessage(T,M):- colormsg(T,M).
 
@@ -390,8 +386,13 @@ print_dmessage(T,M):- colormsg(T,M).
 
 % sanity is used for type checking (is not required)
 % sanity(Call):-!.
-sanity(Call):-bugger_flag(release,true),!,assertion(sanely(Call)).
-sanity(Call):-must(sanely(Call)).
+sanity(Call):-bugger_flag(release,true),!,assertion(Call).
+sanity(G):- tlbugger:show_must_go_on,!,ignore(show_call_failure(G)).
+sanity(G):- must(show_call_failure(G)).
+
+
+:-thread_local tlbugger:show_must_go_on/0.
+badfood(MCall):-numbervars(MCall,0,_,[functor_name('VAR_______________________x0BADF00D'),attvar(bind),singletons(true)]).
 
 % -- CODEBLOCK
 :- export(must/1).
@@ -400,6 +401,13 @@ must(MCall):- !, ignore(must0(MCall)).
 :- export(must0/1).
 :-meta_predicate(must0(0)).
 must0(MCall):- tracing,!,MCall.
+must0(MCall):- tlbugger:show_must_go_on,!,
+ strip_module(MCall,M,Call),
+ (
+  '@'(catch(Call,E,(dumpST,print_dmessage(error,must_ex(E:Call)),debug,rtrace((leash(+exception),Call)),dtrace(Call))),M) 
+  *-> true ; 
+  '@'((notrace((print_dmessage(warning,must_failed(Call)),print_dmessage(error,must_failed(Call)))),badfood(Call)),M)).
+
 must0(MCall):- 
  strip_module(MCall,M,Call),
  (
@@ -775,10 +783,18 @@ static_predicate(FA):-once(predicate_property(FA,_)),not(predicate_property(FA,d
 % ===================================================================
 % Safely number vars
 % ===================================================================
+bugger_numbervars_with_names(Term):-
+   term_variables(Term,Vars),bugger_name_variables(Vars),!,numbervars(Vars,91,_,[attvar(skip),singletons(true)]),!.
+
+bugger_name_variables([]).
+bugger_name_variables([Var|Vars]):-
+   (var_property(Var, name(Name)) -> Var = '$VAR'(Name) ; true),
+   bugger_name_variables(Vars).
+
 
 numbervars_impl(Term,Start,List):- integer(Start),!,numbervars_impl(Term,'$VAR',Start,List).
 numbervars_impl(Term,Functor,Start):- integer(Start),atom(Functor),!,numbervars_impl(Term,Functor,Start,_End).
-numbervars_impl(Term,Functor,List):- is_list(List),atom(Functor),!,!,must(( numbervars(Term,0,_End,[functor_name(Functor)|List]))).
+numbervars_impl(Term,Functor,List):- is_list(List),atom(Functor),!, term_variables(Term,Vars),bugger_name_variables(Vars),!,must(( numbervars(Term,0,_End,[functor_name(Functor)|List]))).
 
 numbervars_impl(Term,Start,End,List):-number(Start),is_list(List),!,must(( numbervars(Term,Start,End,List) )).
 numbervars_impl(Term,Functor,Start,List):- sanity(number(Start)),is_list(List),!,must(( numbervars(Term,Start,_End,[functor_name(Functor)|List]))).

@@ -77,7 +77,7 @@ wrapper_for(irreflexive,pred_isa_t).
 wrapper_for(symmetric,pred_isa_t).
 wrapper_for(antisymmetric,pred_isa_t).
 
-wrapper_for(subclass,pred_t).
+wrapper_for(genls,pred_t).
 wrapper_for(genls,pred_t).
 wrapper_for(genlInverse,pred_t).
 wrapper_for(genlPreds,pred_t).
