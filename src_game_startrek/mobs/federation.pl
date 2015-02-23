@@ -12,12 +12,14 @@
 % Declare the module name and the exported (public) predicates.
 */
 
+end_of_file.
+
 
 
 % Declare the module name and the exported (public) predicates.
 :-module(modFederation,[]).
 
-:- include(logicmoo(vworld/moo_header)).
+:- include(logicmoo(dbase/dbase_i_header)).
 :- register_module_type(planning).
 
 :-decl_type(tFederation).

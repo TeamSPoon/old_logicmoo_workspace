@@ -98,6 +98,8 @@
 :-onSpawn localityOfObject(tStove,tKitchen).
 :-onSpawn localityOfObject(tKitchenCounter,tKitchen).
 
+:- do_gc.
+
 % ==================================================
 % Classes of things
 % ==================================================
@@ -118,6 +120,8 @@ subclass(tEnvelope, tOfficeItem).
 subclass(tStamp, tOfficeItem).
 subclass(tKey, tOfficeItem).
 subclass(tBall, tThrowAble).
+
+:- do_gc.
 
 subclass(tPajamas, tClothing).
 subclass(tShirt, tClothing).
@@ -183,7 +187,7 @@ subclass(tFridge,tKitchenFurnature).
 subclass(tStove,tKitchenFurnature).
 subclass(tKitchenCounter,tKitchenFurnature).
 
-
+:- do_gc.
 % ==================================================
 % typeProps Descriptions
 % ==================================================
@@ -210,6 +214,8 @@ typeProps(tCoat,[mudColor(vBlack),mudSize(isEach(vMedium,vFits)),mudShape(isLike
 typeProps(tPants,[mudColor(vBlack),mudSize(isEach(vMedium,vFits)),mudShape(isLikeFn(mudShape,tAss)),mudMaterial(vDenim),mudTexture(vCoarse)]).
 typeProps(tNani,[mudColor(vBrown),mudColor(vWhite),mudSize(vMedium),mudShape(isLikeFn(mudShape,tTeddybear)),mudMaterial(vPlush),mudTexture(isEach(vFuzzy,vSoft))]).
 typeProps(tLightSwitch,[mudColor(vCream),mudSize(vSmall),mudShape(vRectangular),mudMaterial(vPlastic),mudTexture(vSmooth)]).
+
+:- do_gc.
 
 typeProps(tBall,[mudColor(vRed),mudSize(vMedium),mudShape(vSpherical),mudMaterial(vRubber),mudTexture(vBumpy)]).
 typeProps(tCoffee,[mudColor(isEach(vBlack,vBrown)),mudSize(vSmall),mudShape(vFluid),mudMaterial(tLiquid),mudTexture(vWet)]).

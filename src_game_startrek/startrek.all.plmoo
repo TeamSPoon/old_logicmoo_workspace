@@ -1032,92 +1032,92 @@ line_count(31).
 number_of_clauses(1).
 Pattern: pathBetween(_G1494,_G1495,_G1496). 
  */
-pathBetween('iArea1000',"n",'iArea1002').
-pathBetween('iArea1001',"e",'iArea1002').
-pathBetween('iArea1002',"n",'iArea1005').
-pathBetween('iArea1002',"e",'iArea1003').
-pathBetween('iArea1002',"s",'iArea1000').
-pathBetween('iArea1002',"w",'iArea1001').
-pathBetween('iArea1003',"w",'iArea1002').
-pathBetween('iArea1004',"e",'iArea1005').
-pathBetween('iArea1005',"n",'iArea1008').
-pathBetween('iArea1005',"e",'iArea1006').
-pathBetween('iArea1005',"s",'iArea1002').
-pathBetween('iArea1005',"w",'iArea1004').
-pathBetween('iArea1006',"n",'iArea1042').
-pathBetween('iArea1006',"w",'iArea1005').
-pathBetween('iArea1007',"e",'iArea1008').
-pathBetween('iArea1008',"n",'iArea1010').
-pathBetween('iArea1008',"e",'iArea1009').
-pathBetween('iArea1008',"s",'iArea1005').
-pathBetween('iArea1008',"w",'iArea1007').
-pathBetween('iArea1009',"w",'iArea1008').
-pathBetween('iArea1010',"s",'iArea1008').
-pathBetween('iArea1010',"u",'iArea1011').
-pathBetween('iArea1011',"n",'iArea1013').
-pathBetween('iArea1011',"u",'iArea1032').
-pathBetween('iArea1011',"d",'iArea1010').
-pathBetween('iArea1012',"e",'iArea1013').
-pathBetween('iArea1013',"n",'iArea1016').
-pathBetween('iArea1013',"e",'iArea1014').
-pathBetween('iArea1013',"s",'iArea1011').
-pathBetween('iArea1013',"w",'iArea1012').
-pathBetween('iArea1014',"w",'iArea1013').
-pathBetween('iArea1015',"e",'iArea1016').
-pathBetween('iArea1016',"n",'iArea1019').
-pathBetween('iArea1016',"e",'iArea1017').
-pathBetween('iArea1016',"s",'iArea1013').
-pathBetween('iArea1016',"w",'iArea1015').
-pathBetween('iArea1017',"w",'iArea1016').
-pathBetween('iArea1018',"e",'iArea1019').
-pathBetween('iArea1019',"n",'iArea1021').
-pathBetween('iArea1019',"e",'iArea1020').
-pathBetween('iArea1019',"s",'iArea1016').
-pathBetween('iArea1019',"w",'iArea1018').
-pathBetween('iArea1020',"w",'iArea1019').
-pathBetween('iArea1021',"s",'iArea1019').
-pathBetween('iArea1022',"n",'iArea1024').
-pathBetween('iArea1022',"s",'iArea1039').
-pathBetween('iArea1023',"e",'iArea1024').
-pathBetween('iArea1024',"n",'iArea1027').
-pathBetween('iArea1024',"e",'iArea1025').
-pathBetween('iArea1024',"s",'iArea1022').
-pathBetween('iArea1024',"w",'iArea1023').
-pathBetween('iArea1025',"w",'iArea1024').
-pathBetween('iArea1026',"e",'iArea1027').
-pathBetween('iArea1027',"n",'iArea1030').
-pathBetween('iArea1027',"e",'iArea1028').
-pathBetween('iArea1027',"s",'iArea1024').
-pathBetween('iArea1027',"w",'iArea1026').
-pathBetween('iArea1028',"w",'iArea1027').
-pathBetween('iArea1029',"e",'iArea1030').
-pathBetween('iArea1030',"n",'iArea1032').
-pathBetween('iArea1030',"e",'iArea1031').
-pathBetween('iArea1030',"s",'iArea1027').
-pathBetween('iArea1030',"w",'iArea1029').
-pathBetween('iArea1031',"w",'iArea1030').
-pathBetween('iArea1032',"s",'iArea1030').
-pathBetween('iArea1032',"u",'iArea1033').
-pathBetween('iArea1032',"d",'iArea1011').
-pathBetween('iArea1033',"u",'iArea1034').
-pathBetween('iArea1033',"d",'iArea1032').
-pathBetween('iArea1034',"u",'iArea1036').
-pathBetween('iArea1034',"d",'iArea1033').
-pathBetween('iArea1035',"e",'iArea1038').
-pathBetween('iArea1036',"n",'iArea1038').
-pathBetween('iArea1036',"e",'iArea1037').
-pathBetween('iArea1036',"d",'iArea1034').
-pathBetween('iArea1037',"w",'iArea1036').
-pathBetween('iArea1038',"s",'iArea1036').
-pathBetween('iArea1038',"w",'iArea1035').
-pathBetween('iArea1039',"n",'iArea1022').
-pathBetween('iArea1039',"u",'iArea1040').
-pathBetween('iArea1040',"u",'iArea1041').
-pathBetween('iArea1040',"d",'iArea1039').
-pathBetween('iArea1041',"u",'iArea1041').
-pathBetween('iArea1041',"d",'iArea1040').
-% pathBetween('iArea1042',"n",'iArea1004075').
-pathBetween('iArea1042',"s",'iArea1006').
+pathBetween('iArea1000',vNorth,'iArea1002').
+pathBetween('iArea1001',vEast,'iArea1002').
+pathBetween('iArea1002',vNorth,'iArea1005').
+pathBetween('iArea1002',vEast,'iArea1003').
+pathBetween('iArea1002',vSouth,'iArea1000').
+pathBetween('iArea1002',vWest,'iArea1001').
+pathBetween('iArea1003',vWest,'iArea1002').
+pathBetween('iArea1004',vEast,'iArea1005').
+pathBetween('iArea1005',vNorth,'iArea1008').
+pathBetween('iArea1005',vEast,'iArea1006').
+pathBetween('iArea1005',vSouth,'iArea1002').
+pathBetween('iArea1005',vWest,'iArea1004').
+pathBetween('iArea1006',vNorth,'iArea1042').
+pathBetween('iArea1006',vWest,'iArea1005').
+pathBetween('iArea1007',vEast,'iArea1008').
+pathBetween('iArea1008',vNorth,'iArea1010').
+pathBetween('iArea1008',vEast,'iArea1009').
+pathBetween('iArea1008',vSouth,'iArea1005').
+pathBetween('iArea1008',vWest,'iArea1007').
+pathBetween('iArea1009',vWest,'iArea1008').
+pathBetween('iArea1010',vSouth,'iArea1008').
+pathBetween('iArea1010',vUp,'iArea1011').
+pathBetween('iArea1011',vNorth,'iArea1013').
+pathBetween('iArea1011',vUp,'iArea1032').
+pathBetween('iArea1011',vDown,'iArea1010').
+pathBetween('iArea1012',vEast,'iArea1013').
+pathBetween('iArea1013',vNorth,'iArea1016').
+pathBetween('iArea1013',vEast,'iArea1014').
+pathBetween('iArea1013',vSouth,'iArea1011').
+pathBetween('iArea1013',vWest,'iArea1012').
+pathBetween('iArea1014',vWest,'iArea1013').
+pathBetween('iArea1015',vEast,'iArea1016').
+pathBetween('iArea1016',vNorth,'iArea1019').
+pathBetween('iArea1016',vEast,'iArea1017').
+pathBetween('iArea1016',vSouth,'iArea1013').
+pathBetween('iArea1016',vWest,'iArea1015').
+pathBetween('iArea1017',vWest,'iArea1016').
+pathBetween('iArea1018',vEast,'iArea1019').
+pathBetween('iArea1019',vNorth,'iArea1021').
+pathBetween('iArea1019',vEast,'iArea1020').
+pathBetween('iArea1019',vSouth,'iArea1016').
+pathBetween('iArea1019',vWest,'iArea1018').
+pathBetween('iArea1020',vWest,'iArea1019').
+pathBetween('iArea1021',vSouth,'iArea1019').
+pathBetween('iArea1022',vNorth,'iArea1024').
+pathBetween('iArea1022',vSouth,'iArea1039').
+pathBetween('iArea1023',vEast,'iArea1024').
+pathBetween('iArea1024',vNorth,'iArea1027').
+pathBetween('iArea1024',vEast,'iArea1025').
+pathBetween('iArea1024',vSouth,'iArea1022').
+pathBetween('iArea1024',vWest,'iArea1023').
+pathBetween('iArea1025',vWest,'iArea1024').
+pathBetween('iArea1026',vEast,'iArea1027').
+pathBetween('iArea1027',vNorth,'iArea1030').
+pathBetween('iArea1027',vEast,'iArea1028').
+pathBetween('iArea1027',vSouth,'iArea1024').
+pathBetween('iArea1027',vWest,'iArea1026').
+pathBetween('iArea1028',vWest,'iArea1027').
+pathBetween('iArea1029',vEast,'iArea1030').
+pathBetween('iArea1030',vNorth,'iArea1032').
+pathBetween('iArea1030',vEast,'iArea1031').
+pathBetween('iArea1030',vSouth,'iArea1027').
+pathBetween('iArea1030',vWest,'iArea1029').
+pathBetween('iArea1031',vWest,'iArea1030').
+pathBetween('iArea1032',vSouth,'iArea1030').
+pathBetween('iArea1032',vUp,'iArea1033').
+pathBetween('iArea1032',vDown,'iArea1011').
+pathBetween('iArea1033',vUp,'iArea1034').
+pathBetween('iArea1033',vDown,'iArea1032').
+pathBetween('iArea1034',vUp,'iArea1036').
+pathBetween('iArea1034',vDown,'iArea1033').
+pathBetween('iArea1035',vEast,'iArea1038').
+pathBetween('iArea1036',vNorth,'iArea1038').
+pathBetween('iArea1036',vEast,'iArea1037').
+pathBetween('iArea1036',vDown,'iArea1034').
+pathBetween('iArea1037',vWest,'iArea1036').
+pathBetween('iArea1038',vSouth,'iArea1036').
+pathBetween('iArea1038',vWest,'iArea1035').
+pathBetween('iArea1039',vNorth,'iArea1022').
+pathBetween('iArea1039',vUp,'iArea1040').
+pathBetween('iArea1040',vUp,'iArea1041').
+pathBetween('iArea1040',vDown,'iArea1039').
+pathBetween('iArea1041',vUp,'iArea1041').
+pathBetween('iArea1041',vDown,'iArea1040').
+% pathBetween('iArea1042',vNorth,'iArea1004075').
+pathBetween('iArea1042',vSouth,'iArea1006').
 
  /* found 86 for pathBetween(_G1494,_G1495,_G1496). */ 
 
@@ -1128,90 +1128,90 @@ line_count(32).
 number_of_clauses(1).
 Pattern: pathName(_G1519,_G1520,_G1521). 
  */
-pathName('iArea1000',"n","A corridor is North").
-pathName('iArea1001',"e","A corridor is East").
-pathName('iArea1002',"n","The corridor continues North").
-pathName('iArea1002',"e","Data's Quarters are East").
-pathName('iArea1002',"s","Main Engineering is South").
-pathName('iArea1002',"w","Geordi's Quarters are West").
-pathName('iArea1003',"w","A corridor is West").
-pathName('iArea1004',"e","A corridor is East").
-pathName('iArea1005',"n","The corridor continues North").
-pathName('iArea1005',"e","The Transporter Room is East").
-pathName('iArea1005',"s","The corridor continues South").
-pathName('iArea1005',"w","The Brig is West").
-pathName('iArea1006',"n","A transporter beam is North").
-pathName('iArea1006',"w","A corridor is West").
-pathName('iArea1007',"e","A corridor is East").
-pathName('iArea1008',"n","The turbolift is North").
-pathName('iArea1008',"e","Holodeck 2 is East").
-pathName('iArea1008',"s","The corridor continues South").
-pathName('iArea1008',"w","The School is West").
-pathName('iArea1009',"w","A corridor is West").
-pathName('iArea1010',"s","A corridor leads South").
-pathName('iArea1010',"u","The turbolift goes Up").
-pathName('iArea1011',"n","A corridor leads North").
-pathName('iArea1011',"u","The turbolift goes Up").
-pathName('iArea1011',"d","The turbolift goes Down").
-pathName('iArea1012',"e","A corridor is East").
-pathName('iArea1013',"n","The corridor continues North").
-pathName('iArea1013',"e","Riker's Quarters are East").
-pathName('iArea1013',"s","The Turbolift is South").
-pathName('iArea1013',"w","The Cargo Bay is West").
-pathName('iArea1014',"w","A corridor is West").
-pathName('iArea1015',"e","A corridor is East").
-pathName('iArea1016',"n","The corridor continues North").
-pathName('iArea1016',"e","Holodeck 4 is East").
-pathName('iArea1016',"s","The corridor continues South").
-pathName('iArea1016',"w","Sick Bay is West").
-pathName('iArea1017',"w","A corridor is West").
-pathName('iArea1018',"e","A corridor is East").
-pathName('iArea1019',"n","Ten Forward is North").
-pathName('iArea1019',"e","Security is East").
-pathName('iArea1019',"s","The corridor continues South").
-pathName('iArea1019',"w","Crusher's Quarters are West").
-pathName('iArea1020',"w","A corridor is West").
-pathName('iArea1021',"s","A corridor is South").
-pathName('iArea1022',"n","A corridor is North").
-pathName('iArea1023',"e","A corridor is East").
-pathName('iArea1024',"n","The corridor continues North").
-pathName('iArea1024',"e","Worf's Quarters are East").
-pathName('iArea1024',"s","The shuttle bay is South").
-pathName('iArea1024',"w","Troi's Quarters are West").
-pathName('iArea1025',"w","A corridor is West").
-pathName('iArea1026',"e","A corridor is East").
-pathName('iArea1027',"n","The corridor continues North").
-pathName('iArea1027',"e","Picard's Quarters are East").
-pathName('iArea1027',"s","The corridor continues South").
-pathName('iArea1027',"w","The Enterprise Gym is West").
-pathName('iArea1028',"w","A corridor is West").
-pathName('iArea1029',"e","A corridor is East").
-pathName('iArea1030',"n","The Turbolift is North").
-pathName('iArea1030',"e","Empty Quarters are East").
-pathName('iArea1030',"s","The corridor continues South").
-pathName('iArea1030',"w","Empty Quarters are West").
-pathName('iArea1031',"w","A corridor is West").
-pathName('iArea1032',"s","A corridor leads South").
-pathName('iArea1032',"u","The turbolift goes Up").
-pathName('iArea1032',"d","The turbolift goes Down").
-pathName('iArea1033',"u","The turbolift goes Up").
-pathName('iArea1033',"d","The turbolift goes Down").
-pathName('iArea1034',"u","The Main Bridge is Up").
-pathName('iArea1034',"d","The turbolift goes Down").
-pathName('iArea1035',"e","The Main Bridge  Lower Half is East").
-pathName('iArea1036',"n","The Main Bridge  Lower Half is North").
-pathName('iArea1036',"e","The Conference Room is East").
-pathName('iArea1036',"d","The Turbolift is Down").
-pathName('iArea1037',"w","The Main Bridge  Upper Half is West").
-pathName('iArea1038',"s","The Main Bridge  Upper Half is South").
-pathName('iArea1038',"w","The Captain's Ready Room is West").
-pathName('iArea1039',"n","The Shuttle Bay is North").
-pathName('iArea1039',"u","Outer Space is Up").
-pathName('iArea1040',"u","Outer Space is Up").
-pathName('iArea1040',"d","Outer Space is Down").
-pathName('iArea1041',"u","* The Galaxy is Up").
-pathName('iArea1041',"d","Outer Space is Down").
-pathName('iArea1042',"s","The Transporter Room is South").
+pathName('iArea1000',vNorth,"A corridor is North").
+pathName('iArea1001',vEast,"A corridor is East").
+pathName('iArea1002',vNorth,"The corridor continues North").
+pathName('iArea1002',vEast,"Data's Quarters are East").
+pathName('iArea1002',vSouth,"Main Engineering is South").
+pathName('iArea1002',vWest,"Geordi's Quarters are West").
+pathName('iArea1003',vWest,"A corridor is West").
+pathName('iArea1004',vEast,"A corridor is East").
+pathName('iArea1005',vNorth,"The corridor continues North").
+pathName('iArea1005',vEast,"The Transporter Room is East").
+pathName('iArea1005',vSouth,"The corridor continues South").
+pathName('iArea1005',vWest,"The Brig is West").
+pathName('iArea1006',vNorth,"A transporter beam is North").
+pathName('iArea1006',vWest,"A corridor is West").
+pathName('iArea1007',vEast,"A corridor is East").
+pathName('iArea1008',vNorth,"The turbolift is North").
+pathName('iArea1008',vEast,"Holodeck 2 is East").
+pathName('iArea1008',vSouth,"The corridor continues South").
+pathName('iArea1008',vWest,"The School is West").
+pathName('iArea1009',vWest,"A corridor is West").
+pathName('iArea1010',vSouth,"A corridor leads South").
+pathName('iArea1010',vUp,"The turbolift goes Up").
+pathName('iArea1011',vNorth,"A corridor leads North").
+pathName('iArea1011',vUp,"The turbolift goes Up").
+pathName('iArea1011',vDown,"The turbolift goes Down").
+pathName('iArea1012',vEast,"A corridor is East").
+pathName('iArea1013',vNorth,"The corridor continues North").
+pathName('iArea1013',vEast,"Riker's Quarters are East").
+pathName('iArea1013',vSouth,"The Turbolift is South").
+pathName('iArea1013',vWest,"The Cargo Bay is West").
+pathName('iArea1014',vWest,"A corridor is West").
+pathName('iArea1015',vEast,"A corridor is East").
+pathName('iArea1016',vNorth,"The corridor continues North").
+pathName('iArea1016',vEast,"Holodeck 4 is East").
+pathName('iArea1016',vSouth,"The corridor continues South").
+pathName('iArea1016',vWest,"Sick Bay is West").
+pathName('iArea1017',vWest,"A corridor is West").
+pathName('iArea1018',vEast,"A corridor is East").
+pathName('iArea1019',vNorth,"Ten Forward is North").
+pathName('iArea1019',vEast,"Security is East").
+pathName('iArea1019',vSouth,"The corridor continues South").
+pathName('iArea1019',vWest,"Crusher's Quarters are West").
+pathName('iArea1020',vWest,"A corridor is West").
+pathName('iArea1021',vSouth,"A corridor is South").
+pathName('iArea1022',vNorth,"A corridor is North").
+pathName('iArea1023',vEast,"A corridor is East").
+pathName('iArea1024',vNorth,"The corridor continues North").
+pathName('iArea1024',vEast,"Worf's Quarters are East").
+pathName('iArea1024',vSouth,"The shuttle bay is South").
+pathName('iArea1024',vWest,"Troi's Quarters are West").
+pathName('iArea1025',vWest,"A corridor is West").
+pathName('iArea1026',vEast,"A corridor is East").
+pathName('iArea1027',vNorth,"The corridor continues North").
+pathName('iArea1027',vEast,"Picard's Quarters are East").
+pathName('iArea1027',vSouth,"The corridor continues South").
+pathName('iArea1027',vWest,"The Enterprise Gym is West").
+pathName('iArea1028',vWest,"A corridor is West").
+pathName('iArea1029',vEast,"A corridor is East").
+pathName('iArea1030',vNorth,"The Turbolift is North").
+pathName('iArea1030',vEast,"Empty Quarters are East").
+pathName('iArea1030',vSouth,"The corridor continues South").
+pathName('iArea1030',vWest,"Empty Quarters are West").
+pathName('iArea1031',vWest,"A corridor is West").
+pathName('iArea1032',vSouth,"A corridor leads South").
+pathName('iArea1032',vUp,"The turbolift goes Up").
+pathName('iArea1032',vDown,"The turbolift goes Down").
+pathName('iArea1033',vUp,"The turbolift goes Up").
+pathName('iArea1033',vDown,"The turbolift goes Down").
+pathName('iArea1034',vUp,"The Main Bridge is Up").
+pathName('iArea1034',vDown,"The turbolift goes Down").
+pathName('iArea1035',vEast,"The Main Bridge  Lower Half is East").
+pathName('iArea1036',vNorth,"The Main Bridge  Lower Half is North").
+pathName('iArea1036',vEast,"The Conference Room is East").
+pathName('iArea1036',vDown,"The Turbolift is Down").
+pathName('iArea1037',vWest,"The Main Bridge  Upper Half is West").
+pathName('iArea1038',vSouth,"The Main Bridge  Upper Half is South").
+pathName('iArea1038',vWest,"The Captain's Ready Room is West").
+pathName('iArea1039',vNorth,"The Shuttle Bay is North").
+pathName('iArea1039',vUp,"Outer Space is Up").
+pathName('iArea1040',vUp,"Outer Space is Up").
+pathName('iArea1040',vDown,"Outer Space is Down").
+pathName('iArea1041',vUp,"* The Galaxy is Up").
+pathName('iArea1041',vDown,"Outer Space is Down").
+pathName('iArea1042',vSouth,"The Transporter Room is South").
 
  /* found 84 for pathName(_G1519,_G1520,_G1521). */ 
 /*
@@ -1245,9 +1245,9 @@ pddlObjects(tRegion,['iArea1000','iArea1001','iArea1002','iArea1003','iArea1004'
 pddlObjects(tAgentGeneric,['NPC0Geordi684','NPC2Worf720','NPC3DrCrusher677','NPC4Troi712','NPC5Riker707','NPC6Picard701','NPC7Guinan689','NPC8OBrien696','NPC9Wesley716','NPC1010Livingston726','NPC1011Spot727','iEnsign728','iEnsign732','iEnsign736','iEnsign740','iEnsign744','iEnsign748','iEnsign752','NPC1013Alexander671',iCommanderData66,iExplorer1]).
 
 %%pddlObjects(tPathway,List):findall(apath(A,B),pathBetween(A,B,C),List).
-pddlObjects(tPathway,[apathFn('iArea1000',"n"),apathFn('iArea1001',"e"),apathFn('iArea1002',"n"),apathFn('iArea1002',"e"),apathFn('iArea1002',"s"),apathFn('iArea1002',"w"),apathFn('iArea1003',"w"),apathFn('iArea1004',"e"),apathFn('iArea1005',"n"),apathFn('iArea1005',"e"),apathFn('iArea1005',"s"),apathFn('iArea1005',"w"),apathFn('iArea1006',"n"),apathFn('iArea1006',"w"),apathFn('iArea1007',"e"),apathFn('iArea1008',"n"),apathFn('iArea1008',"e"),apathFn('iArea1008',"s"),apathFn('iArea1008',"w"),apathFn('iArea1009',"w"),apathFn('iArea1010',"s"),apathFn('iArea1010',"u"),apathFn('iArea1011',"n"),apathFn('iArea1011',"u"),apathFn('iArea1011',"d"),apathFn('iArea1012',"e"),apathFn('iArea1013',"n"),apathFn('iArea1013',"e"),apathFn('iArea1013',"s"),apathFn('iArea1013',"w"),apathFn('iArea1014',"w"),apathFn('iArea1015',"e"),apathFn('iArea1016',"n"),apathFn('iArea1016',"e"),apathFn('iArea1016',"s"),apathFn('iArea1016',"w"),apathFn('iArea1017',"w"),apathFn('iArea1018',"e"),apathFn('iArea1019',"n"),apathFn('iArea1019',"e"),apathFn('iArea1019',"s"),apathFn('iArea1019',"w"),apathFn('iArea1020',"w"),apathFn('iArea1021',"s"),apathFn('iArea1022',"n"),apathFn('iArea1022',"s"),apathFn('iArea1023',"e"),apathFn('iArea1024',"n"),apathFn('iArea1024',"e"),apathFn('iArea1024',"s"),apathFn('iArea1024',"w"),apathFn('iArea1025',"w"),apathFn('iArea1026',"e"),apathFn('iArea1027',"n"),apathFn('iArea1027',"e"),apathFn('iArea1027',"s"),apathFn('iArea1027',"w"),apathFn('iArea1028',"w"),apathFn('iArea1029',"e"),apathFn('iArea1030',"n"),apathFn('iArea1030',"e"),apathFn('iArea1030',"s"),apathFn('iArea1030',"w"),apathFn('iArea1031',"w"),apathFn('iArea1032',"s"),apathFn('iArea1032',"u"),apathFn('iArea1032',"d"),apathFn('iArea1033',"u"),apathFn('iArea1033',"d"),apathFn('iArea1034',"u"),apathFn('iArea1034',"d"),apathFn('iArea1035',"e"),apathFn('iArea1036',"n"),apathFn('iArea1036',"e"),apathFn('iArea1036',"d"),apathFn('iArea1037',"w"),apathFn('iArea1038',"s"),apathFn('iArea1038',"w"),apathFn('iArea1039',"n"),apathFn('iArea1039',"u"),apathFn('iArea1040',"u"),apathFn('iArea1040',"d"),apathFn('iArea1041',"u"),apathFn('iArea1041',"d"),apathFn('iArea1042',"n"),apathFn('iArea1042',"s")]).
+pddlObjects(tPathway,[apathFn('iArea1000',vNorth),apathFn('iArea1001',vEast),apathFn('iArea1002',vNorth),apathFn('iArea1002',vEast),apathFn('iArea1002',vSouth),apathFn('iArea1002',vWest),apathFn('iArea1003',vWest),apathFn('iArea1004',vEast),apathFn('iArea1005',vNorth),apathFn('iArea1005',vEast),apathFn('iArea1005',vSouth),apathFn('iArea1005',vWest),apathFn('iArea1006',vNorth),apathFn('iArea1006',vWest),apathFn('iArea1007',vEast),apathFn('iArea1008',vNorth),apathFn('iArea1008',vEast),apathFn('iArea1008',vSouth),apathFn('iArea1008',vWest),apathFn('iArea1009',vWest),apathFn('iArea1010',vSouth),apathFn('iArea1010',vUp),apathFn('iArea1011',vNorth),apathFn('iArea1011',vUp),apathFn('iArea1011',vDown),apathFn('iArea1012',vEast),apathFn('iArea1013',vNorth),apathFn('iArea1013',vEast),apathFn('iArea1013',vSouth),apathFn('iArea1013',vWest),apathFn('iArea1014',vWest),apathFn('iArea1015',vEast),apathFn('iArea1016',vNorth),apathFn('iArea1016',vEast),apathFn('iArea1016',vSouth),apathFn('iArea1016',vWest),apathFn('iArea1017',vWest),apathFn('iArea1018',vEast),apathFn('iArea1019',vNorth),apathFn('iArea1019',vEast),apathFn('iArea1019',vSouth),apathFn('iArea1019',vWest),apathFn('iArea1020',vWest),apathFn('iArea1021',vSouth),apathFn('iArea1022',vNorth),apathFn('iArea1022',vSouth),apathFn('iArea1023',vEast),apathFn('iArea1024',vNorth),apathFn('iArea1024',vEast),apathFn('iArea1024',vSouth),apathFn('iArea1024',vWest),apathFn('iArea1025',vWest),apathFn('iArea1026',vEast),apathFn('iArea1027',vNorth),apathFn('iArea1027',vEast),apathFn('iArea1027',vSouth),apathFn('iArea1027',vWest),apathFn('iArea1028',vWest),apathFn('iArea1029',vEast),apathFn('iArea1030',vNorth),apathFn('iArea1030',vEast),apathFn('iArea1030',vSouth),apathFn('iArea1030',vWest),apathFn('iArea1031',vWest),apathFn('iArea1032',vSouth),apathFn('iArea1032',vUp),apathFn('iArea1032',vDown),apathFn('iArea1033',vUp),apathFn('iArea1033',vDown),apathFn('iArea1034',vUp),apathFn('iArea1034',vDown),apathFn('iArea1035',vEast),apathFn('iArea1036',vNorth),apathFn('iArea1036',vEast),apathFn('iArea1036',vDown),apathFn('iArea1037',vWest),apathFn('iArea1038',vSouth),apathFn('iArea1038',vWest),apathFn('iArea1039',vNorth),apathFn('iArea1039',vUp),apathFn('iArea1040',vUp),apathFn('iArea1040',vDown),apathFn('iArea1041',vUp),apathFn('iArea1041',vDown),apathFn('iArea1042',vNorth),apathFn('iArea1042',vSouth)]).
 
-pddlObjects(vtDirection,["n","s","e","w","u","d"]).
+pddlObjects(vtDirection,[vNorth,vSouth,vEast,vWest,vUp,vDown]).
 /*********************** predcate defns ***********************************/
 
 
@@ -1268,180 +1268,180 @@ inconsistent_constraint([certified(P), not_insured(P)]).
 
 %%atomic_invariants([]):!.%%,fail.
 atomic_invariants([
-      pathBetween('iArea1000',"n",'iArea1002'),
-      pathBetween('iArea1001',"e",'iArea1002'),
-      pathBetween('iArea1002',"n",'iArea1005'),
-      pathBetween('iArea1002',"e",'iArea1003'),
-      pathBetween('iArea1002',"s",'iArea1000'),
-      pathBetween('iArea1002',"w",'iArea1001'),
-      pathBetween('iArea1003',"w",'iArea1002'),
-      pathBetween('iArea1004',"e",'iArea1005'),
-      pathBetween('iArea1005',"n",'iArea1008'),
-      pathBetween('iArea1005',"e",'iArea1006'),
-      pathBetween('iArea1005',"s",'iArea1002'),
-      pathBetween('iArea1005',"w",'iArea1004'),
-      pathBetween('iArea1006',"n",'iArea1042'),
-      pathBetween('iArea1006',"w",'iArea1005'),
-      pathBetween('iArea1007',"e",'iArea1008'),
-      pathBetween('iArea1008',"n",'iArea1010'),
-      pathBetween('iArea1008',"e",'iArea1009'),
-      pathBetween('iArea1008',"s",'iArea1005'),
-      pathBetween('iArea1008',"w",'iArea1007'),
-      pathBetween('iArea1009',"w",'iArea1008'),
-      pathBetween('iArea1010',"s",'iArea1008'),
-      pathBetween('iArea1010',"u",'iArea1011'),
-      pathBetween('iArea1011',"n",'iArea1013'),
-      pathBetween('iArea1011',"u",'iArea1032'),
-      pathBetween('iArea1011',"d",'iArea1010'),
-      pathBetween('iArea1012',"e",'iArea1013'),
-      pathBetween('iArea1013',"n",'iArea1016'),
-      pathBetween('iArea1013',"e",'iArea1014'),
-      pathBetween('iArea1013',"s",'iArea1011'),
-      pathBetween('iArea1013',"w",'iArea1012'),
-      pathBetween('iArea1014',"w",'iArea1013'),
-      pathBetween('iArea1015',"e",'iArea1016'),
-      pathBetween('iArea1016',"n",'iArea1019'),
-      pathBetween('iArea1016',"e",'iArea1017'),
-      pathBetween('iArea1016',"s",'iArea1013'),
-      pathBetween('iArea1016',"w",'iArea1015'),
-      pathBetween('iArea1017',"w",'iArea1016'),
-      pathBetween('iArea1018',"e",'iArea1019'),
-      pathBetween('iArea1019',"n",'iArea1021'),
-      pathBetween('iArea1019',"e",'iArea1020'),
-      pathBetween('iArea1019',"s",'iArea1016'),
-      pathBetween('iArea1019',"w",'iArea1018'),
-      pathBetween('iArea1020',"w",'iArea1019'),
-      pathBetween('iArea1021',"s",'iArea1019'),
-      pathBetween('iArea1022',"n",'iArea1024'),
-      pathBetween('iArea1022',"s",'iArea1039'),
-      pathBetween('iArea1023',"e",'iArea1024'),
-      pathBetween('iArea1024',"n",'iArea1027'),
-      pathBetween('iArea1024',"e",'iArea1025'),
-      pathBetween('iArea1024',"s",'iArea1022'),
-      pathBetween('iArea1024',"w",'iArea1023'),
-      pathBetween('iArea1025',"w",'iArea1024'),
-      pathBetween('iArea1026',"e",'iArea1027'),
-      pathBetween('iArea1027',"n",'iArea1030'),
-      pathBetween('iArea1027',"e",'iArea1028'),
-      pathBetween('iArea1027',"s",'iArea1024'),
-      pathBetween('iArea1027',"w",'iArea1026'),
-      pathBetween('iArea1028',"w",'iArea1027'),
-      pathBetween('iArea1029',"e",'iArea1030'),
-      pathBetween('iArea1030',"n",'iArea1032'),
-      pathBetween('iArea1030',"e",'iArea1031'),
-      pathBetween('iArea1030',"s",'iArea1027'),
-      pathBetween('iArea1030',"w",'iArea1029'),
-      pathBetween('iArea1031',"w",'iArea1030'),
-      pathBetween('iArea1032',"s",'iArea1030'),
-      pathBetween('iArea1032',"u",'iArea1033'),
-      pathBetween('iArea1032',"d",'iArea1011'),
-      pathBetween('iArea1033',"u",'iArea1034'),
-      pathBetween('iArea1033',"d",'iArea1032'),
-      pathBetween('iArea1034',"u",'iArea1036'),
-      pathBetween('iArea1034',"d",'iArea1033'),
-      pathBetween('iArea1035',"e",'iArea1038'),
-      pathBetween('iArea1036',"n",'iArea1038'),
-      pathBetween('iArea1036',"e",'iArea1037'),
-      pathBetween('iArea1036',"d",'iArea1034'),
-      pathBetween('iArea1037',"w",'iArea1036'),
-      pathBetween('iArea1038',"s",'iArea1036'),
-      pathBetween('iArea1038',"w",'iArea1035'),
-      pathBetween('iArea1039',"n",'iArea1022'),
-      pathBetween('iArea1039',"u",'iArea1040'),
-      pathBetween('iArea1040',"u",'iArea1041'),
-      pathBetween('iArea1040',"d",'iArea1039'),
-      pathBetween('iArea1041',"u",'iArea1041'),
-      pathBetween('iArea1041',"d",'iArea1040'),
-      % pathBetween('iArea1042',"n",'iArea1004075'),
-      pathBetween('iArea1042',"s",'iArea1006'),
+      pathBetween('iArea1000',vNorth,'iArea1002'),
+      pathBetween('iArea1001',vEast,'iArea1002'),
+      pathBetween('iArea1002',vNorth,'iArea1005'),
+      pathBetween('iArea1002',vEast,'iArea1003'),
+      pathBetween('iArea1002',vSouth,'iArea1000'),
+      pathBetween('iArea1002',vWest,'iArea1001'),
+      pathBetween('iArea1003',vWest,'iArea1002'),
+      pathBetween('iArea1004',vEast,'iArea1005'),
+      pathBetween('iArea1005',vNorth,'iArea1008'),
+      pathBetween('iArea1005',vEast,'iArea1006'),
+      pathBetween('iArea1005',vSouth,'iArea1002'),
+      pathBetween('iArea1005',vWest,'iArea1004'),
+      pathBetween('iArea1006',vNorth,'iArea1042'),
+      pathBetween('iArea1006',vWest,'iArea1005'),
+      pathBetween('iArea1007',vEast,'iArea1008'),
+      pathBetween('iArea1008',vNorth,'iArea1010'),
+      pathBetween('iArea1008',vEast,'iArea1009'),
+      pathBetween('iArea1008',vSouth,'iArea1005'),
+      pathBetween('iArea1008',vWest,'iArea1007'),
+      pathBetween('iArea1009',vWest,'iArea1008'),
+      pathBetween('iArea1010',vSouth,'iArea1008'),
+      pathBetween('iArea1010',vUp,'iArea1011'),
+      pathBetween('iArea1011',vNorth,'iArea1013'),
+      pathBetween('iArea1011',vUp,'iArea1032'),
+      pathBetween('iArea1011',vDown,'iArea1010'),
+      pathBetween('iArea1012',vEast,'iArea1013'),
+      pathBetween('iArea1013',vNorth,'iArea1016'),
+      pathBetween('iArea1013',vEast,'iArea1014'),
+      pathBetween('iArea1013',vSouth,'iArea1011'),
+      pathBetween('iArea1013',vWest,'iArea1012'),
+      pathBetween('iArea1014',vWest,'iArea1013'),
+      pathBetween('iArea1015',vEast,'iArea1016'),
+      pathBetween('iArea1016',vNorth,'iArea1019'),
+      pathBetween('iArea1016',vEast,'iArea1017'),
+      pathBetween('iArea1016',vSouth,'iArea1013'),
+      pathBetween('iArea1016',vWest,'iArea1015'),
+      pathBetween('iArea1017',vWest,'iArea1016'),
+      pathBetween('iArea1018',vEast,'iArea1019'),
+      pathBetween('iArea1019',vNorth,'iArea1021'),
+      pathBetween('iArea1019',vEast,'iArea1020'),
+      pathBetween('iArea1019',vSouth,'iArea1016'),
+      pathBetween('iArea1019',vWest,'iArea1018'),
+      pathBetween('iArea1020',vWest,'iArea1019'),
+      pathBetween('iArea1021',vSouth,'iArea1019'),
+      pathBetween('iArea1022',vNorth,'iArea1024'),
+      pathBetween('iArea1022',vSouth,'iArea1039'),
+      pathBetween('iArea1023',vEast,'iArea1024'),
+      pathBetween('iArea1024',vNorth,'iArea1027'),
+      pathBetween('iArea1024',vEast,'iArea1025'),
+      pathBetween('iArea1024',vSouth,'iArea1022'),
+      pathBetween('iArea1024',vWest,'iArea1023'),
+      pathBetween('iArea1025',vWest,'iArea1024'),
+      pathBetween('iArea1026',vEast,'iArea1027'),
+      pathBetween('iArea1027',vNorth,'iArea1030'),
+      pathBetween('iArea1027',vEast,'iArea1028'),
+      pathBetween('iArea1027',vSouth,'iArea1024'),
+      pathBetween('iArea1027',vWest,'iArea1026'),
+      pathBetween('iArea1028',vWest,'iArea1027'),
+      pathBetween('iArea1029',vEast,'iArea1030'),
+      pathBetween('iArea1030',vNorth,'iArea1032'),
+      pathBetween('iArea1030',vEast,'iArea1031'),
+      pathBetween('iArea1030',vSouth,'iArea1027'),
+      pathBetween('iArea1030',vWest,'iArea1029'),
+      pathBetween('iArea1031',vWest,'iArea1030'),
+      pathBetween('iArea1032',vSouth,'iArea1030'),
+      pathBetween('iArea1032',vUp,'iArea1033'),
+      pathBetween('iArea1032',vDown,'iArea1011'),
+      pathBetween('iArea1033',vUp,'iArea1034'),
+      pathBetween('iArea1033',vDown,'iArea1032'),
+      pathBetween('iArea1034',vUp,'iArea1036'),
+      pathBetween('iArea1034',vDown,'iArea1033'),
+      pathBetween('iArea1035',vEast,'iArea1038'),
+      pathBetween('iArea1036',vNorth,'iArea1038'),
+      pathBetween('iArea1036',vEast,'iArea1037'),
+      pathBetween('iArea1036',vDown,'iArea1034'),
+      pathBetween('iArea1037',vWest,'iArea1036'),
+      pathBetween('iArea1038',vSouth,'iArea1036'),
+      pathBetween('iArea1038',vWest,'iArea1035'),
+      pathBetween('iArea1039',vNorth,'iArea1022'),
+      pathBetween('iArea1039',vUp,'iArea1040'),
+      pathBetween('iArea1040',vUp,'iArea1041'),
+      pathBetween('iArea1040',vDown,'iArea1039'),
+      pathBetween('iArea1041',vUp,'iArea1041'),
+      pathBetween('iArea1041',vDown,'iArea1040'),
+      % pathBetween('iArea1042',vNorth,'iArea1004075'),
+      pathBetween('iArea1042',vSouth,'iArea1006'),
 
      %% printAll(pathBetween(X,Y,Z),agentRoute(apath(X,Y),X,Z)).
-      agentRoute(apath('iArea1000',"n"),'iArea1000','iArea1002'),
-      agentRoute(apath('iArea1001',"e"),'iArea1001','iArea1002'),
-      agentRoute(apath('iArea1002',"n"),'iArea1002','iArea1005'),
-      agentRoute(apath('iArea1002',"e"),'iArea1002','iArea1003'),
-      agentRoute(apath('iArea1002',"s"),'iArea1002','iArea1000'),
-      agentRoute(apath('iArea1002',"w"),'iArea1002','iArea1001'),
-      agentRoute(apath('iArea1003',"w"),'iArea1003','iArea1002'),
-      agentRoute(apath('iArea1004',"e"),'iArea1004','iArea1005'),
-      agentRoute(apath('iArea1005',"n"),'iArea1005','iArea1008'),
-      agentRoute(apath('iArea1005',"e"),'iArea1005','iArea1006'),
-      agentRoute(apath('iArea1005',"s"),'iArea1005','iArea1002'),
-      agentRoute(apath('iArea1005',"w"),'iArea1005','iArea1004'),
-      agentRoute(apath('iArea1006',"n"),'iArea1006','iArea1042'),
-      agentRoute(apath('iArea1006',"w"),'iArea1006','iArea1005'),
-      agentRoute(apath('iArea1007',"e"),'iArea1007','iArea1008'),
-      agentRoute(apath('iArea1008',"n"),'iArea1008','iArea1010'),
-      agentRoute(apath('iArea1008',"e"),'iArea1008','iArea1009'),
-      agentRoute(apath('iArea1008',"s"),'iArea1008','iArea1005'),
-      agentRoute(apath('iArea1008',"w"),'iArea1008','iArea1007'),
-      agentRoute(apath('iArea1009',"w"),'iArea1009','iArea1008'),
-      agentRoute(apath('iArea1010',"s"),'iArea1010','iArea1008'),
-      agentRoute(apath('iArea1010',"u"),'iArea1010','iArea1011'),
-      agentRoute(apath('iArea1011',"n"),'iArea1011','iArea1013'),
-      agentRoute(apath('iArea1011',"u"),'iArea1011','iArea1032'),
-      agentRoute(apath('iArea1011',"d"),'iArea1011','iArea1010'),
-      agentRoute(apath('iArea1012',"e"),'iArea1012','iArea1013'),
-      agentRoute(apath('iArea1013',"n"),'iArea1013','iArea1016'),
-      agentRoute(apath('iArea1013',"e"),'iArea1013','iArea1014'),
-      agentRoute(apath('iArea1013',"s"),'iArea1013','iArea1011'),
-      agentRoute(apath('iArea1013',"w"),'iArea1013','iArea1012'),
-      agentRoute(apath('iArea1014',"w"),'iArea1014','iArea1013'),
-      agentRoute(apath('iArea1015',"e"),'iArea1015','iArea1016'),
-      agentRoute(apath('iArea1016',"n"),'iArea1016','iArea1019'),
-      agentRoute(apath('iArea1016',"e"),'iArea1016','iArea1017'),
-      agentRoute(apath('iArea1016',"s"),'iArea1016','iArea1013'),
-      agentRoute(apath('iArea1016',"w"),'iArea1016','iArea1015'),
-      agentRoute(apath('iArea1017',"w"),'iArea1017','iArea1016'),
-      agentRoute(apath('iArea1018',"e"),'iArea1018','iArea1019'),
-      agentRoute(apath('iArea1019',"n"),'iArea1019','iArea1021'),
-      agentRoute(apath('iArea1019',"e"),'iArea1019','iArea1020'),
-      agentRoute(apath('iArea1019',"s"),'iArea1019','iArea1016'),
-      agentRoute(apath('iArea1019',"w"),'iArea1019','iArea1018'),
-      agentRoute(apath('iArea1020',"w"),'iArea1020','iArea1019'),
-      agentRoute(apath('iArea1021',"s"),'iArea1021','iArea1019'),
-      agentRoute(apath('iArea1022',"n"),'iArea1022','iArea1024'),
-      agentRoute(apath('iArea1022',"s"),'iArea1022','iArea1039'),
-      agentRoute(apath('iArea1023',"e"),'iArea1023','iArea1024'),
-      agentRoute(apath('iArea1024',"n"),'iArea1024','iArea1027'),
-      agentRoute(apath('iArea1024',"e"),'iArea1024','iArea1025'),
-      agentRoute(apath('iArea1024',"s"),'iArea1024','iArea1022'),
-      agentRoute(apath('iArea1024',"w"),'iArea1024','iArea1023'),
-      agentRoute(apath('iArea1025',"w"),'iArea1025','iArea1024'),
-      agentRoute(apath('iArea1026',"e"),'iArea1026','iArea1027'),
-      agentRoute(apath('iArea1027',"n"),'iArea1027','iArea1030'),
-      agentRoute(apath('iArea1027',"e"),'iArea1027','iArea1028'),
-      agentRoute(apath('iArea1027',"s"),'iArea1027','iArea1024'),
-      agentRoute(apath('iArea1027',"w"),'iArea1027','iArea1026'),
-      agentRoute(apath('iArea1028',"w"),'iArea1028','iArea1027'),
-      agentRoute(apath('iArea1029',"e"),'iArea1029','iArea1030'),
-      agentRoute(apath('iArea1030',"n"),'iArea1030','iArea1032'),
-      agentRoute(apath('iArea1030',"e"),'iArea1030','iArea1031'),
-      agentRoute(apath('iArea1030',"s"),'iArea1030','iArea1027'),
-      agentRoute(apath('iArea1030',"w"),'iArea1030','iArea1029'),
-      agentRoute(apath('iArea1031',"w"),'iArea1031','iArea1030'),
-      agentRoute(apath('iArea1032',"s"),'iArea1032','iArea1030'),
-      agentRoute(apath('iArea1032',"u"),'iArea1032','iArea1033'),
-      agentRoute(apath('iArea1032',"d"),'iArea1032','iArea1011'),
-      agentRoute(apath('iArea1033',"u"),'iArea1033','iArea1034'),
-      agentRoute(apath('iArea1033',"d"),'iArea1033','iArea1032'),
-      agentRoute(apath('iArea1034',"u"),'iArea1034','iArea1036'),
-      agentRoute(apath('iArea1034',"d"),'iArea1034','iArea1033'),
-      agentRoute(apath('iArea1035',"e"),'iArea1035','iArea1038'),
-      agentRoute(apath('iArea1036',"n"),'iArea1036','iArea1038'),
-      agentRoute(apath('iArea1036',"e"),'iArea1036','iArea1037'),
-      agentRoute(apath('iArea1036',"d"),'iArea1036','iArea1034'),
-      agentRoute(apath('iArea1037',"w"),'iArea1037','iArea1036'),
-      agentRoute(apath('iArea1038',"s"),'iArea1038','iArea1036'),
-      agentRoute(apath('iArea1038',"w"),'iArea1038','iArea1035'),
-      agentRoute(apath('iArea1039',"n"),'iArea1039','iArea1022'),
-      agentRoute(apath('iArea1039',"u"),'iArea1039','iArea1040'),
-      agentRoute(apath('iArea1040',"u"),'iArea1040','iArea1041'),
-      agentRoute(apath('iArea1040',"d"),'iArea1040','iArea1039'),
-      agentRoute(apath('iArea1041',"u"),'iArea1041','iArea1041'),
-      agentRoute(apath('iArea1041',"d"),'iArea1041','iArea1040'),
-      % agentRoute(apath('iArea1042',"n"),'iArea1042','iArea1004075'),
-      agentRoute(apath('iArea1042',"s"),'iArea1042','iArea1006')
+      agentRoute(apath('iArea1000',vNorth),'iArea1000','iArea1002'),
+      agentRoute(apath('iArea1001',vEast),'iArea1001','iArea1002'),
+      agentRoute(apath('iArea1002',vNorth),'iArea1002','iArea1005'),
+      agentRoute(apath('iArea1002',vEast),'iArea1002','iArea1003'),
+      agentRoute(apath('iArea1002',vSouth),'iArea1002','iArea1000'),
+      agentRoute(apath('iArea1002',vWest),'iArea1002','iArea1001'),
+      agentRoute(apath('iArea1003',vWest),'iArea1003','iArea1002'),
+      agentRoute(apath('iArea1004',vEast),'iArea1004','iArea1005'),
+      agentRoute(apath('iArea1005',vNorth),'iArea1005','iArea1008'),
+      agentRoute(apath('iArea1005',vEast),'iArea1005','iArea1006'),
+      agentRoute(apath('iArea1005',vSouth),'iArea1005','iArea1002'),
+      agentRoute(apath('iArea1005',vWest),'iArea1005','iArea1004'),
+      agentRoute(apath('iArea1006',vNorth),'iArea1006','iArea1042'),
+      agentRoute(apath('iArea1006',vWest),'iArea1006','iArea1005'),
+      agentRoute(apath('iArea1007',vEast),'iArea1007','iArea1008'),
+      agentRoute(apath('iArea1008',vNorth),'iArea1008','iArea1010'),
+      agentRoute(apath('iArea1008',vEast),'iArea1008','iArea1009'),
+      agentRoute(apath('iArea1008',vSouth),'iArea1008','iArea1005'),
+      agentRoute(apath('iArea1008',vWest),'iArea1008','iArea1007'),
+      agentRoute(apath('iArea1009',vWest),'iArea1009','iArea1008'),
+      agentRoute(apath('iArea1010',vSouth),'iArea1010','iArea1008'),
+      agentRoute(apath('iArea1010',vUp),'iArea1010','iArea1011'),
+      agentRoute(apath('iArea1011',vNorth),'iArea1011','iArea1013'),
+      agentRoute(apath('iArea1011',vUp),'iArea1011','iArea1032'),
+      agentRoute(apath('iArea1011',vDown),'iArea1011','iArea1010'),
+      agentRoute(apath('iArea1012',vEast),'iArea1012','iArea1013'),
+      agentRoute(apath('iArea1013',vNorth),'iArea1013','iArea1016'),
+      agentRoute(apath('iArea1013',vEast),'iArea1013','iArea1014'),
+      agentRoute(apath('iArea1013',vSouth),'iArea1013','iArea1011'),
+      agentRoute(apath('iArea1013',vWest),'iArea1013','iArea1012'),
+      agentRoute(apath('iArea1014',vWest),'iArea1014','iArea1013'),
+      agentRoute(apath('iArea1015',vEast),'iArea1015','iArea1016'),
+      agentRoute(apath('iArea1016',vNorth),'iArea1016','iArea1019'),
+      agentRoute(apath('iArea1016',vEast),'iArea1016','iArea1017'),
+      agentRoute(apath('iArea1016',vSouth),'iArea1016','iArea1013'),
+      agentRoute(apath('iArea1016',vWest),'iArea1016','iArea1015'),
+      agentRoute(apath('iArea1017',vWest),'iArea1017','iArea1016'),
+      agentRoute(apath('iArea1018',vEast),'iArea1018','iArea1019'),
+      agentRoute(apath('iArea1019',vNorth),'iArea1019','iArea1021'),
+      agentRoute(apath('iArea1019',vEast),'iArea1019','iArea1020'),
+      agentRoute(apath('iArea1019',vSouth),'iArea1019','iArea1016'),
+      agentRoute(apath('iArea1019',vWest),'iArea1019','iArea1018'),
+      agentRoute(apath('iArea1020',vWest),'iArea1020','iArea1019'),
+      agentRoute(apath('iArea1021',vSouth),'iArea1021','iArea1019'),
+      agentRoute(apath('iArea1022',vNorth),'iArea1022','iArea1024'),
+      agentRoute(apath('iArea1022',vSouth),'iArea1022','iArea1039'),
+      agentRoute(apath('iArea1023',vEast),'iArea1023','iArea1024'),
+      agentRoute(apath('iArea1024',vNorth),'iArea1024','iArea1027'),
+      agentRoute(apath('iArea1024',vEast),'iArea1024','iArea1025'),
+      agentRoute(apath('iArea1024',vSouth),'iArea1024','iArea1022'),
+      agentRoute(apath('iArea1024',vWest),'iArea1024','iArea1023'),
+      agentRoute(apath('iArea1025',vWest),'iArea1025','iArea1024'),
+      agentRoute(apath('iArea1026',vEast),'iArea1026','iArea1027'),
+      agentRoute(apath('iArea1027',vNorth),'iArea1027','iArea1030'),
+      agentRoute(apath('iArea1027',vEast),'iArea1027','iArea1028'),
+      agentRoute(apath('iArea1027',vSouth),'iArea1027','iArea1024'),
+      agentRoute(apath('iArea1027',vWest),'iArea1027','iArea1026'),
+      agentRoute(apath('iArea1028',vWest),'iArea1028','iArea1027'),
+      agentRoute(apath('iArea1029',vEast),'iArea1029','iArea1030'),
+      agentRoute(apath('iArea1030',vNorth),'iArea1030','iArea1032'),
+      agentRoute(apath('iArea1030',vEast),'iArea1030','iArea1031'),
+      agentRoute(apath('iArea1030',vSouth),'iArea1030','iArea1027'),
+      agentRoute(apath('iArea1030',vWest),'iArea1030','iArea1029'),
+      agentRoute(apath('iArea1031',vWest),'iArea1031','iArea1030'),
+      agentRoute(apath('iArea1032',vSouth),'iArea1032','iArea1030'),
+      agentRoute(apath('iArea1032',vUp),'iArea1032','iArea1033'),
+      agentRoute(apath('iArea1032',vDown),'iArea1032','iArea1011'),
+      agentRoute(apath('iArea1033',vUp),'iArea1033','iArea1034'),
+      agentRoute(apath('iArea1033',vDown),'iArea1033','iArea1032'),
+      agentRoute(apath('iArea1034',vUp),'iArea1034','iArea1036'),
+      agentRoute(apath('iArea1034',vDown),'iArea1034','iArea1033'),
+      agentRoute(apath('iArea1035',vEast),'iArea1035','iArea1038'),
+      agentRoute(apath('iArea1036',vNorth),'iArea1036','iArea1038'),
+      agentRoute(apath('iArea1036',vEast),'iArea1036','iArea1037'),
+      agentRoute(apath('iArea1036',vDown),'iArea1036','iArea1034'),
+      agentRoute(apath('iArea1037',vWest),'iArea1037','iArea1036'),
+      agentRoute(apath('iArea1038',vSouth),'iArea1038','iArea1036'),
+      agentRoute(apath('iArea1038',vWest),'iArea1038','iArea1035'),
+      agentRoute(apath('iArea1039',vNorth),'iArea1039','iArea1022'),
+      agentRoute(apath('iArea1039',vUp),'iArea1039','iArea1040'),
+      agentRoute(apath('iArea1040',vUp),'iArea1040','iArea1041'),
+      agentRoute(apath('iArea1040',vDown),'iArea1040','iArea1039'),
+      agentRoute(apath('iArea1041',vUp),'iArea1041','iArea1041'),
+      agentRoute(apath('iArea1041',vDown),'iArea1041','iArea1040'),
+      % agentRoute(apath('iArea1042',vNorth),'iArea1042','iArea1004075'),
+      agentRoute(apath('iArea1042',vSouth),'iArea1042','iArea1006')
 
      ]).
 */
