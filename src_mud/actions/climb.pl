@@ -14,7 +14,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(mtCommand).
+% :- register_module_type (mtCommand).
 
 can_move_into(_LOC,XXYY):-var(XXYY),!,fail.
 can_move_into(_LOC,XXYY):-not(mudAtLoc(_,XXYY)),!.
@@ -75,4 +75,4 @@ update_stats(Agent,pulled) :-
 	(add_cmdfailure(Agent,pulled)).
 
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

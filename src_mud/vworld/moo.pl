@@ -12,8 +12,8 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(utility).
+% :- register_module_type (utility).
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).
 
 

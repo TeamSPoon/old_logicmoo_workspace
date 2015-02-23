@@ -25,7 +25,7 @@
                   login_and_run_nodebug/0]).
 
 :- multifile thlocal:wants_logout/1.
-:- decl_thlocal thlocal:wants_logout/1.
+:- thread_local thlocal:wants_logout/1.
 
 :- dynamic thglobal:agent_message_stream/4, telnet_fmt_shown/3, thglobal:player_command_stack/2.
 
@@ -33,7 +33,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(utility).
+% :- register_module_type (utility).
 
 :-  use_module(library(threadutil)).
 
@@ -165,13 +165,13 @@ read_and_do_telnet:-
             must(once(do_player_action(List))),!.
 
 
-:-decl_mpred_prolog(prompt_read/2).
+:-export(prompt_read/2).
 prompt_read_telnet(Prompt,Atom):-
       get_session_id(O),
       prompt_read(Prompt,IAtom),
       (IAtom==end_of_file -> (change(assert,thlocal:wants_logout(O)),Atom='quit') ; IAtom=Atom),!.
 
-:-decl_mpred_prolog(prompt_read/2).
+:-export(prompt_read/2).
 prompt_read(Prompt,Atom):-        
         ansi_format([reset,hfg(white),bold],'~w',[Prompt]),flush_output,        
         repeat,read_code_list_or_next_command(Atom),!.
@@ -255,7 +255,7 @@ write_pretty(Percepts) :-
 write_pretty_aux(Rest,Rest,5).
 write_pretty_aux([[]|Tail],Return,Column) :-
 	Ctemp is Column + 1,
-	glyphType(Obj,0),
+	typeHasGlyph(Obj,0),
 	write(Obj), write(' '),
 	write_pretty_aux(Tail,Return,Ctemp).
 write_pretty_aux([[vDark]|Tail],Return,Column) :-
@@ -264,7 +264,7 @@ write_pretty_aux([[vDark]|Tail],Return,Column) :-
 	write_pretty_aux(Tail,Return,Ctemp).
 write_pretty_aux([[Head]|Tail], Return, Column) :-
 	Ctemp is Column + 1,
-	glyphType(Map,Head),
+	typeHasGlyph(Map,Head),
 	write(Map), write(' '),
 	write_pretty_aux(Tail, Return, Ctemp).
 write_pretty_aux([[Agent]|Tail],Return,Column) :-
@@ -286,7 +286,7 @@ cmdShowRoomGrid(Room) :- ignore(show_room_grid_new(Room)),!.
 % ===================================================================
 % show_room_grid_new(Room)
 % ===================================================================
-:-decl_mpred_prolog(show_room_grid_new/1).
+:-export(show_room_grid_new/1).
 show_room_grid_new(Room):-
    grid_size(Room,Xs,Ys,_Zs),
    Ys1 is Ys+1,Xs1 is Xs+1,
@@ -310,7 +310,7 @@ show_room_grid_single(_Room,_LOC,_OutsideTest):- write('--'), !.
 
 inst_label(Obj,SLabe2):- call(term_to_atom(Obj,SLabel)),sub_atom(SLabel,1,2,_,SLabe2),!.
 inst_label(Obj,SLabe2):- call(term_to_atom(Obj,SLabel)),sub_atom(SLabel,0,2,_,SLabe2),!.
-inst_label(Obj,Label):- glyphType(Label,Obj),!.
+inst_label(Obj,Label):- typeHasGlyph(Obj,Label),!.
 inst_label(Obj,Label):-  iprops(Obj,nameStrings(Val)),Val\=Obj,inst_label(Val,Label),!.
 inst_label(Obj,Label):-  iprops(Obj,mudNamed(Val)),Val\=Obj,!,inst_label(Val,Label),!.
 inst_label(Obj,Label):-  iprops(Obj,isa(Val)),Val\=Obj,inst_label(Val,Label),!.
@@ -352,7 +352,7 @@ cmdShowRoomGrid(Room,Y,X,N) :-
         loc_to_xy(Room,X,Y,LOC),
 	asserted_atloc(Obj,LOC),
         prop(Obj,isa,Class),
-	glyphType(Label,Class),
+	typeHasGlyph(Label,Class),
 	write(Label), write(' '),
 	XX is X + 1,
 	!,
@@ -370,7 +370,7 @@ cmdShowRoomGrid(Room,Y,X,N) :-
 % Used to display the labels of the grid locations. (the key to the map).
 % Used at end of run.
 display_grid_labels :-
-	findall([Label,Name],glyphType(Label,Name),List),
+	findall([Label,Name],typeHasGlyph(Name,Label),List),
 	forall(prop_memb([Label,Name],List),
 	           (write(Label), write('='), write(Name), write(' '))),
 		   nl.
@@ -505,4 +505,4 @@ call_pred(Call, Options) :-
 
 
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

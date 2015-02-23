@@ -18,7 +18,7 @@
 
 % Possible agent actions.
 :- include(logicmoo(vworld/moo_header)).
-:- register_module_type(planning).
+% :- register_module_type (planning).
 
 :-decl_type(tMonster).
 
@@ -52,13 +52,21 @@ monster_idea(Agent,actMove(1,Dir)) :-
 
 monster_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[tCorpse]).
 
-predArgTypes(wearsClothing(tObj,tClothing)).
+:-decl_type(tClothing).
+:-decl_mpred_hybrid(wearsClothing/2).
+
+%:-wdmsg(wearsClothing/2).
+%:-prolog.
+%:-visible(+all),leash(+all),trace.
+:-add(predArgTypes(wearsClothing(tObj,tClothing))).
+%:-notrace.
+%:- prolog.
 
 % TODO fingure out why term_expansion is not working
 %:-visible(+all),leash(-all),trace.
-:-add(instTypeProps(Instance,tMonster,[mudDescription(txtFormatFn("Very screy looking monster named ~w",[Instance])),wearsClothing(tToughHide),mudPossess(tToughHide)])).
+instTypeProps(Instance,tMonster,[mudDescription(txtFormatFn("Very screy looking monster named ~w",[Instance])),wearsClothing(tToughHide),mudPossess(tToughHide)]).
 %:-notrace.
 %:- prolog.
 
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

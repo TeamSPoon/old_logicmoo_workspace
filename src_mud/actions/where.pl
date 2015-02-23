@@ -16,8 +16,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(mtCommand).
-
+% :- register_module_type (mtCommand).
 
 % where 
 user:agent_text_command(Agent,["where",BE,X],Agent,actWhere(X)):-memberchk(BE,[is,are,be,were]).
@@ -45,6 +44,6 @@ mud_cmd_who_1(Who):-
       once((get_inRegion(Who,Where),
             fmt(cmdresult(actWho(Who),localityOfObject(Who,Where)))))).
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).
 
 

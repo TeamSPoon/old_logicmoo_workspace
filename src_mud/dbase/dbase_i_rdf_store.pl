@@ -274,8 +274,8 @@ any_to_prolog(_,Ss,Sx):-copy_term(Ss,Sx).
 p2q(P,N,A):-p2q_alias(P,N,A).
 p2q(isa,rdf,type).
 p2q(tFood,knowrob,'Food').
-p2q(mpred_arity, mud,predArity).
-p2q(predArity, mud,predArity).
+p2q(mpred_arity, mud,mpred_arity).
+p2q(mpred_arity, mud,mpred_arity).
 p2q(tCol, rdfs,'Class').
 p2q(tCol,owl,'Class').
 p2q(tItem,knowrob,'HumanScaleObject').
@@ -415,9 +415,9 @@ user:decl_database_hook(change(assert,_A_or_Z),DB):-use_rdf_hooks,rdf_assert_hoo
 
 rdf_assert_ignored(DB):-thlocal:rdf_asserting(_,DB),!.
 rdf_assert_ignored(svo(_,prologOnly,_)).
-rdf_assert_ignored(mpred_prop(_,predArity(1))).
+rdf_assert_ignored(mpred_prop(_,mpred_arity(1))).
 rdf_assert_ignored(mpred_prop(_,predArgTypes(_))).
-rdf_assert_ignored(DB):-functor(DB,F,_),member(F,[ruleBackward,mudTermAnglify,ruleEquiv]).
+rdf_assert_ignored(DB):-functor(DB,F,_),member(F,[ruleBackward,mudTermAnglify,'<=>']).
 rdf_assert_ignored(DB):-functor(DB,_,1).
 rdf_assert_ignored(DB):-  not(ground(DB)). 
 
@@ -443,7 +443,7 @@ rdf_assert_hook0(subclass(C,P)):-!,rdf_object(C),rdf_object(P),rdf_assert_x(C,rd
 rdf_assert_hook0(mudDescription(C,P)):-!,rdf_object(C),rdf_object(P),rdf_assert_x(C,rdfs:comment,P).
 rdf_assert_hook0(isa(Prop,tPred)):- rdf_to_pred(Prop,P),!,rdf_object(P),rdf_assert_x(P,rdf:type,owl:'Property').
 rdf_assert_hook0(isa(Prop,prologSingleValued)):- functor(Prop,P,_),!,rdf_object(P),rdf_assert_x(P,rdf:type,owl:'FunctionalProperty').
-rdf_assert_hook0(predArity(W1,N)):-rdf_to_pred(W1,W),N>1,rdf_assert_x(W,rdf:type,owl:'Property').
+rdf_assert_hook0(mpred_arity(W1,N)):-rdf_to_pred(W1,W),N>1,rdf_assert_x(W,rdf:type,owl:'Property').
 rdf_assert_hook0(isa(W,tCol)):-!,rdf_object(W),rdf_assert_x(W,rdf:type,owl:'Class').
 rdf_assert_hook0(isa(C,P)):-!,rdf_object(C),rdf_object(P),P\=tCol,rdf_assert_x(C,rdf:type,P).
 rdf_assert_hook0(svo(S,P,O)):-!,must(rdf_assert_x(S,P,O)).

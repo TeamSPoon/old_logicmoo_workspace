@@ -48,7 +48,7 @@ was_runs_tests_pl:-is_startup_file('run_tests.pl').
 %:- at_start(start_servers)
 
 % [Optionaly] Add some game content
-:- if_flag_true(was_runs_tests_pl, declare_load_game(logicmoo('rooms/startrek.all.plmoo'))).
+:- if_flag_true(was_runs_tests_pl, declare_load_dbase(logicmoo('rooms/startrek.all.plmoo'))).
 
 mud_test_local:-
    test_name("tests to see if we have: player1"),
@@ -94,7 +94,7 @@ mud_test_local:-
    test_name("tests to see if 'food' can be an item"),
       test_true(parseIsa(tItem, _, [food], [])).
 
-mud_test_local:-call_mpred(cmdShowRoomGrid('Area1000')).
+mud_test_local:-mpred_call(cmdShowRoomGrid('Area1000')).
 
 
 % more tests even

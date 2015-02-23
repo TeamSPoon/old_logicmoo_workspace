@@ -13,7 +13,7 @@
 % :- dynamic memory/2.
 
 :- include(logicmoo(vworld/moo_header)).
-:- register_module_type(planning).
+% :- register_module_type (planning).
 
 % Possible agent actions.
 
@@ -73,4 +73,4 @@ vacuum_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[tOutlet]).
 
 
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

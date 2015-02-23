@@ -13,7 +13,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(mtCommand).
+% :- register_module_type (mtCommand).
 
 vtActionTemplate(actTake(tCarryAble)).
 
@@ -78,4 +78,4 @@ must_post_for_take(Agent,Obj):-
 update_charge(Agent,actTake) :- 
         padd(Agent,mudEnergy(-2)).
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

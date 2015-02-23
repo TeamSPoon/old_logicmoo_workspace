@@ -19,11 +19,11 @@
 
 % Possible agent actions.
 :- include(logicmoo(vworld/moo_header)).
-:- register_module_type(planning).
+% :- register_module_type (planning).
+
 
 :-decl_type(tPredator).
 tCol(tPredator).
-
 user:world_agent_plan(_World,Agent,Act):-
    isa(Agent,tPredator),
    predator_idea(Agent,Act).
@@ -54,4 +54,4 @@ predator_idea(Agent,Act) :-
       move_or_sit_memory_idea(Agent,Act,[tNut]).
 
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

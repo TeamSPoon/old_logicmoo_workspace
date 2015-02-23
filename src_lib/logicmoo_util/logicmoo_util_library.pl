@@ -80,6 +80,10 @@ filematch(RelativeTo,Mask,File1):-absolute_file_name(Mask,File1,[expand(true),ex
 lastMember2(_E,List):-var(List),!,fail.
 lastMember2(E,[H|List]):-lastMember2(E,List);E=H.
 
+is_true(B):-B==true.
+is_true(B):-is_proof(B).
+
+is_proof(P):-compound(P),functor(P,ftProofFn,_).
 
 safe_univ(Call,List):-hotrace(safe_univ0(Call,List)),!.
 
@@ -529,7 +533,8 @@ pred_delete(Pred,[A|C], B, D) :-
         ).
 
 
-contains_singletons(Term):- not(ground(Term)),not(not((term_variables(Term,Vs),numbervars(Term,0,_,[attvar(bind),singletons(true)]),member('$VAR'('_'),Vs)))).
+contains_singletons(Term):- not(ground(Term)),not(not((term_variables(Term,Vs),
+   numbervars(Term,0,_,[attvar(bind),singletons(true)]),member('$VAR'('_'),Vs)))).
 
 
 % this is a backwards compatablity block for SWI-Prolog 6.6.6

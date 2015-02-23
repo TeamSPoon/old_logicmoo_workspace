@@ -8,7 +8,7 @@
 */
 % :-swi_module(world_2d,[]).
 
-:- decl_mpred_prolog(((
+:-export(((
          check_for_fall/3,
          dir_offset/5,
          doorLocation/5,
@@ -35,7 +35,7 @@ grid_dist(L1,L2,Dist):- to_3d(L1,L13D),to_3d(L2,L23D),dist(L13D,L23D,Dist),!.
 
 dist(_,_,5).
 
-:-decl_mpred_prolog(pathBetween_call(tRegion,vtDirection,tRegion)).
+:-decl_mpred(pathBetween_call(tRegion,vtDirection,tRegion)).
 
 % pathBetween_call(From,DirS,To):-string(DirS),!,atom_string(Dir,DirS),!,any_to_dir(Dir,Dir2),pathBetween(From,Dir2,To),same(Dir,Dir2).
 pathBetween_call_0(From,Dir,To):-any_to_dir(Dir,Dir2),is_asserted(pathBetween(From,Dir2,To)),same(Dir,Dir2).
@@ -112,7 +112,7 @@ init3(LocName,LocType,xyzFn(LocName,_,Y,1),[]) :-
 	init2(LocName,LocType,X,1).
 
 init3(LocName,LocType,xyzFn(LocName,X,Y,1),[O|T]) :-
-	glyphType(O,Type),
+	typeHasGlyph(Type, O),
            rez_loc_object(xyzFn(LocName,X,Y,1),Type),
 	K is X + 1,
 	init3(LocName,LocType,xyzFn(LocName,K,Y,1),T).
@@ -140,14 +140,14 @@ locationToRegion_0(Obj,Obj):-nonvar(Obj),!,isa(Obj,tRegion),!.
 locationToRegion_0(Obj,Region):-nonvar(Obj),must(localityOfObject(Obj,Location)),!,locationToRegion_0(Location,Region).
 locationToRegion_0(Obj,Obj):-dmsg(warn(locationToRegion(Obj,Obj))),!.
 
-:-decl_mpred_prolog(mudNearbyLocs/2).
+:-export(mudNearbyLocs/2).
 mudNearbyLocs(L1,L2):- var(L1),nonvar(L2),!,mudNearbyLocs(L2,L1).
 mudNearbyLocs(L1,L2):- nonvar(L1),nonvar(L2),L2=xyzFn(_,_,_,_),locationToRegion(L1,R),!,call_tabled(locs_near_i(R,L2)).
 mudNearbyLocs(L1,L2):- nonvar(L1),nonvar(L2),locationToRegion(L1,R1),locationToRegion(L2,R2),!,mudNearbyRegions(R1,R2).
 mudNearbyLocs(L1,L2):- must((hotrace(mudNearbyRegions(R1,R2)),in_grid_no_rnd(R1,L1),in_grid_no_rnd(R2,L2))).
 
 % :- decl_not_mpred(locs_near_i,2).
-:-decl_mpred_prolog(locs_near_i/2).
+:-export(locs_near_i/2).
 locs_near_i(L1,L2):- locationToRegion(L1,R),in_grid_no_rnd(R,L2).
 locs_near_i(L1,L2):- locationToRegion(L1,R),pathBetween_call(R,_,R2),in_grid_no_rnd(R2,L2).
 
@@ -181,12 +181,12 @@ same_regions(Agent,Obj):-must(inRegion(Agent,Where1)),dif_safe(Agent,Obj),inRegi
 %:- ensure_universal_stub(prologPTTP,inRegion/2).
 %:- ensure_universal_stub(prologPTTP,mudTestAgentWearing/2).
 
-:-decl_mpred_hybrid(mudAtLoc_deduced/2).
+:-decl_mpred_prolog(mudAtLoc_deduced/2).
 
 predArgTypes(mudAtLoc_deduced(tObj,tSpatialThing)).
 
 mudAtLoc_deduced(X,Y):-show_call_failure(is_asserted(mudAtLoc(X,Y))),!.
-mudAtLoc_deduced(X,Y):-is_asserted(localityOfObject(X,_)),!,create_random_fact(mudAtLoc(X,Y)).
+mudAtLoc_deduced(X,Y):-is_asserted(localityOfObject(X,_)),!,must((create_random_fact(mudAtLoc(X,Y)),is_asserted(mudAtLoc(X,Y)))).
 
 
 localityOfObject_deduced(Agent,Where):- must(is_asserted(mudAtLoc(Agent,Where));is_asserted(localityOfObject(Agent,Where));mudAtLoc_deduced(Agent,Where)).
@@ -249,13 +249,13 @@ put_in_world_lc_gen(Obj):-choose_for(mudFacing,Obj,_),!,must_det((choose_for(mud
 ensure_in_world(What):-must_det(put_in_world(What)).
 
 
-% :- decl_mpred_prolog user:decl_database_hook/2.
-:- decl_mpred_prolog deduce_facts/2.
-:- decl_mpred_prolog create_random_fact/1.
-:- decl_mpred_prolog hooked_random_instance/3.
-%:- decl_mpred_prolog fact_always_true/1.
-:- decl_mpred_prolog fact_maybe_deduced/1.
-:- decl_mpred_prolog fact_is_false/2.
+% :-export user:decl_database_hook/2.
+:-export deduce_facts/2.
+:-export create_random_fact/1.
+:-export hooked_random_instance/3.
+%:-export fact_always_true/1.
+:-export fact_maybe_deduced/1.
+:-export fact_is_false/2.
 
 :-decl_mpred_hybrid(mudInsideOf(tObj,tObj)).
 
@@ -296,7 +296,7 @@ random_xyzFn(LOC):-
    must_det(random_instance(tRegion,Region,true)),
    in_grid_rnd(Region,LOC),!.
 
-random_xyzFn(xyzFn('Area1000',1,1,1)):-  trace_or_throw(game_not_loaded).
+random_xyzFn(xyzFn('Area1000',1,1,1)):-  trace_or_throw(dbase_not_loaded).
 
 unoccupied(_,Loc):- not(is_asserted(mudAtLoc(_,Loc))),!.
 unoccupied(_,_):-!.
@@ -388,10 +388,10 @@ p2c_dir2('d','vDown').
 p2c_dir2('e','vEast').
 p2c_dir2('n','vNorth').
 
-:-dynamic_multifile_exported(is_any_dir/1).
+:-export(is_any_dir/1).
 is_any_dir(Dir):-var(Dir),!,fail.
 is_any_dir(Dir):-any_to_dir(Dir,_).
-:-dynamic_multifile_exported(any_to_dir/2).
+:-export(any_to_dir/2).
 
 any_to_dir(D,D):-var(D),!.
 any_to_dir(S,D):-string(S),string_to_atom(S,A),any_to_dir(A,D),!.
@@ -400,7 +400,7 @@ any_to_dir(A,D):-p2c_dir2(D,A),!.
 any_to_dir(D,O):-atom(D),sub_atom(D, 0, 1, _, S),toLowercase(S,L),p2c_dir2(L,O),!.
 any_to_dir(D,D):-pathBetween(_,D,_),!.
 
-:-dynamic_multifile_exported(dir_offset/5).
+:-export(dir_offset/5).
 
 % :-decl_mpred_hybrid(dir_offset(term,int,int,int,int)).
 

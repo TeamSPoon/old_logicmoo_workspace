@@ -18,7 +18,7 @@
 :- include(logicmoo('vworld/moo_header.pl')).
 
 /*
-:-decl_mpred_prolog(include_moo_files/1).
+:-export(include_moo_files/1).
 include_moo_files(Mask):- expand_file_name(Mask,X), forall(member(E,X),user_ensure_loaded(E)).
 */
 
@@ -47,7 +47,7 @@ in_user_startup(Call):- '@'(Call,user).
          use_module(logicmoo(vworld/moo))),'user').
 */
 
-:- user_ensure_loaded(moo_loader).
+% :- user_ensure_loaded(moo_loader).
 
 % logicmoo vworld mud server
 %:- user_ensure_loaded(logicmoo(vworld/world)).
@@ -57,6 +57,7 @@ in_user_startup(Call):- '@'(Call,user).
 
 
 :- user_ensure_loaded(logicmoo(vworld/moo_testing)).
+
 
 /*
 
@@ -117,6 +118,8 @@ make_qlfs:-
 % :- catch(logicmoo('pldata/mworld0_declpreds.qlf'),_,make_qlfs).
 
 
+:- forall(filematch('../*/*/basic*.plmoo', X),(dmsg(ensure_plmoo_loaded(X)),ensure_plmoo_loaded(X))).
+
 
 /*
 
@@ -125,7 +128,7 @@ make_qlfs:-
 :- include_moo_files('../src_asserts/pldata/?*.pl').
 
 */
-:- decl_mpred_prolog(user_ensure_nl_loaded/1).
+:-export(user_ensure_nl_loaded/1).
 user_ensure_nl_loaded(_):-!.
 user_ensure_nl_loaded(F):-load_files([F],[expand(true),if(changed),qcompile(auto)]).
 
@@ -148,7 +151,7 @@ download_and_install_el:-
   shell('unzip -u -d ../src_assets/pldata/ PlDataBinary.zip'),
   catch(user_ensure_loaded(logicmoo(pldata/el_assertions)),E,fmt('Cant use el_assertions',E)).
 
-:- xperimental_big_data->catch(user_ensure_loaded(logicmoo(pldata/el_assertions)),_,download_and_install_el);true.
+%:- xperimental_big_data->catch(user_ensure_loaded(logicmoo(pldata/el_assertions)),_,download_and_install_el);true.
 
 :- asserta(loaded_external_kbs),show_call(kbp_to_dbase_t).
 
@@ -226,8 +229,6 @@ user:agent_text_command(Agent,["run",Term], Agent,actProlog(Term)):- ignore(Term
 :- ensure_plmoo_loaded(logicmoo('*/?*.plmoo')).
 :- forall(filematch(logicmoo('*/*/?*.plmoo'), X),dmsg(X)).
 :- ensure_plmoo_loaded(logicmoo('*/*/?*.plmoo')).
-
-:- forall(filematch('../*/*/basic*.plmoo', X),(dmsg(ensure_plmoo_loaded(X)),ensure_plmoo_loaded(X))).
 
 % puts world into running state
 % :- must(old_setup).

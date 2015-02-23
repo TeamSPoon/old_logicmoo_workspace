@@ -13,49 +13,101 @@
 */
 
 
-:-meta_predicate_transparent(call_mpred(0)).
+:-meta_predicate_transparent(mpred_call(0)).
 
 % oncely later will throw an error if there where choice points left over by call
-:-meta_predicate(prologCall(0)).
-:-export(prologCall/1).
+:-meta_predicate(mpred_call(0)).
+:-export(mpred_call/1).
 oncely(:-(Call)):-!,Call,!.
 oncely(:-(Call)):-!,req(Call).
 oncely(Call):-once(Call).
 % ================================================
-% database_call/2
+% dbase_op/2
 % ================================================
 
-:-meta_predicate(call_mpred(0)).
-:-export(call_mpred/1).
-call_mpred(C):-database_call(call_mpred,C).
-
-query(dbase_t, req, G):- prologCall(G).
-query(_, _, Op, G):- dtrace, prologCall(call(Op,G)).
-
-:-meta_predicate(is_callable(0)).
-:-export(is_callable/1).
-is_callable(C):-current_predicate(_,C),!.
+/*
+query(dbase_t, req, G):- mpred_call(G).
+query(_, _, Op, G):- dtrace, mpred_call(call(Op,G)).
+once(A,B,C,D):-trace_or_throw(once(A,B,C,D)).
+*/
 
 
-:-dynamic(naf/1).
-:-meta_predicate(naf(0)).
-:-export(naf/1).
-naf(Goal):-not(prologCall(Goal)).
+:-meta_predicate(deducedSimply(0)).
+:-export(deducedSimply/1).
+deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),not(is_asserted(Call)),nonvar(Fact),Body,dmsg((deducedSimply2(Call):-Fact)),!,show_call((is_asserted(Fact),ground(Call))).
 
-:-meta_predicate(prologCall(0)).
-:-export(prologCall/1).
-prologCall(call(X)):-!,prologCall(X).
-prologCall((X,Y)):-!,prologCall(X),prologCall(Y).
-prologCall((X;Y)):-!,prologCall(X);prologCall(Y).
-prologCall(call(X,Y)):-!,append_term(X,Y,XY),!,prologCall(XY).
-prologCall(call(X,Y,Z)):-!,append_term(X,Y,XY),append_term(XY,Z,XYZ),!,prologCall(XYZ).
-prologCall(Call):- 
-  thlocal:assert_op_override(OvOp),
-   must((reduce_dbase_op(OvOp,OvOpR),lookup_inverted_op(OvOpR,_,OverridePolarity),
-   Call=..[Was|Apply],lookup_inverted_op(Was,InvertCurrent,_WasPol),   
-   ((OverridePolarity ==('-') -> debugOnError(show_call(apply(InvertCurrent,Apply))) ; debugOnError(show_call(apply(Was,Apply))))))).
-prologCall(Call):-current_predicate(_,Call),!,debugOnError(Call).
-prologCall(Call):-debugOnError(is_asserted(Call)).
+% deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),nonvar(Fact),Body,ground(Call),dmsg((deducedSimply1(Call):-Fact)),show_call((is_asserted(Fact),ground(Call))).
+
+
+dbase_op(Op,     H ):- (var(Op);var(H)),!,trace_or_throw(var_database_call(Op,  H )).
+dbase_op(Op,     H ):- once(fully_expand(Op,H,HH)),H\=@=HH,!,dbase_op(Op, HH).
+dbase_op(neg(_,Op),  H ):- !, show_call(not(dbase_op(Op,  H ))).
+dbase_op(change(assert,Op),H):-!,must(dbase_modify(change(assert,Op),H)),!.
+dbase_op(change(retract,Op),H):-!,must(dbase_modify(change(retract,Op),H)),!.
+dbase_op(query(dbase_t,Ireq),  H ):-!, dbase_op(Ireq,H).
+dbase_op(query(Dbase_t,_Ireq),  H ):-!, dbase_op(Dbase_t,H).
+dbase_op(call(Op),H):-!,dbase_op(Op,H).
+dbase_op(Op,((include(A)))):- with_no_assertions(thlocal:already_in_kb_term_expansion,dbase_op(Op,((load_data_file(A))))),!.
+dbase_op(Op, call(H)):- nonvar(H),!, dbase_op(Op,H).
+dbase_op(Op,  not(H)):- nonvar(H),!, dbase_op(neg(not,Op),H).
+dbase_op(Op,'\\+'(H)):- nonvar(H),!, dbase_op(neg(('\\+'),Op),H).
+dbase_op(Op,    ~(H)):- nonvar(H),!, dbase_op(neg(~,Op),H).
+dbase_op(Op,     {H}):- nonvar(H),!, dbase_op(Op,H).
+dbase_op(must,Call):- !,must(dbase_op(req,Call)).
+dbase_op(assertedOnly,Call):- !,with_assertions(thlocal:infInstanceOnly(Call),dbase_op(req,Call)).
+dbase_op(once,Call):- !,once(dbase_op(req,Call)).
+dbase_op(_ , clause(H,B) ):- !, is_asserted(H,B).
+dbase_op(_ , clause(H,B,Ref) ):- !,  is_asserted(H,B,Ref).
+dbase_op(_ , (H :- B) ):- !, is_asserted(H,B).
+dbase_op(is_asserted,X):-was_isa(X,I,C),!,isa_asserted(I,C).
+dbase_op(is_asserted,H):-!,is_asserted(H).
+dbase_op(clauses(Op),  H):-!,dbase_op((Op),  H).
+dbase_op(conjecture,X):-was_isa(X,I,C),!,isa_backchaing(I,C).
+dbase_op(conjecture,H):-!,mpred_call(H).
+dbase_op(nonPFC,  H ):-!, mpred_call(H).
+dbase_op(mpred_call,  H ):-!, mpred_call(H).
+dbase_op(Atom,H):-atom(Atom),current_predicate(Atom/1),!,debugOnError(call(Atom,H)).
+dbase_op(_,C):- is_callable(C),!,mpred_call(C).
+% dbase_op(Op,H):-!,loop_check(dbase_op(Op,H),trace_or_throw(loop_database_call(Op,  H ))).
+dbase_op(Op,  H ):- trace_or_throw(unknown_database_call(Op,  H )).
+
+:-export(whenAnd/2).
+whenAnd(A,B):-A,ground(B),once(B).
+
+
+user:agent_text_command(_Agent,_Text,_AgentTarget,_Cmd):-fail.
+user:agent_call_command(_Gent,actGrep(Obj)):- term_listing(Obj).
+
+
+% =======================================
+% Transforming DBASE OPs
+% ========================================
+
+reduce_dbase_op(Op,Op2):-must(notrace(transitive(how_to_op,Op,Op2))),!.
+reduce_dbase_op(A,A).
+
+how_to_op(assert(a),asserta_new).
+how_to_op(assert(z),assertz_if_new).
+how_to_op(retract(one),retract).
+how_to_op(retract(all),retract_all).
+how_to_op(retract(all),retractall).
+how_to_op(change(assert,z),assertz_if_new).
+how_to_op(change(assert,_),asserta_if_new).
+how_to_op(change(retract,one),retract).
+how_to_op(change(retract,_),retract_all).
+how_to_op(asserta,asserta_new).
+how_to_op(assertz,assertz_if_new).
+how_to_op(call(W),W).
+how_to_op(clauses(W),W).
+how_to_op(assert,assert_if_new).
+how_to_op(assert(_),asserta_new).
+how_to_op(retract(_),retract_all).
+how_to_op(conjecture,call).
+how_to_op(query(dbase_t, req),req).
+how_to_op(query(dbase_t, Req),Req).
+how_to_op(change(Op,HOW),O):- !, O=..[Op,HOW].
+how_to_op(HowOP,HowOP).
+
 
 lookup_inverted_op(retract,assert,-).
 lookup_inverted_op(retractall,assert,-).
@@ -67,61 +119,55 @@ lookup_inverted_op(asserta_if_new,retract,+).
 lookup_inverted_op(asserta_new,retract,+).
 
 
+% ================================================
+% is_callable/mpred_call/naf
+% ================================================
 
-:-meta_predicate(deducedSimply(0)).
-:-export(deducedSimply/1).
-deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),not(is_asserted(Call)),nonvar(Fact),Body,dmsg((deducedSimply2(Call):-Fact)),!,show_call((is_asserted(Fact),ground(Call))).
+%:-dynamic(naf/1).
+:-meta_predicate(naf(0)).
+:-export(naf/1).
+naf(Goal):-not(mpred_call(Goal)).
 
-% deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),nonvar(Fact),Body,ground(Call),dmsg((deducedSimply1(Call):-Fact)),show_call((is_asserted(Fact),ground(Call))).
+:-meta_predicate(is_callable(0)).
+:-export(is_callable/1).
+is_callable(C):-current_predicate(_,C),!.
 
-database_op_int_call(Op,A):- must((expand_goal_correct_argIsa(A,AA))),database_op_int_call_0(Op, ((AA))).
-database_op_int_call_0(Op,((ensure_loaded(A)))):- database_op_int_2(Op,((load_data_file(A)))),!.
-database_op_int_call_0(Op,((include(A)))):- database_op_int_2(Op,((load_data_file(A)))),!.
-database_op_int_call_0(Op,A):- ((predicate_property(A,_)/*;is_mpred_callable(A)*/)),!,database_call(Op,A),!.
-database_op_int_call_0(Op,A):- trace_or_throw(missing_directive(Op,A)),!.
+:-meta_predicate(mpred_call(0)).
+:-export(mpred_call/1).
+mpred_call(call(X)):-!,mpred_call(X).
+mpred_call((X,Y)):-!,mpred_call(X),mpred_call(Y).
+mpred_call((X;Y)):-!,mpred_call(X);mpred_call(Y).
+mpred_call(call(X,Y)):-!,append_term(X,Y,XY),!,mpred_call(XY).
+mpred_call(call(X,Y,Z)):-!,append_term(X,Y,XY),append_term(XY,Z,XYZ),!,mpred_call(XYZ).
+mpred_call(Call):- 
+ show_call_success(( thlocal:assert_op_override(OvOp), OvOp\=change(assert, _))),fail,
+   must((reduce_dbase_op(OvOp,OvOpR),lookup_inverted_op(OvOpR,_,OverridePolarity),
+     must((Call=..[Was|Apply],lookup_inverted_op(Was,InvertCurrent,_WasPol))),
+   ((OverridePolarity ==('-') -> debugOnError(show_call(apply(InvertCurrent,Apply))) ; debugOnError(show_call(apply(Was,Apply))))))).
+mpred_call(Call):-current_predicate(_,Call),!,debugOnError(Call).
+mpred_call(Call):-mpred_call_last_resorts(Call).
+mpred_call(Call):-current_predicate(req/1),!,loop_check(debugOnError(req(Call)),mpred_call_last_resorts(Call)).
 
-database_call(Op,     H ):- (var(Op);var(H)),!,trace_or_throw(var_database_call(Op,  H )).
-database_call(_,true):-!.
-database_call(Op,     H ):- once(demodulize(H,HH)),H\=@=HH,!,database_call(Op, HH).
-database_call(call(Op),H):-!,database_call(Op,H).
-database_call(Op, call(H)):- nonvar(H),!, database_call(Op,H).
-database_call(Op,  not(H)):- nonvar(H),!, database_call(neg(not,Op),H).
-database_call(Op,'\\+'(H)):- nonvar(H),!, database_call(neg(('\\+'),Op),H).
-database_call(Op,    ~(H)):- nonvar(H),!, database_call(neg(~,Op),H).
-database_call(Op,     {H}):- nonvar(H),!, database_call(Op,H).
-database_call(must,Call):- !,must(database_call(req,Call)).
-database_call(assertedOnly,Call):- !,with_assertions(thlocal:infInstanceOnly(Call),database_call(req,Call)).
-database_call(once,Call):- !,once(database_call(req,Call)).
-database_call(neg(_,Op),  H ):- !,trace, not(database_call(Op,  H )).
-database_call(Op, clause(H,B) ):- !, database_check(clause(Op),clause(H,B)).
-database_call(Op, clause(H,B,Ref) ):- !, database_check(clause(Op),clause(H,B,Ref)).
-database_call(Op, (H :- B) ):- !, show_call(database_check(clause(Op),clause(H,B))).
-database_call(is_asserted,H):-!,is_asserted(H).
-database_call(conjecture,H):-!,prologCall(H).
-database_call(nonPFC,  H ):-!, prologCall(H).
-database_call(call_mpred,  H ):-!, prologCall(H).
-database_call(query(dbase_t,Ireq),  H ):-!, database_call(Ireq,H).
-database_call(query(Dbase_t,_Ireq),  H ):-!, database_call(Dbase_t,H).
-database_call(Atom,H):-atom(Atom),current_predicate(Atom/1),!,debugOnError(call(Atom,H)).
-database_call(_,C):- is_callable(C),!,prologCall(C).
-database_call(Op,  H ):- trace_or_throw(unknown_database_call(Op,  H )).
-
-:- export(whenAnd/2).
-whenAnd(A,B):-A,ground(B),once(B).
+mpred_call_last_resorts(Call):- clause(prolog_xref:process_directive(D, Q),_),nonvar(D),D=Call,!, trace,show_call(prolog_xref:process_directive(Call,Q),fmt(Q)).
+mpred_call_last_resorts(Call):- current_predicate(is_asserted/1),!,is_asserted(Call).
+mpred_call_last_resorts(Call):-debugOnError(Call).
 
 
 end_of_file.
 
 
-check_mcall_ok(_):-!.
-check_mcall_ok(C):-functor(C,F,_),not(mpred_prop(F,_)),!,ignore(resolve_if_false(C)),!.
-check_mcall_ok(C):-checkNoArgViolation(C),resolve_if_false(C),!.
-check_mcall_ok(_).
+tms_after_prolog_call(_):-!.
+tms_after_prolog_call(C):-functor(C,F,_),not(mpred_prop(F,_)),!,ignore(resolve_if_false(C)),!.
+tms_after_prolog_call(C):-checkNoArgViolation(C),resolve_if_false(C),!.
+tms_after_prolog_call(_).
 
 
 % ================================================
 % call_typelect/2,4
 % ================================================
+% grab_argsIsa(F,Types):- fail,deducedSimply(mpred_prop(F,predArgTypes(Types))).
+% grab_argsIsa(F,Types):- call_typelect([flag(+firstValue),+debugOnError,+deducedSimply],mpred_prop(F,predArgTypes(Types))).
+
 call_typelect(Ops,Call):-call_typelect(Ops,Ops,Call,Call).
 
 call_typelect(Ops,Flags,Call,Vars):-ground(Call),not(member(ground,Flags)),!,call_typelect(Ops,[ground|Flags],Call,Vars).

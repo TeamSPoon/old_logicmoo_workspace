@@ -12,7 +12,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(mtCommand).
+% :- register_module_type (mtCommand).
 :- multifile thlocal:wants_logout/1.
 
 % rename
@@ -40,4 +40,4 @@ verb_alias(quit,actLogout).
 verb_alias(logoff,actLogout).
 
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

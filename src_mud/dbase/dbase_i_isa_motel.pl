@@ -15421,3 +15421,9 @@ motel_user_decl_database_hook(change(assert,_),isa(C,CT)):- ttObjectType(C),!,mu
 motel_user_decl_database_hook(change(assert,_),Lit):-motel_literal_assert_retract(Lit, Assert, _Retract),!,must(Assert).
 motel_user_decl_database_hook(change( retract,_),Lit):-motel_literal_assert_retract(Lit,_Assert, Retract),!,must(Retract).
 
+
+mudIsa_motel(tCol,tCol).
+mudIsa_motel(I,T):-no_repeats_av(deduce_M(isa(I,T))),I\=tCol,I\==isTDisjoint(tBOT),I\==tTOP,T\==isTDisjoint(tBOT),T\==tTOP.
+
+
+

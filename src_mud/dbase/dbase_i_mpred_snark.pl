@@ -61,10 +61,6 @@
 
 :- include(dbase_i_header).
 :- ensure_loaded(dbase_i_mpred_pttp).
-:- ensure_loaded(dbase_i_mpred_snark_testing).
-
-% :- if_file_exists(use_module('../ext/moo_ext_lisp_triska')).
-
 
 %  all(R, room(R) => exists(D, (door(D) & has(R,D))))
 % for any arbitrary R, if R is a room then there exists some object D that is a door, and R has a D.
@@ -714,7 +710,6 @@ ensure_quantifiers(Wff,WffO):-
 
 :-multifile(function_corisponding_predicate/2).
 :-dynamic(function_corisponding_predicate/2).
-%:-decl_mpred_hybrid(function_corisponding_predicate(tFunction,tPred)).
 
 get_pred( Pred,F):-get_functor( Pred,F).
 is_function(Function):-compound(Function),get_functor(Function,F,A),is_function(Function,F,A).
@@ -764,7 +759,7 @@ conjuncts_to_list(Lit,[Lit]).
 :-export(kif_to_boxlog/3).
 kif_to_boxlog(WffIn,Why,Out) :-  kif_to_boxlog(WffIn,'$VAR'('KB'),Why,Out),!.
 
-kif_to_boxlog(Wff:-B,KB,Why,Flattened) :- B==true,!, kif_to_boxlog(Wff,KB,Why,Flattened).
+kif_to_boxlog(Wff:-B,KB,Why,Flattened) :- is_true(B),!, kif_to_boxlog(Wff,KB,Why,Flattened).
 kif_to_boxlog((HEADIn:-BODYIn),KB,Why,Flattened) :-  
   ignore('$VAR'('KB')=KB),
   must_det_l([
@@ -842,7 +837,7 @@ clauses_to_boxlog(KB,Why,cl([H,Head|List],BodyIn),ListOf):-
 
 
 dbase_t_tell_snark(OP2,RULE):- 
- with_assertions(thlocal:current_pttp_db_oper(mud_call_op(OP2)),
+ with_assertions(thlocal:current_pttp_db_oper(mud_call_store_op(OP2)),
    (show_call(call((must(snark_tell(RULE))))))).
 
 
@@ -1048,7 +1043,7 @@ user:provide_mpred_setup(Op,H):-provide_snark_op(Op,H).
 % OPHOOK ASSERT
 provide_snark_op(change(assert,_How),(HeadBody)):- 
    pttp_listens_to_head(HeadBody),
-   why_to_id(Head,(HeadBody),ID),
+   why_to_id(provide_snark_op,(HeadBody),ID),
    snark_tell(ID,(HeadBody)).
 
 % OPHOOK CALL
@@ -1068,8 +1063,8 @@ provide_snark_op(OP,(HeadBody)):-
 
 
 % CLAUSES HOOK 
-provide_mpred_storage_clauses(wid,H,B):-wid(_,_,(H:-B)).
-provide_mpred_storage_clauses(wid,H,true):-wid(_,_,(H)),compound(H),not(functor(H,':-',2)).
+user:provide_mpred_storage_clauses(wid,H,B,ftProofFn(IDWhy)):-wid(IDWhy,_,(H:-B)).
+user:provide_mpred_storage_clauses(wid,H,true,ftProofFn(IDWhy)):-wid(IDWhy,_,(H)),compound(H),not(functor(H,':-',2)).
 
 
 % REGISTER HOOK
@@ -1077,13 +1072,12 @@ user:provide_mpred_setup(OP,HeadIn,StubType,RESULT):-  pttp_listens_to_stub(Stub
    get_pifunctor(HeadIn,Head,F),
       assert_if_new(user:mpred_prop(F,prologPTTP)),
          ensure_universal_stub(Head),
-         RESULT = declared(pttp_listens_to_head(Head)),
-         asserta_if_new(user:provide_mpred_setup(OP,HEAD,Head,RESULT)).
-
+         RESULT = declared(pttp_listens_to_head(OP,Head)).
 
 :- uses_logic(logicmoo_kb_refution).
 
 :- if_startup_script(tsnark).
+:- if_startup_script(ensure_loaded(dbase_i_mpred_snark_testing)).
 :- logicmoo_example3.
 
 end_of_file.

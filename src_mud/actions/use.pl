@@ -10,7 +10,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(mtCommand).
+% :- register_module_type (mtCommand).
 
 predArgTypes(action_verb_useable(vtVerb,tCol,ftTerm(tPred),ftTerm(tPred),ftTerm(tPred))).
 
@@ -39,6 +39,7 @@ prologMultiValued(mudContains(tContainer,tObj)).
 genlPreds(wearsClothing,mudPossess).
 genlPreds(mudWielding,mudPossess).
 genlPreds(mudStowing,mudPossess).
+prologHybrid(mudKnowing(tAgentGeneric,ftTerm)).
 genlPreds(mudKnowing,mudPossess).
 genlPreds(mudPossess,mudContains).
 genlInverse(mudContains,mudInsideOf).
@@ -145,8 +146,8 @@ must_post_use(ActUse,Agent,Obj):-
 update_charge(Agent,_ActWield) :- 
         padd(Agent,mudEnergy(-2)).
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).
 
 
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

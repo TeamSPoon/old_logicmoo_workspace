@@ -6,7 +6,7 @@
 */
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(mtCommand).
+% :- register_module_type (mtCommand).
 
 
 % ====================================================
@@ -86,4 +86,4 @@ test_anyInst(O):- test_exists(O).
 % helps for testings
 % :- listing(inventory:_).
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

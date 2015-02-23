@@ -21,11 +21,11 @@
 % :-swi_module(user). 
 :-swi_module(modLook, []).
 
-:- decl_mpred_prolog((  mudGetPrecepts/2,  mudNearReach/2, mudNearFeet/2,  mudCanSense/5 , cmdLook/2)).
+:-export((  mudGetPrecepts/2,  mudNearReach/2, mudNearFeet/2,  mudCanSense/5 , cmdLook/2)).
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(mtCommand).
+% :- register_module_type (mtCommand).
 
 :- dynamic blocks/1.
 
@@ -33,7 +33,7 @@
 % mudCanSense(Agent,Sense,InList,CanDetect,CantDetect).
 mudCanSense(_Agent,visual,InList,InList,[]).
 
-user:action_info(actExamine(tItem), "view details of item (see also @list)").
+user:action_info(actExamine(tItem), "view details of item (see also @ftListFn)").
 user:agent_call_command(_Gent,actExamine(SObj)):- term_listing(SObj).
 
 visibleTo(Agent,Agent).
@@ -63,17 +63,17 @@ user:agent_call_command(Agent,actLook(_Dir,SObj)):-
    objects_match_for_agent(Agent,SObj,tObj,Percepts),
    forall_member(P,Percepts,call_agent_action(Agent,actExamine(P))).
 
-:-decl_mpred_prolog(look_as/1).
+:-export(look_as/1).
 look_as(Agent):-
    get_session_id(O),
    with_assertions(thlocal:session_agent(O,Agent),
         must((mudAtLoc_deduced(Agent,LOC),cmdLook(Agent,LOC)))).
 
 
-:-decl_mpred_prolog(cmdLook/2).
-cmdLook(Agent,LOC):-  mmake, call(cmdLook_proc,Agent,LOC).
+:-export(cmdLook/2).
+cmdLook(Agent,LOC):- garbage_collect_atoms, call(cmdLook_proc,Agent,LOC).
 
-:-decl_mpred_prolog(cmdLook_proc/3).
+:-export(cmdLook_proc/3).
 cmdLook_proc(Agent,LOC):- 
    with_no_modifications(with_assertions(mpred_prop(nameStrings,prologListValued),cmdLook_proc_0(Agent,LOC))).
 cmdLook_proc_0(Agent,LOC):-
@@ -107,7 +107,7 @@ cmdLook_proc_0(Agent,LOC):-
        ]),
     show_inventory(Agent,Agent).
 
-:-decl_mpred_prolog(nameStringsList/2).
+:-export(nameStringsList/2).
 
 nameStringsList(Region,ValueList):-findall(Value,nameStrings(Region,Value),ValueList).
 
@@ -132,7 +132,7 @@ get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
 
 % Get only the Percepts
 
-:-decl_mpred(mudGetPrecepts(tAgentGeneric,list(tSpatialThing)),[predModule(user)]).
+:-decl_mpred(mudGetPrecepts(tAgentGeneric,ftListFn(tSpatialThing)),[predModule(user)]).
 mudGetPrecepts(Agent,Percepts) :- mudGetPrecepts0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts).
 mudGetPrecepts0(Agent,Percepts) :-
   call((
@@ -144,7 +144,7 @@ mudGetPrecepts0(Agent,Percepts) :-
 	!.
 
 % Look at locations immediately around argent
-% :-decl_mpred(mudNearReach(tAgentGeneric,list(tSpatialThing)),[predModule(user)]).
+% :-decl_mpred(mudNearReach(tAgentGeneric,ftListFn(tSpatialThing)),[predModule(user)]).
 mudNearReach(Agent,PerceptsO):- get_near0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
    
 get_near0(Agent,Percepts) :-
@@ -154,7 +154,7 @@ get_near0(Agent,Percepts) :-
 	view_dirs(Agent,Dirs,Percepts))),!.
 
 % Look only at location tAgentGeneric is currently in.
-% :-decl_mpred(mudNearFeet(tAgentGeneric,list(tSpatialThing)),[predModule(user)]).
+% :-decl_mpred(mudNearFeet(tAgentGeneric,ftListFn(tSpatialThing)),[predModule(user)]).
 mudNearFeet(Agent,PerceptsO) :-  get_feet0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
 
 get_feet0(Agent,Percepts):-
@@ -166,6 +166,7 @@ get_feet0(Agent,Percepts):-
 	get_mdir_u(Agent,[Facing,Rev],LOC,Percepts))),
 	!.
 
+pddlObjects(vtDirection,[vNorth,vSouth,vEast,vWest,vNE,vNW,vSE,vSW]).
 
 
 %View list starting at vac'vSouth position and moving out in a clockwise spiral
@@ -261,7 +262,7 @@ dark_if_yes(yes,_,[vDark]).
 %dark_if_yes(no,[[]],[]).
 dark_if_yes(no,[P],P).
 
-% Builds the Percepts list. (everything located up to 2 locations away from tAgentGeneric).
+% Builds the Percepts ftListFn. (everything located up to 2 locations away from tAgentGeneric).
 view_dirs(_,[],[]).
 view_dirs(Agent,[[D1|D2]|Rest],Percepts) :-
       tLooking(Agent),
@@ -303,4 +304,4 @@ mask([K|Tail],SoFar,What) :-
 mask([Head|Tail],SoFar,What) :-
 	mask(Tail,[Head|SoFar],What).
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

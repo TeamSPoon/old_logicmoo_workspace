@@ -1585,12 +1585,13 @@ builtin(is_asserted,_).
 
 builtin(P,2):-dbase_t(P,_,_),!,fail.
 builtin(P,3):-dbase_t(P,_,_,_),!,fail.
-builtin(P,_):-user:mpred_prop(P,predStub(prologHybrid)),!,fail.
+builtin(P,_):- current_predicate(resultIsa/2),user:mpred_prop(P,predStub(prologHybrid)),!,fail.
 builtin(isa,2):-!,fail.
 builtin(isa,_):-!,fail.
 builtin(S2,_):-is_p_to_not(S2),!,fail.
 
 builtin(call_proof,2).
+builtin(query,0):-!,fail.
 builtin(true,0).
 builtin(false,0).
 builtin(fail,0).
@@ -1623,6 +1624,7 @@ builtin(display,1).
 builtin(write,1).
 builtin(nl,0).
 builtin(use_pttp,0).
+builtin(ANY,0):-atom(ANY).
 builtin(infer_by,_).
 builtin(search_cost,_).
 builtin(test_and_decrement_search_cost,_).
@@ -1633,6 +1635,8 @@ builtin(M:P,A):-atom(M),!,builtin(P,A).
 builtin(F,_):- user:mpred_prop(F,prologOnly),!. %,fail.
 builtin(unifiable_member,_).
 builtin(dbase_t,_).
+builtin(F,_):-user:mpred_prop(F,prologPTTP),!,fail.
+builtin(F,_):-user:mpred_prop(F,prologSNARK),!,fail.
 builtin(F,A):-current_predicate(F/A),functor(P,F,A),builtin_why(P,F,A,Why),!,dmsg(todo(warn(builtin_why(F,A,Why)))).
 %%% ***
 
@@ -1660,10 +1664,10 @@ builtin_why(X,0):-atom(X).
       assert_if_new(was_pttp_functor(external,NF,A)),
       assert_if_new(was_pttp_functor(internal,IF,A)),
       assert_if_new(was_pttp_functor(internal,INF,A)),
-         dynamic_multifile_exported(F/A),
-         dynamic_multifile_exported(NF/A),
-         dynamic_multifile_exported(IF/A),
-         dynamic_multifile_exported(INF/A))))).
+         export(F/A),
+         export(NF/A),
+         export(IF/A),
+         export(INF/A))))).
 
 
 
@@ -1682,7 +1686,7 @@ builtin_why(X,0):-atom(X).
 %
 % Example:  pttp_nnf(ex(Y, all(X, (f(Y) => f(X)))),NNF).
 %           NNF =  all(_A,(-(f(all(X,f(ex)=>f(X))));f(_A)))) ?
-:- export(pttp_nnf/2).
+:-export(pttp_nnf/2).
 pttp_nnf((A,B),(C,D)):- must(not_ftVar(A)), !, pttp_nnf(A,C), pttp_nnf(B,D).
 pttp_nnf(Fml,NNFOUT) :- pttp_nnf(Fml,[],NNF,_),NNFOUT=NNF.
 
@@ -1763,7 +1767,7 @@ pttp_nnf_post_clean(C,CC,Vars):-
    pttp_nnf_post_clean(B,BB,Vars),
    CC=..[AA|BB],!.
 
-:- export(logical_functor_pttp/1).
+:-export(logical_functor_pttp/1).
 
 logical_functor_pttp(X):-not(atom(X)),!,fail.
 logical_functor_pttp(X):-pttp_nnf_pre_clean_functor(A,B,_),(X==A;X==B),!.
@@ -1777,7 +1781,7 @@ pttp_nnf_pre_clean_functor('&',(,),[]).
 pttp_nnf_pre_clean_functor('v',(;),[]).
 pttp_nnf_pre_clean_functor(and,(,),[]).
 pttp_nnf_pre_clean_functor(or,(;),[]).
-pttp_nnf_pre_clean_functor('::',(:),[]).
+% pttp_nnf_pre_clean_functor('::',(:),[]).
 pttp_nnf_pre_clean_functor(~,(-),[]).
 pttp_nnf_pre_clean_functor(not,(-),[]).
 pttp_nnf_pre_clean_functor(implies,(=>),[]).

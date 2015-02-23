@@ -16,7 +16,7 @@
 :-swi_module(modr, [ call_agent_command_0/2,  call_agent_action/2 ]).
 */
 
-:-decl_mpred_prolog(parse_agent_text_command_checked/5).
+:-export(parse_agent_text_command_checked/5).
 parse_agent_text_command_checked(Agent,VERB,ARGS,NewAgent,CMD):- 
    catch(( parse_agent_text_command(Agent,VERB,ARGS,NewAgent,CMD),
          nonvar(CMD),must(nonvar(NewAgent))),'$aborted',true),
@@ -72,7 +72,7 @@ call_agent_action(Agent,CMDI):-
      with_assertions(thlocal:agent_current_action(Agent,CMD),
       call(Wrapper, call_agent_action_lc(Agent,CMD)))).
 
-:-decl_mpred_prolog(where_atloc/2).
+:-export(where_atloc/2).
 where_atloc(Agent,Where):-mudAtLoc(Agent,Where).
 where_atloc(Agent,Where):-localityOfObject(Agent,Where).
 where_atloc(Agent,Where):-mudAtLoc(Agent,Loc),!,locationToRegion(Loc,Where).
@@ -85,7 +85,7 @@ call_agent_action_lc(Agent,CMD):-
    raise_location_event(Where,actNotice(reciever,begin(Agent,CMD))),   
    catch(call_agent_where_action_lc(Agent,Where,CMD),E,(fmt('call_agent_action/2 Error ~q ',[E])))]))),!.
 
-:-decl_mpred_prolog(send_command_completed_message/4).
+:-export(send_command_completed_message/4).
 send_command_completed_message(Agent,Where,Done,CMD):-
      ignore((must_det_l([flush_output,renumbervars(CMD,SCMD),Message =..[Done,Agent,SCMD],
                 raise_location_event(Where,actNotice(reciever,Message)),
@@ -125,8 +125,8 @@ agent_call_command_now(Agent,CMD):-
 get_session_id(IDIn):-current_input(ID),is_stream(ID),!,ID=IDIn.
 get_session_id(ID):-thread_self(ID).
 
-:-dynamic_multifile_exported(current_agent/1).
-:-decl_mpred_prolog(current_agent/1).
+:-export(current_agent/1).
+:-export(current_agent/1).
 current_agent(PIn):- get_session_id(O),get_agent_session(P,O),!,P=PIn.
 
 :-export(current_agent_or_var/1).
@@ -165,10 +165,10 @@ ensure_new_player(P):- prolog_must_l([assert_isa(P,tExplorer),assert_isa(P,tPlay
 detatch_player(P):- thglobal:global_session_agent(_,P),!,trace_or_throw(detatch_player(P)).
 detatch_player(_).
 
-:-decl_mpred_prolog(become_player/1).
+:-export(become_player/1).
 become_player(NewName):- once(current_agent(Was)),Was=NewName,!.
 become_player(NewName):- get_session_id(O),retractall(thglobal:global_session_agent(O,_)),detatch_player(NewName),asserta(thglobal:global_session_agent(O,NewName)),ensure_player_stream_local(NewName).
-:-decl_mpred_prolog(become_player/2).
+:-export(become_player/2).
 become_player(_Old,NewName):-become_player(NewName).
 
 % Lists all the agents in the run. Except for other monsters.
@@ -177,7 +177,7 @@ list_agents(Agents) :- % build cache
 	findall(NearAgent,req(tAgentGeneric(NearAgent)),Agents),
 	assert(agent_list(Agents)),!.
 
-:-decl_mpred_prolog((agent_into_corpse/1, display_stats/1)).
+:-export((agent_into_corpse/1, display_stats/1)).
 
 % When an agent dies, it turns into a tCorpse.
 % corpse is defined as an object in the *.objects.pl files

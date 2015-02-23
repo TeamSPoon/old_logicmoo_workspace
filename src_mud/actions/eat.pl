@@ -20,7 +20,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(mtCommand).
+% :- register_module_type (mtCommand).
 
 subclass(tFood,tEatAble).
 user:action_info(actEat(tEatAble),"nourish oneself").
@@ -41,4 +41,4 @@ update_charge(Agent,actEat) :-
 	New is Old - 1,
 	add(mudEnergy(Agent,New)).
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

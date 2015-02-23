@@ -15,7 +15,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(mtCommand).
+% :- register_module_type (mtCommand).
 
 % attack joe ->translates-> attack nw
 vtActionTemplate(actAttack(vtDirection)).
@@ -93,4 +93,4 @@ update_stats(Agent,wiff) :-
 
 
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

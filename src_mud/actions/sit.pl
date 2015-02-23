@@ -9,37 +9,33 @@
 */
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(mtCommand).
+% :- register_module_type (mtCommand).
 
-:-decl_mpred(vtPosture/1).
+:-decl_type(vtPosture/1).
 
-:-decl_mpred(stance(tAgentGeneric,vtPosture)).
+prologSingleValued(mudStance(tAgentGeneric,vtPosture),prologHybrid).
 
-vtPosture(actSit).
-vtPosture(actStand).
-vtPosture(actLay).
-vtPosture(actSleep).
-vtPosture(actKneel).
+vtPosture(vSit).
+vtPosture(vStand).
+vtPosture(vLay).
+vtPosture(vSleep).
+vtPosture(vKneel).
 
-tCol(vtPosture).
 
-moo_posture(P):-isa(P,vtPosture).
 
-:-decl_mpred(prologSingleValued(stance(tAgentGeneric,vtPosture))).
-
-user:action_info(Posture,ftText("sets and agent's stance to ",Posture)):-moo_posture(PostureV),Posture=..[PostureV,isOptional(tFurniture,vHere)].
+user:action_info(Posture,ftText("sets and agent's stance to ",Posture)):-vtPosture(PostureV),Posture=..[PostureV,isOptional(tFurniture,vHere)].
 
 % Sit and do nothing.
-user:agent_call_command(Agent,Verb):- compound(Verb), functor(Verb,Sit,1),moo_posture(Sit),arg(1,Verb,Where),user:agent_call_command(Agent,actOnto(Where,Sit)).
+user:agent_call_command(Agent,Verb):- compound(Verb), functor(Verb,Sit,1),vtPosture(Sit),arg(1,Verb,Where),user:agent_call_command(Agent,actOnto(Where,Sit)).
 
-user:action_info(actOnto(isOptional(tFurniture,vHere),vPosture),txtConcatFn("onto tObj do ",Posture)):-moo_posture(Posture).
+user:action_info(actOnto(isOptional(tFurniture,vHere),Posture),txtConcatFn("onto tObj do ",Posture)):-vtPosture(Posture).
 
 user:agent_call_command(Agent,actOnto(Where,Sit)):-
         fmt('agent ~w is now ~wing on ~w',[Agent,Sit,Where]),
-        padd(Agent,stance(Sit)),
+        padd(Agent,mudStance(Sit)),
         padd(Agent,localityOfObject(Where)),
 	call_update_charge(Agent,Sit).
 
-update_charge(Agent,Sit) :- moo_posture(Sit), padd(Agent,[mudEnergy(-1)]).
+update_charge(Agent,Sit) :- vtPosture(Sit), padd(Agent,[mudEnergy(-1)]).
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

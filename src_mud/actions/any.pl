@@ -17,7 +17,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(mtCommand).
+% :- register_module_type (mtCommand).
 user:action_rules(_,_,_,_):-fail.
 
 end_of_file.
@@ -46,4 +46,4 @@ user:agent_call_command(Agent,ACT) :-
 %Nothing to use
       (add_cmdfailure(Agent,SENT))).
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

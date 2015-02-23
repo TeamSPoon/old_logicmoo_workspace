@@ -9,7 +9,7 @@
 
 :-swi_module(parser_imperative, []).
 
-:-decl_mpred_prolog((
+:-export((
                    parse_agent_text_command/5,            
                    parse_agent_text_command_0/5,            
                    objects_match/3,
@@ -23,12 +23,12 @@
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
-:- register_module_type(utility).
+% :- register_module_type (utility).
 
 % =====================================================================================================================
 % get_agent_text_command/4
 % =====================================================================================================================
-:-decl_mpred_prolog(get_agent_text_command/4).
+:-export(get_agent_text_command/4).
 
 get_agent_text_command(Agent,VERBOrListIn,AgentR,CMD):-
    debugOnError(loop_check(get_agent_text_command_0(Agent,VERBOrListIn,AgentR,CMD),fail)).
@@ -80,7 +80,7 @@ parse_for(Type,StringM, Term):-parse_for(Type,StringM, Term, []).
 list_tail(_,[]).
 list_tail(String,LeftOver):-ground(String),to_word_list(String,List),length(List,L),!,between(1,L,X),length(LeftOver,X).
 
-:-decl_mpred_prolog(parse_for/4).
+:-export(parse_for/4).
 parse_for(Type,StringM,Term,LeftOver):-
    to_word_list(StringM,String),  
    list_tail(String,LeftOver),
@@ -100,9 +100,9 @@ desc_len(S0,Region):- call(term_to_atom(S0,S)),
    atomic_list_concat_catch(Words,' ',S),length(Words,Ws),atomic_list_concat_catch(Sents,'.',S),length(Sents,Ss),Region is Ss+Ws,!.
 
 
-:-decl_mpred_prolog(objects_match_for_agent/3).
+:-export(objects_match_for_agent/3).
 objects_match_for_agent(Agent,Text,ObjList):- objects_match_for_agent(Agent,Text,[mudPossess(Agent,isSelf),isSame(mudAtLoc),isSame(localityOfObject),tAgentGeneric,tItem,tRegion],ObjList).  
-:-decl_mpred_prolog(objects_match_for_agent/4).
+:-export(objects_match_for_agent/4).
 objects_match_for_agent(Agent,Text,Match,ObjList):- objects_for_agent(Agent,isOneOf([text_means(Agent,Text,isSelf),isAnd([isOneOf(Match),match_object(Text,isSelf)])]),ObjList).  
 
 
@@ -147,7 +147,7 @@ objects_match(Text,Possibles,MatchList):- findall(Obj,(member(Obj,Possibles),mat
 object_string(O,String):-object_string(_,O,1-4,String),!.
 object_string_0_5(O,String):-object_string(_,O,0-5,String),!.
 
-:-decl_mpred_prolog(object_string/4).
+:-export(object_string/4).
 :-dynamic object_string_fmt/3.
 :-retractall(object_string_fmt(_,_,_)).
 object_string(_,O,DescSpecs,String):- object_string_fmt(O,DescSpecs,String),!.
@@ -166,7 +166,7 @@ save_fmt_e(O,A):-atom(A),!,save_fmt_a(O,A),!.
 save_fmt_e(O,[E|L]):-!,save_fmt_e(O,E),!,save_fmt_e(O,L),!.
 save_fmt_e(O,isa(A)):-!,must(save_fmt_e(O,A)).
 save_fmt_e(O,t(A,_)):-!,must(save_fmt_e(O,A)).
-save_fmt_e(_,E):-compound(E),!. % cycPred(_),predStubType(_),cycPlus2(_),predStub(_),predModule(_),arity(_),
+save_fmt_e(_,E):-compound(E),!. % cycPred(_),predStub(_),cycPlus2(_),predStub(_),predModule(_),arity(_),
 %save_fmt_e(O,E):- string(E),!,must((to_word_list(E,WL),save_fmt_e(O,WL))),!.
 save_fmt_e(O,E):- identical_member(E,O) -> true ; (O=[_|CDR],nb_setarg(2,O,[E|CDR])).
 
@@ -178,9 +178,9 @@ save_fmt_a(_,A):-vtSkippedPrintNames(A),!.
 save_fmt_a(O,E):-to_case_breaks(E,List),maplist(save_fmt_a(O),List).
 
 
-object_name_is_descriptive(O):- (isa(O,tCol);isa(O,tPred);hasInstance(macroDeclarer,O);isa(O,ttValueType),isa(O,name_is_descriptive)).
+object_name_is_descriptive(O):- (isa(O,tCol);isa(O,tPred);hasInstance(functorDeclares,O);isa(O,ttValueType),isa(O,name_is_descriptive)).
 
-:-decl_mpred_prolog(object_print_details/5).
+:-export(object_print_details/5).
 
 
 object_print_details(Print,Agent,O,DescSpecs,Skipped):- atoms_of(O,OS),!,
@@ -277,10 +277,10 @@ parse_agent_text_command_0(Agent,IVERB,ARGS,NewAgent,GOAL):-
    verb_alias_to_verb(IVERB,SVERB), IVERB\=SVERB,!,
    parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL).
 
-parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,actProlog(call_mpred(PROLOGTERM))):- compound(PROLOGTERM),functor(PROLOGTERM,F,_),mpred_prop(F,_),!.
+parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,actProlog(mpred_call(PROLOGTERM))):- compound(PROLOGTERM),functor(PROLOGTERM,F,_),mpred_prop(F,_),!.
 parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,actProlog(req(PROLOGTERM))):- compound(PROLOGTERM),is_callable(PROLOGTERM),!.
 
-:-decl_mpred_prolog(parse_agent_text_command_1/5).
+:-export(parse_agent_text_command_1/5).
 % parses a verb phrase and retuns one interpretation (action)
 parse_agent_text_command_1(Agent,SVERB,ARGS,Agent,GOAL):-
    parse_vp_real(Agent,SVERB,ARGS,GOALANDLEFTOVERS),
@@ -575,7 +575,7 @@ mudDistance(Agent,Obj,1):-localityOfObject(Obj,Agent),!.
 mudDistance(Agent,Obj,2):-localityOfObject(Obj,Where),localityOfObject(Agent,Where),!.
 mudDistance(_Agent,_Obj,2).
 
-naming_order(_,ORDER,L,R):-compare(ORDER,L,R).
+naming_order(ORDER,L,R):-compare(ORDER,L,R).
 
 get_sorted_instances(Inst,Type,HOW):-findall(Inst,isa(Inst,Type),List),predsort(HOW,List,Sorted),!,member(Inst,Sorted).
 

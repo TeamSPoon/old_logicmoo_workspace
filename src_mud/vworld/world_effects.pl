@@ -47,10 +47,10 @@ do_act_affect(_,_,_).
 
 
 % Check to see if last action was successful or not
-:-dynamic_multifile_exported(success/2).
+:-export(success/2).
 success(Agent,YN) :- mudCmdFailure(Agent,_)-> YN=vFalse ; YN=vTrue.
 
-:-dynamic_multifile_exported(add_cmdfailure/2).
+:-export(add_cmdfailure/2).
 add_cmdfailure(Agent,What):-add(mudCmdFailure(Agent,What)).
 
 % Initialize world.
@@ -61,10 +61,10 @@ add_cmdfailure(Agent,What):-add(mudCmdFailure(Agent,What)).
 
 % Check to see if any of the objects should be placed in the world as it runs.
 
-:-decl_mpred_prolog(call_update_charge/2).
+:-export(call_update_charge/2).
 call_update_charge(Agent,What):- padd(Agent,cmdsuccess(What)), doall(must(update_charge(Agent,What))),!.
 
-:-decl_mpred_prolog(call_update_stats/2).
+:-export(call_update_stats/2).
 call_update_stats(Agent,What):- padd(Agent,cmdsuccess(What)), doall(must(update_stats(Agent,What))),!.
 
 set_stats(Agent,[]) :- set_stats(Agent,[mudStr(2),mudHeight(2),mudStm(2),mudSpd(2)]).

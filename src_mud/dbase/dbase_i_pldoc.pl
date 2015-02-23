@@ -13,13 +13,20 @@ term_listing(Match):-
   '@'(ignore((catch(listing(Match),E,wdmsg(E)))),'user'),
   term_non_listing(Match),!.
 
-:- export term_non_listing/1.
+term_dbase_listing(Match):-
+  get_functor(Match,F,A),
+  (A==0->RA=_;RA=A),!,
+ format('/* listing_mpred_hook(~q) => ~n',[Match]),!,
+ debugOnError(ignore(call_no_cuts(user:listing_mpred_hook(F/RA,Match)))),!,
+ format(' <= listing_mpred_hook(~q) */ ~n',[Match]).
+
+:-export(term_non_listing/1).
 term_non_listing(Match):- 
    format('/* term_non_listing(~q) => ~n',[Match]),
    '@'(ignore((doall((
       dbase_i_pldoc:synth_clause_for(H,B,_Ref),
       once(dbase_i_pldoc:ok_show(H)),
-      once(dbase_i_pldoc:term_matches_hb(Match,H,B)),
+      once(dbase_i_pldoc:slow_term_matches_hb(Match,H,B)),
       dbase_i_pldoc:portray_hb(H,B),
       fail)))),'user'),
    format(' <= term_non_listing(~q) */ ~n',[Match]).
@@ -28,7 +35,7 @@ term_non_listing(Match):-
 % user:prolog_list_goal(Goal):- writeq(hello(prolog_list_goal(Goal))),nl.
 
 :- multifile prolog:locate_clauses/2.
-% prolog:locate_clauses(A, _) :- get_functor(A,F),term_non_listing(F),!,fail.
+prolog:locate_clauses(A, _) :- once(term_dbase_listing(A)),fail.
 
 :-export((synth_clause_for/3)).
 synth_clause_for(H,B,Ref):- cur_predicate(_,H),synth_clause_ref(H,B,Ref).
@@ -39,8 +46,6 @@ synth_clause_ref(H,(fail,synth_clause_info(Props)),0):- once(pred_info(H,Props))
 synth_clause_ref(H,B,Ref):- predicate_property(M:H,number_of_clauses(_)),!,clause(M:H,B,Ref).
 
 :-export((term_matches_hb/3)).
-term_matches_hb(noinfo,_,info(_)):-!,fail. 
-term_matches_hb(HO,H,B):- atom(HO),!, term_matches_hb_2(exact,HO,H,B).
 term_matches_hb([],_,_):-!.
 term_matches_hb([F1],H,B):-!,term_matches_hb(F1,H,B),!.
 term_matches_hb([F1|FS],H,B):-!,term_matches_hb(F1,H,B),!,term_matches_hb(FS,H,B),!.
@@ -52,27 +57,36 @@ term_matches_hb(not(C),H,B):-nonvar(C),!,not(term_matches_hb(C,H,B)).
 term_matches_hb(-(C),H,B):-nonvar(C),!,not(term_matches_hb(C,H,B)).
 term_matches_hb(+(C),H,B):-nonvar(C),!,(term_matches_hb(C,H,B)).
 term_matches_hb(module(M),H,_):-!,predicate_property(H,imported_from(M)).
-term_matches_hb(M:HO,H,B):-!,term_matches_hb(module(M),H,B),!,term_matches_hb(h(HO),H,B).
 term_matches_hb(F/A,H,_):-atom(F),functor(H,F,A),!.
 term_matches_hb(h(P),H,_):-!,term_matches_hb(P,H,666666).
 term_matches_hb(b(P),_,B):-!,term_matches_hb(P,666666,B).
 term_matches_hb(HO,H,B):- string(HO),!, term_matches_hb_2(mudContains,HO,H,B).
 term_matches_hb(mudContains(HO),H,B):-!, term_matches_hb_2(mudContains,HO,H,B).
-term_matches_hb(HO,H,B):- !,term_matches_hb_2(exact,HO,H,B).
 
-:- export term_matches_hb_2/4.
+:-export slow_term_matches_hb/3.
+slow_term_matches_hb(noinfo,_,info(_)):-!,fail. 
+slow_term_matches_hb(HO,H,B):- atom(HO),!, term_matches_hb_2(exact,HO,H,B).
+slow_term_matches_hb(HO,H,B):-term_matches_hb(HO,H,B).
+slow_term_matches_hb(M:HO,H,B):-!,term_matches_hb(module(M),H,B),!,term_matches_hb(h(HO),H,B).
+slow_term_matches_hb(HO,H,B):- !,term_matches_hb_2(exact,HO,H,B).
+
+:-export fast_term_matches_hb/3.
+fast_term_matches_hb(HO,H,B):-contains_var(HO,(H:-B)).
+fast_term_matches_hb(HO,H,B):-term_matches_hb(HO,H,B).
+
+:-export term_matches_hb_2/4.
 term_matches_hb_2(mudContains,HO,H,B):- any_to_string(HO,HS),!, with_output_to(string(H1B1),write_canonical((H:-B))), (sub_atom_icasechk(HS,_,H1B1);sub_atom_icasechk(H1B1,_,HS)),!.
 term_matches_hb_2(exact,HO,H,B):- contains_var(HO,(H:-B)).
 
 % match_term_listing(HO,H,B):-!, synth_clause_ref(H,B,_Ref), term_matches_hb(HO,H,B).
 
 :-dynamic cur_predicates/1.
-:- export cur_predicate/2.
+:-export cur_predicate/2.
 cur_predicate(M:F/A,M:P):-
    current_predicate(M:F/A),functor(P,F,A),not(predicate_property(user:P,imported_from(_))).
 
 
-:- export ok_show/1.
+:-export ok_show/1.
 ok_show(F/A):-!,functor(P,F,A),ok_show(P),!.
 ok_show(P):-not(bad_pred(P)).
 
@@ -80,13 +94,13 @@ ok_show(P):-not(bad_pred(P)).
 
 % when we import new and awefull code base (the previous )this can be helpfull
 % we redfine list_undefined/1 .. this is the old version
-:- dynamic_multifile_exported(scansrc_list_undefined/1).
+:- export(scansrc_list_undefined/1).
 scansrc_list_undefined(_):-!.
 scansrc_list_undefined(A):- real_list_undefined(A).
 
 list_undefined:-real_list_undefined([]).
 
-:- dynamic_multifile_exported(real_list_undefined/1).
+:- export(real_list_undefined/1).
 real_list_undefined(A):-
  merge_options(A, [module_class([user])], B),
         prolog_walk_code([undefined(trace), on_trace(found_undef)|B]),
@@ -120,7 +134,7 @@ update_changed_files :-
            true %list_undefined,list_void_declarations
 	).
 
-:- dynamic_multifile_exported(remove_undef_search/0).
+:- export(remove_undef_search/0).
 remove_undef_search:- ((
  '@'(use_module(library(check)),'user'),
  redefine_system_predicate(check:list_undefined(_)),
@@ -158,7 +172,7 @@ show_all(Call):-doall((show_call(Call))).
 
 :-export(alt_calls/1).
 alt_calls(call).
-alt_calls(call_mpred).
+alt_calls(mpred_call).
 alt_calls(is_asserted).
 alt_calls(dbase_t).
 alt_calls(req).
@@ -176,7 +190,7 @@ sreq(Call):-
  with_assertions(readOnlyDatabases,
                 (
            (is_callable(Call)-> findallCall(Call,call,CallL,CallLL) ; (CallL=[];CallLL=[])),
-                 findallCall(Call,call_mpred,MCallL,MCallLL),
+                 findallCall(Call,mpred_call,MCallL,MCallLL),
                  findallCall(Call,dbase_t,DCallL,DCallLL),
                  findallCall(Call,is_asserted,ACallL,ACallLL),
                  findallCall(Call,req,RCallL,RCallLL),
@@ -185,7 +199,7 @@ sreq(Call):-
    flatten([CallLL,MCallLL,DCallLL,ACallLL,RCallLL,ICallLL],WITHFUNCTOR),
    list_to_set(ALL,SET),
                  showDif(SET,call,CallL,WITHFUNCTOR),
-                 showDif(SET,call_mpred,MCallL,WITHFUNCTOR),
+                 showDif(SET,mpred_call,MCallL,WITHFUNCTOR),
                  showDif(SET,dbase_t,DCallL,WITHFUNCTOR),
                  showDif(SET,is_asserted,ACallL,WITHFUNCTOR),
                  showDif(SET,req,RCallL,WITHFUNCTOR),
@@ -235,7 +249,7 @@ is_actverb(X):-user:action_info(PX,_),functor(PX,X,_).
 is_actverb(X):-vtActionTemplate(PX),functor(PX,X,_).
 is_actverb(X):-vtPosture(PX),functor(PX,X,_).
 is_actverb(X):-verb_alias(_,X).
-vtVerb(X):-is_actverb(X).
+% user:vtVerb(X):-is_actverb(X).
 
 :-export(ensure_starts_with_prefix/3).
 ensure_starts_with_prefix(A,Prefix,A):- atom_concat(Prefix,Rest,A),toCamelcase(Rest,CC),toPropercase(CC,PC),Rest==PC,!.

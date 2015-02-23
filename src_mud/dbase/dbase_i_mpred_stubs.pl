@@ -12,7 +12,7 @@
 
 :- include(dbase_i_header).
 
-:- dynamic_multifile_exported correctArgsIsa/3.
+:- export correctArgsIsa/3.
 
 hybrid_tPredStubImpl(prologHybrid).
 hybrid_tPredStubImpl(prologPTTP).
@@ -39,6 +39,14 @@ maybe_storage_stub(F,StubType):- hybrid_tPredStubImpl(StubType),not((StubType==p
 
 
 % has_storage_stub(Head):- !.
+has_storage_stub(Head):-
+has_storage_stub(Head):-  
+      get_pifunctor(Head,PHead,_F),
+      create_stub_body(PHead,Body),
+      (predicate_property(PHead,dynamic);user:clause(PHead,Body)),
+      thglobal:pfcManageHybrids,!.
+      
+
 has_storage_stub(Head):-       
       get_pifunctor(Head,PHead,F),
       create_stub_body(PHead,Body),
@@ -58,7 +66,11 @@ missing_stub(Head):-has_storage_stub(Head),!,fail.
 missing_stub(Head):-not(predicate_property(Head,public)),listing(Head).
 
 create_stub_body(Head,Stub):-create_stub_body(call(conjecture),Head,Stub).
-create_stub_body(call(conjecture),Head,Stub):- Stub = (call_provided_mpred_storage_op(call(conjecture),Head,Then),Then).
+% return fail to cut and fail
+create_stub_body(call(conjecture),Head,Stub):- Stub = (call_provided_mpred_storage_op(call(conjecture),Head,Then),
+   ((Then=(!,Whatnot))->
+     (!,Whatnot);
+      Then)).
 
 erase_mpred_storage_op(Head):-
    create_stub_body(_,Head,Stub),
@@ -70,6 +82,7 @@ really_add_mpred_storage_op(Head):-
    asserta_if_new((Head:- Stub)).
 
 
+renumbervarZ((H:-B),GGG):-is_true(B),!,copy_term(H,GG),unnumbervars(GG,GGG),numbervars(GGG,0,_).
 renumbervarZ(H,GGG):-copy_term(H,GG),unnumbervars(GG,GGG),numbervars(GGG,0,_).
 is_same_clauses(Head,NEWHBLISTN,HBLISTN):-
    maplist(renumbervarZ,HBLISTN,HBLIST),
@@ -101,120 +114,82 @@ change(assert,z) asserts last if no =@=
 change( retract,one)  using =
 change( retract,all)  using =
 
-*/
-
 same_functors(Head1,Head2):-must_det(get_functor(Head1,F1,A1)),must_det(get_functor(Head2,F2,A2)),!,F1=F2,A1=A2.
 good_for_hybrid(H,F):- not(mpred_prop(F,_ANY_)),predicate_property(H,number_of_clauses(0)),predicate_property(H,dynamic).
 ensure_exists(Head):-get_pifunctor(Head,PHead,F),get_functor(Head,F,A),(predicate_property(PHead,dynamic)->true;(predicate_property(PHead,_)->dmsg(warn(static_pred,F/A));dynamic(F/A))).
 
-reduce_clause(H,HHH):-notrace(once(((demodulize(H,HH),H\=@=HH,!,reduce_clause(HH,HHH))))),!.
-reduce_clause((C:- B),C):-B==true,!.
-reduce_clause(C,C).
-
-demodulize(Var,OUT):-is_ftVar(Var),!,OUT=Var.
-demodulize(Var,OUT):-not(compound(Var)),!,OUT=Var.
-demodulize(H,HHH):-once(strip_module(H,_,HH)),H\==HH,!,demodulize(HH,HHH).
-demodulize(M:H,HH):-atom(M),!,demodulize(H,HH).
-demodulize((H:-B),(HH:-BB)):-!,demodulize(H,HH),demodulize(B,BB).
-demodulize((H,B),(HH,BB)):-!,demodulize(H,HH),demodulize(B,BB).
-demodulize('&'(H,B),'&'(HH,BB)):-!,demodulize(H,HH),demodulize(B,BB).
-demodulize('v'(H,B),'v'(HH,BB)):-!,demodulize(H,HH),demodulize(B,BB).
-demodulize((H;B),(HH;BB)):-!,demodulize(H,HH),demodulize(B,BB).
-demodulize([H|B],[HH|BB]):-!,demodulize(H,HH),demodulize(B,BB).
-demodulize({H},{HH}):-!,demodulize(H,HH).
-demodulize(H,HH):-compound(H),H=..HL,!,demodulize(HL,HHL),HH=..HHL,!.
-demodulize(HB,HB).
-
-correct_negations(How,(~({X})),O):-nonvar(X),wrap_in_neg_functor(How,X,O).
-correct_negations(How,(-({X})),O):-nonvar(X),wrap_in_neg_functor(How,X,O).
-correct_negations(How,(not({X})),O):-nonvar(X),wrap_in_neg_functor(How,X,O).
-correct_negations(How,(notz({X})),O):-nonvar(X),wrap_in_neg_functor(How,X,O).
-correct_negations(How,(assertable_not({X})),O):-nonvar(X),wrap_in_neg_functor(How,X,O).
-correct_negations(How,(\+({X})),O):-nonvar(X),wrap_in_neg_functor(How,X,O).
-
-wrap_in_neg_functor(clause,X,assertable_neg(X)).
-wrap_in_neg_functor(mpred,X,not(X)).
-wrap_in_neg_functor(callable,X, (\+(X))).
-
-pfc_head_expansion(_,V,V ):-var(V),!.
-pfc_head_expansion(How,H,GG):-correct_negations(How,H,GG),!.
-pfc_head_expansion(_,V,V).
-database_expand_term(I,O):-with_assertions(thlocal:into_form_code,expand_term(I,O)).
+*/
 
 
+% -- CODEBLOCK
+is_tCol(V):-is_ftVar(V),!,fail.
+is_tCol(tCol).
+is_tCol(F):- mpred_prop(F,tCol);hasInstance(tCol,F);hasInstance(F,_).
 
-call_provided_mpred_storage_op(Op,H,(!,database_op(Op,H))).
+is_proc(V):-is_ftVar(V),!,fail.
+is_proc(F):- functor(P,F,1),predicate_property(P,_),must(not(mpred_prop(F,tCol))).
 
-test_call_cut:- X=!,dmsg(testing_call_cut),call(X).
-test_call_cut:- X=!,dmsg(testing_call_cut2),(X).
+% -- CODEBLOCK
+is_call_op(Var):-var(Var),!,trace_or_throw(var_is_call_op(Var)).
+is_call_op(call(_)):-!.
+is_call_op(query(_,_)):-!.
+is_call_op(call).
+
+non_call_op(Op):-mpred_op(Op),not(is_call_op(Op)).
+
+% -- CODEBLOCK
+mpred_change_op(change(_,_)).
+
+% -- CODEBLOCK
+mpred_op(Op):-mpred_change_op(Op).
+mpred_op(call(_)).
+mpred_op(query(_,_)).
+mpred_op(clauses(_)).
+
+% -- CODEBLOCK
+:-export(last_arg_ground/1).
+last_arg_ground(HEAD):-compound(HEAD),functor(HEAD,F,A),last_arg_ground(F, A, HEAD),!.
+last_arg_ground(mud_test,_,_).
+last_arg_ground(_,A,_):-A>2,!.
+last_arg_ground(_,A,HEAD):-arg(A,HEAD,Arg),!,ground(Arg).
+
+
+call_provided_mpred_storage_op(call(_),H,true):-was_isa(H,I,C),!,isa_asserted(I,C).
+call_provided_mpred_storage_op(Op,H,true):-!,no_repeats_old(loop_check(mpred_op(Op,H),is_asserted(H))).
+
+
+test_call_cut:- X=!,dmsg(testing_call_cut),X.
 test_call_cut:- throw(test_failed(testing_call_cut)).
-:-doall(test_call_cut).
+% :-doall(test_call_cut).
 
-change(X,B):-database_op(X,B),!.
-change(X,B,C):-database_op(change(X,B),C),!.
-retract(X,Y):-database_op(change(retract,X),Y),!.
-
-database_op(Op,      H ):- (var(Op);var(H)),!,trace_or_throw(var_database_op(Op,  H )).
-database_op(Op,     H ):- once(demodulize(H,HH)),H\=@=HH,!,database_op(Op, HH).
-%database_op(change(Cmd,How),H):-!,append_term(Cmd,How,Op),database_op(Op,H).
-database_op(Op,H):-  must_op(Op, call_no_cuts_loop_checked(provide_mpred_storage_op(Op,H),database_op0(Op,H))).
+%change(X,B):-dbase_op(X,B),!.
+%change(X,B,C):-dbase_op(change(X,B),C),!.
+%retract(X,Y):-dbase_op(change(retract,X),Y),!.
 
 
 must_op(Op,     H ):- (var(Op);var(H)),!,trace_or_throw(var_database_op0(Op,  H )).
-must_op(Op,     H ):- once(demodulize(H,HH)),H\=@=HH,!,must_op(Op, HH).
+must_op(Op,     H ):- once(fully_expand(Op,H,HH)),H\=@=HH,!,must_op(Op, HH).
 must_op(change(assert,_),Call):-!,must(Call),!.
 must_op(change( retract,_),Call):-!,must(Call),!.
 must_op(clauses(_),Call):-!,loop_check(debugOnError(Call)).
 must_op(call(_),Call):-!,loop_check(debugOnError(Call)).
 must_op(_,Call):-!,loop_check(debugOnError(Call)).
 
-database_op0(Op,     H ):- (var(Op);var(H)),!,trace_or_throw(var_database_op0(Op,  H )).
-database_op0(Op,     H ):- once(demodulize(H,HH)),H\=@=HH,!,database_call(Op, HH).
-database_op0(change(assert,Op),(H)):-!,must(database_modify(change(assert,Op),(H))),!.
-database_op0(change(retract,Op),(H)):-!,must(database_modify(change( retract,Op),(H))),!.
-database_op0(clauses(Op),(H)):-!,database_check(clauses(Op),H).
-database_op0(is_asserted,(H)):-!,database_check(clauses(is_asserted),H).
-database_op0(call(Op),H):-!,database_call(Op,H).
-database_op0(Op,H):-!,trace_or_throw(unknown_database_op0(Op,H)).
-
-database_modify(Op,H):- (var(Op);var(H)),!,trace_or_throw(var_database_modify_op(Op,  H )).
-database_modify(Op,     H ):- once(demodulize(H,HH)),H\=@=HH,!,database_modify(Op, HH).
-database_modify(P,H):- thlocal:noDBaseMODs(_),!,dmsg(noDBaseMODs(P,H)).
-database_modify(Op,  H):- Op=..[Assert,How],!,database_modify(change(Assert,How),   H).
-database_modify(Op,  H):- Op=..[Assert],!,database_modify(change(Assert,one),   H).
-%database_modify(change(Cmd,How),H):-!,must(( append_term(Cmd,How,Op),!,database_modify(Op,H))).
-database_modify(change(assert,_),   H):- database_check(clauses(is_asserted),H),!.
-database_modify(change(Type,_),   H):- expire_pre_change(Type,H),fail.
-database_modify(Op,          H):- database_expand_term(H,GG),H\=@=GG,!,database_modify(Op, GG ),!.
-database_modify(Op,          H):- pfc_head_expansion(clause,H,GG),H\=@=GG,database_modify(Op, GG ),!.
-database_modify(Op,          H):- user:must_op(Op,call_no_cuts(provide_mpred_storage_op(Op,H))),!,ignore(call_no_cuts(expire_post_change(Op,H))).
-% database_modify(Op, (H:-TRUE) ):-TRUE==true,!,must((database_modify(Op,H))).
-database_modify(Op,          H):-!,trace_or_throw(unknown_database_modify(Op,H)).
-
-/*
-database_modify(Op,H):- Op=change(assert,a),!, must(loop_check(database_op(Op,H),loop_check(hooked_asserta(H),dtrace(user:provide_mpred_storage_op(Op,H))))),!.
-database_modify(Op,H):- Op=change(assert,_),!, must(loop_check(database_op(Op,H),loop_check(hooked_assertz(H),dtrace(user:provide_mpred_storage_op(Op,H))))),!.
-database_modify(Op,H):- Op=change( retract,all),!, must(loop_check(hooked_retractall(H),database_op(Op,H))),!,call_no_cuts(expire_post_change( retract,H)).
-database_modify(Op,H):- Op=change( retract,_),!, loop_check(hooked_change( retract,H),database_op(Op,H)),call_no_cuts(expire_post_change( retract,H)).
-database_modify(Op,H):-!,trace_or_throw(unknown_database_modify(Op,H)).
-*/
-
-
 call_wdmsg(P,DB):- thlocal:noDBaseMODs(_),!,wdmsg(error(noDBaseMODs(P,DB))).
 call_wdmsg(P,DB):- get_functor(DB,F,A), call_wdmsg(P,DB,F,A).
 
-call_wdmsg(P,DB,dbase_t,_A):-!, append_term(P,DB,CALL),dmsg((CALL)),prologCall(CALL).
-call_wdmsg(P,MP,F,A):- mpred_prop(F,prologHybrid),must(A>1),into_functor_form(dbase_t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,prologCall(CALL).
-call_wdmsg(P,MP,F,A):- not(mpred_prop(F,prologOnly)),decl_mpred_hybrid(F/A), into_functor_form(dbase_t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,prologCall(CALL).
-call_wdmsg(P,DB,F,_):- append_term(P,DB,CALL),dmsg(info(CALL)),must(mpred_prop(F,prologOnly)),!,prologCall(CALL).
-%call_wdmsg(P,DB,S,_):-  dtrace((append_term(P,DB,CALL),dmsg((CALL)),prologCall(CALL))).
+call_wdmsg(P,DB,dbase_t,_A):-!, append_term(P,DB,CALL),dmsg((CALL)),mpred_call(CALL).
+call_wdmsg(P,MP,F,A):- mpred_prop(F,prologHybrid),must(A>1),into_functor_form(dbase_t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,mpred_call(CALL).
+call_wdmsg(P,MP,F,A):- not(mpred_prop(F,prologOnly)),decl_mpred_hybrid(F/A), into_functor_form(dbase_t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,mpred_call(CALL).
+call_wdmsg(P,DB,F,_):- append_term(P,DB,CALL),dmsg(info(CALL)),must(mpred_prop(F,prologOnly)),!,mpred_call(CALL).
+%call_wdmsg(P,DB,S,_):-  dtrace((append_term(P,DB,CALL),dmsg((CALL)),mpred_call(CALL))).
 
 
 % ================================================================================
 % INSTALL MISSING STUBS
 % ================================================================================
 
-%:-rescan_mpred_props.
+%:-agenda_rescan_mpred_props.
 
 % pass 2
 scan_missing_stubs(F):-
@@ -226,7 +201,7 @@ mpred_missing_stubs(F,A):-prologHybrid = StubType, hybrid_tPredStubImpl(StubType
 
 :-assertz_if_new(call_OnEachLoad(rescan_missing_stubs)).
 
-:-dynamic_multifile_exported(rescan_missing_stubs/0).
+:-export(rescan_missing_stubs/0).
 % rescan_missing_stubs:-no_rescans,!.
 rescan_missing_stubs:-loop_check_local(time_call(rescan_missing_stubs_lc),true).
 rescan_missing_stubs_lc:- once(thglobal:use_cyc_database), once(with_assertions(thlocal:useOnlyExternalDBs,forall((kb_t(arity(F,A)),A>1,good_pred_relation_name(F,A),not(mpred_arity(F,A))),with_no_dmsg(decl_mpred_mfa,decl_mpred_hybrid(F,A))))),fail.
@@ -234,9 +209,9 @@ rescan_missing_stubs_lc:- hotrace((doall((mpred_missing_stubs(F,A),mpred_arity(F
 
 no_rescans.
 
-:-dynamic_multifile_exported(rescan_mpred_props/0).
+:-export(agenda_rescan_mpred_props/0).
 
-rescan_mpred_props:- loop_check(rescan_mpred_props_lc,true).
+agenda_rescan_mpred_props:- loop_check(rescan_mpred_props_lc,true).
 rescan_mpred_props_lc:-no_rescans,!.
 rescan_mpred_props_lc:-rescan_duplicated_facts(user,mpred_prop(_,_)),fail.
 rescan_mpred_props_lc:-time(forall(mpred_prop_ordered(Pred,Prop),hooked_asserta(mpred_prop(Pred,Prop)))),fail.
@@ -248,33 +223,9 @@ rescan_mpred_props_lc.
 % GRABOUT STORAGE STUB CLAUSES
 % ================================================================================
 provide_clauses_list(Head,HBLISTO):- get_pifunctor(Head,PHead,_),  
-  findall((PHead :- B),no_repeats_old([PHead:B],call_no_cuts(provide_mpred_storage_clauses(_,PHead,B))),HBLIST),
-  delete(HBLIST,(PHead:-(call_provided_mpred_storage_op(call(conjecture), PHead,Then),Then)),HBLISTO),!.
+  findall((PHead :- B),
+    no_repeats_old([PHead:B],((call_no_cuts(user:provide_mpred_storage_clauses(_,PHead,B,Proof)),is_source_proof(Proof)))),
+   HBLIST),
+   create_stub_body(PHead,Stub),
+   delete(HBLIST,Stub,HBLISTO),!.
 
-is_asserted(PHeadIn,BIn):-demodulize((PHeadIn:-BIn),(PHead:-B)),no_repeats_old([PHead:B],((dif(NotProlog,prolog),
-   call_no_cuts(provide_mpred_storage_clauses(NotProlog,PHead,B))))).
-is_asserted(PHeadIn,BIn):-demodulize((PHeadIn:-BIn),(PHead:-B)),no_repeats_old([PHead:B],call_no_cuts(provide_mpred_storage_clauses(prolog,PHead,B))),not(notrace(special_wrapper_body(B,_))).
-
-is_asserted(H):- once(demodulize(H,HH)),H\=@=HH,!,is_asserted(HH).
-is_asserted(H):- \+ current_predicate(_,H),compound(H),(H=..[C,I] -> hasInstance(C,I);dbase_t(H)).
-is_asserted((H:-B)):-!,is_asserted(H,B).
-is_asserted((H1,H2)):-!,is_asserted(H1),is_asserted(H2).
-is_asserted((H1;H2)):-!,is_asserted(H1);is_asserted(H2).
-
-is_asserted(clause(H,B)):-!,is_asserted(H,B).
-is_asserted(clause(H,B,Ref)):-!,clause(H,B,Ref).
-is_asserted(M:H):-nonvar(M),!,is_asserted(H).
-is_asserted(H):-!,is_asserted(H,true).
-
-database_check(Op, H ):- (var(Op);var(H)),!,trace_or_throw(var_database_check_op(Op,  H )).
-database_check(_,H):-debugOnError(is_asserted(H)).
-
-
-% nart_to_atomic(F,F):-!,atom(F).
-nart_to_atomic(F,F).
-
-% ================================================
-% is_asserted/1
-% ================================================
-                                    
-had_module(M:X,X):-atom(M).

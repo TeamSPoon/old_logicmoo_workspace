@@ -6,7 +6,7 @@
 */
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(mtCommand).
+% :- register_module_type (mtCommand).
 
 %isa(tHumanPlayer,ttAgentType).
 %subclass(ttAgentType,tCol).
@@ -18,10 +18,10 @@ user:type_action_info(tHumanPlayer,actHelp(isOptional(ftString,"")), "shows this
 
 
 
-:-decl_mpred_prolog(get_type_action_help_commands_list/3).
+:-export(get_type_action_help_commands_list/3).
 get_type_action_help_commands_list(A,B,C):-no_repeats_old(get_type_action_help_0(A,B,C)).
 
-:-decl_mpred_prolog(get_all_templates/1).
+:-export(get_all_templates/1).
 get_all_templates(Templ):- call_tabled(get_all_templates0(Templ)).
 
 get_all_templates0(Templ):-get_good_templates(Templ).
@@ -29,11 +29,6 @@ get_all_templates0(Templ):-get_bad_templates(Templ),not(get_good_templates(Templ
 get_good_templates(Templ):- no_repeats_old((get_type_action_help_1(_,Templ,_),good_template(Templ))).
 get_bad_templates(Templ):- no_repeats_old((get_type_action_help_1(_,Templ,_),not(good_template(Templ)))).
 
-
-vtActionTemplate(Templ):- loop_check(get_all_templates(Templ),fail).
-
-:-decl_mpred_prolog(good_template/1).
-good_template(Templ):- \+ contains_singletons(Templ).
 
 
 to_param_doc(TEMPL,S):-sformat(S,'Prolog looks like: ~q',[TEMPL]).
@@ -47,6 +42,7 @@ get_type_action_help_0(What,Syntax,txtConcatFn(makes,happen,List)):- call_no_cut
                      % once(member(isa(Obj,_Type),List);_Type=term),
                       ignore(Agent=an(What)),ignore(What=tAgentGeneric).
 
+:-export(get_type_action_help_1/3).
 get_type_action_help_1(What,TEMPL,S):- get_type_action_help_0(What,TEMPL,S).
 get_type_action_help_1(_What,TEMPL,S):- call_no_cuts(isa(TEMPL,vtActionTemplate)),to_param_doc(TEMPL,S).
 
@@ -102,4 +98,11 @@ user:hook_coerce(Text,vtVerb,Inst):- get_all_templates(A),nonvar(A),functor_safe
 %user:agent_text_command(Agent,[Who],Agent,Cmd):- nonvar(Who), get_all_templates(Syntax),Syntax=..[Who,isOptional(_,Default)],Cmd=..[Who,Default].
 %user:agent_text_command(Agent,[Who,Type],Agent,Cmd):- get_all_templates(Syntax),nonvar(Who),Syntax=..[Who,isOptional(Type,_)],Cmd=..[Who,Type].
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).
+
+:-export(good_template/1).
+good_template(Templ):- \+ contains_singletons(Templ).
+
+vtActionTemplate(Templ) <= (loop_check(get_all_templates(Templ),fail)).
+
+

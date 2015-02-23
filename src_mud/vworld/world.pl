@@ -14,7 +14,7 @@
 */
 
 %:-swi_module(world, [
-:-dynamic_multifile_exported((
+:-export((
         call_agent_command/2,
        % call_agent_action/2,
             %mud_isa/2,
@@ -69,7 +69,7 @@
 
 :-discontiguous create_instance_0/3.
 
-:-decl_mpred_prolog((
+:-export((
           create_instance/2,
           create_instance/3,
           create_instance_0/3,
@@ -79,14 +79,14 @@
 :- dynamic  agent_list/1.
 
 
-:- include(logicmoo('vworld/moo_header.pl')).
-:- register_module_type(utility).
+:- include(moo_header).
+% :- register_module_type (utility).
 
 % :- ensure_loaded(logicmoo('vworld/world_2d.pl')).
-:- include(logicmoo('vworld/world_2d.pl')).
-:- include(logicmoo('vworld/world_text.pl')).
-:- include(logicmoo('vworld/world_effects.pl')).
-:- include(logicmoo('vworld/world_events.pl')).
+:- ensure_loaded(logicmoo('vworld/world_2d.pl')).
+:- ensure_loaded(logicmoo('vworld/world_text.pl')).
+:- ensure_loaded(logicmoo('vworld/world_effects.pl')).
+:- ensure_loaded(logicmoo('vworld/world_events.pl')).
 :- if_file_exists(ensure_loaded(logicmoo('vworld/world_spawning.pl'))).
 
 :-export(isaOrSame/2).
@@ -139,8 +139,8 @@ subclass(tFood,tItem).
 ttSpatialType(SubType):-member(SubType,[tAgentGeneric,tItem,tRegion]).
 %ttSpatialType(S):- is_asserted(ttSpatialType(T)), impliedSubClass(S,T).
 
-%createableSubclassType(S,T):-call_mpred(  ttSpatialType(T)),is_asserted(subclass(S,T)).
-%createableSubclassType(T,tSpatialThing):-call_mpred( ttSpatialType(T)).
+%createableSubclassType(S,T):-mpred_call(  ttSpatialType(T)),is_asserted(subclass(S,T)).
+%createableSubclassType(T,tSpatialThing):-mpred_call( ttSpatialType(T)).
 
 
 create_agent(P):-create_agent(P,[]).
@@ -148,18 +148,18 @@ create_agent(P,List):-must_det(create_instance(P,tAgentGeneric,List)).
 
 % decl_type(Spec):-create_instance(Spec,col,[]).
 
-:-decl_mpred_prolog(create_instance/1).
+:-export(create_instance/1).
 create_instance(P):- must_det((isa(P,What),ttSpatialType(What))),must_det(create_instance(P,What,[])).
 :-export(create_instance/2).
 create_instance(Name,Type):-create_instance(Name,Type,[]).
 user:create_instance(Name,Type):-create_instance(Name,Type,[]).
-:-decl_mpred_prolog(create_instance/3).
+:-export(create_instance/3).
 create_instance(What,Type,Props):- 
   loop_check_local(time_call(create_instance_now(What,Type,Props)),dmsg(already_create_instance(What,Type,Props))).
 
 create_instance_now(What,Type,Props):-
   must((var(Type);atom_concat('t',_,Type ))),!,
- with_assertions(thlocal:skip_db_op_hooks,
+ with_assertions(thlocal:agenda_suspend_scans,
   with_assertions(thlocal:deduceArgTypes(_),
   with_no_assertions(thlocal:useOnlyExternalDBs,
    with_no_assertions(thlocal:noRandomValues(_),
@@ -170,7 +170,7 @@ create_instance_now(What,Type,Props):-
 
 :-discontiguous create_instance_0/3.
 
-:- decl_mpred_prolog(is_creating_now/1).
+:-export(is_creating_now/1).
 :- dynamic(is_creating_now/1).
 
 create_instance_0(What,Type,List):- (var(What);var(Type);var(List)),trace_or_throw((var_create_instance_0(What,Type,List))).
@@ -186,7 +186,7 @@ subclass(tExplorer,tAgentGeneric).
 :-dynamic_multifile_exported(predTypeMax/3).
 :-dynamic_multifile_exported(predInstMax/3).
 
-predInstMax(I,mudEnergy,NRG):- infSecondOrder, predTypeMax(mudEnergy,AgentType,NRG),isa(I,AgentType).
+%NEXT TODO predInstMax(I,mudEnergy,NRG):- infSecondOrder, predTypeMax(mudEnergy,AgentType,NRG),isa(I,AgentType).
 %predInstMax(I,mudHealth,Dam):- predTypeMax(mudHealth,AgentType,Dam),isa(I,AgentType).
 
 punless(Cond,Action):- once((call(Cond);call(Action))).
@@ -262,8 +262,8 @@ create_instance_0(What,Type,Props):- leash(+call),trace,dtrace,trace_or_throw(dm
 
 
 
-% already convered mudPossess(Who,Thing):-genlInverse(W,mudPossess),into_mpred_form(dbase_t(W,Thing,Who),Call),call_mpred(Call).
-% already convered mudPossess(Who,Thing):-genlPreds(mudPossess,W),into_mpred_form(dbase_t(W,Who,Thing),Call),call_mpred(Call).
+% already convered mudPossess(Who,Thing):-genlInverse(W,mudPossess),into_mpred_form(dbase_t(W,Thing,Who),Call),mpred_call(Call).
+% already convered mudPossess(Who,Thing):-genlPreds(mudPossess,W),into_mpred_form(dbase_t(W,Who,Thing),Call),mpred_call(Call).
 
 
-:- include(logicmoo(vworld/moo_footer)).
+% % :- include(logicmoo(vworld/moo_footer)).

@@ -11,18 +11,18 @@
 %      default_repl_obj_to_string/3,default_repl_writer/4,show_kb_via_pred/3,show_kb_preds/2,show_kb_preds/3,success/2
 :- include(logicmoo(vworld/moo_header)).
 
-:-decl_mpred_prolog(fully_expand/2).
+:-export(eng_fully_expand/2).
 
-:- begin_prolog_source.
+% :- begin_prolog_source.
 
-:- begin_transform_moo_preds.
+% :- begin_transform_moo_preds.
 
 
 % ===========================================
 % generatePhrase_local(+Term,-English).
 % Generate english version of a message
 % ===========================================
-:-decl_mpred_prolog(generatePhrase_local/2).
+:-export(generatePhrase_local/2).
 
 bugger:term_to_message_string(T,T):-var(T),!.
 bugger:term_to_message_string(T,T):-!.
@@ -44,8 +44,8 @@ is_leave_alone(A):-failOnError((sub_atom(A,_,1,0,S),atom_number(S,_))),!.
 :- decl_mpred_hybrid(mudTermAnglify/2).
 
 mudTermAnglify(A,B):-local_term_anglify(A,B).
-:- decl_mpred_prolog(term_anglify_args/6).
-:- decl_mpred_prolog(term_anglify_last/2).
+:-export(term_anglify_args/6).
+:-export(term_anglify_last/2).
 
 term_anglify_last(Head,English):-compound(Head),
    functor(Head,F,A),A>1,
@@ -57,7 +57,7 @@ term_anglify_last(Head,English):-compound(Head),
 mudTermAnglify(Head,EnglishO):- compound(Head), 
    Head=..[F|ARGS],mpred_prop(F,Info),
    member(Info,[prologSingleValued,predArgMulti(_)]),   
-   term_anglify_args(Head,F,1,ARGS,Info,English),fully_expand(English,EnglishO),!.
+   term_anglify_args(Head,F,1,ARGS,Info,English),eng_fully_expand(English,EnglishO),!.
 
 
 term_anglify_args(Head,F,A,ARGS,predArgMulti(Which),English):- !,replace_nth(ARGS,Which,_OldVar,NewVar,NEWARGS),!,
@@ -69,12 +69,12 @@ term_anglify_args(Head,F,A,ARGS,predArgMulti(Which),English):- !,replace_nth(ARG
 
 term_expansion((term_anglify_args(_Head,F,A,ARGS0,prologSingleValued,English):- add_arg_parts_of_speech(F,1,ARGS0,ARGS),verb_after_arg(F,A,After),
    insert_into(ARGS,After,verbFn(F),NEWARGS),
-   fully_expand(NEWARGS,English),X),O).
+   eng_fully_expand(NEWARGS,English),X),O).
 
 */
 term_anglify_args(_Head,F,A,ARGS0,prologSingleValued,English):- add_arg_parts_of_speech(F,1,ARGS0,ARGS),verb_after_arg(F,A,After),
                insert_into(ARGS,After,verbFn(F),NEWARGS),
-               fully_expand(NEWARGS,English),!.
+               eng_fully_expand(NEWARGS,English),!.
 
 /*
 unCamelCase(S,String):-any_to_string(S,Str),S\=Str,!,unCamelCase(Str,String),!.
@@ -94,9 +94,9 @@ mudTermAnglify(mudTermAnglify(Term,Text),[ftCallable(Term),is,converted,to,engli
 
 term_anglify_np_last(Obj,T,String):- local_term_anglify_np_last(Obj,T,String).
 
-generatePhrase_local(Term,String):- debugOnError(( fully_expand(Term,EnglishM),!,
-          % fmt('FR0=~q~n',[fully_expand(Term,EnglishM)]),
-          fully_expand(EnglishM,EnglishG),fix_grammar(EnglishG,English) , join_for_string(English,String))),!.
+generatePhrase_local(Term,String):- debugOnError(( eng_fully_expand(Term,EnglishM),!,
+          % fmt('FR0=~q~n',[eng_fully_expand(Term,EnglishM)]),
+          eng_fully_expand(EnglishM,EnglishG),fix_grammar(EnglishG,English) , join_for_string(English,String))),!.
 
 local_grammar_correction([are,is,here],[are,here]).
 local_grammar_correction([you,is],[you,are]).
@@ -136,7 +136,7 @@ list_to_atomics_list0([],[]):-!.
 */
 
 
-fully_expand(I,OOF):-copy_term(I,C),flatten([C],FC),fully_expand_0(FC,O),flatten([O],OF),fully_expand_0(OF,OOF).
+eng_fully_expand(I,OOF):-copy_term(I,C),flatten([C],FC),fully_expand_0(FC,O),flatten([O],OF),fully_expand_0(OF,OOF).
 
 fully_expand_0(FC,O):-ccatch(fully_expand_1(FC,O),E,(trace,dmsg(exact_message(error_m(E,fully_expand_1(FC,O)))),fail)),!.
 %fully_expand_0(FC,O):-ccatch((trace,fully_expand_1(FC,O)),_,fail).
@@ -190,7 +190,7 @@ local_term_anglify_first(T,TA):-enter_term_anglify(T,TA).
 
 flatten_append(First,Last,Out):-flatten([First],FirstF),flatten([Last],LastF),append(FirstF,LastF,Out),!.
 
-:-decl_mpred_prolog(local_term_anglify/2).
+:-export(local_term_anglify/2).
 local_term_anglify(Var,[ftCallable(Var)]):- var(Var),!.
 local_term_anglify([Var],[ftCallable([Var])]):- var(Var),!.
 
@@ -217,7 +217,7 @@ local_term_anglify(fN(Obj,argIsaFn(_PathName,_NumTwo)),String):- enter_term_angl
 local_term_anglify(cmdresult(Cmd,Whatnot),[the,command,result,of,Cmd,is,Whatnot]):-!.
 local_term_anglify(string(Obj),[String]):-failOnError(any_to_string(Obj,StringUQ)),atomics_to_string(['"',StringUQ,'"'],"",String).
 % enter_term_anglify(ftCallable(Obj),string(String)):-failOnError(any_to_string(Obj,StringUQ)),atomics_to_string(['(',StringUQ,')'],"",String).
-local_term_anglify(mudAtLoc(Obj,LOC),String):-fully_expand( [fN(Obj,np),is,at,fN(LOC,np)],String).
+local_term_anglify(mudAtLoc(Obj,LOC),String):-eng_fully_expand( [fN(Obj,np),is,at,fN(LOC,np)],String).
 local_term_anglify(mudDescription(Obj,Term),[fN(Obj,np),mudDescription,mudContains,:,string(Term)]).
 local_term_anglify(fN(Obj,X),String):- locationToRegion(Obj,Region), Obj \= Region, enter_term_anglify(fN(Region,X),String),!.
 % should not have searched nouns yet
@@ -265,5 +265,74 @@ anglify_noun_known(Obj,_Hint,StringO):- findall(String,holds_t(nameStrings,Obj,S
 %anglify_noun_known(Obj,_Hint,String):-
 %nameStrings(X,Y,_,_)
 
-
 :-  end_transform_moo_preds.
+
+
+
+detWithSpace(WithSpace,String):-ddeterminer0(String),atom_concat(String,' ',WithSpace).
+detWithSpace(WithSpace,String):-ddeterminer1(String),atom_concat(String,' ',WithSpace).
+
+:-meta_predicate_transparent(determinerRemoved/3).
+determinerRemoved(S0,Det,S):- fail,detWithSpace(WithSpace,String),string_concat(WithSpace,S,S0),string_lower(String,Det).
+
+:-meta_predicate_transparent(query_description/1).
+query_description(mudDescription(I,S)):-  is_asserted(mudDescription(I,S)).
+query_description(dbase_t(mudDescription,I,S)):- is_asserted(mudDescription(I,S));is_asserted(mudKeyword(I,S)).
+
+
+:-meta_predicate_transparent(remove_description/1).
+remove_description(mudDescription(I,S)):- dmsg(trace_or_throw(remove_description(mudDescription(I,S)))).
+
+:-meta_predicate_transparent(add_description/1).
+add_description(mudDescription(I,S)):-add_description(I,S).
+
+:-meta_predicate_transparent(add_description/2).
+add_description(A,S0):-hooked_assertz(mudDescription(A,S0)),fail.
+add_description(A,S0):- atomic(S0),string_concat('#$PunchingSomething ',S,S0),!,add_description(A,S).
+% add_description(A,S0):-determinerRemoved(S0,String,S),!,add_description(A,S),add(determinerString(A,String)).
+add_description(A,S0):-
+   any_to_string(S0,S),
+   atomic_list_concat(Words,' ',S),
+   atomic_list_concat(Sents,'.',S),!,
+   length(Words,Ws),
+   must_det(add_description(A,S,S0,Ws,Sents,Words)).
+
+% mudBareHandDamage: 10d10+75
+add_description(A,S,_S0,Ws,_Sents,_Words):- Ws<3,  
+   atomic_list_concat([K,V],': ',S),!,add_description_kv(A,K,V).
+
+add_description(A,S,_S0,Ws,_Sents,_Words):- Ws<3,
+   atomic_list_concat([K,V],'=',S),!,add_description_kv(A,K,V).
+
+% "NOBACKSTAB","ACT_STAY_ZONE","MEMORY"
+add_description(A,_S,_S0,1,_,[Word]):-add_description_word(A,Word),!.
+
+%#$PunchingSomething ..
+add_description(A,S,S0,Ws,Sents,['#$PunchingSomething',B|C]):-add_description(A,S,S0,Ws,Sents,[B|C]).
+add_description(A,S,S0,Ws,Sents,[Det,B|C]):-ddeterminer(Det,L),add_description(A,S,S0,Ws,Sents,[B|C]),hooked_assertz(determinerString(A,L)).
+add_description(A,S,S0,Ws,_Sents,_Words):-Ws>3,is_here_String(S),text_to_string(S0,String),!,hooked_assertz(descriptionHere(A,String)).
+add_description(A,_S,S0,_Ws,_Sents,_Words):- any_to_string(S0,String),hooked_assertz(mudDescription(A,String)).
+
+is_here_String(S):- atomic_list_concat_safe([_,is,_,here,_],S).
+is_here_String(S):- atomic_list_concat_safe([_,here],S).
+is_here_String(S):- atomic_list_concat_safe([_,is,here,_],S).
+
+
+ddeterminer1('A').
+ddeterminer1('An').
+ddeterminer1('The').
+ddeterminer0(a).
+ddeterminer0(an).
+ddeterminer0(the).
+ddeterminer(L,L):-ddeterminer0(L).
+ddeterminer(U,L):-string_lower(U,L),U\=L,!,ddeterminer0(L).
+
+add_description_word(A,Word):- string_upper(Word,Word),string_lower(Word,Flag),string_to_atom(Flag,Atom),atom_concat(flagged_,Atom,FAtom),add((isa(A,FAtom))).
+add_description_word(A,Word):- string_lower(Word,Word),add((mudKeyword(A,Word))).
+add_description_word(A,Word):- string_lower(Word,Lower),add((mudKeyword(A,Lower))).
+
+
+add_description_kv(A,K,V):- atom_concat('#$PunchingSomething ',Key,K),!,add_description_kv(A,Key,V).
+add_description_kv(A,K,V):- atom_concat('+',Key,K),!,add_description_kv(A,Key,V).
+add_description_kv(A,K,V):-atom_to_value(V,Term),C=..[K,A,Term],show_load_call(add(C)).
+

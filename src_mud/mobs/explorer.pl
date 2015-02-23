@@ -18,7 +18,7 @@
 :-swi_module(tExplorer,[]).
 
 :- include(logicmoo(vworld/moo_header)).
-:- register_module_type(planning).
+% :- register_module_type (planning).
 
 :-decl_type(tExplorer).
 
@@ -26,6 +26,7 @@ vette_idea(Agent,Act,Act):-var(Act),!,dmsg(vette_idea(Agent,Act)).
 vette_idea(_,actSit,actSit):-!.
 vette_idea(Agent,Act,Act):-dmsg(vette_idea(Agent,Act)).
 
+prologHybrid(typeHasGlyph(tCol,ftString)).
 mudLabelTypeProps('Px',tExplorer,[]).
 
 user:world_agent_plan(_World,Agent,ActV):-
@@ -97,4 +98,4 @@ explorer_idea(Agent,actLook) :-
 	add(mudMemory(Agent,aDirectionsFn(New))).
 
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

@@ -11,15 +11,15 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(utility).
+% :- register_module_type (utility).
 
 % live another day to fight (meaning repl_to_string/1 for now is in prolog)
 % local_decl_db_prop(repl_writer(tAgentGeneric,term),[prologSingleValued,argSingleValueDefault(2,default_repl_writer)]).
 % local_decl_db_prop(repl_to_string(tAgentGeneric,term),[prologSingleValued,argSingleValueDefault(2,default_repl_obj_to_string)]).
 
-:-decl_mpred_prolog(default_repl_writer/4).
+:-export(default_repl_writer/4).
 default_repl_writer(_TL,N,Type,V):-copy_term(Type,TypeO),ignore(TypeO=o),  ( TypeO == o -> fmt('~q= ~q.~n',[N,V]) ; fmt('~q=D(~w) ~q.~n',[N,TypeO,V])).
-:-decl_mpred_prolog(default_repl_obj_to_string/3).
+:-export(default_repl_obj_to_string/3).
 default_repl_obj_to_string(O,Type,Out):- copy_term(Type,TypeO), ignore((TypeO = o )), ( TypeO == o -> Out=O ; Out = stringD(TypeO,O)).
 
 
@@ -28,11 +28,11 @@ default_repl_obj_to_string(O,Type,Out):- copy_term(Type,TypeO), ignore((TypeO = 
 canUseEnglish:-true.
 
 
-:-decl_mpred_prolog(show_kb_preds/2).
+:-export(show_kb_preds/2).
 show_kb_preds(Agent,List):- mmake,
       show_kb_preds(Agent,_,List).
 
-:-decl_mpred_prolog(show_kb_preds/3).
+:-export(show_kb_preds/3).
 show_kb_preds(Agent,LOC,List):-
     must_det_l([       
         ignore((once(mudAtLoc(Agent,LOC);localityOfObject(Agent,LOC)))),
@@ -45,7 +45,7 @@ show_kb_preds(Agent,LOC,List):-
 
 
 
-:-decl_mpred_prolog(show_kb_via_pred/3).
+:-export(show_kb_via_pred/3).
 show_kb_via_pred(_,_,[]).
 show_kb_via_pred(WPred,ToSTR,[L|List]):-!,
    show_kb_via_pred(WPred,ToSTR,L),
@@ -55,7 +55,7 @@ show_kb_via_pred(WPred,ToSTR,L):-!,
 
 
 
-:-decl_mpred_prolog(show_kb_via_pred_0/3).
+:-export(show_kb_via_pred_0/3).
 
 show_kb_via_pred_0(WPred,ToSTR,listof(Call)):- contains_var(Call,value),subst(Call,value,P,PCall),subst(Call,value,PS,PSCall),!,
                                                show_kb_via_pred_0(WPred,ToSTR,forEach(findall(P,PCall,PS),fmt(PSCall))).
@@ -182,4 +182,4 @@ fmt_holds_tcall_pred(WPred,ToSTR,N,Type,V0):-fmt_holds_tcall_pred_trans(WPred,To
 fmt_holds_tcall_pred_trans(WPred,ToSTR,N,Type,V0):-must((debugOnError(call(ToSTR,V0,Type,V)),!,debugOnError(call(WPred,_Tn,N,Type,V)))).
 
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

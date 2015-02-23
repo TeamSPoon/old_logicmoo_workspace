@@ -11,22 +11,22 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(mtCommand).
+% :- register_module_type (mtCommand).
 
-:- dynamic_multifile_exported(found_undef/3).
+:- export(found_undef/3).
 found_undef(_,_,_).
 :- dynamic undef/2.
 
 /*
 % when we import new and awefull code base (the previous )this can be helpfull
 % we redfine list_undefined/1 .. this is the old version
-:- dynamic_multifile_exported(scansrc_list_undefined/1).
+:- export(scansrc_list_undefined/1).
 scansrc_list_undefined(_):-!.
 scansrc_list_undefined(A):- real_list_undefined(A).
 
 list_undefined:-real_list_undefined([]).
 
-:- dynamic_multifile_exported(real_list_undefined/1).
+:- export(real_list_undefined/1).
 real_list_undefined(A):-
  merge_options(A, [module_class([user])], B),
         prolog_walk_code([undefined(trace), on_trace(found_undef)|B]),
@@ -40,7 +40,7 @@ real_list_undefined(A):-
         ).
 
 
-:- dynamic_multifile_exported(remove_undef_search/0).
+:- export(remove_undef_search/0).
 remove_undef_search:- ((
  '@'(use_module(library(check)),'user'),
  redefine_system_predicate(check:list_undefined(_)),
@@ -108,4 +108,4 @@ include_moo_file_ni_1(M):- source_file_property(_,includes(M)),!.
 include_moo_file_ni_1(M):- user_ensure_loaded(M).
 
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

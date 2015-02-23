@@ -1398,7 +1398,8 @@ must_not_repeat(C):-call(C).
 % ===================================================
 
 
-memberchk_same(X, [Y|Ys]) :- (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (nonvar(Ys),memberchk_same(X, Ys) )).
+% memberchk_same(X, [Y|Ys]) :- (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (nonvar(Ys),memberchk_same(X, Ys) )).
+memberchk_same(X, [Y|Ys]) :- (   X =@= Y ->  (var(X) -> X==Y ; false) ;   (nonvar(Ys),memberchk_same(X, Ys) )).
 
 
 no_repeats_av:-tlbugger:attributedVars.
@@ -2603,17 +2604,17 @@ show_call0(C):- C. % debugOnError0(C). % dmsg(show_call(C)),C.
 :- meta_predicate_transparent show_call(0).
 show_call(M:add(A)):-!, show_call0(M:add(A)),!.
 % show_call(M:must(C)):- !, M:must(C).
-show_call(C):-one_must((show_call0(C),dmsg(succeed(C))),((dmsg(failed_show_call(C)),!,fail))).
+show_call(C):-one_must((show_call0(C),dmsg(succeed(C))),((dmsg(failed_show_call(C)),garbage_collect_atoms,!,fail))).
 
 :- meta_predicate_transparent show_call_failure(0).
-show_call_failure(C):-one_must((show_call0(C)),((dmsg(failed_show_call(C)),!,fail))).
+show_call_failure(C):-one_must((show_call0(C)),((dmsg(failed_show_call(C)),garbage_collect_atoms,!,fail))).
 
 :- meta_predicate_transparent show_call_success(0).
 show_call_success(C):- show_call0(C),dmsg(show_call_success(C)).
 
 :- meta_predicate_transparent logOnFailure(0).
 :- export(logOnFailure/1).
-logOnFailure(C):-one_must(C,(dmsg(failed_show_call(C)),!,fail)).
+logOnFailure(C):-one_must(C,(dmsg(failed_show_call(C)),garbage_collect_atoms,!,fail)).
 
 
 :-dynamic(user:logLevel/2).

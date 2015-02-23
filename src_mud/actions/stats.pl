@@ -10,7 +10,7 @@
 */
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(mtCommand).
+% :- register_module_type (mtCommand).
 
 % ====================================================
 % show the stats system
@@ -63,4 +63,4 @@ your ability to command your own destiny.
 user:action_info(actGrep(isOptional(ftTerm,isSelfAgent)), "Examine MUD listing of something").
 user:agent_call_command(_Gent,actGrep(Obj)):- term_listing(Obj).
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

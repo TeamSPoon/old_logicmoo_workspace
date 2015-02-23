@@ -15,7 +15,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(mtCommand).
+% :- register_module_type (mtCommand).
 
 % :- begin_transform_moo_preds.
 
@@ -114,4 +114,4 @@ user:agent_call_command(Agent,actGo(Dir)) :-
 	call_update_charge(Agent,actMove).
 
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

@@ -10,7 +10,7 @@
 */
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(mtCommand).
+% :- register_module_type (mtCommand).
 
 
 
@@ -18,7 +18,7 @@
 % item rez (to mudStowing inventory)
 % ====================================================
 
-:-decl_mpred_prolog(rez_to_inventory/3).
+:-export(rez_to_inventory/3).
 rez_to_inventory(Agent,NameOrType,NewObj):-   
   must_det_l([
    create_meta(NameOrType,Clz,tItem,NewObj),
@@ -48,7 +48,7 @@ user:agent_call_command(Agent,actCreate(SWhat)):- with_all_dmsg(must_det(create_
 :-decl_mpred_prolog(authorWas(ftTerm,ftTerm)).
 :-decl_mpred_prolog(current_pronoun(tAgentGeneric,ftString,ftTerm)).
 
-:-decl_mpred_prolog(create_new_object/2).
+:-export(create_new_object/2).
 
 create_new_object(Agent,[tCol,NameOfType|DefaultParams]):-!,create_new_type(Agent,[NameOfType|DefaultParams]).
 
@@ -63,7 +63,7 @@ create_new_object(Agent,[NameOrType|Params]):-
    must((isa(NewObj,tItem),padd(Agent,mudStowing(NewObj)))),
    add_missing_instance_defaults(NewObj).
 
-:-decl_mpred_prolog(create_new_type/2).
+:-export(create_new_type/2).
 create_new_type(Agent,[NewObj|DefaultParams]):-
    decl_type(NewObj),
    padd(NewObj,authorWas(create_new_type(Agent,[NewObj|DefaultParams]))),
@@ -76,4 +76,4 @@ getPropInfo(_Agent,_NewName,PropsIn,N,[comment(ftText(need,to,actParse,PropsIn,N
 
 
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

@@ -58,7 +58,7 @@ pttp_test(chang_lee_example2,
 %%%   this is problem GRP003-1 in TPTP
 %%% SOURCE
 
-:- export(chang_lee_example3/0).
+:-export(chang_lee_example3/0).
 pttp_test(chang_lee_example3,
 	((
           p(e,X,X),

@@ -50,13 +50,13 @@ user:semweb_startup :- register_ros_package(milo).
 % [Optionaly] register/run EulerSharp robot services (we use it for the ontology mainly)
 user:semweb_startup :- register_ros_package(euler).
 
-:- with_no_term_expansions(if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop.pl'))).
+:- with_assertions(user:prolog_mud_disable_term_expansions,if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop.pl'))).
 :- current_predicate(egg_go/0)->egg_go;true.
 
 % [Manditory] run_tests (includes run_common)
-:- include(run_tests).
+% :- include(run_tests).
 % OR
-% :- include(run_common).
+:- include(run_common).
 
 % [Optionaly] remove debug noises
 % user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),show_call(asserta(prolog_debug:debugging(http(X), false, O)))).
@@ -72,13 +72,17 @@ user:semweb_startup :- register_ros_package(euler).
 % this is what happens when the world is not found
 % :- add_game_dir('../games/src_game_unknown',prolog_repl).     
 
+tCol(tLivingRoom).
+subclass(tLivingRoom,tRegion).
+subclass(tOfficeRoom,tRegion).
 :- onSpawn(pathConnects(tLivingRoom,tOfficeRoom)).
-
+:- prolog.
+:- ensure_some_pathBetween.
 % int_firstOrder(some_query, 666, What, C, E, A, J, D, L, B)
 % :- forall(clause(user:mud_regression_test,Call),must(Call)).
 
-:- declare_load_game('../games/src_game_nani/a_nani_household.plmoo').
-:- declare_load_game('../games/src_game_nani/objs_misc_household.plmoo').
+:- declare_load_dbase('../games/src_game_nani/a_nani_household.plmoo').
+% :- declare_load_dbase('../games/src_game_nani/objs_misc_household.plmoo').
 
 % the following 4 worlds are in version control in examples
 % :- add_game_dir('../games/src_game_wumpus',prolog_repl).       
@@ -89,8 +93,8 @@ user:semweb_startup :- register_ros_package(euler).
 %:- add_game_dir('../games/src_game_startrek',prolog_repl).
 
 tAgentGeneric(iCommanderData66).
-instance(iCommanderData66,'tMonster').
-instance(iCommanderData66,'tExplorer').
+isa(iCommanderData66,'tMonster').
+isa(iCommanderData66,'tExplorer').
 wearsClothing(iCommanderData66,'iBoots673').
 wearsClothing(iCommanderData66,'iComBadge674').
 wearsClothing(iCommanderData66,'iGoldUniform675').
@@ -105,20 +109,21 @@ tAgentGeneric(iExplorer77).
 wearsClothing(iExplorer77,'iBoots7773').
 wearsClothing(iExplorer77,'iComBadge7774').
 wearsClothing(iExplorer77,'iGoldUniform7775').
-instance(iExplorer77,'tExplorer').
+isa(iExplorer77,'tExplorer').
 mudStowing(iExplorer77,'iPhaser7776').
 pddlSomethingIsa('iBoots7773',['tBoots','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iComBadge7774',['tComBadge','ProtectiveAttire','PortableObject','tNecklace']).
 pddlSomethingIsa('iGoldUniform7775',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iPhaser7776',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
-instance(iExplorer77,'tExplorer').
-localityOfObject(iExplorer77,'tLivingRoom').
+isa(iExplorer77,'tExplorer').
 
-:- prolog.
+:-onSpawn(localityOfObject(iExplorer77,'tLivingRoom')).
+
 
 % [Manditory] This loads the game and initializes so test can be ran
 :- if_startup_script( at_start(finish_processing_world)).
 
+:- prolog.
 % :- if_startup_script( doall(now_run_local_tests_dbg)).
 
 :-enqueue_player_command(actWho).

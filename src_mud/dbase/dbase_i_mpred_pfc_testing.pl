@@ -10,35 +10,41 @@
 
 :- include(dbase_i_header).
 
+user:term_expansion(A,B):- once(pfc_file_expansion(A,B)),A\=@=B.
+
 :- pfcTrace.
 %:- pfcWatch.
 :- pfcWarn.
 next_test :- sleep(1),pfcReset.
 
-end_of_file.
+:-dynamic((disjointWith/2,subclass/2)).
 
-disjointWith(P1,P2) , subclass(C1,P1),subclass(C2,P2) => disjointWith(C1,C2).
-
-disjointWith(P1,P2) , subclass(C1,P1) =>    disjointWith(C1,P2).
-
-disjointWith(P1,P2) =>  ((subclass(C1,P1),subclass(C2,P2) => disjointWith(C1,C2))).
-:-prolog.
-tCol(Col) => isa(Col,tCol).
-
-isa(I,Sub), subclass(Sub, Super) => isa(I,Super).
+(disjointWith(P1,P2) , subclass(C1,P1)) =>    disjointWith(C1,P2).
+disjointWith(Sub, Super) => disjointWith( Super, Sub).
+disjointWith(tObj,tRegion).
+disjointWith(ttSpatialType,ttAbstractType).
 
 
+tCol(Col) <=> isa(Col,tCol).
 
-isa(I,Sub), disjointWith(Sub, Super) => not(isa(I,Super)).
+(isa(I,Sub), subclass(Sub, Super)) => isa(I,Super).
+
+
+
+(isa(I,Sub), disjointWith(Sub, Super)) => not(isa(I,Super)).
 
 subclass(tPartOfobj,tItem).
 
-dividesBetween(tItem,tPathways).
+% dividesBetween(tItem,tPathways).
+dividesBetween(tItem,tMassfull,tMassless).
+dividesBetween(tObj,tItem,tAgentGeneric).
+dividesBetween(tObj,tMassfull,tMassless).
+dividesBetween(tSpatialThing,tObj,tRegion).
 dividesBetween(tAgentGeneric,tPlayer,tNpcPlayer).
 
+dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , subclass(C1,S) ,subclass(C2,S)).
 
-
-disjointWith(P1,P2) => (isa(C,P1) <=> isa(C,P2)).
+disjointWith(P1,P2) => (not(isa(C,P1)) <=> isa(C,P2)).
 
 isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
 
@@ -48,10 +54,10 @@ isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
 => tCol(tRelation).
 => tCol(ttSpatialType).
 => tCol(ttFormatType).
-=> tCol(macroDeclarer).
+=> tCol(functorDeclares).
 % tCol(ArgsIsa):-is_pred_declarer(ArgsIsa).
 % TODO decide if OK
-%tCol(F):-hasInstance(macroDeclarer,F).
+%tCol(F):-hasInstance(functorDeclares,F).
 => tCol(ttFormatType).
 => tCol(vtActionTemplate).
 => tCol(tRegion).
@@ -59,8 +65,6 @@ isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
 
 isa(tRegion,ttSpatialType).
 isa(tRelation,ttAbstractType).
-
-:-prolog.
 
 
 
@@ -87,22 +91,15 @@ not(P), P => conflict(P).
 
 
 
-
-
-:-prolog.
-
-
-
-
   % -*-Prolog-*-
-% here is an example which defines default facts and rules.  Will it work?
+% here is an example which defines pfcDefault facts and rules.  Will it work?
 
-(default(P)/pfcAtom(P))  =>  (~not(P) => P).
+(pfcDefault(P)/pfcAtom(P))  =>  (~not(P) => P).
 
-default((P => Q))/pfcAtom(Q) => (P, ~not(Q) => Q).
+pfcDefault((P => Q))/pfcAtom(Q) => (P, ~not(Q) => Q).
 
-% birds fly by default.
-=> default((bird(X) => fly(X))).
+% birds fly by pfcDefault.
+=> pfcDefault((bird(X) => fly(X))).
 
 % here's one way to do an isa hierarchy.
 % isa = subclass.
@@ -119,12 +116,15 @@ isa(C1,C2) =>
 penguin(X) => not(fly(X)).
 
 % chilly is a penguin.
-:-(add(=> penguin(chilly))).
+:-(pfcAdd(=> penguin(chilly))).
 
 % rtrace(Goal):- Goal. % (notrace((visible(+all),visible(+unify),visible(+exception),leash(-all),leash(+exception))),(trace,Goal),leash(+all)).
 
 % :- gutracer.
 
+
+:-prolog.
+end_of_file.
 
 :-next_test.
 :-debug.
@@ -244,7 +244,6 @@ parse(Words) :-
   parse(Words,Id),
   format("~Nsentence id = ~w",Id),
   show(Id,sentence(X)).
-
 
 parse(Words,Id) :- 
   gen_s_tag(Id),
@@ -480,7 +479,7 @@ host_name(User,Host)
   user(User,Name,Host).
 
 
-% the default full_name for a user is 'unknown'.
+% the pfcDefault full_name for a user is 'unknown'.
 user(User),
 ~full_name(User,X)/(X\==unknown)
   =>
@@ -488,7 +487,7 @@ full_name(User,unknown).
   
 
 
-% the default host_name for a user is 'unknown'.
+% the pfcDefault host_name for a user is 'unknown'.
 user(User),
 ~host_name(User,X)/(X\==unknown)
   =>
@@ -617,7 +616,7 @@ not(subsumes(C1,C2)) <=
   type(C2,R,T2),
   not(subsume(T1,T2)).
 
-:-dynamic_multifile_exported otherGender/2.
+:-export otherGender/2.
 :-next_test. % ==
 
 % kinship domain example.
@@ -651,7 +650,7 @@ spouse(P1,P2), spouse(P1,P3), {P2\==P3} =>
    bigamist(P1), 
    {format("~N~w is a bigamist, married to both ~w and ~w~n",[P1,P2,P3])}.
 
-% here is an example of a default rule
+% here is an example of a pfcDefault rule
 
 parent(P1,X), 
   parent(P2,X)/(P1\==P2),
@@ -733,14 +732,14 @@ prove_by_contradiction(P) :-
 :-prolog.
 
 :-next_test. % ==
-% here is an example which defines default facts and rules.  Will it work?
+% here is an example which defines pfcDefault facts and rules.  Will it work?
 
-(default(P)/pfcAtom(P))  =>  (~not(P) => P).
+(pfcDefault(P)/pfcAtom(P))  =>  (~not(P) => P).
 
-default((P => Q))/pfcAtom(Q) => (P, ~not(Q) => Q).
+pfcDefault((P => Q))/pfcAtom(Q) => (P, ~not(Q) => Q).
 
-% birds fly by default.
-=> default((bird(X) => fly(X))).
+% birds fly by pfcDefault.
+=> pfcDefault((bird(X) => fly(X))).
 
 % here's one way to do an isa hierarchy.
 % isa = subclass.

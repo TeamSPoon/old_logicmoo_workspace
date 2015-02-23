@@ -15,6 +15,8 @@
 % See the the seemingly white (not dirrectly usable) in some tUsefull way
 defined_affordance([subjType= "Passable",actionVerb= "TravelThru"]).
 
+prologHybrid(mudDescription(ftTerm,ftString),prologHybrid).
+prologHybrid(nameStrings(ftTerm,ftString)).
 
 defined_affordance([subjType= "Television",
 stringMatch= "TV",

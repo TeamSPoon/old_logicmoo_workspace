@@ -13,7 +13,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(mtCommand).
+% :- register_module_type (mtCommand).
 
 vtActionTemplate(actDrop(tDropAble)).
 
@@ -38,4 +38,4 @@ user:agent_text_command(Agent,[actDrop,X],Agent,actDrop(X)).
 
 %:-must_det(show_call(get_agent_text_command(agent1,[drop,item1],_R,_CMD))).
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

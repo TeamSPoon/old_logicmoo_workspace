@@ -37,7 +37,7 @@ alt_forms1(AR,P,NP):-compound(P),P=..[F,A,B|R],alt_forms2(AR,F,A,B,R,NP).
 % alt_forms2(r,F,A,B,R,NP):-genlPreds(F,FF),NP=..[FF,A,B|R].
 alt_forms2(r,F,A,B,R,NP):-genlPreds(FF,F),NP=..[FF,A,B|R].
 
-user:decl_database_hook(change( retract,Kind),P):- forall(alt_forms(r,P,NP),ignore(database_op(change( retract,Kind),NP))).
+user:decl_database_hook(change( retract,Kind),P):- forall(alt_forms(r,P,NP),ignore(dbase_op(change( retract,Kind),NP))).
 
 
 
@@ -57,7 +57,7 @@ run_deduce_facts_from(Type,Fact):-loop_check_local(run_deduce_facts_from_lc(Type
 run_deduce_facts_from_lc(Type,Fact):-doall((call_no_cuts(deduce_facts_forward(Fact,Deduction)),add_deduction(Type,Deduction,Fact))).
 
 
-user:decl_database_hook(change(assert,_),BadFact):-bad_fact_why(BadFact,WHY),trace_or_throw(bad_fact_why(BadFact,WHY)).
+user:decl_database_hook(change(assert,_),BadFact):-mpred_call(tms_reject_why(BadFact,WHY)),trace_or_throw(tms_reject_why(BadFact,WHY)).
 
 
 deduce_facts_forward(Fact,mpred_prop(AF,[predArgTypes(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],is_pred_declarer(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,
@@ -71,8 +71,8 @@ deduce_facts_forward(mpred_prop(F,predArgTypes(ArgTs)),argIsa(F,A,Type)):-arg(A,
 
 deduce_facts_forward(argIsa(F,_A,Type),[isa(Type,tCol),isa(F,tRelation)]):-atom(Type),not(hasInstance(ttFormatType,Type)).
 
-%deduce_facts_forward(B,A):- is_asserted(ruleEquiv(B,A)),not(contains_singletons(A)).
-%deduce_facts_forward(B,A):- is_asserted(ruleEquiv(A,B)),not(contains_singletons(A)).
+%deduce_facts_forward(B,A):- is_asserted('<=>'(B,A)),not(contains_singletons(A)).
+%deduce_facts_forward(B,A):- is_asserted('<=>'(A,B)),not(contains_singletons(A)).
 deduce_facts_forward(Term,NewTerm):- current_predicate(good_for_chaining/2),
   hotrace(good_for_chaining(Op,Term)), db_rewrite(Op,Term,NewTerm),not(contains_singletons(NewTerm)).
 
@@ -108,6 +108,52 @@ add_deduction_lc(Type,Fact,How):-dmsg(add_deduction(Type,Fact,'_________from____
 do_deduction_type(change(assert,_),Fact):-add(Fact).
 do_deduction_type(change( retract,_),Fact):-functor(Fact,F,A),(F=isa;F=mpred_prop;A=1),!.
 do_deduction_type(change( retract,_),Fact):-clr(Fact).
+
+
+
+
+learnArgIsa(P,N,_):-argIsa_asserted(P,N,_),!.
+learnArgIsa(P,N,T):-dmsg((skipping(learnArgIsa(P,N,T)))),!.
+learnArgIsa(P,N,T):-grtrace, add(argIsa(P,N,T)).
+
+learnArgIsaInst(K,Num,Arg):-integer(Arg),!,learnArgIsa(K,Num,ftInt).
+learnArgIsaInst(K,Num,Arg):-number(Arg),!,learnArgIsa(K,Num,ftNumber).
+learnArgIsaInst(_,_,_).
+
+
+
+deduce_facts(Fact,isa(Arg,Type)):- test_tl(agenda_slow_op_do_prereqs),agenda_slow_op_enqueue(deduce_argIsa_facts(Fact,Arg,Type)).
+
+nonusefull_deduction_type(ftTerm).
+nonusefull_deduction_type(ftVoprop).
+nonusefull_deduction_type(vtDirection).
+nonusefull_deduction_type(Type):-ttSpatialType(Type),!,fail.
+nonusefull_deduction_type(tObj).
+nonusefull_deduction_type(Type):-is_asserted(ttFormatType(Type)).
+
+assert_deduced_arg_isa_facts(Fact):- !, ignore(((ground(Fact),forall(deduce_argIsa_facts(Fact,Arg,Type),show_call(add(isa(Arg,Type))))))).
+
+assert_deduced_arg_isa_facts(Fact):- agenda_slow_op_enqueue(assert_deduced_arg_isa_facts_0(Fact)),!.
+assert_deduced_arg_isa_facts_0(Fact):- ignore(((ground(Fact),forall(deduce_argIsa_facts(Fact,Arg,Type),show_call(add(isa(Arg,Type))))))).
+
+
+deduce_argIsa_facts(Fact,Arg,Type):- ground(Fact), functor(Fact,F,A),A>1, deduce_from_predicate(F), arg(N,Fact,Arg),ground(Arg),
+   call_argIsa_ForAssert(F,N,Type),sanity(atom(Type)),sanity(ground(Arg)).
+
+never_deduce_from_predicate(isa).
+never_deduce_from_predicate(mpred_prop).
+never_deduce_from_predicate(mpred_arity).
+never_deduce_from_predicate(subclass).
+never_deduce_from_predicate(typeProps).
+never_deduce_from_predicate(P):-mpred_arity(P,1).
+never_deduce_from_predicate(P):-mpred_prop(P,ftCallable).
+never_deduce_from_predicate(P):-argIsa_asserted(P,_,tCol).
+never_deduce_from_predicate(P):-argIsa_asserted(P,_,ftVoprop).
+
+deduce_from_predicate(Never):-never_deduce_from_predicate(Never),!,fail.
+deduce_from_predicate(P):-mpred_prop(P,_).
+deduce_from_predicate(_).
+
 
 /*
 a :- b. % a if b

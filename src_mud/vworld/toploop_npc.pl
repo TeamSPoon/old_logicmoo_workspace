@@ -99,7 +99,7 @@ warnOnError(X):-catch(X,E,dmsg(error(E:X))).
 
 user:agent_call_command(Agent,actProlog(C)) :- true,must(nonvar(C)),agent_call_safely(Agent,C).
 
-:-decl_mpred_prolog(agent_call_safely/2).
+:-export(agent_call_safely/2).
 agent_call_safely(_Agnt,C):- any_to_callable(C,X,Vars), !, gensym(result_count_,RC),flag(RC,_,0),agent_call_safely(RC,X,Vars),flag(RC,CC,CC),fmt(result_count(CC)).
 agent_call_safely(RC,X,[]) :- !, '@'(notrace((warnOnError(doall(((X,flag(RC,CC,CC+1),fmt(cmdresult(X,true)))))))),user).
 agent_call_safely(RC,X,Vars) :-  '@'(notrace((warnOnError(doall(((X,flag(RC,CC,CC+1),fmt(cmdresult(X,Vars)))))))),user).
@@ -116,4 +116,4 @@ user:agent_call_command(_Agent,actIdea(Who)) :-  must(command_actIdea(Who,Idea))
 user:agent_call_command(_Agent,actTock) :- npc_tick.
 user:agent_call_command(_Agent,actTick(Other)) :-user:agent_call_command(Other,actTick).
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

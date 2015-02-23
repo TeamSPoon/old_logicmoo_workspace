@@ -16,7 +16,7 @@
         last_test_name/1,
         test_call/1]).
 
-:- decl_thlocal was_test_name/1.
+:- thread_local was_test_name/1.
 
 :- meta_predicate_transparent test_call(+).
 :- meta_predicate_transparent run_mud_test(+,+).
@@ -28,7 +28,7 @@
 % :- trace,leash(+all),meta_predicate_transparent run_mud_tests().
 
 :- include(logicmoo(vworld/moo_header)).
-:- register_module_type(utility).
+% :- register_module_type (utility).
 
 % do some sanity testing (expects the startrek world is loaded)
 run_mud_tests:-

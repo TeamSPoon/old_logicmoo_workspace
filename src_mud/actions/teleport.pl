@@ -17,7 +17,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(mtCommand).
+% :- register_module_type (mtCommand).
 
 % teleport
 user:action_info(actTeleport(isOptional(isAnd([tObj,isNot(tRegion)]),isSelfAgent),isOptionalStr("to"),isOptional(tRegion,isRandom(tRegion))),"teleport [obj] [to] [somewhere]").
@@ -34,4 +34,4 @@ user:agent_call_command(_Agent,actTeleport(Other,_TO,Where)):-
    add(mudAtLoc(Target,Where3D)).
 
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

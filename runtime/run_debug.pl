@@ -81,7 +81,7 @@ mud_test_local :- if_flag_true(was_run_dbg_pl,at_start(must_det(run_mud_tests)))
 /*
 
 explorer(player1)> prolog statistics
-notice(you,begin(you,prologCall(statistics)))
+notice(you,begin(you,mpred_call(statistics)))
 statistics.
 188.523 seconds cpu time for 282,024,744 inferences
 1,004,265 atoms, 14,959 functors, 11,578 predicates, 176 modules, 268,104,937 VM-codes

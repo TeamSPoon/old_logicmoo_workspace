@@ -10,7 +10,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(mtCommand).
+% :- register_module_type (mtCommand).
 
 user:action_info(actDrink(tDrinkAble),"Drink a Drinkable Item").
 
@@ -25,4 +25,4 @@ user:agent_call_command(Agent,actDrink(Obj)) :-
 
 update_charge(Agent,actDrink) :- add(mudEnergy(Agent,-1)).
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

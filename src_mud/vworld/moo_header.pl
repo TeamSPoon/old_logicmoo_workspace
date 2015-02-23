@@ -32,6 +32,8 @@
 :- multifile user:agent_text_command/4.
 :- multifile user:check_permanence/4.
 
-:- include(logicmoo(dbase/dbase_i_header)).
+% :- include(logicmoo(dbase/dbase_i_header)).
 
-:-must(not(mpred_prop(dbase_t,prologHybrid))).
+:-ensure_loaded(logicmoo(dbase/dbase)).
+
+% :-must(not(mpred_prop(dbase_t,prologHybrid))).

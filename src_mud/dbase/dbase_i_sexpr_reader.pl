@@ -183,7 +183,8 @@ if_script_file_time(X):-if_startup_script(time(X)).
               (cons (car x) (append (cdr x) y))
             y))
 
-        (append '(a b) '(3 4 5))")).
+        (append '(a b) '(3 4 5))"
+)).
 
     %@ V = [append, [a, b, 3, 4, 5]].
     
@@ -196,7 +197,8 @@ if_script_file_time(X):-if_startup_script(time(X)).
             (if (= 1 n)
                 1
               (+ (fib (- n 1)) (fib (- n 2))))))
-        (fib 24)")).
+        (fib 24)"
+)).
 
     %@ % 14,255,802 inferences, 3.71 CPU in 3.87 seconds (96% CPU, 3842534 Lips)
     %@ V = [fib, 46368].
@@ -212,7 +214,8 @@ if_script_file_time(X):-if_startup_script(time(X)).
               f2
             (fib1 f2 (+ f1 f2) (+ i 1) to)))
 
-        (fib 250)")).
+        (fib 250)"
+)).
 
     %@ % 39,882 inferences, 0.010 CPU in 0.013 seconds (80% CPU, 3988200 Lips)
     %@ V = [fib, fib1, 7896325826131730509282738943634332893686268675876375].
@@ -228,7 +231,8 @@ if_script_file_time(X):-if_startup_script(time(X)).
             (setq i (+ i 1)))
           (car f))
 
-        (fib 350)")).
+        (fib 350)"
+)).
 
     %@ % 34,233 inferences, 0.010 CPU in 0.010 seconds (98% CPU, 3423300 Lips)
     %@ V = [fib, 6254449428820551641549772190170184190608177514674331726439961915653414425].
@@ -263,7 +267,7 @@ if_script_file_time(X):-if_startup_script(time(X)).
 % Sample use (on a SUN):
 %
 %  $ prolog
-%  | ?- restore('sc.bin').         (load the compiler's image)
+%  | ?- restore('sc.bin').         (load the compiler''s image)
 %  | ?- ex.
 %  Input file name (.scm) : test
 %  Input file is "test.scm"
@@ -288,8 +292,8 @@ if_script_file_time(X):-if_startup_script(time(X)).
 %     though; the stack could be copied by call-with-current-continuation
 %     and restored by a call to the continuation)
 %   - there is no garbage-collector and heap-overflow is not checked
-%   - list constants will cause the assembly to abort (this is a restriction
-%     caused by the SUN's assembler not the Scheme compiler) however, you
+%   - list constants will cause the assembly to abort [this is a restriction
+%     caused by the SUN''s assembler not the Scheme compiler] however, you
 %     can use 'cons' to build a list at execution time
 %   - symbols are not interned (i.e. symbol constants with the same name at
 %     two different places are not eq?)
@@ -488,7 +492,7 @@ sexpr_string([]) --> """", !.
 sexpr_string([C|S]) --> chr(C), sexpr_string(S).
 
 chr(92) --> "\\", !.
-chr(34) --> "\""", !.
+chr(34) --> "\"", !.
 chr(N)  --> [C], {C >= 32, N is C}.
 
 sym_or_num(E) --> [C], {sym_char(C)}, sym_string(S), {string_to_atom([C|S],E)}.
@@ -510,7 +514,10 @@ digit(N) --> [C], {C >= 48, C =<57, N is C-48}.
 
 sexpr(E,C,X,Z) :- white([C|X],Y), sexpr(E,Y,Z).
 
-sym_char(C) :- C > 32, \+ memb(C,";()#""',`").
+% dquote semicolon parens  hash qquote comma, backquote
+sym_char(C) :- C > 32, not(member(C,[34,59,40,41,35,39,44,96])).  
+
+
 
 string_to_atom(S,N) :- number(N,S,[]), !.
 string_to_atom(S,I) :- lowcase(S,L), name(I,L).
@@ -931,7 +938,7 @@ non_gc(chr(N),Value) :- Value is N*2-131071.
 
 data_reg(N) :- integer(N), 1 =< N, N =< 4.
 
-emit_non_gc(Value,Dest) :- -128=<Value, Value<128, \+ data_reg(Dest), !,
+emit_non_gc(Value,Dest) :- -128=<Value, Value<128, '\\+'(data_reg(Dest)), !,
     opcode(moveq), immediate(Value), comma, dregister(0), newline,
     emit(move(0,Dest)).
 emit_non_gc(Value,Dest) :- -128=<Value, Value<128, Dest>=0, !,
@@ -1058,7 +1065,7 @@ free_var(V,Env,[V]).
 
 % Normalization of expressions.
 
-% The input is an S-expression that follows Scheme's syntax for expressions.
+% The input is an S-expression that follows Scheme''s syntax for expressions.
 % The resulting expression will only contain the following structures:
 %
 %   cst(C)        a constant of value 'C'
@@ -1076,7 +1083,7 @@ free_var(V,Env,[V]).
 % self-recursive expressions (such as 'letrec's, 'define's, etc...).
 % They are converted first by doing a topological sort on the sub-expressions
 % according to the variable dependencies between them.  The equivalent of a
-% cascade of 'let's is generated for the expressions which are not really
+% cascade of 'let''s is generated for the expressions which are not really
 % recursive.  When they really are recursive (i.e. a cycle has been discovered
 % while doing the topological sort), a method involving a kind of 'Y' operator
 % is used.  I will not describe it in detail but here is an example that gives
@@ -1101,7 +1108,8 @@ free_var(V,Env,[V]).
 %
 % is transformed into the equivalent of:
 %
-% (let ((loop 'undefined))
+% (let ((loop '
+%                 undefined))
 %   (set! loop (lambda () (loop)))
 %   (set! loop read))
 
@@ -1134,6 +1142,9 @@ parameters(Param_pattern,Params,Kind) :- params(Param_pattern,Kind,[],Params).
 params([],none,P,P) :- !.
 params([V|Tail],R,P1,P3) :- !, param_add(V,P1,P2), params(Tail,R,P2,P3).
 params(V,rest,P1,P2) :- param_add(V,P1,P2).
+
+
+:- op(900,fy,(\+)).
 
 param_add(V,_,_) :- \+ symbol(V), !,
     error("Variable name must be a symbol").
@@ -1803,6 +1814,8 @@ remove_node(X,[node(Y,N1,Info)|Tail1],[node(Y,N2,Info)|Tail2]) :-
 
 end_of_file.
 
+end_of_file.
+
                         SIS Compiler documentation
 
                 (Straightforward Implementation of Scheme)
@@ -1830,13 +1843,13 @@ The compiler comes with the following files:
 
 To use the compiler, write the scheme program you want to compile into a
 file; the file must have the extension '.scm' (for the sake of brevity
-let's call it 'source.scm').  Then start your Prolog and load 'sc'.  Type
+let''s call it 'source.scm').  Then start your Prolog and load 'sc'.  Type
 the query 'ex.' to start the compiler.  It will then ask for the name of
-the file to compile; type the file's name without the extension (ie.
+the file to compile; type the file''s name without the extension (ie.
 source).  A trace of the compilation phases should appear.  The file
 'source.s' will be generated which contains an MC68000 assembly language
 program.  Exit Prolog and type 'asm source' this will assemble the
-compiler's output and generate the file 'source', the executable image of
+compiler''s output and generate the file 'source', the executable image of
 the program.  To execute, type 'source'.
 
 It is possible to ask for the open-coding of certain procedure calls
@@ -1897,7 +1910,7 @@ The first step consists in reading all the characters of the source file
 into a list.  This is not very efficient but it simplifies parsing.
 The list is parsed using a DCG grammar description of Scheme.  A parse
 tree of the program is generated by the parser.  A simple list
-representation similar to Scheme's own representation for S-expressions
+representation similar to Scheme''s own representation for S-expressions
 is used.  For example, the expression
 
     (DEFINE (weird x) (list x "ABC" 123 #t #(1 2 3)))
@@ -1922,8 +1935,8 @@ The normalization of the expressions is done in 3 steps.
         assignment conversion
     3 - closure analysis
 
-Most of macro expansion is straightforward.  It's simplicity stems from
-Prolog's ease of doing pattern matching and case analysis.  The hardest
+Most of macro expansion is straightforward.  It''s simplicity stems from
+Prolog''s ease of doing pattern matching and case analysis.  The hardest
 case to handle is mutually or self-recursive expressions (such as
 'letrec's, 'define's, etc.).  I will explain this case using an example.
 Suppose the expression to compile is:
@@ -1968,7 +1981,7 @@ the example we would obtain:
 Think about it, it works...  A more 'natural' conversion would be to
 generate an allocate/assign/use form (as explained in the R3RS) but
 our solution is entirely functional and through data-flow analysis the
-compiler could recover the original expression's semantics (presently
+compiler could recover the original expression''s semantics (presently
 the compiler is not that intelligent but it might come in the future).
 
 After this phase, only the basic special form of expressions are left
@@ -2043,7 +2056,7 @@ fib (10 times (fib 20))      4.1
 4. Run-time structure
 
 A quick look at the benchmarks shows that the code generated is fairly
-efficient.  The system's efficiency is mainly due to a cleverly designed
+efficient.  The system''s efficiency is mainly due to a cleverly designed
 run-time architecture.  It has been designed in a way that makes frequent
 operations perform quickly.  Some of the most frequent operations in Scheme
 are:
@@ -2090,8 +2103,8 @@ procedures with closed variables) are represented like this:
          +----------+----------+----------+----------+----------+----
                      \_________ _________/ \_________ _________/
                                |                     |
-                     Pointer to closure's      First closed       ...
-                             body            variable's value
+                     Pointer to closure''s      First closed       ...
+                             body            variable''s value
 
 Thus the caller does not have to distinguish simple procedures from true
 closures.  Environment related processing is done automatically (and if
@@ -2132,14 +2145,14 @@ value and 2 bytes (just before the value) that encode the type of the
 value.  These 2 bytes contain the opcode 'jmp' (long jump) if the value
 is a procedure and a 'trap' opcode if it isn't a procedure of if the type
 is not yet known.  When a procedure bound to a global variable needs to
-be called a jump to the variable's opcode is done.  Most of the time
+be called a jump to the variable''s opcode is done.  Most of the time
 the value of the variable will be a procedure and it will be jumped to.
 If this is not the case the trap handler is called; it will determine
 if the value at the return address is a procedure or not.  If it is,
 the opcode will be changed to 'jmp' and a jump to the procedure will
 be performed.  If it is not, an error handler is called.  The price
 one pays for this scheme is that assignments to global variables must
-also change the variable's opcode back to a 'trap' opcode.  Since
+also change the variable''s opcode back to a 'trap' opcode.  Since
 assignments are infrequent in Scheme programs this is not a high price
 to pay.
 
@@ -2199,7 +2212,7 @@ HEADER============
 | This is the 'header.s' file which is appended to the front of the
 | assembly program output by the compiler.  It contains run-time routines
 | for the scheme system and M4 macro definitions which are needed to
-| expand the macros in the compiler's output.
+| expand the macros in the compiler''s output.
 
 | -----------------------------------------------------------------------------
 |

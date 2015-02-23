@@ -15,7 +15,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(mtCommand).
+% :- register_module_type (mtCommand).
 
 vtActionTemplate(actPush(vtDirection)).
 
@@ -101,4 +101,4 @@ update_charge(Agent,actPush) :- padd(Agent,[mudEnergy(-6)]).
 update_stats(Agent,strain) :- padd(Agent,[mudHealth(-2)]).
 update_stats(Agent,hernia) :- padd(Agent,[mudHealth(-4),mudCmdFailure(hernia)]).
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

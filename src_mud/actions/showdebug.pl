@@ -51,4 +51,4 @@ verb_alias(debug,actShow).
 verb_alias(nodebug,actHide).
 
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).

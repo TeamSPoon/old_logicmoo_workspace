@@ -9,7 +9,7 @@
 
 :- include(logicmoo('vworld/moo_header.pl')).
 
-:- register_module_type(mtCommand).
+% :- register_module_type (mtCommand).
 
 user:action_info(Say,ftText("invokes",Does)):-socialCommand(Say,_SocialVerb,Does).
 

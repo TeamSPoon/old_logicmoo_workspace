@@ -17,7 +17,7 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
-:- register_module_type(mtCommand).
+% :- register_module_type (mtCommand).
 
 % actPut
 user:action_info(actPut(tThrowAble,txtPrepSpatial,tPutTargetAble),"actPut [obj] [onto|inside] [somewhere]").
@@ -38,4 +38,4 @@ user:agent_call_command(_Agent,actPut(Other,_Prep,Where)):-
    add(mudAtLoc(Where3D,Location)).
 
 
-:- include(logicmoo(vworld/moo_footer)).
+% :- include(logicmoo(vworld/moo_footer)).
