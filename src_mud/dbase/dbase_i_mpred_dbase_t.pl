@@ -131,6 +131,14 @@ dbase_t(P,A1,A2,A3,A4,A5):- loop_check_mpred(dbase_t(P,A1,A2,A3,A4,A5)).
 dbase_t(P,A1,A2,A3,A4):- loop_check_mpred(dbase_t(P,A1,A2,A3,A4)).
 dbase_t(P,A1,A2,A3):- loop_check_mpred(dbase_t(P,A1,A2,A3)).
 dbase_t(P,A1,A2):- loop_check_mpred(dbase_t(P,A1,A2)).
+dbase_t(P,A1,A2,A3,A4,A5,A6,A7):- mpred_pa_call(P,7,call(P,A1,A2,A3,A4,A5,A6,A7)).
+dbase_t(P,A1,A2,A3,A4,A5,A6):- mpred_pa_call(P,6,call(P,A1,A2,A3,A4,A5,A6)).
+dbase_t(P,A1,A2,A3,A4,A5):- mpred_pa_call(P,5,call(P,A1,A2,A3,A4,A5)).
+dbase_t(P,A1,A2,A3,A4):- mpred_pa_call(P,4,call(P,A1,A2,A3,A4)).
+dbase_t(P,A1,A2,A3):- mpred_pa_call(P,3,call(P,A1,A2,A3)).
+dbase_t(P,A1,A2):- mpred_pa_call(P,2,call(P,A1,A2)).
+
+mpred_pa_call(F,A,Call):-mpred_arity(F,A),call(Call).
 
 isCycPredArity_ignoreable(F,A):- ignore(mpred_prop(F,cycPred(A))),ignore(mpred_arity(F,A)).
 

@@ -171,7 +171,7 @@ database_modify_5(Op,GG):- must((copy_term(GG,GGG),must_mpred_op(Op,GGG), same_n
 
 database_modify_6(Op,GG):- must((copy_term(GG,GGE),doall(call_no_cuts(expire_post_change(Op,GGE))),same_nvars(GG,GGE))),!.
 database_modify_7(Op,GG):- must((copy_term(GG,GGH),run_database_hooks(Op,GGH),same_nvars(GG,GGH))),!.
-database_modify_8(Op,GG):- must((copy_term(GG,GGA),is_asserted_eq(GGA),same_nvars(GG,GGA))),!.
+database_modify_8(Op,GG):- must((copy_term(GG,GGA),must(is_asserted_eq(GGA)),same_nvars(GG,GGA))),!.
                                
 
 
@@ -247,7 +247,7 @@ make_body_clause(Head,Body,call_mpred_body(Head,Body)).
 special_head(_,F,Why):-special_head0(F,Why),!,show_call_failure(not(mpred_prop(F,prologOnly))).
 special_head0(F,is_pred_declarer):-is_pred_declarer(F),!.
 special_head0(F,functorDeclares):-hasInstance(functorDeclares,F),!.
-special_head0(F,prologMacroHead):-isa_backchaing(F,prologMacroHead),!.
+special_head0(F,prologMacroHead):-hasInstance(prologMacroHead,F),!.
 special_head0(isa,isa).
 special_head0(F,tCol):-hasInstance(tCol,F),!.
 special_head0(F,prologHybrid):-mpred_prop(F,prologHybrid).
@@ -285,8 +285,7 @@ mdel(C0):- dmsg(warn(failed(mdel(C0)))),!,fail.
 clr(C0):- dmsg(clr(C0)),database_api_entry(change( retract,all),C0),verify_sanity(ireq(C0)->(dmsg(warn(incomplete_CLR(C0))));true).
 
 % -  preq(Query) = query with P note
-preq(_P,isa(X,Y)):- ground(isa(X,Y)),!,loop_check(isa_backchaing(X,Y)).
-preq(P,C0):- loop_check(database_api_entry(query(dbase_t,P),C0)).
+preq(P,C0):- Op=query(dbase_t,P),fully_expand(Op,C0,C1),loop_check(database_api_entry(Op,C1),loop_check(mpred_call(C1))).
 
 % -  req(Query) = Normal query
 req(C0):- dmsg(req(C0)), preq(req,C0).
@@ -333,7 +332,7 @@ add(A):-trace_or_throw(fmt('add is skipping ~q.',[A])).
 
 implied_skipped(subclass(C0,C0)).
 implied_skipped(props(_,[])).
-implied_skipped(Skipped):-compound(Skipped), not(functor(Skipped,_,1)), (dbase_t(Skipped);out_of_dbase_t(Skipped)).
+implied_skipped(Skipped):-compound(Skipped), not(functor(Skipped,_,1)),fail, (dbase_t(Skipped);out_of_dbase_t(Skipped)).
 implied_skipped(Skipped):-already_added_this_round(Skipped).
 
 

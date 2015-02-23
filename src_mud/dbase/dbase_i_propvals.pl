@@ -158,6 +158,7 @@ checkNoArgViolation(Prop,__,Value):-checkNoArgViolationOrDeduceInstead(Prop,2,Va
 checkNoArgViolation(Prop,Obj,__):-checkNoArgViolationOrDeduceInstead(Prop,1,Obj),fail.
 checkNoArgViolation(_,_,_):-!.
 
+checkNoArgViolationOrDeduceInstead(_,_,_):-!.
 checkNoArgViolationOrDeduceInstead(Prop,N,Obj):-argIsa_call(Prop,N,Type),
    not(isa(Type,ttUnverifiableType)),
    findall(OT,isa(Obj,OT),OType),

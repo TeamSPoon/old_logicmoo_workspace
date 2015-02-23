@@ -147,8 +147,9 @@ pfc_assert0(G):- pfc_local(G),!,assert(G).
 pfc_assert0(G):- add(G),pfcMark(G).
 
 
-pfc_clause_db(H,B):- must(pfc_local(H)),!,pfc_clause_local_db(H,B).
+pfc_clause_db(H,B):- must(pfc_local(H)), clause(H,B),!.
 pfc_clause_db_unify(H,B):- must(pfc_local(H)), clause(H,B),!.
+pfc_clause_db_check(H,B):- must(pfc_local(H)), pfc_clause_local_db(H,B),!.
 pfc_clause_db_ref(H,B,Ref):-must(pfc_local(H)),!,pfc_clause_local_db_ref(H,B,Ref).
 
 pfc_clause_local_db(H,B):- copy_term(H:B,HH:BB),clause(HH,BB,Ref),clause(CH,CB,Ref),H:B=@=CH:CB,!.
@@ -364,11 +365,11 @@ pfcAddDbToHead(P,NewP) :-
 
 pfcUnique((Head:-Tail)) :- 
   !, 
-  \+ pfc_clause_db(Head,Tail).
+  \+ pfc_clause_db_unify(Head,Tail).
 
 pfcUnique(P) :-
   !,
-  \+ pfc_clause_db(P,true).
+  \+ pfc_clause_db_unify(P,true).
 
 
 pfcEnqueue(P,S) :-
@@ -392,7 +393,7 @@ pfcRemoveOldVersion((Identifier::::Body)) :-
   
 pfcRemoveOldVersion((Identifier::::Body)) :-
   nonvar(Identifier),
-  pfc_clause_db((Identifier::::OldBody),_),
+  pfc_clause_db_unify((Identifier::::OldBody),_),
   \+(Body=OldBody),
   pfcRem((Identifier::::OldBody)),
   !.
@@ -513,7 +514,7 @@ pfcBtPtCombine(Head,Body,Support) :-
   fail.
 pfcBtPtCombine(_,_,_) :- !.
 
-pfcGetTriggerQuick(Trigger) :-  pfc_clause_db(Trigger,true).
+pfcGetTriggerQuick(Trigger) :-  pfc_clause_db_unify(Trigger,true).
 
 pfcGetTrigger(Trigger):-pfcGetTriggerQuick(Trigger).
 
@@ -1023,7 +1024,7 @@ pfcBC(P) :-
 pfcBC(F) :-
   %= this is probably not advisable due to extreme inefficiency.
   var(F)    ->  pfcFact(F) ;
-  otherwise ->  pfc_clause_db(F,Condition),pfc_call(nonPFC,Condition).
+  otherwise ->  pfc_clause_db_unify(F,Condition),pfc_call(nonPFC,Condition).
 
 %%pfcBC(F) :- 
 %=  %= we really need to check for system predicates as well.
@@ -1281,8 +1282,8 @@ pfcType(_,fact) :-
   %= if it's not one of the above, it must be a fact!
   !.
 
-pfcAssertIfUnknown(P):- (show_call_success(is_asserted(P));(fail,show_call(prologCall(P)))),!.
-pfcAssertIfUnknown(P):- show_call(pfc_assert(P)),!,sanity(is_asserted(P)).
+pfcAssertIfUnknown(P):- is_asserted_eq(P),!.
+pfcAssertIfUnknown(P):- show_call(pfc_assert(P)),!,sanity(must(is_asserted_eq(P))).
 
 pfcAssert(P,Support) :- 
   (pfc_clause(P) ; pfc_assert(P)),
@@ -1303,7 +1304,7 @@ pfc_clause((Head :- Body)) :-
   !,
   copy_term(Head,Head_copy),
   copy_term(Body,Body_copy),
-  pfc_clause_db(Head,Body),
+  pfc_clause_db_unify(Head,Body),
   variant(Head,Head_copy),
   variant(Body,Body_copy).
 
@@ -1311,7 +1312,7 @@ pfc_clause(Head) :-
   % find a unit clause identical to Head by finding one which unifies,
   % and then checking to see if it is identical
   copy_term(Head,Head_copy),
-  pfc_clause_db(Head_copy,true),
+  pfc_clause_db_unify(Head_copy,true),
   variant(Head,Head_copy).
 
 
@@ -1459,7 +1460,7 @@ pfcDatabaseTerm(pfcDefault/1).
 % removes all forward chaining rules and pfcJustification_L from db.
 
 pfcReset :-
-  pfc_clause_db(support1(P,F,Trigger),true),
+  pfc_clause_db_unify(support1(P,F,Trigger),true),
   pfcRetractOrWarn(P),
   pfcRetractOrWarn(support1(P,F,Trigger)),
   pfcRetractOrWarn(support2(F,Trigger,P)),
@@ -1474,7 +1475,7 @@ pfcReset.
 pfcDatabaseItem(Term) :-
   pfcDatabaseTerm(P/A),
   functor(Term,P,A),
-  pfc_clause_db(Term,_).
+  pfc_clause_db_unify(Term,_).
 
 pfcRetractOrWarn(X) :-  pfc_retract(X), !.
 pfcRetractOrWarn(X) :- 
@@ -1555,8 +1556,8 @@ pfcClassifyFacts([H|T],User,[H|Pfc],Rule) :-
   pfcClassifyFacts(T,User,Pfc,Rule).
 
 
-printHeadItems(Head):-ignore((bagof(Head,pfc_clause_db(Head,true),R1),pfcPrintitems(R1))).
-printHeadCallItems(Head):-ignore((bagof(Head,pfc_clause_db(Head,true),R1),pfcPrintitems(R1))).
+printHeadItems(Head):-ignore((bagof(Head,pfc_clause_db_unify(Head,true),R1),pfcPrintitems(R1))).
+printHeadCallItems(Head):-ignore((bagof(Head,pfc_clause_db_unify(Head,true),R1),pfcPrintitems(R1))).
 
 pfcPrintRules :-
   printHeadItems((P=>Q)),printHeadItems((P<=>Q)),printHeadItems((P<=Q)).

@@ -52,7 +52,7 @@ user:hasInstance_dyn(W,isKappaFn(_,S)):-nonvar(S),nonvar(W),!.
 
 
 hasInstance(T,I):- user:hasInstance_dyn(T,I).
-hasInstance(T,I):- thglobal:pfcManageHybrids,loop_check(isa(I,T)).
+hasInstance(T,I):- thglobal:pfcManageHybrids,clause_safe(isa(I,T),true).
 
 /*
 disabled hasInstance(T,I):- not(current_predicate(deduce_M/1)),!,user:hasInstance_dyn(T,I).
@@ -192,8 +192,8 @@ asserted_subclass(I,T):- ((thlocal:useOnlyExternalDBs,!);thglobal:use_cyc_databa
 asserted_subclass(T,ST):-dbase_t(subclass,T,ST).
 
 chk_ft(T):- not_ft_quick(T),!,fail.
-chk_ft(I):- thlocal:infForward, dbase_t(formatTypePrologCode,I,_),!.
-chk_ft(I):- thlocal:infForward, asserted_subclass(I,FT),I\=FT,chk_ft(FT),!.
+%chk_ft(I):- thlocal:infForward, dbase_t(formatTypePrologCode,I,_),!.
+%chk_ft(I):- thlocal:infForward, asserted_subclass(I,FT),I\=FT,chk_ft(FT),!.
 chk_ft(I):- thlocal:infForward, !,hasInstance(ttFormatType,I).
 
 
@@ -212,7 +212,7 @@ transitive_subclass_or_same(A,B):-transitive_subclass(A,B).
 :-export((transitive_subclass/2)).
 transitive_subclass(_,T):-T==ttFormatType,!,fail.
 transitive_subclass(A,_):-A==ttFormatType,!,fail.
-transitive_subclass(A,T):-thglobal:pfcManageHybrids,!,is_asserted(subclass(A,T)).
+transitive_subclass(A,T):-thglobal:pfcManageHybrids,!,clause(subclass(A,T),true).
 transitive_subclass(A,T):- fail, bad_idea,!, into_single_class(A,AA), into_single_class(T,TT), fact_loop_checked(subclass(A,T),transitive_P_l_r(dbase_t,subclass,AA,TT)).
 transitive_subclass(I,T):- fail,stack_check,((thlocal:useOnlyExternalDBs,!);thglobal:use_cyc_database),
    fact_loop_checked(subclass(I,T),transitive_P_l_r(cyckb_t,genls,I,T)).

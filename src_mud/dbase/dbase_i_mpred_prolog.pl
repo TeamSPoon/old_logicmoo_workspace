@@ -56,6 +56,14 @@ user:provide_mpred_setup(Op,HeadIn,StubType,OUT):-  StubType = prologOnly,
 user:provide_mpred_setup(Op,HeadIn,prologOnly,OUT):- get_functor(HeadIn,F),mpred_prop(F,prologHybrid),retractall(mpred_prop(F,prologOnly)),
    MSG = trace_or_throw(prologOnly_was_hybrid(HeadIn,Op)),
    wdmsg(MSG),must(OUT=MSG),!.
+
+user:provide_mpred_setup(Op,HeadIn,StubType,OUT):-  StubType = prologOnly, get_pifunctor(HeadIn,Head,F,A),  
+  show_call_failure(not(cant_redefine(Head))),
+  must((Op= call(_))),
+  not(current_predicate(F/A)),
+  module_transparent(F/A),export(F/A),dynamic_safe(F/A),
+  asserta_if_new(mpred_prop(F,predStub(StubType))),
+  asserta_if_new(mpred_prop(F,StubType)),!.
    
 user:provide_mpred_setup(Op,HeadIn,StubType,OUT):-  StubType = prologOnly, get_pifunctor(HeadIn,Head,F,A),  
   show_call_failure(not(cant_redefine(Head))),

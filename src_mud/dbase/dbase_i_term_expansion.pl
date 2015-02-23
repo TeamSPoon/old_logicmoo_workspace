@@ -62,7 +62,7 @@ as_is_term(NC):-compound(NC),functor(NC,Op,2),infix_op(Op,_).
 
 
 fully_expand(_,Sent,SentO):-thlocal:infSkipFullExpand,!,must(Sent=SentO).
-fully_expand(Op,Sent,SentO):- must(fully_expand_clause(Op,Sent,BO)),!,must(SentO=BO),
+fully_expand(Op,Sent,SentO):- must(notrace((fully_expand_clause(Op,Sent,BO),!,SentO=BO))),
    ignore(((notrace((Sent\=@=SentO, (Sent\=isa(_,_)->SentO\=isa(_,_);true), (Sent \=@= user:SentO), dmsg(fully_expand(Op,(Sent --> SentO)))))))),!.
 
 fully_expand_clause(_,Sent,SentO):-not(compound(Sent)),!,must(SentO=Sent).

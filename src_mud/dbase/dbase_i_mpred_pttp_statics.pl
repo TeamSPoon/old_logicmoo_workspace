@@ -1108,8 +1108,8 @@ correct_pttp_1(LC, BodyIn,F,A,L,Body):- is_holds_false_pttp(F),negated_literal(B
 correct_pttp_1(LC, BodyIn,F,A,L,Body):- is_holds_false_pttp(F),trace_or_throw(correct_pttp_1(LC,BodyIn,F,A,L,Body)).
 correct_pttp_1(LC,_BodyIn,F,_,[L|IST],Body):- correct_pttp_2(LC,F,[L|IST],Body).
 
-correct_pttp_2(LC,F,[L|IST],Body):- do_not_wrap(F),Body=..[F,L|IST].
-correct_pttp_2(LC,F,[L|IST],Body):- atom(F),builtin(F,_),Body=..[F,L|IST].
+correct_pttp_2(LC,F,[L|IST],Body):- do_not_wrap(F),!,Body=..[F,L|IST].
+correct_pttp_2(LC,F,[L|IST],Body):- atom(F),builtin(F,_),!,Body=..[F,L|IST].
 correct_pttp_2(LC,F,L,Body):- is_ftVar(F),!,trace_or_throw(correct_pttp_2(LC,F,L,Body)).
 correct_pttp_2(LC,F,[L|IST],Body):- is_holds_true_pttp(F),!,Body =..[F,L|IST].
 % uncomment (need it) correct_pttp_2(LC,infer_by,[L|IST],Body):- infer_by = F, Body =..[F,L|IST].
@@ -1377,6 +1377,8 @@ is_p_to_not('pred_isa_t').
 is_p_to_not('pred_t').
 
 
+is_p_or_not(F):-is_p_to_n(P,N),(F=P;F=N).
+
 % assertable_t TODO
 
 is_p_to_n1(P,N):-atom(P),is_p_to_n0(PF,NF),atom_concat(Root,PF,P),atom_concat(Root,NF,N).
@@ -1579,12 +1581,8 @@ builtin(T) :-
 builtin(V,A):-is_ftVar(V),!,trace_or_throw(builtin(V,A)).
 builtin(!,0).
 
-builtin(F,A):-is_builtin_p_to_n(P,N),member(F,[P,N]),member(A,[2,3,4]).
 
 builtin(is_asserted,_).
-
-builtin(P,2):-dbase_t(P,_,_),!,fail.
-builtin(P,3):-dbase_t(P,_,_,_),!,fail.
 builtin(P,_):- current_predicate(resultIsa/2),user:mpred_prop(P,predStub(prologHybrid)),!,fail.
 builtin(isa,2):-!,fail.
 builtin(isa,_):-!,fail.
@@ -1600,6 +1598,10 @@ builtin(trace,0).
 builtin(atom,1).
 builtin(integer,1).
 builtin(number,1).
+builtin(F,_):-is_p_or_not(F),!,fail.
+builtin(not_asserted_t,_):-!,fail.
+builtin(P,2):-dbase_t(P,_,_),!,fail.
+builtin(P,3):-dbase_t(P,_,_,_),!,fail.
 builtin(atomic,1).
 builtin(constant,1).
 builtin(functor,3).
@@ -1627,6 +1629,7 @@ builtin(use_pttp,0).
 builtin(ANY,0):-atom(ANY).
 builtin(infer_by,_).
 builtin(search_cost,_).
+builtin(F,A):-is_builtin_p_to_n(P,N),member(F,[P,N]),member(A,[2,3,4]).
 builtin(test_and_decrement_search_cost,_).
 builtin(unify,_).
 builtin(identical_member_special,_).

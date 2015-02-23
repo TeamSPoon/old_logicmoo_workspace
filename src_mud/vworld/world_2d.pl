@@ -230,7 +230,7 @@ find_instance_of(Pred,Subj,Obj):- predRelationAllExists(Pred,SubjT,ObjT), isa(Su
 
 mudSubPart(Outer,Inner):-is_asserted(mudInsideOf(Inner,Outer)).
 mudSubPart(Agent,Clothes):-wearsClothing(Agent,Clothes).
-mudSubPart(Subj,Obj):- tl_true(thlocal:infThirdOrder), find_instance_of(mudSubPart,Subj,Obj).
+mudSubPart(Subj,Obj):- test_tl(infThirdOrder), find_instance_of(mudSubPart,Subj,Obj).
 % mudSubPart(face,isEach(eyes,nose,mouth)).
 % mudSubPart([upper_torso,arms,left_arm,left_hand,left_digits]).
 % mudSubPart([upper_torso,arms,right_arm,right_hand,right_digits]).
