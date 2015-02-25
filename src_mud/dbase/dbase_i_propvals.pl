@@ -82,12 +82,12 @@ choose_each(Prop,Obj,Value):- hasInstance(completeExtentAsserted, Prop),!,choose
 choose_each(Prop,Obj,Value):- one_must(choose_asserted(Prop,Obj,Value),(fallback_value(Prop,Obj,Value),maybe_cache(Prop,Obj,Value,Obj))).
 
 % choose_asserted(Prop,Obj,Value):- dbase_t(Prop,Obj,Value). % ,must_det(is_asserted(dbase_t(Prop,Obj,Value))).
-choose_asserted(Prop,Obj,Value):- is_asserted(dbase_t(Prop,Obj,Value)).
-choose_asserted(Prop,Obj,Value):- choose_asserted_mid_order(Prop,Obj,Value).
+choose_asserted(Prop,Obj,Value):- is_asserted(dbase_t(Prop,Obj,Value)),!.
+choose_asserted(Prop,Obj,Value):- choose_asserted_mid_order(Prop,Obj,Value),!.
 choose_asserted(Prop,Obj,Value):- nonvar(Obj),transitive_other(Prop,1,Obj,What),choose_asserted_mid_order(Prop,Obj,Value),maybe_cache(Prop,Obj,Value,What).
 
 choose_asserted_mid_order(Prop,Obj,Value):-loop_check(choose_asserted_mid_order_all(Prop,Obj,Value),fail).
-choose_asserted_mid_order_all(Prop,Obj,Value):- mpred_call(dbase_t(Prop,Obj,Value)).
+choose_asserted_mid_order_all(Prop,Obj,Value):- mpred_call(dbase_t(Prop,Obj,Value)),!.
 choose_asserted_mid_order_all(Prop,Obj,_Value):- atom(Prop), Fact=.. [Prop,Obj,_],thlocal:infInstanceOnly(Fact),!,fail.
 choose_asserted_mid_order_all(Prop,Obj,Value):- is_asserted(genlPreds(Other,Prop)),choose_asserted(Other,Obj,Value).
 % choose_asserted_mid_order_all(Prop,Obj,Value):- is_asserted(genlInverse(Prop,Other)),choose_val(Other,Value,Obj).

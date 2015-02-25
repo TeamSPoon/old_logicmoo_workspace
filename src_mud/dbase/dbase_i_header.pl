@@ -23,7 +23,8 @@
 :- discontiguous(user:enabled/1).
 :- multifile user:was_enabled/1.
 :- discontiguous(user:was_enabled/1).
-:- multifile user:listing_mpred_hook/3.
+:- multifile user:listing_mpred_hook/2.
+:- dynamic user:listing_mpred_hook/2.
 
 :- multifile user:genls/2.
 :- dynamic user:genls/2.

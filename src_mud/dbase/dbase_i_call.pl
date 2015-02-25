@@ -54,21 +54,16 @@ dbase_op(Op,  not(H)):- nonvar(H),!, dbase_op(neg(not,Op),H).
 dbase_op(Op,'\\+'(H)):- nonvar(H),!, dbase_op(neg(('\\+'),Op),H).
 dbase_op(Op,    ~(H)):- nonvar(H),!, dbase_op(neg(~,Op),H).
 dbase_op(Op,     {H}):- nonvar(H),!, dbase_op(Op,H).
+
 dbase_op(must,Call):- !,must(dbase_op(req,Call)).
-dbase_op(assertedOnly,Call):- !,with_assertions(thlocal:infInstanceOnly(Call),dbase_op(req,Call)).
 dbase_op(once,Call):- !,once(dbase_op(req,Call)).
+
+dbase_op(assertedOnly,Call):- !,with_assertions(thlocal:infInstanceOnly(Call),dbase_op(req,Call)).
 dbase_op(_ , clause(H,B) ):- !, is_asserted(H,B).
 dbase_op(_ , clause(H,B,Ref) ):- !,  is_asserted(H,B,Ref).
 dbase_op(_ , (H :- B) ):- !, is_asserted(H,B).
 dbase_op(clauses(Op),  H):-!,dbase_op((Op),  H).
-dbase_op(conjecture,X):-was_isa(X,I,C),!,isa_backchaing(I,C).
-dbase_op(conjecture,H):-!,mpred_call(H).
-dbase_op(nonPFC,  H ):-!, mpred_call(H).
-dbase_op(mpred_call,  H ):-!, mpred_call(H).
-dbase_op(Atom,H):-atom(Atom),current_predicate(Atom/1),!,debugOnError(call(Atom,H)).
-dbase_op(_,C):- is_callable(C),!,mpred_call(C).
-% dbase_op(Op,H):-!,loop_check(dbase_op(Op,H),trace_or_throw(loop_database_call(Op,  H ))).
-dbase_op(Op,  H ):- trace_or_throw(unknown_database_call(Op,  H )).
+dbase_op(_,C):- mpred_call(C).
 
 :-export(whenAnd/2).
 whenAnd(A,B):-A,ground(B),once(B).
@@ -102,7 +97,7 @@ how_to_op(assert,assert_if_new).
 how_to_op(assert(_),asserta_new).
 how_to_op(retract(_),retract_all).
 how_to_op(conjecture,call).
-how_to_op(query(dbase_t, req),req).
+how_to_op(query(dbase_t, req),mpred_call).
 how_to_op(query(dbase_t, Req),Req).
 how_to_op(change(Op,HOW),O):- !, O=..[Op,HOW].
 how_to_op(HowOP,HowOP).
@@ -143,14 +138,14 @@ mpred_call(Call):-
    must((reduce_dbase_op(OvOp,OvOpR),lookup_inverted_op(OvOpR,_,OverridePolarity),
      must((Call=..[Was|Apply],lookup_inverted_op(Was,InvertCurrent,_WasPol))),
    ((OverridePolarity ==('-') -> debugOnError(show_call(apply(InvertCurrent,Apply))) ; debugOnError(show_call(apply(Was,Apply))))))).
-mpred_call(Call):-current_predicate(_,Call),!,debugOnError(Call).
-mpred_call(Call):-mpred_call_last_resorts(Call).
-mpred_call(Call):-current_predicate(req/1),!,loop_check(debugOnError(req(Call)),mpred_call_last_resorts(Call)).
+% mpred_call(Call):-fully_expand(_,Call,Expand),mpred_call_0(Expand).
 
-mpred_call_last_resorts(Call):- clause(prolog_xref:process_directive(D, Q),_),nonvar(D),D=Call,!, trace,show_call(prolog_xref:process_directive(Call,Q),fmt(Q)).
-mpred_call_last_resorts(Call):- current_predicate(is_asserted/1),!,is_asserted(Call).
-mpred_call_last_resorts(Call):-debugOnError(Call).
+mpred_call(Call):- mpred_call_0(Call).
+mpred_call_0(Call):-current_predicate(_,Call),debugOnError(loop_check(Call)).
+mpred_call_0(Call):-clause(prolog_xref:process_directive(D, Q),_),nonvar(D),D=Call,!, trace,show_call(prolog_xref:process_directive(Call,Q),fmt(Q)).
+mpred_call_0(Call):-current_predicate(is_asserted/1),!,is_asserted(Call).
 
+% https://gist.githubusercontent.com/vwood/662109/raw/dce9e9ce9505443a82834cdc86163773a0dccc0c/ecldemo.c
 
 end_of_file.
 

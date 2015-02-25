@@ -3305,6 +3305,170 @@ user:prolog_exception_hook(A,B,C,D):- fail,
 :-'$set_predicate_attribute'(with_assertions(_,_), hide_childs, 0).
 
 
+:- multifile user:listing_mpred_hook/2.
+:- dynamic user:listing_mpred_hook/2.
+user:listing_mpred_hook(_,_).
+
+:-export((term_listing/1)).
+term_listing([]):-!.
+term_listing(Match):- 
+  '@'(ignore((catch(listing(Match),E,wdmsg(E)))),'user'),
+  term_non_listing(Match),!.
+
+term_dbase_listing(Match):-
+  get_functor(Match,F,A),
+  (A==0->RA=_;RA=A),!,
+ %format('/* listing_mpred_hook(~q) => ~n',[Match]),!,
+ debugOnError(ignore(call_no_cuts(user:listing_mpred_hook(F/RA,Match)))),!,
+ true.
+ %format(' <= listing_mpred_hook(~q) */ ~n',[Match]).
+
+:-export(term_non_listing/1).
+term_non_listing(Match):- 
+   format('/* term_non_listing(~q) => ~n',[Match]),
+   '@'(ignore((doall((
+      dbase_i_pldoc:synth_clause_for(H,B,_Ref),
+      once(dbase_i_pldoc:ok_show(H)),
+      once(dbase_i_pldoc:slow_term_matches_hb(Match,H,B)),
+      dbase_i_pldoc:portray_hb(H,B),
+      fail)))),'user'),
+   format(' <= term_non_listing(~q) */ ~n',[Match]).
+
+:- multifile user:prolog_list_goal/1.
+% user:prolog_list_goal(Goal):- writeq(hello(prolog_list_goal(Goal))),nl.
+
+:- multifile prolog:locate_clauses/2.
+prolog:locate_clauses(A, _) :- once(term_dbase_listing(A)),fail.
+
+:-export((synth_clause_for/3)).
+synth_clause_for(H,B,Ref):- cur_predicate(_,H),synth_clause_ref(H,B,Ref).
+
+
+:-export((synth_clause_ref/3)).
+synth_clause_ref(H,(fail,synth_clause_info(Props)),0):- once(pred_info(H,Props)).
+synth_clause_ref(H,B,Ref):- predicate_property(M:H,number_of_clauses(_)),!,clause(M:H,B,Ref).
+
+:-export((term_matches_hb/3)).
+term_matches_hb([],_,_):-!.
+term_matches_hb([F1],H,B):-!,term_matches_hb(F1,H,B),!.
+term_matches_hb([F1|FS],H,B):-!,term_matches_hb(F1,H,B),!,term_matches_hb(FS,H,B),!.
+term_matches_hb((F1,FS),H,B):-!,term_matches_hb(F1,H,B),!,term_matches_hb(FS,H,B),!.
+term_matches_hb((F1;FS),H,B):-!,term_matches_hb(F1,H,B);term_matches_hb(FS,H,B).
+term_matches_hb(arity(A),H,_):-!,functor(H,_,A).
+term_matches_hb(functor(F),H,_):-!,functor(H,F,_).
+term_matches_hb(not(C),H,B):-nonvar(C),!,not(term_matches_hb(C,H,B)).
+term_matches_hb(-(C),H,B):-nonvar(C),!,not(term_matches_hb(C,H,B)).
+term_matches_hb(+(C),H,B):-nonvar(C),!,(term_matches_hb(C,H,B)).
+term_matches_hb(module(M),H,_):-!,predicate_property(H,imported_from(M)).
+term_matches_hb(F/A,H,_):-atom(F),functor(H,F,A),!.
+term_matches_hb(h(P),H,_):-!,term_matches_hb(P,H,666666).
+term_matches_hb(b(P),_,B):-!,term_matches_hb(P,666666,B).
+term_matches_hb(HO,H,B):- string(HO),!, term_matches_hb_2(mudContains,HO,H,B).
+term_matches_hb(mudContains(HO),H,B):-!, term_matches_hb_2(mudContains,HO,H,B).
+
+:-export(slow_term_matches_hb/3).
+slow_term_matches_hb(noinfo,_,info(_)):-!,fail. 
+slow_term_matches_hb(HO,H,B):- atom(HO),!, term_matches_hb_2(exact,HO,H,B).
+slow_term_matches_hb(HO,H,B):-term_matches_hb(HO,H,B).
+slow_term_matches_hb(M:HO,H,B):-!,term_matches_hb(module(M),H,B),!,term_matches_hb(h(HO),H,B).
+slow_term_matches_hb(HO,H,B):- !,term_matches_hb_2(exact,HO,H,B).
+
+:-export(fast_term_matches_hb/3).
+fast_term_matches_hb(HO,H,B):-contains_var(HO,(H:-B)).
+fast_term_matches_hb(HO,H,B):-term_matches_hb(HO,H,B).
+
+:-export(term_matches_hb_2/4).
+term_matches_hb_2(mudContains,HO,H,B):- any_to_string(HO,HS),!, with_output_to(string(H1B1),write_canonical((H:-B))), (sub_atom_icasechk(HS,_,H1B1);sub_atom_icasechk(H1B1,_,HS)),!.
+term_matches_hb_2(exact,HO,H,B):- contains_var(HO,(H:-B)).
+
+% match_term_listing(HO,H,B):-!, synth_clause_ref(H,B,_Ref), term_matches_hb(HO,H,B).
+
+:-dynamic(cur_predicates/1).
+:-export((cur_predicate)/2).
+cur_predicate(M:F/A,M:P):-
+   current_predicate(M:F/A),functor(P,F,A),not(predicate_property(user:P,imported_from(_))).
+
+
+:-export(ok_show/1).
+ok_show(F/A):-!,functor(P,F,A),ok_show(P),!.
+ok_show(P):-not(bad_pred(P)).
+
+
+
+% when we import new and awefull code base (the previous )this can be helpfull
+% we redfine list_undefined/1 .. this is the old version
+:- export(scansrc_list_undefined/1).
+scansrc_list_undefined(_):-!.
+scansrc_list_undefined(A):- real_list_undefined(A).
+
+list_undefined:-real_list_undefined([]).
+
+:- export(real_list_undefined/1).
+real_list_undefined(A):-
+ merge_options(A, [module_class([user])], B),
+        prolog_walk_code([undefined(trace), on_trace(found_undef)|B]),
+        findall(C-D, retract(undef(C, D)), E),
+        (   E==[]
+        ->  true
+        ;   print_message(warning, check(undefined_predicates)),
+            keysort(E, F),
+            group_pairs_by_key(F, G),
+            maplist(check:report_undefined, G)
+        ).
+
+:-export(mmake/0).
+mmake:- update_changed_files.
+:-export(update_changed_files/0).
+update_changed_files :-
+        set_prolog_flag(verbose_load,true),
+        ensure_loaded(library(make)),
+	findall(File, make:modified_file(File), Reload0),
+	list_to_set(Reload0, Reload),
+	(   prolog:make_hook(before, Reload)
+	->  true
+	;   true
+	),
+	print_message(silent, make(reload(Reload))),
+	maplist(make:reload_file, Reload),
+	print_message(silent, make(done(Reload))),
+	(   prolog:make_hook(after, Reload)
+	->  true
+	;   
+           true %list_undefined,list_void_declarations
+	).
+
+:- export(remove_undef_search/0).
+remove_undef_search:- ((
+ '@'(use_module(library(check)),'user'),
+ redefine_system_predicate(check:list_undefined(_)),
+ abolish(check:list_undefined/1),
+ assert((check:list_undefined(A):- not(thread_self(main)),!, ignore(A=[]))),
+ assert((check:list_undefined(A):- reload_library_index,  update_changed_files,call(thread_self(main)),!, ignore(A=[]))),
+ assert((check:list_undefined(A):- ignore(A=[]),scansrc_list_undefined(A))))).
+
+% :- remove_undef_search.
+
+
+:-export(bad_pred/1).
+bad_pred(M:P):-!,atom(M),bad_pred(P). 
+bad_pred(P):-functor(P,F,A),arg(_,v(cur_predicates/_,db_op/_,db_op00/_,db_op0/_,db_op_loop/_,do_expand_args_l/3),F/A).
+bad_pred(P):-predicate_property(P,autoloaded(_)).
+bad_pred(P):-not(predicate_property(P,number_of_clauses(_))).
+bad_pred(P):-predicate_property(P,imported_from(_)),predicate_property(P,static).
+bad_pred(P):-predicate_property(P,foreign).
+
+:-export(pred_info/2).
+pred_info(H,Props):- get_functor(H,F), findall(PP,mpred_prop(F,PP),Props).
+
+:-export(portray_hb/2).
+portray_hb(H,B):- B==true, !, portray_one_line(H).
+portray_hb(H,B):- portray_one_line((H:-B)).
+
+:-export(portray_one_line/1).
+portray_one_line(H):- current_predicate(wdmsg/1),wdmsg(H),!.
+portray_one_line(H):- not(not((snumbervars(H),writeq(H),write('.'),nl))),!.
+
+
 end_of_file.
 
 % current_predicate

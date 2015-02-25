@@ -46,6 +46,7 @@ world_clear(Named):-fmt('Clearing world database: ~q.~n',[Named]).
 % ================================================
 :- thread_local thlocal:fail_is_asserted/1.
 
+with_fail_is_asserted(Temp,Goal):-ground(Temp),!,Goal.
 with_fail_is_asserted(Temp,Goal):-with_assertions(thlocal:fail_is_asserted(Temp),Goal).
 
 not_asserted(X):- not(is_asserted_ilc(X)).
@@ -56,7 +57,7 @@ is_asserted(X,Y):- loop_check(is_asserted_ilc(X,Y)).
 is_asserted(X,Y,Z):- loop_check(is_asserted_ilc(X,Y,Z)).
 
 is_asserted_ilc(V):-var(V),!,trace_or_throw(var_is_asserted(V)).
-is_asserted_ilc(X):- thlocal:fail_is_asserted(X),!,fail.
+% is_asserted_ilc(X):- thlocal:fail_is_asserted(X),!,fail.
 is_asserted_ilc(HB):-notrace((reduce_clause(is_asserted_ilc,HB,HHBB),(HB\=@=HHBB))),!,is_asserted_ilc(HHBB).
 % TODO: test removal
 is_asserted_ilc(prologHybrid(H)):-get_functor(H,F),!,isa_asserted(F,prologHybrid).
@@ -73,7 +74,7 @@ is_asserted_1(HB):-expand_to_hb(HB,H,B),!,is_asserted_ilc(H,B).
 is_asserted_ilc((H:-BB),B):- is_true(B),!,is_asserted_ilc(H,BB).
 is_asserted_ilc(H,B):-notrace((fully_expand(is_asserted,(H:-B),CL),expand_to_hb(CL,HH,BB))),!,is_asserted_2(HH,BB).
 
-is_asserted_2(H,B):-thglobal:pfcManageHybrids,!,pfc_clause_db_check(H,B).
+is_asserted_2(H,B):-thglobal:pfcManageHybrids,!,pfc_clause_db_unify(H,B).
 is_asserted_2(H,B):-call_no_cuts(user:provide_mpred_storage_clauses(_,H,B,_Ref)),not(notrace(special_wrapper_body(B,_))).
 
 is_asserted_ilc((H:-BB),B,Ref):- is_true(B),!,is_asserted_ilc(H,BB,Ref).
@@ -280,26 +281,26 @@ get_body_functor(BDY,BF,A):-get_functor(BDY,BF,A).
 del(C0):- ireq(C0),!,idel(C0),!.
 del(C0):- mreq(C0),!,mdel(C0),!.
 
-idel(C0):- dmsg(idel(C0)),database_api_entry(change( retract,one),C0), verify_sanity(ireq(C0)->(dmsg(warn(incomplete_I_DEL(C0))),fail);true),!.
+idel(C0):- dmsg(idel(C0)),dbase_modify(change( retract,a),C0), verify_sanity(ireq(C0)->(dmsg(warn(incomplete_I_DEL(C0))),fail);true),!.
 idel(C0):- dmsg(warn(failed(idel(C0)))),!,fail.
 
-mdel(C0):- dmsg(mdel(C0)),database_api_entry(change( retract,one),C0), verify_sanity(mreq(C0)->(dmsg(warn(incomplete_M_DEL(C0))),fail);true),!.
+mdel(C0):- dmsg(mdel(C0)),dbase_modify(change( retract,one),C0), verify_sanity(mreq(C0)->(dmsg(warn(incomplete_M_DEL(C0))),fail);true),!.
 mdel(C0):- dmsg(warn(failed(mdel(C0)))),!,fail.
 
 % -  clr(Retractall)
-clr(C0):- dmsg(clr(C0)),database_api_entry(change( retract,all),C0),verify_sanity(ireq(C0)->(dmsg(warn(incomplete_CLR(C0))));true).
+clr(C0):- dmsg(clr(C0)),dbase_modify(change(retract,all),C0),verify_sanity(ireq(C0)->(dmsg(warn(incomplete_CLR(C0))));true).
 
 % -  preq(Query) = query with P note
-preq(P,C0):- Op=query(dbase_t,P),fully_expand(Op,C0,C1),loop_check(database_api_entry(Op,C1),loop_check(mpred_call(C1))).
+preq(P,C0):- agenda_do_prequery,dbase_op(query(dbase_t,P),C0).
 
 % -  req(Query) = Normal query
-req(C0):- dmsg(req(C0)), preq(req,C0).
+req(C0):- nop(dmsg(req(C0))), preq(req,C0).
 
 % -  mreq(Query) = Forced Full query
-mreq(C0):- dmsg(mreq(C0)), agenda_rescan_for_module_ready,no_loop_check(with_assertions([-infInstanceOnly(_),-thlocal:infAssertedOnly(_),-thlocal:noRandomValues(_)],preq(must,C0))).
+mreq(C0):- nop(dmsg(mreq(C0))), agenda_rescan_for_module_ready,no_loop_check(with_assertions([-infInstanceOnly(_),-thlocal:infAssertedOnly(_),-thlocal:noRandomValues(_)],preq(must,C0))).
 
 % -  ireq(Query) = Normal query (May not use second order logic) (must be asserted on isntance) (used mainly by 2nd order logic to avoid looping)
-ireq(C0):- dmsg(ireq(C0)), agenda_rescan_for_module_ready,no_loop_check(with_assertions([+infInstanceOnly(_), +thlocal:infAssertedOnly(_),+thlocal:noRandomValues(_)],preq(ireq,C0))).
+ireq(C0):- nop(dmsg(ireq(C0))), agenda_rescan_for_module_ready,no_loop_check(with_assertions([+infInstanceOnly(_), +thlocal:infAssertedOnly(_),+thlocal:noRandomValues(_)],preq(ireq,C0))).
 
 :-dmsg_hide(req).
 :-dmsg_hide(ireq).
@@ -344,7 +345,7 @@ implied_skipped(Skipped):-already_added_this_round(Skipped).
 :-export(add_fast/1).
 % -  add(Assertion)
 % add_fast(C0):- must_det((add_fast(C0), xtreme_debug(once(ireq(C0);(with_all_dmsg((debug(blackboard),show_call(add_fast(C0)),rtrace(add_fast(C0)),dtrace(ireq(C0))))))))),!.
-add_fast(Term):-database_api_entry(change(assert,add), Term),!. % ,xtreme_debug(ireq(C0)->true;dmsg(warn(failed_ireq(C0)))))),!.
+add_fast(Term):-dbase_modify(change(assert,add), Term),!. % ,xtreme_debug(ireq(C0)->true;dmsg(warn(failed_ireq(C0)))))),!.
 
 % -  upprop(Obj,PropSpecs) update the properties
 upprop(Obj,PropSpecs):- upprop(props(Obj,PropSpecs)).
@@ -358,13 +359,6 @@ prop(Obj,Prop,Value):- req(dbase_t(Prop,Obj,Value)).
 % -  prop_or(Obj,Prop,Value,OrElse)
 prop_or(Obj,Prop,Value,OrElse):- one_must(ireq(dbase_t(Prop,Obj,Value)),Value=OrElse).
 
-
-% ================================================
-% database_api_entry/2
-% ================================================
-% delays the run of required operations until the first query
-database_api_entry(change(Assert,Op),Term):- copy_term(Term,CTerm),!,must(dbase_modify(change(Assert,Op),CTerm)).
-database_api_entry(Op,Term):- agenda_do_prequery,dbase_op(Op,Term).
 
 
 % ================================================

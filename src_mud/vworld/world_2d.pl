@@ -185,8 +185,7 @@ same_regions(Agent,Obj):-must(inRegion(Agent,Where1)),dif_safe(Agent,Obj),inRegi
 :-decl_mpred_prolog(mudAtLoc/2).
 predArgTypes(mudAtLoc(tObj,tSpatialThing)).
 
-
-mudAtLoc(X,Y):-tObj(X),not_asserted(mudAtLoc(X,Y)),with_fail_is_asserted(mudAtLoc(X,Y),put_in_world_ilc(X)).
+mudAtLoc(X,Y):-tObj(X),not_asserted(mudAtLoc(X,Y)),!,must(localityOfOjbect(X,_R)), !,ensure_in_world(X),must(is_asserted(mudAtLoc(X,Y)),!.
 
 mostSpecificLocalityOfObject(Agent,Where):-  is_asserted_lc(mudAtLoc(Agent,Where));is_asserted_lc(localityOfObject(Agent,Where));is_asserted_lc(inRegion(Obj,Region)).
 
@@ -238,12 +237,12 @@ mudSubPart(Subj,Obj):- test_tl(infThirdOrder), find_instance_of(mudSubPart,Subj,
 put_in_world(isSelf):-!.
 put_in_world(Agent):-loop_check(put_in_world_ilc(Agent),true),!.
 
-put_in_world_ilc(Obj):-isa_asserted(Obj,tRegion),!.
 put_in_world_ilc(Obj):-is_asserted(mudAtLoc(Obj,_)),!.
-put_in_world_ilc(Obj):-localityOfObject(Obj,What),not(tRegion(What)),!,ensure_in_world(What),!.
+put_in_world_ilc(Obj):-isa_asserted(Obj,tRegion),!.
+put_in_world_ilc(Obj):-is_asserted(localityOfObject(Obj,What)),not(tRegion(What)),!,ensure_in_world(What),!.
 put_in_world_ilc(Obj):-with_fallbacksg(with_fallbacks(put_in_world_ilc_gen(Obj))),!.
 
-put_in_world_ilc_gen(Obj):-choose_for(mudFacing,Obj,_),!,must_det((choose_for(mudAtLoc,Obj,LOC),nonvar(LOC))).
+put_in_world_ilc_gen(Obj):- create_and_assert_random_fact(mudAtLoc(Obj,LOC)),create_and_assert_random_fact(mudFacing(Obj,Dir)),!.
 
 
 ensure_in_world(What):-must_det(put_in_world(What)).
@@ -274,9 +273,10 @@ user:fact_always_true(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,L
 fact_maybe_deduced(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,LOC)),locationToRegion(LOC,Region),!.
 fact_maybe_deduced(localityOfObject(apathFn(Region,Dir),Region)):-is_asserted(pathBetween(Region,Dir,_)).
 
+create_and_assert_random_fact(Fact):-must(create_random_fact(Fact)),hooked_asserta(Fact).
+
 %  suggest a random fact that is probably is not already true
-create_random_fact(mudAtLoc(Obj,LOC)) :- nonvar(Obj),asserted_or_deduced(localityOfObject(Obj,Region)),!,
-   ((in_grid(Region,LOC),unoccupied(Obj,LOC),is_fact_consistent(mudAtLoc(Obj,LOC)))).
+create_random_fact(mudAtLoc(Obj,LOC)) :- nonvar(Obj),is_asserted(localityOfObject(Obj,Region)),!,((in_grid(Region,LOC),unoccupied(Obj,LOC),is_fact_consistent(mudAtLoc(Obj,LOC)))).
 create_random_fact(mudAtLoc(Obj,LOC)) :- nonvar(Obj),((in_grid(Region,LOC),unoccupied(Obj,LOC),is_fact_consistent(mudAtLoc(Obj,LOC)))).
 create_random_fact(localityOfObject(Obj,Region)) :- nonvar(Obj),not(is_asserted(localityOfObject(Obj,_))),asserted_or_deduced(localityOfObject(Obj,Region)).
 
