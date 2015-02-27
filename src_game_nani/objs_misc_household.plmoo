@@ -19,7 +19,7 @@
 % ==================================================
 
 :-decl_mpred_hybrid(localityOfObject(tObj,tSpatialThing)).
-% which will imply ... :-decl_mpred_hybrid(localityOfObject(kappa(Self,subclass(Self,obj)),kappa(Self2,subclass(Self2,tSpatialThing)))).
+% which will imply ... :-decl_mpred_hybrid(localityOfObject(kappa(Self,genls(Self,obj)),kappa(Self2,genls(Self2,tSpatialThing)))).
 
 
 
@@ -104,88 +104,90 @@
 % Classes of things
 % ==================================================
 
-subclass(tCandle,tPortableDevice).
-subclass(tFlashlight, tPortableDevice).
-subclass(tFlashlight, tTurnOnAble).
-subclass(tDesk, tOfficeRoomFurnature).
-subclass(tApple, tFood).
-subclass(tNani, tArt).
-subclass(tNani, tWashAble).
-subclass(tClothing, tWashAble).
-subclass(tNani, tCarryAble).
-subclass(tBroccoli, tFood).
-subclass(tFood,tEatAble).
-subclass(tCrackers, tFood).
-subclass(tEnvelope, tOfficeItem).
-subclass(tStamp, tOfficeItem).
-subclass(tKey, tOfficeItem).
-subclass(tBall, tThrowAble).
+genls(tCandle,tPortableDevice).
+genls(tFlashlight, tPortableDevice).
+genls(tFlashlight, tTurnOnAble).
+genls(tDesk, tOfficeRoomFurnature).
+genls(tApple, tFood).
+genls(tNani, tArt).
+genls(tNani, tWashAble).
+genls(tClothing, tWashAble).
+genls(tClothing, tWearAble).
+genls(tNani, tCarryAble).
+genls(tBroccoli, tFood).
+genls(tFood,tEatAble).
+genls(tCrackers, tFood).
+genls(tEnvelope, tOfficeItem).
+genls(tStamp, tOfficeItem).
+genls(tKey, tOfficeItem).
+genls(tBall, tThrowAble).
+
 
 :- do_gc.
 
-subclass(tPajamas, tClothing).
-subclass(tShirt, tClothing).
-subclass(tCoat, tClothing).
-subclass(tPants, tClothing).
-subclass(tClothing, tFoldAble).
-subclass(tClothing, tWearAble).
+genls(tPajamas, tClothing).
+genls(tShirt, tClothing).
+genls(tCoat, tClothing).
+genls(tPants, tClothing).
+genls(tClothing, tFoldAble).
+genls(tClothing, tWearAble).
 
-subclass(tCoffeeCup, tLiquidContainer).
-subclass(tCoffeeCup, tDrinkAble).
-subclass(tCoffeeCup, tThrowAble).
-subclass(tCoffee, tLiquid).
-subclass(tBook, tReadAble).
+genls(tCoffeeCup, tLiquidContainer).
+genls(tCoffeeCup, tDrinkAble).
+genls(tCoffeeCup, tThrowAble).
+genls(tCoffee, tLiquid).
+genls(tBook, tReadAble).
 
-subclass(tPillow, tBedding).
-subclass(tBlanket, tBedding).                                                              
-subclass(tBedding, tFoldAble).
-subclass(tFoldAble, tCarryAble).
-subclass(tThrowAble, tCarryAble).
-subclass(tPortableDevice,tCarryAble).
-subclass(tPhysicalDevice,tUseAble).
-subclass(tWearAble, tCarryAble).
-subclass(tCarryAble, tCarryAble).
-subclass(tFood,tCarryAble).
-subclass(tCarryAble,tObj).
-subclass(tPartofObj,isTDisjoint(tCarryAble)).
+genls(tPillow, tBedding).
+genls(tBlanket, tBedding).                                                              
+genls(tBedding, tFoldAble).
+genls(tFoldAble, tCarryAble).
+genls(tThrowAble, tCarryAble).
+genls(tPortableDevice,tCarryAble).
+genls(tPhysicalDevice,tUseAble).
+genls(tWearAble, tCarryAble).
+genls(tCarryAble, tCarryAble).
+genls(tFood,tCarryAble).
+genls(tCarryAble,tObj).
+genls(tPartofObj,isTDisjoint(tCarryAble)).
 
-subclass(tLightSwitch, tWallFurnature).
-subclass(tComputer, tOfficeFurnature).
-subclass(tPartofFurnature,tPartofObj).
+genls(tLightSwitch, tWallFurnature).
+genls(tComputer, tOfficeFurnature).
+genls(tPartofFurnature,tPartofObj).
 
-subclass(tBed, tBedRoomFurnature).
-subclass(tStandTable, tBedRoomFurnature).
-subclass(tDresser, tBedRoomFurnature).
+genls(tBed, tBedRoomFurnature).
+genls(tStandTable, tBedRoomFurnature).
+genls(tDresser, tBedRoomFurnature).
 
-subclass(tWashingMachine, tDeviceFurnature).
-subclass(tTable, tFurnature).
-subclass(tTable, tHasSurface).
-subclass(tSofa, tLivingRoomFurnature).
-subclass(tEasyChair, tLivingRoomFurnature).
-subclass(tCoffeeTable, tLivingRoomFurnature).
-subclass(tBookcase, tWallFurnature).
-subclass(tDrawer, tContainer).
-subclass(tDrawer, tOpenCloseAble).
-subclass(tDrawer, tPartofFurnature).
-subclass(tTopDrawer, tPartofFurnature).
-subclass(tMiddleDrawer, tPartofFurnature).
-subclass(tBottomDrawer, tPartofFurnature). 
-subclass(tHousePlant, tPartofObj).
-subclass(tPlanter, tContainer). 
-subclass(tGueridon, tLivingRoomFurnature).
-subclass(tGardenPlant, tOutdoorFurnature).
-subclass(tSpatialThing,tLookAble).
-subclass(tNani,tTeddybear).
-subclass(tTeddybear,tTreasure).
+genls(tWashingMachine, tDeviceFurnature).
+genls(tTable, tFurnature).
+genls(tTable, tHasSurface).
+genls(tSofa, tLivingRoomFurnature).
+genls(tEasyChair, tLivingRoomFurnature).
+genls(tCoffeeTable, tLivingRoomFurnature).
+genls(tBookcase, tWallFurnature).
+genls(tDrawer, tContainer).
+genls(tDrawer, tOpenCloseAble).
+genls(tDrawer, tPartofFurnature).
+genls(tTopDrawer, tPartofFurnature).
+genls(tMiddleDrawer, tPartofFurnature).
+genls(tBottomDrawer, tPartofFurnature). 
+genls(tHousePlant, tPartofObj).
+genls(tPlanter, tContainer). 
+genls(tGueridon, tLivingRoomFurnature).
+genls(tGardenPlant, tOutdoorFurnature).
+genls(tSpatialThing,tLookAble).
+genls(tNani,tTeddybear).
+genls(tTeddybear,tTreasure).
 
-subclass(tBathTub,tBathRoomFurnature).
-subclass(tShower,tBathRoomFurnature).
-subclass(tToilet,tBathRoomFurnature).
-subclass(tSink,tBathRoomFurnature).
-subclass(tKitchenSink,tKitchenFurnature).
-subclass(tFridge,tKitchenFurnature).
-subclass(tStove,tKitchenFurnature).
-subclass(tKitchenCounter,tKitchenFurnature).
+genls(tBathTub,tBathRoomFurnature).
+genls(tShower,tBathRoomFurnature).
+genls(tToilet,tBathRoomFurnature).
+genls(tSink,tBathRoomFurnature).
+genls(tKitchenSink,tKitchenFurnature).
+genls(tFridge,tKitchenFurnature).
+genls(tStove,tKitchenFurnature).
+genls(tKitchenCounter,tKitchenFurnature).
 
 :- do_gc.
 % ==================================================
