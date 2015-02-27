@@ -129,7 +129,6 @@ make_qlfs:-
 
 */
 :-export(user_ensure_nl_loaded/1).
-user_ensure_nl_loaded(_):-!.
 user_ensure_nl_loaded(F):-load_files([F],[expand(true),if(changed),qcompile(auto)]).
 
 % :- user_ensure_loaded(logicmoo(pldata/tiny_kb)).
@@ -186,7 +185,6 @@ download_and_install_el:-
 :- xperimental->include_moo_files('../external/XperiMental/src_incoming/actions/?*.pl');true.
 
 % New Objects
-:- include_moo_files('../src_mud/objs/?*.pl').
 :- include_moo_files('../src_assets/objs/?*.pl').
 :- xperimental->include_moo_files('../external/XperiMental/src_incoming/actions/?*.pl');true.
 

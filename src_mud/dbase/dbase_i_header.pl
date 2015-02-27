@@ -15,6 +15,8 @@
 :-op(0,fy,('enabled')).
 :- '@'(ensure_loaded('../../src_lib/logicmoo_util/logicmoo_util_all'),user).
 
+:-dynamic(user_db:grant_openid_server/2).
+:-multifile(user_db:grant_openid_server/2).
 :- multifile user:was_imported_kb_content/2.
 :- discontiguous(user:was_imported_kb_content/2).
 :- multifile(user:disabled/1).
@@ -43,10 +45,11 @@
 % these do not get defined!?
 % :-dynamic user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
 
+:- multifile(user:semweb_startup).
 
 :- dynamic thglobal:pfcManageHybrids/0.
 :- thread_local thlocal:into_form_code.
-:- dynamic_multifile_exported user:formatTypePrologCode/2.
+:- dynamic_multifile_exported user:defnSufficient/2.
 :- thread_local user:repl_to_string/2.
 :- thread_local user:repl_writer/2.
 :- dynamic_multifile_exported user:loaded_external_kbs/0.

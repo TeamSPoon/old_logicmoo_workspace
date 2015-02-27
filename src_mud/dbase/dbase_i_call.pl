@@ -138,12 +138,14 @@ mpred_call(Call):-
    must((reduce_dbase_op(OvOp,OvOpR),lookup_inverted_op(OvOpR,_,OverridePolarity),
      must((Call=..[Was|Apply],lookup_inverted_op(Was,InvertCurrent,_WasPol))),
    ((OverridePolarity ==('-') -> debugOnError(show_call(apply(InvertCurrent,Apply))) ; debugOnError(show_call(apply(Was,Apply))))))).
-% mpred_call(Call):-fully_expand(_,Call,Expand),mpred_call_0(Expand).
 
-mpred_call(Call):- mpred_call_0(Call).
-mpred_call_0(Call):-current_predicate(_,Call),debugOnError(loop_check(Call)).
-mpred_call_0(Call):-clause(prolog_xref:process_directive(D, Q),_),nonvar(D),D=Call,!, trace,show_call(prolog_xref:process_directive(Call,Q),fmt(Q)).
-mpred_call_0(Call):-current_predicate(is_asserted/1),!,is_asserted(Call).
+mpred_call(Call):-fully_expand(_,Call,Expand),!,mpred_call_0(Expand).
+
+mpred_call_0(Call):- one_must(mpred_call_1(Call),mpred_call_2(Call)).
+
+mpred_call_1(Call):-current_predicate(_,Call),debugOnError(loop_check(Call)).
+mpred_call_1(Call):-clause(prolog_xref:process_directive(D, Q),_),nonvar(D),D=Call,!, trace,show_call(prolog_xref:process_directive(Call,Q),fmt(Q)).
+mpred_call_2(Call):-current_predicate(is_asserted/1),!,is_asserted(Call).
 
 % https://gist.githubusercontent.com/vwood/662109/raw/dce9e9ce9505443a82834cdc86163773a0dccc0c/ecldemo.c
 

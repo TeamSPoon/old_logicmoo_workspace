@@ -76,7 +76,7 @@ pttp_assert(X) :- must_pttp_id(ID),pttp_assert_wid(ID,X).
 
 % -- CODEBLOCK
 :-export(pttp_assert_wid/2).
-pttp_assert_wid(ID,XY):-pttp_assert_wid(ID,pttp,XY).
+pttp_assert_wid(ID,XY):- with_no_term_expansions(with_assertions(user:prolog_mud_disable_term_expansions,(pttp_assert_wid(ID,pttp,XY)))).
 
 pttp_assert_wid(ID,Mode,(X,Y)):- !, pttp_assert_wid(ID,Mode,X),kb_incr(ID,ID2), pttp_assert_wid(ID2,Mode,Y).
 pttp_assert_wid(ID,Mode,[X|Y]):- !, pttp_assert_wid(ID,Mode,X),kb_incr(ID,ID2), pttp_assert_wid(ID2,Mode,Y).

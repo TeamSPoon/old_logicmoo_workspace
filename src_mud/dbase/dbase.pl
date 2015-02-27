@@ -19,7 +19,7 @@
 % [Manditory] define how we interact with the module system
 swi_module(M,E):-dmsg(swi_module(M,E)).
 
-
+user_db:grant_openid_server(_,_).
 
 % ================================================
 % Debugging settings
@@ -52,7 +52,7 @@ when_debugging(What,Call):- debugging(What),!,Call.
 when_debugging(_,_).
 
 :- asserta(tlbugger:no_colors).
-:- asserta(tlbugger:show_must_go_on).
+% :- asserta(tlbugger:show_must_go_on).
 
 :- set_prolog_flag(double_quotes, atom).
 :- set_prolog_flag(double_quotes, string).
@@ -158,7 +158,7 @@ user:decl_database_hook(change(assert,_A_or_Z),typeProps(T,_)):- decl_type_safe(
 
 user:decl_database_hook(change(assert,_A_or_Z),mpred_prop(F,W)):- sanity((nop(mpred_prop(F,W)),atom(F))).
 
-user:decl_database_hook(change(assert,_),formatTypePrologCode(FT,_)):- define_ft(FT).
+user:decl_database_hook(change(assert,_),defnSufficient(FT,_)):- define_ft(FT).
 
 user:decl_database_hook(change(assert,_),subFormat(FT,OFT)):- define_ft(OFT),define_ft(FT).
 
@@ -186,13 +186,13 @@ resolveConflict(C) :-
 % DBASE_T System
 % ================================================
 
+:- ensure_loaded(dbase_i_kb_agenda).
 :- ensure_loaded(dbase_i_mpred_pfc).
 :- ensure_loaded(dbase_i_call).
 :- ensure_loaded(dbase_i_coroutining).
 :- ensure_loaded(dbase_i_pldoc).
 :- ensure_loaded(dbase_i_db_preds).
 :- ensure_loaded(dbase_i_term_expansion).
-:- ensure_loaded(dbase_i_kb_agenda).
 :- ensure_loaded(dbase_i_kb_store).
 :- ensure_loaded(dbase_i_isa_subclass).
 
@@ -229,7 +229,7 @@ dbase_module_ready.
 :- decl_mpred_hybrid(argIsa/3).
 user:ruleBackward( argIsa(F,N,Isa), argIsa_call(F,N,Isa)).
 
-:-asserta(pfcExpansion).
+:-asserta(thlocal:pfcExpansion).
 :-decl_mpred_prolog(resolveConflict/1).
 :-decl_mpred_prolog(pfcSelect/1).
 
@@ -240,7 +240,7 @@ user:ruleBackward( argIsa(F,N,Isa), argIsa_call(F,N,Isa)).
 
 user:term_expansion(A,B):- not(user:prolog_mud_disable_term_expansions), once(pfc_file_expansion(A,B)),A\=@=B.
 
-user:semweb_startup:- with_no_term_expansions(if_file_exists(user_ensure_loaded((dbase_i_rdf_store)))).
+user:semweb_startup:- with_no_term_expansions(if_file_exists(user_ensure_loaded(logicmoo(dbase/dbase_i_rdf_store)))).
 
 :- with_no_term_expansions(if_file_exists(user_ensure_loaded(logicmoo(mobs/planner/dbase_i_hyhtn)))).
 :-decl_type(predIsFlag).
@@ -291,4 +291,6 @@ vtTestType(vTest2).
 % :-asserta(user:isa_pred_now_locked).
 
 % :-asserta(user:prolog_mud_disable_term_expansions).
+
+% :-prolog.
 

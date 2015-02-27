@@ -50,7 +50,7 @@
           tsn/0,
           op(300,fx,'-'),
           op(600,xfx,'=>'),
-          op(650,xfx,'<=>'),
+          op(600,xfx,'<=>'),
           op(350,xfx,'xor'),
           op(400,yfx,'&'),  
           op(500,yfx,'v')
@@ -74,7 +74,7 @@
      op( 400, fy, user:(box) ),	% Necessity, Always
      op( 400, fy, user:(dia) ),	% Possibly, Eventually
      op( 400, fy, user:(cir) ),	% Next time
-     op(600,xfx,user:'<-'),
+     op(1075,xfx,user:'<-'),
   
   
      op(400,fy,box),		% Necessity, Always
@@ -83,9 +83,9 @@
 
      op(300,fx,'-'),
      op(300,fx,'~'),
-     op(600,xfx,'=>'),
-     op(600,xfx,'<-'),
-     op(650,xfx,'<=>'),
+     op(1075,xfx,'=>'),
+     op(1075,xfx,'<-'),
+     op(1075,xfx,'<=>'),
      op(350,xfx,'xor'),
      op(400,yfx,'&'),  
      op(500,yfx,'v')
@@ -619,16 +619,16 @@ pred_subst2( Pred, X, Sk, [A|As], [Ap|AS] ) :- pred_subst( Pred, A,X,Sk,Ap ), pr
 :- op(300,fx,'-').
 :- op(400,yfx,'&').  
 :- op(500,yfx,'v').
-:- op(600,xfx,'=>').
-:- op(650,xfx,'<=>').
+:- op(1075,xfx,'=>').
+:- op(1075,xfx,'<=>').
 :- op(350,xfx,'xor').
 
 :- op(300,fx,user:'~').
 :- op(300,fx,user:'-').
 :- op(400,yfx,user:'&').  
 :- op(500,yfx,user:'v').
-:- op(600,xfx,user:'=>').
-:- op(650,xfx,user:'<=>').
+:- op(1075,xfx,user:'=>').
+:- op(1075,xfx,user:'<=>').
 :- op(350,xfx,user:'xor').
 
 

@@ -297,6 +297,7 @@ translateOneArg(Op,Prop,O,Type,isOneOf(VAL,LIST),VAL,G,(GO,G)):-
 
 % db_op(Op, Obj,size + 2).
 translateOneArg(_O,Prop,Obj,_Type,ARG,NEW,G,(GETTER,STORE,G)):-
+       ground(ARG),
        functor(ARG,F,2), additiveOp(F),!,
        ARG=..[F,Prop,VAL],
        GETTER=..[Prop,Obj,OLD],

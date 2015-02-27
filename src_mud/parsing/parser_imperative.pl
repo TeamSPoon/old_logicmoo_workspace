@@ -565,19 +565,24 @@ instances_of_type_0(Inst,Type):- isa(Inst,Type).
 
 instances_sortable(TYPE,HOW):-instances_sortable0(TYPE,HOW),!.
 instances_sortable(TYPE,HOW):-genls(TYPE,SUPER),instances_sortable0(SUPER,HOW),!.
+instances_sortable(tWieldAble,distance_to_current_avatar(Agent)):-current_agent_or_var(Agent).
 instances_sortable0(tWieldAble,distance_to_current_avatar(Agent)):-current_agent_or_var(Agent).
 instances_sortable0(tWearAble,distance_to_current_avatar(Agent)):-current_agent_or_var(Agent).
 
 distance_to_current_avatar(Agent,ORDEROUT,L,R):-mudDistance(Agent,L,L1),mudDistance(Agent,R,R1),compare(ORDER,L1,R1),!, (ORDER == '=' -> naming_order(ORDEROUT,L,R) ; ORDEROUT=ORDER).
 
-
-mudDistance(Agent,Obj,1):-localityOfObject(Obj,Agent),!.
-mudDistance(Agent,Obj,2):-localityOfObject(Obj,Where),localityOfObject(Agent,Where),!.
-mudDistance(_Agent,_Obj,2).
+mudDistance(Agent,Obj,(-1)):- var(Agent),!.
+mudDistance(Agent,Obj,0):- mudWielding(Agent,Obj),!.
+mudDistance(Agent,Obj,1):- wearsClothing(Agent,Obj),!.
+mudDistance(Agent,Obj,2):- mudStowing(Agent,Obj),!.
+mudDistance(Agent,Obj,3):- mudPossess(Agent,Obj),!.
+mudDistance(Agent,Obj,N):- mudPossess(OtherAgent,Obj),!,mudDistance(Agent,OtherAgent,AD),mudDistance(Agent,OtherAgent,OAD),!,N is AD + OAD.
+mudDistance(Agent,Obj,5):- same_regions(Agent,Obj),!.
+mudDistance(_Agent,_Obj,20).
 
 naming_order(ORDER,L,R):-compare(ORDER,L,R).
 
-get_sorted_instances(Inst,Type,HOW):-findall(Inst,isa(Inst,Type),List),predsort(HOW,List,Sorted),!,member(Inst,Sorted).
+get_sorted_instances(Inst,Type,HOW):-findall(Inst,isa(Inst,Type),List),sort(List,NoDupes),predsort(HOW,NoDupes,Sorted),!,member(Inst,Sorted).
 
 % instances_of_type(Inst,Type):- atom(Type), Term =..[Type,Inst], logOnError(req(Term)).
 % longest_string(?Order, @Term1, @Term2)

@@ -813,7 +813,7 @@ snumbervars(Term):-numbervars_impl(Term,0,_).
 % ===================================================================
 % Loop checking
 % ===================================================================
-:- thread_local ilc/1.
+:- thread_local tlbugger:ilc/1.
 :- thread_local ilc_local/2.
 
 reduce_make_key(call(C),O):-!,reduce_make_key(C,O).
@@ -832,15 +832,15 @@ reduce_make_key(O,O).
 make_key(M:CCI,Key):- atom(M),!,notrace((=(CCI,CC),(ground(CC)->Key=CC ; (copy_term(CC,Key,_),numbervars(Key,0,_))))).
 make_key(CCI,Key):- notrace((=(CCI,CC),(ground(CC)->Key=CC ; (copy_term(CC,Key,_),numbervars(Key,0,_))))).
 
-is_loop_checked(Call):-  make_key(Call,Key),!,ilc(Key).
+is_loop_checked(Call):-  make_key(Call,Key),!,tlbugger:ilc(Key).
 is_module_loop_checked(Module, Call):- (var(Call)->true;make_key(Call,Key)),!,ilc_local(Module,Key).
 
-no_loop_check_unsafe(Call):- with_no_assertions(ilc(_),with_no_assertions(ilc_local(_,_),loop_check(Call,fail))).
+no_loop_check_unsafe(Call):- with_no_assertions(tlbugger:ilc(_),with_no_assertions(ilc_local(_,_),loop_check(Call,fail))).
 
 % WAS no_loop_check(Call):- no_loop_check(Call,trace_or_throw(loop_to_no_loop_check(Call))).
-no_loop_check(Call):- make_key(Call,Key), with_assertions([-(ilc(_)),ilc(Key)],Call).
+no_loop_check(Call):- make_key(Call,Key), with_assertions([-(tlbugger:ilc(_)),tlbugger:ilc(Key)],Call).
 
-no_loop_check(Call, TODO):-  with_no_assertions(ilc(_),loop_check_local(Call,TODO)).
+no_loop_check(Call, TODO):-  with_no_assertions(tlbugger:ilc(_),loop_check_local(Call,TODO)).
 
 no_loop_check_module( Module, Call, TODO):-  with_no_assertions(ilc_local(Module,_),loop_check_local(Call,TODO)).
 
@@ -855,7 +855,7 @@ loop_check_module(Module,Call):-loop_check_module(Module,Call,fail).
 loop_check_module(Module,Call,TODO):- make_key(Call,Key), LC = ilc_local(Module,Key),  
  ( \+(LC) -> (setup_call_cleanup(asserta(LC,REF),Call,erase_safe(LC:loop_check_module(Module,Call,TODO),REF))); ((can_fail(TODO)->retract_can_table;true),call(TODO)) ).
 
-loop_check_term(Call,Key,TODO):- TT = ilc(Key),
+loop_check_term(Call,Key,TODO):- TT = tlbugger:ilc(Key),
  ( \+(TT) -> (setup_call_cleanup(asserta(TT,REF), Call, erase_safe(TT:loop_check_term(Call,Key,TODO),REF))) ; ((can_fail(TODO)->retract_can_table;true),call(TODO)) ).
 
 can_fail(G):-not(G=true),not(G=must(_)).
@@ -1416,8 +1416,7 @@ must_not_repeat(C):-call(C).
 % ===================================================
 
 
-% memberchk_same(X, [Y|Ys]) :- (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (nonvar(Ys),memberchk_same(X, Ys) )).
-memberchk_same(X, [Y|Ys]) :- (   X =@= Y ->  (var(X) -> X==Y ; false) ;   (nonvar(Ys),memberchk_same(X, Ys) )).
+memberchk_same(X, [Y|Ys]) :- (   X =@= Y ->  (var(X) -> X==Y ; true) ;   (nonvar(Ys),memberchk_same(X, Ys) )).
 
 
 no_repeats_av:-tlbugger:attributedVars.
@@ -1426,7 +1425,7 @@ no_repeats_av:-tlbugger:attributedVars.
 :- meta_predicate no_repeats(0).
 
 no_repeats(Call):- tlbugger:old_no_repeats,!, no_repeats_old(Call).
-no_repeats(Call):- no_repeats_av,no_repeats_av(Call).
+no_repeats(Call):- no_repeats_av,!,no_repeats_av(Call).
 no_repeats(Call):- no_repeats_old(Call).
 
 
@@ -1859,6 +1858,7 @@ local_predicate(P,F/N):-functor_safe(P,F,N),!,fail.
 %atom_contains666(F,C):- hotrace((atom(F),atom(C),sub_atom(F,_,_,_,C))).
 
 real_builtin_predicate(G):- predicate_property(G,foreign),!.
+real_builtin_predicate(G):- (predicate_property(prolog:G,built_in),
 real_builtin_predicate(G):- (predicate_property(G,built_in),(functor(G,F,_),not(user:mpred_prop(F,prologHybrid)))).
 
 will_debug_else_throw(E,Goal):- dmsg(bugger(will_debug_else_throw(E,Goal))),grtrace,Goal.
@@ -2980,8 +2980,8 @@ retract_can_table :- retractall(maybe_table_key(_)).
 :- meta_predicate_transparent(make_key(?,-)).
 
 :-module_transparent(ex/0).
-lex:-listing(ilc),listing(ilc_local(_,_)),forall(current_predicate(table_bugger:F/A),listing(table_bugger:F/A)),catch(listing(implied_dont_add),_,true).
-ex:-expire_tabled_list(_),retractall(ilc(_)),retractall(ilc_local(_,_)),dmsg_showall(_),forall(current_predicate(table_bugger:F/A),(functor(RA,F,A),retractall(RA))),catch(expire_dont_add,_,true).
+lex:-listing(tlbugger:ilc),listing(ilc_local(_,_)),forall(current_predicate(table_bugger:F/A),listing(table_bugger:F/A)),catch(listing(implied_dont_add),_,true).
+ex:-expire_tabled_list(_),retractall(tlbugger:ilc(_)),retractall(ilc_local(_,_)),dmsg_showall(_),forall(current_predicate(table_bugger:F/A),(functor(RA,F,A),retractall(RA))),catch(expire_dont_add,_,true).
 
 expire_tabled_list(V):-var(V),!,retractall(table_bugger:call_tabled_cached_results(_,_)).
 expire_tabled_list(_):-!,retractall(table_bugger:call_tabled_cached_results(_,_)).
@@ -3043,7 +3043,7 @@ call_tabled0(Key,Vars,C,List):- asserta(table_bugger:maybe_table_key(Key)), find
 
 really_can_table:- not(test_tl(tlbugger:cannot_save_table)),!.
 
-outside_of_loop_check:- (clause(ilc(_),B)->B=(!,fail);true),(clause(ilc_local(_,_),BL)->BL=(!,fail);true).
+outside_of_loop_check:- (clause(tlbugger:ilc(_),B)->B=(!,fail);true),(clause(ilc_local(_,_),BL)->BL=(!,fail);true).
 
 
 :-meta_predicate_transparent(test_tl(1,+)).

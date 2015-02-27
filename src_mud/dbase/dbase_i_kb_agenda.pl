@@ -62,9 +62,9 @@ agenda_slow_op_enqueue(Slow):- assertz_if_new(agenda_slow_op_todo(Slow)),!.
 :-dynamic(already_added_this_round/1).
 expire_dont_add:-retractall(already_added_this_round(_)),expire_tabled_list(all),nop(dmsg(expire_dont_add)).
 
-expire_pre_change(assert,_):-expire_tabled_list(all),!. 
+expire_pre_change(change(assert,_),_):-expire_tabled_list(all),!. 
 expire_pre_change(_,_).
-expire_post_change( retract,_):-expire_dont_add,!.
+expire_post_change(change(retract,_),_):-expire_dont_add,!.
 expire_post_change(_,_).
 
 % ============================================

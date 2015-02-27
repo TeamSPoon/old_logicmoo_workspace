@@ -6,6 +6,9 @@
 
 prolog:message(git(update_versions),A,A):-!.
 
+:-dynamic(did_do_semweb_startup_late_once).
+do_semweb_startup_late_once:-did_do_semweb_startup_late_once,!.
+do_semweb_startup_late_once:-asserta(did_semweb_startup_late_once),forall(clause(semweb_startup_late,G),must(show_call(G))).
 
 % :- pack_install(blog_core,[interactive(false)]).
 load_blog_core:- use_module(library(arouter)),use_module(library(docstore)),use_module(library(bc/bc_main)),use_module(library(bc/bc_view)),
@@ -148,15 +151,15 @@ http_open:location(A, B) :-
         member(C, A),
         phrase(atom_field(location, B), C), !.
 */
-user:semweb_startup:- cp_server:attach_account_info.
+semweb_startup_late:- cp_server:attach_account_info.
 
 :- asserta((user:file_search_path(A,B):-pre_file_search_path(A,B))).
 
 
-user:semweb_startup :- debug(http_request(_)),debug(cm(_)),debug(swish(_)),debug(storage).
-user:semweb_startup :- listing(pre_http_location/3).
-user:semweb_startup :- listing(location/3).
-user:semweb_startup :- ensure_webserver.
+semweb_startup_late:- debug(http_request(_)),debug(cm(_)),debug(swish(_)),debug(storage).
+semweb_startup_late:- listing(pre_http_location/3).
+semweb_startup_late:- listing(location/3).
+semweb_startup_late:- ensure_webserver.
 
 ensure_webserver :- thread_property(_,alias('httpd@3020_1')),!.
 ensure_webserver :- http_server(http_dispatch,[ port(3020), workers(16) ]).
@@ -165,5 +168,8 @@ ensure_webserver :- http_server(http_dispatch,[ port(3020), workers(16) ]).
 %prolog:message(git(update_versions))  --> [ 'Updating GIT version stamps in the background.' ])).
 % :-must(prolog:retract((message(git(update_versions,_,_):-_)))).
 
+user:semweb_startup:- do_semweb_startup_late_once.
 
+:- if_startup_script(do_semweb_startup_late_once).
 
+:- do_semweb_startup_late_once.

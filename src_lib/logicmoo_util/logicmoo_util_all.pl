@@ -65,26 +65,30 @@ normalize_path(Where,WhereF2):-clip_dir_sep(Where,WhereF2).
 
 :- export(enumerate_files/2).
 
-enumerate_files(Spec,Result):-no_repeats([Result],((enumerate_files0(Spec,NResult),normalize_path(NResult,Result)))),exists_file_or_dir(Result).
+enumerate_files(Spec,Result):-no_repeats_old([Result],((enumerate_files0(Spec,NResult),normalize_path(NResult,Result)))),exists_file_or_dir(Result).
 
-enumerate_files0(Spec,Result):- expand_file_name_safe(Spec,ResultList),ResultList\=[],member(NResult,ResultList),enumerate_files2(NResult,Result).
+:- export(enumerate_files0/2).
+enumerate_files0(Spec,Result):- expand_file_name_safe(Spec,ResultList),ResultList\=[],!,member(NResult,ResultList),enumerate_files2(NResult,Result).
 enumerate_files0(Spec,Result):- enumerate_files1(Spec,M),enumerate_files2(M,Result).
 
+:- export(enumerate_files2/2).
 enumerate_files2(Spec,Result):-sub_atom(Spec,_,1,_,'*') -> enumerate_files1(Spec,Result);Spec=Result.
 
+:- export(enumerate_files1/2).
+enumerate_files1(Atom,Result):- atomic(Atom),not(is_absolute_file_name(Atom)),atomic_list_concat(List,'/',Atom),!,concat_paths(List,Result).
 enumerate_files1(Spec,Result):- exists_file_or_dir(Spec),!,Result=Spec.
 enumerate_files1(P/C,Result):- !,concat_paths(P,C,Result).
 enumerate_files1(Spec,Result):- expand_file_name_safe(Spec,ResultList),member(Result,ResultList).
 enumerate_files1(Spec,Result):- file_search_path(Spec,Result).
 enumerate_files1(Spec,Result):- expand_file_search_path(Spec,Result).
 enumerate_files1(Spec,Result):- absolute_file_name(Spec,Result).
-enumerate_files1(Atom,Result):- atomic(Atom),not(is_absolute_file_name(Atom)),atomic_list_concat(List,'/',Atom),!,concat_paths(List,Result).
 enumerate_files1(Atom,Result):- atomic(Atom),once((member(Sep,['/**/','/**','**']),atomic_list_concat([B,A|R],Sep,Atom))),concat_paths([B,'**',A|R],Result).
 
-expand_file_name_safe(I,O):-catch(expand_file_name(I,O),_,fail),O\=[].
-expand_file_name_safe(I,[O]):-catch(expand_file_search_path(I,O),_,fail).
+:- export(expand_file_name_safe/2).
+expand_file_name_safe(I,O):-catch(expand_file_name(I,O),_,fail),O\=[],!.
+expand_file_name_safe(I,[O]):-catch(expand_file_search_path(I,O),_,fail),!.
 expand_file_name_safe(I,L):- findall(O,absolute_file_name(I,O,[expand(true),solutions(all)]);
- absolute_file_name(I,O,[expand(true),solutions(all),file_type(directory)]),L).
+ absolute_file_name(I,O,[expand(true),solutions(all),file_type(directory)]),L),!.
 
 :- export(exists_file_or_dir/1).
 exists_file_or_dir(X):-atomic(X),once((catch(exists_file(X),E,(fmt(E:X),fail));is_directory(X))).

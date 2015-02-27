@@ -196,7 +196,6 @@ doall_and_fail(Call):- time_call(once(doall(Call))),fail.
 :-export(etrace/0).
 etrace:-leash(-all),leash(+exception),trace.
 
-current_filesource(F):-seeing(X),stream_property(X,file_name(F)).
 
 :-export(onEndOfFile/1).
 :-dynamic(onEndOfFile/2).
@@ -312,8 +311,8 @@ term_expand_local_each(CM,X,F,A,X):-registered_module_type(CM,dynamic),dynamic(F
 % include_moo_files(MASK)
 % ========================================
 
-include_moo_files(Mask):- expand_file_name(Mask,X),
-     forall(member(E,X),ensure_moo_loaded(E)).
+include_moo_files(Mask):- 
+     forall(filematch(Mask,E),ensure_moo_loaded(E)).
 /*
 module(M,Preds):-
     'format'(user_error,'% visting module ~w.~n',[M]),

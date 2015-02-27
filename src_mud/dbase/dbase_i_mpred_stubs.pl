@@ -39,7 +39,7 @@ maybe_storage_stub(F,StubType):- hybrid_tPredStubImpl(StubType),not((StubType==p
 
 
 % has_storage_stub(Head):- !.
-has_storage_stub(Head):-  thglobal:pfcManageHybrids,!,
+has_storage_stub(Head):-  thglobal:pfcManageHybrids,!,   
       get_pifunctor(Head,PHead,_F),
       create_stub_body(PHead,Body),
       (predicate_property(PHead,dynamic);user:clause_safe(PHead,Body)),!.
@@ -134,16 +134,16 @@ is_call_op(call(_)):-!.
 is_call_op(query(_,_)):-!.
 is_call_op(call).
 
-non_call_op(Op):-mpred_op(Op),not(is_call_op(Op)).
+is_non_call_op(Op):-is_mpred_op(Op),not(is_call_op(Op)).
 
 % -- CODEBLOCK
-mpred_change_op(change(_,_)).
+is_mpred_change_op(change(_,_)).
 
 % -- CODEBLOCK
-mpred_op(Op):-mpred_change_op(Op).
-mpred_op(call(_)).
-mpred_op(query(_,_)).
-mpred_op(clauses(_)).
+is_mpred_op(Op):-is_mpred_change_op(Op).
+is_mpred_op(call(_)).
+is_mpred_op(query(_,_)).
+is_mpred_op(clauses(_)).
 
 % -- CODEBLOCK
 :-export(last_arg_ground/1).
@@ -154,7 +154,7 @@ last_arg_ground(_,A,HEAD):-arg(A,HEAD,Arg),!,ground(Arg).
 
 
 call_provided_mpred_storage_op(call(_),H,true):-was_isa(H,I,C),!,isa_asserted(I,C).
-call_provided_mpred_storage_op(Op,H,true):-!,no_repeats_old(loop_check(mpred_op(Op,H),is_asserted(H))).
+call_provided_mpred_storage_op(Op,H,true):-!,no_repeats_old(loop_check(may_storage_op(Op,H),is_asserted(H))).
 
 
 test_call_cut:- X=!,dmsg(testing_call_cut),X.

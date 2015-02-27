@@ -137,42 +137,44 @@ list_to_atomics_list0([E|EnglishF],[A|EnglishA]):-
 list_to_atomics_list0([],[]):-!.
 */
 
+eng_fully_expand(I,O):-loop_check(transitive(eng_fully_expand_ilc,I,O),I=O).
+eng_fully_expand_ilc(I,O):-copy_term(I,C),flatten([C],FC),eng_fully_expand_0(FC,O).
 
-eng_fully_expand(I,OOF):-copy_term(I,C),flatten([C],FC),fully_expand_0(FC,O),flatten([O],OF),fully_expand_0(OF,OOF).
+eng_fully_expand_0(FC,O):-ccatch(eng_fully_expand_1(FC,O),E,(trace,dmsg(exact_message(error_m(E,eng_fully_expand_1(FC,O)))),fail)),!.
+%eng_fully_expand_0(FC,O):-ccatch((trace,eng_fully_expand_1(FC,O)),_,fail).
 
-fully_expand_0(FC,O):-ccatch(fully_expand_1(FC,O),E,(trace,dmsg(exact_message(error_m(E,fully_expand_1(FC,O)))),fail)),!.
-%fully_expand_0(FC,O):-ccatch((trace,fully_expand_1(FC,O)),_,fail).
+eng_fully_expand_1(A,B):-loop_check(eng_fully_expand_1_ilc(A,B),A=B).
 
-fully_expand_1(Var,Var):-var(Var),!.
-fully_expand_1([],[]):-!.
-% fully_expand_1(StringIsError,_Out):-string(StringIsError),!,trace,fail.
-fully_expand_1([T|TT],FTAO):-local_term_anglify_first([T|TT],TA),flatten([TA],FTA),fully_expand_1(FTA,FTAO),!.
-fully_expand_1([T|Term],Out):-!,
-   fully_expand_2(T,E),
-   fully_expand_1(Term,English),
+eng_fully_expand_1_ilc(Var,Var):-var(Var),!.
+eng_fully_expand_1_ilc([],[]):-!.
+% eng_fully_expand_1(StringIsError,_Out):-string(StringIsError),!,trace,fail.
+eng_fully_expand_1_ilc([T|TT],FTAO):-local_term_anglify_first([T|TT],TA),flatten([TA],FTA),eng_fully_expand_1(FTA,FTAO),!.
+eng_fully_expand_1_ilc([T|Term],Out):-!,
+   eng_fully_expand_2(T,E),
+   eng_fully_expand_1(Term,English),
    flatten_append(E,English,Out),!.
 
-fully_expand_1(T,E):-fully_expand_2(T,E),!.
+eng_fully_expand_1_ilc(T,E):-loop_check(eng_fully_expand_2(T,E),(T=E)),!.
 
-fully_expand_2(Var,Var):-var(Var),!.
-fully_expand_2([],[]):-!.
-% fully_expand_2(Var,Var):-not(compound(Var)),!.
-fully_expand_2(T,FTAO):-local_term_anglify_first(T,TA),flatten([TA],FTA),fully_expand_1(FTA,FTAO).
-fully_expand_2(StringIsOK,StringIsOK):-string(StringIsOK),!.
-fully_expand_2([T|Term],Out):-!,
-   fully_expand_2(T,E),
-   fully_expand_1(Term,English),
+eng_fully_expand_2(Var,Var):-var(Var),!.
+eng_fully_expand_2([],[]):-!.
+eng_fully_expand_2(Var,Var):-not(compound(Var)),!.
+eng_fully_expand_2(T,FTAO):-local_term_anglify_first(T,TA),flatten([TA],FTA),eng_fully_expand_1(FTA,FTAO).
+eng_fully_expand_2(StringIsOK,StringIsOK):-string(StringIsOK),!.
+eng_fully_expand_2([T|Term],Out):-!,
+   eng_fully_expand_2(T,E),
+   eng_fully_expand_1(Term,English),
    flatten_append(E,English,Out),!.
-fully_expand_2(Pred,Pred):-!.
-fully_expand_2(Pred,Out):-
+eng_fully_expand_2(Pred,Pred):-!.
+eng_fully_expand_2(Pred,Out):-
    safe_univ(Pred,[F|ARGS]),
-   fully_expand_1_l(ARGS,NEWARGS),
+   eng_fully_expand_1_l(ARGS,NEWARGS),
    safe_univ(Out,[F|NEWARGS]),!.
 
-fully_expand_1_l([],[]):-!.
-fully_expand_1_l([T|Term],[E|English]):-!,
-   fully_expand_1(T,E),
-   fully_expand_1_l(Term,English).
+eng_fully_expand_1_l([],[]):-!.
+eng_fully_expand_1_l([T|Term],[E|English]):-!,
+   eng_fully_expand_1(T,E),
+   eng_fully_expand_1_l(Term,English).
 
 
 best_nl_phrase(List,Sorted):-predsort(best_nl_phrase,List,Sorted).
@@ -196,16 +198,17 @@ is_phrase_type(posNP).
 % enter_term_anglify(MASK)
 % ========================================
 
-enter_term_anglify(X,Y):-findall(X-Y-Body,clause( mudTermAnglify(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
-enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_np(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
-enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_last(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
-enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_np_last(X,Y),Body),List),!,member(X-Y-Body,List),call(Body).
+enter_term_anglify(X,Y):-var(X),copy_term(X,Y),!.
+enter_term_anglify(X,Y):-findall(X-Y-Body,clause( mudTermAnglify(X,Y),Body),List),member(X-Y-Body,List),call(Body),!.
+enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_np(X,Y),Body),List),member(X-Y-Body,List),call(Body),!.
+enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_last(X,Y),Body),List),member(X-Y-Body,List),call(Body),!.
+enter_term_anglify(X,Y):-findall(X-Y-Body,clause( term_anglify_np_last(X,Y),Body),List),member(X-Y-Body,List),call(Body),!.
+enter_term_anglify(X,X).
 
 
-
-local_term_anglify_first(T,TA):-compound(T),local_term_anglify(T,TA).
+local_term_anglify_first(T,TA):-compound(T),loop_check(local_term_anglify(T,TA)),!.
 % local_term_anglify_first(FmtObj,String):-compound(FmtObj),functor(FmtObj,Fmt,_),corece(FmtObj,Fmt,String),!.
-local_term_anglify_first(T,TA):-enter_term_anglify(T,TA).
+local_term_anglify_first(T,TA):-must(enter_term_anglify(T,TA)),!.
 
 
 flatten_append(First,Last,Out):-flatten([First],FirstF),flatten([Last],LastF),append(FirstF,LastF,Out),!.

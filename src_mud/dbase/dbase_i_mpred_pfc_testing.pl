@@ -94,9 +94,9 @@ not(P), P => conflict(P).
   % -*-Prolog-*-
 % here is an example which defines pfcDefault facts and rules.  Will it work?
 
-(pfcDefault(P)/pfcAtom(P))  =>  (~not(P) => P).
+(pfcDefault(P)/pfcLiteral(P))  =>  (~not(P) => P).
 
-pfcDefault((P => Q))/pfcAtom(Q) => (P, ~not(Q) => Q).
+pfcDefault((P => Q))/pfcLiteral(Q) => (P, ~not(Q) => Q).
 
 % birds fly by pfcDefault.
 => pfcDefault((bird(X) => fly(X))).
@@ -734,9 +734,9 @@ prove_by_contradiction(P) :-
 :-next_test. % ==
 % here is an example which defines pfcDefault facts and rules.  Will it work?
 
-(pfcDefault(P)/pfcAtom(P))  =>  (~not(P) => P).
+(pfcDefault(P)/pfcLiteral(P))  =>  (~not(P) => P).
 
-pfcDefault((P => Q))/pfcAtom(Q) => (P, ~not(Q) => Q).
+pfcDefault((P => Q))/pfcLiteral(Q) => (P, ~not(Q) => Q).
 
 % birds fly by pfcDefault.
 => pfcDefault((bird(X) => fly(X))).

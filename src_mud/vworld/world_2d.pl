@@ -78,6 +78,7 @@ in_grid(LocName,Var):-var(LocName),!,no_repeats_old([LocName,Var],(tRegion(LocNa
 in_grid(LocName,Var):-var(Var),!,in_grid_rnd(LocName,Var).
 in_grid(LocName,Var):-in_grid_no_rnd(LocName,Var).
 
+in_grid_no_rnd(xyzFn(LocName,X,Y,Z),xyzFn(LocName,X,Y,Z)) :- nonvar(X),!.
 in_grid_no_rnd(LocName,xyzFn(LocName,X,Y,Z)) :- !,
    grid_size(LocName,MaxX,MaxY,MaxZ),!,between(1,MaxX,X),between(1,MaxY,Y),between(1,MaxZ,Z).
 in_grid_no_rnd(LocName,LocName).
@@ -133,7 +134,10 @@ rez_loc_object(XY,Type):-
 %predModule(mudNearbyObjs(tObj,tObj),user).
 mudNearbyObjs(X,Y):-mudAtLoc(X,L1),mudAtLoc(Y,L2),mudNearbyLocs(L1,L2).
 
-locationToRegion(Obj,RegionIn):-var(Obj),!,dmsg(warn(var_locationToRegion(Obj,RegionIn))),isa(RegionIn,tRegion).
+is_location(Obj):-var(Obj),!,fail.
+is_location(xyzFn(_,_,_,_)):-!.
+is_location(Obj):-!,isa(Obj,tRegion),!.
+
 locationToRegion(Obj,RegionIn):-locationToRegion_0(Obj,Region),sanity((nonvar(Region),isa(Region,tRegion))),!,RegionIn=Region.
 locationToRegion_0(Obj,Obj):-var(Obj),dmsg(warn(var_locationToRegion(Obj,Obj))),!.
 locationToRegion_0(xyzFn(Region,_,_,_),Region2):-nonvar(Region),!,locationToRegion_0(Region,Region2).
@@ -157,14 +161,17 @@ mudNearbyRegions(R1,R1).
 
 % 345345  instTypeProps(OfAgent,agent,[facing(F),atloc(L)]):-  dfsdfd ignore((nonvar(OfAgent),create_someval(facing,OfAgent,F),create_someval(atloc,OfAgent,L))).
 
-transitive_other(mudAtLoc,1,Obj,What):-mudInsideOf(Obj,What).
+%transitive_other(mudAtLoc,1,Obj,What):-mudInsideOf(Obj,What).
+
+mudAtLoc(Obj,Where):-mudSubPart(What,Obj),mudAtLoc(What,Where).
+localityOfObject(Obj,Where):-mudSubPart(What,Obj),localityOfObject(What,Where).
+
 % transitive_other(localityOfObject,1,Obj,What):-mudInsideOf(Obj,What).
 
 :-decl_mpred_hybrid(mudInsideOf/2).
 % :-sanity(( requires_storage((mudInsideOf(_G3775190, _G3775191):-is_asserted(mudStowing(_G3775191, _G3775190))))  )).
-mudInsideOf(Inner,Outer):-is_asserted(mudStowing(Outer,Inner)).
-mudInsideOf(Inner,Outer):-is_asserted(mudContains(Outer,Inner)).
-
+mudInsideOf(Inner,Outer):-loop_check(mudStowing(Outer,Inner)).
+mudInsideOf(Inner,Outer):-loop_check(mudContains(Outer,Inner)).
 
 moves_with(Obj1,Obj2):-nonvar(Obj2),!,moves_with(Obj2,Where),localityOfObject(Where,Obj1).
 moves_with(Obj1,Obj2):-moves_with_sym(Obj1,Obj2).
@@ -185,17 +192,16 @@ same_regions(Agent,Obj):-must(inRegion(Agent,Where1)),dif_safe(Agent,Obj),inRegi
 :-decl_mpred_prolog(mudAtLoc/2).
 predArgTypes(mudAtLoc(tObj,tSpatialThing)).
 
-mudAtLoc(X,Y):-tObj(X),not_asserted(mudAtLoc(X,Y)),!,must(localityOfOjbect(X,_R)), !,ensure_in_world(X),must(is_asserted(mudAtLoc(X,Y)),!.
+mudAtLoc(X,Y):-loop_check(mudAtLoc_rule(X,Y)).
+mudAtLoc_rule(X,YY):-tObj(X),not_asserted(mudAtLoc(X,Y)),!,put_in_world(X),is_asserted(mudAtLoc(X,Y)),!,Y=YY.
 
-mostSpecificLocalityOfObject(Agent,Where):-  is_asserted_lc(mudAtLoc(Agent,Where));is_asserted_lc(localityOfObject(Agent,Where));is_asserted_lc(inRegion(Obj,Region)).
-
-inRegion(Agent,RegionIn):- nonvar(Agent),!, loop_check(( mostSpecificLocalityOfObject(Agent,Where), locationToRegion(Where,Region)),fail),!,Region=RegionIn.
-inRegion(Agent,RegionIn):- must(nonvar(RegionIn)),!,(tItem(Agent);tAgentGeneric(Agent)),inRegion(Agent,RegionIn).
-
-%inRegion(Agent,Region):- nonvar(Region),!, loop_check(( (is_asserted(atloc(Agent,Where));localityOfObject(Agent,Where)), locationToRegion(Where,Region)),fail).
+mostSpecificLocalityOfObject(Obj,Where):-
+   one_must(is_asserted(mudAtLoc(Obj,Where)),one_must(is_asserted(localityOfObject(Obj,Where)),is_asserted(inRegion(Obj,Where)))).
 
 
-% inRegion(Obj,Where):- localityOfObject(Obj,Where), tRegion(Where).
+inRegion(Agent,RegionIn):-nonvar(Agent),nonvar(RegionIn),!,inRegion(Agent,Region),!,same(Region,RegionIn).
+inRegion(Where,Region):-nonvar(Where),var(Region),is_location(Where),!,locationToRegion(Where,Region).
+inRegion(Agent,Region):-nonvar(Agent),var(Region),loop_check(( mostSpecificLocalityOfObject(Agent,Where), inRegion(Where,Region)),fail).
 
 % :-snark_tell(localityOfObject(A,B) &  localityOfObject(B,C) => localityOfObject(A,C)).
 
@@ -223,9 +229,9 @@ simplifyFullName(FullNameFn,FullNameFn).
 find_instance_of(Pred,Subj,Obj):- predRelationAllExists(Pred,SubjT,ObjT), isa(Subj,SubjT), 
  (is_asserted(dbase_t(Pred,Subj,Obj),isa(Obj,ObjT)) *-> true ; (predPredicateToFunction(Pred,SubjT,ObjT,PredFn), Obj =.. [PredFn,Subj])).
 
-mudSubPart(Outer,Inner):-is_asserted(mudInsideOf(Inner,Outer)).
+mudSubPart(Outer,Inner):-mudInsideOf(Inner,Outer).
 mudSubPart(Agent,Clothes):-wearsClothing(Agent,Clothes).
-mudSubPart(Subj,Obj):- test_tl(infThirdOrder), find_instance_of(mudSubPart,Subj,Obj).
+mudSubPart(Subj,Obj):- (nonvar(Subj);nonvar(Obj)),!,test_tl(infThirdOrder), find_instance_of(mudSubPart,Subj,Obj).
 % mudSubPart(face,isEach(eyes,nose,mouth)).
 % mudSubPart([upper_torso,arms,left_arm,left_hand,left_digits]).
 % mudSubPart([upper_torso,arms,right_arm,right_hand,right_digits]).
@@ -233,19 +239,21 @@ mudSubPart(Subj,Obj):- test_tl(infThirdOrder), find_instance_of(mudSubPart,Subj,
 % mudSubPart([pelvis,legs,right_leg,right_foot,right_toes]).
 
 
-
+put_in_world(X):-var(X),trace_or_throw(var_put_in_world(X)).
 put_in_world(isSelf):-!.
 put_in_world(Agent):-loop_check(put_in_world_ilc(Agent),true),!.
 
-put_in_world_ilc(Obj):-is_asserted(mudAtLoc(Obj,_)),!.
-put_in_world_ilc(Obj):-isa_asserted(Obj,tRegion),!.
-put_in_world_ilc(Obj):-is_asserted(localityOfObject(Obj,What)),not(tRegion(What)),!,ensure_in_world(What),!.
-put_in_world_ilc(Obj):-with_fallbacksg(with_fallbacks(put_in_world_ilc_gen(Obj))),!.
+put_in_world_ilc(Obj):-is_in_world(Obj),!.
+put_in_world_ilc(_):- thlocal:noDBaseHOOKS(_),!.
+put_in_world_ilc(Obj):-clause(localityOfObject(Obj,What),true),asserta(mudAtLoc(Obj,xyzFn(What,3,3,1))),!.
+put_in_world_ilc(Obj):-mudSubPart(What,Obj),!,put_in_world(What),!.
+put_in_world_ilc(Obj):-create_and_assert_random_fact(mudAtLoc(Obj,_LOC)),create_and_assert_random_fact(mudFacing(Obj,_Dir)),!.
 
-put_in_world_ilc_gen(Obj):- create_and_assert_random_fact(mudAtLoc(Obj,LOC)),create_and_assert_random_fact(mudFacing(Obj,Dir)),!.
+is_in_world(Obj):-isa_asserted(Obj,tRegion),!.
+is_in_world(Obj):-clause(mudAtLoc(Obj,_),true),!.
+is_in_world(Obj):-clause(mudStowing(Who,Obj),true),!,is_in_world(Who).
+is_in_world(Obj):-mudSubPart(What,Obj),is_in_world(What),!.
 
-
-ensure_in_world(What):-must_det(put_in_world(What)).
 
 
 % :-export user:decl_database_hook/2.
@@ -273,12 +281,16 @@ user:fact_always_true(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,L
 fact_maybe_deduced(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,LOC)),locationToRegion(LOC,Region),!.
 fact_maybe_deduced(localityOfObject(apathFn(Region,Dir),Region)):-is_asserted(pathBetween(Region,Dir,_)).
 
+create_and_assert_random_fact(Fact):- thlocal:noDBaseHOOKS(_),!.
 create_and_assert_random_fact(Fact):-must(create_random_fact(Fact)),hooked_asserta(Fact).
 
 %  suggest a random fact that is probably is not already true
-create_random_fact(mudAtLoc(Obj,LOC)) :- nonvar(Obj),is_asserted(localityOfObject(Obj,Region)),!,((in_grid(Region,LOC),unoccupied(Obj,LOC),is_fact_consistent(mudAtLoc(Obj,LOC)))).
-create_random_fact(mudAtLoc(Obj,LOC)) :- nonvar(Obj),((in_grid(Region,LOC),unoccupied(Obj,LOC),is_fact_consistent(mudAtLoc(Obj,LOC)))).
-create_random_fact(localityOfObject(Obj,Region)) :- nonvar(Obj),not(is_asserted(localityOfObject(Obj,_))),asserted_or_deduced(localityOfObject(Obj,Region)).
+create_random_fact(G) :- into_functor_form(dbase_t,G,MPred),G\=@=MPred,!,create_random_fact(MPred).
+create_random_fact(G) :- is_asserted(G),!,dmsg((create_random_fact(G) :- is_asserted(G))).
+create_random_fact(dbase_t(mudAtLoc,Obj,LOC)) :- !,nonvar(Obj),is_asserted(localityOfObject(Obj,Region)),!,((in_grid(Region,LOC),unoccupied(Obj,LOC),is_fact_consistent(mudAtLoc(Obj,LOC)))).
+create_random_fact(dbase_t(localityOfObject,Obj,Region)) :- !, nonvar(Obj),not(is_asserted(localityOfObject(Obj,_))),asserted_or_deduced(localityOfObject(Obj,Region)).
+create_random_fact(dbase_t(Other,Obj,Default)) :- nonvar(Obj),argIsa_call(Other,2,Type),random_instance_no_throw(Type,Default,ground(Default)),!.
+
 
 %  suggest random values
 hooked_random_instance(vtDirection,Dir,Test) :- my_random_member(Dir,[vNorth,vSouth,vEast,vWest,vNE,vNW,vSE,vSW]),Test,!.
@@ -308,7 +320,7 @@ unoccupied_ilc(Obj,Loc):- is_occupied(Loc,What),!,What=Obj.
 unoccupied_ilc(_,_).
 
 is_occupied(Loc,What):- is_asserted(mudAtLoc(What,Loc)),!.
-is_occupied(Loc,What):- locationToRegion(Loc,Region),localityOfObject(What,Region),ensure_in_world(What),mudAtLoc(What,Loc),!.
+is_occupied(Loc,What):- locationToRegion(Loc,Region),localityOfObject(What,Region),put_in_world(What),mudAtLoc(What,Loc),!.
 
 % Used all over the place
 % Transforms location based on cardinal direction given

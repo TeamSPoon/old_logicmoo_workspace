@@ -1635,11 +1635,11 @@ builtin(unify,_).
 builtin(identical_member_special,_).
 builtin(identical_member_special_loop_check,_).
 builtin(M:P,A):-atom(M),!,builtin(P,A).
-builtin(F,_):- user:mpred_prop(F,prologOnly),!. %,fail.
+builtin(F,_):- (user:mpred_prop(F,prologOnly)),!. %,fail.
 builtin(unifiable_member,_).
 builtin(dbase_t,_).
-builtin(F,_):-user:mpred_prop(F,prologPTTP),!,fail.
-builtin(F,_):-user:mpred_prop(F,prologSNARK),!,fail.
+%builtin(F,_):-user:mpred_prop(F,prologPTTP),!,fail.
+%builtin(F,_):-user:mpred_prop(F,prologSNARK),!,fail.
 builtin(F,A):-current_predicate(F/A),functor(P,F,A),builtin_why(P,F,A,Why),!,dmsg(todo(warn(builtin_why(F,A,Why)))).
 %%% ***
 

@@ -103,11 +103,11 @@
 :-add(isa(ttFormatType,ttAbstractType)).
 :-add(predArgTypes(typeGenls(ttTypeType,tCol))).
 
-mpred_prop(formatTypePrologCode,prologOnly).
+mpred_prop(defnSufficient,prologOnly).
 
 isa(argIsa,prologHybrid).
 isa(determinerString, prologMultiValued).
-isa(formatTypePrologCode, completeExtentAsserted).
+isa(defnSufficient, completeExtentAsserted).
 isa(ftInt,ttFormatType).
 isa(ftNumber,ttFormatType).
 isa(ftString,ttFormatType).
@@ -122,14 +122,14 @@ ttFormatted(ftListFn(ftRest)).
 
 %completelyAssertedCollection(Ext):- fwc, arg(_,vv(tCol,vtDirection,ttFormatType,tRegion,ftString,genlPreds),Ext).
 completeExtentAsserted(formatted_resultIsa).
-completeExtentAsserted(formatTypePrologCode).
+completeExtentAsserted(defnSufficient).
 completelyAssertedCollection(completelyAssertedCollection).
 ttFormatType(ftString).
 ttFormatType(ftVar).
 ttFormatType(ftVoprop).
 
 
-:-pfcAdd(((prologMacroHead(Compound), {get_functor(Compound,F)}) => functorDeclares(F))).
+:- pfcAdd(((prologMacroHead(Compound)/{get_functor(Compound,F)}) => functorDeclares(F))).
 :- pfcAdd((isa(_,ArgsIsa)=>tCol(ArgsIsa))).
 
 :- pfcTrace.
@@ -145,7 +145,7 @@ predArgTypes(argQuotedIsa(tRelation,ftInt,ttFormatType)).
 predArgTypes(argIsa(tRelation,ftInt,tCol)).
 predArgTypes(argSingleValueDefault(prologSingleValued,ftInt,ftTerm)).
 predArgTypes(formatted_resultIsa(ttFormatType,tCol)).
-predArgTypes(formatTypePrologCode(ttFormatType,ftTerm)).
+predArgTypes(defnSufficient(ttFormatType,ftTerm)).
 predArgTypes(isLikeFn(tPred,tCol)).
 predArgTypes(ruleForward(ftTerm,ftTerm)).
 prologHybrid(instTypeProps(ftID,tCol,ftVoprop)).
@@ -246,23 +246,23 @@ dividesBetween(tObj,tMassfull,tMassless).
 dividesBetween(tSpatialThing,tObj,tRegion).
 formatted_resultIsa(ftDice(ftInt,ftInt,ftInt),ftInt).
 
-formatTypePrologCode(ftInt,integer).
-formatTypePrologCode(ftFloat,float).
-formatTypePrologCode(ftAtom,atom).
-formatTypePrologCode(ftString,string).
-formatTypePrologCode(ftCallable,is_callable).
-formatTypePrologCode(ftCompound,compound).
-formatTypePrologCode(ftGround,ground).
-formatTypePrologCode(ftID,is_id).
-formatTypePrologCode(ftTerm,nonvar).
-formatTypePrologCode(ftVar,var).
-formatTypePrologCode(ftNonvar,nonvar).
-formatTypePrologCode(ftNumber,number).
-formatTypePrologCode(ftRest,is_rest).
-formatTypePrologCode(ftListFn(Type),is_list_of(Type)).
-formatTypePrologCode(ftBoolean,is_boolean).
-formatTypePrologCode(ftText,is_string).
-formatTypePrologCode(ftCodeIs(SomeCode),SomeCode):-nonvar(SomeCode).
+defnSufficient(ftInt,integer).
+defnSufficient(ftFloat,float).
+defnSufficient(ftAtom,atom).
+defnSufficient(ftString,string).
+defnSufficient(ftCallable,is_callable).
+defnSufficient(ftCompound,compound).
+defnSufficient(ftGround,ground).
+defnSufficient(ftID,is_id).
+defnSufficient(ftTerm,nonvar).
+defnSufficient(ftVar,var).
+defnSufficient(ftNonvar,nonvar).
+defnSufficient(ftNumber,number).
+defnSufficient(ftRest,is_rest).
+defnSufficient(ftListFn(Type),is_list_of(Type)).
+defnSufficient(ftBoolean,is_boolean).
+defnSufficient(ftText,is_string).
+defnSufficient(ftCodeIs(SomeCode),SomeCode):-nonvar(SomeCode).
 
 (isa(Inst,ttSpatialType), tCol(Inst)) => genls(Inst,tSpatialThing).
 % (isa(Inst,Type), tCol(Inst)) => isa(Type,ttTypeType).
@@ -346,21 +346,27 @@ tPenguin(X) => not(tFly(X)).
 % iChilly7 is a tPenguin.
 :-(pfcAdd(=> tPenguin(iChilly7))).
 
-(pfcDefault(P)/pfcAtom(P))  =>  (~not(P) => P).
+((pfcDefault(P)/pfcLiteral(P))  =>  (~not(P) => P)).
 
 % rtrace(Goal):- Goal. % (notrace((visible(+all),visible(+unify),visible(+exception),leash(-all),leash(+exception))),(trace,Goal),leash(+all)).
 
 % :- gutracer.
 
-(pfcDefault((P => Q))/pfcAtom(Q)) => (P, ~not(Q) => Q).
+(pfcDefault((P => Q))/pfcLiteral(Q)) => (P, (~not(Q) => Q)).
 
 (not(isa(I,Super) <= (isa(I,Sub), disjointWith(Sub, Super)))).
 
 (tCol(Inst), {isa_from_morphology(Inst,Type)}) => isa(Inst,Type).
 
-((disjointWith(P1,P2) , genls(C1,P1), {dif:dif(C1,P1)}) =>    disjointWith(C1,P2)).
+%((disjointWith(P1,P2) , genls(C1,P1), {dif:dif(C1,P1)}) =>    disjointWith(C1,P2)).
+% (disjointWith(C1,P2) <= (genls(C1,P1), {dif:dif(C1,P1)}, disjointWith(P1,P2))).
 
 ((is_asserted(isa(I,Sub)), is_asserted(genls(Sub, Super)),{dif:dif(Sub, Super)}) => isa(I,Super)).
+
+( ttFormatted(FT), {dif:dif(FT,COL)}, genls(FT, COL),tCol(COL),{not(isa(COL,ttFormatType))}) => formatted_resultIsa(FT,COL).
+
+(genls(I,Sub),{dif:dif(I,Super),is_asserted(genls(I,Sub)),is_asserted(genls(Sub, Super)), nonvar(I),nonvar(Sub),nonvar(Super)})    
+ => (genls(I,Super) , completeExtentAsserted(genls)).
 /*
 :-prolog.
 
@@ -369,7 +375,7 @@ genls(_Sub, Super) => tCol(Super).
 genls(Sub, _Super) => tCol(Sub).
 % use backchain instead (isa(I,Sub), disjointWith(Sub, Super)) => not(isa(I,Super)).
 
-( ttFormatted(FT), {dif:dif(FT,COL)}, genls(FT, COL),tCol(COL),{not(isa(COL,ttFormatType))}) => formatted_resultIsa(FT,COL).
+
 
 (genls(I,Sub),{dif:dif(I,Super),is_asserted(genls(I,Sub)),is_asserted(genls(Sub, Super)), nonvar(I),nonvar(Sub),nonvar(Super)})    => (genls(I,Super) , completeExtentAsserted(genls)).
 

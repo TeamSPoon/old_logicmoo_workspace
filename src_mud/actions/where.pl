@@ -35,14 +35,10 @@ user:agent_call_command(_Gent,actWho(W)) :- mud_cmd_who(W).
 mud_cmd_who(isMissing):-!,mud_cmd_who_1(_).
 mud_cmd_who(Who):- mud_cmd_who_1(Who).
 
-get_inRegion(Agnt,Where):- inRegion(Agnt,Where),!.
-get_inRegion(Agnt,Where):- mudAtLoc(Agnt,Where),!.
-get_inRegion(Agnt,Where):- localityOfObject(Agnt,Where),!.
-
 mud_cmd_who_1(Who):-
      forall(tAgentGeneric(Who),
-      once((get_inRegion(Who,Where),
-            fmt(cmdresult(actWho(Who),localityOfObject(Who,Where)))))).
+      once((inRegion(Who,Where),
+            fmt(cmdresult(actWho(Who),inRegion(Who,Where)))))).
 
 % :- include(logicmoo(vworld/moo_footer)).
 

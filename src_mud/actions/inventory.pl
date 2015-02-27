@@ -8,6 +8,8 @@
 
 % :- register_module_type (mtCommand).
 
+:-decl_mpred_prolog(nearest_reachable_object(tAgentGeneric,tObj)).
+:-decl_mpred_prolog(farthest_reachable_object(tAgentGeneric,tObj)).
 
 % ====================================================
 % the entire inventory system
@@ -23,7 +25,7 @@ tFarthestReachableItem(Obj):-
   farthest_reachable_object(Agent,Obj).
 
 
-:-decl_mpred_prolog(nearest_reachable_object(tAgentGeneric,tObj)).
+
 nearest_reachable_object(Agent,Obj):- 
   with_no_modifications((findall(Obj,farthest_reachable_object(Agent,Obj),List),reverse(List,Reverse),!,member(Obj,Reverse))).
 
@@ -49,9 +51,9 @@ farthest_reachable_object0(Agent,Obj):-
   
 
 detatch_object(Obj):-  
-  (mudPossess(Agent,Obj)->clr(mudPossess(Agent,Obj));true),
-  (with_no_modifications(mudAtLoc(Obj,LOC))-> clr(mudAtLoc(Obj,LOC));true),
-  (with_no_modifications(localityOfObject(Obj,R))-> clr(localityOfObject(Obj,R));true).
+  (is_asserted(mudPossess(Agent,Obj))->clr(mudPossess(Agent,Obj));true),
+  (is_asserted(mudAtLoc(Obj,LOC))-> clr(mudAtLoc(Obj,LOC));true),
+  (is_asserted(localityOfObject(Obj,R))-> clr(localityOfObject(Obj,R));true).
 
 user:action_info(actInventory(isOptional(tAgentGeneric,isSelfAgent)), "Examine an inventory").
 

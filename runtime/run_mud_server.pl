@@ -16,6 +16,8 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
+:- export(with_no_dbase_expansions/1).
+:- meta_predicate(with_no_dbase_expansions(0)).
 with_no_dbase_expansions(Goal):-
   with_assertions(user:prolog_mud_disable_term_expansions,Goal).
 
@@ -32,15 +34,21 @@ swi_module(M,E):-dmsg(swi_module(M,E)).
 %:- set_prolog_flag(debug,false).
 %:- set_mem_opt(false).
 
+:-dynamic(did_ref_job/1).
+do_ref_job(_Body,Ref):-did_ref_job(Ref),!.
+do_ref_job(Body ,Ref):-asserta(did_ref_job(Ref)),!,show_call(Body).
 :- multifile(user:semweb_startup).
 :- export(do_semweb_startup/0).
-do_semweb_startup:-forall(clause(user:semweb_startup,Body),must(show_call(Body))).
+do_semweb_startup:-
+   predicate_property(user:semweb_startup,number_of_clauses(N1)),
+   forall(clause(user:semweb_startup,Body,Ref),must(do_ref_job(Body,Ref))),
+   predicate_property(user:semweb_startup,number_of_clauses(N2)),
+   ((N2\=N1) -> do_semweb_startup ; true).
 
 % [Optionaly] register swish server (remote file editing)
 :- with_no_dbase_expansions(if_file_exists(ensure_loaded('../externals/swish/logicmoo_run_swish'))).
 
 % [Optionaly] register/run Cliopatria sparql server (remote RDF browsing)
-% :- if_startup_script(ensure_loaded('run_clio')).
 user:semweb_startup:-ensure_loaded('run_clio').
 
 % [Optionaly] register/run KnowRob robot services (we use it for the ontology mainly)
@@ -75,8 +83,8 @@ user:semweb_startup :- register_ros_package(euler).
 % :- add_game_dir('../games/src_game_unknown',prolog_repl).     
 
 tCol(tLivingRoom).
-subclass(tLivingRoom,tRegion).
-subclass(tOfficeRoom,tRegion).
+genls(tLivingRoom,tRegion).
+genls(tOfficeRoom,tRegion).
 :- onSpawn(pathConnects(tLivingRoom,tOfficeRoom)).
 :- do_ensure_some_pathBetween.
 % int_firstOrder(some_query, 666, What, C, E, A, J, D, L, B)
@@ -125,6 +133,9 @@ isa(iExplorer1,'tExplorer').
 
 % [Manditory] This loads the game and initializes so test can be ran
 :- if_startup_script( at_start(finish_processing_world)).
+
+
+% :- prolog_repl.
 
 % :- if_startup_script( doall(now_run_local_tests_dbg)).
 

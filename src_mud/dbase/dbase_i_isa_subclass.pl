@@ -33,7 +33,7 @@ user:hasInstance_dyn(completelyAssertedCollection,ttValueType).
 user:hasInstance_dyn(completelyAssertedCollection,ttSpatialType).
 user:hasInstance_dyn(completelyAssertedCollection,tRelation).
 user:hasInstance_dyn(completelyAssertedCollection,tPred).
-user:hasInstance_dyn(completelyAssertedCollection,formatTypePrologCode).
+user:hasInstance_dyn(completelyAssertedCollection,defnSufficient).
 user:hasInstance_dyn(completelyAssertedCollection,genlPreds).
 
 user:hasInstance_dyn(ttNotSpatialType,ftInt).
@@ -97,10 +97,14 @@ never_type_f(iPlayer2).
 never_type_f(genls).
 never_type_f(must).
 never_type_f(mpred_prop).
-never_type_f(formatTypePrologCode).
+never_type_f(defnSufficient).
+
+noncol_type('LogicalConnective').
 
 never_type_why(V,ftVar(isSelf)):-is_ftVar(V),!.
 never_type_why(mpred_call,mpred_call(isSelf)):-!.
+never_type_why(C,_):-hasInstance(tCol,C),!,fail. % already declared to be a type
+never_type_why(C,T):- noncol_type(T),hasInstance(T,C),!.
 never_type_why(F,Why):-decided_not_was_isa(F,W),!,Why=(decided_not_was_isa(F,W)).
 never_type_why(F,_):-mpred_prop(F,tCol),!,fail.
 %never_type_why(C):- compound(C),functor(C,F,1),isa_asserted(F,tCol).
@@ -157,7 +161,7 @@ type_prefix(macro,ttMacroType).
 % ========================================
 :- dynamic decided_not_was_isa/2.
 :-export(was_isa/3).
-was_isa(G,I,C):-notrace(((not(decided_not_was_isa(G,When)),compound(G),once(was_isa0(G,I,C)->true;((functor(G,F,1),get_when(When),asserta(decided_not_was_isa(F,When)),!,fail)))))).
+was_isa(G,I,C):-notrace(((not(decided_not_was_isa(G,When)),compound(G),once(was_isa0(G,I,C)-> true;((functor(G,F,1),get_when(When),asserta(decided_not_was_isa(F,When)),!,fail)))))).
 
 % get_when(When)
 get_when(F:L):-source_location(F,L),!.
@@ -172,10 +176,12 @@ was_isa0(is_typef(_),_,_):-!,fail.
 was_isa0(notrace(_),_,_):-!,fail.
 was_isa0(call(_),_,_):-!,fail.
 was_isa0(trace(_),_,_):-!,fail.
+was_isa0(not(_),_,_):-!,fail.
 % was_isa0(hasInstance(tCol,I),I,tCol).
 was_isa0(ttNotSpatialType(I),I,ttNotSpatialType).
 was_isa0(tChannel(I),I,tChannel).
 was_isa0(tAgentGeneric(I),I,tAgentGeneric).
+was_isa0(dbase_t(C,_),_,_):-never_type_why(C,_),!,fail.
 was_isa0(dbase_t(C,I),I,C).
 was_isa0(dbase_t(P,I,C),I,C):-!,P==isa.
 was_isa0(isa(I,C),I,C).
@@ -192,7 +198,7 @@ asserted_subclass(I,T):- ((thlocal:useOnlyExternalDBs,!);thglobal:use_cyc_databa
 asserted_subclass(T,ST):-dbase_t(genls,T,ST).
 
 chk_ft(T):- not_ft_quick(T),!,fail.
-%chk_ft(I):- thlocal:infForward, dbase_t(formatTypePrologCode,I,_),!.
+%chk_ft(I):- thlocal:infForward, dbase_t(defnSufficient,I,_),!.
 %chk_ft(I):- thlocal:infForward, asserted_subclass(I,FT),I\=FT,chk_ft(FT),!.
 chk_ft(I):- thlocal:infForward, !,hasInstance(ttFormatType,I).
 
@@ -263,7 +269,7 @@ is_known_false(F):-is_known_false0(F),!.
 
 :-export(is_known_false0/1).
 is_known_false0(isa(G,Why)):-!,catch(not_mud_isa(G,Why),_,fail).
-is_known_false0(genls(Type,_)):-arg(_,vv(tCol,tRelation,ttFormatType),Type).
+% is_known_false0(genls(Type,_)):-arg(_,vv(tCol,tRelation,ttFormatType),Type).
 
 
 :-export(has_free_args/1).

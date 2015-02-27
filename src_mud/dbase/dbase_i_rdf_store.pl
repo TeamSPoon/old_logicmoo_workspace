@@ -21,6 +21,8 @@
 expire_rdf_caches :- forall(clause(expire_one_rdf_cache,Body),must(Body)).
 
 :- multifile(user:semweb_startup).
+
+user:semweb_startup:- retractall((tlbugger:show_must_go_on)).
 user:semweb_startup:- expire_rdf_caches.
 
 /** <module> MUD STORE
@@ -303,32 +305,33 @@ qname_to_prolog_1(NS,Name,Atom):-toPropercase(Name,AtomU),!,atom_concat(NS,AtomU
 cache_rdf_alias(_,URL,URL):- is_url(URL),!.
 cache_rdf_alias(DB,From,To):- sanity(ground(rdf_alias(DB,From,To))),rdf_alias(DB,From,To),!.
 cache_rdf_alias(DB,NS:From,To):- DB==NS,!,asserta(rdf_alias(DB,NS:From,To)),!.
-cache_rdf_alias(DB,R:From,To):- trace_or_throw(cache_rdf_alias(DB:R:From,To)).
+cache_rdf_alias(DB,R:From,To):- dmsg(trace_or_throw(cache_rdf_alias(DB:R:From,To))),asserta(rdf_alias(DB,R:From,To)),!.
 cache_rdf_alias(DB,From,To):- dmsg(rdf_alias(DB,From,To)),asserta(rdf_alias(DB,From,To)),!.
 list_rdf_alias:-listing(rdf_alias).
 
 
-any_to_rdf(From,To):-sanity(ground(From)),any_to_rdf(mud,From,To),sanity(ground(To)).
+any_to_rdf(From,To):-sanity(ground(From)),any_to_rdf(mud,From,To),!,sanity(ground(To)).
 
 any_to_rdf(_,Var,V):-var(Var),!,must(copy_term(Var,V)).
 %any_to_rdf(DB,DB:From,To):-!,any_to_rdf(DB,From,To).
 %any_to_rdf(_,DB:From,To):-!,any_to_rdf(DB,From,To).
 
+:-export(any_to_rdf/3).
 any_to_rdf(_,U,U):-is_url(U),!.
 any_to_rdf(DB,S,URL):- ground(S),rdf_alias(DB,S,URL),!.
-any_to_rdf(_,NS:N,URL):-rdf_current_qname(NS,N),rdf_global_dbase_object(NS:N,URL).
-any_to_rdf(DB,From,URL):-p2q(From,DB,N),!,rdf_global_dbase_object(DB:N,URL).
-any_to_rdf(_,mud:From,URL):-p2q(From,NS,N),!,rdf_global_dbase_object(NS:N,URL).
-any_to_rdf(mud,From,URL):-p2q(From,NS,N),!,rdf_global_dbase_object(NS:N,URL).
-any_to_rdf(_,From,URL):-p2q(From,NS,N),!,rdf_global_dbase_object(NS:N,URL).
+any_to_rdf(_,NS:N,URL):-rdf_current_qname(NS,N),rdf_global_dbase_object(NS:N,URL),!.
+any_to_rdf(DB,From,URL):-p2q(From,DB,N),!,rdf_global_dbase_object(DB:N,URL),!.
+any_to_rdf(_,mud:From,URL):-p2q(From,NS,N),!,rdf_global_dbase_object(NS:N,URL),!.
+any_to_rdf(mud,From,URL):-p2q(From,NS,N),!,rdf_global_dbase_object(NS:N,URL),!.
+any_to_rdf(_,From,URL):-p2q(From,NS,N),!,rdf_global_dbase_object(NS:N,URL),!.
 any_to_rdf(_,S,URL):- rdf_alias(_,S,URL),!.
-any_to_rdf(_, [], Nil) :- rdf_equal(rdf:nil, Nil).
+any_to_rdf(_, [], Nil) :- rdf_equal(rdf:nil, Nil),!.
 any_to_rdf(_,node(S),Sx):-atom_concat('__bnode',S,Sx),!.
 any_to_rdf(_,Text,Sx):- is_list(Text),catch(text_to_string(Text,String),_,fail),!,any_to_rdf(String,Sx).
-any_to_rdf(DB,U,O):- nonvar(U),self_eval_object(U),rdf_to_lit(U,M),!,any_to_rdf(DB,M,O).
-any_to_rdf(DB,S,URL):- any_to_rdf_0(DB,S,URL),cache_rdf_alias(DB,S,URL).
-any_to_rdf(DB,S,URL):- any_to_rdf_1(DB,S,URL).
-any_to_rdf(DB,S,URL):- any_to_rdf_2(DB,S,URL),cache_rdf_alias(DB,S,URL).
+any_to_rdf(DB,U,O):- nonvar(U),self_eval_object(U),rdf_to_lit(U,M),!,any_to_rdf(DB,M,O),!.
+any_to_rdf(DB,S,URL):- any_to_rdf_0(DB,S,URL),cache_rdf_alias(DB,S,URL),!.
+any_to_rdf(DB,S,URL):- any_to_rdf_1(DB,S,URL),!.
+any_to_rdf(DB,S,URL):- any_to_rdf_2(DB,S,URL),cache_rdf_alias(DB,S,URL),!.
 
 any_to_rdf_0(DB,Var,V):-not(ground(Var)),trace_or_throw(nonground(any_to_rdf(DB,Var,V))).
 any_to_rdf_0(DB,Var,V):-must(nonvar(DB)),not(ground(DB)),trace_or_throw(nonground(any_to_rdf(DB,Var,V))).
@@ -363,7 +366,7 @@ rdf_literal_value_safe(Sx,S):-rdf_literal_value(Sx,S),!.
 onLoadTTL([],_File):-!.
 onLoadTTL(List,DB):-is_list(List),!,forall(member(X,List),onLoadTTL(X,DB)).
 onLoadTTL(X,DB):-format('~q.~n',[X-DB]),fail.
-onLoadTTL(rdf(S,P,O),DB):-rdf_assert_x(S,P,O,DB).
+onLoadTTL(rdf(S,P,O),DB):- must(rdf_assert_x(S,P,O,DB)).
 
 rdf_to_graph(DB,Go):-var(DB),!,rdf_to_graph(user,Go).
 rdf_to_graph(Gx,DB):-rdf_current_ns(DB,Gx),!.
@@ -429,10 +432,11 @@ cyc_to_rdf(pathName(A,Dir,String),mudNamed([apathFn,A,Dir],String)).
 cyc_to_rdf(argSingleValueDefault(PAB, 2, V),type_default(A,[P,isSelf,V])):-PAB=[P,A,_].
 cyc_to_rdf(argIsa(P,2,D),range(P,D)):-mpred_arity(P,2).
 
-rdf_assert_hook(CYC):-into_mpred_form(CYC,DIF),CYC\=@=DIF,!,rdf_assert_hook(DIF).
+:-export(rdf_assert_hook/1).
+rdf_assert_hook(CYC):-into_mpred_form(CYC,DIF),CYC\=@=DIF,!,must(rdf_assert_hook(DIF)).
 rdf_assert_hook(CYC):-once(cyc_to_rdf(CYC,RDF)),CYC\=RDF,must(call(rdf_assert_hook(RDF))).
 rdf_assert_hook(PSO):-rdf_assert_ignored(PSO),!.
-rdf_assert_hook(PSO):-rdf_assert_hook0(PSO),!.
+rdf_assert_hook(PSO):-must(rdf_assert_hook0(PSO)),!.
 rdf_assert_hook(PSO):-dmsg(once(skipped(rdf_assert_hook(PSO)))).
 
 
@@ -467,8 +471,8 @@ rdf_assert_x(S,P,O):- rdf_assert_x(S,P,O,mud).
 % rdf_assert_x(S,P,O,DB):-Q=rdf_x(S,P,O,DB),not(ground(Q)),!,Q.
 rdf_assert_x(S,P,O,DB):-
   logOnFailure((
-    notrace((must(notrace((rdf_to_graph(DB,Gx)))),any_to_rdf(Gx,S,Sx),any_to_rdf(Gx,P,Px),any_to_rdf(Gx,O,Ox))),
-      logOnFailure(((must(call(rdf_assert(Sx,Px,Ox,Gx)))))))).
+    must(((rdf_to_graph(DB,Gx),any_to_rdf(Gx,S,Sx),any_to_rdf(Gx,P,Px),any_to_rdf(Gx,O,Ox)))),
+      logOnFailure(((must(call(rdf_assert(Sx,Px,Ox,Gx)))))))),!.
 
 :-export(add_spog/4).
 add_spog(S,P,O,DB):- must(spog_to_prolog(S,P,O,DB,REQ)),!,
@@ -635,8 +639,7 @@ sync_from_rdf:-dmsg(todo(code_sync_from_rdf)),!.
 sync_from_rdf:-forall(rdf_db:rdf(S,P,O,DB),add_spog(S,P,O,DB)).
 
 sync_to_rdf:-
-   forall(p2q(P,NS,N),rdf_assert_p2q(P,NS,N)),
-  
+   forall(p2q(P,NS,N),must(rdf_assert_p2q(P,NS,N))),  
    forall(mpred_prop(P,O),rdf_assert_hook(mpred_prop(P,O))),
    forall(hasInstance(C,I),rdf_assert_hook(isa(I,C))),
    forall(disjointWith0(A,B),rdf_assert_hook(disjointWith(A,B))),

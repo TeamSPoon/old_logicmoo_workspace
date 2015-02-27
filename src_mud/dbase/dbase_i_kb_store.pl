@@ -52,16 +52,16 @@ with_fail_is_asserted(Temp,Goal):-with_assertions(thlocal:fail_is_asserted(Temp)
 not_asserted(X):- not(is_asserted_ilc(X)).
 is_asserted_eq(HB):- ( \+ \+ is_asserted(HB)).
 
-is_asserted(X):- loop_check(is_asserted_ilc(X)).
-is_asserted(X,Y):- loop_check(is_asserted_ilc(X,Y)).
-is_asserted(X,Y,Z):- loop_check(is_asserted_ilc(X,Y,Z)).
+is_asserted(X):- no_repeats(loop_check(is_asserted_ilc(X))).
+is_asserted(X,Y):- no_repeats(loop_check(is_asserted_ilc(X,Y))).
+is_asserted(X,Y,Z):- no_repeats(loop_check(is_asserted_ilc(X,Y,Z))).
 
 is_asserted_ilc(V):-var(V),!,trace_or_throw(var_is_asserted(V)).
 % is_asserted_ilc(X):- thlocal:fail_is_asserted(X),!,fail.
-is_asserted_ilc(HB):-notrace((reduce_clause(is_asserted_ilc,HB,HHBB),(HB\=@=HHBB))),!,is_asserted_ilc(HHBB).
+% is_asserted_ilc(HB):-hotrace((reduce_clause(is_asserted_ilc,HB,HHBB),(HB\=@=HHBB))),!,is_asserted_ilc(HHBB).
 % TODO: test removal
 is_asserted_ilc(prologHybrid(H)):-get_functor(H,F),!,isa_asserted(F,prologHybrid).
-is_asserted_ilc(HB):-notrace((fully_expand(is_asserted,HB,HHBB))),!,is_asserted_1(HHBB).
+is_asserted_ilc(HB):-hotrace((fully_expand(is_asserted,HB,HHBB))),!,is_asserted_1(HHBB).
 
 is_asserted_1(clause(H,B,Ref)):-!,is_asserted_ilc(H,B,Ref).
 is_asserted_1(clause(H,B)):-!,is_asserted_ilc(H,B).
@@ -74,13 +74,13 @@ is_asserted_1(HB):-expand_to_hb(HB,H,B),!,is_asserted_ilc(H,B).
 is_asserted_ilc((H:-BB),B):- is_true(B),!,is_asserted_ilc(H,BB).
 is_asserted_ilc(H,B):-notrace((fully_expand(is_asserted,(H:-B),CL),expand_to_hb(CL,HH,BB))),!,is_asserted_2(HH,BB).
 
-is_asserted_2(H,B):-thglobal:pfcManageHybrids,!,pfc_clause_db_unify(H,B).
+is_asserted_2(H,B):-thglobal:pfcManageHybrids,!,pfc_clause_is_asserted(H,B).
 is_asserted_2(H,B):-call_no_cuts(user:provide_mpred_storage_clauses(_,H,B,_Ref)),not(notrace(special_wrapper_body(B,_))).
 
 is_asserted_ilc((H:-BB),B,Ref):- is_true(B),!,is_asserted_ilc(H,BB,Ref).
-is_asserted_ilc(H,B,Ref):-notrace((fully_expand(is_asserted,(H:-B),CL),expand_to_hb(CL,HH,BB))),is_asserted_3(HH,BB,Ref).
+is_asserted_ilc(H,B,Ref):-hotrace((fully_expand(is_asserted,(H:-B),CL),expand_to_hb(CL,HH,BB))),is_asserted_3(HH,BB,Ref).
 
-is_asserted_3(H,B,Ref):-thglobal:pfcManageHybrids,!,pfc_clause_db_ref(H,B,Ref).
+is_asserted_3(H,B,Ref):-thglobal:pfcManageHybrids,!,pfc_clause_is_asserted(H,B,Ref).
 is_asserted_3(H,B,Ref):-call_no_cuts(user:provide_mpred_storage_clauses(_,H,B,Ref)),not(notrace(special_wrapper_body(B,_))).
 
 is_source_proof(_).
@@ -168,13 +168,13 @@ database_modify_3(change(assert,AorZ),      G,GG):-database_modify_4(change(asse
 
 
 database_modify_4(change(assert,AorZ),      G,GG):- Op = change(assert,AorZ),                              
-                              database_modify_5(Op,GG),
+                              database_modify_5(Op,GG),!,
                               database_modify_6(Op,GG),
                               database_modify_7(Op,GG),
-                              sanity(database_modify_8(Op,GG)).
+                              sanity(database_modify_8(Op,GG)),!.
 
-database_modify_5(Op,GG):- thglobal:pfcManageHybrids,!,copy_term(GG,GGG),must((pfcAdd(GGG),sanity(variant(GG,GGG)))),!.
-database_modify_5(Op,GG):- copy_term(GG,GGG),must((must_mpred_op(Op,GGG), sanity(variant(GG,GGG)))),!.
+database_modify_5(Op,GG):- thglobal:pfcManageHybrids,!,copy_term(GG,GGG),(\+ \+ pfcAdd(GGG)),!,show_call_failure(variant(GG,GGG)),!.
+database_modify_5(Op,GG):- copy_term(GG,GGG),must((must_storage_op(Op,GGG), sanity(variant(GG,GGG)))),!.
 database_modify_6(Op,GG):- copy_term(GG,GGE),doall(must(call_no_cuts(expire_post_change(Op,GGE)))),sanity(variant(GG,GGE)),!.
 database_modify_7(Op,GG):- copy_term(GG,GGH),must((run_database_hooks(Op,GGH),sanity(variant(GG,GGH)))),!.
 database_modify_8(Op,GG):- copy_term(GG,GGA),is_asserted_eq(GGA),sanity(variant(GG,GGA)),!.
@@ -193,13 +193,13 @@ hooked_retract(G):-  Op = change(retract,a),
                    ignore(slow_sanity(ignore(show_call_failure((dbase_op(is_asserted,G)))))),
                    slow_sanity(not(singletons_throw_else_fail(retract_cloc(G)))),
                    slow_sanity(ignore(((ground(G), once(show_call_failure((is_asserted(G)))))))),
-                   must_mpred_op(Op,G),expire_post_change( retract,G),
+                   must_storage_op(Op,G),expire_post_change( Op,G),
                    sanity(ignore(show_call_failure(not(is_asserted(G))))),
                    loop_check(run_database_hooks_depth_1(change(retract,a),G),true).
 
 hooked_retractall(G):- Op = change(retract,all),
                    slow_sanity(ignore(((ground(G), once(show_call_failure((is_asserted(G)))))))),
-                   must_mpred_op(Op,G),expire_post_change( retract,G),
+                   must_storage_op(Op,G),expire_post_change( Op,G),
                    sanity(ignore(show_call_failure(not(is_asserted(G))))),
                    loop_check(run_database_hooks_depth_1(change(retract,all),G),true).
 
@@ -210,9 +210,9 @@ user:provide_mpred_storage_op(Op,G):- (call_no_cuts(pfc_provide_mpred_storage_op
 user:provide_mpred_storage_op(Op,G):- (call_no_cuts(prolog_provide_mpred_storage_op(Op,G))).
 user:provide_mpred_storage_op(Op,G):- Op\=change(_,_), (call_no_cuts(user:provide_mpred_storage_clauses(_Type,G,true,_Proof))).
 
-must_mpred_op(Op,G):- doall(must(call_no_cuts((user:provide_mpred_storage_op(Op,G))))).
+must_storage_op(Op,G):- doall(must(may_storage_op(Op,G))).
 
-mpred_op(Op,G):- call_no_cuts(user:provide_mpred_storage_op(Op,G)).
+may_storage_op(Op,G):- call_no_cuts(user:provide_mpred_storage_op(Op,G)).
 
 
 :- meta_predicate hooked_asserta(0), hooked_assertz(0), hooked_retract(0), hooked_retractall(0).

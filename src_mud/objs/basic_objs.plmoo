@@ -125,7 +125,7 @@ formatted_resultIsa(apathFn(tRegion,vtDirection),tPathway).
 :-decl_mpred_prolog(is_vtActionTemplate/1).
 
 is_vtActionTemplate(C):-nonvar(C),get_functor(C,F),!,atom_concat(act,_,F).
-formatTypePrologCode(ftAction,is_vtActionTemplate).
+defnSufficient(ftAction,is_vtActionTemplate).
 
 genls('FemaleAnimal',tPlayer).
 genls('MaleAnimal',tPlayer).
@@ -275,10 +275,10 @@ vtBasicDir(vSouth).
 vtBasicDir(vWest).
 vtBasicDirPlusUpDown(vDown).
 vtBasicDirPlusUpDown(vUp).
-localityOfObject(Above,HasSurface):- mudLocOnSurface(Above,HasSurface).
-localityOfObject(Clothes,Agent):- mudSubPart(Agent,Clothes).
-localityOfObject(Inner,Container):- mudInsideOf(Inner,Container).
-localityOfObject(Inner,Outer):- user:use_pttp, localityOfObject(Inner,Container),localityOfObject(Container,Outer).
+%localityOfObject(Above,HasSurface):- mudLocOnSurface(Above,HasSurface).
+%localityOfObject(Clothes,Agent):- mudSubPart(Agent,Clothes).
+%localityOfObject(Inner,Container):- mudInsideOf(Inner,Container).
+%localityOfObject(Inner,Outer):- user:use_pttp, localityOfObject(Inner,Container),localityOfObject(Container,Outer).
 nameStrings(apathFn(Region,Dir),Text):- pathName(Region,Dir,Text).
 pddlSomethingIsa('NpcCol1012-Ensign732',['NpcCol1012',actor,'MaleAnimal']).
 predArgTypes(mudMaterial(tSpatialThing,vtMaterial)).
@@ -338,6 +338,8 @@ genls(tApple, tFood).
 genls(tNani, tArt).
 genls(tNani, tWashAble).
 genls(tClothing, tWashAble).
+genls(tClothing, tWearAble).
+genls(tPants, tWearAble).
 genls(tNani, tCarryAble).
 genls(tBroccoli, tFood).
 genls(tFood,tEatAble).

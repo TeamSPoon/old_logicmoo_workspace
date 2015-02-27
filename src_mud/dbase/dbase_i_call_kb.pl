@@ -264,7 +264,7 @@ write_assertions:-
 print_sentence(Proof):- fix_sentence(Proof,New),!,ignore((Proof\=New,!,must_det(retract(Proof)),assert(assert_next(New)))),!.
 
 
-
+fix_sentence(X,X).
 
 relax_term(P,P,Aic,Aic,Bic,Bic):- !.
 /*

@@ -138,7 +138,7 @@ dbase_t(P,A1,A2,A3,A4):- mpred_pa_call(P,4,call(P,A1,A2,A3,A4)).
 dbase_t(P,A1,A2,A3):- mpred_pa_call(P,3,call(P,A1,A2,A3)).
 dbase_t(P,A1,A2):- mpred_pa_call(P,2,call(P,A1,A2)).
 
-mpred_pa_call(F,A,Call):-mpred_arity(F,A),call(Call).
+mpred_pa_call(F,A,Call):-nonvar(F),mpred_arity(F,A),call(Call).
 
 isCycPredArity_ignoreable(F,A):- ignore(mpred_prop(F,cycPred(A))),ignore(mpred_arity(F,A)).
 
@@ -294,7 +294,7 @@ ensure_universal_stub5(HeadIn,Head,F,A,_HBLIST):- thglobal:pfcManageHybrids,!,
    % public(F/A),
    % lock_predicate(Head),
    retractall(mpred_prop(F,prologOnly)),
-   pfcMark(Head),
+   pfcMarkC(Head),
    dmsg(pfcManageHybrids(HeadIn)),!.
 
 
@@ -386,7 +386,7 @@ dbase_t_mpred_storage_clauses_rules(ruleBackward,H,B):-ruleBackward(H,B).
 % dbase_t_mpred_storage_clauses_rules('<=>',H,B):-'<=>'(B,HH),each_subterm(HH,SubTerm),compound(SubTerm),SubTerm = H.
 
 
-dbase_t_provide_mpred_storage_op(Op,HB):-notrace(demodulize(Op,HB,HeadBody)),get_functor(HeadBody,F),(F==dbase_t;mpred_prop(F,prologHybrid)), must(mpred_op(Op)), 
+dbase_t_provide_mpred_storage_op(Op,HB):-notrace(demodulize(Op,HB,HeadBody)),get_functor(HeadBody,F),(F==dbase_t;mpred_prop(F,prologHybrid)), must(is_mpred_op(Op)), 
     with_assertions(thlocal:already_in_kb_term_expansion,dbase_t_storage_op(Op,HeadBody)).
 
 % ====================================================
@@ -406,7 +406,7 @@ dbase_t_storage_op(Op,X):- was_isa(X,I,C),!,dbase_op(Op,isa(I,C)).
 
 % HOOK MOST ALL CALLS
 dbase_t_storage_op(Op,HeadBodyI):- notrace(((expand_term(HeadBodyI,HeadBodyM)),HeadBodyI\=@=HeadBodyM)),!,dbase_t_storage_op(Op,HeadBodyM).
-dbase_t_storage_op(Op,X):- not(non_call_op(Op)),!,dbase_t_call_op(Op,X).
+dbase_t_storage_op(Op,X):- not(is_non_call_op(Op)),!,dbase_t_call_op(Op,X).
 
 % RULE HOOK (for prolog special wrapper body stubs)
 dbase_t_storage_op(Op,(Head:-Body)):-

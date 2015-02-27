@@ -24,10 +24,12 @@ genls(tStowAble,tCarryAble).
 
 :-decl_mpred_hybrid(mudWielding/2).
 :-decl_mpred_hybrid(mudStowing/2).
+:-decl_mpred_hybrid(mudPossess/2).
 
-mudPossess(A,O):-mudStowing(A,O).
-mudPossess(A,O):-mudWielding(A,O).
-mudPossess(A,O):-wearsClothing(A,O).
+:-pfcAdd((mudStowing(A,O) => mudPossess(A,O))).
+mudWielding(A,O) => mudPossess(A,O).
+wearsClothing(A,O) => mudPossess(A,O).
+
 
 prologMultiValued(wearsClothing(tAgentGeneric,tWearAble)).
 prologMultiValued(mudWielding(tAgentGeneric,tWieldAble)).
@@ -41,7 +43,7 @@ genlPreds(mudWielding,mudPossess).
 genlPreds(mudStowing,mudPossess).
 prologHybrid(mudKnowing(tAgentGeneric,ftTerm)).
 genlPreds(mudKnowing,mudPossess).
-genlPreds(mudPossess,mudContains).
+% genlPreds(mudPossess,mudContains).
 genlInverse(mudContains,mudInsideOf).
 %genlInverse(mudStowing,mudInsideOf).
 %genlInverse(mudInsideOf,mudPossess).
