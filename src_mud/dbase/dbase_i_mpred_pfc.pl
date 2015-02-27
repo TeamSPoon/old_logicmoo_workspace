@@ -416,8 +416,10 @@ pfcDefaultSetting(GeneralTerm,Default) :-
 %= pfcAdd(P,S) asserts P into the dataBase with support from S.
 
 pfcAdd(isa(I,Not)):-Not==not,!,pfcAdd(not(I)),!.
-pfcAdd(P) :- pfcAdd(P,(pfcUser,pfcUser)).
+pfcAdd(P) :- get_user_support_for(P,S) pfcAdd(P,S).
 
+get_user_support_for(P,(pfcUser(P),pfcUser(P))).
+get_god_support_for(P,(pfcGod(P),pfcGod(P))).
 
 pfcAdd(P,S):-pfcDoConjs(pfcAdd0,P,[S]).
 
@@ -585,7 +587,7 @@ remove_selection(P) :-
 
 
 % select_next_fact(P) identifies the next fact to reason from.  
-% It tries the pfcUser defined predicate first and, failing that, 
+% It tries the user defined predicate first and, failing that, 
 %  the default mechanism.
 
 select_next_fact(P) :- 
@@ -724,8 +726,11 @@ pfcAddType(action,_Action) :- !.
 %= If it is not, then the fact is retreactred from the database and any support
 %= relationships it participated in removed.
 pfcRem(P) :- 
-  % pfcRem/1 is the pfcUser's interface - it withdraws pfcUser support for P.
-  pfcDoConjs(pfcLambda([E],pfcRem(E,(pfcUser,pfcUser))),P).
+  % pfcRem/1 is the user's interface - it withdraws user support for P.
+  pfcDoConjs(pfcLambda([E],pfcRem_user(E)),P).
+
+pfcRem_user(E):- pfcRem_user(E),get_user_support_for(E,S),!,pfcRem(E,S).
+
 
 pfcRem(P,S) :-
   % pfcDebug(format("~Nremoving support ~w from ~w",[S,P])),
@@ -736,12 +741,15 @@ pfcRem(P,S) :-
 
 %%
 %= pfcRem2 is like pfcRem, but if P is still in the DB after removing the
-%= pfcUser's support, it is retracted by more forceful means (e.g. removeLiteralSupportsAndDependants/1).
+%= user's support, it is retracted by more forceful means (e.g. removeLiteralSupportsAndDependants/1).
 %%
 
 pfcRem2(P) :- 
-  % pfcRem2/1 is the pfcUser's interface - it withdraws pfcUser support for P.
-  pfcDoConjs(pfcLambda([E],pfcRem2(E,(pfcUser,pfcUser))),P).
+  % pfcRem2/1 is the user's interface - it withdraws user support for P.
+  pfcDoConjs(pfcLambda([E],pfcRem2_user(E)),P).
+
+pfcRem2_user(E):- get_user_support_for(E,S), pfcRem2(E,S).
+
 
 pfcRem2(P,S) :-
   pfcRem(P,S),
@@ -846,14 +854,14 @@ pfcSupported(_,_P) :- true.
 
 
 %%
-%= a fact is well founded if it is supported by the pfcUser
+%= a fact is well founded if it is supported by the user
 %= or by a set of facts and a rules, all of which are well founded.
 %%
 
 wellFounded(Fact) :- pfcWFF(Fact,[]).
 
 pfcWFF(F,_) :-
-  % supported by pfcUser (pfcAxiom) or an "absent" fact (assumption).
+  % supported by user (pfcAxiom) or an "absent" fact (assumption/assumable).
   (pfcAxiom(F) ; pfcAssumptionBase(F)),
   !.
 
@@ -877,13 +885,13 @@ pfcWFF_L([X|Rest],L) :-
 % supports(+F,-ListofSupporters) where ListOfSupports is a list of the
 % supports for one justification for fact F -- i.e. a list of facts which,
 % together allow one to deduce F.  One of the facts will typically be a rule.
-% The supports for a pfcUser-defined fact are: [pfcUser].
+% The supports for a user-defined fact are: [pfcUser(Original)].
 
 supportsForWhy(F,[Fact|MoreFacts]) :-
   pfcGetSupport(F,(Fact,Trigger)),
   triggerSupports(Trigger,MoreFacts).
 
-triggerSupports(pfcUser,[]) :- !.
+triggerSupports(pfcUser(_),[]) :- !.
 triggerSupports(Trigger,[Fact|MoreFacts]) :-
   pfcGetSupport(Trigger,(Fact,AnotherTrigger)),
   triggerSupports(AnotherTrigger,MoreFacts).
@@ -1018,7 +1026,7 @@ pfcDefineBcRule(Head,Body,ParentRule) :-
   pfcBuildRhs(Head,Rhs),
   pfcForEach(pfc_nf(Body,Lhs),
           (pfcBuildTrigger(Lhs,rhs(Rhs),Trigger),
-           pfcAdd(pfcBT(Head,Trigger),(ParentRuleCopy,pfcUser)))).
+           pfcAdd(pfcBT(Head,Trigger),(ParentRuleCopy,pfcUser(_))))).
  
 
 
@@ -1313,7 +1321,7 @@ pfcProcessRule(Lhs,Rhs,ParentRule) :-
   copy_term(ParentRule,ParentRuleCopy),
   pfcBuildRhs(Rhs,Rhs2),
   pfcForEach(pfc_nf(Lhs,Lhs2), 
-          pfcBuild1Rule(Lhs2,rhs(Rhs2),(ParentRuleCopy,pfcUser))).
+          pfcBuild1Rule(Lhs2,rhs(Rhs2),(ParentRuleCopy,pfcUser(_)))).
 
 pfcBuild1Rule(Lhs,Rhs,Support) :-
   pfcBuildTrigger(Lhs,Rhs,Trigger),
@@ -1658,7 +1666,8 @@ pfcClassifyFacts([H|T],User,Pfc,[H|Rule]) :-
   pfcClassifyFacts(T,User,Pfc,Rule).
 
 pfcClassifyFacts([H|T],[H|User],Pfc,Rule) :-
-  pfcGetSupport(H,(pfcUser,pfcUser)),
+  get_user_support_for(H,US),
+  pfcGetSupport(H,US),
   !,
   pfcClassifyFacts(T,User,Pfc,Rule).
 
@@ -1745,7 +1754,8 @@ pfcTraceAddPrint(P,S) :-
   !,
   copy_term(P,Pcopy),
   numbervars(Pcopy,0,_),
-  (S=(pfcUser,pfcUser)
+  get_user_support_for(P,PS),
+  (S = PS
        -> format("~nAdding (u) ~q",[Pcopy])
         ; format("~nAdding (g) ~q",[Pcopy])).
 
@@ -1901,9 +1911,9 @@ pfcJustification_L(F,Js) :- bagof(J,pfcJustificationDB(F,J),Js).
 justSupports(F,J):- loop_check(pfcGetSupport(F,J)).
 
 
-%= pfcBase1(P,L) - is true iff L is a list of "pfcBase1" facts which, taken
+%= pfcBase1(P,L) - is true iff L is a list of "base" facts which, taken
 %= together, allows us to deduce P.  A pfcBase1 fact is an pfcAxiom (a fact 
-%= added by the pfcUser or a raw Prolog fact (i.e. one w/o any support))
+%= added by the user or a raw Prolog fact (i.e. one w/o any support))
 %= or an assumption.
 
 pfcBase1(F,[F]) :- (pfcAxiom(F) ; pfcAssumptionBase(F)),!.
@@ -1924,8 +1934,8 @@ pfcBases([X|Rest],L) :-
   pfcUnion(Bx,Br,L).
 	
 pfcAxiom(F) :- 
-  pfcGetSupport(F,(pfcUser,pfcUser)); 
-  pfcGetSupport(F,(pfcGod,pfcGod)).
+ (get_user_support_for(F,US), pfcGetSupport(F,US)); 
+ (get_god_support_for(F,GS),pfcGetSupport(F,GS)).
 
 %= an pfcAssumptionBase/1''s G was a failed goal, i.e. were assuming that our failure to 
 %= prove P is a proof of not(P)
