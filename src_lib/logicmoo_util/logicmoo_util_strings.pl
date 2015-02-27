@@ -474,6 +474,7 @@ ltrim(X,X).
 
 any_to_string(Atom,String):- must_det(any_to_string0(Atom,StringS)),StringS=String.
 
+any_to_string0(Atom,String):- number(Atom),!,number_string(Atom,String).
 any_to_string0(Atom,String):- string(Atom),!,Atom=String.
 any_to_string0(Atom,String):-var(Atom),!,term_string(Atom,String).
 any_to_string0(fmt(Fmt,Args),String):-!,sformat(String,Fmt,Args).

@@ -12,6 +12,26 @@
 :-module(logicmoo_util_bugger_catch,[
       ]).
 
+%================================================================
+% maplist/[2,3]
+% this must succeed  maplist_safe(=,[X,X,X],[1,2,3]).
+% well if its not "maplist" what shall we call it?
+%================================================================
+% so far only the findall version works .. the other runs out of local stack!?
+
+:-export((   maplist_safe/2,
+   maplist_safe/3)).
+
+maplist_safe(_Pred,[]):-!.
+maplist_safe(Pred,LIST):-findall(E,(member(E,LIST), bugger:debugOnFailure(apply(Pred,[E]))),LISTO),!, ignore(LIST=LISTO),!.
+% though this should been fine %  maplist_safe(Pred,[A|B]):- copy_term(Pred+A, Pred0+A0), debugOnFailure(once(call(Pred0,A0))),     maplist_safe(Pred,B),!.
+
+maplist_safe(_Pred,[],[]):-!.
+maplist_safe(Pred,LISTIN, LIST):-!, findall(EE, ((member(E,LISTIN),debugOnFailure(apply(Pred,[E,EE])))), LISTO),  ignore(LIST=LISTO),!.
+% though this should been fine % maplist_safe(Pred,[A|B],OUT):- copy_term(Pred+A, Pred0+A0), debugOnFailureEach(once(call(Pred0,A0,AA))),  maplist_safe(Pred,B,BB), !, ignore(OUT=[AA|BB]).
+
+
+
 :- export(bad_functor/1).
 bad_functor(L) :- arg(_,v('|','.',[],':','/'),L).
 

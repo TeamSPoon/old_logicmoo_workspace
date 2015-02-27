@@ -33,9 +33,9 @@ get_pifunctor(Head,PHead,F,A):-atom(Head),ensure_arity(Head,A),!,get_pifunctor(H
 
 maybe_storage_stub(F,StubType):- hybrid_tPredStubImpl(StubType),not((StubType==prologOnly)),mpred_arity(F,A),must(ensure_universal_stub(F/A)).
 
-% user:decl_database_hook(change(assert,_),mpred_prop(F,StubType)):- maybe_storage_stub(F,StubType).
+% user:decl_database_hook(change(assert,_),user:mpred_prop(F,StubType)):- maybe_storage_stub(F,StubType).
 % user:decl_database_hook(change(assert,_),isa(F,StubType)):- maybe_storage_stub(F,StubType).
-% user:decl_database_hook(change(assert,_),mpred_arity(F,StubType)):-  hybrid_tPredStubImpl(StubType),mpred_prop(F,StubType),must(ensure_universal_stub(F/A)).
+% user:decl_database_hook(change(assert,_),mpred_arity(F,StubType)):-  hybrid_tPredStubImpl(StubType),user:mpred_prop(F,StubType),must(ensure_universal_stub(F/A)).
 
 
 % has_storage_stub(Head):- !.
@@ -53,7 +53,7 @@ has_storage_stub(Head):-
       (((show_call_failure(predicate_property(PHead,number_of_clauses(1)))),(show_call_failure(predicate_property(PHead,number_of_rules(1)))))
         -> true; (listing(PHead),trace)),
       !,
-      must((mpred_prop(F,predStub(StubType)),
+      must((user:mpred_prop(F,predStub(StubType)),
       must(hybrid_tPredStubImpl(StubType)))).
       
 
@@ -114,7 +114,7 @@ change( retract,one)  using =
 change( retract,all)  using =
 
 same_functors(Head1,Head2):-must_det(get_functor(Head1,F1,A1)),must_det(get_functor(Head2,F2,A2)),!,F1=F2,A1=A2.
-good_for_hybrid(H,F):- not(mpred_prop(F,_ANY_)),predicate_property(H,number_of_clauses(0)),predicate_property(H,dynamic).
+good_for_hybrid(H,F):- not(user:mpred_prop(F,_ANY_)),predicate_property(H,number_of_clauses(0)),predicate_property(H,dynamic).
 ensure_exists(Head):-get_pifunctor(Head,PHead,F),get_functor(Head,F,A),(predicate_property(PHead,dynamic)->true;(predicate_property(PHead,_)->dmsg(warn(static_pred,F/A));dynamic(F/A))).
 
 */
@@ -123,10 +123,10 @@ ensure_exists(Head):-get_pifunctor(Head,PHead,F),get_functor(Head,F,A),(predicat
 % -- CODEBLOCK
 is_tCol(V):-is_ftVar(V),!,fail.
 is_tCol(tCol).
-is_tCol(F):- mpred_prop(F,tCol);hasInstance(tCol,F);hasInstance(F,_).
+is_tCol(F):- user:mpred_prop(F,tCol);hasInstance(tCol,F);hasInstance(F,_).
 
 is_proc(V):-is_ftVar(V),!,fail.
-is_proc(F):- functor(P,F,1),predicate_property(P,_),must(not(mpred_prop(F,tCol))).
+is_proc(F):- functor(P,F,1),predicate_property(P,_),must(not(user:mpred_prop(F,tCol))).
 
 % -- CODEBLOCK
 is_call_op(Var):-var(Var),!,trace_or_throw(var_is_call_op(Var)).
@@ -178,9 +178,9 @@ call_wdmsg(P,DB):- thlocal:noDBaseMODs(_),!,wdmsg(error(noDBaseMODs(P,DB))).
 call_wdmsg(P,DB):- get_functor(DB,F,A), call_wdmsg(P,DB,F,A).
 
 call_wdmsg(P,DB,dbase_t,_A):-!, append_term(P,DB,CALL),dmsg((CALL)),mpred_call(CALL).
-call_wdmsg(P,MP,F,A):- mpred_prop(F,prologHybrid),must(A>1),into_functor_form(dbase_t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,mpred_call(CALL).
-call_wdmsg(P,MP,F,A):- not(mpred_prop(F,prologOnly)),decl_mpred_hybrid(F/A), into_functor_form(dbase_t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,mpred_call(CALL).
-call_wdmsg(P,DB,F,_):- append_term(P,DB,CALL),dmsg(info(CALL)),must(mpred_prop(F,prologOnly)),!,mpred_call(CALL).
+call_wdmsg(P,MP,F,A):- user:mpred_prop(F,prologHybrid),must(A>1),into_functor_form(dbase_t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,mpred_call(CALL).
+call_wdmsg(P,MP,F,A):- not(user:mpred_prop(F,prologOnly)),decl_mpred_hybrid(F/A), into_functor_form(dbase_t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,mpred_call(CALL).
+call_wdmsg(P,DB,F,_):- append_term(P,DB,CALL),dmsg(info(CALL)),must(user:mpred_prop(F,prologOnly)),!,mpred_call(CALL).
 %call_wdmsg(P,DB,S,_):-  dtrace((append_term(P,DB,CALL),dmsg((CALL)),mpred_call(CALL))).
 
 
@@ -195,7 +195,7 @@ scan_missing_stubs(F):-
    ignore((forall(mpred_missing_stubs(F,A),
       (mpred_arity(F,A),show_call(ensure_universal_stub(F/A)))))).
 
-mpred_missing_stubs(F,A):-prologHybrid = StubType, hybrid_tPredStubImpl(StubType),mpred_prop(F,StubType),must(mpred_arity(F,A)),not(has_storage_stub(F/A)).
+mpred_missing_stubs(F,A):-prologHybrid = StubType, hybrid_tPredStubImpl(StubType),user:mpred_prop(F,StubType),must(mpred_arity(F,A)),not(has_storage_stub(F/A)).
 
 
 :-assertz_if_new(call_OnEachLoad(rescan_missing_stubs)).
@@ -212,8 +212,8 @@ no_rescans.
 
 agenda_rescan_mpred_props:- loop_check(rescan_mpred_props_ilc,true).
 rescan_mpred_props_ilc:-no_rescans,!.
-rescan_mpred_props_ilc:-rescan_duplicated_facts(user,mpred_prop(_,_)),fail.
-rescan_mpred_props_ilc:-time(forall(mpred_prop_ordered(Pred,Prop),hooked_asserta(mpred_prop(Pred,Prop)))),fail.
+rescan_mpred_props_ilc:-rescan_duplicated_facts(user,user:mpred_prop(_,_)),fail.
+rescan_mpred_props_ilc:-time(forall(mpred_prop_ordered(Pred,Prop),hooked_asserta(user:mpred_prop(Pred,Prop)))),fail.
 rescan_mpred_props_ilc:-rescan_missing_stubs.
 rescan_mpred_props_ilc.
 

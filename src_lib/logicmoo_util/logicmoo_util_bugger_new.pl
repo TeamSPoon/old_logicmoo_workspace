@@ -64,6 +64,7 @@ do_meta_arg(_Env,(-),Goal,Goal).
 do_meta_arg(_Env,(?),Goal,Goal).
 do_meta_arg(Env, _,Goal,mcall(Goal,Env)).
 
+
 :- export(mcall2/2).
 mcall2(M:Goal,Env):-!,mcall3(M,Goal,Env).
 mcall2(Goal,Env):-mcall3(user,Goal,Env).

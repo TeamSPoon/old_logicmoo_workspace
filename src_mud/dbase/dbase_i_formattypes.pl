@@ -101,6 +101,7 @@ argIsa_call_nt(_O,F,N,Type):-argIsa_call_nt(F,N,Type).
 argIsa_call(F,N,Type):- argIsa_known(F,N,Type),!.
 argIsa_call(F,N,Type):- argIsa_call_1(F,N,Type),!.
 
+:-export(argIsa_known/3).
 argIsa_known(F,N,Type):- argIsa_call_0(F,N,Type),!.
 argIsa_known(F,N,Type):- argIsa_asserted(F,N,Type),!.
 
@@ -129,6 +130,8 @@ argIsa_call_0(Col,2,ftVoprop):-hasInstance(tCol,Col).
 argIsa_call_0(defnSufficient,1,ttFormatType).
 argIsa_call_0(defnSufficient,2,ftCallable).
 argIsa_call_0(ttFormatted,1,ttFormatType).
+
+
 argIsa_call_0(isa,1,ftID).
 argIsa_call_0(export,_,ftTerm).
 argIsa_call_0(decl_mpred_hybrid,_,ftTerm).
@@ -136,8 +139,8 @@ argIsa_call_0(decl_mpred_hybrid,_,ftTerm).
 
 argIsa_call_0(isa,2,tCol).
 
-argIsa_call_0(mpred_prop,1,tPred).
-argIsa_call_0(mpred_prop,2,ftVoprop).
+argIsa_call_0(user:mpred_prop,1,tPred).
+argIsa_call_0(user:mpred_prop,2,ftVoprop).
 
 argIsa_call_0(formatted_resultIsa,1,ttFormatType).
 argIsa_call_0(formatted_resultIsa,2,tCol).
@@ -156,6 +159,11 @@ argIsa_call_0(predInstMax,3,ftInt).
 argIsa_call_0(prop,1,ftID).
 argIsa_call_0(prop,N,ftVoprop):- N>1.
 
+argIsa_call_0(apathFn,1,tRegion).
+argIsa_call_0(apathFn,2,vtDirection).
+argIsa_call_0(localityOfObject,1,tObj).
+argIsa_call_0(localityOfObject,2,tSpatialThing).
+
 argIsa_call_0(typeProps,1,tCol).
 argIsa_call_0(typeProps,N,ftVoprop):- N>1.
 
@@ -173,7 +181,7 @@ argIsa_call_0('<=>',_,ftTerm).
 argIsa_call_0(F,N,Type):-between(1,2,N),argIsa_call_3(F,Type).
 argIsa_call_0(class_template,N,Type):- (N=1 -> Type=tCol;Type=ftListFn(ftVoprop)).
 argIsa_call_0(Arity,N,T):-mpred_arity_pred(Arity),!,arg(N,vv(tPred,ftInt,tCol),T).
-argIsa_call_0(F,2,ftString):-member(F,[descriptionHere,nameftStrings,mudKeyword]).
+argIsa_call_0(F,2,ftString):-member(F,[descriptionHere,mudDescription,nameStrings,mudKeyword]),!.
 
 argIsa_call_0(F,N,Type):-hasInstance(functorDeclares,F),!,(N=1 -> Type=F ; Type=ftTerm(ftVoprop)).
 argIsa_call_0(F,N,Type):-hasInstance(tCol,F),!,(N=1 -> Type=F ; Type=ftTerm(ftVoprop)).
@@ -192,15 +200,15 @@ argIsa_call_3(subFormat,ttFormatType).
 
 % argIsa_call_0(HILOG,_,term):-hilog_functor(HILOG).
 
-argIsa_asserted(F,N,Type):- dbase_t(argIsa,F,N,Type),!.
+argIsa_asserted(F,N,Type):- debugOnError(dbase_t(argIsa,F,N,Type)),!.
 argIsa_asserted(F,N,Type):- argIsa_call_0(F,N,Type),!.
 argIsa_asserted(F,N,Type):- get_mpred_prop(F,argIsa(N,Type)),nonvar(Type),add(argIsa(F,N,Type)),!.
 argIsa_asserted(F,N,Type):- grab_argsIsa(F,Types),arg(N,Types,Type),show_call_failure((nonvar(Type),add(argIsa(F,N,Type)))),!.
-argIsa_asserted(F,N,_):- mpred_prop(F,prologHybrid),dmsg(cant_grab_argsIsa(F,N,_)),fail.
+argIsa_asserted(F,N,_):- user:mpred_prop(F,prologHybrid),dmsg(cant_grab_argsIsa(F,N,_)),fail.
 argIsa_asserted(F,N,argIsaFn(F,N)).
 
 grab_argsIsa(resultIsa,resultIsa(tFunction,tCol)).
-grab_argsIsa(F,Types):- mpred_prop(F,predArgTypes(Types)),get_functor(Types,F),assert_predArgTypes_fa(F,Types),!.
+grab_argsIsa(F,Types):- user:mpred_prop(F,predArgTypes(Types)),get_functor(Types,F),assert_predArgTypes_fa(F,Types),!.
 
 grab_argsIsa({}, A):-trace_or_throw(crazy_grab_argsIsa({}, A)).
 grab_argsIsa(was_imported_kb_content, A):-trace_or_throw(crazy_grab_argsIsa(was_imported_kb_content, A)).
@@ -240,10 +248,14 @@ correctArgsIsa(_,NC,NC):-not(compound(NC)),!.
 correctArgsIsa(_,NC,NC):-as_is_term(NC),!.
 correctArgsIsa(_,G,G):- (is_release; bad_idea;  thlocal:infSkipArgIsa),!.
 correctArgsIsa(Op,M:G,MAA):- nonvar(M),!,correctArgsIsa(Op,G,GG),M:GG=MAA.
-correctArgsIsa(Op,(A,B),(AA,BB)):-!,correctArgsIsa(Op,A,AA),correctArgsIsa(Op,B,BB).
-correctArgsIsa(_,G,GG):- get_functor(G,F,A),arg(_,vv(genls/_,mpred_prop/_,mpred_arity/_,genls/_,mudDescription/_,'<=>'/_,formatted_resultIsa/_,resultIsa/_,defnSufficient/_),F/A),!,must_equals(G,GG).
+correctArgsIsa(_,(A,B),(AA,BB)):-!,correctArgsIsa(Op,A,AA),correctArgsIsa(Op,B,BB).
+correctArgsIsa(_,isa(Args,PredArgTypes),isa(Args,PredArgTypes)):- predArgTypes==predArgTypes,!.
+correctArgsIsa(_,G,GG):- get_functor(G,F,A),
+  arg(_,vv(genls/_,user:mpred_prop/_,
+    hasInstance/2,mpred_arity/_,genls/_,'<=>'/_,
+    formatted_resultIsa/_,resultIsa/_,defnSufficient/_),F/A),!,must_equals(G,GG).
 correctArgsIsa(_,G,GG):- get_functor(G,F),hasInstance(functorDeclares,F),!,must_equals(G,GG).
-correctArgsIsa(_,G,GG):- thlocal:trust_argIsas, !,must_equals(G,GG).
+correctArgsIsa(_,G,GG):- thlocal:infSkipArgIsa, !,must_equals(G,GG).
 correctArgsIsa(Op,G,GG):- correctArgsIsa0(Op,G,GG),nonvar(GG),!.
 correctArgsIsa(Op,G,GG):- grtrace,correctArgsIsa0(Op,G,GG).
 
@@ -261,7 +273,7 @@ correctArgsIsa00(Op,[KP,Prop|Args],AA):-is_holds_true(KP),!,correctArgsIsa00(Op,
 correctArgsIsa00(Op,[KP,Prop|Args],[KP|AArgs]):-logical_functor_ft(KP),!,correctAnyType(Op,[Prop|Args],ftListFn(ftAskable),AArgs).
 correctArgsIsa00(Op,[KP,Prop|Args],[KP|AA]):-is_holds_false(KP),!,correctArgsIsa00(Op,[KP,Prop|Args],AA).
 %correctArgsIsa00(_ ,[Prop,Arg],[Prop,Arg]):- !.
-correctArgsIsa00(Op,[Prop,ArgI],[Prop,ArgO]):- mpred_prop(Prop,tCol),!, correctAnyType(query(ftID,Op),ArgI,Prop,ArgO).
+correctArgsIsa00(Op,[Prop,ArgI],[Prop,ArgO]):- user:mpred_prop(Prop,tCol),!, correctAnyType(query(ftID,Op),ArgI,Prop,ArgO).
 correctArgsIsa00(Op,[Prop|Args],[Prop|AArgs]):- discoverAndCorrectArgsIsa(Op,Prop,1,Args,AArgs).
 
 discoverAndCorrectArgsIsa(Op,Prop,_,ArgsIn,ArgsOut):- length(ArgsIn,ArgUsed),show_call_failure((mpred_full_arity(Prop,MaxArity),(ArgUsed=<MaxArity))),

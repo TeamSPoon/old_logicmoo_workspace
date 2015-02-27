@@ -199,10 +199,13 @@ convertAndCall(Type,Call):- Call=..[F|IN],maplist(to_nonvars(Type),IN,OUT), IN \
 
 as_dlog(Fml,Fml):-is_ftVar(Fml),!.
 as_dlog(Fml,FmlO):- to_dlog_ops(OPS),subsT_each(each,Fml,OPS,FmlO),!.
+
 as_symlog(Fml,Fml):-is_ftVar(Fml),!.
 as_symlog(Fml,FmlO):- as_dlog(Fml,FmlM),to_symlog_ops(OPS),subsT_each(each,FmlM,OPS,FmlO).
+
 as_prolog(Fml,Fml):-is_ftVar(Fml),!.
-as_prolog(Fml,FmlO):- as_dlog(Fml,FmlM),to_prolog_ops(OPS),subsT_each(each,FmlM,OPS,FmlO).
+as_prolog(Fml,FmlO):- as_symlog(Fml,FmlM),
+  to_prolog_ops(OPS),subsT_each(each,FmlM,OPS,FmlO).
 
 
 %=% Negation Normal Form
@@ -669,7 +672,7 @@ write_list([F|R]) :- write(F), write('.'), nl, write_list(R).
 write_list([]).
 
 numbervars_with_names(Term):-
-   term_variables(Term,Vars),name_variables(Vars),!,numbervars(Vars,91,_,[attvar(skip),singletons(true)]),!.
+   term_variables(Term,Vars),name_variables(Vars),!,numbervars(Term,91,_,[attvar(skip),singletons(false)]),!.
 
 name_variables([]).
 name_variables([Var|Vars]):-
@@ -717,7 +720,7 @@ is_function(_,F,_):- atom_concat('sk',_Was,F),!,fail.
 is_function(_,F,_):- atom_concat(_Was,'Fn',F).
 is_function(_,F,A):- A2 is A+1,current_predicate(F/A2), not(current_predicate(F/A)).
 
-is_ftEquality(Term):-get_pred(Term,Pred),(mpred_prop( Pred,prologEquality);Pred==mudEquals).
+is_ftEquality(Term):-get_pred(Term,Pred),(user:mpred_prop( Pred,prologEquality);Pred==mudEquals).
 
 function_to_predicate(Function,NewVar,Pred):-
   Function=..[F|ARGS],
@@ -749,17 +752,17 @@ conjuncts_to_list((A,B),ABL):-!,
 conjuncts_to_list(Lit,[Lit]).
 
 % kif_to_boxlog('=>'(WffIn,enables(Rule)),'$VAR'('MT2'),complete,Out1), % kif_to_boxlog('=>'(enabled(Rule),WffIn),'$VAR'('KB'),complete,Out).  
-%=----- kif_to_boxlog(+Wff,-NormalClauses) ------
 
-%:-export(kif_to_boxlog/2).
-% kif_to_boxlog(Wff,Out) :- why_to_id(rule,Wff,Why), kif_to_boxlog(Wff,Why,Out),!.
-% kif_to_boxlog(WffIn,Out) :- kif_to_boxlog(all('$VAR'('KB'),'=>'(asserted_t('$VAR'('KB'),WffIn),WffIn)),'$VAR'('KB'),complete,Out).
-% kif_to_boxlog(WffIn,NormalClauses):- kif_to_boxlog(WffIn,'$VAR'('KB'),WffIn,NormalClauses).
+%=----- kif_to_boxlog(+Wff,-NormalClauses) ------
+:-export(kif_to_boxlog/2).
+kif_to_boxlog(Wff,Out) :- why_to_id(rule,Wff,Why), kif_to_boxlog(Wff,Why,Out),!.
+kif_to_boxlog(WffIn,Out) :-  why_to_id(rule,WffIn,Why), kif_to_boxlog(all('$VAR'('KB'),'=>'(asserted_t('$VAR'('KB'),WffIn),WffIn)),'$VAR'('KB'),Why,Out).
+kif_to_boxlog(WffIn,NormalClauses):- why_to_id(rule,WffIn,Why), kif_to_boxlog(WffIn,'$VAR'('KB'),Why,NormalClauses).
 
 :-export(kif_to_boxlog/3).
 kif_to_boxlog(WffIn,Why,Out) :-  kif_to_boxlog(WffIn,'$VAR'('KB'),Why,Out),!.
 
-kif_to_boxlog(Wff:-B,KB,Why,Flattened) :- is_true(B),!, kif_to_boxlog(Wff,KB,Why,Flattened).
+kif_to_boxlog((Wff:-B),KB,Why,Flattened) :- is_true(B),!, kif_to_boxlog(Wff,KB,Why,Flattened).
 kif_to_boxlog((HEADIn:-BODYIn),KB,Why,Flattened) :-  
   ignore('$VAR'('KB')=KB),
   must_det_l([
@@ -841,10 +844,12 @@ dbase_t_tell_snark(OP2,RULE):-
    (show_call(call((must(snark_tell(RULE))))))).
 
 
-%:-export(kif_to_boxlog/1).
-%kif_to_boxlog(A):- as_dlog(A,AA),kif_to_boxlog(AA,B),!,maplist(snark_tell_boxes,B),!,nl,nl.
-%:-export(kif_to_boxlog/1).
-%kif_to_boxlog(A):- with_all_dmsg(( kif_to_boxlog(A,B),!,maplist(snark_tell_boxes,B),!,nl,nl)).
+fix_input_vars(AIn,A):-copy_term(AIn,A),numbervars(A,672,_).
+
+%:-export(show_boxlog/1).
+%assert_boxlog(AIn):- fix_input_vars(AIn,A), as_dlog(A,AA),kif_to_boxlog(AA,B),!,maplist(snark_tell_boxes(Why),B),!,nl,nl.
+%:-export(show_boxlog2/2).
+%assert_boxlog2(AIn):- fix_input_vars(AIn,A), with_all_dmsg(( kif_to_boxlog(A,B),!,maplist(snark_tell_boxes(Why),B),!,nl,nl)).
 
 snark_test_string(
 "
@@ -983,35 +988,40 @@ snark_tell(Wff):- why_to_id(tell,Wff,Why),snark_tell(Why,Wff).
 :-export(snark_tell/2).
 snark_tell(_,[]).
 snark_tell(Why,[H|T]):-!,snark_tell(Why,H),kb_incr(Why,Why2),snark_tell(Why2,T).
-snark_tell(Why,Wff):-must(kif_to_boxlog(Wff,Why,Asserts)),must(snark_tell_boxes(Why,Asserts)),!.
+snark_tell(Why,Wff):-  must(kif_to_boxlog(Wff,Why,Asserts)),must(snark_tell_boxes(Why,Asserts)),!.
 
 snark_tell_boxes(_,[]).
 snark_tell_boxes(Why,[H|T]):-!,snark_tell_boxes(Why,H),kb_incr(Why,Why2),snark_tell_boxes(Why2,T).
-snark_tell_boxes(Why,Assert):- boxlog_to_pttp(Assert,Prolog),
-  wdmsgl(snark_tell_boxes(pttp_assert_wid(Why,Prolog))),unnumbervars(Prolog,PTTP), must(pttp_assert_wid(Why,PTTP)).
+snark_tell_boxes(Why,Assert):- trace,
+  boxlog_to_prolog(Assert,PrologI),
+  as_prolog(PrologI,Prolog),
+  wdmsgl(snark_tell_boxes(assert_wfs(Why,Prolog))),
+  unnumbervars(Prolog,PTTP), must(assert_wfs(Why,PTTP)).
+
+assert_wfs(Why,PrologI):-as_prolog(PrologI,Prolog), with_assertions(thlocal:with_why_wfs(Why,Prolog),show_call(pfcAdd(Prolog))).
 
 
-boxlog_to_pttp(V,V):-is_ftVar(V),!.
-boxlog_to_pttp(impossible_in(_, H), - HH):-!,boxlog_to_pttp(H,HH).
-boxlog_to_pttp(proven_in(_, H),  HH):-!,boxlog_to_pttp(H,HH).
+boxlog_to_prolog(V,V):-is_ftVar(V),!.
+boxlog_to_prolog(impossible_in(_, H), - HH):-!,boxlog_to_prolog(H,HH).
+boxlog_to_prolog(proven_in(_, H),  HH):-!,boxlog_to_prolog(H,HH).
 
-boxlog_to_pttp(FSkip1, Conj):-FSkip1=..[when_in,_|ARGS],maplist(boxlog_to_pttp,ARGS,LIST),list_to_conjuncts(LIST,Conj),!.
-boxlog_to_pttp(proven_t(H),  HH):-!,boxlog_to_pttp(H,HH).
-boxlog_to_pttp(impossible_t(H), - HH):-!,boxlog_to_pttp(H,HH).
-boxlog_to_pttp((H:-B),(HH:-BB)):-!,boxlog_to_pttp(H,HH),boxlog_to_pttp(B,BB).
-boxlog_to_pttp((H & B),(HH , BB)):-!,boxlog_to_pttp(H,HH),boxlog_to_pttp(B,BB).
-boxlog_to_pttp((H v B),(HH ; BB)):-!,boxlog_to_pttp(H,HH),boxlog_to_pttp(B,BB).
-boxlog_to_pttp((H , B),(HH , BB)):-!,boxlog_to_pttp(H,HH),boxlog_to_pttp(B,BB).
-boxlog_to_pttp((H ; B),(HH ; BB)):-!,boxlog_to_pttp(H,HH),boxlog_to_pttp(B,BB).
-boxlog_to_pttp( - (H), - (HH)):-!,boxlog_to_pttp(H,HH).
-boxlog_to_pttp(BL,PTTP):-as_prolog(BL,PTTP).
+boxlog_to_prolog(FSkip1, Conj):-FSkip1=..[when_in,_|ARGS],maplist(boxlog_to_prolog,ARGS,LIST),list_to_conjuncts(LIST,Conj),!.
+boxlog_to_prolog(proven_t(H),  HH):-!,boxlog_to_prolog(H,HH).
+boxlog_to_prolog(impossible_t(H), - HH):-!,boxlog_to_prolog(H,HH).
+boxlog_to_prolog((H:-B),(HH:-BB)):-!,boxlog_to_prolog(H,HH),boxlog_to_prolog(B,BB).
+boxlog_to_prolog((H & B),(HH , BB)):-!,boxlog_to_prolog(H,HH),boxlog_to_prolog(B,BB).
+boxlog_to_prolog((H v B),(HH ; BB)):-!,boxlog_to_prolog(H,HH),boxlog_to_prolog(B,BB).
+boxlog_to_prolog((H , B),(HH , BB)):-!,boxlog_to_prolog(H,HH),boxlog_to_prolog(B,BB).
+boxlog_to_prolog((H ; B),(HH ; BB)):-!,boxlog_to_prolog(H,HH),boxlog_to_prolog(B,BB).
+boxlog_to_prolog( - (H), - (HH)):-!,boxlog_to_prolog(H,HH).
+boxlog_to_prolog(BL,PTTP):-as_prolog(BL,PTTP).
 
 
 /*
 :-told.
 :-dmsg_show(_).
 :-dmsg('i see this').
-:- kif_to_boxlog(exists(C, course(C) & -exists(MT3, midterm(C,MT3)))).
+:- snark_tell(exists(C, course(C) & -exists(MT3, midterm(C,MT3)))).
 :- snark_test_string(TODO),snarky(string(TODO),current_output).
 :-set_no_debug.
 */
@@ -1024,12 +1034,12 @@ boxlog_to_pttp(BL,PTTP):-as_prolog(BL,PTTP).
 :-dynamic(snark_pred_head/1).
 
 snark_pred_head(P):-var(P),user:mpred_prop(F,prologSNARK),mpred_arity(F,A),functor(P,F,A).
-snark_pred_head(P):-get_functor(P,F,_),mpred_prop(F,prologPTTP).
+snark_pred_head(P):-get_functor(P,F,_),user:mpred_prop(F,prologPTTP).
 
 :-dynamic(pttp_pred_head/1).
 
 pttp_pred_head(P):-var(P),user:mpred_prop(F,prologPTTP),mpred_arity(F,A),functor(P,F,A).
-pttp_pred_head(P):-get_functor(P,F,_),mpred_prop(F,prologPTTP).
+pttp_pred_head(P):-get_functor(P,F,_),user:mpred_prop(F,prologPTTP).
 
 :-multifile(snarky_comment/1).
 

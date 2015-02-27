@@ -16,17 +16,17 @@
 % Douglas Miles
 */
 % ========================================
-% mpred_prop/1/2/3
+% user:mpred_prop/1/2/3
 % ========================================
 
 :- export mpred_arity/2.
-:- export mpred_prop/2.
+:- export user:mpred_prop/2.
 :- export is_never_type/1.
 
 user:decl_database_hook(change(assert,_),Fact):- ignore((compound(Fact),Fact=..[F,Arg1|PROPS],is_pred_declarer(F),decl_mpred(Arg1,[F|PROPS]))).
 user:decl_database_hook(change(assert,_),isa(F,P)):- is_pred_declarer(P),decl_mpred(F,P).
-% this causes too many bugs user:decl_database_hook(change(assert,_),mpred_prop(F,mpred_arity(A))):- ignore((A==1,atom(F),not(is_never_type(F)),not(mpred_prop(F,prologOnly)),decl_type(F))).
-user:decl_database_hook(change(assert,_),mpred_prop(F,P)):- decl_mpred(F,P).
+% this causes too many bugs user:decl_database_hook(change(assert,_),user:mpred_prop(F,mpred_arity(A))):- ignore((A==1,atom(F),not(is_never_type(F)),not(user:mpred_prop(F,prologOnly)),decl_type(F))).
+user:decl_database_hook(change(assert,_),user:mpred_prop(F,P)):- decl_mpred(F,P).
 
 
 mpred_arity(apathFn,2).
@@ -35,14 +35,14 @@ mpred_arity(isInstFn,1).
 mpred_arity(ftListFn,1).
 mpred_arity(xyzFn,4).
 mpred_arity(mpred_arity,2).
-mpred_arity(mpred_prop,2).
+mpred_arity(user:mpred_prop,2).
 mpred_arity(is_never_type,1).
 mpred_arity(self_call,1).
 mpred_arity(argIsa, 3).
 mpred_arity(isa, 2).
 %mpred_arity(Prop,2):-is_pred_declarer(Prop).
 mpred_arity(predArgTypes,2).
-mpred_arity(mpred_prop,2).
+mpred_arity(user:mpred_prop,2).
 mpred_arity(mpred_arity,2).
 mpred_arity(is_never_type,1).
 mpred_arity(prologSingleValued,1).
@@ -61,7 +61,7 @@ decl_mpred_mfa(M,FF,A):-
    get_functor(FF,F,_),
    must_det_l([
      ignore((var(M),context_module(M),dmsg(decl_mpred_mfa(M,F,A)))),
-     ignore((nonvar(M),asserta_if_new(mpred_prop(F,predModule(M))))),
+     ignore((nonvar(M),asserta_if_new(user:mpred_prop(F,predModule(M))))),
      assert_arity(F,A),  
      must_det(nonvar(M)),
     '@'((
@@ -92,35 +92,35 @@ registerCycPredPlus2(P):-!,user:with_pi(P,registerCycPredPlus2_3).
 % ========================================
 % mpred_props database
 % ========================================
-mpred_prop(resolveConflict,predModule(user)).
-mpred_prop(pfcSelect,predModule(user)).
-mpred_prop(agent_text_command,prologOnly).
-mpred_prop(dbase_t,prologOnly).
-mpred_prop(member,prologOnly).
-mpred_prop(mpred_arity,prologOnly).
-mpred_prop(mpred_prop,prologOnly).
-mpred_prop(is_never_type,prologOnly).
-mpred_prop(term_expansion,prologOnly).
-mpred_prop(var,prologOnly).
-mpred_prop(H,Prop):-nonvar(H),get_functor(H,F), H \=@= F, !,mpred_prop(F,Prop).
-mpred_prop(F,Prop):-mpred_call(hasInstance(ttPredType,Prop)),hasInstance(Prop, F).
-mpred_prop(F,Prop):-mpred_arity(F,A),functor(H,F,A),predicate_property(H,Prop).
-%mpred_prop(F,tCol):-current_predicate(tCol/1),tCol(F).
+user:mpred_prop(resolveConflict,predModule(user)).
+user:mpred_prop(pfcSelect,predModule(user)).
+user:mpred_prop(agent_text_command,prologOnly).
+user:mpred_prop(dbase_t,prologOnly).
+user:mpred_prop(member,prologOnly).
+user:mpred_prop(mpred_arity,prologOnly).
+user:mpred_prop(user:mpred_prop,prologOnly).
+user:mpred_prop(is_never_type,prologOnly).
+user:mpred_prop(term_expansion,prologOnly).
+user:mpred_prop(var,prologOnly).
+user:mpred_prop(H,Prop):-nonvar(H),get_functor(H,F), H \=@= F, !,user:mpred_prop(F,Prop).
+user:mpred_prop(F,Prop):-mpred_call(hasInstance(ttPredType,Prop)),hasInstance(Prop, F).
+user:mpred_prop(F,Prop):-mpred_arity(F,A),functor(H,F,A),predicate_property(H,Prop).
+%user:mpred_prop(F,tCol):-current_predicate(tCol/1),tCol(F).
 
 /*
-% mpred_prop(F,prologOnly):- not(mpred_prop(F,prologHybrid)),(F=is_pred_declarer;(current_predicate(F/1);not(hasInstance(F,tCol)))).
-mpred_prop(G,predProxyAssert(add)):- atom(G),prologMacroHead(G).
-mpred_prop(G,predProxyQuery(ireq)):- atom(G),prologMacroHead(G).
-mpred_prop(G,predProxyRetract(del)):- atom(G),prologMacroHead(G).
+% user:mpred_prop(F,prologOnly):- not(user:mpred_prop(F,prologHybrid)),(F=is_pred_declarer;(current_predicate(F/1);not(hasInstance(F,tCol)))).
+user:mpred_prop(G,predProxyAssert(add)):- atom(G),prologMacroHead(G).
+user:mpred_prop(G,predProxyQuery(ireq)):- atom(G),prologMacroHead(G).
+user:mpred_prop(G,predProxyRetract(del)):- atom(G),prologMacroHead(G).
 */
 
 
 
 get_mpred_prop(F,_A,P):-get_mpred_prop(F,P).
-get_mpred_prop(F,P):- mpred_prop(F,P).
+get_mpred_prop(F,P):- user:mpred_prop(F,P).
 
 :- export(listprolog/0).
-listprolog:-listing(mpred_prop(_,prologOnly)).
+listprolog:-listing(user:mpred_prop(_,prologOnly)).
 
 
 ensure_arity(F,A):- one_must(mpred_arity(F,A),one_must((current_predicate(F/A),assert_arity(F,A)),(ground(F:A),assert_arity(F,A)))),!.
@@ -128,20 +128,20 @@ ensure_arity(F,A):- one_must(mpred_arity(F,A),one_must((current_predicate(F/A),a
 assert_arity(typeProps,0):- trace_or_throw(assert_arity(typeProps,0)).
 assert_arity(F,A):-not(atom(F)),trace_or_throw(assert_arity(F,A)).
 assert_arity(F,A):-not(integer(A)),trace_or_throw(assert_arity(F,A)).
-assert_arity(F,A):-mpred_arity(F,A),assert_if_new(mpred_prop(F,mpred_arity(A))),!.
+assert_arity(F,A):-mpred_arity(F,A),assert_if_new(user:mpred_prop(F,mpred_arity(A))),!.
 assert_arity(F,A):-mpred_arity(F,1),dmsg(trace_or_throw(was_one_assert_arity(F,A))),!.
 assert_arity(F,2):-F = argsIsa, nottrace_or_throw(assert_arity_argsIsa(F,2)).
 assert_arity(F,0):- dmsg(trace_or_throw(assert_arity(F,0))),!.
-assert_arity(F,A):-assert_if_new(mpred_arity(F,A)),assert_if_new(mpred_prop(F,mpred_arity(A))),!.
+assert_arity(F,A):-assert_if_new(mpred_arity(F,A)),assert_if_new(user:mpred_prop(F,mpred_arity(A))),!.
 assert_arity(F,A):-dmsg(failed_assert_arity(F,A)).
 
 assert_arity_ilc(F,A):-
   % A2 is A+2,ensure_universal_stub_plus_2(F,A2),
-  retractall(mpred_prop(F,mpred_arity(_))),
+  retractall(user:mpred_prop(F,mpred_arity(_))),
   retractall(mpred_arity(F,_)),
    must_det(good_pred_relation_name(F,A)),
     hooked_asserta(mpred_arity(F,A)),
-    hooked_asserta(mpred_prop(F,mpred_arity(A))),!.
+    hooked_asserta(user:mpred_prop(F,mpred_arity(A))),!.
 
 
 
@@ -158,8 +158,8 @@ bad_pred_relation_name(F,A):-mpred_arity(F,AO), A \= AO.
 first_mpred_props(mpred_arity(_)).
 first_mpred_props(predArgTypes(_)).
 
-mpred_prop_ordered(Pred,Prop):-first_mpred_props(Prop),mpred_prop(Pred,Prop),not(mpred_prop(Pred,prologOnly)).
-mpred_prop_ordered(Pred,Prop):-mpred_prop(Pred,Prop),not(first_mpred_props(Prop)),not(mpred_prop(Pred,prologOnly)).
+mpred_prop_ordered(Pred,Prop):-first_mpred_props(Prop),user:mpred_prop(Pred,Prop),not(user:mpred_prop(Pred,prologOnly)).
+mpred_prop_ordered(Pred,Prop):-user:mpred_prop(Pred,Prop),not(first_mpred_props(Prop)),not(user:mpred_prop(Pred,prologOnly)).
 
 :- export((decl_mpred/1)).
 
@@ -200,8 +200,8 @@ decl_mpred_2(F,mpred_arity(A)):- assert_arity(F,A),fail.
 % decl_mpred_2(F,prologHybrid):- decl_mpred_hybrid(F).
 decl_mpred_2(F,cycPlus2(A)):- ensure_universal_stub_plus_2(F,A).
 
-decl_mpred_2(F,Prop):-mpred_prop(F,Prop),!.
-decl_mpred_2(F,Prop):-hooked_asserta(mpred_prop(F,Prop)),fail.
+decl_mpred_2(F,Prop):-user:mpred_prop(F,Prop),!.
+decl_mpred_2(F,Prop):-hooked_asserta(user:mpred_prop(F,Prop)),fail.
 
 decl_mpred_2(F,A):-once(user:provide_mpred_write_attributes(F,A)).
 

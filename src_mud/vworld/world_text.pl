@@ -57,7 +57,7 @@ term_anglify_last(Head,English):-compound(Head),
    term_anglify_args(Head,F,A,ARGS,prologSingleValued,English).
 
 mudTermAnglify(Head,EnglishO):- compound(Head), 
-   Head=..[F|ARGS],mpred_prop(F,Info),
+   Head=..[F|ARGS],user:mpred_prop(F,Info),
    member(Info,[prologSingleValued,predArgMulti(_)]),   
    term_anglify_args(Head,F,1,ARGS,Info,English),eng_fully_expand(English,EnglishO),!.
 

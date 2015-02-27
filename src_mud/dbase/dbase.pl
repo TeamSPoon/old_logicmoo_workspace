@@ -51,7 +51,7 @@ verify_sanity(P):- dmsg('$ERROR_incomplete_SANITY'(P)),!.
 when_debugging(What,Call):- debugging(What),!,Call.
 when_debugging(_,_).
 
-:- asserta(tlbugger:no_colors).
+% :- asserta(tlbugger:no_colors).
 % :- asserta(tlbugger:show_must_go_on).
 
 :- set_prolog_flag(double_quotes, atom).
@@ -84,7 +84,6 @@ when_debugging(_,_).
 :- thread_local thlocal:session_agent/2.
 :- thread_local thlocal:agenda_suspend_scans/0.
 :- thread_local thlocal:tracing80/0.
-:- thread_local thlocal:trust_argIsas/0.
 :- thread_local thlocal:useAltPOS/0.
 :- thread_local thlocal:useOnlyExternalDBs/0.
 :- thread_local thlocal:usePlTalk/0.
@@ -124,13 +123,13 @@ notice_predicate_head((H1;H2)):-!,notice_predicate_head(H1),notice_predicate_hea
 notice_predicate_head((H1:-B1)):-!,notice_predicate_head(H1),notice_predicate_body(B1).
 notice_predicate_head(H):- compound(H), must_compile_special_clause(H), get_functor(H,F,A),
            \+(current_predicate(F/A)),!,
-           not(mpred_prop(F,prologOnly)),
+           not(user:mpred_prop(F,prologOnly)),
            decl_mpred_hybrid(F/A).
 
 expanded_already_functor(was_imported_kb_content).
 expanded_already_functor(was_enabled).
 
-% expanded_already_functor(F):-mpred_prop(F,prologOnly).
+% expanded_already_functor(F):-user:mpred_prop(F,prologOnly).
 
 must_compile_special_clause(CL):- sanity(nonvar(CL)),not(thlocal:into_form_code),not(thlocal:already_in_kb_term_expansion),not((get_functor(CL,F),expanded_already_functor(F))).
 
@@ -156,7 +155,7 @@ user:ruleRewrite(mudLabelTypeProps(Lbl,T,Props),typeProps(T,[typeHasGlyph(Lbl)|P
 
 user:decl_database_hook(change(assert,_A_or_Z),typeProps(T,_)):- decl_type_safe(T).
 
-user:decl_database_hook(change(assert,_A_or_Z),mpred_prop(F,W)):- sanity((nop(mpred_prop(F,W)),atom(F))).
+user:decl_database_hook(change(assert,_A_or_Z),user:mpred_prop(F,W)):- sanity((nop(user:mpred_prop(F,W)),atom(F))).
 
 user:decl_database_hook(change(assert,_),defnSufficient(FT,_)):- define_ft(FT).
 

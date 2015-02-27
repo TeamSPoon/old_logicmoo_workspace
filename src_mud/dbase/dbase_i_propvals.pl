@@ -68,7 +68,7 @@ choose_for(mudAtLoc,Obj,_):- nonvar(Obj),isa_asserted(Obj,tRegion),!,fail.
 choose_for(Prop,Obj,Value):- var(Obj),trace_or_throw(var_choose_for(Prop,Obj,Value)).
 choose_for(Prop,Obj,Value):- not(is_fact_consistent(dbase_t(Prop,Obj,Value))),!,fail.
 choose_for(Prop,Obj,Value):- nonvar(Value),!,choose_for(Prop,Obj,RValue),!,RValue=Value.
-choose_for(Prop,Obj,Value):- mpred_prop(Prop,prologSingleValued),!,must(choose_one(Prop,Obj,Value)),!.
+choose_for(Prop,Obj,Value):- user:mpred_prop(Prop,prologSingleValued),!,must(choose_one(Prop,Obj,Value)),!.
 choose_for(Prop,Obj,Value):- no_repeats(choose_each(Prop,Obj,Value)).
 
 choose_one(mudAtLoc,Obj,_):-nonvar(Obj),isa_asserted(Obj,tRegion),!,fail.
@@ -145,7 +145,7 @@ get_prop_args(Fact,Prop,ARGS):-Fact=..[Prop|ARGS],!.
 
 dont_check_args(Fact):-functor(Fact,F,A),dont_check_args(F,A).
 dont_check_args(isa,2).
-dont_check_args(mpred_prop,2).
+dont_check_args(user:mpred_prop,2).
 dont_check_args(mpred_arity,2).
 dont_check_args(A,1):-atom(A).
 
@@ -170,7 +170,7 @@ checkNoArgViolationOrDeduceInstead(Prop,N,Obj):-argIsa_call(Prop,N,Type),
    findall(OT,isa(Obj,OT),OType),
    checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type).
 
-user:hook_coerce(Text,tPred,Pred):- mpred_prop(Pred,mpred_arity(_)),name_text(Pred,Text).
+user:hook_coerce(Text,tPred,Pred):- user:mpred_prop(Pred,mpred_arity(_)),name_text(Pred,Text).
 
 
 subft_or_subclass_or_same(C,C):-!.
@@ -256,10 +256,10 @@ fallback_value(Prop,Obj,Value):-Fact=..[Prop,Obj,Value],
 %:-dmsg_hide(defaultArgValue).
 
 no_fallback(genls,2).
-no_fallback(P,2):-not(mpred_prop(P,prologSingleValued)).
+no_fallback(P,2):-not(user:mpred_prop(P,prologSingleValued)).
 
 :-export(defaultArgValue/4).
-defaultArgValue(Fact,F,A,OLD):- stack_check, mpred_prop(F,argSingleValueDefault(A,OLD)),!,dmsg(defaultArgValue(fallback_value(Fact,F,argSingleValueDefault(A,OLD)))).
+defaultArgValue(Fact,F,A,OLD):- stack_check, user:mpred_prop(F,argSingleValueDefault(A,OLD)),!,dmsg(defaultArgValue(fallback_value(Fact,F,argSingleValueDefault(A,OLD)))).
 defaultArgValue(mudFacing(_,_),_,2,vNorth):-!.
 defaultArgValue(mudEnergy(_,_),_,2,200):-!.
 defaultArgValue(mudHealth(_,_),_,2,500):-!.
@@ -344,11 +344,11 @@ instance_missing_props(I,LPS,PS):-
 
 % OLD FALLBACK SYSTEM:
 inst_missing_prop(I,P):- P=..[F|Args], MP=..[F,I|Args],inst_missing_prop(I,MP,F).
-inst_missing_prop(_,_,F):- mpred_prop(F,flag),!,fail.
+inst_missing_prop(_,_,F):- user:mpred_prop(F,flag),!,fail.
 inst_missing_prop(_,MP,F):- must_det((MP=..[F|Args],get_sv_argnum(F,Args,A),replace_arg(MP,A,BLANK,COLD))), ignore(ireq(COLD)),!,var(BLANK).
 */
 
-get_sv_argnum(F,Args,ArgNum):-once(mpred_prop(F,functionalArg(ArgNum));length(Args,ArgNum)).
+get_sv_argnum(F,Args,ArgNum):-once(user:mpred_prop(F,functionalArg(ArgNum));length(Args,ArgNum)).
 
 dontAssertTypeProps:-!.
 

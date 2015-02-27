@@ -22,8 +22,6 @@ logicmoo_util_library:-module(logicmoo_util_library,
          eraseall/2,
          time_file_safe/2,
          
-         maplist_safe/2,
-         maplist_safe/3,
          subst/4,
          predsubst/3,
          wsubst/4,
@@ -470,23 +468,6 @@ time_file_safe(F,INNER_XML):-exists_file_safe(F),time_file(F,INNER_XML).
 :- export(list_to_set_safe/2).
 list_to_set_safe(A,A):-(var(A);atomic(A)),!.
 list_to_set_safe([A|AA],BB):- (not(not(lastMember2(A,AA))) -> list_to_set_safe(AA,BB) ; (list_to_set_safe(AA,NB),BB=[A|NB])),!.
-
-
-%================================================================
-% maplist/[2,3]
-% this must succeed  maplist_safe(=,[X,X,X],[1,2,3]).
-% well if its not "maplist" what shall we call it?
-%================================================================
-% so far only the findall version works .. the other runs out of local stack!?
-
-maplist_safe(_Pred,[]):-!.
-maplist_safe(Pred,LIST):-findall(E,(member(E,LIST), bugger:debugOnFailure(apply(Pred,[E]))),LISTO),!, ignore(LIST=LISTO),!.
-% though this should been fine %  maplist_safe(Pred,[A|B]):- copy_term(Pred+A, Pred0+A0), debugOnFailure(once(call(Pred0,A0))),     maplist_safe(Pred,B),!.
-
-maplist_safe(_Pred,[],[]):-!.
-maplist_safe(Pred,LISTIN, LIST):-!, findall(EE, ((member(E,LISTIN),debugOnFailure(apply(Pred,[E,EE])))), LISTO),  ignore(LIST=LISTO),!.
-% though this should been fine % maplist_safe(Pred,[A|B],OUT):- copy_term(Pred+A, Pred0+A0), debugOnFailureEach(once(call(Pred0,A0,AA))),  maplist_safe(Pred,B,BB), !, ignore(OUT=[AA|BB]).
-
 
 
 % TODO remove this next line

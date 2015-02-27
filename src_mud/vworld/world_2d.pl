@@ -281,7 +281,7 @@ user:fact_always_true(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,L
 fact_maybe_deduced(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,LOC)),locationToRegion(LOC,Region),!.
 fact_maybe_deduced(localityOfObject(apathFn(Region,Dir),Region)):-is_asserted(pathBetween(Region,Dir,_)).
 
-create_and_assert_random_fact(Fact):- thlocal:noDBaseHOOKS(_),!.
+create_and_assert_random_fact(_):- thlocal:noDBaseHOOKS(_),!.
 create_and_assert_random_fact(Fact):-must(create_random_fact(Fact)),hooked_asserta(Fact).
 
 %  suggest a random fact that is probably is not already true

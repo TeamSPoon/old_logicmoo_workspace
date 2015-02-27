@@ -75,7 +75,7 @@ cmdLook(Agent,LOC):- garbage_collect_atoms, call(cmdLook_proc,Agent,LOC).
 
 :-export(cmdLook_proc/3).
 cmdLook_proc(Agent,LOC):- 
-   with_no_modifications(with_assertions(mpred_prop(nameStrings,prologListValued),cmdLook_proc_0(Agent,LOC))).
+   with_no_modifications(with_assertions(user:mpred_prop(nameStrings,prologListValued),cmdLook_proc_0(Agent,LOC))).
 cmdLook_proc_0(Agent,LOC):-
   % implicit in next command clr(props(Agent,mudNeedsLook(_))),
    add(props(Agent,mudNeedsLook(vFalse))),

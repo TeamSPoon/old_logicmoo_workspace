@@ -95,7 +95,7 @@ into_plist_arities(_,_,plist(P,LIST),[P|LIST]):-!.
 into_plist_arities(_,_,Call,PLIST):-Call=..PLIST. % finally the fallthrue
 
 
-never_dbase_mpred(mpred_prop).
+never_dbase_mpred(user:mpred_prop).
 never_dbase_mpred(isa).
 never_dbase_mpred(mpred_arity).
 
@@ -114,7 +114,7 @@ dbase_t(CALL):- into_plist_arities(3,10,CALL,[P|LIST]),dbase_plist_t(P,LIST).
 dbase_plist_t(P,[]):-!,dbase_t(P).
 dbase_plist_t(P,LIST):-var(P),!,is_list(LIST),CALL=..[dbase_t,P|LIST],debugOnError((CALL)).
 dbase_plist_t(dbase_t,[P|LIST]):-!, dbase_plist_t(P,LIST).
-dbase_plist_t(mpred_prop,[C,I]):-!,ground(I:C),mpred_prop(C,I).
+dbase_plist_t(user:mpred_prop,[C,I]):-!,ground(I:C),user:mpred_prop(C,I).
 dbase_plist_t(isa,[I,C]):-!,hasInstance(C,I).
 dbase_plist_t(P,_):-never_dbase_mpred(P),!,fail.
 dbase_plist_t(P,[L|IST]):-is_holds_true(P),!,dbase_plist_t(L,IST).
@@ -125,22 +125,22 @@ dbase_plist_t(P,LIST):- CALL=..[dbase_t,P|LIST],debugOnError(CALL).
 loop_check_mpred(Call):- !, fail,not(thlocal:infInstanceOnly(_)),loop_check_local(ireq(Call),loop_check_mpred(Call),fail).
 % loop_check_mpred(Call):-loop_check_local(mpred_call(dbase_t,Call),fail).
 
-dbase_t(P,A1,A2,A3,A4,A5,A6,A7):- loop_check_mpred(dbase_t(P,A1,A2,A3,A4,A5,A6,A7)).
-dbase_t(P,A1,A2,A3,A4,A5,A6):- loop_check_mpred(dbase_t(P,A1,A2,A3,A4,A5,A6)).
-dbase_t(P,A1,A2,A3,A4,A5):- loop_check_mpred(dbase_t(P,A1,A2,A3,A4,A5)).
-dbase_t(P,A1,A2,A3,A4):- loop_check_mpred(dbase_t(P,A1,A2,A3,A4)).
-dbase_t(P,A1,A2,A3):- loop_check_mpred(dbase_t(P,A1,A2,A3)).
 dbase_t(P,A1,A2):- loop_check_mpred(dbase_t(P,A1,A2)).
-dbase_t(P,A1,A2,A3,A4,A5,A6,A7):- mpred_pa_call(P,7,call(P,A1,A2,A3,A4,A5,A6,A7)).
-dbase_t(P,A1,A2,A3,A4,A5,A6):- mpred_pa_call(P,6,call(P,A1,A2,A3,A4,A5,A6)).
-dbase_t(P,A1,A2,A3,A4,A5):- mpred_pa_call(P,5,call(P,A1,A2,A3,A4,A5)).
-dbase_t(P,A1,A2,A3,A4):- mpred_pa_call(P,4,call(P,A1,A2,A3,A4)).
-dbase_t(P,A1,A2,A3):- mpred_pa_call(P,3,call(P,A1,A2,A3)).
 dbase_t(P,A1,A2):- mpred_pa_call(P,2,call(P,A1,A2)).
+dbase_t(P,A1,A2,A3):- loop_check_mpred(dbase_t(P,A1,A2,A3)).
+dbase_t(P,A1,A2,A3):- mpred_pa_call(P,3,call(P,A1,A2,A3)).
+dbase_t(P,A1,A2,A3,A4):- loop_check_mpred(dbase_t(P,A1,A2,A3,A4)).
+dbase_t(P,A1,A2,A3,A4):- mpred_pa_call(P,4,call(P,A1,A2,A3,A4)).
+dbase_t(P,A1,A2,A3,A4,A5):- loop_check_mpred(dbase_t(P,A1,A2,A3,A4,A5)).
+dbase_t(P,A1,A2,A3,A4,A5):- mpred_pa_call(P,5,call(P,A1,A2,A3,A4,A5)).
+dbase_t(P,A1,A2,A3,A4,A5,A6):- loop_check_mpred(dbase_t(P,A1,A2,A3,A4,A5,A6)).
+dbase_t(P,A1,A2,A3,A4,A5,A6):- mpred_pa_call(P,6,call(P,A1,A2,A3,A4,A5,A6)).
+dbase_t(P,A1,A2,A3,A4,A5,A6,A7):- loop_check_mpred(dbase_t(P,A1,A2,A3,A4,A5,A6,A7)).
+dbase_t(P,A1,A2,A3,A4,A5,A6,A7):- mpred_pa_call(P,7,call(P,A1,A2,A3,A4,A5,A6,A7)).
 
-mpred_pa_call(F,A,Call):-nonvar(F),mpred_arity(F,A),call(Call).
+mpred_pa_call(F,A,Call):-mpred_arity(F,A),current_predicate(F/A),call(Call).
 
-isCycPredArity_ignoreable(F,A):- ignore(mpred_prop(F,cycPred(A))),ignore(mpred_arity(F,A)).
+isCycPredArity_ignoreable(F,A):- ignore(user:mpred_prop(F,cycPred(A))),ignore(mpred_arity(F,A)).
 
 which_t(dac(d,a_notnow,c,no_fallback)).
 
@@ -217,7 +217,7 @@ decl_mpred_hybrid_ilc(M,F,F/0):-
     decl_mpred_hybrid_ilc(M,PI,F/A))).
 
 decl_mpred_hybrid_ilc(M,PI,F/A):-
-     must(not(mpred_prop(F,prologOnly))),
+     must(not(user:mpred_prop(F,prologOnly))),
      assert_arity(F,A),
      must(mpred_arity(F,A)),
      must(M=user),
@@ -284,16 +284,16 @@ ensure_universal_stub5(HeadIn,Head,F,A,_HBLIST):- thglobal:pfcManageHybrids,!,
     must((StubType = prologHybrid)),
    tf_result(predicate_property(Head,dynamic),WasDynamic),
    tf_result(predicate_property(Head,multifile),WasMulifile),      
-   asserta_if_new(mpred_prop(F,StubType)),
+   asserta_if_new(user:mpred_prop(F,StubType)),
    dynamic_safe(F/A),
-   call((asserta_if_new(mpred_prop(F,predStub(StubType))))),
+   call((asserta_if_new(user:mpred_prop(F,predStub(StubType))))),
    % abolish(F,A),
    % really_add_mpred_storage_op(Head),
    must((predicate_property(Head,dynamic))),
    (WasDynamic-> (dynamic_safe(F/A),(if_result(WasMulifile,multifile(F/A)))) ; dynamic_safe(F/A)),   
    % public(F/A),
    % lock_predicate(Head),
-   retractall(mpred_prop(F,prologOnly)),
+   retractall(user:mpred_prop(F,prologOnly)),
    pfcMarkC(Head),
    dmsg(pfcManageHybrids(HeadIn)),!.
 
@@ -302,17 +302,17 @@ ensure_universal_stub5(HeadIn,Head,F,A,[]):-!,
  must((StubType = prologHybrid)),
    tf_result(predicate_property(Head,dynamic),WasDynamic),
    tf_result(predicate_property(Head,multifile),WasMulifile),      
-   asserta_if_new(mpred_prop(F,StubType)),
+   asserta_if_new(user:mpred_prop(F,StubType)),
    dynamic_safe(F/A),
-   call((asserta_if_new(mpred_prop(F,predStub(StubType))))),
+   call((asserta_if_new(user:mpred_prop(F,predStub(StubType))))),
    abolish(F,A),really_add_mpred_storage_op(Head),
    (WasDynamic-> (dynamic_safe(F/A),(if_result(WasMulifile,multifile(F/A)))) ; compile_predicates([F/A])),   
    % public(F/A),
    lock_predicate(Head),
-   retractall(mpred_prop(F,prologOnly)),
+   retractall(user:mpred_prop(F,prologOnly)),
    dmsg(compiled_new_predicate(HeadIn)),!.
 
-ensure_universal_stub5(HeadIn,Head,F,A,HBLIST):- mpred_prop(F,prologOnly), must((StubType = prologHybrid)), !,
+ensure_universal_stub5(HeadIn,Head,F,A,HBLIST):- user:mpred_prop(F,prologOnly), must((StubType = prologHybrid)), !,
    forall(member(HB,HBLIST),must(show_call(assert_dbase_t(HB)))),!,
    expire_dont_add,ex,
   (is_same_clauses(Head,HBLIST)
@@ -321,13 +321,13 @@ ensure_universal_stub5(HeadIn,Head,F,A,HBLIST):- mpred_prop(F,prologOnly), must(
       dmsg(converted_prolog_predicate(HeadIn)),
             tf_result(predicate_property(Head,dynamic),WasDynamic),
             tf_result(predicate_property(Head,multifile),WasMulifile),      
-            asserta_if_new(mpred_prop(F,StubType)),
-            call((asserta_if_new(mpred_prop(F,predStub(StubType))))),
+            asserta_if_new(user:mpred_prop(F,StubType)),
+            call((asserta_if_new(user:mpred_prop(F,predStub(StubType))))),
             abolish(F,A),really_add_mpred_storage_op(Head),
             (WasDynamic-> (dynamic_safe(F/A),(if_result(WasMulifile,multifile(F/A)))) ; compile_predicates([F/A])),
             public(F/A),
             lock_predicate(Head),
-            retractall(mpred_prop(F,prologOnly)),
+            retractall(user:mpred_prop(F,prologOnly)),
             set_prolog_flag(gc,true), garbage_collect_atoms,
             dmsg(compiled_new_predicate(HeadIn)));
        ((wdmsg(error(cannot_absorb_all_clauses((Head))))),!,fail)).
@@ -342,15 +342,15 @@ ensure_universal_stub5(HeadIn,Head,F,A,HBLIST):-  must((StubType = prologHybrid)
     dmsg(merging_prolog_predicate(HeadIn)),
           tf_result(predicate_property(Head,dynamic),WasDynamic),
           tf_result(predicate_property(Head,multifile),WasMulifile),      
-          asserta_if_new(mpred_prop(F,StubType)),
-          call((asserta_if_new(mpred_prop(F,predStub(StubType))))),
+          asserta_if_new(user:mpred_prop(F,StubType)),
+          call((asserta_if_new(user:mpred_prop(F,predStub(StubType))))),
           abolish(F,A),really_add_mpred_storage_op(Head),
           (WasDynamic-> dynamic_safe(F/A) ; compile_predicates([F/A])),
           if_result(WasMulifile,multifile(F/A)), 
           compile_predicates([F/A]),
           public(F/A),
           lock_predicate(Head),
-          retractall(mpred_prop(F,prologOnly)),
+          retractall(user:mpred_prop(F,prologOnly)),
           dmsg(merging_prolog_predicate(HeadIn)));
      ((wdmsg(error(cannot_absorb_all_clauses((Head))))),!,fail)).
 
@@ -386,7 +386,7 @@ dbase_t_mpred_storage_clauses_rules(ruleBackward,H,B):-ruleBackward(H,B).
 % dbase_t_mpred_storage_clauses_rules('<=>',H,B):-'<=>'(B,HH),each_subterm(HH,SubTerm),compound(SubTerm),SubTerm = H.
 
 
-dbase_t_provide_mpred_storage_op(Op,HB):-notrace(demodulize(Op,HB,HeadBody)),get_functor(HeadBody,F),(F==dbase_t;mpred_prop(F,prologHybrid)), must(is_mpred_op(Op)), 
+dbase_t_provide_mpred_storage_op(Op,HB):-notrace(demodulize(Op,HB,HeadBody)),get_functor(HeadBody,F),(F==dbase_t;user:mpred_prop(F,prologHybrid)), must(is_mpred_op(Op)), 
     with_assertions(thlocal:already_in_kb_term_expansion,dbase_t_storage_op(Op,HeadBody)).
 
 % ====================================================
@@ -538,8 +538,8 @@ body_call_cyckb(HEAD_T):-el_holds_DISABLED_KB, HEAD_T =.. [dbase_t|PLIST], thglo
 body_req(HEAD,HEAD_T):- (hook_body_req(HEAD,HEAD_T)).
 
 :-export(body_req_normal/4).
-%hook_body_req(HEAD,HEAD_T):- mpred_prop(F,prologPTTP),!,dmsg(warn(hook_body_req(HEAD,HEAD_T))),fail.
-%hook_body_req(HEAD,HEAD_T):- mpred_prop(F,prologOnly),!,dmsg(warn(hook_body_req(HEAD,HEAD_T))),fail.
+%hook_body_req(HEAD,HEAD_T):- user:mpred_prop(F,prologPTTP),!,dmsg(warn(hook_body_req(HEAD,HEAD_T))),fail.
+%hook_body_req(HEAD,HEAD_T):- user:mpred_prop(F,prologOnly),!,dmsg(warn(hook_body_req(HEAD,HEAD_T))),fail.
 hook_body_req(_,_,isa(I,C),_):- !, body_req_isa(I,C).
 hook_body_req(_,_,_,dbase_t(C,I)):- !, body_req_isa(I,C).
 hook_body_req(_,_,_,hasInstance(C,I)):- !, body_req_isa(I,C).
@@ -553,10 +553,10 @@ body_req_normal(HEAD,HEAD_T):- not(ground(HEAD)),!,no_repeats(HEAD_T,body_req_1(
 body_req_normal(HEAD,HEAD_T):- body_req_1(HEAD,HEAD_T),!. 
 
 :-export(body_req_1/4).
-body_req_1(HEAD,HEAD_T):- get_functor(HEAD,F), mpred_prop(F,call_tabled),!, call_tabled(body_req_2(HEAD,HEAD_T)).
+body_req_1(HEAD,HEAD_T):- get_functor(HEAD,F), user:mpred_prop(F,call_tabled),!, call_tabled(body_req_2(HEAD,HEAD_T)).
 body_req_1(HEAD,HEAD_T):- body_req_2(HEAD,HEAD_T).
 
-body_req_2(HEAD,  _):-   get_functor(HEAD,F), mpred_prop(F,external(Module)),!,call(Module:HEAD).
+body_req_2(HEAD,  _):-   get_functor(HEAD,F), user:mpred_prop(F,external(Module)),!,call(Module:HEAD).
 body_req_2(HEAD,HEAD_T):- body_req_with_rules(HEAD,HEAD_T).
 
 body_req_with_rules(HEAD,HEAD_T):-body_req_no_rules(HEAD,HEAD_T).
@@ -569,7 +569,7 @@ body_req_no_rules(F,_,_,HEAD_T):- body_req_plus_cyc(F,_,_,HEAD_T).
 body_req_only_rules(HEAD, _):-  ruleBackward(HEAD,BODY),call_mpred_body(HEAD,BODY).
 body_req_only_rules(_,_,_,dbase_t(F,Obj,LValue)):-  choose_val(F,Obj,LValue).
 
-body_req_plus_cyc(F,_,_,HEAD_T):-  mpred_prop(F,cycPlus2(_)),thlocal:useOnlyExternalDBs,!,with_assertions(thglobal:use_cyc_database,body_call_cyckb(HEAD_T)).
+body_req_plus_cyc(F,_,_,HEAD_T):-  user:mpred_prop(F,cycPlus2(_)),thlocal:useOnlyExternalDBs,!,with_assertions(thglobal:use_cyc_database,body_call_cyckb(HEAD_T)).
  
 foo_b(b1).
 foo_b(b2):-!.

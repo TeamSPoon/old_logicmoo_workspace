@@ -418,14 +418,14 @@ user:decl_database_hook(change(assert,_A_or_Z),DB):-use_rdf_hooks,rdf_assert_hoo
 
 rdf_assert_ignored(DB):-thlocal:rdf_asserting(_,DB),!.
 rdf_assert_ignored(svo(_,prologOnly,_)).
-rdf_assert_ignored(mpred_prop(_,mpred_arity(1))).
-rdf_assert_ignored(mpred_prop(_,predArgTypes(_))).
+rdf_assert_ignored(user:mpred_prop(_,mpred_arity(1))).
+rdf_assert_ignored(user:mpred_prop(_,predArgTypes(_))).
 rdf_assert_ignored(DB):-functor(DB,F,_),member(F,[ruleBackward,mudTermAnglify,'<=>']).
 rdf_assert_ignored(DB):-functor(DB,_,1).
 rdf_assert_ignored(DB):-  not(ground(DB)). 
 
 
-cyc_to_rdf(mpred_prop(P,PST),svo(F,StubType,S)):- PST=..[StubType,S],rdf_object(S),rdf_to_pred(P,F).
+cyc_to_rdf(user:mpred_prop(P,PST),svo(F,StubType,S)):- PST=..[StubType,S],rdf_object(S),rdf_to_pred(P,F).
 cyc_to_rdf(argIsa(P,1,D),domain(P,D)).
 cyc_to_rdf(isa(apathFn(A,Dir),T),isa([apathFn,A,Dir],T)).
 cyc_to_rdf(pathName(A,Dir,String),mudNamed([apathFn,A,Dir],String)).
@@ -640,7 +640,7 @@ sync_from_rdf:-forall(rdf_db:rdf(S,P,O,DB),add_spog(S,P,O,DB)).
 
 sync_to_rdf:-
    forall(p2q(P,NS,N),must(rdf_assert_p2q(P,NS,N))),  
-   forall(mpred_prop(P,O),rdf_assert_hook(mpred_prop(P,O))),
+   forall(user:mpred_prop(P,O),rdf_assert_hook(user:mpred_prop(P,O))),
    forall(hasInstance(C,I),rdf_assert_hook(isa(I,C))),
    forall(disjointWith0(A,B),rdf_assert_hook(disjointWith(A,B))),
    forall(is_known_trew(B),rdf_assert_hook(B)),

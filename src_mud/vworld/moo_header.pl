@@ -36,4 +36,4 @@
 
 :-ensure_loaded(logicmoo(dbase/dbase)).
 
-% :-must(not(mpred_prop(dbase_t,prologHybrid))).
+% :-must(not(user:mpred_prop(dbase_t,prologHybrid))).

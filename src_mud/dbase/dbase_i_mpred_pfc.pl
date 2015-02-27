@@ -14,6 +14,23 @@
 
 :- include(dbase_i_header).
 
+
+:- op(500,fx,'~').
+:- op(1075,xfx,('=>')).
+:- op(1075,xfx,'<=>').
+:- op(1075,xfx,('<=')).
+:- op(1100,fx,('=>')).
+:- op(1150,xfx,('::::')).
+
+:- op(1200,fx,(user:disabled)).
+:- op(1200,fx,(user:enabled)).
+:- user:op(1199,fx,(:-)).
+:- user:op(1199,xfx,(:-)).
+
+make_functor(P,M:F,A):-!,functor(P,F,A),(P=F;P=M:F),!.
+make_functor(P,F,A):-!,functor(P,F,A),(P=F;P=_:F),!.
+pfc_mpred_prop(F,T):-clause(user:mpred_prop(F,T),true).
+
 :- ignore((current_predicate(not/1),abolish(system:not/1),abolish(not/1),dynamic(not/1),assert(((not(P):- nonvar(P), \+ P))),meta_predicate(not(0)))).
 :- op(0,fx,'decl_mpred_pfc').
 decl_mpred_pfc(F/A):-!,export(F/A),dynamic(F/A),asserta_if_new(user:mpred_prop(prologOnly)),asserta_if_new(prolog_arity(F,A)),asserta_if_new(user:mpred_prop(F,isPfcMeta)).
@@ -43,7 +60,7 @@ pfc_clause_is_asserted(H,B):- var(H),nonvar(B),!,fail.
 pfc_clause_is_asserted(H,B):- one_must(pfc_clause_db_unify(H,B),pfc_clause_is_asserted_hb_nonunify(H,B)).
 pfc_clause_is_asserted(H,B,Ref):-pfc_clause_db_ref(H,B,Ref).
 
-pfc_clause_is_asserted_hb_nonunify(G, T   ):- T==true,notrace(pfcRuleOutcomeHeadBody(G,H,B)),G\=@=H,!,pfc_clause_is_asserted(H,B).
+pfc_clause_is_asserted_hb_nonunify(G, T   ):- T==true,!,notrace(pfcRuleOutcomeHeadBody(G,H,B)),G\=@=H,!,pfc_clause_is_asserted(H,B).
 pfc_clause_is_asserted_hb_nonunify(H,(T,B)):- T==true,!,pfc_clause_is_asserted_hb_nonunify(H,B).
 pfc_clause_is_asserted_hb_nonunify(H,(B,T)):- T==true,!,pfc_clause_is_asserted_hb_nonunify(H,B).
 pfc_clause_is_asserted_hb_nonunify(H,B):- pfc_clause_db_unify( =>( B , H) , true).
@@ -51,7 +68,7 @@ pfc_clause_is_asserted_hb_nonunify(H,B):- pfc_clause_db_unify( <=( H , B) , true
 pfc_clause_is_asserted_hb_nonunify(H,B):-pfc_mpred_storage_clauses(_,H,B,_).
 
 
-pfcDatabaseGoal(G):-compound(G),functor(G,F,A),pfcDatabaseTerm(F/A).
+pfcDatabaseGoal(G):-compound(G),get_functor(G,F,A),pfcDatabaseTerm(F/A).
 
 user:provide_mpred_storage_clauses(Type,H,B,Proof):-pfc_mpred_storage_clauses(Type,H,B,Proof).
 
@@ -59,19 +76,19 @@ pfc_mpred_storage_clauses(forward(Type),('=>'(H)),B,Proof):- nonvar(H),!, user:p
 pfc_mpred_storage_clauses(forward,H,B, ftProofFn(R)):- R=(=>(B,H)),clause(R,true).
 pfc_mpred_storage_clauses(backward,H,B,ftProofFn(R)):- R=(<=(H,B)),clause(R,true).
 pfc_mpred_storage_clauses(equiv,H,B,   ftProofFn(R)):- R=(<=>(LS,RS)),clause(R,true),(((LS=H,RS=B));((LS=B,RS=H))).
-% pfc_mpred_storage_clauses(Type,H,true, ftProofFn(R)):-nonvar(H),!,pfcDatabaseTerm(F/A),functor(R,F,A),pfcRuleOutcomeHead(R,H),clause(R,true),pfcType(R,Type),Type\=rule.
-% pfc_mpred_storage_clauses(Type,H,true, ftProofFn(R)):-pfcDatabaseTerm(F/A),functor(R,F,A),pfcType(R,Type),Type\=rule,clause(R,true),once(pfcRuleOutcomeHead(R,H)).
+% pfc_mpred_storage_clauses(Type,H,true, ftProofFn(R)):-nonvar(H),!,pfcDatabaseTerm(F/A),make_functor(R,F,A),pfcRuleOutcomeHead(R,H),clause(R,true),pfcType(R,Type),Type\=rule.
+% pfc_mpred_storage_clauses(Type,H,true, ftProofFn(R)):-pfcDatabaseTerm(F/A),make_functor(R,F,A),pfcType(R,Type),Type\=rule,clause(R,true),once(pfcRuleOutcomeHead(R,H)).
 
 :-dynamic(pfcExpectedClauseCount_db/3).
 pfcGetExpectedClauseCount(F,A,C):- (pfcExpectedClauseCount_db(F,A,C);C=0).
-pfcGetActualClauseCount(F,A,C):-functor(P,F,A),predicate_property(P,number_of_clauses(C)).
+pfcGetActualClauseCount(F,A,C):-make_functor(P,F,A),predicate_property(P,number_of_clauses(C)).
 pfcIsClauseCountWrong(F,A):-pfcGetExpectedClauseCount(F,A,E),pfcGetActualClauseCount(F,A,C),!,C\=E.
 pfcCountsClauses(F,A):- mpred_arity(F,A),pfcWatches(F/A).
 
 pfcCheckClauseCounts :- forall(pfcCountsClauses(F,A),pfcUpdateClauses(F,A)).
 
 pfcUpdateClauses(F,A):-not(pfcIsClauseCountWrong(F,A)),!.
-pfcUpdateClauses(F,A):-functor(P,F,A),forall((clause(P,T),is_true(T)),hooked_asserta(P)),retractall(pfcExpectedClauseCount_db(F,A,_)),
+pfcUpdateClauses(F,A):-make_functor(P,F,A),forall((clause(P,T),is_true(T)),hooked_asserta(P)),retractall(pfcExpectedClauseCount_db(F,A,_)),
    predicate_property(P,number_of_clauses(C)),
    asserta(pfcExpectedClauseCount_db(F,A,C)).
 
@@ -82,10 +99,10 @@ pfcUpdateClauses(F,A):-functor(P,F,A),forall((clause(P,T),is_true(T)),hooked_ass
 :- thread_local thlocal:pfcExpansion/0.
 :- dynamic thlocal:pfcExpansionWas.
 
-maybe_hybrid(F/_):-user:mpred_prop(F,prologOnly),!.
-maybe_hybrid(F/_):-user:mpred_prop(F,prologHybrid),!.
-maybe_hybrid(F/_):-user:mpred_prop(F,isPfcMeta),!.
-maybe_hybrid(F/_):-user:mpred_prop(F,X),atom(X),!.
+maybe_hybrid(F/_):-pfc_mpred_prop(F,prologOnly),!.
+maybe_hybrid(F/_):-pfc_mpred_prop(F,prologHybrid),!.
+maybe_hybrid(F/_):-pfc_mpred_prop(F,isPfcMeta),!.
+maybe_hybrid(F/_):-pfc_mpred_prop(F,X),atom(X),!.
 maybe_hybrid(F/A):-atom(F),debugOnError(current_predicate(F/A)),!.
 maybe_hybrid(_/A):-A=1,!.
 % maybe_hybrid(C/1):-ignore((nonvar(C)->decl_mpred_hybrid(C/1);ignore(decl_mpred_hybrid(isa/2))))
@@ -107,7 +124,7 @@ pfcDoConjs(Pred,(H,T),S):-!, apply(Pred,[H|S]), pfcDoConjs(Pred,T,S).
 pfcDoConjs(Pred,H,S):-apply(Pred,[H|S]).
 
 deny_pfc_Permission_to_remove(pfcInternal,_,_):-!,fail. %allow
-deny_pfc_Permission_to_remove(_,P,not(pfcControlled)):-get_functor(P,F,A), not(pfc_local(P,F,A);mpred_prop(F,pfcControlled)).
+deny_pfc_Permission_to_remove(_,P,not(pfcControlled)):-get_functor(P,F,A), not(pfc_local(P,F,A);pfc_mpred_prop(F,pfcControlled)).
 
 pfc_pre_expansion_each(X,X):-as_is_term(X),!.
 pfc_pre_expansion_each(X,X):-not(compound((X))),!.
@@ -119,6 +136,11 @@ pfc_pre_expansion_each(X,X):- \+ \+ ((get_functor(X,F,A),must(maybe_hybrid(F/A))
 % {G}:-mpred_call(G).
 user:mpred_arity(F,A):-pfcDatabaseTerm(F/A).
 user:mpred_prop(F,argIsa(_,ftAskable)):-pfcDatabaseTerm(F/_).
+
+user:mpred_prop(isa,pfcMustFC).
+
+pfcMustFC(H):-get_functor(H,F),pfc_mpred_prop(F,pfcMustFC).
+pfcPreferBC(H):-get_functor(H,F,A),pfc_mpred_prop(F,pfcPreferBC),dynamic(F/A),functor(PHead,F,A),asserta_if_new((PHead:-callBC(PHead))).
 
 :-dynamic p.
 :-dynamic x.
@@ -132,9 +154,9 @@ pfc_local(G):-get_functor(G,F,A),pfc_local(G,F,A).
 pfc_local(G,_,_):-thglobal:pfcManageHybrids,!,pfcMarkC(G),!.
 pfc_local(G,_,_):- not(current_predicate(hooked_assertz/1)),!,pfcMarkC(G).
 pfc_local(_,F,A):-pfcDatabaseTerm(F/A),!.
-pfc_local(_,F,_):-user:mpred_prop(F,isPfcMeta),!.
-pfc_local(_,F,_):-user:mpred_prop(F,prologOnly).
-pfc_local(_,F,_):-user:mpred_prop(F,prologHybrid),!,fail.
+pfc_local(_,F,_):-pfc_mpred_prop(F,isPfcMeta),!.
+pfc_local(_,F,_):-pfc_mpred_prop(F,prologOnly).
+pfc_local(_,F,_):-pfc_mpred_prop(F,prologHybrid),!,fail.
 
 
 % pfc_local(_).
@@ -142,8 +164,13 @@ pfc_local(_,F,_):-user:mpred_prop(F,prologHybrid),!,fail.
 pfcControlled(G):-notrace(pfcControlled0(G)).
 pfcWatches(G):-notrace(pfcWatched0(G)).
 
-pfcControlled0(G):- get_functor(G,F), (user:mpred_prop(F,pfcControlled);user:mpred_prop(F,pfcMustFC)).
-pfcWatched0(G):- get_functor(G,F), (user:mpred_prop(F,pfcWatched);user:mpred_prop(F,pfcControlled);user:mpred_prop(F,pfcMustFC)).
+pfcControlled0(Var):-is_ftVar(Var),!.
+pfcControlled0((_:F)/A):-!,pfcControlled0(F/A).
+pfcControlled0(G):- get_functor(G,F), (pfc_mpred_prop(F,pfcControlled);pfc_mpred_prop(F,pfcMustFC)).
+
+pfcWatched0(Var):-is_ftVar(Var),!.
+pfcWatched0((_:F)/A):-!,pfcWatched0(F/A).
+pfcWatched0(G):- get_functor(G,F), (pfc_mpred_prop(F,pfcWatched);pfc_mpred_prop(F,pfcControlled);pfc_mpred_prop(F,pfcMustFC)).
 
 :-thread_local(thlocal:pfc_no_mark/0).
 
@@ -157,7 +184,7 @@ pfcMarkB(G):-pfcMarkAs(G,pfcPreferBC).
 pfcMarkAs(_, _):-thlocal:pfc_no_mark,!.
 pfcMarkAs(G,As):-must(pfcDoConjs(pfcMarkAs1,G,[As])),!.
 
-pfcMarkAs1(F,As):-atom(F),clause(user:mpred_prop(F,prologOnly),true),!,dmsg(todo(warn(wont_pfcMarkAs1(F,As)))).
+pfcMarkAs1(F,As):-atom(F),clause(pfc_mpred_prop(F,prologOnly),true),!,dmsg(todo(warn(wont_pfcMarkAs1(F,As)))).
 pfcMarkAs1(F,As):-atom(F),!,assert_if_new(user:mpred_prop(F,As)).
 pfcMarkAs1(G,_):-not(compound(G)),!.
 pfcMarkAs1((G1,G2),As):-!,pfcMarkAs1(G1,As),pfcMarkAs1(G2,As).
@@ -177,7 +204,7 @@ throw_on_bad_fact(assert(_,G)):-!,dtrace,pfc_assert0(G).
 throw_on_bad_fact(G):-why_throw_on_bad_fact(G,Why), dmsg(error(trace_or_throw(throw_on_bad_fact(Why,G)))),!,fail.
 
 why_throw_on_bad_fact(G,singletons(HS)):-   
-  head_singletons_g(G,HS),get_functor(HS,F),!,not(mpred_prop(F,predCanHaveSingletons)).
+  head_singletons_g(G,HS),get_functor(HS,F),!,not(pfc_mpred_prop(F,predCanHaveSingletons)).
 
 head_singletons_g(G,HS):- pfcRuleOutcomeHeadBody(G,H,B), head_singletons_hb(H,B,HS),!.
   
@@ -256,17 +283,8 @@ pfcVersion(1.2).
 
 
 
-:- op(500,fx,'~').
-:- op(1075,xfx,('=>')).
-:- op(1075,xfx,'<=>').
-:- op(1075,xfx,('<=')).
-:- op(1100,fx,('=>')).
-:- op(1150,xfx,('::::')).
-
-:- op(1200,fx,(user:disabled)).
-:- op(1200,fx,(user:enabled)).
-:- user:op(1199,fx,(:-)).
-:- user:op(1199,xfx,(:-)).
+pfcPreferedDir(H,B,(B=>H)):-pfcMustFC(H).
+pfcPreferedDir(H,B,(H<=B)):-pfcPreferBC(H).
 
 
 
@@ -310,14 +328,15 @@ pfc_file_expansion_each(((Q:-P)),(:- (pfcMarkB(Q),pfcMarkC(Q),pfcAdd((Q:-P))))):
 pfc_file_expansion_each((Q,(:- (pfcMarkC(Q),pfcAdd(Q))))):- nonvar(Q),pfcUseAllFact(Q).
 
 pfcMustUseFC(G):- once(pfcRuleOutcomeHeadBody(G,H,_)),H\=@=G,!,pfcMustUseFC(H).
-pfcMustUseFC(G):- get_functor(G,F),not(user:mpred_prop(F,prologOnly)),user:mpred_prop(F,pfcMustFC).
+pfcMustUseFC(G):- get_functor(G,F),not(pfc_mpred_prop(F,prologOnly)),pfc_mpred_prop(F,pfcMustFC).
 
 pfcUseAllBC(((Q:-P))):-may_use_head(Q),no_head_singletons_hb(Q,P).
 pfcUseAllFact(Q):-may_use_head(Q),no_head_singletons_hb(Q,true).
 
 no_head_singletons_hb(Q,P):-not(((head_singletons_hb(Q,P,_),get_functor(Q,F,A),decl_mpred_prolog(F/A)))).
 
-callBC(G):-loop_check(mpred_call(G)).
+callBC(G):-pfc_negation(G,Pos),!,show_call(not(callBC(G))),!.
+callBC(G):-predicate_property(G,number_of_clauses(1)) -> pfcBC(G) ; loop_check(mpred_call(G)).
 
 may_never_deduce_bc_change.
 
@@ -326,9 +345,9 @@ may_use_head(Q):-var(Q),!,fail.
 may_use_head(_:_):-!,fail.
 may_use_head(Q):-Q \= (F/A),!, get_functor(Q,F,A),!,may_use_head(F/A).
 may_use_head(F/_):- atom_contains(F,'_'),!,fail.
-may_use_head(F/_):- user:mpred_prop(F,prologOnly),!,fail.
-may_use_head(F/_):- current_predicate(F/A),functor(G,F,A),real_builtin_predicate(G),!,fail.
-may_use_head(F/A):- functor(G,F,A),real_builtin_predicate(G),!,fail.
+may_use_head(F/_):- pfc_mpred_prop(F,prologOnly),!,fail.
+may_use_head(F/_):- current_predicate(F/A),make_functor(G,F,A),real_builtin_predicate(G),!,fail.
+may_use_head(F/A):- make_functor(G,F,A),real_builtin_predicate(G),!,fail.
 may_use_head(_/1):-!,fail.
 may_use_head(_/2).
 % may_use_head(_/_).
@@ -388,14 +407,6 @@ pfcDefaultSetting(GeneralTerm,Default) :-
 % Pfc Search strategy. pfc_settings(searchMode,X) where X is one of {direct,depth,breadth}
 :- pfcDefaultSetting(pfc_settings(searchMode,_), pfc_settings(searchMode,direct)).
 
-user:mpred_prop(isa,pfcMustFC).
-
-pfcMustFC(H):-get_functor(H,F),mpred_prop(F,pfcMustFC).
-pfcPreferBC(H):-get_functor(H,F,A),mpred_prop(F,pfcPreferBC),dynamic(F/A),functor(PHead,F,A),asserta_if_new((PHead:-callBC(PHead))).
-
-pfcPreferedDir(H,B,(B=>H)):-pfcMustFC(H).
-pfcPreferedDir(H,B,(H<=B)):-pfcPreferBC(H).
-
 
 % 
 
@@ -405,7 +416,7 @@ pfcPreferedDir(H,B,(H<=B)):-pfcPreferBC(H).
 %= pfcAdd(P,S) asserts P into the dataBase with support from S.
 
 pfcAdd(isa(I,Not)):-Not==not,!,pfcAdd(not(I)),!.
-pfcAdd(P) :- pfcAdd(P,(pcfUser,pcfUser)).
+pfcAdd(P) :- pfcAdd(P,(pfcUser,pfcUser)).
 
 
 pfcAdd(P,S):-pfcDoConjs(pfcAdd0,P,[S]).
@@ -469,7 +480,7 @@ pfcRepropagate(P) :-
   forall(must(pfcGetSupport(P,S)), pfcRepropagate(P,S)).
 
 pfcRepropagate(P,S) :-
-  must(pfcAssertIfUnknown(P)), % was simply pfc_assert(P),
+  (\+ \+ must(pfcAssertIfUnknown(P))), % was simply pfc_assert(P),
   pfcTraceAdd(P,S),
   !,
   pfcEnqueue(P,S),
@@ -574,7 +585,7 @@ remove_selection(P) :-
 
 
 % select_next_fact(P) identifies the next fact to reason from.  
-% It tries the pcfUser defined predicate first and, failing that, 
+% It tries the pfcUser defined predicate first and, failing that, 
 %  the default mechanism.
 
 select_next_fact(P) :- 
@@ -713,8 +724,8 @@ pfcAddType(action,_Action) :- !.
 %= If it is not, then the fact is retreactred from the database and any support
 %= relationships it participated in removed.
 pfcRem(P) :- 
-  % pfcRem/1 is the pcfUser's interface - it withdraws pcfUser support for P.
-  pfcDoConjs(pfcLambda([E],pfcRem(E,(pcfUser,pcfUser))),P).
+  % pfcRem/1 is the pfcUser's interface - it withdraws pfcUser support for P.
+  pfcDoConjs(pfcLambda([E],pfcRem(E,(pfcUser,pfcUser))),P).
 
 pfcRem(P,S) :-
   % pfcDebug(format("~Nremoving support ~w from ~w",[S,P])),
@@ -725,12 +736,12 @@ pfcRem(P,S) :-
 
 %%
 %= pfcRem2 is like pfcRem, but if P is still in the DB after removing the
-%= pcfUser's support, it is retracted by more forceful means (e.g. removeLiteralSupportsAndDependants/1).
+%= pfcUser's support, it is retracted by more forceful means (e.g. removeLiteralSupportsAndDependants/1).
 %%
 
 pfcRem2(P) :- 
-  % pfcRem2/1 is the pcfUser's interface - it withdraws pcfUser support for P.
-  pfcDoConjs(pfcLambda([E],pfcRem2(E,(pcfUser,pcfUser))),P).
+  % pfcRem2/1 is the pfcUser's interface - it withdraws pfcUser support for P.
+  pfcDoConjs(pfcLambda([E],pfcRem2(E,(pfcUser,pfcUser))),P).
 
 pfcRem2(P,S) :-
   pfcRem(P,S),
@@ -835,14 +846,14 @@ pfcSupported(_,_P) :- true.
 
 
 %%
-%= a fact is well founded if it is supported by the pcfUser
+%= a fact is well founded if it is supported by the pfcUser
 %= or by a set of facts and a rules, all of which are well founded.
 %%
 
 wellFounded(Fact) :- pfcWFF(Fact,[]).
 
 pfcWFF(F,_) :-
-  % supported by pcfUser (pfcAxiom) or an "absent" fact (assumption).
+  % supported by pfcUser (pfcAxiom) or an "absent" fact (assumption).
   (pfcAxiom(F) ; pfcAssumptionBase(F)),
   !.
 
@@ -866,13 +877,13 @@ pfcWFF_L([X|Rest],L) :-
 % supports(+F,-ListofSupporters) where ListOfSupports is a list of the
 % supports for one justification for fact F -- i.e. a list of facts which,
 % together allow one to deduce F.  One of the facts will typically be a rule.
-% The supports for a pcfUser-defined fact are: [pcfUser].
+% The supports for a pfcUser-defined fact are: [pfcUser].
 
 supportsForWhy(F,[Fact|MoreFacts]) :-
   pfcGetSupport(F,(Fact,Trigger)),
   triggerSupports(Trigger,MoreFacts).
 
-triggerSupports(pcfUser,[]) :- !.
+triggerSupports(pfcUser,[]) :- !.
 triggerSupports(Trigger,[Fact|MoreFacts]) :-
   pfcGetSupport(Trigger,(Fact,AnotherTrigger)),
   triggerSupports(AnotherTrigger,MoreFacts).
@@ -1007,7 +1018,7 @@ pfcDefineBcRule(Head,Body,ParentRule) :-
   pfcBuildRhs(Head,Rhs),
   pfcForEach(pfc_nf(Body,Lhs),
           (pfcBuildTrigger(Lhs,rhs(Rhs),Trigger),
-           pfcAdd(pfcBT(Head,Trigger),(ParentRuleCopy,pcfUser)))).
+           pfcAdd(pfcBT(Head,Trigger),(ParentRuleCopy,pfcUser)))).
  
 
 
@@ -1115,15 +1126,16 @@ trigger_trigger1(Trigger,Body) :-
 %= Note that this has the side effect of catching unsupported facts and
 %= assigning them support from God.
 %%
+pfcBC(F):-loop_check(pfcBC0(F)).
 
-pfcBC(P) :-
+pfcBC0(P) :-
   % trigger any bc rules.
   pfcBT(P,Trigger),
   pfcGetSupport(pfcBT(P,Trigger),S),
   pfcEvalLHS(Trigger,S),
   fail.
 
-pfcBC(F) :-
+pfcBC0(F) :-
   %= this is probably not advisable due to extreme inefficiency.
   var(F)    ->  pfcFact(F) ;
   ( \+ current_predicate(_,F)) -> mpred_call(F) ;
@@ -1301,7 +1313,7 @@ pfcProcessRule(Lhs,Rhs,ParentRule) :-
   copy_term(ParentRule,ParentRuleCopy),
   pfcBuildRhs(Rhs,Rhs2),
   pfcForEach(pfc_nf(Lhs,Lhs2), 
-          pfcBuild1Rule(Lhs2,rhs(Rhs2),(ParentRuleCopy,pcfUser))).
+          pfcBuild1Rule(Lhs2,rhs(Rhs2),(ParentRuleCopy,pfcUser))).
 
 pfcBuild1Rule(Lhs,Rhs,Support) :-
   pfcBuildTrigger(Lhs,Rhs,Trigger),
@@ -1384,9 +1396,8 @@ pfcType(_,fact) :-
   %= if it's not one of the above, it must be a fact!
   !.
 
-pfcAssertIfUnknown(P):- clause_safe(P,true),!.
-pfcAssertIfUnknown(P):- is_asserted_eq(P),!.
-pfcAssertIfUnknown(P):- show_call(pfc_assert(P)),!,sanity(is_asserted_eq(P)).
+pfcAssertIfUnknown(P):- \+ \+ is_asserted(P),!.
+pfcAssertIfUnknown(P):- show_call(pfc_assert(P)),sanity(is_asserted_eq(P)).
 
 pfcAssert(P,Support) :- 
   (pfc_clause(P) ; pfc_assert(P)),
@@ -1635,9 +1646,9 @@ pfcPrintFacts(P,C) :-
   pfcPrintitems(Pfc).
 
 
-%= printitems clobbers it's arguments - beware!
+%= printitems clobbers it's arguments - beware (fixed .. it no longer clobers)!
 
-pfcPrintitems(H):-pfcDoConjs(pfcLambda([E],(numbervars(E,0,_),format("~n  ~w",[E]))),H).
+pfcPrintitems(HIn):-copy_term(HIn,H),pfcDoConjs(pfcLambda([E],(numbervars(E,0,_),format("~n ~q",[E]))),H).
 
 pfcClassifyFacts([],[],[],[]).
 
@@ -1647,7 +1658,7 @@ pfcClassifyFacts([H|T],User,Pfc,[H|Rule]) :-
   pfcClassifyFacts(T,User,Pfc,Rule).
 
 pfcClassifyFacts([H|T],[H|User],Pfc,Rule) :-
-  pfcGetSupport(H,(pcfUser,pcfUser)),
+  pfcGetSupport(H,(pfcUser,pfcUser)),
   !,
   pfcClassifyFacts(T,User,Pfc,Rule).
 
@@ -1725,24 +1736,24 @@ pfcTraceAdd(P,S) :-
 
 crazy_bad_fact(isa(not,tCol)).
 crazy_bad_fact(isa(_,not)).
-crazy_bad_fact(mpred_prop(_,predArgTypes)).
+crazy_bad_fact(user:mpred_prop(_,predArgTypes)).
 
 pfcTraceAddPrint(P,S) :- crazy_bad_fact(P),retractall(tlbugger:show_must_go_on),!,trace_or_throw(crazy_pfcTraceAddPrint(P,S)).
 
 pfcTraceAddPrint(P,S) :-
-  \+ \+ pfc_settings(traced,P),
+  \+ \+ pfc_settings(mpredTracing,P),
   !,
   copy_term(P,Pcopy),
   numbervars(Pcopy,0,_),
-  (S=(pcfUser,pcfUser)
-       -> format("~nAdding (u) ~w",[Pcopy])
-        ; format("~nAdding (g) ~w",[Pcopy])).
+  (S=(pfcUser,pfcUser)
+       -> format("~nAdding (u) ~q",[Pcopy])
+        ; format("~nAdding (g) ~q",[Pcopy])).
 
 pfcTraceAddPrint(_,_).
 
 
 pfcTraceBreak(P,_S) :-
-  pfc_settings(spied,P,add) -> 
+  pfc_settings(mpredSpying,P,add) -> 
    (copy_term(P,Pcopy),
     numbervars(Pcopy,0,_),
     format("~nBreaking on pfcAdd(~w)",[Pcopy]),
@@ -1757,10 +1768,10 @@ pfcTraceRem(pfcNT(_,_)) :-
   !.
 
 pfcTraceRem(P) :-
-  (pfc_settings(traced,P) 
+  (pfc_settings(mpredTracing,P) 
      -> format('~nRemoving ~w.',[P])
       ; true),
-  (pfc_settings(spied,P,pfcRem)
+  (pfc_settings(mpredSpying,P,pfcRem)
    -> (format("~nBreaking on pfcRem(~w)",[P]),
        break)
    ; true).
@@ -1769,10 +1780,10 @@ pfcTraceRem(P) :-
 pfcTrace :- pfcTrace(_).
 
 pfcTrace(Form) :-
-  asserta(pfc_settings(traced,Form)).
+  asserta(pfc_settings(mpredTracing,Form)).
 
 pfcTrace(Form,Condition) :- 
-  pfc_assert((pfc_settings(traced,Form) :- Condition)).
+  pfc_assert((pfc_settings(mpredTracing,Form) :- Condition)).
 
 pfcSpy(Form) :- pfcSpy(Form,[add,pfcRem],true).
 
@@ -1787,21 +1798,21 @@ pfcSpy(Form,Mode,Condition) :-
   pfcSpy1(Form,Mode,Condition).
 
 pfcSpy1(Form,Mode,Condition) :-
-  pfc_assert((pfc_settings(spied,Form,Mode) :- Condition)).
+  pfc_assert((pfc_settings(mpredSpying,Form,Mode) :- Condition)).
 
 pfcNospy :- pfcNospy(_,_,_).
 
 pfcNospy(Form) :- pfcNospy(Form,_,_).
 
 pfcNospy(Form,Mode,Condition) :- 
-  pfc_clause_db_ref(pfc_settings(spied,Form,Mode), Condition, Ref),
+  pfc_clause_db_ref(pfc_settings(mpredSpying,Form,Mode), Condition, Ref),
   erase(Ref),
   fail.
 pfcNospy(_,_,_).
 
 pfcNoTrace :- pfcUntrace.
 pfcUntrace :- pfcUntrace(_).
-pfcUntrace(Form) :- pfc_retractall(pfcInternal,pfc_settings(traced,Form)).
+pfcUntrace(Form) :- pfc_retractall(pfcInternal,pfc_settings(mpredTracing,Form)).
 
 % needed:  pfcTraceRule(Name)  ...
 
@@ -1892,7 +1903,7 @@ justSupports(F,J):- loop_check(pfcGetSupport(F,J)).
 
 %= pfcBase1(P,L) - is true iff L is a list of "pfcBase1" facts which, taken
 %= together, allows us to deduce P.  A pfcBase1 fact is an pfcAxiom (a fact 
-%= added by the pcfUser or a raw Prolog fact (i.e. one w/o any support))
+%= added by the pfcUser or a raw Prolog fact (i.e. one w/o any support))
 %= or an assumption.
 
 pfcBase1(F,[F]) :- (pfcAxiom(F) ; pfcAssumptionBase(F)),!.
@@ -1913,7 +1924,7 @@ pfcBases([X|Rest],L) :-
   pfcUnion(Bx,Br,L).
 	
 pfcAxiom(F) :- 
-  pfcGetSupport(F,(pcfUser,pcfUser)); 
+  pfcGetSupport(F,(pfcUser,pfcUser)); 
   pfcGetSupport(F,(pfcGod,pfcGod)).
 
 %= an pfcAssumptionBase/1''s G was a failed goal, i.e. were assuming that our failure to 

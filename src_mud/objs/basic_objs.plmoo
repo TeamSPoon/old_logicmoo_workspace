@@ -14,7 +14,16 @@
 */
 
 
-
+argIsa(aDirectionsFn,2,ftListFn(vtDirection)).
+argIsa(apathFn,1,tRegion).
+argIsa(apathFn,2,vtDirection).
+argIsa(localityOfObject,1,tObj).
+argIsa(localityOfObject,2,tSpatialThing).
+argIsa(mudColor,1,tObj).
+argIsa(mudColor,2,vtColor).
+argIsa(mudFacing,1,tObj).
+argIsa(mudFacing,2,vtDirection).
+argIsa(mudMemory,2,ftTerm).
 
 /*
 tms_reject_why(mudAtLoc(iArea1025, _),isa(iArea1025,tRegion)).
@@ -25,7 +34,7 @@ tms_reject_why(mudAtLoc(R,_),isa(R,tRegion)):- isa(R,tRegion).
 
 %deduce_facts_forward(localityOfObject(_,Region),isa(Region,tSpatialThing)).
 deduce_facts_forward(localityOfObject(Obj,_),isa(Obj,tObj)).
-fix_argIsa(F,N,vtDirection(Val),vtDirection):-add(mpred_prop(F,argSingleValueDefault(N,Val))),!.
+fix_argIsa(F,N,vtDirection(Val),vtDirection):-add(user:mpred_prop(F,argSingleValueDefault(N,Val))),!.
 
 */
 
@@ -103,16 +112,6 @@ prologHybrid(typeHasGlyph(tCol,ftString)).
 
 
 prologHybrid(instVerbOverride(ftTerm,ftAction,ftAction)).
-argIsa(aDirectionsFn,2,ftListFn(vtDirection)).
-argIsa(apathFn,1,tRegion).
-argIsa(apathFn,2,vtDirection).
-argIsa(localityOfObject,1,tObj).
-argIsa(localityOfObject,2,tSpatialThing).
-argIsa(mudColor,1,tObj).
-argIsa(mudColor,2,vtColor).
-argIsa(mudFacing,1,tObj).
-argIsa(mudFacing,2,vtDirection).
-argIsa(mudMemory,2,ftTerm).
 %isa(localityOfObject,prologHybrid). 
 %isa(mudActAffect, prologMultiValued).
 %isa(mudMaxHitPoints,prologHybrid).
@@ -182,7 +181,7 @@ prologHybrid(mudListPrice(tItem,ftNumber)).
 prologHybrid(mudOpaqueness(ftTerm,ftPercent)).
 prologHybrid(mudPossess(tAgentGeneric,tObj)).
 prologHybrid(mudShape(tSpatialThing,vtShape)).
-prologHybrid(mudSize(tSpatialThing,ftNumber)).
+prologHybrid(mudSize(tSpatialThing,ftTerm)).
 prologHybrid(mudTextSame(ftText,ftText)).
 prologHybrid(mudTexture(tSpatialThing,vtTexture)).
 prologHybrid(typeGrid(tCol,ftInt,ftListFn(ftString))).

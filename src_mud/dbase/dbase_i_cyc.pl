@@ -59,7 +59,7 @@ list_to_ops(Pred,[H|T],Body):-!,
 
 :-thread_local thocal:outer_pred_expansion/2.
 
-cyc_to_pfc_expansion_entry(I,O):-fail,cyc_to_pfc_expansion(I,M),!,must((functor(I,FI,AI),functor(M,MF,MA),FI==MF)),O=M.
+cyc_to_pfc_expansion_entry(I,O):-fail,cyc_to_pfc_expansion(I,M),!,must((functor(I,FI,_),functor(M,MF,_),FI==MF)),O=M.
 
 cyc_to_pfc_expansion(V,V):-is_ftVar(V),!.
 cyc_to_pfc_expansion(I,O):-cyc_to_pfc_idiom(I,O),!.
@@ -220,7 +220,7 @@ checkCycAvailablity:- ccatch((ignore((invokeSubL("(+ 1 1)",R))),(R==2->assert_if
 :- dynamic((assertedTinyKB/4,assertedTinyKB/5,assertedTinyKB/6,assertedTinyKB/7)).
 :-style_check(-singleton).
 :-style_check(-discontiguous).
-:-style_check(-atom).
+% :-style_check(-atom).
 % :-style_check(-string).
 :-set_prolog_flag(double_quotes,string).
 assertedTinyKB(unitMultiplicationFactor, '$VAR'('UNIT'), '$VAR'('UNIT'), 1, 'BaseKB', vStrMon).

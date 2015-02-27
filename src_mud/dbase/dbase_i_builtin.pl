@@ -103,7 +103,7 @@
 :-add(isa(ttFormatType,ttAbstractType)).
 :-add(predArgTypes(typeGenls(ttTypeType,tCol))).
 
-mpred_prop(defnSufficient,prologOnly).
+user:mpred_prop(defnSufficient,prologOnly).
 
 isa(argIsa,prologHybrid).
 isa(determinerString, prologMultiValued).

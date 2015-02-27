@@ -349,7 +349,7 @@ one_must(MCall,OnFail):- strip_module(MCall,M,Call), '@'(( Call *->  true ;    O
 
 :-export(transitive/3).
 :-meta_predicate(transitive(2,+,-)).
-transitive(X,A,B):- once(call(X,A,R) -> ( R\=@=A -> transitive(X,R,B) ; B=R); B=A),!.
+transitive(X,A,B):- once(debugOnError(call(X,A,R)) -> ( R\=@=A -> transitive(X,R,B) ; B=R); B=A),!.
 
 
 must_det(C):- must(C),!.
@@ -1648,10 +1648,8 @@ hideTrace:-
      ctrace/0,
      willTrace/0], -all),
 
-  hideTrace([
-     traceafter_call/1,
-
-     notrace_call/1], -all),
+  hideTrace([traceafter_call/1], -all),
+  % hideTrace([notrace_call/1], -all),
 
   hideTrace(user:[
    call/1,
@@ -1857,8 +1855,10 @@ local_predicate(P,F/N):-functor_safe(P,F,N),!,fail.
 
 %atom_contains666(F,C):- hotrace((atom(F),atom(C),sub_atom(F,_,_,_,C))).
 
+:-meta_predicate(real_builtin_predicate(0)).
+
 real_builtin_predicate(G):- predicate_property(G,foreign),!.
-real_builtin_predicate(G):- (predicate_property(prolog:G,built_in),
+real_builtin_predicate(G):- strip_module(G,_,GS),(predicate_property(prolog:GS,built_in);predicate_property(system:GS,built_in)),!.
 real_builtin_predicate(G):- (predicate_property(G,built_in),(functor(G,F,_),not(user:mpred_prop(F,prologHybrid)))).
 
 will_debug_else_throw(E,Goal):- dmsg(bugger(will_debug_else_throw(E,Goal))),grtrace,Goal.
@@ -2671,19 +2671,24 @@ stack_check(BreakIfOver,Error):- stack_check_else(BreakIfOver, trace_or_throw(st
 stack_check_else(BreakIfOver,Call):- stack_depth(Level) ,  ( Level < BreakIfOver -> true ; (dbgsubst(Call,stack_lvl,Level,NewCall),NewCall)).
 
 % dumpstack_arguments.
-dumpST:-prolog_call(notrace(dumpST(5000))).
-
+dumpST:- notrace((prolog_current_frame(Frame),dumpST2(Frame,5000))).
 % dumpST(_):-is_hiding_dmsgs,!.
-dumpST(Opts):- prolog_current_frame(Frame),dumpST(Frame,Opts).
+dumpST(Opts):- dumpST(_,Opts).
 
-dumpST(Frame,MaxDepth):-integer(MaxDepth),!,dumpST(Frame,[max_depth(MaxDepth),numbervars(safe),show([has_alternatives,level,context_module,goal,clause])]).
 dumpST(Frame,Opts):-var(Opts),!,dumpST(Frame,5000).
+dumpST(Frame,MaxDepth):-integer(MaxDepth),Term = dumpST(MaxDepth),
+   ignore(prolog_current_frame(Frame)),
+   ignore(( get_prolog_backtrace(MaxDepth, Trace,[frame(Frame),goal_depth(100)]),
+    format(user_error, '% ~p', [Term]), nl(user_error),
+    print_prolog_backtrace(user_error, Trace,[subgoal_positions(true)]), nl(user_error), fail)).
 dumpST(Frame,Opts):-is_list(Opts),!,dumpST(1,Frame,Opts).
 dumpST(Frame,Opts):-show_call(dumpST(1,Frame,[Opts])).
+dumpST2(Frame,MaxDepth):-integer(MaxDepth),!,dumpST(Frame,[max_depth(MaxDepth),numbervars(safe),show([has_alternatives,level,context_module,goal,clause])]).
 
 get_m_opt(Opts,Max_depth,D100,RetVal):-E=..[Max_depth,V],(((member(E,Opts),nonvar(V)))->RetVal=V;RetVal=D100).
 
 dumpST(N,Frame,Opts):-
+  ignore(prolog_current_frame(Frame)),
   must(( dumpST(N,Frame,Opts,Out))),
    must((get_m_opt(Opts,numbervars,-1,Start),
    neg1_numbervars(Out,Start,ROut),
@@ -3167,7 +3172,8 @@ dumptrace(G):-tracing,!,leash(+call),G.
 dumptrace(G):- not(ifCanTrace),!,notrace((fmt((not(ifCanTrace(G)))))),!,snumbervars(G),!,notrace(dumpST).
 dumptrace(G):- repeat, fmt(in_dumptrace(G)),leash(+exception),show_call_failure(get_single_char(C)),with_all_dmsg(dumptrace(G,C)).
 
-dumptrace(_,0'g):-notrace(dumpST(500000000)),!,fail.
+dumptrace(_,0'g):-notrace(dumpST2(_,500000000)),!,fail.
+dumptrace(_,0'G):-notrace(dumpST(_,500000000)),!,fail.
 dumptrace(G,0'l):-notrace(ggtrace),!,G.
 dumptrace(G,0's):-notrace(ggtrace),!,notrace(G).
 dumptrace(G,0'i):-notrace(ggtrace),!,ignore(G).
@@ -3279,6 +3285,28 @@ bugger_error_info(C):-contains_var(type_error,C).
 bugger_error_info(C):-contains_var(instantiation_error,C).
 bugger_error_info(C):-contains_var(existence_error(procedure,_/_),C).
 
+% Installs exception reporter.
+:- multifile(user:prolog_exception_hook/4).
+:- dynamic(user:prolog_exception_hook/4).
+% Writes exceptions with stacktrace into stderr.
+% Fail/0 call at the end allows the exception to be
+% processed by other hooks too.
+:- asserta((user:prolog_exception_hook(Exception, Exception, Frame, _):- 
+    (   Exception = error(Term)
+    ;   Exception = error(Term, _)),
+    Term \= type_error(number,_), 
+    Term \= syntax_error(_), 
+    format(user_error, 'Error ST-Begin: ~p', [Term]), nl(user_error),
+    dumpST(Frame,20),
+    format(user_error, 'Error ST-End: ~p', [Term]), nl(user_error),
+    nl(user_error), fail)).
+
+
+% show the warnings origins
+:-multifile(user:message_hook/3).
+:-dynamic(user:message_hook/3).
+:- asserta((user:message_hook(Term, Kind, Lines):- (Kind= warning;Kind= error),Term\=syntax_error(_),
+  dmsg(user:message_hook(Term, Kind, Lines)),notrace(dumpST(20)),dmsg(user:message_hook(Term, Kind, Lines)),fail)).
 
 % have to load this module here so we dont take ownership of prolog_exception_hook/4.
 :- user_use_module(library(prolog_stack)).

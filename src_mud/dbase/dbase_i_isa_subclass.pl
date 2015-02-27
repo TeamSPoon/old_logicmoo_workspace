@@ -70,7 +70,7 @@ assert_hasInstance(T,I):- assert_if_new(user:hasInstance_dyn(T,I)),!,expire_tabl
 :-export(is_typef/1).
 is_typef(C):-var(C),!,fail.
 is_typef(prologSingleValued).
-is_typef(F):- (hasInstance(functorDeclares,F);hasInstance(tCol,F);clause(mpred_prop(F,tCol),true)),!.
+is_typef(F):- (hasInstance(functorDeclares,F);hasInstance(tCol,F);clause(user:mpred_prop(F,tCol),true)),!.
 is_typef(F):- atom(F),current_predicate(isa_from_morphology/2),isa_from_morphology(F,TT),!,atom_concat(_,'Type',TT).
 
 % ========================================
@@ -96,7 +96,7 @@ never_type_f('Area1000').
 never_type_f(iPlayer2).
 never_type_f(genls).
 never_type_f(must).
-never_type_f(mpred_prop).
+never_type_f(user:mpred_prop).
 never_type_f(defnSufficient).
 
 noncol_type('LogicalConnective').
@@ -106,13 +106,13 @@ never_type_why(mpred_call,mpred_call(isSelf)):-!.
 never_type_why(C,_):-hasInstance(tCol,C),!,fail. % already declared to be a type
 never_type_why(C,T):- noncol_type(T),hasInstance(T,C),!.
 never_type_why(F,Why):-decided_not_was_isa(F,W),!,Why=(decided_not_was_isa(F,W)).
-never_type_why(F,_):-mpred_prop(F,tCol),!,fail.
+never_type_why(F,_):-user:mpred_prop(F,tCol),!,fail.
 %never_type_why(C):- compound(C),functor(C,F,1),isa_asserted(F,tCol).
 never_type_why(F,Why):-atom(F),functor(G,F,1),real_builtin_predicate(G),!,Why=(whynot( real_builtin_predicate(G) )).
 never_type_why(M:C,Why):-atomic(M),!,never_type_why(C,Why).
-% never_type_why(F):-dmsg(never_type_why(F)),!,asserta_if_new(mpred_prop(F,prologOnly)).
+% never_type_why(F):-dmsg(never_type_why(F)),!,asserta_if_new(user:mpred_prop(F,prologOnly)).
 never_type_why(F,Why):-never_type_f(F),Why=is_never_type(F).
-never_type_why(F,Why):- atom(F), mpred_arity(F,A),!,F\==isa, mpred_prop(F,_), A > 1,Why=(whynot( mpred_arity(F,A) )).
+never_type_why(F,Why):- atom(F), mpred_arity(F,A),!,F\==isa, user:mpred_prop(F,_), A > 1,Why=(whynot( mpred_arity(F,A) )).
 
 
 % ========================================
@@ -377,7 +377,7 @@ atom_prefix_other(Inst,Prefix,Other):-atom_type_prefix_other(Inst,_,Prefix,Other
 atom_type_prefix_other(Inst,Type,Prefix,Other):-atom(Inst),type_prefix(Prefix,Type),atom_concat(Prefix,Other,Inst),capitalized(Other).
 atom_type_prefix_other(Inst,Type,Suffix,Other):-atom(Inst),type_suffix(Suffix,Type),atom_concat(Other,Suffix,Inst),!.
 
-mpred_prop(F,tCol):-isa_from_morphology(F,Col),atom_concat(_,'Type',Col),mpred_arity(F,1).
+user:mpred_prop(F,tCol):-isa_from_morphology(F,Col),atom_concat(_,'Type',Col),mpred_arity(F,1).
 
 
 onLoadPfcRule('=>'(hasInstance(tCol,Inst), {isa_from_morphology(Inst,Type)} , isa(Inst,Type))).
@@ -400,12 +400,12 @@ isa_asserted_0(I,T):-atom(I),isa_from_morphology(I,T).
 isa_asserted_0(I,T):-(atom(I);atom(T)),type_isa(I,T).
 isa_asserted_0(I,T):- ((thlocal:useOnlyExternalDBs,!);thglobal:use_cyc_database),(kbp_t([isa,I,T]);kbp_t([T,I])).
 isa_asserted_0(I,T):- var(I),member(T,[ftVar,ftProlog]).
-isa_asserted_0(I,T):- is_asserted(mpred_prop(I,T)),hasInstance(tCol,T). % pddlSomethingIsa
+isa_asserted_0(I,T):- is_asserted(user:mpred_prop(I,T)),hasInstance(tCol,T). % pddlSomethingIsa
 isa_asserted_0(I,T):- nonvar(I),/*not(not_ft(T)),*/(  ((var(T);chk_ft(T)),term_is_ft(I,T))*->true;type_deduced(I,T) ).
 isa_asserted_0(I,T):- HEAD= isa(I, T),ruleBackward(HEAD,BODY),call_mpred_body(HEAD,BODY).
 isa_asserted_0(I,T):- nonvar(T),isa_asserted_1(I,T).
 
-% isa_asserted_1(I,T):- T\=predStub(_),mpred_prop(I,T).
+% isa_asserted_1(I,T):- T\=predStub(_),user:mpred_prop(I,T).
 isa_asserted_1(I,T):- atom(T),isa_w_type_atom(I,T).
 isa_asserted_1(_,T):- hasInstance(completelyAssertedCollection,T),!,fail.
 isa_asserted_1(I,T):- append_term(T,I,HEAD),ruleBackward(HEAD,BODY),call_mpred_body(HEAD,BODY).
@@ -413,14 +413,14 @@ isa_asserted_1(I,'&'(T1 , T2)):-!,nonvar(T1),var(T2),!,dif:dif(T1,T2),isa_backch
 isa_asserted_1(I,'&'(T1 , T2)):-!,nonvar(T1),!,dif:dif(T1,T2),isa_backchaing(I,T1),isa_backchaing(I,T2).
 isa_asserted_1(I,(T1 ; T2)):-!,nonvar(T1),!,dif:dif(T1,T2),isa_backchaing(I,T1),isa_backchaing(I,T2).
 
-isa_w_type_atom(I,T):- is_pred_declarer(T),!,mpred_prop(I,T).
+isa_w_type_atom(I,T):- is_pred_declarer(T),!,user:mpred_prop(I,T).
 isa_w_type_atom(_,T):- dont_call_type_arity_one(T),!,fail.
 isa_w_type_atom(I,T):- G=..[T,I],once_if_ground(isa_atom_call(T,G),_).
 
 dont_call_type_arity_one(tCol).
 dont_call_type_arity_one(ttFormatType).
 dont_call_type_arity_one(ttAgentType).
-dont_call_type_arity_one(F):-mpred_prop(F,prologHybrid),!.
+dont_call_type_arity_one(F):-user:mpred_prop(F,prologHybrid),!.
 
 isa_atom_call(T,G):-loop_check(isa_atom_call_ilc(T,G)).
 
@@ -460,7 +460,7 @@ decl_type(Spec):- decl_type_unsafe(Spec),!.
 decl_type_unsafe(Spec):- never_type_why(Spec,Why),!,trace_or_throw(never_type_why(Spec,Why)).
 decl_type_unsafe(Spec):-
  with_assertions([thlocal:infSkipArgIsa,thlocal:infSkipFullExpand], 
-   ((hooked_asserta(isa(Spec,tCol)),assert_hasInstance(tCol,Spec),hooked_asserta(mpred_prop(Spec,tCol)),decl_mpred_hybrid(Spec/1)))),!.
+   ((hooked_asserta(isa(Spec,tCol)),assert_hasInstance(tCol,Spec),hooked_asserta(user:mpred_prop(Spec,tCol)),decl_mpred_hybrid(Spec/1)))),!.
 
 
 define_compound_isa(Spec,T):- get_functor(Spec,F),define_compound_isa(F,Spec,T).
@@ -569,7 +569,7 @@ assert_isa_ilc(I,T):- once(decl_type(T)),
 assert_isa_ilc_unchecked(I,T):- compound(I),!,must((get_functor(I,F),assert_compound_isa(I,T,F))),!.
 assert_isa_ilc_unchecked(I,tCol):- must(show_call(decl_type(I))).
 assert_isa_ilc_unchecked(I,ttFormatType):- must(show_call(define_ft(I))).
-assert_isa_ilc_unchecked(I,_):- not(mpred_prop(I,_)),not(hasInstance(tCol,I)),show_call_failure(assert_if_new(i_countable(I))),fail.
+assert_isa_ilc_unchecked(I,_):- not(user:mpred_prop(I,_)),not(hasInstance(tCol,I)),show_call_failure(assert_if_new(i_countable(I))),fail.
 assert_isa_ilc_unchecked(I,T):-
   with_assertions([thlocal:infSkipArgIsa,thlocal:infSkipFullExpand],((  hooked_asserta(isa(I,T)),assert_hasInstance(T,I)))).
 

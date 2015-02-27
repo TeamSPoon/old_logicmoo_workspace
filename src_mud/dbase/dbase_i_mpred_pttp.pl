@@ -95,7 +95,8 @@ pttp_assert_wid(ID,_Mode,PNF):-  must( pttp_nnf(PNF,X)),!,show_call_failure(must
 
 % -- CODEBLOCK
 :-export(pttp_assert_real_wid/2).
-pttp_assert_real_wid(ID,X):- kb_incr(ID,IDINC),must( pttp1_wid(IDINC,X,Y)),!, must(pttp_assert_int_wid(IDINC,Y)),!.
+pttp_assert_real_wid(ID,X):- kb_incr(ID,IDINC),
+  must( pttp1_wid(IDINC,X,Y)),!, must(pttp_assert_int_wid(IDINC,Y)),!.
 
 
 % -- CODEBLOCK

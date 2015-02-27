@@ -153,7 +153,7 @@ end_of_file.
 
 
 tms_after_prolog_call(_):-!.
-tms_after_prolog_call(C):-functor(C,F,_),not(mpred_prop(F,_)),!,ignore(resolve_if_false(C)),!.
+tms_after_prolog_call(C):-functor(C,F,_),not(user:mpred_prop(F,_)),!,ignore(resolve_if_false(C)),!.
 tms_after_prolog_call(C):-checkNoArgViolation(C),resolve_if_false(C),!.
 tms_after_prolog_call(_).
 
@@ -161,8 +161,8 @@ tms_after_prolog_call(_).
 % ================================================
 % call_typelect/2,4
 % ================================================
-% grab_argsIsa(F,Types):- fail,deducedSimply(mpred_prop(F,predArgTypes(Types))).
-% grab_argsIsa(F,Types):- call_typelect([flag(+firstValue),+debugOnError,+deducedSimply],mpred_prop(F,predArgTypes(Types))).
+% grab_argsIsa(F,Types):- fail,deducedSimply(user:mpred_prop(F,predArgTypes(Types))).
+% grab_argsIsa(F,Types):- call_typelect([flag(+firstValue),+debugOnError,+deducedSimply],user:mpred_prop(F,predArgTypes(Types))).
 
 call_typelect(Ops,Call):-call_typelect(Ops,Ops,Call,Call).
 
