@@ -335,7 +335,7 @@ pfcUseAllFact(Q):-may_use_head(Q),no_head_singletons_hb(Q,true).
 
 no_head_singletons_hb(Q,P):-not(((head_singletons_hb(Q,P,_),get_functor(Q,F,A),decl_mpred_prolog(F/A)))).
 
-callBC(G):-pfc_negation(G,Pos),!,show_call(not(callBC(G))),!.
+callBC(G):-pfc_negation(G,Pos),!,show_call(not(callBC(Pos))),!.
 callBC(G):-predicate_property(G,number_of_clauses(1)) -> pfcBC(G) ; loop_check(mpred_call(G)).
 
 may_never_deduce_bc_change.
@@ -416,7 +416,7 @@ pfcDefaultSetting(GeneralTerm,Default) :-
 %= pfcAdd(P,S) asserts P into the dataBase with support from S.
 
 pfcAdd(isa(I,Not)):-Not==not,!,pfcAdd(not(I)),!.
-pfcAdd(P) :- get_user_support_for(P,S) pfcAdd(P,S).
+pfcAdd(P) :- get_user_support_for(P,S),pfcAdd(P,S).
 
 get_user_support_for(P,(pfcUser(P),pfcUser(P))).
 get_god_support_for(P,(pfcGod(P),pfcGod(P))).
@@ -729,7 +729,7 @@ pfcRem(P) :-
   % pfcRem/1 is the user's interface - it withdraws user support for P.
   pfcDoConjs(pfcLambda([E],pfcRem_user(E)),P).
 
-pfcRem_user(E):- pfcRem_user(E),get_user_support_for(E,S),!,pfcRem(E,S).
+pfcRem_user(E):- get_user_support_for(E,S),!,pfcRem(E,S).
 
 
 pfcRem(P,S) :-
