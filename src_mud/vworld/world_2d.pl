@@ -164,9 +164,10 @@ mudNearbyRegions(R1,R1).
 %transitive_other(mudAtLoc,1,Obj,What):-mudInsideOf(Obj,What).
 
 mudAtLoc(Obj,Where):-mudSubPart(What,Obj),mudAtLoc(What,Where).
-localityOfObject(Obj,Where):-mudSubPart(What,Obj),localityOfObject(What,Where).
 
-% transitive_other(localityOfObject,1,Obj,What):-mudInsideOf(Obj,What).
+localityOfObject(Obj,Where)<= mudSubPart(What,Obj),localityOfObject(What,Where).
+localityOfObject(Obj,Region),tRegion(Region)=> inRegion(Obj,Region).
+
 
 :-decl_mpred_hybrid(mudInsideOf/2).
 % :-sanity(( requires_storage((mudInsideOf(_G3775190, _G3775191):-is_asserted(mudStowing(_G3775191, _G3775190))))  )).
@@ -192,16 +193,45 @@ same_regions(Agent,Obj):-must(inRegion(Agent,Where1)),dif_safe(Agent,Obj),inRegi
 :-decl_mpred_prolog(mudAtLoc/2).
 predArgTypes(mudAtLoc(tObj,tSpatialThing)).
 
-mudAtLoc(X,Y):-loop_check(mudAtLoc_rule(X,Y)).
-mudAtLoc_rule(X,YY):-tObj(X),not_asserted(mudAtLoc(X,Y)),!,put_in_world(X),is_asserted(mudAtLoc(X,Y)),!,Y=YY.
 
+% compute the most specific location description
 mostSpecificLocalityOfObject(Obj,Where):-
    one_must(is_asserted(mudAtLoc(Obj,Where)),one_must(is_asserted(localityOfObject(Obj,Where)),is_asserted(inRegion(Obj,Where)))).
 
 
-inRegion(Agent,RegionIn):-nonvar(Agent),nonvar(RegionIn),!,inRegion(Agent,Region),!,same(Region,RegionIn).
-inRegion(Where,Region):-nonvar(Where),var(Region),is_location(Where),!,locationToRegion(Where,Region).
-inRegion(Agent,Region):-nonvar(Agent),var(Region),loop_check(( mostSpecificLocalityOfObject(Agent,Where), inRegion(Where,Region)),fail).
+% objects can be two places x,y,z's at once
+((mudAtLoc(Obj,NewLoc), 
+ {(mudAtLoc(Obj,OldLoc), OldLoc\==NewLoc)})
+   =>
+   ~mudAtLoc(Obj,OldLoc)).
+
+% objects are placed by default in center of region
+((inRegion(Obj,Region), ~tPathway(Obj), ~mudPossess(_,Obj),
+{not_asserted(mudAtLoc(Obj,xyzFn(Region,_,_,_)))})
+  =>
+  mudAtLoc(Obj,xyzFn(Region,3,3,1))).
+
+% objects can be two regions at once
+((localityOfObject(Obj,NewLoc), 
+ {(localityOfObject(Obj,OldLoc), OldLoc\==NewLoc)})
+  => 
+  ~localityOfObject(Obj,OldLoc)).
+
+% if something leaves a room get rid of old location 
+((inRegion(Obj,NewRegion), 
+ {(mudAtLoc(Obj,OldLoc), OldLoc\=xyzFn(NewRegion,_,_,_))})
+  => 
+  ~mudAtLoc(Obj,OldLoc)).
+
+% create pathway objects and place them in world
+(pathBetween(Region,Dir,_R2)/mudExitAtLoc(Region,Dir,LOC)   
+    { Obj = apathFn(Region,Dir) }) =>  
+                        (tPathway(Obj),localityOfObject(Obj,Region),mudAtLoc(Obj,LOC))).
+
+
+mudDoorwayDir(Region,apathFn(Region,Dir),Dir) :- tPathway(apathFn(Region,Dir)).
+
+mudExitAtLoc(Region,Dir,xyzFn(Region,X,Y,Z)):-calc_from_center_xyz(Region,Dir,2,X,Y,Z).
 
 % :-snark_tell(localityOfObject(A,B) &  localityOfObject(B,C) => localityOfObject(A,C)).
 
@@ -239,20 +269,14 @@ mudSubPart(Subj,Obj):- (nonvar(Subj);nonvar(Obj)),!,test_tl(infThirdOrder), find
 % mudSubPart([pelvis,legs,right_leg,right_foot,right_toes]).
 
 
-put_in_world(X):-var(X),trace_or_throw(var_put_in_world(X)).
-put_in_world(isSelf):-!.
-put_in_world(Agent):-loop_check(put_in_world_ilc(Agent),true),!.
-
-put_in_world_ilc(Obj):-is_in_world(Obj),!.
-put_in_world_ilc(_):- thlocal:noDBaseHOOKS(_),!.
-put_in_world_ilc(Obj):-clause(localityOfObject(Obj,What),true),asserta(mudAtLoc(Obj,xyzFn(What,3,3,1))),!.
-put_in_world_ilc(Obj):-mudSubPart(What,Obj),!,put_in_world(What),!.
-put_in_world_ilc(Obj):-create_and_assert_random_fact(mudAtLoc(Obj,_LOC)),create_and_assert_random_fact(mudFacing(Obj,_Dir)),!.
 
 is_in_world(Obj):-isa_asserted(Obj,tRegion),!.
 is_in_world(Obj):-clause(mudAtLoc(Obj,_),true),!.
 is_in_world(Obj):-clause(mudStowing(Who,Obj),true),!,is_in_world(Who).
 is_in_world(Obj):-mudSubPart(What,Obj),is_in_world(What),!.
+
+put_in_world(Obj):-is_in_world(Obj),!.
+put_in_world(Obj):-random_xyzFn(LOC),pfcAdd(mudAtLoc(Obj,LOC)).
 
 
 
@@ -281,8 +305,8 @@ user:fact_always_true(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,L
 fact_maybe_deduced(localityOfObject(Obj,Region)):- is_asserted(mudAtLoc(Obj,LOC)),locationToRegion(LOC,Region),!.
 fact_maybe_deduced(localityOfObject(apathFn(Region,Dir),Region)):-is_asserted(pathBetween(Region,Dir,_)).
 
-create_and_assert_random_fact(_):- thlocal:noDBaseHOOKS(_),!.
-create_and_assert_random_fact(Fact):-must(create_random_fact(Fact)),hooked_asserta(Fact).
+% create_and_assert_random_fact(_):- thlocal:noDBaseHOOKS(_),!.
+create_and_assert_random_fact(Fact):- fail,must(create_random_fact(Fact)),hooked_asserta(Fact).
 
 %  suggest a random fact that is probably is not already true
 create_random_fact(G) :- into_functor_form(dbase_t,G,MPred),G\=@=MPred,!,create_random_fact(MPred).
@@ -303,14 +327,13 @@ deduce_facts(localityOfObject(Obj,Region),mudAtLoc(Obj,LOC)):- tRegion(Region),n
   must_det(mudAtLoc(Obj,LOC)).
 
 
-% random_region(LOC):- findall(O,isa(O,region),LOCS),my_random_member(LOC,LOCS).
+random_region(LOC):- findall(O,isa(O,tRegion),LOCS),my_random_member(LOC,LOCS).
 
 
 random_xyzFn(LOC):-
    must_det(random_instance(tRegion,Region,true)),
    in_grid_rnd(Region,LOC),!.
-
-random_xyzFn(xyzFn('Area1000',1,1,1)):-  trace_or_throw(dbase_not_loaded).
+random_xyzFn(xyzFn('Area1000',1,1,1)):-  dmsg(trace_or_throw(dbase_not_loaded)).
 
 unoccupied(_,Loc):- not(is_asserted(mudAtLoc(_,Loc))),!.
 unoccupied(_,_):-!.
@@ -329,6 +352,11 @@ calc_xyz(Region1,Dir,force(X1,Y1,Z1),X2,Y2,Z2):-
    to_3d(Region1,xyzFn(_,X,Y,Z)),
    get_dir_offset(Dir,1,OX,OY,OZ),
    X2 is X+ (OX*X1),Y2 is Y+OY*Y1,Z2 is Z+OZ*Z1.
+
+calc_from_center_xyz(Region1,Dir,R,X2,Y2,Z2):-
+   to_3d(Region1,xyzFn(Region1,X,Y,Z)),
+   get_dir_offset(Dir,R,OX,OY,_),
+   X2 is X+ (OX*R) ,Y2 is Y+(OY*R), Z2 is Z.
 
 from_dir_target(LOC,Dir,XXYY):- is_3d(LOC),!,
   move_dir_target(LOC,Dir,XXYY).

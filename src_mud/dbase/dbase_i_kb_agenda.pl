@@ -59,8 +59,8 @@ agenda_rescan_for_module_ready:- with_assertions(thlocal:in_agenda_rescan_for_mo
 agenda_slow_op_enqueue(Slow):- test_tl(agenda_slow_op_do_prereqs),!,debugOnError(Slow).
 agenda_slow_op_enqueue(Slow):- assertz_if_new(agenda_slow_op_todo(Slow)),!.
 
-:-dynamic(already_added_this_round/1).
-expire_dont_add:-retractall(already_added_this_round(_)),expire_tabled_list(all),nop(dmsg(expire_dont_add)).
+:-dynamic(user:already_added_this_round/1).
+expire_dont_add:-retractall(user:already_added_this_round(_)),expire_tabled_list(all),nop(dmsg(expire_dont_add)).
 
 expire_pre_change(change(assert,_),_):-expire_tabled_list(all),!. 
 expire_pre_change(_,_).

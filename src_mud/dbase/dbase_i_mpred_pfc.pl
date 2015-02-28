@@ -60,10 +60,12 @@ pfc_clause_is_asserted(H,B):- var(H),nonvar(B),!,fail.
 pfc_clause_is_asserted(H,B):- one_must(pfc_clause_db_unify(H,B),pfc_clause_is_asserted_hb_nonunify(H,B)).
 pfc_clause_is_asserted(H,B,Ref):-pfc_clause_db_ref(H,B,Ref).
 
+pfc_clause_is_asserted_hb_nonunify(H,B):- pfc_clause_db_unify( =>( B , H) , true).
+pfc_clause_is_asserted_hb_nonunify(H,B):- pfc_clause_db_unify( <=( H , B) , true).
+pfc_clause_is_asserted_hb_nonunify(_,_):-!,fail.
 pfc_clause_is_asserted_hb_nonunify(G, T   ):- T==true,!,notrace(pfcRuleOutcomeHeadBody(G,H,B)),G\=@=H,!,pfc_clause_is_asserted(H,B).
 pfc_clause_is_asserted_hb_nonunify(H,(T,B)):- T==true,!,pfc_clause_is_asserted_hb_nonunify(H,B).
 pfc_clause_is_asserted_hb_nonunify(H,(B,T)):- T==true,!,pfc_clause_is_asserted_hb_nonunify(H,B).
-pfc_clause_is_asserted_hb_nonunify(H,B):- pfc_clause_db_unify( =>( B , H) , true).
 pfc_clause_is_asserted_hb_nonunify(H,B):- pfc_clause_db_unify( <=( H , B) , true).
 pfc_clause_is_asserted_hb_nonunify(H,B):-pfc_mpred_storage_clauses(_,H,B,_).
 
@@ -259,7 +261,7 @@ pfc_clause_db_ref(H,B,Ref):-must(pfc_local(H)),!,pfc_clause_local_db_ref(H,B,Ref
 
 pfc_clause_local_db_ref(H,B,Ref):- copy_term(H:B,HH:BB),clause(HH,BB,Ref),clause(CH,CB,Ref),H:B=@=CH:CB,!.
 
-
+pfc_call(true):-!.
 pfc_call(G):- pfc_call(nonPFC,G).
 pfc_call(_,G):- pfc_local(G),!,must(predicate_property(G,_)),!, debugOnError(call(G)).
 pfc_call(Why,X):-dbase_op(call(Why),X).
@@ -338,7 +340,7 @@ pfcUseAllFact(Q):-may_use_head(Q),no_head_singletons_hb(Q,true).
 no_head_singletons_hb(Q,P):-not(((head_singletons_hb(Q,P,_),get_functor(Q,F,A),decl_mpred_prolog(F/A)))).
 
 callBC(G):-pfc_negation(G,Pos),!,show_call(not(callBC(Pos))),!.
-callBC(G):-predicate_property(G,number_of_clauses(1)) -> pfcBC(G) ; loop_check(mpred_call(G)).
+callBC(G):- loop_check(pfcBC2(G)).
 
 may_never_deduce_bc_change.
 
@@ -1162,10 +1164,31 @@ pfcBC0(F) :-
   ( \+ current_predicate(_,F)) -> mpred_call(F) ;
   % check for system predicates as well.
   not(predicate_property(F,number_of_clauses(_))) -> pfc_call(systemPred,F) ; 
-  otherwise ->  pfc_clause_db_unify(F,Condition),
-    with_assertions(thlocal:noDBaseHOOKS(_),pfc_call(neck(F),Condition)).
+  otherwise ->  pfc_clause_db_unify(F,Condition), pfc_call(neck(F),Condition).
 
 
+%%
+%= pfcBC2(F) is true iff F is a fact available for backward chaining ONLY.
+%= Note that this has the side effect of catching unsupported facts and
+%= assigning them support from God.
+%= this Predicate should hide Facts from callBC/1
+%%
+pfcBC2(P) :-
+  % trigger any bc rules.
+  pfcBT(P,Trigger),
+  pfcGetSupport(pfcBT(P,Trigger),S),
+  pfcEvalLHS(Trigger,S),
+  fail.
+
+pfcBC2(F) :- nonvar(F),
+ (
+  %= this is probably not advisable due to extreme inefficiency.
+  var(F)    ->  pfcFact(F) ;
+  ( \+ current_predicate(_,F)) -> mpred_call(F) ;
+  % check for system predicates as well.
+  not(predicate_property(F,number_of_clauses(_))) -> pfc_call(systemPred,F) ; 
+  otherwise ->  
+   (pfc_clause_db_unify(F,Condition),Condition\==true),show_call(pfc_call(neck(F),Condition))).
 
 % an action is pfcUndoable if there exists a method for undoing it.
 pfcUndoable(A) :- pfcUndoMethod(A,_).

@@ -368,6 +368,9 @@ tPenguin(X) => not(tFly(X)).
 
 (genls(I,Sub),{dif:dif(I,Super),is_asserted(genls(I,Sub)),is_asserted(genls(Sub, Super)), nonvar(I),nonvar(Sub),nonvar(Super)})    
  => (genls(I,Super) , completeExtentAsserted(genls)).
+
+
+
 /*
 :-prolog.
 

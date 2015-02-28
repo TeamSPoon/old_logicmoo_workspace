@@ -825,10 +825,15 @@ fib(N,M) <=
 
 :-next_test. % ==
 
-at(Obj,NewLoc), 
-{(at(Obj,OldLoc), OldLoc\==NewLoc)}
+mudAtLoc(Obj,NewLoc), 
+{(mudAtLoc(Obj,OldLoc), OldLoc\==NewLoc)}
   =>
-  ~at(Obj,OldLoc).
+  ~mudAtLoc(Obj,OldLoc).
+
+localityOfObject(Obj,NewLoc), 
+{(localityOfObject(Obj,OldLoc), OldLoc\==NewLoc)}
+  =>
+  ~localityOfObject(Obj,OldLoc).
 
 function(P) =>
   {P1 =.. [P,X,Y],
@@ -1216,7 +1221,7 @@ test_b1(X) :-
 % Devices behave as intended unless they are faulty.
 isa(X,Class), ~faulty(X) => behave(X,Class).
 
-% a wire equates the values at each end.
+% a wire equates the values mudAtLoc each end.
 wire(T1,T2) => (value(T1,V) <=> value(T2,V)).
 
 % It is a conflict if a terminal has two different values.

@@ -267,7 +267,7 @@ resultIsa(apathFn,tPathway).
 tInferInstanceFromArgType(vtSize).
 tInferInstanceFromArgType(vtTexture).
 ttAgentType(tMonster).
-user:instTypeProps(apathFn(Region,_Dir),tPathway,[localityOfObject(Region)]).
+% user:instTypeProps(apathFn(Region,_Dir),tPathway,[localityOfObject(Region)]).
 vtBasicDir(vEast).
 vtBasicDir(vNorth).
 vtBasicDir(vSouth).

@@ -2985,7 +2985,7 @@ retract_can_table :- retractall(maybe_table_key(_)).
 :- meta_predicate_transparent(make_key(?,-)).
 
 :-module_transparent(ex/0).
-lex:-listing(tlbugger:ilc),listing(ilc_local(_,_)),forall(current_predicate(table_bugger:F/A),listing(table_bugger:F/A)),catch(listing(implied_dont_add),_,true).
+lex:-listing(tlbugger:ilc),listing(ilc_local(_,_)),forall(current_predicate(table_bugger:F/A),listing(table_bugger:F/A)),catch(listing(user:already_added_this_round),_,true).
 ex:-expire_tabled_list(_),retractall(tlbugger:ilc(_)),retractall(ilc_local(_,_)),dmsg_showall(_),forall(current_predicate(table_bugger:F/A),(functor(RA,F,A),retractall(RA))),catch(expire_dont_add,_,true).
 
 expire_tabled_list(V):-var(V),!,retractall(table_bugger:call_tabled_cached_results(_,_)).

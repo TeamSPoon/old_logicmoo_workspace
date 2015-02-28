@@ -337,14 +337,14 @@ add(grid_key(KW=COL)):- !, add(typeHasGlyph(COL,KW)).
 add(Term):- expands_on(isEach,Term), !,forall(do_expand_args(isEach,Term,O),add(/*to_exp*/(O))),!.
 add(:-(Term)):- !, must(add_fast(:-(Term))).
 add(Skipped):- ground(Skipped),implied_skipped(Skipped),!.
-add(C0):- ignore((ground(C0),asserta(already_added_this_round(C0)))),!,must_det(add_fast(C0)).
+add(C0):- ignore((ground(C0),asserta(user:already_added_this_round(C0)))),!,must_det(add_fast(C0)).
 add(A):-trace_or_throw(fmt('add is skipping ~q.',[A])).
 
 
 implied_skipped(genls(C0,C0)).
 implied_skipped(props(_,[])).
 implied_skipped(Skipped):-compound(Skipped), not(functor(Skipped,_,1)),fail, (dbase_t(Skipped);out_of_dbase_t(Skipped)).
-implied_skipped(Skipped):-already_added_this_round(Skipped).
+implied_skipped(Skipped):-user:already_added_this_round(Skipped).
 
 
 :-export(add_fast/1).

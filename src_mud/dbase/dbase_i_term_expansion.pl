@@ -88,7 +88,7 @@ fully_expand(Op,Sent,SentO):-fully_expand_now(Op,Sent,SentO),!.
 
 fully_expand_now(_,Sent,SentO):-not(compound(Sent)),!,Sent=SentO.
 fully_expand_now(_,Sent,SentO):-thlocal:infSkipFullExpand,!,must(Sent=SentO).
-% fully_expand_now(Op,/*to_exp*/(G),G0):- !,fully_expand_now(Op,G,G0).
+% fully_expand_now(Op,/*to_exp*/(G),G0):-!,fully_expand_now(Op,G,G0).
 fully_expand_now(Op,Sent,SentO):- must(notrace((fully_expand_clause(Op,Sent,BO),!,SentO=BO))),
    ignore(((notrace((Sent\=@=SentO, (Sent\=isa(_,_)->SentO\=isa(_,_);true), 
     (Sent \=@= user:SentO), dmsg(fully_expand(Op,(Sent --> SentO)))))))),!.

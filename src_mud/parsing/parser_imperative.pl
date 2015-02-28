@@ -283,6 +283,8 @@ parse_agent_text_command_0(Agent,PROLOGTERM,[],Agent,actProlog(req(PROLOGTERM)))
 :-export(parse_agent_text_command_1/5).
 % parses a verb phrase and retuns one interpretation (action)
 parse_agent_text_command_1(Agent,SVERB,ARGS,Agent,GOAL):-
+
+ 
    parse_vp_real(Agent,SVERB,ARGS,GOALANDLEFTOVERS),
    dmsg_parserm(parserm("GOALANDLEFTOVERS"=GOALANDLEFTOVERS)),
    GOALANDLEFTOVERS \= [],
@@ -320,7 +322,8 @@ get_vp_templates(_Agent,SVERB,_ARGS,TEMPLATES):-
    sort(TEMPLATES_FA,TEMPLATES),!.
    
 % parses a verb phrase and retuns multiple interps
-parse_vp_real(Agent,SVERB,ARGS,Sorted):-
+parse_vp_real(Agent,SVERB,ARGS,Sorted):- with_assertions(thlocal:infSkipFullExpand,parse_vp_real_no_arg_checking(Agent,SVERB,ARGS,Sorted)).
+parse_vp_real_no_arg_checking(Agent,SVERB,ARGS,Sorted):-
    get_vp_templates(Agent,SVERB,ARGS,TEMPLATES),   
    dmsg_parserm(("TEMPLATES"= (orig([SVERB|ARGS]) = TEMPLATES))),
    TEMPLATES \= [],
@@ -334,7 +337,7 @@ parse_vp_real(Agent,SVERB,ARGS,Sorted):-
       GOAL=..[VERB|GOODARGS])),
       GOALANDLEFTOVERS_FA),
    sort(GOALANDLEFTOVERS_FA,GOALANDLEFTOVERS),
-   predsort(bestParse,GOALANDLEFTOVERS,Sorted).
+   predsort(bestParse,GOALANDLEFTOVERS,Sorted),!.
 
 chooseBestGoal([_LeftOver - GOAL],GOAL):-!.
 chooseBestGoal(GOALANDLEFTOVERS,GOAL):-
