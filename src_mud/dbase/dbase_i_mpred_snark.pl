@@ -893,10 +893,10 @@ door(What).
 
 
 % :-export(tsn/0).
-tsn:-with_all_dmsg(forall(clause(tsnark,C),must(C))).
+tsn:-with_all_dmsg(forall(clause(snark,C),must(C))).
 
-% tsnark:- make.
-tsnark:- snark_test_string(TODO),snarky(string(TODO),current_output).
+% snark:- make.
+tsnark:- snark_test_string(TODO),snark(string(TODO),current_output).
 
 :- multifile(user:mud_regression_test/0).
 user:mud_regression_test :- tsn.
@@ -905,33 +905,35 @@ user:mud_regression_test :- tsn.
 :-asserta_if_new(snark_action_mode(tell)).
 
 :-thread_local(snark_reader_mode/1).
-:-asserta_if_new(snark_reader_mode(prolog)).
+:-asserta_if_new(snark_reader_mode(lisp)).
 
 
 snark_read(In,Wff,Vs):-
-  snark_reader_mode(lisp)->
-    lisp_read(In,Wff);
-      catch(read_term(In,Wff,[module(dbase_i_snark),double_quotes(string),variable_names(Vs)]),E,(fmt(E),fail)).
+  (snark_reader_mode(lisp)-> 
+    catch((lisp_read(In,WffIn),with_output_to(atom(A),write_term(WffIn,
+      [module(dbase_i_snark),numbervars(true),quoted(true)])),
+     read_term_from_atom(A,Wff,[module(dbase_i_snark),double_quotes(string),variable_names(Vs)])),E,(fmt(E),fail));
+      catch(read_term(In,Wff,[module(dbase_i_snark),double_quotes(string),variable_names(Vs)]),E,(fmt(E),fail))).
 
 %= --------- to test program -------------
-:-export(snarky/0).
-snarky:-current_input(In),current_output(Out),!,snarky(In,Out).
-:-export(snarky/2).
 :-ensure_loaded(dbase_i_sexpr_reader).
+
+:-export(snark/0).
+snark:- current_input(In),current_output(Out),!,snark(In,Out).
 
 open_input(InS,InS):-is_stream(InS),!.
 open_input(string(InS),In):-text_to_string(InS,Str),string_codes(Str,Codes),open_chars_stream(Codes,In),!.
 
-
-snarky(InS,Out) :-
-  open_input(InS,In),
+:-export(snark/2).
+snark(InS,Out) :-
+  l_open_input(InS,In),
    repeat,             
-        once((snark_action_mode(Mode),write(Out,Mode),write(Out,'> '))),
+      debugOnError((  once((snark_action_mode(Mode),write(Out,Mode),write(Out,'> '))),
         snark_read(In,Wff,Vs),
          b_setval('$variable_names', Vs),
            portray_clause(Out,Wff,[variable_names(Vs),quoted(true)]),
            once(snark_process(Wff)),
-           Wff == end_of_file,!.
+           Wff == end_of_file)),!.
 
 :-export(id_to_why/3).
 why_to_id(Term,Wff,IDWhy):-not(atom(Term)),term_to_atom(Term,Atom),!,why_to_id(Atom,Wff,IDWhy).
@@ -998,7 +1000,7 @@ snark_tell_boxes(Why,Assert):- trace,
   wdmsgl(snark_tell_boxes(assert_wfs(Why,Prolog))),
   unnumbervars(Prolog,PTTP), must(assert_wfs(Why,PTTP)).
 
-assert_wfs(Why,PrologI):-as_prolog(PrologI,Prolog), with_assertions(thlocal:with_why_wfs(Why,Prolog),show_call(pfcAdd(Prolog))).
+assert_wfs(Why,PrologI):-as_prolog(PrologI,Prolog), with_assertions(thlocal:current_why(Why,Prolog),show_call(pfcAdd(Prolog))).
 
 
 boxlog_to_prolog(V,V):-is_ftVar(V),!.
@@ -1022,7 +1024,7 @@ boxlog_to_prolog(BL,PTTP):-as_prolog(BL,PTTP).
 :-dmsg_show(_).
 :-dmsg('i see this').
 :- snark_tell(exists(C, course(C) & -exists(MT3, midterm(C,MT3)))).
-:- snark_test_string(TODO),snarky(string(TODO),current_output).
+:- snark_test_string(TODO),snark(string(TODO),current_output).
 :-set_no_debug.
 */
 :-notrace.

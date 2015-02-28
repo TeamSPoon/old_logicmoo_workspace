@@ -278,8 +278,9 @@ get_body_functor(BDY,BF,A):-get_functor(BDY,BF,A).
 
 
 % -  del(RetractOne) 
-del(C0):- ireq(C0),!,idel(C0),!.
-del(C0):- mreq(C0),!,mdel(C0),!.
+del(C):- fully_expand(change(retract,a),/*to_exp*/(C),C0),del0(C0).
+del0(C0):- ireq(C0),!,idel(C0),!.
+del0(C0):- mreq(C0),!,mdel(C0),!.
 
 idel(C0):- dmsg(idel(C0)),dbase_modify(change( retract,a),C0), verify_sanity(ireq(C0)->(dmsg(warn(incomplete_I_DEL(C0))),fail);true),!.
 idel(C0):- dmsg(warn(failed(idel(C0)))),!,fail.
@@ -288,26 +289,30 @@ mdel(C0):- dmsg(mdel(C0)),dbase_modify(change( retract,one),C0), verify_sanity(m
 mdel(C0):- dmsg(warn(failed(mdel(C0)))),!,fail.
 
 % -  clr(Retractall)
-clr(C0):- dmsg(clr(C0)),dbase_modify(change(retract,all),C0),verify_sanity(ireq(C0)->(dmsg(warn(incomplete_CLR(C0))));true).
+clr(C0):- dmsg(clr(C0)),dbase_modify(change(retract,all),/*to_exp*/(C0)),verify_sanity(ireq(C0)->(dmsg(warn(incomplete_CLR(C0))));true).
 
 % -  preq(Query) = query with P note
 preq(P,C0):- agenda_do_prequery,dbase_op(query(dbase_t,P),C0).
 
 % -  req(Query) = Normal query
-req(C0):- nop(dmsg(req(C0))), preq(req,C0).
+req(C0):- nop(dmsg(req(C0))), preq(req,/*to_exp*/(C0)).
 
 % -  mreq(Query) = Forced Full query
-mreq(C0):- nop(dmsg(mreq(C0))), agenda_rescan_for_module_ready,no_loop_check(with_assertions([-infInstanceOnly(_),-thlocal:infAssertedOnly(_),-thlocal:noRandomValues(_)],preq(must,C0))).
+mreq(C0):- nop(dmsg(mreq(C0))), agenda_rescan_for_module_ready,
+   no_loop_check(with_assertions([-infInstanceOnly(_),-thlocal:infAssertedOnly(_),-thlocal:noRandomValues(_)],
+     preq(must,/*to_exp*/(C0)))).
 
 % -  ireq(Query) = Normal query (May not use second order logic) (must be asserted on isntance) (used mainly by 2nd order logic to avoid looping)
-ireq(C0):- nop(dmsg(ireq(C0))), agenda_rescan_for_module_ready,no_loop_check(with_assertions([+infInstanceOnly(_), +thlocal:infAssertedOnly(_),+thlocal:noRandomValues(_)],preq(ireq,C0))).
+ireq(C0):- nop(dmsg(ireq(C0))), 
+  agenda_rescan_for_module_ready,
+   no_loop_check(with_assertions([+infInstanceOnly(_), +thlocal:infAssertedOnly(_),+thlocal:noRandomValues(_)],preq(ireq,/*to_exp*/(C0)))).
 
 :-dmsg_hide(req).
 :-dmsg_hide(ireq).
 
 % -  props(Obj,QueryPropSpecs)
 props(Obj,PropSpecs):- req(props(Obj,PropSpecs)).
-iprops(Obj,PropSpecs):- ireq(props(Obj,PropSpecs)).
+iprops(Obj,PropSpecs):- ireq(/*to_exp*/(props(Obj,PropSpecs))).
 
 
 
@@ -329,7 +334,7 @@ add(end_of_file):-!.
 add(C0:-BODY):- is_true(BODY),!,add(C0).
 add(M:HB):-atom(M),!, must_det(add(HB)),!.
 add(grid_key(KW=COL)):- !, add(typeHasGlyph(COL,KW)).
-add(Term):- expands_on(isEach,Term), !,forall(do_expand_args(isEach,Term,O),add(O)),!.
+add(Term):- expands_on(isEach,Term), !,forall(do_expand_args(isEach,Term,O),add(/*to_exp*/(O))),!.
 add(:-(Term)):- !, must(add_fast(:-(Term))).
 add(Skipped):- ground(Skipped),implied_skipped(Skipped),!.
 add(C0):- ignore((ground(C0),asserta(already_added_this_round(C0)))),!,must_det(add_fast(C0)).
@@ -351,9 +356,9 @@ add_fast(Term):-dbase_modify(change(assert,add), Term),!. % ,xtreme_debug(ireq(C
 upprop(Obj,PropSpecs):- upprop(props(Obj,PropSpecs)).
 upprop(C0):- add(C0).
 % -  padd(Obj,Prop,Value)
-padd(Obj,PropSpecs):- add(props(Obj,PropSpecs)).
+padd(Obj,PropSpecs):- add(/*to_exp*/(props(Obj,PropSpecs))).
 % -  padd(Obj,Prop,Value)
-padd(Obj,Prop,Value):- add(dbase_t(Prop,Obj,Value)).
+padd(Obj,Prop,Value):- add(/*to_exp*/(dbase_t(Prop,Obj,Value))).
 % -  prop(Obj,Prop,Value)
 prop(Obj,Prop,Value):- req(dbase_t(Prop,Obj,Value)).
 % -  prop_or(Obj,Prop,Value,OrElse)

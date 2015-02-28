@@ -277,7 +277,7 @@ vtBasicDirPlusUpDown(vUp).
 %localityOfObject(Above,HasSurface):- mudLocOnSurface(Above,HasSurface).
 %localityOfObject(Clothes,Agent):- mudSubPart(Agent,Clothes).
 %localityOfObject(Inner,Container):- mudInsideOf(Inner,Container).
-%localityOfObject(Inner,Outer):- user:use_pttp, localityOfObject(Inner,Container),localityOfObject(Container,Outer).
+%localityOfObject(Inner,Outer):- user:only_if_pttp, localityOfObject(Inner,Container),localityOfObject(Container,Outer).
 nameStrings(apathFn(Region,Dir),Text):- pathName(Region,Dir,Text).
 pddlSomethingIsa('NpcCol1012-Ensign732',['NpcCol1012',actor,'MaleAnimal']).
 predArgTypes(mudMaterial(tSpatialThing,vtMaterial)).

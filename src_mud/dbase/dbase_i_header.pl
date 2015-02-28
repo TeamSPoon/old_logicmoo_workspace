@@ -48,7 +48,8 @@
 :- multifile(user:semweb_startup).
 
 :- dynamic thglobal:pfcManageHybrids/0.
-:- thread_local thlocal:into_form_code.
+:- thread_local thlocal:into_form_code/0.
+:- thread_local thlocal:current_why/2.
 :- dynamic_multifile_exported user:defnSufficient/2.
 :- thread_local user:repl_to_string/2.
 :- thread_local user:repl_writer/2.
@@ -97,9 +98,7 @@
 
 
 % DYN KB
-:- thread_local user:use_pttp/0.
-:- dynamic_multifile_exported user:use_pttp/0.
-
+:- dynamic_multifile_exported user:only_if_pttp/0.
 :- dynamic_multifile_exported user:use_snark/2.
 :- dynamic_multifile_exported user:is_mpred_prop/3.
 :- dynamic_multifile_exported user:hasInstance_dyn/2.

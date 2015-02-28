@@ -138,7 +138,10 @@ run_database_hooks_0(TypeIn,HookIn):-
 % Spawn new instances
 % ========================================
 
-onSpawn(ClassFact):- ClassFact=..[Funct,InstA],createByNameMangle(InstA,Inst,Type2),assert_isa(Type2,tCol),assert_isa(Inst,Funct),assert_isa(Inst,Type2),!.
+onSpawn(ClassFact):- ClassFact=..[Funct,InstA],
+ createByNameMangle(InstA,Inst,Type2),
+ assert_isa(Type2,tCol),
+ assert_isa(Inst,Funct),assert_isa(Inst,Type2),!.
 onSpawn(ClassFact):- ClassFact=..[Funct|InstADeclB],must_det(onSpawn_f_args(Funct,InstADeclB)).
 
 onSpawn_f_args(Funct,List):-
@@ -270,7 +273,7 @@ createByNameMangle(InstA,IDA,InstAO):-must(createByNameMangle0(InstA,IDA,InstAO)
 createByNameMangle0(InstA,InstA,Type):-compound(InstA),InstA=..[Type|Props],assert_isa(InstA,Type),with_assertions(deduceArgTypes(_),padd(InstA,Props)).
 createByNameMangle0(InstA,Inst,Type):- compound(InstA),!,functor_catch(InstA,Type,A),must(A==1),assert_isa(InstA,Type),InstA=Inst.
 createByNameMangle0(InstA,_,_Type):- not(atom(InstA)),!,trace_or_throw(todo(not_atom_createByNameMangle(InstA))).
-createByNameMangle0(OType,InstA,Type):-tCol(OType),!,create_from_type(OType,InstA,Type).
+createByNameMangle0(OType,InstA,Type):-isa_asserted(OType,tCol),!,create_from_type(OType,InstA,Type).
 createByNameMangle0(Suggest,InstA,Type):- once(split_name_type(Suggest,InstA,Type)),Suggest==InstA,assert_isa(InstA,Type).
 createByNameMangle0(OType,InstA,Type):- create_from_type(OType,InstA,Type),!.
 createByNameMangle0(InstA,IDA,InstA):- gensym(InstA,IDA), englishServerInterface([actCreate,InstA,IDA]).

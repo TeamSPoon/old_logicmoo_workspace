@@ -16,6 +16,23 @@
 % kretract[all](Obj,height(ObjHt))  == kretract[all](Obj,height,ObjHt) == pretract[all](height,Obj,ObjHt) == del[all](QueryForm)
 % keraseall(AnyTerm).
 %
+
+Interestingly there are three main components I have finally admit to needing despite the fact that using Prolog was to provide these exact components.  First of all a defaulting system using to shadow (hidden) behind assertions
+
+
+Axiomatic semantics define the meaning of a command in a program by describing its effect on assertions about the program state. The assertions are logical statements - predicates with variables, where the variables define the state of the program.
+
+
+Predicate transformer semantics to combine programming concepts in a compact way, before logic is realized.   
+
+
+This simplicity makes proving the correctness of programs easier, using Hoare logic.
+
+
+Axiomatic semantics
+
+Writing in Prolog is actually really easy for a MUD is when the length's chosen
+
 %
 % Dec 13, 2035
 % Douglas Miles
@@ -59,11 +76,22 @@ as_is_term(NC):-compound(NC),functor(NC,Op,2),infix_op(Op,_).
 
 :-moo_hide_childs(fully_expand/3).
 
+must_expand(/*to_exp*/(_)).
+must_expand(props(_,_)).
+must_expand(typeProps(_,_)).
+must_expand(G):-functor(G,_,A),!,A==1.
 
+fully_expand(_,Sent,SentO):-not(compound(Sent)),!,Sent=SentO.
+fully_expand(Op,Sent,SentO):-must_expand(Sent),!,fully_expand_now(Op,Sent,SentO),!.
+fully_expand(_,Sent,SentO):-get_functor(Sent,_,A),A\==1,!,Sent=SentO.
+fully_expand(Op,Sent,SentO):-fully_expand_now(Op,Sent,SentO),!.
 
-fully_expand(_,Sent,SentO):-thlocal:infSkipFullExpand,!,must(Sent=SentO).
-fully_expand(Op,Sent,SentO):- must(notrace((fully_expand_clause(Op,Sent,BO),!,SentO=BO))),
-   ignore(((notrace((Sent\=@=SentO, (Sent\=isa(_,_)->SentO\=isa(_,_);true), (Sent \=@= user:SentO), dmsg(fully_expand(Op,(Sent --> SentO)))))))),!.
+fully_expand_now(_,Sent,SentO):-not(compound(Sent)),!,Sent=SentO.
+fully_expand_now(_,Sent,SentO):-thlocal:infSkipFullExpand,!,must(Sent=SentO).
+% fully_expand_now(Op,/*to_exp*/(G),G0):- !,fully_expand_now(Op,G,G0).
+fully_expand_now(Op,Sent,SentO):- must(notrace((fully_expand_clause(Op,Sent,BO),!,SentO=BO))),
+   ignore(((notrace((Sent\=@=SentO, (Sent\=isa(_,_)->SentO\=isa(_,_);true), 
+    (Sent \=@= user:SentO), dmsg(fully_expand(Op,(Sent --> SentO)))))))),!.
 
 fully_expand_clause(_,Sent,SentO):-not(compound(Sent)),!,must(SentO=Sent).
 fully_expand_clause(Op,Sent,SentO):-var(Op),!,fully_expand_clause(is_asserted,Sent,SentO),!.
@@ -110,13 +138,13 @@ db_expand_0(Op,(G;B),(GG;BB)):-!,db_expand_0(Op,G,GG),db_expand_0(Op,B,BB).
 db_expand_0(Op,(G:-B),(GG:-BB)):-!,db_expand_0(Op,G,GG),fully_expand_goal(Op,B,BB).
 db_expand_0(_,Term,CL):- expands_on(isEach,Term),!,findall(O,do_expand_args(isEach,Term,O),L),!,list_to_conjuncts(L,CL).
 %db_expand_0(Op,user:mpred_prop(F,Props),O):- Props==tCol, !,db_expand_0(Op,isa(F,tCol),O).
-db_expand_0(Op,pddlSomethingIsa(A,List),O):- !,db_expand_maplist(fully_expand(Op),List,E,isa(A,E),O).
-db_expand_0(Op,pddlDescription(A,List),O):- !,db_expand_maplist(fully_expand(Op),List,E,mudDescription(A,E),O).
-db_expand_0(Op,pddlObjects(Type,List),O):- !,db_expand_maplist(fully_expand(Op),List,I,isa(I,Type),O).
-db_expand_0(Op,pddlSorts(Type,List),O):- !,db_expand_maplist(fully_expand(Op),List,I,genls(I,Type),O).
-db_expand_0(Op,pddlTypes(List),O):- !,db_expand_maplist(fully_expand(Op),List,I,isa(I,tCol),O).
-db_expand_0(Op,pddlPredicates(List),O):- !,db_expand_maplist(fully_expand(Op),List,I,isa(I,tPred),O).
-db_expand_0(Op,EACH,O):- EACH=..[each|List],db_expand_maplist(fully_expand(Op),List,T,T,O).
+db_expand_0(Op,pddlSomethingIsa(A,List),O):- !,db_expand_maplist(fully_expand_now(Op),List,E,isa(A,E),O).
+db_expand_0(Op,pddlDescription(A,List),O):- !,db_expand_maplist(fully_expand_now(Op),List,E,mudDescription(A,E),O).
+db_expand_0(Op,pddlObjects(Type,List),O):- !,db_expand_maplist(fully_expand_now(Op),List,I,isa(I,Type),O).
+db_expand_0(Op,pddlSorts(Type,List),O):- !,db_expand_maplist(fully_expand_now(Op),List,I,genls(I,Type),O).
+db_expand_0(Op,pddlTypes(List),O):- !,db_expand_maplist(fully_expand_now(Op),List,I,isa(I,tCol),O).
+db_expand_0(Op,pddlPredicates(List),O):- !,db_expand_maplist(fully_expand_now(Op),List,I,isa(I,tPred),O).
+db_expand_0(Op,EACH,O):- EACH=..[each|List],db_expand_maplist(fully_expand_now(Op),List,T,T,O).
 
 db_expand_0(_ ,user:mpred_prop(I, C),user:mpred_prop(I, C)):-atom(C),!.
 db_expand_0(_ ,predArgTypes(F,Args),isa(Args,predArgTypes)):-atom(F),!,functor(Args,Pred,A),assert_arity(Pred,A).
@@ -177,10 +205,11 @@ is_meta_functor(Sent,F,List):-compound(Sent),Sent=..[F|List],(predicate_property
 
 db_expand_5(_ ,NC,NC):- as_is_term(NC),!.
 db_expand_5(Op,{Sent},{SentO}):-!, fully_expand_goal(Op,Sent,SentO).
-db_expand_5(Op,Sent,SentO):-current_predicate(correctArgsIsa/3),get_functor(Sent,F),argIsa_call_0(F,2,W),!,
+db_expand_5(Op,Sent,SentO):-current_predicate(correctArgsIsa/3),arg(2,Sent,Arg),nonvar(Arg),get_functor(Sent,F),argIsa_call_0(F,2,W),!,
   (W==ftString->correctArgsIsa(Op,Sent,SentO);Sent=SentO),!.
 db_expand_5(_,A,B):-thglobal:pfcManageHybrids,!,A=B.
-db_expand_5(Op,Sent,SentO):-current_predicate(correctArgsIsa/3),must(correctArgsIsa(Op,Sent,SentO)),!.
+db_expand_5(Op,Sent,SentO):-ground(Sent),current_predicate(correctArgsIsa/3),must(correctArgsIsa(Op,Sent,SentO)),!.
+db_expand_5(_,A,B):-A=B.
 
 instTypePropsToType(instTypeProps,ttSpatialType).
 typePropsToType(typeProps,tCol).
@@ -294,8 +323,8 @@ translateOneArg(_O,Prop,Obj,Type,ARG,OLD,G,(GETTER,COMPARE,G)):-
        COMPARE= compare_op(Type,F,OLD,VAL),!.
 
 % props(Obj,isOneOf(Sz,[size+1,2])).
-translateOneArg(Op,Prop,O,Type,isOneOf(VAL,LIST),VAL,G,(GO,G)):-
-   translateListOps(Op,Prop,O,Type,VAL,LIST,G,GO).
+translateOneArg(Op,Prop,O,Type,isOneOf(VAL,LIST),VAL,G,(G0,G)):-
+   translateListOps(Op,Prop,O,Type,VAL,LIST,G,G0).
 
 % db_op(Op, Obj,size + 2).
 translateOneArg(_O,Prop,Obj,_Type,ARG,NEW,G,(GETTER,STORE,G)):-
@@ -310,8 +339,8 @@ translateOneArg(_O,_Prop,_Obj,Type,ATOMIC,ATOMICUSE,G,(G,ignore(same_arg(tCol(Ty
 
 translateListOps(_O,_Prop,_Obj,_Type,_VAL,[],G,G).
 translateListOps(Op,Prop,Obj,Type,VAL,[L|LIST],G,GO2):-
-   translateOneArg(Op,Prop,Obj,Type,L,VAL,G,GO),
-   translateListOps(Op,Prop,Obj,Type,VAL,LIST,GO,GO2).
+   translateOneArg(Op,Prop,Obj,Type,L,VAL,G,G0),
+   translateListOps(Op,Prop,Obj,Type,VAL,LIST,G0,GO2).
 
 compare_op(Type,F,OLD,VAL):-nop(Type),show_call((call(F,OLD,VAL))),!.
 
@@ -374,7 +403,7 @@ into_mpred_form_ilc(G,O):- functor(G,F,A),G=..[F,P|ARGS],!,into_mpred_form6(G,F,
 
 % TODO confirm negations
 
-into_mpred_form6(H,_,_,_,_,GO):- once(with_assertions(thlocal:into_form_code,(expand_term( (H :- true) , C ), reduce_clause(is_asserted,C,G)))),expanded_different(H,G),!,into_mpred_form(G,GO),!.
+into_mpred_form6(H,_,_,_,_,G0):- once(with_assertions(thlocal:into_form_code,(expand_term( (H :- true) , C ), reduce_clause(is_asserted,C,G)))),expanded_different(H,G),!,into_mpred_form(G,G0),!.
 into_mpred_form6(_,F,_,1,[C],O):-alt_calls(F),!,into_mpred_form(C,O),!.
 into_mpred_form6(_,':-',C,1,_,':-'(O)):-!,into_mpred_form_ilc(C,O).
 into_mpred_form6(_,not,C,1,_,not(O)):-into_mpred_form(C,O),!.

@@ -147,7 +147,8 @@ predArgTypes(argSingleValueDefault(prologSingleValued,ftInt,ftTerm)).
 predArgTypes(formatted_resultIsa(ttFormatType,tCol)).
 predArgTypes(defnSufficient(ttFormatType,ftTerm)).
 predArgTypes(isLikeFn(tPred,tCol)).
-predArgTypes(ruleForward(ftTerm,ftTerm)).
+predArgTypes(ruleForward(ftAskable,ftTerm)).
+predArgTypes(ruleBackward(ftTerm,fsAskable)).
 prologHybrid(instTypeProps(ftID,tCol,ftVoprop)).
 prologHybrid(subFormat(ttFormatType,ttFormatType)).
 prologMacroHead(macroSomethingDescription(ftTerm,ftListFn(ftString))).
@@ -162,9 +163,9 @@ prologMultiValued(genlPreds(tPred,tPred)).
 prologMultiValued(predModule(tRelation,ftAtom)).
 prologMultiValued(predProxyAssert(prologMultiValued,ftTerm)).
 prologMultiValued(predProxyQuery(prologMultiValued,ftTerm)).
-prologMultiValued(ruleBackward(ftTerm,ftTerm)).
 % prologMultiValued('<=>'(ftTerm,ftTerm)).
-prologMultiValued(ruleForward(ftTerm,ftTerm)).
+prologMultiValued(ruleBackward(ftTerm,fsAskable)).
+prologMultiValued(ruleForward(fsAskable,ftTerm)).
 prologNegByFailure(predArgMulti(prologMultiValued,ftInt)).
 prologNegByFailure(tDeleted(ftID)).
 prologSingleValued(predInstMax(ftID,prologSingleValued,ftInt),prologHybrid).

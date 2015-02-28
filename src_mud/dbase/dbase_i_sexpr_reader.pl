@@ -4,7 +4,7 @@
     Public domain code.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-:-module(dbase_i_sexp_reader,[codelist_to_forms/2,parse_to_source/2]).
+%:-module(dbase_i_sexp_reader,[codelist_to_forms/2,parse_to_source/2,get_source/1,lisp_read/2,l_open_input/2]).
 :- style_check(-singleton).
 :- style_check(-discontiguous).
 % :- style_check(-atom).
@@ -16,40 +16,123 @@
 :-multifile(user:mpred_prop/2).
 :- use_module('../../src_lib/logicmoo_util/logicmoo_util_all.pl').
 
-parsing(String, Expr) :- string(String),!,string_codes(String,Codes),phrase(expressions(Expr), Codes).
-parsing(String, Expr) :- phrase(expressions(Expr), String).
+parse_sexpr(String, Expr) :- string(String),!,string_codes(String,Codes),phrase(sexpr(Expr), Codes).
+parse_sexpr(String, Expr) :- phrase(sexpr(Expr), String).
 
-expressions([E|Es]) -->
-    ws, expression(E), ws,
-    !, % single solution: longest input match
-    expressions(Es).
-expressions([]) --> [].
+:-export(sexpr//1).
 
-ws --> [W], { code_type(W, space) }, ws.
-ws --> [].
+% Use DCG for parser.
 
-% A number N is represented as n(N), a symbol S as s(S).
 
-expression(s(A))         --> symbol(Cs), { atom_codes(A, Cs) }.
-expression(n(N))         --> number(Cs), { number_codes(N, Cs) }.
-expression(List)         --> "(", expressions(List), ")".
-expression([s(quote),Q]) --> "'", expression(Q).
+sexpr(L)                      --> "(", !, white, sexpr_list(L), white.
+sexpr(vec(V))                 --> "#(", !, sexpr_vector(V), white.
+sexpr(s(t))                 --> "#t", !, white.
+sexpr(s(f))                 --> "#f", !, white.
+sexpr(s(E))              --> "#$", !, white, sexpr(E).
+sexpr(chr(N))                 --> "#\\", [C], !, {N is C}, white.
+sexpr(str(S))                 --> """", !, sexpr_string(S), white.
+sexpr([s(quote),E])              --> "'", !, white, sexpr(E).
+sexpr([s(backquote),E])         --> "`", !, white, sexpr(E).
+sexpr(['unquote-splicing',E]) --> ",@", !, white, sexpr(E).
+sexpr(comma(E))            --> ",", !, white, sexpr(E).
+sexpr(s(E))                      --> sym_or_num(E),!, white.
 
-number([D|Ds]) --> digit(D), number(Ds).
-number([D])    --> digit(D).
+blank --> [C], {C =< 32}, white.
+blank --> ";", comment, white.
 
-digit(D) --> [D], { code_type(D, digit) }.
+white --> blank.
+white --> [].
 
-symbol([A|As]) -->
-    [A],
-    { memberchk(A, "+/-*><=") ; code_type(A, alpha) },
-    symbolr(As).
+comment --> [C], {eoln(C)}, !.
+comment --> [C], comment.
 
-symbolr([A|As]) -->
-    [A],
-    { memberchk(A, "+/-*><=") ; code_type(A, alnum) },
-    symbolr(As).
-symbolr([]) --> [].
+sexprs([H|T]) --> sexpr(H), !, sexprs(T).
+sexprs([]) --> [].
+
+
+:-export(sexpr_list//1).
+
+sexpr_list([]) --> ")", !.
+sexpr_list(_) --> ".", [C], {\+ sym_char(C)}, !, fail.
+sexpr_list([Car|Cdr]) --> sexpr(Car), !, sexpr_rest(Cdr).
+
+sexpr_rest([]) --> ")", !.
+sexpr_rest(E) --> ".", [C], {\+ sym_char(C)}, !, sexpr(E,C), !, ")".
+sexpr_rest([Car|Cdr]) --> sexpr(Car), !, sexpr_rest(Cdr).
+
+sexpr_vector([]) --> ")", !.
+sexpr_vector([First|Rest]) --> sexpr(First), !, sexpr_vector(Rest).
+
+sexpr_string([]) --> """", !.
+sexpr_string([C|S]) --> chr(C), sexpr_string(S).
+
+chr(92) --> "\\", !.
+chr(34) --> "\"", !.
+chr(N)  --> [C], {C >= 32, N is C}.
+
+sym_or_num(E) --> [C], {sym_char(C)}, sym_string(S), {string_to_atom([C|S],E)}.
+
+sym_string([H|T]) --> [H], {sym_char(H)}, sym_string(T).
+sym_string([]) --> [].
+
+number(N) --> unsigned_number(N).
+number(N) --> "-", unsigned_number(M), {N is -M}.
+number(N) --> "+", unsigned_number(N).
+
+unsigned_number(N) --> cdigit(X), unsigned_number(X,N).
+unsigned_number(N,M) --> cdigit(X), {Y is N*10+X}, unsigned_number(Y,M).
+unsigned_number(N,N) --> [].
+
+cdigit(N) --> [C], {C >= 48, C =<57, N is C-48}.
+
+% . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+sexpr(E,C,X,Z) :- white([C|X],Y), sexpr(E,Y,Z).
+
+% dquote semicolon parens  hash qquote comma, backquote
+sym_char(C) :- C > 32, not(member(C,[34,59,40,41,35,39,44,96])).  
+
+
+l_open_input(InS,InS):-is_stream(InS),!.
+l_open_input((InS),In):-string(InS),!,l_open_input(string(InS),In).
+l_open_input(string(InS),In):-text_to_string(InS,Str),string_codes(Str,Codes),open_chars_stream(Codes,In),!.
+l_open_input(Filename,In) :- catch(see(Filename),_,fail),current_input(In),!.
+l_open_input(InS,In):-text_to_string(InS,Str),string_codes(Str,Codes),open_chars_stream(Codes,In),!.
+
+
+to_untyped(s(S),O):-!,to_untyped(S,O).
+to_untyped(comma(S),comma(O)):-!,to_untyped(S,O).
+to_untyped(vect(S),vect(O)):-!,to_untyped(S,O).
+to_untyped(n(S),O):-!,to_untyped(S,O).
+to_untyped([[]],[]):-!.
+to_untyped([s(quote),Rest],Out):-!,maplist(to_untyped,Rest,Out).
+to_untyped([s(backquote),Rest],Out):-!,to_untyped(Rest,Out).
+to_untyped([s(S)|Rest],Out):-is_list(Rest),!,maplist(to_untyped,[S|Rest],Mid),Out=..Mid,!.
+to_untyped([H|T],[HH|TT]):-!,to_untyped(H,HH),to_untyped(T,TT).
+to_untyped(str(S),O):-atom_string(S,O),!.
+to_untyped(char(S),char(S)):-!.
+to_untyped(S,O):- string(S),atom_string(A,S),!,to_untyped(A,O).
+to_untyped(S,O):- catch((atom_codes(S,C), number_codes(O,C),!),_,fail),!.
+to_untyped(H,O):- compound(H),!,H=..HL,maplist(to_untyped,HL,OL),O=..OL.
+to_untyped(S,'$VAR'(VarName)):-atom_concat('??',VarNameI,S),atom_concat('_',VarNameI,VarName).
+to_untyped(S,'$VAR'(VarNameU)):-atom_concat('?',VarName,S),atom_upper(VarName,VarNameU).
+to_untyped(S,S):-!.
+
+atom_upper(A,U):-string_upper(A,S),atom_string(U,S).
+
+lisp_read(Forms):-lisp_read(current_input,Forms),!.
+lisp_read(I,Forms):-stream_source_typed(I,Type),!,must(to_untyped(Type,Forms)).
+stream_source_typed(I,Expr):-   l_open_input(I,In),
+  see(In),
+   read_line_to_codes(current_input,AsciiCodes),(parse_sexpr(AsciiCodes,Expr);read_term_from_codes(AsciiCodes,Expr,[])),!,seen.
+
+
+lowcase([],[]).
+lowcase([C1|T1],[C2|T2]) :- lowercase(C1,C2), lowcase(T1,T2).
+
+lowercase(C1,C2) :- C1 >= 65, C1 =< 90, !, C2 is C1+32.
+lowercase(C,C).
+
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    Interpretation
@@ -67,11 +150,11 @@ symbolr([]) --> [].
 
 
 codelist_to_forms(AsciiCodesList,FormsOut):-
-    parsing(AsciiCodesList, Forms0),    
+    parse_sexpr(AsciiCodesList, Forms0),    
     compile_all(Forms0, FormsOut),!.
 
 run(Program, Values) :-
-    parsing(Program, Forms0),    
+    parse_sexpr(Program, Forms0),    
     empty_assoc(E),
     compile_all(Forms0, Forms),
     writeq(seeingFormas(Forms)),nl,
@@ -254,6 +337,9 @@ if_script_file_time(X):-if_startup_script(time(X)).
     %@ V = [map, plus1, [2, 3, 4]].
 
 
+
+end_of_file.
+
 % -----------------------------------------------------------------------------
 %
 %                               S I S   version 0.1
@@ -432,13 +518,16 @@ parse_to_source(I,Source) :-
   
 
 
-parse(I,Program) :-
-    write_term('1) Reading input...'), newline,
-      l_open_input(I,In),see(In), get_source(Source), !, close_input,
-    write_term('   ...done'), newline,
+parse(I,Program) :-    
+    lisp_read(I,Source),    
     write_term('2) Parsing...'), newline,
       white(Source,Start), sexprs(Program,Start,[]), !,
     write_term('   ...done'), newline.
+
+lisp_read(I,Source):- 
+  write_term('1) Reading input...'), newline,  
+ l_open_input(I,In),see(In), get_source(Source), !, 
+ close_input,write_term('   ...done'), newline,!.
 
 get_source(S) :- read_char(C), get_source(C,S).
 get_source(eof,[]) :- !.
@@ -504,11 +593,11 @@ number(N) --> unsigned_number(N).
 number(N) --> "-", unsigned_number(M), {N is -M}.
 number(N) --> "+", unsigned_number(N).
 
-unsigned_number(N) --> digit(X), unsigned_number(X,N).
-unsigned_number(N,M) --> digit(X), {Y is N*10+X}, unsigned_number(Y,M).
+unsigned_number(N) --> cdigit(X), unsigned_number(X,N).
+unsigned_number(N,M) --> cdigit(X), {Y is N*10+X}, unsigned_number(Y,M).
 unsigned_number(N,N) --> [].
 
-digit(N) --> [C], {C >= 48, C =<57, N is C-48}.
+cdigit(N) --> [C], {C >= 48, C =<57, N is C-48}.
 
 % . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -518,9 +607,6 @@ sexpr(E,C,X,Z) :- white([C|X],Y), sexpr(E,Y,Z).
 sym_char(C) :- C > 32, not(member(C,[34,59,40,41,35,39,44,96])).  
 
 
-
-string_to_atom(S,N) :- number(N,S,[]), !.
-string_to_atom(S,I) :- lowcase(S,L), name(I,L).
 
 lowcase([],[]).
 lowcase([C1|T1],[C2|T2]) :- lowercase(C1,C2), lowcase(T1,T2).
@@ -550,13 +636,13 @@ compile_expr([define|Def],set(Var,C)) :- !,
     write_term('   compiling '), write_term(Var), newline,
     compile_expression(Expr,C).
 compile_expr(Expr,C) :-
-    write_term('   compiling <expression>'), newline,
+    write_term('   compiling <sexpr>'), newline,
     compile_expression(Expr,C).
 
 compile_expression(E,C) :-
     expand(E,X),    % expand macros and convert to prolog structures
     alpha(X,Y),     % rename variables and convert assignments
-    closurize(Y,C). % find out which lambda-expression are actually going to
+    closurize(Y,C). % find out which lambda-sexpr are actually going to
                     % be 'true' closures (i.e. they have closed variables)
 
 % To add new predefined procedures, add their names to this list:
@@ -1013,7 +1099,7 @@ last_num(0).
 
 % Mutable variable analysis.
 
-% Compute the set of all variables which are assigned in a given expression.
+% Compute the set of all variables which are assigned in a given sexpr.
 
 mut_vars(Expr,L) :- mut_vars(Expr,[],L).
 mut_vars(cst(C),Env,[]).
@@ -1040,7 +1126,7 @@ mut_bindings([V|Tail],Vals,S) :-
 
 % Free variable analysis.
 
-% Compute the set of all free variables in a given expression.
+% Compute the set of all free variables in a given sexpr.
 
 free_vars(Expr,L) :- free_vars(Expr,[],L).
 free_vars(cst(C),Env,[]).
@@ -1065,17 +1151,17 @@ free_var(V,Env,[V]).
 
 % Normalization of expressions.
 
-% The input is an S-expression that follows Scheme''s syntax for expressions.
-% The resulting expression will only contain the following structures:
+% The input is an S-sexpr that follows Scheme''s syntax for expressions.
+% The resulting sexpr will only contain the following structures:
 %
 %   cst(C)        a constant of value 'C'
 %   ref(V)        a reference to variable 'V'
-%   set(V,X)      an assignment of expression 'X' to variable 'V'
-%   tst(X,Y,Z)    a conditionnal expression (X=test,Y=consequent,Z=alternative)
+%   set(V,X)      an assignment of sexpr 'X' to variable 'V'
+%   tst(X,Y,Z)    a conditionnal sexpr (X=test,Y=consequent,Z=alternative)
 %   app(L)        an application (first expr in 'L'=procedure, rest=arguments)
-%   pro(P,K,B,S)  a procedure (lambda-expression) having 'P' as formal
+%   pro(P,K,B,S)  a procedure (lambda-sexpr) having 'P' as formal
 %                 parameters (i.e. the list of all parameters in order),
-%                 the expression 'B' as body and 'S' as source-code ('K' is
+%                 the sexpr 'B' as body and 'S' as source-code ('K' is
 %                 'rest' if there is a rest parameter and 'none' otherwise)
 %
 % Most of the conversion is done through macro expansion and is fairly
@@ -1397,12 +1483,12 @@ do_bindings([[V,I,S]|X],[[V,I]|Y],[S|Z]) :- do_bindings(X,Y,Z).
 
 % Alpha conversion (renaming of variables) and assignment conversion.
 
-% This phase renames all of the variables local to the expression (to eliminate
+% This phase renames all of the variables local to the sexpr (to eliminate
 % aliasing problems) and adds 'boxes' (cells) to handle assignment to local
 % variables.  For each mutable variable (i.e. a local variable that is assigned
-% somewhere in the expression), create a box containing the value of the
+% somewhere in the sexpr), create a box containing the value of the
 % variable.  References to mutable variables is done by dereferencing the box
-% it is associated to.  For example, the normal form of this expression:
+% it is associated to.  For example, the normal form of this sexpr:
 %
 % (lambda (x y) (set! x (- x y)) x)
 %
@@ -1446,12 +1532,12 @@ alpha_list([E|T1],[C|T2],Env) :- alpha(E,C,Env), alpha_list(T1,T2,Env).
 
 % Closure analysis.
 
-% For every procedure definition (i.e. lambda-expression) in the given
-% expression, compute the set of closed variables of the procedure
+% For every procedure definition (i.e. lambda-sexpr) in the given
+% sexpr, compute the set of closed variables of the procedure
 % and the set of parameters which are referenced in the procedure
 % and augment the procedure definition by these sets.  A closed variable
-% is a variable that is declared in a lambda-expression and used
-% in a sub-lambda-expression.  For example, the expression:
+% is a variable that is declared in a lambda-sexpr and used
+% in a sub-lambda-sexpr.  For example, the sexpr:
 %
 % (lambda (x y z) (map (lambda (n) (+ y n)) x))
 %
@@ -1514,10 +1600,10 @@ gen_proc_entry(Params1,Kind,Closed,[temp|Params2]) -->
 
 % gen(Expr,Dest,Env1,Env2)
 %
-% Generate intermediate code for expression Expr given the run-time environment
+% Generate intermediate code for sexpr Expr given the run-time environment
 % Env1.  Env2 is the environment after having executed Expr.  Dest specifies
 % where to put the result: 'd' means discard the result, 't' means the
-% expression is in tail position, 'push' means push the result on the run-time
+% sexpr is in tail position, 'push' means push the result on the run-time
 % stack otherwise Dest is a virtual register number.
 
 gen(cst(C),d,E1,E1) --> !, [].
@@ -1812,7 +1898,6 @@ remove_node(X,[node(Y,N1,Info)|Tail1],[node(Y,N2,Info)|Tail2]) :-
     remove_node(X,Tail1,Tail2).
 
 
-end_of_file.
 
 end_of_file.
 
@@ -1907,11 +1992,11 @@ Compilation is a 3 step process:
 2.1 Parsing
 
 The first step consists in reading all the characters of the source file
-into a list.  This is not very efficient but it simplifies parsing.
+into a list.  This is not very efficient but it simplifies parse_sexpr.
 The list is parsed using a DCG grammar description of Scheme.  A parse
 tree of the program is generated by the parser.  A simple list
 representation similar to Scheme''s own representation for S-expressions
-is used.  For example, the expression
+is used.  For example, the sexpr
 
     (DEFINE (weird x) (list x "ABC" 123 #t #(1 2 3)))
 
@@ -1939,7 +2024,7 @@ Most of macro expansion is straightforward.  It''s simplicity stems from
 Prolog''s ease of doing pattern matching and case analysis.  The hardest
 case to handle is mutually or self-recursive expressions (such as
 'letrec's, 'define's, etc.).  I will explain this case using an example.
-Suppose the expression to compile is:
+Suppose the sexpr to compile is:
 
     (letrec ((a (lambda (x) (b (+ x (c 1)))))           ; def1
              (b (lambda (x) (if (d x 0) (a x) (c x))))  ; def2
@@ -1948,7 +2033,7 @@ Suppose the expression to compile is:
       (a (c -30)))                                      ; body
 
 The compiler will start by constructing the variable dependency graph
-for the (local) variables in this expression.  Thus for the example:
+for the (local) variables in this sexpr.  Thus for the example:
 
      a <-----> b                   ( x --> y  means x depends on y )
        \     / |
@@ -1981,7 +2066,7 @@ the example we would obtain:
 Think about it, it works...  A more 'natural' conversion would be to
 generate an allocate/assign/use form (as explained in the R3RS) but
 our solution is entirely functional and through data-flow analysis the
-compiler could recover the original expression''s semantics (presently
+compiler could recover the original sexpr''s semantics (presently
 the compiler is not that intelligent but it might come in the future).
 
 After this phase, only the basic special form of expressions are left
@@ -1990,9 +2075,9 @@ in the program, ie.
     - constant reference       eg.  123
     - variable reference       eg.  x
     - assignement              eg.  (set! x 456)
-    - conditional expression   eg.  (if a b c)
+    - conditional sexpr   eg.  (if a b c)
     - application              eg.  (list a b c)
-    - lambda-expression        eg.  (lambda (b) b)
+    - lambda-sexpr        eg.  (lambda (b) b)
 
 Alphatization consists of renaming the local variables to prevent
 aliasing problems.  In this step, assignments are also converted into a
@@ -2003,10 +2088,10 @@ variable always stays the same after it has been bound.  Only
 data structures are mutable.
 
 The last normalization step is closure analysis.  It consists in anotating
-each lambda-expression with the set of its closed variables (ie. the
+each lambda-sexpr with the set of its closed variables (ie. the
 free, non-global variables which are referenced in its body).  Space for
 these variables will be allocated in the closures generated for this
-lambda-expression.
+lambda-sexpr.
 
 Once the program is normalized, it is passed to a DCG grammar in order to
 generate the intermediate code.  Code generation is case driven and
@@ -2016,7 +2101,7 @@ can be generated.  This includes code for:
 
     - the application of a procedure bound to a global variable
     - the body of lambda-expressions with no closed variables
-    - the application of a lambda-expression (ie. a 'let')
+    - the application of a lambda-sexpr (ie. a 'let')
     - a 'let' variable which is not used in the body
     - ordering of arguments to evaluate trivial arguments last
       (ie. arguments which need only a small number of resources)
@@ -2032,7 +2117,7 @@ generate code for another machine.
 
 In addition, this step is responsible for the 'dumping' of Scheme objects
 to the code file.  These are most often the constants contained in the
-source program.  For example, if the following expression were compiled:
+source program.  For example, if the following sexpr were compiled:
 
     (member 'b '(a b c))
 

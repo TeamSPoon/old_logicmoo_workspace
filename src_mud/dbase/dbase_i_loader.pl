@@ -152,7 +152,14 @@ dbase_name_variables([Var|Vars]):-
 add_term(end_of_file,_):-!.
 add_term(Term,Vs):- 
    b_setval('$variable_names', Vs),
-    with_assertions(thlocal:already_in_kb_term_expansion,must(add(Term))).
+    add_from_file(Term).
+
+add_from_file(:-(TermIn)):-
+  fully_expand(is_asserted,/*to_exp*/(TermIn),Term),
+  with_assertions(thlocal:already_in_kb_term_expansion,must(add(:-(Term)))).
+add_from_file(TermIn):-
+  fully_expand(is_asserted,/*to_exp*/(TermIn),Term),
+  with_assertions(thlocal:already_in_kb_term_expansion,must(add(Term))).
 
 myDebugOnError(Term):-catch(once(must((Term))),E,(dmsg(error(E,start_myDebugOnError(Term))),trace,rtrace((Term)),dmsginfo(stop_myDebugOnError(E=Term)),trace)).
          
@@ -377,7 +384,7 @@ loader_term_expansion(CL,EXP):-
 % ==== do it
   WHY = was_imported_kb_content(inside_dynamic_reader,CL),
   dmsg(WHY),
-  with_assertions(thlocal:already_in_kb_term_expansion,must(add(CL))),!,
+  add_from_file(CL),
   must(EXP=user:WHY).
 
 loader_term_expansion(CL,WHY):- 
@@ -386,6 +393,6 @@ loader_term_expansion(CL,WHY):-
 % ==== do it
   WHY = was_imported_kb_content(requires_storage(WhyRS),CL),
   dmsg(WHY),
-  with_assertions(thlocal:already_in_kb_term_expansion,must(add(CL))),!.
+  add_from_file(CL),!.
 
 

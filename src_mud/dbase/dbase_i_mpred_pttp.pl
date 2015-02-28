@@ -86,7 +86,7 @@ pttp_assert_wid(ID,Mode,(call:-CALL)):-!,pttp_assert_wid(ID,Mode,(call(CALL))).
 pttp_assert_wid(_, _Mode,uses_logic(Name)):-!,must(pttp_logic(Name,Data)),!,must(pttp_load_wid(Name,Data)).
 pttp_assert_wid(ID,_Mode,snark(YY)):-!,numbervars(YY,'$VAR',7567,_),must(pttp_assert_wid(ID,snark,YY)).
 pttp_assert_wid(ID,_Mode,call(CALL)):-!, save_wid(ID,call,call(CALL)),unnumbervars(CALL,RCALL),show_call_failure(must(RCALL)).
-pttp_assert_wid(ID,pttp,X):- bugger:with_assertions(thlocal:pttp_current_id(ID), (( pttp1_wid(ID,X,Y), pttp2_wid(ID,Y)) )).
+pttp_assert_wid(ID,pttp,X):- bugger:with_assertions(thlocal:current_why(ID,X), (( pttp1_wid(ID,X,Y), pttp2_wid(ID,Y)) )).
 % pttp_assert_wid(ID,Mode,KIF):- show_call_failure(snark_tell(ID,KIF)),!.
 pttp_assert_wid(ID,snark,X):-!,show_call_failure(must(snark_tell(ID,X))).
 pttp_assert_wid(ID,_Mode,X):-  !,show_call_failure(must(pttp_assert_real_wid(ID,X))).
@@ -306,8 +306,7 @@ int_listing_wid:-
   forall(was_pttp_functor(internal,F/A),(functor(P,F,A),forall(clause(P,B),portray_clause_0((P:-B))))).
 
 :- thread_local(is_query_functor/1).
-:- thread_local thlocal:pttp_current_id/1.
-must_pttp_id(ID):-must(thlocal:pttp_current_id(ID)).
+must_pttp_id(ID):-must(thlocal:current_why(ID,_)).
 is_query_lit(Q):- functor(Q,F,_),atom_concat('quer',_,F).
 
 get_int_query(Int_query):- is_query_functor(X),!, atom_concat('int_',X,Int_query).

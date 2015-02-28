@@ -576,7 +576,8 @@ mudDistance(Agent,Obj,0):- mudWielding(Agent,Obj),!.
 mudDistance(Agent,Obj,1):- wearsClothing(Agent,Obj),!.
 mudDistance(Agent,Obj,2):- mudStowing(Agent,Obj),!.
 mudDistance(Agent,Obj,3):- mudPossess(Agent,Obj),!.
-mudDistance(Agent,Obj,N):- mudPossess(OtherAgent,Obj),!,mudDistance(Agent,OtherAgent,AD),mudDistance(Agent,OtherAgent,OAD),!,N is AD + OAD.
+mudDistance(Agent,Obj,N):- mudPossess(OtherAgent,Obj),mudDistance(OtherAgent,Obj,AD),!,
+  (same_regions(Agent,OtherAgent)->OAD=5; OAD=20),!,N is AD + OAD.
 mudDistance(Agent,Obj,5):- same_regions(Agent,Obj),!.
 mudDistance(_Agent,_Obj,20).
 

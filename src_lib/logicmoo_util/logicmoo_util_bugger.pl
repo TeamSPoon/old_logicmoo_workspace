@@ -3295,6 +3295,9 @@ bugger_error_info(C):-contains_var(existence_error(procedure,_/_),C).
     (   Exception = error(Term)
     ;   Exception = error(Term, _)),
     Term \= type_error(number,_), 
+    Term \= type_error(character_code,_), 
+    Term \= type_error(character,_), 
+    Term \= type_error(text,_), 
     Term \= syntax_error(_), 
     format(user_error, 'Error ST-Begin: ~p', [Term]), nl(user_error),
     dumpST(Frame,20),

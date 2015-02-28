@@ -233,20 +233,22 @@ pfc_retract(_,pfcPT(Key,Head,Body)) :-
 pfc_retract(_,G):- pfc_local(G),!,retract(G).
 pfc_retract(_,G):- hooked_retract(G).
 
-pfc_assertz(G):- unnumbervars(G,GG),pfc_assertz0(GG).
+pfc_assertz(G):- pfc_dbase_transform(G,GG),pfc_assertz0(GG).
 pfc_assertz0(G):- throw_on_bad_fact(G),!.
 pfc_assertz0(G):- pfc_local(G),!,assertz(G).
 pfc_assertz0(G):- must(not(pfc_local(G))), hooked_assertz(G),pfcMarkC(G).
 
-pfc_asserta(G):- unnumbervars(G,GG),pfc_asserta0(GG).
+pfc_asserta(G):- pfc_dbase_transform(G,GG),pfc_asserta0(GG).
 pfc_asserta0(G):- throw_on_bad_fact(G),!.
 pfc_asserta0(G):- pfc_local(G),!,asserta(G).
 pfc_asserta0(G):- hooked_asserta(G),pfcMarkC(G).
 
-pfc_assert(G):- unnumbervars(G,GG),pfc_assert0(GG).
+pfc_assert(G):- pfc_dbase_transform(G,GG),pfc_assert0(GG).
 pfc_assert0(G):- throw_on_bad_fact(G),!.
 pfc_assert0(G):- pfc_local(G),!,assert(G).
 pfc_assert0(G):- add(G),pfcMarkC(G).
+
+pfc_dbase_transform(G,GGG):-fully_expand(is_asserted,G,GG),!,unnumbervars(GG,GGG).
 
 
 pfc_clause_db_unify(H,B):- must(pfc_local(H)),
@@ -415,11 +417,22 @@ pfcDefaultSetting(GeneralTerm,Default) :-
 
 %= pfcAdd(P,S) asserts P into the dataBase with support from S.
 
-pfcAdd(isa(I,Not)):-Not==not,!,pfcAdd(not(I)),!.
-pfcAdd(P) :- get_user_support_for(P,S),pfcAdd(P,S).
+pfcAdd(/*to_exp*/((:-export number/1))):-trace_or_throw(crazy_pfcAdd(/*to_exp*/((:-export number/1)))).
+pfcAdd(P):-fully_expand(is_asserted,P,PO),!,pfcAdd_u(PO).
+pfcAdd_u(isa(I,Not)):-Not==not,!,pfcAdd(not(I)),!.
+pfcAdd_u(P) :- get_user_support_for_add(P,S),pfcAdd(P,S).
 
-get_user_support_for(P,(pfcUser(P),pfcUser(P))).
-get_god_support_for(P,(pfcGod(P),pfcGod(P))).
+get_support_for(P,PS):-thlocal:current_why(PS,P),!.
+get_support_for(_,PS):-thlocal:current_why(PS,_),!.
+get_support_for(P,PS):-copy_term(P,PS).
+
+
+get_user_support_for_lookup(_,(pfcUser(_),pfcUser(_))).
+get_user_support_for_remove(_,(pfcUser(_),pfcUser(_))).
+get_user_support_for_add(P,(pfcUser(PS),pfcUser(PS))):-get_support_for(P,PS).
+
+get_god_support_for_lookup(_,(pfcGod(_),pfcGod(_))).
+get_god_support_for_add(P,(pfcGod(PS),pfcGod(PS))):-get_support_for(P,PS).
 
 pfcAdd(P,S):-pfcDoConjs(pfcAdd0,P,[S]).
 
@@ -427,7 +440,7 @@ pfcAdd0(P,S):-cyc_to_pfc_expansion_entry(P,PE),!,pfcAdd1(PE,S),!.
 pfcAdd0(P,S):-pfcAdd1(P,S),!.
 
 pfcAdd1(P,S):-fully_expand(change(assert,add),P,PE)->(PE\=@=P,!,pfcAdd(PE,S)),!.
-pfcAdd1(M:P0,S0) :- atom(M),!,pfcAdd0(P0,S0).
+pfcAdd1(M:PO,S0) :- atom(M),!,pfcAdd0(PO,S0).
 pfcAdd1(P:-B,S) :-is_true(B),!,pfcAdd0(P,S).
 pfcAdd1(B=>P,S) :-is_true(B),!,pfcAdd0(P,S).
 pfcAdd1(P<=B,S) :-is_true(B),!,pfcAdd0(P,S).
@@ -438,7 +451,7 @@ pfcAdd1((B=>H),S) :-head_singletons_hb(H,B,_),!,pfcAdd2((H<=B),S).
 pfcAdd1((H:-B),S) :-pfcPreferedDir(H,B,G),!,pfcAdd2(G,S).
 pfcAdd1(P,S) :- pfcAdd2(P,S).
 
-pfcAdd2(P0,S0) :- copy_term(P0:S0,P1:S1),
+pfcAdd2(PO,S0) :- copy_term(PO:S0,P1:S1),
  must((pfc_pre_expansion_each(P1,P),pfc_pre_expansion_each(S1,S))),
   must(copy_term(P-S,P2-S2)),
   (\+ \+ pfcPost(P2,S2)),
@@ -729,7 +742,7 @@ pfcRem(P) :-
   % pfcRem/1 is the user's interface - it withdraws user support for P.
   pfcDoConjs(pfcLambda([E],pfcRem_user(E)),P).
 
-pfcRem_user(E):- get_user_support_for(E,S),!,pfcRem(E,S).
+pfcRem_user(E):- get_user_support_for_remove(E,S),!,pfcRem(E,S).
 
 
 pfcRem(P,S) :-
@@ -748,7 +761,7 @@ pfcRem2(P) :-
   % pfcRem2/1 is the user's interface - it withdraws user support for P.
   pfcDoConjs(pfcLambda([E],pfcRem2_user(E)),P).
 
-pfcRem2_user(E):- get_user_support_for(E,S), pfcRem2(E,S).
+pfcRem2_user(E):- get_user_support_for_remove(E,S), pfcRem2(E,S).
 
 
 pfcRem2(P,S) :-
@@ -1666,7 +1679,7 @@ pfcClassifyFacts([H|T],User,Pfc,[H|Rule]) :-
   pfcClassifyFacts(T,User,Pfc,Rule).
 
 pfcClassifyFacts([H|T],[H|User],Pfc,Rule) :-
-  get_user_support_for(H,US),
+  get_user_support_for_lookup(H,US),
   pfcGetSupport(H,US),
   !,
   pfcClassifyFacts(T,User,Pfc,Rule).
@@ -1754,7 +1767,7 @@ pfcTraceAddPrint(P,S) :-
   !,
   copy_term(P,Pcopy),
   numbervars(Pcopy,0,_),
-  get_user_support_for(P,PS),
+  get_user_support_for_lookup(P,PS),
   (S = PS
        -> format("~nAdding (u) ~q",[Pcopy])
         ; format("~nAdding (g) ~q",[Pcopy])).
@@ -1934,8 +1947,8 @@ pfcBases([X|Rest],L) :-
   pfcUnion(Bx,Br,L).
 	
 pfcAxiom(F) :- 
- (get_user_support_for(F,US), pfcGetSupport(F,US)); 
- (get_god_support_for(F,GS),pfcGetSupport(F,GS)).
+ (get_user_support_for_lookup(F,US), pfcGetSupport(F,US)); 
+ (get_god_support_for_lookup(F,GS),pfcGetSupport(F,GS)).
 
 %= an pfcAssumptionBase/1''s G was a failed goal, i.e. were assuming that our failure to 
 %= prove P is a proof of not(P)

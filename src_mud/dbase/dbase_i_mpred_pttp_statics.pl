@@ -1625,7 +1625,7 @@ builtin(is,2).
 builtin(display,1).
 builtin(write,1).
 builtin(nl,0).
-builtin(use_pttp,0).
+builtin(only_if_pttp,0).
 builtin(ANY,0):-atom(ANY).
 builtin(infer_by,_).
 builtin(search_cost,_).

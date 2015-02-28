@@ -359,8 +359,7 @@ ensure_universal_stub5(HeadIn,Head,F,A,HBLIST):-  must((StubType = prologHybrid)
 assert_dbase_t((G:-B)):-is_true(B),!,must(assert_dbase_t(G)).
 assert_dbase_t(DB):-once(fully_expand(change(assert,add),DB,MP)),DB\=@=MP,!,must(assert_dbase_t(MP)).
 assert_dbase_t((G1,G2)):-!,assert_dbase_t(G1),assert_dbase_t(G2).
-assert_dbase_t(G):-was_isa(G,I,C),!,must(assert_isa(I,C)).
-assert_dbase_t(G):-with_assertions(thlocal:already_in_kb_term_expansion,must(dbase_t_storage_op(change(assert,z),G))),!.
+assert_dbase_t(G):-add_from_file(G).
 
 
 :- op(1150,fx,decl_mpred_hybrid).
@@ -380,7 +379,7 @@ dbase_t_mpred_storage_clauses_facts(W,H,B):-dbase_t_mpred_storage_clauses_rules(
 
 % TODO USE PFC FOR FOREWARD RULES
 % TODO USE PTTP FOR BACKARDS RULES
-dbase_t_mpred_storage_clauses_rules(ruleForward,H,B):-ruleForward(H,B).
+dbase_t_mpred_storage_clauses_rules(ruleForward,H,B):-ruleForward(B,H).
 dbase_t_mpred_storage_clauses_rules(ruleBackward,H,B):-ruleBackward(H,B).
 % dbase_t_mpred_storage_clauses_rules('<=>',H,B):-'<=>'(HH,B),each_subterm(HH,SubTerm),compound(SubTerm),SubTerm = H.
 % dbase_t_mpred_storage_clauses_rules('<=>',H,B):-'<=>'(B,HH),each_subterm(HH,SubTerm),compound(SubTerm),SubTerm = H.
