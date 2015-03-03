@@ -250,13 +250,18 @@ pfc_assert0(G):- throw_on_bad_fact(G),!.
 pfc_assert0(G):- pfc_local(G),!,assert(G).
 pfc_assert0(G):- add(G),pfcMarkC(G).
 
-pfc_dbase_transform(G,GGG):-fully_expand(is_asserted,G,GG),!,unnumbervars(GG,GGG).
+% pfc_dbase_transform_hb(H,B,H,B):-!.
+pfc_dbase_transform_hb(H,B,HH,BB):-pfc_dbase_transform_no_uv((H:-B),AC),expand_to_hb(AC,HH,BB),!,must(H=HH).
+
+pfc_dbase_transform_no_uv(G,GG):-must((fully_expand(is_asserted,G,GG))),!.
+
+pfc_dbase_transform(G,GGG):-must((fully_expand(is_asserted,G,GG))),!,unnumbervars(GG,GGG).
 
 
-pfc_clause_db_unify(H,B):- must(pfc_local(H)),
+pfc_clause_db_unify(H0,B0):-pfc_dbase_transform_hb(H0,B0,H,B),must(pfc_local(H)),
    (current_predicate(_,H) -> (predicate_property(H,number_of_clauses(_)) -> clause(H,B) ; B = call(H)); % simulates a body for system predicates
                                              B = mpred_call(H)).
-pfc_clause_db_check(H,B):- copy_term(H:B,HH:BB), clause(HH,BB,Ref),clause(CH,CB,Ref),H:B=@=CH:CB,!.
+pfc_clause_db_check(H0,B0):- pfc_dbase_transform_hb(H0,B0,H,B), copy_term(H:B,HH:BB), clause(HH,BB,Ref),clause(CH,CB,Ref),H:B=@=CH:CB,!.
 pfc_clause_db_ref(H,B,Ref):-must(pfc_local(H)),!,pfc_clause_local_db_ref(H,B,Ref).
 
 pfc_clause_local_db_ref(H,B,Ref):- copy_term(H:B,HH:BB),clause(HH,BB,Ref),clause(CH,CB,Ref),H:B=@=CH:CB,!.
@@ -940,8 +945,8 @@ pfcRuleOutcomeHead(pfcNT(_,_,Outcome),OutcomeO):-!,pfcRuleOutcomeHead(Outcome,Ou
 pfcRuleOutcomeHead(pfcPT(_,Outcome),OutcomeO):-!,pfcRuleOutcomeHead(Outcome,OutcomeO).
 pfcRuleOutcomeHead(pfcPT(_,_,Outcome),OutcomeO):-!,pfcRuleOutcomeHead(Outcome,OutcomeO).
 pfcRuleOutcomeHead(support1(Outcome,_,_),OutcomeO):-!,pfcRuleOutcomeHead(Outcome,OutcomeO).
-pfcRuleOutcomeHead(support2(_,_,Outcome),OutcomeO):-!,pfcRuleOutcomeHead(Outcome,OutcomeO).
-pfcRuleOutcomeHead(support3(_,Outcome,_),OutcomeO):-!,pfcRuleOutcomeHead(Outcome,OutcomeO).
+pfcRuleOutcomeHead(support3(_,_,Outcome),OutcomeO):-!,pfcRuleOutcomeHead(Outcome,OutcomeO).
+pfcRuleOutcomeHead(support2(_,Outcome,_),OutcomeO):-!,pfcRuleOutcomeHead(Outcome,OutcomeO).
 pfcRuleOutcomeHead(pfcQueue(Outcome),OutcomeO):-!,pfcRuleOutcomeHead(Outcome,OutcomeO).
 pfcRuleOutcomeHead(pfcDefault(Outcome),OutcomeO):-!,pfcRuleOutcomeHead(Outcome,OutcomeO).
 pfcRuleOutcomeHead(Outcome:-_,Outcome):-!.
@@ -959,8 +964,8 @@ pfcRuleOutcomeHeadBody(pfcPT(Ante1a,Ante1b,Outcome),OutcomeO,(Ante1a,Ante1b,Ante
 pfcRuleOutcomeHeadBody(pfcNT(Ante1,Outcome),OutcomeO,(Ante1,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
 pfcRuleOutcomeHeadBody(pfcNT(Ante1a,Ante1b,Outcome),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
 pfcRuleOutcomeHeadBody(support1(Outcome,Ante1a,Ante1b),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
-pfcRuleOutcomeHeadBody(support2(Ante1a,Ante1b,Outcome),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
-pfcRuleOutcomeHeadBody(support3(Ante1a,Outcome,Ante1b),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
+pfcRuleOutcomeHeadBody(support3(Ante1a,Ante1b,Outcome),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
+pfcRuleOutcomeHeadBody(support2(Ante1a,Outcome,Ante1b),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
 pfcRuleOutcomeHeadBody(pfcQueue(Outcome),OutcomeO,Ante2):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
 pfcRuleOutcomeHeadBody(pfcDefault(Outcome),OutcomeO,Ante2):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
 pfcRuleOutcomeHeadBody((Outcome:-Ante),Outcome,Ante):-!.
@@ -1017,7 +1022,7 @@ pfcRunPT(Fact,F) :-
 pfcRunPT(_,_).
 
 pfcRunNT(_Fact,F) :-
-  support3(pfcNT(F,Condition,Body),X,_),
+  support2(pfcNT(F,Condition,Body),X,_),
   Condition,
   pfcRem(X,(_,pfcNT(F,Condition,Body))),
   fail.
@@ -1509,21 +1514,21 @@ pfcConjoin(C1,C2,(C1,C2)).
 %= predicates for manipulating support relationships
 %%
 
-:-decl_mpred_pfc(support2/3).
-:-decl_mpred_pfc(support1/3).
 :-decl_mpred_pfc(support3/3).
+:-decl_mpred_pfc(support1/3).
+:-decl_mpred_pfc(support2/3).
 
 %= pfcAddSupport(+Fact,+Support)
 
 pfcAddSupport(P,(Fact,Trigger)) :-
   pfc_assert(support1(P,Fact,Trigger)),
-  pfc_assert(support2(Fact,Trigger,P)),
-  pfc_assert(support3(Trigger,P,Fact)).
+  pfc_assert(support3(Fact,Trigger,P)),
+  pfc_assert(support2(Trigger,P,Fact)).
 
 pfcGetSupport(P,(Fact,Trigger)) :-
    nonvar(P)         -> support1(P,Fact,Trigger) 
-   ; nonvar(Fact)    -> support2(Fact,Trigger,P) 
-   ; nonvar(Trigger) -> support3(Trigger,P,Fact) 
+   ; nonvar(Fact)    -> support3(Fact,Trigger,P) 
+   ; nonvar(Trigger) -> support2(Trigger,P,Fact) 
    ; otherwise       -> support1(P,Fact,Trigger).
 
 
@@ -1534,21 +1539,21 @@ pfcRemSupport(P,(Fact,Trigger)) :-
   nonvar(P),
   !,
   pfcRetractOrWarn(pfcRemoveSupport,support1(P,Fact,Trigger)),
-  pfcRetractOrWarn(pfcRemoveSupport,support2(Fact,Trigger,P)),
-  pfcRetractOrWarn(pfcRemoveSupport,support3(Trigger,P,Fact)).
+  pfcRetractOrWarn(pfcRemoveSupport,support3(Fact,Trigger,P)),
+  pfcRetractOrWarn(pfcRemoveSupport,support2(Trigger,P,Fact)).
 
 
 pfcRemSupport(P,(Fact,Trigger)) :-
   nonvar(Fact),
   !,
-  pfcRetractOrWarn(pfcRemoveSupport,support2(Fact,Trigger,P)),
+  pfcRetractOrWarn(pfcRemoveSupport,support3(Fact,Trigger,P)),
   pfcRetractOrWarn(pfcRemoveSupport,support1(P,Fact,Trigger)),
-  pfcRetractOrWarn(pfcRemoveSupport,support3(Trigger,P,Fact)).
+  pfcRetractOrWarn(pfcRemoveSupport,support2(Trigger,P,Fact)).
 
 pfcRemSupport(P,(Fact,Trigger)) :-
-  pfcRetractOrWarn(pfcRemoveSupport,support3(Trigger,P,Fact)),
+  pfcRetractOrWarn(pfcRemoveSupport,support2(Trigger,P,Fact)),
   pfcRetractOrWarn(pfcRemoveSupport,support1(P,Fact,Trigger)),
-  pfcRetractOrWarn(pfcRemoveSupport,support2(Fact,Trigger,P)).
+  pfcRetractOrWarn(pfcRemoveSupport,support3(Fact,Trigger,P)).
 
 
 pfc_collect_supports(Tripples) :-
@@ -1602,8 +1607,8 @@ pfc_trigger_key(X,X).
 % the database and should not be present in an empty pfc database
 
 pfcDatabaseTerm(support1/3).
-pfcDatabaseTerm(support2/3).
 pfcDatabaseTerm(support3/3).
+pfcDatabaseTerm(support2/3).
 pfcDatabaseTerm(pfcPT/3).
 pfcDatabaseTerm(pfcNT/3).
 pfcDatabaseTerm(pfcPT/2).
@@ -1621,8 +1626,8 @@ pfcReset :-
   pfc_clause_db_unify(support1(P,F,Trigger),true),
   pfcRetractOrWarn(pfcReset,P),
   pfcRetractOrWarn(pfcReset,support1(P,F,Trigger)),
-  pfcRetractOrWarn(pfcReset,support2(F,Trigger,P)),
-  pfcRetractOrWarn(pfcReset,support3(Trigger,P,F)),
+  pfcRetractOrWarn(pfcReset,support3(F,Trigger,P)),
+  pfcRetractOrWarn(pfcReset,support2(Trigger,P,F)),
   fail.
 pfcReset :-
   pfcDatabaseItem(T),

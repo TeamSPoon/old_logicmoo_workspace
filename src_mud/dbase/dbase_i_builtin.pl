@@ -129,7 +129,7 @@ ttFormatType(ftVar).
 ttFormatType(ftVoprop).
 
 
-:- pfcAdd(((prologMacroHead(Compound)/{get_functor(Compound,F)}) => functorDeclares(F))).
+:- pfcAdd(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) => functorDeclares(F))).
 :- pfcAdd((isa(_,ArgsIsa)=>tCol(ArgsIsa))).
 
 :- pfcTrace.

@@ -21,6 +21,8 @@
   use_term_listing/2,  world_clear/1,  
    with_kb_assertions/2)).
 
+compound_functor(Compound,F):-compound(Compound),nonvar(Compound),get_functor(Compound,F).
+
 not_variant(G,GG):-
  not(not((
   %numbervars(G,0,_),
