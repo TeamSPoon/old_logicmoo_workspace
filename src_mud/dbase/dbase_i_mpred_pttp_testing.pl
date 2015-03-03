@@ -344,7 +344,7 @@ pttp_logic(logicmoo_kb_logic,
           ((
            uses_logic(logicmoo_kb_refution),
 
-          (( pred_t(ptSubclass,C1,C2) & pred_isa_t(C1,P) => pred_isa_t(C2,P) )),
+          (( pred_t(genls,C1,C2) & pred_isa_t(C1,P) => pred_isa_t(C2,P) )),
           (( pred_t(genls,C1,C2) & isa(I,C1) => isa(I,C2) )),
 
           (( pred_t(disjointWith,C1,C2) =>  pred_isa_t(C1,P) v pred_isa_t(C2,P) )),

@@ -207,11 +207,11 @@ mostSpecificLocalityOfObject(Obj,Where):-
 
 % objects are placed by default in center of region
 ((inRegion(Obj,Region), ~tPathway(Obj), ~mudPossess(_,Obj),
-{not_asserted(mudAtLoc(Obj,xyzFn(Region,_,_,_)))})
+{not_asserted(mudAtLoc(Obj,xyzFn(Region,_,_,_))),in_grid_rnd(Region,LOC)})
   =>
-  mudAtLoc(Obj,xyzFn(Region,3,3,1))).
+  mudAtLoc(Obj,LOC)).
 
-% objects can be two regions at once
+% objects cannot be in two localities (Regions?) at once
 ((localityOfObject(Obj,NewLoc), 
  {(localityOfObject(Obj,OldLoc), OldLoc\==NewLoc)})
   => 
@@ -224,9 +224,9 @@ mostSpecificLocalityOfObject(Obj,Where):-
   ~mudAtLoc(Obj,OldLoc)).
 
 % create pathway objects and place them in world
-(pathBetween(Region,Dir,_R2)/mudExitAtLoc(Region,Dir,LOC)   
-    { Obj = apathFn(Region,Dir) }) =>  
-                        (tPathway(Obj),localityOfObject(Obj,Region),mudAtLoc(Obj,LOC))).
+(pathBetween(Region,Dir,R2)/ground(pathBetween(Region,Dir,R2)),   
+    { mudExitAtLoc(Region,Dir,LOC), Obj = apathFn(Region,Dir) }) =>  
+                        (tPathway(Obj),localityOfObject(Obj,Region),mudAtLoc(Obj,LOC)).
 
 
 mudDoorwayDir(Region,apathFn(Region,Dir),Dir) :- tPathway(apathFn(Region,Dir)).
@@ -354,9 +354,9 @@ calc_xyz(Region1,Dir,force(X1,Y1,Z1),X2,Y2,Z2):-
    X2 is X+ (OX*X1),Y2 is Y+OY*Y1,Z2 is Z+OZ*Z1.
 
 calc_from_center_xyz(Region1,Dir,R,X2,Y2,Z2):-
-   to_3d(Region1,xyzFn(Region1,X,Y,Z)),
+   room_center(Region1,X,Y,Z),
    get_dir_offset(Dir,R,OX,OY,_),
-   X2 is X+ (OX*R) ,Y2 is Y+(OY*R), Z2 is Z.
+   X2 is X+ OX ,Y2 is Y+ OY, Z2 is Z.
 
 from_dir_target(LOC,Dir,XXYY):- is_3d(LOC),!,
   move_dir_target(LOC,Dir,XXYY).

@@ -247,21 +247,31 @@ pfc_asserta0(G):- hooked_asserta(G),pfcMarkC(G).
 
 pfc_assert(G):- pfc_dbase_transform(G,GG),pfc_assert0(GG).
 pfc_assert0(G):- throw_on_bad_fact(G),!.
-pfc_assert0(G):- pfc_local(G),!,assert(G).
+pfc_assert0(G):- pfc_local(G),!,assert(G),add_meta_facts(assert,G).
 pfc_assert0(G):- add(G),pfcMarkC(G).
 
-% pfc_dbase_transform_hb(H,B,H,B):-!.
-pfc_dbase_transform_hb(H,B,HH,BB):-pfc_dbase_transform_no_uv((H:-B),AC),expand_to_hb(AC,HH,BB),!,must(H=HH).
+add_meta_facts(How,(H:-True)):-is_true(True),must(nonvar(H)),!,add_meta_facts(How,H).
+add_meta_facts(How,(H<=B)):- add_meta_facts(How,(H:-infoF(H<=B))),!,add_meta_facts(assert_if_new,(H:-callBC(B))).
+add_meta_facts(How,(B=>H)):- add_meta_facts(How,(H:-infoF(B=>H))),!.
+add_meta_facts(How,(B<=>H)):- add_meta_facts(How,(H:-infoF(B<=>H))),!,add_meta_facts(How,(B:-infoF(B<=>H))),!.
+add_meta_facts(How,((A,B):-infoF(C))):-(nonvar(A);nonvar(B)),!,add_meta_facts(How,((A):-infoF(C))),add_meta_facts(How,((B):-infoF(C))),!.
+add_meta_facts(How,((A;B):-infoF(C))):-(nonvar(A);nonvar(B)),!,add_meta_facts(How,((A):-infoF(C))),add_meta_facts(How,((B):-infoF(C))),!.
+add_meta_facts(How,(~(A):-infoF(C))):- nonvar(A),!,add_meta_facts(How,((A):-infoF(C))),call(How,(~(A):-infoF(C))).
+add_meta_facts(How,(A:-infoF(C))):-nonvar(C),rewrap_h(A,AA),call(How,(AA:-infoF(C))),!.
+add_meta_facts(_,_).
 
-pfc_dbase_transform_no_uv(G,GG):-must((fully_expand(is_asserted,G,GG))),!.
+rewrap_h(A,A):-nonvar(A),!.
+rewrap_h(A,not(not(A))):-!.
+
+infoF(_):-!,fail.
 
 pfc_dbase_transform(G,GGG):-must((fully_expand(is_asserted,G,GG))),!,unnumbervars(GG,GGG).
 
 
-pfc_clause_db_unify(H0,B0):-pfc_dbase_transform_hb(H0,B0,H,B),must(pfc_local(H)),
+pfc_clause_db_unify(H,B):- must(pfc_local(H)),
    (current_predicate(_,H) -> (predicate_property(H,number_of_clauses(_)) -> clause(H,B) ; B = call(H)); % simulates a body for system predicates
                                              B = mpred_call(H)).
-pfc_clause_db_check(H0,B0):- pfc_dbase_transform_hb(H0,B0,H,B), copy_term(H:B,HH:BB), clause(HH,BB,Ref),clause(CH,CB,Ref),H:B=@=CH:CB,!.
+pfc_clause_db_check(H,B):- copy_term(H:B,HH:BB), clause(HH,BB,Ref),clause(CH,CB,Ref),H:B=@=CH:CB,!.
 pfc_clause_db_ref(H,B,Ref):-must(pfc_local(H)),!,pfc_clause_local_db_ref(H,B,Ref).
 
 pfc_clause_local_db_ref(H,B,Ref):- copy_term(H:B,HH:BB),clause(HH,BB,Ref),clause(CH,CB,Ref),H:B=@=CH:CB,!.
@@ -1090,6 +1100,12 @@ pfc_eval_rhs([Head|Tail],Support) :-
   pfc_eval_rhs(Tail,Support).
 
 
+
+pfc_eval_rhs1(XXrest,Support) :- is_list(XXrest),
+ % embedded sublist.
+ !, pfc_eval_rhs(XXrest,Support).
+
+
 pfc_eval_rhs1({Action},Support) :-
  % evaluable Prolog code.
  !,
@@ -1101,15 +1117,9 @@ pfc_eval_rhs1(P,_Support) :-
  !,
  pfcRem(P).
 
-pfc_eval_rhs1([X|Xrest],Support) :-
- % embedded sublist.
- !,
- pfc_eval_rhs([X|Xrest],Support).
-
 pfc_eval_rhs1(Assertion,Support) :-
  % an assertion to be added.
  pfcPost1(Assertion,Support).
-
 
 pfc_eval_rhs1(X,_) :-
   pfcWarn("Malformed rhs of a rule: ~w",[X]).
@@ -1118,9 +1128,10 @@ pfc_eval_rhs1(X,_) :-
 %%
 %= evaluate an action found on the rhs of a rule.
 %%
+:-dynamic(pfcEval/1).
 
 pfcEvalAction(Action,Support) :-
-  pfc_call(pfcEval,Action), 
+  must(pfc_call(pfcEval,Action)), 
   (pfcUndoable(Action) 
      -> pfcAddActionTrace(Action,Support) 
       ; true).
@@ -1334,6 +1345,10 @@ pfc_negation((-P),P).
 pfc_negation((\+(P)),P).
 pfc_negation((naf(P)),P).
 % pfc_negation(not(P)),P).
+% pfc_negation(NP,PP):-loop_check(pfc_negation0(NP,PP)).
+pfc_negation0(NP,PP):- NP=..[NF,A|RGS],negated_functor(NF,PF),!,PP=..[PF,A|RGS].
+
+
 
 pfcNegatedLiteral(P) :- 
   pfc_negation(P,Q),

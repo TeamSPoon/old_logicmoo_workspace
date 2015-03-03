@@ -66,21 +66,22 @@ pttp_call(Goal,Max,Min,Inc,ProofIn,ProofOut,ShowProof) :-
 :-export(pttp_load_wid/1).
 pttp_load_wid(Name):-must(pttp_logic(Name,Data)),!,must(pttp_load_wid(Name,Data)).
 :-export(pttp_load_wid/2).
-pttp_load_wid(Name,Data):- must(retractall_wid(Name)),wdmsg(pttp_load_wid(Name)),must(pttp_assert_wid(Name:0,Data)),!.
+pttp_load_wid(Name,Data):- must(retractall_wid(Name)),wdmsg(pttp_load_wid(Name)),must(ptt_tell_wid(Name:0,Data)),!.
 uses_logic(Name):-pttp_logic(Name,Data),pttp_load_wid(Name,Data).
 
 
 % -- CODEBLOCK
 :-export(pttp_assert/1).
-pttp_assert(X) :- must_pttp_id(ID),pttp_assert_wid(ID,X).
+pttp_assert(X) :- must_pttp_id(ID),ptt_tell_wid(ID,X).
 
 % -- CODEBLOCK
-:-export(pttp_assert_wid/2).
-pttp_assert_wid(ID,XY):- 
+:-export(ptt_tell_wid/2).
+ptt_tell_wid(ID,XY):- 
     with_no_term_expansions(
        with_assertions(user:prolog_mud_disable_term_expansions,
           with_assertions(thlocal:infSkipFullExpand,pttp_assert_wid(ID,pttp,XY)))),!.
 
+:-export(pttp_assert_wid/3).
 pttp_assert_wid(ID,Mode,(X,Y)):- !, pttp_assert_wid(ID,Mode,X),kb_incr(ID,ID2), pttp_assert_wid(ID2,Mode,Y).
 pttp_assert_wid(ID,Mode,[X|Y]):- !, pttp_assert_wid(ID,Mode,X),kb_incr(ID,ID2), pttp_assert_wid(ID2,Mode,Y).
 %pttp_assert_wid(ID,Mode,(X:-Y)):- get_functor(X,F), !,save_wid(ID,pttp_in,(X:-Y)), pttp_assert_real_wid(ID,(X:-Y)).
@@ -226,7 +227,7 @@ do_pttp_test(TestName,Data) :-
                           dmsg(do_pttp_test(TestName)),
                           retractall_wid(TestName),
                            eraseall(int_query,_),eraseall(int_not_firstOrder,_),eraseall(int_firstOrder,_),                                                           
-                               pttp_assert_wid(TestName:0,Data), 
+                               ptt_tell_wid(TestName:0,Data), 
                                once((ignore(call_print_tf(pttp_prove(TestName,query))))),
                                sleep(1)])),E,dmsg(error(TestName:E)))),retractall_wid(TestName)).
                               
@@ -318,7 +319,7 @@ get_int_query(int_query).
 :-export(pttp_query/1).
 pttp_query(X) :- must_pttp_id(ID),pttp_query_wid(ID,X).
 :-export(pttp_query_wid/2).
-pttp_query_wid(ID, Y):- pttp_assert_wid(ID,(query:-Y)), pttp_prove(ID,query),!.
+pttp_query_wid(ID, Y):- ptt_tell_wid(ID,(query:-Y)), pttp_prove(ID,query),!.
 
 /*
  A thread local safe way to do it

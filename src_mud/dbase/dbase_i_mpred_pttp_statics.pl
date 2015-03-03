@@ -16,7 +16,7 @@
        % nnf/4,
        !.
 /*
-       pttp_assert_wid/2,
+       ptt_tell_wid/2,
        pttp_test/2,
        search/7,
        do_pttp_test/1,
