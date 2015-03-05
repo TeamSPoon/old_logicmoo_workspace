@@ -97,7 +97,7 @@ call_agent_where_action_ilc(Agent,Where,CMD):- debugOnError(agent_call_command_n
 % fail event
 call_agent_where_action_ilc(Agent,Where,CMD):-  send_command_completed_message(Agent,Where,failed,CMD),!. 
 
-correctCommand(CMD,OUT):-compound(CMD),
+correctCommand(CMD,OUT):-compound(CMD),fail,
    must(current_agent(Who)),
    CMD=..[F|ARGS],   
    functor(CMD,F,A),
@@ -109,9 +109,16 @@ correctCommand(CMD,OUT):-compound(CMD),
 correctCommand(CMD,CMD).
 
 correctEachTypeOrFail( Who, F, Q,ARGS,TYPES,NEWS):- is_list(TYPES),!,maplist(correctEachTypeOrFail(Who,F,Q),ARGS,TYPES,NEWS).
-correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- isa(Arg,Type),!,Inst = Arg.
+correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- fail, not(is_ephemeral(Arg)),not(is_ephemeral(Type)),isa(Arg,Type),!,Inst = Arg.
 correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- !,acceptableArg(Arg,Type),!,Inst = Arg.
-correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):- must(coerce(Arg,Type,Inst)).
+correctEachTypeOrFail(_Who,_F,_Q,Arg,Type,Inst):-not(is_ephemeral(Arg)),not(is_ephemeral(Type)), must(coerce(Arg,Type,Inst)),not(is_ephemeral(Inst)).
+
+is_ephemeral(Var):-var(Var),!,fail.
+is_ephemeral(isMissing).
+is_ephemeral(isOptional(_,_)).
+is_ephemeral(isRandom(_)).
+is_ephemeral(isOneOf(_)).
+
 
 acceptableArg(Arg,Type):-dmsg(acceptableArg(Arg,Type)).
 

@@ -14,7 +14,7 @@
 % user:type_action_info(human_player,help, "shows this help").
 user:type_action_info(tHumanPlayer,actHelp(isOptional(ftString,"")), "shows this help").
 
-% user:action_info(TEMPL,S):- vtActionTemplate(TEMPL),to_param_doc(TEMPL,S).
+% user:action_info(TEMPL,S):- action_info(TEMPL),to_param_doc(TEMPL,S).
 
 
 
@@ -44,7 +44,7 @@ get_type_action_help_0(What,Syntax,txtConcatFn(makes,happen,List)):- call_no_cut
 
 :-export(get_type_action_help_1/3).
 get_type_action_help_1(What,TEMPL,S):- get_type_action_help_0(What,TEMPL,S).
-get_type_action_help_1(_What,TEMPL,S):- call_no_cuts(isa(TEMPL,vtActionTemplate)),to_param_doc(TEMPL,S).
+get_type_action_help_1(_What,TEMPL,S):- call_no_cuts(isa(TEMPL,action_info)),to_param_doc(TEMPL,S).
 
 
 first_pl((BODY,_),PL):-!,

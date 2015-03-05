@@ -344,6 +344,9 @@ add_functor(Ext,F/A):- must(( export(F/A),assertz_if_new(user:was_pttp_functor(E
 
 
 
+pttp_tell(Wff):- why_to_id(pttp_tell,Wff,Why),pttp_assert_int_wid(Why,Wff).
+
+
 % ===============================================================================
 % pttp_assert_int
 % ===============================================================================

@@ -16,7 +16,7 @@
 user:provide_mpred_write_attributes(F,A,multifile):- multifile(F/A).
 user:provide_mpred_write_attributes(F,A,thread_local):- thread_local(F/A).
 user:provide_mpred_write_attributes(F,A,dynamic):- dynamic(F/A).
-user:provide_mpred_write_attributes(F,external(Module)):- dmsg(decl_mpred(F,external(Module))),not(dbase_mod(Module)),must_det(mpred_arity(F,A)),functor(HEAD,F,A),must_det(predicate_property(Module:HEAD,_)),!.
+user:provide_mpred_write_attributes(F,external(Module)):- dmsg(decl_mpred(F,external(Module))),not(dbase_mod(Module)),must_det(arity(F,A)),functor(HEAD,F,A),must_det(predicate_property(Module:HEAD,_)),!.
 
 user:provide_mpred_read_attributes(Obj,PropVal):- fail, safe_univ(PropVal,[Prop,NonVar|Val]),safe_univ(CallVal,[Prop,Obj,NonVar|Val]),
      predicate_property(CallVal,_),!,mpred_call(CallVal).
@@ -95,7 +95,7 @@ decl_mpred_prolog(M,PI,FA):- must(decl_mpred_prolog(_,M,PI,FA)).
 decl_mpred_prolog(F,Other):- 
      decl_mpred(F,Other),
      get_functor(F,F0),
-     must(mpred_arity(F0,A)),
+     must(arity(F0,A)),
      decl_mpred_prolog(F0/A).
 
 :-export(decl_mpred_prolog/4).
@@ -103,7 +103,7 @@ decl_mpred_prolog(CM,M,PI,FA):- loop_check(must(decl_mpred_prolog_ilc(CM,M,PI,FA
 
 % decl_mpred_prolog_ilc(_,_,_,_):-!.
 decl_mpred_prolog_ilc(CM,M,PI,F/A):-
-      assert_if_new(mpred_arity(F,A)),
+      assert_if_new(arity(F,A)),
       assert_if_new(user:mpred_prop(F,prologOnly)),
       assert_if_new(user:mpred_prop(F,predCanHaveSingletons)),
       assert_if_new(user:mpred_prop(F,[info(decl_mpred_prolog(CM,M,PI,F/A))])),

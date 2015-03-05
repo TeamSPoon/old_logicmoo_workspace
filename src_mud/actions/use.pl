@@ -63,7 +63,7 @@ user:action_info(Syntax,String):-
 use_action_templates(Syntax):-no_repeats([Syntax],(
   action_verb_useable(ActUse,Wieldable,_NowWielding,_Possessing,_Unstowed),Syntax=..[ActUse,Wieldable])).
 
-vtActionTemplate(Templ):-use_action_templates(Templ).
+action_info(Templ):-use_action_templates(Templ).
 
 user:agent_call_command(Agent,Syntax) :- 
     call((action_verb_useable(ActUse,_Wieldable,_NowWielding,_Possessing,_Unstowed),Syntax=..[ActUse,Obj])),

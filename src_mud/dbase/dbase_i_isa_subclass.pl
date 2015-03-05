@@ -112,7 +112,7 @@ never_type_why(F,Why):-atom(F),functor(G,F,1),real_builtin_predicate(G),!,Why=(w
 never_type_why(M:C,Why):-atomic(M),!,never_type_why(C,Why).
 % never_type_why(F):-dmsg(never_type_why(F)),!,asserta_if_new(user:mpred_prop(F,prologOnly)).
 never_type_why(F,Why):-never_type_f(F),Why=is_never_type(F).
-never_type_why(F,Why):- atom(F), mpred_arity(F,A),!,F\==isa, user:mpred_prop(F,_), A > 1,Why=(whynot( mpred_arity(F,A) )).
+never_type_why(F,Why):- atom(F), arity(F,A),!,F\==isa, user:mpred_prop(F,_), A > 1,Why=(whynot( arity(F,A) )).
 
 
 % ========================================
@@ -318,7 +318,8 @@ not_mud_isa(G,tCol,Why):-never_type_why(G,Why).
 % isa_backchaing(i,c)
 % ==========================
 :-export(isa_backchaing/2).
-isa_backchaing(I,T):- fact_loop_checked(isa(I,T),isa_backchaing_0(I,T)).
+%isa_backchaing(I,T):- fact_loop_checked(isa(I,T),isa_backchaing_0(I,T)).
+isa_backchaing(I,T):- no_repeats(no_loop_check(isa_backchaing_0(I,T))).
 
 :-export(isa_backchaing_0/2).
 isa_backchaing_0(I,T):-  T==ftVar,!,var(I).
@@ -377,7 +378,7 @@ atom_prefix_other(Inst,Prefix,Other):-atom_type_prefix_other(Inst,_,Prefix,Other
 atom_type_prefix_other(Inst,Type,Prefix,Other):-atom(Inst),type_prefix(Prefix,Type),atom_concat(Prefix,Other,Inst),capitalized(Other).
 atom_type_prefix_other(Inst,Type,Suffix,Other):-atom(Inst),type_suffix(Suffix,Type),atom_concat(Other,Suffix,Inst),!.
 
-user:mpred_prop(F,tCol):-isa_from_morphology(F,Col),atom_concat(_,'Type',Col),mpred_arity(F,1).
+user:mpred_prop(F,tCol):-isa_from_morphology(F,Col),atom_concat(_,'Type',Col),arity(F,1).
 
 
 onLoadPfcRule('=>'(hasInstance(tCol,Inst), {isa_from_morphology(Inst,Type)} , isa(Inst,Type))).
@@ -474,7 +475,7 @@ define_compound_isa(F,Spec,T):- add(formatted_resultIsa(Spec,T)),add(resultIsa(F
 
 
 :-export(define_ft/1).
-define_ft(ftListFn(Spec)):- nonvar(Spec),never_type_why(Spec,Why),!,trace_or_throw(never_ft(ftListFn(Spec),Why)).
+% define_ft(ftListFn(Spec)):- nonvar(Spec),never_type_why(Spec,Why),!,trace_or_throw(never_ft(ftListFn(Spec),Why)).
 define_ft(ftListFn(_)):-!.
 define_ft(Spec):- never_type_why(Spec,Why),!,trace_or_throw(never_ft(never_type_why(Spec,Why))).
 define_ft(M:F):- !, '@'(define_ft(F), M).
@@ -516,7 +517,7 @@ system:term_expansion(isa(Compound,PredArgTypes),
    ground(Compound:PredArgTypes),show_call(pfcAdd(isa(Compound,PredArgTypes))),!.
 */
 
-
+isa_provide_mpred_storage_op(_,_):-!,fail.
 % ISA MODIFY
 isa_provide_mpred_storage_op(change(assert,_),G):- was_isa(G,I,C),!,dmsg(assert_isa_from_op(I,C)),!, assert_isa(I,C).
 % ISA MODIFY

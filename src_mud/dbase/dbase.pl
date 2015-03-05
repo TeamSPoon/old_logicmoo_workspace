@@ -11,15 +11,25 @@
 % Dec 13, 2035
 % Douglas Miles
 */
+:- op(500,fx,'~').
+:- op(1050,xfx,('=>')).
+:- op(1050,xfx,'<=>').
+:- op(1050,xfx,('<=')).
+:- op(1100,fx,('=>')).
+:- op(1150,xfx,('::::')).
+
 :- use_module(library(semweb/turtle)).
 :- include(dbase_i_header).
+:- multifile(system:term_expansion/2).
 :- multifile(user:term_expansion/2).
+:- multifile(user:goal_expansion/2).
 :-dynamic user:isa_pred_now_locked/0.
 :-thread_local user:prolog_mud_disable_term_expansions.
 % [Manditory] define how we interact with the module system
-swi_module(M,E):-dmsg(swi_module(M,E)).
 
-user_db:grant_openid_server(_,_).
+:-if(not(current_predicate(swi_module/2))).
+swi_module(M,E):-dmsg(swi_module(M,E)).
+:-endif.
 
 % ================================================
 % Debugging settings
@@ -57,12 +67,11 @@ when_debugging(_,_).
 :- set_prolog_flag(double_quotes, atom).
 :- set_prolog_flag(double_quotes, string).
 
-
 % ================================================
 % Thread Locals
 % ================================================
-
-:- thread_local thlocal:already_in_kb_term_expansion/0.
+:- thread_local thlocal:consulting_sources/0.
+:- thread_local thlocal:already_in_file_term_expansion/0.
 :- thread_local thlocal:agent_current_action/2.
 :- thread_local thlocal:caller_module/2.
 :- thread_local thlocal:dbase_opcall/2.
@@ -71,6 +80,7 @@ when_debugging(_,_).
 :- thread_local thlocal:enable_src_loop_checking/0.
 :- thread_local thlocal:in_dynamic_reader/1.
 :- thread_local thlocal:in_prolog_source_code/0.
+:- thread_local thlocal:is_calling/0.
 :- thread_local thlocal:infAssertedOnly/1.
 :- thread_local thlocal:infInstanceOnly/1.
 :- thread_local thlocal:infSkipArgIsa/0.
@@ -131,7 +141,8 @@ expanded_already_functor(was_enabled).
 
 % expanded_already_functor(F):-user:mpred_prop(F,prologOnly).
 
-must_compile_special_clause(CL):- sanity(nonvar(CL)),not(thlocal:into_form_code),not(thlocal:already_in_kb_term_expansion),not((get_functor(CL,F),expanded_already_functor(F))).
+must_compile_special_clause(:- (_) ):-!,fail.
+must_compile_special_clause(CL):- sanity(nonvar(CL)),not(thlocal:into_form_code),not(thlocal:already_in_file_term_expansion),not((get_functor(CL,F),expanded_already_functor(F))).
 
 
 %user:goal_expanstion(H,_):- notice_predicate_head(H),fail.
@@ -175,16 +186,12 @@ user:decl_database_hook(AR,C):- record_on_thread(dbase_change,changing(AR,C)).
 record_on_thread(Dbase_change,O):- thread_self(ID),thlocal:dbase_capture(ID,Dbase_change),!,Z=..[Dbase_change,ID,O],assertz(Z).
 
 
-% this isn't written yet.
-resolveConflict(C) :-
-  format("~NHalting with conflict ~w", [C]),
-  pfcHalt.
-
 
 % ================================================
 % DBASE_T System
 % ================================================
-
+%:- with_no_term_expansions(if_file_exists(user_ensure_loaded(logicmoo(dbase/dbase_i_rdf_store)))).
+%:- asserta(thglobal:using_rdf_dbase_hook).
 :- ensure_loaded(dbase_i_kb_agenda).
 :- ensure_loaded(dbase_i_mpred_pfc).
 :- ensure_loaded(dbase_i_call).
@@ -195,8 +202,6 @@ resolveConflict(C) :-
 :- ensure_loaded(dbase_i_kb_store).
 :- ensure_loaded(dbase_i_isa_subclass).
 
-:- multifile(user:goal_expansion/2).
-:- multifile(user:term_expansion/2).
 
 :- asserta((user:isa(I,C):-loop_check(isa_backchaing(I,C)))).
 :- asserta(('$toplevel':isa(I,C):-user:isa(I,C))).
@@ -224,6 +229,7 @@ user:term_expansion(G,isa(I,C)):-not(user:prolog_mud_disable_term_expansions),no
 
 
 dbase_module_ready.
+:- with_no_term_expansions(if_file_exists(user_ensure_loaded(logicmoo(dbase/dbase_i_rdf_store)))).
 
 :- decl_mpred_hybrid(argIsa/3).
 user:ruleBackward( argIsa(F,N,Isa), argIsa_call(F,N,Isa)).
@@ -237,7 +243,7 @@ user:ruleBackward( argIsa(F,N,Isa), argIsa_call(F,N,Isa)).
 :-decl_type(tPred).
 :-decl_mpred_hybrid(isa/2).
 
-user:term_expansion(A,B):- not(user:prolog_mud_disable_term_expansions), once(pfc_file_expansion(A,B)),A\=@=B.
+user:term_expansion(A,B):- not(user:prolog_mud_disable_term_expansions),in_file_expansion,once(pfc_file_expansion(A,B)),A\=@=B.
 
 user:semweb_startup:- with_no_term_expansions(if_file_exists(user_ensure_loaded(logicmoo(dbase/dbase_i_rdf_store)))).
 
@@ -247,7 +253,9 @@ user:semweb_startup:- with_no_term_expansions(if_file_exists(user_ensure_loaded(
 :-decl_mpred_hybrid(formatted_resultIsa/2).
 :-decl_mpred_hybrid(resultIsa/2).
 
-system:term_expansion(IN,OUT):- not(user:prolog_mud_disable_term_expansions),dbase_module_ready, must_compile_special_clause(IN),loader_term_expansion(IN,WHY),must(OUT = user:WHY).
+system:term_expansion(IN,OUT):- not(user:prolog_mud_disable_term_expansions),
+  in_file_expansion, dbase_module_ready, must_compile_special_clause(IN),
+  loader_term_expansion(IN,WHY),must(OUT = user:WHY).
 
 % :- sanity(test_expand_units(tCol(_A))).
 
@@ -277,19 +285,17 @@ vtTestType(vTest2).
 
 :- show_call(source_location(_,_)).
 
+:-must(in_file_expansion;in_file_directive).
+% :- must(show_call(ensure_plmoo_loaded(logicmoo(dbase/dbase_i_builtin)))).
 
+:- must(show_call(with_assertions(thlocal:pfcExpansion,with_assertions(thlocal:consulting_sources,ensure_loaded(logicmoo(dbase/dbase_i_builtin)))))).
 
-:-must(add(argIsa(tPred,1,tPred))).
-
-
-
-:- must(show_call(ensure_plmoo_loaded(logicmoo(dbase/dbase_i_builtin)))).
-
-:- if_startup_script(with_assertions(thlocal:pfcExpansion,ensure_loaded(dbase_i_mpred_pfc_testing))).
+% :- if_startup_script(with_assertions(thlocal:pfcExpansion,ensure_loaded(dbase_i_mpred_pfc_testing))).
 
 % :-asserta(user:isa_pred_now_locked).
 
 % :-asserta(user:prolog_mud_disable_term_expansions).
 
-% :-prolog.
+term_expansion(I,O):- thlocal:consulting_sources, with_no_assertions(thlocal:consulting_sources,add(I)),O=true.
+user:goal_expansion(ISA,G) :-compound(ISA),thlocal:is_calling,was_isa(ISA,I,C),G=no_repeats(isa(I,C)).
 

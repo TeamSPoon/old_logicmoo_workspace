@@ -25,8 +25,8 @@
 :- discontiguous(user:enabled/1).
 :- multifile user:was_enabled/1.
 :- discontiguous(user:was_enabled/1).
-:- multifile user:listing_mpred_hook/2.
-:- dynamic user:listing_mpred_hook/2.
+:- multifile user:listing_mpred_hook/1.
+:- dynamic user:listing_mpred_hook/1.
 
 :- multifile user:genls/2.
 :- dynamic user:genls/2.
@@ -102,7 +102,7 @@
 :- dynamic_multifile_exported user:use_snark/2.
 :- dynamic_multifile_exported user:is_mpred_prop/3.
 :- dynamic_multifile_exported user:hasInstance_dyn/2.
-:- dynamic_multifile_exported user:mpred_arity/2.
+:- dynamic_multifile_exported user:arity/2.
 :- dynamic_multifile_exported user:mpred_prop/2.
 :- dynamic_multifile_exported user:'<=>'/2.
 :- dynamic_multifile_exported user:ruleForward/2.

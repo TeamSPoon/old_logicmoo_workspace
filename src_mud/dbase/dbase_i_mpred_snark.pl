@@ -672,7 +672,8 @@ write_list([F|R]) :- write(F), write('.'), nl, write_list(R).
 write_list([]).
 
 numbervars_with_names(Term):-
-   term_variables(Term,Vars),name_variables(Vars),!,numbervars(Term,91,_,[attvar(skip),singletons(false)]),!.
+   term_variables(Term,Vars),name_variables(Vars),!,
+   numbervars(Term,91,_,[attvar(skip),singletons(false)]),!.
 
 name_variables([]).
 name_variables([Var|Vars]):-
@@ -1035,12 +1036,12 @@ boxlog_to_prolog(BL,PTTP):-as_prolog(BL,PTTP).
 
 :-dynamic(snark_pred_head/1).
 
-snark_pred_head(P):-var(P),user:mpred_prop(F,prologSNARK),mpred_arity(F,A),functor(P,F,A).
+snark_pred_head(P):-var(P),user:mpred_prop(F,prologSNARK),arity(F,A),functor(P,F,A).
 snark_pred_head(P):-get_functor(P,F,_),user:mpred_prop(F,prologPTTP).
 
 :-dynamic(pttp_pred_head/1).
 
-pttp_pred_head(P):-var(P),user:mpred_prop(F,prologPTTP),mpred_arity(F,A),functor(P,F,A).
+pttp_pred_head(P):-var(P),user:mpred_prop(F,prologPTTP),arity(F,A),functor(P,F,A).
 pttp_pred_head(P):-get_functor(P,F,_),user:mpred_prop(F,prologPTTP).
 
 :-multifile(snarky_comment/1).

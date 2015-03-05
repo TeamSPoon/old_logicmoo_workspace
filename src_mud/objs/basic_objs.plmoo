@@ -279,7 +279,6 @@ vtBasicDirPlusUpDown(vUp).
 %localityOfObject(Inner,Container):- mudInsideOf(Inner,Container).
 %localityOfObject(Inner,Outer):- user:only_if_pttp, localityOfObject(Inner,Container),localityOfObject(Container,Outer).
 nameStrings(apathFn(Region,Dir),Text):- pathName(Region,Dir,Text).
-pddlSomethingIsa('NpcCol1012-Ensign732',['NpcCol1012',actor,'MaleAnimal']).
 predArgTypes(mudMaterial(tSpatialThing,vtMaterial)).
 predArgTypes(mudSize(tSpatialThing,vtSize)).
 predArgTypes(mudTexture(tSpatialThing,vtTexture)).
@@ -315,7 +314,8 @@ ensure_some_pathBetween(R1,R2):-
    must((add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)))),!.
 
 :- decl_mpred_prolog(do_ensure_some_pathBetween/0).
-do_ensure_some_pathBetween:- forall(no_repeats((is_asserted(pathConnects(R1,R2)),ground(R1:R2),tRegion(R1),tRegion(R2),dif(R1,R2))),show_call_failure((ensure_some_pathBetween(R1,R2),ensure_some_pathBetween(R2,R1)))).
+do_ensure_some_pathBetween:- 
+  call(forall(no_repeats((is_asserted(pathConnects(R1,R2)),ground(R1:R2),tRegion(R1),tRegion(R2),dif(R1,R2))),show_call_failure((ensure_some_pathBetween(R1,R2),ensure_some_pathBetween(R2,R1))))).
 
 :-onEachLoad(do_ensure_some_pathBetween).
 

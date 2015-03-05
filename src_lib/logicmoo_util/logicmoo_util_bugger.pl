@@ -1874,7 +1874,6 @@ on_prolog_ecall(F,A,Var,Value):-
   on_prolog_ecall(F,A,IfTrue,true),!.
 
 
-
 default_ecall(asis,call,call).
 default_ecall(asis,fake_failure,fail).
 default_ecall(asis,error,nocatch).
@@ -3271,74 +3270,8 @@ quiet_all_module_predicates_are_transparent(ModuleName):-
                    (module_transparent(ModuleName:F/A))))).
 
 
-:- module_predicates_are_exported(bugger).
-:- module_meta_predicates_are_transparent(bugger).
-:- all_module_predicates_are_transparent(bugger).
-:- all_module_predicates_are_transparent(logicmoo_util_bugger_catch).
-
-:-module_property(bugger, exports(List)),moo_show_childs(List).
-
-% bugger_prolog_exception_hook(error(syntax_error(operator_expected),_),_,_,_).
-bugger_prolog_exception_hook(Info,_,_,_):- bugger_error_info(Info),!, dumpST,dmsg(prolog_exception_hook(Info)), dtrace.
-
-bugger_error_info(C):-contains_var(type_error,C).
-bugger_error_info(C):-contains_var(instantiation_error,C).
-bugger_error_info(C):-contains_var(existence_error(procedure,_/_),C).
-
-% Installs exception reporter.
-:- multifile(user:prolog_exception_hook/4).
-:- dynamic(user:prolog_exception_hook/4).
-% Writes exceptions with stacktrace into stderr.
-% Fail/0 call at the end allows the exception to be
-% processed by other hooks too.
-:- asserta((user:prolog_exception_hook(Exception, Exception, Frame, _):- 
-    (   Exception = error(Term)
-    ;   Exception = error(Term, _)),
-    Term \= type_error(number,_), 
-    Term \= type_error(character_code,_), 
-    Term \= type_error(character,_), 
-    Term \= type_error(text,_), 
-    Term \= syntax_error(_), 
-    format(user_error, 'Error ST-Begin: ~p', [Term]), nl(user_error),
-    dumpST(Frame,20),
-    format(user_error, 'Error ST-End: ~p', [Term]), nl(user_error),
-    nl(user_error), fail)).
-
-
-% show the warnings origins
-:-multifile(user:message_hook/3).
-:-dynamic(user:message_hook/3).
-:- asserta((user:message_hook(Term, Kind, Lines):- (Kind= warning;Kind= error),Term\=syntax_error(_),
-  dmsg(user:message_hook(Term, Kind, Lines)),notrace(dumpST(20)),dmsg(user:message_hook(Term, Kind, Lines)),fail)).
-
-% have to load this module here so we dont take ownership of prolog_exception_hook/4.
-:- user_use_module(library(prolog_stack)).
-
-user:prolog_exception_hook(A,B,C,D):- fail,
-   once(copy_term(A,AA)),catchv(( once(bugger_prolog_exception_hook(AA,B,C,D))),_,fail),fail.
-
-:-'$syspreds':'$hide'('$syspreds':leash/1).
-:-'$syspreds':'$hide'(leash/1).
-:-'$syspreds':'$hide'('$syspreds':visible/1).
-:-'$syspreds':'$hide'(visible/1).
-:-'$syspreds':'$hide'(notrace/0).
-:-'$syspreds':'$hide'(hotrace/1).
-:-'$syspreds':'$hide'(trace/0).
-% :-'$set_predicate_attribute'(!, trace, 1).
-
-:-hideTrace.
-
-%:-module(bugger).
-%:-prolog.
-
-:-retract(double_quotes_was(WAS)),set_prolog_flag(double_quotes,WAS).
-:-moo_hide_all(with_assertions/2).
-:-'$set_predicate_attribute'(with_assertions(_,_), hide_childs, 0).
-
-
-:- multifile user:listing_mpred_hook/2.
-:- dynamic user:listing_mpred_hook/2.
-user:listing_mpred_hook(_,_).
+:- multifile user:listing_mpred_hook/1.
+:- dynamic user:listing_mpred_hook/1.
 
 :-export((term_listing/1)).
 term_listing([]):-!.
@@ -3346,13 +3279,10 @@ term_listing(Match):-
   '@'(ignore((catch(listing(Match),E,wdmsg(E)))),'user'),
   term_non_listing(Match),!.
 
-term_dbase_listing(Match):-
-  get_functor(Match,F,A),
-  (A==0->RA=_;RA=A),!,
+user:term_dbase_listing(Match):-
  %format('/* listing_mpred_hook(~q) => ~n',[Match]),!,
- debugOnError(ignore(call_no_cuts(user:listing_mpred_hook(F/RA,Match)))),!,
- true.
- %format(' <= listing_mpred_hook(~q) */ ~n',[Match]).
+ once(debugOnError(doall(call_no_cuts(user:listing_mpred_hook(Match))))),
+ !. %format(' <= listing_mpred_hook(~q) */ ~n',[Match]).
 
 :-export(term_non_listing/1).
 term_non_listing(Match):- 
@@ -3369,7 +3299,7 @@ term_non_listing(Match):-
 % user:prolog_list_goal(Goal):- writeq(hello(prolog_list_goal(Goal))),nl.
 
 :- multifile prolog:locate_clauses/2.
-prolog:locate_clauses(A, _) :- once(term_dbase_listing(A)),fail.
+prolog:locate_clauses(A, _) :- current_predicate(user:term_dbase_listing/1),call_no_cuts(user:term_dbase_listing(A)),fail.
 
 :-export((synth_clause_for/3)).
 synth_clause_for(H,B,Ref):- cur_predicate(_,H),synth_clause_ref(H,B,Ref).
@@ -3498,6 +3428,114 @@ portray_hb(H,B):- portray_one_line((H:-B)).
 :-export(portray_one_line/1).
 portray_one_line(H):- current_predicate(wdmsg/1),wdmsg(H),!.
 portray_one_line(H):- not(not((snumbervars(H),writeq(H),write('.'),nl))),!.
+
+
+
+
+
+:-module_transparent(nth_pi/2).
+:-module_transparent(nth_goal/2).
+:-module_transparent(nth_frame/3).
+:-module_transparent(nth_frame_attribute/5).
+nth_pi(Nth, Value):- prolog_current_frame(Frame), nth_frame_attribute(Nth,-1, Frame, predicate_indicator, Value).
+nth_goal(Nth, Value):- prolog_current_frame(Frame), nth_frame_attribute(Nth,-1, Frame, goal, Value).
+nth_frame(Nth, Key, Value):- prolog_current_frame(Frame), nth_frame_attribute(Nth,-1, Frame, Key, Value).
+nth_frame_attribute(Nth,NthIn, Frame, Key, Value):-  
+   (NthIn>=0,Nth=NthIn,prolog_frame_attribute(Frame, Key, Value));
+   ((prolog_frame_attribute(Frame, parent, ParentFrame),
+     NthNext is NthIn + 1, nth_frame_attribute(Nth,NthNext, ParentFrame, Key, Value))).
+
+in_file_expansion :- nth_pi(LF,_:'$load_file'/_),nth_pi(TL,'$toplevel':_/0),!,LF<TL, 
+  (nth_pi(ED,_:'$execute_directive_3'/_)-> (LF<ED) ; true).
+
+in_file_directive :- nth_pi(LF,_:'$load_file'/_),nth_pi(TL,'$toplevel':_/0),!,LF<TL, 
+  (nth_pi(ED,_:'$execute_directive_3'/_)-> (LF>ED) ; false).
+
+in_toplevel :- nth_pi(LF,_:'$load_file'/_),nth_pi(TL,'$toplevel':_/0),!,LF>TL, 
+  (nth_pi(ED,_:'$execute_directive_3'/_)-> (ED>TL) ; true).
+
+
+
+
+
+
+
+
+:- module_predicates_are_exported(bugger).
+:- module_meta_predicates_are_transparent(bugger).
+:- all_module_predicates_are_transparent(bugger).
+:- all_module_predicates_are_transparent(logicmoo_util_bugger_catch).
+
+:-module_property(bugger, exports(List)),moo_show_childs(List).
+
+% bugger_prolog_exception_hook(error(syntax_error(operator_expected),_),_,_,_).
+bugger_prolog_exception_hook(Info,_,_,_):- bugger_error_info(Info),!, dumpST,dmsg(prolog_exception_hook(Info)), dtrace.
+
+bugger_error_info(C):-contains_var(type_error,C).
+bugger_error_info(C):-contains_var(instantiation_error,C).
+bugger_error_info(C):-contains_var(existence_error(procedure,_/_),C).
+
+% Installs exception reporter.
+:- multifile(user:prolog_exception_hook/4).
+:- dynamic(user:prolog_exception_hook/4).
+% Writes exceptions with stacktrace into stderr.
+% Fail/0 call at the end allows the exception to be
+% processed by other hooks too.
+:- asserta((user:prolog_exception_hook(Exception, Exception, Frame, _):- 
+    (   Exception = error(Term)
+    ;   Exception = error(Term, _)),
+    Term \= type_error(number,_), 
+    Term \= type_error(character_code,_), 
+    Term \= type_error(character,_), 
+    Term \= type_error(text,_), 
+    Term \= syntax_error(_), 
+    format(user_error, 'Error ST-Begin: ~p', [Term]), nl(user_error),
+    dumpST(Frame,20),
+    format(user_error, 'Error ST-End: ~p', [Term]), nl(user_error),
+    nl(user_error), fail)).
+
+
+% show the warnings origins
+:-multifile(user:message_hook/3).
+:-dynamic(user:message_hook/3).
+:- asserta((user:message_hook(Term, Kind, Lines):- (Kind= warning;Kind= error),Term\=syntax_error(_),
+  dmsg(user:message_hook(Term, Kind, Lines)),notrace(dumpST(20)),dmsg(user:message_hook(Term, Kind, Lines)),fail)).
+
+% have to load this module here so we dont take ownership of prolog_exception_hook/4.
+:- user_use_module(library(prolog_stack)).
+
+user:prolog_exception_hook(A,B,C,D):- fail,
+   once(copy_term(A,AA)),catchv(( once(bugger_prolog_exception_hook(AA,B,C,D))),_,fail),fail.
+
+:-'$syspreds':'$hide'('$syspreds':leash/1).
+:-'$syspreds':'$hide'(leash/1).
+:-'$syspreds':'$hide'('$syspreds':visible/1).
+:-'$syspreds':'$hide'(visible/1).
+:-'$syspreds':'$hide'(notrace/0).
+:-'$syspreds':'$hide'(hotrace/1).
+:-'$syspreds':'$hide'(trace/0).
+% :-'$set_predicate_attribute'(!, trace, 1).
+
+:-hideTrace.
+
+%:-module(bugger).
+%:-prolog.
+
+:-retract(double_quotes_was(WAS)),set_prolog_flag(double_quotes,WAS).
+:-moo_hide_all(with_assertions/2).
+:-'$set_predicate_attribute'(with_assertions(_,_), hide_childs, 0).
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 end_of_file.

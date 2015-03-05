@@ -574,7 +574,7 @@ instances_sortable0(tWearAble,distance_to_current_avatar(Agent)):-current_agent_
 
 distance_to_current_avatar(Agent,ORDEROUT,L,R):-mudDistance(Agent,L,L1),mudDistance(Agent,R,R1),compare(ORDER,L1,R1),!, (ORDER == '=' -> naming_order(ORDEROUT,L,R) ; ORDEROUT=ORDER).
 
-mudDistance(Agent,Obj,(-1)):- var(Agent),!.
+mudDistance(Agent,_Obj,(-1)):- var(Agent),!.
 mudDistance(Agent,Obj,0):- mudWielding(Agent,Obj),!.
 mudDistance(Agent,Obj,1):- wearsClothing(Agent,Obj),!.
 mudDistance(Agent,Obj,2):- mudStowing(Agent,Obj),!.

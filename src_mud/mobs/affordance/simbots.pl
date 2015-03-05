@@ -12,6 +12,8 @@
 
 :- include(logicmoo(vworld/moo_header)).
 
+:- discontiguous(defined_affordance/1).
+
 % See the the seemingly white (not dirrectly usable) in some tUsefull way
 defined_affordance([subjType= "Passable",actionVerb= "TravelThru"]).
 
@@ -598,7 +600,7 @@ user:action_info(Templ,DESC):-verb_desc(V,O,DESC),Templ=..[V,O].
 user:action_info(Templ,text([verb_for_type,V,O,DOC])):- no_repeats([V,O],verb_affordance(V,O,_,_,_)),Templ=..[V,O], 
                   findall(pir(P,I,R),((verb_affordance(V, O,P,I,R))),DOC).
 
-vtActionTemplate(Templ):-simbots_templates(Templ).
+action_info(Templ):-simbots_templates(Templ).
 simbots_templates(Templ):-no_repeats(simbots_templates0(Templ)).
 simbots_templates0(Templ):-verb_for_type(V, O),Templ=..[V,O].
 simbots_templates0(Templ):-verb_desc(V,O,_),Templ=..[V,O].

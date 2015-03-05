@@ -143,7 +143,7 @@ user_ensure_nl_loaded(F):-load_files([F],[expand(true),if(changed),qcompile(auto
 % :- user_ensure_loaded(logicmoo(pldata/tt0_00022_cycl)).
 % :- user_ensure_loaded(logicmoo(pldata/hl_holds)).
 % :- user_ensure_loaded(logicmoo(pldata/mworld0)).
-:- user_ensure_nl_loaded(logicmoo(pldata/transform_dump)).
+% :- user_ensure_nl_loaded(logicmoo(pldata/transform_dump)).
 % :- catch(user_ensure_loaded(logicmoo(pldata/withvars_988)),_,true).
 download_and_install_el:-
   shell('wget -N http://logicmoo.org/devel/LogicmooDeveloperFramework/TEMP~/www.logicmoo.org/downloads/datafiles/PlDataBinary.zip',_),

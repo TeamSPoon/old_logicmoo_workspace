@@ -31,11 +31,11 @@ get_pifunctor(Head,PHead,F,A):-atom(Head),ensure_arity(Head,A),!,get_pifunctor(H
 % INSTALL STORAGE STUBS
 % ================================================================================
 
-maybe_storage_stub(F,StubType):- hybrid_tPredStubImpl(StubType),not((StubType==prologOnly)),mpred_arity(F,A),must(ensure_universal_stub(F/A)).
+maybe_storage_stub(F,StubType):- hybrid_tPredStubImpl(StubType),not((StubType==prologOnly)),arity(F,A),must(ensure_universal_stub(F/A)).
 
 % user:decl_database_hook(change(assert,_),user:mpred_prop(F,StubType)):- maybe_storage_stub(F,StubType).
 % user:decl_database_hook(change(assert,_),isa(F,StubType)):- maybe_storage_stub(F,StubType).
-% user:decl_database_hook(change(assert,_),mpred_arity(F,StubType)):-  hybrid_tPredStubImpl(StubType),user:mpred_prop(F,StubType),must(ensure_universal_stub(F/A)).
+% user:decl_database_hook(change(assert,_),arity(F,StubType)):-  hybrid_tPredStubImpl(StubType),user:mpred_prop(F,StubType),must(ensure_universal_stub(F/A)).
 
 
 % has_storage_stub(Head):- !.
@@ -193,9 +193,9 @@ call_wdmsg(P,DB,F,_):- append_term(P,DB,CALL),dmsg(info(CALL)),must(user:mpred_p
 % pass 2
 scan_missing_stubs(F):-
    ignore((forall(mpred_missing_stubs(F,A),
-      (mpred_arity(F,A),show_call(ensure_universal_stub(F/A)))))).
+      (arity(F,A),show_call(ensure_universal_stub(F/A)))))).
 
-mpred_missing_stubs(F,A):-prologHybrid = StubType, hybrid_tPredStubImpl(StubType),user:mpred_prop(F,StubType),must(mpred_arity(F,A)),not(has_storage_stub(F/A)).
+mpred_missing_stubs(F,A):-prologHybrid = StubType, hybrid_tPredStubImpl(StubType),user:mpred_prop(F,StubType),must(arity(F,A)),not(has_storage_stub(F/A)).
 
 
 :-assertz_if_new(call_OnEachLoad(rescan_missing_stubs)).
@@ -203,8 +203,8 @@ mpred_missing_stubs(F,A):-prologHybrid = StubType, hybrid_tPredStubImpl(StubType
 :-export(rescan_missing_stubs/0).
 % rescan_missing_stubs:-no_rescans,!.
 rescan_missing_stubs:-loop_check_local(time_call(rescan_missing_stubs_ilc),true).
-rescan_missing_stubs_ilc:- once(thglobal:use_cyc_database), once(with_assertions(thlocal:useOnlyExternalDBs,forall((kb_t(arity(F,A)),A>1,good_pred_relation_name(F,A),not(mpred_arity(F,A))),with_no_dmsg(decl_mpred_mfa,decl_mpred_hybrid(F,A))))),fail.
-rescan_missing_stubs_ilc:- hotrace((doall((mpred_missing_stubs(F,A),mpred_arity(F,A),ensure_universal_stub(F/A))))).
+rescan_missing_stubs_ilc:- once(thglobal:use_cyc_database), once(with_assertions(thlocal:useOnlyExternalDBs,forall((kb_t(arity(F,A)),A>1,good_pred_relation_name(F,A),not(arity(F,A))),with_no_dmsg(decl_mpred_mfa,decl_mpred_hybrid(F,A))))),fail.
+rescan_missing_stubs_ilc:- hotrace((doall((mpred_missing_stubs(F,A),arity(F,A),ensure_universal_stub(F/A))))).
 
 no_rescans.
 

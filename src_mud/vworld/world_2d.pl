@@ -163,9 +163,14 @@ mudNearbyRegions(R1,R1).
 
 %transitive_other(mudAtLoc,1,Obj,What):-mudInsideOf(Obj,What).
 
-mudAtLoc(Obj,Where):-mudSubPart(What,Obj),mudAtLoc(What,Where).
+is_at(Obj,Where):-localityOfObject(Obj,Where).
+is_at(Obj,Where):-mudAtLoc(Obj,Where).
+is_at(Obj,Where):-mudSubPart(What,Obj),is_at(What,Where).
 
-localityOfObject(Obj,Where)<= mudSubPart(What,Obj),localityOfObject(What,Where).
+(tObj(Obj), ~mudPossses(_,Obj))=>spatialInRegion(Obj).
+tPathway(Obj)=>spatialInRegion(Obj).
+
+
 localityOfObject(Obj,Region),tRegion(Region)=> inRegion(Obj,Region).
 
 
@@ -200,25 +205,25 @@ mostSpecificLocalityOfObject(Obj,Where):-
 
 
 % objects can be two places x,y,z's at once
-((mudAtLoc(Obj,NewLoc), 
+((spatialInRegion(Obj),mudAtLoc(Obj,NewLoc), 
  {(mudAtLoc(Obj,OldLoc), OldLoc\==NewLoc)})
    =>
    ~mudAtLoc(Obj,OldLoc)).
 
 % objects are placed by default in center of region
-((inRegion(Obj,Region), ~tPathway(Obj), ~mudPossess(_,Obj),
-{not_asserted(mudAtLoc(Obj,xyzFn(Region,_,_,_))),in_grid_rnd(Region,LOC)})
+((spatialInRegion(Obj), inRegion(Obj,Region), ~tPathway(Obj),
+ {not_asserted(mudAtLoc(Obj,xyzFn(Region,_,_,_))),in_grid_rnd(Region,LOC)})
   =>
-  mudAtLoc(Obj,LOC)).
+   mudAtLoc(Obj,LOC)).
 
 % objects cannot be in two localities (Regions?) at once
-((localityOfObject(Obj,NewLoc), 
+((spatialInRegion(Obj),localityOfObject(Obj,NewLoc), 
  {(localityOfObject(Obj,OldLoc), OldLoc\==NewLoc)})
   => 
   ~localityOfObject(Obj,OldLoc)).
 
 % if something leaves a room get rid of old location 
-((inRegion(Obj,NewRegion), 
+((spatialInRegion(Obj),inRegion(Obj,NewRegion), 
  {(mudAtLoc(Obj,OldLoc), OldLoc\=xyzFn(NewRegion,_,_,_))})
   => 
   ~mudAtLoc(Obj,OldLoc)).
@@ -237,7 +242,7 @@ mudExitAtLoc(Region,Dir,xyzFn(Region,X,Y,Z)):-calc_from_center_xyz(Region,Dir,2,
 
 :- decl_mpred_hybrid(mudSubPart/2).
 :- decl_mpred_hybrid(predInnerArgIsa/1).
-:- decl_mpred_hybrid(predRelationAllExists/3).
+:- decl_mpred_hybrid(relationAllExists/3).
 
 
 genls(tPlayer,tHominid).
@@ -245,10 +250,13 @@ genls(tHumanBody,tBodyPart).
 
 predInnerArgIsa(mudSubPart(tBodyPart,tBodyPart)).
 
-predRelationAllExists(mudSubPart,tHominid,tHumanBody).
-predRelationAllExists(mudSubPart,tHumanBody,tBodyPart).
-predRelationAllExists(mudSubPart,tHumanBody,isEach(tHumanHead,tHumanNeck,tHumanUpperTorso,tHumanLowerTorso,tHumanPelvis,tHumanArms,tHumanLegs)).
-predRelationAllExists(mudSubPart,tHumanHead,isEach(tHumanFace,tHumanHair)).
+
+relationAllExists(Pred,Col1,Col2), isa(Inst,Col1) => ({G=..[Pred,Inst,Value]},( ~G => ({Value=skFn(Pred,Col2)},isa(Value,Col2), G))).
+
+relationAllExists(mudSubPart,tHominid,tHumanBody).
+relationAllExists(mudSubPart,tHumanBody,tBodyPart).
+relationAllExists(mudSubPart,tHumanBody,isEach(tHumanHead,tHumanNeck,tHumanUpperTorso,tHumanLowerTorso,tHumanPelvis,tHumanArms,tHumanLegs)).
+relationAllExists(mudSubPart,tHumanHead,isEach(tHumanFace,tHumanHair)).
 
 predPredicateToFunction(Pred,SubjT,ObjT,FullNameFnO):- 
   is_asserted(predPredicateToFunction(Pred,SubjT,ObjT,FullNameFn)) *-> FullNameFnO=FullNameFn ; 
@@ -256,7 +264,7 @@ predPredicateToFunction(Pred,SubjT,ObjT,FullNameFnO):-
 
 simplifyFullName(FullNameFn,FullNameFn).
 
-find_instance_of(Pred,Subj,Obj):- predRelationAllExists(Pred,SubjT,ObjT), isa(Subj,SubjT), 
+find_instance_of(Pred,Subj,Obj):- relationAllExists(Pred,SubjT,ObjT), isa(Subj,SubjT), 
  (is_asserted(dbase_t(Pred,Subj,Obj),isa(Obj,ObjT)) *-> true ; (predPredicateToFunction(Pred,SubjT,ObjT,PredFn), Obj =.. [PredFn,Subj])).
 
 mudSubPart(Outer,Inner):-mudInsideOf(Inner,Outer).

@@ -82,8 +82,8 @@ coerce(What,Type,NewThing,_Else):-coerce(What,Type,NewThing),!.
 coerce(_ ,_,     NewThing,Else):- NewThing = Else.
 
 
-mpred_arity_pred(P):- nonvar(P),arg(_,a(arity,mpred_arity,arityMax,arityMin),P).
-mpred_arity_pred(mpred_arity).
+mpred_arity_pred(P):- nonvar(P),arg(_,a(arity,arity,arityMax,arityMin),P).
+mpred_arity_pred(arity).
 
 as_one_of(Types,Type):-nonvar(Type),tCol(Type),!,member(Type,Types).
 as_one_of([Type],TypeO):-!,same_arg(same_or(genls),Type,TypeO).
@@ -191,7 +191,7 @@ argIsa_call_0(F,N,ftAskable):- current_predicate(F/A),N =< A, functor(P,F,A), pr
 
 
 
-argIsa_call_3(WP,tPred(mpred_arity(2))):-member(WP,[predProxyRetract,predProxyAssert,predProxyQuery,genlPreds,genlInverse]).
+argIsa_call_3(WP,tPred(arity(2))):-member(WP,[predProxyRetract,predProxyAssert,predProxyQuery,genlPreds,genlInverse]).
 argIsa_call_3(disjointWith,tCol).
 argIsa_call_3(ftFormFn,ftTerm).
 argIsa_call_3(mudTermAnglify,ftTerm).
@@ -215,7 +215,7 @@ grab_argsIsa(was_imported_kb_content, A):-trace_or_throw(crazy_grab_argsIsa(was_
 grab_argsIsa(F,Types):- hasInstance(ttFormatted,Types),compound(Types),get_functor(Types,F),assert_predArgTypes_fa(F,Types).
 grab_argsIsa(F,Types):- hasInstance(predArgTypes,Types),compound(Types),get_functor(Types,F),assert_predArgTypes_fa(F,Types).
 grab_argsIsa(F,Types):- is_asserted(defnSufficient(Types,_)),compound(Types),get_functor(Types,F),assert_predArgTypes_fa(F,Types).
-grab_argsIsa(F,Types):- is_asserted(vtActionTemplate(Types)),compound(Types),get_functor(Types,F),assert_predArgTypes_fa(F,Types).
+grab_argsIsa(F,Types):- is_asserted(get_all_templates(Types)),compound(Types),get_functor(Types,F),assert_predArgTypes_fa(F,Types).
 grab_argsIsa(F,Types):- current_predicate(get_all_templates/1),get_all_templates(Types),ground(Types),get_functor(Types,F),assert_predArgTypes_fa(F,Types).
 grab_argsIsa(F,Types):- hasInstance(_,Types),compound(Types),ground(Types),get_functor(Types,F),assert_predArgTypes_fa(F,Types).
 
@@ -233,7 +233,7 @@ argIsa_call_1(F,_,ftTerm(ftProlog)):-member(F/_,
                                 formatted_resultIsa/2,
                                 bracket/3]).
 
-argIsa_call_1(Prop,N1,Type):- mpred_arity(Prop,Arity),dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),must(N1=<Arity),must( Type=argIsaFn(Prop,N1)).
+argIsa_call_1(Prop,N1,Type):- arity(Prop,Arity),dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),must(N1=<Arity),must( Type=argIsaFn(Prop,N1)).
 
 argIsa_call_1(Prop,N1,Type):- dmsg(todo(define(argIsa_call(Prop,N1,'_TYPE')))),must( Type=argIsaFn(Prop,N1)).
 argIsa_call_1(_,_,ftTerm).
@@ -252,7 +252,7 @@ correctArgsIsa(_,(A,B),(AA,BB)):-!,correctArgsIsa(Op,A,AA),correctArgsIsa(Op,B,B
 correctArgsIsa(_,isa(Args,PredArgTypes),isa(Args,PredArgTypes)):- predArgTypes==predArgTypes,!.
 correctArgsIsa(_,G,GG):- get_functor(G,F,A),
   arg(_,vv(genls/_,user:mpred_prop/_,
-    hasInstance/2,mpred_arity/_,genls/_,'<=>'/_,
+    hasInstance/2,arity/_,genls/_,'<=>'/_,
     formatted_resultIsa/_,resultIsa/_,defnSufficient/_),F/A),!,must_equals(G,GG).
 correctArgsIsa(_,G,GG):- get_functor(G,F),hasInstance(functorDeclares,F),!,must_equals(G,GG).
 correctArgsIsa(_,G,GG):- thlocal:infSkipArgIsa, !,must_equals(G,GG).
@@ -296,7 +296,7 @@ discoverAndCorrectArgsIsa_from_left(Op,Prop,N1,[A|Args],Out):-
 
 
 mpred_full_arity({},A):-trace_or_throw(crazy_mpred_full_arity({}, A)).
-mpred_full_arity(F,A):-mpred_arity(F,A),!.
+mpred_full_arity(F,A):-arity(F,A),!.
 mpred_full_arity(F,A):-grab_argsIsa(F,Types),show_call((functor(Types,F,A),assert_arity(F,A))),!.
 
 :-export(correctAnyType/4).

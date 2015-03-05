@@ -25,7 +25,7 @@ if_result(TF,Call):-(TF->Call;true).
 
 :- dbase_mod(M),export((
           % M:dbase_t/1,
-          % M:dbase_t/2,
+          M:dbase_t/2,
           M:dbase_t/3,
           M:dbase_t/4,
           M:dbase_t/5,
@@ -53,13 +53,17 @@ if_result(TF,Call):-(TF->Call;true).
 :-export((dbase_t/1,hasInstance/2)).
 :- dynamic((
          % dbase_t/1,
-         % dbase_t/2,
+          dbase_t/2,
           dbase_t/3,
           dbase_t/4,
           dbase_t/5,
           dbase_t/6,
           dbase_t/7,
-          asserted_dbase_t/1,
+          dbase_t/8,
+          dbase_t/9,
+          dbase_t/10,
+          dbase_t/11,
+        %  asserted_dbase_t/1,
           asserted_dbase_t/2,
           asserted_dbase_t/3,
           asserted_dbase_t/4,
@@ -68,14 +72,14 @@ if_result(TF,Call):-(TF->Call;true).
           asserted_dbase_t/7,
           assertion_f/1,
           assertion_t/1,
-          asserted_dbase_f/1,
+        %  asserted_dbase_f/1,
           asserted_dbase_f/2,
           asserted_dbase_f/3,
           asserted_dbase_f/4,
           asserted_dbase_f/5,
           asserted_dbase_f/6,
           asserted_dbase_f/7,
-          dbase_f/1,
+         % dbase_f/1,
           dbase_f/2,
           dbase_f/3,
           dbase_f/4,
@@ -97,7 +101,7 @@ into_plist_arities(_,_,Call,PLIST):-Call=..PLIST. % finally the fallthrue
 
 never_dbase_mpred(user:mpred_prop).
 never_dbase_mpred(isa).
-never_dbase_mpred(mpred_arity).
+never_dbase_mpred(arity).
 
 
 % ================================================================================
@@ -138,9 +142,13 @@ dbase_t(P,A1,A2,A3,A4,A5,A6):- mpred_pa_call(P,6,call(P,A1,A2,A3,A4,A5,A6)).
 dbase_t(P,A1,A2,A3,A4,A5,A6,A7):- loop_check_mpred(dbase_t(P,A1,A2,A3,A4,A5,A6,A7)).
 dbase_t(P,A1,A2,A3,A4,A5,A6,A7):- mpred_pa_call(P,7,call(P,A1,A2,A3,A4,A5,A6,A7)).
 
-mpred_pa_call(F,A,Call):-mpred_arity(F,A),current_predicate(F/A),call(Call).
+mpred_pa_call(F,A,Call):-arity(F,A),current_predicate(F/A),call(Call).
 
-isCycPredArity_ignoreable(F,A):- ignore(user:mpred_prop(F,cycPred(A))),ignore(mpred_arity(F,A)).
+mpred_fact_arity(F,A):-arity(F,A),once(mpred_prop(F,prologHybrid);mpred_prop(F,pfcControlled);mpred_prop(F,prologPTTP);mpred_prop(F,prologSNARK)).
+
+prologHybridFact(G):- (var(G)->(mpred_fact_arity(F,A),functor(G,F,A));true),into_mpred_form(G,M),!,no_repeats(mpred_call(M)).
+
+isCycPredArity_ignoreable(F,A):- ignore(user:mpred_prop(F,cycPred(A))),ignore(arity(F,A)).
 
 which_t(dac(d,a_notnow,c,no_fallback)).
 
@@ -203,7 +211,7 @@ decl_mpred_hybrid(F,A):- integer(A),!,decl_mpred_hybrid(F/A).
 decl_mpred_hybrid(F,Other):- 
      decl_mpred(F,Other),
      get_functor(F,F0),
-     must(mpred_arity(F0,A)),
+     must(arity(F0,A)),
      decl_mpred_hybrid(F0/A).
 
 :-export(decl_mpred_hybrid/3).
@@ -212,14 +220,14 @@ decl_mpred_hybrid3(M,PI,FA):- loop_check(must(decl_mpred_hybrid_ilc(M,PI,FA)),tr
 
 
 decl_mpred_hybrid_ilc(M,F,F/0):-
-    mpred_arity(F,A),!,
+    arity(F,A),!,
     must((functor(PI,F,A),
     decl_mpred_hybrid_ilc(M,PI,F/A))).
 
 decl_mpred_hybrid_ilc(M,PI,F/A):-
      must(not(user:mpred_prop(F,prologOnly))),
      assert_arity(F,A),
-     must(mpred_arity(F,A)),
+     must(arity(F,A)),
      must(M=user),
      decl_mpred_mfa(M,F,A),
      decl_mpred_pi(PI),
@@ -234,7 +242,7 @@ decl_mpred_hybrid4(_CM,M,PI,F/A):-
 
 
 ensure_universal_stub_plus_minus_2_HIDE(F,AMinus2):-
-   decl_mpred(F,mpred_arity(AMinus2)),
+   decl_mpred(F,arity(AMinus2)),
    decl_mpred_hybrid(F/AMinus2).
    
 ensure_universal_stub_plus_2(F,A2):- once(( AMinus2 is A2 -2, ensure_universal_stub_plus_minus_2(F,AMinus2))),fail.
@@ -364,7 +372,7 @@ assert_dbase_t(G):-add_from_file(G).
 
 :- op(1150,fx,decl_mpred_hybrid).
 
-user:listing_mpred_hook(_F_A,Match):- 
+user:listing_mpred_hook(Match):- 
  (( 
   dif:dif(How,prolog(_)),
   no_repeats_old([H,B],((user:provide_mpred_storage_clauses(dbase_t,H,B,_)),
@@ -386,7 +394,7 @@ dbase_t_mpred_storage_clauses_rules(ruleBackward,H,B):-ruleBackward(H,B).
 
 
 dbase_t_provide_mpred_storage_op(Op,HB):-notrace(demodulize(Op,HB,HeadBody)),get_functor(HeadBody,F),(F==dbase_t;user:mpred_prop(F,prologHybrid)), must(is_mpred_op(Op)), 
-    with_assertions(thlocal:already_in_kb_term_expansion,dbase_t_storage_op(Op,HeadBody)).
+    with_assertions(thlocal:already_in_file_term_expansion,dbase_t_storage_op(Op,HeadBody)).
 
 % ====================================================
 % dbase_t_storage_op/2
@@ -596,11 +604,11 @@ retract_ar_fact(one,What):- dmsg(mssing(retract_ar_fact(one,What))).
 
 make_functorskel(_,_):-!. % currently ununused
 make_functorskel(F,_):- fskel(F,_,_,_,_,_,_),!.
-make_functorskel(F,N):- mpred_arity(F,N),make_functorskel(F,N,SKEL),asserta(SKEL),!.
-make_functorskel(F,N):- ignore(mpred_arity(F,A)),dmsg(todo(trace_or_throw(illegal_make_functorskel(F,N,A)))).
+make_functorskel(F,N):- arity(F,N),make_functorskel(F,N,SKEL),asserta(SKEL),!.
+make_functorskel(F,N):- ignore(arity(F,A)),dmsg(todo(trace_or_throw(illegal_make_functorskel(F,N,A)))).
 
 dbase2pred2svo(DBASE,PRED,svo(A,F,RGS)):-fskel(F,DBASE,PRED,A,RGS,_,_),!.
 dbase2pred2svo(DBASE,PRED,svo(A,F,RGS)):-compound(PRED),functor(PRED,F,N),make_functorskel(F,N),!,fskel(F,DBASE,PRED,A,RGS,_,_),!.
-dbase2pred2svo(DBASE,PRED,svo(A,F,RGS)):-compound(DBASE),!,arg(1,DBASE,F),must_det(mpred_arity(F,N)),make_functorskel(F,N),!,fskel(F,DBASE,PRED,A,RGS,_,_),!.
-dbase2pred2svo(DBASE,PRED,svo(A,F,RGS)):-nonvar(F),must(mpred_arity(F,N)),make_functorskel(F,N),!,fskel(F,DBASE,PRED,A,RGS,_,_),!.
+dbase2pred2svo(DBASE,PRED,svo(A,F,RGS)):-compound(DBASE),!,arg(1,DBASE,F),must_det(arity(F,N)),make_functorskel(F,N),!,fskel(F,DBASE,PRED,A,RGS,_,_),!.
+dbase2pred2svo(DBASE,PRED,svo(A,F,RGS)):-nonvar(F),must(arity(F,N)),make_functorskel(F,N),!,fskel(F,DBASE,PRED,A,RGS,_,_),!.
 

@@ -24,24 +24,24 @@ parse_sexpr(String, Expr) :- phrase(sexpr(Expr), String).
 % Use DCG for parser.
 
 
-sexpr(L)                      --> "(", !, white, sexpr_list(L), white.
-sexpr(vec(V))                 --> "#(", !, sexpr_vector(V), white.
-sexpr(s(t))                 --> "#t", !, white.
-sexpr(s(f))                 --> "#f", !, white.
-sexpr(s(E))              --> "#$", !, white, sexpr(E).
-sexpr(chr(N))                 --> "#\\", [C], !, {N is C}, white.
-sexpr(str(S))                 --> """", !, sexpr_string(S), white.
-sexpr([s(quote),E])              --> "'", !, white, sexpr(E).
-sexpr([s(backquote),E])         --> "`", !, white, sexpr(E).
-sexpr(['unquote-splicing',E]) --> ",@", !, white, sexpr(E).
-sexpr(comma(E))            --> ",", !, white, sexpr(E).
-sexpr(s(E))                      --> sym_or_num(E),!, white.
+sexpr(L)                      --> "(", !, swhite, sexpr_list(L), swhite.
+sexpr(vec(V))                 --> "#(", !, sexpr_vector(V), swhite.
+sexpr(s(t))                 --> "#t", !, swhite.
+sexpr(s(f))                 --> "#f", !, swhite.
+sexpr(s(E))              --> "#$", !, swhite, sexpr(E).
+sexpr(chr(N))                 --> "#\\", [C], !, {N is C}, swhite.
+sexpr(str(S))                 --> """", !, sexpr_string(S), swhite.
+sexpr([s(quote),E])              --> "'", !, swhite, sexpr(E).
+sexpr([s(backquote),E])         --> "`", !, swhite, sexpr(E).
+sexpr(['unquote-splicing',E]) --> ",@", !, swhite, sexpr(E).
+sexpr(comma(E))            --> ",", !, swhite, sexpr(E).
+sexpr(s(E))                      --> sym_or_num(E),!, swhite.
 
-blank --> [C], {C =< 32}, white.
-blank --> ";", comment, white.
+sblank --> [C], {C =< 32}, swhite.
+sblank --> ";", comment, swhite.
 
-white --> blank.
-white --> [].
+swhite --> sblank.
+swhite --> [].
 
 comment --> [C], {eoln(C)}, !.
 comment --> [C], comment.
@@ -70,14 +70,15 @@ chr(92) --> "\\", !.
 chr(34) --> "\"", !.
 chr(N)  --> [C], {C >= 32, N is C}.
 
-sym_or_num(E) --> [C], {sym_char(C)}, sym_string(S), {string_to_atom([C|S],E)}.
+sym_or_num(s(E)) --> [C], {sym_char(C)}, sym_string(S), {string_to_atom([C|S],E)}.
+sym_or_num(n(E)) --> snumber(E).
 
 sym_string([H|T]) --> [H], {sym_char(H)}, sym_string(T).
 sym_string([]) --> [].
 
-number(N) --> unsigned_number(N).
-number(N) --> "-", unsigned_number(M), {N is -M}.
-number(N) --> "+", unsigned_number(N).
+snumber(N) --> unsigned_number(N).
+snumber(N) --> "-", unsigned_number(M), {N is -M}.
+snumber(N) --> "+", unsigned_number(N).
 
 unsigned_number(N) --> cdigit(X), unsigned_number(X,N).
 unsigned_number(N,M) --> cdigit(X), {Y is N*10+X}, unsigned_number(Y,M).
@@ -87,7 +88,7 @@ cdigit(N) --> [C], {C >= 48, C =<57, N is C-48}.
 
 % . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-sexpr(E,C,X,Z) :- white([C|X],Y), sexpr(E,Y,Z).
+sexpr(E,C,X,Z) :- swhite([C|X],Y), sexpr(E,Y,Z).
 
 % dquote semicolon parens  hash qquote comma, backquote
 sym_char(C) :- C > 32, not(member(C,[34,59,40,41,35,39,44,96])).  

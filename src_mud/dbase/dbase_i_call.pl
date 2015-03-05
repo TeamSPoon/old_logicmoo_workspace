@@ -48,7 +48,7 @@ dbase_op(change(retract,Op),H):-!,must(dbase_modify(change(retract,Op),H)),!.
 dbase_op(query(dbase_t,Ireq),  H ):-!, dbase_op(Ireq,H).
 dbase_op(query(Dbase_t,_Ireq),  H ):-!, dbase_op(Dbase_t,H).
 dbase_op(call(Op),H):-!,dbase_op(Op,H).
-dbase_op(Op,((include(A)))):- with_no_assertions(thlocal:already_in_kb_term_expansion,dbase_op(Op,((load_data_file(A))))),!.
+dbase_op(Op,((include(A)))):- with_no_assertions(thlocal:already_in_file_term_expansion,dbase_op(Op,((load_data_file(A))))),!.
 dbase_op(Op, call(H)):- nonvar(H),!, dbase_op(Op,H).
 dbase_op(Op,  not(H)):- nonvar(H),!, dbase_op(neg(not,Op),H).
 dbase_op(Op,'\\+'(H)):- nonvar(H),!, dbase_op(neg(('\\+'),Op),H).
@@ -139,7 +139,7 @@ mpred_call(Call):-
      must((Call=..[Was|Apply],lookup_inverted_op(Was,InvertCurrent,_WasPol))),
    ((OverridePolarity ==('-') -> debugOnError(show_call(apply(InvertCurrent,Apply))) ; debugOnError(show_call(apply(Was,Apply))))))).
 
-mpred_call(Call):-fully_expand(_,Call,Expand),!,mpred_call_0(Expand).
+mpred_call(Call):-fully_expand(query(dbase_t,mpred_call),Call,Expand),!,mpred_call_0(Expand).
 
 mpred_call_0(Call):- one_must(mpred_call_1(Call),mpred_call_2(Call)).
 

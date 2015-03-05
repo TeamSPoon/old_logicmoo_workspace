@@ -24,7 +24,10 @@ with_no_dbase_expansions(Goal):-
 % bugger:action_verb_useable(actWearUnused,wearsClothing,tWearAble,mudPossess).
 
 % [Manditory] define how we interact with the module system
+:-if(not(current_predicate(swi_module/2))).
 swi_module(M,E):-dmsg(swi_module(M,E)).
+:-endif.
+
 
 % [Optionaly] Set the Prolog optimize/debug flags
 :- set_prolog_flag(verbose_load,true).
@@ -52,13 +55,13 @@ do_semweb_startup:-
 user:semweb_startup:-ensure_loaded('run_clio').
 
 % [Optionaly] register/run KnowRob robot services (we use it for the ontology mainly)
-user:semweb_startup :- with_no_term_expansions(if_file_exists(ensure_loaded('../externals/MUD_KnowRob/knowrob_addons/knowrob_mud/prolog/init.pl'))).
+% TODO user:semweb_startup :- with_no_term_expansions(if_file_exists(ensure_loaded('../externals/MUD_KnowRob/knowrob_addons/knowrob_mud/prolog/init.pl'))).
 
 % [Optionaly] register/run MILO robot services (we use it for the ontology mainly)
-user:semweb_startup :- register_ros_package(milo).
+% TODO user:semweb_startup :- register_ros_package(milo).
 
 % [Optionaly] register/run EulerSharp robot services (we use it for the ontology mainly)
-user:semweb_startup :- register_ros_package(euler).
+% TODO user:semweb_startup :- register_ros_package(euler).
 
 :- with_no_dbase_expansions(if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop.pl'))).
 :- current_predicate(egg_go/0)->egg_go;true.
@@ -74,8 +77,7 @@ user:semweb_startup :- register_ros_package(euler).
 
 :-multifile(pre_file_search_path/2).
 % user:pre_file_search_path(_,_):-!,fail.
-% :- do_semweb_startup.
-% :- do_web_startup.
+%:- do_semweb_startup.
 
 
 % [Manditory] load_default_game

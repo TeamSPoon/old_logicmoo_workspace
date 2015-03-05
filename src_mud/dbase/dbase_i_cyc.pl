@@ -160,7 +160,7 @@ loadTinyAssertions:-forall(tinyAssertion(V),hooked_asserta(V)).
 % DBASE to Cyc Predicate Mapping
 % ============================================
 /*
-mpred_arity('abbreviationString-PN', 2).
+arity('abbreviationString-PN', 2).
 
 typical_mtvars([_,_]).
 

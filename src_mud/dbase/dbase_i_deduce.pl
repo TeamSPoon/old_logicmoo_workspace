@@ -142,10 +142,10 @@ deduce_argIsa_facts(Fact,Arg,Type):- ground(Fact), functor(Fact,F,A),A>1, deduce
 
 never_deduce_from_predicate(isa).
 never_deduce_from_predicate(user:mpred_prop).
-never_deduce_from_predicate(mpred_arity).
+never_deduce_from_predicate(arity).
 never_deduce_from_predicate(genls).
 never_deduce_from_predicate(typeProps).
-never_deduce_from_predicate(P):-mpred_arity(P,1).
+never_deduce_from_predicate(P):-arity(P,1).
 never_deduce_from_predicate(P):-user:mpred_prop(P,ftCallable).
 never_deduce_from_predicate(P):-argIsa_asserted(P,_,tCol).
 never_deduce_from_predicate(P):-argIsa_asserted(P,_,ftVoprop).

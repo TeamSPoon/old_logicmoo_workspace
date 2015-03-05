@@ -98,7 +98,7 @@ create_someval(Prop,Obj,Value):- into_mpred_form(dbase_t(Prop,Obj,Value),Fact),a
 create_someval(Prop,Obj,Value):- into_mpred_form(dbase_t(Prop,Obj,Value),Fact),not(test_tl(thlocal:noRandomValues,Fact)),create_random_fact(Fact),!.
 create_someval(Prop,Obj,_):- Fact=.. [Prop,Obj,_],test_tl(thlocal:infAssertedOnly,Fact),!,fail.
 create_someval(Prop,Obj,Value):- fallback_value(Prop,Obj,DValue),!,Value=DValue.
-create_someval(Pred,_Arg1,Value):- must_det_l([mpred_arity(Pred,Last),argIsa_call(Pred,Last,Type),random_instance(Type,Value,nonvar(Value))]).
+create_someval(Pred,_Arg1,Value):- must_det_l([arity(Pred,Last),argIsa_call(Pred,Last,Type),random_instance(Type,Value,nonvar(Value))]).
 
 asserted_or_deduced(Fact):- is_asserted(Fact),!.
 asserted_or_deduced(Fact):- user:fact_always_true(Fact),must_det(is_fact_consistent(Fact)),!,add(Fact).
@@ -123,8 +123,8 @@ random_instance_no_throw(Type,Value,Test):- findall(V,isa(V,Type),Possibles),Pos
 
 random_instance(Type,Value,Test):- must(random_instance_no_throw(Type,Value,Test)).
 
-guess_arity(F,GA,A):-GA=0,!,must(mpred_arity(F,A)).
-guess_arity(F,GA,A):-mpred_arity(F,A);A=GA.
+guess_arity(F,GA,A):-GA=0,!,must(arity(F,A)).
+guess_arity(F,GA,A):-arity(F,A);A=GA.
 
 save_fallback(Fact):-not(ground(Fact)),trace_or_throw(var_save_fallback(Fact)).
 save_fallback(Fact):-is_fact_consistent(Fact),add(Fact).
@@ -146,7 +146,7 @@ get_prop_args(Fact,Prop,ARGS):-Fact=..[Prop|ARGS],!.
 dont_check_args(Fact):-functor(Fact,F,A),dont_check_args(F,A).
 dont_check_args(isa,2).
 dont_check_args(user:mpred_prop,2).
-dont_check_args(mpred_arity,2).
+dont_check_args(arity,2).
 dont_check_args(A,1):-atom(A).
 
 
@@ -170,7 +170,7 @@ checkNoArgViolationOrDeduceInstead(Prop,N,Obj):-argIsa_call(Prop,N,Type),
    findall(OT,isa(Obj,OT),OType),
    checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type).
 
-user:hook_coerce(Text,tPred,Pred):- user:mpred_prop(Pred,mpred_arity(_)),name_text(Pred,Text).
+user:hook_coerce(Text,tPred,Pred):- user:mpred_prop(Pred,arity(_)),name_text(Pred,Text).
 
 
 subft_or_subclass_or_same(C,C):-!.
@@ -198,7 +198,7 @@ assert_subclass_on_argIsa(Prop,N,argIsaFn(Prop,N)):-!.
 assert_subclass_on_argIsa(Prop,N,_OType):-argIsa_call(Prop,N,PropType),PropType=argIsaFn(Prop,N),!. % , assert_argIsa(Prop,N,OType).
 assert_subclass_on_argIsa(Prop,N,OType):-argIsa_call(Prop,N,PropType),assert_subclass_safe(OType,PropType).
 
-guessed_mpred_arity(F,A):-mpred_arity(F,AA),!,A=AA.
+guessed_mpred_arity(F,A):-arity(F,AA),!,A=AA.
 guessed_mpred_arity(_,2).
 
 suggestedType(Prop,N,_,argIsaFn(Prop, N),FinalType):- sanity(Prop\=props),guessed_mpred_arity(Prop,N),i_name('vt',Prop,FinalType),!,must((decl_type(FinalType),assert_isa(FinalType,tInferInstanceFromArgType))).

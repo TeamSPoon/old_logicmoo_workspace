@@ -6,7 +6,7 @@
 % Dec 13, 2035
 %
 */
-:-swi_module(dbase_i_loader, []).
+% :-swi_module(dbase_i_loader, []).
 
 :- include(dbase_i_header).
 
@@ -154,19 +154,16 @@ add_term(Term,Vs):-
    b_setval('$variable_names', Vs),
     add_from_file(Term).
 
-add_from_file(:-(TermIn)):-
-  fully_expand(is_asserted,/*to_exp*/(TermIn),Term),
-  with_assertions(thlocal:already_in_kb_term_expansion,must(add(:-(Term)))).
-add_from_file(TermIn):-
-  fully_expand(is_asserted,/*to_exp*/(TermIn),Term),
-  with_assertions(thlocal:already_in_kb_term_expansion,must(add(Term))).
+
+add_from_file(Term):-
+  with_assertions(thlocal:already_in_file_term_expansion,must(add(Term))).
 
 myDebugOnError(Term):-catch(once(must((Term))),E,(dmsg(error(E,start_myDebugOnError(Term))),trace,rtrace((Term)),dmsginfo(stop_myDebugOnError(E=Term)),trace)).
          
 read_one_term(Term,Vs):- catch(once(( read_term(Term,[double_quotes(string),variable_names(Vs)]))),E,(Term=error(E),dmsg(error(E,read_one_term(Term))))).
 read_one_term(Stream,Term,Vs):- catch(once(( read_term(Stream,Term,[double_quotes(string),variable_names(Vs)]))),E,(Term=error(E),dmsg(error(E,read_one_term(Term))))).
 
-rescan_mpred_stubs:- doall((user:mpred_prop(F,prologHybrid),mpred_arity(F,A),A>0,warnOnError(declare_dbase_local_dynamic(moo,F,A)))).
+rescan_mpred_stubs:- doall((user:mpred_prop(F,prologHybrid),arity(F,A),A>0,warnOnError(declare_dbase_local_dynamic(moo,F,A)))).
 
 :-ensure_loaded(dbase_i_sexpr_reader).
 

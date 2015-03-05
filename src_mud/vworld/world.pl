@@ -227,7 +227,9 @@ valueReset(charge,max_charge).
 */
 
 
-decltypeProps(Type,Props),isa(Obj,Type),{flatten([Props],VoProps)} => instProps(Obj,VoProps).
+relationMostInstance(mudColor, tTable, vWhite).
+
+%typeProps(Type,Props),isa(Obj,Type),{flatten([Props],VoProps)} => props(Obj,VoProps).
 ttSpatialType(tRegion).
 
 create_instance_0(T, tItem, List):-

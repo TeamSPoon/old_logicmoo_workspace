@@ -77,8 +77,8 @@ to_tclass(F,FO):- string(F),!,atom_string(F,S),to_tclass(S,FO).
 to_tclass(Prop,New):- ttFormatType(Prop),ensure_starts_with_prefix(Prop,ft,New),!.
 to_tclass(Prop,New):- ttValueType(Prop),ensure_starts_with_prefix(Prop,vt,New),!.
 
-to_tclass(Prop,New):- mpred_arity(Prop,1),mpred_arity(Prop,tCol),ensure_starts_with_prefix(Prop,t,New),!.
-to_tclass(Prop,New):- user:mpred_prop(Prop,prologHybrid),mpred_arity(Prop,M),M>1,user:mpred_prop(Prop,predArgTypes(_)),ensure_starts_with_prefix(Prop,mud,New),!.
+to_tclass(Prop,New):- arity(Prop,1),arity(Prop,tCol),ensure_starts_with_prefix(Prop,t,New),!.
+to_tclass(Prop,New):- user:mpred_prop(Prop,prologHybrid),arity(Prop,M),M>1,user:mpred_prop(Prop,predArgTypes(_)),ensure_starts_with_prefix(Prop,mud,New),!.
 to_tclass(Prop,New):- (call(dbase_t,Prop,_,_);dbase_t(Prop,_,_,_);dbase_t(Prop,_,_,_,_)),ensure_starts_with_prefix(Prop,mud,New),!.
 to_tclass(Prop,New):- is_actverb(Prop),ensure_starts_with_prefix(Prop,act,New),!.
 to_tclass(Prop,New):- isa(Prop,tCol),ensure_starts_with_prefix(Prop,t,New),!.
@@ -87,7 +87,7 @@ to_tclass(Prop,New):- (dbase_t(_,_,Prop);dbase_t(_,_,Prop,_);dbase_t(_,_,_,Prop)
 
 is_actverb(X):-user:type_action_info(_,PX,_),functor(PX,X,_).
 is_actverb(X):-user:action_info(PX,_),functor(PX,X,_).
-is_actverb(X):-vtActionTemplate(PX),functor(PX,X,_).
+is_actverb(X):-action_info(PX),functor(PX,X,_).
 is_actverb(X):-vtPosture(PX),functor(PX,X,_).
 is_actverb(X):-verb_alias(_,X).
 % user:vtVerb(X):-is_actverb(X).

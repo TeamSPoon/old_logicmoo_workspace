@@ -74,6 +74,9 @@ conflict(C) => {resolveConflict(C)}.
 % this isn't written yet.
 resolveConflict(C) :-
   format("~NHalting with conflict ~w", [C]),
+  pfcJustification_L(C),
+  pfc_negate(C,N),
+  pfcJustification_L(N),
   pfcHalt.
 
 % meta rules to schedule inferencing.
@@ -87,6 +90,477 @@ not(P), P => conflict(P).
 
 
 
+
+:-dynamic(pfcDefault/1).
+% -*-Prolog-*-
+% here is an example which defines pfcDefault facts and rules.  Will it work?
+
+(((pfcDefault(P)/pfcLiteral(P))  =>  (~neg(P) => P))).
+
+((pfcDefault((P => Q))/pfcLiteral(Q) => (P, ~neg(Q) => Q))).
+
+
+:-dynamic(conflict/1).
+% a conflict triggers a Prolog action to resolve it.
+((conflict(C) => {resolveConflict(C)})).
+
+:-dynamic(resolveConflict/1).
+% this isnt written yet.
+resolveConflict(C) :-
+  format("~NHalting with conflict ~w", [C]),
+  pfcHalt.
+
+% meta rules to schedule inferencing.
+
+% resolve conflicts asap
+pfcSelect(conflict(X)) :- pfcQueue(conflict(X)).
+  
+% a pretty basic conflict.
+{pfcLiteral(P)}, neg(P), P => conflict(P).
+
+/*
+% reflexive equality
+equal(A,B) => equal(B,A).
+equal(A,B),{ \\+ (A=B}),equal(B,C),{ \\+ (A=C)} => equal(A,C).
+
+notequal(A,B) <= notequal(B,A).
+notequal(C,B) <= equal(A,C),notequal(A,B).
+*/
+
+% is this how to define constraints?
+% either(P,Q) => (neg(P) => Q), (neg(Q) => P).
+% (P,Q => false) => (P => neg(Q)), (Q => neg(P)).
+
+
+:-dynamic((fly/1,bird/1,penguin/1)).
+
+
+% birds fly by pfcDefault.
+(pfcDefault((bird(X) => fly(X)))).
+
+% heres one way to do an subclass hierarchy.
+
+(((genls_test(C1,C2) =>
+  {P1 =.. [C1,X],
+    P2 =.. [C2,X]},
+  (P1 => P2)))).
+
+(genls_test(canary,bird)).
+(genls_test(penguin,bird)).
+
+% penguins do neg fly.
+(penguin(X) => neg(fly(X))).
+
+% chilly is a penguin.
+(penguin(chilly)).
+
+% tweety is a canary.
+(canary(tweety)).
+
+:- prolog.
+
+end_of_file.
+
+
+% asserting mpred_sv(p) cuases p/2 to be treated as a mpred_sv, i.e.
+% if p(foo,1)) is a fact and we assert_db p(foo,2), then the forrmer assertion
+% is retracted.
+
+mpred_sv(Pred,Arity)
+  =>
+  {
+   dynamic(Pred/Arity),
+   length(AfterList,Arity),
+   append(Left,[A],AfterList),
+   append(Left,[B],BeforeList),
+  After =.. [Pred|AfterList],
+  Before =.. [Pred|BeforeList]},
+  (After,{Before, \==(A , B)} => {rem2(Before)}).
+
+
+% rem assertions about satisfied goals.
+action(Goal), Goal, {format("~n Doing ~q.~n",[Goal])} =>  {rem2(action(Goal))}.
+
+% if someone picks up an object, then it is no longer "on" anything.
+grasping(_Actor,Object) => {rem2(on(Object,_))}.
+
+% objects that arent being held or on something end up on the floor.
+
+object(Object), 
+~on(Object,X)/(\==(X , floor)),
+~grasping(_,Object)
+ =>
+{on(Object,floor);format("~n~w falls to the floor.",[Object])},
+on(Object,floor).
+
+
+% This accomplishes moving an actor from XY1 to XY2, taking a help
+% object along.
+
+action(moveto(Actor,From,To))
+  =>
+  {rem2(at(Actor,From)),
+   pfcAdd(at(Actor,To)),
+   (grasping(Actor,Object) -> pfcAdd(at(Object,To)) ; true),
+   rem2(action(moveto(Actor,From,To)))}.
+   
+
+% if X is reported to be on some new object Obj2, rem the assertion
+% that it was on Obj1.
+
+=> mpred_sv(at,2).
+
+at(X,Y) => {format("~n~w now at ~w",[X,Y])}.
+
+=> mpred_sv(grasping,2).
+
+=> mpred_sv(on,2).
+
+on(X,Y) => {format("~n~w now on ~w",[X,Y])}.
+
+
+
+% monkey and bananas problem in Pfc
+
+% jump to the floor.
+action(on(Actor,floor)) =>
+  { format("~n~w jumps onto the floor",[Actor]),
+  pfcAdd(on(Actor,floor)) }.
+
+action(on(Actor,X)),
+at(Actor,Loc),
+at(X,Loc),
+~grasping(Actor,_)
+  => {
+  format("~n~w climbs onto ~w.",[Actor,X]),
+  pfcAdd(on(Actor,X)) }.
+
+action(grasping(Actor,Object)),
+weight(Object,light),
+at(Object,XY)
+=>
+
+ (~at(Actor,XY)  =>  {pfcAdd(action(at(Actor,XY)))}),
+
+ (~on(Object,ceiling),at(Actor,XY)
+  =>
+  {format("~n~w picks up ~w.",[Actor,Object])},
+  {pfcAdd(grasping(Actor,Object))}),
+
+ (on(Object,ceiling), at(ladder,XY)
+  =>
+     (~on(Actor, ladder)
+      =>
+      {format("~n~w wants to climb ladder to get to ~w.",[Actor,Object]),
+       pfcAdd(action(on(Actor,ladder)))}),
+
+     (on(Actor,ladder)
+      =>
+      {format("~n~w climbs ladder and grabs ~w.",[Actor,Object]),
+       grasping(Actor,Object)})),
+      
+ (on(Object,ceiling), ~at(ladder,XY)
+  =>
+  {format("~n~w wants to move ladder to ~w.",[Actor,XY]),
+  pfcAdd(action(move(Actor,ladder,XY)))}).
+
+
+action(at(Actor,XY)),
+   at(Actor,XY2)/(\==(XY , XY2))
+    =>
+   {format("~n~w wants to move from ~w to ~w",[Actor,XY2,XY]),
+    pfcAdd(action(moveto(Actor,XY2,XY)))}.
+
+(action(on(Actor,Object)) ; action(grasping(Actor,Object))),
+at(Object,XY),
+at(Actor,XY),
+grasping(Actor,Object2)/(\==(Object2 , Object))
+  =>
+{format("~n~w releases ~w.",[Actor,Object2]),
+ rem2(grasping(Actor,Object2))}.
+
+
+
+action(move(Actor,Object,Destination)),
+ grasping(Actor,Object),
+ at(Actor,XY)/(\==(XY , Destination))
+  => action(moveto(Actor,XY,Destination)).
+
+action(move(Actor,Object,Destination)),
+ ~grasping(Actor,Object)
+  =>  action(grasping(Actor,Object)).
+
+
+% predicates to describe whats going on.
+% action(...
+
+
+% here''s how to do it:
+start :-
+
+  pfcAdd(object(bananas)),
+  pfcAdd(weight(bananas,light)),
+  pfcAdd(at(bananas,xy(9,9))),
+  pfcAdd(on(bananas,ceiling)),
+
+  pfcAdd(object(couch)),
+  pfcAdd(wieght(couch,heavy)),
+  pfcAdd(at(couch,xy(7,7))),
+  pfcAdd(on(couch,floor)),
+
+  pfcAdd(object(ladder)),
+  pfcAdd(weight(ladder,light)),
+  pfcAdd(at(ladder,xy(4,3))),
+  pfcAdd(on(ladder,floor)),
+
+  pfcAdd(object(blanket)),
+  pfcAdd(weight(blanket,light)),
+  pfcAdd(at(blanket,xy(7,7))),
+
+  pfcAdd(object(monkey)),
+  pfcAdd(on(monkey,couch)),
+  pfcAdd(at(monkey,xy(7,7))),
+  pfcAdd(grasping(monkey,blanket)).
+
+:-dynamic(go/0).
+% go. to get started.
+go :- pfcAdd(action(grasping(monkey,bananas))).
+
+db :- listing([object,at,on,grasping,weight,action]).
+
+
+
+
+% -*-Prolog-*-
+  
+=> factoral(0,1).
+=> factoral(1,1).
+=> factoral(2,2).
+factoral(N,M) <= {N>0,N1 is N-1}, factoral(N1,M1), {M is N*M1}.
+
+ 
+=> fibonacci(1,1).
+=> fibonacci(2,1).
+fibonacci(N,M) <= 
+  {N>2,N1 is N-1,N2 is N-2},
+  fibonacci(N1,M1),
+  fibonacci(N2,M2),
+  {M is M1+M2}.
+
+
+end_of_file.
+
+% -*-Prolog-*-
+
+
+:- dynamic ('-->>')/2.
+:- dynamic ('--*>>')/2.
+
+% a simple pfc dcg grammar.  requires dcg_pfc.pl
+
+% backward grammar rules.
+s(s(Np,Vp)) -->> np(Np), vp(Vp).
+
+vp(vp(V,Np)) -->> verb(V), np(Np).
+vp(vp(V)) -->> verb(V).
+vp(vp(VP,X)) -->> vp(VP), pp(X).
+
+np(np(N,D)) -->> det(D), noun(N).
+np(np(N)) -->> noun(N).
+np(np(Np,pp(Pp))) -->> np(Np), pp(Pp).
+
+pp(pp(P,Np)) -->> prep(P), np(Np).
+
+% forward grammar rules.
+P --*>>  [W],{cat(W,Cat),P =.. [Cat,W]}.
+
+% simple facts.
+cat(the,det).
+cat(a,det).
+cat(man,noun).
+cat(fish,noun).
+cat(eats,verb).
+cat(catches,verb).
+cat(in,prep).
+cat(on,prep).
+cat(house,noun).
+cat(table,noun).
+
+:-compile_pfcg.
+
+
+
+
+% -*-Prolog-*-
+
+
+
+or(P,Q) => 
+  (neg(P) => Q),
+  (neg(Q) => P).
+		
+prove_by_contradiction(P) :- P.
+prove_by_contradiction(P) :-
+  \+ (neg(P) ; P),
+  pfcAdd(neg(P)),
+  P -> rem1(neg(P))
+    ; (rem1(neg(P)),fail).
+
+/*
+=> or(p,q).
+=> (p ==> x).
+=> (q ==> x).
+*/
+
+% try :- prove_by_contradiction(x).
+
+  
+
+or(P1,P2,P3) =>
+  (neg(P1), neg(P2) => P3),
+  (neg(P1), neg(P3) => P2),
+  (neg(P2), neg(P3) => P1).
+
+
+
+
+
+%% some simple tests to see if Pfc is working properly
+
+:- pfcTrace.
+
+time(Call,Time) :-
+  statistics(runtime,_),
+  call_pl(Call),
+  statistics(runtime,[_,Time]).
+
+
+test0 :- 
+  pfcAdd([(p(X) => q),
+       p(1),
+       (p(X), ~r(X) => s(X)),
+       (t(X), {X>0} => r(X)),
+       (t(X), {X<0} => minusr(X)),
+       t(-2),
+       t(1)]).
+
+test1 :-
+  consult('kinship.pfc'),
+  consult('finin.pfc').
+
+% test2 
+:-
+  pfcAdd([(a(X),~b(Y)/(Y>X) => biggest(a)),
+       (b(X),~a(Y)/(Y>X) => biggest(b)),
+        a(5)]).
+
+
+%test3 :-
+%  pfcAdd([(a(X),\+(b(Y))/(Y>X) => biggest(a)),
+%       (b(X),\+a((Y))/(Y>X) => biggest(b)),
+%        a(5)]).
+
+% test4 
+:-
+    pfcAdd([(foo(X), bar(Y)/{X=:=Y} => foobar(X)),
+         (foobar(X), go => found(X)),
+	 (found(X), {X>=100} => big(X)),
+	 (found(X), {X>=10,X<100} => medium(X)),
+	 (found(X), {X<10} => little(X)),
+	 foo(1),
+	 bar(2),
+	 bar(1),
+	 foo(100),
+	 goAhead,
+	 bar(100)
+	]).
+
+
+% test5 
+:-
+    pfcAdd([(faz(X), ~baz(Y)/{X=:=Y} => fazbaz(X)),
+         (fazbaz(X), go => found(X)),
+	 (found(X), {X>=100} => big(X)),
+	 (found(X), {X>=10,X<100} => medium(X)),
+	 (found(X), {X<10} => little(X)),
+	 faz(1),
+	 goAhead,
+	 baz(2),
+	 baz(1)
+	]).
+
+
+% test6 
+:-
+    pfcAdd([(d(X), ~f(Y)/{X=:=Y} => justD(X)),
+         (justD(X), go => dGo(X)),
+	 d(1),
+	 go,
+	 f(1)
+	]).
+
+
+% test7 
+:-
+    pfcAdd([(g(X), h(Y)/{X=:=Y} => justG(X)),
+         (justG(X), go => gGo(X)),
+	 g(1),
+	 go,
+	 h(1)
+	]).
+
+
+% test8 
+:-
+    pfcAdd([(j(X), k(Y) => bothJK(X,Y)),
+         (bothJK(X,Y), go => jkGo(X,Y)),
+	 j(1),
+	 go,
+	 k(2)
+	]).
+
+
+% test9 
+:-
+    pfcAdd([(j(X), k(Y) => bothJK(X,Y)),
+         (bothJK(X,Y) => jkGo(X,Y)),
+	 j(1),
+	 k(2)
+	]).
+
+% test10 
+:-
+  pfcAdd([
+	(j(X), k(Y) => bothJK(X,Y)),
+	(bothJK(X,Y), go => jkGo(X,Y)),
+	j(1),
+	go,
+	k(2)
+       ]).
+
+
+
+% -*-Prolog-*-
+
+%% meta rules
+
+/*
+
+:- op(1050,xfx, ('==>') ).
+
+:- dynamic ( ('==>') /2).
+
+% ops5-like production:
+
+(Lsh ==> Rhs) =>  (Lsh => {Rhs}).
+
+:- op(1050,xfx,('==>')).
+
+(P ==> Q) => 
+  (P => Q),
+  (neg(Q) => neg(P)).
+
+*/
 
 
 
@@ -741,16 +1215,16 @@ pfcDefault((P => Q))/pfcLiteral(Q) => (P, ~not(Q) => Q).
 % birds fly by pfcDefault.
 => pfcDefault((bird(X) => fly(X))).
 
-% here's one way to do an isa hierarchy.
-% isa = genls.
+% here's one way to do an scl hierarchy.
+% scl = genls.
 
-isa(C1,C2) =>
+scl(C1,C2) =>
   {P1 =.. [C1,X],
     P2 =.. [C2,X]},
   (P1 => P2).
 
-=> isa(canary,bird).
-=> isa(penguin,bird).
+=> scl(canary,bird).
+=> scl(penguin,bird).
 
 % penguins do not fly.
 penguin(X) => not(fly(X)).
