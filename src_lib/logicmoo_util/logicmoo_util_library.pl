@@ -177,25 +177,6 @@ same_heads(M1:H,M2:Head):-H=@=Head,!,call(dmsg(warn(same_heads(M1:H,M2:Head)))).
 same_heads(H,M2:Head):-H=@=Head,!,nop(dmsg(warn(same_heads(_M1:H,M2:Head)))).
 same_heads(M1:H,Head):-H=@=Head,!,nop(dmsg(warn(same_heads(M1:H,_M2:Head)))).
 
-:-meta_predicate clause_safe(?, ?).
-:-module_transparent clause_safe/2.
-:- export(clause_safe/2).
-
-:- export(clause_safe_m3/3).
-
-clause_safe(M:H,B):-!,debugOnError(clause(M:H,B)).
-clause_safe(H,B):-!,debugOnError(clause(H,B)).
-
-clause_safe(M:H,B):-!,clause_safe_m3(M,H,B).
-clause_safe(H,B):-!,clause_safe_m3(_,H,B).
-%clause_safe(M,string(S),B):- trace_or_throw(clause_safe(M,string(S),B)).
-clause_safe_m3(M,H,B):-  (nonvar(H)->true;(trace,current_predicate(M:F/A),functor(H,F,A))),predicate_property(M:H,number_of_clauses(_)),clause(H,B).
-
-
-
-:- meta_predicate doall(0).
-doall(M:C):-!, M:ignore(M:(C,fail)).
-doall(C):-ignore((C,fail)).
 
 % :- ensure_loaded(logicmoo_util_bugger).
 
@@ -368,6 +349,7 @@ get_functor(Obj,FO):-notrace((must(functor_h(Obj,F,_)),FO=F)).
 get_functor(Obj,FO,AO):-notrace((must(functor_h(Obj,F,A)),FO=F,AO=A)).
 
 functor_h(Obj,F,A):-var(Obj),trace_or_throw(var_functor_h(Obj,F,A)).
+functor_h(Obj,F,A):- (Obj = '$VAR'(_)),trace_or_throw(var_functor_h(Obj,F,A)).
 functor_h(Obj,F,A):-var(Obj),!,(number(A)->functor(Obj,F,A);((current_predicate(F/A);throw(var_functor_h(Obj,F,A))))).
 functor_h(F//A,F,Ap2):-number(A),!,Ap2 is A+2,( atom(F) ->  true ; current_predicate(F/Ap2)).
 functor_h(F/A,F,A):-number(A),!,( atom(F) ->  true ; current_predicate(F/A)).

@@ -374,23 +374,23 @@ assert_dbase_t(G):-add_from_file(G).
 
 user:listing_mpred_hook(Match):- 
  (( 
-  dif:dif(How,prolog(_)),
-  no_repeats_old([H,B],((user:provide_mpred_storage_clauses(dbase_t,H,B,_)),
-                How\=prolog(_))),slow_term_matches_hb(Match,H,B),portray_hb(How:H,B))),fail.
+  dif:dif(Proof,prologRef(_)),
+  no_repeats_old([H,B],((user:provide_mpred_storage_clauses(H,B,Proof)),
+                Proof\=prologRef(_))),slow_term_matches_hb(Match,H,B),portray_hb(Proof:H,B))),fail.
 
       
-user:provide_mpred_storage_clauses(How,H,B,ftProofFn(How)):-dbase_t_mpred_storage_clauses_facts(How,H,B).
+user:provide_mpred_storage_clauses(H,B,Proof):-dbase_t_mpred_storage_clauses_facts(H,B,Proof).
 
-dbase_t_mpred_storage_clauses_facts(dbase_t,H,true):-is_list(H),!,length(H,A),A>2,loop_check(dbase_t(H)).
-dbase_t_mpred_storage_clauses_facts(dbase_t,H,true):-compound(H),!,current_predicate(into_plist_arities/4),functor(H,_,A),A>1,loop_check(dbase_t(H)).
-dbase_t_mpred_storage_clauses_facts(W,H,B):-dbase_t_mpred_storage_clauses_rules(W,H,B),H\=isa(_,_).
+dbase_t_mpred_storage_clauses_facts(H,true,dbase_t(H)):-is_list(H),!,length(H,A),A>2,loop_check(dbase_t(H)).
+dbase_t_mpred_storage_clauses_facts(H,true,dbase_t(H)):-compound(H),!,current_predicate(into_plist_arities/4),functor(H,_,A),A>1,loop_check(dbase_t(H)).
+% dbase_t_mpred_storage_clauses_facts(H,B,W):-dbase_t_mpred_storage_clauses_rules(H,B,W),H\=isa(_,_).
 
 % TODO USE PFC FOR FOREWARD RULES
 % TODO USE PTTP FOR BACKARDS RULES
-dbase_t_mpred_storage_clauses_rules(ruleForward,H,B):-ruleForward(B,H).
-dbase_t_mpred_storage_clauses_rules(ruleBackward,H,B):-ruleBackward(H,B).
-% dbase_t_mpred_storage_clauses_rules('<=>',H,B):-'<=>'(HH,B),each_subterm(HH,SubTerm),compound(SubTerm),SubTerm = H.
-% dbase_t_mpred_storage_clauses_rules('<=>',H,B):-'<=>'(B,HH),each_subterm(HH,SubTerm),compound(SubTerm),SubTerm = H.
+% dbase_t_mpred_storage_clauses_rules(H,B,ruleForward(B,H)):-ruleForward(B,H).
+% dbase_t_mpred_storage_clauses_rules(H,B,ruleBackward(H,B)):-ruleBackward(H,B).
+% dbase_t_mpred_storage_clauses_rules(H,B,'<=>'):-'<=>'(HH,B),each_subterm(HH,SubTerm),compound(SubTerm),SubTerm = H.
+% dbase_t_mpred_storage_clauses_rules(H,B,'<=>'):-'<=>'(B,HH),each_subterm(HH,SubTerm),compound(SubTerm),SubTerm = H.
 
 
 dbase_t_provide_mpred_storage_op(Op,HB):-notrace(demodulize(Op,HB,HeadBody)),get_functor(HeadBody,F),(F==dbase_t;user:mpred_prop(F,prologHybrid)), must(is_mpred_op(Op)), 
@@ -585,7 +585,8 @@ foo_b(b3):-!.
 :-must_det((findall(R,call_no_cuts(foo_b(R)),List),length(List,3))).
 
 
-% user:decl_database_hook(AR,C):-smart_decl_database(AR,C).
+
+%OLD user:decl_database_hook(AR,C):-smart_decl_database(AR,C).
 
 smart_decl_database(AR,svo(S,V,O)):- !,dbase2pred2svo(DBASE,PRED,svo(S,V,O)),!,smart_db_op(AR,DBASE,PRED,svo(S,V,O)).
 smart_decl_database(AR,DBASE):- functor_catch(DBASE,dbase_t,_),!,dbase2pred2svo(DBASE,PRED,SVO),!,smart_db_op(AR,DBASE,PRED,SVO).

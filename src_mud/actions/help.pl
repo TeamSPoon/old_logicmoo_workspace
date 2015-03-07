@@ -22,7 +22,7 @@ user:type_action_info(tHumanPlayer,actHelp(isOptional(ftString,"")), "shows this
 get_type_action_help_commands_list(A,B,C):-no_repeats_old(get_type_action_help_0(A,B,C)).
 
 :-export(get_all_templates/1).
-get_all_templates(Templ):- call_tabled(get_all_templates0(Templ)).
+get_all_templates(Templ):- call_tabled(no_repeats(get_all_templates0(Templ))).
 
 get_all_templates0(Templ):-get_good_templates(Templ).
 get_all_templates0(Templ):-get_bad_templates(Templ),not(get_good_templates(Templ)).
@@ -56,7 +56,8 @@ action_info_db(TEMPL,INFO,WAS):- (PRED=user:agent_call_command(_,WAS);PRED=user:
    (nonvar(WAS)->true;once(( ignore((nop(S=S),first_pl(BODY,PL),ignore(catch(notrace(PL),_,true)))),nonvar(WAS)))),
    
     (TEMPL=@=WAS -> ((clause_property(REF,line_count(LC)),INFO=line(LC:S))) ;  (not(not(TEMPL=WAS)) -> INFO=file(S) ; fail)).
- 
+
+:-trace.
 user:action_info(TEMPL,txtConcatFn(S,contains,WAS)):-action_info_db(TEMPL,S,WAS),not(clause_asserted(user:action_info(TEMPL,_Help),true)).
 
 
@@ -93,7 +94,10 @@ show_help(Str):-commands_list(ListS),forall(member(E,ListS),write_string_if_cont
 write_string_if_contains("",E):-!,show_templ_doc(E),!.
 write_string_if_contains(Must,E):-ignore((with_output_to(string(Str),show_templ_doc_all(E)),str_contains_all([Must],Str),fmt(Str))).
 
-user:hook_coerce(Text,vtVerb,Inst):- get_all_templates(A),nonvar(A),functor_safe(A,Inst,_),name_text(Inst,Text).
+
+isa(Inst,vtVerb) <= (get_all_templates(A),nonvar(A),functor_safe(A,Inst,_)).
+
+user:hook_coerce(Text,vtVerb,Inst):- isa(Inst,vtVerb),name_text(Inst,Text).
 
 %user:agent_text_command(Agent,[Who],Agent,Cmd):- nonvar(Who), get_all_templates(Syntax),Syntax=..[Who,isOptional(_,Default)],Cmd=..[Who,Default].
 %user:agent_text_command(Agent,[Who,Type],Agent,Cmd):- get_all_templates(Syntax),nonvar(Who),Syntax=..[Who,isOptional(Type,_)],Cmd=..[Who,Type].
@@ -103,6 +107,5 @@ user:hook_coerce(Text,vtVerb,Inst):- get_all_templates(A),nonvar(A),functor_safe
 :-export(good_template/1).
 good_template(Templ):- \+ contains_singletons(Templ).
 
-:-pfcAdd((vtActionTemplate(Templ) <= (loop_check(get_all_templates(Templ),fail)))).
-
+vtActionTemplate(Templ) :- loop_check(get_all_templates(Templ)).
 

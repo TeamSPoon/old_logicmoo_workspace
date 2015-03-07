@@ -43,7 +43,7 @@ prolog_side_effects(G):-user:mpred_prop(G,predStub(prologOnly)),!.
 prolog_side_effects(P):-atom(P),!,prolog_side_effects(P/_).
 
 
-user:provide_mpred_storage_clauses(prolog(Mod),G,B,ftProofFn(aClauseRefFn(Ref))):-predicate_property(G,number_of_clauses(_)),clause(G,B,Ref),clause_property(Ref,predicate(Mod:_)).
+user:provide_mpred_storage_clauses(G,B,(prologRef(Mod:Ref))):-predicate_property(G,number_of_clauses(_)),clause(G,B,Ref),clause_property(Ref,predicate(Mod:_)).
 
 cant_redefine(PI):-real_builtin_predicate(PI);predicate_property(PI,imported_from(lists)).
 

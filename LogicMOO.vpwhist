@@ -3,9 +3,7 @@ PrologMUD_base.vpj=Release
 [Global]
 CurrentProject=PrologMUD.vpj
 [ProjectDates]
-PrologMUD.vpj=20150215202042343
-PrologMUD_base.vpj=20150118165844771
-externals\PrologMUD_ext.vpj=20150209214117951
+PrologMUD.vpj=20150306152332432
 [TreeExpansion2]
 - PrologMUD.vpj
   - externals

@@ -95,6 +95,7 @@ user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog')
 user:file_search_path(weblog, 'C:/Users/Administrator/AppData/Roaming/SWI-Prolog/pack/weblog').
 user:file_search_path(weblog, '/usr/lib/swi-prolog/pack/weblog/prolog'):-current_prolog_flag(unix,true).
 user:file_search_path(cliopatria, '../externals/ClioPatria'). % :- current_prolog_flag(unix,true).
+user:file_search_path(user, '../externals/ClioPatria/user/').
 user:file_search_path(swish, '../externals/swish'):- current_prolog_flag(unix,true).
 
 :- user_use_module(library(settings)).

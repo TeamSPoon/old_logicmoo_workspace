@@ -14,10 +14,10 @@
 % [Manditory] Load the Logicmioo utils
 :- '@'(ensure_loaded('../src_lib/logicmoo_util/logicmoo_util_all'),user).
 
-:- include(logicmoo(vworld/moo_header)).
+%:- include(logicmoo(vworld/moo_header)).
 
-:- export(with_no_dbase_expansions/1).
-:- meta_predicate(with_no_dbase_expansions(0)).
+%:- export(with_no_dbase_expansions/1).
+%:- meta_predicate(with_no_dbase_expansions(0)).
 with_no_dbase_expansions(Goal):-
   with_assertions(user:prolog_mud_disable_term_expansions,Goal).
 
@@ -28,6 +28,13 @@ with_no_dbase_expansions(Goal):-
 swi_module(M,E):-dmsg(swi_module(M,E)).
 :-endif.
 
+user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog').
+user:file_search_path(weblog, 'C:/Users/Administrator/AppData/Roaming/SWI-Prolog/pack/weblog').
+user:file_search_path(weblog, '/usr/lib/swi-prolog/pack/weblog/prolog'):-current_prolog_flag(unix,true).
+user:file_search_path(cliopatria, '../externals/ClioPatria'). % :- current_prolog_flag(unix,true).
+user:file_search_path(user, '../externals/ClioPatria/user/').
+user:file_search_path(swish, '../externals/swish'):- current_prolog_flag(unix,true).
+
 
 % [Optionaly] Set the Prolog optimize/debug flags
 :- set_prolog_flag(verbose_load,true).
@@ -35,7 +42,7 @@ swi_module(M,E):-dmsg(swi_module(M,E)).
 :- set_prolog_flag(gui_tracer, false).
 :- set_prolog_flag(answer_write_options, [quoted(true), portray(true), max_depth(1000), spacing(next_argument)]).
 %:- set_prolog_flag(debug,false).
-%:- set_mem_opt(false).
+:- set_mem_opt(false).
 
 :-dynamic(did_ref_job/1).
 do_ref_job(_Body,Ref):-did_ref_job(Ref),!.
@@ -63,22 +70,24 @@ user:semweb_startup:-ensure_loaded('run_clio').
 % [Optionaly] register/run EulerSharp robot services (we use it for the ontology mainly)
 % TODO user:semweb_startup :- register_ros_package(euler).
 
+:- do_semweb_startup.
+
 :- with_no_dbase_expansions(if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop.pl'))).
 :- current_predicate(egg_go/0)->egg_go;true.
+
+
+% [Optionaly] remove debug noises
+user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),show_call(asserta(prolog_debug:debugging(http(X), false, O)))).
+% user:semweb_startup:- forall(retract(prolog_debug:debugging((X), true, O)),show_call(asserta(prolog_debug:debugging((X), false, O)))).
+
+:-multifile(pre_file_search_path/2).
+% user:pre_file_search_path(_,_):-!,fail.
+
 
 % [Manditory] run_tests (includes run_common)
 % :- include(run_tests).
 % OR
 :- include(run_common).
-
-% [Optionaly] remove debug noises
-% user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),show_call(asserta(prolog_debug:debugging(http(X), false, O)))).
-% user:semweb_startup:- forall(retract(prolog_debug:debugging((X), true, O)),show_call(asserta(prolog_debug:debugging((X), false, O)))).
-
-:-multifile(pre_file_search_path/2).
-% user:pre_file_search_path(_,_):-!,fail.
-%:- do_semweb_startup.
-
 
 % [Manditory] load_default_game
 % this is what happens when the world is not found
@@ -87,6 +96,7 @@ user:semweb_startup:-ensure_loaded('run_clio').
 tCol(tLivingRoom).
 genls(tLivingRoom,tRegion).
 genls(tOfficeRoom,tRegion).
+:-decl_mpred_hybrid(pathConnects(tRegion,tRegion),symmetric).
 :- onSpawn(pathConnects(tLivingRoom,tOfficeRoom)).
 :- do_ensure_some_pathBetween.
 % int_firstOrder(some_query, 666, What, C, E, A, J, D, L, B)
@@ -137,7 +147,7 @@ isa(iExplorer1,'tExplorer').
 :- if_startup_script( at_start(finish_processing_world)).
 
 
-% :- prolog_repl.
+:- prolog_repl.
 
 % :- if_startup_script( doall(now_run_local_tests_dbg)).
 
@@ -145,6 +155,9 @@ isa(iExplorer1,'tExplorer').
 :-enqueue_player_command("rez crackers").
 :-enqueue_player_command("drop crackers").
 :-enqueue_player_command('look').
+
+:-enqueue_player_command(prolog).
+
 :-enqueue_player_command("take crackers").
 :-enqueue_player_command("eat crackers").
 :-enqueue_player_command('look').

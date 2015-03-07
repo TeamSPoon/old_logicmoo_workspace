@@ -59,11 +59,9 @@ is_asserted(X,Y):- no_repeats(loop_check(is_asserted_ilc(X,Y))).
 is_asserted(X,Y,Z):- no_repeats(loop_check(is_asserted_ilc(X,Y,Z))).
 
 is_asserted_ilc(V):-var(V),!,trace_or_throw(var_is_asserted(V)).
-% is_asserted_ilc(X):- thlocal:fail_is_asserted(X),!,fail.
-% is_asserted_ilc(HB):-hotrace((reduce_clause(is_asserted_ilc,HB,HHBB),(HB\=@=HHBB))),!,is_asserted_ilc(HHBB).
 % TODO: test removal
 is_asserted_ilc(prologHybrid(H)):-get_functor(H,F),!,isa_asserted(F,prologHybrid).
-is_asserted_ilc(HB):-hotrace((fully_expand(is_asserted_1,HB,HHBB))),!,is_asserted_1(HHBB).
+is_asserted_ilc(HB):-hotrace((fully_expand_warn(is_asserted_1,HB,HHBB))),!,is_asserted_1(HHBB).
 
 is_asserted_1(clause(H,B,Ref)):-!,is_asserted_ilc(H,B,Ref).
 is_asserted_1(clause(H,B)):-!,is_asserted_ilc(H,B).
@@ -74,16 +72,16 @@ is_asserted_1(isa(H,B)):-!,isa_asserted(H,B).
 is_asserted_1(HB):-expand_to_hb(HB,H,B),!,is_asserted_ilc(H,B).
 
 is_asserted_ilc((H:-BB),B):- is_true(B),!,is_asserted_ilc(H,BB).
-is_asserted_ilc(H,B):-notrace((fully_expand(is_asserted_2,(H:-B),CL),expand_to_hb(CL,HH,BB))),!,is_asserted_2(HH,BB).
+is_asserted_ilc(H,B):-notrace((fully_expand_warn(is_asserted_2,(H:-B),CL),expand_to_hb(CL,HH,BB))),!,is_asserted_2(HH,BB).
 
-% is_asserted_2(H,B):-thglobal:pfcManageHybrids,!,pfc_clause_is_asserted(H,B).
-is_asserted_2(H,B):-call_no_cuts(user:provide_mpred_storage_clauses(_,H,B,_Ref)),not(notrace(special_wrapper_body(B,_))).
+is_asserted_2(H,B):-thglobal:pfcManageHybrids,!,pfc_clause_is_asserted(H,B).
+is_asserted_2(H,B):-call_no_cuts(user:provide_mpred_storage_clauses(H,B,_Ref)),not(notrace(special_wrapper_body(B,_))).
 
 is_asserted_ilc((H:-BB),B,Ref):- is_true(B),!,is_asserted_ilc(H,BB,Ref).
-is_asserted_ilc(H,B,Ref):-hotrace((fully_expand(is_asserted_3,(H:-B),CL),expand_to_hb(CL,HH,BB))),is_asserted_3(HH,BB,Ref).
+is_asserted_ilc(H,B,Ref):-hotrace((fully_expand_warn(is_asserted_3,(H:-B),CL),expand_to_hb(CL,HH,BB))),is_asserted_3(HH,BB,Ref).
 
 % is_asserted_3(H,B,Ref):-thglobal:pfcManageHybrids,!,pfc_clause_is_asserted(H,B,Ref).
-is_asserted_3(H,B,Ref):-call_no_cuts(user:provide_mpred_storage_clauses(_,H,B,Ref)),not(notrace(special_wrapper_body(B,_))).
+is_asserted_3(H,B,Ref):-call_no_cuts(user:provide_mpred_storage_clauses(H,B,Ref)),not(notrace(special_wrapper_body(B,_))).
 
 is_source_proof(_).
 
@@ -135,7 +133,7 @@ dbase_modify(Op,                 G):- G\=predArgTypes(_),fully_expand(Op,G,GG),n
 dbase_modify(_,  (:-include(FILE))):- !,must(load_data_file_now(FILE)).
 dbase_modify(Op,  (:-(G))         ):- !,must(with_assert_op_override(Op,debugOnError(G))).
 dbase_modify(P,                  G):- thlocal:noDBaseMODs(_),!,dmsg(noDBaseMODs(P,G)).
-dbase_modify(Op,                 G):- dbase_head_expansion(clause,G,GG),not_variant(G,GG),database_modify_0(Op, GG ),!.
+%dbase_modify(Op,                 G):- dbase_head_expansion(clause,G,GG),not_variant(G,GG),database_modify_0(Op, GG ),!.
 dbase_modify(Op,                 G):- database_modify_0(Op,G ),!.
 dbase_modify(Op,                 G):- trace_or_throw(unknown_database_modify(Op,G)).
 
@@ -164,19 +162,20 @@ database_modify_0(change(assert,AZ),          G):- copy_term(G,GG),database_modi
 database_modify_assert(change(assert,_),         G,GG):- ( \+ \+ is_asserted(GG)),must(variant(G,GG)),!.
 database_modify_assert(change(assert,AZ),       _G,GG):- expire_pre_change(AZ,GG),fail.
 database_modify_assert(change(assert,AorZ),      G,GG):- G \= (_:-_), get_functor(G,F,A),
-   (user:mpred_prop(F,prologSingleValued) -> (AorZ \== sv -> db_assert_sv(AorZ,G,F,A); fail); 
-       user:mpred_prop(F,prologOrdered) -> (AorZ\==z -> database_modify_assert_must(change(assert,z),G,GG);true)).
+   (asserted_mpred_prop(F,prologSingleValued) -> (AorZ \== sv -> db_assert_sv(AorZ,G,F,A); fail); 
+       asserted_mpred_prop(F,prologOrdered) -> (AorZ\==z -> database_modify_assert_must(change(assert,z),G,GG);true)).
 database_modify_assert(change(assert,AorZ),      G,GG):-database_modify_assert_must(change(assert,AorZ),G,GG).
 
 database_modify_assert_must(Op,G,GG):-must(database_modify_assert_4(Op,G,GG)).
 
+database_modify_assert_4(change(assert,_),_, GG):- thglobal:pfcManageHybrids,!,copy_term(GG,GGG),(\+ \+ pfcAdd_fast(GGG)),!,show_call_failure(variant(GG,GGG)),!.
 database_modify_assert_4(change(assert,AorZ), _,GG):- Op = change(assert,AorZ),                              
                               database_modify_5(Op,GG),!,
                               database_modify_6(Op,GG),
                               database_modify_7(Op,GG),
                               ignore(show_call_failure(database_modify_8(Op,GG))),!.
 
-database_modify_5(_ ,GG):- thglobal:pfcManageHybrids,!,copy_term(GG,GGG),(\+ \+ pfcAdd(GGG)),!,show_call_failure(variant(GG,GGG)),!.
+database_modify_5(change(assert,_), GG):- thglobal:pfcManageHybrids,!,copy_term(GG,GGG),(\+ \+ pfcAdd_fast(GGG)),!,show_call_failure(variant(GG,GGG)),!.
 database_modify_5(Op,GG):- copy_term(GG,GGG),must((must_storage_op(Op,GGG), sanity(variant(GG,GGG)))),!.
 database_modify_6(Op,GG):- copy_term(GG,GGE),doall(must(call_no_cuts(expire_post_change(Op,GGE)))),sanity(variant(GG,GGE)),!.
 database_modify_7(Op,GG):- copy_term(GG,GGH),must((run_database_hooks(Op,GGH),sanity(variant(GG,GGH)))),!.
@@ -211,7 +210,7 @@ user:provide_mpred_storage_op(Op,G):- (loop_check(pfc_provide_mpred_storage_op(O
 user:provide_mpred_storage_op(Op,G):- (loop_check(dbase_t_provide_mpred_storage_op(Op,G))).
 user:provide_mpred_storage_op(Op,G):- (loop_check(prolog_provide_mpred_storage_op(Op,G))).
 user:provide_mpred_storage_op(Op,G):- (loop_check(isa_provide_mpred_storage_op(Op,G))).
-user:provide_mpred_storage_op(Op,G):- Op\=change(_,_), (call_no_cuts(user:provide_mpred_storage_clauses(_Type,G,true,_Proof))).
+user:provide_mpred_storage_op(Op,G):- Op\=change(_,_), (call_no_cuts(user:provide_mpred_storage_clauses(G,true,_Proof))).
 
 must_storage_op(Op,G):- doall(must(may_storage_op(Op,G))).
 
@@ -254,13 +253,13 @@ make_body_clause(_Head,Body,Body):-atomic(Body),!.
 make_body_clause(_Head,Body,Body):-special_wrapper_body(Body),!.
 make_body_clause(Head,Body,call_mpred_body(Head,Body)).
 
-special_head(_,F,Why):-special_head0(F,Why),!,show_call_failure(not(user:mpred_prop(F,prologOnly))).
+special_head(_,F,Why):-special_head0(F,Why),!,show_call_failure(not(asserted_mpred_prop(F,prologOnly))).
 special_head0(F,is_pred_declarer):-is_pred_declarer(F),!.
 special_head0(F,functorDeclares):-hasInstance(functorDeclares,F),!.
 special_head0(F,prologMacroHead):-hasInstance(prologMacroHead,F),!.
 special_head0(isa,isa).
 special_head0(F,tCol):-hasInstance(tCol,F),!.
-special_head0(F,prologHybrid):-user:mpred_prop(F,prologHybrid).
+special_head0(F,prologHybrid):-asserted_mpred_prop(F,prologHybrid).
 
 
 
@@ -293,7 +292,10 @@ mdel(C0):- dmsg(mdel(C0)),dbase_modify(change( retract,one),C0), verify_sanity(m
 mdel(C0):- dmsg(warn(failed(mdel(C0)))),!,fail.
 
 % -  clr(Retractall)
-clr(C0):- dmsg(clr(C0)),dbase_modify(change(retract,all),/*to_exp*/(C0)),verify_sanity(ireq(C0)->(dmsg(warn(incomplete_CLR(C0))));true).
+clr(C0):- dmsg(clr(C0)),fail,dbase_modify(change(retract,all),/*to_exp*/(C0)),verify_sanity(ireq(C0)->(dmsg(warn(incomplete_CLR(C0))));true).
+clr(P):- pfcGetSupport(P,Support),
+  pfcFilterSupports(Support,fact,Results),
+  pfcDoConjs(pfcRem1,Results).
 
 % -  preq(Query) = query with P note
 preq(P,C0):- agenda_do_prequery,dbase_op(query(dbase_t,P),C0).
@@ -334,35 +336,38 @@ forall_setof(ForEach,Call):-
 :-moo_hide_childs((add)/1).
 add(A):- var(A),!,trace_or_throw(var_add(A)).
 add(end_of_file):-!.
-% add(C0):-check_override(add(C0)),!.
-add(C0:-BODY):- is_true(BODY),!,add(C0).
-add(M:HB):-atom(M),!, must_det(add(HB)),!.
 add(grid_key(KW=COL)):- !, add(typeHasGlyph(COL,KW)).
 add(Term):- expands_on(isEach,Term), !,forall(do_expand_args(isEach,Term,O),add(/*to_exp*/(O))),!.
-add(:-(Term)):- !, must(add_fast(:-(Term))).
-add(Skipped):- ground(Skipped),implied_skipped(Skipped),!,dmsg(implied_skipped(Skipped)).
-add(C0):- ignore((ground(C0),asserta(user:already_added_this_round(C0)))),!,must_det(add_fast(C0)).
-add(A):-trace_or_throw(fmt('add is skipping ~q.',[A])).
+add(TermIn):- fully_expand(change(assert,add),TermIn,Term),add_0(Term).
+
+add_0(A):- is_ftVar(A),!,trace_or_throw(var_add(A)).
+add_0(((H1,H2):-B)):-!,add_0((H1:-B)),add_0((H2:-B)).
+add_0(((H1,H2))):-!,add_0((H1)),add_0((H2)).
+add_0(:-(Term)):- !, must(add_fast(:-(Term))).
+% add_0(C0):-check_override(add(C0)),!.
+add_0(Skipped):- ground(Skipped),implied_skipped(Skipped),!,dmsg(implied_skipped(Skipped)).
+add_0(C0):- ignore((ground(C0),asserta(user:already_added_this_round(C0)))),!,must_det(pfcAdd_fast(C0)).
+add_0(A):-trace_or_throw(fmt('add/1 is failing ~q.',[A])).
 
 
 implied_skipped(genls(C0,C0)).
 implied_skipped(props(_,[])).
 implied_skipped(Skipped):-compound(Skipped), not(functor(Skipped,_,1)),fail, (dbase_t(Skipped);out_of_dbase_t(Skipped)).
-implied_skipped(Skipped):-user:already_added_this_round(Skipped).
+% implied_skipped(Skipped):-user:already_added_this_round(Skipped).
 
 
-:-export(add_fast/1).
+:-export(pfcAdd_fast/1).
 % -  add(Assertion)
-% add_fast(C0):- must_det((add_fast(C0), xtreme_debug(once(ireq(C0);(with_all_dmsg((debug(blackboard),show_call(add_fast(C0)),rtrace(add_fast(C0)),dtrace(ireq(C0))))))))),!.
+% pfcAdd_fast(C0):- must_det((pfcAdd_fast(C0), xtreme_debug(once(ireq(C0);(with_all_dmsg((debug(blackboard),show_call(pfcAdd_fast(C0)),rtrace(pfcAdd_fast(C0)),dtrace(ireq(C0))))))))),!.
 add_fast(Term):-dbase_numbervars_with_names(Term),dbase_modify(change(assert,add), Term),!. % ,xtreme_debug(ireq(C0)->true;dmsg(warn(failed_ireq(C0)))))),!.
 
 % -  upprop(Obj,PropSpecs) update the properties
 upprop(Obj,PropSpecs):- upprop(props(Obj,PropSpecs)).
 upprop(C0):- add(C0).
 % -  padd(Obj,Prop,Value)
-padd(Obj,PropSpecs):- add(/*to_exp*/(props(Obj,PropSpecs))).
+padd(Obj,PropSpecs):- add((props(Obj,PropSpecs))).
 % -  padd(Obj,Prop,Value)
-padd(Obj,Prop,Value):- add(/*to_exp*/(dbase_t(Prop,Obj,Value))).
+padd(Obj,Prop,Value):- add((dbase_t(Prop,Obj,Value))).
 % -  prop(Obj,Prop,Value)
 prop(Obj,Prop,Value):- req(dbase_t(Prop,Obj,Value)).
 % -  prop_or(Obj,Prop,Value,OrElse)
@@ -493,5 +498,6 @@ db_redir_op_if_needed(Op,_C0,Prop,ARGS):- database_modify_units(Op,Unit).
 */
 
 test_expand_units(IN):-fully_expand(query(dbase_t,must),IN,OUT),dmsg(test_expand_units((IN->OUT))).
+
 
 

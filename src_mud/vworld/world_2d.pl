@@ -167,7 +167,7 @@ is_at(Obj,Where):-localityOfObject(Obj,Where).
 is_at(Obj,Where):-mudAtLoc(Obj,Where).
 is_at(Obj,Where):-mudSubPart(What,Obj),is_at(What,Where).
 
-(tObj(Obj), ~mudPossses(_,Obj))=>spatialInRegion(Obj).
+(tObj(Obj), ~mudPossess(_,Obj))=>spatialInRegion(Obj).
 tPathway(Obj)=>spatialInRegion(Obj).
 
 
@@ -284,7 +284,7 @@ is_in_world(Obj):-clause(mudStowing(Who,Obj),true),!,is_in_world(Who).
 is_in_world(Obj):-mudSubPart(What,Obj),is_in_world(What),!.
 
 put_in_world(Obj):-is_in_world(Obj),!.
-put_in_world(Obj):-random_xyzFn(LOC),pfcAdd(mudAtLoc(Obj,LOC)).
+put_in_world(Obj):-random_xyzFn(LOC),add_fast(mudAtLoc(Obj,LOC)).
 
 
 
@@ -321,7 +321,7 @@ create_random_fact(G) :- into_functor_form(dbase_t,G,MPred),G\=@=MPred,!,create_
 create_random_fact(G) :- is_asserted(G),!,dmsg((create_random_fact(G) :- is_asserted(G))).
 create_random_fact(dbase_t(mudAtLoc,Obj,LOC)) :- !,nonvar(Obj),is_asserted(localityOfObject(Obj,Region)),!,((in_grid(Region,LOC),unoccupied(Obj,LOC),is_fact_consistent(mudAtLoc(Obj,LOC)))).
 create_random_fact(dbase_t(localityOfObject,Obj,Region)) :- !, nonvar(Obj),not(is_asserted(localityOfObject(Obj,_))),asserted_or_deduced(localityOfObject(Obj,Region)).
-create_random_fact(dbase_t(Other,Obj,Default)) :- nonvar(Obj),argIsa_call(Other,2,Type),random_instance_no_throw(Type,Default,ground(Default)),!.
+create_random_fact(dbase_t(Other,Obj,Default)) :- nonvar(Obj),argIsa(Other,2,Type),random_instance_no_throw(Type,Default,ground(Default)),!.
 
 
 %  suggest random values
@@ -483,7 +483,6 @@ facing_offset(left,F,X,Y,Z):-dir_offset(vWest,F,X,Y,Z).
 facing_offset(right,F,X,Y,Z):-dir_offset(vEast,F,X,Y,Z).
 facing_offset(behind,F,X,Y,Z):-dir_offset(vSouth,F,X,Y,Z).
 facing_offset(front,F,X,Y,Z):-dir_offset(vNorth,F,X,Y,Z).
-
 
 
 user:decl_database_hook(change( retract,_),mudAtLoc(Agent,_)):-padd(Agent,mudNeedsLook(vTrue)).

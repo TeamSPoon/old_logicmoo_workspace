@@ -33,9 +33,12 @@ get_pifunctor(Head,PHead,F,A):-atom(Head),ensure_arity(Head,A),!,get_pifunctor(H
 
 maybe_storage_stub(F,StubType):- hybrid_tPredStubImpl(StubType),not((StubType==prologOnly)),arity(F,A),must(ensure_universal_stub(F/A)).
 
-% user:decl_database_hook(change(assert,_),user:mpred_prop(F,StubType)):- maybe_storage_stub(F,StubType).
-% user:decl_database_hook(change(assert,_),isa(F,StubType)):- maybe_storage_stub(F,StubType).
-% user:decl_database_hook(change(assert,_),arity(F,StubType)):-  hybrid_tPredStubImpl(StubType),user:mpred_prop(F,StubType),must(ensure_universal_stub(F/A)).
+
+%OLD user:decl_database_hook(change(assert,_),user:mpred_prop(F,StubType)):- maybe_storage_stub(F,StubType).
+
+%OLD user:decl_database_hook(change(assert,_),isa(F,StubType)):- maybe_storage_stub(F,StubType).
+
+%OLD user:decl_database_hook(change(assert,_),arity(F,StubType)):-  hybrid_tPredStubImpl(StubType),user:mpred_prop(F,StubType),must(ensure_universal_stub(F/A)).
 
 
 % has_storage_stub(Head):- !.
@@ -223,7 +226,7 @@ rescan_mpred_props_ilc.
 % ================================================================================
 provide_clauses_list(Head,HBLISTO):- get_pifunctor(Head,PHead,_),  
   findall((PHead :- B),
-    no_repeats_old([PHead:B],((call_no_cuts(user:provide_mpred_storage_clauses(_,PHead,B,Proof)),is_source_proof(Proof)))),
+    no_repeats_old([PHead:B],((call_no_cuts(user:provide_mpred_storage_clauses(PHead,B,Proof)),is_source_proof(Proof)))),
    HBLIST),
    create_stub_body(PHead,Stub),
    delete(HBLIST,Stub,HBLISTO),!.

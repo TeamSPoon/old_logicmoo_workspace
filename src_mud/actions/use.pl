@@ -26,7 +26,7 @@ genls(tStowAble,tCarryAble).
 :-decl_mpred_hybrid(mudStowing/2).
 :-decl_mpred_hybrid(mudPossess/2).
 
-:-pfcAdd((mudStowing(A,O) => mudPossess(A,O))).
+:-add((mudStowing(A,O) => mudPossess(A,O))).
 mudWielding(A,O) => mudPossess(A,O).
 wearsClothing(A,O) => mudPossess(A,O).
 

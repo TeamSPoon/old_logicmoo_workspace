@@ -71,6 +71,8 @@ user_db:grant_openid_server(_,_).
 
 :- load_conf_d([ 'config-enabled' ], []).
 
+:-nb_setval(pldoc_options,[ prefer(manual) ]).
+
 :- use_module(library(http/thread_httpd)).
 :- use_module(library(http/http_dispatch)).
 
@@ -158,7 +160,7 @@ http_open:location(A, B) :-
 semweb_startup_late:- cp_server:attach_account_info.
 
 :- asserta((user:file_search_path(A,B):-pre_file_search_path(A,B))).
-
+ 
 
 semweb_startup_late:- debug(http_request(_)),debug(cm(_)),debug(swish(_)),debug(storage).
 semweb_startup_late:- listing(pre_http_location/3).

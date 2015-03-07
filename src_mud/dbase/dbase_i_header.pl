@@ -81,7 +81,7 @@
 :- multifile user:now_unused/1.
 :- multifile user:provide_mpred_read_attributes/3.
 :- multifile user:provide_mpred_setup/4.
-:- multifile user:provide_mpred_storage_clauses/4.
+:- multifile user:provide_mpred_storage_clauses/3.
 :- multifile user:provide_mpred_storage_op/2.
 :- multifile user:provide_mpred_write_attributes/2.
 
@@ -105,9 +105,9 @@
 :- dynamic_multifile_exported user:arity/2.
 :- dynamic_multifile_exported user:mpred_prop/2.
 :- dynamic_multifile_exported user:'<=>'/2.
-:- dynamic_multifile_exported user:ruleForward/2.
+% :- dynamic_multifile_exported user:ruleForward/2.
 :- dynamic_multifile_exported user:ruleRewrite/2.
-:- dynamic_multifile_exported user:ruleBackward/2.
+% :- dynamic_multifile_exported user:ruleBackward/2.
 
 % :- '@'(ensure_loaded(dbase),'user').
 

@@ -200,8 +200,8 @@ on(Object,floor).
 action(moveto(Actor,From,To))
   =>
   {rem2(at(Actor,From)),
-   pfcAdd(at(Actor,To)),
-   (grasping(Actor,Object) -> pfcAdd(at(Object,To)) ; true),
+   add(at(Actor,To)),
+   (grasping(Actor,Object) -> add(at(Object,To)) ; true),
    rem2(action(moveto(Actor,From,To)))}.
    
 
@@ -225,7 +225,7 @@ on(X,Y) => {format("~n~w now on ~w",[X,Y])}.
 % jump to the floor.
 action(on(Actor,floor)) =>
   { format("~n~w jumps onto the floor",[Actor]),
-  pfcAdd(on(Actor,floor)) }.
+  add(on(Actor,floor)) }.
 
 action(on(Actor,X)),
 at(Actor,Loc),
@@ -233,26 +233,26 @@ at(X,Loc),
 ~grasping(Actor,_)
   => {
   format("~n~w climbs onto ~w.",[Actor,X]),
-  pfcAdd(on(Actor,X)) }.
+  add(on(Actor,X)) }.
 
 action(grasping(Actor,Object)),
 weight(Object,light),
 at(Object,XY)
 =>
 
- (~at(Actor,XY)  =>  {pfcAdd(action(at(Actor,XY)))}),
+ (~at(Actor,XY)  =>  {add(action(at(Actor,XY)))}),
 
  (~on(Object,ceiling),at(Actor,XY)
   =>
   {format("~n~w picks up ~w.",[Actor,Object])},
-  {pfcAdd(grasping(Actor,Object))}),
+  {add(grasping(Actor,Object))}),
 
  (on(Object,ceiling), at(ladder,XY)
   =>
      (~on(Actor, ladder)
       =>
       {format("~n~w wants to climb ladder to get to ~w.",[Actor,Object]),
-       pfcAdd(action(on(Actor,ladder)))}),
+       add(action(on(Actor,ladder)))}),
 
      (on(Actor,ladder)
       =>
@@ -262,14 +262,14 @@ at(Object,XY)
  (on(Object,ceiling), ~at(ladder,XY)
   =>
   {format("~n~w wants to move ladder to ~w.",[Actor,XY]),
-  pfcAdd(action(move(Actor,ladder,XY)))}).
+  add(action(move(Actor,ladder,XY)))}).
 
 
 action(at(Actor,XY)),
    at(Actor,XY2)/(\==(XY , XY2))
     =>
    {format("~n~w wants to move from ~w to ~w",[Actor,XY2,XY]),
-    pfcAdd(action(moveto(Actor,XY2,XY)))}.
+    add(action(moveto(Actor,XY2,XY)))}.
 
 (action(on(Actor,Object)) ; action(grasping(Actor,Object))),
 at(Object,XY),
@@ -298,33 +298,33 @@ action(move(Actor,Object,Destination)),
 % here''s how to do it:
 start :-
 
-  pfcAdd(object(bananas)),
-  pfcAdd(weight(bananas,light)),
-  pfcAdd(at(bananas,xy(9,9))),
-  pfcAdd(on(bananas,ceiling)),
+  add(object(bananas)),
+  add(weight(bananas,light)),
+  add(at(bananas,xy(9,9))),
+  add(on(bananas,ceiling)),
 
-  pfcAdd(object(couch)),
-  pfcAdd(wieght(couch,heavy)),
-  pfcAdd(at(couch,xy(7,7))),
-  pfcAdd(on(couch,floor)),
+  add(object(couch)),
+  add(wieght(couch,heavy)),
+  add(at(couch,xy(7,7))),
+  add(on(couch,floor)),
 
-  pfcAdd(object(ladder)),
-  pfcAdd(weight(ladder,light)),
-  pfcAdd(at(ladder,xy(4,3))),
-  pfcAdd(on(ladder,floor)),
+  add(object(ladder)),
+  add(weight(ladder,light)),
+  add(at(ladder,xy(4,3))),
+  add(on(ladder,floor)),
 
-  pfcAdd(object(blanket)),
-  pfcAdd(weight(blanket,light)),
-  pfcAdd(at(blanket,xy(7,7))),
+  add(object(blanket)),
+  add(weight(blanket,light)),
+  add(at(blanket,xy(7,7))),
 
-  pfcAdd(object(monkey)),
-  pfcAdd(on(monkey,couch)),
-  pfcAdd(at(monkey,xy(7,7))),
-  pfcAdd(grasping(monkey,blanket)).
+  add(object(monkey)),
+  add(on(monkey,couch)),
+  add(at(monkey,xy(7,7))),
+  add(grasping(monkey,blanket)).
 
 :-dynamic(go/0).
 % go. to get started.
-go :- pfcAdd(action(grasping(monkey,bananas))).
+go :- add(action(grasping(monkey,bananas))).
 
 db :- listing([object,at,on,grasping,weight,action]).
 
@@ -402,7 +402,7 @@ or(P,Q) =>
 prove_by_contradiction(P) :- P.
 prove_by_contradiction(P) :-
   \+ (neg(P) ; P),
-  pfcAdd(neg(P)),
+  add(neg(P)),
   P -> rem1(neg(P))
     ; (rem1(neg(P)),fail).
 
@@ -436,7 +436,7 @@ time(Call,Time) :-
 
 
 test0 :- 
-  pfcAdd([(p(X) => q),
+  add([(p(X) => q),
        p(1),
        (p(X), ~r(X) => s(X)),
        (t(X), {X>0} => r(X)),
@@ -450,19 +450,19 @@ test1 :-
 
 % test2 
 :-
-  pfcAdd([(a(X),~b(Y)/(Y>X) => biggest(a)),
+  add([(a(X),~b(Y)/(Y>X) => biggest(a)),
        (b(X),~a(Y)/(Y>X) => biggest(b)),
         a(5)]).
 
 
 %test3 :-
-%  pfcAdd([(a(X),\+(b(Y))/(Y>X) => biggest(a)),
+%  add([(a(X),\+(b(Y))/(Y>X) => biggest(a)),
 %       (b(X),\+a((Y))/(Y>X) => biggest(b)),
 %        a(5)]).
 
 % test4 
 :-
-    pfcAdd([(foo(X), bar(Y)/{X=:=Y} => foobar(X)),
+    add([(foo(X), bar(Y)/{X=:=Y} => foobar(X)),
          (foobar(X), go => found(X)),
 	 (found(X), {X>=100} => big(X)),
 	 (found(X), {X>=10,X<100} => medium(X)),
@@ -478,7 +478,7 @@ test1 :-
 
 % test5 
 :-
-    pfcAdd([(faz(X), ~baz(Y)/{X=:=Y} => fazbaz(X)),
+    add([(faz(X), ~baz(Y)/{X=:=Y} => fazbaz(X)),
          (fazbaz(X), go => found(X)),
 	 (found(X), {X>=100} => big(X)),
 	 (found(X), {X>=10,X<100} => medium(X)),
@@ -492,7 +492,7 @@ test1 :-
 
 % test6 
 :-
-    pfcAdd([(d(X), ~f(Y)/{X=:=Y} => justD(X)),
+    add([(d(X), ~f(Y)/{X=:=Y} => justD(X)),
          (justD(X), go => dGo(X)),
 	 d(1),
 	 go,
@@ -502,7 +502,7 @@ test1 :-
 
 % test7 
 :-
-    pfcAdd([(g(X), h(Y)/{X=:=Y} => justG(X)),
+    add([(g(X), h(Y)/{X=:=Y} => justG(X)),
          (justG(X), go => gGo(X)),
 	 g(1),
 	 go,
@@ -512,7 +512,7 @@ test1 :-
 
 % test8 
 :-
-    pfcAdd([(j(X), k(Y) => bothJK(X,Y)),
+    add([(j(X), k(Y) => bothJK(X,Y)),
          (bothJK(X,Y), go => jkGo(X,Y)),
 	 j(1),
 	 go,
@@ -522,7 +522,7 @@ test1 :-
 
 % test9 
 :-
-    pfcAdd([(j(X), k(Y) => bothJK(X,Y)),
+    add([(j(X), k(Y) => bothJK(X,Y)),
          (bothJK(X,Y) => jkGo(X,Y)),
 	 j(1),
 	 k(2)
@@ -530,7 +530,7 @@ test1 :-
 
 % test10 
 :-
-  pfcAdd([
+  add([
 	(j(X), k(Y) => bothJK(X,Y)),
 	(bothJK(X,Y), go => jkGo(X,Y)),
 	j(1),
@@ -590,7 +590,7 @@ isa(C1,C2) =>
 penguin(X) => not(fly(X)).
 
 % chilly is a penguin.
-:-(pfcAdd(=> penguin(chilly))).
+:-(add(=> penguin(chilly))).
 
 % rtrace(Goal):- Goal. % (notrace((visible(+all),visible(+unify),visible(+exception),leash(-all),leash(+exception))),(trace,Goal),leash(+all)).
 

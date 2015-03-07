@@ -48,7 +48,6 @@ farthest_reachable_object0(Agent,Obj):-
 farthest_reachable_object0(Agent,Obj):-
   test_exists(Obj),
   mudPossess(Agent,Obj).
-  
 
 detatch_object(Obj):-  
   (is_asserted(mudPossess(Agent,Obj))->clr(mudPossess(Agent,Obj));true),

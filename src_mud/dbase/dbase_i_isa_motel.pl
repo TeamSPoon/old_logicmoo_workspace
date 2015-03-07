@@ -15413,7 +15413,7 @@ motel_literal_assert_retract(typeSubclass(X,Y),defprimconcept(X,Y),undefprimconc
 motel_literal_assert_retract(disjointWith(X,Y),sb_disjoint(X,Y),undefprimconcept(X,isTDisjoint(Y))).
 motel_literal_assert_retract(isa(X,Y),assert_ind(X,Y),delete_ind(X,Y)).
 
-user:decl_database_hook(OP,FACT):-motel_user_decl_database_hook(OP,FACT).
+%OLD user:decl_database_hook(OP,FACT):-motel_user_decl_database_hook(OP,FACT).
 
 
 motel_user_decl_database_hook(change(assert,_),isa(C,ttObjectType)):-!,must(sb_primconcept(C)).

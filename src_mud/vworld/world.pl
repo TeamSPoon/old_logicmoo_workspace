@@ -110,7 +110,7 @@ anyInst(O):-exisitingThing(O).
 
 % predArgTypes(typeGenls(col,metaclass)).
 
-user:decl_database_hook(change(assert,_),typeGenls(_,MC)):-assert_isa(MC,ttTypeType).
+%OLD user:decl_database_hook(change(assert,_),typeGenls(_,MC)):-assert_isa(MC,ttTypeType).
 
 % deduce_facts(typeGenls(T,MC),deduce_facts(genls(S,T),isa(S,MC))).
 
@@ -128,7 +128,9 @@ ttNotSpatialType(ftInt).
 ttNotSpatialType(ftTerm).
 
 genls(tWearAble,tItem).
-genls(tLookAble,tItem).
+genls(tItem,tLookAble).
+genls(tRegion,tLookAble).
+genls(tObj,tLookAble).
 genls(tKnife,tItem).
 genls(tFood,tItem).
 

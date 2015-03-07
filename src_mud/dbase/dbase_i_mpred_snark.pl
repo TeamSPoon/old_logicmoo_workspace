@@ -1067,7 +1067,7 @@ provide_snark_op(call(_How),Head):-
 % OPHOOK CLAUSES
 provide_snark_op(clauses(_How),(Head:-Body)):- 
    pttp_listens_to_head(Head),
-   provide_mpred_storage_clauses(wid,Head,Body).
+   provide_mpred_storage_clauses(Head,Body,_Why).
 
 % OPHOOK 
 provide_snark_op(OP,(HeadBody)):- 
@@ -1076,8 +1076,8 @@ provide_snark_op(OP,(HeadBody)):-
 
 
 % CLAUSES HOOK 
-user:provide_mpred_storage_clauses(wid,H,B,ftProofFn(IDWhy)):-wid(IDWhy,_,(H:-B)).
-user:provide_mpred_storage_clauses(wid,H,true,ftProofFn(IDWhy)):-wid(IDWhy,_,(H)),compound(H),not(functor(H,':-',2)).
+user:provide_mpred_storage_clauses(H,B,wid3(IDWhy)):-wid(IDWhy,_,(H:-B)).
+user:provide_mpred_storage_clauses(H,true,wid3(IDWhy)):-wid(IDWhy,_,(H)),compound(H),not(functor(H,':-',2)).
 
 
 % REGISTER HOOK

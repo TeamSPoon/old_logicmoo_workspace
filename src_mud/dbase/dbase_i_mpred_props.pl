@@ -23,11 +23,12 @@
 :- export user:mpred_prop/2.
 :- export is_never_type/1.
 
-user:decl_database_hook(change(assert,_),Fact):- ignore((compound(Fact),Fact=..[F,Arg1|PROPS],is_pred_declarer(F),decl_mpred(Arg1,[F|PROPS]))).
-user:decl_database_hook(change(assert,_),isa(F,P)):- is_pred_declarer(P),decl_mpred(F,P).
+%OLD user:decl_database_hook(change(assert,_),Fact):- ignore((compound(Fact),Fact=..[F,Arg1|PROPS],is_pred_declarer(F),decl_mpred(Arg1,[F|PROPS]))).
+%OLD user:decl_database_hook(change(assert,_),isa(F,P)):- is_pred_declarer(P),decl_mpred(F,P).
 % this causes too many bugs user:decl_database_hook(change(assert,_),user:mpred_prop(F,arity(A))):- ignore((A==1,atom(F),not(is_never_type(F)),not(user:mpred_prop(F,prologOnly)),decl_type(F))).
-user:decl_database_hook(change(assert,_),user:mpred_prop(F,P)):- decl_mpred(F,P).
+%OLD user:decl_database_hook(change(assert,_),user:mpred_prop(F,P)):- decl_mpred(F,P).
 
+asserted_mpred_prop(F,P):-clause(mpred_prop(F,P),true).
 
 arity(apathFn,2).
 arity(isKappaFn,2).
@@ -35,14 +36,13 @@ arity(isInstFn,1).
 arity(ftListFn,1).
 arity(xyzFn,4).
 arity(arity,2).
-arity(user:mpred_prop,2).
+arity(mpred_prop,2).
 arity(is_never_type,1).
 arity(self_call,1).
 arity(argIsa, 3).
 arity(isa, 2).
 %arity(Prop,2):-is_pred_declarer(Prop).
 arity(predArgTypes,2).
-arity(user:mpred_prop,2).
 arity(arity,2).
 arity(is_never_type,1).
 arity(prologSingleValued,1).
@@ -237,10 +237,10 @@ assert_predArgTypes_l(F,L,ArgsList):- must(assert_predArgTypes_from_right(F,L,Ar
 
 
 assert_predArgTypes_from_right(_,_,[]):-!.
-assert_predArgTypes_from_right(F,A,ArgsList):-append(Left,[Last],ArgsList),add(argIsa(F,A,Last)),!,Am1 is A -1, assert_predArgTypes_from_right(F,Am1,Left).
+assert_predArgTypes_from_right(F,A,ArgsList):-append(Left,[Last],ArgsList),assert_argIsa(F,A,Last),!,Am1 is A -1, assert_predArgTypes_from_right(F,Am1,Left).
 
 assert_predArgTypes_from_left(_,_,[]):-!.
-assert_predArgTypes_from_left(F,A,[Type|ArgsList]):-add(argIsa(F,A,Type)),!,Ap1 is A + 1,assert_predArgTypes_from_left(F,Ap1,ArgsList).
+assert_predArgTypes_from_left(F,A,[Type|ArgsList]):-assert_argIsa(F,A,Type),!,Ap1 is A + 1,assert_predArgTypes_from_left(F,Ap1,ArgsList).
 
 
 user:term_expansion(G,_):- not(prolog_mud_disable_term_expansions), not(thlocal:into_form_code),notrace((once(glean_pred_props_maybe(G)),fail)).

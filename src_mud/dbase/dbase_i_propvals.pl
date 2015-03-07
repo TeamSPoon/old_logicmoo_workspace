@@ -98,7 +98,7 @@ create_someval(Prop,Obj,Value):- into_mpred_form(dbase_t(Prop,Obj,Value),Fact),a
 create_someval(Prop,Obj,Value):- into_mpred_form(dbase_t(Prop,Obj,Value),Fact),not(test_tl(thlocal:noRandomValues,Fact)),create_random_fact(Fact),!.
 create_someval(Prop,Obj,_):- Fact=.. [Prop,Obj,_],test_tl(thlocal:infAssertedOnly,Fact),!,fail.
 create_someval(Prop,Obj,Value):- fallback_value(Prop,Obj,DValue),!,Value=DValue.
-create_someval(Pred,_Arg1,Value):- must_det_l([arity(Pred,Last),argIsa_call(Pred,Last,Type),random_instance(Type,Value,nonvar(Value))]).
+create_someval(Pred,_Arg1,Value):- must_det_l([arity(Pred,Last),argIsa(Pred,Last,Type),random_instance(Type,Value,nonvar(Value))]).
 
 asserted_or_deduced(Fact):- is_asserted(Fact),!.
 asserted_or_deduced(Fact):- user:fact_always_true(Fact),must_det(is_fact_consistent(Fact)),!,add(Fact).
@@ -117,7 +117,7 @@ random_instance_no_throw(Type,Value,Test):- copy_term(ri(Type,Value,Test),ri(RTy
    must_det(Test),!.
 random_instance_no_throw(Type,Value,Test):- atom(Type),atom_concat('random_',Type,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),call(Fact),Test,!.
 random_instance_no_throw(Type,Value,Test):- compound(Type),get_functor(Type,F),atom_concat('random_',F,Pred),current_predicate(F/1),Fact=..[Pred,Value],predicate_property(Fact,_),Fact,Test,!.
-random_instance_no_throw(Type,Value,Test):- compound(Type),get_functor(Type,F,GA),guess_arity(F,GA,A),functor(Formatted,F,A),hasInstance(ttFormatted,Formatted),
+random_instance_no_throw(Type,Value,Test):- compound(Type),get_functor(Type,F,GA),guess_arity(F,GA,A),functor(Formatted,F,A),hasInstance(ftFormatting,Formatted),
                          Formatted=..[F|ArgTypes],functor(Value,F,A),Value=..[F|ValueArgs],must((maplist(random_instance_no_throw,ArgTypes,ValueArgs,_),Test)),!.
 random_instance_no_throw(Type,Value,Test):- findall(V,isa(V,Type),Possibles),Possibles\=[],must_det((my_random_member(Value,Possibles),Test)),!.
 
@@ -165,7 +165,7 @@ checkNoArgViolation(Prop,Obj,__):-checkNoArgViolationOrDeduceInstead(Prop,1,Obj)
 checkNoArgViolation(_,_,_):-!.
 
 checkNoArgViolationOrDeduceInstead(_,_,_):-!.
-checkNoArgViolationOrDeduceInstead(Prop,N,Obj):-argIsa_call(Prop,N,Type),
+checkNoArgViolationOrDeduceInstead(Prop,N,Obj):-argIsa(Prop,N,Type),
    not(isa(Type,ttUnverifiableType)),
    findall(OT,isa(Obj,OT),OType),
    checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type).
@@ -180,7 +180,7 @@ checkNoArgViolationOrDeduceInstead(_Prop,_N,_Obj,[H|T],Type):-nonvar(T),!,member
 checkNoArgViolationOrDeduceInstead(Prop,N,[H|T],OType,Type):-!,forall(member(Obj,[H|T]),checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type)).
 checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type):- not(thlocal:deduceArgTypes(Prop)),!,reallyCheckArgViolation(Prop,N,Obj,OType,Type).
 checkNoArgViolationOrDeduceInstead(Prop,N,Obj,OType,Type):- must_det(deduce_argN(Prop,N,Obj,OType,Type)),fail.
-checkNoArgViolationOrDeduceInstead(Prop,N,Obj,_,_):- argIsa_call(Prop,N,Type),findall(OT,isa(Obj,OT),OType),reallyCheckArgViolation(Prop,N,Obj,OType,Type).
+checkNoArgViolationOrDeduceInstead(Prop,N,Obj,_,_):- argIsa(Prop,N,Type),findall(OT,isa(Obj,OT),OType),reallyCheckArgViolation(Prop,N,Obj,OType,Type).
 
 openSubClass(tSpatialThing).
 openSubClass(tObj).
@@ -192,11 +192,11 @@ reallyCheckArgViolation(_Prop,_N,_Obj,[OType|_],OpenSubClass):- openSubClass(Ope
 reallyCheckArgViolation(Prop,N,Obj,OType,Type):- violatesType(Obj,Type),trace_or_throw(violatesType_maybe_cache(Prop,N,Obj,OType\=Type)).
 reallyCheckArgViolation(_,_,_,_,_).
 
-assert_argIsa(Prop,N,Type):-show_call_failure(add(argIsa(Prop,N,Type))).
+assert_argIsa(Prop,N,Type):-show_call_failure(add_fast(argIsa(Prop,N,Type))).
 
 assert_subclass_on_argIsa(Prop,N,argIsaFn(Prop,N)):-!.
-assert_subclass_on_argIsa(Prop,N,_OType):-argIsa_call(Prop,N,PropType),PropType=argIsaFn(Prop,N),!. % , assert_argIsa(Prop,N,OType).
-assert_subclass_on_argIsa(Prop,N,OType):-argIsa_call(Prop,N,PropType),assert_subclass_safe(OType,PropType).
+assert_subclass_on_argIsa(Prop,N,_OType):-argIsa(Prop,N,PropType),PropType=argIsaFn(Prop,N),!. % , assert_argIsa(Prop,N,OType).
+assert_subclass_on_argIsa(Prop,N,OType):-argIsa(Prop,N,PropType),assert_subclass_safe(OType,PropType).
 
 guessed_mpred_arity(F,A):-arity(F,AA),!,A=AA.
 guessed_mpred_arity(_,2).
@@ -229,8 +229,8 @@ violatesType(Value,ftString):-string(Value),!,fail.
 violatesType(Value,Type):- compound(Type),!,ttFormatType(Type),not(term_is_ft(Value,Type)),!.
 violatesType(Value,Type):- once((isa_backchaing(Value,_))), no_loop_check(not(isa_backchaing(Value,Type))).
 
-user:decl_database_hook(Type,Changer):- retract(on_change_once(Type,Changer,Fact)),Fact.
-user:decl_database_hook(Type,Changer):- current_predicate(on_change_always/3),forall(on_change_always(Type,Changer,Fact),Fact).
+%OLD user:decl_database_hook(Type,Changer):- retract(on_change_once(Type,Changer,Fact)),Fact.
+%OLD user:decl_database_hook(Type,Changer):- current_predicate(on_change_always/3),forall(on_change_always(Type,Changer,Fact),Fact).
 
 /*
 % = falbacks come from...
@@ -239,9 +239,9 @@ user:decl_database_hook(Type,Changer):- current_predicate(on_change_always/3),fo
 is_fact_consistent(Fact):-is_asserted(Fact),!.
 is_fact_consistent(Fact):-into_mpred_form(Fact,MForm), not(fact_is_false(MForm,_Why)).
 
-user:decl_database_hook(change(assert,_),Fact):- fact_is_false(Fact,Why),trace_or_throw(fact_is_false(Fact,Why)).
+%OLD user:decl_database_hook(change(assert,_),Fact):- fact_is_false(Fact,Why),trace_or_throw(fact_is_false(Fact,Why)).
 
-user:decl_database_hook(change(assert,_),Fact):- ignore((not(dont_check_args(Fact)),agenda_slow_op_enqueue(checkNoArgViolation(Fact)))).
+%OLD user:decl_database_hook(change(assert,_),Fact):- ignore((not(dont_check_args(Fact)),agenda_slow_op_enqueue(checkNoArgViolation(Fact)))).
 
 
 :-export(fallback_value/3).
@@ -265,12 +265,12 @@ defaultArgValue(mudEnergy(_,_),_,2,200):-!.
 defaultArgValue(mudHealth(_,_),_,2,500):-!.
 defaultArgValue(Fact,F,A,Value):- Fact=..[F,P|Args],is_fact_consistent(Fact),defaultArgValue(Fact,F,A,P,Args,Value).
 
-defaultArgValue(Fact,F,A,P,_Args,Value):-var(P),!,argIsa_call(F,A,Type),defaultTypeValue(Fact,Type,Value),!,dmsg(defaultArgValue(using_defaultTypeValue1(Fact,Type,Value))).
+defaultArgValue(Fact,F,A,P,_Args,Value):-var(P),!,argIsa(F,A,Type),defaultTypeValue(Fact,Type,Value),!,dmsg(defaultArgValue(using_defaultTypeValue1(Fact,Type,Value))).
 defaultArgValue(_Call,F,2,P,[Arg],Arg):-create_someval(F,P,Arg),!. 
 defaultArgValue(mudShape(Like,V1),mudShape,2,Like,[V1],_):- isa(Like,Type),V1 = isLikeFn(mudShape,Type).
 % OLD FALLBACK SYSTEM: defaultArgValue(Fact,F,LastPlus1,I,_Args,Value):- get_instance_default_props(I,PropList),Last is LastPlus1 - 1, functor(Prop,F,Last),member(Prop,PropList),arg(Last,Prop,Value),!,dmsg(defaultArgValue(defaultArgValue_get_type_props(Fact))).
 
-defaultArgValue(Fact,F,A,_P,_Args,Value):-argIsa_call(F,A,Type),is_fact_consistent(Fact),defaultTypeValue(Fact,Type,Value),!.
+defaultArgValue(Fact,F,A,_P,_Args,Value):-argIsa(F,A,Type),is_fact_consistent(Fact),defaultTypeValue(Fact,Type,Value),!.
 
 
 defaultTypeValue(Fact,_,_):- thlocal:noRandomValues(Fact),!,fail.

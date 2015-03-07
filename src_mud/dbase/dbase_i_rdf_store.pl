@@ -431,7 +431,7 @@ rdf_object(O):-ground(O).
 :-dynamic(thglobal:using_rdf_dbase_hook).
 
 :-multifile(user:decl_database_hook).
-user:decl_database_hook(change(assert,_A_or_Z),DBI):- copy_term(DBI,DB), thglobal:using_rdf_dbase_hook,numbervars_with_names(DB),rdf_assert_hook(DB),!.
+%OLD user:decl_database_hook(change(assert,_A_or_Z),DBI):- copy_term(DBI,DB), thglobal:using_rdf_dbase_hook,numbervars_with_names(DB),rdf_assert_hook(DB),!.
 
 :-thread_local(thlocal:rdf_asserting/2).
 
@@ -680,6 +680,7 @@ sync_from_rdf:-dmsg(todo(code_sync_from_rdf)),!.
 sync_from_rdf:-forall(rdf_db:rdf(S,P,O,DB),add_spog(S,P,O,DB)).
 
 % sync_to_rdf:-dmsg(todo(code_sync_to_rdf)),!.
+sync_to_rdf:-!.
 sync_to_rdf:-
    forall(p2q(P,NS,N),must(rdf_assert_p2q(P,NS,N))),  
    forall(user:mpred_prop(P,O),rdf_assert_hook(user:mpred_prop(P,O))),

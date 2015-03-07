@@ -18,12 +18,14 @@
 :- op(1100,fx,('=>')).
 :- op(1150,xfx,('::::')).
 
+:-nb_setval(pldoc_object,pldoc_object_missing).
+
 :- use_module(library(semweb/turtle)).
 :- include(dbase_i_header).
 :- multifile(system:term_expansion/2).
 :- multifile(user:term_expansion/2).
 :- multifile(user:goal_expansion/2).
-:-dynamic user:isa_pred_now_locked/0.
+:- dynamic(user:isa_pred_now_locked/0).
 :-thread_local user:prolog_mud_disable_term_expansions.
 % [Manditory] define how we interact with the module system
 
@@ -154,7 +156,8 @@ must_compile_special_clause(CL):- sanity(nonvar(CL)),not(thlocal:into_form_code)
 % A tiny bit of TMS
 % ================================================
 
-user:decl_database_hook(change(assert,_),Fact):- resolve_if_false(Fact).
+
+%OLD user:decl_database_hook(change(assert,_),Fact):- resolve_if_false(Fact).
 
 was_known_false(Fact):-is_known_false(Fact),doall(retract((is_known_false(_):-true))),dmsg(trace_or_throw(error+was_known_false(Fact))).
 
@@ -164,13 +167,15 @@ user:ruleRewrite(isa(isInstFn(Sub),Super),genls(Sub,Super)):-ground(Sub:Super),!
 user:ruleRewrite(mudLabelTypeProps(Lbl,T,[]),typeHasGlyph(T,Lbl)):-must(nonvar(T)).
 user:ruleRewrite(mudLabelTypeProps(Lbl,T,Props),typeProps(T,[typeHasGlyph(Lbl)|Props])).
 
-user:decl_database_hook(change(assert,_A_or_Z),typeProps(T,_)):- decl_type_safe(T).
 
-user:decl_database_hook(change(assert,_A_or_Z),user:mpred_prop(F,W)):- sanity((nop(user:mpred_prop(F,W)),atom(F))).
+%OLD user:decl_database_hook(change(assert,_A_or_Z),typeProps(T,_)):- decl_type_safe(T).
 
-user:decl_database_hook(change(assert,_),defnSufficient(FT,_)):- define_ft(FT).
 
-user:decl_database_hook(change(assert,_),subFormat(FT,OFT)):- define_ft(OFT),define_ft(FT).
+%OLD user:decl_database_hook(change(assert,_A_or_Z),user:mpred_prop(F,W)):- sanity((nop(user:mpred_prop(F,W)),atom(F))).
+
+%OLD user:decl_database_hook(change(assert,_),defnSufficient(FT,_)):- define_ft(FT).
+
+%OLD user:decl_database_hook(change(assert,_),subFormat(FT,OFT)):- define_ft(OFT),define_ft(FT).
 
 
 % ================================================
@@ -182,7 +187,7 @@ user:decl_database_hook(change(assert,_),subFormat(FT,OFT)):- define_ft(OFT),def
 while_capturing_changes(Call,Changes):-thread_self(ID),with_assertions(thlocal:dbase_capture(ID,_),(Call,get_dbase_changes(ID,Changes),clear_dbase_changes(ID))).
 clear_dbase_changes(ID):-retractall(thlocal:dbase_change(ID,_)).
 get_dbase_changes(ID,Changes):-findall(C,thlocal:dbase_change(ID,C),Changes).
-user:decl_database_hook(AR,C):- record_on_thread(dbase_change,changing(AR,C)).
+%OLD user:decl_database_hook(AR,C):- record_on_thread(dbase_change,changing(AR,C)).
 record_on_thread(Dbase_change,O):- thread_self(ID),thlocal:dbase_capture(ID,Dbase_change),!,Z=..[Dbase_change,ID,O],assertz(Z).
 
 
@@ -232,7 +237,7 @@ dbase_module_ready.
 :- with_no_term_expansions(if_file_exists(user_ensure_loaded(logicmoo(dbase/dbase_i_rdf_store)))).
 
 :- decl_mpred_hybrid(argIsa/3).
-user:ruleBackward( argIsa(F,N,Isa), argIsa_call(F,N,Isa)).
+:- add_fast(<=( argIsa(F,N,Isa), argIsa_known(F,N,Isa))).
 
 :-asserta(thlocal:pfcExpansion).
 :-decl_mpred_prolog(resolveConflict/1).
@@ -254,7 +259,8 @@ user:semweb_startup:- with_no_term_expansions(if_file_exists(user_ensure_loaded(
 :-decl_mpred_hybrid(resultIsa/2).
 
 system:term_expansion(IN,OUT):- not(user:prolog_mud_disable_term_expansions),
-  in_file_expansion, dbase_module_ready, must_compile_special_clause(IN),
+  dbase_module_ready, must_compile_special_clause(IN),
+  in_file_expansion, 
   loader_term_expansion(IN,WHY),must(OUT = user:WHY).
 
 % :- sanity(test_expand_units(tCol(_A))).
@@ -287,6 +293,19 @@ vtTestType(vTest2).
 
 :-must(in_file_expansion;in_file_directive).
 % :- must(show_call(ensure_plmoo_loaded(logicmoo(dbase/dbase_i_builtin)))).
+
+/*
+:- pfcAdd(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) => functorDeclares(F))).
+(ttFormatType(FT)/is_declarations(FT))=>ftFormatting(FT).
+
+action_info(ArgTypes)/is_declarations(ArgTypes) =>vtActionTemplate(ArgTypes).
+action_info(ArgTypes,_)/is_declarations(ArgTypes) =>vtActionTemplate(ArgTypes).
+
+ftFormatting(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
+predArgTypes(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
+vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
+
+*/
 
 :- must(show_call(with_assertions(thlocal:pfcExpansion,with_assertions(thlocal:consulting_sources,ensure_loaded(logicmoo(dbase/dbase_i_builtin)))))).
 

@@ -1857,6 +1857,7 @@ local_predicate(P,F/N):-functor_safe(P,F,N),!,fail.
 
 :-meta_predicate(real_builtin_predicate(0)).
 
+
 real_builtin_predicate(G):- predicate_property(G,foreign),!.
 real_builtin_predicate(G):- strip_module(G,_,GS),(predicate_property(prolog:GS,built_in);predicate_property(system:GS,built_in)),!.
 real_builtin_predicate(G):- (predicate_property(G,built_in),(functor(G,F,_),not(user:mpred_prop(F,prologHybrid)))).
@@ -2676,9 +2677,9 @@ dumpST(Opts):- dumpST(_,Opts).
 
 dumpST(Frame,Opts):-var(Opts),!,dumpST(Frame,5000).
 dumpST(Frame,MaxDepth):-integer(MaxDepth),Term = dumpST(MaxDepth),
-   ignore(prolog_current_frame(Frame)),
+   (var(Frame)->prolog_current_frame(Frame);true),
    ignore(( get_prolog_backtrace(MaxDepth, Trace,[frame(Frame),goal_depth(100)]),
-    format(user_error, '% ~p', [Term]), nl(user_error),
+    format(user_error, '% dumpST ~p', [Term]), nl(user_error),
     print_prolog_backtrace(user_error, Trace,[subgoal_positions(true)]), nl(user_error), fail)).
 dumpST(Frame,Opts):-is_list(Opts),!,dumpST(1,Frame,Opts).
 dumpST(Frame,Opts):-show_call(dumpST(1,Frame,[Opts])).
@@ -2688,7 +2689,7 @@ get_m_opt(Opts,Max_depth,D100,RetVal):-E=..[Max_depth,V],(((member(E,Opts),nonva
 
 dumpST(N,Frame,Opts):-
   ignore(prolog_current_frame(Frame)),
-  must(( dumpST(N,Frame,Opts,Out))),
+  must(( dumpST4(N,Frame,Opts,Out))),
    must((get_m_opt(Opts,numbervars,-1,Start),
    neg1_numbervars(Out,Start,ROut),
    reverse(ROut,RROut),
@@ -2711,12 +2712,12 @@ fdmsg1(G):-mesg_color(G,Ctrl),!,ansicall(Ctrl,format(' ~q ',[G])),!.
 fdmsg(fr(List)):-is_list(List),!,fresh_line,ignore(forall(member(E,List),fdmsg1(E))),nl.
 fdmsg(M):-dmsg(M).
 
-dumpST(N,Frame,Opts,[nf(max_depth,N,Frame,Opts)]):-get_m_opt(Opts,max_depth,100,MD),N>=MD,!.
-dumpST(N,Frame,Opts,[fr(Goal)|MORE]):- get_m_opt(Opts,show,goal,Ctrl),getPFA(Frame,Ctrl,Goal),!,dumpST_Parent(N,Frame,Opts,MORE).
-dumpST(N,Frame,Opts,[nf(no(Ctrl),N,Frame,Opts)|MORE]):- get_m_opt(Opts,show,goal,Ctrl),!,dumpST_Parent(N,Frame,Opts,MORE).
-dumpST(N,Frame,Opts,[nf(noFrame(N,Frame,Opts))]).
+dumpST4(N,Frame,Opts,[nf(max_depth,N,Frame,Opts)]):-get_m_opt(Opts,max_depth,100,MD),N>=MD,!.
+dumpST4(N,Frame,Opts,[fr(Goal)|MORE]):- get_m_opt(Opts,show,goal,Ctrl),getPFA(Frame,Ctrl,Goal),!,dumpST_Parent(N,Frame,Opts,MORE).
+dumpST4(N,Frame,Opts,[nf(no(Ctrl),N,Frame,Opts)|MORE]):- get_m_opt(Opts,show,goal,Ctrl),!,dumpST_Parent(N,Frame,Opts,MORE).
+dumpST4(N,Frame,Opts,[nf(noFrame(N,Frame,Opts))]).
 
-dumpST_Parent(N,Frame,Opts,More):- prolog_frame_attribute(Frame,parent,ParentFrame), NN is N +1,dumpST(NN,ParentFrame,Opts,More),!.
+dumpST_Parent(N,Frame,Opts,More):- prolog_frame_attribute(Frame,parent,ParentFrame), NN is N +1,dumpST4(NN,ParentFrame,Opts,More),!.
 dumpST_Parent(N,Frame,Opts,[nf(noParent(N,Frame,Opts))]).
 
 
@@ -2931,6 +2932,27 @@ export_all_preds(ModuleName):-forall(current_predicate(ModuleName:F/A),
 
 module_notrace(M):- forall(predicate_property(P,imported_from(M)),bugger:moo_hide_childs(M:P)).
 
+:-export(doall/1).
+:- meta_predicate doall(0).
+doall(M:C):-!, M:ignore(M:(C,fail)).
+doall(C):-ignore((C,fail)).
+
+
+:-meta_predicate clause_safe(?, ?).
+:-module_transparent clause_safe/2.
+:- export(clause_safe/2).
+
+:- export(clause_safe_m3/3).
+
+clause_safe(M:H,B):-!,debugOnError(clause(M:H,B)).
+clause_safe(H,B):-!,debugOnError(clause(H,B)).
+
+clause_safe(M:H,B):-!,clause_safe_m3(M,H,B).
+clause_safe(H,B):-!,clause_safe_m3(_,H,B).
+%clause_safe(M,string(S),B):- trace_or_throw(clause_safe(M,string(S),B)).
+clause_safe_m3(M,H,B):-  (nonvar(H)->true;(trace,current_predicate(M:F/A),functor(H,F,A))),predicate_property(M:H,number_of_clauses(_)),clause(H,B).
+
+
 
 % =====================================================================================================================
 :- export((call_no_cuts/1)).
@@ -2941,8 +2963,8 @@ call_no_cuts((A,B)):-!,(call_no_cuts(A),call_no_cuts(B)).
 call_no_cuts((A;B)):-!,(call_no_cuts(A);call_no_cuts(B)).
 call_no_cuts((A->B)):-!,(call_no_cuts(A)->call_no_cuts(B)).
 call_no_cuts((A->B;C)):-!,(call_no_cuts(A)->call_no_cuts(B);call_no_cuts(C)).
-call_no_cuts(M:CALL):-atom(M),get_functor(CALL,F,A),functor(C,F,A),must(once(not(not(clause_safe(C,_))))),!,clause_safe(CALL,TEST),call(TEST).
-call_no_cuts(CALL):-get_functor(CALL,F,A),functor(C,F,A),must(once(not(not(clause_safe(C,_))))),!,clause_safe(CALL,TEST),call(TEST).
+call_no_cuts(M:CALL):-atom(M),!,functor(CALL,F,A),functor(C,F,A),must(once(not(not(clause_safe(C,_))))),!,clause_safe(CALL,TEST),call(TEST).
+call_no_cuts(CALL):-functor(CALL,F,A),functor(C,F,A),must(once(not(not(clause_safe(C,_))))),!,clause_safe(CALL,TEST),call(TEST).
 
 :- meta_predicate call_no_cuts_loop_checked(0).
 :- module_transparent call_no_cuts_loop_checked/1.
@@ -3279,7 +3301,9 @@ term_listing(Match):-
   '@'(ignore((catch(listing(Match),E,wdmsg(E)))),'user'),
   term_non_listing(Match),!.
 
+user:listing_mpred_hook(_):-fail.
 user:term_dbase_listing(Match):-
+ current_predicate(user:listing_mpred_hook/1), 
  %format('/* listing_mpred_hook(~q) => ~n',[Match]),!,
  once(debugOnError(doall(call_no_cuts(user:listing_mpred_hook(Match))))),
  !. %format(' <= listing_mpred_hook(~q) */ ~n',[Match]).
@@ -3475,6 +3499,10 @@ bugger_error_info(C):-contains_var(type_error,C).
 bugger_error_info(C):-contains_var(instantiation_error,C).
 bugger_error_info(C):-contains_var(existence_error(procedure,_/_),C).
 
+:-thread_self(ID),current_input(In),asserta(thread_current_input(ID,In)).
+
+:-listing(thread_current_input/2).
+
 % Installs exception reporter.
 :- multifile(user:prolog_exception_hook/4).
 :- dynamic(user:prolog_exception_hook/4).
@@ -3489,8 +3517,14 @@ bugger_error_info(C):-contains_var(existence_error(procedure,_/_),C).
     Term \= type_error(character,_), 
     Term \= type_error(text,_), 
     Term \= syntax_error(_), 
+    Term \= existence_error(procedure,iCrackers1),
+    prolog_frame_attribute(Frame,parent,PFrame),
+    prolog_frame_attribute(PFrame,goal,Goal),
     format(user_error, 'Error ST-Begin: ~p', [Term]), nl(user_error),
+    ignore((thread_current_input(main,In),see(In))),
     dumpST(Frame,20),
+
+    dtrace(Goal),
     format(user_error, 'Error ST-End: ~p', [Term]), nl(user_error),
     nl(user_error), fail)).
 

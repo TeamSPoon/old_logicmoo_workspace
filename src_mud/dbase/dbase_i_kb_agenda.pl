@@ -165,7 +165,7 @@ convertOneSpawnArg(Funct,N,A,O):-spawnOneSpawnArg(Funct,N,A,O).
 
 spawnOneSpawnArg(Funct,N,A,O):-
  createByNameMangle(A,O,TypeA),assert_isa(TypeA,tCol),
- assert_subclass_on_argIsa(Funct,N,TypeA).
+ must(assert_subclass_on_argIsa(Funct,N,TypeA)).
  
 
 convertOneTypedSpawnArg(Type,A,O):-
@@ -280,7 +280,7 @@ createByNameMangle0(InstA,IDA,InstA):- gensym(InstA,IDA), englishServerInterface
 
 
 create_from_type(OType,InstA,Type):-sanity(var(InstA)),i_name(t,OType,Type),atom_concat(Type,'7',InstA7),i_name(i,InstA7,InstA),must_det(assert_isa(InstA,Type)), 
- call_after_dbase_load_slow(create_instance(InstA,Type)).
+ call_after_dbase_load_slow(isa(InstA,Type)).
 
 wfAssert(X):-add(X). % add_later(X).
 

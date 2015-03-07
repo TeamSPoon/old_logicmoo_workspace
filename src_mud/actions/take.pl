@@ -72,7 +72,7 @@ do_change_for_take(Agent,Obj) :-
 
 must_post_for_take(Agent,Obj):-
        fmt([Agent,take,Obj]),
-       (req(mudPossess(Agent,Obj)) -> true; trace_or_throw(req(mudPossess(Agent,Obj)))).
+       sanity(mudPossess(Agent,Obj)).
 
 % Record keeping
 update_charge(Agent,actTake) :- 

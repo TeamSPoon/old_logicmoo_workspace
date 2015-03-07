@@ -37,7 +37,8 @@ alt_forms1(AR,P,NP):-compound(P),P=..[F,A,B|R],alt_forms2(AR,F,A,B,R,NP).
 % alt_forms2(r,F,A,B,R,NP):-genlPreds(F,FF),NP=..[FF,A,B|R].
 alt_forms2(r,F,A,B,R,NP):-genlPreds(FF,F),NP=..[FF,A,B|R].
 
-user:decl_database_hook(change( retract,Kind),P):- forall(alt_forms(r,P,NP),ignore(dbase_op(change( retract,Kind),NP))).
+
+%OLD user:decl_database_hook(change( retract,Kind),P):- forall(alt_forms(r,P,NP),ignore(dbase_op(change( retract,Kind),NP))).
 
 
 
@@ -47,17 +48,17 @@ user:decl_database_hook(change( retract,Kind),P):- forall(alt_forms(r,P,NP),igno
 % ========================================================================================
 
 
-user:decl_database_hook(Type,Fact):- current_predicate(add_deduction/3),current_predicate(add/1),run_deduce_facts_from(Type,Fact).
+%OLD user:decl_database_hook(Type,Fact):- current_predicate(add_deduction/3),current_predicate(add/1),run_deduce_facts_from(Type,Fact).
 
 
-user:decl_database_hook(_,user:mpred_prop('ArtifactCol1008-VISOR688', flagged_visor)):- trace_or_throw(user:mpred_prop('ArtifactCol1008-VISOR688', flagged_visor)).
+%OLD user:decl_database_hook(_,user:mpred_prop('ArtifactCol1008-VISOR688', flagged_visor)):- trace_or_throw(user:mpred_prop('ArtifactCol1008-VISOR688', flagged_visor)).
 
 run_deduce_facts_from(Type,M:Fact):-atom(M),!,run_deduce_facts_from(Type,Fact).
 run_deduce_facts_from(Type,Fact):-loop_check_local(run_deduce_facts_from_ilc(Type,Fact),true).
 run_deduce_facts_from_ilc(Type,Fact):-doall((call_no_cuts(deduce_facts_forward(Fact,Deduction)),add_deduction(Type,Deduction,Fact))).
 
 
-user:decl_database_hook(change(assert,_),BadFact):-mpred_call(tms_reject_why(BadFact,WHY)),trace_or_throw(tms_reject_why(BadFact,WHY)).
+%OLD user:decl_database_hook(change(assert,_),BadFact):-mpred_call(tms_reject_why(BadFact,WHY)),trace_or_throw(tms_reject_why(BadFact,WHY)).
 
 
 deduce_facts_forward(Fact,user:mpred_prop(AF,[predArgTypes(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],is_pred_declarer(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,
@@ -86,11 +87,19 @@ fix_argsIsas(_,_,[],[]):-!.
 fix_argsIsas(F,N,[Arg|TList],[G|List]):-
    fix_argIsa(F,N,Arg,G),!, N1 is N + 1,fix_argsIsas(F,N1,TList,List),!.
 
-user:decl_database_hook(change(assert,_),predArgTypes(ArgTs)):-
-   ArgTs=..[F|ArgTList],
+%OLD user:decl_database_hook(change(assert,_),predArgTypes(ArgTs)):-
+/*   ArgTs=..[F|ArgTList],
    fix_argsIsas(F,1,ArgTList,GList),
    Good=..[F|GList],
    Good\=ArgTs,!,del(user:mpred_prop(F,predArgTypes(ArgTs))),decl_mpred(F,predArgTypes(Good)).
+*/
+
+%OLD user:decl_database_hook(change(assert,_),isa(ArgTs,PredArgTypes)):- predArgTypes==PredArgTypes,
+/*   ArgTs=..[F|ArgTList],
+   fix_argsIsas(F,1,ArgTList,GList),
+   Good=..[F|GList],
+   Good\=ArgTs,!,del(user:mpred_prop(F,predArgTypes(ArgTs))),decl_mpred(F,predArgTypes(Good)).
+*/
 
 :-export(add_deduction/3).
 quiet_fact(Fact):-functor(Fact,F,A),quiet_fact(F,A).
@@ -114,7 +123,7 @@ do_deduction_type(change( retract,_),Fact):-clr(Fact).
 
 learnArgIsa(P,N,_):-argIsa_asserted(P,N,_),!.
 learnArgIsa(P,N,T):-dmsg((skipping(learnArgIsa(P,N,T)))),!.
-learnArgIsa(P,N,T):-grtrace, add(argIsa(P,N,T)).
+learnArgIsa(P,N,T):-grtrace, assert_argIsa(P,N,T).
 
 learnArgIsaInst(K,Num,Arg):-integer(Arg),!,learnArgIsa(K,Num,ftInt).
 learnArgIsaInst(K,Num,Arg):-number(Arg),!,learnArgIsa(K,Num,ftNumber).

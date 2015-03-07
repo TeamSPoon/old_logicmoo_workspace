@@ -28,8 +28,11 @@
 :- op(1100,fx,('=>')).
 :- op(1150,xfx,('::::')).
 
+tCol(X)=>{decl_type(X)}.
+:-decl_type(tBird).
 
 :- meta_predicate(neg(0)).
+
 
 :- meta_predicate(mp_test_agr(?,+,-,*,^,:,0,1,5,9)).
 % becomes         mp_test_agr(+,+,-,?,^,:,0,1,0,0)
@@ -42,7 +45,7 @@ mp_test_agr(_,_,_,_,_,_,_,_,_,_).
 
 :- include(dbase_i_header).
 
-:-must(add(argIsa(tPred,1,tPred))).
+:-must(assert_argIsa(tPred,1,tPred)).
 
 
 :-dynamic(pfcDefault/1).
@@ -97,7 +100,9 @@ notequal(C,B) <= equal(A,C),notequal(A,B).
 :- decl_type(completelyAssertedCollection).
 :- decl_type(completeExtentAsserted).
 :- decl_type(ttFormatType).
+:- decl_type(functorDeclares).
 :- decl_mpred_hybrid isa/2.
+
 % :- decl_mpred_pfc neg/1.
 :- decl_mpred_hybrid genls/2.
 :- decl_mpred_hybrid(( tCol/1, genls/2, predArgTypes/1)).
@@ -117,7 +122,6 @@ notequal(C,B) <= equal(A,C),notequal(A,B).
 :- decl_mpred_hybrid(argIsa/3).
 :- decl_mpred_hybrid(argSingleValueDefault, 3).
 :- decl_mpred_hybrid(disjointWith/2).
-:- decl_mpred_hybrid(functorDeclares/1).
 :- decl_mpred_hybrid(instTypeProps/3).
 :- decl_mpred_hybrid(predModule, 2).
 :- decl_mpred_hybrid(predProxyAssert,2).
@@ -131,7 +135,6 @@ notequal(C,B) <= equal(A,C),notequal(A,B).
 :- decl_mpred_hybrid(genls/2).
 :- decl_mpred_hybrid(typeGenls/2).
 :- decl_mpred_prolog(arg/3).
-:- decl_type(functorDeclares).
 :- decl_type(predArgTypes).
 :- decl_type(prologMultiValued).
 :- decl_type(prologSingleValued).
@@ -143,6 +146,8 @@ notequal(C,B) <= equal(A,C),notequal(A,B).
 :- decl_type(ttFormatted).
 :- decl_type(ttSpatialType).
 :- decl_type(ttTypeType).
+:- decl_type(tPathway).
+
 :- decl_type(ttValueType).
 :- decl_type(vtActionTemplate).
 :- define_ft(ftString).
@@ -155,12 +160,12 @@ notequal(C,B) <= equal(A,C),notequal(A,B).
 :- do_gc.
 :- forall(is_pred_declarer(F),must((decl_type(F),add(isa(F,functorDeclares)),add(genls(F,tPred))))).
 :- export mtForPred/2.
-:- must_det(argIsa_call(genlPreds,2,_Type)).
 :- user:decl_mpred_hybrid((argIsa/3, formatted_resultIsa/2, localityOfObject/2, subFormat/2, isa/2, mudLabelTypeProps/3, genls/2, pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, ttFormatType/1, typeProps/2)).
 :-add(isa(tObj,ttSpatialType)).
 :-add(isa(tRegion,ttSpatialType)).
 :-add(isa(ttFormatType,ttAbstractType)).
 :-add(predArgTypes(typeGenls(ttTypeType,tCol))).
+
 
 user:mpred_prop(defnSufficient,prologOnly).
 
@@ -206,8 +211,8 @@ predArgTypes(argSingleValueDefault(prologSingleValued,ftInt,ftTerm)).
 predArgTypes(formatted_resultIsa(ttFormatType,tCol)).
 predArgTypes(defnSufficient(ttFormatType,ftTerm)).
 predArgTypes(isLikeFn(tPred,tCol)).
-predArgTypes(ruleForward(ftAskable,ftTerm)).
-predArgTypes(ruleBackward(ftTerm,fsAskable)).
+predArgTypes('=>'(ftAskable,ftTerm)).
+predArgTypes('<='(ftTerm,fsAskable)).
 prologHybrid(instTypeProps(ftID,tCol,ftVoprop)).
 prologHybrid(subFormat(ttFormatType,ttFormatType)).
 prologMacroHead(macroSomethingDescription(ftTerm,ftListFn(ftString))).
@@ -223,8 +228,8 @@ prologMultiValued(predModule(tRelation,ftAtom)).
 prologMultiValued(predProxyAssert(prologMultiValued,ftTerm)).
 prologMultiValued(predProxyQuery(prologMultiValued,ftTerm)).
 % prologMultiValued('<=>'(ftTerm,ftTerm)).
-prologMultiValued(ruleBackward(ftTerm,fsAskable)).
-prologMultiValued(ruleForward(fsAskable,ftTerm)).
+prologMultiValued('<='(ftTerm,fsAskable)).
+prologMultiValued('=>'(fsAskable,ftTerm)).
 prologNegByFailure(predArgMulti(prologMultiValued,ftInt)).
 prologNegByFailure(tDeleted(ftID)).
 prologSingleValued(predInstMax(ftID,prologSingleValued,ftInt),prologHybrid).
@@ -380,6 +385,8 @@ dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
 => tCol(tRegion).
 => tCol(tContainer).
 
+(mpred_prop(_,predArgTypes(ArgTypes)),{is_declarations(ArgTypes)}) => ({is_declarations(ArgTypes)}, predArgTypes(ArgTypes)).
+
 
 % tCol(Type),(tBinaryPredicate(Pred)/(functor(G,Pred,2),G=..[Pred,isInstFn(Type),Value])), G => relationMostInstance(Pred,Type,Value).
 
@@ -442,23 +449,24 @@ tCol(tBird).
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 % % % These next two have been comnbined with the two following % % %
-%(((pfcDefault(P)/pfcLiteral(P))  =>  (~neg(P) => P))).
-%((pfcDefault((P => Q))/pfcLiteral(Q) => (P, ~neg(Q) => Q))).
+(((pfcDefault(P)/pfcLiteral(P))  =>  (~neg(P) => P))).
+((pfcDefault((P => Q))/pfcLiteral(Q) => (P, ~neg(Q) => Q))).
 
-((pfcDefault(P)/pfcLiteral(P), {pfcFreeLastArg(P,F)})) =>  ((~F, ~neg(P)) => P).
-((pfcDefault((P => Q))/pfcLiteral(Q), {pfcFreeLastArg(Q,F)})) => ((P, ~F, ~neg(Q)) => Q).
+%((pfcDefault(P)/pfcLiteral(P), {pfcVerifyMissing(P,F)})) =>  ((F, ~neg(P)) => P).
+%((pfcDefault((P => Q))/pfcLiteral(Q), {pfcVerifyMissing(Q,F)})) => ((P, F, ~neg(Q)) => Q).
 % % % 
 (pfcDefault((Q <= P))/pfcLiteral(Q)) => (Q <=(P, ~neg(Q))).
 %(pfcDefault((P => Q))/pfcLiteral(Q)) => (Q <=(P, ~neg(Q))).
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 
+ neg(P) <= {pfcVerifyMissing(P,F,Test)},Test,{F\=P}.
 
 % is this how to define constraints?
 either(P,Q) => (neg(P) => Q), (neg(Q) => P).
 % (P,Q => false) => (P => neg(Q)), (Q => neg(P)).
 
 % rembmer the tCol rule points to isa/2
-tCol(C)=>{P=..[C,I],assertz_if_new(P:-infoF(isa(I,C)))}.
+tCol(C)=>{atom(C),P=..[C,I],assertz_if_new(P:-infoF(isa(I,C)))}.
 
 %((relationMostInstance(Pred,Type,Value),{G=..[Pred,Inst,Value],GI=..[Pred,Inst,_]})) => (({GI=..[Pred,Inst,_]},isa(Inst,Type), ~GI) => G ).
 ((relationAllInstance(Pred,Type,Value),{G=..[Pred,Inst,Value]})) =>  ((isa(Inst,Type), {G=..[Pred,Inst,Value]} => G )).
@@ -480,7 +488,7 @@ zDefault((P => Q))/pfcLiteral(Q) => ((P, ~neg(Q) => Q)).
 % here's one way to do an isa hierarchy.
 % genlPreds = subclass.
 
-(genlPreds(C1,C2)) =>
+/*(genlPreds(C1,C2)) =>
   {P1 =.. [C1,X],
     P2 =.. [C2,X]},
   (P1 => P2).
@@ -494,7 +502,10 @@ zDefault((P => Q))/pfcLiteral(Q) => ((P, ~neg(Q) => Q)).
   {P1 =.. [C1,X,Y,Z],
     P2 =.. [C2,X,Y,Z]},
   (P1 => P2).
+*/
 
+(relationMostInstance(Pred,_Arg1Type,Value),argIsa(Pred,2,Type)=>(isa(Value,Type),isa(Pred,tRolePredicate))).
+(relationAllInstance(Pred,_Arg1Type,Value),argIsa(Pred,2,Type)=>(isa(Value,Type),isa(Pred,tRolePredicate))).
 
 => genlPreds(zCanary,zBird).
 => genlPreds(zPenguin,zBird).
@@ -581,4 +592,5 @@ genls(Sub, _Super) => tCol(Sub).
 % :-prolog.
 
 
+:- must_det(argIsa(genlPreds,2,_Type)).
 

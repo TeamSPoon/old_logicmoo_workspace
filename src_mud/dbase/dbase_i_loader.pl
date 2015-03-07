@@ -155,7 +155,7 @@ add_term(Term,Vs):-
     add_from_file(Term).
 
 
-add_from_file(Term):-
+add_from_file(Term):-  
   with_assertions(thlocal:already_in_file_term_expansion,must(add(Term))).
 
 myDebugOnError(Term):-catch(once(must((Term))),E,(dmsg(error(E,start_myDebugOnError(Term))),trace,rtrace((Term)),dmsginfo(stop_myDebugOnError(E=Term)),trace)).

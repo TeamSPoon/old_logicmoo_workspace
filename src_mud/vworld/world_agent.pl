@@ -144,7 +144,6 @@ interesting_to_player(Type,Agent,C):- contains_var(C,Agent),dmsg(agent_database_
 interesting_to_player(Type,Agent,C):-is_asserted(localityOfObject(Agent,Region)),contains_var(C,Region),dmsg(region_database_hook(Type,C)),!.
 interesting_to_player(Type,Agent,C):-is_asserted(localityOfObject(Agent,Region)),is_asserted(localityOfObject(Other,Region)),contains_var(C,Other),!,dmsg(other_database_hook(Type,C)),!.
 
-
 user:decl_database_hook(Type,C):- current_agent(Agent),interesting_to_player(Type,Agent,C).
 
 
