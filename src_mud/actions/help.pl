@@ -24,6 +24,9 @@ get_type_action_help_commands_list(A,B,C):-no_repeats_old(get_type_action_help_0
 :-export(get_all_templates/1).
 get_all_templates(Templ):- call_tabled(no_repeats(get_all_templates0(Templ))).
 
+:-export(good_template/1).
+good_template(Templ):- not(contains_singletons(Templ)).
+
 get_all_templates0(Templ):-get_good_templates(Templ).
 get_all_templates0(Templ):-get_bad_templates(Templ),not(get_good_templates(Templ)).
 get_good_templates(Templ):- no_repeats_old((get_type_action_help_1(_,Templ,_),good_template(Templ))).
@@ -57,7 +60,7 @@ action_info_db(TEMPL,INFO,WAS):- (PRED=user:agent_call_command(_,WAS);PRED=user:
    
     (TEMPL=@=WAS -> ((clause_property(REF,line_count(LC)),INFO=line(LC:S))) ;  (not(not(TEMPL=WAS)) -> INFO=file(S) ; fail)).
 
-:-trace.
+% :-trace.
 user:action_info(TEMPL,txtConcatFn(S,contains,WAS)):-action_info_db(TEMPL,S,WAS),not(clause_asserted(user:action_info(TEMPL,_Help),true)).
 
 
@@ -104,8 +107,5 @@ user:hook_coerce(Text,vtVerb,Inst):- isa(Inst,vtVerb),name_text(Inst,Text).
 
 % :- include(logicmoo(vworld/moo_footer)).
 
-:-export(good_template/1).
-good_template(Templ):- \+ contains_singletons(Templ).
-
-vtActionTemplate(Templ) :- loop_check(get_all_templates(Templ)).
+:-add((vtActionTemplate(Templ) :- loop_check(get_all_templates(Templ)))).
 

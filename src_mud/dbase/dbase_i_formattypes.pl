@@ -142,8 +142,8 @@ argIsa_call_0(decl_mpred_hybrid,_,ftTerm).
 
 
 argIsa_call_0(isa,2,tCol).
-argIsa_call_0(user:mpred_prop,1,tPred).
-argIsa_call_0(user:mpred_prop,2,ftVoprop).
+argIsa_call_0(mpred_prop,1,tPred).
+argIsa_call_0(mpred_prop,2,ftVoprop).
 
 argIsa_call_0(formatted_resultIsa,1,ttFormatType).
 argIsa_call_0(formatted_resultIsa,2,tCol).

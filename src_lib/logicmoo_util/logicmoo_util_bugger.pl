@@ -2503,7 +2503,7 @@ mesg_arg1(T,C):-compound(T),arg(1,T,F),!,nonvar(F),mesg_arg1(F,C).
 :-dynamic(defined_message_color/2).
 
 defined_message_color(todo,[fg(red),bg(black),underline]).
-defined_message_color(error,[fg(red),hbg(black),bold]).
+%defined_message_color(error,[fg(red),hbg(black),bold]).
 defined_message_color(warn,[fg(black),hbg(red),bold]).
 defined_message_color(A,B):-term_color0(A,B).
 

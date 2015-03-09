@@ -879,10 +879,11 @@ pfcUndo(pfcNT(Head,Condition,Body)) :-
 
 pfcUndo(Fact) :-
   % undo a random fact, printing out the trace, if relevant.
-  pfc_retract(pfcUndo,Fact),
+  pfc_retract(pfcUndo,Fact),!,
   pfcTraceRem(Fact),
   unFc1(Fact).
-  
+
+pfcUndo(Fact) :- dmsg(no_pfcUndo(Fact)).
 
 
 %= unFc(P) "un-forward-chains" from fact f.  That is, fact F has just
@@ -1633,6 +1634,7 @@ pfcAddSupport(P,(Fact,Trigger)) :-
   pfcAssertS(support3(Fact,Trigger,P)),
   pfcAssertS(support2(Trigger,P,Fact)).
 
+pfcGetSupportORNil(P,Support):- (pfcGetSupport(P,Support) *-> true ; Support = (fail)).
 % for a litteral
 pfcGetSupport1(P,(Fact,Trigger)) :-
    nonvar(P)         -> support1(P,Fact,Trigger) 
@@ -1640,24 +1642,34 @@ pfcGetSupport1(P,(Fact,Trigger)) :-
    ; nonvar(Trigger) -> support2(Trigger,P,Fact) 
    ; otherwise       -> support1(P,Fact,Trigger).
 
-pfcGetSupport(P,More):- fully_expand(is_asserted,P,PS),P\=@=PS,!,pfcGetSupport(PS,More).
-pfcGetSupport(P,More):- pfcGetSupport1(P,More).
+pfcGetSupport(P,More):- fully_expand(is_asserted,P,PS),P \=@= PS,!,pfcGetSupport(PS,More).
+pfcGetSupport(P,More):- pfcGetSupport1(P,More),!.
 % TODO pack the T1 into T2 return value is still a (Fact,Trigger) pair
-pfcGetSupport((P1,P2),((F1,F2),(T1,T2))):- pfcGetSupport(P1,(F1,T1)),pfcGetSupport(P2,(F2,T2)).
+pfcGetSupport((P1,P2),((F1,F2),(T1,T2))):-!,pfcGetSupport(P1,(F1,T1)),pfcGetSupport(P2,(F2,T2)).
 
 pfcRemoveSupportItems(P,Types):-
   pfcGetSupport(P,Support),
-  pfcFilterSupports(Support,Types,Results),
+  show_call(pfcFilterSupports(Support,Types,Results)),
   pfcDoConjs(pfcRem1,Results).
 
-pfcFilterSupports(Support,Filter,Results):-findall(Term, ((sub_term(Support,Term),nonvar(Term),pfcTypeFilter(Term,Filter))),Results).
+pfcFilterSupports(Support,Filter,ResultsO):-
+  findall(Term, ((sub_term(Term,Support),pfcLiteral(Term),compound(Term),pfcTypeFilter(Term,Filter))),Results),
+  list_to_set(Results,ResultsO).
 
-pfcTypeFilter(Term,Filter):-pfcTypeFull(Term,Type),member(Type,Filter).
+pfcTypeFilter(Term,Filter):- not(is_list(Filter)),!,pfcTypeFilter(Term,[Filter]).
+pfcTypeFilter(Term,FilterS):- pfcTypeFull(Term,Type),memberchk(Type,FilterS),!.
+pfcTypeFilter(Term,FilterS):- member(Filter,FilterS),append_term(Filter,Term,Call),current_predicate(_,Call),debugOnError(Call),!.
 
 
 % There are three of these to try to efficiently handle the cases
 % where some of the arguments are not bound but at least one is.
 
+
+is_support(E):-compound(E),functor(E,F,_),memberchk(F,[support1,support2,support3]).
+
+
+pfcRemSupport(_,(P,_)) :- is_support(P),!,pfcRetractOrWarn(pfcRemoveSupport,P).
+pfcRemSupport(P,_) :-is_support(P),!,pfcRetractOrWarn(pfcRemoveSupport,P).
 pfcRemSupport(P,(Fact,Trigger)) :-
   nonvar(P),
   !,
@@ -1763,7 +1775,7 @@ pfcDatabaseItem(Term) :-
   pfc_clause_db_unify(Term,_).
 
 pfcRetractOrWarn(Why,X) :-  pfc_retract(Why,X), !.
-pfcRetractOrWarn(Why,X) :- compound(X),arg(_,X,E),compound(E),functor(E,F,_),member(F,[support1,support2,support3]),!,
+pfcRetractOrWarn(Why,X) :- fail,compound(X),arg(_,X,E),compound(E),functor(E,F,_),member(F,[support1,support2,support3]),!,
   pfcError("~w couldn't pfc_retract ~p.",[Why,X]),dtrace.
 
 pfcRetractOrWarn(Why,X) :- 

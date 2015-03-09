@@ -40,9 +40,10 @@ visibleTo(Agent,Agent).
 visibleTo(Agent,Obj):-mudPossess(Agent,Obj).
 visibleTo(Agent,Obj):-same_regions(Agent,Obj).
 
+
 :- decl_type(txtPrepOf).
 :- decl_type(txtPrepSpatial).
-user:hook_coerce(Prep,txtPrepSpatial,Str):-member(Prep,[in,on,north_of,inside,onto,ontop]),name_text(Prep,Str).
+user:hook_coerce(StrIn,txtPrepSpatial,Str):-member(Prep,[in,on,north_of,inside,onto,ontop]),name_text(Prep,StrIn),name_text(Prep,Str).
 user:hook_coerce(Prep,txtPrepSpatial,Inst):-user:hook_coerce(Prep,txtPrepOf,Inst).
 user:hook_coerce([SDir,of],txtPrepOf,vDirFn(Dir)):-user:hook_coerce(SDir,vtDirection,Dir).
 

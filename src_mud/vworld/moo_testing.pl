@@ -34,7 +34,7 @@
 run_mud_tests:-
   forall(mud_test(Name,Test),run_mud_test(Name,Test)).
 
-user:action_info(actTests,"run run_mud_tests/:").
+user:action_info(actTests,"run run_mud_tests").
 
 user:agent_call_command(_Agent,actTests) :- scan_updates, run_mud_tests.
 

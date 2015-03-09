@@ -120,8 +120,8 @@ never_type_why(F,Why):- atom(F), arity(F,A),!,F\==isa, asserted_mpred_prop(F,_),
 % Checks F's name for isa(F,*).
 % ========================================
 
-isa_from_morphology(Inst,Type):-atom(Inst),type_prefix(Prefix,Type),atom_concat(Prefix,Other,Inst),capitalized(Other),!.
 isa_from_morphology(Inst,Type):-atom(Inst),type_suffix(Suffix,Type),atom_concat(Base,Suffix,Inst),!,atom_length(Base,BL),BL>2.
+isa_from_morphology(Inst,Type):-atom(Inst),type_prefix(Prefix,Type),atom_concat(Prefix,Other,Inst),capitalized(Other),!.
 
 type_suffix('Fn',ftFunctional).
 type_suffix('Type',ttTypeType).

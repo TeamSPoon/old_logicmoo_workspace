@@ -172,6 +172,7 @@ tPathway(Obj)=>spatialInRegion(Obj).
 
 
 localityOfObject(Obj,Region),tRegion(Region)=> inRegion(Obj,Region).
+mudAtLoc(Obj,LOC),{locationToRegion(LOC,Region)},tRegion(Region)=> inRegion(Obj,Region).
 
 
 :-decl_mpred_hybrid(mudInsideOf/2).
@@ -187,7 +188,7 @@ moves_with_sym(Obj1,Obj2):-localityOfObject(Where,Obj1),moves_with(Obj2,Where).
 mudLocOnSurface(Clothes,Agent):-loop_check(wearsClothing(Agent,Clothes),fail).
 
 :-export(same_regions/2).
-same_regions(Agent,Obj):-must(inRegion(Agent,Where1)),dif_safe(Agent,Obj),inRegion(Obj,Where2),Where1=Where2.
+same_regions(Agent,Obj):-inRegion(Agent,Where1),dif(Agent,Obj),inRegion(Obj,Where2),Where1=Where2.
 
 %:-add(prologPTTP(inRegion(tObj,tRegion))).
 %prologPTTP(localityOfObject(tObj,tSpatialthing)).
@@ -227,6 +228,12 @@ mostSpecificLocalityOfObject(Obj,Where):-
  {(mudAtLoc(Obj,OldLoc), OldLoc\=xyzFn(NewRegion,_,_,_))})
   => 
   ~mudAtLoc(Obj,OldLoc)).
+
+% if something leaves a room get rid of old inRegion/2 
+((spatialInRegion(Obj),inRegion(Obj,NewRegion), 
+ {(inRegion(Obj,OldLoc), OldLoc\=NewRegion)})
+  => 
+  ~inRegion(Obj,OldLoc)).
 
 % create pathway objects and place them in world
 (pathBetween(Region,Dir,R2)/ground(pathBetween(Region,Dir,R2)),   

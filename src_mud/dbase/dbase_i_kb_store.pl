@@ -292,10 +292,12 @@ mdel(C0):- dmsg(mdel(C0)),dbase_modify(change( retract,one),C0), verify_sanity(m
 mdel(C0):- dmsg(warn(failed(mdel(C0)))),!,fail.
 
 % -  clr(Retractall)
-clr(C0):- dmsg(clr(C0)),fail,dbase_modify(change(retract,all),/*to_exp*/(C0)),verify_sanity(ireq(C0)->(dmsg(warn(incomplete_CLR(C0))));true).
-clr(P):- pfcGetSupport(P,Support),
-  pfcFilterSupports(Support,fact,Results),
-  pfcDoConjs(pfcRem1,Results).
+% clr(C0):- dmsg(clr(C0)),fail,dbase_modify(change(retract,all),/*to_exp*/(C0)),verify_sanity(ireq(C0)->(dmsg(warn(incomplete_CLR(C0))));true).
+clr(P):- agenda_do_prequery,forall(P, must(((
+ doall((must(pfcGetSupportORNil(P,Support)),
+  must(show_call(pfcFilterSupports(Support,fact,Results))),
+  must(pfcDoConjs(pfcRem1,Results)),sanity(not(pfcSupported(P))))),
+                 not(P))))).
 
 % -  preq(Query) = query with P note
 preq(P,C0):- agenda_do_prequery,dbase_op(query(dbase_t,P),C0).

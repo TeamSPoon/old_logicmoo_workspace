@@ -319,7 +319,7 @@ get_vp_templates(_Agent,SVERB,_ARGS,TEMPLATES):-
      verb_matches(SVERB,VERB))),
      TEMPLATES_FA),
     % ( TEMPLATES_FA=[] -> (dmsg(noTemplates(Agent,SVERB,ARGS)),!,fail); true),
-   sort(TEMPLATES_FA,TEMPLATES),!.
+   predsort(mostIdiomatic,TEMPLATES_FA,TEMPLATES).
    
 % parses a verb phrase and retuns multiple interps
 parse_vp_real(Agent,SVERB,ARGS,Sorted):- with_assertions(thlocal:infSkipFullExpand,parse_vp_real_no_arg_checking(Agent,SVERB,ARGS,Sorted)).
@@ -344,6 +344,18 @@ chooseBestGoal(GOALANDLEFTOVERS,GOAL):-
    predsort(bestParse,GOALANDLEFTOVERS,Sorted),
    dmsg_parserm(("Sorted"=Sorted)),
    member(_LeftOver - GOAL,Sorted),!.
+
+% mostIdiomatic(?Order, @Term1, @Term2)
+mostIdiomatic(Order, Term1, Term2):-mostComplex(Order, Term1, Term2).
+% mostComplex(?Order, @Term1, @Term2)
+mostComplex(Order, Term1, Term2):-complexity_count(Term1,Complexity1),complexity_count(Term2,Complexity2),compare(Order,Complexity2,Complexity1),Order \== '=' ,!.
+mostComplex(Order, Term1, Term2):-compare(Order,Term1,Term2).
+
+complexity_count(S,-1):-var(S).
+complexity_count(S,L):-string(S),!,string_length(S,L).
+complexity_count(S,1):-atomic(S),!.
+complexity_count([H|T],L):-!,complexity_count(H,HL),complexity_count(T,TL),L is HL+TL.
+complexity_count(S,L):-functor(S,_,A),S=..[_|ARGS],!,complexity_count(ARGS,AL),L is A+AL.
 
 % bestParse(?Order, @Term1, @Term2)
 bestParse(Order,LeftOver1-GOAL1,LeftOver2-GOAL2):-
@@ -390,7 +402,7 @@ user:hook_coerce(Text,Subclass,X):-
    same_arg(ftText,TextVar,Text))). % dmsg(todo(user:hook_coerce(Text,Subclass))),impliedSubClass(Subclass,tSpatialThing).
 
 
-phrase_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver):-length(TYPEARGS,N),length(GOODARGS,N),!,
+phrase_parseForTypes(TYPEARGS,ARGS,GOODARGS,LeftOver):- % length(TYPEARGS,N),length(GOODARGS,N),!,
   to_word_list(ARGS,ARGSL),!,phrase_parseForTypes_0(TYPEARGS,ARGSL,GOODARGS,LeftOver).
 
 string_append(A,[B1,B2],C,ABC):-append(A,[B1,B2|C],ABC).

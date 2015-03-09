@@ -112,7 +112,7 @@ genls(tOfficeRoom,tRegion).
 
 
 % :- add_game_dir('../games/src_game_startrek',prolog_repl).
-:- declare_load_dbase('../games/src_game_startrek/startrek.all.plmoo').
+% :- declare_load_dbase('../games/src_game_startrek/startrek.all.plmoo').
 
 
 tAgentGeneric(iCommanderData66).
@@ -145,9 +145,6 @@ isa(iExplorer1,'tExplorer').
 
 % [Manditory] This loads the game and initializes so test can be ran
 :- if_startup_script( at_start(finish_processing_world)).
-
-
-:- prolog_repl.
 
 % :- if_startup_script( doall(now_run_local_tests_dbg)).
 

@@ -226,7 +226,7 @@ is_meta_functor(Sent,F,List):-compound(Sent),Sent=..[F|List],(predicate_property
 db_expand_5(_ ,NC,NC):- as_is_term(NC),!.
 db_expand_5(Op,{Sent},{SentO}):-!, fully_expand_goal(Op,Sent,SentO).
 
-db_expand_5(Op,A,A):-unnumbervars(A,U),A\=@=U.
+db_expand_5(_,A,A):-unnumbervars(A,U),A\=@=U.
 db_expand_5(Op,Sent,SentO):-current_predicate(correctArgsIsa/3),arg(2,Sent,Arg),nonvar(Arg),get_functor(Sent,F),asserted_argIsa_known(F,2,_),!,
   correctArgsIsa(Op,Sent,SentO),!.
 db_expand_5(_,A,B):-thglobal:pfcManageHybrids,!,A=B.
