@@ -269,7 +269,7 @@ add_meta_facts(How,(B=>H)):- add_meta_facts(How,(H:-infoF(B=>H))),!.
 add_meta_facts(How,(B<=>H)):- add_meta_facts(How,(H:-infoF(B<=>H))),!,add_meta_facts(How,(B:-infoF(B<=>H))),!.
 add_meta_facts(How,((A,B):-INFOC)):-is_meta_info(INFOC),(nonvar(A);nonvar(B)),!,add_meta_facts(How,((A):-INFOC)),add_meta_facts(How,((B):-INFOC)),!.
 add_meta_facts(How,((A;B):-INFOC)):-is_meta_info(INFOC),(nonvar(A);nonvar(B)),!,add_meta_facts(How,((A):-INFOC)),add_meta_facts(How,((B):-INFOC)),!.
-add_meta_facts(How,(~(A):-infoF(C))):-nonvar(C),nonvar(A),!,add_meta_facts(How,((A):-infoF(~(C)))),call(How,(~(A):-infoF(C))).
+add_meta_facts(How,(~(A):-infoF(C))):-nonvar(C),nonvar(A),!,add_meta_facts(How,((A):-infoF(~(C)))). % ,call(How,(~(A):-infoF(C))).
 add_meta_facts(How,(A:-INFOC)):-is_meta_info(INFOC),rewrap_h(A,AA),call(How,(AA:-INFOC)),!.
 add_meta_facts(_,_).
 
@@ -1424,6 +1424,8 @@ pfcConnective('-').
 pfcConnective('~').
 pfcConnective(('\\+')).
 
+~(F):-pfcCall(F).
+
 pfcProcessRule(Lhs,Rhs,ParentRule) :-
   copy_term(ParentRule,ParentRuleCopy),
   pfcBuildRhs(Rhs,Rhs2),
@@ -1643,9 +1645,9 @@ pfcGetSupport1(P,(Fact,Trigger)) :-
    ; otherwise       -> support1(P,Fact,Trigger).
 
 pfcGetSupport(P,More):- fully_expand(is_asserted,P,PS),P \=@= PS,!,pfcGetSupport(PS,More).
-pfcGetSupport(P,More):- pfcGetSupport1(P,More),!.
+pfcGetSupport((P1,P2),((F1,F2),(T1,T2))):-nonvar(P1),!,pfcGetSupport(P1,(F1,T1)),pfcGetSupport(P2,(F2,T2)).
+pfcGetSupport(P,More):- pfcGetSupport1(P,More).
 % TODO pack the T1 into T2 return value is still a (Fact,Trigger) pair
-pfcGetSupport((P1,P2),((F1,F2),(T1,T2))):-!,pfcGetSupport(P1,(F1,T1)),pfcGetSupport(P2,(F2,T2)).
 
 pfcRemoveSupportItems(P,Types):-
   pfcGetSupport(P,Support),
@@ -1664,6 +1666,7 @@ pfcTypeFilter(Term,FilterS):- member(Filter,FilterS),append_term(Filter,Term,Cal
 % There are three of these to try to efficiently handle the cases
 % where some of the arguments are not bound but at least one is.
 
+% pfcGetSupport2(P,(P,Trigger)) :- pfcPT(isa(A, tObj), pfcNT(mudPossess(B, A), pfcCall(mudPossess(B, A)), rhs([spatialInRegion(A)])))
 
 is_support(E):-compound(E),functor(E,F,_),memberchk(F,[support1,support2,support3]).
 
@@ -1894,7 +1897,7 @@ pfcFact(P) :- no_repeats(pfcFact(P,true)).
 
 pfcFact(P,C) :- no_repeats(pfcFact0(P,C)).
 
-pfcFact(P,C) :- 
+pfcFact0(P,C) :- 
   pfcGetSupport(P,_),
   pfcType(P,fact),
   pfc_call_prolog_native(fact,C).

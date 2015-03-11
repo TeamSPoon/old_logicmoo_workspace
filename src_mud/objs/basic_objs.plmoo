@@ -359,6 +359,8 @@ genls( tCarryAble, tCarryAble).
 
 genls(tPortableDevice,tCarryAble).
 
+:- decl_type(spatialInRegion).
+
 :-do_gc.
 
 genls(tPajamas, tClothing).

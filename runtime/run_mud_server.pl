@@ -112,7 +112,7 @@ genls(tOfficeRoom,tRegion).
 
 
 % :- add_game_dir('../games/src_game_startrek',prolog_repl).
-% :- declare_load_dbase('../games/src_game_startrek/startrek.all.plmoo').
+:- declare_load_dbase('../games/src_game_startrek/startrek.all.plmoo').
 
 
 tAgentGeneric(iCommanderData66).

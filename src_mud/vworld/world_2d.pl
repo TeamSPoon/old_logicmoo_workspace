@@ -167,7 +167,7 @@ is_at(Obj,Where):-localityOfObject(Obj,Where).
 is_at(Obj,Where):-mudAtLoc(Obj,Where).
 is_at(Obj,Where):-mudSubPart(What,Obj),is_at(What,Where).
 
-(tObj(Obj), ~mudPossess(_,Obj))=>spatialInRegion(Obj).
+% ((tObj(Obj), ~(mudPossess(_,Obj)))=>spatialInRegion(Obj)).
 tPathway(Obj)=>spatialInRegion(Obj).
 
 
@@ -517,7 +517,7 @@ in_world_move0(LOC,Agent,Dir) :-
         dmsg(move_dir_target(LOC,DirS,XXYY)),
         locationToRegion(LOC,Region1),
         locationToRegion(XXYY,Region2),
-              
+              ((expire_dont_add, clr(mudAtLoc(Agent,LOC)))),
         ((expire_dont_add, add(mudAtLoc(Agent,XXYY)),
         sanity((is_asserted(mudAtLoc(Agent,LOC2)),LOC2 \== LOC)))),         
    ifThen(( Region1\==Region2) ,raise_location_event(LOC,actNotice(reciever,actLeave(Agent,Region1,to(Dir))))),
