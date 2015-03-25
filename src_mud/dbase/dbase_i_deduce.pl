@@ -121,7 +121,7 @@ do_deduction_type(change( retract,_),Fact):-clr(Fact).
 
 
 
-learnArgIsa(P,N,_):-argIsa_asserted(P,N,_),!.
+learnArgIsa(P,N,_):-argIsa_known(P,N,_),!.
 learnArgIsa(P,N,T):-dmsg((skipping(learnArgIsa(P,N,T)))),!.
 learnArgIsa(P,N,T):-grtrace, assert_argIsa(P,N,T).
 
@@ -156,8 +156,8 @@ never_deduce_from_predicate(genls).
 never_deduce_from_predicate(typeProps).
 never_deduce_from_predicate(P):-arity(P,1).
 never_deduce_from_predicate(P):-user:mpred_prop(P,ftCallable).
-never_deduce_from_predicate(P):-argIsa_asserted(P,_,tCol).
-never_deduce_from_predicate(P):-argIsa_asserted(P,_,ftVoprop).
+never_deduce_from_predicate(P):-argIsa_known(P,_,tCol).
+never_deduce_from_predicate(P):-argIsa_known(P,_,ftVoprop).
 
 deduce_from_predicate(Never):-never_deduce_from_predicate(Never),!,fail.
 deduce_from_predicate(P):-user:mpred_prop(P,_).

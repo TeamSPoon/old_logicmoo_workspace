@@ -161,7 +161,7 @@ mudNearbyRegions(R1,R1).
 
 % 345345  instTypeProps(OfAgent,agent,[facing(F),atloc(L)]):-  dfsdfd ignore((nonvar(OfAgent),create_someval(facing,OfAgent,F),create_someval(atloc,OfAgent,L))).
 
-%transitive_other(mudAtLoc,1,Obj,What):-mudInsideOf(Obj,What).
+% CANT transitive_other(mudAtLoc,1,Obj,What):-mudInsideOf(Obj,What).
 
 is_at(Obj,Where):-localityOfObject(Obj,Where).
 is_at(Obj,Where):-mudAtLoc(Obj,Where).

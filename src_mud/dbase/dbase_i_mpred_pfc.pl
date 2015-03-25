@@ -134,6 +134,9 @@ pfcLambda([A1,A2,A3,A4],Body,A1,A2,A3,A4):-Body.
 
 :-call(pfcLambda([E],writeln(E)),hello_lambda).
 
+:-dynamic(pfcControlled/1).
+:-dynamic(pfcWatched/1).
+
 pfcDoConjs(_,[],_) :- !.
 pfcDoConjs(Pred,H,S):-var(H),!,apply(Pred,[H|S]).
 pfcDoConjs(Pred,[H|T],S):-!, apply(Pred,[H|S]), pfcDoConjs(Pred,T,S).
@@ -157,7 +160,7 @@ user:mpred_prop(F,argIsa(_,ftAskable)):-pfcDatabaseTerm(F/_).
 user:mpred_prop(isa,pfcMustFC).
 
 pfcMustFC(H):-get_functor(H,F),pfc_mpred_prop(F,pfcMustFC).
-pfcPreferBC(H):-get_functor(H,F,A),pfc_mpred_prop(F,pfcPreferBC),dynamic(F/A),functor(PHead,F,A),asserta_if_new((PHead:-callBC(PHead))).
+pfcPreferBC(H):-get_functor(H,F,A),pfc_mpred_prop(F,pfcPreferBC),dynamic(F/A),functor(PHead,F,A),asserta_if_new(((PHead:-callBC(PHead)))).
 
 
 :- decl_mpred_pfc pfc_local/1.
@@ -250,8 +253,10 @@ pfc_retract(_,G):- hooked_retract(G).
 pfc_ignored(argIsa(F, A, argIsaFn(F, A))).
 pfc_ignored(genls(A,A)).
 pfc_ignored(isa(tCol,tCol)).
-pfc_ignored(isa(_,ftTerm)).
-pfc_ignored(isa(_,ftString)).
+pfc_ignored(isa(W,tCol)):-user:hasInstance_dyn(tCol,W).
+pfc_ignored(isa(W,_)):-compound(W),isa(W,predArgTypes).
+ 
+pfc_ignored(isa(_,Atom)):-atom(Atom),atom_concat(ft,_,Atom),!.
 pfc_ignored(isa(_,argIsaFn(_, _))).
 
 pfc_assert(G):- pfc_dbase_transform(G,GG),pfc_assert0(GG).
@@ -407,7 +412,7 @@ pfc_file_expansion_each(((Q:-P)),(:- (pfcMarkF(Q),pfcMarkC(P=>Q),pfcAdd(P=>Q))))
 pfc_file_expansion_each(((Q:-P)),(:- (pfcMarkF(Q),pfcMarkC(P=>Q),pfcAdd(P=>Q)))):- nonvar(P),P\==true,nonvar(Q),is_fc_body(P),!.
 pfc_file_expansion_each(((Q:-P)),(:- (pfcMarkB(Q),pfcMarkC(Q),pfcAdd(Q<=P)))):- nonvar(P),P\==true,nonvar(Q),is_bc_body(P),!.
 
-pfc_file_expansion_each(((Q:-P)),(:- pfcMarkB(Q),pfcAdd(Q<=P))):- nonvar(P),nonvar(Q),P\==true,not(is_fc_body(P)),pfcControlled(Q),!.
+%pfc_file_expansion_each(((Q:-P)),(:- pfcMarkB(Q),pfcAdd(Q<=P))):- nonvar(P),nonvar(Q),P\==true,not(is_fc_body(P)),pfcControlled(Q),!.
 pfc_file_expansion_each(P,(:- pfcAdd(P))):- pfcMustFC(P),!.
 pfc_file_expansion_each(P,(:- pfcAdd(P))):-pfcControlled(P),!.
 %pfc_file_expansion_each(((Q:-P)),(:- (pfcMarkB(Q),pfcMarkC(Q),pfcAdd((Q:-P))))):- nonvar(P),P\==true,nonvar(Q),pfcUseAllBC((Q:-P)).
@@ -523,6 +528,8 @@ pfcAdd1(P,S):-transitive(pfc_correct_add(S),P,PO), P\=@=PO ,!, pfcWarn("pfcAdd1 
 % pfcAdd1(P,_):-pfcTypeFull(P,T),T==support,!,assert_if_new(P),!.
 % pfcAdd1(P,S) :- is_wrong(P,S,_),!.
 pfcAdd1(P,_):-pfc_ignored(P),!.
+%pfcAdd1(PO,S0) :- is_deduced_by_god(S0),pfcGetSupport(PO,Why),!,trace_or_throw(not_needed(Why,pfcAdd1(PO,S0))).
+pfcAdd1(PO,S0) :- is_deduced_by_god(S0),pfcGetSupport(PO,Why),!,dmsg(not_needed(Why,pfcAdd1(PO,S0))).
 pfcAdd1(PO,S0) :- copy_term(PO:S0,P1:S1),
  must((pfc_pre_expansion_each(P1,P),pfc_pre_expansion_each(S1,S))),
   must(copy_term(P-S,P2-S2)),
@@ -577,13 +584,13 @@ pfcRepropagate(P,S) :-
 %= pfcAddDbToHead(+P,-NewP) talkes a fact P or a conditioned fact
 %= (P:-C) and adds the Db context.
 %%
-
+/*
 pfcAddDbToHead(P,NewP) :-
   pfcCurrentDb(Db),
   (Db=true        -> NewP = P;
    P=(Head:-Body) -> NewP = (Head :- (Db,Body));
    otherwise      -> NewP = (P :- Db)).
-
+*/
 
 % pfcUnique(X) is true if there is no assertion X in the prolog db.
 
@@ -933,12 +940,12 @@ pcfRemoveIfUnsupported(P) :-
 
 pfcSupported(P) :- 
   pfc_settings(tmsMode,Mode),
-  pfcSupported(Mode,P).
+  pfcSupported2(Mode,P).
 
-pfcSupported(local,P) :- !, pfcGetSupport(P,_).
-pfcSupported(cycles,P) :-  !, wellFounded(P).
-pfcSupported(full,P) :-  !, wellFounded(P).
-pfcSupported(_,_P) :- true.
+pfcSupported2(local,P) :- !, pfcGetSupport(P,A),!,A\=fail.
+pfcSupported2(cycles,P) :-  !, wellFounded(P).
+pfcSupported2(full,P) :-  !, wellFounded(P).
+pfcSupported2(_,_P) :- true.
 
 
 %%
@@ -993,7 +1000,8 @@ get_user_support_for_remove(_,(pfcUser(_),pfcUser(_))).
 get_user_support_for_add(P,(pfcUser(PS),pfcUser(PS))):-get_support_for(P,PS).
 
 get_god_support_for_lookup(_,(pfcGod(_),pfcGod(_))).
-get_god_support_for_add(P,(pfcGod(PS),pfcGod(PS))):-get_support_for(P,PS).
+is_deduced_by_god((pfcGod(_),pfcGod(_))).
+%get_god_support_for_add(P,(pfcGod(PS),pfcGod(PS))):-get_support_for(P,PS).
 
 
 %%
@@ -1213,7 +1221,8 @@ pfcBC_Cache(F) :-
   ( \+ current_predicate(_,F)) -> mpred_call(F) ;
   % check for system predicates as well.
   not(predicate_property(F,number_of_clauses(_))) -> pfc_call_prolog_native(systemPred,F) ; 
-  otherwise ->  (pfc_clause_db_unify(F,Condition), pfc_call_prolog_native(neck(F),Condition), maybeSupport(F,(pfcGod(_),pfcGod(_)))).
+  otherwise ->  (pfc_clause_db_unify(F,Condition), 
+    pfc_call_prolog_native(neck(F),Condition), ignore((ground(F),(not(is_asserted_1(F)), maybeSupport(F,(pfcGod(_),pfcGod(_))))))).
 
 
 maybeSupport(P,_):-pfc_ignored(P),!.
@@ -1559,7 +1568,7 @@ pfcType(_,fact) :-
 
 
 pfcAssertIfUnknown(P):-unnumbervars(P,U),pfcAssertIfUnknown(P,U).
-pfcAssertIfUnknown(_,U):- \+ \+ is_asserted(U),!.
+pfcAssertIfUnknown(_,U):- \+ \+ is_asserted_1(U),!.
 pfcAssertIfUnknown(P,U):- show_call(pfc_assert(P)),no_loop_check(sanity(is_asserted_eq(U))).
 
 pfcAssertS(P):-assert_if_new(P).
@@ -1644,10 +1653,12 @@ pfcGetSupport1(P,(Fact,Trigger)) :-
    ; nonvar(Trigger) -> support2(Trigger,P,Fact) 
    ; otherwise       -> support1(P,Fact,Trigger).
 
-pfcGetSupport(P,More):- fully_expand(is_asserted,P,PS),P \=@= PS,!,pfcGetSupport(PS,More).
+pfcGetSupport(P,More):- fully_expand_warn(is_asserted,P,PS),P \=@= PS,!,pfcGetSupport(PS,More).
 pfcGetSupport((P1,P2),((F1,F2),(T1,T2))):-nonvar(P1),!,pfcGetSupport(P1,(F1,T1)),pfcGetSupport(P2,(F2,T2)).
 pfcGetSupport(P,More):- pfcGetSupport1(P,More).
 % TODO pack the T1 into T2 return value is still a (Fact,Trigger) pair
+
+pfcWhy(G,Proof):-pfcGetSupport(G,S),(S=(G,G)->Proof=asserted;Proof=S).
 
 pfcRemoveSupportItems(P,Types):-
   pfcGetSupport(P,Support),
@@ -1671,8 +1682,8 @@ pfcTypeFilter(Term,FilterS):- member(Filter,FilterS),append_term(Filter,Term,Cal
 is_support(E):-compound(E),functor(E,F,_),memberchk(F,[support1,support2,support3]).
 
 
-pfcRemSupport(_,(P,_)) :- is_support(P),!,pfcRetractOrWarn(pfcRemoveSupport,P).
-pfcRemSupport(P,_) :-is_support(P),!,pfcRetractOrWarn(pfcRemoveSupport,P).
+pfcRemSupport(_,(P,_)) :- is_support(P),!,ignore(pfcRetractOrWarn(pfcRemoveSupport,P)).
+pfcRemSupport(P,_) :-is_support(P),!,ignore(pfcRetractOrWarn(pfcRemoveSupport,P)).
 pfcRemSupport(P,(Fact,Trigger)) :-
   nonvar(P),
   !,
@@ -1703,7 +1714,7 @@ pfc_support_relation((P,F,T)) :-
   support1(P,F,T).
 
 pfc_make_supports((P,S1,S2)) :- 
-  pfcAddSupport(P,(S1,S2),_),
+  pfcAddSupport(P,(S1,S2)),
   (pfcAddSome(P); true),
   !.
 
@@ -2196,6 +2207,8 @@ pfcDescendants(P,L) :-
 
 :- use_module(library(lists)).
 
+:-dynamic(pfcWhyMemory1/2).
+
 pfcWhy :- 
   pfcWhyMemory1(P,_),
   pfcWhy(P).
@@ -2330,7 +2343,7 @@ pfc_t_lp(X,Id,S,SR,ss(X,Id,(S \\ SR))) :- var(X),!.
 
 pfc_t_lp((LP,List),Id,S,SR,ss(LP,Id,(S \\ List2))):- 
    !,
-   pfcAppend(List,SR,List2).
+   append(List,SR,List2).
 
 pfc_t_lp(LP,Id,S,SR,ss(LP,Id,(S \\ SR))).
 

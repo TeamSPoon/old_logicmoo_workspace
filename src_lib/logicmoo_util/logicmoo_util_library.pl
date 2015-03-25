@@ -137,7 +137,7 @@ flatten_dedupe(Percepts0,Percepts):-
 
 % peekAttributes/2,pushAttributes/2,pushCateElement/2.
 :- module_transparent((asserta_new/1,asserta_if_new/1,assertz_new/1,assertz_if_new/1,assert_if_new/1,assertz_if_new_clause/1,assertz_if_new_clause/2,clause_asserted/2,as_clause/2,clause_asserted/1,eraseall/2)).
-:- meta_predicate asserta_new(0),asserta_if_new(0),assertz_new(0),assertz_if_new(0),assert_if_new(0),assertz_if_new_clause(0),assertz_if_new_clause(0,0).
+:- meta_predicate asserta_new(?),asserta_if_new(?),assertz_new(?),assertz_if_new(?),assert_if_new(?),assertz_if_new_clause(?),assertz_if_new_clause(?,?).
 :- meta_predicate clause_asserted(-,-),as_clause(-,-,-),clause_asserted(-),eraseall(-,-).
 
 asserta_new(_Ctx,NEW):-ignore((retract(NEW),fail)),asserta(NEW).

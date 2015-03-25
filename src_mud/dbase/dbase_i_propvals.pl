@@ -41,7 +41,7 @@ infSecondOrder :- not(thlocal:infInstanceOnly(_)).
 infThirdOrder :- fail, infSecondOrder, not(thlocal:noRandomValues(_)).
 
 
-:-export(transitive_other/4).
+% CANT :-export(transitive_other/4).
 
 choose_val(Prop,Obj,Value):- thlocal:useOnlyExternalDBs,!, body_call_cyckb(dbase_t(Prop,Obj,Value)).
 choose_val(Prop,Obj,Value):- var(Obj),nonvar(Value),!,mdif(Obj,Value),is_asserted(dbase_t(Prop,Obj,Value)).
@@ -50,7 +50,7 @@ choose_val(Prop,Obj,Value):- mdif(Obj,Value),choose_right(Prop,Obj,Value).
 generate_candidate_arg_values(Prop,N,Obj):-call_vars_tabled(Obj,generate_candidate_arg_values0(Prop,N,Obj)).
 
 generate_candidate_arg_values0(Prop,N,R):- cached_isa(Prop,completelyAssertedCollection),arg(N,vv(Obj,Value),R),!,is_asserted(dbase_t(Prop,Obj,Value)).
-generate_candidate_arg_values0(Prop,N,Obj):- once((argIsa_asserted(Prop,N,Type),type_has_instances(Type))),!,cached_isa(Obj,Type).
+generate_candidate_arg_values0(Prop,N,Obj):- once((argIsa_known(Prop,N,Type),type_has_instances(Type))),!,cached_isa(Obj,Type).
 generate_candidate_arg_values0(Prop,N,R):- arg(N,vv(Obj,Value),R),!,is_asserted(dbase_t(Prop,Obj,Value)).
 
 type_has_instances(Type):-  atom(Type),Type\=ftTerm,Type\=tCol,not_ft(Type),isa(_,Type),!.
@@ -84,7 +84,7 @@ choose_each(Prop,Obj,Value):- one_must(choose_asserted(Prop,Obj,Value),(fallback
 % choose_asserted(Prop,Obj,Value):- dbase_t(Prop,Obj,Value). % ,must_det(is_asserted(dbase_t(Prop,Obj,Value))).
 choose_asserted(Prop,Obj,Value):- is_asserted(dbase_t(Prop,Obj,Value)),!.
 choose_asserted(Prop,Obj,Value):- choose_asserted_mid_order(Prop,Obj,Value),!.
-choose_asserted(Prop,Obj,Value):- nonvar(Obj),transitive_other(Prop,1,Obj,What),choose_asserted_mid_order(Prop,Obj,Value),maybe_cache(Prop,Obj,Value,What).
+% CANT choose_asserted(Prop,Obj,Value):- nonvar(Obj),transitive_other(Prop,1,Obj,What),choose_asserted_mid_order(Prop,Obj,Value),maybe_cache(Prop,Obj,Value,What).
 
 choose_asserted_mid_order(Prop,Obj,Value):-loop_check(choose_asserted_mid_order_all(Prop,Obj,Value),fail).
 choose_asserted_mid_order_all(Prop,Obj,Value):- mpred_call(dbase_t(Prop,Obj,Value)),!.

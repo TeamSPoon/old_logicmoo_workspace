@@ -104,8 +104,8 @@ pttp_assert_real_wid(ID,X):- kb_incr(ID,IDINC),
 
 
 % -- CODEBLOCK
-:-export(static_predicate/1).
-:-meta_predicate(static_predicate(0)).
+:-export(static_predicate/2).
+:-meta_predicate(static_predicate(0,?)).
 static_predicate(M:(Y:-_),Why):-!,static_predicate(M:Y,Why).
 static_predicate((Y:-_),Why):-!,static_predicate(Y,Why).
 static_predicate(_:Y,file(F)):-!,predicate_property(_:Y,file(F)),not(predicate_property(_:Y,dynamic)).

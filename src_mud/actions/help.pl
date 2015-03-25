@@ -8,13 +8,13 @@
 
 % :- register_module_type (mtCommand).
 
-%isa(tHumanPlayer,ttAgentType).
+isa(tHumanPlayer,ttAgentType).
 %genls(ttAgentType,tCol).
 
-% user:type_action_info(human_player,help, "shows this help").
 user:type_action_info(tHumanPlayer,actHelp(isOptional(ftString,"")), "shows this help").
 
-% user:action_info(TEMPL,S):- action_info(TEMPL),to_param_doc(TEMPL,S).
+user:action_info(TEMPL,S):- is_asserted(action_templ(TEMPL)),to_param_doc(TEMPL,S).
+to_param_doc(TEMPL,S):-sformat(S,'Prolog looks like: ~q',[TEMPL]).
 
 
 
@@ -22,6 +22,7 @@ user:type_action_info(tHumanPlayer,actHelp(isOptional(ftString,"")), "shows this
 get_type_action_help_commands_list(A,B,C):-no_repeats_old(get_type_action_help_0(A,B,C)).
 
 :-export(get_all_templates/1).
+
 get_all_templates(Templ):- call_tabled(no_repeats(get_all_templates0(Templ))).
 
 :-export(good_template/1).
@@ -30,17 +31,16 @@ good_template(Templ):- not(contains_singletons(Templ)).
 get_all_templates0(Templ):-get_good_templates(Templ).
 get_all_templates0(Templ):-get_bad_templates(Templ),not(get_good_templates(Templ)).
 get_good_templates(Templ):- no_repeats_old((get_type_action_help_1(_,Templ,_),good_template(Templ))).
+get_good_templates(Templ):- isa(Templ,vtActionTemplate).
 get_bad_templates(Templ):- no_repeats_old((get_type_action_help_1(_,Templ,_),not(good_template(Templ)))).
 
 
-
-to_param_doc(TEMPL,S):-sformat(S,'Prolog looks like: ~q',[TEMPL]).
 
 
 
 get_type_action_help_0(What,TEMPL,Help):- call_no_cuts(user:type_action_info(What,TEMPL,Help)).
 get_type_action_help_0(_What,TEMPL,Help):- call_no_cuts(user:action_info(TEMPL,Help)).
-get_type_action_help_0(isaFn(A),TEMPL,txtConcatFn(Text,'does: ',do(A2,TEMPL))):- between(1,5,L),length(Text,L),get_agent_text_command(A,Text,A2,Goal),(nonvar(Goal)->TEMPL=Goal;TEMPL=Text).
+get_type_action_help_0(isaFn(A),TEMPL,txtConcatFn(Text,'does: ',do(A2,TEMPL))):- between(1,5,L),length(Text,L),get_agent_text_command(A,Text,A2,Goal),(ground(Goal)->TEMPL=Goal;TEMPL=Text).
 get_type_action_help_0(What,Syntax,txtConcatFn(makes,happen,List)):- call_no_cuts(action_rules(Agent,Verb,[Obj|Objs],List)),atom(Verb),safe_univ(Syntax,[Verb,Obj|Objs]), 
                      % once(member(isa(Obj,_Type),List);_Type=term),
                       ignore(Agent=an(What)),ignore(What=tAgentGeneric).
@@ -56,7 +56,7 @@ first_pl(PL,PL).
 
 action_info_db(TEMPL,INFO,WAS):- (PRED=user:agent_call_command(_,WAS);PRED=user:agent_text_command(_,_,_,WAS)) ,
    clause(PRED,BODY,REF),clause_property(REF,file(S)),
-   (nonvar(WAS)->true;once(( ignore((nop(S=S),first_pl(BODY,PL),ignore(catch(notrace(PL),_,true)))),nonvar(WAS)))),
+   (ground(WAS)->true;once(( ignore((nop(S=S),first_pl(BODY,PL),ignore(catch(((true;notrace(PL)),!),_,true)))),ground(WAS)))),
    
     (TEMPL=@=WAS -> ((clause_property(REF,line_count(LC)),INFO=line(LC:S))) ;  (not(not(TEMPL=WAS)) -> INFO=file(S) ; fail)).
 
@@ -98,7 +98,7 @@ write_string_if_contains("",E):-!,show_templ_doc(E),!.
 write_string_if_contains(Must,E):-ignore((with_output_to(string(Str),show_templ_doc_all(E)),str_contains_all([Must],Str),fmt(Str))).
 
 
-isa(Inst,vtVerb) <= (get_all_templates(A),nonvar(A),functor_safe(A,Inst,_)).
+isa(Inst,vtVerb) <= (vtActionTemplate(A),{nonvar(A),functor_safe(A,Inst,_)}).
 
 user:hook_coerce(Text,vtVerb,Inst):- isa(Inst,vtVerb),name_text(Inst,Text).
 
@@ -107,5 +107,5 @@ user:hook_coerce(Text,vtVerb,Inst):- isa(Inst,vtVerb),name_text(Inst,Text).
 
 % :- include(logicmoo(vworld/moo_footer)).
 
-:-add((vtActionTemplate(Templ) :- loop_check(get_all_templates(Templ)))).
+:-add(((get_all_templates(Templ))=>vtActionTemplate(Templ))).
 

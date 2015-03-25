@@ -15,17 +15,17 @@
 
 % :- register_module_type (mtCommand).
 
-action_info(actTake(tCarryAble)).
+action_templ(actTake(tCarryAble)).
 
 % Command Hook
 user:agent_call_command(Agent,actTake(Obj)) :- 
   not(action_verb_useable(actTake,_,_,_,_)),
-  agent_call_take(Agent,Obj).
+  must(agent_call_take(Agent,Obj)).
 
 % Successfully
 agent_call_take(Agent,Obj) :- 
 	once((farthest_reachable_object(Agent,Obj))),
-	nop((ignore(props(Obj,mudWeight<2)),
+	must((nop(props(Obj,mudWeight<2)),
 	ignore(do_act_affect(Agent,actTake,Obj)))),
 	do_act_for_take(Agent,Obj),
 	call_update_charge(Agent,actTake).
@@ -39,8 +39,8 @@ agent_call_take(Agent,_Obj) :-
 % Is the obect going to stick around after take-ing, either as is
 % or in the agent's possession.
 do_act_for_take(Agent,Obj) :-
-	do_change_for_take(Agent,Obj),!.
-        %term_listing(Obj).
+	do_change_for_take(Agent,Obj),!,
+        term_listing(Obj).
 
 do_change_for_take(_,Obj):-
         props(Obj,mudPermanence(actTake,Disappears)), 

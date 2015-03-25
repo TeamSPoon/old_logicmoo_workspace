@@ -645,7 +645,7 @@ mk_skolem_name(_O ,_V,[],SIn,SIn):-!.
 mk_skolem_name(_O,_V, OP,SIn,SIn):- is_log_op(OP),!.
 mk_skolem_name(_O,_V,Fml,SIn,SOut):- atomic(Fml),!,i_name(Fml,N),toPropercase(N,CU),!,(atom_contains(SIn,CU)->SOut=SIn;atom_concat(SIn,CU,SOut)).
 mk_skolem_name( Orig,Var,[H|T],SIn,SOut):- !,mk_skolem_name( Orig,Var,H,SIn,M),mk_skolem_name( Orig,Var,T,M,SOut).
-mk_skolem_name( Orig,Var,isa(VX,Lit),SIn,SOut):- same_var(same_var(Var,VX)),not_ftVar(Lit),!,mk_skolem_name( Orig,Var,['Is',Lit,'In'],'',F),atom_concat(F,SIn,SOut).
+mk_skolem_name( Orig,Var,isa(VX,Lit),SIn,SOut):- same_var(Var,VX),not_ftVar(Lit),!,mk_skolem_name( Orig,Var,['Is',Lit,'In'],'',F),atom_concat(F,SIn,SOut).
 mk_skolem_name( Orig,Var,Fml,SIn,SOut):- Fml=..[F,VX],same_var(Var,VX),!,mk_skolem_name( Orig,Var,['Is',F,'In'],SIn,SOut).
 mk_skolem_name( Orig,Var,Fml,SIn,SOut):- Fml=..[F,Other,VX|_],same_var(Var,VX),!,type_of_var( Orig,Other,OtherType),
    mk_skolem_name( Orig,Var,[OtherType,'Arg2Of',F],SIn,SOut).
@@ -1047,6 +1047,8 @@ pttp_pred_head(P):-get_functor(P,F,_),user:mpred_prop(F,prologPTTP).
 :-multifile(snarky_comment/1).
 
 
+pttp_listens_to_head(_OP,P):-pttp_pred_head(P).
+
 pttp_listens_to_stub(prologPTTP).
 pttp_listens_to_stub(prologSNARK).
 
@@ -1054,24 +1056,24 @@ pttp_listens_to_stub(prologSNARK).
 user:provide_mpred_setup(Op,H):-provide_snark_op(Op,H).
 
 % OPHOOK ASSERT
-provide_snark_op(change(assert,_How),(HeadBody)):- 
-   pttp_listens_to_head(HeadBody),
+provide_snark_op(change(assert,How),(HeadBody)):- 
+   pttp_listens_to_head(change(assert,How),HeadBody),
    why_to_id(provide_snark_op,(HeadBody),ID),
    snark_tell(ID,(HeadBody)).
 
 % OPHOOK CALL
-provide_snark_op(call(_How),Head):- 
-  pttp_listens_to_head(Head),
+provide_snark_op(call(How),Head):- 
+  pttp_listens_to_head(call(How),Head),
   pttp_call(Head).
 
 % OPHOOK CLAUSES
-provide_snark_op(clauses(_How),(Head:-Body)):- 
-   pttp_listens_to_head(Head),
+provide_snark_op(clauses(How),(Head:-Body)):- 
+   pttp_listens_to_head(clauses(How),Head),
    provide_mpred_storage_clauses(Head,Body,_Why).
 
 % OPHOOK 
 provide_snark_op(OP,(HeadBody)):- 
-   pttp_listens_to_head(HeadBody),
+   pttp_listens_to_head(OP,HeadBody),
    snark_process(OP,HeadBody).
 
 

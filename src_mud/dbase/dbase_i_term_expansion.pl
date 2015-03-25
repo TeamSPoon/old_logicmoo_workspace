@@ -86,8 +86,12 @@ must_expand(props(_,_)).
 must_expand(typeProps(_,_)).
 must_expand(G):-functor(G,_,A),!,A==1.
 
-fully_expand_warn(_,C,C):-!.
-fully_expand_warn(A,B,C):-fully_expand(A,B,C),must(B=@=C).
+% fully_expand_warn(_,C,C):-!.
+fully_expand_warn(A,B,O):-must(fully_expand(A,B,C)),!,must(same_terms(B,C)),(O=C;must(same_terms(O,C))),!.
+
+same_terms(A,B):-A=@=B,!.
+same_terms(M:A,B):-atom(M),!,same_terms(A,B).
+same_terms(A,M:B):-atom(M),!,same_terms(A,B).
 
 fully_expand(_,Sent,SentO):-not(compound(Sent)),!,Sent=SentO.
 fully_expand(Op,Sent,SentO):-must_expand(Sent),!,fully_expand_now(Op,Sent,SentO),!.
@@ -96,7 +100,7 @@ fully_expand(Op,Sent,SentO):-fully_expand_now(Op,Sent,SentO),!.
 
 fully_expand_now(_,Sent,SentO):-not(compound(Sent)),!,Sent=SentO.
 fully_expand_now(_,Sent,SentO):-thlocal:infSkipFullExpand,!,must(Sent=SentO).
-fully_expand_now(Op,Sent,SentO):- must(notrace((fully_expand_clause(Op,Sent,BO),!,SentO=BO))),
+fully_expand_now(Op,Sent,SentO):- must(fully_expand_clause(Op,Sent,BO)),!,must(notrace((SentO=BO))),
    ignore(((notrace((Sent\=@=SentO, (Sent\=isa(_,_)->SentO\=isa(_,_);true), 
     (Sent \=@= user:SentO), dmsg(fully_expand(Op,(Sent --> SentO)))))))),!.
 
@@ -246,7 +250,7 @@ expand_props(Op,(Term,True),OUT):- is_true(True),!,expand_props(Op,(Term),OUT).
 expand_props(_ ,(Term1,Term2),Term1):- Term1==Term2,!.
 %expand_props(Op,Term,OUT):- stack_check,(var(Op);var(Term)),!,trace_or_throw(var_expand_units(Op,Term,OUT)).
 expand_props(Op,Sent,OUT):-Sent=..[And|C12],is_logical_functor(And),!,maplist(expand_props(Op),C12,O12),OUT=..[And|O12].
-expand_props(Op,props(Obj,Open),OUT):- var(Open),!,trace_or_throw(expand_props(Op,props(Obj,Open)),OUT).
+expand_props(Op,props(Obj,Open),OUT):- var(Open),!,trace_or_throw(expand_props(Op,props(Obj,Open))->OUT).
 expand_props(_ ,props(Obj,List),isa(Obj,ftID)):- List==[],!.
 expand_props(Op,props(Obj,[P]),OUT):- nonvar(P),!,expand_props(Op,props(Obj,P),OUT).
 expand_props(Op,props(Obj,[P|ROPS]),OUT):- !,expand_props(Op,props(Obj,P),OUT1),expand_props(Op,props(Obj,ROPS),OUT2),conjoin(OUT1,OUT2,OUT).
@@ -655,7 +659,7 @@ force_head_expansion(H,HR):- try_mud_head_expansion(H,HR),!.
 force_head_expansion(H,HR):- force_expand(expand_term(H,HR)).
 
 mud_rule_expansion(H,True,HR):-is_true(True),!,force_clause_expansion(H,HR).  
-mud_rule_expansion(H,B,HB):- pttp_expansions(H,B),pttp_term_expansion((H:-B),HB).
+% mud_rule_expansion(H,B,HB):- pttp_expansions(H,B),pttp_term_expansion((H:-B),HB).
 mud_rule_expansion(H,B,((HR:-BR))):-force_head_expansion(H,HR),force_expand_goal(B,BR),!.
 
 is_term_head(H):- (( \+ \+ (inside_clause_expansion(H0),!,H=H0))),!.

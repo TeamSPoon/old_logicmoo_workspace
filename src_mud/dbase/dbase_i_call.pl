@@ -144,7 +144,7 @@ mpred_call(Call):-fully_expand(query(dbase_t,mpred_call),Call,Expand),!,mpred_ca
 mpred_call_0(Call):- one_must(mpred_call_1(Call),mpred_call_2(Call)).
 
 mpred_call_1(Call):-current_predicate(_,Call),debugOnError(loop_check(Call)).
-mpred_call_1(Call):-clause(prolog_xref:process_directive(D, Q),_),nonvar(D),D=Call,!, trace,show_call(prolog_xref:process_directive(Call,Q),fmt(Q)).
+mpred_call_1(Call):-clause(prolog_xref:process_directive(D, Q),_),nonvar(D),D=Call,!, trace,show_call((prolog_xref:process_directive(Call,Q),fmt(Q))).
 mpred_call_2(Call):-current_predicate(is_asserted/1),!,is_asserted(Call).
 
 % https://gist.githubusercontent.com/vwood/662109/raw/dce9e9ce9505443a82834cdc86163773a0dccc0c/ecldemo.c

@@ -7,6 +7,64 @@
 
 :- include(dbase_i_header).
 
+% :-use_module(dbase_i_pldoc_html).
+
+:- multifile
+	prolog:doc_object_summary/4,	% Object, ?Category, ?Section, ?Summary
+	prolog:doc_object_page//2,	% +Object, +Options
+	prolog:doc_nav_tree//2,		% +Object, +Options
+	prolog:doc_object_link//2,	% +Object, +Options
+	prolog:doc_category/3,		% Name, Order, Description
+	prolog:doc_file_index_header//2,% +File, +Options
+	prolog:doc_object_title/2,	% +Object, -Title
+	prolog:doc_object_href/2,	% +Object, -HREF
+	prolog:doc_canonical_object/2,	% +ObjectIn, -CanonicalObj
+	prolog:doc_search_field//1,	% +Options
+	prolog:doc_places_menu//1,	% +Dir
+	prolog:doc_directory/1,		% ?Dir
+	prolog:doc_object_page_footer//2, % +Object, +Options
+	prolog:doc_page_header//2,	% +File, +Options
+	prolog:doc_links//2,		% +Directory, +Options
+	prolog:doc_file_title//3.	% +Title, +File, +Options
+
+
+:- predicate_options(pred_dt//3, 3,
+		     [ edit(boolean)
+		     ]).
+
+:- predicate_options(db_object_page//2, 2,
+		     [ for(any),
+		       header(boolean),
+		       links(boolean),
+		       no_manual(boolean),
+		       try_manual(boolean),
+		       search_in(oneof([all,app,man])),
+		       search_match(oneof([name,summary])),
+		       search_options(boolean)
+		     ]).
+
+% prolog:doc_object_summary(A,B,C,D):-man_object_summary(A,B,C,D).
+
+:-thread_local(user:html_listed/1).
+
+prolog:doc_object_page_footer(Obj,_) --> { not(user:html_listed(Obj)) },!,pldoc_html:html_listing('Footer',Obj).
+
+%prolog:doc_page_header(A,B) --> {format(user_error,'~n~q~n',[doc_page_header(A, B)]),fail}.
+%prolog:doc_object_summary(A,B,C,D) :- format(user_error,'~n~q~n',[doc_object_summary(A, B,C,D)]),dumpST(10),fail.
+%prolog:doc_object_href(A,B) :- format(user_error,'~n+++++++++++++++========================~q~n',[doc_object_href(A, B)]),dumpST(10),fail.
+
+:- multifile prolog:doc_is_public_object/1.
+
+
+/*
+:- abolish(prolog:doc_object_page/4).
+:- multifile prolog:doc_object_page//2.
+% prolog:doc_object_page(Obj, Options,A,B) :-  format(user_error,'~n~q~n',[dbase_object_page(Obj, Options)]), dbase_object_page(Obj, Options,A,B),!.
+prolog:doc_object_page(Obj, Options,A,B) :-  format(user_error,'~n~q~n',[pldoc_man:man_page(Obj, Options)]), pldoc_man:man_page(Obj, [no_manual(fail), footer(false)|Options],A,B).
+*/
+
+
+:- listing(prolog:doc_object_page//2).
 
 :-export(show_all/1).
 show_all(Call):-doall((show_call(Call))).
@@ -64,6 +122,34 @@ showCounts([H|L],OTHER):- occurrences_of_term(H,OTHER,N),write_count(H,N),showCo
 
 write_count(H,N):- writeq(H:N),write(', ').
 
+
+:- use_module(library(apply)).
+:- use_module(library(option)).
+:- use_module(library(debug)).
+:- use_module(library(lists)).
+:- use_module(library(codesio)).
+:- use_module(library(prolog_colour)).
+:- use_module(library('pldoc/doc_process')).
+:- use_module(library('pldoc/doc_colour')).
+:- use_module(library('pldoc/doc_html')).
+:- use_module(library('pldoc/doc_index')).
+:- use_module(library('pldoc/doc_search')).
+:- use_module(library('pldoc/doc_modes')).
+:- use_module(library('pldoc/doc_man')).
+:- use_module(library('pldoc/doc_wiki')).
+:- use_module(library('pldoc/doc_util')).
+:- use_module(library('pldoc/doc_modes')).
+:- use_module(library('pldoc/doc_htmlsrc')).
+:- use_module(library('pldoc/doc_access')).
+:- use_module(library('pldoc/doc_pack')).
+:- use_module(library('pldoc/doc_register')).
+:- use_module(library('pldoc/doc_library')).
+:- use_module(library(http/html_write)).
+:- use_module(library(http/http_path)).
+:- use_module(library(prolog_xref)).
+:- use_module(library(http/http_dispatch)).
+:- use_module(library(http/html_head)).
+
 /*
 
 :-source_to_txt('../src_mud/actions/take.pl').
@@ -107,8 +193,6 @@ transform_term0(Term,TermOut):- atom(Term),atom_length(Term,L),L>2,to_tclass(Ter
 transform_term0([H|T],[HO|TO]):-!,transform_term0(H,HO),transform_term0(T,TO).
 transform_term0(Term,TermO):-compound(Term),Term=..List,maplist(transform_term0,List,ListO),TermO=..ListO.
 transform_term0(Term,Term):-!.
-
-
 
 /*  Part of SWI-Prolog
 
@@ -371,7 +455,7 @@ html_fragment(fragment(Start, End, structured_comment, []),
 	    DOM = [\pred_dt(Modes, pubdef, []), dd(class=defbody, DOM1)],
 	    wiki_lines_to_dom(Lines1, Args, DOM0),
 	    strip_leading_par(DOM0, DOM1),
-	    phrase(pldoc_html:html(DOM), Tokens),		% HACK
+	    phrase(html(DOM), Tokens),		% HACK
 	    noformat(Out, '<dl class="comment">~n', [Out]),
 	    print_html(Out, Tokens),
 	    noformat(Out, '</dl>~n', [Out])

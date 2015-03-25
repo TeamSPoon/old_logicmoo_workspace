@@ -27,6 +27,7 @@
 :- op(1050,xfx,('<=')).
 :- op(1100,fx,('=>')).
 :- op(1150,xfx,('::::')).
+:-dynamic(subFormat/2).
 
 tCol(X)=>{decl_type(X)}.
 :-decl_type(tBird).
@@ -167,6 +168,23 @@ notequal(C,B) <= equal(A,C),notequal(A,B).
 :-add(predArgTypes(typeGenls(ttTypeType,tCol))).
 
 
+subFormat(ftDeplictsFn(tCol),ftSpec).
+subFormat(ftDeplictsFn(ttFormatted),ftSpec).
+subFormat(ftDeplictsFn(ttFormatted),ftSpec).
+subFormat(ftVoprop,ftSpec).
+
+ttFormatted(isEach(ftRest(ftTerm))).
+ttFormatted(isRandom(tCol)).
+ttFormatted(isAnd(ftRest(ftSpec))).
+ttFormatted(isMost(ftRest(ftSpec))).
+ttFormatted(isOneOf(ftRest(ftSpec))).
+ttFormatted(isNot(ftSpec)).
+ttFormatted(isOptional(ftSpec,ftTerm)).
+ttFormatted(isOptionalStr(ftString)).
+ttFormatted(exactStr(ftString)).
+
+resultIsa(ftDeplictsFn,ftSpec).
+
 user:mpred_prop(defnSufficient,prologOnly).
 
 isa(argIsa,prologHybrid).
@@ -180,10 +198,14 @@ isa(isKappaFn,tFunction).
 isa(prologMultiValued, tCol).
 arity(ftListFn,1).
 arity(isLikeFn,2).
+arity(ftDeplictsFn,1).
 ttFormatted(ftDice(ftInt,ftInt,ftInt)).
 ttFormatted(ftListFn(ftRest)).
+ttFormatted(ftDeplictsFn(tCol)).
 
 
+
+tCol(completeIsaAsserted).
 %completelyAssertedCollection(Ext):- fwc, arg(_,vv(tCol,vtDirection,ttFormatType,tRegion,ftString,genlPreds),Ext).
 completeExtentAsserted(formatted_resultIsa).
 completeExtentAsserted(defnSufficient).
@@ -211,9 +233,9 @@ predArgTypes(argSingleValueDefault(prologSingleValued,ftInt,ftTerm)).
 predArgTypes(formatted_resultIsa(ttFormatType,tCol)).
 predArgTypes(defnSufficient(ttFormatType,ftTerm)).
 predArgTypes(isLikeFn(tPred,tCol)).
-predArgTypes('=>'(ftAskable,ftTerm)).
-predArgTypes('<='(ftTerm,fsAskable)).
-prologHybrid(instTypeProps(ftID,tCol,ftVoprop)).
+predArgTypes('=>'(ftAskable,ftAssertable)).
+predArgTypes('<='(ftAssertable,ftAskable)).
+prologHybrid(instTypeProps(ftID,tCol,ftRest(ftVoprop))).
 prologHybrid(subFormat(ttFormatType,ttFormatType)).
 prologMacroHead(macroSomethingDescription(ftTerm,ftListFn(ftString))).
 prologMacroHead(pddlObjects(tCol,ftListFn(ftID))).
@@ -228,8 +250,8 @@ prologMultiValued(predModule(tRelation,ftAtom)).
 prologMultiValued(predProxyAssert(prologMultiValued,ftTerm)).
 prologMultiValued(predProxyQuery(prologMultiValued,ftTerm)).
 % prologMultiValued('<=>'(ftTerm,ftTerm)).
-prologMultiValued('<='(ftTerm,fsAskable)).
-prologMultiValued('=>'(fsAskable,ftTerm)).
+prologMultiValued('<='(ftAssertable,ftAskable)).
+prologMultiValued('=>'(ftAskable,ftAssertable)).
 prologNegByFailure(predArgMulti(prologMultiValued,ftInt)).
 prologNegByFailure(tDeleted(ftID)).
 prologSingleValued(predInstMax(ftID,prologSingleValued,ftInt),prologHybrid).
@@ -250,6 +272,7 @@ subFormat(ftString,ftText).
 subFormat(ftTerm,ftProlog).
 subFormat(ftText,ftTerm).
 subFormat(ftVar,ftProlog).
+subFormat(ftVoprop,ftRest(ftVoprop)).
 subFormat(ftVoprop,ftTerm).
 
 tCol(tChannel).
@@ -326,6 +349,7 @@ defnSufficient(ftVar,var).
 defnSufficient(ftNonvar,nonvar).
 defnSufficient(ftNumber,number).
 defnSufficient(ftRest,is_rest).
+defnSufficient(ftRest(Type),is_rest_of(Type)).
 defnSufficient(ftListFn(Type),is_list_of(Type)).
 defnSufficient(ftBoolean,is_boolean).
 defnSufficient(ftText,is_string).
@@ -410,12 +434,33 @@ neg(isa(I,Super)) <= (isa(I,Sub), disjointWith(Sub, Super)).
 %((disjointWith(P1,P2) , genls(C1,P1), {dif:dif(C1,P1)}) =>    disjointWith(C1,P2)).
 % (disjointWith(C1,P2) <= (genls(C1,P1), {dif:dif(C1,P1)}, disjointWith(P1,P2))).
 
+tCol(ttPreAssertedCollection).
+tCol(completeIsaAsserted).
+% genls(completeIsaAsserted,tSpatialThing).
+genls(ttPreAssertedCollection,tCol).
+ttPreAssertedCollection(ttPreAssertedCollection).
+ttPreAssertedCollection(tPred).
+ttPreAssertedCollection(tCol).
+ttPreAssertedCollection(ttFormatType).
+ttPreAssertedCollection(ttTypeType).
+ttPreAssertedCollection(tItem).
+ttPreAssertedCollection(tRegion).
+ttPreAssertedCollection(tObj).
+ttPreAssertedCollection(tAgentGeneric).
+ttPreAssertedCollection(tCarryAble).
+ttPreAssertedCollection(vtVerb).
+genls(ttTypeByAction,ttPreAssertedCollection).
+genls(ttPreAssertedCollection,completelyAssertedCollection).
+
+((completeIsaAsserted(I), isa(I,Sub), genls(Sub, Super),{ground(Sub:Super)}) => ({dif:dif(Sub, Super)}, isa(I,Super))).
+% TODO ADD THIS :-pfcAdd((ttPreAssertedCollection(Super), isa(I,Sub), genls(Sub, Super)) => ({ground(I:Sub:Super),dif:dif(Sub, Super)}, isa(I,Super))).
 % (isa(I,Sub), genls(Sub, Super),{ground(Sub:Super)}, ~neg(completelyAssertedCollection(Super))) => ({dif:dif(Sub, Super)}, isa(I,Super)).
+% (genls(I,Sub), genls(Sub, Super),{ground(I:Sub:Super)}) => ({dif:dif(I,Sub),dif:dif(Sub, Super)}, genls(I,Super)).
 
 ( ttFormatted(FT), {dif:dif(FT,COL)}, genls(FT, COL),tCol(COL),{not(isa(COL,ttFormatType))}) => formatted_resultIsa(FT,COL).
- 
-(genls(I,Sub),{dif:dif(I,Super),is_asserted(genls(I,Sub)),is_asserted(genls(Sub, Super)), nonvar(I),nonvar(Sub),nonvar(Super)})    
- => (genls(I,Super) , completeExtentAsserted(genls)).
+
+% {dif:dif(I,Super),nonvar(I),nonvar(Sub),nonvar(Super)},
+(genls(I,Sub),genls(Sub, Super)) => ({nonvar(I),nonvar(Sub),nonvar(Super),dif:dif(I,Super),dif:dif(Sub,Super),dif:dif(I,Sub)},genls(I,Super) , completeExtentAsserted(genls)).
 
 /*
 

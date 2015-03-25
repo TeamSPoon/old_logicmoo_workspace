@@ -16,6 +16,9 @@
 
 %:- include(logicmoo(vworld/moo_header)).
 
+
+:- '@'(ensure_loaded('../src_mud/dbase/dbase_i_pldoc'),user).
+
 %:- export(with_no_dbase_expansions/1).
 %:- meta_predicate(with_no_dbase_expansions(0)).
 with_no_dbase_expansions(Goal):-
@@ -62,7 +65,9 @@ do_semweb_startup:-
 user:semweb_startup:-ensure_loaded('run_clio').
 
 % [Optionaly] register/run KnowRob robot services (we use it for the ontology mainly)
-% TODO user:semweb_startup :- with_no_term_expansions(if_file_exists(ensure_loaded('../externals/MUD_KnowRob/knowrob_addons/knowrob_mud/prolog/init.pl'))).
+% TODO 
+
+user:semweb_startup :- with_no_term_expansions(if_file_exists(ensure_loaded('../externals/MUD_KnowRob/knowrob_addons/knowrob_mud/prolog/init.pl'))).
 
 % [Optionaly] register/run MILO robot services (we use it for the ontology mainly)
 % TODO user:semweb_startup :- register_ros_package(milo).
@@ -70,6 +75,7 @@ user:semweb_startup:-ensure_loaded('run_clio').
 % [Optionaly] register/run EulerSharp robot services (we use it for the ontology mainly)
 % TODO user:semweb_startup :- register_ros_package(euler).
 
+:- ensure_loaded(logicmoo(dbase/dbase_i_pldoc)).
 :- do_semweb_startup.
 
 :- with_no_dbase_expansions(if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop.pl'))).
@@ -93,17 +99,18 @@ user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),s
 % this is what happens when the world is not found
 % :- add_game_dir('../games/src_game_unknown',prolog_repl).     
 
+% :- prolog_repl.
+
 tCol(tLivingRoom).
 genls(tLivingRoom,tRegion).
 genls(tOfficeRoom,tRegion).
 :-decl_mpred_hybrid(pathConnects(tRegion,tRegion),symmetric).
 :- onSpawn(pathConnects(tLivingRoom,tOfficeRoom)).
-:- do_ensure_some_pathBetween.
 % int_firstOrder(some_query, 666, What, C, E, A, J, D, L, B)
 % :- forall(clause(user:mud_regression_test,Call),must(Call)).
 
 :- declare_load_dbase('../games/src_game_nani/a_nani_household.plmoo').
-% :- declare_load_dbase('../games/src_game_nani/objs_misc_household.plmoo').
+:- declare_load_dbase('../games/src_game_nani/objs_misc_household.plmoo').
 
 % the following 4 worlds are in version control in examples
 % :- add_game_dir('../games/src_game_wumpus',prolog_repl).       
@@ -112,8 +119,9 @@ genls(tOfficeRoom,tRegion).
 
 
 % :- add_game_dir('../games/src_game_startrek',prolog_repl).
-:- declare_load_dbase('../games/src_game_startrek/startrek.all.plmoo').
+% :- declare_load_dbase('../games/src_game_startrek/startrek.all.plmoo').
 
+:- do_ensure_some_pathBetween.
 
 tAgentGeneric(iCommanderData66).
 isa(iCommanderData66,'tMonster').
@@ -129,15 +137,15 @@ pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','Por
 mudDescription(iCommanderData66,txtFormatFn("Very screy looking monster named ~w",[iCommanderData66])).
 
 tAgentGeneric(iExplorer1).
-wearsClothing(iExplorer1,'iBoots7773').
-wearsClothing(iExplorer1,'iComBadge7774').
-wearsClothing(iExplorer1,'iGoldUniform7775').
+wearsClothing(iExplorer1,'iBoots773').
+wearsClothing(iExplorer1,'iComBadge774').
+wearsClothing(iExplorer1,'iGoldUniform775').
 isa(iExplorer1,'tExplorer').
-mudStowing(iExplorer1,'iPhaser7776').
-pddlSomethingIsa('iBoots7773',['tBoots','ProtectiveAttire','PortableObject','tWearAble']).
-pddlSomethingIsa('iComBadge7774',['tComBadge','ProtectiveAttire','PortableObject','tNecklace']).
-pddlSomethingIsa('iGoldUniform7775',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
-pddlSomethingIsa('iPhaser7776',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
+mudStowing(iExplorer1,'iPhaser776').
+pddlSomethingIsa('iBoots773',['tBoots','ProtectiveAttire','PortableObject','tWearAble']).
+pddlSomethingIsa('iComBadge774',['tComBadge','ProtectiveAttire','PortableObject','tNecklace']).
+pddlSomethingIsa('iGoldUniform775',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
+pddlSomethingIsa('iPhaser776',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
 isa(iExplorer1,'tExplorer').
 
 :-onSpawn(localityOfObject(iExplorer1,'tLivingRoom')).
@@ -148,12 +156,13 @@ isa(iExplorer1,'tExplorer').
 
 % :- if_startup_script( doall(now_run_local_tests_dbg)).
 
+% :-enqueue_player_command("hide").
 :-enqueue_player_command(actWho).
 :-enqueue_player_command("rez crackers").
 :-enqueue_player_command("drop crackers").
 :-enqueue_player_command('look').
 
-:-enqueue_player_command(prolog).
+% :-enqueue_player_command(prolog).
 
 :-enqueue_player_command("take crackers").
 :-enqueue_player_command("eat crackers").
@@ -164,7 +173,7 @@ isa(iExplorer1,'tExplorer').
 :-enqueue_player_command("take shirt").
 :-enqueue_player_command("inventory").
 
-:-enqueue_player_command(prolog).
+% :-enqueue_player_command(prolog).
 
 % [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
 % :- register_timer_thread(npc_ticker,30,npc_tick).

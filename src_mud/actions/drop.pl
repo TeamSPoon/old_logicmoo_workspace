@@ -19,8 +19,6 @@
 
 user:action_info(actDrop(isOneOf([tDropAble,tNearestReachableItem,tObj,ftID])),"Drop an item").
 
-% user:action_info(W,W):- is_asserted(user:action_info(W)). 
-
 % Drop something
 user:agent_call_command(Agent,actDrop(Obj)) :-
 	mudPossess(Agent,Obj),

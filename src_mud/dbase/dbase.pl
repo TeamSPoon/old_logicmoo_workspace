@@ -294,12 +294,13 @@ vtTestType(vTest2).
 :-must(in_file_expansion;in_file_directive).
 % :- must(show_call(ensure_plmoo_loaded(logicmoo(dbase/dbase_i_builtin)))).
 
+:- pfcAdd(((action_templ(ArgTypes)/is_declarations(ArgTypes) => vtActionTemplate(ArgTypes)))).
+:- pfcAdd(((action_info(ArgTypes,_)/is_declarations(ArgTypes) => vtActionTemplate(ArgTypes)))).
 /*
 :- pfcAdd(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) => functorDeclares(F))).
 (ttFormatType(FT)/is_declarations(FT))=>ftFormatting(FT).
 
-action_info(ArgTypes)/is_declarations(ArgTypes) =>vtActionTemplate(ArgTypes).
-action_info(ArgTypes,_)/is_declarations(ArgTypes) =>vtActionTemplate(ArgTypes).
+
 
 ftFormatting(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
 predArgTypes(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).

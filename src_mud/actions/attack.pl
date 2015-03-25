@@ -18,7 +18,7 @@
 % :- register_module_type (mtCommand).
 
 % attack joe ->translates-> attack nw
-action_info(actAttack(vtDirection)).
+action_templ(actAttack(vtDirection)).
 
 % Attack
 % Successful Attack

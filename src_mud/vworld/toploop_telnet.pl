@@ -149,7 +149,7 @@ ensure_player_stream_local(P):-
   set_player_stream(P,Id,In,Out).
 
 set_player_stream(P,Id,In,Out):-
-  foc_current_player(P),
+  % foc_current_player(P),
    (thglobal:agent_message_stream(P,Id,In,Out)->true;
       ((retractall(thglobal:agent_message_stream(P,Id,_,_)),
      assert(thglobal:agent_message_stream(P,Id,In,Out))))).
@@ -177,7 +177,8 @@ prompt_read(Prompt,Atom):-
         repeat,read_code_list_or_next_command(Atom),!.
 
 read_code_list_or_next_command(Atom):-current_input(In),read_code_list_or_next_command(In,Atom),!.
-read_code_list_or_next_command(In,Atom):- must(thglobal:agent_message_stream(P,_,In,_)),retract(thglobal:player_command_stack(P,Atom)),!.
+
+read_code_list_or_next_command(In,Atom):- must(thglobal:agent_message_stream(P,_,In,_)),retract(thglobal:player_command_stack(P,Atom)),fmt(thglobal:player_command_stack(P,Atom)),!.
 read_code_list_or_next_command(In,end_of_file):- at_end_of_stream(In),!.
 read_code_list_or_next_command(In,Atom):- 
  (var(In)->current_input(In);true), catchv(wait_for_input([In], Ready, 1),_,fail),!,  member(In,Ready),
@@ -300,12 +301,13 @@ show_room_grid_new(_):-nl.
 
 door_label(R,Dir,'  '):- pathBetween_call(R,Dir,SP),atomic(SP).
 
+asserted_atloc_for_map(O,L):-asserted_atloc(O,L),O\=apathFn(_,_).
 asserted_atloc(O,L):-is_asserted(mudAtLoc(O,L)).
 
 show_room_grid_single(Room, xyzFn(Room,X,Y,Z),OutsideTest):- call(OutsideTest), doorLocation(Room,X,Y,Z,Dir),door_label(Room,Dir,Label),write(Label),!.
 show_room_grid_single(_Room,_LOC,OutsideTest):- call(OutsideTest),!,write('[]'),!.
-show_room_grid_single(_Room,LOC,_OutsideTest):- asserted_atloc(Obj,LOC),inst_label(Obj,Label), write(Label), !.
-show_room_grid_single(_Room,LOC,_OutsideTest):- asserted_atloc(_Obj,LOC),write('..'), !.
+show_room_grid_single(_Room,LOC,_OutsideTest):- asserted_atloc_for_map(Obj,LOC),inst_label(Obj,Label), write(Label), !.
+show_room_grid_single(_Room,LOC,_OutsideTest):- asserted_atloc_for_map(_Obj,LOC),write('..'), !.
 show_room_grid_single(_Room,_LOC,_OutsideTest):- write('--'), !.
 
 inst_label(Obj,SLabe2):- call(term_to_atom(Obj,SLabel)),sub_atom(SLabel,1,2,_,SLabe2),!.

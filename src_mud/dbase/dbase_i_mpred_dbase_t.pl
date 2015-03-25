@@ -256,7 +256,7 @@ ensure_universal_stub_plus_2(F,A2):-
    append(ARGSMinus2,[_,_],ARGS),
    HEADMinus2=..[F|ARGSMinus2],
    AMinus2 is A2 -2,
-   assert_if_new(HEAD:-HEADMinus2),!,
+   assert_if_new((HEAD:-HEADMinus2)),!,
   % compile_predicates([HEAD]),
    dbase_mod(M),
    decl_mpred_hybrid(M,F,AMinus2).

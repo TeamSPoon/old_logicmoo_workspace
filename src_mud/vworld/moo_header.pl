@@ -23,7 +23,7 @@
 :- multifile user:mud_test_local/1.
 :- multifile user:mud_test_local/2.
 :- multifile user:world_agent_plan/3.
-:- multifile user:action_info/1.
+:- multifile user:action_templ/1.
 :- multifile user:action_info/2.
 :- multifile user:action_info/3.
 :- multifile user:action_rules/4.

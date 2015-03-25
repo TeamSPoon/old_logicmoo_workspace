@@ -93,7 +93,7 @@ cmdLook_proc_0(Agent,LOC):-
          mudAtLoc(Agent,value),
          nameStringsList(vHere,value),
          forEach(mudDescription(vHere,Value),fmt(mudDescription(Value))),
-         events=mudDeliverableLocationEvents(Agent,LOC,value),
+         events=clause(mudDeliverableLocationEvents(Agent,LOC,value),true),
          path(D) = pathBetween(vHere,D,value),
          pathName(D) = pathName(vHere,D,value),
          % value = localityOfObject(value,vHere),

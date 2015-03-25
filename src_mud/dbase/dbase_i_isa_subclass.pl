@@ -376,7 +376,7 @@ isa_asserted(I,T):- nonvar(T),isa_asserted_1(I,T).
 isa_asserted_1(I,T):- atom(T),isa_w_type_atom(I,T).
 isa_asserted_1(_,T):- hasInstance(completelyAssertedCollection,T),!,fail.
 %isa_asserted_1(I,T):- append_term(T,I,HEAD),ruleBackward(HEAD,BODY),call_mpred_body(HEAD,BODY).
-isa_asserted_1(I,'&'(T1 , T2)):-!,nonvar(T1),var(T2),!,dif:dif(T1,T2),isa_backchaing(I,T1),impliedSubClass(T1,T2),isa_backchaing(I,T2).
+isa_asserted_1(I,'&'(T1 , T2)):-!,nonvar(T1),var(T2),!,dif:dif(T1,T2),isa_backchaing(I,T1),subclass(T1,T2),isa_backchaing(I,T2).
 isa_asserted_1(I,'&'(T1 , T2)):-!,nonvar(T1),!,dif:dif(T1,T2),isa_backchaing(I,T1),isa_backchaing(I,T2).
 isa_asserted_1(I,(T1 ; T2)):-!,nonvar(T1),!,dif:dif(T1,T2),isa_backchaing(I,T1),isa_backchaing(I,T2).
 
@@ -487,7 +487,7 @@ isa_provide_mpred_storage_op(_,_):-!,fail.
 % ISA MODIFY
 isa_provide_mpred_storage_op(change(assert,_),G):- was_isa(G,I,C),!,dmsg(assert_isa_from_op(I,C)),!, assert_isa(I,C).
 % ISA MODIFY
-isa_provide_mpred_storage_op(change(retract,How),G):- was_isa(G,I,C),!,show_call((with_assert_op_override(change(retract,How),dmsg(retract_isa(G,I,C)),!, assert_isa(I,C)))).
+isa_provide_mpred_storage_op(change(retract,How),G):- was_isa(G,I,C),!,show_call((with_assert_op_override(change(retract,How),((dmsg(retract_isa(G,I,C)),!, assert_isa(I,C)))))).
 % ISA CALL
 isa_provide_mpred_storage_op(call(_),G):- was_isa(G,I,C),!, (isa_backchaing(I,C);hasInstance(C,I)).
 % ISA CLAUSES
@@ -510,7 +510,6 @@ user:provide_mpred_storage_clauses(H,B,(What)):-isa_provide_mpred_storage_clause
 % assert_isa/2
 % ================================================
 :-meta_predicate(assert_isa(+,+)).
-:-export i_countable/1.
 
 assert_isa([I],T):-nonvar(I),!,assert_isa(I,T).
 assert_isa(I,T):-assert_isa_i(I,T),sanity(show_call_failure(is_asserted(isa(I,T)));show_call_failure(isa_asserted(I,T))).
@@ -536,7 +535,7 @@ assert_isa_ilc(I,T):- once(decl_type(T)),
 assert_isa_ilc_unchecked(I,T):- compound(I),!,must((get_functor(I,F),assert_compound_isa(I,T,F))),!.
 assert_isa_ilc_unchecked(I,tCol):- must(show_call(decl_type(I))).
 assert_isa_ilc_unchecked(I,ttFormatType):- must(show_call(define_ft(I))).
-assert_isa_ilc_unchecked(I,_):- not(asserted_mpred_prop(I,_)),not(hasInstance(tCol,I)),show_call_failure(assert_if_new(i_countable(I))),fail.
+assert_isa_ilc_unchecked(I,_):- not(asserted_mpred_prop(I,_)),not(hasInstance(tCol,I)),show_call_failure(assert_if_new(user:hasInstance_dyn(tCountable,I))),fail.
 assert_isa_ilc_unchecked(I,T):-
   with_assertions([thlocal:infSkipArgIsa,thlocal:infSkipFullExpand],((  hooked_asserta(isa(I,T)),assert_hasInstance(T,I)))).
 

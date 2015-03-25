@@ -71,9 +71,9 @@ command_actTick(Who):-
  
 get_world_agent_plan(W,Who,Idea):-with_current_agent(Who,call_no_cuts(world_agent_plan(W,Who,Idea))).
 
-do_agent_call_plan_command(A,C):- agent_current_action(A,CC),dmsg(too_busy(CC,agent_call_plan_command(A,C))),!.
+do_agent_call_plan_command(A,C):- thlocal:agent_current_action(A,CC),dmsg(too_busy(CC,agent_call_plan_command(A,C))),!.
 do_agent_call_plan_command(A,C):-   
-   with_current_agent(A,with_assertions(agent_current_action(A,C), call_agent_command(A,C))).
+   with_current_agent(A,with_assertions(thlocal:agent_current_action(A,C), call_agent_command(A,C))).
 
 
 command_actIdea(Who,IdeaS):- 

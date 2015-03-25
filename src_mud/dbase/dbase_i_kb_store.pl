@@ -18,7 +18,8 @@
 
 :-export(( (add)/1, clr/1,fully_expand/3,ireq/1,del/1,  
   padd/2, padd/3, prop/3, prop_or/4, props/2, iprops/2, upprop/2,add/1, ireq/1, mreq/1, upprop/1, req/1, 
-  use_term_listing/2,  world_clear/1,  
+  % use_term_listing/2,  
+  world_clear/1,  
    with_kb_assertions/2)).
 
 compound_functor(Compound,F):-compound(Compound),nonvar(Compound),get_functor(Compound,F).
@@ -237,7 +238,8 @@ is_pred_declarer(Prop):- % vFormatted
 requires_storage((Head :- Body),Why):- nonvar(Head),!, requires_storage(Head,Body,Why).
 requires_storage(C,Why):- requires_storage(C,true,Why).
 
-requires_storage(_,_,thlocal:consulting_sources):-thlocal:consulting_sources,in_file_expansion.
+requires_storage(_,_,thlocal:consulting_sources):-thlocal:consulting_sources,!.
+% requires_storage(_,_,thlocal:consulting_sources):-thlocal:consulting_sources,in_file_expansion.
 requires_storage(G,_,Why):-get_functor(G,F),!,special_head(G,F,Why),!.
 
 special_wrapper_functor(call_mpred_body,direct_to_prolog).
@@ -250,7 +252,7 @@ special_wrapper_functor(loop_check_term,meta).
 %special_wrapper_functor(loop_check_clauses).
 
 make_body_clause(_Head,Body,Body):-atomic(Body),!.
-make_body_clause(_Head,Body,Body):-special_wrapper_body(Body),!.
+make_body_clause(_Head,Body,Body):-special_wrapper_body(Body,_Why),!.
 make_body_clause(Head,Body,call_mpred_body(Head,Body)).
 
 special_head(_,F,Why):-special_head0(F,Why),!,show_call_failure(not(asserted_mpred_prop(F,prologOnly))).
@@ -296,8 +298,18 @@ mdel(C0):- dmsg(warn(failed(mdel(C0)))),!,fail.
 clr(P):- agenda_do_prequery,forall(P, must(((
  doall((must(pfcGetSupportORNil(P,Support)),
   must(show_call(pfcFilterSupports(Support,fact,Results))),
-  must(pfcDoConjs(pfcRem1,Results)),sanity(not(pfcSupported(P))))),
+  must(pfcDoConjs(pfcRemE,Results)),sanity(not(pfcSupported2(local,P))))),
                  not(P))))).
+
+pfcRemE(P):-var(P),!.
+pfcRemE(!):-!.
+pfcRemE(consult(P)):-!,pfcRemE(P).
+pfcRemE([P]):-!,pfcRemE(P).
+pfcRemE(P):-pfcRem3(P),fail.
+pfcRemE(P):-pfcRem2(P,_),fail.
+pfcRemE(P):-pfcRem1(P,_),fail.
+pfcRemE(P):-predicate_property(P,number_of_clauses(_)),predicate_property(P,dynamic),clause(P,true,Ref),erase(Ref),fail.
+pfcRemE(_).
 
 % -  preq(Query) = query with P note
 preq(P,C0):- agenda_do_prequery,dbase_op(query(dbase_t,P),C0).

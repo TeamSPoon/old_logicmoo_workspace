@@ -107,7 +107,7 @@ update_stats(Agent,fall) :- padd(Agent,mudHealth,-10).
 
 % cheating but to test
 
-action_info(actGo(vtDirection)).
+action_templ(actGo(vtDirection)).
 user:agent_call_command(Agent,actGo(Dir)) :-
 	mudAtLoc(Agent,LOC),
         in_world_move(LOC,Agent,Dir),

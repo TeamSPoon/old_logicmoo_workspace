@@ -9,8 +9,8 @@
 % Revised At:  $Date: 2002/07/11 21:57:28 $
 % ===================================================================
 */
-module_decl:-module(bugger,[
-      op(1150,fx,meta_predicate_transparent),
+module_decl:-swi_module(bugger,[
+      op(1150,fx,(meta_predicate_transparent)),
       op(1150,fx,decl_thlocal),
      was_module/2,
      with_dmsg/2,
@@ -501,7 +501,7 @@ dynamic_safe(M,F,A):- (static_predicate(M,F,A) -> nop(dmsg(warn(not(M:dynamic(M:
 % ----------
 :- export(with_pi/2).
 :- module_transparent(with_pi/2).
-:- meta_predicate(with_pi(0,0)).
+:- meta_predicate(with_pi(0,4)).
 with_pi(_:[],_):-!.
 with_pi(M:(P1,P2),Pred3):-!,'@'(( with_pi(M:P1,Pred3),with_pi(M:P2,Pred3) ),M).
 with_pi(M:P,Pred3):-context_module(CM),!,with_pi_selected(CM,M,P,Pred3),!.
@@ -863,7 +863,7 @@ can_fail(G):-not(G=true),not(G=must(_)).
 % ===================================================================
 % Bugger Term Expansions
 % ===================================================================
-always_show_dmsg.
+always_show_dmsg:-fail.
 
 is_hiding_dmsgs:- \+always_show_dmsg, current_prolog_flag(opt_debug,false),!.
 
@@ -959,7 +959,10 @@ p_predicate_property(_:P,PP):-predicate_property(P,PP).
 %current_bugger_predicate(M:FF/FA):-nonvar(FF),!,current_predicate(M:FF,FA).
 %current_bugger_predicate(FF/FA):-nonvar(FF),!,!,current_predicate(FF/FA).
 :-module_transparent(current_predicate_module/2).
+current_predicate_module(P,M):-var(P),!,current_predicate(F/A),functor_safe(P,F,A),(nonvar(M)->true;p_predicate_property(P,imported_from(M))).
+current_predicate_module(OM:F/A,M):-!,functor_safe(P,F,A),(current_predicate(M:F/A);(current_predicate(OM:F/A),M=OM);current_predicate(F/A)),(nonvar(M)->true;p_predicate_property(P,imported_from(M))).
 current_predicate_module(OM:P,M):-!,functor_safe(P,F,A),(current_predicate(M:F/A);(current_predicate(OM:F/A),M=OM);current_predicate(F/A)),(nonvar(M)->true;p_predicate_property(P,imported_from(M))).
+current_predicate_module(F/A,M):-!,functor_safe(P,F,A),(current_predicate(M:F/A);(current_predicate(OM:F/A),M=OM);current_predicate(F/A)),(nonvar(M)->true;p_predicate_property(P,imported_from(M))).
 current_predicate_module(P,M):-!,functor_safe(P,F,A),(current_predicate(M:F/A);current_predicate(F/A)),(nonvar(M)->true;p_predicate_property(P,imported_from(M))).
 
 :-meta_predicate(bugger_atom_change(:,0,+,+,-,-)).
@@ -1458,7 +1461,9 @@ no_repeats_old(Call):- no_repeats_old(Call,Call).
 
 :- export(no_repeats_old/2).
 :- meta_predicate no_repeats_old(+,0).
-no_repeats_old(Vs,Call):- CONS = [_], traceok(Call), notrace(( \+ memberchk_same(Vs,CONS), copy_term(Vs,CVs), CONS=[_|T], nb_setarg(2, CONS, [CVs|T]))).
+no_repeats_old(Vs,Call):- CONS = [_], (Call), notrace(( \+ memberchk_same(Vs,CONS), copy_term(Vs,CVs), CONS=[_|T], nb_setarg(2, CONS, [CVs|T]))).
+
+% no_repeats(Vs,Call):- CONS = [_], (Call), (( \+ memberchk_same(Vs,CONS), copy_term(Vs,CVs), CONS=[_|T], nb_setarg(2, CONS, [CVs|T]))).
 
 
 % for dont-care vars
@@ -1685,7 +1690,11 @@ hideRest.
 functor_source_file(M,P,F,A,File):-functor_source_file0(M,P,F,A,File). % sanity(ground((M,F,A,File))),must(user:nonvar(P)).
 functor_source_file0(M,P,F,A,File):-current_predicate(F/A),functor_safe(P,F,A),source_file(P,File),predicate_module(P,M).
 
+predicate_module(P,M):- var(P),!,trace_or_throw(var_predicate_module(P,M)).
 predicate_module(P,M):- predicate_property(P,imported_from(M)),!.
+predicate_module(F/A,M):- atom(F),integer(A),functor(P,F,A),P\==F/A,predicate_property(P,imported_from(M)),!.
+predicate_module(Ctx:P,M):- Ctx:predicate_property(P,imported_from(M)),!.
+predicate_module(Ctx:F/A,M):- Ctx:((atom(F),integer(A),functor(P,F,A),P\==F/A,predicate_property(P,imported_from(M)))),!.
 predicate_module(M:_,M):-!. %strip_module(P,M,_F),!.
 predicate_module(_P,user):-!. %strip_module(P,M,_F),!.
 %%predicate_module(P,M):- strip_module(P,M,_F),!.
@@ -2315,7 +2324,7 @@ matches_term0(F/A,Term):- (var(A)->member(A,[0,1,2,3,4]);true), functor_safe(Fil
 matches_term0(Filter,Term):- sub_term(STerm,Term),nonvar(STerm),matches_term0(Filter,STerm),!.
 
 dmsginfo(V):-dmsg(info(V)).
-dmsg(V):- notrace(dmsg0(V)).
+dmsg(V):- notrace((dmsg0(V),garbage_collect,garbage_collect_atoms)).
 :-'$syspreds':'$hide'(dmsg/1).
 
 dmsg0(V):- is_with_dmsg(FP),!,FP=..FPL,append(FPL,[V],VVL),VV=..VVL,once(dmsg0(VV)).
@@ -2680,7 +2689,8 @@ dumpST(Frame,MaxDepth):-integer(MaxDepth),Term = dumpST(MaxDepth),
    (var(Frame)->prolog_current_frame(Frame);true),
    ignore(( get_prolog_backtrace(MaxDepth, Trace,[frame(Frame),goal_depth(100)]),
     format(user_error, '% dumpST ~p', [Term]), nl(user_error),
-    print_prolog_backtrace(user_error, Trace,[subgoal_positions(true)]), nl(user_error), fail)).
+    print_prolog_backtrace(user_error, Trace,[subgoal_positions(true)]), nl(user_error), fail)),!.
+dumpST(Frame,MaxDepth):- integer(MaxDepth),(var(Frame)->prolog_current_frame(Frame);true),dumpST2(Frame,MaxDepth).
 dumpST(Frame,Opts):-is_list(Opts),!,dumpST(1,Frame,Opts).
 dumpST(Frame,Opts):-show_call(dumpST(1,Frame,[Opts])).
 dumpST2(Frame,MaxDepth):-integer(MaxDepth),!,dumpST(Frame,[max_depth(MaxDepth),numbervars(safe),show([has_alternatives,level,context_module,goal,clause])]).
@@ -2696,7 +2706,7 @@ dumpST(N,Frame,Opts):-
    ignore((forall(member(E,RROut),fdmsg(E)))))).
 
 neg1_numbervars(T,-1,T):-!.
-neg1_numbervars(Out,Start,ROut):-copy_term(Out,ROut),integer(Start),!,safe_numbervars(ROut,Start,_).
+neg1_numbervars(Out,Start,ROut):-copy_term(Out,ROut),integer(Start),!,snumbervars(ROut,Start,_).
 neg1_numbervars(Out,safe,ROut):-copy_term(Out,ROut),safe_numbervars(ROut).
 
 fdmsg1(txt(S)):-'format'(S,[]),!.
@@ -3509,7 +3519,7 @@ bugger_error_info(C):-contains_var(existence_error(procedure,_/_),C).
 % Writes exceptions with stacktrace into stderr.
 % Fail/0 call at the end allows the exception to be
 % processed by other hooks too.
-:- asserta((user:prolog_exception_hook(Exception, Exception, Frame, _):- 
+disabled_this:- asserta((user:prolog_exception_hook(Exception, Exception, Frame, _):- 
     (   Exception = error(Term)
     ;   Exception = error(Term, _)),
     Term \= type_error(number,_), 

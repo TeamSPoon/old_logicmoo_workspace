@@ -138,6 +138,10 @@ ftFormatting(xyzFn(tRegion,ftInt,ftInt,ftInt)).
 
 :- do_gc.
 
+tCol(ttTypeByAction).
+genls(ttTypeByAction,tCol).
+(isa(X,ttTypeByAction) => isa(X,tCol)).
+
 
 % (isa(Inst,Type),isa(Type,ttTypeByAction)) => isa(Inst,tHasAction).
 
@@ -257,7 +261,8 @@ prologSingleValued(mudStm(tAgentGeneric,ftInt),prologHybrid).
 prologSingleValued(mudStr(tAgentGeneric,ftInt),prologHybrid).
 prologSingleValued(mudToHitArmorClass0(tAgentGeneric,ftInt),prologHybrid).
 prologSingleValued(mudWeight(tObj,ftInt),prologHybrid).
-prologSingleValued(spawn_rate(isPropFn(genls(tObj)),ftInt)).
+% prologSingleValued(spawn_rate(isPropFn(genls(tObj)),ftInt)).
+prologSingleValued(spawn_rate(tCol,ftInt).
 prologSingleValued(stat_total(tAgentGeneric,ftInt)).
 prologSingleValued(typeGrid(tCol,ftInt,ftListFn(ftString))).
 resultIsa(apathFn,tPathway).
@@ -315,7 +320,7 @@ ensure_some_pathBetween(R1,R2):-
 
 :- decl_mpred_prolog(do_ensure_some_pathBetween/0).
 do_ensure_some_pathBetween:- 
-  call(forall(no_repeats((is_asserted(pathConnects(R1,R2)),ground(R1:R2),tRegion(R1),tRegion(R2),dif(R1,R2))),show_call_failure((ensure_some_pathBetween(R1,R2),ensure_some_pathBetween(R2,R1))))).
+  (forall(no_repeats((is_asserted(pathConnects(R1,R2)),ground(R1:R2),isa(R1,tRegion),isa(R2,tRegion),dif(R1,R2))),show_call_failure((ensure_some_pathBetween(R1,R2),ensure_some_pathBetween(R2,R1))))).
 
 :-onEachLoad(do_ensure_some_pathBetween).
 
@@ -385,7 +390,6 @@ genls(tPortableDevice,tCarryAble).
 genls(tPortableDevice,tPhysicalDevice).
 genls(tPhysicalDevice,tUseAble).
 genls(tWearAble, tCarryAble).
-genls(tCarryAble,tCarryAble).
 genls(tFood,tCarryAble).
 genls(tCarryAble,tObj).
 genls(tPartofObj,tNotTakAble).

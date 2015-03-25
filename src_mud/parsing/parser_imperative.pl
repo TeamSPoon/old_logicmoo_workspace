@@ -210,9 +210,10 @@ must_make_object_string_list_cached(P,Obj,WList):-
 same_ci(A,B):-notrace((must((non_empty(A),non_empty(B))),any_to_string(A,StringA),any_to_string(B,StringB),!,string_ci(StringA,StringB))),!.
 
 match_object(S,Obj):-name_text(Obj,S).
+match_object(S,Obj):-ground(S:Obj),match_object_exp(S,Obj),!.
 
-/*
-match_object(S,Obj):-sanity(ground(S:Obj)),must(((atoms_of(S,Atoms),!,Atoms\=[]))),match_object_0(Atoms,Obj).
+
+match_object_exp(S,Obj):-sanity(ground(S:Obj)),must(((atoms_of(S,Atoms),!,Atoms\=[]))),match_object_0(Atoms,Obj).
 
 match_object_0([S],Obj):-nonvar(S),match_object_1(S,Obj),!.
 match_object_0(Atoms,Obj):-
@@ -222,7 +223,6 @@ match_object_0(Atoms,Obj):-
 match_object_1(A,Obj):-same_ci(A,Obj),!.
 match_object_1(A,Obj):-notrace((isa(Obj,Type))),same_ci(A,Type),!.
 
-*/
 
 dmsg_parserm(D):-dmsg(D),!.
 dmsg_parserm(D):-ignore((debugging(parser),dmsg(D))).
@@ -409,7 +409,7 @@ string_append(A,[B1,B2],C,ABC):-append(A,[B1,B2|C],ABC).
 string_append(A,[B],C,ABC):-append(A,[B|C],ABC).
 
 
-is_counted_for_parse(I):-i_countable(I),not(excluded_in_parse(I)),!.
+is_counted_for_parse(I):-hasInstance(tCountable,I),not(excluded_in_parse(I)),!.
 
 excluded_in_parse(apathFn(_, _)).
 excluded_in_parse(I):-tCol(I).
@@ -562,6 +562,7 @@ coerce(A,B,C):-no_repeats(coerce0(A,B,C)),(show_call_failure(isa(C,B))->!;true).
 coerce0(String,Type,Inst):- var(Type),trace_or_throw(var_specifiedItemType(String,Type,Inst)).
 coerce0(String,isNot(Type),Inst):-!,not(coerce0(String,Type,Inst)).
 coerce0([String],Type,Inst):- nonvar(String),!,coerce0(String,Type,Inst).
+coerce0(String,Type,Inst):- atomic(String),Type==tCol,i_name('t',String,Inst),hasInstance(tCol,Inst),!.
 coerce0(String,Type,Inst):- ttFormatType(Type),checkAnyType(change(assert,actParse),String,Type,AAA),Inst=AAA.
 coerce0(Text,Type,Inst):- (no_repeats_old(call_no_cuts(hook_coerce(Text,Type,Inst)))).
 %coerce0(String,Type,Longest) :- findall(Inst, (user:hook_coerce(Inst,Type,Inst),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.

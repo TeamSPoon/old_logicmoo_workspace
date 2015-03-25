@@ -11,7 +11,7 @@ if [ $# -eq 0 ]
     export RUNFILE="$1"
 fi
 
-export $PROLOGUSER=root
+export $PROLOGUSER=logicmoo_mud
 
 echo "You should not see this ever";
 reset -w

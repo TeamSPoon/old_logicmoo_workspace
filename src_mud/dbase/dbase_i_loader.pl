@@ -289,7 +289,7 @@ load_moo_files(M:F0,List):-
 
 hdr_debug(_,_):-!.
 hdr_debug(F,A):-'format'(F,A).
-:-meta_predicate module_typed_term_expand(?,?),term_expansion_local0(?,?).
+:-meta_predicate module_typed_term_expand(?,?).
 % :-meta_predicate user:term_expansion(?,?).
 
 
