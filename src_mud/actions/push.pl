@@ -17,7 +17,7 @@
 
 % :- register_module_type (mtCommand).
 
-action_templ(actPush(vtDirection)).
+vtActionTemplate(actPush(vtDirection)).
 
 % Push a box
 % Nothing to push... agent moves and takes a little damage.

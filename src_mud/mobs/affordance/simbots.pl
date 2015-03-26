@@ -549,14 +549,14 @@ verb_desc_or_else(ActVerb,Types,verb_desc(ActVerb,Types)):-nonvar(ActVerb),nonva
 
 user:agent_call_command(Agent,Templ):- simbots_templates(Templ), (fmt(agent_call_command_simbots_real_3(Agent,Templ)),fail).
 
-user:action_info(actDo(vtVerb,ftListFn(ftTerm)),"reinterps a action").
+action_info(actDo(vtVerb,ftListFn(ftTerm)),"reinterps a action").
 user:agent_call_command(Agent,actDo(A)):-CMD=..[A],!,user:agent_call_command(Agent,CMD).
 user:agent_call_command(Agent,actDo(A,B)):-CMD=..[A,B],!,user:agent_call_command(Agent,CMD).
 user:agent_call_command(Agent,actDo(A,B,C)):- CMD=..[A,B,C],!,user:agent_call_command(Agent,CMD).
 user:agent_call_command(Agent,actDo(A,B,C,D)):- CMD=..[A,B,C,D],!,user:agent_call_command(Agent,CMD).
 user:agent_call_command(Agent,actDo(A,B,C,D,E)):- CMD=..[A,B,C,D,E],!,user:agent_call_command(Agent,CMD).
 
-user:action_info(actTextcmd(ftString),"reinterps a term as text").
+action_info(actTextcmd(ftString),"reinterps a term as text").
 user:agent_call_command(Agent,actTextcmd(A)):-sformat(CMD,'~w',[A]),!,do_player_action(Agent,CMD).
 user:agent_call_command(Agent,actTextcmd(A,B)):-sformat(CMD,'~w ~w',[A,B]),!,do_player_action(Agent,CMD).
 user:agent_call_command(Agent,actTextcmd(A,B,C)):-sformat(CMD,'~w ~w ~w',[A,B,C]),!,do_player_action(Agent,CMD).
@@ -596,11 +596,10 @@ verb_alias("observe",actUse).
 verb_alias("operate",actUse).
 
 
-user:action_info(Templ,DESC):-verb_desc(V,O,DESC),Templ=..[V,O].
-user:action_info(Templ,text([verb_for_type,V,O,DOC])):- no_repeats([V,O],verb_affordance(V,O,_,_,_)),Templ=..[V,O], 
+action_info(Templ,DESC):-verb_desc(V,O,DESC),Templ=..[V,O].
+action_info(Templ,text([verb_for_type,V,O,DOC])):- no_repeats([V,O],verb_affordance(V,O,_,_,_)),Templ=..[V,O], 
                   findall(pir(P,I,R),((verb_affordance(V, O,P,I,R))),DOC).
 
-action_templ(Templ):-simbots_templates(Templ).
 simbots_templates(Templ):-no_repeats(simbots_templates0(Templ)).
 simbots_templates0(Templ):-verb_for_type(V, O),Templ=..[V,O].
 simbots_templates0(Templ):-verb_desc(V,O,_),Templ=..[V,O].
@@ -835,4 +834,7 @@ verb_for_type(actSearch, tContainer).
 verb_for_type(actThinkAbout, tLookAble).
 
 
-*/
+*/
+
+simbots_templates(Templ) => vtActionTemplate(Templ).
+

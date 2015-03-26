@@ -52,9 +52,11 @@ farthest_reachable_object0(Agent,Obj):-
 detatch_object(Obj):-  
   (is_asserted(mudPossess(Agent,Obj))->clr(mudPossess(Agent,Obj));true),
   (is_asserted(mudAtLoc(Obj,LOC))-> clr(mudAtLoc(Obj,LOC));true),
-  (is_asserted(localityOfObject(Obj,R))-> clr(localityOfObject(Obj,R));true).
+  (is_asserted(localityOfObject(Obj,R))-> clr(localityOfObject(Obj,R));true),
+  (clr(inRegion(Obj,_))),!.
+   
 
-user:action_info(actInventory(isOptional(tAgentGeneric,isSelfAgent)), "Examine an inventory").
+action_info(actInventory(isOptional(tAgentGeneric,isSelfAgent)), "Examine an inventory").
 
 user:agent_call_command(Agent,actInventory(Who)):- show_inventory(Agent,Who).
 

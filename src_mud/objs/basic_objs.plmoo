@@ -99,7 +99,7 @@ prologHybrid(typeHasGlyph(tCol,ftString)).
 :- dynamic stat_total/2.
 :- dynamic(spawn_rate/2).
 :- decl_type(tMonster/1).
-:- decl_mpred_prolog(action_info(vtActionTemplate,ftText)).
+%:- decl_mpred_prolog(action_info(vtActionTemplate,ftText)).
 :- decl_mpred_prolog(agent_call_command(tAgentGeneric,ftAction)).
 :- decl_mpred_prolog(member(ftTerm,ftTerm)).
 :- decl_mpred_prolog(mud_test(ftTerm,ftCallable)).

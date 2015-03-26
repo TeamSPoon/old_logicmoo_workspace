@@ -90,6 +90,8 @@ must_expand(G):-functor(G,_,A),!,A==1.
 fully_expand_warn(A,B,O):-must(fully_expand(A,B,C)),!,must(same_terms(B,C)),(O=C;must(same_terms(O,C))),!.
 
 same_terms(A,B):-A=@=B,!.
+same_terms(A,A):-!,fail.
+same_terms((A:-AA),(B:-BB)):-!,same_terms(A,B),same_terms(AA,BB).
 same_terms(M:A,B):-atom(M),!,same_terms(A,B).
 same_terms(A,M:B):-atom(M),!,same_terms(A,B).
 

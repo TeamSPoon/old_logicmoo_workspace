@@ -172,8 +172,8 @@ to_tclass(Prop,New):- (dbase_t(_,_,Prop);dbase_t(_,_,Prop,_);dbase_t(_,_,_,Prop)
 % to_tclass(Prop,actDrop).
 
 is_actverb(X):-user:type_action_info(_,PX,_),functor(PX,X,_).
-is_actverb(X):-user:action_info(PX,_),functor(PX,X,_).
-is_actverb(X):-action_info(PX),functor(PX,X,_).
+is_actverb(X):-action_info(PX,_),functor(PX,X,_).
+is_actverb(X):-vtActionTemplate(PX),functor(PX,X,_).
 is_actverb(X):-vtPosture(PX),functor(PX,X,_).
 is_actverb(X):-verb_alias(_,X).
 % user:vtVerb(X):-is_actverb(X).

@@ -15,7 +15,7 @@
 
 % :- register_module_type (mtCommand).
 
-action_templ(actTake(tCarryAble)).
+vtActionTemplate(actTake(tCarryAble)).
 
 % Command Hook
 user:agent_call_command(Agent,actTake(Obj)) :- 

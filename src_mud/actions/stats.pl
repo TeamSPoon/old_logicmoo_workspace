@@ -15,7 +15,7 @@
 % ====================================================
 % show the stats system
 % ====================================================
-user:action_info(actStats(isOptional(tObj,isSelfAgent)), "Examine MUD stats of something").
+action_info(actStats(isOptional(tObj,isSelfAgent)), "Examine MUD stats of something").
 user:agent_call_command(Agent,actStats(What)):-    
    show_kb_preds(Agent,[
          mudEnergy(What,value),
@@ -27,7 +27,7 @@ user:agent_call_command(Agent,actStats(What)):-
    term_listing(What),!.
 
 
-user:action_info(actGrep(ftTerm),"grep for a term").
+action_info(actGrep(ftTerm),"grep for a term").
 
 
 
@@ -60,7 +60,7 @@ endurance, and sustained positioning and motion.
 your ability to command your own destiny.
 */
 
-user:action_info(actGrep(isOptional(ftTerm,isSelfAgent)), "Examine MUD listing of something").
+action_info(actGrep(isOptional(ftTerm,isSelfAgent)), "Examine MUD listing of something").
 user:agent_call_command(_Gent,actGrep(Obj)):- term_listing(Obj).
 
 % :- include(logicmoo(vworld/moo_footer)).

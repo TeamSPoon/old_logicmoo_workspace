@@ -284,6 +284,7 @@ get_body_functor(BDY,BF,A):-get_functor(BDY,BF,A).
 
 % -  del(RetractOne) 
 del(C):- fully_expand(change(retract,a),/*to_exp*/(C),C0),del0(C0).
+del0(C0):- mpred_call(C0),!,clr(C0),!.
 del0(C0):- ireq(C0),!,idel(C0),!.
 del0(C0):- mreq(C0),!,mdel(C0),!.
 

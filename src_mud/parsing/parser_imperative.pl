@@ -314,7 +314,7 @@ get_vp_templates(_Agent,SVERB,_ARGS,TEMPLATES):-
     ((
       get_all_templates(TEMPL),
      %isa(Agent,What),
-     %user:action_info(What,TEMPL,_),
+     %action_info(What,TEMPL,_),
      TEMPL=..[VERB|TYPEARGS],
      verb_matches(SVERB,VERB))),
      TEMPLATES_FA),
@@ -573,7 +573,7 @@ coerce0(String,Type,Inst):- not(string(String)),!,text_to_string(String,StringS)
 
 instances_of_type(Inst,Type):- no_repeats_old(instances_of_type_0(Inst,Type)).
 
-available_instances_of_type(Agent,Obj,Type):- must(current_agent(Agent)), current_agent_or_var(Agent), isa(Obj,Type), same_regions(Agent,Obj),!.
+available_instances_of_type(Agent,Obj,Type):- must(current_agent(Agent)), current_agent_or_var(Agent), isa(Obj,Type), mudDistance(Agent,Obj,D),D<6.
 
 instances_of_type_0(Inst,Type):- instances_sortable(Type,HOW),!,get_sorted_instances(Inst,Type,HOW).
 % should never need this but .. instances_of_type_0(Inst,Type):- genls(SubType,Type),isa(Inst,SubType).
@@ -581,7 +581,8 @@ instances_of_type_0(Inst,Type):- isa(Inst,Type).
 
 instances_sortable(TYPE,HOW):-instances_sortable0(TYPE,HOW),!.
 instances_sortable(TYPE,HOW):-genls(TYPE,SUPER),instances_sortable0(SUPER,HOW),!.
-instances_sortable(tWieldAble,distance_to_current_avatar(Agent)):-current_agent_or_var(Agent).
+instances_sortable(_,distance_to_current_avatar(Agent)):-current_agent_or_var(Agent).
+
 instances_sortable0(tWieldAble,distance_to_current_avatar(Agent)):-current_agent_or_var(Agent).
 instances_sortable0(tWearAble,distance_to_current_avatar(Agent)):-current_agent_or_var(Agent).
 

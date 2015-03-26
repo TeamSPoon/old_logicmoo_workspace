@@ -63,7 +63,7 @@ verify_sanity(P):- dmsg('$ERROR_incomplete_SANITY'(P)),!.
 when_debugging(What,Call):- debugging(What),!,Call.
 when_debugging(_,_).
 
-% :- asserta(tlbugger:no_colors).
+:- asserta(tlbugger:no_colors).
 % :- asserta(tlbugger:show_must_go_on).
 
 :- set_prolog_flag(double_quotes, atom).
@@ -294,9 +294,9 @@ vtTestType(vTest2).
 :-must(in_file_expansion;in_file_directive).
 % :- must(show_call(ensure_plmoo_loaded(logicmoo(dbase/dbase_i_builtin)))).
 
-:- pfcAdd(((action_templ(ArgTypes)/is_declarations(ArgTypes) => vtActionTemplate(ArgTypes)))).
-:- pfcAdd(((action_info(ArgTypes,_)/is_declarations(ArgTypes) => vtActionTemplate(ArgTypes)))).
 /*
+:- pfcAdd(((vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) => vtActionTemplate(ArgTypes)))).
+:- pfcAdd(((action_info(ArgTypes,_)/is_declarations(ArgTypes) => vtActionTemplate(ArgTypes)))).
 :- pfcAdd(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) => functorDeclares(F))).
 (ttFormatType(FT)/is_declarations(FT))=>ttFormatted(FT).
 

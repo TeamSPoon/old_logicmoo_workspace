@@ -23,14 +23,16 @@
 :- multifile user:mud_test_local/1.
 :- multifile user:mud_test_local/2.
 :- multifile user:world_agent_plan/3.
-:- multifile user:action_templ/1.
-:- multifile user:action_info/2.
-:- multifile user:action_info/3.
+:- multifile action_info/2.
 :- multifile user:action_rules/4.
 :- multifile user:action_verb_useable/4.
 :- multifile user:agent_call_command/2.
 :- multifile user:agent_text_command/4.
 :- multifile user:check_permanence/4.
+
+
+:- dynamic user:action_rules/4.
+:- dynamic action_info/2.
 
 % :- include(logicmoo(dbase/dbase_i_header)).
 

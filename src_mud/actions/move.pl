@@ -25,7 +25,7 @@ user:agent_text_command(Agent,[DirSS],Agent,OUT):-nonvar(DirSS), show_call(coerc
 
 user:agent_call_command(Agnt,Cmd):- compound(Cmd),functor(Cmd,actMove,_),!,must(move_command(Agnt,Cmd)).
 
-user:action_info(actMove(isOptional(ftNumber,1),vtDirection),"Move [n=1] distance in direction").
+action_info(actMove(isOptional(ftNumber,1),vtDirection),"Move [n=1] distance in direction").
 
 /*
 % dir###
@@ -107,7 +107,7 @@ update_stats(Agent,fall) :- padd(Agent,mudHealth,-10).
 
 % cheating but to test
 
-action_templ(actGo(vtDirection)).
+vtActionTemplate(actGo(vtDirection)).
 user:agent_call_command(Agent,actGo(Dir)) :-
 	mudAtLoc(Agent,LOC),
         in_world_move(LOC,Agent,Dir),

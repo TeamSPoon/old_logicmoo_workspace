@@ -20,7 +20,7 @@
 % :- register_module_type (mtCommand).
 
 % actPut
-user:action_info(actPut(tThrowAble,txtPrepSpatial,tPutTargetAble),"actPut [obj] [onto|inside] [somewhere]").
+action_info(actPut(tThrowAble,txtPrepSpatial,tPutTargetAble),"actPut [obj] [onto|inside] [somewhere]").
 
 verb_alias(set,actPut).
 verb_alias(place,actPut).

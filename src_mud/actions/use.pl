@@ -55,7 +55,7 @@ action_verb_useable(actStow,tStowAble,mudStowing,mudPossess,mudWielding).
 % action_verb_useable(actUse,mudUsing,tUseAble,mudPossess,mudPossess).
 
 
-user:action_info(Syntax,String):-
+action_info(Syntax,String):-
  action_verb_useable(ActUse,Wieldable,NowWielding,Possessing,Unstowed),
    Syntax=..[ActUse,Wieldable],
    sformat(String,'~w a ~w that you ~w so it will be ~w and not be ~w.',[ActUse,Wieldable,Possessing,NowWielding,Unstowed]).
@@ -63,7 +63,7 @@ user:action_info(Syntax,String):-
 use_action_templates(Syntax):-no_repeats([Syntax],(
   action_verb_useable(ActUse,Wieldable,_NowWielding,_Possessing,_Unstowed),Syntax=..[ActUse,Wieldable])).
 
-action_templ(Templ):-use_action_templates(Templ).
+vtActionTemplate(Templ):-use_action_templates(Templ).
 
 user:agent_call_command(Agent,Syntax) :- 
     call((action_verb_useable(ActUse,_Wieldable,_NowWielding,_Possessing,_Unstowed),Syntax=..[ActUse,Obj])),
