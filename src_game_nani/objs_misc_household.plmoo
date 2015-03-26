@@ -146,7 +146,6 @@ genls(tThrowAble, tCarryAble).
 genls(tPortableDevice,tCarryAble).
 genls(tPhysicalDevice,tUseAble).
 genls(tWearAble, tCarryAble).
-genls(tCarryAble, tCarryAble).
 genls(tFood,tCarryAble).
 genls(tCarryAble,tObj).
 genls(tPartofObj,isTDisjoint(tCarryAble)).
