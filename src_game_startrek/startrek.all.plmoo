@@ -27,7 +27,7 @@ typeGrid('FreeSpaceContent',5, [--,--,--,--,--]).
 
 % : style_check(singleton).
 :-set_prolog_flag(double_quotes,string).
-:-style_check(+atom).
+%:-style_check(+atom).
 
 %%:['../hyhtn/translog4.pl'].
 %end_of_file.
