@@ -289,7 +289,7 @@ not_mud_isa0(I,T):-(var(I);var(T)),trace_or_throw(var_not_mud_isa(I,T)).
 not_mud_isa0(actGossup,tChannel).
 not_mud_isa0(_, blah):-!.
 not_mud_isa0(I,predArgTypes):-!,not(compound(I)).
-not_mud_isa0(I,ftFormatting):-!,not(compound(I)).
+not_mud_isa0(I,ttFormatted):-!,not(compound(I)).
 not_mud_isa0(_,prologHybrid):-!,fail.
 not_mud_isa0(prologMacroHead, ttFormatType).
 not_mud_isa0(tAgentGeneric,ttFormatType).
@@ -452,7 +452,7 @@ define_ft(Spec):- loop_check(define_ft_0(Spec),true).
 define_ft_0(xyzFn):-!.
 define_ft_0(Spec):- hasInstance(ttFormatType,Spec),!.
 define_ft_0(Spec):- hasInstance(tCol,Spec),dmsg(once(maybe_coierting_plain_type_to_formattype(Spec))),fail.
-define_ft_0(Spec):- hooked_asserta(isa(Spec,ttFormatType)),(compound(Spec)->hooked_asserta(isa(Spec,ftFormatting));true).
+define_ft_0(Spec):- hooked_asserta(isa(Spec,ttFormatType)),(compound(Spec)->hooked_asserta(isa(Spec,ttFormatted));true).
 
 :-export(assert_subclass/2).
 assert_subclass(O,T):-assert_subclass_safe(O,T).

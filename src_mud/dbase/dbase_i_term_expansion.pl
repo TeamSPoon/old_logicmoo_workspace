@@ -429,7 +429,7 @@ into_mpred_form_ilc(G,O):- functor(G,F,A),G=..[F,P|ARGS],!,into_mpred_form6(G,F,
 % TODO confirm negations
 
 into_mpred_form6(C,_,_,2,_,C):-!.
-into_mpred_form6(H,_,_,_,_,G0):- once(with_assertions(thlocal:into_form_code,(expand_term( (H :- true) , C ), reduce_clause(is_asserted,C,G)))),expanded_different(H,G),!,into_mpred_form(G,G0),!.
+% into_mpred_form6(H,_,_,_,_,G0):- once(with_assertions(thlocal:into_form_code,(expand_term( (H :- true) , C ), reduce_clause(is_asserted,C,G)))),expanded_different(H,G),!,into_mpred_form(G,G0),!.
 into_mpred_form6(_,F,_,1,[C],O):-alt_calls(F),!,into_mpred_form(C,O),!.
 into_mpred_form6(_,':-',C,1,_,':-'(O)):-!,into_mpred_form_ilc(C,O).
 into_mpred_form6(_,not,C,1,_,not(O)):-into_mpred_form(C,O),!.

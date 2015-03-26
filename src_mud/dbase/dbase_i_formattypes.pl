@@ -211,9 +211,8 @@ grab_argsIsa_6(Types):- hasInstance(ttFormatted,Types).
 grab_argsIsa_6(mudColor(tSpatialThing, vtColor)).
 grab_argsIsa_6(Types):- hasInstance(predArgTypes,Types).
 grab_argsIsa_6(Types):- is_asserted(defnSufficient(Types,_)).
-grab_argsIsa_6(Types):- hasInstance(_,Types),compound(Types),ground(Types).
 grab_argsIsa_6(Types):- asserted_mpred_prop(_,predArgTypes(Types)).
-grab_argsIsa_6(Types):- is_asserted(get_all_templates(Types)).
+grab_argsIsa_6(Types):- hasInstance(_,Types),compound(Types),ground(Types).
 grab_argsIsa_6(Types):- current_predicate(get_all_templates/1),get_all_templates(Types),ground(Types).
 
 argIsa_call_6(F,N,Type):- asserted_mpred_prop(F,argIsa(N,Type)),nonvar(Type),assert_argIsa(F,N,Type),!.

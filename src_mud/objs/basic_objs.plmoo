@@ -132,9 +132,10 @@ genls(isEach('PortableObject','ProtectiveAttire','SomethingToWear'),tCarryAble).
 genls(isEach('ProtectiveAttire','SomethingToWear'),tWearAble).
 genls(isEach(tRegion,tAgentGeneric),tChannel).
 
-ftFormatting(aDirectionsFn(ftTerm,ftListFn(ftTerm))).
-ftFormatting(apathFn(tRegion,vtDirection)).
-ftFormatting(xyzFn(tRegion,ftInt,ftInt,ftInt)).
+:-decl_type(ttFormatted).
+ttFormatted(aDirectionsFn(ftTerm,ftListFn(ftTerm))).
+ttFormatted(apathFn(tRegion,vtDirection)).
+ttFormatted(xyzFn(tRegion,ftInt,ftInt,ftInt)).
 
 :- do_gc.
 
@@ -552,7 +553,7 @@ mudLabelTypeProps(nk,tNastyKnife,[mudActAffect(actWield,mudAttack(2))]).
 mudLabelTypeProps(th,tToughHide,[mudActAffect(actWear,mudArmor(2))]).
 
 typeProps(tAgentGeneric,[mudMoveDist(1)]).
-typeProps(tAgentGeneric,[predInstMax(mudHealth,500), predInstMax(mudEnergy,200), mudHealth(500), mudEnergy(200),  mudFacing(isRandom(vtBasicDir)), mudAgentTurnnum(0), mudScore(1), mudMemory(aDirectionsFn([n,s,e,w,ne,nw,se,sw,u,d]))]).
+typeProps(tAgentGeneric,[predInstMax(mudHealth,500), predInstMax(mudEnergy,200), mudHealth(500), mudEnergy(200),  mudFacing(isRandom(vtBasicDir)), mudAgentTurnnum(0), mudScore(1), mudMemory(aDirectionsFn([vNorth,vSouth,vEast,vWest,vNE,vNW,vSE,vSW,vUp,vDown]))]).
 typeProps(tAgentGeneric,mudLastCommand(actStand)).
 typeProps(tAgentGeneric,mudNeedsLook(vFalse)).
 typeProps(tFood,[mudHeight(0)]).

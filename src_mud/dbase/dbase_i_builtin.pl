@@ -170,7 +170,6 @@ notequal(C,B) <= equal(A,C),notequal(A,B).
 
 subFormat(ftDeplictsFn(tCol),ftSpec).
 subFormat(ftDeplictsFn(ttFormatted),ftSpec).
-subFormat(ftDeplictsFn(ttFormatted),ftSpec).
 subFormat(ftVoprop,ftSpec).
 
 ttFormatted(isEach(ftRest(ftTerm))).

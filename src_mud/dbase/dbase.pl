@@ -298,11 +298,11 @@ vtTestType(vTest2).
 :- pfcAdd(((action_info(ArgTypes,_)/is_declarations(ArgTypes) => vtActionTemplate(ArgTypes)))).
 /*
 :- pfcAdd(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) => functorDeclares(F))).
-(ttFormatType(FT)/is_declarations(FT))=>ftFormatting(FT).
+(ttFormatType(FT)/is_declarations(FT))=>ttFormatted(FT).
 
 
 
-ftFormatting(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
+ttFormatted(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
 predArgTypes(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
 vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
 
