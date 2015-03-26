@@ -378,7 +378,7 @@ bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
 name_text(Name,Text):-nameStrings(Name,Text).
 name_text(Name,Text):-mudKeyword(Name,Text).
 name_text(Name,Text):-nonvar(Text),!,name_text(Name,TextS),equals_icase(Text,TextS).
-% name_text(Name,Text):-argIsa(N,2,ftString),not(is_asserted(argIsa(N,1,ftString))),dbase_t(N,Name,Text).
+% name_text(Name,Text):-argIsa(N,2,ftString),not_asserted((argIsa(N,1,ftString))),dbase_t(N,Name,Text).
 name_text(Name,Text):-atomic(Name),!,name_text_atomic(Name,Text).
 name_text(Name,Text):-is_list(Name),!,member(N,Name),name_text(N,Text).
 name_text(Name,Text):-compound(Name),!,Name=..[F,A|List],!,name_text([F,A|List],Text).

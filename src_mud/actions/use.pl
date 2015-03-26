@@ -18,8 +18,8 @@ genls(isEach('PortableObject','ProtectiveAttire',tStowAble),tWieldAble).
 genls('FluidReservoir',tDrinkAble).
 genls(tWeapon,tWieldAble).
 genls(tContolDevice,tUseAble).
-genls(tUseAble,tWieldAble).
-genls(tStowAble,tCarryAble).
+genls(tWieldAble,tUseAble).
+genls(tCarryAble,tStowAble).
 
 
 :-decl_mpred_hybrid(mudWielding/2).

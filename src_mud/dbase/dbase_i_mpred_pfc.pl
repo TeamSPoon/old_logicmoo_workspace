@@ -1530,7 +1530,7 @@ pfc_listing_mpred_hook(Match):- not(not(pfcLiteral(Match))),pfc_listing_mpred_ho
 match_clauses(H,H,B):-clause(H,B).
 
 nonvar_contains_term(V,A):-atomic(A),!,sub_term(VV,V),nonvar(VV),functor_safe(VV,A,_).
-nonvar_contains_term(V,A):-sub_term(VV,V),nonvar(VV),not(not(A=VV)).
+nonvar_contains_term(V,A):-sub_term(VV,V),nonvar(VV),A=@=VV.
 % nonvar_contains_term(V,C):-functor(C,A,_),!,nonvar_contains_term(V,A).
 
 head_search_for_listing(H):-member(H,[neg(_),(_=>_),(_<=_),(_<=>_),isa(_,_),argIsa(_,_,_)]).
@@ -1539,7 +1539,7 @@ head_search_for_listing(H):-  pfcDatabaseTerm(F/A),functor(H,F,A).
 pfc_listing_mpred_hook_2nd(Match):- 
  no_repeats(CL,(( no_repeats(head_search_for_listing(F)),predicate_property(F,number_of_clauses(_)),match_clauses(F,H,B), CL=(H:-B),
    not(is_meta_info(B)),
-   nonvar_contains_term(CL,Match)))),
+   once(nonvar_contains_term(CL,Match))))),
    portray_clause(CL),fail.
 
 

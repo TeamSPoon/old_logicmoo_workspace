@@ -52,6 +52,7 @@ world_clear(Named):-fmt('Clearing world database: ~q.~n',[Named]).
 with_fail_is_asserted(Temp,Goal):-ground(Temp),!,Goal.
 with_fail_is_asserted(Temp,Goal):-with_assertions(thlocal:fail_is_asserted(Temp),Goal).
 
+not_asserted(X):- !,(\+ clause(X,true)).
 not_asserted(X):- not(no_loop_check(is_asserted_ilc(X))).
 is_asserted_eq(HB):- ( \+ \+ no_loop_check(is_asserted_ilc(HB))).
 
@@ -197,13 +198,13 @@ hooked_retract(G):-  Op = change(retract,a),
                    slow_sanity(not(singletons_throw_else_fail(retract_cloc(G)))),
                    slow_sanity(ignore(((ground(G), once(show_call_failure((is_asserted(G)))))))),
                    must_storage_op(Op,G),expire_post_change( Op,G),
-                   sanity(ignore(show_call_failure(not(is_asserted(G))))),
+                   sanity(ignore(show_call_failure(not_asserted((G))))),
                    loop_check(run_database_hooks_depth_1(change(retract,a),G),true).
 
 hooked_retractall(G):- Op = change(retract,all),
                    slow_sanity(ignore(((ground(G), once(show_call_failure((is_asserted(G)))))))),
                    must_storage_op(Op,G),expire_post_change( Op,G),
-                   sanity(ignore(show_call_failure(not(is_asserted(G))))),
+                   sanity(ignore(show_call_failure(not_asserted((G))))),
                    loop_check(run_database_hooks_depth_1(change(retract,all),G),true).
 
 

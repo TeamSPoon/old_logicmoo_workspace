@@ -327,7 +327,7 @@ create_and_assert_random_fact(Fact):- fail,must(create_random_fact(Fact)),hooked
 create_random_fact(G) :- into_functor_form(dbase_t,G,MPred),G\=@=MPred,!,create_random_fact(MPred).
 create_random_fact(G) :- is_asserted(G),!,dmsg((create_random_fact(G) :- is_asserted(G))).
 create_random_fact(dbase_t(mudAtLoc,Obj,LOC)) :- !,nonvar(Obj),is_asserted(localityOfObject(Obj,Region)),!,((in_grid(Region,LOC),unoccupied(Obj,LOC),is_fact_consistent(mudAtLoc(Obj,LOC)))).
-create_random_fact(dbase_t(localityOfObject,Obj,Region)) :- !, nonvar(Obj),not(is_asserted(localityOfObject(Obj,_))),asserted_or_deduced(localityOfObject(Obj,Region)).
+create_random_fact(dbase_t(localityOfObject,Obj,Region)) :- !, nonvar(Obj),not_asserted((localityOfObject(Obj,_))),asserted_or_deduced(localityOfObject(Obj,Region)).
 create_random_fact(dbase_t(Other,Obj,Default)) :- nonvar(Obj),argIsa(Other,2,Type),random_instance_no_throw(Type,Default,ground(Default)),!.
 
 
@@ -337,7 +337,7 @@ hooked_random_instance(ftInt,3,Test):-call(Test),dmsg(random_instance(ftInt,3,Te
 
 %  give required forward deductions
 deduce_facts(mudAtLoc(Obj,LOC),localityOfObject(Obj,Region)):- nonvar(LOC),locationToRegion(LOC,Region).
-deduce_facts(localityOfObject(Obj,Region),mudAtLoc(Obj,LOC)):- tRegion(Region),not(is_asserted(mudAtLoc(Obj,_))), nonvar(Obj),
+deduce_facts(localityOfObject(Obj,Region),mudAtLoc(Obj,LOC)):- tRegion(Region),not_asserted((mudAtLoc(Obj,_))), nonvar(Obj),
   show_call(put_in_world(Obj)),
   must_det(mudAtLoc(Obj,LOC)).
 
@@ -350,9 +350,9 @@ random_xyzFn(LOC):-
    in_grid_rnd(Region,LOC),!.
 random_xyzFn(xyzFn('Area1000',1,1,1)):-  dmsg(trace_or_throw(dbase_not_loaded)).
 
-unoccupied(_,Loc):- not(is_asserted(mudAtLoc(_,Loc))),!.
+unoccupied(_,Loc):- not_asserted((mudAtLoc(_,Loc))),!.
 unoccupied(_,_):-!.
-unoccupied(Obj,Loc):- loop_check(unoccupied_ilc(Obj,Loc),not(is_asserted(mudAtLoc(_,Loc)))),!.
+unoccupied(Obj,Loc):- loop_check(unoccupied_ilc(Obj,Loc),not_asserted((mudAtLoc(_,Loc)))),!.
 
 unoccupied_ilc(Obj,Loc):- is_occupied(Loc,What),!,What=Obj.
 unoccupied_ilc(_,_).

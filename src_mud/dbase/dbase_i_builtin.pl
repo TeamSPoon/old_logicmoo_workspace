@@ -33,6 +33,7 @@ tCol(X)=>{decl_type(X)}.
 :-decl_type(tBird).
 
 :- meta_predicate(neg(0)).
+:- dynamic(neg(0)).
 
 
 :- meta_predicate(mp_test_agr(?,+,-,*,^,:,0,1,5,9)).
@@ -76,7 +77,7 @@ resolveConflict(C) :-
 /*
 % reflexive equality
 equal(A,B) => equal(B,A).
-equal(A,B),{ \\+ (A=B}),equal(B,C),{ \\+ (A=C)} => equal(A,C).
+equal(A,B),{ \+ (A=B}),equal(B,C),{ \+ (A=C)} => equal(A,C).
 
 notequal(A,B) <= notequal(B,A).
 notequal(C,B) <= equal(A,C),notequal(A,B).
@@ -452,15 +453,50 @@ genls(ttTypeByAction,ttPreAssertedCollection).
 genls(ttPreAssertedCollection,completelyAssertedCollection).
 
 ((completeIsaAsserted(I), isa(I,Sub), genls(Sub, Super),{ground(Sub:Super)}) => ({dif:dif(Sub, Super)}, isa(I,Super))).
-% TODO ADD THIS :-pfcAdd((ttPreAssertedCollection(Super), isa(I,Sub), genls(Sub, Super)) => ({ground(I:Sub:Super),dif:dif(Sub, Super)}, isa(I,Super))).
+% TODO ADD THIS :-pfcAdd((ttPreAssertedCollection(Super), isa(I,Sub), genls(Sub, Super)) => ({ground(I:Sub:Super),\==(Sub, Super)}, isa(I,Super))).
 % (isa(I,Sub), genls(Sub, Super),{ground(Sub:Super)}, ~neg(completelyAssertedCollection(Super))) => ({dif:dif(Sub, Super)}, isa(I,Super)).
-% (genls(I,Sub), genls(Sub, Super),{ground(I:Sub:Super)}) => ({dif:dif(I,Sub),dif:dif(Sub, Super)}, genls(I,Super)).
 
 ( ttFormatted(FT), {dif:dif(FT,COL)}, genls(FT, COL),tCol(COL),{not(isa(COL,ttFormatType))}) => formatted_resultIsa(FT,COL).
 
 % {dif:dif(I,Super),nonvar(I),nonvar(Sub),nonvar(Super)},
-(genls(I,Sub),genls(Sub, Super)) => ({nonvar(I),nonvar(Sub),nonvar(Super),dif:dif(I,Super),dif:dif(Sub,Super),dif:dif(I,Sub)},genls(I,Super) , completeExtentAsserted(genls)).
+(genls(I,Sub),genls(Sub, Super)) => ({nonvar(I),nonvar(Sub),nonvar(Super),\==(I,Super),\==(Sub,Super),\==(I,Sub)},genls(I,Super) , completeExtentAsserted(genls)).
 
+
+neg(isa(I,Super)) <= (isa(I,Sub), disjointWith(Sub, Super)).
+
+genls(tPartOfobj,tItem).
+
+((isa(Pred,prologSingleValued),arity(Pred,Arity))
+  =>
+  {
+   dynamic(Pred/Arity),
+   length(AfterList,Arity),
+   append(Left,[A],AfterList),
+   append(Left,[B],BeforeList),
+  After =.. [Pred|AfterList],
+  Before =.. [Pred|BeforeList]},
+  (After,{Before, \==(A , B)} => {pfcRem2(Before)})).
+
+
+% dividesBetween(tItem,tPathway).
+dividesBetween(tItem,tMassfull,tMassless).
+dividesBetween(tObj,tItem,tAgentGeneric).
+dividesBetween(tObj,tMassfull,tMassless).
+dividesBetween(tSpatialThing,tObj,tRegion).
+dividesBetween(tAgentGeneric,tPlayer,tNpcPlayer).
+
+dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
+
+disjointWith(P1,P2) => (not(isa(C,P1)) <=> isa(C,P2)).
+
+isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
+
+=> tCol(tCol).
+=> tCol(tPred).
+=> tCol(tFunction).
+=> tCol(tRelation).
+=> tCol(ttSpatialType).
+=> tCol(ttFormatType).
 /*
 
 % this isn't written yet.

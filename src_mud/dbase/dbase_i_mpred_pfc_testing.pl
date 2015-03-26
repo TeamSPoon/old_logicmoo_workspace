@@ -19,7 +19,7 @@ next_test :- sleep(1),pfcReset.
 
 :-dynamic((disjointWith/2,genls/2)).
 
-(disjointWith(P1,P2) , genls(C1,P1)) =>    disjointWith(C1,P2).
+%(disjointWith(P1,P2) , genls(C1,P1)) =>    disjointWith(C1,P2).
 disjointWith(Sub, Super) => disjointWith( Super, Sub).
 disjointWith(tObj,tRegion).
 disjointWith(ttSpatialType,ttAbstractType).

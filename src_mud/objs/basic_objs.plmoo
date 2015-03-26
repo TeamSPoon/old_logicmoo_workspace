@@ -263,7 +263,7 @@ prologSingleValued(mudStr(tAgentGeneric,ftInt),prologHybrid).
 prologSingleValued(mudToHitArmorClass0(tAgentGeneric,ftInt),prologHybrid).
 prologSingleValued(mudWeight(tObj,ftInt),prologHybrid).
 % prologSingleValued(spawn_rate(isPropFn(genls(tObj)),ftInt)).
-prologSingleValued(spawn_rate(tCol,ftInt).
+prologSingleValued(spawn_rate(tCol,ftInt)).
 prologSingleValued(stat_total(tAgentGeneric,ftInt)).
 prologSingleValued(typeGrid(tCol,ftInt,ftListFn(ftString))).
 resultIsa(apathFn,tPathway).
@@ -339,6 +339,7 @@ genls(tItem,tObj).
 genls(tCandle,tPortableDevice).
 genls(tFlashlight, tPortableDevice).
 genls(tDesk, tOfficeRoomFurnature).
+
 genls(tApple, tFood).
 genls(tNani, tArt).
 genls(tNani, tWashAble).
@@ -357,11 +358,11 @@ genls(tOfficeItem, tItem).
 genls(tFood, tItem).
 genls(tClothing, tItem).
 
-genls(tItem, tCarryAble).
+genls( tCarryAble, tItem).
 genls( tCarryAble, tDropAble).
 
 genls( tCarryAble, tThrowAble).
-genls( tCarryAble, tCarryAble).
+% genls( tCarryAble, tCarryAble).
 
 genls(tPortableDevice,tCarryAble).
 
@@ -441,6 +442,9 @@ genls(tStove,tKitchenFurnature).
 genls(tKitchenCounter,tKitchenFurnature).
 genls(tFurnature,tOntoAble).
 
+
+genls(tFurnature,tItem).
+genls(tOfficeRoomFurnature,tFurnature).
 genls(tBathRoomFurnature,tFurnature).
 genls(tKitchenFurnature,tFurnature).
 genls(tLivingRoomFurnature,tFurnature).
@@ -448,6 +452,45 @@ genls(tOutdoorFurnature,tFurnature).
 
 :- do_gc.
 
+
+
+
+%(isa(I,Sub), disjointWith(Sub, Super)) => neg(isa(I,Super)).
+
+neg(isa(I,Super)) <= (isa(I,Sub), disjointWith(Sub, Super)).
+
+genls(tPartOfobj,tItem).
+
+% dividesBetween(tItem,tPathways).
+dividesBetween(tItem,tMassfull,tMassless).
+dividesBetween(tObj,tItem,tAgentGeneric).
+dividesBetween(tObj,tMassfull,tMassless).
+dividesBetween(tSpatialThing,tObj,tRegion).
+dividesBetween(tAgentGeneric,tPlayer,tNpcPlayer).
+
+dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
+
+disjointWith(P1,P2) => (not(isa(C,P1)) <=> isa(C,P2)).
+
+isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
+
+=> tCol(tCol).
+=> tCol(tPred).
+=> tCol(tFunction).
+=> tCol(tRelation).
+=> tCol(ttSpatialType).
+=> tCol(ttFormatType).
+% => tCol(functorDeclares).
+% tCol(ArgsIsa):-is_pred_declarer(ArgsIsa).
+% TODO decide if OK
+%tCol(F):-hasInstance(functorDeclares,F).
+=> tCol(ttFormatType).
+=> tCol(vtActionTemplate).
+=> tCol(tRegion).
+=> tCol(tContainer).
+
+isa(tRegion,ttSpatialType).
+isa(tRelation,ttAbstractType).
 
 % ==================================================
 % typeProps Descriptions

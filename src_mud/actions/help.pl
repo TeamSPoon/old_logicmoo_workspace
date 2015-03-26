@@ -23,8 +23,11 @@ good_template(Templ):- not(contains_singletons(Templ)).
 
 get_all_templates0(Templ):-get_good_templates(Templ).
 get_all_templates0(Templ):-get_bad_templates(Templ),not(get_good_templates(Templ)).
-get_good_templates(Templ):- no_repeats_old((action_info(Templ,_),good_template(Templ))).
-get_good_templates(Templ):- isa(Templ,vtActionTemplate).
+
+get_good_templates(Templ):- isa(Templ,vtActionTemplate),good_template(Templ).
+% get_good_templates(Templ):- no_repeats_old((action_info(Templ,_),good_template(Templ))).
+
+
 get_bad_templates(Templ):- no_repeats_old((action_info(Templ,_),not(good_template(Templ)))).
 
 
@@ -44,7 +47,7 @@ action_info_db(TEMPL,INFO,WAS):- (PRED=user:agent_call_command(_,WAS);PRED=user:
     (TEMPL=@=WAS -> ((clause_property(REF,line_count(LC)),INFO=line(LC:S))) ;  (not(not(TEMPL=WAS)) -> INFO=file(S) ; fail)).
 
 % :-trace.
-action_info(TEMPL,txtConcatFn(S,contains,WAS)) <= {action_info_db(TEMPL,S,WAS),not(clause_asserted(action_info(TEMPL,_Help),true))}.
+action_info(TEMPL,txtConcatFn(S,contains,WAS)) <= {action_info_db(TEMPL,S,WAS),not_asserted(action_info(TEMPL,_Help))}.
 
 
 commands_list(ListS):- findall(Templ,get_all_templates(Templ),List),predsort(alpha_shorter_1,List,ListS).
@@ -57,11 +60,8 @@ alpha_shorter_1(OrderO, P1,P2):-functor_h(P1,F1,A1),functor_h(P2,F2,A2),compare(
   (compare(OrderA,A1,A2), (OrderA \== '=' -> OrderO=OrderA ; compare(OrderO,P1,P2)))).
 
 
-action_documentation(TEMPL,DOC):-no_repeats_old((action_info(_,TEMPL,DOC)*->true;action_info(_What,TEMPL,DOC))).
-get_template_docu_all(TEMPL,DOC):-no_repeats_old(action_info(_What,TEMPL,DOC)).
-
-show_templ_doc(TEMPL):-findall(DOC,action_documentation(TEMPL,DOC),DOCL),nvfmt(TEMPL=DOCL).
-show_templ_doc_all(TEMPL):-findall(DOC,get_template_docu_all(TEMPL,DOC),DOCL),nvfmt(TEMPL=DOCL).
+show_templ_doc(TEMPL):-findall(DOC,action_info(TEMPL,DOC),DOCL),nvfmt(TEMPL=DOCL).
+show_templ_doc_all(TEMPL):-findall(DOC,action_info(TEMPL,DOC),DOCL),nvfmt(TEMPL=DOCL).
 
 nvfmt([XX]):-!,nvfmt(XX).
 nvfmt(XX=[YY]):-!,nvfmt(XX=YY).
@@ -91,7 +91,8 @@ user:hook_coerce(Text,vtVerb,Inst):- isa(Inst,vtVerb),name_text(Inst,Text).
 
 (type_action_info(_,TEMPL,Help) => action_info(TEMPL,Help)).
 (action_info(TEMPL,_Help) => vtActionTemplate(TEMPL)).
+((vtActionTemplate(TEMPL), { not_asserted(action_info(TEMPL,_)),to_param_doc(TEMPL,S)}) => action_info(TEMPL,S)).
 
-((vtActionTemplate(TEMPL) { not(clause(action_info(TEMPL,_),true)),to_param_doc(TEMPL,S)}) => action_info(TEMPL,S)).
+
 
 

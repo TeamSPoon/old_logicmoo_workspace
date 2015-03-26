@@ -231,7 +231,7 @@ argIsa_call_7(F,_,ftTerm(ftProlog)):-member(F/_,
                                 bracket/3]).
 
 argIsa_call_7(mudFacing,_,ftTerm).
-% argIsa_call_7(Var,2,ftTerm):-not(must(not(is_asserted(isa(Var,tCol))))),dmsg(trace_or_throw( argIsa_call_9(Var,2,ftTerm))),fail.
+% argIsa_call_7(Var,2,ftTerm):-not(must(not_asserted((isa(Var,tCol))))),dmsg(trace_or_throw( argIsa_call_9(Var,2,ftTerm))),fail.
 argIsa_call_7(Prop,N1,Type):- is_2nd_order_holds(Prop),dmsg(todo(define(argIsa(Prop,N1,'Second_Order_TYPE')))),dumpST,dtrace,
    Type=argIsaFn(Prop,N1).
 argIsa_call_7(F,N,Type):- debugOnError(dbase_t(argIsa,F,N,Type)).
