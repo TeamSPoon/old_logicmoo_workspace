@@ -335,26 +335,9 @@ do_ensure_some_pathBetween:-
 
 genls(tAgentGeneric,tObj).
 genls(tItem,tObj).
-
-genls(tCandle,tPortableDevice).
-genls(tFlashlight, tPortableDevice).
-genls(tDesk, tOfficeRoomFurnature).
-
-genls(tApple, tFood).
-genls(tNani, tArt).
-genls(tNani, tWashAble).
 genls(tClothing, tWashAble).
 genls(tClothing, tWearAble).
-genls(tPants, tWearAble).
-genls(tNani, tCarryAble).
-genls(tBroccoli, tFood).
 genls(tFood,tEatAble).
-genls(tCrackers, tFood).
-genls(tEnvelope, tOfficeItem).
-genls(tStamp, tOfficeItem).
-genls(tKey, tOfficeItem).
-
-genls(tOfficeItem, tItem).
 genls(tFood, tItem).
 genls(tClothing, tItem).
 
@@ -370,22 +353,13 @@ genls(tPortableDevice,tCarryAble).
 
 :-do_gc.
 
-genls(tPajamas, tClothing).
-genls(tShirt, tClothing).
-genls(tCoat, tClothing).
-genls(tPants, tClothing).
 genls(tClothing, tFoldAble).
 genls(tClothing, tWearAble).
 
-genls(tCoffeeCup, tLiquidContainer).
-genls(tCoffeeCup, tDrinkAble).
-genls(tCoffeeCup, tThrowAble).
-genls(tCoffee, tLiquid).
-genls(tBook, tReadAble).
+genls(tLiquidContainer, tDrinkAble).
+genls(tLiquidContainer, tThrowAble).
 
-genls(tPillow, tBedding).
-genls(tBlanket, tBedding).                                                              
-genls(tBedding, tFoldAble).
+
 genls(tFoldAble, tCarryAble).
 genls(tThrowAble, tCarryAble).
 genls(tPortableDevice,tCarryAble).
@@ -396,59 +370,11 @@ genls(tFood,tCarryAble).
 genls(tCarryAble,tObj).
 genls(tPartofObj,tNotTakAble).
 genls(tBodyPart,tPartofObj).
-
-
-genls(tLightSwitch, tWallFurnature).
-genls(tComputer, tOfficeFurnature).
-genls(tPartofFurnature,tPartofObj).
-
-genls(tBed, tBedRoomFurnature).
-genls(tStandTable, tBedRoomFurnature).
-genls(tDresser, tBedRoomFurnature).
-
-genls(tWashingMachine, tDeviceFurnature).
-genls(tTable, tFurnature).
-
-genls(tTable, tFurnatureMoveAble).
-
-genls(tTable, tHasSurface).
-genls(tSofa, tLivingRoomFurnature).
-genls(tEasyChair, tLivingRoomFurnature).
-genls(tEasyChair, tSitAble).
-genls(tCoffeeTable, tLivingRoomFurnature).
-genls(tBookcase, tWallFurnature).
-genls(tDrawer, tContainer).
-genls(tDrawer, tOpenAble).
-genls(tDrawer, tCloseAble).
-genls(tDrawer, tPartofFurnature).
-genls(tTopDrawer, tPartofFurnature).
-genls(tMiddleDrawer, tPartofFurnature).
-genls(tBottomDrawer, tPartofFurnature). 
-genls(tHousePlant, tPartofObj).
-genls(tPlanter, tContainer). 
-genls(tGueridon, tLivingRoomFurnature).
-genls(tGardenPlant, tOutdoorFurnature).
 genls(tSpatialThing,tLookAble).
-genls(tNani,tTeddybear).
-genls(tTeddybear,tTreasure).
-
-genls(tBathTub,tBathRoomFurnature).
-genls(tShower,tBathRoomFurnature).
-genls(tToilet,tBathRoomFurnature).
-genls(tSink,tBathRoomFurnature).
-genls(tKitchenSink,tKitchenFurnature).
-genls(tFridge,tKitchenFurnature).
-genls(tStove,tKitchenFurnature).
-genls(tKitchenCounter,tKitchenFurnature).
 genls(tFurnature,tOntoAble).
-
-
 genls(tFurnature,tItem).
-genls(tOfficeRoomFurnature,tFurnature).
-genls(tBathRoomFurnature,tFurnature).
-genls(tKitchenFurnature,tFurnature).
-genls(tLivingRoomFurnature,tFurnature).
-genls(tOutdoorFurnature,tFurnature).
+
+genls(tPartofFurnature,tPartofObj).
 
 :- do_gc.
 
@@ -491,10 +417,122 @@ isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
 
 isa(tRegion,ttSpatialType).
 isa(tRelation,ttAbstractType).
+typeProps(tTorso,[mudColor(isLikeFn(mudColor,tSkin)),mudShape(vUnique)]).
+typeProps(tSkin,[mudColor(vUnique),mudShape(vUnique)]).
+
+%Empty Location
+% You *have* to use 0 as the id of the empty location. (no way!)
+mudLabelTypeProps(--,ftVar,[]).
+
+%NEXT TODO predTypeMax(mudEnergy,tAgentGeneric,120).
+
+typeProps(tAgentGeneric,[predInstMax(mudHealth,500)]).
+genls('IndoorsIsolatedFromOutside',tRegion).
+genls('SpaceInAHOC',tRegion).
+
+typeProps(tAgentGeneric,[mudMoveDist(1)]).
+typeProps(tAgentGeneric,[predInstMax(mudHealth,500), predInstMax(mudEnergy,200), mudHealth(500), mudEnergy(200),  mudFacing(isRandom(vtBasicDir)), mudAgentTurnnum(0), mudScore(1), 
+    mudMemory(aDirectionsFn([vNorth,vSouth,vEast,vWest,vNE,vNW,vSE,vSW,vUp,vDown]))]).
+% typeProps(tAgentGeneric,mudLastCommand(actStand)).
+typeProps(tAgentGeneric,mudNeedsLook(vFalse)).
+typeProps(tFood,[mudHeight(0)]).
+typeProps(tItem,mudEnergy(140)).
+typeProps(tItem,mudListPrice(0)).
+typeProps(tObj,[mudOpaqueness(100)]).
+typeProps(tRegion,[mudOpaqueness(1)]).
+typeProps(tSpatialThing,mudHeight(0)).
+
+% :-end_module_type(dynamic).
+
+% instTypeProps(isSelf,Type,[mudNamed(isSelf),typeHasGlyph(Lbl)|SP]):-  mudLabelTypeProps(Lbl,Type,SomeProps),nonvar(Type),flatten(SomeProps,SP).
+
+:- do_gc.
+% Vacuum World example objects........
+mudLabelTypeProps(wl,tWall,[mudHeight(3),mudWeight(4)]).
+
+
+(wearsClothing(A,I)=>{(add(tAgentGeneric(A)),add(tClothing(I)))}).
+
+(predArgTypes(Args)/pfcLiteral(Args)=>{ functor(Args,F,A), A>1, functor(Matcher,F,A)}, (({pfcLiteral(Matcher)},Matcher/pfcLiteral(Matcher))=>{deduceFromArgTypes(Matcher)})).
+
+
+end_of_file.
+
+
 
 % ==================================================
 % typeProps Descriptions
 % ==================================================
+genls(tBed, tBedRoomFurnature).
+genls(tStandTable, tBedRoomFurnature).
+genls(tDresser, tBedRoomFurnature).
+genls(tBook, tReadAble).
+
+genls(tNani, tArt).
+genls(tNani, tWashAble).
+genls(tCrackers, tFood).
+genls(tEnvelope, tOfficeItem).
+genls(tStamp, tOfficeItem).
+genls(tKey, tOfficeItem).
+
+genls(tOfficeItem, tItem).
+genls(tLightSwitch, tWallFurnature).
+genls(tComputer, tOfficeFurnature).
+genls(tBroccoli, tFood).
+genls(tCandle,tPortableDevice).
+genls(tFlashlight, tPortableDevice).
+genls(tDesk, tOfficeRoomFurnature).
+genls(tApple, tFood).
+genls(tPants, tWearAble).
+genls(tNani, tCarryAble).
+genls(tPajamas, tClothing).
+genls(tShirt, tClothing).
+genls(tCoat, tClothing).
+genls(tPants, tClothing).
+genls(tCoffee, tLiquid).
+genls(tCoffeeCup, tLiquidContainer).
+genls(tPillow, tBedding).
+genls(tBlanket, tBedding).                                                              
+genls(tBedding, tFoldAble).
+genls(tWashingMachine, tDeviceFurnature).
+genls(tTable, tFurnature).
+
+genls(tTable, tFurnatureMoveAble).
+
+genls(tTable, tHasSurface).
+genls(tSofa, tLivingRoomFurnature).
+genls(tEasyChair, tLivingRoomFurnature).
+genls(tEasyChair, tSitAble).
+genls(tCoffeeTable, tLivingRoomFurnature).
+genls(tBookcase, tWallFurnature).
+genls(tDrawer, tContainer).
+genls(tDrawer, tOpenAble).
+genls(tDrawer, tCloseAble).
+genls(tDrawer, tPartofFurnature).
+genls(tTopDrawer, tPartofFurnature).
+genls(tMiddleDrawer, tPartofFurnature).
+genls(tBottomDrawer, tPartofFurnature). 
+genls(tHousePlant, tPartofObj).
+genls(tPlanter, tContainer). 
+genls(tGueridon, tLivingRoomFurnature).
+genls(tGardenPlant, tOutdoorFurnature).
+
+genls(tNani,tTeddybear).
+genls(tTeddybear,tTreasure).
+
+genls(tBathTub,tBathRoomFurnature).
+genls(tShower,tBathRoomFurnature).
+genls(tToilet,tBathRoomFurnature).
+genls(tSink,tBathRoomFurnature).
+genls(tKitchenSink,tKitchenFurnature).
+genls(tFridge,tKitchenFurnature).
+genls(tStove,tKitchenFurnature).
+genls(tKitchenCounter,tKitchenFurnature).
+genls(tOfficeRoomFurnature,tFurnature).
+genls(tBathRoomFurnature,tFurnature).
+genls(tKitchenFurnature,tFurnature).
+genls(tLivingRoomFurnature,tFurnature).
+genls(tOutdoorFurnature,tFurnature).
 
 typeProps(tCandle,[mudColor(vBlue),mudSize(vSmall),mudShape(vTriangular),mudMaterial(vWax),mudTexture(vSticky)]).
 typeProps(tRedApple,[mudColor(vRed),mudSize(vSmall),mudShape(vRound),isa(tFruit),mudTexture(vSmooth)]).
@@ -539,21 +577,7 @@ typeProps(tHousePlant,[mudColor(vGreen),mudSize(vMedium),mudShape(vAnthuriumCrys
 typeProps(tGueridon,[mudColor(isEach(vBrown,vShiney)),mudSize(vMedium),mudShape(vCircular),mudMaterial(vWood),mudTexture(vSmooth),mudWeight(25)]).		 
 
 typeProps(tTeddybear,[mudColor(vNatural),mudShape(vUnique)]).
-typeProps(tTorso,[mudColor(isLikeFn(mudColor,tSkin)),mudShape(vUnique)]).
-typeProps(tSkin,[mudColor(vUnique),mudShape(vUnique)]).
 
-%NEXT TODO predTypeMax(mudEnergy,tAgentGeneric,120).
-
-typeProps(tAgentGeneric,[predInstMax(mudHealth,500)]).
-
-
-% :-end_module_type(dynamic).
-
-% instTypeProps(isSelf,Type,[mudNamed(isSelf),typeHasGlyph(Lbl)|SP]):-  mudLabelTypeProps(Lbl,Type,SomeProps),nonvar(Type),flatten(SomeProps,SP).
-
-:- do_gc.
-% Vacuum World example objects........
-mudLabelTypeProps(wl,tWall,[mudHeight(3),mudWeight(4)]).
 mudLabelTypeProps(tr,tTree,[mudHeight(3),mudWeight(4)]).
 mudLabelTypeProps(rk,tRock,[mudHeight(2),mudWeight(4)]).
 mudLabelTypeProps(pt,tPit,[mudHeight(-1),mudWeight(4)]).
@@ -580,10 +604,6 @@ mudLabelTypeProps(ed,tEdgeOfWorld,[mudHeight(10),mudWeight(4)]).
 mudLabelTypeProps(dr,tDoor,[mudHeight(3),mudWeight(2)]).
 :-garbage_collect_atoms.
 
-%Empty Location
-% You *have* to use 0 as the id of the empty location. (no way!)
-mudLabelTypeProps(--,ftVar,[]).
-
 % What an agent turns into upon death.
 % Must be named iCorpseFn (or edit agent_to_corpse/1 in lib.pl.
  mudLabelTypeProps(cp,tCorpsea,[mudHeight(1),mudWeight(1),mudPermanence(actTake,vTakenMoves),mudActAffect(actEat,mudEnergy(+80)),mudActAffect(actTake,mudScore(+10))]).
@@ -595,16 +615,7 @@ mudLabelTypeProps(da,tCorpsec,[mudHeight(2),mudWeight(2)]).
 mudLabelTypeProps(nk,tNastyKnife,[mudActAffect(actWield,mudAttack(2))]).
 mudLabelTypeProps(th,tToughHide,[mudActAffect(actWear,mudArmor(2))]).
 
-typeProps(tAgentGeneric,[mudMoveDist(1)]).
-typeProps(tAgentGeneric,[predInstMax(mudHealth,500), predInstMax(mudEnergy,200), mudHealth(500), mudEnergy(200),  mudFacing(isRandom(vtBasicDir)), mudAgentTurnnum(0), mudScore(1), mudMemory(aDirectionsFn([vNorth,vSouth,vEast,vWest,vNE,vNW,vSE,vSW,vUp,vDown]))]).
-typeProps(tAgentGeneric,mudLastCommand(actStand)).
-typeProps(tAgentGeneric,mudNeedsLook(vFalse)).
-typeProps(tFood,[mudHeight(0)]).
-typeProps(tItem,mudEnergy(140)).
-typeProps(tItem,mudListPrice(0)).
-typeProps(tObj,[mudOpaqueness(100)]).
-typeProps(tRegion,[mudOpaqueness(1)]).
-typeProps(tSpatialThing,mudHeight(0)).
+
 
 % Define the maximum charge and maximum damage an agent can have
 

@@ -60,6 +60,7 @@ run_deduce_facts_from_ilc(Type,Fact):-doall((call_no_cuts(deduce_facts_forward(F
 
 %OLD user:decl_database_hook(change(assert,_),BadFact):-mpred_call(tms_reject_why(BadFact,WHY)),trace_or_throw(tms_reject_why(BadFact,WHY)).
 
+deduceFromArgTypes(_).
 
 deduce_facts_forward(Fact,user:mpred_prop(AF,[predArgTypes(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],is_pred_declarer(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,
                 ArgTs=..[AF|ARGS],!,sanity(ground(ARGS)).

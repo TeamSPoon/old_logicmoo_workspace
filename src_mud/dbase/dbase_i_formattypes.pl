@@ -100,7 +100,7 @@ argIsa_op_call(_,F,N,Type):-hotrace((loop_check((argIsa_known(F,N,Type),!),Type=
 
 
 :-export(argIsa_known/3).
-argIsa_known(F,N,Type):- one_must(asserted_argIsa_known(F,N,Type),argIsa_known0(F,N,Type)).
+argIsa_known(F,N,Type):- nonvar(F),number(N),one_must(asserted_argIsa_known(F,N,Type),argIsa_known0(F,N,Type)).
 argIsa_known0(F,N,Type):- not(number(N)),trace_or_throw(type_error(not(number(N)),argIsa_known(F,N,Type))).
 argIsa_known0(F,N,Type):- argIsa_call_7(F,N,Type),!.
 argIsa_known0(F,N,Type):- argIsa_call_9(F,N,Type),!.

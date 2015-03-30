@@ -553,7 +553,7 @@ parseIsa(isMost(List),Term1) --> {!},parseIsaMost(List,Term1).
 
 parseIsa(Type,Term)--> dcgAnd(dcgLenBetween(1,2),theText(String)),{coerce(String,Type,Term)}.
 
-
+% With CHRs, one can introduce user­defined hard­wired constraints into a given high­level host language. In this extended abstract the host the language is Prolog, a CLP language with equality over Herbrand terms as the only its only built­in constraint. We claim that using our logic based language allows for reasoning  about, inspection and modification of a constraint system. 
 parseIsaMost(List,Term) --> parseIsa(isAnd(List),Term),{!}.
 % parseIsaMost(A, B, C, D) :- parseIsa(isAnd(A), B, C, E), !, D=E.
 
@@ -563,8 +563,8 @@ coerce0(String,Type,Inst):- var(Type),trace_or_throw(var_specifiedItemType(Strin
 coerce0(String,isNot(Type),Inst):-!,not(coerce0(String,Type,Inst)).
 coerce0([String],Type,Inst):- nonvar(String),!,coerce0(String,Type,Inst).
 coerce0(String,Type,Inst):- atomic(String),Type==tCol,i_name('t',String,Inst),hasInstance(tCol,Inst),!.
-coerce0(String,Type,Inst):- ttFormatType(Type),checkAnyType(change(assert,actParse),String,Type,AAA),Inst=AAA.
 coerce0(Text,Type,Inst):- (no_repeats_old(call_no_cuts(hook_coerce(Text,Type,Inst)))).
+coerce0(String,Type,Inst):- ttFormatType(Type),!,checkAnyType(change(assert,actParse),String,Type,AAA),Inst=AAA.
 %coerce0(String,Type,Longest) :- findall(Inst, (user:hook_coerce(Inst,Type,Inst),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.
 coerce0(String,Type,Inst):- var(String),!,instances_of_type(Inst,Type),name_text(Inst,String).
 coerce0(String,Type,Inst):- not(ttFormatType(Type)),must(tCol(Type)),instances_of_type(Inst,Type),match_object(String,Inst).

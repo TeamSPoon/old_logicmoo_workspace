@@ -109,8 +109,8 @@ genls(tOfficeRoom,tRegion).
 % int_firstOrder(some_query, 666, What, C, E, A, J, D, L, B)
 % :- forall(clause(user:mud_regression_test,Call),must(Call)).
 
-:- declare_load_dbase('../games/src_game_nani/a_nani_household.plmoo').
-:- declare_load_dbase('../games/src_game_nani/objs_misc_household.plmoo').
+% :- declare_load_dbase('../games/src_game_nani/a_nani_household.plmoo').
+% :- declare_load_dbase('../games/src_game_nani/objs_misc_household.plmoo').
 
 % the following 4 worlds are in version control in examples
 % :- add_game_dir('../games/src_game_wumpus',prolog_repl).       

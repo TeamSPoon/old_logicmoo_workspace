@@ -297,14 +297,20 @@ mdel(C0):- dmsg(warn(failed(mdel(C0)))),!,fail.
 
 % -  clr(Retractall)
 % clr(C0):- dmsg(clr(C0)),fail,dbase_modify(change(retract,all),/*to_exp*/(C0)),verify_sanity(ireq(C0)->(dmsg(warn(incomplete_CLR(C0))));true).
-clr(P):- agenda_do_prequery,forall(P, must(((
- doall((must(pfcGetSupportORNil(P,Support)),
+clr(P):- agenda_do_prequery,forall(P, must((( 
+ doall((  
+  must(pfcGetSupportORNil(P,Support)),
   must(show_call(pfcFilterSupports(Support,fact,Results))),
-  must(pfcDoConjs(pfcRemE,Results)),sanity(not(pfcSupported2(local,P))))),
+  must(pfcDoConjs(pfcRemE,Results)),
+  pfcRemE(P),
+  sanity(not(pfcSupported2(local,P))))),
                  not(P))))).
 
 pfcRemE(P):-var(P),!.
 pfcRemE(!):-!.
+pfcRemE(true):-!.
+pfcRemE(\+neg(P)):-!,pfcRemE(P).
+pfcRemE(pfcCall(_)):-!.
 pfcRemE(consult(P)):-!,pfcRemE(P).
 pfcRemE([P]):-!,pfcRemE(P).
 pfcRemE(P):-pfcRem3(P),fail.

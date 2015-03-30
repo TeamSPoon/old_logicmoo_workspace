@@ -139,8 +139,8 @@ pfcLambda([A1,A2,A3,A4],Body,A1,A2,A3,A4):-Body.
 
 pfcDoConjs(_,[],_) :- !.
 pfcDoConjs(Pred,H,S):-var(H),!,apply(Pred,[H|S]).
-pfcDoConjs(Pred,[H|T],S):-!, apply(Pred,[H|S]), pfcDoConjs(Pred,T,S).
 pfcDoConjs(Pred,(H,T),S):-!, apply(Pred,[H|S]), pfcDoConjs(Pred,T,S).
+pfcDoConjs(Pred,[H|T],S):-!, apply(Pred,[H|S]), pfcDoConjs(Pred,T,S).
 pfcDoConjs(Pred,H,S):-apply(Pred,[H|S]).
 
 deny_pfc_Permission_to_remove(pfcInternal,_,_):-!,fail. %allow
@@ -199,6 +199,7 @@ pfcMarkB(_):-!.
 pfcMarkB(G):-pfcMarkAs(G,pfcPreferBC).
 
 pfcMarkAs(_, _):-thlocal:pfc_no_mark,!.
+pfcMarkAs(G,_):-is_true(G),!.
 pfcMarkAs(G,As):-must(pfcDoConjs(pfcMarkAs1,G,[As])),!.
 
 pfcMarkAs1(F,As):-atom(F),clause(pfc_mpred_prop(F,prologOnly),true),!,dmsg(todo(warn(wont_pfcMarkAs1(F,As)))).
@@ -316,6 +317,7 @@ not_too_deep(Key,G):-stack_depth(CD),
 :- decl_mpred_pfc(go/0).
 
 pfcRuleOutcomeHead(Outcome,OutcomeO):-var(Outcome),!,OutcomeO=Outcome.
+pfcRuleOutcomeHead((Outcome1,Outcome2),OutcomeO):-!,pfcRuleOutcomeHead(Outcome1,Outcome1O),pfcRuleOutcomeHead(Outcome2,Outcome2O),pfcConjoin(Outcome1O,Outcome2O,OutcomeO).
 pfcRuleOutcomeHead(_=>Outcome,OutcomeO):-!,pfcRuleOutcomeHead(Outcome,OutcomeO).
 pfcRuleOutcomeHead(Outcome<=_,OutcomeO):-!,pfcRuleOutcomeHead(Outcome,OutcomeO).
 pfcRuleOutcomeHead(Outcome<=>_,OutcomeO):-pfcRuleOutcomeHead(Outcome,OutcomeO).
@@ -333,23 +335,29 @@ pfcRuleOutcomeHead(pfcQueue(Outcome),OutcomeO):-!,pfcRuleOutcomeHead(Outcome,Out
 pfcRuleOutcomeHead(Outcome:-_,Outcome):-!.
 pfcRuleOutcomeHead(Outcome,Outcome).
 
-pfcRuleOutcomeHeadBody(Outcome,OutcomeO,true):-is_ftVar(Outcome),!,OutcomeO=Outcome.
-pfcRuleOutcomeHeadBody(Ante1=>Outcome,OutcomeO,(Ante1,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
-pfcRuleOutcomeHeadBody(Outcome<=Ante1,OutcomeO,(Ante1,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
-pfcRuleOutcomeHeadBody(Outcome<=>Ante1,OutcomeO,(Ante1,Ante2)):-pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
-pfcRuleOutcomeHeadBody(Ante1<=>Outcome,OutcomeO,(Ante1,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
-pfcRuleOutcomeHeadBody(_::::Outcome,OutcomeO,Ante2):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
-pfcRuleOutcomeHeadBody(pfcBT(Outcome,Ante1),OutcomeO,(Ante1,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
-pfcRuleOutcomeHeadBody(pfcPT(Ante1,Outcome),OutcomeO,(Ante1,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
-pfcRuleOutcomeHeadBody(pfcPT3(Ante1a,Ante1b,Outcome),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
-pfcRuleOutcomeHeadBody(pfcNT(Ante1a,Ante1b,Outcome),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
-pfcRuleOutcomeHeadBody(support1(Outcome,Ante1a,Ante1b),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
-pfcRuleOutcomeHeadBody(support3(Ante1a,Ante1b,Outcome),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
-pfcRuleOutcomeHeadBody(support2(Ante1a,Outcome,Ante1b),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
-pfcRuleOutcomeHeadBody(pfcQueue(Outcome),OutcomeO,Ante2):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
-% pfcRuleOutcomeHeadBody(pfc Default(Outcome),OutcomeO,Ante2):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
-pfcRuleOutcomeHeadBody((Outcome:-Ante),Outcome,Ante):-!.
-pfcRuleOutcomeHeadBody(Outcome,Outcome,true).
+
+pfcRuleOutcomeHeadBody(Outcome,OutcomeO,AnteO):-pfcRuleOutcomeHeadBody_0(Outcome,OutcomeO,Ante),pfcRuleOutcomeHead(Ante,AnteO).
+
+pfcRuleOutcomeHeadBody_0(Outcome,OutcomeO,true):-is_ftVar(Outcome),!,OutcomeO=Outcome.
+pfcRuleOutcomeHeadBody_0((Outcome1,Outcome2),OutcomeO,AnteO):-!,pfcRuleOutcomeHeadBody(Outcome1,Outcome1O,Ante1),pfcRuleOutcomeHeadBody(Outcome2,Outcome2O,Ante2),
+                   pfcConjoin(Outcome1O,Outcome2O,OutcomeO),
+                   pfcConjoin(Ante1,Ante2,AnteO).
+pfcRuleOutcomeHeadBody_0(Ante1=>Outcome,OutcomeO,(Ante1,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
+pfcRuleOutcomeHeadBody_0(Outcome<=Ante1,OutcomeO,(Ante1,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
+pfcRuleOutcomeHeadBody_0(Outcome<=>Ante1,OutcomeO,(Ante1,Ante2)):-pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
+pfcRuleOutcomeHeadBody_0(Ante1<=>Outcome,OutcomeO,(Ante1,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
+pfcRuleOutcomeHeadBody_0(_::::Outcome,OutcomeO,Ante2):-!,pfcRuleOutcomeHeadBody_0(Outcome,OutcomeO,Ante2).
+pfcRuleOutcomeHeadBody_0(pfcBT(Outcome,Ante1),OutcomeO,(Ante1,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
+pfcRuleOutcomeHeadBody_0(pfcPT(Ante1,Outcome),OutcomeO,(Ante1,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
+pfcRuleOutcomeHeadBody_0(pfcPT3(Ante1a,Ante1b,Outcome),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
+pfcRuleOutcomeHeadBody_0(pfcNT(Ante1a,Ante1b,Outcome),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
+pfcRuleOutcomeHeadBody_0(support1(Outcome,Ante1a,Ante1b),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
+pfcRuleOutcomeHeadBody_0(support3(Ante1a,Ante1b,Outcome),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
+pfcRuleOutcomeHeadBody_0(support2(Ante1a,Outcome,Ante1b),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
+pfcRuleOutcomeHeadBody_0(pfcQueue(Outcome),OutcomeO,Ante2):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
+% pfcRuleOutcomeHeadBody_0(pfc Default(Outcome),OutcomeO,Ante2):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
+pfcRuleOutcomeHeadBody_0((Outcome:-Ante),Outcome,Ante):-!.
+pfcRuleOutcomeHeadBody_0(Outcome,Outcome,true).
 
 
 pfcVersion(1.2).
@@ -890,7 +898,7 @@ pfcUndo(Fact) :-
   pfcTraceRem(Fact),
   unFc1(Fact).
 
-pfcUndo(Fact) :- dmsg(no_pfcUndo(Fact)).
+pfcUndo(Fact) :- dmsg(no_pfcUndo(Fact)),sanity((functor(Fact,F,_),not((atom_concat(_,'Fn',F),dtrace)))).
 
 
 %= unFc(P) "un-forward-chains" from fact f.  That is, fact F has just
@@ -1623,8 +1631,8 @@ pfcUnion([Head|Tail],L,[Head|Tail2]) :-
 %= arg3 is a simplified expression representing the conjunction of
 %= args 1 and 2.
 
-pfcConjoin(true,X,X) :- !.
-pfcConjoin(X,true,X) :- !.
+pfcConjoin(TRUE,X,X) :- is_true(TRUE),!.
+pfcConjoin(X,TRUE,X) :- is_true(TRUE),!.
 pfcConjoin(C1,C2,(C1,C2)).
 
 % pfcFile('pfcsupport').	% support maintenance
@@ -1664,6 +1672,14 @@ pfcRemoveSupportItems(P,Types):-
   pfcGetSupport(P,Support),
   show_call(pfcFilterSupports(Support,Types,Results)),
   pfcDoConjs(pfcRem1,Results).
+
+pfcTypeFilter_l(ResultsO,Filter,ResultsO):-pfcTypeFilter(ResultsO,Filter).
+pfcTypeFilter_l((Body,More),Filter,ResultsO):-!,pfcTypeFilter_l(Body,Filter,BodyO),pfcTypeFilter_l((More),Filter,(ResultsM)),conjoin(BodyO,ResultsM,ResultsO).
+pfcTypeFilter_l(_,_Filter,!).
+
+pfcFilterSupports(Support,Filter,ResultsO):- 
+  pfcRuleOutcomeHeadBody(Support,_,Body),
+  pfcTypeFilter_l(Body,Filter,ResultsO),!.
 
 pfcFilterSupports(Support,Filter,ResultsO):-
   findall(Term, ((sub_term(Term,Support),pfcLiteral(Term),compound(Term),pfcTypeFilter(Term,Filter))),Results),
@@ -2066,6 +2082,7 @@ nopfcWarn :-
  
 pfcWarn(Msg) :-  pfcWarn(Msg,[]).
 
+pfcWarn(_,_):- !.
 pfcWarn(Msg,Args) :- 
   pfc_settings(warnings,true),
   !,
