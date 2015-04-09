@@ -120,7 +120,7 @@ genls(tCrackers, tFood).
 genls(tEnvelope, tOfficeItem).
 genls(tStamp, tOfficeItem).
 genls(tKey, tOfficeItem).
-genls(tBall, tThrowAble).
+genls(tBall, tCarryAble).
 
 
 :- do_gc.
@@ -134,7 +134,7 @@ genls(tClothing, tWearAble).
 
 genls(tCoffeeCup, tLiquidContainer).
 genls(tCoffeeCup, tDrinkAble).
-genls(tCoffeeCup, tThrowAble).
+genls(tCoffeeCup, tCarryAble).
 genls(tCoffee, tLiquid).
 genls(tBook, tReadAble).
 
@@ -142,7 +142,6 @@ genls(tPillow, tBedding).
 genls(tBlanket, tBedding).                                                              
 genls(tBedding, tFoldAble).
 genls(tFoldAble, tCarryAble).
-genls(tThrowAble, tCarryAble).
 genls(tPortableDevice,tCarryAble).
 genls(tPhysicalDevice,tUseAble).
 genls(tWearAble, tCarryAble).
