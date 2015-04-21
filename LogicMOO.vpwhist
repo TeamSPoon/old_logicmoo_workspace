@@ -622,13 +622,37 @@ PrologMUD.vpj=20150420201859256
     + config-enabled
     + RDF-store
   - src_lib
-    + pfc
+    + mpred_base
       + prolog
         + mpred
-          + ext
           + util
-        + mpred - Copy
       + t
+    + mpred_larkc
+      + prolog
+        + plarkc
+    + mpred_online
+      + prolog
+        + mpred_online
+    + mpred_pttp
+      + prolog
+        + mpred
+          + flux
+          + pttp
+    + prologmud
+      + prolog
+        + prologmud
+          + actions
+          + mobs
+            + affordance
+            + planner
+          + objs
+          + parsing
+          + runtime
+            + config-enabled
+            + RDF-store
+          + server
+          + vworld
+    + ref_unused
   + src_lisp
     + CVS
     + cycl
@@ -734,14 +758,6 @@ PrologMUD.vpj=20150420201859256
       + qa
       + sdbi
     + sublisp
-  + src_mud
-    - actions
-    + mobs
-      + affordance
-      + planner
-    + objs
-    + parsing
-    - vworld
   + \usr
     + lib
       + swi-prolog
@@ -789,47 +805,35 @@ PrologMUD.vpj=20150420201859256
               + swi
               + trace
               + xref
-scroll:9
+scroll:0
 [State]
-SCREEN: 1920 1080 0 0 1612 648 0 0 M 0 0 0 0 1593 616
+SCREEN: 1920 1080 0 0 1612 648 0 0 N 0 0 0 0 1277 252
 CWD: ..\PrologMUD
-BUFFER: BN="src_lib\pfc\prolog\mpred\dbase_i_mpred_stubs.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.26743 CL=1 LE=0 CX=0 CY=32 WI=5 BI=16 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="src_lib\pfc\prolog\mpred\dbase_i_kb_store.pl"
+BUFFER: BN="packs\mpred_logicmoo\pack.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.416 CL=49 LE=0 CX=48 CY=10 WI=5 BI=18 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="src_lib\pfc\prolog\mpred\dbase_i_isa_subclass.pl"
+VIEW: LN=.0 CL=20 LE=0 CX=19 CY=0 WI=5 BI=5 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\mpred_online\pack.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.618 CL=31 LE=0 CX=30 CY=20 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="src_lib\pfc\prolog\mpred\dbase_i_db_preds.pl"
+VIEW: LN=.247 CL=80 LE=0 CX=79 CY=7 WI=5 BI=16 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\mpred_plarkc\pack.pl"
 BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.12757 CL=1 LE=0 CX=0 CY=2 WI=5 BI=15 HT=0 HN=0 HF=0 HC=4
-WINDOW: 88 88 1395 418 -1 -1 N  WF=0 WT=5 "Default Fixed Font,10,0,1"
-BUFFER: BN="src_lib\pfc\prolog\mpred\dbase_i_kb_store.pl"
-VIEW: LN=.2941 CL=1 LE=0 CX=0 CY=33 WI=110 BI=18 HT=0 HN=0 HF=0 HC=4
-WINDOW: 110 110 1395 418 -1 -1 N  WF=0 WT=6 "Default Fixed Font,10,0,1"
-BUFFER: BN="src_lib\pfc\prolog\mpred\dbase_i_isa_subclass.pl"
-VIEW: LN=.618 CL=31 LE=0 CX=30 CY=20 WI=111 BI=17 HT=0 HN=0 HF=0 HC=4
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1395 418 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\mpred_logicmoo\pack.pl"
+VIEW: LN=.240 CL=21 LE=0 CX=20 CY=6 WI=12 BI=5 HT=0 HN=0 HF=0 HC=4
 WINDOW: 66 66 1395 418 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
-BUFFER: BN="src_lib\pfc\prolog\mpred\dbase_i_mpred_stubs.pl"
-VIEW: LN=.1530 CL=1 LE=0 CX=0 CY=33 WI=107 BI=16 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1395 418 -1 -1 N  WF=0 WT=2 ",,,"
-BUFFER: BN="src_lib\pfc\prolog\mpred\dbase_i_db_preds.pl"
-VIEW: LN=.12757 CL=1 LE=0 CX=0 CY=2 WI=12 BI=15 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\mpred_plarkc\pack.pl"
+VIEW: LN=.193 CL=36 LE=0 CX=35 CY=5 WI=108 BI=17 HT=0 HN=0 HF=0 HC=4
 WINDOW: 44 44 1395 418 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
-BUFFER: BN="src_lib\pfc\prolog\mpred\dbase_i_db_preds.pl"
-VIEW: LN=.12757 CL=1 LE=0 CX=0 CY=2 WI=106 BI=15 HT=0 HN=0 HF=0 HC=4
-WINDOW: 132 132 1395 418 -1 -1 M  WF=0 WT=7 ",,,"
-BUFFER: BN="src_lib\pfc\prolog\mpred\dbase_i_isa_subclass.pl"
-VIEW: LN=.618 CL=31 LE=0 CX=30 CY=20 WI=114 BI=17 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\mpred_online\pack.pl"
+VIEW: LN=.223 CL=17 LE=0 CX=16 CY=6 WI=13 BI=16 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
-externals\MUD_XperiMental\Blocks-World\src\sitcalc_async_knowledge\domain_wumpus.pl
-externals\MUD_XperiMental\sitcalc_async_knowledge\main.pl
-externals\MUD_XperiMental\Blocks-World\src\sitcalc_async_knowledge\prover.pl
-src_lib\pfc\prolog\mpred\dbase_i_db_preds.pl
 src_lib\pfc\prolog\mpred\dbase_i_mpred_dbase_t.pl
 src_lib\pfc\prolog\mpred\dbase_i_mpred_stubs.pl
 src_lib\pfc\prolog\mpred\dbase_i_isa_subclass.pl
 src_lib\pfc\prolog\mpred\dbase_i_propvals.pl
 src_lib\pfc\prolog\mpred\dbase_i_kb_store.pl
+packs\mpred_base\pack.pl
+packs\mpred_plarkc\pack.pl
+packs\mpred_online\pack.pl
+packs\mpred_logicmoo\pack.pl
