@@ -73,7 +73,7 @@ non_assertable(WW,notAssertable(Why)):- compound(WW),get_functor(WW,F),user:mpre
 % non_assertable(WW,Why):- db_prop_add
 
 is_logical_functor(And):-notrace(is_logical_functor0(And)).
-is_logical_functor0(X):-atom(X),member(X,[',',';']).
+is_logical_functor0(X):-atom(X),member(X,[',',';',xor,'\\+',neg]).
 is_logical_functor0(X):-call_if_defined(logical_functor_pttp(X)).
 is_logical_functor0(And):-member(And,[(,),(;),('<='),('=>'),('<=>'),(':-'),(and),nop]).
 

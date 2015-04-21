@@ -10,6 +10,7 @@
 %
 */
 
+
 :- include(dbase_i_header).
 
 :- export correctArgsIsa/3.

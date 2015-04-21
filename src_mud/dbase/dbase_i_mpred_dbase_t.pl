@@ -118,7 +118,7 @@ dbase_t(CALL):- into_plist_arities(3,10,CALL,[P|LIST]),dbase_plist_t(P,LIST).
 dbase_plist_t(P,[]):-!,dbase_t(P).
 dbase_plist_t(P,LIST):-var(P),!,is_list(LIST),CALL=..[dbase_t,P|LIST],debugOnError((CALL)).
 dbase_plist_t(dbase_t,[P|LIST]):-!, dbase_plist_t(P,LIST).
-dbase_plist_t(user:mpred_prop,[C,I]):-!,ground(I:C),user:mpred_prop(C,I).
+dbase_plist_t(user:mpred_prop,[C,A,I]):-!,ground(I:C),user:mpred_prop(C,A,I).
 dbase_plist_t(isa,[I,C]):-!,hasInstance(C,I).
 dbase_plist_t(P,_):-never_dbase_mpred(P),!,fail.
 dbase_plist_t(P,[L|IST]):-is_holds_true(P),!,dbase_plist_t(L,IST).
@@ -235,7 +235,8 @@ decl_mpred_hybrid_ilc(M,PI,F/A):-
      
 
 decl_mpred_hybrid4(_CM,M,PI,F/A):-
-   decl_mpred_hybrid3(M,PI,F/A).
+   must(decl_mpred_hybrid3(M,PI,F/A)).
+decl_mpred_hybrid4(_CM,M,PI,FA):- dtrace,decl_mpred_hybrid3(M,PI,FA).
 
 :-op(1150,fx,decl_mpred_hybrid).
 
@@ -506,6 +507,7 @@ call_rule_db(F,A,HEAD):- use_snark(HEAD,_),!,snark_ask(HEAD).
 call_rule_db(F,A,HEAD):- ruleBackward(HEAD,BODY),call_mpred_body(HEAD,BODY).
 
 :- style_check(+singleton).
+:- style_check(-singleton).
 
 call_mpred_body(_,true):-!.
 call_mpred_body(HEAD,and(A,B)):- !,call_mpred_body(HEAD,A),!,call_mpred_body(HEAD,B).

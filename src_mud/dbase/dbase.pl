@@ -147,8 +147,8 @@ must_compile_special_clause(:- (_) ):-!,fail.
 must_compile_special_clause(CL):- sanity(nonvar(CL)),not(thlocal:into_form_code),not(thlocal:already_in_file_term_expansion),not((get_functor(CL,F),expanded_already_functor(F))).
 
 
-%user:goal_expanstion(H,_):- notice_predicate_head(H),fail.
-%user:term_expanstion(H:-_,_):- must_compile_special_clause(H),notice_predicate_head(H),fail.
+%OLD user:goal_expanstion(H,_):- notice_predicate_head(H),fail.
+%OLD user:term_expanstion(H:-_,_):- must_compile_special_clause(H),notice_predicate_head(H),fail.
 
 % makeConstant(X):- trace_or_throw(makeConstant(X)).
 
@@ -159,23 +159,14 @@ must_compile_special_clause(CL):- sanity(nonvar(CL)),not(thlocal:into_form_code)
 
 %OLD user:decl_database_hook(change(assert,_),Fact):- resolve_if_false(Fact).
 
-was_known_false(Fact):-is_known_false(Fact),doall(retract((is_known_false(_):-true))),dmsg(trace_or_throw(error+was_known_false(Fact))).
+%OLD was_known_false(Fact):-is_known_false(Fact),doall(retract((is_known_false(_):-true))),dmsg(trace_or_throw(error+was_known_false(Fact))).
 
-resolve_if_false(Fact):- ignore(((is_known_false(Fact),was_known_false(Fact)))).
+%OLD resolve_if_false(Fact):- ignore(((is_known_false(Fact),was_known_false(Fact)))).
 
 user:ruleRewrite(isa(isInstFn(Sub),Super),genls(Sub,Super)):-ground(Sub:Super),!.
-user:ruleRewrite(mudLabelTypeProps(Lbl,T,[]),typeHasGlyph(T,Lbl)):-must(nonvar(T)).
-user:ruleRewrite(mudLabelTypeProps(Lbl,T,Props),typeProps(T,[typeHasGlyph(Lbl)|Props])).
+user:ruleRewrite(mudLabelTypeProps(Lbl,T,[]),typeHasGlyph(T,Lbl)):-nonvar(T),!.
+user:ruleRewrite(mudLabelTypeProps(Lbl,T,Props),typeProps(T,[typeHasGlyph(Lbl)|Props])):-nonvar(T),!.
 
-
-%OLD user:decl_database_hook(change(assert,_A_or_Z),typeProps(T,_)):- decl_type_safe(T).
-
-
-%OLD user:decl_database_hook(change(assert,_A_or_Z),user:mpred_prop(F,W)):- sanity((nop(user:mpred_prop(F,W)),atom(F))).
-
-%OLD user:decl_database_hook(change(assert,_),defnSufficient(FT,_)):- define_ft(FT).
-
-%OLD user:decl_database_hook(change(assert,_),subFormat(FT,OFT)):- define_ft(OFT),define_ft(FT).
 
 
 % ================================================
@@ -195,6 +186,8 @@ record_on_thread(Dbase_change,O):- thread_self(ID),thlocal:dbase_capture(ID,Dbas
 % ================================================
 % DBASE_T System
 % ================================================
+
+
 %:- with_no_term_expansions(if_file_exists(user_ensure_loaded(logicmoo(dbase/dbase_i_rdf_store)))).
 %:- asserta(thglobal:using_rdf_dbase_hook).
 :- ensure_loaded(dbase_i_kb_agenda).
@@ -229,6 +222,20 @@ record_on_thread(Dbase_change,O):- thread_self(ID),thlocal:dbase_capture(ID,Dbas
 :- ensure_loaded(dbase_i_mpred_snark).
 
 
+dbase_numbervars_with_names(Term):- term_variables(Term,Vars),dbase_name_variables(Vars),!,numbervars(Vars,91,_,[attvar(skip),singletons(true)]),!.
+
+dbase_name_variables([]).
+dbase_name_variables([Var|Vars]):-
+   (var_property(Var, name(Name)) -> Var = '$VAR'(Name) ; true),
+   dbase_name_variables(Vars).
+
+
+
+
+
+
+
+
 user:goal_expansion(G,isa(I,C)):-G\=isa(_,_),(was_isa(G,I,C)),!.
 user:term_expansion(G,isa(I,C)):-not(user:prolog_mud_disable_term_expansions),notrace((was_isa(G,I,C))).
 
@@ -248,7 +255,7 @@ dbase_module_ready.
 :-decl_type(tPred).
 :-decl_mpred_hybrid(isa/2).
 
-user:term_expansion(A,B):- not(user:prolog_mud_disable_term_expansions),in_file_expansion,once(pfc_file_expansion(A,B)),A\=@=B.
+user:term_expansion(A,B):- not(user:prolog_mud_disable_term_expansions), current_predicate(pfcExpansion_loaded/0),loop_check(pfc_file_expansion(A,B)),A\=@=B.
 
 user:semweb_startup:- with_no_term_expansions(if_file_exists(user_ensure_loaded(logicmoo(dbase/dbase_i_rdf_store)))).
 
@@ -277,7 +284,7 @@ system:term_expansion(IN,OUT):- not(user:prolog_mud_disable_term_expansions),
 vtTestType(vTest1).
 vtTestType(vTest2).
 
-:-must(not(user:mpred_prop(dbase_t,prologHybrid))).
+:-must(not(user:mpred_prop(dbase_t,_,prologHybrid))).
 % :-decl_mpred_hybrid(function_corisponding_predicate(tFunction,tPred)).
 
 :- sanity(tCol(tCol)).
@@ -316,6 +323,14 @@ vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes)
 
 % :-asserta(user:prolog_mud_disable_term_expansions).
 
+% :-loadTinyAssertions1.
+
+%:-prolog_repl.
+%:-showTinyAssertions.
+%:-prolog_repl.
+%:-loadTinyAssertions2.
+
 term_expansion(I,O):- thlocal:consulting_sources, with_no_assertions(thlocal:consulting_sources,add(I)),O=true.
 user:goal_expansion(ISA,G) :-compound(ISA),thlocal:is_calling,was_isa(ISA,I,C),G=no_repeats(isa(I,C)).
 
+% :-prolog_repl.

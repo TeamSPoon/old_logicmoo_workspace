@@ -17,20 +17,14 @@
 % keraseall(AnyTerm).
 %
 
-Interestingly there are three main components I have finally admit to needing despite the fact that using Prolog was to provide these exact components.  First of all a defaulting system using to shadow (hidden) behind assertions
-
-
-Axiomatic semantics define the meaning of a command in a program by describing its effect on assertions about the program state. The assertions are logical statements - predicates with variables, where the variables define the state of the program.
-
-
+Interestingly there are three main components I have finally admit to needing despite the fact that using Prolog was to provide these exact components.  
+First of all a defaulting system using to shadow (hidden) behind assertions
+Axiomatic semantics define the meaning of a command in a program by describing its effect on assertions about the program state.
+The assertions are logical statements - predicates with variables, where the variables define the state of the program.
 Predicate transformer semantics to combine programming concepts in a compact way, before logic is realized.   
-
-
 This simplicity makes proving the correctness of programs easier, using Hoare logic.
 
-
 Axiomatic semantics
-
 Writing in Prolog is actually really easy for a MUD is when the length's chosen
 
 %
@@ -117,7 +111,7 @@ fully_expand_clause(Op, HB,HHBB):- must((to_reduced_hb(Op,HB,H,B),fully_expand_h
 fully_expand_head(Op,Sent,SentO):- must(with_assertions(thlocal:into_form_code,transitive(db_expand_term(Op),Sent,SentO))).
 fully_expand_goal(Op,Sent,SentO):- must(with_assertions(thlocal:into_form_code,transitive(db_expand_term(Op),Sent,SentO))).
 
-
+db_expand_term(_,Sent,SentO):-not_ftVar(Sent),if_defined(user:ruleRewrite(Sent,SentO),fail).
 db_expand_term(Op,Sent,SentO):- db_expand_final(Op ,Sent,SentO),!.
 db_expand_term(Op,Sent,SentO):- is_meta_functor(Sent,F,List),!,maplist(fully_expand_goal(Op),List,ListO),List\=@=ListO,SentO=..[F|ListO].
 db_expand_term(_ ,NC,OUT):-pfc_expand(NC,OUT),NC\=@=OUT,!.
@@ -147,8 +141,8 @@ db_expand_chain(_,M:PO,PO) :- atom(M),!.
 db_expand_chain(_,(P:-B),P) :-is_true(B),!.
 db_expand_chain(_,B=>P,P) :-is_true(B),!.
 db_expand_chain(_,P<=B,P) :-is_true(B),!.
-db_expand_chain(_,P,PE):-cyc_to_pfc_expansion_entry(P,PE),!.
 db_expand_chain(_,isa(I,Not),INot):-Not==not,!,INot =.. [Not,I].
+db_expand_chain(_,P,PE):-fail,cyc_to_pfc_expansion_entry(P,PE).
 db_expand_chain(_,(=>P),P) :- !.
 
 db_expand_z(Op ,Sent,SentO):-db_expand_final(Op ,Sent,SentO),!.
@@ -208,7 +202,7 @@ demodulize(Op,H,HH):-compound(H),H=..[F|HL],!,maplist(demodulize(Op),HL,HHL),HH=
 demodulize(_ ,HB,HB).
 
 
-db_expand_1(change(_,_),Sent,SentO):-user:ruleRewrite(Sent,SentO),!.
+db_expand_1(change(_,_),Sent,SentO):-not_ftVar(Sent),user:ruleRewrite(Sent,SentO),!.
 % db_expand_1(_,Sent,SentO):-loop_check(expand_term(Sent,SentO),Sent=SentO),!.
 
 db_expand_2(_ ,NC,NC):- as_is_term(NC),!.
@@ -415,11 +409,13 @@ into_functor_form(Dbase_t,_X,F,A,Call):-Call=..[Dbase_t,F|A].
 :-export(into_mpred_form/2).
 into_mpred_form(V,VO):-not(compound(V)),!,VO=V.
 into_mpred_form(M:X,M:O):- atom(M),!,into_mpred_form(X,O),!.
+into_mpred_form(Sent,SentO):-not_ftVar(Sent),if_defined(user:ruleRewrite(Sent,SentM),fail),into_mpred_form(SentM,SentO).
 into_mpred_form((H:-B),(HH:-BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
 into_mpred_form((H:-B),(HH:-BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
 into_mpred_form((H,B),(HH,BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
 into_mpred_form((H;B),(HH;BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
 into_mpred_form(WAS,isa(I,C)):-was_isa(WAS,I,C),!.
+into_mpred_form(dbase_t(P,A),O):-atomic(P),!,O=..[P,A].
 into_mpred_form(dbase_t(P,A,B),O):-atomic(P),!,O=..[P,A,B].
 into_mpred_form(dbase_t(P,A,B,C),O):-atomic(P),!,O=..[P,A,B,C].
 into_mpred_form(Var,MPRED):- var(Var), trace_or_throw(var_into_mpred_form(Var,MPRED)).
@@ -552,6 +548,13 @@ univ_left(Comp,[H,M:P|List]):- nonvar(M),univ_left0(M,Comp,[H,P|List]),!.
 univ_left(Comp,[P|List]):-dbase_mod(DBASE), univ_left0(DBASE,Comp,[P|List]),!.
 univ_left0(M,M:Comp,List):- Comp=..List,!.
 
+
+
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
 
 
 :-export((force_expand_head/2,force_head_expansion/2)).

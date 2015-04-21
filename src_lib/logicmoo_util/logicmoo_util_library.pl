@@ -63,18 +63,6 @@ logicmoo_util_library:-module(logicmoo_util_library,
 if_file_exists(M:Call):- arg(1,Call,File),(filematch(File,_)-> must((filematch(File,X),exists_file(X),call(M:Call)));fmt(not_installing(M,Call))),!.
 
 
-:-export(current_filesource/1).
-:-export(current_filedir/1).
-current_filedir(D):- no_repeats([D],(current_filesource(F),file_directory_name(F,D))).
-current_filesource(F):-seeing(X),is_stream(X),stream_property(X,file_name(F)).
-current_filesource(F):-stream_property(_,file_name(F)).
-
-:- export(filematch/2).
-:- export(filematch/3).
-filematch(Mask,File1):- one_must(filematch('./',Mask,File1),(current_filedir(D),filematch(D,Mask,File1))).
-filematch(RelativeTo,Mask,File1):-absolute_file_name(Mask,File1,[expand(true),extensions(['',plmoo,pl,'pl.in']),file_errors(fail),solutions(all),relative_to(RelativeTo),access(read)]).
-
-
 :- ensure_loaded(logicmoo_util_bugger_new).
 :- ensure_loaded(logicmoo_util_bugger_catch).
 :- '@'( ensure_loaded(logicmoo_util_bugger), 'user').

@@ -1,3 +1,10 @@
+
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     Lisprolog -- Interpreter for a simple Lisp. Written in Prolog.
     Written Nov. 26th, 2006 by Markus Triska (triska@gmx.at).
@@ -12,8 +19,8 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    Parsing
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-:-dynamic(user:mpred_prop/2).
-:-multifile(user:mpred_prop/2).
+:-dynamic(user:mpred_prop/3).
+:-multifile(user:mpred_prop/3).
 :- use_module('../../src_lib/logicmoo_util/logicmoo_util_all.pl').
 
 parse_sexpr(String, Expr) :- string(String),!,string_codes(String,Codes),phrase(sexpr(Expr), Codes).
@@ -38,13 +45,13 @@ sexpr(comma(E))            --> ",", !, swhite, sexpr(E).
 sexpr(s(E))                      --> sym_or_num(E),!, swhite.
 
 sblank --> [C], {C =< 32}, swhite.
-sblank --> ";", comment, swhite.
+sblank --> ";", line_comment, swhite.
 
 swhite --> sblank.
 swhite --> [].
 
-comment --> [C], {eoln(C)}, !.
-comment --> [C], comment.
+line_comment --> [C], {eoln(C)}, !.
+line_comment --> [C], line_comment.
 
 sexprs([H|T]) --> sexpr(H), !, sexprs(T).
 sexprs([]) --> [].

@@ -30,6 +30,11 @@
 
 :- multifile user:genls/2.
 :- dynamic user:genls/2.
+:- multifile user:isa/2.
+:- dynamic user:isa/2.
+
+:- style_check(-singleton).
+
 
 :-op(1190,fx,(disabled)).
 :-op(1190,fx,(enabled)).
@@ -48,6 +53,7 @@
 :- multifile(user:semweb_startup).
 
 :- dynamic thglobal:pfcManageHybrids/0.
+:- dynamic thlocal:infMustArgIsa/0.
 :- thread_local thlocal:into_form_code/0.
 :- thread_local thlocal:current_why/2.
 :- dynamic_multifile_exported user:defnSufficient/2.
@@ -104,10 +110,14 @@
 :- dynamic_multifile_exported user:hasInstance_dyn/2.
 :- dynamic_multifile_exported user:arity/2.
 :- dynamic_multifile_exported user:mpred_prop/2.
+:- dynamic_multifile_exported user:relationMostInstance/3.
 :- dynamic_multifile_exported user:'<=>'/2.
 % :- dynamic_multifile_exported user:ruleForward/2.
 :- dynamic_multifile_exported user:ruleRewrite/2.
 % :- dynamic_multifile_exported user:ruleBackward/2.
+:- dynamic_multifile_exported user:tNearestReachableItem/1.
+:- dynamic_multifile_exported user:tFarthestReachableItem/1.
+:- dynamic_multifile_exported deduceFromArgTypes/1.
 
 % :- '@'(ensure_loaded(dbase),'user').
 

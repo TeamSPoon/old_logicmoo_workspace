@@ -53,7 +53,7 @@ user:agent_call_command(Agent,actCreate(SWhat)):- with_all_dmsg(must_det(create_
 create_new_object(Agent,[tCol,NameOfType|DefaultParams]):-!,create_new_type(Agent,[NameOfType|DefaultParams]).
 
 create_new_object(Agent,[NameOrType|Params]):-
-   create_meta(NameOrType,NewType,tSpatialThing,NewObj),
+    create_meta(NameOrType,NewType,tSpatialThing,NewObj),
    assert_isa(NewObj,NewType),
    add(genls(NewType,tItem)),
    padd(NewObj,authorWas(create_new_object(Agent,[NameOrType|Params]))),
@@ -72,7 +72,7 @@ create_new_type(Agent,[NewObj|DefaultParams]):-
    add(typeProps(NewObj,PropList)).
 
 
-getPropInfo(_Agent,_NewName,PropsIn,N,[comment(ftText(need,to,actParse,PropsIn,N))]).
+getPropInfo(_Agent,_NewName,PropsIn,N,[mudDescription(ftText(need,to,actParse,PropsIn,N))]).
 
 
 

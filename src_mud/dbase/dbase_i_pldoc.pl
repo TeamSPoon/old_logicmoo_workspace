@@ -1,3 +1,10 @@
+
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+
 :- module(dbase_i_pldoc,
 	  [ 		% +Source, +OutStream, +Options
           source_to_txt/3,

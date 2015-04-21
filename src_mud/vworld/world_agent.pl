@@ -133,7 +133,6 @@ get_session_id(IDIn):-current_input(ID),is_stream(ID),!,ID=IDIn.
 get_session_id(ID):-thread_self(ID).
 
 :-export(current_agent/1).
-:-export(current_agent/1).
 current_agent(PIn):- get_session_id(O),get_agent_session(P,O),!,P=PIn.
 
 :-export(current_agent_or_var/1).
@@ -159,6 +158,26 @@ foc_current_player(P):-
              once(get_dettached_npc(P);generate_new_player(P)),
                retractall(thglobal:global_session_agent(O,P)),
               asserta(thglobal:global_session_agent(O,P)),assert_isa(P,tHumanPlayer),must_det(create_agent(P))]),!.
+
+
+
+:-export(my_random_member/2).
+my_random_member(LOC,LOCS):- must_det((length(LOCS,Len),Len>0)),random_permutation(LOCS,LOCS2),!,member(LOC,LOCS2).
+
+:-export(random_instance/3).
+random_instance_no_throw(Type,Value,Test):-var(Test),!,random_instance_no_throw(Type,Value,true).
+random_instance_no_throw(Type,Value,Test):- copy_term(ri(Type,Value,Test),ri(RType,RValue,RTest)),
+   hooked_random_instance(RType,RValue,RTest),
+   checkAnyType(query(_,_),RValue,Type,Value),
+   must_det(Test),!.
+random_instance_no_throw(Type,Value,Test):- atom(Type),atom_concat('random_',Type,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),call(Fact),Test,!.
+random_instance_no_throw(Type,Value,Test):- compound(Type),get_functor(Type,F),atom_concat('random_',F,Pred),current_predicate(F/1),Fact=..[Pred,Value],predicate_property(Fact,_),Fact,Test,!.
+random_instance_no_throw(Type,Value,Test):- compound(Type),get_functor(Type,F,GA),guess_arity(F,GA,A),functor(Formatted,F,A),hasInstance(ttFormatted,Formatted),
+                         Formatted=..[F|ArgTypes],functor(Value,F,A),Value=..[F|ValueArgs],must((maplist(random_instance_no_throw,ArgTypes,ValueArgs,_),Test)),!.
+random_instance_no_throw(Type,Value,Test):- findall(V,isa(V,Type),Possibles),Possibles\=[],must_det((my_random_member(Value,Possibles),Test)),!.
+
+random_instance(Type,Value,Test):- must(random_instance_no_throw(Type,Value,Test)).
+
 
 
 get_dettached_npc(P):-random_instance_no_throw(tAgentGeneric,P,true),not(isa(P,tHumanPlayer)),!.

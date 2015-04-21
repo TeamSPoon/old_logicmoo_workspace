@@ -19,6 +19,7 @@
 :- meta_predicate warnOnError(0).
 :- meta_predicate agent_call_safely(?,?,?).
 
+
 :- include(logicmoo(vworld/moo_header)).
 % :- begin_transform_moo_preds.
 :- dynamic(npc_tick_tock_time/1).
@@ -57,15 +58,15 @@ move_or_sit_memory_idea(Agent,actSit,_) :-
 	add(mudMemory(Agent,aDirectionsFn(New))).
 
 
-command_actTick(Who):- 
+command_actTick(Who):- (side_effect_prone),
    ignore(current_agent(Who)),
    must(nonvar(Who)),
    with_current_agent(Who,
-     (
+     must_det_l((
       show_call_failure(current_agent(Who)),
       command_actIdea(Who,IdeaS),
       my_random_member(Idea,IdeaS),!,
-      do_agent_call_plan_command(Who,Idea))).
+      do_agent_call_plan_command(Who,Idea)))).
 
 
  
@@ -97,7 +98,7 @@ user:agent_text_command(Agent,["tlocals"],Agent,actProlog(tlocals)).
 
 warnOnError(X):-catch(X,E,dmsg(error(E:X))).
 
-user:agent_call_command(Agent,actProlog(C)) :- true,must(nonvar(C)),agent_call_safely(Agent,C).
+user:agent_call_command(Agent,actProlog(C)) :- (side_effect_prone),true,nonvar(C),agent_call_safely(Agent,C).
 
 :-export(agent_call_safely/2).
 agent_call_safely(_Agnt,C):- any_to_callable(C,X,Vars), !, gensym(result_count_,RC),flag(RC,_,0),agent_call_safely(RC,X,Vars),flag(RC,CC,CC),fmt(result_count(CC)).
@@ -113,7 +114,7 @@ any_to_callable(C,X,Vs):- (expand_goal(C,X)),term_variables((C,X),Vs),!.
 user:agent_call_command(_Agent,actNpcTimer(Time)):-retractall(npc_tick_tock_time(_)),asserta(npc_tick_tock_time(Time)).
 user:agent_call_command(Who,actTick) :-  debugOnError(command_actTick(Who)).
 user:agent_call_command(_Agent,actIdea(Who)) :-  must(command_actIdea(Who,Idea)),fmt(result_actIdea(Who,Idea)).
-user:agent_call_command(_Agent,actTock) :- npc_tick.
-user:agent_call_command(_Agent,actTick(Other)) :-user:agent_call_command(Other,actTick).
+user:agent_call_command(_Agent,actTock) :- (side_effect_prone), npc_tick.
+user:agent_call_command(_Agent,actTick(Other)) :-(side_effect_prone), user:agent_call_command(Other,actTick).
 
 % :- include(logicmoo(vworld/moo_footer)).

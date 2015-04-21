@@ -27,6 +27,7 @@
 :- include(dbase_i_header).
 :-export correctArgsIsa/3.
 
+assert_argIsa(Prop,N,Type):-show_call_failure(add_fast(argIsa(Prop,N,Type))).
 
 
 term_is_ft(Term,Type):- var(Term),!,member(Type,[ftVar,ftProlog]).
@@ -35,14 +36,14 @@ term_is_ft([T|Term],ftListFn(Type)):-!,is_list_of(Type,[T|Term]).
 term_is_ft(Term,Type):- no_repeats_av(Type,(term_is_ft_how(Term,Was),trans_subft(Was,Type))).
 
 
-term_is_ft_how(Term,Type):- is_asserted(defnSufficient(Type,Info)),(show_call_success((Info='SubLQuoteFn'(LISPSYMBOL),nop(Term+Type+LISPSYMBOL)))->fail;call(Info,Term)).
-term_is_ft_how(Term,Type):- compound(Term),functor(Term,F,A),functor(Type,F,A),hasInstance(ttFormatted,Type),
-   Type=..[_|Types],Term=..[_|Args],!,maplist(isa,Args,Types).
+term_is_ft_how(Term,Type):- is_asserted(quotedDefnIff(Type,Info)),nonvar(Info),(show_call_success((Info='SubLQuoteFn'(LISPSYMBOL),nop(Term+Type+LISPSYMBOL)))->fail;(append_term(Info,Term,CALL),mpred_call(CALL))),!.
+term_is_ft_how(Term,Type):- compound(Term),functor(Term,F,A),functor(Type,F,A),
+  once((hasInstance(ttFormatted,Type),Type=..[_|Types],Term=..[_|Args],maplist(isa,Args,Types))).
 
 trans_subft(FT,FT).
-trans_subft(FT,Sub):-dbase_t(subFormat(FT,Sub)).
-trans_subft(FT,Sub):-dbase_t(subFormat(FT,A)),dbase_t(subFormat(A,Sub)).
-trans_subft(FT,Sub):-dbase_t(subFormat(FT,A)),dbase_t(subFormat(A,B)),dbase_t(subFormat(B,Sub)).
+trans_subft(FT,Sub):-is_asserted(subFormat(FT,Sub)).
+trans_subft(FT,Sub):-is_asserted(subFormat(FT,A)),is_asserted(subFormat(A,Sub)).
+trans_subft(FT,Sub):-is_asserted(subFormat(FT,A)),is_asserted(subFormat(A,B)),is_asserted(subFormat(B,Sub)).
 
 is_id(ID):-atom(ID)->true;(compound(ID),arg(1,ID,A),is_id(A)).
 is_boolean(isMissing):-!,fail.
@@ -132,8 +133,8 @@ argIsa_call_0(isKappaFn,2,ftAskable).
 argIsa_call_0(isInstFn,1,tCol).
 argIsa_call_0(Col,1,Col):-hasInstance(tCol,Col).
 argIsa_call_0(Col,2,ftVoprop):-hasInstance(tCol,Col).
-argIsa_call_0(defnSufficient,1,ttFormatType).
-argIsa_call_0(defnSufficient,2,ftCallable).
+argIsa_call_0(quotedDefnIff,1,ttFormatType).
+argIsa_call_0(quotedDefnIff,2,ftCallable).
 argIsa_call_0(ttFormatted,1,ttFormatType).
 
 
@@ -144,7 +145,8 @@ argIsa_call_0(decl_mpred_hybrid,_,ftTerm).
 
 argIsa_call_0(isa,2,tCol).
 argIsa_call_0(mpred_prop,1,tPred).
-argIsa_call_0(mpred_prop,2,ftVoprop).
+argIsa_call_0(mpred_prop,2,ftArgTypes).
+argIsa_call_0(mpred_prop,3,ftVoprop).
 
 argIsa_call_0(formatted_resultIsa,1,ttFormatType).
 argIsa_call_0(formatted_resultIsa,2,tCol).
@@ -205,12 +207,12 @@ argIsa_call_3(subFormat,ttFormatType).
 grab_argsIsa(resultIsa,resultIsa(tFunction,tCol)).
 grab_argsIsa(P, A):-P==was_imported_kb_content,trace_or_throw(crazy_grab_argsIsa(was_imported_kb_content, A)).
 grab_argsIsa(P, A):-P=={}, trace_or_throw(crazy_grab_argsIsa({}, A)).
-grab_argsIsa(F,Types):- grab_argsIsa_6(Types),compound(Types),get_functor(Types,F),assert_predArgTypes_fa(F,Types).
+grab_argsIsa(F,Types):- grab_argsIsa_6(Types),compound(Types),Types\='$VAR'(_),get_functor(Types,F),assert_predArgTypes_fa(F,Types).
 
 grab_argsIsa_6(Types):- hasInstance(ttFormatted,Types).
 grab_argsIsa_6(mudColor(tSpatialThing, vtColor)).
 grab_argsIsa_6(Types):- hasInstance(predArgTypes,Types).
-grab_argsIsa_6(Types):- is_asserted(defnSufficient(Types,_)).
+grab_argsIsa_6(Types):- is_asserted(quotedDefnIff(Types,_)).
 grab_argsIsa_6(Types):- asserted_mpred_prop(_,predArgTypes(Types)).
 grab_argsIsa_6(Types):- hasInstance(_,Types),compound(Types),ground(Types).
 grab_argsIsa_6(Types):- current_predicate(get_all_templates/1),get_all_templates(Types),ground(Types).
@@ -228,6 +230,7 @@ argIsa_call_7(F,_,ftTerm(ftProlog)):-member(F/_,
                                 registered_module_type/2,       
                                 ruleBackward/2,
                                 formatted_resultIsa/2,
+                                pfcPT/_,rhs/_,pfcNT/_,pfcBT/_,
                                 bracket/3]).
 
 argIsa_call_7(mudFacing,_,ftTerm).
@@ -247,14 +250,14 @@ correctArgsIsa(In,Out):- correctArgsIsa(query(must,dbase_t),In,Out),!.
 :-export(correctArgsIsa/3).
 correctArgsIsa(_,NC,NC):-not(compound(NC)),!.
 correctArgsIsa(_,NC,NC):-as_is_term(NC),!.
-correctArgsIsa(_,G,G):- (is_release; bad_idea;  thlocal:infSkipArgIsa),!.
+correctArgsIsa(_,G,G):- (\+ thlocal:infMustArgIsa), (is_release; bad_idea; skipWrapper;  thlocal:infSkipArgIsa),!.
 correctArgsIsa(Op,M:G,MAA):- nonvar(M),!,correctArgsIsa(Op,G,GG),M:GG=MAA.
 correctArgsIsa(_,(A,B),(AA,BB)):-!,correctArgsIsa(Op,A,AA),correctArgsIsa(Op,B,BB).
 correctArgsIsa(_,isa(Args,PredArgTypes),isa(Args,PredArgTypes)):- predArgTypes==predArgTypes,!.
 correctArgsIsa(_,G,GG):- get_functor(G,F,A),
   arg(_,vv('{}'/_,  genls/_,user:mpred_prop/_,
-    hasInstance/2,arity/_,genls/_,'<=>'/_,
-    formatted_resultIsa/_,resultIsa/_,defnSufficient/_),F/A),!,must_equals(G,GG).
+    hasInstance/2,arity/_,genls/_,'<=>'/_,pfcPT/_,rhs/_,pfcNT/_,pfcBT/_,
+    formatted_resultIsa/_,resultIsa/_,quotedDefnIff/_),F/A),!,must_equals(G,GG).
 correctArgsIsa(_,G,GG):- get_functor(G,F),hasInstance(functorDeclares,F),!,must_equals(G,GG).
 correctArgsIsa(_,G,GG):- thlocal:infSkipArgIsa, !,must_equals(G,GG).
 correctArgsIsa(Op,G,GG):- correctArgsIsa0(Op,G,GG),nonvar(GG),!.
@@ -313,7 +316,7 @@ evaluatableFunctor(isOptional).
 
 % correctAnyType(_,A,_,A):-is_release.
 
-correctAnyType(_, A,_Type,AA):- var(A),sanity(var(AA)),must_det(A=AA),!.
+correctAnyType(_, A,_Type,AA):- is_ftVar(A),sanity(var(AA)),must_det(A=AA),!.
 correctAnyType(Op,A,Type,AA):-  var(A),correctType(Op,A,Type,AA),sanity(var(AA)),must_det(A==AA),!.
 correctAnyType(_, A,Type,AA):-  evaluatableArg(A,Type),dmsg(evaluatableArg(A,Type)),must_det(A=AA),!.
 correctAnyType(Op,A,Type,AA):- var(Type),trace_or_throw(correctAnyType(Op,A,Type,AA)).

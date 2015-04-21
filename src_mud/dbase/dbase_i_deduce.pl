@@ -16,6 +16,26 @@
 % Douglas Miles
 */
 
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
 % ========================================================================================
 % DEDUCE RETRACTIONS
 % ========================================================================================
@@ -51,7 +71,7 @@ alt_forms2(r,F,A,B,R,NP):-genlPreds(FF,F),NP=..[FF,A,B|R].
 %OLD user:decl_database_hook(Type,Fact):- current_predicate(add_deduction/3),current_predicate(add/1),run_deduce_facts_from(Type,Fact).
 
 
-%OLD user:decl_database_hook(_,user:mpred_prop('ArtifactCol1008-VISOR688', flagged_visor)):- trace_or_throw(user:mpred_prop('ArtifactCol1008-VISOR688', flagged_visor)).
+%OLD user:decl_database_hook(_,user:mpred_prop('ArtifactCol1008-VISOR688', N,flagged_visor)):- trace_or_throw(user:mpred_prop('ArtifactCol1008-VISOR688',N, flagged_visor)).
 
 run_deduce_facts_from(Type,M:Fact):-atom(M),!,run_deduce_facts_from(Type,Fact).
 run_deduce_facts_from(Type,Fact):-loop_check_local(run_deduce_facts_from_ilc(Type,Fact),true).

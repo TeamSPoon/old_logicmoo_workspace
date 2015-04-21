@@ -77,7 +77,7 @@
           create_agent/2)).
 
 :- dynamic  agent_list/1.
-
+:- dynamic mudDescription/2.
 
 :- include(moo_header).
 % :- register_module_type (utility).
@@ -99,6 +99,11 @@ obj_memb(E,L):-is_list(L)->member(E,L);E=L.
 isa_any(E,L):-flatten([E],EE),flatten([L],LL),!,intersect(A,EE,B,LL,isaOrSame(A,B),_Results).
 prop_memb(E,L):-flatten([E],EE),flatten([L],LL),!,intersect(A,EE,B,LL,isaOrSame(A,B),_Results).
 
+tCol(tItem).
+tCol(tAgentGeneric).
+tCol(tRegion).
+:-decl_type(tItem).
+tCol(tItem).
 exisitingThing(O):-tItem(O).
 exisitingThing(O):-tAgentGeneric(O).
 exisitingThing(O):-tRegion(O).
@@ -211,6 +216,8 @@ create_instance_0(T,tAgentGeneric,List):-
    % set_stats(P,[]),
    put_in_world(P),
    add_missing_instance_defaults(P)]).
+
+add_missing_instance_defaults(P):- add(tNewlyCreated(P)).
    
 /*
 reset_values(I):- forall(valueReset(To,From),reset_value(I,To,From)).

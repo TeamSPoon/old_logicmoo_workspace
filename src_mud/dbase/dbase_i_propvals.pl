@@ -12,7 +12,14 @@
 % Douglas Miles
 */
 
+
+
 :- include(dbase_i_header).
+
+
+side_effect_prone:- \+ thlocal:noDBaseMODs(_).
+
+
 
 :-meta_predicate_transparent(with_no_modifications(0)).
 with_no_modifications(CALL):-!,CALL.
@@ -39,6 +46,14 @@ infSecondOrder :- not(thlocal:infInstanceOnly(_)).
 
 :-thread_local(infThirdOrder/0).
 infThirdOrder :- fail, infSecondOrder, not(thlocal:noRandomValues(_)).
+
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+
+assert_argIsa(Prop,N,Type):-show_call_failure(add_fast(argIsa(Prop,N,Type))).
 
 
 % CANT :-export(transitive_other/4).
@@ -106,22 +121,6 @@ asserted_or_deduced(Fact):- test_tl(thlocal:infAssertedOnly,Fact),!,fail.
 asserted_or_deduced(Fact):- fact_maybe_deduced(Fact),is_fact_consistent(Fact),add(Fact).
 asserted_or_deduced(Fact):- deducedSimply(Fact),is_fact_consistent(Fact),add(Fact).
 
-:-export(my_random_member/2).
-my_random_member(LOC,LOCS):- must_det((length(LOCS,Len),Len>0)),random_permutation(LOCS,LOCS2),!,member(LOC,LOCS2).
-
-:-export(random_instance/3).
-random_instance_no_throw(Type,Value,Test):-var(Test),!,random_instance_no_throw(Type,Value,true).
-random_instance_no_throw(Type,Value,Test):- copy_term(ri(Type,Value,Test),ri(RType,RValue,RTest)),
-   hooked_random_instance(RType,RValue,RTest),
-   checkAnyType(query(_,_),RValue,Type,Value),
-   must_det(Test),!.
-random_instance_no_throw(Type,Value,Test):- atom(Type),atom_concat('random_',Type,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),call(Fact),Test,!.
-random_instance_no_throw(Type,Value,Test):- compound(Type),get_functor(Type,F),atom_concat('random_',F,Pred),current_predicate(F/1),Fact=..[Pred,Value],predicate_property(Fact,_),Fact,Test,!.
-random_instance_no_throw(Type,Value,Test):- compound(Type),get_functor(Type,F,GA),guess_arity(F,GA,A),functor(Formatted,F,A),hasInstance(ttFormatted,Formatted),
-                         Formatted=..[F|ArgTypes],functor(Value,F,A),Value=..[F|ValueArgs],must((maplist(random_instance_no_throw,ArgTypes,ValueArgs,_),Test)),!.
-random_instance_no_throw(Type,Value,Test):- findall(V,isa(V,Type),Possibles),Possibles\=[],must_det((my_random_member(Value,Possibles),Test)),!.
-
-random_instance(Type,Value,Test):- must(random_instance_no_throw(Type,Value,Test)).
 
 guess_arity(F,GA,A):-GA=0,!,must(arity(F,A)).
 guess_arity(F,GA,A):-arity(F,A);A=GA.
@@ -145,7 +144,7 @@ get_prop_args(Fact,Prop,ARGS):-Fact=..[Prop|ARGS],!.
 
 dont_check_args(Fact):-functor(Fact,F,A),dont_check_args(F,A).
 dont_check_args(isa,2).
-dont_check_args(user:mpred_prop,2).
+dont_check_args(user:mpred_prop,3).
 dont_check_args(arity,2).
 dont_check_args(A,1):-atom(A).
 
@@ -191,12 +190,6 @@ reallyCheckArgViolation(_,_,_,List,Type):-memberchk(Type,List),!.
 reallyCheckArgViolation(_Prop,_N,_Obj,[OType|_],OpenSubClass):- openSubClass(OpenSubClass), atom(OType),show_call_failure(assert_subclass_safe(OType,OpenSubClass)),!.
 reallyCheckArgViolation(Prop,N,Obj,OType,Type):- violatesType(Obj,Type),trace_or_throw(violatesType_maybe_cache(Prop,N,Obj,OType\=Type)).
 reallyCheckArgViolation(_,_,_,_,_).
-
-assert_argIsa(Prop,N,Type):-show_call_failure(add_fast(argIsa(Prop,N,Type))).
-
-assert_subclass_on_argIsa(Prop,N,argIsaFn(Prop,N)):-!.
-assert_subclass_on_argIsa(Prop,N,_OType):-argIsa(Prop,N,PropType),PropType=argIsaFn(Prop,N),!. % , assert_argIsa(Prop,N,OType).
-assert_subclass_on_argIsa(Prop,N,OType):-argIsa(Prop,N,PropType),assert_subclass_safe(OType,PropType).
 
 guessed_mpred_arity(F,A):-arity(F,AA),!,A=AA.
 guessed_mpred_arity(_,2).
@@ -280,7 +273,7 @@ defaultTypeValue(_Info,ftInt,0).
 defaultTypeValue(Fact,Type,Out):- random_instance(Type,ROut,nonvar(ROut)),dmsg(defaultArgValue(random_instance(Fact,Type,ROut=Out))),!,Out=ROut.
 
 % NEW FALLBACK SYSTEM:
-add_missing_instance_defaults(P):- hooked_asserta(ttNewlyCreated(P)).
+add_missing_instance_defaults(P):- hooked_asserta(tNewlyCreated(P)).
 /*
 
 :-export(get_instance_default_props/2).

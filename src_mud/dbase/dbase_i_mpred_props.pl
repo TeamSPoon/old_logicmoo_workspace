@@ -20,7 +20,7 @@
 % ========================================
 
 :- export arity/2.
-:- export user:mpred_prop/2.
+:- export user:mpred_prop/3.
 :- export is_never_type/1.
 
 %OLD user:decl_database_hook(change(assert,_),Fact):- ignore((compound(Fact),Fact=..[F,Arg1|PROPS],is_pred_declarer(F),decl_mpred(Arg1,[F|PROPS]))).
@@ -36,7 +36,7 @@ arity(isInstFn,1).
 arity(ftListFn,1).
 arity(xyzFn,4).
 arity(arity,2).
-arity(mpred_prop,2).
+arity(mpred_prop,3).
 arity(is_never_type,1).
 arity(self_call,1).
 arity(argIsa, 3).
@@ -51,6 +51,7 @@ arity('<=>',2).
 arity(typeHasGlyph,2).
 arity(mudMaxHitPoints,2).
 arity(F,A):- atom(F), current_predicate(F/A),A>1.
+arity(F,1):- atom(F), current_predicate(F/1).
 
 
 decl_mpred_pi(PI):-ignore((ground(PI),compound(PI),decl_mpred(PI))).
@@ -89,25 +90,63 @@ registerCycPredPlus2_3(M,_PI,F/A2):-
 
 registerCycPredPlus2(P):-!,user:with_pi(P,registerCycPredPlus2_3).
 
+
+:-op(0,fx,(decl_mpred_prolog)).
+
+:-export(decl_mpred_prolog/1).
+decl_mpred_prolog(P):- with_pi(P,decl_mpred_prolog).
+
+:-export(decl_mpred_prolog/3).
+decl_mpred_prolog(M,F,A):-integer(A),!,must(functor(PI,F,A)),decl_mpred_prolog(M,PI,F/A).
+decl_mpred_prolog(M,PI,FA):- must(decl_mpred_prolog(_,M,PI,FA)).
+
+decl_mpred_prolog(F,Other):- 
+     decl_mpred(F,Other),
+     get_functor(F,F0),
+     must(arity(F0,A)),
+     decl_mpred_prolog(F0/A).
+
+:-export(decl_mpred_prolog/4).
+decl_mpred_prolog(CM,M,PI,FA):- loop_check(must(decl_mpred_prolog_ilc(CM,M,PI,FA)),true).
+
+% decl_mpred_prolog_ilc(_,_,_,_):-!.
+decl_mpred_prolog_ilc(CM,M,PI,F/A):-
+      decl_mpred(F,arity(A)),
+      decl_mpred(F,prologOnly),
+      decl_mpred(F,predCanHaveSingletons),
+      decl_mpred(F,[info(decl_mpred_prolog(CM,M,PI,F/A))]),
+      decl_mpred(PI,predModule(M)).   
+
+
+:-op(1120,fx,decl_mpred_prolog).
+
+
+
 % ========================================
 % mpred_props database
 % ========================================
 user:mpred_prop(resolveConflict,predModule(user)).
 user:mpred_prop(pfcSelect,predModule(user)).
-user:mpred_prop(agent_text_command,prologOnly).
+user:mpred_prop(agent_text_command/4,prologOnly).
 user:mpred_prop(dbase_t,prologOnly).
-user:mpred_prop(member,prologOnly).
-user:mpred_prop(arity,prologOnly).
-user:mpred_prop(user:mpred_prop,prologOnly).
-user:mpred_prop(is_never_type,prologOnly).
-user:mpred_prop(term_expansion,prologOnly).
-user:mpred_prop(var,prologOnly).
-user:mpred_prop(F,Prop):-arity(F,A),functor(H,F,A),predicate_property(H,Prop).
-user:mpred_prop(H,Prop):-nonvar(H),get_functor(H,F), H \=@= F, !,user:mpred_prop(F,Prop).
-user:mpred_prop(F,Prop):-nonvar(Prop)->hasInstance(Prop, F);(mpred_call(hasInstance(ttPredType,Prop)),hasInstance(Prop, F)).
+user:mpred_prop(member/2,prologOnly).
+user:mpred_prop(arity/2,prologOnly).
+user:mpred_prop(mpred_prop/3,prologOnly).
+user:mpred_prop(is_never_type/1,prologOnly).
+user:mpred_prop(term_expansion/2,prologOnly).
+user:mpred_prop(var/1,prologOnly).
+user:mpred_prop(F,Prop):- current_predicate(hasInstance/2),  (nonvar(Prop)->(hasInstance(Prop, F));((hasInstance(ttPredType,Prop)),(hasInstance(Prop, F)))).
+user:mpred_prop(F,Prop):-nonvar(F),mpred_prop_nvh(F,Prop).
 %user:mpred_prop(F,tCol):-current_predicate(tCol/1),tCol(F).
 
+mpred_prop_nvh(H0,mpred_prop(Prop)):-get_arity(H0,F,A),atom(F),integer(A),functor(H,F,A),predicate_property(H,Prop).
+mpred_prop_nvh(H0,(Prop)):-nonvar(Prop),get_arity(H0,F,A),atom(F),integer(A),functor(H,F,A),predicate_property(H,Prop).
+mpred_prop_nvh(H,Prop):-get_functor(H,F,A), H \=@= F, !,user:mpred_prop(F,Prop).
+
 /*
+
+
+
 % user:mpred_prop(F,prologOnly):- not(user:mpred_prop(F,prologHybrid)),(F=is_pred_declarer;(current_predicate(F/1);not(hasInstance(F,tCol)))).
 user:mpred_prop(G,predProxyAssert(add)):- atom(G),prologMacroHead(G).
 user:mpred_prop(G,predProxyQuery(ireq)):- atom(G),prologMacroHead(G).
@@ -122,6 +161,11 @@ get_mpred_prop(F,P):- user:mpred_prop(F,P).
 :- export(listprolog/0).
 listprolog:-listing(user:mpred_prop(_,prologOnly)).
 
+
+get_arity(Term,F,A):- atom(Term),F=Term,!,ensure_arity(F,A).
+get_arity(F/A,F,A):- atom(F),ensure_arity(F,A),!.
+get_arity(M:FA,F,A):-atom(M),!,get_arity(FA,F,A).
+get_arity(FA,F,A):- get_functor(FA,F,A).
 
 ensure_arity(F,A):- one_must(arity(F,A),one_must((current_predicate(F/A),assert_arity(F,A)),(ground(F:A),assert_arity(F,A)))),!.
 

@@ -59,7 +59,7 @@ do_semweb_startup:-
    ((N2\=N1) -> do_semweb_startup ; true).
 
 % [Optionaly] register swish server (remote file editing)
-:- with_no_dbase_expansions(if_file_exists(ensure_loaded('../externals/swish/logicmoo_run_swish'))).
+% :- with_no_dbase_expansions(if_file_exists(ensure_loaded('../externals/swish/logicmoo_run_swish'))).
 
 % [Optionaly] register/run Cliopatria sparql server (remote RDF browsing)
 user:semweb_startup:-ensure_loaded('run_clio').
@@ -99,7 +99,9 @@ user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),s
 % this is what happens when the world is not found
 % :- add_game_dir('../games/src_game_unknown',prolog_repl).     
 
-% :- prolog_repl.
+% % :- prolog_repl.
+
+:- dynamic(mudDescription/2).
 
 tCol(tLivingRoom).
 genls(tLivingRoom,tRegion).
@@ -121,8 +123,6 @@ genls(tOfficeRoom,tRegion).
 % :- add_game_dir('../games/src_game_startrek',prolog_repl).
 % :- declare_load_dbase('../games/src_game_startrek/startrek.all.plmoo').
 
-:- do_ensure_some_pathBetween.
-
 tAgentGeneric(iCommanderData66).
 isa(iCommanderData66,'tMonster').
 isa(iCommanderData66,'tExplorer').
@@ -134,6 +134,7 @@ pddlSomethingIsa('iBoots673',['tBoots','ProtectiveAttire','PortableObject','tWea
 pddlSomethingIsa('iComBadge674',['tComBadge','ProtectiveAttire','PortableObject','tNecklace']).
 pddlSomethingIsa('iGoldUniform675',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
+
 mudDescription(iCommanderData66,txtFormatFn("Very screy looking monster named ~w",[iCommanderData66])).
 
 tAgentGeneric(iExplorer1).
@@ -149,6 +150,9 @@ pddlSomethingIsa('iPhaser776',['tPhaser','Handgun',tWeapon,'LightingDevice','Por
 isa(iExplorer1,'tExplorer').
 
 :-onSpawn(localityOfObject(iExplorer1,'tLivingRoom')).
+
+:- do_ensure_some_pathBetween.
+
 
 
 % [Manditory] This loads the game and initializes so test can be ran

@@ -1,3 +1,9 @@
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+
 % ==============================================
 :-ensure_loaded(dbase_i_sexp_reader).
 % 31 December 03 THIS IS A TRANSLATION IN KIF (ACCORDING TO THE KIF-DRAFT PROPOSED TO THE AMERICAN NATIONAL STANDARD NCITS.T2/98-004

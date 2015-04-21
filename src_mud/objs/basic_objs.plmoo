@@ -321,9 +321,10 @@ ensure_some_pathBetween(R1,R2):-
 
 :- decl_mpred_prolog(do_ensure_some_pathBetween/0).
 do_ensure_some_pathBetween:- 
-  (forall(no_repeats((is_asserted(pathConnects(R1,R2)),ground(R1:R2),isa(R1,tRegion),isa(R2,tRegion),dif(R1,R2))),show_call_failure((ensure_some_pathBetween(R1,R2),ensure_some_pathBetween(R2,R1))))).
+  must((forall(no_repeats((is_asserted(pathConnects(R1,R2)),ground(R1:R2),isa(R1,tRegion),isa(R2,tRegion),dif(R1,R2))),
+    show_call_failure((ensure_some_pathBetween(R1,R2),ensure_some_pathBetween(R2,R1)))))).
 
-:-onEachLoad(do_ensure_some_pathBetween).
+:-onEachLoad(must(do_ensure_some_pathBetween)).
 
 :-assert_until_end_of_file(infSupertypeName).
 :-onEndOfFile(dmsg(infSupertypeName)).
@@ -344,12 +345,12 @@ genls(tClothing, tItem).
 genls( tCarryAble, tItem).
 genls( tCarryAble, tDropAble).
 
-genls( tCarryAble, tThrowAble).
+% throw(sane_transitivity (genls( tCarryAble, tThrowAble))).
 % genls( tCarryAble, tCarryAble).
 
 genls(tPortableDevice,tCarryAble).
 
-:- decl_type(spatialInRegion).
+:- decl_mpred(spatialInRegion/1).
 
 :-do_gc.
 
@@ -357,11 +358,11 @@ genls(tClothing, tFoldAble).
 genls(tClothing, tWearAble).
 
 genls(tLiquidContainer, tDrinkAble).
-genls(tLiquidContainer, tThrowAble).
+genls(tLiquidContainer, tCarryAble).
 
 
 genls(tFoldAble, tCarryAble).
-genls(tThrowAble, tCarryAble).
+% genls(tThrowAble, tCarryAble).
 genls(tPortableDevice,tCarryAble).
 genls(tPortableDevice,tPhysicalDevice).
 genls(tPhysicalDevice,tUseAble).
@@ -394,11 +395,11 @@ dividesBetween(tObj,tMassfull,tMassless).
 dividesBetween(tSpatialThing,tObj,tRegion).
 dividesBetween(tAgentGeneric,tPlayer,tNpcPlayer).
 
-dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
+% dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
 
-disjointWith(P1,P2) => (not(isa(C,P1)) <=> isa(C,P2)).
+% disjointWith(P1,P2) => (not(isa(C,P1)) <=> isa(C,P2)).
 
-isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
+% isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
 
 => tCol(tCol).
 => tCol(tPred).
@@ -453,7 +454,11 @@ mudLabelTypeProps(wl,tWall,[mudHeight(3),mudWeight(4)]).
 
 (wearsClothing(A,I)=>{(add(tAgentGeneric(A)),add(tClothing(I)))}).
 
-(predArgTypes(Args)/pfcLiteral(Args)=>{ functor(Args,F,A), A>1, functor(Matcher,F,A)}, (({pfcLiteral(Matcher)},Matcher/pfcLiteral(Matcher))=>{deduceFromArgTypes(Matcher)})).
+(predArgTypes(Args)/pfcLiteral(Args)=>{ functor(Args,F,A), A>1, functor(Matcher,F,A)}, 
+  (({pfcLiteral(Matcher),pfcUserFact(Matcher),nop((clause_safe(Matcher,_))),\+((arg(_,Matcher,GT),var(GT)))},Matcher/pfcLiteral(Matcher))=>{deduceFromArgTypes(Matcher)})).
+
+genls(tBread, tFood).
+typeProps(tCrackers,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]).
 
 
 end_of_file.
@@ -470,7 +475,6 @@ genls(tBook, tReadAble).
 
 genls(tNani, tArt).
 genls(tNani, tWashAble).
-genls(tCrackers, tFood).
 genls(tEnvelope, tOfficeItem).
 genls(tStamp, tOfficeItem).
 genls(tKey, tOfficeItem).
@@ -549,7 +553,6 @@ typeProps(tEnvelope,[mudColor(vWhite),mudSize(vSmall),mudShape(vRectangular),mud
 typeProps(tDesk,[mudColor(isEach(vBrown,vShiney)),mudSize(vLarge),mudShape(isEach(vCubular,vRectangular)),mudTexture(isEach(vSmooth,vRidged)),mudWeight(175)]).
 typeProps(tWashingMachine,[mudColor(vWhite),mudSize(vLarge),mudShape(isEach(vCubular,vSquare)),mudMaterial(vMetal),mudTexture(vSmooth),mudWeight(125)]).
 typeProps(tBroccoli,[mudColor(vGreen),mudSize(vSmall),mudShape(isLikeFn(mudShape,tTree)),isa(tVegetable),mudTexture(isEach(vPorous,vBumpy))]).                                                                    
-typeProps(tCrackers,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]).
 typeProps(tComputer,[mudColor(vGrey),mudMaterial(vPlastic),mudShape(isEach(vCubular,vRectangular)),mudSize(vMedium),mudTexture(vSmooth)]).
 typeProps(tStamp,[mudColor(vPolychromatic),mudSize(isEach(vTiny,thin)),mudShape(vSquare),mudMaterial(vPaper),mudTexture(isEach(vSmooth,vSticky))]).
 typeProps(tCoat,[mudColor(vBlack),mudSize(isEach(vMedium,vFits)),mudShape(isLikeFn(mudShape,tTorso)),mudMaterial(isEach(vWool,vCotton,vRayon)),mudTexture(vCoarse)]).

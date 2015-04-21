@@ -1,4 +1,4 @@
-/** <module> dbase_i_mpred_dbase_t
+/** <module> dbase_i_mpred_prolog
 % Provides a prolog dabase in these predicates...
 %
 %  dbase_t/N
@@ -12,6 +12,15 @@
 */
 
 :- include(dbase_i_header).
+
+
+
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+
 
 user:provide_mpred_write_attributes(F,A,multifile):- multifile(F/A).
 user:provide_mpred_write_attributes(F,A,thread_local):- thread_local(F/A).
@@ -39,7 +48,7 @@ prolog_side_effects(G):-get_functor(G,F),user:mpred_prop(F,sideEffect),!.
 prolog_side_effects(G):-predicate_property(G,number_of_rules(N)),N >0,clause(G,(B,_)),compound(B),!.
 prolog_side_effects(G):-predicate_property(G,exported),!.
 prolog_side_effects(G):-functor_h(G,F),user:mpred_prop(F,prologOnly),!.
-prolog_side_effects(G):-user:mpred_prop(G,predStub(prologOnly)),!.
+prolog_side_effects(G):-get_mpred_prop(G,predStub(prologOnly)),!.
 prolog_side_effects(P):-atom(P),!,prolog_side_effects(P/_).
 
 
@@ -83,37 +92,7 @@ user:provide_mpred_setup(Op,HeadIn,StubType,OUT):-  StubType = prologOnly, get_p
    must(OUT=defined(user:provide_mpred_setup(Op,Head,StubType))).
 
    
-:-op(0,fx,decl_mpred_prolog).
 
-:-export(decl_mpred_prolog/1).
-decl_mpred_prolog(P):- with_pi(P,decl_mpred_prolog).
-
-:-export(decl_mpred_prolog/3).
-decl_mpred_prolog(M,F,A):-integer(A),!,must(functor(PI,F,A)),decl_mpred_prolog(M,PI,F/A).
-decl_mpred_prolog(M,PI,FA):- must(decl_mpred_prolog(_,M,PI,FA)).
-
-decl_mpred_prolog(F,Other):- 
-     decl_mpred(F,Other),
-     get_functor(F,F0),
-     must(arity(F0,A)),
-     decl_mpred_prolog(F0/A).
-
-:-export(decl_mpred_prolog/4).
-decl_mpred_prolog(CM,M,PI,FA):- loop_check(must(decl_mpred_prolog_ilc(CM,M,PI,FA)),true).
-
-% decl_mpred_prolog_ilc(_,_,_,_):-!.
-decl_mpred_prolog_ilc(CM,M,PI,F/A):-
-      assert_if_new(arity(F,A)),
-      assert_if_new(user:mpred_prop(F,prologOnly)),
-      assert_if_new(user:mpred_prop(F,predCanHaveSingletons)),
-      assert_if_new(user:mpred_prop(F,[info(decl_mpred_prolog(CM,M,PI,F/A))])),
-      decl_mpred(PI,predModule(M)),    
-      must(call_no_cuts((user:provide_mpred_setup(call(_),PI,prologOnly,OUT),dmsg(PI=OUT)))),!.      
-
-
-:-op(1120,fx,decl_mpred_prolog).
-
- 
 
 user_dynamic_multifile_exported(_):- dbase_mod(user),!.
 user_dynamic_multifile_exported(Prop/Arity):- 

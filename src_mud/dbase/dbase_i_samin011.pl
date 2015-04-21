@@ -1,3 +1,10 @@
+
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+
 % 3918 blanks
 % :-assert_kif(";================================================ ").
 % :-assert_kif("; SMINK011 An ontology derived from ").

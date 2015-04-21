@@ -129,10 +129,14 @@ term_singletons(Fml, NS,NSO, S,NSV):- compound(Fml),Fml=..[_,H|T],!, term_single
 
 subst_eq(A,B,C,D):-subst(A,B,C,D).
 
+get_kv(X=Y,X,Y):-!.
+get_kv(KV,X,Y):-functor(KV,_,1),KV=..[X,Y],!.
+get_kv(KV,X,Y):-arg(1,KV,X),arg(2,KV,Y),!.
+
 :-export(subsT_each/4).
 subsT_each(_,In,[],In):-!.
-subsT_each(each,In,[X=Y|TODO],Out):-!,subst_eq(In,X,Y,Mid),subsT_each(each,Mid,TODO,Out),!.
-subsT_each(REV,In,[X=Y|TODO],Out):-subst_eq(In,Y,X,Mid),subsT_each(REV,Mid,TODO,Out),!.
+subsT_each(each,In,[KV|TODO],Out):-!,get_kv(KV,X,Y),subst_eq(In,X,Y,Mid),subsT_each(each,Mid,TODO,Out),!.
+subsT_each(REV,In,[KV|TODO],Out):-!,get_kv(KV,X,Y),subst_eq(In,Y,X,Mid),subsT_each(REV,Mid,TODO,Out),!.
 
 contains_var_lits(Fml,Var,Lits):- findall(Lit,contains_t_var(Fml,Var,Lit),Lits).
 
@@ -143,13 +147,15 @@ get_isa0(IT,I,TT):-IT=..[T,I],is_colection_name(IT,T,TT),!.
 is_colection_name(_,-,_):-!,fail.
 is_colection_name(IT,T,TT):- atom_length(T,TL),TL>2,not(atom_contains(T,'_')),not(predicate_property(IT,_)),to_iname(T,TT).
 
+:-dynamic(mudEquals/2).
 :-export(mudEquals/2).
 mudEquals(X,Y):-X=Y.
 
 :-export(not_mudEquals/2).
+:-dynamic(not_mudEquals/2).
 not_mudEquals(X,Y):- X \= Y.
 
-
+to_iname(T,T):-!.
 to_iname(T,TT):-not(current_predicate(i_name/3)),!,T=TT.
 to_iname(T,TT):-is_ftVar(T)->TT=T;(not_log_op(T),i_name(t,T,TT)).
 
@@ -160,31 +166,39 @@ contains_t_var(Fml,Var,Term):-each_subterm(Fml,Term),compound(Term),arg(_,Term,O
 type_of_var(Fml,Var,Type):-contains_type_lits(Fml,Var,Lits),!,(member(Type,Lits)*->true;Type='Unk').
 
 to_dlog_ops([
-       % ';'='v',
-       % ','='&',
+       'theExists'='exists',
+       'ex'='exists',
+       'forAll'='all',
+       'forall'='all',
+       ';'='v',
+       ','='&',
        '~'='-',
      'not'='-',      
+     'neg'='-',
      'naf'='-',      
       ':-' = ':-',
      'and'='&',
       'or'='v',
-       ';'='v',
       ':-'=':-',
       '<='=':-',
  'implies'='=>',
+ 'implies_fc'='=>',
+ 'implies_bc'=':-',
    'equiv'='<=>',
       '=>'='=>',
      '<=>'='<=>']).
 
-to_symlog_ops(['v'='v',
+to_symlog_ops([
+   'v'='v',
    '&'='&',
    '=>'='=>',
    '<=>'='<=>',
    '~'='-',
    ':-'=':-']).
 
-to_prolog_ops(['v'=';',
-   '&'=',',
+to_prolog_ops([
+   'v'=';',
+   '&'=',',   
    '=>'='=>',
    '<=>'='<=>',
    '-'='not',
@@ -203,8 +217,9 @@ as_dlog(Fml,FmlO):- to_dlog_ops(OPS),subsT_each(each,Fml,OPS,FmlO),!.
 as_symlog(Fml,Fml):-is_ftVar(Fml),!.
 as_symlog(Fml,FmlO):- as_dlog(Fml,FmlM),to_symlog_ops(OPS),subsT_each(each,FmlM,OPS,FmlO).
 
-as_prolog(Fml,Fml):-is_ftVar(Fml),!.
-as_prolog(Fml,FmlO):- as_symlog(Fml,FmlM),
+:-dynamic(thglobal:as_prolog/2).
+thglobal:as_prolog(Fml,Fml):-is_ftVar(Fml),!.
+thglobal:as_prolog(Fml,FmlO):- as_symlog(Fml,FmlM),
   to_prolog_ops(OPS),subsT_each(each,FmlM,OPS,FmlO).
 
 
@@ -499,7 +514,11 @@ make_1_cl(KB,One,List,cl([One],NewBodyList)):-is_pos(One),!,delete_eq(List,One,R
 is_neg(-(_)).
 is_pos(One):-get_functor(One,F),!,not(is_log_op(F)).
 
+:-export(is_log_sent/1).
+is_log_sent(S):-get_functor(S,F,_),is_log_op(F).
+
 not_log_op(OP):-not(is_log_op(OP)).
+:-export(is_log_op/1).
 is_log_op(OP):-atomic(OP),to_dlog_ops(OPS),!,(member(OP=_,OPS);member(_=OP,OPS)).
 
 
@@ -666,7 +685,7 @@ flatten_or_list(_Orig,X,[X]).
 
 
 
-fmtl(X):- as_prolog(X,XX), fmt(XX).
+fmtl(X):- thglobal:as_prolog(X,XX), fmt(XX).
 
 write_list([F|R]) :- write(F), write('.'), nl, write_list(R).
 write_list([]).
@@ -716,17 +735,24 @@ ensure_quantifiers(Wff,WffO):-
 :-dynamic(function_corisponding_predicate/2).
 
 get_pred( Pred,F):-get_functor( Pred,F).
+is_function(F):- is_ftVar(F),!,fail.
+
+ 
 is_function(Function):-compound(Function),get_functor(Function,F,A),is_function(Function,F,A).
+
+is_function(_,'SubLQuoteFn',_):-!,fail.
 is_function(_,F,_):- atom_concat('sk',_Was,F),!,fail.
 is_function(_,F,_):- atom_concat(_Was,'Fn',F).
+is_function(_,F,_):- hasInstance(tFunction,F).
 is_function(_,F,A):- A2 is A+1,current_predicate(F/A2), not(current_predicate(F/A)).
 
-is_ftEquality(Term):-get_pred(Term,Pred),(user:mpred_prop( Pred,prologEquality);Pred==mudEquals).
+is_ftEquality(Term):-is_ftVar(Term),!,fail.
+is_ftEquality(Term):-get_pred(Term,Pred),(user:mpred_prop( Pred,_,prologEquality);Pred==mudEquals;genlPreds(Pred,equals)).
 
-function_to_predicate(Function,NewVar,Pred):-
+function_to_predicate(Function,NewVar,PredifiedFunction):-
   Function=..[F|ARGS],
   function_corisponding_predicate(F,P),
-  Pred=..[P,NewVar|ARGS].
+  PredifiedFunction=..[P,NewVar|ARGS].
 function_to_predicate(Function,NewVar,mudEquals(NewVar,Function)).
 
 :-export(defunctionalize/2).
@@ -738,8 +764,8 @@ defunctionalize(OP,Wff,WffO):- compound(Wff),
   not(is_ftEquality(SubTerm)),
   arg(_,SubTerm,Function),is_function(Function),
   subst_eq(SubTerm,Function,NewVar,NewSubTerm),
-  must(function_to_predicate(Function,NewVar,Pred)),
-  NEW =..[OP,Pred,NewSubTerm],
+  must(function_to_predicate(Function,NewVar,PredifiedFunction)),
+  NEW =..[OP,PredifiedFunction,NewSubTerm],
   subst_eq(Wff,SubTerm,NEW,NextWff),!,
   defunctionalize(OP,NextWff,WffO).
 defunctionalize(_,Wff,Wff).
@@ -764,6 +790,10 @@ kif_to_boxlog(WffIn,NormalClauses):- why_to_id(rule,WffIn,Why), kif_to_boxlog(Wf
 kif_to_boxlog(WffIn,Why,Out) :-  kif_to_boxlog(WffIn,'$VAR'('KB'),Why,Out),!.
 
 kif_to_boxlog((Wff:-B),KB,Why,Flattened) :- is_true(B),!, kif_to_boxlog(Wff,KB,Why,Flattened).
+kif_to_boxlog(or(X,Y,Z),KB,Why,Flattened):- !,kif_to_boxlog('v'(X,'v'(Y,Z)),KB,Why,Flattened).
+kif_to_boxlog(and(X,Y,Z),KB,Why,Flattened):- !,kif_to_boxlog('&'(X,'&'(Y,Z)),KB,Why,Flattened).
+kif_to_boxlog(neg(X),KB,Why,Flattened):- !,kif_to_boxlog(not(X),KB,Why,Flattened).
+  
 kif_to_boxlog((HEADIn:-BODYIn),KB,Why,Flattened) :-  
   ignore('$VAR'('KB')=KB),
   must_det_l([
@@ -997,11 +1027,11 @@ snark_tell_boxes(_,[]).
 snark_tell_boxes(Why,[H|T]):-!,snark_tell_boxes(Why,H),kb_incr(Why,Why2),snark_tell_boxes(Why2,T).
 snark_tell_boxes(Why,Assert):- trace,
   boxlog_to_prolog(Assert,PrologI),
-  as_prolog(PrologI,Prolog),
+  thglobal:as_prolog(PrologI,Prolog),
   wdmsgl(snark_tell_boxes(assert_wfs(Why,Prolog))),
   unnumbervars(Prolog,PTTP), must(assert_wfs(Why,PTTP)).
 
-assert_wfs(Why,PrologI):-as_prolog(PrologI,Prolog), with_assertions(thlocal:current_why(Why,Prolog),show_call(pfcAdd(Prolog))).
+assert_wfs(Why,PrologI):-thglobal:as_prolog(PrologI,Prolog), with_assertions(thlocal:current_why(Why,Prolog),show_call(pfcAdd(Prolog))).
 
 
 boxlog_to_prolog(V,V):-is_ftVar(V),!.
@@ -1009,15 +1039,17 @@ boxlog_to_prolog(impossible_in(_, H), - HH):-!,boxlog_to_prolog(H,HH).
 boxlog_to_prolog(proven_in(_, H),  HH):-!,boxlog_to_prolog(H,HH).
 
 boxlog_to_prolog(FSkip1, Conj):-FSkip1=..[when_in,_|ARGS],maplist(boxlog_to_prolog,ARGS,LIST),list_to_conjuncts(LIST,Conj),!.
+boxlog_to_prolog(ARGS, Conj):- is_list(ARGS),maplist(boxlog_to_prolog,ARGS,LIST),list_to_conjuncts(LIST,Conj),!.
 boxlog_to_prolog(proven_t(H),  HH):-!,boxlog_to_prolog(H,HH).
 boxlog_to_prolog(impossible_t(H), - HH):-!,boxlog_to_prolog(H,HH).
+boxlog_to_prolog((V :- TRUE),VE):-is_true(TRUE),boxlog_to_prolog(V,VE),!.
 boxlog_to_prolog((H:-B),(HH:-BB)):-!,boxlog_to_prolog(H,HH),boxlog_to_prolog(B,BB).
 boxlog_to_prolog((H & B),(HH , BB)):-!,boxlog_to_prolog(H,HH),boxlog_to_prolog(B,BB).
 boxlog_to_prolog((H v B),(HH ; BB)):-!,boxlog_to_prolog(H,HH),boxlog_to_prolog(B,BB).
 boxlog_to_prolog((H , B),(HH , BB)):-!,boxlog_to_prolog(H,HH),boxlog_to_prolog(B,BB).
 boxlog_to_prolog((H ; B),(HH ; BB)):-!,boxlog_to_prolog(H,HH),boxlog_to_prolog(B,BB).
 boxlog_to_prolog( - (H), - (HH)):-!,boxlog_to_prolog(H,HH).
-boxlog_to_prolog(BL,PTTP):-as_prolog(BL,PTTP).
+boxlog_to_prolog(BL,PTTP):-thglobal:as_prolog(BL,PTTP).
 
 
 /*
@@ -1035,6 +1067,7 @@ boxlog_to_prolog(BL,PTTP):-as_prolog(BL,PTTP).
 
 
 :-dynamic(snark_pred_head/1).
+:-style_check(-singleton).
 
 snark_pred_head(P):-var(P),user:mpred_prop(F,prologSNARK),arity(F,A),functor(P,F,A).
 snark_pred_head(P):-get_functor(P,F,_),user:mpred_prop(F,prologPTTP).

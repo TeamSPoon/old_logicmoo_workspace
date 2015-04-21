@@ -118,9 +118,6 @@ make_qlfs:-
 % :- catch(logicmoo('pldata/mworld0_declpreds.qlf'),_,make_qlfs).
 
 
-:- forall(filematch('../*/*/basic*.plmoo', X),(dmsg(ensure_plmoo_loaded(X)),ensure_plmoo_loaded(X))).
-
-
 /*
 
 % done in 'user' to avoid reloading when we reload dbase
@@ -152,7 +149,7 @@ download_and_install_el:-
 
 %:- xperimental_big_data->catch(user_ensure_loaded(logicmoo(pldata/el_assertions)),_,download_and_install_el);true.
 
-:- asserta(loaded_external_kbs),show_call(kbp_to_dbase_t).
+% :- asserta(loaded_external_kbs),show_call(kbp_to_dbase_t).
 
 :- user_ensure_loaded(logicmoo('vworld/world_agent.pl')).
 
@@ -212,6 +209,9 @@ user:agent_text_command(Agent,["run",Term], Agent,actProlog(Term)):- ignore(Term
 
 %:-forall(make_tabled_perm(get_all_templates(TEMPL)),dmsg(TEMPL)).
 %:-forall(make_tabled_perm(grab_argsIsa(F,Types)),dmsg(grab_argsIsa(F,Types))).
+
+
+:- forall(filematch('../*/*/basic*.plmoo', X),(dmsg(ensure_plmoo_loaded(X)),ensure_plmoo_loaded(X))).
 
 % [Optionaly] Start the telent server
 :-at_start(toploop_telnet:start_mud_telnet(4000)).

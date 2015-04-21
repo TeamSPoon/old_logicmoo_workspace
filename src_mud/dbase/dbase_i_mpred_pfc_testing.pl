@@ -10,14 +10,208 @@
 
 :- include(dbase_i_header).
 
-user:term_expansion(A,B):- once(pfc_file_expansion(A,B)),A\=@=B.
+% user:term_expansion(A,B):- current_predicate(pfcExpansion_loaded/0),loop_check(pfc_file_expansion(A,B)),A\=@=B.
+
 
 :- pfcTrace.
 %:- pfcWatch.
 :- pfcWarn.
+
 next_test :- sleep(1),pfcReset.
 
-:-dynamic((disjointWith/2,genls/2)).
+
+% :-dynamic((species/2)).
+
+:- pfc_setting_change(add,default,pfcAdd).
+
+
+species(fred,human).
+species(rover,dog).
+species(felix,cat).
+species(house1, house).
+species(house2, house).
+species(house3, house).
+species(house4, house).
+species(car1, car).
+species(car2, car).
+species(car3, car).
+
+male(fred).
+male(joe).
+male(jed).
+male(sam).
+male(george).
+male(jack).
+male(rover).
+male(felix).
+male(rover).
+male(felix).
+male(tramp).
+male(snoopy).
+%male(tim).
+male(harry).
+male(jason).
+female(mary).
+female(sally).
+female(jane).
+female(jill).
+female(mavis).
+female(lady).
+female(lassie).
+female(freida).
+female(jane).
+%female(terry).
+
+hasChild(fred, jed).
+hasChild(fred, sally).
+hasChild(joe, jane).
+hasChild(mary, jed).
+hasChild(mary, sally).
+hasChild(mary, jane).
+hasChild(jane, george).
+hasChild(jane, jack).
+hasChild(sam, george).
+hasChild(sam, jack).
+hasChild(jill, mavis).
+hasChild(george, mavis).
+hasChild(lady, rover).
+hasChild(lady, lassie).
+hasChild(tramp, lassie).
+hasChild(rover, snoopy).
+hasChild(lassie, snoopy).
+hasChild(tim, jason).
+hasChild(freida, jason).
+hasChild(jane, terry).
+hasChild(harry, terry).
+hasChild(jason, jill).
+hasChild(terry, jill).
+
+owns(sam, rover).
+owns(jane, rover).
+owns(jack, felix).
+owns(joe, snoopy).
+owns(tim, car2).
+owns(jane, house2).
+owns(harry, house2).
+owns(joe, car3).
+owns(terry, house4).
+owns(terry, car1).
+owns(jason, house4).
+owns(jason, car1).
+owns(jill, house1).
+owns(mavis, house3).
+owns(jane, lady).
+
+:- pfc_setting_change(neck,default,(<=)).
+
+parentOf(X,Y) :- hasChild(X,Y).
+
+
+motherOf(X,Y) :- parentOf(X,Y), female(X).
+motherOf(X,Y) :- parentOf(B,Y), parentOf(X,Y), X \= B, male(B).
+
+fatherOf(X,Y) :- parentOf(X,Y), male(X).
+fatherOf(X,Y) :- parentOf(B,Y), parentOf(X,Y), X \= B, female(B).
+
+grandparentOf(X,Y) :- parentOf(X,Z), parentOf(Z,Y).
+
+grandmotherOf(X,Y) :- grandparentOf(X,Y), female(X).
+grandmotherOf(X,Y) :- grandparentOf(X,Y), isFemale(X).
+
+grandfatherOf(X,Y) :- grandparentOf(X,Y), male(X).
+grandfatherOf(X,Y) :- grandparentOf(X,Y), isMale(X).
+
+greatgrandparentOf(X,Y) :- parentOf(X,Z), parentOf(Z,A), parentOf(A,Y).
+
+greatgrandmotherOf(X,Y) :- greatgrandparentOf(X,Y), female(X).
+greatgrandmotherOf(X,Y) :- greatgrandparentOf(X,Y), isFemale(X).
+
+greatgrandfatherOf(X,Y) :- greatgrandparentOf(X,Y), male(X).
+greatgrandfatherOf(X,Y) :- greatgrandparentOf(X,Y), isMale(X).
+
+childOf(X,Y) :- parentOf(Y,X).
+
+daughterOf(X,Y) :- parentOf(Y,X), isFemale(X).
+
+sonOf(X,Y) :- parentOf(Y,X), isMale(X).
+
+grandchildOf(X,Y) :- parentOf(Y,Z), parentOf(Z,X).
+
+granddaughterOf(X,Y) :- female(X), grandparentOf(Y,X).
+granddaughterOf(X,Y) :- isFemale(X), grandparentOf(Y,X).
+
+grandsonOf(X,Y) :- male(X), grandparentOf(Y,X).
+grandsonOf(X,Y) :- isMale(X), grandparentOf(Y,X).
+
+greatgrandchildOf(X,Y) :- greatgrandparentOf(Y,X).
+
+greatgranddaughterOf(X,Y) :- female(X), greatgrandparentOf(Y,X).
+greatgranddaughterOf(X,Y) :- isFemale(X), greatgrandparentOf(Y,X).
+
+greatgrandsonOf(X,Y) :- male(X), greatgrandparentOf(Y,X).
+greatgrandsonOf(X,Y) :- isMale(X), greatgrandparentOf(Y,X).
+
+ancestorOf(X,Y) :- parentOf(X, Y).
+ancestorOf(X,Y) :- parentOf(X, Z), ancestorOf(Z,Y).
+
+ancestorOf(X,Y,0) :- X =Y,true.
+ancestorOf(X,Y,1) :- parentOf(X,Y).
+ancestorOf(X,Y,N) :- number(N),!,N>1, N1 is N -1, ancestorOf(X,Y,N1).
+
+parent(X) :- hasChild(X,Y).
+
+%helper function
+descendantOf(X,Y) :- childOf(X,Y).
+descendantOf(X,Y) :- childOf(X,Z), childOf(Z,Y).
+related(X,X).
+related(X,Y) :- ancestorOf(X,Y).
+related(X,Y) :- ancestorOf(Y,X).
+related(X,Y) :- descendantOf(X,Y).
+related(X,Y) :- descendantOf(Y,X).
+
+sibling(X,Y) :- motherOf(Z,X), motherOf(Z,Y), fatherOf(W,X), fatherOf(W,Y), \+pet(X), \+pet(Y), X \= Y.
+
+sisterOf(X,Y) :- sibling(X,Y), female(X).
+sisterOf(X,Y) :- sibling(X,Y), isFemale(X).
+
+brotherOf(X,Y) :- sibling(X,Y), male(X).
+brotherOf(X,Y) :- sibling(X,Y), isMale(X).
+
+%helping function 
+atLeastOneParent(X,Y) :- (motherOf(Z,X), motherOf(Z,Y) ; fatherOf(W,X), fatherOf(W,Y) ).
+atLeastTwoParents(X,Y) :- (motherOf(Z,X), motherOf(Z,Y) , fatherOf(W,X), fatherOf(W,Y) ).
+stepSibling(X,Y) :- atLeastOneParent(X,Y), \+atLeastTwoParents(X,Y), \+pet(X), \+pet(Y), X \= Y.
+
+getSpecies(X,Y) :- species(X,Y).
+
+:- pfc_setting_change(neck,default,(=>)).
+
+isMale(A) :- male(A).
+isMale(A) :- parentOf(B, Y), parentOf(A, Y), A \= B, female(B).
+
+isFemale(A) :- female(A).
+isFemale(A) :- parentOf(B, Y), parentOf(A, Y), A \= B, male(B).
+
+pet(X) :- owns(Y,X), ( isMale(X) ; isFemale(X) ).
+
+
+(species(I,C) <=> (isa(I,C),isa(C,tCol))).
+
+dbase_t(Pred,A1,A2):- atom(Pred),Call=..[Pred,A1,A2],call(Call).
+% dbase_t(Pred,A1,A2,A3):- atom(Pred),Call=..[Pred,A1,A2,A3],(Call).
+
+((argIsa(Pred,1,Col),dbase_t(Pred,Arg,_)) => isa(Arg,Col)).
+
+((argIsa(Pred,2,Col),dbase_t(Pred,_,Arg)) => isa(Arg,Col)).
+
+argIsa(owns,1,human).
+argIsa(owns,2,notHuman).
+
+% :-pfc_set_forward(parent/1).
+
+end_of_file.
+
+:-dynamic((disjointWith/2,genls/2,isa/2)).
 
 %(disjointWith(P1,P2) , genls(C1,P1)) =>    disjointWith(C1,P2).
 disjointWith(Sub, Super) => disjointWith( Super, Sub).
@@ -27,11 +221,11 @@ disjointWith(ttSpatialType,ttAbstractType).
 
 tCol(Col) <=> isa(Col,tCol).
 
-(isa(I,Sub), genls(Sub, Super)) => isa(I,Super).
+% (isa(I,Sub), genls(Sub, Super)) => isa(I,Super).
 
 
 
-(isa(I,Sub), disjointWith(Sub, Super)) => not(isa(I,Super)).
+(isa(I,Sub), disjointWith(Sub, Super)) => neg(isa(I,Super)).
 
 genls(tPartOfobj,tItem).
 
@@ -44,7 +238,7 @@ dividesBetween(tAgentGeneric,tPlayer,tNpcPlayer).
 
 dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
 
-disjointWith(P1,P2) => (not(isa(C,P1)) <=> isa(C,P2)).
+disjointWith(P1,P2) => (neg(isa(C,P1)) <=> isa(C,P2)).
 
 isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
 
@@ -68,29 +262,6 @@ isa(tRelation,ttAbstractType).
 
 
 
-% a conflict triggers a Prolog action to resolve it.
-conflict(C) => {resolveConflict(C)}.
-
-% this isn't written yet.
-resolveConflict(C) :-
-  format("~NHalting with conflict ~w", [C]),
-  pfcJustification_L(C),
-  pfc_negate(C,N),
-  pfcJustification_L(N),
-  pfcHalt.
-
-% meta rules to schedule inferencing.
-
-% resolve conflicts asap
-pfcSelect(conflict(X)) :- pfcQueue(conflict(X)).
-  
-% a pretty basic conflict.
-not(P), P => conflict(P).
-
-
-
-
-
 :-dynamic(pfcDefault/1).
 % -*-Prolog-*-
 % here is an example which defines pfcDefault facts and rules.  Will it work?
@@ -108,6 +279,9 @@ not(P), P => conflict(P).
 % this isnt written yet.
 resolveConflict(C) :-
   format("~NHalting with conflict ~w", [C]),
+   pfcJustification_L(C),
+   pfc_negate(C,N),
+   pfcJustification_L(N),   
   pfcHalt.
 
 % meta rules to schedule inferencing.
@@ -130,7 +304,6 @@ notequal(C,B) <= equal(A,C),notequal(A,B).
 % is this how to define constraints?
 % either(P,Q) => (neg(P) => Q), (neg(Q) => P).
 % (P,Q => false) => (P => neg(Q)), (Q => neg(P)).
-
 
 :-dynamic((fly/1,bird/1,penguin/1)).
 
@@ -568,9 +741,9 @@ test1 :-
   % -*-Prolog-*-
 % here is an example which defines pfcDefault facts and rules.  Will it work?
 
-(pfcDefault(P)/pfcLiteral(P))  =>  (~not(P) => P).
+(pfcDefault(P)/pfcLiteral(P))  =>  (~neg(P) => P).
 
-pfcDefault((P => Q))/pfcLiteral(Q) => (P, ~not(Q) => Q).
+pfcDefault((P => Q))/pfcLiteral(Q) => (P, ~neg(Q) => Q).
 
 % birds fly by pfcDefault.
 => pfcDefault((bird(X) => fly(X))).
@@ -586,8 +759,8 @@ isa(C1,C2) =>
 => isa(canary,bird).
 => isa(penguin,bird).
 
-% penguins do not fly.
-penguin(X) => not(fly(X)).
+% penguins do neg fly.
+penguin(X) => neg(fly(X)).
 
 % chilly is a penguin.
 :-(add(=> penguin(chilly))).
@@ -1068,27 +1241,27 @@ type(Super,Role,Type), genls(Super,Sub) => type(Sub,Role,Type).
 genls(Super,Sub),
       genls(Super,SubSub),
       {Sub \== SubSub},
-      \+ not(subsumes(Sub,SubSub)),
-      \+ not(primitive(SubSub))
+      \+ neg(subsumes(Sub,SubSub)),
+      \+ neg(primitive(SubSub))
       =>
       genls(Sub,SubSub).
 
 disjoint(C1,C2) => disjoint(C2,C1).
 
-not(subsume(C1,C2)) <= genls(C2,C1).
+neg(subsume(C1,C2)) <= genls(C2,C1).
 
-not(subsumes(C1,C2)) <= disjoint(C1,C2).
+neg(subsumes(C1,C2)) <= disjoint(C1,C2).
 
-not(subsumes(C1,C2)) <=
+neg(subsumes(C1,C2)) <=
   % we can't infer that C1 subsumes C2 if C1 has a role that C2 doen't.
   role(C1,R),
   \+ role(C2,R).
 
-not(subsumes(C1,C2)) <=
+neg(subsumes(C1,C2)) <=
   % we can't infer that C1 subsumes C2 if C1 has a role a type that...
   type(C1,R,T1),
   type(C2,R,T2),
-  not(subsume(T1,T2)).
+  neg(subsume(T1,T2)).
 
 :-export otherGender/2.
 :-next_test. % ==
@@ -1182,19 +1355,19 @@ show(P) => demons(P,show_pfc_fact(P),hide_pfc_fact(P)).
 
 (P ==> Q) => 
   (P => Q),
-  (not(Q) => not(P)).
+  (neg(Q) => neg(P)).
 
 
 or(P,Q) => 
-  (not(P) => Q),
-  (not(Q) => P).
+  (neg(P) => Q),
+  (neg(Q) => P).
 		
 prove_by_contradiction(P) :- P.
 prove_by_contradiction(P) :-
-  \+ (not(P) ; P),
-  add(not(P)),
-  P -> pfcRem(not(P))
-    ; (pfcRem(not(P)),fail).
+  \+ (neg(P) ; P),
+  add(neg(P)),
+  P -> pfcRem(neg(P))
+    ; (pfcRem(neg(P)),fail).
 
 => or(p,q).
 => (p ==> x).
@@ -1208,9 +1381,9 @@ prove_by_contradiction(P) :-
 :-next_test. % ==
 % here is an example which defines pfcDefault facts and rules.  Will it work?
 
-(pfcDefault(P)/pfcLiteral(P))  =>  (~not(P) => P).
+(pfcDefault(P)/pfcLiteral(P))  =>  (~neg(P) => P).
 
-pfcDefault((P => Q))/pfcLiteral(Q) => (P, ~not(Q) => Q).
+pfcDefault((P => Q))/pfcLiteral(Q) => (P, ~neg(Q) => Q).
 
 % birds fly by pfcDefault.
 => pfcDefault((bird(X) => fly(X))).
@@ -1226,8 +1399,8 @@ scl(C1,C2) =>
 => scl(canary,bird).
 => scl(penguin,bird).
 
-% penguins do not fly.
-penguin(X) => not(fly(X)).
+% penguins do neg fly.
+penguin(X) => neg(fly(X)).
 
 % chilly is a penguin.
 => penguin(chilly).
@@ -1239,24 +1412,24 @@ penguin(X) => not(fly(X)).
 
 % is this how to define constraints?
 
-either(P,Q) => (not(P) => Q), (not(Q) => P).
+either(P,Q) => (neg(P) => Q), (neg(Q) => P).
 
-(P,Q => false) => (P => not(Q)), (Q => not(P)).
+(P,Q => false) => (P => neg(Q)), (Q => neg(P)).
 
 
 :-next_test. % ==
 % here is an interesting rule!
 
-not(P), P => contradiction(P).
+neg(P), P => contradiction(P).
 
 contradiction(P) => 
-  {format('~n% contradiction - both ~w and not(~w) added.~n',[P,P])}.
+  {format('~n% contradiction - both ~w and neg(~w) added.~n',[P,P])}.
 
 % this means that both P and Q can't be true.
 disjoint(P,Q)
   =>
-  (P => not(Q)),
-  (Q => not(P)).
+  (P => neg(Q)),
+  (Q => neg(P)).
 
 => disjoint(male(P), female(P)).
 
@@ -1276,9 +1449,9 @@ bel(A1,desire(A2,know(A2,bel(A1,P)))), self(A1), bel(A1,P) => tell(A1,A2,P).
 
 bel(A1,desire(A2,knowif(A2,P))),
 self(A1),
-bel(A1,not(P))
+bel(A1,neg(P))
 =>
-tell(A1,A2,not(P)).
+tell(A1,A2,neg(P)).
 
 
 => fact(0,1).
@@ -1336,17 +1509,17 @@ merge(T1,T2,N) :-
 
 
 
-not(P),P => contrradiction.
+neg(P),P => contrradiction.
 
-bird(X), ~not(fly(X)) => fly(X).
+bird(X), ~neg(fly(X)) => fly(X).
 
 penguin(X) => bird(X).
 
-penguin(X) => not(fly(X)).
+penguin(X) => neg(fly(X)).
 
-bird(X), injured(X) => not(fly(X)).
+bird(X), injured(X) => neg(fly(X)).
 
-bird(X), dead(X) => not(fly(X)).
+bird(X), dead(X) => neg(fly(X)).
 
 :-pfcPrintDB.
 
@@ -1555,10 +1728,10 @@ lit(X) => notequal(voltage(t1(X)),voltage(t2(X))).
 
 
 % a pretty basic conflict.
-not(P), P => conflict(P).
+neg(P), P => conflict(P).
 
 % this doesn't work anyomore. twf.
-% voltage(T,V) => (not(voltage(T,V2)) <= {\+V=:=V2}).
+% voltage(T,V) => (neg(voltage(T,V2)) <= {\+V=:=V2}).
 
 % It is a conflict if a terminal has two different voltages.
 voltage(T,V1), voltage(T,V2)/(\+V1=:=V2) => conflict(two_voltages(T,V1,V2)).
@@ -1619,8 +1792,8 @@ isa(X,gizmo) =>
 
 test_bs(X) :- 
   add([isa(X,gizmo),
-       observed(not(lit(b1(X)))),
-       observed(not(lit(b2(X)))),
+       observed(neg(lit(b1(X)))),
+       observed(neg(lit(b2(X)))),
        observed(lit(b3(X)))]).
 
 
@@ -1682,7 +1855,7 @@ isa(X,gizmo) =>
 
 test_b1(X) :- 
   add([isa(X,gizmo),
-       observed(not(lit(bulb(X))))]).
+       observed(neg(lit(bulb(X))))]).
 
 
 

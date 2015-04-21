@@ -1,6 +1,13 @@
 :-swi_module(dbase_i_call_kb,[]).
 
 
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+
+
 :- dynamic(assertion_f/1).
 :- export(kb_f/1).
 kb_f(X):-assertion_f(X).
@@ -197,7 +204,6 @@ assert_to_db_list(HOLDS,PLIST):- safe_univ(Call,[HOLDS|PLIST]), assert(assert_ne
 with_kb_assertions_matching(PLIST,Proof,Call):- doall((kbp_t_list(PLIST, Proof),Call)).
    
 :-export(kbp_to_dbase_t/0).
-
 kbp_to_dbase_t:- must_det(with_assertions(thlocal:useOnlyExternalDBs,kbp_to_dbase_0)).
 
 kbp_to_dbase_0:-!.

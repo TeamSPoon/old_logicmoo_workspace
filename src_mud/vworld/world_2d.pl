@@ -196,7 +196,7 @@ same_regions(Agent,Obj):-inRegion(Agent,Where1),dif(Agent,Obj),inRegion(Obj,Wher
 %:- ensure_universal_stub(prologPTTP,inRegion/2).
 %:- ensure_universal_stub(prologPTTP,mudTestAgentWearing/2).
 
-:-decl_mpred_prolog(mudAtLoc/2).
+:-decl_mpred_hybrid(mudAtLoc/2).
 predArgTypes(mudAtLoc(tObj,tSpatialThing)).
 
 
@@ -258,7 +258,7 @@ genls(tHumanBody,tBodyPart).
 predInnerArgIsa(mudSubPart(tBodyPart,tBodyPart)).
 
 
-relationAllExists(Pred,Col1,Col2), isa(Inst,Col1) => ({G=..[Pred,Inst,Value]},( ~G => ({Value=skFn(Pred,Col2)},isa(Value,Col2), G))).
+relationAllExists(Pred,Col1,Col2), isa(Inst,Col1) => ({G=..[Pred,Inst,Value]},( ~G => ({Value=skPredArg2InstFn(Pred,Col2)},isa(Value,Col2), G))).
 
 relationAllExists(mudSubPart,tHominid,tHumanBody).
 relationAllExists(mudSubPart,tHumanBody,tBodyPart).

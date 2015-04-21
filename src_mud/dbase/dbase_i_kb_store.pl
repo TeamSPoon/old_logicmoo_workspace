@@ -301,7 +301,7 @@ clr(P):- agenda_do_prequery,forall(P, must(((
  doall((  
   must(pfcGetSupportORNil(P,Support)),
   must(show_call(pfcFilterSupports(Support,fact,Results))),
-  must(pfcDoConjs(pfcRemE,Results)),
+  must(pfc_maptree(pfcRemE,Results)),
   pfcRemE(P),
   sanity(not(pfcSupported2(local,P))))),
                  not(P))))).
@@ -359,23 +359,25 @@ forall_setof(ForEach,Call):-
 add(A):- var(A),!,trace_or_throw(var_add(A)).
 add(end_of_file):-!.
 add(grid_key(KW=COL)):- !, add(typeHasGlyph(COL,KW)).
+% add(Term):- unnumbervars(Term,TermE), Term \=@= TermE,!,add(TermE).
 add(Term):- expands_on(isEach,Term), !,forall(do_expand_args(isEach,Term,O),add(/*to_exp*/(O))),!.
 add(TermIn):- fully_expand(change(assert,add),TermIn,Term),add_0(Term).
 
 add_0(A):- is_ftVar(A),!,trace_or_throw(var_add(A)).
 add_0(((H1,H2):-B)):-!,add_0((H1:-B)),add_0((H2:-B)).
 add_0(((H1,H2))):-!,add_0((H1)),add_0((H2)).
+add_0(dynamic(Term)):- !,must(get_arity(Term,F,A)), must(dynamic(F/A)).
 add_0(:-(Term)):- !, must(add_fast(:-(Term))).
 % add_0(C0):-check_override(add(C0)),!.
-add_0(Skipped):- ground(Skipped),implied_skipped(Skipped),!,dmsg(implied_skipped(Skipped)).
-add_0(C0):- ignore((ground(C0),asserta(user:already_added_this_round(C0)))),!,must_det(pfcAdd_fast(C0)).
+% add_0(Skipped):- ground(Skipped),implied_skipped(Skipped),!. % ,dmsg(implied_skipped(Skipped)).
+add_0(C0):- ignore((ground(C0),asserta(user:already_added_this_round(C0)))),must(pfcAdd_fast(C0)),!.
 add_0(A):-trace_or_throw(fmt('add/1 is failing ~q.',[A])).
 
 
 implied_skipped(genls(C0,C0)).
 implied_skipped(props(_,[])).
 implied_skipped(Skipped):-compound(Skipped), not(functor(Skipped,_,1)),fail, (dbase_t(Skipped);out_of_dbase_t(Skipped)).
-% implied_skipped(Skipped):-user:already_added_this_round(Skipped).
+implied_skipped(Skipped):-user:already_added_this_round(Skipped),(is_asserted(Skipped)).
 
 
 :-export(pfcAdd_fast/1).
@@ -430,7 +432,7 @@ db_assert_sv_now(Must,C,F,A, REPLACE):- db_assert_sv_replace(Must,C,F,A, REPLACE
 db_assert_sv_update(Must,C,F,A,UPDATE):-
    replace_arg(C,A,OLD,COLD),
    % prefer updated values to come from instances but will settle with anything legal
-   notrace(must_det((once(ireq(COLD);mreq(COLD)),ground(COLD)))),
+   notrace(must((once(ireq(COLD);mreq(COLD)),ground(COLD)))),
    update_value(OLD,UPDATE,NEW),!,
    db_assert_sv_replace(Must,C,F,A,NEW),!.
 

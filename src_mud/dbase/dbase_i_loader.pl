@@ -141,14 +141,6 @@ load_dbase_name_stream(_Name):- do_gc,repeat,read_one_term(Term,Vs),myDebugOnErr
 load_dbase_name_stream(_Name,Stream):- do_gc,repeat,read_one_term(Stream,Term,Vs),myDebugOnError(add_term(Term,Vs)),Term == end_of_file,!.
 
 
-dbase_numbervars_with_names(Term):-
-   term_variables(Term,Vars),dbase_name_variables(Vars),!,numbervars(Vars,91,_,[attvar(skip),singletons(true)]),!.
-
-dbase_name_variables([]).
-dbase_name_variables([Var|Vars]):-
-   (var_property(Var, name(Name)) -> Var = '$VAR'(Name) ; true),
-   dbase_name_variables(Vars).
-
 add_term(end_of_file,_):-!.
 add_term(Term,Vs):- 
    b_setval('$variable_names', Vs),
@@ -158,12 +150,12 @@ add_term(Term,Vs):-
 add_from_file(Term):-  
   with_assertions(thlocal:already_in_file_term_expansion,must(add(Term))).
 
-myDebugOnError(Term):-catch(once(must((Term))),E,(dmsg(error(E,start_myDebugOnError(Term))),trace,rtrace((Term)),dmsginfo(stop_myDebugOnError(E=Term)),trace)).
+myDebugOnError(Term):-catch(once(must((Term))),E,(dmsg(error(E,start_myDebugOnError(Term))),trace,rtrace((Term)),dmsginfo(stop_myDebugOnError(E=Term)),trace,Term)).
          
 read_one_term(Term,Vs):- catch(once(( read_term(Term,[double_quotes(string),variable_names(Vs)]))),E,(Term=error(E),dmsg(error(E,read_one_term(Term))))).
 read_one_term(Stream,Term,Vs):- catch(once(( read_term(Stream,Term,[double_quotes(string),variable_names(Vs)]))),E,(Term=error(E),dmsg(error(E,read_one_term(Term))))).
 
-rescan_mpred_stubs:- doall((user:mpred_prop(F,prologHybrid),arity(F,A),A>0,warnOnError(declare_dbase_local_dynamic(moo,F,A)))).
+% rescan_mpred_stubs:- doall((user:mpred_prop(F,prologHybrid),arity(F,A),A>0,warnOnError(declare_dbase_local_dynamic(moo,F,A)))).
 
 :-ensure_loaded(dbase_i_sexpr_reader).
 
@@ -327,7 +319,7 @@ scan_updates:-!.
 scan_updates:-ignore(catch(make,_,true)).
 
 
-do_term_expansions:- context_module(CM), notrace(do_term_expansions(CM)).
+do_term_expansions:- context_module(CM), (do_term_expansions(CM)).
 
 do_term_expansions(_):- thread_self(ID),always_expand_on_thread(ID),!.
 do_term_expansions(_):- always_transform_heads,not(prevent_transform_moo_preds),!.

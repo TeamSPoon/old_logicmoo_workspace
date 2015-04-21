@@ -48,7 +48,7 @@ user:hasInstance_dyn(ttSpatialType,tObj).
 user:hasInstance_dyn(ttSpatialType,tRegion).
 user:hasInstance_dyn(ttSpatialType,tSpatialThing).
 
-user:hasInstance_dyn(W,isKappaFn(_,S)):-nonvar(S),nonvar(W),!.
+user:hasInstance_dyn(W,SS):-nonvar(W),nonvar(SS),SS=isKappaFn(_,S),nonvar(S),!.
 
 
 hasInstance(T,I):- user:hasInstance_dyn(T,I).
@@ -69,7 +69,8 @@ assert_hasInstance(T,I):- assert_if_new(user:hasInstance_dyn(T,I)),!,expire_tabl
 % ========================================
 :-export(is_typef/1).
 is_typef(C):-var(C),!,fail.
-is_typef(prologSingleValued).
+is_typef(prologSingleValued):-!.
+is_typef(F):- isa_backchaing(F,tCol),!.
 is_typef(F):- (hasInstance(functorDeclares,F);hasInstance(tCol,F);clause(asserted_mpred_prop(F,tCol),true)),!.
 is_typef(F):- atom(F),current_predicate(isa_from_morphology/2),isa_from_morphology(F,TT),!,atom_concat(_,'Type',TT).
 
@@ -78,12 +79,14 @@ is_typef(F):- atom(F),current_predicate(isa_from_morphology/2),isa_from_morpholo
 % Checks F for not_mudIsa(F,tCol).
 % ========================================
 :-export is_never_type/1.
+
 is_never_type(V):-var(V),!,fail.
 is_never_type(V):-never_type_why(V,_),!.
 
 
 never_type_f(Var):-is_ftVar(Var),!,trace_or_throw(var_never_type(Var)).
 never_type_f(F):-hasInstance(T,F),T==tCol,!,fail.
+never_type_f(_:W):-!,never_type_f(W).
 never_type_f(':-').
 never_type_f('include').
 never_type_f('tCol'):-!,fail.
@@ -96,10 +99,12 @@ never_type_f('Area1000').
 never_type_f(iPlayer2).
 never_type_f(genls).
 never_type_f(must).
-never_type_f(user:mpred_prop).
+never_type_f(mpred_prop).
 never_type_f(defnSufficient).
+never_type_f(backchainForbidden).
 
 noncol_type('LogicalConnective').
+
 
 never_type_why(V,ftVar(isSelf)):-is_ftVar(V),!.
 never_type_why(mpred_call,mpred_call(isSelf)):-!.
@@ -161,12 +166,13 @@ type_prefix(macro,ttMacroType).
 % ========================================
 :- dynamic decided_not_was_isa/2.
 :-export(was_isa/3).
-was_isa(G,I,C):-notrace(((not(decided_not_was_isa(G,When)),compound(G),once(was_isa0(G,I,C)-> true;((functor(G,F,1),get_when(When),asserta(decided_not_was_isa(F,When)),!,fail)))))).
+was_isa(G,I,C):-compound(G),functor(G,F,_),notrace(((not(decided_not_was_isa(F,_)),once(was_isa0(G,I,C)-> true;((functor(G,F,1),get_when(When),asserta_if_new(decided_not_was_isa(F,When)),!,fail)))))).
 
 % get_when(When)
 get_when(F:L):-source_location(F,L),!.
 get_when(F:L):-source_location(file,F),current_input(S),line_position(S,L),!.
 get_when(When):-current_input(S),findall(NV,stream_property(S,NV),When),!.
+get_when(M):-context_module(M),!.
 get_when(user):-!.
 
 
@@ -312,10 +318,10 @@ not_mud_isa(G,tCol,Why):-never_type_why(G,Why).
 % isa_backchaing(i,c)
 % ==========================
 :-export(isa_backchaing/2).
-isa_backchaing(I,T):- no_repeats(isa_backchaing_0(I,T)).
+isa_backchaing(I,T):- (atom(I);var(I)),!, no_repeats(isa_backchaing_0(I,T)).
 
 :-export(isa_backchaing_0/2).
-isa_backchaing_0(I,T):-  T==ftVar,!,var(I).
+isa_backchaing_0(I,T):-  T==ftVar,!,is_ftVar(I).
 isa_backchaing_0(I,T):-  var(I),nonvar(T),!,no_repeats_old(transitive_subclass_or_same(AT,T)),isa_asserted(I,AT).
 isa_backchaing_0(I,T):-  var(I),   var(T),!,setof(TT,AT^(isa_asserted(I,AT),transitive_subclass_or_same(AT,TT)),List),!,member(T,List).
 isa_backchaing_0(I,T):-  nonvar(T),!,isa_backchaing_i_i(I,T),!.
@@ -425,6 +431,8 @@ decl_type(Spec):- compound(Spec),must_det(define_compound_isa(Spec,tCol)),!.
 decl_type(Spec):- decl_type_unsafe(Spec),!.
 
 decl_type_unsafe(Spec):- never_type_why(Spec,Why),!,trace_or_throw(never_type_why(Spec,Why)).
+decl_type_unsafe(Spec):- !, must((with_assertions([thlocal:infSkipArgIsa,thlocal:infSkipFullExpand],(add(isa(Spec,tCol)),add(arity(Spec,1)))))).
+
 decl_type_unsafe(Spec):-
  with_assertions([thlocal:infSkipArgIsa,thlocal:infSkipFullExpand], 
    ((hooked_asserta(isa(Spec,tCol)),assert_hasInstance(tCol,Spec),hooked_asserta(user:mpred_prop(Spec,tCol)),decl_mpred_hybrid(Spec/1)))),!.

@@ -45,7 +45,7 @@ agenda_do_prequery:- loop_check_local(agenda_rescan_dbase_ops,true).
 :-export(agenda_slow_op_restart/0).
 
 % agenda_slow_op_restart:-!.
-agenda_slow_op_restart:- loop_check(forall(retract(agenda_slow_op_todo(Slow)),(must(is_callable(Slow)),must_det(Slow))),true).
+agenda_slow_op_restart:- loop_check(forall(user:agenda_slow_op_todo(Slow),(must(is_callable(Slow),Slow,ignore(retract(user:agenda_slow_op_todo(Slow)))))),true).
 
 :-export(agenda_rescan_dbase_ops/0).
 agenda_rescan_dbase_ops:- test_tl(agenda_suspend_scans),!.
@@ -56,8 +56,9 @@ agenda_rescan_for_module_ready:- thlocal:in_agenda_rescan_for_module_ready,!.
 agenda_rescan_for_module_ready:- with_assertions(thlocal:in_agenda_rescan_for_module_ready,loop_check_local(do_all_of(dbase_module_ready),true)).
 
 :-export agenda_slow_op_todo/1.
-agenda_slow_op_enqueue(Slow):- test_tl(agenda_slow_op_do_prereqs),!,debugOnError(Slow).
-agenda_slow_op_enqueue(Slow):- assertz_if_new(agenda_slow_op_todo(Slow)),!.
+:-dynamic agenda_slow_op_todo/1.
+user:agenda_slow_op_enqueue(Slow):- test_tl(agenda_slow_op_do_prereqs),!,debugOnError(Slow).
+user:agenda_slow_op_enqueue(Slow):- assertz_if_new(agenda_slow_op_todo(Slow)),!.
 
 :-dynamic(user:already_added_this_round/1).
 expire_dont_add:-retractall(user:already_added_this_round(_)),expire_tabled_list(all),nop(dmsg(expire_dont_add)).
@@ -173,6 +174,10 @@ convertOneTypedSpawnArg(Type,A,O):-
  assert_subclass(TypeA,Type).
 
 
+assert_subclass_on_argIsa(Prop,N,argIsaFn(Prop,N)):-!.
+assert_subclass_on_argIsa(Prop,N,_OType):-argIsa(Prop,N,PropType),PropType=argIsaFn(Prop,N),!. % , assert_argIsa(Prop,N,OType).
+assert_subclass_on_argIsa(Prop,N,OType):-argIsa(Prop,N,PropType),assert_subclass_safe(OType,PropType).
+
 % ========================================
 % Rescan for consistency
 % ========================================
@@ -182,7 +187,7 @@ rescan_all:- doall_and_fail(agenda_rescan_dbase_ops).
 rescan_all:- doall_and_fail(agenda_dbase_repropigate).
 rescan_all:- doall_and_fail(rescan_dbase_loaded).
 rescan_all:- doall_and_fail(agenda_rescan_dbase_ops).
-rescan_all:- doall_and_fail(agenda_rescan_sim_objects).
+% rescan_all:- doall_and_fail(agenda_rescan_sim_objects).
 rescan_all:- doall_and_fail(agenda_slow_op_restart).
 rescan_all:- doall_and_fail(agenda_rescan_mpred_props).
 rescan_all.
