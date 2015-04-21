@@ -54,6 +54,12 @@
 				Refilter="1"
 				Excludes=".git/;*.*~;*~/"/>
 		</Folder>
+		<Folder Name="src_lisp">
+			<F
+				N="src_lisp/*.l*"
+				Recurse="1"
+				Excludes="*.svn*"/>
+		</Folder>
 		<Folder Name="src_mud">
 			<F
 				N="src_mud/*.*"
@@ -292,6 +298,7 @@
 							<F N="/usr/lib/swi-prolog/library/pldoc/doc_access.pl"/>
 							<F N="/usr/lib/swi-prolog/library/pldoc/doc_colour.pl"/>
 							<F N="/usr/lib/swi-prolog/library/pldoc/doc_html.pl"/>
+							<F N="/usr/lib/swi-prolog/library/pldoc/doc_html_maybe.pl"/>
 							<F N="/usr/lib/swi-prolog/library/pldoc/doc_htmlsrc.pl"/>
 							<F N="/usr/lib/swi-prolog/library/pldoc/doc_index.pl"/>
 							<F N="/usr/lib/swi-prolog/library/pldoc/doc_library.pl"/>
