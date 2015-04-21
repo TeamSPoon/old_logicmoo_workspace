@@ -1,4 +1,4 @@
-/** <module> dbase_i_mpred_prolog
+/** <module> logicmoo_i_mpred_prolog
 % Provides a prolog dabase in these predicates...
 %
 %  dbase_t/N
@@ -11,7 +11,7 @@
 %
 */
 
-:- include(dbase_i_header).
+:- include(logicmoo_i_header).
 
 
 

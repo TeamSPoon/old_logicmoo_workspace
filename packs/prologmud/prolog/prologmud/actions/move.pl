@@ -13,7 +13,7 @@
 % :-swi_module(user). 
 :-swi_module(modMove, []).
 
-:- include(logicmoo(vworld/moo_header)).
+:- include(library(prologmud/server/mud_header)).
 
 % :- register_module_type (mtCommand).
 
@@ -114,4 +114,4 @@ user:agent_call_command(Agent,actGo(Dir)) :-
 	call_update_charge(Agent,actMove).
 
 
-% :- include(logicmoo(vworld/moo_footer)).
+% :- include(library(prologmud/server/mud_footer)).

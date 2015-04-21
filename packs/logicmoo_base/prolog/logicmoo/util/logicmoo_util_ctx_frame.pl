@@ -36,8 +36,8 @@
          currentContext/2]).
 
 
-% :- ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_library)).
-% :-ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_bugger)).
+% :- ensure_loaded((logicmoo_util_library)).
+% :-ensure_loaded((logicmoo_util_bugger)).
 
 currentContext(Name,X):-hotrace(makeLocalContext(Name,X)),!.
 

@@ -6,9 +6,16 @@
 % Dec 13, 2035
 %
 */
-% :-swi_module(dbase_i_loader, []).
+% :-swi_module(logicmoo_i_loader, []).
 
-:- include(dbase_i_header).
+:- include(logicmoo_i_header).
+
+
+:- export(with_no_dbase_expansions/1).
+:- meta_predicate(with_no_dbase_expansions(0)).
+with_no_dbase_expansions(Goal):-
+  with_assertions(user:prolog_mud_disable_term_expansions,Goal).
+
 
 current_context_module(Ctx):-user:loading_module_h(Ctx),!.
 current_context_module(Ctx):-context_module(Ctx).
@@ -157,9 +164,9 @@ read_one_term(Stream,Term,Vs):- catch(once(( read_term(Stream,Term,[double_quote
 
 % rescan_mpred_stubs:- doall((user:mpred_prop(F,prologHybrid),arity(F,A),A>0,warnOnError(declare_dbase_local_dynamic(moo,F,A)))).
 
-:-ensure_loaded(dbase_i_sexpr_reader).
 
 /*
+:-ensure_loaded(logicmoo_i_sexpr_reader).
 
 :- parse_to_source(
   "(documentation instance EnglishLanguage \"An object is an &%instance of a &%SetOrClass if it is included in that &%SetOrClass. 
@@ -371,7 +378,7 @@ loader_term_expansion(CL,EXP):-
  % ==== why we assert
   inside_dynamic_reader,!,
 % ==== do it
-  WHY = was_imported_kb_content(inside_dynamic_reader,CL),
+  WHY = '$was_imported_kb_content$'(inside_dynamic_reader,CL),
   dmsg(WHY),
   add_from_file(CL),
   must(EXP=user:WHY).
@@ -380,7 +387,7 @@ loader_term_expansion(CL,WHY):-
 % ==== why we assert
   requires_storage(CL,WhyRS),
 % ==== do it
-  WHY = was_imported_kb_content(requires_storage(WhyRS),CL),
+  WHY = '$was_imported_kb_content$'(requires_storage(WhyRS),CL),
   dmsg(WHY),
   add_from_file(CL),!.
 

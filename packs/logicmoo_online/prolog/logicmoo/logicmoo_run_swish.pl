@@ -3,7 +3,7 @@
 % :- module(swish_with_localedit,[]).
 
 :- multifile(user:semweb_startup).
-:- '@'(ensure_loaded(library(logicmoo/bugger)),user).
+:- '@'(ensure_loaded(library(logicmoo/util/logicmoo_util_bugger)),user).
 
 :- use_module(library(process)).
 install_bower:- prolog_file_dir(('.'),LPWD),

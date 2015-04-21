@@ -11,7 +11,7 @@ end_of_file.
     Public domain code.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-%:-module(dbase_i_sexp_reader,[codelist_to_forms/2,parse_to_source/2,get_source/1,lisp_read/2,l_open_input/2]).
+%:-module(logicmoo_i_sexp_reader,[codelist_to_forms/2,parse_to_source/2,get_source/1,lisp_read/2,l_open_input/2]).
 :- style_check(-singleton).
 :- style_check(-discontiguous).
 % :- style_check(-atom).
@@ -19,8 +19,8 @@ end_of_file.
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    Parsing
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-:-dynamic(user:mpred_prop/3).
-:-multifile(user:mpred_prop/3).
+:-dynamic(user:mpred_prop/2).
+:-multifile(user:mpred_prop/2).
 :- use_module('../../src_lib/logicmoo_util/logicmoo_util_all.pl').
 
 parse_sexpr(String, Expr) :- string(String),!,string_codes(String,Codes),phrase(sexpr(Expr), Codes).

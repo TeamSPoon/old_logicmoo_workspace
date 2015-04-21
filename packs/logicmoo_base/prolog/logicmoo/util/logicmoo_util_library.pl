@@ -67,8 +67,8 @@ if_file_exists(M:Call):- arg(1,Call,File),(filematch(File,_)-> must((filematch(F
 :- ensure_loaded(logicmoo_util_bugger_catch).
 :- '@'( ensure_loaded(logicmoo_util_bugger), 'user').
 
-% :-user_use_module(logicmoo(logicmoo_util/logicmoo_util_strings)).
-% :-user_use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)).
+% :-user_use_module((logicmoo_util_strings)).
+% :-user_use_module((logicmoo_util_ctx_frame)).
 
 lastMember2(_E,List):-var(List),!,fail.
 lastMember2(E,[H|List]):-lastMember2(E,List);E=H.

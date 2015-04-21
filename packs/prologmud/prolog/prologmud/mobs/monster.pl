@@ -17,7 +17,7 @@
 % :- dynamic  agent_list/1.
 
 % Possible agent actions.
-:- include(logicmoo(vworld/moo_header)).
+:- include(library(prologmud/server/mud_header)).
 % :- register_module_type (planning).
 
 :-decl_type(tMonster).
@@ -69,4 +69,4 @@ instTypeProps(Instance,tMonster,[mudDescription(txtFormatFn("Very screy looking 
 %:- prolog.
 
 
-% :- include(logicmoo(vworld/moo_footer)).
+% :- include(library(prologmud/server/mud_footer)).

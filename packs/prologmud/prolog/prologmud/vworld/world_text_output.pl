@@ -7,7 +7,7 @@
 %
 */
 
-:-swi_module(toploop_output, []).
+:-swi_module(world_text_output, []).
 
 :- include(library(prologmud/server/mud_header)).
 

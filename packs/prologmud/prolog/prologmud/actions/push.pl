@@ -13,7 +13,7 @@
 % :-swi_module(user). 
 :-swi_module(modPush, []).
 
-:- include(logicmoo(vworld/moo_header)).
+:- include(library(prologmud/server/mud_header)).
 
 % :- register_module_type (mtCommand).
 
@@ -101,4 +101,4 @@ update_charge(Agent,actPush) :- padd(Agent,[mudEnergy(-6)]).
 update_stats(Agent,strain) :- padd(Agent,[mudHealth(-2)]).
 update_stats(Agent,hernia) :- padd(Agent,[mudHealth(-4),mudCmdFailure(hernia)]).
 
-% :- include(logicmoo(vworld/moo_footer)).
+% :- include(library(prologmud/server/mud_footer)).

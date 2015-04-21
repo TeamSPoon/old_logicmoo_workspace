@@ -33,7 +33,7 @@ not_variant(G,GG):-
 % ========================================
 % Shared Preds
 % ========================================
-:- include(dbase_i_header).
+:- include(logicmoo_i_header).
 
 % TODO: canonicalize clauses first!
 with_kb_assertions([],Call):- !,Call.
@@ -159,7 +159,7 @@ ensure_predicate_reachable(M,C):-once((predicate_property(C,imported_from(Other)
 ensure_predicate_reachable(_,_).
 
 
-singletons_throw_else_fail(C):- not_is_release,contains_singletons(C),!,(test_tl(thlocal:already_in_file_term_expansion) -> (dmsg(contains_singletons(C))); dmsg(trace_or_throw(contains_singletons(C)))),fail.
+singletons_throw_else_fail(C):- fail,not_is_release,contains_singletons(C),!,(test_tl(thlocal:already_in_file_term_expansion) -> (dmsg(contains_singletons(C))); dmsg(trace_or_throw(contains_singletons(C)))),fail.
 nonground_throw_else_fail(C):- not_is_release,not(ground(C)),!,( (test_tl(thlocal:already_in_file_term_expansion) ->dmsg(not_ground(C)); trace_or_throw(not_ground(C)))),fail.
 
 % ================================================
@@ -172,19 +172,11 @@ with_logical_functor(And,[G|T],Call):-
    DO =..[And,call(Call,G),with_logical_functor(And,T,Call)],
    call(DO).
 
-% ================================================================================
-% DETECT PREDS THAT NEED STORAGE 
-% ================================================================================
-:-export(is_pred_declarer/1).
-is_pred_declarer(Prop):- % vFormatted 
-	arg(_,v(predArgTypes,predIsFlag,tPred,
-        prologMultiValued,prologSingleValued,prologMacroHead,prologOnly,
-		prologOrdered,prologNegByFailure,prologPTTP,prologSNARK,prologHybrid,prologListValued),Prop).
 
 requires_storage((Head :- Body),Why):- nonvar(Head),!, requires_storage(Head,Body,Why).
 requires_storage(C,Why):- requires_storage(C,true,Why).
 
-requires_storage(_,_,thlocal:consulting_sources):-thlocal:consulting_sources,!.
+requires_storage(_,_,thlocal:consulting_sources):-thlocal:consulting_sources,pfc_may_expand,!.
 % requires_storage(_,_,thlocal:consulting_sources):-thlocal:consulting_sources,in_file_expansion.
 requires_storage(G,_,Why):-get_functor(G,F),!,special_head(G,F,Why),!.
 
@@ -323,6 +315,14 @@ implied_skipped(genls(C0,C0)).
 implied_skipped(props(_,[])).
 implied_skipped(Skipped):-compound(Skipped), not(functor(Skipped,_,1)),fail, (dbase_t(Skipped);out_of_dbase_t(Skipped)).
 implied_skipped(Skipped):-user:already_added_this_round(Skipped),(is_asserted(Skipped)).
+
+
+dbase_numbervars_with_names(Term):- term_variables(Term,Vars),dbase_name_variables(Vars),!,numbervars(Vars,91,_,[attvar(skip),singletons(true)]),!.
+
+dbase_name_variables([]).
+dbase_name_variables([Var|Vars]):-
+   (var_property(Var, name(Name)) -> Var = '$VAR'(Name) ; true),
+   dbase_name_variables(Vars).
 
 
 :-export(pfcAdd_fast/1).

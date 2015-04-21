@@ -141,10 +141,10 @@ clip_dir_sep(Where,Where):-!.
 
 
 
-current_source_file(F):-source_location(F,_).
-current_source_file(F):-prolog_load_context(file, F).
-current_source_file(F):-prolog_load_context(source, F).
-current_source_file(F):-prolog_load_context(stream, S),stream_property(S,file_name(F)),!.
+source_file(F):-source_location(F,_).
+source_file(F):-prolog_load_context(file, F).
+source_file(F):-prolog_load_context(source, F).
+source_file(F):-prolog_load_context(stream, S),stream_property(S,file_name(F)),!.
 
 
 
@@ -192,16 +192,16 @@ user:file_search_path(logicmoo,Dir):-
 locally_to_dir(Locally,Dir):-logicmoo_runtime_dir(RunDir), join_path33(RunDir,Locally,Directory),my_absolute_file_name(Directory,Dir),exists_directory(Dir),!.
 locally_to_dir(Directory,Dir):-my_absolute_file_name(Directory,Dir),exists_directory(Dir),!.
 
-:- '@'( ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_bugger_new)), 'user').
-:- '@'( ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_bugger_catch)), 'user').
-:- '@'( ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_bugger)), 'user').
-:- '@'( ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_strings)), 'user').
-:- '@'( ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_library)), 'user').
-:- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)), 'user').
-:- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_terms)), 'user').
-:- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_dcg)), 'user').
-:- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_coroutining_was)), 'user').
-:- '@'( use_module(logicmoo(logicmoo_util/logicmoo_util_coroutining_iz)), 'user').
+:- '@'( ensure_loaded((logicmoo_util_bugger_new)), 'user').
+:- '@'( ensure_loaded((logicmoo_util_bugger_catch)), 'user').
+:- '@'( ensure_loaded((logicmoo_util_bugger)), 'user').
+:- '@'( ensure_loaded((logicmoo_util_strings)), 'user').
+:- '@'( ensure_loaded((logicmoo_util_library)), 'user').
+:- '@'( use_module((logicmoo_util_ctx_frame)), 'user').
+:- '@'( use_module((logicmoo_util_terms)), 'user').
+:- '@'( use_module((logicmoo_util_dcg)), 'user').
+:- '@'( use_module((logicmoo_util_coroutining_was)), 'user').
+:- '@'( use_module((logicmoo_util_coroutining_iz)), 'user').
 
 /*
 win_fork(G,SERVIO,PID):-atom_concat('swipl-win.exe ',G,AC),writeq(win_fork(AC,SERVIO)),nl,

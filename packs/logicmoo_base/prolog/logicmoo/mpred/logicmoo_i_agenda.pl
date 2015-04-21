@@ -176,7 +176,8 @@ convertOneTypedSpawnArg(Type,A,O):-
 
 assert_subclass_on_argIsa(Prop,N,argIsaFn(Prop,N)):-!.
 assert_subclass_on_argIsa(Prop,N,_OType):-argIsa(Prop,N,PropType),PropType=argIsaFn(Prop,N),!. % , assert_argIsa(Prop,N,OType).
-assert_subclass_on_argIsa(Prop,N,OType):-argIsa(Prop,N,PropType),assert_subclass_safe(OType,PropType).
+assert_subclass_on_argIsa(Prop,N,OType):-argIsa(Prop,N,PropType),assert_subclass_safe(OType,PropType),!.
+assert_subclass_on_argIsa(Prop,N,OType):-dmsg(assert_subclass_on_argIsa(Prop,N,OType)).
 
 % ========================================
 % Rescan for consistency

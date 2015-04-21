@@ -7,7 +7,7 @@
 % :-swi_module(user). 
 :-swi_module(showdebug, []).
 
-:- include(logicmoo(vworld/moo_header)).
+:- include(library(prologmud/server/mud_header)).
 
 :-decl_type(vtOnOff).
 
@@ -51,4 +51,4 @@ verb_alias(debug,actShow).
 verb_alias(nodebug,actHide).
 
 
-% :- include(logicmoo(vworld/moo_footer)).
+% :- include(library(prologmud/server/mud_footer)).

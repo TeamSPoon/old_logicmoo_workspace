@@ -1249,8 +1249,8 @@ list_difference_eq_memberchk_eq(X, [Y|Ys]) :- (  X == Y -> true ;  list_differen
 
 :-use_module(library(ansi_term)).
 
-:-dynamic(user:mpred_prop/3).
-:-multifile(user:mpred_prop/3).
+:-dynamic(user:mpred_prop/2).
+:-multifile(user:mpred_prop/2).
 :- meta_predicate_transparent(tlocal_show/6).
 tlocal_show(M,F,A,P,_ON,TF):-
    copy_term(P,PL),
@@ -3441,10 +3441,10 @@ user:term_dbase_listing(Match):-
 term_non_listing(Match):- 
    format('/* term_non_listing(~q) => ~n',[Match]),
    '@'(ignore((doall((
-      dbase_i_pldoc:synth_clause_for(H,B,_Ref),
-      once(dbase_i_pldoc:ok_show(H)),
-      once(dbase_i_pldoc:slow_term_matches_hb(Match,H,B)),
-      dbase_i_pldoc:portray_hb(H,B),
+      logicmoo_i_pldoc:synth_clause_for(H,B,_Ref),
+      once(logicmoo_i_pldoc:ok_show(H)),
+      once(logicmoo_i_pldoc:slow_term_matches_hb(Match,H,B)),
+      logicmoo_i_pldoc:portray_hb(H,B),
       fail)))),'user'),
    format(' <= term_non_listing(~q) */ ~n',[Match]).
 
@@ -3662,7 +3662,7 @@ disabled_this:- asserta((user:prolog_exception_hook(Exception, Exception, Frame,
 :-multifile(user:message_hook/3).
 :-dynamic(user:message_hook/3).
 :- asserta((user:message_hook(Term, Kind, Lines):- (Kind= warning;Kind= error),Term\=syntax_error(_),
-  dmsg(user:message_hook(Term, Kind, Lines)),notrace(dumpST(20)),dmsg(user:message_hook(Term, Kind, Lines)),fail)).
+  dmsg(user:message_hook(Term, Kind, Lines)),notrace(dumpST(20)),dmsg(user:message_hook(Term, Kind, Lines)),dtrace,fail)).
 
 % have to load this module here so we dont take ownership of prolog_exception_hook/4.
 :- user_use_module(library(prolog_stack)).

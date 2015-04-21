@@ -8,7 +8,7 @@
 % :-swi_module(user). 
 :-swi_module(moduleUse, [do_act_use/3]).
 
-:- include(logicmoo(vworld/moo_header)).
+:- include(library(prologmud/server/mud_header)).
 
 % :- register_module_type (mtCommand).
 
@@ -148,8 +148,8 @@ must_post_use(ActUse,Agent,Obj):-
 update_charge(Agent,_ActWield) :- 
         padd(Agent,mudEnergy(-2)).
 
-% :- include(logicmoo(vworld/moo_footer)).
+% :- include(library(prologmud/server/mud_footer)).
 
 
 
-% :- include(logicmoo(vworld/moo_footer)).
+% :- include(library(prologmud/server/mud_footer)).

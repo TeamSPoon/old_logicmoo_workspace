@@ -1,4 +1,4 @@
-/** <module> dbase_i_mpred_pttp
+/** <module> logicmoo_i_mpred_pttp
 % Provides a prolog database replacement that uses an interpretation of SNARK
 %
 %  dbase_t/N
@@ -43,7 +43,7 @@
 %=    atleast(X,N,A)
 %=    atmost(X,N,A)
 /*
-:- module(dbase_i_snark, 
+:- module(logicmoo_i_snark, 
           [ 
            nnf/4, 
            pnf/3, pnf/2, cf/4,
@@ -59,8 +59,8 @@
 % SWI Prolog modules do not export operators by default
 % so they must be explicitly placed in the user namespace
 
-:- include(dbase_i_header).
-:- ensure_loaded(dbase_i_mpred_pttp).
+:- include(logicmoo_i_header).
+:- ensure_loaded(logicmoo_i_mpred_pttp).
 
 %  all(R, room(R) => exists(D, (door(D) & has(R,D))))
 % for any arbitrary R, if R is a room then there exists some object D that is a door, and R has a D.
@@ -942,12 +942,12 @@ user:mud_regression_test :- tsn.
 snark_read(In,Wff,Vs):-
   (snark_reader_mode(lisp)-> 
     catch((lisp_read(In,WffIn),with_output_to(atom(A),write_term(WffIn,
-      [module(dbase_i_snark),numbervars(true),quoted(true)])),
-     read_term_from_atom(A,Wff,[module(dbase_i_snark),double_quotes(string),variable_names(Vs)])),E,(fmt(E),fail));
-      catch(read_term(In,Wff,[module(dbase_i_snark),double_quotes(string),variable_names(Vs)]),E,(fmt(E),fail))).
+      [module(logicmoo_i_snark),numbervars(true),quoted(true)])),
+     read_term_from_atom(A,Wff,[module(logicmoo_i_snark),double_quotes(string),variable_names(Vs)])),E,(fmt(E),fail));
+      catch(read_term(In,Wff,[module(logicmoo_i_snark),double_quotes(string),variable_names(Vs)]),E,(fmt(E),fail))).
 
 %= --------- to test program -------------
-:-ensure_loaded(dbase_i_sexpr_reader).
+:-ensure_loaded(logicmoo_i_sexpr_reader).
 
 :-export(snark/0).
 snark:- current_input(In),current_output(Out),!,snark(In,Out).
@@ -1125,7 +1125,7 @@ user:provide_mpred_setup(OP,HeadIn,StubType,RESULT):-  pttp_listens_to_stub(Stub
 :- uses_logic(logicmoo_kb_refution).
 
 :- if_startup_script(tsnark).
-:- if_startup_script(ensure_loaded(dbase_i_mpred_snark_testing)).
+:- if_startup_script(ensure_loaded(logicmoo_i_mpred_snark_testing)).
 :- logicmoo_example3.
 
 end_of_file.

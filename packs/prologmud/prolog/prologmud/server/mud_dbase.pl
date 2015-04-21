@@ -22,7 +22,7 @@
 :-nb_setval(pldoc_object,pldoc_object_missing).
 
 :- use_module(library(semweb/turtle)).
-:- include(dbase_i_header).
+:- include(logicmoo_i_header).
 :- multifile(system:term_expansion/2).
 :- multifile(user:term_expansion/2).
 :- multifile(user:goal_expansion/2).
@@ -140,7 +140,7 @@ notice_predicate_head(H):- compound(H), must_compile_special_clause(H), get_func
            not(mpred_hooks:mpred_prop(F,code)),
            decl_mpred_hybrid(F/A).
 
-expanded_already_functor(was_imported_kb_content).
+expanded_already_functor('$was_imported_kb_content$').
 expanded_already_functor(was_enabled).
 expanded_already_functor(_:NV):-nonvar(NV),!,expanded_already_functor(NV).
 
@@ -196,18 +196,18 @@ record_on_thread(Dbase_change,O):- thread_self(ID),thlocal:mpred_capture(ID,Dbas
 :- asserta((user:isa(I,C):-loop_check(isa_backchaing(I,C)))).
 :- asserta(('$toplevel':isa(I,C):-user:isa(I,C))).
 
-%TODO :- ensure_loaded(dbase_i_kb_store).
-:- ensure_loaded(dbase_i_loader).
-:- ensure_loaded(dbase_i_formattypes).
-:- ensure_loaded(dbase_i_isa_genls).
+%TODO :- ensure_loaded(logicmoo_i_kb_store).
+:- ensure_loaded(logicmoo_i_loader).
+:- ensure_loaded(logicmoo_i_formattypes).
+:- ensure_loaded(logicmoo_i_isa_genls).
 
-% :- ensure_loaded(dbase_i_deduce).
-%TODO :- ensure_loaded(dbase_i_call_kb).
-%TODO :- ensure_loaded(dbase_i_mpred_pttp).
-%TODO :- ensure_loaded(dbase_i_mpred_snark).
-%TODO :- ensure_loaded(dbase_i_coroutining).
-%TODO :- ensure_loaded(dbase_i_pldoc).
-%:- with_no_term_expansions(if_file_exists(user:ensure_loaded(library(mpred_dbase/dbase_i_rdf_store)))).
+% :- ensure_loaded(logicmoo_i_deduce).
+%TODO :- ensure_loaded(logicmoo_i_call_kb).
+%TODO :- ensure_loaded(logicmoo_i_mpred_pttp).
+%TODO :- ensure_loaded(logicmoo_i_mpred_snark).
+%TODO :- ensure_loaded(logicmoo_i_coroutining).
+%TODO :- ensure_loaded(logicmoo_i_pldoc).
+%:- with_no_term_expansions(if_file_exists(user:ensure_loaded(library(mpred_dbase/logicmoo_i_rdf_store)))).
 %:- asserta(thglobal:using_rdf_mpred_hook).
 
 
@@ -217,7 +217,7 @@ user:term_expansion(G,isa(I,C)):-not(user:prolog_mud_disable_term_expansions),no
 
 
 mpred_module_ready.
-:- with_no_term_expansions(if_file_exists(user:ensure_loaded(library(mpred_dbase/dbase_i_rdf_store)))).
+:- with_no_term_expansions(if_file_exists(user:ensure_loaded(library(mpred_dbase/logicmoo_i_rdf_store)))).
 
 :- decl_mpred_hybrid(argIsa/3).
 :- add_fast(<=( argIsa(F,N,Isa), argIsa_known(F,N,Isa))).
@@ -233,9 +233,9 @@ mpred_module_ready.
 
 user:term_expansion(A,B):- not(user:prolog_mud_disable_term_expansions), current_predicate(pfcExpansion_loaded/0),loop_check(pfc_file_expansion(A,B)),A\=@=B.
 
-user:semweb_startup:- with_no_term_expansions(if_file_exists(user:ensure_loaded(library(mpred_dbase/dbase_i_rdf_store)))).
+user:semweb_startup:- with_no_term_expansions(if_file_exists(user:ensure_loaded(library(mpred_dbase/logicmoo_i_rdf_store)))).
 
-:- with_no_term_expansions(if_file_exists(user:ensure_loaded(logicmoo(mobs/planner/dbase_i_hyhtn)))).
+:- with_no_term_expansions(if_file_exists(user:ensure_loaded(logicmoo(mobs/planner/logicmoo_i_hyhtn)))).
 :-decl_type(predIsFlag).
 :-decl_type(code).
 :-decl_mpred_hybrid(formatted_resultIsa/2).
@@ -260,7 +260,7 @@ system:term_expansion(IN,OUT):- not(user:prolog_mud_disable_term_expansions),
 vtTestType(vTest1).
 vtTestType(vTest2).
 
-:-must(not(mpred_hooks:mpred_prop(h,_,prologHybrid))).
+:-must(not(mpred_hooks:mpred_prop(h,prologHybrid))).
 % :-decl_mpred_hybrid(function_corisponding_predicate(tFunction,tPred)).
 
 :- sanity(tCol(tCol)).
@@ -275,7 +275,7 @@ vtTestType(vTest2).
 :- show_call(source_location(_,_)).
 
 :-must(in_file_expansion;in_file_directive).
-% :- must(show_call(ensure_plmoo_loaded(library(mpred_dbase/dbase_i_builtin)))).
+% :- must(show_call(ensure_plmoo_loaded(library(mpred_dbase/logicmoo_i_builtin)))).
 
 /*
 :- pfc_add(((vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) => vtActionTemplate(ArgTypes)))).
@@ -291,9 +291,9 @@ vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes)
 
 */
 
-:- must(show_call(with_assertions(thlocal:pfcExpansion,with_assertions(thlocal:consulting_sources,ensure_loaded(library(mpred_dbase/dbase_i_builtin)))))).
+:- must(show_call(with_assertions(thlocal:pfcExpansion,with_assertions(thlocal:consulting_sources,ensure_loaded(library(mpred_dbase/logicmoo_i_builtin)))))).
 
-% :- if_startup_script(with_assertions(thlocal:pfcExpansion,ensure_loaded(dbase_i_mpred_pfc_testing))).
+% :- if_startup_script(with_assertions(thlocal:pfcExpansion,ensure_loaded(logicmoo_i_mpred_pfc_testing))).
 
 % :-asserta(user:isa_pred_now_locked).
 

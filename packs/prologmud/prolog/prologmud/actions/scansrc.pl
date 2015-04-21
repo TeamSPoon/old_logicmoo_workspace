@@ -9,7 +9,7 @@
 %
 :-swi_module(modScansrc, []).
 
-:- include(logicmoo(vworld/moo_header)).
+:- include(library(prologmud/server/mud_header)).
 
 % :- register_module_type (mtCommand).
 
@@ -108,4 +108,4 @@ include_moo_file_ni_1(M):- source_file_property(_,includes(M)),!.
 include_moo_file_ni_1(M):- user_ensure_loaded(M).
 
 
-% :- include(logicmoo(vworld/moo_footer)).
+% :- include(library(prologmud/server/mud_footer)).

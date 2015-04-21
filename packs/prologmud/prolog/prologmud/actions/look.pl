@@ -23,7 +23,7 @@
 
 :-export((  mudGetPrecepts/2,  mudNearReach/2, mudNearFeet/2,  mudCanSense/5 , cmdLook/2)).
 
-:- include(logicmoo(vworld/moo_header)).
+:- include(library(prologmud/server/mud_header)).
 
 % :- register_module_type (mtCommand).
 
@@ -68,11 +68,11 @@ user:agent_call_command(Agent,actLook(_Dir,SObj)):-
 look_as(Agent):-
    get_session_id(O),
    with_assertions(thlocal:session_agent(O,Agent),
-        must((mudAtLoc(Agent,LOC),cmdLook(Agent,LOC)))).
+        must((mudAtLoc(Agent,LOC),cmdLook(Agent,LOC)))),!.
 
 
 :-export(cmdLook/2).
-cmdLook(Agent,LOC):- garbage_collect_atoms, call(cmdLook_proc,Agent,LOC).
+cmdLook(Agent,LOC):- garbage_collect_atoms, call(cmdLook_proc,Agent,LOC),!.
 
 :-export(cmdLook_proc/3).
 cmdLook_proc(Agent,LOC):- 
@@ -106,7 +106,7 @@ cmdLook_proc_0(Agent,LOC):-
          mudHeightOnObj(Agent,value),
          mudLastCmdSuccess=wasSuccess(Agent,value)
        ]),
-    show_inventory(Agent,Agent).
+    show_inventory(Agent,Agent),!.
 
 :-export(nameStringsList/2).
 
@@ -305,4 +305,4 @@ mask([K|Tail],SoFar,What) :-
 mask([Head|Tail],SoFar,What) :-
 	mask(Tail,[Head|SoFar],What).
 
-% :- include(logicmoo(vworld/moo_footer)).
+% :- include(library(prologmud/server/mud_footer)).

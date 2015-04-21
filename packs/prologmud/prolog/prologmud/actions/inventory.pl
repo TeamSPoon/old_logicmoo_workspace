@@ -4,7 +4,7 @@
 % Douglas Miles 2014
 % inventory(Agt,Inv) = inventory (anything the agent has taken)
 */
-:- include(logicmoo(vworld/moo_header)).
+:- include(library(prologmud/server/mud_header)).
 
 % :- register_module_type (mtCommand).
 
@@ -92,4 +92,4 @@ test_anyInst(O):- test_exists(O).
 % helps for testings
 % :- listing(inventory:_).
 
-% :- include(logicmoo(vworld/moo_footer)).
+% :- include(library(prologmud/server/mud_footer)).

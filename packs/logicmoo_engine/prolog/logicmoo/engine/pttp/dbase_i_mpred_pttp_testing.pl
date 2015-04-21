@@ -9,8 +9,8 @@
 %%% 
 
 :- '@'(ensure_loaded('../../src_lib/logicmoo_util/logicmoo_util_all'),user).
-:- include(dbase_i_header).
-:- ensure_loaded(dbase_i_mpred_pttp).
+:- include(logicmoo_i_header).
+:- ensure_loaded(logicmoo_i_mpred_pttp).
 
 :- multifile(pttp_test/2).
 :- discontiguous(pttp_test/2).

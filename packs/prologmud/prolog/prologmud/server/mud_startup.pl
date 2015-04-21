@@ -15,16 +15,15 @@
 
 :- set_prolog_flag(verbose_load,true).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(mud_header).
 
+user:file_search_path(logicmoo,pack(prologmud)).
 /*
 :-export(include_moo_files/1).
 include_moo_files(Mask):- expand_file_name(Mask,X), forall(member(E,X),user_ensure_loaded(E)).
 */
 
 in_user_startup(Call):- '@'(Call,user).
-
-:- '@'(ensure_loaded(logicmoo('vworld/moo.pl')),'user').
 
 % standard header used in all files that all modules are loaded (therefore useful for when(?) the day comes that modules *can*only*see their explicitly imported modules)
 %:- prolog_flag(unknown,error,fail). % Not sure if this is needed for Quintus
@@ -38,25 +37,25 @@ in_user_startup(Call):- '@'(Call,user).
 :- set_prolog_flag(double_quotes, atom).
 :- set_prolog_flag(double_quotes, string).
 /*
-:- '@'((ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_bugger)),
-         ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_library)),
-         use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)),
-         ensure_loaded(logicmoo(logicmoo_util/logicmoo_util_strings)),
-         use_module(logicmoo(logicmoo_util/logicmoo_util_terms)),
-         use_module(logicmoo(logicmoo_util/logicmoo_util_dcg)),
-         use_module(logicmoo(vworld/moo))),'user').
+:- '@'((ensure_loaded(library(logicmoo/util/logicmoo_util_bugger)),
+         ensure_loaded(library(logicmoo/util/logicmoo_util_library)),
+         use_module(library(logicmoo/util/logicmoo_util_ctx_frame)),
+         ensure_loaded(library(logicmoo/util/logicmoo_util_strings)),
+         use_module(library(logicmoo/util/logicmoo_util_terms)),
+         use_module(library(logicmoo/util/logicmoo_util_dcg)),
+         use_module(library(prologmud/server/mud))),'user').
 */
 
 % :- user_ensure_loaded(moo_loader).
 
 % logicmoo vworld mud server
-%:- user_ensure_loaded(logicmoo(vworld/world)).
-:- user_ensure_loaded(logicmoo(vworld/toploop_npc)).
-:- user_ensure_loaded(logicmoo(vworld/toploop_telnet)).
-:- user_ensure_loaded(logicmoo(vworld/toploop_output)).
+%:- user_ensure_loaded(library(prologmud/vworld/world)).
+:- user_ensure_loaded(library(prologmud/vworld/world_npc)).
+:- user_ensure_loaded(library(prologmud/server/mud_telnet)).
+:- user_ensure_loaded(library(prologmud/vworld/world_text_output)).
 
 
-:- user_ensure_loaded(logicmoo(vworld/moo_testing)).
+:- user_ensure_loaded(library(prologmud/server/mud_testing)).
 
 
 /*
@@ -171,17 +170,18 @@ download_and_install_el:-
 
 
 % NPC planners
-:- include_moo_files('../src_mud/mobs/?*.pl').
+:- include_moo_files(library(prologmud/mobs/'?*.pl')).
 :- include_moo_files('../src_assets/mobs/?*.pl').
 :- xperimental->include_moo_files('../external/XperiMental/src_incoming/mobs/?*.pl');true.
 
 
 % Action/Commands implementation
-:- include_moo_files('../src_mud/actions/?*.pl').
+:- include_moo_files(library(prologmud/actions/'?*.pl')).
 :- include_moo_files('../src_assets/actions/?*.pl').
 :- xperimental->include_moo_files('../external/XperiMental/src_incoming/actions/?*.pl');true.
 
 % New Objects
+:- include_moo_files(library(prologmud/objs/'?*.pl')).
 :- include_moo_files('../src_assets/objs/?*.pl').
 :- xperimental->include_moo_files('../external/XperiMental/src_incoming/actions/?*.pl');true.
 
@@ -218,7 +218,7 @@ user:agent_text_command(Agent,["run",Term], Agent,actProlog(Term)):- ignore(Term
 
 
 % standard header used in all files that all modules are loaded (therefore useful for when(?) the day comes that modules *can*only*see their explicitly imported modules)
-% :- user_ensure_loaded(logicmoo(vworld/moo_header)).
+% :- include(library(prologmud/server/mud_header)).
 
 % These contain the definition of the object cols.
 % Load the map file appropriate for the world being used.
@@ -235,7 +235,7 @@ user:agent_text_command(Agent,["run",Term], Agent,actProlog(Term)):- ignore(Term
 
 
 % standard footer to clean up any header defined states
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(library(prologmud/server/mud_footer)).
 /*
 % Load datalog
 :- if_flag_true(fullStart, ((use_module(logicmoo('des/des.pl')),

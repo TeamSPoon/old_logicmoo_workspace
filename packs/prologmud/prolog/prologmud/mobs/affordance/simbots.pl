@@ -10,7 +10,7 @@
 %
  */
 
-:- include(logicmoo(vworld/moo_header)).
+:- include(library(prologmud/server/mud_header)).
 
 :- discontiguous(defined_affordance/1).
 

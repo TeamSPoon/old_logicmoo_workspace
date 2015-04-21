@@ -5,7 +5,7 @@
 
 not(P):- \+ P.
    
-:- '@'(ensure_loaded(library(logicmoo/bugger)),user).
+:- '@'(ensure_loaded(library(logicmoo/util/logicmoo_util_bugger)),user).
 
 :- kill_term_expansion.
 %:- include(library(prologmud/server/mud_header)).

@@ -1,4 +1,4 @@
-/** <module> dbase_i_mpred_pttp
+/** <module> logicmoo_i_mpred_pttp
 % Provides a prolog database replacent that uses PTTP
 %
 %  wid/3
@@ -10,7 +10,7 @@
 %
 */
 
-:- include(dbase_i_header).
+:- include(logicmoo_i_header).
 
 :- thread_local thlocal:current_pttp_db_oper/1.
 
@@ -184,7 +184,7 @@ reassemble_intified(H, FHARGS ):-compound(H),H=..HEADL,append(HARGS,[G, E, A, M,
 reassemble_intified(OUT,OUT).
 
 grab_body(call_proof(_,A),A):-!.
-grab_body((A,B),AB):-grab_body(A,AA),grab_body(B,BB),conjoin(AA,BB,AB).
+grab_body((A,B),AB):-grab_body(A,AA),grab_body(B,BB),db_conjoin(AA,BB,AB).
 grab_body(_,true).
 
 :-export(portray_clause_0/1).
@@ -375,9 +375,9 @@ pttp_assert_int_wid04(ID,Y,F,A):- user:wid(_,_,Y),!,asserta(user:wid(ID,F/A,Y)),
 pttp_assert_int_wid04(ID,Y,F,A):- assertz(user:wid(ID,F/A,Y)),add_functor(internal,F/A),!,assertz_unumbered(Y),!.
 
 
-:- ensure_loaded(dbase_i_mpred_pttp_statics).
-:- ensure_loaded(dbase_i_mpred_pttp_precompiled).
-:- ensure_loaded(dbase_i_mpred_pttp_testing).
+:- ensure_loaded(logicmoo_i_mpred_pttp_statics).
+:- ensure_loaded(logicmoo_i_mpred_pttp_precompiled).
+:- ensure_loaded(logicmoo_i_mpred_pttp_testing).
 
 :- if_startup_script(do_pttp_tests).
 

@@ -5,16 +5,16 @@ end_of_file.
 end_of_file.
 end_of_file.
 
-:- module(dbase_i_pldoc,
+:- module(logicmoo_i_pldoc,
 	  [ 		% +Source, +OutStream, +Options
           source_to_txt/3,
           source_to_txt/1,
           s_to_html/3
 	  ]).
 
-:- include(dbase_i_header).
+:- include(logicmoo_i_header).
 
-% :-use_module(dbase_i_pldoc_html).
+% :-use_module(logicmoo_i_pldoc_html).
 
 :- multifile
 	prolog:doc_object_summary/4,	% Object, ?Category, ?Section, ?Summary

@@ -3,33 +3,9 @@
 
 */
 
-:- multifile(user:mud_regression_test/0).
-:- multifile user:was_imported_kb_content/2.
-:- dynamic user:was_imported_kb_content/2.
-:- discontiguous(user:was_imported_kb_content/2).
 
 :- set_prolog_flag(generate_debug_info, true).
 :- exists_directory(runtime)->working_directory(_,runtime);(exists_directory('../runtime')->working_directory(_,'../runtime');true).
-
-% [Manditory] Load the Logicmioo utils
-:- '@'(ensure_loaded('../src_lib/logicmoo_util/logicmoo_util_all'),user).
-
-%:- include(logicmoo(vworld/moo_header)).
-
-
-:- '@'(ensure_loaded('../src_mud/dbase/dbase_i_pldoc'),user).
-
-%:- export(with_no_dbase_expansions/1).
-%:- meta_predicate(with_no_dbase_expansions(0)).
-with_no_dbase_expansions(Goal):-
-  with_assertions(user:prolog_mud_disable_term_expansions,Goal).
-
-% bugger:action_verb_useable(actWearUnused,wearsClothing,tWearAble,mudPossess).
-
-% [Manditory] define how we interact with the module system
-:-if(not(current_predicate(swi_module/2))).
-swi_module(M,E):-dmsg(swi_module(M,E)).
-:-endif.
 
 user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog').
 user:file_search_path(weblog, 'C:/Users/Administrator/AppData/Roaming/SWI-Prolog/pack/weblog').
@@ -37,7 +13,19 @@ user:file_search_path(weblog, '/usr/lib/swi-prolog/pack/weblog/prolog'):-current
 user:file_search_path(cliopatria, '../externals/ClioPatria'). % :- current_prolog_flag(unix,true).
 user:file_search_path(user, '../externals/ClioPatria/user/').
 user:file_search_path(swish, '../externals/swish'):- current_prolog_flag(unix,true).
+user:file_search_path(pack, '../packs').
+file_search_path(logicmoo, '/devel/LogicmooDeveloperFramework/PrologMUD/packs/prologmud/prolog/prologmud/').
+file_search_path(logicmoo, '/devel/LogicmooDeveloperFramework/PrologMUD/packs/logicmoo_base/prolog/logicmoo/').
 
+:- attach_packs.
+
+% [Manditory] Load the Logicmioo utils
+:- user:ensure_loaded(library(logicmoo/logicmoo_base)).
+
+
+% [Optionaly] Set up the Prolog optimize/debug flags
+% :- ensure_loaded(library(logicmoo/mpred_online)).
+% :- '@'(ensure_loaded('../src_mud/dbase/dbase_i_pldoc'),user).
 
 % [Optionaly] Set the Prolog optimize/debug flags
 :- set_prolog_flag(verbose_load,true).
@@ -67,6 +55,11 @@ user:semweb_startup:-ensure_loaded('run_clio').
 % [Optionaly] register/run KnowRob robot services (we use it for the ontology mainly)
 % TODO 
 
+:- multifile(user:mud_regression_test/0).
+:- multifile user:was_imported_kb_content/2.
+:- dynamic user:was_imported_kb_content/2.
+:- discontiguous(user:was_imported_kb_content/2).
+
 user:semweb_startup :- with_no_term_expansions(if_file_exists(ensure_loaded('../externals/MUD_KnowRob/knowrob_addons/knowrob_mud/prolog/init.pl'))).
 
 % [Optionaly] register/run MILO robot services (we use it for the ontology mainly)
@@ -75,8 +68,8 @@ user:semweb_startup :- with_no_term_expansions(if_file_exists(ensure_loaded('../
 % [Optionaly] register/run EulerSharp robot services (we use it for the ontology mainly)
 % TODO user:semweb_startup :- register_ros_package(euler).
 
-:- ensure_loaded(logicmoo(dbase/dbase_i_pldoc)).
-:- do_semweb_startup.
+% :- ensure_loaded(logicmoo(dbase/dbase_i_pldoc)).
+% :- do_semweb_startup.
 
 :- with_no_dbase_expansions(if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop.pl'))).
 :- current_predicate(egg_go/0)->egg_go;true.
@@ -101,7 +94,7 @@ user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),s
 
 % % :- prolog_repl.
 
-:- dynamic(mudDescription/2).
+:- dynamic(user:mudDescription/2).
 
 tCol(tLivingRoom).
 genls(tLivingRoom,tRegion).
@@ -135,7 +128,7 @@ pddlSomethingIsa('iComBadge674',['tComBadge','ProtectiveAttire','PortableObject'
 pddlSomethingIsa('iGoldUniform675',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
 
-mudDescription(iCommanderData66,txtFormatFn("Very screy looking monster named ~w",[iCommanderData66])).
+user:mudDescription(iCommanderData66,txtFormatFn("Very screy looking monster named ~w",[iCommanderData66])).
 
 tAgentGeneric(iExplorer1).
 wearsClothing(iExplorer1,'iBoots773').

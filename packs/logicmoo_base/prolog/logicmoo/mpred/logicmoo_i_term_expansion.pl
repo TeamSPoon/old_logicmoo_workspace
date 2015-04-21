@@ -56,9 +56,17 @@ dbase_head_expansion(_,V,V).
 any_op_to_call_op(_,call(conjecture)).
 
 db_expand_maplist(FE,[E],E,G,O):- !,call(FE,G,O).
-db_expand_maplist(FE,[E|List],T,G,O):- copy_term(T+G,CT+CG),E=CT,!,call(FE,CG,O1),db_expand_maplist(FE,List,T,G,O2),conjoin(O1,O2,O).
+db_expand_maplist(FE,[E|List],T,G,O):- copy_term(T+G,CT+CG),E=CT,!,call(FE,CG,O1),db_expand_maplist(FE,List,T,G,O2),db_conjoin(O1,O2,O).
 db_expand_maplist(FE,List,T,G,O):-findall(M, (member(T,List),call(FE,G,M)), ML),list_to_conjuncts(ML,O).
 
+%= db_conjoin(+Conjunct1,+Conjunct2,?Conjunction).
+%= arg3 is a simplified expression representing the conjunction of
+%= args 1 and 2.
+
+db_conjoin(TRUE,X,X) :- is_true(TRUE),!.
+db_conjoin(X,TRUE,X) :- is_true(TRUE),!.
+db_conjoin(X,Y,O):- X==Y,!,O=X.
+db_conjoin(C1,C2,(C1,C2)).
 
 % ================================================
 % fully_expand/3
@@ -249,7 +257,7 @@ expand_props(Op,Sent,OUT):-Sent=..[And|C12],is_logical_functor(And),!,maplist(ex
 expand_props(Op,props(Obj,Open),OUT):- var(Open),!,trace_or_throw(expand_props(Op,props(Obj,Open))->OUT).
 expand_props(_ ,props(Obj,List),isa(Obj,ftID)):- List==[],!.
 expand_props(Op,props(Obj,[P]),OUT):- nonvar(P),!,expand_props(Op,props(Obj,P),OUT).
-expand_props(Op,props(Obj,[P|ROPS]),OUT):- !,expand_props(Op,props(Obj,P),OUT1),expand_props(Op,props(Obj,ROPS),OUT2),conjoin(OUT1,OUT2,OUT).
+expand_props(Op,props(Obj,[P|ROPS]),OUT):- !,expand_props(Op,props(Obj,P),OUT1),expand_props(Op,props(Obj,ROPS),OUT2),db_conjoin(OUT1,OUT2,OUT).
 expand_props(Op,props(Obj,PropVal),OUT):- atom(PropVal),!,Call=..[PropVal,Obj],!,into_expand_mpred_form(Op,Call,OUT).
 expand_props(Op,props(Obj,PropVal),OUT):- safe_univ(PropVal,[Prop,NonVar|Val]),Obj==NonVar,!,into_expand_mpred_form(Op,[dbase_t,Prop,Obj|Val],OUT).
 expand_props(Op,props(Obj,PropVal),OUT):- PropVal=..[Op,Pred|Val],comparitiveOp(Op),
@@ -289,7 +297,7 @@ create_the_inst_fn(_,Type,PropsIsa,NewType):-PropsIsa==tCol, NewType = isInstFn(
 % create_the_inst_fn(_,Type,PropsIsa,NewType):-!, NewType = isInstFn(Type),!.
 create_the_inst_fn(X,Type,PropsIsa,NewType):- NewType = isKappaFn(X,and(isa(X,Type),isa(Type,PropsIsa))),!.
 
-:-export(conjoin/3).
+:-export(conjoin_op/4).
 conjoin_op(Op,A,B,C) :-  C =.. [Op,A,B].
 
 
@@ -300,7 +308,7 @@ db_quf_l_0(Op,_And,[C],D2,D3):- db_quf(Op,C,D2,D3),!.
 db_quf_l_0(Op, And,[C|C12],PreO,TemplO):-
   db_quf(Op,C,Pre,Next),
   db_quf_l_0(Op,And,C12,Pre2,Templ2),
-  conjoin(Pre,Pre2,PreO),
+  db_conjoin(Pre,Pre2,PreO),
   conjoin_op(And,Next,Templ2,TemplO).
 
 :-export(db_quf/4).

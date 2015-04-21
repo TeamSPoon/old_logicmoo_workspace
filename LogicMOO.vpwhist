@@ -3,7 +3,7 @@ PrologMUD_base.vpj=Release
 [Global]
 CurrentProject=PrologMUD.vpj
 [ProjectDates]
-PrologMUD.vpj=20150420201859256
+PrologMUD.vpj=20150421052859730
 [TreeExpansion2]
 - PrologMUD.vpj
   - externals
@@ -308,9 +308,9 @@ PrologMUD.vpj=20150420201859256
       + prolog
         + chat80
         + CURT
-    + MUD_ircbot
-      + prolog
-        + eggdrop
+    - MUD_ircbot
+      - prolog
+        - eggdrop
     + MUD_PDDL
       + prolog
         + Blocks_world
@@ -618,41 +618,41 @@ PrologMUD.vpj=20150420201859256
         + prolog
         + snd
     + src_game_wumpus
-  - runtime
-    + config-enabled
-    + RDF-store
-  - src_lib
-    + mpred_base
-      + prolog
-        + mpred
-          + util
+  - packs
+    - logicmoo_base
+      - prolog
+        + logicmoo
+          - mpred
+          - util
       + t
-    + mpred_larkc
+    + logicmoo_engine
       + prolog
-        + plarkc
-    + mpred_online
+        + logicmoo
+          + engine
+            + flux
+            + plarkc
+            + pttp
+    + logicmoo_online
       + prolog
-        + mpred_online
-    + mpred_pttp
-      + prolog
-        + mpred
-          + flux
-          + pttp
-    + prologmud
-      + prolog
-        + prologmud
+        + logicmoo
+          + mpred_online
+          + swish_lib
+            + render
+    - prologmud
+      - prolog
+        - prologmud
           + actions
           + mobs
             + affordance
             + planner
           + objs
           + parsing
-          + runtime
-            + config-enabled
-            + RDF-store
-          + server
-          + vworld
+          - server
+          - vworld
     + ref_unused
+  - runtime
+    + config-enabled
+    + RDF-store
   + src_lisp
     + CVS
     + cycl
@@ -805,35 +805,17 @@ PrologMUD.vpj=20150420201859256
               + swi
               + trace
               + xref
-scroll:0
+scroll:37
 [State]
-SCREEN: 1920 1080 0 0 1612 648 0 0 N 0 0 0 0 1277 252
+SCREEN: 1920 1080 0 0 1612 648 0 0 M 0 0 0 0 1460 616
 CWD: ..\PrologMUD
-BUFFER: BN="packs\mpred_logicmoo\pack.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=20 LE=0 CX=19 CY=0 WI=5 BI=5 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\mpred_online\pack.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.247 CL=80 LE=0 CX=79 CY=7 WI=5 BI=16 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="packs\mpred_plarkc\pack.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1395 418 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\mpred_logicmoo\pack.pl"
-VIEW: LN=.240 CL=21 LE=0 CX=20 CY=6 WI=12 BI=5 HT=0 HN=0 HF=0 HC=4
-WINDOW: 66 66 1395 418 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\mpred_plarkc\pack.pl"
-VIEW: LN=.193 CL=36 LE=0 CX=35 CY=5 WI=108 BI=17 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1395 418 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
-BUFFER: BN="packs\mpred_online\pack.pl"
-VIEW: LN=.223 CL=17 LE=0 CX=16 CY=6 WI=13 BI=16 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
-src_lib\pfc\prolog\mpred\dbase_i_mpred_dbase_t.pl
-src_lib\pfc\prolog\mpred\dbase_i_mpred_stubs.pl
-src_lib\pfc\prolog\mpred\dbase_i_isa_subclass.pl
-src_lib\pfc\prolog\mpred\dbase_i_propvals.pl
-src_lib\pfc\prolog\mpred\dbase_i_kb_store.pl
-packs\mpred_base\pack.pl
-packs\mpred_plarkc\pack.pl
-packs\mpred_online\pack.pl
-packs\mpred_logicmoo\pack.pl
+packs\prologmud\prolog\prologmud\vworld\world_text.pl
+packs\prologmud\prolog\prologmud\server\dbase_i_header.pl
+packs\prologmud\prolog\prologmud\server\mud.pl
+packs\prologmud\prolog\prologmud\server\mud_telnet.pl
+packs\prologmud\prolog\prologmud\vworld\world_text_output.pl
+packs\prologmud\prolog\prologmud\vworld\world_agent.pl
+packs\prologmud\prolog\prologmud\vworld\world.pl
+packs\prologmud\prolog\prologmud\server\mud_startup.pl
+packs\prologmud\prolog\prologmud\server\moo_testing.pl

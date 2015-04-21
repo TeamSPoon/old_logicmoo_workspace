@@ -5,7 +5,7 @@ end_of_file.
 end_of_file.
 
 % ==============================================
-:-ensure_loaded(dbase_i_sexp_reader).
+:-ensure_loaded(logicmoo_i_sexp_reader).
 % 31 December 03 THIS IS A TRANSLATION IN KIF (ACCORDING TO THE KIF-DRAFT PROPOSED TO THE AMERICAN NATIONAL STANDARD NCITS.T2/98-004
 %   http://logic.stanford.edu/kif/dpans.html) OF DOLCE V2.1 For comments on this version, please contact: borgo@loa-cnr.it REVIEW INFO CHANGES - COMMENTS
 % ==============================================

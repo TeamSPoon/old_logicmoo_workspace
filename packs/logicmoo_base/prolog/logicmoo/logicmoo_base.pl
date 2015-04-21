@@ -20,15 +20,17 @@
 
 :-nb_setval(pldoc_object,pldoc_object_missing).
 
-:- use_module(library(semweb/turtle)).
-:- include(dbase_i_header).
 :- multifile(system:term_expansion/2).
 :- multifile(user:term_expansion/2).
 :- multifile(user:goal_expansion/2).
+:- use_module(library(semweb/turtle)).
+:- include(mpred/logicmoo_i_header).
 :- dynamic(user:isa_pred_now_locked/0).
 :-thread_local user:prolog_mud_disable_term_expansions.
-% [Manditory] define how we interact with the module system
 
+:-dynamic('$was_imported_kb_content$'/2).
+:-multifile('$was_imported_kb_content$'/2).
+% [Manditory] define how we interact with the module system
 :-if(not(current_predicate(swi_module/2))).
 swi_module(M,E):-dmsg(swi_module(M,E)).
 :-endif.
@@ -138,13 +140,13 @@ notice_predicate_head(H):- compound(H), must_compile_special_clause(H), get_func
            not(user:mpred_prop(F,prologOnly)),
            decl_mpred_hybrid(F/A).
 
-expanded_already_functor(was_imported_kb_content).
-expanded_already_functor(was_enabled).
+%expanded_already_functor('$was_imported_kb_content$').
+%expanded_already_functor(was_enabled).
 
 % expanded_already_functor(F):-user:mpred_prop(F,prologOnly).
 
-must_compile_special_clause(:- (_) ):-!,fail.
-must_compile_special_clause(CL):- sanity(nonvar(CL)),not(thlocal:into_form_code),not(thlocal:already_in_file_term_expansion),not((get_functor(CL,F),expanded_already_functor(F))).
+%must_compile_special_clause(:- (_) ):-!,fail.
+%must_compile_special_clause(CL):- sanity(nonvar(CL)),not(thlocal:into_form_code),not(thlocal:already_in_file_term_expansion),not((get_functor(CL,F),expanded_already_functor(F))).
 
 
 %OLD user:goal_expanstion(H,_):- notice_predicate_head(H),fail.
@@ -168,6 +170,15 @@ user:ruleRewrite(mudLabelTypeProps(Lbl,T,[]),typeHasGlyph(T,Lbl)):-nonvar(T),!.
 user:ruleRewrite(mudLabelTypeProps(Lbl,T,Props),typeProps(T,[typeHasGlyph(Lbl)|Props])):-nonvar(T),!.
 
 
+% ================================================================================
+% DETECT PREDS THAT NEED SPECIAL STORAGE 
+% ================================================================================
+:-export(is_pred_declarer/1).
+is_pred_declarer(Prop):- % vFormatted 
+	arg(_,v(predArgTypes,predIsFlag,tPred,
+        prologMultiValued,prologSingleValued,prologMacroHead,prologOnly,
+		prologOrdered,prologNegByFailure,prologPTTP,prologSNARK,prologHybrid,prologListValued),Prop).
+
 
 % ================================================
 % Capturing Assertions
@@ -187,48 +198,30 @@ record_on_thread(Dbase_change,O):- thread_self(ID),thlocal:dbase_capture(ID,Dbas
 % DBASE_T System
 % ================================================
 
-
-%:- with_no_term_expansions(if_file_exists(user_ensure_loaded(logicmoo(dbase/dbase_i_rdf_store)))).
-%:- asserta(thglobal:using_rdf_dbase_hook).
-:- ensure_loaded(dbase_i_kb_agenda).
-:- ensure_loaded(dbase_i_mpred_pfc).
-:- ensure_loaded(dbase_i_call).
-:- ensure_loaded(dbase_i_coroutining).
-:- ensure_loaded(dbase_i_pldoc).
-:- ensure_loaded(dbase_i_db_preds).
-:- ensure_loaded(dbase_i_term_expansion).
-:- ensure_loaded(dbase_i_kb_store).
-:- ensure_loaded(dbase_i_isa_subclass).
-
-
-:- asserta((user:isa(I,C):-loop_check(isa_backchaing(I,C)))).
-:- asserta(('$toplevel':isa(I,C):-user:isa(I,C))).
-
-:- ensure_loaded(dbase_i_mpred_props).
-:- ensure_loaded(dbase_i_mpred_stubs).
-:- ensure_loaded(dbase_i_mpred_prolog).
-:- ensure_loaded(dbase_i_mpred_dbase_t).
-:- ensure_loaded(dbase_i_loader).
-:- ensure_loaded(dbase_i_cyc).
-:- ensure_loaded(dbase_i_propvals).
-
-:- dynamic(isa/2).
-:- decl_mpred_hybrid(isa/2).
-
-:- ensure_loaded(dbase_i_formattypes).
-:- ensure_loaded(dbase_i_deduce).
-:- ensure_loaded(dbase_i_call_kb).
-:- ensure_loaded(dbase_i_mpred_pttp).
-:- ensure_loaded(dbase_i_mpred_snark).
+:- ensure_loaded(mpred/logicmoo_i_mpred_props).
+:- ensure_loaded(mpred/logicmoo_i_pfc).
+:- ensure_loaded(mpred/logicmoo_i_agenda).
+:- ensure_loaded(mpred/logicmoo_i_call).
+:- ensure_loaded(mpred/logicmoo_i_coroutining).
+:- ensure_loaded(mpred/logicmoo_i_hooks).
+:- ensure_loaded(mpred/logicmoo_i_term_expansion).
+:- ensure_loaded(mpred/logicmoo_i_store).
+:- ensure_loaded(mpred/logicmoo_i_mpred_stubs).
+:- ensure_loaded(mpred/logicmoo_i_types).
+:- ensure_loaded(mpred/logicmoo_i_loader).
+:- ensure_loaded(mpred/logicmoo_i_argtypes).
+:- ensure_loaded(mpred/logicmoo_i_term_expansion_pfc).
 
 
+
+/*
 dbase_numbervars_with_names(Term):- term_variables(Term,Vars),dbase_name_variables(Vars),!,numbervars(Vars,91,_,[attvar(skip),singletons(true)]),!.
 
 dbase_name_variables([]).
 dbase_name_variables([Var|Vars]):-
    (var_property(Var, name(Name)) -> Var = '$VAR'(Name) ; true),
    dbase_name_variables(Vars).
-
+*/
 
 
 
@@ -284,7 +277,7 @@ system:term_expansion(IN,OUT):- not(user:prolog_mud_disable_term_expansions),
 vtTestType(vTest1).
 vtTestType(vTest2).
 
-:-must(not(user:mpred_prop(dbase_t,_,prologHybrid))).
+:-must(not(user:mpred_prop(dbase_t,prologHybrid))).
 % :-decl_mpred_hybrid(function_corisponding_predicate(tFunction,tPred)).
 
 :- sanity(tCol(tCol)).
@@ -299,7 +292,6 @@ vtTestType(vTest2).
 :- show_call(source_location(_,_)).
 
 :-must(in_file_expansion;in_file_directive).
-% :- must(show_call(ensure_plmoo_loaded(logicmoo(dbase/dbase_i_builtin)))).
 
 /*
 :- pfcAdd(((vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) => vtActionTemplate(ArgTypes)))).
@@ -308,14 +300,16 @@ vtTestType(vTest2).
 (ttFormatType(FT)/is_declarations(FT))=>ttFormatted(FT).
 
 
-
+% Functions
 ttFormatted(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
+% Preds
 predArgTypes(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
+% Representations
 vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
 
 */
 
-:- must(show_call(with_assertions(thlocal:pfcExpansion,with_assertions(thlocal:consulting_sources,ensure_loaded(logicmoo(dbase/dbase_i_builtin)))))).
+:- must(show_call(with_assertions(thlocal:pfcExpansion,with_assertions(thlocal:consulting_sources,ensure_loaded('mpred/logicmoo_i_builtin.pfc'))))).
 
 % :- if_startup_script(with_assertions(thlocal:pfcExpansion,ensure_loaded(dbase_i_mpred_pfc_testing))).
 

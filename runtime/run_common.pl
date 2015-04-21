@@ -58,7 +58,7 @@ create_module(M):-context_module(CM),module(M),asserta(M:this_is_a_module(M)),wr
 :-create_module(hook).
 :-create_module(thlocal).
 :-create_module(thglobal).
-:-create_module(moo).
+%:-create_module(moo).
 
 
 :-module_transparent parser_chat80_module/1.
@@ -87,16 +87,6 @@ within_user(Call):- '@'(Call,'user').
 % :- user_use_module('logicmoo_util/logicmoo_util_all.pl').
 % And adds the local directories to file search path of logicmoo(..)
 % ======================================================
-:- within_user(consult('../src_lib/logicmoo_util/logicmoo_util_all')).
-
-% one more case of not clear what's the good way to do this.
-% Add your own path to weblog for now
-user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog').
-user:file_search_path(weblog, 'C:/Users/Administrator/AppData/Roaming/SWI-Prolog/pack/weblog').
-user:file_search_path(weblog, '/usr/lib/swi-prolog/pack/weblog/prolog'):-current_prolog_flag(unix,true).
-user:file_search_path(cliopatria, '../externals/ClioPatria'). % :- current_prolog_flag(unix,true).
-user:file_search_path(user, '../externals/ClioPatria/user/').
-user:file_search_path(swish, '../externals/swish'):- current_prolog_flag(unix,true).
 
 :- user_use_module(library(settings)).
 
@@ -154,7 +144,7 @@ enqueue_player_command(P,C):-foc_current_player(P),assertz_if_new(thglobal:playe
 
 
 % [Required] load and start mud
-:- within_user(ensure_loaded(logicmoo(vworld/moo_startup))).
+:-  ensure_loaded(library(prologmud/server/mud_startup)).
 
 startup_mod:run_setup_now:-
    within_user((

@@ -1,7 +1,7 @@
 /** <module>
 % ===================================================================
-% File 'dbase_i_builtin.pl'
-% Purpose: Emulation of OpenCyc for SWI-Prolog
+% File 'logicmoo_i_builtin.pfc'
+% Purpose: Agent Reactivity for SWI-Prolog
 % Maintainer: Douglas Miles
 % Contact: $Author: dmiles $@users.sourceforge.net ;
 % Version: 'interface' 1.0.0
@@ -57,7 +57,7 @@ mp_test_agr(_,_,_,_,_,_,_,_,_,_).
 
 :-pfcTrace.
 
-:- include(dbase_i_header).
+% :-include(logicmoo_i_header).
 
 :-must(assert_argIsa(tPred,1,tPred)).
 
@@ -180,7 +180,8 @@ notequal(C,B) <= equal(A,C),notequal(A,B).
 :-add(isa(tRegion,ttSpatialType)).
 :-add(isa(ttFormatType,ttAbstractType)).
 :-add(predArgTypes(typeGenls(ttTypeType,tCol))).
-
+:-discontiguous(subFormat/2).
+:-dynamic( tChannel/1).
 
 subFormat(ftDeplictsFn(tCol),ftSpec).
 subFormat(ftDeplictsFn(ttFormatted),ftSpec).
@@ -199,7 +200,7 @@ ttFormatted(exactStr(ftString)).
 resultIsa(F,C)=>(isa(F,'tFunction'),isa(C,ftSpec)).
 resultIsa(ftDeplictsFn,ftSpec).
 
-user:mpred_prop(quotedDefnIff,2,prologOnly).
+user:mpred_prop(quotedDefnIff/2,prologOnly).
 
 isa(argIsa,prologHybrid).
 isa(determinerString, prologMultiValued).
@@ -750,7 +751,7 @@ tPenguin(X) => neg(tFly(X)).
 
 :-listing([fly/1,bird/1,penguin/1,canary/1]).
 
-:-must(fly(tweety)).
+:-ignore(show_call_failure(fly(tweety))).
 
 /*
 
@@ -802,7 +803,8 @@ genls(Sub, _Super) => tCol(Sub).
 
 
 % Hook a predicate up!
-(tinyInstallToAssertedEL(F,A) => ({functor(H,F,A),make_el_stub(H,_,_,B)},(H<=B))).
+/*
+(tinyInstallToAssertedEL(F,A) => ({current_predicate(make_el_stub/4),functor(H,F,A),make_el_stub(H,_,_,B)},(H<=B))).
 
 ((tinyPredTypeActive(PREDTYPE),isa(F,PREDTYPE)) => tinyPredActive(F)).
 
@@ -820,22 +822,31 @@ genls(Sub, _Super) => tCol(Sub).
 =>tinyPredActive(afterRemoving).
 =>tinyPredActive(afterAdding).
 
-argQuotedIsa(sentenceTruth,1,'CycLSentence-Assertible').
-
-
 % argQuotedIsa(Pred, N, FT) <=  (argIsa(Pred, N, Type),genls(Type,FT),ttFormatType(FT)).
 
 % consistent(CycL) <= cycLToMpred(neg(CycL),Consequent),not(pfcCall(Consequent)). 
 
 =>tinyPredTypeActive('expansion').
 =>tinyPredTypeActive('collectionExpansion').
+(isa(F,tPred),arity(F,A),{once((tinyAssertion0(DB,MT,STR),arg(1,DB,F),atom(F)))})=>tinyInstallToAssertedEL(F,A).
+*/
 
+argQuotedIsa(sentenceTruth,1,'CycLSentence-Assertible').
 :- pfcAdd(((collectionExpansion(COL,RULE),isa(PRED,COL),{subst(RULE,':ARG1',PRED,NEWRULE)}) => trueSentence(NEWRULE))).
 :- pfcAdd(((expansion(F,RULE),arity(F,A),{make_kw_functor(F,A,CYCL),kw_to_vars((CYCL<=>RULE),NEWRULE)}) => trueSentence(NEWRULE))).
 
-(isa(F,tPred),arity(F,A),{once((tinyAssertion0(DB,MT,STR),arg(1,DB,F),atom(F)))})=>tinyInstallToAssertedEL(F,A).
 nearestIsa(I,C) <= is_user_supported(isa(I,C)).
 nearestGenls(I,C) <= is_user_supported(genls(I,C)).
+
+
+ttFormatted(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
+predArgTypes(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
+:- pfcAdd(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) => functorDeclares(F))).
+(ttFormatType(FT)/is_declarations(FT))=>ttFormatted(FT).
+
+:- show_call(source_location(_,_)).
+
+:- must(in_file_expansion;in_file_directive).
 
 end_of_file.
 

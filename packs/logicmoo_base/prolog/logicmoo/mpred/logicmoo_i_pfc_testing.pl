@@ -1,4 +1,4 @@
-/** <module> dbase_i_mpred_pfc_testing
+/** <module> logicmoo_i_mpred_pfc_testing
 % Tests a prolog database replacent that uses PFC
 %  
 %
@@ -8,7 +8,7 @@
 %
 */
 
-:- include(dbase_i_header).
+:- include(logicmoo_i_header).
 
 % user:term_expansion(A,B):- current_predicate(pfcExpansion_loaded/0),loop_check(pfc_file_expansion(A,B)),A\=@=B.
 

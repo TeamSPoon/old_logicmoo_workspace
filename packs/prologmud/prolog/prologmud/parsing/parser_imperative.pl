@@ -21,7 +21,7 @@
                    phrase_parseForTypes_9//2,
                    parseForTypes//2)).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(library(prologmud/server/mud_header)).
 
 % :- register_module_type (utility).
 
@@ -611,7 +611,7 @@ longest_string(Order,TStr1,TStr2):-
    compare(Order,L2-Str2,L1-Str1).
 */
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(library(prologmud/server/mud_footer)).
 
 end_of_file.
 

@@ -40,6 +40,13 @@
 				Refilter="1"
 				Excludes=".git/;*.*~;*~/"/>
 		</Folder>
+		<Folder Name="packs">
+			<F
+				N="packs/*.*"
+				Recurse="1"
+				Refilter="0"
+				Excludes=".git/;*.*~;*~/"/>
+		</Folder>
 		<Folder Name="runtime">
 			<F
 				N="runtime/*.*"

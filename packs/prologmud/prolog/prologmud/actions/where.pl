@@ -14,7 +14,7 @@
 % :-swi_module(user). 
 :-swi_module(where_cmd, []).
 
-:- include(logicmoo(vworld/moo_header)).
+:- include(library(prologmud/server/mud_header)).
 
 % :- register_module_type (mtCommand).
 
@@ -40,6 +40,6 @@ mud_cmd_who_1(Who):-
       once((inRegion(Who,Where),
             fmt(cmdresult(actWho(Who),inRegion(Who,Where)))))).
 
-% :- include(logicmoo(vworld/moo_footer)).
+% :- include(library(prologmud/server/mud_footer)).
 
 

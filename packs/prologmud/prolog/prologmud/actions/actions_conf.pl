@@ -19,4 +19,5 @@ end_of_file.
 :- use_module('eat.pl').    % eat(Object). eat/destroy item in possesion
 :- use_module('attack.pl'). % attack(Dir). attack another agent in direction Dir
 
+% bugger:action_verb_useable(actWearUnused,wearsClothing,tWearAble,mudPossess).
 

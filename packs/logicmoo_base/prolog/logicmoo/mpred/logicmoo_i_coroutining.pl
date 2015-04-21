@@ -1,6 +1,6 @@
 /** <module> 
 % ===================================================================
-% File 'dbase_i_coroutining.pl'
+% File 'logicmoo_i_coroutining.pl'
 % Purpose: For Emulation of OpenCyc for SWI-Prolog
 % Maintainer: Douglas Miles
 % Contact: $Author: dmiles $@users.sourceforge.net ;

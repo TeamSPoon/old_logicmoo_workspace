@@ -4,7 +4,7 @@
 % Douglas Miles 2014
 
 */
-:- include(logicmoo(vworld/moo_header)).
+:- include(library(prologmud/server/mud_header)).
 
 % :- register_module_type (mtCommand).
 
@@ -24,4 +24,4 @@ user:agent_call_command(Agent,actGet(Obj0,Prop0)) :- subst(dbase_t(Prop0,Obj0,Va
                                                         ccatch((findall(Value,(req(K),fmt(K)),L),
                                                           (L==[_|_]->true;fmt(wasMissing(K)))),E,fmt('@get Error ~q',[E:K])).
 
-% :- include(logicmoo(vworld/moo_footer)).
+% :- include(library(prologmud/server/mud_footer)).

@@ -1,4 +1,4 @@
-/** <module> dbase_i_mpred_pfc
+/** <module> logicmoo_i_mpred_pfc
 % Provides a prolog database replacent that uses PFC
 %  
 %
@@ -12,7 +12,7 @@
 %
 */
 
-:- include(dbase_i_header).
+:- include(logicmoo_i_header).
 
 pmsg(S):-dmsg(pfc(S)).
 pmsg(S,Args):- sformat(SF,S,Args),pmsg(SF).
@@ -348,7 +348,7 @@ pfc_pre_expansion_each(X,X):- \+ \+ ((get_functor(X,F,A),must(maybe_hybrid(F/A);
 user:arity(F,A):-pfcDatabaseTerm(F/A).
 user:mpred_prop(F,argIsa(_,ftAskable)):-pfcDatabaseTerm(F/_).
 
-user:mpred_prop(isa,2,pfcMustFC).
+user:mpred_prop(isa,pfcMustFC).
 
 pfcMustFC(H):-get_functor(H,F),pfc_mpred_prop(F,pfcMustFC).
 pfcPreferBC(H):-get_functor(H,F,A),pfc_mpred_prop(F,pfcPreferBC),dynamic(F/A),functor(PHead,F,A),assertz_if_new(((PHead:-callBC(PHead)))).
@@ -588,8 +588,9 @@ is_fc_body(P):- (fwc==P ; (compound(P),arg(_,P,E),is_fc_body(E))),!.
 is_bc_body(P):- (bwc==P ; (compound(P),arg(_,P,E),is_bc_body(E))),!.
 
 pfc_file_expansion(A,B):- A\=(:-(_)), compound(A), loop_check(pfc_file_expansion_lc(A,B)).
-pfc_file_expansion_lc(A,B) :- not(thlocal:into_form_code), pfc_file_expansion_each(A,B), 
-    (thlocal:pfcExpansion -> true;  (pmsg(warn_PfcWantedToExpand(A)),pmsg(warn_into(B)),!,fail)).
+pfc_file_expansion_lc(A,BO) :- A\=(:-(_)),not(thlocal:into_form_code), pfc_file_expansion_each(A,B),
+   ((B=(:-(CALL))) -> (must(CALL),BO='$was_imported_kb_content$'(A,CALL)) ;
+    (pfc_may_expand -> (BO=B,dmsg(expanded(A->B)));  (pmsg(warn_PfcWantedToExpand(A)),pmsg(warn_into(B)),trace,pfc_may_expand,!,fail))).
 :-export(pfc_file_expansion/2).
 
 /*
@@ -1933,7 +1934,7 @@ pfcRemoveSupportItems(P,Types):-
   pfc_maptree(pfcRem1,Results).
 
 pfcTypeFilter_l(ResultsO,Filter,ResultsO):-pfcTypeFilter(ResultsO,Filter).
-pfcTypeFilter_l((Body,More),Filter,ResultsO):-!,pfcTypeFilter_l(Body,Filter,BodyO),pfcTypeFilter_l((More),Filter,(ResultsM)),conjoin(BodyO,ResultsM,ResultsO).
+pfcTypeFilter_l((Body,More),Filter,ResultsO):-!,pfcTypeFilter_l(Body,Filter,BodyO),pfcTypeFilter_l((More),Filter,(ResultsM)),db_conjoin(BodyO,ResultsM,ResultsO).
 pfcTypeFilter_l(_,_Filter,!).
 
 pfcFilterSupports(Support,Filter,ResultsO):- 
@@ -2721,11 +2722,11 @@ make_term(ss(Constituent,Id,String),Term) :-
 
 % user:term_expansion(A,B):- A\=(:-(_)), compound(A),loop_check(pfc_file_expansion_lc(A,B)),A\=@=B.
 
-user:term_expansion(A,B):- current_predicate(_,pfcExpansion_loaded),loop_check(pfc_file_expansion(A,B)),A\=@=B.
+system:term_expansion(A,B):- current_predicate(_,pfcExpansion_loaded),loop_check(pfc_file_expansion(A,B)),A\=@=B,wdmsg(returning(B)).
 
 pfcExpansion_loaded.
 % system:goal_expansion(P,O):- (\+ current_predicate(_,P)),O= pfcCall(P).
-:- if_startup_script(with_assertions(thlocal:pfcExpansion,ensure_loaded(dbase_i_mpred_pfc_testing))).
+:- if_startup_script(with_assertions(thlocal:pfcExpansion,ensure_loaded(logicmoo_i_mpred_pfc_testing))).
 
 :- if_startup_script(prolog).
 

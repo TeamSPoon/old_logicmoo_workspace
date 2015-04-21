@@ -1,8 +1,8 @@
 
-:- include(dbase_i_header).
+:- include(logicmoo_i_header).
 
 :-
- %swi_module(dbase_i_pttp_statics,[ 
+ %swi_module(logicmoo_i_pttp_statics,[ 
     % pttp1/2,
       op(400,fy,-),    % negation
       op(500,xfy,&),   % conjunction

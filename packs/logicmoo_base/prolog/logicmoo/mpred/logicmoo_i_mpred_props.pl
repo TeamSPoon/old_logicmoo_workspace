@@ -20,7 +20,7 @@
 % ========================================
 
 :- export arity/2.
-:- export user:mpred_prop/3.
+:- export user:mpred_prop/2.
 :- export is_never_type/1.
 
 %OLD user:decl_database_hook(change(assert,_),Fact):- ignore((compound(Fact),Fact=..[F,Arg1|PROPS],is_pred_declarer(F),decl_mpred(Arg1,[F|PROPS]))).
@@ -66,7 +66,7 @@ decl_mpred_mfa(M,FF,A):-
      assert_arity(F,A),  
      must_det(nonvar(M)),
     '@'((
-     nop((static_predicate(M,F,A)->true; M:dynamic(F/A))), 
+     nop((static_predicate(M,F,A)->true; (M:dynamic(F/A),M:discontiguous(F/A)))), 
      nop(M:export(F/A)),
      nop(M:multifile(M:F/A))),M) ]).
 
@@ -128,10 +128,10 @@ decl_mpred_prolog_ilc(CM,M,PI,F/A):-
 user:mpred_prop(resolveConflict,predModule(user)).
 user:mpred_prop(pfcSelect,predModule(user)).
 user:mpred_prop(agent_text_command/4,prologOnly).
-user:mpred_prop(dbase_t,prologOnly).
+%user:mpred_prop(dbase_t,prologOnly).
 user:mpred_prop(member/2,prologOnly).
 user:mpred_prop(arity/2,prologOnly).
-user:mpred_prop(mpred_prop/3,prologOnly).
+user:mpred_prop(mpred_prop/2,prologOnly).
 user:mpred_prop(is_never_type/1,prologOnly).
 user:mpred_prop(term_expansion/2,prologOnly).
 user:mpred_prop(var/1,prologOnly).

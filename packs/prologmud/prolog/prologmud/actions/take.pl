@@ -11,7 +11,7 @@
 */
 :-swi_module(moduleTake, [do_act_for_take/2]).
 
-:- include(logicmoo(vworld/moo_header)).
+:- include(library(prologmud/server/mud_header)).
 
 % :- register_module_type (mtCommand).
 
@@ -78,4 +78,4 @@ must_post_for_take(Agent,Obj):-
 update_charge(Agent,actTake) :- 
         padd(Agent,mudEnergy(-2)).
 
-% :- include(logicmoo(vworld/moo_footer)).
+% :- include(library(prologmud/server/mud_footer)).

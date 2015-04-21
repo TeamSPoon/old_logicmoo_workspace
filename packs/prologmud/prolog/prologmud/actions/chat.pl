@@ -7,7 +7,7 @@
 % :-swi_module(user). 
 :-swi_module(chat, [vtSocialVerb/1,socialCommand/3,chat_to_callcmd/4]).
 
-:- include(logicmoo('vworld/moo_header.pl')).
+:- include(library(prologmud/server/mud_header)).
 
 % :- register_module_type (mtCommand).
 
@@ -44,4 +44,5 @@ do_social(Agent,Say,Whom,Text):-
 
 :- module_meta_predicates_are_transparent(chat).
 
-:- include(logicmoo('vworld/moo_footer.pl')).
+:- include(library(prologmud/server/mud_footer)).
+

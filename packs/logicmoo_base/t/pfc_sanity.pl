@@ -1,4 +1,4 @@
-/** <module> dbase_i_mpred_pfc_testing
+/** <module> logicmoo_i_mpred_pfc_testing
 % Tests a prolog database replacent that uses PFC
 %  
 %

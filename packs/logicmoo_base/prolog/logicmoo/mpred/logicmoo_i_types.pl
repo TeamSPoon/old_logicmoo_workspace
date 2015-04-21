@@ -12,7 +12,7 @@
 % Douglas Miles
 */
 
-:- include(dbase_i_header).
+:- include(logicmoo_i_header).
 
 % ============================================
 % inital hasInstance/2 database
@@ -613,4 +613,15 @@ impliedSubClass(T,ST):-predicate_property(transitive_subclass(T,ST),_),!,call_ta
 % sublass of 4 special cols
 % assert_isa_hooked_creation(I,T):- doall((ttSpatialType(ST),impliedSubClass(T,ST),call_after_dbase_load((create_instance(I,ST,[isa(T)]))))).
 
+:- asserta((user:isa(I,C):-loop_check(isa_backchaing(I,C)))).
+:- asserta(('$toplevel':isa(I,C):-user:isa(I,C))).
+
+
+:- forall(is_pred_declarer(Prop),decl_type(Prop)).
+:- dynamic(isa/2).
+:- decl_mpred_hybrid(isa/2).
+:- decl_mpred_hybrid(argIsa/3).
+:- decl_type(tPred).
+:- decl_type(predIsFlag).
+:- decl_type(prologOnly).
 

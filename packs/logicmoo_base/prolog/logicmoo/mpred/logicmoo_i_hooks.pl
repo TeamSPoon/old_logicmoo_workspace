@@ -118,7 +118,7 @@ additiveOp((/)).
 
 
 
-/** <module> dbase_i_mpred_dbase_t
+/** <module> logicmoo_i_mpred_dbase_t
 % Provides a prolog dabase in these predicates...
 %
 %  dbase_t/N
@@ -131,7 +131,7 @@ additiveOp((/)).
 %
 */
 
-:- include(dbase_i_header).
+:- include(logicmoo_i_header).
 
 
 :- meta_predicate(tf_result(0,+)).

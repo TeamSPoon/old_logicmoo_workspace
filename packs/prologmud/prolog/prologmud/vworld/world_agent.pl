@@ -10,7 +10,7 @@
 */
 % :-swi_module(world_agent,[]).
 
-:- include(logicmoo(vworld/moo_header)).
+:- include(library(prologmud/server/mud_header)).
 /*
 % This file is "included" from world.pl 
 :-swi_module(modr, [ call_agent_command_0/2,  call_agent_action/2 ]).

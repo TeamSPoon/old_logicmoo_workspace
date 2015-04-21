@@ -31,7 +31,7 @@
 
 :- meta_predicate toploop_telnet:show_room_grid_single(*,*,0).
 
-:- include(logicmoo(vworld/moo_header)).
+:- include(library(prologmud/server/mud_header)).
 
 % :- register_module_type (utility).
 
@@ -226,7 +226,7 @@ do_player_action(Agent,CMD):-fmt('skipping_unknown_player_action(~q,~q).~n',[Age
 % ===========================================================
 look_brief(Agent):- prop(Agent,mudLastCommand,X),nonvar(X),functor(X,actLook,_),!.
 look_brief(Agent):- not(prop(Agent,mudNeedsLook,vTrue)),!.
-look_brief(Agent):- must(prop(Agent,mudNeedsLook,vTrue)),look_as(Agent).
+look_brief(Agent):- must(prop(Agent,mudNeedsLook,vTrue)),look_as(Agent),!.
 
 telnet_repl_writer(_TL,call,ftTerm,Goal):-!,ignore(debugOnError(Goal)).
 telnet_repl_writer( TL,text,Type,[V]):-telnet_repl_writer(TL,text,Type,V).
@@ -326,7 +326,7 @@ show_room_grid_old(Room) :-
 	gridValue(Room,1,G,_),
 	length(G,N),
 	M is N + 1,
-	cmdShowRoomGrid(Room,1,1,M).
+	cmdShowRoomGrid(Room,1,1,M),!.
 
 cmdShowRoomGrid(Room,Old,N,N) :-
 	New is Old + 1,
@@ -507,4 +507,4 @@ call_pred(Call, Options) :-
 
 
 
-% :- include(logicmoo(vworld/moo_footer)).
+% :- include(library(prologmud/server/mud_footer)).

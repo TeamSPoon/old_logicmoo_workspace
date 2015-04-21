@@ -84,11 +84,11 @@ isQVar(Cvar):-atom(Cvar),atom_concat('?',_,Cvar).
    decl_dcgTest_startsWith/2,
    decl_dcgTest_startsWith/3.
 
-:- '@'((use_module(logicmoo(logicmoo_util/logicmoo_util_library)),
-        use_module(logicmoo(logicmoo_util/logicmoo_util_bugger)),        
-         use_module(logicmoo(logicmoo_util/logicmoo_util_ctx_frame)),
-         use_module(logicmoo(logicmoo_util/logicmoo_util_strings)),
-         use_module(logicmoo(logicmoo_util/logicmoo_util_terms))),'user').
+:- '@'((use_module((logicmoo_util_library)),
+        use_module((logicmoo_util_bugger)),        
+         use_module((logicmoo_util_ctx_frame)),
+         use_module((logicmoo_util_strings)),
+         use_module((logicmoo_util_terms))),'user').
 
 decl_dcgTest(X,Y):- nonvar(Y),!,do_dcgTest(X,Y,true).
 decl_dcgTest(X,Y,Z):- nonvar(Y),!,do_dcgTest(X,Y,Z).

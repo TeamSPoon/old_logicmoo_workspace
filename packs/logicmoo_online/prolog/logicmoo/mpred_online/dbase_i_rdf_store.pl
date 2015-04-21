@@ -5,7 +5,7 @@ end_of_file.
 end_of_file.
 end_of_file.
 
-/** <module> dbase_i_mpred_dbase_t
+/** <module> logicmoo_i_mpred_dbase_t
 % Provides a prolog dabase in these predicates...
 %
 %  dbase_t/N

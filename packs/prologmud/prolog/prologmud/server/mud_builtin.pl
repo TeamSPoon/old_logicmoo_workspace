@@ -1,6 +1,6 @@
 /** <module>
 % ===================================================================
-% File 'dbase_i_builtin.pl'
+% File 'logicmoo_i_builtin.pl'
 % Purpose: Emulation of OpenCyc for SWI-Prolog
 % Maintainer: Douglas Miles
 % Contact: $Author: dmiles $@users.sourceforge.net ;
@@ -79,7 +79,7 @@ mp_test_agr(_,_,_,_,_,_,_,_,_,_).
 
 :-pfc_trace.
 
-:- include(dbase_i_header).
+:- include(logicmoo_i_header).
 
 :-must(assert_argIsa(tPred,1,tPred)).
 
@@ -442,7 +442,7 @@ dividesBetween(tAgentGeneric,tPlayer,tNpcPlayer).
 => tCol(tRegion).
 => tCol(tContainer).
 
-(mpred_prop(_,_,predArgTypes(ArgTypes)),{is_declarations(ArgTypes)}) => ({is_declarations(ArgTypes)}, predArgTypes(ArgTypes)).
+(mpred_prop(_,predArgTypes(ArgTypes)),{is_declarations(ArgTypes)}) => ({is_declarations(ArgTypes)}, predArgTypes(ArgTypes)).
 
 
 % tCol(Type),(tBinaryPredicate(Pred)/(functor(G,Pred,2),G=..[Pred,isInstFn(Type),Value])), G => relationMostInstance(Pred,Type,Value).

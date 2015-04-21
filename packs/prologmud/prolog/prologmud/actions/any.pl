@@ -15,7 +15,7 @@
 
 
 
-:- include(logicmoo(vworld/moo_header)).
+:- include(library(prologmud/server/mud_header)).
 
 % :- register_module_type (mtCommand).
 user:action_rules(_,_,_,_):-fail.
@@ -46,4 +46,4 @@ user:agent_call_command(Agent,ACT) :-
 %Nothing to use
       (add_cmdfailure(Agent,SENT))).
 
-% :- include(logicmoo(vworld/moo_footer)).
+% :- include(library(prologmud/server/mud_footer)).

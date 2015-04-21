@@ -79,14 +79,13 @@
 :- dynamic  agent_list/1.
 :- dynamic mudDescription/2.
 
-:- include(moo_header).
+:- include(library(prologmud/server/mud_header)).
 % :- register_module_type (utility).
 
-% :- ensure_loaded(logicmoo('vworld/world_2d.pl')).
-:- ensure_loaded(logicmoo('vworld/world_2d.pl')).
-:- ensure_loaded(logicmoo('vworld/world_text.pl')).
-:- ensure_loaded(logicmoo('vworld/world_effects.pl')).
-:- ensure_loaded(logicmoo('vworld/world_events.pl')).
+:- ensure_loaded(world_2d).
+:- ensure_loaded(world_text).
+:- ensure_loaded(world_effects).
+:- ensure_loaded(world_events).
 :- if_file_exists(ensure_loaded(logicmoo('vworld/world_spawning.pl'))).
 
 :-export(isaOrSame/2).
@@ -279,4 +278,4 @@ create_instance_0(What,Type,Props):- leash(+call),trace,dtrace,trace_or_throw(dm
 % already convered mudPossess(Who,Thing):-genlPreds(mudPossess,W),into_mpred_form(dbase_t(W,Who,Thing),Call),mpred_call(Call).
 
 
-% % :- include(logicmoo(vworld/moo_footer)).
+% % :- include(library(prologmud/server/mud_footer)).

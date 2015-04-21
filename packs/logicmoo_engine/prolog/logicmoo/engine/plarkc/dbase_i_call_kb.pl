@@ -1,4 +1,4 @@
-:-swi_module(dbase_i_call_kb,[]).
+:-swi_module(logicmoo_i_call_kb,[]).
 
 
 end_of_file.
@@ -357,7 +357,7 @@ assertion_t(Call):- thglobal:use_cyc_database,!,with_assertions(thlocal:useOnlyE
 % end holds_t
 % ================================================================================
 
-:-user_ensure_loaded(dbase_i_call_kb).
+:-user_ensure_loaded(logicmoo_i_call_kb).
 
 % ================================================================================
 % begin holds_f

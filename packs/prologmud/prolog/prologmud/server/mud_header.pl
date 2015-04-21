@@ -9,16 +9,42 @@
 % Dec 13, 2035
 %
 */
+
+:- multifile user:term_specifier_text/2.
+:- multifile user:type_action_info/3.
+:- multifile user:update_charge/2.
+:- multifile user:update_stats/2.
+:- multifile user:use_usable/4.
+:- multifile user:verb_alias/2.
+:- multifile user:mud_test/0.
+:- multifile user:mud_test/1.
+:- multifile user:mud_test/2.
+:- multifile user:mud_test_local/0.
+:- multifile user:mud_test_local/1.
+:- multifile user:mud_test_local/2.
+:- multifile user:world_agent_plan/3.
+:- multifile action_info/2.
+:- multifile user:action_rules/4.
+:- multifile user:action_verb_useable/4.
+:- multifile user:agent_call_command/2.
+:- multifile user:agent_text_command/4.
+:- multifile user:check_permanence/4.
+
+
+:- dynamic user:action_rules/4.
+:- dynamic action_info/2.
+
+
 :-op(0,fx,('disabled')).
 :-op(0,fx,('enabled')).
 :-op(0,fy,('disabled')).
 :-op(0,fy,('enabled')).
-:- '@'(ensure_loaded(library(logicmoo/bugger)),user).
+:- '@'(ensure_loaded(library(logicmoo/util/logicmoo_util_bugger)),user).
 
 :-dynamic(user_db:grant_openid_server/2).
 :-multifile(user_db:grant_openid_server/2).
-:- multifile user:was_imported_kb_content/2.
-:- discontiguous(user:was_imported_kb_content/2).
+:- multifile user:'$was_imported_kb_content$'/2.
+:- discontiguous(user:'$was_imported_kb_content$'/2).
 :- multifile(user:disabled/1).
 :- discontiguous(user:disabled/1).
 :- multifile(user:enabled/1).
@@ -106,14 +132,13 @@
 % DYN KB
 :- dynamic_multifile_exported user:only_if_pttp/0.
 :- dynamic_multifile_exported user:use_snark/2.
-:- dynamic_multifile_exported user:is_mpred_prop/3.
+:- dynamic_multifile_exported user:is_mpred_prop/2.
 :- dynamic_multifile_exported user:hasInstance_dyn/2.
 :- dynamic_multifile_exported user:mpred_arity/2.
-:- dynamic_multifile_exported mpred_hooks:mpred_prop/3.
+:- dynamic_multifile_exported mpred_hooks:mpred_prop/2.
 :- dynamic_multifile_exported user:'<=>'/2.
 % :- dynamic_multifile_exported user:ruleForward/2.
 :- dynamic_multifile_exported user:ruleRewrite/2.
 % :- dynamic_multifile_exported user:ruleBackward/2.
 
-% :- '@'(ensure_loaded(dbase),'user').
-
+% :-must(not(user:mpred_prop(dbase_t,prologHybrid))).

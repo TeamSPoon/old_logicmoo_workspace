@@ -1,4 +1,4 @@
-/** <module> dbase_i_mpred_stubs.
+/** <module> logicmoo_i_mpred_stubs.
 % Provides a prolog dabase in these predicates...
 %
 %  Manages the hybrid_tPredStubImpl/1 in various files
@@ -11,7 +11,7 @@
 */
 
 
-:- include(dbase_i_header).
+:- include(logicmoo_i_header).
 
 :- export correctArgsIsa/3.
 
@@ -311,6 +311,7 @@ ensure_universal_stub5(HeadIn,Head,F,A,_HBLIST):- thglobal:pfcManageHybrids,!,
    (WasDynamic-> (dynamic_safe(F/A),(if_result(WasMulifile,multifile(F/A)))) ; dynamic_safe(F/A)),   
    % public(F/A),
    % lock_predicate(Head),
+   discontiguous(Head),
    retractall(user:mpred_prop(F,prologOnly)),
    pfcMarkC(Head),
    dmsg(pfcManageHybrids(HeadIn)),!.
@@ -459,11 +460,11 @@ dbase_t_storage_op(Op,HeadBody):-
      must((mud_call_store_op(Op,DB),sanity(show_call(DB)))),!.
 
 mud_call_store_op(Op,(H:-B)):- is_true(B),!,mud_call_store_op(Op,H).
-mud_call_store_op(Op,dbase_t(was_imported_kb_content, _, OPRAND)):-!,loop_check(dbase_op(Op,OPRAND),true).
+mud_call_store_op(Op,dbase_t('$was_imported_kb_content$', _, OPRAND)):-!,loop_check(dbase_op(Op,OPRAND),true).
 mud_call_store_op(Op,OPRAND):- show_call_success(wff_check_failed(Op,OPRAND,_WHY)),!.
 mud_call_store_op(Op,OPRAND):- reduce_dbase_op(Op,Op2),show_call(call(Op2,OPRAND)).
 
-wff_check_failed(_,DB,WHY):- DB =  dbase_t(was_imported_kb_content, WHY, _Assert).
+wff_check_failed(_,DB,WHY):- DB =  dbase_t('$was_imported_kb_content$', WHY, _Assert).
 wff_check_dbase_t_throw(DB):- wff_check_failed(_,DB,WHY),trace_or_throw(crazy_dbase_t_was_imported_kb_content(WHY,DB)).
 wff_check_dbase_t_throw(_).
 

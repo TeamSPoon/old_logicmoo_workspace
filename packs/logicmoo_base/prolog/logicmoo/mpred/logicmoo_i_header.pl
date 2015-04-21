@@ -13,12 +13,22 @@
 :-op(0,fx,('enabled')).
 :-op(0,fy,('disabled')).
 :-op(0,fy,('enabled')).
-:- '@'(ensure_loaded('../../src_lib/logicmoo_util/logicmoo_util_all'),user).
+
+:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
 
 :-dynamic(user_db:grant_openid_server/2).
 :-multifile(user_db:grant_openid_server/2).
-:- multifile user:was_imported_kb_content/2.
-:- discontiguous(user:was_imported_kb_content/2).
+:- multifile user:'$was_imported_kb_content$'/2.
+:- discontiguous(user:'$was_imported_kb_content$'/2).
+
+
+:-dynamic('$was_imported_kb_content$'/2).
+:-multifile('$was_imported_kb_content$'/2).
+:-user:export('$was_imported_kb_content$'/2).
+:-dynamic('$was_imported_kb_content$'/2).
+:- discontiguous('$was_imported_kb_content$'/2).
+
+
 :- multifile(user:disabled/1).
 :- discontiguous(user:disabled/1).
 :- multifile(user:enabled/1).
@@ -106,7 +116,7 @@
 % DYN KB
 :- dynamic_multifile_exported user:only_if_pttp/0.
 :- dynamic_multifile_exported user:use_snark/2.
-:- dynamic_multifile_exported user:is_mpred_prop/3.
+:- dynamic_multifile_exported user:is_mpred_prop/2.
 :- dynamic_multifile_exported user:hasInstance_dyn/2.
 :- dynamic_multifile_exported user:arity/2.
 :- dynamic_multifile_exported user:mpred_prop/2.
