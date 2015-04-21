@@ -44,6 +44,48 @@ with_kb_assertions(With,Call):-
 
 world_clear(Named):-fmt('Clearing world database: ~q.~n',[Named]).
 
+
+
+get_pifunctor(Head,PHead):-must(get_pifunctor(Head,PHead,_,_)).
+get_pifunctor(Head,PHead,F):-must(get_pifunctor(Head,PHead,F,_)).
+
+get_pifunctor(Head,PHead,F,A):-var(Head),!,sanity(atom(F)),must(ensure_arity(F,A)),functor(PHead,F,A),ignore(PHead=Head).
+get_pifunctor(Head,PHead,F,A):-get_functor(Head,F,A),functor(PHead,F,A),ignore(PHead=Head),!.
+get_pifunctor(Head,PHead,F,A):-atom(Head),ensure_arity(Head,A),!,get_pifunctor(Head/A,PHead,F,A).
+
+
+
+side_effect_prone:- \+ thlocal:noDBaseMODs(_).
+
+
+
+:-meta_predicate_transparent(with_no_modifications(0)).
+with_no_modifications(CALL):-!,CALL.
+with_no_modifications(CALL):-with_assertions(thlocal:noDBaseMODs(_),CALL).
+
+:-meta_predicate_transparent(with_no_db_hooks(0)).
+with_no_db_hooks(CALL):-!,CALL.
+with_no_db_hooks(CALL):-with_assertions(thlocal:noDBaseHOOKS(_),CALL).
+
+:-meta_predicate_transparent(with_fallbacks(0)).
+with_fallbacks(CALL):-with_no_assertions(thlocal:infAssertedOnly(_),CALL).
+
+:-meta_predicate_transparent(with_fallbacksg(0)).
+with_fallbacksg(CALL):-with_no_assertions(thlocal:noRandomValues(_),CALL).
+
+:-meta_predicate_transparent(with_no_fallbacksg(0)).
+with_no_fallbacksg(CALL):-with_assertions(thlocal:noRandomValues(_),CALL).
+
+:-meta_predicate_transparent(with_no_fallbacks(0)).
+with_no_fallbacks(CALL):-with_assertions(thlocal:infAssertedOnly(_),CALL).
+
+:-thread_local(infSecondOrder/0).
+infSecondOrder :- not(thlocal:infInstanceOnly(_)).
+
+:-thread_local(infThirdOrder/0).
+infThirdOrder :- fail, infSecondOrder, not(thlocal:noRandomValues(_)).
+
+
 % ================================================
 % is_asserted/1/2/3
 % ================================================
@@ -129,103 +171,6 @@ with_logical_functor(_And,[G],Call):- !, call(Call,G).
 with_logical_functor(And,[G|T],Call):-
    DO =..[And,call(Call,G),with_logical_functor(And,T,Call)],
    call(DO).
-
-dbase_modify(Op,                 G):- (var(Op);var(G)),!,trace_or_throw(var_database_modify_op(Op,  G )).
-dbase_modify(Op,                 G):- G\=predArgTypes(_),fully_expand(Op,G,GG),not_variant(G,GG),!,dbase_modify(Op, GG ),!.
-dbase_modify(_,  (:-include(FILE))):- !,must(load_data_file_now(FILE)).
-dbase_modify(Op,  (:-(G))         ):- !,must(with_assert_op_override(Op,debugOnError(G))).
-dbase_modify(P,                  G):- thlocal:noDBaseMODs(_),!,dmsg(noDBaseMODs(P,G)).
-%dbase_modify(Op,                 G):- dbase_head_expansion(clause,G,GG),not_variant(G,GG),database_modify_0(Op, GG ),!.
-dbase_modify(Op,                 G):- database_modify_0(Op,G ),!.
-dbase_modify(Op,                 G):- trace_or_throw(unknown_database_modify(Op,G)).
-
-
-/*
-database_modify_0(change(assert, add), G):-predicate_property(M:G,_PP),M==system,!,mpred_call(G).
-database_modify_0(change(assert, add), G):-current_predicate(_,G),!,debugOnError(G).
-database_modify_0(Op,G):- Op=change(_,_), G=..[And|Stuff], is_logical_functor(And),dtrace(And),loop_check(with_logical_functor(And,Stuff,database_modify_0(Op))).
-database_modify_0(Op,G):- once(must(db_quf(Op,G,U,Template))),not(is_true(U)),!, mpred_call(U),database_modify_0(Op,Template).
-database_modify_0(change(Assert,AorZ),G):- non_assertable(G,Why),trace_or_throw(non_assertable(Why,change(Assert,AorZ),G)).
-database_modify_0(change(retract,all),G):- !, db_quf(change( retract,all),G,U,Template),!,when_debugging(retract,dtrace), doall((mpred_call(U),hooked_retractall(Template))).
-database_modify_0(change(retract,A),G):- must(db_quf(change( retract,A),G,U,Template)),!,when_debugging(retract,dtrace), mpred_call(U),!,hooked_retract(Template).
-database_modify_0(Op,  G):- Op=..[Assert,How],!,database_modify_0(change(Assert,How),   G).
-database_modify_0(Op,  G):- Op=..[Assert],!,database_modify_0(change(Assert,one),   G).
-*/
-
-database_modify_0(Op,                       M:G):- atom(M),!, database_modify_0(Op,G).
-database_modify_0(Op,                   (C1,C2)):- !, must(database_modify_0(Op,C1)), must(database_modify_0(Op,C2)).
-database_modify_0(change(Assert,AorZ),(G:-TRUE)):- is_true(TRUE),!,database_modify_0(change(Assert,AorZ),G).
-database_modify_0(change(retract,a),          G):- hooked_retract(G).
-database_modify_0(change(retract,one),        G):- hooked_retract(G).
-database_modify_0(change(retract,_),          G):- hooked_retractall(G).
-database_modify_0(change(assert,AZ),          G):- singletons_throw_else_fail(assert(AZ,G)).
-database_modify_0(change(assert,AZ),          G):- copy_term(G,GG),database_modify_assert(change(assert,AZ),G,GG),(must(variant(G,GG))).
-
-database_modify_assert(change(assert,_),         G,GG):- ( \+ \+ is_asserted(GG)),must(variant(G,GG)),!.
-database_modify_assert(change(assert,AZ),       _G,GG):- expire_pre_change(AZ,GG),fail.
-database_modify_assert(change(assert,AorZ),      G,GG):- G \= (_:-_), get_functor(G,F,A),
-   (asserted_mpred_prop(F,prologSingleValued) -> (AorZ \== sv -> db_assert_sv(AorZ,G,F,A); fail); 
-       asserted_mpred_prop(F,prologOrdered) -> (AorZ\==z -> database_modify_assert_must(change(assert,z),G,GG);true)).
-database_modify_assert(change(assert,AorZ),      G,GG):-database_modify_assert_must(change(assert,AorZ),G,GG).
-
-database_modify_assert_must(Op,G,GG):-must(database_modify_assert_4(Op,G,GG)).
-
-database_modify_assert_4(change(assert,_),_, GG):- thglobal:pfcManageHybrids,!,copy_term(GG,GGG),(\+ \+ pfcAdd_fast(GGG)),!,show_call_failure(variant(GG,GGG)),!.
-database_modify_assert_4(change(assert,AorZ), _,GG):- Op = change(assert,AorZ),                              
-                              database_modify_5(Op,GG),!,
-                              database_modify_6(Op,GG),
-                              database_modify_7(Op,GG),
-                              ignore(show_call_failure(database_modify_8(Op,GG))),!.
-
-database_modify_5(change(assert,_), GG):- thglobal:pfcManageHybrids,!,copy_term(GG,GGG),(\+ \+ pfcAdd_fast(GGG)),!,show_call_failure(variant(GG,GGG)),!.
-database_modify_5(Op,GG):- copy_term(GG,GGG),must((must_storage_op(Op,GGG), sanity(variant(GG,GGG)))),!.
-database_modify_6(Op,GG):- copy_term(GG,GGE),doall(must(call_no_cuts(expire_post_change(Op,GGE)))),sanity(variant(GG,GGE)),!.
-database_modify_7(Op,GG):- copy_term(GG,GGH),must((run_database_hooks(Op,GGH),sanity(variant(GG,GGH)))),!.
-database_modify_8(_ ,GG):- copy_term(GG,GGA),no_loop_check(is_asserted_eq(GGA)),sanity(variant(GG,GGA)),!.
-                               
-
-
-% ========================================
-% only place ever should actual game database be changed from
-% ========================================
-
-hooked_asserta(G):- loop_check(dbase_modify(change(assert,a),G),true).
-
-hooked_assertz(G):- loop_check(dbase_modify(change(assert,z),G),true).
-
-hooked_retract(G):-  Op = change(retract,a),
-                   ignore(slow_sanity(ignore(show_call_failure((dbase_op(is_asserted,G)))))),
-                   slow_sanity(not(singletons_throw_else_fail(retract_cloc(G)))),
-                   slow_sanity(ignore(((ground(G), once(show_call_failure((is_asserted(G)))))))),
-                   must_storage_op(Op,G),expire_post_change( Op,G),
-                   sanity(ignore(show_call_failure(not_asserted((G))))),
-                   loop_check(run_database_hooks_depth_1(change(retract,a),G),true).
-
-hooked_retractall(G):- Op = change(retract,all),
-                   slow_sanity(ignore(((ground(G), once(show_call_failure((is_asserted(G)))))))),
-                   must_storage_op(Op,G),expire_post_change( Op,G),
-                   sanity(ignore(show_call_failure(not_asserted((G))))),
-                   loop_check(run_database_hooks_depth_1(change(retract,all),G),true).
-
-
-user:provide_mpred_storage_op(Op,G):- (loop_check(pfc_provide_mpred_storage_op(Op,G))).
-user:provide_mpred_storage_op(Op,G):- (loop_check(dbase_t_provide_mpred_storage_op(Op,G))).
-user:provide_mpred_storage_op(Op,G):- (loop_check(prolog_provide_mpred_storage_op(Op,G))).
-user:provide_mpred_storage_op(Op,G):- (loop_check(isa_provide_mpred_storage_op(Op,G))).
-user:provide_mpred_storage_op(Op,G):- Op\=change(_,_), (call_no_cuts(user:provide_mpred_storage_clauses(G,true,_Proof))).
-
-must_storage_op(Op,G):- doall(must(may_storage_op(Op,G))).
-
-may_storage_op(Op,G):-call_no_cuts(user:provide_mpred_storage_op(Op,G)).
-
-
-:- meta_predicate hooked_asserta(0), hooked_assertz(0), hooked_retract(0), hooked_retractall(0).
-
-:- meta_predicate del(-),clr(-),add(-),req(-), fully_expand(-,-,-).
-
-% Found new meta-predicates in iteration 1 (0.281 sec)
-%:- meta_predicate dbase_modify(?,?,?,0).
-
 
 % ================================================================================
 % DETECT PREDS THAT NEED STORAGE 
@@ -496,32 +441,107 @@ db_must_asserta_confirmed_sv(CNEW,A,NEW):-dmsg(unconfirmed(db_must_asserta_confi
 
 with_assert_op_override(Op,Call):-with_assertions(thlocal:assert_op_override(Op),Call).
 
+test_expand_units(IN):-fully_expand(query(dbase_t,must),IN,OUT),dmsg(test_expand_units((IN->OUT))).
 
 
-% ================================================
-% db_redir_op_if_needed/4
-% ================================================
-/* TODO RE-INCORPERATE
-db_redir_op_if_needed(Op,C0,Prop,_ARGS):- glean_pred_props_maybe(C0),fail.
 
-% predProxyDatabase/1
-db_redir_op_if_needed(Op,C0,Prop,_ARGS):- get_mpred_prop(Prop,predProxyDatabase(Other)),must(nonvar(Other)),!,call(Other,Op,C0).
+dbase_modify(Op,                 G):- (var(Op);var(G)),!,trace_or_throw(var_database_modify_op(Op,  G )).
+dbase_modify(Op,                 G):- G\=predArgTypes(_),fully_expand(Op,G,GG),not_variant(G,GG),!,dbase_modify(Op, GG ),!.
+dbase_modify(_,  (:-include(FILE))):- !,must(load_data_file_now(FILE)).
+dbase_modify(Op,  (:-(G))         ):- !,must(with_assert_op_override(Op,debugOnError(G))).
+dbase_modify(P,                  G):- thlocal:noDBaseMODs(_),!,dmsg(noDBaseMODs(P,G)).
+%dbase_modify(Op,                 G):- dbase_head_expansion(clause,G,GG),not_variant(G,GG),database_modify_0(Op, GG ),!.
+dbase_modify(Op,                 G):- database_modify_0(Op,G ),!.
+dbase_modify(Op,                 G):- trace_or_throw(unknown_database_modify(Op,G)).
 
-% predProxyAssert/1
-db_redir_op_if_needed(change(assert,A),C0,Prop,_RGS):- get_mpred_prop(Prop,predProxyAssert(How)),must(nonvar(How)),!, once(ignore((call(How,C0), run_database_hooks(change(assert,A),C0)))).
 
-% predProxyRetract/1
-db_redir_op_if_needed(change(retract,A),C0,Prop,_RGS):- get_mpred_prop(Prop,predProxyRetract(How)),must(nonvar(How)),!, once(ignore((call(How,C0), run_database_hooks(change( retract,A),C0)))).
-
-% predProxyQuery/1
-db_redir_op_if_needed(query(Must,HLDS),C0,Prop,_RGS):- get_mpred_prop(Prop,predProxyQuery(How)),must(nonvar(How)),!, dbase_op(query(Must,HLDS),call(How,C0)).
-
-% plain prop
-db_redir_op_if_needed(Op,_C0,Prop,ARGS):- database_modify_units(Op,Unit).
-
+/*
+database_modify_0(change(assert, add), G):-predicate_property(M:G,_PP),M==system,!,mpred_call(G).
+database_modify_0(change(assert, add), G):-current_predicate(_,G),!,debugOnError(G).
+database_modify_0(Op,G):- Op=change(_,_), G=..[And|Stuff], is_logical_functor(And),dtrace(And),loop_check(with_logical_functor(And,Stuff,database_modify_0(Op))).
+database_modify_0(Op,G):- once(must(db_quf(Op,G,U,Template))),not(is_true(U)),!, mpred_call(U),database_modify_0(Op,Template).
+database_modify_0(change(Assert,AorZ),G):- non_assertable(G,Why),trace_or_throw(non_assertable(Why,change(Assert,AorZ),G)).
+database_modify_0(change(retract,all),G):- !, db_quf(change( retract,all),G,U,Template),!,when_debugging(retract,dtrace), doall((mpred_call(U),hooked_retractall(Template))).
+database_modify_0(change(retract,A),G):- must(db_quf(change( retract,A),G,U,Template)),!,when_debugging(retract,dtrace), mpred_call(U),!,hooked_retract(Template).
+database_modify_0(Op,  G):- Op=..[Assert,How],!,database_modify_0(change(Assert,How),   G).
+database_modify_0(Op,  G):- Op=..[Assert],!,database_modify_0(change(Assert,one),   G).
 */
 
-test_expand_units(IN):-fully_expand(query(dbase_t,must),IN,OUT),dmsg(test_expand_units((IN->OUT))).
+database_modify_0(Op,                       M:G):- atom(M),!, database_modify_0(Op,G).
+database_modify_0(Op,                   (C1,C2)):- !, must(database_modify_0(Op,C1)), must(database_modify_0(Op,C2)).
+database_modify_0(change(Assert,AorZ),(G:-TRUE)):- is_true(TRUE),!,database_modify_0(change(Assert,AorZ),G).
+database_modify_0(change(retract,a),          G):- hooked_retract(G).
+database_modify_0(change(retract,one),        G):- hooked_retract(G).
+database_modify_0(change(retract,_),          G):- hooked_retractall(G).
+database_modify_0(change(assert,AZ),          G):- singletons_throw_else_fail(assert(AZ,G)).
+database_modify_0(change(assert,AZ),          G):- copy_term(G,GG),database_modify_assert(change(assert,AZ),G,GG),(must(variant(G,GG))).
+
+database_modify_assert(change(assert,_),         G,GG):- ( \+ \+ is_asserted(GG)),must(variant(G,GG)),!.
+database_modify_assert(change(assert,AZ),       _G,GG):- expire_pre_change(AZ,GG),fail.
+database_modify_assert(change(assert,AorZ),      G,GG):- G \= (_:-_), get_functor(G,F,A),
+   (asserted_mpred_prop(F,prologSingleValued) -> (AorZ \== sv -> db_assert_sv(AorZ,G,F,A); fail); 
+       asserted_mpred_prop(F,prologOrdered) -> (AorZ\==z -> database_modify_assert_must(change(assert,z),G,GG);true)).
+database_modify_assert(change(assert,AorZ),      G,GG):-database_modify_assert_must(change(assert,AorZ),G,GG).
+
+database_modify_assert_must(Op,G,GG):-must(database_modify_assert_4(Op,G,GG)).
+
+database_modify_assert_4(change(assert,_),_, GG):- thglobal:pfcManageHybrids,!,copy_term(GG,GGG),(\+ \+ pfcAdd_fast(GGG)),!,show_call_failure(variant(GG,GGG)),!.
+database_modify_assert_4(change(assert,AorZ), _,GG):- Op = change(assert,AorZ),                              
+                              database_modify_5(Op,GG),!,
+                              database_modify_6(Op,GG),
+                              database_modify_7(Op,GG),
+                              ignore(show_call_failure(database_modify_8(Op,GG))),!.
+
+database_modify_5(change(assert,_), GG):- thglobal:pfcManageHybrids,!,copy_term(GG,GGG),(\+ \+ pfcAdd_fast(GGG)),!,show_call_failure(variant(GG,GGG)),!.
+database_modify_5(Op,GG):- copy_term(GG,GGG),must((must_storage_op(Op,GGG), sanity(variant(GG,GGG)))),!.
+database_modify_6(Op,GG):- copy_term(GG,GGE),doall(must(call_no_cuts(expire_post_change(Op,GGE)))),sanity(variant(GG,GGE)),!.
+database_modify_7(Op,GG):- copy_term(GG,GGH),must((run_database_hooks(Op,GGH),sanity(variant(GG,GGH)))),!.
+database_modify_8(_ ,GG):- copy_term(GG,GGA),no_loop_check(is_asserted_eq(GGA)),sanity(variant(GG,GGA)),!.
+                               
+
+
+% ========================================
+% only place ever should actual game database be changed from
+% ========================================
+
+hooked_asserta(G):- loop_check(dbase_modify(change(assert,a),G),true).
+
+hooked_assertz(G):- loop_check(dbase_modify(change(assert,z),G),true).
+
+hooked_retract(G):-  Op = change(retract,a),
+                   ignore(slow_sanity(ignore(show_call_failure((dbase_op(is_asserted,G)))))),
+                   slow_sanity(not(singletons_throw_else_fail(retract_cloc(G)))),
+                   slow_sanity(ignore(((ground(G), once(show_call_failure((is_asserted(G)))))))),
+                   must_storage_op(Op,G),expire_post_change( Op,G),
+                   sanity(ignore(show_call_failure(not_asserted((G))))),
+                   loop_check(run_database_hooks_depth_1(change(retract,a),G),true).
+
+hooked_retractall(G):- Op = change(retract,all),
+                   slow_sanity(ignore(((ground(G), once(show_call_failure((is_asserted(G)))))))),
+                   must_storage_op(Op,G),expire_post_change( Op,G),
+                   sanity(ignore(show_call_failure(not_asserted((G))))),
+                   loop_check(run_database_hooks_depth_1(change(retract,all),G),true).
+
+
+user:provide_mpred_storage_op(Op,G):- (loop_check(pfc_provide_mpred_storage_op(Op,G))).
+user:provide_mpred_storage_op(Op,G):- (loop_check(dbase_t_provide_mpred_storage_op(Op,G))).
+user:provide_mpred_storage_op(Op,G):- (loop_check(prolog_provide_mpred_storage_op(Op,G))).
+user:provide_mpred_storage_op(Op,G):- (loop_check(isa_provide_mpred_storage_op(Op,G))).
+user:provide_mpred_storage_op(Op,G):- Op\=change(_,_), (call_no_cuts(user:provide_mpred_storage_clauses(G,true,_Proof))).
+
+must_storage_op(Op,G):- doall(must(may_storage_op(Op,G))).
+
+may_storage_op(Op,G):-call_no_cuts(user:provide_mpred_storage_op(Op,G)).
+
+
+:- meta_predicate hooked_asserta(0), hooked_assertz(0), hooked_retract(0), hooked_retractall(0).
+
+:- meta_predicate del(-),clr(-),add(-),req(-), fully_expand(-,-,-).
+
+% Found new meta-predicates in iteration 1 (0.281 sec)
+%:- meta_predicate dbase_modify(?,?,?,0).
+
+
 
 
 

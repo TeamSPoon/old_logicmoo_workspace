@@ -17,36 +17,6 @@
 :- include(dbase_i_header).
 
 
-side_effect_prone:- \+ thlocal:noDBaseMODs(_).
-
-
-
-:-meta_predicate_transparent(with_no_modifications(0)).
-with_no_modifications(CALL):-!,CALL.
-with_no_modifications(CALL):-with_assertions(thlocal:noDBaseMODs(_),CALL).
-
-:-meta_predicate_transparent(with_no_db_hooks(0)).
-with_no_db_hooks(CALL):-!,CALL.
-with_no_db_hooks(CALL):-with_assertions(thlocal:noDBaseHOOKS(_),CALL).
-
-:-meta_predicate_transparent(with_fallbacks(0)).
-with_fallbacks(CALL):-with_no_assertions(thlocal:infAssertedOnly(_),CALL).
-
-:-meta_predicate_transparent(with_fallbacksg(0)).
-with_fallbacksg(CALL):-with_no_assertions(thlocal:noRandomValues(_),CALL).
-
-:-meta_predicate_transparent(with_no_fallbacksg(0)).
-with_no_fallbacksg(CALL):-with_assertions(thlocal:noRandomValues(_),CALL).
-
-:-meta_predicate_transparent(with_no_fallbacks(0)).
-with_no_fallbacks(CALL):-with_assertions(thlocal:infAssertedOnly(_),CALL).
-
-:-thread_local(infSecondOrder/0).
-infSecondOrder :- not(thlocal:infInstanceOnly(_)).
-
-:-thread_local(infThirdOrder/0).
-infThirdOrder :- fail, infSecondOrder, not(thlocal:noRandomValues(_)).
-
 end_of_file.
 end_of_file.
 end_of_file.
