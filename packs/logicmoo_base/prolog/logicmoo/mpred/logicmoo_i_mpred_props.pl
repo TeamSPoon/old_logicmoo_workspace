@@ -23,11 +23,6 @@
 :- export user:mpred_prop/2.
 :- export is_never_type/1.
 
-%OLD user:decl_database_hook(change(assert,_),Fact):- ignore((compound(Fact),Fact=..[F,Arg1|PROPS],is_pred_declarer(F),decl_mpred(Arg1,[F|PROPS]))).
-%OLD user:decl_database_hook(change(assert,_),isa(F,P)):- is_pred_declarer(P),decl_mpred(F,P).
-% this causes too many bugs user:decl_database_hook(change(assert,_),user:mpred_prop(F,arity(A))):- ignore((A==1,atom(F),not(is_never_type(F)),not(user:mpred_prop(F,prologOnly)),decl_type(F))).
-%OLD user:decl_database_hook(change(assert,_),user:mpred_prop(F,P)):- decl_mpred(F,P).
-
 asserted_mpred_prop(F,P):-clause(mpred_prop(F,P),true).
 
 arity(apathFn,2).

@@ -198,7 +198,7 @@ ttFormatted(ftDeplictsFn(tCol)).
 :- decl_type(tAvoidForwardChain).
 :- decl_type('SententialOperator').
 :- assert_hasInstance(tAvoidForwardChain,'$VAR'('FUNC')).
-:-trace.
+
 tAvoidForwardChain(isEach('FunctionToArg',holds,equals,different,evaluate,trueSentence,'TINYKB-ASSERTION',termOfUnit)).
 genls('SententialRelation','SententialOperator').
 genls('SententialOperator',tAvoidForwardChain).

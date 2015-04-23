@@ -80,7 +80,7 @@ verify_sanity(P):- dmsg('$ERROR_incomplete_SANITY'(P)),!.
 when_debugging(What,Call):- debugging(What),!,Call.
 when_debugging(_,_).
 
-:- asserta(tlbugger:no_colors).
+% :- asserta(tlbugger:no_colors).
 % :- asserta(tlbugger:show_must_go_on).
 
 :- set_prolog_flag(double_quotes, atom).
@@ -340,7 +340,7 @@ vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes)
 %:-prolog_repl.
 %:-loadTinyAssertions2.
 
-:- source_location(S,_),forall(source_file(H,S),( \+predicate_property(H,built_in), functor(H,F,A),module_transparent(F/A),export(F/A))).
+% :- source_location(S,_),forall(source_file(H,S),( \+predicate_property(H,built_in), functor(H,F,A),module_transparent(F/A),export(F/A))).
 
 %system:term_expansion(I,O):- thlocal:consulting_sources, with_no_assertions(thlocal:consulting_sources,add(I)),O=true.
 user:goal_expansion(ISA,G) :-compound(ISA),thlocal:is_calling,was_isa(ISA,I,C),G=no_repeats(isa(I,C)).

@@ -61,9 +61,11 @@ map_unless(Test,Pred,(H,T),S):-!, apply(Pred,[H|S]), map_unless(Test,Pred,T,S).
 map_unless(Test,Pred,[H|T],S):-!, apply(Pred,[H|S]), map_unless(Test,Pred,T,S).
 map_unless(Test,Pred,H,S):-H=..List,!,map_unless(Test,Pred,List,S),!.
 
-pfc_maptree(_,[],_) :- !.
+pfc_maptree(Pred,List):-pfc_maptree(Pred,List,[]).
 pfc_maptree(Pred,H,S):-var(H),!,apply(Pred,[H|S]).
-pfc_maptree(Pred,(H,T),S):-!, apply(Pred,[H|S]), pfc_maptree(Pred,T,S).
+pfc_maptree(_,[],_) :- !.
+pfc_maptree(Pred,(H,T),S):-!, pfc_maptree(Pred,H,S), pfc_maptree(Pred,T,S).
+pfc_maptree(Pred,(H;T),S):-!, pfc_maptree(Pred,H,S) ; pfc_maptree(Pred,T,S).
 pfc_maptree(Pred,[H|T],S):-!, apply(Pred,[H|S]), pfc_maptree(Pred,T,S).
 pfc_maptree(Pred,H,S):-apply(Pred,[H|S]). 
 
@@ -361,6 +363,7 @@ pfc_add_trigger(_Sup,pt(Trigger,Body),Support) :-
   !,
   pfc_trace_msg('~N%       Adding p-trigger ~q~n',
 		[pt(Trigger,Body)]),
+  functor(Trigger,F,A),pfc_add_fast([pfcControls(F),arity(F,A)]),
   pfc_assert_i(pt(Trigger,Body),Support),
   copy_term(pt(Trigger,Body),Tcopy),
   pfc_call(Trigger),
@@ -372,6 +375,7 @@ pfc_add_trigger(_Sup,nt(Trigger,Test,Body),Support) :-
   !,
   pfc_trace_msg('~N%       Adding n-trigger: ~q~n       test: ~q~n       body: ~q~n',
 		[Trigger,Test,Body]),
+  functor(Trigger,F,A),pfc_add_fast([pfcControls(F),arity(F,A)]),
   copy_term(Trigger,TriggerCopy),
   pfc_assert_i(nt(TriggerCopy,Test,Body),Support),
   \+Test,
@@ -381,6 +385,7 @@ pfc_add_trigger(_Sup,nt(Trigger,Test,Body),Support) :-
 pfc_add_trigger(Sup,bt(Trigger,Body),Support) :-
   !,
   pfc_assert_i(bt(Trigger,Body),Support),
+  functor(Trigger,F,A),pfc_add_fast([pfcControls(F),arity(F,A)]),
   % WAS pfc_bt_pt_combine(Sup,Trigger,Body).
   pfc_bt_pt_combine(Sup,Trigger,Body,Support).
 
@@ -1319,7 +1324,7 @@ pfc_retract_or_warn_i(X) :-
 
 pfc_queue :- listing(pfc_queue/2).
 
-pppfc:-pfc_silient,!.
+
 pppfc :-
   pp_facts,
   pp_rules,
@@ -1333,7 +1338,6 @@ pp_facts :- pp_facts(_,true).
 
 pp_facts(Pattern) :- pp_facts(Pattern,true).
 
-pp_facts(_,_):-pfc_silient,!.
 pp_facts(P,C) :-
   pfc_facts(P,C,L),
   pfc_classify_facts(L,User,Pfc,_Rule),
@@ -1360,7 +1364,6 @@ pp_items(H) :- pp_item(H).
 pp_item(P):-pp_item("",P).
 pp_item(M,O):- (\+ \+ (numbervars(M:O),pp_item0(M,O))),!.
 
-pp_item0(_,_):-pfc_silient,!.
 pp_item0(M,spft(W,U,U)):-!,pp_item0(M,U:W).
 pp_item0(M,(H:-true)):-pp_item0(M,H).
 pp_item0(M,spft(P,F,T)):-!,format('~N% ~w   d:~q    <== ~q <==> ~q~n', [M,P,F,T]).
@@ -1419,7 +1422,6 @@ get_pi(F/A,PI):-functor(PI,F,A).
 get_pi(PI,PI):-!.
 get_pi(Mask,PI):-get_functor(Mask,F,A),functor(PI,F,A),!.
 
-print_db_items(_,_,_):-pfc_silient,!.
 print_db_items(Title,Mask,What0):-
      get_pi(Mask,H),
      get_pi(What0,What),
@@ -1912,7 +1914,6 @@ system:term_expansion(I,OO):- \+ thlocal:pfc_already_in_file_expansion(_),
 
  
 :-assert(thlocal:pfc_term_expansion_ok).
-:- pfc_trace.
 
 
 
@@ -1924,8 +1925,7 @@ genls(X,tPred) => is_declarer_macro(X).
 
 tCol(tCol).
 tCol(tPred).
-tCol(pfcContolled).
-
+tCol(pfcControls).
 
 
 :-dynamic(pfc_default/1).
@@ -1970,7 +1970,7 @@ mpred_sv(Pred,Arity)
 
 
 pfc_mark_C(G) => {pfc_mark_C(G)}.
-pfc_mark_C(G) :-  map_literals(pfc_lambda([P],(get_functor(P,F,A),pfc_add([isa(F,pfcContolled),arity(F,A)]))),G).
+pfc_mark_C(G) :-  map_literals(pfc_lambda([P],(get_functor(P,F,A),pfc_add([isa(F,pfcControls),arity(F,A)]))),G).
 
 
 end_of_file.
@@ -2083,6 +2083,8 @@ or(P1,P2,P3) =>
 	 baz(2),
 	 baz(1)
 	]).
+
+:-pfc_untrace.
 
 % :-trace.
 

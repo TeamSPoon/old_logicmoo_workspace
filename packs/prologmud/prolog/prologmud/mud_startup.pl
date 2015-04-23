@@ -215,7 +215,7 @@ user:agent_text_command(Agent,["run",Term], Agent,actProlog(Term)):- ignore(Term
 % Load the map file appropriate for the world being used.
 % Load the mud files appropriate for the mobs being used.
 :- forall(filematch(prologmud('*/?*.plmoo'), X),dmsg(X)).
-:- trace,ensure_plmoo_loaded(prologmud('*/?*.plmoo')).
+:- ensure_plmoo_loaded(prologmud('*/?*.plmoo')).
 :- forall(filematch(prologmud('*/*/?*.plmoo'), X),dmsg(X)).
 :- ensure_plmoo_loaded(prologmud('*/*/?*.plmoo')).
 

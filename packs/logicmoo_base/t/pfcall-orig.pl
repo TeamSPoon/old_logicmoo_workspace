@@ -1783,6 +1783,7 @@ pfc_selectJustificationNode(Js,Index,Step) :-
 	 baz(2),
 	 baz(1)
 	]).
+:- pfc_trace.
 
 :-prolog.    
 

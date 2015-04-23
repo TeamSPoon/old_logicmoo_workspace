@@ -221,7 +221,7 @@ get_body_functor(BDY,BF,A):-get_functor(BDY,BF,A).
 
 
 % -  del(RetractOne) 
-del(C):- fully_expand(change(retract,a),/*to_exp*/(C),C0),del0(C0).
+del(C):- fully_expand(change(retract,a),C,C0),pfc_maptree(del0,C0).
 del0(C0):- mpred_call(C0),!,clr(C0),!.
 del0(C0):- ireq(C0),!,idel(C0),!.
 del0(C0):- mreq(C0),!,mdel(C0),!.
@@ -234,23 +234,13 @@ mdel(C0):- dmsg(warn(failed(mdel(C0)))),!,fail.
 
 % -  clr(Retractall)
 % clr(C0):- dmsg(clr(C0)),fail,mpred_modify(change(retract,all),/*to_exp*/(C0)),verify_sanity(ireq(C0)->(dmsg(warn(incomplete_CLR(C0))));true).
-clr(P):- agenda_do_prequery,forall(P, must((( 
- doall((  pfc_rem2(P),
-   sanity(not(pfc_tms_supported(local,P))))),
-                 not(P))))).
+clr(P):- agenda_do_prequery,
+  fully_expand(change(retract,all),P,PL),
+  pfc_maptree(clr0,PL).
 
-pfcRemE(P):-var(P),!.
-pfcRemE(!):-!.
-pfcRemE(true):-!.
-pfcRemE(\+neg(P)):-!,pfcRemE(P).
-pfcRemE(pfcCall(_)):-!.
-pfcRemE(consult(P)):-!,pfcRemE(P).
-pfcRemE([P]):-!,pfcRemE(P).
-pfcRemE(P):-pfcRem3(P),fail.
-pfcRemE(P):-pfc_rem2(P,_),fail.
-pfcRemE(P):-pfcRem1(P,_),fail.
-pfcRemE(P):-predicate_property(P,number_of_clauses(_)),predicate_property(P,dynamic),clause(P,true,Ref),erase(Ref),fail.
-pfcRemE(_).
+clr0(P):- 
+  forall(debugOnError(P), forall( pfc_rem2(P), sanity(not(pfc_tms_supported(local,P)),must(\+(P))))).
+
 
 % -  preq(Query) = query with P note
 preq(P,C0):- agenda_do_prequery,mpred_op(query(t,P),C0).
