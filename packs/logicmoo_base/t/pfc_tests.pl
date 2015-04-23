@@ -113,3 +113,5 @@ test(10) :-
 :- pfc_trace.
 
 run_tests:-forall(between(1,10,X),debugOnError((once(test(X))))).
+
+

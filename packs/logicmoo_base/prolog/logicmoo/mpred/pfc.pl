@@ -1916,15 +1916,15 @@ system:term_expansion(I,OO):- \+ thlocal:pfc_already_in_file_expansion(_),
 
 
 
-tCol(X)<=>isa(X,tCol).
+tCol(X) <=> isa(X,tCol).
 tCol(X) => ruleRewrite(t(X,I),isa(I,X)).
-
 tCol(X) => { pfc_add(isa(X,tCol)) },is_declarer_macro(X).
 
 genls(X,tPred) => is_declarer_macro(X).
 
 tCol(tCol).
 tCol(tPred).
+tCol(pfcContolled).
 
 
 
@@ -1943,107 +1943,14 @@ pfc_select(conflict(X),W) :- pfc_queue(conflict(X),W).
 
 % a pretty basic conflict.
 (neg(P), P) => conflict(P).
-/*
-(({pfc_literal(P)}, \+(P), P) => conflict(P)).
-(({pfc_literal(P)}, P, neg(P)) => conflict(P)).
-(({pfc_literal(P)}, P, \+(P)) => conflict(P)).
-
-( (neg(P)/pfc_literal(P)),P) =>conflict(neg(P)).
-
-(((P/pfc_literal(P)),neg(P)) => {pfc_rem2(neg(P))}).
-(((neg(P)/pfc_literal(P)),P) => {pfc_rem2(P)}).
-*/
-
-
-a=>z.
-=>a.
-% =>b. b=>z.
-
-%:-pfc_remove3(a).
-:-pfc_rem(a).
-% :-pfc_unfwc(a).
-% :-pfc_unfwc1(a).
-
-
-:-lsting([a,z]).
-
-
-:- include(pack(logicmoo_base/t/pfc_tests)).
-
-:- run_tests.
-
 
 
 % is this how to define constraints?
 (either(P,Q) => (neg(P) => Q), (neg(Q) => P)).
 % ((P,Q => false) => (P => neg(Q)), (Q => neg(P))).
 
-:-dynamic((fly/1,bird/1,penguin/1)).
 
-% birds fly by pfc_default.
-=> pfc_default((bird(X) => fly(X))).
-
-% heres one way to do an subclass hierarchy.
-
-zenls(C1,C2) =>
-  {P1 =.. [C1,X],
-    P2 =.. [C2,X]},
-  (P1 => P2).
-
-=> zenls(canary,bird).
-
-% tweety is a canary.
-=> canary(tweety).
-:-lsting([neg/1,fly]).
-=> neg(fly(tweety)).
-:-lsting([neg/1,fly]).
-:- pfc_rem(neg(fly(tweety))).
-:-lsting([neg/1,fly]).
-
-%:-trace.
-
-=> zenls(penguin,bird).
-=> bird(chilly).
-% penguins do not fly.
-penguin(X) => neg(fly(X)).
-
-
-
-% chilly is a penguin.
-=> penguin(chilly).
-
-:-lsting([neg/1,fly,penguin,bird]).
-:-pfc_listing(chilly).
-%:-trace.
-
-:-pfc_rem(penguin(chilly)).
-
-:-lsting([neg/1,fly,penguin,bird]).
-:-pfc_listing(chilly).
-%:-trace.
-
-
-
-:-must(bird(chilly)).
-
-:-pfc_assert(fly(chilly)).
-
-:-lsting([neg/1,fly,penguin,bird]).
-%:-trace.
-
-:-pfc_rem1(fly(chilly)).
-
-:-lsting([neg/1,fly,penguin,bird]).
-%%:-trace.
-
-
-
-
-
-
-
-
-% asserting mpred_sv(p) cuases p/2 to be treated as a mpred_sv, i.e.
+% asserting mpred_sv(p,2) causes p/2 to be treated as a mpred_sv, i.e.
 % if p(foo,1)) is a fact and we assert_db p(foo,2), then the forrmer assertion
 % is retracted.
 
@@ -2058,48 +1965,27 @@ mpred_sv(Pred,Arity)
   Before =.. [Pred|BeforeList]},
   (After,{Before, \==(A , B)} => {pfc_rem2(Before)}).
 
-  /*
-:-  pp_facts.
-:-   pp_triggers.
-:-   pp_supports.
-:-   pp_rules.
-*/
-
-=> factoral(0,1).
-=> factoral(1,1).
-=> factoral(2,2).
-factoral(N,M) <= {N>0,N1 is N-1}, factoral(N1,M1), {M is N*M1}.
-
-
-=> fibonacci(1,1).
-=> fibonacci(2,1).
-fibonacci(N,M) <=
-  {N>2,N1 is N-1,N2 is N-2},
-  fibonacci(N1,M1),
-  fibonacci(N2,M2),
-  {M is M1+M2}.
 
 
 
-% ({(C => {Goal})} => {assert_if_new((C:-Goal))}).
-
-=>tCol(pfcContolled).
 
 pfc_mark_C(G) => {pfc_mark_C(G)}.
 pfc_mark_C(G) :-  map_literals(pfc_lambda([P],(get_functor(P,F,A),pfc_add([isa(F,pfcContolled),arity(F,A)]))),G).
 
 
+end_of_file.
 
-% ((C => {Goal}))=> {assert_if_new((C:-Goal))}.
+
+
+% :- include(pack(logicmoo_base/t/pfc_tests)).
+
+% :- run_tests.
+
 
 
 
 
 % -*-Prolog-*-
-
-
-
-
 
 
 /*
@@ -2200,7 +2086,81 @@ or(P1,P2,P3) =>
 
 % :-trace.
 
-end_of_file.
+
+
+
+a=>z.
+=>a.
+% =>b. b=>z.
+
+%:-pfc_remove3(a).
+:-pfc_rem(a).
+% :-pfc_unfwc(a).
+% :-pfc_unfwc1(a).
+
+
+:-lsting([a,z]).
+
+
+:-dynamic((fly/1,bird/1,penguin/1)).
+
+% birds fly by pfc_default.
+=> pfc_default((bird(X) => fly(X))).
+
+% heres one way to do an subclass hierarchy.
+
+zenls(C1,C2) =>
+  {P1 =.. [C1,X],
+    P2 =.. [C2,X]},
+  (P1 => P2).
+
+=> zenls(canary,bird).
+
+% tweety is a canary.
+=> canary(tweety).
+:-lsting([neg/1,fly]).
+=> neg(fly(tweety)).
+:-lsting([neg/1,fly]).
+:- pfc_rem(neg(fly(tweety))).
+:-lsting([neg/1,fly]).
+
+%:-trace.
+
+=> zenls(penguin,bird).
+=> bird(chilly).
+% penguins do not fly.
+penguin(X) => neg(fly(X)).
+
+
+
+% chilly is a penguin.
+=> penguin(chilly).
+
+:-lsting([neg/1,fly,penguin,bird]).
+:-pfc_listing(chilly).
+%:-trace.
+
+:-pfc_rem(penguin(chilly)).
+
+:-lsting([neg/1,fly,penguin,bird]).
+:-pfc_listing(chilly).
+%:-trace.
+
+
+
+:-must(bird(chilly)).
+
+:-pfc_assert(fly(chilly)).
+
+:-lsting([neg/1,fly,penguin,bird]).
+%:-trace.
+
+:-pfc_rem1(fly(chilly)).
+
+:-lsting([neg/1,fly,penguin,bird]).
+%%:-trace.
+
+
 
 %= meta rules
 
