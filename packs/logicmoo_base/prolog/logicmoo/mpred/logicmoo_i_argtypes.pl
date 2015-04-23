@@ -30,6 +30,7 @@
 assert_argIsa(Prop,N,Type):-show_call_failure(add_fast(argIsa(Prop,N,Type))).
 
 
+
 term_is_ft(Term,Type):- var(Term),!,member(Type,[ftVar,ftProlog]).
 term_is_ft(_ANY,Type):- Type==ftVar,!,fail.
 term_is_ft([T|Term],ftListFn(Type)):-!,is_list_of(Type,[T|Term]).

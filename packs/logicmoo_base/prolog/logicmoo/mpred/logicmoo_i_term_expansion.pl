@@ -411,7 +411,7 @@ into_functor_form(Dbase_t,_X,HFDS,A,Call):- is_holds_true(HFDS), Call=..[Dbase_t
 into_functor_form(Dbase_t,_X,F,A,Call):-Call=..[Dbase_t,F|A].
 
 % ========================================
-% into_mpred_form/2 (removes a second order functors until the common mpred form is left)
+% into_mpred_form/2 (removes second order functors until the common mpred form is left)
 % ========================================
 :-moo_hide_childs(into_mpred_form/2).
 :-export(into_mpred_form/2).

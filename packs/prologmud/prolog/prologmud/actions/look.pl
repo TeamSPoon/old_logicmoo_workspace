@@ -89,7 +89,7 @@ cmdLook_proc_0(Agent,LOC):-
          %  but yet this doent?
        %   cmdShowRoomGrid = once(with_output_to(string(value),cmdShowRoomGrid(region))),
          % for now workarround is 
-         call(cmdShowRoomGrid(vHere)),
+         call((cmdShowRoomGrid(vHere),!)),
          mudAtLoc(Agent,value),
          nameStringsList(vHere,value),
          forEach(mudDescription(vHere,Value),fmt(mudDescription(Value))),

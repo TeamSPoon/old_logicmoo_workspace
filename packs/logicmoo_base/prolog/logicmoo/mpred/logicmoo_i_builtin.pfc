@@ -144,6 +144,10 @@ notequal(C,B) <= equal(A,C),notequal(A,B).
 :- define_ft(ftVar).
 :- define_ft(ftSpec).
 
+
+argIsa(Prop,N,Type) <= argIsa_known(Prop,N,Type).
+argQuotedIsa(Prop,N,Type) <= argIsa(Prop,N,Type),ttFormatType(Type).
+
 %:-export(repl_to_string(tAgentGeneric,ftTerm)).
 %:-export(repl_writer/2).
 %:-export(repl_writer(tAgentGeneric,ftTerm)).
@@ -498,7 +502,7 @@ jj=>jj.
 
 % completeExtentAsserted(genls)
 
-sane_transitivity(PredInfo,I,Sub,Super):-  
+sane_transitivity(_PredInfo,I,Sub,Super):-  
 % (I=Super->trace_or_throw(sane_transitivity(PredInfo,I,Sub,Super));true),
 %  sanity(I=Sub->trace_or_throw(sane_transitivity(PredInfo,I,Sub,Super));true),
 %  sanity(Sub=Super->trace_or_throw(sane_transitivity(PredInfo,I,Sub,Super));true),

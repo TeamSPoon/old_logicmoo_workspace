@@ -291,12 +291,13 @@ cmdShowRoomGrid(Room) :- ignore(show_room_grid_new(Room)),!.
 show_room_grid_new(Room):-
    grid_size(Room,Xs,Ys,_Zs),
    Ys1 is Ys+1,Xs1 is Xs+1,
-   between(0,Ys1,Y),
-   nl, between(0,Xs1,X),
-   loc_to_xy(Room,X,Y,LOC),
+   forall(between(0,Ys1,Y),
+   ((nl, 
+   forall(between(0,Xs1,X),
+   ((loc_to_xy(Room,X,Y,LOC),
    write(' '),
    OutsideTest = (not(between(1,Xs,X));not(between(1,Ys,Y))),
-   once(show_room_grid_single(Room,LOC,OutsideTest)),fail.
+   once(show_room_grid_single(Room,LOC,OutsideTest)))))))),!,nl.
 show_room_grid_new(_):-nl.
 
 door_label(R,Dir,'  '):- pathBetween_call(R,Dir,SP),atomic(SP).

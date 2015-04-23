@@ -1219,7 +1219,7 @@ pfcRetractOrWarn(X) :-
 
 :- dynamic pfcTraced/1.
 :- dynamic pfcSpied/2.
-:- dynamic pfcTraceExecution/0.
+:- dynamic pfc_trace_exec/0.
 :- dynamic   pfc_warnings/1.
 
 :- pfcDefault(pfc_warnings(_), pfc_warnings(true)).
@@ -1423,14 +1423,14 @@ pfcUntrace(Form) :- retractall(pfcTraced(Form)).
 
 % if the correct flag is set, trace exection of Pfc
 pfc_trace_msg(Msg,Args) :-
-    pfcTraceExecution,
+    pfc_trace_exec,
     !,
     format(user_output, Msg, Args).
 pfc_trace_msg(_Msg,_Args).
 
-pfcWatch :- assert(pfcTraceExecution).
+pfcWatch :- assert(pfc_trace_exec).
 
-pfcNoWatch :-  retractall(pfcTraceExecution).
+pfcNoWatch :-  retractall(pfc_trace_exec).
 
 pfcError(Msg) :-  pfcError(Msg,[]).
 

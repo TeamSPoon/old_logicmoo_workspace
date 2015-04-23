@@ -722,7 +722,7 @@ pfc_rule_check(_Sup,_).
 
 fcpt(Fact,F) :-
   pfc_get_trigger_quick(pt(F,Body)),
-  pp_item("Found ",pt(F,Body)),
+  (pfc_trace_exec->pp_item("Found ",pt(F,Body));true),
   pfc_eval_lhs(Body,(Fact,pt(F,Body))),
   fail.
 
@@ -1315,7 +1315,7 @@ pfc_retract_or_warn_i(X) :-
 
 :- dynamic pfc_traced/1.
 :- dynamic pfc_spied/2.
-:- dynamic pfc_traceExecution/0.
+:- dynamic pfc_trace_exec/0.
 :- dynamic   pfc_warnings/1.
 
 :- pfc_init_i(pfc_warnings(_), pfc_warnings(true)).
@@ -1587,14 +1587,14 @@ pfc_untrace(Form) :- retractall_i(pfc_traced(Form)).
 
 % if the correct flag is set, trace exection of Pfc
 pfc_trace_msg(Msg,Args) :-
-    pfc_traceExecution,
+    pfc_trace_exec,
     !,
     format(user_output, Msg, Args).
 pfc_trace_msg(_Msg,_Args).
 
-pfc_watch :- assert_i(pfc_traceExecution).
+pfc_watch :- assert_i(pfc_trace_exec).
 
-pfc_no_watch :-  retractall_i(pfc_traceExecution).
+pfc_no_watch :-  retractall_i(pfc_trace_exec).
 
 pfc_error(Msg) :-  pfc_error(Msg,[]).
 

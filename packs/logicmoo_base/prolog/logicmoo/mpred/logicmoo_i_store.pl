@@ -239,7 +239,7 @@ clr(P):- agenda_do_prequery,
   pfc_maptree(clr0,PL).
 
 clr0(P):- 
-  forall(debugOnError(P), forall( pfc_rem2(P), sanity(not(pfc_tms_supported(local,P)),must(\+(P))))).
+  forall(debugOnError(P), forall( pfc_rem2(P), sanity((not(pfc_tms_supported(local,P)),must(\+(P)))))).
 
 
 % -  preq(Query) = query with P note
