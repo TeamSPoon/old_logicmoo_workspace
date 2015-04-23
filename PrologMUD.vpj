@@ -67,13 +67,6 @@
 				Recurse="1"
 				Excludes="*.svn*"/>
 		</Folder>
-		<Folder Name="src_mud">
-			<F
-				N="src_mud/*.*"
-				Recurse="1"
-				Refilter="1"
-				Excludes=".git/;*.*~;*~/"/>
-		</Folder>
 		<Folder Name="/usr">
 			<Folder Name="lib">
 				<Folder Name="swi-prolog">
@@ -305,7 +298,6 @@
 							<F N="/usr/lib/swi-prolog/library/pldoc/doc_access.pl"/>
 							<F N="/usr/lib/swi-prolog/library/pldoc/doc_colour.pl"/>
 							<F N="/usr/lib/swi-prolog/library/pldoc/doc_html.pl"/>
-							<F N="/usr/lib/swi-prolog/library/pldoc/doc_html_maybe.pl"/>
 							<F N="/usr/lib/swi-prolog/library/pldoc/doc_htmlsrc.pl"/>
 							<F N="/usr/lib/swi-prolog/library/pldoc/doc_index.pl"/>
 							<F N="/usr/lib/swi-prolog/library/pldoc/doc_library.pl"/>
@@ -448,7 +440,6 @@
 						<F N="/usr/lib/swi-prolog/library/qsave.pl"/>
 						<F N="/usr/lib/swi-prolog/library/quasi_quotations.pl"/>
 						<F N="/usr/lib/swi-prolog/library/quintus.pl"/>
-						<F N="/usr/lib/swi-prolog/library/R.pl"/>
 						<F N="/usr/lib/swi-prolog/library/random.pl"/>
 						<F N="/usr/lib/swi-prolog/library/rbtrees.pl"/>
 						<F N="/usr/lib/swi-prolog/library/rdf.pl"/>
