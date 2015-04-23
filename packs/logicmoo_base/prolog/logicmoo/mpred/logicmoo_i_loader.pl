@@ -11,9 +11,9 @@
 :- include(logicmoo_i_header).
 
 
-:- export(with_no_dbase_expansions/1).
-:- meta_predicate(with_no_dbase_expansions(0)).
-with_no_dbase_expansions(Goal):-
+:- export(with_no_mpred_expansions/1).
+:- meta_predicate(with_no_mpred_expansions(0)).
+with_no_mpred_expansions(Goal):-
   with_assertions(user:prolog_mud_disable_term_expansions,Goal).
 
 
@@ -36,24 +36,24 @@ end_module_type(CM,Type):-retractall(registered_module_type(CM,Type)).
 
 
 
-:-dynamic(registered_dbase_file/1).
+:-dynamic(registered_mpred_file/1).
 :-export(declare_load_dbase/1).
-declare_load_dbase(Spec):- forall(no_repeats_old(File,filematch(Spec,File)),show_call(asserta_if_new(registered_dbase_file(File)))).
+declare_load_dbase(Spec):- forall(no_repeats_old(File,filematch(Spec,File)),show_call(asserta_if_new(registered_mpred_file(File)))).
 
 % :-export((is_compiling_sourcecode/1)).
 is_compiling_sourcecode:-is_compiling,!.
-is_compiling_sourcecode:-compiling, current_input(X),not((stream_property(X,file_no(0)))),prolog_load_context(source,F),not((thglobal:loading_dbase_file(_,_))),F=user,!.
+is_compiling_sourcecode:-compiling, current_input(X),not((stream_property(X,file_no(0)))),prolog_load_context(source,F),not((thglobal:loading_mpred_file(_,_))),F=user,!.
 is_compiling_sourcecode:-compiling,dmsg(system_compiling),!.
 
-:-export(load_dbase_files/0).
-load_dbase_files :- forall(registered_dbase_file(File),ensure_plmoo_loaded(File)).
+:-export(load_mpred_files/0).
+load_mpred_files :- forall(registered_mpred_file(File),ensure_plmoo_loaded(File)).
 
 :-dynamic thglobal:current_world/1.
 thglobal:current_world(current).
 
 :- meta_predicate show_load_call(0).
 
-ensure_dbase_file(Mask):- ensure_plmoo_loaded(Mask).
+ensure_mpred_file(Mask):- ensure_plmoo_loaded(Mask).
 
 :-meta_predicate_transparent(load_dbase/1).
 
@@ -107,7 +107,7 @@ reload_plmoo_file(FileIn):-
    absolute_file_name(FileIn,File),
    thglobal:current_world(World),
    retractall(thglobal:loaded_file_world_time(File,World,_)),   
-   dbase_mod(DBASE),'@'(load_data_file(World,File),DBASE).
+   mpred_mod(DBASE),'@'(load_data_file(World,File),DBASE).
 
 :-meta_predicate_transparent(load_data_file/2).
 load_data_file(World,FileIn):- with_assertions(thglobal:current_world(World),load_data_file(FileIn)).
@@ -131,21 +131,21 @@ load_data_file_now(FileIn):-
   assert(thglobal:loaded_file_world_time(File,World,NewTime)), 
    dmsginfo(loading_data_file(File,World,NewTime)),!,
 
-  catch((with_assertions(thglobal:loading_dbase_file(World,File),
-      must(setup_call_cleanup(see(File),load_dbase_name_stream(World),seen))),
+  catch((with_assertions(thglobal:loading_mpred_file(World,File),
+      must(setup_call_cleanup(see(File),load_mpred_name_stream(World),seen))),
       load_data_file_end(World,File)),
    Error,
-    (wdmsg(error(Error,File)),retractall(thglobal:loaded_dbase_file(World,File)),
+    (wdmsg(error(Error,File)),retractall(thglobal:loaded_mpred_file(World,File)),
      retractall(thglobal:loaded_file_world_time(File,World,NewTime)))).
 
 :-export(load_data_file_end/2).
 load_data_file_end(World,File):-
-   asserta_new(thglobal:loaded_dbase_file(World,File)),
+   asserta_new(thglobal:loaded_mpred_file(World,File)),
    dmsginfo(info(load_data_file_complete(File))),
    forall(onEndOfFile(File,Call),must((mpred_call(Call),retractall(onEndOfFile(File,Call))))).
 
-load_dbase_name_stream(_Name):- do_gc,repeat,read_one_term(Term,Vs),myDebugOnError(add_term(Term,Vs)),Term == end_of_file,!.
-load_dbase_name_stream(_Name,Stream):- do_gc,repeat,read_one_term(Stream,Term,Vs),myDebugOnError(add_term(Term,Vs)),Term == end_of_file,!.
+load_mpred_name_stream(_Name):- do_gc,repeat,read_one_term(Term,Vs),myDebugOnError(add_term(Term,Vs)),Term == end_of_file,!.
+load_mpred_name_stream(_Name,Stream):- do_gc,repeat,read_one_term(Stream,Term,Vs),myDebugOnError(add_term(Term,Vs)),Term == end_of_file,!.
 
 
 add_term(end_of_file,_):-!.
@@ -162,7 +162,7 @@ myDebugOnError(Term):-catch(once(must((Term))),E,(dmsg(error(E,start_myDebugOnEr
 read_one_term(Term,Vs):- catch(once(( read_term(Term,[double_quotes(string),variable_names(Vs)]))),E,(Term=error(E),dmsg(error(E,read_one_term(Term))))).
 read_one_term(Stream,Term,Vs):- catch(once(( read_term(Stream,Term,[double_quotes(string),variable_names(Vs)]))),E,(Term=error(E),dmsg(error(E,read_one_term(Term))))).
 
-% rescan_mpred_stubs:- doall((user:mpred_prop(F,prologHybrid),arity(F,A),A>0,warnOnError(declare_dbase_local_dynamic(moo,F,A)))).
+% rescan_mpred_stubs:- doall((user:mpred_prop(F,prologHybrid),arity(F,A),A>0,warnOnError(declare_mpred_local_dynamic(moo,F,A)))).
 
 
 /*
@@ -191,7 +191,7 @@ assert_kif_dolce(_).
 %:-meta_predicate_transparent(rescan_all/0).
 :-meta_predicate_transparent(doall_and_fail(0)).
 
-finish_processing_world :- load_dbase_files, loop_check_local(with_assertions(thlocal:agenda_slow_op_do_prereqs,doall(finish_processing_dbase)),true).
+finish_processing_world :- load_mpred_files, loop_check_local(with_assertions(thlocal:agenda_slow_op_do_prereqs,doall(finish_processing_dbase)),true).
 
 doall_and_fail(Call):- time_call(once(doall(Call))),fail.
 
@@ -204,7 +204,7 @@ etrace:-leash(-all),leash(+exception),trace.
 :-dynamic(onEndOfFile/2).
 onEndOfFile(Call):-current_filesource(F),asserta(onEndOfFile(F,Call)).
 
-assert_until_end_of_file(Fact):-must_det_l((thread_local(Fact),asserta(Fact),((onEndOfFile(dbase_op(change( retract,one),Fact)))))).
+assert_until_end_of_file(Fact):-must_det_l((thread_local(Fact),asserta(Fact),((onEndOfFile(mpred_op(change( retract,one),Fact)))))).
 
 :- style_check(-singleton).
 :- style_check(-discontiguous).
@@ -218,7 +218,7 @@ savedb:-!.
 savedb:- debugOnError(rsavedb),!.
 %:-meta_predicate_transparent(rsavedb/0).
 rsavedb:-
- debugOnError(agenda_dbase_repropigate),
+ debugOnError(agenda_mpred_repropigate),
  catch((   
    ignore(catch(make_directory('/tmp/lm/'),_,true)),
    ignore(catch(delete_file('/tmp/lm/savedb'),E,(dmsginfo(E:delete_file('/tmp/lm/savedb'))))),   
@@ -227,9 +227,9 @@ rsavedb:-
 
 %:-meta_predicate_transparent(make_db_listing/0).
 make_db_listing:-
- % dbase_mod(DBM),
+ % mpred_mod(DBM),
 %   listing(t),
- %  listing(dbase_f),
+ %  listing(mpred_f),
      listing(_),
      listing(user:_),  
      listing(dbase:_),

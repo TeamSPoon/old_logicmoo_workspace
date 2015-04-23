@@ -1,6 +1,6 @@
 /** <module> 
 % ===================================================================
-% File 'dbase_db_preds.pl'
+% File 'mpred_db_preds.pl'
 % Purpose: Emulation of OpenCyc for SWI-Prolog
 % Maintainer: Douglas Miles
 % Contact: $Author: dmiles $@users.sourceforge.net ;
@@ -26,7 +26,7 @@
 is_svo_functor(Prop):- notrace((atom(Prop),arg(_,svo(svo,prop,valueOf,rdf),Prop))).
 
 :-export(hilog_functor/1).
-hilog_functor(dbase_ttttt).
+hilog_functor(mpred_ttttt).
 
 :-export(is_holds_true_not_hilog/1).
 is_holds_true_not_hilog(HOFDS):-is_holds_true(HOFDS),\+ hilog_functor(HOFDS).
@@ -35,7 +35,7 @@ is_holds_true_not_hilog(HOFDS):-is_holds_true(HOFDS),\+ hilog_functor(HOFDS).
 is_holds_true(Prop):- notrace((atom(Prop),is_holds_true0(Prop))),!.
 
 % k,p,..
-is_holds_true0(Prop):-arg(_,vvv(holds,holds_t,t,asserted_dbase_t,assertion_t,assertion,secondOrder,firstOrder),Prop).
+is_holds_true0(Prop):-arg(_,vvv(holds,holds_t,t,asserted_mpred_t,assertion_t,assertion,secondOrder,firstOrder),Prop).
 is_holds_true0(Prop):-atom_concat(_,'_t',Prop).
 
 :-export(is_2nd_order_holds/1).
@@ -44,7 +44,7 @@ is_2nd_order_holds(Prop):- is_holds_true(Prop) ; is_holds_false(Prop).
 :-export(is_holds_false/1).
 is_holds_false(Prop):-notrace((atom(Prop),is_holds_false0(Prop))).
 
-is_holds_false0(Prop):-member(Prop,[not,nholds,holds_f,dbase_f,aint,assertion_f,asserted_dbase_f,retraction,not_secondOrder,not_firstOrder]).
+is_holds_false0(Prop):-member(Prop,[not,nholds,holds_f,mpred_f,aint,assertion_f,asserted_mpred_f,retraction,not_secondOrder,not_firstOrder]).
 is_holds_false0(Prop,Stem):-atom_concat('not_',Stem,Prop).
 is_holds_false0(Prop,Stem):-atom_concat('int_not_',Stem,Prop).
 is_holds_false0(Prop,Stem):-atom_concat(Stem,'_f',Prop).
@@ -118,7 +118,7 @@ additiveOp((/)).
 
 
 
-/** <module> logicmoo_i_mpred_dbase_t
+/** <module> logicmoo_i_mpred_mpred_t
 % Provides a prolog dabase in these predicates...
 %
 %  t/N
@@ -143,7 +143,7 @@ if_result(TF,Call):-(TF->Call;true).
 % is_holds_true/is_holds_false
 % ========================================
 
-:- dbase_mod(M),export((
+:- mpred_mod(M),export((
           % M:t/1,
           M:t/2,
           M:t/3,
@@ -156,7 +156,7 @@ if_result(TF,Call):-(TF->Call;true).
           M:t/10,
           M:t/11)).
 
-:- dbase_mod(M),export((
+:- mpred_mod(M),export((
           % M:holds_t/1,
           M:holds_t/2,
           M:holds_t/3,
@@ -183,29 +183,29 @@ if_result(TF,Call):-(TF->Call;true).
           t/9,
           t/10,
           t/11,
-        %  asserted_dbase_t/1,
-          asserted_dbase_t/2,
-          asserted_dbase_t/3,
-          asserted_dbase_t/4,
-          asserted_dbase_t/5,
-          asserted_dbase_t/6,
-          asserted_dbase_t/7,
+        %  asserted_mpred_t/1,
+          asserted_mpred_t/2,
+          asserted_mpred_t/3,
+          asserted_mpred_t/4,
+          asserted_mpred_t/5,
+          asserted_mpred_t/6,
+          asserted_mpred_t/7,
           assertion_f/1,
           assertion_t/1,
-        %  asserted_dbase_f/1,
-          asserted_dbase_f/2,
-          asserted_dbase_f/3,
-          asserted_dbase_f/4,
-          asserted_dbase_f/5,
-          asserted_dbase_f/6,
-          asserted_dbase_f/7,
-         % dbase_f/1,
-          dbase_f/2,
-          dbase_f/3,
-          dbase_f/4,
-          dbase_f/5,
-          dbase_f/6,
-          dbase_f/7)).
+        %  asserted_mpred_f/1,
+          asserted_mpred_f/2,
+          asserted_mpred_f/3,
+          asserted_mpred_f/4,
+          asserted_mpred_f/5,
+          asserted_mpred_f/6,
+          asserted_mpred_f/7,
+         % mpred_f/1,
+          mpred_f/2,
+          mpred_f/3,
+          mpred_f/4,
+          mpred_f/5,
+          mpred_f/6,
+          mpred_f/7)).
 
 
 :-export(into_plist/2).
@@ -219,9 +219,9 @@ into_plist_arities(_,_,plist(P,LIST),[P|LIST]):-!.
 into_plist_arities(_,_,Call,PLIST):-Call=..PLIST. % finally the fallthrue
 
 
-never_dbase_mpred(user:mpred_prop).
-never_dbase_mpred(isa).
-never_dbase_mpred(arity).
+never_mpred_mpred(user:mpred_prop).
+never_mpred_mpred(isa).
+never_mpred_mpred(arity).
 
 
 % ================================================================================
@@ -231,19 +231,19 @@ never_dbase_mpred(arity).
 :-dynamic t/2.
 % t(C,I):- trace_or_throw(t(C,I)),hasInstance(C,I). % ,fail,loop_check_term(isa_backchaing(I,C),hasInstance(C,I),fail).
 
-%t([P|LIST]):- !,dbase_plist_t(P,LIST).
+%t([P|LIST]):- !,mpred_plist_t(P,LIST).
 %t(naf(CALL)):-!,not(t(CALL)).
-%t(not(CALL)):-!,dbase_f(CALL).
-t(CALL):- into_plist_arities(3,10,CALL,[P|LIST]),dbase_plist_t(P,LIST).
-dbase_plist_t(P,[]):-!,t(P).
-dbase_plist_t(P,LIST):-var(P),!,is_list(LIST),CALL=..[t,P|LIST],debugOnError((CALL)).
-dbase_plist_t(t,[P|LIST]):-!, dbase_plist_t(P,LIST).
-dbase_plist_t(user:mpred_prop,[C,A,I]):-!,ground(I:C),user:mpred_prop(C,A,I).
-dbase_plist_t(isa,[I,C]):-!,hasInstance(C,I).
-dbase_plist_t(P,_):-never_dbase_mpred(P),!,fail.
-dbase_plist_t(P,[L|IST]):-is_holds_true(P),!,dbase_plist_t(L,IST).
-dbase_plist_t(P,LIST):-is_holds_false(P),!,dbase_f(LIST).
-dbase_plist_t(P,LIST):- CALL=..[t,P|LIST],debugOnError(CALL).
+%t(not(CALL)):-!,mpred_f(CALL).
+t(CALL):- into_plist_arities(3,10,CALL,[P|LIST]),mpred_plist_t(P,LIST).
+mpred_plist_t(P,[]):-!,t(P).
+mpred_plist_t(P,LIST):-var(P),!,is_list(LIST),CALL=..[t,P|LIST],debugOnError((CALL)).
+mpred_plist_t(t,[P|LIST]):-!, mpred_plist_t(P,LIST).
+mpred_plist_t(user:mpred_prop,[C,A,I]):-!,ground(I:C),user:mpred_prop(C,A,I).
+mpred_plist_t(isa,[I,C]):-!,hasInstance(C,I).
+mpred_plist_t(P,_):-never_mpred_mpred(P),!,fail.
+mpred_plist_t(P,[L|IST]):-is_holds_true(P),!,mpred_plist_t(L,IST).
+mpred_plist_t(P,LIST):-is_holds_false(P),!,mpred_f(LIST).
+mpred_plist_t(P,LIST):- CALL=..[t,P|LIST],debugOnError(CALL).
 
 % loop_check_mpred(Call):- current_predicate(ireq/1), loop_check_term(ireq(Call),loop_check_mpred(Call),fail).
 loop_check_mpred(Call):- !, fail,not(thlocal:infInstanceOnly(_)),loop_check_local(ireq(Call),loop_check_mpred(Call),fail).

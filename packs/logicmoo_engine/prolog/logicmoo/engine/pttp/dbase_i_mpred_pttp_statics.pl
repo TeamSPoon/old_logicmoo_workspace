@@ -26,7 +26,7 @@
         ]).
 */
 
-use_dbase_t.
+use_mpred_t.
 
 :- dynamic t/3.
 :- multifile t/3.
@@ -37,7 +37,7 @@ use_dbase_t.
 :- dynamic int_asserted_t/11.
 :- multifile int_asserted_t/11.
 
-int_asserted_t(A, B, C, C1, H, I, D, E, F, J, G) :- use_dbase_t,
+int_asserted_t(A, B, C, C1, H, I, D, E, F, J, G) :- use_mpred_t,
  user:t(A, B, C, C1),D=E, F=[K, [asserted_t(A, B, C, C1), G, H, I]|L], J=[K|L].
 
 
@@ -45,28 +45,28 @@ int_asserted_t(A, B, C, C1, H, I, D, E, F, J, G) :- use_dbase_t,
 :- multifile int_asserted_t/10.
 
 int_asserted_t(A, B, C, H, I, D, E, F, J, G) :- 
-   pretest_call((use_dbase_t, dif(B,C), user:t(A, B, C),D=E)),
+   pretest_call((use_mpred_t, dif(B,C), user:t(A, B, C),D=E)),
    F=[K, [asserted_t(A, B, C), G, H, I]|L], J=[K|L].
 
 :- dynamic int_pred_t/10.
 :- multifile int_pred_t/10.
 
 int_pred_t(A, B, C, H, I, D, E, F, J, G) :-
-   pretest_call((use_dbase_t, dif(B,C), user:t(A, B, C),D=E)),
+   pretest_call((use_mpred_t, dif(B,C), user:t(A, B, C),D=E)),
   F=[K, [pred_t(A, B, C), G, H, I]|L], J=[K|L].
 
 :- dynamic not_int_pred_t/10.
 :- multifile not_int_pred_t/10.
 
 not_int_pred_t(A, B, C, H, I, D, E, F, J, G) :- 
-   pretest_call((use_dbase_t,not(user:t(A, B, C)), dif(B,C),D=E)),
+   pretest_call((use_mpred_t,not(user:t(A, B, C)), dif(B,C),D=E)),
  F=[K, [not_pred_t(A, B, C), G, H, I]|L], J=[K|L].
 
 :- dynamic int_refuted_t/10.
 :- multifile int_refuted_t/10.
 
 int_refuted_t(A, B, C, H, I, D, E, F, J, G) :- 
-   pretest_call((is_extent_known(A),use_dbase_t,not(user:t(A, B, C)), dif(B,C),D=E)),
+   pretest_call((is_extent_known(A),use_mpred_t,not(user:t(A, B, C)), dif(B,C),D=E)),
  F=[K, [refuted_t(A, B, C), G, H, I]|L], J=[K|L].
 
 is_extent_known(wearsClothing).
@@ -1062,7 +1062,7 @@ add_args(INFO,BodyIn,
 
 :-export(is_holds_false_pttp/1).
 is_holds_false_pttp(A):-not(atom(A)),!,fail.
-is_holds_false_pttp(Prop):-member(Prop,[not,nholds,holds_f,dbase_f,aint,assertion_f,asserted_dbase_f,retraction,not_secondOrder,not_firstOrder]).
+is_holds_false_pttp(Prop):-member(Prop,[not,nholds,holds_f,mpred_f,aint,assertion_f,asserted_mpred_f,retraction,not_secondOrder,not_firstOrder]).
 is_holds_false_pttp(F):-atom_concat(_,'_false',F).
 %is_holds_false_pttp(F):-atom_concat(_,'_f',F).
 is_holds_false_pttp(F):-is_p_to_n(_,F).
@@ -1070,7 +1070,7 @@ is_holds_false_pttp(F):-is_p_to_n(_,F).
 
 :-export(is_holds_true_pttp/1).
 is_holds_true_pttp(A):-not(atom(A)),!,fail.
-is_holds_true_pttp(Prop):-arg(_,vvv(holds,holds_t,t,asserted_dbase_t,assertion_t,assertion,secondOrder,asserted_t),Prop).
+is_holds_true_pttp(Prop):-arg(_,vvv(holds,holds_t,t,asserted_mpred_t,assertion_t,assertion,secondOrder,asserted_t),Prop).
 is_holds_true_pttp(F):-atom_concat(_,'_true',F).
 is_holds_true_pttp(F):-atom_concat(_,'_t',F).
 %is_holds_true_pttp(F):-atom_concat('pos',_,F).

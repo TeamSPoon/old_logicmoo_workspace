@@ -203,19 +203,19 @@ assert_to_db_list(HOLDS,PLIST):- safe_univ(Call,[HOLDS|PLIST]), assert(assert_ne
 
 with_kb_assertions_matching(PLIST,Proof,Call):- doall((kbp_t_list(PLIST, Proof),Call)).
    
-:-export(kbp_to_dbase_t/0).
-kbp_to_dbase_t:- must_det(with_assertions(thlocal:useOnlyExternalDBs,kbp_to_dbase_0)).
+:-export(kbp_to_mpred_t/0).
+kbp_to_mpred_t:- must_det(with_assertions(thlocal:useOnlyExternalDBs,kbp_to_mpred_0)).
 
-kbp_to_dbase_0:-!.
-% kbp_to_dbase_0:- once(time_call(move_implied)),fail.
-kbp_to_dbase_0:- once(time_call(hide_term_rewrites)),fail.
-kbp_to_dbase_0:- once(time_call(hide_empty_strings)),fail.
-% kbp_to_dbase_0:- once(time_call(convert_easy_strings)),fail.
-% kbp_to_dbase_0:- once(time_call(convert_easy_strings2)),fail.
-kbp_to_dbase_0:- time_call(drain_assert_next_buffer),!.
+kbp_to_mpred_0:-!.
+% kbp_to_mpred_0:- once(time_call(move_implied)),fail.
+kbp_to_mpred_0:- once(time_call(hide_term_rewrites)),fail.
+kbp_to_mpred_0:- once(time_call(hide_empty_strings)),fail.
+% kbp_to_mpred_0:- once(time_call(convert_easy_strings)),fail.
+% kbp_to_mpred_0:- once(time_call(convert_easy_strings2)),fail.
+kbp_to_mpred_0:- time_call(drain_assert_next_buffer),!.
 
-kbp_to_dbase_no_more:- forall((into_plist(_Call,PLIST),kbp_t(PLIST)),assert_to_db_list(_F,PLIST)),
-   retractall(thglobal:use_cyc_database),tell('a.txt'),listing(t),listing('ASSERTION'),told,dmsg(done_dbase_t).
+kbp_to_mpred_no_more:- forall((into_plist(_Call,PLIST),kbp_t(PLIST)),assert_to_db_list(_F,PLIST)),
+   retractall(thglobal:use_cyc_database),tell('a.txt'),listing(t),listing('ASSERTION'),told,dmsg(done_mpred_t).
 
 
 :-export(move_implied/0).
@@ -384,27 +384,27 @@ holds_f([P|LIST]):- !, holds_f_p2(P,LIST).
 holds_f(CALL):- CALL=..[P|LIST],holds_f([P|LIST]).
 holds_f_p2(P,LIST):- CALL=..[holds_f,P|LIST],call(CALL).
 
-dbase_f(List):- is_list(List),!,Call=..[dbase_f|List],Call.
-dbase_f(List):- holds_f(List).
+mpred_f(List):- is_list(List),!,Call=..[mpred_f|List],Call.
+mpred_f(List):- holds_f(List).
 
 
-call_f(_,P,A1,A2,A3,A4,A5,A6,A7):- callable_tf(P,7),List= [P,A1,A2,A3,A4,A5,A6,A7], CALL=..List,(assertion_f(List);dbase_f(CALL);xcall_f(CALL)).
-call_f(dac(d,_,_,_),P,A1,A2,A3,A4,A5,A6):- dbase_f(P,A1,A2,A3,A4,A5,A6).
+call_f(_,P,A1,A2,A3,A4,A5,A6,A7):- callable_tf(P,7),List= [P,A1,A2,A3,A4,A5,A6,A7], CALL=..List,(assertion_f(List);mpred_f(CALL);xcall_f(CALL)).
+call_f(dac(d,_,_,_),P,A1,A2,A3,A4,A5,A6):- mpred_f(P,A1,A2,A3,A4,A5,A6).
 call_f(dac(_,a,_,_),P,A1,A2,A3,A4,A5,A6):- assertion_f([P,A1,A2,A3,A4,A5,A6]).
 call_f(dac(_,_,c,_),P,A1,A2,A3,A4,A5,A6):- callable_tf(P,6),xcall_f(P,A1,A2,A3,A4,A5,A6).
-call_f(dac(d,_,_,_),P,A1,A2,A3,A4,A5):- dbase_f(P,A1,A2,A3,A4,A5).
+call_f(dac(d,_,_,_),P,A1,A2,A3,A4,A5):- mpred_f(P,A1,A2,A3,A4,A5).
 call_f(dac(_,a,_,_),P,A1,A2,A3,A4,A5):- assertion_f([P,A1,A2,A3,A4,A5]).
 call_f(dac(_,_,c,_),P,A1,A2,A3,A4,A5):- callable_tf(P,5),xcall_f(P,A1,A2,A3,A4,A5).
-call_f(dac(d,_,_,_),P,A1,A2,A3,A4):- dbase_f(P,A1,A2,A3,A4).
+call_f(dac(d,_,_,_),P,A1,A2,A3,A4):- mpred_f(P,A1,A2,A3,A4).
 call_f(dac(_,a,_,_),P,A1,A2,A3,A4):- assertion_f([P,A1,A2,A3,A4]).
 call_f(dac(_,_,c,_),P,A1,A2,A3,A4):- callable_tf(P,4),xcall_f(P,A1,A2,A3,A4).
-call_f(dac(d,_,_,_),P,A1,A2,A3):- dbase_f(P,A1,A2,A3).
+call_f(dac(d,_,_,_),P,A1,A2,A3):- mpred_f(P,A1,A2,A3).
 call_f(dac(_,a,_,_),P,A1,A2,A3):- assertion_f([P,A1,A2,A3]).
 call_f(dac(_,_,c,_),P,A1,A2,A3):- callable_tf(P,3),xcall_f(P,A1,A2,A3).
-call_f(dac(d,_,_,_),P,A1,A2):- dbase_f(P,A1,A2).
+call_f(dac(d,_,_,_),P,A1,A2):- mpred_f(P,A1,A2).
 call_f(dac(_,a,_,_),P,A1,A2):- assertion_f([P,A1,A2]).
 call_f(dac(_,_,c,_),P,A1,A2):- callable_tf(P,2),xcall_f(P,A1,A2).
-call_f(dac(d,_,_,_),P,A1):- dbase_f(P,A1).
+call_f(dac(d,_,_,_),P,A1):- mpred_f(P,A1).
 call_f(dac(_,a,_,_),P,A1):- assertion_f([P,A1]).
 call_f(dac(_,_,c,_),P,A1):- callable_tf(P,1),xcall_f(P,A1).
 

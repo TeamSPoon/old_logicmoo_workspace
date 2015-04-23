@@ -158,8 +158,8 @@ type_prefix(ft,ttFormatType).
 type_prefix(pred,ttPredType).
 type_prefix(macro,ttMacroType).
 
-:-call_after(dbase_module_ready,((forall(type_prefix(_,T),add(isa(T,tCol)))))).
-:-call_after(dbase_module_ready,fmt(passed_dbase_module_ready)).
+:-call_after(mpred_module_ready,((forall(type_prefix(_,T),add(isa(T,tCol)))))).
+:-call_after(mpred_module_ready,fmt(passed_mpred_module_ready)).
 
 % ========================================
 % was_isa(Goal,I,C) recognises isa/2 and its many alternative forms
@@ -475,7 +475,7 @@ assert_isa_safe(O,T):- ignore((nonvar(O),nonvar(T),decl_type_safe(T),assert_isa(
 %OLD user:decl_database_hook(change(assert,_A_or_Z),genls(S,C)):-decl_type_safe(S),decl_type_safe(C).
 
 
-%OLD user:decl_database_hook(change(assert,_A_or_Z),isa(W,ttSpatialType)):-decl_type_safe(W). %,call_after_dbase_load(forall(isa(I,W),create_instance(I,W))).
+%OLD user:decl_database_hook(change(assert,_A_or_Z),isa(W,ttSpatialType)):-decl_type_safe(W). %,call_after_mpred_load(forall(isa(I,W),create_instance(I,W))).
 %OLD user:decl_database_hook(change(assert,_A_or_Z),isa(W,tCol)):- (test_tl(infSupertypeName);true),guess_supertypes(W).
 
 guess_supertypes(W):-atom(W),atomic_list_concat(List,'_',W),length(List,S),S>2,!, append(FirstPart,[Last],List),atom_length(Last,AL),AL>3,not(member(flagged,FirstPart)),
@@ -505,8 +505,8 @@ isa_provide_mpred_storage_clauses(H,true,hasInstanceCI):-
       ((functor(H,C,1)-> H=..[C,I]; H=isa(I,C)), hasInstance(C,I)) ; 
       (hasInstance(C,I),(nonvar(C)->append_term(C,I,H);H=isa(I,C)))).
 
-%isa_provide_mpred_storage_clauses(isa(I,C),B,W):-dbase_t_mpred_storage_clauses_rules(isa(I,C),B,W).
-%isa_provide_mpred_storage_clauses(isa(I,C),B,W):-nonvar(C),append_term(C,I,H),dbase_t_mpred_storage_clauses_rules(H,B,W).
+%isa_provide_mpred_storage_clauses(isa(I,C),B,W):-mpred_t_mpred_storage_clauses_rules(isa(I,C),B,W).
+%isa_provide_mpred_storage_clauses(isa(I,C),B,W):-nonvar(C),append_term(C,I,H),mpred_t_mpred_storage_clauses_rules(H,B,W).
 
 
 user:provide_mpred_storage_clauses(H,B,(What)):-isa_provide_mpred_storage_clauses(H,B,What).
@@ -609,9 +609,9 @@ impliedSubClass(T,ST):-predicate_property(transitive_subclass(T,ST),_),!,call_ta
 */
 
 % one of 4 special cols
-% assert_isa_hooked_creation(I,T):- ttSpatialType(T),!,call_after_dbase_load((create_instance(I,T,[]))).
+% assert_isa_hooked_creation(I,T):- ttSpatialType(T),!,call_after_mpred_load((create_instance(I,T,[]))).
 % sublass of 4 special cols
-% assert_isa_hooked_creation(I,T):- doall((ttSpatialType(ST),impliedSubClass(T,ST),call_after_dbase_load((create_instance(I,ST,[isa(T)]))))).
+% assert_isa_hooked_creation(I,T):- doall((ttSpatialType(ST),impliedSubClass(T,ST),call_after_mpred_load((create_instance(I,ST,[isa(T)]))))).
 
 :- asserta((user:isa(I,C):-loop_check(isa_backchaing(I,C)))).
 :- asserta(('$toplevel':isa(I,C):-user:isa(I,C))).

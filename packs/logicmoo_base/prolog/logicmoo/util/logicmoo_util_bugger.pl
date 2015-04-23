@@ -3432,7 +3432,7 @@ term_listing(Match):-
   term_non_listing(Match),!.
 
 user:listing_mpred_hook(_):-fail.
-user:term_dbase_listing(Match):-
+user:term_mpred_listing(Match):-
  current_predicate(user:listing_mpred_hook/1), 
  %format('/* listing_mpred_hook(~q) => ~n',[Match]),!,
  once(debugOnError(doall(call_no_cuts(user:listing_mpred_hook(Match))))),
@@ -3453,7 +3453,7 @@ term_non_listing(Match):-
 % user:prolog_list_goal(Goal):- writeq(hello(prolog_list_goal(Goal))),nl.
 
 :- multifile prolog:locate_clauses/2.
-prolog:locate_clauses(A, _) :- current_predicate(user:term_dbase_listing/1),call_no_cuts(user:term_dbase_listing(A)),fail.
+prolog:locate_clauses(A, _) :- current_predicate(user:term_mpred_listing/1),call_no_cuts(user:term_mpred_listing(A)),fail.
 
 :-export((synth_clause_for/3)).
 synth_clause_for(H,B,Ref):- user:((cur_predicate(_,H),synth_clause_ref(H,B,Ref))).

@@ -1,6 +1,6 @@
 /** <module> 
 % ===================================================================
-% File 'dbase_db_preds.pl'
+% File 'mpred_db_preds.pl'
 % Purpose: Emulation of OpenCyc for SWI-Prolog
 % Maintainer: Douglas Miles
 % Contact: $Author: dmiles $@users.sourceforge.net ;
@@ -58,7 +58,7 @@ alt_forms1(AR,P,NP):-compound(P),P=..[F,A,B|R],alt_forms2(AR,F,A,B,R,NP).
 alt_forms2(r,F,A,B,R,NP):-genlPreds(FF,F),NP=..[FF,A,B|R].
 
 
-%OLD user:decl_database_hook(change( retract,Kind),P):- forall(alt_forms(r,P,NP),ignore(dbase_op(change( retract,Kind),NP))).
+%OLD user:decl_database_hook(change( retract,Kind),P):- forall(alt_forms(r,P,NP),ignore(mpred_op(change( retract,Kind),NP))).
 
 
 

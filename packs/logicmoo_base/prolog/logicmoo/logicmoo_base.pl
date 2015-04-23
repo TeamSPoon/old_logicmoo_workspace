@@ -42,9 +42,9 @@ swi_module(M,E):-dmsg(swi_module(M,E)).
 :-endif.
 
 
-:- export(with_no_dbase_expansions/1).
-:- meta_predicate(with_no_dbase_expansions(0)).
-%with_no_dbase_expansions(Goal):-
+:- export(with_no_mpred_expansions/1).
+:- meta_predicate(with_no_mpred_expansions(0)).
+%with_no_mpred_expansions(Goal):-
 %  with_assertions(user:prolog_mud_disable_term_expansions,Goal).
 
 :-dynamic(tChannel/1).
@@ -65,7 +65,7 @@ is_release :- fail,1 is random(3).
 :-export(not_is_release/0).
 not_is_release :- true. % 1 is random(3).
 simple_code :- fail.
-save_in_dbase_t:-true.
+save_in_mpred_t:-true.
 not_simple_code :- \+ simple_code.
 type_error_checking:-false.
 % slow_sanity(A):-nop(A).
@@ -93,7 +93,7 @@ when_debugging(_,_).
 :- thread_local thlocal:already_in_file_term_expansion/0.
 :- thread_local thlocal:agent_current_action/2.
 :- thread_local thlocal:caller_module/2.
-:- thread_local thlocal:dbase_opcall/2.
+:- thread_local thlocal:mpred_opcall/2.
 :- thread_local thlocal:deduceArgTypes/1.
 :- thread_local thlocal:agenda_slow_op_do_prereqs/0.
 :- thread_local thlocal:enable_src_loop_checking/0.
@@ -126,15 +126,15 @@ when_debugging(_,_).
 
 :-dynamic(thlocal:infForward).
 thlocal:infForward.
-:- dynamic(dbase_module_ready).
+:- dynamic(mpred_module_ready).
 
 % ========================================
-% dbase_mod/1
+% mpred_mod/1
 % ========================================
 
-:- export(dbase_mod/1).
-:- dynamic dbase_mod/1.
-dbase_mod(user).
+:- export(mpred_mod/1).
+:- dynamic mpred_mod/1.
+mpred_mod(user).
 
 % TODO uncomment the next line without breaking it all!
 % thglobal:use_cyc_database.
@@ -199,13 +199,13 @@ is_pred_declarer(Prop):- % vFormatted
 % Capturing Assertions
 % ================================================
 :- thread_local((record_on_thread/2)).
-:- thread_local thlocal:dbase_capture/2.
-:- thread_local thlocal:dbase_change/2.
-while_capturing_changes(Call,Changes):-thread_self(ID),with_assertions(thlocal:dbase_capture(ID,_),(Call,get_dbase_changes(ID,Changes),clear_dbase_changes(ID))).
-clear_dbase_changes(ID):-retractall(thlocal:dbase_change(ID,_)).
-get_dbase_changes(ID,Changes):-findall(C,thlocal:dbase_change(ID,C),Changes).
-%OLD user:decl_database_hook(AR,C):- record_on_thread(dbase_change,changing(AR,C)).
-record_on_thread(Dbase_change,O):- thread_self(ID),thlocal:dbase_capture(ID,Dbase_change),!,Z=..[Dbase_change,ID,O],assertz(Z).
+:- thread_local thlocal:mpred_capture/2.
+:- thread_local thlocal:mpred_change/2.
+while_capturing_changes(Call,Changes):-thread_self(ID),with_assertions(thlocal:mpred_capture(ID,_),(Call,get_mpred_changes(ID,Changes),clear_mpred_changes(ID))).
+clear_mpred_changes(ID):-retractall(thlocal:mpred_change(ID,_)).
+get_mpred_changes(ID,Changes):-findall(C,thlocal:mpred_change(ID,C),Changes).
+%OLD user:decl_database_hook(AR,C):- record_on_thread(mpred_change,changing(AR,C)).
+record_on_thread(Dbase_change,O):- thread_self(ID),thlocal:mpred_capture(ID,Dbase_change),!,Z=..[Dbase_change,ID,O],assertz(Z).
 
 
 
@@ -230,12 +230,12 @@ record_on_thread(Dbase_change,O):- thread_self(ID),thlocal:dbase_capture(ID,Dbas
 
 
 /*
-dbase_numbervars_with_names(Term):- term_variables(Term,Vars),dbase_name_variables(Vars),!,numbervars(Vars,91,_,[attvar(skip),singletons(true)]),!.
+mpred_numbervars_with_names(Term):- term_variables(Term,Vars),mpred_name_variables(Vars),!,numbervars(Vars,91,_,[attvar(skip),singletons(true)]),!.
 
-dbase_name_variables([]).
-dbase_name_variables([Var|Vars]):-
+mpred_name_variables([]).
+mpred_name_variables([Var|Vars]):-
    (var_property(Var, name(Name)) -> Var = '$VAR'(Name) ; true),
-   dbase_name_variables(Vars).
+   mpred_name_variables(Vars).
 */
 
 
@@ -248,8 +248,8 @@ user:goal_expansion(G,isa(I,C)):-G\=isa(_,_),(was_isa(G,I,C)),!.
 user:term_expansion(G,isa(I,C)):-not(user:prolog_mud_disable_term_expansions),notrace((was_isa(G,I,C))).
 
 
-dbase_module_ready.
-:- with_no_term_expansions(if_file_exists(user:ensure_loaded(logicmoo(dbase/dbase_i_rdf_store)))).
+mpred_module_ready.
+:- with_no_term_expansions(if_file_exists(user:ensure_loaded(logicmoo(dbase/mpred_i_rdf_store)))).
 
 :- decl_mpred_hybrid(argIsa/3).
 :- add_fast(<=( argIsa(F,N,Isa), argIsa_known(F,N,Isa))).
@@ -266,16 +266,16 @@ dbase_module_ready.
 system:term_expansion(A,B):- not(user:prolog_mud_disable_term_expansions), 
   current_predicate(pfcExpansion_loaded/0),loop_check(pfc_file_expansion(A,B)),A\=@=B.
 
-user:semweb_startup:- with_no_term_expansions(if_file_exists(user:ensure_loaded(logicmoo(dbase/dbase_i_rdf_store)))).
+user:semweb_startup:- with_no_term_expansions(if_file_exists(user:ensure_loaded(logicmoo(dbase/mpred_i_rdf_store)))).
 
-:- with_no_term_expansions(if_file_exists(user:ensure_loaded(logicmoo(mobs/planner/dbase_i_hyhtn)))).
+:- with_no_term_expansions(if_file_exists(user:ensure_loaded(logicmoo(mobs/planner/mpred_i_hyhtn)))).
 :-decl_type(predIsFlag).
 :-decl_type(prologOnly).
 :-decl_mpred_hybrid(formatted_resultIsa/2).
 :-decl_mpred_hybrid(resultIsa/2).
 
 system:term_expansion(IN,OUT):- not(user:prolog_mud_disable_term_expansions),
-  dbase_module_ready, must_compile_special_clause(IN),
+  mpred_module_ready, must_compile_special_clause(IN),
   in_file_expansion, 
   loader_term_expansion(IN,WHY),must(OUT = user:WHY).
 
@@ -327,7 +327,7 @@ vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes)
 
 :- must(show_call(with_assertions(thlocal:pfcExpansion,with_assertions(thlocal:consulting_sources,ensure_loaded('mpred/logicmoo_i_builtin.pfc'))))).
 
-% :- if_startup_script(with_assertions(thlocal:pfcExpansion,ensure_loaded(dbase_i_mpred_pfc_testing))).
+% :- if_startup_script(with_assertions(thlocal:pfcExpansion,ensure_loaded(mpred_i_mpred_pfc_testing))).
 
 % :-asserta(user:isa_pred_now_locked).
 
@@ -340,7 +340,11 @@ vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes)
 %:-prolog_repl.
 %:-loadTinyAssertions2.
 
-term_expansion(I,O):- thlocal:consulting_sources, with_no_assertions(thlocal:consulting_sources,add(I)),O=true.
+:- source_location(S,_),forall(source_file(H,S),( \+predicate_property(H,built_in), functor(H,F,A),module_transparent(F/A),export(F/A))).
+
+%system:term_expansion(I,O):- thlocal:consulting_sources, with_no_assertions(thlocal:consulting_sources,add(I)),O=true.
 user:goal_expansion(ISA,G) :-compound(ISA),thlocal:is_calling,was_isa(ISA,I,C),G=no_repeats(isa(I,C)).
+
+
 
 % :-prolog_repl.

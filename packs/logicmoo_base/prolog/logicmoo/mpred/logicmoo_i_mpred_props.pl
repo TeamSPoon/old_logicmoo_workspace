@@ -1,6 +1,6 @@
 /** <module> 
 % ===================================================================
-% File 'dbase_db_preds.pl'
+% File 'mpred_db_preds.pl'
 % Purpose: Emulation of OpenCyc for SWI-Prolog
 % Maintainer: Douglas Miles
 % Contact: $Author: dmiles $@users.sourceforge.net ;

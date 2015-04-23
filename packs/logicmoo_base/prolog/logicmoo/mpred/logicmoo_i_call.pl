@@ -22,7 +22,7 @@ oncely(:-(Call)):-!,Call,!.
 oncely(:-(Call)):-!,req(Call).
 oncely(Call):-once(Call).
 % ================================================
-% dbase_op/2
+% mpred_op/2
 % ================================================
 
 /*
@@ -39,31 +39,31 @@ deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),not_asserted((Call)),
 % deducedSimply(Call):- clause(deduce_facts(Fact,Call),Body),nonvar(Fact),Body,ground(Call),dmsg((deducedSimply1(Call):-Fact)),show_call((is_asserted(Fact),ground(Call))).
 
 
-dbase_op(Op,     H ):- (var(Op);var(H)),!,trace_or_throw(var_database_call(Op,  H )).
-dbase_op(is_asserted,H):-!,is_asserted(H).
-dbase_op(Op,     H ):- once(fully_expand(Op,H,HH)),H\=@=HH,!,dbase_op(Op, HH).
-dbase_op(neg(_,Op),  H ):- !, show_call(not(dbase_op(Op,  H ))).
-dbase_op(change(assert,Op),H):-!,must(dbase_modify(change(assert,Op),H)),!.
-dbase_op(change(retract,Op),H):-!,must(dbase_modify(change(retract,Op),H)),!.
-dbase_op(query(t,Ireq),  H ):-!, dbase_op(Ireq,H).
-dbase_op(query(Dbase_t,_Ireq),  H ):-!, dbase_op(Dbase_t,H).
-dbase_op(call(Op),H):-!,dbase_op(Op,H).
-dbase_op(Op,((include(A)))):- with_no_assertions(thlocal:already_in_file_term_expansion,dbase_op(Op,((load_data_file(A))))),!.
-dbase_op(Op, call(H)):- nonvar(H),!, dbase_op(Op,H).
-dbase_op(Op,  not(H)):- nonvar(H),!, dbase_op(neg(not,Op),H).
-dbase_op(Op,'\\+'(H)):- nonvar(H),!, dbase_op(neg(('\\+'),Op),H).
-dbase_op(Op,    ~(H)):- nonvar(H),!, dbase_op(neg(~,Op),H).
-dbase_op(Op,     {H}):- nonvar(H),!, dbase_op(Op,H).
+mpred_op(Op,     H ):- (var(Op);var(H)),!,trace_or_throw(var_database_call(Op,  H )).
+mpred_op(is_asserted,H):-!,is_asserted(H).
+mpred_op(Op,     H ):- once(fully_expand(Op,H,HH)),H\=@=HH,!,mpred_op(Op, HH).
+mpred_op(neg(_,Op),  H ):- !, show_call(not(mpred_op(Op,  H ))).
+mpred_op(change(assert,Op),H):-!,must(mpred_modify(change(assert,Op),H)),!.
+mpred_op(change(retract,Op),H):-!,must(mpred_modify(change(retract,Op),H)),!.
+mpred_op(query(t,Ireq),  H ):-!, mpred_op(Ireq,H).
+mpred_op(query(Dbase_t,_Ireq),  H ):-!, mpred_op(Dbase_t,H).
+mpred_op(call(Op),H):-!,mpred_op(Op,H).
+mpred_op(Op,((include(A)))):- with_no_assertions(thlocal:already_in_file_term_expansion,mpred_op(Op,((load_data_file(A))))),!.
+mpred_op(Op, call(H)):- nonvar(H),!, mpred_op(Op,H).
+mpred_op(Op,  not(H)):- nonvar(H),!, mpred_op(neg(not,Op),H).
+mpred_op(Op,'\\+'(H)):- nonvar(H),!, mpred_op(neg(('\\+'),Op),H).
+mpred_op(Op,    ~(H)):- nonvar(H),!, mpred_op(neg(~,Op),H).
+mpred_op(Op,     {H}):- nonvar(H),!, mpred_op(Op,H).
 
-dbase_op(must,Call):- !,must(dbase_op(req,Call)).
-dbase_op(once,Call):- !,once(dbase_op(req,Call)).
+mpred_op(must,Call):- !,must(mpred_op(req,Call)).
+mpred_op(once,Call):- !,once(mpred_op(req,Call)).
 
-dbase_op(assertedOnly,Call):- !,with_assertions(thlocal:infInstanceOnly(Call),dbase_op(req,Call)).
-dbase_op(_ , clause(H,B) ):- !, is_asserted(H,B).
-dbase_op(_ , clause(H,B,Ref) ):- !,  is_asserted(H,B,Ref).
-dbase_op(_ , (H :- B) ):- !, is_asserted(H,B).
-dbase_op(clauses(Op),  H):-!,dbase_op((Op),  H).
-dbase_op(_,C):- mpred_call(C).
+mpred_op(assertedOnly,Call):- !,with_assertions(thlocal:infInstanceOnly(Call),mpred_op(req,Call)).
+mpred_op(_ , clause(H,B) ):- !, is_asserted(H,B).
+mpred_op(_ , clause(H,B,Ref) ):- !,  is_asserted(H,B,Ref).
+mpred_op(_ , (H :- B) ):- !, is_asserted(H,B).
+mpred_op(clauses(Op),  H):-!,mpred_op((Op),  H).
+mpred_op(_,C):- mpred_call(C).
 
 :-export(whenAnd/2).
 whenAnd(A,B):-A,ground(B),once(B).
@@ -77,8 +77,8 @@ user:agent_call_command(_Gent,actGrep(Obj)):- term_listing(Obj).
 % Transforming DBASE OPs
 % ========================================
 
-reduce_dbase_op(Op,Op2):-must(notrace(transitive(how_to_op,Op,Op2))),!.
-reduce_dbase_op(A,A).
+reduce_mpred_op(Op,Op2):-must(notrace(transitive(how_to_op,Op,Op2))),!.
+reduce_mpred_op(A,A).
 
 how_to_op(assert(a),asserta_new).
 how_to_op(assert(z),assertz_if_new).
@@ -135,7 +135,7 @@ mpred_call(call(X,Y)):-!,append_term(X,Y,XY),!,mpred_call(XY).
 mpred_call(call(X,Y,Z)):-!,append_term(X,Y,XY),append_term(XY,Z,XYZ),!,mpred_call(XYZ).
 mpred_call(Call):- 
  show_call_success(( thlocal:assert_op_override(OvOp), OvOp\=change(assert, _))),fail,
-   must((reduce_dbase_op(OvOp,OvOpR),lookup_inverted_op(OvOpR,_,OverridePolarity),
+   must((reduce_mpred_op(OvOp,OvOpR),lookup_inverted_op(OvOpR,_,OverridePolarity),
      must((Call=..[Was|Apply],lookup_inverted_op(Was,InvertCurrent,_WasPol))),
    ((OverridePolarity ==('-') -> debugOnError(show_call(apply(InvertCurrent,Apply))) ; debugOnError(show_call(apply(Was,Apply))))))).
 

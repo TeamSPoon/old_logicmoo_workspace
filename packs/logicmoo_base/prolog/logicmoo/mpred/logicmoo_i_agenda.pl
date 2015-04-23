@@ -24,47 +24,47 @@ tick_every(Name,Seconds,OnTick):-repeat,sleep(Seconds),catch(OnTick,E,dmsg(cause
 % Agenda system - source file loading
 % ================================================
 
-:- dynamic((thglobal:loading_dbase_file/2, thglobal:loaded_dbase_file/2)).
+:- dynamic((thglobal:loading_mpred_file/2, thglobal:loaded_mpred_file/2)).
 
-thglobal:after_dbase_load:- not(thglobal:loading_dbase_file(_,_)),thglobal:loaded_dbase_file(_,_),!.
+thglobal:after_mpred_load:- not(thglobal:loading_mpred_file(_,_)),thglobal:loaded_mpred_file(_,_),!.
 
 % when all previous tasks have completed
-after_dbase_load_pass2:- not(thglobal:will_call_after(thglobal:after_dbase_load,_)).
-:- meta_predicate(call_after_dbase_load(0)).
-% call_after_dbase_load(Code):- thglobal:after_dbase_load,!, call_after_next(after_dbase_load_pass2,Code).
-call_after_dbase_load(Code):- call_after_next(thglobal:after_dbase_load,Code).
+after_mpred_load_pass2:- not(thglobal:will_call_after(thglobal:after_mpred_load,_)).
+:- meta_predicate(call_after_mpred_load(0)).
+% call_after_mpred_load(Code):- thglobal:after_mpred_load,!, call_after_next(after_mpred_load_pass2,Code).
+call_after_mpred_load(Code):- call_after_next(thglobal:after_mpred_load,Code).
 
-:-export(rescan_dbase_loaded/0).
-rescan_dbase_loaded:- ignore((thglobal:after_dbase_load, loop_check(call_after(thglobal:after_dbase_load, true ),true))).
+:-export(rescan_mpred_loaded/0).
+rescan_mpred_loaded:- ignore((thglobal:after_mpred_load, loop_check(call_after(thglobal:after_mpred_load, true ),true))).
 
-:-export(rescan_dbase_loaded_pass2/0).
-rescan_dbase_loaded_pass2:- ignore((thglobal:after_dbase_load, loop_check(call_after(after_dbase_load_pass2,  dmsg(rescan_dbase_loaded_pass2_comlpete)),true))).
+:-export(rescan_mpred_loaded_pass2/0).
+rescan_mpred_loaded_pass2:- ignore((thglobal:after_mpred_load, loop_check(call_after(after_mpred_load_pass2,  dmsg(rescan_mpred_loaded_pass2_comlpete)),true))).
 
 % ================================================
 % Agenda system - standard database
 % ================================================
 
 % agenda_do_prequery:-!.
-agenda_do_prequery:- loop_check_local(agenda_rescan_dbase_ops,true).
-:-'$hide'(agenda_rescan_dbase_ops/0).
+agenda_do_prequery:- loop_check_local(agenda_rescan_mpred_ops,true).
+:-'$hide'(agenda_rescan_mpred_ops/0).
 :-'$hide'(agenda_do_prequery/0).
 %:- rescan_missing_stubs.
 %:- agenda_rescan_mpred_props.
 
-:- sanity(dbase_mod(user)).
+:- sanity(mpred_mod(user)).
 
 :-export(agenda_slow_op_restart/0).
 
 % agenda_slow_op_restart:-!.
 agenda_slow_op_restart:- loop_check(forall(user:agenda_slow_op_todo(Slow),(must(is_callable(Slow),Slow,ignore(retract(user:agenda_slow_op_todo(Slow)))))),true).
 
-:-export(agenda_rescan_dbase_ops/0).
-agenda_rescan_dbase_ops:- test_tl(agenda_suspend_scans),!.
-agenda_rescan_dbase_ops:- agenda_rescan_for_module_ready.
+:-export(agenda_rescan_mpred_ops/0).
+agenda_rescan_mpred_ops:- test_tl(agenda_suspend_scans),!.
+agenda_rescan_mpred_ops:- agenda_rescan_for_module_ready.
 
 :-thread_local thlocal:in_agenda_rescan_for_module_ready/0.
 agenda_rescan_for_module_ready:- thlocal:in_agenda_rescan_for_module_ready,!.
-agenda_rescan_for_module_ready:- with_assertions(thlocal:in_agenda_rescan_for_module_ready,loop_check_local(do_all_of(dbase_module_ready),true)).
+agenda_rescan_for_module_ready:- with_assertions(thlocal:in_agenda_rescan_for_module_ready,loop_check_local(do_all_of(mpred_module_ready),true)).
 
 :-export agenda_slow_op_todo/1.
 :-dynamic agenda_slow_op_todo/1.
@@ -115,7 +115,7 @@ show_cgoal(G):- slow_sanity((stack_check(9600,dmsg(warning(maybe_overflow(stack_
 
 
 :-export(add_later/1).
-add_later(Fact):- call_after_dbase_load(add(Fact)).
+add_later(Fact):- call_after_mpred_load(add(Fact)).
 
 % ========================================
 % run_database_hooks(Type,Hook)
@@ -161,7 +161,7 @@ onSpawn_f_args(Funct,List):-
   (convertSpawnArgs(Funct,1,List,NewList),
    Later =.. [t,Funct|NewList],
    add(Later),
-  call_after_dbase_load_slow(with_assertions(deduceArgTypes(Funct), add(Later))))),!.
+  call_after_mpred_load_slow(with_assertions(deduceArgTypes(Funct), add(Later))))),!.
 
 convertSpawnArgs(_,_,[],[]).
 convertSpawnArgs(Funct,N,[A|List],[O|NewList]):-
@@ -195,10 +195,10 @@ assert_subclass_on_argIsa(Prop,N,OType):-dmsg(assert_subclass_on_argIsa(Prop,N,O
 % ========================================
 
 %:-meta_predicate_transparent(rescan_all/0).
-rescan_all:- doall_and_fail(agenda_rescan_dbase_ops).
-rescan_all:- doall_and_fail(agenda_dbase_repropigate).
-rescan_all:- doall_and_fail(rescan_dbase_loaded).
-rescan_all:- doall_and_fail(agenda_rescan_dbase_ops).
+rescan_all:- doall_and_fail(agenda_rescan_mpred_ops).
+rescan_all:- doall_and_fail(agenda_mpred_repropigate).
+rescan_all:- doall_and_fail(rescan_mpred_loaded).
+rescan_all:- doall_and_fail(agenda_rescan_mpred_ops).
 % rescan_all:- doall_and_fail(agenda_rescan_sim_objects).
 rescan_all:- doall_and_fail(agenda_slow_op_restart).
 rescan_all:- doall_and_fail(agenda_rescan_mpred_props).
@@ -223,11 +223,11 @@ rescandb:- mpred_call(finish_processing_world).
 
 
 
-:-export((agenda_dbase_repropigate/0, rescan_duplicated_facts/0, rerun_database_hooks/0 , gather_fact_heads/2)).
+:-export((agenda_mpred_repropigate/0, rescan_duplicated_facts/0, rerun_database_hooks/0 , gather_fact_heads/2)).
 
-agenda_dbase_repropigate:-  loop_check_local(rescan_dbase_facts_local).
+agenda_mpred_repropigate:-  loop_check_local(rescan_mpred_facts_local).
 
-rescan_dbase_facts_local:-with_no_assertions(thglobal:use_cyc_database,(must_det(rescan_duplicated_facts),must_det(rerun_database_hooks))).
+rescan_mpred_facts_local:-with_no_assertions(thglobal:use_cyc_database,(must_det(rescan_duplicated_facts),must_det(rerun_database_hooks))).
 
 rescan_duplicated_facts:- !, notrace( forall(member(M,[moo,user,world,hook]), forall((predicate_property(M:H,dynamic),arity(F,A),functor(H,F,A)), rescan_duplicated_facts(M,H)))).
 rescan_duplicated_facts(_M,_H):-!.
@@ -275,12 +275,12 @@ englishServerInterface(SomeEnglish):-dmsg(todo(englishServerInterface(SomeEnglis
 :-dynamic(user:call_OnEachLoad/1).
 
 :-export(onLoad/1).
-onLoad(C):-call_after_dbase_load(C).
+onLoad(C):-call_after_mpred_load(C).
 :-export(user:onEachLoad/1).
 onEachLoad(C):-assert_if_new(user:call_OnEachLoad(C)).
 
 
-call_after_dbase_load_slow(A):-dmsg(call_after_dbase_load_slow(A)).
+call_after_mpred_load_slow(A):-dmsg(call_after_mpred_load_slow(A)).
 
 call_OnEachLoad:-forall(call_OnEachLoad(C),doall(C)).
 
@@ -297,7 +297,7 @@ createByNameMangle0(InstA,IDA,InstA):- gensym(InstA,IDA), englishServerInterface
 
 
 create_from_type(OType,InstA,Type):-sanity(var(InstA)),i_name(t,OType,Type),atom_concat(Type,'7',InstA7),i_name(i,InstA7,InstA),must_det(assert_isa(InstA,Type)), 
- call_after_dbase_load_slow(isa(InstA,Type)).
+ call_after_mpred_load_slow(isa(InstA,Type)).
 
 wfAssert(X):-add(X). % add_later(X).
 

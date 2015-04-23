@@ -9,7 +9,7 @@
 */
 % =======================================================
 
-% :-swi_module(dbase_formattypes, []).
+% :-swi_module(mpred_formattypes, []).
 
 :-export((          
           any_to_number/2,

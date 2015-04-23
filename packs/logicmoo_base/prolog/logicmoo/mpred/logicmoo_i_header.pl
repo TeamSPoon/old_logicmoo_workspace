@@ -105,7 +105,7 @@
 :- dynamic_multifile_exported user:is_never_type/1.
 
 % DYN FOR CODE
-:- dynamic_multifile_exported thglobal:after_dbase_load/0.
+:- dynamic_multifile_exported thglobal:after_mpred_load/0.
 :- dynamic_multifile_exported thglobal:use_cyc_database/0.
 :- dynamic_multifile_exported thglobal:global_session_agent/2.
 

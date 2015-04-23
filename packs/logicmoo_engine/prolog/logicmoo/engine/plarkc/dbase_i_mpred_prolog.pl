@@ -25,7 +25,7 @@ end_of_file.
 user:provide_mpred_write_attributes(F,A,multifile):- multifile(F/A).
 user:provide_mpred_write_attributes(F,A,thread_local):- thread_local(F/A).
 user:provide_mpred_write_attributes(F,A,dynamic):- dynamic(F/A).
-user:provide_mpred_write_attributes(F,external(Module)):- dmsg(decl_mpred(F,external(Module))),not(dbase_mod(Module)),must_det(arity(F,A)),functor(HEAD,F,A),must_det(predicate_property(Module:HEAD,_)),!.
+user:provide_mpred_write_attributes(F,external(Module)):- dmsg(decl_mpred(F,external(Module))),not(mpred_mod(Module)),must_det(arity(F,A)),functor(HEAD,F,A),must_det(predicate_property(Module:HEAD,_)),!.
 
 user:provide_mpred_read_attributes(Obj,PropVal):- fail, safe_univ(PropVal,[Prop,NonVar|Val]),safe_univ(CallVal,[Prop,Obj,NonVar|Val]),
      predicate_property(CallVal,_),!,mpred_call(CallVal).
@@ -87,16 +87,16 @@ user:provide_mpred_setup(Op,HeadIn,StubType,OUT):-  StubType = prologOnly, get_p
    module_transparent(F/A),export(F/A),dynamic_safe(F/A),
    asserta_if_new(user:mpred_prop(F,predStub(StubType))),
    asserta_if_new(user:mpred_prop(F,StubType)),
-   forall(member(HB,HBLIST),must(dbase_modify(change(assert,z),HB))),!,
+   forall(member(HB,HBLIST),must(mpred_modify(change(assert,z),HB))),!,
    must_same_clauses(Head,HBLIST))),
    must(OUT=defined(user:provide_mpred_setup(Op,Head,StubType))).
 
    
 
 
-user_dynamic_multifile_exported(_):- dbase_mod(user),!.
+user_dynamic_multifile_exported(_):- mpred_mod(user),!.
 user_dynamic_multifile_exported(Prop/Arity):- 
-   dbase_mod(M), '@'( M:decl_mpred(Prop/Arity) , M).
+   mpred_mod(M), '@'( M:decl_mpred(Prop/Arity) , M).
 
 
 
@@ -124,7 +124,7 @@ prolog_op(is_asserted,(G)):-!,clause_asserted(G,true).
 
 prolog_op(conjecture,G):-!, mpred_call(G).
 prolog_op(call,G):-!, mpred_call(G).
-prolog_op(Op,G):- reduce_dbase_op(Op,Op2), debugOnError(call(Op2,G)).
+prolog_op(Op,G):- reduce_mpred_op(Op,Op2), debugOnError(call(Op2,G)).
 
 
 
@@ -139,7 +139,7 @@ prolog_modify(change( retract,all),G):-!,retractall(G).
 prolog_modify(change(retract,one),(G-B)):-!,retract((G-B)).
 
 prolog_modify(change(retract,_),G):-!,retract(G).
-prolog_modify(Op,G):- reduce_dbase_op(Op,Op2), mud_call_store_op(Op2,G).
+prolog_modify(Op,G):- reduce_mpred_op(Op,Op2), mud_call_store_op(Op2,G).
 
 ensure_dynamic(Var):-var(Var),!,trace_or_throw(var_ensure_dynamic(Var)).
 ensure_dynamic(M:H1):-atom(M),!,ensure_dynamic(H1).

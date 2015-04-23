@@ -1,6 +1,6 @@
 /** <module> 
 % ===================================================================
-% File 'dbase_c_term_expansion'
+% File 'mpred_c_term_expansion'
 % Purpose: Emulation of OpenCyc for SWI-Prolog
 % Maintainer: Douglas Miles
 % Contact: $Author: dmiles $@users.sourceforge.net ;
@@ -44,9 +44,9 @@ reduce_clause(_,C,C).
 to_reduced_hb(Op,HB,HH,BB):-reduce_clause(Op,HB,HHBB),expand_to_hb(HHBB,HH,BB).
 
 /*
-dbase_head_expansion(_,V,V ):-var(V),!.
-dbase_head_expansion(Op,H,GG):-correct_negations(Op,H,GG),!.
-dbase_head_expansion(_,V,V).
+mpred_head_expansion(_,V,V ):-var(V),!.
+mpred_head_expansion(Op,H,GG):-correct_negations(Op,H,GG),!.
+mpred_head_expansion(_,V,V).
 */
 
 % ================================================
@@ -195,7 +195,7 @@ db_expand_0(_,arity(F,A),arity(F,A)):-atom(F),!.
 
 /*
 db_expand_0(Op,MT:Term,MT:O):- is_kb_module(MT),!,with_assertions(thlocal:caller_module(kb,MT),db_expand_0(Op,Term,O)).
-db_expand_0(Op,DB:Term,DB:O):- dbase_mod(DB),!,with_assertions(thlocal:caller_module(db,DB),db_expand_0(Op,Term,O)).
+db_expand_0(Op,DB:Term,DB:O):- mpred_mod(DB),!,with_assertions(thlocal:caller_module(db,DB),db_expand_0(Op,Term,O)).
 db_expand_0(Op,KB:Term,KB:O):- atom(KB),!,with_assertions(thlocal:caller_module(prolog,KB),db_expand_0(Op,Term,O)).
 */
 db_expand_0(Op,(:-(CALL)),(:-(CALLO))):-with_assert_op_override(Op,db_expand_0(Op,CALL,CALLO)).
@@ -553,7 +553,7 @@ add_from_file(B,B):- add(B). % db_op(change(assert,_OldV),B),!.
 
 univ_left(Comp,[M:P|List]):- nonvar(M),univ_left0(M, Comp, [P|List]),!.
 univ_left(Comp,[H,M:P|List]):- nonvar(M),univ_left0(M,Comp,[H,P|List]),!.
-univ_left(Comp,[P|List]):-dbase_mod(DBASE), univ_left0(DBASE,Comp,[P|List]),!.
+univ_left(Comp,[P|List]):-mpred_mod(DBASE), univ_left0(DBASE,Comp,[P|List]),!.
 univ_left0(M,M:Comp,List):- Comp=..List,!.
 
 
@@ -617,10 +617,10 @@ negate_wrapper(Dbase_f,Dbase_t):-negate_wrapper0(Dbase_t,Dbase_f).
 negate_wrapper(P,N):-trace_or_throw(unkown(negate_wrapper(P,N))).
 
 negate_wrapper0(holds_t,holds_f).
-negate_wrapper0(t,dbase_f).
+negate_wrapper0(t,mpred_f).
 negate_wrapper0(int_firstOrder,int_not_firstOrder).
 negate_wrapper0(firstOrder,not_firstOrder).
-negate_wrapper0(asserted_dbase_t,asserted_dbase_f).
+negate_wrapper0(asserted_mpred_t,asserted_mpred_f).
 negate_wrapper0(Dbase_t,Dbase_f):- atom_concat(Dbase,'_t',Dbase_t),atom_concat(Dbase,'_f',Dbase_f).
 
 :-thread_local hga_wrapper/3.
@@ -630,22 +630,22 @@ get_goal_wrappers(if_use_holds_db, Holds_t , N):- hga_wrapper(_,Holds_t,_),!,neg
 get_goal_wrappers(if_use_holds_db, holds_t , holds_f).
 
 get_head_wrappers(if_mud_asserted, Holds_t , N):- hga_wrapper(Holds_t,_,_),!,negate_wrapper(Holds_t,N),!.
-get_head_wrappers(if_mud_asserted, t , dbase_f).
+get_head_wrappers(if_mud_asserted, t , mpred_f).
 
 get_asserted_wrappers(if_mud_asserted, Holds_t , N):-  hga_wrapper(_,_,Holds_t),!,negate_wrapper(Holds_t,N),!.
 get_asserted_wrappers(if_mud_asserted, t , t).
 
-try_mud_body_expansion(G0,G2):- ((mud_goal_expansion_0(G0,G1),!,expanded_different(G0, G1),!,dbase_mod(DBASE))),prepend_module(G1,DBASE,G2).
+try_mud_body_expansion(G0,G2):- ((mud_goal_expansion_0(G0,G1),!,expanded_different(G0, G1),!,mpred_mod(DBASE))),prepend_module(G1,DBASE,G2).
 mud_goal_expansion_0(G1,G2):- ((get_goal_wrappers(If_use_holds_db, Holds_t , Holds_f),!,Holds_t\=nil ,  mud_pred_expansion(If_use_holds_db, Holds_t - Holds_f,G1,G2))).
 
-try_mud_head_expansion(G0,G2):- ((mud_head_expansion_0(G0,G1),!,expanded_different(G0, G1),!,dbase_mod(DBASE))),prepend_module(G1,DBASE,G2).
+try_mud_head_expansion(G0,G2):- ((mud_head_expansion_0(G0,G1),!,expanded_different(G0, G1),!,mpred_mod(DBASE))),prepend_module(G1,DBASE,G2).
 mud_head_expansion_0(G1,G2):- ((get_head_wrappers(If_mud_asserted, Dbase_t , Dbase_f),!,Dbase_t\=nil, mud_pred_expansion(If_mud_asserted, Dbase_t - Dbase_f,G1,G2))),!.
 
 try_mud_asserted_expansion(G0,G2):-  must(is_compiling_sourcecode),    
   mud_asserted_expansion_0(G0,G1),!,
    expanded_different(G0, G1),
    while_capturing_changes(add_from_file(G1,G2),Changes),!,ignore((Changes\==[],dmsg(add(todo(Changes-G2))))).
-mud_asserted_expansion_0(G1,G2):- ((get_asserted_wrappers(If_mud_asserted, Asserted_dbase_t , Asserted_dbase_f),!,Asserted_dbase_t\=nil,mud_pred_expansion(If_mud_asserted, Asserted_dbase_t - Asserted_dbase_f,G1,G2))),!.
+mud_asserted_expansion_0(G1,G2):- ((get_asserted_wrappers(If_mud_asserted, Asserted_mpred_t , Asserted_mpred_f),!,Asserted_mpred_t\=nil,mud_pred_expansion(If_mud_asserted, Asserted_mpred_t - Asserted_mpred_f,G1,G2))),!.
 
 :-export(force_clause_expansion/2).
 

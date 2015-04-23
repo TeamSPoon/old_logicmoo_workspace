@@ -141,7 +141,7 @@ download_and_install_el:-
 
 %:- xperimental_big_data->catch(user:ensure_loaded(logicmoo(pldata/el_assertions)),_,download_and_install_el);true.
 
-% :- asserta(loaded_external_kbs),show_call(kbp_to_dbase_t).
+% :- asserta(loaded_external_kbs),show_call(kbp_to_mpred_t).
 
 :- user:ensure_loaded(prologmud(vworld/world_agent)).
 :- user:ensure_loaded(prologmud(parsing/parser_imperative)).
@@ -154,8 +154,8 @@ download_and_install_el:-
 :- user:ensure_loaded(logicmoo(parsing/parser_chat80)). 
 */
 
-%:- user:ensure_loaded(logicmoo(dbase/dbase_ext_lisp)).
-%:- user:ensure_loaded(logicmoo(dbase/dbase_ext_chr)).
+%:- user:ensure_loaded(logicmoo(dbase/mpred_ext_lisp)).
+%:- user:ensure_loaded(logicmoo(dbase/mpred_ext_chr)).
 
 
 

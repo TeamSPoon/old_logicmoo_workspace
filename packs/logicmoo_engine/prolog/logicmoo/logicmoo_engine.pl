@@ -538,13 +538,13 @@ negate0(_KB,-(X),(X)):-!.
 negate0(_KB,(X),-(X)):-!.
 
 
-dbase_quf(In,Out):-transitive(dbase_quf_0,In,Out).
+mpred_quf(In,Out):-transitive(mpred_quf_0,In,Out).
 
-dbase_quf_0(InOut,InOut):-non_compound(InOut),!.
-dbase_quf_0(In,Out):- current_predicate(db_quf/4),db_quf(change(assert,_Must),In,U,C),conjoin(U,C,Out).
+mpred_quf_0(InOut,InOut):-non_compound(InOut),!.
+mpred_quf_0(In,Out):- current_predicate(db_quf/4),db_quf(change(assert,_Must),In,U,C),conjoin(U,C,Out).
 
 :-export(nonegate/3).
-nonegate( KB,Fml,OutZ):- unbuiltin_negate(KB,Fml,Out),defunctionalize(Out,OutY),dbase_quf(OutY,OutZ).
+nonegate( KB,Fml,OutZ):- unbuiltin_negate(KB,Fml,Out),defunctionalize(Out,OutY),mpred_quf(OutY,OutZ).
 
 unbuiltin_negate(_, Fml,Out):-get_functor(Fml,F,A),builtin(F,A),!,must(Out=Fml).
 unbuiltin_negate(KB,Fml,Out):-once(negate(KB,Fml,Neg)),negate(KB,Neg,Out),!.
@@ -870,7 +870,7 @@ clauses_to_boxlog(KB,Why,cl([H,Head|List],BodyIn),ListOf):-
     clauses_to_boxlog(KB,Why,cl([E],Body),Answer))),ListOf),!.
 
 
-dbase_t_tell_snark(OP2,RULE):- 
+mpred_t_tell_snark(OP2,RULE):- 
  with_assertions(thlocal:current_pttp_db_oper(mud_call_store_op(OP2)),
    (show_call(call((must(snark_tell(RULE))))))).
 

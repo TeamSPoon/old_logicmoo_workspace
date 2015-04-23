@@ -19,17 +19,17 @@
 
 isa_db(I,C):-clause(isa(I,C),true).
 
-dbase_to_cyc(tCol,'#$Collection').
-dbase_to_cyc(ttFormatType,'#$CycLExpressionType').
-dbase_to_cyc(tPred,'#$Predicate').
-dbase_to_cyc(tFunction,'#$Function-Denotational').
-dbase_to_cyc(ftVar,'#$CycLVariable').
+mpred_to_cyc(tCol,'#$Collection').
+mpred_to_cyc(ttFormatType,'#$CycLExpressionType').
+mpred_to_cyc(tPred,'#$Predicate').
+mpred_to_cyc(tFunction,'#$Function-Denotational').
+mpred_to_cyc(ftVar,'#$CycLVariable').
 
 
-dbase_to_cyc(D,C):-var(D),dbase_t_type(C),atom_concat('t',C,D).
-dbase_to_cyc(D,C):-nonvar(D),atom_concat('t',C,D),dbase_t_type(C).
+mpred_to_cyc(D,C):-var(D),mpred_t_type(C),atom_concat('t',C,D).
+mpred_to_cyc(D,C):-nonvar(D),atom_concat('t',C,D),mpred_t_type(C).
 
-dbase_t_type('#$Relation').
+mpred_t_type('#$Relation').
 
 %cyc_to_pfc_idiom(different,dif).
 cyc_to_pfc_idiom(equiv,(<=>)).

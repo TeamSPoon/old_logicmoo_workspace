@@ -66,7 +66,7 @@ prolog:doc_object_page_footer(Obj,_) --> { not(user:html_listed(Obj)) },!,pldoc_
 /*
 :- abolish(prolog:doc_object_page/4).
 :- multifile prolog:doc_object_page//2.
-% prolog:doc_object_page(Obj, Options,A,B) :-  format(user_error,'~n~q~n',[dbase_object_page(Obj, Options)]), dbase_object_page(Obj, Options,A,B),!.
+% prolog:doc_object_page(Obj, Options,A,B) :-  format(user_error,'~n~q~n',[mpred_object_page(Obj, Options)]), mpred_object_page(Obj, Options,A,B),!.
 prolog:doc_object_page(Obj, Options,A,B) :-  format(user_error,'~n~q~n',[pldoc_man:man_page(Obj, Options)]), pldoc_man:man_page(Obj, [no_manual(fail), footer(false)|Options],A,B).
 */
 

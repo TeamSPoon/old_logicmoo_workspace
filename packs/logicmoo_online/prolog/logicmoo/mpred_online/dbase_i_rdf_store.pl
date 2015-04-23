@@ -5,7 +5,7 @@ end_of_file.
 end_of_file.
 end_of_file.
 
-/** <module> logicmoo_i_mpred_dbase_t
+/** <module> logicmoo_i_mpred_mpred_t
 % Provides a prolog dabase in these predicates...
 %
 %  t/N
@@ -18,7 +18,7 @@ end_of_file.
 %
 */
 
-:-module(dbase_rdf_store, [dbase_rdf/3,atom_to_qname/2,rdf_object/1,rdf_assert_hook/1,expire_rdf_caches/0 ]).
+:-module(mpred_rdf_store, [mpred_rdf/3,atom_to_qname/2,rdf_object/1,rdf_assert_hook/1,expire_rdf_caches/0 ]).
 
 :-multifile(user:expire_one_rdf_cache/0).
 
@@ -133,7 +133,7 @@ user:semweb_startup:- n3_parse('http://raw.github.com/knowrob/knowrob/master/kno
 
 
 /*[rdf_register_prefix/2,rdf_register_prefix/3,rdf_current_ns/2,rdf/4,rdf_assert/4,
-                                      rdf_current_prefix/2,rdf_global_dbase_object/2,rdf_resource/1,rdf_current_predicate/1,
+                                      rdf_current_prefix/2,rdf_global_mpred_object/2,rdf_resource/1,rdf_current_predicate/1,
                                       rdf_has/3,rdf_graph_property/2,rdf_equal/2,rdf_literal_value/2,rdf_reachable/3,rdf_set_graph/2,rdf_subject/1]).
                                       */
 :- rdf_register_prefix(agents_owl, 'http://onto.ui.sav.sk/agents.owl#',[force(true)]).
@@ -144,14 +144,14 @@ user:semweb_startup:- n3_parse('http://raw.github.com/knowrob/knowrob/master/kno
 :- rdf_register_prefix(mud,'http://www.prologmoo.com/onto/mud.owl#',[force(true)]).
 
 :- public(rdf/3).
-rdf(S,P,O):- show_call(dbase_rdf(S,P,O)).
+rdf(S,P,O):- show_call(mpred_rdf(S,P,O)).
 
 :-op(1150, fx, (rdf_meta)).   :- rdf_meta
 	rdf(o,o,o),
         rdf_assert_p2q(o,r,o),
         rdf_x(o,r,o,o),
         rdf_assert_x(o,r,o,o),
-	dbase_rdf_store:individual_of(r,r).
+	mpred_rdf_store:individual_of(r,r).
 
 
 
@@ -167,7 +167,7 @@ is_url(S):-atom_chars(S,['h'|Chars]),memberchk('/',Chars),!.
 
 % allow rdf_current_resource(knowrob:'Food')
 :-export(rdf_current_resource/1).
-rdf_current_resource(O):- compound(O),!,O=NS:A, rdf_global_dbase_object(O,URL),(O\=@=URL->rdf_current_resource(URL);rdf_current_qname(NS,A)).
+rdf_current_resource(O):- compound(O),!,O=NS:A, rdf_global_mpred_object(O,URL),(O\=@=URL->rdf_current_resource(URL);rdf_current_qname(NS,A)).
 rdf_current_resource(O):- (rdf_resource(O);rdf_current_predicate(O);rdf_qname_url_created(_,_,O)). % aalready included rdf_subject(O).
 
 :-dynamic(rdf_current_qname_cached/2).
@@ -232,10 +232,10 @@ standard_search_pattern(i,[knowrob],mud).
 standard_search_pattern(T,[rdfs,rdf,owl,knowrob,prolog,e,_]):- (var(T) ; T == ''),!.
 standard_search_pattern(T,[Knowrob,prolog,rdfs,rdf,owl,e,_]):- standard_search_pattern(T,Knowrob,_Mud),!.
 
-rdf_global_dbase_object(NS:N,URL):-rdf_qname_url_created(NS,N,URL).
-rdf_global_dbase_object(L,O):-rdf_global_object(L,O).
+rdf_global_mpred_object(NS:N,URL):-rdf_qname_url_created(NS,N,URL).
+rdf_global_mpred_object(L,O):-rdf_global_object(L,O).
 
-rdf_create_qname(NS,Name,URL):-rdf_global_dbase_object(NS:Name,URL),rdf_current_resource(URL),!.
+rdf_create_qname(NS,Name,URL):-rdf_global_mpred_object(NS:Name,URL),rdf_current_resource(URL),!.
 rdf_create_qname(NS,Name,URL):-must(rdf_current_ns(NS,PREFIX)),atom_concat(PREFIX,Name,URL),nop(must(is_url(URL))),asserta(rdf_qname_url_created(NS,Name,URL)).
    %text_to_string(Name,Label),show_call(rdf_assert(URL,rdfs:label,literal(type(xsd:string, Label)))).
 
@@ -249,7 +249,7 @@ prefix_other_qname(List,COL,URI):-is_list(List),!,member(NS,List),prefix_other_q
 prefix_other_qname(NS,Name,QNAME):-rdf_current_prefix(NS,_),!,check_qname(NS,Name,QNAME).
 prefix_other_qname(Prefix,COL,URI):-standard_search_pattern(Prefix,List),!,((member(NS,List),prefix_other_qname(NS,COL,URI))),!.
 
-url_to_qname(URL,NS,Name):-rdf_global_dbase_object(NS:Name,URL).
+url_to_qname(URL,NS,Name):-rdf_global_mpred_object(NS:Name,URL).
 url_to_qname('http://www.w3.org/1999/02/22-rdf-syntax-ns#first',rdf,first).
 url_to_qname('http://www.w3.org/1999/02/22-rdf-syntax-ns#type',rdf,type).
 url_to_qname('http://www.w3.org/1999/02/22-rdf-syntax-ns#',rdf,'<>').
@@ -342,11 +342,11 @@ any_to_rdf(DB,A / B,URL):-any_to_rdf(DB,f_a(A,B),URL),!.
 any_to_rdf(_,'$VAR'('_'),Sx):-format(atom(S),'~w',[_]),atom_concat('__bnode',S,Sx),!.
 any_to_rdf(_,'$VAR'(A),Sx):-format(atom(S),'~w',['$VAR'(A)]),atom_concat('__bnode',S,Sx),!.
 any_to_rdf(DB,S,URL):- ground(S),rdf_alias(DB,S,URL),!.
-any_to_rdf(_,NS:N,URL):-rdf_current_qname(NS,N),rdf_global_dbase_object(NS:N,URL),!.
-any_to_rdf(DB,From,URL):-p2q(From,DB,N),!,rdf_global_dbase_object(DB:N,URL),!.
-any_to_rdf(_,mud:From,URL):-p2q(From,NS,N),!,rdf_global_dbase_object(NS:N,URL),!.
-any_to_rdf(mud,From,URL):-p2q(From,NS,N),!,rdf_global_dbase_object(NS:N,URL),!.
-any_to_rdf(_,From,URL):-p2q(From,NS,N),!,rdf_global_dbase_object(NS:N,URL),!.
+any_to_rdf(_,NS:N,URL):-rdf_current_qname(NS,N),rdf_global_mpred_object(NS:N,URL),!.
+any_to_rdf(DB,From,URL):-p2q(From,DB,N),!,rdf_global_mpred_object(DB:N,URL),!.
+any_to_rdf(_,mud:From,URL):-p2q(From,NS,N),!,rdf_global_mpred_object(NS:N,URL),!.
+any_to_rdf(mud,From,URL):-p2q(From,NS,N),!,rdf_global_mpred_object(NS:N,URL),!.
+any_to_rdf(_,From,URL):-p2q(From,NS,N),!,rdf_global_mpred_object(NS:N,URL),!.
 any_to_rdf(_,S,URL):- rdf_alias(_,S,URL),!.
 any_to_rdf(_, [], Nil) :- rdf_equal(rdf:nil, Nil),!.
 any_to_rdf(_,node(S),Sx):-atom_concat('__bnode',S,Sx),!.
@@ -366,12 +366,12 @@ any_to_rdf_0(DB,[H|T],List):-
 	rdf_assert(List, rdf:first, HH, DB),
 	rdf_assert(List, rdf:type, rdf:'List', DB).
 
-any_to_rdf_0(_,NS:R,URL):-sanity(ground(NS:R)),must(rdf_global_dbase_object(NS:R,URL)),!.
+any_to_rdf_0(_,NS:R,URL):-sanity(ground(NS:R)),must(rdf_global_mpred_object(NS:R,URL)),!.
 any_to_rdf_0(DB,S,Sxx):-atom(S),atom_to_qname(S,Sx),Sx\=S,!,any_to_rdf(DB,Sx,Sxx).
-any_to_rdf_0(DB,S,URL):-atom(S),rdf_graph_ns(DB,NS),rdf_global_dbase_object(NS:S,URL),!.
+any_to_rdf_0(DB,S,URL):-atom(S),rdf_graph_ns(DB,NS),rdf_global_mpred_object(NS:S,URL),!.
 
 any_to_rdf_1(_,literal(W),O):-nonvar(W),!,must(rdf_global_object(literal(W),O)),!,must(compound(O)).
-any_to_rdf_1(_,S,Sx):-catchv((rdf_global_dbase_object(S,Sx),not(compound(Sx))),_,fail),!.
+any_to_rdf_1(_,S,Sx):-catchv((rdf_global_mpred_object(S,Sx),not(compound(Sx))),_,fail),!.
 % any_to_rdf_1(DB,literal(type(xsd:string,String)),G):- text_to_string(String,SString),rdf_global_object(literal(type('http://www.w3.org/2001/XMLSchema#string',SString)),O).
 % any_to_rdf_1(mud,literal(S),literal(S)):-!.
 
@@ -435,10 +435,10 @@ rdf_object(L):-is_list(L),!.
 rdf_object(C):-atomic(C).
 rdf_object(O):-ground(O).
 
-:-dynamic(thglobal:using_rdf_dbase_hook).
+:-dynamic(thglobal:using_rdf_mpred_hook).
 
 :-multifile(user:decl_database_hook).
-%OLD user:decl_database_hook(change(assert,_A_or_Z),DBI):- copy_term(DBI,DB), thglobal:using_rdf_dbase_hook,numbervars_with_names(DB),rdf_assert_hook(DB),!.
+%OLD user:decl_database_hook(change(assert,_A_or_Z),DBI):- copy_term(DBI,DB), thglobal:using_rdf_mpred_hook,numbervars_with_names(DB),rdf_assert_hook(DB),!.
 
 :-thread_local(thlocal:rdf_asserting/2).
 
@@ -510,8 +510,8 @@ to_rdf_ignore(DB,A,B):-any_to_rdf(DB,A,BB),ignore(B=BB).
 
 
 
-dbase_t_rdf(Sc,rdf:type,CC):- /*o_to_p(CC,Oc),*/clause(hasInstance(Oc,Sc),true),any_to_rdf(Oc,CC),!.
-dbase_t_rdf(Sc,Pc,Oc):-t(Pc,Sc,Oc),!.
+mpred_t_rdf(Sc,rdf:type,CC):- /*o_to_p(CC,Oc),*/clause(hasInstance(Oc,Sc),true),any_to_rdf(Oc,CC),!.
+mpred_t_rdf(Sc,Pc,Oc):-t(Pc,Sc,Oc),!.
 
 :-export(rdf_assert_x/3).
 rdf_assert_x(S,P,O):- rdf_assert_x(S,P,O,mud).
@@ -546,10 +546,10 @@ rdf_x(S,P,O,DB):-
                 enforce_never_p(DB,P,NeverP),
                 once((rdf_from_graph(Gx,DB),rdf_to_prolog_io(DB,Sio,Sx,S),rdf_to_prolog_io(DB,Oio,Ox,O))).
 
-dbase_rdf(S,P,O):-
+mpred_rdf(S,P,O):-
   current_g(DB),
   maplist(any_to_prolog(DB),[S,P,O],[Sc,Pc,Oc]),
-  dbase_t_rdf(Sc,Pc,Oc),
+  mpred_t_rdf(Sc,Pc,Oc),
   maplist(to_rdf_ignore(DB),[Sc,Pc,Oc],[S,P,O]).
 
 % http://localhost:3020/cliopatria/browse/list_triples?graph=file:///t:/devel/cliopatria/rdf/base/rdfs.rdfs
@@ -557,50 +557,50 @@ dbase_rdf(S,P,O):-
 % http://localhost:3020/servlets/loadLibraryOntology?resultFormat=html&ontology=rdfs
 % http://localhost:3020/servlets/loadLibraryOntology?resultFormat=html&ontology=owl
 
-dbase_rdf(skosxl:prefLabel,   rdf:type, owl:'ObjectProperty').
-dbase_rdf(skosxl:altLabel,    rdf:type, owl:'ObjectProperty').
-dbase_rdf(skosxl:hiddenLabel, rdf:type, owl:'ObjectProperty').
+mpred_rdf(skosxl:prefLabel,   rdf:type, owl:'ObjectProperty').
+mpred_rdf(skosxl:altLabel,    rdf:type, owl:'ObjectProperty').
+mpred_rdf(skosxl:hiddenLabel, rdf:type, owl:'ObjectProperty').
 
-dbase_rdf('http://www.w3.org/2000/01/rdf-schema#ContainerMembershipProperty','http://www.w3.org/2000/01/rdf-schema#subClassOf','http://www.w3.org/1999/02/22-rdf-syntax-ns#Property').
-dbase_rdf('http://www.w3.org/2002/07/owl#someValuesFrom','http://www.w3.org/1999/02/22-rdf-syntax-ns#type','http://www.w3.org/1999/02/22-rdf-syntax-ns#Property').
-dbase_rdf('http://www.w3.org/2002/07/owl#someValuesFrom','http://www.w3.org/2000/01/rdf-schema#label',literal(someValuesFrom)).
-dbase_rdf('http://www.w3.org/2002/07/owl#someValuesFrom','http://www.w3.org/2000/01/rdf-schema#domain','http://www.w3.org/2002/07/owl#Restriction').
-dbase_rdf('http://www.w3.org/2002/07/owl#FunctionalProperty','http://www.w3.org/1999/02/22-rdf-syntax-ns#type','http://www.w3.org/2000/01/rdf-schema#Class').
-dbase_rdf('http://www.w3.org/2002/07/owl#FunctionalProperty','http://www.w3.org/2000/01/rdf-schema#label',literal('FunctionalProperty')).
-dbase_rdf('http://www.w3.org/2002/07/owl#FunctionalProperty','http://www.w3.org/2000/01/rdf-schema#subClassOf','http://www.w3.org/1999/02/22-rdf-syntax-ns#Property').
-dbase_rdf('http://www.w3.org/1999/02/22-rdf-syntax-ns#object','http://www.w3.org/1999/02/22-rdf-syntax-ns#type','http://www.w3.org/1999/02/22-rdf-syntax-ns#Property').
-dbase_rdf('http://www.w3.org/1999/02/22-rdf-syntax-ns#object','http://www.w3.org/2000/01/rdf-schema#comment',literal('The object of an RDF statement.')).
-dbase_rdf('http://www.w3.org/1999/02/22-rdf-syntax-ns#object','http://www.w3.org/2000/01/rdf-schema#domain','http://www.w3.org/1999/02/22-rdf-syntax-ns#Statement').
-dbase_rdf('http://www.w3.org/1999/02/22-rdf-syntax-ns#object','http://www.w3.org/2000/01/rdf-schema#isDefinedBy','http://www.w3.org/1999/02/22-rdf-syntax-ns#').
-dbase_rdf('http://www.w3.org/1999/02/22-rdf-syntax-ns#object','http://www.w3.org/2000/01/rdf-schema#label',literal(lang(en,object))).
+mpred_rdf('http://www.w3.org/2000/01/rdf-schema#ContainerMembershipProperty','http://www.w3.org/2000/01/rdf-schema#subClassOf','http://www.w3.org/1999/02/22-rdf-syntax-ns#Property').
+mpred_rdf('http://www.w3.org/2002/07/owl#someValuesFrom','http://www.w3.org/1999/02/22-rdf-syntax-ns#type','http://www.w3.org/1999/02/22-rdf-syntax-ns#Property').
+mpred_rdf('http://www.w3.org/2002/07/owl#someValuesFrom','http://www.w3.org/2000/01/rdf-schema#label',literal(someValuesFrom)).
+mpred_rdf('http://www.w3.org/2002/07/owl#someValuesFrom','http://www.w3.org/2000/01/rdf-schema#domain','http://www.w3.org/2002/07/owl#Restriction').
+mpred_rdf('http://www.w3.org/2002/07/owl#FunctionalProperty','http://www.w3.org/1999/02/22-rdf-syntax-ns#type','http://www.w3.org/2000/01/rdf-schema#Class').
+mpred_rdf('http://www.w3.org/2002/07/owl#FunctionalProperty','http://www.w3.org/2000/01/rdf-schema#label',literal('FunctionalProperty')).
+mpred_rdf('http://www.w3.org/2002/07/owl#FunctionalProperty','http://www.w3.org/2000/01/rdf-schema#subClassOf','http://www.w3.org/1999/02/22-rdf-syntax-ns#Property').
+mpred_rdf('http://www.w3.org/1999/02/22-rdf-syntax-ns#object','http://www.w3.org/1999/02/22-rdf-syntax-ns#type','http://www.w3.org/1999/02/22-rdf-syntax-ns#Property').
+mpred_rdf('http://www.w3.org/1999/02/22-rdf-syntax-ns#object','http://www.w3.org/2000/01/rdf-schema#comment',literal('The object of an RDF statement.')).
+mpred_rdf('http://www.w3.org/1999/02/22-rdf-syntax-ns#object','http://www.w3.org/2000/01/rdf-schema#domain','http://www.w3.org/1999/02/22-rdf-syntax-ns#Statement').
+mpred_rdf('http://www.w3.org/1999/02/22-rdf-syntax-ns#object','http://www.w3.org/2000/01/rdf-schema#isDefinedBy','http://www.w3.org/1999/02/22-rdf-syntax-ns#').
+mpred_rdf('http://www.w3.org/1999/02/22-rdf-syntax-ns#object','http://www.w3.org/2000/01/rdf-schema#label',literal(lang(en,object))).
 
 
-dbase_rdf(S, P, O):-!, rdf_db:rdf(S, P, O).
+mpred_rdf(S, P, O):-!, rdf_db:rdf(S, P, O).
 
-dbase_rdf(S, P, O):-dmsg(dbase_rdf(S, P, O)),!,fail.
+mpred_rdf(S, P, O):-dmsg(mpred_rdf(S, P, O)),!,fail.
 
-dbase_rdf(literal(L), _, _) :-		% should move to compiler
+mpred_rdf(literal(L), _, _) :-		% should move to compiler
 	nonvar(L), !, fail.
-dbase_rdf(_, literal(L), _) :-		% idem
+mpred_rdf(_, literal(L), _) :-		% idem
 	nonvar(L), !, fail.
-dbase_rdf(S, P, O) :-
+mpred_rdf(S, P, O) :-
 	var(P), !,
 	(   rdf_db:rdf(S,P,O)
 	;   rdf_db:rdf(P, rdf:type, rdf:'Property'),
 	    rdf_db:rdf(S, P, O),
 	    \+ rdf_db:rdf(S,P,O)
 	).
-dbase_rdf(S, P, C) :-
+mpred_rdf(S, P, C) :-
 	rdf_reachable(rdf:type, rdfs:subPropertyOf, P), !,
 	individual_of(S, C).
-dbase_rdf(S, P, O) :-					% transitive predicates
+mpred_rdf(S, P, O) :-					% transitive predicates
 	rdf_reachable(rdfs:subClassOf, rdfs:subPropertyOf, P), !,
 	(   (nonvar(S) ; nonvar(O))
 	->  rdfs_subclass_of(S, O)		% generate from given start
 	;   individual_of(S, rdfs:'Class'),	% generated unbounded (slow!)
 	    rdfs_subclass_of(S, O)
 	).
-dbase_rdf(S, rdfs:subPropertyOf, O) :- !,
+mpred_rdf(S, rdfs:subPropertyOf, O) :- !,
 	(   nonvar(S)
 	->  individual_of(S, rdf:'Property'),
 	    rdfs_subproperty_of(S, O)
@@ -610,43 +610,43 @@ dbase_rdf(S, rdfs:subPropertyOf, O) :- !,
 	;   individual_of(S, rdf:'Property'),
 	    rdfs_subproperty_of(S, O)
 	).
-dbase_rdf(S, serql:directSubClassOf, O) :- !, rdf_has(S, rdfs:subClassOf, O).
-dbase_rdf(S, serql:directType, O) :- !, rdf_has(S, rdf:type, O).
-dbase_rdf(S, serql:directSubPropertyOf, O) :- !, rdf_has(S, rdfs:subPropertyOf, O).
-dbase_rdf(S, P, O) :- rdf_has(S, P, O).
+mpred_rdf(S, serql:directSubClassOf, O) :- !, rdf_has(S, rdfs:subClassOf, O).
+mpred_rdf(S, serql:directType, O) :- !, rdf_has(S, rdf:type, O).
+mpred_rdf(S, serql:directSubPropertyOf, O) :- !, rdf_has(S, rdfs:subPropertyOf, O).
+mpred_rdf(S, P, O) :- rdf_has(S, P, O).
 
 
 %%	individual_of(?Resource, ?Class)
-individual_of(Resource, Class):- dbase_individual_of(Resource, Class).
+individual_of(Resource, Class):- mpred_individual_of(Resource, Class).
 
 
-dbase_individual_of(Resource, Class) :-
+mpred_individual_of(Resource, Class) :-
 	nonvar(Resource), !,
 	(   Resource = literal(_)
 	->  rdfs_subclass_of(Class, rdfs:'Literal')
-	;   dbase_rdf_has_type(Resource, MyClass),
+	;   mpred_rdf_has_type(Resource, MyClass),
 	    rdfs_subclass_of(MyClass, Class)
 	;   rdf_equal(Class, rdfs:'Resource')
 	).
-dbase_individual_of(Resource, Class) :-
+mpred_individual_of(Resource, Class) :-
 	nonvar(Class), !,
 	(   rdf_equal(Class, rdfs:'Resource')
 	->  rdf_subject(Resource)
 	;   rdfs_subclass_of(SubClass, Class),
-	    dbase_rdf_has_type(Resource, SubClass)
+	    mpred_rdf_has_type(Resource, SubClass)
 	).
-dbase_individual_of(Resource, Class) :-
+mpred_individual_of(Resource, Class) :-
 	rdf_subject(Resource),
 	individual_of(Resource, Class).
 
 
-%%	dbase_rdf_has_type(+Resource, -Class) is nondet.
-%%	dbase_rdf_has_type(-Resource, +Class) is nondet.
+%%	mpred_rdf_has_type(+Resource, -Class) is nondet.
+%%	mpred_rdf_has_type(-Resource, +Class) is nondet.
 %
 %	Perform RDFS entailment rules to enumerate the types of Resource
 %	or generate all resources entailed  by   the  given  class.
 
-dbase_rdf_has_type(Resource, Class) :-
+mpred_rdf_has_type(Resource, Class) :-
 	empty_nb_set(Set),
 	(   atom(Resource)
 	->  (   rdf_has(Resource, rdf:type, Class)
@@ -677,7 +677,7 @@ dbase_rdf_has_type(Resource, Class) :-
 :- multifile
 	cliopatria:entailment/2.
 
-cliopatria:entailment(dbase_rdf, dbase_rdf_store).
+cliopatria:entailment(mpred_rdf, mpred_rdf_store).
 
 
 :-export(sync_to_rdf/0).
@@ -693,7 +693,7 @@ sync_to_rdf:-
    forall(user:mpred_prop(P,O),rdf_assert_hook(user:mpred_prop(P,O))),
    forall(hasInstance(C,I),rdf_assert_hook(isa(I,C))),
    forall(is_known_trew(B),rdf_assert_hook(B)),
-   (thglobal:using_rdf_dbase_hook -> true ; (asserta(thglobal:using_rdf_dbase_hook),forall(prologHybridFact(G),rdf_assert_hook(G)))),
+   (thglobal:using_rdf_mpred_hook -> true ; (asserta(thglobal:using_rdf_mpred_hook),forall(prologHybridFact(G),rdf_assert_hook(G)))),
    asserta_if_new(user:call_OnEachLoad(sync_to_rdf)),
    asserta_if_new(user:call_OnEachLoad(sync_from_rdf)),
    !.

@@ -1,6 +1,6 @@
 /** <module> 
 % ===================================================================
-% File 'dbase_db_preds.pl'
+% File 'mpred_db_preds.pl'
 % Purpose: Emulation of OpenCyc for SWI-Prolog
 % Maintainer: Douglas Miles
 % Contact: $Author: dmiles $@users.sourceforge.net ;
@@ -163,7 +163,7 @@ singletons_throw_else_fail(C):- fail,not_is_release,contains_singletons(C),!,(te
 nonground_throw_else_fail(C):- not_is_release,not(ground(C)),!,( (test_tl(thlocal:already_in_file_term_expansion) ->dmsg(not_ground(C)); trace_or_throw(not_ground(C)))),fail.
 
 % ================================================
-% dbase_modify/2
+% mpred_modify/2
 % ================================================
 
 with_logical_functor(not,[G],Call):- !, not(call(Call,G)).
@@ -226,14 +226,14 @@ del0(C0):- mpred_call(C0),!,clr(C0),!.
 del0(C0):- ireq(C0),!,idel(C0),!.
 del0(C0):- mreq(C0),!,mdel(C0),!.
 
-idel(C0):- dmsg(idel(C0)),dbase_modify(change( retract,a),C0), verify_sanity(ireq(C0)->(dmsg(warn(incomplete_I_DEL(C0))),fail);true),!.
+idel(C0):- dmsg(idel(C0)),mpred_modify(change( retract,a),C0), verify_sanity(ireq(C0)->(dmsg(warn(incomplete_I_DEL(C0))),fail);true),!.
 idel(C0):- dmsg(warn(failed(idel(C0)))),!,fail.
 
-mdel(C0):- dmsg(mdel(C0)),dbase_modify(change( retract,one),C0), verify_sanity(mreq(C0)->(dmsg(warn(incomplete_M_DEL(C0))),fail);true),!.
+mdel(C0):- dmsg(mdel(C0)),mpred_modify(change( retract,one),C0), verify_sanity(mreq(C0)->(dmsg(warn(incomplete_M_DEL(C0))),fail);true),!.
 mdel(C0):- dmsg(warn(failed(mdel(C0)))),!,fail.
 
 % -  clr(Retractall)
-% clr(C0):- dmsg(clr(C0)),fail,dbase_modify(change(retract,all),/*to_exp*/(C0)),verify_sanity(ireq(C0)->(dmsg(warn(incomplete_CLR(C0))));true).
+% clr(C0):- dmsg(clr(C0)),fail,mpred_modify(change(retract,all),/*to_exp*/(C0)),verify_sanity(ireq(C0)->(dmsg(warn(incomplete_CLR(C0))));true).
 clr(P):- agenda_do_prequery,forall(P, must((( 
  doall((  pfc_rem2(P),
    sanity(not(pfc_tms_supported(local,P))))),
@@ -253,7 +253,7 @@ pfcRemE(P):-predicate_property(P,number_of_clauses(_)),predicate_property(P,dyna
 pfcRemE(_).
 
 % -  preq(Query) = query with P note
-preq(P,C0):- agenda_do_prequery,dbase_op(query(t,P),C0).
+preq(P,C0):- agenda_do_prequery,mpred_op(query(t,P),C0).
 
 % -  req(Query) = Normal query
 req(C0):- nop(dmsg(req(C0))), preq(req,/*to_exp*/(C0)).
@@ -309,22 +309,22 @@ add_0(A):-trace_or_throw(fmt('add/1 is failing ~q.',[A])).
 
 implied_skipped(genls(C0,C0)).
 implied_skipped(props(_,[])).
-implied_skipped(Skipped):-compound(Skipped), not(functor(Skipped,_,1)),fail, (t(Skipped);out_of_dbase_t(Skipped)).
+implied_skipped(Skipped):-compound(Skipped), not(functor(Skipped,_,1)),fail, (t(Skipped);out_of_mpred_t(Skipped)).
 implied_skipped(Skipped):-user:already_added_this_round(Skipped),(is_asserted(Skipped)).
 
 
-dbase_numbervars_with_names(Term):- term_variables(Term,Vars),dbase_name_variables(Vars),!,numbervars(Vars,91,_,[attvar(skip),singletons(true)]),!.
+mpred_numbervars_with_names(Term):- term_variables(Term,Vars),mpred_name_variables(Vars),!,numbervars(Vars,91,_,[attvar(skip),singletons(true)]),!.
 
-dbase_name_variables([]).
-dbase_name_variables([Var|Vars]):-
+mpred_name_variables([]).
+mpred_name_variables([Var|Vars]):-
    (var_property(Var, name(Name)) -> Var = '$VAR'(Name) ; true),
-   dbase_name_variables(Vars).
+   mpred_name_variables(Vars).
 
 
 :-export(pfc_add_fast/1).
 % -  add(Assertion)
 % pfc_add_fast(C0):- must_det((pfc_add_fast(C0), xtreme_debug(once(ireq(C0);(with_all_dmsg((debug(blackboard),show_call(pfc_add_fast(C0)),rtrace(pfc_add_fast(C0)),dtrace(ireq(C0))))))))),!.
-add_fast(Term):-dbase_numbervars_with_names(Term),dbase_modify(change(assert,add), Term),!. % ,xtreme_debug(ireq(C0)->true;dmsg(warn(failed_ireq(C0)))))),!.
+add_fast(Term):-mpred_numbervars_with_names(Term),mpred_modify(change(assert,add), Term),!. % ,xtreme_debug(ireq(C0)->true;dmsg(warn(failed_ireq(C0)))))),!.
 
 % -  upprop(Obj,PropSpecs) update the properties
 upprop(Obj,PropSpecs):- upprop(props(Obj,PropSpecs)).
@@ -346,7 +346,7 @@ prop_or(Obj,Prop,Value,OrElse):- one_must(ireq(t(Prop,Obj,Value)),Value=OrElse).
 
 :-dmsg_hide(db_assert_sv).
 
-:-dmsg_hide(dbase_modify).
+:-dmsg_hide(mpred_modify).
 :-dmsg_hide(add).
 
 :-dmsg_hide(into_mpred_form).
@@ -430,7 +430,7 @@ confirm_hook(CNEW:NEW=@=CNOW:NOW):-
 db_must_asserta_confirmed_sv(CNEW,A,NEW):-
    replace_arg(CNEW,A,NOW,CNOW),
    sanity(not(singletons_throw_else_fail(CNEW))),
-   dbase_modify(change(assert,sv),CNEW),!,
+   mpred_modify(change(assert,sv),CNEW),!,
    verify_sanity(confirm_hook(CNEW:NEW=@=CNOW:NOW)),!.
 
 db_must_asserta_confirmed_sv(CNEW,A,NEW):-dmsg(unconfirmed(db_must_asserta_confirmed_sv(CNEW,A,NEW))).
@@ -441,14 +441,14 @@ test_expand_units(IN):-fully_expand(query(t,must),IN,OUT),dmsg(test_expand_units
 
 
 
-dbase_modify(Op,                 G):- (var(Op);var(G)),!,trace_or_throw(var_database_modify_op(Op,  G )).
-dbase_modify(Op,                 G):- G\=pred_argtypes(_),fully_expand(Op,G,GG),not_variant(G,GG),!,dbase_modify(Op, GG ),!.
-dbase_modify(_,  (:-include(FILE))):- !,must(load_data_file_now(FILE)).
-dbase_modify(Op,  (:-(G))         ):- !,must(with_assert_op_override(Op,debugOnError(G))).
-dbase_modify(P,                  G):- thlocal:noDBaseMODs(_),!,dmsg(noDBaseMODs(P,G)).
-%dbase_modify(Op,                 G):- dbase_head_expansion(clause,G,GG),not_variant(G,GG),database_modify_0(Op, GG ),!.
-dbase_modify(Op,                 G):- database_modify_0(Op,G ),!.
-dbase_modify(Op,                 G):- trace_or_throw(unknown_database_modify(Op,G)).
+mpred_modify(Op,                 G):- (var(Op);var(G)),!,trace_or_throw(var_database_modify_op(Op,  G )).
+mpred_modify(Op,                 G):- G\=pred_argtypes(_),fully_expand(Op,G,GG),not_variant(G,GG),!,mpred_modify(Op, GG ),!.
+mpred_modify(_,  (:-include(FILE))):- !,must(load_data_file_now(FILE)).
+mpred_modify(Op,  (:-(G))         ):- !,must(with_assert_op_override(Op,debugOnError(G))).
+mpred_modify(P,                  G):- thlocal:noDBaseMODs(_),!,dmsg(noDBaseMODs(P,G)).
+%mpred_modify(Op,                 G):- mpred_head_expansion(clause,G,GG),not_variant(G,GG),database_modify_0(Op, GG ),!.
+mpred_modify(Op,                 G):- database_modify_0(Op,G ),!.
+mpred_modify(Op,                 G):- trace_or_throw(unknown_database_modify(Op,G)).
 
 
 /*
@@ -500,12 +500,12 @@ database_modify_8(_ ,GG):- copy_term(GG,GGA),no_loop_check(is_asserted_eq(GGA)),
 % only place ever should actual game database be changed from
 % ========================================
 
-hooked_asserta(G):- loop_check(dbase_modify(change(assert,a),G),true).
+hooked_asserta(G):- loop_check(mpred_modify(change(assert,a),G),true).
 
-hooked_assertz(G):- loop_check(dbase_modify(change(assert,z),G),true).
+hooked_assertz(G):- loop_check(mpred_modify(change(assert,z),G),true).
 
 hooked_retract(G):-  Op = change(retract,a),
-                   ignore(slow_sanity(ignore(show_call_failure((dbase_op(is_asserted,G)))))),
+                   ignore(slow_sanity(ignore(show_call_failure((mpred_op(is_asserted,G)))))),
                    slow_sanity(not(singletons_throw_else_fail(retract_cloc(G)))),
                    slow_sanity(ignore(((ground(G), once(show_call_failure((is_asserted(G)))))))),
                    must_storage_op(Op,G),expire_post_change( Op,G),
@@ -520,7 +520,7 @@ hooked_retractall(G):- Op = change(retract,all),
 
 
 user:provide_mpred_storage_op(Op,G):- (loop_check(pfc_provide_mpred_storage_op(Op,G))).
-user:provide_mpred_storage_op(Op,G):- (loop_check(dbase_t_provide_mpred_storage_op(Op,G))).
+user:provide_mpred_storage_op(Op,G):- (loop_check(mpred_t_provide_mpred_storage_op(Op,G))).
 user:provide_mpred_storage_op(Op,G):- (loop_check(prolog_provide_mpred_storage_op(Op,G))).
 user:provide_mpred_storage_op(Op,G):- (loop_check(isa_provide_mpred_storage_op(Op,G))).
 user:provide_mpred_storage_op(Op,G):- Op\=change(_,_), (call_no_cuts(user:provide_mpred_storage_clauses(G,true,_Proof))).
@@ -535,7 +535,7 @@ may_storage_op(Op,G):-call_no_cuts(user:provide_mpred_storage_op(Op,G)).
 :- meta_predicate del(-),clr(-),add(-),req(-), fully_expand(-,-,-).
 
 % Found new meta-predicates in iteration 1 (0.281 sec)
-%:- meta_predicate dbase_modify(?,?,?,0).
+%:- meta_predicate mpred_modify(?,?,?,0).
 
 
 

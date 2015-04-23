@@ -31,7 +31,7 @@ user:file_search_path(pack, '../packs').
 
 
 % :- ensure_loaded(library(logicmoo/mpred_online)).
-% :- '@'(ensure_loaded('../src_mud/dbase/dbase_i_pldoc'),user).
+% :- '@'(ensure_loaded('../src_mud/dbase/mpred_i_pldoc'),user).
 
 % [Optionaly] Set up the Prolog optimize/debug flags
 %:- set_prolog_flag(debug,false).
@@ -50,7 +50,7 @@ do_semweb_startup:-
    ((N2\=N1) -> do_semweb_startup ; true).
 
 % [Optionaly] register swish server (remote file editing)
-% :- with_no_dbase_expansions(if_file_exists(ensure_loaded('../externals/swish/logicmoo_run_swish'))).
+% :- with_no_mpred_expansions(if_file_exists(ensure_loaded('../externals/swish/logicmoo_run_swish'))).
 
 % [Optionaly] register/run Cliopatria sparql server (remote RDF browsing)
 user:semweb_startup:-ensure_loaded('run_clio').
@@ -71,10 +71,10 @@ user:semweb_startup :- with_no_term_expansions(if_file_exists(ensure_loaded('../
 % [Optionaly] register/run EulerSharp robot services (we use it for the ontology mainly)
 % TODO user:semweb_startup :- register_ros_package(euler).
 
-% :- ensure_loaded(logicmoo(dbase/dbase_i_pldoc)).
+% :- ensure_loaded(logicmoo(dbase/mpred_i_pldoc)).
 % :- do_semweb_startup.
 
-:- with_no_dbase_expansions(if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop.pl'))).
+:- with_no_mpred_expansions(if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop.pl'))).
 :- current_predicate(egg_go/0)->egg_go;true.
 
 

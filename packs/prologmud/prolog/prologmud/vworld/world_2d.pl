@@ -348,7 +348,7 @@ random_region(LOC):- findall(O,isa(O,tRegion),LOCS),my_random_member(LOC,LOCS).
 random_xyzFn(LOC):-
    must_det(random_instance(tRegion,Region,true)),
    in_grid_rnd(Region,LOC),!.
-random_xyzFn(xyzFn('Area1000',1,1,1)):-  dmsg(trace_or_throw(dbase_not_loaded)).
+random_xyzFn(xyzFn('Area1000',1,1,1)):-  dmsg(trace_or_throw(mpred_not_loaded)).
 
 unoccupied(_,Loc):- not_asserted((mudAtLoc(_,Loc))),!.
 unoccupied(_,_):-!.

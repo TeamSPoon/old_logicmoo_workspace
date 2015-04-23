@@ -1,4 +1,4 @@
-/** <module> dbase_i_mpred_pfc
+/** <module> mpred_i_mpred_pfc
 % Provides a prolog database replacent that uses PFC
 %  
 %
@@ -12,7 +12,7 @@
 %
 */
 
-:- include(dbase_i_header).
+:- include(mpred_i_header).
 
 pmsg(S,Args):- sformat(SF,S,Args),dmsg(pfc(SF)).
 
@@ -262,7 +262,7 @@ pfc_ignored(isa(W,_)):-compound(W),isa(W,pred_argtypes).
 pfc_ignored(isa(_,Atom)):-atom(Atom),atom_concat(ft,_,Atom),!.
 pfc_ignored(isa(_,argIsaFn(_, _))).
 
-pfc_assert(G):- pfc_dbase_transform(G,GG),pfc_assert0(GG).
+pfc_assert(G):- pfc_mpred_transform(G,GG),pfc_assert0(GG).
 pfc_assert0(G):- not(not(pfc_ignored(G))).
 pfc_assert0(G):- throw_on_bad_fact(G),!.
 pfc_assert0(G):- thglobal:pfcManageHybrids,!,pfc_local(G),!,assertz_if_new(G),add_meta_facts(assertz_if_new,G).
@@ -291,7 +291,7 @@ rewrap_h(A,not_not(A)):-!.
 % used to annotate a predciate to indicate PFC support
 infoF(_):-fail.
 
-pfc_dbase_transform(G,GGG):-must((fully_expand_warn(pfc_dbase_transform,G,GG))),!,unnumbervars(GG,GGG).
+pfc_mpred_transform(G,GGG):-must((fully_expand_warn(pfc_mpred_transform,G,GG))),!,unnumbervars(GG,GGG).
 
 
 pfc_clause_db_unify(H,B):- must(pfc_local(H)),
@@ -305,7 +305,7 @@ pfc_clause_local_db_ref(H,B,Ref):- copy_term(H:B,HH:BB),clause(HH,BB,Ref),clause
 % pfc_call_prolog_native(G):- pfc_call_prolog_native(nonPFC,G).
 pfc_call_prolog_native(_,true):-!.
 pfc_call_prolog_native(_,G):- pfc_local(G),!,show_call_failure(predicate_property(G,_)),!, debugOnError(call(G)).
-pfc_call_prolog_native(Why,X):-dbase_op(call(Why),X).
+pfc_call_prolog_native(Why,X):-mpred_op(call(Why),X).
 
 :-thread_local ntd_max_depth/2.
 
@@ -2327,7 +2327,7 @@ pfcSelectJustificationNode(Js,Index,Step) :-
   nth(StepNo,Justification,Step).
 
 
-:- if_startup_script(with_assertions(thlocal:pfcExpansion,ensure_loaded(dbase_i_mpred_pfc_testing))).
+:- if_startup_script(with_assertions(thlocal:pfcExpansion,ensure_loaded(mpred_i_mpred_pfc_testing))).
 
 :- if_startup_script(prolog).
 

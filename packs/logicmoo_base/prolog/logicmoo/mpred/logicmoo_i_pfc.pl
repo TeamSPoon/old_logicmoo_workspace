@@ -464,7 +464,7 @@ pfc_ignored(isa(W,_)):-compound(W),isa(W,pred_argtypes).
 pfc_ignored(isa(_,Atom)):-atom(Atom),atom_concat(ft,_,Atom),!.
 pfc_ignored(isa(_,argIsaFn(_, _))).
 
-pfc_assert(G):- pfc_dbase_transform(G,GG),must(pfc_assert0(GG)),!.
+pfc_assert(G):- pfc_mpred_transform(G,GG),must(pfc_assert0(GG)),!.
 
 pfc_assert0(G):- \+(must(\+(pfc_ignored(G)))).
 pfc_assert0(G):- must(\+(throw_on_bad_fact(G))),fail.
@@ -500,7 +500,7 @@ rewrap_h(A,A):-nonvar(A),\+ is_static_pred(A).
 rewrap_h(A,F):- functor(A,F,_),\+ is_static_pred(F),!.
 rewrap_h(A,not_not(A)):-!.
 
-pfc_dbase_transform(G,GGG):-must((pfc_fully_expand_warn(pfc_dbase_transform,G,GG))),!,unnumbervars(GG,GGG).
+pfc_mpred_transform(G,GGG):-must((pfc_fully_expand_warn(pfc_mpred_transform,G,GG))),!,unnumbervars(GG,GGG).
 
 
 pfc_clause_db_unify(H,B):- must(pfc_local(H)),
@@ -514,7 +514,7 @@ pfc_clause_local_db_ref(H,B,Ref):- copy_term(H:B,HH:BB),clause(HH,BB,Ref),clause
 % pfc_call_prolog_native(G):- pfc_call_prolog_native(nonPFC,G).
 pfc_call_prolog_native(_,true):-!.
 pfc_call_prolog_native(_,G):- pfc_local(G),!,show_call_failure(predicate_property(G,_)),!, debugOnError(call(G)).
-pfc_call_prolog_native(Why,X):-dbase_op(call(Why),X).
+pfc_call_prolog_native(Why,X):-mpred_op(call(Why),X).
 
 :-thread_local ntd_max_depth/2.
 
@@ -2732,7 +2732,7 @@ user:term_expansion(A,B):- current_predicate(_,pfcExpansion_loaded),loop_check(p
 
 pfcExpansion_loaded.
 % system:goal_expansion(P,O):- (\+ current_predicate(_,P)),O= pfcCall(P).
-:- if_startup_script(with_assertions(thlocal:pfcExpansion,ensure_loaded(dbase_i_mpred_pfc_testing))).
+:- if_startup_script(with_assertions(thlocal:pfcExpansion,ensure_loaded(mpred_i_mpred_pfc_testing))).
 
 :- if_startup_script(prolog).
 
