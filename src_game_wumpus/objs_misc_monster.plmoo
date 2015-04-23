@@ -223,7 +223,7 @@ Object applies:
 */
 % :- module(objects, [  ]).
 
-% :- include(logicmoo(vworld/moo_header)).
+% :- include(library(prologmud/server/mud_header)).
 
 :-register_module_type([world_types,parser]).
 
@@ -279,4 +279,4 @@ mudLabelTypeProps(th,tToughHide,[mudActAffect(actWear,mudArmor(2))]).
 % Define the maximum mudEnergy and maximum mudHealth an agent can have
 
 
-% :- include(logicmoo(vworld/moo_footer)).
+% :- include(prologmud(mud_footer)).

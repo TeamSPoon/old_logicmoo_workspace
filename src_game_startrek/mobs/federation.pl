@@ -19,7 +19,7 @@ end_of_file.
 % Declare the module name and the exported (public) predicates.
 :-module(modFederation,[]).
 
-:- include(logicmoo(dbase/dbase_i_header)).
+:- include(library(dbase/mpred_i_header)).
 :- register_module_type(planning).
 
 :-decl_type(tFederation).
@@ -95,4 +95,4 @@ federation_idea(Agent,actLook) :-
 	add(mudMemory(Agent,aDirectionsFn(New))).
 
 
-:- include(logicmoo(vworld/moo_footer)).
+:- include(prologmud(mud_footer)).

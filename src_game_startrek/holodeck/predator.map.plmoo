@@ -47,6 +47,6 @@ typeGrid(tBigForestMap,19,[ed,--,--,--,--,--,--,--,--,--,--,--,--,--,tr,--,--,--
 typeGrid(tBigForestMap,20,[ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed,ed]).
 
 
-% :- include(logicmoo(vworld/moo_footer)).
+% :- include(prologmud(mud_footer)).
 
 
