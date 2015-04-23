@@ -28,45 +28,45 @@
 
 use_dbase_t.
 
-:- dynamic dbase_t/3.
-:- multifile dbase_t/3.
-:- dynamic dbase_t/4.
-:- multifile dbase_t/4.
+:- dynamic t/3.
+:- multifile t/3.
+:- dynamic t/4.
+:- multifile t/4.
 
 
 :- dynamic int_asserted_t/11.
 :- multifile int_asserted_t/11.
 
 int_asserted_t(A, B, C, C1, H, I, D, E, F, J, G) :- use_dbase_t,
- user:dbase_t(A, B, C, C1),D=E, F=[K, [asserted_t(A, B, C, C1), G, H, I]|L], J=[K|L].
+ user:t(A, B, C, C1),D=E, F=[K, [asserted_t(A, B, C, C1), G, H, I]|L], J=[K|L].
 
 
 :- dynamic int_asserted_t/10.
 :- multifile int_asserted_t/10.
 
 int_asserted_t(A, B, C, H, I, D, E, F, J, G) :- 
-   pretest_call((use_dbase_t, dif(B,C), user:dbase_t(A, B, C),D=E)),
+   pretest_call((use_dbase_t, dif(B,C), user:t(A, B, C),D=E)),
    F=[K, [asserted_t(A, B, C), G, H, I]|L], J=[K|L].
 
 :- dynamic int_pred_t/10.
 :- multifile int_pred_t/10.
 
 int_pred_t(A, B, C, H, I, D, E, F, J, G) :-
-   pretest_call((use_dbase_t, dif(B,C), user:dbase_t(A, B, C),D=E)),
+   pretest_call((use_dbase_t, dif(B,C), user:t(A, B, C),D=E)),
   F=[K, [pred_t(A, B, C), G, H, I]|L], J=[K|L].
 
 :- dynamic not_int_pred_t/10.
 :- multifile not_int_pred_t/10.
 
 not_int_pred_t(A, B, C, H, I, D, E, F, J, G) :- 
-   pretest_call((use_dbase_t,not(user:dbase_t(A, B, C)), dif(B,C),D=E)),
+   pretest_call((use_dbase_t,not(user:t(A, B, C)), dif(B,C),D=E)),
  F=[K, [not_pred_t(A, B, C), G, H, I]|L], J=[K|L].
 
 :- dynamic int_refuted_t/10.
 :- multifile int_refuted_t/10.
 
 int_refuted_t(A, B, C, H, I, D, E, F, J, G) :- 
-   pretest_call((is_extent_known(A),use_dbase_t,not(user:dbase_t(A, B, C)), dif(B,C),D=E)),
+   pretest_call((is_extent_known(A),use_dbase_t,not(user:t(A, B, C)), dif(B,C),D=E)),
  F=[K, [refuted_t(A, B, C), G, H, I]|L], J=[K|L].
 
 is_extent_known(wearsClothing).
@@ -1070,7 +1070,7 @@ is_holds_false_pttp(F):-is_p_to_n(_,F).
 
 :-export(is_holds_true_pttp/1).
 is_holds_true_pttp(A):-not(atom(A)),!,fail.
-is_holds_true_pttp(Prop):-arg(_,vvv(holds,holds_t,dbase_t,asserted_dbase_t,assertion_t,assertion,secondOrder,asserted_t),Prop).
+is_holds_true_pttp(Prop):-arg(_,vvv(holds,holds_t,t,asserted_dbase_t,assertion_t,assertion,secondOrder,asserted_t),Prop).
 is_holds_true_pttp(F):-atom_concat(_,'_true',F).
 is_holds_true_pttp(F):-atom_concat(_,'_t',F).
 %is_holds_true_pttp(F):-atom_concat('pos',_,F).
@@ -1600,8 +1600,8 @@ builtin(integer,1).
 builtin(number,1).
 builtin(F,_):-is_p_or_not(F),!,fail.
 builtin(not_asserted_t,_):-!,fail.
-builtin(P,2):-dbase_t(P,_,_),!,fail.
-builtin(P,3):-dbase_t(P,_,_,_),!,fail.
+builtin(P,2):-t(P,_,_),!,fail.
+builtin(P,3):-t(P,_,_,_),!,fail.
 builtin(atomic,1).
 builtin(constant,1).
 builtin(functor,3).
@@ -1637,7 +1637,7 @@ builtin(identical_member_special_loop_check,_).
 builtin(M:P,A):-atom(M),!,builtin(P,A).
 builtin(F,_):- (user:mpred_prop(F,prologOnly)),!. %,fail.
 builtin(unifiable_member,_).
-builtin(dbase_t,_).
+builtin(t,_).
 %builtin(F,_):-user:mpred_prop(F,prologPTTP),!,fail.
 %builtin(F,_):-user:mpred_prop(F,prologSNARK),!,fail.
 builtin(F,A):-current_predicate(F/A),functor(P,F,A),builtin_why(P,F,A,Why),!,dmsg(todo(warn(builtin_why(F,A,Why)))).

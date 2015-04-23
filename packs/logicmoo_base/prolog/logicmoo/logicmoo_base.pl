@@ -11,6 +11,9 @@
 % Dec 13, 2035
 % Douglas Miles
 */
+
+:- prolog_load_context(directory,Dir),asserta(user:file_search_path(logicmoo,Dir)).
+
 :- op(500,fx,'~').
 :- op(1050,xfx,('=>')).
 :- op(1050,xfx,'<=>').
@@ -18,15 +21,18 @@
 :- op(1100,fx,('=>')).
 :- op(1150,xfx,('::::')).
 
-:-nb_setval(pldoc_object,pldoc_object_missing).
+:- nb_setval(pldoc_object,pldoc_object_missing).
+
+:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
+:- include(mpred/logicmoo_i_header).
+
+:- dynamic(user:isa_pred_now_locked/0).
+:- thread_local user:prolog_mud_disable_term_expansions.
 
 :- multifile(system:term_expansion/2).
 :- multifile(user:term_expansion/2).
 :- multifile(user:goal_expansion/2).
-:- use_module(library(semweb/turtle)).
-:- include(mpred/logicmoo_i_header).
-:- dynamic(user:isa_pred_now_locked/0).
-:-thread_local user:prolog_mud_disable_term_expansions.
+
 
 :-dynamic('$was_imported_kb_content$'/2).
 :-multifile('$was_imported_kb_content$'/2).
@@ -34,6 +40,15 @@
 :-if(not(current_predicate(swi_module/2))).
 swi_module(M,E):-dmsg(swi_module(M,E)).
 :-endif.
+
+
+:- export(with_no_dbase_expansions/1).
+:- meta_predicate(with_no_dbase_expansions(0)).
+%with_no_dbase_expansions(Goal):-
+%  with_assertions(user:prolog_mud_disable_term_expansions,Goal).
+
+:-dynamic(tChannel/1).
+:-dynamic(subFormat/2).
 
 % ================================================
 % Debugging settings
@@ -175,7 +190,7 @@ user:ruleRewrite(mudLabelTypeProps(Lbl,T,Props),typeProps(T,[typeHasGlyph(Lbl)|P
 % ================================================================================
 :-export(is_pred_declarer/1).
 is_pred_declarer(Prop):- % vFormatted 
-	arg(_,v(predArgTypes,predIsFlag,tPred,
+	arg(_,v(pred_argtypes,predIsFlag,tPred,
         prologMultiValued,prologSingleValued,prologMacroHead,prologOnly,
 		prologOrdered,prologNegByFailure,prologPTTP,prologSNARK,prologHybrid,prologListValued),Prop).
 
@@ -198,8 +213,8 @@ record_on_thread(Dbase_change,O):- thread_self(ID),thlocal:dbase_capture(ID,Dbas
 % DBASE_T System
 % ================================================
 
+:- ensure_loaded(mpred/pfc).
 :- ensure_loaded(mpred/logicmoo_i_mpred_props).
-:- ensure_loaded(mpred/logicmoo_i_pfc).
 :- ensure_loaded(mpred/logicmoo_i_agenda).
 :- ensure_loaded(mpred/logicmoo_i_call).
 :- ensure_loaded(mpred/logicmoo_i_coroutining).
@@ -234,25 +249,26 @@ user:term_expansion(G,isa(I,C)):-not(user:prolog_mud_disable_term_expansions),no
 
 
 dbase_module_ready.
-:- with_no_term_expansions(if_file_exists(user_ensure_loaded(logicmoo(dbase/dbase_i_rdf_store)))).
+:- with_no_term_expansions(if_file_exists(user:ensure_loaded(logicmoo(dbase/dbase_i_rdf_store)))).
 
 :- decl_mpred_hybrid(argIsa/3).
 :- add_fast(<=( argIsa(F,N,Isa), argIsa_known(F,N,Isa))).
 
 :-asserta(thlocal:pfcExpansion).
 :-decl_mpred_prolog(resolveConflict/1).
-:-decl_mpred_prolog(pfcSelect/1).
+:-decl_mpred_prolog(pfc_select/2).
 
 :-must((fully_expand_goal(_,:-multifile user:create_random_fact/1,O),show_call_failure(O=(:-multifile user:create_random_fact/1)))).
 
 :-decl_type(tPred).
 :-decl_mpred_hybrid(isa/2).
 
-user:term_expansion(A,B):- not(user:prolog_mud_disable_term_expansions), current_predicate(pfcExpansion_loaded/0),loop_check(pfc_file_expansion(A,B)),A\=@=B.
+system:term_expansion(A,B):- not(user:prolog_mud_disable_term_expansions), 
+  current_predicate(pfcExpansion_loaded/0),loop_check(pfc_file_expansion(A,B)),A\=@=B.
 
-user:semweb_startup:- with_no_term_expansions(if_file_exists(user_ensure_loaded(logicmoo(dbase/dbase_i_rdf_store)))).
+user:semweb_startup:- with_no_term_expansions(if_file_exists(user:ensure_loaded(logicmoo(dbase/dbase_i_rdf_store)))).
 
-:- with_no_term_expansions(if_file_exists(user_ensure_loaded(logicmoo(mobs/planner/dbase_i_hyhtn)))).
+:- with_no_term_expansions(if_file_exists(user:ensure_loaded(logicmoo(mobs/planner/dbase_i_hyhtn)))).
 :-decl_type(predIsFlag).
 :-decl_type(prologOnly).
 :-decl_mpred_hybrid(formatted_resultIsa/2).
@@ -277,7 +293,7 @@ system:term_expansion(IN,OUT):- not(user:prolog_mud_disable_term_expansions),
 vtTestType(vTest1).
 vtTestType(vTest2).
 
-:-must(not(user:mpred_prop(dbase_t,prologHybrid))).
+:-must(not(user:mpred_prop(t,prologHybrid))).
 % :-decl_mpred_hybrid(function_corisponding_predicate(tFunction,tPred)).
 
 :- sanity(tCol(tCol)).
@@ -294,16 +310,16 @@ vtTestType(vTest2).
 :-must(in_file_expansion;in_file_directive).
 
 /*
-:- pfcAdd(((vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) => vtActionTemplate(ArgTypes)))).
-:- pfcAdd(((action_info(ArgTypes,_)/is_declarations(ArgTypes) => vtActionTemplate(ArgTypes)))).
-:- pfcAdd(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) => functorDeclares(F))).
+:- pfc_add(((vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) => vtActionTemplate(ArgTypes)))).
+:- pfc_add(((action_info(ArgTypes,_)/is_declarations(ArgTypes) => vtActionTemplate(ArgTypes)))).
+:- pfc_add(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) => functorDeclares(F))).
 (ttFormatType(FT)/is_declarations(FT))=>ttFormatted(FT).
 
 
 % Functions
 ttFormatted(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
 % Preds
-predArgTypes(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
+pred_argtypes(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
 % Representations
 vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
 

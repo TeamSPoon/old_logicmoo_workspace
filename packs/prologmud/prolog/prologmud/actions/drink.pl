@@ -8,7 +8,7 @@
 % :-swi_module(user). 
 :-swi_module(modDrink, []).
 
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 
 % :- register_module_type (mtCommand).
 
@@ -25,4 +25,4 @@ user:agent_call_command(Agent,actDrink(Obj)) :-
 
 update_charge(Agent,actDrink) :- add(mudEnergy(Agent,-1)).
 
-% :- include(library(prologmud/server/mud_footer)).
+% :- include(prologmud(mud_footer)).

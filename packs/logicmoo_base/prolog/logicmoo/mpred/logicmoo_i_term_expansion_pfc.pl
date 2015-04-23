@@ -73,18 +73,19 @@ pfc_using_file(F):- inside_file(pfc),!.
 pfc_using_file(F):- file_name_extension(_,pfc,F),!.
 
 
-must_compile_special_clause(:- (_) ):-!,fail.
-must_compile_special_clause(CL):- 
+must_compile_special_clause(CL):- (CL \= :-(_)),
    sanity(nonvar(CL)), \+(thlocal:into_form_code),
     \+(thlocal:already_in_file_term_expansion),
     \+((get_functor(CL,F),expanded_already_functor(F))),
-   pfcType(CL,_).
+   pfc_db_type(CL,_),!.
 
 :-multifile(thlocal:pfc_module_expansion/1).
 :-thread_local(thlocal:pfc_module_expansion/1).
 
 pfc_use_module(M):- must(atom(M)),retractall(pfc_skipped_module(M)),show_call(asserta_if_new(thlocal:pfc_module_expansion(M))).
 
+compile_this(_,F,M:C,O):-atom(M),!,compile_this(M,F,C,O).
+compile_this(M,F,'$was_imported_kb_content$'(_,_),code):-!.
 compile_this(M,F,C,pfc_add):- pfc_using_file(F), \+ pfc_skipped_module(M),!.
 compile_this(M,F,C,O):- (var(M);var(F);var(C)),trace_or_throw(var_compile_this(M,F,C,O)).
 compile_this(M,F,C,requires_storage(WHY)):- requires_storage(C,WHY),!.
@@ -103,14 +104,17 @@ pfc_may_expand_module(M):-thlocal:pfc_module_expansion(M),!.
 pfc_may_expand_module(_):-thlocal:pfc_module_expansion(*),!.
 
 
+:-module_transparent(pfc_file_module_term_expansion/4).
 pfc_file_module_term_expansion(F,M,A,BBBO):-compile_this(M,F,A,How),   
    user:xfile_load_form(How,M,A,B),must(source_location(F,L)),b_getval('$variable_names', Vs),
    pfc_file_module_term_expansion_1(How,M,A,Vs,F,L,B,BBBO).
 
+:-module_transparent(pfc_file_module_term_expansion_1/7).
 pfc_file_module_term_expansion_1(How,M,A,Vs,F,L,B,BBBO):-
    copy_term(A:B:Vs,AA:BB:VVs),pfc_implode_varnames(VVs),INFO=info(M:How,AA->BB,F:L,VVs),
    pfc_file_module_term_expansion_2(How,INFO,F,M,AA,B,BBBO),!.
- 
+
+:-module_transparent( pfc_file_module_term_expansion_2/6).
 pfc_file_module_term_expansion_2(How,INFO,F,M,AA,BBB,BBBO):- 
    (BBB = (:- _) -> BBBO = BBB ;
       (How == code -> BBBO = BBB ;
@@ -177,7 +181,7 @@ pfc_directive_expansion(pfc_multifile,
                  export(('=>')/1),
                  export(('~')/1),
                  export(('neg')/1),
-                 include(library(mpred/mpred_header)))):- source_module(M).
+                 include(logicmoo(mpred/logicmoo_i_header)))):- source_module(M).
 
 
 pfc_directive_expansion(pfc_module,(asserta(user:mpred_directive_value(pfc,module,M)))):-source_module(M).
@@ -198,10 +202,11 @@ inside_file(W) :- prolog_load_context(source,Source),user:mpred_directive_value(
 
 system:term_expansion((:- (M:DIR)),O):-atom(M),atom(DIR),with_source_module(M, ((pfc_directive_expansion(DIR,OO),!, must(O=(:- OO))))).
 system:term_expansion((:- DIR),O):- atom(DIR), pfc_directive_expansion(DIR,OO),!,must(O=(:- OO)).
-system:term_expansion(A,BO):- notrace((A\=(:-_),A\=end_of_file,current_predicate(pfc_file_loaded/0))), 
+system:term_expansion(A,BO):- fail, notrace((A\=(:-_),A\=end_of_file,current_predicate(pfc_file_loaded/0))), 
    notrace((\+ user:disable_mpred_term_expansions, \+ thlocal:already_in_file_term_expansion,\+ (get_functor(A,F),expanded_already_functor(F)))),
    ((source_file(I),must(loading_module(M);source_module(M)))),
-   with_no_assertions(thlocal:consulting_sources, with_source_module(M, loop_check(pfc_file_module_term_expansion(I,M,A,B)))),
+   with_no_assertions(thlocal:consulting_sources, 
+   with_source_module(M, loop_check(pfc_file_module_term_expansion(I,M,A,B)))),
    must(nonvar(B)),BO=B.
 
 % ISA QUERY
@@ -265,10 +270,10 @@ end_of_file.
 :- user:export(user:pfc_is_negated_functor/3).
 :- import(user:pfc_is_negated_functor/3).
 
-:- dynamic(user:mpred_arity/2).
-:- multifile(user:mpred_arity/2).
-:- user:export(user:mpred_arity/2).
-:- import(user:mpred_arity/2).
+:- dynamic(user:arity/2).
+:- multifile(user:arity/2).
+:- user:export(user:arity/2).
+:- import(user:arity/2).
 
 :- user:dynamic(user:ruleRewrite/2).
 :- user:multifile(user:ruleRewrite/2).
@@ -292,11 +297,11 @@ end_of_file.
 :- user:ensure_loaded(library(logicmoo/logicmoo_util_strings)).
 
 
-:- include(library(mpred/mpred_props)).
-:- include(library(mpred/mpred_form)).
-% :- use_module(library(mpred/mpred_hooks)).
-% :- include(library(mpred/mpred_call)).
-% :- include(library(mpred/mpred_database)).
+:- include(logicmoo(mpred/logicmoo_props)).
+:- include(logicmoo(mpred/logicmoo_form)).
+% :- use_module(logicmoo(mpred/logicmoo_hooks)).
+% :- include(logicmoo(mpred/logicmoo_call)).
+% :- include(logicmoo(mpred/logicmoo_database)).
 
 /*
 bugger:was/2
@@ -353,9 +358,9 @@ default_module(user).
 :- dynamic(('=>')/2).
 :- dynamic(('=>')/1).
 :- dynamic(('~')/1).
-:- dynamic(('pfc_t_b')/2).
-:- dynamic(('pfc_t_neg')/3).
-:- dynamic(('pfc_t_pos')/2).
+:- dynamic(('bt')/2).
+:- dynamic(('nt')/3).
+:- dynamic(('pt')/2).
 :- dynamic(('pfc_t_pkey')/3).
 :- dynamic(('::::')/2).
 :- dynamic((pfc_action)/2).
@@ -363,7 +368,7 @@ default_module(user).
 :- dynamic((pfc_queue)/2).
 :- dynamic((pfc_select)/2).
 :- dynamic((pfc_undo_method)/2).
-:- dynamic((pfc_sup_db)/3).
+:- dynamic((spft)/3).
 :- dynamic((pfc_ignored)/1).
 
 :-style_check(-singleton).
@@ -560,7 +565,7 @@ mpred_uclause(X,Y):-db_uclause(X,Y).
 pfc_var_call(Why,G):-pfc_fact(G)*->true;pfc_var_call_0(Why,G).
 pfc_var_call_0(Why,G):-var(G),!,mpred_arity_var_call(F,A),functor(G,F,A),pfc_call(Why,G).
 
-mpred_arity_var_call(F,A):-mpred_arity(F,A).
+mpred_arity_var_call(F,A):-arity(F,A).
 
 pfc_univ_call(Why,P,List):-nonvar(List),!,pfc_univ_call_0(Why,P,List).
 pfc_univ_call(Why,P,List):-nonvar(P),!,functor(P,F,A),P=..List.
@@ -569,7 +574,7 @@ pfc_univ_call(Why,P,List):-mpred_arity_var_call(F,A),functor(P,F,A),P=..List.
 pfc_univ_call_0(Why,P,[F|Right]):-var(F),!,mpred_arity_var_call(F,A),functor(P,F,A),P=..[F|Right].
 pfc_univ_call_0(Why,P,['$VAR'(F)|Right]):- !, fail, trace_or_throw(ftVar_pfc_univ_call(Why,(P=..['$VAR'(F)|Right]))).
 pfc_univ_call_0(Why,P,List):-is_list(List),!,P=..List.
-pfc_univ_call_0(Why,P,[F|Right]):- !, F=..[FF|Left],mpred_arity(FF,A),functor(P,FF,A),P=..[FF|ALL],append(Left,Right,ALL).
+pfc_univ_call_0(Why,P,[F|Right]):- !, F=..[FF|Left],arity(FF,A),functor(P,FF,A),P=..[FF|ALL],append(Left,Right,ALL).
 
 
 pfc_mpred_op(OP,TERM):-if_defined(mpred_op(OP,TERM),trace_or_throw(pfc_mpred_op(OP,TERM))).
@@ -606,9 +611,9 @@ pfc_preferedDir(H,B,(H<=B)):-mpred_prop(H,pfc_is_bc).
 pfc_preferedDir(H,B,(H:-B)).
 
 pfc_prefered_neck(H,FB):-pfc_prefered_neck_fb(H,FB)*->true;mpred_get(neck,H,FB).
-pfc_prefered_neck_fb(H,(<=)):- once(db_uclause(H,pfc_bc_only(H));db_uclause(H,pfc_info(H <= _));db_uclause(H <= _,true)).
-pfc_prefered_neck_fb(H,(=>)):- once(db_uclause(H,pfc_info(_ => H));db_uclause(_ => H,true)).
-pfc_prefered_neck_fb(H,(:-)):- once(db_uclause(H,pfc_info(H:-_));(db_uclause(H,B),\+is_true(B),\+pfc_is_info(B))).
+pfc_prefered_neck_fb(H,(<=)):- once(db_uclause(H,pfc_bc_only(H));db_uclause(H,infoF(H <= _));db_uclause(H <= _,true)).
+pfc_prefered_neck_fb(H,(=>)):- once(db_uclause(H,infoF(_ => H));db_uclause(_ => H,true)).
+pfc_prefered_neck_fb(H,(:-)):- once(db_uclause(H,infoF(H:-_));(db_uclause(H,B),\+is_true(B),\+pfc_is_info(B))).
 
 
 
@@ -631,9 +636,9 @@ pfc_set_neck(H,Type):-
 
 pfc_assume_dynamic(G) :- get_functor(G,F,A),pfc_assume_dynamic(G,F/A).
 
-pfc_assume_dynamic(G,F/A):-predicate_property(G,dynamic),mpred_home_module(G,M),!,export(M:F/A),asserta_if_new(user:mpred_arity(F,A)),decl_mpred_home_module(G,M).
-pfc_assume_dynamic(G,F/A):-predicate_property(G,_),mpred_home_module(G,M),!,export(M:F/A),asserta_if_new(user:mpred_arity(F,A)),decl_mpred_home_module(G,M).
-pfc_assume_dynamic(G,F/A):-show_call(dynamic_safe(F/A)),mpred_home_module(G,M),!,export(M:F/A),asserta_if_new(user:mpred_arity(F,A)),decl_mpred_home_module(G,M).
+pfc_assume_dynamic(G,F/A):-predicate_property(G,dynamic),mpred_home_module(G,M),!,export(M:F/A),asserta_if_new(user:arity(F,A)),decl_mpred_home_module(G,M).
+pfc_assume_dynamic(G,F/A):-predicate_property(G,_),mpred_home_module(G,M),!,export(M:F/A),asserta_if_new(user:arity(F,A)),decl_mpred_home_module(G,M).
+pfc_assume_dynamic(G,F/A):-show_call(dynamic_safe(F/A)),mpred_home_module(G,M),!,export(M:F/A),asserta_if_new(user:arity(F,A)),decl_mpred_home_module(G,M).
 
 pfc_dynamic_safe(M,F,A):- functor(C,F,A),predicate_property(C,imported_from(system)),!,pmsg(warn(predicate_property(M:C,imported_from(system)))).
 pfc_dynamic_safe(M,F,A):- (static_predicate(M,F,A) -> (pmsg(warn(not(M:dynamic(M:F/A))))) ; logOnErrorIgnore(M:dynamic(M:F/A))). % , warn_module_dupes(M,F,A).
@@ -783,11 +788,11 @@ pfc_manages_unknowns :- mpred_prop(*,pfc_control).
 
 % :-decl_mpred(pfc_state/1,pfc_col).
 
-pfc_state(pfc_sup_db/3).
+pfc_state(spft/3).
 pfc_state(pfc_t_pkey/3).
-pfc_state(pfc_t_pos/3).
-pfc_state(pfc_t_b/2).
-pfc_state(pfc_t_neg/3).
+pfc_state(pt/3).
+pfc_state(bt/2).
+pfc_state(nt/3).
 pfc_state('=>'/2).
 pfc_state('<=>'/2).
 pfc_state('<='/2).
@@ -807,18 +812,18 @@ pfc_local(G,_,_):-  \+(current_predicate(mpred_assertz/1)),!,pfc_mark_C(G).
 pfc_local(_,_,_).
 
 pfc_add_minfo(How,(H:-True)):-is_true(True),must(pfc_is_bound(H)),!,pfc_add_minfo(How,H).
-pfc_add_minfo(How,(H<=B)):- !,pfc_add_minfo(How,(H:-pfc_info(H<=B))),!,pfc_add_minfo(How,(H:-pfc_bc_only(H))),pfc_add_minfo_2(How,(B:-pfc_info(H<=B))).
-pfc_add_minfo(How,(B=>H)):- !,pfc_add_minfo(How,(H:-pfc_info(B=>H))),!,pfc_add_minfo_2(How,(B:-pfc_info(B=>H))).
-pfc_add_minfo(How,(B<=>H)):- !,pfc_add_minfo(How,(H:-pfc_info(B<=>H))),!,pfc_add_minfo(How,(B:-pfc_info(B<=>H))),!.
+pfc_add_minfo(How,(H<=B)):- !,pfc_add_minfo(How,(H:-infoF(H<=B))),!,pfc_add_minfo(How,(H:-pfc_bc_only(H))),pfc_add_minfo_2(How,(B:-infoF(H<=B))).
+pfc_add_minfo(How,(B=>H)):- !,pfc_add_minfo(How,(H:-infoF(B=>H))),!,pfc_add_minfo_2(How,(B:-infoF(B=>H))).
+pfc_add_minfo(How,(B<=>H)):- !,pfc_add_minfo(How,(H:-infoF(B<=>H))),!,pfc_add_minfo(How,(B:-infoF(B<=>H))),!.
 pfc_add_minfo(How,((A,B):-INFOC)):-pfc_is_info(INFOC),(pfc_is_bound(A);pfc_is_bound(B)),!,pfc_add_minfo(How,((A):-INFOC)),pfc_add_minfo(How,((B):-INFOC)),!.
 pfc_add_minfo(How,((A;B):-INFOC)):-pfc_is_info(INFOC),(pfc_is_bound(A);pfc_is_bound(B)),!,pfc_add_minfo(How,((A):-INFOC)),pfc_add_minfo(How,((B):-INFOC)),!.
-pfc_add_minfo(How,(~(A):-pfc_info(C))):-pfc_is_bound(C),pfc_is_bound(A),!,pfc_add_minfo(How,((A):-pfc_info((C)))). % call(How,(~(A):-pfc_info(C))).
-pfc_add_minfo(How,(neg(A):-pfc_info(C))):-pfc_is_bound(C),pfc_is_bound(A),!,pfc_add_minfo(How,((A):-pfc_info((C)))). % call(How,(~(A):-pfc_info(C))).
+pfc_add_minfo(How,(~(A):-infoF(C))):-pfc_is_bound(C),pfc_is_bound(A),!,pfc_add_minfo(How,((A):-infoF((C)))). % call(How,(~(A):-infoF(C))).
+pfc_add_minfo(How,(neg(A):-infoF(C))):-pfc_is_bound(C),pfc_is_bound(A),!,pfc_add_minfo(How,((A):-infoF((C)))). % call(How,(~(A):-infoF(C))).
 pfc_add_minfo(How,(A:-INFOC)):-nonvar(INFOC),INFOC= pfc_bc_only(A),!,call(How,(A:-INFOC)),!.
 pfc_add_minfo(How,(A:-INFOC)):-pfc_is_info(INFOC),!,pfc_rewrap_h(A,AA),call(How,(AA:-INFOC)),!.
-pfc_add_minfo(How,pfc_t_b(H,_)):-!,call(How,(H:-pfc_bc_only(H))).
-pfc_add_minfo(How,pfc_t_neg(H,Test,Body)):-!,call(How,(H:-fail,pfc_t_neg(H,Test,Body))).
-pfc_add_minfo(How,pfc_t_pos(H,Body)):-!,call(How,(H:-fail,pfc_t_pos(H,Body))).
+pfc_add_minfo(How,bt(H,_)):-!,call(How,(H:-pfc_bc_only(H))).
+pfc_add_minfo(How,nt(H,Test,Body)):-!,call(How,(H:-fail,nt(H,Test,Body))).
+pfc_add_minfo(How,pt(H,Body)):-!,call(How,(H:-fail,pt(H,Body))).
 %pfc_add_minfo(How,G):-pmsg(skipped_add_meta_facts(How,G)).
 pfc_add_minfo(_,_).
 
@@ -826,7 +831,7 @@ pfc_add_minfo(_,_).
 pfc_add_minfo_2(How,G):-pfc_add_minfo(How,G).
 
 pfc_is_info(pfc_bc_only(C)):-pfc_is_bound(C),!.
-pfc_is_info(pfc_info(C)):-pfc_is_bound(C),!.
+pfc_is_info(infoF(C)):-pfc_is_bound(C),!.
 
 {}(X):-pfc_call(X).
 
@@ -840,7 +845,7 @@ pfc_rewrap_h(A,F):-pfc_is_bound(A),\+ pfc_wont_assert(A), functor(A,F,_),!.
 pfc_rewrap_h(A,pfc_info_head(A)):-!.
 
 % used to annotate a predciate to indicate PFC support
-pfc_info(_):-fail.
+infoF(_):-fail.
 
 pfc_into_prolog(G,GGG):-must((pfc_warn_expand(pfc_into_prolog,G,GG))),!,unnumbervars(GG,GGG).
 
@@ -875,11 +880,11 @@ pfc_get_head_body_0('=>'(Body1,Head),HeadO,(Body1,Body2)):-!,pfc_get_head_body(H
 pfc_get_head_body_0((Head<=Body1),HeadO,(Body1,Body2)):-!,pfc_get_head_body(Head,HeadO,Body2).
 pfc_get_head_body_0((L<=>R),HeadO,Body):-!,pfc_get_head_body(((L<=R),(R<=L)),HeadO,Body).
 pfc_get_head_body_0(_::::Head,HeadO,Body2):-!,pfc_get_head_body_0(Head,HeadO,Body2).
-pfc_get_head_body_0(pfc_t_b(Head,Body1),HeadO,(Body1,Body2)):-!,pfc_get_head_body(Head,HeadO,Body2).
-pfc_get_head_body_0(pfc_t_pos(Body1,Head),HeadO,(Body1,Body2)):-!,pfc_get_head_body(Head,HeadO,Body2).
+pfc_get_head_body_0(bt(Head,Body1),HeadO,(Body1,Body2)):-!,pfc_get_head_body(Head,HeadO,Body2).
+pfc_get_head_body_0(pt(Body1,Head),HeadO,(Body1,Body2)):-!,pfc_get_head_body(Head,HeadO,Body2).
 pfc_get_head_body_0(pfc_t_pkey(_,Head,Body1b),HeadO,(Body1b,Body2)):-!,pfc_get_head_body(Head,HeadO,Body2).
-pfc_get_head_body_0(pfc_t_neg(_,Head,Body1b),HeadO,(Body1b,Body2)):-!,pfc_get_head_body(Head,HeadO,Body2).
-pfc_get_head_body_0(pfc_sup_db(Head,Body1a,Body1b),HeadO,(Body1a,Body1b,Body2)):-!,pfc_get_head_body(Head,HeadO,Body2).
+pfc_get_head_body_0(nt(_,Head,Body1b),HeadO,(Body1b,Body2)):-!,pfc_get_head_body(Head,HeadO,Body2).
+pfc_get_head_body_0(spft(Head,Body1a,Body1b),HeadO,(Body1a,Body1b,Body2)):-!,pfc_get_head_body(Head,HeadO,Body2).
 pfc_get_head_body_0(pfc_queue(Head,S),HeadO,Body2):-!,pfc_get_head_body(Head,HeadO,Body2).
 pfc_get_head_body_0('~'(Head),'~'(HeadO),Body):-!,pfc_get_head_body(Head,HeadO,Body).
 pfc_get_head_body_0('neg'(Head),'neg'(HeadO),Body):-!,pfc_get_head_body(Head,HeadO,Body).
@@ -1092,11 +1097,11 @@ pfc_add1(P0,S):-
 % % pfc_add1a(P,S) :- pfc_is_already_false(P,S,_),!.
 pfc_add2(P,_):- call(pfc_ignored(P)),!.
 
-pfc_simu_support(P0,U0,U0,O) :- pfc_sup_db(P0,U1,U1),(U0==U1->O=sup_id(P0,U0);O=sup_users(P0,U0,U1)).
-pfc_simu_support(P0,F0,T0,sup_ident(P0)) :- pfc_sup_db(P0,S0,T0),S0\=S1.
-pfc_simu_support(P0,F0,T0,sup_t(P0,F1,F0)) :- pfc_sup_db(P0,F1,T0),T0\=T1.
-pfc_simu_support(P0,F0,T0,sup_f(P0,T1,T0)) :- pfc_sup_db(P0,F0,T1),T0\=T1.
-pfc_simu_support(P0,F0,T0,sup_ft(P0,F1,F0,T1,T0)):- pfc_sup_db(P0,F1,T1).
+pfc_simu_support(P0,U0,U0,O) :- spft(P0,U1,U1),(U0==U1->O=sup_id(P0,U0);O=sup_users(P0,U0,U1)).
+pfc_simu_support(P0,F0,T0,sup_ident(P0)) :- spft(P0,S0,T0),S0\=S1.
+pfc_simu_support(P0,F0,T0,sup_t(P0,F1,F0)) :- spft(P0,F1,T0),T0\=T1.
+pfc_simu_support(P0,F0,T0,sup_f(P0,T1,T0)) :- spft(P0,F0,T1),T0\=T1.
+pfc_simu_support(P0,F0,T0,sup_ft(P0,F1,F0,T1,T0)):- spft(P0,F1,T1).
 
 pfc_add2(P0,S):-S=(F0,T0),!,pfc_add1(P0,S,F0,T0).
 
@@ -1318,12 +1323,12 @@ pfc_halt(Format,Args) :-
 %=
 
 
-pfc_addTrigger(pfc_t_pos(Trigger,Body),Support) :-
+pfc_addTrigger(pt(Trigger,Body),Support) :-
   !,
   pfc_trace_msg('      Adding positive trigger ~q~n',
-		[pfc_t_pos(Trigger,Body)]),  
-  pfc_int_add_last(pfc_t_pos(Trigger,Body),Support),
-  copy_term(pfc_t_pos(Trigger,Body),Tcopy),
+		[pt(Trigger,Body)]),  
+  pfc_int_add_last(pt(Trigger,Body),Support),
+  copy_term(pt(Trigger,Body),Tcopy),
   pfc_bc_caching(Trigger),
   pfc_evalLHS(Body,(Trigger,Tcopy)),
   fail.
@@ -1338,19 +1343,19 @@ pfc_addTrigger(pfc_t_pkey(Trigger,Test,Body),Support) :- trace,
        pfc_evalLHS(Body,((Trigger),pfc_t_pkey(TriggerCopy,Test,Body))).
 
 
-pfc_addTrigger(pfc_t_neg(Trigger,Test,Body),Support) :-
+pfc_addTrigger(nt(Trigger,Test,Body),Support) :-
   !,
   pfc_trace_msg('      Adding negative trigger: ~q~n       test: ~q~n       body: ~q~n',
 		[Trigger,Test,Body]),
   copy_term(Trigger,TriggerCopy),
-  pfc_int_add_last(pfc_t_neg(TriggerCopy,Test,Body),Support),
+  pfc_int_add_last(nt(TriggerCopy,Test,Body),Support),
   \+Test,
-  pfc_evalLHS(Body,((\+Trigger),pfc_t_neg(TriggerCopy,Test,Body))).
+  pfc_evalLHS(Body,((\+Trigger),nt(TriggerCopy,Test,Body))).
 
 
-pfc_addTrigger(pfc_t_b(Trigger,Body),Support) :-
+pfc_addTrigger(bt(Trigger,Body),Support) :-
   !,
-  pfc_int_add_last(pfc_t_b(Trigger,Body),Support),
+  pfc_int_add_last(bt(Trigger,Body),Support),
   pfc_btPtCombine(Trigger,Body,Support).
 
 pfc_addTrigger(X,Support) :-
@@ -1358,9 +1363,9 @@ pfc_addTrigger(X,Support) :-
 
 
 pfc_btPtCombine(Head,Body,Support) :- 
-  %= a backward trigger (pfc_t_b) was just added with head and Body and support Support
-  %= find any pfc_t_pos's with unifying heads and add the instantied pfc_t_b body.
-  pfc_getTriggerQuick(pfc_t_pos(Head,_PtBody)),
+  %= a backward trigger (bt) was just added with head and Body and support Support
+  %= find any pt's with unifying heads and add the instantied bt body.
+  pfc_getTriggerQuick(pt(Head,_PtBody)),
   pfc_evalLHS(Body,Support),
   fail.
 pfc_btPtCombine(_,_,_) :- !.
@@ -1502,12 +1507,12 @@ pfc_removeSupportsQuietly(_).
 pfc_undo(List):- is_list(List),!,maplist(pfc_undo,List).
 pfc_undo(N):- pfc_from_negation(N,P),!,pfc_undo(neg(P)).
 
-pfc_undo(pfc_t_neg(Head,Condition,Body)) :-  
+pfc_undo(nt(Head,Condition,Body)) :-  
   % undo a negative trigger.
   !,
-  (db_retract(pfc_t_neg(Head,Condition,Body))
-    -> unFc(pfc_t_neg(Head,Condition,Body))
-     ; pfc_error("Trigger not found to remove: ~w",[pfc_t_neg(Head,Condition,Body)])).
+  (db_retract(nt(Head,Condition,Body))
+    -> unFc(nt(Head,Condition,Body))
+     ; pfc_error("Trigger not found to remove: ~w",[nt(Head,Condition,Body)])).
 
 pfc_undo(Fact) :-
   % undo a random hybrid_fact, printing out the trace, if relevant.
@@ -1537,9 +1542,9 @@ unFc1(F) :-
 pfc_unFcCheckTriggers(F) :-
   pfc_type(F,hybrid_fact),
   copy_term(F,Fcopy),
-  pfc_t_neg(Fcopy,Condition,Action),
+  nt(Fcopy,Condition,Action),
   (\+ pfc_call(Condition)),
-  pfc_evalLHS(Action,((\+F),pfc_t_neg(F,Condition,Action))),
+  pfc_evalLHS(Action,((\+F),nt(F,Condition,Action))),
   fail.
 pfc_unFcCheckTriggers(_).
 
@@ -1556,13 +1561,13 @@ pfc_remove_SR(_).
 %= it from the DB if it is not.
 
 pfc_removeIfUnsupported(P) :- 
-   pfc_supported(P) -> true ;  pfc_undo(P).
+   pfc_tms_supported(P) -> true ;  pfc_undo(P).
 
 
-%= pfc_supported(+P) succeeds if P is "supported". What this means
+%= pfc_tms_supported(+P) succeeds if P is "supported". What this means
 %= depends on the TMS mode selected.
 
-pfc_supported(P) :- 
+pfc_tms_supported(P) :- 
   mpred_get(pfc_tms,P,Mode),
   pfc_wff_support(Mode,P).
 
@@ -1679,32 +1684,32 @@ pfc_good_rhs(rhs([Var])):-pfc_is_unbound(Var),!,fail.
 pfc_good_rhs(_).
 
 pfc_runPT(Fact,F) :- 
-  pfc_getTriggerQuick(pfc_t_pos(F,Body)),
+  pfc_getTriggerQuick(pt(F,Body)),
   pfc_trace_msg('      Found positive trigger: ~q~n       body: ~q~n',
 		[F,Body]),
   must(pfc_good_rhs(Body)),
-  pfc_not_too_deep(pfc_runPT, pfc_evalLHS(Body,(Fact,pfc_t_pos(F,Body)))),
+  pfc_not_too_deep(pfc_runPT, pfc_evalLHS(Body,(Fact,pt(F,Body)))),
   fail.
 
 %pfc_runPT(Fact,F) :- 
-%  pfc_getTriggerQuick(pfc_t_pos(presently(F),Body)),
-%  pfc_evalLHS(Body,(presently(Fact),pfc_t_pos(presently(F),Body))),
+%  pfc_getTriggerQuick(pt(presently(F),Body)),
+%  pfc_evalLHS(Body,(presently(Fact),pt(presently(F),Body))),
 %  fail.
 
 pfc_runPT(_,_).
 
 
 pfc_runNT(_Fact,F) :-
-  pfc_sup_db(X,_,pfc_t_neg(F,Condition,Body)),
+  spft(X,_,nt(F,Condition,Body)),
   pfc_call(Condition),
-  pfc_rem1(X,(_,pfc_t_neg(F,Condition,Body))),
+  pfc_rem1(X,(_,nt(F,Condition,Body))),
   fail.
 pfc_runNT(_,_).
 
 
 %=
 %= pfc_defineBcRule(+Head,+Body,+ParentRule) - defines a backeard
-%= chaining hybrid_rule and adds the corresponding pfc_t_b triggers to the database.
+%= chaining hybrid_rule and adds the corresponding bt triggers to the database.
 %=
 
 pfc_defineBcRule(Head,_Body,ParentRule) :-
@@ -1721,7 +1726,7 @@ pfc_defineBcRule(Head,Body,ParentRule) :-
   source_user(U),
   pfc_forEach(pfc_nf(Body,Lhs),
           (pfc_buildTrigger(Lhs,rhs(Rhs),Trigger),
-           pfc_add_BTRule(pfc_t_b(Head,Trigger),(ParentRuleCopy,U)))).
+           pfc_add_BTRule(bt(Head,Trigger),(ParentRuleCopy,U)))).
  
 
 
@@ -1742,7 +1747,7 @@ pfc_evalLHS(rhs(X),Support) :-
   !.
 
 pfc_evalLHS(X,Support) :-
-  pfcType(X,trigger),
+  pfc_db_type(X,trigger),
   !,
   pfc_addTrigger(X,Support),
   !.
@@ -1814,13 +1819,13 @@ unused_pfc_trigger_the_trigger(_,_,_).
 %  !,
 %  copy_term(Trigger,TriggerCopy),
 %  pfc_bc_caching(Trigger),
-%  pfc_evalLHS(Body,(presently(Trigger),pfc_t_pos(presently(TriggerCopy),Body))),
+%  pfc_evalLHS(Body,(presently(Trigger),pt(presently(TriggerCopy),Body))),
 %  fail.
 
 unused_trigger_trigger1(Trigger,Body) :-
   copy_term(Trigger,TriggerCopy),
   pfc_bc_caching(Trigger),
-  pfc_evalLHS(Body,(Trigger,pfc_t_pos(TriggerCopy,Body))),
+  pfc_evalLHS(Body,(Trigger,pt(TriggerCopy,Body))),
   fail.
 
 
@@ -1836,8 +1841,8 @@ pfc_bc_caching(F):-hotrace(pfc_loop_check(pfc_bC_Cache(F))).
 pfc_bC_Cache(not(P)) :-nonvar(P),!,pfc_bC_Cache(neg(P)).
 pfc_bC_Cache(P) :-
   % trigger any bc rules.
-  pfc_t_b(P,Trigger),
-  pfc_get_support(pfc_t_b(P,Trigger),S),
+  bt(P,Trigger),
+  pfc_get_support(bt(P,Trigger),S),
   pfc_evalLHS(Trigger,S),
   pfc_maybeSupport(P,S),
   fail.
@@ -2109,18 +2114,18 @@ pfc_build1Rule(Lhs,Rhs,Support) :-
 
 pfc_buildTrigger([],Consequent,Consequent).
 
-pfc_buildTrigger([V|Triggers],Consequent,pfc_t_pos(V,X)) :-
+pfc_buildTrigger([V|Triggers],Consequent,pt(V,X)) :-
   pfc_is_unbound(V),
   !, 
   pfc_buildTrigger(Triggers,Consequent,X).
 
-pfc_buildTrigger([(T1/Test)|Triggers],Consequent,pfc_t_neg(T2,Test2,X)) :- 
+pfc_buildTrigger([(T1/Test)|Triggers],Consequent,nt(T2,Test2,X)) :- 
   pfc_from_negation(T1,T2),
   !,
   pfc_buildNtTest(T2,Test,Test2),
   pfc_buildTrigger(Triggers,Consequent,X).
 
-pfc_buildTrigger([(T1)|Triggers],Consequent,pfc_t_neg(T2,Test,X)) :- 
+pfc_buildTrigger([(T1)|Triggers],Consequent,nt(T2,Test,X)) :- 
   pfc_from_negation(T1,T2),
   !,
   pfc_buildNtTest(T2,true,Test),
@@ -2130,7 +2135,7 @@ pfc_buildTrigger([{Test}|Triggers],Consequent,(Test->X)) :-
   !,
   pfc_buildTrigger(Triggers,Consequent,X).
 
-pfc_buildTrigger([T/Test|Triggers],Consequent,pfc_t_pos(T,X)) :-
+pfc_buildTrigger([T/Test|Triggers],Consequent,pt(T,X)) :-
   !, 
   pfc_buildTest(Test,Test2),
   pfc_buildTrigger([{Test2}|Triggers],Consequent,X).
@@ -2140,14 +2145,14 @@ pfc_buildTrigger([T/Test|Triggers],Consequent,pfc_t_pos(T,X)) :-
 %  !,
 %  pfc_buildTrigger(Triggers,Consequent,X).
 
-pfc_buildTrigger([T|Triggers],Consequent,pfc_t_pos(T,X)) :-
+pfc_buildTrigger([T|Triggers],Consequent,pt(T,X)) :-
   !, 
   pfc_buildTrigger(Triggers,Consequent,X).
 
 %=
 %= pfc_buildNtTest(+,+,-).
 %=
-%= builds the test used in a negative trigger (pfc_t_neg/3).  This test is a
+%= builds the test used in a negative trigger (nt/3).  This test is a
 %= conjunction of the check than no matching facts are in the db and any
 %= additional test specified in the hybrid_rule attached to this ~ term.
 %=
@@ -2167,26 +2172,26 @@ pfc_buildTest(Test,Test):-pfc_mark_W(Test).
 
 
 
-pfc_data_type(pfc_sup_db(_,_,_),support).
+pfc_data_type(spft(_,_,_),support).
 
 pfc_data_type((H:-B),Type):-is_true(B),!,pfc_data_type(H,Type).
 pfc_data_type(G,Type) :- pfc_type(G,Type).
 
 %= simple typeing for pfc objects
-pfcType(('=>'(_,_)),hybrid_rule).
-pfcType(('<=>'(_,_)),hybrid_rule).
-pfcType(('<='(_,_)),hybrid_rule).
-pfcType(pfc_t_pkey(_,_,_),trigger).
-pfcType(pfc_t_pos(_,_),trigger).
-pfcType(pfc_t_neg(_,_,_),trigger).
-pfcType(pfc_t_b(_,_),trigger).
-pfcType(pfc_action(_),action).
-pfcType(('=>'(_)),hybrid_fact).
-pfcType(('~'(_)),hybrid_fact).
-pfcType(('neg'(_)),hybrid_fact).
-pfcType((('::::'(_,X))),Type):-pfc_is_bound(X),pfc_type(X,Type).
+pfc_db_type(('=>'(_,_)),hybrid_rule).
+pfc_db_type(('<=>'(_,_)),hybrid_rule).
+pfc_db_type(('<='(_,_)),hybrid_rule).
+pfc_db_type(pfc_t_pkey(_,_,_),trigger).
+pfc_db_type(pt(_,_),trigger).
+pfc_db_type(nt(_,_,_),trigger).
+pfc_db_type(bt(_,_),trigger).
+pfc_db_type(pfc_action(_),action).
+pfc_db_type(('=>'(_)),hybrid_fact).
+pfc_db_type(('~'(_)),hybrid_fact).
+pfc_db_type(('neg'(_)),hybrid_fact).
+pfc_db_type((('::::'(_,X))),Type):-pfc_is_bound(X),pfc_type(X,Type).
 %= if it's not one of the above, it must be a hybrid_fact!
-pfc_type(P,T):- (pfcType(P,T0)*->((pfc_is_unbound(T)->T0=T;T==T0)*->true);T=hybrid_fact).
+pfc_type(P,T):- (pfc_db_type(P,T0)*->((pfc_is_unbound(T)->T0=T;T==T0)*->true);T=hybrid_fact).
  
 
 
@@ -2258,11 +2263,11 @@ pfc_op_join(OP,C1,C2,R)  :-R=..[OP,C1,C2].
 %= predicates for manipulating support relationships
 %=
 
-:-dynamic(pfc_sup_db/3).
+:-dynamic(spft/3).
 
 %= pfc_addSupport(+Fact,+Support)
 pfc_addSupport(P,(Fact,Trigger)) :-
-  assertz_if_new(pfc_sup_db(P,Fact,Trigger)).
+  assertz_if_new(spft(P,Fact,Trigger)).
 
 pfc_get_support_OR(P,OR,Support):- (pfc_get_support(P,Support) *-> true ; Support = OR).
 
@@ -2273,14 +2278,14 @@ pfc_get_support(P,S):-
   (pfc_get_support_neg(P,S)*-> true; 
    pfc_get_support_cnj(P,S))).
 
-pfc_get_support_lit(P,(F,T)):- pfc_sup_db(P,F,T).
+pfc_get_support_lit(P,(F,T)):- spft(P,F,T).
 pfc_get_support_neg(N,S):- pfc_from_negation(N,P),!,pfc_get_support(neg(P),S).
 pfc_get_support_cnj((P1,P2),((F1,F2),(T1,T2))):-!,pfc_get_support(P1,(F1,T1)),pfc_get_support(P2,(F2,T2)).
 % pfc_get_support_cnj([P1|P2],[S1|S2]):-!,pfc_get_support_OR(P1,if_was_asserted(P1),S1),pfc_get_support(P2,S2).
 
 
 % TODO pack the T1 into T2 return value is still a (Fact,Trigger) pair
-pfc_why(G,Proof):-pfc_sup_db(G,F,T),(F==T -> Proof=asserted(T,G);Proof=deduced(F,T)).
+pfc_why(G,Proof):-spft(G,F,T),(F==T -> Proof=asserted(T,G);Proof=deduced(F,T)).
 
 pfc_removeSupportItems(P,Types):-
   pfc_get_support(P,Support),
@@ -2305,11 +2310,11 @@ pfc_typeFilter(Term,FilterS):- member(Filter,FilterS),append_term(Filter,Term,Ca
 
 % There are three of these to try to efficiently handle the cases
 % where some of the arguments are not bound but at least one is.
-pfc_is_support_goal(pfc_sup_db(_,_,_)).
+pfc_is_support_goal(spft(_,_,_)).
 
 
-pfc_rem_support(P,Fact,Trigger) :- must_no_numvars(v(P,Fact,Trigger)),(db_retract(pfc_sup_db(P,Fact,Trigger))).
-pfc_rem_support(P,(Fact,Trigger)) :- must_no_numvars(v(P,Fact,Trigger)), (db_retract(pfc_sup_db(P,Fact,Trigger))).
+pfc_rem_support(P,Fact,Trigger) :- must_no_numvars(v(P,Fact,Trigger)),(db_retract(spft(P,Fact,Trigger))).
+pfc_rem_support(P,(Fact,Trigger)) :- must_no_numvars(v(P,Fact,Trigger)), (db_retract(spft(P,Fact,Trigger))).
 
 pfc_collect_supports(Tripples) :-
   bagof(Tripple, pfc_support_relation(Tripple), Tripples),
@@ -2317,7 +2322,7 @@ pfc_collect_supports(Tripples) :-
 pfc_collect_supports([]).
 
 pfc_support_relation((P,F,T)) :-
-  pfc_sup_db(P,F,T).
+  spft(P,F,T).
 
 unused_pfc_make_supports((P,S1,S2)) :- 
   pfc_addSupport(P,(S1,S2)),
@@ -2329,9 +2334,9 @@ unused_pfc_make_supports((P,S1,S2)) :-
 %= Arg1 is a trigger.  Key is the best term to index it on.
 
 /*
-%pfc_triggerKey(pfc_t_pos(Key,_),Key).
+%pfc_triggerKey(pt(Key,_),Key).
 pfc_triggerKey(pfc_t_pkey(Key,_,_),Key).
-pfc_triggerKey(pfc_t_neg(Key,_,_),Key).
+pfc_triggerKey(nt(Key,_,_),Key).
 pfc_triggerKey(Key,Key).
 */
 
@@ -2352,9 +2357,9 @@ pfc_trigger_key(X,X).
 % removes all forward chaining rules and justifications from db.
 
 pfc_reset :-
-  db_uclause(pfc_sup_db(P,F,Trigger),true),
+  db_uclause(spft(P,F,Trigger),true),
   log_and_continue_on_failure(pfc_retract(P)),
-  log_and_continue_on_failure(db_retract(pfc_sup_db(P,F,Trigger))),
+  log_and_continue_on_failure(db_retract(spft(P,F,Trigger))),
   fail.
 pfc_reset :-
   pfc_databaseItem(T),
@@ -2413,7 +2418,7 @@ pfc_printFacts(P,C) :-
   fmt("Pfc added facts:",[]),
   must(pfc_printitems(Pfc)).
 
-pfc_sup_user(P,U):- pfc_sup_db(P,U,U).
+pfc_sup_user(P,U):- spft(P,U,U).
 
 %= printitems clobbers it's arguments - beware (fixed .. it no longer clobers)!
 
@@ -2443,11 +2448,11 @@ pfc_printRules :-
 
 pfc_printTriggers :-
   fmt("% Positive triggers...~n",[]),
-     printHeadCallItems(pfc_getTrigger(pfc_t_pos(_,_))),
+     printHeadCallItems(pfc_getTrigger(pt(_,_))),
   fmt("% Negative triggers...~n",[]),
-     printHeadCallItems(pfc_getTrigger(pfc_t_neg(_,_,_))),
+     printHeadCallItems(pfc_getTrigger(nt(_,_,_))),
   fmt("% Goal triggers...~n",[]),
-     printHeadCallItems(pfc_getTrigger(pfc_t_b(_,_))),!.
+     printHeadCallItems(pfc_getTrigger(bt(_,_))),!.
 
 pfc_printSupports :- 
   % temporary hack.
@@ -2471,7 +2476,7 @@ pfc_fact(P) :- no_repeats(pfc_fact(P,true)).
 %= pfc_fact(P,C) is true if hybrid_fact P was asserted into the database via
 %= add and condition C is satisfied.  For example, we might do:
 %= 
-%=  pfc_fact(X,pfc_userFact(X))
+%=  pfc_fact(X,pfc_user_fact(X))
 %=
 
 pfc_fact(P,C) :- no_repeats(pfc_fact0(P,C)).
@@ -2502,13 +2507,13 @@ pfc_trace_add(P) :-
   % this is here for upward compat. - should go away eventually.
   pfc_trace_add(P,(o,o)).
 
-pfc_trace_add(pfc_t_pos(_,_),_) :-
+pfc_trace_add(pt(_,_),_) :-
   % hack for now - never trace triggers.
   !.
 pfc_trace_add(pfc_t_pkey(_,_,_),_) :-
   % hack for now - never trace triggers.
   !.
-pfc_trace_add(pfc_t_neg(_,_,_),_) :-
+pfc_trace_add(nt(_,_,_),_) :-
   % hack for now - never trace triggers.
   !.
 
@@ -2518,7 +2523,7 @@ pfc_trace_add(P,S) :-
 
 %example pfc_is_crazy_bad_fact(mpred_prop(not,tCol)).
 %example pfc_is_crazy_bad_fact(mpred_prop(_,not)).
-pfc_is_crazy_bad_fact(mpred_prop(_,predArgTypes)).
+pfc_is_crazy_bad_fact(mpred_prop(_,pred_argtypes)).
 
 pfc_trace_addPrint(P,S) :- pfc_is_crazy_bad_fact(P),retractall(tlbugger:show_must_go_on),!,trace_or_throw(crazy_pfc_trace_addPrint(P,S)).
 
@@ -2542,7 +2547,7 @@ pfc_traceBreak(P,_S) :-
     break)
    ; true.
 
-pfc_traceRem(pfc_t_pos(_,_)) :-
+pfc_traceRem(pt(_,_)) :-
   % hack for now - never trace triggers.
   !.
 
@@ -2692,7 +2697,7 @@ pfc_bases_L_L([X|Rest],L) :-
   pfc_bases_L_L(Rest,Br),
   pfc_union(Bx,Br,L).
 	
-pfc_axiom(P) :- pfc_sup_db(P,FT,FT).
+pfc_axiom(P) :- spft(P,FT,FT).
 
 %= an pfc_assumptionBase/1''s G was a failed goal, i.e. were assuming that our failure to 
 %= prove P is a proof of not(P)
@@ -2903,7 +2908,7 @@ pfc_mark1(G,code):-!,get_functor(G,F,A),must(decl_mpred(core,F/A,true)).
 pfc_mark1(G,pfc_state):-!,get_functor(G,F,A),decl_mpred(F/A,pfc_state).
 pfc_mark1({Code},As):- !,pfc_mark_P(Code).
 pfc_mark1(F,As):-atom(F),mpred_prop(F,pfc_dont_expand),!,pmsg(todo(warn(wont_pfc_change1(F,As)))).
-pfc_mark1(F,As):-atom(F),!,ignore((user:mpred_arity(F,A),!,pfc_mark(F/A,As))).
+pfc_mark1(F,As):-atom(F),!,ignore((user:arity(F,A),!,pfc_mark(F/A,As))).
 pfc_mark1(G,_):- \+(compound(G)),!.
 pfc_mark1(G,_):- \+ pfc_is_rule_or_fact(G),!.
 pfc_mark1(forall(G1,G2),As):-!,pfc_mark(G1,As),pfc_mark(G2,As).
@@ -2987,10 +2992,10 @@ pfc_ify(F/A):- export(F/A),((pfc_wont_assert(F/A)->pfc_mark_P(F/A);pfc_mark_S(F/
 % :- pfc_mark_S(pfc_database/1).
 %:- pfc_mark_S(pfc Default/1).
 :- pfc_mark_P((pfc_local/1)).
-:- pfc_mark_S(('pfc_t_b')/2).
-:- pfc_mark_S(('pfc_t_neg')/3).
+:- pfc_mark_S(('bt')/2).
+:- pfc_mark_S(('nt')/3).
 :- pfc_mark_S(('pfc_t_pkey')/2).
-:- pfc_mark_S(('pfc_t_pos')/2).
+:- pfc_mark_S(('pt')/2).
 :- pfc_mark_S(('::::')/2).
 :- pfc_mark_S(('<=')/2).
 :- pfc_mark_S(('=>')/1).
@@ -3002,7 +3007,7 @@ pfc_ify(F/A):- export(F/A),((pfc_wont_assert(F/A)->pfc_mark_P(F/A);pfc_mark_S(F/
 :- pfc_mark_S(pfc_queue/2).
 :- pfc_mark_S(pfc_select/2).
 :- pfc_mark_S(pfc_undo_method/2).
-:- pfc_mark_S(pfc_sup_db/3).
+:- pfc_mark_S(spft/3).
 :- pfc_mark_S(mpred_db/3).
 :- pfc_mark_S(user:hasInstance/2).
 
@@ -3014,9 +3019,9 @@ was_isa(G,I,C):-call((current_predicate(mpred_types_loaded/0),if_defined(was_isa
 
 :- forall(context_module(Mod),forall(module_predicate(Mod,_,F,A),pfc_ify(F/A))).
 
-:- forall(pfcType(F/A,hybrid_rule),decl_mpred(F/A,pfc_state)).
+:- forall(pfc_db_type(F/A,hybrid_rule),decl_mpred(F/A,pfc_state)).
 
-:- forall(pfcType(H, hybrid_rule),forall(db_uclause(H,true),pfc_add(H))).
+:- forall(pfc_db_type(H, hybrid_rule),forall(db_uclause(H,true),pfc_add(H))).
 
 
 % :- pfc_add((mpred_db(pfc_is_bc,F/A,true) => {make_functor(PHead,F,A),assertz_if_new(PHead:-pfc_bc_only(PHead)),pfc_assume_dynamic(F/A)})).
@@ -3061,10 +3066,10 @@ trace_all:- forall((M=prolog,current_predicate(M:F/A)),trace(M:F/A,+all)),
 
 % with_assertions(thlocal:consulting_sources..)
 
-:- ensure_loaded(library(mpred/mpred_types)).
-:- ensure_loaded(library(mpred/mpred_argtypes)).
-:- ensure_loaded(library(mpred/mpred_call)).
-:- ensure_loaded(library(mpred/mpred_database)).
+:- ensure_loaded(logicmoo(mpred/logicmoo_types)).
+:- ensure_loaded(logicmoo(mpred/logicmoo_argtypes)).
+:- ensure_loaded(logicmoo(mpred/logicmoo_call)).
+:- ensure_loaded(logicmoo(mpred/logicmoo_database)).
 
 :-ensure_loaded(library(statistics)).
 

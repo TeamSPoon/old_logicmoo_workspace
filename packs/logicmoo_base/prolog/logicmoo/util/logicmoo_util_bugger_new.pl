@@ -10,9 +10,9 @@ end_of_file.
 :-multifile(system:goal_expansion/2).
 :- export(system:goal_expansion/2).
 :-multifile(tlbugger:bugger_prolog_flag/2).
-:-multifile(mpred_arity/2).
+:-multifile(arity/2).
 :-meta_predicate(lmdmsg_call(0)).
-:-dynamic(mpred_arity/2).
+:-dynamic(arity/2).
 :-thread_local(inxp/0).
 :- meta_predicate wno(:,:).
 :- meta_predicate wyes(:,:).
@@ -125,7 +125,7 @@ mcall_expansion(_,_M,call,_,_):-!,fail.
 mcall_expansion(Goal,_M,_Call,_,Goal):-!.
 mcall_expansion(Goal,M,F,_,zxz:mcall(M:Goal)):- atom_length(F,L),L<4.
 mcall_expansion(Goal,M,F,A,zxz:mcall(M:Goal)):- \+ current_predicate(F/A).
-mcall_expansion(Goal,M,F,A,zxz:mcall(M:Goal)):- \+ \+ mpred_arity(F,A).
+mcall_expansion(Goal,M,F,A,zxz:mcall(M:Goal)):- \+ \+ arity(F,A).
 
 wno(A,Goal):-setup_call_cleanup(asserta((A:-!,fail),REF),Goal,erase(REF)).
 wyes(A,Goal):-setup_call_cleanup(asserta(A,REF),Goal,erase(REF)).

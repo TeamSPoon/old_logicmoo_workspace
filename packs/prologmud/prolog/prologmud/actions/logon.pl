@@ -10,7 +10,7 @@
 % :-swi_module(user). 
 :-swi_module(modLogin, []).
 
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 
 % :- register_module_type (mtCommand).
 :- multifile thlocal:wants_logout/1.
@@ -40,4 +40,4 @@ verb_alias(quit,actLogout).
 verb_alias(logoff,actLogout).
 
 
-% :- include(library(prologmud/server/mud_footer)).
+% :- include(prologmud(mud_footer)).

@@ -15,7 +15,7 @@
 */
 %:- module(tiny_kb,['TINYKB-ASSERTION'/5, 'TINYKB-ASSERTION'/6]).
 
-:-if_file_exists(user_ensure_loaded(logicmoo(ext/moo_ext_cyc_new))).
+:-if_file_exists(user:ensure_loaded(logicmoo(ext/moo_ext_cyc_new))).
 
 isa_db(I,C):-clause(isa(I,C),true).
 
@@ -163,7 +163,7 @@ tinyKB_All(PO,MT,STR):- current_predicate('TINYKB-ASSERTION'/5),!,
                memberchk(str(STR),PROPS), 
               (member(vars(VARS),PROPS)->(nb_setval('$variable_names', []),fixvars(P,0,VARS,PO));PO=P ))).
 
-tinyKB:-forall(tinyKB(P,MT,STR),((print_assertion(P,MT,STR),pfcAdd(P)))).
+tinyKB:-forall(tinyKB(P,MT,STR),((print_assertion(P,MT,STR),pfc_add(P)))).
 
 print_assertion(P,MT,STR):- P=..PL,append([exactlyAssertedEL|PL],[MT,STR],PPL),PP=..PPL, portray_clause(current_output,PP,[numbervars(false)]).
 
@@ -179,17 +179,17 @@ tDressedMt('BookkeepingMt').
 tDressedMt('EnglishParaphraseMt').
 tDressedMt('TemporaryEnglishParaphraseMt').
 
-call_el_stub(V,MT,STR):-into_mpred_form(V,M),!,M=..ML,((ML=[dbase_t|ARGS]-> true; ARGS=ML)),CALL=..[exactlyAssertedEL|ARGS],!,call(CALL,MT,STR).
-make_el_stub(V,MT,STR,CALL):-into_mpred_form(V,M),!,M=..ML,((ML=[dbase_t|ARGS]-> true; ARGS=ML)),append(ARGS,[MT,STR],CARGS),CALL=..[exactlyAssertedEL|CARGS],!.
+call_el_stub(V,MT,STR):-into_mpred_form(V,M),!,M=..ML,((ML=[t|ARGS]-> true; ARGS=ML)),CALL=..[exactlyAssertedEL|ARGS],!,call(CALL,MT,STR).
+make_el_stub(V,MT,STR,CALL):-into_mpred_form(V,M),!,M=..ML,((ML=[t|ARGS]-> true; ARGS=ML)),append(ARGS,[MT,STR],CARGS),CALL=..[exactlyAssertedEL|CARGS],!.
 
 tinyAssertion(V,MT,STR):- 
  nonvar(V) -> call_el_stub(V,MT,STR);
   (tinyAssertion0(W,MT,STR),once(into_mpred_form(W,V))).
 
-tinyAssertion0(dbase_t(A,B,C,D,E),MT,STR):-exactlyAssertedEL(A,B,C,D,E,MT,STR).
-tinyAssertion0(dbase_t(A,B,C,D),MT,STR):-exactlyAssertedEL(A,B,C,D,MT,STR).
-tinyAssertion0(dbase_t(A,B,C),MT,STR):-exactlyAssertedEL(A,B,C,MT,STR).
-tinyAssertion0(dbase_t(A,B),MT,STR):-exactlyAssertedEL(A,B,MT,STR).
+tinyAssertion0(t(A,B,C,D,E),MT,STR):-exactlyAssertedEL(A,B,C,D,E,MT,STR).
+tinyAssertion0(t(A,B,C,D),MT,STR):-exactlyAssertedEL(A,B,C,D,MT,STR).
+tinyAssertion0(t(A,B,C),MT,STR):-exactlyAssertedEL(A,B,C,MT,STR).
+tinyAssertion0(t(A,B),MT,STR):-exactlyAssertedEL(A,B,MT,STR).
 
 
 addTinyCycL(CycLIn):- into_mpred_form(CycLIn,CycL),
@@ -249,7 +249,7 @@ addCycL1((A => (V1 , V2))):-not(is_ftVar(V1)),!,show_call(addCycL0((A => V1))) ,
 addCycL1((V1 , V2)):-!,addCycL0(V1),addCycL0(V2),!.
 addCycL1([V1 | V2]):-!,addCycL0(V1),addCycL0(V2),!.
 addCycL1(V):-addTiny_added(V),!.
-addCycL1(V):-asserta(addTiny_added(V)),unnumbervars(V,VE),pfcAdd(VE),remQueuedTinyKB(VE).
+addCycL1(V):-asserta(addTiny_added(V)),unnumbervars(V,VE),pfc_add(VE),remQueuedTinyKB(VE).
 
 
 sent_to_conseq(CycLIn,Consequent):- into_mpred_form(CycLIn,CycL), ignore((tiny_support(CycL,_MT,CALL),retract(CALL))),must(cycLToMpred(CycL,Consequent)),!.
@@ -291,15 +291,15 @@ typical_mtvars([_,_]).
 % arity 1 person
 make_functorskel(Person,1,fskel(Person,hasInstance(Person,A),Call,A,[],MtVars,Call2)):-typical_mtvars(MtVars),Call=..[Person,A],Call2=..[Person,A|MtVars]. 
 % arity 2 likes
-make_functorskel(Likes,2,fskel(Likes,dbase_t(Likes,A,B),Call,A,B,MtVars,Call2)):- typical_mtvars(MtVars),Call=..[Likes,A,B],Call2=..[Likes,A,B|MtVars]. 
+make_functorskel(Likes,2,fskel(Likes,t(Likes,A,B),Call,A,B,MtVars,Call2)):- typical_mtvars(MtVars),Call=..[Likes,A,B],Call2=..[Likes,A,B|MtVars]. 
 % arity 3 between
-make_functorskel(Between,3,fskel(Between,dbase_t(Between,A,B,C),Call,A,[B,C],MtVars,Call2)):- typical_mtvars(MtVars),Call=..[Between,A,B,C],Call2=..[Between,A,B,C|MtVars]. 
+make_functorskel(Between,3,fskel(Between,t(Between,A,B,C),Call,A,[B,C],MtVars,Call2)):- typical_mtvars(MtVars),Call=..[Between,A,B,C],Call2=..[Between,A,B,C|MtVars]. 
 % arity 4 xyz
-make_functorskel(Xyz,4,fskel(Xyz,dbase_t(Xyz,I,X,Y,Z),Call,I,[X,Y,Z],MtVars,Call2)):- typical_mtvars(MtVars),Call=..[Xyz,I,X,Y,Z],Call2=..[Xyz,I,X,Y,Z|MtVars]. 
+make_functorskel(Xyz,4,fskel(Xyz,t(Xyz,I,X,Y,Z),Call,I,[X,Y,Z],MtVars,Call2)):- typical_mtvars(MtVars),Call=..[Xyz,I,X,Y,Z],Call2=..[Xyz,I,X,Y,Z|MtVars]. 
 % arity 5 rxyz
-make_functorskel(RXyz,5,fskel(RXyz,dbase_t(RXyz,I,R,X,Y,Z),Call,I,[R,X,Y,Z],MtVars,Call2)):-typical_mtvars(MtVars),Call=..[RXyz,I,R,X,Y,Z],Call2=..[RXyz,I,R,X,Y,Z|MtVars]. 
+make_functorskel(RXyz,5,fskel(RXyz,t(RXyz,I,R,X,Y,Z),Call,I,[R,X,Y,Z],MtVars,Call2)):-typical_mtvars(MtVars),Call=..[RXyz,I,R,X,Y,Z],Call2=..[RXyz,I,R,X,Y,Z|MtVars]. 
 % arity >6 
-make_functorskel(F,N,fskel(F,DBASE,Call,I,NList,MtVars,Call2)):-typical_mtvars(MtVars),functor(Call,F,N),Call=..[F,I|NList],DBASE=..[dbase_t,F,I|NList],append([F,I|NList],MtVars,CALL2List),Call2=..CALL2List.
+make_functorskel(F,N,fskel(F,DBASE,Call,I,NList,MtVars,Call2)):-typical_mtvars(MtVars),functor(Call,F,N),Call=..[F,I|NList],DBASE=..[t,F,I|NList],append([F,I|NList],MtVars,CALL2List),Call2=..CALL2List.
 
 */
 

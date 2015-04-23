@@ -12,12 +12,12 @@
 %
 */
 
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 
 % Declare the module name and the exported (public) predicates.
 :-swi_module(tPrey,[]).
 
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 % :- register_module_type (planning).
 % :- register_module_type (mtCommand).
 
@@ -101,4 +101,4 @@ spawn_prey(N) :-
 	spawn_prey(Ntemp).
 
 
-% :- include(library(prologmud/server/mud_footer)).
+% :- include(prologmud(mud_footer)).

@@ -1,6 +1,6 @@
 %% some simple tests to see if Pfc is working properly
 
-:- pfcTrace.
+:- pfc_trace.
 
 time(Call,Time) :-
   statistics(runtime,_),

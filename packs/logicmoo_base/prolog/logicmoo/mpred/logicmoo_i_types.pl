@@ -93,7 +93,7 @@ never_type_f('tCol'):-!,fail.
 never_type_f('onSpawn').
 never_type_f('ensure_loaded').
 never_type_f('declare_load_dbase').
-never_type_f('user_ensure_loaded').
+never_type_f('user:ensure_loaded').
 never_type_f('meta_predicate').
 never_type_f('Area1000').
 never_type_f(iPlayer2).
@@ -187,9 +187,9 @@ was_isa0(not(_),_,_):-!,fail.
 was_isa0(ttNotSpatialType(I),I,ttNotSpatialType).
 was_isa0(tChannel(I),I,tChannel).
 was_isa0(tAgentGeneric(I),I,tAgentGeneric).
-was_isa0(dbase_t(C,_),_,_):-never_type_why(C,_),!,fail.
-was_isa0(dbase_t(C,I),I,C).
-was_isa0(dbase_t(P,I,C),I,C):-!,P==isa.
+was_isa0(t(C,_),_,_):-never_type_why(C,_),!,fail.
+was_isa0(t(C,I),I,C).
+was_isa0(t(P,I,C),I,C):-!,P==isa.
 was_isa0(isa(I,C),I,C).
 was_isa0(M:G,I,C):-atom(M),!,was_isa0(G,I,C).
 was_isa0(G,I,C):-G=..[C,I],!,is_typef(C),!,not(is_never_type(C)).
@@ -201,10 +201,10 @@ not_ft_quick(T):-nonvar(T),(T=tItem;T=tRegion;T=tCol;T=completelyAssertedCollect
 
 :-export(asserted_subclass/2).
 asserted_subclass(I,T):- ((thlocal:useOnlyExternalDBs,!);thglobal:use_cyc_database),(kbp_t([genls,I,T])).
-asserted_subclass(T,ST):-dbase_t(genls,T,ST).
+asserted_subclass(T,ST):-t(genls,T,ST).
 
 chk_ft(T):- not_ft_quick(T),!,fail.
-%chk_ft(I):- thlocal:infForward, dbase_t(defnSufficient,I,_),!.
+%chk_ft(I):- thlocal:infForward, t(defnSufficient,I,_),!.
 %chk_ft(I):- thlocal:infForward, asserted_subclass(I,FT),I\=FT,chk_ft(FT),!.
 chk_ft(I):- thlocal:infForward, !,hasInstance(ttFormatType,I).
 
@@ -256,7 +256,7 @@ is_known_trew(genls(tAgentGeneric,tChannel)).
 is_known_trew(genls(completelyAssertedCollection, extentDecidable)).
 is_known_trew(genls(ttFormatType,tCol)).
 is_known_trew(genls(ttFormatType,ttNotSpatialType)).
-is_known_trew(genls(predArgTypes,tRelation)).
+is_known_trew(genls(pred_argtypes,tRelation)).
 is_known_trew(genls(tFunction,tRelation)).
 is_known_trew(genls(F,tPred)):-is_pred_declarer(F).
 is_known_trew(disjointWith(A,B)):-disjointWithT(A,B).
@@ -294,7 +294,7 @@ disjointWithT(B,A):-disjointWith0(A,B).
 not_mud_isa0(I,T):-(var(I);var(T)),trace_or_throw(var_not_mud_isa(I,T)).
 not_mud_isa0(actGossup,tChannel).
 not_mud_isa0(_, blah):-!.
-not_mud_isa0(I,predArgTypes):-!,not(compound(I)).
+not_mud_isa0(I,pred_argtypes):-!,not(compound(I)).
 not_mud_isa0(I,ttFormatted):-!,not(compound(I)).
 not_mud_isa0(_,prologHybrid):-!,fail.
 not_mud_isa0(prologMacroHead, ttFormatType).
@@ -357,8 +357,8 @@ onLoadPfcRule('=>'(hasInstance(tCol,Inst), {isa_from_morphology(Inst,Type)} , is
 
 callOr(Pred,I,T):-(call(Pred,I);call(Pred,T)),!.
 
-% type_deduced(I,T):-atom(T),i_name(mud,T,P),!,clause(dbase_t(P,_,I),true).
-type_deduced(I,T):-nonvar(I),not(number(I)),clause(dbase_t(P,_,I),true),(argIsa_known(P,2,AT)->T=AT;i_name(vt,P,T)).
+% type_deduced(I,T):-atom(T),i_name(mud,T,P),!,clause(t(P,_,I),true).
+type_deduced(I,T):-nonvar(I),not(number(I)),clause(t(P,_,I),true),(argIsa_known(P,2,AT)->T=AT;i_name(vt,P,T)).
 
 compound_isa(F,_,T):- mpred_call(resultIsa(F,T)).
 compound_isa(_,I,T):- mpred_call(formatted_resultIsa(I,T)).
@@ -486,9 +486,9 @@ guess_supertypes(W):-atom(W),T=t,to_first_break(W,lower,T,All,upper),!,to_first_
 
 /*
 system:term_expansion(isa(Compound,PredArgTypes),
-  (:-dmsg(pfcAdd(wizza(Compound,PredArgTypes))))):-
+  (:-dmsg(pfc_add(wizza(Compound,PredArgTypes))))):-
   user:isa_pred_now_locked,
-   ground(Compound:PredArgTypes),show_call(pfcAdd(isa(Compound,PredArgTypes))),!.
+   ground(Compound:PredArgTypes),show_call(pfc_add(isa(Compound,PredArgTypes))),!.
 */
 
 isa_provide_mpred_storage_op(_,_):-!,fail.
@@ -565,13 +565,13 @@ assert_isa_reversed(T,I):-assert_isa(I,T).
 % ================================================
 % assert_isa HOOKS
 % ================================================
-%OLD user:decl_database_hook(_,genls(_,_)):-retractall(dbase_t(_,isa,_,_)),retractall(dbase_t(_,genls,_,_)).
+%OLD user:decl_database_hook(_,genls(_,_)):-retractall(t(_,isa,_,_)),retractall(t(_,genls,_,_)).
 %OLD user:decl_database_hook(change(assert,_),DATA):-into_mpred_form(DATA,O),!,O=isa(I,T),hotrace(doall(assert_isa_hooked(I,T))).
 %OLD user:decl_database_hook(change(assert,_),isa(I,T)):- assert_hasInstance(T,I),fail.
 
 %OLD user:decl_database_hook(change( retract,_),isa(I,T)):-doall(db_retract_isa_hooked(I,T)).
 
-assert_isa_hooked(A,_):-retractall(dbase_t(cache_I_L,isa,A,_)),fail.
+assert_isa_hooked(A,_):-retractall(t(cache_I_L,isa,A,_)),fail.
 assert_isa_hooked(F,T):- is_pred_declarer(T),decl_mpred(F,T),fail.
 assert_isa_hooked(I,T):- assert_isa(I,T).
 assert_isa_hooked(I,T):- not(ground(assert_isa(T))),!, trace_or_throw(not(ground(assert_isa(I,T)))).

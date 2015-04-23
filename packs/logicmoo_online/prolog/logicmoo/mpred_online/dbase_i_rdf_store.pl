@@ -8,7 +8,7 @@ end_of_file.
 /** <module> logicmoo_i_mpred_dbase_t
 % Provides a prolog dabase in these predicates...
 %
-%  dbase_t/N
+%  t/N
 %  hybridRule/2
 %  
 %
@@ -446,7 +446,7 @@ rdf_assert_ignored(DB):-thlocal:rdf_asserting(_,DB),!.
 rdf_assert_ignored(':-'(_)).
 rdf_assert_ignored(G):-not(compound(atom(G))),!.
 rdf_assert_ignored(_):-flag(rdf_assert_hook_max,W,W),W>4000,!.
-rdf_assert_ignored(support1(_,_,_)).
+rdf_assert_ignored(spft(_,_,_)).
 rdf_assert_ignored(support2(_,_,_)).
 rdf_assert_ignored(support3(_,_,_)).
 rdf_assert_ignored(isa(tCol,tCol)).
@@ -457,7 +457,7 @@ rdf_assert_ignored(svo(_,prologOnly,_)).
 rdf_assert_ignored(mpred_prop(_,_)).
 rdf_assert_ignored(_:mpred_prop(_,_)).
 rdf_assert_ignored(user:mpred_prop(_,arity(1))).
-rdf_assert_ignored(user:mpred_prop(_,predArgTypes(_))).
+rdf_assert_ignored(user:mpred_prop(_,pred_argtypes(_))).
 %rdf_assert_ignored(DB):-functor(DB,F,_),member(F,[ruleBackward,mudTermAnglify,'<=>']).
 rdf_assert_ignored(DB):-functor(DB,_,1).
 rdf_assert_ignored(G):-pfcTypeFull(G,Type),!,(Type==trigger;Type==support).
@@ -511,7 +511,7 @@ to_rdf_ignore(DB,A,B):-any_to_rdf(DB,A,BB),ignore(B=BB).
 
 
 dbase_t_rdf(Sc,rdf:type,CC):- /*o_to_p(CC,Oc),*/clause(hasInstance(Oc,Sc),true),any_to_rdf(Oc,CC),!.
-dbase_t_rdf(Sc,Pc,Oc):-dbase_t(Pc,Sc,Oc),!.
+dbase_t_rdf(Sc,Pc,Oc):-t(Pc,Sc,Oc),!.
 
 :-export(rdf_assert_x/3).
 rdf_assert_x(S,P,O):- rdf_assert_x(S,P,O,mud).

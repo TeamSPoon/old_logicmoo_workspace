@@ -80,7 +80,7 @@ show_all(Call):-doall((show_call(Call))).
 alt_calls(call).
 alt_calls(mpred_call).
 alt_calls(is_asserted).
-alt_calls(dbase_t).
+alt_calls(t).
 alt_calls(req).
 alt_calls(mreq).
 alt_calls(ireq).
@@ -97,7 +97,7 @@ sreq(Call):-
                 (
            (is_callable(Call)-> findallCall(Call,call,CallL,CallLL) ; (CallL=[];CallLL=[])),
                  findallCall(Call,mpred_call,MCallL,MCallLL),
-                 findallCall(Call,dbase_t,DCallL,DCallLL),
+                 findallCall(Call,t,DCallL,DCallLL),
                  findallCall(Call,is_asserted,ACallL,ACallLL),
                  findallCall(Call,req,RCallL,RCallLL),
                  findallCall(Call,ireq,ICallL,ICallLL))),
@@ -106,7 +106,7 @@ sreq(Call):-
    list_to_set(ALL,SET),
                  showDif(SET,call,CallL,WITHFUNCTOR),
                  showDif(SET,mpred_call,MCallL,WITHFUNCTOR),
-                 showDif(SET,dbase_t,DCallL,WITHFUNCTOR),
+                 showDif(SET,t,DCallL,WITHFUNCTOR),
                  showDif(SET,is_asserted,ACallL,WITHFUNCTOR),
                  showDif(SET,req,RCallL,WITHFUNCTOR),
                  showDif(SET,ireq,ICallL,WITHFUNCTOR).
@@ -171,11 +171,11 @@ to_tclass(Prop,New):- ttFormatType(Prop),ensure_starts_with_prefix(Prop,ft,New),
 to_tclass(Prop,New):- ttValueType(Prop),ensure_starts_with_prefix(Prop,vt,New),!.
 
 to_tclass(Prop,New):- arity(Prop,1),arity(Prop,tCol),ensure_starts_with_prefix(Prop,t,New),!.
-to_tclass(Prop,New):- user:mpred_prop(Prop,prologHybrid),arity(Prop,M),M>1,user:mpred_prop(Prop,predArgTypes(_)),ensure_starts_with_prefix(Prop,mud,New),!.
-to_tclass(Prop,New):- (call(dbase_t,Prop,_,_);dbase_t(Prop,_,_,_);dbase_t(Prop,_,_,_,_)),ensure_starts_with_prefix(Prop,mud,New),!.
+to_tclass(Prop,New):- user:mpred_prop(Prop,prologHybrid),arity(Prop,M),M>1,user:mpred_prop(Prop,pred_argtypes(_)),ensure_starts_with_prefix(Prop,mud,New),!.
+to_tclass(Prop,New):- (call(t,Prop,_,_);t(Prop,_,_,_);t(Prop,_,_,_,_)),ensure_starts_with_prefix(Prop,mud,New),!.
 to_tclass(Prop,New):- is_actverb(Prop),ensure_starts_with_prefix(Prop,act,New),!.
 to_tclass(Prop,New):- isa(Prop,tCol),ensure_starts_with_prefix(Prop,t,New),!.
-to_tclass(Prop,New):- (dbase_t(_,_,Prop);dbase_t(_,_,Prop,_);dbase_t(_,_,_,Prop)),ensure_starts_with_prefix(Prop,v,New),!.
+to_tclass(Prop,New):- (t(_,_,Prop);t(_,_,Prop,_);t(_,_,_,Prop)),ensure_starts_with_prefix(Prop,v,New),!.
 % to_tclass(Prop,actDrop).
 
 is_actverb(X):-user:type_action_info(_,PX,_),functor(PX,X,_).

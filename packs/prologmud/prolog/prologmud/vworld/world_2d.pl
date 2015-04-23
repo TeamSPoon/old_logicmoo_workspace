@@ -131,7 +131,7 @@ rez_loc_object(XY,Type):-
 
 %prologOnly(mudNearbyObjs(tObj,tObj)).
 %prologOnly(mudNearbyObjs(tObj,tObj)).
-%predModule(mudNearbyObjs(tObj,tObj),user).
+%pred_module(mudNearbyObjs(tObj,tObj),user).
 mudNearbyObjs(X,Y):-mudAtLoc(X,L1),mudAtLoc(Y,L2),mudNearbyLocs(L1,L2).
 
 is_location(Obj):-var(Obj),!,fail.
@@ -190,14 +190,14 @@ mudLocOnSurface(Clothes,Agent):-loop_check(wearsClothing(Agent,Clothes),fail).
 :-export(same_regions/2).
 same_regions(Agent,Obj):-inRegion(Agent,Where1),dif(Agent,Obj),inRegion(Obj,Where2),Where1=Where2.
 
-%:-add(prologPTTP(inRegion(tObj,tRegion))).
+:-add(prologHybrid(inRegion(tObj,tRegion))).
 %prologPTTP(localityOfObject(tObj,tSpatialthing)).
 
 %:- ensure_universal_stub(prologPTTP,inRegion/2).
 %:- ensure_universal_stub(prologPTTP,mudTestAgentWearing/2).
 
 :-decl_mpred_hybrid(mudAtLoc/2).
-predArgTypes(mudAtLoc(tObj,tSpatialThing)).
+pred_argtypes(mudAtLoc(tObj,tSpatialThing)).
 
 
 % compute the most specific location description
@@ -272,7 +272,7 @@ predPredicateToFunction(Pred,SubjT,ObjT,FullNameFnO):-
 simplifyFullName(FullNameFn,FullNameFn).
 
 find_instance_of(Pred,Subj,Obj):- relationAllExists(Pred,SubjT,ObjT), isa(Subj,SubjT), 
- (is_asserted(dbase_t(Pred,Subj,Obj),isa(Obj,ObjT)) *-> true ; (predPredicateToFunction(Pred,SubjT,ObjT,PredFn), Obj =.. [PredFn,Subj])).
+ (is_asserted(t(Pred,Subj,Obj),isa(Obj,ObjT)) *-> true ; (predPredicateToFunction(Pred,SubjT,ObjT,PredFn), Obj =.. [PredFn,Subj])).
 
 mudSubPart(Outer,Inner):-mudInsideOf(Inner,Outer).
 mudSubPart(Agent,Clothes):-wearsClothing(Agent,Clothes).
@@ -324,11 +324,11 @@ fact_maybe_deduced(localityOfObject(apathFn(Region,Dir),Region)):-is_asserted(pa
 create_and_assert_random_fact(Fact):- fail,must(create_random_fact(Fact)),hooked_asserta(Fact).
 
 %  suggest a random fact that is probably is not already true
-create_random_fact(G) :- into_functor_form(dbase_t,G,MPred),G\=@=MPred,!,create_random_fact(MPred).
+create_random_fact(G) :- into_functor_form(t,G,MPred),G\=@=MPred,!,create_random_fact(MPred).
 create_random_fact(G) :- is_asserted(G),!,dmsg((create_random_fact(G) :- is_asserted(G))).
-create_random_fact(dbase_t(mudAtLoc,Obj,LOC)) :- !,nonvar(Obj),is_asserted(localityOfObject(Obj,Region)),!,((in_grid(Region,LOC),unoccupied(Obj,LOC),is_fact_consistent(mudAtLoc(Obj,LOC)))).
-create_random_fact(dbase_t(localityOfObject,Obj,Region)) :- !, nonvar(Obj),not_asserted((localityOfObject(Obj,_))),asserted_or_deduced(localityOfObject(Obj,Region)).
-create_random_fact(dbase_t(Other,Obj,Default)) :- nonvar(Obj),argIsa(Other,2,Type),random_instance_no_throw(Type,Default,ground(Default)),!.
+create_random_fact(t(mudAtLoc,Obj,LOC)) :- !,nonvar(Obj),is_asserted(localityOfObject(Obj,Region)),!,((in_grid(Region,LOC),unoccupied(Obj,LOC),is_fact_consistent(mudAtLoc(Obj,LOC)))).
+create_random_fact(t(localityOfObject,Obj,Region)) :- !, nonvar(Obj),not_asserted((localityOfObject(Obj,_))),asserted_or_deduced(localityOfObject(Obj,Region)).
+create_random_fact(t(Other,Obj,Default)) :- nonvar(Obj),argIsa(Other,2,Type),random_instance_no_throw(Type,Default,ground(Default)),!.
 
 
 %  suggest random values

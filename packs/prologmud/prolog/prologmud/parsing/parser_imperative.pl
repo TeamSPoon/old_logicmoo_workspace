@@ -21,7 +21,7 @@
                    phrase_parseForTypes_9//2,
                    parseForTypes//2)).
 
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 
 % :- register_module_type (utility).
 
@@ -166,16 +166,18 @@ save_fmt_e(O,A):-atom(A),!,save_fmt_a(O,A),!.
 save_fmt_e(O,[E|L]):-!,save_fmt_e(O,E),!,save_fmt_e(O,L),!.
 save_fmt_e(O,isa(A)):-!,must(save_fmt_e(O,A)).
 save_fmt_e(O,t(A,_)):-!,must(save_fmt_e(O,A)).
-save_fmt_e(_,E):-compound(E),!. % cycPred(_),predStub(_),cycPlus2(_),predStub(_),predModule(_),arity(_),
+save_fmt_e(_,E):-compound(E),!. % cycPred(_),predStub(_),cycPlus2(_),predStub(_),pred_module(_),arity(_),
 %save_fmt_e(O,E):- string(E),!,must((to_word_list(E,WL),save_fmt_e(O,WL))),!.
 save_fmt_e(O,E):- identical_member(E,O) -> true ; (O=[_|CDR],nb_setarg(2,O,[E|CDR])).
 
-save_fmt_a(_,E):-var(E),!.
-save_fmt_a(O,t(E,_)):-!,save_fmt_a(O,E).
-save_fmt_a(O,E):-compound(O),arg(1,O,E),!,save_fmt_a(O,E).
-save_fmt_a(_,A):-atom_length(A,L),L =< 1.
-save_fmt_a(_,A):-vtSkippedPrintNames(A),!.
-save_fmt_a(O,E):-to_case_breaks(E,List),maplist(save_fmt_a(O),List).
+save_fmt_a(P,A):-loop_check(save_fmt_a_0(P,A),true),!.
+
+save_fmt_a_0(_,E):-var(E),!.
+save_fmt_a_0(O,t(E,_)):-!,save_fmt_a(O,E).
+save_fmt_a_0(O,E):-compound(O),arg(1,O,E),!,save_fmt_a(O,E).
+save_fmt_a_0(_,A):-atom_length(A,L),L =< 1.
+save_fmt_a_0(_,A):-vtSkippedPrintNames(A),!.
+save_fmt_a_0(O,E):-to_case_breaks(E,List),maplist(save_fmt_a(O),List).
 
 
 object_name_is_descriptive(O):- (isa(O,tCol);isa(O,tPred);hasInstance(functorDeclares,O);isa(O,ttValueType),isa(O,name_is_descriptive)).
@@ -199,7 +201,7 @@ object_print_details0(Print,Agent,O,DescSpecs,Skipped):-
 vtSkippedPrintNames(T):-var(T),!,fail.
 vtSkippedPrintNames(T):-ttFormatType(T).
 %vtSkippedPrintNames(T):-isa(T,ttTypeType).
-vtSkippedPrintNames(E):-member(E,[tObj,isSelf,the,is,tSpatialThing,ttNotSpatialType,ttSpatialType,prologHybrid,dbase_t,prologPTTP,prologSNARK,prologOnly,tRelation,tPred,'',[]]).
+vtSkippedPrintNames(E):-member(E,[tObj,isSelf,the,is,tSpatialThing,ttNotSpatialType,ttSpatialType,prologHybrid,t,prologPTTP,prologSNARK,prologOnly,tRelation,tPred,'',[]]).
 
 
 must_make_object_string_list(_,Obj,WList):- object_string(Obj,WList),!.
@@ -378,7 +380,7 @@ bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
 name_text(Name,Text):-nameStrings(Name,Text).
 name_text(Name,Text):-mudKeyword(Name,Text).
 name_text(Name,Text):-nonvar(Text),!,name_text(Name,TextS),equals_icase(Text,TextS).
-% name_text(Name,Text):-argIsa(N,2,ftString),not_asserted((argIsa(N,1,ftString))),dbase_t(N,Name,Text).
+% name_text(Name,Text):-argIsa(N,2,ftString),not_asserted((argIsa(N,1,ftString))),t(N,Name,Text).
 name_text(Name,Text):-atomic(Name),!,name_text_atomic(Name,Text).
 name_text(Name,Text):-is_list(Name),!,member(N,Name),name_text(N,Text).
 name_text(Name,Text):-compound(Name),!,Name=..[F,A|List],!,name_text([F,A|List],Text).
@@ -414,7 +416,7 @@ is_counted_for_parse(I):-hasInstance(tCountable,I),not(excluded_in_parse(I)),!.
 excluded_in_parse(apathFn(_, _)).
 excluded_in_parse(I):-tCol(I).
 excluded_in_parse(I):-ttFormatType(I).
-excluded_in_parse(I):-user:mpred_prop(_,predArgTypes(I)).
+excluded_in_parse(I):-user:mpred_prop(_,pred_argtypes(I)).
 excluded_in_parse(apathFn(_ = _)).
 
 instance_for_parse(I):-is_counted_for_parse(I).
@@ -515,7 +517,7 @@ parseIsa(isNot(Type), Term, C, D) :- !, dcgAnd(dcgNot(parseIsa(Type)), theText(T
 
 parseIsa(vp,Goal,Left,Right):-!,one_must(parseFmt_vp1(isSelfAgent,Goal,Left,Right),parseFmt_vp2(isSelfAgent,Goal,Left,Right)).
 
-parseIsa(dbase_t(P,S,O),TermV) -->{!},parseIsa(call(dbase_t(P,S,O)),TermV).
+parseIsa(t(P,S,O),TermV) -->{!},parseIsa(call(t(P,S,O)),TermV).
 parseIsa(call(Call),TermV) --> {!,subst(Call,isSelf,TermV,NewCall)},theText(TermT), {req(NewCall),match_object(TermT,TermV)}.
 parseIsa(exactStr(Str),Str) --> {!},[Atom],{equals_icase(Atom,Str),!}.
 parseIsa(isOptionalStr(Str),Str) --> {not(optional_strings_opt)},[Atom],{equals_icase(Atom,Str),!}.
@@ -611,7 +613,7 @@ longest_string(Order,TStr1,TStr2):-
    compare(Order,L2-Str2,L1-Str1).
 */
 
-:- include(library(prologmud/server/mud_footer)).
+:- include(prologmud(mud_footer)).
 
 end_of_file.
 

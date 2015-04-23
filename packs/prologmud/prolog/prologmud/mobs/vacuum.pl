@@ -12,7 +12,7 @@
 % Predicates asserted during run.
 % :- dynamic memory/2.
 
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 % :- register_module_type (planning).
 
 % Possible agent actions.
@@ -73,4 +73,4 @@ vacuum_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[tOutlet]).
 
 
 
-% :- include(library(prologmud/server/mud_footer)).
+% :- include(prologmud(mud_footer)).

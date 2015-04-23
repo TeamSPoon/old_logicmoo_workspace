@@ -43,8 +43,8 @@
 
 :-dynamic(user_db:grant_openid_server/2).
 :-multifile(user_db:grant_openid_server/2).
-:- multifile user:'$was_imported_kb_content$'/2.
-:- discontiguous(user:'$was_imported_kb_content$'/2).
+:- multifile '$was_imported_kb_content$'/2.
+:- discontiguous('$was_imported_kb_content$'/2).
 :- multifile(user:disabled/1).
 :- discontiguous(user:disabled/1).
 :- multifile(user:enabled/1).
@@ -134,11 +134,11 @@
 :- dynamic_multifile_exported user:use_snark/2.
 :- dynamic_multifile_exported user:is_mpred_prop/2.
 :- dynamic_multifile_exported user:hasInstance_dyn/2.
-:- dynamic_multifile_exported user:mpred_arity/2.
+:- dynamic_multifile_exported user:arity/2.
 :- dynamic_multifile_exported mpred_hooks:mpred_prop/2.
 :- dynamic_multifile_exported user:'<=>'/2.
 % :- dynamic_multifile_exported user:ruleForward/2.
 :- dynamic_multifile_exported user:ruleRewrite/2.
 % :- dynamic_multifile_exported user:ruleBackward/2.
 
-% :-must(not(user:mpred_prop(dbase_t,prologHybrid))).
+% :-must(not(user:mpred_prop(t,prologHybrid))).

@@ -18,7 +18,7 @@
 % :-swi_module(user). 
 :-swi_module(modEat, []).
 
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 
 % :- register_module_type (mtCommand).
 
@@ -41,4 +41,4 @@ update_charge(Agent,actEat) :-
 	New is Old - 1,
 	add(mudEnergy(Agent,New)).
 
-% :- include(library(prologmud/server/mud_footer)).
+% :- include(prologmud(mud_footer)).

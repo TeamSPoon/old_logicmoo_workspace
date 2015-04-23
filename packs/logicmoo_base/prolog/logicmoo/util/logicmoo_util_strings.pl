@@ -756,7 +756,7 @@ str_contains_all0([A|Atoms],String):-
 atoms_of(Var,[]):- (var(Var);Var==[]),!.
 atoms_of(':',[]).
 atoms_of('moo',[]).
-atoms_of('dbase_t',[]).
+atoms_of('t',[]).
 atoms_of(',',[]).
 atoms_of(':-',[]).
 atoms_of('$VAR',[]):-!.

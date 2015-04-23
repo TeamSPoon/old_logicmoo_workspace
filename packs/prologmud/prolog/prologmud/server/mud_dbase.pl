@@ -191,7 +191,7 @@ record_on_thread(Dbase_change,O):- thread_self(ID),thlocal:mpred_capture(ID,Dbas
 % ================================================
 
 
-:- user:ensure_loaded(library(mpred/mpred_pfc)).
+:- user:ensure_loaded(logicmoo(mpred/logicmoo_pfc)).
 
 :- asserta((user:isa(I,C):-loop_check(isa_backchaing(I,C)))).
 :- asserta(('$toplevel':isa(I,C):-user:isa(I,C))).
@@ -286,7 +286,7 @@ vtTestType(vTest2).
 
 
 ttFormatted(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
-predArgTypes(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
+pred_argtypes(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
 vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
 
 */

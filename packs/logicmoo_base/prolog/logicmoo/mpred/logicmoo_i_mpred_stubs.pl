@@ -198,9 +198,9 @@ must_op(_,Call):-!,loop_check(debugOnError(Call)).
 call_wdmsg(P,DB):- thlocal:noDBaseMODs(_),!,wdmsg(error(noDBaseMODs(P,DB))).
 call_wdmsg(P,DB):- get_functor(DB,F,A), call_wdmsg(P,DB,F,A).
 
-call_wdmsg(P,DB,dbase_t,_A):-!, append_term(P,DB,CALL),dmsg((CALL)),mpred_call(CALL).
-call_wdmsg(P,MP,F,A):- user:mpred_prop(F,prologHybrid),must(A>1),into_functor_form(dbase_t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,mpred_call(CALL).
-call_wdmsg(P,MP,F,A):- not(user:mpred_prop(F,prologOnly)),decl_mpred_hybrid(F/A), into_functor_form(dbase_t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,mpred_call(CALL).
+call_wdmsg(P,DB,t,_A):-!, append_term(P,DB,CALL),dmsg((CALL)),mpred_call(CALL).
+call_wdmsg(P,MP,F,A):- user:mpred_prop(F,prologHybrid),must(A>1),into_functor_form(t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,mpred_call(CALL).
+call_wdmsg(P,MP,F,A):- not(user:mpred_prop(F,prologOnly)),decl_mpred_hybrid(F/A), into_functor_form(t,MP,DB),!, append_term(P,DB,CALL),dmsg(info(CALL)),!,mpred_call(CALL).
 call_wdmsg(P,DB,F,_):- append_term(P,DB,CALL),dmsg(info(CALL)),must(user:mpred_prop(F,prologOnly)),!,mpred_call(CALL).
 %call_wdmsg(P,DB,S,_):-  dtrace((append_term(P,DB,CALL),dmsg((CALL)),mpred_call(CALL))).
 
@@ -313,7 +313,7 @@ ensure_universal_stub5(HeadIn,Head,F,A,_HBLIST):- thglobal:pfcManageHybrids,!,
    % lock_predicate(Head),
    discontiguous(Head),
    retractall(user:mpred_prop(F,prologOnly)),
-   pfcMarkC(Head),
+   pfc_mark_C(Head),
    dmsg(pfcManageHybrids(HeadIn)),!.
 
 
@@ -392,8 +392,8 @@ user:listing_mpred_hook(Match):-
       
 user:provide_mpred_storage_clauses(H,B,Proof):-dbase_t_mpred_storage_clauses_facts(H,B,Proof).
 
-dbase_t_mpred_storage_clauses_facts(H,true,dbase_t(H)):-is_list(H),!,length(H,A),A>2,loop_check(dbase_t(H)).
-dbase_t_mpred_storage_clauses_facts(H,true,dbase_t(H)):-compound(H),!,current_predicate(into_plist_arities/4),functor(H,_,A),A>1,loop_check(dbase_t(H)).
+dbase_t_mpred_storage_clauses_facts(H,true,t(H)):-is_list(H),!,length(H,A),A>2,loop_check(t(H)).
+dbase_t_mpred_storage_clauses_facts(H,true,t(H)):-compound(H),!,current_predicate(into_plist_arities/4),functor(H,_,A),A>1,loop_check(t(H)).
 % dbase_t_mpred_storage_clauses_facts(H,B,W):-dbase_t_mpred_storage_clauses_rules(H,B,W),H\=isa(_,_).
 
 % TODO USE PFC FOR FOREWARD RULES
@@ -404,7 +404,7 @@ dbase_t_mpred_storage_clauses_facts(H,true,dbase_t(H)):-compound(H),!,current_pr
 % dbase_t_mpred_storage_clauses_rules(H,B,'<=>'):-'<=>'(B,HH),each_subterm(HH,SubTerm),compound(SubTerm),SubTerm = H.
 
 
-dbase_t_provide_mpred_storage_op(Op,HB):-notrace(demodulize(Op,HB,HeadBody)),get_functor(HeadBody,F),(F==dbase_t;user:mpred_prop(F,prologHybrid)), must(is_mpred_op(Op)), 
+dbase_t_provide_mpred_storage_op(Op,HB):-notrace(demodulize(Op,HB,HeadBody)),get_functor(HeadBody,F),(F==t;user:mpred_prop(F,prologHybrid)), must(is_mpred_op(Op)), 
     with_assertions(thlocal:already_in_file_term_expansion,dbase_t_storage_op(Op,HeadBody)).
 
 % ====================================================
@@ -455,16 +455,16 @@ dbase_t_storage_op(Op,RULE):- mpred_call(is_snark_rule(RULE)),!,
 
 % FACT DB HOOK
 dbase_t_storage_op(Op,HeadBody):-
-    into_functor_form(dbase_t,HeadBody,DB),
+    into_functor_form(t,HeadBody,DB),
      % wff_check_dbase_t_throw(DB),
      must((mud_call_store_op(Op,DB),sanity(show_call(DB)))),!.
 
 mud_call_store_op(Op,(H:-B)):- is_true(B),!,mud_call_store_op(Op,H).
-mud_call_store_op(Op,dbase_t('$was_imported_kb_content$', _, OPRAND)):-!,loop_check(dbase_op(Op,OPRAND),true).
+mud_call_store_op(Op,t('$was_imported_kb_content$', _, OPRAND)):-!,loop_check(dbase_op(Op,OPRAND),true).
 mud_call_store_op(Op,OPRAND):- show_call_success(wff_check_failed(Op,OPRAND,_WHY)),!.
 mud_call_store_op(Op,OPRAND):- reduce_dbase_op(Op,Op2),show_call(call(Op2,OPRAND)).
 
-wff_check_failed(_,DB,WHY):- DB =  dbase_t('$was_imported_kb_content$', WHY, _Assert).
+wff_check_failed(_,DB,WHY):- DB =  t('$was_imported_kb_content$', WHY, _Assert).
 wff_check_dbase_t_throw(DB):- wff_check_failed(_,DB,WHY),trace_or_throw(crazy_dbase_t_was_imported_kb_content(WHY,DB)).
 wff_check_dbase_t_throw(_).
 
@@ -506,9 +506,9 @@ call_for_literal_db00(_,_,HEAD):- is_asserted_dbase_t(HEAD).
 call_for_literal_db00(F,_,   _):- (isa(F,completelyAssertedCollection);hasInstance(completeExtentAsserted,F)),!,fail.
 call_for_literal_db00(F,A,HEAD):- loop_check(call_rule_db(F,A,HEAD)).
 call_for_literal_db00(F,A,HEAD):- not(use_snark(HEAD,true)),HEAD=..[P1,A1,A2],dif(P2,P1),loop_check_term(is_asserted_dbase_t(genlPreds(P2,P1)),gp(P1),fail),
-   call(dbase_t,P2,A1,A2).
+   call(t,P2,A1,A2).
 
-is_asserted_dbase_t(HEAD):-dbase_t(HEAD)*->true;((show_call_success(out_of_dbase_t(HEAD)))).
+is_asserted_dbase_t(HEAD):-t(HEAD)*->true;((show_call_success(out_of_dbase_t(HEAD)))).
 out_of_dbase_t(HEAD):-clause_safe(HEAD,true)*->true;show_call_success(user:fact_always_true(HEAD)).
 
 
@@ -539,7 +539,7 @@ constrain_args(_,[_P,AR,GS]):-!,dif(AR,GS).
 constrain_args(A,B):-constrain_args_pttp(A,B).
 
 
-% call_body_req(HEAD):- functor(HEAD,F,A),HEAD_T=..[F|ARGS],HEAD_T=..[dbase_t,F|ARGS],hook_body_req(HEAD,HEAD_T).
+% call_body_req(HEAD):- functor(HEAD,F,A),HEAD_T=..[F|ARGS],HEAD_T=..[t,F|ARGS],hook_body_req(HEAD,HEAD_T).
 
 
 
@@ -549,7 +549,7 @@ constrain_args(A,B):-constrain_args_pttp(A,B).
 
 body_req_isa(I,C):-isa_backchaing(I,C).
 
-body_call_cyckb(HEAD_T):-el_holds_DISABLED_KB, HEAD_T =.. [dbase_t|PLIST], thglobal:use_cyc_database,!, no_repeats(kbp_t(PLIST)).
+body_call_cyckb(HEAD_T):-el_holds_DISABLED_KB, HEAD_T =.. [t|PLIST], thglobal:use_cyc_database,!, no_repeats(kbp_t(PLIST)).
 
 % =====================================
 % = body_req
@@ -560,7 +560,7 @@ body_req(HEAD,HEAD_T):- (hook_body_req(HEAD,HEAD_T)).
 %hook_body_req(HEAD,HEAD_T):- user:mpred_prop(F,prologPTTP),!,dmsg(warn(hook_body_req(HEAD,HEAD_T))),fail.
 %hook_body_req(HEAD,HEAD_T):- user:mpred_prop(F,prologOnly),!,dmsg(warn(hook_body_req(HEAD,HEAD_T))),fail.
 hook_body_req(_,_,isa(I,C),_):- !, body_req_isa(I,C).
-hook_body_req(_,_,_,dbase_t(C,I)):- !, body_req_isa(I,C).
+hook_body_req(_,_,_,t(C,I)):- !, body_req_isa(I,C).
 hook_body_req(_,_,_,hasInstance(C,I)):- !, body_req_isa(I,C).
 hook_body_req(_,_,_ ,HEAD_T):- thlocal:useOnlyExternalDBs,!, body_call_cyckb(HEAD_T).
 % loop checking is not usefull (why the cut was added)
@@ -586,7 +586,7 @@ body_req_no_rules(_,_,_  , HEAD_T):- clause(HEAD_T,true).
 body_req_no_rules(F,_,_,HEAD_T):- body_req_plus_cyc(F,_,_,HEAD_T).
 
 body_req_only_rules(HEAD, _):-  ruleBackward(HEAD,BODY),call_mpred_body(HEAD,BODY).
-body_req_only_rules(_,_,_,dbase_t(F,Obj,LValue)):-  choose_val(F,Obj,LValue).
+body_req_only_rules(_,_,_,t(F,Obj,LValue)):-  choose_val(F,Obj,LValue).
 
 body_req_plus_cyc(F,_,_,HEAD_T):-  user:mpred_prop(F,cycPlus2(_)),thlocal:useOnlyExternalDBs,!,with_assertions(thglobal:use_cyc_database,body_call_cyckb(HEAD_T)).
  
@@ -601,7 +601,7 @@ foo_b(b3):-!.
 %OLD user:decl_database_hook(AR,C):-smart_decl_database(AR,C).
 
 smart_decl_database(AR,svo(S,V,O)):- !,dbase2pred2svo(DBASE,PRED,svo(S,V,O)),!,smart_db_op(AR,DBASE,PRED,svo(S,V,O)).
-smart_decl_database(AR,DBASE):- functor_catch(DBASE,dbase_t,_),!,dbase2pred2svo(DBASE,PRED,SVO),!,smart_db_op(AR,DBASE,PRED,SVO).
+smart_decl_database(AR,DBASE):- functor_catch(DBASE,t,_),!,dbase2pred2svo(DBASE,PRED,SVO),!,smart_db_op(AR,DBASE,PRED,SVO).
 smart_decl_database(AR,PRED):- dbase2pred2svo(DBASE,PRED,SVO),!,smart_db_op(AR,DBASE,PRED,SVO).
 
 smart_db_op(change( retract,AR),A,B,C):- retract_ar_fact(AR,A), retract_ar_fact(AR,B),  retract_ar_fact(AR,C).

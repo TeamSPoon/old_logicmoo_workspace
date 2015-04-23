@@ -31,7 +31,7 @@
 
 :- meta_predicate toploop_telnet:show_room_grid_single(*,*,0).
 
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 
 % :- register_module_type (utility).
 
@@ -507,4 +507,4 @@ call_pred(Call, Options) :-
 
 
 
-% :- include(library(prologmud/server/mud_footer)).
+% :- include(prologmud(mud_footer)).

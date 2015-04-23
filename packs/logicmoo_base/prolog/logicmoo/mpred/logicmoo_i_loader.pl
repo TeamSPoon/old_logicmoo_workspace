@@ -228,7 +228,7 @@ rsavedb:-
 %:-meta_predicate_transparent(make_db_listing/0).
 make_db_listing:-
  % dbase_mod(DBM),
-%   listing(dbase_t),
+%   listing(t),
  %  listing(dbase_f),
      listing(_),
      listing(user:_),  
@@ -271,7 +271,7 @@ ensure_moo_loaded(A) :-
 
 :- meta_predicate load_moo_files(:,+).
 
-load_moo_files(F0):- user_ensure_loaded(F0).
+load_moo_files(F0):- user:ensure_loaded(F0).
 % load_moo_files(F0):-use_module(F0).
 
 load_moo_files(M:F0,List):-!,
@@ -379,7 +379,7 @@ loader_term_expansion(CL,EXP):-
   inside_dynamic_reader,!,
 % ==== do it
   WHY = '$was_imported_kb_content$'(inside_dynamic_reader,CL),
-  dmsg(WHY),
+  %dmsg(WHY),
   add_from_file(CL),
   must(EXP=user:WHY).
 
@@ -388,7 +388,7 @@ loader_term_expansion(CL,WHY):-
   requires_storage(CL,WhyRS),
 % ==== do it
   WHY = '$was_imported_kb_content$'(requires_storage(WhyRS),CL),
-  dmsg(WHY),
+  %dmsg(WHY),
   add_from_file(CL),!.
 
 

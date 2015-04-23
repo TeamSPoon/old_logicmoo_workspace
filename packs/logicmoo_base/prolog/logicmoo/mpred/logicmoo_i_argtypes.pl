@@ -122,7 +122,7 @@ argIsa_ft(F,N,FTO):-must((argIsa_known(F,N,FT),to_format_type(FT,FTO))),!.
 
 
 :-export(argIsa_call_0/3).
-argIsa_call_0(F,N,Type):- clause(dbase_t(argIsa,F,N,Type),true).
+argIsa_call_0(F,N,Type):- clause(t(argIsa,F,N,Type),true).
 argIsa_call_0(F,N,Type):- clause(argIsa(F,N,Type),true).
 argIsa_call_0(argIsa,1,tRelation).
 argIsa_call_0(argIsa,2,ftInt).
@@ -180,8 +180,8 @@ argIsa_call_0(instTypeProps,N,ftVoprop):- N> 2.
 
 argIsa_call_0(must,1,ftAskable).
 
-argIsa_call_0(predModule,1,tPred).
-argIsa_call_0(predModule,2,ftAtom).
+argIsa_call_0(pred_module,1,tPred).
+argIsa_call_0(pred_module,2,ftAtom).
 % argIsa_call_0(user:agent_text_command,_,ftTerm).
 argIsa_call_0('<=>',_,ftTerm).
 argIsa_call_0(F,N,Type):-between(1,2,N),argIsa_call_3(F,Type).
@@ -211,9 +211,9 @@ grab_argsIsa(F,Types):- grab_argsIsa_6(Types),compound(Types),Types\='$VAR'(_),g
 
 grab_argsIsa_6(Types):- hasInstance(ttFormatted,Types).
 grab_argsIsa_6(mudColor(tSpatialThing, vtColor)).
-grab_argsIsa_6(Types):- hasInstance(predArgTypes,Types).
+grab_argsIsa_6(Types):- hasInstance(pred_argtypes,Types).
 grab_argsIsa_6(Types):- is_asserted(quotedDefnIff(Types,_)).
-grab_argsIsa_6(Types):- asserted_mpred_prop(_,predArgTypes(Types)).
+grab_argsIsa_6(Types):- asserted_mpred_prop(_,pred_argtypes(Types)).
 grab_argsIsa_6(Types):- hasInstance(_,Types),compound(Types),ground(Types).
 grab_argsIsa_6(Types):- current_predicate(get_all_templates/1),get_all_templates(Types),ground(Types).
 
@@ -237,7 +237,7 @@ argIsa_call_7(mudFacing,_,ftTerm).
 % argIsa_call_7(Var,2,ftTerm):-not(must(not_asserted((isa(Var,tCol))))),dmsg(trace_or_throw( argIsa_call_9(Var,2,ftTerm))),fail.
 argIsa_call_7(Prop,N1,Type):- is_2nd_order_holds(Prop),dmsg(todo(define(argIsa(Prop,N1,'Second_Order_TYPE')))),dumpST,dtrace,
    Type=argIsaFn(Prop,N1).
-argIsa_call_7(F,N,Type):- debugOnError(dbase_t(argIsa,F,N,Type)).
+argIsa_call_7(F,N,Type):- debugOnError(t(argIsa,F,N,Type)).
 
 argIsa_call_9(Prop,N1,Type):- arity(Prop,Arity),dmsg(todo(define(argIsa_known(Prop,N1,'_TYPE')))),must(N1=<Arity),Type=argIsaFn(Prop,N1).
 argIsa_call_9(Prop,N1,Type):- dmsg(todo(define(argIsa_known(Prop,N1,'_TYPE')))),Type=argIsaFn(Prop,N1).
@@ -245,7 +245,7 @@ argIsa_call_9(_,_,ftTerm).
 
 
 :-export(correctArgsIsa/2).
-correctArgsIsa(In,Out):- correctArgsIsa(query(must,dbase_t),In,Out),!.
+correctArgsIsa(In,Out):- correctArgsIsa(query(must,t),In,Out),!.
 
 :-export(correctArgsIsa/3).
 correctArgsIsa(_,NC,NC):-not(compound(NC)),!.
@@ -253,7 +253,7 @@ correctArgsIsa(_,NC,NC):-as_is_term(NC),!.
 correctArgsIsa(_,G,G):- (\+ thlocal:infMustArgIsa), (is_release; bad_idea; skipWrapper;  thlocal:infSkipArgIsa),!.
 correctArgsIsa(Op,M:G,MAA):- nonvar(M),!,correctArgsIsa(Op,G,GG),M:GG=MAA.
 correctArgsIsa(_,(A,B),(AA,BB)):-!,correctArgsIsa(Op,A,AA),correctArgsIsa(Op,B,BB).
-correctArgsIsa(_,isa(Args,PredArgTypes),isa(Args,PredArgTypes)):- predArgTypes==predArgTypes,!.
+correctArgsIsa(_,isa(Args,PredArgTypes),isa(Args,PredArgTypes)):- pred_argtypes==pred_argtypes,!.
 correctArgsIsa(_,G,GG):- get_functor(G,F,A),
   arg(_,vv('{}'/_,  genls/_,user:mpred_prop/_,
     hasInstance/2,arity/_,genls/_,'<=>'/_,pfcPT/_,rhs/_,pfcNT/_,pfcBT/_,
@@ -270,7 +270,7 @@ list_to_callform([P|ARGS],_,CALL):-atom(P),!,CALL=..[P|ARGS].
 list_to_callform(ARGS,Functor,CALL):-CALL=..[Functor|ARGS].
 
 correctArgsIsa0(Op,[PRED|ARGS],RESULT):-!,correctArgsIsa00(Op,[PRED|ARGS],RESULT).
-correctArgsIsa0(Op,A,RESULTC):-A=..[PRED|ARGS],!,correctArgsIsa00(Op,[PRED|ARGS],RESULT), list_to_callform(RESULT,dbase_t,RESULTC).
+correctArgsIsa0(Op,A,RESULTC):-A=..[PRED|ARGS],!,correctArgsIsa00(Op,[PRED|ARGS],RESULT), list_to_callform(RESULT,t,RESULTC).
 
 correctArgsIsa00(_ ,[Prop|Args],AA):-stack_check(1000), var(Prop),!,AA=[Prop|Args].
 correctArgsIsa00(Op,[KP,Prop|Args],AA):-is_holds_true(KP),!,correctArgsIsa00(Op,[Prop|Args],AA).
@@ -476,7 +476,7 @@ must_equals_correct(Op,A,AA):-must(correctArgsIsa(Op,A,AA)).
 
 must_equals(A,AA):-must_det(A=AA).
 
-deduced_is_tCol(A):- (thlocal:infSkipArgIsa->true; (hasInstance(tCol,A)->true;(fail,pfcAdd(isa(A,tCol))))),!.
+deduced_is_tCol(A):- (thlocal:infSkipArgIsa->true; (hasInstance(tCol,A)->true;(fail,pfc_add(isa(A,tCol))))),!.
 :- style_check(+singleton).
 
 :-export(any_to_value/2).

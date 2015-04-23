@@ -15,7 +15,7 @@
 % :-swi_module(user). 
 :-swi_module(modPut, []).
 
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 
 % :- register_module_type (mtCommand).
 
@@ -38,4 +38,4 @@ user:agent_call_command(_Agent,actPut(Other,_Prep,Where)):-
    add(mudAtLoc(Where3D,Location)).
 
 
-% :- include(library(prologmud/server/mud_footer)).
+% :- include(prologmud(mud_footer)).

@@ -3,37 +3,40 @@
 
 */
 
+:- attach_packs.
 
 :- set_prolog_flag(generate_debug_info, true).
+% [Optionaly] Set the Prolog optimize/debug flags
+:- set_prolog_flag(verbose_load,true).
+:- use_module(library(gui_tracer)).
+:- set_prolog_flag(gui_tracer, false).
+:- set_prolog_flag(answer_write_options, [quoted(true), portray(true), max_depth(1000), spacing(next_argument)]).
+
 :- exists_directory(runtime)->working_directory(_,runtime);(exists_directory('../runtime')->working_directory(_,'../runtime');true).
 
+:-multifile(user:file_search_path/2).
 user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog').
 user:file_search_path(weblog, 'C:/Users/Administrator/AppData/Roaming/SWI-Prolog/pack/weblog').
 user:file_search_path(weblog, '/usr/lib/swi-prolog/pack/weblog/prolog'):-current_prolog_flag(unix,true).
 user:file_search_path(cliopatria, '../externals/ClioPatria'). % :- current_prolog_flag(unix,true).
 user:file_search_path(user, '../externals/ClioPatria/user/').
 user:file_search_path(swish, '../externals/swish'):- current_prolog_flag(unix,true).
+user:file_search_path(prologmud, '/devel/LogicmooDeveloperFramework/PrologMUD/packs/prologmud/prolog/prologmud/').
+user:file_search_path(logicmoo, '/devel/LogicmooDeveloperFramework/PrologMUD/packs/logicmoo_base/prolog/logicmoo/').
 user:file_search_path(pack, '../packs').
-file_search_path(logicmoo, '/devel/LogicmooDeveloperFramework/PrologMUD/packs/prologmud/prolog/prologmud/').
-file_search_path(logicmoo, '/devel/LogicmooDeveloperFramework/PrologMUD/packs/logicmoo_base/prolog/logicmoo/').
-
 :- attach_packs.
 
-% [Manditory] Load the Logicmioo utils
+% [Manditory] Load the Logicmioo Base Ssytem
 :- user:ensure_loaded(library(logicmoo/logicmoo_base)).
 
 
-% [Optionaly] Set up the Prolog optimize/debug flags
 % :- ensure_loaded(library(logicmoo/mpred_online)).
 % :- '@'(ensure_loaded('../src_mud/dbase/dbase_i_pldoc'),user).
 
-% [Optionaly] Set the Prolog optimize/debug flags
-:- set_prolog_flag(verbose_load,true).
-:- use_module(library(gui_tracer)).
-:- set_prolog_flag(gui_tracer, false).
-:- set_prolog_flag(answer_write_options, [quoted(true), portray(true), max_depth(1000), spacing(next_argument)]).
+% [Optionaly] Set up the Prolog optimize/debug flags
 %:- set_prolog_flag(debug,false).
 :- set_mem_opt(false).
+
 
 :-dynamic(did_ref_job/1).
 do_ref_job(_Body,Ref):-did_ref_job(Ref),!.
@@ -56,9 +59,9 @@ user:semweb_startup:-ensure_loaded('run_clio').
 % TODO 
 
 :- multifile(user:mud_regression_test/0).
-:- multifile user:was_imported_kb_content/2.
-:- dynamic user:was_imported_kb_content/2.
-:- discontiguous(user:was_imported_kb_content/2).
+:- multifile user:'$was_imported_kb_content$'/2.
+:- dynamic user:'$was_imported_kb_content$'/2.
+:- discontiguous(user:'$was_imported_kb_content$'/2).
 
 user:semweb_startup :- with_no_term_expansions(if_file_exists(ensure_loaded('../externals/MUD_KnowRob/knowrob_addons/knowrob_mud/prolog/init.pl'))).
 
@@ -128,7 +131,7 @@ pddlSomethingIsa('iComBadge674',['tComBadge','ProtectiveAttire','PortableObject'
 pddlSomethingIsa('iGoldUniform675',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
 
-user:mudDescription(iCommanderData66,txtFormatFn("Very screy looking monster named ~w",[iCommanderData66])).
+:-asserta(user:mudDescription(iCommanderData66,txtFormatFn("Very screy looking monster named ~w",[iCommanderData66]))).
 
 tAgentGeneric(iExplorer1).
 wearsClothing(iExplorer1,'iBoots773').

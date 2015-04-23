@@ -8,7 +8,7 @@
 % to do this.
 % Douglas Miles 2014
 */
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 
 % :- register_module_type (mtCommand).
 
@@ -27,9 +27,9 @@ rez_to_inventory(Agent,NameOrType,NewObj):-
    padd(NewObj,authorWas(rez_to_inventory(Agent,NameOrType,NewObj))),
    add_missing_instance_defaults(NewObj),
    mudStowing(Agent,NewObj),
-   ireq(dbase_t(mudStowing,Agent,NewObj)),
+   ireq(t(mudStowing,Agent,NewObj)),
    mudPossess(Agent,NewObj),
-   ireq(dbase_t(mudPossess,Agent,NewObj)),
+   ireq(t(mudPossess,Agent,NewObj)),
    mudPossess(Agent,NewObj)]).
 
 
@@ -76,4 +76,4 @@ getPropInfo(_Agent,_NewName,PropsIn,N,[mudDescription(ftText(need,to,actParse,Pr
 
 
 
-% :- include(library(prologmud/server/mud_footer)).
+% :- include(prologmud(mud_footer)).

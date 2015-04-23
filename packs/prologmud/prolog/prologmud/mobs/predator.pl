@@ -18,7 +18,7 @@
 % :- dynamic memory/2.
 
 % Possible agent actions.
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 % :- register_module_type (planning).
 
 
@@ -54,4 +54,4 @@ predator_idea(Agent,Act) :-
       move_or_sit_memory_idea(Agent,Act,[tNut]).
 
 
-% :- include(library(prologmud/server/mud_footer)).
+% :- include(prologmud(mud_footer)).

@@ -13,7 +13,7 @@
 % :-swi_module(user). 
 :-swi_module(modAttack, []).
 
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 
 % :- register_module_type (mtCommand).
 
@@ -93,4 +93,4 @@ update_stats(Agent,wiff) :-
 
 
 
-% :- include(library(prologmud/server/mud_footer)).
+% :- include(prologmud(mud_footer)).

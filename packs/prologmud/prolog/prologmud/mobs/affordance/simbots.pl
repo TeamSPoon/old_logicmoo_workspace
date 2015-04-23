@@ -10,7 +10,7 @@
 %
  */
 
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 
 :- discontiguous(defined_affordance/1).
 
@@ -537,7 +537,7 @@ agent_call_command_simbots_real(Agent,Templ):- must(simbots_templates(Templ)),no
 
 affordance_side_effects(Agent,Templ,Template):- Templ=..[ActVerb|ARGS],
       verb_affordance(ActVerb,Types,_,_,_),args_match_types(ARGS,Types),!,must(Template=..[ActVerb,Types]),
-      findall(dbase_t(Trait,Agent,Real), verb_affordance(ActVerb,Types,Trait,_Think,Real),NewAdds),
+      findall(t(Trait,Agent,Real), verb_affordance(ActVerb,Types,Trait,_Think,Real),NewAdds),
       forall(member(Add,NewAdds),add(Add)).
 
 affordance_message(Agent,Templ,Template):- Templ=..[ActVerb|ARGS],

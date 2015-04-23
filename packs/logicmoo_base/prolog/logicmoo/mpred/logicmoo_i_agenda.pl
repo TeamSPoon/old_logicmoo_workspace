@@ -1,3 +1,14 @@
+% =======================================================
+/** <module> 
+% This is mainly used by the moo_loader but also needed everywhere
+%
+% Logicmoo Project PrologMUD: A MUD server written in Prolog
+% Maintainer: Douglas Miles
+% Dec 13, 2035
+%
+*/
+% =======================================================
+
 
 :- meta_predicate tick_every(*,*,0).
 :- meta_predicate register_timer_thread(*,*,0).
@@ -148,7 +159,7 @@ onSpawn(ClassFact):- ClassFact=..[Funct|InstADeclB],must_det(onSpawn_f_args(Func
 onSpawn_f_args(Funct,List):-
  with_assertions(deduceArgTypes(Funct),
   (convertSpawnArgs(Funct,1,List,NewList),
-   Later =.. [dbase_t,Funct|NewList],
+   Later =.. [t,Funct|NewList],
    add(Later),
   call_after_dbase_load_slow(with_assertions(deduceArgTypes(Funct), add(Later))))),!.
 

@@ -17,7 +17,7 @@
 % Declare the module name and the exported (public) predicates.
 :-swi_module(tExplorer,[]).
 
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 % :- register_module_type (planning).
 
 :-decl_type(tExplorer).
@@ -98,4 +98,4 @@ explorer_idea(Agent,actLook) :-
 	add(mudMemory(Agent,aDirectionsFn(New))).
 
 
-% :- include(library(prologmud/server/mud_footer)).
+% :- include(prologmud(mud_footer)).

@@ -7,7 +7,7 @@
 % Douglas Miles 2014
 
 */
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 
 % :- register_module_type (mtCommand).
 
@@ -38,4 +38,4 @@ user:agent_call_command(Agent,actOnto(Where,Sit)):-
 
 update_charge(Agent,Sit) :- vtPosture(Sit), padd(Agent,[mudEnergy(-1)]).
 
-% :- include(library(prologmud/server/mud_footer)).
+% :- include(prologmud(mud_footer)).

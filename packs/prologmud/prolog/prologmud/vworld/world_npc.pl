@@ -20,7 +20,7 @@
 :- meta_predicate agent_call_safely(?,?,?).
 
 
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 % :- begin_transform_moo_preds.
 :- dynamic(npc_tick_tock_time/1).
 npc_tick_tock_time(60).
@@ -117,4 +117,4 @@ user:agent_call_command(_Agent,actIdea(Who)) :-  must(command_actIdea(Who,Idea))
 user:agent_call_command(_Agent,actTock) :- (side_effect_prone), npc_tick.
 user:agent_call_command(_Agent,actTick(Other)) :-(side_effect_prone), user:agent_call_command(Other,actTick).
 
-% :- include(library(prologmud/server/mud_footer)).
+% :- include(prologmud(mud_footer)).

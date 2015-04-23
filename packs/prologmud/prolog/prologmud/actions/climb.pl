@@ -12,7 +12,7 @@
 % :-swi_module(user). 
 :-swi_module(modClimb, []).
 
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 
 % :- register_module_type (mtCommand).
 
@@ -75,4 +75,4 @@ update_stats(Agent,pulled) :-
 	(add_cmdfailure(Agent,pulled)).
 
 
-% :- include(library(prologmud/server/mud_footer)).
+% :- include(prologmud(mud_footer)).

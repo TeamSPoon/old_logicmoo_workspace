@@ -8,16 +8,16 @@ default((P => Q))/pfc_literal(Q) => (P, ~not(Q) => Q).
 % birds fly by default.
 => default((bird(X) => fly(X))).
 
-% here's one way to do an isa hierarchy.
-% isa = subclass.
+% here's one way to do an zisa hierarchy.
+% zisa = subclass.
 
-isa(C1,C2) =>
+zisa(C1,C2) =>
   {P1 =.. [C1,X],
     P2 =.. [C2,X]},
   (P1 => P2).
 
-=> isa(canary,bird).
-=> isa(penguin,bird).
+=> zisa(canary,bird).
+=> zisa(penguin,bird).
 
 % penguins do not fly.
 penguin(X) => not(fly(X)).

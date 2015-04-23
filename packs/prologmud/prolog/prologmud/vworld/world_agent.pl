@@ -10,7 +10,7 @@
 */
 % :-swi_module(world_agent,[]).
 
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 /*
 % This file is "included" from world.pl 
 :-swi_module(modr, [ call_agent_command_0/2,  call_agent_action/2 ]).
@@ -76,7 +76,7 @@ call_agent_action(Agent,CMDI):-
 where_atloc(Agent,Where):-mudAtLoc(Agent,Where).
 where_atloc(Agent,Where):-localityOfObject(Agent,Where).
 where_atloc(Agent,Where):-mudAtLoc(Agent,Loc),!,locationToRegion(Loc,Where).
-where_atloc(Agent,'OffStage'):-nonvar(Agent).
+where_atloc(Agent,'OffStage'):-fail,nonvar(Agent).
 
 % call_agent_action_ilc(Agent,CMD):- with_no_fallbacksg(with_no_fallbacks(call_agent_action_ilc0(Agent,CMD))).
 call_agent_action_ilc(Agent,CMD):-
@@ -103,7 +103,7 @@ correctCommand(CMD,OUT):-compound(CMD),fail,
    functor(CMD,F,A),
    functor(MATCH,F,A),
    vtActionTemplate(MATCH),compound(MATCH),MATCH=..[F|TYPES],!,
-   correctEachTypeOrFail(Who,F,query(dbase_t, must),ARGS,TYPES,NEWS),!,
+   correctEachTypeOrFail(Who,F,query(t, must),ARGS,TYPES,NEWS),!,
    OUT=..[F|NEWS].
 
 correctCommand(CMD,CMD).

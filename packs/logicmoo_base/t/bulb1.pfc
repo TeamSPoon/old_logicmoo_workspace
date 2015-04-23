@@ -17,7 +17,7 @@ resolveConflict(C) :-
 % meta rules to schedule inferencing.
 
 % resolve conflicts asap
-pfc_select(conflict(X)) :- pfc_queue(conflict(X)).
+pfc_select(conflict(X),S) :- pfc_queue(conflict(X),S).
   
 % a pretty basic conflict.
 not(P), P => conflict(P).

@@ -4,7 +4,7 @@
 % Douglas Miles 2014
 % inventory(Agt,Inv) = inventory (anything the agent has taken)
 */
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 
 % :- register_module_type (mtCommand).
 
@@ -72,16 +72,16 @@ show_inventory(Agent,Who):-
 
 mudInventoryLocation(Who,Obj,Loc):- 
          findall(prop(Obj,PRED),
-                  (member(dbase_t(PRED,A,B), [
-                        dbase_t(mudPossess,Who,Obj),
-                        dbase_t(mudStowing,Who,Obj),
-                        dbase_t(mudContains,Who,Obj),
-                        dbase_t(mudWielding,Who,Obj),
-                        dbase_t(wearsClothing,Who,Obj)]),
-                     ireq(dbase_t(PRED,A,B))),
+                  (member(t(PRED,A,B), [
+                        t(mudPossess,Who,Obj),
+                        t(mudStowing,Who,Obj),
+                        t(mudContains,Who,Obj),
+                        t(mudWielding,Who,Obj),
+                        t(wearsClothing,Who,Obj)]),
+                     ireq(t(PRED,A,B))),
                   RESULTS),
          setof(Obj,member(prop(Obj,PRED),RESULTS),OBJLIST),!,
-         member(Obj,OBJLIST),once((member(PRED2,[mudAtLoc,localityOfObject]),ireq(dbase_t(PRED2,Obj,Loc)))).
+         member(Obj,OBJLIST),once((member(PRED2,[mudAtLoc,localityOfObject]),ireq(t(PRED2,Obj,Loc)))).
 
 test_exists(O):- tItem(O).
 test_exists(O):- tAgentGeneric(O).
@@ -92,4 +92,4 @@ test_anyInst(O):- test_exists(O).
 % helps for testings
 % :- listing(inventory:_).
 
-% :- include(library(prologmud/server/mud_footer)).
+% :- include(prologmud(mud_footer)).

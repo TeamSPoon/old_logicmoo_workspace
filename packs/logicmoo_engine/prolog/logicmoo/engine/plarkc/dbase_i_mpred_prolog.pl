@@ -1,7 +1,7 @@
 /** <module> logicmoo_i_mpred_prolog
 % Provides a prolog dabase in these predicates...
 %
-%  dbase_t/N
+%  t/N
 %  hybridRule/2
 %  
 %

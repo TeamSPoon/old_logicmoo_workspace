@@ -17,7 +17,7 @@
 % :- dynamic  agent_list/1.
 
 % Possible agent actions.
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 % :- register_module_type (planning).
 
 :-decl_type(tMonster).
@@ -58,15 +58,15 @@ monster_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[tCorpse]).
 %:-wdmsg(wearsClothing/2).
 %:-prolog.
 %:-visible(+all),leash(+all),trace.
-:-add(predArgTypes(wearsClothing(tObj,tClothing))).
+:-add(pred_argtypes(wearsClothing(tObj,tClothing))).
 %:-notrace.
 %:- prolog.
 
 % TODO fingure out why term_expansion is not working
 %:-visible(+all),leash(-all),trace.
-instTypeProps(Instance,tMonster,[mudDescription(txtFormatFn("Very screy looking monster named ~w",[Instance])),wearsClothing(tToughHide),mudPossess(tToughHide)]).
+%instTypeProps(Instance,tMonster,[mudDescription(txtFormatFn("Very screy looking monster named ~w",[Instance])),wearsClothing(tToughHide),mudPossess(tToughHide)]).
 %:-notrace.
 %:- prolog.
 
 
-% :- include(library(prologmud/server/mud_footer)).
+% :- include(prologmud(mud_footer)).

@@ -26,7 +26,7 @@ oncely(Call):-once(Call).
 % ================================================
 
 /*
-query(dbase_t, req, G):- mpred_call(G).
+query(t, req, G):- mpred_call(G).
 query(_, _, Op, G):- dtrace, mpred_call(call(Op,G)).
 once(A,B,C,D):-trace_or_throw(once(A,B,C,D)).
 */
@@ -45,7 +45,7 @@ dbase_op(Op,     H ):- once(fully_expand(Op,H,HH)),H\=@=HH,!,dbase_op(Op, HH).
 dbase_op(neg(_,Op),  H ):- !, show_call(not(dbase_op(Op,  H ))).
 dbase_op(change(assert,Op),H):-!,must(dbase_modify(change(assert,Op),H)),!.
 dbase_op(change(retract,Op),H):-!,must(dbase_modify(change(retract,Op),H)),!.
-dbase_op(query(dbase_t,Ireq),  H ):-!, dbase_op(Ireq,H).
+dbase_op(query(t,Ireq),  H ):-!, dbase_op(Ireq,H).
 dbase_op(query(Dbase_t,_Ireq),  H ):-!, dbase_op(Dbase_t,H).
 dbase_op(call(Op),H):-!,dbase_op(Op,H).
 dbase_op(Op,((include(A)))):- with_no_assertions(thlocal:already_in_file_term_expansion,dbase_op(Op,((load_data_file(A))))),!.
@@ -97,8 +97,8 @@ how_to_op(assert,assert_if_new).
 how_to_op(assert(_),asserta_new).
 how_to_op(retract(_),retract_all).
 how_to_op(conjecture,call).
-how_to_op(query(dbase_t, req),mpred_call).
-how_to_op(query(dbase_t, Req),Req).
+how_to_op(query(t, req),mpred_call).
+how_to_op(query(t, Req),Req).
 how_to_op(change(Op,HOW),O):- !, O=..[Op,HOW].
 how_to_op(HowOP,HowOP).
 
@@ -139,7 +139,7 @@ mpred_call(Call):-
      must((Call=..[Was|Apply],lookup_inverted_op(Was,InvertCurrent,_WasPol))),
    ((OverridePolarity ==('-') -> debugOnError(show_call(apply(InvertCurrent,Apply))) ; debugOnError(show_call(apply(Was,Apply))))))).
 
-mpred_call(Call):-fully_expand(query(dbase_t,mpred_call),Call,Expand),!,mpred_call_0(Expand).
+mpred_call(Call):-fully_expand(query(t,mpred_call),Call,Expand),!,mpred_call_0(Expand).
 
 mpred_call_0(Call):- one_must(mpred_call_1(Call),mpred_call_2(Call)).
 

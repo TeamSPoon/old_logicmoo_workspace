@@ -23,7 +23,7 @@
 
 :-export((  mudGetPrecepts/2,  mudNearReach/2, mudNearFeet/2,  mudCanSense/5 , cmdLook/2)).
 
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 
 % :- register_module_type (mtCommand).
 
@@ -133,7 +133,7 @@ get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
 
 % Get only the Percepts
 
-:-decl_mpred(mudGetPrecepts(tAgentGeneric,ftListFn(tSpatialThing)),[predModule(user)]).
+:-decl_mpred(mudGetPrecepts(tAgentGeneric,ftListFn(tSpatialThing)),[pred_module(user)]).
 mudGetPrecepts(Agent,Percepts) :- mudGetPrecepts0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts).
 mudGetPrecepts0(Agent,Percepts) :-
   call((
@@ -145,7 +145,7 @@ mudGetPrecepts0(Agent,Percepts) :-
 	!.
 
 % Look at locations immediately around argent
-% :-decl_mpred(mudNearReach(tAgentGeneric,ftListFn(tSpatialThing)),[predModule(user)]).
+% :-decl_mpred(mudNearReach(tAgentGeneric,ftListFn(tSpatialThing)),[pred_module(user)]).
 mudNearReach(Agent,PerceptsO):- get_near0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
    
 get_near0(Agent,Percepts) :-
@@ -155,7 +155,7 @@ get_near0(Agent,Percepts) :-
 	view_dirs(Agent,Dirs,Percepts))),!.
 
 % Look only at location tAgentGeneric is currently in.
-% :-decl_mpred(mudNearFeet(tAgentGeneric,ftListFn(tSpatialThing)),[predModule(user)]).
+% :-decl_mpred(mudNearFeet(tAgentGeneric,ftListFn(tSpatialThing)),[pred_module(user)]).
 mudNearFeet(Agent,PerceptsO) :-  get_feet0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
 
 get_feet0(Agent,Percepts):-
@@ -207,10 +207,10 @@ check_for_blocks(Agent) :-
 	add(visually_blocked(Agent,Blocked_Percepts)).
 check_for_blocks(_,[]).
 
-predArgTypes(mudSize(tSpatialThing,ftTerm)).
-predArgTypes(mudShape(tSpatialThing,vtShape)).
+pred_argtypes(mudSize(tSpatialThing,ftTerm)).
+pred_argtypes(mudShape(tSpatialThing,vtShape)).
 prologSingleValued(mudHeightOnObj(tSpatialThing,ftNumber)).
-predArgTypes(mudTexture(tSpatialThing,vtTexture)).
+pred_argtypes(mudTexture(tSpatialThing,vtTexture)).
 
 :-decl_mpred_hybrid(mudHeightOnObj(tSpatialThing,ftNumber)).
 % High enough to see over obstacles??
@@ -305,4 +305,4 @@ mask([K|Tail],SoFar,What) :-
 mask([Head|Tail],SoFar,What) :-
 	mask(Tail,[Head|SoFar],What).
 
-% :- include(library(prologmud/server/mud_footer)).
+% :- include(prologmud(mud_footer)).

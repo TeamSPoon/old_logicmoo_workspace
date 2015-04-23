@@ -426,7 +426,7 @@ badfood(MCall):- numbervars(MCall,0,_,[functor_name('VAR_______________________x
 % -- CODEBLOCK
 :- export(must/1).
 :-meta_predicate(must(0)).
-must(MCall):- skipWrapper,!, (MCall *-> true ; (trace,tlbugger:show_must_go_on)).
+must(MCall):- skipWrapper,!, (MCall *-> true ; dtrace(MCall)).
 must(MCall):- tlbugger:show_must_go_on,!,
  strip_module(MCall,M,Call),
  (
@@ -2826,7 +2826,8 @@ imploded_copyvars(C,CT):-must((source_variables(Vs),copy_term(C-Vs,CT-VVs),b_imp
 
 :-export(unnumbervars/2).
 
-unnumbervars(In,Out):-!,must(( term_string(In,String),term_string(Out,String))),!.
+unnumbervars(In,Out):- contains_term('$VAR'(I),In),atomic(I),!,must(( term_string(In,String),term_string(Out,String))),!.
+unnumbervars(In,Out):-In=Out,!.
 unnumbervars(X,YY):- fail,
  source_variables(Vs),copy_term(X-Vs,CXVs-CVs),b_implode_varnames(CVs),
      unnumbervars1(CXVs,YY),!.
@@ -2844,7 +2845,7 @@ unnumbervars1(X,YO):-
  must((source_variables(Vs),
    with_output_to(string(A),write_term(X,[numbervars(true),variable_names(Vs),character_escapes(true),ignore_ops(true),quoted(true)])))),
    must(atom_to_term(A,Y,NewVars)),
-   (NewVar==[]-> YO=X ; (length(TV,TVL),length(NewVars,NewVarsL),(NewVarsL==TVL-> (YO=X) ; (trace,add_newvars(NewVars),Y=X)))).
+   (NewVars==[]-> YO=X ; (length(TV,TVL),length(NewVars,NewVarsL),(NewVarsL==TVL-> (YO=X) ; (trace,add_newvars(NewVars),Y=X)))).
 
 add_newvars(_):-!.
 add_newvars(Vs):- (var(Vs);Vs=[]),!.
@@ -3441,10 +3442,10 @@ user:term_dbase_listing(Match):-
 term_non_listing(Match):- 
    format('/* term_non_listing(~q) => ~n',[Match]),
    '@'(ignore((doall((
-      logicmoo_i_pldoc:synth_clause_for(H,B,_Ref),
-      once(logicmoo_i_pldoc:ok_show(H)),
-      once(logicmoo_i_pldoc:slow_term_matches_hb(Match,H,B)),
-      logicmoo_i_pldoc:portray_hb(H,B),
+      synth_clause_for(H,B,_Ref),
+      once(ok_show(H)),
+      once(slow_term_matches_hb(Match,H,B)),
+      portray_hb(H,B),
       fail)))),'user'),
    format(' <= term_non_listing(~q) */ ~n',[Match]).
 
@@ -3455,11 +3456,12 @@ term_non_listing(Match):-
 prolog:locate_clauses(A, _) :- current_predicate(user:term_dbase_listing/1),call_no_cuts(user:term_dbase_listing(A)),fail.
 
 :-export((synth_clause_for/3)).
-synth_clause_for(H,B,Ref):- cur_predicate(_,H),synth_clause_ref(H,B,Ref).
+synth_clause_for(H,B,Ref):- user:((cur_predicate(_,H),synth_clause_ref(H,B,Ref))).
 
 
 :-export((synth_clause_ref/3)).
-synth_clause_ref(H,(fail,synth_clause_info(Props)),0):- once(pred_info(H,Props)).
+synth_clause_ref(M:H,B,Ref):-M==user,!,synth_clause_ref(H,B,Ref).
+synth_clause_ref(H,(fail,synth_clause_info(Props)),0):- (H\=(_:-_)),once(pred_info(H,Props)).
 synth_clause_ref(H,B,Ref):- predicate_property(M:H,number_of_clauses(_)),!,clause(M:H,B,Ref).
 
 :-export((term_matches_hb/3)).

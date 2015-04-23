@@ -53,7 +53,7 @@ kb_t(Call):- into_plist(Call,PLIST),[AH|LIST]=PLIST,!, kb_t(AH,LIST,PLIST).
 
 
 kb_t(AH,_,PLIST):-var(AH),!,kbp_t(PLIST).
-kb_t(dbase_t,PLIST,_):- !,kbp_t(PLIST).  % dbase_t is our versuion of '$holds' or call/N
+kb_t(t,PLIST,_):- !,kbp_t(PLIST).  % t is our versuion of '$holds' or call/N
 kb_t(genls,PLIST,_):- !,kbp_t([genls|PLIST]). % rewrite hack for SUMO callers
 kb_t(AH,PLIST,_):- is_holds_true(AH),!,kb_t(PLIST). % is_holds_true/1 is temp disabled for speed
 kb_t(AH,PLIST,_):- is_holds_false(AH),!,kb_f(PLIST). % is_holds_false(not).
@@ -105,19 +105,19 @@ link_to_holds_list(Pred,TargetPred):-
 
 /*
 cyckb_t(P,A1,A2,A3,A4,A5,A6,A7):- el_holds(P,A1,A2,A3,A4,A5,A6,A7,_,_).
-cyckb_t(P,A1,A2,A3,A4,A5,A6,A7):- dbase_t([P,A1,A2,A3,A4,A5,A6,A7]).
+cyckb_t(P,A1,A2,A3,A4,A5,A6,A7):- t([P,A1,A2,A3,A4,A5,A6,A7]).
 cyckb_t(P,A1,A2,A3,A4,A5,A6):- el_holds(P,A1,A2,A3,A4,A5,A6,_,_).
-cyckb_t(P,A1,A2,A3,A4,A5,A6):- dbase_t([P,A1,A2,A3,A4,A5,A6]).
+cyckb_t(P,A1,A2,A3,A4,A5,A6):- t([P,A1,A2,A3,A4,A5,A6]).
 cyckb_t(P,A1,A2,A3,A4,A5):-el_holds(P,A1,A2,A3,A4,A5,_,_).
-cyckb_t(P,A1,A2,A3,A4,A5):- dbase_t([P,A1,A2,A3,A4,A5]).
+cyckb_t(P,A1,A2,A3,A4,A5):- t([P,A1,A2,A3,A4,A5]).
 cyckb_t(P,A1,A2,A3,A4):- el_holds(P,A1,A2,A3,A4,_,_).
-cyckb_t(P,A1,A2,A3,A4):- dbase_t([P,A1,A2,A3,A4]).
+cyckb_t(P,A1,A2,A3,A4):- t([P,A1,A2,A3,A4]).
 cyckb_t(P,A1,A2,A3):- el_holds(P,A1,A2,A3,_,_).
-cyckb_t(P,A1,A2,A3):- dbase_t([P,A1,A2,A3]).
+cyckb_t(P,A1,A2,A3):- t([P,A1,A2,A3]).
 cyckb_t(P,A1,A2):- el_holds(P,A1,A2,_,_).
-cyckb_t(P,A1,A2):- dbase_t([P,A1,A2]).
+cyckb_t(P,A1,A2):- t([P,A1,A2]).
 cyckb_t(P,A1):- el_holds(P,A1,_,_).
-cyckb_t(P,A1):- dbase_t([P,A1]).
+cyckb_t(P,A1):- t([P,A1]).
 */
 
 :-dynamic(el_holds_DISABLED_KB/0).
@@ -152,12 +152,12 @@ cyckb_t_implies(ANTE,CONSEQ):- nop(cyckb_t_implies(ANTE,CONSEQ)),!,fail.
 kbp_t_list_prehook(PLIST,PLIST).
 
 :-export(kbp_t_list/1). 
-kbp_t_list(PLIST):- thlocal:useDbase_t, dbase_t(PLIST).
+kbp_t_list(PLIST):- thlocal:useDbase_t, t(PLIST).
 kbp_t_list(PLIST):- apply(cyckb_t,PLIST).
 
 
 :-export(kbp_t_list/2). 
-% kbp_t_list(PLIST,dbase_t(PLIST)):- thlocal:useDbase_t,  dbase_t(PLIST).
+% kbp_t_list(PLIST,t(PLIST)):- thlocal:useDbase_t,  t(PLIST).
 kbp_t_list(PLIST,Proof):- kbp_t_list(PLIST,_,Proof).
 
 % 
@@ -165,7 +165,7 @@ kbp_t_list(PLIST,Proof):- kbp_t_list(PLIST,_,Proof).
 
 :-export(kbp_t_list/3). 
 kbp_t_list(PLIST,Props):- tiny_kb_ASSERTION(PLIST,Props).
-kbp_t_list(PLIST,[amt(dbase_t)],Proof):- thlocal:useDbase_t,  CallList = [dbase_t|PLIST],Call=..CallList,/*Call,*/ clause(Call,true,Ref),clause(Head, Body, Ref),proof_from_clause(Head, Body, Proof).
+kbp_t_list(PLIST,[amt(t)],Proof):- thlocal:useDbase_t,  CallList = [t|PLIST],Call=..CallList,/*Call,*/ clause(Call,true,Ref),clause(Head, Body, Ref),proof_from_clause(Head, Body, Proof).
 kbp_t_list(PLIST,Props,Proof):- is_list(PLIST),!,kbp_t_list_1(PLIST,Props,Proof).
 kbp_t_list(PLIST,Props,Proof):- kbp_t_list_0(PLIST,Props,Proof).
 
@@ -180,7 +180,7 @@ prove_calllist(Functor,CallList,Proof):- dif(Body,true), Head =.. [Functor|CallL
 
 :-export(kb_mt/2).
 kb_mt(C,MT):- into_plist(C,PLIST),!,  append([el_holds|PLIST],[MT,_PropsV],CallList),Call=..CallList,Call.
-kb_mt(C,dbase_t):- thlocal:useDbase_t, dbase_t(C).
+kb_mt(C,t):- thlocal:useDbase_t, t(C).
 
 
 proof_from_clause(Head, true, Head):-!.
@@ -215,7 +215,7 @@ kbp_to_dbase_0:- once(time_call(hide_empty_strings)),fail.
 kbp_to_dbase_0:- time_call(drain_assert_next_buffer),!.
 
 kbp_to_dbase_no_more:- forall((into_plist(_Call,PLIST),kbp_t(PLIST)),assert_to_db_list(_F,PLIST)),
-   retractall(thglobal:use_cyc_database),tell('a.txt'),listing(dbase_t),listing('ASSERTION'),told,dmsg(done_dbase_t).
+   retractall(thglobal:use_cyc_database),tell('a.txt'),listing(t),listing('ASSERTION'),told,dmsg(done_dbase_t).
 
 
 :-export(move_implied/0).
@@ -288,7 +288,7 @@ callable_tf(P,2):- mpred_arity_pred(P),!,fail.
 callable_tf(F,A):- functor_safe(P,F,A),predicate_property(P,_),!.
 
 
-call_whichlist_t(dac(d,_,_,_),CALL,_):- dbase_t(CALL).
+call_whichlist_t(dac(d,_,_,_),CALL,_):- t(CALL).
 call_whichlist_t(dac(_,a,_,_),_,List):- assertion_t(List).
 call_whichlist_t(dac(_,_,c,_),CALL,_):- xcall_t(CALL).
 call_whichlist_t(dac(_,_,_,holds_t),CALL,_):- holds_t(CALL).
@@ -296,27 +296,27 @@ call_whichlist_t(dac(_,_,_,holds_t),CALL,_):- holds_t(CALL).
 call_which_t(DBS,P,A1,A2,A3,A4,A5,A6,A7):- callable_tf(P,7),List= [P,A1,A2,A3,A4,A5,A6,A7], CALL=..List, call_whichlist_t(DBS,CALL,List).
 call_which_t(dac(_,_,_,h),P,A1,A2,A3,A4,A5,A6,A7):- holds_t(P,A1,A2,A3,A4,A5,A6,A7).
 
-call_which_t(dac(d,_,_,_),P,A1,A2,A3,A4,A5,A6):- dbase_t(P,A1,A2,A3,A4,A5,A6).
+call_which_t(dac(d,_,_,_),P,A1,A2,A3,A4,A5,A6):- t(P,A1,A2,A3,A4,A5,A6).
 call_which_t(dac(_,a,_,_),P,A1,A2,A3,A4,A5,A6):- assertion_t([P,A1,A2,A3,A4,A5,A6]).
 call_which_t(dac(_,_,c,_),P,A1,A2,A3,A4,A5,A6):- callable_tf(P,6),xcall_t(P,A1,A2,A3,A4,A5,A6).
 call_which_t(dac(_,_,_,holds_t),P,A1,A2,A3,A4,A5,A6):- holds_t(P,A1,A2,A3,A4,A5,A6).
 
-call_which_t(dac(d,_,_,_),P,A1,A2,A3,A4,A5):- dbase_t(P,A1,A2,A3,A4,A5).
+call_which_t(dac(d,_,_,_),P,A1,A2,A3,A4,A5):- t(P,A1,A2,A3,A4,A5).
 call_which_t(dac(_,a,_,_),P,A1,A2,A3,A4,A5):- assertion_t([P,A1,A2,A3,A4,A5]).
 call_which_t(dac(_,_,c,_),P,A1,A2,A3,A4,A5):- callable_tf(P,5),xcall_t(P,A1,A2,A3,A4,A5).
 call_which_t(dac(_,_,_,holds_t),P,A1,A2,A3,A4,A5):- holds_t(P,A1,A2,A3,A4,A5).
 
-call_which_t(dac(d,_,c,_),P,A1,A2,A3,A4):- dbase_t(P,A1,A2,A3,A4).
+call_which_t(dac(d,_,c,_),P,A1,A2,A3,A4):- t(P,A1,A2,A3,A4).
 call_which_t(dac(_,a,_,_),P,A1,A2,A3,A4):- assertion_t([P,A1,A2,A3,A4]).
 call_which_t(dac(_,_,c,_),P,A1,A2,A3,A4):- callable_tf(P,4),xcall_t(P,A1,A2,A3,A4).
 call_which_t(dac(_,_,_,holds_t),P,A1,A2,A3,A4):- holds_t(P,A1,A2,A3,A4).
 
-call_which_t(dac(d,_,_,_),P,A1,A2,A3):- dbase_t(P,A1,A2,A3).
+call_which_t(dac(d,_,_,_),P,A1,A2,A3):- t(P,A1,A2,A3).
 call_which_t(dac(_,a,_,_),P,A1,A2,A3):- assertion_t([P,A1,A2,A3]).
 call_which_t(dac(_,_,c,_),P,A1,A2,A3):- callable_tf(P,3),xcall_t(P,A1,A2,A3).
 call_which_t(dac(_,_,_,holds_t),P,A1,A2,A3):- holds_t(P,A1,A2,A3).
 
-call_which_t(dac(d,_,_,_),P,A1,A2):- dbase_t(P,A1,A2).
+call_which_t(dac(d,_,_,_),P,A1,A2):- t(P,A1,A2).
 call_which_t(dac(_,a,_,_),P,A1,A2):- assertion_t([P,A1,A2]).
 call_which_t(dac(_,_,c,_),P,A1,A2):- callable_tf(P,2),xcall_t(P,A1,A2).
 call_which_t(dac(_,_,_,holds_t),P,A1,A2):- holds_t(P,A1,A2).
@@ -357,7 +357,7 @@ assertion_t(Call):- thglobal:use_cyc_database,!,with_assertions(thlocal:useOnlyE
 % end holds_t
 % ================================================================================
 
-:-user_ensure_loaded(logicmoo_i_call_kb).
+:-user:ensure_loaded(logicmoo_i_call_kb).
 
 % ================================================================================
 % begin holds_f

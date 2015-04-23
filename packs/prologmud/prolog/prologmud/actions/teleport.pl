@@ -15,7 +15,7 @@
 % :-swi_module(user). 
 :-swi_module(modTeleport, []).
 
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 
 % :- register_module_type (mtCommand).
 
@@ -33,4 +33,4 @@ user:agent_call_command(_Agent,actTeleport(Other,_TO,Where)):-
    add(mudAtLoc(Target,Where3D)).
 
 
-% :- include(library(prologmud/server/mud_footer)).
+% :- include(prologmud(mud_footer)).

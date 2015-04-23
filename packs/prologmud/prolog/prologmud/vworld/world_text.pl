@@ -9,7 +9,7 @@
 */
 % :-swi_module(world_text,[]).
 %      default_repl_obj_to_string/3,default_repl_writer/4,show_kb_via_pred/3,show_kb_preds/2,show_kb_preds/3,wasSuccess/2
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 
 % :-export(eng_fully_expand/2).
 
@@ -301,7 +301,7 @@ determinerRemoved(S0,Det,S):- fail,detWithSpace(WithSpace,String),string_concat(
 
 :-meta_predicate_transparent(query_description/1).
 query_description(mudDescription(I,S)):-  is_asserted(mudDescription(I,S)).
-query_description(dbase_t(mudDescription,I,S)):- is_asserted(mudDescription(I,S));is_asserted(mudKeyword(I,S)).
+query_description(t(mudDescription,I,S)):- is_asserted(mudDescription(I,S));is_asserted(mudKeyword(I,S)).
 
 
 :-meta_predicate_transparent(remove_description/1).

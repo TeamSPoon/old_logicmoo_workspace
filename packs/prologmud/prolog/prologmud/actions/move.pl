@@ -13,7 +13,7 @@
 % :-swi_module(user). 
 :-swi_module(modMove, []).
 
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 
 % :- register_module_type (mtCommand).
 
@@ -114,4 +114,4 @@ user:agent_call_command(Agent,actGo(Dir)) :-
 	call_update_charge(Agent,actMove).
 
 
-% :- include(library(prologmud/server/mud_footer)).
+% :- include(prologmud(mud_footer)).

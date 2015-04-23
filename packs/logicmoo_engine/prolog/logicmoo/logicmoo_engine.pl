@@ -1,7 +1,7 @@
 /** <module> logicmoo_i_mpred_pttp
 % Provides a prolog database replacement that uses an interpretation of SNARK
 %
-%  dbase_t/N
+%  t/N
 %  hybridRule/2
 %  
 %
@@ -1031,7 +1031,7 @@ snark_tell_boxes(Why,Assert):- trace,
   wdmsgl(snark_tell_boxes(assert_wfs(Why,Prolog))),
   unnumbervars(Prolog,PTTP), must(assert_wfs(Why,PTTP)).
 
-assert_wfs(Why,PrologI):-thglobal:as_prolog(PrologI,Prolog), with_assertions(thlocal:current_why(Why,Prolog),show_call(pfcAdd(Prolog))).
+assert_wfs(Why,PrologI):-thglobal:as_prolog(PrologI,Prolog), with_assertions(thlocal:current_why(Why,Prolog),show_call(pfc_add(Prolog))).
 
 
 boxlog_to_prolog(V,V):-is_ftVar(V),!.
@@ -1132,14 +1132,14 @@ end_of_file.
 
 :-dynamic(user:int_proven_t/10).
 
-int_proven_t(P, X, Y, E, F, A, B, C, G, D) :- dbase_t(P,X,Y),
+int_proven_t(P, X, Y, E, F, A, B, C, G, D) :- t(P,X,Y),
         test_and_decrement_search_cost(A, 0, B),
         C=[H, [proven_t(P, X, Y), D, E, F]|I],
         G=[H|I].
 
 
 :-dynamic(user:int_assumed_t/10).
-int_assumed_t(P, X, Y, E, F, A, B, C, G, D) :- dbase_t(P,X,Y),
+int_assumed_t(P, X, Y, E, F, A, B, C, G, D) :- t(P,X,Y),
         test_and_decrement_search_cost(A, 0, B),
         C=[H, [assumed_t(P, X, Y), D, E, F]|I],
         G=[H|I].

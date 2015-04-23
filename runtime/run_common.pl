@@ -48,7 +48,7 @@ add_game_dir(GAMEDIR,Else):- add_to_search_path_first(game, GAMEDIR),now_try_gam
 now_try_game_dir(Else):-  enumerate_files(game('.'), GAMEDIR) *-> 
   ((exists_directory(GAMEDIR) -> 
     with_all_dmsg(( 
-      % forall(enumerate_files(game('**/*.pl'),X),user_ensure_loaded(X)),
+      % forall(enumerate_files(game('**/*.pl'),X),user:ensure_loaded(X)),
       forall(no_repeats_old(X,enumerate_files(game('**/*.plmoo'),X)),declare_load_dbase(X)))); (fmt(missing(GAMEDIR)),Else)));  (fmt(no_game_dir),Else).
 
 
@@ -144,7 +144,7 @@ enqueue_player_command(P,C):-foc_current_player(P),assertz_if_new(thglobal:playe
 
 
 % [Required] load and start mud
-:-  ensure_loaded(library(prologmud/server/mud_startup)).
+:-  ensure_loaded(prologmud(mud_startup)).
 
 startup_mod:run_setup_now:-
    within_user((

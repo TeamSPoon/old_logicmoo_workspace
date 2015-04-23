@@ -79,13 +79,16 @@
 :- dynamic  agent_list/1.
 :- dynamic mudDescription/2.
 
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 % :- register_module_type (utility).
 
 :- ensure_loaded(world_2d).
 :- ensure_loaded(world_text).
+:- ensure_loaded(world_text_output).
 :- ensure_loaded(world_effects).
 :- ensure_loaded(world_events).
+:- ensure_loaded(world_agent).
+:- ensure_loaded(world_npc).
 :- if_file_exists(ensure_loaded(logicmoo('vworld/world_spawning.pl'))).
 
 :-export(isaOrSame/2).
@@ -112,7 +115,7 @@ anyInst(O):-exisitingThing(O).
 /*
 
 
-% predArgTypes(typeGenls(col,metaclass)).
+% pred_argtypes(typeGenls(col,metaclass)).
 
 %OLD user:decl_database_hook(change(assert,_),typeGenls(_,MC)):-assert_isa(MC,ttTypeType).
 
@@ -148,7 +151,7 @@ ttSpatialType(SubType):-member(SubType,[tAgentGeneric,tItem,tRegion]).
 %createableSubclassType(S,T):-mpred_call(  ttSpatialType(T)),is_asserted(genls(S,T)).
 %createableSubclassType(T,tSpatialThing):-mpred_call( ttSpatialType(T)).
 
-
+create_agent(P):-functor(P,isKappaFn,_),!.
 create_agent(P):-create_agent(P,[]).
 create_agent(P,List):-must_det(create_instance(P,tAgentGeneric,List)).
 
@@ -274,8 +277,8 @@ create_instance_0(What,Type,Props):- leash(+call),trace,dtrace,trace_or_throw(dm
 
 
 
-% already convered mudPossess(Who,Thing):-genlInverse(W,mudPossess),into_mpred_form(dbase_t(W,Thing,Who),Call),mpred_call(Call).
-% already convered mudPossess(Who,Thing):-genlPreds(mudPossess,W),into_mpred_form(dbase_t(W,Who,Thing),Call),mpred_call(Call).
+% already convered mudPossess(Who,Thing):-genlInverse(W,mudPossess),into_mpred_form(t(W,Thing,Who),Call),mpred_call(Call).
+% already convered mudPossess(Who,Thing):-genlPreds(mudPossess,W),into_mpred_form(t(W,Who,Thing),Call),mpred_call(Call).
 
 
-% % :- include(library(prologmud/server/mud_footer)).
+% % :- include(prologmud(mud_footer)).

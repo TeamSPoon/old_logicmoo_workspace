@@ -35,7 +35,7 @@ is_holds_true_not_hilog(HOFDS):-is_holds_true(HOFDS),\+ hilog_functor(HOFDS).
 is_holds_true(Prop):- notrace((atom(Prop),is_holds_true0(Prop))),!.
 
 % k,p,..
-is_holds_true0(Prop):-arg(_,vvv(holds,holds_t,dbase_t,asserted_dbase_t,assertion_t,assertion,secondOrder,firstOrder),Prop).
+is_holds_true0(Prop):-arg(_,vvv(holds,holds_t,t,asserted_dbase_t,assertion_t,assertion,secondOrder,firstOrder),Prop).
 is_holds_true0(Prop):-atom_concat(_,'_t',Prop).
 
 :-export(is_2nd_order_holds/1).
@@ -56,7 +56,7 @@ is_holds_false0(Prop,Stem):-atom_concat(Stem,'_f',Prop).
 :- thread_local thlocal:override_hilog/1.
 
 current_hilog(Dbase_t):- thlocal:override_hilog(Dbase_t),!.
-current_hilog(dbase_t).
+current_hilog(t).
 
 
 
@@ -121,7 +121,7 @@ additiveOp((/)).
 /** <module> logicmoo_i_mpred_dbase_t
 % Provides a prolog dabase in these predicates...
 %
-%  dbase_t/N
+%  t/N
 %  hybridRule/2
 %  
 %
@@ -144,17 +144,17 @@ if_result(TF,Call):-(TF->Call;true).
 % ========================================
 
 :- dbase_mod(M),export((
-          % M:dbase_t/1,
-          M:dbase_t/2,
-          M:dbase_t/3,
-          M:dbase_t/4,
-          M:dbase_t/5,
-          M:dbase_t/6,
-          M:dbase_t/7,
-          M:dbase_t/8,
-          M:dbase_t/9,
-          M:dbase_t/10,
-          M:dbase_t/11)).
+          % M:t/1,
+          M:t/2,
+          M:t/3,
+          M:t/4,
+          M:t/5,
+          M:t/6,
+          M:t/7,
+          M:t/8,
+          M:t/9,
+          M:t/10,
+          M:t/11)).
 
 :- dbase_mod(M),export((
           % M:holds_t/1,
@@ -170,19 +170,19 @@ if_result(TF,Call):-(TF->Call;true).
           M:holds_t/11)).
 
 
-:-export((dbase_t/1,hasInstance/2)).
+:-export((t/1,hasInstance/2)).
 :- dynamic((
-         % dbase_t/1,
-          dbase_t/2,
-          dbase_t/3,
-          dbase_t/4,
-          dbase_t/5,
-          dbase_t/6,
-          dbase_t/7,
-          dbase_t/8,
-          dbase_t/9,
-          dbase_t/10,
-          dbase_t/11,
+         % t/1,
+          t/2,
+          t/3,
+          t/4,
+          t/5,
+          t/6,
+          t/7,
+          t/8,
+          t/9,
+          t/10,
+          t/11,
         %  asserted_dbase_t/1,
           asserted_dbase_t/2,
           asserted_dbase_t/3,
@@ -214,7 +214,7 @@ into_plist(In,Out):-into_plist_arities(2,12,In,Out).
 :-export(into_plist_arities/4).
 into_plist_arities(Min,Max,PLIST,PLISTO):- var(PLIST),!,between(Min,Max,X),length(PLIST,X),PLISTO=PLIST.
 into_plist_arities(_,_,[P|LIST],[P|LIST]):-var(P),!.
-into_plist_arities(_,_,[dbase_t|PLIST],PLIST):-!.  % dbase_t is our versuion of '$holds' or call/N
+into_plist_arities(_,_,[t|PLIST],PLIST):-!.  % t is our versuion of '$holds' or call/N
 into_plist_arities(_,_,plist(P,LIST),[P|LIST]):-!.
 into_plist_arities(_,_,Call,PLIST):-Call=..PLIST. % finally the fallthrue
 
@@ -228,39 +228,39 @@ never_dbase_mpred(arity).
 % begin holds_t
 % ================================================================================
 
-:-dynamic dbase_t/2.
-% dbase_t(C,I):- trace_or_throw(dbase_t(C,I)),hasInstance(C,I). % ,fail,loop_check_term(isa_backchaing(I,C),hasInstance(C,I),fail).
+:-dynamic t/2.
+% t(C,I):- trace_or_throw(t(C,I)),hasInstance(C,I). % ,fail,loop_check_term(isa_backchaing(I,C),hasInstance(C,I),fail).
 
-%dbase_t([P|LIST]):- !,dbase_plist_t(P,LIST).
-%dbase_t(naf(CALL)):-!,not(dbase_t(CALL)).
-%dbase_t(not(CALL)):-!,dbase_f(CALL).
-dbase_t(CALL):- into_plist_arities(3,10,CALL,[P|LIST]),dbase_plist_t(P,LIST).
-dbase_plist_t(P,[]):-!,dbase_t(P).
-dbase_plist_t(P,LIST):-var(P),!,is_list(LIST),CALL=..[dbase_t,P|LIST],debugOnError((CALL)).
-dbase_plist_t(dbase_t,[P|LIST]):-!, dbase_plist_t(P,LIST).
+%t([P|LIST]):- !,dbase_plist_t(P,LIST).
+%t(naf(CALL)):-!,not(t(CALL)).
+%t(not(CALL)):-!,dbase_f(CALL).
+t(CALL):- into_plist_arities(3,10,CALL,[P|LIST]),dbase_plist_t(P,LIST).
+dbase_plist_t(P,[]):-!,t(P).
+dbase_plist_t(P,LIST):-var(P),!,is_list(LIST),CALL=..[t,P|LIST],debugOnError((CALL)).
+dbase_plist_t(t,[P|LIST]):-!, dbase_plist_t(P,LIST).
 dbase_plist_t(user:mpred_prop,[C,A,I]):-!,ground(I:C),user:mpred_prop(C,A,I).
 dbase_plist_t(isa,[I,C]):-!,hasInstance(C,I).
 dbase_plist_t(P,_):-never_dbase_mpred(P),!,fail.
 dbase_plist_t(P,[L|IST]):-is_holds_true(P),!,dbase_plist_t(L,IST).
 dbase_plist_t(P,LIST):-is_holds_false(P),!,dbase_f(LIST).
-dbase_plist_t(P,LIST):- CALL=..[dbase_t,P|LIST],debugOnError(CALL).
+dbase_plist_t(P,LIST):- CALL=..[t,P|LIST],debugOnError(CALL).
 
 % loop_check_mpred(Call):- current_predicate(ireq/1), loop_check_term(ireq(Call),loop_check_mpred(Call),fail).
 loop_check_mpred(Call):- !, fail,not(thlocal:infInstanceOnly(_)),loop_check_local(ireq(Call),loop_check_mpred(Call),fail).
-% loop_check_mpred(Call):-loop_check_local(mpred_call(dbase_t,Call),fail).
+% loop_check_mpred(Call):-loop_check_local(mpred_call(t,Call),fail).
 
-dbase_t(P,A1,A2):- loop_check_mpred(dbase_t(P,A1,A2)).
-dbase_t(P,A1,A2):- mpred_pa_call(P,2,call(P,A1,A2)).
-dbase_t(P,A1,A2,A3):- loop_check_mpred(dbase_t(P,A1,A2,A3)).
-dbase_t(P,A1,A2,A3):- mpred_pa_call(P,3,call(P,A1,A2,A3)).
-dbase_t(P,A1,A2,A3,A4):- loop_check_mpred(dbase_t(P,A1,A2,A3,A4)).
-dbase_t(P,A1,A2,A3,A4):- mpred_pa_call(P,4,call(P,A1,A2,A3,A4)).
-dbase_t(P,A1,A2,A3,A4,A5):- loop_check_mpred(dbase_t(P,A1,A2,A3,A4,A5)).
-dbase_t(P,A1,A2,A3,A4,A5):- mpred_pa_call(P,5,call(P,A1,A2,A3,A4,A5)).
-dbase_t(P,A1,A2,A3,A4,A5,A6):- loop_check_mpred(dbase_t(P,A1,A2,A3,A4,A5,A6)).
-dbase_t(P,A1,A2,A3,A4,A5,A6):- mpred_pa_call(P,6,call(P,A1,A2,A3,A4,A5,A6)).
-dbase_t(P,A1,A2,A3,A4,A5,A6,A7):- loop_check_mpred(dbase_t(P,A1,A2,A3,A4,A5,A6,A7)).
-dbase_t(P,A1,A2,A3,A4,A5,A6,A7):- mpred_pa_call(P,7,call(P,A1,A2,A3,A4,A5,A6,A7)).
+t(P,A1,A2):- loop_check_mpred(t(P,A1,A2)).
+t(P,A1,A2):- mpred_pa_call(P,2,call(P,A1,A2)).
+t(P,A1,A2,A3):- loop_check_mpred(t(P,A1,A2,A3)).
+t(P,A1,A2,A3):- mpred_pa_call(P,3,call(P,A1,A2,A3)).
+t(P,A1,A2,A3,A4):- loop_check_mpred(t(P,A1,A2,A3,A4)).
+t(P,A1,A2,A3,A4):- mpred_pa_call(P,4,call(P,A1,A2,A3,A4)).
+t(P,A1,A2,A3,A4,A5):- loop_check_mpred(t(P,A1,A2,A3,A4,A5)).
+t(P,A1,A2,A3,A4,A5):- mpred_pa_call(P,5,call(P,A1,A2,A3,A4,A5)).
+t(P,A1,A2,A3,A4,A5,A6):- loop_check_mpred(t(P,A1,A2,A3,A4,A5,A6)).
+t(P,A1,A2,A3,A4,A5,A6):- mpred_pa_call(P,6,call(P,A1,A2,A3,A4,A5,A6)).
+t(P,A1,A2,A3,A4,A5,A6,A7):- loop_check_mpred(t(P,A1,A2,A3,A4,A5,A6,A7)).
+t(P,A1,A2,A3,A4,A5,A6,A7):- mpred_pa_call(P,7,call(P,A1,A2,A3,A4,A5,A6,A7)).
 
 mpred_pa_call(F,A,Call):-arity(F,A),current_predicate(F/A),call(Call).
 
@@ -282,7 +282,7 @@ holds_t(P,A1,A2):- isCycPredArity_ignoreable(P,2),which_t(DBS),(call_which_t(DBS
 holds_t(P,A1):- isCycPredArity_ignoreable(P,1),which_t(DBS),(call_which_t(DBS,P,A1);call_mt_t(DBS,P,A1,_,_)).
 
 
-% holds_relaxed_t(P,A1,A2):-var(A1),var(A2),!,dbase_t(P,A1,A2).
+% holds_relaxed_t(P,A1,A2):-var(A1),var(A2),!,t(P,A1,A2).
 holds_relaxed_t(P,A1,A2):-
   isCycPredArity_ignoreable(P,2),which_t(DBS),
       relax_term(P,PR,A1,R1,A2,R2),
@@ -293,10 +293,10 @@ holds_relaxed_0_t(DBS,P,A1,A2):- call_mt_t(DBS,P,A1,A2,_,_).
 
 /*
 holds_relaxed_0_t(dac(_,a,_,_),P,A1,A2):- assertion_t([P,A1,A2]).
-holds_relaxed_0_t(dac(d,_,_,_),P,A1,A2):- dbase_t(P,A1,A2).
+holds_relaxed_0_t(dac(d,_,_,_),P,A1,A2):- t(P,A1,A2).
 holds_relaxed_0_t(dac(_,_,_,h),P,A1,A2):- call_which_t(DBS,P,A1,A2).
 holds_relaxed_0_t(DBS,P,A1,A2):- call_mt_t(DBS,P,A1,A2,_,_).
-holds_relaxed_0_t(_DBS,P,A1,A2):- ground((P,A1)), TEMPL=..[P,T1,_],dbase_t(argSingleValueDefault,TEMPL,2,A2),req(isa(A1,T1)),!.
+holds_relaxed_0_t(_DBS,P,A1,A2):- ground((P,A1)), TEMPL=..[P,T1,_],t(argSingleValueDefault,TEMPL,2,A2),req(isa(A1,T1)),!.
 */
 
 holds_t([AH,P|LIST]):- is_holds_true(AH),!,holds_plist_t(P,LIST).

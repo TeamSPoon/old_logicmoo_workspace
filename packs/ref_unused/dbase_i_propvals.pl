@@ -28,30 +28,30 @@ assert_argIsa(Prop,N,Type):-show_call_failure(add_fast(argIsa(Prop,N,Type))).
 
 % CANT :-export(transitive_other/4).
 
-choose_val(Prop,Obj,Value):- thlocal:useOnlyExternalDBs,!, body_call_cyckb(dbase_t(Prop,Obj,Value)).
-choose_val(Prop,Obj,Value):- var(Obj),nonvar(Value),!,mdif(Obj,Value),is_asserted(dbase_t(Prop,Obj,Value)).
+choose_val(Prop,Obj,Value):- thlocal:useOnlyExternalDBs,!, body_call_cyckb(t(Prop,Obj,Value)).
+choose_val(Prop,Obj,Value):- var(Obj),nonvar(Value),!,mdif(Obj,Value),is_asserted(t(Prop,Obj,Value)).
 choose_val(Prop,Obj,Value):- mdif(Obj,Value),choose_right(Prop,Obj,Value).
 
 generate_candidate_arg_values(Prop,N,Obj):-call_vars_tabled(Obj,generate_candidate_arg_values0(Prop,N,Obj)).
 
-generate_candidate_arg_values0(Prop,N,R):- cached_isa(Prop,completelyAssertedCollection),arg(N,vv(Obj,Value),R),!,is_asserted(dbase_t(Prop,Obj,Value)).
+generate_candidate_arg_values0(Prop,N,R):- cached_isa(Prop,completelyAssertedCollection),arg(N,vv(Obj,Value),R),!,is_asserted(t(Prop,Obj,Value)).
 generate_candidate_arg_values0(Prop,N,Obj):- once((argIsa_known(Prop,N,Type),type_has_instances(Type))),!,cached_isa(Obj,Type).
-generate_candidate_arg_values0(Prop,N,R):- arg(N,vv(Obj,Value),R),!,is_asserted(dbase_t(Prop,Obj,Value)).
+generate_candidate_arg_values0(Prop,N,R):- arg(N,vv(Obj,Value),R),!,is_asserted(t(Prop,Obj,Value)).
 
 type_has_instances(Type):-  atom(Type),Type\=ftTerm,Type\=tCol,not_ft(Type),isa(_,Type),!.
 
-choose_right(Prop,Obj,Value):- thlocal:useOnlyExternalDBs,!, body_call_cyckb(dbase_t(Prop,Obj,Value)).
+choose_right(Prop,Obj,Value):- thlocal:useOnlyExternalDBs,!, body_call_cyckb(t(Prop,Obj,Value)).
 choose_right(Prop,Obj,Value):- nonvar(Obj),!,choose_for(Prop,Obj,RValue),RValue=Value.
-choose_right(Prop,Obj,Value):- cached_isa(Prop,completelyAssertedCollection),not(cached_isa(Prop,prologSingleValued)),!,is_asserted(dbase_t(Prop,Obj,Value)).
+choose_right(Prop,Obj,Value):- cached_isa(Prop,completelyAssertedCollection),not(cached_isa(Prop,prologSingleValued)),!,is_asserted(t(Prop,Obj,Value)).
 choose_right(Prop,Obj,Value):- findall(Obj,generate_candidate_arg_values(Prop,1,Obj),Objs),Objs\=[],!,member(Obj,Objs),nonvar(Obj),choose_for(Prop,Obj,Value).
-choose_right(Prop,Obj,Value):- dmsg(var_choose_right(Prop,Obj,Value)),!,dtrace,is_asserted(dbase_t(Prop,Obj,Value)).
+choose_right(Prop,Obj,Value):- dmsg(var_choose_right(Prop,Obj,Value)),!,dtrace,is_asserted(t(Prop,Obj,Value)).
 choose_right(Prop,Obj,Value):- choose_for(Prop,Obj,RValue),RValue=Value.
 
 :-export(choose_for/3).
 
 choose_for(mudAtLoc,Obj,_):- nonvar(Obj),isa_asserted(Obj,tRegion),!,fail.
 choose_for(Prop,Obj,Value):- var(Obj),trace_or_throw(var_choose_for(Prop,Obj,Value)).
-choose_for(Prop,Obj,Value):- not(is_fact_consistent(dbase_t(Prop,Obj,Value))),!,fail.
+choose_for(Prop,Obj,Value):- not(is_fact_consistent(t(Prop,Obj,Value))),!,fail.
 choose_for(Prop,Obj,Value):- nonvar(Value),!,choose_for(Prop,Obj,RValue),!,RValue=Value.
 choose_for(Prop,Obj,Value):- user:mpred_prop(Prop,prologSingleValued),!,must(choose_one(Prop,Obj,Value)),!.
 choose_for(Prop,Obj,Value):- no_repeats(choose_each(Prop,Obj,Value)).
@@ -66,21 +66,21 @@ choose_one(Prop,Obj,Value):- create_someval(Prop,Obj,RValue),ground(create_somev
 choose_each(Prop,Obj,Value):- hasInstance(completeExtentAsserted, Prop),!,choose_asserted(Prop,Obj,Value).
 choose_each(Prop,Obj,Value):- one_must(choose_asserted(Prop,Obj,Value),(fallback_value(Prop,Obj,Value),maybe_cache(Prop,Obj,Value,Obj))).
 
-% choose_asserted(Prop,Obj,Value):- dbase_t(Prop,Obj,Value). % ,must_det(is_asserted(dbase_t(Prop,Obj,Value))).
-choose_asserted(Prop,Obj,Value):- is_asserted(dbase_t(Prop,Obj,Value)),!.
+% choose_asserted(Prop,Obj,Value):- t(Prop,Obj,Value). % ,must_det(is_asserted(t(Prop,Obj,Value))).
+choose_asserted(Prop,Obj,Value):- is_asserted(t(Prop,Obj,Value)),!.
 choose_asserted(Prop,Obj,Value):- choose_asserted_mid_order(Prop,Obj,Value),!.
 % CANT choose_asserted(Prop,Obj,Value):- nonvar(Obj),transitive_other(Prop,1,Obj,What),choose_asserted_mid_order(Prop,Obj,Value),maybe_cache(Prop,Obj,Value,What).
 
 choose_asserted_mid_order(Prop,Obj,Value):-loop_check(choose_asserted_mid_order_all(Prop,Obj,Value),fail).
-choose_asserted_mid_order_all(Prop,Obj,Value):- mpred_call(dbase_t(Prop,Obj,Value)),!.
+choose_asserted_mid_order_all(Prop,Obj,Value):- mpred_call(t(Prop,Obj,Value)),!.
 choose_asserted_mid_order_all(Prop,Obj,_Value):- atom(Prop), Fact=.. [Prop,Obj,_],thlocal:infInstanceOnly(Fact),!,fail.
 choose_asserted_mid_order_all(Prop,Obj,Value):- is_asserted(genlPreds(Other,Prop)),choose_asserted(Other,Obj,Value).
 % choose_asserted_mid_order_all(Prop,Obj,Value):- is_asserted(genlInverse(Prop,Other)),choose_val(Other,Value,Obj).
 
 :-export(create_someval/3).
 create_someval(Prop,Obj,Value):- ground(Prop-Obj-Value),!,dmsg(error_create_someval(Prop,Obj,Value)).
-create_someval(Prop,Obj,Value):- into_mpred_form(dbase_t(Prop,Obj,Value),Fact),asserted_or_deduced(Fact),!.
-create_someval(Prop,Obj,Value):- into_mpred_form(dbase_t(Prop,Obj,Value),Fact),not(test_tl(thlocal:noRandomValues,Fact)),create_random_fact(Fact),!.
+create_someval(Prop,Obj,Value):- into_mpred_form(t(Prop,Obj,Value),Fact),asserted_or_deduced(Fact),!.
+create_someval(Prop,Obj,Value):- into_mpred_form(t(Prop,Obj,Value),Fact),not(test_tl(thlocal:noRandomValues,Fact)),create_random_fact(Fact),!.
 create_someval(Prop,Obj,_):- Fact=.. [Prop,Obj,_],test_tl(thlocal:infAssertedOnly,Fact),!,fail.
 create_someval(Prop,Obj,Value):- fallback_value(Prop,Obj,DValue),!,Value=DValue.
 create_someval(Pred,_Arg1,Value):- must_det_l([arity(Pred,Last),argIsa(Pred,Last,Type),random_instance(Type,Value,nonvar(Value))]).
@@ -99,7 +99,7 @@ save_fallback(Fact):-not(ground(Fact)),trace_or_throw(var_save_fallback(Fact)).
 save_fallback(Fact):-is_fact_consistent(Fact),add(Fact).
 
 save_fallback(Obj,Prop,Value):-not(ground(padd(Obj,Prop,Value))),trace_or_throw(var_save_fallback(Obj,Prop,Value)).
-save_fallback(Obj,Prop,Value):-is_fact_consistent(dbase_t(Prop,Obj,Value)),padd(Obj,Prop,Value).
+save_fallback(Obj,Prop,Value):-is_fact_consistent(t(Prop,Obj,Value)),padd(Obj,Prop,Value).
 maybe_cache(_Prop,_Obj,_Value,_What):-!.
 maybe_cache(Prop,Obj,Value,What):-not(not(maybe_cache_0(Prop,Obj,Value,What))).
 
@@ -109,7 +109,7 @@ checkNoArgViolation(_):- (bad_idea),!.
 checkNoArgViolation(Fact):-get_prop_args(Fact,Prop,ARGS),checkNoArgViolation_p_args(Prop,ARGS),!.
 checkNoArgViolation(_).
 
-get_prop_args(Fact,Prop,ARGS):-Fact=..[dbase_t,Prop|ARGS],!.
+get_prop_args(Fact,Prop,ARGS):-Fact=..[t,Prop|ARGS],!.
 get_prop_args(Fact,Prop,ARGS):-Fact=..[Prop|ARGS],!.
 
 dont_check_args(Fact):-functor(Fact,F,A),dont_check_args(F,A).
@@ -173,10 +173,10 @@ deduce_argN(Prop,N,_,ObjectTypes,Type):- suggestedType(Prop,N,ObjectTypes,Type,F
 deduce_argN(_ ,_ ,Obj,[],Type):- tCol(Type), assert_isa(Obj,Type),!.
 deduce_argN(Prop,N,_,[OType|_],_Type):-assert_subclass_on_argIsa(Prop,N,OType),!.
 
-maybe_cache_0(Prop,Obj,Value,_What):- checkNoArgViolation(Prop,Obj,Value), is_asserted(dbase_t(Prop,Obj,Value)),!.
+maybe_cache_0(Prop,Obj,Value,_What):- checkNoArgViolation(Prop,Obj,Value), is_asserted(t(Prop,Obj,Value)),!.
 maybe_cache_0(Prop,Obj,Value,What):- padd(Obj,Prop,Value),
   ignore((What\=Obj,
-   into_mpred_form(dbase_t(Prop,What,_),Trigger),hooked_asserta(on_change_once(change(retract,_),Trigger,del(dbase_t(Prop,Obj,Value)))))).
+   into_mpred_form(t(Prop,What,_),Trigger),hooked_asserta(on_change_once(change(retract,_),Trigger,del(t(Prop,Obj,Value)))))).
 
 :-export(on_change_once/3).
 :-export(on_change_always/3).
@@ -208,7 +208,7 @@ is_fact_consistent(Fact):-into_mpred_form(Fact,MForm), not(fact_is_false(MForm,_
 
 
 :-export(fallback_value/3).
-fallback_value(Prop,Obj,Value):- isa(Obj,ObjType),is_asserted(dbase_t(Prop,isTypeFn(ObjType),Value)),!.
+fallback_value(Prop,Obj,Value):- isa(Obj,ObjType),is_asserted(t(Prop,isTypeFn(ObjType),Value)),!.
 fallback_value(_Prop,Obj,_Value):-var(Obj),!,fail.
 fallback_value(Prop,_Obj,_Value):-no_fallback(Prop,2),!,fail.
 fallback_value(Prop,Obj,Value):-Fact=..[Prop,Obj,Value], 
@@ -289,7 +289,7 @@ add_missing_instance_defaults_ilc(P):-
 
 % OLD FALLBACK SYSTEM:
 :-export(gather_props_for/3).
-gather_props_for(_Op,Obj,Props):-setof(Prop,(between(1,7,L),length(REST,L),(dbase_t([P,Obj|REST])),Prop=..[P|REST]),Props).
+gather_props_for(_Op,Obj,Props):-setof(Prop,(between(1,7,L),length(REST,L),(t([P,Obj|REST])),Prop=..[P|REST]),Props).
 */
 
 /*

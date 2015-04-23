@@ -9,7 +9,7 @@
 %
 :-swi_module(modScansrc, []).
 
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 
 % :- register_module_type (mtCommand).
 
@@ -105,7 +105,7 @@ include_moo_file_ni_1(M):- atomic_list_concat([_,_|_],'_c_',M),!.
 include_moo_file_ni_1(M):- source_file_property(M,_),!.
 include_moo_file_ni_1(M):- source_file_property(_,includes(M)),!.
 
-include_moo_file_ni_1(M):- user_ensure_loaded(M).
+include_moo_file_ni_1(M):- user:ensure_loaded(M).
 
 
-% :- include(library(prologmud/server/mud_footer)).
+% :- include(prologmud(mud_footer)).

@@ -17,13 +17,8 @@
 
 :- include(mud_header).
 
-user:file_search_path(logicmoo,pack(prologmud)).
-/*
-:-export(include_moo_files/1).
-include_moo_files(Mask):- expand_file_name(Mask,X), forall(member(E,X),user_ensure_loaded(E)).
-*/
+:- prolog_load_context(directory,Dir),asserta(user:file_search_path(prologmud,Dir)).
 
-in_user_startup(Call):- '@'(Call,user).
 
 % standard header used in all files that all modules are loaded (therefore useful for when(?) the day comes that modules *can*only*see their explicitly imported modules)
 %:- prolog_flag(unknown,error,fail). % Not sure if this is needed for Quintus
@@ -43,19 +38,17 @@ in_user_startup(Call):- '@'(Call,user).
          ensure_loaded(library(logicmoo/util/logicmoo_util_strings)),
          use_module(library(logicmoo/util/logicmoo_util_terms)),
          use_module(library(logicmoo/util/logicmoo_util_dcg)),
-         use_module(library(prologmud/server/mud))),'user').
+         use_module(prologmud(server/mud))),'user').
 */
 
-% :- user_ensure_loaded(moo_loader).
 
 % logicmoo vworld mud server
-%:- user_ensure_loaded(library(prologmud/vworld/world)).
-:- user_ensure_loaded(library(prologmud/vworld/world_npc)).
-:- user_ensure_loaded(library(prologmud/server/mud_telnet)).
-:- user_ensure_loaded(library(prologmud/vworld/world_text_output)).
 
+:- user:ensure_loaded(logicmoo(logicmoo_base)).
+:- user:ensure_loaded(prologmud(server/mud_telnet)).
+:- user:ensure_loaded(prologmud(vworld/world)).
 
-:- user_ensure_loaded(library(prologmud/server/mud_testing)).
+:- user:ensure_loaded(prologmud(server/mud_testing)).
 
 
 /*
@@ -127,7 +120,7 @@ make_qlfs:-
 :-export(user_ensure_nl_loaded/1).
 user_ensure_nl_loaded(F):-load_files([F],[expand(true),if(changed),qcompile(auto)]).
 
-% :- user_ensure_loaded(logicmoo(pldata/tiny_kb)).
+% :- user:ensure_loaded(logicmoo(pldata/tiny_kb)).
 /*
 :- user_ensure_nl_loaded(logicmoo(pldata/nldata_freq_pdat)).
 :- user_ensure_nl_loaded(logicmoo(pldata/nldata_BRN_WSJ_LEXICON)).
@@ -136,52 +129,50 @@ user_ensure_nl_loaded(F):-load_files([F],[expand(true),if(changed),qcompile(auto
 :- user_ensure_nl_loaded(logicmoo(pldata/nldata_dictionary_some01)).
 :- user_ensure_nl_loaded(logicmoo(pldata/nldata_talk_db_pdat)).
 */
-% :- user_ensure_loaded(logicmoo(pldata/tt0_00022_cycl)).
-% :- user_ensure_loaded(logicmoo(pldata/hl_holds)).
-% :- user_ensure_loaded(logicmoo(pldata/mworld0)).
+% :- user:ensure_loaded(logicmoo(pldata/tt0_00022_cycl)).
+% :- user:ensure_loaded(logicmoo(pldata/hl_holds)).
+% :- user:ensure_loaded(logicmoo(pldata/mworld0)).
 % :- user_ensure_nl_loaded(logicmoo(pldata/transform_dump)).
-% :- catch(user_ensure_loaded(logicmoo(pldata/withvars_988)),_,true).
+% :- catch(user:ensure_loaded(logicmoo(pldata/withvars_988)),_,true).
 download_and_install_el:-
   shell('wget -N http://logicmoo.org/devel/LogicmooDeveloperFramework/TEMP~/www.logicmoo.org/downloads/datafiles/PlDataBinary.zip',_),
   shell('unzip -u -d ../src_assets/pldata/ PlDataBinary.zip'),
-  catch(user_ensure_loaded(logicmoo(pldata/el_assertions)),E,fmt('Cant use el_assertions',E)).
+  catch(user:ensure_loaded(logicmoo(pldata/el_assertions)),E,fmt('Cant use el_assertions',E)).
 
-%:- xperimental_big_data->catch(user_ensure_loaded(logicmoo(pldata/el_assertions)),_,download_and_install_el);true.
+%:- xperimental_big_data->catch(user:ensure_loaded(logicmoo(pldata/el_assertions)),_,download_and_install_el);true.
 
 % :- asserta(loaded_external_kbs),show_call(kbp_to_dbase_t).
 
-:- user_ensure_loaded(logicmoo('vworld/world_agent.pl')).
-
-:- user_ensure_loaded(logicmoo(parsing/parser_imperative)).
-
-:- user_ensure_loaded(logicmoo('vworld/world.pl')).
+:- user:ensure_loaded(prologmud(vworld/world_agent)).
+:- user:ensure_loaded(prologmud(parsing/parser_imperative)).
+:- user:ensure_loaded(prologmud(vworld/world)).
 
 /*
-:- user_ensure_loaded(logicmoo(parsing/parser_talk)). 
-:- user_ensure_loaded(logicmoo(parsing/parser_e2c)). 
-:- user_ensure_loaded(logicmoo(parsing/parser_CURT)). 
-:- user_ensure_loaded(logicmoo(parsing/parser_chat80)). 
+:- user:ensure_loaded(logicmoo(parsing/parser_talk)). 
+:- user:ensure_loaded(logicmoo(parsing/parser_e2c)). 
+:- user:ensure_loaded(logicmoo(parsing/parser_CURT)). 
+:- user:ensure_loaded(logicmoo(parsing/parser_chat80)). 
 */
 
-%:- user_ensure_loaded(logicmoo(dbase/dbase_ext_lisp)).
-%:- user_ensure_loaded(logicmoo(dbase/dbase_ext_chr)).
+%:- user:ensure_loaded(logicmoo(dbase/dbase_ext_lisp)).
+%:- user:ensure_loaded(logicmoo(dbase/dbase_ext_chr)).
 
 
 
 
 % NPC planners
-:- include_moo_files(library(prologmud/mobs/'?*.pl')).
+:- include_moo_files(prologmud(mobs/'?*.pl')).
 :- include_moo_files('../src_assets/mobs/?*.pl').
 :- xperimental->include_moo_files('../external/XperiMental/src_incoming/mobs/?*.pl');true.
 
 
 % Action/Commands implementation
-:- include_moo_files(library(prologmud/actions/'?*.pl')).
+:- include_moo_files(prologmud(actions/'?*.pl')).
 :- include_moo_files('../src_assets/actions/?*.pl').
 :- xperimental->include_moo_files('../external/XperiMental/src_incoming/actions/?*.pl');true.
 
 % New Objects
-:- include_moo_files(library(prologmud/objs/'?*.pl')).
+:- include_moo_files(prologmud(objs/'?*.pl')).
 :- include_moo_files('../src_assets/objs/?*.pl').
 :- xperimental->include_moo_files('../external/XperiMental/src_incoming/actions/?*.pl');true.
 
@@ -211,22 +202,22 @@ user:agent_text_command(Agent,["run",Term], Agent,actProlog(Term)):- ignore(Term
 %:-forall(make_tabled_perm(grab_argsIsa(F,Types)),dmsg(grab_argsIsa(F,Types))).
 
 
-:- forall(filematch('../*/*/basic*.plmoo', X),(dmsg(ensure_plmoo_loaded(X)),ensure_plmoo_loaded(X))).
+:- forall(filematch('*/*.plmoo', X),(dmsg(ensure_plmoo_loaded(X)),ensure_plmoo_loaded(X))).
 
 % [Optionaly] Start the telent server
 :-at_start(toploop_telnet:start_mud_telnet(4000)).
 
 
 % standard header used in all files that all modules are loaded (therefore useful for when(?) the day comes that modules *can*only*see their explicitly imported modules)
-% :- include(library(prologmud/server/mud_header)).
+% :- include(prologmud(mud_header)).
 
 % These contain the definition of the object cols.
 % Load the map file appropriate for the world being used.
 % Load the mud files appropriate for the mobs being used.
-:- forall(filematch(logicmoo('*/?*.plmoo'), X),dmsg(X)).
-:- ensure_plmoo_loaded(logicmoo('*/?*.plmoo')).
-:- forall(filematch(logicmoo('*/*/?*.plmoo'), X),dmsg(X)).
-:- ensure_plmoo_loaded(logicmoo('*/*/?*.plmoo')).
+:- forall(filematch(prologmud('*/?*.plmoo'), X),dmsg(X)).
+:- trace,ensure_plmoo_loaded(prologmud('*/?*.plmoo')).
+:- forall(filematch(prologmud('*/*/?*.plmoo'), X),dmsg(X)).
+:- ensure_plmoo_loaded(prologmud('*/*/?*.plmoo')).
 
 % puts world into running state
 % :- must(old_setup).
@@ -235,7 +226,7 @@ user:agent_text_command(Agent,["run",Term], Agent,actProlog(Term)):- ignore(Term
 
 
 % standard footer to clean up any header defined states
-:- include(library(prologmud/server/mud_footer)).
+:- include(prologmud(mud_footer)).
 /*
 % Load datalog
 :- if_flag_true(fullStart, ((use_module(logicmoo('des/des.pl')),
@@ -292,3 +283,5 @@ lundef :- A = [],
   ==
 
 */
+
+:-pfc_untrace.

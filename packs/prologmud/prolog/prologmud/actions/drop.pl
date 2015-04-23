@@ -11,7 +11,7 @@
 % :-swi_module(user). 
 :-swi_module(modDrop, []).
 
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 
 % :- register_module_type (mtCommand).
 
@@ -40,4 +40,4 @@ update_charge(Agent,actDrop) :- add(mudEnergy(Agent,-1)).
 
 %:-must_det(show_call(get_agent_text_command(agent1,[drop,item1],_R,_CMD))).
 
-% :- include(library(prologmud/server/mud_footer)).
+% :- include(prologmud(mud_footer)).

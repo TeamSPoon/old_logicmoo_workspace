@@ -235,12 +235,8 @@ mdel(C0):- dmsg(warn(failed(mdel(C0)))),!,fail.
 % -  clr(Retractall)
 % clr(C0):- dmsg(clr(C0)),fail,dbase_modify(change(retract,all),/*to_exp*/(C0)),verify_sanity(ireq(C0)->(dmsg(warn(incomplete_CLR(C0))));true).
 clr(P):- agenda_do_prequery,forall(P, must((( 
- doall((  
-  must(pfcGetSupportORNil(P,Support)),
-  must(show_call(pfcFilterSupports(Support,fact,Results))),
-  must(pfc_maptree(pfcRemE,Results)),
-  pfcRemE(P),
-  sanity(not(pfcSupported2(local,P))))),
+ doall((  pfc_rem2(P),
+   sanity(not(pfc_tms_supported(local,P))))),
                  not(P))))).
 
 pfcRemE(P):-var(P),!.
@@ -251,13 +247,13 @@ pfcRemE(pfcCall(_)):-!.
 pfcRemE(consult(P)):-!,pfcRemE(P).
 pfcRemE([P]):-!,pfcRemE(P).
 pfcRemE(P):-pfcRem3(P),fail.
-pfcRemE(P):-pfcRem2(P,_),fail.
+pfcRemE(P):-pfc_rem2(P,_),fail.
 pfcRemE(P):-pfcRem1(P,_),fail.
 pfcRemE(P):-predicate_property(P,number_of_clauses(_)),predicate_property(P,dynamic),clause(P,true,Ref),erase(Ref),fail.
 pfcRemE(_).
 
 % -  preq(Query) = query with P note
-preq(P,C0):- agenda_do_prequery,dbase_op(query(dbase_t,P),C0).
+preq(P,C0):- agenda_do_prequery,dbase_op(query(t,P),C0).
 
 % -  req(Query) = Normal query
 req(C0):- nop(dmsg(req(C0))), preq(req,/*to_exp*/(C0)).
@@ -307,13 +303,13 @@ add_0(dynamic(Term)):- !,must(get_arity(Term,F,A)), must(dynamic(F/A)).
 add_0(:-(Term)):- !, must(add_fast(:-(Term))).
 % add_0(C0):-check_override(add(C0)),!.
 % add_0(Skipped):- ground(Skipped),implied_skipped(Skipped),!. % ,dmsg(implied_skipped(Skipped)).
-add_0(C0):- ignore((ground(C0),asserta(user:already_added_this_round(C0)))),must(pfcAdd_fast(C0)),!.
+add_0(C0):- ignore((ground(C0),asserta(user:already_added_this_round(C0)))),must(pfc_add_fast(C0)),!.
 add_0(A):-trace_or_throw(fmt('add/1 is failing ~q.',[A])).
 
 
 implied_skipped(genls(C0,C0)).
 implied_skipped(props(_,[])).
-implied_skipped(Skipped):-compound(Skipped), not(functor(Skipped,_,1)),fail, (dbase_t(Skipped);out_of_dbase_t(Skipped)).
+implied_skipped(Skipped):-compound(Skipped), not(functor(Skipped,_,1)),fail, (t(Skipped);out_of_dbase_t(Skipped)).
 implied_skipped(Skipped):-user:already_added_this_round(Skipped),(is_asserted(Skipped)).
 
 
@@ -325,9 +321,9 @@ dbase_name_variables([Var|Vars]):-
    dbase_name_variables(Vars).
 
 
-:-export(pfcAdd_fast/1).
+:-export(pfc_add_fast/1).
 % -  add(Assertion)
-% pfcAdd_fast(C0):- must_det((pfcAdd_fast(C0), xtreme_debug(once(ireq(C0);(with_all_dmsg((debug(blackboard),show_call(pfcAdd_fast(C0)),rtrace(pfcAdd_fast(C0)),dtrace(ireq(C0))))))))),!.
+% pfc_add_fast(C0):- must_det((pfc_add_fast(C0), xtreme_debug(once(ireq(C0);(with_all_dmsg((debug(blackboard),show_call(pfc_add_fast(C0)),rtrace(pfc_add_fast(C0)),dtrace(ireq(C0))))))))),!.
 add_fast(Term):-dbase_numbervars_with_names(Term),dbase_modify(change(assert,add), Term),!. % ,xtreme_debug(ireq(C0)->true;dmsg(warn(failed_ireq(C0)))))),!.
 
 % -  upprop(Obj,PropSpecs) update the properties
@@ -336,11 +332,11 @@ upprop(C0):- add(C0).
 % -  padd(Obj,Prop,Value)
 padd(Obj,PropSpecs):- add((props(Obj,PropSpecs))).
 % -  padd(Obj,Prop,Value)
-padd(Obj,Prop,Value):- add((dbase_t(Prop,Obj,Value))).
+padd(Obj,Prop,Value):- add((t(Prop,Obj,Value))).
 % -  prop(Obj,Prop,Value)
-prop(Obj,Prop,Value):- req(dbase_t(Prop,Obj,Value)).
+prop(Obj,Prop,Value):- req(t(Prop,Obj,Value)).
 % -  prop_or(Obj,Prop,Value,OrElse)
-prop_or(Obj,Prop,Value,OrElse):- one_must(ireq(dbase_t(Prop,Obj,Value)),Value=OrElse).
+prop_or(Obj,Prop,Value,OrElse):- one_must(ireq(t(Prop,Obj,Value)),Value=OrElse).
 
 
 
@@ -441,12 +437,12 @@ db_must_asserta_confirmed_sv(CNEW,A,NEW):-dmsg(unconfirmed(db_must_asserta_confi
 
 with_assert_op_override(Op,Call):-with_assertions(thlocal:assert_op_override(Op),Call).
 
-test_expand_units(IN):-fully_expand(query(dbase_t,must),IN,OUT),dmsg(test_expand_units((IN->OUT))).
+test_expand_units(IN):-fully_expand(query(t,must),IN,OUT),dmsg(test_expand_units((IN->OUT))).
 
 
 
 dbase_modify(Op,                 G):- (var(Op);var(G)),!,trace_or_throw(var_database_modify_op(Op,  G )).
-dbase_modify(Op,                 G):- G\=predArgTypes(_),fully_expand(Op,G,GG),not_variant(G,GG),!,dbase_modify(Op, GG ),!.
+dbase_modify(Op,                 G):- G\=pred_argtypes(_),fully_expand(Op,G,GG),not_variant(G,GG),!,dbase_modify(Op, GG ),!.
 dbase_modify(_,  (:-include(FILE))):- !,must(load_data_file_now(FILE)).
 dbase_modify(Op,  (:-(G))         ):- !,must(with_assert_op_override(Op,debugOnError(G))).
 dbase_modify(P,                  G):- thlocal:noDBaseMODs(_),!,dmsg(noDBaseMODs(P,G)).
@@ -485,14 +481,14 @@ database_modify_assert(change(assert,AorZ),      G,GG):-database_modify_assert_m
 
 database_modify_assert_must(Op,G,GG):-must(database_modify_assert_4(Op,G,GG)).
 
-database_modify_assert_4(change(assert,_),_, GG):- thglobal:pfcManageHybrids,!,copy_term(GG,GGG),(\+ \+ pfcAdd_fast(GGG)),!,show_call_failure(variant(GG,GGG)),!.
+database_modify_assert_4(change(assert,_),_, GG):- thglobal:pfcManageHybrids,!,copy_term(GG,GGG),(\+ \+ pfc_add_fast(GGG)),!,show_call_failure(variant(GG,GGG)),!.
 database_modify_assert_4(change(assert,AorZ), _,GG):- Op = change(assert,AorZ),                              
                               database_modify_5(Op,GG),!,
                               database_modify_6(Op,GG),
                               database_modify_7(Op,GG),
                               ignore(show_call_failure(database_modify_8(Op,GG))),!.
 
-database_modify_5(change(assert,_), GG):- thglobal:pfcManageHybrids,!,copy_term(GG,GGG),(\+ \+ pfcAdd_fast(GGG)),!,show_call_failure(variant(GG,GGG)),!.
+database_modify_5(change(assert,_), GG):- thglobal:pfcManageHybrids,!,copy_term(GG,GGG),(\+ \+ pfc_add_fast(GGG)),!,show_call_failure(variant(GG,GGG)),!.
 database_modify_5(Op,GG):- copy_term(GG,GGG),must((must_storage_op(Op,GGG), sanity(variant(GG,GGG)))),!.
 database_modify_6(Op,GG):- copy_term(GG,GGE),doall(must(call_no_cuts(expire_post_change(Op,GGE)))),sanity(variant(GG,GGE)),!.
 database_modify_7(Op,GG):- copy_term(GG,GGH),must((run_database_hooks(Op,GGH),sanity(variant(GG,GGH)))),!.

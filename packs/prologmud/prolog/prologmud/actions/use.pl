@@ -8,11 +8,11 @@
 % :-swi_module(user). 
 :-swi_module(moduleUse, [do_act_use/3]).
 
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 
 % :- register_module_type (mtCommand).
 
-predArgTypes(action_verb_useable(vtVerb,tCol,ftTerm(tPred),ftTerm(tPred),ftTerm(tPred))).
+pred_argtypes(action_verb_useable(vtVerb,tCol,ftTerm(tPred),ftTerm(tPred),ftTerm(tPred))).
 
 genls(isEach('PortableObject','ProtectiveAttire',tStowAble),tWieldAble).
 genls('FluidReservoir',tDrinkAble).
@@ -98,31 +98,31 @@ get_add_remove_use(ActUse,Agent,NowWielding,Obj,Unstowed):-
  must_det_l([
      action_verb_useable(ActUse,Wieldable,NowWielding,Possessing,Unstowed),
       show_call_failure(isa(Obj,Wieldable)),
-  %   show_call_failure(ireq(dbase_t(Unstowed,Agent,Obj))),
-  %   show_call_failure(not(ireq(dbase_t(NowWielding,Agent,Obj)))),
-     show_call_failure(ireq(dbase_t(Possessing,Agent,Obj)))]).
+  %   show_call_failure(ireq(t(Unstowed,Agent,Obj))),
+  %   show_call_failure(not(ireq(t(NowWielding,Agent,Obj)))),
+     show_call_failure(ireq(t(Possessing,Agent,Obj)))]).
 
 % Is the obect going to stick around after use-ing, either as is or in the agent's possession.
 do_change_use(ActUse,Agent,Obj,vTakenDeletes):-
         get_add_remove_use(ActUse,Agent,NowWielding,Obj,Unstowed),
         detatch_object(Obj),
-        clr(dbase_t(Unstowed,Agent,Obj)),
-        add(dbase_t(NowWielding,Agent,Obj)),    
+        clr(t(Unstowed,Agent,Obj)),
+        add(t(NowWielding,Agent,Obj)),    
         must_post_use(ActUse,Agent,Obj),
         detatch_object(Obj).
 do_change_use(ActUse,Agent,_Source,vTakenCopyFn(What)) :-
         get_add_remove_use(ActUse,Agent,NowWielding,Obj,Unstowed),
         create_new_object([What],Obj),
         detatch_object(Obj),
-        clr(dbase_t(Unstowed,Agent,Obj)),
-        add(dbase_t(NowWielding,Agent,Obj)),        
+        clr(t(Unstowed,Agent,Obj)),
+        add(t(NowWielding,Agent,Obj)),        
         must_post_use(ActUse,Agent,Obj).
 do_change_use(ActUse,Agent,Obj,vTakenStays) :-        
         get_add_remove_use(ActUse,Agent,NowWielding,Obj,Unstowed),
         mudAtLoc(Obj,Was),
         detatch_object(Obj),
-        clr(dbase_t(Unstowed,Agent,Obj)),
-        add(dbase_t(NowWielding,Agent,Obj)),
+        clr(t(Unstowed,Agent,Obj)),
+        add(t(NowWielding,Agent,Obj)),
         must_post_use(ActUse,Agent,Obj),
         detatch_object(Obj),
         add(mudAtLoc(Obj,Was)).
@@ -131,16 +131,16 @@ do_change_use(ActUse,Agent,Obj,vTakenMoves) :-
  must_det_l([
         get_add_remove_use(ActUse,Agent,NowWielding,Obj,Unstowed),        
         detatch_object(Obj),
-        clr(dbase_t(Unstowed,Agent,Obj)),
-	add(dbase_t(NowWielding,Agent,Obj)),
+        clr(t(Unstowed,Agent,Obj)),
+	add(t(NowWielding,Agent,Obj)),
         must_post_use(ActUse,Agent,Obj)]).
 
 must_post_use(ActUse,Agent,Obj):-
       must_det_l([
        get_add_remove_use(ActUse,Agent,NowWielding,Obj,Unstowed),
        fmt([Agent,ActUse,Obj]),       
-       REQ = dbase_t(NowWielding,Agent,Obj),
-       CLR = dbase_t(Unstowed,Agent,Obj),
+       REQ = t(NowWielding,Agent,Obj),
+       CLR = t(Unstowed,Agent,Obj),
        (ireq(REQ) -> true; trace_or_throw(ireq(REQ))),
        (ireq(CLR) -> trace_or_throw(not(ireq(REQ))); true)]),!.
 
@@ -148,8 +148,8 @@ must_post_use(ActUse,Agent,Obj):-
 update_charge(Agent,_ActWield) :- 
         padd(Agent,mudEnergy(-2)).
 
-% :- include(library(prologmud/server/mud_footer)).
+% :- include(prologmud(mud_footer)).
 
 
 
-% :- include(library(prologmud/server/mud_footer)).
+% :- include(prologmud(mud_footer)).

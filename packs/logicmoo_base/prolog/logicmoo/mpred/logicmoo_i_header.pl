@@ -18,8 +18,8 @@
 
 :-dynamic(user_db:grant_openid_server/2).
 :-multifile(user_db:grant_openid_server/2).
-:- multifile user:'$was_imported_kb_content$'/2.
-:- discontiguous(user:'$was_imported_kb_content$'/2).
+:- multifile '$was_imported_kb_content$'/2.
+:- discontiguous('$was_imported_kb_content$'/2).
 
 
 :-dynamic('$was_imported_kb_content$'/2).

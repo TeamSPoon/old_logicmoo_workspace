@@ -27,7 +27,7 @@
 
 % :- trace,leash(+all),meta_predicate_transparent run_mud_tests().
 
-:- include(library(prologmud/server/mud_header)).
+:- include(prologmud(mud_header)).
 % :- register_module_type (utility).
 
 % do some sanity testing (expects the startrek world is loaded)

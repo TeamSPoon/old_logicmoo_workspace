@@ -27,7 +27,7 @@
 :- op(1050,xfx,('<=')).
 :- op(1100,fx,('=>')).
 :- op(1150,xfx,('::::')).
-:- decl_type(predArgTypes).
+:- decl_type(pred_argtypes).
 :- decl_type(functorDeclares).
 :- decl_type(prologMultiValued).
 :- decl_type(prologSingleValued).
@@ -42,9 +42,9 @@
 :- decl_type(tPathway).
 :- forall(mpred_hooks:mpred_is_trigger(F),must((decl_type(F),add(isa(F,functorDeclares)),add(genls(F,tPred))))).
 
-:- add((isa(isEach(prologMultiValued,prologOrdered,prologNegByFailure,predArgTypes,prologPTTP,prologHybrid,predCanHaveSingletons,code,code,prologMacroHead,prologListValued,prologSingleValued),tCol))).
+:- add((isa(isEach(prologMultiValued,prologOrdered,prologNegByFailure,pred_argtypes,prologPTTP,prologHybrid,predCanHaveSingletons,code,code,prologMacroHead,prologListValued,prologSingleValued),tCol))).
 
-:- add((isa(isEach(prologMultiValued,prologOrdered,prologNegByFailure,predArgTypes,prologPTTP,prologHybrid,predCanHaveSingletons,code,code,prologMacroHead,prologListValued,prologSingleValued),functorDeclares))).
+:- add((isa(isEach(prologMultiValued,prologOrdered,prologNegByFailure,pred_argtypes,prologPTTP,prologHybrid,predCanHaveSingletons,code,code,prologMacroHead,prologListValued,prologSingleValued),functorDeclares))).
 
 :-dynamic(subFormat/2).
 
@@ -56,13 +56,13 @@ tCol(X)=>{decl_type(X)}.
 :- meta_predicate(neg(0)).
 :- dynamic(neg(0)).
 
-:-dynamic(predModule/2).
-:-decl_mpred(predModule/2).
+:-dynamic(pred_module/2).
+:-decl_mpred(pred_module/2).
 
 :-dynamic(argIsa/3).
 :-decl_mpred(argIsa/3).
 
-isa(Spec,tCol)=>mpred_arity(Spec,1).
+isa(Spec,tCol)=>arity(Spec,1).
 
 % TODO ADD props(I,[C])
 % :-pfc_add((mpred_prop(I,C)=>{add((isa(I,tPred),decl_mpred(I,C)))})).
@@ -121,12 +121,12 @@ notequal(C,B) <= equal(A,C),notequal(A,B).
 
 % :- decl_mpred_pfc neg/1.
 :- decl_mpred_hybrid genls/2.
-:- decl_mpred_hybrid(( tCol/1, genls/2, predArgTypes/1)).
+:- decl_mpred_hybrid(( tCol/1, genls/2, pred_argtypes/1)).
 :- decl_mpred_hybrid(typeProps/2).
-:- must(mpred_arity(typeProps,2)).
-:- add((argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,predArgTypes,prologHybrid,prologPTTP,predCanHaveSingletons,code,prologMacroHead,prologListValued,prologSingleValued),1,tPred))).
-:- add((argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,predArgTypes,prologHybrid,prologPTTP,code,prologMacroHead,prologListValued,prologSingleValued),2,ftListFn(ftVoprop)))).
-:- add((genls(isEach(prologMultiValued,prologOrdered,prologNegByFailure,predArgTypes,prologHybrid,prologPTTP,code,prologMacroHead,prologListValued,prologSingleValued),tPred))).
+:- must(arity(typeProps,2)).
+:- add((argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,pred_argtypes,prologHybrid,prologPTTP,predCanHaveSingletons,code,prologMacroHead,prologListValued,prologSingleValued),1,tPred))).
+:- add((argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,pred_argtypes,prologHybrid,prologPTTP,code,prologMacroHead,prologListValued,prologSingleValued),2,ftListFn(ftVoprop)))).
+:- add((genls(isEach(prologMultiValued,prologOrdered,prologNegByFailure,pred_argtypes,prologHybrid,prologPTTP,code,prologMacroHead,prologListValued,prologSingleValued),tPred))).
 :- assert_hasInstance(tCol,tCol).
 :- begin_transform_moo_preds.
 :- debug.
@@ -138,7 +138,7 @@ notequal(C,B) <= equal(A,C),notequal(A,B).
 :- decl_mpred_hybrid(argSingleValueDefault, 3).
 :- decl_mpred_hybrid(disjointWith/2).
 :- decl_mpred_hybrid(instTypeProps/3).
-:- decl_mpred_hybrid(predModule, 2).
+:- decl_mpred_hybrid(pred_module, 2).
 :- decl_mpred_hybrid(predProxyAssert,2).
 :- decl_mpred_hybrid(predProxyQuery, 2).
 :- decl_mpred_hybrid(predProxyRetract, 2).
@@ -168,7 +168,7 @@ notequal(C,B) <= equal(A,C),notequal(A,B).
 :-add(isa(tObj,ttSpatialType)).
 :-add(isa(tRegion,ttSpatialType)).
 :-add(isa(ttFormatType,ttAbstractType)).
-:-add(predArgTypes(typeGenls(ttTypeType,tCol))).
+:-add(pred_argtypes(typeGenls(ttTypeType,tCol))).
 
 
 subFormat(ftDeplictsFn(tCol),ftSpec).
@@ -199,9 +199,9 @@ isa(ftString,ttFormatType).
 isa(isInstFn,tFunction).
 isa(isKappaFn,tFunction).
 isa(prologMultiValued, tCol).
-mpred_arity(ftListFn,1).
-mpred_arity(isLikeFn,2).
-mpred_arity(ftDeplictsFn,1).
+arity(ftListFn,1).
+arity(isLikeFn,2).
+arity(ftDeplictsFn,1).
 ttFormatted(ftDice(ftInt,ftInt,ftInt)).
 ttFormatted(ftListFn(ftRest)).
 ttFormatted(ftDeplictsFn(tCol)).
@@ -240,22 +240,22 @@ ttFormatType(ftVoprop).
 % :-dynamic((disjointWith/2,genls/2)).
 
 
-predArgTypes(argQuotedIsa(tRelation,ftInt,ttFormatType)).
-predArgTypes(argIsa(tRelation,ftInt,tCol)).
-predArgTypes(argSingleValueDefault(prologSingleValued,ftInt,ftTerm)).
-predArgTypes(formatted_resultIsa(ttFormatType,tCol)).
+pred_argtypes(argQuotedIsa(tRelation,ftInt,ttFormatType)).
+pred_argtypes(argIsa(tRelation,ftInt,tCol)).
+pred_argtypes(argSingleValueDefault(prologSingleValued,ftInt,ftTerm)).
+pred_argtypes(formatted_resultIsa(ttFormatType,tCol)).
 
-predArgTypes(predModule(tPred,tPrologModule)).
-predArgTypes(quotedDefnIff(ttFormatType,ftTerm)).
-predArgTypes(defnNecessary(ttFormatType,ftTerm)).
-predArgTypes(defnIff(ttFormatType,ftTerm)).
-predArgTypes(quotedDefnIff(ttFormatType,ftTerm)).
+pred_argtypes(pred_module(tPred,tPrologModule)).
+pred_argtypes(quotedDefnIff(ttFormatType,ftTerm)).
+pred_argtypes(defnNecessary(ttFormatType,ftTerm)).
+pred_argtypes(defnIff(ttFormatType,ftTerm)).
+pred_argtypes(quotedDefnIff(ttFormatType,ftTerm)).
 
 
 
-predArgTypes(isLikeFn(tPred,tCol)).
-predArgTypes('=>'(ftAskable,ftAssertable)).
-predArgTypes('<='(ftAssertable,ftAskable)).
+pred_argtypes(isLikeFn(tPred,tCol)).
+pred_argtypes('=>'(ftAskable,ftAssertable)).
+pred_argtypes('<='(ftAssertable,ftAskable)).
 prologHybrid(instTypeProps(ftID,tCol,ftRest(ftVoprop))).
 prologHybrid(subFormat(ttFormatType,ttFormatType)).
 prologMacroHead(macroSomethingDescription(ftTerm,ftListFn(ftString))).
@@ -267,7 +267,7 @@ prologMacroHead(pddlTypes(ftListFn(tCol))).
 prologMultiValued(comment(ftTerm,ftString)).
 prologMultiValued(genlInverse(tPred,tPred)).
 prologMultiValued(genlPreds(tPred,tPred)).
-prologMultiValued(predModule(tRelation,ftAtom)).
+prologMultiValued(pred_module(tRelation,ftAtom)).
 prologMultiValued(predProxyAssert(prologMultiValued,ftTerm)).
 prologMultiValued(predProxyQuery(prologMultiValued,ftTerm)).
 % prologMultiValued('<=>'(ftTerm,ftTerm)).
@@ -380,9 +380,9 @@ quotedDefnIff(ftBoolean,is_boolean).
 quotedDefnIff(ftText,is_string).
 quotedDefnIff(ftCodeIs(SomeCode),SomeCode):-nonvar(SomeCode).
 
-isa(mpred_arity,tBinaryPredicate).
+isa(arity,tBinaryPredicate).
 
-(mpred_arity(Pred,2),tPred(Pred)) <=> isa(Pred,tBinaryPredicate).
+(arity(Pred,2),tPred(Pred)) <=> isa(Pred,tBinaryPredicate).
 prologHybrid(relationMostInstance(tBinaryPredicate,tCol,ftValue)).
 relationMostInstance(BP,_,_)=>tBinaryPredicate(BP).
 prologHybrid(relationAllInstance(tBinaryPredicate,tCol,ftValue)).
@@ -442,7 +442,7 @@ dividesBetween(tAgentGeneric,tPlayer,tNpcPlayer).
 => tCol(tRegion).
 => tCol(tContainer).
 
-(mpred_prop(_,predArgTypes(ArgTypes)),{is_declarations(ArgTypes)}) => ({is_declarations(ArgTypes)}, predArgTypes(ArgTypes)).
+(mpred_prop(_,pred_argtypes(ArgTypes)),{is_declarations(ArgTypes)}) => ({is_declarations(ArgTypes)}, pred_argtypes(ArgTypes)).
 
 
 % tCol(Type),(tBinaryPredicate(Pred)/(functor(G,Pred,2),G=..[Pred,isInstFn(Type),Value])), G => relationMostInstance(Pred,Type,Value).
@@ -548,7 +548,7 @@ quotedIsa(I,C)<=term_is_ft(I,C).
 implies(and(resultIsaArg('$VAR'('FUNC'), 5), arg5Genl('$VAR'('FUNC'), '$VAR'('COL'))), resultIsa('$VAR'('FUNC'), '$VAR'('COL'))).
 
 
-%((genlPreds(Col1,Col2),(mpred_arity(Col1,1);mpred_arity(Col2,1)))=>genls(Col1,Col2)).
+%((genlPreds(Col1,Col2),(arity(Col1,1);arity(Col2,1)))=>genls(Col1,Col2)).
 %((genls(Col1,Col2),(tPred(Col1);tPred(Col2)))=>genlPreds(Col1,Col2)).
 
 :-decl_type('UnaryPredicate').
@@ -557,7 +557,7 @@ implies(and(resultIsaArg('$VAR'('FUNC'), 5), arg5Genl('$VAR'('FUNC'), '$VAR'('CO
 
 genls(tPartOfobj,tItem).
 
-((isa(Pred,prologSingleValued),mpred_arity(Pred,Arity))
+((isa(Pred,prologSingleValued),arity(Pred,Arity))
   =>
   {
    dynamic(Pred/Arity),
@@ -566,7 +566,7 @@ genls(tPartOfobj,tItem).
    append(Left,[B],BeforeList),
   After =.. [Pred|AfterList],
   Before =.. [Pred|BeforeList]},
-  (After,{Before, \==(A , B)} => {pfcRem2(Before)})).
+  (After,{Before, \==(A , B)} => {pfc_rem2(Before)})).
 
 
 % dividesBetween(tItem,tPathway).
@@ -603,7 +603,7 @@ conflict(C) => {resolveConflict(C)}.
 % meta rules to schedule inferencing.
 
 % resolve conflicts asap
-pfc_select(conflict(X)) :- pfc_queue(conflict(X)).
+pfc_select(conflict(X),S) :- pfc_queue(conflict(X),S).
   
 % a pretty basic conflict.
 ((neg(P), P ) => conflict(P)).
@@ -646,7 +646,7 @@ relationMostInstance(Pred,Type,Value),{G=..[Pred,Inst,Value]} => pfc_default(isa
 
 :-decl_mpred_hybrid((zDefault/1,zPenguin/1,zFly/1,zBird/1,zCanary/1)).
 
-'UnaryPredicate'(Pred)<=>(mpred_arity(Pred,1),tPred(Pred)).
+'UnaryPredicate'(Pred)<=>(arity(Pred,1),tPred(Pred)).
 
 'UnaryPredicate'(zDefault).
 (zDefault(P)/pfc_literal(P))  =>  (~neg(P) => P).
@@ -665,12 +665,12 @@ zDefault((P => Q))/pfc_literal(Q) => ((P, ~neg(Q) => Q)).
     P2 =.. [C2,X]},
   (P1 => P2).
 
-(genlPreds(C1,C2),mpred_arity(C1,2)) =>
+(genlPreds(C1,C2),arity(C1,2)) =>
   {P1 =.. [C1,X,Y],
     P2 =.. [C2,X,Y]},
   (P1 => P2).
 
-(genlPreds(C1,C2),mpred_arity(C1,3)) =>
+(genlPreds(C1,C2),arity(C1,3)) =>
   {P1 =.. [C1,X,Y,Z],
     P2 =.. [C2,X,Y,Z]},
   (P1 => P2).

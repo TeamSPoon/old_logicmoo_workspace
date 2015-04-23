@@ -33,7 +33,7 @@
 
 :-must((pfc_add(q),pfc_must(q))).
 
-:-listing(pfc_sup_db).
+:-listing(spft).
 :-listing((=>)).
 :-pfc_add(=>b).
 =>b.
@@ -458,7 +458,7 @@ resolveConflict(C) :-
 % meta rules to schedule inferencing.
 
 % resolve conflicts asap
-pfc_select(conflict(X)) :- pfc_queue(conflict(X)).
+pfc_select(conflict(X),S) :- pfc_queue(conflict(X),S).
   
 
 /*
@@ -769,7 +769,7 @@ or(P1,P2,P3) =>
 
 %% some simple tests to see if Pfc is working properly
 
-:- pfcTrace.
+:- pfc_trace.
 
 time(Call,Time) :-
   statistics(runtime,_),
@@ -1918,7 +1918,7 @@ resolveConflict(C) :-
 % meta rules to schedule inferencing.
 
 % resolve conflicts asap
-pfc_select(conflict(X)) :- pfc_queue(conflict(X)).
+pfc_select(conflict(X),S) :- pfc_queue(conflict(X),S).
   
 
 %% ***** here is a particular test case. *****
@@ -2069,7 +2069,7 @@ behave(X,multiplier) =>
 % meta rules to schedule inferencing.
 
 % resolve conflicts asap
-pfc_select(conflict(X)) :- pfc_queue(conflict(X)).
+pfc_select(conflict(X),S) :- pfc_queue(conflict(X),S).
 
 
 
