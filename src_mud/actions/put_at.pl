@@ -20,13 +20,13 @@
 % :- register_module_type (mtCommand).
 
 % actPut
-action_info(actPut(tCarryAble,txtPrepSpatial,tPutTargetAble),"actPut [obj] [onto|inside] [somewhere]").
+user:action_info(actPut(tCarryAble,txtPrepSpatial,tPutTargetAble),"actPut [obj] [onto|inside] [somewhere]").
 
-verb_alias(set,actPut).
-verb_alias(place,actPut).
-verb_alias(hide,actPut).
-verb_alias(display,actPut).
-verb_alias(stow,actPut).
+user:verb_alias(set,actPut).
+user:verb_alias(place,actPut).
+user:verb_alias(hide,actPut).
+user:verb_alias(display,actPut).
+user:verb_alias(stow,actPut).
 
 %targeted
 user:agent_call_command(_Agent,actPut(Other,_Prep,Where)):-

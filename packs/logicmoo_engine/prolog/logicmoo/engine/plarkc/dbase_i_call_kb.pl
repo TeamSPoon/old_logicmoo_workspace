@@ -1,6 +1,15 @@
 :-swi_module(logicmoo_i_call_kb,[]).
 
 
+:-export(kbp_t/1). 
+
+kbp_t(_):- not(loaded_external_kbs),!,fail.
+% kbp_t(PLIST):- ground(PLIST),!,no_repeats(call_no_cuts(kbp_t_list_prehook(PLIST,PLISTO))),kbp_t_list(PLISTO).
+% kbp_t(PLIST):- kbp_t_list_prehook(PLIST,PLISTO),kbp_t_list(PLISTO).
+% TODO RE-ENABLE 
+% kbp_t(PLIST):- kbp_t_list(PLIST). % append(PLIST,[_MT,_PROOF],PLISTO), apply(el_holds,PLISTO).  % el_holds has 2 extra args our callers shouldnt be forced to use.. but this is a big slowdown
+
+
 end_of_file.
 end_of_file.
 end_of_file.
@@ -58,13 +67,6 @@ kb_t(genls,PLIST,_):- !,kbp_t([genls|PLIST]). % rewrite hack for SUMO callers
 kb_t(AH,PLIST,_):- is_holds_true(AH),!,kb_t(PLIST). % is_holds_true/1 is temp disabled for speed
 kb_t(AH,PLIST,_):- is_holds_false(AH),!,kb_f(PLIST). % is_holds_false(not).
 kb_t(_,_,PLIST):- kbp_t(PLIST).
-
-:-export(kbp_t/1). 
-
-kbp_t(_):- not(loaded_external_kbs),!,fail.
-% kbp_t(PLIST):- ground(PLIST),!,no_repeats(call_no_cuts(kbp_t_list_prehook(PLIST,PLISTO))),kbp_t_list(PLISTO).
-% kbp_t(PLIST):- kbp_t_list_prehook(PLIST,PLISTO),kbp_t_list(PLISTO).
-kbp_t(PLIST):- kbp_t_list(PLIST). % append(PLIST,[_MT,_PROOF],PLISTO), apply(el_holds,PLISTO).  % el_holds has 2 extra args our callers shouldnt be forced to use.. but this is a big slowdown
 
 
 :-export(link_to_holds2/2).

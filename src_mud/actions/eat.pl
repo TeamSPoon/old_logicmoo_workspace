@@ -23,7 +23,7 @@
 % :- register_module_type (mtCommand).
 
 genls(tFood,tEatAble).
-action_info(actEat(tEatAble),"nourish oneself").
+user:action_info(actEat(tEatAble),"nourish oneself").
 
 % Eat something held
 % Check to make sure it's in the agents possession... 

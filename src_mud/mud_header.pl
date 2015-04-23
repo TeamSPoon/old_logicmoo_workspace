@@ -16,6 +16,7 @@
 :- multifile user:update_stats/2.
 :- multifile user:use_usable/4.
 :- multifile user:verb_alias/2.
+:- multifile user:vtActionTemplate/1.
 :- multifile user:mud_test/0.
 :- multifile user:mud_test/1.
 :- multifile user:mud_test/2.
@@ -23,7 +24,7 @@
 :- multifile user:mud_test_local/1.
 :- multifile user:mud_test_local/2.
 :- multifile user:world_agent_plan/3.
-:- multifile action_info/2.
+:- multifile user:action_info/2.
 :- multifile user:action_rules/4.
 :- multifile user:action_verb_useable/4.
 :- multifile user:agent_call_command/2.
@@ -31,8 +32,27 @@
 :- multifile user:check_permanence/4.
 
 
+:- dynamic user:term_specifier_text/2.
+:- dynamic user:type_action_info/3.
+:- dynamic user:update_charge/2.
+:- dynamic user:update_stats/2.
+:- dynamic user:use_usable/4.
+:- dynamic user:verb_alias/2.
+:- dynamic user:vtActionTemplate/1.
+:- dynamic user:mud_test/0.
+:- dynamic user:mud_test/1.
+:- dynamic user:mud_test/2.
+:- dynamic user:mud_test_local/0.
+:- dynamic user:mud_test_local/1.
+:- dynamic user:mud_test_local/2.
+:- dynamic user:world_agent_plan/3.
+:- dynamic user:action_info/2.
 :- dynamic user:action_rules/4.
-:- dynamic action_info/2.
+:- dynamic user:action_verb_useable/4.
+:- dynamic user:agent_call_command/2.
+:- dynamic user:agent_text_command/4.
+:- dynamic user:check_permanence/4.
+
 
 
 :-op(0,fx,('disabled')).
@@ -133,7 +153,7 @@
 :- dynamic_multifile_exported user:only_if_pttp/0.
 :- dynamic_multifile_exported user:use_snark/2.
 :- dynamic_multifile_exported user:is_mpred_prop/2.
-:- dynamic_multifile_exported user:hasInstance_dyn/2.
+%:- dynamic_multifile_exported user:hasInstance_dyn/2.
 :- dynamic_multifile_exported user:arity/2.
 :- dynamic_multifile_exported mpred_hooks:mpred_prop/2.
 :- dynamic_multifile_exported user:'<=>'/2.

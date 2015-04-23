@@ -8,8 +8,8 @@
 
 % :- register_module_type (mtCommand).
 
-action_info(actGet(isOptional(ftTerm,isSelfAgent),tPred),ftText("@get term to a property")).
-action_info(actSet(isOptional(ftTerm,isSelfAgent),tPred,ftTerm),ftText("@sets term to a property")).
+user:action_info(actGet(isOptional(ftTerm,isSelfAgent),tPred),ftText("@get term to a property")).
+user:action_info(actSet(isOptional(ftTerm,isSelfAgent),tPred,ftTerm),ftText("@sets term to a property")).
 
 user:agent_text_command(Agent,["@set",Prop0,Value0],Agent,actSet(Agent,Prop0,Value0)).
 user:agent_text_command(Agent,["@get",Prop0],Agent,actGet(Agent,Prop0)).

@@ -17,7 +17,7 @@
 
 % orderedBy(tDropAble,tNearestReachableItem).
 
-action_info(actDrop(isOneOf([tDropAble,tNearestReachableItem,tObj,ftID])),"Drop an item").
+user:action_info(actDrop(isOneOf([tDropAble,tNearestReachableItem,tObj,ftID])),"Drop an item").
 
 % Drop something
 user:agent_call_command(Agent,actDrop(Obj)) :-

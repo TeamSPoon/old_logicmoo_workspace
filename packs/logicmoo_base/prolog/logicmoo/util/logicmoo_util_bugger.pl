@@ -511,7 +511,7 @@ static_predicate(M,F,A):- functor_safe(FA,F,A),  once(M:predicate_property(FA,_)
 
 
 :- export((((dynamic_safe)/1))).
-:- meta_predicate(dynamic_safe(0)).
+:- meta_predicate(dynamic_safe(+)).
 :- module_transparent((((dynamic_safe)/1))).
 dynamic_safe(MFA):- with_mfa(MFA,dynamic_safe).
 
@@ -820,8 +820,9 @@ numbervars_impl(Term,Functor,Start):- integer(Start),atom(Functor),!,numbervars_
 numbervars_impl(Term,Functor,List):- is_list(List),atom(Functor),!, term_variables(Term,Vars),bugger_name_variables(Vars),!,must(( numbervars(Term,0,_End,[functor_name(Functor)|List]))).
 
 numbervars_impl(Term,Start,End,List):-number(Start),is_list(List),!,must(( numbervars(Term,Start,End,List) )).
-numbervars_impl(Term,Functor,Start,List):- sanity(number(Start)),is_list(List),!,must(( numbervars(Term,Start,_End,[functor_name(Functor)|List]))).
-numbervars_impl(Term,Functor,Start,End):- sanity((must(var(End);number(End)),numbervars(Term,Start,End,[attvar(skip),functor_name(Functor),singletons(true)]))).
+numbervars_impl(Term,Functor,Start,List):- is_list(List),sanity(integer(Start)),!,must(( numbervars(Term,Start,_End,[functor_name(Functor)|List]))).
+numbervars_impl(Term,Functor,Start,End):- !,debugOnError((numbervars(Term,Start,End,[attvar(skip),functor_name(Functor),singletons(true)]))).
+numbervars_impl(Term,Functor,Start,End):- sanity((must(var(End);integer(End)),numbervars(Term,Start,End,[attvar(skip),functor_name(Functor),singletons(true)]))).
 
 numbervars_impl(Term,Functor,Start,End,List):-must(( must(var(End);number(End)),numbervars(Term,Start,End,[functor_name(Functor)|List]))).
 

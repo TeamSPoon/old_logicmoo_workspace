@@ -78,7 +78,7 @@ pttp_assert(X) :- must_pttp_id(ID),ptt_tell_wid(ID,X).
 :-export(ptt_tell_wid/2).
 ptt_tell_wid(ID,XY):- 
     with_no_term_expansions(
-       with_assertions(user:prolog_mud_disable_term_expansions,
+       with_assertions(thlocal:disable_mpred_term_expansions_locally,
           with_assertions(thlocal:infSkipFullExpand,pttp_assert_wid(ID,pttp,XY)))),!.
 
 :-export(pttp_assert_wid/3).

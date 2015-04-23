@@ -10,7 +10,7 @@
 
 :- include(logicmoo_i_header).
 
-% user:term_expansion(A,B):- current_predicate(pfcExpansion_loaded/0),loop_check(pfc_file_expansion(A,B)),A\=@=B.
+% user:term_expansion(A,B):- \+ thlocal:disable_mpred_term_expansions_locally, current_predicate(pfcExpansion_loaded/0),loop_check(pfc_file_expansion(A,B)),A\=@=B.
 
 
 :- pfc_trace.
@@ -249,7 +249,7 @@ isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
 => tCol(ttSpatialType).
 => tCol(ttFormatType).
 => tCol(functorDeclares).
-% tCol(ArgsIsa):-is_pred_declarer(ArgsIsa).
+% tCol(ArgsIsa):-functorDeclaresPred(ArgsIsa).
 % TODO decide if OK
 %tCol(F):-hasInstance(functorDeclares,F).
 => tCol(ttFormatType).

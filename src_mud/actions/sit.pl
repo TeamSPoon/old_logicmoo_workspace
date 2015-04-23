@@ -23,12 +23,12 @@ vtPosture(vKneel).
 
 
 
-action_info(Posture,ftText("sets and agent's stance to ",Posture)):-vtPosture(PostureV),Posture=..[PostureV,isOptional(tFurniture,vHere)].
+user:action_info(Posture,ftText("sets and agent's stance to ",Posture)):-vtPosture(PostureV),Posture=..[PostureV,isOptional(tFurniture,vHere)].
 
 % Sit and do nothing.
 user:agent_call_command(Agent,Verb):- compound(Verb), functor(Verb,Sit,1),vtPosture(Sit),arg(1,Verb,Where),user:agent_call_command(Agent,actOnto(Where,Sit)).
 
-action_info(actOnto(isOptional(tFurniture,vHere),Posture),txtConcatFn("onto tObj do ",Posture)):-vtPosture(Posture).
+user:action_info(actOnto(isOptional(tFurniture,vHere),Posture),txtConcatFn("onto tObj do ",Posture)):-vtPosture(Posture).
 
 user:agent_call_command(Agent,actOnto(Where,Sit)):-
         fmt('agent ~w is now ~wing on ~w',[Agent,Sit,Where]),

@@ -157,7 +157,7 @@ pfcRem123a(HH):- doall(pfcRem1(HH,_)),doall(pfcRem3(HH)).
 make_functor(PO,M:F,A):-must(ground(F/A)),!,functor(P,F,A),(P=PO;P=M:PO).
 make_functor(PO,F,A):-must(ground(F/A)),!,functor(P,F,A),(P=PO;P=_:PO).
 
-pfc_mpred_prop(F,T):-clause(user:mpred_prop(F,T),true).
+isa(F,T):-clause(user:mpred_prop(F,T),true).
 
 pfc_setting_change(Prop,Pred,Type):-ignore(retractall(pfc_settings(Prop,Pred,_))),asserta(pfc_settings(Prop,Pred,Type)).
 
@@ -204,10 +204,9 @@ pfc_fully_expand_warn(Type,B,A):-pfc_fully_expand(Type,B,A),(B\=@=A->wdmsg(error
 
 % :- ignore((current_predicate(not/1),abolish(system:not/1),abolish(not/1),dynamic(not/1),assert(((not(P):- nonvar(P), \+ P))),meta_predicate(not(0)))).
 :- op(0,fx,'decl_mpred_pfc').
-user:isa(pfcMetaPred,tCol).
-user:isa(pfcMustFC,tCol).
-decl_mpred_pfc(F/A):-!,export(F/A),dynamic(F/A),asserta_if_new(user:mpred_prop(F,prologOnly)),asserta_if_new(arity(F,A)),asserta_if_new(user:mpred_prop(F,pfcMetaPred)),
-  asserta_if_new(user:mpred_prop(F,arity(A))).
+isa(pfcMetaPred,tCol).
+isa(pfcMustFC,tCol).
+decl_mpred_pfc(F/A):-!,export(F/A),dynamic(F/A),asserta_if_new(user:mpred_prop(F,prologOnly)),asserta_if_new(arity(F,A)),asserta_if_new(user:mpred_prop(F,pfcMetaPred)).
 decl_mpred_pfc(F):-atom(F),!,decl_mpred_pfc(F/0).
 :- op(1150,fx,'decl_mpred_pfc').
 
@@ -302,10 +301,10 @@ pfcUpdateClauses(F,A):-make_functor(P,F,A),forall((clause(P,T),is_true(T)),hooke
 :- thread_local thlocal:pfcExpansion/0.
 :- dynamic thlocal:pfcExpansionWas.
 
-maybe_hybrid(F/_):-pfc_mpred_prop(F,prologOnly),!.
-maybe_hybrid(F/_):-pfc_mpred_prop(F,prologHybrid),!.
-maybe_hybrid(F/_):-pfc_mpred_prop(F,pfcMetaPred),!.
-maybe_hybrid(F/_):-pfc_mpred_prop(F,X),atom(X),!.
+maybe_hybrid(F/_):-isa(F,prologOnly),!.
+maybe_hybrid(F/_):-isa(F,prologHybrid),!.
+maybe_hybrid(F/_):-isa(F,pfcMetaPred),!.
+maybe_hybrid(F/_):-isa(F,X),atom(X),!.
 maybe_hybrid(F/A):-atom(F),debugOnError(current_predicate(F/A)),!.
 % maybe_hybrid(C/1):-ignore((nonvar(C)->decl_mpred_hybrid(C/1);ignore(decl_mpred_hybrid(isa/2))))
 maybe_hybrid(F/A):- current_predicate((decl_mpred_hybrid)/1), ignore(must((atom(F),decl_mpred_hybrid(F/A)))).
@@ -341,7 +340,7 @@ pfc_maptree(Pred,[H|T],S):-!, apply(Pred,[H|S]), pfc_maptree(Pred,T,S).
 pfc_maptree(Pred,H,S):-apply(Pred,[H|S]).
 
 deny_pfc_Permission_to_remove(pfcInternal,_,_):-!,fail. %allow
-deny_pfc_Permission_to_remove(_,P,not(pfcControlled)):-get_functor(P,F,A), \+(pfc_local(P,F,A);pfc_mpred_prop(F,pfcControlled)).
+deny_pfc_Permission_to_remove(_,P,not(pfcControlled)):-get_functor(P,F,A), \+(pfc_local(P,F,A);isa(F,pfcControlled)).
 
 pfc_pre_expansion_each(X,X):- \+ compound(X),!.
 pfc_pre_expansion_each(X,X):-if_defined(as_is_term(X)),!.
@@ -357,8 +356,8 @@ user:mpred_prop(F,argIsa(_,ftAskable)):-pfcDatabaseTerm(F/_).
 
 user:mpred_prop(isa,2,pfcMustFC).
 
-pfcMustFC(H):-get_functor(H,F),pfc_mpred_prop(F,pfcMustFC).
-pfcPreferBC(H):-get_functor(H,F,A),pfc_mpred_prop(F,pfcPreferBC),dynamic(F/A),functor(PHead,F,A),assertz_if_new(((PHead:-callBC(PHead)))).
+pfcMustFC(H):-get_functor(H,F),isa(F,pfcMustFC).
+pfcPreferBC(H):-get_functor(H,F,A),isa(F,pfcPreferBC),dynamic(F/A),functor(PHead,F,A),assertz_if_new(((PHead:-callBC(PHead)))).
 
 :-asserta_if_new(thglobal:pfcManageHybrids).
 pfc_manage_hybrids:-!.
@@ -403,7 +402,7 @@ pfc_mark_As(_, _):-thlocal:pfc_no_mark,!.
 pfc_mark_As(G,_):-is_true(G),!.
 pfc_mark_As(G,As):-must(pfc_maptree(pfc_mark_As1,G,[As])),!.
 
-pfc_mark_As1(F,As):-atom(F),clause(pfc_mpred_prop(F,prologOnly),true),!,pmsg(todo(warn(wont_pfc_mark_As1(F,As)))).
+pfc_mark_As1(F,As):-atom(F),clause(isa(F,prologOnly),true),!,pmsg(todo(warn(wont_pfc_mark_As1(F,As)))).
 pfc_mark_As1(F,As):-atom(F),!,assert_if_new(user:mpred_prop(F,As)).
 pfc_mark_As1(G,_):- \+(compound(G)),!.
 pfc_mark_As1(u,_):-!.
@@ -425,7 +424,7 @@ pfc_mark_As2(F,A,As):-assert_if_new(user:arity(F,A)),must(pfc_mark_As1(F,As)).
 throw_on_bad_fact(G):-why_throw_on_bad_fact(G,Why), pmsg(((throw_on_bad_fact(Why,G)))),!,fail.
 
 why_throw_on_bad_fact(G,singletons(HS)):-   
-  head_singletons_g(G,HS),get_functor(HS,F),!,not(pfc_mpred_prop(F,predCanHaveSingletons)).
+  head_singletons_g(G,HS),get_functor(HS,F),!,not(isa(F,predCanHaveSingletons)).
 
 head_singletons_g(G,HS):- pfcRuleOutcomeHeadBody(G,H,B), head_singletons_hb(H,B,HS),!.
   
@@ -458,7 +457,7 @@ pfc_retract(_,G):- hooked_retract(G).
 pfc_ignored(argIsa(F, A, argIsaFn(F, A))).
 pfc_ignored(genls(A,A)).
 pfc_ignored(isa(tCol,tCol)).
-pfc_ignored(isa(W,tCol)):-if_defined(user:hasInstance_dyn(tCol,W)).
+%pfc_ignored(isa(W,tCol)):-if_defined(user:hasInstance_dyn(tCol,W)).
 pfc_ignored(isa(W,_)):-compound(W),isa(W,pred_argtypes).
  
 pfc_ignored(isa(_,Atom)):-atom(Atom),atom_concat(ft,_,Atom),!.
@@ -636,16 +635,16 @@ pfc_file_expansion_each(((Q:-P)),(:- (pfc_mark_F(Q),pfc_mark_C(P=>Q),pfc_add(P=>
 pfc_file_expansion_each(((Q:-P)),(:- (pfc_mark_F(Q),pfc_mark_C(P=>Q),pfc_add(P=>Q)))):- nonvar(P),P\==true,nonvar(Q),is_fc_body(P),!.
 pfc_file_expansion_each(((Q:-P)),(:- (pfc_mark_B(Q),pfc_mark_C(Q),pfc_add(Q<=P)))):- nonvar(P),P\==true,nonvar(Q),is_bc_body(P),!.
 
-%pfc_file_expansion_each(((Q:-P)),(:- pfc_mark_B(Q),pfc_add(Q<=P))):- nonvar(P),nonvar(Q),P\==true,not(is_fc_body(P)),pfcControlled(Q),!.
+%pfc_file_expansion_each(((Q:-P)),(:- pfc_mark_B(Q),pfc_add(Q<=P))):- nonvar(P),nonvar(Q),P\==true,not(is_fc_body(P)),isa(Q),!.
 pfc_file_expansion_each(P,(:- pfc_add(P))):- pfcMustFC(P),!.
-pfc_file_expansion_each(P,(:- pfc_add(P))):-pfcControlled(P),!.
+pfc_file_expansion_each(P,(:- pfc_add(P))):-isa(P),!.
 %pfc_file_expansion_each(((Q:-P)),(:- (pfc_mark_B(Q),pfc_mark_C(Q),pfc_add((Q:-P))))):- nonvar(P),P\==true,nonvar(Q),pfcUseAllBC((Q:-P)).
 %pfc_file_expansion_each((Q,(:- (pfc_mark_C(Q),pfc_add(Q))))):- nonvar(Q),pfcUseAllFact(Q).
 pfc_file_expansion_each(P,O):- pfc_transform_neck(P,H), H \=@= P, pfc_file_expansion_each(H,O).
 pfc_file_expansion_each(P,(:- CALL)):- pfc_get_setting(add,P,How),!,How\==prolog,CALL=..[How,P].
 
 pfcMustUseFC(G):- once(pfcRuleOutcomeHeadBody(G,H,_)),H\=@=G,!,pfcMustUseFC(H).
-pfcMustUseFC(G):- get_functor(G,F),not(pfc_mpred_prop(F,prologOnly)),pfc_mpred_prop(F,pfcMustFC).
+pfcMustUseFC(G):- get_functor(G,F),not(isa(F,prologOnly)),isa(F,pfcMustFC).
 
 pfcUseAllBC(((Q:-P))):-may_use_head(Q),no_head_singletons_hb(Q,P).
 pfcUseAllFact(Q):-may_use_head(Q),no_head_singletons_hb(Q,true).
@@ -663,7 +662,7 @@ may_use_head(Q):-var(Q),!,fail.
 may_use_head(_:_):-!,fail.
 may_use_head(Q):-Q \= (F/A),!, get_functor(Q,F,A),!,may_use_head(F/A).
 may_use_head(F/_):- atom_contains(F,'_'),!,fail.
-may_use_head(F/_):- pfc_mpred_prop(F,prologOnly),!,fail.
+may_use_head(F/_):- isa(F,prologOnly),!,fail.
 may_use_head(F/_):- current_predicate(F/A),make_functor(G,F,A),real_builtin_predicate(G),!,fail.
 may_use_head(F/A):- make_functor(G,F,A),real_builtin_predicate(G),!,fail.
 may_use_head(_/1):-!,fail.
@@ -2610,7 +2609,7 @@ pfc_file_expansion((P --*>> Q),(:- pfc_add(Rule))) :-
   pfc_translate_rule((P --*>> Q), Rule).
 */
 
-:- multifile('term_expansion'/2).
+:- multifile(term_expansion/2).
 % term_expansion(I,O):-pfc_file_expansion(I,O),I\=@=O, (pfc_term_expansion_ok -> true ; print_message(warning,pfc_file_expansion(I,O))).
 
 
@@ -2728,7 +2727,8 @@ make_term(ss(Constituent,Id,String),Term) :-
 
 % user:term_expansion(A,B):- loop_check(pfc_file_expansion_lc(A,B)),A\=@=B.
 
-user:term_expansion(A,B):- current_predicate(_,pfcExpansion_loaded),loop_check(pfc_file_expansion(A,B)),A\=@=B.
+user:term_expansion(A,B):- \+ thlocal:disable_mpred_term_expansions_locally,
+  current_predicate(_,pfcExpansion_loaded),loop_check(pfc_file_expansion(A,B)),A\=@=B.
 
 pfcExpansion_loaded.
 % system:goal_expansion(P,O):- (\+ current_predicate(_,P)),O= pfcCall(P).

@@ -8,7 +8,7 @@
 %
 */
 
-:-swi_module(toploop_telnet, [                  
+:-module(mud_telnet, [                  
                   do_player_action/1,
                   connect_player/2,
                   look_brief/1,
@@ -19,6 +19,7 @@
                   telnet_repl_obj_to_string/3,
                   start_mud_telnet/1,
                   read_and_do_telnet/0,
+                  run_player_telnet_0/0,
                   run_player_telnet/0,
                   login_and_run/0,
                   ensure_player_stream_local/1,

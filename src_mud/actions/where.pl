@@ -21,14 +21,14 @@
 % where 
 user:agent_text_command(Agent,["where",BE,X],Agent,actWhere(X)):-memberchk(BE,[is,are,be,were]).
 user:agent_text_command(Agent,["where_is",X],Agent,actWhere(X)).
-action_info(actWhere(ftTerm),"Tells where something is").
+user:action_info(actWhere(ftTerm),"Tells where something is").
 user:agent_call_command(_Agent,actWhere(SObj)) :-
     forall(
      (mudAtLoc(Obj,LOC), match_object(SObj,Obj)),
         fmt(cmdresult(actWhere,mudAtLoc(Obj,LOC)))).
 
 
-action_info(actWho(isOptional(tAgentGeneric,isMissing)),"Lists who is online (where they are at least)").
+user:action_info(actWho(isOptional(tAgentGeneric,isMissing)),"Lists who is online (where they are at least)").
 
 user:agent_call_command(_Gent,actWho(W)) :- mud_cmd_who(W).
 

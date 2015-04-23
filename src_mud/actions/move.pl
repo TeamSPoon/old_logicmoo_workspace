@@ -25,7 +25,7 @@ user:agent_text_command(Agent,[DirSS],Agent,OUT):-nonvar(DirSS), show_call(coerc
 
 user:agent_call_command(Agnt,Cmd):- compound(Cmd),functor(Cmd,actMove,_),!,must(move_command(Agnt,Cmd)).
 
-action_info(actMove(isOptional(ftNumber,1),vtDirection),"Move [n=1] distance in direction").
+user:action_info(actMove(isOptional(ftNumber,1),vtDirection),"Move [n=1] distance in direction").
 
 /*
 % dir###

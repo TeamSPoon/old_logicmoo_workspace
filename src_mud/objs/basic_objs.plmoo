@@ -52,7 +52,7 @@ fix_argIsa(F,N,vtDirection(Val),vtDirection):-add(user:mpred_prop(F,argSingleVal
 %:- compile_predicates([isa/2]).
 %:- decl_mpred_hybrid(repl_to_string(tAgentGeneric,term),[prologSingleValued,argSingleValueDefault(2,default_repl_obj_to_string)]).
 % :- decl_mpred_hybrid(repl_writer(tAgentGeneric,term),[prologSingleValued,argSingleValueDefault(2,default_repl_writer)]).
-%:- forall(is_pred_declarer(F),dynamic(F/1)).
+%:- forall(functorDeclaresPred(F),dynamic(F/1)).
 %:- foreach(retract(isa(I,C)),assert_hasInstance(C,I)).
 %isa(AT,ttAgentType):- genls(AT,ttAgentGeneric).
 %genls(AT,ttAgentGeneric):- isa(AT,ttAgentType).
@@ -89,7 +89,7 @@ prologHybrid(typeHasGlyph(tCol,ftString)).
 :- decl_mpred_prolog((latitude/2, mudMoveDist/2, longitude/2)).
 :- decl_mpred_prolog(mudMoveDist/2,[pred_argtypes(mudMoveDist(tAgentGeneric,ftInt)),prologSingleValued,pred_module(user),query(call),argSingleValueDefault(2,1)]).
 :- decl_mpred_prolog(stat_total/2).
-:- decl_mpred_prolog(verb_alias(ftString,vtVerb)).
+:- decl_mpred_prolog(user:verb_alias(ftString,vtVerb)).
 :- decl_type(tContainer).
 :- decl_type(tRegion).
 :- decl_type(vtBasicDir).
@@ -99,7 +99,7 @@ prologHybrid(typeHasGlyph(tCol,ftString)).
 :- dynamic stat_total/2.
 :- dynamic(spawn_rate/2).
 :- decl_type(tMonster/1).
-%:- decl_mpred_prolog(action_info(vtActionTemplate,ftText)).
+%:- decl_mpred_prolog(user:action_info(vtActionTemplate,ftText)).
 :- decl_mpred_prolog(agent_call_command(tAgentGeneric,ftAction)).
 :- decl_mpred_prolog(member(ftTerm,ftTerm)).
 :- decl_mpred_prolog(mud_test(ftTerm,ftCallable)).
@@ -408,7 +408,7 @@ dividesBetween(tAgentGeneric,tPlayer,tNpcPlayer).
 => tCol(ttSpatialType).
 => tCol(ttFormatType).
 % => tCol(functorDeclares).
-% tCol(ArgsIsa):-is_pred_declarer(ArgsIsa).
+% tCol(ArgsIsa):-functorDeclaresPred(ArgsIsa).
 % TODO decide if OK
 %tCol(F):-hasInstance(functorDeclares,F).
 => tCol(ttFormatType).

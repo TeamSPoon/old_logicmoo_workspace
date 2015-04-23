@@ -69,8 +69,8 @@ mpred_op(_,C):- mpred_call(C).
 whenAnd(A,B):-A,ground(B),once(B).
 
 
-user:agent_text_command(_Agent,_Text,_AgentTarget,_Cmd):-fail.
-user:agent_call_command(_Gent,actGrep(Obj)):- term_listing(Obj).
+%user:agent_text_command(_Agent,_Text,_AgentTarget,_Cmd):-fail.
+:-asserta((user:agent_call_command(_Gent,actGrep(Obj)):- term_listing(Obj))).
 
 
 % =======================================

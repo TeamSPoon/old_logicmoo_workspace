@@ -83,14 +83,14 @@ command_actIdea(Who,IdeaS):-
              dmsg(get_world_agent_plan(current,Who,Idea))),IdeaS),
   (IdeaS==[]->dmsg(noidea(actIdea(Who)));true).
 
-action_info(actNpcTimer(ftInt),"sets how often to let NPCs run").
+user:action_info(actNpcTimer(ftInt),"sets how often to let NPCs run").
 
-action_info(actTock,"Makes All NPCs do something brilliant").
-action_info(actTick(tAgentGeneric),"Makes some agent do something brilliant").
-action_info(actTick,"Makes *your* agent do something brilliant").
+user:action_info(actTock,"Makes All NPCs do something brilliant").
+user:action_info(actTick(tAgentGeneric),"Makes some agent do something brilliant").
+user:action_info(actTick,"Makes *your* agent do something brilliant").
 
-action_info(actIdea(isOptional(tAgentGeneric,isSelfAgent)),"Makes some agent (or self) think of something brilliant").
-action_info(actProlog(ftCallable),"Call a ftCallable").
+user:action_info(actIdea(isOptional(tAgentGeneric,isSelfAgent)),"Makes some agent (or self) think of something brilliant").
+user:action_info(actProlog(ftCallable),"Call a ftCallable").
 
 user:agent_text_command(Agent,["prolog",X],Agent,actProlog(X)):-ignore(X=isRandom(ftCallable)).
 user:agent_text_command(Agent,["prolog"],Agent,actProlog(prolog_repl)).

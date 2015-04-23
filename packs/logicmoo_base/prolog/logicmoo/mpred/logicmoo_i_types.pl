@@ -18,40 +18,11 @@
 % inital hasInstance/2 database
 % ============================================
 
-user:hasInstance_dyn(tCol,tCol).
-user:hasInstance_dyn(tCol,completelyAssertedCollection).
-user:hasInstance_dyn(tCol,ttFormatType).
-user:hasInstance_dyn(tCol,tSpatialThing).
-user:hasInstance_dyn(tCol,tPred).
-user:hasInstance_dyn(tCol,ftTerm).
 
-user:hasInstance_dyn(completelyAssertedCollection,completelyAssertedCollection).
-user:hasInstance_dyn(completelyAssertedCollection,prologSingleValued).
-user:hasInstance_dyn(completelyAssertedCollection,tCol).
-user:hasInstance_dyn(completelyAssertedCollection,ttFormatType).
-user:hasInstance_dyn(completelyAssertedCollection,ttValueType).
-user:hasInstance_dyn(completelyAssertedCollection,ttSpatialType).
-user:hasInstance_dyn(completelyAssertedCollection,tRelation).
-user:hasInstance_dyn(completelyAssertedCollection,tPred).
-user:hasInstance_dyn(completelyAssertedCollection,defnSufficient).
-user:hasInstance_dyn(completelyAssertedCollection,genlPreds).
-
-user:hasInstance_dyn(ttNotSpatialType,ftInt).
-%user:hasInstance_dyn(ttNotSpatialType,ftTerm).
-user:hasInstance_dyn(ttNotSpatialType,tCol).
-user:hasInstance_dyn(ttNotSpatialType,ttFormatType).
-user:hasInstance_dyn(ttNotSpatialType,ttValueType).
-
-user:hasInstance_dyn(ttSpatialType,tAgentGeneric).
-user:hasInstance_dyn(ttSpatialType,tItem).
-user:hasInstance_dyn(ttSpatialType,tObj).
-user:hasInstance_dyn(ttSpatialType,tRegion).
-user:hasInstance_dyn(ttSpatialType,tSpatialThing).
-
-user:hasInstance_dyn(W,SS):-nonvar(W),nonvar(SS),SS=isKappaFn(_,S),nonvar(S),!.
+% user:hasInstance_dyn(W,SS):-nonvar(W),nonvar(SS),SS=isKappaFn(_,S),nonvar(S),!.
 
 
-hasInstance(T,I):- user:hasInstance_dyn(T,I).
+% hasInstance(T,I):- user:hasInstance_dyn(T,I).
 hasInstance(T,I):- thglobal:pfcManageHybrids,clause_safe(isa(I,T),true).
 
 /*
@@ -60,8 +31,7 @@ disabled hasInstance(T,I):- !, (mudIsa_motel(I,T) *-> true ; (((atom(I),must(not
 disabled hasInstance(T,I):- rdf_x(I,rdf:type,T).
 */
 
-assert_hasInstance(T,I):- sanity(ground(T:I)),hasInstance(T,I),!.
-assert_hasInstance(T,I):- assert_if_new(user:hasInstance_dyn(T,I)),!,expire_tabled_list(all).
+assert_hasInstance(T,I):-  sanity(ground(T:I)),pfc_add(isa(I,T)),!,expire_tabled_list(all).
 
 % ========================================
 % is_typef(F).
@@ -166,7 +136,8 @@ type_prefix(macro,ttMacroType).
 % ========================================
 :- dynamic decided_not_was_isa/2.
 :-export(was_isa/3).
-was_isa(G,I,C):-compound(G),functor(G,F,_),notrace(((not(decided_not_was_isa(F,_)),once(was_isa0(G,I,C)-> true;((functor(G,F,1),get_when(When),asserta_if_new(decided_not_was_isa(F,When)),!,fail)))))).
+was_isa(G,I,C):- \+ thlocal:disable_mpred_term_expansions_locally,
+  compound(G),functor(G,F,_),notrace(((not(decided_not_was_isa(F,_)),once(was_isa0(G,I,C)-> true;((functor(G,F,1),get_when(When),asserta_if_new(decided_not_was_isa(F,When)),!,fail)))))).
 
 % get_when(When)
 get_when(F:L):-source_location(F,L),!.
@@ -184,7 +155,7 @@ was_isa0(call(_),_,_):-!,fail.
 was_isa0(trace(_),_,_):-!,fail.
 was_isa0(not(_),_,_):-!,fail.
 % was_isa0(hasInstance(tCol,I),I,tCol).
-was_isa0(ttNotSpatialType(I),I,ttNotSpatialType).
+was_isa0(ttNotTemporalType(I),I,ttNotTemporalType).
 was_isa0(tChannel(I),I,tChannel).
 was_isa0(tAgentGeneric(I),I,tAgentGeneric).
 was_isa0(t(C,_),_,_):-never_type_why(C,_),!,fail.
@@ -197,7 +168,7 @@ was_isa0(G,I,C):-G=..[C,I],!,is_typef(C),!,not(is_never_type(C)).
 
 not_ft(T):-nonvar(T),not_ft_quick(T),not(hasInstance(ttFormatType,T)).
 
-not_ft_quick(T):-nonvar(T),(T=tItem;T=tRegion;T=tCol;T=completelyAssertedCollection;transitive_subclass_or_same(T,tSpatialThing)).
+not_ft_quick(T):-nonvar(T),(T=tItem;T=tRegion;T=tCol;T=completelyAssertedCollection;transitive_subclass_or_same(T,tTemporalThing)).
 
 :-export(asserted_subclass/2).
 asserted_subclass(I,T):- ((thlocal:useOnlyExternalDBs,!);thglobal:use_cyc_database),(kbp_t([genls,I,T])).
@@ -241,7 +212,7 @@ transitive_P_r_l(DB,P,L,R):-ground(L:R),call(DB,P,A3,R),call(DB,P,A2,A3),call(DB
 is_known_true(C):-has_free_args(C),!,trace_or_throw(has_free_args(is_known_trew,C)).
 is_known_true(F):-is_known_false0(F),!,fail.
 is_known_true(F):-is_known_trew(F),!.
-%is_known_true(isa(G,tSpatialThing)):- hasInstance(_,G),not_mud_isa(G,tCol),not_mud_isa(G,tPred).
+%is_known_true(isa(G,tTemporalThing)):- hasInstance(_,G),not_mud_isa(G,tCol),not_mud_isa(G,tPred).
 is_known_true(genls(G,G)).
 is_known_true(isa(apathFn(_,_),tPathway)).
 is_known_true(isa(_,ftTerm)).
@@ -255,10 +226,10 @@ is_known_trew(genls(prologSingleValued, extentDecidable)).
 is_known_trew(genls(tAgentGeneric,tChannel)).
 is_known_trew(genls(completelyAssertedCollection, extentDecidable)).
 is_known_trew(genls(ttFormatType,tCol)).
-is_known_trew(genls(ttFormatType,ttNotSpatialType)).
+is_known_trew(genls(ttFormatType,ttNotTemporalType)).
 is_known_trew(genls(pred_argtypes,tRelation)).
 is_known_trew(genls(tFunction,tRelation)).
-is_known_trew(genls(F,tPred)):-is_pred_declarer(F).
+is_known_trew(genls(F,tPred)):-functorDeclaresPred(F).
 is_known_trew(disjointWith(A,B)):-disjointWithT(A,B).
 
 pfcNeverTrue(P):-is_known_false(P).
@@ -282,15 +253,15 @@ disjointWith0(tRegion,tObj).
 disjointWith0(ttFormatType,tItem).
 disjointWith0(ttFormatType,tObj).
 disjointWith0(ttFormatType,tRegion).
-disjointWith0(ttSpatialType,ttNotSpatialType).
+disjointWith0(ttTemporalType,ttNotTemporalType).
 
 disjointWithT(A,B):-disjointWith0(A,B).
 disjointWithT(B,A):-disjointWith0(A,B).
 
 :-export(not_mud_isa/3).
 %not_mud_isa0(tObj, completelyAssertedCollection).
-%not_mud_isa0(tObj, ttSpatialType).
-%not_mud_isa0(tSpatialThing,ttSpatialType).
+%not_mud_isa0(tObj, ttTemporalType).
+%not_mud_isa0(tTemporalThing,ttTemporalType).
 not_mud_isa0(I,T):-(var(I);var(T)),trace_or_throw(var_not_mud_isa(I,T)).
 not_mud_isa0(actGossup,tChannel).
 not_mud_isa0(_, blah):-!.
@@ -302,16 +273,16 @@ not_mud_isa0(tAgentGeneric,ttFormatType).
 not_mud_isa0(tCol,ttFormatType).
 not_mud_isa0(tItem,ttFormatType).
 not_mud_isa0(tObj, ttFormatType).
-not_mud_isa0(tSpatialThing, tSpatialThing).
-not_mud_isa0(completelyAssertedCollection,ttSpatialType).
+not_mud_isa0(tTemporalThing, tTemporalThing).
+not_mud_isa0(completelyAssertedCollection,ttTemporalType).
 not_mud_isa0(ttFormatType,ttFormatType).
-not_mud_isa0(ttSpatialType,tSpatialThing).
+not_mud_isa0(ttTemporalType,tTemporalThing).
 %not_mud_isa0(I,tCol):- compound(I),!, \+ hasInstance(tCol,I).
 %not_mud_isa0(I,C):- compound(I),!, \+ hasInstance(C,I).
 not_mud_isa(I,C):-not_mud_isa(I,C,_).
 
 not_mud_isa(I,C,Why):-not_mud_isa0(I,C),Why=not_mud_isa0(I,C).
-not_mud_isa(G,tSpatialThing,Why):- ((hasInstance(tCol,G),Why=hasInstance(tCol,G));(tPred(G),Why=tPred(G))).
+not_mud_isa(G,tTemporalThing,Why):- ((hasInstance(tCol,G),Why=hasInstance(tCol,G));(tPred(G),Why=tPred(G))).
 not_mud_isa(G,tCol,Why):-never_type_why(G,Why).
 
 % ==========================
@@ -338,8 +309,8 @@ isa_backchaing_i_i(I,T):-not(hasInstance(completelyAssertedCollection,T)),!,no_r
 
 :-export(type_isa/2).
 
-type_isa(Type,ttSpatialType):-arg(_,vv(tAgentGeneric,tItem,tObj,tRegion),Type),!.
-type_isa(ArgIsa,ttPredType):-is_pred_declarer(ArgIsa),!.
+type_isa(Type,ttTemporalType):-arg(_,vv(tAgentGeneric,tItem,tObj,tRegion),Type),!.
+type_isa(ArgIsa,ttPredType):-functorDeclaresPred(ArgIsa),!.
 type_isa(ftString,ttFormatType):-!.
 type_isa(Type,ttFormatType):-chk_ft(Type),!. % text
 %  from name
@@ -386,7 +357,7 @@ isa_asserted_1(I,'&'(T1 , T2)):-!,nonvar(T1),var(T2),!,dif:dif(T1,T2),isa_backch
 isa_asserted_1(I,'&'(T1 , T2)):-!,nonvar(T1),!,dif:dif(T1,T2),isa_backchaing(I,T1),isa_backchaing(I,T2).
 isa_asserted_1(I,(T1 ; T2)):-!,nonvar(T1),!,dif:dif(T1,T2),isa_backchaing(I,T1),isa_backchaing(I,T2).
 
-isa_w_type_atom(I,T):- is_pred_declarer(T),!,asserted_mpred_prop(I,T).
+isa_w_type_atom(I,T):- functorDeclaresPred(T),!,asserted_mpred_prop(I,T).
 isa_w_type_atom(_,T):- dont_call_type_arity_one(T),!,fail.
 isa_w_type_atom(I,T):- G=..[T,I],once_if_ground(isa_atom_call(T,G),_).
 
@@ -475,7 +446,7 @@ assert_isa_safe(O,T):- ignore((nonvar(O),nonvar(T),decl_type_safe(T),assert_isa(
 %OLD user:decl_database_hook(change(assert,_A_or_Z),genls(S,C)):-decl_type_safe(S),decl_type_safe(C).
 
 
-%OLD user:decl_database_hook(change(assert,_A_or_Z),isa(W,ttSpatialType)):-decl_type_safe(W). %,call_after_mpred_load(forall(isa(I,W),create_instance(I,W))).
+%OLD user:decl_database_hook(change(assert,_A_or_Z),isa(W,ttTemporalType)):-decl_type_safe(W). %,call_after_mpred_load(forall(isa(I,W),create_instance(I,W))).
 %OLD user:decl_database_hook(change(assert,_A_or_Z),isa(W,tCol)):- (test_tl(infSupertypeName);true),guess_supertypes(W).
 
 guess_supertypes(W):-atom(W),atomic_list_concat(List,'_',W),length(List,S),S>2,!, append(FirstPart,[Last],List),atom_length(Last,AL),AL>3,not(member(flagged,FirstPart)),
@@ -526,7 +497,7 @@ assert_isa_i(I,T):- sanity(not(singletons_throw_else_fail(assert_isa(I,T)))),fai
 assert_isa_i(_,ftTerm):-!.
 assert_isa_i(_,ftTerm(_)):-!.
 assert_isa_i(I,T):-not_mud_isa(I,T,Why),!,throw(Why).
-assert_isa_i(I,PT):- nonvar(PT),is_pred_declarer(PT),!,decl_mpred(I,PT),assert_hasInstance(PT,I).
+assert_isa_i(I,PT):- nonvar(PT),functorDeclaresPred(PT),!,decl_mpred(I,PT),assert_hasInstance(PT,I).
 assert_isa_i(I,T):- skipped_table_call(loop_check(assert_isa_ilc(I,T),loop_check(assert_hasInstance(T,I),dtrace(assert_isa_ilc(I,T))))).
 
 :-export(assert_isa_ilc/2).
@@ -572,7 +543,7 @@ assert_isa_reversed(T,I):-assert_isa(I,T).
 %OLD user:decl_database_hook(change( retract,_),isa(I,T)):-doall(db_retract_isa_hooked(I,T)).
 
 assert_isa_hooked(A,_):-retractall(t(cache_I_L,isa,A,_)),fail.
-assert_isa_hooked(F,T):- is_pred_declarer(T),decl_mpred(F,T),fail.
+assert_isa_hooked(F,T):- functorDeclaresPred(T),decl_mpred(F,T),fail.
 assert_isa_hooked(I,T):- assert_isa(I,T).
 assert_isa_hooked(I,T):- not(ground(assert_isa(T))),!, trace_or_throw(not(ground(assert_isa(I,T)))).
 assert_isa_hooked(I,T):- assert_hasInstance(T,I),fail.
@@ -594,10 +565,10 @@ assert_isa_hooked(food5,tWeapon):-trace_or_throw(assert_isa(food5,tWeapon)).
 
 %OLD user:decl_database_hook(change(assert,_),isa(I,T)):- doall(assert_isa_hooked_after(I,T)).
 
-assert_isa_hooked_after(F,T):-is_pred_declarer(T),!,decl_mpred(F,T).
+assert_isa_hooked_after(F,T):-functorDeclaresPred(T),!,decl_mpred(F,T).
 assert_isa_hooked_after(_,tCol):-!.
 assert_isa_hooked_after(_,ttFormatType):-!.
-%assert_isa_hooked_after(I,T):- ttSpatialType(T),!,assert_isa_hooked_creation(I,T).
+%assert_isa_hooked_after(I,T):- ttTemporalType(T),!,assert_isa_hooked_creation(I,T).
 
 %assert_isa_hooked_after(I,T):- assert_isa_hooked_creation(I,T).
 
@@ -609,18 +580,14 @@ impliedSubClass(T,ST):-predicate_property(transitive_subclass(T,ST),_),!,call_ta
 */
 
 % one of 4 special cols
-% assert_isa_hooked_creation(I,T):- ttSpatialType(T),!,call_after_mpred_load((create_instance(I,T,[]))).
+% assert_isa_hooked_creation(I,T):- ttTemporalType(T),!,call_after_mpred_load((create_instance(I,T,[]))).
 % sublass of 4 special cols
-% assert_isa_hooked_creation(I,T):- doall((ttSpatialType(ST),impliedSubClass(T,ST),call_after_mpred_load((create_instance(I,ST,[isa(T)]))))).
+% assert_isa_hooked_creation(I,T):- doall((ttTemporalType(ST),impliedSubClass(T,ST),call_after_mpred_load((create_instance(I,ST,[isa(T)]))))).
 
 :- asserta((user:isa(I,C):-loop_check(isa_backchaing(I,C)))).
 :- asserta(('$toplevel':isa(I,C):-user:isa(I,C))).
-
-
-:- forall(is_pred_declarer(Prop),decl_type(Prop)).
-:- dynamic(isa/2).
-:- decl_mpred_hybrid(isa/2).
-:- decl_mpred_hybrid(argIsa/3).
+=> pfcControlled(isa/2).
+=> pfcControlled(argIsa/3).
 :- decl_type(tPred).
 :- decl_type(predIsFlag).
 :- decl_type(prologOnly).

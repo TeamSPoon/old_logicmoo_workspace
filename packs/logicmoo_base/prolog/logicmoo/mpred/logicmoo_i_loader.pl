@@ -14,7 +14,7 @@
 :- export(with_no_mpred_expansions/1).
 :- meta_predicate(with_no_mpred_expansions(0)).
 with_no_mpred_expansions(Goal):-
-  with_assertions(user:prolog_mud_disable_term_expansions,Goal).
+  with_assertions(thlocal:disable_mpred_term_expansions_locally,Goal).
 
 
 current_context_module(Ctx):-user:loading_module_h(Ctx),!.

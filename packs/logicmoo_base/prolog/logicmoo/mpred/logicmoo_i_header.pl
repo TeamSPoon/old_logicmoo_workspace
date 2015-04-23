@@ -14,20 +14,27 @@
 :-op(0,fy,('disabled')).
 :-op(0,fy,('enabled')).
 
-:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
+:- thread_local(thlocal:disable_mpred_term_expansions_locally/0).
+:- multifile(system:term_expansion/2).
+:- multifile(user:term_expansion/2).
+:- multifile(user:goal_expansion/2).
+
+:- op(500,fx,'~').
+:- op(1050,xfx,('=>')).
+:- op(1050,xfx,'<=>').
+:- op(1050,xfx,('<=')).
+:- op(1100,fx,('=>')).
+:- op(1150,xfx,('::::')).
 
 :-dynamic(user_db:grant_openid_server/2).
 :-multifile(user_db:grant_openid_server/2).
+
 :- multifile '$was_imported_kb_content$'/2.
-:- discontiguous('$was_imported_kb_content$'/2).
-
-
-:-dynamic('$was_imported_kb_content$'/2).
-:-multifile('$was_imported_kb_content$'/2).
-:-user:export('$was_imported_kb_content$'/2).
 :-dynamic('$was_imported_kb_content$'/2).
 :- discontiguous('$was_imported_kb_content$'/2).
 
+
+:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
 
 :- multifile(user:disabled/1).
 :- discontiguous(user:disabled/1).
@@ -117,7 +124,7 @@
 :- dynamic_multifile_exported user:only_if_pttp/0.
 :- dynamic_multifile_exported user:use_snark/2.
 :- dynamic_multifile_exported user:is_mpred_prop/2.
-:- dynamic_multifile_exported user:hasInstance_dyn/2.
+%:- dynamic_multifile_exported user:hasInstance_dyn/2.
 :- dynamic_multifile_exported user:arity/2.
 :- dynamic_multifile_exported user:mpred_prop/2.
 :- dynamic_multifile_exported user:relationMostInstance/3.
@@ -129,5 +136,4 @@
 :- dynamic_multifile_exported user:tFarthestReachableItem/1.
 :- dynamic_multifile_exported deduceFromArgTypes/1.
 
-% :- '@'(ensure_loaded(dbase),'user').
 

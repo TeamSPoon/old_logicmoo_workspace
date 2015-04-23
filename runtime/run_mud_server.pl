@@ -74,7 +74,7 @@ user:semweb_startup :- with_no_term_expansions(if_file_exists(ensure_loaded('../
 % :- ensure_loaded(logicmoo(dbase/mpred_i_pldoc)).
 % :- do_semweb_startup.
 
-:- with_no_mpred_expansions(if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop.pl'))).
+:- with_no_mpred_expansions(if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop/eggdrop.pl'))).
 :- current_predicate(egg_go/0)->egg_go;true.
 
 

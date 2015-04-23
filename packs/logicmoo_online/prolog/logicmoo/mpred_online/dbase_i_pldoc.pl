@@ -179,10 +179,10 @@ to_tclass(Prop,New):- (t(_,_,Prop);t(_,_,Prop,_);t(_,_,_,Prop)),ensure_starts_wi
 % to_tclass(Prop,actDrop).
 
 is_actverb(X):-user:type_action_info(_,PX,_),functor(PX,X,_).
-is_actverb(X):-action_info(PX,_),functor(PX,X,_).
+is_actverb(X):-user:action_info(PX,_),functor(PX,X,_).
 is_actverb(X):-vtActionTemplate(PX),functor(PX,X,_).
 is_actverb(X):-vtPosture(PX),functor(PX,X,_).
-is_actverb(X):-verb_alias(_,X).
+is_actverb(X):-user:verb_alias(_,X).
 % user:vtVerb(X):-is_actverb(X).
 
 :-export(ensure_starts_with_prefix/3).

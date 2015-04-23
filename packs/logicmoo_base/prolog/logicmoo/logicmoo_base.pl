@@ -13,25 +13,13 @@
 */
 
 :- prolog_load_context(directory,Dir),asserta(user:file_search_path(logicmoo,Dir)).
-
-:- op(500,fx,'~').
-:- op(1050,xfx,('=>')).
-:- op(1050,xfx,'<=>').
-:- op(1050,xfx,('<=')).
-:- op(1100,fx,('=>')).
-:- op(1150,xfx,('::::')).
+:- dynamic(user:isa_pred_now_locked/0).
 
 :- nb_setval(pldoc_object,pldoc_object_missing).
 
-:- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
 :- include(mpred/logicmoo_i_header).
 
-:- dynamic(user:isa_pred_now_locked/0).
-:- thread_local user:prolog_mud_disable_term_expansions.
 
-:- multifile(system:term_expansion/2).
-:- multifile(user:term_expansion/2).
-:- multifile(user:goal_expansion/2).
 
 
 :-dynamic('$was_imported_kb_content$'/2).
@@ -45,7 +33,7 @@ swi_module(M,E):-dmsg(swi_module(M,E)).
 :- export(with_no_mpred_expansions/1).
 :- meta_predicate(with_no_mpred_expansions(0)).
 %with_no_mpred_expansions(Goal):-
-%  with_assertions(user:prolog_mud_disable_term_expansions,Goal).
+%  with_assertions(thlocal:disable_mpred_term_expansions_locally,Goal).
 
 :-dynamic(tChannel/1).
 :-dynamic(subFormat/2).
@@ -185,11 +173,16 @@ user:ruleRewrite(mudLabelTypeProps(Lbl,T,[]),typeHasGlyph(T,Lbl)):-nonvar(T),!.
 user:ruleRewrite(mudLabelTypeProps(Lbl,T,Props),typeProps(T,[typeHasGlyph(Lbl)|Props])):-nonvar(T),!.
 
 
+% ================================================
+% DBASE_T System
+% ================================================
+
+:- ensure_loaded(mpred/pfc).
 % ================================================================================
 % DETECT PREDS THAT NEED SPECIAL STORAGE 
 % ================================================================================
-:-export(is_pred_declarer/1).
-is_pred_declarer(Prop):- % vFormatted 
+:-export(functorDeclaresPred/1).
+functorDeclaresPred(Prop):- % vFormatted 
 	arg(_,v(pred_argtypes,predIsFlag,tPred,
         prologMultiValued,prologSingleValued,prologMacroHead,prologOnly,
 		prologOrdered,prologNegByFailure,prologPTTP,prologSNARK,prologHybrid,prologListValued),Prop).
@@ -244,8 +237,8 @@ mpred_name_variables([Var|Vars]):-
 
 
 
-user:goal_expansion(G,isa(I,C)):-G\=isa(_,_),(was_isa(G,I,C)),!.
-user:term_expansion(G,isa(I,C)):-not(user:prolog_mud_disable_term_expansions),notrace((was_isa(G,I,C))).
+user:goal_expansion(G,isa(I,C)):- \+  thlocal:disable_mpred_term_expansions_locally, G\=isa(_,_),(was_isa(G,I,C)),!.
+user:term_expansion(G,isa(I,C)):- \+  thlocal:disable_mpred_term_expansions_locally, notrace(was_isa(G,I,C)).
 
 
 mpred_module_ready.
@@ -263,7 +256,7 @@ mpred_module_ready.
 :-decl_type(tPred).
 :-decl_mpred_hybrid(isa/2).
 
-system:term_expansion(A,B):- not(user:prolog_mud_disable_term_expansions), 
+system:term_expansion(A,B):- \+  thlocal:disable_mpred_term_expansions_locally,
   current_predicate(pfcExpansion_loaded/0),loop_check(pfc_file_expansion(A,B)),A\=@=B.
 
 user:semweb_startup:- with_no_term_expansions(if_file_exists(user:ensure_loaded(logicmoo(dbase/mpred_i_rdf_store)))).
@@ -274,7 +267,7 @@ user:semweb_startup:- with_no_term_expansions(if_file_exists(user:ensure_loaded(
 :-decl_mpred_hybrid(formatted_resultIsa/2).
 :-decl_mpred_hybrid(resultIsa/2).
 
-system:term_expansion(IN,OUT):- not(user:prolog_mud_disable_term_expansions),
+system:term_expansion(IN,OUT):- \+  thlocal:disable_mpred_term_expansions_locally,
   mpred_module_ready, must_compile_special_clause(IN),
   in_file_expansion, 
   loader_term_expansion(IN,WHY),must(OUT = user:WHY).
@@ -311,7 +304,7 @@ vtTestType(vTest2).
 
 /*
 :- pfc_add(((vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) => vtActionTemplate(ArgTypes)))).
-:- pfc_add(((action_info(ArgTypes,_)/is_declarations(ArgTypes) => vtActionTemplate(ArgTypes)))).
+:- pfc_add(((user:action_info(ArgTypes,_)/is_declarations(ArgTypes) => vtActionTemplate(ArgTypes)))).
 :- pfc_add(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) => functorDeclares(F))).
 (ttFormatType(FT)/is_declarations(FT))=>ttFormatted(FT).
 
@@ -331,7 +324,6 @@ vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes)
 
 % :-asserta(user:isa_pred_now_locked).
 
-% :-asserta(user:prolog_mud_disable_term_expansions).
 
 % :-loadTinyAssertions1.
 
@@ -342,9 +334,7 @@ vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes)
 
 % :- source_location(S,_),forall(source_file(H,S),( \+predicate_property(H,built_in), functor(H,F,A),module_transparent(F/A),export(F/A))).
 
-%system:term_expansion(I,O):- thlocal:consulting_sources, with_no_assertions(thlocal:consulting_sources,add(I)),O=true.
-user:goal_expansion(ISA,G) :-compound(ISA),thlocal:is_calling,was_isa(ISA,I,C),G=no_repeats(isa(I,C)).
+%system:term_expansion(I,O):- \+ thlocal:disable_mpred_term_expansions_locally, thlocal:consulting_sources, with_no_assertions(thlocal:consulting_sources,add(I)),O=true.
+user:goal_expansion(ISA,G) :- \+ thlocal:disable_mpred_term_expansions_locally, compound(ISA),thlocal:is_calling,was_isa(ISA,I,C),G=no_repeats(isa(I,C)).
 
 
-
-% :-prolog_repl.

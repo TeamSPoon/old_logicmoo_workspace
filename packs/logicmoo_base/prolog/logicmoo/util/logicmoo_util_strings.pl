@@ -7,7 +7,7 @@
 % Revision:  $Revision: 1.7 $
 % Revised At:   $Date: 2002/07/11 21:57:28 $
 % ===================================================================
-logicmoo_util_strings:-module(logicmoo_util_strings,[
+:-module(logicmoo_util_strings,[
             atoms_of/2,
             to_word_list/2,
             equals_icase/2,
@@ -93,11 +93,11 @@ string_lower(M,U):-toLowercase(M,U).
 :- meta_predicate map_tree_to_list(2,?,*).
 
 
-:- meta_predicate_transparent(camelSplitters(+)).
+%:- meta_predicate_transparent(user:camelSplitters(+)).
 
-:- meta_predicate_transparent(to_string_hook(-,-,+)).
+%:- meta_predicate_transparent(to_string_hook(-,-,+)).
 
-camelSplitters(V):-member(V,[' ','-','_',':','mt','doom','Mt','Doom']).
+user:camelSplitters(V):-member(V,[' ','-','_',':','mt','doom','Mt','Doom']).
 
 
 concat_atom_safe(I,O):-concat_atom_safe(I,'',O).
@@ -281,7 +281,7 @@ toPropercase(A,U):-atom_length(A,1),toUppercase(A,U),!.
 toPropercase('_','_'):-!.
 toPropercase('_','-'):-!.
 
-toPropercase(D3,DD3):- camelSplitters(V),concat_atom_safe([L,I|ST],V,D3),L \='',I \='',toPropercase([L,I|ST],LIST2),toPropercase(V,VV),concat_atom_safe(LIST2,VV,DD3),!.
+toPropercase(D3,DD3):- user:camelSplitters(V),concat_atom_safe([L,I|ST],V,D3),L \='',I \='',toPropercase([L,I|ST],LIST2),toPropercase(V,VV),concat_atom_safe(LIST2,VV,DD3),!.
 toPropercase(CX,Y):- name(CX,[S|SS]),char_type(S,to_lower(NA)),name(NA,[N]),name(Y,[N|SS]),!.
 toPropercase(A,A).
 

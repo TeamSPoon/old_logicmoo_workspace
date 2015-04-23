@@ -36,7 +36,7 @@ arity(is_never_type,1).
 arity(self_call,1).
 arity(argIsa, 3).
 arity(isa, 2).
-%arity(Prop,2):-is_pred_declarer(Prop).
+%arity(Prop,2):-functorDeclaresPred(Prop).
 arity(pred_argtypes,1).
 arity(arity,2).
 arity(is_never_type,1).
@@ -142,7 +142,7 @@ mpred_prop_nvh(H,Prop):-get_functor(H,F,A), H \=@= F, !,user:mpred_prop(F,Prop).
 
 
 
-% user:mpred_prop(F,prologOnly):- not(user:mpred_prop(F,prologHybrid)),(F=is_pred_declarer;(current_predicate(F/1);not(hasInstance(F,tCol)))).
+% user:mpred_prop(F,prologOnly):- not(user:mpred_prop(F,prologHybrid)),(F=functorDeclaresPred;(current_predicate(F/1);not(hasInstance(F,tCol)))).
 user:mpred_prop(G,predProxyAssert(add)):- atom(G),prologMacroHead(G).
 user:mpred_prop(G,predProxyQuery(ireq)):- atom(G),prologMacroHead(G).
 user:mpred_prop(G,predProxyRetract(del)):- atom(G),prologMacroHead(G).
@@ -179,7 +179,7 @@ assert_arity_ilc(F,A):-
   retractall(user:mpred_prop(F,arity(_))),
   retractall(arity(F,_)),
    must_det(good_pred_relation_name(F,A)),
-    hooked_asserta(arity(F,A)),
+    pfc_add_fast(arity(F,A)),
     hooked_asserta(user:mpred_prop(F,arity(A))),!.
 
 
@@ -216,16 +216,16 @@ decl_mpred_4(M,PI,F/A):-
 decl_mpred(C,More):- ignore(loop_check(decl_mpred_0(C,More),true)).
 
 decl_mpred_0(C,More):- (var(C);var(More)), trace_or_throw(var_decl_mpred(C,More)).
-decl_mpred_0(F/A,More):-atom(F),integer(A),!,decl_mpred_2(F,arity(A)),decl_mpred(F,More),!.
-decl_mpred_0(M:FA,More):-atom(M),!,decl_mpred_0(M:FA,More),decl_mpred_0(FA,[pred_module(M)]).
-decl_mpred_0(F,A):-number(A),!,decl_mpred_2(F,arity(A)),!.
+decl_mpred_0(F/A,More):-atom(F),integer(A),!,assert_arity(F,A),decl_mpred(F,More),!.
+decl_mpred_0(M:FA,More):-atom(M),!,decl_mpred_0(FA,More),decl_mpred_0(FA,[pred_module(M)]).
+decl_mpred_0(F,A):-atom(F),number(A),!,assert_arity(F,A).
 decl_mpred_0(F,tPred):-!,assert_hasInstance(tPred,F).
 decl_mpred_0(C,More):-string(C),!,dmsg(trace_or_throw(var_string_decl_mpred(C,More))).
 decl_mpred_0(mudDescription, predProxyRetract):-dtrace(decl_mpred_0(mudDescription, predProxyRetract)).
 decl_mpred_0(_,pred_argtypes):-!.
 decl_mpred_0(F,pred_argtypes(ArgTypes)):-!,decl_mpred_2(F,pred_argtypes(ArgTypes)).
-decl_mpred_0(C,More):-compound(C),C=..[F,Arg1|PROPS],is_pred_declarer(F),!,ground(Arg1),decl_mpred(Arg1,[F,PROPS,More]).
-decl_mpred_0(C,More):-compound(C),!,functor(C,F,A),decl_mpred_2(F,arity(A)),decl_mpred_0(F,More),!,ignore((ground(C),decl_mpred(F,pred_argtypes(C)))),!.
+decl_mpred_0(C,More):-compound(C),C=..[F,Arg1|PROPS],functorDeclaresPred(F),!,ground(Arg1),decl_mpred(Arg1,[F,PROPS,More]).
+decl_mpred_0(C,More):-compound(C),!,functor(C,F,A),assert_arity(F,A),decl_mpred_0(F,More),!,ignore((ground(C),decl_mpred(F,pred_argtypes(C)))),!.
 decl_mpred_0(_,[]):-!.
 decl_mpred_0(F,[Prop|Types]):-!,decl_mpred_0(F,Prop),!,decl_mpred_0(F,Types),!.
 
@@ -234,7 +234,6 @@ decl_mpred_0(F,T):-doall(( decl_mpred_2(F,T) )).
 
 decl_mpred_2(F,pred_argtypes(FARGS)):- functor(FARGS,_,A),decl_mpred(F,A),fail.
 decl_mpred_2(_,pred_argtypes(FARGS)):- functor(FARGS,_,A),arg(A,FARGS,Arg),var(Arg),!.
-decl_mpred_2(F,arity(A)):- assert_arity(F,A),fail.
 
 % decl_mpred_2(F,prologHybrid):- decl_mpred_hybrid(F).
 decl_mpred_2(F,cycPlus2(A)):- ensure_universal_stub_plus_2(F,A).
@@ -256,7 +255,7 @@ functor_check_univ(G1,F,List):-must_det(compound(G1)),must_det(G1 \= _:_),must_d
 glean_pred_props_maybe(_:G):-!,compound(G),with_assertions(infConfidence(vWeak),forall(glean_pred_props_maybe_some(G),true)).
 glean_pred_props_maybe(G):-compound(G),with_assertions(infConfidence(vWeak),forall(glean_pred_props_maybe_some(G),true)).
 
-glean_pred_props_maybe_some(G):-compound(G),G=..[F,Arg1|RGS],is_pred_declarer(F),add_mpred_prop_gleaned(Arg1,[F|RGS]).
+glean_pred_props_maybe_some(G):-compound(G),G=..[F,Arg1|RGS],functorDeclaresPred(F),add_mpred_prop_gleaned(Arg1,[F|RGS]).
 % glean_pred_props_maybe_some(G):-arg(_,G,Arg1),compound(Arg1),arg(_,Arg1,Col),hasInstance(tCol,Col),with_assertions(infConfidence(vWeak),assert_predArgTypes(Arg1)).
 
 add_mpred_prop_gleaned(M:Arg1,FRGS):-atom(M),!,add_mpred_prop_gleaned(Arg1,FRGS).
@@ -282,4 +281,4 @@ assert_predArgTypes_from_left(_,_,[]):-!.
 assert_predArgTypes_from_left(F,A,[Type|ArgsList]):-assert_argIsa(F,A,Type),!,Ap1 is A + 1,assert_predArgTypes_from_left(F,Ap1,ArgsList).
 
 
-user:term_expansion(G,_):- not(prolog_mud_disable_term_expansions), not(thlocal:into_form_code),notrace((once(glean_pred_props_maybe(G)),fail)).
+user:term_expansion(G,_):- \+ thlocal:disable_mpred_term_expansions_locally, not(thlocal:into_form_code),notrace((once(glean_pred_props_maybe(G)),fail)).

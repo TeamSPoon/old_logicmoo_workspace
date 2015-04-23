@@ -176,9 +176,9 @@ with_logical_functor(And,[G|T],Call):-
 requires_storage((Head :- Body),Why):- nonvar(Head),!, requires_storage(Head,Body,Why).
 requires_storage(C,Why):- requires_storage(C,true,Why).
 
+requires_storage(G,_,Why):-get_functor(G,F),!,special_head(G,F,Why),!.
 requires_storage(_,_,thlocal:consulting_sources):-thlocal:consulting_sources,pfc_may_expand,!.
 % requires_storage(_,_,thlocal:consulting_sources):-thlocal:consulting_sources,in_file_expansion.
-requires_storage(G,_,Why):-get_functor(G,F),!,special_head(G,F,Why),!.
 
 special_wrapper_functor(call_mpred_body,direct_to_prolog).
 special_wrapper_functor(body_req,direct_to_prolog).
@@ -194,12 +194,13 @@ make_body_clause(_Head,Body,Body):-special_wrapper_body(Body,_Why),!.
 make_body_clause(Head,Body,call_mpred_body(Head,Body)).
 
 special_head(_,F,Why):-special_head0(F,Why),!,show_call_failure(not(asserted_mpred_prop(F,prologOnly))).
-special_head0(F,is_pred_declarer):-is_pred_declarer(F),!.
+special_head0(F,functorDeclaresPred):-functorDeclaresPred(F),!.
 special_head0(F,functorDeclares):-hasInstance(functorDeclares,F),!.
 special_head0(F,prologMacroHead):-hasInstance(prologMacroHead,F),!.
 special_head0(isa,isa).
 special_head0(F,tCol):-hasInstance(tCol,F),!.
-special_head0(F,prologHybrid):-asserted_mpred_prop(F,prologHybrid).
+special_head0(F,prologHybrid):-hasInstance(prologHybrid,F).
+special_head0(F,pfcControls):-hasInstance(pfcControls,F).
 
 
 
@@ -290,7 +291,7 @@ add_0(A):- is_ftVar(A),!,trace_or_throw(var_add(A)).
 add_0(((H1,H2):-B)):-!,add_0((H1:-B)),add_0((H2:-B)).
 add_0(((H1,H2))):-!,add_0((H1)),add_0((H2)).
 add_0(dynamic(Term)):- !,must(get_arity(Term,F,A)), must(dynamic(F/A)).
-add_0(:-(Term)):- !, must(add_fast(:-(Term))).
+add_0(A):-A =(:-(Term)), !, must(add_fast(A)).
 % add_0(C0):-check_override(add(C0)),!.
 % add_0(Skipped):- ground(Skipped),implied_skipped(Skipped),!. % ,dmsg(implied_skipped(Skipped)).
 add_0(C0):- ignore((ground(C0),asserta(user:already_added_this_round(C0)))),must(pfc_add_fast(C0)),!.
@@ -509,7 +510,8 @@ hooked_retractall(G):- Op = change(retract,all),
                    loop_check(run_database_hooks_depth_1(change(retract,all),G),true).
 
 
-user:provide_mpred_storage_op(Op,G):- (loop_check(pfc_provide_mpred_storage_op(Op,G))).
+user:provide_mpred_storage_op(_,_):-fail.
+%user:provide_mpred_storage_op(Op,G):- (loop_check(pfc_provide_mpred_storage_op(Op,G))).
 user:provide_mpred_storage_op(Op,G):- (loop_check(mpred_t_provide_mpred_storage_op(Op,G))).
 user:provide_mpred_storage_op(Op,G):- (loop_check(prolog_provide_mpred_storage_op(Op,G))).
 user:provide_mpred_storage_op(Op,G):- (loop_check(isa_provide_mpred_storage_op(Op,G))).
@@ -520,7 +522,7 @@ must_storage_op(Op,G):- doall(must(may_storage_op(Op,G))).
 may_storage_op(Op,G):-call_no_cuts(user:provide_mpred_storage_op(Op,G)).
 
 
-:- meta_predicate hooked_asserta(0), hooked_assertz(0), hooked_retract(0), hooked_retractall(0).
+:- meta_predicate hooked_asserta(+), hooked_assertz(+), hooked_retract(+), hooked_retractall(+).
 
 :- meta_predicate del(-),clr(-),add(-),req(-), fully_expand(-,-,-).
 

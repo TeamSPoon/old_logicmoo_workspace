@@ -254,6 +254,14 @@ pfc_unique_u(P) :-
   \+ clause_u(P,true).
 
 
+pfc_unique_i((Head:-Tail)) :-
+  !,
+  \+ clause_i(Head,Tail).
+pfc_unique_i(P) :-
+  !,
+  \+ clause_i(P,true).
+
+
 pfc_enqueue(P,S) :-
   pfc_search(Mode)
     -> (Mode=direct  -> pfc_fwd(P,S) ;
@@ -363,7 +371,7 @@ pfc_add_trigger(_Sup,pt(Trigger,Body),Support) :-
   !,
   pfc_trace_msg('~N%       Adding p-trigger ~q~n',
 		[pt(Trigger,Body)]),
-  functor(Trigger,F,A),pfc_add_fast([pfcControls(F),arity(F,A)]),
+   functor(Trigger,F,A),pfc_add_fast([=>pfcControlled(F),=>arity(F,A)]),
   pfc_assert_i(pt(Trigger,Body),Support),
   copy_term(pt(Trigger,Body),Tcopy),
   pfc_call(Trigger),
@@ -375,7 +383,7 @@ pfc_add_trigger(_Sup,nt(Trigger,Test,Body),Support) :-
   !,
   pfc_trace_msg('~N%       Adding n-trigger: ~q~n       test: ~q~n       body: ~q~n',
 		[Trigger,Test,Body]),
-  functor(Trigger,F,A),pfc_add_fast([pfcControls(F),arity(F,A)]),
+   functor(Trigger,F,A),pfc_add_fast([=>pfcControlled(F),=>arity(F,A)]),
   copy_term(Trigger,TriggerCopy),
   pfc_assert_i(nt(TriggerCopy,Test,Body),Support),
   \+Test,
@@ -385,7 +393,7 @@ pfc_add_trigger(_Sup,nt(Trigger,Test,Body),Support) :-
 pfc_add_trigger(Sup,bt(Trigger,Body),Support) :-
   !,
   pfc_assert_i(bt(Trigger,Body),Support),
-  functor(Trigger,F,A),pfc_add_fast([pfcControls(F),arity(F,A)]),
+  functor(Trigger,F,A),pfc_add_fast([=>pfcControlled(F),=>arity(F,A)]),
   % WAS pfc_bt_pt_combine(Sup,Trigger,Body).
   pfc_bt_pt_combine(Sup,Trigger,Body,Support).
 
@@ -1857,8 +1865,7 @@ nth_pfc_call(N,List,Ele):-N2 is N+1,lists:nth0(N2,List,Ele).
 
 
 
-:-dynamic(is_declarer_macro/1).
-is_declarer_macro(tCol).
+:-dynamic(prologMacroHead/1).
 
 
 compute_resolve(NewerP,OlderQ,S1,S2,(pfc_remove3(OlderQ),pfc_add(NewerP),pfc_rem1(conflict(NewerP)))):-wdmsg(compute_resolve(S1>S2)).
@@ -1890,8 +1897,9 @@ pfc_file_expansion_0(('<='(P,Q)),(:- pfc_assert(('<='(P,Q))))).
 pfc_file_expansion_0((P<=>Q),(:- pfc_assert((P<=>Q)))).
 pfc_file_expansion_0((RuleName :::: Rule),(:- pfc_assert((RuleName :::: Rule)))).
 pfc_file_expansion_0((=>P),(:- pfc_assert((=>P)))).
-pfc_file_expansion_0(Fact,Output):- get_functor(Fact,F,A),is_pred_declarer(F),pfc_add(Fact),Output='$was_imported_kb_content$'(Fact,is_pred_declarer(F)),!.
-pfc_file_expansion_0(Fact,Output):- get_functor(Fact,F,A),is_declarer_macro(F),pfc_add(Fact),Output='$was_imported_kb_content$'(Fact,is_declarer_macro(F)),!.
+pfc_file_expansion_0(Fact,Output):- get_functor(Fact,F,A),if_defined(functorDeclaresPred(F)),pfc_add(Fact),Output='$was_imported_kb_content$'(Fact,functorDeclaresPred(F)),!.
+pfc_file_expansion_0(Fact,Output):- get_functor(Fact,F,A),if_defined(functorDeclares(F)),pfc_add(Fact),Output='$was_imported_kb_content$'(Fact,functorDeclares(F)),!.
+pfc_file_expansion_0(Fact,Output):- get_functor(Fact,F,A),if_defined(prologMacroHead(F)),pfc_add(Fact),Output='$was_imported_kb_content$'(Fact,prologMacroHead(F)),!.
 
 
 was_exported_content(I,CALL,Output):-Output='$was_imported_kb_content$'(I,CALL),!.
@@ -1909,23 +1917,82 @@ pfc_file_expansion(I,OO):- compound(I),(I\=(:-(_))), I\= was_exported_content(_,
       (OO = O))).
 
 :- multifile(system:term_expansion/2).
-system:term_expansion(I,OO):- \+ thlocal:pfc_already_in_file_expansion(_), 
+system:term_expansion(I,OO):- \+ thlocal:disable_mpred_term_expansions_locally, \+ thlocal:pfc_already_in_file_expansion(_), 
   with_assertions(thlocal:pfc_already_in_file_expansion(I),pfc_file_expansion(I,OO)),!.
 
+show_pred_info(F/A):-functor(H,F,A),!,show_pred_info(H).
+show_pred_info(Head):-
+        doall(show_call(predicate_property(Head,_))),doall(show_call(clause(Head,_))).
  
 :-assert(thlocal:pfc_term_expansion_ok).
 
+:-dynamic(tCol/1).
+=>tCol(tCol).
 
-
+% ruleRewrite(isa(I,C),Head):-loop_check((atom(C),Head=..[C,I])).
 tCol(X) <=> isa(X,tCol).
 tCol(X) => ruleRewrite(t(X,I),isa(I,X)).
-tCol(X) => { pfc_add(isa(X,tCol)) },is_declarer_macro(X).
+tCol(P) => {get_functor(P,C), functor(Head,C,1),
+  (not(predicate_property(Head,_))->dynamic(C/1);true),  
+  Head=..[C,I],
+ (predicate_property(Head,dynamic)->true;show_pred_info(Head))},
+   functorDeclares(C),
+   isa(C,pfcControlled),
+   arity(C,1),
+   (isa(I,C)/ground(I:C)=>Head),
+   isa(C,tCol).
 
-genls(X,tPred) => is_declarer_macro(X).
+tCol(functorDeclaresPred).
 
-tCol(tCol).
-tCol(tPred).
-tCol(pfcControls).
+functorDeclaresPred(P) => {get_functor(P,C), functor(Head,C,1),
+  (not(predicate_property(Head,_))->dynamic(C/1);true),  
+  Head=..[C,I],
+ (predicate_property(Head,dynamic)->true;show_pred_info(Head))},
+   isa(C,pfcControlled),
+   arity(C,1),
+   (isa(I,C)/ground(I:C)=>Head).
+
+genls(X,tPred) <=> functorDeclaresPred(X).
+
+
+tCol(pfcControlled).
+tCol(functorDeclaresPred).
+tCol(functorDeclares).
+tCol(prologMacroHead).
+=>tCol(completelyAssertedCollection).
+tCol(ttFormatType).
+tCol(ttTemporalType).
+tCol(ttNotTemporalType).
+tCol(tTemporalThing).
+tCol(ftTerm).
+
+prologMacroHead(tCol).
+
+functorDeclaresPred(P)=>completelyAssertedCollection(P).
+
+completelyAssertedCollection(completelyAssertedCollection).
+completelyAssertedCollection(prologSingleValued).
+completelyAssertedCollection(tCol).
+completelyAssertedCollection(ttFormatType).
+completelyAssertedCollection(ttValueType).
+completelyAssertedCollection(ttTemporalType).
+completelyAssertedCollection(tRelation).
+completelyAssertedCollection(tPred).
+completelyAssertedCollection(defnSufficient).
+completelyAssertedCollection(genlPreds).
+
+:-dynamic(ttNotTemporalType/1).
+ttNotTemporalType(ftInt).
+%ttNotTemporalType(ftTerm).
+ttNotTemporalType(tCol).
+ttNotTemporalType(ttFormatType).
+ttNotTemporalType(ttValueType).
+
+=>ttNotTemporalType(tCol).
+ttNotTemporalType(T)=>tCol(T).
+=>ttTemporalType(tTemporalThing).
+ttTemporalType(T)=>tCol(T).
+
 
 
 :-dynamic(pfc_default/1).
@@ -1967,10 +2034,19 @@ mpred_sv(Pred,Arity)
 
 
 
+:- dynamic(isa/2).
 
 
 pfc_mark_C(G) => {pfc_mark_C(G)}.
-pfc_mark_C(G) :-  map_literals(pfc_lambda([P],(get_functor(P,F,A),pfc_add([isa(F,pfcControls),arity(F,A)]))),G).
+pfc_mark_C(G) :-  map_literals(pfc_lambda([P],(get_functor(P,F,A),pfc_add([isa(F,pfcControlled),arity(F,A)]))),G).
+
+(pfcControlled(F),arity(F,A),{not(current_predicate(F/A))})=>{dynamic_safe(F/A)}.
+pfcControlled(C)/compound(C)=>({get_functor(C,F)},pfcControlled(F)).
+isa(F,pfcMustFC)=>pfcControlled(F).
+
+
+functorDeclaresPred(Prop)=>tCol(Prop).
+
 
 
 end_of_file.

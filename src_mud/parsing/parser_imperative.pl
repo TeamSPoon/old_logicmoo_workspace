@@ -294,31 +294,34 @@ parse_agent_text_command_1(Agent,SVERB,ARGS,Agent,GOAL):-
    dmsg_parserm(parserm("chooseBestGoal"=GOAL)).
 
 
-verb_alias('l',actLook).
-verb_alias('lo',actLook).
-verb_alias('s',actMove(vSouth)).
-% verb_alias('go','go').
-verb_alias('where is',actWhere).
+user:verb_alias('l',actLook).
+user:verb_alias('lo',actLook).
+user:verb_alias('s',actMove(vSouth)).
+% user:verb_alias('go','go').
+user:verb_alias('where is',actWhere).
 
 % pos_word_formula('infinitive',Verb,Formula):- 'infinitive'(TheWord, Verb, _, _G183), 'verbSemTrans'(TheWord, 0, 'TransitiveNPCompFrame', Formula, _, _).
 
-verb_alias_to_verb(IVERB,SVERB):- verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.
+verb_alias_to_verb(IVERB,SVERB):- user:verb_alias(L,Look),verb_matches(L,IVERB),SVERB=Look,!.
 verb_alias_to_verb(IVERB,SVERB):- coerce(IVERB,vtVerb,SVERB), IVERB \= SVERB.
 
 subst_parser_vars(Agent,TYPEARGS,TYPEARGS_R):- subst(TYPEARGS,isSelfAgent,Agent,S1),where_atloc(Agent,Here),subst(S1,vHere,Here,TYPEARGS_R).
 
 % verb_matches("go",VERB):-!,VERB=go.
 verb_matches(SVERB,VERB):-samef(VERB,SVERB).
-verb_matches(SVERB,VERB):-name_text(VERB,SVERB).
+verb_matches(SVERB,VERB):-name_text_matches(SVERB,VERB).
+
+name_text_matches(SVERB,VERB):-name_text(SVERB,SSTR),name_text(VERB,STR),(same_ci(SSTR,STR)),!.
+
 
 get_vp_templates(_Agent,SVERB,_ARGS,TEMPLATES):-
    findall([VERB|TYPEARGS],
     ((
       get_all_templates(TEMPL),
      %isa(Agent,What),
-     %action_info(What,TEMPL,_),
+     %user:action_info(What,TEMPL,_),
      TEMPL=..[VERB|TYPEARGS],
-     verb_matches(SVERB,VERB))),
+     (verb_matches(SVERB,VERB)))),
      TEMPLATES_FA),
     % ( TEMPLATES_FA=[] -> (dmsg(noTemplates(Agent,SVERB,ARGS)),!,fail); true),
    predsort(mostIdiomatic,TEMPLATES_FA,TEMPLATES).

@@ -55,7 +55,7 @@ action_verb_useable(actStow,tStowAble,mudStowing,mudPossess,mudWielding).
 % action_verb_useable(actUse,mudUsing,tUseAble,mudPossess,mudPossess).
 
 
-action_info(Syntax,String):-
+user:action_info(Syntax,String):-
  action_verb_useable(ActUse,Wieldable,NowWielding,Possessing,Unstowed),
    Syntax=..[ActUse,Wieldable],
    sformat(String,'~w a ~w that you ~w so it will be ~w and not be ~w.',[ActUse,Wieldable,Possessing,NowWielding,Unstowed]).

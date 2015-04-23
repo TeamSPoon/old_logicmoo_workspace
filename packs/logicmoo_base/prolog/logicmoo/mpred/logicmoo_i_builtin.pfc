@@ -30,7 +30,7 @@
 
 :-dynamic(subFormat/2).
 
-:-decl_type(tBird).
+tCol(tBird).
 :-must(dynamic(tBird/1)).
 
 tCol(X)=>{decl_type(X)}.
@@ -87,10 +87,10 @@ notequal(C,B) <= equal(A,C),notequal(A,B).
 :-export(string/1).
 :-export(var/1).
 
-:- decl_type(completelyAssertedCollection).
-:- decl_type(completeExtentAsserted).
-:- decl_type(ttFormatType).
-:- decl_type(functorDeclares).
+tCol(completelyAssertedCollection).
+tCol(completeExtentAsserted).
+tCol(ttFormatType).
+tCol(functorDeclares).
 :- decl_mpred_hybrid isa/2.
 
 % :- decl_mpred_pfc neg/1.
@@ -125,21 +125,21 @@ notequal(C,B) <= equal(A,C),notequal(A,B).
 :- decl_mpred_hybrid(genls/2).
 :- decl_mpred_hybrid(typeGenls/2).
 :- decl_mpred_prolog(arg/3).
-:- decl_type(pred_argtypes).
-:- decl_type(prologMultiValued).
-:- decl_type(prologSingleValued).
-:- decl_type(tCol).
-:- decl_type(tFunction).
-:- decl_type(tInferInstanceFromArgType).
-:- decl_type(tPred).
-:- decl_type(tRelation).
-:- decl_type(ttFormatted).
-:- decl_type(ttSpatialType).
-:- decl_type(ttTypeType).
-:- decl_type(tPathway).
+tCol(pred_argtypes).
+tCol(prologMultiValued).
+tCol(prologSingleValued).
+tCol(tCol).
+tCol(tFunction).
+tCol(tInferInstanceFromArgType).
+tCol(tPred).
+tCol(tRelation).
+tCol(ttFormatted).
+tCol(ttSpatialType).
+tCol(ttTypeType).
+tCol(tPathway).
 
-:- decl_type(ttValueType).
-:- decl_type(vtActionTemplate).
+tCol(ttValueType).
+tCol(vtActionTemplate).
 :- define_ft(ftString).
 :- define_ft(ftVar).
 :- define_ft(ftSpec).
@@ -154,7 +154,7 @@ argQuotedIsa(Prop,N,Type) <= argIsa(Prop,N,Type),ttFormatType(Type).
 %prologHybrid(typeProps(tCol,ftVoprop)).
 :- discontiguous(prologSingleValued/1).
 :- do_gc.
-:- forall(is_pred_declarer(F),must((decl_type(F),add(isa(F,functorDeclares)),add(genls(F,tPred))))).
+:- forall(functorDeclaresPred(F),must((decl_type(F),add(isa(F,functorDeclares)),add(genls(F,tPred))))).
 :- export mtForPred/2.
 :- user:decl_mpred_hybrid((argIsa/3, formatted_resultIsa/2, localityOfObject/2, subFormat/2, isa/2, mudLabelTypeProps/3, genls/2, pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, ttFormatType/1, typeProps/2)).
 :-add(isa(tObj,ttSpatialType)).
@@ -199,8 +199,13 @@ ttFormatted(ftDice(ftInt,ftInt,ftInt)).
 ttFormatted(ftListFn(ftRest)).
 ttFormatted(ftDeplictsFn(tCol)).
 
-:- decl_type(tAvoidForwardChain).
-:- decl_type('SententialOperator').
+ttTemporalType(tAgentGeneric).
+ttTemporalType(tItem).
+ttTemporalType(tObj).
+ttTemporalType(tRegion).
+
+tCol(tAvoidForwardChain).
+tCol('SententialOperator').
 :- assert_hasInstance(tAvoidForwardChain,'$VAR'('FUNC')).
 
 tAvoidForwardChain(isEach('FunctionToArg',holds,equals,different,evaluate,trueSentence,'TINYKB-ASSERTION',termOfUnit)).
@@ -297,8 +302,8 @@ tChannel(A):- tAgentGeneric(A).
 tChannel(A):- tRegion(A).
 tChannel(iGossupChannel).
 
-:-decl_type(tNewlyCreated).
-:-decl_type(ttTypeFacet).
+tCol(tNewlyCreated).
+tCol(ttTypeFacet).
 
 ttTypeFacet(tNewlyCreated).
 ttTypeFacet(ttTypeFacet).
@@ -337,7 +342,7 @@ ttUnverifiableType(vtDirection).
 
 
 
-is_pred_declarer(ArgsIsa)=>isa(ArgsIsa,tCol).
+functorDeclaresPred(ArgsIsa)=>isa(ArgsIsa,tCol).
 %TODO isa(_,ArgsIsa)=>tCol(ArgsIsa).
 cycAssert(A,B):- trace_or_throw(cycAssert(A,B)).
 
@@ -428,7 +433,7 @@ dividesBetween(tAgentGeneric,tPlayer,tNpcPlayer).
 => tCol(ttSpatialType).
 => tCol(ttFormatType).
 => tCol(functorDeclares).
-% tCol(ArgsIsa):-is_pred_declarer(ArgsIsa).
+% tCol(ArgsIsa):-functorDeclaresPred(ArgsIsa).
 % TODO decide if OK
 %tCol(F):-hasInstance(functorDeclares,F).
 => tCol(ttFormatType).
@@ -487,7 +492,7 @@ genls(ttPreAssertedCollection,completelyAssertedCollection).
 
 ( ttFormatted(FT), {dif:dif(FT,COL)}, genls(FT, COL),tCol(COL),{not(isa(COL,ttFormatType))}) => formatted_resultIsa(FT,COL).
 
-:-decl_type(ttNonGenled).
+tCol(ttNonGenled).
 % genls(ttFormatType,ttNonGenled).
 isa('Thing',ttNonGenled).
 isa('CycLTerm',ttNonGenled).
@@ -544,7 +549,7 @@ implies(and(resultIsaArg('$VAR'('FUNC'), 5), arg5Genl('$VAR'('FUNC'), '$VAR'('CO
 %((genlPreds(Col1,Col2),(arity(Col1,1);arity(Col2,1)))=>genls(Col1,Col2)).
 %((genls(Col1,Col2),(tPred(Col1);tPred(Col2)))=>genlPreds(Col1,Col2)).
 
-:-decl_type('UnaryPredicate').
+tCol('UnaryPredicate').
 
 ((argQuotedIsa(Pred, _, 'CycLSentence') => 'SententialOperator'(Pred))).
 

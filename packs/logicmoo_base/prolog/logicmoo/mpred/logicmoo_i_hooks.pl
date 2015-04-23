@@ -238,7 +238,7 @@ t(CALL):- into_plist_arities(3,10,CALL,[P|LIST]),mpred_plist_t(P,LIST).
 mpred_plist_t(P,[]):-!,t(P).
 mpred_plist_t(P,LIST):-var(P),!,is_list(LIST),CALL=..[t,P|LIST],debugOnError((CALL)).
 mpred_plist_t(t,[P|LIST]):-!, mpred_plist_t(P,LIST).
-mpred_plist_t(user:mpred_prop,[C,A,I]):-!,ground(I:C),user:mpred_prop(C,A,I).
+mpred_plist_t(user:mpred_prop,[C,A,I]):-!,ground(I:C),user:mpred_prop(C,I).
 mpred_plist_t(isa,[I,C]):-!,hasInstance(C,I).
 mpred_plist_t(P,_):-never_mpred_mpred(P),!,fail.
 mpred_plist_t(P,[L|IST]):-is_holds_true(P),!,mpred_plist_t(L,IST).

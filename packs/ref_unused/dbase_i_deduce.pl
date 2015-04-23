@@ -82,7 +82,7 @@ run_deduce_facts_from_ilc(Type,Fact):-doall((call_no_cuts(deduce_facts_forward(F
 
 deduceFromArgTypes(_).
 
-deduce_facts_forward(Fact,user:mpred_prop(AF,[pred_argtypes(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],is_pred_declarer(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,
+deduce_facts_forward(Fact,user:mpred_prop(AF,[pred_argtypes(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],functorDeclaresPred(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,
                 ArgTs=..[AF|ARGS],!,sanity(ground(ARGS)).
 
 deduce_facts_forward(pred_argtypes(ArgTs),user:mpred_prop(F,pred_argtypes(ArgTs))):-get_functor(ArgTs,F),assert_predArgTypes_fa(F,ArgTs).

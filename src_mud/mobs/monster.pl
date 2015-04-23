@@ -16,8 +16,8 @@
 % :- dynamic memory/2. 
 % :- dynamic  agent_list/1.
 
-% Possible agent actions.
 :- include(prologmud(mud_header)).
+% Possible agent actions.
 % :- register_module_type (planning).
 
 :-decl_type(tMonster).

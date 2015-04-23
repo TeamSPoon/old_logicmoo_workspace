@@ -56,7 +56,7 @@ detatch_object(Obj):-
   (clr(inRegion(Obj,_))),!.
    
 
-action_info(actInventory(isOptional(tAgentGeneric,isSelfAgent)), "Examine an inventory").
+user:action_info(actInventory(isOptional(tAgentGeneric,isSelfAgent)), "Examine an inventory").
 
 user:agent_call_command(Agent,actInventory(Who)):- show_inventory(Agent,Who).
 

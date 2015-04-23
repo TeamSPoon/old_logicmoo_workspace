@@ -50,8 +50,7 @@
 :-multifile(thlocal:into_form_code).
 :-thread_local(thlocal:into_form_code).
 :-thread_local(thlocal:disable_mpred_term_expansions_locally/0).
-:-thread_local(user:disable_mpred_term_expansions).
-:-dynamic(thglobal:disable_mpred_term_expansions_globally/0).
+:-dynamic(thglobal:thlocal:disable_mpred_term_expansions_locally_globally/0).
 
 %fwc:-true.
 %bwc:-true.
@@ -73,7 +72,7 @@ pfc_using_file(F):- inside_file(pfc),!.
 pfc_using_file(F):- file_name_extension(_,pfc,F),!.
 
 
-must_compile_special_clause(CL):- (CL \= :-(_)),
+must_compile_special_clause(CL):- \+ thlocal:disable_mpred_term_expansions_locally,  (CL \= :-(_)), 
    sanity(nonvar(CL)), \+(thlocal:into_form_code),
     \+(thlocal:already_in_file_term_expansion),
     \+((get_functor(CL,F),expanded_already_functor(F))),
@@ -84,6 +83,7 @@ must_compile_special_clause(CL):- (CL \= :-(_)),
 
 pfc_use_module(M):- must(atom(M)),retractall(pfc_skipped_module(M)),show_call(asserta_if_new(thlocal:pfc_module_expansion(M))).
 
+compile_this(_,_,_,_):- thlocal:disable_mpred_term_expansions_locally,!,fail.
 compile_this(_,F,M:C,O):-atom(M),!,compile_this(M,F,C,O).
 compile_this(M,F,'$was_imported_kb_content$'(_,_),code):-!.
 compile_this(M,F,C,pfc_add):- pfc_using_file(F), \+ pfc_skipped_module(M),!.
@@ -154,6 +154,8 @@ expanded_already_functor(_:NV):-nonvar(NV),!,expanded_already_functor(NV).
 
 pfc_prove_neg(G):-trace, \+ pfc_bc_caching(G), \+ pfc_fact(G).
 
+:- multifile(system:term_expansion/2).
+:- multifile(system:goal_expansion/2).
 system:goal_expansion(A,_B):-fail,notrace((source_module(M),(M=pfc_sanity;M=user;M=system),if_defined(pmsg(M:goal_expansion(A)),format(user_error,'~N% ~q~n',M:goal_expansion(A))))),fail.
 system:term_expansion(A,_B):-fail,notrace((source_module(M),(M=pfc_sanity;M=user;M=system),if_defined(pmsg(M:term_expansion(A)),format(user_error,'~N% ~q~n',M:term_expansion(A))))),fail.
 
@@ -163,6 +165,7 @@ system:goal_expansion(N,pfc_prove_neg(P)):-fail,pfc_from_negation_plus_holder(N,
 
 :-thread_local(mpred_pfc_add_loaded).
 
+pfc_directive_expansion(_,_):- thlocal:disable_mpred_term_expansions_locally,!,fail.
 
 pfc_directive_expansion(pfc_ops, 
            ( op(500,fx,('~')),op(500,fx,('neg')),op(1075,xfx,('=>')), op(1075,xfx,('<=>')),op(1075,xfx,('<=')), op(1100,fx,('=>')), op(1150,xfx,('::::')))).
@@ -203,18 +206,18 @@ inside_file(W) :- prolog_load_context(source,Source),user:mpred_directive_value(
 system:term_expansion((:- (M:DIR)),O):-atom(M),atom(DIR),with_source_module(M, ((pfc_directive_expansion(DIR,OO),!, must(O=(:- OO))))).
 system:term_expansion((:- DIR),O):- atom(DIR), pfc_directive_expansion(DIR,OO),!,must(O=(:- OO)).
 system:term_expansion(A,BO):- fail, notrace((A\=(:-_),A\=end_of_file,current_predicate(pfc_file_loaded/0))), 
-   notrace((\+ user:disable_mpred_term_expansions, \+ thlocal:already_in_file_term_expansion,\+ (get_functor(A,F),expanded_already_functor(F)))),
+   notrace((\+ thlocal:disable_mpred_term_expansions_locally, \+ thlocal:already_in_file_term_expansion,\+ (get_functor(A,F),expanded_already_functor(F)))),
    ((source_file(I),must(loading_module(M);source_module(M)))),
    with_no_assertions(thlocal:consulting_sources, 
    with_source_module(M, loop_check(pfc_file_module_term_expansion(I,M,A,B)))),
    must(nonvar(B)),BO=B.
 
 % ISA QUERY
-system:goal_expansion(ISA,GO) :- once((compound(ISA),was_isa(ISA,I,C))),thlocal:is_calling,show_call(GO=no_repeats(isa(I,C))).
+system:goal_expansion(ISA,GO) :- \+ thlocal:disable_mpred_term_expansions_locally, once((compound(ISA),was_isa(ISA,I,C))),thlocal:is_calling,show_call(GO=no_repeats(isa(I,C))).
 % ISA GOAL
 % pfc_system_goal_expansion(G,GO):-G\=isa(_,_),was_isa(G,I,C),GO=isa(I,C).
 % ISA EVER
-%pfc_term_expansion(G,GO):-call( \+ user:disable_mpred_term_expansions ),was_isa(G,I,C),GO=isa(I,C).
+%pfc_term_expansion(G,GO):-  \+ thlocal:disable_mpred_term_expansions_locally,was_isa(G,I,C),GO=isa(I,C).
 
 
 
@@ -2884,8 +2887,6 @@ pfc_why_non_interactive1(P):-
 
 
 
-
-:- multifile(term_expansion/2).
 
 
 

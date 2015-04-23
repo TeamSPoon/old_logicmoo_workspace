@@ -174,15 +174,15 @@ db_expand_0(Op,EACH,O):- EACH=..[each|List],db_expand_maplist(fully_expand_now(O
 db_expand_0(_ ,user:mpred_prop(I, C),user:mpred_prop(I, C)):-atom(C),!.
 db_expand_0(_ ,pred_argtypes(F,Args),isa(Args,pred_argtypes)):-atom(F),!,functor(Args,Pred,A),assert_arity(Pred,A).
 db_expand_0(_ ,pred_argtypes(Args),isa(Args,pred_argtypes)):-!,functor(Args,Pred,A),assert_arity(Pred,A).
-db_expand_0(Op,PredDEclaration,O):-PredDEclaration=..[F,Pred/A|Args],is_pred_declarer(F),
+db_expand_0(Op,PredDEclaration,O):-PredDEclaration=..[F,Pred/A|Args],functorDeclaresPred(F),
   integer(A),
   assert_arity(Pred,A),
   expand_props(Op,props(Pred,[arity(A),F,tPred|Args]),O),!.
-db_expand_0(Op,PredDEclaration,O):-PredDEclaration=..[F,PredDecl|Args],is_pred_declarer(F),
+db_expand_0(Op,PredDEclaration,O):-PredDEclaration=..[F,PredDecl|Args],functorDeclaresPred(F),
   compound(PredDecl),functor(PredDecl,Pred,A), (F==pred_argtypes -> ISA = tPred ; ISA=F),
   assert_arity(Pred,A),
   expand_props(Op,props(Pred,[arity(A),pred_argtypes(PredDecl),tPred,ISA|Args]),O),!.
-db_expand_0(Op,PredDEclaration,O):-PredDEclaration=..[F,Pred|Args],is_pred_declarer(F),
+db_expand_0(Op,PredDEclaration,O):-PredDEclaration=..[F,Pred|Args],functorDeclaresPred(F),
   atom(Pred),
   expand_props(Op,props(Pred,[tPred,F|Args]),O),!.
 
@@ -476,7 +476,7 @@ transform_functor_holds(Op,_,ArgIn,_,ArgOut):- transform_holds(Op,ArgIn,ArgOut),
 transform_holds_3(_,A,A):-not(compound(A)),!.
 transform_holds_3(_,props(Obj,Props),props(Obj,Props)):-!.
 %transform_holds_3(Op,Sent,OUT):-Sent=..[And|C12],is_logical_functor(And),!,maplist(transform_holds_3(Op),C12,O12),OUT=..[And|O12].
-transform_holds_3(_,A,A):-functor_catch(A,F,N), predicate_property(A,_),user:mpred_prop(F,arity(N)),!.
+transform_holds_3(_,A,A):-functor_catch(A,F,N), predicate_property(A,_),arity(F,N),!.
 transform_holds_3(HFDS,M:Term,OUT):-atom(M),!,transform_holds_3(HFDS,Term,OUT).
 transform_holds_3(HFDS,[P,A|ARGS],DBASE):- var(P),!,DBASE=..[HFDS,P,A|ARGS].
 transform_holds_3(HFDS, ['[|]'|ARGS],DBASE):- trace_or_throw(list_transform_holds_3(HFDS,['[|]'|ARGS],DBASE)).

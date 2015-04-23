@@ -252,7 +252,6 @@ provide_clauses_list(Head,HBLISTO):- get_pifunctor(Head,PHead,_),
 
 
 ensure_universal_stub_plus_minus_2_HIDE(F,AMinus2):-
-   decl_mpred(F,arity(AMinus2)),
    decl_mpred_hybrid(F/AMinus2).
    
 ensure_universal_stub_plus_2(F,A2):- once(( AMinus2 is A2 -2, ensure_universal_stub_plus_minus_2(F,AMinus2))),fail.
@@ -303,10 +302,11 @@ ensure_universal_stub5(HeadIn,Head,F,A,_HBLIST):- thglobal:pfcManageHybrids,!,
    tf_result(predicate_property(Head,dynamic),WasDynamic),
    tf_result(predicate_property(Head,multifile),WasMulifile),      
    asserta_if_new(user:mpred_prop(F,StubType)),
+   add(isa(F,StubType)),
    dynamic_safe(F/A),
-   call((asserta_if_new(user:mpred_prop(F,predStub(StubType))))),
    % abolish(F,A),
    % really_add_mpred_storage_op(Head),
+   (predicate_property(Head,dynamic)->true;show_pred_info(Head)),
    must((predicate_property(Head,dynamic))),
    (WasDynamic-> (dynamic_safe(F/A),(if_result(WasMulifile,multifile(F/A)))) ; dynamic_safe(F/A)),   
    % public(F/A),
@@ -314,6 +314,7 @@ ensure_universal_stub5(HeadIn,Head,F,A,_HBLIST):- thglobal:pfcManageHybrids,!,
    discontiguous(Head),
    retractall(user:mpred_prop(F,prologOnly)),
    pfc_mark_C(Head),
+   add(isa(Head,pfcControlled)),
    dmsg(pfcManageHybrids(HeadIn)),!.
 
 

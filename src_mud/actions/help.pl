@@ -25,14 +25,14 @@ get_all_templates0(Templ):-get_good_templates(Templ).
 get_all_templates0(Templ):-get_bad_templates(Templ),not(get_good_templates(Templ)).
 
 get_good_templates(Templ):- isa(Templ,vtActionTemplate),good_template(Templ).
-% get_good_templates(Templ):- no_repeats_old((action_info(Templ,_),good_template(Templ))).
+% get_good_templates(Templ):- no_repeats_old((user:action_info(Templ,_),good_template(Templ))).
 
 
-get_bad_templates(Templ):- no_repeats_old((action_info(Templ,_),not(good_template(Templ)))).
+get_bad_templates(Templ):- no_repeats_old((user:action_info(Templ,_),not(good_template(Templ)))).
 
 
-action_info(TEMPL, txtConcatFn(Text,'does: ',do(A2,TEMPL))) <= {between(1,5,L),length(Text,L),get_agent_text_command(_A,Text,A2,Goal),(ground(Goal)->TEMPL=Goal;TEMPL=Text)}.
-(action_rules(_Agent,Verb,[Obj|Objs],List),{atom(Verb),safe_univ(Syntax,[Verb,Obj|Objs])} => action_info(Syntax, txtConcatFn(makes,happen,List))).
+user:action_info(TEMPL, txtConcatFn(Text,'does: ',do(A2,TEMPL))) <= {between(1,5,L),length(Text,L),get_agent_text_command(_A,Text,A2,Goal),(ground(Goal)->TEMPL=Goal;TEMPL=Text)}.
+(action_rules(_Agent,Verb,[Obj|Objs],List),{atom(Verb),safe_univ(Syntax,[Verb,Obj|Objs])} => user:action_info(Syntax, txtConcatFn(makes,happen,List))).
 
 to_param_doc(TEMPL,S):-sformat(S,'Prolog looks like: ~q',[TEMPL]).
 
@@ -47,7 +47,7 @@ action_info_db(TEMPL,INFO,WAS):- (PRED=user:agent_call_command(_,WAS);PRED=user:
     (TEMPL=@=WAS -> ((clause_property(REF,line_count(LC)),INFO=line(LC:S))) ;  (not(not(TEMPL=WAS)) -> INFO=file(S) ; fail)).
 
 % :-trace.
-action_info(TEMPL,txtConcatFn(S,contains,WAS)) <= {action_info_db(TEMPL,S,WAS),not_asserted(action_info(TEMPL,_Help))}.
+user:action_info(TEMPL,txtConcatFn(S,contains,WAS)) <= {action_info_db(TEMPL,S,WAS),not_asserted(user:action_info(TEMPL,_Help))}.
 
 
 commands_list(ListS):- findall(Templ,get_all_templates(Templ),List),predsort(alpha_shorter_1,List,ListS).
@@ -60,8 +60,8 @@ alpha_shorter_1(OrderO, P1,P2):-functor_h(P1,F1,A1),functor_h(P2,F2,A2),compare(
   (compare(OrderA,A1,A2), (OrderA \== '=' -> OrderO=OrderA ; compare(OrderO,P1,P2)))).
 
 
-show_templ_doc(TEMPL):-findall(DOC,action_info(TEMPL,DOC),DOCL),nvfmt(TEMPL=DOCL).
-show_templ_doc_all(TEMPL):-findall(DOC,action_info(TEMPL,DOC),DOCL),nvfmt(TEMPL=DOCL).
+show_templ_doc(TEMPL):-findall(DOC,user:action_info(TEMPL,DOC),DOCL),nvfmt(TEMPL=DOCL).
+show_templ_doc_all(TEMPL):-findall(DOC,user:action_info(TEMPL,DOC),DOCL),nvfmt(TEMPL=DOCL).
 
 nvfmt([XX]):-!,nvfmt(XX).
 nvfmt(XX=[YY]):-!,nvfmt(XX=YY).
@@ -89,10 +89,10 @@ user:hook_coerce(Text,vtVerb,Inst):- isa(Inst,vtVerb),name_text(Inst,Text).
 
 % :-add(((get_all_templates(Templ))=>vtActionTemplate(Templ))).
 
-(type_action_info(_,TEMPL,Help) => action_info(TEMPL,Help)).
-(action_info(TEMPL,_Help) => vtActionTemplate(TEMPL)).
-((vtActionTemplate(TEMPL), { not_asserted(action_info(TEMPL,_)),to_param_doc(TEMPL,S)}) => action_info(TEMPL,S)).
-
+(type_action_info(_,TEMPL,Help) => user:action_info(TEMPL,Help)).
+(user:action_info(TEMPL,_Help) => vtActionTemplate(TEMPL)).
+((vtActionTemplate(TEMPL), { not_asserted(user:action_info(TEMPL,_)),to_param_doc(TEMPL,S)}) => user:action_info(TEMPL,S)).
+user:action_info(TEMPL,_S)=>vtActionTemplate(TEMPL).
 
 
 
