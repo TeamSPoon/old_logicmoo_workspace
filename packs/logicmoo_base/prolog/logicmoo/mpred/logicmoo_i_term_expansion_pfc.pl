@@ -222,16 +222,6 @@ pfc_file_loaded.
 end_of_file.
 
 
-% ISA QUERY
-system:goal_expansion(ISA,GO) :- \+ thlocal:disable_mpred_term_expansions_locally, once((compound(ISA),was_isa(ISA,I,C))),thlocal:is_calling,show_call(GO=no_repeats(isa(I,C))).
-% ISA GOAL
-% pfc_system_goal_expansion(G,GO):-G\=isa(_,_),was_isa(G,I,C),GO=isa(I,C).
-% ISA EVER
-%pfc_term_expansion(G,GO):-  \+ thlocal:disable_mpred_term_expansions_locally,was_isa(G,I,C),GO=isa(I,C).
-
-
-
-
 
 :-if(current_module(pfc)).
 :-throw(loaded(pfc)).

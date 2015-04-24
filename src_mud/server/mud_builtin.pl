@@ -486,25 +486,6 @@ pathConnects(R1,R2):-pathBetween(R2,Dir,R1),nop(Dir).
 
 
 
-:- decl_mpred_prolog(ensure_some_pathBetween/2).
-ensure_some_pathBetween(R1,R2):- pathBetween(R1,_,R2),!.
-ensure_some_pathBetween(R1,R2):- pathBetween(R2,_,R1),!.
-ensure_some_pathBetween(R1,R2):- 
-   random_instance(vtBasicDir,Dir,true),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
-   must((add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)))),!.
-ensure_some_pathBetween(R1,R2):- 
-   random_instance(vtBasicDirPlusUpDown,Dir,true),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
-   must((add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)))),!.
-ensure_some_pathBetween(R1,R2):- 
-   random_instance(vtDirection,Dir,true),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
-   must((add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)))),!.
-
-:- decl_mpred_prolog(do_ensure_some_pathBetween/0).
-do_ensure_some_pathBetween:- 
-  must((forall(no_repeats((is_asserted(pathConnects(R1,R2)),ground(R1:R2),isa(R1,tRegion),isa(R2,tRegion),dif(R1,R2))),
-    show_call_failure((ensure_some_pathBetween(R1,R2),ensure_some_pathBetween(R2,R1)))))).
-
-:-onEachLoad(must(do_ensure_some_pathBetween)).
 
 :-assert_until_end_of_file(infSupertypeName).
 :-onEndOfFile(dmsg(infSupertypeName)).
@@ -641,6 +622,28 @@ genls(tBread, tFood).
 typeProps(tCrackers,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]).
 
 
+
+:- decl_mpred_prolog(ensure_some_pathBetween/2).
+ensure_some_pathBetween(R1,R2):- pathBetween(R1,_,R2),!.
+ensure_some_pathBetween(R1,R2):- pathBetween(R2,_,R1),!.
+ensure_some_pathBetween(R1,R2):- 
+   random_instance(vtBasicDir,Dir,true),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
+   must((add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)))),!.
+ensure_some_pathBetween(R1,R2):- 
+   random_instance(vtBasicDirPlusUpDown,Dir,true),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
+   must((add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)))),!.
+ensure_some_pathBetween(R1,R2):- 
+   random_instance(vtDirection,Dir,true),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
+   must((add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)))),!.
+
+:- decl_mpred_prolog(user:do_ensure_some_pathBetween/0).
+user:do_ensure_some_pathBetween:- 
+  must((forall(no_repeats((is_asserted(pathConnects(R1,R2)),ground(R1:R2),isa(R1,tRegion),isa(R2,tRegion),dif(R1,R2))),
+    show_call_failure((ensure_some_pathBetween(R1,R2),ensure_some_pathBetween(R2,R1)))))).
+
+:-onEachLoad(must(user:do_ensure_some_pathBetween)).
+
+
 /*
 
  the CycL language extends Prolog's first order logic capabilities with some higher order logics.  
@@ -675,5 +678,6 @@ O = [
       parent(P, C):- grandparent(G, C), parent(G,P))].   % if you prove G is grandparent of P somehow, you will have proved that G is parent to  parentOf P
 
 */
+
 
 

@@ -147,7 +147,8 @@ isa(iExplorer1,'tExplorer').
 
 :-onSpawn(localityOfObject(iExplorer1,'tLivingRoom')).
 
-:- do_ensure_some_pathBetween.
+:- include(prologmud(server/mud_builtin)).
+:- ((trace,user:do_ensure_some_pathBetween)).
 
 
 
