@@ -40,277 +40,6 @@
 :- decl_type(ttSpatialType).
 :- decl_type(ttTypeType).
 :- decl_type(tPathway).
-:- forall(mpred_hooks:mpred_is_trigger(F),must((decl_type(F),add(isa(F,functorDeclares)),add(genls(F,tPred))))).
-
-:- add((isa(isEach(prologMultiValued,prologOrdered,prologNegByFailure,pred_argtypes,prologPTTP,prologHybrid,predCanHaveSingletons,code,code,prologMacroHead,prologListValued,prologSingleValued),tCol))).
-
-:- add((isa(isEach(prologMultiValued,prologOrdered,prologNegByFailure,pred_argtypes,prologPTTP,prologHybrid,predCanHaveSingletons,code,code,prologMacroHead,prologListValued,prologSingleValued),functorDeclares))).
-
-:-dynamic(subFormat/2).
-
-:-decl_type(tBird).
-:-must(dynamic(tBird/1)).
-
-tCol(X)=>{decl_type(X)}.
-
-:- meta_predicate(neg(0)).
-:- dynamic(neg(0)).
-
-:-dynamic(pred_module/2).
-:-decl_mpred(pred_module/2).
-
-:-dynamic(argIsa/3).
-:-decl_mpred(argIsa/3).
-
-isa(Spec,tCol)=>arity(Spec,1).
-
-% TODO ADD props(I,[C])
-% :-pfc_add((mpred_prop(I,C)=>{add((isa(I,tPred),decl_mpred(I,C)))})).
-
-
-%TODO :-pfc_add((hasInstance(C,I)=>{ /* retract(hasInstance_dyn(C,I)), */ add((isa(I,C))) , add((props(I,C)))})).
-
-:- meta_predicate(mp_test_agr(?,+,-,*,^,:,0,1,5,9)).
-% becomes         mp_test_agr(+,+,-,?,^,:,0,1,0,0)
-
-mp_test_agr(_,_,_,_,_,_,_,_,_,_).
-
-:-show_call(predicate_property(mp_test_agr(_,_,_,_,_,_,_,_,_,_),meta_predicate(_))).
-
-:-pfc_trace.
-
-:- include(logicmoo_i_header).
-
-:-must(assert_argIsa(tPred,1,tPred)).
-
-
-
-% a pretty basic conflict.
-(({pfc_literal(P)}, neg(P), P => conflict(P))).
-
-/*
-% reflexive equality
-equal(A,B) => equal(B,A).
-equal(A,B),{ \+ (A=B}),equal(B,C),{ \+ (A=C)} => equal(A,C).
-
-notequal(A,B) <= notequal(B,A).
-notequal(C,B) <= equal(A,C),notequal(A,B).
-*/
-
-% is this how to define constraints?
-% either(P,Q) => (neg(P) => Q), (neg(Q) => P).
-% (P,Q => false) => (P => neg(Q)), (Q => neg(P)).
-
-
-:-export(member/2).
-:-export(arg/3).
-%:-export(mpred_call/1).
-:-decl_mpred_prolog(cycAssert/2).
-:-export(integer/1).
-% :-export(makeConstant/1).
-% :-export(naf/1).
-:-export(number/1).
-:-export(string/1).
-:-export(var/1).
-
-:- decl_type(completelyAssertedCollection).
-:- decl_type(completeExtentAsserted).
-:- decl_type(ttFormatType).
-:- decl_type(functorDeclares).
-:- decl_mpred_hybrid isa/2.
-
-% :- decl_mpred_pfc neg/1.
-:- decl_mpred_hybrid genls/2.
-:- decl_mpred_hybrid(( tCol/1, genls/2, pred_argtypes/1)).
-:- decl_mpred_hybrid(typeProps/2).
-:- must(arity(typeProps,2)).
-:- add((argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,pred_argtypes,prologHybrid,prologPTTP,predCanHaveSingletons,code,prologMacroHead,prologListValued,prologSingleValued),1,tPred))).
-:- add((argIsa(isEach(tPred,prologMultiValued,prologOrdered,prologNegByFailure,pred_argtypes,prologHybrid,prologPTTP,code,prologMacroHead,prologListValued,prologSingleValued),2,ftListFn(ftVoprop)))).
-:- add((genls(isEach(prologMultiValued,prologOrdered,prologNegByFailure,pred_argtypes,prologHybrid,prologPTTP,code,prologMacroHead,prologListValued,prologSingleValued),tPred))).
-:- assert_hasInstance(tCol,tCol).
-:- begin_transform_moo_preds.
-:- debug.
-%TODO FIX :- decl_mpred(tDeleted(ftID),[predIsFlag]).
-:- decl_mpred_hybrid disjointWith/2.
-:- decl_mpred_hybrid(( ttNotSpatialType/1,ttSpatialType/1 )).
-:- decl_mpred_hybrid((genlInverse/2,genlPreds/2)).
-:- decl_mpred_hybrid(argIsa/3).
-:- decl_mpred_hybrid(argSingleValueDefault, 3).
-:- decl_mpred_hybrid(disjointWith/2).
-:- decl_mpred_hybrid(instTypeProps/3).
-:- decl_mpred_hybrid(pred_module, 2).
-:- decl_mpred_hybrid(predProxyAssert,2).
-:- decl_mpred_hybrid(predProxyQuery, 2).
-:- decl_mpred_hybrid(predProxyRetract, 2).
-:- decl_mpred_hybrid(predTypeMax/3).
-:- decl_mpred_hybrid(prologSingleValued/1).
-:- decl_mpred_hybrid(resultIsa/2).
-:- decl_mpred_hybrid(genls/2).
-:- decl_mpred_hybrid(isa/2).
-:- decl_mpred_hybrid(genls/2).
-:- decl_mpred_hybrid(typeGenls/2).
-:- decl_mpred_prolog(arg/3).
-
-:- decl_type(ttValueType).
-:- decl_type(vtActionTemplate).
-:- define_ft(ftString).
-:- define_ft(ftVar).
-:- define_ft(ftSpec).
-
-%:-export(repl_to_string(tAgentGeneric,ftTerm)).
-%:-export(repl_writer/2).
-%:-export(repl_writer(tAgentGeneric,ftTerm)).
-%prologHybrid(typeProps(tCol,ftVoprop)).
-:- discontiguous(prologSingleValued/1).
-:- do_gc.
-:- export mtForPred/2.
-:- user:decl_mpred_hybrid((argIsa/3, formatted_resultIsa/2, localityOfObject/2, subFormat/2, isa/2, mudLabelTypeProps/3, genls/2, pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, ttFormatType/1, typeProps/2)).
-:-add(isa(tObj,ttSpatialType)).
-:-add(isa(tRegion,ttSpatialType)).
-:-add(isa(ttFormatType,ttAbstractType)).
-:-add(pred_argtypes(typeGenls(ttTypeType,tCol))).
-
-
-subFormat(ftDeplictsFn(tCol),ftSpec).
-subFormat(ftDeplictsFn(ttFormatted),ftSpec).
-subFormat(ftVoprop,ftSpec).
-
-ttFormatted(isEach(ftRest(ftTerm))).
-ttFormatted(isRandom(tCol)).
-ttFormatted(isAnd(ftRest(ftSpec))).
-ttFormatted(isMost(ftRest(ftSpec))).
-ttFormatted(isOneOf(ftRest(ftSpec))).
-ttFormatted(isNot(ftSpec)).
-ttFormatted(isOptional(ftSpec,ftTerm)).
-ttFormatted(isOptionalStr(ftString)).
-ttFormatted(exactStr(ftString)).
-
-resultIsa(F,C)=>(isa(F,'tFunction'),isa(C,ftSpec)).
-resultIsa(ftDeplictsFn,ftSpec).
-
-:-decl_mpred(quotedDefnIff/2,code).
-
-isa(argIsa,prologHybrid).
-isa(determinerString, prologMultiValued).
-isa(quotedDefnIff, completeExtentAsserted).
-isa(ftInt,ttFormatType).
-isa(ftNumber,ttFormatType).
-isa(ftString,ttFormatType).
-isa(isInstFn,tFunction).
-isa(isKappaFn,tFunction).
-isa(prologMultiValued, tCol).
-arity(ftListFn,1).
-arity(isLikeFn,2).
-arity(ftDeplictsFn,1).
-ttFormatted(ftDice(ftInt,ftInt,ftInt)).
-ttFormatted(ftListFn(ftRest)).
-ttFormatted(ftDeplictsFn(tCol)).
-
-:- decl_type(tAvoidForwardChain).
-:- decl_type('SententialOperator').
-:- assert_hasInstance(tAvoidForwardChain,'$VAR'('FUNC')).
-tAvoidForwardChain(isEach('FunctionToArg',holds,equals,different,evaluate,trueSentence,'TINYKB-ASSERTION',termOfUnit)).
-genls('SententialRelation','SententialOperator').
-genls('SententialOperator',tAvoidForwardChain).
-genls('VariableArityRelation',tAvoidForwardChain).
-genls('CommutativeRelation',tAvoidForwardChain).
-genls('tFunction',tAvoidForwardChain).
-genls('EvaluatableRelation',tAvoidForwardChain).
-
-
-tCol(completeIsaAsserted).
-%completelyAssertedCollection(Ext):- fwc, arg(_,vv(tCol,vtDirection,ttFormatType,tRegion,ftString,genlPreds),Ext).
-completeExtentAsserted(formatted_resultIsa).
-completeExtentAsserted(quotedDefnIff).
-completelyAssertedCollection(completelyAssertedCollection).
-ttFormatType(ftString).
-ttFormatType(ftVar).
-ttFormatType(ftVoprop).
-
-
-:- pfc_add(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) => functorDeclares(F))).
-:- pfc_add((isa(_,ArgsIsa)=>tCol(ArgsIsa))).
-
-:- pfc_trace.
-%:- pfcWatch.
-:- pfc_warn.
-% next_test :- sleep(1),pfcReset.
-
-
-% :-dynamic((disjointWith/2,genls/2)).
-
-
-pred_argtypes(argQuotedIsa(tRelation,ftInt,ttFormatType)).
-pred_argtypes(argIsa(tRelation,ftInt,tCol)).
-pred_argtypes(argSingleValueDefault(prologSingleValued,ftInt,ftTerm)).
-pred_argtypes(formatted_resultIsa(ttFormatType,tCol)).
-
-pred_argtypes(pred_module(tPred,tPrologModule)).
-pred_argtypes(quotedDefnIff(ttFormatType,ftTerm)).
-pred_argtypes(defnNecessary(ttFormatType,ftTerm)).
-pred_argtypes(defnIff(ttFormatType,ftTerm)).
-pred_argtypes(quotedDefnIff(ttFormatType,ftTerm)).
-
-
-
-pred_argtypes(isLikeFn(tPred,tCol)).
-pred_argtypes('=>'(ftAskable,ftAssertable)).
-pred_argtypes('<='(ftAssertable,ftAskable)).
-prologHybrid(instTypeProps(ftID,tCol,ftRest(ftVoprop))).
-prologHybrid(subFormat(ttFormatType,ttFormatType)).
-prologMacroHead(macroSomethingDescription(ftTerm,ftListFn(ftString))).
-prologMacroHead(pddlObjects(tCol,ftListFn(ftID))).
-prologMacroHead(pddlPredicates(ftListFn(ftVoprop))).
-prologMacroHead(pddlSomethingIsa(ftTerm,ftListFn(tCol))).
-prologMacroHead(pddlSorts(tCol,ftListFn(tCol))).
-prologMacroHead(pddlTypes(ftListFn(tCol))).
-prologMultiValued(comment(ftTerm,ftString)).
-prologMultiValued(genlInverse(tPred,tPred)).
-prologMultiValued(genlPreds(tPred,tPred)).
-prologMultiValued(pred_module(tRelation,ftAtom)).
-prologMultiValued(predProxyAssert(prologMultiValued,ftTerm)).
-prologMultiValued(predProxyQuery(prologMultiValued,ftTerm)).
-% prologMultiValued('<=>'(ftTerm,ftTerm)).
-prologMultiValued('<='(ftAssertable,ftAskable)).
-prologMultiValued('=>'(ftAskable,ftAssertable)).
-prologNegByFailure(predArgMulti(prologMultiValued,ftInt)).
-prologNegByFailure(tDeleted(ftID)).
-prologSingleValued(predInstMax(ftID,prologSingleValued,ftInt),prologHybrid).
-prologSingleValued(predTypeMax(prologSingleValued,tCol,ftInt),prologHybrid).
-resultIsa(txtFormatFn,ftText).
-%'<=>'(prologMultiValued(CallSig,[predProxyAssert(mpred_asserta),predProxyRetract(mpred_retract),predProxyQuery(call)]),code(CallSig)).
-%'<=>'(prologMultiValued(CallSig,[predProxyAssert(pttp_tell),predProxyRetract(pttp_retract),predProxyQuery(pttp_ask)]),prologPTTP(CallSig)).
-subFormat(ftAtom,ftTerm).
-subFormat(ftCallable,ftProlog).
-resultIsa(ftDice,ftInt).
-subFormat(ftID,ftTerm).
-subFormat(ftInt,ftNumber).
-subFormat(ftInteger,ftNumber).
-subFormat(ftNumber,ftPercent).
-subFormat(ftPercent,ftNumber).
-subFormat(ftString,ftTerm).
-subFormat(ftString,ftText).
-subFormat(ftTerm,ftProlog).
-subFormat(ftText,ftTerm).
-subFormat(ftVar,ftProlog).
-subFormat(ftVoprop,ftRest(ftVoprop)).
-subFormat(ftVoprop,ftTerm).
-
-
-
-tCol(tChannel).
-tChannel(A):- tAgentGeneric(A).
-tChannel(A):- tRegion(A).
-tChannel(iGossupChannel).
-
-:-decl_type(tNewlyCreated).
-:-decl_type(ttTypeFacet).
-
-ttTypeFacet(tNewlyCreated).
-ttTypeFacet(ttTypeFacet).
-ttTypeFacet(tChannel).
-ttTypeFacet(ttUnverifiableType).
-
 
 typeGenls(tAgentGeneric,ttAgentType).
 typeGenls(tItem,ttItemType).
@@ -324,28 +53,12 @@ typeGenls(ttObjectType,tObj).
 typeGenls(ttPredType,tPred).
 typeGenls(ttRegionType,tRegion).
 typeGenls(ttSpatialType,tSpatialThing).
-typeGenls(ttTypeFacet,tCol).
-typeGenls(ttTypeType,tCol).
+genls(tSpatialThing,tTemporalThing).
+genls(ttSpatialType,ttTemporalType).
 
-ttTypeFacet(ttUnverifiableType).
 ttUnverifiableType(ftDice).
-ttUnverifiableType(ftID).
-ttUnverifiableType(ftListFn(ftTerm)).
-ttUnverifiableType(ftString).
-ttUnverifiableType(ftTerm).
-ttUnverifiableType(ftText).
-ttUnverifiableType(ftVoprop).
-ttUnverifiableType(tCol).
-ttUnverifiableType(tFunction).
-ttUnverifiableType(tPred).
-ttUnverifiableType(ttFormatType).
 ttUnverifiableType(vtDirection).
 
-
-
-mpred_hooks:mpred_is_trigger(ArgsIsa)=>isa(ArgsIsa,tCol).
-%TODO isa(_,ArgsIsa)=>tCol(ArgsIsa).
-cycAssert(A,B):- trace_or_throw(cycAssert(A,B)).
 
 /*
 disjointWith(A,B):- A=B,!,fail.
@@ -358,27 +71,8 @@ disjointWith(tObj,tRegion).
 disjointWith(tRegion,tObj).
 disjointWith(ttSpatialType,ttAbstractType).
 
-prologHybrid(dividesBetween(tCol,tCol,tCol)).
 
 
-quotedDefnIff(ftInt,integer).
-quotedDefnIff(ftFloat,float).
-quotedDefnIff(ftAtom,atom).
-quotedDefnIff(ftString,string).
-quotedDefnIff(ftCallable,is_callable).
-quotedDefnIff(ftCompound,compound).
-quotedDefnIff(ftGround,ground).
-quotedDefnIff(ftID,is_id).
-quotedDefnIff(ftTerm,nonvar).
-quotedDefnIff(ftVar,var).
-quotedDefnIff(ftNonvar,nonvar).
-quotedDefnIff(ftNumber,number).
-quotedDefnIff(ftRest,is_rest).
-quotedDefnIff(ftRest(Type),is_rest_of(Type)).
-quotedDefnIff(ftListFn(Type),is_list_of(Type)).
-quotedDefnIff(ftBoolean,is_boolean).
-quotedDefnIff(ftText,is_string).
-quotedDefnIff(ftCodeIs(SomeCode),SomeCode):-nonvar(SomeCode).
 
 isa(arity,tBinaryPredicate).
 
@@ -403,8 +97,6 @@ disjointWith(ttSpatialType,ttAbstractType).
 
 
 genls(tPartOfobj,tItem).
-
-:-decl_mpred_hybrid(dividesBetween(tCol,tCol,tCol)).
 
 % defined more correctly below dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
 dividesBetween(tItem,tMassfull,tMassless).
@@ -474,100 +166,14 @@ tCol(completeIsaAsserted).
 % genls(completeIsaAsserted,tSpatialThing).
 genls(ttPreAssertedCollection,tCol).
 ttPreAssertedCollection(ttPreAssertedCollection).
-ttPreAssertedCollection(tPred).
-ttPreAssertedCollection(tCol).
-ttPreAssertedCollection(ttFormatType).
-ttPreAssertedCollection(ttTypeType).
 ttPreAssertedCollection(tItem).
 ttPreAssertedCollection(tRegion).
 ttPreAssertedCollection(tObj).
 ttPreAssertedCollection(tAgentGeneric).
 ttPreAssertedCollection(tCarryAble).
 ttPreAssertedCollection(vtVerb).
+
 genls(ttTypeByAction,ttPreAssertedCollection).
-genls(ttPreAssertedCollection,completelyAssertedCollection).
-
-((completeIsaAsserted(I), isa(I,Sub), genls(Sub, Super),{ground(Sub:Super)}) => ({dif:dif(Sub, Super)}, isa(I,Super))).
-% TODO ADD THIS :-pfc_add((ttPreAssertedCollection(Super), isa(I,Sub), genls(Sub, Super)) => ({ground(I:Sub:Super),\==(Sub, Super)}, isa(I,Super))).
-% (isa(I,Sub), genls(Sub, Super),{ground(Sub:Super)}, ~neg(completelyAssertedCollection(Super))) => ({dif:dif(Sub, Super)}, isa(I,Super)).
-
-( ttFormatted(FT), {dif:dif(FT,COL)}, genls(FT, COL),tCol(COL),{not(isa(COL,ttFormatType))}) => formatted_resultIsa(FT,COL).
-
-:-decl_type(ttNonGenled).
-% genls(ttFormatType,ttNonGenled).
-isa('Thing',ttNonGenled).
-isa('CycLTerm',ttNonGenled).
-
-a=>b.
-b=>c.
-c=>a.
-
-
-jj=>jj.
-
-
-% completeExtentAsserted(genls)
-
-sane_transitivity(I,PredInfo,Sub,PredInfo2,Super):-  INFO = sane_transitivity(I,PredInfo,Sub,PredInfo2,Super),
- I\=Super,I\=Sub,Sub\=Super,
- (I=Super->trace_or_throw(INFO);true),
-  sanity(I=Sub->trace_or_throw(INFO);true),
-  sanity(Sub=Super->trace_or_throw(INFO));true),
-  \=(I,Super),\=(Sub,Super),\=(I,Sub),
-  \+(isa(Super,ttNonGenled)),
-  \+(isa(I,ttNonGenled)).
-
-(genls(I,Sub),genls(Sub, Super),{sane_transitivity(I,genls,Sub,genls,Super)}) => genls(I,Super).
-
-
-
-makeArgConstraint(I,TCol)=>{
-     concat_atom([result,I],'',ResultIsa),pfc_add(argIsa(ResultIsa,1,tFunction)),pfc_add(argIsa(ResultIsa,2,TCol)),
-     concat_atom([arg,I],'',ArgIsa),pfc_add(argIsa(ArgIsa,1,tRelation)),pfc_add(argIsa(ArgIsa,2,ftInt)),pfc_add(argIsa(ArgIsa,3,TCol)),
-     doall((between(1,6,N),concat_atom([arg,N,I],'',ArgNIsa),
-     pfc_add(argIsa(ArgNIsa,1,tRelation)),pfc_add(argIsa(ArgNIsa,2,TCol)),  
-     CArgNIsa =.. [ArgNIsa,Pred,Col],
-     CArgIsa =.. [ArgIsa,Pred,N,Col],
-     %pfc_add((CArgNIsa<=>CArgIsa)),
-     pfc_add_fast(ruleRewrite(CArgNIsa,CArgIsa))
-     ))}.
-
-makeArgConstraint('Isa',tCol).
-makeArgConstraint('Genl',tCol).
-makeArgConstraint('QuotedIsa',ttFormatType).
-makeArgConstraint('Format',ftTerm).
-makeArgConstraint('SometimesIsa',tCol).
-
-
-
-prologHybrid(quotedIsa(ftTerm,ttFormatType)).
-
-isa(I,C)<=quotedIsa(I,C).
-quotedIsa(I,C)<=term_is_ft(I,C).
-
-implies(and(resultIsaArg('$VAR'('FUNC'), 5), arg5Genl('$VAR'('FUNC'), '$VAR'('COL'))), resultIsa('$VAR'('FUNC'), '$VAR'('COL'))).
-
-
-%((genlPreds(Col1,Col2),(arity(Col1,1);arity(Col2,1)))=>genls(Col1,Col2)).
-%((genls(Col1,Col2),(tPred(Col1);tPred(Col2)))=>genlPreds(Col1,Col2)).
-
-:-decl_type('UnaryPredicate').
-
-((argQuotedIsa(Pred, _, 'CycLSentence') => 'SententialOperator'(Pred))).
-
-genls(tPartOfobj,tItem).
-
-((isa(Pred,prologSingleValued),arity(Pred,Arity))
-  =>
-  {
-   dynamic(Pred/Arity),
-   length(AfterList,Arity),
-   append(Left,[A],AfterList),
-   append(Left,[B],BeforeList),
-  After =.. [Pred|AfterList],
-  Before =.. [Pred|BeforeList]},
-  (After,{Before, \==(A , B)} => {pfc_rem2(Before)})).
-
 
 % dividesBetween(tItem,tPathway).
 dividesBetween(tItem,tMassfull,tMassless).
@@ -583,164 +189,457 @@ isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
 (neg(isa(I,Super)) <= (disjointWith(Sub, Super),isa(I,Sub))).
 % disjointWith(P1,P2) => {\+(isa(P1,ttNonGenled)),\+(isa(P2,ttNonGenled))},(neg(isa(C,P1)) <=> isa(C,P2)).
 
+
+=> tCol(ttSpatialType).
+
+
+
+argIsa(aDirectionsFn,2,ftListFn(vtDirection)).
+argIsa(apathFn,1,tRegion).
+argIsa(apathFn,2,vtDirection).
+argIsa(localityOfObject,1,tObj).
+argIsa(localityOfObject,2,tSpatialThing).
+argIsa(mudColor,1,tObj).
+argIsa(mudColor,2,vtColor).
+argIsa(mudFacing,1,tObj).
+argIsa(mudFacing,2,vtDirection).
+argIsa(mudMemory,2,ftTerm).
+
+/*
+tms_reject_why(mudAtLoc(iArea1025, _),isa(iArea1025,tRegion)).
+tms_reject_why(localityOfObject(iArea1025, iOfficeRoom7),isa(iArea1025,tRegion)).
+tms_reject_why(localityOfObject(R,_),isa(R,tRegion)):- isa(R,tRegion).
+tms_reject_why(mudFacing(R,_),isa(R,tRegion)):- isa(R,tRegion).
+tms_reject_why(mudAtLoc(R,_),isa(R,tRegion)):- isa(R,tRegion).
+
+%deduce_facts_forward(localityOfObject(_,Region),isa(Region,tSpatialThing)).
+deduce_facts_forward(localityOfObject(Obj,_),isa(Obj,tObj)).
+fix_argIsa(F,N,vtDirection(Val),vtDirection):-add(user:mpred_prop(F,argSingleValueDefault(N,Val))),!.
+
+*/
+
+:-decl_type(tChannel).
+:-decl_type(tItem).
+:-decl_type(vtVerb).
+
+% :- decl_mpred(tAgentGeneric(ftID),[predIsFlag]).
+% :- decl_mpred_prolog(createableSubclassType/2).
+% alt_forms1(none_AR,localityOfObject(P,R),mudAtLoc(P,L)):-ground(localityOfObject(P,R)),is_asserted(mudAtLoc(P,L)),nonvar(L),once(locationToRegion(L,R)).
+% alt_forms1(none_AR,mudAtLoc(P,L),localityOfObject(P,R)):-ground(mudAtLoc(P,L)),once(locationToRegion(L,R)),nonvar(R).
+% argsIsa(mudFacing,ftTerm).
+% we need a way to call this: maxCapacity
+% we need a way to call this: typeMaxCapacity
+%:- compile_predicates([isa/2]).
+%:- decl_mpred_hybrid(repl_to_string(tAgentGeneric,term),[prologSingleValued,argSingleValueDefault(2,default_repl_obj_to_string)]).
+% :- decl_mpred_hybrid(repl_writer(tAgentGeneric,term),[prologSingleValued,argSingleValueDefault(2,default_repl_writer)]).
+%:- forall(functorDeclaresPred(F),dynamic(F/1)).
+%:- foreach(retract(isa(I,C)),assert_hasInstance(C,I)).
+%isa(AT,ttAgentType):- genls(AT,ttAgentGeneric).
+%genls(AT,ttAgentGeneric):- isa(AT,ttAgentType).
+%subFormat(ftTextType,ftText).
+:- decl_mpred(tItem(ftID),[predIsFlag]).
+:- decl_mpred(tRegion(ftID),[predIsFlag]).
+:- decl_mpred(tRegion(ftID),tCol).
+:- decl_mpred(tThinking(tAgentGeneric),[predIsFlag]).
+:- decl_mpred_hybrid mudLastCommand/2.
+:- decl_mpred_hybrid mudNamed/2, mudSpd/2.
+:- decl_mpred_hybrid mudStr/2.
+:- decl_mpred_hybrid typeGrid/3.
+:- decl_mpred_hybrid((( mudContains/2))).
+:- decl_mpred_hybrid((( mudLastCmdSuccess/2 ))).
+:- do_gc.
+:- dynamic(user:mudDescription/2).
+:- decl_mpred_hybrid((tItem/1, tRegion/1, instVerbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, mudToHitArmorClass0/2, tThinking/1, tDeleted/1, mudWeight/2, mudPermanence/3, act_term/2, mudAgentTurnnum/2, mudAtLoc/2, mudEnergy/2, mudHealth/2, mudDescription/2, mudFacing/2, mudCmdFailure/2, mudSpd/2, typeGrid/3, mudHeight/2, mudMemory/2, isa/2, pathName/3, mudPossess/2, mudScore/2, mudStm/2, mudStr/2, wearsClothing/2)).
+:- decl_mpred_hybrid(( mudArmorLevel/2, mudLevelOf/2, mudToHitArmorClass0/2, mudBareHandDamage/2, chargeCapacity/2, mudEnergy/2, tCol/1, tAgentGeneric/1, tItem/1, tRegion/1, instVerbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, tThinking/1, mudWeight/2, mudPermanence/3, act_term/2, mudAgentTurnnum/2, mudAtLoc/2, mudEnergy/2, mudHealth/2, mudDescription/2, mudFacing/2, failure/2, gridValue/4, mudHeight/2, mudMemory/2, isa/2, pathName/3, mudPossess/2, mudScore/2, mudStm/2, mudStr/2, mudWearing/2)).
+:- decl_mpred_hybrid(typeHasGlyph,2).
+prologHybrid(typeHasGlyph(tCol,ftString)).
+:- decl_mpred_hybrid(mudActAffect/3).
+:- decl_mpred_hybrid(mudAtLoc,2).
+:- decl_mpred_hybrid(mudColor/2).
+:- decl_mpred_hybrid(mudHealth,2).
+:- decl_mpred_hybrid(mudMaterial/2).
+:- decl_mpred_hybrid(mudMaxHitPoints(tAgentGeneric,ftInt)).
+:- decl_mpred_hybrid(mudNeedsLook,2).
+:- decl_mpred_hybrid(mudNeedsLook/2,[completelyAssertedCollection]).
+:- decl_mpred_hybrid(mudShape/2).
+:- decl_mpred_hybrid(mudSize/2).
+:- decl_mpred_hybrid(mudStowing(tAgentGeneric,tItem)).
+:- decl_mpred_hybrid(mudTexture/2).
+:- decl_mpred_hybrid(pathBetween,3).
+:- decl_mpred_prolog((latitude/2, mudMoveDist/2, longitude/2)).
+:- decl_mpred_prolog(mudMoveDist/2,[pred_argtypes(mudMoveDist(tAgentGeneric,ftInt)),prologSingleValued,pred_module(user),query(call),argSingleValueDefault(2,1)]).
+:- decl_mpred_prolog(stat_total/2).
+:- decl_mpred_prolog(user:verb_alias(ftString,vtVerb)).
+:- decl_type(tContainer).
+:- decl_type(tRegion).
+:- decl_type(vtBasicDir).
+:- decl_type(vtBasicDirPlusUpDown).
+:- decl_type(vtDirection).
+:- decl_type(vtVerb).
+:- dynamic stat_total/2.
+:- dynamic(spawn_rate/2).
+:- decl_type(tMonster/1).
+%:- decl_mpred_prolog(user:action_info(vtActionTemplate,ftText)).
+:- decl_mpred_prolog(agent_call_command(tAgentGeneric,ftAction)).
+:- decl_mpred_prolog(member(ftTerm,ftTerm)).
+:- decl_mpred_prolog(mud_test(ftTerm,ftCallable)).
+:- decl_mpred_prolog(use_action_templates(ftTerm)).
+%:- decl_mpred((tAgentGeneric/1, mudEnergy/2,mudHealth/2, mudAtLoc/2, failure/2, typeGrid/3, gridValue/4, isa/2, tItem/1, mudMemory/2, pathName/3, mudPossess/2, tRegion/1, mudScore/2, mudStm/2, mudFacing/2, localityOfObject/2, tThinking/1, mudWearing/2, mudFacing/2, mudHeight/2, act_term/2, nameStrings/2, mudDescription/2, pathBetween/3, mudAgentTurnnum/2)).
+:- dynamic_safe(mudToHitArmorClass0 / 2).
+:- ensure_universal_stub(mudAtLoc/2).
+:- must(decl_mpred_prolog(agent_call_command/2)).
+:- user:decl_mpred_hybrid((argIsa/3, formatted_resultIsa/2, typeHasGlyph/2, inRegion/2, mudContains/2, isa/2, mudLabelTypeProps/3, mudMemory/2, mudPossess/2, mudStowing/2, genls/2, mudToHitArmorClass0/2, pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, ttFormatType/1, typeProps/2)).
+
+
+prologHybrid(instVerbOverride(ftTerm,ftAction,ftAction)).
+%isa(localityOfObject,prologHybrid). 
+%isa(mudActAffect, prologMultiValued).
+%isa(mudMaxHitPoints,prologHybrid).
+isa(vtDirection,ttValueType).
+
+prologMultiValued(agent_text_command(tAgentGeneric,ftText,tAgentGeneric,ftAction)).
+
+formatted_resultIsa(apathFn(tRegion,vtDirection),tPathway).
+
+:-decl_mpred_prolog(is_vtActionTemplate/1).
+
+is_vtActionTemplate(C):-nonvar(C),get_functor(C,F),!,atom_concat(act,_,F).
+defnSufficient(ftAction,is_vtActionTemplate).
+
+genls('FemaleAnimal',tPlayer).
+genls('MaleAnimal',tPlayer).
+genls(isEach('PortableObject','ProtectiveAttire','SomethingToWear'),tCarryAble).
+genls(isEach('ProtectiveAttire','SomethingToWear'),tWearAble).
+genls(isEach(tRegion,tAgentGeneric),tChannel).
+
+:-decl_type(ttFormatted).
+ttFormatted(aDirectionsFn(ftTerm,ftListFn(ftTerm))).
+ttFormatted(apathFn(tRegion,vtDirection)).
+ttFormatted(xyzFn(tRegion,ftInt,ftInt,ftInt)).
+
+:- do_gc.
+
+tCol(ttTypeByAction).
+genls(ttTypeByAction,tCol).
+(isa(X,ttTypeByAction) => isa(X,tCol)).
+
+
+% (isa(Inst,Type),isa(Type,ttTypeByAction)) => isa(Inst,tHasAction).
+
+genls(tAgentGeneric,tObj).
+genls(tAgentGeneric,tSpatialThing).
+genls(tCarryAble,tItem).
+genls(tChargeAble,tItem).
+genls(tContolDevice,tChargeAble).
+genls(tDoor,tFurniture).
+genls(tDoor,tItem).
+genls(tDrinkAble,tItem).
+genls(tEatAble,tItem).
+genls(tFunction,tRelation).
+genls(tFurniture,tObj).
+genls(tFurniture,tPartofObj).
+genls(tHumanPlayer,tPlayer).
+genls(tItem,tObj).
+genls(tItem,tSpatialThing).
+genls(tMonster,ttAgentGeneric).
+genls(tNpcPlayer,tPlayer).
+genls(tObj,tSpatialThing).
+genls(tPathway,tDoor).
+genls(tPlayer,tAgentGeneric).
+genls(tPred,tRelation).
+genls(tRegion,tSpatialThing).
+genls(ttObjectType,tCol).
+genls(ttSpatialType,tCol).
+genls(tUseAble,tItem).
+genls(tWearAble,tItem).
+genls(vtBasicDir,vtBasicDirPlusUpDown).
+genls(vtBasicDirPlusUpDown,vtDirection).
+genls(vtDirection,tTypevalue).
+genls(vtPosture,vtVerb).
+
+prologHybrid(typeHasGlyph(tCol,ftString)).
+prologHybrid(mudColor(tSpatialThing,vtColor)).
+
+prologHybrid(mudKnowing(tAgentGeneric,ftTerm)).
+prologHybrid(mudLabelTypeProps(ftString,tCol,ftVoprop)).
+prologHybrid(mudListPrice(tItem,ftNumber)).
+prologHybrid(mudOpaqueness(ftTerm,ftPercent)).
+prologHybrid(mudPossess(tAgentGeneric,tObj)).
+prologHybrid(mudShape(tSpatialThing,vtShape)).
+prologHybrid(mudSize(tSpatialThing,ftTerm)).
+prologHybrid(mudTextSame(ftText,ftText)).
+prologHybrid(mudTexture(tSpatialThing,vtTexture)).
+prologHybrid(typeGrid(tCol,ftInt,ftListFn(ftString))).
+prologListValued(aDirectionsFn(ftTerm,ftListFn(ftTerm))).
+prologListValued(mudGetPrecepts(tAgentGeneric,ftListFn(tSpatialThing)),[pred_module(user)]).
+prologListValued(mudNearFeet(tAgentGeneric,ftListFn(tSpatialThing)),[]).
+prologListValued(mudNearReach(tAgentGeneric,ftListFn(tSpatialThing)),[pred_module(user)]).
+prologMultiValued(action_rules(tAgentGeneric,vtVerb,ftListFn(ftVar),ftVoprop)).
+prologMultiValued(mudLastCmdSuccess(tAgentGeneric,ftAction)).
+prologMultiValued(descriptionHere(ftTerm,ftString)).
+prologMultiValued(descriptionHere(ftTerm,ftString),prologOrdered).
+prologMultiValued(determinerString(ftTerm,ftString)).
+prologMultiValued(typeHasGlyph(ftTerm,ftString)).
+prologMultiValued(gridValue(tRegion,ftInt,ftInt,tObj)).
+prologMultiValued(instVerbOverride(ftTerm,ftAction,ftAction)).
+prologMultiValued(isa(ftTerm,tCol)).
+prologMultiValued(mudActAffect(ftTerm,ftTerm,ftTerm)).
+prologMultiValued(mudActAffect(tItem,vtVerb,ftTerm(ftVoprop))).
+prologMultiValued(mudCmdFailure(tAgentGeneric,ftAction)).
+
+:- do_gc.
+
+
+prologMultiValued(mudDescription(ftTerm,ftString),prologOrdered,prologHybrid).
+prologMultiValued(mudDescription(ftTerm,ftText), [predProxyAssert(add_description),predProxyRetract(remove_description),predProxyQuery(query_description)],prologHybrid).
+prologMultiValued(mudDescription(ftTerm,ftText),[predProxyAssert(add_description)],prologHybrid).
+prologMultiValued(mudKeyword(ftTerm,ftString),prologHybrid).
+prologMultiValued(mudMemory(tAgentGeneric,ftTerm),prologHybrid).
+prologMultiValued(mudNamed(ftTerm,ftTerm),[],prologHybrid).
+prologMultiValued(mudPossess(tObj,tObj),prologHybrid).
+prologMultiValued(nameStrings(ftTerm,ftString),prologHybrid).
+prologMultiValued(pathBetween(tRegion,vtDirection,tRegion),prologHybrid).
+prologMultiValued(pathName(tRegion,vtDirection,ftString),prologHybrid).
+prologMultiValued(genls(tCol,tCol),prologHybrid).
+prologMultiValued(typeGrid(tCol,ftInt,ftListFn(ftString)),prologHybrid).
+prologMultiValued(verbAsWell(ftTerm,ftAction,ftAction),prologHybrid).
+
+prologNegByFailure(mudNeedsLook(tObj,ftBoolean),prologHybrid).
+prologNegByFailure(tAgentGeneric(ftID),prologHybrid).
+prologNegByFailure(tCol(ftID),prologHybrid).
+prologNegByFailure(tItem(ftID),prologHybrid).
+prologNegByFailure(tRegion(ftID),prologHybrid).
+prologNegByFailure(tThinking(tAgentGeneric),prologHybrid).
+pathName(Region,Dir,Text)=>mudDescription(apathFn(Region,Dir),Text).
+
+prologSingleValued(chargeCapacity(tChargeAble,ftInt),prologHybrid).
+prologSingleValued(location_center(tRegion,xyzFn(tRegion,ftInt,ftInt,ftInt)),prologHybrid).
+prologSingleValued(mudAgentTurnnum(tAgentGeneric,ftInt),[argSingleValueDefault(2,0)],prologHybrid).
+prologSingleValued(mudArmor(tObj,ftInt),prologHybrid).
+prologSingleValued(mudArmorLevel(tWearAble,ftInt),prologHybrid).
+prologSingleValued(mudAtLoc(tObj,xyzFn(tRegion,ftInt,ftInt,ftInt)),prologHybrid).
+prologSingleValued(mudAttack(tObj,ftInt),prologHybrid).
+prologSingleValued(mudBareHandDamage(tAgentGeneric,ftInt),prologHybrid).
+% prologSingleValued(mudBareHandDamage(tAgentGeneric,ftDice),prologHybrid).
+% prologSingleValued(mudEnergy(tChargeAble,ftInt(500)),prologHybrid).
+prologSingleValued(mudEnergy(tChargeAble,ftInt),prologHybrid).
+prologSingleValued(mudEnergy(tObj,ftInt),[argSingleValueDefault(2,500)],prologHybrid).
+prologSingleValued(mudFacing(tObj,vtDirection(vNorth)),prologHybrid).
+prologSingleValued(mudFacing(tObj,vtDirection),[argSingleValueDefault(2,vNorth)],prologHybrid).
+prologSingleValued(mudHealth(tObj,ftInt),prologHybrid).
+prologSingleValued(mudHeight(tObj,ftInt),prologHybrid).
+prologSingleValued(mudHeight(tSpatialThing,ftInt),prologHybrid).
+prologSingleValued(mudID(tObj,ftID),prologHybrid).
+prologSingleValued(mudLastCommand(tAgentGeneric,ftAction),prologHybrid).
+prologSingleValued(mudLevelOf(tCarryAble,ftInt),prologHybrid).
+prologSingleValued(mudMaxHitPoints(tAgentGeneric,ftInt),[prologHybrid],prologHybrid).
+prologSingleValued(mudMoveDist(tAgentGeneric,ftInt),[argSingleValueDefault(2,1)]).
+prologSingleValued(mudNeedsLook(tAgentGeneric,ftBoolean),argSingleValueDefault(2,vFalse),prologHybrid).
+prologSingleValued(mudPermanence(tItem,vtVerb,vtPerminance),prologHybrid).
+prologSingleValued(mudScore(tObj,ftInt),prologHybrid).
+prologSingleValued(mudSpd(tAgentGeneric,ftInt),prologHybrid).
+prologSingleValued(mudStm(tAgentGeneric,ftInt),prologHybrid).
+prologSingleValued(mudStr(tAgentGeneric,ftInt),prologHybrid).
+prologSingleValued(mudToHitArmorClass0(tAgentGeneric,ftInt),prologHybrid).
+prologSingleValued(mudWeight(tObj,ftInt),prologHybrid).
+% prologSingleValued(spawn_rate(isPropFn(genls(tObj)),ftInt)).
+prologSingleValued(spawn_rate(tCol,ftInt)).
+prologSingleValued(stat_total(tAgentGeneric,ftInt)).
+prologSingleValued(typeGrid(tCol,ftInt,ftListFn(ftString))).
+resultIsa(apathFn,tPathway).
+% '<=>'(isa(Whom,tNpcPlayer),whenAnd(isa(Whom,tPlayer),naf(isa(Whom,tHumanPlayer)))).
+'<=>'(mudDescription(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
+'<=>'(nameStrings(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
+tInferInstanceFromArgType(vtSize).
+tInferInstanceFromArgType(vtTexture).
+ttAgentType(tMonster).
+% user:instTypeProps(apathFn(Region,_Dir),tPathway,[localityOfObject(Region)]).
+vtBasicDir(vEast).
+vtBasicDir(vNorth).
+vtBasicDir(vSouth).
+vtBasicDir(vWest).
+vtBasicDirPlusUpDown(vDown).
+vtBasicDirPlusUpDown(vUp).
+%localityOfObject(Above,HasSurface):- mudLocOnSurface(Above,HasSurface).
+%localityOfObject(Clothes,Agent):- mudSubPart(Agent,Clothes).
+%localityOfObject(Inner,Container):- mudInsideOf(Inner,Container).
+%localityOfObject(Inner,Outer):- user:only_if_pttp, localityOfObject(Inner,Container),localityOfObject(Container,Outer).
+nameStrings(apathFn(Region,Dir),Text):- pathName(Region,Dir,Text).
+pred_argtypes(mudMaterial(tSpatialThing,vtMaterial)).
+pred_argtypes(mudSize(tSpatialThing,vtSize)).
+pred_argtypes(mudTexture(tSpatialThing,vtTexture)).
+pred_argtypes(mudWearing(tAgentGeneric,tWearAble)).
+pred_argtypes(pathName(tRegion,vtDirection,ftString)).
+pred_argtypes(resultIsa(tFunction,tCol)).
+pred_argtypes(wasSuccess(tAgentGeneric,ftBoolean)).
+pred_argtypes(type_action_info(tCol,vtActionTemplate,ftText)).
+%NEXT TODO predTypeMax(mudEnergy,tObj,130).
+%NEXT TODO predTypeMax(mudHealth,tObj,500).
+
+
+:-decl_mpred_hybrid(pathBetween(tRegion,vtDirection,tRegion)).
+:-decl_mpred_hybrid(pathConnects(tRegion,tRegion),symmetric).
+
+
+pathConnects(R1,R2):-pathBetween(R1,Dir,R2),nop(Dir).
+pathConnects(R1,R2):-pathBetween(R2,Dir,R1),nop(Dir).
+
+
+
+:- decl_mpred_prolog(ensure_some_pathBetween/2).
+ensure_some_pathBetween(R1,R2):- pathBetween(R1,_,R2),!.
+ensure_some_pathBetween(R1,R2):- pathBetween(R2,_,R1),!.
+ensure_some_pathBetween(R1,R2):- 
+   random_instance(vtBasicDir,Dir,true),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
+   must((add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)))),!.
+ensure_some_pathBetween(R1,R2):- 
+   random_instance(vtBasicDirPlusUpDown,Dir,true),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
+   must((add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)))),!.
+ensure_some_pathBetween(R1,R2):- 
+   random_instance(vtDirection,Dir,true),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
+   must((add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)))),!.
+
+:- decl_mpred_prolog(do_ensure_some_pathBetween/0).
+do_ensure_some_pathBetween:- 
+  must((forall(no_repeats((is_asserted(pathConnects(R1,R2)),ground(R1:R2),isa(R1,tRegion),isa(R2,tRegion),dif(R1,R2))),
+    show_call_failure((ensure_some_pathBetween(R1,R2),ensure_some_pathBetween(R2,R1)))))).
+
+:-onEachLoad(must(do_ensure_some_pathBetween)).
+
+:-assert_until_end_of_file(infSupertypeName).
+:-onEndOfFile(dmsg(infSupertypeName)).
+
+% ==================================================
+% Classes of things
+% ==================================================
+:- do_gc.
+
+genls(tAgentGeneric,tObj).
+genls(tItem,tObj).
+genls(tClothing, tWashAble).
+genls(tClothing, tWearAble).
+genls(tFood,tEatAble).
+genls(tFood, tItem).
+genls(tClothing, tItem).
+
+genls( tCarryAble, tItem).
+genls( tCarryAble, tDropAble).
+
+% throw(sane_transitivity (genls( tCarryAble, tThrowAble))).
+% genls( tCarryAble, tCarryAble).
+
+genls(tPortableDevice,tCarryAble).
+
+:- decl_mpred(spatialInRegion/1).
+
+:-do_gc.
+
+genls(tClothing, tFoldAble).
+genls(tClothing, tWearAble).
+
+genls(tLiquidContainer, tDrinkAble).
+genls(tLiquidContainer, tCarryAble).
+
+
+genls(tFoldAble, tCarryAble).
+% genls(tThrowAble, tCarryAble).
+genls(tPortableDevice,tCarryAble).
+genls(tPortableDevice,tPhysicalDevice).
+genls(tPhysicalDevice,tUseAble).
+genls(tWearAble, tCarryAble).
+genls(tFood,tCarryAble).
+genls(tCarryAble,tObj).
+genls(tPartofObj,tNotTakAble).
+genls(tBodyPart,tPartofObj).
+genls(tSpatialThing,tLookAble).
+genls(tFurnature,tOntoAble).
+genls(tFurnature,tItem).
+
+genls(tPartofFurnature,tPartofObj).
+
+:- do_gc.
+
+
+
+
+%(isa(I,Sub), disjointWith(Sub, Super)) => neg(isa(I,Super)).
+
+neg(isa(I,Super)) <= (isa(I,Sub), disjointWith(Sub, Super)).
+
+genls(tPartOfobj,tItem).
+
+% dividesBetween(tItem,tPathways).
+dividesBetween(tItem,tMassfull,tMassless).
+dividesBetween(tObj,tItem,tAgentGeneric).
+dividesBetween(tObj,tMassfull,tMassless).
+dividesBetween(tSpatialThing,tObj,tRegion).
+dividesBetween(tAgentGeneric,tPlayer,tNpcPlayer).
+
+% dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
+
+% disjointWith(P1,P2) => (not(isa(C,P1)) <=> isa(C,P2)).
+
+% isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
+
 => tCol(tCol).
 => tCol(tPred).
 => tCol(tFunction).
-:-(add((=> tCol(tRelation)))).
+=> tCol(tRelation).
 => tCol(ttSpatialType).
 => tCol(ttFormatType).
-/*
+% => tCol(functorDeclares).
+% tCol(ArgsIsa):-functorDeclaresPred(ArgsIsa).
+% TODO decide if OK
+%tCol(F):-hasInstance(functorDeclares,F).
+=> tCol(ttFormatType).
+=> tCol(vtActionTemplate).
+=> tCol(tRegion).
+=> tCol(tContainer).
 
-% this isn't written yet.
-resolveConflict(C) :- dtrace,
-  format("~NHalting with conflict ~w", [C]),
-  pfc_halt.
+isa(tRegion,ttSpatialType).
+isa(tRelation,ttAbstractType).
+typeProps(tTorso,[mudColor(isLikeFn(mudColor,tSkin)),mudShape(vUnique)]).
+typeProps(tSkin,[mudColor(vUnique),mudShape(vUnique)]).
 
+%Empty Location
+% You *have* to use 0 as the id of the empty location. (no way!)
+mudLabelTypeProps(--,ftVar,[]).
 
-% a conflict triggers a Prolog action to resolve it.
-conflict(C) => {resolveConflict(C)}.
+%NEXT TODO predTypeMax(mudEnergy,tAgentGeneric,120).
 
-% meta rules to schedule inferencing.
+typeProps(tAgentGeneric,[predInstMax(mudHealth,500)]).
+genls('IndoorsIsolatedFromOutside',tRegion).
+genls('SpaceInAHOC',tRegion).
 
-% resolve conflicts asap
-pfc_select(conflict(X),S) :- pfc_queue(conflict(X),S).
-  
-% a pretty basic conflict.
-((neg(P), P ) => conflict(P)).
+typeProps(tAgentGeneric,[mudMoveDist(1)]).
+typeProps(tAgentGeneric,[predInstMax(mudHealth,500), predInstMax(mudEnergy,200), mudHealth(500), mudEnergy(200),  mudFacing(isRandom(vtBasicDir)), mudAgentTurnnum(0), mudScore(1), 
+    mudMemory(aDirectionsFn([vNorth,vSouth,vEast,vWest,vNE,vNW,vSE,vSW,vUp,vDown]))]).
+% typeProps(tAgentGeneric,mudLastCommand(actStand)).
+typeProps(tAgentGeneric,mudNeedsLook(vFalse)).
+typeProps(tFood,[mudHeight(0)]).
+typeProps(tItem,mudEnergy(140)).
+typeProps(tItem,mudListPrice(0)).
+typeProps(tObj,[mudOpaqueness(100)]).
+typeProps(tRegion,[mudOpaqueness(1)]).
+typeProps(tSpatialThing,mudHeight(0)).
 
-*/
+% :-end_module_type(dynamic).
 
-tCol(tFly).
-tCol(tCanary).
-tCol(tPenguin).
-tCol(tBird).
-=> genls(tCanary,tBird).
-=> genls(tPenguin,tBird).
-%(isa(A, tBird) =>isa(A, tFly)).
-%(isa(A, tBird), ~neg(isa(A, tFly))=>isa(A, tFly)).
+% instTypeProps(isSelf,Type,[mudNamed(isSelf),typeHasGlyph(Lbl)|SP]):-  mudLabelTypeProps(Lbl,Type,SomeProps),nonvar(Type),flatten(SomeProps,SP).
 
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
-% % % These next two have been comnbined with the two following % % %
-(((pfc_default(P)/pfc_literal(P))  =>  (~neg(P) => P))).
-((pfc_default((P => Q))/pfc_literal(Q) => (P, ~neg(Q) => Q))).
-
-%((pfc_default(P)/pfc_literal(P), {pfcVerifyMissing(P,F)})) =>  ((F, ~neg(P)) => P).
-%((pfc_default((P => Q))/pfc_literal(Q), {pfcVerifyMissing(Q,F)})) => ((P, F, ~neg(Q)) => Q).
-% % % 
-(pfc_default((Q <= P))/pfc_literal(Q)) => (Q <=(P, ~neg(Q))).
-%(pfc_default((P => Q))/pfc_literal(Q)) => (Q <=(P, ~neg(Q))).
-% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
-
- neg(P) <= {pfcVerifyMissing(P,F,Test)},Test,{F\=P}.
-
-% is this how to define constraints?
-either(P,Q) => (neg(P) => Q), (neg(Q) => P).
-% (P,Q => false) => (P => neg(Q)), (Q => neg(P)).
-
-% rembmer the tCol rule points to isa/2
-tCol(C)=>{atom(C),P=..[C,I],assertz_if_new(P:-isa(I,C))}.
-
-%((relationMostInstance(Pred,Type,Value),{G=..[Pred,Inst,Value],GI=..[Pred,Inst,_]})) => (({GI=..[Pred,Inst,_]},isa(Inst,Type), ~GI) => G ).
-((relationAllInstance(Pred,Type,Value),{G=..[Pred,Inst,Value]})) =>  ((isa(Inst,Type), {G=..[Pred,Inst,Value]} => G )).
-relationMostInstance(Pred,Type,Value),{G=..[Pred,Inst,Value]} => pfc_default(isa(Inst,Type) => G).
-
-:-decl_mpred_hybrid((zDefault/1,zPenguin/1,zFly/1,zBird/1,zCanary/1)).
-
-'UnaryPredicate'(Pred)<=>(arity(Pred,1),tPred(Pred)).
-
-'UnaryPredicate'(zDefault).
-(zDefault(P)/pfc_literal(P))  =>  (~neg(P) => P).
-zDefault((P => Q))/pfc_literal(Q) => ((P, ~neg(Q) => Q)).
-%zDefault((P => Q))/pfc_literal(Q) => (Q <=(P, ~neg(Q))).
-%zDefault((Q <= P))/pfc_literal(Q) => (Q <=(P, ~neg(Q))).
-
-% birds fly by default.
-=> zDefault((zBird(X) => zFly(X))).
-
-% here's one way to do an isa hierarchy.
-% genlPreds = subclass.
-
-/*(genlPreds(C1,C2)) =>
-  {P1 =.. [C1,X],
-    P2 =.. [C2,X]},
-  (P1 => P2).
-
-(genlPreds(C1,C2),arity(C1,2)) =>
-  {P1 =.. [C1,X,Y],
-    P2 =.. [C2,X,Y]},
-  (P1 => P2).
-
-(genlPreds(C1,C2),arity(C1,3)) =>
-  {P1 =.. [C1,X,Y,Z],
-    P2 =.. [C2,X,Y,Z]},
-  (P1 => P2).
-*/
-
-(relationMostInstance(Pred,_Arg1Type,Value),argIsa(Pred,2,Type)=>(isa(Value,Type),isa(Pred,tRolePredicate))).
-(relationAllInstance(Pred,_Arg1Type,Value),argIsa(Pred,2,Type)=>(isa(Value,Type),isa(Pred,tRolePredicate))).
-
-=> genlPreds(zCanary,zBird).
-=> genlPreds(zPenguin,zBird).
-
-% penguins do neg fly.
-zPenguin(X) => neg(zFly(X)).
-
-% chilly is a penguin.
-=> zPenguin(iChilly).
-
-% tweety is a canary.
-=> zCanary(iTweety).
+:- do_gc.
+% Vacuum World example objects........
+mudLabelTypeProps(wl,tWall,[mudHeight(3),mudWeight(4)]).
 
 
-% birds fly by default.
-=> (pfc_default((tBird(X) => tFly(X)))).
+(wearsClothing(A,I)=>{(add(tAgentGeneric(A)),add(tClothing(I)))}).
 
-% => genls(tBird,tFly).
+(pred_argtypes(Args)/pfc_literal(Args)=>{ functor(Args,F,A), A>1, functor(Matcher,F,A)}, 
+  (({pfc_literal(Matcher),pfc_user_fact(Matcher),nop((clause_safe(Matcher,_))),\+((arg(_,Matcher,GT),var(GT)))},Matcher/pfc_literal(Matcher))=>{deduceFromArgTypes(Matcher)})).
 
+genls(tBread, tFood).
+typeProps(tCrackers,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]).
 
-% penguins do neg tFly.
-tPenguin(X) => neg(tFly(X)).
-
-% iChilly is a tPenguin.
-((=> tPenguin(iChilly))).
-
-% iTweety is a tCanary.
-((=> tCanary(iTweety))).
-
-:-must(in_file_expansion;in_file_directive).
-
-:-listing(tBird).
-:-listing(tFly).
-
-
-:-dynamic((fly/1,bird/1,penguin/1,canary/1)).
-
-
-% birds fly by default.
-(pfc_default((bird(X) => fly(X)))).
-
-% heres one way to do an subclass hierarchy.
-
-(((genls_test(C1,C2) =>
-  {P1 =.. [C1,X],
-    P2 =.. [C2,X]},
-  (P1 => P2)))).
-
-(genls_test(canary,bird)).
-(genls_test(penguin,bird)).
-
-% penguins do neg fly.
-(penguin(X) => neg(fly(X))).
-
-% chilly is a penguin.
-(penguin(chilly)).
-
-% tweety is a canary.
-:-rtrace(add(canary(tweety))).
-
-:-listing([fly/1,bird/1,penguin/1,canary/1]).
-:-listing(=>).
-:-rtrace(must(fly(tweety))).
 
 /*
 
@@ -774,17 +673,6 @@ O = [
       (-grandparent(G, P):- -parent(G, _P) ; -parent(_P, P)),    
       parent(G, P):- grandparent(G, C), parent(P,C),   % if you prove G is grandparent of P somehow, you will have proved that G is parent to  parentOf P
       parent(P, C):- grandparent(G, C), parent(G,P))].   % if you prove G is grandparent of P somehow, you will have proved that G is parent to  parentOf P
-
-*/
-
-
-
-/*
-
-(isa(COLTYPEINST,COLTYPE) , typeGenls(COLTYPE,COL)) => genls(COLTYPEINST,COL).
-genls(_Sub, Super) => tCol(Super).
-genls(Sub, _Super) => tCol(Sub).
-% use backchain instead (isa(I,Sub), disjointWith(Sub, Super)) => neg(isa(I,Super)).
 
 */
 

@@ -51,4 +51,4 @@ user:verb_alias(debug,actShow).
 user:verb_alias(nodebug,actHide).
 
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).

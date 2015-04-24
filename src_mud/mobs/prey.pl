@@ -101,4 +101,4 @@ spawn_prey(N) :-
 	spawn_prey(Ntemp).
 
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).

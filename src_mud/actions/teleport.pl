@@ -33,4 +33,4 @@ user:agent_call_command(_Agent,actTeleport(Other,_TO,Where)):-
    add(mudAtLoc(Target,Where3D)).
 
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).

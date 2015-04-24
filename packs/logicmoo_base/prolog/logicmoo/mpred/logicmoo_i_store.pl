@@ -105,6 +105,7 @@ is_asserted(X,Y,Z):- no_repeats(loop_check(is_asserted_ilc(X,Y,Z))).
 is_asserted_ilc(V):-var(V),!,trace_or_throw(var_is_asserted(V)).
 % TODO: test removal
 is_asserted_ilc(prologHybrid(H)):-get_functor(H,F),!,isa_asserted(F,prologHybrid).
+is_asserted_ilc((H)):- is_static_pred(H),!,show_pred_info(H),dtrace(is_asserted_ilc((H))).
 is_asserted_ilc(HB):-hotrace((fully_expand_warn(is_asserted_1,HB,HHBB))),!,is_asserted_1(HHBB).
 
 is_asserted_1(clause(H,B,Ref)):-!,is_asserted_ilc(H,B,Ref).
@@ -510,12 +511,15 @@ hooked_retractall(G):- Op = change(retract,all),
                    loop_check(run_database_hooks_depth_1(change(retract,all),G),true).
 
 
-user:provide_mpred_storage_op(_,_):-fail.
-%user:provide_mpred_storage_op(Op,G):- (loop_check(pfc_provide_mpred_storage_op(Op,G))).
-user:provide_mpred_storage_op(Op,G):- (loop_check(mpred_t_provide_mpred_storage_op(Op,G))).
-user:provide_mpred_storage_op(Op,G):- (loop_check(prolog_provide_mpred_storage_op(Op,G))).
-user:provide_mpred_storage_op(Op,G):- (loop_check(isa_provide_mpred_storage_op(Op,G))).
-user:provide_mpred_storage_op(Op,G):- Op\=change(_,_), (call_no_cuts(user:provide_mpred_storage_clauses(G,true,_Proof))).
+
+user:provide_mpred_storage_op(Op,G):- get_functor(G,F,A),user:provide_mpred_storage_op(Op,G,F,A).
+
+user:provide_mpred_storage_op(Op,G, F,_A):- hasInstance(pfcControlled,F),!,loop_check(prolog_provide_mpred_storage_op(Op,G)).
+user:provide_mpred_storage_op(Op,G, F,_A):- hasInstance(prologOnly,F),!,loop_check(pfc_provide_mpred_storage_op(Op,G)).
+user:provide_mpred_storage_op(Op,G,_F,_A):- loop_check(prolog_provide_mpred_storage_op(Op,G)).
+
+%user:provide_mpred_storage_op(Op,G):- (loop_check(isa_provide_mpred_storage_op(Op,G))).
+%user:provide_mpred_storage_op(Op,G):- Op\=change(_,_), (call_no_cuts(user:provide_mpred_storage_clauses(G,true,_Proof))).
 
 must_storage_op(Op,G):- doall(must(may_storage_op(Op,G))).
 
@@ -531,5 +535,46 @@ may_storage_op(Op,G):-call_no_cuts(user:provide_mpred_storage_op(Op,G)).
 
 
 
+
+
+%retract_all((G:-B)) :-!, forall(clause(G,B,Ref),erase(Ref)).
+retract_all(HB) :- ignore((retract(HB),fail)).
+
+
+is_static_pred(Head:-_):-!,predicate_property(Head,_),not(predicate_property(Head,dynamic)).
+is_static_pred(Head):-predicate_property(Head,_),not(predicate_property(Head,dynamic)).
+
+prolog_provide_mpred_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),user:mpred_prop(F,prologOnly),!, prolog_op(Op,G).
+prolog_provide_mpred_storage_op(Op,G):- G\=isa(_,_), get_functor(G,F),not(user:mpred_prop(F,prologHybrid)),!,current_predicate(_,G), prolog_op(Op,G).
+use_if_modify_new:- current_predicate(assert_if_new/1).
+prolog_op(change(AR,Op), G):-ensure_dynamic(G),!,prolog_modify(change(AR,Op), G).
+
+prolog_op(_,clause(G,B)):-!,clause_asserted(G,B).
+prolog_op(_,clause(G,B,Ref)):-!,clause(G,B,Ref).
+
+prolog_op(query(_,Op),G):-!,prolog_op(Op,G).
+prolog_op(call(Op),G):-!, prolog_op(Op,G).
+prolog_op(clauses(Op),G):-!, prolog_op(Op,G).
+prolog_op(is_asserted,(G:-B)):-!,clause_asserted(G,B).
+prolog_op(is_asserted,(G)):-!,clause_asserted(G,true).
+
+prolog_op(conjecture,G):-!, mpred_call(G).
+prolog_op(call,G):-!, mpred_call(G).
+prolog_op(Op,G):- reduce_mpred_op(Op,Op2), debugOnError(call(Op2,G)).
+
+
+
+prolog_modify(_Op,(:-(G))):-!, mpred_call(G).
+prolog_modify(change(assert,z),G):- use_if_modify_new,!,assertz_if_new(G).
+prolog_modify(change(assert,a),G):- use_if_modify_new,!,asserta_if_new(G).
+prolog_modify(change(assert,_),G):- use_if_modify_new,!,assert_if_new(G).
+prolog_modify(change(assert,z),G):-!,assertz(G).
+prolog_modify(change(assert,a),G):-!,asserta(G).
+prolog_modify(change(assert,_),G):-!,assert(G).
+prolog_modify(change( retract,all),G):-!,retractall(G).
+prolog_modify(change(retract,one),(G-B)):-!,retract((G-B)).
+
+prolog_modify(change(retract,_),G):-!,retract(G).
+prolog_modify(Op,G):- reduce_mpred_op(Op,Op2), mud_call_store_op(Op2,G).
 
 

@@ -205,12 +205,22 @@ inside_file(W) :- prolog_load_context(source,Source),user:mpred_directive_value(
 
 system:term_expansion((:- (M:DIR)),O):-atom(M),atom(DIR),with_source_module(M, ((pfc_directive_expansion(DIR,OO),!, must(O=(:- OO))))).
 system:term_expansion((:- DIR),O):- atom(DIR), pfc_directive_expansion(DIR,OO),!,must(O=(:- OO)).
+
+
 system:term_expansion(A,BO):- fail, notrace((A\=(:-_),A\=end_of_file,current_predicate(pfc_file_loaded/0))), 
    notrace((\+ thlocal:disable_mpred_term_expansions_locally, \+ thlocal:already_in_file_term_expansion,\+ (get_functor(A,F),expanded_already_functor(F)))),
    ((source_file(I),must(loading_module(M);source_module(M)))),
    with_no_assertions(thlocal:consulting_sources, 
    with_source_module(M, loop_check(pfc_file_module_term_expansion(I,M,A,B)))),
    must(nonvar(B)),BO=B.
+
+
+:-export(pfc_file_loaded/0).
+pfc_file_loaded.
+
+
+end_of_file.
+
 
 % ISA QUERY
 system:goal_expansion(ISA,GO) :- \+ thlocal:disable_mpred_term_expansions_locally, once((compound(ISA),was_isa(ISA,I,C))),thlocal:is_calling,show_call(GO=no_repeats(isa(I,C))).
@@ -221,11 +231,6 @@ system:goal_expansion(ISA,GO) :- \+ thlocal:disable_mpred_term_expansions_locall
 
 
 
-:-export(pfc_file_loaded/0).
-pfc_file_loaded.
-
-
-end_of_file.
 
 
 :-if(current_module(pfc)).

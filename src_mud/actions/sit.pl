@@ -38,4 +38,4 @@ user:agent_call_command(Agent,actOnto(Where,Sit)):-
 
 update_charge(Agent,Sit) :- vtPosture(Sit), padd(Agent,[mudEnergy(-1)]).
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).

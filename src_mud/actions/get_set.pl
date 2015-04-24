@@ -24,4 +24,4 @@ user:agent_call_command(Agent,actGet(Obj0,Prop0)) :- subst(t(Prop0,Obj0,Value),i
                                                         ccatch((findall(Value,(req(K),fmt(K)),L),
                                                           (L==[_|_]->true;fmt(wasMissing(K)))),E,fmt('@get Error ~q',[E:K])).
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).

@@ -46,4 +46,4 @@ user:agent_call_command(Agent,ACT) :-
 %Nothing to use
       (add_cmdfailure(Agent,SENT))).
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).

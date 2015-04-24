@@ -76,4 +76,4 @@ getPropInfo(_Agent,_NewName,PropsIn,N,[mudDescription(ftText(need,to,actParse,Pr
 
 
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).

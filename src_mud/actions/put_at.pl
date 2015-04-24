@@ -38,4 +38,4 @@ user:agent_call_command(_Agent,actPut(Other,_Prep,Where)):-
    add(mudAtLoc(Where3D,Location)).
 
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).

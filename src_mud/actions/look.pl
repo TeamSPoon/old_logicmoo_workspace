@@ -308,4 +308,4 @@ mask([K|Tail],SoFar,What) :-
 mask([Head|Tail],SoFar,What) :-
 	mask(Tail,[Head|SoFar],What).
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).

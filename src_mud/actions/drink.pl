@@ -25,4 +25,4 @@ user:agent_call_command(Agent,actDrink(Obj)) :-
 
 update_charge(Agent,actDrink) :- add(mudEnergy(Agent,-1)).
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).

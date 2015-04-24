@@ -148,8 +148,8 @@ must_post_use(ActUse,Agent,Obj):-
 update_charge(Agent,_ActWield) :- 
         padd(Agent,mudEnergy(-2)).
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).
 
 
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).

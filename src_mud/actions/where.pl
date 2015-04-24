@@ -40,6 +40,6 @@ mud_cmd_who_1(Who):-
       once((inRegion(Who,Where),
             fmt(cmdresult(actWho(Who),inRegion(Who,Where)))))).
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).
 
 

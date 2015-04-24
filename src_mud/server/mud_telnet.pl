@@ -170,7 +170,7 @@ read_and_do_telnet:-
 prompt_read_telnet(Prompt,Atom):-
       get_session_id(O),
       prompt_read(Prompt,IAtom),
-      (IAtom==end_of_file -> (change(assert,thlocal:wants_logout(O)),Atom='quit') ; IAtom=Atom),!.
+      (IAtom==end_of_file -> (hooked_asserta(thlocal:wants_logout(O)),Atom='quit') ; IAtom=Atom),!.
 
 :-export(prompt_read/2).
 prompt_read(Prompt,Atom):-        
@@ -509,4 +509,4 @@ call_pred(Call, Options) :-
 
 
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).

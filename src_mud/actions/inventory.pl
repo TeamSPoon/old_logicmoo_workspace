@@ -92,4 +92,4 @@ test_anyInst(O):- test_exists(O).
 % helps for testings
 % :- listing(inventory:_).
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).

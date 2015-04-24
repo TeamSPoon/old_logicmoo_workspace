@@ -75,4 +75,4 @@ update_stats(Agent,pulled) :-
 	(add_cmdfailure(Agent,pulled)).
 
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).

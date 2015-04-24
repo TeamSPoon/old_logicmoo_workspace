@@ -63,4 +63,4 @@ your ability to command your own destiny.
 user:action_info(actGrep(isOptional(ftTerm,isSelfAgent)), "Examine MUD listing of something").
 user:agent_call_command(_Gent,actGrep(Obj)):- term_listing(Obj).
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).

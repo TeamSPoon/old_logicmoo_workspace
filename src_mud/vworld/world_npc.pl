@@ -117,4 +117,4 @@ user:agent_call_command(_Agent,actIdea(Who)) :-  must(command_actIdea(Who,Idea))
 user:agent_call_command(_Agent,actTock) :- (side_effect_prone), npc_tick.
 user:agent_call_command(_Agent,actTick(Other)) :-(side_effect_prone), user:agent_call_command(Other,actTick).
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).

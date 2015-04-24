@@ -98,4 +98,4 @@ explorer_idea(Agent,actLook) :-
 	add(mudMemory(Agent,aDirectionsFn(New))).
 
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).

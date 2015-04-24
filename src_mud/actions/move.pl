@@ -114,4 +114,4 @@ user:agent_call_command(Agent,actGo(Dir)) :-
 	call_update_charge(Agent,actMove).
 
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).

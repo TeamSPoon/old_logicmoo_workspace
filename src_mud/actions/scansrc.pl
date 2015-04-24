@@ -108,4 +108,4 @@ include_moo_file_ni_1(M):- source_file_property(_,includes(M)),!.
 include_moo_file_ni_1(M):- user:ensure_loaded(M).
 
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).

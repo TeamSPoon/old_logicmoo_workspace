@@ -143,8 +143,8 @@ objects_for_agent(Agent,Relation,MatchList):- findall(Obj, relates(Agent,Relatio
 
 objects_match(Text,Possibles,MatchList):- findall(Obj,(member(Obj,Possibles),match_object(Text,Obj)), MatchList).
 
-
-object_string(O,String):-object_string(_,O,1-4,String),!.
+:-dynamic(object_string/2).
+object_string(O,String) :- bwc, object_string(_,O,1-4,String),!.
 object_string_0_5(O,String):-object_string(_,O,0-5,String),!.
 
 :-export(object_string/4).
@@ -257,7 +257,7 @@ parse_agent_text_command(Agent,PROLOGTERM,[],Agent,actProlog(PROLOGTERM)):- nonv
 parse_agent_text_command(Agent,SVERB,ARGS,NewAgent,GOAL):-
  dmsg(failed_parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL)),
  debugging(parser),
- debug,visible(+all),leash(+all), dtrace,
+ debug,visible(+all),leash(+all), 
  parse_agent_text_command_0(Agent,SVERB,ARGS,NewAgent,GOAL),!.
 
 parse_agent_text_command(Agent,IVERB,ARGS,Agent,GOAL):- 
@@ -379,15 +379,25 @@ bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
 
 :-style_check(+singleton).
 
+:-multifile(name_text/2).
+:-dynamic(name_text/2).
 :-export(name_text/2).
-name_text(Name,Text):-nameStrings(Name,Text).
-name_text(Name,Text):-mudKeyword(Name,Text).
-name_text(Name,Text):-nonvar(Text),!,name_text(Name,TextS),equals_icase(Text,TextS).
-% name_text(Name,Text):-argIsa(N,2,ftString),not_asserted((argIsa(N,1,ftString))),t(N,Name,Text).
-name_text(Name,Text):-atomic(Name),!,name_text_atomic(Name,Text).
-name_text(Name,Text):-is_list(Name),!,member(N,Name),name_text(N,Text).
-name_text(Name,Text):-compound(Name),!,Name=..[F,A|List],!,name_text([F,A|List],Text).
 
+
+
+=>pfcControlled(name_text(ftTerm,ftString)).
+
+name_text(Name,Text):- nonvar(Text),!,name_text(Name,TextS),equals_icase(Text,TextS).
+name_text(Name,Text):- bwc, name_text0(Name,Text).
+
+:-multifile(name_text0/2).
+:-export(name_text0/2).
+name_text0(Name,Text):-nameStrings(Name,Text).
+name_text0(Name,Text):-mudKeyword(Name,Text).
+% name_text0(Name,Text):-argIsa(N,2,ftString),not_asserted((argIsa(N,1,ftString))),t(N,Name,Text).
+name_text0(Name,Text):-atomic(Name),!,name_text_atomic(Name,Text).
+name_text0(Name,Text):-is_list(Name),!,member(N,Name),name_text(N,Text).
+name_text0(Name,Text):-compound(Name),!,Name=..[F,A|List],!,name_text([F,A|List],Text).
 
 name_text_atomic(Name,Text):-string(Name),Name=Text.
 name_text_atomic(Name,Text):-to_case_breaks(Name,[_|ListN]),member(t(Text,_),ListN).

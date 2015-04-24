@@ -281,4 +281,4 @@ create_instance_0(What,Type,Props):- leash(+call),trace,dtrace,trace_or_throw(dm
 % already convered mudPossess(Who,Thing):-genlPreds(mudPossess,W),into_mpred_form(t(W,Who,Thing),Call),mpred_call(Call).
 
 
-% % :- include(prologmud(mud_footer)).
+% :- include(prologmud(mud_footer)).

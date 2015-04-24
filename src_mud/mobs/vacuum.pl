@@ -73,4 +73,4 @@ vacuum_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[tOutlet]).
 
 
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).

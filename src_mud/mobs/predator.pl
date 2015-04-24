@@ -54,4 +54,4 @@ predator_idea(Agent,Act) :-
       move_or_sit_memory_idea(Agent,Act,[tNut]).
 
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).

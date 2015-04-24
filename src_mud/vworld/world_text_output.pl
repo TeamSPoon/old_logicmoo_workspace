@@ -182,4 +182,4 @@ fmt_holds_tcall_pred(WPred,ToSTR,N,Type,V0):-fmt_holds_tcall_pred_trans(WPred,To
 fmt_holds_tcall_pred_trans(WPred,ToSTR,N,Type,V0):-must((debugOnError(call(ToSTR,V0,Type,V)),!,debugOnError(call(WPred,_Tn,N,Type,V)))).
 
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).

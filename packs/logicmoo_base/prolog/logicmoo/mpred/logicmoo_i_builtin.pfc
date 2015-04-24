@@ -549,7 +549,7 @@ implies(and(resultIsaArg('$VAR'('FUNC'), 5), arg5Genl('$VAR'('FUNC'), '$VAR'('CO
 %((genlPreds(Col1,Col2),(arity(Col1,1);arity(Col2,1)))=>genls(Col1,Col2)).
 %((genls(Col1,Col2),(tPred(Col1);tPred(Col2)))=>genlPreds(Col1,Col2)).
 
-tCol('UnaryPredicate').
+:-must(pfc_add(tCol('UnaryPredicate'))).
 
 ((argQuotedIsa(Pred, _, 'CycLSentence') => 'SententialOperator'(Pred))).
 
@@ -680,8 +680,8 @@ zDefault((P => Q))/pfc_literal(Q) => ((P, ~neg(Q) => Q)).
     P2 =.. [C2,X]},
   (P1 => P2).
 
-(relationMostInstance(Pred,_Arg1Type,Value),argIsa(Pred,2,Type)=>(isa(Value,Type),isa(Pred,tRolePredicate))).
-(relationAllInstance(Pred,_Arg1Type,Value),argIsa(Pred,2,Type)=>(isa(Value,Type),isa(Pred,tRolePredicate))).
+(relationMostInstance(Pred,_,Value),argIsa(Pred,2,Type)=>(isa(Value,Type),isa(Pred,tRolePredicate))).
+(relationAllInstance(Pred,_,Value),argIsa(Pred,2,Type)=>(isa(Value,Type),isa(Pred,tRolePredicate))).
 
 => zenlPreds(tCanary,tBird).
 => zenlPreds(tPenguin,tBird).

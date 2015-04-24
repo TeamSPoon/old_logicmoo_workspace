@@ -41,4 +41,4 @@ update_charge(Agent,actEat) :-
 	New is Old - 1,
 	add(mudEnergy(Agent,New)).
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).

@@ -40,4 +40,4 @@ user:verb_alias(quit,actLogout).
 user:verb_alias(logoff,actLogout).
 
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).

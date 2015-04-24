@@ -93,4 +93,4 @@ update_stats(Agent,wiff) :-
 
 
 
-% :- include(prologmud(mud_footer)).
+:- include(prologmud(mud_footer)).
