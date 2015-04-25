@@ -99,6 +99,8 @@ user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),s
 
 :- dynamic(user:mudDescription/2).
 
+:- ensure_loaded(prologmud(server/mud_builtin)).
+
 tCol(tLivingRoom).
 genls(tLivingRoom,tRegion).
 genls(tOfficeRoom,tRegion).
@@ -107,12 +109,12 @@ genls(tOfficeRoom,tRegion).
 % int_firstOrder(some_query, 666, What, C, E, A, J, D, L, B)
 % :- forall(clause(user:mud_regression_test,Call),must(Call)).
 
-% :- declare_load_dbase('../games/src_game_nani/a_nani_household.plmoo').
-% :- declare_load_dbase('../games/src_game_nani/objs_misc_household.plmoo').
+:- declare_load_dbase('../games/src_game_nani/a_nani_household.plmoo').
+:- declare_load_dbase('../games/src_game_nani/objs_misc_household.plmoo').
 
 % the following 4 worlds are in version control in examples
 % :- add_game_dir('../games/src_game_wumpus',prolog_repl).       
-% :- add_game_dir('../games/src_game_nani',prolog_repl).       
+:- add_game_dir('../games/src_game_nani',prolog_repl).       
 % :- add_game_dir('../games/src_game_sims',prolog_repl).
 
 
@@ -147,9 +149,8 @@ isa(iExplorer1,'tExplorer').
 
 :-onSpawn(localityOfObject(iExplorer1,'tLivingRoom')).
 
-:- include(prologmud(server/mud_builtin)).
-:- ((trace,user:do_ensure_some_pathBetween)).
 
+:- ((user:do_ensure_some_pathBetween)).
 
 
 % [Manditory] This loads the game and initializes so test can be ran

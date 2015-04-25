@@ -106,10 +106,11 @@ decl_mpred_prolog(CM,M,PI,FA):- loop_check(must(decl_mpred_prolog_ilc(CM,M,PI,FA
 
 % decl_mpred_prolog_ilc(_,_,_,_):-!.
 decl_mpred_prolog_ilc(CM,M,PI,F/A):-
-      decl_mpred(F,arity(A)),
+      assert_arity(F,A),
+      add(isa(F,prologOnly)),
       decl_mpred(F,prologOnly),
       decl_mpred(F,predCanHaveSingletons),
-      decl_mpred(F,[info(decl_mpred_prolog(CM,M,PI,F/A))]),
+      %decl_mpred(F,[info(decl_mpred_prolog(CM,M,PI,F/A))]),
       decl_mpred(PI,pred_module(M)).   
 
 
@@ -170,17 +171,17 @@ assert_arity(F,A):-not(integer(A)),trace_or_throw(assert_arity(F,A)).
 assert_arity(F,A):-arity(F,A),assert_if_new(user:mpred_prop(F,arity(A))),!.
 assert_arity(F,A):-arity(F,1),dmsg(trace_or_throw(was_one_assert_arity(F,A))),!.
 assert_arity(F,2):-F = argsIsa, nottrace_or_throw(assert_arity_argsIsa(F,2)).
-assert_arity(F,0):- dmsg(trace_or_throw(assert_arity(F,0))),!.
-assert_arity(F,A):-assert_if_new(arity(F,A)),assert_if_new(user:mpred_prop(F,arity(A))),!.
-assert_arity(F,A):-dmsg(failed_assert_arity(F,A)).
+assert_arity(F,0):- dmsg(trace_or_throw(assert_arity(F,0))),fail.
+assert_arity(F,A):-loop_check(assert_arity_ilc(F,A),true),!.
+assert_arity(F,A):-assert_if_new(arity(F,A)),dmsg(failed_assert_arity(F,A)).
 
 assert_arity_ilc(F,A):-
   % A2 is A+2,ensure_universal_stub_plus_2(F,A2),
-  retractall(user:mpred_prop(F,arity(_))),
-  retractall(arity(F,_)),
+ % retractall(user:mpred_prop(F,arity(_))),
+ % retractall(arity(F,_)),
    must_det(good_pred_relation_name(F,A)),
-    pfc_add_fast(arity(F,A)),
-    hooked_asserta(user:mpred_prop(F,arity(A))),!.
+    pfc_add_fast(arity(F,A)),!.
+  %  hooked_asserta(user:mpred_prop(F,arity(A))),!.
 
 
 
