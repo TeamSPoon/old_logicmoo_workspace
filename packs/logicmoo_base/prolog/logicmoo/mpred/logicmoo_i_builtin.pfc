@@ -540,8 +540,8 @@ makeArgConstraint('SometimesIsa',tCol).
 
 prologHybrid(quotedIsa(ftTerm,ttFormatType)).
 
-isa(I,C)<=quotedIsa(I,C).
-quotedIsa(I,C)<=term_is_ft(I,C).
+isa(I,C):-quotedIsa(I,C).
+quotedIsa(I,C):-term_is_ft(I,C).
 
 implies(and(resultIsaArg('$VAR'('FUNC'), 5), arg5Genl('$VAR'('FUNC'), '$VAR'('COL'))), resultIsa('$VAR'('FUNC'), '$VAR'('COL'))).
 

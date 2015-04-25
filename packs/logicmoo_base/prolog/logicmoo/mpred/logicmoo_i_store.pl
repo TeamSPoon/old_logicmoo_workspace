@@ -292,7 +292,7 @@ add_0(A):- is_ftVar(A),!,trace_or_throw(var_add(A)).
 add_0(((H1,H2):-B)):-!,add_0((H1:-B)),add_0((H2:-B)).
 add_0(((H1,H2))):-!,add_0((H1)),add_0((H2)).
 add_0(dynamic(Term)):- !,must(get_arity(Term,F,A)), must(dynamic(F/A)).
-add_0(A):-A =(:-(Term)), !, must(add_fast(A)).
+add_0(A):- A =(:-(Term)), !, must(add_fast(A)).
 % add_0(C0):-check_override(add(C0)),!.
 % add_0(Skipped):- ground(Skipped),implied_skipped(Skipped),!. % ,dmsg(implied_skipped(Skipped)).
 add_0(C0):- ignore((ground(C0),asserta(user:already_added_this_round(C0)))),must(pfc_add_fast(C0)),!.

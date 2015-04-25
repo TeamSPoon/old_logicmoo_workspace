@@ -212,7 +212,7 @@ must_make_object_string_list_cached(P,Obj,WList):-
 same_ci(A,B):-notrace((must((non_empty(A),non_empty(B))),any_to_string(A,StringA),any_to_string(B,StringB),!,string_ci(StringA,StringB))),!.
 
 match_object(S,Obj):-name_text(Obj,S).
-match_object(S,Obj):-ground(S:Obj),match_object_exp(S,Obj),!.
+% match_object(S,Obj):-ground(S:Obj),match_object_exp(S,Obj),!.
 
 
 match_object_exp(S,Obj):-sanity(ground(S:Obj)),must(((atoms_of(S,Atoms),!,Atoms\=[]))),match_object_0(Atoms,Obj).
@@ -386,10 +386,17 @@ bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
 
 
 
-=>pfcControlled(name_text(ftTerm,ftString)).
+=>pfcControlled(name_text_known(ftTerm,ftString)).
 
-name_text(Name,Text):- nonvar(Text),!,name_text(Name,TextS),equals_icase(Text,TextS).
-name_text(Name,Text):- bwc, name_text0(Name,Text).
+name_text(Name,Text):- nonvar(Text),!,name_text(Name,TextS),equals_icase(Text,TextS),!.
+name_text(Name,Name):- string(Name).
+name_text(Name,Text):- name_text_known_for(Name),!,name_text_known(Name,Text).
+
+
+name_text_known_for(Name)<=name_text_known(Name,_).
+
+name_text_known(Name,Text):- bwc, name_text0(Name,Text).
+name_text_known(Name,_)=>name_text_known_for(Name).
 
 :-multifile(name_text0/2).
 :-export(name_text0/2).
@@ -397,9 +404,12 @@ name_text0(Name,Text):-nameStrings(Name,Text).
 name_text0(Name,Text):-mudKeyword(Name,Text).
 % name_text0(Name,Text):-argIsa(N,2,ftString),not_asserted((argIsa(N,1,ftString))),t(N,Name,Text).
 name_text0(Name,Text):-atomic(Name),!,name_text_atomic(Name,Text).
-name_text0(Name,Text):-is_list(Name),!,member(N,Name),name_text(N,Text).
-name_text0(Name,Text):-compound(Name),!,Name=..[F,A|List],!,name_text([F,A|List],Text).
+name_text0(Name,Text):-is_list(Name),!,member(N,Name),name_text0(N,Text).
+name_text0(Name,Text):-compound(Name),!,Name=..[F,A|List],!,F\='[|]',name_text0([F,A|List],Text).
 
+name_text_atomic([],_):-!,fail.
+name_text_atomic('',_):-!,fail.
+name_text_atomic("",_):-!,fail.
 name_text_atomic(Name,Text):-string(Name),Name=Text.
 name_text_atomic(Name,Text):-to_case_breaks(Name,[_|ListN]),member(t(Text,_),ListN).
 name_text_atomic(Name,Text):-i_name('',Name,TextN),atom_string(TextN,Text).

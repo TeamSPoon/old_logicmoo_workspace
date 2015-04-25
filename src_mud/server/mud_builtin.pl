@@ -20,6 +20,7 @@
 % Dec 13, 2035
 % Douglas Miles
 */
+:- pfc_begin.
 
 :- op(500,fx,'~').
 :- op(1050,xfx,('=>')).
@@ -41,7 +42,9 @@
 :- decl_type(ttTypeType).
 :- decl_type(tPathway).
 
+%:-rtrace.
 typeGenls(tAgentGeneric,ttAgentType).
+%:-nortrace.
 typeGenls(tItem,ttItemType).
 typeGenls(tObj,ttObjectType).
 typeGenls(tPred,ttPredType).
@@ -363,6 +366,7 @@ prologHybrid(mudColor(tSpatialThing,vtColor)).
 prologHybrid(mudKnowing(tAgentGeneric,ftTerm)).
 prologHybrid(mudLabelTypeProps(ftString,tCol,ftVoprop)).
 prologHybrid(mudListPrice(tItem,ftNumber)).
+:-dynamic(mudOpaqueness/2).
 prologHybrid(mudOpaqueness(ftTerm,ftPercent)).
 prologHybrid(mudPossess(tAgentGeneric,tObj)).
 prologHybrid(mudShape(tSpatialThing,vtShape)).
@@ -616,30 +620,35 @@ mudLabelTypeProps(wl,tWall,[mudHeight(3),mudWeight(4)]).
 (wearsClothing(A,I)=>{(add(tAgentGeneric(A)),add(tClothing(I)))}).
 
 (pred_argtypes(Args)/pfc_literal(Args)=>{ functor(Args,F,A), A>1, functor(Matcher,F,A)}, 
-  (({pfc_literal(Matcher),pfc_user_fact(Matcher),nop((clause_safe(Matcher,_))),\+((arg(_,Matcher,GT),var(GT)))},Matcher/pfc_literal(Matcher))=>{deduceFromArgTypes(Matcher)})).
+  (({pfc_literal(Matcher), 
+    pfc_user_fact(Matcher),nop((clause_safe(Matcher,_))),\+((arg(_,Matcher,GT),var(GT)))},Matcher/pfc_literal(Matcher))=>{deduceFromArgTypes(Matcher)})).
 
 genls(tBread, tFood).
 typeProps(tCrackers,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]).
 
 
+user:action_info(C,_)=>vtActionTemplate(C).
+
+:-forall(vtActionTemplate(Templ),add(vtActionTemplate(Templ))).
+
+random_path_dir(Dir):-random_instance(vtBasicDir,Dir,true).
+random_path_dir(Dir):-random_instance(vtBasicDirPlusUpDown,Dir,true).
+random_path_dir(Dir):-random_instance(vtDirection,Dir,true).
 
 :- decl_mpred_prolog(ensure_some_pathBetween/2).
 ensure_some_pathBetween(R1,R2):- pathBetween(R1,_,R2),!.
 ensure_some_pathBetween(R1,R2):- pathBetween(R2,_,R1),!.
-ensure_some_pathBetween(R1,R2):- 
-   random_instance(vtBasicDir,Dir,true),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
+ensure_some_pathBetween(R1,R2):- random_path_dir(Dir),
+   not(pathBetween(R1,Dir,_)),must(reverse_dir(Dir,Rev)),not(pathBetween(R2,Rev,_)),!,
    must((add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)))),!.
-ensure_some_pathBetween(R1,R2):- 
-   random_instance(vtBasicDirPlusUpDown,Dir,true),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
-   must((add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)))),!.
-ensure_some_pathBetween(R1,R2):- 
-   random_instance(vtDirection,Dir,true),not(pathBetween(R1,Dir,_)),reverse_dir(Dir,Rev),not(pathBetween(R2,Rev,_)),!,
-   must((add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)))),!.
+
+ensure_some_pathBetween(R1,R2):- must((add(pathBetween(R1,skPathFn(vtDirection,R1,R2),R2)),add(pathBetween(R2,skPathFn(vtDirection,R2,R1),R1)))),!.
+
 
 :- decl_mpred_prolog(user:do_ensure_some_pathBetween/0).
 user:do_ensure_some_pathBetween:- 
   must((forall(no_repeats((is_asserted(pathConnects(R1,R2)),ground(R1:R2),isa(R1,tRegion),isa(R2,tRegion),dif(R1,R2))),
-    show_call_failure((ensure_some_pathBetween(R1,R2),ensure_some_pathBetween(R2,R1)))))).
+    must((ensure_some_pathBetween(R1,R2),ensure_some_pathBetween(R2,R1)))))).
 
 :-onEachLoad(must(user:do_ensure_some_pathBetween)).
 

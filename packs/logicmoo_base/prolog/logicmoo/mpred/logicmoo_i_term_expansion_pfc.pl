@@ -70,6 +70,7 @@ with_source_module(M,CALL):- setup_call_cleanup('$set_source_module'(Old, M),CAL
 pfc_using_file(F):- var(F),!,source_file(F), pfc_using_file(F),!.
 pfc_using_file(F):- inside_file(pfc),!.
 pfc_using_file(F):- file_name_extension(_,pfc,F),!.
+pfc_using_file(F):- file_name_extension(_,plmoo,F),!.
 
 
 must_compile_special_clause(CL):- \+ thlocal:disable_mpred_term_expansions_locally,  (CL \= :-(_)), 
@@ -315,7 +316,7 @@ source_user(M):-(source_module(M)),!.
 source_user(M):-context_module(M).
 
 mpred_prop(A,B,C):-mpred_get(A,B,C).
-
+/*
 :- 
    multifile(('<=')/2),
    multifile(('<=>'/2)),
@@ -338,7 +339,7 @@ mpred_prop(A,B,C):-mpred_get(A,B,C).
    dynamic(('=>')/1),
    dynamic(('~')/1),
    dynamic(('neg')/1).
-
+*/
 pmsg(F,A):-implode_varnames_copy(A,AA),sformat(S,F,AA),pmsg(S).
 pmsg(S):-implode_varnames_copy(S,SC),wdmsg(pfc(SC)).
 
@@ -350,17 +351,18 @@ default_module(user).
 
 :- thread_local(user:pfc_uses/2).
 
-
+/*
 :- dynamic(('<=')/2).
 :- dynamic(('<=>')/2).
 :- dynamic(('=>')/2).
 :- dynamic(('=>')/1).
 :- dynamic(('~')/1).
+:- dynamic(('::::')/2).
+*/
 :- dynamic(('bt')/2).
 :- dynamic(('nt')/3).
 :- dynamic(('pt')/2).
 :- dynamic(('pfc_t_pkey')/3).
-:- dynamic(('::::')/2).
 :- dynamic((pfc_action)/2).
 :- dynamic((pfc_haltSignal)/1).
 :- dynamic((pfc_queue)/2).

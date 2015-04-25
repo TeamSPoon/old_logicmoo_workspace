@@ -33,6 +33,7 @@
 % mudCanSense(Agent,Sense,InList,CanDetect,CantDetect).
 mudCanSense(_Agent,visual,InList,InList,[]).
 
+
 user:action_info(actExamine(tItem), "view details of item (see also @ftListFn)").
 user:agent_call_command(_Gent,actExamine(SObj)):- term_listing(SObj).
 
@@ -171,7 +172,6 @@ get_feet0(Agent,Percepts):-
 
 pddlObjects(vtDirection,[vNorth,vSouth,vEast,vWest,vNE,vNW,vSE,vSW]).
 
-user:action_info(T,_)=>vtActionTemplate(T).
 
 %View list starting at vac'vSouth position and moving out in a clockwise spiral
 %old_view_list([[vEast,vWest],[vNorth,vHere],[vNE,vHere],[vEast,vHere],[vSE,vHere],[vSouth,vHere],[vSW,vHere],

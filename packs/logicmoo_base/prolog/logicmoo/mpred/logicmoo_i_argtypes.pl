@@ -34,6 +34,7 @@ assert_argIsa(Prop,N,Type):-show_call_failure(add_fast(argIsa(Prop,N,Type))).
 term_is_ft(Term,Type):- var(Term),!,member(Type,[ftVar,ftProlog]).
 term_is_ft(_ANY,Type):- Type==ftVar,!,fail.
 term_is_ft([T|Term],ftListFn(Type)):-!,is_list_of(Type,[T|Term]).
+term_is_ft(Term,Type):- nonvar(Type),\+ttFormatType(Type),!,fail.
 term_is_ft(Term,Type):- no_repeats_av(Type,(term_is_ft_how(Term,Was),trans_subft(Was,Type))).
 
 
@@ -511,7 +512,7 @@ roll_dice(Rolls,Sided,Bonus,Result):- LessRolls is Rolls-1, roll_dice(LessRolls,
 
 call_argIsa_ForAssert(F,N,Type):-argIsa_known(F,N,Type),atom(Type),!,not(nonusefull_deduction_type(Type)),tCol(Type).
 
-:-add_fast(<=( argIsa(F,N,Isa), argIsa_known(F,N,Isa))).
+:-pfc_add_fast(<=( argIsa(F,N,Isa), argIsa_known(F,N,Isa))).
 :-decl_mpred_hybrid(formatted_resultIsa/2).
 :-decl_mpred_hybrid(resultIsa/2).
 

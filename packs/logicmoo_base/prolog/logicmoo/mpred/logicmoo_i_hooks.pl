@@ -387,6 +387,9 @@ i_name(OType,IType):-typename_to_iname0('',OType,IOType),!,IOType=IType.
 :-export(i_name/3).
 i_name(I,OType,IType):-typename_to_iname0(I,OType,IOType),!,IOType=IType.
 
+:-export(typename_to_iname0/3).
+
+typename_to_iname0(I, [], O):- trace_or_throw(bad_typename_to_iname0(I, [], O)).
 typename_to_iname0(I,OType,IType):-type_prefix(Prefix,_),atom_concat(Prefix,Type,OType),capitalized(Type),!,typename_to_iname0(I,Type,IType).
 typename_to_iname0(I,Type,IType):-nonvar(Type),toUpperCamelcase(Type,UType),atom_concat(I,UType,IType).
 

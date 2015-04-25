@@ -104,9 +104,9 @@ fully_expand(Op,Sent,SentO):-fully_expand_now(Op,Sent,SentO),!.
 
 fully_expand_now(_,Sent,SentO):- (\+ compound(Sent)),!,Sent=SentO.
 fully_expand_now(_,Sent,SentO):-thlocal:infSkipFullExpand,!,must(Sent=SentO).
-fully_expand_now(Op,Sent,SentO):- must(fully_expand_clause(Op,Sent,BO)),!,must(notrace((SentO=BO))),
+fully_expand_now(Op,Sent,SentO):- hotrace((must(fully_expand_clause(Op,Sent,BO)),!,must(notrace((SentO=BO))),
    ignore(((notrace((Sent\=@=SentO, (Sent\=isa(_,_)->SentO\=isa(_,_);true), 
-    (Sent \=@= user:SentO), nop(dmsg(fully_expand(Op,(Sent --> SentO))))))))),!.
+    (Sent \=@= user:SentO), nop(dmsg(fully_expand(Op,(Sent --> SentO))))))))))),!.
 
 fully_expand_clause(_,Sent,SentO):- (\+ compound(Sent)),!,must(SentO=Sent).
 fully_expand_clause(Op,Sent,SentO):-var(Op),!,fully_expand_clause(is_asserted,Sent,SentO),!.
@@ -423,9 +423,9 @@ into_mpred_form((H:-B),(HH:-BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
 into_mpred_form((H,B),(HH,BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
 into_mpred_form((H;B),(HH;BB)):-!,into_mpred_form(H,HH),into_mpred_form(B,BB).
 into_mpred_form(WAS,isa(I,C)):-was_isa(WAS,I,C),!.
-into_mpred_form(t(P,A),O):-atomic(P),!,O=..[P,A].
-into_mpred_form(t(P,A,B),O):-atomic(P),!,O=..[P,A,B].
-into_mpred_form(t(P,A,B,C),O):-atomic(P),!,O=..[P,A,B,C].
+into_mpred_form(t(P,A),O):-atom(P),!,O=..[P,A].
+into_mpred_form(t(P,A,B),O):-atom(P),!,O=..[P,A,B].
+into_mpred_form(t(P,A,B,C),O):-atom(P),!,O=..[P,A,B,C].
 into_mpred_form(Var,MPRED):- var(Var), trace_or_throw(var_into_mpred_form(Var,MPRED)).
 into_mpred_form(I,O):-loop_check(into_mpred_form_ilc(I,O),O=I). % trace_or_throw(into_mpred_form(I,O))).
 

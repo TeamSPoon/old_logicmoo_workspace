@@ -121,7 +121,9 @@ genls(tOfficeRoom,tRegion).
 % :- add_game_dir('../games/src_game_startrek',prolog_repl).
 % :- declare_load_dbase('../games/src_game_startrek/startrek.all.plmoo').
 
+%:-rtrace.
 tAgentGeneric(iCommanderData66).
+%:-nortrace.
 isa(iCommanderData66,'tMonster').
 isa(iCommanderData66,'tExplorer').
 wearsClothing(iCommanderData66,'iBoots673').

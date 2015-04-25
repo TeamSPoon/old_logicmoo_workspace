@@ -48,6 +48,7 @@ genlInverse(mudContains,mudInsideOf).
 %genlInverse(mudStowing,mudInsideOf).
 %genlInverse(mudInsideOf,mudPossess).
 
+
 % action_verb_useable(Actionn,RequiredArg,AddedProp,PrecondProp,RemovedProp).
 action_verb_useable(actWear,tWearAble,wearsClothing,mudPossess,mudStowing).
 action_verb_useable(actWield,tWieldAble,mudWielding,mudPossess,mudStowing).
@@ -56,14 +57,10 @@ action_verb_useable(actStow,tStowAble,mudStowing,mudPossess,mudWielding).
 
 
 user:action_info(Syntax,String):-
- action_verb_useable(ActUse,Wieldable,NowWielding,Possessing,Unstowed),
-   Syntax=..[ActUse,Wieldable],
+ no_repeats([Syntax],(
+  action_verb_useable(ActUse,Wieldable,NowWielding,Possessing,Unstowed),
+  Syntax=..[ActUse,isAnd(tNearestReachableItem,call(Possessing,isSelfAgent,isSelf),Wieldable)])),
    sformat(String,'~w a ~w that you ~w so it will be ~w and not be ~w.',[ActUse,Wieldable,Possessing,NowWielding,Unstowed]).
-
-use_action_templates(Syntax):-no_repeats([Syntax],(
-  action_verb_useable(ActUse,Wieldable,_NowWielding,_Possessing,_Unstowed),Syntax=..[ActUse,Wieldable])).
-
-vtActionTemplate(Templ):-use_action_templates(Templ).
 
 user:agent_call_command(Agent,Syntax) :- 
     call((action_verb_useable(ActUse,_Wieldable,_NowWielding,_Possessing,_Unstowed),Syntax=..[ActUse,Obj])),

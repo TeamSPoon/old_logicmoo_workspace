@@ -553,7 +553,10 @@ check_for_fall(_,_,_).
 % Used for fleeing
 reverse_dir(W,R):-string(W),atom_string(A,W),!,reverse_dir0(A,RA),atom_string(RA,R),!.
 reverse_dir(A,R):-reverse_dir0(A,R),!.
-reverse_dir(Was,reverseOf(Was)):-nonvar(Was).
+reverse_dir(reverseOf(Was),Was):-nonvar(Was),!.
+reverse_dir(skPathFn(vtDirection,R2,R1),skPathFn(vtDirection,R1,R2)):-nonvar(R1).
+reverse_dir(Was,reverseOf(Was)):-nonvar(Was),!.
+
 
 reverse_dir0(vDown,vUp).
 reverse_dir0(vUp,vDown).

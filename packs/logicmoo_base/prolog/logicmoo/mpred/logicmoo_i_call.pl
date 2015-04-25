@@ -128,6 +128,7 @@ is_callable(C):-current_predicate(_,C),!.
 
 :-meta_predicate(mpred_call(0)).
 :-export(mpred_call/1).
+mpred_call(V):-var(V),trace_or_throw(var_mpred_call(V)).
 mpred_call(call(X)):-!,mpred_call(X).
 mpred_call((X,Y)):-!,mpred_call(X),mpred_call(Y).
 mpred_call((X;Y)):-!,mpred_call(X);mpred_call(Y).

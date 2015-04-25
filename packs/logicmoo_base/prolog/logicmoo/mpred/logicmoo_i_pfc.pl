@@ -101,9 +101,9 @@ pfc_transform_neck(HB,_,HB).
 % H = parentOf(_,_), pfc_clause(H,B,R).
 
 pfc_get_neck(H,FB):-pfc_get_neck_fb(H,FB)*->true;pfc_get_setting_pred(neck,H,FB).
-pfc_get_neck_fb(H,(<=)):- once(clause(H,callBC(H));clause(H,infoF(H <= _));clause(H <= _,true)).
+pfc_get_neck_fb(H,(<=)):- once(clause(H,pfc_bc_only(H));clause(H,infoF(H <= _));clause(H <= _,true)).
 pfc_get_neck_fb(H,(=>)):- once(clause(H,infoF(_ => H));clause(_ => H,true)).
-pfc_get_neck_fb(H,(:-)):- once(clause(H,infoF(H:-_));(clause(H,B),\+is_true(B),\+is_meta_info(B))).
+pfc_get_neck_fb(H,(:-)):- once(clause(H,infoF(H:-_));(clause(H,B),\+is_true(B),\+pfc_is_info(B))).
 
 pfc_is_neck_other(H,Type):-pfc_get_neck(H,T),T\=Type,!.
 
@@ -258,7 +258,7 @@ pfc_clause(H,B,Why):-predicate_property(H,number_of_clauses(_)),clause(H,CL,R),p
 % pfc_clause(H,true, pfcTypeFull(R,Type)):-nonvar(H),!,pfcDatabaseTerm(F/A),make_functor(R,F,A),pfcRuleOutcomeHead(R,H),clause(R,true),pfcTypeFull(R,Type),Type\=rule.
 % pfc_clause(H,true, pfcTypeFull(R)):-pfcDatabaseTerm(F/A),make_functor(R,F,A),pfcTypeFull(R,Type),Type\=rule,clause(R,true),once(pfcRuleOutcomeHead(R,H)).
 
-pfc_pbody(H,callBC(BC),R,fail,deduced(backchains)):-!.
+pfc_pbody(H,pfc_bc_only(BC),R,fail,deduced(backchains)):-!.
 pfc_pbody(H,infoF(INFO),R,B,Why):-!,pfc_pbody_f(H,INFO,R,B,Why).
 pfc_pbody(H,B,R,BIn,WHY):- is_true(B),!,BIn=B,get_why(H,H,R,WHY).
 pfc_pbody(H,B,R,B,asserted(R,(H:-B))).
@@ -357,7 +357,7 @@ user:mpred_prop(F,argIsa(_,ftAskable)):-pfcDatabaseTerm(F/_).
 user:mpred_prop(isa,2,pfcMustFC).
 
 pfcMustFC(H):-get_functor(H,F),isa(F,pfcMustFC).
-pfcPreferBC(H):-get_functor(H,F,A),isa(F,pfcPreferBC),dynamic(F/A),functor(PHead,F,A),assertz_if_new(((PHead:-callBC(PHead)))).
+pfcPreferBC(H):-get_functor(H,F,A),isa(F,pfcPreferBC),dynamic(F/A),functor(PHead,F,A),assertz_if_new(((PHead:-pfc_bc_only(PHead)))).
 
 :-asserta_if_new(thglobal:pfcManageHybrids).
 pfc_manage_hybrids:-!.
@@ -467,37 +467,33 @@ pfc_assert(G):- pfc_mpred_transform(G,GG),must(pfc_assert0(GG)),!.
 
 pfc_assert0(G):- \+(must(\+(pfc_ignored(G)))).
 pfc_assert0(G):- must(\+(throw_on_bad_fact(G))),fail.
-pfc_assert0(G):- must((pfc_manage_hybrids)),!,must((pfc_local(G),!,assertz_if_new(G),add_meta_facts(assertz_if_new,G))).
+pfc_assert0(G):- must((pfc_manage_hybrids)),!,must((pfc_local(G),!,assertz_if_new(G),pfc_add_minfo(assertz_if_new,G))).
 pfc_assert0(G):- pfc_local(G),!,
   must(( ( \+ predicate_property(G,dynamic) -> must(G) ; (assertz_if_new(G),if_defined(hooked_assertz(G),true))),
-   add_meta_facts(assertz,G))).
+   pfc_add_minfo(assertz,G))).
 
 pfc_assert0(G):- trace,add(G),pfc_mark_C(G).
 
 user:mpred_prop(F,prologOnly):-user:mpred_prop(F,pfcMetaPred).
 
-add_meta_facts(G):-add_meta_facts(assertz_if_new,G).
-add_meta_facts(How,(H:-True)):-is_true(True),must(nonvar(H)),!,add_meta_facts(How,H).
-add_meta_facts(How,(H<=B)):- !,add_meta_facts(How,(H:-infoF(H<=B))),!,add_meta_facts(How,(H:-callBC(H))).
-add_meta_facts(How,(B=>H)):- !,add_meta_facts(How,(H:-infoF(B=>H))),!.
-add_meta_facts(How,(B<=>H)):- !,add_meta_facts(How,(H:-infoF(B<=>H))),!,add_meta_facts(How,(B:-infoF(B<=>H))),!.
-add_meta_facts(How,((A,B):-INFOC)):-is_meta_info(INFOC),(nonvar(A);nonvar(B)),!,add_meta_facts(How,((A):-INFOC)),add_meta_facts(How,((B):-INFOC)),!.
-add_meta_facts(How,((A;B):-INFOC)):-is_meta_info(INFOC),(nonvar(A);nonvar(B)),!,add_meta_facts(How,((A):-INFOC)),add_meta_facts(How,((B):-INFOC)),!.
-add_meta_facts(How,(~(A):-infoF(C))):-nonvar(C),nonvar(A),!,add_meta_facts(How,((A):-infoF(~(C)))). % call(How,(~(A):-infoF(C))).
-add_meta_facts(How,(A:-INFOC)):-is_meta_info(INFOC),!,rewrap_h(A,AA),call(How,(AA:-INFOC)),!.
-add_meta_facts(How,pfcBT(H,_)):-!,add_meta_facts(How,(H:-callBC(H))).
-%add_meta_facts(How,G):-dmsg(skipped_add_meta_facts(How,G)).
-add_meta_facts(_,_).
+pfc_add_minfo(G):-pfc_add_minfo(assertz_if_new,G).
+pfc_add_minfo(How,(H:-True)):-is_true(True),must(nonvar(H)),!,pfc_add_minfo(How,H).
+pfc_add_minfo(How,(H<=B)):- !,pfc_add_minfo(How,(H:-infoF(H<=B))),!,pfc_add_minfo(How,(H:-pfc_bc_only(H))).
+pfc_add_minfo(How,(B=>H)):- !,pfc_add_minfo(How,(H:-infoF(B=>H))),!.
+pfc_add_minfo(How,(B<=>H)):- !,pfc_add_minfo(How,(H:-infoF(B<=>H))),!,pfc_add_minfo(How,(B:-infoF(B<=>H))),!.
+pfc_add_minfo(How,((A,B):-INFOC)):-pfc_is_info(INFOC),(nonvar(A);nonvar(B)),!,pfc_add_minfo(How,((A):-INFOC)),pfc_add_minfo(How,((B):-INFOC)),!.
+pfc_add_minfo(How,((A;B):-INFOC)):-pfc_is_info(INFOC),(nonvar(A);nonvar(B)),!,pfc_add_minfo(How,((A):-INFOC)),pfc_add_minfo(How,((B):-INFOC)),!.
+pfc_add_minfo(How,(~(A):-infoF(C))):-nonvar(C),nonvar(A),!,pfc_add_minfo(How,((A):-infoF(~(C)))). % call(How,(~(A):-infoF(C))).
+pfc_add_minfo(How,(A:-INFOC)):-pfc_is_info(INFOC),!,pfc_rewrap_h(A,AA),call(How,(AA:-INFOC)),!.
+pfc_add_minfo(How,pfcBT(H,_)):-!,pfc_add_minfo(How,(H:-pfc_bc_only(H))).
+%pfc_add_minfo(How,G):-dmsg(skipped_add_meta_facts(How,G)).
+pfc_add_minfo(_,_).
 
 
-is_meta_info(callBC(C)):-nonvar(C),!.
-is_meta_info(infoF(C)):-nonvar(C),!.
+pfc_is_info(pfc_bc_only(C)):-nonvar(C),!.
+pfc_is_info(infoF(C)):-nonvar(C),!.
 
 is_static_pred(A):-current_predicate(_,A), \+ predicate_property(A,dynamic).
-:-dynamic(not_not/1).
-rewrap_h(A,A):-nonvar(A),\+ is_static_pred(A).
-rewrap_h(A,F):- functor(A,F,_),\+ is_static_pred(F),!.
-rewrap_h(A,not_not(A)):-!.
 
 pfc_mpred_transform(G,GGG):-must((pfc_fully_expand_warn(pfc_mpred_transform,G,GG))),!,unnumbervars(GG,GGG).
 
@@ -651,9 +647,9 @@ pfcUseAllFact(Q):-may_use_head(Q),no_head_singletons_hb(Q,true).
 
 no_head_singletons_hb(Q,P):-not(((head_singletons_hb(Q,P,_),get_functor(Q,F,A),decl_mpred_prolog(F/A)))).
 
-callBC(isa(_,_)):-!,fail.
-callBC(G):-pfc_negation(G,Pos),!,show_call(not(callBC(Pos))),!.
-callBC(G):- loop_check_nr(pfcBC_NoFacts(G)).
+pfc_bc_only(isa(_,_)):-!,fail.
+pfc_bc_only(G):-pfc_negation(G,Pos),!,show_call(not(pfc_bc_only(Pos))),!.
+pfc_bc_only(G):- loop_check_nr(pfcBC_NoFacts(G)).
 
 may_never_deduce_bc_change.
 
@@ -1495,7 +1491,7 @@ maybeSupport(P,S):-( \+ ground(P)-> true;
 %= pfcBC_NoFacts(F) is true iff F is a fact available for backward chaining ONLY.
 %= Note that this has the side effect of catching unsupported facts and
 %= assigning them support from God.
-%= this Predicate should hide Facts from callBC/1
+%= this Predicate should hide Facts from pfc_bc_only/1
 %%
 pfcBC_NoFacts(F):- pfcBC_NoFacts_TRY(F)*-> true ; (pfc_slow_search,pfcBC_Cache(F)).
 
@@ -1509,8 +1505,8 @@ pfcBC_NoFacts_TRY(F) :- nonvar(F),
   otherwise -> pfcBC_NoFacts_TRY2(F)).
 
 ruleBackward(F,Condition):-ruleBackward0(F,Condition),Condition\=call(F).
-ruleBackward0(F,Condition):-pfc_clause_db_unify(F,Condition),not(is_true(Condition);is_meta_info(Condition)).
-ruleBackward0(F,Condition):-'<='(F,Condition),not(is_true(Condition);is_meta_info(Condition)).
+ruleBackward0(F,Condition):-pfc_clause_db_unify(F,Condition),not(is_true(Condition);pfc_is_info(Condition)).
+ruleBackward0(F,Condition):-'<='(F,Condition),not(is_true(Condition);pfc_is_info(Condition)).
 
 pfcBC_NoFacts_TRY2(F) :- no_repeats(ruleBackward(F,Condition)),
   pfc_call_prolog_native(neck(F),Condition),\+ clause(F,true),
@@ -1811,7 +1807,7 @@ head_search_for_listing(H):-  pfcDatabaseTerm(F/A),functor(H,F,A).
 
 pfc_listing_mpred_hook_2nd(Match):- 
  no_repeats(CL,(( no_repeats(head_search_for_listing(F)),predicate_property(F,number_of_clauses(_)),match_clauses(F,H,B), CL=(H:-B),
-   not(is_meta_info(B)),
+   not(pfc_is_info(B)),
    once(nonvar_contains_term(CL,Match))))),
    portray_clause(CL),fail.
 
@@ -2728,7 +2724,8 @@ make_term(ss(Constituent,Id,String),Term) :-
 % user:term_expansion(A,B):- loop_check(pfc_file_expansion_lc(A,B)),A\=@=B.
 
 user:term_expansion(A,B):- \+ thlocal:disable_mpred_term_expansions_locally,
-  current_predicate(_,pfcExpansion_loaded),loop_check(pfc_file_expansion(A,B)),A\=@=B.
+  current_predicate(_,pfcExpansion_loaded),
+  debugOnError(loop_check(pfc_file_expansion(A,B))),A\=@=B.
 
 pfcExpansion_loaded.
 % system:goal_expansion(P,O):- (\+ current_predicate(_,P)),O= pfcCall(P).
