@@ -9,6 +9,7 @@
 */
 % :- module(user,[]).
 
+
 :-ensure_loaded(library(pfc/pfc_runtime)).
 
 :- pfc_module.
@@ -934,7 +935,7 @@ penguin(X) => neg(fly(X)).
 % chilly is a penguin.
 :-(add(=> penguin(chilly))).
 
-% rtrace(Goal):- Goal. % (notrace((visible(+all),visible(+unify),visible(+exception),leash(-all),leash(+exception))),(trace,Goal),leash(+all)).
+% rtrace(Goal):- Goal. % (hotrace((visible(+all),visible(+unify),visible(+exception),leash(-all),leash(+exception))),(trace,Goal),leash(+all)).
 
 % :- gutracer.
 

@@ -25,7 +25,7 @@ end_of_file.
 user:provide_mpred_write_attributes(F,A,multifile):- multifile(F/A).
 user:provide_mpred_write_attributes(F,A,thread_local):- thread_local(F/A).
 user:provide_mpred_write_attributes(F,A,dynamic):- dynamic(F/A).
-user:provide_mpred_write_attributes(F,external(Module)):- dmsg(decl_mpred(F,external(Module))),not(mpred_mod(Module)),must_det(arity(F,A)),functor(HEAD,F,A),must_det(predicate_property(Module:HEAD,_)),!.
+user:provide_mpred_write_attributes(F,external(Module)):- dmsg(decl_mpred(F,external(Module))),not(user:mpred_mod(Module)),must_det(arity(F,A)),functor(HEAD,F,A),must_det(predicate_property(Module:HEAD,_)),!.
 
 user:provide_mpred_read_attributes(Obj,PropVal):- fail, safe_univ(PropVal,[Prop,NonVar|Val]),safe_univ(CallVal,[Prop,Obj,NonVar|Val]),
      predicate_property(CallVal,_),!,mpred_call(CallVal).
@@ -94,9 +94,9 @@ user:provide_mpred_setup(Op,HeadIn,StubType,OUT):-  StubType = prologOnly, get_p
    
 
 
-user_dynamic_multifile_exported(_):- mpred_mod(user),!.
+user_dynamic_multifile_exported(_):- user:mpred_mod(user),!.
 user_dynamic_multifile_exported(Prop/Arity):- 
-   mpred_mod(M), '@'( M:decl_mpred(Prop/Arity) , M).
+   user:mpred_mod(M), '@'( M:decl_mpred(Prop/Arity) , M).
 
 
 

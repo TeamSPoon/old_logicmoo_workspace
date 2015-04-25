@@ -2,9 +2,6 @@
 /** <module> MUD server startup script in SWI-Prolog
 
 */
-
-:- attach_packs.
-
 :- set_prolog_flag(generate_debug_info, true).
 % [Optionaly] Set the Prolog optimize/debug flags
 :- set_prolog_flag(verbose_load,true).
@@ -12,8 +9,14 @@
 :- set_prolog_flag(gui_tracer, false).
 :- set_prolog_flag(answer_write_options, [quoted(true), portray(true), max_depth(1000), spacing(next_argument)]).
 
-:- exists_directory(runtime)->working_directory(_,runtime);(exists_directory('../runtime')->working_directory(_,'../runtime');true).
 
+:- multifile(user:mud_regression_test/0).
+:- multifile user:'$was_imported_kb_content$'/2.
+:- dynamic user:'$was_imported_kb_content$'/2.
+:- discontiguous(user:'$was_imported_kb_content$'/2).
+
+
+:- exists_directory(runtime)->working_directory(_,runtime);(exists_directory('../runtime')->working_directory(_,'../runtime');true).
 :-multifile(user:file_search_path/2).
 user:file_search_path(weblog, 'C:/docs/Prolog/weblog/development/weblog/prolog').
 user:file_search_path(weblog, 'C:/Users/Administrator/AppData/Roaming/SWI-Prolog/pack/weblog').
@@ -21,14 +24,15 @@ user:file_search_path(weblog, '/usr/lib/swi-prolog/pack/weblog/prolog'):-current
 user:file_search_path(cliopatria, '../externals/ClioPatria'). % :- current_prolog_flag(unix,true).
 user:file_search_path(user, '../externals/ClioPatria/user/').
 user:file_search_path(swish, '../externals/swish'):- current_prolog_flag(unix,true).
-user:file_search_path(prologmud, '/devel/LogicmooDeveloperFramework/PrologMUD/packs/prologmud/prolog/prologmud/').
-user:file_search_path(logicmoo, '/devel/LogicmooDeveloperFramework/PrologMUD/packs/logicmoo_base/prolog/logicmoo/').
-user:file_search_path(pack, '../packs').
+user:file_search_path(pack, '../packs/').
+user:file_search_path(prologmud, '../packs/prologmud/prolog/prologmud/').
 :- attach_packs.
 
 % [Manditory] Load the Logicmioo Base Ssytem
 :- user:ensure_loaded(library(logicmoo/logicmoo_base)).
 
+:- with_no_mpred_expansions(if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop/eggdrop.pl'))).
+:- current_predicate(egg_go/0)->egg_go;true.
 
 % :- ensure_loaded(library(logicmoo/mpred_online)).
 % :- '@'(ensure_loaded('../src_mud/dbase/mpred_i_pldoc'),user).
@@ -38,6 +42,8 @@ user:file_search_path(pack, '../packs').
 :- set_mem_opt(false).
 
 
+
+/*
 :-dynamic(did_ref_job/1).
 do_ref_job(_Body,Ref):-did_ref_job(Ref),!.
 do_ref_job(Body ,Ref):-asserta(did_ref_job(Ref)),!,show_call(Body).
@@ -49,6 +55,7 @@ do_semweb_startup:-
    predicate_property(user:semweb_startup,number_of_clauses(N2)),
    ((N2\=N1) -> do_semweb_startup ; true).
 
+
 % [Optionaly] register swish server (remote file editing)
 % :- with_no_mpred_expansions(if_file_exists(ensure_loaded('../externals/swish/logicmoo_run_swish'))).
 
@@ -57,11 +64,6 @@ user:semweb_startup:-ensure_loaded('run_clio').
 
 % [Optionaly] register/run KnowRob robot services (we use it for the ontology mainly)
 % TODO 
-
-:- multifile(user:mud_regression_test/0).
-:- multifile user:'$was_imported_kb_content$'/2.
-:- dynamic user:'$was_imported_kb_content$'/2.
-:- discontiguous(user:'$was_imported_kb_content$'/2).
 
 user:semweb_startup :- with_no_term_expansions(if_file_exists(ensure_loaded('../externals/MUD_KnowRob/knowrob_addons/knowrob_mud/prolog/init.pl'))).
 
@@ -74,9 +76,6 @@ user:semweb_startup :- with_no_term_expansions(if_file_exists(ensure_loaded('../
 % :- ensure_loaded(logicmoo(dbase/mpred_i_pldoc)).
 % :- do_semweb_startup.
 
-:- with_no_mpred_expansions(if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop/eggdrop.pl'))).
-:- current_predicate(egg_go/0)->egg_go;true.
-
 
 % [Optionaly] remove debug noises
 user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),show_call(asserta(prolog_debug:debugging(http(X), false, O)))).
@@ -86,16 +85,17 @@ user:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),s
 % user:pre_file_search_path(_,_):-!,fail.
 
 
-% [Manditory] run_tests (includes run_common)
-% :- include(run_tests).
-% OR
-:- include(run_common).
+*/
+
+
+
+% [Required] load and start mud
+:- user:ensure_loaded(prologmud(mud_startup)).
 
 % [Manditory] load_default_game
 % this is what happens when the world is not found
 % :- add_game_dir('../games/src_game_unknown',prolog_repl).     
 
-% % :- prolog_repl.
 
 :- dynamic(user:mudDescription/2).
 
@@ -109,12 +109,12 @@ genls(tOfficeRoom,tRegion).
 % int_firstOrder(some_query, 666, What, C, E, A, J, D, L, B)
 % :- forall(clause(user:mud_regression_test,Call),must(Call)).
 
-:- declare_load_dbase('../games/src_game_nani/a_nani_household.plmoo').
-:- declare_load_dbase('../games/src_game_nani/objs_misc_household.plmoo').
+% :- declare_load_dbase('../games/src_game_nani/a_nani_household.plmoo').
+% :- declare_load_dbase('../games/src_game_nani/objs_misc_household.plmoo').
 
 % the following 4 worlds are in version control in examples
 % :- add_game_dir('../games/src_game_wumpus',prolog_repl).       
-:- add_game_dir('../games/src_game_nani',prolog_repl).       
+% :- add_game_dir('../games/src_game_nani',prolog_repl).       
 % :- add_game_dir('../games/src_game_sims',prolog_repl).
 
 
@@ -158,29 +158,38 @@ isa(iExplorer1,'tExplorer').
 % [Manditory] This loads the game and initializes so test can be ran
 :- if_startup_script( at_start(finish_processing_world)).
 
+
+% [Optionaly] Start the telent server
+:-at_start(toploop_telnet:start_mud_telnet(4000)).
+
+
 % :- if_startup_script( doall(now_run_local_tests_dbg)).
 
+
+
 % :-enqueue_player_command("hide").
-:-enqueue_player_command(actWho).
-:-enqueue_player_command("rez crackers").
-:-enqueue_player_command("drop crackers").
-:-enqueue_player_command('look').
 
-% :-enqueue_player_command(prolog).
+:- enqueue_player_command(actWho).
 
-:-enqueue_player_command("take crackers").
-:-enqueue_player_command("eat crackers").
-:-enqueue_player_command('look').
-:-enqueue_player_command("rez pants").
-:-enqueue_player_command("wear pants").
-:-enqueue_player_command("tp to closet").
-:-enqueue_player_command("take shirt").
-:-enqueue_player_command("inventory").
+/*
+:- enqueue_player_command("rez crackers"),
+   enqueue_player_command("drop crackers"),
+   enqueue_player_command('look'),
+   enqueue_player_command("take crackers"),
+   enqueue_player_command("eat crackers"),
+   enqueue_player_command('look').
 
-% :-enqueue_player_command(prolog).
+:-enqueue_player_command("rez pants"),
+   enqueue_player_command("wear pants"),
+   enqueue_player_command("tp to closet"),
+   enqueue_player_command("take shirt"),
+   enqueue_player_command("inventory").
+*/
+
+:-enqueue_player_command(prolog).
 
 % [Optionaly] Tell the NPCs to do something every 30 seconds (instead of 90 seconds)
-% :- register_timer_thread(npc_ticker,30,npc_tick).
+:- register_timer_thread(npc_ticker,30,npc_tick).
 
 % [Optionaly] Put a telnet client handler on the main console (nothing is executed past the next line)
 :- if_startup_script(at_start(run)).

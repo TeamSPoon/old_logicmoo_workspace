@@ -55,7 +55,7 @@ thglobal:current_world(current).
 
 ensure_mpred_file(Mask):- ensure_plmoo_loaded(Mask).
 
-:-meta_predicate_transparent(load_dbase/1).
+:-meta_predicate(load_dbase(?)).
 
 load_dbase(File):-thglobal:current_world(World), load_dbase(World,File),!.
 load_dbase(World,File):- 
@@ -65,35 +65,18 @@ load_dbase(World,File):-
       time_call(ensure_plmoo_loaded(File)),!,
       time_call(finish_processing_world))).
 
-/*
 
-path_concat(L,R,LR):-path_concat1(L,R,LR),!.
-path_concat(R,L,LR):-path_concat1(L,R,LR),!.
-path_concat(L,R,LR):-atom_concat(L,R,LR),!.
-path_concat1('',R,R):-!.
-path_concat1('./',R,R):-!.
-path_concat1('.',R,R):-!.
-
-
-:-meta_predicate_transparent(files_matching/2).
-:-meta_predicate_transparent(files_matching/3).
-files_matching(Mask,File1):- files_matching('./',Mask,File1),access_file(File1,read),!.
-files_matching(_Prepend,Mask,File1):- compound(Mask),Mask=..[F,A],!,file_search_path(F,NextPrepend),files_matching(NextPrepend,A,File1),access_file(File1,read).
-files_matching(Prepend,Mask,File1):- filematch(Prepend,Mask,File1),access_file(File1,read).
-% files_matching(Prepend,Mask,File1):- path_concat(Prepend,Mask,PMask),expand_file_name(PMask,Files),Files\=[],!,member(File1,Files),access_file(File1,read).
-*/
-
-:-meta_predicate_transparent(ensure_plmoo_loaded/1).
+:-meta_predicate(ensure_plmoo_loaded(?)).
 ensure_plmoo_loaded(Mask):-
   forall(filematch(Mask,File1),ensure_plmoo_loaded_each(File1)).
 
 :-dynamic(thglobal:loaded_file_world_time/3).
-:-meta_predicate_transparent(thglobal:loaded_file_world_time/3).
-:-meta_predicate_transparent(get_last_time_file/3).
+:-meta_predicate(thglobal:loaded_file_world_time(+,+,+)).
+:-meta_predicate(get_last_time_file(+,+,+)).
 get_last_time_file(FileIn,World,LastTime):- absolute_file_name(FileIn,File),thglobal:loaded_file_world_time(File,World,LastTime),!.
 get_last_time_file(_,_,0).
 
-:-meta_predicate_transparent(ensure_plmoo_loaded_each/1).
+:-meta_predicate(ensure_plmoo_loaded_each(?)).
 ensure_plmoo_loaded_each(FileIn):-
    absolute_file_name(FileIn,File),
    must(thglobal:current_world(World)),
@@ -101,15 +84,15 @@ ensure_plmoo_loaded_each(FileIn):-
    get_last_time_file(File,World,LastTime),
    (LastTime<NewTime -> reload_plmoo_file(File) ; true).
 
-:-meta_predicate_transparent(reload_plmoo_file/1).
+:-meta_predicate(reload_plmoo_file(?)).
 
 reload_plmoo_file(FileIn):-
    absolute_file_name(FileIn,File),
    thglobal:current_world(World),
    retractall(thglobal:loaded_file_world_time(File,World,_)),   
-   mpred_mod(DBASE),'@'(load_data_file(World,File),DBASE).
+   user:mpred_mod(DBASE),'@'(load_data_file(World,File),DBASE).
 
-:-meta_predicate_transparent(load_data_file/2).
+:-meta_predicate(load_data_file(+,+)).
 load_data_file(World,FileIn):- with_assertions(thglobal:current_world(World),load_data_file(FileIn)).
 
 
@@ -120,7 +103,7 @@ must_locate_file(FileIn,File):-
    
 
 :-thread_local(thlocal:onEndOfFile/2).
-:-meta_predicate_transparent(load_data_file/1).
+:-meta_predicate(load_data_file(?)).
 load_data_file(FileIn):- must(load_data_file_now(FileIn)).
 
 
@@ -179,17 +162,8 @@ assert_kif(_).
 assert_kif(String):-must((codelist_to_forms(String,Forms);parse_to_source(string(String),Forms))),dmsg(Forms),!.
 assert_kif_dolce(_).
 
-%:-meta_predicate_transparent(finish_processing_world).
-%:-meta_predicate(finish_processing_world).
 
-%:- dynamic(finish_processing_world/0).
-
-% :-module_transparent(finish_processing_world()).
-
-% :-meta_predicate_transparent(finish_processing_world).
-% :-meta_predicate_transparent(finish_processing_dbase()).
-%:-meta_predicate_transparent(rescan_all/0).
-:-meta_predicate_transparent(doall_and_fail(0)).
+:-meta_predicate(doall_and_fail(0)).
 
 finish_processing_world :- load_mpred_files, loop_check_local(with_assertions(thlocal:agenda_slow_op_do_prereqs,doall(finish_processing_dbase)),true).
 
@@ -213,10 +187,10 @@ assert_until_end_of_file(Fact):-must_det_l((thread_local(Fact),asserta(Fact),((o
 % gload:- load_dbase(savedb),!.
 gload:- load_dbase(logicmoo('rooms/startrek.all.plmoo')).
 
-%:-meta_predicate_transparent(savedb/0).
+%:-meta_predicate(savedb/0).
 savedb:-!.
 savedb:- debugOnError(rsavedb),!.
-%:-meta_predicate_transparent(rsavedb/0).
+%:-meta_predicate(rsavedb/0).
 rsavedb:-
  debugOnError(agenda_mpred_repropigate),
  catch((   
@@ -225,9 +199,8 @@ rsavedb:-
    tell('/tmp/lm/savedb'),make_db_listing,told),E,dmsginfo(savedb(E))),!.
 
 
-%:-meta_predicate_transparent(make_db_listing/0).
 make_db_listing:-
- % mpred_mod(DBM),
+ % user:mpred_mod(DBM),
 %   listing(t),
  %  listing(mpred_f),
      listing(_),
@@ -289,7 +262,6 @@ load_moo_files(M:F0,List):-
 hdr_debug(_,_):-!.
 hdr_debug(F,A):-'format'(F,A).
 :-meta_predicate module_typed_term_expand(?,?).
-% :-meta_predicate user:term_expansion(?,?).
 
 
 module_typed_term_expand(X,_):-not(compound(X)),!,fail.

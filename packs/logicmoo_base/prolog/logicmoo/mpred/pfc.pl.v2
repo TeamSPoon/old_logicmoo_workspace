@@ -249,7 +249,7 @@ pfc_clause_is_asserted(H,B,Ref):-pfc_clause_db_ref(H,B,Ref).
 pfc_clause_is_asserted_hb_nonunify(H,B):- pfc_clause_db_unify( =>( B , H) , true).
 pfc_clause_is_asserted_hb_nonunify(H,B):- pfc_clause_db_unify( <=( H , B) , true).
 pfc_clause_is_asserted_hb_nonunify(_,_):-!,fail.
-pfc_clause_is_asserted_hb_nonunify(G, T   ):- T==true,!,notrace(pfcRuleOutcomeHeadBody(G,H,B)),G\=@=H,!,pfc_clause_is_asserted(H,B).
+pfc_clause_is_asserted_hb_nonunify(G, T   ):- T==true,!,hotrace(pfcRuleOutcomeHeadBody(G,H,B)),G\=@=H,!,pfc_clause_is_asserted(H,B).
 pfc_clause_is_asserted_hb_nonunify(H,(T,B)):- T==true,!,pfc_clause_is_asserted_hb_nonunify(H,B).
 pfc_clause_is_asserted_hb_nonunify(H,(B,T)):- T==true,!,pfc_clause_is_asserted_hb_nonunify(H,B).
 pfc_clause_is_asserted_hb_nonunify(H,B):- pfc_clause_db_unify( <=( H , B) , true).
@@ -385,8 +385,8 @@ pfc_local(_,_,_).
 
 % pfc_local(_).
 
-pfcControlled(G):-notrace(pfcControlled0(G)).
-pfcWatches(G):-notrace(pfcWatched0(G)).
+pfcControlled(G):-hotrace(pfcControlled0(G)).
+pfcWatches(G):-hotrace(pfcWatched0(G)).
 
 pfcControlled0(Var):-is_ftVar(Var),!.
 pfcControlled0((_:F)/A):-atom(M),!,pfcControlled0(F/A).

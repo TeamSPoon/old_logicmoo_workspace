@@ -308,7 +308,7 @@ PrologMUD.vpj=20150423041333987
       + prolog
         + chat80
         + CURT
-    - MUD_ircbot
+    + MUD_ircbot
       - prolog
         - eggdrop
     + MUD_PDDL
@@ -641,16 +641,635 @@ PrologMUD.vpj=20150423041333987
     - prologmud
       - prolog
         - prologmud
-          - actions
-          - mobs
+          + actions
+          + games
+            + src_game_nani
+              + web
+                + css
+                + icons
+                + js
+                + prolog
+                + snd
+            + src_game_sims
+              + web
+                + css
+                + icons
+                + js
+                + prolog
+                + snd
+            + src_game_startrek
+              + holodeck
+              + mobs
+              + web
+                + css
+                + icons
+                + js
+                + prolog
+                + snd
+            + src_game_wumpus
+          + mobs
             - affordance
-            - planner
+            + planner
           - objs
           - parsing
+          - runtime
+            + cache
+              + rdf
+                + 01
+                  + 04
+                  + 59
+                + 03
+                  + 4a
+                  + f2
+                + 04
+                  + 32
+                  + 9d
+                  + a4
+                + 06
+                  + 9b
+                  + dd
+                + 07
+                  + bc
+                + 08
+                  + c4
+                  + e8
+                + 09
+                  + 2b
+                + 0a
+                  + 4e
+                + 0b
+                  + 4c
+                  + a4
+                + 0d
+                  + 04
+                  + 61
+                + 0e
+                  + 8c
+                + 0f
+                  + 80
+                + 10
+                  + 1f
+                  + 7a
+                  + ee
+                + 11
+                  + f7
+                + 12
+                  + bb
+                  + d0
+                + 13
+                  + 72
+                + 14
+                  + 01
+                + 17
+                  + 8e
+                  + d9
+                + 18
+                  + 08
+                  + 74
+                  + 8e
+                + 19
+                  + 02
+                  + 14
+                + 1a
+                  + c6
+                  + e7
+                + 1b
+                  + f0
+                + 1c
+                  + 85
+                  + b0
+                + 1d
+                  + 21
+                  + 83
+                + 1e
+                  + 58
+                  + d0
+                + 1f
+                  + 62
+                  + 8a
+                + 20
+                  + 02
+                  + 0a
+                  + 15
+                  + 3e
+                  + c2
+                + 22
+                  + 03
+                  + 22
+                  + ae
+                  + ef
+                + 23
+                  + 90
+                  + d2
+                + 25
+                  + 2e
+                  + b6
+                + 26
+                  + 6c
+                + 28
+                  + 62
+                  + bc
+                + 2a
+                  + 03
+                  + bc
+                + 2b
+                  + 26
+                  + e4
+                  + fd
+                + 2d
+                  + 1e
+                  + be
+                + 2e
+                  + 58
+                  + 7e
+                  + 9e
+                  + ca
+                + 2f
+                  + 19
+                  + ea
+                + 30
+                  + 55
+                  + 67
+                + 31
+                  + 30
+                  + d3
+                + 33
+                  + f1
+                + 34
+                  + 65
+                + 35
+                  + 52
+                + 36
+                  + b1
+                  + fe
+                + 37
+                  + 42
+                  + 9b
+                  + e8
+                  + fe
+                + 3a
+                  + d2
+                + 3c
+                  + 13
+                  + 36
+                  + 63
+                  + 8f
+                + 3d
+                  + 59
+                + 3e
+                  + 66
+                + 40
+                  + 41
+                + 41
+                  + 0d
+                  + ac
+                  + d2
+                + 43
+                  + 0e
+                  + 30
+                  + f7
+                + 44
+                  + 1b
+                  + 85
+                  + b2
+                  + ca
+                  + fe
+                + 45
+                  + 3a
+                  + 55
+                  + ed
+                + 46
+                  + 17
+                  + 1c
+                  + 38
+                  + 79
+                + 47
+                  + 94
+                  + bc
+                  + f9
+                + 48
+                  + 87
+                  + ad
+                + 49
+                  + e4
+                + 4a
+                  + 91
+                  + f5
+                  + f9
+                + 4b
+                  + d8
+                  + f9
+                + 4c
+                  + 08
+                  + 1a
+                + 4d
+                  + 07
+                  + d5
+                + 4e
+                  + 1c
+                  + a8
+                + 50
+                  + 51
+                  + fd
+                + 51
+                  + 60
+                  + b3
+                  + e7
+                  + eb
+                + 52
+                  + 96
+                  + fb
+                + 53
+                  + d0
+                + 55
+                  + 0f
+                + 57
+                  + 48
+                  + b6
+                  + ba
+                  + df
+                  + e4
+                + 58
+                  + 17
+                  + 31
+                  + 77
+                  + cc
+                + 59
+                  + c1
+                + 5a
+                  + f6
+                + 5b
+                  + 4b
+                  + df
+                + 5c
+                  + ba
+                + 5d
+                  + 4a
+                  + 4c
+                  + 6e
+                + 5f
+                  + 98
+                  + a9
+                + 60
+                  + d3
+                + 61
+                  + 2f
+                  + 99
+                + 62
+                  + 56
+                + 63
+                  + 19
+                  + f5
+                + 64
+                  + 80
+                + 65
+                  + 90
+                + 66
+                  + 10
+                + 68
+                  + 09
+                  + 54
+                + 6a
+                  + 3a
+                  + a4
+                + 6c
+                  + d5
+                + 6d
+                  + 6f
+                  + ed
+                + 6e
+                  + b6
+                + 6f
+                  + c4
+                  + de
+                + 70
+                  + 0d
+                + 71
+                  + 65
+                  + 6b
+                + 72
+                  + 93
+                  + b6
+                + 73
+                  + 82
+                  + c5
+                + 75
+                  + d4
+                + 76
+                  + 63
+                  + 91
+                  + e7
+                + 78
+                  + 2b
+                  + 38
+                + 79
+                  + dd
+                  + f7
+                + 7d
+                  + 1e
+                  + 62
+                  + e5
+                + 7e
+                  + 21
+                  + bb
+                  + e0
+                + 82
+                  + 05
+                  + 78
+                  + 84
+                  + 92
+                  + a8
+                + 85
+                  + 05
+                + 87
+                  + a0
+                  + b7
+                  + bc
+                + 88
+                  + ad
+                + 89
+                  + a5
+                + 8a
+                  + e9
+                + 8b
+                  + 0e
+                  + bb
+                + 8c
+                  + 30
+                  + 5d
+                  + aa
+                + 8d
+                  + 80
+                + 8e
+                  + 67
+                  + 90
+                + 8f
+                  + 75
+                + 90
+                  + d5
+                + 91
+                  + 25
+                + 92
+                  + 6d
+                  + 88
+                  + e6
+                + 93
+                  + 16
+                  + 5c
+                  + 9d
+                + 94
+                  + 4e
+                  + ff
+                + 95
+                  + c9
+                + 96
+                  + 0c
+                  + 0e
+                  + a4
+                + 97
+                  + 77
+                  + b8
+                + 9a
+                  + a8
+                  + f2
+                + 9b
+                  + 23
+                  + 84
+                  + d5
+                + 9c
+                  + d5
+                + 9f
+                  + cb
+                + a0
+                  + 2d
+                  + fa
+                + a2
+                  + 6a
+                  + 8e
+                + a3
+                  + 08
+                  + b1
+                  + ed
+                  + f5
+                + a4
+                  + 4f
+                  + 69
+                  + a5
+                  + c9
+                  + e9
+                + a5
+                  + 04
+                  + 77
+                + a6
+                  + 04
+                  + 90
+                + a7
+                  + 65
+                + a8
+                  + 85
+                + ab
+                  + 9c
+                + ac
+                  + d0
+                + ad
+                  + 06
+                  + dc
+                + ae
+                  + 9e
+                  + a5
+                + af
+                  + 74
+                  + a8
+                  + de
+                + b0
+                  + 00
+                  + a4
+                + b1
+                  + 24
+                  + 32
+                  + 4d
+                + b2
+                  + 97
+                  + 9e
+                + b3
+                  + 78
+                + b4
+                  + 0b
+                + b6
+                  + af
+                  + f4
+                + b7
+                  + 1a
+                  + d9
+                + b8
+                  + ef
+                + b9
+                  + 52
+                  + a0
+                + ba
+                  + 05
+                  + ff
+                + bb
+                  + ab
+                + bc
+                  + 75
+                  + b0
+                  + dc
+                + bd
+                  + 73
+                  + bc
+                  + da
+                + be
+                  + 5e
+                  + d1
+                + c1
+                  + bb
+                  + ec
+                + c3
+                  + 33
+                  + d7
+                + c4
+                  + 13
+                  + 17
+                  + 55
+                  + 58
+                + c6
+                  + 40
+                  + 76
+                  + ed
+                + c7
+                  + 66
+                  + 81
+                  + e2
+                + c8
+                  + be
+                  + e4
+                + c9
+                  + 3c
+                  + 73
+                  + ed
+                + ca
+                  + 54
+                  + c0
+                  + d2
+                  + fa
+                + cb
+                  + bb
+                + cc
+                  + 55
+                  + b8
+                + cd
+                  + 78
+                  + c0
+                  + c5
+                + ce
+                  + 39
+                  + b6
+                + cf
+                  + ed
+                + d2
+                  + 18
+                  + 64
+                  + cf
+                + d3
+                  + b2
+                + d4
+                  + 94
+                  + c1
+                  + da
+                + d6
+                  + 5c
+                  + fb
+                + d7
+                  + 00
+                  + 0a
+                + d8
+                  + 32
+                  + 80
+                + da
+                  + 34
+                  + 51
+                + db
+                  + ec
+                + dc
+                  + 0a
+                  + 23
+                  + 2d
+                  + 4a
+                  + 71
+                + dd
+                  + 9a
+                + de
+                  + 0f
+                + df
+                  + e6
+                  + ee
+                + e1
+                  + 3e
+                  + 81
+                + e2
+                  + 82
+                + e3
+                  + 0c
+                  + 7c
+                + e7
+                  + 6a
+                + e8
+                  + 69
+                  + f4
+                + e9
+                  + 37
+                + ea
+                  + 14
+                  + 5f
+                  + 75
+                + eb
+                  + c7
+                  + fb
+                + ed
+                  + 77
+                  + 8a
+                + ee
+                  + e7
+                + f0
+                  + 41
+                + f2
+                  + 3b
+                  + 5c
+                + f3
+                  + 52
+                  + 84
+                + f4
+                  + 27
+                  + 48
+                + f5
+                  + 40
+                  + d3
+                + f7
+                  + f9
+                + f8
+                  + bd
+                + fa
+                  + 9e
+                + fb
+                  + d2
+                  + d8
+                + fc
+                  + 52
+                  + b2
+                  + f1
+                + fd
+                  + 00
+                  + 4f
+                + fe
+                  + 0d
+                  + 43
+            + config-enabled
+            + RDF-store
           - server
           + vworld
     + ref_unused
-  - runtime
+  + runtime
     + config-enabled
     + RDF-store
   + src_lisp
@@ -763,7 +1382,7 @@ PrologMUD.vpj=20150423041333987
       - swi-prolog
         - boot
         - demo
-        - library
+        + library
           + chr
           + clp
             + clpq
@@ -805,17 +1424,107 @@ PrologMUD.vpj=20150423041333987
               + swi
               + trace
               + xref
-scroll:62
+scroll:2
 [State]
-SCREEN: 1920 1080 912 544 1612 648 0 0 M 0 0 0 0 1460 616
-CWD: packs
+SCREEN: 1920 1080 -220 539 1612 648 0 0 M 0 0 0 0 1460 616
+CWD: packs\logicmoo_base\prolog\logicmoo\util
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\pfc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.31795 CL=44 LE=0 CX=43 CY=23 WI=5 BI=15 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\util\logicmoo_util_bugger.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.10503 CL=35 LE=0 CX=34 CY=22 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\runtime\run_mud_server.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.3869 CL=18 LE=0 CX=17 CY=15 WI=5 BI=5 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\server\mud_builtin.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.27740 CL=23 LE=0 CX=22 CY=15 WI=5 BI=28 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\runtime\run_debug.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.11 CL=1 LE=0 CX=0 CY=1 WI=5 BI=29 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\runtime\run_tests.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=23 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\server\mud_testing.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=608 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.5255 CL=1 LE=0 CX=0 CY=15 WI=5 BI=26 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\logicmoo_base\t\pfc_sanity.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.230 CL=1 LE=0 CX=0 CY=11 WI=5 BI=20 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\logicmoo_base.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.12064 CL=2 LE=0 CX=1 CY=17 WI=5 BI=30 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\pfc.plt"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.205 CL=13 LE=0 CX=12 CY=10 WI=5 BI=19 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_pfc_testing.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=40 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.5505 CL=13 LE=0 CX=12 CY=7 WI=5 BI=21 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_builtin.pfc"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=512 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.15727 CL=1 LE=0 CX=0 CY=21 WI=5 BI=22 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\runtime\run_common.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=552 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.11 CL=1 LE=0 CX=0 CY=1 WI=5 BI=16 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="packs\prologmud\prolog\prologmud\mud_startup.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Perl	HM=0 MF=544 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.10803 CL=1 LE=0 CX=0 CY=33 WI=5 BI=18 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1262 418 -1 -1 N  WF=0 WT=16 ",,,"
+BUFFER: BN="packs\prologmud\prolog\prologmud\runtime\run_tests.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=179 BI=23 HT=0 HN=0 HF=0 HC=4
+WINDOW: 176 176 1262 418 -1 -1 N  WF=0 WT=10 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_builtin.pfc"
+VIEW: LN=.15727 CL=1 LE=0 CX=0 CY=21 WI=167 BI=22 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1262 418 -1 -1 N  WF=0 WT=13 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\runtime\run_tests.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=173 BI=23 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1262 418 -1 -1 N  WF=0 WT=6 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\mud_startup.pl"
+VIEW: LN=.5532 CL=1 LE=0 CX=0 CY=18 WI=159 BI=18 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1262 418 -1 -1 N  WF=0 WT=4 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\runtime\run_mud_server.pl"
+VIEW: LN=.1669 CL=1 LE=0 CX=0 CY=25 WI=155 BI=5 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1262 418 -1 -1 N  WF=0 WT=15 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\server\mud_builtin.pl"
+VIEW: LN=.27740 CL=23 LE=0 CX=22 CY=15 WI=177 BI=28 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1262 418 -1 -1 N  WF=0 WT=12 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\runtime\run_debug.pl"
+VIEW: LN=.11 CL=1 LE=0 CX=0 CY=1 WI=171 BI=29 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1262 418 -1 -1 N  WF=0 WT=5 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\runtime\run_common.pl"
+VIEW: LN=.11 CL=1 LE=0 CX=0 CY=1 WI=157 BI=16 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1262 418 -1 -1 N  WF=0 WT=14 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\prologmud\prolog\prologmud\server\mud_testing.pl"
+VIEW: LN=.5255 CL=1 LE=0 CX=0 CY=15 WI=175 BI=26 HT=0 HN=0 HF=0 HC=4
+WINDOW: 198 198 1262 418 -1 -1 N  WF=0 WT=11 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\logicmoo_base.pl"
+VIEW: LN=.12064 CL=2 LE=0 CX=1 CY=17 WI=169 BI=30 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1262 418 -1 -1 N  WF=0 WT=7 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\logicmoo_base\t\pfc_sanity.pl"
+VIEW: LN=.230 CL=1 LE=0 CX=0 CY=11 WI=111 BI=20 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1262 418 -1 -1 N  WF=0 WT=9 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_pfc_testing.pl"
+VIEW: LN=.5505 CL=13 LE=0 CX=12 CY=7 WI=113 BI=21 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1262 418 -1 -1 N  WF=0 WT=8 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\pfc.plt"
+VIEW: LN=.205 CL=13 LE=0 CX=12 CY=10 WI=110 BI=19 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1262 418 -1 -1 N  WF=0 WT=3 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\util\logicmoo_util_bugger.pl"
+VIEW: LN=.10503 CL=35 LE=0 CX=34 CY=22 WI=153 BI=17 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1262 418 -1 -1 N  WF=0 WT=2 "Default Fixed Font,10,0,1"
+BUFFER: BN="packs\logicmoo_base\prolog\logicmoo\mpred\pfc.pl"
+VIEW: LN=.31795 CL=44 LE=0 CX=43 CY=23 WI=106 BI=15 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1262 418 -1 -1 M  WF=0 WT=1 ",,,"
+BUFFER: BN="packs\prologmud\prolog\prologmud\runtime\run_tests.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=181 BI=23 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
-packs\prologmud\prolog\prologmud\mobs\monster.pl
-packs\prologmud\prolog\prologmud\mobs\predator.pl
-packs\prologmud\prolog\prologmud\mobs\prey.pl
-packs\prologmud\prolog\prologmud\vworld\world.pl
-packs\prologmud\prolog\prologmud\vworld\world_npc.pl
-packs\prologmud\prolog\prologmud\vworld\world_text_output.pl
-packs\prologmud\prolog\prologmud\mobs\vacuum.pl
-packs\prologmud\prolog\prologmud\objs\basic_objs.plmoo
-packs\prologmud\prolog\prologmud\server\mud_telnet.pl
+packs\prologmud\prolog\prologmud\runtime\run_common.pl
+packs\prologmud\prolog\prologmud\runtime\run_debug.pl
+packs\prologmud\prolog\prologmud\runtime\run_tests.pl
+packs\prologmud\prolog\prologmud\server\mud_builtin.pl
+packs\prologmud\prolog\prologmud\runtime\run_mud_server.pl
+packs\prologmud\prolog\prologmud\mud_startup.pl
+packs\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_builtin.pfc
+packs\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_builtin.pfc.bak
+packs\logicmoo_base\prolog\logicmoo\mpred\logicmoo_i_coroutining.pl.bak

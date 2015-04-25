@@ -104,8 +104,8 @@ fully_expand(Op,Sent,SentO):-fully_expand_now(Op,Sent,SentO),!.
 
 fully_expand_now(_,Sent,SentO):- (\+ compound(Sent)),!,Sent=SentO.
 fully_expand_now(_,Sent,SentO):-thlocal:infSkipFullExpand,!,must(Sent=SentO).
-fully_expand_now(Op,Sent,SentO):- hotrace((must(fully_expand_clause(Op,Sent,BO)),!,must(notrace((SentO=BO))),
-   ignore(((notrace((Sent\=@=SentO, (Sent\=isa(_,_)->SentO\=isa(_,_);true), 
+fully_expand_now(Op,Sent,SentO):- hotrace((must(fully_expand_clause(Op,Sent,BO)),!,must(hotrace((SentO=BO))),
+   ignore(((hotrace((Sent\=@=SentO, (Sent\=isa(_,_)->SentO\=isa(_,_);true), 
     (Sent \=@= user:SentO), nop(dmsg(fully_expand(Op,(Sent --> SentO))))))))))),!.
 
 fully_expand_clause(_,Sent,SentO):- (\+ compound(Sent)),!,must(SentO=Sent).
@@ -195,7 +195,7 @@ db_expand_0(_,arity(F,A),arity(F,A)):-atom(F),!.
 
 /*
 db_expand_0(Op,MT:Term,MT:O):- is_kb_module(MT),!,with_assertions(thlocal:caller_module(kb,MT),db_expand_0(Op,Term,O)).
-db_expand_0(Op,DB:Term,DB:O):- mpred_mod(DB),!,with_assertions(thlocal:caller_module(db,DB),db_expand_0(Op,Term,O)).
+db_expand_0(Op,DB:Term,DB:O):- user:mpred_mod(DB),!,with_assertions(thlocal:caller_module(db,DB),db_expand_0(Op,Term,O)).
 db_expand_0(Op,KB:Term,KB:O):- atom(KB),!,with_assertions(thlocal:caller_module(prolog,KB),db_expand_0(Op,Term,O)).
 */
 db_expand_0(Op,(:-(CALL)),(:-(CALLO))):-with_assert_op_override(Op,db_expand_0(Op,CALL,CALLO)).
@@ -553,7 +553,7 @@ add_from_file(B,B):- add(B). % db_op(change(assert,_OldV),B),!.
 
 univ_left(Comp,[M:P|List]):- nonvar(M),univ_left0(M, Comp, [P|List]),!.
 univ_left(Comp,[H,M:P|List]):- nonvar(M),univ_left0(M,Comp,[H,P|List]),!.
-univ_left(Comp,[P|List]):-mpred_mod(DBASE), univ_left0(DBASE,Comp,[P|List]),!.
+univ_left(Comp,[P|List]):-user:mpred_mod(DBASE), univ_left0(DBASE,Comp,[P|List]),!.
 univ_left0(M,M:Comp,List):- Comp=..List,!.
 
 
@@ -635,10 +635,11 @@ get_head_wrappers(if_mud_asserted, t , mpred_f).
 get_asserted_wrappers(if_mud_asserted, Holds_t , N):-  hga_wrapper(_,_,Holds_t),!,negate_wrapper(Holds_t,N),!.
 get_asserted_wrappers(if_mud_asserted, t , t).
 
-try_mud_body_expansion(G0,G2):- ((mud_goal_expansion_0(G0,G1),!,expanded_different(G0, G1),!,mpred_mod(DBASE))),prepend_module(G1,DBASE,G2).
+
+try_mud_body_expansion(G0,G2):- ((mud_goal_expansion_0(G0,G1),!,expanded_different(G0, G1),!,user:mpred_mod(DBASE))),prepend_module(G1,DBASE,G2).
 mud_goal_expansion_0(G1,G2):- ((get_goal_wrappers(If_use_holds_db, Holds_t , Holds_f),!,Holds_t\=nil ,  mud_pred_expansion(If_use_holds_db, Holds_t - Holds_f,G1,G2))).
 
-try_mud_head_expansion(G0,G2):- ((mud_head_expansion_0(G0,G1),!,expanded_different(G0, G1),!,mpred_mod(DBASE))),prepend_module(G1,DBASE,G2).
+try_mud_head_expansion(G0,G2):- ((mud_head_expansion_0(G0,G1),!,expanded_different(G0, G1),!,user:mpred_mod(DBASE))),prepend_module(G1,DBASE,G2).
 mud_head_expansion_0(G1,G2):- ((get_head_wrappers(If_mud_asserted, Dbase_t , Dbase_f),!,Dbase_t\=nil, mud_pred_expansion(If_mud_asserted, Dbase_t - Dbase_f,G1,G2))),!.
 
 try_mud_asserted_expansion(G0,G2):-  must(is_compiling_sourcecode),    
@@ -772,7 +773,7 @@ do_holds_form([F|List],HOLDS - _NHOLDS,G2):- G2=..[HOLDS,F|List].
 
 
 
-differnt_assert(G1,G2):- notrace(differnt_assert1(G1,G2)),dmsg(differnt_assert(G1,G2)),dtrace.
+differnt_assert(G1,G2):- hotrace(differnt_assert1(G1,G2)),dmsg(differnt_assert(G1,G2)),dtrace.
 
 differnt_assert1(M:G1,G2):-atom(M),!, differnt_assert1(G1,G2).
 differnt_assert1(G1,M:G2):-atom(M),!, differnt_assert1(G1,G2).

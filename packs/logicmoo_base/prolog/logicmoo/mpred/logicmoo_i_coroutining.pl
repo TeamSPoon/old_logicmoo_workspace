@@ -42,6 +42,7 @@ same_arg(_How,X,Y):-var(X),var(Y),!,X=Y.
 same_arg(equals,X,Y):-!,equals_call(X,Y).
 same_arg(tCol(_Type),X,Y):-!, unify_with_occurs_check(X,Y).
 
+same_arg(ftText,X,Y):-(var(X);var(Y)),!,X=Y.
 same_arg(ftText,X,Y):-!, string_equal_ci(X,Y).
 
 same_arg(same_or(equals),X,Y):- same_arg(equals,X,Y).

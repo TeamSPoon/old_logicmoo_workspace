@@ -93,9 +93,9 @@ string_lower(M,U):-toLowercase(M,U).
 :- meta_predicate map_tree_to_list(2,?,*).
 
 
-%:- meta_predicate_transparent(user:camelSplitters(+)).
+%:- meta_predicate(user:camelSplitters(+)).
 
-%:- meta_predicate_transparent(to_string_hook(-,-,+)).
+%:- meta_predicate(to_string_hook(-,-,+)).
 
 user:camelSplitters(V):-member(V,[' ','-','_',':','mt','doom','Mt','Doom']).
 
@@ -778,6 +778,8 @@ longest_string(Order,TStr1,TStr2):-
 % this is a backwards compatablity block for SWI-Prolog 6.6.6
 :- retract(double_quotes_was_strings(WAS)),set_prolog_flag(double_quotes,WAS).
 
-:- module_predicates_are_exported(logicmoo_util_strings).
+:- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
+
+% :- module_predicates_are_exported(logicmoo_util_strings).
 :- all_module_predicates_are_transparent(logicmoo_util_strings).
 

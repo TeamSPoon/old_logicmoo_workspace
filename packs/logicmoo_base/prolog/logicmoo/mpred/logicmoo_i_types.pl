@@ -137,7 +137,7 @@ type_prefix(macro,ttMacroType).
 :- dynamic decided_not_was_isa/2.
 :-export(was_isa/3).
 was_isa(G,I,C):- \+ thlocal:disable_mpred_term_expansions_locally,
-  compound(G),functor(G,F,_),notrace(((not(decided_not_was_isa(F,_)),once(was_isa0(G,I,C)-> true;((functor(G,F,1),get_when(When),asserta_if_new(decided_not_was_isa(F,When)),!,fail)))))).
+  compound(G),functor(G,F,_),hotrace(((not(decided_not_was_isa(F,_)),once(was_isa0(G,I,C)-> true;((functor(G,F,1),get_when(When),asserta_if_new(decided_not_was_isa(F,When)),!,fail)))))).
 
 % get_when(When)
 get_when(F:L):-source_location(F,L),!.
@@ -150,7 +150,7 @@ get_when(user):-!.
 was_isa0('$VAR'(_),_,_):-!,fail.
 was_isa0(isa(I,C),I,C):-!.
 was_isa0(is_typef(_),_,_):-!,fail.
-was_isa0(notrace(_),_,_):-!,fail.
+was_isa0(hotrace(_),_,_):-!,fail.
 was_isa0(call(_),_,_):-!,fail.
 was_isa0(trace(_),_,_):-!,fail.
 was_isa0(not(_),_,_):-!,fail.
@@ -493,7 +493,7 @@ user:provide_mpred_storage_clauses(H,B,(What)):-isa_provide_mpred_storage_clause
 assert_isa([I],T):-nonvar(I),!,assert_isa(I,T).
 assert_isa(I,T):-assert_isa_i(I,T),sanity(show_call_failure(is_asserted(isa(I,T)));show_call_failure(isa_asserted(I,T))).
 
-assert_isa_i(I,T):- sanity(not(singletons_throw_else_fail(assert_isa(I,T)))),fail.
+%assert_isa_i(I,T):- once(sanity(not(singletons_throw_else_fail(assert_isa(I,T))))),fail.
 assert_isa_i(_,ftTerm):-!.
 assert_isa_i(_,ftTerm(_)):-!.
 assert_isa_i(I,T):-not_mud_isa(I,T,Why),!,throw(Why).
@@ -505,6 +505,8 @@ assert_isa_i(I,T):- skipped_table_call(loop_check(assert_isa_ilc(I,T),loop_check
 assert_isa_ilc(isKappaFn(_,_),_):-!.
 assert_isa_ilc(_I,T):- member(T,[ftString]),!.
 assert_isa_ilc(I,T):- is_list(I),!,maplist(assert_isa_reversed(T),I).
+assert_isa_ilc(I,T):- !,pfc_assert(isa(I,T)).
+
 assert_isa_ilc(I,T):- not(not(hasInstance(T,I))),!.
 assert_isa_ilc(I,T):- hotrace(chk_ft(T)),(compound(I)->dmsg(once(dont_assert_c_is_ft(I,T)));dmsg(once(dont_assert_is_ft(I,T)))),rtrace((chk_ft(T))).
 assert_isa_ilc(I,T):- once(decl_type(T)),

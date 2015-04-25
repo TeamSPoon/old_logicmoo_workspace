@@ -1,4 +1,4 @@
-/** <module> mpred_i_mpred_pfc_testing
+/** <module> logicmoo_i_mpred_pfc_testing
 % Tests a prolog database replacent that uses PFC
 %  
 %
@@ -8,9 +8,10 @@
 %
 */
 
-:- include(mpred_i_header).
+:- include(logicmoo_i_header).
 
-% user:term_expansion(A,B):- current_predicate(pfcExpansion_loaded/0),loop_check(pfc_file_expansion(A,B)),A\=@=B.
+
+% user:term_expansion(A,B):- \+ thlocal:disable_mpred_term_expansions_locally, current_predicate(pfcExpansion_loaded/0),loop_check(pfc_file_expansion(A,B)),A\=@=B.
 
 
 :- pfc_trace.
@@ -249,7 +250,7 @@ isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
 => tCol(ttSpatialType).
 => tCol(ttFormatType).
 => tCol(functorDeclares).
-% tCol(ArgsIsa):-is_pred_declarer(ArgsIsa).
+% tCol(ArgsIsa):-functorDeclaresPred(ArgsIsa).
 % TODO decide if OK
 %tCol(F):-hasInstance(functorDeclares,F).
 => tCol(ttFormatType).
@@ -262,13 +263,13 @@ isa(tRelation,ttAbstractType).
 
 
 
-:-dynamic(pfcDefault/1).
+:-dynamic(pfc_default/1).
 % -*-Prolog-*-
-% here is an example which defines pfcDefault facts and rules.  Will it work?
+% here is an example which defines pfc_default facts and rules.  Will it work?
 
-(((pfcDefault(P)/pfcLiteral(P))  =>  (~neg(P) => P))).
+(((pfc_default(P)/pfc_literal(P))  =>  (~neg(P) => P))).
 
-((pfcDefault((P => Q))/pfcLiteral(Q) => (P, ~neg(Q) => Q))).
+((pfc_default((P => Q))/pfc_literal(Q) => (P, ~neg(Q) => Q))).
 
 
 :-dynamic(conflict/1).
@@ -290,7 +291,7 @@ resolveConflict(C) :-
 pfc_select(conflict(X),S) :- pfc_queue(conflict(X),S).
   
 % a pretty basic conflict.
-{pfcLiteral(P)}, neg(P), P => conflict(P).
+{pfc_literal(P)}, neg(P), P => conflict(P).
 
 /*
 % reflexive equality
@@ -308,8 +309,8 @@ notequal(C,B) <= equal(A,C),notequal(A,B).
 :-dynamic((fly/1,bird/1,penguin/1)).
 
 
-% birds fly by pfcDefault.
-(pfcDefault((bird(X) => fly(X)))).
+% birds fly by pfc_default.
+(pfc_default((bird(X) => fly(X)))).
 
 % heres one way to do an subclass hierarchy.
 
@@ -739,14 +740,14 @@ test1 :-
 
 
   % -*-Prolog-*-
-% here is an example which defines pfcDefault facts and rules.  Will it work?
+% here is an example which defines pfc_default facts and rules.  Will it work?
 
-(pfcDefault(P)/pfcLiteral(P))  =>  (~neg(P) => P).
+(pfc_default(P)/pfc_literal(P))  =>  (~neg(P) => P).
 
-pfcDefault((P => Q))/pfcLiteral(Q) => (P, ~neg(Q) => Q).
+pfc_default((P => Q))/pfc_literal(Q) => (P, ~neg(Q) => Q).
 
-% birds fly by pfcDefault.
-=> pfcDefault((bird(X) => fly(X))).
+% birds fly by pfc_default.
+=> pfc_default((bird(X) => fly(X))).
 
 % here's one way to do an isa hierarchy.
 % isa = genls.
@@ -765,7 +766,7 @@ penguin(X) => neg(fly(X)).
 % chilly is a penguin.
 :-(add(=> penguin(chilly))).
 
-% rtrace(Goal):- Goal. % (notrace((visible(+all),visible(+unify),visible(+exception),leash(-all),leash(+exception))),(trace,Goal),leash(+all)).
+% rtrace(Goal):- Goal. % (hotrace((visible(+all),visible(+unify),visible(+exception),leash(-all),leash(+exception))),(trace,Goal),leash(+all)).
 
 % :- gutracer.
 
@@ -1126,7 +1127,7 @@ host_name(User,Host)
   user(User,Name,Host).
 
 
-% the pfcDefault full_name for a user is 'unknown'.
+% the pfc_default full_name for a user is 'unknown'.
 user(User),
 ~full_name(User,X)/(X\==unknown)
   =>
@@ -1134,7 +1135,7 @@ full_name(User,unknown).
   
 
 
-% the pfcDefault host_name for a user is 'unknown'.
+% the pfc_default host_name for a user is 'unknown'.
 user(User),
 ~host_name(User,X)/(X\==unknown)
   =>
@@ -1297,7 +1298,7 @@ spouse(P1,P2), spouse(P1,P3), {P2\==P3} =>
    bigamist(P1), 
    {format("~N~w is a bigamist, married to both ~w and ~w~n",[P1,P2,P3])}.
 
-% here is an example of a pfcDefault rule
+% here is an example of a pfc_default rule
 
 parent(P1,X), 
   parent(P2,X)/(P1\==P2),
@@ -1379,14 +1380,14 @@ prove_by_contradiction(P) :-
 :-prolog.
 
 :-next_test. % ==
-% here is an example which defines pfcDefault facts and rules.  Will it work?
+% here is an example which defines pfc_default facts and rules.  Will it work?
 
-(pfcDefault(P)/pfcLiteral(P))  =>  (~neg(P) => P).
+(pfc_default(P)/pfc_literal(P))  =>  (~neg(P) => P).
 
-pfcDefault((P => Q))/pfcLiteral(Q) => (P, ~neg(Q) => Q).
+pfc_default((P => Q))/pfc_literal(Q) => (P, ~neg(Q) => Q).
 
-% birds fly by pfcDefault.
-=> pfcDefault((bird(X) => fly(X))).
+% birds fly by pfc_default.
+=> pfc_default((bird(X) => fly(X))).
 
 % here's one way to do an scl hierarchy.
 % scl = genls.
@@ -1934,5 +1935,6 @@ test(X) :-
   add(value(in(2,m3(X)),3.0)),
   add(observed(value(out(a1(X)),10.0))),
   add(observed(value(out(a2(X)),12.0))).
+
 
 

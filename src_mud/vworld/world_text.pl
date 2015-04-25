@@ -39,13 +39,11 @@ is_leave_alone(parserm).
 % is_leave_alone(F):- is_db_prop(F,_,_),!,fail.
 is_leave_alone(A):-failOnError((sub_atom(A,_,1,0,S),atom_number(S,_))),!.
 
+:- discontiguous(mudTermAnglify/2).
 
-
-:- decl_mpred_hybrid(mudTermAnglify/2).
+:- decl_mpred_prolog(mudTermAnglify/2).
 :- decl_mpred_prolog(term_anglify_args/6).
 :- decl_mpred_prolog(term_anglify_last/2).
-
-mudTermAnglify(A,B):-local_term_anglify(A,B).
 :-export(term_anglify_args/6).
 :-export(term_anglify_last/2).
 
@@ -55,6 +53,8 @@ term_anglify_last(Head,English):-compound(Head),
    atom_codes(F,[C|_]),code_type(C,lower),
    Head=..[F|ARGS],
    term_anglify_args(Head,F,A,ARGS,prologSingleValued,English).
+
+mudTermAnglify(A,B):-local_term_anglify(A,B).
 
 mudTermAnglify(Head,EnglishO):- compound(Head), 
    Head=..[F|ARGS],user:mpred_prop(F,Info),
@@ -296,21 +296,21 @@ anglify_noun_known(Obj,_Hint,StringO):- findall(String,holds_t(nameStrings,Obj,S
 detWithSpace(WithSpace,String):-ddeterminer0(String),atom_concat(String,' ',WithSpace).
 detWithSpace(WithSpace,String):-ddeterminer1(String),atom_concat(String,' ',WithSpace).
 
-:-meta_predicate_transparent(determinerRemoved/3).
+:-export(determinerRemoved/3).
 determinerRemoved(S0,Det,S):- fail,detWithSpace(WithSpace,String),string_concat(WithSpace,S,S0),string_lower(String,Det).
 
-:-meta_predicate_transparent(query_description/1).
+:-export(query_description/1).
 query_description(mudDescription(I,S)):-  is_asserted(mudDescription(I,S)).
 query_description(t(mudDescription,I,S)):- is_asserted(mudDescription(I,S));is_asserted(mudKeyword(I,S)).
 
 
-:-meta_predicate_transparent(remove_description/1).
+:-export(remove_description/1).
 remove_description(mudDescription(I,S)):- dmsg(trace_or_throw(remove_description(mudDescription(I,S)))).
 
-:-meta_predicate_transparent(add_description/1).
+:-export(add_description/1).
 add_description(mudDescription(I,S)):-add_description(I,S).
 
-:-meta_predicate_transparent(add_description/2).
+:-export(add_description/2).
 add_description(A,S0):-hooked_assertz(mudDescription(A,S0)),fail.
 add_description(A,S0):- atomic(S0),string_concat('#$PunchingSomething ',S,S0),!,add_description(A,S).
 % add_description(A,S0):-determinerRemoved(S0,String,S),!,add_description(A,S),add(determinerString(A,String)).

@@ -193,7 +193,7 @@ bad_pred_relation_name('[|]',_).
 bad_pred_relation_name(F,A):-must_det((atom_codes(F,[C|_]),to_upper(C,U))),!, U == C, A>1.
 bad_pred_relation_name(F,A):-arity(F,AO), A \= AO.
 
-:-at_start(writeq("at start!~n")).
+% :-at_start(writeq("at start!~n")).
 
 first_mpred_props(arity(_)).
 first_mpred_props(pred_argtypes(_)).
@@ -282,4 +282,4 @@ assert_predArgTypes_from_left(_,_,[]):-!.
 assert_predArgTypes_from_left(F,A,[Type|ArgsList]):-assert_argIsa(F,A,Type),!,Ap1 is A + 1,assert_predArgTypes_from_left(F,Ap1,ArgsList).
 
 
-user:term_expansion(G,_):- \+ thlocal:disable_mpred_term_expansions_locally, not(thlocal:into_form_code),notrace((once(glean_pred_props_maybe(G)),fail)).
+% user:term_expansion(G,_):- \+ thlocal:disable_mpred_term_expansions_locally, not(thlocal:into_form_code),hotrace((once(glean_pred_props_maybe(G)),fail)).

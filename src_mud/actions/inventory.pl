@@ -19,7 +19,7 @@ tNearestReachableItem(Obj):-
   current_agent(Agent),
   nearest_reachable_object(Agent,Obj).
 
-:- decl_type(tFarthestReachableItem).
+tCol(tFarthestReachableItem).
 tFarthestReachableItem(Obj):-
   current_agent(Agent),
   farthest_reachable_object(Agent,Obj).

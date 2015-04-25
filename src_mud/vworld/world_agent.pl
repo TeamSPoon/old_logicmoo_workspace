@@ -67,7 +67,7 @@ call_agent_action(Agent,CMDI):-var(CMDI),trace_or_throw(call_agent_action(Agent,
 call_agent_action(Agent,CMDI):-
    subst(CMDI,isSelfAgent,Agent,CMD),
    thread_self(TS),
-   (TS=main -> Wrapper = call ; Wrapper = notrace),
+   (TS=main -> Wrapper = call ; Wrapper = call),
    with_assertions(thlocal:session_agent(TS,Agent),
      with_assertions(thlocal:agent_current_action(Agent,CMD),
       call(Wrapper, call_agent_action_ilc(Agent,CMD)))).
@@ -187,12 +187,12 @@ generate_new_player(P):- prolog_must_l([gensym(iPlayer,N),not((isa_asserted(N,tA
 
 ensure_new_player(P):- prolog_must_l([assert_isa(P,tExplorer),assert_isa(P,tPlayer),assert_isa(P,tAgentGeneric)]),!.
 
-detatch_player(P):- thglobal:global_session_agent(_,P),!,trace_or_throw(detatch_player(P)).
-detatch_player(_).
+deatch_player(P):- thglobal:global_session_agent(_,P),!,trace_or_throw(deatch_player(P)).
+deatch_player(_).
 
 :-export(become_player/1).
 become_player(NewName):- once(current_agent(Was)),Was=NewName,!.
-become_player(NewName):- get_session_id(O),retractall(thglobal:global_session_agent(O,_)),detatch_player(NewName),asserta(thglobal:global_session_agent(O,NewName)),ensure_player_stream_local(NewName).
+become_player(NewName):- get_session_id(O),retractall(thglobal:global_session_agent(O,_)),deatch_player(NewName),asserta(thglobal:global_session_agent(O,NewName)),ensure_player_stream_local(NewName).
 :-export(become_player/2).
 become_player(_Old,NewName):-become_player(NewName).
 

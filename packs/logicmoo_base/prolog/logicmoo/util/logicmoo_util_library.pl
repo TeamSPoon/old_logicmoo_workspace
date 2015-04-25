@@ -188,7 +188,7 @@ in_thread_and_join(Goal,Status):-thread_create(Goal,ID,[]),thread_join(ID,Status
 % Usage: predsubst(+Fml,+Pred,?FmlSk)
 
 predsubst(A,Pred, D):- 
-      ccatch(notrace(nd_predsubst(A,Pred,D)),_,fail),!.
+      ccatch(hotrace(nd_predsubst(A,Pred,D)),_,fail),!.
 predsubst(A,_B,A).
 
 nd_predsubst(  Var, Pred,SUB ) :- call(Pred,Var,SUB).
@@ -259,7 +259,7 @@ univ_safe(P,L):- must_det(is_list(L)),debugOnError((P=..L)).
 
 :-moo_hide_childs(subst/4).
 
-subst(A,B,C,D):-  notrace((ccatch(notrace(nd_subst(A,B,C,D)),E,(dumpST,dmsg(E:nd_subst(A,B,C,D)),fail)))),!.
+subst(A,B,C,D):-  hotrace((ccatch(hotrace(nd_subst(A,B,C,D)),E,(dumpST,dmsg(E:nd_subst(A,B,C,D)),fail)))),!.
 subst(A,_B,_C,A).
 
 nd_subst(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
@@ -281,7 +281,7 @@ nd_subst2( _X, _Sk, L, L ).
 
 
 wsubst(A,B,C,D):- 
-      ccatch(notrace(weak_nd_subst(A,B,C,D)),_,fail),!.
+      ccatch(hotrace(weak_nd_subst(A,B,C,D)),_,fail),!.
 wsubst(A,_B,_C,A).
 
 weak_nd_subst(  Var, VarS,SUB,SUB ) :- nonvar(Var),Var=VarS,!.
@@ -309,7 +309,7 @@ get_module_of_4(_P,F,A,M):- current_predicate(M0:F0/A0),F0=F,A0=A,!,M=M0.
 get_module_of_4(P,F,A,M):-trace_or_throw((get_module_of_4(P,F,A,M))).
 
 /*
-get_module_of_4(_P,F,A,M):- current_predicate(F0/A0),F0=F,A0=A,!,mpred_mod(M).
+get_module_of_4(_P,F,A,M):- current_predicate(F0/A0),F0=F,A0=A,!,user:mpred_mod(M).
 get_module_of_4(_P,F,A,_M):-trace, isCycPredArity(F,A),!,fail.
 get_module_of_4(P,F,A,M):- trace, debugCall(get_module_of_4(P,F,A,M)).
 */
@@ -332,9 +332,9 @@ remove_dupes([],[],_):-!.
 remove_dupes([I|In],Out,Shown):-member(I,Shown),!,remove_dupes(In,Out,Shown).
 remove_dupes([I|In],[I|Out],Shown):-remove_dupes(In,Out,[I|Shown]).
 
-functor_h(Obj,F):-notrace(functor_h(Obj,F,_)).
-get_functor(Obj,FO):-notrace((must(functor_h(Obj,F,_)),FO=F)).
-get_functor(Obj,FO,AO):-notrace((must(functor_h(Obj,F,A)),FO=F,AO=A)).
+functor_h(Obj,F):-hotrace(functor_h(Obj,F,_)).
+get_functor(Obj,FO):-hotrace((must(functor_h(Obj,F,_)),FO=F)).
+get_functor(Obj,FO,AO):-hotrace((must(functor_h(Obj,F,A)),FO=F,AO=A)).
 
 functor_h(Obj,F,A):-var(Obj),trace_or_throw(var_functor_h(Obj,F,A)).
 functor_h(Obj,F,A):- (Obj = '$VAR'(_)),trace_or_throw(var_functor_h(Obj,F,A)).

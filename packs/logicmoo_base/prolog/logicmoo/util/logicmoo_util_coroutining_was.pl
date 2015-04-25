@@ -54,7 +54,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 was:was(X,Y) :-
-	notrace(was_c_c(X,Y,_)).
+	hotrace(was_c_c(X,Y,_)).
 
 
 % was:attr_portray_hook(varwas(L,U),_Var) :- length(L,LL),length(U,UU),write(wazzzs([LL-UU])).

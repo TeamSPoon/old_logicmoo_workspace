@@ -975,7 +975,7 @@ meetsCharConstrait(C,[]):-! /*,trace*/,  fail.
 meetsCharConstrait(C,List):- member(LType,List),(LType==C ;( code_type(C,Type), LType=Type)),!.
 
 char0ExceptFor(C,Include,Exclude) --> escapedChar(C),{!,not(member(escape, Exclude))}.
-char0ExceptFor(C,Include,Exclude) --> [C], {notrace(( meetsCharConstrait(C,Include) , not(meetsCharConstrait(C,Exclude)) ))}.
+char0ExceptFor(C,Include,Exclude) --> [C], {hotrace(( meetsCharConstrait(C,Include) , not(meetsCharConstrait(C,Exclude)) ))}.
 
 chars0ExceptFor([C|Cs],Include,Exclude) --> escapedChar(C),{!,not(member(escape, Exclude))},chars0ExceptFor(Cs,Include,Exclude).
 chars0ExceptFor([C|Cs],Include,Exclude) --> char0ExceptFor(C,Include,Exclude), chars0ExceptFor(Cs,Include,Exclude),!.
@@ -2615,7 +2615,7 @@ P =^.. L :- pterm_to_sterm(P,L).
 % Usage: subst(+Fml,+X,+Sk,?FmlSk)
 
 subst(A,B,C,D):- 
-      catch(notrace(nd_subst(A,B,C,D)),_,fail),!.
+      catch(hotrace(nd_subst(A,B,C,D)),_,fail),!.
 subst(A,B,C,A).
 
 nd_subst(  Var, VarS,SUB,SUB ) :- Var==VarS,!.
@@ -2704,7 +2704,7 @@ weak_nd_subst2( X, Sk, L, L ).
 % ========================================================================================
 getCputime(Start):-statistics(cputime,Start).
 prolog_statistics:-statistics.
-prolog_notrace(G):-notrace(G).
+prolog_hotrace(G):-hotrace(G).
 
 % ========================================================================================
 % Threads 
@@ -3254,7 +3254,7 @@ callCycApi(Out,PrologGoal,ToplevelVars):-cycGoal(PrologGoal,ToplevelVars,Result)
 passAlong(X,Y):-toCycApiExpression(X,CycLX),evalSubL(CycLX,Y,Vars),asserta(evalSubLCache(X,Y)).
 
 
-notraceTry(Goal):-notrace(ignore(catch(Goal,E,debugFmt(Goal-E)))).
+notraceTry(Goal):-hotrace(ignore(catch(Goal,E,debugFmt(Goal-E)))).
 
 
 cycGoal(X,Y,Z):-debugFmt('?- ~q.~n',[cycGoal(X,Y,Z)]),fail.

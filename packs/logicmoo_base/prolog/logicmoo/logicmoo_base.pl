@@ -21,6 +21,10 @@
 
 
 
+:- export(user:mpred_mod/1).
+:- dynamic user:mpred_mod/1.
+user:mpred_mod(user).
+
 
 :-dynamic('$was_imported_kb_content$'/2).
 :-multifile('$was_imported_kb_content$'/2).
@@ -62,9 +66,9 @@ xtreme_debug(P):- not_is_release, verify_sanity(P).
 xtreme_debug(_).
 
 verify_sanity(P):-(true; is_release),!,nop(P).
-verify_sanity(P):- debugOnError(notrace(P)),!.
+verify_sanity(P):- debugOnError(hotrace(P)),!.
 verify_sanity(P):- dmsg('$ERROR_incomplete_SANITY'(P)),!.
-:-meta_predicate_transparent(when_debugging(+,0)).
+:-meta_predicate(when_debugging(+,0)).
 when_debugging(What,Call):- debugging(What),!,Call.
 when_debugging(_,_).
 
@@ -117,12 +121,9 @@ thlocal:infForward.
 :- dynamic(mpred_module_ready).
 
 % ========================================
-% mpred_mod/1
+% user:mpred_mod/1
 % ========================================
 
-:- export(mpred_mod/1).
-:- dynamic mpred_mod/1.
-mpred_mod(user).
 
 % TODO uncomment the next line without breaking it all!
 % thglobal:use_cyc_database.
@@ -238,7 +239,7 @@ mpred_name_variables([Var|Vars]):-
 
 
 user:goal_expansion(G,isa(I,C)):- \+  thlocal:disable_mpred_term_expansions_locally, G\=isa(_,_),(was_isa(G,I,C)),!.
-user:term_expansion(G,isa(I,C)):- \+  thlocal:disable_mpred_term_expansions_locally, notrace(was_isa(G,I,C)).
+user:term_expansion(G,isa(I,C)):- \+  thlocal:disable_mpred_term_expansions_locally, hotrace(was_isa(G,I,C)).
 
 
 mpred_module_ready.
@@ -257,7 +258,8 @@ mpred_module_ready.
 :-decl_mpred_hybrid(isa/2).
 
 system:term_expansion(A,B):- \+  thlocal:disable_mpred_term_expansions_locally,
-  current_predicate(pfcExpansion_loaded/0),loop_check(pfc_file_expansion(A,B)),A\=@=B.
+  current_predicate(pfcExpansion_loaded/0),loop_check(pfc_file_expansion(A,B)),A\=@=B,
+  nop(dmsg(pfc_file_expansion_base(IN,WHY))).
 
 user:semweb_startup:- with_no_term_expansions(if_file_exists(user:ensure_loaded(logicmoo(dbase/mpred_i_rdf_store)))).
 
@@ -270,7 +272,9 @@ user:semweb_startup:- with_no_term_expansions(if_file_exists(user:ensure_loaded(
 system:term_expansion(IN,OUT):- \+  thlocal:disable_mpred_term_expansions_locally,
   mpred_module_ready, must_compile_special_clause(IN),
   in_file_expansion, 
-  loader_term_expansion(IN,WHY),must(OUT = user:WHY).
+  loader_term_expansion(IN,WHY),
+  must(OUT = user:WHY),
+  dmsg(loader_term_expansion(IN,WHY)).
 
 % :- sanity(test_expand_units(tCol(_A))).
 

@@ -267,7 +267,7 @@ ensure_universal_stub_plus_2(F,A2):-
    AMinus2 is A2 -2,
    assert_if_new((HEAD:-HEADMinus2)),!,
   % compile_predicates([HEAD]),
-   mpred_mod(M),
+   user:mpred_mod(M),
    decl_mpred_hybrid(M,F,AMinus2).
 
 % ==============================
@@ -405,7 +405,7 @@ mpred_t_mpred_storage_clauses_facts(H,true,t(H)):-compound(H),!,current_predicat
 % mpred_t_mpred_storage_clauses_rules(H,B,'<=>'):-'<=>'(B,HH),each_subterm(HH,SubTerm),compound(SubTerm),SubTerm = H.
 
 
-mpred_t_provide_mpred_storage_op(Op,HB):-notrace(demodulize(Op,HB,HeadBody)),get_functor(HeadBody,F),(F==t;user:mpred_prop(F,prologHybrid)), must(is_mpred_op(Op)), 
+mpred_t_provide_mpred_storage_op(Op,HB):-hotrace(demodulize(Op,HB,HeadBody)),get_functor(HeadBody,F),(F==t;user:mpred_prop(F,prologHybrid)), must(is_mpred_op(Op)), 
     with_assertions(thlocal:already_in_file_term_expansion,mpred_t_storage_op(Op,HeadBody)).
 
 % ====================================================
@@ -424,7 +424,7 @@ mpred_t_storage_op(_,isa(_,_)):- !,fail. % <- keeps u out of isa hybrids hairs
 mpred_t_storage_op(Op,X):- was_isa(X,I,C),!,mpred_op(Op,isa(I,C)).
 
 % HOOK MOST ALL CALLS
-mpred_t_storage_op(Op,HeadBodyI):- notrace(((expand_term(HeadBodyI,HeadBodyM)),HeadBodyI\=@=HeadBodyM)),!,mpred_t_storage_op(Op,HeadBodyM).
+mpred_t_storage_op(Op,HeadBodyI):- hotrace(((expand_term(HeadBodyI,HeadBodyM)),HeadBodyI\=@=HeadBodyM)),!,mpred_t_storage_op(Op,HeadBodyM).
 mpred_t_storage_op(Op,X):- not(is_non_call_op(Op)),!,mpred_t_call_op(Op,X).
 
 % RULE HOOK (for prolog special wrapper body stubs)

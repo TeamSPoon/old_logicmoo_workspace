@@ -209,7 +209,7 @@ must_make_object_string_list(P,Obj,WList):- call_tabled(must_make_object_string_
 must_make_object_string_list_cached(P,Obj,WList):-
   must((object_string(P,Obj,0-5,String),nonvar(String),non_empty(String),string_ci(String,LString),to_word_list(LString,WList))).
 
-same_ci(A,B):-notrace((must((non_empty(A),non_empty(B))),any_to_string(A,StringA),any_to_string(B,StringB),!,string_ci(StringA,StringB))),!.
+same_ci(A,B):-hotrace((must((non_empty(A),non_empty(B))),any_to_string(A,StringA),any_to_string(B,StringB),!,string_ci(StringA,StringB))),!.
 
 match_object(S,Obj):-name_text(Obj,S).
 % match_object(S,Obj):-ground(S:Obj),match_object_exp(S,Obj),!.
@@ -219,11 +219,11 @@ match_object_exp(S,Obj):-sanity(ground(S:Obj)),must(((atoms_of(S,Atoms),!,Atoms\
 
 match_object_0([S],Obj):-nonvar(S),match_object_1(S,Obj),!.
 match_object_0(Atoms,Obj):-
-   current_agent_or_var(P),notrace(must_make_object_string_list(P,Obj,WList)),!,
-   forall(member(A,Atoms),(member(W,WList),notrace(string_equal_ci(A,W)))).
+   current_agent_or_var(P),hotrace(must_make_object_string_list(P,Obj,WList)),!,
+   forall(member(A,Atoms),(member(W,WList),hotrace(string_equal_ci(A,W)))).
 
 match_object_1(A,Obj):-same_ci(A,Obj),!.
-match_object_1(A,Obj):-notrace((isa(Obj,Type))),same_ci(A,Type),!.
+match_object_1(A,Obj):-hotrace((isa(Obj,Type))),same_ci(A,Type),!.
 
 
 dmsg_parserm(D):-dmsg(D),!.

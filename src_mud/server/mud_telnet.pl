@@ -57,7 +57,8 @@ service_client_call(Call, Slave, In, Out, Host, Peer, Options):-
    call(Call).
   
 login_and_run_nodebug:- 
- must(set_no_debug), (notrace(login_and_run)->true;login_and_run).
+ % must(set_no_debug), 
+ must(login_and_run).
 
 login_and_run:-
    % current_input(In),current_output(Out),

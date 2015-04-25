@@ -107,7 +107,7 @@ tCol(functorDeclares).
 :- debug.
 %TODO FIX :- decl_mpred(tDeleted(ftID),[predIsFlag]).
 :- decl_mpred_hybrid disjointWith/2.
-:- decl_mpred_hybrid(( ttNotSpatialType/1,ttSpatialType/1 )).
+:- decl_mpred_hybrid(( ttNotTemporalType/1,ttTemporalType/1 )).
 :- decl_mpred_hybrid((genlInverse/2,genlPreds/2)).
 :- decl_mpred_hybrid(argIsa/3).
 :- decl_mpred_hybrid(argSingleValueDefault, 3).
@@ -134,7 +134,7 @@ tCol(tInferInstanceFromArgType).
 tCol(tPred).
 tCol(tRelation).
 tCol(ttFormatted).
-tCol(ttSpatialType).
+tCol(ttTemporalType).
 tCol(ttTypeType).
 tCol(tPathway).
 
@@ -157,8 +157,6 @@ argQuotedIsa(Prop,N,Type) <= argIsa(Prop,N,Type),ttFormatType(Type).
 :- forall(functorDeclaresPred(F),must((decl_type(F),add(isa(F,functorDeclares)),add(genls(F,tPred))))).
 :- export mtForPred/2.
 :- user:decl_mpred_hybrid((argIsa/3, formatted_resultIsa/2, localityOfObject/2, subFormat/2, isa/2, mudLabelTypeProps/3, genls/2, pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, ttFormatType/1, typeProps/2)).
-:-add(isa(tObj,ttSpatialType)).
-:-add(isa(tRegion,ttSpatialType)).
 :-add(isa(ttFormatType,ttAbstractType)).
 :-add(pred_argtypes(typeGenls(ttTypeType,tCol))).
 :-discontiguous(subFormat/2).
@@ -199,10 +197,6 @@ ttFormatted(ftDice(ftInt,ftInt,ftInt)).
 ttFormatted(ftListFn(ftRest)).
 ttFormatted(ftDeplictsFn(tCol)).
 
-ttTemporalType(tAgentGeneric).
-ttTemporalType(tItem).
-ttTemporalType(tObj).
-ttTemporalType(tRegion).
 
 tCol(tAvoidForwardChain).
 tCol('SententialOperator').
@@ -297,34 +291,23 @@ subFormat(ftVoprop,ftTerm).
 
 
 
-tCol(tChannel).
-tChannel(A):- tAgentGeneric(A).
-tChannel(A):- tRegion(A).
-tChannel(iGossupChannel).
 
 tCol(tNewlyCreated).
 tCol(ttTypeFacet).
 
 ttTypeFacet(tNewlyCreated).
 ttTypeFacet(ttTypeFacet).
-ttTypeFacet(tChannel).
 ttTypeFacet(ttUnverifiableType).
 
 
-typeGenls(tAgentGeneric,ttAgentType).
-typeGenls(tItem,ttItemType).
-typeGenls(tObj,ttObjectType).
 typeGenls(tPred,ttPredType).
-typeGenls(tRegion,ttRegionType).
-typeGenls(ttAgentType,tAgentGeneric).
 typeGenls(ttFormatTypeType,ttFormatType).
-typeGenls(ttItemType,tItem).
-typeGenls(ttObjectType,tObj).
 typeGenls(ttPredType,tPred).
-typeGenls(ttRegionType,tRegion).
-typeGenls(ttSpatialType,tSpatialThing).
+typeGenls(ttTemporalType,tTemporalThing).
 typeGenls(ttTypeFacet,tCol).
 typeGenls(ttTypeType,tCol).
+
+
 
 ttTypeFacet(ttUnverifiableType).
 ttUnverifiableType(ftDice).
@@ -342,9 +325,10 @@ ttUnverifiableType(vtDirection).
 
 
 
-functorDeclaresPred(ArgsIsa)=>isa(ArgsIsa,tCol).
+functorDeclaresPred(ArgsIsa)=>isa(ArgsIsa,tPred).
 %TODO isa(_,ArgsIsa)=>tCol(ArgsIsa).
-cycAssert(A,B):- trace_or_throw(cycAssert(A,B)).
+
+
 
 /*
 disjointWith(A,B):- A=B,!,fail.
@@ -353,9 +337,9 @@ disjointWith(A,B):- disjointWithT(AS,BS),transitive_subclass_or_same(A,AS),trans
 disjointWith(A,B):- once((type_isa(A,AT),type_isa(B,BT))),AT \= BT.
 */
 disjointWith(Sub, Super) => disjointWith( Super, Sub).
-disjointWith(tObj,tRegion).
-disjointWith(tRegion,tObj).
-disjointWith(ttSpatialType,ttAbstractType).
+
+
+disjointWith(ttTemporalType,ttAbstractType).
 
 prologHybrid(dividesBetween(tCol,tCol,tCol)).
 
@@ -387,7 +371,7 @@ relationMostInstance(BP,_,_)=>tBinaryPredicate(BP).
 prologHybrid(relationAllInstance(tBinaryPredicate,tCol,ftValue)).
 relationAllInstance(BP,_,_)=>tBinaryPredicate(BP).
 
-((isa(Inst,ttSpatialType), tCol(Inst)) => genls(Inst,tSpatialThing)).
+((isa(Inst,ttTemporalType), tCol(Inst)) => genls(Inst,tTemporalThing)).
 
 % (isa(Inst,Type), tCol(Inst)) => isa(Type,ttTypeType).
 % (isa(TypeType,ttTypeType) , isa(Inst,TypeType), genls(SubInst,Inst)) => isa(SubInst,TypeType).
@@ -397,63 +381,20 @@ relationAllInstance(BP,_,_)=>tBinaryPredicate(BP).
 => tCol(vtDirection).
 
 disjointWith(Sub, Super) => disjointWith( Super, Sub).
-disjointWith(tObj,tRegion).
-disjointWith(ttSpatialType,ttAbstractType).
+disjointWith(ttTemporalType,ttAbstractType).
 
 
-genls(tPartOfobj,tItem).
-
-:-decl_mpred_hybrid(dividesBetween(tCol,tCol,tCol)).
-
-% defined more correctly below dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
-dividesBetween(tItem,tMassfull,tMassless).
-dividesBetween(tObj,tItem,tAgentGeneric).
-dividesBetween(tObj,tMassfull,tMassless).
-dividesBetween(tSpatialThing,tObj,tRegion).
-formatted_resultIsa(ftDice(ftInt,ftInt,ftInt),ftInt).
-(dividesBetween(tAgentGeneric,tMale,tFemale)).
-
-% dividesBetween(tItem,tPathways).
-dividesBetween(tItem,tMassfull,tMassless).
-dividesBetween(tObj,tItem,tAgentGeneric).
-dividesBetween(tObj,tMassfull,tMassless).
-dividesBetween(tSpatialThing,tObj,tRegion).
-dividesBetween(tAgentGeneric,tPlayer,tNpcPlayer).
-
-% dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
-
-% disjointWith(P1,P2) => ((neg(isa(C,P1))) <=> isa(C,P2)).
-
-% isa(Col1, ttObjectType) => neg(isa(Col1, ttFormatType)).
-
-=> tCol(tCol).
-=> tCol(tPred).
-=> tCol(tFunction).
-=> tCol(tRelation).
-=> tCol(ttSpatialType).
-=> tCol(ttFormatType).
-=> tCol(functorDeclares).
-% tCol(ArgsIsa):-functorDeclaresPred(ArgsIsa).
-% TODO decide if OK
-%tCol(F):-hasInstance(functorDeclares,F).
-=> tCol(ttFormatType).
-=> tCol(vtActionTemplate).
-=> tCol(tRegion).
-=> tCol(tContainer).
-
-(mpred_prop(_,_,pred_argtypes(ArgTypes)),{is_declarations(ArgTypes)}) => ({is_declarations(ArgTypes)}, pred_argtypes(ArgTypes)).
 
 
-% tCol(Type),(tBinaryPredicate(Pred)/(functor(G,Pred,2),G=..[Pred,isInstFn(Type),Value])), G => relationMostInstance(Pred,Type,Value).
 
 
-isa(tRegion,ttSpatialType).
+
 isa(tRelation,ttAbstractType).
 
 genlPreds(genls,equals).
 % genls(A, B):- tCol(A),{A=B}.
 
-% rtrace(Goal):- Goal. % (notrace((visible(+all),visible(+unify),visible(+exception),leash(-all),leash(+exception))),(trace,Goal),leash(+all)).
+% rtrace(Goal):- Goal. % (hotrace((visible(+all),visible(+unify),visible(+exception),leash(-all),leash(+exception))),(trace,Goal),leash(+all)).
 
 % :- gutracer.
 
@@ -470,20 +411,60 @@ tCol(tFly).
 
 tCol(ttPreAssertedCollection).
 tCol(completeIsaAsserted).
-% genls(completeIsaAsserted,tSpatialThing).
+% genls(completeIsaAsserted,tTemporalThing).
 genls(ttPreAssertedCollection,tCol).
 ttPreAssertedCollection(ttPreAssertedCollection).
 ttPreAssertedCollection(tPred).
-ttPreAssertedCollection(tCol).
-ttPreAssertedCollection(ttFormatType).
-ttPreAssertedCollection(ttTypeType).
-ttPreAssertedCollection(tItem).
-ttPreAssertedCollection(tRegion).
-ttPreAssertedCollection(tObj).
-ttPreAssertedCollection(tAgentGeneric).
-ttPreAssertedCollection(tCarryAble).
-ttPreAssertedCollection(vtVerb).
-genls(ttTypeByAction,ttPreAssertedCollection).
+
+
+% dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
+
+% disjointWith(P1,P2) => ((neg(isa(C,P1))) <=> isa(C,P2)).
+
+% isa(Col1, ttObjectType) => neg(isa(Col1, ttFormatType)).
+
+=> tCol(tCol).
+=> tCol(tPred).
+=> tCol(tFunction).
+=> tCol(tRelation).
+=> tCol(ttTemporalType).
+=> tCol(ttFormatType).
+=> tCol(functorDeclares).
+% tCol(ArgsIsa):-functorDeclaresPred(ArgsIsa).
+% TODO decide if OK
+%tCol(F):-hasInstance(functorDeclares,F).
+=> tCol(ttFormatType).
+
+(mpred_prop(_,_,pred_argtypes(ArgTypes)),{is_declarations(ArgTypes)}) => ({is_declarations(ArgTypes)}, pred_argtypes(ArgTypes)).
+
+
+% tCol(Type),(tBinaryPredicate(Pred)/(functor(G,Pred,2),G=..[Pred,isInstFn(Type),Value])), G => relationMostInstance(Pred,Type,Value).
+
+
+
+%((genlPreds(Col1,Col2),(arity(Col1,1);arity(Col2,1)))=>genls(Col1,Col2)).
+%((genls(Col1,Col2),(tPred(Col1);tPred(Col2)))=>genlPreds(Col1,Col2)).
+
+:-must(pfc_add(tCol('UnaryPredicate'))).
+
+((argQuotedIsa(Pred, _, 'CycLSentence') => 'SententialOperator'(Pred))).
+
+genls(tPartOfobj,tItem).
+
+((isa(Pred,prologSingleValued),arity(Pred,Arity))
+  =>
+  {
+   dynamic(Pred/Arity),
+   length(AfterList,Arity),
+   append(Left,[A],AfterList),
+   append(Left,[B],BeforeList),
+  After =.. [Pred|AfterList],
+  Before =.. [Pred|BeforeList]},
+  (After,{Before, \==(A , B)} => {pfc_rem2(Before)})).
+
+
+
+
 genls(ttPreAssertedCollection,completelyAssertedCollection).
 
 ((completeIsaAsserted(I), isa(I,Sub), genls(Sub, Super),{ground(Sub:Super)}) => ({dif:dif(Sub, Super)}, isa(I,Super))).
@@ -496,6 +477,86 @@ tCol(ttNonGenled).
 % genls(ttFormatType,ttNonGenled).
 isa('Thing',ttNonGenled).
 isa('CycLTerm',ttNonGenled).
+prologHybrid(quotedIsa(ftTerm,ttFormatType)).
+
+isa(I,C):-quotedIsa(I,C).
+quotedIsa(I,C):-term_is_ft(I,C).
+
+
+tCol(ttSpatialType).
+tCol(tSpatialThing).
+ttPreAssertedCollection(ttTypeType).
+genls(ttSpatialType,ttTemporalType).
+genls(tSpatialThing,tTemporalThing).
+
+
+
+end_of_file.
+
+
+
+=> tCol(vtActionTemplate).
+=> tCol(tRegion).
+=> tCol(tContainer).
+disjointWith(tObj,tRegion).
+disjointWith(tObj,tRegion).
+disjointWith(tRegion,tObj).
+
+
+ttTemporalType(tAgentGeneric).
+ttTemporalType(tItem).
+ttTemporalType(tObj).
+ttTemporalType(tRegion).
+tCol(tChannel).
+tChannel(A):- tAgentGeneric(A).
+tChannel(A):- tRegion(A).
+tChannel(iGossupChannel).
+ttTypeFacet(tChannel).
+typeGenls(tAgentGeneric,ttAgentType).
+typeGenls(tItem,ttItemType).
+typeGenls(tObj,ttObjectType).
+:-add(isa(tObj,ttTemporalType)).
+:-add(isa(tRegion,ttTemporalType)).
+typeGenls(tRegion,ttRegionType).
+typeGenls(ttAgentType,tAgentGeneric).
+typeGenls(ttItemType,tItem).
+typeGenls(ttObjectType,tObj).
+typeGenls(ttRegionType,tRegion).
+cycAssert(A,B):- trace_or_throw(cycAssert(A,B)).
+
+
+genls(tPartOfobj,tItem).
+
+:-decl_mpred_hybrid(dividesBetween(tCol,tCol,tCol)).
+
+% defined more correctly below dividesBetween(S,C1,C2) => (disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)).
+dividesBetween(tItem,tMassfull,tMassless).
+dividesBetween(tObj,tItem,tAgentGeneric).
+dividesBetween(tObj,tMassfull,tMassless).
+dividesBetween(tTemporalThing,tObj,tRegion).
+formatted_resultIsa(ftDice(ftInt,ftInt,ftInt),ftInt).
+(dividesBetween(tAgentGeneric,tMale,tFemale)).
+
+% dividesBetween(tItem,tPathways).
+dividesBetween(tItem,tMassfull,tMassless).
+dividesBetween(tObj,tItem,tAgentGeneric).
+dividesBetween(tObj,tMassfull,tMassless).
+dividesBetween(tTemporalThing,tObj,tRegion).
+dividesBetween(tAgentGeneric,tPlayer,tNpcPlayer).
+
+
+isa(tRegion,ttTemporalType).
+
+ttPreAssertedCollection(tCol).
+ttPreAssertedCollection(ttFormatType).
+ttPreAssertedCollection(tItem).
+ttPreAssertedCollection(tRegion).
+ttPreAssertedCollection(tObj).
+ttPreAssertedCollection(tAgentGeneric).
+ttPreAssertedCollection(tCarryAble).
+ttPreAssertedCollection(vtVerb).
+genls(ttTypeByAction,ttPreAssertedCollection).
+
 
 a=>b.
 b=>c.
@@ -538,40 +599,19 @@ makeArgConstraint('SometimesIsa',tCol).
 
 
 
-prologHybrid(quotedIsa(ftTerm,ttFormatType)).
-
-isa(I,C):-quotedIsa(I,C).
-quotedIsa(I,C):-term_is_ft(I,C).
-
 implies(and(resultIsaArg('$VAR'('FUNC'), 5), arg5Genl('$VAR'('FUNC'), '$VAR'('COL'))), resultIsa('$VAR'('FUNC'), '$VAR'('COL'))).
 
 
-%((genlPreds(Col1,Col2),(arity(Col1,1);arity(Col2,1)))=>genls(Col1,Col2)).
-%((genls(Col1,Col2),(tPred(Col1);tPred(Col2)))=>genlPreds(Col1,Col2)).
 
-:-must(pfc_add(tCol('UnaryPredicate'))).
 
-((argQuotedIsa(Pred, _, 'CycLSentence') => 'SententialOperator'(Pred))).
 
-genls(tPartOfobj,tItem).
-
-((isa(Pred,prologSingleValued),arity(Pred,Arity))
-  =>
-  {
-   dynamic(Pred/Arity),
-   length(AfterList,Arity),
-   append(Left,[A],AfterList),
-   append(Left,[B],BeforeList),
-  After =.. [Pred|AfterList],
-  Before =.. [Pred|BeforeList]},
-  (After,{Before, \==(A , B)} => {pfc_rem2(Before)})).
 
 
 % dividesBetween(tItem,tPathway).
 dividesBetween(tItem,tMassfull,tMassless).
 dividesBetween(tObj,tItem,tAgentGeneric).
 dividesBetween(tObj,tMassfull,tMassless).
-dividesBetween(tSpatialThing,tObj,tRegion).
+dividesBetween(tTemporalThing,tObj,tRegion).
 dividesBetween(tAgentGeneric,tPlayer,tNpcPlayer).
 
 ((dividesBetween(S,C1,C2),{ground(S:C1:C2)}) => ({ground(S:C1:C2)},(disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)))).
@@ -585,7 +625,7 @@ isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
 => tCol(tPred).
 => tCol(tFunction).
 => tCol(tRelation).
-=> tCol(ttSpatialType).
+=> tCol(ttTemporalType).
 => tCol(ttFormatType).
 /*
 

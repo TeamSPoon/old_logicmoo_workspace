@@ -23,7 +23,7 @@
 % ========================================
 
 :-export(is_svo_functor/1).
-is_svo_functor(Prop):- notrace((atom(Prop),arg(_,svo(svo,prop,valueOf,rdf),Prop))).
+is_svo_functor(Prop):- hotrace((atom(Prop),arg(_,svo(svo,prop,valueOf,rdf),Prop))).
 
 :-export(hilog_functor/1).
 hilog_functor(mpred_ttttt).
@@ -32,7 +32,7 @@ hilog_functor(mpred_ttttt).
 is_holds_true_not_hilog(HOFDS):-is_holds_true(HOFDS),\+ hilog_functor(HOFDS).
 
 :-export(is_holds_true/1).
-is_holds_true(Prop):- notrace((atom(Prop),is_holds_true0(Prop))),!.
+is_holds_true(Prop):- hotrace((atom(Prop),is_holds_true0(Prop))),!.
 
 % k,p,..
 is_holds_true0(Prop):-arg(_,vvv(holds,holds_t,t,asserted_mpred_t,assertion_t,assertion,secondOrder,firstOrder),Prop).
@@ -42,7 +42,7 @@ is_holds_true0(Prop):-atom_concat(_,'_t',Prop).
 is_2nd_order_holds(Prop):- is_holds_true(Prop) ; is_holds_false(Prop).
 
 :-export(is_holds_false/1).
-is_holds_false(Prop):-notrace((atom(Prop),is_holds_false0(Prop))).
+is_holds_false(Prop):-hotrace((atom(Prop),is_holds_false0(Prop))).
 
 is_holds_false0(Prop):-member(Prop,[not,nholds,holds_f,mpred_f,aint,assertion_f,asserted_mpred_f,retraction,not_secondOrder,not_firstOrder]).
 is_holds_false0(Prop,Stem):-atom_concat('not_',Stem,Prop).
@@ -72,7 +72,7 @@ non_assertable(_:WW,Why):- !,non_assertable(WW,Why).
 non_assertable(WW,notAssertable(Why)):- compound(WW),get_functor(WW,F),user:mpred_prop(F,notAssertable(Why)),!.
 % non_assertable(WW,Why):- db_prop_add
 
-is_logical_functor(And):-notrace(is_logical_functor0(And)).
+is_logical_functor(And):-hotrace(is_logical_functor0(And)).
 is_logical_functor0(X):-atom(X),member(X,[',',';',xor,'\\+',neg]).
 is_logical_functor0(X):-call_if_defined(logical_functor_pttp(X)).
 is_logical_functor0(And):-member(And,[(,),(;),('<='),('=>'),('<=>'),(':-'),(and),nop]).
@@ -143,7 +143,7 @@ if_result(TF,Call):-(TF->Call;true).
 % is_holds_true/is_holds_false
 % ========================================
 
-:- mpred_mod(M),export((
+:- user:mpred_mod(M),export((
           % M:t/1,
           M:t/2,
           M:t/3,
@@ -156,7 +156,7 @@ if_result(TF,Call):-(TF->Call;true).
           M:t/10,
           M:t/11)).
 
-:- mpred_mod(M),export((
+:- user:mpred_mod(M),export((
           % M:holds_t/1,
           M:holds_t/2,
           M:holds_t/3,
@@ -319,9 +319,9 @@ holds_plist_t(P,LIST):- apply(holds_t,[P|LIST]).
 
 :-op(0,fx,decl_mpred_hybrid).
 
-:-meta_predicate_transparent(decl_mpred_hybrid(+)).
-:-meta_predicate_transparent(decl_mpred_hybrid(+,+)).
-:-meta_predicate_transparent(decl_mpred_hybrid(+,+,+)).
+:-meta_predicate(decl_mpred_hybrid(+)).
+:-meta_predicate(decl_mpred_hybrid(+,+)).
+:-meta_predicate(decl_mpred_hybrid(+,+,+)).
 
 
 decl_mpred_hybrid(M):- must(with_pi(M,decl_mpred_hybrid4)).
@@ -400,8 +400,8 @@ split_name_type(Suggest,InstName,Type):- must_det(split_name_type_0(Suggest,NewI
 split_name_type_0(S,P,C):- string(S),!,atom_string(A,S),split_name_type_0(A,P,C),!.
 split_name_type_0(FT,FT,ttFormatType):-hasInstance(ttFormatType,FT),!,dmsg(trace_or_throw(ttFormatType(FT))),fail.
 split_name_type_0(T,T,C):- compound(T),functor(T,C,_),!.
-split_name_type_0(T,T,C):- notrace((once(atomic_list_concat_safe([CO,'-'|_],T)),atom_string(C,CO))).
-split_name_type_0(T,T,C):- notrace((atom(T),atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),catchv(number_codes(_,Digits),_,fail),atom_codes(CC,Type),!,i_name(t,CC,C))).
+split_name_type_0(T,T,C):- hotrace((once(atomic_list_concat_safe([CO,'-'|_],T)),atom_string(C,CO))).
+split_name_type_0(T,T,C):- hotrace((atom(T),atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),catchv(number_codes(_,Digits),_,fail),atom_codes(CC,Type),!,i_name(t,CC,C))).
 split_name_type_0(C,P,C):- var(P),atom(C),i_name(i,C,I),gensym(I,P),!.
 
 

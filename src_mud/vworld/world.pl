@@ -145,7 +145,7 @@ genls(tFood,tItem).
 %ttSpatialType(FT):- nonvar(FT),ttFormatType(FT),!,fail.
 %ttSpatialType(FT):- nonvar(FT),ttNotSpatialType(FT),!,fail.
 %ttSpatialType(tItem). %  col, formattype, 
-ttSpatialType(SubType):-member(SubType,[tAgentGeneric,tItem,tRegion]).
+% ttSpatialType(SubType):-member(SubType,[tAgentGeneric,tItem,tRegion]).
 %ttSpatialType(S):- is_asserted(ttSpatialType(T)), impliedSubClass(S,T).
 
 %createableSubclassType(S,T):-mpred_call(  ttSpatialType(T)),is_asserted(genls(S,T)).

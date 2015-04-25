@@ -415,10 +415,10 @@ rdf_to_prolog_io(DB,i,S,Sx):-any_to_prolog(DB,S,Sx).
 
 rdf_to_prolog_io(DB,o,S,Sx):-!,must(any_to_prolog(DB,S,Sx)),!.
 rdf_to_prolog_io(_,i,S,Sx):-ground(S),!,must(S=Sx).
-rdf_to_prolog_io(DB,i,S,Sx):-must(notrace(any_to_prolog(DB,S,Sx))),!.
+rdf_to_prolog_io(DB,i,S,Sx):-must(hotrace(any_to_prolog(DB,S,Sx))),!.
 
 to_rdf_io(_,S,Sx,o):-var(S),!,must(copy_term(S,Sx)).
-to_rdf_io(DB,S,Sx,i):-notrace(must(any_to_rdf(DB,S,Sx))).
+to_rdf_io(DB,S,Sx,i):-hotrace(must(any_to_rdf(DB,S,Sx))).
 
 bootstrap_ttl:- rdf_process_turtle('bootstrap.ttl',onLoadTTL,[prefixes(X)]),forall(member(NS-Prefix,X),rdf_register_prefix(NS,Prefix)).
 
@@ -527,7 +527,7 @@ add_spog(S,P,O,DB):- must(spog_to_prolog(S,P,O,DB,REQ)),!,
   (REQ==end_of_file-> true ; with_assertions(thlocal:rdf_asserting(DB,REQ),add(REQ))),!.
 
 :-export(spog_to_prolog/5).
-spog_to_prolog(Sx,Px,Ox,Gx,svo(S,P,O)):- notrace(NeverP=[rdf:rest,rdf:first]),
+spog_to_prolog(Sx,Px,Ox,Gx,svo(S,P,O)):- hotrace(NeverP=[rdf:rest,rdf:first]),
     must_det_l([rdf_from_graph(Gx,DB),rdf_to_prolog_io(DB,o,Px,P)]),!,
     enforce_never_p(DB,P,NeverP),
     must_det_l([rdf_to_prolog_io(DB,o,Sx,S),rdf_to_prolog_io(DB,o,Ox,O)]).
@@ -539,8 +539,8 @@ rdf_x(S,P,O):- rdf_x(S,P,O,_MUD).
 :-export(rdf_x/4).
 rdf_x(S,P,O,DB):-
   (nonvar(DB)->true;rdf_graph(Gx)),
-  notrace(once((to_rdf_io(user,DB,Gx,_Gio),to_rdf_io(Gx,S,Sx,Sio),to_rdf_io(Gx,P,Px,Pio),to_rdf_io(Gx,O,Ox,Oio)))),
-                notrace(((nonvar(P)->NeverP=[];NeverP=[rdf:rest,rdf:first,rdf:type]))),
+  hotrace(once((to_rdf_io(user,DB,Gx,_Gio),to_rdf_io(Gx,S,Sx,Sio),to_rdf_io(Gx,P,Px,Pio),to_rdf_io(Gx,O,Ox,Oio)))),
+                hotrace(((nonvar(P)->NeverP=[];NeverP=[rdf:rest,rdf:first,rdf:type]))),
                 rdf_db:rdf(Sx,Px,Ox,Gx),
                 rdf_to_prolog_io(DB,Pio,Px,P),
                 enforce_never_p(DB,P,NeverP),

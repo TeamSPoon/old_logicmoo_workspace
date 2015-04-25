@@ -149,7 +149,7 @@ isa(tRelation,ttAbstractType).
 genlPreds(genls,equals).
 % genls(A, B):- tCol(A),{A=B}.
 
-% rtrace(Goal):- Goal. % (notrace((visible(+all),visible(+unify),visible(+exception),leash(-all),leash(+exception))),(trace,Goal),leash(+all)).
+% rtrace(Goal):- Goal. % (hotrace((visible(+all),visible(+unify),visible(+exception),leash(-all),leash(+exception))),(trace,Goal),leash(+all)).
 
 % :- gutracer.
 

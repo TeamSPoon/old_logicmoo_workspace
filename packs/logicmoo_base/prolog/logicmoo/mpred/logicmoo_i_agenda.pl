@@ -51,7 +51,8 @@ agenda_do_prequery:- loop_check_local(agenda_rescan_mpred_ops,true).
 %:- rescan_missing_stubs.
 %:- agenda_rescan_mpred_props.
 
-:- sanity(mpred_mod(user)).
+
+:- sanity(user:mpred_mod(user)).
 
 :-export(agenda_slow_op_restart/0).
 
@@ -194,7 +195,7 @@ assert_subclass_on_argIsa(Prop,N,OType):-dmsg(assert_subclass_on_argIsa(Prop,N,O
 % Rescan for consistency
 % ========================================
 
-%:-meta_predicate_transparent(rescan_all/0).
+%:-meta_predicate(rescan_all/0).
 rescan_all:- doall_and_fail(agenda_rescan_mpred_ops).
 rescan_all:- doall_and_fail(agenda_mpred_repropigate).
 rescan_all:- doall_and_fail(rescan_mpred_loaded).
@@ -206,7 +207,7 @@ rescan_all.
 
 ensure_at_least_one_region:- (isa(_,tRegion)->true;create_instance(oneRegion1,tRegion)),!.
 
-% :-meta_predicate_transparent(finish_processing_dbase).
+% :-meta_predicate(finish_processing_dbase).
 finish_processing_dbase:- do_gc,dmsginfo(begin_finish_processing_dbase),fail.
 finish_processing_dbase:- doall_and_fail(rescan_all).
 finish_processing_dbase:- doall_and_fail(ensure_at_least_one_region).
@@ -217,7 +218,7 @@ finish_processing_dbase:- do_gc,dmsginfo(end_finish_processing_dbase),fail.
 finish_processing_dbase.
 
 
-%:-meta_predicate_transparent(rescandb/0).
+%:-meta_predicate(rescandb/0).
 % rescandb:- forall(thglobal:current_world(World),(findall(File,thglobal:loaded_file_world_time(File,World,_),Files),forall(member(File,Files),ensure_plmoo_loaded_each(File)),mpred_call(finish_processing_world))).
 rescandb:- mpred_call(finish_processing_world).
 
@@ -229,11 +230,11 @@ agenda_mpred_repropigate:-  loop_check_local(rescan_mpred_facts_local).
 
 rescan_mpred_facts_local:-with_no_assertions(thglobal:use_cyc_database,(must_det(rescan_duplicated_facts),must_det(rerun_database_hooks))).
 
-rescan_duplicated_facts:- !, notrace( forall(member(M,[moo,user,world,hook]), forall((predicate_property(M:H,dynamic),arity(F,A),functor(H,F,A)), rescan_duplicated_facts(M,H)))).
+rescan_duplicated_facts:- !, hotrace( forall(member(M,[moo,user,world,hook]), forall((predicate_property(M:H,dynamic),arity(F,A),functor(H,F,A)), rescan_duplicated_facts(M,H)))).
 rescan_duplicated_facts(_M,_H):-!.
 rescan_duplicated_facts(M,H):-!,rescan_duplicated_facts(M,H,true).
 rescan_duplicated_facts(M,H):-findall(H,(clause_safe(M:H,B),B==true),CF1), once((list_to_set(CF1,CF2),reduce_fact_heads(M,H,CF1,CF2))).
-rescan_duplicated_facts(M,H,BB):-notrace(doall((gather_fact_heads(M,H),BB=true,once((findall(C,(clause_safe(H,B),B=@=BB,reduce_clause(is_asserted,(H:-B),C)),CF1),
+rescan_duplicated_facts(M,H,BB):-hotrace(doall((gather_fact_heads(M,H),BB=true,once((findall(C,(clause_safe(H,B),B=@=BB,reduce_clause(is_asserted,(H:-B),C)),CF1),
                                                                      list_to_set(CF1,CF2),once(reduce_fact_heads(M,H,CF1,CF2))))))).
 rerun_database_hooks:-!.
 rerun_database_hooks:-time_call(doall((gather_fact_heads(_M,H),forall(is_asserted(H),run_database_hooks(change(assert,z),H))))),fail.

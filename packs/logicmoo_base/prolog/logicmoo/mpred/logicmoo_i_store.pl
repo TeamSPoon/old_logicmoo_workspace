@@ -59,24 +59,24 @@ side_effect_prone:- \+ thlocal:noDBaseMODs(_).
 
 
 
-:-meta_predicate_transparent(with_no_modifications(0)).
+:-meta_predicate(with_no_modifications(0)).
 with_no_modifications(CALL):-!,CALL.
 with_no_modifications(CALL):-with_assertions(thlocal:noDBaseMODs(_),CALL).
 
-:-meta_predicate_transparent(with_no_db_hooks(0)).
+:-meta_predicate(with_no_db_hooks(0)).
 with_no_db_hooks(CALL):-!,CALL.
 with_no_db_hooks(CALL):-with_assertions(thlocal:noDBaseHOOKS(_),CALL).
 
-:-meta_predicate_transparent(with_fallbacks(0)).
+:-meta_predicate(with_fallbacks(0)).
 with_fallbacks(CALL):-with_no_assertions(thlocal:infAssertedOnly(_),CALL).
 
-:-meta_predicate_transparent(with_fallbacksg(0)).
+:-meta_predicate(with_fallbacksg(0)).
 with_fallbacksg(CALL):-with_no_assertions(thlocal:noRandomValues(_),CALL).
 
-:-meta_predicate_transparent(with_no_fallbacksg(0)).
+:-meta_predicate(with_no_fallbacksg(0)).
 with_no_fallbacksg(CALL):-with_assertions(thlocal:noRandomValues(_),CALL).
 
-:-meta_predicate_transparent(with_no_fallbacks(0)).
+:-meta_predicate(with_no_fallbacks(0)).
 with_no_fallbacks(CALL):-with_assertions(thlocal:infAssertedOnly(_),CALL).
 
 :-thread_local(infSecondOrder/0).
@@ -117,16 +117,16 @@ is_asserted_1(isa(H,B)):-!,isa_asserted(H,B).
 is_asserted_1(HB):-expand_to_hb(HB,H,B),!,is_asserted_ilc(H,B).
 
 is_asserted_ilc((H:-BB),B):- is_true(B),!,is_asserted_ilc(H,BB).
-is_asserted_ilc(H,B):-notrace((fully_expand_warn(is_asserted_2,(H:-B),CL),expand_to_hb(CL,HH,BB))),!,is_asserted_2(HH,BB).
+is_asserted_ilc(H,B):-hotrace((fully_expand_warn(is_asserted_2,(H:-B),CL),expand_to_hb(CL,HH,BB))),!,is_asserted_2(HH,BB).
 
 is_asserted_2(H,B):-thglobal:pfcManageHybrids,!,pfc_clause_is_asserted(H,B).
-is_asserted_2(H,B):-call_no_cuts(user:provide_mpred_storage_clauses(H,B,_Ref)),not(notrace(special_wrapper_body(B,_))).
+is_asserted_2(H,B):-call_no_cuts(user:provide_mpred_storage_clauses(H,B,_Ref)),not(hotrace(special_wrapper_body(B,_))).
 
 is_asserted_ilc((H:-BB),B,Ref):- is_true(B),!,is_asserted_ilc(H,BB,Ref).
 is_asserted_ilc(H,B,Ref):-hotrace((fully_expand_warn(is_asserted_3,(H:-B),CL),expand_to_hb(CL,HH,BB))),is_asserted_3(HH,BB,Ref).
 
 % is_asserted_3(H,B,Ref):-thglobal:pfcManageHybrids,!,pfc_clause_is_asserted(H,B,Ref).
-is_asserted_3(H,B,Ref):-call_no_cuts(user:provide_mpred_storage_clauses(H,B,Ref)),not(notrace(special_wrapper_body(B,_))).
+is_asserted_3(H,B,Ref):-call_no_cuts(user:provide_mpred_storage_clauses(H,B,Ref)),not(hotrace(special_wrapper_body(B,_))).
 
 is_source_proof(_).
 
@@ -134,14 +134,14 @@ is_source_proof(_).
 % ================================================
 % fact_checked/2, fact_loop_checked/2
 % ================================================
-:- meta_predicate_transparent(fact_checked(?,0)).
+:- meta_predicate(fact_checked(?,0)).
 
 fact_checked(Fact,Call):- not(ground(Fact)),!,no_loop_check(call_tabled(Call),is_asserted(Fact)).
 fact_checked(Fact,_):- is_known_false0(Fact),!,fail.
 fact_checked(Fact,_):- is_known_trew(Fact),!.
 fact_checked(Fact,Call):- no_loop_check(call_tabled(Call),is_asserted(Fact)).
 
-:-meta_predicate_transparent(fact_loop_checked(+,0)).
+:-meta_predicate(fact_loop_checked(+,0)).
 fact_loop_checked(Fact,Call):- no_repeats(fact_checked(Fact,Call)).
 
 
@@ -188,7 +188,7 @@ special_wrapper_functor(call_provided_mpred_storage_op,direct_to_prolog).
 special_wrapper_functor(loop_check,meta).
 special_wrapper_functor(loop_check_term,meta).
 %special_wrapper_functor(pttp_req).
-%special_wrapper_functor(loop_check_clauses).
+
 
 make_body_clause(_Head,Body,Body):-atomic(Body),!.
 make_body_clause(_Head,Body,Body):-special_wrapper_body(Body,_Why),!.
@@ -198,10 +198,11 @@ special_head(_,F,Why):-special_head0(F,Why),!,show_call_failure(not(asserted_mpr
 special_head0(F,functorDeclaresPred):-functorDeclaresPred(F),!.
 special_head0(F,functorDeclares):-hasInstance(functorDeclares,F),!.
 special_head0(F,prologMacroHead):-hasInstance(prologMacroHead,F),!.
+special_head0(F,pfcControlled):-hasInstance(pfcControlled,F),!.
 special_head0(isa,isa).
 special_head0(F,tCol):-hasInstance(tCol,F),!.
 special_head0(F,prologHybrid):-hasInstance(prologHybrid,F).
-special_head0(F,pfcControls):-hasInstance(pfcControls,F).
+special_head0(F,pfcControlled):-hasInstance(pfcControlled,F).
 
 
 
@@ -348,7 +349,7 @@ prop_or(Obj,Prop,Value,OrElse):- one_must(ireq(t(Prop,Obj,Value)),Value=OrElse).
 % assert_with to change(CA1,CB2) singlevalue pred
 :-export((db_assert_sv/4)).
 %db_assert_sv(_Must,C,F,A):- throw_if_true_else_fail(contains_singletons(C),db_assert_sv(C,F,A)).
-db_assert_sv(Must,C,F,A):- ex, ignore(( loop_check(db_assert_sv_ilc(Must,C,F,A),true))).
+db_assert_sv(Must,C,F,A):- trace,ex, ignore(( loop_check(db_assert_sv_ilc(Must,C,F,A),true))).
 
 :-export((db_assert_sv_ilc/4)).
 db_assert_sv_ilc(Must,C,F,A):- arg(A,C,UPDATE),db_assert_sv_now(Must,C,F,A,UPDATE),!.
@@ -365,7 +366,7 @@ db_assert_sv_now(Must,C,F,A, REPLACE):- db_assert_sv_replace(Must,C,F,A, REPLACE
 db_assert_sv_update(Must,C,F,A,UPDATE):-
    replace_arg(C,A,OLD,COLD),
    % prefer updated values to come from instances but will settle with anything legal
-   notrace(must((once(ireq(COLD);mreq(COLD)),ground(COLD)))),
+   hotrace(must((once(ireq(COLD);mreq(COLD)),ground(COLD)))),
    update_value(OLD,UPDATE,NEW),!,
    db_assert_sv_replace(Must,C,F,A,NEW),!.
 
@@ -382,7 +383,7 @@ db_assert_sv_replace(_Must,C,_,A,NEW):- fail,
 db_assert_sv_replace(Must,C,F,A,NEW):-
    replace_arg(C,A,OLD,COLD),
    replace_arg(C,A,NEW,CNEW),
-   notrace(ignore(ireq(COLD))),
+   hotrace(ignore(ireq(COLD))),
    must_det(db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW)),!.
 
 db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):- var(OLD),!,   
@@ -395,7 +396,7 @@ db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):- unify_with_occurs_chec
 db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):- equals_call(OLD,NEW),!,dmsg(db_assert_sv_same(COLD,'__same__',CNEW)),trace_or_throw(dtrace).
 db_assert_sv_replace_with(Must,C,F,A,COLD,CNEW,OLD,NEW):-
    dmsg(db_assert_sv(COLD,'__replace__',CNEW)),
-   notrace((ignore(show_call_failure((clr(COLD), not(ireq(COLD))))))),
+   hotrace((ignore(show_call_failure((clr(COLD), not(ireq(COLD))))))),
    %replace_arg(C,A,_,CBLANK),must_det(clr(CBLANK)),hooked_retractall(CBLANK),   
    db_must_asserta_confirmed_sv(CNEW,A,NEW),!.
 
@@ -409,7 +410,7 @@ equals_call(X,Y):-compound(X),compound(Y),once((correctArgsIsa(X,XX),correctArgs
 
 confirm_hook(CNEW:NEW=@=CNOW:NOW):-
    sanity(var(NOW)),               
-   notrace((once(ireq(CNOW)))),
+   hotrace((once(ireq(CNOW)))),
    CNEW:NEW=@=CNOW:NOW,!.
 
 confirm_hook(CNEW:NEW=@=CNOW:NOW):-
@@ -466,6 +467,9 @@ database_modify_0(change(assert,AZ),          G):- copy_term(G,GG),database_modi
 
 database_modify_assert(change(assert,_),         G,GG):- ( \+ \+ is_asserted(GG)),must(variant(G,GG)),!.
 database_modify_assert(change(assert,AZ),       _G,GG):- expire_pre_change(AZ,GG),fail.
+
+database_modify_assert(change(assert,_),_, GG):- thglobal:pfcManageHybrids,!,copy_term(GG,GGG),(\+ \+ pfc_add_fast(GGG)),!,show_call_failure(variant(GG,GGG)),!.
+
 database_modify_assert(change(assert,AorZ),      G,GG):- G \= (_:-_), get_functor(G,F,A),
    (asserted_mpred_prop(F,prologSingleValued) -> (AorZ \== sv -> db_assert_sv(AorZ,G,F,A); fail); 
        asserted_mpred_prop(F,prologOrdered) -> (AorZ\==z -> database_modify_assert_must(change(assert,z),G,GG);true)).

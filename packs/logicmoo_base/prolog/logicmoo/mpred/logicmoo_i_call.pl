@@ -13,7 +13,7 @@
 */
 
 
-:-meta_predicate_transparent(mpred_call(0)).
+:-meta_predicate(mpred_call(0)).
 
 % oncely later will throw an error if there where choice points left over by call
 :-meta_predicate(mpred_call(0)).
@@ -77,7 +77,7 @@ whenAnd(A,B):-A,ground(B),once(B).
 % Transforming DBASE OPs
 % ========================================
 
-reduce_mpred_op(Op,Op2):-must(notrace(transitive(how_to_op,Op,Op2))),!.
+reduce_mpred_op(Op,Op2):-must(hotrace(transitive(how_to_op,Op,Op2))),!.
 reduce_mpred_op(A,A).
 
 how_to_op(assert(a),asserta_new).
@@ -140,10 +140,10 @@ mpred_call(Call):-
      must((Call=..[Was|Apply],lookup_inverted_op(Was,InvertCurrent,_WasPol))),
    ((OverridePolarity ==('-') -> debugOnError(show_call(apply(InvertCurrent,Apply))) ; debugOnError(show_call(apply(Was,Apply))))))).
 
-mpred_call(Call):-fully_expand(query(t,mpred_call),Call,Expand),!,mpred_call_0(Expand).
+mpred_call(Call):- mpred_call_0(Call).
 
 mpred_call_0(Call):-predicate_property(Call,foreign),!,Call.
-mpred_call_0(Call):- one_must(mpred_call_1(Call),mpred_call_2(Call)).
+mpred_call_0(Expand):- fully_expand(query(t,mpred_call),Expand,Call),!, one_must(mpred_call_1(Call),mpred_call_2(Call)).
 
 mpred_call_1(Call):-current_predicate(_,Call),debugOnError(loop_check(Call)).
 mpred_call_1(Call):-clause(prolog_xref:process_directive(D, Q),_),nonvar(D),D=Call,!, trace,show_call((prolog_xref:process_directive(Call,Q),fmt(Q))).

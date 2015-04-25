@@ -76,6 +76,7 @@
 :- dynamic_multifile_exported user:defnSufficient/2.
 :- thread_local user:repl_to_string/2.
 :- thread_local user:repl_writer/2.
+:- thread_local thlocal:infSupertypeName/0.
 :- dynamic_multifile_exported user:loaded_external_kbs/0.
 :- dynamic_multifile_exported user:loading_module_h/1.
 :- dynamic_multifile_exported user:registered_module_type/2.

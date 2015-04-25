@@ -10,6 +10,17 @@
 %   Purpose: Provides a prolog database replacent that uses PFC
 %
 */
+
+:- op(500,fx,('~')),op(1075,xfx,('=>')),
+          op(1075,xfx,('<=>')),op(1075,xfx,('<=')),
+          op(1100,fx,('=>')),
+          op(1150,xfx,('::::')).
+
+
+
+
+
+:- use_module(library(lists)).
 :- user:ensure_loaded(library(terms)).
 :- user:ensure_loaded(library(base32)).
 
@@ -42,7 +53,7 @@
 :- dynamic(pfc_skipped_module/1).
 :-forall(current_module(CM),assert(pfc_skipped_module(CM))).
 :-retractall(pfc_skipped_module(pfc)).
-:-show_call(loading_module(X)),retractall(X).
+% :-show_call(loading_module(X)),retractall(X).
 
 :-listing(pfc_skipped_module/1).
 
@@ -141,7 +152,6 @@ pfc_maybe_skip(M):- asserta_if_new(pfc_skipped_module(M)),!.
 
 expanded_already_functor('$was_imported_kb_content$').
 expanded_already_functor(was_enabled).
-expanded_already_functor('$was_imported_kb_content$').
 expanded_already_functor(_:NV):-nonvar(NV),!,expanded_already_functor(NV).
 
 % expanded_already_functor(F):-mpred_prop(F,code).
@@ -151,14 +161,10 @@ expanded_already_functor(_:NV):-nonvar(NV),!,expanded_already_functor(NV).
 %is_compiling:-is_compiling_clause;compiling.
 
 
-
-
-pfc_prove_neg(G):-trace, \+ pfc_bc_caching(G), \+ pfc_fact(G).
-
 :- multifile(system:term_expansion/2).
 :- multifile(system:goal_expansion/2).
-system:goal_expansion(A,_B):-fail,notrace((source_module(M),(M=pfc_sanity;M=user;M=system),if_defined(pmsg(M:goal_expansion(A)),format(user_error,'~N% ~q~n',M:goal_expansion(A))))),fail.
-system:term_expansion(A,_B):-fail,notrace((source_module(M),(M=pfc_sanity;M=user;M=system),if_defined(pmsg(M:term_expansion(A)),format(user_error,'~N% ~q~n',M:term_expansion(A))))),fail.
+system:goal_expansion(A,_B):-fail,hotrace((source_module(M),(M=pfc_sanity;M=user;M=system),if_defined(pmsg(M:goal_expansion(A)),format(user_error,'~N% ~q~n',M:goal_expansion(A))))),fail.
+system:term_expansion(A,_B):-fail,hotrace((source_module(M),(M=pfc_sanity;M=user;M=system),if_defined(pmsg(M:term_expansion(A)),format(user_error,'~N% ~q~n',M:term_expansion(A))))),fail.
 
 system:goal_expansion(N,pfc_prove_neg(P)):-fail,pfc_from_negation_plus_holder(N,P),show_call_failure(mpred_prop(P,pfc_control)).
 
@@ -208,40 +214,468 @@ system:term_expansion((:- (M:DIR)),O):-atom(M),atom(DIR),with_source_module(M, (
 system:term_expansion((:- DIR),O):- atom(DIR), pfc_directive_expansion(DIR,OO),!,must(O=(:- OO)).
 
 
-system:term_expansion(A,BO):- fail, notrace((A\=(:-_),A\=end_of_file,current_predicate(pfc_file_loaded/0))), 
-   notrace((\+ thlocal:disable_mpred_term_expansions_locally, \+ thlocal:already_in_file_term_expansion,\+ (get_functor(A,F),expanded_already_functor(F)))),
+system:term_expansion(A,BO):- fail, hotrace((A\=(:-_),A\=end_of_file,current_predicate(pfc_file_loaded/0))), 
+   hotrace((\+ thlocal:disable_mpred_term_expansions_locally, \+ thlocal:already_in_file_term_expansion,\+ (get_functor(A,F),expanded_already_functor(F)))),
    ((source_file(I),must(loading_module(M);source_module(M)))),
    with_no_assertions(thlocal:consulting_sources, 
    with_source_module(M, loop_check(pfc_file_module_term_expansion(I,M,A,B)))),
    must(nonvar(B)),BO=B.
 
 
+
+
+
+pfc_file_expansion_0((P=>Q),(:- pfc_assert((P=>Q)))).
+% maybe reverse some rules?
+%pfc_file_expansion_0((P=>Q),(:- pfc_assert(('<='(Q,P))))).  % speed-up attempt
+pfc_file_expansion_0(('<='(P,Q)),(:- pfc_assert(('<='(P,Q))))).
+pfc_file_expansion_0((P<=>Q),(:- pfc_assert((P<=>Q)))).
+pfc_file_expansion_0((RuleName :::: Rule),(:- pfc_assert((RuleName :::: Rule)))).
+pfc_file_expansion_0((=>P),(:- pfc_assert((=>P)))).
+pfc_file_expansion_0(Fact,Output):- pfc_file_expansion_1(Fact,C),pfc_file_expansion_0(C,Output),!.
+% pfc_file_expansion_0(Fact,Output):- pfc_file_expansion_1(Fact,C),CALL=pfc_assert(C),must(CALL),Output='$was_imported_kb_content$'(Fact,CALL).
+pfc_file_expansion_0(Fact,Output):- get_functor(Fact,F,A),if_defined(functorDeclaresPred(F)),pfc_add(Fact),Output='$was_imported_kb_content$'(Fact,functorDeclaresPred(F)),!.
+pfc_file_expansion_0(Fact,Output):- get_functor(Fact,F,A),if_defined(functorDeclares(F)),pfc_add(Fact),Output='$was_imported_kb_content$'(Fact,functorDeclares(F)),!.
+pfc_file_expansion_0(Fact,Output):- get_functor(Fact,F,A),if_defined(prologMacroHead(F)),pfc_add(Fact),Output='$was_imported_kb_content$'(Fact,prologMacroHead(F)),!.
+pfc_file_expansion_0(Fact,Output):- get_functor(Fact,F,A),if_defined(pfcControlled(F)),pfc_add(Fact),Output='$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
+pfc_file_expansion_0(Fact,Output):- pfc_expand_in_file_anyways(F),!,
+     pfc_assert(Fact),Output='$was_imported_kb_content$'(Fact,pfc_expand_in_file_anyways(F)),!.
+
+stream_pos(File:C):-source_file(File),current_input_stream(S),line_count(S,C).
+compile_clause(CL):- make_dynamic(CL),must((assertz_if_new(CL),clause_asserted(CL))).
+
+make_dynamic(C):- compound(C),get_functor(C,F,A),
+  functor(P,F,A),
+  ( \+predicate_property(P,_) -> dynamic(F/A) ; (predicate_property(P,dynamic)->true;dynamic_safe(P))),!,
+  must((predicate_property(P,dynamic))).
+
+
+pfc_file_expansion_1((H:-Chain,B),(H=>{B})):- is_action_body(Chain),must(atom(Chain)),make_dynamic(H).
+pfc_file_expansion_1((H:-Chain,B),(H:-B)):- is_code_body(Chain),must(atom(Chain)),make_dynamic(H).
+pfc_file_expansion_1((H:-Chain,B),(B=>H)):- is_fc_body(Chain),must(atom(Chain)),make_dynamic(H).
+pfc_file_expansion_1((H:-Chain,B),(H<=B)):- is_bc_body(Chain),must(atom(Chain)),make_dynamic(H).
+
+
+pfc_expand_in_file_anyways(F):- pfc_using_file(F),must(loading_module(M);source_module(M)), (M=user; \+ pfc_skipped_module(M)),!.
+
+was_exported_content(I,CALL,Output):-Output='$was_imported_kb_content$'(I,CALL),!.
+
+:- thread_local(thlocal:pfc_term_expansion_ok/0).
+:- thread_local(thlocal:pfc_already_in_file_expansion/1).
+
+
+:- export(pfc_file_expansion/2).
+%:- module_transparent(pfc_file_expansion/2).
+pfc_file_expansion(I,OO):- compound(I),(I\=(:-(_))), I\= was_exported_content(_,_),
+   once(loop_check(pfc_file_expansion_0(I,O))),
+   I\=@=O, 
+   ((thlocal:pfc_term_expansion_ok -> nop(wdmsg((pfc_file_expansion(I,O)))) ; print_message(warning,wanted_pfc_term_expansion(I,O))),
+   ((O=(:-(CALL))) -> 
+      (current_predicate(_,CALL) -> ((must(CALL),was_exported_content(I,CALL,OO))); OO=O);
+      (OO = O))).
+
+:- multifile(system:term_expansion/2).
+%:- module_transparent(system:term_expansion/2).
+system:term_expansion(I,OO):- \+ thlocal:disable_mpred_term_expansions_locally, \+ thlocal:pfc_already_in_file_expansion(_), 
+  pfc:with_assertions(thlocal:pfc_already_in_file_expansion(I),pfc_file_expansion(I,OO)),!,
+  nop(dmsg(pfc_file_expansion(I,OO))).
+
+
+:-assert_if_new(thlocal:pfc_term_expansion_ok).
+
+
 :-export(pfc_file_loaded/0).
 pfc_file_loaded.
+
+
 
 
 end_of_file.
 
 
 
-:-if(current_module(pfc)).
-:-throw(loaded(pfc)).
-:-else.
-:-if(fail).
-:- module(pfc,[pfc_add/1,pfc_rem/1,
-          op(500,fx,('~')),op(1075,xfx,('=>')),
-          op(1075,xfx,('<=>')),op(1075,xfx,('<=')),
-          op(1100,fx,('=>')),
-          op(1150,xfx,('::::')),          
-         (<=>)/2,(=>)/2,(<=)/2,(=>)/1,(~)/1,
-      %   op(400,yfx,'\\\\'),op(1200,xfx,'-->>'),op(1200,xfx,'--*>>'), op(1200,xfx,'<<--'),
-          pfc_add/2]).
-:-endif.
+% :- include(pack(logicmoo_base/t/pfc_tests)).
 
-:- op(500,fx,('~')),op(1075,xfx,('=>')),
-          op(1075,xfx,('<=>')),op(1075,xfx,('<=')),
-          op(1100,fx,('=>')),
-          op(1150,xfx,('::::')).
+% :- run_tests.
+
+
+
+
+
+% -*-Prolog-*-
+
+
+/*
+:-if(current_predicate(compile_pfcg/0)).
+
+% -*-Prolog-*-
+
+
+:- dynamic ('-->>')/2.
+:- dynamic ('--*>>')/2.
+
+% a simple pfc dcg grammar.  requires dcg_pfc.pl
+
+% backward grammar rules.
+s(s(Np,Vp)) -->> np(Np), vp(Vp).
+
+vp(vp(V,Np)) -->> verb(V), np(Np).
+vp(vp(V)) -->> verb(V).
+vp(vp(VP,X)) -->> vp(VP), pp(X).
+
+np(np(N,D)) -->> det(D), noun(N).
+np(np(N)) -->> noun(N).
+np(np(Np,pp(Pp))) -->> np(Np), pp(Pp).
+
+pp(pp(P,Np)) -->> prep(P), np(Np).
+
+% forward grammar rules.
+P --*>>  [W],{cat(W,Cat),P =.. [Cat,W]}.
+
+% simple facts.
+cat(the,det).
+cat(a,det).
+cat(man,noun).
+cat(fish,noun).
+cat(eats,verb).
+cat(catches,verb).
+cat(in,prep).
+cat(on,prep).
+cat(house,noun).
+cat(table,noun).
+
+:-compile_pfcg.
+
+:-endif.
+*/
+/*
+% reflexive equality
+equal(A,B) => equal(B,A).
+equal(A,B),{ \\+ (A=B}),equal(B,C),{ \\+ (A=C)} => equal(A,C).
+
+notequal(A,B) <= notequal(B,A).
+notequal(C,B) <= equal(A,C),notequal(A,B).
+*/
+% -*-Prolog-*-
+
+or(P,Q) =>
+  (neg(P) => Q),
+  (neg(Q) => P).
+		
+prove_by_contradiction(P) :- P.
+prove_by_contradiction(P) :-
+  \+ (neg(P) ; P),
+  pfc_assert(neg(P)),
+  P -> pfc_rem1(neg(P))
+    ; (pfc_rem1(neg(P)),fail).
+
+/*
+=> or(p,q).
+=> (p ==> x).
+=> (q ==> x).
+*/
+
+% try :- prove_by_contradiction(x).
+
+or(P1,P2,P3) =>
+  (neg(P1), neg(P2) => P3),
+  (neg(P1), neg(P3) => P2),
+  (neg(P2), neg(P3) => P1).
+
+
+%= some simple tests to see if Pfc is working properly
+
+:- pfc_trace.
+
+
+% test5
+:-
+    pfc_assert([(faz(X), ~baz(Y)/{X=:=Y} => fazbaz(X)),
+         (fazbaz(X), go => found(X)),
+	 (found(X), {X>=100} => big(X)),
+	 (found(X), {X>=10,X<100} => medium(X)),
+	 (found(X), {X<10} => little(X)),
+	 faz(1),
+	 goAhead,
+	 baz(2),
+	 baz(1)
+	]).
+
+:-pfc_untrace.
+
+% :-trace.
+
+
+
+
+a=>z.
+=>a.
+% =>b. b=>z.
+
+%:-pfc_remove3(a).
+:-pfc_rem(a).
+% :-pfc_unfwc(a).
+% :-pfc_unfwc1(a).
+
+
+:-lsting([a,z]).
+
+
+:-dynamic((fly/1,bird/1,penguin/1)).
+
+% birds fly by pfc_default.
+=> pfc_default((bird(X) => fly(X))).
+
+% heres one way to do an subclass hierarchy.
+
+zenls(C1,C2) =>
+  {P1 =.. [C1,X],
+    P2 =.. [C2,X]},
+  (P1 => P2).
+
+=> zenls(canary,bird).
+
+% tweety is a canary.
+=> canary(tweety).
+:-lsting([neg/1,fly]).
+=> neg(fly(tweety)).
+:-lsting([neg/1,fly]).
+:- pfc_rem(neg(fly(tweety))).
+:-lsting([neg/1,fly]).
+
+%:-trace.
+
+=> zenls(penguin,bird).
+=> bird(chilly).
+% penguins do not fly.
+penguin(X) => neg(fly(X)).
+
+
+
+% chilly is a penguin.
+=> penguin(chilly).
+
+:-lsting([neg/1,fly,penguin,bird]).
+:-pfc_listing(chilly).
+%:-trace.
+
+:-pfc_rem(penguin(chilly)).
+
+:-lsting([neg/1,fly,penguin,bird]).
+:-pfc_listing(chilly).
+%:-trace.
+
+
+
+:-must(bird(chilly)).
+
+:-pfc_assert(fly(chilly)).
+
+:-lsting([neg/1,fly,penguin,bird]).
+%:-trace.
+
+:-pfc_rem1(fly(chilly)).
+
+:-lsting([neg/1,fly,penguin,bird]).
+%%:-trace.
+
+
+
+%= meta rules
+
+/*
+
+:- op(1050,xfx, ('==>') ).
+
+:- dynamic ( ('==>') /2).
+
+% ops5-like production:
+
+(Lsh ==> Rhs) =>  (Lsh => {Rhs}).
+
+:- op(1050,xfx,('==>')).
+
+(P ==> Q) =>
+  (P => Q),
+  (neg(Q) => neg(P)).
+
+*/
+
+
+% -*-Prolog-*-
+
+%= meta rules
+
+:- op(1050,xfx,('==>')).
+
+:- dynamic (('==>')/2).
+
+% ops5-like production:
+
+(Lsh ==> Rhs) =>  (Lsh => {Rhs}).
+
+% asserting mpred_sv(p) cuases p/2 to be treated as a mpred_sv, i.e.
+% if p(foo,1)) is a fact and we assert p(foo,2), then the forrmer assertion
+% is retracted.
+
+/*
+mpred_sv(P)
+  =>
+  {P =.. [Pred,Arg1,Arg2],
+  P2 =.. [Pred,Arg1,Arg3]},
+  (P,{P2,Arg2 \== Arg3} => {pfc_rem2(P2)}).
+*/
+
+% remove assertions about satisfied goals.
+goal(Goal), Goal =>  {pfc_rem2(goal(Goal))}.
+
+% if someone picks up an object, then it is no longer "on" anything.
+hold(_Actor,Object) => {pfc_rem2(on(Object,_))}.
+
+% objects that aren't being held or on something end up on the floor.
+
+object(Object),
+~on(Object,X)/(X\==floor),
+~hold(_,Object)
+ =>
+{on(Object,floor);format("~n~w falls to the floor.",[Object])},
+on(Object,floor).
+
+
+% This accomplishes moving an actor from XY1 to XY2, taking a help
+% object along.
+
+goal(moveto(Actor,From,To))
+  =>
+  {pfc_rem2(at(Actor,From)),
+   pfc_assert(at(Actor,To)),
+   (hold(Actor,Object) -> pfc_assert(at(Object,To)) ; true),
+   pfc_rem2(goal(moveto(Actor,From,To)))}.
+
+
+% if X is reported to be on some new object Obj2, remove the assertion
+% that it was on Obj1.
+
+=> mpred_sv(at(_,_)).
+
+at(X,Y) => {format("~n~w now at ~w",[X,Y])}.
+
+
+=> mpred_sv(on(_,_)).
+
+on(X,Y) => {format("~n~w now on ~w",[X,Y])}.
+
+% monkey and bananas problem in Pfc
+
+% jump to the floor.
+goal(on(Actor,floor)) ==>
+  format("~n~w jumps onto the floor",[Actor]),
+  pfc_assert(on(Actor,floor)).
+
+goal(on(Actor,X)),
+at(Actor,Loc),
+at(X,Loc),
+~hold(Actor,_)
+  ==>
+  format("~n~w climbs onto ~w.",[Actor,X]),
+  pfc_assert(on(Actor,X)).
+
+goal(hold(Actor,Object)),
+weight(Object,light),
+at(Object,XY)
+=>
+
+ (~at(Actor,XY)  =>  {pfc_assert(goal(at(Actor,XY)))}),
+
+ (~on(Object,ceiling),at(Actor,XY)
+  =>
+  {format("~n~w picks up ~w.",[Actor,Object])},
+  {pfc_assert(hold(Actor,Object))}),
+
+ (on(Object,ceiling), at(ladder,XY)
+  =>
+     (~on(Actor, ladder)
+      =>
+      {format("~n~w wants to climb ladder to get to ~w.",[Actor,Object]),
+       pfc_assert(goal(on(Actor,ladder)))}),
+
+     (on(Actor,ladder)
+      =>
+      {format("~n~w climbs ladder and grabs ~w.",[Actor,Object]),
+       hold(Actor,Object)})),
+  
+ (on(Object,ceiling), ~at(ladder,XY)
+  =>
+  {format("~n~w wants to move ladder to ~w.",[Actor,XY]),
+  pfc_assert(goal(move(Actor,ladder,XY)))}).
+
+
+goal(at(Actor,XY)),
+at(Actor,XY2)/(XY \== XY2)
+ =>
+{format("~n~w wants to move from ~w to ~w",[Actor,XY2,XY]),
+ pfc_assert(goal(moveto(Actor,XY2,XY)))}.
+
+(goal(on(Actor,Object)) ; goal(hold(Actor,Object))),
+at(Object,XY),
+at(Actor,XY),
+hold(Actor,Object2)/(Object2 \== Object)
+  =>
+{format("~n~w releases ~w.",[Actor,Object2]),
+ pfc_rem2(hold(Actor,Object2))}.
+
+goal(move(Actor,Object,Destination)),
+hold(Actor,Object),
+at(Actor,XY)/(XY \== Destination)
+ =>
+goal(moveto(Actor,XY,Destination)).
+
+goal(move(Actor,Object,_Destination)),
+~hold(Actor,Object)
+ =>
+goal(hold(Actor,Object)).
+
+
+% predicates to describe what's going on.
+% goal(...
+
+
+% here's how to do it:
+start :-
+
+  pfc_assert(object(bananas)),
+  pfc_assert(weight(bananas,light)),
+  pfc_assert(at(bananas,(9,9))),
+  pfc_assert(on(bananas,ceiling)),
+
+  pfc_assert(object(couch)),
+  pfc_assert(wieght(couch,heavy)),
+  pfc_assert(at(couch,(7,7))),
+  pfc_assert(on(couch,floor)),
+
+  pfc_assert(object(ladder)),
+  pfc_assert(weight(ladder,light)),
+  pfc_assert(at(ladder,(4,3))),
+  pfc_assert(on(ladder,floor)),
+
+  pfc_assert(object(blanket)),
+  pfc_assert(weight(blanket,light)),
+  pfc_assert(at(blanket,(7,7))),
+
+  pfc_assert(object(monkey)),
+  pfc_assert(on(monkey,couch)),
+  pfc_assert(at(monkey,(7,7))),
+  pfc_assert(hold(monkey,blanket)).
+
+% go. to get started.
+go :- pfc_assert(goal(hold(monkey,bananas))).
+
+db :- listing([object,at,on,hold,weight,goal]).
+
+
+
+end_of_file.
+
 
 
 :- dynamic(user:isa/2).
