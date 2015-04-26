@@ -141,6 +141,9 @@ get_when(When):-current_input(S),findall(NV,stream_property(S,NV),When),!.
 get_when(M):-context_module(M),!.
 get_when(user):-!.
 
+to_isa_out(I,C,OUT):-new_was_isa,!,(atom(C)->OUT=..[C,I];OUT=t(C,I)).
+to_isa_out(I,C,isa(I,C)).
+
 
 was_isa0('$VAR'(_),_,_):-!,fail.
 was_isa0(isa(I,C),I,C):-!.

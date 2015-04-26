@@ -139,73 +139,11 @@ tf_result(Call,TF):-(Call->TF=true;TF=fail).
 :- meta_predicate(if_result(0,0)).
 if_result(TF,Call):-(TF->Call;true).
 
+
+
 % ========================================
 % is_holds_true/is_holds_false
 % ========================================
-
-:- user:mpred_mod(M),export((
-          % M:t/1,
-          M:t/2,
-          M:t/3,
-          M:t/4,
-          M:t/5,
-          M:t/6,
-          M:t/7,
-          M:t/8,
-          M:t/9,
-          M:t/10,
-          M:t/11)).
-
-:- user:mpred_mod(M),export((
-          % M:holds_t/1,
-          M:holds_t/2,
-          M:holds_t/3,
-          M:holds_t/4,
-          M:holds_t/5,
-          M:holds_t/6,
-          M:holds_t/7,
-          M:holds_t/8,
-          M:holds_t/9,
-          M:holds_t/10,
-          M:holds_t/11)).
-
-
-:-export((t/1,tE/2)).
-:- dynamic((
-         % t/1,
-          t/2,
-          t/3,
-          t/4,
-          t/5,
-          t/6,
-          t/7,
-          t/8,
-          t/9,
-          t/10,
-          t/11,
-        %  asserted_mpred_t/1,
-          asserted_mpred_t/2,
-          asserted_mpred_t/3,
-          asserted_mpred_t/4,
-          asserted_mpred_t/5,
-          asserted_mpred_t/6,
-          asserted_mpred_t/7,
-          assertion_f/1,
-          assertion_t/1,
-        %  asserted_mpred_f/1,
-          asserted_mpred_f/2,
-          asserted_mpred_f/3,
-          asserted_mpred_f/4,
-          asserted_mpred_f/5,
-          asserted_mpred_f/6,
-          asserted_mpred_f/7,
-         % mpred_f/1,
-          mpred_f/2,
-          mpred_f/3,
-          mpred_f/4,
-          mpred_f/5,
-          mpred_f/6,
-          mpred_f/7)).
 
 
 :-export(into_plist/2).

@@ -32,6 +32,19 @@ Writing in Prolog is actually really easy for a MUD is when the length's chosen
 % Douglas Miles
 */
 
+db_expand_0123(_,NC,NC):- as_is_term(NC),!.
+db_expand_0123(Op,IN,OUT):-db_expand_0(Op,IN,MID),db_expand_3c(Op,MID,M1),into_mpred_form(M1,OUT).
+%db_expand_23fast(_,NC,NC):- as_is_term(NC),!.
+%db_expand_23fast(Op,IN,OUT):-expand_props(Op,IN,IN1),db_expand_3(Op,IN1,M1)
+
+
+list_to_conjuncts([],true).
+list_to_conjuncts([H],HH):-list_to_conjuncts(H,HH).
+list_to_conjuncts([H|T],Body):-!,
+    list_to_conjuncts(H,HH),
+    list_to_conjuncts(T,TT),
+    pfc_conjoin(HH,TT,Body).
+list_to_conjuncts(H,H).
 
 expand_to_hb((HH:-BB),HH,BB):-!.
 expand_to_hb(HH,HH,true).
@@ -128,7 +141,9 @@ db_expand_term(Op,SI,SentO):-
        transitive(db_expand_chain(Op),SI,S0),!,
        transitive(db_expand_z(Op),S0,S1),!,
        transitive(db_expand_1(Op),S1,S2),!,transitive(db_expand_2(Op),S2,S3),!,
-       transitive(db_expand_3(Op),S3,S4),!,transitive(db_expand_4(Op),S4,S5),!,
+       transitive(db_expand_3(Op),S3,S3a),!,
+       transitive(db_expand_3b(Op),S3a,S4),!,
+       transitive(db_expand_4(Op),S4,S5),!,
        transitive(db_expand_5(Op),S5,SentO).
 
 pfc_expand(PfcRule,Out):-compound(PfcRule),functor(PfcRule,F,A),pfc_database_term(F/A),
@@ -219,13 +234,18 @@ db_expand_1(change(_,_),Sent,SentO):-not_ftVar(Sent),user:ruleRewrite(Sent,SentO
 db_expand_2(_ ,NC,NC):- as_is_term(NC),!.
 db_expand_2(Op,Sent,SentO):-expand_props(Op,Sent,SentO),Sent\=@=SentO,!.
 
+db_expand_3(Op,Sent,SentO):-db_expand_final(Op ,Sent,SentO),!.
+db_expand_3(Op,Sent,SentO):-db_expand_3a(Op,Sent,SentO).
+db_expand_3(Op,Sent,SentO):-db_expand_3b(Op,Sent,SentO).
+db_expand_3(Op,Sent,SentO):-db_expand_3c(Op,Sent,SentO).
 
-db_expand_3(Op ,Sent,SentO):-db_expand_final(Op ,Sent,SentO),!.
-db_expand_3(Op,G,OUT):- G=..[Pred,InstFn,VO],InstFn=isInstFn(Type),nonvar(Type),GO=..[relationMostInstance,Pred,Type,VO],db_expand_3(Op,GO,OUT).
-%db_expand_3(Op,G,OUT):- G=..[Pred,InstFn|VO],InstFn=isInstFn(Type),nonvar(Type),GO=..[Pred,Type|VO],db_expand_3(Op,GO,OUT).
-db_expand_3(Op,RDF,OUT):- RDF=..[SVO,S,V,O],is_svo_functor(SVO),!,must_det(into_expand_mpred_form(Op,[t,V,S,O],OUT)).
-db_expand_3(_Op,Sent,SentO):-once(into_mpred_form(Sent,SentO)).
-db_expand_3(_Op,Sent,SentO):-once(transform_holds(t,Sent,SentO)).
+
+db_expand_3a(Op,G,OUT):- G=..[Pred,InstFn,VO],InstFn=isInstFn(Type),nonvar(Type),GO=..[relationMostInstance,Pred,Type,VO],db_expand_3b(Op,GO,OUT).
+%db_expand_3a(Op,G,OUT):- G=..[Pred,InstFn|VO],InstFn=isInstFn(Type),nonvar(Type),GO=..[Pred,Type|VO],db_expand_3b(Op,GO,OUT).
+db_expand_3a(Op,RDF,OUT):- RDF=..[SVO,S,V,O],is_svo_functor(SVO),!,must_det(into_expand_mpred_form(Op,[t,V,S,O],OUT)).
+
+db_expand_3b(_Op,Sent,SentO):-once(into_mpred_form(Sent,SentO)).
+db_expand_3c(_Op,Sent,SentO):-once(transform_holds(t,Sent,SentO)).
 
 db_expand_4(_ ,NC,NC):- as_is_term(NC),!.
 % db_expand_4(_,A,B):-thglobal:pfcManageHybrids,!,A=B.

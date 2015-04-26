@@ -369,3 +369,4 @@ isac_gen(Y, [H|List]):-isa(Y,H),!,isac_gen(Y, List).
 isac:attribute_goals(X) -->
       { get_attr(X, isac, List) },
       [isac(X, List)].
+

@@ -1696,7 +1696,7 @@ pfcConnective('-').
 pfcConnective('~').
 pfcConnective(('\\+')).
 pfcConnective(neg):-!,fail.
-pfcConnective(F):- loop_check(if_defined(is_logical_functor(F))).
+pfcConnective(F) :- loop_check(if_defined(is_logical_functor(F))).
 
 :-dynamic((~)/1).
 :-dynamic((neg)/1).

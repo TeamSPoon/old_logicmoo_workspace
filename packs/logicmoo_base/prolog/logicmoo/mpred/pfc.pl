@@ -5,6 +5,7 @@
 %   Purpose: consult system file for ensure
 
 
+
 % ======================= pfc_file('pfccore').	% core of Pfc.
 
 %   File   : pfccore.pl
@@ -63,6 +64,62 @@ compiled(F/A):- dynamic(F/A),compile_predicates([F/A]).
 :- dynamic(pfc_debugging/0).
 :- dynamic(pfc_select/2).
 :- dynamic(pfc_search/1).
+
+
+to_assertable((P=>Q),was_new_rule((P=>Q))):-!.
+to_assertable((P<=Q),was_new_rule((P<=Q))):-!.
+to_assertable((P<=>Q),was_new_rule((P<=>Q))):-!.
+to_assertable(P,P).
+
+to_addable_form_wte(P0,P):-to_addable_form(P0,P),!, (((([P0]\=@=P,\+functor(P,_,1))->dmsg(to_addable_form([P0],(->),P));true))).
+to_addable_form_wte(P0,P):-
+  with_assertions(thlocal:pfc_already_in_file_expansion(P0),
+    ((once(to_addable_form(P0,P1)),expand_term(P1,P)))),!,
+  ((((P0\=@=P,\+functor(P,_,1))->dmsg(to_addable_form(P0,(->),P));true))).
+
+retract_eq_quitely((H:-B)):-ignore((clause(H,B,Ref),clause(HH,BB,Ref),H=@=HH,B=@=BB,!,erase(Ref))).
+retract_eq_quitely((H)):-ignore((clause(H,true,Ref),clause(HH,BB,Ref),H=@=HH,BB==true,!,erase(Ref))).
+assert_eq_quitely(H):-assert_if_new(H).
+
+to_addable_form(I,O):- current_predicate(logicmoo_i_term_expansion_file/0),fully_expand(_,I,II),once((into_mpred_form(II,M),to_predicate_isas_each(M,O))),!.
+%to_addable_form(I,O):- current_predicate(logicmoo_i_term_expansion_file/0),once((into_mpred_form(I,M),to_predicate_isas_each(M,O))),!.
+to_addable_form(I,O):- to_predicate_isas_each(I,O),!.
+
+to_predicate_isas_each(I,O):-decompress_each(I,M),maplist(to_predicate_isas,M,O),!.
+to_predicate_isas_each(I,O):-trace,to_predicate_isas(I,O).
+
+decompress_each(I,O):- findall(M,do_expand_args(isEach,I,M),O),!.
+
+to_predicate_isas(V,V):-not(compound(V)),!.
+to_predicate_isas([H|T],[HH|TT]):-!,to_predicate_isas(H,HH),to_predicate_isas(T,TT),!.
+to_predicate_isas((H,T),(HH,TT)):-!,to_predicate_isas(H,HH),to_predicate_isas(T,TT),!.
+%to_predicate_isas(I,I):-contains_term(S,I),nonvar(S),exact_args(S),!.
+to_predicate_isas(I,O):-to_predicate_isas0(I,O).
+
+to_predicate_isas0(V,V):-not(compound(V)),!.
+to_predicate_isas0({V},{V}):-!.
+to_predicate_isas0(eXact(V),V):-!.
+to_predicate_isas0(isa(I,C),V):-!,atom(C)->V=..[C,I];V=t(C,I).
+to_predicate_isas0(C,C):-exact_args(C),!.
+to_predicate_isas0([H|T],[HH|TT]):-!,to_predicate_isas0(H,HH),to_predicate_isas0(T,TT),!.
+to_predicate_isas0(C,CO):-C=..[F|CL],maplist(to_predicate_isas0,CL,CLO),!,CO=..[F|CLO].
+
+:-source_location(F,_),asserta(absolute_source_location_pfc(F)).
+
+exact_args(asserted(_)).
+exact_args(retract_eq_quitely(_)).
+exact_args(asserts_eq_quitely(_)).
+exact_args(assertz_if_new(_)).
+exact_args((_:-_)).
+exact_args((_ =.. _)).
+exact_args((:-( _))).
+exact_args((A/B)):- (var(A);var(B)).
+exact_args(pfc_add(_)).
+exact_args(dynamic(_)).
+exact_args(cwc).
+exact_args(true).
+% exact_args(C):-source_file(C,I),absolute_source_location_pfc(I).
+
 
 
 
@@ -325,13 +382,10 @@ pfc_add_fast(P):-pfc_assert_fast(P).
 
 %= pfc_assert(P,S) asserts P into the user''s dataBase with support from S.
 pfc_assert(P) :- 
-  with_assertions(thlocal:pfc_already_in_file_expansion(P),expand_term(P,P0)),
-  pfc_assert_fast(P0).
+  pfc_assert_fast(P).
 
 pfc_assert(P,S) :- 
-  with_assertions(thlocal:pfc_already_in_file_expansion(P),expand_term(P,P0)),
-  to_addable_form(P0,P1),
-  pfc_assert_fast(P1,S).
+  pfc_assert_fast(P,S).
 
 
 pfc_assert_fast(P0):-pfc_assert_fast(P0,(u,u)).
@@ -345,55 +399,6 @@ pfc_assert_fast(P,S) :-
 %pfc_assert_fast(_,_).
 %pfc_assert_fast(P,S) :- pfc_warn("pfc_assert_fast(~w,~w) failed",[P,S]).
 
-
-decompress_each(I,O):- findall(M,do_expand_args(isEach,I,M),O),!.
-
-compress_isa_each(I,O):-decompress_each(I,M),maplist(compress_isa,M,O),!.
-compress_isa_each(I,O):-compress_isa(I,O).
-
-compress_isa(V,V):-not(compound(V)),!.
-compress_isa([H|T],[HH|TT]):-!,compress_isa(H,HH),compress_isa(T,TT),!.
-compress_isa((H,T),(HH,TT)):-!,compress_isa(H,HH),compress_isa(T,TT),!.
-compress_isa(I,I):-contains_term(S,I),nonvar(S),exact_args(S),!.
-compress_isa(I,O):-compress_isa0(I,O).
-
-
-compress_isa0(V,V):-not(compound(V)),!.
-compress_isa0({V},{V}):-!.
-compress_isa0(eXact(V),V):-!.
-compress_isa0(isa(I,C),V):-!,atom(C)->V=..[C,I];V=isa(I,C).
-compress_isa0(C,C):-exact_args(C),!.
-compress_isa0([H|T],[HH|TT]):-!,compress_isa0(H,HH),compress_isa0(T,TT),!.
-compress_isa0(C,CO):-C=..[F|CL],maplist(compress_isa0,CL,CLO),!,CO=..[F|CLO].
-
-:-source_location(F,_),asserta(absolute_source_location_pfc(F)).
-
-exact_args(asserted(_)).
-exact_args(retract_eq_quitely(_)).
-exact_args(asserts_eq_quitely(_)).
-exact_args(assertz_if_new(_)).
-exact_args((_:-_)).
-exact_args((_ =.. _)).
-exact_args((:-( _))).
-exact_args((A/B)):- (var(A);var(B)).
-exact_args(pfc_add(_)).
-exact_args(dynamic(_)).
-exact_args(cwc).
-exact_args(true).
-exact_args(C):-source_file(C,I),absolute_source_location_pfc(I).
-
-to_addable_form(I,O):- current_predicate(logicmoo_i_term_expansion_file/0),once((into_mpred_form(I,M),compress_isa_each(M,O))),!.
-to_addable_form(I,O):- compress_isa_each(I,O),!.
-
-to_assertable(I,OO):-compress_isa(I,M),to_assertable0(M,OO).
-to_assertable0((P=>Q),was_new((P=>Q))):-!.
-to_assertable0((P<=Q),was_new((P<=Q))):-!.
-to_assertable0((P<=>Q),was_new((P<=>Q))):-!.
-to_assertable0(P,P).
-
-retract_eq_quitely((H:-B)):-ignore((clause(H,B,Ref),clause(HH,BB,Ref),H=@=HH,B=@=BB,!,erase(Ref))).
-retract_eq_quitely((H)):-ignore((clause(H,true,Ref),clause(HH,BB,Ref),H=@=HH,BB==true,!,erase(Ref))).
-assert_eq_quitely(H):-assert_if_new(H).
 
 % pfc_post(+Ps,+S) tries to assert a fact or set of fact to the database.  For
 % each fact (or the singelton) pfc_post1 is called. It always succeeds.
@@ -409,9 +414,13 @@ pfc_post(P,S) :-
 % pfc_post1(+P,+S) tries to assert a fact to the database, and, if it succeeded,
 % adds an entry to the pfc queue for subsequent forward chaining.
 % It always succeeds.
-pfc_post1(P,S):-
- compress_isa_each(P,PE),maplist(pfc_post1_sp(S),PE).
+pfc_post1(P0,S):-
+  to_addable_form_wte(P0,P),
+      (is_list(P)
+        ->maplist(pfc_post1_sp(S),P);
+       pfc_post1_sp(S,P)).
 
+pfc_post1_sp(S,P) :- nonvar(P),P=(P1,P2),!,pfc_post1_sp(S,(P1)),pfc_post1_sp(S,(P2)).
 pfc_post1_sp(S,P) :-
   dynamic(P),
   %= db pfc_add_db_to_head(P,P2),
@@ -419,14 +428,14 @@ pfc_post1_sp(S,P) :-
   pfc_add_support(P,S),
   to_assertable(P,AP),
   pfc_unique_u(AP),
-  show_call(assert_u(AP)),
+  assert_u(AP),
   pfc_trace_add(P,S),
   !,
   pfc_enqueue(P,S),
   !.
 
 pfc_post1_sp(_,_).
-%=pfc_post1_sp(S,P) :-  pfc_warn("pfc_post1_ps(~w,~w) failed",[P,S]).
+%=pfc_post1_sp(S,P) :-  pfc_warn("pfc_post1(~w,~w) failed",[P,S]).
 
 
 % was nothing  pfc_current_db/1.
@@ -573,7 +582,7 @@ pfc_add_trigger(_Sup,pt(Trigger,Body),Support) :-
   !,
   pfc_trace_msg('~N%       Adding p-trigger ~q~n',
 		[pt(Trigger,Body)]),
-  pfc_assert_i(pt(Trigger,Body),Support),
+  pfc_assert_i(pt(Trigger,Body),Support),   
    pfc_mark_as(Trigger,pfcPosTrigger),
   copy_term(pt(Trigger,Body),Tcopy),
   pfc_call(Trigger),
@@ -1284,9 +1293,10 @@ build_rhs(X,[X2]) :-
 pfc_compile_rhsTerm((P/C),((P:-C))) :- !,pfc_mark_as(P,pfcRHS).
 
 pfc_compile_rhsTerm(P,P):- pfc_mark_as(P,pfcRHS).
-
-pfc_mark_as(neg(P),Type):-nonvar(P),!,get_functor(P,F,A),pfc_add_fast([arity(F,A),pfcMark(Type,neg,F,A)]).
-pfc_mark_as(P,Type):-get_functor(P,F,A),pfc_mark_fa_as(F,A,Type).
+pfc_mark_as(P,_):-var(P),!.
+pfc_mark_as(neg(P),Type):-var(P)->true;(get_functor(P,F,A),pfc_add_fast([arity(F,A),pfcMark(Type,neg,F,A)])).
+pfc_mark_as(P,Type):-copy_term(P,P0),numbervars(P0,0,_,[attvar(bind)]),pfc_mark_as0(P0,Type).
+pfc_mark_as0(P,Type):-get_functor(P,F,A),pfc_mark_fa_as(F,A,Type).
 
 pfc_mark_fa_as(isa,_,_):- !.
 pfc_mark_fa_as(arity,_,_):- !.
@@ -1542,7 +1552,7 @@ pfc_trigger_key(X,X).
 %   Author :  Dan Corpron
 %   Updated: 10/11/87, ...
 %   Purpose: predicates to manipulate a pfc database (e.g. save,
-%=	restore, reset, etc.0
+%=	restore, reset, etc).
 
 % pfc_database_term(P/A) is true iff P/A is something that pfc adds to
 % the database and should not be present in an empty pfc database
@@ -1631,7 +1641,6 @@ pp_facts(P,C) :-
 
 draw_line:- format("~N%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%~n",[]).
 
-%= printitems clobbers it''s arguments - beware!
 
 pp_items([]).
 pp_items([H|T]) :-
@@ -1642,13 +1651,21 @@ pp_items(H) :- pp_item(H).
 pp_item(P):-pp_item("",P).
 pp_item(M,O):- (\+ \+ (numbervars(M:O),pp_item0(M,O))),!.
 
-pp_item0(M,spft(W,U,U)):-!,pp_item0(M,U:W).
+
 pp_item0(M,(H:-true)):-pp_item0(M,H).
-pp_item0(M,spft(P,F,T)):-!,format('~N% ~w   d:~q    <== ~q <==> ~q~n', [M,P,F,T]).
+pp_item0(M,was_new_rule(H)):-pp_item0(M,H).
+pp_item0(M,spft(W,U,U)):-!,pp_item0(M,U:W).
+pp_item0(M,spft(W,F,U)):- atom(U),!,
+  format('~N%~n',[]),pp_item0(M,U:W),
+        format('~N%   rule: ~q~n%~n', [F]),!.
+pp_item0(M,spft(W,F,U)):-!,
+                                  format('~N% ~w~n%   d:       ~q~n%   format:    ~q~n', [M,W,F]),
+  pp_item0(M,U).
+pp_item0(M,U:W):- !,sformat(SM,'~w  ~w:',[M,U]),!, pp_item0(SM,W).
 pp_item0(M,nt(Trigger,Test,Body)) :- !, format('~N%  ~w n-trigger: ~q~n%       test: ~q~n%       body: ~q~n', [M,Trigger,Test,Body]).
-pp_item0(M,pt(F,Body)):-              !,format('~N%  ~w p-trigger: ~q~n%       body: ~q~n', [M,F,Body]).
+pp_item0(M,pt(F,Body)):-              !,format('~N%  ~w p-trigger: ~q~n%       body:~n', [M,F]),dmsg(Body).
 pp_item0(M,bt(F,Body)):-              !,format('~N%  ~w b-trigger: ~q~n%       body: ~q~n', [M,F,Body]).
-pp_item0(M,H):- \+ \+ numbervars(M:H),format("~N%   ~w ~w~n",[M,H]).
+pp_item0(M,H):- \+ \+ numbervars(M:H),  format("~N%   ~w ~q~n",[M,H]).
 
 pfc_classify_facts([],[],[],[]).
 
@@ -1700,18 +1717,23 @@ get_pi(F/A,PI):-functor(PI,F,A).
 get_pi(PI,PI):-!.
 get_pi(Mask,PI):-get_functor(Mask,F,A),functor(PI,F,A),!.
 
-print_db_items(Title,Mask,What0):-
+print_db_items(Title,Mask,What0):-print_db_items(Title,Mask,Mask,What0).
+print_db_items(Title,Mask,SHOW,What0):-
      get_pi(Mask,H),
      get_pi(What0,What),
-     \+ \+ (clause(H,B),pfc_contains_term(What,(H:-B))),!,
-     draw_line, 
-     format("~N% ~w for ~q...~n",[Title,What]),
-     doall((clause(H,B),pfc_contains_term(What,(H:-B)),pp_item((H:-B)))),
-     draw_line.
-print_db_items(_,_,_).
+     flag(print_db_items,_,0),     
+     doall((clause(H,B),
+      pfc_contains_term(What,(H:-B)),
+      flag(print_db_items,LI,LI+1),
+      once(LI==0->(draw_line,format("~N% ~w for ~q...~n",[Title,What]));true),
+        pp_item((SHOW)))),
+      (flag(linenum,LI,LI),LI>0->draw_line;true).
+print_db_items(_,_,_,_).
 
-pfc_contains_term(What,Inside):-compound(What),!,(\+ \+ ((numbervars(Inside),contains_term(What,Inside)))).
-pfc_contains_term(What,Inside):- (\+ \+ ((subst(Inside,What,found,Diff),Diff \=@= Inside ))).
+pfc_contains_term(What,Inside):-compound(What),!,
+  (\+ \+ ((numbervars(Inside),contains_term(What,Inside)))).
+pfc_contains_term(What,Inside):- (\+ \+ ((numbervars(Inside),contains_term(In,Inside),                
+                       (compound(In)->(functor(In,F,_),F=What);What=Inside)))).
 
 user:listing_mpred_hook(What):- debugOnError(pfc_listing(What)).
 
@@ -1730,15 +1752,14 @@ pfc_listing_1(What):-
    print_db_items("Positive triggers",pt(_,_),What),
    print_db_items("Negative triggers", nt(_,_,_),What),
    print_db_items("Goal triggers",bt(_,_),What),
-   print_db_items("Forward Rules",(_=>_),What),
-   print_db_items("Bidirectional Rules",(_<=>_),What), 
-   print_db_items("Backchaining Rules",(_<=_),What),
-   print_db_items("Forward Facts",(=>(_)),What),
+   print_db_items("Forward Rules",was_new_rule(A=>B),What),
+   print_db_items("Bidirectional Rules",was_new_rule(A<=>B),What), 
+   print_db_items("Backchaining Rules",was_new_rule(A<=B),What),
+   print_db_items("Forward Facts",was_new_rule(=>(A)),(=>(A)),What),
    dif(A,B),print_db_items("Pfc Supports",spft(_,A,B),What),
    dif(G,u),print_db_items("Non-user/God Facts",spft(_,G,G),What),
    print_db_items("User Supported Facts",spft(_,u,u),What),
-   
-  
+
    !.     
 
 %= pfc_fact(P) is true if fact P was asserted into the database via pfc_assert.

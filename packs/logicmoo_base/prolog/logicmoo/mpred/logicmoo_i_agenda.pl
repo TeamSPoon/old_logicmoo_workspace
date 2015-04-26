@@ -158,11 +158,11 @@ onSpawn(ClassFact):- ClassFact=..[Funct,InstA],
 onSpawn(ClassFact):- ClassFact=..[Funct|InstADeclB],must_det(onSpawn_f_args(Funct,InstADeclB)).
 
 onSpawn_f_args(Funct,List):-
- with_assertions(deduceArgTypes(Funct),
-  (convertSpawnArgs(Funct,1,List,NewList),
+  convertSpawnArgs(Funct,1,List,NewList),
    Later =.. [t,Funct|NewList],
    add(Later),
-  call_after_mpred_load_slow(with_assertions(deduceArgTypes(Funct), add(Later))))),!.
+  !. 
+  % call_after_mpred_load_slow(with_assertions(deduceArgTypes(Funct), add(Later))))),!.
 
 convertSpawnArgs(_,_,[],[]).
 convertSpawnArgs(Funct,N,[A|List],[O|NewList]):-
@@ -257,7 +257,6 @@ gather_fact_heads(M,H):- (nonvar(M)->true; member(M,[dbase,moo,world,user,hook])
 
 
 
-
 :-export(begin_prolog_source/0).
 :-export(end_prolog_source/0).
 begin_prolog_source:- must_det(asserta(thlocal:in_prolog_source_code)).
@@ -297,8 +296,11 @@ createByNameMangle0(OType,InstA,Type):- create_from_type(OType,InstA,Type),!.
 createByNameMangle0(InstA,IDA,InstA):- gensym(InstA,IDA), englishServerInterface([actCreate,InstA,IDA]).
 
 
-create_from_type(OType,InstA,Type):-sanity(var(InstA)),i_name(t,OType,Type),atom_concat(Type,'7',InstA7),i_name(i,InstA7,InstA),must_det(assert_isa(InstA,Type)), 
- call_after_mpred_load_slow(isa(InstA,Type)).
+create_from_type(OType,InstA,Type):- sanity(var(InstA)),
+   i_name(t,OType,Type),atom_concat(Type,'7',InstA7),
+   i_name(i,InstA7,InstA),
+   must_det(assert_isa(InstA,Type)),!. 
+ % call_after_mpred_load_slow(isa(InstA,Type)).
 
 wfAssert(X):-add(X). % add_later(X).
 

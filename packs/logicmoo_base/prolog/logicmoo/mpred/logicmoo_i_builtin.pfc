@@ -86,15 +86,19 @@ typeGenls(ttPredType,tPred).
 ttPredType(X)=>tCol(X).
 
 tSet(ttFormatType).
-isa(I,C):-pfc_univ(C,I,CI),CI.
 
-(tCol(C)/(atom(C),Head=..[C,I]) => ({decl_type(C)},asserted(pfc_univ(C,I,Head)),
+isa(I,C):-pfc_univ(C,I,CI),call(CI).
+
+((tCol(C)/(atom(C),Head=..[C,I])) => (({decl_type(C)},asserted(pfc_univ(C,I,Head)),
                                     {dynamic(C/1)},asserted((Head:-loop_check(isa(I,C)))),
-                                    (isa(I,C)/nonvar(I)=>Head,{nop((retract_eq_quitely(isa(I,C))))}))).
+                                    ((isa(I,C)/nonvar(I)=>Head,{nop((retract_eq_quitely(isa(I,C))))}))))).
 
 %tCol(X) => isa(X,tCol).
 %tCol(X) => ruleRewrite(t(X,I),isa(I,X)).
 
+
+%typeProps(tCoffeeCup,[mudColor(vBlack),mudColor(isEach(vBrown,vBlack)),mudSize(vSmall),mudShape(vCuplike),mudMaterial(vGlass),mudTexture(vSmooth)]).
+%props(iCoffeeCup7,[mudColor(vBlack),mudColor(isEach(vBrown,vBlack)),mudSize(vSmall),mudShape(vCuplike),mudMaterial(vGlass),mudTexture(vSmooth)]).
 
 =>tSet(tSet).
 
@@ -277,10 +281,6 @@ prologOnly(pfc_select/2).
 tCol(tPred).
 prologHybrid(isa/2).
 
-system:term_expansion(A,B):- \+  thlocal:disable_mpred_term_expansions_locally,
-  current_predicate(pfcExpansion_loaded/0),loop_check(pfc_file_expansion(A,B)),A\=@=B,
-  nop(dmsg(pfc_file_expansion_base(IN,WHY))).
-
 mpred_online:semweb_startup:- with_no_term_expansions(if_file_exists(user:ensure_loaded(logicmoo(dbase/mpred_i_rdf_store)))).
 
 :- with_no_term_expansions(if_file_exists(user:ensure_loaded(logicmoo(mobs/planner/mpred_i_hyhtn)))).
@@ -289,12 +289,6 @@ tCol(prologOnly).
 prologHybrid(formatted_resultIsa/2).
 prologHybrid(resultIsa/2).
 
-system:term_expansion(IN,OUT):- \+  thlocal:disable_mpred_term_expansions_locally,
-  mpred_module_ready, must_compile_special_clause(IN),
-  in_file_expansion, 
-  loader_term_expansion(IN,WHY),
-  must(OUT = user:WHY),
-  nop(dmsg(loader_term_expansion(IN,WHY))).
 
 % :- sanity(test_expand_units(tCol(_A))).
 
@@ -417,6 +411,7 @@ tCol(functorDeclares).
 
 ((prologHybrid(C),{get_functor(C,F,A),C\=F}) => arity(F,A)).
 prologHybrid(typeProps/2).
+arity(typeProps,2).
 
 
 
@@ -546,11 +541,11 @@ ttFormatType(ftVoprop).
 
 
 :- pfc_add(((isa(Compound,prologMacroHead)/compound_functor(Compound,F)) => functorDeclares(F))).
-:- pfc_add((isa(_,ArgsIsa)=>tCol(ArgsIsa))).
+% :- rtrace,pfc_add((isa(_,ArgsIsa)=>tCol(ArgsIsa))).
 
-:- pfc_trace.
+%:- pfc_trace.
 %:- pfcWatch.
-:- pfc_warn.
+%:- pfc_warn.
 % next_test :- sleep(1),pfcReset.
 
 

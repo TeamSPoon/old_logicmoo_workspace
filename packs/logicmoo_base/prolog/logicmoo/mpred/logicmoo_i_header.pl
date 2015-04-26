@@ -258,8 +258,13 @@
 :- dynamic(user:isa_pred_now_locked/0).
 :- dynamic(pfc_manages_unknowns/0).
 
+:- dynamic(props/2).
+:- multifile(props/2).
+
 
 :- thread_local user:repl_to_string/2.
 :- thread_local user:repl_writer/2.
+
+
 
 

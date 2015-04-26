@@ -624,11 +624,11 @@ system:term_expansion(I,OO):- \+ thlocal:disable_mpred_term_expansions_locally, 
 pfc_file_loaded.
 
 
-user:goal_expansion(G,isa(I,C)):- \+  thlocal:disable_mpred_term_expansions_locally, G\=isa(_,_),(use_was_isa(G,I,C)),!.
-user:term_expansion(G,isa(I,C)):- \+  thlocal:disable_mpred_term_expansions_locally, hotrace(use_was_isa(G,I,C)).
+user:goal_expansion(G,OUT):- \+  thlocal:disable_mpred_term_expansions_locally, G\=isa(_,_),(use_was_isa(G,I,C)),!,to_isa_out(I,C,OUT).
+user:term_expansion(G,OUT):- \+  thlocal:disable_mpred_term_expansions_locally, hotrace(use_was_isa(G,I,C)),!,to_isa_out(I,C,OUT).
 
 %system:term_expansion(I,O):- \+ thlocal:disable_mpred_term_expansions_locally, thlocal:consulting_sources, with_no_assertions(thlocal:consulting_sources,add(I)),O=true.
-user:goal_expansion(ISA,G) :- \+ thlocal:disable_mpred_term_expansions_locally, compound(ISA),thlocal:is_calling,use_was_isa(ISA,I,C),G=no_repeats(isa(I,C)).
+user:goal_expansion(ISA,G) :- \+ thlocal:disable_mpred_term_expansions_locally, compound(ISA),thlocal:is_calling,use_was_isa(ISA,I,C),to_isa_out(I,C,OUT),G=no_repeats(OUT).
 
 
 
