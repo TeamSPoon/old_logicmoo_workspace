@@ -138,7 +138,7 @@ is_location(Obj):-var(Obj),!,fail.
 is_location(xyzFn(_,_,_,_)):-!.
 is_location(Obj):-!,isa(Obj,tRegion),!.
 
-locationToRegion(Obj,RegionIn):-locationToRegion_0(Obj,Region),sanity((nonvar(Region),isa(Region,tRegion))),!,RegionIn=Region.
+locationToRegion(Obj,RegionIn):-locationToRegion_0(Obj,Region),sanity((nonvar(Region),tRegion(Region))),!,RegionIn=Region.
 locationToRegion_0(Obj,Obj):-var(Obj),dmsg(warn(var_locationToRegion(Obj,Obj))),!.
 locationToRegion_0(xyzFn(Region,_,_,_),Region2):-nonvar(Region),!,locationToRegion_0(Region,Region2).
 locationToRegion_0(Obj,Obj):-nonvar(Obj),!,isa(Obj,tRegion),!.
@@ -175,7 +175,7 @@ localityOfObject(Obj,Region),tRegion(Region)=> inRegion(Obj,Region).
 mudAtLoc(Obj,LOC),{locationToRegion(LOC,Region)},tRegion(Region)=> inRegion(Obj,Region).
 
 
-:-decl_mpred_hybrid(mudInsideOf/2).
+prologHybrid(mudInsideOf/2).
 % :-sanity(( requires_storage((mudInsideOf(_G3775190, _G3775191):-is_asserted(mudStowing(_G3775191, _G3775190))))  )).
 mudInsideOf(Inner,Outer):-loop_check(mudStowing(Outer,Inner)).
 mudInsideOf(Inner,Outer):-loop_check(mudContains(Outer,Inner)).
@@ -196,8 +196,8 @@ same_regions(Agent,Obj):-inRegion(Agent,Where1),dif(Agent,Obj),inRegion(Obj,Wher
 %:- ensure_universal_stub(prologPTTP,inRegion/2).
 %:- ensure_universal_stub(prologPTTP,mudTestAgentWearing/2).
 
-:-decl_mpred_hybrid(mudAtLoc/2).
-pred_argtypes(mudAtLoc(tObj,tSpatialThing)).
+prologHybrid(mudAtLoc/2).
+mpred_argtypes(mudAtLoc(tObj,tSpatialThing)).
 
 
 % compute the most specific location description
@@ -303,7 +303,7 @@ put_in_world(Obj):-random_xyzFn(LOC),add_fast(mudAtLoc(Obj,LOC)).
 :-export fact_maybe_deduced/1.
 :-export fact_is_false/2.
 
-:-decl_mpred_hybrid(mudInsideOf(tObj,tObj)).
+prologHybrid(mudInsideOf(tObj,tObj)).
 
 % facts that cant be true
 
@@ -459,7 +459,7 @@ any_to_dir(D,D):-pathBetween(_,D,_),!.
 
 :-export(dir_offset/5).
 
-% :-decl_mpred_hybrid(dir_offset(term,int,int,int,int)).
+% prologHybrid(dir_offset(term,int,int,int,int)).
 
 
 dir_offset(vUp,F,0,0,F).

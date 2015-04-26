@@ -13,8 +13,6 @@
 
 :- include(logicmoo_i_header).
 
-:- export correctArgsIsa/3.
-
 hybrid_tPredStubImpl(prologHybrid).
 hybrid_tPredStubImpl(prologPTTP).
 hybrid_tPredStubImpl(prologPfc).
@@ -144,7 +142,7 @@ ensure_exists(Head):-get_pifunctor(Head,PHead,F),get_functor(Head,F,A),(predicat
 % -- CODEBLOCK
 is_tCol(V):-is_ftVar(V),!,fail.
 is_tCol(tCol).
-is_tCol(F):- user:mpred_prop(F,tCol);hasInstance(tCol,F);hasInstance(F,_).
+is_tCol(F):- user:mpred_prop(F,tCol);tE(tCol,F);tE(F,_).
 
 is_proc(V):-is_ftVar(V),!,fail.
 is_proc(F):- functor(P,F,1),predicate_property(P,_),must(not(user:mpred_prop(F,tCol))).
@@ -216,7 +214,7 @@ scan_missing_stubs(F):-
    ignore((forall(mpred_missing_stubs(F,A),
       (arity(F,A),show_call(ensure_universal_stub(F/A)))))).
 
-mpred_missing_stubs(F,A):-prologHybrid = StubType, hybrid_tPredStubImpl(StubType),user:mpred_prop(F,StubType),must(arity(F,A)),not(has_storage_stub(F/A)).
+mpred_missing_stubs(F,A):-prologHybrid = StubType, hybrid_tPredStubImpl(StubType),arity(F,A),user:mpred_prop(F,StubType),must(arity(F,A)),not(has_storage_stub(F/A)).
 
 
 :-assertz_if_new(call_OnEachLoad(rescan_missing_stubs)).
@@ -238,37 +236,25 @@ rescan_mpred_props_ilc:-time(forall(mpred_prop_ordered(Pred,Prop),hooked_asserta
 rescan_mpred_props_ilc:-rescan_missing_stubs.
 rescan_mpred_props_ilc.
 
+first_mpred_props(mpred_argtypes(_)).
+
+mpred_prop_ordered(Pred,Prop):-first_mpred_props(Prop),user:mpred_prop(Pred,Prop),not(user:mpred_prop(Pred,prologOnly)).
+mpred_prop_ordered(Pred,Prop):-user:mpred_prop(Pred,Prop),not(first_mpred_props(Prop)),not(user:mpred_prop(Pred,prologOnly)).
+
 
 % ================================================================================
 % GRABOUT STORAGE STUB CLAUSES
 % ================================================================================
 provide_clauses_list(Head,HBLISTO):- get_pifunctor(Head,PHead,_),  
   findall((PHead :- B),
-    no_repeats_old([PHead:B],((call_no_cuts(user:provide_mpred_storage_clauses(PHead,B,Proof)),is_source_proof(Proof)))),
+   no_repeats_old([PHead:B],((call_no_cuts(user:provide_mpred_storage_clauses(_,PHead,B,Proof)),is_source_proof(Proof)))),
    HBLIST),
    create_stub_body(PHead,Stub),
    delete(HBLIST,Stub,HBLISTO),!.
 
 
+get_cc(PI,NC):-provide_clauses_list(PI,HBLISTO),length(HBLISTO,NC).
 
-ensure_universal_stub_plus_minus_2_HIDE(F,AMinus2):-
-   decl_mpred_hybrid(F/AMinus2).
-   
-ensure_universal_stub_plus_2(F,A2):- once(( AMinus2 is A2 -2, ensure_universal_stub_plus_minus_2(F,AMinus2))),fail.
-
-%ensure_universal_stub_plus_2(F,A2):- cannot_override(F,A2,Why),!,dmsg(cannot_override_plus_2(F,A2,Why)).
-
-ensure_universal_stub_plus_2(F,A2):- 
-   export(F/A2),
-   functor(HEAD,F,A2),
-   HEAD=..[F|ARGS],
-   append(ARGSMinus2,[_,_],ARGS),
-   HEADMinus2=..[F|ARGSMinus2],
-   AMinus2 is A2 -2,
-   assert_if_new((HEAD:-HEADMinus2)),!,
-  % compile_predicates([HEAD]),
-   user:mpred_mod(M),
-   decl_mpred_hybrid(M,F,AMinus2).
 
 % ==============================
 % SETUP HYBRID HOOK
@@ -312,8 +298,7 @@ ensure_universal_stub5(HeadIn,Head,F,A,_HBLIST):- thglobal:pfcManageHybrids,!,
    % public(F/A),
    % lock_predicate(Head),
    discontiguous(Head),
-   retractall(user:mpred_prop(F,prologOnly)),
-   pfc_mark_C(Head),
+   retractall(user:mpred_prop(F,prologOnly)),   
    add(isa(Head,pfcControlled)),
    dmsg(pfcManageHybrids(HeadIn)),!.
 
@@ -504,7 +489,7 @@ call_for_literal_db0(F,A,HEAD):-no_repeats(HEAD,call_for_literal_db00(F,A,HEAD))
 
 :- style_check(-singleton).
 call_for_literal_db00(_,_,HEAD):- is_asserted_mpred_t(HEAD).
-call_for_literal_db00(F,_,   _):- (isa(F,completelyAssertedCollection);hasInstance(completeExtentAsserted,F)),!,fail.
+call_for_literal_db00(F,_,   _):- (isa(F,completelyAssertedCollection);tE(completeExtentAsserted,F)),!,fail.
 call_for_literal_db00(F,A,HEAD):- loop_check(call_rule_db(F,A,HEAD)).
 call_for_literal_db00(F,A,HEAD):- not(use_snark(HEAD,true)),HEAD=..[P1,A1,A2],dif(P2,P1),loop_check_term(is_asserted_mpred_t(genlPreds(P2,P1)),gp(P1),fail),
    call(t,P2,A1,A2).
@@ -562,7 +547,7 @@ body_req(HEAD,HEAD_T):- (hook_body_req(HEAD,HEAD_T)).
 %hook_body_req(HEAD,HEAD_T):- user:mpred_prop(F,prologOnly),!,dmsg(warn(hook_body_req(HEAD,HEAD_T))),fail.
 hook_body_req(_,_,isa(I,C),_):- !, body_req_isa(I,C).
 hook_body_req(_,_,_,t(C,I)):- !, body_req_isa(I,C).
-hook_body_req(_,_,_,hasInstance(C,I)):- !, body_req_isa(I,C).
+hook_body_req(_,_,_,tE(C,I)):- !, body_req_isa(I,C).
 hook_body_req(_,_,_ ,HEAD_T):- thlocal:useOnlyExternalDBs,!, body_call_cyckb(HEAD_T).
 % loop checking is not usefull (why the cut was added)
 hook_body_req(HEAD,HEAD_T):-  no_repeats(body_req_normal(HEAD,HEAD_T)).
@@ -625,4 +610,41 @@ dbase2pred2svo(DBASE,PRED,svo(A,F,RGS)):-fskel(F,DBASE,PRED,A,RGS,_,_),!.
 dbase2pred2svo(DBASE,PRED,svo(A,F,RGS)):-compound(PRED),functor(PRED,F,N),make_functorskel(F,N),!,fskel(F,DBASE,PRED,A,RGS,_,_),!.
 dbase2pred2svo(DBASE,PRED,svo(A,F,RGS)):-compound(DBASE),!,arg(1,DBASE,F),must_det(arity(F,N)),make_functorskel(F,N),!,fskel(F,DBASE,PRED,A,RGS,_,_),!.
 dbase2pred2svo(DBASE,PRED,svo(A,F,RGS)):-nonvar(F),must(arity(F,N)),make_functorskel(F,N),!,fskel(F,DBASE,PRED,A,RGS,_,_),!.
+
+
+:-export(registerCycPredPlus2/1).
+
+
+registerCycPredPlus2_3(_CM,M,PI,F/A2):-
+  registerCycPredPlus2_3(M,PI,F/A2).
+
+registerCycPredPlus2_3(M,_PI,F/A2):- 
+  ignore((A2==3,assertz_if_new(is_never_type(F)))),
+  A is A2 - 2, decl_mpred_mfa(M,F,A),
+  decl_mpred(F,cycPlus2(A2)),decl_mpred(F,cycPred(A)).
+
+
+registerCycPredPlus2(P):-!,user:with_pi(P,registerCycPredPlus2_3).
+
+
+ensure_universal_stub_plus_minus_2_HIDE(F,AMinus2):-
+   decl_mpred_hybrid(F/AMinus2).
+
+ensure_universal_stub_plus_minus_2(F,AMinus2):- decl_mpred(F,arity(AMinus2)), decl_mpred_mfa(user,F,AMinus2).
+   
+ensure_universal_stub_plus_2(F,A2):- once(( AMinus2 is A2 -2, ensure_universal_stub_plus_minus_2(F,AMinus2))),fail.
+
+%ensure_universal_stub_plus_2(F,A2):- cannot_override(F,A2,Why),!,dmsg(cannot_override_plus_2(F,A2,Why)).
+
+ensure_universal_stub_plus_2(F,A2):- 
+   export(F/A2),
+   functor(HEAD,F,A2),
+   HEAD=..[F|ARGS],
+   append(ARGSMinus2,[_,_],ARGS),
+   HEADMinus2=..[F|ARGSMinus2],
+   AMinus2 is A2 -2,
+   assert_if_new((HEAD:-HEADMinus2)),!,
+  % compile_predicates([HEAD]),
+   user:mpred_mod(M),
+   decl_mpred_hybrid(M,F,AMinus2).
 

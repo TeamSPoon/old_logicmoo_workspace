@@ -12,7 +12,7 @@
 
 % :- register_module_type (mtCommand).
 
-pred_argtypes(action_verb_useable(vtVerb,tCol,ftTerm(tPred),ftTerm(tPred),ftTerm(tPred))).
+mpred_argtypes(action_verb_useable(vtVerb,tCol,ftTerm(tPred),ftTerm(tPred),ftTerm(tPred))).
 
 genls(isEach('PortableObject','ProtectiveAttire',tStowAble),tWieldAble).
 genls('FluidReservoir',tDrinkAble).
@@ -22,9 +22,9 @@ genls(tWieldAble,tUseAble).
 genls(tCarryAble,tStowAble).
 
 
-:-decl_mpred_hybrid(mudWielding/2).
-:-decl_mpred_hybrid(mudStowing/2).
-:-decl_mpred_hybrid(mudPossess/2).
+prologHybrid(mudWielding/2).
+prologHybrid(mudStowing/2).
+prologHybrid(mudPossess/2).
 
 :-add((mudStowing(A,O) => mudPossess(A,O))).
 mudWielding(A,O) => mudPossess(A,O).
@@ -37,7 +37,7 @@ prologMultiValued(mudStowing(tAgentGeneric,tStowAble)).
 prologMultiValued(mudContains(tContainer,tObj)).
 
 
-:-decl_mpred_hybrid(genlPreds/2).
+prologHybrid(genlPreds/2).
 genlPreds(wearsClothing,mudPossess).
 genlPreds(mudWielding,mudPossess).
 genlPreds(mudStowing,mudPossess).

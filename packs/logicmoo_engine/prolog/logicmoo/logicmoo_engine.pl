@@ -743,7 +743,7 @@ is_function(Function):-compound(Function),get_functor(Function,F,A),is_function(
 is_function(_,'SubLQuoteFn',_):-!,fail.
 is_function(_,F,_):- atom_concat('sk',_Was,F),!,fail.
 is_function(_,F,_):- atom_concat(_Was,'Fn',F).
-is_function(_,F,_):- hasInstance(tFunction,F).
+is_function(_,F,_):- tFunction(F).
 is_function(_,F,A):- A2 is A+1,current_predicate(F/A2), not(current_predicate(F/A)).
 
 is_ftEquality(Term):-is_ftVar(Term),!,fail.

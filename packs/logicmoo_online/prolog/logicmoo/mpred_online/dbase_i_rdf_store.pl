@@ -27,10 +27,10 @@ end_of_file.
 
 expire_rdf_caches :- forall(clause(expire_one_rdf_cache,Body),must(Body)).
 
-:- multifile(user:semweb_startup).
+:- multifile(mpred_online:semweb_startup).
 
-user:semweb_startup:- retractall((tlbugger:show_must_go_on)).
-user:semweb_startup:- expire_rdf_caches.
+mpred_online:semweb_startup:- retractall((tlbugger:show_must_go_on)).
+mpred_online:semweb_startup:- expire_rdf_caches.
 
 /** <module> MUD STORE
 
@@ -121,11 +121,11 @@ n3_parse_2(URL,Imported,Options) :-
       n3_parse_1(Import_URL,[Import_URL|Imported],Options)
     ; true).
 
-user:semweb_startup:- n3_parse('http://omeo.googlecode.com/svn/trunk/build/ro-subset.owl').
-user:semweb_startup:- n3_parse('http://knowrob.org/kb/roboearth.owl').
-user:semweb_startup:- n3_parse('http://ias.cs.tum.edu/kb/knowrob.owl').
-user:semweb_startup:- n3_parse('http://raw.github.com/knowrob/knowrob/master/knowrob_omics/rdf/locations.rdf').
-user:semweb_startup:- n3_parse('http://raw.github.com/knowrob/knowrob/master/knowrob_omics/rdf/roboearth.rdf').
+mpred_online:semweb_startup:- n3_parse('http://omeo.googlecode.com/svn/trunk/build/ro-subset.owl').
+mpred_online:semweb_startup:- n3_parse('http://knowrob.org/kb/roboearth.owl').
+mpred_online:semweb_startup:- n3_parse('http://ias.cs.tum.edu/kb/knowrob.owl').
+mpred_online:semweb_startup:- n3_parse('http://raw.github.com/knowrob/knowrob/master/knowrob_omics/rdf/locations.rdf').
+mpred_online:semweb_startup:- n3_parse('http://raw.github.com/knowrob/knowrob/master/knowrob_omics/rdf/roboearth.rdf').
 
 % :- rdf_attach_library((.)).
 % :-  with_no_term_expansions(use_module(cliopatria(cliopatria))).
@@ -457,7 +457,7 @@ rdf_assert_ignored(svo(_,prologOnly,_)).
 rdf_assert_ignored(mpred_prop(_,_)).
 rdf_assert_ignored(_:mpred_prop(_,_)).
 rdf_assert_ignored(user:mpred_prop(_,arity(1))).
-rdf_assert_ignored(user:mpred_prop(_,pred_argtypes(_))).
+rdf_assert_ignored(user:mpred_prop(_,mpred_argtypes(_))).
 %rdf_assert_ignored(DB):-functor(DB,F,_),member(F,[ruleBackward,mudTermAnglify,'<=>']).
 rdf_assert_ignored(DB):-functor(DB,_,1).
 rdf_assert_ignored(G):-pfcTypeFull(G,Type),!,(Type==trigger;Type==support).
@@ -510,7 +510,7 @@ to_rdf_ignore(DB,A,B):-any_to_rdf(DB,A,BB),ignore(B=BB).
 
 
 
-mpred_t_rdf(Sc,rdf:type,CC):- /*o_to_p(CC,Oc),*/clause(hasInstance(Oc,Sc),true),any_to_rdf(Oc,CC),!.
+mpred_t_rdf(Sc,rdf:type,CC):- /*o_to_p(CC,Oc),*/clause(tE(Oc,Sc),true),any_to_rdf(Oc,CC),!.
 mpred_t_rdf(Sc,Pc,Oc):-t(Pc,Sc,Oc),!.
 
 :-export(rdf_assert_x/3).
@@ -691,7 +691,7 @@ sync_to_rdf:-!.
 sync_to_rdf:-
    forall(p2q(P,NS,N),must(rdf_assert_p2q(P,NS,N))),  
    forall(user:mpred_prop(P,O),rdf_assert_hook(user:mpred_prop(P,O))),
-   forall(hasInstance(C,I),rdf_assert_hook(isa(I,C))),
+   forall(tE(C,I),rdf_assert_hook(isa(I,C))),
    forall(is_known_trew(B),rdf_assert_hook(B)),
    (thglobal:using_rdf_mpred_hook -> true ; (asserta(thglobal:using_rdf_mpred_hook),forall(prologHybridFact(G),rdf_assert_hook(G)))),
    asserta_if_new(user:call_OnEachLoad(sync_to_rdf)),
@@ -700,11 +700,11 @@ sync_to_rdf:-
 
 
 
-user:semweb_startup:- must(sync_from_rdf).
-user:semweb_startup:- must(sync_to_rdf).
+mpred_online:semweb_startup:- must(sync_from_rdf).
+mpred_online:semweb_startup:- must(sync_to_rdf).
 
 
 :- multifile(user:call_OnEachLoad/1).
-user:semweb_startup:- asserta_if_new(user:call_OnEachLoad(sync_to_rdf)).
-user:semweb_startup:- asserta_if_new(user:call_OnEachLoad(sync_from_rdf)).
+mpred_online:semweb_startup:- asserta_if_new(user:call_OnEachLoad(sync_to_rdf)).
+mpred_online:semweb_startup:- asserta_if_new(user:call_OnEachLoad(sync_from_rdf)).
 

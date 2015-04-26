@@ -42,8 +42,8 @@ visibleTo(Agent,Obj):-mudPossess(Agent,Obj).
 visibleTo(Agent,Obj):-same_regions(Agent,Obj).
 
 
-:- decl_type(txtPrepOf).
-:- decl_type(txtPrepSpatial).
+tCol(txtPrepOf).
+tCol(txtPrepSpatial).
 user:hook_coerce(StrIn,txtPrepSpatial,Str):-member(Prep,[in,on,north_of,inside,onto,ontop]),name_text(Prep,StrIn),name_text(Prep,Str).
 user:hook_coerce(Prep,txtPrepSpatial,Inst):-user:hook_coerce(Prep,txtPrepOf,Inst).
 user:hook_coerce([SDir,of],txtPrepOf,vDirFn(Dir)):-user:hook_coerce(SDir,vtDirection,Dir).
@@ -85,7 +85,7 @@ cmdLook_proc_0(Agent,LOC):-
    add(props(Agent,mudNeedsLook(vFalse))),
      show_kb_preds(Agent,LOC,
          [
-         location= LOC,
+         location= nop(LOC),
       % TODO make this work
          %  why does this this work on Prolog REPL?
          %   with_output_to(string(Str),cmdShowRoomGrid('Area1000'))
@@ -210,12 +210,12 @@ check_for_blocks(Agent) :-
 	add(visually_blocked(Agent,Blocked_Percepts)).
 check_for_blocks(_,[]).
 
-pred_argtypes(mudSize(tSpatialThing,ftTerm)).
-pred_argtypes(mudShape(tSpatialThing,vtShape)).
+mpred_argtypes(mudSize(tSpatialThing,ftTerm)).
+mpred_argtypes(mudShape(tSpatialThing,vtShape)).
 prologSingleValued(mudHeightOnObj(tSpatialThing,ftNumber)).
-pred_argtypes(mudTexture(tSpatialThing,vtTexture)).
+mpred_argtypes(mudTexture(tSpatialThing,vtTexture)).
 
-:-decl_mpred_hybrid(mudHeightOnObj(tSpatialThing,ftNumber)).
+prologHybrid(mudHeightOnObj(tSpatialThing,ftNumber)).
 % High enough to see over obstacles??
 % Check to see how tall the tAgentGeneric is and if they are standing on an item
 mudHeightOnObj(Agent,Ht) :-

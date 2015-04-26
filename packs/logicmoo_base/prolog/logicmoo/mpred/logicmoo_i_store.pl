@@ -104,7 +104,7 @@ is_asserted(X,Y,Z):- no_repeats(loop_check(is_asserted_ilc(X,Y,Z))).
 
 is_asserted_ilc(V):-var(V),!,trace_or_throw(var_is_asserted(V)).
 % TODO: test removal
-is_asserted_ilc(prologHybrid(H)):-get_functor(H,F),!,isa_asserted(F,prologHybrid).
+%is_asserted_ilc(prologHybrid(H)):-get_functor(H,F),!,isa_asserted(F,prologHybrid).
 is_asserted_ilc((H)):- is_static_pred(H),!,show_pred_info(H),dtrace(is_asserted_ilc((H))).
 is_asserted_ilc(HB):-hotrace((fully_expand_warn(is_asserted_1,HB,HHBB))),!,is_asserted_1(HHBB).
 
@@ -113,7 +113,7 @@ is_asserted_1(clause(H,B)):-!,is_asserted_ilc(H,B).
 is_asserted_1((H1,H2)):-!,is_asserted_1(H1),is_asserted_1(H2).
 is_asserted_1((H1;H2)):-!,is_asserted_1(H1);is_asserted_1(H2).
 % TODO: test removal
-is_asserted_1(isa(H,B)):-!,isa_asserted(H,B).
+% is_asserted_1(isa(H,B)):-!,isa_asserted(H,B).
 is_asserted_1(HB):-expand_to_hb(HB,H,B),!,is_asserted_ilc(H,B).
 
 is_asserted_ilc((H:-BB),B):- is_true(B),!,is_asserted_ilc(H,BB).
@@ -194,15 +194,15 @@ make_body_clause(_Head,Body,Body):-atomic(Body),!.
 make_body_clause(_Head,Body,Body):-special_wrapper_body(Body,_Why),!.
 make_body_clause(Head,Body,call_mpred_body(Head,Body)).
 
-special_head(_,F,Why):-special_head0(F,Why),!,show_call_failure(not(asserted_mpred_prop(F,prologOnly))).
+special_head(_,F,Why):-special_head0(F,Why),!,show_call_failure(not(isa(F,prologOnly))).
 special_head0(F,functorDeclaresPred):-functorDeclaresPred(F),!.
-special_head0(F,functorDeclares):-hasInstance(functorDeclares,F),!.
-special_head0(F,prologMacroHead):-hasInstance(prologMacroHead,F),!.
-special_head0(F,pfcControlled):-hasInstance(pfcControlled,F),!.
+special_head0(F,functorDeclares):-tE(functorDeclares,F),!.
+special_head0(F,prologMacroHead):-tE(prologMacroHead,F),!.
+special_head0(F,pfcControlled):-tE(pfcControlled,F),!.
 special_head0(isa,isa).
-special_head0(F,tCol):-hasInstance(tCol,F),!.
-special_head0(F,prologHybrid):-hasInstance(prologHybrid,F).
-special_head0(F,pfcControlled):-hasInstance(pfcControlled,F).
+special_head0(F,tCol):-tE(tCol,F),!.
+special_head0(F,prologHybrid):-tE(prologHybrid,F).
+special_head0(F,pfcControlled):-tE(pfcControlled,F).
 
 
 
@@ -435,7 +435,7 @@ test_expand_units(IN):-fully_expand(query(t,must),IN,OUT),dmsg(test_expand_units
 
 
 mpred_modify(Op,                 G):- (var(Op);var(G)),!,trace_or_throw(var_database_modify_op(Op,  G )).
-mpred_modify(Op,                 G):- G\=pred_argtypes(_),fully_expand(Op,G,GG),not_variant(G,GG),!,mpred_modify(Op, GG ),!.
+mpred_modify(Op,                 G):- G\=mpred_argtypes(_),fully_expand(Op,G,GG),not_variant(G,GG),!,mpred_modify(Op, GG ),!.
 mpred_modify(_,  (:-include(FILE))):- !,must(load_data_file_now(FILE)).
 mpred_modify(Op,  (:-(G))         ):- !,must(with_assert_op_override(Op,debugOnError(G))).
 mpred_modify(P,                  G):- thlocal:noDBaseMODs(_),!,dmsg(noDBaseMODs(P,G)).
@@ -471,8 +471,8 @@ database_modify_assert(change(assert,AZ),       _G,GG):- expire_pre_change(AZ,GG
 database_modify_assert(change(assert,_),_, GG):- thglobal:pfcManageHybrids,!,copy_term(GG,GGG),(\+ \+ pfc_add_fast(GGG)),!,show_call_failure(variant(GG,GGG)),!.
 
 database_modify_assert(change(assert,AorZ),      G,GG):- G \= (_:-_), get_functor(G,F,A),
-   (asserted_mpred_prop(F,prologSingleValued) -> (AorZ \== sv -> db_assert_sv(AorZ,G,F,A); fail); 
-       asserted_mpred_prop(F,prologOrdered) -> (AorZ\==z -> database_modify_assert_must(change(assert,z),G,GG);true)).
+   (isa(F,prologSingleValued) -> (AorZ \== sv -> db_assert_sv(AorZ,G,F,A); fail); 
+       isa(F,prologOrdered) -> (AorZ\==z -> database_modify_assert_must(change(assert,z),G,GG);true)).
 database_modify_assert(change(assert,AorZ),      G,GG):-database_modify_assert_must(change(assert,AorZ),G,GG).
 
 database_modify_assert_must(Op,G,GG):-must(database_modify_assert_4(Op,G,GG)).
@@ -518,8 +518,8 @@ hooked_retractall(G):- Op = change(retract,all),
 
 user:provide_mpred_storage_op(Op,G):- get_functor(G,F,A),user:provide_mpred_storage_op(Op,G,F,A).
 
-user:provide_mpred_storage_op(Op,G, F,_A):- hasInstance(pfcControlled,F),!,loop_check(prolog_provide_mpred_storage_op(Op,G)).
-user:provide_mpred_storage_op(Op,G, F,_A):- hasInstance(prologOnly,F),!,loop_check(pfc_provide_mpred_storage_op(Op,G)).
+user:provide_mpred_storage_op(Op,G, F,_A):- tE(pfcControlled,F),!,loop_check(prolog_provide_mpred_storage_op(Op,G)).
+user:provide_mpred_storage_op(Op,G, F,_A):- tE(prologOnly,F),!,loop_check(pfc_provide_mpred_storage_op(Op,G)).
 user:provide_mpred_storage_op(Op,G,_F,_A):- loop_check(prolog_provide_mpred_storage_op(Op,G)).
 
 %user:provide_mpred_storage_op(Op,G):- (loop_check(isa_provide_mpred_storage_op(Op,G))).

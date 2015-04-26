@@ -11,7 +11,7 @@
 
 % :- register_module_type (mtCommand).
 
-:-decl_type(vtPosture/1).
+tCol(vtPosture/1).
 
 prologSingleValued(mudStance(tAgentGeneric,vtPosture),prologHybrid).
 

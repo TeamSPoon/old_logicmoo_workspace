@@ -180,7 +180,7 @@ save_fmt_a_0(_,A):-vtSkippedPrintNames(A),!.
 save_fmt_a_0(O,E):-to_case_breaks(E,List),maplist(save_fmt_a(O),List).
 
 
-object_name_is_descriptive(O):- (isa(O,tCol);isa(O,tPred);hasInstance(functorDeclares,O);isa(O,ttValueType),isa(O,name_is_descriptive)).
+object_name_is_descriptive(O):- (isa(O,tCol);isa(O,tPred);tE(functorDeclares,O);isa(O,ttValueType),isa(O,name_is_descriptive)).
 
 :-export(object_print_details/5).
 
@@ -197,7 +197,7 @@ object_print_details0(Print,Agent,O,DescSpecs,Skipped):-
        forall(is_asserted(descriptionHere(O,KW)),ignore((meets_desc_spec(KW,DescSpecs)->call(Print,' ~w ',[KW])))),
        forall(isa(O,S),ignore((not(vtSkippedPrintNames(S)),object_print_details0(Print,Agent,S,DescSpecs,[O|Skipped])))))))).
 
-%:-decl_type(ttTypeType).
+%tCol(ttTypeType).
 vtSkippedPrintNames(T):-var(T),!,fail.
 vtSkippedPrintNames(T):-ttFormatType(T).
 %vtSkippedPrintNames(T):-isa(T,ttTypeType).
@@ -435,12 +435,12 @@ string_append(A,[B1,B2],C,ABC):-append(A,[B1,B2|C],ABC).
 string_append(A,[B],C,ABC):-append(A,[B|C],ABC).
 
 
-is_counted_for_parse(I):-hasInstance(tCountable,I),not(excluded_in_parse(I)),!.
+is_counted_for_parse(I):-tE(tCountable,I),not(excluded_in_parse(I)),!.
 
 excluded_in_parse(apathFn(_, _)).
 excluded_in_parse(I):-tCol(I).
 excluded_in_parse(I):-ttFormatType(I).
-excluded_in_parse(I):-user:mpred_prop(_,pred_argtypes(I)).
+excluded_in_parse(I):-user:mpred_prop(_,mpred_argtypes(I)).
 excluded_in_parse(apathFn(_ = _)).
 
 instance_for_parse(I):-is_counted_for_parse(I).
@@ -588,7 +588,7 @@ coerce(A,B,C):-no_repeats(coerce0(A,B,C)),(show_call_failure(isa(C,B))->!;true).
 coerce0(String,Type,Inst):- var(Type),trace_or_throw(var_specifiedItemType(String,Type,Inst)).
 coerce0(String,isNot(Type),Inst):-!,not(coerce0(String,Type,Inst)).
 coerce0([String],Type,Inst):- nonvar(String),!,coerce0(String,Type,Inst).
-coerce0(String,Type,Inst):- atomic(String),Type==tCol,i_name('t',String,Inst),hasInstance(tCol,Inst),!.
+coerce0(String,Type,Inst):- atomic(String),Type==tCol,i_name('t',String,Inst),tE(tCol,Inst),!.
 coerce0(Text,Type,Inst):- (no_repeats_old(call_no_cuts(hook_coerce(Text,Type,Inst)))).
 coerce0(String,Type,Inst):- ttFormatType(Type),!,checkAnyType(change(assert,actParse),String,Type,AAA),Inst=AAA.
 %coerce0(String,Type,Longest) :- findall(Inst, (user:hook_coerce(Inst,Type,Inst),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.

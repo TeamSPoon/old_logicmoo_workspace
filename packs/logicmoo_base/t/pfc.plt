@@ -228,7 +228,7 @@ tCol(Col) <=> isa(Col,tCol).
 
 (isa(I,Sub), disjointWith(Sub, Super)) => neg(isa(I,Super)).
 
-genls(tPartOfobj,tItem).
+genls(tPartofObj,tItem).
 
 % dividesBetween(tItem,tPathways).
 dividesBetween(tItem,tMassfull,tMassless).
@@ -252,7 +252,7 @@ isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
 => tCol(functorDeclares).
 % tCol(ArgsIsa):-functorDeclaresPred(ArgsIsa).
 % TODO decide if OK
-%tCol(F):-hasInstance(functorDeclares,F).
+%tCol(F):-tE(functorDeclares,F).
 => tCol(ttFormatType).
 => tCol(vtActionTemplate).
 => tCol(tRegion).

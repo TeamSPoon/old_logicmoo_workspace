@@ -9,7 +9,7 @@
 
 :- include(prologmud(mud_header)).
 
-:-decl_type(vtOnOff).
+tCol(vtOnOff).
 
 isa(vOn,vtOnOff).
 isa(vOff,vtOnOff).

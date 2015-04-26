@@ -20,11 +20,17 @@
 :- include(prologmud(mud_header)).
 % :- register_module_type (planning).
 
-:-decl_type(tExplorer).
+tCol(tExplorer).
 
 vette_idea(Agent,Act,Act):-var(Act),!,dmsg(vette_idea(Agent,Act)).
 vette_idea(_,actSit,actSit):-!.
 vette_idea(Agent,Act,Act):-dmsg(vette_idea(Agent,Act)).
+
+
+prologHybrid(mudLabelTypeProps/3).
+:-show_pred_info(mudLabelTypeProps/3).
+:- sleep(2.0).
+:-must(arity(mudLabelTypeProps,3)).
 
 prologHybrid(typeHasGlyph(tCol,ftString)).
 mudLabelTypeProps('Px',tExplorer,[]).

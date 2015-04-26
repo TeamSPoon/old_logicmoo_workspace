@@ -96,7 +96,9 @@
 % these do not get defined!?
 % :-dynamic user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
 
-:- multifile(user:semweb_startup).
+:- multifile(mpred_online:semweb_startup).
+
+
 
 :- dynamic thglobal:pfcManageHybrids/0.
 :- dynamic thlocal:infMustArgIsa/0.

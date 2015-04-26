@@ -323,7 +323,7 @@ call_which_t(dac(_,a,_,_),P,A1,A2):- assertion_t([P,A1,A2]).
 call_which_t(dac(_,_,c,_),P,A1,A2):- callable_tf(P,2),xcall_t(P,A1,A2).
 call_which_t(dac(_,_,_,holds_t),P,A1,A2):- holds_t(P,A1,A2).
 
-call_which_t(dac(d,_,_,_),P,A1):- hasInstance(P,A1).
+call_which_t(dac(d,_,_,_),P,A1):- tE(P,A1).
 call_which_t(dac(_,a,_,_),P,A1):- assertion_t([P,A1]).
 call_which_t(dac(_,_,c,_),P,A1):- callable_tf(P,1),xcall_t(P,A1).
 call_which_t(dac(_,_,_,holds_t),P,A1):- holds_t(P,A1).

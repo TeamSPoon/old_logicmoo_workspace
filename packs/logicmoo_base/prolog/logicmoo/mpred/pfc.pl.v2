@@ -466,7 +466,7 @@ pfc_ignored(argIsa(F, A, argIsaFn(F, A))).
 pfc_ignored(genls(A,A)).
 pfc_ignored(isa(tCol,tCol)).
 pfc_ignored(isa(W,tCol)):-if_defined(user:hasInstance_dyn(tCol,W)).
-pfc_ignored(isa(W,_)):-compound(W),isa(W,pred_argtypes).
+pfc_ignored(isa(W,_)):-compound(W),isa(W,mpred_argtypes).
  
 pfc_ignored(isa(_,Atom)):-atom(Atom),atom_concat(ft,_,Atom),!.
 pfc_ignored(isa(_,argIsaFn(_, _))).
@@ -2254,7 +2254,7 @@ pfcTraceAdd(P,S) :-
 
 crazy_bad_fact(isa(not,tCol)).
 crazy_bad_fact(isa(_,not)).
-crazy_bad_fact(user:mpred_prop(_,pred_argtypes)).
+crazy_bad_fact(user:mpred_prop(_,mpred_argtypes)).
 
 pfcTraceAddPrint(P,S) :- crazy_bad_fact(P),retractall(tlbugger:show_must_go_on),!,trace_or_throw(crazy_pfcTraceAddPrint(P,S)).
 

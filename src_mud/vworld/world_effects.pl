@@ -13,7 +13,7 @@
 */
 
 
-:-decl_mpred_hybrid(mudActAffect/3).
+prologHybrid(mudActAffect/3).
 
 % Used by eat.pl and take.pl
 % Is the object worth anything (either scored points or charge)

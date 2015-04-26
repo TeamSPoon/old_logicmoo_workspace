@@ -9,15 +9,93 @@
 % Dec 13, 2035
 %
 */
-:-op(0,fx,('disabled')).
-:-op(0,fx,('enabled')).
-:-op(0,fy,('disabled')).
-:-op(0,fy,('enabled')).
 
 :- thread_local(thlocal:disable_mpred_term_expansions_locally/0).
 :- multifile(system:term_expansion/2).
 :- multifile(user:term_expansion/2).
 :- multifile(user:goal_expansion/2).
+
+
+:- dynamic(new_was_isa/0).
+:- multifile(new_was_isa/0).
+
+:-dynamic(pfc_univ/3).
+:-multifile(pfc_univ/3).
+
+
+:-dynamic((t/1,tE/2)).
+:- dynamic((
+         % t/1,
+          t/2,
+          t/3,
+          t/4,
+          t/5,
+          t/6,
+          t/7,
+          t/8,
+          t/9,
+          t/10,
+          t/11,
+        %  asserted_mpred_t/1,
+          asserted_mpred_t/2,
+          asserted_mpred_t/3,
+          asserted_mpred_t/4,
+          asserted_mpred_t/5,
+          asserted_mpred_t/6,
+          asserted_mpred_t/7,
+          assertion_f/1,
+          assertion_t/1,
+        %  asserted_mpred_f/1,
+          asserted_mpred_f/2,
+          asserted_mpred_f/3,
+          asserted_mpred_f/4,
+          asserted_mpred_f/5,
+          asserted_mpred_f/6,
+          asserted_mpred_f/7,
+         % mpred_f/1,
+          mpred_f/2,
+          mpred_f/3,
+          mpred_f/4,
+          mpred_f/5,
+          mpred_f/6,
+          mpred_f/7)).
+
+:-multifile((t/1,tE/2)).
+:- multifile((
+         % t/1,
+          t/2,
+          t/3,
+          t/4,
+          t/5,
+          t/6,
+          t/7,
+          t/8,
+          t/9,
+          t/10,
+          t/11,
+        %  asserted_mpred_t/1,
+          asserted_mpred_t/2,
+          asserted_mpred_t/3,
+          asserted_mpred_t/4,
+          asserted_mpred_t/5,
+          asserted_mpred_t/6,
+          asserted_mpred_t/7,
+          assertion_f/1,
+          assertion_t/1,
+        %  asserted_mpred_f/1,
+          asserted_mpred_f/2,
+          asserted_mpred_f/3,
+          asserted_mpred_f/4,
+          asserted_mpred_f/5,
+          asserted_mpred_f/6,
+          asserted_mpred_f/7,
+         % mpred_f/1,
+          mpred_f/2,
+          mpred_f/3,
+          mpred_f/4,
+          mpred_f/5,
+          mpred_f/6,
+          mpred_f/7)).
 
 :- op(500,fx,'~').
 :- op(1050,xfx,('=>')).
@@ -29,37 +107,24 @@
 :-dynamic(user_db:grant_openid_server/2).
 :-multifile(user_db:grant_openid_server/2).
 
-:- multifile '$was_imported_kb_content$'/2.
-:-dynamic('$was_imported_kb_content$'/2).
-:- discontiguous('$was_imported_kb_content$'/2).
-
+:- dynamic user:'$was_imported_kb_content$'/2.
+:- multifile user:'$was_imported_kb_content$'/2.
+:- discontiguous(user:'$was_imported_kb_content$'/2).
 
 :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
 
-:- multifile(user:disabled/1).
-:- discontiguous(user:disabled/1).
-:- multifile(user:enabled/1).
-:- discontiguous(user:enabled/1).
-:- multifile user:was_enabled/1.
-:- discontiguous(user:was_enabled/1).
 :- multifile user:listing_mpred_hook/1.
 :- dynamic user:listing_mpred_hook/1.
 
-:- multifile user:genls/2.
 :- dynamic user:genls/2.
-:- multifile user:isa/2.
 :- dynamic user:isa/2.
+:- multifile user:genls/2.
+:- multifile user:isa/2.
+
+:- dynamic tE/2.
+:- multifile tE/2.
 
 :- style_check(-singleton).
-
-
-:-op(1190,fx,(disabled)).
-:-op(1190,fx,(enabled)).
-:-op(1190,fy,(disabled)).
-:-op(1190,fy,(enabled)).
-:-op(1120,fx,(export)).
-:-op(1120,fx,(dynamic_multifile_exported)).
-
 :- set_prolog_flag(double_quotes, atom).
 :- set_prolog_flag(double_quotes, string). 
 :- set_prolog_flag(generate_debug_info, true).
@@ -67,10 +132,11 @@
 % these do not get defined!?
 % :-dynamic user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
 
-:- multifile(user:semweb_startup).
+:- multifile(mpred_online:semweb_startup).
 
+:-dynamic(thlocal:infForward).
+:- dynamic(mpred_module_ready).
 :- dynamic thglobal:pfcManageHybrids/0.
-:- dynamic thlocal:infMustArgIsa/0.
 :- thread_local thlocal:into_form_code/0.
 :- thread_local thlocal:current_why/2.
 :- dynamic_multifile_exported user:defnSufficient/2.
@@ -136,5 +202,64 @@
 :- dynamic_multifile_exported user:tNearestReachableItem/1.
 :- dynamic_multifile_exported user:tFarthestReachableItem/1.
 :- dynamic_multifile_exported deduceFromArgTypes/1.
+
+% ================================================
+% Thread Locals
+% ================================================
+:- thread_local thlocal:consulting_sources/0.
+:- thread_local thlocal:already_in_file_term_expansion/0.
+:- thread_local thlocal:agent_current_action/2.
+:- thread_local thlocal:caller_module/2.
+:- thread_local thlocal:mpred_opcall/2.
+:- thread_local thlocal:deduceArgTypes/1.
+:- thread_local thlocal:agenda_slow_op_do_prereqs/0.
+:- thread_local thlocal:enable_src_loop_checking/0.
+:- thread_local thlocal:in_dynamic_reader/1.
+:- thread_local thlocal:in_prolog_source_code/0.
+:- thread_local thlocal:is_calling/0.
+:- thread_local thlocal:infAssertedOnly/1.
+:- thread_local thlocal:infInstanceOnly/1.
+:- thread_local thlocal:infSkipArgIsa/0.
+:- thread_local thlocal:infSkipFullExpand/0.
+:- thread_local thlocal:into_form_code/0.
+:- thread_local thlocal:inVoProp/0.
+:- thread_local thlocal:no_arg_type_error_checking/0.
+:- thread_local thlocal:noDBaseHOOKS/1.
+:- thread_local thlocal:noDBaseMODs/1.
+:- thread_local thlocal:noRandomValues/1.
+:- thread_local thlocal:session_agent/2.
+:- thread_local thlocal:agenda_suspend_scans/0.
+:- thread_local thlocal:tracing80/0.
+:- thread_local thlocal:useAltPOS/0.
+:- thread_local thlocal:useOnlyExternalDBs/0.
+:- thread_local thlocal:usePlTalk/0.
+:- thread_local thlocal:with_callMPred/1.
+:- thread_local thlocal:assert_op_override/1.
+
+:- dynamic(thglobal:use_cyc_database/0).
+:- thread_local(thlocal:agenda_slow_op_do_prereqs/0).
+:- thread_local(thlocal:already_in_file_term_expansion/0).
+:- thread_local(thlocal:assert_op_override/1).
+:- thread_local(thlocal:caller_module/2).
+:- thread_local(thlocal:consulting_sources/0).
+:- thread_local(thlocal:deduceArgTypes/1).
+:- thread_local(thlocal:enable_src_loop_checking/0).
+:- thread_local(thlocal:in_prolog_source_code/0).
+:- thread_local(thlocal:infMustArgIsa/0).
+:- thread_local(thlocal:infSkipArgIsa/0).
+:- thread_local(thlocal:infSkipFullExpand/0).
+:- thread_local(thlocal:is_calling/0).
+:- thread_local(thlocal:mpred_opcall/2).
+:- thread_local(thlocal:mpred_pfc_add_loaded/0).
+:- thread_local(thlocal:noDBaseHOOKS/1).
+:- thread_local(thlocal:noDBaseMODs/1).
+:- thread_local(thlocal:pfc_loads_file/0).
+:- thread_local(thlocal:with_callMPred/1).
+:- dynamic(user:isa_pred_now_locked/0).
+:- dynamic(pfc_manages_unknowns/0).
+
+
+:- thread_local user:repl_to_string/2.
+:- thread_local user:repl_writer/2.
 
 

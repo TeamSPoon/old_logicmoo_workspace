@@ -41,9 +41,9 @@ is_leave_alone(A):-failOnError((sub_atom(A,_,1,0,S),atom_number(S,_))),!.
 
 :- discontiguous(mudTermAnglify/2).
 
-:- decl_mpred_prolog(mudTermAnglify/2).
-:- decl_mpred_prolog(term_anglify_args/6).
-:- decl_mpred_prolog(term_anglify_last/2).
+prologOnly(mudTermAnglify/2).
+prologOnly(term_anglify_args/6).
+prologOnly(term_anglify_last/2).
 :-export(term_anglify_args/6).
 :-export(term_anglify_last/2).
 
@@ -187,12 +187,12 @@ best_nl_phrase(Order,TStr1,TStr2):-
 
 is_phrase_type(posNP).
 
-:- decl_mpred_prolog(local_term_anglify/2).
-:- decl_mpred_prolog(local_term_anglify_first/2).
-:- decl_mpred_prolog(local_term_anglify_last/2).
-:- decl_mpred_prolog(local_term_anglify_np/2).
-:- decl_mpred_prolog(enter_term_anglify/2).
-:- decl_mpred_prolog(term_anglify_np_last/2).
+prologOnly(local_term_anglify/2).
+prologOnly(local_term_anglify_first/2).
+prologOnly(local_term_anglify_last/2).
+prologOnly(local_term_anglify_np/2).
+prologOnly(enter_term_anglify/2).
+prologOnly(term_anglify_np_last/2).
 
 % ========================================
 % enter_term_anglify(MASK)

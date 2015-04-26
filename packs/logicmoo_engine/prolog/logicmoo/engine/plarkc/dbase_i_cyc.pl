@@ -214,7 +214,7 @@ is_simple_arg(A):-functor(A,Simple,_),tEscapeFunction(Simple).
 
 'tEscapeFunction'('TINYKB-ASSERTION').
 'tEscapeFunction'('SubLQuoteFn').
-'tEscapeFunction'(X):- hasInstance('UnreifiableFunction',X).
+'tEscapeFunction'(X):- 'UnreifiableFunction'(X).
 
 needs_canoncalization(CycL):-is_ftVar(CycL),!,fail.
 needs_canoncalization(CycL):-functor(CycL,F,_),isa_db(F,'SentenceOperator').
@@ -289,7 +289,7 @@ arity('abbreviationString-PN', 2).
 typical_mtvars([_,_]).
 
 % arity 1 person
-make_functorskel(Person,1,fskel(Person,hasInstance(Person,A),Call,A,[],MtVars,Call2)):-typical_mtvars(MtVars),Call=..[Person,A],Call2=..[Person,A|MtVars]. 
+make_functorskel(Person,1,fskel(Person,tE(Person,A),Call,A,[],MtVars,Call2)):-typical_mtvars(MtVars),Call=..[Person,A],Call2=..[Person,A|MtVars]. 
 % arity 2 likes
 make_functorskel(Likes,2,fskel(Likes,t(Likes,A,B),Call,A,B,MtVars,Call2)):- typical_mtvars(MtVars),Call=..[Likes,A,B],Call2=..[Likes,A,B|MtVars]. 
 % arity 3 between

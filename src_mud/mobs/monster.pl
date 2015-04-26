@@ -20,7 +20,7 @@
 % Possible agent actions.
 % :- register_module_type (planning).
 
-:-decl_type(tMonster).
+tCol(tMonster).
 
 user:world_agent_plan(_World,Agent,Act):-
    isa(Agent,tMonster),
@@ -52,13 +52,13 @@ monster_idea(Agent,actMove(1,Dir)) :-
 
 monster_idea(Agent,Act) :- move_or_sit_memory_idea(Agent,Act,[tCorpse]).
 
-:-decl_type(tClothing).
-:-decl_mpred_hybrid(wearsClothing/2).
+tCol(tClothing).
+prologHybrid(wearsClothing/2).
 
 %:-wdmsg(wearsClothing/2).
 %:-prolog.
 %:-visible(+all),leash(+all),trace.
-:-add(pred_argtypes(wearsClothing(tObj,tClothing))).
+:-add(mpred_argtypes(wearsClothing(tObj,tClothing))).
 %:-notrace.
 %:- prolog.
 

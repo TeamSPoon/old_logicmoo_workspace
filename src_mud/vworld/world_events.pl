@@ -44,6 +44,6 @@ get_agent_stream(Whom,Input,Output):- thglobal:agent_message_stream(Whom,_,Input
 get_agent_stream(Whom,_Input,_Output):-ignore(retract(thglobal:agent_message_stream(Whom,_,_,_))),!,fail.
 
 :-export(mudDeliverableLocationEvents/3).
-:-decl_mpred_hybrid(mudDeliverableLocationEvents(tAgentGeneric,tRegion,ftTerm)).
+prologHybrid(mudDeliverableLocationEvents(tAgentGeneric,tRegion,ftTerm)).
 
 mudDeliverableLocationEvents(Agent,Loc,actTick(Agent,Loc)).

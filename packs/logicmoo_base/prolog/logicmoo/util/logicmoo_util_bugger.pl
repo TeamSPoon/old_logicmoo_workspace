@@ -351,8 +351,8 @@ restore_trace(Goal):-  tracing, notrace,!,'$leash'(Old, Old),'$visible'(OldV, Ol
 restore_trace(Goal):-  '$leash'(Old, Old),'$visible'(OldV, OldV),call_cleanup(Goal,((notrace,'$leash'(_, Old),'$visible'(_, OldV)))).
 
 
-start_rtrace:-hotrace((visible(+all),visible(+unify),visible(+exception),leash(-all),leash(+exception),assert(tlbugger:rtracing))).
-stop_rtrace:-hotrace((visible(+all),visible(+unify),visible(+exception),leash(+all),leash(+exception),notrace,ignore(retract(tlbugger:rtracing)))).
+start_rtrace:-notrace((visible(+all),visible(+unify),visible(+exception),leash(-all),leash(+exception),assert(tlbugger:rtracing))).
+stop_rtrace:-notrace((visible(+all),visible(+unify),visible(+exception),leash(+all),leash(+exception),notrace,ignore(retract(tlbugger:rtracing)))).
 nortrace:-stop_rtrace.
 rtrace:-start_rtrace,trace.
 rnotrace:-stop_rtrace,trace.
@@ -459,7 +459,7 @@ badfood(MCall):- numbervars(MCall,0,_,[functor_name('VAR_______________________x
 :-meta_predicate (must(:)).
 %must(C):-  tlbugger:skipMust,!,catch(C,E,(wdmsg(E:C),fail)).
 % must(C):- catch(C,E,(wdmsg(E:C),fail)) *-> true ; (wdmsg(failed_must(C)),dtrace(C)).
-must(MCall):- skipWrapper,!, (MCall *-> true ; ((trace,MCall))).
+must(MCall):- skipWrapper,!, (MCall *-> true ; ((dmsg(failed(must(MCall))),trace,MCall))).
 %must(C):-  tlbugger:skipMust,!,catch(C,E,(wdmsg(E:C),fail)).
 must(MCall):- hotrace((tlbugger:show_must_go_on,
  strip_module(MCall,M,Call))),!,
@@ -1703,11 +1703,13 @@ singletons(_).
 :-set_prolog_flag(debug,true).
 :-set_prolog_flag(gc,true).
 */
-set_mem_opt(_):- !.
-set_mem_opt0(TF):- set_prolog_flag(gc,TF),set_prolog_flag(last_call_optimisation,TF),set_prolog_flag(optimise,TF).
+set_optimize(_):- !.
+set_optimize(TF):- set_prolog_flag(gc,TF),set_prolog_flag(last_call_optimisation,TF),set_prolog_flag(optimise,TF).
 
-do_gc:- statistics,!. % ,do_gc0,do_gc0,statistics.
-do_gc0:- current_prolog_flag(gc,GCWAS),set_prolog_flag(gc,true), garbage_collect, garbage_collect_atoms, set_prolog_flag(gc,GCWAS).
+do_gc:- current_prolog_flag(gc,true),!,do_gc0.
+do_gc:- set_prolog_flag(gc,true), do_gc0, set_prolog_flag(gc,false).
+
+do_gc0:- notrace((garbage_collect, garbage_collect_atoms, statistics)).
 
 
 failOnError(Call):-catchv(Call,_,fail).
@@ -2282,13 +2284,14 @@ matches_term0(F/A,Term):- (var(A)->member(A,[0,1,2,3,4]);true), functor_safe(Fil
 matches_term0(Filter,Term):- sub_term(STerm,Term),nonvar(STerm),matches_term0(Filter,STerm),!.
 
 dmsginfo(V):-dmsg(info(V)).
-dmsg(V):- hotrace((dmsg0(V),garbage_collect,garbage_collect_atoms)).
+dmsg(V):- hotrace((dmsg0(V),garbage_collect,garbage_collect_atoms,ignore((source_location(S,L),format('% ~w~n',[S:L]))))).
 :-'$syspreds':'$hide'(dmsg/1).
 
 :-export(dmsg0/1).
 :-export(dmsg1/1).
 dmsg0(V):- is_with_dmsg(FP),!,FP=..FPL,append(FPL,[V],VVL),VV=..VVL,once(dmsg0(VV)).
 dmsg0(_):- \+ always_show_dmsg, is_hiding_dmsgs,!.
+
 dmsg0(V):- var(V),!,dmsg0(dmsg_var(V)).
 dmsg0(V):- once(dmsg1(V)), ignore((hook:dmsg_hook(V),fail)).
 %dmsg1(trace_or_throw(V)):- dumpST(350),print_dmessage(warning,V),fail.
@@ -3549,6 +3552,9 @@ in_toplevel :- nth_pi(LF,_:'$load_file'/_),nth_pi(TL,'$toplevel':_/0),!,LF>TL,
 
 :- source_location(S,_),forall(source_file(H,S),(functor(H,F,A),export(F/A),module_transparent(F/A))).
 
+:-dynamic(did_ref_job/1).
+do_ref_job(_Body,Ref):-did_ref_job(Ref),!.
+do_ref_job(Body ,Ref):-asserta(did_ref_job(Ref)),!,show_call(Body).
 
 
 :- all_module_predicates_are_transparent(bugger).

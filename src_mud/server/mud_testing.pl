@@ -17,6 +17,7 @@
         test_call/1]).
 
 :- thread_local was_test_name/1.
+:- multifile(user:mud_regression_test/0).
 
 :- meta_predicate test_call(+).
 :- meta_predicate run_mud_test(+,+).
@@ -90,21 +91,6 @@ run_mud_test(Name,Test):-
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-:- catch(noguitracer,_,true).
-
-
 % define tests locally
 
 mud_test(test_movedist,
@@ -141,9 +127,6 @@ mud_test_level2(drop_take,
   do_player_action('take food'),
   do_player_action('eat food'))))).
 
-
-% Was this our startup file?
-was_runs_tests_pl:-is_startup_file('run_tests.pl').
 
 :- catch(noguitracer,_,true).
 
@@ -272,6 +255,7 @@ must_test("tests to see if poorly canonicalized code (unrestricted quantificatio
 mud_test_local :- at_start(must_det(run_mud_tests)).
 
 
+% :- forall(clause(user:mud_regression_test,Call),must(Call)).
 
 
 

@@ -21,7 +21,7 @@
 % :- register_module_type (planning).
 % :- register_module_type (mtCommand).
 
-:-decl_type(tPrey).
+tCol(tPrey).
 tCol(tPrey).
 
 % Predicates asserted during run.

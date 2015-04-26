@@ -16,6 +16,7 @@
 % Douglas Miles
 */
 
+
 end_of_file.
 end_of_file.
 end_of_file.
@@ -80,18 +81,16 @@ run_deduce_facts_from_ilc(Type,Fact):-doall((call_no_cuts(deduce_facts_forward(F
 
 %OLD user:decl_database_hook(change(assert,_),BadFact):-mpred_call(tms_reject_why(BadFact,WHY)),trace_or_throw(tms_reject_why(BadFact,WHY)).
 
-deduceFromArgTypes(_).
-
-deduce_facts_forward(Fact,user:mpred_prop(AF,[pred_argtypes(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],functorDeclaresPred(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,
+deduce_facts_forward(Fact,user:mpred_prop(AF,[mpred_argtypes(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],functorDeclaresPred(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,
                 ArgTs=..[AF|ARGS],!,sanity(ground(ARGS)).
 
-deduce_facts_forward(pred_argtypes(ArgTs),user:mpred_prop(F,pred_argtypes(ArgTs))):-get_functor(ArgTs,F),assert_predArgTypes_fa(F,ArgTs).
-deduce_facts_forward(user:mpred_prop(F,pred_argtypes(ArgTs)),pred_argtypes(ArgTs)):-get_functor(ArgTs,F),assert_predArgTypes_fa(F,ArgTs).
+deduce_facts_forward(mpred_argtypes(ArgTs),user:mpred_prop(F,mpred_argtypes(ArgTs))):-get_functor(ArgTs,F),assert_predArgTypes_fa(F,ArgTs).
+deduce_facts_forward(user:mpred_prop(F,mpred_argtypes(ArgTs)),mpred_argtypes(ArgTs)):-get_functor(ArgTs,F),assert_predArgTypes_fa(F,ArgTs).
 
-deduce_facts_forward(pred_argtypes(ArgTs),argIsa(F,A,Type)):-get_functor(ArgTs,F,_),arg(A,ArgTs,Type).
-deduce_facts_forward(user:mpred_prop(F,pred_argtypes(ArgTs)),argIsa(F,A,Type)):-arg(A,ArgTs,Type).
+deduce_facts_forward(mpred_argtypes(ArgTs),argIsa(F,A,Type)):-get_functor(ArgTs,F,_),arg(A,ArgTs,Type).
+deduce_facts_forward(user:mpred_prop(F,mpred_argtypes(ArgTs)),argIsa(F,A,Type)):-arg(A,ArgTs,Type).
 
-deduce_facts_forward(argIsa(F,_A,Type),[isa(Type,tCol),isa(F,tRelation)]):-atom(Type),not(hasInstance(ttFormatType,Type)).
+deduce_facts_forward(argIsa(F,_A,Type),[isa(Type,tCol),isa(F,tRelation)]):-atom(Type),not(tE(ttFormatType,Type)).
 
 %deduce_facts_forward(B,A):- is_asserted('<=>'(B,A)),not(contains_singletons(A)).
 %deduce_facts_forward(B,A):- is_asserted('<=>'(A,B)),not(contains_singletons(A)).
@@ -108,18 +107,18 @@ fix_argsIsas(_,_,[],[]):-!.
 fix_argsIsas(F,N,[Arg|TList],[G|List]):-
    fix_argIsa(F,N,Arg,G),!, N1 is N + 1,fix_argsIsas(F,N1,TList,List),!.
 
-%OLD user:decl_database_hook(change(assert,_),pred_argtypes(ArgTs)):-
+%OLD user:decl_database_hook(change(assert,_),mpred_argtypes(ArgTs)):-
 /*   ArgTs=..[F|ArgTList],
    fix_argsIsas(F,1,ArgTList,GList),
    Good=..[F|GList],
-   Good\=ArgTs,!,del(user:mpred_prop(F,pred_argtypes(ArgTs))),decl_mpred(F,pred_argtypes(Good)).
+   Good\=ArgTs,!,del(user:mpred_prop(F,mpred_argtypes(ArgTs))),decl_mpred(F,mpred_argtypes(Good)).
 */
 
-%OLD user:decl_database_hook(change(assert,_),isa(ArgTs,PredArgTypes)):- pred_argtypes==PredArgTypes,
+%OLD user:decl_database_hook(change(assert,_),isa(ArgTs,PredArgTypes)):- mpred_argtypes==PredArgTypes,
 /*   ArgTs=..[F|ArgTList],
    fix_argsIsas(F,1,ArgTList,GList),
    Good=..[F|GList],
-   Good\=ArgTs,!,del(user:mpred_prop(F,pred_argtypes(ArgTs))),decl_mpred(F,pred_argtypes(Good)).
+   Good\=ArgTs,!,del(user:mpred_prop(F,mpred_argtypes(ArgTs))),decl_mpred(F,mpred_argtypes(Good)).
 */
 
 :-export(add_deduction/3).

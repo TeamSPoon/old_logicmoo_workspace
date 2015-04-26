@@ -104,7 +104,7 @@ prop_memb(E,L):-flatten([E],EE),flatten([L],LL),!,intersect(A,EE,B,LL,isaOrSame(
 tCol(tItem).
 tCol(tAgentGeneric).
 tCol(tRegion).
-:-decl_type(tItem).
+tCol(tItem).
 tCol(tItem).
 exisitingThing(O):-tItem(O).
 exisitingThing(O):-tAgentGeneric(O).
@@ -115,7 +115,7 @@ anyInst(O):-exisitingThing(O).
 /*
 
 
-% pred_argtypes(typeGenls(col,metaclass)).
+% mpred_argtypes(typeGenls(col,metaclass)).
 
 %OLD user:decl_database_hook(change(assert,_),typeGenls(_,MC)):-assert_isa(MC,ttTypeType).
 
@@ -129,7 +129,7 @@ anyInst(O):-exisitingThing(O).
 %cached(G):-ccatch(G,_,fail).
 
 
-:-decl_type(ttNotSpatialType).
+tCol(ttNotSpatialType).
 
 ttNotSpatialType(ftInt).
 ttNotSpatialType(ftTerm).
@@ -155,7 +155,6 @@ create_agent(P):-functor(P,isKappaFn,_),!.
 create_agent(P):-create_agent(P,[]).
 create_agent(P,List):-must_det(create_instance(P,tAgentGeneric,List)).
 
-% decl_type(Spec):-create_instance(Spec,col,[]).
 
 :-export(create_instance/1).
 create_instance(P):- must_det((isa(P,What),ttSpatialType(What))),must_det(create_instance(P,What,[])).
@@ -186,7 +185,7 @@ create_instance_0(What,Type,List):- (var(What);var(Type);var(List)),trace_or_thr
 create_instance_0(I,_,_):-is_creating_now(I),!.
 create_instance_0(I,_,_):-asserta_if_new(is_creating_now(I)),fail.
 create_instance_0(What,FormatType,List):- FormatType\==tCol, ttFormatType(FormatType),!,trace_or_throw(ttFormatType(FormatType,create_instance(What,FormatType,List))).
-create_instance_0(SubType,tCol,List):-decl_type(SubType),padd(SubType,List).
+create_instance_0(SubType,tCol,List):-add(tCol(SubType)),padd(SubType,List).
 
 ttSpatialType(tAgentGeneric).
 genls(tActor,tAgentGeneric).

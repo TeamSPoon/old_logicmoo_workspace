@@ -2,7 +2,8 @@
 
 % :- module(swish_with_localedit,[]).
 
-:- multifile(user:semweb_startup).
+
+:- multifile(mpred_online:semweb_startup).
 :- '@'(ensure_loaded(library(logicmoo/util/logicmoo_util_bugger)),user).
 
 :- use_module(library(process)).
@@ -208,4 +209,40 @@ hup(_Signal) :-
 :- use_module(library(http/http_dispatch)).
 :- if_startup_script((http_server(http_dispatch, [ port(3050), workers(16) ]),
   debug(http_request(_)),debug(cm(_)),debug(swish(_)),debug(storage))).
+
+:- multifile(mpred_online:semweb_startup).
+:- export(do_semweb_startup/0).
+do_semweb_startup:-
+   predicate_property(mpred_online:semweb_startup,number_of_clauses(N1)),
+   forall(clause(mpred_online:semweb_startup,Body,Ref),must(do_ref_job(Body,Ref))),
+   predicate_property(mpred_online:semweb_startup,number_of_clauses(N2)),
+   ((N2\=N1) -> do_semweb_startup ; true).
+
+% [Optionaly] register swish server (remote file editing)
+% TODO :- with_no_mpred_expansions(if_file_exists(ensure_loaded('../externals/swish/logicmoo_run_swish'))).
+
+% [Optionaly] register/run Cliopatria sparql server (remote RDF browsing)
+% TODO mpred_online:semweb_startup:-ensure_loaded('run_clio').
+
+% [Optionaly] register/run KnowRob robot services (we use it for the ontology mainly)
+% TODO mpred_online:semweb_startup :- with_no_term_expansions(if_file_exists(ensure_loaded('../externals/MUD_KnowRob/knowrob_addons/knowrob_mud/prolog/init.pl'))).
+
+% [Optionaly] register/run MILO robot services (we use it for the ontology mainly)
+% TODO mpred_online:semweb_startup :- register_ros_package(milo).
+
+% [Optionaly] register/run EulerSharp robot services (we use it for the ontology mainly)
+% TODO mpred_online:semweb_startup :- register_ros_package(euler).
+
+% :- ensure_loaded(logicmoo(dbase/mpred_i_pldoc)).
+% :- do_semweb_startup.
+
+
+% [Optionaly] remove debug noises
+% mpred_online:semweb_startup:- forall(retract(prolog_debug:debugging(http(X), true, O)),show_call(asserta(prolog_debug:debugging(http(X), false, O)))).
+% mpred_online:semweb_startup:- forall(retract(prolog_debug:debugging((X), true, O)),show_call(asserta(prolog_debug:debugging((X), false, O)))).
+
+:-multifile(pre_file_search_path/2).
+% user:pre_file_search_path(_,_):-!,fail.
+
+
 

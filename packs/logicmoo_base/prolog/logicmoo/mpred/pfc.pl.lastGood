@@ -1919,7 +1919,7 @@ system:term_expansion(I,OO):- \+ thlocal:pfc_already_in_file_expansion(_),
 
 
 tCol(X)<=>isa(X,tCol).
-tCol(X) => ruleRewrite(t(X,I),isa(I,X)).
+tCol(X)/atom(X) => ruleRewrite(t(X,I),isa(I,X)).
 
 tCol(X) => { pfc_add(isa(X,tCol)) },is_declarer_macro(X).
 

@@ -63,7 +63,7 @@ choose_one(Prop,Obj,_Value):- Fact=.. [Prop,Obj,_],thlocal:infInstanceOnly(Fact)
 choose_one(Prop,Obj,Value):- with_fallbacks(fallback_value(Prop,Obj,RValue)),ground(choose_one(Prop,Obj,RValue)),checkNoArgViolation(Prop,Obj,RValue),!,Value = RValue,save_fallback(Obj,Prop,Value).
 choose_one(Prop,Obj,Value):- create_someval(Prop,Obj,RValue),ground(create_someval(Prop,Obj,RValue)),checkNoArgViolation(Prop,Obj,RValue),!,Value = RValue,save_fallback(Obj,Prop,Value).
 
-choose_each(Prop,Obj,Value):- hasInstance(completeExtentAsserted, Prop),!,choose_asserted(Prop,Obj,Value).
+choose_each(Prop,Obj,Value):- tE(completeExtentAsserted, Prop),!,choose_asserted(Prop,Obj,Value).
 choose_each(Prop,Obj,Value):- one_must(choose_asserted(Prop,Obj,Value),(fallback_value(Prop,Obj,Value),maybe_cache(Prop,Obj,Value,Obj))).
 
 % choose_asserted(Prop,Obj,Value):- t(Prop,Obj,Value). % ,must_det(is_asserted(t(Prop,Obj,Value))).

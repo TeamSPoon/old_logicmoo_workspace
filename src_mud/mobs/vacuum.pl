@@ -17,7 +17,7 @@
 
 % Possible agent actions.
 
-:-decl_type(tVacuum).
+tCol(tVacuum).
 tCol(tVacuum).
 
 user:world_agent_plan(_World,Agent,Act):-

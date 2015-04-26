@@ -22,7 +22,6 @@
 % :- register_module_type (planning).
 
 
-:-decl_type(tPredator).
 tCol(tPredator).
 user:world_agent_plan(_World,Agent,Act):-
    isa(Agent,tPredator),

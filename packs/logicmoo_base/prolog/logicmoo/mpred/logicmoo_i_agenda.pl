@@ -67,8 +67,8 @@ agenda_rescan_mpred_ops:- agenda_rescan_for_module_ready.
 agenda_rescan_for_module_ready:- thlocal:in_agenda_rescan_for_module_ready,!.
 agenda_rescan_for_module_ready:- with_assertions(thlocal:in_agenda_rescan_for_module_ready,loop_check_local(do_all_of(mpred_module_ready),true)).
 
-:-export agenda_slow_op_todo/1.
-:-dynamic agenda_slow_op_todo/1.
+:-export(agenda_slow_op_todo/1).
+:-dynamic(agenda_slow_op_todo/1).
 user:agenda_slow_op_enqueue(Slow):- test_tl(agenda_slow_op_do_prereqs),!,debugOnError(Slow).
 user:agenda_slow_op_enqueue(Slow):- assertz_if_new(agenda_slow_op_todo(Slow)),!.
 
@@ -123,7 +123,7 @@ add_later(Fact):- call_after_mpred_load(add(Fact)).
 %
 %     assert/retract hooks
 % ========================================
-:- export user:decl_database_hook/2.
+:- export(user:decl_database_hook/2).
 % hooks are declared as
 %        user:decl_database_hook(change(assert,A_or_Z),Fact):- ...
 %        user:decl_database_hook(change( retract,One_or_All),Fact):- ...
@@ -205,13 +205,13 @@ rescan_all:- doall_and_fail(agenda_slow_op_restart).
 rescan_all:- doall_and_fail(agenda_rescan_mpred_props).
 rescan_all.
 
-ensure_at_least_one_region:- (isa(_,tRegion)->true;create_instance(oneRegion1,tRegion)),!.
+ensure_at_least_one_region:- (isa(_,tRegion)->true;add(isa(iRegion1,tRegion))),!.
 
 % :-meta_predicate(finish_processing_dbase).
 finish_processing_dbase:- do_gc,dmsginfo(begin_finish_processing_dbase),fail.
-finish_processing_dbase:- doall_and_fail(rescan_all).
+finish_processing_dbase:- (doall_and_fail(rescan_all)).
 finish_processing_dbase:- doall_and_fail(ensure_at_least_one_region).
-finish_processing_dbase:- doall_and_fail(call_OnEachLoad).
+finish_processing_dbase:- (doall_and_fail(call_OnEachLoad)).
 finish_processing_dbase:- dmsginfo(saving_finish_processing_dbase),fail.
 finish_processing_dbase:- savedb,fail.
 finish_processing_dbase:- do_gc,dmsginfo(end_finish_processing_dbase),fail.

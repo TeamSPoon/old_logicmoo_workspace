@@ -19,6 +19,7 @@
 
 :- prolog_load_context(directory,Dir),asserta(user:file_search_path(prologmud,Dir)).
 
+xyzFn(R,X,Y,Z):-dmsg(xyzFn(R,X,Y,Z)),trace_or_throw(xyzFn(R,X,Y,Z)).
 
 
 /** <module> An Implementation a MUD server in SWI-Prolog
@@ -41,7 +42,6 @@ prolog:message(git(update_versions),A,A):-!.
 
 :- ((current_prolog_flag(readline, true))->expand_file_name("~/.pl-history", [File|_]),(exists_file(File) -> rl_read_history(File); true),at_halt(rl_write_history(File));true).
 
-:-module(user).
 
 :- multifile( entailment:rdf /3 ).
 
@@ -74,7 +74,7 @@ now_try_game_dir(Else):-  enumerate_files(game('.'), GAMEDIR) *->
       forall(no_repeats_old(X,enumerate_files(game('**/*.plmoo'),X)),declare_load_dbase(X)))); (fmt(missing(GAMEDIR)),Else)));  (fmt(no_game_dir),Else).
 
 
-:-context_module(CM),assert(startup_mod:loading_from_cm(CM)).
+:-context_module(CM),assert(user:loading_from_cm(CM)).
 create_module(M):-context_module(CM),module(M),asserta(M:this_is_a_module(M)),writeq(switching_back_to_module(CM)),module(CM).
 :-create_module(user).
 :-create_module(hook).
@@ -90,7 +90,7 @@ parser_chat80_module(moo).
 
 
 :-export(prolog_repl/0).
-prolog_repl:- with_all_dmsg((nl,fmt("Press Ctrl-D to start the mud!"),nl,catch(tlocals,E,dmsg(tlocals==E)),'@'(prolog,'user'))).
+prolog_repl:- with_all_dmsg((nl,fmt("Press Ctrl-D to start the mud!"),nl,'@'(prolog,'user'))).
 
 :- set_prolog_flag(gui,false).
 :- set_prolog_flag(history,1000).
@@ -121,12 +121,12 @@ within_user(Call):- '@'(Call,'user').
 
 % :- user_use_module(logicmoo('http/user_page')).
 
-:- meta_predicate(startup_mod:if_version_greater(?,0)).
+:- meta_predicate(user:if_version_greater(?,0)).
 
-startup_mod:if_version_greater(V,Goal):- current_prolog_flag(version,F), ((F > V) -> call(Goal) ; true).
+user:if_version_greater(V,Goal):- current_prolog_flag(version,F), ((F > V) -> call(Goal) ; true).
 
 % set to false because we don't want to use the mudconsole
-:- if_flag_true(false, startup_mod:if_version_greater(70109,user_use_module(logicmoo('mudconsole/mudconsolestart')))).
+:- if_flag_true(false, user:if_version_greater(70109,user_use_module(logicmoo('mudconsole/mudconsolestart')))).
 
 % [Optionaly 1st run] tell where ClioPatria is located and restart for the 2nd run
 %:- set_setting(cliopatria_binding:path, '/devel/ClioPatria'), save_settings('moo_settings.db').
@@ -151,6 +151,8 @@ hard_work:-
    ensure_loaded(swish(logicmoo_run_swish))
    )))),!.
 
+% [Required] load the mud PFCs
+:- user:ensure_loaded(prologmud(server/mud_builtin)).
 
 
 slow_work:- with_assertions( prevent_transform_moo_preds , within_user(at_start(hard_work))).
@@ -158,20 +160,20 @@ slow_work:- with_assertions( prevent_transform_moo_preds , within_user(at_start(
 thread_work:- thread_property(X, status(running)),X=loading_code,!.
 thread_work:- thread_create(slow_work,_,[alias(loading_code)]).
 
-% start_servers :- startup_mod:if_version_greater(70111,thread_work).
-start_servers :- startup_mod:if_version_greater(70111,slow_work).
+% start_servers :- user:if_version_greater(70111,thread_work).
+start_servers :- user:if_version_greater(70111,slow_work).
 
 enqueue_player_command(C):-enqueue_player_command(_,C).
 enqueue_player_command(P,C):-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,C)).
 
 
-startup_mod:run_setup_now:-
+user:run_setup_now:-
    within_user((
       finish_processing_world      
    % TO UNDO register_timer_thread(npc_ticker,90,npc_tick)
    )).
 
-run_setup:- within_user(at_start(startup_mod:run_setup_now)).
+run_setup:- within_user(at_start(user:run_setup_now)).
 
 run:- within_user(at_start(login_and_run)).
 
@@ -232,6 +234,8 @@ debug_talk:- debug_repl_wo_cyc(parser_talk,t3).
 % [Optional] Testing PTTP
 % :-is_startup_file('run_debug.pl')->doall(do_pttp_test(_));true.
 
+% Was this our startup file?
+was_runs_tests_pl:-is_startup_file('run_tests.pl').
 
 % [Optional] Interactively debug E2C
 % :- debug_e2c.
@@ -243,9 +247,9 @@ mud_test_local :- current_predicate(kellerStorage:kellerStorageTestSuite/0) -> k
 
 
 % the real tests now (once)
-mud_test_local :- if_flag_true(was_run_dbg_pl,at_start(must_det(run_mud_tests))).
+mud_test_local :- if_flag_true(was_runs_tests_pl,at_start(must_det(run_mud_tests))).
 
- % :- if_flag_true(was_run_dbg_pl, doall(now_run_local_tests_dbg)).
+ % :- if_flag_true(was_runs_tests_pl, doall(now_run_local_tests_dbg)).
 
 
 % [Optionaly] Allows testing/debug of the chat80 system (withouyt loading the servers)
@@ -280,11 +284,11 @@ cmdresult(statistics,true)
 % :- prolog.
 
 % :-foc_current_player(P),assertz_if_new(thglobal:player_command_stack(P,chat80)).
-:- if_flag_true(was_run_dbg_pl, at_start(run)).
+:- if_flag_true(was_runs_tests_pl, at_start(run)).
 
 
 % So scripted versions don't just exit
-%:- if_flag_true(was_run_dbg_pl,at_start(prolog)).
+%:- if_flag_true(was_runs_tests_pl,at_start(prolog)).
 
 %:- kill_term_expansion.
 %:- prolog.

@@ -14,7 +14,7 @@
 % ====================================================
 % the entire inventory system
 % ====================================================
-:- decl_type(tNearestReachableItem).
+tCol(tNearestReachableItem).
 tNearestReachableItem(Obj):-
   current_agent(Agent),
   nearest_reachable_object(Agent,Obj).

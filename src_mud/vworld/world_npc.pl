@@ -94,7 +94,7 @@ user:action_info(actProlog(ftCallable),"Call a ftCallable").
 
 user:agent_text_command(Agent,["prolog",X],Agent,actProlog(X)):-ignore(X=isRandom(ftCallable)).
 user:agent_text_command(Agent,["prolog"],Agent,actProlog(prolog_repl)).
-user:agent_text_command(Agent,["tlocals"],Agent,actProlog(tlocals)).
+% user:agent_text_command(Agent,["tlocals"],Agent,actProlog(tlocals)).
 
 warnOnError(X):-catch(X,E,dmsg(error(E:X))).
 

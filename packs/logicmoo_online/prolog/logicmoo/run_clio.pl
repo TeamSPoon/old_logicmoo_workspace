@@ -1,4 +1,4 @@
-:- multifile(user:semweb_startup).
+:- multifile(mpred_online:semweb_startup).
 :- ensure_loaded('../src_lib/logicmoo_util/logicmoo_util_all').
 
 :- multifile
@@ -174,7 +174,7 @@ ensure_webserver :- http_server(http_dispatch,[ port(3020), workers(16) ]).
 %prolog:message(git(update_versions))  --> [ 'Updating GIT version stamps in the background.' ])).
 % :-must(prolog:retract((message(git(update_versions,_,_):-_)))).
 
-user:semweb_startup:- do_semweb_startup_late_once.
+mpred_online:semweb_startup:- do_semweb_startup_late_once.
 
 :- if_startup_script(do_semweb_startup_late_once).
 

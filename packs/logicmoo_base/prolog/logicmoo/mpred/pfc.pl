@@ -17,6 +17,7 @@
 
 :- use_module(library(lists)).
 
+:-set_prolog_flag(gc,false).
 
 /*
 :- multifile(('=>')/1).
@@ -96,7 +97,7 @@ pfc_clause_is_asserted(H,B):- has_cl(H) , clause_u(H,B).
 
 % pfcDatabaseGoal(G):-compound(G),get_functor(G,F,A),pfcDatabaseTerm(F/A).
 
-user:provide_mpred_storage_clauses(Type,H,B,Proof):-pfc_clause(Type,H,B,Proof).
+user:provide_mpred_storage_clauses(pfc,H,B,Proof):-pfc_clause(H,B,Proof).
 
 %pfc_clause('=>'(H),B,forward(Proof)):- nonvar(H),!, user:provide_mpred_storage_clauses(H,B,Proof).
 %pfc_clause(H,B,forward(R)):- R=(=>(B,H)),clause(R,true).
@@ -329,7 +330,8 @@ pfc_assert(P) :-
 
 pfc_assert(P,S) :- 
   with_assertions(thlocal:pfc_already_in_file_expansion(P),expand_term(P,P0)),
-  pfc_assert_fast(P0,S).
+  to_addable_form(P0,P1),
+  pfc_assert_fast(P1,S).
 
 
 pfc_assert_fast(P0):-pfc_assert_fast(P0,(u,u)).
@@ -344,10 +346,54 @@ pfc_assert_fast(P,S) :-
 %pfc_assert_fast(P,S) :- pfc_warn("pfc_assert_fast(~w,~w) failed",[P,S]).
 
 
-to_assertable((P=>Q),was_new((P=>Q))):-!.
-to_assertable((P<=Q),was_new((P<=Q))):-!.
-to_assertable((P<=>Q),was_new((P<=>Q))):-!.
-to_assertable(P,P).
+decompress_each(I,O):- findall(M,do_expand_args(isEach,I,M),O),!.
+
+compress_isa_each(I,O):-decompress_each(I,M),maplist(compress_isa,M,O),!.
+compress_isa_each(I,O):-compress_isa(I,O).
+
+compress_isa(V,V):-not(compound(V)),!.
+compress_isa([H|T],[HH|TT]):-!,compress_isa(H,HH),compress_isa(T,TT),!.
+compress_isa((H,T),(HH,TT)):-!,compress_isa(H,HH),compress_isa(T,TT),!.
+compress_isa(I,I):-contains_term(S,I),nonvar(S),exact_args(S),!.
+compress_isa(I,O):-compress_isa0(I,O).
+
+
+compress_isa0(V,V):-not(compound(V)),!.
+compress_isa0({V},{V}):-!.
+compress_isa0(eXact(V),V):-!.
+compress_isa0(isa(I,C),V):-!,atom(C)->V=..[C,I];V=isa(I,C).
+compress_isa0(C,C):-exact_args(C),!.
+compress_isa0([H|T],[HH|TT]):-!,compress_isa0(H,HH),compress_isa0(T,TT),!.
+compress_isa0(C,CO):-C=..[F|CL],maplist(compress_isa0,CL,CLO),!,CO=..[F|CLO].
+
+:-source_location(F,_),asserta(absolute_source_location_pfc(F)).
+
+exact_args(asserted(_)).
+exact_args(retract_eq_quitely(_)).
+exact_args(asserts_eq_quitely(_)).
+exact_args(assertz_if_new(_)).
+exact_args((_:-_)).
+exact_args((_ =.. _)).
+exact_args((:-( _))).
+exact_args((A/B)):- (var(A);var(B)).
+exact_args(pfc_add(_)).
+exact_args(dynamic(_)).
+exact_args(cwc).
+exact_args(true).
+exact_args(C):-source_file(C,I),absolute_source_location_pfc(I).
+
+to_addable_form(I,O):- current_predicate(logicmoo_i_term_expansion_file/0),once((into_mpred_form(I,M),compress_isa_each(M,O))),!.
+to_addable_form(I,O):- compress_isa_each(I,O),!.
+
+to_assertable(I,OO):-compress_isa(I,M),to_assertable0(M,OO).
+to_assertable0((P=>Q),was_new((P=>Q))):-!.
+to_assertable0((P<=Q),was_new((P<=Q))):-!.
+to_assertable0((P<=>Q),was_new((P<=>Q))):-!.
+to_assertable0(P,P).
+
+retract_eq_quitely((H:-B)):-ignore((clause(H,B,Ref),clause(HH,BB,Ref),H=@=HH,B=@=BB,!,erase(Ref))).
+retract_eq_quitely((H)):-ignore((clause(H,true,Ref),clause(HH,BB,Ref),H=@=HH,BB==true,!,erase(Ref))).
+assert_eq_quitely(H):-assert_if_new(H).
 
 % pfc_post(+Ps,+S) tries to assert a fact or set of fact to the database.  For
 % each fact (or the singelton) pfc_post1 is called. It always succeeds.
@@ -357,28 +403,30 @@ pfc_post([H|T],S) :-
   pfc_post1(H,S),
   pfc_post(T,S).
 pfc_post([],_) :- !.
-pfc_post(P,S) :- pfc_post1(P,S).
-
+pfc_post(P,S) :-   
+  pfc_post1(P,S).
 
 % pfc_post1(+P,+S) tries to assert a fact to the database, and, if it succeeded,
 % adds an entry to the pfc queue for subsequent forward chaining.
 % It always succeeds.
+pfc_post1(P,S):-
+ compress_isa_each(P,PE),maplist(pfc_post1_sp(S),PE).
 
-pfc_post1(P,S) :-
+pfc_post1_sp(S,P) :-
   dynamic(P),
   %= db pfc_add_db_to_head(P,P2),
   % pfc_remove_old_version(P),
   pfc_add_support(P,S),
   to_assertable(P,AP),
   pfc_unique_u(AP),
-  assert_u(AP),
+  show_call(assert_u(AP)),
   pfc_trace_add(P,S),
   !,
   pfc_enqueue(P,S),
   !.
 
-pfc_post1(_,_).
-%=pfc_post1(P,S) :-  pfc_warn("pfc_post1(~w,~w) failed",[P,S]).
+pfc_post1_sp(_,_).
+%=pfc_post1_sp(S,P) :-  pfc_warn("pfc_post1_ps(~w,~w) failed",[P,S]).
 
 
 % was nothing  pfc_current_db/1.
@@ -1031,10 +1079,12 @@ trigger_trigger1(Trigger,Body) :-
 %= Note that this has the side effect [maybe] of catching unsupported facts and
 %= assigning them support from God. (g,g)
 %=
-pfc_call(F):-  no_repeats((loop_check(loop_check((pfc_call_0(F))),loop_check((pfc_call_0(F)))))).
+pfc_call(F):- no_repeats(loop_check(pfc_call_0(F))).
+pfc_call_0(ISA):-compound(ISA),ISA=isa(I, C), var(C),!,tE(tCol,C),nonvar(C),pfc_call_0(isa(I, C)).
 pfc_call_0(t(A,B,C)):-atom(A),!,ABC=..[A,B,C],pfc_call_0(ABC).
+pfc_call_0(F):- call_with_bc_triggers(F),maybeSupport(F,(g,g)),fail.
 pfc_call_0(F):- pfc_call_with_no_triggers(F).
-pfc_call_0(F):- call_with_bc_triggers(F).
+
 
 
 call_with_bc_triggers(P) :-
@@ -1043,15 +1093,24 @@ call_with_bc_triggers(P) :-
   pfc_get_support(bt(P,Trigger),S),
      pfc_eval_lhs(Trigger,S).
 
+pfc_call_with_no_triggers(F) :- 
+  %= this (var(F)) is probably not advisable due to extreme inefficiency.
+  var(F)    ->  pfc_fact(F) ; 
+  \+ current_predicate(_,F) -> (get_functor(F,FF,AA),show_call(dynamic(FF/AA)),add(arity(FF,AA)),fail);
+  %= we check for system predicates as well.
+  \+ has_cl(F) -> call_prologsys(F) ; 
+  clause_u(F,Condition),(Condition==true->true;call_u(Condition)).
+
+/*  
 pfc_call_with_no_triggers(F) :-
   %= this (var(F)) is probably not advisable due to extreme inefficiency.
   var(F)    ->  pfc_fact(F) ; 
   has_cl(F) ->  (clause_prologsys(F,Condition),(Condition==true->true;not(pfc_is_info(Condition)),call_prologsys(Condition)));
   %= we check for system predicates as well.
   current_predicate(_,F) -> call_u(F) ; ((expand_goal(F,FE),F\=@=FE)->(trace,pfc_call_with_no_triggers(FE));(get_functor(F,FF,AA),show_call(dynamic(FF/AA)),!,pfcBC_Cache(F))).
+*/
 
-
-pfc_bc_only(G):- pfc_negation(G,Pos),!,\+ show_call(pfc_bc_only(Pos)).
+pfc_bc_only(G):- pfc_negation(G,Pos),!, show_call(\+ pfc_bc_only(Pos)).
 pfc_bc_only(G):- !,(pfc_call(G)).
 %pfc_bc_only(G):- loop_check(no_repeats(pfcBC_NoFacts(G))).
 
@@ -1226,8 +1285,13 @@ pfc_compile_rhsTerm((P/C),((P:-C))) :- !,pfc_mark_as(P,pfcRHS).
 
 pfc_compile_rhsTerm(P,P):- pfc_mark_as(P,pfcRHS).
 
-pfc_mark_as(neg(P),Type):-nonvar(P),!,get_functor(P,F,A),pfc_add_fast([pfcMark(Type,neg,F,A),arity(F,A)]).
-pfc_mark_as(P,Type):-get_functor(P,F,A),pfc_add_fast([pfcMark(Type,pos,F,A),arity(F,A)]).
+pfc_mark_as(neg(P),Type):-nonvar(P),!,get_functor(P,F,A),pfc_add_fast([arity(F,A),pfcMark(Type,neg,F,A)]).
+pfc_mark_as(P,Type):-get_functor(P,F,A),pfc_mark_fa_as(F,A,Type).
+
+pfc_mark_fa_as(isa,_,_):- !.
+pfc_mark_fa_as(arity,_,_):- !.
+pfc_mark_fa_as(pfcMark,_,_):- !.
+pfc_mark_fa_as(F,A,Type):- pfc_add_fast([arity(F,A),pfcMark(Type,pos,F,A)]).
 
 
 %= pfc_negation(N,P) is true if N is a negated term and P is the term
@@ -2118,169 +2182,5 @@ show_pred_info_0(Head):-
         doall(show_call(predicate_property(Head,_))),
         (has_cl(Head)->doall((show_call(clause(Head,_))));hotrace((listing(Head)))),!.
 
-
-
-
-:- user:ensure_loaded(logicmoo(mpred/logicmoo_i_term_expansion_pfc)).
-
-
-
-
-
-:-dynamic(tCol/1).
-=>tCol(tCol).
-
-% ruleRewrite(isa(I,C),Head):-loop_check((atom(C),Head=..[C,I])).
-tCol(X) <=> isa(X,tCol).
-tCol(X) => ruleRewrite(t(X,I),isa(I,X)).
-
-=>tSet(tSet).
-
-tSet(P)=> 
-  {get_functor(P,C), functor(Head,C,1),
-  (\+(predicate_property(Head,_))->dynamic(C/1);true),  
-  Head=..[C,I],
- (predicate_property(Head,dynamic)->true;show_pred_info(Head))},
-   functorDeclares(C),
-   isa(C,pfcControlled),
-   arity(C,1),
-   (isa(I,C)/ground(I:C)=>Head),
-   isa(C,tCol).
-
-tSet(ttFormatType).
-tCol(ttFormatType).
-ttFormatType(P) => {get_functor(P,C), functor(Head,C,1),
-  (\+(predicate_property(Head,_))->dynamic(C/1);true),  
-  Head=..[C,I],
- (predicate_property(Head,dynamic)->true;show_pred_info(Head))},
-   neg(functorDeclares(C)),
-   isa(C,prologOnly),
-   arity(C,1),
-   (Head=>{retract(Head)}),
-   (isa(I,C)=>{retract(isa(I,C))}).
-
-tCol(tSet).
-
-(tCol(P),~ttFormatType(P)) => tSet(P).
-
-tCol(functorDeclaresPred).
-
-functorDeclaresPred(P) => {get_functor(P,C), functor(Head,C,1),
-  (\+(predicate_property(Head,_))->dynamic(C/1);true),  
-  Head=..[C,I],
- (predicate_property(Head,dynamic)->true;show_pred_info(Head))},
-   isa(C,pfcControlled),
-   arity(C,1),
-   (isa(I,C)/ground(I:C)=>Head).
-
-genls(X,tPred) <=> functorDeclaresPred(X).
-
-
-tCol(pfcControlled).
-tCol(functorDeclaresPred).
-tCol(functorDeclares).
-tCol(prologMacroHead).
-=>tCol(completelyAssertedCollection).
-tCol(ttFormatType).
-tCol(ttTemporalType).
-tCol(ttNotTemporalType).
-tCol(tTemporalThing).
-tCol(ftTerm).
-
-prologMacroHead(tCol).
-
-functorDeclaresPred(P)=>completelyAssertedCollection(P).
-
-completelyAssertedCollection(completelyAssertedCollection).
-completelyAssertedCollection(prologSingleValued).
-completelyAssertedCollection(tCol).
-completelyAssertedCollection(ttFormatType).
-completelyAssertedCollection(ttValueType).
-completelyAssertedCollection(ttTemporalType).
-completelyAssertedCollection(tRelation).
-completelyAssertedCollection(tPred).
-completelyAssertedCollection(defnSufficient).
-completelyAssertedCollection(genlPreds).
-
-:-dynamic(ttNotTemporalType/1).
-ttNotTemporalType(ftInt).
-%ttNotTemporalType(ftTerm).
-ttNotTemporalType(tCol).
-ttNotTemporalType(ttFormatType).
-ttNotTemporalType(ttValueType).
-
-=>ttNotTemporalType(tCol).
-ttNotTemporalType(T)=>tCol(T).
-=>ttTemporalType(tTemporalThing).
-ttTemporalType(T)=>tCol(T).
-
-
-
-:-dynamic(pfc_default/1).
-% here is an example which defines pfc_default facts and rules.  Will it work?
-(pfc_default(P)/pfc_literal(P))  =>  (~neg(P) => P).
-(pfc_default((P => Q))/pfc_literal(Q)) => (P, ~neg(Q) => Q).
-
-:-dynamic(conflict/1).
-% a conflict triggers a Prolog action to resolve it.
-conflict(C) => {must(resolveConflict(C))}.
-
-% meta rules to schedule inferencing.
-% resolve conflicts asap
-pfc_select(conflict(X),W) :- pfc_queue(conflict(X),W).
-
-% a pretty basic conflict.
-(neg(P), P) => conflict(P).
-
-
-% is this how to define constraints?
-(either(P,Q) => (neg(P) => Q), (neg(Q) => P)).
-% ((P,Q => false) => (P => neg(Q)), (Q => neg(P))).
-
-
-% asserting mpred_sv(p,2) causes p/2 to be treated as a mpred_sv, i.e.
-% if p(foo,1)) is a fact and we assert_db p(foo,2), then the forrmer assertion
-% is retracted.
-
-mpred_sv(Pred,Arity)
-  =>
-  {
-   dynamic(Pred/Arity),
-   length(AfterList,Arity),
-   append(Left,[A],AfterList),
-   append(Left,[B],BeforeList),
-  After =.. [Pred|AfterList],
-  Before =.. [Pred|BeforeList]},
-  (After,{Before, \==(A , B)} => {pfc_rem2(Before)}).
-
-
-
-:- dynamic(isa/2).
-
-pfcMark(_Type,_Pos,F,_A)=>pfcControlled(F).
-
-pfc_mark_C(G) => {pfc_mark_C(G)}.
-pfc_mark_C(G) :-  map_literals(pfc_lambda([P],(get_functor(P,F,A),pfc_add([isa(F,pfcControlled),arity(F,A)]))),G).
-
-( pfcControlled(F)/atom(F), arity(F,A),{\+ current_predicate(F/A) } ) => {dynamic_safe(F/A)}.
-pfcControlled(C)/compound(C)=>({get_functor(C,F)},pfcControlled(F)).
-isa(F,pfcMustFC)=>pfcControlled(F).
-
-
-functorDeclaresPred(Prop)=>tCol(Prop).
-
-
-((argIsa(Pred,1,Col),t(Pred,Arg,_)) => isa(Arg,Col)).
-((argIsa(Pred,2,Col),t(Pred,_,Arg)) => isa(Arg,Col)).
-
-
-tCol(Col) <=> isa(Col,tCol).
-
-:-dynamic((disjointWith/2,genls/2,isa/2)).
-
-%(disjointWith(P1,P2) , genls(C1,P1)) =>    disjointWith(C1,P2).
-disjointWith(Sub, Super) => disjointWith( Super, Sub).
-disjointWith(tObj,tRegion).
-disjointWith(ttSpatialType,ttAbstractType).
 
 
