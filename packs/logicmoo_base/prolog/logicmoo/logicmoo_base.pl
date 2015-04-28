@@ -57,10 +57,6 @@ is_stable:-fail.
 fast_mud.
 xperimental:-fail.
 xperimental_big_data:-fail.
-:-export(is_release/0).
-is_release :- fail,1 is random(3).
-:-export(not_is_release/0).
-not_is_release :- true. % 1 is random(3).
 simple_code :- fail.
 save_in_mpred_t:-true.
 not_simple_code :- \+ simple_code.

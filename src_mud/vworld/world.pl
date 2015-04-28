@@ -115,7 +115,7 @@ anyInst(O):-exisitingThing(O).
 /*
 
 
-% mpred_argtypes(typeGenls(col,metaclass)).
+% meta_argtypes(typeGenls(col,metaclass)).
 
 %OLD user:decl_database_hook(change(assert,_),typeGenls(_,MC)):-assert_isa(MC,ttTypeType).
 
@@ -163,7 +163,7 @@ create_instance(Name,Type):-create_instance(Name,Type,[]).
 user:create_instance(Name,Type):-create_instance(Name,Type,[]).
 :-export(create_instance/3).
 create_instance(What,Type,Props):- 
-  loop_check_local(time_call(create_instance_now(What,Type,Props)),dmsg(already_create_instance(What,Type,Props))).
+  loop_check(time_call(create_instance_now(What,Type,Props)),dmsg(already_create_instance(What,Type,Props))).
 
 create_instance_now(What,Type,Props):-
   must((var(Type);atom_concat('t',_,Type ))),!,

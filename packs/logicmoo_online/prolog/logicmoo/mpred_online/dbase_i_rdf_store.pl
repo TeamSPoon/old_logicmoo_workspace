@@ -457,7 +457,7 @@ rdf_assert_ignored(svo(_,prologOnly,_)).
 rdf_assert_ignored(mpred_prop(_,_)).
 rdf_assert_ignored(_:mpred_prop(_,_)).
 rdf_assert_ignored(user:mpred_prop(_,arity(1))).
-rdf_assert_ignored(user:mpred_prop(_,mpred_argtypes(_))).
+rdf_assert_ignored(user:mpred_prop(_,meta_argtypes(_))).
 %rdf_assert_ignored(DB):-functor(DB,F,_),member(F,[ruleBackward,mudTermAnglify,'<=>']).
 rdf_assert_ignored(DB):-functor(DB,_,1).
 rdf_assert_ignored(G):-pfcTypeFull(G,Type),!,(Type==trigger;Type==support).
@@ -510,7 +510,7 @@ to_rdf_ignore(DB,A,B):-any_to_rdf(DB,A,BB),ignore(B=BB).
 
 
 
-mpred_t_rdf(Sc,rdf:type,CC):- /*o_to_p(CC,Oc),*/clause(tE(Oc,Sc),true),any_to_rdf(Oc,CC),!.
+mpred_t_rdf(Sc,rdf:type,CC):- /*o_to_p(CC,Oc),*/clause(t(Oc,Sc),true),any_to_rdf(Oc,CC),!.
 mpred_t_rdf(Sc,Pc,Oc):-t(Pc,Sc,Oc),!.
 
 :-export(rdf_assert_x/3).
@@ -691,7 +691,7 @@ sync_to_rdf:-!.
 sync_to_rdf:-
    forall(p2q(P,NS,N),must(rdf_assert_p2q(P,NS,N))),  
    forall(user:mpred_prop(P,O),rdf_assert_hook(user:mpred_prop(P,O))),
-   forall(tE(C,I),rdf_assert_hook(isa(I,C))),
+   forall(t(C,I),rdf_assert_hook(isa(I,C))),
    forall(is_known_trew(B),rdf_assert_hook(B)),
    (thglobal:using_rdf_mpred_hook -> true ; (asserta(thglobal:using_rdf_mpred_hook),forall(prologHybridFact(G),rdf_assert_hook(G)))),
    asserta_if_new(user:call_OnEachLoad(sync_to_rdf)),

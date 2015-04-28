@@ -89,7 +89,8 @@ safe_univ0(Call,[L|List]):- sanity(atom(L);compound(Call)),ccatch(Call =.. [L|Li
 
 :- export(append_term/3).
 append_term(T,I,HEAD):-atom(T),HEAD=..[T,I],!.
-append_term(Call,E,CallE):- Call=..List, append(List,[E],ListE), CallE=..ListE.
+append_term(Call,E,CallE):-var(Call), must(compound(CallE)),CallE=..ListE,append(List,[E],ListE),Call=..List.
+append_term(Call,E,CallE):-must(compound(Call)), Call=..List, append(List,[E],ListE), CallE=..ListE.
 
 % =================================================================================
 % Utils
@@ -352,6 +353,7 @@ functor_h(Obj,F,A):-functor_catch(Obj,F,A).
 
 :- dynamic_multifile_exported((do_expand_args/3)).
 
+do_expand_args(_,Term,Term):- compound(Term),functor(Term,F,_),argsQuoted(F),!.
 do_expand_args(Exp,Term,Out):- compound(Term),!,do_expand_args_c(Exp,Term,Out).
 do_expand_args(_,Term,Term).
 

@@ -12,7 +12,7 @@
 
 % :- register_module_type (mtCommand).
 
-mpred_argtypes(action_verb_useable(vtVerb,tCol,ftTerm(tPred),ftTerm(tPred),ftTerm(tPred))).
+meta_argtypes(action_verb_useable(vtVerb,tCol,ftTerm(tPred),ftTerm(tPred),ftTerm(tPred))).
 
 genls(isEach('PortableObject','ProtectiveAttire',tStowAble),tWieldAble).
 genls('FluidReservoir',tDrinkAble).

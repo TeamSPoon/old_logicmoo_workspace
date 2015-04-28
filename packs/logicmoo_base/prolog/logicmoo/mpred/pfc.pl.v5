@@ -2663,7 +2663,7 @@ pfc_trace_add(P,S) :-
 
 %example pfc_is_crazy_bad_fact(mpred_prop(not,tCol)).
 %example pfc_is_crazy_bad_fact(mpred_prop(_,not)).
-pfc_is_crazy_bad_fact(mpred_prop(_,mpred_argtypes)).
+pfc_is_crazy_bad_fact(mpred_prop(_,meta_argtypes)).
 
 pfc_trace_addPrint(P,S) :- pfc_is_crazy_bad_fact(P),retractall(tlbugger:show_must_go_on),!,trace_or_throw(crazy_pfc_trace_addPrint(P,S)).
 
@@ -3147,10 +3147,10 @@ pfc_ify(F/A):- export(F/A),((pfc_wont_assert(F/A)->pfc_mark_P(F/A);pfc_mark_S(F/
 :- pfc_mark_S(pfc_undo_method/2).
 :- pfc_mark_S(spft/3).
 :- pfc_mark_S(mpred_db/3).
-:- pfc_mark_S(user:tE/2).
+:- pfc_mark_S(user:t/2).
 
 prologHybrid(user:ruleRewrite/2).
-prologHybrid(user:tE/2).
+prologHybrid(user:t/2).
 
 
 

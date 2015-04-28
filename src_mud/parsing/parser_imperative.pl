@@ -166,7 +166,7 @@ save_fmt_e(O,A):-atom(A),!,save_fmt_a(O,A),!.
 save_fmt_e(O,[E|L]):-!,save_fmt_e(O,E),!,save_fmt_e(O,L),!.
 save_fmt_e(O,isa(A)):-!,must(save_fmt_e(O,A)).
 save_fmt_e(O,t(A,_)):-!,must(save_fmt_e(O,A)).
-save_fmt_e(_,E):-compound(E),!. % cycPred(_),predStub(_),cycPlus2(_),predStub(_),pred_module(_),arity(_),
+save_fmt_e(_,E):-compound(E),!. % cycPred(_),predStub(_),cycPlus2(_),predStub(_),mpred_module(_),arity(_),
 %save_fmt_e(O,E):- string(E),!,must((to_word_list(E,WL),save_fmt_e(O,WL))),!.
 save_fmt_e(O,E):- identical_member(E,O) -> true ; (O=[_|CDR],nb_setarg(2,O,[E|CDR])).
 
@@ -180,7 +180,7 @@ save_fmt_a_0(_,A):-vtSkippedPrintNames(A),!.
 save_fmt_a_0(O,E):-to_case_breaks(E,List),maplist(save_fmt_a(O),List).
 
 
-object_name_is_descriptive(O):- (isa(O,tCol);isa(O,tPred);tE(functorDeclares,O);isa(O,ttValueType),isa(O,name_is_descriptive)).
+object_name_is_descriptive(O):- (isa(O,tCol);isa(O,tPred);t(functorDeclares,O);isa(O,ttValueType),isa(O,name_is_descriptive)).
 
 :-export(object_print_details/5).
 
@@ -389,7 +389,8 @@ bestParse(Order,LeftOver1-GOAL2,LeftOver1-GOAL2,L1,L2,A1,A2):-
 =>pfcControlled(name_text_known(ftTerm,ftString)).
 
 name_text(Name,Text):- nonvar(Text),!,name_text(Name,TextS),equals_icase(Text,TextS),!.
-name_text(Name,Name):- string(Name).
+name_text(Name,Name):- !,name_text0(Name,Name).
+name_text(Name,Name):- string(Name),!.
 name_text(Name,Text):- name_text_known_for(Name),!,name_text_known(Name,Text).
 
 
@@ -435,12 +436,12 @@ string_append(A,[B1,B2],C,ABC):-append(A,[B1,B2|C],ABC).
 string_append(A,[B],C,ABC):-append(A,[B|C],ABC).
 
 
-is_counted_for_parse(I):-tE(tCountable,I),not(excluded_in_parse(I)),!.
+is_counted_for_parse(I):-t(tCountable,I),not(excluded_in_parse(I)),!.
 
 excluded_in_parse(apathFn(_, _)).
 excluded_in_parse(I):-tCol(I).
 excluded_in_parse(I):-ttFormatType(I).
-excluded_in_parse(I):-user:mpred_prop(_,mpred_argtypes(I)).
+excluded_in_parse(I):-user:mpred_prop(_,meta_argtypes(I)).
 excluded_in_parse(apathFn(_ = _)).
 
 instance_for_parse(I):-is_counted_for_parse(I).
@@ -588,7 +589,7 @@ coerce(A,B,C):-no_repeats(coerce0(A,B,C)),(show_call_failure(isa(C,B))->!;true).
 coerce0(String,Type,Inst):- var(Type),trace_or_throw(var_specifiedItemType(String,Type,Inst)).
 coerce0(String,isNot(Type),Inst):-!,not(coerce0(String,Type,Inst)).
 coerce0([String],Type,Inst):- nonvar(String),!,coerce0(String,Type,Inst).
-coerce0(String,Type,Inst):- atomic(String),Type==tCol,i_name('t',String,Inst),tE(tCol,Inst),!.
+coerce0(String,Type,Inst):- atomic(String),Type==tCol,i_name('t',String,Inst),t(tCol,Inst),!.
 coerce0(Text,Type,Inst):- (no_repeats_old(call_no_cuts(hook_coerce(Text,Type,Inst)))).
 coerce0(String,Type,Inst):- ttFormatType(Type),!,checkAnyType(change(assert,actParse),String,Type,AAA),Inst=AAA.
 %coerce0(String,Type,Longest) :- findall(Inst, (user:hook_coerce(Inst,Type,Inst),equals_icase(Inst,String)), Possibles), sort_by_strlen(Possibles,[Longest|_]),!.

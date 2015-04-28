@@ -35,7 +35,7 @@ is_holds_true_not_hilog(HOFDS):-is_holds_true(HOFDS),\+ hilog_functor(HOFDS).
 is_holds_true(Prop):- hotrace((atom(Prop),is_holds_true0(Prop))),!.
 
 % k,p,..
-is_holds_true0(Prop):-arg(_,vvv(holds,holds_t,t,tE,asserted_mpred_t,assertion_t,assertion,secondOrder,firstOrder),Prop).
+is_holds_true0(Prop):-arg(_,vvv(holds,holds_t,t,t,asserted_mpred_t,assertion_t,assertion,secondOrder,firstOrder),Prop).
 is_holds_true0(Prop):-atom_concat(_,'_t',Prop).
 
 :-export(is_2nd_order_holds/1).
@@ -167,7 +167,7 @@ never_mpred_mpred(arity).
 % ================================================================================
 
 :-dynamic t/2.
-% t(C,I):- trace_or_throw(t(C,I)),tE(C,I). % ,fail,loop_check_term(isa_backchaing(I,C),tE(C,I),fail).
+% t(C,I):- trace_or_throw(t(C,I)),t(C,I). % ,fail,loop_check_term(isa_backchaing(I,C),t(C,I),fail).
 
 %t([P|LIST]):- !,mpred_plist_t(P,LIST).
 %t(naf(CALL)):-!,not(t(CALL)).
@@ -177,15 +177,15 @@ mpred_plist_t(P,[]):-!,t(P).
 mpred_plist_t(P,LIST):-var(P),!,is_list(LIST),CALL=..[t,P|LIST],debugOnError((CALL)).
 mpred_plist_t(t,[P|LIST]):-!, mpred_plist_t(P,LIST).
 mpred_plist_t(user:mpred_prop,[C,A,I]):-!,ground(I:C),user:mpred_prop(C,I).
-mpred_plist_t(isa,[I,C]):-!,tE(C,I).
+mpred_plist_t(isa,[I,C]):-!,t(C,I).
 mpred_plist_t(P,_):-never_mpred_mpred(P),!,fail.
 mpred_plist_t(P,[L|IST]):-is_holds_true(P),!,mpred_plist_t(L,IST).
 mpred_plist_t(P,LIST):-is_holds_false(P),!,mpred_f(LIST).
 mpred_plist_t(P,LIST):- CALL=..[t,P|LIST],debugOnError(CALL).
 
 % loop_check_mpred(Call):- current_predicate(ireq/1), loop_check_term(ireq(Call),loop_check_mpred(Call),fail).
-loop_check_mpred(Call):- !, fail,not(thlocal:infInstanceOnly(_)),loop_check_local(ireq(Call),loop_check_mpred(Call),fail).
-% loop_check_mpred(Call):-loop_check_local(mpred_call(t,Call),fail).
+loop_check_mpred(Call):- !, fail,not(thlocal:infInstanceOnly(_)),loop_check(ireq(Call),loop_check_mpred(Call),fail).
+% loop_check_mpred(Call):-loop_check(mpred_call(t,Call),fail).
 
 t(P,A1,A2):- loop_check_mpred(t(P,A1,A2)).
 t(P,A1,A2):- mpred_pa_call(P,2,call(P,A1,A2)).
@@ -279,7 +279,7 @@ typename_to_iname0(I,Type,IType):-nonvar(Type),toUpperCamelcase(Type,UType),atom
 split_name_type(Suggest,InstName,Type):- must_det(split_name_type_0(Suggest,NewInstName,NewType)),!,must((NewInstName=InstName,NewType=Type)),!.
 
 split_name_type_0(S,P,C):- string(S),!,atom_string(A,S),split_name_type_0(A,P,C),!.
-split_name_type_0(FT,FT,ttFormatType):-tE(ttFormatType,FT),!,dmsg(trace_or_throw(ttFormatType(FT))),fail.
+split_name_type_0(FT,FT,ttFormatType):-t(ttFormatType,FT),!,dmsg(trace_or_throw(ttFormatType(FT))),fail.
 split_name_type_0(T,T,C):- compound(T),functor(T,C,_),!.
 split_name_type_0(T,T,C):- hotrace((once(atomic_list_concat_safe([CO,'-'|_],T)),atom_string(C,CO))).
 split_name_type_0(T,T,C):- hotrace((atom(T),atom_codes(T,AC),last(AC,LC),is_digit(LC),append(Type,Digits,AC),catchv(number_codes(_,Digits),_,fail),atom_codes(CC,Type),!,i_name(t,CC,C))).

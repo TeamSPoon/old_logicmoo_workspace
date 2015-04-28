@@ -31,7 +31,7 @@
 :- op(1050,xfx,('<=')).
 :- op(1100,fx,('=>')).
 :- op(1150,xfx,('::::')).
-tCol(mpred_argtypes).
+tCol(meta_argtypes).
 tCol(functorDeclares).
 tCol(prologMultiValued).
 tCol(prologSingleValued).
@@ -151,13 +151,13 @@ dividesBetween(tAgentGeneric,tPlayer,tNpcPlayer).
 => tCol(functorDeclares).
 % tCol(ArgsIsa):-mpred_hooks:mpred_is_trigger(ArgsIsa).
 % TODO decide if OK
-%tCol(F):-tE(functorDeclares,F).
+%tCol(F):-t(functorDeclares,F).
 => tCol(ttFormatType).
 => tCol(vtActionTemplate).
 => tCol(tRegion).
 => tCol(tContainer).
 
-(mpred_prop(_,mpred_argtypes(ArgTypes)),{is_declarations(ArgTypes)}) => ({is_declarations(ArgTypes)}, mpred_argtypes(ArgTypes)).
+(mpred_prop(_,meta_argtypes(ArgTypes)),{is_declarations(ArgTypes)}) => meta_argtypes(ArgTypes).
 
 
 % tCol(Type),(tBinaryPredicate(Pred)/(functor(G,Pred,2),G=..[Pred,isInstFn(Type),Value])), G => relationMostInstance(Pred,Type,Value).
@@ -205,7 +205,7 @@ dividesBetween(tObj,tMassfull,tMassless).
 dividesBetween(tSpatialThing,tObj,tRegion).
 dividesBetween(tAgentGeneric,tPlayer,tNpcPlayer).
 
-((dividesBetween(S,C1,C2),{ground(S:C1:C2)}) => ({ground(S:C1:C2)},(disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)))).
+((dividesBetween(S,C1,C2),{ground(S:C1:C2)}) => ((disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)))).
 
 isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
 
@@ -214,6 +214,9 @@ isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
 
 
 => tCol(ttSpatialType).
+
+% Representations
+vtActionTemplate(ArgTypes)/is_declarations(ArgTypes) => metaFormatting(ArgTypes).
 
 
 
@@ -267,7 +270,9 @@ predIsFlag(tThinking(tAgentGeneric),[predIsFlag]).
 prologHybrid(isEach(mudLastCommand/2,mudNamed/2, mudSpd/2,mudStr/2,typeGrid/3)).
 prologHybrid(isEach((mudContains/2))).
 prologHybrid(isEach((mudLastCmdSuccess/2 ))).
+
 :- do_gc.
+
 :- dynamic(mudDescription/2).
 :- dynamic((tItem/1, tRegion/1, instVerbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, mudToHitArmorClass0/2, tThinking/1, tDeleted/1, mudWeight/2, mudPermanence/3, act_term/2, mudAgentTurnnum/2, mudAtLoc/2, mudEnergy/2, mudHealth/2, mudDescription/2, mudFacing/2, mudCmdFailure/2, mudSpd/2, typeGrid/3, mudHeight/2, mudMemory/2, isa/2, pathName/3, mudPossess/2, mudScore/2, mudStm/2, mudStr/2, wearsClothing/2)).
 :- dynamic((mudArmorLevel/2, mudLevelOf/2, mudToHitArmorClass0/2, mudBareHandDamage/2, chargeCapacity/2, mudEnergy/2, tCol/1, tAgentGeneric/1, tItem/1, tRegion/1, instVerbOverride/3,mudNamed/2, determinerString/2, mudKeyword/2 ,descriptionHere/2, tThinking/1, mudWeight/2, mudPermanence/3, act_term/2, mudAgentTurnnum/2, mudAtLoc/2, mudEnergy/2, mudHealth/2, mudDescription/2, mudFacing/2, failure/2, gridValue/4, mudHeight/2, mudMemory/2, isa/2, pathName/3, mudPossess/2, mudScore/2, mudStm/2, mudStr/2, mudWearing/2)).
@@ -288,8 +293,11 @@ prologHybrid(mudSize/2).
 prologHybrid(mudStowing(tAgentGeneric,tItem)).
 prologHybrid(mudTexture/2).
 prologHybrid(pathBetween/3).
-prologOnly((latitude/2, mudMoveDist/2, longitude/2)).
-prologOnly(mudMoveDist/2,[mpred_argtypes(mudMoveDist(tAgentGeneric,ftInt)),prologSingleValued,pred_module(user),query(call),argSingleValueDefault(2,1)]).
+:-dynamic((latitude/2, mudMoveDist/2, longitude/2)).
+prologOnly(mudMoveDist/2)
+:-dynamic(mudMoveDist/2).
+meta_argtypes(mudMoveDist(tAgentGeneric,ftInt)).
+prologSingleValued(mudMoveDist,[mpred_module(user),query(call),argSingleValueDefault(2,1)]).
 prologOnly(stat_total/2).
 prologOnly(user:verb_alias(ftString,vtVerb)).
 tCol(tContainer).
@@ -314,6 +322,12 @@ prologOnly((agent_call_command/2)).
  pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, ttFormatType/1, typeProps/2)).
 prologHybrid(isEach(argIsa/3, formatted_resultIsa/2, typeHasGlyph/2, inRegion/2, mudContains/2, isa/2, mudLabelTypeProps/3, mudMemory/2, mudPossess/2, mudStowing/2, genls/2, mudToHitArmorClass0/2, 
  pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, ttFormatType/1, typeProps/2)).
+
+
+
+arity(typeHasGlyph,2).
+arity(mudTermAnglify,2).
+arity(mudMaxHitPoints,2).
 
 
 prologHybrid(instVerbOverride(ftTerm,ftAction,ftAction)).
@@ -397,9 +411,9 @@ prologHybrid(mudTextSame(ftText,ftText)).
 prologHybrid(mudTexture(tSpatialThing,vtTexture)).
 prologHybrid(typeGrid(tCol,ftInt,ftListFn(ftString))).
 prologListValued(aDirectionsFn(ftTerm,ftListFn(ftTerm))).
-prologListValued(mudGetPrecepts(tAgentGeneric,ftListFn(tSpatialThing)),[pred_module(user)]).
+prologListValued(mudGetPrecepts(tAgentGeneric,ftListFn(tSpatialThing)),[mpred_module(user)]).
 prologListValued(mudNearFeet(tAgentGeneric,ftListFn(tSpatialThing)),[]).
-prologListValued(mudNearReach(tAgentGeneric,ftListFn(tSpatialThing)),[pred_module(user)]).
+prologListValued(mudNearReach(tAgentGeneric,ftListFn(tSpatialThing)),[mpred_module(user)]).
 prologMultiValued(action_rules(tAgentGeneric,vtVerb,ftListFn(ftVar),ftVoprop)).
 prologMultiValued(mudLastCmdSuccess(tAgentGeneric,ftAction)).
 prologMultiValued(descriptionHere(ftTerm,ftString)).
@@ -478,8 +492,7 @@ resultIsa(apathFn,tPathway).
 '<=>'(nameStrings(apathFn(Region,Dir),Text),pathName(Region,Dir,Text)).
 tInferInstanceFromArgType(vtSize).
 tInferInstanceFromArgType(vtTexture).
-ttAgentType(tMonster).
-% user:instTypeProps(apathFn(Region,_Dir),tPathway,[localityOfObject(Region)]).
+
 vtBasicDir(vEast).
 vtBasicDir(vNorth).
 vtBasicDir(vSouth).
@@ -491,21 +504,24 @@ vtBasicDirPlusUpDown(vUp).
 %localityOfObject(Inner,Container):- mudInsideOf(Inner,Container).
 %localityOfObject(Inner,Outer):- user:only_if_pttp, localityOfObject(Inner,Container),localityOfObject(Container,Outer).
 nameStrings(apathFn(Region,Dir),Text):- pathName(Region,Dir,Text).
-mpred_argtypes(mudMaterial(tSpatialThing,vtMaterial)).
-mpred_argtypes(mudSize(tSpatialThing,vtSize)).
-mpred_argtypes(mudTexture(tSpatialThing,vtTexture)).
-mpred_argtypes(mudWearing(tAgentGeneric,tWearAble)).
-mpred_argtypes(pathName(tRegion,vtDirection,ftString)).
-mpred_argtypes(resultIsa(tFunction,tCol)).
-mpred_argtypes(wasSuccess(tAgentGeneric,ftBoolean)).
-mpred_argtypes(type_action_info(tCol,vtActionTemplate,ftText)).
+meta_argtypes(mudMaterial(tSpatialThing,vtMaterial)).
+meta_argtypes(mudSize(tSpatialThing,vtSize)).
+meta_argtypes(mudTexture(tSpatialThing,vtTexture)).
+meta_argtypes(mudWearing(tAgentGeneric,tWearAble)).
+meta_argtypes(pathName(tRegion,vtDirection,ftString)).
+meta_argtypes(resultIsa(tFunction,tCol)).
+meta_argtypes(wasSuccess(tAgentGeneric,ftBoolean)).
+meta_argtypes(type_action_info(tCol,vtActionTemplate,ftText)).
 %NEXT TODO predTypeMax(mudEnergy,tObj,130).
 %NEXT TODO predTypeMax(mudHealth,tObj,500).
 
+tCol(ttAgentType).
 
 prologHybrid(pathBetween(tRegion,vtDirection,tRegion)).
 prologHybrid(pathConnects(tRegion,tRegion),tSymmetricRelation).
 
+ttAgentType(tMonster).
+% user:instTypeProps(apathFn(Region,_Dir),tPathway,[localityOfObject(Region)]).
 
 
 => tCol(vtActionTemplate).
@@ -659,7 +675,7 @@ dividesBetween(tAgentGeneric,tPlayer,tNpcPlayer).
 % => tCol(functorDeclares).
 % tCol(ArgsIsa):-functorDeclaresPred(ArgsIsa).
 % TODO decide if OK
-%tCol(F):-tE(functorDeclares,F).
+%tCol(F):-t(functorDeclares,F).
 => tCol(ttFormatType).
 => tCol(vtActionTemplate).
 => tCol(tRegion).
@@ -704,9 +720,6 @@ mudLabelTypeProps(wl,tWall,[mudHeight(3),mudWeight(4)]).
 
 (wearsClothing(A,I)=>{add(tAgentGeneric(A)),add(tClothing(I))}).
 
-((mpred_argtypes(Types)/(pfc_literal(Types),compound(Types),functor(Types,F,A), A> 1, functor(Matcher,F,A)))
-  => 
-    ((Matcher/pfc_literal(Matcher)=>{between(1,A,N),arg(N,Matcher,I),arg(N,Types,T),ground(I:T),\+ttFormatType(T)},isa(I,T)))).
 
 genls(tBread, tFood).
 typeProps(tCrackers,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)),mudSize(vSmall),mudTexture(isEach(vDry,vCoarse))]).
@@ -714,30 +727,22 @@ typeProps(tCrackers,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)
 
 user:action_info(C,_)=>vtActionTemplate(C).
 
-:-forall(vtActionTemplate(Templ),add(vtActionTemplate(Templ))).
+cachedPredicate(Goal)=>{forall(Goal,pfc_add(Goal))}.
 
+tCol(cachedPredicate).
+cachedPredicate(vtActionTemplate(_)).
+
+
+tCol(random_path_dir).
 random_path_dir(Dir):-random_instance(vtBasicDir,Dir,true).
 random_path_dir(Dir):-random_instance(vtBasicDirPlusUpDown,Dir,true).
 random_path_dir(Dir):-random_instance(vtDirection,Dir,true).
 
 prologOnly(ensure_some_pathBetween/2).
-ensure_some_pathBetween(R1,R2):- pathBetween(R1,_,R2),!.
-ensure_some_pathBetween(R1,R2):- pathBetween(R2,_,R1),!.
-ensure_some_pathBetween(R1,R2):- random_path_dir(Dir),
-   not(pathBetween(R1,Dir,_)),must(reverse_dir(Dir,Rev)),not(pathBetween(R2,Rev,_)),!,
-   must((add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)))),!.
 
-ensure_some_pathBetween(R1,R2):- must((add(pathBetween(R1,skPathFn(vtDirection,R1,R2),R2)),add(pathBetween(R2,skPathFn(vtDirection,R2,R1),R1)))),!.
-
-tPred(pathConnects(tRegion,tRegion)).
-:-dynamic(user:do_ensure_some_pathBetween/0).
-% isa(user:do_ensure_some_pathBetween,prologOnly).
-user:do_ensure_some_pathBetween:- 
-  must((forall(no_repeats((is_asserted(pathConnects(R1,R2)),ground(R1:R2),isa(R1,tRegion),isa(R2,tRegion),dif(R1,R2))),
-    must((ensure_some_pathBetween(R1,R2),ensure_some_pathBetween(R2,R1)))))).
-
-:-onEachLoad(must(user:do_ensure_some_pathBetween)).
-
+prologOnly(onEachLoad).
+argsQuoted(onEachLoad).
+argsQuoted(must).
 
 /*
 
@@ -774,5 +779,14 @@ O = [
 
 */
 
+:-pfc_add((prologSingleValued(P,Info)=>(prologSingleValued(P),added(props(P,Info))))).
+/*
 
+(((meta_argtypes(Types)/
+ (functor(Types,F,A), A >1, functor(Matcher,F,A),arity(F,A)))
+  => 
+    ((Matcher => {between(1,A,N),arg(N,Matcher,I),arg(N,Types,T),ground(I:T)},\+ttFormatType(T),isa(I,T),{dmsg(isa(I,T))})))).
 
+((argQuotedIsa(Pred, _, 'CycLSentence') => 'SententialOperator'(Pred))).
+
+*/

@@ -75,22 +75,22 @@ alt_forms2(r,F,A,B,R,NP):-genlPreds(FF,F),NP=..[FF,A,B|R].
 %OLD user:decl_database_hook(_,user:mpred_prop('ArtifactCol1008-VISOR688', flagged_visor)):- trace_or_throw(user:mpred_prop('ArtifactCol1008-VISOR688',N, flagged_visor)).
 
 run_deduce_facts_from(Type,M:Fact):-atom(M),!,run_deduce_facts_from(Type,Fact).
-run_deduce_facts_from(Type,Fact):-loop_check_local(run_deduce_facts_from_ilc(Type,Fact),true).
+run_deduce_facts_from(Type,Fact):-loop_check(run_deduce_facts_from_ilc(Type,Fact),true).
 run_deduce_facts_from_ilc(Type,Fact):-doall((call_no_cuts(deduce_facts_forward(Fact,Deduction)),add_deduction(Type,Deduction,Fact))).
 
 
 %OLD user:decl_database_hook(change(assert,_),BadFact):-mpred_call(tms_reject_why(BadFact,WHY)),trace_or_throw(tms_reject_why(BadFact,WHY)).
 
-deduce_facts_forward(Fact,user:mpred_prop(AF,[mpred_argtypes(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],functorDeclaresPred(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,
+deduce_facts_forward(Fact,user:mpred_prop(AF,[meta_argtypes(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],functorDeclaresPred(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,
                 ArgTs=..[AF|ARGS],!,sanity(ground(ARGS)).
 
-deduce_facts_forward(mpred_argtypes(ArgTs),user:mpred_prop(F,mpred_argtypes(ArgTs))):-get_functor(ArgTs,F),assert_predArgTypes_fa(F,ArgTs).
-deduce_facts_forward(user:mpred_prop(F,mpred_argtypes(ArgTs)),mpred_argtypes(ArgTs)):-get_functor(ArgTs,F),assert_predArgTypes_fa(F,ArgTs).
+deduce_facts_forward(meta_argtypes(ArgTs),user:mpred_prop(F,meta_argtypes(ArgTs))):-get_functor(ArgTs,F),assert_predArgTypes_fa(F,ArgTs).
+deduce_facts_forward(user:mpred_prop(F,meta_argtypes(ArgTs)),meta_argtypes(ArgTs)):-get_functor(ArgTs,F),assert_predArgTypes_fa(F,ArgTs).
 
-deduce_facts_forward(mpred_argtypes(ArgTs),argIsa(F,A,Type)):-get_functor(ArgTs,F,_),arg(A,ArgTs,Type).
-deduce_facts_forward(user:mpred_prop(F,mpred_argtypes(ArgTs)),argIsa(F,A,Type)):-arg(A,ArgTs,Type).
+deduce_facts_forward(meta_argtypes(ArgTs),argIsa(F,A,Type)):-get_functor(ArgTs,F,_),arg(A,ArgTs,Type).
+deduce_facts_forward(user:mpred_prop(F,meta_argtypes(ArgTs)),argIsa(F,A,Type)):-arg(A,ArgTs,Type).
 
-deduce_facts_forward(argIsa(F,_A,Type),[isa(Type,tCol),isa(F,tRelation)]):-atom(Type),not(tE(ttFormatType,Type)).
+deduce_facts_forward(argIsa(F,_A,Type),[isa(Type,tCol),isa(F,tRelation)]):-atom(Type),not(t(ttFormatType,Type)).
 
 %deduce_facts_forward(B,A):- is_asserted('<=>'(B,A)),not(contains_singletons(A)).
 %deduce_facts_forward(B,A):- is_asserted('<=>'(A,B)),not(contains_singletons(A)).
@@ -107,18 +107,18 @@ fix_argsIsas(_,_,[],[]):-!.
 fix_argsIsas(F,N,[Arg|TList],[G|List]):-
    fix_argIsa(F,N,Arg,G),!, N1 is N + 1,fix_argsIsas(F,N1,TList,List),!.
 
-%OLD user:decl_database_hook(change(assert,_),mpred_argtypes(ArgTs)):-
+%OLD user:decl_database_hook(change(assert,_),meta_argtypes(ArgTs)):-
 /*   ArgTs=..[F|ArgTList],
    fix_argsIsas(F,1,ArgTList,GList),
    Good=..[F|GList],
-   Good\=ArgTs,!,del(user:mpred_prop(F,mpred_argtypes(ArgTs))),decl_mpred(F,mpred_argtypes(Good)).
+   Good\=ArgTs,!,del(user:mpred_prop(F,meta_argtypes(ArgTs))),decl_mpred(F,meta_argtypes(Good)).
 */
 
-%OLD user:decl_database_hook(change(assert,_),isa(ArgTs,PredArgTypes)):- mpred_argtypes==PredArgTypes,
+%OLD user:decl_database_hook(change(assert,_),isa(ArgTs,PredArgTypes)):- meta_argtypes==PredArgTypes,
 /*   ArgTs=..[F|ArgTList],
    fix_argsIsas(F,1,ArgTList,GList),
    Good=..[F|GList],
-   Good\=ArgTs,!,del(user:mpred_prop(F,mpred_argtypes(ArgTs))),decl_mpred(F,mpred_argtypes(Good)).
+   Good\=ArgTs,!,del(user:mpred_prop(F,meta_argtypes(ArgTs))),decl_mpred(F,meta_argtypes(Good)).
 */
 
 :-export(add_deduction/3).

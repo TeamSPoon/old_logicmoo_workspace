@@ -73,15 +73,31 @@ compiled(F/A):- dynamic(F/A),compile_predicates([F/A]).
 :- dynamic(pfc_select/2).
 :- dynamic(pfc_search/1).
 
+:-style_check(+singleton).
+
+list_to_conjuncts(Var,Var):-var(Var),!.
+list_to_conjuncts([],true).
+list_to_conjuncts([H],HH):-list_to_conjuncts(H,HH).
+list_to_conjuncts([H|T],Body):-!,
+    list_to_conjuncts(H,HH),
+    list_to_conjuncts(T,TT),
+    pfc_conjoin(HH,TT,Body).
+list_to_conjuncts(H,H).
+
 to_assertable([A],B):-nonvar(A),!,to_assertable(A,B).
 to_assertable((P=>Q),was_new_rule((P=>Q))):-!.
 to_assertable((P<=Q),was_new_rule((P<=Q))):-!.
 to_assertable((P<=>Q),was_new_rule((P<=>Q))):-!.
 to_assertable(P,P).
 
-to_addable_form_wte(P0,P):-not(is_list(P0)),!,to_addable_form_wte([P0],P).
-to_addable_form_wte(P0,P):-to_addable_form(P0,P),!, ((((P0\=@=P,\+(([PU]=P,functor(PU,_,1))))->dmsg(to_addable_form(P0,(->),P));true))).
-to_addable_form_wte(P0,P):-
+
+to_addable_form_wte(P0,P):- 
+   with_assertions(thlocal:pfc_already_in_file_expansion(P0),
+     with_assertions(thlocal:disable_mpred_term_expansions_locally,to_addable_form_wte0(P0,P))).
+
+to_addable_form_wte0(P0,P):-not(is_list(P0)),!,to_addable_form_wte([P0],P).
+to_addable_form_wte0(P0,P):-to_addable_form(P0,P),!, ((((P0\=@=P,\+(([PU]=P,functor(PU,_,1))))->dmsg(to_addable_form(P0,(->),P));true))).
+to_addable_form_wte0(P0,P):-
   with_assertions(thlocal:pfc_already_in_file_expansion(P0),
     ((once(to_addable_form(P0,P1)),expand_term(P1,P)))),!,
   ((((P0\=@=P,\+functor(P,_,1))->dmsg(to_addable_form(P0,(->),P));true))).
@@ -94,6 +110,7 @@ to_addable_form(I,OO):-is_list(I),!,maplist(to_addable_form,I,O),flatten(O,OO).
 to_addable_form(I,OO):- current_predicate(logicmoo_i_term_expansion_file/0),fully_expand(_,I,II),once((into_mpred_form(II,M),to_predicate_isas_each(M,O))),!,into_mpred_form(O,OO).
 %to_addable_form(I,O):- current_predicate(logicmoo_i_term_expansion_file/0),once((into_mpred_form(I,M),to_predicate_isas_each(M,O))),!.
 to_addable_form(I,O):- to_predicate_isas_each(I,O),!.
+
 
 to_predicate_isas_each(I,O):-decompress_each(I,M),maplist(to_predicate_isas,M,O),!.
 to_predicate_isas_each(I,O):-trace,to_predicate_isas(I,O).
@@ -129,6 +146,8 @@ exact_args(dynamic(_)).
 exact_args(cwc).
 exact_args(true).
 % exact_args(C):-source_file(C,I),absolute_source_location_pfc(I).
+
+:-ensure_loaded(logicmoo_i_term_expansion).
 
 pfc_is_tautology(Var):-var(Var).
 pfc_is_tautology(V):- \+ \+ (numbervars(V),pfc_is_taut(V)).
@@ -340,7 +359,8 @@ pfc_lambda([A1,A2,A3,A4],Body,A1,A2,A3,A4):-Body.
 %example pfcVerifyMissing(mpred_prop(I,D), mpred_prop(I,C), ((mpred_prop(I,C), {D==C});~mpred_prop(I,C))). 
 %example pfcVerifyMissing(mudColor(I,D), mudColor(I,C), ((mudColor(I,C), {D==C});~mudColor(I,C))). 
 
-pfcVerifyMissing(GC, GO, ((GO, {D==C});\+ GO) ):-  GC=..[F,A|Args],append(Left,[D],Args),append(Left,[C],NewArgs),GO=..[F,A|NewArgs],!.
+pfcVerifyMissing(GC, GO, ((GO, {D==C});\+ GO) ):- 
+       GC=..[F,A|Args],append(Left,[D],Args),append(Left,[C],NewArgs),GO=..[F,A|NewArgs],!.
 
 %example pfc_freeLastArg(mpred_prop(I,C),neg(mpred_prop(I,C))):-nonvar(C),!.
 %example pfc_freeLastArg(mpred_prop(I,C),(mpred_prop(I,F),C\=F)):-!.
@@ -398,6 +418,7 @@ pfc_add(P,S):-pfc_assert(P,S).
 pfc_add_fast('$was_imported_kb_content$'(_, _)<=_):-!.
 pfc_add_fast(P):-pfc_assert_fast(P).
 
+
 %= pfc_assert/2 and pfc_post/2 are the main ways to assert_db new clauses into the
 %= database and have forward reasoning done.
 
@@ -423,7 +444,7 @@ pfc_assert_fast(P0,S):-
        pfc_assert_fast_sp(S,P)).
 
 pfc_assert_fast_sp(S,P) :-to_addable_form_wte(P,PC),PC\=@=P,pfc_assert_fast_sp(S,PC).
-pfc_assert_fast_sp(S,P) :-
+pfc_assert_fast_sp(S,P) :-  
    pfc_rule_hb(P,OutcomeO,_),
      loop_check_term((pfc_post1_sp(S,P),pfc_run),pfc_asserting(OutcomeO),(pfc_post1_sp(S,P),dmsg(looped_outcome((P))))),!.
   
@@ -446,7 +467,6 @@ pfc_post(P,S) :-
 % pfc_post1(+P,+S) tries to assert a fact to the database, and, if it succeeded,
 % adds an entry to the pfc queue for subsequent forward chaining.
 % It always succeeds.
-pfc_post1(pfc_assert(P0),S):-!,pfc_post1(P0,S).
 pfc_post1(P0,S):-
   to_addable_form_wte(P0,P),
       (is_list(P)
@@ -462,17 +482,6 @@ pfc_post1_sp(S,P) :-
   % pfc_remove_old_version(P),
   pfc_add_support(P,S),
   to_assertable(P,AP),
-  pfc_post1_sp_3(S,P,AP).
-
-
-pfc_post1_sp(_,_).
-%=pfc_post1_sp(S,P) :-  pfc_warn("pfc_post1(~w,~w) failed",[P,S]).
-
-pfc_post1_sp_3(S,P,(AP1,AP2)):-!,
-         pfc_post1_sp_3(S,P,AP1),
-         pfc_post1_sp_3(S,P,AP2).
-
-pfc_post1_sp_3(S,P,AP):-
   pfc_unique_u(AP),
   assert_u(AP),
   pfc_trace_add(P,S),
@@ -480,6 +489,8 @@ pfc_post1_sp_3(S,P,AP):-
   pfc_enqueue(P,S),
   !.
 
+pfc_post1_sp(_,_).
+%=pfc_post1_sp(S,P) :-  pfc_warn("pfc_post1(~w,~w) failed",[P,S]).
 
 
 % was nothing  pfc_current_db/1.
@@ -950,7 +961,7 @@ pfc_fwd(P,S) :- pfc_fwd1(P,S).
 
 % pfc_fwd1(+P) forward chains for a single fact.
 
-pfc_fwd1(Fact,Sup) :-
+pfc_fwd1(Fact,Sup) :-  
   must(pfc_rule_check(Sup,Fact)),
   copy_term(Fact,F),
   % check positive triggers
@@ -1346,7 +1357,7 @@ pfc_compile_rhsTerm((P/C),((P:-C))) :- !,pfc_mark_as(P,pfcRHS).
 pfc_compile_rhsTerm(P,P):- pfc_mark_as(P,pfcRHS).
 pfc_mark_as(P,_):-var(P),!.
 pfc_mark_as(neg(P),Type):-var(P)->true;(get_functor(P,F,A),pfc_add_fast([arity(F,A),pfcMark(Type,neg,F,A)])).
-pfc_mark_as(P,Type):-copy_term(P,P0),numbervars(P0,0,_,[attvar(bind)]),pfc_mark_as0(P0,Type).
+pfc_mark_as(P,Type):- \+ \+ pfc_mark_as0(P,Type).
 pfc_mark_as0(P,Type):-get_functor(P,F,A),pfc_mark_fa_as(F,A,Type).
 
 pfc_mark_fa_as(isa,_,_):- !.
@@ -1360,7 +1371,7 @@ pfc_mark_fa_as(_:mpred_prop,N,_):- must(N=2).
 pfc_mark_fa_as(F,A,Type):- pfc_add_fast([arity(F,A),pfcMark(Type,pos,F,A)]).
 
 :-debug.
-isInstFn(A):-!,trace_or_throw(isInstFn(A)).
+isInstFn(A,isInstFn(A)):-!,trace_or_throw(isInstFn(A)).
 
 %= pfc_negation(N,P) is true if N is a negated term and P is the term
 %= with the negation operator stripped.
@@ -1871,7 +1882,7 @@ pfc_trace_add(P,S) :-
    pfc_trace_break(P,S).
 
 
-pfc_trace_addPrint(P,S):-pfc_silient,!.
+% pfc_trace_addPrint(_,_):-pfc_silient,!.
 pfc_trace_addPrint(P,S):- (\+ \+ pfc_trace_addPrint_0(P,S)).
 pfc_trace_addPrint_0(P,S) :-
   pfc_traced(P),
@@ -1884,13 +1895,13 @@ pfc_trace_addPrint_0(P,S) :-
 pfc_trace_addPrint_0(_,_).
 
 
-pfc_trace_break(P,_S) :-
+pfc_trace_break(P,_S) :- 
+ \+ \+ (
   pfc_spied(P,add) ->
-   (copy_term(P,Pcopy),
-    numbervars(Pcopy,0,_),
-    format("~N% Breaking on pfc_assert(~w)",[Pcopy]),
+   (    
+    format("~N% Breaking on pfc_assert(~w)",[P]),
     break)
-   ; true.
+   ; true).
 
 pfc_trace_rem(pt2(_,_)) :-
   % hack for now - never trace triggers.
@@ -2202,9 +2213,7 @@ pp_justification1([J|Js],N) :-
 pp_justifications2([],_,_).
 
 pp_justifications2([C|Rest],JustNo,StepNo) :-
-  copy_term(C,CCopy),
-  numbervars(CCopy,0,_),
-  format("~N%     ~w.~w ~w",[JustNo,StepNo,CCopy]),
+  format("~N%     ~w.~w ~w",[JustNo,StepNo,C]),
   StepNext is 1+StepNo,
   pp_justifications2(Rest,JustNo,StepNext).
 

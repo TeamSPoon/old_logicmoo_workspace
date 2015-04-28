@@ -2,14 +2,6 @@
 /** <module> MUD server startup script in SWI-Prolog
 
 */
-:- set_prolog_flag(generate_debug_info, true).
-% [Optionaly] Set the Prolog optimize/debug flags
-:- set_prolog_flag(verbose_load,true).
-:- use_module(library(gui_tracer)).
-:- set_prolog_flag(gui_tracer, false).
-:- set_prolog_flag(answer_write_options, [quoted(true), portray(true), max_depth(1000), spacing(next_argument)]).
-:- catch(noguitracer,_,true).
-
 
 :- exists_directory(runtime)->working_directory(_,runtime);(exists_directory('../runtime')->working_directory(_,'../runtime');true).
 :-multifile(user:file_search_path/2).
@@ -26,16 +18,10 @@ user:file_search_path(prologmud, '../packs/prologmud/prolog/prologmud/').
 % [Required] Load the Logicmioo Base System
 :- user:ensure_loaded(library(logicmoo/logicmoo_base)).
 
-% [Optionaly] Set up the Prolog optimize/debug flags
-%:- set_prolog_flag(debug,false).
-:- set_optimize(false).
-
 % [Optionaly] Load an Eggdrop 
-:- with_no_mpred_expansions(if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop/eggdrop.pl'))).
+:- if_file_exists(ensure_loaded('../externals/MUD_ircbot/prolog/eggdrop/eggdrop.pl')).
 :- current_predicate(egg_go/0)->egg_go;true.
 
-% [Optionaly] load the mpred_online system
-% :- if_file_exists(user:ensure_loaded(library(logicmoo/mpred_online))).
 
 % [Required] load the mud system
 :- user:ensure_loaded(prologmud(mud_startup)).
@@ -47,18 +33,17 @@ user:file_search_path(prologmud, '../packs/prologmud/prolog/prologmud/').
 % :- add_game_dir('../games/src_game_nani',prolog_repl).       
 
 % [Optional] the following game files though can be loaded separate instead
-:- declare_load_dbase('../games/src_game_nani/a_nani_household.plmoo').
-:- declare_load_dbase('../games/src_game_nani/objs_misc_household.plmoo').
+% :- declare_load_dbase('../games/src_game_nani/a_nani_household.plmoo').
+% :- declare_load_dbase('../games/src_game_nani/objs_misc_household.plmoo').
 
 % [Optional] Creates or suppliments a world
-:-trace.
+
 tCol(tLivingRoom).
 genls(tLivingRoom,tRegion).
 genls(tOfficeRoom,tRegion).
 prologHybrid(pathConnects(tRegion,tRegion),tSymmetricRelation).
-:-pfc_run,onSpawn(pathConnects(tLivingRoom,tOfficeRoom)).
+
 tAgentGeneric(iCommanderData66).
-isa(iCommanderData66,'tMonster').
 isa(iCommanderData66,'tExplorer').
 wearsClothing(iCommanderData66,'iBoots673').
 wearsClothing(iCommanderData66,'iComBadge674').
@@ -68,7 +53,6 @@ pddlSomethingIsa('iBoots673',['tBoots','ProtectiveAttire','PortableObject','tWea
 pddlSomethingIsa('iComBadge674',['tComBadge','ProtectiveAttire','PortableObject','tNecklace']).
 pddlSomethingIsa('iGoldUniform675',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
-mudDescription(iCommanderData66,txtFormatFn("Very screy looking monster named ~w",[iCommanderData66])).
 
 tAgentGeneric(iExplorer1).
 wearsClothing(iExplorer1,'iBoots773').
@@ -80,20 +64,39 @@ pddlSomethingIsa('iBoots773',['tBoots','ProtectiveAttire','PortableObject','tWea
 pddlSomethingIsa('iComBadge774',['tComBadge','ProtectiveAttire','PortableObject','tNecklace']).
 pddlSomethingIsa('iGoldUniform775',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iPhaser776',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
-isa(iExplorer1,'tExplorer').
 
-:- onSpawn(pathConnects(tLivingRoom,tOfficeRoom)).
+isa(iCommanderData66,'tMonster').
+mudDescription(iCommanderData66,txtFormatFn("Very screy looking monster named ~w",[iCommanderData66])).
+
+:-onSpawn(pathConnects(tLivingRoom,tOfficeRoom)).
 :-onSpawn(localityOfObject(iExplorer1,'tLivingRoom')).
+:-onSpawn(localityOfObject(iCommanderData66,'tOfficeRoom')).
+:-onSpawn(pathConnects(tLivingRoom,tOfficeRoom)).
 
-arity(do_ensure_some_pathBetween,0).
 
-% [Manditory] But soon it will be triggerd by the next block
-:- (((user:do_ensure_some_pathBetween))).
+
+% arity(do_ensure_some_pathBetween,0).
+ensure_some_pathBetween(R1,R2):- pathBetween(R1,_,R2),!.
+ensure_some_pathBetween(R1,R2):- pathBetween(R2,_,R1),!.
+ensure_some_pathBetween(R1,R2):- random_path_dir(Dir), not(pathBetween(R1,Dir,_)),must(reverse_dir(Dir,Rev)),not(pathBetween(R2,Rev,_)),!, must((add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)))),!.
+ensure_some_pathBetween(R1,R2):- must((add(pathBetween(R1,skPathFn(vtDirection,R1,R2),R2)),add(pathBetween(R2,skPathFn(vtDirection,R2,R1),R1)))),!.
+
+tPred(pathConnects(tRegion,tRegion)).
+% isa(user:do_ensure_some_pathBetween,prologOnly).
+
+do_ensure_some_pathBetween:-
+  must((forall(no_repeats((is_asserted(pathConnects(R1,R2)),ground(R1:R2),isa(R1,tRegion),isa(R2,tRegion),dif(R1,R2))),
+    must((ensure_some_pathBetween(R1,R2),ensure_some_pathBetween(R2,R1)))))).
+
+
+:-onEachLoad(must(do_ensure_some_pathBetween)).
 
 
 % [Manditory] This loads the game and initializes so test can be ran
 :- (if_startup_script( at_start(finish_processing_world))).
 
+% [Manditory] But soon it will be triggerd by the next block
+:- (((user:do_ensure_some_pathBetween))).
 
 % [Optionaly] Start the telent server
 :-at_start(toploop_telnet:start_mud_telnet(4000)).

@@ -71,7 +71,7 @@ show_inventory(Agent,Who):-
 
 
 mudInventoryLocation(Who,Obj,Loc):- 
-         findall(prop(Obj,PRED),
+         findall(props(Obj,PRED),
                   (member(t(PRED,A,B), [
                         t(mudPossess,Who,Obj),
                         t(mudStowing,Who,Obj),
@@ -80,7 +80,7 @@ mudInventoryLocation(Who,Obj,Loc):-
                         t(wearsClothing,Who,Obj)]),
                      ireq(t(PRED,A,B))),
                   RESULTS),
-         setof(Obj,member(prop(Obj,PRED),RESULTS),OBJLIST),!,
+         setof(Obj,member(props(Obj,PRED),RESULTS),OBJLIST),!,
          member(Obj,OBJLIST),once((member(PRED2,[mudAtLoc,localityOfObject]),ireq(t(PRED2,Obj,Loc)))).
 
 test_exists(O):- tItem(O).

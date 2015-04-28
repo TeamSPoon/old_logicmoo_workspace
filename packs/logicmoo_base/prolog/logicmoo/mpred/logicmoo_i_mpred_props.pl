@@ -25,7 +25,7 @@
 :- export(user:mpred_prop/2).
 :- export(is_never_type/1).
 
-isa(F,P):-clause(user:mpred_prop(F,P),true).
+
 
 arity(apathFn,2).
 arity(isKappaFn,2).
@@ -33,22 +33,16 @@ arity(isInstFn,1).
 arity(ftListFn,1).
 arity(xyzFn,4).
 arity(arity,2).
-arity(user:mpred_prop,3).
 arity(is_never_type,1).
-arity(self_call,1).
 arity(argIsa, 3).
-arity(isa, 2).
-%arity(Prop,2):-functorDeclaresPred(Prop).
-arity(mpred_argtypes,1).
+arity(Prop,1):-functorDeclaresPred(Prop).
+arity(meta_argtypes,1).
 arity(arity,2).
 arity(is_never_type,1).
 arity(prologSingleValued,1).
-arity(mudTermAnglify,2).
 arity('<=>',2).
-arity(typeHasGlyph,2).
-arity(mudMaxHitPoints,2).
 arity(F,A):- atom(F), current_predicate(F/A),A>1.
-arity(F,1):- atom(F), current_predicate(F/1).
+arity(F,1):- atom(F), current_predicate(F/1),\+((dif:dif(Z,1), arity(F,Z))).
 
 
 decl_mpred_pi(PI):-ignore((ground(PI),compound(PI),decl_mpred(PI))).
@@ -76,7 +70,7 @@ decl_mpred_mfa(M,FF,A):-
 
 :-export(decl_mpred_prolog/1).
 decl_mpred_prolog(A):-not(compound(A)),!.
-decl_mpred_prolog(M):-M=..[isEach|List],!,maplist(decl_mpred_prolog,List).
+decl_mpred_prolog(M):- M=..[isEach|List],!,maplist(decl_mpred_prolog,List).
 decl_mpred_prolog(P):- with_pi(P,decl_mpred_prolog).
 
 :-export(decl_mpred_prolog/3).
@@ -117,12 +111,14 @@ decl_mpred_hybrid(F,Other):- decl_mpred(F,Other),
      get_functor(F,F0),
      must(arity(F0,A)),
      decl_mpred_hybrid(F0/A).
+
 :-export(decl_mpred_hybrid/4).
-decl_mpred_hybrid(CM,M,PI,FA):- loop_check(must(decl_mpred_hybrid_ilc(CM,M,PI,FA)),true).
+decl_mpred_hybrid(CM,M,PIN,FA):- unnumbervars(PIN,PI),loop_check(must(decl_mpred_hybrid_ilc(CM,M,PI,FA)),true).
 
-decl_mpred_hybrid_ilc(CM,M,PI,F/A):-atom(PI),A==0,must(arity(F,_)),not(current_predicate(F/A)),!,forall((arity(F,AA),AA\=0),(functor(PIA,F,AA),decl_mpred_hybrid_ilc(CM,M,PIA,F/AA))).
+decl_mpred_hybrid_ilc(CM,M,PI,F/A):-atom(PI),A==0,must(arity(F,_)),not(current_predicate(F/A)),!,
+   forall((arity(F,AA),AA\=0),(functor(PIA,F,AA),decl_mpred_hybrid_ilc(CM,M,PIA,F/AA))).
 
-decl_mpred_hybrid_ilc(CM,M,PI,F/A):- loop_check_term(decl_mpred_hybrid_ilc_0(CM,M,PI,F/A),decl_mpred_hybrid_ilc(CM,M,F),true).
+decl_mpred_hybrid_ilc(CM,M,PIN,F/A):- unnumbervars(PIN,PI),loop_check_term(decl_mpred_hybrid_ilc_0(CM,M,PI,F/A),decl_mpred_hybrid_ilc(CM,M,F),true).
 decl_mpred_hybrid_ilc_0(CM,M,PI,F/A):-
       assert_arity(F,A),
       add(mpred_module(PI,M)),
@@ -153,7 +149,7 @@ user:mpred_prop(user:mpred_prop/2,prologOnly).
 user:mpred_prop(is_never_type/1,prologOnly).
 user:mpred_prop(term_expansion/2,prologOnly).
 user:mpred_prop(var/1,prologOnly).
-user:mpred_prop(F,Prop):- current_predicate(tE/2),  (nonvar(Prop)->(tE(Prop, F));((tE(ttPredType,Prop)),(tE(Prop, F)))).
+user:mpred_prop(F,Prop):- current_predicate(t/2),  (nonvar(Prop)->(t(Prop, F));((t(ttPredType,Prop)),(t(Prop, F)))).
 user:mpred_prop(F,Prop):-nonvar(F),mpred_prop_nvh(F,Prop).
 %user:mpred_prop(F,tCol):-current_predicate(tCol/1),tCol(F).
 
@@ -165,7 +161,7 @@ mpred_prop_nvh(H,Prop):-get_functor(H,F,A), H \=@= F, !,user:mpred_prop(F,Prop).
 
 
 
-% user:mpred_prop(F,prologOnly):- not(user:mpred_prop(F,prologHybrid)),(F=functorDeclaresPred;(current_predicate(F/1);not(tE(F,tCol)))).
+% user:mpred_prop(F,prologOnly):- not(user:mpred_prop(F,prologHybrid)),(F=functorDeclaresPred;(current_predicate(F/1);not(t(F,tCol)))).
 user:mpred_prop(G,predProxyAssert(add)):- atom(G),prologMacroHead(G).
 user:mpred_prop(G,predProxyQuery(ireq)):- atom(G),prologMacroHead(G).
 user:mpred_prop(G,predProxyRetract(del)):- atom(G),prologMacroHead(G).
@@ -210,7 +206,7 @@ bad_pred_relation_name1(X,Y):-bad_pred_relation_name0(X,Y).
 bad_pred_relation_name1(F,A):-must_det((atom_codes(F,[C|_]),to_upper(C,U))),!, U == C, A>1.
 bad_pred_relation_name1(F,A):-arity(F,AO), A \= AO.
 
-:-at_start(writeq("Seen Mpred_props at start!\n")).
+:-at_start(writeq("Seen Mpred_props at start!\n")),!.
 
 
 % ========================================
@@ -220,13 +216,13 @@ bad_pred_relation_name1(F,A):-arity(F,AO), A \= AO.
 :- export((decl_mpred/1)).
 
 decl_mpred((A,B)):-decl_mpred(A),decl_mpred(B).
-decl_mpred(M):-loop_check_local(with_pi(M,decl_mpred_4),true).
+decl_mpred(M):-loop_check(with_pi(M,decl_mpred_4),true).
 
-decl_mpred_4(user,prologSingleValued(ARGS),prologSingleValued/1):- compound(ARGS),get_functor(ARGS,F,A),!, decl_mpred(F,[prologArity(A),prologSingleValued,mpred_argtypes(ARGS)]),!.
+decl_mpred_4(user,prologSingleValued(ARGS),prologSingleValued/1):- compound(ARGS),get_functor(ARGS,F,A),!, decl_mpred(F,[prologArity(A),prologSingleValued,meta_argtypes(ARGS)]),!.
 decl_mpred_4(_,F,F/0):-!,assert_hasInstance(tPred,F).
 decl_mpred_4(M,PI,F/A):-
    decl_mpred(F,A),
-   ignore((ground(PI),compound(PI),decl_mpred(F,mpred_argtypes(PI)))),
+   ignore((ground(PI),compound(PI),decl_mpred(F,meta_argtypes(PI)))),
    decl_mpred(F,[mpred_module(M)]).
 
 :-export(decl_mpred/2).
@@ -240,18 +236,18 @@ decl_mpred_0(F,A):-atom(F),number(A),!,assert_arity(F,A).
 decl_mpred_0(F,tPred):-!,assert_hasInstance(tPred,F).
 decl_mpred_0(C,More):-string(C),!,dmsg(trace_or_throw(var_string_decl_mpred(C,More))).
 decl_mpred_0(mudDescription, predProxyRetract):-dtrace(decl_mpred_0(mudDescription, predProxyRetract)).
-decl_mpred_0(_,mpred_argtypes):-!.
-decl_mpred_0(F,mpred_argtypes(ArgTypes)):-!,decl_mpred_2(F,mpred_argtypes(ArgTypes)).
+decl_mpred_0(_,meta_argtypes):-!.
+decl_mpred_0(F,meta_argtypes(ArgTypes)):-!,decl_mpred_2(F,meta_argtypes(ArgTypes)).
 decl_mpred_0(C,More):-compound(C),C=..[F,Arg1|PROPS],functorDeclaresPred(F),!,ground(Arg1),decl_mpred(Arg1,[F,PROPS,More]).
-decl_mpred_0(C,More):-compound(C),!,functor(C,F,A),assert_arity(F,A),decl_mpred_0(F,More),!,ignore((ground(C),decl_mpred(F,mpred_argtypes(C)))),!.
+decl_mpred_0(C,More):-compound(C),!,functor(C,F,A),assert_arity(F,A),decl_mpred_0(F,More),!,ignore((ground(C),decl_mpred(F,meta_argtypes(C)))),!.
 decl_mpred_0(_,[]):-!.
 decl_mpred_0(F,[Prop|Types]):-!,decl_mpred_0(F,Prop),!,decl_mpred_0(F,Types),!.
 
 decl_mpred_0(F,T):-doall(( decl_mpred_2(F,T) )).
 
 
-decl_mpred_2(F,mpred_argtypes(FARGS)):- functor(FARGS,_,A),decl_mpred(F,A),fail.
-decl_mpred_2(_,mpred_argtypes(FARGS)):- functor(FARGS,_,A),arg(A,FARGS,Arg),var(Arg),!.
+decl_mpred_2(F,meta_argtypes(FARGS)):- functor(FARGS,_,A),decl_mpred(F,A),fail.
+decl_mpred_2(_,meta_argtypes(FARGS)):- functor(FARGS,_,A),arg(A,FARGS,Arg),var(Arg),!.
 
 % decl_mpred_2(F,prologHybrid):- decl_mpred_hybrid(F).
 decl_mpred_2(F,cycPlus2(A)):- ensure_universal_stub_plus_2(F,A).
@@ -274,11 +270,11 @@ glean_pred_props_maybe(_:G):-!,compound(G),with_assertions(infConfidence(vWeak),
 glean_pred_props_maybe(G):-compound(G),with_assertions(infConfidence(vWeak),forall(glean_pred_props_maybe_some(G),true)).
 
 glean_pred_props_maybe_some(G):-compound(G),G=..[F,Arg1|RGS],functorDeclaresPred(F),add_mpred_prop_gleaned(Arg1,[F|RGS]).
-% glean_pred_props_maybe_some(G):-arg(_,G,Arg1),compound(Arg1),arg(_,Arg1,Col),tE(tCol,Col),with_assertions(infConfidence(vWeak),assert_predArgTypes(Arg1)).
+% glean_pred_props_maybe_some(G):-arg(_,G,Arg1),compound(Arg1),arg(_,Arg1,Col),t(tCol,Col),with_assertions(infConfidence(vWeak),assert_predArgTypes(Arg1)).
 
 add_mpred_prop_gleaned(M:Arg1,FRGS):-atom(M),!,add_mpred_prop_gleaned(Arg1,FRGS).
 add_mpred_prop_gleaned(Arg1,FRGS):-functor_check_univ(Arg1,F,ARGSISA),add_mpred_prop_gleaned_4(Arg1,F,ARGSISA,FRGS).
-add_mpred_prop_gleaned_4(Arg1,_F,[ARG|_],FRGS):-nonvar(ARG),!,decl_mpred(Arg1,[mpred_argtypes(Arg1)|FRGS]).
+add_mpred_prop_gleaned_4(Arg1,_F,[ARG|_],FRGS):-nonvar(ARG),!,decl_mpred(Arg1,[meta_argtypes(Arg1)|FRGS]).
 add_mpred_prop_gleaned_4(Arg1,_F,_,FRGS):-decl_mpred(Arg1,FRGS).
 
 

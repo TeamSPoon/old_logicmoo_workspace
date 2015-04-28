@@ -24,8 +24,8 @@ unused_bugger:-module(bugger,[
          module_predicates_are_exported/0,
          all_module_predicates_are_transparent/1,
          
-         is_loop_checked/1,
-         is_module_loop_checked/2,
+         %is_loop_checked/1,
+         %is_module_loop_checked/2,
          snumbervars/1,
          safe_numbervars/1,
          safe_numbervars/2,
@@ -68,8 +68,10 @@ unused_bugger:-module(bugger,[
      flush_output_safe/0,
      flush_output_safe/1,
 
-     loop_check/2,
-     loop_check_term/3,
+     % loop_check/2,
+     loop_check_term/3,     
+     loop_check_term_key/3,
+     no_loop_check_term_key/3,
          % loop_check_throw/1,
          %loop_check_fail/1,
 
@@ -244,7 +246,7 @@ hotrace(M:X):-  visible(+exception),leash(+exception),restore_trace((notrace,M:c
      flush_output_safe/0,
      flush_output_safe/1,
 
-     loop_check/2,
+     %loop_check/2,
      loop_check_term/3,
          % loop_check_throw/1,
          %loop_check_fail/1,
@@ -375,7 +377,7 @@ errx:-debugOnError((assert_if_new(tlbugger:dont_skip_bugger),do_gc,dumpST(10))),
 
 % false = use this wrapper, true = code is good and avoid using this wrapper
 :- export(skipWrapper/0).
-skipWrapper:-!.
+skipWrapper:-!,fail.
 skipWrapper:- tracing,\+tlbugger:rtracing.
 skipWrapper:- tlbugger:dont_skip_bugger,!,fail.
 skipWrapper:- 0 is random(5),!.
@@ -400,7 +402,7 @@ logOnErrorIgnore(C):-ignore(logOnError0(C)).
 
 :- meta_predicate(one_must(0,0)).
 one_must(MCall,OnFail):- skipWrapper,!, (MCall *->  true ;    OnFail).
-one_must(Call,OnFail):- strip_module(Call,M,Call), '@'(( Call *->  true ;    OnFail ),M).
+one_must(MCall,OnFail):- strip_module(MCall,M,Call), '@'(( Call *->  true ;    OnFail ),M).
 
 
 :-export(transitive/3).
@@ -449,6 +451,10 @@ sanity(G):- tlbugger:show_must_go_on,!,ignore(show_call_failure(G)).
 sanity(G):- must(show_call_failure(G)).
 
 
+:-export(is_release/0).
+is_release :- \+ not_is_release.
+:-export(not_is_release/0).
+not_is_release :- 1 is random(4).
 
 
 :-thread_local tlbugger:show_must_go_on/0.
@@ -456,10 +462,12 @@ badfood(MCall):- numbervars(MCall,0,_,[functor_name('VAR_______________________x
 
 % -- CODEBLOCK
 :- export(must/1).
-:-meta_predicate (must(:)).
+:-meta_predicate (must(0)).
+%must(C):-is_release,!,C.
+
 %must(C):-  tlbugger:skipMust,!,catch(C,E,(wdmsg(E:C),fail)).
-% must(C):- catch(C,E,(wdmsg(E:C),fail)) *-> true ; (wdmsg(failed_must(C)),dtrace(C)).
-must(MCall):- skipWrapper,!, (MCall *-> true ; ((dmsg(failed(must(MCall))),trace,MCall))).
+must(C):- catch(C,E,(wdmsg(E:C),fail)) *-> true ; (wdmsg(failed_must(C)),trace,dtrace(C)).
+%must(MCall):- skipWrapper,!, (MCall *-> true ; ((dmsg(failed(must(MCall))),trace,MCall))).
 %must(C):-  tlbugger:skipMust,!,catch(C,E,(wdmsg(E:C),fail)).
 must(MCall):- hotrace((tlbugger:show_must_go_on,
  strip_module(MCall,M,Call))),!,
@@ -856,7 +864,6 @@ snumbervars(Term):-numbervars_impl(Term,0,_).
 % Loop checking
 % ===================================================================
 :- thread_local tlbugger:ilc/1.
-:- thread_local ilc_local/2.
 
 reduce_make_key(call(C),O):-!,reduce_make_key(C,O).
 reduce_make_key(no_repeats(C),O):-!,reduce_make_key(C,O).
@@ -874,33 +881,38 @@ reduce_make_key(O,O).
 make_key(M:CCI,Key):- atom(M),!,hotrace((=(CCI,CC),(ground(CC)->Key=CC ; (copy_term(CC,Key,_),numbervars(Key,0,_))))).
 make_key(CCI,Key):- hotrace((=(CCI,CC),(ground(CC)->Key=CC ; (copy_term(CC,Key,_),numbervars(Key,0,_))))).
 
-is_loop_checked(Call):-  make_key(Call,Key),!,tlbugger:ilc(Key).
-is_module_loop_checked(Module, Call):- (var(Call)->true;make_key(Call,Key)),!,ilc_local(Module,Key).
+%is_loop_checked(Call):-  make_key(Call,Key),!,tlbugger:ilc(Key).
 
-no_loop_check_unsafe(Call):- with_no_assertions(tlbugger:ilc(_),with_no_assertions(ilc_local(_,_),loop_check(Call,fail))).
 
-% WAS no_loop_check(Call):- no_loop_check(Call,trace_or_throw(loop_to_no_loop_check(Call))).
-no_loop_check(Call):- make_key(Call,Key), with_assertions([-(tlbugger:ilc(_)),tlbugger:ilc(Key)],Call).
+%WAS no_loop_check(Call):- no_loop_check(Call,trace_or_throw(loop_to_no_loop_check(Call))).
+%no_loop_check(Call):- make_key(Call,Key), with_assertions([-(tlbugger:ilc(_)),tlbugger:ilc(Key)],Call).
+%no_loop_check(Call, TODO):-  with_no_assertions(tlbugger:ilc(_),loop_check(Call,TODO)).
 
-no_loop_check(Call, TODO):-  with_no_assertions(tlbugger:ilc(_),loop_check_local(Call,TODO)).
+%loop_check(Call):- loop_check(Call,fail).
+%loop_check(Call, TODO):- make_key(Call,Key),!, loop_check_term(Call,Key,TODO).
 
-no_loop_check_module( Module, Call, TODO):-  with_no_assertions(ilc_local(Module,_),loop_check_local(Call,TODO)).
 
-loop_check(Call):- loop_check(Call,fail).
-loop_check(Call, TODO):- make_key(Call,Key),!, loop_check_term(Call,Key,TODO).
-
-loop_check_local(Call):- loop_check_local(Call,trace_or_throw(syntax_loop_check_local(Call))).
-loop_check_local(Call,TODO):- loop_check_module(current,Call,TODO).
-
-% loop_check_local(Call):- loop_check_local(Call,trace_or_throw(syntax_loop_check_local(Call))).
-loop_check_module(Module,Call):-loop_check_module(Module,Call,fail).
-loop_check_module(Module,Call,TODO):- make_key(Call,Key), LC = ilc_local(Module,Key),  
- ( \+(LC) -> (setup_call_cleanup(asserta(LC,REF),Call,erase_safe(LC:loop_check_module(Module,Call,TODO),REF))); ((can_fail(TODO)->retract_can_table;true),call(TODO)) ).
-
+loop_check_term_key(Call,KeyIn,TODO):- make_key(KeyIn,Key),!, loop_check_term(Call,Key,TODO).
+no_loop_check_term_key(Call,KeyIn,TODO):- make_key(KeyIn,Key),!,with_no_assertions(tlbugger:ilc(_),loop_check_term(Call,Key,TODO)).
 loop_check_term(Call,Key,TODO):- TT = tlbugger:ilc(Key),
  ( \+(TT) -> (setup_call_cleanup(asserta(TT,REF), Call, erase_safe(TT:loop_check_term(Call,Key,TODO),REF))) ; ((can_fail(TODO)->retract_can_table;true),call(TODO)) ).
 
 can_fail(G):-not(G=true),not(G=must(_)).
+
+% get_where(When)
+get_where(B:L):-get_where0(F:L),file_base_name(F,B).
+get_where0(F:L):-source_location(file,F),current_input(S),line_position(S,L),!.
+get_where0(F:L):-source_location(F,L),!.
+get_where0(A:0):-current_input(S),stream_property(S,alias(A)),!.
+get_where0(M:0):-context_module(M),!.
+get_where0(user:0):-!.
+
+lco_goal_expansion(loop_check(G),loop_check(G,fail)).
+lco_goal_expansion(loop_check(G,TODO),loop_check_term_key(G,G:W,TODO)):-must(get_where(W)).
+lco_goal_expansion(no_loop_check(G),no_loop_check(G,fail)).
+lco_goal_expansion(no_loop_check(G,TODO),no_loop_check_term_key(G,G:W,TODO)):-must(get_where(W)).
+
+
 
 % ===================================================================
 % Bugger Term Expansions
@@ -1062,17 +1074,14 @@ bugger_term_expansion(CM,T,T3):- once(bugger_t_expansion(CM,T,T2)),T\==T2,!,nop(
 :- meta_predicate(hotrace(0)).
 :- meta_predicate(traceok(0)).
 
-:- meta_predicate((loop_check_module(?,0))).
-:- meta_predicate((loop_check_module(?,0,0))).
-:- meta_predicate((no_loop_check_module(0,?,0))).
-
-:- meta_predicate((loop_check_local(0,0))).
-:- meta_predicate((no_loop_check(0,0))).
-:- meta_predicate((no_loop_check(0))).
-:- meta_predicate((no_loop_check_unsafe(0))).
+%:- meta_predicate((loop_check(0,0))).
+%:- meta_predicate((no_loop_check(0,0))).
+%:- meta_predicate((no_loop_check(0))).
+%:- meta_predicate((no_loop_check_unsafe(0))).
 :- meta_predicate((loop_check_term(0,?,0))).
-:- meta_predicate((loop_check(0,0))).
-:- meta_predicate((loop_check(0))).
+:- meta_predicate((loop_check_term_key(0,?,0))).
+%:- meta_predicate((loop_check(0,0))).
+%:- meta_predicate((loop_check(0))).
 
 :- export(mstatistics/0).
 mstatistics:-
@@ -1325,9 +1334,9 @@ user_use_module(What):- '@'(use_module(What),'user').
 
 :- module_transparent(must_det_l/1).
 
-:- module_transparent(loop_check/2).
-:- module_transparent(no_loop_check/1).
-:- export(no_loop_check/1).
+:- module_transparent(loop_check_term_key/3).
+:- module_transparent(no_loop_check_term_key/3).
+% :- export(no_loop_check/1).
 %:- module_transparent(loop_check_fail/1).
 %:- module_transparent(loop_check_throw/1).
 %:- module_transparent(loop_check_term/3).
@@ -1535,7 +1544,8 @@ traceok(X):-  tlbugger:wastracing -> call_cleanup((trace,call(X)),notrace) ; cal
 
 :-thread_local(tlbugger:ifCanTrace/0).
 % thread locals should defaults to false: tlbugger:ifCanTrace.
-%MAIN tlbugger:ifCanTrace.
+%MAIN 
+tlbugger:ifCanTrace.
 
 
 :- export(ifWontTrace/0).
@@ -1769,11 +1779,11 @@ rtraceOnError(C):-
 
 with_skip_bugger(C):-setup_call_cleanup(asserta( tlbugger:skip_bugger),C,retract( tlbugger:skip_bugger)).
 
-debugOnError(C):- tlbugger:rtracing,!, catchv(C,E,call_cleanup(debugCallWhy(thrown(E),C),throw(E))).
-debugOnError(C):- skipWrapper,!,C.
+%debugOnError(C):- tlbugger:rtracing,!, catchv(C,E,call_cleanup(debugCallWhy(thrown(E),C),throw(E))).
+%debugOnError(C):- skipWrapper,!,C.
 debugOnError(C):- !,debugOnError0(C).
 debugOnError(C):-prolog_ecall(0,debugOnError0,C).
-debugOnError0(C):- skipWrapper,!,C.
+debugOnError0(C):- tlbugger:rtracing,!,C.
 debugOnError0(C):- catchv(C,E,call_cleanup(debugCallWhy(thrown(E),C),throw(E))).
 debugOnErrorEach(C):-prolog_ecall(1,debugOnError0,C).
 debugOnErrorIgnore(C):-ignore(debugOnError0(C)).
@@ -2284,7 +2294,7 @@ matches_term0(F/A,Term):- (var(A)->member(A,[0,1,2,3,4]);true), functor_safe(Fil
 matches_term0(Filter,Term):- sub_term(STerm,Term),nonvar(STerm),matches_term0(Filter,STerm),!.
 
 dmsginfo(V):-dmsg(info(V)).
-dmsg(V):- hotrace((dmsg0(V),garbage_collect,garbage_collect_atoms,ignore((source_location(S,L),format('% ~w~n',[S:L]))))).
+dmsg(V):- hotrace((dmsg0(V),ignore((prolog_load_context(file,F),prolog_load_context(stream,S),line_count(S,L),format('% ~w~n',[F:L]))))).
 :-'$syspreds':'$hide'(dmsg/1).
 
 :-export(dmsg0/1).
@@ -2597,7 +2607,7 @@ show_call(M:add(A)):-!, show_call0(M:add(A)),!.
 show_call(C):-one_must((show_call0(C),dmsg(succeed(C))),((dmsg(failed_show_call(C)),garbage_collect_atoms,!,fail))).
 
 :- meta_predicate show_call_failure(0).
-show_call_failure(C):-one_must((show_call0(C)),((dmsg(failed_show_call(C)),garbage_collect_atoms,!,fail))).
+show_call_failure(C):-one_must((show_call0(C)),((dmsg(failed_show_call(C)),dmsg(failed_show_call(C)),garbage_collect_atoms,!,fail))).
 
 :- meta_predicate show_call_success(0).
 show_call_success(C):- show_call0(C),dmsg(show_call_success(C)).
@@ -2656,6 +2666,7 @@ dumpST(Frame,MaxDepth):-integer(MaxDepth),Term = dumpST(MaxDepth),
 dumpST(Frame,MaxDepth):- integer(MaxDepth),(var(Frame)->prolog_current_frame(Frame);true),dumpST2(Frame,MaxDepth).
 dumpST(Frame,Opts):-is_list(Opts),!,dumpST(1,Frame,Opts).
 dumpST(Frame,Opts):-show_call(dumpST(1,Frame,[Opts])).
+dumpST2(Frame,From-MaxDepth):-integer(MaxDepth),!,dumpST(Frame,[skip_depth(From),max_depth(MaxDepth),numbervars(safe),show([has_alternatives,level,context_module,goal,clause])]).
 dumpST2(Frame,MaxDepth):-integer(MaxDepth),!,dumpST(Frame,[max_depth(MaxDepth),numbervars(safe),show([has_alternatives,level,context_module,goal,clause])]).
 
 get_m_opt(Opts,Max_depth,D100,RetVal):-E=..[Max_depth,V],(((member(E,Opts),nonvar(V)))->RetVal=V;RetVal=D100).
@@ -2686,6 +2697,7 @@ fdmsg(fr(List)):-is_list(List),!,fresh_line,ignore(forall(member(E,List),fdmsg1(
 fdmsg(M):-dmsg(M).
 
 dumpST4(N,Frame,Opts,[nf(max_depth,N,Frame,Opts)]):-get_m_opt(Opts,max_depth,100,MD),N>=MD,!.
+dumpST4(N,Frame,Opts,[nf(max_depth,N,Frame,Opts)]):-get_m_opt(Opts,skip_depth,100,SD),N<=SD,!,fail.
 dumpST4(N,Frame,Opts,[fr(Goal)|MORE]):- get_m_opt(Opts,show,goal,Ctrl),getPFA(Frame,Ctrl,Goal),!,dumpST_Parent(N,Frame,Opts,MORE).
 dumpST4(N,Frame,Opts,[nf(no(Ctrl),N,Frame,Opts)|MORE]):- get_m_opt(Opts,show,goal,Ctrl),!,dumpST_Parent(N,Frame,Opts,MORE).
 dumpST4(N,Frame,Opts,[nf(noFrame(N,Frame,Opts))]).
@@ -2958,32 +2970,13 @@ listify(OUT,OUT):-not(not(is_list(OUT))),!.
 listify(OUT,[OUT]).
 
 
-
-
-
 traceIf(_Call):-!.
 traceIf(Call):-ignore((Call,trace)).
 
-
-
-
 traceafter_call(X):- call_cleanup(restore_trace((leash(-all),visible(-all),X)),(leash(+call), trace)).
-
-/*
-% :- meta_predicate notrace_call(0).
-
-notrace_call(X):-hotrace,catchv(traceafter_call(X),E,(dmsg(E-X),trace,throw(E))).
-traceafter_call(X):-X,trace.
-traceafter_call(_):-tracing,fail.
-traceafter_call(_):-trace,fail.
-*/
-
-
 
 %getWordTokens(WORDS,TOKENS):-concat_atom(TOKENS,' ',WORDS).
 %is_string(S):- string(S).
-
-
 
  %:-interactor.
 
@@ -3038,6 +3031,7 @@ call_no_cuts((A->B;C)):-!,(call_no_cuts(A)->call_no_cuts(B);call_no_cuts(C)).
 call_no_cuts(M:CALL):-atom(M),!,functor(CALL,F,A),functor(C,F,A),must(once(not(not(clause_safe(C,_))))),!,clause_safe(CALL,TEST),call(TEST).
 call_no_cuts(CALL):-functor(CALL,F,A),functor(C,F,A),must(once(not(not(clause_safe(C,_))))),!,clause_safe(CALL,TEST),call(TEST).
 
+/*
 :- meta_predicate call_no_cuts_loop_checked(0).
 :- module_transparent call_no_cuts_loop_checked/1.
 :- meta_predicate call_no_cuts_loop_checked(0,0).
@@ -3045,7 +3039,7 @@ call_no_cuts(CALL):-functor(CALL,F,A),functor(C,F,A),must(once(not(not(clause_sa
 call_no_cuts_loop_checked(Call):-call_no_cuts_loop_checked(Call, fail).
 call_no_cuts_loop_checked(Call, TODO):-!, loop_check(Call,TODO).
 call_no_cuts_loop_checked(Call, TODO):- clause(Call,Body),make_key(Body,Key),loop_check_term(Body,Key,TODO).
-
+*/
 
 % =====================================================================================================================
 :- export((call_tabled/1)).
@@ -3078,8 +3072,8 @@ retract_can_table :- retractall(maybe_table_key(_)).
 :- meta_predicate(make_key(?,-)).
 
 :-module_transparent(ex/0).
-lex:-listing(tlbugger:ilc),listing(ilc_local(_,_)),forall(current_predicate(table_bugger:F/A),listing(table_bugger:F/A)),catch(listing(user:already_added_this_round),_,true).
-ex:-expire_tabled_list(_),retractall(tlbugger:ilc(_)),retractall(ilc_local(_,_)),dmsg_showall(_),forall(current_predicate(table_bugger:F/A),(functor(RA,F,A),retractall(RA))),catch(expire_dont_add,_,true).
+lex:-listing(tlbugger:ilc(_)),forall(current_predicate(table_bugger:F/A),listing(table_bugger:F/A)),catch(listing(user:already_added_this_round),_,true).
+ex:-expire_tabled_list(_),retractall(tlbugger:ilc(_)),dmsg_showall(_),forall(current_predicate(table_bugger:F/A),(functor(RA,F,A),retractall(RA))),catch(expire_dont_add,_,true).
 
 expire_tabled_list(V):-var(V),!,retractall(table_bugger:call_tabled_cached_results(_,_)).
 expire_tabled_list(_):-!,retractall(table_bugger:call_tabled_cached_results(_,_)).
@@ -3141,7 +3135,7 @@ call_tabled0(Key,Vars,C,List):- asserta(table_bugger:maybe_table_key(Key)), find
 
 really_can_table:- not(test_tl(tlbugger:cannot_save_table)),!.
 
-outside_of_loop_check:- (clause(tlbugger:ilc(_),B)->B=(!,fail);true),(clause(ilc_local(_,_),BL)->BL=(!,fail);true).
+outside_of_loop_check:- (clause(tlbugger:ilc(_),B)->B=(!,fail);true).
 
 
 :-meta_predicate(test_tl(1,+)).
@@ -3637,4 +3631,7 @@ user:prolog_exception_hook(A,B,C,D):- fail,
 :-'$set_predicate_attribute'(with_assertions(_,_), hide_childs, 0).
 
 logicmoo_bugger_loaded.
+system:goal_expansion(LC,LCOO):-nonvar(LC),transitive(lco_goal_expansion,LC,LCO),LC\=@=LCO,must(LCO=LCOO),!.
+system:term_expansion(LC,LCOO):-nonvar(LC),transitive(lco_goal_expansion,LC,LCO),LC\=@=LCO,must(LCO=LCOO),!.
+system:term_expansion(LC,LCOO):-nonvar(LC),(LC=(H:-B)),expand_goal(B,BE),B\=@=BE,must((H:-BE)=LCOO).
 

@@ -63,7 +63,7 @@ choose_one(Prop,Obj,_Value):- Fact=.. [Prop,Obj,_],thlocal:infInstanceOnly(Fact)
 choose_one(Prop,Obj,Value):- with_fallbacks(fallback_value(Prop,Obj,RValue)),ground(choose_one(Prop,Obj,RValue)),checkNoArgViolation(Prop,Obj,RValue),!,Value = RValue,save_fallback(Obj,Prop,Value).
 choose_one(Prop,Obj,Value):- create_someval(Prop,Obj,RValue),ground(create_someval(Prop,Obj,RValue)),checkNoArgViolation(Prop,Obj,RValue),!,Value = RValue,save_fallback(Obj,Prop,Value).
 
-choose_each(Prop,Obj,Value):- tE(completeExtentAsserted, Prop),!,choose_asserted(Prop,Obj,Value).
+choose_each(Prop,Obj,Value):- t(completeExtentAsserted, Prop),!,choose_asserted(Prop,Obj,Value).
 choose_each(Prop,Obj,Value):- one_must(choose_asserted(Prop,Obj,Value),(fallback_value(Prop,Obj,Value),maybe_cache(Prop,Obj,Value,Obj))).
 
 % choose_asserted(Prop,Obj,Value):- t(Prop,Obj,Value). % ,must_det(is_asserted(t(Prop,Obj,Value))).
@@ -282,7 +282,7 @@ each_default_inst_type_props(_,Type,[typeHasGlyph(Lbl)|Props]):-call_no_cuts(mud
 :-export((add_missing_instance_defaults/1)).
 add_missing_instance_defaults(_P):-dontAssertTypeProps,!.
 add_missing_instance_defaults(P):-
-   loop_check_local(add_missing_instance_defaults_ilc(P),true).
+   loop_check(add_missing_instance_defaults_ilc(P),true).
 add_missing_instance_defaults_ilc(P):-
    get_inst_default_props(P,_PropListL,Missing),
    once(Missing=[];show_call(padd(P,Missing))).
@@ -317,7 +317,7 @@ dontAssertTypeProps:-!.
 
 :-export(agenda_rescan_sim_objects/0).
 
-agenda_rescan_sim_objects:- loop_check_local(agenda_rescan_sim_objects_ilc,true).
+agenda_rescan_sim_objects:- loop_check(agenda_rescan_sim_objects_ilc,true).
 % agenda_rescan_sim_objects_ilc:- dmsg(todo(fix(agenda_rescan_sim_objects,"to not set atloc/2"))),!,
 agenda_rescan_sim_objects_ilc:-dontAssertTypeProps,!.
 agenda_rescan_sim_objects_ilc:-
@@ -331,7 +331,7 @@ agenda_rescan_sim_objects_ilc:-
           dmsg(agenda_rescan_sim_objects_for(I,Type,missing_from(Missing))),
           padd(I,Missing))))))))))),fail.
 
-agenda_rescan_sim_objects_ilc:-ignore(loop_check_local(rescan_duplicated_facts,true)).
+agenda_rescan_sim_objects_ilc:-ignore(loop_check(rescan_duplicated_facts,true)).
 
 
 % :- include(logicmoo(parsing/parser_chat80)). 

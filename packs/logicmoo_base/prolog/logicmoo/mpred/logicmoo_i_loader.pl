@@ -173,7 +173,7 @@ assert_kif_dolce(_).
 
 :-meta_predicate(doall_and_fail(0)).
 
-finish_processing_world :- load_mpred_files, loop_check_local(with_assertions(thlocal:agenda_slow_op_do_prereqs,doall(finish_processing_dbase)),true).
+finish_processing_world :- load_mpred_files, loop_check(with_assertions(thlocal:agenda_slow_op_do_prereqs,doall(finish_processing_dbase)),true).
 
 doall_and_fail(Call):- time_call(once(doall(Call))),fail.
 
@@ -385,6 +385,7 @@ loader_term_expansion(CL,WHY):-
 :- asserta(thlocal:infForward).
 
 :- dynamic(pfc_skipped_module/1).
+pfc_skipped_module(eggdrop).
 :-forall(current_module(CM),assert(pfc_skipped_module(CM))).
 :-retractall(pfc_skipped_module(pfc)).
 % :-show_call(loading_module(X)),retractall(X).
@@ -534,11 +535,10 @@ pfc_directive_expansion(pfc_multifile,
 
 pfc_directive_expansion(pfc_module,(asserta(user:mpred_directive_value(pfc,module,M)))):-source_module(M).
 
-pfc_directive_expansion(pfc_begin,file_begin(pfc)):- must(source_location(S,_);context_module(S)).
-pfc_directive_expansion(pfc_end,file_end(pfc)):- must(source_location(S,_);context_module(S)).
-pfc_directive_expansion(dyn_begin,file_begin(dynamic_reader)):- must(source_location(S,_);context_module(S)).
-pfc_directive_expansion(dyn_end,file_end(dynamic_reader)):- must(source_location(S,_);context_module(S)).
-
+pfc_begin:-file_begin(pfc).
+pfc_end:-file_end(pfc).
+dyn_begin:-file_begin(dynamic_reader).
+dyn_end:-file_end(dynamic_reader).
 
 file_begin(W):- must_det(( prolog_load_context(file,Source),asserta(user:mpred_directive_value(W,file,Source)))).
 file_end(W):- must_det(( prolog_load_context(file,Source),retract(user:mpred_directive_value(W,file,Source)))).
@@ -574,7 +574,7 @@ pfc_file_expansion_0(Fact,Output):- get_functor(Fact,F,A),if_defined(functorDecl
 pfc_file_expansion_0(Fact,Output):- get_functor(Fact,F,A),if_defined(functorDeclares(F)),pfc_add(Fact),Output='$was_imported_kb_content$'(Fact,functorDeclares(F)),!.
 pfc_file_expansion_0(Fact,Output):- get_functor(Fact,F,A),if_defined(prologMacroHead(F)),pfc_add(Fact),Output='$was_imported_kb_content$'(Fact,prologMacroHead(F)),!.
 pfc_file_expansion_0(Fact,Output):- get_functor(Fact,F,A),if_defined(pfcControlled(F)),pfc_add(Fact),Output='$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
-pfc_file_expansion_0(Fact,Output):- pfc_expand_in_file_anyways(F),!,
+pfc_file_expansion_0(Fact,Output):- \+ thlocal:disable_mpred_term_expansions_locally, pfc_expand_in_file_anyways(F),!,
      pfc_assert(Fact),Output='$was_imported_kb_content$'(Fact,pfc_expand_in_file_anyways(F)),!.
 
 stream_pos(File:C):-source_file(File),current_input_stream(S),line_count(S,C).

@@ -32,26 +32,26 @@
 :- multifile user:check_permanence/4.
 
 
-:- dynamic user:term_specifier_text/2.
-:- dynamic user:type_action_info/3.
-:- dynamic user:update_charge/2.
-:- dynamic user:update_stats/2.
-:- dynamic user:use_usable/4.
-:- dynamic user:verb_alias/2.
-:- dynamic user:vtActionTemplate/1.
-:- dynamic user:mud_test/0.
-:- dynamic user:mud_test/1.
-:- dynamic user:mud_test/2.
-:- dynamic user:mud_test_local/0.
-:- dynamic user:mud_test_local/1.
-:- dynamic user:mud_test_local/2.
-:- dynamic user:world_agent_plan/3.
-:- dynamic user:action_info/2.
-:- dynamic user:action_rules/4.
-:- dynamic user:action_verb_useable/4.
-:- dynamic user:agent_call_command/2.
-:- dynamic user:agent_text_command/4.
-:- dynamic user:check_permanence/4.
+:- dynamic_multifile_exported user:term_specifier_text/2.
+:- dynamic_multifile_exported user:type_action_info/3.
+:- dynamic_multifile_exported user:update_charge/2.
+:- dynamic_multifile_exported user:update_stats/2.
+:- dynamic_multifile_exported user:use_usable/4.
+:- dynamic_multifile_exported user:verb_alias/2.
+:- dynamic_multifile_exported user:vtActionTemplate/1.
+:- dynamic_multifile_exported user:mud_test/0.
+:- dynamic_multifile_exported user:mud_test/1.
+:- dynamic_multifile_exported user:mud_test/2.
+:- dynamic_multifile_exported user:mud_test_local/0.
+:- dynamic_multifile_exported user:mud_test_local/1.
+:- dynamic_multifile_exported user:mud_test_local/2.
+:- dynamic_multifile_exported user:world_agent_plan/3.
+:- dynamic_multifile_exported user:action_info/2.
+:- dynamic_multifile_exported user:action_rules/4.
+:- dynamic_multifile_exported user:action_verb_useable/4.
+:- dynamic_multifile_exported user:agent_call_command/2.
+:- dynamic_multifile_exported user:agent_text_command/4.
+:- dynamic_multifile_exported user:check_permanence/4.
 
 
 
@@ -61,7 +61,7 @@
 :-op(0,fy,('enabled')).
 :- '@'(ensure_loaded(library(logicmoo/util/logicmoo_util_bugger)),user).
 
-:-dynamic(user_db:grant_openid_server/2).
+:-dynamic_multifile_exported(user_db:grant_openid_server/2).
 :-multifile(user_db:grant_openid_server/2).
 :- multifile '$was_imported_kb_content$'/2.
 :- discontiguous('$was_imported_kb_content$'/2).
@@ -72,12 +72,12 @@
 :- multifile user:was_enabled/1.
 :- discontiguous(user:was_enabled/1).
 :- multifile user:listing_mpred_hook/1.
-:- dynamic user:listing_mpred_hook/1.
+:- dynamic_multifile_exported user:listing_mpred_hook/1.
 
 :- multifile user:genls/2.
-:- dynamic user:genls/2.
+:- dynamic_multifile_exported user:genls/2.
 :- multifile user:isa/2.
-:- dynamic user:isa/2.
+:- dynamic_multifile_exported user:isa/2.
 
 :- style_check(-singleton).
 
@@ -94,14 +94,19 @@
 :- set_prolog_flag(generate_debug_info, true).
 
 % these do not get defined!?
-% :-dynamic user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
+% :-dynamic_multifile_exported user_db:assert_user/2, user_db:grant_openid_server/2, user_db:retractall_grant_openid_server/2, user_db:retractall_user/2, user_db:assert_grant_openid_server/2.
 
 :- multifile(mpred_online:semweb_startup).
 
+:-dynamic(tChannel/1).
+:-multifile(tChannel/1).
 
 
-:- dynamic thglobal:pfcManageHybrids/0.
-:- dynamic thlocal:infMustArgIsa/0.
+
+%:- dynamic_multifile_exported(do_ensure_some_pathBetween/0).
+%:- dynamic_multifile_exported(ensure_some_pathBetween/2).
+:- dynamic_multifile_exported thglobal:pfcManageHybrids/0.
+:- dynamic_multifile_exported thlocal:infMustArgIsa/0.
 :- thread_local thlocal:into_form_code/0.
 :- thread_local thlocal:current_why/2.
 :- dynamic_multifile_exported user:defnSufficient/2.

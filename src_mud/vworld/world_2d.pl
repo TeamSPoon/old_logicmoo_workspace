@@ -131,7 +131,7 @@ rez_loc_object(XY,Type):-
 
 %prologOnly(mudNearbyObjs(tObj,tObj)).
 %prologOnly(mudNearbyObjs(tObj,tObj)).
-%pred_module(mudNearbyObjs(tObj,tObj),user).
+%mpred_module(mudNearbyObjs(tObj,tObj),user).
 mudNearbyObjs(X,Y):-mudAtLoc(X,L1),mudAtLoc(Y,L2),mudNearbyLocs(L1,L2).
 
 is_location(Obj):-var(Obj),!,fail.
@@ -197,7 +197,7 @@ same_regions(Agent,Obj):-inRegion(Agent,Where1),dif(Agent,Obj),inRegion(Obj,Wher
 %:- ensure_universal_stub(prologPTTP,mudTestAgentWearing/2).
 
 prologHybrid(mudAtLoc/2).
-mpred_argtypes(mudAtLoc(tObj,tSpatialThing)).
+meta_argtypes(mudAtLoc(tObj,tSpatialThing)).
 
 
 % compute the most specific location description

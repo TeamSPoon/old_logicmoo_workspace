@@ -136,9 +136,9 @@ pfcRem13(H):-
   doall((CL=(HH<=_),support_shape(CL),sub_term_v(H,HH),pfcRem123(HH,CL))),
   doall((CL=(HH:-_),support_shape(CL),sub_term_v(H,HH),pfcRem123(HH,CL))),
   doall((CL=(_<=>_),support_shape(CL),sub_term_v(H,CL),pfcRem123a(CL))),
-  doall((CL=(pfcPT(_,_)),support_shape(CL),sub_term_v(rhs([H]),CL),pfcRem123a(CL))),
-  doall((CL=(pfcBT(_,_)),support_shape(CL),sub_term_v(rhs([H]),CL),pfcRem123a(CL))),
-  doall((CL=(pfcNT(_,_)),support_shape(CL),sub_term_v(rhs([H]),CL),pfcRem123a(CL))),
+  doall((CL=(pt(_,_)),support_shape(CL),sub_term_v(rhs([H]),CL),pfcRem123a(CL))),
+  doall((CL=(bt(_,_)),support_shape(CL),sub_term_v(rhs([H]),CL),pfcRem123a(CL))),
+  doall((CL=(nt(_,_)),support_shape(CL),sub_term_v(rhs([H]),CL),pfcRem123a(CL))),
   doall((CL=(spft(_,_,_)),support_shape(CL),sub_term_v(rhs([H]),CL),pfcRem123a(CL))),
   doall((CL=(support2(_,_,_)),support_shape(CL),sub_term_v(rhs([H]),CL),pfcRem123a(CL))),
   doall((CL=(support3(_,_,_)),support_shape(CL),sub_term_v(rhs([H]),CL),pfcRem123a(CL))),
@@ -446,8 +446,8 @@ pfc_retract(_,pfcPT3(Key,Head,Body)) :-
   %
   !,
   (retract(pfcPT3(Key,Head,Body))
-    -> unFc(pfcPT(Head,Body))
-     ; pfc_warn("Trigger not found to pfc_retract: ~w",[pfcPT(Head,Body)])).
+    -> unFc(pt(Head,Body))
+     ; pfc_warn("Trigger not found to pfc_retract: ~w",[pt(Head,Body)])).
 pfc_retract(pfcInternal(_),G):- must(pfc_local(G)),!,retract(G).
 pfc_retract(pfcInternal,G):- must(pfc_local(G)),!,retract(G).
 pfc_retract(_,G):- pfc_local(G),!,retract(G),loop_check(if_defined(run_database_hooks_depth_1(change(retract,a),G),true),true).
@@ -458,7 +458,7 @@ pfc_ignored(argIsa(F, A, argIsaFn(F, A))).
 pfc_ignored(genls(A,A)).
 pfc_ignored(isa(tCol,tCol)).
 %pfc_ignored(isa(W,tCol)):-if_defined(user:hasInstance_dyn(tCol,W)).
-pfc_ignored(isa(W,_)):-compound(W),isa(W,mpred_argtypes).
+pfc_ignored(isa(W,_)):-compound(W),isa(W,meta_argtypes).
  
 pfc_ignored(isa(_,Atom)):-atom(Atom),atom_concat(ft,_,Atom),!.
 pfc_ignored(isa(_,argIsaFn(_, _))).
@@ -485,7 +485,7 @@ pfc_add_minfo(How,((A,B):-INFOC)):-pfc_is_info(INFOC),(nonvar(A);nonvar(B)),!,pf
 pfc_add_minfo(How,((A;B):-INFOC)):-pfc_is_info(INFOC),(nonvar(A);nonvar(B)),!,pfc_add_minfo(How,((A):-INFOC)),pfc_add_minfo(How,((B):-INFOC)),!.
 pfc_add_minfo(How,(~(A):-infoF(C))):-nonvar(C),nonvar(A),!,pfc_add_minfo(How,((A):-infoF(~(C)))). % call(How,(~(A):-infoF(C))).
 pfc_add_minfo(How,(A:-INFOC)):-pfc_is_info(INFOC),!,pfc_rewrap_h(A,AA),call(How,(AA:-INFOC)),!.
-pfc_add_minfo(How,pfcBT(H,_)):-!,pfc_add_minfo(How,(H:-pfc_bc_only(H))).
+pfc_add_minfo(How,bt(H,_)):-!,pfc_add_minfo(How,(H:-pfc_bc_only(H))).
 %pfc_add_minfo(How,G):-dmsg(skipped_add_meta_facts(How,G)).
 pfc_add_minfo(_,_).
 
@@ -529,9 +529,9 @@ pfcRuleOutcomeHead(Outcome<=_,OutcomeO):-!,pfcRuleOutcomeHead(Outcome,OutcomeO).
 pfcRuleOutcomeHead(Outcome<=>_,OutcomeO):-pfcRuleOutcomeHead(Outcome,OutcomeO).
 pfcRuleOutcomeHead(_<=>Outcome,OutcomeO):-!,pfcRuleOutcomeHead(Outcome,OutcomeO).
 pfcRuleOutcomeHead(_::::Outcome,OutcomeO):-!,pfcRuleOutcomeHead(Outcome,OutcomeO).
-pfcRuleOutcomeHead(pfcBT(Outcome,_),OutcomeO):-!,pfcRuleOutcomeHead(Outcome,OutcomeO).
-pfcRuleOutcomeHead(pfcNT(_,_,Outcome),OutcomeO):-!,pfcRuleOutcomeHead(Outcome,OutcomeO).
-pfcRuleOutcomeHead(pfcPT(_,Outcome),OutcomeO):-!,pfcRuleOutcomeHead(Outcome,OutcomeO).
+pfcRuleOutcomeHead(bt(Outcome,_),OutcomeO):-!,pfcRuleOutcomeHead(Outcome,OutcomeO).
+pfcRuleOutcomeHead(nt(_,_,Outcome),OutcomeO):-!,pfcRuleOutcomeHead(Outcome,OutcomeO).
+pfcRuleOutcomeHead(pt(_,Outcome),OutcomeO):-!,pfcRuleOutcomeHead(Outcome,OutcomeO).
 pfcRuleOutcomeHead(pfcPT3(_,_,Outcome),OutcomeO):-!,pfcRuleOutcomeHead(Outcome,OutcomeO).
 pfcRuleOutcomeHead(spft(Outcome,_,_),OutcomeO):-!,pfcRuleOutcomeHead(Outcome,OutcomeO).
 pfcRuleOutcomeHead(support3(_,_,Outcome),OutcomeO):-!,pfcRuleOutcomeHead(Outcome,OutcomeO).
@@ -553,10 +553,10 @@ pfcRuleOutcomeHeadBody_0(Outcome<=Ante1,OutcomeO,(Ante1,Ante2)):-!,pfcRuleOutcom
 pfcRuleOutcomeHeadBody_0(Outcome<=>Ante1,OutcomeO,(Ante1,Ante2)):-pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
 pfcRuleOutcomeHeadBody_0(Ante1<=>Outcome,OutcomeO,(Ante1,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
 pfcRuleOutcomeHeadBody_0(_::::Outcome,OutcomeO,Ante2):-!,pfcRuleOutcomeHeadBody_0(Outcome,OutcomeO,Ante2).
-pfcRuleOutcomeHeadBody_0(pfcBT(Outcome,Ante1),OutcomeO,(Ante1,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
-pfcRuleOutcomeHeadBody_0(pfcPT(Ante1,Outcome),OutcomeO,(Ante1,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
+pfcRuleOutcomeHeadBody_0(bt(Outcome,Ante1),OutcomeO,(Ante1,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
+pfcRuleOutcomeHeadBody_0(pt(Ante1,Outcome),OutcomeO,(Ante1,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
 pfcRuleOutcomeHeadBody_0(pfcPT3(Ante1a,Ante1b,Outcome),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
-pfcRuleOutcomeHeadBody_0(pfcNT(Ante1a,Ante1b,Outcome),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
+pfcRuleOutcomeHeadBody_0(nt(Ante1a,Ante1b,Outcome),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
 pfcRuleOutcomeHeadBody_0(spft(Outcome,Ante1a,Ante1b),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
 pfcRuleOutcomeHeadBody_0(support3(Ante1a,Ante1b,Outcome),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
 pfcRuleOutcomeHeadBody_0(support2(Ante1a,Outcome,Ante1b),OutcomeO,(Ante1a,Ante1b,Ante2)):-!,pfcRuleOutcomeHeadBody(Outcome,OutcomeO,Ante2).
@@ -686,9 +686,9 @@ pfc_addPreTermExpansion(Info):-pfc_file_expansion_each(Info,What),!,What=(:-Call
 :- decl_mpred_pfc ('::::')/2.
 :- decl_mpred_pfc '<=>'/2.
 :- decl_mpred_pfc '<='/2.
-:- decl_mpred_pfc 'pfcPT'/2.
-:- decl_mpred_pfc 'pfcNT'/3.
-:- decl_mpred_pfc 'pfcBT'/2.
+:- decl_mpred_pfc 'pt'/2.
+:- decl_mpred_pfc 'nt'/3.
+:- decl_mpred_pfc 'bt'/2.
 :- decl_mpred_pfc pfcUndoMethod/2.
 :- decl_mpred_pfc pfcAction/2.
 
@@ -967,29 +967,29 @@ pfc_halt(Format,Args) :-
 %%
 
 
-pfc_addTrigger(pfcPT(Trigger,Body),Support) :-
+pfc_addTrigger(pt(Trigger,Body),Support) :-
   !,
   pfc_trace_msg('      Adding positive trigger ~q~n',
-		[pfcPT(Trigger,Body)]),
-  pfcAssertInt(pfcPT(Trigger,Body),Support),
-  copy_term(pfcPT(Trigger,Body),Tcopy),
+		[pt(Trigger,Body)]),
+  pfcAssertInt(pt(Trigger,Body),Support),
+  copy_term(pt(Trigger,Body),Tcopy),
   pfcTriggerCall(Trigger),
   pfcEvalLHS(Body,(Trigger,Tcopy)),
   fail.
 
 
-pfc_addTrigger(pfcNT(Trigger,Test,Body),Support) :-
+pfc_addTrigger(nt(Trigger,Test,Body),Support) :-
   !,
   pfc_trace_msg('      Adding negative trigger: ~q~n       test: ~q~n       body: ~q~n',
 		[Trigger,Test,Body]),
   copy_term(Trigger,TriggerCopy),
-  pfcAssertInt(pfcNT(TriggerCopy,Test,Body),Support),
+  pfcAssertInt(nt(TriggerCopy,Test,Body),Support),
   \+Test,
-  pfcEvalLHS(Body,((\+Trigger),pfcNT(TriggerCopy,Test,Body))).
+  pfcEvalLHS(Body,((\+Trigger),nt(TriggerCopy,Test,Body))).
 
-pfc_addTrigger(pfcBT(Trigger,Body),Support) :-
+pfc_addTrigger(bt(Trigger,Body),Support) :-
   !,
-  pfcAssertInt(pfcBT(Trigger,Body),Support),
+  pfcAssertInt(bt(Trigger,Body),Support),
   pfcBtPtCombine(Trigger,Body).
 
 pfc_addTrigger(X,Support) :-
@@ -997,9 +997,9 @@ pfc_addTrigger(X,Support) :-
 
 
 pfcBtPtCombine(Head,Body,Support) :- 
-  %= a backward trigger (pfcBT) was just added with head and Body and support Support
-  %= find any pfcPT's with unifying heads and add the instantied pfcBT body.
-  pfcGetTriggerQuick(pfcPT(Head,_PtBody)),
+  %= a backward trigger (bt) was just added with head and Body and support Support
+  %= find any pt's with unifying heads and add the instantied bt body.
+  pfcGetTriggerQuick(pt(Head,_PtBody)),
   pfcEvalLHS(Body,Support),
   fail.
 pfcBtPtCombine(_,_,_) :- !.
@@ -1137,12 +1137,12 @@ pfcRemoveSupportsQuietly(_).
 
 
 
-pfcUndo(pfcNT(Head,Condition,Body)) :-  
+pfcUndo(nt(Head,Condition,Body)) :-  
   % undo a negative trigger.
   !,
-  (pfc_retract(pfcInternal(pfcNT),pfcNT(Head,Condition,Body))
-    -> unFc(pfcNT(Head,Condition,Body))
-     ; pfcError("Trigger not found to pfc_retract: ~w",[pfcNT(Head,Condition,Body)])).
+  (pfc_retract(pfcInternal(nt),nt(Head,Condition,Body))
+    -> unFc(nt(Head,Condition,Body))
+     ; pfcError("Trigger not found to pfc_retract: ~w",[nt(Head,Condition,Body)])).
 
 pfcUndo(Fact) :-
   % undo a random fact, printing out the trace, if relevant.
@@ -1172,9 +1172,9 @@ unFc1(F) :-
 pfcUnFcCheckTriggers(F) :-
   pfc_db_type(F,fact),
   copy_term(F,Fcopy),
-  pfcNT(Fcopy,Condition,Action),
+  nt(Fcopy,Condition,Action),
   (\+ Condition),
-  pfcEvalLHS(Action,((\+F),pfcNT(F,Condition,Action))),
+  pfcEvalLHS(Action,((\+F),nt(F,Condition,Action))),
   fail.
 pfcUnFcCheckTriggers(_).
 
@@ -1307,30 +1307,30 @@ fc_rule_check(_).
 
 
 pfcRunPT(Fact,F) :- 
-  pfcGetTriggerQuick(pfcPT(F,Body)),
+  pfcGetTriggerQuick(pt(F,Body)),
   pfc_trace_msg('      Found positive trigger: ~q~n       body: ~q~n',
 		[F,Body]),
-  not_too_deep(pfcRunPT, pfcEvalLHS(Body,(Fact,pfcPT(F,Body)))),
+  not_too_deep(pfcRunPT, pfcEvalLHS(Body,(Fact,pt(F,Body)))),
   fail.
 
 %pfcRunPT(Fact,F) :- 
-%  pfcGetTriggerQuick(pfcPT(presently(F),Body)),
-%  pfcEvalLHS(Body,(presently(Fact),pfcPT(presently(F),Body))),
+%  pfcGetTriggerQuick(pt(presently(F),Body)),
+%  pfcEvalLHS(Body,(presently(Fact),pt(presently(F),Body))),
 %  fail.
 
 pfcRunPT(_,_).
 
 pfcRunNT(_Fact,F) :-
-  support2(pfcNT(F,Condition,Body),X,_),
+  support2(nt(F,Condition,Body),X,_),
   Condition,
-  pfcRem1(X,(_,pfcNT(F,Condition,Body))),
+  pfcRem1(X,(_,nt(F,Condition,Body))),
   fail.
 pfcRunNT(_,_).
 
 
 %%
 %= pfcDefineBcRule(+Head,+Body,+ParentRule) - defines a backeard
-%= chaining rule and adds the corresponding pfcBT triggers to the database.
+%= chaining rule and adds the corresponding bt triggers to the database.
 %%
 
 pfcDefineBcRule(Head,_Body,ParentRule) :-
@@ -1345,7 +1345,7 @@ pfcDefineBcRule(Head,Body,ParentRule) :-
   pfcBuildRhs(Head,Rhs),
   pfcForEach(pfc_nf(Body,Lhs),
           (pfcBuildTrigger(Lhs,rhs(Rhs),Trigger),
-           pfc_add_BTRule(pfcBT(Head,Trigger),(ParentRuleCopy,u)))).
+           pfc_add_BTRule(bt(Head,Trigger),(ParentRuleCopy,u)))).
  
 
 
@@ -1438,13 +1438,13 @@ pfc_trigger_the_trigger(_,_,_).
 %  !,
 %  copy_term(Trigger,TriggerCopy),
 %  pfcCall(Trigger),
-%  pfcEvalLHS(Body,(presently(Trigger),pfcPT(presently(TriggerCopy),Body))),
+%  pfcEvalLHS(Body,(presently(Trigger),pt(presently(TriggerCopy),Body))),
 %  fail.
 
 trigger_trigger1(Trigger,Body) :-
   copy_term(Trigger,TriggerCopy),
   pfcTriggerCall(Trigger),
-  pfcEvalLHS(Body,(Trigger,pfcPT(TriggerCopy,Body))),
+  pfcEvalLHS(Body,(Trigger,pt(TriggerCopy,Body))),
   fail.
 
 
@@ -1464,8 +1464,8 @@ pfcTriggerCall(F):-
 
 pfcBC_Cache(P) :-
   % trigger any bc rules.
-  pfcBT(P,Trigger),
-  pfcGetSupport(pfcBT(P,Trigger),S),
+  bt(P,Trigger),
+  pfcGetSupport(bt(P,Trigger),S),
   pfcEvalLHS(Trigger,S),
   maybeSupport(P,S),
   fail.
@@ -1716,18 +1716,18 @@ pfcBuild1Rule(Lhs,Rhs,Support) :-
 
 pfcBuildTrigger([],Consequent,Consequent).
 
-pfcBuildTrigger([V|Triggers],Consequent,pfcPT(V,X)) :-
+pfcBuildTrigger([V|Triggers],Consequent,pt(V,X)) :-
   var(V),
   !, 
   pfcBuildTrigger(Triggers,Consequent,X).
 
-pfcBuildTrigger([(T1/Test)|Triggers],Consequent,pfcNT(T2,Test2,X)) :- 
+pfcBuildTrigger([(T1/Test)|Triggers],Consequent,nt(T2,Test2,X)) :- 
   pfc_negation(T1,T2),
   !,
   pfcBuildNtTest(T2,Test,Test2),
   pfcBuildTrigger(Triggers,Consequent,X).
 
-pfcBuildTrigger([(T1)|Triggers],Consequent,pfcNT(T2,Test,X)) :- 
+pfcBuildTrigger([(T1)|Triggers],Consequent,nt(T2,Test,X)) :- 
   pfc_negation(T1,T2),
   !,
   pfcBuildNtTest(T2,true,Test),
@@ -1737,7 +1737,7 @@ pfcBuildTrigger([{Test}|Triggers],Consequent,(Test->X)) :-
   !,
   pfcBuildTrigger(Triggers,Consequent,X).
 
-pfcBuildTrigger([T/Test|Triggers],Consequent,pfcPT(T,X)) :-
+pfcBuildTrigger([T/Test|Triggers],Consequent,pt(T,X)) :-
   !, 
   pfcBuildTest(Test,Test2),
   pfcBuildTrigger([{Test2}|Triggers],Consequent,X).
@@ -1747,14 +1747,14 @@ pfcBuildTrigger([T/Test|Triggers],Consequent,pfcPT(T,X)) :-
 %  !,
 %  pfcBuildTrigger(Triggers,Consequent,X).
 
-pfcBuildTrigger([T|Triggers],Consequent,pfcPT(T,X)) :-
+pfcBuildTrigger([T|Triggers],Consequent,pt(T,X)) :-
   !, 
   pfcBuildTrigger(Triggers,Consequent,X).
 
 %%
 %= pfcBuildNtTest(+,+,-).
 %%
-%= builds the test used in a negative trigger (pfcNT/3).  This test is a
+%= builds the test used in a negative trigger (nt/3).  This test is a
 %= conjunction of the check than no matching facts are in the db and any
 %= additional test specified in the rule attached to this ~ term.
 %%
@@ -1826,9 +1826,9 @@ pfc_db_type(('=>'(_,_)),Type) :- !, Type=rule.
 pfc_db_type(('<=>'(_,_)),Type) :- !, Type=rule.
 pfc_db_type(('<='(_,_)),Type) :- !, Type=rule.
 pfc_db_type(pfcPT3(_,_,_),Type) :- !, Type=trigger.
-pfc_db_type(pfcPT(_,_),Type) :- !, Type=trigger.
-pfc_db_type(pfcNT(_,_,_),Type) :- !,  Type=trigger.
-pfc_db_type(pfcBT(_,_),Type) :- !,  Type=trigger.
+pfc_db_type(pt(_,_),Type) :- !, Type=trigger.
+pfc_db_type(nt(_,_,_),Type) :- !,  Type=trigger.
+pfc_db_type(bt(_,_),Type) :- !,  Type=trigger.
 pfc_db_type(pfcAction(_),Type) :- !, Type=action.
 pfc_db_type((('::::'(_,X))),Type) :- !, pfc_db_type(X,Type).
 pfc_db_type(_,fact) :-
@@ -1954,7 +1954,7 @@ pfcTypeFilter(Term,FilterS):- member(Filter,FilterS),append_term(Filter,Term,Cal
 % There are three of these to try to efficiently handle the cases
 % where some of the arguments are not bound but at least one is.
 
-% pfcGetSupport2(P,(P,Trigger)) :- pfcPT(isa(A, tObj), pfcNT(mudPossess(B, A), pfcCall(mudPossess(B, A)), rhs([spatialInRegion(A)])))
+% pfcGetSupport2(P,(P,Trigger)) :- pt(isa(A, tObj), nt(mudPossess(B, A), pfcCall(mudPossess(B, A)), rhs([spatialInRegion(A)])))
 
 is_support(E):-compound(E),functor(E,F,_),memberchk(F,[spft,support2,support3]).
 
@@ -2017,9 +2017,9 @@ pfc_make_supports((P,S1,S2)) :-
 %%
 %= Arg1 is a trigger.  Key is the best term to index it on.
 
-pfcTriggerKey(pfcPT(Key,_),Key).
+pfcTriggerKey(pt(Key,_),Key).
 pfcTriggerKey(pfcPT3(Key,_,_),Key).
-pfcTriggerKey(pfcNT(Key,_,_),Key).
+pfcTriggerKey(nt(Key,_,_),Key).
 pfcTriggerKey(Key,Key).
 
 
@@ -2054,9 +2054,9 @@ pfcDatabaseTerm(spft/3).
 pfcDatabaseTerm(support3/3).
 pfcDatabaseTerm(support2/3).
 pfcDatabaseTerm(pfcPT3/3).
-pfcDatabaseTerm(pfcNT/3).
-pfcDatabaseTerm(pfcPT/2).
-pfcDatabaseTerm(pfcBT/2).
+pfcDatabaseTerm(nt/3).
+pfcDatabaseTerm(pt/2).
+pfcDatabaseTerm(bt/2).
 pfcDatabaseTerm('=>'/2).
 pfcDatabaseTerm('<=>'/2).
 pfcDatabaseTerm('<='/2).
@@ -2169,11 +2169,11 @@ pfcPrintRules :-
 
 pfcPrintTriggers :-
   fmt("% Positive triggers...~n",[]),
-     printHeadCallItems(pfcGetTrigger(pfcPT(_,_))),
+     printHeadCallItems(pfcGetTrigger(pt(_,_))),
   fmt("% Negative triggers...~n",[]),
-     printHeadCallItems(pfcGetTrigger(pfcNT(_,_,_))),
+     printHeadCallItems(pfcGetTrigger(nt(_,_,_))),
   fmt("% Goal triggers...~n",[]),
-     printHeadCallItems(pfcGetTrigger(pfcBT(_,_))),!.
+     printHeadCallItems(pfcGetTrigger(bt(_,_))),!.
 
 pfcPrintSupports :- 
   % temporary hack.
@@ -2228,10 +2228,10 @@ pfcTraceAdd(P) :-
   % this is here for upward compat. - should go away eventually.
   pfcTraceAdd(P,(o,o)).
 
-pfcTraceAdd(pfcPT(_,_),_) :-
+pfcTraceAdd(pt(_,_),_) :-
   % hack for now - never trace triggers.
   !.
-pfcTraceAdd(pfcNT(_,_,_),_) :-
+pfcTraceAdd(nt(_,_,_),_) :-
   % hack for now - never trace triggers.
   !.
 
@@ -2241,7 +2241,7 @@ pfcTraceAdd(P,S) :-
 
 crazy_bad_fact(isa(not,tCol)).
 crazy_bad_fact(isa(_,not)).
-crazy_bad_fact(user:mpred_prop(_,mpred_argtypes)).
+crazy_bad_fact(user:mpred_prop(_,meta_argtypes)).
 
 pfcTraceAddPrint(P,S) :- crazy_bad_fact(P),retractall(tlbugger:show_must_go_on),!,trace_or_throw(crazy_pfcTraceAddPrint(P,S)).
 
@@ -2266,10 +2266,10 @@ pfcTraceBreak(P,_S) :-
     break)
    ; true.
 
-pfcTraceRem(pfcPT(_,_)) :-
+pfcTraceRem(pt(_,_)) :-
   % hack for now - never trace triggers.
   !.
-pfcTraceRem(pfcNT(_,_)) :-
+pfcTraceRem(nt(_,_)) :-
   % hack for now - never trace triggers.
   !.
 

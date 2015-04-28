@@ -172,9 +172,9 @@ random_instance_no_throw(Type,Value,Test):- copy_term(ri(Type,Value,Test),ri(RTy
    must_det(Test),!.
 random_instance_no_throw(Type,Value,Test):- atom(Type),atom_concat('random_',Type,Pred),Fact=..[Pred,Value],predicate_property(Fact,_),call(Fact),Test,!.
 random_instance_no_throw(Type,Value,Test):- compound(Type),get_functor(Type,F),atom_concat('random_',F,Pred),current_predicate(F/1),Fact=..[Pred,Value],predicate_property(Fact,_),Fact,Test,!.
-random_instance_no_throw(Type,Value,Test):- compound(Type),get_functor(Type,F,GA),guess_arity(F,GA,A),functor(Formatted,F,A),tE(ttFormatted,Formatted),
+random_instance_no_throw(Type,Value,Test):- compound(Type),get_functor(Type,F,GA),guess_arity(F,GA,A),functor(Formatted,F,A),t(ttFormatted,Formatted),
                          Formatted=..[F|ArgTypes],functor(Value,F,A),Value=..[F|ValueArgs],must((maplist(random_instance_no_throw,ArgTypes,ValueArgs,_),Test)),!.
-random_instance_no_throw(Type,Value,Test):- findall(V,isa(V,Type),Possibles),Possibles\=[],must_det((my_random_member(Value,Possibles),Test)),!.
+random_instance_no_throw(Type,Value,Test):-must(( findall(V,isa(V,Type),Possibles),Possibles\=[])),must_det((my_random_member(Value,Possibles),Test)),!.
 
 random_instance(Type,Value,Test):- must(random_instance_no_throw(Type,Value,Test)).
 

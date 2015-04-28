@@ -38,7 +38,7 @@ db_redir_op_if_needed(change(retract,A),C0,Prop,_RGS):- get_mpred_prop(Prop,pred
 % predProxyQuery/1
 db_redir_op_if_needed(query(Must,HLDS),C0,Prop,_RGS):- get_mpred_prop(Prop,predProxyQuery(How)),must(nonvar(How)),!, mpred_op(query(Must,HLDS),call(How,C0)).
 
-% plain prop
+% plain props
 db_redir_op_if_needed(Op,_C0,Prop,ARGS):- database_modify_units(Op,Unit).
 
 */
@@ -142,7 +142,7 @@ ensure_exists(Head):-get_pifunctor(Head,PHead,F),get_functor(Head,F,A),(predicat
 % -- CODEBLOCK
 is_tCol(V):-is_ftVar(V),!,fail.
 is_tCol(tCol).
-is_tCol(F):- user:mpred_prop(F,tCol);tE(tCol,F);tE(F,_).
+is_tCol(F):- user:mpred_prop(F,tCol);t(tCol,F);t(F,_).
 
 is_proc(V):-is_ftVar(V),!,fail.
 is_proc(F):- functor(P,F,1),predicate_property(P,_),must(not(user:mpred_prop(F,tCol))).
@@ -221,7 +221,7 @@ mpred_missing_stubs(F,A):-prologHybrid = StubType, hybrid_tPredStubImpl(StubType
 
 :-export(rescan_missing_stubs/0).
 % rescan_missing_stubs:-no_rescans,!.
-rescan_missing_stubs:-loop_check_local(time_call(rescan_missing_stubs_ilc),true).
+rescan_missing_stubs:-loop_check(time_call(rescan_missing_stubs_ilc),true).
 rescan_missing_stubs_ilc:- once(thglobal:use_cyc_database), once(with_assertions(thlocal:useOnlyExternalDBs,forall((kb_t(arity(F,A)),A>1,good_pred_relation_name(F,A),not(arity(F,A))),with_no_dmsg(decl_mpred_mfa,decl_mpred_hybrid(F,A))))),fail.
 rescan_missing_stubs_ilc:- hotrace((doall((mpred_missing_stubs(F,A),arity(F,A),ensure_universal_stub(F/A))))).
 
@@ -236,7 +236,7 @@ rescan_mpred_props_ilc:-time(forall(mpred_prop_ordered(Pred,Prop),hooked_asserta
 rescan_mpred_props_ilc:-rescan_missing_stubs.
 rescan_mpred_props_ilc.
 
-first_mpred_props(mpred_argtypes(_)).
+first_mpred_props(meta_argtypes(_)).
 
 mpred_prop_ordered(Pred,Prop):-first_mpred_props(Prop),user:mpred_prop(Pred,Prop),not(user:mpred_prop(Pred,prologOnly)).
 mpred_prop_ordered(Pred,Prop):-user:mpred_prop(Pred,Prop),not(first_mpred_props(Prop)),not(user:mpred_prop(Pred,prologOnly)).
@@ -489,7 +489,7 @@ call_for_literal_db0(F,A,HEAD):-no_repeats(HEAD,call_for_literal_db00(F,A,HEAD))
 
 :- style_check(-singleton).
 call_for_literal_db00(_,_,HEAD):- is_asserted_mpred_t(HEAD).
-call_for_literal_db00(F,_,   _):- (isa(F,completelyAssertedCollection);tE(completeExtentAsserted,F)),!,fail.
+call_for_literal_db00(F,_,   _):- (isa(F,completelyAssertedCollection);t(completeExtentAsserted,F)),!,fail.
 call_for_literal_db00(F,A,HEAD):- loop_check(call_rule_db(F,A,HEAD)).
 call_for_literal_db00(F,A,HEAD):- not(use_snark(HEAD,true)),HEAD=..[P1,A1,A2],dif(P2,P1),loop_check_term(is_asserted_mpred_t(genlPreds(P2,P1)),gp(P1),fail),
    call(t,P2,A1,A2).
@@ -547,7 +547,7 @@ body_req(HEAD,HEAD_T):- (hook_body_req(HEAD,HEAD_T)).
 %hook_body_req(HEAD,HEAD_T):- user:mpred_prop(F,prologOnly),!,dmsg(warn(hook_body_req(HEAD,HEAD_T))),fail.
 hook_body_req(_,_,isa(I,C),_):- !, body_req_isa(I,C).
 hook_body_req(_,_,_,t(C,I)):- !, body_req_isa(I,C).
-hook_body_req(_,_,_,tE(C,I)):- !, body_req_isa(I,C).
+hook_body_req(_,_,_,t(C,I)):- !, body_req_isa(I,C).
 hook_body_req(_,_,_ ,HEAD_T):- thlocal:useOnlyExternalDBs,!, body_call_cyckb(HEAD_T).
 % loop checking is not usefull (why the cut was added)
 hook_body_req(HEAD,HEAD_T):-  no_repeats(body_req_normal(HEAD,HEAD_T)).

@@ -136,7 +136,7 @@ get_all(Agent,Vit,Dam,Suc,Scr,Percepts,Inv) :-
 
 % Get only the Percepts
 
-:-decl_mpred(mudGetPrecepts(tAgentGeneric,ftListFn(tSpatialThing)),[pred_module(user)]).
+:-decl_mpred(mudGetPrecepts(tAgentGeneric,ftListFn(tSpatialThing)),[mpred_module(user)]).
 mudGetPrecepts(Agent,Percepts) :- mudGetPrecepts0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts).
 mudGetPrecepts0(Agent,Percepts) :-
   call((
@@ -148,7 +148,7 @@ mudGetPrecepts0(Agent,Percepts) :-
 	!.
 
 % Look at locations immediately around argent
-% :-decl_mpred(mudNearReach(tAgentGeneric,ftListFn(tSpatialThing)),[pred_module(user)]).
+% :-decl_mpred(mudNearReach(tAgentGeneric,ftListFn(tSpatialThing)),[mpred_module(user)]).
 mudNearReach(Agent,PerceptsO):- get_near0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
    
 get_near0(Agent,Percepts) :-
@@ -158,7 +158,7 @@ get_near0(Agent,Percepts) :-
 	view_dirs(Agent,Dirs,Percepts))),!.
 
 % Look only at location tAgentGeneric is currently in.
-% :-decl_mpred(mudNearFeet(tAgentGeneric,ftListFn(tSpatialThing)),[pred_module(user)]).
+% :-decl_mpred(mudNearFeet(tAgentGeneric,ftListFn(tSpatialThing)),[mpred_module(user)]).
 mudNearFeet(Agent,PerceptsO) :-  get_feet0(Agent,Percepts0),!,flatten_set(Percepts0,Percepts),delete(Percepts,Agent,PerceptsO).
 
 get_feet0(Agent,Percepts):-
@@ -210,10 +210,10 @@ check_for_blocks(Agent) :-
 	add(visually_blocked(Agent,Blocked_Percepts)).
 check_for_blocks(_,[]).
 
-mpred_argtypes(mudSize(tSpatialThing,ftTerm)).
-mpred_argtypes(mudShape(tSpatialThing,vtShape)).
+meta_argtypes(mudSize(tSpatialThing,ftTerm)).
+meta_argtypes(mudShape(tSpatialThing,vtShape)).
 prologSingleValued(mudHeightOnObj(tSpatialThing,ftNumber)).
-mpred_argtypes(mudTexture(tSpatialThing,vtTexture)).
+meta_argtypes(mudTexture(tSpatialThing,vtTexture)).
 
 prologHybrid(mudHeightOnObj(tSpatialThing,ftNumber)).
 % High enough to see over obstacles??

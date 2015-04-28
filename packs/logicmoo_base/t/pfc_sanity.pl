@@ -423,7 +423,7 @@ isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
 => tCol(functorDeclares).
 % tCol(ArgsIsa):-mpred_hooks:mpred_is_trigger(ArgsIsa).
 % TODO decide if OK
-%tCol(F):-tE(functorDeclares,F).
+%tCol(F):-t(functorDeclares,F).
 => tCol(ttFormatType).
 => tCol(vtActionTemplate).
 => tCol(tRegion).

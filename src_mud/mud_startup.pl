@@ -17,14 +17,26 @@
 
 :- include(mud_header).
 
+:- set_prolog_flag(generate_debug_info, true).
+% [Optionaly] Set the Prolog optimize/debug flags
+:- set_prolog_flag(verbose_load,true).
+:- use_module(library(gui_tracer)).
+:- set_prolog_flag(gui_tracer, false).
+:- set_prolog_flag(answer_write_options, [quoted(true), portray(true), max_depth(1000), spacing(next_argument)]).
+:- catch(noguitracer,_,true).
+
+
+% [Optionaly] Set up the Prolog optimize/debug flags
+%:- set_prolog_flag(debug,false).
+:- set_optimize(false).
+
+
+% [Optionaly] load the mpred_online system
+% :- if_file_exists(user:ensure_loaded(library(logicmoo/mpred_online))).
+
 :- prolog_load_context(directory,Dir),asserta(user:file_search_path(prologmud,Dir)).
 
 xyzFn(R,X,Y,Z):-dmsg(xyzFn(R,X,Y,Z)),trace_or_throw(xyzFn(R,X,Y,Z)).
-
-
-/** <module> An Implementation a MUD server in SWI-Prolog
-
-*/
 
 :- multifile
 	prolog:message/3.

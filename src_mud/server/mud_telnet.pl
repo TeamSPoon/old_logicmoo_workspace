@@ -127,7 +127,7 @@ run_player_local :-
           retract(thlocal:wants_logout(O)),
         retractall(thglobal:agent_message_stream(P,Id,_,_))))))),!.
 
-
+:-export(set_console_attached/0).
 set_console_attached:-
   thread_self(Id),current_input(In),current_output(Out), (thread_self(main)->get_main_thread_error_stream(Err); Err=Out),
   (thread_util:has_console(Id,In, Out,Err)->true;((retractall(thread_util:has_console(Id,_,_,_)),asserta(thread_util:has_console(Id,In,Out,Err))))).

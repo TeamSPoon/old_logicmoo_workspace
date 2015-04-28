@@ -108,6 +108,7 @@ is_asserted_ilc(V):-var(V),!,trace_or_throw(var_is_asserted(V)).
 is_asserted_ilc((H)):- is_static_pred(H),!,show_pred_info(H),dtrace(is_asserted_ilc((H))).
 is_asserted_ilc(HB):-hotrace((fully_expand_warn(is_asserted_1,HB,HHBB))),!,is_asserted_1(HHBB).
 
+%is_asserted_1(argIsa(mpred_prop,2,mpred_prop/2)):- dtrace,!,fail.
 is_asserted_1(clause(H,B,Ref)):-!,is_asserted_ilc(H,B,Ref).
 is_asserted_1(clause(H,B)):-!,is_asserted_ilc(H,B).
 is_asserted_1((H1,H2)):-!,is_asserted_1(H1),is_asserted_1(H2).
@@ -196,13 +197,13 @@ make_body_clause(Head,Body,call_mpred_body(Head,Body)).
 
 special_head(_,F,Why):-special_head0(F,Why),!,show_call_failure(not(isa(F,prologOnly))).
 special_head0(F,functorDeclaresPred):-functorDeclaresPred(F),!.
-special_head0(F,functorDeclares):-tE(functorDeclares,F),!.
-special_head0(F,prologMacroHead):-tE(prologMacroHead,F),!.
-special_head0(F,pfcControlled):-tE(pfcControlled,F),!.
+special_head0(F,functorDeclares):-t(functorDeclares,F),!.
+special_head0(F,prologMacroHead):-t(prologMacroHead,F),!.
+special_head0(F,pfcControlled):-t(pfcControlled,F),!.
 special_head0(isa,isa).
-special_head0(F,tCol):-tE(tCol,F),!.
-special_head0(F,prologHybrid):-tE(prologHybrid,F).
-special_head0(F,pfcControlled):-tE(pfcControlled,F).
+special_head0(F,tCol):-t(tCol,F),!.
+special_head0(F,prologHybrid):-t(prologHybrid,F).
+special_head0(F,pfcControlled):-t(pfcControlled,F).
 
 
 
@@ -326,7 +327,7 @@ upprop(C0):- add(C0).
 padd(Obj,PropSpecs):- add((props(Obj,PropSpecs))).
 % -  padd(Obj,Prop,Value)
 padd(Obj,Prop,Value):- add((t(Prop,Obj,Value))).
-% -  prop(Obj,Prop,Value)
+% -  props(Obj,Prop,Value)
 prop(Obj,Prop,Value):- req(t(Prop,Obj,Value)).
 % -  prop_or(Obj,Prop,Value,OrElse)
 prop_or(Obj,Prop,Value,OrElse):- one_must(ireq(t(Prop,Obj,Value)),Value=OrElse).
@@ -435,7 +436,7 @@ test_expand_units(IN):-fully_expand(query(t,must),IN,OUT),dmsg(test_expand_units
 
 
 mpred_modify(Op,                 G):- (var(Op);var(G)),!,trace_or_throw(var_database_modify_op(Op,  G )).
-mpred_modify(Op,                 G):- G\=mpred_argtypes(_),fully_expand(Op,G,GG),not_variant(G,GG),!,mpred_modify(Op, GG ),!.
+mpred_modify(Op,                 G):- G\=meta_argtypes(_),fully_expand(Op,G,GG),not_variant(G,GG),!,mpred_modify(Op, GG ),!.
 mpred_modify(_,  (:-include(FILE))):- !,must(load_data_file_now(FILE)).
 mpred_modify(Op,  (:-(G))         ):- !,must(with_assert_op_override(Op,debugOnError(G))).
 mpred_modify(P,                  G):- thlocal:noDBaseMODs(_),!,dmsg(noDBaseMODs(P,G)).
@@ -518,8 +519,8 @@ hooked_retractall(G):- Op = change(retract,all),
 
 user:provide_mpred_storage_op(Op,G):- get_functor(G,F,A),user:provide_mpred_storage_op(Op,G,F,A).
 
-user:provide_mpred_storage_op(Op,G, F,_A):- tE(pfcControlled,F),!,loop_check(prolog_provide_mpred_storage_op(Op,G)).
-user:provide_mpred_storage_op(Op,G, F,_A):- tE(prologOnly,F),!,loop_check(pfc_provide_mpred_storage_op(Op,G)).
+user:provide_mpred_storage_op(Op,G, F,_A):- t(pfcControlled,F),!,loop_check(prolog_provide_mpred_storage_op(Op,G)).
+user:provide_mpred_storage_op(Op,G, F,_A):- t(prologOnly,F),!,loop_check(pfc_provide_mpred_storage_op(Op,G)).
 user:provide_mpred_storage_op(Op,G,_F,_A):- loop_check(prolog_provide_mpred_storage_op(Op,G)).
 
 %user:provide_mpred_storage_op(Op,G):- (loop_check(isa_provide_mpred_storage_op(Op,G))).

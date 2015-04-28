@@ -45,7 +45,7 @@ rescan_mpred_loaded_pass2:- ignore((thglobal:after_mpred_load, loop_check(call_a
 % ================================================
 
 % agenda_do_prequery:-!.
-agenda_do_prequery:- loop_check_local(agenda_rescan_mpred_ops,true).
+agenda_do_prequery:- loop_check(agenda_rescan_mpred_ops,true).
 :-'$hide'(agenda_rescan_mpred_ops/0).
 :-'$hide'(agenda_do_prequery/0).
 %:- rescan_missing_stubs.
@@ -65,7 +65,7 @@ agenda_rescan_mpred_ops:- agenda_rescan_for_module_ready.
 
 :-thread_local thlocal:in_agenda_rescan_for_module_ready/0.
 agenda_rescan_for_module_ready:- thlocal:in_agenda_rescan_for_module_ready,!.
-agenda_rescan_for_module_ready:- with_assertions(thlocal:in_agenda_rescan_for_module_ready,loop_check_local(do_all_of(mpred_module_ready),true)).
+agenda_rescan_for_module_ready:- with_assertions(thlocal:in_agenda_rescan_for_module_ready,loop_check(do_all_of(mpred_module_ready),true)).
 
 :-export(agenda_slow_op_todo/1).
 :-dynamic(agenda_slow_op_todo/1).
@@ -101,7 +101,7 @@ call_after_next(When,C):- ignore((When,!,do_all_of(When))),assert_next(When,C).
 do_all_of_when(When):- ignore((more_to_do(When),When,do_all_of(When))).
 
 :-export(do_all_of/1).
-do_all_of(When):- ignore(loop_check_local(do_all_of_ilc(When),true)),!.
+do_all_of(When):- ignore(loop_check(do_all_of_ilc(When),true)),!.
 do_all_of_ilc(When):- not(thglobal:will_call_after(When,_)),!.
 do_all_of_ilc(When):-  repeat,do_stuff_of_ilc(When), not(more_to_do(When)).
 
@@ -226,7 +226,7 @@ rescandb:- mpred_call(finish_processing_world).
 
 :-export((agenda_mpred_repropigate/0, rescan_duplicated_facts/0, rerun_database_hooks/0 , gather_fact_heads/2)).
 
-agenda_mpred_repropigate:-  loop_check_local(rescan_mpred_facts_local).
+agenda_mpred_repropigate:-  loop_check(rescan_mpred_facts_local).
 
 rescan_mpred_facts_local:-with_no_assertions(thglobal:use_cyc_database,(must_det(rescan_duplicated_facts),must_det(rerun_database_hooks))).
 
