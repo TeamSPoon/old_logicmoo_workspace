@@ -24,9 +24,29 @@
 
 :- use_module(library(lists)).
 
-:-set_prolog_flag(gc,false).
+:- set_prolog_flag(gc,false).
 
-argIsa(1).
+compiled(F/A):- dynamic(F/A),compile_predicates([F/A]).
+
+:- discontiguous(pfc_file_expansion_0/2).
+:- compiled(('=>')/1).
+:- compiled(('neg')/1).
+:- compiled(('=>')/2).
+:- compiled(('<=')/2).
+:- compiled(('::::')/2).
+:- compiled(('<=>')/2).
+:- dynamic('pt'/2).
+:- dynamic('pk'/3).
+:- dynamic('nt'/3).
+:- dynamic('bt'/2).
+:- dynamic(pfc_undo_method/2).
+:- dynamic(fcTmsMode/1).
+:- dynamic(pfc_queue/2).
+:- dynamic(pfc_database/1).
+:- dynamic(pfc_halt_signal/1).
+:- dynamic(pfc_debugging/0).
+:- dynamic(pfc_select/2).
+:- dynamic(pfc_search/1).
 
 /*
 :- multifile(('=>')/1).
@@ -49,29 +69,6 @@ argIsa(1).
 :- multifile(pfc_debugging/0).
 :- multifile(pfc_select/2).
 :- multifile(pfc_search/1).
-
-compiled(F/A):- dynamic(F/A),compile_predicates([F/A]).
-
-:- discontiguous(pfc_file_expansion_0/2).
-:- compiled(('=>')/1).
-:- compiled(('neg')/1).
-:- compiled(('=>')/2).
-:- compiled(('<=')/2).
-:- compiled(('::::')/2).
-:- compiled(('<=>')/2).
-:- dynamic('pt'/2).
-:- dynamic('pk'/3).
-:- dynamic('nt'/3).
-:- dynamic('bt'/2).
-:- dynamic(pfc_undo_method/2).
-:- dynamic(fcAction/2).
-:- dynamic(fcTmsMode/1).
-:- dynamic(pfc_queue/2).
-:- dynamic(pfc_database/1).
-:- dynamic(pfc_halt_signal/1).
-:- dynamic(pfc_debugging/0).
-:- dynamic(pfc_select/2).
-:- dynamic(pfc_search/1).
 
 to_assertable([A],B):-nonvar(A),!,to_assertable(A,B).
 to_assertable((P=>Q),was_new_rule((P=>Q))):-!.
@@ -109,6 +106,7 @@ to_predicate_isas(I,O):-to_predicate_isas0(I,O).
 to_predicate_isas0(V,V):-not(compound(V)),!.
 to_predicate_isas0({V},{V}):-!.
 to_predicate_isas0(eXact(V),V):-!.
+to_predicate_isas0(t(C,I),V):-atom(C),V=..[C,I],!.
 to_predicate_isas0(isa(I,C),V):-!,atom(C)->V=..[C,I];V=t(C,I).
 to_predicate_isas0(C,C):-exact_args(C),!.
 to_predicate_isas0([H|T],[HH|TT]):-!,to_predicate_isas0(H,HH),to_predicate_isas0(T,TT),!.
@@ -185,7 +183,7 @@ pfc_clause(H,B,Why):-has_cl(H),clause(H,CL,R),pfc_pbody(H,CL,R,B,Why).
 % pfc_clause(H,true, pfcTypeFull(R,Type)):-nonvar(H),!,pfcDatabaseTerm(F/A),make_functor(R,F,A),pfcRuleOutcomeHead(R,H),clause(R,true),pfcTypeFull(R,Type),Type\=rule.
 % pfc_clause(H,true, pfcTypeFull(R)):-pfcDatabaseTerm(F/A),make_functor(R,F,A),pfcTypeFull(R,Type),Type\=rule,clause(R,true),once(pfcRuleOutcomeHead(R,H)).
 
-pfc_pbody(H,pfc_bc_only(BC),R,fail,deduced(backchains)):-!.
+pfc_pbody(_H,pfc_bc_only(_BC),_R,fail,deduced(backchains)):-!.
 pfc_pbody(H,infoF(INFO),R,B,Why):-!,pfc_pbody_f(H,INFO,R,B,Why).
 pfc_pbody(H,B,R,BIn,WHY):- is_true(B),!,BIn=B,get_why(H,H,R,WHY).
 pfc_pbody(H,B,R,B,asserted(R,(H:-B))).
@@ -453,8 +451,10 @@ pfc_post1(P0,S):-
         ->maplist(pfc_post1_sp(S),P);
        pfc_post1_sp(S,P)).
 
-pfc_post1_sp(S,(P1,P2)) :- !,pfc_post1_sp(S,(P1)),pfc_post1_sp(S,(P2)).
 
+pfc_post1_sp(S,(P1,P2)) :- !,pfc_post1_sp(S,(P1)),pfc_post1_sp(S,(P2)).
+pfc_post1_sp(S,[P1]) :- !,pfc_post1_sp(S,(P1)).
+pfc_post1_sp(S,[P1|P2]) :- !,pfc_post1_sp(S,(P1)),pfc_post1_sp(S,(P2)).
 pfc_post1_sp(_S,P) :- pfc_is_tautology(P),!,dmsg(todo(error(pfc_is_tautology(P)))),dtrace.
 pfc_post1_sp(S,P) :-
   dynamic(P),
@@ -468,10 +468,12 @@ pfc_post1_sp(S,P) :-
 pfc_post1_sp(_,_).
 %=pfc_post1_sp(S,P) :-  pfc_warn("pfc_post1(~w,~w) failed",[P,S]).
 
-pfc_post1_sp_3(S,P,(AP1,AP2)):-!,
-         pfc_post1_sp_3(S,P,AP1),
-         pfc_post1_sp_3(S,P,AP2).
-
+pfc_post1_sp_3(S,P,(AP1,AP2)):-!,pfc_post1_sp_3(S,P,AP1),pfc_post1_sp_3(S,P,AP2).
+pfc_post1_sp_3(S,(AP1,AP2),P):-!,pfc_post1_sp_3(S,AP1,P),pfc_post1_sp_3(S,AP2,P).
+pfc_post1_sp_3(S,[P],AP):-!,pfc_post1_sp_3(S,P,AP).
+pfc_post1_sp_3(S,P,[AP]):-!,pfc_post1_sp_3(S,P,AP).
+pfc_post1_sp_3(S,[P|More],AP):-!,pfc_post1_sp_3(S,P,AP),pfc_post1_sp_3(S,More,AP).
+pfc_post1_sp_3(S,P,[AP|More]):-!,pfc_post1_sp_3(S,P,AP),pfc_post1_sp_3(S,P,More).
 pfc_post1_sp_3(S,P,AP):-
   pfc_unique_u(AP),
   assert_u(AP),

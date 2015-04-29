@@ -328,8 +328,8 @@ isa(F,pfcMustFC)=>pfcControlled(F).
 functorDeclaresPred(Prop)=>tCol(Prop).
 
 
-((arity(Pred,2),argIsa(Pred,1,Col)/(nonvar(Pred),Col\=ftTerm,tSet(Col)),t(Pred,Arg,_)/nonvar(Arg)) => t(Col,Arg)).
-((arity(Pred,2),argIsa(Pred,2,Col)/(nonvar(Pred),Col\=ftTerm,tSet(Col)),t(Pred,_,Arg)/nonvar(Arg)) => t(Col,Arg)).
+%SLOW ((arity(Pred,2),argIsa(Pred,1,Col)/(nonvar(Pred),Col\=ftTerm,tSet(Col)),t(Pred,Arg,_)/nonvar(Arg)) => t(Col,Arg)).
+%SLOW ((arity(Pred,2),argIsa(Pred,2,Col)/(nonvar(Pred),Col\=ftTerm,tSet(Col)),t(Pred,_,Arg)/nonvar(Arg)) => t(Col,Arg)).
 
 % tCol(Col) <=> isa(Col,tCol).
 
@@ -566,6 +566,8 @@ prologHybrid(isEach(argIsa/3, formatted_resultIsa/2, localityOfObject/2, subForm
 :-discontiguous(subFormat/2).
 :-dynamic(tChannel/1).
 :-multifile(tChannel/1).
+
+% :-pfc_add((I/fully_expand(_,I,O)=>O)).
 
 subFormat(ftDeplictsFn(tCol),ftSpec).
 subFormat(ftDeplictsFn(ttFormatted),ftSpec).

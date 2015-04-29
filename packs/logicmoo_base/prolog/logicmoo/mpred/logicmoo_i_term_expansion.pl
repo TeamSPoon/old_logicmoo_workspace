@@ -351,7 +351,6 @@ from_univ(_,In,Out):-Mid=..[t|In],!,db_expand_a(Op,Mid,Out).
 expand_props(_,Sent,OUT):-not(compound(Sent)),!,OUT=Sent.
 %expand_props(Op,Term,OUT):- stack_check,(var(Op);var(Term)),!,trace_or_throw(var_expand_units(Op,Term,OUT)).
 expand_props(Op,Sent,OUT):-Sent=..[And|C12],is_logical_functor(And),!,maplist(expand_props(Op),C12,O12),OUT=..[And|O12].
-expand_props(Op,props(Obj,Open),props(Obj,Open)):- var(Obj),!. % ,trace_or_throw(expand_props(Op,props(Obj,Open))->OUT).
 expand_props(Op,props(Obj,Open),props(Obj,Open)):- var(Open),!. % ,trace_or_throw(expand_props(Op,props(Obj,Open))->OUT).
 expand_props(_ ,props(Obj,List),ftID(Obj)):- List==[],!.
 expand_props(Op,props(Obj,[P]),OUT):- nonvar(P),!,expand_props(Op,props(Obj,P),OUT).
@@ -363,6 +362,7 @@ expand_props(Op,props(Obj,PropVal),OUT):- PropVal=..[Op,Pred|Val],comparitiveOp(
     expand_props(Op,props(Obj,PropVal2),OUT),!.
 expand_props(Op,props(Obj,PropVal),OUT):- PropVal=..[Prop|Val],not(infix_op(Prop,_)),!,from_univ(Op,[Prop,Obj|Val],OUT).
 expand_props(Op,props(Obj,PropVal),OUT):- PropVal=..[Prop|Val],!,trace(from_univ(Op,[Prop,Obj|Val],OUT)).
+expand_props(Op,props(Obj,Open),props(Obj,Open)):- var(Obj),!. % ,trace_or_throw(expand_props(Op,props(Obj,Open))->OUT).
 
 expand_props(Op,ClassTemplate,OUT):- ClassTemplate=..[props,Inst,Second,Third|Props],!,
    expand_props(Op,props(Inst,[Second,Third|Props]),OUT),!.
