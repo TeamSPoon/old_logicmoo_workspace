@@ -399,6 +399,9 @@ name_text_known_for(Name)<=name_text_known(Name,_).
 name_text_known(Name,Text):- bwc, name_text0(Name,Text).
 name_text_known(Name,_)=>name_text_known_for(Name).
 
+:-pfc_add((vtActionTemplate(AT)/functor(AT,F,_)=>vtVerb(F))).
+:-pfc_add((vtVerb(F)/(i_name('',F,Txt),toLowercase(Txt,LText))=>mudKeyword(F,LText))).
+
 :-multifile(name_text0/2).
 :-export(name_text0/2).
 name_text0(Name,Text):-nameStrings(Name,Text).

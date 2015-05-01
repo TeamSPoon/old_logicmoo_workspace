@@ -23,16 +23,35 @@
 :- multifile(pfc_univ/3).
 
 
+:- dynamic(completelyAssertedCollection/1).
+:- multifile(completelyAssertedCollection/1).
+:- dynamic(tCol/1).
+:- multifile(tCol/1).
+:- dynamic(ttPredType/1).
+:- multifile(ttPredType/1).
+:- dynamic(functorDeclares/1).
+:- multifile(functorDeclares/1).
+:- dynamic(ttFormatType/1).
+:- multifile(ttFormatType/1).
+:- dynamic(tPred/1).
+:- multifile(tPred/1).
+:- dynamic(tRelation/1).
+:- multifile(tRelation/1).
+:- dynamic(arity/2).
+:- multifile(arity/2).
+
+
+
 :- dynamic(user:prologSideEffects/1).
 :- multifile(user:prologSideEffects/1).
 
 :- dynamic(user:argsQuoted/1).
 :- multifile(user:argsQuoted/1).
 
-:-dynamic((t/1,t/2)).
+%:-dynamic((t/1,t/2)).
 :- dynamic((
          % t/1,
-          t/2,
+         % t/2,
           t/3,
           t/4,
           t/5,
@@ -69,7 +88,7 @@
 :-multifile((t/1,t/2)).
 :- multifile((
          % t/1,
-          t/2,
+        %  t/2,
           t/3,
           t/4,
           t/5,
@@ -127,8 +146,8 @@
 :- multifile user:genls/2.
 :- multifile user:isa/2.
 
-:- dynamic t/2.
-:- multifile t/2.
+%:- dynamic t/2.
+%:- multifile t/2.
 
 :- style_check(-singleton).
 :- set_prolog_flag(double_quotes, atom).

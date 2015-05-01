@@ -81,7 +81,7 @@ run_deduce_facts_from_ilc(Type,Fact):-doall((call_no_cuts(deduce_facts_forward(F
 
 %OLD user:decl_database_hook(change(assert,_),BadFact):-mpred_call(tms_reject_why(BadFact,WHY)),trace_or_throw(tms_reject_why(BadFact,WHY)).
 
-deduce_facts_forward(Fact,user:mpred_prop(AF,[meta_argtypes(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],functorDeclaresPred(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,
+deduce_facts_forward(Fact,user:mpred_prop(AF,[meta_argtypes(ArgTs)|PROPS])):-compound(Fact),Fact=..[F,ArgTs|PROPS],ttPredType(F),compound(ArgTs),functor(ArgTs,AF,N),N>0,
                 ArgTs=..[AF|ARGS],!,sanity(ground(ARGS)).
 
 deduce_facts_forward(meta_argtypes(ArgTs),user:mpred_prop(F,meta_argtypes(ArgTs))):-get_functor(ArgTs,F),assert_predArgTypes_fa(F,ArgTs).

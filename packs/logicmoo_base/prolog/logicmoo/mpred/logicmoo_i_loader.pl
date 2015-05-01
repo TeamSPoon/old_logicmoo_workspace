@@ -23,7 +23,7 @@ as_list(List,AL):-flatten([List],AL),!.
 with_no_mpred_expansions(Goal):-
   with_assertions(thlocal:disable_mpred_term_expansions_locally,Goal).
 
-use_was_isa(G,I,C):-call((current_predicate(mpred_types_loaded/0),if_defined(was_isa(G,I,C)))).
+use_was_isa(G,I,C):-call((current_predicate(mpred_types_loaded/0),if_defined(was_isa_syntax(G,I,C)))).
 
 current_context_module(Ctx):-user:loading_module_h(Ctx),!.
 current_context_module(Ctx):-context_module(Ctx).
@@ -568,14 +568,14 @@ pfc_file_expansion_0(('<='(P,Q)),(:- pfc_assert(('<='(P,Q))))).
 pfc_file_expansion_0((P<=>Q),(:- pfc_assert((P<=>Q)))).
 pfc_file_expansion_0((RuleName :::: Rule),(:- pfc_assert((RuleName :::: Rule)))).
 pfc_file_expansion_0((=>P),(:- pfc_assert((=>P)))).
-pfc_file_expansion_0(Fact,Output):- pfc_file_expansion_1(Fact,C),pfc_file_expansion_0(C,Output),!.
-% pfc_file_expansion_0(Fact,Output):- pfc_file_expansion_1(Fact,C),CALL=pfc_assert(C),must(CALL),Output='$was_imported_kb_content$'(Fact,CALL).
-pfc_file_expansion_0(Fact,Output):- get_functor(Fact,F,A),if_defined(functorDeclaresPred(F)),pfc_add(Fact),Output='$was_imported_kb_content$'(Fact,functorDeclaresPred(F)),!.
-pfc_file_expansion_0(Fact,Output):- get_functor(Fact,F,A),if_defined(functorDeclares(F)),pfc_add(Fact),Output='$was_imported_kb_content$'(Fact,functorDeclares(F)),!.
-pfc_file_expansion_0(Fact,Output):- get_functor(Fact,F,A),if_defined(prologMacroHead(F)),pfc_add(Fact),Output='$was_imported_kb_content$'(Fact,prologMacroHead(F)),!.
-pfc_file_expansion_0(Fact,Output):- get_functor(Fact,F,A),if_defined(pfcControlled(F)),pfc_add(Fact),Output='$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
-pfc_file_expansion_0(Fact,Output):- \+ thlocal:disable_mpred_term_expansions_locally, pfc_expand_in_file_anyways(F),!,
-     pfc_assert(Fact),Output='$was_imported_kb_content$'(Fact,pfc_expand_in_file_anyways(F)),!.
+pfc_file_expansion_0(Fact,Output):- pfc_file_expansion_1(Fact,C),must(pfc_file_expansion_0(C,Output)),!.
+pfc_file_expansion_0(Fact,(:- ((pfc_assert(Fact))))):- pfc_file_expansion_2(Fact,_Output),!.
+
+pfc_file_expansion_2(Fact,Output):- get_functor(Fact,F,A),if_defined(ttPredType(F)),Output='$was_imported_kb_content$'(Fact,ttPredType(F)),!.
+pfc_file_expansion_2(Fact,Output):- get_functor(Fact,F,A),if_defined(functorDeclares(F)),Output='$was_imported_kb_content$'(Fact,functorDeclares(F)),!.
+pfc_file_expansion_2(Fact,Output):- get_functor(Fact,F,A),if_defined(prologMacroHead(F)),Output='$was_imported_kb_content$'(Fact,prologMacroHead(F)),!.
+pfc_file_expansion_2(Fact,Output):- get_functor(Fact,F,A),if_defined(pfcControlled(F)),Output='$was_imported_kb_content$'(Fact,pfcControlled(F)),!.
+pfc_file_expansion_2(Fact,Output):- \+ thlocal:disable_mpred_term_expansions_locally, pfc_expand_in_file_anyways(F),!,Output='$was_imported_kb_content$'(Fact,pfc_expand_in_file_anyways(F)),!.
 
 stream_pos(File:C):-source_file(File),current_input_stream(S),line_count(S,C).
 compile_clause(CL):- make_dynamic(CL),must((assertz_if_new(CL),clause_asserted(CL))).

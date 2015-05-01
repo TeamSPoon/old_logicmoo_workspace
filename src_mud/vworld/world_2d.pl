@@ -342,7 +342,7 @@ deduce_facts(localityOfObject(Obj,Region),mudAtLoc(Obj,LOC)):- tRegion(Region),n
   must_det(mudAtLoc(Obj,LOC)).
 
 
-random_region(LOC):- findall(O,isa(O,tRegion),LOCS),my_random_member(LOC,LOCS).
+random_region(LOC):- var(LOC),findall(O,isa(O,tRegion),LOCS),my_random_member(LOC,LOCS).
 
 
 random_xyzFn(LOC):-

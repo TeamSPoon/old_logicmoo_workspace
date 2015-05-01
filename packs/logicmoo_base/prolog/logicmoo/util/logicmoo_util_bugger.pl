@@ -407,7 +407,14 @@ one_must(MCall,OnFail):- strip_module(MCall,M,Call), '@'(( Call *->  true ;    O
 
 :-export(transitive/3).
 :-meta_predicate(transitive(2,+,-)).
+:-meta_predicate(transitive_lc(2,+,-)).
+:-meta_predicate(transitive_except(+,2,+,-)).
+
 transitive(X,A,B):- once(debugOnError(call(X,A,R)) -> ( R\=@=A -> transitive(X,R,B) ; B=R); B=A),!.
+
+transitive_lc(X,A,B):-transitive_except([],X,A,B).
+
+transitive_except(NotIn,X,A,B):- memberchk_same(A,NotIn)-> (B=A,!) ;((once(debugOnError(call(X,A,R)) -> ( R\=@=A -> transitive_except([A|NotIn],X,R,B) ; B=R); B=A))),!.
 
 
 must_det(C):- must(C),!.
@@ -550,7 +557,12 @@ moo_show_childs(M,F,A,_MPred):- moo_trace_hidechilds(M,F,A,0,0).
 :- export(static_predicate/3).
 :- meta_predicate(static_predicate(+,+,+)).
 static_predicate(M,F,A):- functor_safe(FA,F,A),  once(M:predicate_property(FA,_)),not(M:predicate_property(FA,dynamic)),not((M:predicate_property(FA,imported_from(Where)),Where \== M)).
+(predicate_property(Head,built_in))
 
+static_predicate(A):-atom(F),!,current_predicate(F/A),!,functor(FA,F,A),static_predicate(FA).
+static_predicate(F/A):-!,atom(F),current_predicate(F/A),!,functor(FA,F,A),static_predicate(FA).
+static_predicate(FA):-predicate_property(FA,built_in),!.
+static_predicate(FA):-once(predicate_property(FA,_)),not(predicate_property(FA,dynamic)).
 
 :- export((((dynamic_safe)/1))).
 :- meta_predicate(dynamic_safe(+)).

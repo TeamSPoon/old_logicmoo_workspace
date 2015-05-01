@@ -196,7 +196,7 @@ make_body_clause(_Head,Body,Body):-special_wrapper_body(Body,_Why),!.
 make_body_clause(Head,Body,call_mpred_body(Head,Body)).
 
 special_head(_,F,Why):-special_head0(F,Why),!,show_call_failure(not(isa(F,prologOnly))).
-special_head0(F,functorDeclaresPred):-functorDeclaresPred(F),!.
+special_head0(F,ttPredType):-ttPredType(F),!.
 special_head0(F,functorDeclares):-t(functorDeclares,F),!.
 special_head0(F,prologMacroHead):-t(prologMacroHead,F),!.
 special_head0(F,pfcControlled):-t(pfcControlled,F),!.
@@ -239,15 +239,14 @@ mdel(C0):- dmsg(warn(failed(mdel(C0)))),!,fail.
 % -  clr(Retractall)
 % clr(C0):- dmsg(clr(C0)),fail,mpred_modify(change(retract,all),/*to_exp*/(C0)),verify_sanity(ireq(C0)->(dmsg(warn(incomplete_CLR(C0))));true).
 clr(P):- agenda_do_prequery,
-  fully_expand(change(retract,all),P,PL),
-  pfc_maptree(clr0,PL).
+  fully_expand(change(retract,all),P,PL),pfc_maptree(clr0,PL).
 
 clr0(P):- 
   forall(debugOnError(P), forall( pfc_rem2(P), sanity((not(pfc_tms_supported(local,P)),must(\+(P)))))).
 
 
 % -  preq(Query) = query with P note
-preq(P,C0):- agenda_do_prequery,mpred_op(query(t,P),C0).
+preq(P,C0):- must(not((atom(C0)))),agenda_do_prequery,mpred_op(query(t,P),C0).
 
 % -  req(Query) = Normal query
 req(C0):- nop(dmsg(req(C0))), preq(req,/*to_exp*/(C0)).

@@ -30,7 +30,7 @@ user:file_search_path(prologmud, '../packs/prologmud/prolog/prologmud/').
 % :- add_game_dir('../games/src_game_wumpus',prolog_repl).       
 % :- add_game_dir('../games/src_game_sims',prolog_repl).
 % :- add_game_dir('../games/src_game_startrek',prolog_repl).
-% :- add_game_dir('../games/src_game_nani',prolog_repl).       
+:- add_game_dir('../games/src_game_nani',prolog_repl).       
 
 % [Optional] the following game files though can be loaded separate instead
 % :- declare_load_dbase('../games/src_game_nani/a_nani_household.plmoo').

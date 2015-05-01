@@ -11,6 +11,8 @@
 isa(tHumanPlayer,ttAgentType).
 %genls(ttAgentType,tCol).
 
+:- dynamic_multifile_exported user:type_action_info/3.
+
 user:type_action_info(tHumanPlayer,actHelp(isOptional(ftString,"")), "shows this help").
 
 
@@ -90,7 +92,7 @@ user:hook_coerce(Text,vtVerb,Inst):- isa(Inst,vtVerb),name_text(Inst,Text).
 
 % :-add(((get_all_templates(Templ))=>vtActionTemplate(Templ))).
 
-(type_action_info(_,TEMPL,Help) => user:action_info(TEMPL,Help)).
+(user:type_action_info(_,TEMPL,Help) => user:action_info(TEMPL,Help)).
 (user:action_info(TEMPL,_Help) => vtActionTemplate(TEMPL)).
 ((vtActionTemplate(TEMPL), { not_asserted(user:action_info(TEMPL,_)),to_param_doc(TEMPL,S)}) => user:action_info(TEMPL,S)).
 user:action_info(TEMPL,_S)=>vtActionTemplate(TEMPL).

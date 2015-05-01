@@ -15,7 +15,7 @@
 :- include(logicmoo_i_header).
 
 % ============================================
-% inital t/2 database
+% inital a/2 database
 % ============================================
 
 
@@ -24,9 +24,9 @@
 
 
 /*
-disabled t(T,I):- not(current_predicate(deduce_M/1)),!,user:hasInstance_dyn(T,I).
-disabled t(T,I):- !, (mudIsa_motel(I,T) *-> true ; (((atom(I),must(not(user:hasInstance_dyn(T,I)))),fail))).
-disabled t(T,I):- rdf_x(I,rdf:type,T).
+disabled a(T,I):- not(current_predicate(deduce_M/1)),!,user:hasInstance_dyn(T,I).
+disabled a(T,I):- !, (mudIsa_motel(I,T) *-> true ; (((atom(I),must(not(user:hasInstance_dyn(T,I)))),fail))).
+disabled a(T,I):- rdf_x(I,rdf:type,T).
 */
 
 assert_hasInstance(T,I):-  sanity(ground(T:I)),pfc_add(isa(I,T)),!,expire_tabled_list(all).
@@ -40,7 +40,7 @@ is_typef(C):-var(C),!,fail.
 is_typef(prologSingleValued):-!.
 is_typef(prologSideEffects):-!.
 is_typef(F):- isa_backchaing(F,tCol),!.
-is_typef(F):- (t(functorDeclares,F);t(tCol,F);clause(isa(F,tCol),true)),!.
+is_typef(F):- (a(functorDeclares,F);a(tCol,F);clause(isa(F,tCol),true)),!.
 is_typef(F):- atom(F),current_predicate(isa_from_morphology/2),isa_from_morphology(F,TT),!,atom_concat(_,'Type',TT).
 
 % ========================================
@@ -52,9 +52,10 @@ is_typef(F):- atom(F),current_predicate(isa_from_morphology/2),isa_from_morpholo
 is_never_type(V):-var(V),!,fail.
 is_never_type(V):-never_type_why(V,_),!.
 
+a(C,I):-must(atom(C)),G=..[C,I], clause_asserted(G).
 
 never_type_f(Var):-is_ftVar(Var),!,trace_or_throw(var_never_type(Var)).
-never_type_f(F):-t(T,F),T==tCol,!,fail.
+never_type_f(F):-a(tCol,F),!,fail.
 never_type_f(_:W):-!,never_type_f(W).
 never_type_f(':-').
 never_type_f('include').
@@ -75,14 +76,14 @@ never_type_f(backchainForbidden).
 noncol_type('LogicalConnective').
 
 never_type_why(V,ftVar(isSelf)):-is_ftVar(V),!.
+never_type_why(M:C,Why):-atomic(M),!,never_type_why(C,Why).
 never_type_why(mpred_call,mpred_call(isSelf)):-!.
-never_type_why(C,_):-t(tCol,C),!,fail. % already declared to be a type
-never_type_why(C,T):- noncol_type(T),t(T,C),!.
-never_type_why(F,_):-isa(F,tCol),!,fail.
-%TODO never_type_why(F,Why):-decided_not_was_isa(F,W),!,Why=(decided_not_was_isa(F,W)).
+never_type_why(C,_):-a(tCol,C),!,fail. % already declared to be a type
+never_type_why(C,_):-isa(C,tCol),!,fail.
+never_type_why(C,noncol_type(T)):- noncol_type(T),a(T,C),!.
+never_type_why(F,decided_not_was_isa(F,W)):-decided_not_was_isa(F,W),!.
 %never_type_why(C):- compound(C),functor(C,F,1),isa_asserted(F,tCol).
 never_type_why(F,Why):-atom(F),functor(G,F,1),real_builtin_predicate(G),!,Why=(whynot( real_builtin_predicate(G) )).
-never_type_why(M:C,Why):-atomic(M),!,never_type_why(C,Why).
 % never_type_why(F):-dmsg(never_type_why(F)),!,asserta_if_new(isa(F,prologOnly)).
 never_type_why(F,Why):-never_type_f(F),Why=is_never_type(F).
 never_type_why(F,Why):-prologSideEffects(F),Why=prologSideEffects(F).
@@ -119,6 +120,7 @@ type_prefix(txt,ftTextType).
 type_prefix(sk,ftSkolemFunction).
 type_prefix(is,tFunction).
 type_prefix(a,tFunction).
+type_prefix(t,tFunction).
 type_prefix(fn,tFunction).
 type_prefix(mud,tPred).
 type_prefix(prop,tPred).
@@ -132,7 +134,7 @@ type_prefix(macro,ttMacroType).
 % ========================================
 :- dynamic decided_not_was_isa/2.
 :-export(was_isa/3).
-was_isa(G,I,C):- \+ thlocal:disable_mpred_term_expansions_locally,
+was_isa(G,I,C):- fail, \+(current_predicate(_,G)),
   compound(G),functor(G,F,_),hotrace(((not(decided_not_was_isa(F,_)),once(was_isa0(G,I,C)-> true;((functor(G,F,1),get_when(When),asserta_if_new(decided_not_was_isa(F,When)),!,fail)))))).
 
 % get_when(When)
@@ -142,7 +144,7 @@ get_when(When):-current_input(S),findall(NV,stream_property(S,NV),When),!.
 get_when(M):-context_module(M),!.
 get_when(user):-!.
 
-to_isa_out(I,C,OUT):-new_was_isa,!,(atom(C)->OUT=..[C,I];OUT=t(C,I)).
+to_isa_out(I,C,OUT):-new_was_isa,!,(atom(C)->OUT=..[C,I];OUT=a(C,I)).
 to_isa_out(I,C,isa(I,C)).
 
 
@@ -153,7 +155,7 @@ was_isa0(hotrace(_),_,_):-!,fail.
 was_isa0(call(_),_,_):-!,fail.
 was_isa0(trace(_),_,_):-!,fail.
 was_isa0(not(_),_,_):-!,fail.
-% was_isa0(t(tCol,I),I,tCol).
+% was_isa0(a(tCol,I),I,tCol).
 was_isa0(ttNotTemporalType(I),I,ttNotTemporalType).
 was_isa0(tChannel(I),I,tChannel).
 was_isa0(tAgentGeneric(I),I,tAgentGeneric).
@@ -165,18 +167,18 @@ was_isa0(M:G,I,C):-atom(M),!,was_isa0(G,I,C).
 was_isa0(G,I,C):-G=..[C,I],!,is_typef(C),!,not(is_never_type(C)).
 was_isa0(t(C,I),I,C):- new_was_isa, atom(C),!.
 
-not_ft(T):-nonvar(T),not_ft_quick(T),not(t(ttFormatType,T)).
+not_ft(T):-nonvar(T),not_ft_quick(T),not(a(ttFormatType,T)).
 
 not_ft_quick(T):-nonvar(T),(T=tItem;T=tRegion;T=tCol;T=completelyAssertedCollection;transitive_subclass_or_same(T,tTemporalThing)).
 
 :-export(asserted_subclass/2).
 asserted_subclass(I,T):- ((thlocal:useOnlyExternalDBs,!);thglobal:use_cyc_database),(kbp_t([genls,I,T])).
-asserted_subclass(T,ST):-t(genls,T,ST).
+asserted_subclass(T,ST):-a(genls,T,ST).
 
 chk_ft(T):- not_ft_quick(T),!,fail.
-%chk_ft(I):- thlocal:infForward, t(defnSufficient,I,_),!.
+%chk_ft(I):- thlocal:infForward, a(defnSufficient,I,_),!.
 %chk_ft(I):- thlocal:infForward, asserted_subclass(I,FT),I\=FT,chk_ft(FT),!.
-chk_ft(I):- thlocal:infForward, !,t(ttFormatType,I).
+chk_ft(I):- thlocal:infForward, !,a(ttFormatType,I).
 
 
 
@@ -209,10 +211,10 @@ transitive_P_r_l(DB,P,L,R):-ground(L:R),call(DB,P,A3,R),call(DB,P,A2,A3),call(DB
 
 
 is_known_true(C):-has_free_args(C),!,trace_or_throw(has_free_args(is_known_trew,C)).
-is_known_true(isa(tPred, functorDeclaresPred)).
+is_known_true(isa(tPred, ttPredType)).
 is_known_true(F):-is_known_false0(F),!,fail.
 is_known_true(F):-is_known_trew(F),!.
-%is_known_true(isa(G,tTemporalThing)):- t(_,G),not_mud_isa(G,tCol),not_mud_isa(G,tPred).
+%is_known_true(isa(G,tTemporalThing)):- a(_,G),not_mud_isa(G,tCol),not_mud_isa(G,tPred).
 is_known_true(genls(G,G)).
 is_known_true(isa(apathFn(_,_),tPathway)).
 is_known_true(isa(_,ftTerm)).
@@ -229,7 +231,7 @@ is_known_trew(genls(ttFormatType,tCol)).
 is_known_trew(genls(ttFormatType,ttNotTemporalType)).
 is_known_trew(genls(meta_argtypes,tRelation)).
 is_known_trew(genls(tFunction,tRelation)).
-is_known_trew(genls(F,tPred)):-t(functorDeclaresPred,F).
+is_known_trew(genls(F,tPred)):-a(ttPredType,F).
 is_known_trew(disjointWith(A,B)):-disjointWithT(A,B).
 
 pfcNeverTrue(P):-is_known_false(P).
@@ -263,9 +265,10 @@ disjointWithT(B,A):-disjointWith0(A,B).
 %not_mud_isa0(tObj, ttTemporalType).
 %not_mud_isa0(tTemporalThing,ttTemporalType).
 not_mud_isa0(I,T):-(var(I);var(T)),trace_or_throw(var_not_mud_isa(I,T)).
-not_mud_isa0(meta_argtypes,functorDeclaresPred).
-not_mud_isa0(isa,functorDeclaresPred).
-not_mud_isa0(props,functorDeclaresPred).
+not_mud_isa0(meta_argtypes,ttPredType).
+not_mud_isa0(isa,ttPredType).
+not_mud_isa0(props,ttPredType).
+not_mud_isa0(F, functorDeclares):-not(clause_asserted(functorDeclares(F))).
 not_mud_isa0(actGossup,tChannel).
 not_mud_isa0(_, blah):-!.
 not_mud_isa0(I,meta_argtypes):-!,not(compound(I)).
@@ -280,39 +283,33 @@ not_mud_isa0(tTemporalThing, tTemporalThing).
 not_mud_isa0(completelyAssertedCollection,ttTemporalType).
 not_mud_isa0(ttFormatType,ttFormatType).
 not_mud_isa0(ttTemporalType,tTemporalThing).
-%not_mud_isa0(I,tCol):- compound(I),!, \+ t(tCol,I).
-%not_mud_isa0(I,C):- compound(I),!, \+ t(C,I).
+%not_mud_isa0(I,tCol):- compound(I),!, \+ a(tCol,I).
+%not_mud_isa0(I,C):- compound(I),!, \+ a(C,I).
 not_mud_isa(I,C):-not_mud_isa(I,C,_).
 
+not_mud_isa(F, CAC,completelyAssertedCollection(CAC)):- completelyAssertedCollection(CAC),!,G=..[CAC,F],\+(clause_asserted(G)).
 not_mud_isa(I,C,Why):-not_mud_isa0(I,C),Why=not_mud_isa0(I,C).
-not_mud_isa(G,tTemporalThing,Why):- ((t(tCol,G),Why=t(tCol,G));(tPred(G),Why=tPred(G))).
+not_mud_isa(G,tTemporalThing,Why):- ((a(tCol,G),Why=a(tCol,G));(tPred(G),Why=tPred(G))).
 not_mud_isa(G,tCol,Why):-never_type_why(G,Why).
 
 % ==========================
 % isa_backchaing(i,c)
 % ==========================
-isa(F,P):-loop_check(isa_backchaing(F,P)).
-%t(P,F):-loop_check(isa(F,P)).
-%t(T,I):- thglobal:pfcManageHybrids,clause_safe(isa(I,T),true).
+isa(F,P):- loop_check(isa_backchaing(F,P)).
+%a(P,F):-loop_check(isa(F,P)).
+%a(T,I):- thglobal:pfcManageHybrids,clause_safe(isa(I,T),true).
 :-export(isa_backchaing/2).
-isa_backchaing(I,T):- (atom(I);var(I)),!, no_repeats(loop_check(isa_backchaing_0(I,T))).
+isa_backchaing(I,T):- no_repeats(loop_check(isa_backchaing_0(I,T))).
 
 :-export(isa_backchaing_0/2).
 isa_backchaing_0(I,T):-  T==ftVar,!,is_ftVar(I).
-isa_backchaing_0(I,T):- T==ftProlog,!.
+isa_backchaing_0(_,T):- T==ftProlog,!.
 isa_backchaing_0(I,T):-  var(I),nonvar(T),!,no_repeats_old(transitive_subclass_or_same(AT,T)),isa_asserted(I,AT).
 isa_backchaing_0(I,T):-  var(I),   var(T),!,setof(TT,AT^(isa_asserted(I,AT),transitive_subclass_or_same(AT,TT)),List),!,member(T,List).
-isa_backchaing_0(I,T):-  nonvar(T),!,isa_backchaing_i_i(I,T),!.
+isa_backchaing_0(I,T):-  var(T),!,isa_asserted(I,AT),transitive_subclass_or_same(AT,T).
+isa_backchaing_0(I,T):-  nonvar(I),nonvar(T),not_mud_isa(I,T),!,fail.
+isa_backchaing_0(I,T):-  isa_asserted(I,T),!.
 isa_backchaing_0(I,T):-  isa_asserted(I,AT),transitive_subclass_or_same(AT,T).
-
-isa_backchaing_i_i(I,T):- not_mud_isa(I,T),!,fail.
-isa_backchaing_i_i(ttFormatType, ttFormatType):-!,fail.
-isa_backchaing_i_i(I,T):-isa_asserted(I,T),!.
-
-isa_backchaing_i_i(_, functorDeclaresPred):-!,fail.
-isa_backchaing_i_i(_, functorDeclares):-!,fail.
-isa_backchaing_i_i(_, prologHybrid):-!,fail.
-isa_backchaing_i_i(I,T):-not(t(completelyAssertedCollection,T)),!,no_repeats_old(transitive_subclass_or_same(AT,T)),isa_asserted(I,AT).
 
 
 % ============================================
@@ -322,7 +319,7 @@ isa_backchaing_i_i(I,T):-not(t(completelyAssertedCollection,T)),!,no_repeats_old
 :-export(type_isa/2).
 
 type_isa(Type,ttTemporalType):-arg(_,vv(tAgentGeneric,tItem,tObj,tRegion),Type),!.
-type_isa(ArgIsa,ttPredType):-t(functorDeclaresPred,ArgIsa),!.
+type_isa(ArgIsa,ttPredType):-a(ttPredType,ArgIsa),!.
 type_isa(ftString,ttFormatType):-!.
 type_isa(Type,ttFormatType):-chk_ft(Type),!. % text
 %  from name
@@ -333,13 +330,13 @@ atom_type_prefix_other(Inst,Type,Prefix,Other):-atom(Inst),type_prefix(Prefix,Ty
 atom_type_prefix_other(Inst,Type,Suffix,Other):-atom(Inst),type_suffix(Suffix,Type),atom_concat(Other,Suffix,Inst),!.
 
 
-onLoadPfcRule('=>'(t(tCol,Inst), {isa_from_morphology(Inst,Type)} , isa(Inst,Type))).
+onLoadPfcRule('=>'(a(tCol,Inst), {isa_from_morphology(Inst,Type)} , isa(Inst,Type))).
 
 
 callOr(Pred,I,T):-(call(Pred,I);call(Pred,T)),!.
 
-% type_deduced(I,T):-atom(T),i_name(mud,T,P),!,clause(t(P,_,I),true).
-type_deduced(I,T):-nonvar(I),not(number(I)),clause(t(P,_,I),true),(argIsa_known(P,2,AT)->T=AT;i_name(vt,P,T)).
+% type_deduced(I,T):-atom(T),i_name(mud,T,P),!,clause(a(P,_,I),true).
+type_deduced(I,T):-nonvar(I),not(number(I)),clause(a(P,_,I),true),(argIsa_known(P,2,AT)->T=AT;i_name(vt,P,T)).
 
 compound_isa(F,_,T):- mpred_call(resultIsa(F,T)).
 compound_isa(_,I,T):- mpred_call(formatted_resultIsa(I,T)).
@@ -349,35 +346,32 @@ isa_asserted(I,C):-no_repeats(loop_check(isa_asserted_0(I,C))).
 
 isa_asserted_0(F,tCol):-isa_from_morphology(F,Col),atom_concat(_,'Type',Col),arity(F,1).
 %isa_asserted_0([I],T):-nonvar(I),!,isa_asserted_0(I,T).
-isa_asserted_0(isInstFn(I),T):-nonvar(I),!,T=I.
-isa_asserted_0(I,T):-nonvar(I),nonvar(T),not_mud_isa(I,T),!,fail.
+isa_asserted_0(isInstFn(I),T):-nonvar(I),trace,!,T=I.
 isa_asserted_0(I,T):- ((thlocal:useOnlyExternalDBs,!);thglobal:use_cyc_database),(kbp_t([isa,I,T]);kbp_t([T,I])).
-isa_asserted_0(I,T):- var(I),member(T,[ftVar,ftProlog]).
 isa_asserted_0(I,T):-is_known_trew(isa(I,T)).
-isa_asserted_0(functorDeclaresPred, prologHybrid):-!.
-isa_asserted_0(I,T):-clause_asserted(isa(I,T)).
-isa_asserted_0(I,T):-clause_asserted(t(T,I)).
-isa_asserted_0(I,T):-pfc_univ(T,I,Head),clause_asserted(Head).
-isa_asserted_0(_, functorDeclaresPred):-!,fail.
-isa_asserted_0(_, functorDeclares):-!,fail.
-isa_asserted_0(_, prologHybrid):-!,fail.
-isa_asserted_0(I,T):-loop_check(t(T,I)).
-isa_asserted_0(I,T):-compound(I),!,get_functor(I,F),compound_isa(F,I,T).
-isa_asserted_0(I,T):-atom(I),isa_from_morphology(I,T).
-isa_asserted_0(I,T):-(atom(I);atom(T)),type_isa(I,T).
-isa_asserted_0(I,T):- nonvar(I),(  ((var(T);chk_ft(T)),if_defined(term_is_ft(I,T)))*->true;type_deduced(I,T) ).
+isa_asserted_0(ttPredType, completelyAssertedCollection):-!.
+isa_asserted_0(I,T):- atom(I),isa_from_morphology(I,T).
+isa_asserted_0(I,T):- (atom(I);atom(T)),type_isa(I,T).
+isa_asserted_0(I,T):- var(T),!,tCol(T),atom(T),isa_asserted(I,T).
+isa_asserted_0(I,T):- atom(T),current_predicate(T/1),G=..[T,I],(predicate_property(G,number_of_clauses(_))->clause(G,true);ignoreOnError(G)).
+isa_asserted_0(I,T):- nonvar(I),nonvar(T),not_mud_isa(I,T),!,fail.
 % isa_asserted_0(I,T):- HEAD= isa(I, T),ruleBackward(HEAD,BODY),trace,call_mpred_body(HEAD,BODY).
+isa_asserted_0(I,T):- nonvar(I),(  ((var(T);chk_ft(T)),if_defined(term_is_ft(I,T)))*->true;type_deduced(I,T) ).
+isa_asserted_0(I,T):- compound(I),!,get_functor(I,F),compound_isa(F,I,T).
 isa_asserted_0(I,T):- nonvar(T),isa_asserted_1(I,T).
 
 % isa_asserted_1(I,T):- T\=predStub(_),isa(I,T).
+isa_asserted_1(_, ttPredType):-!,fail.
+isa_asserted_1(_, functorDeclares):-!,fail.
+isa_asserted_1(_, prologHybrid):-!,fail.
 isa_asserted_1(I,T):- atom(T),loop_check(isa_w_type_atom(I,T)).
-isa_asserted_1(_,T):- t(completelyAssertedCollection,T),!,fail.
+isa_asserted_1(_,T):- a(completelyAssertedCollection,T),!,fail.
 %isa_asserted_1(I,T):- append_term(T,I,HEAD),ruleBackward(HEAD,BODY),call_mpred_body(HEAD,BODY).
 isa_asserted_1(I,'&'(T1 , T2)):-!,nonvar(T1),var(T2),!,dif:dif(T1,T2),isa_backchaing(I,T1),subclass(T1,T2),isa_backchaing(I,T2).
 isa_asserted_1(I,'&'(T1 , T2)):-!,nonvar(T1),!,dif:dif(T1,T2),isa_backchaing(I,T1),isa_backchaing(I,T2).
 isa_asserted_1(I,(T1 ; T2)):-!,nonvar(T1),!,dif:dif(T1,T2),isa_backchaing(I,T1),isa_backchaing(I,T2).
 
-isa_w_type_atom(I,T):- t(functorDeclaresPred,T),!,isa(I,T).
+isa_w_type_atom(I,T):- a(ttPredType,T),!,isa(I,T).
 isa_w_type_atom(_,T):- dont_call_type_arity_one(T),!,fail.
 isa_w_type_atom(I,T):- G=..[T,I],once_if_ground(isa_atom_call(T,G),_).
 
@@ -419,7 +413,7 @@ decl_type((A,L)):-!,decl_type(A),decl_type(L).
 decl_type(Spec):- decl_type_unsafe(Spec),!.
 
 decl_type_unsafe(Spec):- never_type_why(Spec,Why),!,trace_or_throw(never_type_why(Spec,Why)).
-decl_type_unsafe(Spec):- !, must((with_assertions([thlocal:infSkipArgIsa,thlocal:infSkipFullExpand],(pfc_add(isa(Spec,tCol)),pfc_add(isa(Spec,functorDeclares)))))).
+decl_type_unsafe(Spec):- !,pfc_add(tCol(Spec)).
 
 
 
@@ -439,8 +433,8 @@ define_ft(Spec):- loop_check(define_ft_0(Spec),true).
 
 
 define_ft_0(xyzFn):-!.
-define_ft_0(Spec):- t(ttFormatType,Spec),!.
-define_ft_0(Spec):- t(tCol,Spec),dmsg(once(maybe_coierting_plain_type_to_formattype(Spec))),fail.
+define_ft_0(Spec):- a(ttFormatType,Spec),!.
+define_ft_0(Spec):- a(tCol,Spec),dmsg(once(maybe_coierting_plain_type_to_formattype(Spec))),fail.
 define_ft_0(Spec):- hooked_asserta(isa(Spec,ttFormatType)),(compound(Spec)->hooked_asserta(isa(Spec,ttFormatted));true).
 
 :-export(assert_subclass/2).
@@ -462,7 +456,7 @@ assert_isa_safe(O,T):- ignore((nonvar(O),nonvar(T),decl_type_safe(T),assert_isa(
 guess_supertypes(W):-atom(W),atomic_list_concat(List,'_',W),length(List,S),S>2,!, append(FirstPart,[Last],List),atom_length(Last,AL),AL>3,not(member(flagged,FirstPart)),
             atomic_list_concat(FirstPart,'_',_NewCol),show_call_failure(assert_subclass_safe(W,Last)).
 guess_supertypes(W):-atom(W),to_first_break(W,lower,tt,_,upper),!,assert_isa(W,ttTypeType),!.
-guess_supertypes(W):-atom(W),T=t,to_first_break(W,lower,T,All,upper),!,to_first_break(All,upper,_,Super,Rest),
+guess_supertypes(W):-atom(W),T=a,to_first_break(W,lower,T,All,upper),!,to_first_break(All,upper,_,Super,Rest),
    atom_length(Rest,L),!,L>2,i_name(T,Rest,Super),show_call_failure(assert_subclass_safe(W,Super)),!.
 
 /*
@@ -478,19 +472,19 @@ isa_provide_mpred_storage_op(change(assert,_),G):- was_isa(G,I,C),!,dmsg(assert_
 % ISA MODIFY
 isa_provide_mpred_storage_op(change(retract,How),G):- was_isa(G,I,C),!,show_call((with_assert_op_override(change(retract,How),((dmsg(retract_isa(G,I,C)),!, assert_isa(I,C)))))).
 % ISA CALL
-isa_provide_mpred_storage_op(call(_),G):- was_isa(G,I,C),!, (isa_backchaing(I,C);t(C,I)).
+isa_provide_mpred_storage_op(call(_),G):- was_isa(G,I,C),!, (isa_backchaing(I,C);a(C,I)).
 % ISA CLAUSES
-isa_provide_mpred_storage_clauses(isa(I,C),true,hasInstanceIC):-t(C,I).
+isa_provide_mpred_storage_clauses(isa(I,C),true,hasInstanceIC):-a(C,I).
 isa_provide_mpred_storage_clauses(H,true,hasInstanceCI):-
    (compound(H)-> 
-      ((functor(H,C,1)-> H=..[C,I]; H=isa(I,C)), t(C,I)) ; 
-      (t(C,I),(nonvar(C)->append_term(C,I,H);H=isa(I,C)))).
+      ((functor(H,C,1)-> H=..[C,I]; H=isa(I,C)), a(C,I)) ; 
+      (a(C,I),(nonvar(C)->append_term(C,I,H);H=isa(I,C)))).
 
 %isa_provide_mpred_storage_clauses(isa(I,C),B,W):-mpred_t_mpred_storage_clauses_rules(isa(I,C),B,W).
 %isa_provide_mpred_storage_clauses(isa(I,C),B,W):-nonvar(C),append_term(C,I,H),mpred_t_mpred_storage_clauses_rules(H,B,W).
 
 
-user:provide_mpred_storage_clauses(H,B,(What)):-isa_provide_mpred_storage_clauses(H,B,What).
+user:provide_mpred_storage_clauses(H,B,(What)):-fail,isa_provide_mpred_storage_clauses(H,B,What).
 
 % isa_backchaing(I,T):- stack_depth(Level),Level>650,trace_or_throw(skip_dmsg_nope(failing_stack_overflow(isa_backchaing(I,T)))),!,fail.
 
@@ -506,8 +500,7 @@ assert_isa(I,T):-assert_isa_i(I,T),sanity(show_call_failure(is_asserted(isa(I,T)
 %assert_isa_i(I,T):- once(sanity(not(singletons_throw_else_fail(assert_isa(I,T))))),fail.
 assert_isa_i(_,ftTerm):-!.
 assert_isa_i(_,ftTerm(_)):-!.
-assert_isa_i(I,T):-not_mud_isa(I,T,Why),!,throw(Why).
-assert_isa_i(I,PT):- nonvar(PT),t(functorDeclaresPred,PT),!,decl_mpred(I,PT),assert_hasInstance(PT,I).
+%assert_isa_i(I,PT):- nonvar(PT),a(ttPredType,PT),!,decl_mpred(I,PT),assert_hasInstance(PT,I).
 assert_isa_i(I,T):- skipped_table_call(loop_check(assert_isa_ilc(I,T),loop_check(assert_hasInstance(T,I),dtrace(assert_isa_ilc(I,T))))).
 
 :-export(assert_isa_ilc/2).
@@ -515,10 +508,9 @@ assert_isa_i(I,T):- skipped_table_call(loop_check(assert_isa_ilc(I,T),loop_check
 assert_isa_ilc(isKappaFn(_,_),_):-!.
 assert_isa_ilc(_I,T):- member(T,[ftString]),!.
 assert_isa_ilc(I,T):- is_list(I),!,maplist(assert_isa_reversed(T),I).
-assert_isa_ilc(I,T):- !,pfc_assert(isa(I,T)).
-
-assert_isa_ilc(I,T):- not(not(t(T,I))),!.
+assert_isa_ilc(I,T):- not(not(a(T,I))),!.
 assert_isa_ilc(I,T):- hotrace(chk_ft(T)),(compound(I)->dmsg(once(dont_assert_c_is_ft(I,T)));dmsg(once(dont_assert_is_ft(I,T)))),rtrace((chk_ft(T))).
+assert_isa_ilc(I,T):- once(decl_type(T)),!,G=..[T,I], pfc_assert(G),(not_mud_isa(I,T,Why)->throw(Why);true),!.
 assert_isa_ilc(I,T):- once(decl_type(T)),
   skipped_table_call(must((assert_isa_ilc_unchecked(I,T),show_call_failure(isa_backchaing(I,T))))),
   assert_hasInstance(T,I).
@@ -526,7 +518,7 @@ assert_isa_ilc(I,T):- once(decl_type(T)),
 assert_isa_ilc_unchecked(I,T):- compound(I),!,must((get_functor(I,F),assert_compound_isa(I,T,F))),!.
 assert_isa_ilc_unchecked(I,tCol):- must(show_call(decl_type(I))).
 assert_isa_ilc_unchecked(I,ttFormatType):- must(show_call(define_ft(I))).
-assert_isa_ilc_unchecked(I,_):- not(isa(I,_)),not(t(tCol,I)),show_call_failure(assert_if_new(user:hasInstance_dyn(tCountable,I))),fail.
+assert_isa_ilc_unchecked(I,_):- not(isa(I,_)),not(a(tCol,I)),show_call_failure(assert_if_new(user:hasInstance_dyn(tCountable,I))),fail.
 assert_isa_ilc_unchecked(I,T):-
   with_assertions([thlocal:infSkipArgIsa,thlocal:infSkipFullExpand],((  hooked_asserta(isa(I,T)),assert_hasInstance(T,I)))).
 
@@ -540,7 +532,7 @@ assert_compound_isa(I,T,F):- ignore((is_Template(I),with_assertions(infConfidenc
 get_mpred_arg(N,_:C,E):-!,compound(C),arg(N,C,E).
 get_mpred_arg(N,C,E):-!,compound(C),arg(N,C,E).
 
-is_Template(I):- get_mpred_arg(_,I,Arg1),t(tCol,Arg1).
+is_Template(I):- get_mpred_arg(_,I,Arg1),a(tCol,Arg1).
 
 
 pfc_univ(C,I,Head):-atom(C),!,Head=..[C,I],predicate_property(Head,number_of_clauses(_)).
@@ -550,14 +542,14 @@ assert_isa_reversed(T,I):-assert_isa(I,T).
 % ================================================
 % assert_isa HOOKS
 % ================================================
-%OLD user:decl_database_hook(_,genls(_,_)):-retractall(t(_,isa,_,_)),retractall(t(_,genls,_,_)).
+%OLD user:decl_database_hook(_,genls(_,_)):-retractall(a(_,isa,_,_)),retractall(a(_,genls,_,_)).
 %OLD user:decl_database_hook(change(assert,_),DATA):-into_mpred_form(DATA,O),!,O=isa(I,T),hotrace(doall(assert_isa_hooked(I,T))).
 %OLD user:decl_database_hook(change(assert,_),isa(I,T)):- assert_hasInstance(T,I),fail.
 
 %OLD user:decl_database_hook(change( retract,_),isa(I,T)):-doall(db_retract_isa_hooked(I,T)).
 
-assert_isa_hooked(A,_):-retractall(t(cache_I_L,isa,A,_)),fail.
-assert_isa_hooked(F,T):- t(functorDeclaresPred,T),decl_mpred(F,T),fail.
+assert_isa_hooked(A,_):-retractall(a(cache_I_L,isa,A,_)),fail.
+assert_isa_hooked(F,T):- a(ttPredType,T),decl_mpred(F,T),fail.
 assert_isa_hooked(I,T):- assert_isa(I,T).
 assert_isa_hooked(I,T):- not(ground(assert_isa(T))),!, trace_or_throw(not(ground(assert_isa(I,T)))).
 assert_isa_hooked(I,T):- assert_hasInstance(T,I),fail.
@@ -579,7 +571,7 @@ assert_isa_hooked(food5,tWeapon):-trace_or_throw(assert_isa(food5,tWeapon)).
 
 %OLD user:decl_database_hook(change(assert,_),isa(I,T)):- doall(assert_isa_hooked_after(I,T)).
 
-assert_isa_hooked_after(F,T):-t(functorDeclaresPred,T),!,decl_mpred(F,T).
+assert_isa_hooked_after(F,T):-a(ttPredType,T),!,decl_mpred(F,T).
 assert_isa_hooked_after(_,tCol):-!.
 assert_isa_hooked_after(_,ttFormatType):-!.
 %assert_isa_hooked_after(I,T):- ttTemporalType(T),!,assert_isa_hooked_creation(I,T).
@@ -605,12 +597,13 @@ impliedSubClass(T,ST):-predicate_property(transitive_subclass(T,ST),_),!,call_ta
 mpred_types_loaded.
 
 % ISA QUERY
-system:goal_expansion(ISA,GO) :- \+ thlocal:disable_mpred_term_expansions_locally, once((compound(ISA),was_isa(ISA,I,C))),thlocal:is_calling,show_call(GO=no_repeats(isa(I,C))).
+system:goal_expansion(ISA,GO) :- \+ thlocal:disable_mpred_term_expansions_locally, \+current_predicate(_,ISA),
+  once((compound(ISA),was_isa(ISA,I,C))),thlocal:is_calling,show_call(GO=no_repeats(isa(I,C))).
 % ISA GOAL
 % pfc_system_goal_expansion(G,GO):-G\=isa(_,_),was_isa(G,I,C),GO=isa(I,C).
 % ISA EVER
 %pfc_term_expansion(G,GO):-  \+ thlocal:disable_mpred_term_expansions_locally,was_isa(G,I,C),GO=isa(I,C).
 
 :-decl_type(tCol).
-:-decl_type(functorDeclaresPred).
+:-decl_type(ttPredType).
 

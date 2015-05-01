@@ -28,6 +28,8 @@
 
 compiled(F/A):- dynamic(F/A),compile_predicates([F/A]).
 
+second_order(TT,Cut):-fail.
+
 :- discontiguous(pfc_file_expansion_0/2).
 :- compiled(('=>')/1).
 :- compiled(('neg')/1).
@@ -76,26 +78,30 @@ to_assertable((P<=Q),was_new_rule((P<=Q))):-!.
 to_assertable((P<=>Q),was_new_rule((P<=>Q))):-!.
 to_assertable(P,P).
 
-to_addable_form_wte(P0,P):-not(is_list(P0)),!,to_addable_form_wte([P0],P).
-to_addable_form_wte(P0,P):-to_addable_form(P0,P),!, ((((P0\=@=P,\+(([PU]=P,functor(PU,_,1))))->dmsg(to_addable_form(P0,(->),P));true))).
-to_addable_form_wte(P0,P):-
-  with_assertions(thlocal:pfc_already_in_file_expansion(P0),
-    ((once(to_addable_form(P0,P1)),expand_term(P1,P)))),!,
-  ((((P0\=@=P,\+functor(P,_,1))->dmsg(to_addable_form(P0,(->),P));true))).
+pfc_each_literal(P,E):-conjuncts_to_list(P,List),member(E,List).
+
+to_addable_form_wte(P0,P):- must(to_addable_form(P0,P)),!, (P0\=@=P->wdmsg(to_addable_form(P0,P));true).
 
 retract_eq_quitely((H:-B)):-ignore((clause(H,B,Ref),clause(HH,BB,Ref),H=@=HH,B=@=BB,!,erase(Ref))).
 retract_eq_quitely((H)):-ignore((clause(H,true,Ref),clause(HH,BB,Ref),H=@=HH,BB==true,!,erase(Ref))).
 assert_eq_quitely(H):-assert_if_new(H).
 
-to_addable_form(I,OO):-is_list(I),!,maplist(to_addable_form,I,O),flatten(O,OO).
-to_addable_form(I,OO):- current_predicate(logicmoo_i_term_expansion_file/0),fully_expand(_,I,II),once((into_mpred_form(II,M),to_predicate_isas_each(M,O))),!,into_mpred_form(O,OO).
-%to_addable_form(I,O):- current_predicate(logicmoo_i_term_expansion_file/0),once((into_mpred_form(I,M),to_predicate_isas_each(M,O))),!.
-to_addable_form(I,O):- to_predicate_isas_each(I,O),!.
+list_to_conjuncts(V,V):-not(compound(V)),!.
+list_to_conjuncts([],true).
+list_to_conjuncts([H],HH):-list_to_conjuncts(H,HH).
+list_to_conjuncts([H|T],Body):-!,
+    list_to_conjuncts(H,HH),
+    list_to_conjuncts(T,TT),
+    pfc_conjoin(HH,TT,Body).
+list_to_conjuncts(H,H).
 
-to_predicate_isas_each(I,O):-decompress_each(I,M),maplist(to_predicate_isas,M,O),!.
-to_predicate_isas_each(I,O):-trace,to_predicate_isas(I,O).
 
-decompress_each(I,O):- findall(M,do_expand_args(isEach,I,M),O),!.
+to_addable_form(I,OO):-is_list(I),!,maplist(to_addable_form,I,O),flatten(O,OO),!.
+to_addable_form(I,O):- current_predicate(logicmoo_i_term_expansion_file/0),once(fully_expand(_,I,II)),!,
+ once((into_mpred_form(II,M),to_predicate_isas_each(M,O))),!.
+to_addable_form(I,O):- findall(M,do_expand_args(isEach,I,M),IM),list_to_conjuncts(IM,M),to_predicate_isas_each(M,O),!.
+
+to_predicate_isas_each(I,O):-to_predicate_isas(I,O).
 
 to_predicate_isas(V,V):-not(compound(V)),!.
 to_predicate_isas([H|T],[HH|TT]):-!,to_predicate_isas(H,HH),to_predicate_isas(T,TT),!.
@@ -139,7 +145,6 @@ pfc_is_taut((B,_)=>A):-nonvar(B),pfc_is_taut(B=>A),!.
 pfc_is_taut((_,B)=>A):-nonvar(B),pfc_is_taut(B=>A),!.
 pfc_is_taut(B=>(A,_)):-nonvar(A),pfc_is_taut(B=>A),!.
 pfc_is_taut(B=>(_,A)):-nonvar(A),pfc_is_taut(B=>A),!.
-
 
 
 user:decl_database_hook(Op,Hook):- loop_check_nr(pfc_provide_mpred_storage_op(Op,Hook)).
@@ -267,7 +272,8 @@ is_action_body(P):- (wac==P ; (compound(P),arg(1,P,E),is_action_body(E))),!.
 :-multifile(pfc_default/1).
 :-dynamic(pfc_default/1).
 
-pfc_silient.
+:-dynamic(pfc_silient/0).
+% pfc_silient.
 
 % user''s program''s database
 assert_u(X):-assert(X).
@@ -415,19 +421,22 @@ pfc_assert_fast((=>P),S) :- nonvar(P),!,
 
 
 pfc_assert_fast(P0,S):-
-  to_addable_form_wte(P0,P),
+  must(to_addable_form_wte(P0,P)),
       (is_list(P)
         ->maplist(pfc_assert_fast_sp(S),P);
        pfc_assert_fast_sp(S,P)).
 
-pfc_assert_fast_sp(S,P) :-to_addable_form_wte(P,PC),PC\=@=P,pfc_assert_fast_sp(S,PC).
-pfc_assert_fast_sp(S,P) :-
+pfc_assert_fast_sp(S,P) :- must(to_addable_form_wte(P,PC)),must(nonvar(PC)),PC\=@=P,!,pfc_assert_fast_sp0(S,PC),!.
+pfc_assert_fast_sp(S,P) :-pfc_assert_fast_sp0(S,P),!.
+%pfc_assert_fast_sp(_,_).
+pfc_assert_fast_sp(P,S) :- pfc_error("pfc_assert_fast(~w,~w) failed",[P,S]).
+
+
+pfc_assert_fast_sp0(S,P) :-
    pfc_rule_hb(P,OutcomeO,_),
      loop_check_term((pfc_post1_sp(S,P),pfc_run),pfc_asserting(OutcomeO),(pfc_post1_sp(S,P),dmsg(looped_outcome((P))))),!.
   
 
-%pfc_assert_fast(_,_).
-pfc_assert_fast_sp(P,S) :- pfc_error("pfc_assert_fast(~w,~w) failed",[P,S]).
 
 
 % pfc_post(+Ps,+S) tries to assert a fact or set of fact to the database.  For
@@ -735,7 +744,7 @@ pfc_add_db_type(action,_Action) :- !.
 
 
 %= pfc_rem1(P,S) removes support S from P and checks to see if P is still supported.
-%= If it is not, then the fact is retreactred from the database and any support
+%= If it is not, then the fact is retracted from the database and any support
 %= relationships it participated in removed.
 
 pfc_rem1(List) :-
@@ -953,7 +962,8 @@ pfc_fwd(P,S) :- pfc_fwd1(P,S).
 % pfc_fwd1(+P) forward chains for a single fact.
 
 pfc_fwd1(Fact,Sup) :-
-  must(pfc_rule_check(Sup,Fact)),
+  copy_term(Fact,Fact0),
+  must(pfc_rule_check(Sup,Fact0)),
   copy_term(Fact,F),
   % check positive triggers
   fcpt(Fact,F),
@@ -1076,21 +1086,29 @@ pfc_eval_rhs1({Action},Support) :-
  !,
  fc_eval_action(Action,Support).
 
+pfc_eval_rhs1(pfc_action(Action),Support) :-
+ % evaluable Prolog code.
+ !,
+ fc_eval_action(Action,Support).
+
 pfc_eval_rhs1(P,_Support) :-
  % predicate to remove.
- pfc_negated_literal(P),
+ pfc_negation(P,N),
  !,
- pfc_rem1(P).
+ pfc_rem1(N).
 
 pfc_eval_rhs1([X|Xrest],Support) :-
  % embedded sublist.
  !,
  pfc_eval_rhs_0([X|Xrest],Support).
 
+pfc_eval_rhs1(added(Assertion),Support) :-
+ % an assertion to be added.
+ pfc_assert(Assertion,Support).
+
 pfc_eval_rhs1(Assertion,Support) :-
  % an assertion to be added.
  pfc_post1(Assertion,Support).
-
 
 pfc_eval_rhs1(X,_) :-
   pfc_warn("Malformed rhs of a rule: ~w",[X]).
@@ -1190,7 +1208,10 @@ pfc_slow_search.
 ruleBackward(F,Condition):-ruleBackward0(F,Condition),Condition\=call_sysprolog(F).
 %ruleBackward0(F,Condition):-clause_u(F,Condition),not(is_true(Condition);pfc_is_info(Condition)).
 ruleBackward0(F,Condition):-'<='(F,Condition),not(is_true(Condition);pfc_is_info(Condition)).
-{X}:-dmsg(legacy({X})),X.
+
+:-dynamic('{}'/1).
+{X}:-dmsg(legacy({X})),trace,call_prologsys(X).
+
 
 pfcBC_NoFacts_TRY(F) :- no_repeats(ruleBackward(F,Condition)),
   % neck(F),
@@ -1343,9 +1364,13 @@ build_rhs((A,B),[A2|Rest]) :-
 build_rhs(X,[X2]) :-
    pfc_compile_rhsTerm(X,X2).
 
-pfc_compile_rhsTerm((P/C),((P:-C))) :- !,pfc_mark_as(P,pfcRHS).
 
+pfc_compile_rhsTerm(P,P):-is_ftVar(P),!.
+pfc_compile_rhsTerm((P/C),((P0:-C))) :- !,pfc_compile_rhsTerm(P,P0).
+pfc_compile_rhsTerm(t(C,I),O):-atom(C),!,G=..[C,I],!,pfc_compile_rhsTerm(G,O).
 pfc_compile_rhsTerm(P,P):- pfc_mark_as(P,pfcRHS).
+
+
 pfc_mark_as(P,_):-var(P),!.
 pfc_mark_as(neg(P),Type):-var(P)->true;(get_functor(P,F,A),pfc_add_fast([arity(F,A),pfcMark(Type,neg,F,A)])).
 pfc_mark_as(P,Type):-copy_term(P,P0),numbervars(P0,0,_,[attvar(bind)]),pfc_mark_as0(P0,Type).
@@ -1362,7 +1387,7 @@ pfc_mark_fa_as(_:mpred_prop,N,_):- must(N=2).
 pfc_mark_fa_as(F,A,Type):- pfc_add_fast([arity(F,A),pfcMark(Type,pos,F,A)]).
 
 :-debug.
-isInstFn(A):-!,trace_or_throw(isInstFn(A)).
+%isInstFn(A):-!,trace_or_throw(isInstFn(A)).
 
 %= pfc_negation(N,P) is true if N is a negated term and P is the term
 %= with the negation operator stripped.
@@ -1647,9 +1672,9 @@ pfc_database_item(Term) :-
 
 pfc_retract_or_warn_i(X) :-  retract_i(X), !.
 pfc_retract_or_warn_i(_) :- pfc_silient,!.
-pfc_retract_or_warn_i(X) :-
-  pfc_warn("Couldn't retract ~p.",[X]).
-
+pfc_retract_or_warn_i(X) :- 
+  pfc_warn("Couldn't retract ~p.",[X]),!.
+pfc_retract_or_warn_i(_).
 
 % ======================= pfc_file('pfcdebug').	% debugging aids (e.g. tracing).
 

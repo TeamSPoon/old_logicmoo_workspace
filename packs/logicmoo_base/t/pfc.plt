@@ -250,7 +250,7 @@ isa(Col1, ttObjectType) => ~isa(Col1, ttFormatType).
 => tCol(ttSpatialType).
 => tCol(ttFormatType).
 => tCol(functorDeclares).
-% tCol(ArgsIsa):-functorDeclaresPred(ArgsIsa).
+% tCol(ArgsIsa):-ttPredType(ArgsIsa).
 % TODO decide if OK
 %tCol(F):-t(functorDeclares,F).
 => tCol(ttFormatType).

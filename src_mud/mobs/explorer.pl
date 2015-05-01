@@ -28,9 +28,9 @@ vette_idea(Agent,Act,Act):-dmsg(vette_idea(Agent,Act)).
 
 
 prologHybrid(mudLabelTypeProps/3).
-:-show_pred_info(mudLabelTypeProps/3).
+:- show_pred_info(mudLabelTypeProps/3).
 :- sleep(2.0).
-:-must(arity(mudLabelTypeProps,3)).
+:- must(arity(mudLabelTypeProps,3)).
 
 prologHybrid(typeHasGlyph(tCol,ftString)).
 mudLabelTypeProps('Px',tExplorer,[]).

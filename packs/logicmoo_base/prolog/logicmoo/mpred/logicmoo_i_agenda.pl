@@ -154,7 +154,8 @@ run_database_hooks_0(TypeIn,HookIn):-
 onSpawn(ClassFact):- ClassFact=..[Funct,InstA],
  createByNameMangle(InstA,Inst,Type2),
  assert_isa(Type2,tCol),
- assert_isa(Inst,Funct),assert_isa(Inst,Type2),!.
+ assert_isa(Inst,Funct),
+ assert_isa(Inst,Type2),!.
 onSpawn(ClassFact):- ClassFact=..[Funct|InstADeclB],must_det(onSpawn_f_args(Funct,InstADeclB)).
 
 onSpawn_f_args(Funct,List):-
@@ -297,7 +298,10 @@ createByNameMangle0(InstA,IDA,InstA):- gensym(InstA,IDA), englishServerInterface
 
 
 create_from_type(OType,InstA,Type):- sanity(var(InstA)),
-   i_name(t,OType,Type),atom_concat(Type,'7',InstA7),
+   i_name(OType,TypeWT),
+   atom_concat('t',TypeWT,Type),
+
+   atom_concat(Type,'7',InstA7),
    i_name(i,InstA7,InstA),
    must_det(assert_isa(InstA,Type)),!. 
  % call_after_mpred_load_slow(isa(InstA,Type)).

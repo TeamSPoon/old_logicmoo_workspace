@@ -46,7 +46,7 @@ tCol(ttTypeType).
 tCol(tPathway).
 
 
-user:ruleRewrite(isa(isInstFn(Sub),Super),genls(Sub,Super)):-ground(Sub:Super),!.
+%user:ruleRewrite(isa(isInstFn(Sub),Super),genls(Sub,Super)):-ground(Sub:Super),!.
 user:ruleRewrite(mudLabelTypeProps(Lbl,T,[]),typeHasGlyph(T,Lbl)):-nonvar(T),!.
 user:ruleRewrite(mudLabelTypeProps(Lbl,T,Props),typeProps(T,[typeHasGlyph(Lbl)|Props])):-nonvar(T),!.
 
@@ -157,7 +157,7 @@ dividesBetween(tAgentGeneric,tPlayer,tNpcPlayer).
 => tCol(tRegion).
 => tCol(tContainer).
 
-(mpred_prop(_,meta_argtypes(ArgTypes)),{is_declarations(ArgTypes)}) => meta_argtypes(ArgTypes).
+%(mpred_prop(_,meta_argtypes(ArgTypes)),{is_declarations(ArgTypes)}) => meta_argtypes(ArgTypes).
 
 
 % tCol(Type),(tBinaryPredicate(Pred)/(functor(G,Pred,2),G=..[Pred,isInstFn(Type),Value])), G => relationMostInstance(Pred,Type,Value).
@@ -184,19 +184,18 @@ tCol(tFly).
 %((disjointWith(P1,P2) , genls(C1,P1), {dif:dif(C1,P1)}) =>    disjointWith(C1,P2)).
 % (disjointWith(C1,P2) <= (genls(C1,P1), {dif:dif(C1,P1)}, disjointWith(P1,P2))).
 
-tCol(ttPreAssertedCollection).
+tCol(completelyAssertedCollection).
 tCol(completeIsaAsserted).
 % genls(completeIsaAsserted,tSpatialThing).
-genls(ttPreAssertedCollection,tCol).
-ttPreAssertedCollection(ttPreAssertedCollection).
-ttPreAssertedCollection(tItem).
-ttPreAssertedCollection(tRegion).
-ttPreAssertedCollection(tObj).
-ttPreAssertedCollection(tAgentGeneric).
-ttPreAssertedCollection(tCarryAble).
-ttPreAssertedCollection(vtVerb).
+genls(completelyAssertedCollection,tCol).
+completelyAssertedCollection(tItem).
+completelyAssertedCollection(tRegion).
+completelyAssertedCollection(tObj).
+completelyAssertedCollection(tAgentGeneric).
+completelyAssertedCollection(tCarryAble).
+completelyAssertedCollection(vtVerb).
 
-genls(ttTypeByAction,ttPreAssertedCollection).
+genls(ttTypeByAction,completelyAssertedCollection).
 
 % dividesBetween(tItem,tPathway).
 dividesBetween(tItem,tMassfull,tMassless).
@@ -204,6 +203,7 @@ dividesBetween(tObj,tItem,tAgentGeneric).
 dividesBetween(tObj,tMassfull,tMassless).
 dividesBetween(tSpatialThing,tObj,tRegion).
 dividesBetween(tAgentGeneric,tPlayer,tNpcPlayer).
+
 
 ((dividesBetween(S,C1,C2),{ground(S:C1:C2)}) => ((disjointWith(C1,C2) , genls(C1,S) ,genls(C2,S)))).
 
@@ -258,7 +258,7 @@ tCol(vtVerb).
 %:- compile_predicates([isa/2]).
 %prologHybrid(repl_to_string(tAgentGeneric,term),[prologSingleValued,argSingleValueDefault(2,default_repl_obj_to_string)]).
 % prologHybrid(repl_writer(tAgentGeneric,term),[prologSingleValued,argSingleValueDefault(2,default_repl_writer)]).
-%:- forall(functorDeclaresPred(F),dynamic(F/1)).
+%:- forall(ttPredType(F),dynamic(F/1)).
 %:- foreach(retract(isa(I,C)),assert_hasInstance(C,I)).
 %isa(AT,ttAgentType):- genls(AT,ttAgentGeneric).
 %genls(AT,ttAgentGeneric):- isa(AT,ttAgentType).
@@ -287,15 +287,15 @@ prologHybrid(mudHealth,2).
 prologHybrid(mudMaterial/2).
 prologHybrid(mudMaxHitPoints(tAgentGeneric,ftInt)).
 prologHybrid(mudNeedsLook,2).
-prologHybrid(mudNeedsLook/2,[completelyAssertedCollection]).
+prologHybrid(mudNeedsLook/2,[completeExtentAsserted]).
 prologHybrid(mudShape/2).
 prologHybrid(mudSize/2).
 prologHybrid(mudStowing(tAgentGeneric,tItem)).
 prologHybrid(mudTexture/2).
 prologHybrid(pathBetween/3).
 :-dynamic((latitude/2, mudMoveDist/2, longitude/2)).
-prologOnly(mudMoveDist/2)
-:-dynamic(mudMoveDist/2).
+prologOnly(mudMoveDist/2).
+:- dynamic(mudMoveDist/2).
 meta_argtypes(mudMoveDist(tAgentGeneric,ftInt)).
 prologSingleValued(mudMoveDist,[mpred_module(user),query(call),argSingleValueDefault(2,1)]).
 prologOnly(stat_total/2).
@@ -308,7 +308,7 @@ tCol(vtDirection).
 tCol(vtVerb).
 :- dynamic stat_total/2.
 :- dynamic(spawn_rate/2).
-tCol(tMonster/1).
+tCol(tMonster).
 %prologOnly(user:action_info(vtActionTemplate,ftText)).
 prologOnly(agent_call_command(tAgentGeneric,ftAction)).
 prologOnly(member(ftTerm,ftTerm)).
@@ -319,7 +319,7 @@ prologHybrid(mudToHitArmorClass0 / 2).
 prologHybrid(mudAtLoc/2).
 prologOnly((agent_call_command/2)).
 :-decl_mpred_hybrid(isEach(argIsa/3, formatted_resultIsa/2, typeHasGlyph/2, inRegion/2, mudContains/2, isa/2, mudLabelTypeProps/3, mudMemory/2, mudPossess/2, mudStowing/2, genls/2, mudToHitArmorClass0/2, 
- pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, ttFormatType/1, typeProps/2)).
+ pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completeExtentAsserted/1, ttFormatType/1, typeProps/2)).
 prologHybrid(isEach(argIsa/3, formatted_resultIsa/2, typeHasGlyph/2, inRegion/2, mudContains/2, isa/2, mudLabelTypeProps/3, mudMemory/2, mudPossess/2, mudStowing/2, genls/2, mudToHitArmorClass0/2, 
  pddlSomethingIsa/2, resultIsa/2, subFormat/2, tCol/1, tRegion/1, completelyAssertedCollection/1, ttFormatType/1, typeProps/2)).
 
@@ -576,15 +576,15 @@ dividesBetween(tAgentGeneric,tPlayer,tNpcPlayer).
 
 isa(tRegion,ttTemporalType).
 
-ttPreAssertedCollection(tCol).
-ttPreAssertedCollection(ttFormatType).
-ttPreAssertedCollection(tItem).
-ttPreAssertedCollection(tRegion).
-ttPreAssertedCollection(tObj).
-ttPreAssertedCollection(tAgentGeneric).
-ttPreAssertedCollection(tCarryAble).
-ttPreAssertedCollection(vtVerb).
-genls(ttTypeByAction,ttPreAssertedCollection).
+completelyAssertedCollection(tCol).
+completelyAssertedCollection(ttFormatType).
+completelyAssertedCollection(tItem).
+completelyAssertedCollection(tRegion).
+completelyAssertedCollection(tObj).
+completelyAssertedCollection(tAgentGeneric).
+completelyAssertedCollection(tCarryAble).
+completelyAssertedCollection(vtVerb).
+genls(ttTypeByAction,completelyAssertedCollection).
 
 
 pathConnects(R1,R2):-pathBetween(R1,Dir,R2),nop(Dir).
@@ -673,7 +673,7 @@ dividesBetween(tAgentGeneric,tPlayer,tNpcPlayer).
 => tCol(ttSpatialType).
 => tCol(ttFormatType).
 % => tCol(functorDeclares).
-% tCol(ArgsIsa):-functorDeclaresPred(ArgsIsa).
+% tCol(ArgsIsa):-ttPredType(ArgsIsa).
 % TODO decide if OK
 %tCol(F):-t(functorDeclares,F).
 => tCol(ttFormatType).
@@ -734,6 +734,7 @@ cachedPredicate(vtActionTemplate(_)).
 
 
 tCol(random_path_dir).
+random_path_dir(Dir):-nonvar(Dir),!,fail.
 random_path_dir(Dir):-random_instance(vtBasicDir,Dir,true).
 random_path_dir(Dir):-random_instance(vtBasicDirPlusUpDown,Dir,true).
 random_path_dir(Dir):-random_instance(vtDirection,Dir,true).
@@ -779,7 +780,6 @@ O = [
 
 */
 
-:-pfc_add((prologSingleValued(P,Info)=>(prologSingleValued(P),added(props(P,Info))))).
 /*
 
 (((meta_argtypes(Types)/
