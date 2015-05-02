@@ -151,25 +151,26 @@ run_database_hooks_0(TypeIn,HookIn):-
 % Spawn new instances
 % ========================================
 
-onSpawn(ClassFact):- ClassFact=..[Funct,InstA],
+onSpawn(ClassFact):-fully_expand(ClassFact,ClassFactO),!,onSpawn_0(ClassFactO).
+onSpawn_0(ClassFact):- ClassFact=..[Funct,InstA],
  createByNameMangle(InstA,Inst,Type2),
  assert_isa(Type2,tCol),
  assert_isa(Inst,Funct),
  assert_isa(Inst,Type2),!.
-onSpawn(ClassFact):- ClassFact=..[Funct|InstADeclB],must_det(onSpawn_f_args(Funct,InstADeclB)).
+onSpawn_0(ClassFact):- ClassFact=..[Funct|InstADeclB],must_det(onSpawn_f_args(Funct,InstADeclB)).
 
 onSpawn_f_args(Funct,List):-
-  convertSpawnArgs(Funct,1,List,NewList),
-   Later =.. [t,Funct|NewList],
+  must(convertSpawnArgs(Funct,1,List,NewList)),
+   Later =.. [Funct|NewList],
    add(Later),
   !. 
   % call_after_mpred_load_slow(with_assertions(deduceArgTypes(Funct), add(Later))))),!.
 
 convertSpawnArgs(_,_,[],[]).
 convertSpawnArgs(Funct,N,[A|List],[O|NewList]):-
- convertOneSpawnArg(Funct,N,A,O),!,
+ must(convertOneSpawnArg(Funct,N,A,O)),!,
  N2 is N + 1,
- convertSpawnArgs(Funct,N2,List,NewList).
+ convertSpawnArgs(Funct,N2,List,NewList),!.
 
 convertOneSpawnArg(_,_,O,O):-string(O),!.
 convertOneSpawnArg(_,_,O,O):-number(O),!.
@@ -178,8 +179,8 @@ convertOneSpawnArg(Funct,N,isInstFn(A),O):-spawnOneSpawnArg(Funct,N,A,O).
 convertOneSpawnArg(Funct,N,A,O):-spawnOneSpawnArg(Funct,N,A,O).
 
 spawnOneSpawnArg(Funct,N,A,O):-
- createByNameMangle(A,O,TypeA),assert_isa(TypeA,tCol),
- must(assert_subclass_on_argIsa(Funct,N,TypeA)).
+ createByNameMangle(A,O,TypeA),assert_isa(TypeA,tCol).
+ %must(assert_subclass_on_argIsa(Funct,N,TypeA)).
  
 
 convertOneTypedSpawnArg(Type,A,O):-

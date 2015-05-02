@@ -136,8 +136,6 @@ for obvious reasons.
      fresh_line/1,
      fresh_line/0,
      logOnFailureIgnore/1,
-	 sendNote/1,
-	 sendNote/4,
 	 writeFailureLog/2,
 	% debugOnFailure/2,
      debugOnFailureEach/1,
@@ -277,6 +275,8 @@ hotrace(M:X):-  visible(+exception),leash(+exception),restore_trace((notrace,M:c
      rtrace/1,  % trace why choice points are left over
      must_each/1,  % list block must succeed once .. it smartly only debugs to the last failures
      logOnErrorIgnore/1,
+     logOnError/1,
+     logOnError0/1,
      debugOnFailure/1, % Succeeds but can be set to [Fail or Debug]
      logOnFailure/1,  % Fails unless [+Ignore]
           % can ignore
@@ -300,8 +300,6 @@ hotrace(M:X):-  visible(+exception),leash(+exception),restore_trace((notrace,M:c
      fresh_line/1,
      fresh_line/0,
      logOnFailureIgnore/1,
-	 sendNote/1,
-	 sendNote/4,
 	 writeFailureLog/2,
 	% debugOnFailure/2,
      debugOnFailureEach/1,
@@ -395,9 +393,10 @@ user:is_ftVar('$VAR'(_)).
 not_ftVar(V):-not(is_ftVar(V)).
 
 logOnError(C):-prolog_ecall(0,logOnError0,C).
+:-export(logOnError0/1).
 logOnError0(C):- catchv(C,E,dmsg(logOnError(E,C))).
 logOnErrorEach(C):-prolog_ecall(1,logOnError,C).
-logOnErrorIgnore(C):-ignore(logOnError0(C)).
+logOnErrorIgnore(C):-prolog:ignore(logOnError0(C)).
 
 
 :- meta_predicate(one_must(0,0)).
@@ -557,7 +556,6 @@ moo_show_childs(M,F,A,_MPred):- moo_trace_hidechilds(M,F,A,0,0).
 :- export(static_predicate/3).
 :- meta_predicate(static_predicate(+,+,+)).
 static_predicate(M,F,A):- functor_safe(FA,F,A),  once(M:predicate_property(FA,_)),not(M:predicate_property(FA,dynamic)),not((M:predicate_property(FA,imported_from(Where)),Where \== M)).
-(predicate_property(Head,built_in))
 
 static_predicate(A):-atom(F),!,current_predicate(F/A),!,functor(FA,F,A),static_predicate(FA).
 static_predicate(F/A):-!,atom(F),current_predicate(F/A),!,functor(FA,F,A),static_predicate(FA).
@@ -572,8 +570,15 @@ dynamic_safe(MFA):- with_mfa(MFA,dynamic_safe).
 :- export((((dynamic_safe)/3))).
 :- meta_predicate(dynamic_safe(+,+,+)).
 :- module_transparent((((dynamic_safe)/3))).
+
+convert_to_dynamic(M,F,A):-  functor(C,F,A), M:predicate_property(C,dynamic),!.
+convert_to_dynamic(M,F,A):-  M:functor(C,F,A),\+ predicate_property(C,_),!,M:((dynamic(F/A),multifile(F/A),export(F/A))),!.
+convert_to_dynamic(M,F,A):-  functor(C,F,A),predicate_property(C,number_of_clauses(_)),\+ predicate_property(C,dynamic),
+  findall((C:-B),clause(C,B),List),abolish(C),dynamic(M:F/A),multifile(M:F/A),export(F/A),maplist(assertz,List),!.
+convert_to_dynamic(M,F,A):-  functor(C,F,A),findall((C:-B),clause(C,B),List),abolish(F,A),dynamic(M:F/A),multifile(M:F/A),export(F/A),maplist(assertz,List),!.
+
 dynamic_safe(M,F,A):- functor(C,F,A),predicate_property(C,imported_from(system)),!,dmsg(warn(predicate_property(M:C,imported_from(system)))).
-dynamic_safe(M,F,A):- (static_predicate(M,F,A) -> nop(dmsg(warn(not(M:dynamic(M:F/A))))) ; logOnErrorIgnore(M:dynamic(M:F/A))). % , warn_module_dupes(M,F,A).
+dynamic_safe(M,F,A):- (static_predicate(M,F,A) -> show_call(convert_to_dynamic(M,F,A)) ; logOnErrorIgnore((dynamic(M:F/A),multifile(M:F/A)))). % , warn_module_dupes(M,F,A).
 :-op(1150,fx,user:dynamic_safe).
 
 
@@ -2709,7 +2714,7 @@ fdmsg(fr(List)):-is_list(List),!,fresh_line,ignore(forall(member(E,List),fdmsg1(
 fdmsg(M):-dmsg(M).
 
 dumpST4(N,Frame,Opts,[nf(max_depth,N,Frame,Opts)]):-get_m_opt(Opts,max_depth,100,MD),N>=MD,!.
-dumpST4(N,Frame,Opts,[nf(max_depth,N,Frame,Opts)]):-get_m_opt(Opts,skip_depth,100,SD),N<=SD,!,fail.
+%dumpST4(N,Frame,Opts,[nf(max_depth,N,Frame,Opts)]):-get_m_opt(Opts,skip_depth,100,SD),N=<SD,!,fail.
 dumpST4(N,Frame,Opts,[fr(Goal)|MORE]):- get_m_opt(Opts,show,goal,Ctrl),getPFA(Frame,Ctrl,Goal),!,dumpST_Parent(N,Frame,Opts,MORE).
 dumpST4(N,Frame,Opts,[nf(no(Ctrl),N,Frame,Opts)|MORE]):- get_m_opt(Opts,show,goal,Ctrl),!,dumpST_Parent(N,Frame,Opts,MORE).
 dumpST4(N,Frame,Opts,[nf(noFrame(N,Frame,Opts))]).
@@ -2735,19 +2740,6 @@ clauseST(ClRef,Goal = HB):- ignore(((clause(Head, Body, ClRef),copy_term(((Head 
    snumbervars(HB,0,_),
    findall(Prop,(member(Prop,[source(_),line_count(_),file(_),fact,erased]),clause_property(ClRef,Prop)),Goal).
 
-
-:-ib_multi_transparent33(seenNote/1).
-
-sendNote(X):-var(X),!.
-sendNote(X):-seenNote(X),!.
-sendNote(X):-!,assert(seenNote(X)).
-sendNote(_).
-
-sendNote(To,From,Subj,Message):-sendNote(To,From,Subj,Message,_).
-
-sendNote(To,From,Subj,Message,Vars):-
-	not(not((safe_numbervars((To,From,Subj,Message,Vars)),
-	dmsg(sendNote(To,From,Subj,Message,Vars))))).
 
 % ========================================================================================
 % safe_numbervars/1 (just simpler safe_numbervars.. will use a rand9ome start point so if a partially numbered getPrologVars wont get dup getPrologVars)

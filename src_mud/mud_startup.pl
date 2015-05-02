@@ -28,7 +28,7 @@
 
 % [Optionaly] Set up the Prolog optimize/debug flags
 %:- set_prolog_flag(debug,false).
-:- set_optimize(false).
+:- set_optimize(true).
 
 
 % [Optionaly] load the mpred_online system

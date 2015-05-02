@@ -218,11 +218,11 @@ win_fork(G,SERVIO,PID):-atom_concat('swipl-win.exe ',G,AC),writeq(win_fork(AC,SE
 show_file_search_path:- % 'format'('% ~q.~n',[forall(user:file_search_path(_,_))]), 
   forall(user:file_search_path(A,B),'format'('% ~q.~n',[user:file_search_path(A,B)])).
 
-:-show_file_search_path.
+:- show_file_search_path.
 
 % :- list_undefined.
 
-:- logicmoo_util_dcg:do_dcg_util_tests.
+:- logicmoo_util_dcg:call(do_dcg_util_tests).
 
 
 % this is a backwards compatablity block for SWI-Prolog 6.6.6

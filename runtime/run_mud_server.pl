@@ -41,7 +41,6 @@ user:file_search_path(prologmud, '../packs/prologmud/prolog/prologmud/').
 tCol(tLivingRoom).
 genls(tLivingRoom,tRegion).
 genls(tOfficeRoom,tRegion).
-prologHybrid(pathConnects(tRegion,tRegion),tSymmetricRelation).
 
 tAgentGeneric(iCommanderData66).
 isa(iCommanderData66,'tExplorer').
@@ -54,12 +53,12 @@ pddlSomethingIsa('iComBadge674',['tComBadge','ProtectiveAttire','PortableObject'
 pddlSomethingIsa('iGoldUniform675',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iPhaser676',['tPhaser','Handgun',tWeapon,'LightingDevice','PortableObject','DeviceSingleUser','tWearAble']).
 
-tAgentGeneric(iExplorer1).
-wearsClothing(iExplorer1,'iBoots773').
-wearsClothing(iExplorer1,'iComBadge774').
-wearsClothing(iExplorer1,'iGoldUniform775').
-isa(iExplorer1,'tExplorer').
-mudStowing(iExplorer1,'iPhaser776').
+tAgentGeneric(iExplorer7).
+wearsClothing(iExplorer7,'iBoots773').
+wearsClothing(iExplorer7,'iComBadge774').
+wearsClothing(iExplorer7,'iGoldUniform775').
+isa(iExplorer7,'tExplorer').
+mudStowing(iExplorer7,'iPhaser776').
 pddlSomethingIsa('iBoots773',['tBoots','ProtectiveAttire','PortableObject','tWearAble']).
 pddlSomethingIsa('iComBadge774',['tComBadge','ProtectiveAttire','PortableObject','tNecklace']).
 pddlSomethingIsa('iGoldUniform775',['tGoldUniform','ProtectiveAttire','PortableObject','tWearAble']).
@@ -68,20 +67,22 @@ pddlSomethingIsa('iPhaser776',['tPhaser','Handgun',tWeapon,'LightingDevice','Por
 isa(iCommanderData66,'tMonster').
 mudDescription(iCommanderData66,txtFormatFn("Very screy looking monster named ~w",[iCommanderData66])).
 
-:-onSpawn(pathConnects(tLivingRoom,tOfficeRoom)).
-:-onSpawn(localityOfObject(iExplorer1,'tLivingRoom')).
-:-onSpawn(localityOfObject(iCommanderData66,'tOfficeRoom')).
+
+:-onSpawn(localityOfObject(tExplorer,tLivingRoom)).
+:-onSpawn(localityOfObject(iCommanderData66,tOfficeRoom)).
 :-onSpawn(pathConnects(tLivingRoom,tOfficeRoom)).
 
 
+mpred_argtypes(pathConnects(tRegion,tRegion)).
+mpred_argtypes(ensure_some_pathBetween(tRegion,tRegion)).
 
 % arity(do_ensure_some_pathBetween,0).
 ensure_some_pathBetween(R1,R2):- pathBetween(R1,_,R2),!.
 ensure_some_pathBetween(R1,R2):- pathBetween(R2,_,R1),!.
-ensure_some_pathBetween(R1,R2):- random_path_dir(Dir), not(pathBetween(R1,Dir,_)),must(reverse_dir(Dir,Rev)),not(pathBetween(R2,Rev,_)),!, must((add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)))),!.
-ensure_some_pathBetween(R1,R2):- must((add(pathBetween(R1,skPathFn(vtDirection,R1,R2),R2)),add(pathBetween(R2,skPathFn(vtDirection,R2,R1),R1)))),!.
+ensure_some_pathBetween(R1,R2):- random_path_dir(Dir), not(pathBetween(R1,Dir,_)),must(reverse_dir(Dir,Rev)),not(pathBetween(R2,Rev,_)),!, 
+   must((add(pathBetween(R1,Dir,R2)),add(pathBetween(R2,Rev,R1)))),!.
+ensure_some_pathBetween(R1,R2):- must((add(pathBetween(R1,apathFn(R1,R2),R2)),add(pathBetween(R2,apathFn(R2,R1),R1)))),!.
 
-tPred(pathConnects(tRegion,tRegion)).
 % isa(user:do_ensure_some_pathBetween,prologOnly).
 
 do_ensure_some_pathBetween:-

@@ -130,16 +130,15 @@ decl_mpred_hybrid_ilc(CM,M,PI,F/A):-atom(PI),A==0,must(arity(F,_)),not(current_p
 decl_mpred_hybrid_ilc(CM,M,PIN,F/A):- unnumbervars(PIN,PI),loop_check_term(decl_mpred_hybrid_ilc_0(CM,M,PI,F/A),decl_mpred_hybrid_ilc(CM,M,F),true).
 decl_mpred_hybrid_ilc_0(CM,M,PI,F/A):-
       assert_arity(F,A),
-      add(mpred_module(PI,M)),
-      add(user:mpred_prop(PI,prologHybrid)),
+      add(mpred_module(F,M)),
+      add(prologHybrid(F)),
       get_cc(PI,NC),
-      must(not(user:mpred_prop(F,prologOnly))),
-      must(arity(F,A)),
       must(M=user),     
       decl_mpred_mfa(M,F,A),
       decl_mpred_pi(PI),
       must(user:provide_mpred_setup(call(conjecture),F/A,prologHybrid,_OUT)),
-      must(get_cc(PI,NC)).
+      must((get_cc(PI,NCN),NCN>=NC)).
+
 
 
 :-op(1120,fx,(decl_mpred_hybrid)).
@@ -150,23 +149,6 @@ prologHybrid(X,Y):-dtrace(prologHybrid(X,Y)).
 % ========================================
 % mpred_props database
 % ========================================
-user:mpred_prop(resolveConflict,mpred_module(user)).
-user:mpred_prop(pfc_select,mpred_module(user)).
-user:mpred_prop(agent_text_command/4,prologOnly).
-%user:mpred_prop(t,prologOnly).
-user:mpred_prop(member/2,prologOnly).
-user:mpred_prop(arity/2,prologOnly).
-user:mpred_prop(user:mpred_prop/2,prologOnly).
-user:mpred_prop(is_never_type/1,prologOnly).
-user:mpred_prop(term_expansion/2,prologOnly).
-user:mpred_prop(var/1,prologOnly).
-user:mpred_prop(F,Prop):- atom(Prop), current_predicate(t/2),  (nonvar(Prop)->(t(Prop, F));((t(ttPredType,Prop)),(t(Prop, F)))).
-user:mpred_prop(F,Prop):-nonvar(F),mpred_prop_nvh(F,Prop).
-%user:mpred_prop(F,tCol):-current_predicate(tCol/1),tCol(F).
-
-mpred_prop_nvh(H0,user:mpred_prop(Prop)):-get_arity(H0,F,A),atom(F),integer(A),functor(H,F,A),predicate_property(H,Prop).
-mpred_prop_nvh(H0,(Prop)):-nonvar(Prop),get_arity(H0,F,A),atom(F),integer(A),functor(H,F,A),predicate_property(H,Prop).
-mpred_prop_nvh(H,Prop):-get_functor(H,F,A), H \=@= F, !,user:mpred_prop(F,Prop).
 
 /*
 
@@ -188,11 +170,11 @@ listprolog:-listing(user:mpred_prop(_,prologOnly)).
 
 
 get_arity(Term,F,A):- atom(Term),F=Term,!,ensure_arity(F,A).
-get_arity(F/A,F,A):- atom(F),ensure_arity(F,A),!.
+get_arity(F/A,F,A):- atom(F),ensure_arity(F,A),!,(A>0).
 get_arity(M:FA,F,A):-atom(M),!,get_arity(FA,F,A).
-get_arity(FA,F,A):- get_functor(FA,F,A).
+get_arity(FA,F,A):- get_functor(FA,F,A),must(A>0).
 
-ensure_arity(F,A):- one_must(arity(F,A),one_must((current_predicate(F/A),assert_arity(F,A)),(ground(F:A),assert_arity(F,A)))),!.
+ensure_arity(F,A):- one_must(arity(F,A),one_must((current_predicate(F/A),(A>0),assert_arity(F,A)),(ground(F:A),(A>0),assert_arity(F,A)))),!.
 
 assert_arity(F,A):-not(atom(F)),trace_or_throw(assert_arity(F,A)).
 assert_arity(F,A):-not(integer(A)),trace_or_throw(assert_arity(F,A)).
@@ -263,10 +245,8 @@ decl_mpred_2(_,meta_argtypes(FARGS)):- functor(FARGS,_,A),arg(A,FARGS,Arg),var(A
 % decl_mpred_2(F,prologHybrid):- decl_mpred_hybrid(F).
 decl_mpred_2(F,cycPlus2(A)):- ensure_universal_stub_plus_2(F,A).
 
-decl_mpred_2(F,Prop):-user:mpred_prop(F,Prop),!.
-decl_mpred_2(F,Prop):-hooked_asserta(user:mpred_prop(F,Prop)),fail.
-
 decl_mpred_2(F,A):-once(user:provide_mpred_write_attributes(F,A)).
+decl_mpred_2(F,Prop):-add(mpred_prop(F,Prop)).
 
 decl_mpred(Mt,F,A):-decl_mpred(F,A),ignore((nonvar(Mt),decl_mpred(F,mt(Mt)))).
 decl_mpred_4(_CM,M,PI,F/A):-

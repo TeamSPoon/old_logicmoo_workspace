@@ -60,6 +60,7 @@ never_type_f(_:W):-!,never_type_f(W).
 never_type_f(':-').
 never_type_f('include').
 never_type_f('tCol'):-!,fail.
+never_type_f('clause_asserted').
 never_type_f('onSpawn').
 never_type_f('ensure_loaded').
 never_type_f('declare_load_dbase').
@@ -287,7 +288,7 @@ not_mud_isa0(ttTemporalType,tTemporalThing).
 %not_mud_isa0(I,C):- compound(I),!, \+ a(C,I).
 not_mud_isa(I,C):-not_mud_isa(I,C,_).
 
-not_mud_isa(F, CAC,completelyAssertedCollection(CAC)):- completelyAssertedCollection(CAC),!,G=..[CAC,F],\+(clause_asserted(G)).
+not_mud_isa(F, CAC,completelyAssertedCollection(CAC)):- completelyAssertedCollection(CAC),!,atom(CAC),G=..[CAC,F],\+(clause_asserted(G)).
 not_mud_isa(I,C,Why):-not_mud_isa0(I,C),Why=not_mud_isa0(I,C).
 not_mud_isa(G,tTemporalThing,Why):- ((a(tCol,G),Why=a(tCol,G));(tPred(G),Why=tPred(G))).
 not_mud_isa(G,tCol,Why):-never_type_why(G,Why).
@@ -295,6 +296,7 @@ not_mud_isa(G,tCol,Why):-never_type_why(G,Why).
 % ==========================
 % isa_backchaing(i,c)
 % ==========================
+isa(I,T):- nonvar(T)->true;((no_repeats(ttTemporalType(T);tSet(T);tCol(T)),atom(T)), loop_check(isa_backchaing(I,T))).
 isa(F,P):- loop_check(isa_backchaing(F,P)).
 %a(P,F):-loop_check(isa(F,P)).
 %a(T,I):- thglobal:pfcManageHybrids,clause_safe(isa(I,T),true).
@@ -456,7 +458,7 @@ assert_isa_safe(O,T):- ignore((nonvar(O),nonvar(T),decl_type_safe(T),assert_isa(
 guess_supertypes(W):-atom(W),atomic_list_concat(List,'_',W),length(List,S),S>2,!, append(FirstPart,[Last],List),atom_length(Last,AL),AL>3,not(member(flagged,FirstPart)),
             atomic_list_concat(FirstPart,'_',_NewCol),show_call_failure(assert_subclass_safe(W,Last)).
 guess_supertypes(W):-atom(W),to_first_break(W,lower,tt,_,upper),!,assert_isa(W,ttTypeType),!.
-guess_supertypes(W):-atom(W),T=a,to_first_break(W,lower,T,All,upper),!,to_first_break(All,upper,_,Super,Rest),
+guess_supertypes(W):-atom(W),T=t,to_first_break(W,lower,T,All,upper),!,to_first_break(All,upper,_,Super,Rest),
    atom_length(Rest,L),!,L>2,i_name(T,Rest,Super),show_call_failure(assert_subclass_safe(W,Super)),!.
 
 /*

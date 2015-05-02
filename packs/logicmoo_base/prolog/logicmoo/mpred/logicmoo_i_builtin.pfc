@@ -39,6 +39,26 @@
 
 :- pfc_begin.
 
+% this mean to leave terms at EL:  foo('QuoteFn'([cant,touch,me])).
+argsQuoted('QuoteFn').
+quasiQuote('QuoteFn').
+argsQuoted(pfc_add).
+argsQuoted(meta_argtypes).
+argsQuoted(ttFormated).
+argsQuoted(ruleRewrite).
+argsQuoted(pathConnects).
+argsQuoted(pfc_action).
+argsQuoted(pfc_assert).
+argsQuoted(pfc_rem).
+argsQuoted(added).
+argsQuoted(call).
+argsQuoted(call_u).
+argsQuoted(member).
+argsQuoted(=..).
+argsQuoted({}).
+argsQuoted(second_order).
+% argsQuoted((':-')).
+
 
 neg(tCol({})).
 
@@ -82,21 +102,38 @@ neg(tCol(genlPreds)).
 neg(arity(argIsa,1)).
 arity(pddlObjects,2).
 
-(arity(F,A)/(atom(F),tPred(F),integer(A),A>1) => (not_col(F),support_2nd_order(F,A))).
+tPred(F),arity(F,A)/(integer(A),A>1) => (not_col(F),support_hilog(F,A)).
 
 (not_col(C) => ( \+ tCol(C), \+ completelyAssertedCollection(C),  neg(tCol(C)))).
 
-(((support_2nd_order(F,A)/(atom(F),integer(A)))) => 
-  ({ functor(Head,F,A),
-  \+ static_predicate(Head),  
-   dynamic_safe(F/A),
-   show_call(discontiguous(F/A)),
-   multifile(F/A),
-   Head=..[F|TTs],TT=..[t,F|TTs]},
+(((support_hilog(F,A)/(atom(F),integer(A),\+ static_predicate(F/A), \+ prologOnly(F)))) =>
+   (hybrid_support(F,A), 
+   {functor(Head,F,A) ,Head=..[F|TTs],TT=..[t,F|TTs]},
    added((Head :- cwc, second_order(TT,CuttedCall), ((CuttedCall=(C1,!,C2)) -> (C1,!,C2);CuttedCall))))).
+
+(((hybrid_support(F,A)/(atom(F),integer(A),\+ static_predicate(F/A), \+ prologOnly(F)))) =>
+  (({  
+    functor(Head,F,A),
+   dynamic_safe(F/A),
+    must(( \+ static_predicate(Head))),
+   show_call(discontiguous(F/A)),
+    multifile(F/A)}),
+   prologHybrid(F),
+   arity(F,A))).
+
+prologHybrid(F),arity(F,A)=>hybrid_support(F,A).
 
 arity(genlPreds,2).
 
+tPred(resolveConflict,mpred_module(user)).
+tPred(pfc_select,mpred_module(user)).
+tPred(agent_text_command/4,prologOnly).
+%tPred(t,prologOnly).
+tPred(member/2,prologOnly).
+tPred(arity/2,prologOnly).
+tPred(is_never_type/1,prologOnly).
+tPred(term_expansion/2,prologOnly).
+tPred(var/1,prologOnly).
 
 tCol(completelyAssertedCollection).
 completelyAssertedCollection(completelyAssertedCollection).
@@ -147,7 +184,7 @@ ttPredType(P)=>(tSet(P),completelyAssertedCollection(P)).
 
 tCol(C)=>completelyAssertedCollection(C).
 
-tCol(C)/(atom(C),TCI=..[C,I]) => {decl_type(C),nop(pfc_univ(C,I,TCI))},arity(C,1).
+tCol(C)/(atom(C),TCI=..[C,I]) => {decl_type(C)},arity(C,1),pfc_univ(C,I,TCI).
 (tCol(C)/(atom(C),TCI=..[C,I],\+ static_predicate(TCI) )) => {dynamic(C/1)}.
 (tCol(C)/(atom(C),TCI=..[C,I],\+ static_predicate(TCI), \+completelyAssertedCollection(C))) => added((TCI:-cwc,isa_backchaing(I,C))).
 
@@ -185,7 +222,7 @@ ttPredType(X)=>tCol(X).
 
 tSet(ttFormatType).
 
-isa(I,C):- pfc_univ(C,I,CI),current_predicate(C/1,CI)->call(CI).
+isa(I,C):-pfc_univ(C,I,CI),atom(C),current_predicate(C/1,CI)->call(CI).
 
 
 
@@ -216,8 +253,8 @@ ttFormatType(P) => {get_functor(P,C), functor(Head,C,1),
    neg(functorDeclares(C)),
    % isa(C,prologOnly),
    arity(C,1),
-   (clause_asserted(Head)/predicate_property(Head,dynamic)=>{retract(Head)}),
-   (clause_asserted(isa(I,C))=>{retract(isa(I,C))}).
+   ((Head)/predicate_property(Head,dynamic)=>{retract(Head)}),
+   ((isa(I,C))=>{retract(isa(I,C))}).
 
 arity(prologMacroHead,1).
 
@@ -239,16 +276,6 @@ isa(pddlSomethingIsa/2, prologHybrid).
 
 arity(argIsa,3).
 
-(ttPredType(P),(arity(P,N)/N==1)) => {get_functor(P,C),
-  dmsg(ttPredType(P)),
-  must(P\==argIsa),
-  functor(Head,C,1),
-  (\+(predicate_property(Head,_))->dynamic(C/1);true),  
-  Head=..[C,I],
- (predicate_property(Head,dynamic)->true;show_pred_info(Head))},
-   isa(C,pfcControlled),
-   arity(C,1).
-   % (isa(I,C)/ground(I:C)=>Head).
 
 %:-rtrace.
 %genls(X,tPred) <=> ttPredType(X).
@@ -311,15 +338,6 @@ ttTemporalType(T)=>tCol(T).
 
 arity(argQuoted,1).
 
-% this mean to leave terms at EL:  foo('QuoteFn'([cant,touch,me])).
-argsQuoted('QuoteFn').
-quasiQuote('QuoteFn').
-argsQuoted(pfc_add).
-argsQuoted(pfc_action).
-
-argsQuoted(call).
-argsQuoted(member/2).
-
 
 ((isa(Inst,ttTemporalType), tCol(Inst)) => genls(Inst,tTemporalThing)).
 
@@ -341,7 +359,7 @@ disjointWith(ttTemporalType,ttAbstractType).
 
 isa(tRelation,ttAbstractType).
 
-(tCol(Inst), {isa_from_morphology(Inst,Type)}) => isa(Inst,Type).
+(tCol(Inst), {isa_from_morphology(Inst,Type)}) => added(isa(Inst,Type)).
 
 % HOW TO MAKE THIS FAST?  isa(Inst,Type) <= {isa_from_morphology(Inst,Type)}.
 
@@ -417,9 +435,8 @@ ttPredType(H)/atom(H) =>  {THP=..[H,P] % , THFA=..[H,F/A],THF=..[H,F]
 % if p(foo,1)) is a fact and we assert_db p(foo,2), then the forrmer assertion
 % is retracted.
 mpred_sv(Pred,Arity)
-  =>
+  => hybrid_support(Pred,Arity),
   {
-   show_call(dynamic(Pred/Arity)),
    length(AfterList,Arity),
    append(Left,[A],AfterList),
    append(Left,[B],BeforeList),
@@ -497,16 +514,16 @@ tCol(X)=>{decl_type(X)}.
 
 :-dynamic(mpred_module/2).
 :-decl_mpred(mpred_module/2).
-mpred_prop(F,mpred_module(M))/ground(M:F) => mpred_module(F,M).
+
 meta_argtypes(mpred_module(tPred,tPrologModule)).
 :-debug.
-%:-rtrace.
+
 prologHybrid(mpred_module, 2).
 prologMultiValued(mpred_module(tRelation,ftAtom)).
 
 
-%pddlObjects(Type,EList)/(as_list(EList,List),IsaEach=..[isEach|List]) => isa(IsaEach,Type).
-%pddlSorts(Type,EList)/(as_list(EList,List),IsaEach=..[isEach|List]) => genls(IsaEach,Type).
+% pddlObjects(Type,EList)=>  isa(isEach(EList),Type).
+% pddlSorts(Type,EList)=> genls(isEach(EList),Type).
 
 
 :-dynamic(argIsa/3).
@@ -653,7 +670,7 @@ ttFormatted(exactStr(ftString)).
 resultIsa(F,C)=>(isa(F,'tFunction'),isa(C,ftSpec)).
 resultIsa(ftDeplictsFn,ftSpec).
 
-user:mpred_prop(quotedDefnIff/2,prologOnly).
+tPred(quotedDefnIff/2,prologOnly).
 
 isa(argIsa,prologHybrid).
 isa(determinerString, prologMultiValued).
@@ -845,12 +862,13 @@ isa(arity,tBinaryPredicate).
 :-must(pfc_add(tCol('UnaryPredicate'))).
 
 
-pfcMark(_Type,_,F,A)/(A>1,F\==arity)=>pfcControlled(F).
+pfcMark(_Type,_,F,A)/(A>1,F\==arity)=>arity(F,A),pfcControlled(F).
 
 pfc_mark_C(G) => {pfc_mark_C(G)}.
 pfc_mark_C(G) :-  map_literals(pfc_lambda([P],(get_functor(P,F,A),pfc_add([isa(F,pfcControlled),arity(F,A)]))),G).
 
-( pfcControlled(F)/atom(F), arity(F,A),{\+ current_predicate(F/A) } ) => support_2nd_order(F,A).
+((pfcControlled(C)/(get_arity(C,F,A),arity(F,A))) => support_hilog(F,A)).
+
 pfcControlled(C)/compound(C)=>({decl_mpred_hybrid(C),get_functor(C,F,A)},arity(F,A),pfcControlled(F)).
 isa(F,pfcMustFC) => pfcControlled(F).
 
@@ -861,9 +879,8 @@ prologOnly(X)/compound(X)=>{decl_mpred_prolog(X)}.
 pfcControlled(X)/compound(X)=>{once(X=(F/A);get_functor(X,F,A)),dynamic(F/A),multifile(F/A),decl_mpred_hybrid(X)}.
 
 
-pfcControlled(C)/nonvar(C)=>prologHybrid(C).
+pfcControlled(C)=>prologHybrid(C).
 
-((prologHybrid(C),{get_functor(C,F,A),C\=F}) => ({dynamic(F/A),discontiguous(F/A)},arity(F,A))).
 
 pfcMark(pfcRHS,_,F,A)/(atom(F),integer(A),F\==arity)=>tPred(F).
 
@@ -889,11 +906,12 @@ quotedIsa(I,C):- cwc, term_is_ft(I,C).
 
 :-time(pfc_add((((arity(Pred,2),tPred(Pred)) <=> isa(Pred,tBinaryPredicate))))).
 
+% if arity is ever greater than 1 it can never become 1
+arity(F,A)/(number(A),A>1) => neg(arity(F,1)).
 
 completelyAssertedCollection(tBinaryPredicate).
 
 prologHybrid(relationMostInstance(tBinaryPredicate,tCol,ftValue)).
-
 
 
 
@@ -948,7 +966,7 @@ tCol(vtTestType).
 vtTestType(vTest1).
 vtTestType(vTest2).
 
-:-must(not(user:mpred_prop(t,prologHybrid))).
+%:-must(not(tPred(prologHybrid))).
 % prologHybrid(function_corisponding_predicate(tFunction,tPred)).
 
 :- sanity(tCol(tCol)).
@@ -1096,7 +1114,7 @@ tCol(tBird).
 %(pfc_default((P => Q))/pfc_literal(Q)) => (Q <=(P, ~neg(Q))).
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 
- neg(P) <= {pfcVerifyMissing(P,F,Test)},Test,{F\=P}.
+neg(P) <= {pfcVerifyMissing(P,F,Test)},Test,{F\=P}.
 
 % is this how to define constraints?
 either(P,Q) => (neg(P) => Q), (neg(Q) => P).

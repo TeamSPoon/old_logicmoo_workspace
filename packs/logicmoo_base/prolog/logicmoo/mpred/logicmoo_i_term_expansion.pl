@@ -41,25 +41,22 @@ is_relation_type(P):-is_pred_declarer(P).
 functor_declares_instance(decl_mpred,tPred).
 functor_declares_instance(decl_mpred_hybrid,prologHybrid).
 functor_declares_instance(decl_mpred_prolog,prologOnly).
-functor_declares_instance(prologSideEffects,tPred).
 
+functor_declares_instance(prologSideEffects,tPred).
 functor_declares_instance(tPred,tPred).
-functor_declares_instance(meta_argtypes,tRelation).
-functor_declares_instance(prologMacroHead,tRelation).
-functor_declares_instance(tFunction,tFunction).
 functor_declares_instance(P,tPred):- arg(_,s(tPred,prologMultiValued,mpred_prop,user:mpred_prop,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,
        predCanHaveSingletons,prologOnly,prologMacroHead,prologListValued,prologSingleValued),P).
 
+functor_declares_instance(meta_argtypes,meta_argtypes).
+functor_declares_instance(prologMacroHead,prologMacroHead).
+functor_declares_instance(tFunction,tFunction).
 functor_declares_instance(P,tCol):- arg(_,s(tCol,tSpec,ttFormatType),P).
 %functor_declares_instance(P,tPred):-isa_asserted(P,ttPredType),!.
 %functor_declares_instance(P,tCol):-isa_asserted(P,functorDeclares),\+functor_declares_instance(P,tPred).
 
-functor_declares_instance_i(P,P):-arity(P,1).
+functor_declares_instance(P,P):-arity(P,1),\+((arity(P,N),N>1)).
 
-
-functor_declares_type(typeInst,tCol).
-
-functor_declares_type_genls(typeProps,tCol).
+functor_declares_collection(typeProps,tCol).
 
 instTypePropsToType(instTypeProps,ttSpatialType).
 expand_to_hb((HH:-BB),HH,BB):-!.
@@ -94,15 +91,7 @@ db_expand_maplist(FE,List,T,G,O):-findall(M, (member(T,List),call(FE,G,M)), ML),
 %   SIMPLISTIC REWRITE (this is not the PRECANONICALIZER)
 % ================================================
 
-as_is_term(M:NC):-atom(M),!,compound(NC),functor(NC,Op,2),infix_op(Op,_).
-as_is_term(NC):-var(NC),!.
-as_is_term('$VAR'(_)):-!.
-/*
-as_is_term('call'(_)):-!.
-as_is_term('{}'(_)):-!.
-as_is_term('ignore'(_)):-!.
-as_is_term(NC):-compound(NC),functor(NC,Op,2),infix_op(Op,_).
-*/
+
 
 :-moo_hide_childs(fully_expand/3).
 
@@ -111,6 +100,7 @@ must_expand(props(_,_)).
 must_expand(typeProps(_,_)).
 must_expand(G):-functor(G,_,A),!,A==1.
 
+fully_expand(X,Y):-fully_expand(_,X,Y).
 % fully_expand_warn(_,C,C):-!.
 fully_expand_warn(A,B,O):-must(fully_expand(A,B,C)),!,must(same_terms(B,C)),(O=C;must(same_terms(O,C))),!.
 
@@ -128,13 +118,17 @@ fully_expand(Op,Sent,SentO):-fully_expand_now(Op,Sent,SentO),!.
 fully_expand_now(_,Sent,SentO):-not(compound(Sent)),!,Sent=SentO.
 fully_expand_now(_,Sent,SentO):-thlocal:infSkipFullExpand,!,must(Sent=SentO).
 fully_expand_now(_,(:-(Sent)),(:-(Sent))):-!.
-fully_expand_now(Op,Sent,SentO):- with_assertions(thlocal:disable_mpred_term_expansions_locally, must(fully_expand_clause(Op,Sent,BO))),!,must(notrace((SentO=BO))),
-   ignore(((notrace((Sent\=@=SentO, (Sent\=isa(_,_)->SentO\=isa(_,_);true), 
+fully_expand_now(Op,Sent,SentO):- copy_term(Sent,NoVary),with_assertions(thlocal:disable_mpred_term_expansions_locally,
+   must(fully_expand_clause(Op,Sent,BO))),!,must(notrace((SentO=BO))),
+    must(Sent=@=NoVary),
+
+   ignore(((fail,notrace((Sent\=@=SentO, (Sent\=isa(_,_)->SentO\=isa(_,_);true), 
     (Sent \=@= user:SentO), dmsg(fully_expand(Op,(Sent --> SentO)))))))),!.
 
 fully_expand_clause(_,Sent,SentO):-not(compound(Sent)),!,must(SentO=Sent).
 fully_expand_clause(Op,Sent,SentO):-var(Op),!,fully_expand_clause(is_asserted,Sent,SentO),!.
 fully_expand_clause(_ ,NC,NC):- as_is_term(NC),!.
+fully_expand_clause(_ ,arity(F,A),arity(F,A)):-!.
 fully_expand_clause(Op ,NC,NCO):- db_expand_final(Op,NC,NCO),!.
 fully_expand_clause(Op,'=>'(Sent),(SentO)):-!,fully_expand_clause(Op,Sent,SentO),!.
 fully_expand_clause(Op,':-'(Sent),Out):-!,fully_expand_goal(Op,Sent,SentO),!,must(Out=':-'(SentO)).
@@ -144,7 +138,19 @@ fully_expand_clause(Op, HB,HHBB):- must((to_reduced_hb(Op,HB,H,B),fully_expand_h
 fully_expand_head(Op,Sent,SentO):- must(with_assertions(thlocal:into_form_code,transitive_lc(db_expand_term(Op),Sent,SentO))),!.
 fully_expand_goal(Op,Sent,SentO):- must(with_assertions(thlocal:into_form_code,transitive_lc(db_expand_term(Op),Sent,SentO))),!.
 
-db_expand_term(_,Sent,SentO):-not_ftVar(Sent),if_defined(user:ruleRewrite(Sent,SentO),fail).
+
+as_is_term(M:NC):-atom(M),!,compound(NC),functor(NC,Op,2),infix_op(Op,_).
+as_is_term(NC):-var(NC).
+as_is_term('$VAR'(_)).
+as_is_term(true).
+as_is_term('call'(_)).
+as_is_term('{}'(_)).
+as_is_term('ignore'(_)).
+/*
+as_is_term(NC):-compound(NC),functor(NC,Op,2),infix_op(Op,_).
+*/
+
+db_expand_term(_,Sent,SentO):-not_ftVar(Sent),copy_term(Sent,NoVary),if_defined(user:ruleRewrite(Sent,SentO),fail),Sent\=@=NoVary,SentO \=@= Sent.
 
 db_expand_term(Op,Sent,SentO):- Op==callable, quasiQuote(QQuote),subst(Sent,QQuote,isEach,MID),Sent\=@=MID,!,db_expand_term(Op,MID,SentO).
 db_expand_term(Op,Sent,SentO):- db_expand_final(Op ,Sent,SentO),!.
@@ -175,13 +181,16 @@ db_expand_final(_ ,meta_argtypes(F,Args),    meta_argtypes(Args)):-atom(F),!,fun
 db_expand_final(_ ,meta_argtypes(Args),      meta_argtypes(Args)):-!.
 db_expand_final(_ ,isa(Args,Meta_argtypes),  meta_argtypes(Args)):-Meta_argtypes==meta_argtypes,!,compound(Args),!,functor(Args,Pred,A),assert_arity(Pred,A).
 db_expand_final(Op,(A,B),(AA,BB)):-!,db_expand_final(Op,A,AA),db_expand_final(Op,B,BB).
-db_expand_final(Op,props(A,B),PROPS):- (nonvar(A);nonvar(B)),!,expand_props(Op,props(A,B),Props),!,Props\=props(_,_),db_expand_term(Op,Props,PROPS).
+db_expand_final(Op,props(A,B),PROPS):- (nonvar(A);nonvar(B)),!,expand_props(_,Op,props(A,B),Props),!,Props\=props(_,_),db_expand_term(Op,Props,PROPS).
 db_expand_final(_, MArg1User, NewMArg1User):- compound(MArg1User), fail,
    MArg1User=..[M,Arg1,Arg2|User],
    compound_all_open(Arg1),
    get_functor(Arg1,F,A),F\==(t),F\==(/),
    member(F,[arity,mpred_module]),
    NewMArg1User=..[M,F/A,Arg2|User],!.
+
+
+listToE(EL,E):-as_list(EL,List),E=..[isEach|List].
 
 
 db_expand_chain(_,M:PO,PO) :- atom(M),!.
@@ -208,8 +217,8 @@ db_expand_0(Op,(Term1,Term2),Out):- Term1==Term2,!,db_expand_0(Op,Term1,Out).
 db_expand_0(Op,(:-(CALL)),(:-(CALLO))):-with_assert_op_override(Op,db_expand_0(Op,CALL,CALLO)).
 db_expand_0(Op,isa(I,O),INot):-Not==not,!,INot =.. [Not,I],!,db_expand_term(Op,INot,O).
 
-db_expand_0(Op,RDF,OUT):- RDF=..[SVO,S,V,O],is_svo_functor(SVO),!,must_det(from_univ(Op,[V,S,O],OUT)).
-db_expand_0(Op,G,OUT):- G=..[Pred,InstFn,VO],InstFn=isInstFn(Type),nonvar(Type),from_univ(Op,[relationMostInstance,Pred,Type,VO],OUT).
+db_expand_0(Op,RDF,OUT):- RDF=..[SVO,S,V,O],is_svo_functor(SVO),!,must_det(from_univ(t,Op,[V,S,O],OUT)).
+db_expand_0(Op,G,OUT):- G=..[Pred,InstFn,VO],InstFn=isInstFn(Type),nonvar(Type),from_univ(relationMostInstance,Op,[Pred,Type,VO],OUT).
 db_expand_0(Op,G,OUT):- G=..[Pred,InstFn|VO],InstFn=isInstFn(Type),nonvar(Type),GO=..[Pred,Type|VO],db_expand_3(Op,GO,OUT).
 
 db_expand_0(Op,(mpred_call(CALL)),(mpred_call(CALLO))):-with_assert_op_override(Op,db_expand_0(Op,CALL,CALLO)).
@@ -222,79 +231,67 @@ db_expand_0(Op,(G:-B),(GG:-BB)):-!,db_expand_0(Op,G,GG),fully_expand_goal(Op,B,B
 db_expand_0(_,Term,CL):- expands_on(isEach,Term),!,findall(O,do_expand_args(isEach,Term,O),L),!,list_to_conjuncts(L,CL).
 
 
-
-
-db_expand_0(Op,pddlSomethingIsa(I,EList),O):- as_list(EList,List),IsaEach=..[isEach|List],db_expand_0(Op,isa(I,IsaEach),O).
-db_expand_0(Op,pddlDescription(I,EList),O):- as_list(EList,List),IsaEach=..[isEach|List],db_expand_0(Op,mudDescription(I,IsaEach),O).
-db_expand_0(Op,pddlObjects(I,EList),O):- as_list(EList,List),IsaEach=..[isEach|List],db_expand_0(Op,isa(IsaEach,I),O).
-db_expand_0(Op,pddlSorts(I,EList),O):- as_list(EList,List),IsaEach=..[isEach|List],db_expand_0(Op,genls(IsaEach,I),O).
-db_expand_0(Op,pddlTypes(EList),O):- as_list(EList,List),IsaEach=..[isEach|List],db_expand_0(Op,isa(IsaEach,tCol),O).
-db_expand_0(Op,pddlPredicates(EList),O):- as_list(EList,List),IsaEach=..[isEach|List],db_expand_0(Op,isa(IsaEach,tPred),O).
+db_expand_0(Op,pddlSomethingIsa(I,EL),O):- listToE(EL,E),db_expand_0(Op,isa(I,E),O).
+db_expand_0(Op,pddlDescription(I,EL),O):- listToE(EL,E),db_expand_0(Op,mudDescription(I,E),O).
+db_expand_0(Op,pddlObjects(I,EL),O):- listToE(EL,E),db_expand_0(Op,isa(E,I),O).
+db_expand_0(Op,pddlSorts(I,EL),O):- listToE(EL,E),db_expand_0(Op,genls(E,I),O).
+db_expand_0(Op,pddlTypes(EL),O):- listToE(EL,E),db_expand_0(Op,isa(E,tCol),O).
+db_expand_0(Op,pddlPredicates(EL),O):- listToE(EL,E),db_expand_0(Op,isa(E,tPred),O).
 
 db_expand_0(Op,EACH,O):- EACH=..[each|List],db_expand_maplist(fully_expand_now(Op),List,T,T,O).
-db_expand_0(Op,DECL,O):-DECL=..[D,F/A|Args],functor_declares_instance(D,TPRED),is_relation_type(TPRED),integer(A),expand_props(Op,props(F,[arity(A),D,TPRED|Args]),O),!.
-db_expand_0(Op,DECL,O):-DECL=..[D,F,A|Args],functor_declares_instance(D,TPRED),is_relation_type(TPRED),integer(A),expand_props(Op,props(F,[arity(A),D,TPRED|Args]),O),!.
-db_expand_0(Op,DECL,O):-DECL=..  [D,C|Args],functor_declares_instance(D,TPRED),is_relation_type(TPRED),compound(C),get_functor(C,F,A),
+db_expand_0(Op,DECL,O):-DECL=..[D,F/A|Args],is_relation_type(TPRED),functor_declares_instance(D,TPRED),integer(A),expand_props(Prefix,Op,props(F,[arity(A),D,TPRED|Args]),O),!.
+db_expand_0(Op,DECL,O):-DECL=..[D,F,A|Args],is_relation_type(TPRED),functor_declares_instance(D,TPRED),integer(A),expand_props(Prefix,Op,props(F,[arity(A),D,TPRED|Args]),O),!.
+db_expand_0(Op,DECL,O):-DECL=..  [D,C|Args],is_relation_type(TPRED),functor_declares_instance(D,TPRED),compound(C),get_functor(C,F,A),
   (\+((arg(_,C,Arg),nonvar(Arg))) -> ArgList = tRelation ; ArgList=meta_argtypes(C)),
-  expand_props(Op,props(F,[TPRED,ArgList,D,arity(A)|Args]),O),!.
+  expand_props(Prefix,Op,props(F,[TPRED,ArgList,D,arity(A)|Args]),O),!.
 
-db_expand_0(Op,DECL,O):-DECL=..[D,F|Args],functor_declares_instance(D,TPRED),atom(F),expand_props(Op,props(F,[D,TPRED|Args]),O),!.
 
-db_expand_0(Op,DECL,O):-DECL=..[D,F,A1|Args],tCol(D),expand_props(Op,props(F,[D,A1|Args]),O),!.
+db_expand_0(Op,DECL,O):-DECL=..[D,F,A1|Args],functor_declares_instance(D,DType),not((arity(D,N),N>1)),expand_props(Prefix,Op,props(F,[DType,D,A1|Args]),O),!.
+db_expand_0(Op,DECL,O):-DECL=..[D,F|Args],functor_declares_instance(D,DType),not((arity(D,N),N>1)),expand_props(Prefix,Op,props(F,[DType,D|Args]),O),!.
 
-/*
-db_expand_0(Op,DECL,O):-DECL=..[D,F/A|Args],is_relation_type(TRelation),ex_argIsa(D,1,TRelation), NEWDECL=..[D,F|Args],  
-  expand_props(Op,(NEWDECL,props(F,[TRelation,arity(A)])),O),!.
-db_expand_0(Op,DECL,O):- DECL=..[D,C|Args],compound(C),is_relation_type(TRelation),ex_argIsa(D,1,TRelation),get_functor(C,F,A),NEWDECL=..[D,F|Args],
-  (compound_all_open(C) -> ArgList = TRelation ; ArgList=meta_argtypes(C)),
-  expand_props(Op,(NEWDECL,props(F,[TRelation,ArgList,arity(A)])),O),!.
-
-% tRegion_template(tLivingRoom,.....).
-db_expand_0(Op,typeProps(C,Props),(isa(I,C)=>OOUT)):- (nonvar(C);nonvar(Props)), expand_props(Op,props(I,Props),OUT),trace,list_to_conjuncts(OUT,OUTC),conjuncts_to_list(OUTC,OUTL),
-   ISEACH=..[isEach|OUTL],
-  db_expand_term(Op,pfc_default(ISEACH),OOUT).
    
-*/
-
-
-% tRegion_template(tLivingRoom,.....).
+%  room_template(iLivingRoom7,.....).
 db_expand_0(Op,ClassTemplate,OUT):- ClassTemplate=..[TypePropsFunctor,Inst|Props],
    functor_declares_instance(TypePropsFunctor,PropsIsa),
    \+ compound_all_open(ClassTemplate),
-   expand_props(Op,props(Inst,[PropsIsa|Props]),OUT),!.
+   pfc_assert(isa(PropsIsa,tCol)),
+   pfc_assert(isa(Inst,PropsIsa)),
+   expand_props(t,Op,props(Inst,[PropsIsa|Props]),OUT),!.
 
-% ttRegionType_template(ttHouseRooms,.....).
+% typeProps(tCrackers,.....).
 db_expand_0(Op,ClassTemplate,OUT):- ClassTemplate=..[TypeTypePropsFunctor,Type|Props],
-   functor_declares_type_genls(TypeTypePropsFunctor,PropsIsa),
+   functor_declares_collection(TypeTypePropsFunctor,PropsIsa),
    \+ compound_all_open(ClassTemplate),
-   expand_props(Op,props(isKappaFn(X,and(isa(X,Type),isa(Type,PropsIsa))),Props),OUT),!.
-
-
-% tRegion_template(tLivingRoom,.....).
-db_expand_0(Op,ClassTemplate,OUT):- ClassTemplate=..[TypePropsFunctor,Type|Props],
-   functor_declares_type(TypePropsFunctor,PropsIsa),
-   trace,\+ compound_all_open(ClassTemplate),
-   pfc_assert(genls(Type,PropsIsa)),
-   expand_props(Op,props(isInstFn(Type),[Type|Props]),OUT),!.
+   pfc_assert(isa(Type,tCol)),
+   pfc_assert(isa(Type,PropsIsa)),
+   expand_props(relationMostInstance,Op,props(Type,Props),OUT),!.
 
 % tRegion_inst_template(X, tLivingRoom,.....).
-db_expand_0(Op,ClassTemplate,OUT):- ClassTemplate=..[FunctorTypePropsIsa,NewInst,Type|Props],
+db_expand_0(Op,ClassTemplate,(isa(NewInst,Type)=>OUT)):- ClassTemplate=..[FunctorTypePropsIsa,NewInst,Type|Props],
   instTypePropsToType(FunctorTypePropsIsa,TypePropsIsa),
    \+ compound_all_open(ClassTemplate),
-  expand_props(Op,props(NewInst,[Type,TypePropsIsa|Props]),OUT),!.
+  expand_props(Op,props(NewInst,Props),OUT),!.
 
+/*
+
+% tRegion_template(tLivingRoom,.....).
+db_expand_0(Op,typeProps(C,Props),(isa(I,C)=>OOUT)):- (nonvar(C);nonvar(Props)), expand_props(Prefix,Op,props(I,Props),OUT),trace,list_to_conjuncts(OUT,OUTC),conjuncts_to_list(OUTC,OUTL),
+   ISEACH=..[isEach|OUTL],
+  db_expand_term(Op,pfc_default(ISEACH),OOUT).
+
+*/
 
 % db_expand_0(Op,C,F/A):-compound_all_open(C),get_functor(C,F,A).
 db_expand_0(Op,ClassTemplate,OUT):- ClassTemplate=..[props,Inst,Second,Third|Props],!,
-   expand_props(Op,props(Inst,[Second,Third|Props]),OUT),!.
+   expand_props(Prefix,Op,props(Inst,[Second,Third|Props]),OUT),!.
 
-
+db_expand_0(Op,IN,OUT):- IN=..[F|Args],F==t,!,must(from_univ(_,Op,Args,OUT)).
 db_expand_0(Op,isa(A,F),OO):-atom(F),O=..[F,A],!,db_expand_a(Op,O,OO).
-db_expand_0(Op,isa(A,F),OO):-nonvar(A),nonvar(F),expand_props(Op,props(A,F),OO).
-db_expand_0(Op,props(A,F),OO):-expand_props(Op,props(A,F),OO).
+db_expand_0(Op,isa(A,F),OO):-nonvar(A),nonvar(F),expand_props(Prefix,Op,props(A,F),OO).
+db_expand_0(Op,props(A,F),OO):-expand_props(Prefix,Op,props(A,F),OO).
 
 db_expand_0(_,arity(F,A),arity(F,A)):-atom(F),!.
-db_expand_0(Op,arity(F,A),O):-expand_props(Op,props(F,arity(A)),O),!.
+db_expand_0(Op,arity(F,A),O):-expand_props(Prefix,Op,props(F,arity(A)),O),!.
 
 db_expand_0(Op,IN,OUT):- IN=..[F|Args],maplist(db_expand_0(Op),Args,ArgsO),map_f(F,FO),OUT=..[FO|ArgsO],!.
 db_expand_0(_ ,HB,HB).
@@ -338,17 +335,20 @@ conjuncts_to_list(Lit,[Lit]).
 
 db_expand_1(_,X,X).
 
+db_expand_2(_,X,X):-!.
 db_expand_2(change(_,_),Sent,SentO):-not_ftVar(Sent),user:ruleRewrite(Sent,SentO),!.
 db_expand_2(_ ,NC,NC):- as_is_term(NC),!.
 db_expand_2(Op,Sent,SentO):-loop_check(expand_term(Sent,SentO)),Sent\=@=SentO,!.
 
 
+db_expand_3(_,A,B):-A=B,!.
 db_expand_3(Op ,Sent,SentO):-db_expand_final(Op ,Sent,SentO),!.
 %db_expand_3(_Op,Sent,SentO):-once(to_predicate_isas(Sent,SentO)).
 db_expand_3(_Op,Sent,SentO):-once(into_mpred_form(Sent,SentO)).
 db_expand_3(_Op,Sent,SentO):-once(transform_holds(t,Sent,SentO)).
 
 
+db_expand_4(_,A,B):-A=B,!.
 db_expand_4(_ ,NC,NC):- as_is_term(NC),!.
 % db_expand_4(_,A,B):-thglobal:pfcManageHybrids,!,A=B.
 db_expand_4(Op,Sent,SentO):-db_quf(Op,Sent,Pretest,Template),(Pretest==true-> SentO = Template ; SentO = (Pretest,Template)),!.
@@ -356,12 +356,12 @@ db_expand_4(Op,Sent,SentO):-db_quf(Op,Sent,Pretest,Template),(Pretest==true-> Se
 
 is_meta_functor(Sent,F,List):-compound(Sent),Sent=..[F|List],(predicate_property(Sent,meta_predicate(_));is_logical_functor(F);F==pfcDefault),!.
 
+db_expand_5(_,A,B):-A=B,!.
 db_expand_5(_Op,Sent,SentO):-once(subst(Sent,user:mpred_prop,isa,SentO)).
 db_expand_5(_Op,Sent,SentO):-once(subst(Sent,mpred_prop,isa,SentO)).
 % db_expand_5(_Op,Sent,SentO):-once(to_predicate_isas(Sent,SentO)).
-db_expand_5(_ ,NC,NC):- as_is_term(NC),!.
 db_expand_5(Op,{Sent},{SentO}):-!, fully_expand_goal(Op,Sent,SentO).
-
+db_expand_5(_ ,NC,NC):- as_is_term(NC),!.
 db_expand_5(_,A,A):-unnumbervars(A,U),A\=@=U.
 db_expand_5(Op,Sent,SentO):-current_predicate(correctArgsIsa/3),arg(2,Sent,Arg),nonvar(Arg),get_functor(Sent,F),asserted_argIsa_known(F,2,_),!,
   correctArgsIsa(Op,Sent,SentO),!.
@@ -369,32 +369,37 @@ db_expand_5(_,A,B):-thglobal:pfcManageHybrids,!,A=B.
 db_expand_5(_,A,B):-A=B.
 
 
-from_univ(Op,[T|MORE],Out):-T==t,!,from_univ(Op,MORE,Out).
-from_univ(Op,[PROP,Obj|MORE],Out):-PROP==props,!,expand_props(Op,props(Obj,MORE),Out).
-from_univ(Op,[PROP|MORE],Out):-atom(PROP),!,Mid=..[PROP|MORE],db_expand_a(Op,Mid,Out).
-from_univ(_,In,Out):-Mid=..[t|In],!,db_expand_a(Op,Mid,Out).
+from_univ(Prefix,Op,[T|MORE],Out):-T==t,!,from_univ(Prefix,Op,MORE,Out).
+from_univ(Prefix,Op,[PROP,Obj|MORE],Out):-PROP==props,!,expand_props(Prefix,Op,props(Obj,MORE),Out).
+from_univ(Prefix,Op,MORE,Out):-atom(Prefix),!,from_univ(_,Op,[Prefix|MORE],Out).
+from_univ(Prefix,Op,[PROP|MORE],Out):-atom(PROP),!,Mid=..[PROP|MORE],db_expand_up(Prefix,Op,Mid,Out).
+from_univ(Prefix,_,In,Out):-Mid=..[t|In],!,db_expand_up(Prefix,Op,Mid,Out).
 
+db_expand_up(Prefix,Op,Mid,OOUT):- db_expand_a(Op,Mid,Out), compound(Prefix),subst(Prefix,value,Out,OOUT).
+db_expand_up(_,Op,Mid,Out):- db_expand_a(Op,Mid,Out).
 
-expand_props(_,Sent,OUT):-not(compound(Sent)),!,OUT=Sent.
-%expand_props(Op,Term,OUT):- stack_check,(var(Op);var(Term)),!,trace_or_throw(var_expand_units(Op,Term,OUT)).
-expand_props(Op,Sent,OUT):-Sent=..[And|C12],is_logical_functor(And),!,maplist(expand_props(Op),C12,O12),OUT=..[And|O12].
-expand_props(Op,props(Obj,Open),props(Obj,Open)):- var(Open),!. % ,trace_or_throw(expand_props(Op,props(Obj,Open))->OUT).
-expand_props(_ ,props(Obj,List),ftID(Obj)):- List==[],!.
-expand_props(Op,props(Obj,[P]),OUT):- nonvar(P),!,expand_props(Op,props(Obj,P),OUT).
-expand_props(Op,props(Obj,[P|ROPS]),OUT):- !,expand_props(Op,props(Obj,P),OUT1),expand_props(Op,props(Obj,ROPS),OUT2),pfc_conjoin(OUT1,OUT2,OUT).
-expand_props(Op,props(Obj,PropVal),OUT):- atom(PropVal),!,from_univ(Op,[PropVal,Obj],OUT).
-expand_props(Op,props(Obj,PropVal),OUT):- safe_univ(PropVal,[Prop,NonVar|Val]),Obj==NonVar,!,from_univ(Op,[Prop,Obj|Val],OUT).
-expand_props(Op,props(Obj,PropVal),OUT):- PropVal=..[Op,Pred|Val],comparitiveOp(Op),
+expand_props(Op,Term,OUT):-expand_props(_,Op,Term,OUT).
+
+expand_props(Prefix,_,Sent,OUT):-not(compound(Sent)),!,OUT=Sent.
+%expand_props(Prefix,Op,Term,OUT):- stack_check,(var(Op);var(Term)),!,trace_or_throw(var_expand_units(Op,Term,OUT)).
+expand_props(Prefix,Op,Sent,OUT):-Sent=..[And|C12],is_logical_functor(And),!,maplist(expand_props(Prefix,Op),C12,O12),OUT=..[And|O12].
+expand_props(Prefix,Op,props(Obj,Open),props(Obj,Open)):- var(Open),!. % ,trace_or_throw(expand_props(Prefix,Op,props(Obj,Open))->OUT).
+expand_props(Prefix,_ ,props(Obj,List),ftID(Obj)):- List==[],!.
+expand_props(Prefix,Op,props(Obj,[P]),OUT):- nonvar(P),!,expand_props(Prefix,Op,props(Obj,P),OUT).
+expand_props(Prefix,Op,props(Obj,[P|ROPS]),OUT):- !,expand_props(Prefix,Op,props(Obj,P),OUT1),expand_props(Prefix,Op,props(Obj,ROPS),OUT2),pfc_conjoin(OUT1,OUT2,OUT).
+expand_props(Prefix,Op,props(Obj,PropVal),OUT):- atom(PropVal),!,from_univ(Prefix,Op,[PropVal,Obj],OUT).
+expand_props(Prefix,Op,props(Obj,PropVal),OUT):- safe_univ(PropVal,[Prop,NonVar|Val]),Obj==NonVar,!,from_univ(Prefix,Op,[Prop,Obj|Val],OUT).
+expand_props(Prefix,Op,props(Obj,PropVal),OUT):- PropVal=..[Op,Pred|Val],comparitiveOp(Op),
    not(comparitiveOp(Pred)),!,OPVAL=..[Op|Val],PropVal2=..[Pred,OPVAL],
     expand_props(Op,props(Obj,PropVal2),OUT),!.
-expand_props(Op,props(Obj,PropVal),OUT):- PropVal=..[Prop|Val],not(infix_op(Prop,_)),!,from_univ(Op,[Prop,Obj|Val],OUT).
-expand_props(Op,props(Obj,PropVal),OUT):- PropVal=..[Prop|Val],!,trace(from_univ(Op,[Prop,Obj|Val],OUT)).
-expand_props(Op,props(Obj,Open),props(Obj,Open)):- var(Obj),!. % ,trace_or_throw(expand_props(Op,props(Obj,Open))->OUT).
+expand_props(Prefix,Op,props(Obj,PropVal),OUT):- PropVal=..[Prop|Val],not(infix_op(Prop,_)),!,from_univ(Prefix,Op,[Prop,Obj|Val],OUT).
+expand_props(Prefix,Op,props(Obj,PropVal),OUT):- PropVal=..[Prop|Val],!,dtrace(from_univ(Prefix,Op,[Prop,Obj|Val],OUT)).
+expand_props(Prefix,Op,props(Obj,Open),props(Obj,Open)):- trace_or_throw(expand_props(Prefix,Op,props(Obj,Open))->OUT).
 
-expand_props(Op,ClassTemplate,OUT):- ClassTemplate=..[props,Inst,Second,Third|Props],!,
-   expand_props(Op,props(Inst,[Second,Third|Props]),OUT),!.
+expand_props(Prefix,Op,ClassTemplate,OUT):- ClassTemplate=..[props,Inst,Second,Third|Props],!,
+   expand_props(Prefix,Op,props(Inst,[Second,Third|Props]),OUT),!.
 
-expand_props(_,Sent,Sent).
+expand_props(Prefix,_,Sent,Sent).
 
 
 :-export(conjoin_op/3).

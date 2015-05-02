@@ -16,6 +16,7 @@
 :- multifile(user:goal_expansion/2).
 
 
+
 :- dynamic(new_was_isa/0).
 :- multifile(new_was_isa/0).
 
@@ -137,6 +138,10 @@
 :- discontiguous(user:'$was_imported_kb_content$'/2).
 
 :- user:ensure_loaded(library(logicmoo/util/logicmoo_util_all)).
+
+:-foreach(arg(_,isEach(prologMultiValued,prologOrdered,prologNegByFailure,meta_argtypes,prologPTTP,
+ prologHybrid,predCanHaveSingletons,prologOnly,tCol,prologMacroHead,prologListValued,prologSingleValued,functorDeclares),P),
+   ((dynamic(P/1),multifile(P/1)))).
 
 :- multifile user:listing_mpred_hook/1.
 :- dynamic user:listing_mpred_hook/1.
@@ -261,7 +266,7 @@
 :- thread_local thlocal:with_callMPred/1.
 :- thread_local thlocal:assert_op_override/1.
 
-:- dynamic(thglobal:use_cyc_database/0).
+:- dynamic_multifile_exported(thglobal:use_cyc_database/0).
 :- thread_local(thlocal:agenda_slow_op_do_prereqs/0).
 :- thread_local(thlocal:already_in_file_term_expansion/0).
 :- thread_local(thlocal:assert_op_override/1).
@@ -280,15 +285,15 @@
 :- thread_local(thlocal:noDBaseMODs/1).
 :- thread_local(thlocal:pfc_loads_file/0).
 :- thread_local(thlocal:with_callMPred/1).
-:- dynamic(user:isa_pred_now_locked/0).
-:- dynamic(pfc_manages_unknowns/0).
+:- dynamic_multifile_exported(user:isa_pred_now_locked/0).
+:- dynamic_multifile_exported(user:pfc_manages_unknowns/0).
 
-:- dynamic(props/2).
-:- multifile(props/2).
+:- dynamic_multifile_exported(user:props/2).
+:- dynamic_multifile_exported(user:props/2).
 
 
-:- thread_local user:repl_to_string/2.
-:- thread_local user:repl_writer/2.
+:- thread_local repl_to_string/2.
+:- thread_local repl_writer/2.
 
 
 

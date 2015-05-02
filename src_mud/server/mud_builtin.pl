@@ -43,8 +43,9 @@ tCol(tRelation).
 tCol(ttFormatted).
 tCol(ttSpatialType).
 tCol(ttTypeType).
-tCol(tPathway).
 
+
+=> neg(arity(pathConnects,1)).
 
 %user:ruleRewrite(isa(isInstFn(Sub),Super),genls(Sub,Super)):-ground(Sub:Super),!.
 user:ruleRewrite(mudLabelTypeProps(Lbl,T,[]),typeHasGlyph(T,Lbl)):-nonvar(T),!.
@@ -586,11 +587,10 @@ completelyAssertedCollection(tCarryAble).
 completelyAssertedCollection(vtVerb).
 genls(ttTypeByAction,completelyAssertedCollection).
 
+arity(pathConnects,2).
 
 pathConnects(R1,R2):-pathBetween(R1,Dir,R2),nop(Dir).
 pathConnects(R1,R2):-pathBetween(R2,Dir,R1),nop(Dir).
-
-
 
 
 
