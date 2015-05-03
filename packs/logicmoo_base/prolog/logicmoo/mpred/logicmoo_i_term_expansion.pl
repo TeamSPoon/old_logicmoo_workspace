@@ -129,23 +129,24 @@ is_relation_type(tFunction).
 is_relation_type(tPred).
 is_relation_type(P):-is_pred_declarer(P).
 
-functor_declares_instance(decl_mpred,tPred).
-functor_declares_instance(decl_mpred_hybrid,prologHybrid).
-functor_declares_instance(decl_mpred_prolog,prologOnly).
+functor_declares_instance(F,C):-functor_declares_instance_0(F,C0),!,C=C0.
+functor_declares_instance_0(decl_mpred,tPred).
+functor_declares_instance_0(decl_mpred_hybrid,prologHybrid).
+functor_declares_instance_0(decl_mpred_prolog,prologOnly).
 
-functor_declares_instance(prologSideEffects,tPred).
-functor_declares_instance(tPred,tPred).
-functor_declares_instance(meta_argtypes,tRelation).
-functor_declares_instance(prologMacroHead,tRelation).
-functor_declares_instance(tFunction,tFunction).
-functor_declares_instance(P,tPred):- arg(_,s(tPred,prologMultiValued,mpred_prop,user:mpred_prop,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,
+functor_declares_instance_0(prologSideEffects,tPred).
+functor_declares_instance_0(tPred,tPred).
+functor_declares_instance_0(meta_argtypes,tRelation).
+functor_declares_instance_0(prologMacroHead,tRelation).
+functor_declares_instance_0(tFunction,tFunction).
+functor_declares_instance_0(P,tPred):- arg(_,s(tPred,prologMultiValued,mpred_prop,user:mpred_prop,prologOrdered,prologNegByFailure,prologHybrid,prologPTTP,
        predCanHaveSingletons,prologOnly,prologMacroHead,prologListValued,prologSingleValued),P).
 
-functor_declares_instance(P,tCol):- arg(_,s(tCol,tSpec,ttFormatType),P).
-%functor_declares_instance(P,tPred):-isa_asserted(P,ttPredType),!.
-%functor_declares_instance(P,tCol):-isa_asserted(P,functorDeclares),\+functor_declares_instance(P,tPred).
+functor_declares_instance_0(P,tCol):- arg(_,s(tCol,tSpec,ttFormatType),P).
+%functor_declares_instance_0(P,tPred):-isa_asserted(P,ttPredType),!.
+%functor_declares_instance_0(P,tCol):-isa_asserted(P,functorDeclares),\+functor_declares_instance_0(P,tPred).
 
-functor_declares_instance(P,P):-functorDeclares(P). % arity(P,1),\+((arity(P,N),N>1)).
+functor_declares_instance_0(P,P):-functorDeclares(P). % arity(P,1),\+((arity(P,N),N>1)).
 
 functor_declares_collectiontype(typeProps,ttTemporalType).
 
@@ -323,9 +324,9 @@ db_expand_0(Op,pddlTypes(EL),O):- listToE(EL,E),db_expand_0(Op,isa(E,tCol),O).
 db_expand_0(Op,pddlPredicates(EL),O):- listToE(EL,E),db_expand_0(Op,isa(E,tPred),O).
 
 db_expand_0(Op,EACH,O):- EACH=..[each|List],db_expand_maplist(fully_expand_now(Op),List,T,T,O).
-db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..[D,F/A|Args],is_relation_type(TPRED),functor_declares_instance(D,TPRED),integer(A),expand_props(Prefix,Op,props(F,[D,TPRED|Args]),O),!.
-db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..[D,F,A|Args],is_relation_type(TPRED),functor_declares_instance(D,TPRED),integer(A),expand_props(Prefix,Op,props(F,[D,TPRED|Args]),O),!.
-db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..  [D,C|Args],is_relation_type(TPRED),functor_declares_instance(D,TPRED),compound(C),get_functor(C,F,A),  
+db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..[D,F/A|Args],integer(A),functor_declares_instance(D,TPRED),is_relation_type(TPRED),expand_props(Prefix,Op,props(F,[D,TPRED|Args]),O),!.
+db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..[D,F,A|Args],integer(A),functor_declares_instance(D,TPRED),is_relation_type(TPRED),expand_props(Prefix,Op,props(F,[D,TPRED|Args]),O),!.
+db_expand_0(Op,DECL,(arity(F,A),O)):-DECL=..  [D,C|Args],compound(C),functor_declares_instance(D,TPRED),get_functor(C,F,A),  
   expand_props(Prefix,Op,props(F,[D,TPRED|Args]),M),!,
   (\+((arg(_,C,Arg),var(Arg))) -> O = (meta_argtypes(C),M) ; (O= (M))).
 

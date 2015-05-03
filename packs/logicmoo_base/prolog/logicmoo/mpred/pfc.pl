@@ -578,12 +578,17 @@ pfc_run0.
 
 
 pfc_run_queued:- repeat,sleep(1.0),pfc_run,fail.
-
 :-thread_property(X,alias(pfc_running_queue))-> true ; thread_create(pfc_run_queued,_,[alias(pfc_running_queue)]).
 
-pfc_one_second_timer:- repeat,sleep(1.0),pfc_one_second_timer,fail.
-
+:-dynamic(pfc_one_second_timer_tick/0).
+pfc_one_second_timer:- repeat,sleep(1.0),pfc_one_second_timer_tick,fail.
 :-thread_property(X,alias(pfc_one_second_timer))-> true ; thread_create(pfc_one_second_timer,_,[alias(pfc_one_second_timer)]).
+
+
+:-dynamic(pfc_one_minute_timer_tick/0).
+pfc_one_minute_timer:- repeat,sleep(60.0),pfc_one_minute_timer_tick,fail.
+:-thread_property(X,alias(pfc_one_minute_timer))-> true ; thread_create(pfc_one_minute_timer,_,[alias(pfc_one_minute_timer)]).
+
 
 
 % pfc_step removes one entry from the pfc_queue and reasons from it.
@@ -657,7 +662,7 @@ pfc_add_trigger(pt(Trigger,Body),Support) :-
   pfc_trace_msg('~N%       Adding p-trigger ~q~n',
 		[pt(Trigger,Body)]),
   pfc_assert_i(pt(Trigger,Body),Support),   
-   pfc_mark_as(Support,p,Trigger,pfcPosTrigger),
+  must(pfc_mark_as(Support,p,Trigger,pfcPosTrigger)),
   copy_term(pt(Trigger,Body),Tcopy),
   call_u(Trigger),
   pfc_eval_lhs(Body,(Trigger,Tcopy)),
@@ -678,8 +683,7 @@ pfc_add_trigger(nt(Trigger,Test,Body),Support) :-
 pfc_add_trigger(bt(Trigger,Body),Support) :-
   !,
    must(pfc_assert_i(bt(Trigger,Body),Support)),
-   pfc_trace_msg('~N%       Adding b-trigger ~q~n',   [pt(Trigger,Body)]),  
-   wdmsg('~N%       Adding b-trigger ~q~n',   [pt(Trigger,Body)]),  
+   pfc_trace_msg('~N%       Adding b-trigger ~q~n',   [bt(Trigger,Body)]),  
    assertz_if_new((Trigger:-pfc_bc_only(Trigger))),
    must(pfc_mark_as(Support,b,Trigger,pfcBcTrigger)),
   % WAS pfc_bt_pt_combine(Trigger,Body).
@@ -1405,7 +1409,9 @@ pfc_mark_as(Sup,_PosNeg,-(P),Type):-pfc_mark_as(Sup,neg,P,Type).
 pfc_mark_as(Sup,_PosNeg,~(P),Type):-pfc_mark_as(Sup,neg,P,Type).
 pfc_mark_as(Sup,PosNeg,P,Type):-get_functor(P,F,A),pfc_mark_fa_as(Sup,PosNeg,P,F,A,Type).
 
-pfc_mark_fa_as(_Sup,_PosNeg,_P,F,A,_):- arity(F,A),!.
+:- dynamic( pfcMark/4).
+
+pfc_mark_fa_as(_Sup,_PosNeg,_P,F,A,Type):- pfcMark(Type,_,F,A),!.
 pfc_mark_fa_as(_Sup,_PosNeg,_P,isa,_,_):- !.
 pfc_mark_fa_as(_Sup,_PosNeg,_P,t,_,_):- !.
 pfc_mark_fa_as(_Sup,_PosNeg,_P,argIsa,N,_):- !,must(N=3).
@@ -1415,6 +1421,12 @@ pfc_mark_fa_as(_Sup,_PosNeg,_P,mpred_prop,N,_):- must(N=2).
 pfc_mark_fa_as(_Sup,_PosNeg,_P,_:mpred_prop,N,_):- must(N=2).
 pfc_mark_fa_as(Sup,PosNeg,_P,F,A,Type):- pfc_assert_fast_i(pfcMark(Type,PosNeg,F,A),(s(Sup),g)).
 
+
+pfc_one_minute_timer_tick:-once(pfc_cleanup),fail.
+
+pfc_cleanup:- forall((no_repeats(F-A,(pfcMark(pfcRHS,_,F,A),A>1))),pfc_cleanup(F,A)).
+
+pfc_cleanup(F,A):-functor(P,F,A),predicate_property(P,dynamic)->(findall(P-B-Ref,clause(P,B,Ref),L),forall(member(P-B-Ref,L),(erase(Ref),assertz_if_new((P:-B)))));true.
 
 :-debug.
 %isInstFn(A):-!,trace_or_throw(isInstFn(A)).

@@ -727,6 +727,8 @@ typeProps(tCrackers,[mudColor(vTan),isa(tBread),mudShape(isEach(vCircular,vFlat)
 
 user:action_info(C,_)=>vtActionTemplate(C).
 
+argsQuoted(cachedPredicate).
+
 cachedPredicate(Goal)=>{forall(Goal,pfc_add(Goal))}.
 
 tCol(cachedPredicate).

@@ -44,8 +44,8 @@ rescan_mpred_loaded_pass2:- ignore((thglobal:after_mpred_load, loop_check(call_a
 % Agenda system - standard database
 % ================================================
 
-% agenda_do_prequery:-!.
-agenda_do_prequery:- loop_check(agenda_rescan_mpred_ops,true).
+agenda_do_prequery:-!.
+agenda_do_prequery:- loop_check(agenda_rescan_mpred_ops,true),!.
 :-'$hide'(agenda_rescan_mpred_ops/0).
 :-'$hide'(agenda_do_prequery/0).
 %:- rescan_missing_stubs.
@@ -61,7 +61,7 @@ agenda_slow_op_restart:- loop_check(forall(user:agenda_slow_op_todo(Slow),(must(
 
 :-export(agenda_rescan_mpred_ops/0).
 agenda_rescan_mpred_ops:- test_tl(agenda_suspend_scans),!.
-agenda_rescan_mpred_ops:- agenda_rescan_for_module_ready.
+agenda_rescan_mpred_ops:- agenda_rescan_for_module_ready,!.
 
 :-thread_local thlocal:in_agenda_rescan_for_module_ready/0.
 agenda_rescan_for_module_ready:- thlocal:in_agenda_rescan_for_module_ready,!.

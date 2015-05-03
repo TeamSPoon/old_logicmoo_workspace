@@ -109,7 +109,16 @@ cmdLook_proc_0(Agent,LOC):-
          mudHeightOnObj(Agent,value),
          mudLastCmdSuccess=wasSuccess(Agent,value)
        ]),
-    show_inventory(Agent,Agent),!.
+    must(show_inventory(Agent,Agent)),!.
+
+
+
+cmdLookTest(Agent,LOC):-current_agent(Agent),mudAtLoc(Agent,LOC),
+     show_kb_preds(Agent,LOC,
+         [
+         mudAtLoc(Agent,value),
+         nameStringsList(vHere,value)]),!.
+
 
 :-export(nameStringsList/2).
 
